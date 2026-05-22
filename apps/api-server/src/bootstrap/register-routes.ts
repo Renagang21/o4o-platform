@@ -35,6 +35,8 @@ import forumRoutes from '../routes/forum/forum.routes.js';
 import notificationsRoutes from '../routes/notifications.routes.js';
 // WO-O4O-SURVEY-CORE-PHASE1-V1: O4O 공통 Survey (Participation Engine)
 import surveyRoutes from '../modules/survey/routes/survey.routes.js';
+// WO-O4O-APPRECIATION-POINT-LIKE-SYSTEM-PHASE1-V1
+import appreciationRoutes from '../modules/appreciation/routes/appreciation.routes.js';
 import settingsRoutes from '../routes/settingsRoutes.js';
 import adminAppsRoutes from '../routes/admin/apps.routes.js';
 import adminUsersRoutes from '../routes/admin/users.routes.js';
@@ -162,6 +164,8 @@ export async function registerCoreRoutes(app: Application): Promise<void> {
   app.use('/api/v1/notifications', notificationsRoutes);
   // WO-O4O-SURVEY-CORE-PHASE1-V1: 공통 설문 도메인
   app.use('/api/v1/surveys', surveyRoutes);
+  // WO-O4O-APPRECIATION-POINT-LIKE-SYSTEM-PHASE1-V1: 기여 감사 포인트
+  app.use('/api/v1/appreciation', appreciationRoutes);
   app.use('/api/v1/settings', settingsRoutes);
   app.use('/api/v1/admin/apps', adminAppsRoutes);
   app.use('/api/v1/admin/users', adminUsersRoutes);

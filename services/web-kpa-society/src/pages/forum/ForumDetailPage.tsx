@@ -10,6 +10,7 @@ import { PageHeader, LoadingSpinner, Card } from '../../components/common';
 import { PageSection, PageContainer } from '@o4o/ui';
 import { ClosedForumAccessBlocker } from '../../components/forum/ClosedForumAccessBlocker';
 import { forumApi } from '../../api';
+import { appreciationApi } from '../../api/appreciation';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 import type { ForumPost, ForumComment } from '../../types';
@@ -29,6 +30,12 @@ export function ForumDetailPage() {
   const [isLiked, setIsLiked] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
   const [isForumOwner, setIsForumOwner] = useState(false);
+  // WO-O4O-APPRECIATION-POINT-LIKE-SYSTEM-PHASE1-V1
+  const [showAppreciation, setShowAppreciation] = useState(false);
+  const [appreciationAmount, setAppreciationAmount] = useState<number | ''>('');
+  const [appreciationMsg, setAppreciationMsg] = useState('');
+  const [isSendingAppreciation, setIsSendingAppreciation] = useState(false);
+  const [appreciationSummary, setAppreciationSummary] = useState<{ totalAmount: number; count: number } | null>(null);
   const [isPinning, setIsPinning] = useState(false);
   // WO-O4O-KPA-CLOSED-FORUM-FRONTEND-ACCESS-UX-V1
   const [closedForumId, setClosedForumId] = useState<string | null>(null);
@@ -51,6 +58,13 @@ export function ForumDetailPage() {
       setComments(commentsRes.data);
       // WO-FORUM-LIKE-SYSTEM-V1: initialize isLiked from server response
       setIsLiked(!!(postRes.data as any)?.isLiked);
+      // WO-O4O-APPRECIATION-POINT-LIKE-SYSTEM-PHASE1-V1: 감사 집계 로드
+      try {
+        const sumRes = await appreciationApi.getSummary('forum_post', id!);
+        setAppreciationSummary(sumRes.data);
+      } catch {
+        // non-critical
+      }
 
       // Check if current user is the forum owner
       // WO-O4O-FORUM-CATEGORY-CLEANUP-V1: use forumId (forum_category_requests)
@@ -94,6 +108,37 @@ export function ForumDetailPage() {
       }
     } finally {
       setIsLiking(false);
+    }
+  };
+
+  // WO-O4O-APPRECIATION-POINT-LIKE-SYSTEM-PHASE1-V1
+  const handleSendAppreciation = async () => {
+    if (!post || !user || isSendingAppreciation) return;
+    const amt = Number(appreciationAmount);
+    if (!amt || amt < 1) { toast.error('금액은 1P 이상이어야 합니다'); return; }
+    try {
+      setIsSendingAppreciation(true);
+      await appreciationApi.send({
+        targetType: 'forum_post',
+        targetId: post.id,
+        amount: amt,
+        message: appreciationMsg.trim() || undefined,
+      });
+      toast.success(`${amt}P 감사 포인트를 전달했습니다 🎁`);
+      setShowAppreciation(false);
+      setAppreciationAmount('');
+      setAppreciationMsg('');
+      // 집계 갱신
+      const sumRes = await appreciationApi.getSummary('forum_post', post.id);
+      setAppreciationSummary(sumRes.data);
+    } catch (err: any) {
+      const msg = err?.message || '';
+      if (msg.includes('INSUFFICIENT_BALANCE') || msg.includes('부족')) toast.error('포인트가 부족합니다');
+      else if (msg.includes('SELF')) toast.error('자신의 게시글에는 감사 포인트를 보낼 수 없습니다');
+      else if (msg.includes('INVALID')) toast.error('금액은 1P 이상이어야 합니다');
+      else toast.error('감사 포인트 전송에 실패했습니다');
+    } finally {
+      setIsSendingAppreciation(false);
     }
   };
 
@@ -241,6 +286,19 @@ export function ForumDetailPage() {
             {isLiked ? '❤️' : '🤍'} 좋아요{post.likeCount > 0 ? ` ${post.likeCount}` : ''}
           </button>
 
+          {/* WO-O4O-APPRECIATION-POINT-LIKE-SYSTEM-PHASE1-V1 */}
+          {user && (
+            <button
+              style={styles.appreciationButton}
+              onClick={() => setShowAppreciation(true)}
+            >
+              🎁 감사하기{appreciationSummary && appreciationSummary.totalAmount > 0 ? ` ${appreciationSummary.totalAmount.toLocaleString()}P` : ''}
+            </button>
+          )}
+          {!user && appreciationSummary && appreciationSummary.totalAmount > 0 && (
+            <span style={styles.appreciationCount}>🎁 {appreciationSummary.totalAmount.toLocaleString()}P</span>
+          )}
+
           <div style={styles.authorActions}>
             {isForumOwner && (
               post.isPinned ? (
@@ -274,6 +332,62 @@ export function ForumDetailPage() {
           </div>
         </div>
       </Card>
+
+      {/* WO-O4O-APPRECIATION-POINT-LIKE-SYSTEM-PHASE1-V1: 감사 포인트 모달 */}
+      {showAppreciation && (
+        <div style={styles.appreciationOverlay} onClick={() => setShowAppreciation(false)}>
+          <div style={styles.appreciationModal} onClick={e => e.stopPropagation()}>
+            <h3 style={styles.appreciationModalTitle}>🎁 감사 포인트 보내기</h3>
+            <p style={styles.appreciationModalDesc}>
+              작성자에게 감사의 마음을 포인트로 전달할 수 있습니다.
+            </p>
+            <div style={styles.appreciationPresets}>
+              {[10, 30, 50].map(p => (
+                <button
+                  key={p}
+                  style={{
+                    ...styles.presetButton,
+                    ...(appreciationAmount === p ? styles.presetButtonActive : {}),
+                  }}
+                  onClick={() => setAppreciationAmount(p)}
+                >
+                  {p}P
+                </button>
+              ))}
+            </div>
+            <input
+              type="number"
+              min={1}
+              style={styles.appreciationInput}
+              placeholder="직접 입력 (1P 이상)"
+              value={appreciationAmount}
+              onChange={e => setAppreciationAmount(e.target.value === '' ? '' : Number(e.target.value))}
+            />
+            <textarea
+              style={styles.appreciationTextarea}
+              placeholder="감사 메시지 (선택)"
+              rows={3}
+              value={appreciationMsg}
+              onChange={e => setAppreciationMsg(e.target.value)}
+            />
+            <div style={styles.appreciationModalActions}>
+              <button
+                style={styles.appreciationCancelButton}
+                onClick={() => { setShowAppreciation(false); setAppreciationAmount(''); setAppreciationMsg(''); }}
+              >
+                취소
+              </button>
+              <button
+                style={styles.appreciationSendButton}
+                onClick={handleSendAppreciation}
+                disabled={isSendingAppreciation || !appreciationAmount}
+              >
+                {isSendingAppreciation ? '전송 중...' : `${appreciationAmount || 0}P 보내기`}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 댓글 섹션 */}
       <div style={styles.commentsSection}>
@@ -581,6 +695,114 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 500,
     border: `1px solid ${colors.neutral300}`,
     transition: 'all 0.2s',
+  },
+  // WO-O4O-APPRECIATION-POINT-LIKE-SYSTEM-PHASE1-V1
+  appreciationButton: {
+    padding: '10px 20px',
+    backgroundColor: '#fffbeb',
+    border: '1px solid #fde68a',
+    borderRadius: '24px',
+    fontSize: '14px',
+    cursor: 'pointer',
+    color: '#92400e',
+    transition: 'all 0.2s',
+  },
+  appreciationCount: {
+    fontSize: '14px',
+    color: '#92400e',
+    padding: '10px 12px',
+  },
+  appreciationOverlay: {
+    position: 'fixed' as const,
+    inset: 0,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1000,
+  },
+  appreciationModal: {
+    backgroundColor: '#fff',
+    borderRadius: '12px',
+    padding: '28px 24px',
+    width: '360px',
+    maxWidth: '90vw',
+    boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
+  },
+  appreciationModalTitle: {
+    margin: '0 0 8px',
+    fontSize: '18px',
+    fontWeight: 600,
+    color: '#1f2937',
+  },
+  appreciationModalDesc: {
+    margin: '0 0 20px',
+    fontSize: '14px',
+    color: '#6b7280',
+  },
+  appreciationPresets: {
+    display: 'flex',
+    gap: '8px',
+    marginBottom: '12px',
+  },
+  presetButton: {
+    flex: 1,
+    padding: '10px 0',
+    border: '1px solid #e5e7eb',
+    borderRadius: '8px',
+    fontSize: '14px',
+    fontWeight: 500,
+    cursor: 'pointer',
+    backgroundColor: '#f9fafb',
+    color: '#374151',
+  },
+  presetButtonActive: {
+    border: '1px solid #f59e0b',
+    backgroundColor: '#fffbeb',
+    color: '#92400e',
+  },
+  appreciationInput: {
+    width: '100%',
+    padding: '10px 12px',
+    border: '1px solid #e5e7eb',
+    borderRadius: '8px',
+    fontSize: '14px',
+    marginBottom: '12px',
+    boxSizing: 'border-box' as const,
+  },
+  appreciationTextarea: {
+    width: '100%',
+    padding: '10px 12px',
+    border: '1px solid #e5e7eb',
+    borderRadius: '8px',
+    fontSize: '14px',
+    resize: 'vertical' as const,
+    marginBottom: '20px',
+    boxSizing: 'border-box' as const,
+  },
+  appreciationModalActions: {
+    display: 'flex',
+    gap: '8px',
+    justifyContent: 'flex-end',
+  },
+  appreciationCancelButton: {
+    padding: '10px 20px',
+    backgroundColor: '#f3f4f6',
+    color: '#374151',
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '14px',
+    cursor: 'pointer',
+  },
+  appreciationSendButton: {
+    padding: '10px 20px',
+    backgroundColor: '#f59e0b',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '14px',
+    fontWeight: 600,
+    cursor: 'pointer',
   },
   // WO-O4O-KPA-CLOSED-FORUM-FRONTEND-ACCESS-UX-V1: generic error fallback
   accessDenied: {

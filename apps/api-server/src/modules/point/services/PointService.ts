@@ -56,7 +56,9 @@ export type PointSourceType =
   | 'admin_grant'
   | 'admin_spend'
   | 'admin_adjust'
-  | 'survey_complete'  // WO-O4O-SURVEY-POINT-REWARD-PHASE1-V1
+  | 'survey_complete'       // WO-O4O-SURVEY-POINT-REWARD-PHASE1-V1
+  | 'appreciation_send'     // WO-O4O-APPRECIATION-POINT-LIKE-SYSTEM-PHASE1-V1: 보내는 쪽 (SPEND)
+  | 'appreciation_receive'  // WO-O4O-APPRECIATION-POINT-LIKE-SYSTEM-PHASE1-V1: 받는 쪽 (EARN)
   | PointPayoutType;
 
 export interface GrantPointParams {

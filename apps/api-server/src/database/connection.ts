@@ -439,6 +439,9 @@ import { CourseCompletion } from '../modules/lms/entities/CourseCompletion.js';
 // ============================================================================
 import { CreditBalance } from '../modules/credit/entities/CreditBalance.js';
 import { CreditTransaction } from '../modules/credit/entities/CreditTransaction.js';
+// APPRECIATION ENTITIES (WO-O4O-APPRECIATION-POINT-LIKE-SYSTEM-PHASE1-V1)
+// ============================================================================
+import { AppreciationSend } from '../modules/appreciation/entities/AppreciationSend.js';
 
 // POINT BUDGET ENTITIES (WO-O4O-SERVICE-OPERATOR-POINT-BUDGET-PHASE1-V1)
 // ============================================================================
@@ -879,6 +882,10 @@ export const AppDataSource = new DataSource({
     // ============================================================================
     CreditBalance,
     CreditTransaction,
+    // ============================================================================
+    // APPRECIATION ENTITIES (WO-O4O-APPRECIATION-POINT-LIKE-SYSTEM-PHASE1-V1)
+    // ============================================================================
+    AppreciationSend,
     // ============================================================================
     // POINT BUDGET ENTITIES (WO-O4O-SERVICE-OPERATOR-POINT-BUDGET-PHASE1-V1)
     // ============================================================================
