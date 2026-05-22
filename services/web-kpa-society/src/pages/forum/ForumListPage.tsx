@@ -15,7 +15,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Link2, Trash2, Sparkles, Tag } from 'lucide-react';
+import { Link2, Trash2, Sparkles, Tag, AlertCircle, RefreshCw } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { BaseTable, ActionBar, RowActionMenu, PageSection, PageContainer, Card, type O4OColumn, type ActionBarAction, type RowActionItem } from '@o4o/ui';
 import { PageHeader } from '../../components/common';
@@ -54,6 +54,7 @@ export function ForumListPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [popularTags, setPopularTags] = useState<{ tag: string; count: number }[]>([]);
 
@@ -69,17 +70,30 @@ export function ForumListPage() {
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
+      setError(null);
 
       const postsRes = await forumApi.getPosts({
         page: currentPage,
         limit: PAGE_SIZE,
         search: searchQuery || undefined,
         tag: activeTag || undefined,
-      });
-      setPosts(postsRes.data || []);
-      setTotalPages(postsRes.totalPages || 1);
-      setTotalCount(postsRes.total || postsRes.data?.length || 0);
-    } catch {
+      }) as any;
+
+      // WO-O4O-KPA-FORUM-ERROR-MASKING-REMOVAL-AND-POST-VISIBILITY-FIX-V1:
+      // Backend는 top-level total/page/totalPages + pagination 객체 둘 다 반환.
+      // top-level 우선, fallback으로 pagination 객체 읽기.
+      const data: ForumPost[] = postsRes.data ?? [];
+      const total: number = postsRes.total ?? postsRes.totalCount ?? data.length;
+      const pages: number = postsRes.totalPages ?? postsRes.pagination?.totalPages ?? 1;
+
+      setPosts(data);
+      setTotalPages(pages);
+      setTotalCount(total);
+    } catch (e: any) {
+      // WO-O4O-KPA-FORUM-ERROR-MASKING-REMOVAL-AND-POST-VISIBILITY-FIX-V1:
+      // 에러를 조용히 빈 배열로 숨기지 않음 — 사용자에게 원인 표시
+      const msg = e?.message ?? '게시글을 불러오는 중 오류가 발생했습니다';
+      setError(msg);
       setPosts([]);
       setTotalPages(1);
       setTotalCount(0);
@@ -361,6 +375,21 @@ export function ForumListPage() {
         description="회원들과 자유롭게 의견을 나눠보세요"
         breadcrumb={[{ label: '홈', href: '/' }, { label: '포럼', href: '/forum' }, { label: '전체 글' }]}
       />
+
+      {/* WO-O4O-KPA-FORUM-ERROR-MASKING-REMOVAL-AND-POST-VISIBILITY-FIX-V1: 에러 표시 */}
+      {error && (
+        <div className="flex items-center gap-3 px-4 py-3 mb-4 rounded-lg bg-red-50 border border-red-200 text-red-700">
+          <AlertCircle size={16} className="shrink-0" />
+          <span className="text-sm flex-1">{error}</span>
+          <button
+            onClick={loadData}
+            className="flex items-center gap-1 text-xs text-red-600 hover:text-red-800 bg-transparent border-none cursor-pointer"
+          >
+            <RefreshCw size={12} />
+            다시 시도
+          </button>
+        </div>
+      )}
 
       {/* Popular Tags Bar */}
       {popularTags.length > 0 && (

@@ -121,23 +121,28 @@ export class ForumPostController extends ForumControllerBase {
       // Flatten author/category into expected flat fields for frontend contract
       const mappedPosts = posts.map((p) => this.flattenPostFields(p));
 
+      const totalPages = Math.ceil(totalCount / limit);
+
+      // WO-O4O-KPA-FORUM-ERROR-MASKING-REMOVAL-AND-POST-VISIBILITY-FIX-V1:
+      // top-level total/page/limit/totalPages = PaginatedResponse 계약과 정합
       res.json({
         success: true,
         data: mappedPosts,
-        pagination: {
-          page,
-          limit,
-          totalPages: Math.ceil(totalCount / limit),
-        },
+        total: totalCount,
+        page,
+        limit,
+        totalPages,
+        pagination: { page, limit, totalPages },
         totalCount,
       });
     } catch (error: any) {
-      logger.warn('Error listing forum posts (returning empty):', error.message);
-      res.json({
-        success: true,
-        data: [],
-        pagination: { page: 1, limit: 20, totalPages: 0 },
-        totalCount: 0,
+      // WO-O4O-KPA-FORUM-ERROR-MASKING-REMOVAL-AND-POST-VISIBILITY-FIX-V1:
+      // 에러를 빈 배열로 은닉하지 않음 — 실제 오류를 500으로 전달
+      logger.error('Error listing forum posts:', { message: error.message, stack: error.stack });
+      res.status(500).json({
+        success: false,
+        error: 'Failed to load forum posts',
+        code: 'FORUM_POSTS_LOAD_ERROR',
       });
     }
   }
@@ -440,8 +445,6 @@ export class ForumPostController extends ForumControllerBase {
       }
 
       // Only decrement postCount if post was previously published
-      const wasPuslished = post.status === PostStatus.PUBLISHED;
-
       // Archive instead of hard delete
       post.status = PostStatus.ARCHIVED;
       await this.postRepository.save(post);
