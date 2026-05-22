@@ -57,6 +57,10 @@ const PartnerInfoPage = lazy(() => import('@/pages/PartnerInfoPage'));
 const MyPageHub = lazy(() => import('@/pages/mypage/MyPageHub'));
 const MyProfilePage = lazy(() => import('@/pages/mypage/MyProfilePage'));
 const MySettingsPage = lazy(() => import('@/pages/mypage/MySettingsPage'));
+// MyPage LMS (WO-O4O-KCOS-LMS-MYPAGE-CANONICAL-ALIGNMENT-V1)
+const MyCreditsPage = lazy(() => import('@/pages/mypage/MyCreditsPage'));
+const MyEnrollmentsPage = lazy(() => import('@/pages/mypage/MyEnrollmentsPage'));
+const MyCertificatesPage = lazy(() => import('@/pages/mypage/MyCertificatesPage'));
 
 // Partner Application (WO-PARTNER-APPLICATION-V1)
 const PartnerApplyPage = lazy(() => import('@/pages/partners/ApplyPage'));
@@ -345,6 +349,31 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <MySettingsPage />
+            </ProtectedRoute>
+          }
+        />
+        {/* MyPage LMS (WO-O4O-KCOS-LMS-MYPAGE-CANONICAL-ALIGNMENT-V1) */}
+        <Route
+          path="mypage/credits"
+          element={
+            <ProtectedRoute>
+              <MyCreditsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="mypage/enrollments"
+          element={
+            <ProtectedRoute>
+              <MyEnrollmentsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="mypage/certificates"
+          element={
+            <ProtectedRoute>
+              <MyCertificatesPage />
             </ProtectedRoute>
           }
         />

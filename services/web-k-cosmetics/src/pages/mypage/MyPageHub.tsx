@@ -6,7 +6,7 @@
 
 import { Link } from 'react-router-dom';
 import { useAuth, ROLE_LABELS, getKCosmeticsDashboardRoute } from '@/contexts/AuthContext';
-import { Mail, Phone, Shield, UserCog, Settings, ChevronRight } from 'lucide-react';
+import { Mail, Phone, Shield, UserCog, Settings, ChevronRight, BookOpen, Award, Coins } from 'lucide-react';
 import { MyPageLayout, QuickActionsSection } from '@o4o/account-ui';
 
 export default function MyPageHub() {
@@ -74,6 +74,31 @@ export default function MyPageHub() {
         >
           <Settings className="w-5 h-5 text-primary-500" />
           <span className="text-sm font-medium text-gray-700 flex-1">설정</span>
+          <ChevronRight className="w-4 h-4 text-gray-300" />
+        </Link>
+        {/* LMS MyPage (WO-O4O-KCOS-LMS-MYPAGE-CANONICAL-ALIGNMENT-V1) */}
+        <Link
+          to="/mypage/enrollments"
+          className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm hover:bg-gray-50 transition-colors"
+        >
+          <BookOpen className="w-5 h-5 text-primary-500" />
+          <span className="text-sm font-medium text-gray-700 flex-1">내 수강</span>
+          <ChevronRight className="w-4 h-4 text-gray-300" />
+        </Link>
+        <Link
+          to="/mypage/certificates"
+          className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm hover:bg-gray-50 transition-colors"
+        >
+          <Award className="w-5 h-5 text-primary-500" />
+          <span className="text-sm font-medium text-gray-700 flex-1">학습 결과</span>
+          <ChevronRight className="w-4 h-4 text-gray-300" />
+        </Link>
+        <Link
+          to="/mypage/credits"
+          className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm hover:bg-gray-50 transition-colors col-span-2"
+        >
+          <Coins className="w-5 h-5 text-primary-500" />
+          <span className="text-sm font-medium text-gray-700 flex-1">내 크레딧</span>
           <ChevronRight className="w-4 h-4 text-gray-300" />
         </Link>
       </div>

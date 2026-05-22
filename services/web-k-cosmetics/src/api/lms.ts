@@ -237,6 +237,14 @@ export const lmsApi = {
     return data;
   },
 
+  // 내 수강 목록 (WO-O4O-KCOS-LMS-MYPAGE-CANONICAL-ALIGNMENT-V1)
+  getMyEnrollments: (params?: { status?: string; page?: number; limit?: number }) =>
+    learnerClient.getMyEnrollments<LmsEnrollment>(params as Record<string, unknown> | undefined),
+
+  // 내 수료증 목록
+  getMyCertificates: (params?: { page?: number; limit?: number }) =>
+    api.get<any>('/lms/certificates', { params }),
+
   // ─── Operator 메서드 (WO-KCOS-OPERATOR-LMS-BOOTSTRAP-V1) ──────────────────
   // KPA Canonical endpoint 기준. 백엔드 /lms/operator/courses/:id/* (requireLmsOperatorScope).
 
