@@ -2,9 +2,10 @@
 
 import { Request } from 'express';
 
+// WO-O4O-REQUIREADMIN-PREFIXED-ONLY-V1: platform: prefix 체계로 전환
 export enum UserRole {
-  SUPER_ADMIN = 'super_admin',
-  ADMIN       = 'admin',
+  SUPER_ADMIN = 'platform:super_admin',
+  ADMIN       = 'platform:admin',
   OPERATOR    = 'operator',    // 서비스운영자 (Platform Service Operator)
   MANAGER     = 'manager',
   VENDOR      = 'vendor',

@@ -250,7 +250,7 @@ export class TemplatesController {
       // Check if user owns the template or is admin
       // WO-O4O-USER-ROLES-RUNTIME-FIELD-CLEANUP-V1: use role_assignments instead of DB user.roles
       if (template.authorId !== userId) {
-        const isAdmin = await roleAssignmentService.hasAnyRole(userId!, ['admin', 'super_admin']);
+        const isAdmin = await roleAssignmentService.hasAnyRole(userId!, ['platform:admin', 'platform:super_admin']);
         if (!isAdmin) {
           return res.status(403).json({
             success: false,
@@ -326,7 +326,7 @@ export class TemplatesController {
       // Check if user owns the template or is admin
       // WO-O4O-USER-ROLES-RUNTIME-FIELD-CLEANUP-V1: use role_assignments instead of DB user.roles
       if (template.authorId !== userId) {
-        const isAdmin = await roleAssignmentService.hasAnyRole(userId!, ['admin', 'super_admin']);
+        const isAdmin = await roleAssignmentService.hasAnyRole(userId!, ['platform:admin', 'platform:super_admin']);
         if (!isAdmin) {
           return res.status(403).json({
             success: false,
@@ -369,7 +369,7 @@ export class TemplatesController {
       // Check if user owns the template or is admin
       // WO-O4O-USER-ROLES-RUNTIME-FIELD-CLEANUP-V1: use role_assignments instead of DB user.roles
       if (template.authorId !== userId) {
-        const isAdmin = await roleAssignmentService.hasAnyRole(userId!, ['admin', 'super_admin']);
+        const isAdmin = await roleAssignmentService.hasAnyRole(userId!, ['platform:admin', 'platform:super_admin']);
         if (!isAdmin) {
           return res.status(403).json({
             success: false,
@@ -416,7 +416,7 @@ export class TemplatesController {
       // Check if user owns the template or is admin
       // WO-O4O-USER-ROLES-RUNTIME-FIELD-CLEANUP-V1: use role_assignments instead of DB user.roles
       if (template.authorId !== userId) {
-        const isAdmin = await roleAssignmentService.hasAnyRole(userId!, ['admin', 'super_admin']);
+        const isAdmin = await roleAssignmentService.hasAnyRole(userId!, ['platform:admin', 'platform:super_admin']);
         if (!isAdmin) {
           return res.status(403).json({
             success: false,

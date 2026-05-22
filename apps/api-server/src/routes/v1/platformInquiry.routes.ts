@@ -30,7 +30,7 @@ export default router;
 export const adminRouter = Router();
 
 adminRouter.use(requireAuth);
-adminRouter.use(requireRole(['admin', 'super_admin']));
+adminRouter.use(requireRole(['platform:admin', 'platform:super_admin']));
 
 adminRouter.get('/inquiries', listInquiries);
 adminRouter.get('/inquiries/:id', getInquiry);

@@ -6,7 +6,7 @@ import { requireRole } from '../middleware/auth.middleware.js';
 const router: Router = Router();
 
 // Partner dashboard routes (partner and admin access)
-const partnerOrAdmin = requireRole(['partner', 'admin', 'super_admin']);
+const partnerOrAdmin = requireRole(['partner', 'platform:admin', 'platform:super_admin']);
 
 // ====================================
 // Phase K: Consumer-facing Partner API

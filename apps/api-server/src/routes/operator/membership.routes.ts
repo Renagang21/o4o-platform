@@ -17,8 +17,8 @@ const controller = new MembershipConsoleController();
 // All routes require authentication + operator-level role + service scope
 // Platform roles + service-prefixed operator/admin roles
 router.use(authenticate);
+// WO-O4O-REQUIREADMIN-PREFIXED-ONLY-V1: legacy unprefixed roles 제거
 router.use(requireRole([
-  'admin', 'super_admin', 'operator', 'manager',
   'platform:admin', 'platform:super_admin',
   'neture:admin', 'neture:operator',
   'glycopharm:admin', 'glycopharm:operator',

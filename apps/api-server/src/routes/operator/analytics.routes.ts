@@ -20,8 +20,8 @@ import { authenticate, requireRole } from '../../middleware/auth.middleware.js';
 import { injectServiceScope } from '../../utils/serviceScope.js';
 import type { ServiceScope } from '../../utils/serviceScope.js';
 
+// WO-O4O-REQUIREADMIN-PREFIXED-ONLY-V1: legacy unprefixed roles 제거
 const requireOperatorOrAdmin = requireRole([
-  'admin', 'super_admin', 'operator',
   'platform:admin', 'platform:super_admin',
   'neture:admin', 'neture:operator',
   'glycopharm:admin', 'glycopharm:operator',

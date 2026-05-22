@@ -28,9 +28,8 @@ const isValidRole = (value: string) => {
 // All admin user routes require authentication
 router.use(authenticate);
 
-// WO-O4O-ADMIN-GUARD-PLATFORM-PREFIX-FIX-V1: RBAC SSOT platform prefix 반영
-// WO-O4O-USER-DOMAIN-ALIGNMENT-V1: operator/manager 제외 유지 — 서비스 운영자는 /api/v1/operator/members 사용
-const ADMIN_ROLES = ['admin', 'super_admin', 'platform:admin', 'platform:super_admin'];
+// WO-O4O-REQUIREADMIN-PREFIXED-ONLY-V1: platform: prefix 필수 (legacy super_admin/admin 제거)
+const ADMIN_ROLES = ['platform:admin', 'platform:super_admin'];
 
 // User management routes (platform admin only)
 router.get('/', requireRole(ADMIN_ROLES), adminUserController.getUsers);

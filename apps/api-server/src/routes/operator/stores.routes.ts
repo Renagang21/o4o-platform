@@ -13,8 +13,8 @@ import { injectServiceScope } from '../../utils/serviceScope.js';
 const router: Router = Router();
 const controller = new StoreConsoleController();
 
+// WO-O4O-REQUIREADMIN-PREFIXED-ONLY-V1: legacy unprefixed roles 제거
 const OPERATOR_ROLES = [
-  'admin', 'super_admin', 'operator', 'manager',
   'platform:admin', 'platform:super_admin',
   'neture:admin', 'neture:operator',
   'glycopharm:admin', 'glycopharm:operator',
