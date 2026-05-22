@@ -3,9 +3,9 @@
  * WO-O4O-SURVEY-POINT-REWARD-PHASE1-V1
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ClipboardList, RefreshCw, AlertCircle, Plus, Loader2, Trash2, PlayCircle, StopCircle } from 'lucide-react';
+import { ClipboardList, RefreshCw, AlertCircle, Plus, Loader2 } from 'lucide-react';
 import { RowActionMenu } from '@o4o/ui';
 import { DataTable, Pagination, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
@@ -18,51 +18,6 @@ const STATUS_CONFIG: Record<string, { text: string; cls: string }> = {
   closed:   { text: '종료',   cls: 'bg-slate-100 text-slate-500' },
   archived: { text: '보관',   cls: 'bg-slate-100 text-slate-400' },
 };
-
-const COLUMNS: ListColumnDef<SurveyItem>[] = [
-  {
-    key: 'title',
-    header: '제목',
-    render: (row) => <span className="font-medium text-slate-800">{row.title}</span>,
-  },
-  {
-    key: 'status',
-    header: '상태',
-    render: (row) => {
-      const cfg = STATUS_CONFIG[row.status] ?? { text: row.status, cls: '' };
-      return <span className={`inline-block px-2 py-0.5 text-xs font-semibold rounded ${cfg.cls}`}>{cfg.text}</span>;
-    },
-  },
-  {
-    key: 'reward',
-    header: '보상',
-    render: (row) => row.rewardEnabled
-      ? <span className="text-xs font-semibold text-emerald-700">{row.rewardAmount}P</span>
-      : <span className="text-xs text-slate-400">미지급</span>,
-  },
-  {
-    key: 'responseCount',
-    header: '응답 수',
-    render: (row) => (
-      <span className="text-sm text-slate-600">
-        {row.responseCount}{row.maxResponses ? ` / ${row.maxResponses}` : ''}
-      </span>
-    ),
-  },
-  {
-    key: 'period',
-    header: '기간',
-    render: (row) => {
-      const fmt = (d?: string | null) => d ? new Date(d).toLocaleDateString('ko-KR') : '-';
-      return <span className="text-xs text-slate-500">{fmt(row.startAt)} ~ {fmt(row.endAt)}</span>;
-    },
-  },
-  {
-    key: 'createdAt',
-    header: '생성일',
-    render: (row) => <span className="text-xs text-slate-500">{new Date(row.createdAt).toLocaleDateString('ko-KR')}</span>,
-  },
-];
 
 const surveyActionPolicy = defineActionPolicy<SurveyItem>('kpa:surveys', {
   rules: [
@@ -77,21 +32,20 @@ const surveyActionPolicy = defineActionPolicy<SurveyItem>('kpa:surveys', {
       visible: (row) => row.status === 'active',
       confirm: (row) => ({
         title: '설문 종료',
-        description: `"${row.title}" 설문을 종료하시겠습니까?`,
-        confirmLabel: '종료',
-        cancelLabel: '취소',
+        message: `"${row.title}" 설문을 종료하시겠습니까?`,
+        confirmText: '종료',
       }),
     },
     {
       key: 'delete',
       label: '삭제',
-      variant: 'destructive',
+      variant: 'danger',
       visible: (row) => row.status === 'draft' || row.status === 'archived',
       confirm: (row) => ({
         title: '설문 삭제',
-        description: `"${row.title}" 설문을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`,
-        confirmLabel: '삭제',
-        cancelLabel: '취소',
+        message: `"${row.title}" 설문을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`,
+        variant: 'danger' as const,
+        confirmText: '삭제',
       }),
     },
   ],
@@ -142,6 +96,68 @@ export default function OperatorSurveyListPage() {
     }
   }, [load]);
 
+  const columns = useMemo((): ListColumnDef<SurveyItem>[] => [
+    {
+      key: 'title',
+      header: '제목',
+      render: (_v, row) => <span className="font-medium text-slate-800">{row.title}</span>,
+    },
+    {
+      key: 'status',
+      header: '상태',
+      render: (_v, row) => {
+        const cfg = STATUS_CONFIG[row.status] ?? { text: row.status, cls: '' };
+        return <span className={`inline-block px-2 py-0.5 text-xs font-semibold rounded ${cfg.cls}`}>{cfg.text}</span>;
+      },
+    },
+    {
+      key: 'rewardEnabled',
+      header: '보상',
+      render: (_v, row) => row.rewardEnabled
+        ? <span className="text-xs font-semibold text-emerald-700">{row.rewardAmount}P</span>
+        : <span className="text-xs text-slate-400">미지급</span>,
+    },
+    {
+      key: 'responseCount',
+      header: '응답 수',
+      render: (_v, row) => (
+        <span className="text-sm text-slate-600">
+          {row.responseCount}{row.maxResponses ? ` / ${row.maxResponses}` : ''}
+        </span>
+      ),
+    },
+    {
+      key: 'startAt',
+      header: '기간',
+      render: (_v, row) => {
+        const fmt = (d?: string | null) => d ? new Date(d).toLocaleDateString('ko-KR') : '-';
+        return <span className="text-xs text-slate-500">{fmt(row.startAt)} ~ {fmt(row.endAt)}</span>;
+      },
+    },
+    {
+      key: 'createdAt',
+      header: '생성일',
+      render: (v) => <span className="text-xs text-slate-500">{new Date(v as string).toLocaleDateString('ko-KR')}</span>,
+    },
+    {
+      key: '_actions',
+      header: '',
+      align: 'center',
+      width: '60px',
+      system: true,
+      onCellClick: () => {},
+      render: (_v, row) => (
+        <RowActionMenu
+          actions={buildRowActions(surveyActionPolicy, row, {
+            activate: () => handleAction('activate', row),
+            close: () => handleAction('close', row),
+            delete: () => handleAction('delete', row),
+          })}
+        />
+      ),
+    },
+  ], [handleAction]);
+
   return (
     <div className="p-6 space-y-4">
       {/* 헤더 */}
@@ -184,18 +200,9 @@ export default function OperatorSurveyListPage() {
         </div>
       ) : (
         <DataTable
-          columns={COLUMNS}
+          columns={columns}
           data={items}
           rowKey="id"
-          renderRowActions={(row) => (
-            <RowActionMenu
-              actions={buildRowActions(surveyActionPolicy, row, {
-                onActivate: () => handleAction('activate', row),
-                onClose: () => handleAction('close', row),
-                onDelete: () => handleAction('delete', row),
-              })}
-            />
-          )}
         />
       )}
 
