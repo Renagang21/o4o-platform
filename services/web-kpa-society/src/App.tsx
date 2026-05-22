@@ -148,6 +148,8 @@ const GuideFeatureLmsPage = lazy(() => import('./pages/guide/GuideFeatureLmsPage
 
 // Community Home (WO-KPA-COMMUNITY-HOME-V1)
 import { CommunityHomePage } from './pages/CommunityHomePage';
+// 최신 활동 전체 보기 (WO-O4O-KPA-HOME-LATEST-ACTIVITY-SECTION-V1)
+const HomeLatestPage = lazy(() => import('./pages/HomeLatestPage').then(m => ({ default: m.HomeLatestPage })));
 
 // About Page (WO-O4O-KPA-ABOUT-PAGE-IMPLEMENTATION-V1)
 const AboutPage = lazy(() => import('./pages/about/AboutPage'));
@@ -546,6 +548,7 @@ function App() {
           <Route path="/pending-approval" element={<PendingApprovalPage />} />
 
           {/* WO-KPA-A-PUBLIC-HOME-INTEGRATION-AND-MENU-SIMPLIFICATION-V1: Home 통합 */}
+          <Route path="/home/latest" element={<Layout serviceName={SERVICE_NAME}><HomeLatestPage /></Layout>} />
           <Route path="/community" element={<Navigate to="/" replace />} />
           {/* /library/content → / 리다이렉트 (WO-KPA-CONTENT-HUB-REMOVAL-V1: /content 제거) */}
           <Route path="/library/content" element={<Navigate to="/" replace />} />

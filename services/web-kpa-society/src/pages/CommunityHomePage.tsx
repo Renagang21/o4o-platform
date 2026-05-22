@@ -20,7 +20,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { Loader2 } from 'lucide-react';
 import { PageHero, Card, useTemplate } from '@o4o/ui';
 import {
   HeroBannerSection,
@@ -33,9 +34,99 @@ import {
 } from '@o4o/shared-space-ui';
 import type { NoticeItem } from '@o4o/shared-space-ui';
 import { homeApi } from '../api/home';
-import type { HomePageData } from '../api/home';
+import type { HomePageData, LatestItem } from '../api/home';
 import { useAuth } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/LoginModalContext';
+
+// ─── 최신 활동 섹션 (WO-O4O-KPA-HOME-LATEST-ACTIVITY-SECTION-V1) ──────────
+
+const LATEST_TABS = [
+  { key: 'all',      label: '전체' },
+  { key: 'forum',    label: '포럼' },
+  { key: 'course',   label: '강의' },
+  { key: 'content',  label: '콘텐츠' },
+  { key: 'signage',  label: '사이니지' },
+  { key: 'resource', label: '자료실' },
+] as const;
+
+const LATEST_BADGE: Record<string, { label: string; cls: string }> = {
+  forum:    { label: '포럼',     cls: 'bg-blue-100 text-blue-700' },
+  course:   { label: '강의',     cls: 'bg-purple-100 text-purple-700' },
+  content:  { label: '콘텐츠',   cls: 'bg-emerald-100 text-emerald-700' },
+  resource: { label: '자료실',   cls: 'bg-amber-100 text-amber-700' },
+  signage:  { label: '사이니지', cls: 'bg-rose-100 text-rose-700' },
+};
+
+interface LatestSectionProps {
+  items: LatestItem[];
+  activeTab: string;
+  onTabChange: (tab: string) => void;
+  loading: boolean;
+}
+
+function LatestActivitySection({ items, activeTab, onTabChange, loading }: LatestSectionProps) {
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-bold text-slate-800 m-0">최신글</h2>
+        <Link to="/home/latest" className="text-sm text-blue-600 hover:text-blue-700 font-medium no-underline">
+          전체 보기 →
+        </Link>
+      </div>
+
+      {/* 탭 필터 */}
+      <div className="flex gap-2 flex-wrap mb-4">
+        {LATEST_TABS.map((t) => (
+          <button
+            key={t.key}
+            onClick={() => onTabChange(t.key)}
+            className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+              activeTab === t.key
+                ? 'bg-blue-600 text-white'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* 목록 */}
+      {loading ? (
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
+        </div>
+      ) : items.length === 0 ? (
+        <div className="text-center py-8 text-slate-400 text-sm">등록된 글이 없습니다</div>
+      ) : (
+        <div className="divide-y divide-slate-100 bg-white rounded-lg border border-slate-200 overflow-hidden">
+          {items.map((item) => {
+            const badge = LATEST_BADGE[item.type];
+            const date = new Date(item.createdAt).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
+            return (
+              <Link
+                key={`${item.type}-${item.id}`}
+                to={item.href}
+                className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors no-underline group"
+              >
+                <span className={`shrink-0 inline-block px-2 py-0.5 text-xs font-semibold rounded ${badge?.cls ?? 'bg-slate-100 text-slate-600'}`}>
+                  {badge?.label ?? item.type}
+                </span>
+                <span className="flex-1 min-w-0 font-medium text-slate-800 truncate group-hover:text-blue-600 transition-colors">
+                  {item.title}
+                </span>
+                {item.authorName && (
+                  <span className="shrink-0 text-xs text-slate-400 hidden sm:block">{item.authorName}</span>
+                )}
+                <span className="shrink-0 text-xs text-slate-400">{date}</span>
+              </Link>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
 
 // ─── 서비스 전용 아이콘 ─────────────────────────────────────
 // ForumIcon, EducationIcon, ContentIcon, SignageIcon, ResourcesIcon → @o4o/shared-space-ui
@@ -56,6 +147,9 @@ export function CommunityHomePage() {
   const { openLoginModal, setOnLoginSuccess } = useAuthModal();
   const [data, setData] = useState<HomePageData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [latestItems, setLatestItems] = useState<LatestItem[]>([]);
+  const [latestTab, setLatestTab] = useState('all');
+  const [latestLoading, setLatestLoading] = useState(true);
 
   // WO-KPA-COMMUNITY-ACCESS-GATE-V1: 비로그인 사용자 카드 클릭 시 로그인 유도
   const handleCardClick = useCallback((href: string, e: React.MouseEvent) => {
@@ -72,6 +166,14 @@ export function CommunityHomePage() {
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    setLatestLoading(true);
+    homeApi.getLatest({ type: latestTab, limit: 8 })
+      .then((res) => setLatestItems(res.data ?? []))
+      .catch(() => setLatestItems([]))
+      .finally(() => setLatestLoading(false));
+  }, [latestTab]);
 
   const noticeItems: NoticeItem[] = (data?.notices ?? []).map((n) => ({
     id: n.id,
@@ -120,6 +222,14 @@ export function CommunityHomePage() {
             </a>
           </Card>
         </>
+      }
+      latestSlot={
+        <LatestActivitySection
+          items={latestItems}
+          activeTab={latestTab}
+          onTabChange={setLatestTab}
+          loading={latestLoading}
+        />
       }
       appEntryCards={[
         { title: '포럼', description: '동료 약사와 질문·토론으로 전문성을 높이세요', href: '/forum', icon: <span className={iconCls}><ForumIcon /></span> },

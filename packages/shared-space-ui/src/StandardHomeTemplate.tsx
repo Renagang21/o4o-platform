@@ -48,6 +48,9 @@ export interface StandardHomeTemplateProps {
   /** 2-column gap. KPA/Glyco: 'gap-4', K-Cosmetics: 'gap-5' */
   noticesGap?: 'gap-4' | 'gap-5';
 
+  /** 최신 활동 섹션 — 공지 아래, 서비스 바로가기 위 (WO-O4O-KPA-HOME-LATEST-ACTIVITY-SECTION-V1) */
+  latestSlot?: ReactNode;
+
   /** AppEntry 카드 목록 */
   appEntryCards: AppEntrySectionProps['cards'];
   appEntryOnCardClick?: AppEntrySectionProps['onCardClick'];
@@ -71,6 +74,7 @@ export function StandardHomeTemplate({
   noticesViewAllHref,
   noticesRightSlot,
   noticesGap = 'gap-4',
+  latestSlot,
   appEntryCards,
   appEntryOnCardClick,
   cta,
@@ -102,7 +106,16 @@ export function StandardHomeTemplate({
         </PageContainer>
       </PageSection>
 
-      {/* 3. 서비스 바로가기 */}
+      {/* 3. 최신 활동 — 선택적 슬롯 */}
+      {latestSlot && (
+        <PageSection>
+          <PageContainer>
+            {latestSlot}
+          </PageContainer>
+        </PageSection>
+      )}
+
+      {/* 4. 서비스 바로가기 */}
       <PageSection>
         <PageContainer>
           <AppEntrySection
@@ -113,14 +126,14 @@ export function StandardHomeTemplate({
         </PageContainer>
       </PageSection>
 
-      {/* 4. CTA */}
+      {/* 5. CTA */}
       <PageSection>
         <PageContainer>
           <CtaGuidanceSection {...cta} />
         </PageContainer>
       </PageSection>
 
-      {/* 5. Help */}
+      {/* 6. Help */}
       <PageSection last>
         <PageContainer>
           <O4OHelpSection {...help} />

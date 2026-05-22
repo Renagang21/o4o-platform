@@ -80,6 +80,16 @@ export interface HomePageData {
   heroAds: CommunityAd[];
 }
 
+// WO-O4O-KPA-HOME-LATEST-ACTIVITY-SECTION-V1
+export interface LatestItem {
+  type: 'forum' | 'course' | 'content' | 'resource' | 'signage';
+  id: string;
+  title: string;
+  authorName?: string;
+  createdAt: string;
+  href: string;
+}
+
 export const homeApi = {
   getNotices: (limit = 5) =>
     apiClient.get<NoticesResponse>('/home/notices', { limit }),
@@ -105,6 +115,10 @@ export const homeApi = {
 
   getForumActivity: (params?: { sort?: string; limit?: number }) =>
     apiClient.get<ForumActivityResponse>('/home/forum-activity', params),
+
+  // WO-O4O-KPA-HOME-LATEST-ACTIVITY-SECTION-V1
+  getLatest: (params?: { type?: string; limit?: number }) =>
+    apiClient.get<{ success: boolean; data: LatestItem[] }>('/home/latest', params),
 
   /**
    * Home 페이지 필수 데이터를 병렬로 가져오기
