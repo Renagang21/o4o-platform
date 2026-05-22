@@ -3,6 +3,7 @@ import { AppDataSource } from '../../database/connection.js';
 import { User } from '../../entities/User.js';
 import { LinkedAccount } from '../../entities/LinkedAccount.js';
 import { AccountActivity } from '../../entities/AccountActivity.js';
+import { ServiceMembership } from '../../modules/auth/entities/ServiceMembership.js';
 import { UserRole, UserStatus } from '../../types/auth.js';
 import {
   AuthProvider,
@@ -86,7 +87,7 @@ export class AuthLoginService {
         if (!credentials) {
           throw new InvalidCredentialsError();
         }
-        return await this.handleEmailLogin(credentials, ipAddress, userAgent);
+        return await this.handleEmailLogin(credentials, ipAddress, userAgent, credentials.serviceKey);
       } else {
         if (!oauthProfile) {
           throw new InvalidCredentialsError();
@@ -101,11 +102,16 @@ export class AuthLoginService {
 
   /**
    * Handle email/password login
+   *
+   * WO-O4O-LOGIN-SERVICEKEY-PARAMETER-V1:
+   * serviceKey 제공 시 해당 서비스 멤버십 검증 추가.
+   * 미제공 시 기존 전역 인증 방식으로 fallback (호환 유지).
    */
   private async handleEmailLogin(
     credentials: { email: string; password: string },
     ipAddress: string,
     userAgent: string,
+    serviceKey?: string,
   ): Promise<UnifiedLoginResponse> {
     const { email, password } = credentials;
 
@@ -142,6 +148,23 @@ export class AuthLoginService {
     if (!user) {
       await this.logLoginAttempt(null, email, ipAddress, userAgent, false, 'account_not_found');
       throw new UserNotFoundError();
+    }
+
+    // WO-O4O-LOGIN-SERVICEKEY-PARAMETER-V1: 서비스 멤버십 검증
+    // serviceKey 제공 시 해당 서비스에 가입된 멤버십이 존재하는지 확인.
+    // 이 검증은 차후 email unique 제거(WO-O4O-EMAIL-UNIQUENESS-REDESIGN-V1) 이후
+    // user 조회 자체를 (email + serviceKey) 기반으로 전환할 준비 단계이다.
+    if (serviceKey) {
+      const smRepo = AppDataSource.getRepository(ServiceMembership);
+      const membership = await smRepo.findOne({
+        where: { userId: user.id, serviceKey },
+      });
+      if (!membership) {
+        await this.logLoginAttempt(user.id, email, ipAddress, userAgent, false, 'service_not_member');
+        const err: any = new Error(`이 계정은 ${serviceKey} 서비스에 가입되어 있지 않습니다.`);
+        err.code = 'SERVICE_NOT_MEMBER';
+        throw err;
+      }
     }
 
     // Check if user has password (not social-only account)

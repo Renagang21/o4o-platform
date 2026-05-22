@@ -46,7 +46,7 @@ export class AuthLoginController extends BaseController {
    * - Cross-origin requests automatically receive tokens in response body
    */
   static async login(req: Request, res: Response): Promise<any> {
-    const { email, password, deviceId, includeLegacyTokens } = req.body as LoginRequestDto & { includeLegacyTokens?: boolean };
+    const { email, password, serviceKey, deviceId, includeLegacyTokens } = req.body as LoginRequestDto & { includeLegacyTokens?: boolean };
     const userAgent = req.headers['user-agent'] || 'Unknown';
     const ipAddress = req.ip || req.socket.remoteAddress || 'Unknown';
 
@@ -62,7 +62,7 @@ export class AuthLoginController extends BaseController {
     try {
       const result = await authenticationService.login({
         provider: 'email',
-        credentials: { email, password },
+        credentials: { email, password, ...(serviceKey && { serviceKey }) },
         ipAddress,
         userAgent,
       });
@@ -114,6 +114,9 @@ export class AuthLoginController extends BaseController {
       // Handle specific auth errors with specific error codes
       if (error.code === 'INVALID_CREDENTIALS') {
         return BaseController.unauthorized(res, '비밀번호가 일치하지 않습니다.', 'INVALID_CREDENTIALS');
+      }
+      if (error.code === 'SERVICE_NOT_MEMBER') {
+        return BaseController.unauthorized(res, error.message, 'SERVICE_NOT_MEMBER');
       }
       if (error.code === 'INVALID_USER') {
         return BaseController.unauthorized(res, error.message, error.code);

@@ -158,6 +158,8 @@ export interface UnifiedLoginRequest {
   credentials?: {
     email: string;
     password: string;
+    /** WO-O4O-LOGIN-SERVICEKEY-PARAMETER-V1: 서비스 독립 인증 기반. 미제공 시 global fallback. */
+    serviceKey?: string;
   };
   oauthProfile?: OAuthProfile;
   ipAddress: string;
