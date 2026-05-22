@@ -88,6 +88,10 @@ export const forumApi = {
   deleteComment: (postId: string, commentId: string) =>
     apiClient.delete<ApiResponse<void>>(`${getForumBasePath()}/posts/${postId}/comments/${commentId}`),
 
+  // 공개 포럼 목록 (WO-O4O-KPA-FORUM-ALL-SEARCH-AND-FILTER-UX-V1)
+  getCategories: () =>
+    apiClient.get<ApiResponse<ForumInfo[]>>(`${getForumBasePath()}/categories`),
+
   // Owner routes — WO-O4O-FORUM-MY-FORUM-EXPANSION-V1
   getMyForums: () =>
     apiClient.get<ApiResponse<ForumInfo[]>>(`${getForumBasePath()}/categories/mine`),

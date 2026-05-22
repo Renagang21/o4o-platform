@@ -10,18 +10,21 @@
  * WO-O4O-FORUM-LIST-DESIGN-REFINEMENT-V1:
  * inline style → Tailwind, hardcoded hex → theme class
  *
+ * WO-O4O-KPA-FORUM-ALL-SEARCH-AND-FILTER-UX-V1:
+ * 포럼 선택 Combobox + 게시글 검색(q) + URL 상태 유지
+ *
  * 컬럼: 제목 (태그 포함) | 작성자 | 작성일 | 👍 | 👁 | 💬 | 액션
  */
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Link2, Trash2, Sparkles, Tag, AlertCircle, RefreshCw } from 'lucide-react';
+import { Link2, Trash2, Sparkles, Tag, AlertCircle, RefreshCw, ChevronDown, X } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { BaseTable, ActionBar, RowActionMenu, PageSection, PageContainer, Card, type O4OColumn, type ActionBarAction, type RowActionItem } from '@o4o/ui';
 import { PageHeader } from '../../components/common';
 import { forumApi } from '../../api';
 import { useAuth } from '../../contexts';
-import type { ForumPost } from '../../types';
+import type { ForumInfo, ForumPost } from '../../types';
 import { buildAiClipboardText, stripHtml, blocksToText } from '../../utils/ai-clipboard';
 
 const PAGE_SIZE = 10;
@@ -39,15 +42,138 @@ function formatDate(dateString: string): string {
   return minutes > 0 ? `${minutes}분 전` : '방금 전';
 }
 
+// ── ForumCombobox ──────────────────────────────────────────────────────────
+
+interface ForumComboboxProps {
+  forums: Pick<ForumInfo, 'id' | 'name' | 'slug'>[];
+  value: string;
+  onChange: (forumId: string) => void;
+}
+
+function ForumCombobox({ forums, value, onChange }: ForumComboboxProps) {
+  const [open, setOpen] = useState(false);
+  const [filterText, setFilterText] = useState('');
+  const containerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const selected = forums.find((f) => f.id === value);
+  const displayLabel = selected ? selected.name : '전체 포럼';
+
+  const filtered = filterText
+    ? forums.filter((f) => f.name.toLowerCase().includes(filterText.toLowerCase()))
+    : forums;
+
+  // Click outside closes
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+        setFilterText('');
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const handleOpen = () => {
+    setOpen((prev) => {
+      if (!prev) setTimeout(() => inputRef.current?.focus(), 10);
+      return !prev;
+    });
+    setFilterText('');
+  };
+
+  const handleSelect = (forumId: string) => {
+    onChange(forumId);
+    setOpen(false);
+    setFilterText('');
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') { setOpen(false); setFilterText(''); }
+  };
+
+  return (
+    <div className="relative shrink-0" ref={containerRef}>
+      <button
+        type="button"
+        onClick={handleOpen}
+        className="inline-flex items-center gap-1.5 px-3 py-2 text-sm bg-white border border-slate-200 rounded-md hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary/30 min-w-[140px] max-w-[200px] whitespace-nowrap"
+      >
+        <span className="flex-1 text-left truncate text-slate-700">{displayLabel}</span>
+        <ChevronDown size={14} className={`text-slate-400 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} />
+      </button>
+
+      {open && (
+        <div
+          className="absolute z-20 mt-1 w-56 bg-white border border-slate-200 rounded-md shadow-lg"
+          onKeyDown={handleKeyDown}
+        >
+          {/* Search input */}
+          <div className="px-2 pt-2 pb-1">
+            <input
+              ref={inputRef}
+              type="text"
+              value={filterText}
+              onChange={(e) => setFilterText(e.target.value)}
+              placeholder="포럼 검색..."
+              className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded focus:outline-none focus:ring-1 focus:ring-primary/30 bg-slate-50"
+            />
+          </div>
+
+          {/* Options list */}
+          <ul className="max-h-56 overflow-y-auto py-1">
+            <li>
+              <button
+                type="button"
+                onClick={() => handleSelect('')}
+                className={`w-full text-left px-3 py-2 text-sm hover:bg-slate-50 transition-colors ${
+                  !value ? 'font-semibold text-primary' : 'text-slate-700'
+                }`}
+              >
+                전체 포럼
+              </button>
+            </li>
+            {filtered.length === 0 ? (
+              <li className="px-3 py-2 text-xs text-slate-400">검색 결과 없음</li>
+            ) : (
+              filtered.map((f) => (
+                <li key={f.id}>
+                  <button
+                    type="button"
+                    onClick={() => handleSelect(f.id)}
+                    className={`w-full text-left px-3 py-2 text-sm hover:bg-slate-50 transition-colors ${
+                      value === f.id ? 'font-semibold text-primary bg-primary-50' : 'text-slate-700'
+                    }`}
+                  >
+                    {f.name}
+                  </button>
+                </li>
+              ))
+            )}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── ForumListPage ──────────────────────────────────────────────────────────
+
 export function ForumListPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user } = useAuth();
 
+  // URL params
+  // WO-O4O-KPA-FORUM-ALL-SEARCH-AND-FILTER-UX-V1:
+  //   q — 게시글 검색 (search 하위 호환 유지)
+  //   forum — 포럼 필터 (forumId)
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
-  const searchQuery = searchParams.get('search') || '';
+  const searchQuery = searchParams.get('q') || searchParams.get('search') || '';
   const activeTag = searchParams.get('tag') || '';
-  const hasFilters = !!(searchQuery || activeTag);
+  const forumParam = searchParams.get('forum') || '';
+  const hasFilters = !!(searchQuery || activeTag || forumParam);
 
   const [searchInput, setSearchInput] = useState(searchQuery);
   const [posts, setPosts] = useState<ForumPost[]>([]);
@@ -57,6 +183,7 @@ export function ForumListPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [popularTags, setPopularTags] = useState<{ tag: string; count: number }[]>([]);
+  const [forums, setForums] = useState<Pick<ForumInfo, 'id' | 'name' | 'slug'>[]>([]);
 
   useEffect(() => { setSearchInput(searchQuery); }, [searchQuery]);
 
@@ -64,6 +191,13 @@ export function ForumListPage() {
   useEffect(() => {
     forumApi.getPopularTags(15)
       .then((res) => { if (res?.data) setPopularTags(res.data); })
+      .catch(() => {});
+  }, []);
+
+  // Load forum list once on mount (WO-O4O-KPA-FORUM-ALL-SEARCH-AND-FILTER-UX-V1)
+  useEffect(() => {
+    forumApi.getCategories()
+      .then((res) => { if (res?.data) setForums(res.data); })
       .catch(() => {});
   }, []);
 
@@ -77,6 +211,7 @@ export function ForumListPage() {
         limit: PAGE_SIZE,
         search: searchQuery || undefined,
         tag: activeTag || undefined,
+        forumId: forumParam || undefined,
       }) as any;
 
       // WO-O4O-KPA-FORUM-ERROR-MASKING-REMOVAL-AND-POST-VISIBILITY-FIX-V1:
@@ -100,40 +235,42 @@ export function ForumListPage() {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, searchQuery, activeTag]);
+  }, [currentPage, searchQuery, activeTag, forumParam]);
 
   useEffect(() => { loadData(); }, [loadData]);
 
-  const updateParam = (key: string, value: string) => {
+  // ── URL param helpers ──
+
+  const updateParams = (updates: Record<string, string>) => {
     const next = new URLSearchParams(searchParams);
-    if (value) next.set(key, value);
-    else next.delete(key);
-    if (key !== 'page') next.delete('page');
+    for (const [key, value] of Object.entries(updates)) {
+      if (value) next.set(key, value);
+      else next.delete(key);
+    }
+    next.delete('search'); // migrate old `search` param → `q`
     setSearchParams(next);
     setSelectedKeys(new Set());
   };
 
   const goToPage = (p: number) => {
     if (p < 1 || p > totalPages) return;
-    updateParam('page', p === 1 ? '' : String(p));
+    const next = new URLSearchParams(searchParams);
+    if (p === 1) next.delete('page'); else next.set('page', String(p));
+    setSearchParams(next);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    updateParam('search', searchInput.trim());
+    updateParams({ q: searchInput.trim(), page: '' });
   };
 
   const handleTagClick = (tag: string) => {
-    if (activeTag === tag) {
-      updateParam('tag', '');
-    } else {
-      const next = new URLSearchParams(searchParams);
-      next.set('tag', tag);
-      next.delete('page');
-      setSearchParams(next);
-      setSelectedKeys(new Set());
-    }
+    updateParams({ tag: activeTag === tag ? '' : tag, page: '' });
+  };
+
+  const handleForumChange = (forumId: string) => {
+    updateParams({ forum: forumId, page: '' });
   };
 
   const handleClearAll = () => {
@@ -141,6 +278,8 @@ export function ForumListPage() {
     setSearchParams({});
     setSelectedKeys(new Set());
   };
+
+  // ── Post actions ──
 
   const handleDeletePost = useCallback(async (id: string) => {
     try {
@@ -192,7 +331,6 @@ export function ForumListPage() {
       toast.error('삭제에 실패했습니다');
     }
   }, [selectedKeys, loadData]);
-
 
   // ── Columns ──
 
@@ -337,16 +475,19 @@ export function ForumListPage() {
 
   // ── Empty Message ──
 
+  const selectedForumName = forums.find((f) => f.id === forumParam)?.name;
+
   const emptyMessage = (
     <div className="py-16 px-5 text-center">
       {hasFilters ? (
         <>
-          <p className="text-sm text-slate-500 mb-3 mt-0">검색 결과가 없습니다</p>
+          <p className="text-sm text-slate-500 mb-1 mt-0">검색 결과가 없습니다</p>
+          <p className="text-xs text-slate-400 mb-3">검색어나 필터를 변경해 주세요</p>
           <button onClick={handleClearAll} className="inline-flex items-center px-4 py-2 text-xs font-semibold text-white bg-primary rounded-md border-none cursor-pointer">전체 보기</button>
         </>
       ) : (
         <>
-          <p className="text-sm text-slate-500 mb-3 mt-0">아직 등록된 글이 없습니다</p>
+          <p className="text-sm text-slate-500 mb-3 mt-0">등록된 게시글이 없습니다</p>
           {user && (
             <Link to="/forum/write" className="inline-flex items-center px-4 py-2 text-xs font-semibold text-white bg-primary rounded-md no-underline">글쓰기</Link>
           )}
@@ -366,6 +507,18 @@ export function ForumListPage() {
     for (let i = start; i <= end; i++) pages.push(i);
     return pages;
   }, [currentPage, totalPages]);
+
+  // Active filter chips
+  const activeChips: { label: string; onRemove: () => void }[] = [];
+  if (forumParam && selectedForumName) {
+    activeChips.push({ label: selectedForumName, onRemove: () => handleForumChange('') });
+  }
+  if (searchQuery) {
+    activeChips.push({ label: `"${searchQuery}"`, onRemove: () => updateParams({ q: '', page: '' }) });
+  }
+  if (activeTag) {
+    activeChips.push({ label: `#${activeTag}`, onRemove: () => updateParams({ tag: '', page: '' }) });
+  }
 
   return (
     <PageSection last>
@@ -416,31 +569,72 @@ export function ForumListPage() {
         </div>
       )}
 
-      {/* Search + Filters */}
+      {/* Search + Forum Filter (WO-O4O-KPA-FORUM-ALL-SEARCH-AND-FILTER-UX-V1) */}
       <div className="mb-4">
-        <form className="flex gap-2 mb-3" onSubmit={handleSearchSubmit}>
+        <form
+          className="flex flex-col sm:flex-row gap-2 mb-3"
+          onSubmit={handleSearchSubmit}
+        >
+          {/* 포럼 선택 Combobox */}
+          <ForumCombobox
+            forums={forums}
+            value={forumParam}
+            onChange={handleForumChange}
+          />
+
+          {/* 제목/내용 검색 */}
           <input
             type="text"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            placeholder="검색어를 입력하세요"
+            placeholder="제목 또는 내용 검색"
             className="flex-1 px-3.5 py-2 text-sm border border-slate-200 rounded-md outline-none bg-white"
           />
-          <button type="submit" className="px-4 py-2 text-sm font-medium text-white bg-primary border-none rounded-md cursor-pointer whitespace-nowrap">검색</button>
+          <button
+            type="submit"
+            className="px-4 py-2 text-sm font-medium text-white bg-primary border-none rounded-md cursor-pointer whitespace-nowrap"
+          >
+            검색
+          </button>
         </form>
-        <div className="flex justify-between items-center gap-2 flex-wrap mb-2">
-          {user && (
-            <Link to="/forum/write" className="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-primary rounded-md no-underline whitespace-nowrap ml-auto">글쓰기</Link>
-          )}
-        </div>
-        {hasFilters && (
-          <div className="flex items-center justify-between px-3 py-1.5 bg-primary-50 rounded-md border border-primary-200">
-            <span className="text-xs text-primary-700">
-              {searchQuery && `"${searchQuery}"`}
-              {searchQuery && activeTag && ' + '}
-              {activeTag && `#${activeTag}`}
-            </span>
-            <button onClick={handleClearAll} className="text-xs text-primary-700 bg-transparent border-none cursor-pointer underline px-1 py-0.5">전체 보기</button>
+
+        {/* 글쓰기 버튼 */}
+        {user && (
+          <div className="flex justify-end mb-2">
+            <Link
+              to="/forum/write"
+              className="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-primary rounded-md no-underline whitespace-nowrap"
+            >
+              글쓰기
+            </Link>
+          </div>
+        )}
+
+        {/* 활성 필터 칩 */}
+        {activeChips.length > 0 && (
+          <div className="flex items-center gap-2 flex-wrap px-3 py-2 bg-primary-50 rounded-md border border-primary-200">
+            <span className="text-xs text-primary-600 font-medium shrink-0">필터:</span>
+            {activeChips.map((chip) => (
+              <span
+                key={chip.label}
+                className="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-white border border-primary-200 text-primary-700 rounded-full"
+              >
+                {chip.label}
+                <button
+                  type="button"
+                  onClick={chip.onRemove}
+                  className="inline-flex items-center justify-center w-3.5 h-3.5 text-primary-400 hover:text-primary-700 bg-transparent border-none cursor-pointer p-0"
+                >
+                  <X size={10} />
+                </button>
+              </span>
+            ))}
+            <button
+              onClick={handleClearAll}
+              className="ml-auto text-xs text-primary-600 bg-transparent border-none cursor-pointer underline px-1 py-0.5"
+            >
+              전체 초기화
+            </button>
           </div>
         )}
       </div>
@@ -458,7 +652,9 @@ export function ForumListPage() {
       {!loading && (
         <div className="flex justify-between items-center py-2 mb-1">
           <span className="text-xs text-slate-500">
-            {hasFilters ? `검색 결과 ${totalCount}건` : `총 ${totalCount}개의 게시글`}
+            {hasFilters
+              ? `검색 결과 ${totalCount}건`
+              : `총 ${totalCount}개의 게시글`}
           </span>
           {totalPages > 1 && (
             <span className="text-xs text-slate-400">{currentPage} / {totalPages} 페이지</span>
