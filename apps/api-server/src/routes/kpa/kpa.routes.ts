@@ -496,6 +496,8 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Posts
   forumRouter.get('/posts', optionalAuth, forumController.listPosts.bind(forumController));
+  // Must be before /posts/:id to prevent 'tags' being matched as :id param
+  forumRouter.get('/posts/tags/popular', optionalAuth, forumController.getPopularTags.bind(forumController));
   forumRouter.get('/posts/:id', optionalAuth, forumController.getPost.bind(forumController));
   forumRouter.post('/posts', authenticate, forumController.createPost.bind(forumController));
   forumRouter.put('/posts/:id', authenticate, forumController.updatePost.bind(forumController));

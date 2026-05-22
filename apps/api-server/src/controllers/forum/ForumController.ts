@@ -35,6 +35,7 @@ export class ForumController {
   updatePost = (req: Request, res: Response) => this.posts.updatePost(req, res);
   deletePost = (req: Request, res: Response) => this.posts.deletePost(req, res);
   toggleLike = (req: Request, res: Response) => this.posts.toggleLike(req, res);
+  getPopularTags = (req: Request, res: Response) => this.posts.getPopularTags(req, res);
 
   // ---- Forum Directory (formerly Categories) ----
   listForums = (req: Request, res: Response) => this.forums.listForums(req, res);
