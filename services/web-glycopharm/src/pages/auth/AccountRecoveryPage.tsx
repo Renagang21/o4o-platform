@@ -8,6 +8,7 @@ import { Mail, Phone, ArrowLeft, CheckCircle, AlertCircle, Search, KeyRound } fr
 import { api } from '../../lib/apiClient';
 
 const SERVICE_URL = import.meta.env.VITE_SERVICE_URL || 'https://glycopharm.co.kr';
+const SERVICE_KEY = 'glycopharm';
 
 type Tab = 'find-id' | 'find-password';
 
@@ -175,7 +176,7 @@ function FindPasswordTab() {
     setIsLoading(true);
 
     try {
-      await api.post('/auth/forgot-password', { email, serviceUrl: SERVICE_URL });
+      await api.post('/auth/forgot-password', { email, serviceKey: SERVICE_KEY, serviceUrl: SERVICE_URL });
       setIsSubmitted(true);
     } catch (err: any) {
       if (err.response) {

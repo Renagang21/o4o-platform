@@ -35,7 +35,7 @@ export class PasswordController extends BaseController {
    * Request password reset email
    */
   static async forgotPassword(req: Request, res: Response): Promise<any> {
-    const { email, serviceUrl } = req.body as PasswordResetRequestDto & { serviceUrl?: string };
+    const { email, serviceKey, serviceUrl } = req.body as PasswordResetRequestDto;
 
     try {
       // Validate serviceUrl against whitelist
@@ -49,7 +49,7 @@ export class PasswordController extends BaseController {
         }
       }
 
-      await PasswordResetService.requestPasswordReset(email, validatedServiceUrl);
+      await PasswordResetService.requestPasswordReset(email, serviceKey, validatedServiceUrl);
 
       // Always return success to prevent email enumeration
       return BaseController.ok(res, {
@@ -73,10 +73,10 @@ export class PasswordController extends BaseController {
    * Reset password with token
    */
   static async resetPassword(req: Request, res: Response): Promise<any> {
-    const { token, password } = req.body as PasswordResetDto;
+    const { token, password, serviceKey } = req.body as PasswordResetDto;
 
     try {
-      await PasswordResetService.resetPassword(token, password);
+      await PasswordResetService.resetPassword(token, password, serviceKey);
 
       return BaseController.ok(res, {
         message: 'Password has been reset successfully',

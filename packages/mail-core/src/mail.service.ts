@@ -410,18 +410,20 @@ export class MailService {
 
   // ── Generic email methods (merged from emailService.ts B) ──
 
-  async sendPasswordResetEmail(email: string, resetToken: string, serviceUrl?: string): Promise<boolean> {
+  async sendPasswordResetEmail(email: string, resetToken: string, serviceUrl?: string, serviceName?: string): Promise<boolean> {
     const baseUrl = serviceUrl || process.env.ADMIN_URL || 'http://localhost:3001';
     const resetUrl = `${baseUrl}/reset-password?token=${resetToken}`;
+    const displayName = serviceName || 'O4O Platform';
 
     const result = await this.sendEmail({
       to: email,
-      subject: 'Password Reset Request - O4O Platform',
+      subject: `Password Reset Request - ${displayName}`,
       template: 'password-reset',
       templateData: {
         resetUrl,
         expiresIn: '1 hour',
         year: new Date().getFullYear(),
+        serviceName: displayName,
       },
     });
     return result.success;

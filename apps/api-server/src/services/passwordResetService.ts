@@ -6,6 +6,7 @@ import { PasswordResetToken } from '../entities/PasswordResetToken.js';
 import { EmailVerificationToken } from '../entities/EmailVerificationToken.js';
 import { emailService } from './email.service.js';
 import { UserStatus } from '../types/auth.js';
+import { getServiceName } from '../config/service-catalog.js';
 
 export class PasswordResetService {
   private static readonly RESET_TOKEN_EXPIRY_HOURS = 1;
@@ -13,50 +14,88 @@ export class PasswordResetService {
 
   /**
    * Request password reset
+   *
+   * WO-O4O-PASSWORD-RESET-SERVICE-ISOLATION-V1:
+   * serviceKey 제공 시:
+   *   1. 해당 서비스 membership 존재 여부 검증
+   *   2. 토큰에 serviceKey 저장
+   *   3. 이메일에 서비스명 표시
+   * 미제공 시: 기존 전역 방식 fallback (호환 유지)
    */
-  static async requestPasswordReset(email: string, serviceUrl?: string): Promise<boolean> {
+  static async requestPasswordReset(email: string, serviceKey?: string, serviceUrl?: string): Promise<boolean> {
     const userRepo = AppDataSource.getRepository(User);
     const tokenRepo = AppDataSource.getRepository(PasswordResetToken);
 
     // Find user by email
     const user = await userRepo.findOne({ where: { email } });
-    
+
     // Always return true to prevent email enumeration
     if (!user) {
       return true;
     }
 
-    // Invalidate any existing tokens
-    await tokenRepo.update(
-      { userId: user.id, usedAt: null },
-      { usedAt: new Date() }
-    );
+    // WO-O4O-PASSWORD-RESET-SERVICE-ISOLATION-V1: serviceKey 제공 시 membership 검증
+    if (serviceKey) {
+      const membershipRows = await AppDataSource.query(
+        `SELECT 1 FROM service_memberships WHERE user_id = $1 AND service_key = $2 LIMIT 1`,
+        [user.id, serviceKey]
+      );
+      // membership 없으면 이메일 열거 방지 목적으로 true 반환 (에러 노출 금지)
+      if (membershipRows.length === 0) {
+        return true;
+      }
+    }
+
+    // Invalidate any existing tokens for this user (+serviceKey 범위로 무효화)
+    if (serviceKey) {
+      await tokenRepo.update(
+        { userId: user.id, usedAt: null, serviceKey },
+        { usedAt: new Date() }
+      );
+      // serviceKey 없는 기존 전역 토큰도 함께 무효화
+      await AppDataSource.query(
+        `UPDATE password_reset_tokens SET used_at = NOW()
+         WHERE user_id = $1 AND used_at IS NULL AND service_key IS NULL`,
+        [user.id]
+      );
+    } else {
+      await tokenRepo.update(
+        { userId: user.id, usedAt: null },
+        { usedAt: new Date() }
+      );
+    }
 
     // Generate new token
     const token = crypto.randomBytes(32).toString('hex');
     const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
 
-    // Create reset token
+    // Create reset token (serviceKey 포함)
     const resetToken = tokenRepo.create({
       token: hashedToken,
       userId: user.id,
       email: user.email,
       user,
+      serviceKey: serviceKey ?? null,
       expiresAt: new Date(Date.now() + this.RESET_TOKEN_EXPIRY_HOURS * 60 * 60 * 1000)
     });
 
     await tokenRepo.save(resetToken);
 
-    // Send email
-    await emailService.sendPasswordResetEmail(email, token, serviceUrl);
+    // Send email with service name
+    const serviceName = serviceKey ? getServiceName(serviceKey) : undefined;
+    await emailService.sendPasswordResetEmail(email, token, serviceUrl, serviceName);
 
     return true;
   }
 
   /**
    * Reset password with token
+   *
+   * WO-O4O-PASSWORD-RESET-SERVICE-ISOLATION-V1:
+   * serviceKey 제공 시 토큰의 serviceKey와 일치하는지 검증한다.
+   * 불일치 시 토큰 유효성 오류로 처리 (다른 서비스 토큰 재사용 방지).
    */
-  static async resetPassword(token: string, newPassword: string): Promise<boolean> {
+  static async resetPassword(token: string, newPassword: string, serviceKey?: string): Promise<boolean> {
     const userRepo = AppDataSource.getRepository(User);
     const tokenRepo = AppDataSource.getRepository(PasswordResetToken);
 
@@ -79,6 +118,12 @@ export class PasswordResetService {
     // Check if token is expired
     if (resetToken.expiresAt < new Date()) {
       throw new Error('Reset token has expired');
+    }
+
+    // WO-O4O-PASSWORD-RESET-SERVICE-ISOLATION-V1: serviceKey 일치 검증
+    // 토큰에 serviceKey가 있고 요청 serviceKey와 불일치 시 거부
+    if (resetToken.serviceKey && serviceKey && resetToken.serviceKey !== serviceKey) {
+      throw new Error('Invalid or expired reset token');
     }
 
     // Hash new password

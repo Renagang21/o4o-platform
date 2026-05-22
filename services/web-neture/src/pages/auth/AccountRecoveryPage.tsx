@@ -8,6 +8,7 @@ import { Mail, Phone, ArrowLeft, CheckCircle, AlertCircle, Search, KeyRound } fr
 import { api } from '../../lib/apiClient';
 
 const SERVICE_URL = import.meta.env.VITE_SERVICE_URL || 'https://neture.co.kr';
+const SERVICE_KEY = 'neture';
 
 type Tab = 'find-id' | 'find-password';
 
@@ -168,7 +169,7 @@ function FindPasswordTab() {
     setIsLoading(true);
 
     try {
-      await api.post('/auth/forgot-password', { email, serviceUrl: SERVICE_URL });
+      await api.post('/auth/forgot-password', { email, serviceKey: SERVICE_KEY, serviceUrl: SERVICE_URL });
       setIsSubmitted(true);
     } catch {
       setError('서버와의 연결에 실패했습니다. 잠시 후 다시 시도해주세요.');

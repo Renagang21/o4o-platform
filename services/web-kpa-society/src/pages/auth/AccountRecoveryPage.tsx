@@ -8,6 +8,7 @@ import { Mail, Phone, ArrowLeft, CheckCircle, AlertCircle, Search, KeyRound } fr
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 const SERVICE_URL = import.meta.env.VITE_SERVICE_URL || 'https://kpa-society.co.kr';
+const SERVICE_KEY = 'kpa-society';
 
 type Tab = 'find-id' | 'find-password';
 
@@ -176,7 +177,7 @@ function FindPasswordTab() {
       const response = await fetch(`${API_BASE_URL}/api/v1/auth/forgot-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, serviceUrl: SERVICE_URL }),
+        body: JSON.stringify({ email, serviceKey: SERVICE_KEY, serviceUrl: SERVICE_URL }),
       });
 
       if (response.ok) {
