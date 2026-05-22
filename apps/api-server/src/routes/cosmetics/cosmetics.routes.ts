@@ -29,6 +29,8 @@ import { createStorePlaylistController } from '../o4o-store/controllers/store-pl
 import { createStoreLibraryController } from '../o4o-store/controllers/store-library.controller.js';
 import { createStoreQrLandingController } from '../o4o-store/controllers/store-qr-landing.controller.js';
 import { createStorePopController } from '../o4o-store/controllers/store-pop.controller.js';
+// WO-O4O-KCOS-STORE-EXECUTION-CANONICAL-ALIGNMENT-V1: Blog controller
+import { createBlogController } from '../o4o-store/controllers/blog.controller.js';
 import { createProductMarketingController } from '../o4o-store/controllers/product-marketing.controller.js';
 import { createAssetSnapshotController } from '../o4o-store/controllers/asset-snapshot.controller.js';
 import { createStoreAssetControlController } from '../o4o-store/controllers/store-asset-control.controller.js';
@@ -130,6 +132,10 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
   // Store POP (internal: /pharmacy/pop/*)
   // WO-O4O-STORE-GUARD-PHASE2B-LIBRARY-MARKETING-POP-V1: serviceKey='cosmetics' 전달.
   router.use('/', createStorePopController(dataSource, coreRequireAuth as any, 'cosmetics'));
+
+  // Store Blog (internal: /stores/:slug/blog/*)
+  // WO-O4O-KCOS-STORE-EXECUTION-CANONICAL-ALIGNMENT-V1: serviceKey='cosmetics' 전달.
+  router.use('/', createBlogController(dataSource, coreRequireAuth as any, 'cosmetics'));
 
   // Store Analytics (internal: /pharmacy/analytics/*)
   // WO-O4O-STORE-OWNER-BACKCOMPAT-CALLERS-MIGRATION-V1: serviceKey='cosmetics' 명시 (canonical)

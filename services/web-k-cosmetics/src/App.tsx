@@ -118,6 +118,13 @@ import { useStoreCapabilities } from './hooks/useStoreCapabilities';
 // Store Settings (WO-STORE-COMMON-SETTINGS-KCOS-UI-V1)
 const StoreSettingsPage = lazy(() => import('@/pages/store/StoreSettingsPage'));
 
+// WO-O4O-KCOS-STORE-EXECUTION-CANONICAL-ALIGNMENT-V1: Blog / POP / QR
+const StoreBlogPage = lazy(() => import('@/pages/store/StoreBlogPage'));
+const StoreBlogPostPage = lazy(() => import('@/pages/store/StoreBlogPostPage'));
+const StoreBlogManagePage = lazy(() => import('@/pages/store/StoreBlogManagePage'));
+const StorePopPage = lazy(() => import('@/pages/store/StorePopPage'));
+const StoreQrPage = lazy(() => import('@/pages/store/StoreQrPage'));
+
 // Admin Dashboard (WO-O4O-KCOS-ADMIN-DASHBOARD-DEDICATED-V1)
 const KCosmeticsAdminDashboard = lazy(() => import('@/pages/admin/KCosmeticsAdminDashboard'));
 
@@ -497,7 +504,15 @@ function AppRoutes() {
         {/* Interest 관리 (WO-O4O-TABLET-INTEREST-UX-REFACTOR-V1) */}
         <Route path="interest-requests" element={<InterestRequestsPage />} />
         <Route path="settings" element={<StoreSettingsPage />} />
+        {/* WO-O4O-KCOS-STORE-EXECUTION-CANONICAL-ALIGNMENT-V1: Blog / POP / QR */}
+        <Route path="content/blog" element={<StoreBlogManagePage />} />
+        <Route path="pop" element={<StorePopPage />} />
+        <Route path="qr" element={<StoreQrPage />} />
       </Route>
+
+      {/* Store public blog routes (WO-O4O-KCOS-STORE-EXECUTION-CANONICAL-ALIGNMENT-V1) */}
+      <Route path="store/:slug/blog" element={<StoreBlogPage />} />
+      <Route path="store/:slug/blog/:postSlug" element={<StoreBlogPostPage />} />
 
       {/* Tablet Kiosk — Public, no auth (WO-O4O-TABLET-INTEREST-UX-REFACTOR-V1) */}
       <Route path="tablet/:slug" element={<TabletStorePage />} />

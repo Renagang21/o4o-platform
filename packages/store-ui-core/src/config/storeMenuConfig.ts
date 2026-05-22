@@ -93,7 +93,11 @@ export const COSMETICS_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'signage', label: '사이니지', subPath: '/signage' },
     ]},
     { label: '매장 실행', items: [
-      { key: 'tablet-displays', label: '태블릿', subPath: '/tablet-displays' },
+      { key: 'tablet-displays', label: '태블릿',  subPath: '/tablet-displays' },
+      // WO-O4O-KCOS-STORE-EXECUTION-CANONICAL-ALIGNMENT-V1: Blog/POP/QR KPA delta 정렬
+      { key: 'content-blog',   label: '블로그',  subPath: '/content/blog' },
+      { key: 'pop',            label: 'POP',     subPath: '/pop' },
+      { key: 'qr',             label: 'QR 코드', subPath: '/qr' },
     ]},
     { label: '설정', items: [
       { key: 'settings', label: '매장 설정', subPath: '/settings' },
