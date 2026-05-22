@@ -892,7 +892,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
             type: 'resource', id: r.id, title: r.title,
             authorName: r.author_name ?? undefined,
             createdAt: new Date(r.created_at).toISOString(),
-            href: `/resources/${r.id}`,
+            href: `/content/${r.id}`,
           });
         }
       })());
