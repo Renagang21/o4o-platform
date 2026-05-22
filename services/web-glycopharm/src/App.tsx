@@ -146,6 +146,8 @@ const InvoicesPage = lazy(() => import('@/pages/operator/InvoicesPage'));
 const GlycoStoreHubPage = lazy(() => import('@/pages/hub/StoreHubPage').then(m => ({ default: m.StoreHubPage })));
 const HubB2BCatalogPage = lazy(() => import('@/pages/hub/HubB2BCatalogPage').then(m => ({ default: m.HubB2BCatalogPage })));
 const HubContentListPage = lazy(() => import('@/pages/hub/HubContentListPage').then(m => ({ default: m.HubContentListPage })));
+// WO-O4O-GLYCOPHARM-EVENT-OFFERS-HUB-CANONICAL-ALIGNMENT-V1
+const HubEventOffersPage = lazy(() => import('@/pages/hub/HubEventOffersPage').then(m => ({ default: m.HubEventOffersPage })));
 import { GlycoPharmHubLayout } from '@/components/layouts/GlycoPharmHubLayout';
 
 // Guide pages (shared components — WO-O4O-GUIDE-COMMON-AND-GLYCOPHARM-HOME-V1)
@@ -459,6 +461,8 @@ function AppRoutes() {
           <Route path="b2b" element={<HubB2BCatalogPage />} />
           <Route path="content" element={<HubContentListPage />} />
           <Route path="signage" element={<Navigate to="/store/signage/library" replace />} />
+          {/* WO-O4O-GLYCOPHARM-EVENT-OFFERS-HUB-CANONICAL-ALIGNMENT-V1 */}
+          <Route path="event-offers" element={<HubEventOffersPage />} />
         </Route>
         {/* WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1 */}
         <Route path="library/content" element={<HubContentListPage />} />

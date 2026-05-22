@@ -10,7 +10,7 @@
  */
 
 import { NavLink, Outlet } from 'react-router-dom';
-import { Home, ShoppingCart, Monitor, FileText, Megaphone } from 'lucide-react';
+import { Home, ShoppingCart, Monitor, FileText, Tag } from 'lucide-react';
 
 const HUB_MENU = [
   {
@@ -46,13 +46,12 @@ const HUB_MENU = [
     end: false,
   },
   {
-    key: 'campaign',
-    label: '캠페인',
-    desc: '플랫폼 캠페인에 참여합니다',
-    icon: Megaphone,
-    to: '#',
+    key: 'event-offers',
+    label: '이벤트/특가',
+    desc: 'GlycoPharm 이벤트 상품을 확인하고 신청합니다',
+    icon: Tag,
+    to: '/store-hub/event-offers',
     end: false,
-    badge: '준비중',
   },
 ];
 
