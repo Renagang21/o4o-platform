@@ -1563,17 +1563,44 @@ export function createMemberController(
           }));
         } catch (e) { console.error('[KPA AuditLog] Failed:', e); }
 
-        // 순서: 프로필 → memberships/roles → member_services(CASCADE) → member → user
+        // WO-O4O-HARD-DELETE-SERVICE-SCOPED-V1:
+        // users는 공통 Identity — 절대 삭제 금지.
+        // KPA 범위 데이터만 정리한다. 다른 서비스 membership/role은 유지.
         const queryRunner = dataSource.createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction();
         try {
+          // KPA-specific 프로필 삭제 (KPA 전용 테이블)
           await queryRunner.query(`DELETE FROM kpa_pharmacist_profiles WHERE user_id = $1`, [member.user_id]);
           await queryRunner.query(`DELETE FROM kpa_student_profiles WHERE user_id = $1`, [member.user_id]);
-          await queryRunner.query(`DELETE FROM service_memberships WHERE user_id = $1`, [member.user_id]);
-          await queryRunner.query(`DELETE FROM role_assignments WHERE user_id = $1`, [member.user_id]);
-          await memberRepo.remove(member); // CASCADE: kpa_member_services 자동 삭제
-          await queryRunner.query(`DELETE FROM users WHERE id = $1`, [member.user_id]);
+
+          // service_memberships: KPA 서비스만 삭제
+          await queryRunner.query(
+            `DELETE FROM service_memberships WHERE user_id = $1 AND service_key = 'kpa-society'`,
+            [member.user_id]
+          );
+
+          // role_assignments: kpa: prefix 역할만 삭제
+          await queryRunner.query(
+            `DELETE FROM role_assignments WHERE user_id = $1 AND role LIKE 'kpa:%'`,
+            [member.user_id]
+          );
+
+          // kpa_members 삭제 (CASCADE: kpa_member_services 자동 삭제)
+          await memberRepo.remove(member);
+
+          // users: 절대 삭제 금지 — 남은 서비스 멤버십 없으면 비활성화만 수행
+          const remainingMemberships = await queryRunner.query(
+            `SELECT 1 FROM service_memberships WHERE user_id = $1 LIMIT 1`,
+            [member.user_id]
+          );
+          if (remainingMemberships.length === 0) {
+            await queryRunner.query(
+              `UPDATE users SET status = 'deleted', "isActive" = false, "updatedAt" = NOW() WHERE id = $1`,
+              [member.user_id]
+            );
+          }
+
           await queryRunner.commitTransaction();
         } catch (txError: any) {
           await queryRunner.rollbackTransaction();

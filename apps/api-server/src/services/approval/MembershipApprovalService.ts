@@ -848,16 +848,82 @@ export class MembershipApprovalService {
       }
 
       if (mode === 'hard') {
-        // Hard delete: FK 참조 데이터도 함께 정리 후 users 삭제
-        await queryRunner.query(`DELETE FROM service_memberships WHERE user_id = $1`, [userId]);
-        await queryRunner.query(`DELETE FROM role_assignments WHERE user_id = $1`, [userId]);
-        // organization_members 정리 (FK 참조)
-        await queryRunner.query(`DELETE FROM organization_members WHERE user_id = $1`, [userId]);
-        // users 삭제 시도 — 남아있는 FK가 있으면 여전히 실패 가능
-        await queryRunner.query(`DELETE FROM users WHERE id = $1`, [userId]);
+        // WO-O4O-HARD-DELETE-SERVICE-SCOPED-V1:
+        // users는 공통 Identity — 절대 삭제 금지.
+        // serviceKey 범위의 데이터만 정리한다.
+        // 다른 서비스 membership/role/profile은 건드리지 않는다.
+
+        // STEP H1: service_memberships — 해당 서비스 범위만 삭제
+        if (isPlatformAdmin) {
+          // platform admin 전체 삭제 시에도 users row는 유지
+          await queryRunner.query(
+            `DELETE FROM service_memberships WHERE user_id = $1`,
+            [userId]
+          );
+        } else {
+          await queryRunner.query(
+            `DELETE FROM service_memberships WHERE user_id = $1 AND service_key = ANY($2)`,
+            [userId, serviceKeys]
+          );
+        }
+
+        // STEP H2: role_assignments — 해당 서비스 prefix 역할만 삭제
+        // 플랫폼 역할(super_admin, admin, operator)은 절대 건드리지 않음
+        const ALL_SERVICE_KEYS_H = ['kpa-society', 'k-cosmetics', 'glycopharm', 'neture'] as const;
+        const hardPrefixes = isPlatformAdmin
+          ? ALL_SERVICE_KEYS_H.map((k) => `${resolveRolePrefixFromCanonicalServiceKey(k)}:`)
+          : serviceKeys
+              .map((k) => `${resolveRolePrefixFromCanonicalServiceKey(k)}:`)
+              .filter((p) => p !== ':');
+
+        for (const prefix of hardPrefixes) {
+          await queryRunner.query(
+            `DELETE FROM role_assignments WHERE user_id = $1 AND role LIKE $2`,
+            [userId, `${prefix}%`]
+          );
+        }
+
+        // STEP H3: organization_members — KPA scope는 kpa_members를 통해 org_id 특정
+        const hardHasKpa = serviceKeys.includes('kpa-society') || isPlatformAdmin;
+        if (hardHasKpa) {
+          const kpaOrgRowsH = await queryRunner.query(
+            `SELECT organization_id FROM kpa_members WHERE user_id = $1 AND organization_id IS NOT NULL LIMIT 1`,
+            [userId]
+          );
+          if (kpaOrgRowsH.length > 0) {
+            const kpaOrgIdH = kpaOrgRowsH[0].organization_id;
+            await queryRunner.query(
+              `DELETE FROM organization_members WHERE user_id = $1 AND organization_id = $2`,
+              [userId, kpaOrgIdH]
+            );
+          }
+
+          // KPA domain profile cleanup
+          await queryRunner.query(
+            `UPDATE kpa_members SET status = 'withdrawn', identity_status = 'withdrawn', updated_at = NOW()
+             WHERE user_id = $1 AND status NOT IN ('withdrawn')`,
+            [userId]
+          );
+        }
+
+        // STEP H4: users — 절대 삭제 금지
+        // 남은 service_memberships가 없으면 users를 비활성화(soft-deactivate)만 수행
+        const remainingMemberships = await queryRunner.query(
+          `SELECT 1 FROM service_memberships WHERE user_id = $1 LIMIT 1`,
+          [userId]
+        );
+        if (remainingMemberships.length === 0) {
+          await queryRunner.query(
+            `UPDATE users SET status = 'deleted', "isActive" = false, "updatedAt" = NOW() WHERE id = $1`,
+            [userId]
+          );
+        }
 
         await queryRunner.commitTransaction();
-        logger.info('[ApprovalService] HARD_DELETE_SUCCESS', { userId, deletedBy });
+        logger.info('[ApprovalService] HARD_DELETE_SUCCESS', {
+          userId, deletedBy, serviceKeys, isPlatformAdmin,
+          usersDeactivated: remainingMemberships.length === 0,
+        });
       } else {
         // Soft delete: 비활성화만 수행 (users 삭제 없음)
         await queryRunner.query(
