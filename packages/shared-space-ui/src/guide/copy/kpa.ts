@@ -499,12 +499,12 @@ export const kpaGuideFeaturesProps: GuideFeaturesPageProps = {
       step: '02',
       title: '강의',
       primaryRoute: '/lms',
-      description: '약사 전문 교육 강의 조회 및 수강. 강의별 커리큘럼과 학습 진행 상황을 확인합니다.',
+      description: '약사 전문 교육 강의 조회 및 수강. 강의별 레슨 학습과 진행 상황을 확인합니다.',
       items: [
         { label: '강의(LMS) 이용 방법', route: '/guide/features/lms' },
-        { label: '강의 홈', route: '/lms' },
-        { label: '강의 목록', route: '/lms/courses' },
+        { label: '강의 목록', route: '/lms' },
         { label: '강의 상세·수강', route: '/lms/course/:id' },
+        { label: '내 강의·수강 이력', route: '/mypage/enrollments' },
       ],
       linkTo: '/guide/features/lms',
     },
@@ -883,6 +883,10 @@ export const kpaGuideFeatureQrTabletProps: GuideFeatureManualPageProps = {
 };
 
 // ─── /guide/features/lms ──────────────────────────────────────────────
+// WO-O4O-KPA-GUIDE-LMS-MANUAL-REFRESH-V1: 실제 구현 기준 전면 정비
+// - 강의 → 레슨 2단계 구조 (Chapter 제거)
+// - 레슨 타입 4종 반영 (텍스트·영상·퀴즈·과제)
+// - 학습자/강사 기능 분리
 
 export const kpaGuideFeatureLmsProps: GuideFeatureManualPageProps = {
   hero: {
@@ -891,69 +895,73 @@ export const kpaGuideFeatureLmsProps: GuideFeatureManualPageProps = {
     description: '약사 대상 전문 강의를 수강하고 학습 진행·수료 상태를 관리하는 교육 허브입니다',
     primaryAction: { label: '강의 목록으로 이동 →', to: '/lms' },
     flowBarTitle: '이용 흐름',
-    flowLabels: ['LMS 개요', '진입 경로', '강의 구성', '학습 진행', '수료/인증', '활용 시나리오'],
+    flowLabels: ['강의 찾기', '수강 신청', '강의 학습', '학습 관리', '수료증', '강사 기능'],
   },
   sections: [
     {
       step: '01',
-      title: 'LMS 개요',
-      description: '강의(LMS)는 단순 콘텐츠 열람이 아니라 수강 → 레슨 학습 → 완료 → 수료 흐름이 있는 학습 관리 기능입니다. 약사 대상 전문 교육과 지식 공유를 위한 커뮤니티 기반 교육 플랫폼으로, 운영/교육/지식 공유 관점에서 활용합니다.',
+      title: '강의 찾기',
+      routeLabel: '/lms',
+      description: '강의 목록에서 원하는 강의를 찾습니다. 키워드 검색과 카테고리 필터로 빠르게 탐색할 수 있습니다.',
       items: [
-        { label: '학습 관리 기능', detail: '강의 수강부터 레슨 완료, 수료증 발급까지 학습 전 과정을 관리합니다.' },
-        { label: '약사 전문 교육', detail: '약사 커뮤니티를 기반으로 보수교육, 제품 교육, 전문 지식 강의가 제공됩니다.' },
-        { label: '운영/교육/지식 공유 도구', detail: '강의는 단순 시청이 아니라 진행률·완료 상태가 관리되는 교육 도구입니다.' },
+        { label: '강의 목록', detail: '수강 가능한 강의 전체가 표시됩니다. 강의명·강사·카테고리 정보를 확인합니다.' },
+        { label: '검색', detail: '키워드를 입력해 강의명 기준으로 검색합니다.' },
+        { label: '필터', detail: '카테고리·상태별로 강의를 좁혀 탐색합니다.' },
       ],
     },
     {
       step: '02',
-      title: '강의 진입 경로',
-      routeLabel: '/lms',
-      description: '강의는 목록 → 상세 → 학습 순서로 진입합니다. 각 경로는 역할이 구분됩니다.',
+      title: '수강 신청',
+      routeLabel: '/lms/course/:id',
+      description: '원하는 강의를 선택한 뒤 수강 신청 버튼을 누르면 학습을 시작할 수 있습니다.',
       items: [
-        { label: '/lms — 강의 목록', detail: '수강 가능한 강의 전체 목록이 표시됩니다. 카테고리·키워드로 탐색합니다.' },
-        { label: '/lms/:courseId — 강의 상세', detail: '강의 소개, 챕터 구성, 수강 시작 버튼이 있습니다. 수강 신청 후 학습이 시작됩니다.' },
-        { label: '/lms/:courseId/lessons/:lessonId — 학습', detail: '레슨 단위로 학습이 진행됩니다. 텍스트·영상·자료 형태로 제공됩니다.' },
+        { label: '일반 강의', detail: '수강 신청 즉시 첫 레슨으로 이동합니다.' },
+        { label: '회원제 강의', detail: '로그인한 회원만 수강 신청이 가능합니다.' },
+        { label: '승인 필요 강의', detail: '강사가 수강 승인을 설정한 강의는 승인 후 학습이 시작됩니다. 승인 대기 중에는 내 강의에서 상태를 확인할 수 있습니다.' },
       ],
     },
     {
       step: '03',
-      title: '강의 구성 이해',
-      description: '강의는 강의 → 챕터 → 레슨 3단계 구조로 구성됩니다. 레슨 단위로 학습이 진행되며, 각 레슨은 텍스트·영상·자료 형태로 제공됩니다.',
+      title: '강의 학습',
+      routeLabel: '/lms/course/:courseId/lesson/:lessonId',
+      description: '강의는 강의 → 레슨 구조로 구성됩니다. 레슨 단위로 학습이 진행되며, 각 레슨은 텍스트·영상·퀴즈·과제 중 하나로 제공됩니다.',
       items: [
-        { label: '강의(Course)', detail: '최상위 학습 단위입니다. 강의명·설명·수료 기준이 설정됩니다.' },
-        { label: '챕터(Chapter)', detail: '강의 내 주제 구분입니다. 순서대로 학습하거나 원하는 챕터를 선택할 수 있습니다.' },
-        { label: '레슨(Lesson)', detail: '가장 작은 학습 단위입니다. 텍스트·영상·첨부 자료로 구성되며, 완료 처리가 가능합니다.' },
+        { label: '텍스트 레슨', detail: '글 형태로 구성된 레슨입니다. 내용을 확인하고 완료 버튼을 누릅니다.' },
+        { label: '영상 레슨', detail: '영상을 시청하는 레슨입니다. 일정 비율 이상 시청하면 완료 처리됩니다.' },
+        { label: '퀴즈', detail: '문제를 풀고 제출하면 결과가 즉시 표시됩니다.' },
+        { label: '과제', detail: '답안을 작성해 제출합니다. 강사의 채점 후 결과를 확인할 수 있습니다.' },
       ],
     },
     {
       step: '04',
-      title: '학습 진행 흐름',
-      routeLabel: '/lms/:courseId/lessons/:lessonId',
-      description: '강의 선택 후 수강을 시작하면 레슨 단위로 학습이 진행됩니다. 마지막 레슨 완료 시 진행률이 100%로 처리되고 수료 상태로 전환됩니다.',
+      title: '학습 관리',
+      routeLabel: '/mypage/enrollments',
+      description: '내 강의에서 수강 중인 강의의 진행 상태를 확인합니다.',
       items: [
-        { label: '강의 선택 → 수강 시작', detail: '강의 상세 페이지에서 수강 신청 후 첫 레슨으로 이동합니다.' },
-        { label: '레슨 학습 → 완료 처리', detail: '레슨 내용을 확인하고 완료 버튼을 누르면 진행률이 업데이트됩니다.' },
-        { label: '전체 레슨 완료 → 수료', detail: '마지막 레슨 완료 시 진행률 100%와 함께 수료(completion) 상태로 자동 전환됩니다.' },
+        { label: '진행률 확인', detail: '수강 중인 강의별 레슨 완료 비율이 표시됩니다.' },
+        { label: '내 강의', detail: '진행 중·완료·승인 대기·거절 상태별로 수강 이력을 확인합니다.' },
       ],
     },
     {
       step: '05',
-      title: '수료 및 인증',
-      description: '모든 레슨을 완료하면 수료 상태가 생성됩니다. 수료증은 자동 발급되며, 공개 검증(verify)이 가능한 구조를 지원합니다.',
+      title: '수료증',
+      routeLabel: '/mypage/certificates',
+      description: '모든 레슨을 완료하면 수료증이 자동 발급됩니다.',
       items: [
-        { label: '수료증 자동 발급', detail: '수료 상태로 전환되면 수료증이 자동으로 생성됩니다. 수료 일시와 강의명이 포함됩니다.' },
-        { label: '공개 검증(verify)', detail: '수료증 링크를 통해 외부에서 수료 사실을 확인할 수 있습니다.' },
-        { label: '강의 상태 구분', detail: 'draft(초안)는 수강 불가, published(공개)는 수강 가능, archived(보관)는 신규 수강이 중단된 상태입니다.' },
+        { label: 'PDF 다운로드', detail: '수료증을 PDF 파일로 내려받을 수 있습니다. 수료 일시와 강의명이 포함됩니다.' },
+        { label: '공개 검증', detail: '수료증 링크를 통해 외부에서 수료 사실을 확인할 수 있습니다.' },
       ],
     },
     {
       step: '06',
-      title: '활용 시나리오',
-      description: '강의는 운영/교육/지식 공유 도구로 다양하게 활용할 수 있습니다.',
+      title: '강사 기능',
+      routeLabel: '/instructor/courses',
+      description: '강사는 강의를 직접 만들고 수강생을 관리합니다.',
       items: [
-        { label: '약사 교육 프로그램', detail: '보수교육·세미나를 강의 형태로 제공해 약사 회원이 시간과 장소에 구애받지 않고 수강합니다.' },
-        { label: '제품/서비스 교육', detail: '약국에서 취급하는 제품의 사용법·특성을 강의로 제공해 직원 교육과 고객 응대 품질을 높입니다.' },
-        { label: '커뮤니티 지식 공유', detail: '현장 약사가 직접 강의를 구성해 노하우와 전문 지식을 커뮤니티 전체와 공유합니다.' },
+        { label: '강의 만들기', detail: '강의 제목·설명·공개 여부를 설정하고 레슨을 추가합니다.' },
+        { label: '레슨 구성', detail: '텍스트·영상·퀴즈·과제 중 타입을 선택해 레슨을 구성합니다.' },
+        { label: '수강생 관리', detail: '수강 신청을 승인하거나 거절하고, 수강생별 진행 현황을 확인합니다.' },
+        { label: '과제 채점', detail: '제출된 과제를 확인하고 점수를 부여합니다.' },
       ],
     },
   ],
