@@ -50,6 +50,7 @@ import { createInvoiceController } from './controllers/invoice.controller.js'; /
 import { createInvoiceDispatchController } from './controllers/invoice-dispatch.controller.js'; // Phase 3-E: Invoice Dispatch
 import { createGlycopharmCommunityHubController } from './controllers/glycopharm-community-hub.controller.js'; // WO-GLYCOPHARM-COMMUNITY-HUB-IMPLEMENTATION-V1
 import { createGlycopharmEventOfferController } from './controllers/event-offer.controller.js'; // WO-O4O-GLYCOPHARM-EVENT-OFFERS-BACKEND-CANONICAL-ALIGNMENT-V1
+import { createNewsController } from '../o4o-store/controllers/news.controller.js'; // WO-O4O-CONTENT-CANONICAL-CROSS-SERVICE-ALIGNMENT-V1
 import { createGlycopharmMemberController } from './controllers/glycopharm-member.controller.js'; // WO-GLYCOPHARM-MEMBER-REGISTER-FLOW-V1
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 import { hasAnyServiceRole, logLegacyRoleUsage } from '../../utils/role.utils.js';
@@ -452,6 +453,24 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
     '/operator/resources',
     createGlycopharmOperatorResourcesRouter(dataSource, authenticate as any, requireGlycopharmScope),
   );
+
+  // ============================================================================
+  // News/Content Routes (CMS 공지/뉴스) — /api/v1/glycopharm/news/*
+  // WO-O4O-CONTENT-CANONICAL-CROSS-SERVICE-ALIGNMENT-V1
+  //
+  // Public: GET /news, GET /news/:id
+  // Operator: GET /news/admin/list, POST /news, PUT /news/:id,
+  //           DELETE /news/:id, DELETE /news/:id/hard,
+  //           POST /news/batch-publish, POST /news/batch-archive, POST /news/batch-hard-delete
+  // ============================================================================
+  router.use('/news', createNewsController(
+    dataSource,
+    coreRequireAuth as any,
+    optionalAuth as any,
+    requireGlycopharmScope as any,
+    'glycopharm',
+    'glycopharm:operator',
+  ));
 
   return router;
 }

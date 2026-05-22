@@ -129,6 +129,8 @@ const OperatorAnalyticsPage = lazy(() => import('@/pages/operator/AnalyticsPage'
 const GuidelineManagementPage = lazy(() => import('@/pages/operator/GuidelineManagementPage'));
 // Operator Guide Contents (WO-O4O-OPERATOR-GUIDE-CONTENTS-CORE-EXTRACTION-V1)
 const OperatorGuideContentsPage = lazy(() => import('@/pages/operator/OperatorGuideContentsPage'));
+// Operator Content Management (WO-O4O-CONTENT-CANONICAL-CROSS-SERVICE-ALIGNMENT-V1)
+const OperatorContentPage = lazy(() => import('@/pages/operator/OperatorContentPage'));
 
 // Operator Semi-Franchise Pages
 const PharmaciesPage = lazy(() => import('@/pages/operator/PharmaciesPage'));
@@ -595,6 +597,8 @@ function AppRoutes() {
         <Route path="guidelines" element={<GuidelineManagementPage />} />
         {/* Guide Contents (WO-O4O-OPERATOR-GUIDE-CONTENTS-CORE-EXTRACTION-V1) */}
         <Route path="guide-contents" element={<OperatorGuideContentsPage />} />
+        {/* Content Management 공지/뉴스 (WO-O4O-CONTENT-CANONICAL-CROSS-SERVICE-ALIGNMENT-V1) */}
+        <Route path="content-management" element={<OperatorContentPage />} />
         {/* LMS Management (WO-GLYCOPHARM-INSTRUCTOR-OPERATOR-V1) */}
         <Route path="lms/courses" element={<LmsCoursesPage />} />
         {/* Resources Management + AI Content (WO-O4O-GLYCOPHARM-AI-CONTENT-ACTIVATION-V1) */}

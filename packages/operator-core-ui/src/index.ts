@@ -38,3 +38,7 @@ export type {
   GuideContentsClient,
   GuideContentsManagerProps,
 } from './modules/guide-contents';
+
+// CMS Content Module (WO-O4O-CONTENT-CANONICAL-CROSS-SERVICE-ALIGNMENT-V1)
+export { CmsContentManager } from './modules/cms-content';
+export type { CmsContentManagerProps } from './modules/cms-content';

@@ -42,6 +42,8 @@ import { createCosmeticsCommunityHubController } from './controllers/cosmetics-c
 import { createCosmeticsTouristHubController } from './controllers/cosmetics-tourist-hub.controller.js';
 // WO-O4O-EVENT-OFFER-KCOS-ADOPTION-V1
 import { createCosmeticsEventOfferController } from './controllers/event-offer.controller.js';
+// WO-O4O-CONTENT-CANONICAL-CROSS-SERVICE-ALIGNMENT-V1
+import { createNewsController } from '../o4o-store/controllers/news.controller.js';
 import { authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 // WO-O4O-OPERATOR-ACTION-LAYER-V1
 import { createActionQueueRouter } from '../../common/action-queue/index.js';
@@ -161,6 +163,23 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
     '/event-offers',
     createCosmeticsEventOfferController(dataSource, authenticate, optionalAuth, requireCosmeticsScope),
   );
+
+  // ============================================================================
+  // News/Content Routes (CMS 공지/뉴스) — /api/v1/cosmetics/news/*
+  // WO-O4O-CONTENT-CANONICAL-CROSS-SERVICE-ALIGNMENT-V1
+  //
+  // Public: GET /news, GET /news/:id
+  // Operator: GET /news/admin/list, POST /news, PUT /news/:id,
+  //           DELETE /news/:id, DELETE /news/:id/hard, batch ops
+  // ============================================================================
+  router.use('/news', createNewsController(
+    dataSource,
+    coreRequireAuth as any,
+    optionalAuth as any,
+    requireCosmeticsScope as any,
+    'k-cosmetics',
+    'cosmetics:operator',
+  ));
 
   return router;
 }

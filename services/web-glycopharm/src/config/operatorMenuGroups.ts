@@ -43,6 +43,7 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '가이드라인 관리', path: '/operator/guidelines' },
     { label: '강의 관리', path: '/operator/lms/courses' },
     { label: '안내 문구 관리', path: '/operator/guide-contents' },
+    { label: '공지/뉴스 관리', path: '/operator/content-management' },
   ],
   signage: [
     { label: 'HQ 미디어', path: '/operator/signage/hq-media' },
@@ -111,6 +112,7 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     { label: '가이드라인 관리', path: '/operator/guidelines' },
     { label: '강의 관리', path: '/operator/lms/courses' },
     { label: '안내 문구 관리', path: '/operator/guide-contents' },
+    { label: '공지/뉴스 관리', path: '/operator/content-management' },
   ],
   signage: [
     { label: 'HQ 미디어', path: '/operator/signage/hq-media' },

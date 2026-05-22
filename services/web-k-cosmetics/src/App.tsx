@@ -146,6 +146,8 @@ const OperatorAiReportPage = lazy(() => import('@/pages/operator/AiReportPage'))
 const StoreCockpitPage = lazy(() => import('@/pages/operator/StoreCockpitPage'));
 // Operator Guide Contents (WO-O4O-OPERATOR-GUIDE-CONTENTS-CORE-EXTRACTION-V1)
 const OperatorGuideContentsPage = lazy(() => import('@/pages/operator/OperatorGuideContentsPage'));
+// Operator Content Management (WO-O4O-CONTENT-CANONICAL-CROSS-SERVICE-ALIGNMENT-V1)
+const OperatorContentPage = lazy(() => import('@/pages/operator/OperatorContentPage'));
 // WO-KCOS-OPERATOR-LMS-BOOTSTRAP-V1
 const OperatorLmsCoursesPage = lazy(() => import('@/pages/operator/OperatorLmsCoursesPage'));
 
@@ -476,6 +478,8 @@ function AppRoutes() {
         <Route path="forum-analytics" element={<ForumAnalyticsPage />} />
         {/* Guide Contents (WO-O4O-OPERATOR-GUIDE-CONTENTS-CORE-EXTRACTION-V1) */}
         <Route path="guide-contents" element={<OperatorGuideContentsPage />} />
+        {/* Content Management 공지/뉴스 (WO-O4O-CONTENT-CANONICAL-CROSS-SERVICE-ALIGNMENT-V1) */}
+        <Route path="content-management" element={<OperatorContentPage />} />
         {/* LMS 강의 관리 (WO-KCOS-OPERATOR-LMS-BOOTSTRAP-V1) */}
         <Route path="lms" element={<OperatorLmsCoursesPage />} />
       </Route>
