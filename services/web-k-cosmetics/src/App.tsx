@@ -36,6 +36,8 @@ import LoginPage from '@/pages/auth/LoginPage';
 import HandoffPage from '@/pages/HandoffPage';
 import AccountRecoveryPage from '@/pages/auth/AccountRecoveryPage';
 import ResetPasswordPage from '@/pages/auth/ResetPasswordPage';
+// WO-O4O-AUTH-VERIFY-EMAIL-FRONTEND-PAGE-V1: 이메일 인증 결과 페이지
+import VerifyEmailPage from '@/pages/auth/VerifyEmailPage';
 
 // ============================================================================
 // Lazy loaded pages (heavy / rarely accessed)
@@ -269,6 +271,7 @@ function AppRoutes() {
         <Route path="register" element={<RegisterPage />} />
         <Route path="forgot-password" element={<AccountRecoveryPage />} />
         <Route path="reset-password" element={<ResetPasswordPage />} />
+        <Route path="auth/verify-email" element={<VerifyEmailPage />} />
         <Route path="contact" element={<ContactPage />} />
         {/* WO-O4O-KCOS-MENU-CANONICAL-ALIGN-V1: 모바일 매장 경영 허브 */}
         <Route path="mobile/store" element={<MobileStorePage />} />

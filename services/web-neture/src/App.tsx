@@ -117,6 +117,8 @@ import {
 // RegisterPage는 RegisterModal로 대체됨 (WO-O4O-AUTH-MODAL-SIGNUP-ROLE-UPDATE-V1)
 import AccountRecoveryPage from './pages/auth/AccountRecoveryPage';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
+// WO-O4O-AUTH-VERIFY-EMAIL-FRONTEND-PAGE-V1: 이메일 인증 결과 페이지
+import VerifyEmailPage from './pages/auth/VerifyEmailPage';
 import { RegisterPendingPage } from './pages/RegisterPendingPage';
 // MyPage 3-split (WO-O4O-NETURE-MYPAGE-SPLIT-V1)
 import MyPageHub from './pages/mypage/MyPageHub';
@@ -605,6 +607,7 @@ function App() {
             <Route path="/register" element={<RegisterRedirect />} />
             <Route path="/forgot-password" element={<AccountRecoveryPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/auth/verify-email" element={<VerifyEmailPage />} />
             <Route path="/register/pending" element={<RegisterPendingPage />} />
             <Route path="/qr/:slug" element={<QrLandingPage />} />
 

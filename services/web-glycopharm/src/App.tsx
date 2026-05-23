@@ -32,6 +32,8 @@ import LoginPage from '@/pages/auth/LoginPage';
 import HandoffPage from '@/pages/HandoffPage';
 import AccountRecoveryPage from '@/pages/auth/AccountRecoveryPage';
 import ResetPasswordPage from '@/pages/auth/ResetPasswordPage';
+// WO-O4O-AUTH-VERIFY-EMAIL-FRONTEND-PAGE-V1: 이메일 인증 결과 페이지
+import VerifyEmailPage from '@/pages/auth/VerifyEmailPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 import RedirectNoticeBanner from '@/components/common/RedirectNoticeBanner';
 import FeatureIntroPage from '@/components/common/FeatureIntroPage';
@@ -406,6 +408,7 @@ function AppRoutes() {
       <Route path="register" element={<RegisterPage />} />
       <Route path="forgot-password" element={<AccountRecoveryPage />} />
       <Route path="reset-password" element={<ResetPasswordPage />} />
+      <Route path="auth/verify-email" element={<VerifyEmailPage />} />
       {/* Public Routes with MainLayout */}
       <Route element={<MainLayout />}>
         <Route path="role-select" element={<RoleSelectPage />} />

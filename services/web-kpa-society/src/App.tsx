@@ -24,6 +24,8 @@ import RegisterModal from './components/RegisterModal';
 const HandoffPage = lazy(() => import('./pages/HandoffPage'));
 const AccountRecoveryPage = lazy(() => import('./pages/auth/AccountRecoveryPage'));
 const ResetPasswordPage = lazy(() => import('./pages/auth/ResetPasswordPage'));
+// WO-O4O-AUTH-VERIFY-EMAIL-FRONTEND-PAGE-V1: 이메일 인증 결과 페이지
+const VerifyEmailPage = lazy(() => import('./pages/auth/VerifyEmailPage'));
 
 // Forum pages — Phase 2 lazy (barrel unwound)
 const ForumHomePage = lazy(() => import('./pages/forum/ForumHomePage').then(m => ({ default: m.ForumHomePage })));
@@ -652,6 +654,7 @@ function App() {
           <Route path="/register" element={<RegisterRoute />} />
           <Route path="/forgot-password" element={<AccountRecoveryPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/auth/verify-email" element={<VerifyEmailPage />} />
           <Route path="/admin/*" element={<AdminRoutes />} />
           {/* 약국 HUB — WO-KPA-PHARMACY-HUB-SIDEBAR-LAYOUT-AND-PRODUCT-TABS-FIX-V1: 좌측 사이드바 레이아웃 */}
           {/* WO-O4O-HUB-TO-STORE-HUB-RENAMING-V1: /hub → /store-hub */}
