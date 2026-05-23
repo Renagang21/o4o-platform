@@ -10,7 +10,6 @@ import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { Home, User, Settings, LogOut, Shield } from 'lucide-react';
 import { useAuth, type User as UserType } from '../../contexts';
-import { DashboardSwitcher, useAccessibleDashboards } from '../common/DashboardSwitcher';
 import { SUPER_OPERATOR_ROLES, hasAnyRole } from '../../lib/role-constants';
 
 function isSuperOperator(user: UserType | null): boolean {
@@ -40,7 +39,6 @@ interface StoreUserDropdownProps {
 export function StoreUserDropdown({ homeLink = '/', onLogout }: StoreUserDropdownProps) {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
-  const accessibleDashboards = useAccessibleDashboards();
 
   const isAdmin = user ? user.roles.includes('kpa:admin') : false;
   const isOperator = user ? user.roles.includes('kpa:operator') : false;
@@ -120,15 +118,13 @@ export function StoreUserDropdown({ homeLink = '/', onLogout }: StoreUserDropdow
                       {isAdmin ? '관리자 콘솔' : '운영 대시보드'}
                     </DropdownLink>
                   )}
-                  {accessibleDashboards.length >= 2 ? (
-                    <>
-                      <DashboardSwitcher onNavigate={() => setOpen(false)} />
-                    </>
-                  ) : (
-                    <DropdownLink to="/mypage" icon={<Home className="w-4 h-4 text-slate-500" />} onClick={() => setOpen(false)}>
-                      마이페이지
-                    </DropdownLink>
-                  )}
+                  {/* WO-O4O-DASHBOARD-SWITCHER-DORMANT-CODE-CLEANUP-V1 (2026-05-23):
+                      DashboardSwitcher 는 단일 대시보드 환경에서 항상 미렌더링되던 dormant code 였음.
+                      WO-KPA-SOCIETY-DASHBOARD-TO-MYPAGE-CONSOLIDATION-V1 이후 마이페이지로 일원화.
+                      이전 conditional 의 두 branch 중 false (>= 2 미만) branch 가 항상 활성 → 마이페이지 링크만 유지. */}
+                  <DropdownLink to="/mypage" icon={<Home className="w-4 h-4 text-slate-500" />} onClick={() => setOpen(false)}>
+                    마이페이지
+                  </DropdownLink>
                   <DropdownLink to="/mypage/settings" icon={<Settings className="w-4 h-4 text-slate-500" />} onClick={() => setOpen(false)}>
                     설정
                   </DropdownLink>
