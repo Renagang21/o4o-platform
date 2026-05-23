@@ -482,7 +482,7 @@ export const kpaGuideFeaturesProps: GuideFeaturesPageProps = {
     title: '기능별 이용 방법',
     description: 'KPA-Society 주요 기능을 카테고리별로 정리했습니다. 필요한 기능을 선택해 바로 이동합니다.',
     flowBarTitle: '기능 카테고리',
-    flowLabels: ['커뮤니티', '강의', '콘텐츠', '자료실', '매장 운영', '사이니지', 'QR · Tablet'],
+    flowLabels: ['커뮤니티', '강의', '콘텐츠', '자료실', '설문조사', '매장 운영', '사이니지', 'QR · Tablet'],
   },
   groups: [
     {
@@ -530,6 +530,19 @@ export const kpaGuideFeaturesProps: GuideFeaturesPageProps = {
     },
     {
       step: '05',
+      title: '설문조사',
+      primaryRoute: '/surveys',
+      description: '설문에 참여해 포인트를 받고, 회원이 직접 설문을 만들어 의견을 모읍니다.',
+      items: [
+        { label: '설문조사 이용 방법', route: '/guide/features/survey' },
+        { label: '설문 목록', route: '/surveys' },
+        { label: '설문 만들기', route: '/content/surveys/new' },
+        { label: '내 설문 관리', route: '/content/surveys' },
+      ],
+      linkTo: '/guide/features/survey',
+    },
+    {
+      step: '06',
       title: '매장 운영',
       primaryRoute: '/store',
       description: '약국 매장의 상품·채널·고객 요청을 통합 관리합니다. 승인된 약사 계정 필요.',
@@ -545,7 +558,7 @@ export const kpaGuideFeaturesProps: GuideFeaturesPageProps = {
       linkTo: '/guide/features/store',
     },
     {
-      step: '06',
+      step: '07',
       title: '디지털 사이니지',
       primaryRoute: '/store/marketing/signage/playlist',
       description: '매장 디스플레이에 재생할 콘텐츠를 플레이리스트로 구성하고 스케줄을 설정합니다.',
@@ -555,7 +568,7 @@ export const kpaGuideFeaturesProps: GuideFeaturesPageProps = {
       linkTo: '/guide/features/signage',
     },
     {
-      step: '07',
+      step: '08',
       title: 'QR · Tablet',
       primaryRoute: '/store/marketing/qr',
       description: 'QR 코드로 고객을 유입하고 태블릿 키오스크로 상담 요청을 연결합니다.',
@@ -744,7 +757,7 @@ export const kpaGuideFeatureContentProps: GuideFeatureManualPageProps = {
       items: [
         { label: '코스형 자료', detail: '/content/courses 에서 공개된 코스형 자료를 확인합니다. 작성은 강사(lms:instructor) 또는 운영자 권한이 필요합니다.' },
         { label: '강의(LMS) 가이드', detail: '강의 수강·작성 흐름은 /guide/features/lms 가이드를 참고합니다.' },
-        { label: '설문조사', detail: '/content/surveys 에서 진행 중 설문에 응답하거나, 종료된 설문의 결과를 확인합니다.' },
+        { label: '설문조사 가이드', detail: '설문 참여·작성·결과 확인·포인트 보상은 /guide/features/survey 가이드를 참고합니다.' },
       ],
     },
   ],
@@ -837,6 +850,104 @@ export const kpaGuideFeatureResourcesProps: GuideFeatureManualPageProps = {
         { label: '콘텐츠', detail: '회원이 직접 글을 작성해 공유하는 문서입니다. 리치 텍스트 편집기, AI로 만들기 등 작성 흐름에 초점.' },
         { label: '자료실', detail: '여러 회원이 함께 쓰는 자료 보관소입니다. 읽기 · 다운로드 · 링크 활용 등 사용 흐름에 초점.' },
         { label: '콘텐츠 가이드 참고', detail: '콘텐츠 작성과 AI 만들기 흐름은 /guide/features/content 가이드를 참고합니다.' },
+      ],
+    },
+  ],
+  bottomNav: {
+    prev: { label: '← 기능별 이용 방법', to: '/guide/features' },
+    home: { label: '홈으로', to: '/' },
+  },
+};
+
+// ─── /guide/features/survey ────────────────────────────────────────────
+// WO-O4O-KPA-GUIDE-SURVEY-MANUAL-NEW-V1: 신규 작성
+// - /surveys = 회원용 진입점 (포인트 보상 배지)
+// - /content/surveys/new = 설문 만들기 진입점 (SINGLE_CHOICE/MULTIPLE_CHOICE/FREE_TEXT만 노출)
+// - /content/surveys = 작성자/관리자용 목록 (검색·상태 필터)
+// - /participation 정적 placeholder는 본 가이드에서 안내하지 않음
+// - QUIZ 유형, scope 상세, 그래프 디테일은 매뉴얼 범위 외
+
+export const kpaGuideFeatureSurveyProps: GuideFeatureManualPageProps = {
+  hero: {
+    eyebrow: '기능별 이용 방법',
+    title: '설문조사 이용 방법',
+    description: '설문에 참여하고 포인트를 받고, 직접 설문을 만들어 의견을 모으는 방법을 안내합니다',
+    primaryAction: { label: '설문조사로 이동 →', to: '/surveys' },
+    flowBarTitle: '이용 흐름',
+    flowLabels: ['설문 둘러보기', '설문 참여', '포인트 보상', '설문 만들기', '결과 보기', '내 설문 관리'],
+  },
+  sections: [
+    {
+      step: '01',
+      title: '설문 둘러보기',
+      routeLabel: '/surveys',
+      description: '/surveys 에서 참여 가능한 설문 목록을 확인합니다. 진행 중인 설문이 카드 형태로 표시됩니다.',
+      items: [
+        { label: '설문 목록 진입', detail: '/surveys 로 이동하면 회원에게 공개된 진행 중 설문이 표시됩니다.' },
+        { label: '설문 카드 정보', detail: '제목, 짧은 설명, 응답 수, 마감일이 카드에 함께 표시됩니다.' },
+        { label: '포인트 표시', detail: '포인트 보상이 설정된 설문은 카드 우측에 포인트 배지가 표시됩니다.' },
+        { label: '설문 상세 진입', detail: '카드를 클릭하면 /surveys/:id 에서 설문 정보와 참여 버튼을 확인합니다.' },
+      ],
+    },
+    {
+      step: '02',
+      title: '설문 참여',
+      routeLabel: '/surveys/:id',
+      description: '설문 상세에서 "설문 참여하기" 버튼을 누르면 응답 화면으로 이동합니다. 각 질문에 답하고 제출합니다.',
+      items: [
+        { label: '참여 버튼', detail: '설문 상세에서 "설문 참여하기"를 누르면 응답 화면이 열립니다.' },
+        { label: '응답 제출', detail: '질문에 답한 뒤 제출하면 결과 화면으로 이동합니다.' },
+        { label: '비로그인 응답', detail: '로그인하지 않아도 응답할 수 있습니다. 단, 비로그인 응답은 포인트 보상 대상이 아닙니다.' },
+        { label: '중복 응답 방지', detail: '같은 브라우저에서 한 설문에 한 번만 응답할 수 있습니다.' },
+        { label: '응답 수정', detail: '응답 수정 가능 여부는 설문마다 다릅니다. 수정 허용 설문은 다시 진입했을 때 이전 응답을 불러옵니다.' },
+      ],
+    },
+    {
+      step: '03',
+      title: '포인트 보상',
+      description: '포인트 보상이 설정된 설문은 응답 완료 즉시 포인트가 지급됩니다. 비로그인 응답은 포인트 대상이 아닙니다.',
+      items: [
+        { label: '포인트 배지', detail: '설문 목록과 상세 화면에서 보상 금액(P) 배지로 표시됩니다.' },
+        { label: '즉시 지급', detail: '응답 완료와 동시에 포인트가 지급됩니다. 설문 상세에서 지급 내역이 표시됩니다.' },
+        { label: '이미 참여한 설문', detail: '재진입 시 "이미 응답하셨습니다" 안내와 지급된 포인트 금액이 함께 표시됩니다.' },
+        { label: '결과 보기 이동', detail: '이미 응답한 설문은 상세 화면에서 "결과 보기" 버튼으로 결과 화면으로 이동합니다.' },
+      ],
+    },
+    {
+      step: '04',
+      title: '설문 만들기',
+      routeLabel: '/content/surveys/new',
+      description: '콘텐츠 허브의 "설문 등록" 또는 /content/surveys/new 로 진입해 설문을 만듭니다. 로그인 회원이면 누구나 만들 수 있습니다.',
+      items: [
+        { label: '진입', detail: '/content/surveys 우상단 "설문 등록" 버튼 또는 /content/surveys/new 로 이동합니다.' },
+        { label: '기본 정보', detail: '제목과 설명을 입력합니다.' },
+        { label: '질문 추가', detail: '단일 선택, 복수 선택, 자유 응답 중 하나를 골라 질문을 추가합니다. 질문마다 필수 여부를 설정할 수 있습니다.' },
+        { label: '평가하지 않는 설문', detail: '설문은 사람을 평가하지 않습니다. 점수 · 등급 · 랭킹 개념이 없으며, 응답을 모으고 보여주는 데 집중합니다.' },
+        { label: '초안 저장', detail: 'DRAFT(초안) 상태로 저장하면 본인만 볼 수 있습니다.' },
+        { label: '공개 전환', detail: 'ACTIVE(진행) 상태로 전환하면 회원이 참여할 수 있는 설문 목록(/surveys)에 노출됩니다.' },
+      ],
+    },
+    {
+      step: '05',
+      title: '결과 보기',
+      routeLabel: '/participation/:id/results',
+      description: '응답이 끝난 설문은 결과 화면으로 이동합니다. 응답자 수와 질문별 집계를 한눈에 확인합니다.',
+      items: [
+        { label: '응답자 수', detail: '설문 전체 응답자 수와 질문 수, 익명/기명 여부가 요약 영역에 표시됩니다.' },
+        { label: '질문별 집계', detail: '선택형 질문은 보기별 응답 분포로, 자유 응답은 답변 목록으로 표시됩니다.' },
+        { label: '종료된 설문', detail: '종료된 설문도 같은 결과 화면에서 누적 응답 결과를 확인할 수 있습니다.' },
+      ],
+    },
+    {
+      step: '06',
+      title: '내 설문 관리',
+      routeLabel: '/content/surveys',
+      description: '내가 만든 설문은 콘텐츠 허브의 설문 목록에서 관리합니다. 검색과 상태 필터로 빠르게 찾아 진행 상황을 확인합니다.',
+      items: [
+        { label: '설문 목록', detail: '/content/surveys 에서 작성한 설문과 다른 회원이 만든 설문을 함께 확인합니다.' },
+        { label: '검색', detail: '상단 검색창에 키워드를 입력해 설문을 찾습니다.' },
+        { label: '상태 필터', detail: '진행중(ACTIVE) · 초안(DRAFT) · 종료(CLOSED) 별로 목록을 좁힐 수 있습니다.' },
+        { label: '행 클릭', detail: '진행 중 설문은 응답 화면, 초안·종료 설문은 결과 화면으로 이동합니다.' },
       ],
     },
   ],

@@ -145,6 +145,8 @@ const GuideFeatureSignagePage = lazy(() => import('./pages/guide/GuideFeatureSig
 const GuideFeatureQrTabletPage = lazy(() => import('./pages/guide/GuideFeatureQrTabletPage').then(m => ({ default: m.GuideFeatureQrTabletPage })));
 const GuideFeatureStorePage = lazy(() => import('./pages/guide/GuideFeatureStorePage').then(m => ({ default: m.GuideFeatureStorePage })));
 const GuideFeatureLmsPage = lazy(() => import('./pages/guide/GuideFeatureLmsPage').then(m => ({ default: m.GuideFeatureLmsPage })));
+// WO-O4O-KPA-GUIDE-SURVEY-MANUAL-NEW-V1
+const GuideFeatureSurveyPage = lazy(() => import('./pages/guide/GuideFeatureSurveyPage').then(m => ({ default: m.GuideFeatureSurveyPage })));
 
 // Community Home (WO-KPA-COMMUNITY-HOME-V1)
 import { CommunityHomePage } from './pages/CommunityHomePage';
@@ -594,6 +596,8 @@ function App() {
           <Route path="/guide/features/qr" element={<Layout serviceName={SERVICE_NAME}><GuideFeatureQrTabletPage /></Layout>} />
           <Route path="/guide/features/store" element={<Layout serviceName={SERVICE_NAME}><GuideFeatureStorePage /></Layout>} />
           <Route path="/guide/features/lms" element={<Layout serviceName={SERVICE_NAME}><GuideFeatureLmsPage /></Layout>} />
+          {/* WO-O4O-KPA-GUIDE-SURVEY-MANUAL-NEW-V1 */}
+          <Route path="/guide/features/survey" element={<Layout serviceName={SERVICE_NAME}><GuideFeatureSurveyPage /></Layout>} />
 
           {/* Service Detail Pages (WO-KPA-HOME-SERVICE-SECTION-V1) */}
           <Route path="/services/branch" element={<Navigate to="/" replace />} />

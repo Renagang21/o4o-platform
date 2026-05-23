@@ -53,6 +53,7 @@ export {
   kpaGuideFeatureStoreProps,
   kpaGuideFeatureLmsProps,
   kpaGuideFeatureQrTabletProps,
+  kpaGuideFeatureSurveyProps,
 } from './copy/kpa.js';
 
 export {
