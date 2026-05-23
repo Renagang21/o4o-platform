@@ -5,6 +5,28 @@
 
 ---
 
+## 사업 철학 SSOT (Priority Chain)
+
+본 CLAUDE.md 다음, 영역별 Freeze/Baseline/IR 위에 다음 문서가 위치한다.
+
+| 순위 | 문서 | 역할 |
+|:---:|------|------|
+| 1 | `CLAUDE.md` (본 문서) | 기술/운영 규칙 |
+| 2 | [`docs/baseline/O4O-BUSINESS-PHILOSOPHY-V1.md`](docs/baseline/O4O-BUSINESS-PHILOSOPHY-V1.md) | **사업 철학 SSOT** — 공급자/운영사업자/매장 정의, HUB 철학, AI 역할 |
+| 3 | [`docs/baseline/O4O-3-ROLE-FLOW-BASELINE-V1.md`](docs/baseline/O4O-3-ROLE-FLOW-BASELINE-V1.md) | **3자 Canonical Flow SSOT** — 누가/언제/무엇을/어떻게 넘기는가 (책임 매트릭스 · 데이터 흐름 · Drift 가드) |
+| 4 | Operator UX Baselines ([`Canonical Workflow`](docs/architecture/O4O-OPERATOR-CANONICAL-WORKFLOW-V1.md) 검수·승인 UX + [`Non-Approval UX Baseline`](docs/baseline/O4O-OPERATOR-NON-APPROVAL-UX-BASELINE-V1.md) 5 Workspace UX + [`HUB Content Publishing Standard`](docs/baseline/O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1.md) RichTextEditor 기반 항목별 게시 — Source Ingestion 보류) | **Operator UX 영역 SSOT** — 자매 구조 |
+| 5 | Store Side Standards ([`Store Menu Canonical Tree`](docs/baseline/O4O-STORE-MENU-CANONICAL-TREE-V1.md) 매장 HUB ↔ 내 매장 메뉴 같은 축 정렬 — 6 항목: 상품 상세 / POP / QR / 블로그 / 사이니지 / 고객 안내문. 설문 V1 범위 외) | **Store 측 메뉴·축 SSOT** — Operator HUB 게시 표준의 매장 측 대응 |
+| 6 | 영역별 Freeze / Baseline / IR | 도메인·계층별 세부 규칙 |
+
+**우선순위 적용:**
+
+- `O4O-BUSINESS-PHILOSOPHY-V1` 의 §3 (참여 주체) / §4 (Canonical Flow) / §5 (HUB 철학) / §6 (AI 역할) / §7 (Drift 방지) 정의는 영역별 문서(Operator, Supplier, HUB, Store, AI 등)에 우선한다.
+- `O4O-3-ROLE-FLOW-BASELINE-V1` 의 §2 (책임 매트릭스) / §3 (데이터 흐름) / §4 (원천 자료 vs 실행 자산) / §5 (AI 개입) / §6 (Drift 금지/권장 흐름) 정의는 영역별 흐름·권한·검수 정책에 우선한다.
+
+충돌 시 위 순서를 기준으로 영역별 문서를 정렬한다. 영역별 Freeze 문서 변경은 별도 WO 필요.
+
+---
+
 ## 0. 환경 원칙 (CRITICAL)
 
 > **기본 환경은 프로덕션이다.** (2026-01-29~)
@@ -228,19 +250,26 @@ import type { RelatedEntity } from './related.entity.js';
 
 > 📄 상세: `docs/platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md`
 > 📄 DataTable 정책: `docs/architecture/OPERATOR-DATATABLE-POLICY-V1.md`
+> 📄 검수·승인 UX: `docs/architecture/O4O-OPERATOR-CANONICAL-WORKFLOW-V1.md`
+> 📄 **검수 외 5개 Workspace UX (자료 등록 / AI 작업 / 큐레이션 / 매장 지원 / 운영 수익)**: `docs/baseline/O4O-OPERATOR-NON-APPROVAL-UX-BASELINE-V1.md`
+> 📄 **매장 HUB 콘텐츠 게시 표준 (RichTextEditor 기반 항목별 게시 — Source Ingestion 보류)**: `docs/baseline/O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1.md`
 
 ### Admin / Operator 역할 구분
+
+> **Canonical 정렬 (2026-05-23):**
+> 본 표는 **권한·기능 매트릭스** (Dashboard / RBAC / Guard 범위) 이다. Operator 의 **사업적 정의** 는 [`docs/baseline/O4O-BUSINESS-PHILOSOPHY-V1.md §3.2`](docs/baseline/O4O-BUSINESS-PHILOSOPHY-V1.md) — "**서비스 운영 사업자** (공급자 자료 수신·등록·구성 + AI 활용 + 매장 실행 자산 제작 + 큐레이션 + 매장 지원 + 운영 수익 모델 구축)" 이다.
+> 본 표의 "운영 + 콘텐츠 + 모니터링" 은 PHILOSOPHY §3.2 의 책임 중 **권한 매트릭스에 반영된 부분 집합**이다.
 
 | 역할 | 범위 |
 |------|------|
 | **Admin** | 구조 + 정책 + 거버넌스 + 금융 |
-| **Operator** | 운영 + 콘텐츠 + 모니터링 |
+| **Operator** | 운영 + 콘텐츠 + 모니터링 (권한 매트릭스 — 사업적 정의는 위 노트 참조) |
 
 ### 핵심 규칙
 
 1. **Guard**: `requireAuth` → `require{Service}Scope('{service}:{role}')` — 레거시 `requireAdmin` 서비스 레벨 사용 금지
-2. **Dashboard**: 5-Block 구조 (`KPI` + `AI Summary` + `Action Queue` + `Activity Log` + `Quick Actions`) — `OperatorDashboardLayout` 컴포넌트 사용
-3. **AI Summary**: Backend `CopilotEngineService.generateInsights()` 사용 — Frontend client-side 생성 금지
+2. **Dashboard**: 5-Block 구조 (`KPI` + `AI Summary` + `Action Queue` + `Activity Log` + `Quick Actions`) — `OperatorDashboardLayout` 컴포넌트 사용. **A~F 6 Workspace 진입 허브** (A 자료 등록 / B AI 작업 / C 큐레이션 / D 매장 지원 / E 운영 수익 / F 검수·승인) — 검수·승인 편향은 Drift. 상세는 `OPERATOR-DASHBOARD-STANDARD-V1 §5-6~§5-9`.
+3. **AI Summary**: Backend `CopilotEngineService.generateInsights()` 사용 — Frontend client-side 생성 금지. AI Summary 는 수신 영역이며, Operator 의 능동 AI 활용은 Workspace B 에서 별도 수행.
 4. **Route**: Backend `/api/v1/{service}/operator/*` · `/api/v1/{service}/admin/*` — Frontend `/operator/*` · `/admin/*`
 
 레이아웃·Sidebar 순서·KPI 분류·DataTable 정책 등 상세 규칙은 canonical 문서 참조.
@@ -303,7 +332,7 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | F1 | **Operator OS** — security-core, hub-core, ai-core, action-log-core, asset-copy-core, operator-ux-core, admin-ux-core | 2026-02-16 | `docs/baseline/BASELINE-OPERATOR-OS-V1.md` |
 | F2 | **KPA UX** — 3개 서비스 영역 5-Block/4-Block 통합 UX | 2026-02-17 | `docs/baseline/KPA-UX-BASELINE-V1.md` |
 | F3 | **Store Layer** — store-ui-core, store-asset-policy-core, store-core, asset-copy-core, hub-core 의존 방향 | 2026-02-22 | `docs/architecture/STORE-LAYER-ARCHITECTURE.md` |
-| F4 | **Platform Content Policy** — HUB 3축 모델 (Producer/Visibility/ServiceScope) | 2026-02-23 | `docs/baseline/PLATFORM-CONTENT-POLICY-V1.md` |
+| F4 | **Platform Content Policy** — HUB 3축 모델 (Producer/Visibility/ServiceScope). `HubProducer='supplier'` 는 Legacy / 명문화된 예외 (2026-05-23 정렬) | 2026-02-23 | `docs/baseline/PLATFORM-CONTENT-POLICY-V1.md` |
 | F5 | **Content Stable** — HUB 콘텐츠 타입·매핑·병합 로직·API 계약 | 2026-02-23 | `docs/baseline/CONTENT-STABLE-DECLARATION-V1.md` |
 | F6 | **Boundary Policy** — Domain Boundary Matrix + Guard Rules 5개 | 2026-02-24 | `docs/architecture/O4O-BOUNDARY-POLICY-V1.md` |
 | F7 | **Neture Partner Contract** — 계약 테이블·ENUM·트랜잭션·Commission 불변 | 2026-02-24 | `docs/baseline/NETURE-PARTNER-CONTRACT-FREEZE-V1.md` |
@@ -318,6 +347,8 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 
 | 영역 | 문서 |
 |------|------|
+| **O4O 사업 철학 SSOT (최상위)** | `docs/baseline/O4O-BUSINESS-PHILOSOPHY-V1.md` |
+| **O4O 3자 Canonical Flow SSOT** | `docs/baseline/O4O-3-ROLE-FLOW-BASELINE-V1.md` |
 | Cosmetics 도메인 | `docs/architecture/COSMETICS-DOMAIN-RULES.md` |
 | Business 서비스 | `docs/architecture/BUSINESS-SERVICE-RULES.md` |
 | O4O Store/Order | `docs/architecture/O4O-STORE-RULES.md` |
@@ -367,7 +398,10 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | **Operator Integration State V1** | `docs/architecture/OPERATOR-INTEGRATION-STATE-V1.md` |
 | **Operator DataTable Policy V1** | `docs/architecture/OPERATOR-DATATABLE-POLICY-V1.md` |
 | **Operator Table Canonical V1** | `docs/architecture/O4O-OPERATOR-TABLE-CANONICAL-V1.md` |
-| **Operator Canonical Workflow V1** | `docs/architecture/O4O-OPERATOR-CANONICAL-WORKFLOW-V1.md` |
+| **Operator Canonical Workflow V1** (검수·승인 UX) | `docs/architecture/O4O-OPERATOR-CANONICAL-WORKFLOW-V1.md` |
+| **Operator Non-Approval UX Baseline V1** (5 Workspace — 자료 등록 / AI 작업 / 큐레이션 / 매장 지원 / 운영 수익) | `docs/baseline/O4O-OPERATOR-NON-APPROVAL-UX-BASELINE-V1.md` |
+| **Operator HUB Content Publishing Standard V1** (RichTextEditor 기반 항목별 게시 — Source Ingestion 보류) | `docs/baseline/O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1.md` |
+| **Store Menu Canonical Tree V1** (매장 HUB ↔ 내 매장 메뉴 같은 축 정렬 — 6 항목, 설문 V1 외) | `docs/baseline/O4O-STORE-MENU-CANONICAL-TREE-V1.md` |
 | **Operator Core Design V1** | `docs/architecture/OPERATOR-CORE-DESIGN-V1.md` |
 | **Operator Core Extraction Verify Checklist V1** | `docs/architecture/OPERATOR-CORE-EXTRACTION-VERIFY-CHECKLIST-V1.md` |
 | **Guide sectionKey 충돌 정책** | `docs/architecture/O4O-GUIDE-SECTIONKEY-CONFLICT-POLICY-V1.md` |
