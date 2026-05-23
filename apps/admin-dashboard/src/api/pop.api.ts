@@ -61,6 +61,10 @@ export const popApi = {
     if (params?.page) query.set('page', String(params.page));
     if (params?.limit) query.set('limit', String(params.limit));
     if (params?.search) query.set('search', params.search);
+    // WO-O4O-BOUNDARY-POLICY-PLATFORM-ADMIN-EXEMPTION-FIX-V1:
+    // POP 제작은 platform 레벨 cross-service 도구로 정의. backend Option B 가
+    // platform admin caller 에 명시 opt-in 을 요구하므로 all=true 를 강제 전달.
+    query.set('all', 'true');
 
     const response = await authClient.api.get<any>(
       `/api/v1/operator/products?${query.toString()}`,

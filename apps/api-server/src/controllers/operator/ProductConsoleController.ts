@@ -8,6 +8,7 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
 import type { ServiceScope } from '../../utils/serviceScope.js';
+import { resolveOperatorScope, logCrossServiceQuery, PLATFORM_ADMIN_SCOPE_REQUIRED_RESPONSE } from '../../utils/serviceScope.js';
 
 /**
  * WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1: Product scope filter via organization listings.
@@ -37,6 +38,14 @@ export class ProductConsoleController {
         sortOrder = 'DESC',
       } = req.query;
 
+      // WO-O4O-BOUNDARY-POLICY-PLATFORM-ADMIN-EXEMPTION-FIX-V1: Option B
+      const resolved = resolveOperatorScope(scope, req.query);
+      if (!resolved) {
+        res.status(400).json(PLATFORM_ADMIN_SCOPE_REQUIRED_RESPONSE);
+        return;
+      }
+      if (resolved.crossService) logCrossServiceQuery(req);
+
       const pageNum = Math.max(1, Number(page));
       const limitNum = Math.min(100, Math.max(1, Number(limit)));
       const offset = (pageNum - 1) * limitNum;
@@ -46,10 +55,10 @@ export class ProductConsoleController {
       const params: any[] = [];
       let paramIdx = 1;
 
-      // WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1: Service scope filter
-      if (!scope.isPlatformAdmin) {
+      // Service scope filter via organization_product_listings — null = cross-service
+      if (resolved.serviceKeys !== null) {
         conditions.push(`${PRODUCT_SCOPE_EXISTS}($${paramIdx}))`);
-        params.push(scope.serviceKeys);
+        params.push(resolved.serviceKeys);
         paramIdx++;
       }
 
@@ -108,11 +117,12 @@ export class ProductConsoleController {
         [...params, limitNum, offset]
       );
 
-      // Stats query — WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1: scoped
-      const scopeFilter = scope.isPlatformAdmin
+      // Stats query — Option B: scoped unless cross-service mode (null serviceKeys)
+      const isCrossServiceMode = resolved.serviceKeys === null;
+      const scopeFilter = isCrossServiceMode
         ? ''
         : `WHERE ${PRODUCT_SCOPE_EXISTS}($1))`;
-      const scopeParams = scope.isPlatformAdmin ? [] : [scope.serviceKeys];
+      const scopeParams = isCrossServiceMode ? [] : [resolved.serviceKeys];
 
       const statsResult = await AppDataSource.query(
         `SELECT

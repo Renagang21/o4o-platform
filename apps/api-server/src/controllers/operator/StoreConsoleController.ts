@@ -12,6 +12,7 @@ import { StoreChannelService } from '../../modules/store-core/services/store-cha
 import { StoreCapability as Cap, type StoreCapabilityKey } from '../../modules/store-core/constants/store-capabilities.js';
 import { getCapabilityMeta } from '@o4o/capabilities';
 import type { ServiceScope } from '../../utils/serviceScope.js';
+import { resolveOperatorScope, logCrossServiceQuery, PLATFORM_ADMIN_SCOPE_REQUIRED_RESPONSE } from '../../utils/serviceScope.js';
 import logger from '../../utils/logger.js';
 
 export class StoreConsoleController {
@@ -68,6 +69,14 @@ export class StoreConsoleController {
         sortOrder = 'DESC',
       } = req.query;
 
+      // WO-O4O-BOUNDARY-POLICY-PLATFORM-ADMIN-EXEMPTION-FIX-V1: Option B
+      const resolved = resolveOperatorScope(scope, req.query);
+      if (!resolved) {
+        res.status(400).json(PLATFORM_ADMIN_SCOPE_REQUIRED_RESPONSE);
+        return;
+      }
+      if (resolved.crossService) logCrossServiceQuery(req);
+
       const pageNum = Math.max(1, Number(page));
       const limitNum = Math.min(100, Math.max(1, Number(limit)));
       const offset = (pageNum - 1) * limitNum;
@@ -77,12 +86,12 @@ export class StoreConsoleController {
       const params: any[] = [];
       let paramIdx = 1;
 
-      // WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1: Service scope filter via enrollment
-      if (!scope.isPlatformAdmin) {
+      // Service scope filter via enrollment — null = cross-service (no filter)
+      if (resolved.serviceKeys !== null) {
         conditions.push(
           `EXISTS (SELECT 1 FROM organization_service_enrollments ose WHERE ose.organization_id = o.id AND ose.service_code = ANY($${paramIdx}))`
         );
-        params.push(scope.serviceKeys);
+        params.push(resolved.serviceKeys);
         paramIdx++;
       }
 
@@ -139,11 +148,12 @@ export class StoreConsoleController {
         [...params, limitNum, offset]
       );
 
-      // Stats query — WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1: scoped by service
-      const enrollmentJoin = scope.isPlatformAdmin
+      // Stats query — Option B: enrollment JOIN applied unless cross-service mode
+      const isCrossService = resolved.serviceKeys === null;
+      const enrollmentJoin = isCrossService
         ? ''
         : 'INNER JOIN organization_service_enrollments ose_s ON ose_s.organization_id = o.id AND ose_s.service_code = ANY($1)';
-      const statsParams = scope.isPlatformAdmin ? [] : [scope.serviceKeys];
+      const statsParams = isCrossService ? [] : [resolved.serviceKeys];
 
       const statsResult = await AppDataSource.query(
         `SELECT
@@ -159,7 +169,7 @@ export class StoreConsoleController {
         `SELECT COUNT(DISTINCT oc.organization_id)::int as with_channel
          FROM organization_channels oc
          INNER JOIN organizations o ON oc.organization_id = o.id
-         ${scope.isPlatformAdmin ? '' : 'INNER JOIN organization_service_enrollments ose_c ON ose_c.organization_id = o.id AND ose_c.service_code = ANY($1)'}
+         ${isCrossService ? '' : 'INNER JOIN organization_service_enrollments ose_c ON ose_c.organization_id = o.id AND ose_c.service_code = ANY($1)'}
          WHERE o.type IN ('pharmacy', 'store', 'branch')`,
         statsParams
       );
@@ -168,7 +178,7 @@ export class StoreConsoleController {
         `SELECT COUNT(DISTINCT opl.organization_id)::int as with_products
          FROM organization_product_listings opl
          INNER JOIN organizations o ON opl.organization_id = o.id
-         ${scope.isPlatformAdmin ? '' : 'INNER JOIN organization_service_enrollments ose_p ON ose_p.organization_id = o.id AND ose_p.service_code = ANY($1)'}
+         ${isCrossService ? '' : 'INNER JOIN organization_service_enrollments ose_p ON ose_p.organization_id = o.id AND ose_p.service_code = ANY($1)'}
          WHERE o.type IN ('pharmacy', 'store', 'branch') AND opl.is_active = true`,
         statsParams
       );

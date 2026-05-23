@@ -19,6 +19,7 @@ import type { DataSource } from 'typeorm';
 import { authenticate, requireRole } from '../../middleware/auth.middleware.js';
 import { injectServiceScope } from '../../utils/serviceScope.js';
 import type { ServiceScope } from '../../utils/serviceScope.js';
+import { resolveOperatorScope, logCrossServiceQuery, PLATFORM_ADMIN_SCOPE_REQUIRED_RESPONSE } from '../../utils/serviceScope.js';
 
 // WO-O4O-REQUIREADMIN-PREFIXED-ONLY-V1: legacy unprefixed roles 제거
 const requireOperatorOrAdmin = requireRole([
@@ -43,26 +44,23 @@ export function createOperatorAnalyticsRoutes(dataSource: DataSource): Router {
   router.get('/summary', async (req: Request, res: Response) => {
     try {
       const scope: ServiceScope = (req as any).serviceScope;
-      const requestedService = req.query.serviceKey as string | undefined;
       const days = Math.min(parseInt(req.query.days as string) || 30, 365);
 
-      // Determine which service keys to query
-      let serviceKeys: string[];
-      if (scope.isPlatformAdmin) {
-        serviceKeys = requestedService ? [requestedService] : [];
-      } else {
-        serviceKeys = requestedService
-          ? scope.serviceKeys.filter(k => k === requestedService)
-          : scope.serviceKeys;
+      // WO-O4O-BOUNDARY-POLICY-PLATFORM-ADMIN-EXEMPTION-FIX-V1: Option B
+      const resolved = resolveOperatorScope(scope, req.query);
+      if (!resolved) {
+        res.status(400).json(PLATFORM_ADMIN_SCOPE_REQUIRED_RESPONSE);
+        return;
       }
+      if (resolved.crossService) logCrossServiceQuery(req);
 
       const fromDate = new Date();
       fromDate.setDate(fromDate.getDate() - days);
 
-      const serviceFilter = serviceKeys.length > 0
+      const serviceFilter = resolved.serviceKeys !== null
         ? `AND service_key = ANY($1)`
         : '';
-      const params: any[] = serviceKeys.length > 0 ? [serviceKeys] : [];
+      const params: any[] = resolved.serviceKeys !== null ? [resolved.serviceKeys] : [];
       const dateParamIdx = params.length + 1;
 
       // Action summary grouped by action_key and status
@@ -126,29 +124,28 @@ export function createOperatorAnalyticsRoutes(dataSource: DataSource): Router {
   router.get('/actions', async (req: Request, res: Response) => {
     try {
       const scope: ServiceScope = (req as any).serviceScope;
-      const requestedService = req.query.serviceKey as string | undefined;
       const actionKey = req.query.actionKey as string | undefined;
       const page = parseInt(req.query.page as string) || 1;
       const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
       const offset = (page - 1) * limit;
+
+      // WO-O4O-BOUNDARY-POLICY-PLATFORM-ADMIN-EXEMPTION-FIX-V1: Option B
+      const resolved = resolveOperatorScope(scope, req.query);
+      if (!resolved) {
+        res.status(400).json(PLATFORM_ADMIN_SCOPE_REQUIRED_RESPONSE);
+        return;
+      }
+      if (resolved.crossService) logCrossServiceQuery(req);
 
       // Build conditions
       const conditions: string[] = [];
       const params: any[] = [];
       let idx = 1;
 
-      // Service key filter
-      let serviceKeys: string[];
-      if (scope.isPlatformAdmin) {
-        serviceKeys = requestedService ? [requestedService] : [];
-      } else {
-        serviceKeys = requestedService
-          ? scope.serviceKeys.filter(k => k === requestedService)
-          : scope.serviceKeys;
-      }
-      if (serviceKeys.length > 0) {
+      // Service key filter — null = cross-service (no filter)
+      if (resolved.serviceKeys !== null) {
         conditions.push(`service_key = ANY($${idx++})`);
-        params.push(serviceKeys);
+        params.push(resolved.serviceKeys);
       }
 
       // Action key filter
@@ -270,21 +267,18 @@ export function createOperatorAnalyticsRoutes(dataSource: DataSource): Router {
   router.get('/insight', async (req: Request, res: Response) => {
     try {
       const scope: ServiceScope = (req as any).serviceScope;
-      const requestedService = req.query.serviceKey as string | undefined;
       const days = Math.min(parseInt(req.query.days as string) || 30, 365);
 
-      // Service key resolution
-      let serviceKeys: string[];
-      if (scope.isPlatformAdmin) {
-        serviceKeys = requestedService ? [requestedService] : [];
-      } else {
-        serviceKeys = requestedService
-          ? scope.serviceKeys.filter(k => k === requestedService)
-          : scope.serviceKeys;
+      // WO-O4O-BOUNDARY-POLICY-PLATFORM-ADMIN-EXEMPTION-FIX-V1: Option B
+      const resolved = resolveOperatorScope(scope, req.query);
+      if (!resolved) {
+        res.status(400).json(PLATFORM_ADMIN_SCOPE_REQUIRED_RESPONSE);
+        return;
       }
+      if (resolved.crossService) logCrossServiceQuery(req);
 
-      // Cache check
-      const cacheKey = `${serviceKeys.join(',')}:${days}`;
+      // Cache check — cross-service mode uses 'ALL' sentinel
+      const cacheKey = `${resolved.serviceKeys === null ? 'ALL' : resolved.serviceKeys.join(',')}:${days}`;
       const cached = getCachedInsight(cacheKey);
       if (cached) {
         res.json({ success: true, data: cached });
@@ -294,10 +288,10 @@ export function createOperatorAnalyticsRoutes(dataSource: DataSource): Router {
       const fromDate = new Date();
       fromDate.setDate(fromDate.getDate() - days);
 
-      const serviceFilter = serviceKeys.length > 0
+      const serviceFilter = resolved.serviceKeys !== null
         ? `AND service_key = ANY($1)`
         : '';
-      const params: any[] = serviceKeys.length > 0 ? [serviceKeys] : [];
+      const params: any[] = resolved.serviceKeys !== null ? [resolved.serviceKeys] : [];
       const dateParamIdx = params.length + 1;
 
       // 1. Total counts

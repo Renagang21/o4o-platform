@@ -72,6 +72,10 @@ export default function StoreManagementPage() {
         limit: '20',
         sortBy: 'createdAt',
         sortOrder: 'DESC',
+        // WO-O4O-BOUNDARY-POLICY-PLATFORM-ADMIN-EXEMPTION-FIX-V1:
+        // platform:super_admin 으로 /admin/stores 진입 시에도 Neture-scoped 로
+        // 강제. backend Option B 가 platform admin 에 명시 opt-in 을 요구함.
+        serviceKey: 'neture',
       });
       if (searchTerm) params.set('search', searchTerm);
 

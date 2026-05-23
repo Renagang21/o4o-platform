@@ -8,6 +8,7 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
 import type { ServiceScope } from '../../utils/serviceScope.js';
+import { resolveOperatorScope, logCrossServiceQuery, PLATFORM_ADMIN_SCOPE_REQUIRED_RESPONSE } from '../../utils/serviceScope.js';
 import { hashPassword } from '../../utils/auth.utils.js';
 import logger from '../../utils/logger.js';
 import { MembershipApprovalService } from '../../services/approval/MembershipApprovalService.js';
@@ -51,10 +52,17 @@ export class MembershipConsoleController {
         limit = 20,
         search,
         status,
-        serviceKey,
         sortBy = 'createdAt',
         sortOrder = 'DESC',
       } = req.query;
+
+      // WO-O4O-BOUNDARY-POLICY-PLATFORM-ADMIN-EXEMPTION-FIX-V1: Option B 스코프 결정
+      const resolved = resolveOperatorScope(scope, req.query);
+      if (!resolved) {
+        res.status(400).json(PLATFORM_ADMIN_SCOPE_REQUIRED_RESPONSE);
+        return;
+      }
+      if (resolved.crossService) logCrossServiceQuery(req);
 
       const pageNum = Math.max(1, Number(page));
       const limitNum = Math.min(100, Math.max(1, Number(limit)));
@@ -84,14 +92,10 @@ export class MembershipConsoleController {
         paramIdx++;
       }
 
-      // WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1: Service scope filter
-      if (!scope.isPlatformAdmin) {
+      // Service scope filter — null serviceKeys 면 cross-service 모드 (필터 미적용)
+      if (resolved.serviceKeys !== null) {
         smConditions.push(`sm_f.service_key = ANY($${paramIdx})`);
-        params.push(scope.serviceKeys);
-        paramIdx++;
-      } else if (serviceKey && serviceKey !== 'all') {
-        smConditions.push(`sm_f.service_key = $${paramIdx}`);
-        params.push(serviceKey);
+        params.push(resolved.serviceKeys);
         paramIdx++;
       }
 
@@ -1147,25 +1151,28 @@ export class MembershipConsoleController {
    * GET /api/v1/operator/members/stats
    * 서비스 멤버십 통계 (operator 전용)
    *
-   * WO-O4O-NETURE-ADMIN-USERS-SCOPE-FIX-V1:
-   *   platform:super_admin 호출자도 serviceKey query 로 단일 서비스 스코프
-   *   지정 가능. 미지정 시 기존 동작(전 서비스) 유지.
+   * WO-O4O-BOUNDARY-POLICY-PLATFORM-ADMIN-EXEMPTION-FIX-V1:
+   *   Option B — service operator 는 auto-scope, platform admin 은 명시적
+   *   serviceKey 또는 all=true 필수. 미명시 시 400.
    *   distinct user count 를 위해 status 별 COUNT(DISTINCT user_id) 사용.
    */
   getStats = async (req: Request, res: Response): Promise<void> => {
     try {
       const scope: ServiceScope = (req as any).serviceScope;
-      const { serviceKey } = req.query;
+
+      const resolved = resolveOperatorScope(scope, req.query);
+      if (!resolved) {
+        res.status(400).json(PLATFORM_ADMIN_SCOPE_REQUIRED_RESPONSE);
+        return;
+      }
+      if (resolved.crossService) logCrossServiceQuery(req);
 
       let serviceFilter = '';
       const params: any[] = [];
 
-      if (!scope.isPlatformAdmin) {
+      if (resolved.serviceKeys !== null) {
         serviceFilter = `WHERE sm.service_key = ANY($1)`;
-        params.push(scope.serviceKeys);
-      } else if (serviceKey && serviceKey !== 'all') {
-        serviceFilter = `WHERE sm.service_key = $1`;
-        params.push(serviceKey);
+        params.push(resolved.serviceKeys);
       }
 
       // WO-GLYCOPHARM-MEMBER-REGISTRATION-PENDING-VISIBILITY-FIX-V1:
