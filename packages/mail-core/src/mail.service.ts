@@ -411,7 +411,21 @@ export class MailService {
   // ── Generic email methods (merged from emailService.ts B) ──
 
   async sendPasswordResetEmail(email: string, resetToken: string, serviceUrl?: string, serviceName?: string): Promise<boolean> {
-    const baseUrl = serviceUrl || process.env.ADMIN_URL || 'http://localhost:3001';
+    // WO-O4O-PASSWORD-RESET-LEGACY-FALLBACK-DEFAULT-V1: reset URL 결정 우선순위
+    //   1. 호출자가 명시한 serviceUrl (api-server 측에서 serviceKey 기반 production origin 으로 결정 — V2 흐름)
+    //   2. PASSWORD_RESET_DEFAULT_URL — 운영자 명시적 override 환경변수
+    //   3. ADMIN_URL — 기존 환경변수 (legacy 호환)
+    //   4. NODE_ENV='production' → 안전한 production 기본값 (https://neture.co.kr)
+    //      그 외 (development/test/undefined) → http://localhost:3001 (기존 dev 동작 유지)
+    // 본 라이브러리는 V1 legacy reset (serviceKey 없는 호출) 의 fallback 만 책임진다.
+    // V2 흐름은 api-server passwordResetService 에서 이미 serviceKey 기반 URL 을 주입한다.
+    const baseUrl =
+      serviceUrl
+      || process.env.PASSWORD_RESET_DEFAULT_URL
+      || process.env.ADMIN_URL
+      || (process.env.NODE_ENV === 'production'
+            ? 'https://neture.co.kr'
+            : 'http://localhost:3001');
     const resetUrl = `${baseUrl}/reset-password?token=${resetToken}`;
     const displayName = serviceName || 'O4O Platform';
 
