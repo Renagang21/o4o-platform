@@ -83,3 +83,16 @@ export function getAllServiceKeys(): string[] {
 export function getServiceOrigins(): string[] {
   return O4O_SERVICES.map(s => `https://${s.domain}`);
 }
+
+/**
+ * 서비스 키 → 공식 origin (`https://{domain}`).
+ * 모르는 키면 undefined.
+ *
+ * WO-O4O-PASSWORD-RESET-EMAIL-LINK-PRODUCTION-URL-FIX-V1:
+ *   비밀번호 재설정 이메일의 base URL 을 server 측에서 serviceKey 로 결정하기 위한 helper.
+ *   클라이언트가 serviceUrl 을 제공하지 않더라도 production URL 이 보장된다.
+ */
+export function getServiceOrigin(key: string): string | undefined {
+  const svc = serviceMap.get(key);
+  return svc ? `https://${svc.domain}` : undefined;
+}

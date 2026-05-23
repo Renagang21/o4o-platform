@@ -7,7 +7,7 @@ import { EmailVerificationToken } from '../entities/EmailVerificationToken.js';
 import { ServiceCredential } from '../modules/auth/entities/ServiceCredential.js';
 import { emailService } from './email.service.js';
 import { UserStatus } from '../types/auth.js';
-import { getServiceName } from '../config/service-catalog.js';
+import { getServiceName, getServiceOrigin } from '../config/service-catalog.js';
 
 export class PasswordResetService {
   private static readonly RESET_TOKEN_EXPIRY_HOURS = 1;
@@ -83,8 +83,15 @@ export class PasswordResetService {
     await tokenRepo.save(resetToken);
 
     // Send email with service name
+    // WO-O4O-PASSWORD-RESET-EMAIL-LINK-PRODUCTION-URL-FIX-V1: reset URL 결정 우선순위
+    //   1. 클라이언트가 명시적으로 보낸 serviceUrl (controller 에서 ALLOWED_ORIGINS 화이트리스트 검증 완료)
+    //   2. serviceKey 가 있으면 service-catalog 의 production origin (`https://{domain}`)
+    //   3. 둘 다 없으면 mail-core 의 라이브러리 기본값 (legacy 전역 reset)
+    // 운영에서 클라이언트가 serviceUrl 을 누락해도 serviceKey 만 있으면 항상 production URL 로 발송된다.
+    const effectiveServiceUrl =
+      serviceUrl ?? (serviceKey ? getServiceOrigin(serviceKey) : undefined);
     const serviceName = serviceKey ? getServiceName(serviceKey) : undefined;
-    await emailService.sendPasswordResetEmail(email, token, serviceUrl, serviceName);
+    await emailService.sendPasswordResetEmail(email, token, effectiveServiceUrl, serviceName);
 
     return true;
   }
