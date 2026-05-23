@@ -1146,27 +1146,49 @@ export class MembershipConsoleController {
   /**
    * GET /api/v1/operator/members/stats
    * 서비스 멤버십 통계 (operator 전용)
+   *
+   * WO-O4O-NETURE-ADMIN-USERS-SCOPE-FIX-V1:
+   *   platform:super_admin 호출자도 serviceKey query 로 단일 서비스 스코프
+   *   지정 가능. 미지정 시 기존 동작(전 서비스) 유지.
+   *   distinct user count 를 위해 status 별 COUNT(DISTINCT user_id) 사용.
    */
   getStats = async (req: Request, res: Response): Promise<void> => {
     try {
       const scope: ServiceScope = (req as any).serviceScope;
+      const { serviceKey } = req.query;
 
-      const serviceFilter = scope.isPlatformAdmin
-        ? ''
-        : `WHERE sm.service_key = ANY($1)`;
-      const params = scope.isPlatformAdmin ? [] : [scope.serviceKeys];
+      let serviceFilter = '';
+      const params: any[] = [];
+
+      if (!scope.isPlatformAdmin) {
+        serviceFilter = `WHERE sm.service_key = ANY($1)`;
+        params.push(scope.serviceKeys);
+      } else if (serviceKey && serviceKey !== 'all') {
+        serviceFilter = `WHERE sm.service_key = $1`;
+        params.push(serviceKey);
+      }
 
       // WO-GLYCOPHARM-MEMBER-REGISTRATION-PENDING-VISIBILITY-FIX-V1:
       // Use sm.status (SSOT for service-level membership state) instead of u.status
+      // WO-O4O-NETURE-ADMIN-USERS-SCOPE-FIX-V1:
+      // COUNT(DISTINCT user_id) — 동일 사용자가 다중 멤버십을 가진 경우에도
+      // 사용자 수 기준으로 카운트 (status 별로 user 가 한 번만 집계됨).
       const rows = await AppDataSource.query(
-        `SELECT sm.status, COUNT(*)::int AS count
+        `SELECT sm.status, COUNT(DISTINCT sm.user_id)::int AS count
          FROM service_memberships sm
          ${serviceFilter}
          GROUP BY sm.status`,
         params
       );
 
-      const total = rows.reduce((sum: number, r: any) => sum + (r.count || 0), 0);
+      // total = distinct user count (status 무관)
+      const totalRows = await AppDataSource.query(
+        `SELECT COUNT(DISTINCT sm.user_id)::int AS total
+         FROM service_memberships sm
+         ${serviceFilter}`,
+        params
+      );
+      const total = totalRows[0]?.total || 0;
 
       res.json({
         success: true,

@@ -99,11 +99,15 @@ const NETURE_ROLE_DISPLAY: Record<string, string> = {
   customer: 'consumer',
 };
 
+// WO-O4O-NETURE-ADMIN-USERS-SCOPE-FIX-V1:
+// Neture 회원 관리 화면이므로 Neture membership role 만 사용한다.
+// 이전 fallback (`u.roles[0]`) 은 cross-service role (kpa:*, glycopharm:*) 을
+// primary role 로 노출할 수 있어 제거 — 목록 조회를 Neture-scoped 로 강제하므로
+// 모든 사용자는 Neture membership 을 보유한다.
 function getPrimaryRole(u: UserData): string {
   const netureMembership = u.memberships?.find(m => m.serviceKey === 'neture');
   if (netureMembership?.role) return NETURE_ROLE_DISPLAY[netureMembership.role] || netureMembership.role;
-  const roles = u.roles || (u.role ? [u.role] : []);
-  return roles[0] || 'user';
+  return 'user';
 }
 
 const ROLE_TAB_FILTER: Record<string, string[]> = {
@@ -246,6 +250,11 @@ export default function UsersManagementPage() {
       const params = new URLSearchParams();
       params.set('page', String(page));
       params.set('limit', '20');
+      // WO-O4O-NETURE-ADMIN-USERS-SCOPE-FIX-V1:
+      // platform:super_admin 으로 호출 시에도 Neture 회원만 표시하기 위해
+      // serviceKey 를 명시적으로 전달한다 (backend platform admin 분기에서
+      // serviceKey 가 없으면 cross-service leak 발생).
+      params.set('serviceKey', 'neture');
       if (activeTab === 'pending') {
         params.set('status', 'pending');
       }
@@ -263,11 +272,12 @@ export default function UsersManagementPage() {
 
   const fetchStats = useCallback(async () => {
     try {
-      const { data } = await api.get('/operator/members/stats');
+      // WO-O4O-NETURE-ADMIN-USERS-SCOPE-FIX-V1: serviceKey=neture 강제 전달
+      const { data } = await api.get('/operator/members/stats?serviceKey=neture');
       const byStatus = data.statistics?.byStatus || [];
       const getCount = (s: string) => byStatus.find((b: any) => b.status === s)?.count || 0;
 
-      const allData = (await api.get('/operator/members?limit=1000')).data;
+      const allData = (await api.get('/operator/members?limit=1000&serviceKey=neture')).data;
       const allUsers: UserData[] = allData.users || [];
       const supplierRoles = ROLE_TAB_FILTER.supplier;
       const partnerRoles = ROLE_TAB_FILTER.partner;
