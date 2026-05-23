@@ -43,7 +43,10 @@ import { HUB_PRODUCER_LABELS } from '@o4o/types/hub-content';
 
 // ── Types ─────────────────────────────────────────────────────────
 
-type HubProducer = 'operator' | 'supplier' | 'community';
+// WO-O4O-SUPPLIER-CONTENT-PRODUCER-UI-CLEANUP-V1 (2026-05-23):
+//   'supplier' 는 PLATFORM-CONTENT-POLICY-V1 §6.3 기준 Legacy / 명문화된 예외.
+//   UI 필터 옵션에서 제거 — Legacy supplier 콘텐츠는 '전체' 탭에서만 노출.
+type HubProducer = 'operator' | 'community';
 type ViewTab = 'media' | 'playlist';
 type SourceFilter = 'all' | HubProducer;
 
@@ -52,7 +55,6 @@ type SourceFilter = 'all' | HubProducer;
 const HUB_PRODUCER_TABS: readonly { key: string; label: string }[] = [
   { key: 'all', label: '전체' },
   { key: 'operator', label: '운영자' },
-  { key: 'supplier', label: '공급자' },
   { key: 'community', label: '커뮤니티' },
 ] as const;
 

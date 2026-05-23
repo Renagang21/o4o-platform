@@ -214,7 +214,11 @@ const SupplierRequestCategoryPage = lazy(() =>
 );
 
 // Signage Content Hub
-const SignageContentHubPage = lazy(() => import('./pages/seller/SignageContentHubPage'));
+// WO-O4O-SUPPLIER-CONTENT-PRODUCER-UI-CLEANUP-V1 (2026-05-23):
+//   SignageContentHubPage 의 공급자 진입점 (/supplier/signage/content) 제거.
+//   공급자는 O4O 내부 Producer 가 아니다 — Canonical 흐름은
+//   "공급자 → 오프라인 전달 → Operator 등록 → HUB" 이다.
+//   페이지 파일 자체는 유지 (Operator/Store 향후 진입 가능).
 
 // Supplier Product Create
 const SupplierProductCreatePage = lazy(() => import('./pages/supplier/SupplierProductCreatePage'));
@@ -723,7 +727,9 @@ function App() {
               <Route path="/supplier/market-trial/new" element={<SupplierTrialCreatePage />} />
               <Route path="/supplier/market-trial/:id" element={<SupplierTrialDetailPage />} />
               <Route path="/supplier/market-trial/:id/edit" element={<SupplierTrialEditPage />} />
-              <Route path="/supplier/signage/content" element={<SignageContentHubPage />} />
+              {/* WO-O4O-SUPPLIER-CONTENT-PRODUCER-UI-CLEANUP-V1 (2026-05-23):
+                  공급자가 Signage Hub 콘텐츠를 직접 탐색·복사하는 진입점 제거.
+                  Canonical 흐름은 Operator 가 HUB 콘텐츠를 큐레이션하고 매장에 배포. */}
               <Route path="/supplier/signage/manage" element={<StoreSignagePage />} />
               <Route path="/supplier/forum" element={<ForumPage title="공급자 포럼" description="공급자 간 소통 공간" basePath="/supplier/forum" />} />
               <Route path="/supplier/forum/write" element={<ForumWritePage backPath="/supplier/forum" />} />

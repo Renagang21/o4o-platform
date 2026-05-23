@@ -18,7 +18,6 @@ import {
   ShoppingCart,
   FlaskConical,
   CreditCard,
-  BookOpen,
   MessageSquare,
   ChevronRight,
   ChevronDown,
@@ -73,11 +72,10 @@ const SUPPLIER_SIDEBAR_GROUPS: SidebarGroup[] = [
     icon: CreditCard,
     items: [{ label: 'Partner Commissions', path: '/supplier/partner-commissions' }],
   },
-  {
-    label: 'Content',
-    icon: BookOpen,
-    items: [{ label: 'Library', path: '/supplier/library' }],
-  },
+  // WO-O4O-SUPPLIER-CONTENT-PRODUCER-UI-CLEANUP-V1 (2026-05-23):
+  //   "Content > Library" 메뉴 제거. 공급자는 O4O 내부 Producer 가 아니다 —
+  //   Canonical 흐름은 "공급자 → 오프라인 전달 → Operator 등록 → HUB" 이다.
+  //   /supplier/library 라우트 자체는 유지 (북마크·링크 호환). 메뉴 진입점만 차단.
   {
     label: 'Community',
     icon: MessageSquare,
