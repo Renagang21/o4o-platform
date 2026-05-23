@@ -141,8 +141,14 @@ export const mypageApi = {
     apiClient.put<ApiResponse<ProfileResponse>>('/mypage/profile', data),
 
   // 비밀번호 변경 - /api/v1/users/password 엔드포인트 사용
+  //   WO-O4O-IDENTITY-V2-PHASE2-CHANGE-PASSWORD-SERVICE-SCOPE-V1:
+  //   serviceKey='kpa-society' 를 자동 주입하여 KPA 범위의 service_credentials 만 갱신.
+  //   다른 서비스(GlycoPharm 등)의 비밀번호에 영향이 없다.
   changePassword: async (data: PasswordChangeRequest): Promise<ApiResponse<{ message: string }>> => {
-    const response = await authClient.api.put('/users/password', data);
+    const response = await authClient.api.put('/users/password', {
+      ...data,
+      serviceKey: 'kpa-society',
+    });
     return response.data;
   },
 

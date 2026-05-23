@@ -4,6 +4,8 @@ import { BaseController } from '../../../common/base.controller.js';
 import type { AuthRequest } from '../../../common/middleware/auth.middleware.js';
 import { AppDataSource } from '../../../database/connection.js';
 import { User } from '../../auth/entities/User.js';
+// WO-O4O-IDENTITY-V2-PHASE2-CHANGE-PASSWORD-SERVICE-SCOPE-V1
+import { ServiceCredential } from '../../auth/entities/ServiceCredential.js';
 import { UpdateProfileDto, ChangePasswordDto } from '../dto/index.js';
 import logger from '../../../utils/logger.js';
 import { env } from '../../../utils/env-validator.js';
@@ -135,6 +137,14 @@ export class UserController extends BaseController {
   /**
    * PUT /api/v1/users/password
    * Change password
+   *
+   * WO-O4O-IDENTITY-V2-PHASE2-CHANGE-PASSWORD-SERVICE-SCOPE-V1:
+   *   serviceKey 제공 시:
+   *     1. 해당 서비스 membership 존재 검증 (없으면 SERVICE_NOT_MEMBER 403)
+   *     2. service_credentials 의 credential 우선, 없으면 users.password fallback 으로 currentPassword 검증
+   *     3. service_credentials.passwordHash 만 갱신 (users.password 무영향)
+   *   미제공 시:
+   *     기존 V1 흐름 유지 — users.password 검증 + users.password 갱신
    */
   static async changePassword(req: AuthRequest, res: Response): Promise<any> {
     if (!req.user) {
@@ -155,21 +165,67 @@ export class UserController extends BaseController {
         select: ['id', 'password'],
       });
 
-      if (!user || !user.password) {
+      if (!user) {
         return BaseController.notFound(res, 'User not found');
       }
 
-      // Verify current password
+      const newPasswordHash = await hashPassword(data.newPassword);
+      const serviceKey = data.serviceKey;
+
+      if (serviceKey) {
+        // ── V2 path: service-scoped credential change ──
+        const membershipRows = await AppDataSource.query(
+          `SELECT 1 FROM service_memberships WHERE user_id = $1 AND service_key = $2 LIMIT 1`,
+          [user.id, serviceKey],
+        );
+        if (membershipRows.length === 0) {
+          return BaseController.error(
+            res,
+            '해당 서비스 멤버십이 없습니다.',
+            403,
+            'SERVICE_NOT_MEMBER',
+          );
+        }
+
+        const credRepo = AppDataSource.getRepository(ServiceCredential);
+        const credential = await credRepo.findOne({
+          where: { userId: user.id, serviceKey },
+        });
+
+        // credential 우선, 없으면 users.password fallback (Phase 1 G-B 정책 일관)
+        const targetHash = credential?.passwordHash ?? user.password;
+        if (!targetHash) {
+          return BaseController.error(res, 'Current password is incorrect', 400);
+        }
+
+        const isValidPassword = await comparePassword(data.currentPassword, targetHash);
+        if (!isValidPassword) {
+          return BaseController.error(res, 'Current password is incorrect', 400);
+        }
+
+        // service_credentials 만 갱신 — users.password 는 건드리지 않는다
+        await credRepo.upsert(
+          { userId: user.id, serviceKey, passwordHash: newPasswordHash },
+          ['userId', 'serviceKey'],
+        );
+
+        return BaseController.ok(res, {
+          message: 'Password changed successfully',
+        });
+      }
+
+      // ── V1 fallback: legacy global change ──
+      if (!user.password) {
+        return BaseController.notFound(res, 'User not found');
+      }
+
       const isValidPassword = await comparePassword(data.currentPassword, user.password);
       if (!isValidPassword) {
         return BaseController.error(res, 'Current password is incorrect', 400);
       }
 
-      // Hash new password
-      const hashedPassword = await hashPassword(data.newPassword);
-      user.password = hashedPassword;
+      user.password = newPasswordHash;
       user.updatedAt = new Date();
-
       await userRepository.save(user);
 
       return BaseController.ok(res, {

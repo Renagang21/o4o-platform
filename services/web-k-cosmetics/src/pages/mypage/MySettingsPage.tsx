@@ -40,7 +40,14 @@ export default function MySettingsPage() {
   const handleChangePassword = async (currentPassword: string, newPassword: string, newPasswordConfirm: string) => {
     setChangingPassword(true);
     try {
-      await api.put('/users/password', { currentPassword, newPassword, newPasswordConfirm });
+      // WO-O4O-IDENTITY-V2-PHASE2-CHANGE-PASSWORD-SERVICE-SCOPE-V1:
+      //   serviceKey='k-cosmetics' 주입 — K-Cosmetics 범위의 service_credentials 만 갱신.
+      await api.put('/users/password', {
+        currentPassword,
+        newPassword,
+        newPasswordConfirm,
+        serviceKey: 'k-cosmetics',
+      });
     } finally {
       setChangingPassword(false);
     }

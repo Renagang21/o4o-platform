@@ -66,6 +66,24 @@ router.patch(
   })
 );
 
+// WO-O4O-IDENTITY-V2-PHASE2-CHANGE-PASSWORD-SERVICE-SCOPE-V1
+// PUT /api/v1/users/password — 사용자 자신의 비밀번호 변경
+//   serviceKey 제공 시 service_credentials 만 갱신 (V2 path)
+//   미제공 시 기존 users.password 흐름 (V1 fallback)
+// requireAdmin 적용 전에 등록 — 일반 사용자가 호출 가능해야 함.
+router.put(
+  '/password',
+  [
+    body('currentPassword').isString().isLength({ min: 6 }),
+    body('newPassword').isString().isLength({ min: 8 }),
+    body('newPasswordConfirm').isString(),
+    body('serviceKey').optional().isString(),
+  ],
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    return UserController.changePassword(req, res);
+  }),
+);
+
 // Validation middleware
 const validateRequest = (req: any, res: any, next: any) => {
   const errors = validationResult(req);

@@ -35,7 +35,15 @@ export default function MySettingsPage() {
   const handleChangePassword = async (currentPassword: string, newPassword: string, newPasswordConfirm: string) => {
     setChangingPassword(true);
     try {
-      await api.put('/users/password', { currentPassword, newPassword, newPasswordConfirm });
+      // WO-O4O-IDENTITY-V2-PHASE2-CHANGE-PASSWORD-SERVICE-SCOPE-V1:
+      //   serviceKey='glycopharm' 주입 — GlycoPharm 범위의 service_credentials 만 갱신.
+      //   다른 서비스(KPA 등)의 비밀번호에 영향 없음.
+      await api.put('/users/password', {
+        currentPassword,
+        newPassword,
+        newPasswordConfirm,
+        serviceKey: 'glycopharm',
+      });
     } finally {
       setChangingPassword(false);
     }
