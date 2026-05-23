@@ -1,8 +1,20 @@
 /**
  * Account Center Dashboard
- * 사용자 프로필 + 서비스 목록 + 서비스 이동/가입
  *
- * WO-O4O-ACCOUNT-CENTER-UI-V1
+ * WO-O4O-AUTH-SERVICE-JOIN-API-DEPRECATION-V1 (2026-05-23):
+ *   "이용 가능한 서비스" 섹션 + "가입" 버튼 제거.
+ *   web-account 는 active membership 보유 서비스의 정보 + 열기 만 담당.
+ *   서비스 가입 신청은 각 서비스 사이트에서 직접 진행 (Register 흐름).
+ *
+ * 변경 전:
+ *   - 내 서비스 + 이용 가능한 서비스 두 섹션
+ *   - handleJoin → POST /auth/services/:key/join → instant active (V2 충돌)
+ * 변경 후:
+ *   - 내 서비스 (active) 만 표시
+ *   - 가입 안내 footer (각 서비스 사이트 안내)
+ *   - 열기 (Handoff) 만 유지
+ *
+ * WO-O4O-ACCOUNT-CENTER-UI-V1 (선행)
  */
 
 import { useEffect, useState, useCallback } from 'react';
@@ -68,30 +80,11 @@ export default function DashboardPage() {
     setActionLoading(null);
   };
 
-  const handleJoin = async (serviceKey: string) => {
-    setActionLoading(serviceKey);
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/auth/services/${serviceKey}/join`, {
-        method: 'POST',
-        credentials: 'include',
-      });
-      const data = await response.json();
-      if (data.success) {
-        // Refresh service list to reflect new membership
-        await fetchServices();
-      } else {
-        setError(data.error || '서비스 가입에 실패했습니다.');
-      }
-    } catch {
-      setError('서비스 가입 중 오류가 발생했습니다.');
-    }
-    setActionLoading(null);
-  };
-
   if (!user) return null;
 
+  // WO-O4O-AUTH-SERVICE-JOIN-API-DEPRECATION-V1: active membership 만 표시.
+  // 비활성/미가입 서비스는 web-account 에서 노출하지 않는다 (각 서비스 사이트에서 가입).
   const myServices = services.filter(s => s.membership?.status === 'active');
-  const availableServices = services.filter(s => !s.membership || s.membership.status !== 'active');
 
   return (
     <div className="space-y-8">
@@ -109,45 +102,30 @@ export default function DashboardPage() {
       {loading ? (
         <p className="text-gray-500 text-center py-8">서비스 목록 로딩 중...</p>
       ) : (
-        <>
-          {/* My Services */}
-          <section>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">내 서비스</h2>
-            {myServices.length === 0 ? (
-              <p className="text-sm text-gray-500">가입된 서비스가 없습니다. 아래에서 서비스에 가입해보세요.</p>
-            ) : (
+        <section>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">내 서비스</h2>
+          {myServices.length === 0 ? (
+            <p className="text-sm text-gray-500">
+              가입된 서비스가 없습니다. 서비스 가입은 각 서비스 사이트에서 신청해 주세요.
+            </p>
+          ) : (
+            <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {myServices.map(service => (
                   <ServiceCard
                     key={service.key}
                     service={service}
                     onOpen={handleOpen}
-                    onJoin={handleJoin}
                     loading={actionLoading === service.key}
                   />
                 ))}
               </div>
-            )}
-          </section>
-
-          {/* Available Services */}
-          {availableServices.length > 0 && (
-            <section>
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">이용 가능한 서비스</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {availableServices.map(service => (
-                  <ServiceCard
-                    key={service.key}
-                    service={service}
-                    onOpen={handleOpen}
-                    onJoin={handleJoin}
-                    loading={actionLoading === service.key}
-                  />
-                ))}
-              </div>
-            </section>
+              <p className="mt-4 text-xs text-gray-500">
+                다른 서비스에 가입하려면 해당 서비스 사이트에서 직접 신청해 주세요.
+              </p>
+            </>
           )}
-        </>
+        </section>
       )}
     </div>
   );

@@ -186,11 +186,17 @@ export class HandoffController extends BaseController {
         [user.id, serviceKey],
       );
 
+      // WO-O4O-AUTH-SERVICE-JOIN-API-DEPRECATION-V1 (2026-05-23):
+      //   Option β — instant active 우회 제거. 모든 신규/재신청은 pending 으로 생성.
+      //   운영자 승인을 거쳐야 active 가 된다 (Register 흐름과 정합).
+      //   IR-O4O-SERVICE-SWITCHER-DEPRECATION-AUDIT-V1 §3.3 의 service_memberships
+      //   생성 경로 비대칭 (Switcher Join 만 instant active) 해소.
       if (existing.length > 0) {
-        // WO-O4O-HANDOFF-INACTIVE-MEMBERSHIP-BLOCK-V1: block withdrawn memberships
-        // WO-O4O-SM-WITHDRAWN-STATUS-CANONICAL-ALIGNMENT-V1:
-        //   canonical 탈퇴 status 가 'withdrawn' 으로 통일됨 (이전 'inactive' 저장 폐기).
-        if (existing[0].status === 'withdrawn') {
+        const current = existing[0];
+
+        // WO-O4O-HANDOFF-INACTIVE-MEMBERSHIP-BLOCK-V1 + WO-O4O-SM-WITHDRAWN-STATUS-CANONICAL-ALIGNMENT-V1:
+        //   withdrawn 은 보안 정책 — 차단 유지.
+        if (current.status === 'withdrawn') {
           logger.warn('[Handoff] Blocked reactivation of withdrawn membership', {
             userId: user.id,
             serviceKey,
@@ -203,18 +209,39 @@ export class HandoffController extends BaseController {
           );
         }
 
-        // Reactivate if pending/rejected/suspended
-        if (existing[0].status !== 'active') {
-          await AppDataSource.query(
-            `UPDATE service_memberships SET status = 'active', updated_at = NOW() WHERE id = $1`,
-            [existing[0].id],
-          );
+        if (current.status === 'active') {
+          // 이미 active — 변경 없음, alreadyActive 알림만 반환
+          return BaseController.ok(res, {
+            serviceKey,
+            serviceName: service.name,
+            status: 'active',
+            alreadyActive: true,
+            message: '이미 가입된 서비스입니다.',
+          });
         }
+
+        if (current.status === 'pending') {
+          // 이미 신청 중 — 변경 없음
+          return BaseController.ok(res, {
+            serviceKey,
+            serviceName: service.name,
+            status: 'pending',
+            pendingApproval: true,
+            requestSubmitted: false,
+            message: '가입 신청이 이미 접수되어 운영자 승인 대기 중입니다.',
+          });
+        }
+
+        // rejected / suspended → pending 으로 재신청 (active 직접 전환 금지)
+        await AppDataSource.query(
+          `UPDATE service_memberships SET status = 'pending', updated_at = NOW() WHERE id = $1`,
+          [current.id],
+        );
       } else {
-        // Create new membership
+        // 신규 → pending 으로 가입 신청 (instant active 금지)
         await AppDataSource.query(
           `INSERT INTO service_memberships (user_id, service_key, status, created_at, updated_at)
-           VALUES ($1, $2, 'active', NOW(), NOW())`,
+           VALUES ($1, $2, 'pending', NOW(), NOW())`,
           [user.id, serviceKey],
         );
       }
@@ -222,7 +249,10 @@ export class HandoffController extends BaseController {
       return BaseController.ok(res, {
         serviceKey,
         serviceName: service.name,
-        status: 'active',
+        status: 'pending',
+        pendingApproval: true,
+        requestSubmitted: true,
+        message: '가입 신청이 접수되었습니다. 운영자 승인 후 이용 가능합니다.',
       });
     } catch (err: any) {
       logger.error('[Handoff] Service join failed', err);
