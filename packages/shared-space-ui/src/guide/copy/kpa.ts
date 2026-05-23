@@ -730,13 +730,11 @@ export const kpaGuideFeatureContentProps: GuideFeatureManualPageProps = {
     {
       step: '05',
       title: '자료실',
-      routeLabel: '/content/resources',
-      description: '운영자가 등록한 자료를 확인하고 내 매장 자료함으로 가져옵니다. 여러 자료를 한 번에 가져올 수도 있습니다.',
+      routeLabel: '/resources',
+      description: '자료실은 콘텐츠와 별개의 공동자료실입니다. 활용·등록·내 자료함 가져가기 등 자세한 사용법은 자료실 가이드를 참고합니다.',
       items: [
-        { label: '자료 목록', detail: '/content/resources 에서 운영자가 등록한 자료를 봅니다. 일반 회원은 직접 등록할 수 없습니다.' },
-        { label: '자료 가져오기', detail: '행 메뉴에서 "내 자료함 가져가기"를 선택하면 내 매장 자료함에 복사됩니다.' },
-        { label: '여러 자료 선택 가져오기', detail: '체크박스로 여러 자료를 선택한 뒤 상단 액션 바에서 한 번에 가져옵니다.' },
-        { label: '가져가기 제한 자료', detail: '제작자가 "제한"으로 등록한 자료는 가져갈 수 없습니다. 목록에서 제한 표시로 구분됩니다.' },
+        { label: '자료실 진입', detail: '/resources 에서 회원들이 함께 이용하는 공동자료실을 확인합니다.' },
+        { label: '자료실 가이드 참고', detail: '자료 활용 방식, 등록, 내 자료함 가져가기 등은 /guide/features/resources 를 참고합니다.' },
       ],
     },
     {
@@ -757,68 +755,88 @@ export const kpaGuideFeatureContentProps: GuideFeatureManualPageProps = {
 };
 
 // ─── /guide/features/resources ─────────────────────────────────────────
+// WO-O4O-KPA-GUIDE-RESOURCES-MANUAL-REFRESH-V1: 실제 구현 기준 전면 정비
+// - /resources (ResourcesHubPage) 기준. /content/resources는 별도 진입점
+// - usage_type 기반 활용 분기 (READ/LINK/DOWNLOAD)
+// - 회원 모달 등록 / 운영자 등록 권한 구분
+// - 매장 경영자 한정 "내 자료함 가져가기" → /store/library/resources
+// - AI 활용 기준 섹션 제거 (자료실에 AI 진입점 없음)
+// - 카테고리/태그 필터 설명 제거 (UI 없음)
 
 export const kpaGuideFeatureResourcesProps: GuideFeatureManualPageProps = {
   hero: {
     eyebrow: '기능별 이용 방법',
     title: '자료실 이용 방법',
-    description: '파일 자료, 원본 자료, 매장 활용 자료',
+    description: '회원들이 함께 이용하는 공동자료실을 둘러보고, 활용하고, 등록하고, 내 매장 자료함으로 가져오는 방법을 안내합니다',
     primaryAction: { label: '자료실로 이동 →', to: '/resources' },
     flowBarTitle: '이용 흐름',
-    flowLabels: ['자료실 이동', '자료 찾기', '자료 활용', '자료 등록', 'AI 활용 기준'],
+    flowLabels: ['자료실 둘러보기', '자료 활용', '자료 등록', '내 자료함 가져가기', '운영 자료', '콘텐츠와 차이'],
   },
   sections: [
     {
       step: '01',
-      title: '자료실 이동',
+      title: '자료실 둘러보기',
       routeLabel: '/resources',
-      description: '자료실 진입 후 카테고리·태그·검색으로 자료를 탐색합니다.',
+      description: '/resources 로 진입해 자료 목록을 확인하고 검색·상세 보기로 원하는 자료를 찾습니다.',
       items: [
-        { label: '자료실 진입', detail: '/resources 로 이동하면 자료 목록이 표시됩니다.' },
-        { label: '자료 목록', detail: '카테고리별, 최신순으로 자료를 확인합니다.' },
-        { label: '검색과 태그 탐색', detail: '키워드 검색과 태그 필터로 원하는 자료를 찾습니다.' },
+        { label: '자료실 진입', detail: '/resources 로 이동하면 공동자료실 메인이 표시됩니다.' },
+        { label: '자료 목록', detail: '최신순으로 자료가 표시됩니다. 자료마다 제목, 요약, 등록자, 조회수가 보입니다.' },
+        { label: '검색', detail: '상단 검색창에 키워드를 입력해 제목 · 내용 · 등록자 기준으로 자료를 찾습니다.' },
+        { label: '자료 상세', detail: '자료를 클릭하면 우측 Drawer에서 본문 · 요약 · 첨부 · 등록일을 확인합니다.' },
+        { label: '좋아요', detail: '로그인 회원은 마음에 드는 자료에 좋아요를 누를 수 있습니다.' },
       ],
     },
     {
       step: '02',
-      title: '자료 찾기',
-      description: '키워드와 태그로 매장 응대에 필요한 자료를 빠르게 확인합니다.',
+      title: '자료 활용',
+      description: '자료마다 등록자가 설정한 활용 방식대로 동작합니다. 자료에 표시된 버튼/액션에 맞춰 사용합니다.',
       items: [
-        { label: '키워드 검색', detail: '제목·설명·태그 키워드로 자료를 검색합니다.' },
-        { label: '태그 확인', detail: '관련 태그로 동일 주제 자료를 묶어 봅니다.' },
-        { label: '자료 상세 확인', detail: '자료를 열어 본문·첨부·등록일을 확인합니다.' },
+        { label: '읽기', detail: '본문이 있는 자료는 Drawer에서 바로 내용을 읽습니다.' },
+        { label: '외부 링크', detail: '외부 URL이 연결된 자료는 새 창으로 해당 페이지로 이동합니다.' },
+        { label: '다운로드', detail: '파일이 첨부된 자료는 버튼을 눌러 PDF · 이미지 · 문서를 내려받습니다.' },
       ],
     },
     {
       step: '03',
-      title: '자료 활용',
-      description: '확인한 자료를 매장 응대와 운영에 직접 사용합니다.',
+      title: '자료 등록',
+      routeLabel: '/resources/new',
+      description: '회원이 직접 자료를 등록해 공동자료실에 공유합니다. 본인이 등록한 자료는 이후 수정 · 삭제할 수 있습니다.',
       items: [
-        { label: 'PDF / 이미지 / 파일 확인', detail: '본문 미리보기 또는 다운로드로 내용을 확인합니다.' },
-        { label: '고객 설명 자료', detail: '상담 시 화면 또는 출력물로 고객에게 직접 제시합니다.' },
-        { label: '매장 운영 참고', detail: '진열·재고·POP 자료 작성에 참고합니다.' },
+        { label: '등록 버튼', detail: '/resources 우상단 "+ 자료 등록" 버튼을 누릅니다. 비로그인 시 로그인 화면으로 이동합니다.' },
+        { label: '등록 모달', detail: '제목, 요약, 본문 또는 첨부 파일/링크, 태그, 활용 방식(읽기·링크·다운로드)을 입력합니다.' },
+        { label: '본인 자료 수정 / 삭제', detail: '/resources/:id/edit 에서 본인이 등록한 자료를 수정하고, 자료 메뉴에서 삭제합니다.' },
       ],
     },
     {
       step: '04',
-      title: '자료 등록',
-      description: '매장에서 작성한 자료를 업로드해 회원과 공유합니다.',
+      title: '내 자료함 가져가기',
+      routeLabel: '/store/library/resources',
+      description: '매장 경영자는 마음에 드는 자료를 내 매장 자료함으로 복사해 보관할 수 있습니다.',
       items: [
-        { label: '파일 업로드', detail: 'PDF·이미지·문서 파일을 자료실에 업로드합니다.' },
-        { label: '제목 입력', detail: '검색에 노출되는 핵심 키워드를 포함한 제목을 작성합니다.' },
-        { label: '태그 입력', detail: '관련 태그를 추가해 분류와 검색 노출을 지원합니다.' },
-        { label: '등록', detail: '저장하면 자료실 목록에 즉시 반영됩니다.' },
+        { label: '권한', detail: '매장이 연결된 경영자 계정에서만 "내 자료함 가져가기" 메뉴가 표시됩니다.' },
+        { label: '단건 가져가기', detail: '자료의 메뉴에서 "내 자료함 가져가기"를 선택하면 내 매장 자료함에 복사됩니다.' },
+        { label: '도착지 확인', detail: '가져간 자료는 /store/library/resources (내 자료함 → 자료) 에서 확인합니다.' },
+        { label: '원본과 독립', detail: '가져간 자료는 가져간 시점의 사본이며, 원본 자료가 수정되어도 내 자료함에는 영향이 없습니다.' },
+        { label: '가져갈 수 없는 자료', detail: '등록자가 "가져가기 제한"으로 설정한 자료는 가져갈 수 없습니다. 메뉴에 "(불가)" 표시가 나타납니다.' },
       ],
     },
     {
       step: '05',
-      title: 'AI 활용 기준',
-      description: 'Raw 자료를 AI로 가공해 매장 응대에 활용합니다. 사용 전 검토는 필수입니다.',
+      title: '운영 자료',
+      description: '운영자가 등록한 자료도 같은 목록에 함께 표시됩니다. 일반 회원이 등록한 자료와 한 화면에서 확인합니다.',
       items: [
-        { label: 'Raw 데이터 기반 설명 생성', detail: '원본 자료를 입력해 고객용 설명문을 생성합니다.' },
-        { label: '요약', detail: '긴 문서를 핵심 요약으로 변환해 응대 시간에 맞춰 사용합니다.' },
-        { label: '상담 문구 작성', detail: '고객 상황에 맞는 상담 응답 초안을 생성합니다.' },
-        { label: '검토 후 사용', detail: 'AI 결과는 약사·매장 책임자가 반드시 검토한 뒤 활용합니다.' },
+        { label: '함께 표시', detail: '운영자 자료와 회원 자료는 자료실 한 목록에 함께 표시되며, 등록자 이름으로 구분합니다.' },
+        { label: '운영자 등록 흐름', detail: '운영자는 별도 메뉴(/operator/resources)에서 자료를 등록 · 수정 · 삭제하고 공개 여부를 관리합니다. 일반 사용은 본 가이드에서 다루지 않습니다.' },
+      ],
+    },
+    {
+      step: '06',
+      title: '콘텐츠와 자료실 차이',
+      description: '콘텐츠와 자료실은 비슷해 보이지만 목적이 다릅니다. 작성이 필요하면 콘텐츠, 활용이 필요하면 자료실을 사용합니다.',
+      items: [
+        { label: '콘텐츠', detail: '회원이 직접 글을 작성해 공유하는 문서입니다. 리치 텍스트 편집기, AI로 만들기 등 작성 흐름에 초점.' },
+        { label: '자료실', detail: '여러 회원이 함께 쓰는 자료 보관소입니다. 읽기 · 다운로드 · 링크 활용 등 사용 흐름에 초점.' },
+        { label: '콘텐츠 가이드 참고', detail: '콘텐츠 작성과 AI 만들기 흐름은 /guide/features/content 가이드를 참고합니다.' },
       ],
     },
   ],
