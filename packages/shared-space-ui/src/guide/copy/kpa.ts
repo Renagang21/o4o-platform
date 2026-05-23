@@ -1057,69 +1057,103 @@ export const kpaGuideFeatureStoreProps: GuideFeatureManualPageProps = {
 };
 
 // ─── /guide/features/forum ─────────────────────────────────────────────
+// WO-O4O-KPA-GUIDE-FORUM-MANUAL-REFRESH-V1: 실제 구현 기준 전면 정비
+// - 포럼 홈/전체 목록 분리, 포럼 선택 Combobox, 인기 태그
+// - 글쓰기/수정/댓글/좋아요/공지 라우트 반영
+// - 감사 포인트 시스템 추가 (Phase 1 구현 완료)
+// - 비공개 포럼 가입 신청 흐름
+// - 포럼 개설 신청 (/forum/request)
+// - 내 활동 (/mypage/my-forums, /mypage/my-requests)
 
 export const kpaGuideFeatureForumProps: GuideFeatureManualPageProps = {
   hero: {
     eyebrow: '기능별 이용 방법',
     title: '포럼 이용 방법',
-    description: '질문·답변·경험 공유 기반 커뮤니티 이용',
+    description: '약사 커뮤니티에서 글을 읽고 쓰고 감사 포인트를 주고받는 방법을 안내합니다',
     primaryAction: { label: '포럼으로 이동 →', to: '/forum' },
     flowBarTitle: '이용 흐름',
-    flowLabels: ['포럼 이동', '글 찾기', '글 작성', '댓글 참여', '활용 기준'],
+    flowLabels: ['포럼 탐색', '글 찾기', '글쓰기와 참여', '감사 시스템', '비공개 포럼', '포럼 개설 신청', '내 활동'],
   },
   sections: [
     {
       step: '01',
-      title: '포럼 이동',
+      title: '포럼 탐색',
       routeLabel: '/forum',
-      description: '커뮤니티 글 목록으로 진입해 검색과 탐색을 시작합니다.',
+      description: '포럼 홈에서 추천 포럼·활동 글을 확인하거나 전체 글 목록에서 포럼·태그별로 탐색합니다.',
       items: [
-        { label: '포럼 진입', detail: '/forum 으로 이동하면 카테고리별 글 목록이 표시됩니다.' },
-        { label: '커뮤니티 글 목록', detail: '최신 글, 인기 글, 카테고리별 글을 확인합니다.' },
-        { label: '검색과 목록 탐색', detail: '키워드 검색과 카테고리 필터로 원하는 글을 찾습니다.' },
+        { label: '포럼 홈', detail: '/forum 에서 추천 포럼, 최근 활동 글, 통합 검색이 표시됩니다.' },
+        { label: '전체 글 목록', detail: '/forum/all 에서 모든 포럼의 글을 한 번에 봅니다.' },
+        { label: '포럼 선택 필터', detail: '전체 글 목록 상단의 Combobox에서 포럼을 선택해 해당 포럼 글만 표시합니다.' },
+        { label: '인기 태그', detail: '인기 태그 칩을 클릭하면 해당 태그가 붙은 글만 필터링됩니다.' },
       ],
     },
     {
       step: '02',
       title: '글 찾기',
-      description: '키워드와 태그로 관심 주제의 글을 빠르게 찾습니다.',
+      routeLabel: '/forum/all',
+      description: '키워드 · 태그 · 포럼 조합으로 원하는 글을 빠르게 찾습니다. 필터 상태는 URL에 유지되어 공유·북마크가 가능합니다.',
       items: [
-        { label: '키워드 검색', detail: '제목·본문 키워드로 글을 검색합니다.' },
-        { label: '태그 확인', detail: '글에 부착된 태그로 관련 주제를 탐색합니다.' },
-        { label: '글 상세 보기', detail: '제목 클릭 시 본문·댓글을 한 화면에 확인합니다.' },
+        { label: '키워드 검색', detail: '제목·본문 키워드로 글을 검색합니다. 포럼 홈 통합 검색은 포럼과 글을 함께 찾습니다.' },
+        { label: '태그 필터', detail: '글에 부착된 태그를 클릭해 동일 태그 글을 모아 봅니다.' },
+        { label: '포럼별 필터', detail: 'Combobox로 특정 포럼만 선택해 해당 포럼 글만 표시합니다.' },
       ],
     },
     {
       step: '03',
-      title: '글 작성',
+      title: '글쓰기와 참여',
       routeLabel: '/forum/write',
-      description: '제목, 내용, 태그를 입력해 새 글을 등록합니다.',
+      description: '글을 작성·수정하고 다른 회원의 글에 댓글·좋아요로 참여합니다. 포럼 운영자는 중요한 글을 공지로 지정할 수 있습니다.',
       items: [
-        { label: '제목 입력', detail: '검색에 노출되는 핵심 키워드를 포함한 제목을 작성합니다.' },
-        { label: '내용 작성', detail: '본문에 질문·경험·근거를 정리합니다.' },
-        { label: '태그 입력', detail: '관련 태그를 추가해 분류 및 노출 범위를 설정합니다.' },
-        { label: '등록', detail: '저장하면 카테고리 글 목록과 검색에 반영됩니다.' },
+        { label: '글 작성', detail: '/forum/write 에서 포럼을 선택해 글을 등록합니다. 포럼 안에서는 /forum/:slug/write 로 바로 진입합니다.' },
+        { label: '글 수정', detail: '/forum/edit/:id 에서 본인이 작성한 글을 수정합니다.' },
+        { label: '글 상세 · 댓글', detail: '/forum/post/:id 에서 본문과 댓글을 확인하고 답변을 등록합니다.' },
+        { label: '좋아요', detail: '글 상세 화면에서 👍 버튼으로 좋아요를 누릅니다. 로그인 회원만 가능합니다.' },
+        { label: '공지글', detail: '포럼 운영자가 공지로 지정한 글은 목록 상단에 공지 배지와 함께 고정 표시됩니다.' },
       ],
     },
     {
       step: '04',
-      title: '댓글 참여',
-      description: '댓글로 답변하고 다른 회원의 응답을 확인합니다.',
+      title: '감사 시스템',
+      routeLabel: '/forum/post/:id',
+      description: '도움이 된 글에 감사 포인트와 메시지를 보내고, 글마다 받은 감사 집계를 확인합니다.',
       items: [
-        { label: '댓글 작성', detail: '본문 하단에서 답변을 등록합니다.' },
-        { label: '답변 확인', detail: '내 글·내 댓글에 달린 답변을 추적합니다.' },
-        { label: '경험 공유', detail: '실제 사례·근거 자료를 댓글로 보충합니다.' },
+        { label: '감사 포인트 보내기', detail: '글 상세 화면의 감사 버튼을 눌러 1P 이상 금액을 선택해 전달합니다. 본인 글에는 전달할 수 없습니다.' },
+        { label: '감사 메시지 작성', detail: '포인트와 함께 짧은 메시지를 남겨 작성자에게 의견을 전달합니다.' },
+        { label: '감사 요약 확인', detail: '글 상세 화면에서 누적 포인트, 감사한 인원, 최근 감사 메시지를 확인합니다.' },
       ],
     },
     {
       step: '05',
-      title: '활용 기준',
-      description: '커뮤니티 정보를 매장 운영과 고객 응대에 활용합니다.',
+      title: '비공개 포럼',
+      description: '포럼은 공개·비공개로 구분됩니다. 비공개 포럼은 가입 신청 후 운영자 승인이 있어야 글을 열람할 수 있습니다.',
       items: [
-        { label: '제품 정보 확인', detail: '실제 사용 후기와 약사 의견을 통해 제품 이해도를 높입니다.' },
-        { label: '사례 확인', detail: '동일 상황의 사례를 검색해 적용 방향을 정합니다.' },
-        { label: '매장 운영 참고', detail: '진열·상담·판매에 적용할 노하우를 모읍니다.' },
-        { label: '커뮤니티 정보 축적', detail: '경험과 답변이 매장 운영 자산으로 누적됩니다.' },
+        { label: '공개 포럼', detail: '누구나 글을 읽을 수 있는 포럼입니다. 로그인하면 글쓰기와 댓글도 가능합니다.' },
+        { label: '비공개 포럼', detail: '🔒 표시가 있는 회원 전용 포럼입니다. 가입 승인 회원만 글을 열람할 수 있습니다.' },
+        { label: '가입 신청', detail: '비공개 포럼 진입 시 표시되는 "가입 신청" 버튼을 눌러 신청을 보냅니다.' },
+        { label: '승인 대기', detail: '신청 후에는 "승인 대기" 상태가 표시됩니다. 포럼 운영자의 승인을 기다립니다.' },
+        { label: '승인 완료 후 참여', detail: '승인되면 새로고침으로 글 열람이 시작됩니다. 신청 상태는 /mypage/my-requests 에서 확인합니다.' },
+      ],
+    },
+    {
+      step: '06',
+      title: '포럼 개설 신청',
+      routeLabel: '/forum/request',
+      description: '새 포럼이 필요할 때 직접 개설을 신청합니다. 운영자 검토 후 승인되면 포럼이 생성됩니다.',
+      items: [
+        { label: '포럼 정보 입력', detail: '포럼 이름(2~50자), 설명(10자 이상), 태그(1개 이상), 신청 사유를 입력합니다.' },
+        { label: '공개 / 비공개 선택', detail: '신청 폼에서 공개 포럼 또는 비공개 포럼을 선택합니다.' },
+        { label: '신청 상태 확인', detail: '신청 후 /mypage/my-requests 에서 검토 · 승인 · 거절 · 보완 요청 상태를 확인합니다.' },
+      ],
+    },
+    {
+      step: '07',
+      title: '내 활동',
+      routeLabel: '/mypage',
+      description: '내가 개설한 포럼과 제출한 신청 내역을 마이페이지에서 관리합니다.',
+      items: [
+        { label: '내 포럼', detail: '/mypage/my-forums 에서 내가 운영하는 포럼 목록, 글 수, 회원 관리 메뉴를 확인합니다.' },
+        { label: '회원 관리', detail: '/mypage/my-forums/:forumId/members 에서 비공개 포럼의 가입 신청을 승인 · 거절합니다.' },
+        { label: '신청 내역', detail: '/mypage/my-requests 에서 포럼 개설 · 가입 등 모든 신청의 상태를 한곳에서 확인합니다.' },
       ],
     },
   ],
