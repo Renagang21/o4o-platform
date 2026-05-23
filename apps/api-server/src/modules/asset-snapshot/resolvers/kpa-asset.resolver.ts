@@ -37,6 +37,29 @@ export class KpaAssetResolver implements ContentResolver {
     if (assetType === 'resource') {
       return this.resolveResource(sourceAssetId);
     }
+    if (assetType === 'blog') {
+      return this.resolveBlog(sourceAssetId);
+    }
+    return null;
+  }
+
+  /**
+   * WO-O4O-OPERATOR-BLOG-PUBLISHING-BACKEND-FOUNDATION-V1 (2026-05-23)
+   *
+   * Phase 1 Backend Foundation — Placeholder.
+   *
+   * store_blog_posts 에는 producer / authorRole 구분 컬럼이 없으며, 실제 데이터는
+   * 매장 직접 작성 블로그 중심이다. 이를 그대로 가져가기 흐름의 source 로 노출하면
+   * Store Menu Canonical 의 운영자 → HUB → 매장 흐름과 충돌할 수 있으므로,
+   * Phase 1 에서는 assetType='blog' 확장 지점만 등록하고 실제 resolve 는 보류한다.
+   *
+   * TODO (Phase 2):
+   *   - store_blog_posts 에 producer 또는 hub_published 컬럼 추가
+   *   - 운영자 게시 (producer='operator', status='published') 만 통과
+   *   - 매장 직접 작성 블로그는 본 resolver 대상 아님 (매장 전용 유지)
+   *   - serviceKey 정합 (P3 정책 — 신규 흐름은 실제 serviceKey 저장)
+   */
+  private async resolveBlog(_id: string): Promise<ResolvedContent | null> {
     return null;
   }
 

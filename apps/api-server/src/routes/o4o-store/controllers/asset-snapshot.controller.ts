@@ -10,12 +10,16 @@
  *   주된 사용자임. 기존 화이트리스트가 HQ role(admin/operator)과 일반 약사(pharmacist)만 포함했던
  *   것은 store_owner role 도입(types/roles.ts) 이전 구성으로, 정책과 불일치하여 본 WO에서 정렬.
  * WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: assetType 'resource' 추가 (kpa_contents sub_type='resource')
+ * WO-O4O-OPERATOR-BLOG-PUBLISHING-BACKEND-FOUNDATION-V1: assetType 'blog' 추가 (Phase 1 Placeholder).
+ *   현재는 KpaAssetResolver.resolveBlog 가 항상 null 반환 (Phase 2 schema 확장 후 활성화).
+ *   허용 목록 에만 등록되어 외부 caller 가 'blog' assetType 으로 요청 시 controller 통과
+ *   하되 source 미발견 (SOURCE_NOT_FOUND) 으로 처리된다.
  *
  * Uses Core Controller Factory with KPA-specific config:
  * - Roles: kpa:admin, kpa:operator, kpa:pharmacist, kpa:store_owner
  * - Org: KpaMember.organization_id
- * - Resolver: KpaAssetResolver (CmsContent + signage_media + lms_courses + kpa_contents content/resource)
- * - Asset types: cms, signage, lesson, content, resource
+ * - Resolver: KpaAssetResolver (CmsContent + signage_media + lms_courses + kpa_contents content/resource + blog placeholder)
+ * - Asset types: cms, signage, lesson, content, resource, blog (placeholder)
  */
 
 import type { RequestHandler } from 'express';
@@ -66,6 +70,8 @@ export function createAssetSnapshotController(
     //   Resolver가 is_deleted=false 만 통과시킨다.
     // WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: KPA 자료실(resource) 가져가기 허용.
     //   Resolver가 sub_type='resource' + is_deleted=false + reusable_policy≠restricted 통과시킨다.
-    allowedAssetTypes: ['cms', 'signage', 'lesson', 'content', 'resource'],
+    // WO-O4O-OPERATOR-BLOG-PUBLISHING-BACKEND-FOUNDATION-V1: 'blog' assetType 등록 (Phase 1 Placeholder).
+    //   현재 resolveBlog 는 null 반환 — Phase 2 schema 확장 후 활성화.
+    allowedAssetTypes: ['cms', 'signage', 'lesson', 'content', 'resource', 'blog'],
   });
 }

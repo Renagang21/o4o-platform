@@ -106,11 +106,41 @@ export class HubContentQueryService {
         return this.querySignageMedia(serviceKey, producer, page, limit);
       case 'signage-playlist':
         return this.querySignagePlaylists(serviceKey, producer, page, limit);
+      case 'blog':
+        return this.queryBlog(serviceKey, producer, page, limit);
       // (제거됨) case 'kpa-store-content' — WO-O4O-REMOVE-STORE-TO-COMMUNITY-SHARE-FLOW-V1.
       // Store → Community 공유 흐름 폐기로 store-shared 콘텐츠는 HUB 에 노출되지 않는다.
       default:
         return { success: true, data: [], pagination: { page, limit, total: 0, totalPages: 0 } };
     }
+  }
+
+  // ── Blog (Phase 1 Foundation — Placeholder) ──
+  //
+  // WO-O4O-OPERATOR-BLOG-PUBLISHING-BACKEND-FOUNDATION-V1 (2026-05-23):
+  //
+  // 현재 store_blog_posts 에는 producer / authorRole 구분 컬럼이 없으며,
+  // 실제 데이터는 매장 직접 작성 블로그 중심이다. 이를 그대로 HUB 에 노출하면
+  // Store Menu Canonical 의 운영자 → HUB → 매장 흐름과 충돌할 수 있으므로,
+  // Phase 1 에서는 sourceDomain='blog' 확장 지점만 등록하고 실제 노출은
+  // 보류한다.
+  //
+  // TODO (Phase 2):
+  //   - store_blog_posts 에 producer / authorRole 또는 hub_published 컬럼 추가
+  //   - 운영자 게시 (producer='operator') 만 HUB 노출, 매장 직접 작성은 매장 전용
+  //   - mapBlogItem 매퍼 신설 (slug / excerpt / publishedAt 등 블로그 전용 필드)
+  //   - queryMixed 의 Promise.allSettled 에 queryBlog 추가
+  private async queryBlog(
+    _serviceKey: string,
+    _producer: HubProducer | undefined,
+    page: number,
+    limit: number,
+  ): Promise<HubContentListResponse> {
+    return {
+      success: true,
+      data: [],
+      pagination: { page, limit, total: 0, totalPages: 0 },
+    };
   }
 
   // ── Mixed merge (in-memory) ──

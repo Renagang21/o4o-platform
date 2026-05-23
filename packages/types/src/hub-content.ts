@@ -23,8 +23,12 @@ export type HubVisibility = 'global' | 'service' | 'store';
  * HUB 콘텐츠 원본 도메인.
  * WO-O4O-REMOVE-STORE-TO-COMMUNITY-SHARE-FLOW-V1:
  *   'kpa-store-content' 제거 — Store → Community 공유 흐름 폐기.
+ * WO-O4O-OPERATOR-BLOG-PUBLISHING-BACKEND-FOUNDATION-V1 (2026-05-23):
+ *   'blog' 추가 — Phase 1 Backend Foundation. 현재 단계는 골격만 등록되어 있으며
+ *   queryBlog 는 placeholder 빈 응답 반환. 운영자 → HUB → 매장 흐름의 실제 노출은
+ *   store_blog_posts 의 producer/authorRole schema 확장 후 Phase 2 에서 활성화.
  */
-export type HubSourceDomain = 'cms' | 'signage-media' | 'signage-playlist';
+export type HubSourceDomain = 'cms' | 'signage-media' | 'signage-playlist' | 'blog';
 
 // =============================================================================
 // API Response DTOs
@@ -94,4 +98,5 @@ export const HUB_SOURCE_DOMAIN_LABELS: Record<HubSourceDomain, string> = {
   cms: 'CMS 콘텐츠',
   'signage-media': '사이니지 미디어',
   'signage-playlist': '사이니지 플레이리스트',
+  blog: '블로그',
 };
