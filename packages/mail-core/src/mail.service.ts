@@ -443,16 +443,32 @@ export class MailService {
     return result.success;
   }
 
-  async sendEmailVerification(email: string, verificationToken: string): Promise<boolean> {
-    const verifyUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/auth/verify-email?token=${verificationToken}`;
+  async sendEmailVerification(email: string, verificationToken: string, serviceUrl?: string, serviceName?: string): Promise<boolean> {
+    // WO-O4O-EMAIL-VERIFICATION-LINK-PRODUCTION-URL-FIX-V1: verify URL 결정 우선순위
+    //   1. 호출자가 명시한 serviceUrl (api-server 가 serviceKey 기반 production origin 으로 주입)
+    //   2. EMAIL_VERIFICATION_DEFAULT_URL — 운영자 명시적 override 환경변수
+    //   3. FRONTEND_URL — 기존 환경변수 (legacy 호환)
+    //   4. NODE_ENV='production' → 'https://neture.co.kr' (안전한 production 기본값)
+    //      그 외 → 'http://localhost:3000' (기존 dev 동작 유지)
+    // sendPasswordResetEmail 과 동일 패턴 — V1 legacy 흐름의 fallback 만 라이브러리가 책임진다.
+    const baseUrl =
+      serviceUrl
+      || process.env.EMAIL_VERIFICATION_DEFAULT_URL
+      || process.env.FRONTEND_URL
+      || (process.env.NODE_ENV === 'production'
+            ? 'https://neture.co.kr'
+            : 'http://localhost:3000');
+    const verifyUrl = `${baseUrl}/auth/verify-email?token=${verificationToken}`;
+    const displayName = serviceName || 'O4O Platform';
 
     const result = await this.sendEmail({
       to: email,
-      subject: 'Verify Your Email - O4O Platform',
+      subject: `Verify Your Email - ${displayName}`,
       template: 'email-verification',
       templateData: {
         verifyUrl,
         year: new Date().getFullYear(),
+        serviceName: displayName,
       },
     });
     return result.success;

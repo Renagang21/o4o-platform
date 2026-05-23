@@ -307,8 +307,9 @@ export class AuthRegisterController extends BaseController {
       });
 
       // Send email verification (optional - don't fail if email fails)
+      // WO-O4O-EMAIL-VERIFICATION-LINK-PRODUCTION-URL-FIX-V1: serviceKey 주입으로 production URL 보장
       try {
-        await PasswordResetService.requestEmailVerification(user.id);
+        await PasswordResetService.requestEmailVerification(user.id, serviceKey);
       } catch (emailError) {
         logger.warn('[AuthRegisterController.register] Email verification failed', {
           error: emailError,

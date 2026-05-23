@@ -171,13 +171,17 @@ export class PasswordResetService {
 
   /**
    * Request email verification
+   *
+   * WO-O4O-EMAIL-VERIFICATION-LINK-PRODUCTION-URL-FIX-V1:
+   *   serviceKey 가 제공되면 이메일 링크의 base URL 을 해당 서비스의 production origin 으로 결정한다.
+   *   미제공 시 mail-core 라이브러리의 fallback (PASSWORD_RESET 과 동일 패턴) 으로 위임.
    */
-  static async requestEmailVerification(userId: string): Promise<boolean> {
+  static async requestEmailVerification(userId: string, serviceKey?: string): Promise<boolean> {
     const userRepo = AppDataSource.getRepository(User);
     const tokenRepo = AppDataSource.getRepository(EmailVerificationToken);
 
     const user = await userRepo.findOne({ where: { id: userId } });
-    
+
     if (!user) {
       throw new Error('User not found');
     }
@@ -207,8 +211,10 @@ export class PasswordResetService {
 
     await tokenRepo.save(verificationToken);
 
-    // Send email
-    await emailService.sendEmailVerification(user.email, token);
+    // Send email — serviceKey 기반 origin / serviceName 주입 (PASSWORD_RESET 과 동일 패턴)
+    const verifyServiceUrl = serviceKey ? getServiceOrigin(serviceKey) : undefined;
+    const verifyServiceName = serviceKey ? getServiceName(serviceKey) : undefined;
+    await emailService.sendEmailVerification(user.email, token, verifyServiceUrl, verifyServiceName);
 
     return true;
   }

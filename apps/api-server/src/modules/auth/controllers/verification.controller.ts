@@ -73,6 +73,11 @@ export class VerificationController extends BaseController {
   /**
    * POST /api/v1/auth/resend-verification
    * Resend verification email (authenticated)
+   *
+   * WO-O4O-EMAIL-VERIFICATION-LINK-PRODUCTION-URL-FIX-V1:
+   *   body.serviceKey 가 제공되면 해당 서비스 production URL 로 인증 링크 발송.
+   *   미제공 시 JWT memberships 중 첫 active membership 의 serviceKey 사용.
+   *   둘 다 없으면 mail-core 의 fallback (PASSWORD_RESET 과 동일 패턴) 으로 위임.
    */
   static async resendVerification(req: AuthRequest, res: Response): Promise<any> {
     const userId = req.user?.id;
@@ -82,7 +87,13 @@ export class VerificationController extends BaseController {
     }
 
     try {
-      await PasswordResetService.requestEmailVerification(userId);
+      const bodyServiceKey = (req.body as { serviceKey?: string } | undefined)?.serviceKey;
+      // fallback: 사용자의 첫 active membership 의 serviceKey (JWT payload 기반)
+      const firstActiveServiceKey = (req.user as { memberships?: { serviceKey: string; status: string }[] } | undefined)
+        ?.memberships?.find((m) => m.status === 'active')?.serviceKey;
+      const effectiveServiceKey = bodyServiceKey ?? firstActiveServiceKey;
+
+      await PasswordResetService.requestEmailVerification(userId, effectiveServiceKey);
 
       return BaseController.ok(res, {
         message: 'Verification email has been sent',
