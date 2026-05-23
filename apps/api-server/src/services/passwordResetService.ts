@@ -4,6 +4,7 @@ import { AppDataSource } from '../database/connection.js';
 import { User } from '../entities/User.js';
 import { PasswordResetToken } from '../entities/PasswordResetToken.js';
 import { EmailVerificationToken } from '../entities/EmailVerificationToken.js';
+import { ServiceCredential } from '../modules/auth/entities/ServiceCredential.js';
 import { emailService } from './email.service.js';
 import { UserStatus } from '../types/auth.js';
 import { getServiceName } from '../config/service-catalog.js';
@@ -129,11 +130,30 @@ export class PasswordResetService {
     // Hash new password
     const hashedPassword = await hashPassword(newPassword);
 
-    // Update user password
-    resetToken.user.password = hashedPassword;
-    resetToken.user.loginAttempts = 0; // Reset login attempts
-    resetToken.user.lockedUntil = null; // Unlock account if locked
-    await userRepo.save(resetToken.user);
+    // WO-O4O-IDENTITY-V2-PHASE1-SCHEMA-RESET-V1: write 대상 분기
+    //   token.serviceKey 존재 → service_credentials (V2 path, L2 Credential)
+    //   미존재               → users.password (V1 fallback)
+    // 두 경로 모두 user 의 lockout 상태 (loginAttempts/lockedUntil) 는 user-global 이므로 함께 reset.
+    // V2 path 에서는 users.password 를 건드리지 않는다 (legacy fallback 보존).
+    if (resetToken.serviceKey) {
+      const credRepo = AppDataSource.getRepository(ServiceCredential);
+      await credRepo.upsert(
+        {
+          userId: resetToken.userId,
+          serviceKey: resetToken.serviceKey,
+          passwordHash: hashedPassword,
+        },
+        ['userId', 'serviceKey'],
+      );
+      resetToken.user.loginAttempts = 0;
+      resetToken.user.lockedUntil = null;
+      await userRepo.save(resetToken.user);
+    } else {
+      resetToken.user.password = hashedPassword;
+      resetToken.user.loginAttempts = 0;
+      resetToken.user.lockedUntil = null;
+      await userRepo.save(resetToken.user);
+    }
 
     // Mark token as used
     resetToken.usedAt = new Date();

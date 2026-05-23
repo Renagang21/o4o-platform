@@ -85,6 +85,8 @@ import { TemplatePreset } from '../entities/TemplatePreset.js';
 import { RoleAssignment } from '../modules/auth/entities/RoleAssignment.js';
 // WO-O4O-SERVICE-MEMBERSHIP-ARCHITECTURE-V1: Global User + Service Membership
 import { ServiceMembership } from '../modules/auth/entities/ServiceMembership.js';
+// WO-O4O-IDENTITY-V2-PHASE1-SCHEMA-RESET-V1: Identity V2 L2 Credential Layer
+import { ServiceCredential } from '../modules/auth/entities/ServiceCredential.js';
 import { RoleApplication } from '../entities/RoleApplication.js';
 import { KycDocument } from '../entities/KycDocument.js';
 // SupplierProfile/SellerProfile/PartnerProfile removed - now in dropshipping-core
@@ -602,6 +604,7 @@ export const AppDataSource = new DataSource({
     RefreshToken,
     RoleAssignment,
     ServiceMembership, // WO-O4O-SERVICE-MEMBERSHIP-ARCHITECTURE-V1
+    ServiceCredential, // WO-O4O-IDENTITY-V2-PHASE1-SCHEMA-RESET-V1
     LoginAttempt,
     LinkingSession,
     // Legacy AUTH entities (to be migrated)
