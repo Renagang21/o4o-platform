@@ -656,69 +656,97 @@ export const kpaGuideFeatureSignageProps: GuideFeatureManualPageProps = {
 };
 
 // ─── /guide/features/content ───────────────────────────────────────────
+// WO-O4O-KPA-GUIDE-CONTENT-MANUAL-REFRESH-V1: 실제 구현 기준 전면 정비
+// - /content = 3-섹션 허브 (문서형/코스형/설문) + 자료실 진입
+// - 문서형 콘텐츠 (/content/documents) — 작성·상세·추천·감사 포인트
+// - AI로 만들기: URL/텍스트 → HTML 생성 (요약·매장용 변환 설명 제거)
+// - 자료실 (/content/resources) — 내 자료함 가져가기
+// - 코스형 자료 · 설문은 별도 가이드로 위임
 
 export const kpaGuideFeatureContentProps: GuideFeatureManualPageProps = {
   hero: {
     eyebrow: '기능별 이용 방법',
     title: '콘텐츠 이용 방법',
-    description: '문서형 콘텐츠, 안내 자료, 매장 설명 자료',
-    primaryAction: { label: '콘텐츠로 이동 →', to: '/content' },
+    description: '문서형 콘텐츠를 읽고 작성하고, AI로 만들고, 자료실에서 가져오는 방법을 안내합니다',
+    primaryAction: { label: '콘텐츠 허브로 이동 →', to: '/content' },
     flowBarTitle: '이용 흐름',
-    flowLabels: ['콘텐츠 이동', '콘텐츠 찾기', '콘텐츠 활용', '콘텐츠 작성', 'AI 활용 기준'],
+    flowLabels: ['콘텐츠 허브', '문서형 콘텐츠', '콘텐츠 작성', 'AI로 만들기', '자료실', '다른 콘텐츠'],
   },
   sections: [
     {
       step: '01',
-      title: '콘텐츠 이동',
+      title: '콘텐츠 허브',
       routeLabel: '/content',
-      description: '콘텐츠 목록으로 진입해 카테고리·태그·검색으로 자료를 탐색합니다.',
+      description: '문서형 콘텐츠, 코스형 자료, 설문조사를 한 화면에서 미리 보고 진입합니다. 우상단의 자료실 링크로 가져갈 수 있는 자료도 바로 확인합니다.',
       items: [
-        { label: '콘텐츠 진입', detail: '/content 로 이동하면 콘텐츠 목록이 표시됩니다.' },
-        { label: '콘텐츠 목록', detail: '카테고리별, 최신순으로 콘텐츠를 확인합니다.' },
-        { label: '검색과 목록 탐색', detail: '키워드 검색과 태그 필터로 원하는 콘텐츠를 찾습니다.' },
+        { label: '문서형 콘텐츠 섹션', detail: '최근 문서 미리보기. 우측 "더 보기 →"로 전체 목록(/content/documents)으로 이동합니다.' },
+        { label: '코스형 자료 섹션', detail: '공개된 코스형 자료가 카드로 표시됩니다. 더 보기로 /content/courses 로 이동합니다.' },
+        { label: '설문조사 섹션', detail: '진행 중·완료된 설문이 표시됩니다. 더 보기로 /content/surveys 로 이동합니다.' },
+        { label: '등록 버튼', detail: '로그인한 회원은 각 섹션 우상단에서 "문서 등록", "코스형 자료 등록", "설문 등록"으로 진입합니다.' },
+        { label: '자료실 진입', detail: '페이지 우상단 "자료실 →" 링크로 /content/resources 로 이동합니다.' },
       ],
     },
     {
       step: '02',
-      title: '콘텐츠 찾기',
-      description: '키워드와 태그로 매장 응대에 필요한 콘텐츠를 빠르게 확인합니다.',
+      title: '문서형 콘텐츠',
+      routeLabel: '/content/documents',
+      description: '회원이 등록한 문서형 콘텐츠를 목록과 상세로 확인합니다. 상세 화면에서 추천·링크 복사·감사 포인트로 작성자에게 반응을 전달합니다.',
       items: [
-        { label: '키워드 검색', detail: '제목·본문·태그 키워드로 콘텐츠를 검색합니다.' },
-        { label: '태그 확인', detail: '관련 태그로 동일 주제 콘텐츠를 묶어 봅니다.' },
-        { label: '콘텐츠 상세 보기', detail: '본문·이미지·작성자·등록일을 확인합니다.' },
+        { label: '문서 목록', detail: '/content/documents 에서 전체 문서를 최신순으로 봅니다. 클릭하면 Drawer로 미리보기가 열립니다.' },
+        { label: '상세 보기', detail: '/content/:id 에서 본문, 제목, 작성자, 요약, 태그, 조회수를 확인합니다.' },
+        { label: '추천', detail: '♥ 버튼으로 좋은 콘텐츠를 추천합니다. 로그인 회원만 가능합니다.' },
+        { label: '링크 복사', detail: '🔗 버튼으로 현재 콘텐츠 링크를 복사해 다른 채널에 공유합니다.' },
+        { label: '감사 포인트', detail: '글 상세에 누적 감사 포인트, 감사한 인원, 최근 감사 메시지가 표시됩니다.' },
       ],
     },
     {
       step: '03',
-      title: '콘텐츠 활용',
-      description: '확인한 콘텐츠를 매장 응대와 운영에 직접 사용합니다.',
+      title: '콘텐츠 작성',
+      routeLabel: '/content/documents/new',
+      description: '리치 텍스트 편집기로 콘텐츠를 작성합니다. 초안으로 저장하거나 바로 공개할 수 있고, 작성자만 이후 수정이 가능합니다.',
       items: [
-        { label: '고객 설명', detail: '상담 시 콘텐츠 본문을 직접 보여주며 설명합니다.' },
-        { label: '매장 안내', detail: '매장 진열·POP·서비스 안내에 콘텐츠를 활용합니다.' },
-        { label: '링크 공유', detail: 'QR·메신저·SNS로 콘텐츠 링크를 고객에게 전달합니다.' },
-        { label: '운영 참고', detail: '운영 의사결정·교육·상담 매뉴얼 작성에 참고합니다.' },
+        { label: '제목 입력', detail: '검색·목록에 노출되는 핵심 제목을 입력합니다. (필수)' },
+        { label: '본문 작성', detail: '리치 텍스트 편집기에서 텍스트·이미지·링크·표를 정리합니다. 이미지는 본문 안에 직접 삽입합니다.' },
+        { label: '요약 입력', detail: '목록·미리보기에서 노출되는 한 줄 요약을 입력합니다. (선택)' },
+        { label: '태그 입력', detail: 'Enter 또는 쉼표로 태그를 추가합니다. 최소 1개 이상 필요합니다.' },
+        { label: '매장 가져가기 정책', detail: '매장이 내 자료함으로 가져갈 수 있는지 선택합니다. 기본은 "허용", 제한하려면 "제한"을 선택합니다.' },
+        { label: '초안 저장 · 공개 저장', detail: '초안은 본인만 보고, 공개는 목록과 자료실 흐름에 노출됩니다.' },
+        { label: '수정', detail: '/content/:id/edit 에서 본인이 작성한 콘텐츠를 수정합니다.' },
       ],
     },
     {
       step: '04',
-      title: '콘텐츠 작성',
-      description: '매장에서 작성한 콘텐츠를 등록해 회원과 공유합니다.',
+      title: 'AI로 만들기',
+      description: '작성 화면 상단의 "AI로 만들기" 버튼으로 URL 또는 텍스트를 입력해 HTML 콘텐츠를 자동 생성합니다.',
       items: [
-        { label: '제목 입력', detail: '검색에 노출되는 핵심 키워드를 포함한 제목을 작성합니다.' },
-        { label: '본문 작성', detail: '에디터에서 텍스트·이미지·링크를 정리합니다.' },
-        { label: '태그 입력', detail: '관련 태그를 추가해 분류와 검색 노출을 지원합니다.' },
-        { label: '게시', detail: '게시 상태로 전환하면 공개 콘텐츠 목록에 반영됩니다.' },
+        { label: 'URL 입력', detail: '웹 페이지 또는 유튜브 URL을 입력하면 AI가 해당 페이지를 HTML 콘텐츠로 변환합니다.' },
+        { label: '텍스트 입력', detail: '텍스트를 붙여넣으면 AI가 HTML 형식으로 정리합니다.' },
+        { label: '본문 자동 입력', detail: '생성된 HTML은 본문 영역에 자동으로 들어갑니다.' },
+        { label: '제목 자동 추출', detail: '제목이 비어 있으면 생성된 HTML의 첫 제목 줄이 자동으로 입력됩니다.' },
+        { label: '추가 편집', detail: '생성 후 리치 텍스트 편집기에서 자유롭게 수정하고 태그·요약을 채워 저장합니다.' },
+        { label: '이용조건 안내', detail: '원문에 라이선스·이용조건이 감지되면 모달에 경고가 표시됩니다. 검토 후 사용합니다.' },
       ],
     },
     {
       step: '05',
-      title: 'AI 활용 기준',
-      description: '콘텐츠를 AI로 가공해 매장 응대에 맞는 형태로 변환합니다. 사용 전 검토는 필수입니다.',
+      title: '자료실',
+      routeLabel: '/content/resources',
+      description: '운영자가 등록한 자료를 확인하고 내 매장 자료함으로 가져옵니다. 여러 자료를 한 번에 가져올 수도 있습니다.',
       items: [
-        { label: '콘텐츠 요약', detail: '긴 콘텐츠를 핵심 요약으로 변환해 응대 시간에 맞춰 사용합니다.' },
-        { label: '설명 문구 생성', detail: '본문에서 고객 설명용 문장을 자동 생성합니다.' },
-        { label: '매장용 문장 변환', detail: '전문 표현을 매장 응대에 적합한 문장으로 다듬습니다.' },
-        { label: '검토 후 사용', detail: 'AI 결과는 약사·매장 책임자가 반드시 검토한 뒤 활용합니다.' },
+        { label: '자료 목록', detail: '/content/resources 에서 운영자가 등록한 자료를 봅니다. 일반 회원은 직접 등록할 수 없습니다.' },
+        { label: '자료 가져오기', detail: '행 메뉴에서 "내 자료함 가져가기"를 선택하면 내 매장 자료함에 복사됩니다.' },
+        { label: '여러 자료 선택 가져오기', detail: '체크박스로 여러 자료를 선택한 뒤 상단 액션 바에서 한 번에 가져옵니다.' },
+        { label: '가져가기 제한 자료', detail: '제작자가 "제한"으로 등록한 자료는 가져갈 수 없습니다. 목록에서 제한 표시로 구분됩니다.' },
+      ],
+    },
+    {
+      step: '06',
+      title: '다른 콘텐츠 이동',
+      description: '콘텐츠 허브에서 코스형 자료와 설문조사로 바로 이동합니다. 사용 방법은 각 전용 가이드를 참고합니다.',
+      items: [
+        { label: '코스형 자료', detail: '/content/courses 에서 공개된 코스형 자료를 확인합니다. 작성은 강사(lms:instructor) 또는 운영자 권한이 필요합니다.' },
+        { label: '강의(LMS) 가이드', detail: '강의 수강·작성 흐름은 /guide/features/lms 가이드를 참고합니다.' },
+        { label: '설문조사', detail: '/content/surveys 에서 진행 중 설문에 응답하거나, 종료된 설문의 결과를 확인합니다.' },
       ],
     },
   ],
