@@ -5,61 +5,28 @@
  * Core Freeze 준수: KPA 모듈 미수정
  */
 import { Router } from 'express';
-import type { Request, Response, NextFunction } from 'express';
 import { StoreConsoleController } from '../../controllers/operator/StoreConsoleController.js';
-import { authenticate } from '../../middleware/auth.middleware.js';
+import { authenticate, requireRole } from '../../middleware/auth.middleware.js';
 import { injectServiceScope } from '../../utils/serviceScope.js';
 
 const router: Router = Router();
 const controller = new StoreConsoleController();
 
+// WO-O4O-OPERATOR-ROLE-ASSIGNMENT-REPAIR-AND-GUARD-NORMALIZATION-V1:
+// 이전의 requireOperatorAccess 는 F11 §2 "membership bypass 로직 ❌" 위반이었음.
+// 운영자 권한의 canonical source = role_assignments (F9 SSOT). 데이터 보정 완료
+// (4 계정 RA reactivate) 후 표준 requireRole 로 정상화. 다른 4 operator route 와
+// 동일한 guard 체인을 갖도록 통일.
+//
 // WO-O4O-REQUIREADMIN-PREFIXED-ONLY-V1: legacy unprefixed roles 제거
-const OPERATOR_ROLES = [
+router.use(authenticate);
+router.use(requireRole([
   'platform:admin', 'platform:super_admin',
   'neture:admin', 'neture:operator',
   'glycopharm:admin', 'glycopharm:operator',
   'cosmetics:admin', 'cosmetics:operator',
   'kpa-society:admin', 'kpa-society:operator',
-];
-
-/**
- * Accept operators who have role_assignments OR active service memberships.
- * KPA Society operators use membership-based auth (service_memberships),
- * not role_assignments, so requireRole() would reject them.
- * WO-KPA-SOCIETY-STORE-ACCESS-FIX-V1
- */
-function requireOperatorAccess(req: Request, res: Response, next: NextFunction): void {
-  const user = (req as any).user;
-  if (!user) {
-    res.status(401).json({ success: false, error: 'Authentication required', code: 'UNAUTHORIZED' });
-    return;
-  }
-
-  // Check JWT roles (from role_assignments, set at login)
-  const userRoles: string[] = user.roles || [];
-  if (OPERATOR_ROLES.some(r => userRoles.includes(r))) {
-    next();
-    return;
-  }
-
-  // Fallback: active service membership in JWT (KPA-style membership-based operators)
-  const memberships: { serviceKey: string; status: string }[] = user.memberships || [];
-  if (memberships.some(m => m.status === 'active')) {
-    next();
-    return;
-  }
-
-  res.status(403).json({
-    success: false,
-    error: `One of these roles required: ${OPERATOR_ROLES.join(', ')}`,
-    code: 'ROLE_REQUIRED',
-    details: { requiredRoles: OPERATOR_ROLES },
-  });
-}
-
-// All routes require authentication + operator-level role (or active membership) + service scope
-router.use(authenticate);
-router.use(requireOperatorAccess);
+]));
 router.use(injectServiceScope);
 
 // Store list with slug + owner + channel_count + product_count
