@@ -4,6 +4,8 @@ import { User } from '../../entities/User.js';
 import { LinkedAccount } from '../../entities/LinkedAccount.js';
 import { AccountActivity } from '../../entities/AccountActivity.js';
 import { ServiceMembership } from '../../modules/auth/entities/ServiceMembership.js';
+// WO-O4O-IDENTITY-V2-PHASE1-REGISTER-LOGIN-V1: Identity V2 L2 Credential dual-read
+import { ServiceCredential } from '../../modules/auth/entities/ServiceCredential.js';
 import { UserRole, UserStatus } from '../../types/auth.js';
 import {
   AuthProvider,
@@ -167,8 +169,23 @@ export class AuthLoginService {
       }
     }
 
-    // Check if user has password (not social-only account)
-    if (!user.password) {
+    // WO-O4O-IDENTITY-V2-PHASE1-REGISTER-LOGIN-V1: Identity V2 dual-read
+    //   serviceKey 있음 + credential 있음 → V2 path (credential.passwordHash 사용)
+    //   serviceKey 있음 + credential 없음 → V1 fallback (users.password)
+    //   serviceKey 없음                   → V1 fallback (users.password)
+    // Phase 1 정책 (G-B No Backfill): 기존 사용자는 credential 없이도 users.password 로 정상 로그인.
+    let credentialHash: string | null = null;
+    if (serviceKey) {
+      const credRepo = AppDataSource.getRepository(ServiceCredential);
+      const credential = await credRepo.findOne({
+        where: { userId: user.id, serviceKey },
+      });
+      credentialHash = credential?.passwordHash ?? null;
+    }
+
+    // Check if user has authentication material (credential for the service OR user.password)
+    // social-only account 판정: credential 도 user.password 도 없을 때만
+    if (!credentialHash && !user.password) {
       await this.logLoginAttempt(user.id, email, ipAddress, userAgent, false, 'no_password');
       throw new SocialLoginRequiredError();
     }
@@ -179,11 +196,12 @@ export class AuthLoginService {
       throw new AccountLockedError(user.lockedUntil || undefined);
     }
 
-    // Verify password
-    const isValidPassword = await comparePassword(password, user.password);
+    // Verify password — credential 우선, 없으면 users.password fallback
+    const targetHash = credentialHash ?? user.password;
+    const isValidPassword = await comparePassword(password, targetHash);
     if (!isValidPassword) {
       await this.handleFailedLogin(user);
-      await this.logLoginAttempt(user.id, email, ipAddress, userAgent, false, 'invalid_password', 'email', user.password?.substring(0, 4));
+      await this.logLoginAttempt(user.id, email, ipAddress, userAgent, false, 'invalid_password', 'email', targetHash?.substring(0, 4));
       throw new InvalidCredentialsError();
     }
 

@@ -10,6 +10,8 @@ import { BaseController } from '../../../common/base.controller.js';
 import { AppDataSource } from '../../../database/connection.js';
 import { User } from '../entities/User.js';
 import { ServiceMembership } from '../entities/ServiceMembership.js';
+// WO-O4O-IDENTITY-V2-PHASE1-REGISTER-LOGIN-V1: Identity V2 L2 Credential dual-write
+import { ServiceCredential } from '../entities/ServiceCredential.js';
 import type { RegisterRequestDto } from '../dto/index.js';
 import logger from '../../../utils/logger.js';
 import { getServiceName } from '../../../config/service-catalog.js';
@@ -114,6 +116,20 @@ export class AuthRegisterController extends BaseController {
           membership.status = 'pending';
           membership.role = effectiveRole;
           await txSmRepo.save(membership);
+
+          // WO-O4O-IDENTITY-V2-PHASE1-REGISTER-LOGIN-V1: Identity V2 dual-write
+          // 새 서비스의 credential 을 별도로 생성. 본인 확인은 위 단계에서 기존 password 로
+          // 완료되었고, Phase 1 정책상 새 서비스의 credential 도 같은 입력 password 로 생성한다
+          // (새 password 입력 UX 는 Phase 3 의 책임). 중복 row 대비하여 upsert.
+          const txCredRepo = manager.getRepository(ServiceCredential);
+          await txCredRepo.upsert(
+            {
+              userId: existingUser.id,
+              serviceKey,
+              passwordHash: await hashPassword(data.password),
+            },
+            ['userId', 'serviceKey'],
+          );
 
           // WO-O4O-GLYCOPHARM-SIGNUP-REFORM-V1: businessInfo 머지 (기존 정보 보존 + 신규 추가)
           // WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1: ceoName/taxInvoiceEmail canonical, taxEmail→email overwrite 제거.
@@ -263,6 +279,20 @@ export class AuthRegisterController extends BaseController {
         membership.status = 'pending';
         membership.role = effectiveRole;
         await txSmRepo.save(membership);
+
+        // WO-O4O-IDENTITY-V2-PHASE1-REGISTER-LOGIN-V1: Identity V2 dual-write
+        // 신규 사용자의 첫 service_credentials row. users.password 와 동일한 hash 재사용
+        // (이미 위에서 한 번 해싱했으므로 비용 절감). 정의상 첫 row 이므로 upsert 의 update 경로는
+        // 트리거되지 않으나 방어적으로 upsert 사용.
+        const txCredRepo = manager.getRepository(ServiceCredential);
+        await txCredRepo.upsert(
+          {
+            userId: newUser.id,
+            serviceKey,
+            passwordHash: hashedPassword,
+          },
+          ['userId', 'serviceKey'],
+        );
 
         // KPA Society: auto-create KPA member
         await AuthRegisterController.createKpaRecords(manager, newUser.id, data);
