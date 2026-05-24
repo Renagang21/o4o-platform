@@ -52,8 +52,11 @@ export function createAdminDashboardController(dataSource: DataSource): Router {
         pendingRegsRow,
         partnerRequestsRow,
       ] = await Promise.all([
-        // 1. 총 사용자
-        dataSource.query(`SELECT COUNT(*)::int AS cnt FROM users`),
+        // 1. 총 사용자 — Neture 서비스 활성 회원 수 (WO-O4O-NETURE-ADMIN-DASHBOARD-TOTAL-USERS-SCOPE-FIX-V1)
+        dataSource.query(
+          `SELECT COUNT(*)::int AS cnt FROM service_memberships
+           WHERE service_key = 'neture' AND status = 'active'`,
+        ),
         // 2. 활성 공급사
         dataSource.query(`SELECT COUNT(*)::int AS cnt FROM neture_suppliers WHERE status = 'ACTIVE'`),
         // 3. 상품 승인 대기
