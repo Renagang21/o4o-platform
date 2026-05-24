@@ -35,6 +35,9 @@ const HUB_MENU_ITEMS: HubMenuItem[] = [
   { label: '블로그', path: '/store-hub/blog', icon: '\u{1F4DD}', description: '운영자 게시 블로그 · 내 매장으로 가져가기' },
   // WO-O4O-KPA-STORE-HUB-POP-CONTENT-IMPORT-V1: 매장 HUB POP 진열 + 가져가기
   { label: 'POP', path: '/store-hub/pop', icon: '\u{1F4E2}', description: '운영자 게시 POP · 내 매장으로 가져가기' },
+  // WO-O4O-KPA-STORE-HUB-QR-CONTENT-IMPORT-V1: 매장 HUB QR 진열 + 가져가기
+  // 매장 사본은 기존 StoreQRPage (/store/marketing/qr) 가 그대로 표시 — 별도 사본 관리 화면 없음.
+  { label: 'QR-code', path: '/store-hub/qr', icon: '\u{1F4F1}', description: '운영자 게시 QR 템플릿 · 내 매장으로 가져가기' },
 ];
 
 function isMenuActive(pathname: string, menuPath: string): boolean {

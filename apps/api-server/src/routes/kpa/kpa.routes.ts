@@ -90,6 +90,7 @@ import { createOperatorBlogController } from '../o4o-store/controllers/operator-
 import { createOperatorPopController } from '../o4o-store/controllers/operator-pop.controller.js';
 import { createStorePopStaffController } from '../o4o-store/controllers/pop.controller.js';
 import { createOperatorQrController } from '../o4o-store/controllers/operator-qr.controller.js';
+import { createStoreQrStaffController } from '../o4o-store/controllers/qr.controller.js';
 import { createLayoutController } from '../o4o-store/controllers/layout.controller.js'; // WO-STORE-BLOCK-ENGINE-V1
 import { createStoreSettingsController } from '../o4o-store/controllers/store-settings.controller.js'; // WO-STORE-COMMON-SETTINGS-FOUNDATION-V1
 // WO-O4O-ROUTES-REFACTOR-V1: Extracted controllers
@@ -460,6 +461,16 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     'kpa',
   );
   router.use('/operator/qr', kpaOperatorQrController);
+
+  // WO-O4O-KPA-STORE-HUB-QR-CONTENT-IMPORT-V1: 운영자 QR 템플릿 → 매장 사본 변환 INSERT
+  // /api/v1/kpa/stores/:slug/qr/staff/import (매장 owner 가 자기 매장 store_qr_codes 사본 생성)
+  // 기존 store-qr-landing controller (/pharmacy/qr/*) 와는 별도 — 변환 전용.
+  const kpaStoreQrStaffController = createStoreQrStaffController(
+    dataSource,
+    coreRequireAuth as any,
+    'kpa',
+  );
+  router.use('/stores', kpaStoreQrStaffController);
 
   const kpaTemplateController = createKpaStoreTemplateController(dataSource, coreRequireAuth as any);
   router.use('/stores', kpaTemplateController);
