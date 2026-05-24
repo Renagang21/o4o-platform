@@ -2,9 +2,17 @@
 """
 WO-O4O-CARE-DATA-ACCUMULATION-TEST-V1
 Care 시스템 데이터 축적 및 분석 안정성 검증
+
+자격증명 정책 (WO-O4O-TEMP-ACCOUNT-DOCS-AND-TEST-CLEANUP-V1):
+    CARE_TEST_EMAIL / CARE_TEST_PASSWORD env vars 필수. 평문 하드코딩 금지.
+    자격증명 SSOT: docs/local/TEST-ACCOUNTS.local.md
+
+    Run: CARE_TEST_EMAIL=... CARE_TEST_PASSWORD=... python scripts/care-data-accumulation-test.py
 """
 
 import json
+import os
+import sys
 import time
 import urllib.request
 import urllib.error
@@ -12,6 +20,12 @@ import ssl
 from datetime import datetime, timedelta, timezone
 
 API_BASE = "https://api.neture.co.kr/api/v1"
+CARE_TEST_EMAIL = os.environ.get("CARE_TEST_EMAIL")
+CARE_TEST_PASSWORD = os.environ.get("CARE_TEST_PASSWORD")
+if not CARE_TEST_EMAIL or not CARE_TEST_PASSWORD:
+    print("CARE_TEST_EMAIL and CARE_TEST_PASSWORD env vars required.", file=sys.stderr)
+    print("See docs/local/TEST-ACCOUNTS.local.md for valid local credentials.", file=sys.stderr)
+    sys.exit(1)
 TOKEN = ""
 
 # SSL context
@@ -87,10 +101,10 @@ def record_time(api_name, duration_ms):
 # =============================================================================
 def authenticate():
     global TOKEN
-    log("Authenticating...")
+    log(f"Authenticating as {CARE_TEST_EMAIL} ...")
     data = {
-        "email": "admin-glycopharm@o4o.com",
-        "password": "O4oTestPass",
+        "email": CARE_TEST_EMAIL,
+        "password": CARE_TEST_PASSWORD,
         "includeLegacyTokens": True,
     }
     duration, status, body = api_call("POST", "/auth/login", data)

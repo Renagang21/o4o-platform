@@ -28,13 +28,13 @@
 SELECT COUNT(*)::int AS total_users FROM users;
 
 -- Bootstrap 계정 존재 여부 (UUID를 text로 캐스팅 필요)
+-- WO-O4O-KPA-TEMP-SEED-BOOTSTRAP-DEPRECATION-V1 이후 super-admin (UUID ...000001) 만 정상 존재.
+-- UUID ...000002~000008 (kpa-admin/kpa-operator/phamacy1/neture-operator/kcos-admin/
+-- kcos-operator/glyco-operator) 는 임시 계정이며 부재가 정상.
 SELECT email, id::text AS id, created_at::date AS created
 FROM users
 WHERE id::text LIKE 'b0000000-b000-4000-b000-%'
 ORDER BY email;
-
--- phamacy1 계정 UUID 확인 (bootstrap UUID 여부)
-SELECT email, id::text AS id FROM users WHERE email = 'phamacy1@o4o.com';
 
 -- migration history
 SELECT COUNT(*)::int AS migration_count FROM typeorm_migrations;

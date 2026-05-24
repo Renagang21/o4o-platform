@@ -4,18 +4,32 @@
 > 작성일: 2026-05-14
 > 상태: DRY-RUN COMPLETE — 실제 실행 전 사용자 승인 필수
 
+> **⚠️ 정책 정합 갱신 (WO-O4O-TEMP-ACCOUNT-DOCS-AND-TEST-CLEANUP-V1, 2026-05-24):**
+>
+> 본 문서는 작성 시점 기준 8 bootstrap 계정의 자동 복구를 전제했다. 그러나
+> `project_test_account_cleanup_policy` 채택 이후 임시 계정 (UUID ...000002~000008,
+> kpa-admin / kpa-operator / phamacy1 / neture-operator / kcos-admin / kcos-operator /
+> glyco-operator) 은 **production 부재가 정상 상태**이며 재생성하지 않는다.
+>
+> 따라서:
+> - "Bootstrap 자동 복구" 는 **super-admin@o4o.com (UUID ...000001) 1 계정만** 대상.
+> - WO-O4O-KPA-TEMP-SEED-BOOTSTRAP-DEPRECATION-V1 (commit `86a08b420`) 에서 본 migration
+>   파일을 super-admin 만 유지하도록 trim 했으며, 다수의 보조 seed migration 을 삭제했다.
+> - STEP 5 / STEP 6 의 임시 계정 smoke test 항목은 폐기. super-admin 기반 smoke 만 유효.
+> - 신규 검증 자격증명은 `docs/local/TEST-ACCOUNTS.local.md` 로 관리.
+
 ---
 
 ## 개요
 
 이 문서는 O4O Platform 운영 데이터 전체 초기화(Reset) 절차를 정의한다.
-채택 전략: **Option B — 선택적 TRUNCATE + bootstrap seed 재실행**
+채택 전략: **Option B — 선택적 TRUNCATE + bootstrap seed 재실행 (super-admin 만)**
 
 | 항목 | 내용 |
 |------|------|
-| 목표 | 운영 데이터 삭제, schema/migration 유지, bootstrap 계정 자동 복구 |
-| 전제 | typeorm_migrations 절대 보존, bootstrap UUID 패턴으로 계정 식별 |
-| 복구 | CI/CD main 배포 → BootstrapCanonicalSeedAccounts migration 자동 실행 |
+| 목표 | 운영 데이터 삭제, schema/migration 유지, super-admin 1 계정 자동 복구 |
+| 전제 | typeorm_migrations 절대 보존, bootstrap UUID ...000001 (super-admin) 만 보존 대상 |
+| 복구 | CI/CD main 배포 → BootstrapCanonicalSeedAccounts migration 자동 실행 (super-admin 만) |
 | SQL | `scripts/reset/O4O-RESET-DRYRUN-V1.sql` |
 
 ---
@@ -195,16 +209,14 @@ gcloud logging read \
 
 ### STEP 6: 서비스 smoke test
 
-아래 계정으로 로그인 테스트 수행 (`docs/local/TEST-ACCOUNTS.local.md` 참조):
+⚠️ **WO-O4O-TEMP-ACCOUNT-DOCS-AND-TEST-CLEANUP-V1 갱신**: 임시 계정 smoke 항목은 폐기.
+super-admin 1 계정만 reset 직후 자동 복구되며, 그 외 검증 계정은 운영자가
+`docs/local/TEST-ACCOUNTS.local.md` 의 정의를 따라 별도로 준비한다.
 
 | 계정 | 목적 |
 |------|------|
-| super-admin@o4o.com | /admin 접근 |
-| kpa-admin@o4o.com | /admin/members 접근 |
-| kpa-operator@o4o.com | /operator/members 접근 |
-| phamacy1@o4o.com | KPA 포털 접근 |
-| neture-operator@o4o.com | Neture 운영자 대시보드 |
-| kcos-admin@o4o.com | K-Cosmetics 관리자 |
+| super-admin@o4o.com | /admin 접근 (자동 복구 — bootstrap migration) |
+| (그 외 검증 계정) | `docs/local/TEST-ACCOUNTS.local.md` SSOT 참조 — 운영자가 별도로 준비 |
 
 smoke test 체크리스트:
 - [ ] 각 계정 로그인 성공

@@ -2,7 +2,16 @@
  * CHECK-O4O-AI-CONTENT-MODAL-BROWSER-REAL-VERIFY-V1
  * Browser-based verification of AI lesson draft modal "URL에서 가져오기" tab.
  *
- * Run: node scripts/verify/verify-ai-content-modal.mjs
+ * Run: TEST_EMAIL=... TEST_PASSWORD=... node scripts/verify/verify-ai-content-modal.mjs
+ *
+ * 자격증명 정책 (WO-O4O-TEMP-ACCOUNT-DOCS-AND-TEST-CLEANUP-V1):
+ *   - 평문 credential 하드코딩 금지 (CLAUDE.md §15).
+ *   - 자격증명 SSOT: `docs/local/TEST-ACCOUNTS.local.md`.
+ *
+ * 추가 주의: 본 스크립트는 GlycoPharm LoginModal 의 "약국 개설자" quick-login 버튼을
+ * 클릭하는 흐름을 사용한다 (line ~74). 해당 버튼은
+ * WO-O4O-TEMP-ACCOUNT-P0-SECURITY-CLEANUP-V1 에서 제거되었으므로 본 스크립트는
+ * 현재 정상 실행되지 않는다. 사용하려면 form 직접 fill 흐름으로 재작성 필요.
  */
 
 import { chromium } from 'playwright';
@@ -11,8 +20,13 @@ import { dirname, resolve } from 'node:path';
 
 const BASE_URL = process.env.KPA_URL || 'https://kpa-society.co.kr';
 const COURSE_EDIT_PATH = '/instructor/courses/77d530a0-1bb3-4e1b-be3f-691811c1c40e';
-const TEST_EMAIL = 'phamacy1@o4o.com';
-const TEST_PASSWORD = 'O4oTestPass@1';
+const TEST_EMAIL = process.env.TEST_EMAIL;
+const TEST_PASSWORD = process.env.TEST_PASSWORD;
+if (!TEST_EMAIL || !TEST_PASSWORD) {
+  console.error('TEST_EMAIL and TEST_PASSWORD env vars required.');
+  console.error('See docs/local/TEST-ACCOUNTS.local.md for valid local credentials.');
+  process.exit(1);
+}
 const OUT_DIR = resolve('scripts/verify/output/ai-modal');
 
 mkdirSync(OUT_DIR, { recursive: true });

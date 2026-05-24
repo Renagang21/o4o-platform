@@ -2,6 +2,17 @@
  * WO-O4O-E2E-REGISTRATION-APPROVAL-LOGIN-TEST-V1
  *
  * 전체 서비스 가입→승인→로그인 E2E 테스트
+ *
+ * 자격증명 정책 (WO-O4O-TEMP-ACCOUNT-DOCS-AND-TEST-CLEANUP-V1):
+ *   평문 credential 하드코딩 금지. 모든 자격증명은 env vars 로 주입.
+ *   자격증명 SSOT: `docs/local/TEST-ACCOUNTS.local.md`.
+ *
+ *   필수 env vars:
+ *     E2E_TEST_USER_EMAIL / E2E_TEST_USER_PASSWORD          (가입할 사용자)
+ *     E2E_OPERATOR_NETURE_EMAIL / E2E_OPERATOR_NETURE_PASSWORD
+ *     E2E_OPERATOR_GLYCOPHARM_EMAIL / E2E_OPERATOR_GLYCOPHARM_PASSWORD
+ *     E2E_OPERATOR_KPA_EMAIL / E2E_OPERATOR_KPA_PASSWORD
+ *     E2E_OPERATOR_KCOSMETICS_EMAIL / E2E_OPERATOR_KCOSMETICS_PASSWORD
  */
 import { chromium, type Browser, type BrowserContext, type Page } from 'playwright';
 import { mkdirSync } from 'fs';
@@ -10,7 +21,25 @@ import { join } from 'path';
 const SCREENSHOT_DIR = join(process.cwd(), 'e2e', 'screenshots');
 mkdirSync(SCREENSHOT_DIR, { recursive: true });
 
-const TEST_USER = { email: 'test-e2e-v3@o4o.com', password: 'O4oTestPass1!' };
+function requireEnv(name: string): string {
+  const v = process.env[name];
+  if (!v) {
+    console.error(`${name} env var required. See docs/local/TEST-ACCOUNTS.local.md.`);
+    process.exit(1);
+  }
+  return v;
+}
+
+const TEST_USER = {
+  email: requireEnv('E2E_TEST_USER_EMAIL'),
+  password: requireEnv('E2E_TEST_USER_PASSWORD'),
+};
+const OPS = {
+  NETURE: { email: requireEnv('E2E_OPERATOR_NETURE_EMAIL'), password: requireEnv('E2E_OPERATOR_NETURE_PASSWORD') },
+  GLYCOPHARM: { email: requireEnv('E2E_OPERATOR_GLYCOPHARM_EMAIL'), password: requireEnv('E2E_OPERATOR_GLYCOPHARM_PASSWORD') },
+  KPA: { email: requireEnv('E2E_OPERATOR_KPA_EMAIL'), password: requireEnv('E2E_OPERATOR_KPA_PASSWORD') },
+  KCOSMETICS: { email: requireEnv('E2E_OPERATOR_KCOSMETICS_EMAIL'), password: requireEnv('E2E_OPERATOR_KCOSMETICS_PASSWORD') },
+};
 const TIMEOUT = 15_000;
 
 interface ServiceConfig {
@@ -98,8 +127,8 @@ const services: ServiceConfig[] = [
     url: 'https://www.neture.co.kr',
     registerPath: '/register',
     loginPath: '/login',
-    operatorEmail: 'admin-neture@o4o.com',
-    operatorPassword: 'O4oTestPass',
+    operatorEmail: OPS.NETURE.email,
+    operatorPassword: OPS.NETURE.password,
     approvalPath: '/operator/registrations',
     fillRegister: async (page: Page) => {
       // Step 1: Role selection (supplier)
@@ -157,8 +186,8 @@ const services: ServiceConfig[] = [
     url: 'https://glycopharm.co.kr',
     registerPath: '/register',
     loginPath: '/login',
-    operatorEmail: 'admin-glycopharm@o4o.com',
-    operatorPassword: 'O4oTestPass',
+    operatorEmail: OPS.GLYCOPHARM.email,
+    operatorPassword: OPS.GLYCOPHARM.password,
     approvalPath: '/operator/users',
     fillRegister: async (page: Page) => {
       await fillField(page, 'input[type="email"], input[name="email"]', TEST_USER.email);
@@ -217,8 +246,8 @@ const services: ServiceConfig[] = [
     url: 'https://kpa-society.co.kr',
     registerPath: '/register',
     loginPath: '/login',
-    operatorEmail: 'kpa-a-admin@o4o.com',
-    operatorPassword: 'O4oTestPass',
+    operatorEmail: OPS.KPA.email,
+    operatorPassword: OPS.KPA.password,
     approvalPath: '/operator',
     fillRegister: async (page: Page) => {
       await fillField(page, 'input[type="email"], input[name="email"]', TEST_USER.email);
@@ -294,8 +323,8 @@ const services: ServiceConfig[] = [
     url: 'https://k-cosmetics.site',
     registerPath: '/register',
     loginPath: '/login',
-    operatorEmail: 'admin-k-cosmetics@o4o.com',
-    operatorPassword: 'O4oTestPass',
+    operatorEmail: OPS.KCOSMETICS.email,
+    operatorPassword: OPS.KCOSMETICS.password,
     approvalPath: '/operator/users',
     fillRegister: async (page: Page) => {
       // Step 1: Role selection (consumer)

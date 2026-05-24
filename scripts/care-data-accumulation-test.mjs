@@ -1,9 +1,22 @@
 /**
  * WO-O4O-CARE-DATA-ACCUMULATION-TEST-V1
  * Care 시스템 데이터 축적 및 분석 안정성 검증
+ *
+ * 자격증명 정책 (WO-O4O-TEMP-ACCOUNT-DOCS-AND-TEST-CLEANUP-V1):
+ *   CARE_TEST_EMAIL / CARE_TEST_PASSWORD env vars 필수. 평문 하드코딩 금지.
+ *   자격증명 SSOT: `docs/local/TEST-ACCOUNTS.local.md`.
+ *
+ *   Run: CARE_TEST_EMAIL=... CARE_TEST_PASSWORD=... node scripts/care-data-accumulation-test.mjs
  */
 
 const API_BASE = "https://api.neture.co.kr/api/v1";
+const CARE_TEST_EMAIL = process.env.CARE_TEST_EMAIL;
+const CARE_TEST_PASSWORD = process.env.CARE_TEST_PASSWORD;
+if (!CARE_TEST_EMAIL || !CARE_TEST_PASSWORD) {
+  console.error("CARE_TEST_EMAIL and CARE_TEST_PASSWORD env vars required.");
+  console.error("See docs/local/TEST-ACCOUNTS.local.md for valid local credentials.");
+  process.exit(1);
+}
 let TOKEN = "";
 
 // Counters
@@ -50,10 +63,10 @@ async function apiCall(method, path, data) {
 // Phase 0: Authentication
 // =============================================================================
 async function authenticate() {
-  log("Authenticating as Operator (pharmacy-scoped)...");
+  log(`Authenticating as ${CARE_TEST_EMAIL} ...`);
   const { duration, status, body } = await apiCall("POST", "/auth/login", {
-    email: "operator-glycopharm@o4o.com",
-    password: "O4oTestPass",
+    email: CARE_TEST_EMAIL,
+    password: CARE_TEST_PASSWORD,
     includeLegacyTokens: true,
   });
 

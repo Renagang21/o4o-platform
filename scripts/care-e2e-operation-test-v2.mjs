@@ -6,10 +6,21 @@
  * Patient → Health Data → Analysis → KPI → Risk → Alert
  * → Priority → LLM Insight → Coaching → Dashboard
  *
- * 실행: node scripts/care-e2e-operation-test-v2.mjs
+ * 자격증명 정책 (WO-O4O-TEMP-ACCOUNT-DOCS-AND-TEST-CLEANUP-V1):
+ *   CARE_TEST_EMAIL / CARE_TEST_PASSWORD env vars 필수. 평문 하드코딩 금지.
+ *   자격증명 SSOT: `docs/local/TEST-ACCOUNTS.local.md`.
+ *
+ *   Run: CARE_TEST_EMAIL=... CARE_TEST_PASSWORD=... node scripts/care-e2e-operation-test-v2.mjs
  */
 
 const API_BASE = "https://api.neture.co.kr/api/v1";
+const CARE_TEST_EMAIL = process.env.CARE_TEST_EMAIL;
+const CARE_TEST_PASSWORD = process.env.CARE_TEST_PASSWORD;
+if (!CARE_TEST_EMAIL || !CARE_TEST_PASSWORD) {
+  console.error("CARE_TEST_EMAIL and CARE_TEST_PASSWORD env vars required.");
+  console.error("See docs/local/TEST-ACCOUNTS.local.md for valid local credentials.");
+  process.exit(1);
+}
 let TOKEN = "";
 
 // Counters
@@ -113,10 +124,10 @@ function getPatientGroup(pidx) {
 // Phase 0: Authentication
 // =============================================================================
 async function authenticate() {
-  log("Authenticating as operator-glycopharm@o4o.com ...");
+  log(`Authenticating as ${CARE_TEST_EMAIL} ...`);
   const { duration, status, body } = await apiCall("POST", "/auth/login", {
-    email: "operator-glycopharm@o4o.com",
-    password: "O4oTestPass",
+    email: CARE_TEST_EMAIL,
+    password: CARE_TEST_PASSWORD,
     includeLegacyTokens: true,
   });
 

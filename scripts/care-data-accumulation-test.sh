@@ -2,9 +2,21 @@
 # =============================================================================
 # WO-O4O-CARE-DATA-ACCUMULATION-TEST-V1
 # Care 시스템 데이터 축적 및 분석 안정성 검증
+#
+# 자격증명 정책 (WO-O4O-TEMP-ACCOUNT-DOCS-AND-TEST-CLEANUP-V1):
+#   CARE_TEST_EMAIL / CARE_TEST_PASSWORD env vars 필수. 평문 하드코딩 금지.
+#   자격증명 SSOT: docs/local/TEST-ACCOUNTS.local.md
+#
+#   Run: CARE_TEST_EMAIL=... CARE_TEST_PASSWORD=... bash scripts/care-data-accumulation-test.sh
 # =============================================================================
 
 set -euo pipefail
+
+if [ -z "${CARE_TEST_EMAIL:-}" ] || [ -z "${CARE_TEST_PASSWORD:-}" ]; then
+  echo "CARE_TEST_EMAIL and CARE_TEST_PASSWORD env vars required." >&2
+  echo "See docs/local/TEST-ACCOUNTS.local.md for valid local credentials." >&2
+  exit 1
+fi
 
 API_BASE="https://api.neture.co.kr/api/v1"
 RESULTS_FILE="/tmp/care-test-results.json"
@@ -32,8 +44,9 @@ declare -a API_TIMES=()
 # Phase 0: Authentication
 # =============================================================================
 authenticate() {
-  log "Phase 0: Authenticating..."
-  printf '{"email":"admin-glycopharm@o4o.com","password":"O4oTestPass","includeLegacyTokens":true}' > /tmp/care-login.json
+  log "Phase 0: Authenticating as ${CARE_TEST_EMAIL} ..."
+  printf '{"email":"%s","password":"%s","includeLegacyTokens":true}' \
+    "${CARE_TEST_EMAIL}" "${CARE_TEST_PASSWORD}" > /tmp/care-login.json
 
   local resp
   resp=$(curl -s -X POST "${API_BASE}/auth/login" \
