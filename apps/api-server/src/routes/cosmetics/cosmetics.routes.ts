@@ -31,6 +31,8 @@ import { createStoreQrLandingController } from '../o4o-store/controllers/store-q
 import { createStorePopController } from '../o4o-store/controllers/store-pop.controller.js';
 // WO-O4O-KCOS-STORE-EXECUTION-CANONICAL-ALIGNMENT-V1: Blog controller
 import { createBlogController } from '../o4o-store/controllers/blog.controller.js';
+// WO-O4O-OPERATOR-BLOG-PUBLISHING-WRITE-API-V1: 운영자 HUB 게시 write API
+import { createOperatorBlogController } from '../o4o-store/controllers/operator-blog.controller.js';
 import { createProductMarketingController } from '../o4o-store/controllers/product-marketing.controller.js';
 import { createAssetSnapshotController } from '../o4o-store/controllers/asset-snapshot.controller.js';
 import { createStoreAssetControlController } from '../o4o-store/controllers/store-asset-control.controller.js';
@@ -138,6 +140,14 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
   // Store Blog (internal: /stores/:slug/blog/*)
   // WO-O4O-KCOS-STORE-EXECUTION-CANONICAL-ALIGNMENT-V1: serviceKey='cosmetics' 전달.
   router.use('/', createBlogController(dataSource, coreRequireAuth as any, 'cosmetics'));
+
+  // WO-O4O-OPERATOR-BLOG-PUBLISHING-WRITE-API-V1: 운영자 HUB 게시 write API
+  // /api/v1/cosmetics/operator/blog/posts (운영자가 매장 HUB 에 게시하는 블로그)
+  // 권한: cosmetics:operator / cosmetics:admin / platform:admin / platform:super_admin
+  router.use(
+    '/operator/blog',
+    createOperatorBlogController(dataSource, coreRequireAuth as any, 'cosmetics'),
+  );
 
   // Store Analytics (internal: /pharmacy/analytics/*)
   // WO-O4O-STORE-OWNER-BACKCOMPAT-CALLERS-MIGRATION-V1: serviceKey='cosmetics' 명시 (canonical)

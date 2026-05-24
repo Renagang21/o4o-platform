@@ -40,8 +40,19 @@ export class StoreBlogPost {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ name: 'store_id', type: 'uuid' })
-  storeId!: string;
+  /**
+   * 매장 ID — author_role 에 따라 NULL 허용 여부가 결정된다.
+   *
+   * WO-O4O-OPERATOR-BLOG-PUBLISHING-WRITE-API-V1 (2026-05-24):
+   *   - author_role='store' : storeId NOT NULL (매장 직접 작성 — 한 매장에 귀속)
+   *   - author_role='operator' : storeId NULL (운영자 HUB 원본 — 특정 매장 무귀속)
+   *
+   * DB CHECK 제약 (CHK_store_blog_posts_author_role_store_id) 으로 schema 레벨 정합 보장:
+   *   (author_role='operator' AND store_id IS NULL)
+   *   OR (author_role='store' AND store_id IS NOT NULL)
+   */
+  @Column({ name: 'store_id', type: 'uuid', nullable: true })
+  storeId!: string | null;
 
   @Column({ name: 'service_key', type: 'varchar', length: 50 })
   serviceKey!: string;

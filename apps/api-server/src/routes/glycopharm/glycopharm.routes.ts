@@ -23,6 +23,8 @@ import { createOperatorController } from './controllers/operator.controller.js';
 import { createPublicController } from './controllers/public.controller.js';
 import { createStoreController } from './controllers/store.controller.js'; // WO-O4O-STOREFRONT-ACTIVATION-V1
 import { createBlogController } from '../o4o-store/controllers/blog.controller.js'; // WO-STORE-BLOG-CHANNEL-V1
+// WO-O4O-OPERATOR-BLOG-PUBLISHING-WRITE-API-V1: 운영자 HUB 게시 write API
+import { createOperatorBlogController } from '../o4o-store/controllers/operator-blog.controller.js';
 import { createLayoutController } from '../o4o-store/controllers/layout.controller.js'; // WO-STORE-BLOCK-ENGINE-V1
 import { createStoreSettingsController } from '../o4o-store/controllers/store-settings.controller.js'; // WO-STORE-COMMON-SETTINGS-FOUNDATION-V1
 // WO-O4O-GLYCOPHARM-STORE-HUB-ADOPTION-V1
@@ -400,6 +402,16 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   // ============================================================================
   const blogController = createBlogController(dataSource, coreRequireAuth as any);
   router.use('/stores', blogController);
+
+  // WO-O4O-OPERATOR-BLOG-PUBLISHING-WRITE-API-V1: 운영자 HUB 게시 write API
+  // /api/v1/glycopharm/operator/blog/posts (운영자가 매장 HUB 에 게시하는 블로그)
+  // 권한: glycopharm:operator / glycopharm:admin / platform:admin / platform:super_admin
+  const glycopharmOperatorBlogController = createOperatorBlogController(
+    dataSource,
+    coreRequireAuth as any,
+    'glycopharm',
+  );
+  router.use('/operator/blog', glycopharmOperatorBlogController);
 
   // ============================================================================
   // Store Layout Block Engine (WO-STORE-BLOCK-ENGINE-V1)
