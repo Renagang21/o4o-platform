@@ -208,9 +208,13 @@ export function CommunityHomePage() {
           <HeroBannerSection
             ads={data?.heroAds ?? []}
             fallback={{
-              badge: '약사/약국 서비스',
-              title: '약사 커뮤니티와 약국 경영 서비스',
-              subtitle: '약사 커뮤니티와 약국 경영 서비스를 한 곳에서',
+              // WO-O4O-KPA-HERO-FALLBACK-VALUE-COPY-V1:
+              // Hero fallback 을 "커뮤니티 소개" 에서 "O4O 가치 전달" 로 전환.
+              // Philosophy §8 최우선 명제 ("정보를 실행 경쟁력으로 전환") 직접 표현.
+              // 3 요소 (AI · 운영자 자료 · 매장 도구) + "작은 약국" 으로 가치 명제 보존.
+              badge: '약사·약국 O4O 플랫폼',
+              title: '정보를 매장 실행 경쟁력으로 연결합니다',
+              subtitle: 'AI · 운영자 자료 · 매장 도구를 연결해 작은 약국도 경쟁력을 만듭니다',
             }}
           />
         </PageHero>
