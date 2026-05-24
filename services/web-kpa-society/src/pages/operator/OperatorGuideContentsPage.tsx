@@ -1,24 +1,14 @@
 /**
  * OperatorGuideContentsPage — /operator/guide-contents (KPA-Society)
  *
- * WO-O4O-OPERATOR-GUIDE-CONTENTS-CORE-EXTRACTION-V1
- * 공통 모듈로 추출됨: @o4o/operator-core-ui/modules/guide-contents
+ * WO-O4O-OPERATOR-COPY-PASTE-WRAPPER-CONSOLIDATION-V1:
+ *   기존 24-line 복사본을 GuideContentsConsolePage thin wrapper 로 정합.
+ * 선행: WO-O4O-OPERATOR-GUIDE-CONTENTS-CORE-EXTRACTION-V1 (canonical 모듈).
  */
 
-import { GuideContentsManager, type GuideContentsConfig } from '@o4o/operator-core-ui/modules/guide-contents';
+import { GuideContentsConsolePage } from '@o4o/operator-core-ui/modules/guide-contents';
 import { guideClient } from '../../api/guideContent';
 
-const config: GuideContentsConfig = {
-  pageKey: 'lms.lesson.editor',
-  sections: [
-    { key: 'article',    label: '문서' },
-    { key: 'video',      label: '동영상' },
-    { key: 'quiz',       label: '퀴즈' },
-    { key: 'assignment', label: '과제' },
-    { key: 'live',       label: '라이브' },
-  ],
-};
-
 export default function OperatorGuideContentsPage() {
-  return <GuideContentsManager serviceKey="kpa-society" config={config} client={guideClient} />;
+  return <GuideContentsConsolePage serviceKey="kpa-society" client={guideClient} />;
 }
