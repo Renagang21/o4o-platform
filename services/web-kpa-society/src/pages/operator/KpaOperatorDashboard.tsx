@@ -140,6 +140,9 @@ export default function KpaOperatorDashboard() {
 
   return (
     <div className="space-y-6">
+      {/* WO-O4O-KPA-OPERATOR-DASHBOARD-GUIDE-CARD-V1: 운영 철학 카드 — Dashboard
+          진입 → 운영 철학 → 운영 기능 순서로 인지. 기능보다 의미를 먼저 전달. */}
+      <OperatorRoleGuideCard />
       {/* WO-O4O-OPERATOR-DASHBOARD-COMMUNITY-STORE-HUB-SPLIT-V1: 2축 운영 네비게이션 */}
       {extData && <AxisNavigationSection extData={extData} />}
       <OperatorDashboardLayout config={config} />
@@ -225,5 +228,41 @@ function AxisNavigationSection({ extData }: { extData: KpaExtendedData }) {
         </div>
       </div>
     </div>
+  );
+}
+
+// ─── 운영 철학 가이드 카드 ─────────────────────────────────────────────────────
+// WO-O4O-KPA-OPERATOR-DASHBOARD-GUIDE-CARD-V1:
+// Dashboard 진입 직후 "운영자는 무엇을 하는 사람인가" 를 전달. 기존 5-Block /
+// AxisNavigationSection 의 카드 문법 재사용 (bg-white rounded-xl + p-5 + emoji
+// icon + title + 설명 + Link). 모바일 1열 자동 stack. 색조 indigo — 기존
+// blue (커뮤니티 운영) / emerald (매장 HUB 운영) 와 시각적으로 구분.
+
+function OperatorRoleGuideCard() {
+  return (
+    <section className="bg-white rounded-xl border border-indigo-100 p-5">
+      <div className="flex items-start gap-3">
+        <span className="text-2xl shrink-0" aria-hidden="true">🤝</span>
+        <div className="flex-1 min-w-0">
+          <h2 className="text-base font-semibold text-slate-900 mb-1">
+            운영자는 관리자가 아닙니다
+          </h2>
+          <p className="text-xs text-slate-500 mb-3">
+            공급자 협력 · 자료 구성 · AI 보조 · 매장 지원 · 운영 생태계 구축
+          </p>
+          <p className="text-sm text-slate-600 leading-relaxed mb-4">
+            운영자는 공급자와 협력하고 자료를 정리하며 AI 도움을 활용하여
+            매장이 실제 활용할 수 있는 환경을 지원합니다.
+          </p>
+          <Link
+            to="/guide/for/operator"
+            className="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors"
+          >
+            운영자 활용 가이드 보기
+            <span className="ml-1" aria-hidden="true">→</span>
+          </Link>
+        </div>
+      </div>
+    </section>
   );
 }
