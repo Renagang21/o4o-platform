@@ -5,7 +5,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Monitor, Tablet, Tv, GraduationCap, Package, Truck, Building2, Megaphone } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Monitor, Tablet, Tv, GraduationCap, Package, Truck, Building2, Megaphone } from 'lucide-react';
 
 export default function SalonTargetPage() {
   const trackEvent = (eventData: { event: string; target: string; action: string; position: string }) => {
@@ -194,9 +194,17 @@ export default function SalonTargetPage() {
           <p className="font-medium text-gray-900">이 업종에 맞는 O4O 활용을 시작해 보세요.</p>
           <div className="mt-4 flex flex-wrap gap-3">
             <Link
+              to="/o4o/apply?industry=salon"
+              onClick={() => trackEvent({ event: 'channel_apply_click', target: 'salon', action: 'apply', position: 'mid' })}
+              className="inline-flex items-center justify-center px-5 py-2.5 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors text-sm"
+            >
+              내 미용실에 적용 검토
+              <ArrowRight className="w-4 h-4 ml-1" />
+            </Link>
+            <Link
               to="/supplier"
               onClick={() => trackEvent({ event: 'mid_cta_click', target: 'salon', action: 'supplier', position: 'mid' })}
-              className="inline-flex items-center justify-center px-5 py-2.5 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors text-sm"
+              className="inline-flex items-center justify-center px-5 py-2.5 border border-primary-600 text-primary-700 font-medium rounded-lg hover:bg-primary-50 transition-colors text-sm"
             >
               제품 공급자로 참여하기
             </Link>
