@@ -74,11 +74,8 @@ function LatestActivitySection({ items, activeTab, onTabChange, loading }: Lates
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4">
+      <div className="mb-4">
         <h2 className="text-lg font-bold text-slate-800 m-0">최신글</h2>
-        <Link to="/home/latest" className="text-sm text-blue-600 hover:text-blue-700 font-medium no-underline">
-          전체 보기 →
-        </Link>
       </div>
 
       {/* 탭 필터 */}
@@ -132,7 +129,7 @@ function LatestActivitySection({ items, activeTab, onTabChange, loading }: Lates
         </div>
       )}
 
-      {/* 탭별 바로가기 — 전체 탭은 섹션 header 의 "전체 보기" 가 담당하므로 skip */}
+      {/* 탭별 바로가기 — 전체 탭은 요약 성격이므로 skip, 카테고리 탭만 해당 공간 바로가기 표시 */}
       {hasTabShortcut && (
         <div className="mt-3 flex justify-end">
           <Link
