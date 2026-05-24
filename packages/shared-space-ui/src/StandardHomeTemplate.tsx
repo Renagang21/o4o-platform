@@ -51,6 +51,16 @@ export interface StandardHomeTemplateProps {
   /** 최신 활동 섹션 — 공지 아래, 서비스 바로가기 위 (WO-O4O-KPA-HOME-LATEST-ACTIVITY-SECTION-V1) */
   latestSlot?: ReactNode;
 
+  /**
+   * 가치 / 역할별 활용 안내 슬롯 — 최신 활동 아래, 서비스 바로가기 위.
+   *
+   * WO-O4O-KPA-HOME-VALUE-CARDS-V1:
+   * 사용자 흐름 "Hero (여기는 무엇을 하는 곳인가) → Value Cards (그래서 나는
+   * 무엇을 하면 되는가) → AppEntry (실제로 시작하기)" 의 중간 단계.
+   * 미전달 시 비활성 (다른 service 영향 0).
+   */
+  valueGuideSlot?: ReactNode;
+
   /** AppEntry 카드 목록 */
   appEntryCards: AppEntrySectionProps['cards'];
   appEntryOnCardClick?: AppEntrySectionProps['onCardClick'];
@@ -75,6 +85,7 @@ export function StandardHomeTemplate({
   noticesRightSlot,
   noticesGap = 'gap-4',
   latestSlot,
+  valueGuideSlot,
   appEntryCards,
   appEntryOnCardClick,
   cta,
@@ -111,6 +122,16 @@ export function StandardHomeTemplate({
         <PageSection>
           <PageContainer>
             {latestSlot}
+          </PageContainer>
+        </PageSection>
+      )}
+
+      {/* 3-1. 가치 / 역할별 활용 안내 — 선택적 슬롯
+              WO-O4O-KPA-HOME-VALUE-CARDS-V1: AppEntry 진입 전 "내 역할로 시작하기" */}
+      {valueGuideSlot && (
+        <PageSection>
+          <PageContainer>
+            {valueGuideSlot}
           </PageContainer>
         </PageSection>
       )}

@@ -21,11 +21,12 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Store, Network, Users } from 'lucide-react';
 import { PageHero, Card, useTemplate } from '@o4o/ui';
 import {
   HeroBannerSection,
   StandardHomeTemplate,
+  AppEntrySection,
   ForumIcon,
   EducationIcon,
   ContentIcon,
@@ -249,6 +250,37 @@ export function CommunityHomePage() {
           activeTab={latestTab}
           onTabChange={setLatestTab}
           loading={latestLoading}
+        />
+      }
+      valueGuideSlot={
+        // WO-O4O-KPA-HOME-VALUE-CARDS-V1:
+        // "내 역할로 시작하기" — Hero("여기는 무엇을 하는 곳인가") 와
+        // AppEntry("실제로 시작하기") 사이의 중간 단계. 사용자가 자기 역할을
+        // 선택해 /guide/for/{store-owner,operator,member} 진입.
+        // AppEntrySection 패턴 재사용 — 데스크탑 3열 / 태블릿 2+1 / 모바일 stack.
+        <AppEntrySection
+          title="내 역할로 시작하기"
+          accentColor="var(--color-primary)"
+          cards={[
+            {
+              title: '매장 경영자',
+              description: '직원이 많지 않아도 AI · 운영자 지원 · 매장 실행 도구를 활용해 정보 전달 경쟁력을 만들 수 있습니다',
+              href: '/guide/for/store-owner',
+              icon: <span className={iconCls}><Store size={24} /></span>,
+            },
+            {
+              title: '서비스 운영자',
+              description: '공급자 협력 · 자료 구성 · 매장 지원 · AI 보조를 활용해 지역 생태계를 운영합니다',
+              href: '/guide/for/operator',
+              icon: <span className={iconCls}><Network size={24} /></span>,
+            },
+            {
+              title: '커뮤니티 참여자',
+              description: '정보 · 경험 · 강의 · 콘텐츠가 실제 현장 활용으로 연결됩니다',
+              href: '/guide/for/member',
+              icon: <span className={iconCls}><Users size={24} /></span>,
+            },
+          ]}
         />
       }
       appEntryCards={[
