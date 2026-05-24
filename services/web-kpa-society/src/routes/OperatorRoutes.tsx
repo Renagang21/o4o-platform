@@ -51,6 +51,9 @@ import CollaborationRequestsPage from '../pages/operator/CollaborationRequestsPa
 // WO-O4O-SURVEY-POINT-REWARD-PHASE1-V1
 import OperatorSurveyListPage from '../pages/operator/survey/OperatorSurveyListPage';
 import OperatorSurveyCreatePage from '../pages/operator/survey/OperatorSurveyCreatePage';
+// WO-O4O-OPERATOR-BLOG-WRITE-PAGE-KPA-V1: 운영자 매장 HUB 블로그 작성/관리
+import OperatorBlogListPage from '../pages/operator/blog/OperatorBlogListPage';
+import OperatorBlogWritePage from '../pages/operator/blog/OperatorBlogWritePage';
 import { RoleGuard } from '../components/auth/RoleGuard';
 import { PLATFORM_ROLES, ROLES } from '../lib/role-constants';
 // WO-O4O-OPERATOR-UI-STANDARDIZATION-V1: shared OperatorShell wrapper
@@ -160,6 +163,11 @@ export function OperatorRoutes() {
           {/* 설문조사 관리 (WO-O4O-SURVEY-POINT-REWARD-PHASE1-V1) */}
           <Route path="surveys" element={<OperatorSurveyListPage />} />
           <Route path="surveys/new" element={<OperatorSurveyCreatePage />} />
+
+          {/* 매장 HUB 블로그 (WO-O4O-OPERATOR-BLOG-WRITE-PAGE-KPA-V1) */}
+          <Route path="blog" element={<OperatorBlogListPage />} />
+          <Route path="blog/new" element={<OperatorBlogWritePage />} />
+          <Route path="blog/:id/edit" element={<OperatorBlogWritePage />} />
 
           {/* 협업 문의 관리 (WO-O4O-KPA-OPERATOR-COLLABORATION-INBOX-V1) */}
           <Route path="collaboration-requests" element={<CollaborationRequestsPage />} />
