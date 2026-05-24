@@ -88,6 +88,7 @@ import { createBlogController } from '../o4o-store/controllers/blog.controller.j
 // WO-O4O-OPERATOR-BLOG-PUBLISHING-WRITE-API-V1: 운영자 HUB 게시 write API
 import { createOperatorBlogController } from '../o4o-store/controllers/operator-blog.controller.js';
 import { createOperatorPopController } from '../o4o-store/controllers/operator-pop.controller.js';
+import { createStorePopStaffController } from '../o4o-store/controllers/pop.controller.js';
 import { createLayoutController } from '../o4o-store/controllers/layout.controller.js'; // WO-STORE-BLOCK-ENGINE-V1
 import { createStoreSettingsController } from '../o4o-store/controllers/store-settings.controller.js'; // WO-STORE-COMMON-SETTINGS-FOUNDATION-V1
 // WO-O4O-ROUTES-REFACTOR-V1: Extracted controllers
@@ -417,6 +418,16 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // ============================================================================
   const kpaBlogController = createBlogController(dataSource, coreRequireAuth as any, 'kpa');
   router.use('/stores', kpaBlogController);
+
+  // WO-O4O-KPA-STORE-HUB-POP-CONTENT-IMPORT-V1: 매장 POP staff CRUD + HUB import
+  // /api/v1/kpa/stores/:slug/pop/staff/* (매장 owner가 자기 매장 store_pops 사본 관리)
+  // 기존 createStorePopController (PDF 생성, /pharmacy/pop/generate) 와는 별도 controller.
+  const kpaStorePopStaffController = createStorePopStaffController(
+    dataSource,
+    coreRequireAuth as any,
+    'kpa',
+  );
+  router.use('/stores', kpaStorePopStaffController);
 
   // WO-O4O-OPERATOR-BLOG-PUBLISHING-WRITE-API-V1: 운영자 HUB 게시 write API
   // /api/v1/kpa/operator/blog/posts (운영자가 매장 HUB 에 게시하는 블로그)

@@ -33,6 +33,8 @@ const HUB_MENU_ITEMS: HubMenuItem[] = [
   { label: '콘텐츠/자료', path: '/store-hub/content', icon: '\u{1F4C4}', description: 'CMS 콘텐츠 탐색 · 복사' },
   // WO-O4O-STORE-HUB-BLOG-CONTENT-IMPORT-V1: 매장 HUB 블로그 진열 + 가져가기
   { label: '블로그', path: '/store-hub/blog', icon: '\u{1F4DD}', description: '운영자 게시 블로그 · 내 매장으로 가져가기' },
+  // WO-O4O-KPA-STORE-HUB-POP-CONTENT-IMPORT-V1: 매장 HUB POP 진열 + 가져가기
+  { label: 'POP', path: '/store-hub/pop', icon: '\u{1F4E2}', description: '운영자 게시 POP · 내 매장으로 가져가기' },
 ];
 
 function isMenuActive(pathname: string, menuPath: string): boolean {

@@ -184,6 +184,9 @@ const HubB2BCatalogPage = lazy(() => import('./pages/pharmacy/HubB2BCatalogPage'
 const HubSignageLibraryPage = lazy(() => import('./pages/pharmacy/HubSignageLibraryPage').then(m => ({ default: m.HubSignageLibraryPage })));
 // WO-O4O-STORE-HUB-BLOG-CONTENT-IMPORT-V1: 매장 HUB 블로그 진열 + 가져가기
 const HubBlogLibraryPage = lazy(() => import('./pages/pharmacy/HubBlogLibraryPage').then(m => ({ default: m.HubBlogLibraryPage })));
+// WO-O4O-KPA-STORE-HUB-POP-CONTENT-IMPORT-V1: 매장 HUB POP 진열 + 가져가기, 내 매장 POP 사본 관리
+const HubPopLibraryPage = lazy(() => import('./pages/pharmacy/HubPopLibraryPage').then(m => ({ default: m.HubPopLibraryPage })));
+const PharmacyPopPage = lazy(() => import('./pages/pharmacy/PharmacyPopPage').then(m => ({ default: m.PharmacyPopPage })));
 const PharmacySellPage = lazy(() => import('./pages/pharmacy/PharmacySellPage').then(m => ({ default: m.PharmacySellPage })));
 const TabletRequestsPage = lazy(() => import('./pages/pharmacy/TabletRequestsPage').then(m => ({ default: m.TabletRequestsPage })));
 const PharmacyBlogPage = lazy(() => import('./pages/pharmacy/PharmacyBlogPage').then(m => ({ default: m.PharmacyBlogPage })));
@@ -678,6 +681,8 @@ function App() {
             <Route path="content" element={<HubContentLibraryPage />} />
             {/* WO-O4O-STORE-HUB-BLOG-CONTENT-IMPORT-V1: 매장 HUB 블로그 진열 + 가져가기 */}
             <Route path="blog" element={<HubBlogLibraryPage />} />
+            {/* WO-O4O-KPA-STORE-HUB-POP-CONTENT-IMPORT-V1: 매장 HUB POP 진열 + 가져가기 */}
+            <Route path="pop" element={<HubPopLibraryPage />} />
           </Route>
           {/* 자료실 Hub — 공동자료실 진입점 (WO-KPA-RESOURCE-SYSTEM-RESET-V1) */}
           <Route path="/resources" element={<Layout serviceName={SERVICE_NAME}><ResourcesHubPage /></Layout>} />
@@ -948,6 +953,8 @@ function App() {
             <Route path="channels/tablet" element={<Navigate to="/store/requests" replace />} />
             <Route path="content" element={<StoreAssetsPage />} />
             <Route path="content/blog" element={<PharmacyBlogPage />} />
+            {/* WO-O4O-KPA-STORE-HUB-POP-CONTENT-IMPORT-V1: 매장 POP 사본 관리 (운영자 HUB 에서 가져온 사본 수정) */}
+            <Route path="content/pop" element={<PharmacyPopPage />} />
             <Route path="content/direct/:id" element={<StoreDirectContentPage />} />
             <Route path="content/:snapshotId/edit" element={<StoreContentEditPage />} />
             {/* WO-O4O-STORE-HUB-LEGACY-LIST-CLEANUP-V1: billing 라우트 제거 (사이드바 미노출, API 미연결 placeholder) */}
