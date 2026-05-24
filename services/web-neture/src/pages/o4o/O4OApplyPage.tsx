@@ -10,14 +10,14 @@
  * 두 페이지 모두 form 없는 안내 페이지였으므로, 본 페이지로 통합 후 두 URL 은
  * Navigate redirect 로 처리. /o4o 메인 + 모든 소개 페이지의 1차 CTA 가 본 페이지로 수렴.
  *
+ * WO-O4O-NETURE-APPLY-FORM-MVP-V1 (2026-05-24):
+ *   기존 mailto-only CtaSection 을 실제 form (ApplyForm) 으로 교체.
+ *   POST /api/v1/platform/inquiries 재사용 (backend 변경 없음).
+ *
  * 디자인: /o4o 메인 (O4OMainPage) 의 Tailwind 패턴 일치.
- * 범위 외: 실제 form 구현 / backend endpoint / 이메일 발송 연동 — 별건 WO.
  */
 
-import { Link } from 'react-router-dom';
-import { ArrowRight, Mail, ArrowLeft } from 'lucide-react';
-
-const CONTACT_EMAIL = 'contact@neture.co.kr';
+import ApplyForm from './ApplyForm';
 
 export default function O4OApplyPage() {
   return (
@@ -27,8 +27,8 @@ export default function O4OApplyPage() {
       <ScopeSection />
       <ProcessSection />
       <InfoSection />
+      <ApplyForm />
       <NoticeSection />
-      <CtaSection />
     </div>
   );
 }
@@ -149,7 +149,7 @@ function ProcessSection() {
 
 function InfoSection() {
   const info = [
-    { label: '방식', value: '이메일 접수 후 유선 또는 화상 상담' },
+    { label: '방식', value: '문의 접수 후 유선 또는 화상 상담' },
     { label: '소요', value: '접수 후 영업일 기준 2~3일 내 회신' },
     { label: '비용', value: '초기 상담은 무료' },
   ];
@@ -180,7 +180,6 @@ function NoticeSection() {
     'O4O는 모든 사업에 열려 있지 않습니다. 플랫폼 취지에 부합하는 경우에만 진행합니다.',
     '제안서는 접촉 이후에만 제공됩니다.',
     '문의 시 사업 개요 (업종, 규모, 목적) 와 관심 분야를 포함하면 검토가 빠릅니다.',
-    '현재는 form 없이 이메일 기반으로 접수합니다. 별도 form 도입은 후속 작업입니다.',
   ];
 
   return (
@@ -193,40 +192,6 @@ function NoticeSection() {
               <li key={item}>{item}</li>
             ))}
           </ul>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ─── 7. CTA ────────────────────────────────────────────────────────────────────
-
-function CtaSection() {
-  return (
-    <section className="bg-slate-900 text-white py-20">
-      <div className="max-w-3xl mx-auto px-4 text-center">
-        <h2 className="text-2xl sm:text-3xl font-bold mb-4">사업 문의 / 상담 요청</h2>
-        <p className="text-slate-300 mb-8">
-          아래 이메일로 사업 개요와 관심 분야를 보내주세요.<br className="hidden sm:inline" />
-          {' '}영업일 기준 2~3일 내 회신드립니다.
-        </p>
-        <a
-          href={`mailto:${CONTACT_EMAIL}?subject=O4O%20%EC%A0%81%EC%9A%A9%20%EA%B2%80%ED%86%A0%20%EB%AC%B8%EC%9D%98`}
-          className="inline-flex items-center justify-center px-8 py-4 bg-primary-600 text-white text-lg font-semibold rounded-lg hover:bg-primary-700 transition-colors shadow-lg mb-6"
-        >
-          <Mail className="w-5 h-5 mr-2" />
-          {CONTACT_EMAIL}
-          <ArrowRight className="w-5 h-5 ml-2" />
-        </a>
-        <div className="flex items-center justify-center gap-4 text-sm">
-          <Link to="/o4o" className="inline-flex items-center text-slate-300 hover:text-white transition-colors">
-            <ArrowLeft className="w-4 h-4 mr-1" />
-            O4O 소개로 돌아가기
-          </Link>
-          <span className="text-slate-600">|</span>
-          <Link to="/" className="text-slate-300 hover:text-white transition-colors">
-            메인으로
-          </Link>
         </div>
       </div>
     </section>
