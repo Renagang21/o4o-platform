@@ -57,6 +57,9 @@ import OperatorBlogWritePage from '../pages/operator/blog/OperatorBlogWritePage'
 // WO-O4O-KPA-OPERATOR-POP-WRITE-PAGE-V1
 import OperatorPopListPage from '../pages/operator/pop/OperatorPopListPage';
 import OperatorPopWritePage from '../pages/operator/pop/OperatorPopWritePage';
+// WO-O4O-KPA-OPERATOR-QR-WRITE-PAGE-V1
+import OperatorQrListPage from '../pages/operator/qr/OperatorQrListPage';
+import OperatorQrWritePage from '../pages/operator/qr/OperatorQrWritePage';
 import { RoleGuard } from '../components/auth/RoleGuard';
 import { PLATFORM_ROLES, ROLES } from '../lib/role-constants';
 // WO-O4O-OPERATOR-UI-STANDARDIZATION-V1: shared OperatorShell wrapper
@@ -176,6 +179,11 @@ export function OperatorRoutes() {
           <Route path="pop" element={<OperatorPopListPage />} />
           <Route path="pop/new" element={<OperatorPopWritePage />} />
           <Route path="pop/:id/edit" element={<OperatorPopWritePage />} />
+
+          {/* 매장 HUB QR-code (WO-O4O-KPA-OPERATOR-QR-WRITE-PAGE-V1) */}
+          <Route path="qr" element={<OperatorQrListPage />} />
+          <Route path="qr/new" element={<OperatorQrWritePage />} />
+          <Route path="qr/:id/edit" element={<OperatorQrWritePage />} />
 
           {/* 협업 문의 관리 (WO-O4O-KPA-OPERATOR-COLLABORATION-INBOX-V1) */}
           <Route path="collaboration-requests" element={<CollaborationRequestsPage />} />

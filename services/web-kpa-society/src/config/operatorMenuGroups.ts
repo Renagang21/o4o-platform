@@ -45,11 +45,15 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   // WO-O4O-KPA-OPERATOR-POP-WRITE-PAGE-V1: 매장 HUB POP (운영자 게시 → 매장 가져가기)
   //   Store Menu Canonical Tree V1 의 'POP' 항목 운영자 게시 측 진입점. 라벨은 sidebar 일관성을
   //   위해 'HUB' prefix 유지 (블로그와 같은 prefix) — canonical 항목명 'POP' 자체는 보존.
+  // WO-O4O-KPA-OPERATOR-QR-WRITE-PAGE-V1: 매장 HUB QR-code (운영자 템플릿 → 매장 가져가기)
+  //   운영자는 QR "템플릿" 작성. 실제 QR slug 는 매장 가져가기 시 발급 (Phase 3-B 의
+  //   store_qr_codes INSERT). canonical 항목명 'QR-code' 유지.
   stores: [
     { label: '매장 관리', path: '/operator/stores' },
     { label: '채널 관리', path: '/operator/store-channels' },
     { label: '매장 HUB 블로그', path: '/operator/blog' },
     { label: '매장 HUB POP', path: '/operator/pop' },
+    { label: '매장 HUB QR-code', path: '/operator/qr' },
   ],
   // WO-KPA-OPERATOR-CONTENT-NOTICE-NEWS-MENU-NORMALIZATION-V1: "공지사항" + "콘텐츠 관리" → "공지사항/뉴스" 통합
   // WO-KPA-LMS-INSTRUCTOR-APPROVAL-RELOCATE-V1: 자료실 관리 → resources 그룹으로, 강의 관리 → lms 그룹으로 이동
