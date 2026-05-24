@@ -35,6 +35,8 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberEmail, setRememberEmail] = useState(false);
   const [error, setError] = useState('');
+  // WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1: 서비스 미가입 차단을 비밀번호 오류와 분리 표시
+  const [isNotMember, setIsNotMember] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 저장된 이메일 복원
@@ -49,6 +51,7 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setIsNotMember(false);
     setIsSubmitting(true);
 
     try {
@@ -71,8 +74,15 @@ export default function LoginPage() {
       } else if (loginType === 'operator') {
         navigate('/operator');
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
+    } catch (err: any) {
+      // WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1:
+      //   AuthContext 가 Error.code 로 SERVICE_NOT_MEMBER 를 전달한다.
+      if (err?.code === 'SERVICE_NOT_MEMBER') {
+        setIsNotMember(true);
+        setError('이 계정은 GlycoPharm 서비스 이용 권한이 없습니다. 서비스 가입 또는 이용 신청 후 로그인할 수 있습니다.');
+      } else {
+        setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
+      }
       setIsSubmitting(false);
     }
   };
@@ -106,10 +116,25 @@ export default function LoginPage() {
         {/* Login Form */}
         <div className="bg-white rounded-2xl border border-slate-200 p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
-            {error && (
+            {error && !isNotMember && (
               <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm">
                 <AlertCircle className="w-4 h-4 flex-shrink-0" />
                 {error}
+              </div>
+            )}
+            {/* WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1: 서비스 미가입 안내 + 가입 링크 */}
+            {isNotMember && error && (
+              <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl space-y-3">
+                <div className="flex items-start gap-2 text-amber-800 text-sm">
+                  <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <span>{error}</span>
+                </div>
+                <NavLink
+                  to="/register"
+                  className="block w-full py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 text-center transition-colors"
+                >
+                  GlycoPharm 가입 신청하기
+                </NavLink>
               </div>
             )}
 

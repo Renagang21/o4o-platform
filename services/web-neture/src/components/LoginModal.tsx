@@ -33,6 +33,9 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
   const [showPassword, setShowPassword] = useState(false);
   const [rememberEmail, setRememberEmail] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1:
+  //   서비스 미가입(SERVICE_NOT_MEMBER) 차단을 비밀번호 오류와 시각적으로 구분하기 위한 분기 state.
+  const [isNotMember, setIsNotMember] = useState(false);
   const [loading, setLoading] = useState(false);
 
   // 저장된 이메일 불러오기
@@ -78,14 +81,22 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setIsNotMember(false);
     setLoading(true);
 
     try {
       const result = await login(email, password);
 
       if (!result.success) {
-        // WO-AUTH-ERROR-MESSAGE-SANITIZATION-V1: AuthContext.login()이 이미 한국어 메시지를 반환
-        setError(result.error || '로그인에 실패했습니다.');
+        // WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1:
+        //   SERVICE_NOT_MEMBER 는 별도 안내(가입 신청 링크 포함)로 노출한다.
+        if (result.code === 'SERVICE_NOT_MEMBER') {
+          setIsNotMember(true);
+          setError('이 계정은 Neture 서비스 이용 권한이 없습니다. Neture 이용 신청 후 승인되면 로그인할 수 있습니다.');
+        } else {
+          // WO-AUTH-ERROR-MESSAGE-SANITIZATION-V1: AuthContext.login()이 이미 한국어 메시지를 반환
+          setError(result.error || '로그인에 실패했습니다.');
+        }
         return;
       }
 
@@ -97,6 +108,11 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleGoToApply = () => {
+    onClose();
+    navigate('/o4o/apply');
   };
 
   if (!isOpen) return null;
@@ -130,9 +146,22 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
 
         <div className="p-6">
               <form onSubmit={handleSubmit} className="space-y-4">
-                {error && (
+                {error && !isNotMember && (
                   <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
                     <p className="text-sm text-red-600">{error}</p>
+                  </div>
+                )}
+                {/* WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1: 서비스 미가입 안내 + 신청 링크 */}
+                {isNotMember && error && (
+                  <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg space-y-3">
+                    <p className="text-sm text-amber-800">{error}</p>
+                    <button
+                      type="button"
+                      onClick={handleGoToApply}
+                      className="w-full py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors"
+                    >
+                      Neture 이용 신청하기
+                    </button>
                   </div>
                 )}
 

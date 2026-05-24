@@ -18,17 +18,28 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1: 서비스 미가입 차단을 비밀번호 오류와 분리 표시
+  const [isNotMember, setIsNotMember] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setIsNotMember(false);
     setLoading(true);
 
     try {
       const result = await login(email, password);
       if (!result.success) {
-        throw new Error(result.error || '로그인에 실패했습니다.');
+        // WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1:
+        //   SERVICE_NOT_MEMBER 는 별도 안내(가입 링크 포함)로 노출한다.
+        if (result.code === 'SERVICE_NOT_MEMBER') {
+          setIsNotMember(true);
+          setError('이 계정은 K-Cosmetics 서비스 이용 권한이 없습니다. 서비스 가입 또는 이용 신청 후 로그인할 수 있습니다.');
+        } else {
+          setError(result.error || '로그인에 실패했습니다.');
+        }
+        return;
       }
       // returnUrl만 LoginPage에서 처리.
       // WO-O4O-POSTLOGINREDIRECT-CANONICALIZATION-V1: 일반 역할 redirect는 App.tsx PostLoginRedirect 담당.
@@ -48,9 +59,21 @@ export default function LoginPage() {
         <p className="text-sm text-slate-500 mb-8 mt-0">K-Cosmetics에 오신 것을 환영합니다</p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-left">
-          {error && (
+          {error && !isNotMember && (
             <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm text-center">
               {error}
+            </div>
+          )}
+          {/* WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1: 서비스 미가입 안내 + 가입 링크 */}
+          {isNotMember && error && (
+            <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg space-y-3 text-left">
+              <p className="text-sm text-amber-800">{error}</p>
+              <Link
+                to="/register"
+                className="block w-full py-2 bg-primary text-white text-sm font-medium rounded-lg text-center no-underline hover:opacity-90 transition-opacity"
+              >
+                K-Cosmetics 가입 신청하기
+              </Link>
             </div>
           )}
 

@@ -37,6 +37,8 @@ export default function LoginModal() {
   const [rememberEmail, setRememberEmail] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPendingError, setIsPendingError] = useState(false);
+  // WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1: 서비스 미가입 차단을 비밀번호 오류와 분리 표시
+  const [isNotMember, setIsNotMember] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const isOpen = activeModal === 'login';
@@ -81,6 +83,7 @@ export default function LoginModal() {
     e.preventDefault();
     setError(null);
     setIsPendingError(false);
+    setIsNotMember(false);
     setLoading(true);
 
     try {
@@ -131,6 +134,10 @@ export default function LoginModal() {
           setIsPendingError(true);
         } else if (errorCode === 'ACCOUNT_LOCKED') {
           errorMessage = '로그인 시도가 너무 많아 계정이 일시적으로 잠겼습니다.';
+        } else if (errorCode === 'SERVICE_NOT_MEMBER') {
+          // WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1
+          errorMessage = '이 계정은 KPA-Society 서비스에 가입되어 있지 않습니다. 회원가입 또는 서비스 이용 절차를 진행해 주세요.';
+          setIsNotMember(true);
         } else if (err.response.status === 429) {
           errorMessage = '로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요.';
         } else {
@@ -201,9 +208,22 @@ export default function LoginModal() {
         <div className="p-6">
           {/* 로그인 폼 */}
           <form onSubmit={handleSubmit} className="space-y-4">
-            {error && (
+            {error && !isNotMember && (
               <div className={`p-3 rounded-lg border ${isPendingError ? 'bg-amber-50 border-amber-200' : 'bg-red-50 border-red-200'}`}>
                 <p className={`text-sm ${isPendingError ? 'text-amber-700' : 'text-red-600'}`}>{error}</p>
+              </div>
+            )}
+            {/* WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1: 서비스 미가입 안내 + 회원가입 모달 전환 */}
+            {isNotMember && error && (
+              <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg space-y-3">
+                <p className="text-sm text-amber-800">{error}</p>
+                <button
+                  type="button"
+                  onClick={() => openRegisterModal()}
+                  className="w-full py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  회원가입 진행하기
+                </button>
               </div>
             )}
 

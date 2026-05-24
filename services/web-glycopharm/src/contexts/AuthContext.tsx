@@ -163,7 +163,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Axios는 non-2xx 시 throw — error.response.data로 서버 에러 접근
       const data = error.response?.data;
       if (data) {
-        throw new Error(resolveAuthError(data, error.response?.status));
+        // WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1:
+        //   LoginPage 가 SERVICE_NOT_MEMBER 분기를 할 수 있도록 Error 객체에 code 속성을 부여한다.
+        //   resolveAuthError 의 한국어 메시지 반환은 그대로 유지(기존 흐름 보존).
+        const wrapped: any = new Error(resolveAuthError(data, error.response?.status));
+        if (typeof data.code === 'string') wrapped.code = data.code;
+        throw wrapped;
       }
       throw new Error('로그인에 실패했습니다.');
     }

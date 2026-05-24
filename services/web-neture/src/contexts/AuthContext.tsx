@@ -35,7 +35,7 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; role?: UserRole; roles?: UserRole[] }>;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; code?: string; role?: UserRole; roles?: UserRole[] }>;
   logout: () => void;
   logoutAll: () => Promise<void>;
   switchRole: (role: UserRole) => void;
@@ -81,7 +81,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener(AUTH_TOKEN_CLEARED_EVENT, handleTokenCleared);
   }, []);
 
-  const login = async (email: string, password: string): Promise<{ success: boolean; error?: string; role?: UserRole; roles?: UserRole[] }> => {
+  const login = async (email: string, password: string): Promise<{ success: boolean; error?: string; code?: string; role?: UserRole; roles?: UserRole[] }> => {
     try {
       setIsLoading(true);
 
@@ -102,7 +102,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const status = error?.response?.status;
 
       if (responseData) {
-        return { success: false, error: resolveAuthError(responseData, status) };
+        // WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1:
+        //   서비스별 안내 UX(가입 링크 등) 노출을 위해 응답 code 를 그대로 전달한다.
+        return {
+          success: false,
+          error: resolveAuthError(responseData, status),
+          code: typeof responseData.code === 'string' ? responseData.code : undefined,
+        };
       }
 
       // CORS/네트워크 오류 vs 서버 오류 구분
