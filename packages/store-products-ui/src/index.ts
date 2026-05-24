@@ -23,6 +23,8 @@ export { default as StoreProductImageManagerModal } from './StoreProductImageMan
 
 // API 클라이언트 — 개별 함수 + 번들 객체
 export {
+  // 설정 (WO-O4O-STORE-PRODUCTS-AUTHCLIENT-INJECTION-FIX-V1)
+  configureStoreProductsApi,
   // 검색/등록
   searchStoreProducts,
   createStoreListing,
@@ -43,6 +45,7 @@ export {
   // 번들
   storeProductsApi,
 } from './api.js';
+export type { StoreProductsApiClient } from './api.js';
 
 // Types
 export type {

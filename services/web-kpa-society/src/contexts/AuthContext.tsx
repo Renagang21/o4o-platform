@@ -12,6 +12,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { AuthClient, getAccessToken } from '@o4o/auth-client';
 import { parseAuthResponse, normalizeMemberships, AUTH_TOKEN_CLEARED_EVENT, type ApiUser } from '@o4o/auth-utils';
+import { configureStoreProductsApi } from '@o4o/store-products-ui';
 
 // Re-export for client.ts to use
 export { getAccessToken };
@@ -70,6 +71,11 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co
 export const authClient = new AuthClient(`${API_BASE_URL}/api/v1`, {
   strategy: 'localStorage',
 });
+
+// WO-O4O-STORE-PRODUCTS-AUTHCLIENT-INJECTION-FIX-V1:
+// store-products-ui 공통 패키지가 KPA의 localStorage-strategy authClient 를 사용하도록 주입.
+// 미주입 시 /store/my-products 가 AUTH_REQUIRED 401 로 회귀하므로 모듈 로드 시점에 1회 호출.
+configureStoreProductsApi(authClient.api);
 
 // ============================================================================
 // Types

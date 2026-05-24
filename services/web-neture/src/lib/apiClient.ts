@@ -8,6 +8,7 @@
  * - localStorage 전략 (o4o_accessToken / o4o_refreshToken)
  */
 import { AuthClient } from '@o4o/auth-client';
+import { configureStoreProductsApi } from '@o4o/store-products-ui';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
 
@@ -17,6 +18,10 @@ export const authClient = new AuthClient(`${API_BASE_URL}/api/v1`, {
 
 /** Axios instance with auto-refresh interceptor */
 export const api = authClient.api;
+
+// WO-O4O-STORE-PRODUCTS-AUTHCLIENT-INJECTION-FIX-V1:
+// store-products-ui 공통 패키지가 Neture 의 localStorage-strategy authClient 를 사용하도록 주입.
+configureStoreProductsApi(api);
 
 /** Raw base URL for non-/api/v1 endpoints (e.g. /health, /api/signage, /api/market-trial) */
 export { API_BASE_URL };
