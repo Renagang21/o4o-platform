@@ -18,10 +18,24 @@ import {
 
 export type StoreBlogPostStatus = 'draft' | 'published' | 'archived';
 
+/**
+ * Blog 작성자 역할 — Operator HUB 게시 vs Store 직접 작성 구분.
+ * WO-O4O-OPERATOR-BLOG-PUBLISHING-V1 Phase 2-1 (2026-05-23):
+ *   - 'operator': 운영자가 매장 HUB 에 게시한 블로그 (운영자 → HUB → 매장 흐름)
+ *   - 'store'   : 매장 경영자가 자기 매장에 직접 작성한 블로그
+ *
+ * 'supplier' 는 타입에 포함되지 않으며 DB CHECK 제약으로도 차단됨.
+ * Canonical: 공급자는 O4O 내부 Producer 가 아니다.
+ */
+export type StoreBlogPostAuthorRole = 'operator' | 'store';
+
 @Entity({ name: 'store_blog_posts' })
 @Index(['storeId', 'status'])
 @Index(['storeId', 'slug'], { unique: true })
 @Index(['storeId', 'publishedAt'])
+// WO-O4O-OPERATOR-BLOG-PUBLISHING-V1 Phase 2-1:
+//   HUB query 최적화 — service_key + author_role + status 복합 조건
+@Index('IDX_store_blog_posts_hub_query', ['serviceKey', 'authorRole', 'status'])
 export class StoreBlogPost {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -31,6 +45,19 @@ export class StoreBlogPost {
 
   @Column({ name: 'service_key', type: 'varchar', length: 50 })
   serviceKey!: string;
+
+  /**
+   * 작성자 역할 — Operator HUB 게시 vs Store 직접 작성.
+   * WO-O4O-OPERATOR-BLOG-PUBLISHING-V1 Phase 2-1 (2026-05-23).
+   *
+   * 신규 row 기본값: 'store' (매장 경영자 직접 작성).
+   * 운영자 HUB 게시 흐름 (Phase 2-2) 에서 'operator' 명시적 저장.
+   *
+   * DB CHECK 제약: author_role IN ('operator', 'store') — 'supplier' 금지.
+   * Phase 2-1 에서는 schema 만 추가하며 queryBlog 실 구현은 별도 진행.
+   */
+  @Column({ name: 'author_role', type: 'varchar', length: 30, default: 'store' })
+  authorRole!: StoreBlogPostAuthorRole;
 
   @Column({ type: 'varchar', length: 255 })
   title!: string;
