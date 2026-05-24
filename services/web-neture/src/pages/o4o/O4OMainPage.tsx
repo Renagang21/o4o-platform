@@ -64,11 +64,18 @@ function HeroSection() {
         <p className="text-xl text-slate-200 mb-4 leading-relaxed">
           오프라인 매장을 위한 온라인 실행 플랫폼입니다.
         </p>
-        <p className="text-base text-slate-400 leading-relaxed">
+        <p className="text-base text-slate-400 leading-relaxed mb-8">
           매장에서의 판매와 고객 경험을 강화하기 위해
           <br className="hidden sm:inline" />
           {' '}온라인 기능을 연결합니다.
         </p>
+        <Link
+          to="/o4o/business-inquiry"
+          className="inline-flex items-center justify-center px-6 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors"
+        >
+          내 사업에 적용 검토
+          <ArrowRight className="ml-2 w-4 h-4" />
+        </Link>
       </div>
     </section>
   );
@@ -296,33 +303,57 @@ function DetailEntrySection() {
 // ─── 9. CTA ──────────────────────────────────────────────────────────────────
 
 function CtaSection() {
-  // 주: WO 원안의 "/about" 버튼은 /about → /o4o redirect 적용 후 자기 자신으로 순환되므로,
-  // "전체 구조 보기"는 상세 진입 페이지(/o4o/intro)로 연결한다.
+  // WO-O4O-NETURE-BUSINESS-INTRO-CTA-RECONNECT-V1:
+  //   1차 CTA = "내 사업에 적용 검토" (사업자 진입 — 기존 메인에서 단절되어 있던 경로 복구).
+  //   2차 = 전체 구조 보기 / 공급자 / 운영 파트너 (기존 항목 유지, 우선순위 후순위로 재배치).
+  //   보조 link = 상담 요청 (사업자 진입의 sub-route).
   return (
     <section className="py-20 bg-slate-900 text-white">
       <div className="max-w-3xl mx-auto px-4 text-center">
         <h2 className="text-2xl sm:text-3xl font-bold mb-4">시작하기</h2>
         <p className="text-slate-300 mb-10">
-          O4O 플랫폼에 참여하거나 더 자세히 살펴보세요.
+          O4O 플랫폼이 내 사업에 맞는지 검토하거나, 참여 방법을 살펴보세요.
         </p>
+
+        {/* 1차 CTA: 사업자 적용 검토 */}
+        <div className="mb-4">
+          <Link
+            to="/o4o/business-inquiry"
+            className="inline-flex items-center justify-center px-8 py-4 bg-primary-600 text-white text-lg font-semibold rounded-lg hover:bg-primary-700 transition-colors shadow-lg"
+          >
+            내 사업에 적용 검토
+            <ArrowRight className="ml-2 w-5 h-5" />
+          </Link>
+        </div>
+
+        {/* 보조 link: 상담 요청 */}
+        <p className="text-sm text-slate-400 mb-10">
+          더 자세히 알아보고 싶다면{' '}
+          <Link to="/o4o/consultation" className="text-primary-400 hover:text-primary-300 underline">
+            상담 요청
+          </Link>
+          도 가능합니다.
+        </p>
+
+        {/* 2차 CTA: 전체 구조 보기 / 공급자 / 운영 파트너 (기존, 후순위 재배치) */}
         <div className="flex flex-col sm:flex-row justify-center gap-3">
           <Link
-            to="/supplier"
-            className="inline-flex items-center justify-center px-6 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors"
+            to="/o4o/intro"
+            className="inline-flex items-center justify-center px-5 py-2.5 bg-slate-700 text-white text-sm font-medium rounded-lg hover:bg-slate-600 transition-colors"
           >
-            제품 공급자로 참여하기
+            전체 구조 보기
+          </Link>
+          <Link
+            to="/supplier"
+            className="inline-flex items-center justify-center px-5 py-2.5 bg-slate-700 text-white text-sm font-medium rounded-lg hover:bg-slate-600 transition-colors"
+          >
+            공급자로 참여하기
           </Link>
           <Link
             to="/partner"
-            className="inline-flex items-center justify-center px-6 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors"
+            className="inline-flex items-center justify-center px-5 py-2.5 bg-slate-700 text-white text-sm font-medium rounded-lg hover:bg-slate-600 transition-colors"
           >
             운영 파트너로 참여하기
-          </Link>
-          <Link
-            to="/o4o/intro"
-            className="inline-flex items-center justify-center px-6 py-3 bg-slate-700 text-white font-medium rounded-lg hover:bg-slate-600 transition-colors"
-          >
-            전체 구조 보기
           </Link>
         </div>
       </div>
