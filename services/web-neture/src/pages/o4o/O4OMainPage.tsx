@@ -46,6 +46,7 @@ export default function O4OMainPage() {
       <ServiceSection />
       <ExecutionSection />
       <OutcomeSection />
+      <PrinciplesSection />
       <DetailEntrySection />
       <CtaSection />
     </div>
@@ -262,24 +263,74 @@ function OutcomeSection() {
   );
 }
 
+// ─── 7.5 운영 원칙 ──────────────────────────────────────────────────────────
+// WO-O4O-NETURE-CONCEPT-PAGES-DEPRECATE-V1: /o4o/principles 흡수.
+//   메인이 이미 다루지 않던 "어떤 기준으로 운영되는가" 영역만 짧게 보강.
+
+function PrinciplesSection() {
+  const principles = [
+    {
+      title: '매장 실행 중심',
+      desc: '공급자·운영자·파트너는 매장이 더 잘 설명하고 판매할 수 있도록 돕는 역할입니다.',
+    },
+    {
+      title: '역할 분리',
+      desc: '사업자·매장·공급자·파트너 각자의 책임 범위가 명확합니다.',
+    },
+    {
+      title: '콘텐츠와 실행의 연결',
+      desc: '콘텐츠는 지원되고, 선택과 실행은 매장이 결정합니다.',
+    },
+    {
+      title: 'AI 는 보조',
+      desc: 'AI 는 콘텐츠와 의사결정을 지원하며, 최종 실행은 매장이 선택합니다.',
+    },
+  ];
+
+  return (
+    <section className="bg-slate-50 py-20">
+      <div className="max-w-4xl mx-auto px-4">
+        <div className="text-center mb-12">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3">O4O 는 이런 원칙으로 운영됩니다</h2>
+          <p className="text-base text-slate-500">매장 실행을 중심에 두는 4 가지 기준입니다.</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {principles.map((p) => (
+            <div key={p.title} className="p-5 bg-white rounded-xl border border-slate-200">
+              <h3 className="font-semibold text-slate-900 mb-2">{p.title}</h3>
+              <p className="text-sm text-slate-600 leading-relaxed">{p.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ─── 8. 상세 설명 진입 (About에서 하던 역할 흡수) ────────────────────────────
 
 function DetailEntrySection() {
+  // WO-O4O-NETURE-CONCEPT-PAGES-DEPRECATE-V1:
+  //   기존 concept/principles/structure/services/intro link 6 개 → 업종별 target 진입 + 사이트 운영자 진입으로 재편.
+  //   redirect self-loop 방지 + 사업자 입장에서 실제 진입할 페이지로 안내.
   const detailLinks = [
-    { name: 'O4O 개요', desc: '플랫폼 소개와 시작점', href: '/o4o/intro' },
-    { name: '핵심 개념', desc: '구조를 이루는 개념들', href: '/o4o/concepts' },
-    { name: '플랫폼 원칙', desc: '운영 원칙과 기준', href: '/o4o/principles' },
-    { name: '판매 구조', desc: '실행 방식의 구조', href: '/o4o/structure' },
-    { name: 'O4O 서비스', desc: '매장에서 사용하는 서비스', href: '/o4o/services' },
-    { name: '대상별 매장', desc: '업종별 적용 사례', href: '/o4o/targets/pharmacy' },
+    { name: '약국', desc: '약국 네트워크 대상 사업자', href: '/o4o/targets/pharmacy' },
+    { name: '의원·병원', desc: '의료기관 대상 사업자', href: '/o4o/targets/clinic' },
+    { name: '안경원', desc: '안경원 네트워크 대상 사업자', href: '/o4o/targets/optical' },
+    { name: '치과', desc: '치과 네트워크 대상 사업자', href: '/o4o/targets/dental' },
+    { name: '미용', desc: '미용 매장 네트워크 대상 사업자', href: '/o4o/targets/salon' },
+    { name: '사이트 운영자', desc: '이미 사이트를 운영 중인 사업자', href: '/o4o/site-operator' },
   ];
 
   return (
     <section className="py-20 bg-white">
       <div className="max-w-5xl mx-auto px-4">
-        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-10 text-center">
-          더 알아보기
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 text-center">
+          업종별 자세히 보기
         </h2>
+        <p className="text-sm text-slate-500 text-center mb-10">
+          내 업종에 어떻게 적용되는지, 어떤 채널과 함께 사용되는지 확인하세요.
+        </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {detailLinks.map((link) => (
             <Link
@@ -331,14 +382,9 @@ function CtaSection() {
           상담 또는 사업 문의도 같은 페이지에서 진행됩니다.
         </p>
 
-        {/* 2차 CTA: 전체 구조 보기 / 공급자 / 운영 파트너 (기존, 후순위 재배치) */}
+        {/* 2차 CTA: 공급자 / 운영 파트너 (기존, 후순위 재배치)
+            WO-O4O-NETURE-CONCEPT-PAGES-DEPRECATE-V1: "전체 구조 보기" /o4o/intro 는 redirect self-loop 가 되므로 제거. */}
         <div className="flex flex-col sm:flex-row justify-center gap-3">
-          <Link
-            to="/o4o/intro"
-            className="inline-flex items-center justify-center px-5 py-2.5 bg-slate-700 text-white text-sm font-medium rounded-lg hover:bg-slate-600 transition-colors"
-          >
-            전체 구조 보기
-          </Link>
           <Link
             to="/supplier"
             className="inline-flex items-center justify-center px-5 py-2.5 bg-slate-700 text-white text-sm font-medium rounded-lg hover:bg-slate-600 transition-colors"

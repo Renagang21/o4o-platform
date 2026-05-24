@@ -61,7 +61,9 @@ import PartnerLandingPage from './pages/PartnerLandingPage';
 // ============================================================================
 // o4o 공통 페이지 (항상 로드)
 // ============================================================================
-import O4OIntroPage from './pages/o4o/O4OIntroPage';
+// WO-O4O-NETURE-CONCEPT-PAGES-DEPRECATE-V1:
+//   O4OIntroPage / O4OConceptsPage / O4OPrinciplesPage / O4OStructurePage / O4OServicesPage / ChannelMapPage
+//   6 페이지를 /o4o 메인으로 흡수 + redirect. App.tsx 의 import 만 제거, 페이지 파일은 보존.
 import SellerOverviewPage from './pages/SellerOverviewPage';
 import SellerQRGuidePage from './pages/SellerQRGuidePage';
 import {
@@ -89,13 +91,6 @@ import {
   OpticalTargetPage,
   DentalTargetPage,
 } from './pages/o4o/targets';
-// WO-O4O-CONCEPTS-PAGE-V1: /o4o/concepts → 신규 O4OConceptsPage(철학 페이지)로 교체.
-// 레거시 ConceptsPage(채널 개념 문서)는 사용 중단.
-import O4OConceptsPage from './pages/o4o/O4OConceptsPage';
-// WO-O4O-STRUCTURE-PAGE-V1: /o4o/structure → 신규 O4OStructurePage(흐름 중심)로 교체.
-// 레거시 ChannelSalesStructurePage(채널·판매 구조)는 사용 중단.
-import O4OStructurePage from './pages/o4o/O4OStructurePage';
-import ChannelMapPage from './pages/manual/concepts/ChannelMapPage';
 // WO-O4O-NETURE-APPLY-PAGE-CONSOLIDATION-V1:
 //   /o4o/business-inquiry + /o4o/consultation → /o4o/apply 통합. 두 page component 파일은
 //   보존 (deprecated), App.tsx 의 import 만 제거 후 redirect 로 처리.
@@ -128,8 +123,6 @@ import PartnershipRequestListPage from './pages/partners/requests/PartnershipReq
 import PartnershipRequestDetailPage from './pages/partners/requests/PartnershipRequestDetailPage';
 import PartnershipRequestCreatePage from './pages/partners/requests/PartnershipRequestCreatePage';
 import PartnerInfoPage from './pages/PartnerInfoPage';
-import O4OPrinciplesPage from './pages/o4o/O4OPrinciplesPage';
-import O4OServicesPage from './pages/o4o/O4OServicesPage';
 import ContentListPage from './pages/content/ContentListPage';
 import ContentDetailPage from './pages/content/ContentDetailPage';
 import MyContentPage from './pages/dashboard/MyContentPage';
@@ -672,7 +665,8 @@ function App() {
                   NetureLayout 통일: About 이동 후 레이아웃 이탈 방지
                */}
               <Route path="/o4o" element={<O4OMainPage />} />
-              <Route path="/o4o/intro" element={<O4OIntroPage />} />
+              {/* WO-O4O-NETURE-CONCEPT-PAGES-DEPRECATE-V1: /o4o/intro → /o4o redirect (메인 흡수) */}
+              <Route path="/o4o/intro" element={<Navigate to="/o4o" replace />} />
               <Route path="/o4o/other-targets" element={<OtherTargetsPage />} />
               <Route path="/o4o/site-operator" element={<SiteOperatorPage />} />
               <Route path="/o4o/targets/pharmacy" element={<PharmacyTargetPage />} />
@@ -684,13 +678,14 @@ function App() {
               <Route path="/o4o/apply" element={<O4OApplyPage />} />
               <Route path="/o4o/business-inquiry" element={<Navigate to="/o4o/apply" replace />} />
               <Route path="/o4o/consultation" element={<Navigate to="/o4o/apply" replace />} />
-              {/* 시맨틱 URL: About → /o4o/* 통일 */}
-              {/* WO-O4O-CONCEPTS-PAGE-V1: 철학 페이지로 교체 */}
-              <Route path="/o4o/concepts" element={<O4OConceptsPage />} />
-              <Route path="/o4o/channel-map" element={<ChannelMapPage />} />
-              <Route path="/o4o/principles" element={<O4OPrinciplesPage />} />
-              <Route path="/o4o/structure" element={<O4OStructurePage />} />
-              <Route path="/o4o/services" element={<O4OServicesPage />} />
+              {/* WO-O4O-NETURE-CONCEPT-PAGES-DEPRECATE-V1:
+                  concept / principle / structure / services / channel-map → /o4o 메인으로 흡수 후 redirect.
+                  페이지 파일은 보존 (App.tsx import 만 제거). */}
+              <Route path="/o4o/concepts" element={<Navigate to="/o4o" replace />} />
+              <Route path="/o4o/channel-map" element={<Navigate to="/o4o" replace />} />
+              <Route path="/o4o/principles" element={<Navigate to="/o4o" replace />} />
+              <Route path="/o4o/structure" element={<Navigate to="/o4o" replace />} />
+              <Route path="/o4o/services" element={<Navigate to="/o4o" replace />} />
               {/* WO-O4O-NETURE-CHANNEL-PAGES-ABSORB-V1: targets/* 흡수 후 redirect */}
               <Route path="/o4o/channels/pharmacy" element={<Navigate to="/o4o/targets/pharmacy" replace />} />
               <Route path="/o4o/channels/optical" element={<Navigate to="/o4o/targets/optical" replace />} />
