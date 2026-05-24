@@ -82,7 +82,8 @@ import PartnerOverviewInfoPage from './pages/PartnerOverviewInfoPage';
 
 // o4o Public Site Pages
 import O4OMainPage from './pages/o4o/O4OMainPage';
-import OtherTargetsPage from './pages/o4o/OtherTargetsPage';
+// WO-O4O-NETURE-OTHER-TARGETS-ABSORB-V1: OtherTargetsPage → /o4o 메인 흡수 후 redirect.
+//   기타 업종 안내는 메인 DetailEntrySection 의 7번째 카드로 흡수. App.tsx import 만 제거.
 import SiteOperatorPage from './pages/o4o/SiteOperatorPage';
 import {
   PharmacyTargetPage,
@@ -667,7 +668,8 @@ function App() {
               <Route path="/o4o" element={<O4OMainPage />} />
               {/* WO-O4O-NETURE-CONCEPT-PAGES-DEPRECATE-V1: /o4o/intro → /o4o redirect (메인 흡수) */}
               <Route path="/o4o/intro" element={<Navigate to="/o4o" replace />} />
-              <Route path="/o4o/other-targets" element={<OtherTargetsPage />} />
+              {/* WO-O4O-NETURE-OTHER-TARGETS-ABSORB-V1: 메인 DetailEntrySection 7번째 카드 흡수 후 redirect */}
+              <Route path="/o4o/other-targets" element={<Navigate to="/o4o" replace />} />
               <Route path="/o4o/site-operator" element={<SiteOperatorPage />} />
               <Route path="/o4o/targets/pharmacy" element={<PharmacyTargetPage />} />
               <Route path="/o4o/targets/clinic" element={<ClinicTargetPage />} />

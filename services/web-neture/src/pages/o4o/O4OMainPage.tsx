@@ -320,6 +320,9 @@ function DetailEntrySection() {
     { name: '치과', desc: '치과 네트워크 대상 사업자', href: '/o4o/targets/dental' },
     { name: '미용', desc: '미용 매장 네트워크 대상 사업자', href: '/o4o/targets/salon' },
     { name: '사이트 운영자', desc: '이미 사이트를 운영 중인 사업자', href: '/o4o/site-operator' },
+    // WO-O4O-NETURE-OTHER-TARGETS-ABSORB-V1: /o4o/other-targets 흡수.
+    //   카페·음식점·피트니스·편의점 등 기타 매장 네트워크 — 적용 가능성은 별도 검토.
+    { name: '기타 업종', desc: '여기에 없는 업종도 적용 검토 가능', href: '/o4o/apply?industry=other' },
   ];
 
   return (
