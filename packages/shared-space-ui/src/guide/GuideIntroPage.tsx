@@ -42,12 +42,25 @@ export function GuideIntroPage({ hero, sections, bottomNav, renderText }: GuideI
                 {renderText ? renderText(`section-${idx}-desc`, section.description) : section.description}
               </p>
               <div style={cardStyles.gridLg}>
-                {section.items.map((item) => (
-                  <div key={item.label} style={cardStyles.basic}>
-                    <p style={cardStyles.basicLabel}>{item.label}</p>
-                    <p style={cardStyles.basicDetail}>{item.detail}</p>
-                  </div>
-                ))}
+                {section.items.map((item) =>
+                  // WO-O4O-KPA-GUIDE-INTRO-ROLE-CARD-LINK-FIX-V1:
+                  // item.href 있으면 Link 로 wrap (개별 카드 클릭), 없으면 기존 div 유지.
+                  item.href ? (
+                    <Link
+                      key={item.label}
+                      to={item.href}
+                      style={{ ...cardStyles.basic, textDecoration: 'none', color: 'inherit', display: 'block' }}
+                    >
+                      <p style={cardStyles.basicLabel}>{item.label}</p>
+                      <p style={cardStyles.basicDetail}>{item.detail}</p>
+                    </Link>
+                  ) : (
+                    <div key={item.label} style={cardStyles.basic}>
+                      <p style={cardStyles.basicLabel}>{item.label}</p>
+                      <p style={cardStyles.basicDetail}>{item.detail}</p>
+                    </div>
+                  ),
+                )}
               </div>
             </div>
           </PageContainer>

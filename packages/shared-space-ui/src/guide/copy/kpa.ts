@@ -73,15 +73,28 @@ export const kpaGuideIntroProps: GuideIntroPageProps = {
       ],
     },
     // WO-O4O-KPA-GUIDE-FOR-ROLE-V1: 역할별 활용 가이드 진입
+    // WO-O4O-KPA-GUIDE-INTRO-ROLE-CARD-LINK-FIX-V1: 카드별 개별 link 추가
     {
       title: '역할별 활용 가이드',
       href: '/guide/for/store-owner',
       description:
         '내 역할에서 무엇을 얻고 어떻게 활용하는지 정리한 가이드입니다. 기능 사용법보다 활용 가치를 먼저 살펴봅니다.',
       items: [
-        { label: '매장 경영자', detail: '직원이 적어도 매장 운영 자산을 만들어 정보 전달 경쟁력을 높입니다.' },
-        { label: '서비스 운영자', detail: '생태계를 운영하고 매장을 지원하는 운영 사업자입니다.' },
-        { label: '커뮤니티 참여자', detail: '정보 공유가 실제 현장 활용으로 연결되는 흐름의 출발점입니다.' },
+        {
+          label: '매장 경영자',
+          detail: '직원이 적어도 매장 운영 자산을 만들어 정보 전달 경쟁력을 높입니다.',
+          href: '/guide/for/store-owner',
+        },
+        {
+          label: '서비스 운영자',
+          detail: '생태계를 운영하고 매장을 지원하는 운영 사업자입니다.',
+          href: '/guide/for/operator',
+        },
+        {
+          label: '커뮤니티 참여자',
+          detail: '정보 공유가 실제 현장 활용으로 연결되는 흐름의 출발점입니다.',
+          href: '/guide/for/member',
+        },
       ],
     },
   ],

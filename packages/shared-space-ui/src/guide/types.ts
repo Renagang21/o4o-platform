@@ -45,6 +45,14 @@ export interface GuideFlowRow {
 export interface GuideLabelDetailItem {
   label: string;
   detail: string;
+  /**
+   * 선택적 개별 link. WO-O4O-KPA-GUIDE-INTRO-ROLE-CARD-LINK-FIX-V1:
+   * 한 section 안에서 각 카드가 다른 destination 으로 가야 할 때 사용
+   * (예: 역할별 활용 가이드 — 매장 경영자 / 운영자 / 커뮤니티 참여자).
+   * 미지정 시 기존 동작 유지 (section.href 만 클릭 가능).
+   * 현재는 GuideIntroPage 에서만 conditional Link wrap 으로 활용.
+   */
+  href?: string;
 }
 
 // ─── /guide/intro ──────────────────────────────────────────────────────
