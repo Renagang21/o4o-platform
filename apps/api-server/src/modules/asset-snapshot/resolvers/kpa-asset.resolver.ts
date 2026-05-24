@@ -44,23 +44,56 @@ export class KpaAssetResolver implements ContentResolver {
   }
 
   /**
-   * WO-O4O-OPERATOR-BLOG-PUBLISHING-BACKEND-FOUNDATION-V1 (2026-05-23)
+   * WO-O4O-OPERATOR-BLOG-PUBLISHING-BACKEND-QUERY-V1 (2026-05-23)
    *
-   * Phase 1 Backend Foundation — Placeholder.
+   * Phase 2 — 운영자 HUB 게시 블로그를 매장 자료함으로 가져가기 위한 source resolver.
    *
-   * store_blog_posts 에는 producer / authorRole 구분 컬럼이 없으며, 실제 데이터는
-   * 매장 직접 작성 블로그 중심이다. 이를 그대로 가져가기 흐름의 source 로 노출하면
-   * Store Menu Canonical 의 운영자 → HUB → 매장 흐름과 충돌할 수 있으므로,
-   * Phase 1 에서는 assetType='blog' 확장 지점만 등록하고 실제 resolve 는 보류한다.
+   * 통과 조건:
+   *   - author_role = 'operator'  (매장 직접 작성 블로그는 본 resolver 대상 아님)
+   *   - status = 'published'      (draft/archived 차단)
    *
-   * TODO (Phase 2):
-   *   - store_blog_posts 에 producer 또는 hub_published 컬럼 추가
-   *   - 운영자 게시 (producer='operator', status='published') 만 통과
-   *   - 매장 직접 작성 블로그는 본 resolver 대상 아님 (매장 전용 유지)
-   *   - serviceKey 정합 (P3 정책 — 신규 흐름은 실제 serviceKey 저장)
+   * 차단:
+   *   - author_role = 'store'  → 매장 직접 작성 블로그는 매장 전용, HUB 자료함 가져가기 대상 아님
+   *   - status ≠ 'published'   → 비공개 상태 블로그 차단
+   *
+   * service_key 정합 (cross-service 노출 차단) 은 listing 단 (HubContentQueryService.queryBlog)
+   * 에서 처리한다. ContentResolver 인터페이스가 (sourceAssetId, assetType) 만 받으므로
+   * resolver 레벨 service_key 검증은 인터페이스 확장이 필요 — 별도 WO 대상.
+   * 다른 resolver (resolveCms / resolveSignage 등) 도 동일 패턴.
+   *
+   * Full Copy — 블로그 본문 / 메타데이터를 contentJson 에 담아 자료함에 보존한다.
    */
-  private async resolveBlog(_id: string): Promise<ResolvedContent | null> {
-    return null;
+  private async resolveBlog(id: string): Promise<ResolvedContent | null> {
+    const rows = await this.dataSource.query(
+      `SELECT id, title, slug, excerpt, content, status, author_role,
+              published_at, created_at, service_key, store_id
+       FROM store_blog_posts
+       WHERE id = $1
+         AND author_role = 'operator'
+         AND status = 'published'
+       LIMIT 1`,
+      [id],
+    );
+    if (!rows || rows.length === 0) return null;
+    const b = rows[0];
+
+    return {
+      title: b.title,
+      type: 'blog',
+      sourceService: 'kpa',
+      contentJson: {
+        title: b.title,
+        slug: b.slug,
+        excerpt: b.excerpt,
+        content: b.content,
+        authorRole: b.author_role,
+        publishedAt:
+          b.published_at instanceof Date ? b.published_at.toISOString() : b.published_at,
+        sourceServiceKey: b.service_key,
+        sourceStoreId: b.store_id,
+        capturedAt: new Date().toISOString(),
+      },
+    };
   }
 
   private async resolveCms(id: string): Promise<ResolvedContent | null> {

@@ -115,32 +115,70 @@ export class HubContentQueryService {
     }
   }
 
-  // ── Blog (Phase 1 Foundation — Placeholder) ──
+  // ── Blog (Phase 2 — Operator HUB Blog Query) ──
   //
-  // WO-O4O-OPERATOR-BLOG-PUBLISHING-BACKEND-FOUNDATION-V1 (2026-05-23):
+  // WO-O4O-OPERATOR-BLOG-PUBLISHING-BACKEND-QUERY-V1 (2026-05-23):
+  //   Phase 2-1 schema 확장 (author_role 컬럼) 위에서 운영자 게시 블로그만 HUB 노출.
   //
-  // 현재 store_blog_posts 에는 producer / authorRole 구분 컬럼이 없으며,
-  // 실제 데이터는 매장 직접 작성 블로그 중심이다. 이를 그대로 HUB 에 노출하면
-  // Store Menu Canonical 의 운영자 → HUB → 매장 흐름과 충돌할 수 있으므로,
-  // Phase 1 에서는 sourceDomain='blog' 확장 지점만 등록하고 실제 노출은
-  // 보류한다.
+  // 조회 조건:
+  //   - store_blog_posts.author_role = 'operator'
+  //   - store_blog_posts.status = 'published'
+  //   - store_blog_posts.service_key = serviceKey  ← cross-service 노출 차단
   //
-  // TODO (Phase 2):
-  //   - store_blog_posts 에 producer / authorRole 또는 hub_published 컬럼 추가
-  //   - 운영자 게시 (producer='operator') 만 HUB 노출, 매장 직접 작성은 매장 전용
-  //   - mapBlogItem 매퍼 신설 (slug / excerpt / publishedAt 등 블로그 전용 필드)
-  //   - queryMixed 의 Promise.allSettled 에 queryBlog 추가
+  // 차단 대상:
+  //   - author_role = 'store' (매장 직접 작성 블로그 — 매장 전용 유지)
+  //   - 다른 service_key 의 운영자 블로그 (Neture 포함 — Neture 는 매장 기능 없음)
+  //
+  // producer 인자가 명시되면 'operator' 만 통과 — supplier/community/store 는 빈 응답
+  // (Blog 도메인의 유일한 producer 는 'operator' 임).
+  //
+  // Raw SQL + Parameter Binding (Boundary Policy: Guard Rule 2).
+  // 복합 인덱스 IDX_store_blog_posts_hub_query (service_key, author_role, status) 활용.
   private async queryBlog(
-    _serviceKey: string,
-    _producer: HubProducer | undefined,
+    serviceKey: string,
+    producer: HubProducer | undefined,
     page: number,
     limit: number,
   ): Promise<HubContentListResponse> {
-    return {
-      success: true,
-      data: [],
-      pagination: { page, limit, total: 0, totalPages: 0 },
-    };
+    if (producer && producer !== 'operator') {
+      return { success: true, data: [], pagination: { page, limit, total: 0, totalPages: 0 } };
+    }
+    try {
+      const offset = (page - 1) * limit;
+
+      const rows = await this.dataSource.query(
+        `SELECT id, title, slug, excerpt, status, published_at, created_at, service_key
+         FROM store_blog_posts
+         WHERE service_key = $1
+           AND author_role = 'operator'
+           AND status = 'published'
+         ORDER BY COALESCE(published_at, created_at) DESC
+         LIMIT $2 OFFSET $3`,
+        [serviceKey, limit, offset],
+      );
+
+      const countRows = await this.dataSource.query(
+        `SELECT COUNT(*)::int AS total
+         FROM store_blog_posts
+         WHERE service_key = $1
+           AND author_role = 'operator'
+           AND status = 'published'`,
+        [serviceKey],
+      );
+
+      const total = countRows[0]?.total ?? 0;
+
+      return {
+        success: true,
+        data: rows.map((r: any) => this.mapBlogItem(r)),
+        pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      };
+    } catch (error: any) {
+      if (error.message?.includes('does not exist')) {
+        return { success: true, data: [], pagination: { page, limit, total: 0, totalPages: 0 } };
+      }
+      throw error;
+    }
   }
 
   // ── Mixed merge (in-memory) ──
@@ -153,16 +191,20 @@ export class HubContentQueryService {
   ): Promise<HubContentListResponse> {
     // WO-O4O-REMOVE-STORE-TO-COMMUNITY-SHARE-FLOW-V1:
     //   queryStoreSharedContent 호출 제거. Store → Community 공유 흐름 폐기.
-    const [cms, media, playlists] = await Promise.allSettled([
+    // WO-O4O-OPERATOR-BLOG-PUBLISHING-BACKEND-QUERY-V1:
+    //   queryBlog 추가 — 운영자 게시 블로그 (author_role='operator') 만 통합 목록에 포함.
+    const [cms, media, playlists, blog] = await Promise.allSettled([
       this.queryCms(serviceKey, producer, 1, MAX_FETCH_PER_DOMAIN),
       this.querySignageMedia(serviceKey, producer, 1, MAX_FETCH_PER_DOMAIN),
       this.querySignagePlaylists(serviceKey, producer, 1, MAX_FETCH_PER_DOMAIN),
+      this.queryBlog(serviceKey, producer, 1, MAX_FETCH_PER_DOMAIN),
     ]);
 
     const items: HubContentItemResponse[] = [];
     if (cms.status === 'fulfilled') items.push(...cms.value.data);
     if (media.status === 'fulfilled') items.push(...media.value.data);
     if (playlists.status === 'fulfilled') items.push(...playlists.value.data);
+    if (blog.status === 'fulfilled') items.push(...blog.value.data);
 
     // Sort: createdAt DESC 기본, 동일 시각일 때 producer 우선순위 tie-break
     // operator(0) > supplier(1) > store(2) > community(3)
@@ -419,6 +461,24 @@ export class HubContentQueryService {
       itemCount: p.itemCount ?? 0,
       totalDuration: p.totalDuration ?? 0,
       creatorName: p.creatorName ?? null,
+    };
+  }
+
+  // WO-O4O-OPERATOR-BLOG-PUBLISHING-BACKEND-QUERY-V1:
+  //   store_blog_posts row → HubContentItemResponse 매퍼.
+  //   producer 는 항상 'operator' (queryBlog 가 author_role='operator' 만 통과시킴).
+  //   thumbnailUrl 은 현재 schema 에 thumbnail 컬럼이 없어 null — 향후 확장 시 추가.
+  private mapBlogItem(b: any): HubContentItemResponse {
+    const createdAtRaw = b.published_at ?? b.created_at;
+    return {
+      id: b.id,
+      sourceDomain: 'blog',
+      producer: 'operator',
+      title: b.title,
+      description: b.excerpt ?? null,
+      thumbnailUrl: null,
+      createdAt: createdAtRaw instanceof Date ? createdAtRaw.toISOString() : String(createdAtRaw),
+      authorRole: 'operator',
     };
   }
 
