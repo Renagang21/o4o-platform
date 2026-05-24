@@ -15,9 +15,10 @@ import { HubContentQueryService } from './hub-content.service.js';
 
 const VALID_PRODUCERS: string[] = ['operator', 'supplier', 'community'];
 // WO-O4O-STORE-HUB-BLOG-CONTENT-IMPORT-V1 (2026-05-24): 'blog' 추가.
-// Phase 2-2 의 queryBlog 구현은 service.ts 에 완료됐으나 controller validation 의
-// 화이트리스트 갱신이 누락되어 ?sourceDomain=blog 호출이 400 반환되던 hotfix.
-const VALID_DOMAINS: string[] = ['cms', 'signage-media', 'signage-playlist', 'blog'];
+// WO-O4O-KPA-POP-OPERATOR-PUBLISHING-V1 Phase 1 (2026-05-24): 'pop' 추가.
+//   Phase 1 Backend Foundation — service.ts 의 queryPop placeholder + asset-snapshot
+//   allowedAssetTypes 'pop' 등록. 실 구현은 Phase 2 후속.
+const VALID_DOMAINS: string[] = ['cms', 'signage-media', 'signage-playlist', 'blog', 'pop'];
 
 export function createHubContentRouter(dataSource: DataSource): Router {
   const router = Router();

@@ -72,6 +72,10 @@ export function createAssetSnapshotController(
     //   Resolver가 sub_type='resource' + is_deleted=false + reusable_policy≠restricted 통과시킨다.
     // WO-O4O-OPERATOR-BLOG-PUBLISHING-BACKEND-FOUNDATION-V1: 'blog' assetType 등록 (Phase 1 Placeholder).
     //   현재 resolveBlog 는 null 반환 — Phase 2 schema 확장 후 활성화.
-    allowedAssetTypes: ['cms', 'signage', 'lesson', 'content', 'resource', 'blog'],
+    // WO-O4O-KPA-POP-OPERATOR-PUBLISHING-V1 Phase 1 (2026-05-24): 'pop' assetType 등록 (Phase 1 Placeholder).
+    //   store_pops entity 는 신설됐으나 resolvePop 은 null 반환 — Phase 2 후속에서 실 구현.
+    //   외부 caller 가 'pop' assetType 으로 요청 시 controller 통과하되 source 미발견
+    //   (SOURCE_NOT_FOUND) 으로 처리된다.
+    allowedAssetTypes: ['cms', 'signage', 'lesson', 'content', 'resource', 'blog', 'pop'],
   });
 }

@@ -108,6 +108,8 @@ export class HubContentQueryService {
         return this.querySignagePlaylists(serviceKey, producer, page, limit);
       case 'blog':
         return this.queryBlog(serviceKey, producer, page, limit);
+      case 'pop':
+        return this.queryPop(serviceKey, producer, page, limit);
       // (제거됨) case 'kpa-store-content' — WO-O4O-REMOVE-STORE-TO-COMMUNITY-SHARE-FLOW-V1.
       // Store → Community 공유 흐름 폐기로 store-shared 콘텐츠는 HUB 에 노출되지 않는다.
       default:
@@ -461,6 +463,29 @@ export class HubContentQueryService {
       itemCount: p.itemCount ?? 0,
       totalDuration: p.totalDuration ?? 0,
       creatorName: p.creatorName ?? null,
+    };
+  }
+
+  // ── POP (Phase 1 Foundation — Placeholder) ──
+  //
+  // WO-O4O-KPA-POP-OPERATOR-PUBLISHING-V1 Phase 1 (2026-05-24):
+  //   Foundation only — store_pops entity / migration / HUB sourceDomain 'pop' /
+  //   asset-snapshot allowedAssetTypes 'pop' / 본 placeholder query + resolvePop placeholder.
+  //   실 구현 (author_role='operator' AND status='published' 필터 + service_key 격리) 은
+  //   Phase 2 에서 진행 — Blog 의 queryBlog 패턴 mirror.
+  //
+  // 본 Phase 1 단계는 sourceDomain='pop' 호출이 controller 400 차단 없이 service 까지 도달하되
+  // 빈 응답 반환. 의도적으로 매장 직접 작성 POP (author_role='store') 도 HUB 노출 안 함.
+  private async queryPop(
+    _serviceKey: string,
+    _producer: HubProducer | undefined,
+    page: number,
+    limit: number,
+  ): Promise<HubContentListResponse> {
+    return {
+      success: true,
+      data: [],
+      pagination: { page, limit, total: 0, totalPages: 0 },
     };
   }
 

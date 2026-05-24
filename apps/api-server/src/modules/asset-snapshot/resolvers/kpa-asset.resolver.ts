@@ -40,6 +40,25 @@ export class KpaAssetResolver implements ContentResolver {
     if (assetType === 'blog') {
       return this.resolveBlog(sourceAssetId);
     }
+    if (assetType === 'pop') {
+      return this.resolvePop(sourceAssetId);
+    }
+    return null;
+  }
+
+  /**
+   * WO-O4O-KPA-POP-OPERATOR-PUBLISHING-V1 Phase 1 Backend Foundation (2026-05-24)
+   *
+   * Phase 1 — placeholder. 항상 null 반환.
+   *
+   * store_pops entity 는 신설됐으나 (Option C — IR-O4O-KPA-POP-STRUCTURE-AND-MENU-AUDIT-V1)
+   * 실 resolver 구현 (id + author_role='operator' AND status='published' 조건 + contentJson
+   * full copy) 은 Phase 2 후속. Blog 의 resolveBlog 패턴 mirror 예정.
+   *
+   * 본 단계는 assetType='pop' 호출이 allowedAssetTypes 통과 후 resolver 분기까지 도달하되
+   * 항상 null 반환 → AssetCopyService 가 SOURCE_NOT_FOUND 로 처리. 매장 사본 생성 안 됨.
+   */
+  private async resolvePop(_id: string): Promise<ResolvedContent | null> {
     return null;
   }
 

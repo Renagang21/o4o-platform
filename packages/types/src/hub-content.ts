@@ -27,8 +27,12 @@ export type HubVisibility = 'global' | 'service' | 'store';
  *   'blog' 추가 — Phase 1 Backend Foundation. 현재 단계는 골격만 등록되어 있으며
  *   queryBlog 는 placeholder 빈 응답 반환. 운영자 → HUB → 매장 흐름의 실제 노출은
  *   store_blog_posts 의 producer/authorRole schema 확장 후 Phase 2 에서 활성화.
+ * WO-O4O-KPA-POP-OPERATOR-PUBLISHING-V1 Phase 1 (2026-05-24):
+ *   'pop' 추가 — Phase 1 Backend Foundation. queryPop 는 placeholder. 운영자 → HUB →
+ *   매장 흐름의 실 구현은 Phase 2 후속. Blog 의 store_blog_posts 와 동일하게 별도
+ *   store_pops entity 보유 (IR-O4O-KPA-POP-STRUCTURE-AND-MENU-AUDIT-V1 Option C).
  */
-export type HubSourceDomain = 'cms' | 'signage-media' | 'signage-playlist' | 'blog';
+export type HubSourceDomain = 'cms' | 'signage-media' | 'signage-playlist' | 'blog' | 'pop';
 
 // =============================================================================
 // API Response DTOs
@@ -99,4 +103,5 @@ export const HUB_SOURCE_DOMAIN_LABELS: Record<HubSourceDomain, string> = {
   'signage-media': '사이니지 미디어',
   'signage-playlist': '사이니지 플레이리스트',
   blog: '블로그',
+  pop: 'POP',
 };
