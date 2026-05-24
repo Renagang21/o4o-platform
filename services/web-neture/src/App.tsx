@@ -98,8 +98,10 @@ import O4OConceptsPage from './pages/o4o/O4OConceptsPage';
 // 레거시 ChannelSalesStructurePage(채널·판매 구조)는 사용 중단.
 import O4OStructurePage from './pages/o4o/O4OStructurePage';
 import ChannelMapPage from './pages/manual/concepts/ChannelMapPage';
-import BusinessInquiryPage from './pages/o4o/BusinessInquiryPage';
-import ConsultationRequestPage from './pages/o4o/ConsultationRequestPage';
+// WO-O4O-NETURE-APPLY-PAGE-CONSOLIDATION-V1:
+//   /o4o/business-inquiry + /o4o/consultation → /o4o/apply 통합. 두 page component 파일은
+//   보존 (deprecated), App.tsx 의 import 만 제거 후 redirect 로 처리.
+import O4OApplyPage from './pages/o4o/O4OApplyPage';
 
 // Admin Vault Pages
 import {
@@ -680,8 +682,10 @@ function App() {
               <Route path="/o4o/targets/salon" element={<SalonTargetPage />} />
               <Route path="/o4o/targets/optical" element={<OpticalTargetPage />} />
               <Route path="/o4o/targets/dental" element={<DentalTargetPage />} />
-              <Route path="/o4o/business-inquiry" element={<BusinessInquiryPage />} />
-              <Route path="/o4o/consultation" element={<ConsultationRequestPage />} />
+              {/* WO-O4O-NETURE-APPLY-PAGE-CONSOLIDATION-V1: 통합 진입 + 기존 2 경로 redirect */}
+              <Route path="/o4o/apply" element={<O4OApplyPage />} />
+              <Route path="/o4o/business-inquiry" element={<Navigate to="/o4o/apply" replace />} />
+              <Route path="/o4o/consultation" element={<Navigate to="/o4o/apply" replace />} />
               {/* 시맨틱 URL: About → /o4o/* 통일 */}
               {/* WO-O4O-CONCEPTS-PAGE-V1: 철학 페이지로 교체 */}
               <Route path="/o4o/concepts" element={<O4OConceptsPage />} />

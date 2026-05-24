@@ -70,7 +70,7 @@ function HeroSection() {
           {' '}온라인 기능을 연결합니다.
         </p>
         <Link
-          to="/o4o/business-inquiry"
+          to="/o4o/apply"
           className="inline-flex items-center justify-center px-6 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors"
         >
           내 사업에 적용 검토
@@ -318,7 +318,7 @@ function CtaSection() {
         {/* 1차 CTA: 사업자 적용 검토 */}
         <div className="mb-4">
           <Link
-            to="/o4o/business-inquiry"
+            to="/o4o/apply"
             className="inline-flex items-center justify-center px-8 py-4 bg-primary-600 text-white text-lg font-semibold rounded-lg hover:bg-primary-700 transition-colors shadow-lg"
           >
             내 사업에 적용 검토
@@ -328,11 +328,7 @@ function CtaSection() {
 
         {/* 보조 link: 상담 요청 */}
         <p className="text-sm text-slate-400 mb-10">
-          더 자세히 알아보고 싶다면{' '}
-          <Link to="/o4o/consultation" className="text-primary-400 hover:text-primary-300 underline">
-            상담 요청
-          </Link>
-          도 가능합니다.
+          상담 또는 사업 문의도 같은 페이지에서 진행됩니다.
         </p>
 
         {/* 2차 CTA: 전체 구조 보기 / 공급자 / 운영 파트너 (기존, 후순위 재배치) */}
