@@ -87,6 +87,7 @@ import { createKpaPaymentController } from './controllers/kpa-payment.controller
 import { createBlogController } from '../o4o-store/controllers/blog.controller.js';
 // WO-O4O-OPERATOR-BLOG-PUBLISHING-WRITE-API-V1: 운영자 HUB 게시 write API
 import { createOperatorBlogController } from '../o4o-store/controllers/operator-blog.controller.js';
+import { createOperatorPopController } from '../o4o-store/controllers/operator-pop.controller.js';
 import { createLayoutController } from '../o4o-store/controllers/layout.controller.js'; // WO-STORE-BLOCK-ENGINE-V1
 import { createStoreSettingsController } from '../o4o-store/controllers/store-settings.controller.js'; // WO-STORE-COMMON-SETTINGS-FOUNDATION-V1
 // WO-O4O-ROUTES-REFACTOR-V1: Extracted controllers
@@ -426,6 +427,16 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     'kpa',
   );
   router.use('/operator/blog', kpaOperatorBlogController);
+
+  // WO-O4O-KPA-POP-PUBLISHING-PHASE2-BACKEND-V1: 운영자 HUB POP write API
+  // /api/v1/kpa/operator/pop/posts (운영자가 매장 HUB 에 게시하는 POP)
+  // 권한: kpa:operator / kpa:admin / platform:admin / platform:super_admin
+  const kpaOperatorPopController = createOperatorPopController(
+    dataSource,
+    coreRequireAuth as any,
+    'kpa',
+  );
+  router.use('/operator/pop', kpaOperatorPopController);
 
   const kpaTemplateController = createKpaStoreTemplateController(dataSource, coreRequireAuth as any);
   router.use('/stores', kpaTemplateController);

@@ -47,19 +47,56 @@ export class KpaAssetResolver implements ContentResolver {
   }
 
   /**
-   * WO-O4O-KPA-POP-OPERATOR-PUBLISHING-V1 Phase 1 Backend Foundation (2026-05-24)
+   * WO-O4O-KPA-POP-PUBLISHING-PHASE2-BACKEND-V1 (2026-05-24)
    *
-   * Phase 1 — placeholder. 항상 null 반환.
+   * Phase 1 placeholder 를 실 구현으로 전환. resolveBlog 패턴 mirror.
    *
-   * store_pops entity 는 신설됐으나 (Option C — IR-O4O-KPA-POP-STRUCTURE-AND-MENU-AUDIT-V1)
-   * 실 resolver 구현 (id + author_role='operator' AND status='published' 조건 + contentJson
-   * full copy) 은 Phase 2 후속. Blog 의 resolveBlog 패턴 mirror 예정.
+   * 통과 조건:
+   *   - author_role = 'operator'  (매장 직접 작성 POP 차단 — 매장 전용)
+   *   - status = 'published'      (draft/archived 차단)
    *
-   * 본 단계는 assetType='pop' 호출이 allowedAssetTypes 통과 후 resolver 분기까지 도달하되
-   * 항상 null 반환 → AssetCopyService 가 SOURCE_NOT_FOUND 로 처리. 매장 사본 생성 안 됨.
+   * 차단:
+   *   - author_role = 'store'  → 매장 직접 작성 POP 는 자료함 가져가기 대상 아님
+   *   - status ≠ 'published'   → 비공개 상태 POP 차단
+   *
+   * service_key 정합 (cross-service 노출 차단) 은 listing 단 (queryPop) 에서 처리한다.
+   * ContentResolver 인터페이스가 (sourceAssetId, assetType) 만 받으므로 resolver 레벨
+   * service_key 검증은 인터페이스 확장이 필요 — 별도 WO 대상. 다른 resolver (resolveBlog
+   * 포함) 도 동일 패턴.
+   *
+   * Full Copy — POP 본문 / 메타데이터를 contentJson 에 담아 자료함에 보존한다.
    */
-  private async resolvePop(_id: string): Promise<ResolvedContent | null> {
-    return null;
+  private async resolvePop(id: string): Promise<ResolvedContent | null> {
+    const rows = await this.dataSource.query(
+      `SELECT id, title, slug, excerpt, content, status, author_role,
+              published_at, created_at, service_key, store_id
+       FROM store_pops
+       WHERE id = $1
+         AND author_role = 'operator'
+         AND status = 'published'
+       LIMIT 1`,
+      [id],
+    );
+    if (!rows || rows.length === 0) return null;
+    const p = rows[0];
+
+    return {
+      title: p.title,
+      type: 'pop',
+      sourceService: 'kpa',
+      contentJson: {
+        title: p.title,
+        slug: p.slug,
+        excerpt: p.excerpt,
+        content: p.content,
+        authorRole: p.author_role,
+        publishedAt:
+          p.published_at instanceof Date ? p.published_at.toISOString() : p.published_at,
+        sourceServiceKey: p.service_key,
+        sourceStoreId: p.store_id,
+        capturedAt: new Date().toISOString(),
+      },
+    };
   }
 
   /**

@@ -195,11 +195,15 @@ export class HubContentQueryService {
     //   queryStoreSharedContent 호출 제거. Store → Community 공유 흐름 폐기.
     // WO-O4O-OPERATOR-BLOG-PUBLISHING-BACKEND-QUERY-V1:
     //   queryBlog 추가 — 운영자 게시 블로그 (author_role='operator') 만 통합 목록에 포함.
-    const [cms, media, playlists, blog] = await Promise.allSettled([
+    // WO-O4O-KPA-POP-PUBLISHING-PHASE2-BACKEND-V1:
+    //   queryPop 추가 — 운영자 게시 POP (author_role='operator', status='published') 만
+    //   mixed 통합 목록에 포함. Blog 와 동일한 정책.
+    const [cms, media, playlists, blog, pop] = await Promise.allSettled([
       this.queryCms(serviceKey, producer, 1, MAX_FETCH_PER_DOMAIN),
       this.querySignageMedia(serviceKey, producer, 1, MAX_FETCH_PER_DOMAIN),
       this.querySignagePlaylists(serviceKey, producer, 1, MAX_FETCH_PER_DOMAIN),
       this.queryBlog(serviceKey, producer, 1, MAX_FETCH_PER_DOMAIN),
+      this.queryPop(serviceKey, producer, 1, MAX_FETCH_PER_DOMAIN),
     ]);
 
     const items: HubContentItemResponse[] = [];
@@ -207,6 +211,7 @@ export class HubContentQueryService {
     if (media.status === 'fulfilled') items.push(...media.value.data);
     if (playlists.status === 'fulfilled') items.push(...playlists.value.data);
     if (blog.status === 'fulfilled') items.push(...blog.value.data);
+    if (pop.status === 'fulfilled') items.push(...pop.value.data);
 
     // Sort: createdAt DESC 기본, 동일 시각일 때 producer 우선순위 tie-break
     // operator(0) > supplier(1) > store(2) > community(3)
@@ -466,26 +471,84 @@ export class HubContentQueryService {
     };
   }
 
-  // ── POP (Phase 1 Foundation — Placeholder) ──
+  // ── POP (Phase 2 — Operator HUB POP Query) ──
   //
-  // WO-O4O-KPA-POP-OPERATOR-PUBLISHING-V1 Phase 1 (2026-05-24):
-  //   Foundation only — store_pops entity / migration / HUB sourceDomain 'pop' /
-  //   asset-snapshot allowedAssetTypes 'pop' / 본 placeholder query + resolvePop placeholder.
-  //   실 구현 (author_role='operator' AND status='published' 필터 + service_key 격리) 은
-  //   Phase 2 에서 진행 — Blog 의 queryBlog 패턴 mirror.
+  // WO-O4O-KPA-POP-PUBLISHING-PHASE2-BACKEND-V1 (2026-05-24):
+  //   Phase 1 placeholder 를 실 조회로 전환. queryBlog 패턴 그대로 mirror — store_pops 와
+  //   store_blog_posts 의 스키마 형태가 동일하기 때문.
   //
-  // 본 Phase 1 단계는 sourceDomain='pop' 호출이 controller 400 차단 없이 service 까지 도달하되
-  // 빈 응답 반환. 의도적으로 매장 직접 작성 POP (author_role='store') 도 HUB 노출 안 함.
+  // 조회 조건:
+  //   - store_pops.author_role = 'operator'   (매장 직접 작성 POP 차단 — 매장 전용 유지)
+  //   - store_pops.status = 'published'       (draft/archived 차단)
+  //   - store_pops.service_key = serviceKey   (cross-service 노출 차단)
+  //
+  // producer 인자가 명시되면 'operator' 만 통과 — supplier/community/store 는 빈 응답
+  // (POP 도메인의 유일한 HUB producer 는 'operator' 임).
+  //
+  // Raw SQL + Parameter Binding (Boundary Policy: Guard Rule 2).
+  // 복합 인덱스 IDX_store_pops_hub_query (service_key, author_role, status) 활용.
   private async queryPop(
-    _serviceKey: string,
-    _producer: HubProducer | undefined,
+    serviceKey: string,
+    producer: HubProducer | undefined,
     page: number,
     limit: number,
   ): Promise<HubContentListResponse> {
+    if (producer && producer !== 'operator') {
+      return { success: true, data: [], pagination: { page, limit, total: 0, totalPages: 0 } };
+    }
+    try {
+      const offset = (page - 1) * limit;
+
+      const rows = await this.dataSource.query(
+        `SELECT id, title, slug, excerpt, status, published_at, created_at, service_key
+         FROM store_pops
+         WHERE service_key = $1
+           AND author_role = 'operator'
+           AND status = 'published'
+         ORDER BY COALESCE(published_at, created_at) DESC
+         LIMIT $2 OFFSET $3`,
+        [serviceKey, limit, offset],
+      );
+
+      const countRows = await this.dataSource.query(
+        `SELECT COUNT(*)::int AS total
+         FROM store_pops
+         WHERE service_key = $1
+           AND author_role = 'operator'
+           AND status = 'published'`,
+        [serviceKey],
+      );
+
+      const total = countRows[0]?.total ?? 0;
+
+      return {
+        success: true,
+        data: rows.map((r: any) => this.mapPopItem(r)),
+        pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      };
+    } catch (error: any) {
+      if (error.message?.includes('does not exist')) {
+        return { success: true, data: [], pagination: { page, limit, total: 0, totalPages: 0 } };
+      }
+      throw error;
+    }
+  }
+
+  // WO-O4O-KPA-POP-PUBLISHING-PHASE2-BACKEND-V1:
+  //   store_pops row → HubContentItemResponse 매퍼. mapBlogItem mirror.
+  //   producer 는 항상 'operator' (queryPop 가 author_role='operator' 만 통과시킴).
+  //   thumbnailUrl 은 store_pops 스키마에 thumbnail 컬럼이 없어 null — 향후 확장 시 추가.
+  private mapPopItem(p: any): HubContentItemResponse {
+    const createdAtRaw = p.published_at ?? p.created_at;
     return {
-      success: true,
-      data: [],
-      pagination: { page, limit, total: 0, totalPages: 0 },
+      id: p.id,
+      sourceDomain: 'pop',
+      producer: 'operator',
+      title: p.title,
+      description: p.excerpt ?? null,
+      thumbnailUrl: null,
+      createdAt: createdAtRaw instanceof Date ? createdAtRaw.toISOString() : String(createdAtRaw),
+      authorRole: 'operator',
     };
   }
 

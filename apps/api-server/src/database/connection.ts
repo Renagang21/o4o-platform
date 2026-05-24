@@ -355,6 +355,11 @@ import {
   ProductMarketingAsset,
 } from '../routes/platform/entities/index.js';
 
+// WO-O4O-KPA-POP-PUBLISHING-PHASE2-BACKEND-V1: StorePop entity 등록 (Phase 1 누락분 정합).
+// Phase 1 에서 entity / migration / asset-snapshot 'pop' / queryPop placeholder 등은 적용됐으나
+// connection.ts entities 배열 등록이 누락되어 TypeORM repository 사용이 불가능했음.
+import { StorePop } from '../routes/o4o-store/entities/store-pop.entity.js';
+
 // ============================================================================
 // PLATFORM STORE POLICY & PAYMENT CONFIG ENTITIES
 // (WO-CORE-STORE-POLICY-SYSTEM-V1, WO-CORE-STORE-PAYMENT-CONFIG-V1)
@@ -982,6 +987,10 @@ export const AppDataSource = new DataSource({
     // STORE QR CODE ENTITY (WO-O4O-QR-LANDING-PAGE-V1)
     // ============================================================================
     StoreQrCode,
+    // STORE POP ENTITY (WO-O4O-KPA-POP-OPERATOR-PUBLISHING-V1 Phase 1 +
+    //   WO-O4O-KPA-POP-PUBLISHING-PHASE2-BACKEND-V1 entities 배열 등록)
+    // ============================================================================
+    StorePop,
     // QR SCAN EVENT ENTITY (WO-O4O-QR-SCAN-ANALYTICS-V1)
     // ============================================================================
     StoreQrScanEvent,
