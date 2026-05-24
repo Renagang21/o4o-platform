@@ -208,40 +208,6 @@ export default function LoginPage() {
               </NavLink>
             </p>
           </div>
-
-          {/* 테스트 계정 입력 보조 버튼 */}
-          <div className="mt-4 pt-4 border-t border-dashed border-slate-200">
-            <p className="text-center text-xs text-slate-400 mb-3">테스트 계정</p>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                disabled={isSubmitting}
-                onClick={() => {
-                  setEmail('pharmacist_test@glycopharm.co.kr');
-                  setPassword('O4oTestPass@1');
-                  setError('');
-                }}
-                className="flex-1 py-2 text-sm border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-50 disabled:opacity-50"
-              >
-                테스트 약국
-              </button>
-            </div>
-            {/* 약국 경영자 빠른 로그인 (개발/테스트 편의용) */}
-            <div className="mt-2">
-              <button
-                type="button"
-                disabled={isSubmitting}
-                onClick={() => {
-                  setEmail('phamacy1@o4o.com');
-                  setPassword('O4oTestPass@1');
-                  setError('');
-                }}
-                className="w-full py-2 text-sm border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-50 disabled:opacity-50"
-              >
-                약국 경영자 로그인
-              </button>
-            </div>
-          </div>
         </div>
       </div>
     </div>

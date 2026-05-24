@@ -118,21 +118,6 @@ export default function LoginPage() {
           </Button>
         </form>
 
-        {/* 테스트 계정 빠른 로그인 */}
-        <div className="mt-4 pt-4 border-t border-dashed border-slate-200">
-          <p className="text-center text-xs text-slate-400 mb-2.5 mt-0">테스트 계정</p>
-          <button
-            type="button"
-            disabled={loading}
-            onClick={() => { setEmail('store-owner-kcosmetics@o4o.com'); setPassword('O4oTestPass@1'); setError(null); }}
-            className={`w-full py-2 text-xs font-medium text-slate-600 bg-slate-50 border border-slate-200 rounded-lg transition-colors ${
-              loading ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:bg-slate-100'
-            }`}
-          >
-            매장 경영자 로그인
-          </button>
-        </div>
-
         <div className="mt-6 pt-6 border-t border-slate-200 text-center">
           <Link to="/" className="text-sm font-medium text-primary no-underline hover:underline">홈으로 돌아가기</Link>
         </div>

@@ -40,7 +40,6 @@ import appreciationRoutes from '../modules/appreciation/routes/appreciation.rout
 import settingsRoutes from '../routes/settingsRoutes.js';
 import adminAppsRoutes from '../routes/admin/apps.routes.js';
 import adminUsersRoutes from '../routes/admin/users.routes.js';
-import seedTestAccountsRoutes from '../routes/admin/seed-test-accounts.js';
 import serviceMonitorRoutes from '../routes/service-monitor.routes.js';
 
 // ============================================================================
@@ -169,7 +168,6 @@ export async function registerCoreRoutes(app: Application): Promise<void> {
   app.use('/api/v1/settings', settingsRoutes);
   app.use('/api/v1/admin/apps', adminAppsRoutes);
   app.use('/api/v1/admin/users', adminUsersRoutes);
-  app.use('/api/v1/admin/seed-test-accounts', seedTestAccountsRoutes);
   app.use('/api/v1/service/monitor', serviceMonitorRoutes);
 
   logger.info('✅ Core API routes registered');
