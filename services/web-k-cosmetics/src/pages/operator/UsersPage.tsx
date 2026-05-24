@@ -1,768 +1,126 @@
 /**
- * Operator Users Page — 회원 관리
- * WO-O4O-MEMBERSHIP-CONSOLE-V1
- * WO-O4O-MEMBER-LIST-STANDARDIZATION-V1
- * WO-O4O-KCOS-USERS-TABLE-STANDARDIZE-V1
+ * Operator Users Page — K-Cosmetics 회원 관리 (thin wrapper)
  *
- * MemberListLayout + @o4o/operator-ux-core DataTable 기반 표준 회원 리스트.
- * 탭: 전체 | 판매자 | 소비자 | 가입 신청
- * 기능: 검색, 정렬, 승인/거부, 비밀번호 변경, 편집, 삭제
+ * WO-O4O-OPERATOR-MEMBERS-LIST-COMMONIZATION-V1:
+ *   768-line 구현을 @o4o/operator-core-ui/modules/members 의 OperatorMembersConsolePage
+ *   thin wrapper 로 정합. K-Cos-specific 분기는 client adapter + slots 으로 흡수:
+ *     - 판매자 / 소비자 역할 탭 → roleTabs prop
+ *     - simple delete confirm → renderDeleteFlow slot
+ *     - EditUserModal → renderEditModal slot
+ *
+ *   본 WO 로 K-Cos 의 bulk action parity 회복 (ActionBar / useBatchAction / BulkResultModal
+ *   wrapper 내장 — 별도 K-Cos UI 추가 없이 자동 활성화).
+ *
+ * 선행:
+ *   - WO-O4O-MEMBERSHIP-CONSOLE-V1 / WO-O4O-KCOS-USERS-TABLE-STANDARDIZE-V1
+ *   - WO-O4O-OPERATOR-MEMBERS-DETAIL-SURFACE-CANONICALIZATION-V1 (Hybrid Canonical)
  */
 
-import { useState, useEffect, useCallback, useMemo, type ReactNode } from 'react';
+import { useState } from 'react';
 import {
-  Users,
-  CheckCircle,
-  XCircle,
-  Clock,
-  RefreshCw,
-  UserCheck,
-  UserX,
-  KeyRound,
-  Pencil,
-  Trash2,
-  AlertCircle,
-  X,
-  Eye,
-  EyeOff,
-} from 'lucide-react';
-import { RowActionMenu, BaseDetailDrawer } from '@o4o/ui';
-import {
-  DataTable,
-  MemberListLayout,
-  StatusBadge,
-  RoleBadge,
-  ServiceBadge,
-  defineActionPolicy,
-  buildRowActions,
-} from '@o4o/operator-ux-core';
-import type { ListColumnDef, MemberTab } from '@o4o/operator-ux-core';
-import { api } from '../../lib/apiClient';
+  OperatorMembersConsolePage,
+  type MembersConsoleClient,
+  type MembersConsoleListParams,
+  type UserData,
+} from '@o4o/operator-core-ui/modules/members';
+import { ConfirmActionDialog } from '@o4o/ui';
 import { toast } from '@o4o/error-handling';
+import { api } from '../../lib/apiClient';
 import EditUserModal from './EditUserModal';
 
-// ─── Types ───────────────────────────────────────────────────
+// ─── Client adapter ──────────────────────────────────────────
 
-interface MembershipData {
-  id: string;
-  serviceKey: string;
-  status: string;
-  role: string;
-  createdAt: string;
-}
-
-interface UserData {
-  id: string;
-  email: string;
-  firstName?: string;
-  lastName?: string;
-  name?: string;
-  nickname?: string;
-  phone?: string;
-  company?: string;
-  status: string;
-  roles?: string[];
-  role?: string;
-  memberships?: MembershipData[];
-  createdAt: string;
-  updatedAt?: string;
-}
-
-interface PaginationData {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-}
-
-// ─── API Helper ──────────────────────────────────────────────
-
-async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
-  const url = path.replace(/^\/api\/v1/, '') || '/';
-  const method = (options?.method || 'GET').toUpperCase();
-  let body: any;
-  if (options?.body && typeof options.body === 'string') {
-    try { body = JSON.parse(options.body); } catch { body = options.body; }
-  }
-  const response = await api.request({ method, url, data: body });
-  return response.data;
-}
-
-// ─── Helpers ──────────────────────────────────────────────
-
-function getUserName(u: UserData): string {
-  if (u.lastName || u.firstName) {
-    const full = `${u.lastName || ''}${u.firstName || ''}`.trim();
-    if (full) return full;
-  }
-  if (u.name && u.name !== u.email) return u.name;
-  return u.email?.split('@')[0] || '사용자';
-}
-
-function getPrimaryRole(u: UserData): string {
-  // service_memberships.role 우선 (SSOT)
-  const membership = u.memberships?.find(m => m.serviceKey === 'k-cosmetics');
-  if (membership?.role) return membership.role;
-  const roles = u.roles || (u.role ? [u.role] : []);
-  return roles[0] || 'user';
-}
-
-// Role tab filtering
-const ROLE_TAB_FILTER: Record<string, string[]> = {
-  all: [],
-  seller: ['cosmetics:store_owner'],
-  consumer: ['consumer', 'customer'],
-  pending: [],
+const kcosMembersClient: MembersConsoleClient = {
+  async list(params: MembersConsoleListParams) {
+    const usp = new URLSearchParams();
+    usp.set('page', String(params.page));
+    usp.set('limit', String(params.limit));
+    // WO-O4O-OPERATOR-MEMBERS-FRONTEND-SERVICEKEY-ALIGNMENT-V1: serviceKey 명시
+    usp.set('serviceKey', 'k-cosmetics');
+    if (params.status) usp.set('status', params.status);
+    if (params.search) usp.set('search', params.search);
+    const { data } = await api.get(`/operator/members?${usp}`);
+    return { users: data.users || [], pagination: data.pagination };
+  },
+  async listAll() {
+    const { data } = await api.get('/operator/members?limit=1000&serviceKey=k-cosmetics');
+    return { users: data.users || [] };
+  },
+  async stats() {
+    const { data } = await api.get('/operator/members/stats?serviceKey=k-cosmetics');
+    return data;
+  },
+  async updateStatus(userId, status) {
+    await api.patch(`/operator/members/${userId}/status`, { status });
+  },
+  async batchUpdateStatus(ids, status) {
+    const { data } = await api.post('/operator/members/batch-status', { ids, status });
+    return data;
+  },
+  async updatePassword(userId, password) {
+    await api.put(`/operator/members/${userId}`, { password });
+  },
 };
 
-// ─── Action Policy (V4-EXPANSION) ────────────────────────────
+// ─── Delete Flow — simple confirm ────────────────────────────
 
-const userActionPolicy = defineActionPolicy<UserData>('k-cosmetics:users', {
-  inlineMax: 2,
-  rules: [
-    {
-      key: 'approve',
-      label: '승인',
-      variant: 'primary',
-      visible: (u) => u.status === 'pending' || u.status === 'rejected',
-    },
-    {
-      key: 'reject',
-      label: '거부',
-      variant: 'danger',
-      visible: (u) => u.status === 'pending',
-      confirm: {
-        title: '회원 거부',
-        message: '이 사용자를 거부 처리하시겠습니까?',
-        variant: 'danger',
-        confirmText: '거부',
-      },
-    },
-    {
-      key: 'suspend',
-      label: '정지',
-      variant: 'warning',
-      visible: (u) => u.status === 'active' || u.status === 'approved',
-      confirm: {
-        title: '회원 정지',
-        message: '이 사용자를 정지 처리하시겠습니까?',
-        variant: 'warning',
-        confirmText: '정지',
-      },
-    },
-    {
-      key: 'activate',
-      label: '활성화',
-      variant: 'primary',
-      visible: (u) => u.status === 'suspended',
-    },
-    {
-      key: 'edit',
-      label: '정보 수정',
-    },
-    {
-      key: 'password',
-      label: '비밀번호 변경',
-    },
-    {
-      key: 'delete',
-      label: '삭제',
-      variant: 'danger',
-      divider: true,
-      confirm: {
-        title: '회원 삭제 확인',
-        message: '이 사용자를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.',
-        variant: 'danger',
-        confirmText: '삭제',
-      },
-    },
-  ],
-});
-
-const USER_ACTION_ICONS: Record<string, ReactNode> = {
-  approve: <UserCheck className="w-4 h-4" />,
-  reject: <UserX className="w-4 h-4" />,
-  suspend: <XCircle className="w-4 h-4" />,
-  activate: <CheckCircle className="w-4 h-4" />,
-  edit: <Pencil className="w-4 h-4" />,
-  password: <KeyRound className="w-4 h-4" />,
-  delete: <Trash2 className="w-4 h-4" />,
-};
-
-// ─── Password Modal ──────────────────────────────────────────
-
-function PasswordModal({ user, onClose, onSuccess }: { user: UserData; onClose: () => void; onSuccess: () => void }) {
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+function KcosDeleteFlow({
+  user,
+  onClose,
+  onDeleted,
+}: {
+  user: UserData;
+  onClose: () => void;
+  onDeleted: () => void;
+}) {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const displayName =
+    user.name || `${user.lastName || ''}${user.firstName || ''}`.trim() || user.email.split('@')[0];
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (password.length < 8) { setError('비밀번호는 최소 8자 이상이어야 합니다.'); return; }
+  const handle = async () => {
     setLoading(true);
-    setError('');
     try {
-      await apiFetch(`/api/v1/operator/members/${user.id}`, {
-        method: 'PUT',
-        body: JSON.stringify({ password }),
-      });
-      toast.success('비밀번호가 변경되었습니다.');
-      onSuccess();
-      onClose();
+      await api.delete(`/operator/members/${user.id}`);
+      toast.success('사용자가 삭제되었습니다.');
+      onDeleted();
     } catch (err: any) {
-      setError(err?.message || '비밀번호 변경에 실패했습니다.');
+      toast.error(err?.message || '삭제에 실패했습니다.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-slate-800">비밀번호 변경</h3>
-          <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded"><X className="w-5 h-5" /></button>
-        </div>
-        <p className="text-sm text-slate-500 mb-4">{getUserName(user)} ({user.email})</p>
-        {error && (
-          <div className="flex items-center gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-700 mb-3">
-            <AlertCircle className="w-4 h-4 shrink-0" />{error}
-          </div>
-        )}
-        <form onSubmit={handleSubmit}>
-          <div className="relative mb-4">
-            <input
-              type={showPassword ? 'text' : 'password'}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="새 비밀번호 (8자 이상)"
-              className="w-full px-3 py-2 pr-10 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-              required
-              minLength={8}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600"
-            >
-              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-            </button>
-          </div>
-          <div className="flex gap-2">
-            <button type="button" onClick={onClose} className="flex-1 py-2 text-sm border border-slate-300 rounded-lg hover:bg-slate-50">취소</button>
-            <button type="submit" disabled={loading} className="flex-1 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50">
-              {loading ? '처리 중...' : '변경'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+    <ConfirmActionDialog
+      open
+      onClose={onClose}
+      onConfirm={handle}
+      title="회원 삭제 확인"
+      message={`${displayName} (${user.email})\n\n이 사용자를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`}
+      confirmText="삭제"
+      variant="danger"
+      loading={loading}
+    />
   );
 }
 
 // ─── Main Component ──────────────────────────────────────────
 
 export default function UsersPage() {
-  const [activeTab, setActiveTab] = useState('all');
-  const [users, setUsers] = useState<UserData[]>([]);
-  const [pagination, setPagination] = useState<PaginationData>({ page: 1, limit: 20, total: 0, totalPages: 0 });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [search, setSearch] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [passwordUser, setPasswordUser] = useState<UserData | null>(null);
-  const [editUser, setEditUser] = useState<UserData | null>(null);
-  // WO-O4O-OPERATOR-MEMBERS-DETAIL-SURFACE-CANONICALIZATION-V1:
-  //   Hybrid Canonical — row click → Drawer (빠른 검토) + footer "전체 상세 페이지 →" 링크로 기존 page route 유지.
-  const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
-
-  // Stats
-  const [stats, setStats] = useState({ total: 0, active: 0, pending: 0, rejected: 0, sellerCount: 0, consumerCount: 0 });
-
-  const fetchUsers = useCallback(async (page = 1) => {
-    setLoading(true);
-    setError('');
-    try {
-      const params = new URLSearchParams();
-      params.set('page', String(page));
-      params.set('limit', '20');
-      // WO-O4O-OPERATOR-MEMBERS-FRONTEND-SERVICEKEY-ALIGNMENT-V1:
-      //   platform admin 분기 (F6 Boundary Policy) 에서 serviceKey 가 없으면
-      //   PLATFORM_ADMIN_SCOPE_REQUIRED 400 — 명시적으로 전달.
-      params.set('serviceKey', 'k-cosmetics');
-      if (activeTab === 'pending') {
-        params.set('status', 'pending');
-      }
-      if (searchQuery) params.set('search', searchQuery);
-
-      const data = await apiFetch<any>(`/api/v1/operator/members?${params}`);
-      setUsers(data.users || []);
-      setPagination(data.pagination || { page, limit: 20, total: 0, totalPages: 0 });
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, [activeTab, searchQuery]);
-
-  const fetchStats = useCallback(async () => {
-    try {
-      // WO-O4O-OPERATOR-MEMBERS-FRONTEND-SERVICEKEY-ALIGNMENT-V1: serviceKey 명시 (위 fetchUsers 와 동일 사유).
-      const data = await apiFetch<any>('/api/v1/operator/members/stats?serviceKey=k-cosmetics');
-      const byStatus = data.statistics?.byStatus || [];
-      const getCount = (s: string) => byStatus.find((b: any) => b.status === s)?.count || 0;
-
-      // Role counts from users (client-side for now)
-      const allData = await apiFetch<any>('/api/v1/operator/members?limit=1000&serviceKey=k-cosmetics');
-      const allUsers: UserData[] = allData.users || [];
-      const sellerRoles = ROLE_TAB_FILTER.seller;
-      const consumerRoles = ROLE_TAB_FILTER.consumer;
-
-      setStats({
-        total: data.statistics?.total || 0,
-        active: getCount('active') + getCount('approved'),
-        pending: getCount('pending'),
-        rejected: getCount('rejected'),
-        sellerCount: allUsers.filter(u => {
-          const role = getPrimaryRole(u);
-          return sellerRoles.includes(role);
-        }).length,
-        consumerCount: allUsers.filter(u => {
-          const role = getPrimaryRole(u);
-          return consumerRoles.includes(role);
-        }).length,
-      });
-    } catch {
-      // stats failure is non-critical
-    }
-  }, []);
-
-  useEffect(() => { fetchUsers(1); }, [fetchUsers]);
-  useEffect(() => { fetchStats(); }, [fetchStats]);
-
-  const handleStatusChange = async (userId: string, status: string) => {
-    setActionLoading(userId);
-    try {
-      await apiFetch(`/api/v1/operator/members/${userId}/status`, {
-        method: 'PATCH',
-        body: JSON.stringify({ status }),
-      });
-      fetchUsers(pagination.page);
-      fetchStats();
-    } catch (err: any) {
-      toast.error(err.message || '오류가 발생했습니다.');
-    } finally {
-      setActionLoading(null);
-    }
-  };
-
-  const handleDelete = async (user: UserData) => {
-    setActionLoading(user.id);
-    try {
-      await apiFetch(`/api/v1/operator/members/${user.id}`, { method: 'DELETE' });
-      fetchUsers(pagination.page);
-      fetchStats();
-    } catch (err: any) {
-      toast.error(err.message || '오류가 발생했습니다.');
-    } finally {
-      setActionLoading(null);
-    }
-  };
-
-  // ─── Role tab filtering (client-side) ──────────────
-
-  const filteredUsers = useMemo(() => {
-    if (activeTab === 'all' || activeTab === 'pending') return users;
-    const allowedRoles = ROLE_TAB_FILTER[activeTab];
-    if (!allowedRoles || allowedRoles.length === 0) return users;
-    return users.filter(u => {
-      const role = getPrimaryRole(u);
-      return allowedRoles.includes(role);
-    });
-  }, [users, activeTab]);
-
-  // ─── Tabs ──────────────────────────────────────────
-
-  const tabs: MemberTab[] = [
-    { key: 'all', label: '전체', count: stats.total },
-    { key: 'seller', label: '판매자', count: stats.sellerCount },
-    { key: 'consumer', label: '소비자', count: stats.consumerCount },
-    { key: 'pending', label: '가입 신청', count: stats.pending },
-  ];
-
-  // ─── Drawer: status-aware footer actions ────────────────────
-  // WO-O4O-OPERATOR-MEMBERS-DETAIL-SURFACE-CANONICALIZATION-V1: Neture 패턴 mirror.
-
-  const drawerActions = useMemo(() => {
-    if (!selectedUser) return [];
-    const u = selectedUser;
-    const isLoading = actionLoading === u.id;
-    const actions: Array<{ label: string; onClick: () => void; variant: 'primary' | 'danger'; loading: boolean; disabled: boolean }> = [];
-
-    if (u.status === 'pending' || u.status === 'rejected') {
-      actions.push({
-        label: '승인',
-        onClick: () => { void handleStatusChange(u.id, 'approved').then(() => setSelectedUser(null)); },
-        variant: 'primary',
-        loading: isLoading,
-        disabled: isLoading,
-      });
-    }
-    if (u.status === 'pending') {
-      actions.push({
-        label: '거부',
-        onClick: () => { void handleStatusChange(u.id, 'rejected').then(() => setSelectedUser(null)); },
-        variant: 'danger',
-        loading: isLoading,
-        disabled: isLoading,
-      });
-    }
-    if (u.status === 'active' || u.status === 'approved') {
-      actions.push({
-        label: '정지',
-        onClick: () => { void handleStatusChange(u.id, 'suspended').then(() => setSelectedUser(null)); },
-        variant: 'danger',
-        loading: isLoading,
-        disabled: isLoading,
-      });
-    }
-    if (u.status === 'suspended') {
-      actions.push({
-        label: '활성화',
-        onClick: () => { void handleStatusChange(u.id, 'approved').then(() => setSelectedUser(null)); },
-        variant: 'primary',
-        loading: isLoading,
-        disabled: isLoading,
-      });
-    }
-    return actions;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedUser, actionLoading]);
-
-  // ─── DataTable Columns ────────────────────────────
-
-  const columns: ListColumnDef<UserData>[] = [
-    {
-      key: 'name',
-      header: '이름',
-      width: '180px',
-      sortable: true,
-      sortAccessor: (user) => getUserName(user),
-      render: (_v, user) => (
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center text-sm font-medium text-slate-600 shrink-0">
-            {getUserName(user).charAt(0)}
-          </div>
-          <span className="font-medium text-slate-800 text-sm truncate">{getUserName(user)}</span>
-        </div>
-      ),
-    },
-    {
-      key: 'email',
-      header: '이메일',
-      width: '220px',
-      sortable: true,
-      sortAccessor: (user) => user.email,
-      render: (_v, user) => <span className="text-sm text-slate-700">{user.email}</span>,
-    },
-    {
-      key: 'role',
-      header: '역할',
-      width: '120px',
-      render: (_v, user) => <RoleBadge role={getPrimaryRole(user)} />,
-    },
-    {
-      key: 'services',
-      header: '서비스',
-      width: '150px',
-      render: (_v, user) => (
-        <div className="flex flex-wrap gap-1">
-          {user.memberships && user.memberships.length > 0 ? (
-            user.memberships.map((m) => <ServiceBadge key={m.id} serviceKey={m.serviceKey} />)
-          ) : (
-            <span className="text-xs text-slate-400">-</span>
-          )}
-        </div>
-      ),
-    },
-    {
-      key: 'createdAt',
-      header: '가입일',
-      width: '100px',
-      sortable: true,
-      sortAccessor: (user) => new Date(user.createdAt).getTime(),
-      render: (_v, user) => (
-        <span className="text-sm text-slate-600">
-          {new Date(user.createdAt).toLocaleDateString('ko-KR')}
-        </span>
-      ),
-    },
-    {
-      key: 'status',
-      header: '상태',
-      width: '80px',
-      render: (_v, user) => <StatusBadge status={user.status} />,
-    },
-    {
-      key: '_actions',
-      header: '액션',
-      width: '60px',
-      align: 'center',
-      onCellClick: () => {},
-      render: (_v, user) => (
-        <RowActionMenu
-          actions={buildRowActions(userActionPolicy, user, {
-            approve: () => handleStatusChange(user.id, 'approved'),
-            reject: () => handleStatusChange(user.id, 'rejected'),
-            suspend: () => handleStatusChange(user.id, 'suspended'),
-            activate: () => handleStatusChange(user.id, 'approved'),
-            edit: () => setEditUser(user),
-            password: () => setPasswordUser(user),
-            delete: () => handleDelete(user),
-          }, {
-            icons: USER_ACTION_ICONS,
-            loading: actionLoading === user.id
-              ? { approve: true, reject: true, suspend: true, activate: true }
-              : undefined,
-          })}
-          inlineMax={userActionPolicy.inlineMax}
-        />
-      ),
-    },
-  ];
-
-  // ─── Pagination ────────────────────────────────────
-
-  const paginationTotal = (activeTab === 'all' || activeTab === 'pending')
-    ? pagination.total
-    : filteredUsers.length;
-  const totalPages = Math.ceil(paginationTotal / pagination.limit) || 1;
-
   return (
-    <div className="p-6">
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        {[
-          { label: '전체', value: stats.total, icon: Users, color: 'slate' },
-          { label: '활성', value: stats.active, icon: CheckCircle, color: 'green' },
-          { label: '대기', value: stats.pending, icon: Clock, color: 'amber' },
-          { label: '거부', value: stats.rejected, icon: XCircle, color: 'red' },
-        ].map((s) => (
-          <div key={s.label} className="bg-white rounded-xl shadow-sm p-4">
-            <div className="flex items-center gap-3">
-              <div className={`w-10 h-10 bg-${s.color}-100 rounded-lg flex items-center justify-center`}>
-                <s.icon className={`w-5 h-5 text-${s.color}-600`} />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-slate-800">{s.value}</p>
-                <p className="text-xs text-slate-500">{s.label}</p>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Member List Layout: Search + Tabs + Table */}
-      <MemberListLayout
-        title="회원 관리"
-        description="회원 승인, 상태 변경, 서비스 멤버십 관리"
-        tabs={tabs}
-        activeTab={activeTab}
-        onTabChange={(key) => { setActiveTab(key); }}
-        search={search}
-        onSearchChange={setSearch}
-        onSearch={(q) => { setSearchQuery(q); }}
-        headerActions={
-          <button
-            onClick={() => { fetchUsers(pagination.page); fetchStats(); }}
-            className="flex items-center gap-2 px-4 py-2 text-sm border border-slate-300 rounded-lg hover:bg-slate-50"
-          >
-            <RefreshCw className="w-4 h-4" />새로고침
-          </button>
-        }
-      >
-        {/* Error */}
-        {error && (
-          <div className="flex items-center gap-2 rounded-lg bg-red-50 p-4 text-sm text-red-700">
-            <AlertCircle className="w-4 h-4 shrink-0" />{error}
-          </div>
-        )}
-
-        {/* DataTable */}
-        <DataTable<UserData>
-          columns={columns}
-          data={filteredUsers}
-          rowKey="id"
-          loading={loading}
-          emptyMessage={activeTab === 'pending' ? '가입 신청이 없습니다.' : '등록된 사용자가 없습니다.'}
-          onRowClick={(user) => setSelectedUser(user)}
-          tableId="kcos-users"
-        />
-
-        {/* Pagination */}
-        {!loading && totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100 mt-2">
-            <p className="text-sm text-slate-500">
-              총 {paginationTotal}명 중 {(pagination.page - 1) * pagination.limit + 1}-
-              {Math.min(pagination.page * pagination.limit, paginationTotal)}명 표시
-            </p>
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() => fetchUsers(Math.max(1, pagination.page - 1))}
-                disabled={pagination.page === 1}
-                className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed text-slate-600"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                const start = Math.max(1, Math.min(pagination.page - 2, totalPages - 4));
-                return start + i;
-              }).filter(p => p <= totalPages).map((pg) => (
-                <button
-                  key={pg}
-                  onClick={() => fetchUsers(pg)}
-                  className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
-                    pagination.page === pg
-                      ? 'bg-primary-600 text-white'
-                      : 'hover:bg-slate-100 text-slate-600'
-                  }`}
-                >
-                  {pg}
-                </button>
-              ))}
-              <button
-                onClick={() => fetchUsers(Math.min(totalPages, pagination.page + 1))}
-                disabled={pagination.page === totalPages}
-                className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed text-slate-600"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
-          </div>
-        )}
-      </MemberListLayout>
-
-      {/* ─── BaseDetailDrawer ───────────────────────────────────
-          WO-O4O-OPERATOR-MEMBERS-DETAIL-SURFACE-CANONICALIZATION-V1:
-            Hybrid Canonical — Drawer 빠른 검토 + 전체 상세 페이지 (CommonUserDetailPage) 진입.
-            기존 /operator/users/:id route 보존 (footer link 로 진입). */}
-      <BaseDetailDrawer
-        open={!!selectedUser}
-        onClose={() => setSelectedUser(null)}
-        title={selectedUser ? getUserName(selectedUser) : ''}
-        width={520}
-        actions={drawerActions}
-      >
-        {selectedUser && (
-          <div style={{ fontSize: 14, color: '#374151' }}>
-            {/* 기본 정보 */}
-            <div style={{ padding: '12px 16px', backgroundColor: '#f8fafc', borderRadius: 8, marginBottom: 16 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-                <div style={{
-                  width: 40, height: 40, borderRadius: '50%',
-                  background: '#e2e8f0', display: 'flex', alignItems: 'center',
-                  justifyContent: 'center', fontWeight: 600, fontSize: 16, color: '#475569', flexShrink: 0,
-                }}>
-                  {getUserName(selectedUser).charAt(0)}
-                </div>
-                <div>
-                  <p style={{ fontWeight: 600, fontSize: 15, color: '#1e293b', marginBottom: 2 }}>
-                    {getUserName(selectedUser)}
-                  </p>
-                  <p style={{ fontSize: 13, color: '#64748b' }}>{selectedUser.email}</p>
-                </div>
-                <div style={{ marginLeft: 'auto' }}>
-                  <StatusBadge status={selectedUser.status} />
-                </div>
-              </div>
-            </div>
-
-            {/* 상세 필드 */}
-            {[
-              { label: '역할', value: getPrimaryRole(selectedUser) },
-              { label: '가입일', value: new Date(selectedUser.createdAt).toLocaleDateString('ko-KR') },
-              selectedUser.phone ? { label: '연락처', value: selectedUser.phone } : null,
-              selectedUser.company ? { label: '소속', value: selectedUser.company } : null,
-            ].filter(Boolean).map((item: any) => (
-              <div key={item.label} style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
-                <span style={{ fontWeight: 600, color: '#64748b', minWidth: 60 }}>{item.label}</span>
-                <span style={{ color: '#1e293b' }}>{item.value}</span>
-              </div>
-            ))}
-
-            {/* 서비스 멤버십 */}
-            {selectedUser.memberships && selectedUser.memberships.length > 0 && (
-              <div style={{ marginTop: 12, marginBottom: 12 }}>
-                <p style={{ fontWeight: 600, color: '#64748b', marginBottom: 6 }}>서비스 멤버십</p>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                  {selectedUser.memberships.map((m) => (
-                    <span
-                      key={m.id}
-                      style={{
-                        padding: '3px 10px', borderRadius: 12, fontSize: 12, fontWeight: 500,
-                        background: m.status === 'active' ? '#eff6ff' : m.status === 'pending' ? '#fffbeb' : '#f1f5f9',
-                        color: m.status === 'active' ? '#1d4ed8' : m.status === 'pending' ? '#92400e' : '#64748b',
-                      }}
-                    >
-                      {m.serviceKey} · {m.status}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* 상태별 안내 */}
-            {selectedUser.status === 'pending' && (
-              <div style={{ marginTop: 12, padding: '10px 14px', backgroundColor: '#fffbeb', borderRadius: 8, border: '1px solid #fde68a' }}>
-                <p style={{ fontSize: 12, color: '#92400e', fontWeight: 500 }}>
-                  가입 신청 대기 중입니다. 아래 버튼으로 승인 또는 거부를 처리하세요.
-                </p>
-              </div>
-            )}
-            {selectedUser.status === 'rejected' && (
-              <div style={{ marginTop: 12, padding: '10px 14px', backgroundColor: '#fef2f2', borderRadius: 8, border: '1px solid #fecaca' }}>
-                <p style={{ fontSize: 12, color: '#991b1b', fontWeight: 500 }}>
-                  거부 처리된 신청입니다. 재승인이 가능합니다.
-                </p>
-              </div>
-            )}
-
-            {/* 전체 상세 링크 */}
-            <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid #f1f5f9' }}>
-              <a
-                href={`/operator/users/${selectedUser.id}`}
-                style={{ fontSize: 13, color: '#2563eb', textDecoration: 'none' }}
-              >
-                전체 상세 페이지 →
-              </a>
-            </div>
-          </div>
-        )}
-      </BaseDetailDrawer>
-
-      {/* Password Modal */}
-      {passwordUser && (
-        <PasswordModal
-          user={passwordUser}
-          onClose={() => setPasswordUser(null)}
-          onSuccess={() => { fetchUsers(pagination.page); }}
-        />
+    <OperatorMembersConsolePage
+      serviceKey="k-cosmetics"
+      client={kcosMembersClient}
+      roleTabs={[
+        { key: 'seller', label: '판매자', roleFilter: ['cosmetics:store_owner'] },
+        { key: 'consumer', label: '소비자', roleFilter: ['consumer', 'customer'] },
+      ]}
+      renderEditModal={({ user, onClose, onSuccess }) => (
+        <EditUserModal userId={user.id} onClose={onClose} onSuccess={onSuccess} />
       )}
-
-      {/* Edit User Modal */}
-      {editUser && (
-        <EditUserModal
-          userId={editUser.id}
-          onClose={() => setEditUser(null)}
-          onSuccess={() => { fetchUsers(pagination.page); }}
-        />
+      renderDeleteFlow={({ user, onClose, onDeleted }) => (
+        <KcosDeleteFlow user={user} onClose={onClose} onDeleted={onDeleted} />
       )}
-    </div>
+    />
   );
 }

@@ -11,7 +11,8 @@
     "./modules/stores": "./src/modules/stores/index.ts",
     "./modules/guide-contents": "./src/modules/guide-contents/index.ts",
     "./modules/cms-content": "./src/modules/cms-content/index.ts",
-    "./modules/resources": "./src/modules/resources/index.ts"
+    "./modules/resources": "./src/modules/resources/index.ts",
+    "./modules/members": "./src/modules/members/index.ts"
   },
   "dependencies": {
     "@o4o/content-editor": "workspace:*",
