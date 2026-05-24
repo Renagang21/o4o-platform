@@ -4,6 +4,13 @@
  * WO-O4O-SERVICE-HANDOFF-ARCHITECTURE-V1
  * Cross-service SSO handoff via Redis-based single-use tokens.
  *
+ * WO-O4O-AUTH-HANDOFF-ACTIVE-MEMBERSHIP-VERIFICATION-V1 (2026-05-24):
+ *   Identity V2 §7.2 해석 A 충족 — generateHandoff / exchangeHandoff 양쪽 모두
+ *   target service 의 service_memberships.status === 'active' 검증을 수행한다.
+ *   pending / rejected / suspended / withdrawn / 미가입 사용자가 Handoff 로
+ *   대상 서비스 인증 토큰을 우회 획득하는 경로를 차단 (Service Join API 의
+ *   pending 정책과 짝을 이루는 V2 정합 보강).
+ *
  * Endpoints:
  * - POST /api/v1/auth/handoff         — Generate handoff token (requireAuth)
  * - POST /api/v1/auth/handoff/exchange — Exchange token for auth (public)
@@ -48,6 +55,61 @@ export class HandoffController extends BaseController {
     }
 
     try {
+      // WO-O4O-AUTH-HANDOFF-ACTIVE-MEMBERSHIP-VERIFICATION-V1:
+      //   target service active membership 검증 (generation 시점).
+      //   미가입 / pending / rejected / suspended / withdrawn 모두 차단.
+      const targetMembership: { status: string }[] = await AppDataSource.query(
+        `SELECT status FROM service_memberships
+           WHERE user_id = $1 AND service_key = $2`,
+        [user.id, targetServiceKey],
+      );
+
+      if (targetMembership.length === 0) {
+        logger.warn('[Handoff] Blocked generation — no membership on target service', {
+          userId: user.id,
+          targetServiceKey,
+          reason: 'no_membership',
+        });
+        return BaseController.error(
+          res,
+          '대상 서비스에 가입되어 있지 않습니다.',
+          403,
+          'HANDOFF_TARGET_NO_MEMBERSHIP',
+        );
+      }
+
+      const targetStatus = targetMembership[0].status;
+
+      if (targetStatus === 'withdrawn') {
+        logger.warn('[Handoff] Blocked generation — withdrawn membership on target service', {
+          userId: user.id,
+          targetServiceKey,
+          membershipStatus: targetStatus,
+          reason: 'withdrawn',
+        });
+        return BaseController.error(
+          res,
+          '탈퇴한 서비스는 Handoff 로 접근할 수 없습니다.',
+          403,
+          'HANDOFF_TARGET_WITHDRAWN',
+        );
+      }
+
+      if (targetStatus !== 'active') {
+        logger.warn('[Handoff] Blocked generation — non-active membership on target service', {
+          userId: user.id,
+          targetServiceKey,
+          membershipStatus: targetStatus,
+          reason: 'not_active',
+        });
+        return BaseController.error(
+          res,
+          '대상 서비스 가입이 아직 승인되지 않았습니다.',
+          403,
+          'HANDOFF_TARGET_NOT_ACTIVE',
+        );
+      }
+
       // Detect source service from request origin
       const origin = req.get('origin') || '';
       let sourceServiceKey = 'unknown';
@@ -125,6 +187,58 @@ export class HandoffController extends BaseController {
           `SELECT service_key AS "serviceKey", status FROM service_memberships WHERE user_id = $1`,
           [user.id],
         );
+
+      // WO-O4O-AUTH-HANDOFF-ACTIVE-MEMBERSHIP-VERIFICATION-V1:
+      //   target service active membership 재검증 (exchange 시점).
+      //   generation 시점에 active 였더라도 60s TTL 사이에 status 가 변경됐을 수 있으므로
+      //   exchange 시점에 다시 확인 (이중 안전판).
+      const targetMembership = memberships.find(
+        m => m.serviceKey === payload.targetServiceKey,
+      );
+
+      if (!targetMembership) {
+        logger.warn('[Handoff] Blocked exchange — no membership on target service', {
+          userId: user.id,
+          targetServiceKey: payload.targetServiceKey,
+          reason: 'no_membership',
+        });
+        return BaseController.error(
+          res,
+          '대상 서비스에 가입되어 있지 않습니다.',
+          403,
+          'HANDOFF_TARGET_NO_MEMBERSHIP',
+        );
+      }
+
+      if (targetMembership.status === 'withdrawn') {
+        logger.warn('[Handoff] Blocked exchange — withdrawn membership on target service', {
+          userId: user.id,
+          targetServiceKey: payload.targetServiceKey,
+          membershipStatus: targetMembership.status,
+          reason: 'withdrawn',
+        });
+        return BaseController.error(
+          res,
+          '탈퇴한 서비스는 Handoff 로 접근할 수 없습니다.',
+          403,
+          'HANDOFF_TARGET_WITHDRAWN',
+        );
+      }
+
+      if (targetMembership.status !== 'active') {
+        logger.warn('[Handoff] Blocked exchange — non-active membership on target service', {
+          userId: user.id,
+          targetServiceKey: payload.targetServiceKey,
+          membershipStatus: targetMembership.status,
+          reason: 'not_active',
+        });
+        return BaseController.error(
+          res,
+          '대상 서비스 가입이 아직 승인되지 않았습니다.',
+          403,
+          'HANDOFF_TARGET_NOT_ACTIVE',
+        );
+      }
 
       // 5. Generate auth tokens
       const tokens = tokenUtils.generateTokens(user, roles, 'neture.co.kr', memberships);
