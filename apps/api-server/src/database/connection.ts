@@ -135,6 +135,7 @@ import {
   CosmeticsStoreListing,
   CosmeticsStorePlaylist,
   CosmeticsStorePlaylistItem,
+  CosmeticsMember, // WO-O4O-KCOS-COSMETICS-MEMBER-PROFILE-FOUNDATION-V1
 } from '../routes/cosmetics/entities/index.js';
 
 // ============================================================================
@@ -701,6 +702,8 @@ export const AppDataSource = new DataSource({
     // COSMETICS STORE PLAYLIST ENTITIES (WO-KCOS-STORES-PHASE4-SIGNAGE-INTEGRATION-V1)
     CosmeticsStorePlaylist,
     CosmeticsStorePlaylistItem,
+    // COSMETICS MEMBER PROFILE (WO-O4O-KCOS-COSMETICS-MEMBER-PROFILE-FOUNDATION-V1)
+    CosmeticsMember,
     // ============================================================================
     // YAKSA ENTITIES (Phase A-1: Yaksa API Implementation)
     // ============================================================================

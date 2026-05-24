@@ -46,6 +46,8 @@ import { createCosmeticsTouristHubController } from './controllers/cosmetics-tou
 import { createCosmeticsEventOfferController } from './controllers/event-offer.controller.js';
 // WO-O4O-KCOS-RESOURCES-BACKEND-V1: K-Cos Resource Layer (GP canonical mirror)
 import { createCosmeticsContentsRouter, createCosmeticsOperatorResourcesRouter } from './controllers/resources.controller.js';
+// WO-O4O-KCOS-COSMETICS-MEMBER-PROFILE-FOUNDATION-V1: profile classification (sub_role) Operator API
+import { createCosmeticsMemberController } from './controllers/cosmetics-member.controller.js';
 // WO-O4O-CONTENT-CANONICAL-CROSS-SERVICE-ALIGNMENT-V1
 import { createNewsController } from '../o4o-store/controllers/news.controller.js';
 import { authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
@@ -194,6 +196,16 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
     '/operator/resources',
     createCosmeticsOperatorResourcesRouter(dataSource, authenticate as any, requireCosmeticsScope),
   );
+
+  // ============================================================================
+  // Member Profile Classification — sub_role (store_owner / store_staff)
+  // WO-O4O-KCOS-COSMETICS-MEMBER-PROFILE-FOUNDATION-V1
+  //   GET   /api/v1/cosmetics/members/me
+  //   GET   /api/v1/cosmetics/members              (operator)
+  //   GET   /api/v1/cosmetics/members/:userId      (operator)
+  //   PATCH /api/v1/cosmetics/members/:userId      (operator — subRole 설정)
+  // ============================================================================
+  router.use('/', createCosmeticsMemberController(dataSource, coreRequireAuth as any));
 
   // ============================================================================
   // News/Content Routes (CMS 공지/뉴스) — /api/v1/cosmetics/news/*
