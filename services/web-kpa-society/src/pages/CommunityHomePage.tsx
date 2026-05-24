@@ -39,14 +39,18 @@ import { useAuth } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/LoginModalContext';
 
 // ─── 최신 활동 섹션 (WO-O4O-KPA-HOME-LATEST-ACTIVITY-SECTION-V1) ──────────
+// WO-O4O-KPA-HOME-LATEST-SUMMARY-LIMIT-AND-TAB-SHORTCUT-V1: 메인 화면 요약 성격에 맞춰
+//   탭별 표시 개수 제한 + 탭별 해당 공간 바로가기 추가.
+
+const LATEST_SUMMARY_LIMIT = 6;
 
 const LATEST_TABS = [
-  { key: 'all',      label: '전체' },
-  { key: 'forum',    label: '포럼' },
-  { key: 'course',   label: '강의' },
-  { key: 'content',  label: '콘텐츠' },
-  { key: 'signage',  label: '사이니지' },
-  { key: 'resource', label: '자료실' },
+  { key: 'all',      label: '전체',     shortcutHref: null,         shortcutLabel: null },
+  { key: 'forum',    label: '포럼',     shortcutHref: '/forum',     shortcutLabel: '포럼 바로가기' },
+  { key: 'course',   label: '강의',     shortcutHref: '/lms',       shortcutLabel: '강의 바로가기' },
+  { key: 'content',  label: '콘텐츠',   shortcutHref: '/content',   shortcutLabel: '콘텐츠 바로가기' },
+  { key: 'signage',  label: '사이니지', shortcutHref: '/signage',   shortcutLabel: '사이니지 바로가기' },
+  { key: 'resource', label: '자료실',   shortcutHref: '/resources', shortcutLabel: '자료실 바로가기' },
 ] as const;
 
 const LATEST_BADGE: Record<string, { label: string; cls: string }> = {
@@ -65,6 +69,9 @@ interface LatestSectionProps {
 }
 
 function LatestActivitySection({ items, activeTab, onTabChange, loading }: LatestSectionProps) {
+  const currentTab = LATEST_TABS.find((t) => t.key === activeTab);
+  const hasTabShortcut = !loading && items.length > 0 && currentTab?.shortcutHref;
+
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
@@ -124,6 +131,18 @@ function LatestActivitySection({ items, activeTab, onTabChange, loading }: Lates
           })}
         </div>
       )}
+
+      {/* 탭별 바로가기 — 전체 탭은 섹션 header 의 "전체 보기" 가 담당하므로 skip */}
+      {hasTabShortcut && (
+        <div className="mt-3 flex justify-end">
+          <Link
+            to={currentTab.shortcutHref!}
+            className="text-sm font-semibold text-blue-600 hover:text-blue-700 no-underline whitespace-nowrap"
+          >
+            {currentTab.shortcutLabel} →
+          </Link>
+        </div>
+      )}
     </div>
   );
 }
@@ -169,7 +188,7 @@ export function CommunityHomePage() {
 
   useEffect(() => {
     setLatestLoading(true);
-    homeApi.getLatest({ type: latestTab, limit: 8 })
+    homeApi.getLatest({ type: latestTab, limit: LATEST_SUMMARY_LIMIT })
       .then((res) => setLatestItems(res.data ?? []))
       .catch(() => setLatestItems([]))
       .finally(() => setLatestLoading(false));
