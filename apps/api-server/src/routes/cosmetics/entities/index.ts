@@ -46,3 +46,9 @@ export * from './cosmetics-store-listing.entity.js';
 // ============================================================================
 export * from './cosmetics-store-playlist.entity.js';
 export * from './cosmetics-store-playlist-item.entity.js';
+
+// ============================================================================
+// CONTENT / RESOURCE ENTITIES (WO-O4O-KCOS-RESOURCES-BACKEND-V1)
+// GP glycopharm_contents canonical template mirror.
+// ============================================================================
+export * from './cosmetics-content.entity.js';

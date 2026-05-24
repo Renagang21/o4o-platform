@@ -44,6 +44,8 @@ import { createCosmeticsCommunityHubController } from './controllers/cosmetics-c
 import { createCosmeticsTouristHubController } from './controllers/cosmetics-tourist-hub.controller.js';
 // WO-O4O-EVENT-OFFER-KCOS-ADOPTION-V1
 import { createCosmeticsEventOfferController } from './controllers/event-offer.controller.js';
+// WO-O4O-KCOS-RESOURCES-BACKEND-V1: K-Cos Resource Layer (GP canonical mirror)
+import { createCosmeticsContentsRouter, createCosmeticsOperatorResourcesRouter } from './controllers/resources.controller.js';
 // WO-O4O-CONTENT-CANONICAL-CROSS-SERVICE-ALIGNMENT-V1
 import { createNewsController } from '../o4o-store/controllers/news.controller.js';
 import { authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
@@ -172,6 +174,25 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
   router.use(
     '/event-offers',
     createCosmeticsEventOfferController(dataSource, authenticate, optionalAuth, requireCosmeticsScope),
+  );
+
+  // ============================================================================
+  // Contents / Resources Routes
+  // WO-O4O-KCOS-RESOURCES-BACKEND-V1 (GP glycopharm_contents canonical mirror)
+  //
+  // Public/Member:
+  //   GET /api/v1/cosmetics/contents?sub_type=resource
+  //
+  // Operator:
+  //   GET    /api/v1/cosmetics/operator/resources
+  //   POST   /api/v1/cosmetics/operator/resources
+  //   PATCH  /api/v1/cosmetics/operator/resources/:id/status
+  //   DELETE /api/v1/cosmetics/operator/resources/:id
+  // ============================================================================
+  router.use('/contents', createCosmeticsContentsRouter(dataSource, optionalAuth as any));
+  router.use(
+    '/operator/resources',
+    createCosmeticsOperatorResourcesRouter(dataSource, authenticate as any, requireCosmeticsScope),
   );
 
   // ============================================================================
