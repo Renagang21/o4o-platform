@@ -89,6 +89,7 @@ import { createBlogController } from '../o4o-store/controllers/blog.controller.j
 import { createOperatorBlogController } from '../o4o-store/controllers/operator-blog.controller.js';
 import { createOperatorPopController } from '../o4o-store/controllers/operator-pop.controller.js';
 import { createStorePopStaffController } from '../o4o-store/controllers/pop.controller.js';
+import { createOperatorQrController } from '../o4o-store/controllers/operator-qr.controller.js';
 import { createLayoutController } from '../o4o-store/controllers/layout.controller.js'; // WO-STORE-BLOCK-ENGINE-V1
 import { createStoreSettingsController } from '../o4o-store/controllers/store-settings.controller.js'; // WO-STORE-COMMON-SETTINGS-FOUNDATION-V1
 // WO-O4O-ROUTES-REFACTOR-V1: Extracted controllers
@@ -448,6 +449,17 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     'kpa',
   );
   router.use('/operator/pop', kpaOperatorPopController);
+
+  // WO-O4O-KPA-OPERATOR-QR-PUBLISHING-PHASE2-BACKEND-V1: 운영자 HUB QR template write API
+  // /api/v1/kpa/operator/qr/templates (운영자가 매장 HUB 에 게시하는 QR 청사진 — 실제 QR 아님)
+  // 권한: kpa:operator / kpa:admin / platform:admin / platform:super_admin
+  // 매장 가져가기 시 기존 store_qr_codes 에 매장 사본 INSERT (Phase 3-B 후속).
+  const kpaOperatorQrController = createOperatorQrController(
+    dataSource,
+    coreRequireAuth as any,
+    'kpa',
+  );
+  router.use('/operator/qr', kpaOperatorQrController);
 
   const kpaTemplateController = createKpaStoreTemplateController(dataSource, coreRequireAuth as any);
   router.use('/stores', kpaTemplateController);

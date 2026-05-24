@@ -200,12 +200,16 @@ export class HubContentQueryService {
     // WO-O4O-KPA-POP-PUBLISHING-PHASE2-BACKEND-V1:
     //   queryPop 추가 — 운영자 게시 POP (author_role='operator', status='published') 만
     //   mixed 통합 목록에 포함. Blog 와 동일한 정책.
-    const [cms, media, playlists, blog, pop] = await Promise.allSettled([
+    // WO-O4O-KPA-OPERATOR-QR-PUBLISHING-PHASE2-BACKEND-V1:
+    //   queryQr 추가 — 운영자 발행 QR template (author_role='operator', status='published')
+    //   만 mixed 통합 목록에 포함. POP/Blog 와 동일 정책.
+    const [cms, media, playlists, blog, pop, qr] = await Promise.allSettled([
       this.queryCms(serviceKey, producer, 1, MAX_FETCH_PER_DOMAIN),
       this.querySignageMedia(serviceKey, producer, 1, MAX_FETCH_PER_DOMAIN),
       this.querySignagePlaylists(serviceKey, producer, 1, MAX_FETCH_PER_DOMAIN),
       this.queryBlog(serviceKey, producer, 1, MAX_FETCH_PER_DOMAIN),
       this.queryPop(serviceKey, producer, 1, MAX_FETCH_PER_DOMAIN),
+      this.queryQr(serviceKey, producer, 1, MAX_FETCH_PER_DOMAIN),
     ]);
 
     const items: HubContentItemResponse[] = [];
@@ -214,6 +218,7 @@ export class HubContentQueryService {
     if (playlists.status === 'fulfilled') items.push(...playlists.value.data);
     if (blog.status === 'fulfilled') items.push(...blog.value.data);
     if (pop.status === 'fulfilled') items.push(...pop.value.data);
+    if (qr.status === 'fulfilled') items.push(...qr.value.data);
 
     // Sort: createdAt DESC 기본, 동일 시각일 때 producer 우선순위 tie-break
     // operator(0) > supplier(1) > store(2) > community(3)
@@ -572,27 +577,94 @@ export class HubContentQueryService {
     };
   }
 
-  // ── QR (Phase 1 Foundation — Placeholder) ──
+  // ── QR (Phase 2 — Operator HUB QR Template Query) ──
   //
-  // WO-O4O-KPA-OPERATOR-HUB-QR-TEMPLATE-FOUNDATION-V1 Phase 1 (2026-05-24):
-  //   Foundation only — operator_qr_templates entity / migration / HUB sourceDomain 'qr' /
-  //   asset-snapshot allowedAssetTypes 'qr' / 본 placeholder query + resolveQr placeholder.
-  //   실 구현 (author_role='operator' AND status='published' 필터 + service_key 격리 +
-  //   target_type='url'|'content' 매핑) 은 Phase 2 후속. POP 의 queryPop 패턴 mirror 예정.
+  // WO-O4O-KPA-OPERATOR-QR-PUBLISHING-PHASE2-BACKEND-V1 (2026-05-24):
+  //   Phase 1 placeholder 를 실 조회로 전환. queryPop 패턴 mirror — operator_qr_templates
+  //   는 운영자 발행 "템플릿" 이며 slug / organization_id / scan tracking 모두 없음.
   //
-  // 본 Phase 1 단계는 sourceDomain='qr' 호출이 controller 400 차단 없이 service 까지 도달하되
-  // 빈 응답 반환. operator_qr_templates 은 운영자 발행 "템플릿" 이며, 매장 가져가기 시 기존
-  // store_qr_codes 에 매장 사본 INSERT 가 일어남 (Phase 3-B).
+  // 조회 조건:
+  //   - operator_qr_templates.author_role = 'operator'  (entity CHECK 로 사실상 단일값)
+  //   - operator_qr_templates.status = 'published'      (draft/archived 차단)
+  //   - operator_qr_templates.service_key = serviceKey  (cross-service 노출 차단)
+  //
+  // producer 인자가 명시되면 'operator' 만 통과 — supplier/community/store 는 빈 응답
+  // (QR template 도메인의 유일한 producer 는 'operator' 임).
+  //
+  // Raw SQL + Parameter Binding (Boundary Policy: Guard Rule 2).
+  // 복합 인덱스 IDX_operator_qr_templates_hub_query (service_key, author_role, status) 활용.
+  //
+  // 매장 가져가기 (Phase 3-B):
+  //   queryQr 응답의 id 를 받아 POST /stores/:slug/qr/staff/import { sourceId } 호출 →
+  //   backend 가 target_type / target_url / target_content_* 를 기존 store_qr_codes 의
+  //   landing_type / landing_target_id 로 변환해 매장 사본 row 발급.
   private async queryQr(
-    _serviceKey: string,
-    _producer: HubProducer | undefined,
+    serviceKey: string,
+    producer: HubProducer | undefined,
     page: number,
     limit: number,
   ): Promise<HubContentListResponse> {
+    if (producer && producer !== 'operator') {
+      return { success: true, data: [], pagination: { page, limit, total: 0, totalPages: 0 } };
+    }
+    try {
+      const offset = (page - 1) * limit;
+
+      const rows = await this.dataSource.query(
+        `SELECT id, title, description, status,
+                target_type, target_url, target_content_kind, target_content_ref,
+                published_at, created_at, service_key
+         FROM operator_qr_templates
+         WHERE service_key = $1
+           AND author_role = 'operator'
+           AND status = 'published'
+         ORDER BY COALESCE(published_at, created_at) DESC
+         LIMIT $2 OFFSET $3`,
+        [serviceKey, limit, offset],
+      );
+
+      const countRows = await this.dataSource.query(
+        `SELECT COUNT(*)::int AS total
+         FROM operator_qr_templates
+         WHERE service_key = $1
+           AND author_role = 'operator'
+           AND status = 'published'`,
+        [serviceKey],
+      );
+
+      const total = countRows[0]?.total ?? 0;
+
+      return {
+        success: true,
+        data: rows.map((r: any) => this.mapQrItem(r)),
+        pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      };
+    } catch (error: any) {
+      if (error.message?.includes('does not exist')) {
+        return { success: true, data: [], pagination: { page, limit, total: 0, totalPages: 0 } };
+      }
+      throw error;
+    }
+  }
+
+  // WO-O4O-KPA-OPERATOR-QR-PUBLISHING-PHASE2-BACKEND-V1:
+  //   operator_qr_templates row → HubContentItemResponse 매퍼.
+  //   producer 는 항상 'operator' (queryQr 가 author_role='operator' 만 통과시킴).
+  //   target_* 필드는 HubContentItemResponse 의 표준 필드에 직접 매핑되지 않으므로,
+  //   description 에 사람-읽기용 요약을 합치고 raw 값은 향후 Phase 3-B 의 frontend 가
+  //   별도 조회 (getOperatorQrTemplate(id)) 로 받는다. 본 Phase 2 의 HUB 응답은
+  //   list 진열에 필요한 최소 정보만 노출.
+  private mapQrItem(q: any): HubContentItemResponse {
+    const createdAtRaw = q.published_at ?? q.created_at;
     return {
-      success: true,
-      data: [],
-      pagination: { page, limit, total: 0, totalPages: 0 },
+      id: q.id,
+      sourceDomain: 'qr',
+      producer: 'operator',
+      title: q.title,
+      description: q.description ?? null,
+      thumbnailUrl: null,
+      createdAt: createdAtRaw instanceof Date ? createdAtRaw.toISOString() : String(createdAtRaw),
+      authorRole: 'operator',
     };
   }
 
