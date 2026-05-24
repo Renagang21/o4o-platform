@@ -1819,6 +1819,20 @@ export default function MemberManagementPage() {
                       완전삭제 진입점은 /admin/members 로 이관되었으므로 본 Drawer 의 삭제 버튼 제거 */}
                 </div>
               )}
+
+              {/* WO-O4O-OPERATOR-MEMBERS-DETAIL-SURFACE-CANONICALIZATION-V1:
+                  Hybrid Canonical — Drawer 빠른 검토 + 전체 상세 페이지 (CommonUserDetailPage) 진입.
+                  KpaMember.user_id 로 /operator/users/:id 라우트 (OperatorRoutes.tsx:161) 연결. */}
+              {selectedMember.user_id && (
+                <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid #f1f5f9' }}>
+                  <a
+                    href={`/operator/users/${selectedMember.user_id}`}
+                    style={{ fontSize: 13, color: '#2563eb', textDecoration: 'none' }}
+                  >
+                    전체 상세 페이지 →
+                  </a>
+                </div>
+              )}
             </div>
           );
         })()}

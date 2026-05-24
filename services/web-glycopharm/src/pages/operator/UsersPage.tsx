@@ -10,7 +10,6 @@
  */
 
 import { useState, useEffect, useCallback, useMemo, type ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Users,
   CheckCircle,
@@ -30,7 +29,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
-import { ActionBar, BulkResultModal, RowActionMenu, ConfirmActionDialog } from '@o4o/ui';
+import { ActionBar, BulkResultModal, RowActionMenu, ConfirmActionDialog, BaseDetailDrawer } from '@o4o/ui';
 import { DataTable, MemberListLayout, StatusBadge, RoleBadge, ServiceBadge, useBatchAction, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
 import type { ListColumnDef, MemberTab } from '@o4o/operator-ux-core';
 import { api } from '../../lib/apiClient';
@@ -373,7 +372,6 @@ function DeleteRiskModal({ userId, userName, userEmail, onClose, onDeleted }: {
 // ─── Main Component ──────────────────────────────────────────
 
 export default function UsersPage() {
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('all');
   const [users, setUsers] = useState<UserData[]>([]);
   const [pagination, setPagination] = useState<PaginationData>({ page: 1, limit: 20, total: 0, totalPages: 0 });
@@ -386,6 +384,9 @@ export default function UsersPage() {
   const [editUser, setEditUser] = useState<UserData | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<UserData | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  // WO-O4O-OPERATOR-MEMBERS-DETAIL-SURFACE-CANONICALIZATION-V1:
+  //   Hybrid Canonical — row click → Drawer (빠른 검토) + footer "전체 상세 페이지 →" 링크로 기존 page route 유지.
+  const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
 
   // V3: Batch action hook
   const batch = useBatchAction();
@@ -541,6 +542,55 @@ export default function UsersPage() {
     { key: 'customer', label: '당뇨인', count: stats.customerCount },
     { key: 'pending', label: '가입 신청', count: stats.pending },
   ];
+
+  // ─── Drawer: status-aware footer actions ────────────────────
+  // WO-O4O-OPERATOR-MEMBERS-DETAIL-SURFACE-CANONICALIZATION-V1: Neture 패턴 mirror.
+
+  const drawerActions = useMemo(() => {
+    if (!selectedUser) return [];
+    const u = selectedUser;
+    const isLoading = actionLoading === u.id;
+    const actions: Array<{ label: string; onClick: () => void; variant: 'primary' | 'danger'; loading: boolean; disabled: boolean }> = [];
+
+    if (u.status === 'pending' || u.status === 'rejected') {
+      actions.push({
+        label: '승인',
+        onClick: () => { void handleStatusChange(u.id, 'approved').then(() => setSelectedUser(null)); },
+        variant: 'primary',
+        loading: isLoading,
+        disabled: isLoading,
+      });
+    }
+    if (u.status === 'pending') {
+      actions.push({
+        label: '거부',
+        onClick: () => { void handleStatusChange(u.id, 'rejected').then(() => setSelectedUser(null)); },
+        variant: 'danger',
+        loading: isLoading,
+        disabled: isLoading,
+      });
+    }
+    if (u.status === 'active' || u.status === 'approved') {
+      actions.push({
+        label: '정지',
+        onClick: () => { void handleStatusChange(u.id, 'suspended').then(() => setSelectedUser(null)); },
+        variant: 'danger',
+        loading: isLoading,
+        disabled: isLoading,
+      });
+    }
+    if (u.status === 'suspended') {
+      actions.push({
+        label: '활성화',
+        onClick: () => { void handleStatusChange(u.id, 'approved').then(() => setSelectedUser(null)); },
+        variant: 'primary',
+        loading: isLoading,
+        disabled: isLoading,
+      });
+    }
+    return actions;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedUser, actionLoading]);
 
   // ─── DataTable Columns ────────────────────────────
 
@@ -735,7 +785,7 @@ export default function UsersPage() {
           rowKey="id"
           loading={loading}
           emptyMessage={activeTab === 'pending' ? '가입 신청이 없습니다.' : '등록된 사용자가 없습니다.'}
-          onRowClick={(user) => navigate(`/operator/users/${user.id}`)}
+          onRowClick={(user) => setSelectedUser(user)}
           selectable
           selectedKeys={selectedIds}
           onSelectionChange={setSelectedIds}
@@ -767,6 +817,104 @@ export default function UsersPage() {
           </div>
         )}
       </MemberListLayout>
+
+      {/* ─── BaseDetailDrawer ───────────────────────────────────
+          WO-O4O-OPERATOR-MEMBERS-DETAIL-SURFACE-CANONICALIZATION-V1:
+            Hybrid Canonical — Drawer 빠른 검토 + 전체 상세 페이지 (CommonUserDetailPage) 진입.
+            기존 /operator/users/:id route 보존 (footer link 로 진입). */}
+      <BaseDetailDrawer
+        open={!!selectedUser}
+        onClose={() => setSelectedUser(null)}
+        title={selectedUser ? getUserName(selectedUser) : ''}
+        width={520}
+        actions={drawerActions}
+      >
+        {selectedUser && (
+          <div style={{ fontSize: 14, color: '#374151' }}>
+            {/* 기본 정보 */}
+            <div style={{ padding: '12px 16px', backgroundColor: '#f8fafc', borderRadius: 8, marginBottom: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+                <div style={{
+                  width: 40, height: 40, borderRadius: '50%',
+                  background: '#e2e8f0', display: 'flex', alignItems: 'center',
+                  justifyContent: 'center', fontWeight: 600, fontSize: 16, color: '#475569', flexShrink: 0,
+                }}>
+                  {getUserName(selectedUser).charAt(0)}
+                </div>
+                <div>
+                  <p style={{ fontWeight: 600, fontSize: 15, color: '#1e293b', marginBottom: 2 }}>
+                    {getUserName(selectedUser)}
+                  </p>
+                  <p style={{ fontSize: 13, color: '#64748b' }}>{selectedUser.email}</p>
+                </div>
+                <div style={{ marginLeft: 'auto' }}>
+                  <StatusBadge status={selectedUser.status} />
+                </div>
+              </div>
+            </div>
+
+            {/* 상세 필드 */}
+            {[
+              { label: '역할', value: getPrimaryRole(selectedUser) },
+              { label: '가입일', value: new Date(selectedUser.createdAt).toLocaleDateString('ko-KR') },
+              selectedUser.phone ? { label: '연락처', value: selectedUser.phone } : null,
+              selectedUser.company ? { label: '소속', value: selectedUser.company } : null,
+            ].filter(Boolean).map((item: any) => (
+              <div key={item.label} style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
+                <span style={{ fontWeight: 600, color: '#64748b', minWidth: 60 }}>{item.label}</span>
+                <span style={{ color: '#1e293b' }}>{item.value}</span>
+              </div>
+            ))}
+
+            {/* 서비스 멤버십 */}
+            {selectedUser.memberships && selectedUser.memberships.length > 0 && (
+              <div style={{ marginTop: 12, marginBottom: 12 }}>
+                <p style={{ fontWeight: 600, color: '#64748b', marginBottom: 6 }}>서비스 멤버십</p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                  {selectedUser.memberships.map((m) => (
+                    <span
+                      key={m.id}
+                      style={{
+                        padding: '3px 10px', borderRadius: 12, fontSize: 12, fontWeight: 500,
+                        background: m.status === 'active' ? '#eff6ff' : m.status === 'pending' ? '#fffbeb' : '#f1f5f9',
+                        color: m.status === 'active' ? '#1d4ed8' : m.status === 'pending' ? '#92400e' : '#64748b',
+                      }}
+                    >
+                      {m.serviceKey} · {m.status}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 상태별 안내 */}
+            {selectedUser.status === 'pending' && (
+              <div style={{ marginTop: 12, padding: '10px 14px', backgroundColor: '#fffbeb', borderRadius: 8, border: '1px solid #fde68a' }}>
+                <p style={{ fontSize: 12, color: '#92400e', fontWeight: 500 }}>
+                  가입 신청 대기 중입니다. 아래 버튼으로 승인 또는 거부를 처리하세요.
+                </p>
+              </div>
+            )}
+            {selectedUser.status === 'rejected' && (
+              <div style={{ marginTop: 12, padding: '10px 14px', backgroundColor: '#fef2f2', borderRadius: 8, border: '1px solid #fecaca' }}>
+                <p style={{ fontSize: 12, color: '#991b1b', fontWeight: 500 }}>
+                  거부 처리된 신청입니다. 재승인이 가능합니다.
+                </p>
+              </div>
+            )}
+
+            {/* 전체 상세 링크 */}
+            <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid #f1f5f9' }}>
+              <a
+                href={`/operator/users/${selectedUser.id}`}
+                style={{ fontSize: 13, color: '#2563eb', textDecoration: 'none' }}
+              >
+                전체 상세 페이지 →
+              </a>
+            </div>
+          </div>
+        )}
+      </BaseDetailDrawer>
 
       {/* Password Modal */}
       {passwordUser && (
