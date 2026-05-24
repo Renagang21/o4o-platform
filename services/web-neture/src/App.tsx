@@ -71,12 +71,10 @@ import {
   MedicalOverviewPage,
 } from './pages/seller';
 import PartnerOverviewInfoPage from './pages/PartnerOverviewInfoPage';
-import {
-  DentalChannelExplanationPage,
-  PharmacyChannelExplanationPage,
-  OpticalChannelExplanationPage,
-  MedicalChannelExplanationPage,
-} from './pages/channel';
+// WO-O4O-NETURE-CHANNEL-PAGES-ABSORB-V1:
+//   /o4o/channels/{type} 4 페이지 → 대응 /o4o/targets/{type} 안의 "채널 활용 안내" 섹션으로 흡수.
+//   App.tsx 의 import 만 제거 후 4 route 를 Navigate redirect 로 교체.
+//   기존 page component 파일 (pages/channel/*) 은 보존 (WO 명시).
 
 // Test Guide Pages (o4o 공통 - 다중 서비스) — removed
 
@@ -693,10 +691,11 @@ function App() {
               <Route path="/o4o/principles" element={<O4OPrinciplesPage />} />
               <Route path="/o4o/structure" element={<O4OStructurePage />} />
               <Route path="/o4o/services" element={<O4OServicesPage />} />
-              <Route path="/o4o/channels/pharmacy" element={<PharmacyChannelExplanationPage />} />
-              <Route path="/o4o/channels/optical" element={<OpticalChannelExplanationPage />} />
-              <Route path="/o4o/channels/medical" element={<MedicalChannelExplanationPage />} />
-              <Route path="/o4o/channels/dental" element={<DentalChannelExplanationPage />} />
+              {/* WO-O4O-NETURE-CHANNEL-PAGES-ABSORB-V1: targets/* 흡수 후 redirect */}
+              <Route path="/o4o/channels/pharmacy" element={<Navigate to="/o4o/targets/pharmacy" replace />} />
+              <Route path="/o4o/channels/optical" element={<Navigate to="/o4o/targets/optical" replace />} />
+              <Route path="/o4o/channels/medical" element={<Navigate to="/o4o/targets/clinic" replace />} />
+              <Route path="/o4o/channels/dental" element={<Navigate to="/o4o/targets/dental" replace />} />
             </Route>
 
             {/* ================================================================

@@ -148,20 +148,43 @@ export default function DentalTargetPage() {
           </p>
         </div>
 
-        {/* 매장 운영자용 채널 안내 */}
-        <div className="rounded-xl border border-gray-200 p-6">
-          <p className="text-sm text-gray-500 mb-3">이 흐름을 실제 매장에서 운영하는 방법을 확인하세요.</p>
-          <Link
-            to="/o4o/channels/dental"
-            onClick={() => trackEvent({ event: 'channel_click', target: 'dental', action: 'channel', position: 'mid' })}
-            className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-medium text-sm"
-          >
-            매장 운영 방식 보기
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-          <p className="text-xs text-gray-400 mt-2">
-            치과 원장·운영자가 실제 채널 구조를 확인하는 자료
+        {/* 채널 활용 안내 — WO-O4O-NETURE-CHANNEL-PAGES-ABSORB-V1: /o4o/channels/dental 흡수 */}
+        <div className="rounded-xl border border-slate-200 bg-slate-50 p-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-2">치과 채널에서 O4O는 어떻게 작동하나요?</h2>
+          <p className="text-sm text-gray-500 mb-5">
+            치과의 신뢰와 통제권을 유지하면서 채널을 운영합니다.
           </p>
+          <ul className="space-y-3 mb-5">
+            <li className="flex items-start gap-3">
+              <span className="shrink-0 mt-0.5 text-lg">🎛️</span>
+              <div>
+                <strong className="text-gray-900">채널 주도권은 치과에 있습니다</strong>
+                <p className="text-sm text-gray-600 mt-0.5">TV·디지털 채널에서 무엇을 보여줄지, 사용할지 말지는 치과가 결정합니다.</p>
+              </div>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="shrink-0 mt-0.5 text-lg">🤝</span>
+              <div>
+                <strong className="text-gray-900">운영자는 지원자</strong>
+                <p className="text-sm text-gray-600 mt-0.5">콘텐츠와 도구는 운영자가 제공하고, 선택·편집은 치과가 합니다.</p>
+              </div>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="shrink-0 mt-0.5 text-lg">🔗</span>
+              <div>
+                <strong className="text-gray-900">QR은 연결 통로</strong>
+                <p className="text-sm text-gray-600 mt-0.5">광고나 판매 강요 수단이 아니라, 관심 있는 환자가 스스로 선택해 이동하는 연결입니다.</p>
+              </div>
+            </li>
+          </ul>
+          <Link
+            to="/o4o/apply?industry=dental"
+            onClick={() => trackEvent({ event: 'channel_apply_click', target: 'dental', action: 'apply', position: 'channel-section' })}
+            className="inline-flex items-center justify-center px-5 py-2.5 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors text-sm"
+          >
+            내 치과에 적용 검토
+            <ArrowRight className="w-4 h-4 ml-1" />
+          </Link>
         </div>
 
         {/* 실행 시나리오 */}
