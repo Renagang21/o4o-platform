@@ -96,6 +96,41 @@ export async function deleteBlogPost(slug: string, postId: string, service?: str
 }
 
 // ─────────────────────────────────────────────────────
+// Operator HUB Blog Import (WO-O4O-STORE-HUB-BLOG-CONTENT-IMPORT-V1)
+// ─────────────────────────────────────────────────────
+
+export interface ImportedOperatorBlogPost extends StaffBlogPost {
+  importSource: {
+    sourceBlogId: string;
+    sourceTitle: string;
+    sourceServiceKey: string;
+    sourceAuthorRole: string;
+    importedAt: string;
+  };
+}
+
+/**
+ * 운영자 HUB 게시 블로그를 매장 사본으로 가져오기.
+ *
+ * Backend 가 author_role='store' + storeId=매장id + service_key=서비스 + status='draft'
+ * 로 store_blog_posts INSERT. excerpt 앞에 "[운영자 자료 가져옴] " 접두어로 출처 표시.
+ *
+ * 권한: store_owner (verifyOwner backend 검증).
+ */
+export async function importOperatorBlog(
+  slug: string,
+  sourceBlogId: string,
+  service?: string,
+): Promise<ImportedOperatorBlogPost> {
+  const url = `${getApiBase(service)}/stores/${encodeURIComponent(slug)}/blog/staff/import`;
+  const json = await authFetch(url, {
+    method: 'POST',
+    body: JSON.stringify({ sourceBlogId }),
+  });
+  return json.data as ImportedOperatorBlogPost;
+}
+
+// ─────────────────────────────────────────────────────
 // Blog Settings (WO-O4O-KPA-STORE-BLOG-META-V1)
 // ─────────────────────────────────────────────────────
 

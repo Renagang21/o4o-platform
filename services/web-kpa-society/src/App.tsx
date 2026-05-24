@@ -178,6 +178,8 @@ const PharmacyApprovalGatePage = lazy(() => import('./pages/pharmacy/PharmacyApp
 const HubContentLibraryPage = lazy(() => import('./pages/pharmacy/HubContentLibraryPage').then(m => ({ default: m.HubContentLibraryPage })));
 const HubB2BCatalogPage = lazy(() => import('./pages/pharmacy/HubB2BCatalogPage').then(m => ({ default: m.HubB2BCatalogPage })));
 const HubSignageLibraryPage = lazy(() => import('./pages/pharmacy/HubSignageLibraryPage').then(m => ({ default: m.HubSignageLibraryPage })));
+// WO-O4O-STORE-HUB-BLOG-CONTENT-IMPORT-V1: 매장 HUB 블로그 진열 + 가져가기
+const HubBlogLibraryPage = lazy(() => import('./pages/pharmacy/HubBlogLibraryPage').then(m => ({ default: m.HubBlogLibraryPage })));
 const PharmacySellPage = lazy(() => import('./pages/pharmacy/PharmacySellPage').then(m => ({ default: m.PharmacySellPage })));
 const TabletRequestsPage = lazy(() => import('./pages/pharmacy/TabletRequestsPage').then(m => ({ default: m.TabletRequestsPage })));
 const PharmacyBlogPage = lazy(() => import('./pages/pharmacy/PharmacyBlogPage').then(m => ({ default: m.PharmacyBlogPage })));
@@ -666,6 +668,8 @@ function App() {
             <Route path="signage" element={<HubSignageLibraryPage />} />
             <Route path="event-offers" element={<PharmacyOwnerOnlyGuard><KpaEventOfferPage /></PharmacyOwnerOnlyGuard>} />
             <Route path="content" element={<HubContentLibraryPage />} />
+            {/* WO-O4O-STORE-HUB-BLOG-CONTENT-IMPORT-V1: 매장 HUB 블로그 진열 + 가져가기 */}
+            <Route path="blog" element={<HubBlogLibraryPage />} />
           </Route>
           {/* 자료실 Hub — 공동자료실 진입점 (WO-KPA-RESOURCE-SYSTEM-RESET-V1) */}
           <Route path="/resources" element={<Layout serviceName={SERVICE_NAME}><ResourcesHubPage /></Layout>} />

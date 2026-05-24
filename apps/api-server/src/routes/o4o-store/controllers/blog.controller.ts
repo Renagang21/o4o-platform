@@ -21,7 +21,10 @@ import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource, LessThanOrEqual } from 'typeorm';
 import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 import { StoreBlogPost } from '../../glycopharm/entities/store-blog-post.entity.js';
-import type { StoreBlogPostStatus } from '../../glycopharm/entities/store-blog-post.entity.js';
+import type {
+  StoreBlogPostStatus,
+  StoreBlogPostAuthorRole,
+} from '../../glycopharm/entities/store-blog-post.entity.js';
 // WO-O4O-KPA-STORE-BLOG-META-V1
 import { StoreBlogSettings } from '../../glycopharm/entities/store-blog-settings.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';
@@ -435,6 +438,123 @@ export function createBlogController(
         return;
       }
       res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: err.message } });
+    }
+  });
+
+  // ============================================================================
+  // STAFF — 운영자 HUB 블로그 가져오기 (Operator HUB → 매장 사본)
+  // POST /stores/:slug/blog/staff/import
+  // body: { sourceBlogId: string }
+  //
+  // WO-O4O-STORE-HUB-BLOG-CONTENT-IMPORT-V1 (2026-05-24)
+  //
+  // 매장 경영자가 운영자 HUB 블로그를 자기 매장으로 가져온다.
+  //   - 소스: store_blog_posts WHERE id=sourceBlogId AND author_role='operator'
+  //           AND service_key=serviceKey AND status='published'
+  //   - 사본: store_blog_posts INSERT (author_role='store', store_id=pharmacy.id,
+  //           service_key=serviceKey, status='draft', title/excerpt/content 복사)
+  //
+  // 슬러그 충돌 시 timestamp suffix 로 fallback.
+  // 사본의 excerpt 앞에 "[운영자 자료 가져옴] " 접두어로 출처 표시 (schema 변경 없는 MVP).
+  // 향후 별도 origin/source_metadata 컬럼 도입 시 그쪽으로 이관.
+  //
+  // 권한: store_owner (verifyOwner 동일 패턴).
+  // ============================================================================
+  router.post('/:slug/blog/staff/import', requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { slug } = req.params;
+      const authReq = req as unknown as AuthRequest;
+      const userId = authReq.user?.id || authReq.authUser?.id;
+      const { sourceBlogId } = req.body ?? {};
+
+      if (typeof sourceBlogId !== 'string' || sourceBlogId.trim().length === 0) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'VALIDATION_ERROR', message: 'sourceBlogId is required' },
+        });
+        return;
+      }
+
+      const pharmacy = await resolvePharmacy(slug);
+      if (!pharmacy) {
+        res.status(404).json({ success: false, error: { code: 'STORE_NOT_FOUND', message: 'Store not found' } });
+        return;
+      }
+
+      if (!userId || !verifyOwner(pharmacy, userId)) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Not the store owner' } });
+        return;
+      }
+
+      // 1. 소스 블로그 조회 — 운영자 게시 + published + 같은 서비스만 허용
+      const source = await blogRepo.findOne({
+        where: {
+          id: sourceBlogId,
+          serviceKey,
+          authorRole: 'operator' as StoreBlogPostAuthorRole,
+          status: 'published' as StoreBlogPostStatus,
+        },
+      });
+      if (!source) {
+        res.status(404).json({
+          success: false,
+          error: {
+            code: 'SOURCE_NOT_FOUND',
+            message: 'Operator-published HUB blog not found for this service',
+          },
+        });
+        return;
+      }
+
+      // 2. 슬러그 충돌 방지 — 매장 내 (store_id+slug) unique 정합
+      const baseSlug = source.slug;
+      let finalSlug = baseSlug;
+      const existingBase = await blogRepo.findOne({
+        where: { storeId: pharmacy.id, slug: baseSlug },
+      });
+      if (existingBase) {
+        finalSlug = `${baseSlug}-${Date.now().toString(36)}`;
+      }
+
+      // 3. 매장 사본 생성 (author_role='store' + storeId NOT NULL)
+      //    출처 표시: excerpt 접두어 (schema 변경 없는 MVP)
+      const ORIGIN_PREFIX = '[운영자 자료 가져옴] ';
+      const sourceExcerpt = (source.excerpt ?? '').trim();
+      const copiedExcerpt = sourceExcerpt
+        ? `${ORIGIN_PREFIX}${sourceExcerpt}`
+        : ORIGIN_PREFIX.trim();
+
+      const copy = blogRepo.create({
+        storeId: pharmacy.id,
+        serviceKey,
+        authorRole: 'store' as StoreBlogPostAuthorRole,
+        title: source.title,
+        slug: finalSlug,
+        excerpt: copiedExcerpt,
+        content: source.content,
+        status: 'draft' as StoreBlogPostStatus,
+      });
+
+      const saved = await blogRepo.save(copy);
+      res.status(201).json({
+        success: true,
+        data: {
+          ...saved,
+          // 응답 메타 — frontend 가 "운영자 자료에서 가져옴" 토스트/표시 활용 가능
+          importSource: {
+            sourceBlogId: source.id,
+            sourceTitle: source.title,
+            sourceServiceKey: source.serviceKey,
+            sourceAuthorRole: source.authorRole,
+            importedAt: new Date().toISOString(),
+          },
+        },
+      });
+    } catch (err: any) {
+      res.status(500).json({
+        success: false,
+        error: { code: 'INTERNAL_ERROR', message: err.message },
+      });
     }
   });
 

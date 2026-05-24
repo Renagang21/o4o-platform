@@ -31,6 +31,8 @@ const HUB_MENU_ITEMS: HubMenuItem[] = [
   { label: '디지털 사이니지', path: '/store-hub/signage', icon: '\u{1F5A5}\uFE0F', description: '사이니지 미디어 · 플레이리스트' },
   { label: '이벤트/특가', path: '/store-hub/event-offers', icon: '\u{1F6CD}\uFE0F', description: 'KPA-Society 이벤트 상품' },
   { label: '콘텐츠/자료', path: '/store-hub/content', icon: '\u{1F4C4}', description: 'CMS 콘텐츠 탐색 · 복사' },
+  // WO-O4O-STORE-HUB-BLOG-CONTENT-IMPORT-V1: 매장 HUB 블로그 진열 + 가져가기
+  { label: '블로그', path: '/store-hub/blog', icon: '\u{1F4DD}', description: '운영자 게시 블로그 · 내 매장으로 가져가기' },
 ];
 
 function isMenuActive(pathname: string, menuPath: string): boolean {
