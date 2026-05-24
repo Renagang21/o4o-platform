@@ -34,6 +34,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '안내 문구 관리', path: '/operator/guide-contents' },
     // WO-O4O-CONTENT-CANONICAL-CROSS-SERVICE-ALIGNMENT-V1
     { label: '공지/뉴스 관리', path: '/operator/content-management' },
+    // WO-O4O-OPERATOR-RESOURCES-CANONICAL-COMMONIZATION-V1
+    { label: '자료실 관리', path: '/operator/resources' },
   ],
   // WO-KCOS-OPERATOR-LMS-BOOTSTRAP-V1
   lms: [
