@@ -15,7 +15,11 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { createSignal, createActionSignal } from '@o4o/hub-core';
 import type { HubSignal, HubActionResult } from '@o4o/hub-core';
-import { authClient } from '@o4o/auth-client';
+// WO-O4O-GLYCOPHARM-USE-STORE-HUB-AUTHCLIENT-FIX-V1:
+// @o4o/auth-client singleton(cookie strategy 기본) 대신 GlycoPharm 의
+// localStorage-strategy authClient.api 사용. store-products-ui 와 같은
+// 401 AUTH_REQUIRED 회귀를 차단한다.
+import { api } from '@/lib/apiClient';
 
 // ─── Types ───
 
@@ -168,7 +172,6 @@ export function useStoreHub() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     setError(null);
-    const api = authClient.api;
 
     try {
       const [aiRes, actionsRes, signageRes, productsRes] = await Promise.allSettled([
