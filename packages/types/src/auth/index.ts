@@ -170,6 +170,14 @@ export interface LoginCredentials {
   email: string;
   password: string;
   deviceId?: string;
+  /**
+   * WO-O4O-LOGIN-SERVICEKEY-FRONTEND-ALIGNMENT-V1:
+   * service-scoped login 검증을 위한 옵션. 명시 시 backend 가
+   * service_memberships 조회 → 미가입자 401 SERVICE_NOT_MEMBER 반환.
+   * 미명시 시 기존 global login 흐름 유지 (legacy / platform-level 호출).
+   * Backend: apps/api-server/src/services/auth/auth-login.service.ts.
+   */
+  serviceKey?: string;
 }
 
 // Register data

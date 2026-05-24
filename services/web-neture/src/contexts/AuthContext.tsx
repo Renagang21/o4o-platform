@@ -85,7 +85,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setIsLoading(true);
 
-      const result = await authClient.login({ email, password });
+      // WO-O4O-LOGIN-SERVICEKEY-FRONTEND-ALIGNMENT-V1:
+      // backend 가 service_memberships 를 검증하도록 serviceKey 를 명시.
+      // Neture 미가입자는 401 SERVICE_NOT_MEMBER 로 차단된다.
+      const result = await authClient.login({ email, password, serviceKey: 'neture' });
       const apiUser = result.user as any;
       if (apiUser) {
         const built = buildPlatformUser(apiUser);

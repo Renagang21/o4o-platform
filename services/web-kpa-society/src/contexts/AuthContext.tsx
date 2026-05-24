@@ -347,7 +347,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string): Promise<User> => {
-    const response = await authClient.login({ email, password });
+    // WO-O4O-LOGIN-SERVICEKEY-FRONTEND-ALIGNMENT-V1:
+    // backend 가 service_memberships 를 검증하도록 serviceKey 를 명시.
+    // KPA-Society 미가입자는 401 SERVICE_NOT_MEMBER 로 차단된다.
+    const response = await authClient.login({ email, password, serviceKey: 'kpa-society' });
 
     if (response.success && response.user) {
       const apiUser = response.user as any;
