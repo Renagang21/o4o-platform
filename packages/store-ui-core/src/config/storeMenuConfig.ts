@@ -252,14 +252,21 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
     // 채널 — 매장 운영 기능 (채널 관리 / 태블릿 / 상담 요청).
     // 태블릿: 매장 내 interactive device. 매장당 복수 tablet 전제.
     //         (idle playlist 연결은 후속 WO에서 도입)
-    // WO-O4O-KPA-STORE-SIDEBAR-PRODUCTION-MENU-REMOVE-V1:
-    //   POP / QR 코드 / 블로그 / 상품 상세설명 / 상품 정보 제작 메뉴 제거.
-    //   제작 진입은 후속 WO에서 "내 자료함 > 매장 제작 자료" 모달로 통합 예정.
-    //   라우트는 유지 (App.tsx 변경 없음, deep-link 호환).
     { label: '채널', items: [
       { key: 'channels',         label: '채널 관리', subPath: '/channels' },
       { key: 'tablet-displays',  label: '태블릿',    subPath: '/commerce/tablet-displays' },
       { key: 'requests',         label: '상담 요청', subPath: '/requests' },
+    ]},
+    // 매장 실행 — Store Menu Canonical 의 실행 자산 진입점.
+    // WO-O4O-KPA-STORE-MENU-BLOG-POP-QR-ALIGNMENT-V1 (2026-05-24):
+    //   기존 WO-O4O-KPA-STORE-SIDEBAR-PRODUCTION-MENU-REMOVE-V1 의 "내 자료함 > 매장 제작 자료
+    //   모달 통합" 후속이 미완성이어서 진입점 부재 상태. 라우트/페이지/API 가 모두 존재하므로
+    //   Store Menu Canonical 정합을 위해 sidebar 직접 노출로 복원.
+    //   (운영자/HUB 측 POP/QR 신설은 별도 WO 후보 — WO-O4O-KPA-POP-PUBLISHING-V1 등.)
+    { label: '매장 실행', items: [
+      { key: 'content-blog', label: '블로그',   subPath: '/content/blog' },
+      { key: 'pop',          label: 'POP',     subPath: '/marketing/pop' },
+      { key: 'qr',           label: 'QR-code', subPath: '/marketing/qr' },
     ]},
     { label: '분석', items: [
       { key: 'analytics-marketing', label: '마케팅 분석', subPath: '/analytics/marketing' },
