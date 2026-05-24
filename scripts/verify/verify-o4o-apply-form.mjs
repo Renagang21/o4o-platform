@@ -90,6 +90,8 @@ const prefillCases = [
   { value: 'clinic',   expect: 'clinic'   },
   { value: 'dental',   expect: 'dental'   },
   { value: 'optical',  expect: 'optical'  },
+  { value: 'salon',    expect: 'salon'    },
+  { value: 'other',    expect: 'other'    },
   { value: 'unknown',  expect: ''         }, // unknown은 비어 있어야 함
 ];
 for (const c of prefillCases) {
@@ -114,6 +116,29 @@ for (const c of prefillCases) {
   const nameError = await page.locator('text=이름을 입력해 주세요.').isVisible();
   const consentError = await page.locator('text=개인정보 수집·이용에 동의해 주세요.').isVisible();
   record('3.empty 빈 form 제출 → 검증 차단', nameError && consentError ? 'PASS' : 'FAIL', { nameError, consentError });
+}
+
+// ─── Test 3.5: target page CTA → apply 진입 (6 target / 2 known + salon 신규) ───
+{
+  // SalonTargetPage 의 "내 미용실에 적용 검토" CTA href 확인
+  await page.goto(`${BASE_URL}/o4o/targets/salon`, { waitUntil: 'domcontentloaded' });
+  const salonCta = page.locator('a[href="/o4o/apply?industry=salon"]').first();
+  const salonCtaCount = await salonCta.count();
+  record('3.5.salon /o4o/targets/salon → apply CTA 존재', salonCtaCount > 0 ? 'PASS' : 'FAIL', { count: salonCtaCount });
+
+  if (salonCtaCount > 0) {
+    // 클릭 후 navigate 결과 검증
+    await salonCta.click();
+    await page.waitForURL(/\/o4o\/apply\?industry=salon/, { timeout: 10000 }).catch(() => {});
+    const finalUrl = page.url();
+    const onApply = finalUrl.includes('/o4o/apply') && finalUrl.includes('industry=salon');
+    record('3.5.salon CTA 클릭 → /o4o/apply?industry=salon 도착', onApply ? 'PASS' : 'FAIL', { finalUrl });
+
+    // 그리고 industry select 가 salon 으로 prefill
+    await page.locator('#apply-industry').waitFor({ state: 'visible', timeout: 10000 });
+    const industryValue = await page.locator('#apply-industry').inputValue();
+    record('3.5.salon prefill = salon', industryValue === 'salon' ? 'PASS' : 'FAIL', { actual: industryValue });
+  }
 }
 
 // ─── Test 4: /privacy 링크 ────────────────────────────────────────────────────
