@@ -1,36 +1,42 @@
 /**
- * HubQrLibraryPage — 매장 HUB QR 템플릿 진열 + 매장으로 가져오기
+ * HubQrLibraryPage — 매장 HUB QR 템플릿 진열 + 매장으로 가져오기 (표준 테이블)
  *
- * WO-O4O-KPA-STORE-HUB-QR-CONTENT-IMPORT-V1 (2026-05-24)
+ * WO-O4O-KPA-STORE-HUB-QR-CONTENT-IMPORT-V1 (Phase 3-B 초기 카드형)
+ * WO-O4O-KPA-STORE-HUB-IMPORT-PAGES-STANDARD-TABLE-V1 (2026-05-24):
+ *   카드형 items.map → O4O 표준 테이블. HubSignageLibraryPage / HubBlog/HubPop 패턴 mirror.
  *
  * 매장 경영자가 KPA HUB 에 진열된 운영자 발행 QR 템플릿을 보고, "가져가기" 로
  * 자기 매장 store_qr_codes 의 사본 row 로 변환·생성한다.
  *
- * 데이터 흐름:
+ * 데이터 흐름 (변경 없음):
  *   - HUB 목록: hubContentApi.list({ serviceKey='kpa', sourceDomain='qr' })
- *               → backend HubContentQueryService.queryQr
- *               → operator_qr_templates 의 author_role='operator' + status='published'
- *                 + service_key='kpa' 만 노출
- *   - 가져가기: importOperatorQr(slug, sourceId)
- *               → backend POST /stores/:slug/qr/staff/import
- *               → operator_qr_templates → store_qr_codes 변환 INSERT
- *                 (organization_id=매장id, landing_type/landing_target_id 변환)
+ *   - 단건 가져가기: importOperatorQr(slug, sourceId)
+ *     → backend POST /stores/:slug/qr/staff/import
+ *     → operator_qr_templates → store_qr_codes 변환 INSERT
+ *   - 일괄 가져가기: Promise.allSettled fan-out
+ *
+ * QR 도메인 차이 (Blog/POP 와):
+ *   - 가져간 사본은 기존 StoreQRPage (/store/marketing/qr) 에서 자동 표시
+ *     (별도 사본 관리 페이지 없음 — 매장 사본 entity 가 store_qr_codes 그대로)
+ *   - 가져갈 때 매장별 slug 가 새로 발급되며 toast 에 slug 표시
  *
  * 권한: store_owner (HubGuard + verifyOwner backend 검증).
- * 패턴: HubPopLibraryPage mirror — QR 도메인 차이로 footer hint 가 매장 사본 관리 화면이
- *   아니라 기존 StoreQRPage (/store/marketing/qr) 로 안내.
  */
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { QrCode, Loader2, AlertCircle, Download, ExternalLink } from 'lucide-react';
+import { Download, X, ExternalLink, QrCode } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
+import { ActionBar, BaseDetailDrawer, BulkResultModal } from '@o4o/ui';
+import { DataTable, useBatchAction } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { hubContentApi } from '../../api/hubContent';
 import type { HubContentItemResponse } from '@o4o/types/hub-content';
 import { getStoreSlug } from '../../api/pharmacyInfo';
 import { importOperatorQr } from '../../api/qrStaff';
 
 const SERVICE_KEY = 'kpa';
+const PAGE_LIMIT = 20;
 
 export function HubQrLibraryPage() {
   const navigate = useNavigate();
@@ -41,12 +47,15 @@ export function HubQrLibraryPage() {
   const [error, setError] = useState<string | null>(null);
   const [slug, setSlug] = useState<string | null>(null);
   const [slugResolved, setSlugResolved] = useState(false);
-  const [importingId, setImportingId] = useState<string | null>(null);
 
-  const limit = 20;
-  const totalPages = Math.ceil(total / limit);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [selectedItem, setSelectedItem] = useState<HubContentItemResponse | null>(null);
+  const [singleImporting, setSingleImporting] = useState(false);
 
-  // Resolve store slug
+  const batch = useBatchAction();
+
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
+
   useEffect(() => {
     let canceled = false;
     (async () => {
@@ -68,7 +77,6 @@ export function HubQrLibraryPage() {
     };
   }, []);
 
-  // Fetch HUB QR list
   const loadData = useCallback(async () => {
     setIsLoading(true);
     setError(null);
@@ -77,7 +85,7 @@ export function HubQrLibraryPage() {
         serviceKey: SERVICE_KEY,
         sourceDomain: 'qr',
         page,
-        limit,
+        limit: PAGE_LIMIT,
       });
       setItems(res.data ?? []);
       setTotal(res.pagination?.total ?? 0);
@@ -92,119 +100,218 @@ export function HubQrLibraryPage() {
     loadData();
   }, [loadData]);
 
-  const handleImport = async (item: HubContentItemResponse) => {
+  useEffect(() => {
+    setSelectedIds(new Set());
+  }, [page]);
+
+  const handleSingleImport = useCallback(
+    async (item: HubContentItemResponse) => {
+      if (!slug) {
+        toast.error('매장 정보를 확인할 수 없습니다');
+        return;
+      }
+      setSingleImporting(true);
+      try {
+        const result = await importOperatorQr(slug, item.id);
+        toast.success(
+          `"${result.title}" 가져오기 완료 — 내 매장 QR 에 추가되었습니다 (slug: ${result.slug})`,
+        );
+        setSelectedItem(null);
+      } catch (e: any) {
+        toast.error(e?.message || '가져오기에 실패했습니다');
+      } finally {
+        setSingleImporting(false);
+      }
+    },
+    [slug],
+  );
+
+  const batchImportItems = useCallback(
+    async (
+      ids: string[],
+    ): Promise<{ data: { results: Array<{ id: string; status: 'success' | 'failed'; error?: string }> } }> => {
+      if (!slug) {
+        return {
+          data: {
+            results: ids.map((id) => ({ id, status: 'failed' as const, error: '매장 정보 미연결' })),
+          },
+        };
+      }
+      const settled = await Promise.allSettled(ids.map((id) => importOperatorQr(slug, id)));
+      const results = settled.map((r, i) => {
+        const id = ids[i];
+        if (r.status === 'fulfilled') return { id, status: 'success' as const };
+        const err = r.reason as { message?: string } | null;
+        const msg = err?.message || 'Network error';
+        return { id, status: 'failed' as const, error: msg };
+      });
+      const successCount = results.filter((r) => r.status === 'success').length;
+      const failCount = results.filter((r) => r.status === 'failed').length;
+      if (successCount > 0) toast.success(`${successCount}개 QR 이 내 매장에 추가되었습니다`);
+      if (failCount > 0) toast.error(`${failCount}개 QR 가져오기에 실패했습니다`);
+      return { data: { results } };
+    },
+    [slug],
+  );
+
+  const handleBulkImport = useCallback(async () => {
+    if (selectedIds.size === 0) return;
     if (!slug) {
       toast.error('매장 정보를 확인할 수 없습니다');
       return;
     }
-    if (!window.confirm(`"${item.title}" QR 템플릿을 내 매장으로 가져오시겠습니까?\n매장 소유 QR-code 가 새로 발급되며, 가져온 후 내 매장 QR 화면에서 수정·출력할 수 있습니다.`)) {
-      return;
+    const ids = Array.from(selectedIds);
+    const result = await batch.executeBatch(batchImportItems, ids);
+    if (result.successCount > 0) {
+      setSelectedIds(new Set());
     }
-    setImportingId(item.id);
-    try {
-      const result = await importOperatorQr(slug, item.id);
-      toast.success(`"${result.title}" 가져오기 완료 — 내 매장 QR 에 추가되었습니다 (slug: ${result.slug})`);
-    } catch (e: any) {
-      toast.error(e?.message || '가져오기에 실패했습니다');
-    } finally {
-      setImportingId(null);
-    }
-  };
+  }, [selectedIds, slug, batch, batchImportItems]);
+
+  const columns: ListColumnDef<HubContentItemResponse>[] = useMemo(
+    () => [
+      {
+        key: 'title',
+        header: '제목',
+        sortable: true,
+        sortAccessor: (item) => item.title,
+        render: (_v, item) => (
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-7 h-7 rounded flex items-center justify-center bg-slate-100 shrink-0 text-slate-400">
+              <QrCode className="w-3.5 h-3.5" />
+            </div>
+            <span className="font-medium text-slate-800 text-sm truncate">{item.title}</span>
+          </div>
+        ),
+      },
+      {
+        key: 'producer',
+        header: '출처',
+        width: '100px',
+        render: () => (
+          <span className="inline-flex items-center px-2 py-0.5 text-xs rounded-full border bg-blue-50 border-blue-200 text-blue-700">
+            운영자 자료
+          </span>
+        ),
+      },
+      {
+        key: 'description',
+        header: '요약',
+        render: (_v, item) => (
+          <span className="text-xs text-slate-500 line-clamp-1">{item.description || '-'}</span>
+        ),
+      },
+      {
+        key: 'createdAt',
+        header: '게시일',
+        width: '110px',
+        sortable: true,
+        sortAccessor: (item) => new Date(item.createdAt).getTime(),
+        render: (_v, item) => (
+          <span className="text-xs text-slate-500">
+            {new Date(item.createdAt).toLocaleDateString('ko-KR')}
+          </span>
+        ),
+      },
+    ],
+    [],
+  );
 
   return (
-    <div className="space-y-6 max-w-5xl">
-      {/* Header */}
-      <div>
-        <h1 className="text-xl font-bold text-slate-800">매장 HUB QR-code</h1>
-        <p className="text-sm text-slate-500 mt-1">
-          KPA 운영자가 발행한 QR 템플릿입니다. "가져가기" 로 내 매장 QR-code 를 새로 발급하고,
-          내 매장 QR 화면에서 수정·출력·통계를 활용할 수 있습니다. 가져온 QR 은 매장 소유이며,
-          slug 와 PNG 가 매장별로 별도 발급됩니다.
+    <div className="max-w-7xl mx-auto px-6 py-8">
+      <header className="mb-6 pb-5 border-b-2 border-slate-200">
+        <h1 className="text-2xl font-bold text-slate-900">매장 HUB QR-code</h1>
+        <p className="mt-1.5 text-sm text-slate-500">
+          KPA 운영자가 발행한 QR 템플릿입니다. 선택해 일괄 가져가기 또는 행 클릭으로 단건 가져가기를 할 수 있습니다.
+          가져갈 때 매장별 slug 가 새로 발급되며, 매장 소유 QR-code 가 됩니다.
         </p>
-      </div>
+      </header>
 
-      {/* No store hint */}
       {slugResolved && !slug && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-800">
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-800 mb-4">
           매장 정보가 연결되지 않아 가져가기 기능을 사용할 수 없습니다. 매장 등록 후 다시 시도해 주세요.
         </div>
       )}
 
-      {/* Content */}
-      {error ? (
-        <div className="flex flex-col items-center justify-center py-16 gap-3 text-slate-500">
-          <AlertCircle className="w-8 h-8 text-red-400" />
-          <p className="text-sm">{error}</p>
+      {error && (
+        <div className="text-center py-16 text-red-600 text-sm">
+          <p>{error}</p>
+          <button
+            onClick={() => loadData()}
+            className="mt-3 px-4 py-1.5 text-xs text-blue-600 border border-blue-400 rounded-lg hover:bg-blue-50"
+          >
+            다시 시도
+          </button>
         </div>
-      ) : isLoading ? (
-        <div className="flex items-center justify-center py-16">
-          <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
-        </div>
-      ) : items.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 gap-3">
-          <QrCode className="w-10 h-10 text-slate-300" />
-          <p className="text-sm text-slate-400">아직 운영자 발행 QR 템플릿이 없습니다</p>
-        </div>
-      ) : (
+      )}
+
+      {!error && (
         <>
-          <div className="space-y-3">
-            {items.map((item) => (
-              <div
-                key={item.id}
-                className="bg-white rounded-xl border border-slate-100 p-4 flex items-center gap-4 hover:border-slate-200 transition-colors"
-              >
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-sm font-semibold text-slate-800 truncate">
-                      {item.title}
-                    </h3>
-                    <span className="px-2 py-0.5 rounded-full text-xs bg-blue-50 text-blue-700">
-                      운영자 자료
-                    </span>
-                  </div>
-                  {item.description && (
-                    <p className="text-xs text-slate-500 mt-1 line-clamp-2">{item.description}</p>
-                  )}
-                  <div className="flex items-center gap-2 mt-1 text-xs text-slate-400">
-                    <span>{new Date(item.createdAt).toLocaleDateString('ko-KR')} 게시</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1 shrink-0">
-                  <button
-                    onClick={() => handleImport(item)}
-                    disabled={!slug || importingId !== null}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
-                    title={slug ? '내 매장으로 가져가기' : '매장 정보 미연결'}
-                  >
-                    {importingId === item.id ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <Download className="w-4 h-4" />
-                    )}
-                    가져가기
-                  </button>
-                </div>
-              </div>
-            ))}
+          <div className="mb-3">
+            <ActionBar
+              selectedCount={selectedIds.size}
+              onClearSelection={() => setSelectedIds(new Set())}
+              actions={[
+                {
+                  key: 'bulk-import',
+                  label: `내 매장에 가져가기 (${selectedIds.size})`,
+                  onClick: handleBulkImport,
+                  variant: 'primary' as const,
+                  icon: <Download className="w-3.5 h-3.5" />,
+                  loading: batch.loading,
+                  group: 'actions',
+                  tooltip: '선택한 QR 템플릿을 내 매장 QR-code 로 일괄 가져갑니다',
+                  visible: selectedIds.size > 0,
+                  disabled: !slug,
+                },
+                {
+                  key: 'clear',
+                  label: '선택 해제',
+                  onClick: () => setSelectedIds(new Set()),
+                  variant: 'default' as const,
+                  icon: <X className="w-3.5 h-3.5" />,
+                  group: 'meta',
+                  visible: selectedIds.size > 0,
+                },
+              ]}
+            />
           </div>
 
-          {/* Pagination */}
+          <BulkResultModal
+            open={batch.showResult}
+            onClose={() => batch.clearResult()}
+            result={batch.result}
+            onRetry={() => batch.retryFailed()}
+          />
+
+          <DataTable<HubContentItemResponse>
+            columns={columns}
+            data={items}
+            rowKey="id"
+            loading={isLoading}
+            emptyMessage="아직 운영자 발행 QR 템플릿이 없습니다"
+            tableId="store-hub-qr"
+            selectable
+            selectedKeys={selectedIds}
+            onSelectionChange={setSelectedIds}
+            onRowClick={(row) => setSelectedItem(row)}
+          />
+
           {totalPages > 1 && (
-            <div className="flex justify-center gap-2">
+            <div className="flex items-center justify-center gap-4 mt-4">
               <button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page <= 1}
-                className="px-3 py-1.5 rounded-lg border border-slate-200 text-sm text-slate-600 disabled:opacity-40"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                className="px-3 py-1.5 text-sm border border-slate-300 rounded-md disabled:opacity-40 hover:bg-slate-50"
               >
                 이전
               </button>
-              <span className="px-3 py-1.5 text-sm text-slate-500">
+              <span className="text-sm text-slate-500">
                 {page} / {totalPages}
               </span>
               <button
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page >= totalPages}
-                className="px-3 py-1.5 rounded-lg border border-slate-200 text-sm text-slate-600 disabled:opacity-40"
+                onClick={() => setPage((p) => p + 1)}
+                className="px-3 py-1.5 text-sm border border-slate-300 rounded-md disabled:opacity-40 hover:bg-slate-50"
               >
                 다음
               </button>
@@ -213,10 +320,9 @@ export function HubQrLibraryPage() {
         </>
       )}
 
-      {/* Footer hint — 가져간 QR 관리 위치 (기존 StoreQRPage) */}
       {slug && items.length > 0 && (
-        <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 text-sm text-slate-600 flex items-center gap-2">
-          <ExternalLink className="w-4 h-4 text-slate-400" />
+        <div className="flex items-start gap-3 mt-8 p-5 bg-blue-50/60 border border-blue-100 rounded-xl text-sm text-slate-600 leading-relaxed">
+          <ExternalLink className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
           <span>
             가져온 QR 은{' '}
             <button
@@ -229,6 +335,49 @@ export function HubQrLibraryPage() {
           </span>
         </div>
       )}
+
+      <BaseDetailDrawer
+        open={!!selectedItem}
+        onClose={() => setSelectedItem(null)}
+        title={selectedItem?.title ?? ''}
+        width={480}
+        actions={
+          selectedItem
+            ? [
+                {
+                  label: singleImporting ? '가져오는 중...' : '내 매장에 가져가기',
+                  onClick: () => handleSingleImport(selectedItem),
+                  variant: 'primary' as const,
+                  disabled: !slug || singleImporting,
+                },
+              ]
+            : []
+        }
+      >
+        {selectedItem && (
+          <div className="space-y-4 p-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="inline-flex items-center px-2 py-0.5 text-xs rounded-full border bg-blue-50 border-blue-200 text-blue-700">
+                운영자 자료
+              </span>
+            </div>
+            {selectedItem.description && (
+              <p className="text-sm text-slate-600 leading-relaxed">{selectedItem.description}</p>
+            )}
+            <dl className="space-y-2 text-sm">
+              <div className="flex gap-3">
+                <dt className="w-20 text-slate-400 shrink-0">게시일</dt>
+                <dd className="text-slate-700">
+                  {new Date(selectedItem.createdAt).toLocaleDateString('ko-KR')}
+                </dd>
+              </div>
+            </dl>
+            <p className="text-xs text-slate-400 mt-3">
+              가져갈 때 매장별 slug 가 새로 발급되며, 매장 사본 QR 은 매장 소유로 자유롭게 수정·출력할 수 있습니다.
+            </p>
+          </div>
+        )}
+      </BaseDetailDrawer>
     </div>
   );
 }
