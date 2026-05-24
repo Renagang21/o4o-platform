@@ -29,7 +29,7 @@ import {
   NETURE_CONTEXTUAL_NAV,
   filterContextualNav,
 } from '../config/navigation';
-import { getNetureDashboardRoute, getNetureRoleLabel } from '../config/dashboard';
+import { getNetureDashboardRoute } from '../config/dashboard';
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function getUserDisplayName(user: any): string {
@@ -66,8 +66,6 @@ export function NetureGlobalHeader() {
   const dashboardPath = hasDashboardRole && user?.roles
     ? getNetureDashboardRoute(user.roles)
     : '/';
-  // 우선순위 기반 라벨 — roles[0]만 보면 Operator에게도 '사용자'가 표시될 수 있음
-  const roleLabel = getNetureRoleLabel(user?.roles);
 
   // WO-O4O-COMMON-MENU-VISIBILITY-POLICY-IMPL-V1: operator/admin은 모든 메뉴를 본다
   const contextualNav = filterContextualNav(NETURE_CONTEXTUAL_NAV, {
@@ -115,15 +113,23 @@ export function NetureGlobalHeader() {
       }
       userMenuItems={
         <>
-          {/* WO-O4O-OPERATOR-MENU-COMMONIZATION-V1: 운영자·관리자는 전용 라벨, 그 외는 동적 라벨 */}
+          {/* WO-O4O-NETURE-SUPPLIER-DASHBOARD-ENTRY-AND-MEMBER-LIST-CLEANUP-V1:
+              역할 동시 보유 사용자(operator + supplier 등)도 각 대시보드에
+              개별 진입할 수 있도록 항목을 역할별로 분리. 각 항목은 자기 역할의
+              canonical route 로 직접 연결. */}
           {isOperator && (
             <GlobalHeaderMenuItem to={dashboardPath} icon={<Shield className="w-4 h-4" />}>
               운영 대시보드
             </GlobalHeaderMenuItem>
           )}
-          {!isOperator && (isSupplier || isPartner) && (
-            <GlobalHeaderMenuItem to={dashboardPath} icon={<LayoutDashboard className="w-4 h-4" />}>
-              {roleLabel} 대시보드
+          {isSupplier && (
+            <GlobalHeaderMenuItem to="/supplier/dashboard" icon={<LayoutDashboard className="w-4 h-4" />}>
+              공급자 대시보드
+            </GlobalHeaderMenuItem>
+          )}
+          {isPartner && (
+            <GlobalHeaderMenuItem to="/partner/dashboard" icon={<LayoutDashboard className="w-4 h-4" />}>
+              파트너 대시보드
             </GlobalHeaderMenuItem>
           )}
           <GlobalHeaderMenuItem to="/mypage" icon={<LayoutDashboard className="w-4 h-4" />}>

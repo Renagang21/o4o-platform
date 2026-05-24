@@ -39,7 +39,6 @@ import {
   MemberListLayout,
   StatusBadge,
   RoleBadge,
-  ServiceBadge,
   defineActionPolicy,
   buildRowActions,
   useBatchAction,
@@ -108,6 +107,35 @@ function getPrimaryRole(u: UserData): string {
   const netureMembership = u.memberships?.find(m => m.serviceKey === 'neture');
   if (netureMembership?.role) return NETURE_ROLE_DISPLAY[netureMembership.role] || netureMembership.role;
   return 'user';
+}
+
+// WO-O4O-NETURE-SUPPLIER-DASHBOARD-ENTRY-AND-MEMBER-LIST-CLEANUP-V1:
+// 회원 리스트에 노출하던 "서비스" 컬럼을 "대시보드 접근" 으로 교체.
+// Neture 회원 관리는 Neture-scoped 이므로 다른 서비스의 멤버십을 같이 표시할 이유가 없다.
+// 대신 이 사용자가 Neture 안에서 어떤 대시보드에 진입 가능한지를 표시한다.
+// 판정 소스: user.roles (platform/neture 역할 배열) + Neture membership.role 결합.
+function getDashboardAccessLabels(u: UserData): string[] {
+  const tokens = new Set<string>([
+    ...(u.roles ?? []),
+    ...(u.role ? [u.role] : []),
+    ...(u.memberships ?? [])
+      .filter(m => m.serviceKey === 'neture')
+      .map(m => m.role),
+  ]);
+  const labels: string[] = [];
+  if (tokens.has('platform:super_admin') || tokens.has('neture:admin') || tokens.has('admin')) {
+    labels.push('관리자 대시보드');
+  }
+  if (tokens.has('neture:operator') || tokens.has('operator')) {
+    labels.push('운영 대시보드');
+  }
+  if (tokens.has('neture:supplier') || tokens.has('supplier')) {
+    labels.push('공급자 대시보드');
+  }
+  if (tokens.has('neture:partner') || tokens.has('partner')) {
+    labels.push('파트너 대시보드');
+  }
+  return labels;
 }
 
 const ROLE_TAB_FILTER: Record<string, string[]> = {
@@ -505,18 +533,27 @@ export default function UsersManagementPage() {
       render: (_v, user) => <RoleBadge role={getPrimaryRole(user)} />,
     },
     {
-      key: 'services',
-      header: '서비스',
-      width: '150px',
-      render: (_v, user) => (
-        <div className="flex flex-wrap gap-1">
-          {user.memberships && user.memberships.length > 0 ? (
-            user.memberships.map((m) => <ServiceBadge key={m.id} serviceKey={m.serviceKey} />)
-          ) : (
-            <span className="text-xs text-slate-400">-</span>
-          )}
-        </div>
-      ),
+      key: 'dashboardAccess',
+      header: '대시보드 접근',
+      width: '200px',
+      render: (_v, user) => {
+        const labels = getDashboardAccessLabels(user);
+        if (labels.length === 0) {
+          return <span className="text-xs text-slate-400">접근 불가</span>;
+        }
+        return (
+          <div className="flex flex-wrap gap-1">
+            {labels.map((label) => (
+              <span
+                key={label}
+                className="px-1.5 py-0.5 rounded text-xs bg-slate-100 text-slate-700"
+              >
+                {label}
+              </span>
+            ))}
+          </div>
+        );
+      },
     },
     {
       key: 'createdAt',
