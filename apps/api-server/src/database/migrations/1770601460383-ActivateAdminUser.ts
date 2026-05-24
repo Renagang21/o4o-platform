@@ -31,8 +31,25 @@ export class ActivateAdminUser1770601460383 implements MigrationInterface {
         `);
 
         if (!existingUser || existingUser.length === 0) {
-            // Hash password: 3Lz157727791!
-            const hashedPassword = await bcrypt.hash('3Lz157727791!', 10);
+            // WO-O4O-SUPER-ADMIN-CREDENTIAL-HARDCODE-REMOVAL-V1 (2026-05-24):
+            //   평문 비밀번호 hardcoding 제거. 새 환경에서 sohae2100 super-admin 자동 생성 시
+            //   process.env.SUPER_ADMIN_BOOTSTRAP_PASSWORD 환경변수로 평문 주입.
+            //
+            //   환경변수 미설정 시 INSERT skip — 본 migration 은 이미 production 에 적용된
+            //   상태이며 TypeORM 이 재실행하지 않으므로 기존 환경에는 무영향. 새 환경 bootstrap
+            //   시에만 환경변수 필요.
+            //
+            //   ⚠️ 기존 git history 에는 평문이 남아 있으므로 운영 super-admin 비밀번호 회전 필수.
+            const bootstrapPassword = process.env.SUPER_ADMIN_BOOTSTRAP_PASSWORD;
+            if (!bootstrapPassword) {
+                console.log(
+                    '[Migration] SUPER_ADMIN_BOOTSTRAP_PASSWORD not set — sohae2100 INSERT skipped. ' +
+                    '기존 환경에 영향 없음 (본 migration 은 이미 적용된 환경에서는 재실행되지 않음).',
+                );
+                return;
+            }
+
+            const hashedPassword = await bcrypt.hash(bootstrapPassword, 10);
 
             await queryRunner.query(`
                 INSERT INTO users (
@@ -54,7 +71,7 @@ export class ActivateAdminUser1770601460383 implements MigrationInterface {
                 )
             `, [hashedPassword]);
 
-            console.log('[Migration] Created sohae2100@gmail.com admin account');
+            console.log('[Migration] Created sohae2100@gmail.com admin account (password from env)');
         } else {
             // User exists, ensure it's active
             await queryRunner.query(`
