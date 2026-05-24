@@ -6,6 +6,7 @@ export { PasswordChangeModal } from './components/PasswordChangeModal.js';
 export { QuickActionsSection } from './components/QuickActionsSection.js';
 export { MyPageNavigation } from './components/MyPageNavigation.js';
 export { MyPageLayout } from './components/MyPageLayout.js';
+export type { MyPageBreadcrumbItem, MyPageLayoutWidth } from './components/MyPageLayout.js';
 export { SettingsSection } from './components/SettingsSection.js';
 export { GlobalUserProfileDropdown } from './components/GlobalUserProfileDropdown.js';
 export type { MyPageNavItem } from './components/MyPageNavigation.js';

@@ -22,6 +22,7 @@ import {
   ArrowRight,
   BarChart3,
   Users,
+  MessageSquare,
 } from 'lucide-react';
 import { useAuth, getNetureDashboardRoute, getNetureRoleLabel } from '../../contexts';
 import { useLoginModal } from '../../contexts/LoginModalContext';
@@ -103,7 +104,11 @@ export default function MyPageHub() {
   };
 
   return (
-    <MyPageLayout title="마이페이지" subtitle="주요 작업을 빠르게 시작하세요">
+    <MyPageLayout
+      title="마이페이지"
+      subtitle="주요 작업을 빠르게 시작하세요"
+      breadcrumb={[{ label: '홈', href: '/' }, { label: '마이페이지' }]}
+    >
       {/* Compact Greeting Bar */}
       <div className="bg-white rounded-2xl shadow-sm p-5 mb-4">
         <div className="flex items-center justify-between">
@@ -163,13 +168,21 @@ export default function MyPageHub() {
       )}
 
       {/* Navigation Cards */}
-      <div className="grid grid-cols-2 gap-3 mb-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
         <Link
           to="/mypage/profile"
           className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm hover:bg-gray-50 transition-colors"
         >
           <UserCog className="w-5 h-5 text-primary-500" />
           <span className="text-sm font-medium text-gray-700 flex-1">프로필 편집</span>
+          <ChevronRight className="w-4 h-4 text-gray-300" />
+        </Link>
+        <Link
+          to="/forum"
+          className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm hover:bg-gray-50 transition-colors"
+        >
+          <MessageSquare className="w-5 h-5 text-primary-500" />
+          <span className="text-sm font-medium text-gray-700 flex-1">포럼</span>
           <ChevronRight className="w-4 h-4 text-gray-300" />
         </Link>
         <Link

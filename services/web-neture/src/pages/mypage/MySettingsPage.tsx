@@ -72,7 +72,11 @@ export default function MySettingsPage() {
   };
 
   return (
-    <MyPageLayout title="마이페이지" subtitle="계정 보안 및 환경 설정을 관리합니다">
+    <MyPageLayout
+      title="마이페이지"
+      subtitle="계정 보안 및 환경 설정을 관리합니다"
+      breadcrumb={[{ label: '홈', href: '/' }, { label: '마이페이지', href: '/mypage' }, { label: '설정' }]}
+    >
       <SettingsSection title="보안 설정">
         <button
           onClick={() => setShowPasswordModal(true)}
