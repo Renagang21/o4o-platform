@@ -31,8 +31,13 @@ export type HubVisibility = 'global' | 'service' | 'store';
  *   'pop' 추가 — Phase 1 Backend Foundation. queryPop 는 placeholder. 운영자 → HUB →
  *   매장 흐름의 실 구현은 Phase 2 후속. Blog 의 store_blog_posts 와 동일하게 별도
  *   store_pops entity 보유 (IR-O4O-KPA-POP-STRUCTURE-AND-MENU-AUDIT-V1 Option C).
+ * WO-O4O-KPA-OPERATOR-HUB-QR-TEMPLATE-FOUNDATION-V1 (2026-05-24):
+ *   'qr' 추가 — Phase 1 Backend Foundation. queryQr 는 placeholder. 운영자 발행 QR 은
+ *   slug 미발급 "템플릿" 이며 (operator_qr_templates entity 신설) 매장 가져가기 시 기존
+ *   store_qr_codes 에 매장 사본 INSERT (IR-O4O-KPA-OPERATOR-HUB-QR-BUSINESS-DEFINITION-V1
+ *   Option B 채택). 실 구현은 Phase 2 후속.
  */
-export type HubSourceDomain = 'cms' | 'signage-media' | 'signage-playlist' | 'blog' | 'pop';
+export type HubSourceDomain = 'cms' | 'signage-media' | 'signage-playlist' | 'blog' | 'pop' | 'qr';
 
 // =============================================================================
 // API Response DTOs
@@ -104,4 +109,5 @@ export const HUB_SOURCE_DOMAIN_LABELS: Record<HubSourceDomain, string> = {
   'signage-playlist': '사이니지 플레이리스트',
   blog: '블로그',
   pop: 'POP',
+  qr: 'QR-code',
 };

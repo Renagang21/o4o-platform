@@ -43,6 +43,30 @@ export class KpaAssetResolver implements ContentResolver {
     if (assetType === 'pop') {
       return this.resolvePop(sourceAssetId);
     }
+    if (assetType === 'qr') {
+      return this.resolveQr(sourceAssetId);
+    }
+    return null;
+  }
+
+  /**
+   * WO-O4O-KPA-OPERATOR-HUB-QR-TEMPLATE-FOUNDATION-V1 Phase 1 Backend Foundation (2026-05-24)
+   *
+   * Phase 1 — placeholder. 항상 null 반환.
+   *
+   * operator_qr_templates entity 는 신설됐으나 (IR-O4O-KPA-OPERATOR-HUB-QR-BUSINESS-DEFINITION-V1
+   * Option B) 실 resolver 구현 (id + author_role='operator' AND status='published' 조건 +
+   * target_type/target_url/target_content_* contentJson 매핑) 은 Phase 2 후속.
+   *
+   * 본 단계는 assetType='qr' 호출이 allowedAssetTypes 통과 후 resolver 분기까지 도달하되
+   * 항상 null 반환 → AssetCopyService 가 SOURCE_NOT_FOUND 로 처리.
+   *
+   * 본 trace 결정 사항: QR 의 매장 가져가기는 자료함 사본 (asset-snapshot copy) 흐름이 아니라
+   * 직접 import endpoint (Phase 3-B 의 /stores/:slug/qr/staff/import) 가 채택될 가능성 높음
+   * (변환 흐름: operator_qr_templates → store_qr_codes INSERT). 본 resolver 는 자료함 통합
+   * 옵션을 위해 미리 골격만 등록.
+   */
+  private async resolveQr(_id: string): Promise<ResolvedContent | null> {
     return null;
   }
 

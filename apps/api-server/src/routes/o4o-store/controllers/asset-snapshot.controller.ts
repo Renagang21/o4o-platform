@@ -76,6 +76,11 @@ export function createAssetSnapshotController(
     //   store_pops entity 는 신설됐으나 resolvePop 은 null 반환 — Phase 2 후속에서 실 구현.
     //   외부 caller 가 'pop' assetType 으로 요청 시 controller 통과하되 source 미발견
     //   (SOURCE_NOT_FOUND) 으로 처리된다.
-    allowedAssetTypes: ['cms', 'signage', 'lesson', 'content', 'resource', 'blog', 'pop'],
+    // WO-O4O-KPA-OPERATOR-HUB-QR-TEMPLATE-FOUNDATION-V1 Phase 1 (2026-05-24): 'qr' assetType 등록 (Phase 1 Placeholder).
+    //   operator_qr_templates entity 신설됐으나 resolveQr 은 null 반환 — Phase 2 후속.
+    //   QR 은 본 trace 에서는 자료함 사본 흐름 (asset-snapshot copy) 대신 직접 import endpoint
+    //   (Phase 3-B 의 /stores/:slug/qr/staff/import) 가 채택될 가능성 높음. allowedAssetTypes
+    //   등록은 추후 자료함 통합 시 옵션으로 열어두는 의미.
+    allowedAssetTypes: ['cms', 'signage', 'lesson', 'content', 'resource', 'blog', 'pop', 'qr'],
   });
 }

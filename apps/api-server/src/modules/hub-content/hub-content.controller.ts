@@ -18,7 +18,11 @@ const VALID_PRODUCERS: string[] = ['operator', 'supplier', 'community'];
 // WO-O4O-KPA-POP-OPERATOR-PUBLISHING-V1 Phase 1 (2026-05-24): 'pop' 추가.
 //   Phase 1 Backend Foundation — service.ts 의 queryPop placeholder + asset-snapshot
 //   allowedAssetTypes 'pop' 등록. 실 구현은 Phase 2 후속.
-const VALID_DOMAINS: string[] = ['cms', 'signage-media', 'signage-playlist', 'blog', 'pop'];
+// WO-O4O-KPA-OPERATOR-HUB-QR-TEMPLATE-FOUNDATION-V1 (2026-05-24): 'qr' 추가.
+//   Phase 1 Backend Foundation — service.ts 의 queryQr placeholder + asset-snapshot
+//   allowedAssetTypes 'qr' 등록. 실 구현은 Phase 2 후속. operator_qr_templates entity
+//   기반 — 매장 가져가기 시 기존 store_qr_codes 에 매장 사본 INSERT (Phase 3-B).
+const VALID_DOMAINS: string[] = ['cms', 'signage-media', 'signage-playlist', 'blog', 'pop', 'qr'];
 
 export function createHubContentRouter(dataSource: DataSource): Router {
   const router = Router();

@@ -110,6 +110,8 @@ export class HubContentQueryService {
         return this.queryBlog(serviceKey, producer, page, limit);
       case 'pop':
         return this.queryPop(serviceKey, producer, page, limit);
+      case 'qr':
+        return this.queryQr(serviceKey, producer, page, limit);
       // (제거됨) case 'kpa-store-content' — WO-O4O-REMOVE-STORE-TO-COMMUNITY-SHARE-FLOW-V1.
       // Store → Community 공유 흐름 폐기로 store-shared 콘텐츠는 HUB 에 노출되지 않는다.
       default:
@@ -567,6 +569,30 @@ export class HubContentQueryService {
       thumbnailUrl: null,
       createdAt: createdAtRaw instanceof Date ? createdAtRaw.toISOString() : String(createdAtRaw),
       authorRole: 'operator',
+    };
+  }
+
+  // ── QR (Phase 1 Foundation — Placeholder) ──
+  //
+  // WO-O4O-KPA-OPERATOR-HUB-QR-TEMPLATE-FOUNDATION-V1 Phase 1 (2026-05-24):
+  //   Foundation only — operator_qr_templates entity / migration / HUB sourceDomain 'qr' /
+  //   asset-snapshot allowedAssetTypes 'qr' / 본 placeholder query + resolveQr placeholder.
+  //   실 구현 (author_role='operator' AND status='published' 필터 + service_key 격리 +
+  //   target_type='url'|'content' 매핑) 은 Phase 2 후속. POP 의 queryPop 패턴 mirror 예정.
+  //
+  // 본 Phase 1 단계는 sourceDomain='qr' 호출이 controller 400 차단 없이 service 까지 도달하되
+  // 빈 응답 반환. operator_qr_templates 은 운영자 발행 "템플릿" 이며, 매장 가져가기 시 기존
+  // store_qr_codes 에 매장 사본 INSERT 가 일어남 (Phase 3-B).
+  private async queryQr(
+    _serviceKey: string,
+    _producer: HubProducer | undefined,
+    page: number,
+    limit: number,
+  ): Promise<HubContentListResponse> {
+    return {
+      success: true,
+      data: [],
+      pagination: { page, limit, total: 0, totalPages: 0 },
     };
   }
 
