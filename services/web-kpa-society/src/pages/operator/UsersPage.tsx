@@ -309,6 +309,10 @@ export default function UsersPage() {
       const params = new URLSearchParams();
       params.set('page', String(page));
       params.set('limit', '20');
+      // WO-O4O-OPERATOR-MEMBERS-FRONTEND-SERVICEKEY-ALIGNMENT-V1:
+      //   platform admin 분기 (F6 Boundary Policy) 에서 serviceKey 가 없으면
+      //   PLATFORM_ADMIN_SCOPE_REQUIRED 400 — 명시적으로 전달.
+      params.set('serviceKey', 'kpa-society');
       if (tab === 'pending') {
         params.set('status', 'pending');
       } else if (statusFilter) {
@@ -328,7 +332,8 @@ export default function UsersPage() {
 
   const fetchStats = useCallback(async () => {
     try {
-      const data = await apiFetch<any>('/api/v1/operator/members/stats');
+      // WO-O4O-OPERATOR-MEMBERS-FRONTEND-SERVICEKEY-ALIGNMENT-V1: serviceKey 명시 (위 fetchUsers 와 동일 사유).
+      const data = await apiFetch<any>('/api/v1/operator/members/stats?serviceKey=kpa-society');
       const byStatus = data.statistics?.byStatus || [];
       const getCount = (s: string) => byStatus.find((b: any) => b.status === s)?.count || 0;
       setStats({
