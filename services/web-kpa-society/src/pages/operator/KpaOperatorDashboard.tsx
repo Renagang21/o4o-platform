@@ -61,7 +61,8 @@ export default function KpaOperatorDashboard() {
         apiClient.get('/members', { status: 'pending', pageSize: 1 }),
         apiClient.get('/pharmacy-requests/pending', { limit: 1 }),
         // WO-O4O-STORE-HUB-OPERATOR-INTEGRATION-V1: Store stats
-        fetch(`${PLATFORM_API_BASE}/api/v1/operator/stores?limit=1`, { headers: storeHeaders }).then(r => r.ok ? r.json() : null),
+        // WO-O4O-OPERATOR-CONSOLE-SERVICEKEY-ALIGNMENT-V1: serviceKey 명시 (F6 Boundary Policy platform admin 400 차단).
+        fetch(`${PLATFORM_API_BASE}/api/v1/operator/stores?limit=1&serviceKey=kpa-society`, { headers: storeHeaders }).then(r => r.ok ? r.json() : null),
         // WO-KPA-A-OPERATOR-DASHBOARD-REFINE-V1: 상품 신청 통계
         apiClient.get('/operator/product-applications/stats'),
       ];

@@ -75,6 +75,10 @@ export default function ProductsPage() {
         limit: '20',
         sortBy: 'createdAt',
         sortOrder: 'DESC',
+        // WO-O4O-OPERATOR-CONSOLE-SERVICEKEY-ALIGNMENT-V1:
+        // F6 Boundary Policy platform admin 분기에서 serviceKey 가 없으면
+        // PLATFORM_ADMIN_SCOPE_REQUIRED 400 — 명시적으로 전달.
+        serviceKey: 'k-cosmetics',
       });
       if (searchTerm) params.set('search', searchTerm);
 

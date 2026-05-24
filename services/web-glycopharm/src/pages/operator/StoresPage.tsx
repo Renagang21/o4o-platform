@@ -42,6 +42,10 @@ const glycoStoresApi: StoresApi = {
     if (params.sortBy) qs.set('sortBy', params.sortBy);
     if (params.sortOrder) qs.set('sortOrder', params.sortOrder);
     if (params.search) qs.set('search', params.search);
+    // WO-O4O-OPERATOR-CONSOLE-SERVICEKEY-ALIGNMENT-V1:
+    // F6 Boundary Policy platform admin 분기에서 serviceKey 가 없으면
+    // PLATFORM_ADMIN_SCOPE_REQUIRED 400 — 명시적으로 전달.
+    qs.set('serviceKey', 'glycopharm');
     return apiFetch<StoresListResponse>(`/api/v1/operator/stores?${qs.toString()}`);
   },
   getStore: (id) => apiFetch(`/api/v1/operator/stores/${id}`),
