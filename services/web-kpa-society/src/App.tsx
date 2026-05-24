@@ -149,6 +149,10 @@ const GuideFeatureStorePage = lazy(() => import('./pages/guide/GuideFeatureStore
 const GuideFeatureLmsPage = lazy(() => import('./pages/guide/GuideFeatureLmsPage').then(m => ({ default: m.GuideFeatureLmsPage })));
 // WO-O4O-KPA-GUIDE-SURVEY-MANUAL-NEW-V1
 const GuideFeatureSurveyPage = lazy(() => import('./pages/guide/GuideFeatureSurveyPage').then(m => ({ default: m.GuideFeatureSurveyPage })));
+// WO-O4O-KPA-GUIDE-FOR-ROLE-V1: 역할별 Value Guide
+const GuideForStoreOwnerPage = lazy(() => import('./pages/guide/GuideForStoreOwnerPage').then(m => ({ default: m.GuideForStoreOwnerPage })));
+const GuideForOperatorPage = lazy(() => import('./pages/guide/GuideForOperatorPage').then(m => ({ default: m.GuideForOperatorPage })));
+const GuideForMemberPage = lazy(() => import('./pages/guide/GuideForMemberPage').then(m => ({ default: m.GuideForMemberPage })));
 
 // Community Home (WO-KPA-COMMUNITY-HOME-V1)
 import { CommunityHomePage } from './pages/CommunityHomePage';
@@ -602,6 +606,10 @@ function App() {
           <Route path="/guide/features/lms" element={<Layout serviceName={SERVICE_NAME}><GuideFeatureLmsPage /></Layout>} />
           {/* WO-O4O-KPA-GUIDE-SURVEY-MANUAL-NEW-V1 */}
           <Route path="/guide/features/survey" element={<Layout serviceName={SERVICE_NAME}><GuideFeatureSurveyPage /></Layout>} />
+          {/* WO-O4O-KPA-GUIDE-FOR-ROLE-V1: 역할별 Value Guide */}
+          <Route path="/guide/for/store-owner" element={<Layout serviceName={SERVICE_NAME}><GuideForStoreOwnerPage /></Layout>} />
+          <Route path="/guide/for/operator" element={<Layout serviceName={SERVICE_NAME}><GuideForOperatorPage /></Layout>} />
+          <Route path="/guide/for/member" element={<Layout serviceName={SERVICE_NAME}><GuideForMemberPage /></Layout>} />
 
           {/* Service Detail Pages (WO-KPA-HOME-SERVICE-SECTION-V1) */}
           <Route path="/services/branch" element={<Navigate to="/" replace />} />

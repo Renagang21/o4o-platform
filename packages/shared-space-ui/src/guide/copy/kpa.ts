@@ -72,6 +72,18 @@ export const kpaGuideIntroProps: GuideIntroPageProps = {
         { label: '정보 기반 판매', detail: '약사의 전문 지식이 콘텐츠로 전환되어 매장 신뢰도와 매출을 높입니다.' },
       ],
     },
+    // WO-O4O-KPA-GUIDE-FOR-ROLE-V1: 역할별 활용 가이드 진입
+    {
+      title: '역할별 활용 가이드',
+      href: '/guide/for/store-owner',
+      description:
+        '내 역할에서 무엇을 얻고 어떻게 활용하는지 정리한 가이드입니다. 기능 사용법보다 활용 가치를 먼저 살펴봅니다.',
+      items: [
+        { label: '매장 경영자', detail: '직원이 적어도 매장 운영 자산을 만들어 정보 전달 경쟁력을 높입니다.' },
+        { label: '서비스 운영자', detail: '생태계를 운영하고 매장을 지원하는 운영 사업자입니다.' },
+        { label: '커뮤니티 참여자', detail: '정보 공유가 실제 현장 활용으로 연결되는 흐름의 출발점입니다.' },
+      ],
+    },
   ],
   bottomNav: {
     home: { label: '← 홈으로', to: '/' },
@@ -1317,5 +1329,296 @@ export const kpaGuideFeatureForumProps: GuideFeatureManualPageProps = {
   bottomNav: {
     prev: { label: '← 기능별 이용 방법', to: '/guide/features' },
     home: { label: '홈으로', to: '/' },
+  },
+};
+
+// ─── /guide/for/store-owner ────────────────────────────────────────────
+// WO-O4O-KPA-GUIDE-FOR-ROLE-V1: 역할별 Value Guide — 매장 경영자
+// "기능 → 어떻게 쓰는가" 가 아니라 "내 역할에서 무엇을 얻고 어떻게 활용하는가" 관점.
+// GuideUsagePageProps (hero + step sections + bottomNav) 재사용.
+
+export const kpaGuideForStoreOwnerProps: GuideUsagePageProps = {
+  hero: {
+    eyebrow: '역할별 이용 가이드',
+    title: '매장 경영자',
+    description:
+      '직원이 많지 않아도 정보 전달 경쟁력을 높이는 방법. 운영자가 준비한 자료를 받아 활용하거나 직접 매장 자산을 만들어 작은 매장도 큰 조직처럼 운영합니다.',
+    flowBarTitle: '활용 흐름',
+    flowLabels: ['운영자 자료 받기', '매장 자산 만들기', '고객 소통', '상품·주문', '분석', 'O4O 철학'],
+  },
+  sections: [
+    {
+      step: '01',
+      title: '운영자가 준비한 자료 받기',
+      routeLabel: '/store-hub/content · /store-hub/blog',
+      description:
+        '운영자가 HUB 에 게시한 콘텐츠와 블로그 자료를 내 매장 자료함으로 가져옵니다. 모든 매장이 같은 자료를 받을 수 있으므로 일관된 정보 전달이 가능합니다.',
+      items: [
+        { label: 'HUB 콘텐츠 받기', detail: '/store-hub/content — 운영자 게시 자료 조회·가져오기' },
+        { label: 'HUB 블로그 받기', detail: '/store-hub/blog — 매장 블로그에 적용 가능' },
+        { label: '내 자료함', detail: '/store/library/contents, /store/library/resources — 받은 자료 적재' },
+        { label: 'Event Offer 참여', detail: '/store-hub/event-offers — 공급자 이벤트 적용' },
+      ],
+    },
+    {
+      step: '02',
+      title: '매장 자산 직접 만들기',
+      routeLabel: '/store/marketing/{pop, qr, signage}',
+      description:
+        '직원이 적어도 디지털 도구로 매장 마케팅 자산을 만듭니다. POP 는 AI 보조로 빠르게 초안을 만들 수 있습니다.',
+      items: [
+        { label: 'POP 제작', detail: '/store/marketing/pop — AI 보조 초안 + 템플릿' },
+        { label: 'QR 코드', detail: '/store/marketing/qr — 자동 생성 + 배경/테마 + 인쇄' },
+        { label: '디지털 사이니지', detail: '/store/marketing/signage/playlist — 매장 TV 플레이리스트' },
+        { label: '매장 제작 자료', detail: '/store/library/production-materials — 직접 만든 자료 보관' },
+      ],
+    },
+    {
+      step: '03',
+      title: '고객과 매장 블로그로 소통',
+      routeLabel: '/store/content/blog',
+      description:
+        '매장 블로그로 단골 고객과 신규 고객에게 정보를 전달합니다. 운영자 자료를 그대로 쓰거나 매장 톤에 맞게 편집할 수 있습니다.',
+      items: [
+        { label: '매장 블로그 작성', detail: '/store/content/blog — 게시물 작성/편집' },
+        { label: '외부 공개 URL', detail: '/store/:slug/blog — 고객이 직접 조회 가능' },
+        { label: '상품 상세 자료', detail: '/store/marketing/product-descriptions — 상품별 설명·효과·사용법' },
+      ],
+    },
+    {
+      step: '04',
+      title: '상품 마스터와 주문',
+      routeLabel: '/store/commerce/*',
+      description:
+        '취급 상품 정보를 정리하고 B2B 발주 · B2C 판매를 한 곳에서 관리합니다.',
+      items: [
+        { label: '상품 마스터', detail: '/store/my-products — 취급 상품 정보·가격·재고' },
+        { label: 'B2B 발주', detail: '/store/commerce/products — 공급자 카탈로그 조회·주문' },
+        { label: 'B2C 판매', detail: '/store/commerce/products/b2c — 온라인 스토어' },
+        { label: '주문 관리', detail: '/store/commerce/order-worktable — 주문 상태·배송' },
+      ],
+    },
+    {
+      step: '05',
+      title: '마케팅 분석으로 의사결정',
+      routeLabel: '/store/analytics/marketing',
+      description:
+        '콘텐츠 조회수 / QR 스캔 / POP 다운로드 통계로 어떤 자료가 효과적인지 확인합니다.',
+      items: [
+        { label: '마케팅 분석', detail: '/store/analytics/marketing — 자료별 효과 측정' },
+        { label: '매장 정보·설정', detail: '/store/info, /store/settings — 매장 외형·템플릿 관리' },
+      ],
+    },
+    {
+      step: '06',
+      title: 'O4O 철학 — 작은 매장도 큰 조직처럼',
+      routeLabel: '(가치 명제)',
+      description:
+        '작은 매장도 큰 조직처럼 운영 경쟁력을 만들 수 있습니다. O4O 는 정보를 제공하는 플랫폼이 아닙니다. 정보를 실행 경쟁력으로 전환하는 플랫폼입니다.',
+      items: [
+        { label: '소규모 사업자 경쟁력', detail: '직원이 많지 않아도 운영 도구·자료·AI 로 매장 경쟁력을 만듭니다.' },
+        { label: '운영자 지원', detail: '운영자가 만든 자료가 매장에 도착해 일관된 정보 전달을 가능하게 합니다.' },
+        { label: 'AI 활용', detail: 'AI 는 매장의 자료 제작을 보조합니다. 사람을 대체하지 않고 경쟁력을 증폭합니다.' },
+        { label: '정보 → 실행', detail: '커뮤니티 정보가 운영자 큐레이션을 거쳐 매장 실행 자산이 되는 흐름입니다.' },
+      ],
+    },
+  ],
+  bottomNav: {
+    prev: { label: '← O4O 개요', to: '/guide/intro' },
+    next: { label: '서비스 운영자 →', to: '/guide/for/operator' },
+  },
+};
+
+// ─── /guide/for/operator ───────────────────────────────────────────────
+// WO-O4O-KPA-GUIDE-FOR-ROLE-V1: 역할별 Value Guide — 서비스 운영자
+// 공급자는 독립 역할로 노출하지 않고 "운영자 협력" 내부에 포함.
+// 미구현 Workspace 는 §05 "준비 중" 섹션에 명시 (사용자 기대치 관리).
+
+export const kpaGuideForOperatorProps: GuideUsagePageProps = {
+  hero: {
+    eyebrow: '역할별 이용 가이드',
+    title: '서비스 운영자',
+    description:
+      '서비스 운영자는 생태계를 운영하고 매장을 지원합니다. 단순 관리자가 아니라 공급자 자료를 받아 매장 실행 자산으로 구성하는 운영 사업자입니다.',
+    flowBarTitle: '운영자 흐름',
+    flowLabels: ['공급자 협력', '콘텐츠 구성', '매장 HUB', '매장·회원 지원', '준비 중', 'O4O 철학'],
+  },
+  sections: [
+    {
+      step: '01',
+      title: '공급자 협력 — 자료 수신·검수',
+      routeLabel: '/operator/{product-applications, event-offers, collaboration-requests}',
+      description:
+        '공급자는 O4O 내부에 직접 등록하지 않습니다. 공급자 자료는 운영자가 오프라인으로 받아 등록·검수해 매장에 전달합니다. 운영자가 공급자 협력의 게이트입니다.',
+      items: [
+        { label: '상품 판매 신청 승인', detail: '/operator/product-applications — 매장 측 상품 등록 검수' },
+        { label: 'Event Offer 승인', detail: '/operator/event-offers — 공급자 이벤트 검수·매장 배포' },
+        { label: '협업 문의', detail: '/operator/collaboration-requests — 외부 협력사 문의 관리' },
+      ],
+    },
+    {
+      step: '02',
+      title: '콘텐츠·자료 구성과 게시',
+      routeLabel: '/operator/{content-hub, resources, guide-contents, ai-report}',
+      description:
+        '운영자가 직접 콘텐츠를 작성하거나 자료실을 정리해서 매장 HUB 로 게시합니다. AI 리포트로 운영 데이터를 참고합니다.',
+      items: [
+        { label: '콘텐츠 작성·HUB 게시', detail: '/operator/content-hub — RichTextEditor 기반 항목별 게시' },
+        { label: '자료실 관리', detail: '/operator/resources — 자료 등록·분류·배포' },
+        { label: '가이드 콘텐츠 편집', detail: '/operator/guide-contents — 사용자 가이드 inline 편집' },
+        { label: 'AI 리포트 조회', detail: '/operator/ai-report — 운영 데이터 분석' },
+      ],
+    },
+    {
+      step: '03',
+      title: '매장 HUB 운영 — 사이니지·미디어',
+      routeLabel: '/operator/signage/*',
+      description:
+        '매장이 사용하는 사이니지 / 미디어 / 플레이리스트를 중앙에서 관리하고 배포합니다. 현재는 전체 매장 대상 일괄 배포가 중심입니다.',
+      items: [
+        { label: 'HQ 미디어', detail: '/operator/signage/hq-media — 중앙 미디어 자산' },
+        { label: 'HQ 플레이리스트', detail: '/operator/signage/hq-playlists — 매장 사이니지 플레이리스트' },
+        { label: '강제 콘텐츠', detail: '/operator/signage/forced-content — 전체 매장 강제 노출' },
+        { label: '매장 목록', detail: '/operator/stores — 매장 현황·상세 조회' },
+      ],
+    },
+    {
+      step: '04',
+      title: '매장·회원 지원과 커뮤니티 운영',
+      routeLabel: '/operator/{members, pharmacy-requests, forum-management, lms, surveys}',
+      description:
+        '회원·약국 신청을 승인하고 포럼·LMS·설문 등 커뮤니티 활동을 운영합니다. 운영자는 매장과 회원에게 운영 서비스를 제공하는 사업자입니다.',
+      items: [
+        { label: '회원 관리', detail: '/operator/members — 가입 승인·역할·자격 관리' },
+        { label: '약국 신청 승인', detail: '/operator/pharmacy-requests — 매장 가입 처리' },
+        { label: '포럼 관리', detail: '/operator/forum-management — 포럼 개설 승인·콘텐츠' },
+        { label: 'LMS 강의 운영', detail: '/operator/lms — 강의 개설·강사·커리큘럼' },
+        { label: '설문 운영', detail: '/operator/surveys — 설문 작성·배포·응답 분석' },
+      ],
+    },
+    {
+      step: '05',
+      title: '준비 중인 운영 도구',
+      routeLabel: '(단계별 활성화 중)',
+      description:
+        'O4O 운영자 책임 중 다음 영역은 단계별로 활성화 중입니다. 현재는 위 4 단계를 중심으로 운영하시면 됩니다.',
+      items: [
+        { label: '공급자 자료 정식 등록 (Workspace A)', detail: '준비 중 — 현재는 콘텐츠 직접 작성으로 대체' },
+        { label: 'AI 콘텐츠 가공 도구 (Workspace B)', detail: '준비 중 — 초안 생성 / 요약 / 이미지 도구' },
+        { label: '매장별 맞춤 큐레이션 (Workspace C)', detail: '준비 중 — 현재는 전체 매장 일괄 배포' },
+        { label: '매장 1:1 지원 (Workspace D)', detail: '준비 중 — 메시징 · 매장별 맞춤 데이터' },
+        { label: '운영 수익 모델 (Workspace E)', detail: '준비 중 — 패키지 · 구독 모델' },
+      ],
+    },
+    {
+      step: '06',
+      title: 'O4O 철학 — 운영자는 매장을 지원하는 사업자',
+      routeLabel: '(가치 명제)',
+      description:
+        '운영자는 관리자가 아니라 매장을 지원하는 운영 사업자입니다. 공급자 자료 + 커뮤니티 데이터 + AI + 운영 경험 + 현장 이해를 활용하여 매장 실행 자산을 생산·구성·운영합니다.',
+      items: [
+        { label: '소규모 사업자 경쟁력', detail: '개별 매장이 운영자 지원으로 큰 조직과 대등하게 운영합니다.' },
+        { label: '3 자 협력 구조', detail: '공급자 → 운영자 → AI 활용 → 매장 HUB → 매장 실행 흐름의 중간 책임자입니다.' },
+        { label: 'AI 활용', detail: 'AI 는 운영자의 가공·구성·요약·추천을 보조합니다. 역할을 대체하지 않습니다.' },
+        { label: '정보 → 실행', detail: '커뮤니티에서 나온 정보를 큐레이션해 매장 실행 자산으로 만드는 책임을 가집니다.' },
+      ],
+    },
+  ],
+  bottomNav: {
+    prev: { label: '← 매장 경영자', to: '/guide/for/store-owner' },
+    next: { label: '커뮤니티 참여자 →', to: '/guide/for/member' },
+  },
+};
+
+// ─── /guide/for/member ─────────────────────────────────────────────────
+// WO-O4O-KPA-GUIDE-FOR-ROLE-V1: 역할별 Value Guide — 커뮤니티 참여자
+// 일반 약사 / 직원 / 강사 등. AI 도움 / 감사 시스템은 미구현이므로 §05 준비 중에 명시.
+
+export const kpaGuideForMemberProps: GuideUsagePageProps = {
+  hero: {
+    eyebrow: '역할별 이용 가이드',
+    title: '커뮤니티 참여자',
+    description:
+      '정보를 나누는 것을 넘어 실제 현장 활용으로 연결합니다. 약사 / 직원 / 강사 등 약사 네트워크 구성원으로 참여하는 흐름입니다.',
+    flowBarTitle: '참여 흐름',
+    flowLabels: ['포럼', '강의', '콘텐츠·자료', '설문', '준비 중', 'O4O 철학'],
+  },
+  sections: [
+    {
+      step: '01',
+      title: '포럼 — 동료 약사와 경험 공유',
+      routeLabel: '/forum',
+      description:
+        '질문·답변·경험 공유로 현장 노하우를 나눕니다. 좋은 게시물은 운영자가 큐레이션해 매장 HUB 자료로 활용될 수 있습니다 (현장 → 매장 환류).',
+      items: [
+        { label: '포럼 글쓰기', detail: '/forum/write — 카테고리별 게시물 작성' },
+        { label: '카테고리별 피드', detail: '/forum/:slug — 주제별 토론' },
+        { label: '댓글·좋아요', detail: '/forum/post/:id — 게시물 토론·추천' },
+      ],
+    },
+    {
+      step: '02',
+      title: '강의 (LMS) — 전문성 강화',
+      routeLabel: '/lms',
+      description:
+        '보수교육·세미나·전문 강의를 수강하고 이수증·자격증을 발급받습니다. 매장 경영자는 직원 교육 자료로도 활용 가능합니다.',
+      items: [
+        { label: '강의 목록·수강', detail: '/lms — 강의 조회·수강' },
+        { label: '내 수강', detail: '/mypage/enrollments — 진도·과제' },
+        { label: '이수증·자격증', detail: '/mypage/certificates, /mypage/qualifications' },
+      ],
+    },
+    {
+      step: '03',
+      title: '콘텐츠 / 자료실 — 운영자 자료 활용',
+      routeLabel: '/content · /resources',
+      description:
+        '운영자가 작성·정리한 콘텐츠와 자료를 조회·다운로드합니다. 매장 경영자라면 이 자료를 그대로 내 매장 자료함으로 가져갈 수 있습니다.',
+      items: [
+        { label: '콘텐츠 허브', detail: '/content — 운영자 게시 콘텐츠 조회' },
+        { label: '자료실', detail: '/resources — 자료 다운로드' },
+        { label: '내 자격·크레딧', detail: '/mypage/qualifications, /mypage/credits' },
+      ],
+    },
+    {
+      step: '04',
+      title: '설문 — 운영자에게 의견 전달',
+      routeLabel: '/participation · /surveys',
+      description:
+        '운영자가 매장·회원에게 배포한 설문에 응답합니다. 응답은 운영자가 운영 데이터로 분석하여 정책·자료에 반영합니다.',
+      items: [
+        { label: '내 설문 참여', detail: '/participation — 참여형 콘텐츠' },
+        { label: '진행 중 설문', detail: '/surveys — 설문 응답' },
+      ],
+    },
+    {
+      step: '05',
+      title: '준비 중인 커뮤니티 기능',
+      routeLabel: '(단계별 활성화 중)',
+      description:
+        '커뮤니티 참여 가치를 더 잘 표현하는 다음 기능은 단계별로 활성화 중입니다.',
+      items: [
+        { label: '감사 / 포인트', detail: '준비 중 — 좋은 답변·게시물 기여 인정 (현재 크레딧 schema 만)' },
+        { label: '사용자 AI 도움', detail: '준비 중 — 일반 사용자용 콘텐츠 보조 도구' },
+        { label: '사용자 콘텐츠 생산', detail: '준비 중 — 현재는 강사만 콘텐츠 생산 가능' },
+      ],
+    },
+    {
+      step: '06',
+      title: 'O4O 철학 — 정보를 실행 경쟁력으로',
+      routeLabel: '(가치 명제)',
+      description:
+        '좋은 정보는 실제 현장에서 활용될 때 더 큰 가치가 됩니다. O4O 는 정보를 제공하는 플랫폼이 아닙니다. 정보를 실행 경쟁력으로 전환하는 플랫폼입니다.',
+      items: [
+        { label: '커뮤니티 → 운영자 → 매장', detail: '포럼·강의의 좋은 정보는 운영자 큐레이션을 거쳐 매장 실행 자산이 됩니다.' },
+        { label: '소규모 사업자 경쟁력', detail: '내 지식·경험이 다른 약사·매장의 경쟁력으로 확장됩니다.' },
+        { label: 'AI 활용', detail: 'AI 는 약사·운영자·매장의 역할을 대체하지 않습니다. 경쟁력 증폭 도구입니다.' },
+        { label: '운영자 보완', detail: '커뮤니티의 자발적 정보가 운영자 단독으로 만들기 어려운 가치를 만듭니다.' },
+      ],
+    },
+  ],
+  bottomNav: {
+    prev: { label: '← 서비스 운영자', to: '/guide/for/operator' },
+    next: { label: '홈으로 →', to: '/' },
   },
 };
