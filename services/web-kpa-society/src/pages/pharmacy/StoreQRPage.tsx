@@ -13,7 +13,9 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { QrCode, Trash2, ExternalLink, Copy, Check, RefreshCw, BarChart3, X, Smartphone, Monitor, Tablet, Download, Printer, ArrowRight, FolderOpen, Sparkles, LayoutTemplate } from 'lucide-react';
+import { QrCode, Trash2, ExternalLink, Copy, Check, BarChart3, X, Smartphone, Monitor, Tablet, Download, Printer, ArrowRight, FolderOpen, Sparkles, LayoutTemplate } from 'lucide-react';
+// WO-O4O-KPA-MY-STORE-COPIES-STANDARD-TABLE-V1: list rendering 표준 테이블 (자체 selection + bulk print 보존)
+import { DataTable, type Column } from '@o4o/ui';
 import { getStoreExecutionAsset } from '../../api/storeExecutionAssets';
 import { Link, useLocation } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
@@ -292,14 +294,9 @@ export function StoreQRPage() {
     ? `${import.meta.env.VITE_API_BASE_URL}/api/v1/kpa`
     : '/api/v1/kpa';
 
-  const handleToggleSelect = (id: string) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
+  // WO-O4O-KPA-MY-STORE-COPIES-STANDARD-TABLE-V1: 자체 row checkbox 제거 (DataTable rowSelection 통일).
+  // handleToggleSelect 는 더 이상 사용처 없음 — 행 selection 은 DataTable 이 처리.
+  // handleSelectAll 은 외부 toolbar 의 "전체 선택" 라벨에서 그대로 사용.
 
   const handleSelectAll = () => {
     if (selectedIds.size === items.length) {
@@ -614,14 +611,12 @@ export function StoreQRPage() {
         </div>
       )}
 
-      {/* QR Code List */}
+      {/* QR Code List — WO-O4O-KPA-MY-STORE-COPIES-STANDARD-TABLE-V1:
+          카드형 → @o4o/ui DataTable. 자체 selectedIds (Set<string>) + handleBulkPrint
+          (외부 toolbar) 는 그대로 보존 — DataTable rowSelection 은 Set ↔ Array 변환만.
+          analytics 토글은 행 아래 펼침이 직접 지원 안 되므로 표 하단에 별도 패널로 표시. */}
       <div style={styles.body}>
-        {loading ? (
-          <div style={styles.emptyState}>
-            <RefreshCw size={24} style={{ color: colors.neutral300, marginBottom: '12px' }} />
-            <p style={{ color: colors.neutral500, fontSize: '14px', margin: 0 }}>불러오는 중...</p>
-          </div>
-        ) : items.length === 0 && !creating ? (
+        {!loading && items.length === 0 && !creating ? (
           <div style={styles.emptyState}>
             <QrCode size={48} style={{ color: colors.neutral300, marginBottom: '12px' }} />
             <p style={{ color: colors.neutral500, fontSize: '14px', margin: 0 }}>
@@ -636,135 +631,189 @@ export function StoreQRPage() {
             </Link>
           </div>
         ) : (
-          <div style={styles.list}>
-            {items.map((item) => (
-              <div key={item.id}>
-                <div style={styles.card}>
-                  <input
-                    type="checkbox"
-                    checked={selectedIds.has(item.id)}
-                    onChange={() => handleToggleSelect(item.id)}
-                    style={styles.checkbox}
-                  />
-                  <div style={styles.cardIcon}>
-                    <QrCode size={24} style={{ color: colors.primary }} />
-                  </div>
-                  <div style={styles.cardInfo}>
-                    <p style={styles.cardTitle}>{item.title}</p>
-                    {item.description && (
-                      <p style={styles.cardDescription}>{item.description}</p>
-                    )}
-                    <div style={styles.cardMeta}>
-                      <span style={styles.cardBadge}>
-                        {LANDING_TYPE_OPTIONS.find((o) => o.value === item.landingType)?.label || item.landingType}
-                      </span>
-                      <span style={styles.cardSlug}>/qr/{item.slug}</span>
-                      {(item.scanCount ?? 0) > 0 && (
-                        <span style={styles.scanBadge}>{item.scanCount}회 스캔</span>
-                      )}
-                    </div>
-                  </div>
-                  <div style={styles.cardActions}>
-                    <div style={{ position: 'relative' }}>
-                      <button
-                        onClick={() => setDownloadMenuId(downloadMenuId === item.id ? null : item.id)}
-                        style={styles.downloadBtn}
-                        title="QR 다운로드"
-                      >
-                        <Download size={14} />
-                        출력
-                      </button>
-                      {downloadMenuId === item.id && (
-                        <div style={styles.downloadMenu}>
-                          <button
-                            onClick={() => handleDownload(item.id, 'png')}
-                            style={styles.downloadMenuItem}
-                          >
-                            PNG 다운로드
-                          </button>
-                          <button
-                            onClick={() => handleDownload(item.id, 'svg')}
-                            style={styles.downloadMenuItem}
-                          >
-                            SVG 다운로드
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                    <button
-                      onClick={() => handleShowAnalytics(item.id)}
-                      style={{
-                        ...styles.iconBtn,
-                        color: analyticsId === item.id ? colors.primary : colors.neutral400,
-                      }}
-                      title="스캔 통계"
-                    >
-                      {analyticsId === item.id ? <X size={16} /> : <BarChart3 size={16} />}
-                    </button>
-                    <button
-                      onClick={() => handleCopyUrl(item.slug, item.id)}
-                      style={styles.iconBtn}
-                      title="QR URL 복사"
-                    >
-                      {copiedId === item.id ? <Check size={16} style={{ color: colors.primary }} /> : <Copy size={16} />}
-                    </button>
-                    <a
-                      href={`/qr/${item.slug}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={styles.iconBtn}
-                      title="QR 페이지 열기"
-                    >
-                      <ExternalLink size={16} />
-                    </a>
-                    <button
-                      onClick={() => handleDelete(item.id)}
-                      style={styles.iconBtn}
-                      title="삭제"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </div>
-                {/* Analytics Panel */}
-                {analyticsId === item.id && (
-                  <div style={styles.analyticsPanel}>
-                    {analyticsLoading ? (
-                      <p style={styles.analyticsLoading}>불러오는 중...</p>
-                    ) : analyticsData ? (
-                      <div style={styles.analyticsGrid}>
-                        <div style={styles.statBox}>
-                          <p style={styles.statValue}>{analyticsData.totalScans}</p>
-                          <p style={styles.statLabel}>총 스캔</p>
-                        </div>
-                        <div style={styles.statBox}>
-                          <p style={styles.statValue}>{analyticsData.todayScans}</p>
-                          <p style={styles.statLabel}>오늘</p>
-                        </div>
-                        <div style={styles.statBox}>
-                          <p style={styles.statValue}>{analyticsData.weeklyScans}</p>
-                          <p style={styles.statLabel}>최근 7일</p>
-                        </div>
-                        <div style={styles.statBox}>
-                          <div style={styles.deviceRow}>
-                            <Smartphone size={12} /> <span>{analyticsData.deviceStats.mobile}</span>
-                          </div>
-                          <div style={styles.deviceRow}>
-                            <Tablet size={12} /> <span>{analyticsData.deviceStats.tablet}</span>
-                          </div>
-                          <div style={styles.deviceRow}>
-                            <Monitor size={12} /> <span>{analyticsData.deviceStats.desktop}</span>
-                          </div>
-                        </div>
+          <>
+            <DataTable<StoreQrCode>
+              rowSelection={{
+                selectedRowKeys: Array.from(selectedIds),
+                onChange: (keys) => setSelectedIds(new Set(keys)),
+              }}
+              columns={[
+                {
+                  key: 'title',
+                  title: 'QR',
+                  render: (_v, item) => (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+                      <div style={{ width: '32px', height: '32px', borderRadius: '6px', backgroundColor: colors.neutral100, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <QrCode size={18} style={{ color: colors.primary }} />
                       </div>
+                      <div style={{ minWidth: 0 }}>
+                        <p style={{ fontSize: '14px', fontWeight: 600, color: colors.neutral800, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {item.title}
+                        </p>
+                        {item.description && (
+                          <p style={{ fontSize: '12px', color: colors.neutral500, margin: '2px 0 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {item.description}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  ),
+                },
+                {
+                  key: 'landingType',
+                  title: '유형',
+                  align: 'center',
+                  render: (_v, item) => (
+                    <span style={{ display: 'inline-flex', padding: '2px 8px', borderRadius: '999px', fontSize: '11px', backgroundColor: colors.neutral100, color: colors.neutral600 }}>
+                      {LANDING_TYPE_OPTIONS.find((o) => o.value === item.landingType)?.label || item.landingType}
+                    </span>
+                  ),
+                },
+                {
+                  key: 'slug',
+                  title: 'URL',
+                  render: (_v, item) => (
+                    <span style={{ fontSize: '12px', fontFamily: 'monospace', color: colors.neutral500 }}>
+                      /qr/{item.slug}
+                    </span>
+                  ),
+                },
+                {
+                  key: 'scanCount',
+                  title: '스캔',
+                  align: 'center',
+                  render: (_v, item) => (
+                    (item.scanCount ?? 0) > 0 ? (
+                      <span style={{ fontSize: '12px', color: colors.primary, fontWeight: 600 }}>
+                        {item.scanCount}
+                      </span>
                     ) : (
-                      <p style={styles.analyticsLoading}>데이터를 불러올 수 없습니다</p>
-                    )}
+                      <span style={{ fontSize: '12px', color: colors.neutral400 }}>-</span>
+                    )
+                  ),
+                },
+                {
+                  key: 'actions',
+                  title: '액션',
+                  align: 'right',
+                  render: (_v, item) => (
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px' }}>
+                      <div style={{ position: 'relative' }}>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setDownloadMenuId(downloadMenuId === item.id ? null : item.id); }}
+                          style={styles.downloadBtn}
+                          title="QR 다운로드"
+                        >
+                          <Download size={14} />
+                          출력
+                        </button>
+                        {downloadMenuId === item.id && (
+                          <div style={styles.downloadMenu}>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); handleDownload(item.id, 'png'); }}
+                              style={styles.downloadMenuItem}
+                            >
+                              PNG 다운로드
+                            </button>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); handleDownload(item.id, 'svg'); }}
+                              style={styles.downloadMenuItem}
+                            >
+                              SVG 다운로드
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleShowAnalytics(item.id); }}
+                        style={{ ...styles.iconBtn, color: analyticsId === item.id ? colors.primary : colors.neutral400 }}
+                        title="스캔 통계"
+                      >
+                        {analyticsId === item.id ? <X size={16} /> : <BarChart3 size={16} />}
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleCopyUrl(item.slug, item.id); }}
+                        style={styles.iconBtn}
+                        title="QR URL 복사"
+                      >
+                        {copiedId === item.id ? <Check size={16} style={{ color: colors.primary }} /> : <Copy size={16} />}
+                      </button>
+                      <a
+                        href={`/qr/${item.slug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        style={styles.iconBtn}
+                        title="QR 페이지 열기"
+                      >
+                        <ExternalLink size={16} />
+                      </a>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleDelete(item.id); }}
+                        style={styles.iconBtn}
+                        title="삭제"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  ),
+                },
+              ] as Column<StoreQrCode>[]}
+              dataSource={items}
+              rowKey="id"
+              loading={loading}
+              emptyText="등록된 QR 코드가 없습니다"
+            />
+
+            {/* Analytics Panel — DataTable 행 아래 펼침이 직접 지원 안 되므로 표 하단에 표시 */}
+            {analyticsId && (
+              <div style={{ ...styles.analyticsPanel, marginTop: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <p style={{ fontSize: '13px', fontWeight: 600, color: colors.neutral700, margin: 0 }}>
+                    스캔 통계: {items.find((i) => i.id === analyticsId)?.title || ''}
+                  </p>
+                  <button
+                    onClick={() => handleShowAnalytics(analyticsId)}
+                    style={{ ...styles.iconBtn, color: colors.neutral400 }}
+                    title="닫기"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+                {analyticsLoading ? (
+                  <p style={styles.analyticsLoading}>불러오는 중...</p>
+                ) : analyticsData ? (
+                  <div style={styles.analyticsGrid}>
+                    <div style={styles.statBox}>
+                      <p style={styles.statValue}>{analyticsData.totalScans}</p>
+                      <p style={styles.statLabel}>총 스캔</p>
+                    </div>
+                    <div style={styles.statBox}>
+                      <p style={styles.statValue}>{analyticsData.todayScans}</p>
+                      <p style={styles.statLabel}>오늘</p>
+                    </div>
+                    <div style={styles.statBox}>
+                      <p style={styles.statValue}>{analyticsData.weeklyScans}</p>
+                      <p style={styles.statLabel}>최근 7일</p>
+                    </div>
+                    <div style={styles.statBox}>
+                      <div style={styles.deviceRow}>
+                        <Smartphone size={12} /> <span>{analyticsData.deviceStats.mobile}</span>
+                      </div>
+                      <div style={styles.deviceRow}>
+                        <Tablet size={12} /> <span>{analyticsData.deviceStats.tablet}</span>
+                      </div>
+                      <div style={styles.deviceRow}>
+                        <Monitor size={12} /> <span>{analyticsData.deviceStats.desktop}</span>
+                      </div>
+                    </div>
                   </div>
+                ) : (
+                  <p style={styles.analyticsLoading}>데이터를 불러올 수 없습니다</p>
                 )}
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
       </div>
 

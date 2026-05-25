@@ -28,6 +28,9 @@ import { useNavigate } from 'react-router-dom';
 import { Loader2, AlertCircle, Edit3, Trash2, ArrowLeft, Save, ExternalLink, Printer } from 'lucide-react';
 import { RichTextEditor } from '@o4o/content-editor';
 import { toast } from '@o4o/error-handling';
+// WO-O4O-KPA-MY-STORE-COPIES-STANDARD-TABLE-V1: list view 표준 테이블
+import { DataTable, type Column, ActionBar, BulkResultModal } from '@o4o/ui';
+import { useBatchAction } from '@o4o/operator-ux-core';
 import {
   fetchStaffPopPosts,
   updateStaffPopPost,
@@ -61,6 +64,10 @@ export function PharmacyPopPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // WO-O4O-KPA-MY-STORE-COPIES-STANDARD-TABLE-V1: 표준 테이블 selection + bulk
+  const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
+  const batch = useBatchAction();
 
   // Editor state
   const [mode, setMode] = useState<ViewMode>('list');
@@ -167,6 +174,35 @@ export function PharmacyPopPage() {
       loadData();
     } catch (e: any) {
       toast.error(e?.message || '삭제에 실패했습니다');
+    }
+  };
+
+  // WO-O4O-KPA-MY-STORE-COPIES-STANDARD-TABLE-V1: Bulk delete (fan-out)
+  // PharmacyPopPage 의 매장 사본 API 는 현재 delete/update 만 노출 — publish/archive 는 운영자 원본만.
+  // 따라서 매장 측 bulk action 은 일괄 삭제만 의미가 있다.
+  const batchPopDelete = async (
+    ids: string[],
+  ): Promise<{ data: { results: Array<{ id: string; status: 'success' | 'failed'; error?: string }> } }> => {
+    if (!slug) {
+      return { data: { results: ids.map((id) => ({ id, status: 'failed' as const, error: 'no slug' })) } };
+    }
+    const settled = await Promise.allSettled(ids.map((id) => deleteStaffPopPost(slug, id)));
+    const results = settled.map((r, i) => {
+      const id = ids[i];
+      if (r.status === 'fulfilled') return { id, status: 'success' as const };
+      const err = r.reason as { message?: string } | null;
+      return { id, status: 'failed' as const, error: err?.message || 'Network error' };
+    });
+    return { data: { results } };
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedKeys.length === 0) return;
+    if (!window.confirm(`선택한 ${selectedKeys.length}개 POP 사본을 삭제하시겠습니까? 되돌릴 수 없습니다.`)) return;
+    const result = await batch.executeBatch(batchPopDelete, selectedKeys);
+    if (result.successCount > 0) {
+      setSelectedKeys([]);
+      loadData();
     }
   };
 
@@ -292,7 +328,7 @@ export function PharmacyPopPage() {
         </div>
       )}
 
-      {/* Status filter */}
+      {/* Status filter — pill */}
       {slug && (
         <div className="flex gap-2">
           {(['', 'draft', 'published', 'archived'] as StatusFilter[]).map((s) => (
@@ -301,11 +337,12 @@ export function PharmacyPopPage() {
               onClick={() => {
                 setStatusFilter(s);
                 setPage(1);
+                setSelectedKeys([]);
               }}
-              className={`px-3 py-1.5 rounded-lg text-sm border ${
+              className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
                 statusFilter === s
-                  ? 'bg-blue-50 border-blue-300 text-blue-700 font-medium'
-                  : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
               }`}
             >
               {s === '' ? '전체' : STATUS_LABEL[s as StaffPopPost['status']]}
@@ -320,67 +357,126 @@ export function PharmacyPopPage() {
           <AlertCircle className="w-8 h-8 text-red-400" />
           <p className="text-sm">{error}</p>
         </div>
-      ) : isLoading ? (
-        <div className="flex items-center justify-center py-16">
-          <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
-        </div>
-      ) : posts.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 gap-3">
-          <p className="text-sm text-slate-400">
-            {statusFilter ? '해당 상태의 POP 사본이 없습니다' : '아직 가져온 POP 사본이 없습니다'}
-          </p>
-          {!statusFilter && (
-            <button
-              onClick={() => navigate('/store-hub/pop')}
-              className="text-sm text-blue-600 hover:underline"
-            >
-              매장 HUB POP 에서 가져오기
-            </button>
-          )}
-        </div>
       ) : (
         <>
-          <div className="space-y-3">
-            {posts.map((item) => (
-              <div
-                key={item.id}
-                className="bg-white rounded-xl border border-slate-100 p-4 flex items-center gap-4 hover:border-slate-200 transition-colors"
-              >
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-sm font-semibold text-slate-800 truncate">{item.title}</h3>
-                    <span className={`px-2 py-0.5 rounded-full text-xs ${STATUS_BADGE[item.status]}`}>
-                      {STATUS_LABEL[item.status]}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 mt-1 text-xs text-slate-400">
-                    <span className="truncate">/{item.slug}</span>
-                    <span>·</span>
-                    <span>{new Date(item.updatedAt).toLocaleDateString('ko-KR')} 수정</span>
-                  </div>
-                  {item.excerpt && (
-                    <p className="text-xs text-slate-500 mt-1 line-clamp-1">{item.excerpt}</p>
-                  )}
-                </div>
-                <div className="flex items-center gap-1 shrink-0">
-                  <button
-                    onClick={() => openEditor(item)}
-                    className="p-2 rounded-lg hover:bg-slate-100 text-slate-500"
-                    title="수정"
-                  >
-                    <Edit3 className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(item.id, item.title)}
-                    className="p-2 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-500"
-                    title="삭제"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            ))}
+          {/* ActionBar — bulk delete only (PopStaff API 가 delete/update 만 노출) */}
+          <div>
+            <ActionBar
+              selectedCount={selectedKeys.length}
+              onClearSelection={() => setSelectedKeys([])}
+              actions={[
+                {
+                  key: 'bulk-delete',
+                  label: `일괄 삭제 (${selectedKeys.length})`,
+                  onClick: handleBulkDelete,
+                  variant: 'danger' as const,
+                  icon: <Trash2 className="w-3.5 h-3.5" />,
+                  loading: batch.loading,
+                  group: 'actions',
+                  visible: selectedKeys.length > 0,
+                  tooltip: '선택한 POP 사본을 일괄 삭제 (되돌릴 수 없음)',
+                },
+              ]}
+            />
           </div>
+
+          <BulkResultModal
+            open={batch.showResult}
+            onClose={() => batch.clearResult()}
+            result={batch.result}
+            onRetry={() => batch.retryFailed()}
+          />
+
+          {/* WO-O4O-KPA-MY-STORE-COPIES-STANDARD-TABLE-V1: 카드형 → @o4o/ui DataTable */}
+          <DataTable<StaffPopPost>
+            rowSelection={{
+              selectedRowKeys: selectedKeys,
+              onChange: setSelectedKeys,
+            }}
+            columns={[
+              {
+                key: 'title',
+                title: '제목',
+                render: (_v, item) => (
+                  <span className="font-medium text-slate-800 text-sm truncate">{item.title}</span>
+                ),
+              },
+              {
+                key: 'slug',
+                title: '슬러그',
+                render: (_v, item) => (
+                  <span className="text-xs text-slate-500 font-mono truncate">/{item.slug}</span>
+                ),
+              },
+              {
+                key: 'status',
+                title: '상태',
+                align: 'center',
+                render: (_v, item) => (
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs ${STATUS_BADGE[item.status]}`}>
+                    {STATUS_LABEL[item.status]}
+                  </span>
+                ),
+              },
+              {
+                key: 'excerpt',
+                title: '요약',
+                render: (_v, item) => (
+                  <span className="text-xs text-slate-500 line-clamp-1">{item.excerpt || '-'}</span>
+                ),
+              },
+              {
+                key: 'updatedAt',
+                title: '수정일',
+                render: (_v, item) => (
+                  <span className="text-xs text-slate-500">
+                    {new Date(item.updatedAt).toLocaleDateString('ko-KR')}
+                  </span>
+                ),
+              },
+              {
+                key: 'actions',
+                title: '액션',
+                align: 'right',
+                render: (_v, item) => (
+                  <div className="flex items-center justify-end gap-1">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); openEditor(item); }}
+                      className="p-1.5 rounded hover:bg-slate-100 text-slate-500"
+                      title="수정"
+                    >
+                      <Edit3 className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleDelete(item.id, item.title); }}
+                      className="p-1.5 rounded hover:bg-red-50 text-slate-400 hover:text-red-500"
+                      title="삭제"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ),
+              },
+            ] as Column<StaffPopPost>[]}
+            dataSource={posts}
+            rowKey="id"
+            loading={isLoading}
+            emptyText={
+              statusFilter ? '해당 상태의 POP 사본이 없습니다' : '아직 가져온 POP 사본이 없습니다'
+            }
+          />
+
+          {/* Empty hint — 가져오기 진입 (DataTable empty 외 보조) */}
+          {!isLoading && posts.length === 0 && !statusFilter && (
+            <div className="text-center mt-3">
+              <button
+                onClick={() => navigate('/store-hub/pop')}
+                className="text-sm text-blue-600 hover:underline"
+              >
+                매장 HUB POP 에서 가져오기
+              </button>
+            </div>
+          )}
 
           {/* Pagination */}
           {totalPages > 1 && (

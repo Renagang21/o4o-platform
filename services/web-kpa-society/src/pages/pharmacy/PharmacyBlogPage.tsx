@@ -32,6 +32,10 @@ import { getAccessToken } from '../../contexts/AuthContext';
 // WO-O4O-BLOG-TEMPLATE-WORKFLOW-V1: 블로그 템플릿 연결
 import { findTemplate } from './productionTemplates';
 import type { ProductionTemplate } from './productionTemplates';
+// WO-O4O-KPA-MY-STORE-COPIES-STANDARD-TABLE-V1: list view 표준 테이블
+import { DataTable, type Column, ActionBar, BulkResultModal } from '@o4o/ui';
+import { useBatchAction } from '@o4o/operator-ux-core';
+import { Send, Archive as ArchiveIcon, Trash2 } from 'lucide-react';
 
 // WO-O4O-KPA-STORE-BLOG-AI-WIRING-V1: HTML 첫 heading 추출 (AI title fallback)
 function extractTitleFromHtml(html: string): string {
@@ -72,6 +76,9 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
   const [mode, setMode] = useState<ViewMode>('list');
   const [editingPost, setEditingPost] = useState<StaffBlogPost | null>(null);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  // WO-O4O-KPA-MY-STORE-COPIES-STANDARD-TABLE-V1: 표준 테이블 selection + bulk
+  const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
+  const batch = useBatchAction();
 
   // Editor state
   const [editorTitle, setEditorTitle] = useState('');
@@ -255,6 +262,50 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
       setError(e.message);
     }
   };
+
+  // WO-O4O-KPA-MY-STORE-COPIES-STANDARD-TABLE-V1: Bulk action — fan-out 패턴
+  type BulkOp = 'publish' | 'archive' | 'delete';
+  const batchBlogOp = async (
+    ids: string[],
+    options?: Record<string, unknown>,
+  ): Promise<{ data: { results: Array<{ id: string; status: 'success' | 'failed'; error?: string }> } }> => {
+    const op = options?.op as BulkOp | undefined;
+    if (!op || !slug) {
+      return { data: { results: ids.map((id) => ({ id, status: 'failed' as const, error: !slug ? 'no slug' : 'op missing' })) } };
+    }
+    const fn =
+      op === 'publish' ? (id: string) => publishBlogPost(slug, id, service)
+      : op === 'archive' ? (id: string) => archiveBlogPost(slug, id, service)
+      : (id: string) => deleteBlogPost(slug, id, service);
+    const settled = await Promise.allSettled(ids.map((id) => fn(id)));
+    const results = settled.map((r, i) => {
+      const id = ids[i];
+      if (r.status === 'fulfilled') return { id, status: 'success' as const };
+      const err = r.reason as { message?: string } | null;
+      return { id, status: 'failed' as const, error: err?.message || 'Network error' };
+    });
+    return { data: { results } };
+  };
+
+  const runBulk = async (ids: string[], op: BulkOp, confirmMsg?: string) => {
+    if (ids.length === 0) return;
+    if (confirmMsg && !window.confirm(confirmMsg)) return;
+    const result = await batch.executeBatch(batchBlogOp, ids, { op });
+    if (result.successCount > 0) {
+      setSelectedKeys([]);
+      await loadPosts();
+    }
+  };
+
+  // status별 가능한 selection 분류 (서버 거절 사전 차단)
+  const selectedSet = new Set(selectedKeys);
+  const selectedDraftIds = posts.filter((p) => selectedSet.has(p.id) && p.status === 'draft').map((p) => p.id);
+  const selectedNotArchivedIds = posts.filter((p) => selectedSet.has(p.id) && p.status !== 'archived').map((p) => p.id);
+  const selectedAllIds = posts.filter((p) => selectedSet.has(p.id)).map((p) => p.id);
+
+  const handleBulkPublish = () => runBulk(selectedDraftIds, 'publish');
+  const handleBulkArchive = () => runBulk(selectedNotArchivedIds, 'archive', `선택한 ${selectedNotArchivedIds.length}개 블로그를 보관하시겠습니까?`);
+  const handleBulkDelete = () => runBulk(selectedAllIds, 'delete', `선택한 ${selectedAllIds.length}개 블로그를 삭제하시겠습니까? 되돌릴 수 없습니다.`);
 
   // WO-O4O-KPA-STORE-BLOG-PUBLIC-HEADER-V1: 공개 URL 복사 / 미리보기
   const buildPublicUrl = (postSlug: string): string | null => {
@@ -710,90 +761,160 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
         </div>
       )}
 
-      {loading ? (
-        <div style={{ textAlign: 'center', padding: '48px 0', color: '#94a3b8' }}>
-          불러오는 중...
-        </div>
-      ) : posts.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '48px 0' }}>
-          <p style={{ color: '#94a3b8', fontSize: '15px' }}>
-            게시글이 없습니다.
-          </p>
-          <button
-            onClick={() => openEditor()}
-            style={{ ...btnStyle, marginTop: '12px', backgroundColor: '#3b82f6', color: '#fff' }}
-          >
-            블로그 글 만들기
-          </button>
-        </div>
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {posts.map((post) => {
-            const status = STATUS_LABELS[post.status] || STATUS_LABELS.draft;
-            return (
-              <div
-                key={post.id}
-                style={{
-                  backgroundColor: '#fff',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '10px',
-                  padding: '16px',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'flex-start',
-                  flexWrap: 'wrap',
-                  gap: '10px',
-                }}
-              >
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                    <span style={{ fontSize: '11px', fontWeight: 600, color: status.color, backgroundColor: status.bg, padding: '2px 8px', borderRadius: '4px' }}>
-                      {status.label}
-                    </span>
-                    <span style={{ fontSize: '15px', fontWeight: 600, color: '#1e293b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {post.title}
-                    </span>
-                  </div>
-                  <span style={{ fontSize: '12px', color: '#94a3b8' }}>
-                    {formatDate(post.updatedAt)}
-                    {post.slug && ` · /${post.slug}`}
-                  </span>
-                </div>
+      {/* WO-O4O-KPA-MY-STORE-COPIES-STANDARD-TABLE-V1: ActionBar bulk action */}
+      <div style={{ marginBottom: '12px' }}>
+        <ActionBar
+          selectedCount={selectedKeys.length}
+          onClearSelection={() => setSelectedKeys([])}
+          actions={[
+            {
+              key: 'bulk-publish',
+              label: `일괄 발행 (${selectedDraftIds.length})`,
+              onClick: handleBulkPublish,
+              variant: 'primary' as const,
+              icon: <Send className="w-3.5 h-3.5" />,
+              loading: batch.loading,
+              group: 'actions',
+              visible: selectedDraftIds.length > 0,
+              tooltip: '선택한 초안 블로그를 일괄 발행합니다',
+            },
+            {
+              key: 'bulk-archive',
+              label: `일괄 보관 (${selectedNotArchivedIds.length})`,
+              onClick: handleBulkArchive,
+              variant: 'default' as const,
+              icon: <ArchiveIcon className="w-3.5 h-3.5" />,
+              loading: batch.loading,
+              group: 'actions',
+              visible: selectedNotArchivedIds.length > 0,
+            },
+            {
+              key: 'bulk-delete',
+              label: `일괄 삭제 (${selectedKeys.length})`,
+              onClick: handleBulkDelete,
+              variant: 'danger' as const,
+              icon: <Trash2 className="w-3.5 h-3.5" />,
+              loading: batch.loading,
+              group: 'actions',
+              visible: selectedKeys.length > 0,
+            },
+          ]}
+        />
+      </div>
 
-                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', flexShrink: 0 }}>
-                  {/* WO-O4O-KPA-STORE-BLOG-PUBLIC-HEADER-V1: 공개 URL 복사 / 미리보기 (발행 글만) */}
-                  {post.status === 'published' && (
-                    <>
-                      <button
-                        onClick={() => handleCopyUrl(post.slug)}
-                        style={{ ...smallBtn, color: '#0f172a' }}
-                        title="공개 URL을 클립보드에 복사"
-                      >
-                        URL 복사
-                      </button>
-                      <button
-                        onClick={() => handlePreview(post.slug)}
-                        style={{ ...smallBtn, color: '#0f172a' }}
-                        title="공개 페이지를 새 탭에서 열기"
-                      >
-                        미리보기
-                      </button>
-                    </>
-                  )}
-                  <button onClick={() => openEditor(post)} style={{ ...smallBtn, color: '#3b82f6' }}>수정</button>
-                  {post.status === 'draft' && (
-                    <button onClick={() => handlePublish(post.id)} style={{ ...smallBtn, color: '#16a34a' }}>발행</button>
-                  )}
-                  {post.status === 'published' && (
-                    <button onClick={() => handleArchive(post.id)} style={{ ...smallBtn, color: '#d97706' }}>보관</button>
-                  )}
-                  <button onClick={() => handleDelete(post.id)} style={{ ...smallBtn, color: '#ef4444' }}>삭제</button>
-                </div>
+      <BulkResultModal
+        open={batch.showResult}
+        onClose={() => batch.clearResult()}
+        result={batch.result}
+        onRetry={() => batch.retryFailed()}
+      />
+
+      {/* WO-O4O-KPA-MY-STORE-COPIES-STANDARD-TABLE-V1: 카드형 → @o4o/ui DataTable */}
+      <DataTable<StaffBlogPost>
+        rowSelection={{
+          selectedRowKeys: selectedKeys,
+          onChange: setSelectedKeys,
+        }}
+        columns={[
+          {
+            key: 'title',
+            title: '제목',
+            render: (_v, post) => (
+              <span style={{ fontWeight: 600, color: '#1e293b' }}>{post.title}</span>
+            ),
+          },
+          {
+            key: 'slug',
+            title: '슬러그',
+            render: (_v, post) => (
+              <span style={{ fontSize: '12px', color: '#94a3b8', fontFamily: 'monospace' }}>
+                {post.slug ? `/${post.slug}` : '-'}
+              </span>
+            ),
+          },
+          {
+            key: 'status',
+            title: '상태',
+            align: 'center',
+            render: (_v, post) => {
+              const s = STATUS_LABELS[post.status] || STATUS_LABELS.draft;
+              return (
+                <span style={{ fontSize: '11px', fontWeight: 600, color: s.color, backgroundColor: s.bg, padding: '2px 8px', borderRadius: '4px' }}>
+                  {s.label}
+                </span>
+              );
+            },
+          },
+          {
+            key: 'updatedAt',
+            title: '수정일',
+            render: (_v, post) => (
+              <span style={{ fontSize: '12px', color: '#64748b' }}>{formatDate(post.updatedAt)}</span>
+            ),
+          },
+          {
+            key: 'actions',
+            title: '액션',
+            align: 'right',
+            render: (_v, post) => (
+              <div style={{ display: 'flex', gap: '4px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                {post.status === 'published' && (
+                  <>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleCopyUrl(post.slug); }}
+                      style={{ ...smallBtn, color: '#0f172a' }}
+                      title="공개 URL 복사"
+                    >
+                      URL
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handlePreview(post.slug); }}
+                      style={{ ...smallBtn, color: '#0f172a' }}
+                      title="공개 페이지 열기"
+                    >
+                      미리보기
+                    </button>
+                  </>
+                )}
+                <button
+                  onClick={(e) => { e.stopPropagation(); openEditor(post); }}
+                  style={{ ...smallBtn, color: '#3b82f6' }}
+                >
+                  수정
+                </button>
+                {post.status === 'draft' && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handlePublish(post.id); }}
+                    style={{ ...smallBtn, color: '#16a34a' }}
+                  >
+                    발행
+                  </button>
+                )}
+                {post.status === 'published' && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleArchive(post.id); }}
+                    style={{ ...smallBtn, color: '#d97706' }}
+                  >
+                    보관
+                  </button>
+                )}
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleDelete(post.id); }}
+                  style={{ ...smallBtn, color: '#ef4444' }}
+                >
+                  삭제
+                </button>
               </div>
-            );
-          })}
-        </div>
-      )}
+            ),
+          },
+        ] as Column<StaffBlogPost>[]}
+        dataSource={posts}
+        rowKey="id"
+        loading={loading}
+        emptyText={
+          posts.length === 0 ? '게시글이 없습니다.' : '검색 결과가 없습니다.'
+        }
+      />
     </div>
   );
 }
