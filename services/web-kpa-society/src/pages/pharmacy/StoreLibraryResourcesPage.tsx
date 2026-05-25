@@ -30,6 +30,8 @@ import { assetSnapshotApi, type AssetSnapshotItem } from '../../api/assetSnapsho
 import { colors } from '../../styles/theme';
 import { stripHtml, blocksToText } from '../../utils/ai-clipboard';
 import { RegisterStoreResourceModal } from './RegisterStoreResourceModal';
+// WO-O4O-KPA-STORE-LIBRARY-RESOURCES-STANDARD-TABLE-V1: list 영역 표준 테이블
+import { DataTable, type Column, ActionBar } from '@o4o/ui';
 
 const PAGE_LIMIT = 50;
 
@@ -250,21 +252,9 @@ export default function StoreLibraryResourcesPage() {
     }
   };
 
-  const toggleOne = (id: string) => {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
-
-  const allSelected = items.length > 0 && items.every((it) => selected.has(it.id));
-
-  const toggleAll = () => {
-    if (allSelected) setSelected(new Set());
-    else setSelected(new Set(items.map((it) => it.id)));
-  };
+  // WO-O4O-KPA-STORE-LIBRARY-RESOURCES-STANDARD-TABLE-V1:
+  //   자체 toggleOne / toggleAll / allSelected 제거 — DataTable rowSelection 이 처리.
+  //   selected (Set<string>) state 는 그대로 보존하여 handleBulkDelete 로직 변경 0.
 
   // library + snapshot 항목 모두 일괄 삭제 가능.
   const handleBulkDelete = async () => {
@@ -341,63 +331,45 @@ export default function StoreLibraryResourcesPage() {
         </div>
       </div>
 
-      {/* Batch toolbar */}
-      {visibleItems.length > 0 && (
-        <div style={styles.toolbar}>
-          <label style={styles.selectAllLabel}>
-            <input
-              type="checkbox"
-              checked={allSelected}
-              onChange={toggleAll}
-              style={styles.checkbox}
-            />
-            전체 선택 ({selected.size}/{visibleItems.length})
-          </label>
-          <div style={{ flex: 1 }} />
-          <button
-            type="button"
-            onClick={handleBulkDelete}
-            disabled={selected.size === 0}
-            style={{ ...styles.bulkDeleteBtn, opacity: selected.size === 0 ? 0.5 : 1 }}
-          >
-            <Trash2 size={14} />
-            선택 삭제
-          </button>
-        </div>
-      )}
+      {/* WO-O4O-KPA-STORE-LIBRARY-RESOURCES-STANDARD-TABLE-V1: ActionBar — 선택 일괄 삭제 */}
+      <div style={{ marginBottom: '12px' }}>
+        <ActionBar
+          selectedCount={selected.size}
+          onClearSelection={() => setSelected(new Set())}
+          actions={[
+            {
+              key: 'bulk-delete',
+              label: `선택 삭제 (${selected.size})`,
+              onClick: handleBulkDelete,
+              variant: 'danger' as const,
+              icon: <Trash2 className="w-3.5 h-3.5" />,
+              group: 'actions',
+              visible: selected.size > 0,
+              tooltip: '선택한 자료를 일괄 삭제합니다 (가져온 자료는 내 자료함에서만 제거)',
+            },
+          ]}
+        />
+      </div>
 
-      {loading ? (
-        <div style={styles.empty}>불러오는 중...</div>
-      ) : visibleItems.length === 0 ? (
-        <div style={styles.empty}>
-          <Library size={32} style={{ color: colors.neutral300, marginBottom: 12 }} />
-          <p style={{ margin: 0, color: colors.neutral500, fontSize: 14 }}>
-            보관된 자료가 없습니다.
-          </p>
-          <p style={{ margin: '6px 0 0', color: colors.neutral400, fontSize: 12 }}>
-            커뮤니티 자료실 또는 공급자 라이브러리에서 자료를 가져와 매장에 보관할 수 있습니다.
-          </p>
-        </div>
-      ) : (
-        <ul style={styles.list}>
-          {visibleItems.map((item) => {
-            const meta = ASSET_TYPE_LABEL[item.assetType] ?? ASSET_TYPE_LABEL.file;
-            const isSnapshot = item.kind === 'snapshot';
-            return (
-              <li key={item.id} style={styles.listItem}>
-                <input
-                  type="checkbox"
-                  checked={selected.has(item.id)}
-                  onChange={() => toggleOne(item.id)}
-                  style={styles.checkbox}
-                  aria-label={`${item.title} 선택`}
-                />
-                <div style={styles.itemMain}>
+      {/* WO-O4O-KPA-STORE-LIBRARY-RESOURCES-STANDARD-TABLE-V1: 카드 list → @o4o/ui DataTable */}
+      <DataTable<UnifiedResourceRow>
+        rowSelection={{
+          selectedRowKeys: Array.from(selected),
+          onChange: (keys) => setSelected(new Set(keys)),
+        }}
+        columns={[
+          {
+            key: 'title',
+            title: '자료명',
+            render: (_v, item) => {
+              const meta = ASSET_TYPE_LABEL[item.assetType] ?? ASSET_TYPE_LABEL.file;
+              return (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
                   <meta.Icon size={16} style={{ color: meta.color, flexShrink: 0 }} />
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0, flex: 1 }}>
                     <button
                       type="button"
-                      onClick={() => setDetailId(item.id)}
+                      onClick={(e) => { e.stopPropagation(); setDetailId(item.id); }}
                       style={styles.itemTitleBtn}
                       title="자료 상세 보기"
                     >
@@ -407,54 +379,106 @@ export default function StoreLibraryResourcesPage() {
                       <span style={styles.itemDesc}>{item.description}</span>
                     )}
                   </div>
-                  <span style={{ ...styles.badge, background: meta.bg, color: meta.color }}>{meta.label}</span>
-                  {/* WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: source 구분 badge */}
-                  <span
-                    style={{
-                      ...styles.badge,
-                      background: isSnapshot ? '#EEF2FF' : '#F5F3FF',
-                      color: isSnapshot ? '#4338CA' : '#6D28D9',
-                    }}
-                    title={isSnapshot ? '커뮤니티 자료실에서 가져온 자료' : '직접 업로드한 자료'}
-                  >
-                    {isSnapshot ? <Download size={11} style={{ marginRight: 3 }} /> : null}
-                    {isSnapshot ? '커뮤니티 가져옴' : '직접 등록'}
-                  </span>
-                  {item.category && (
-                    <span style={{ ...styles.badge, background: colors.neutral100, color: colors.neutral600 }}>
-                      {item.category}
-                    </span>
-                  )}
                 </div>
-                <div style={styles.itemMeta}>
-                  <span style={styles.metaText}>
-                    {item.updatedAt ? new Date(item.updatedAt).toLocaleDateString('ko-KR') : ''}
-                  </span>
-                  {item.href && (
-                    <a
-                      href={item.href}
-                      target="_blank"
-                      rel="noreferrer"
-                      style={styles.openLink}
-                      title="원본 열기"
-                    >
-                      <ExternalLink size={14} />
-                    </a>
-                  )}
-                  <button
-                    onClick={() => handleDelete(item)}
-                    disabled={deletingId === item.id}
-                    style={styles.deleteBtn}
-                    title={item.kind === 'snapshot' ? '내 자료함에서 제거' : '삭제'}
+              );
+            },
+          },
+          {
+            key: 'assetType',
+            title: '유형',
+            align: 'center',
+            render: (_v, item) => {
+              const meta = ASSET_TYPE_LABEL[item.assetType] ?? ASSET_TYPE_LABEL.file;
+              return (
+                <span style={{ ...styles.badge, background: meta.bg, color: meta.color }}>
+                  {meta.label}
+                </span>
+              );
+            },
+          },
+          {
+            key: 'kind',
+            title: '출처',
+            align: 'center',
+            render: (_v, item) => {
+              const isSnapshot = item.kind === 'snapshot';
+              return (
+                <span
+                  style={{
+                    ...styles.badge,
+                    background: isSnapshot ? '#EEF2FF' : '#F5F3FF',
+                    color: isSnapshot ? '#4338CA' : '#6D28D9',
+                  }}
+                  title={isSnapshot ? '커뮤니티 자료실에서 가져온 자료' : '직접 업로드한 자료'}
+                >
+                  {isSnapshot ? <Download size={11} style={{ marginRight: 3 }} /> : null}
+                  {isSnapshot ? '커뮤니티 가져옴' : '직접 등록'}
+                </span>
+              );
+            },
+          },
+          {
+            key: 'category',
+            title: '카테고리',
+            render: (_v, item) => (
+              item.category ? (
+                <span style={{ ...styles.badge, background: colors.neutral100, color: colors.neutral600 }}>
+                  {item.category}
+                </span>
+              ) : (
+                <span style={styles.metaText}>-</span>
+              )
+            ),
+          },
+          {
+            key: 'updatedAt',
+            title: '수정일',
+            render: (_v, item) => (
+              <span style={styles.metaText}>
+                {item.updatedAt ? new Date(item.updatedAt).toLocaleDateString('ko-KR') : ''}
+              </span>
+            ),
+          },
+          {
+            key: 'actions',
+            title: '액션',
+            align: 'right',
+            render: (_v, item) => (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '6px' }}>
+                {item.href && (
+                  <a
+                    href={item.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    style={styles.openLink}
+                    title="원본 열기"
                   >
-                    <Trash2 size={14} />
-                  </button>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      )}
+                    <ExternalLink size={14} />
+                  </a>
+                )}
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleDelete(item); }}
+                  disabled={deletingId === item.id}
+                  style={styles.deleteBtn}
+                  title={item.kind === 'snapshot' ? '내 자료함에서 제거' : '삭제'}
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            ),
+          },
+        ] as Column<UnifiedResourceRow>[]}
+        dataSource={visibleItems}
+        rowKey="id"
+        loading={loading}
+        emptyText="보관된 자료가 없습니다. 커뮤니티 자료실 또는 공급자 라이브러리에서 자료를 가져와 매장에 보관할 수 있습니다."
+        onRow={(row) => ({
+          onClick: () => setDetailId(row.id),
+          style: { cursor: 'pointer' },
+        })}
+      />
+
 
       {detailRow && (
         <ResourceDetailDrawer row={detailRow} onClose={() => setDetailId(null)} />
