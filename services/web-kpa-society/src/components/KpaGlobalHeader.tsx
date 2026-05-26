@@ -110,12 +110,13 @@ export function KpaGlobalHeader() {
   ];
 
   // User 정보 변환
+  // isLoading 중 placeholder를 전달해 GlobalHeader의 isAuthenticated && user 조건 충족.
+  // side effects(creditApi, notif)는 useAuth()의 실제 user를 참조하므로 영향 없음.
   const headerUser = user
-    ? {
-        displayName: getUserDisplayName(user),
-        email: user.email,
-      }
-    : null;
+    ? { displayName: getUserDisplayName(user), email: user.email }
+    : isLoading
+      ? { displayName: '', email: '' }
+      : null;
 
   const handleLogout = async () => {
     await logout();
