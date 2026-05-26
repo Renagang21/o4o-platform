@@ -85,6 +85,8 @@ export interface AdminSupplier {
   representativeName: string;
   status: string;
   email: string;
+  businessNumber?: string;
+  taxEmail?: string;
   createdAt: string;
 }
 
@@ -665,6 +667,14 @@ export interface RegistrationRecord {
   companyName?: string;
   businessNumber?: string;
   licenseNumber?: string;
+  // WO-O4O-NETURE-SUPPLIER-REGISTRATION-BUSINESS-INFO-V1
+  representativeName?: string;
+  taxInvoiceEmail?: string;
+  contactName?: string;
+  managerPhone?: string;
+  businessAddress?: string;
+  businessAddressDetail?: string;
+  businessType?: string;
   createdAt: string;
   processedAt?: string;
   processedBy?: string;

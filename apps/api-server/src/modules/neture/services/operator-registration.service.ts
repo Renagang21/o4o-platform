@@ -41,6 +41,13 @@ export class OperatorRegistrationService {
               u."businessInfo"->>'businessName' AS "companyName",
               u."businessInfo"->>'businessNumber' AS "businessNumber",
               u."businessInfo"->>'licenseNumber' AS "licenseNumber",
+              u."businessInfo"->>'ceoName' AS "representativeName",
+              u."businessInfo"->>'taxInvoiceEmail' AS "taxInvoiceEmail",
+              u."businessInfo"->>'contactName' AS "contactName",
+              u."businessInfo"->>'managerPhone' AS "managerPhone",
+              u."businessInfo"->>'address' AS "businessAddress",
+              u."businessInfo"->>'address2' AS "businessAddressDetail",
+              u."businessInfo"->>'businessType' AS "businessType",
               sm.service_key AS "service",
               u."createdAt" AS "createdAt",
               sm.approved_at AS "processedAt",
@@ -150,16 +157,20 @@ export class OperatorRegistrationService {
           const contactPhone = userRow?.phone || null;
           const bizInfo = userRow?.businessInfo;
           const bizName = bizInfo?.businessName || userRow?.name || '';
-          const representativeName = userRow?.name || null;
+          // WO-O4O-NETURE-SUPPLIER-REGISTRATION-BUSINESS-INFO-V1:
+          // ceoName(canonical) 우선, 없으면 user.name fallback
+          const representativeName = bizInfo?.ceoName || userRow?.name || null;
+          const businessNumber = bizInfo?.businessNumber || null;
+          const businessAddress = bizInfo?.address || null;
 
           // WO-NETURE-SUPPLIER-APPROVAL-TWO-STEP-ACTIVATION-V1:
           // 가입 승인 시 PENDING으로 생성 → 운영자가 별도 공급 승인 후 ACTIVE
           const [insertedSupplier] = await queryRunner.query(
-            `INSERT INTO neture_suppliers (user_id, slug, contact_email, contact_phone, representative_name, status, approved_by, approved_at, created_at, updated_at)
-             VALUES ($1, $2, $3, $4, $5, 'PENDING', NULL, NULL, NOW(), NOW())
+            `INSERT INTO neture_suppliers (user_id, slug, contact_email, contact_phone, representative_name, business_number, business_address, status, approved_by, approved_at, created_at, updated_at)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, 'PENDING', NULL, NULL, NOW(), NOW())
              ON CONFLICT (user_id) DO NOTHING
              RETURNING id`,
-            [userId, slug, contactEmail, contactPhone, representativeName],
+            [userId, slug, contactEmail, contactPhone, representativeName, businessNumber, businessAddress],
           );
 
           // organization 연동 (businessName이 있는 경우)

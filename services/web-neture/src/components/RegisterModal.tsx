@@ -76,6 +76,14 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
     companyName: '',
     businessNumber: '',
     businessType: '',
+    // 공급자 사업자 정보
+    representativeName: '',
+    businessAddress: '',
+    businessAddressDetail: '',
+    // 공급자 담당자/세금계산서
+    contactName: '',
+    contactPhone: '',
+    taxInvoiceEmail: '',
     agreeTerms: false,
     agreePrivacy: false,
     agreeMarketing: false,
@@ -101,6 +109,12 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
         companyName: '',
         businessNumber: '',
         businessType: '',
+        representativeName: '',
+        businessAddress: '',
+        businessAddressDetail: '',
+        contactName: '',
+        contactPhone: '',
+        taxInvoiceEmail: '',
         agreeTerms: false,
         agreePrivacy: false,
         agreeMarketing: false,
@@ -148,7 +162,7 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
     const checked = target instanceof HTMLInputElement ? target.checked : false;
     const type = target instanceof HTMLInputElement ? target.type : 'text';
 
-    if (name === 'phone' || name === 'businessNumber') {
+    if (name === 'phone' || name === 'businessNumber' || name === 'contactPhone') {
       value = value.replace(/\D/g, '');
     }
 
@@ -195,6 +209,15 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
         phone: formData.phone.replace(/\D/g, ''),
         role: selectedRole,
         service: 'neture',
+        // 공급자 사업자 정보 필드 매핑
+        ...(selectedRole === 'supplier' && {
+          representativeName: formData.representativeName,
+          taxInvoiceEmail: formData.taxInvoiceEmail,
+          contactName: formData.contactName,
+          managerPhone: formData.contactPhone,
+          address1: formData.businessAddress,
+          address2: formData.businessAddressDetail,
+        }),
       });
 
       setStep(3);
@@ -234,8 +257,15 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
     const base = formData.email && formData.password && formData.lastName && formData.firstName &&
       formData.phone && formData.phone.length >= 10 && formData.phone.length <= 11 &&
       (selectedRole === 'user' || formData.companyName) && formData.agreeTerms && formData.agreePrivacy;
-    if (existingAccountMode) return base && formData.password.length > 0;
-    return base && isPasswordStrong && formData.password === formData.passwordConfirm;
+    const supplierExtra = selectedRole !== 'supplier' || (
+      formData.representativeName.trim() &&
+      formData.taxInvoiceEmail.trim() &&
+      formData.contactName.trim() &&
+      formData.contactPhone.length >= 10 &&
+      formData.businessAddress.trim()
+    );
+    if (existingAccountMode) return base && supplierExtra && formData.password.length > 0;
+    return base && supplierExtra && isPasswordStrong && formData.password === formData.passwordConfirm;
   };
 
   if (!isOpen) return null;
@@ -494,7 +524,7 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
               {/* 사업자 정보 — 일반 사용자는 표시하지 않음 */}
               {selectedRole !== 'user' && (
               <div className="p-4 bg-gray-50 rounded-lg space-y-3">
-                <h4 className="text-sm font-semibold text-gray-700">사업자 정보</h4>
+                <h4 className="text-sm font-semibold text-gray-700">사업자 기본정보</h4>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     회사명 <span className="text-red-500">*</span>
@@ -542,6 +572,103 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                       <option value="other">기타</option>
                     </select>
                   </div>
+                </div>
+
+                {/* 공급자 전용 추가 사업자 정보 */}
+                {selectedRole === 'supplier' && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        대표자명 <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="representativeName"
+                        value={formData.representativeName}
+                        onChange={handleInputChange}
+                        placeholder="홍길동"
+                        className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-shadow bg-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        사업장 주소 <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="businessAddress"
+                        value={formData.businessAddress}
+                        onChange={handleInputChange}
+                        placeholder="서울시 강남구 테헤란로 123"
+                        className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-shadow bg-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        상세주소
+                      </label>
+                      <input
+                        type="text"
+                        name="businessAddressDetail"
+                        value={formData.businessAddressDetail}
+                        onChange={handleInputChange}
+                        placeholder="5층 502호 (선택)"
+                        className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-shadow bg-white"
+                      />
+                    </div>
+                  </>
+                )}
+              </div>
+              )}
+
+              {/* 담당자/세금계산서 정보 — 공급자만 */}
+              {selectedRole === 'supplier' && (
+              <div className="p-4 bg-blue-50 rounded-lg space-y-3">
+                <h4 className="text-sm font-semibold text-gray-700">담당자 / 세금계산서 정보</h4>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      담당자명 <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="contactName"
+                      value={formData.contactName}
+                      onChange={handleInputChange}
+                      placeholder="김담당"
+                      className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-shadow bg-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      담당자 휴대폰 <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="tel"
+                      name="contactPhone"
+                      value={formData.contactPhone}
+                      onChange={handleInputChange}
+                      placeholder="숫자만 입력"
+                      className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-shadow bg-white"
+                    />
+                    {formData.contactPhone.length > 0 && formData.contactPhone.length < 10 && (
+                      <p className="mt-1 text-xs text-red-500">10자리 이상 입력해주세요</p>
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    세금계산서 이메일 <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    name="taxInvoiceEmail"
+                    value={formData.taxInvoiceEmail}
+                    onChange={handleInputChange}
+                    placeholder="tax@company.com"
+                    className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-shadow bg-white"
+                  />
+                  <p className="mt-1 text-xs text-gray-400">세금계산서 수신용 이메일 (로그인 이메일과 달라도 됩니다)</p>
                 </div>
               </div>
               )}

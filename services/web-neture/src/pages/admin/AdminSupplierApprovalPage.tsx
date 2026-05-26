@@ -149,6 +149,7 @@ export default function AdminSupplierApprovalPage() {
               <tr>
                 <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">공급자명</th>
                 <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">대표자</th>
+                <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">사업자번호</th>
                 <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">이메일</th>
                 <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">상태</th>
                 <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">등록일</th>
@@ -163,7 +164,13 @@ export default function AdminSupplierApprovalPage() {
                     <p className="text-xs text-slate-400 mt-0.5">{s.id.slice(0, 8)}...</p>
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-600">{s.representativeName || '-'}</td>
-                  <td className="px-6 py-4 text-sm text-slate-600">{s.email}</td>
+                  <td className="px-6 py-4 text-sm text-slate-600">{s.businessNumber || '-'}</td>
+                  <td className="px-6 py-4 text-sm text-slate-600">
+                    <div>{s.email}</div>
+                    {s.taxEmail && s.taxEmail !== s.email && (
+                      <div className="text-xs text-slate-400 mt-0.5">세금: {s.taxEmail}</div>
+                    )}
+                  </td>
                   <td className="px-6 py-4">
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[s.status] || 'bg-gray-100 text-gray-700'}`}>
                       {statusLabels[s.status] || s.status}

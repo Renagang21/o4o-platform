@@ -41,6 +41,14 @@ interface RegistrationRequest {
   companyName?: string;
   businessNumber?: string;
   licenseNumber?: string;
+  // WO-O4O-NETURE-SUPPLIER-REGISTRATION-BUSINESS-INFO-V1
+  representativeName?: string;
+  taxInvoiceEmail?: string;
+  contactName?: string;
+  managerPhone?: string;
+  businessAddress?: string;
+  businessAddressDetail?: string;
+  businessType?: string;
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   createdAt: string;
   processedAt?: string;
@@ -118,6 +126,13 @@ export default function RegistrationRequestsPage() {
         companyName: r.companyName,
         businessNumber: r.businessNumber,
         licenseNumber: r.licenseNumber,
+        representativeName: r.representativeName,
+        taxInvoiceEmail: r.taxInvoiceEmail,
+        contactName: r.contactName,
+        managerPhone: r.managerPhone,
+        businessAddress: r.businessAddress,
+        businessAddressDetail: r.businessAddressDetail,
+        businessType: r.businessType,
         status: mapStatus(r.status),
         createdAt: r.createdAt || new Date().toISOString(),
         processedAt: r.processedAt,
@@ -503,6 +518,45 @@ export default function RegistrationRequestsPage() {
                     <div>
                       <div className="text-sm text-gray-500">면허번호</div>
                       <div className="font-medium">{selectedRequest.licenseNumber}</div>
+                    </div>
+                  )}
+                  {selectedRequest.representativeName && (
+                    <div>
+                      <div className="text-sm text-gray-500">대표자명</div>
+                      <div className="font-medium">{selectedRequest.representativeName}</div>
+                    </div>
+                  )}
+                  {selectedRequest.businessType && (
+                    <div>
+                      <div className="text-sm text-gray-500">업종</div>
+                      <div className="font-medium">{selectedRequest.businessType}</div>
+                    </div>
+                  )}
+                  {selectedRequest.businessAddress && (
+                    <div className="col-span-2">
+                      <div className="text-sm text-gray-500">사업장 주소</div>
+                      <div className="font-medium">
+                        {selectedRequest.businessAddress}
+                        {selectedRequest.businessAddressDetail && ` ${selectedRequest.businessAddressDetail}`}
+                      </div>
+                    </div>
+                  )}
+                  {selectedRequest.contactName && (
+                    <div>
+                      <div className="text-sm text-gray-500">담당자명</div>
+                      <div className="font-medium">{selectedRequest.contactName}</div>
+                    </div>
+                  )}
+                  {selectedRequest.managerPhone && (
+                    <div>
+                      <div className="text-sm text-gray-500">담당자 휴대폰</div>
+                      <div className="font-medium">{selectedRequest.managerPhone}</div>
+                    </div>
+                  )}
+                  {selectedRequest.taxInvoiceEmail && (
+                    <div className="col-span-2">
+                      <div className="text-sm text-gray-500">세금계산서 이메일</div>
+                      <div className="font-medium">{selectedRequest.taxInvoiceEmail}</div>
                     </div>
                   )}
                   <div>

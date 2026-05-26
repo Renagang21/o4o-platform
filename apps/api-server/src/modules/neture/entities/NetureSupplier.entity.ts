@@ -82,8 +82,14 @@ export class NetureSupplier {
 
   // === Business Profile Fields (WO-NETURE-SUPPLIER-BUSINESS-PROFILE-FORM-ALIGNMENT-V1) ===
 
+  @Column({ name: 'business_number', type: 'varchar', length: 20, nullable: true })
+  businessNumber: string | null;
+
   @Column({ name: 'representative_name', type: 'varchar', length: 100, nullable: true })
   representativeName: string | null;
+
+  @Column({ name: 'business_address', type: 'text', nullable: true })
+  businessAddress: string | null;
 
   @Column({ name: 'manager_name', type: 'varchar', length: 100, nullable: true })
   managerName: string | null;

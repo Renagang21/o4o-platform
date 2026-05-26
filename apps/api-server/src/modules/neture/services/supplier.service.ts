@@ -303,7 +303,7 @@ export class NetureSupplierService {
 
   async getAllSuppliers(
     filters?: { status?: SupplierStatus },
-  ): Promise<Array<{ id: string; name: string; slug: string; status: SupplierStatus; contactEmail: string; userId: string; identityStatus: string | null; userEmail: string | null; createdAt: Date; updatedAt: Date }>> {
+  ): Promise<Array<{ id: string; name: string; slug: string; status: SupplierStatus; contactEmail: string; userId: string; identityStatus: string | null; userEmail: string | null; representativeName: string | null; businessNumber: string | null; taxEmail: string | null; createdAt: Date; updatedAt: Date }>> {
     try {
       const where: { status?: SupplierStatus } = {};
       if (filters?.status) where.status = filters.status;
@@ -337,6 +337,9 @@ export class NetureSupplierService {
           userId: s.userId,
           identityStatus: userInfo?.status || null,
           userEmail: userInfo?.email || null,
+          representativeName: s.representativeName || null,
+          businessNumber: s.businessNumber || null,
+          taxEmail: s.taxEmail || null,
           createdAt: s.createdAt,
           updatedAt: s.updatedAt,
         };
