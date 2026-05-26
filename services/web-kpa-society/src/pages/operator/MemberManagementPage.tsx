@@ -13,7 +13,7 @@
  * 탭: 전체 | 약사 | 약대생 | 가입 신청
  */
 
-import { useState, useEffect, useCallback, useMemo, type CSSProperties, type ReactNode } from 'react';
+import { useState, useEffect, useCallback, useMemo, type ReactNode } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import {
@@ -30,7 +30,8 @@ import {
   Trash2,
   ShieldAlert,
 } from 'lucide-react';
-import { ActionBar, BulkResultModal, RowActionMenu, ConfirmActionDialog, BaseDetailDrawer, AddressSearch } from '@o4o/ui';
+import { ActionBar, BulkResultModal, RowActionMenu, ConfirmActionDialog, BaseDetailDrawer } from '@o4o/ui';
+import { KpaEditUserModal, type KpaMemberForEdit, type ApiRequestFn } from '@o4o/operator-core-ui';
 import {
   DataTable,
   MemberListLayout,
@@ -42,6 +43,19 @@ import {
 import type { ListColumnDef, MemberTab } from '@o4o/operator-ux-core';
 import { ACTIVITY_TYPE_LABELS } from '../../contexts/AuthContext';
 import { apiClient } from '../../api/client';
+
+// ─── KpaEditUserModal API adapter ────────────────────────────
+// KPA apiClient baseURL = /api/v1/kpa — paths are relative to that.
+const kpaEditModalMakeRequest: ApiRequestFn = async (method, path, data) => {
+  switch (method) {
+    case 'GET': return apiClient.get(path);
+    case 'PATCH': return apiClient.patch(path, data);
+    case 'POST': return apiClient.post(path, data);
+    case 'PUT': return apiClient.put(path, data);
+    case 'DELETE': return apiClient.delete(path);
+    default: throw new Error(`Unsupported method: ${method as string}`);
+  }
+};
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -327,57 +341,9 @@ export default function MemberManagementPage() {
   // WO-O4O-KPA-ADMIN-MEMBER-MANAGEMENT-SEPARATION-V1:
   //   완전삭제 진입점 + DeleteRiskModal 은 /admin/members (AdminMemberManagementPage) 로 이관.
   const [selectedMember, setSelectedMember] = useState<KpaMember | null>(null);
-  // WO-O4O-OPERATOR-MEMBER-EDIT-ROLE-MANAGEMENT-V1:
-  //   Drawer 인라인 편집 모드 + 폼 state.
-  //   기존 EditMemberModal 제거 — 모든 편집은 Drawer 내부에서 진행.
-  // WO-O4O-KPA-OPERATOR-ACTIVITYTYPE-STOREOWNER-REALIGNMENT-V1:
-  //   조직 역할(member/operator/admin) 편집 제거 → 활동 유형 + 약국 정보 편집 중심으로 재설계.
-  // WO-O4O-KPA-OPERATOR-MEMBER-CANONICAL-EDIT-COMPLETE-V1:
-  //   license_number / business_number / pharmacy_phone 추가.
-  //   business_number / pharmacy_phone 은 users.businessInfo JSONB merge — backend 가 처리.
-  const [isEditing, setIsEditing] = useState(false);
-  const [editForm, setEditForm] = useState<{
-    name: string;
-    nickname: string;
-    membership_type: string;
-    activity_type: string;
-    license_number: string;
-    pharmacy_name: string;
-    pharmacy_address: string;
-    // WO-O4O-KPA-PHARMACY-CONTACT-NAME-FIELD-V1
-    contactName: string;
-    // WO-O4O-KPA-PHARMACY-OWNER-ADDRESS-CANONICALIZE-V1: canonical split address fields
-    zipCode: string;
-    address1: string;
-    address2: string;
-    business_number: string;
-    pharmacy_phone: string;
-    // WO-O4O-KPA-OPERATOR-MEMBER-BUSINESS-INFO-EDIT-PAYLOAD-ALIGNMENT-V1:
-    //   canonical 약국 정보 3개 필드 운영자 수정 가능 (개설자 연락처/대표자명/세금계산서 이메일).
-    ownerPhone: string;
-    ceoName: string;
-    taxInvoiceEmail: string;
-    status: MemberStatus;
-  }>({
-    name: '',
-    nickname: '',
-    membership_type: 'pharmacist',
-    activity_type: '',
-    license_number: '',
-    pharmacy_name: '',
-    pharmacy_address: '',
-    contactName: '',
-    zipCode: '',
-    address1: '',
-    address2: '',
-    business_number: '',
-    pharmacy_phone: '',
-    ownerPhone: '',
-    ceoName: '',
-    taxInvoiceEmail: '',
-    status: 'active',
-  });
-  const [savingEdit, setSavingEdit] = useState(false);
+  // WO-O4O-OPERATOR-EDITUSER-MODAL-KPA-INTEGRATION-V1:
+  //   Drawer 인라인 편집 제거 → KpaEditUserModal 독립 모달로 이전.
+  const [editModalOpen, setEditModalOpen] = useState(false);
 
   // WO-O4O-KPA-MEMBER-BULK-ACTION-ALIGN-V1: bulk selection + batch hook
   //   - selectedIds: 현재 페이지 기준 회원 ID 집합 (canonical Set<string>)
@@ -480,6 +446,9 @@ export default function MemberManagementPage() {
     return m.status === 'withdrawn';
   }, []);
 
+  // WO-O4O-OPERATOR-EDITUSER-MODAL-KPA-INTEGRATION-V1:
+  //   편집은 KpaEditUserModal 독립 모달로 이전.
+  //   openMemberEdit: Drawer 열기 + 모달 즉시 진입 (행 액션 경로).
   const openMemberEdit = useCallback((m: KpaMember) => {
     if (memberHasSuperAdmin(m)) {
       toast.error('super_admin 권한을 보유한 회원은 수정할 수 없습니다.');
@@ -490,224 +459,8 @@ export default function MemberManagementPage() {
       return;
     }
     setSelectedMember(m);
-    // WO-O4O-KPA-MEMBER-EDIT-FORM-CURRENT-VALUE-FIX-V1:
-    //   pharmacy_address / pharmacy_phone 현재값을 form 에 prefill.
-    //   기존 ''(빈 문자열) 초기화는 운영자가 "주소가 비어있다"고 오인하게 만들었음.
-    //   빈 값 명시 삭제는 본 WO 범위 외 — saveMemberEdit 에서 비교 기반 변경 감지로 보호.
-    setEditForm({
-      name: m.user?.name || '',
-      nickname: m.user?.nickname || '',
-      membership_type: m.membership_type || 'pharmacist',
-      activity_type: m.activity_type || '',
-      license_number: m.license_number || '',
-      pharmacy_name: m.pharmacy_name || '',
-      pharmacy_address: m.pharmacy_address || '',
-      // WO-O4O-KPA-PHARMACY-CONTACT-NAME-FIELD-V1
-      contactName: m.business_info?.contactName || '',
-      // WO-O4O-KPA-PHARMACY-OWNER-ADDRESS-CANONICALIZE-V1: canonical address prefill
-      zipCode: m.business_info?.zipCode || '',
-      address1: m.business_info?.address || '',
-      address2: m.business_info?.address2 || '',
-      business_number: m.business_info?.businessNumber || '',
-      pharmacy_phone: m.business_info?.pharmacy_phone || '',
-      // WO-O4O-KPA-OPERATOR-MEMBER-BUSINESS-INFO-EDIT-PAYLOAD-ALIGNMENT-V1:
-      //   정책 B (canonical-only): canonical key 우선, legacy alias 는 read fallback 으로만 사용.
-      ownerPhone: m.business_info?.ownerPhone || '',
-      ceoName: m.business_info?.ceoName || m.business_info?.representativeName || '',
-      taxInvoiceEmail: m.business_info?.taxInvoiceEmail || m.business_info?.taxEmail || '',
-      status: m.status,
-    });
-    setIsEditing(true);
+    setEditModalOpen(true);
   }, [memberHasSuperAdmin, memberIsWithdrawn]);
-
-  const enterEditMode = useCallback(() => {
-    if (!selectedMember) return;
-    if (memberHasSuperAdmin(selectedMember)) {
-      toast.error('super_admin 권한을 보유한 회원은 수정할 수 없습니다.');
-      return;
-    }
-    if (memberIsWithdrawn(selectedMember)) {
-      toast.error('탈퇴 처리된 회원은 수정할 수 없습니다.');
-      return;
-    }
-    // WO-O4O-KPA-MEMBER-EDIT-FORM-CURRENT-VALUE-FIX-V1: 현재값 prefill (openMemberEdit 와 동일 정책)
-    setEditForm({
-      name: selectedMember.user?.name || '',
-      nickname: selectedMember.user?.nickname || '',
-      membership_type: selectedMember.membership_type || 'pharmacist',
-      activity_type: selectedMember.activity_type || '',
-      license_number: selectedMember.license_number || '',
-      pharmacy_name: selectedMember.pharmacy_name || '',
-      pharmacy_address: selectedMember.pharmacy_address || '',
-      // WO-O4O-KPA-PHARMACY-CONTACT-NAME-FIELD-V1
-      contactName: selectedMember.business_info?.contactName || '',
-      // WO-O4O-KPA-PHARMACY-OWNER-ADDRESS-CANONICALIZE-V1: canonical address prefill
-      zipCode: selectedMember.business_info?.zipCode || '',
-      address1: selectedMember.business_info?.address || '',
-      address2: selectedMember.business_info?.address2 || '',
-      business_number: selectedMember.business_info?.businessNumber || '',
-      pharmacy_phone: selectedMember.business_info?.pharmacy_phone || '',
-      // WO-O4O-KPA-OPERATOR-MEMBER-BUSINESS-INFO-EDIT-PAYLOAD-ALIGNMENT-V1: canonical prefill
-      ownerPhone: selectedMember.business_info?.ownerPhone || '',
-      ceoName: selectedMember.business_info?.ceoName || selectedMember.business_info?.representativeName || '',
-      taxInvoiceEmail: selectedMember.business_info?.taxInvoiceEmail || selectedMember.business_info?.taxEmail || '',
-      status: selectedMember.status,
-    });
-    setIsEditing(true);
-  }, [selectedMember, memberHasSuperAdmin, memberIsWithdrawn]);
-
-  const cancelEditMode = useCallback(() => setIsEditing(false), []);
-
-  const saveMemberEdit = useCallback(async () => {
-    if (!selectedMember) return;
-    setSavingEdit(true);
-    try {
-      // 1) 사전 검증 — super_admin / withdrawn 이중 가드
-      if (memberHasSuperAdmin(selectedMember)) {
-        throw new Error('super_admin 권한을 보유한 회원은 수정할 수 없습니다.');
-      }
-      if (memberIsWithdrawn(selectedMember)) {
-        throw new Error('탈퇴 처리된 회원은 수정할 수 없습니다.');
-      }
-
-      // 2) 변경 사항 계산
-      //   WO-O4O-KPA-OPERATOR-ACTIVITYTYPE-STOREOWNER-REALIGNMENT-V1:
-      //     조직 역할(role) 변경 제거 — admin scope 권한은 admin.neture.co.kr 로 이관.
-      //   WO-O4O-KPA-OPERATOR-MEMBER-CANONICAL-EDIT-COMPLETE-V1:
-      //     license_number / business_number / pharmacy_phone 추가.
-      const currentName = (selectedMember.user?.name || '').trim();
-      const newName = editForm.name.trim();
-      const nameChanged = newName !== currentName;
-      // WO-O4O-KPA-MEMBER-CAPABILITY-NICKNAME-UI-CANONICAL-CLEANUP-V1:
-      //   nickname trim 비교. 빈 문자열로 비우면 backend 가 NULL 로 저장.
-      const currentNickname = (selectedMember.user?.nickname || '').trim();
-      const newNickname = editForm.nickname.trim();
-      const nicknameChanged = newNickname !== currentNickname;
-      const typeChanged = editForm.membership_type !== (selectedMember.membership_type || '');
-      const activityChanged = editForm.activity_type !== (selectedMember.activity_type || '');
-      const licenseChanged = editForm.license_number !== (selectedMember.license_number || '');
-      const pharmacyNameChanged = editForm.pharmacy_name !== (selectedMember.pharmacy_name || '');
-      const currentContactName = (selectedMember.business_info?.contactName || '').trim();
-      const newContactName = editForm.contactName.trim();
-      const contactNameChanged = newContactName !== currentContactName;
-
-      // WO-O4O-KPA-PHARMACY-OWNER-ADDRESS-CANONICALIZE-V1: canonical address change detection
-      const currentZipCode = (selectedMember.business_info?.zipCode || '').trim();
-      const newZipCode = editForm.zipCode.trim();
-      const currentAddress1 = (selectedMember.business_info?.address || '').trim();
-      const newAddress1 = editForm.address1.trim();
-      const currentAddress2 = (selectedMember.business_info?.address2 || '').trim();
-      const newAddress2 = editForm.address2.trim();
-      const addressChanged = newAddress1.length > 0 && (
-        newZipCode !== currentZipCode || newAddress1 !== currentAddress1 || newAddress2 !== currentAddress2
-      );
-
-      // WO-O4O-KPA-MEMBER-EDIT-FORM-CURRENT-VALUE-FIX-V1:
-      //   pharmacy_address / pharmacy_phone 가 form 에 prefill 되므로 변경 감지를
-      //   비교 기반으로 전환한다. 단, 빈 값 명시 삭제는 본 WO 범위 외이므로
-      //   `newValue.length === 0` (운영자가 입력칸을 비웠을 때) 은 "변경 없음"으로 유지.
-      //   → 의도치 않은 빈 저장을 방지하고 기존 데이터를 보존한다.
-      const currentPharmacyAddress = (selectedMember.pharmacy_address || '').trim();
-      const newPharmacyAddress = editForm.pharmacy_address.trim();
-      const pharmacyAddressChanged = newPharmacyAddress.length > 0 && newPharmacyAddress !== currentPharmacyAddress;
-      const currentBusinessNumber = selectedMember.business_info?.businessNumber || '';
-      const businessNumberChanged = editForm.business_number !== currentBusinessNumber;
-      const currentPharmacyPhone = (selectedMember.business_info?.pharmacy_phone || '').trim();
-      const newPharmacyPhone = editForm.pharmacy_phone.trim();
-      const pharmacyPhoneChanged = newPharmacyPhone.length > 0 && newPharmacyPhone !== currentPharmacyPhone;
-
-      // WO-O4O-KPA-OPERATOR-MEMBER-BUSINESS-INFO-EDIT-PAYLOAD-ALIGNMENT-V1:
-      //   canonical 3개 필드 — 정책 A (빈 문자열 = 변경 없음) 적용. 정책 B (canonical fallback read).
-      const currentOwnerPhone = (selectedMember.business_info?.ownerPhone || '').trim();
-      const newOwnerPhone = editForm.ownerPhone.trim();
-      const ownerPhoneChanged = newOwnerPhone.length > 0 && newOwnerPhone !== currentOwnerPhone;
-      const currentCeoName = (
-        selectedMember.business_info?.ceoName
-        || selectedMember.business_info?.representativeName
-        || ''
-      ).trim();
-      const newCeoName = editForm.ceoName.trim();
-      const ceoNameChanged = newCeoName.length > 0 && newCeoName !== currentCeoName;
-      const currentTaxInvoiceEmail = (
-        selectedMember.business_info?.taxInvoiceEmail
-        || selectedMember.business_info?.taxEmail
-        || ''
-      ).trim();
-      const newTaxInvoiceEmail = editForm.taxInvoiceEmail.trim();
-      const taxInvoiceEmailChanged = newTaxInvoiceEmail.length > 0 && newTaxInvoiceEmail !== currentTaxInvoiceEmail;
-
-      const statusChanged = editForm.status !== selectedMember.status;
-
-      if (
-        !nameChanged && !nicknameChanged && !typeChanged && !activityChanged && !licenseChanged
-        && !pharmacyNameChanged && !pharmacyAddressChanged
-        && !businessNumberChanged && !pharmacyPhoneChanged && !contactNameChanged && !addressChanged
-        && !ownerPhoneChanged && !ceoNameChanged && !taxInvoiceEmailChanged
-        && !statusChanged
-      ) {
-        setIsEditing(false);
-        return;
-      }
-
-      // 3) 순차 호출 — info → status
-      //    backend PATCH /:id/info 가 activity_type 변경 시 store_owner 부여/회수 자동 동기화 +
-      //    warnings[] 응답 가능. status 가 마지막 (MembershipApprovalService 흐름에 영향).
-      if (
-        nameChanged || nicknameChanged || typeChanged || activityChanged || licenseChanged
-        || pharmacyNameChanged || pharmacyAddressChanged
-        || businessNumberChanged || pharmacyPhoneChanged || contactNameChanged || addressChanged
-        || ownerPhoneChanged || ceoNameChanged || taxInvoiceEmailChanged
-      ) {
-        const payload: Record<string, string> = {};
-        if (nameChanged) payload.name = newName;
-        // WO-O4O-KPA-MEMBER-CAPABILITY-NICKNAME-UI-CANONICAL-CLEANUP-V1: nickname write
-        if (nicknameChanged) payload.nickname = newNickname;
-        if (typeChanged) payload.membership_type = editForm.membership_type;
-        if (activityChanged) payload.activity_type = editForm.activity_type;
-        if (licenseChanged) payload.license_number = editForm.license_number;
-        if (pharmacyNameChanged) payload.pharmacy_name = editForm.pharmacy_name;
-        // WO-O4O-KPA-MEMBER-EDIT-FORM-CURRENT-VALUE-FIX-V1:
-        //   변경 감지에서 이미 trim + 비-빈 + 다른 값 보장 — 변수 그대로 전달.
-        if (pharmacyAddressChanged) payload.pharmacy_address = newPharmacyAddress;
-        if (businessNumberChanged) payload.business_number = editForm.business_number;
-        if (pharmacyPhoneChanged) payload.pharmacy_phone = newPharmacyPhone;
-        if (contactNameChanged) payload.contactName = newContactName;
-        // WO-O4O-KPA-PHARMACY-OWNER-ADDRESS-CANONICALIZE-V1: send split address fields
-        if (addressChanged) {
-          payload.zipCode = newZipCode;
-          payload.address1 = newAddress1;
-          payload.address2 = newAddress2;
-        }
-        // WO-O4O-KPA-OPERATOR-MEMBER-BUSINESS-INFO-EDIT-PAYLOAD-ALIGNMENT-V1:
-        //   정책 A/B 준수: canonical key 만 전송, 빈 값은 변경 감지에서 이미 skip.
-        if (ownerPhoneChanged) payload.ownerPhone = newOwnerPhone;
-        if (ceoNameChanged) payload.ceoName = newCeoName;
-        if (taxInvoiceEmailChanged) payload.taxInvoiceEmail = newTaxInvoiceEmail;
-        const infoRes = await apiClient.patch<{ success: boolean; warnings?: string[] }>(
-          `/members/${selectedMember.id}/info`,
-          payload,
-        );
-        // backend warnings (예: store_owner 부여 보류 사유) 를 warning toast 로 노출
-        if (Array.isArray(infoRes?.warnings) && infoRes.warnings.length > 0) {
-          for (const w of infoRes.warnings) {
-            toast.warning(w);
-          }
-        }
-      }
-      if (statusChanged) {
-        await apiClient.patch(`/members/${selectedMember.id}/status`, { status: editForm.status });
-      }
-
-      toast.success('회원 정보가 저장되었습니다.');
-      setIsEditing(false);
-      // 5) 목록 + Drawer (selectedMember) 갱신 — selectedMember 는 별도 effect 가 members 변동 시 동기화.
-      await fetchMembers(memberPage);
-    } catch (e: any) {
-      toast.error(e?.message || '저장에 실패했습니다.');
-    } finally {
-      setSavingEdit(false);
-    }
-  }, [selectedMember, editForm, memberHasSuperAdmin, memberIsWithdrawn, fetchMembers, memberPage]);
 
   // 목록(fetchMembers) 갱신 후 Drawer 의 selectedMember 도 최신 데이터로 동기화.
   // selectedMember 가 현재 페이지에 없으면(필터 변경 등) 기존 객체 유지.
@@ -719,9 +472,9 @@ export default function MemberManagementPage() {
     });
   }, [members]);
 
-  // Drawer 닫힘 시 편집 모드 해제
+  // Drawer 닫힘 시 편집 모달 해제
   useEffect(() => {
-    if (!selectedMember) setIsEditing(false);
+    if (!selectedMember) setEditModalOpen(false);
   }, [selectedMember]);
 
   // WO-O4O-KPA-MEMBER-BULK-ACTION-ALIGN-V1:
@@ -1235,77 +988,47 @@ export default function MemberManagementPage() {
         onClose={() => setSelectedMember(null)}
         title={selectedMember ? (selectedMember.user?.name || '-') : ''}
         width={520}
-        actions={selectedMember ? (
-          isEditing ? [
+        actions={selectedMember && !memberHasSuperAdmin(selectedMember) ? [
+          ...(selectedMember.status === 'pending' ? [
             {
-              label: '저장',
-              onClick: () => { void saveMemberEdit(); },
+              label: '승인',
+              onClick: () => { handleStatusChange(selectedMember.id, 'active').then(() => setSelectedMember(null)); },
               variant: 'primary' as const,
-              loading: savingEdit,
-              disabled: savingEdit,
+              loading: actionLoading === selectedMember.id,
+              disabled: actionLoading === selectedMember.id,
             },
             {
-              label: '취소',
-              onClick: cancelEditMode,
-              variant: 'default' as const,
-              disabled: savingEdit,
+              label: '반려',
+              onClick: () => { handleStatusChange(selectedMember.id, 'rejected').then(() => setSelectedMember(null)); },
+              variant: 'danger' as const,
+              loading: actionLoading === selectedMember.id,
+              disabled: actionLoading === selectedMember.id,
             },
-          ] : [
-            ...(memberHasSuperAdmin(selectedMember) ? [] : [
-              ...(selectedMember.status === 'pending' ? [
-                {
-                  label: '승인',
-                  onClick: () => { handleStatusChange(selectedMember.id, 'active').then(() => setSelectedMember(null)); },
-                  variant: 'primary' as const,
-                  loading: actionLoading === selectedMember.id,
-                  disabled: actionLoading === selectedMember.id,
-                },
-                {
-                  label: '반려',
-                  onClick: () => { handleStatusChange(selectedMember.id, 'rejected').then(() => setSelectedMember(null)); },
-                  variant: 'danger' as const,
-                  loading: actionLoading === selectedMember.id,
-                  disabled: actionLoading === selectedMember.id,
-                },
-              ] : []),
-              ...(selectedMember.status === 'active' ? [{
-                label: '정지',
-                onClick: () => { handleStatusChange(selectedMember.id, 'suspended').then(() => setSelectedMember(null)); },
-                variant: 'danger' as const,
-                loading: actionLoading === selectedMember.id,
-                disabled: actionLoading === selectedMember.id,
-              }] : []),
-              ...(selectedMember.status === 'suspended' ? [{
-                label: '복원',
-                onClick: () => { handleStatusChange(selectedMember.id, 'active').then(() => setSelectedMember(null)); },
-                variant: 'primary' as const,
-                loading: actionLoading === selectedMember.id,
-                disabled: actionLoading === selectedMember.id,
-              }] : []),
-            ]),
-          ]
-        ) : []}
+          ] : []),
+          ...(selectedMember.status === 'active' ? [{
+            label: '정지',
+            onClick: () => { handleStatusChange(selectedMember.id, 'suspended').then(() => setSelectedMember(null)); },
+            variant: 'danger' as const,
+            loading: actionLoading === selectedMember.id,
+            disabled: actionLoading === selectedMember.id,
+          }] : []),
+          ...(selectedMember.status === 'suspended' ? [{
+            label: '복원',
+            onClick: () => { handleStatusChange(selectedMember.id, 'active').then(() => setSelectedMember(null)); },
+            variant: 'primary' as const,
+            loading: actionLoading === selectedMember.id,
+            disabled: actionLoading === selectedMember.id,
+          }] : []),
+        ] : []}
       >
         {selectedMember && (() => {
-          // WO-O4O-OPERATOR-MEMBER-EDIT-ROLE-MANAGEMENT-V1:
-          //   편집/보기 모드 분기. super_admin 회원은 편집 진입 차단.
-          // WO-O4O-KPA-OPERATOR-ACTIVITYTYPE-STOREOWNER-REALIGNMENT-V1:
-          //   조직 역할 select 제거 → 활동 유형 select + pharmacy_owner 부여/회수 흐름으로 교체.
-          //   admin scope (operator/admin/super_admin) 수정은 admin.neture.co.kr 로 이관.
+          // WO-O4O-OPERATOR-EDITUSER-MODAL-KPA-INTEGRATION-V1:
+          //   Drawer 는 view-only. 편집은 KpaEditUserModal 독립 모달.
           const targetIsSuperAdmin = memberHasSuperAdmin(selectedMember);
           const hasStoreOwnerCap = (selectedMember.capabilities ?? []).includes('kpa:store_owner');
-          const inputStyle: CSSProperties = {
-            width: '100%',
-            padding: '6px 10px',
-            border: '1px solid #cbd5e1',
-            borderRadius: 6,
-            fontSize: 14,
-            color: '#1e293b',
-            background: '#fff',
-          };
-          const fieldRowStyle: CSSProperties = { display: 'flex', gap: 8, marginBottom: 10, alignItems: 'flex-start', flexWrap: 'wrap' };
-          const labelStyle: CSSProperties = { fontWeight: 600, color: '#64748b', minWidth: 100, flexShrink: 0, paddingTop: 2 };
-          const valueStyle: CSSProperties = { color: '#1e293b', flex: 1, minWidth: 0, wordBreak: 'break-word', overflowWrap: 'break-word' as const };
+          const fieldRowStyle = { display: 'flex', gap: 8, marginBottom: 10, alignItems: 'flex-start' as const, flexWrap: 'wrap' as const };
+          const labelStyle = { fontWeight: 600, color: '#64748b', minWidth: 100, flexShrink: 0, paddingTop: 2 };
+          const valueStyle = { color: '#1e293b', flex: 1, minWidth: 0, wordBreak: 'break-word' as const, overflowWrap: 'break-word' as const };
 
           return (
             <div style={{ fontSize: 14, color: '#374151' }}>
@@ -1316,26 +1039,13 @@ export default function MemberManagementPage() {
                     {(selectedMember.user?.name || '-').charAt(0)}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        value={editForm.name}
-                        onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))}
-                        placeholder="이름"
-                        disabled={savingEdit}
-                        style={{ ...inputStyle, fontWeight: 600, fontSize: 15, marginBottom: 4 }}
-                      />
-                    ) : (
-                      <p style={{ fontWeight: 600, fontSize: 15, color: '#1e293b', marginBottom: 2 }}>
-                        {selectedMember.user?.name || '-'}
-                      </p>
-                    )}
+                    <p style={{ fontWeight: 600, fontSize: 15, color: '#1e293b', marginBottom: 2 }}>
+                      {selectedMember.user?.name || '-'}
+                    </p>
                     <p style={{ fontSize: 13, color: '#64748b' }} title="이메일은 수정할 수 없습니다">
                       {selectedMember.user?.email || '-'}
                     </p>
-                    {/* WO-O4O-KPA-MEMBER-CAPABILITY-NICKNAME-UI-CANONICAL-CLEANUP-V1:
-                        보기 모드에서 닉네임이 있을 때만 이메일 아래 보조 표시. */}
-                    {!isEditing && selectedMember.user?.nickname && (
+                    {selectedMember.user?.nickname && (
                       <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }} title="닉네임 (users.nickname)">
                         @{selectedMember.user.nickname}
                       </p>
@@ -1347,161 +1057,48 @@ export default function MemberManagementPage() {
                 </div>
               </div>
 
-              {/* WO-O4O-KPA-MEMBER-CAPABILITY-NICKNAME-UI-CANONICAL-CLEANUP-V1:
-                  닉네임 편집 행 — 수정 모드에서만 노출. 보기 모드는 기본정보 블록 안에 보조 표시. */}
-              {isEditing && (
-                <div style={fieldRowStyle}>
-                  <span style={labelStyle}>닉네임</span>
-                  <input
-                    type="text"
-                    value={editForm.nickname}
-                    onChange={(e) => setEditForm((f) => ({ ...f, nickname: e.target.value }))}
-                    placeholder="닉네임 (선택 — 비우면 해제)"
-                    maxLength={50}
-                    disabled={savingEdit}
-                    style={inputStyle}
-                  />
-                </div>
-              )}
-
-              {/* 상세 필드 */}
               {/* 유형 */}
               <div style={fieldRowStyle}>
                 <span style={labelStyle}>유형</span>
-                {isEditing ? (
-                  <select
-                    value={editForm.membership_type}
-                    onChange={(e) => setEditForm((f) => ({ ...f, membership_type: e.target.value }))}
-                    disabled={savingEdit}
-                    style={inputStyle}
-                  >
-                    <option value="pharmacist">약사</option>
-                    <option value="student">약대생</option>
-                    {/* pharmacist_member / pharmacy_student_member 는 canonical 저장값 — pharmacist/student alias 와 동일 표시 */}
-                    {editForm.membership_type === 'pharmacist_member' && (
-                      <option value="pharmacist_member">약사</option>
-                    )}
-                    {editForm.membership_type === 'pharmacy_student_member' && (
-                      <option value="pharmacy_student_member">약대생</option>
-                    )}
-                  </select>
-                ) : (
-                  <span style={valueStyle}>
-                    {selectedMember.membership_type === 'pharmacist' || selectedMember.membership_type === 'pharmacist_member'
-                      ? '약사'
-                      : selectedMember.membership_type === 'student' || selectedMember.membership_type === 'pharmacy_student_member'
-                        ? '약대생'
-                        : '-'}
-                  </span>
-                )}
+                <span style={valueStyle}>
+                  {selectedMember.membership_type === 'pharmacist' || selectedMember.membership_type === 'pharmacist_member'
+                    ? '약사'
+                    : selectedMember.membership_type === 'student' || selectedMember.membership_type === 'pharmacy_student_member'
+                      ? '약대생'
+                      : '-'}
+                </span>
               </div>
-
-              {/* 조직 역할 표시 제거 — WO-O4O-KPA-OPERATOR-MEMBER-CANONICAL-EDIT-COMPLETE-V1:
-                  · legacy 조직 역할(member/operator/admin) UI 완전 제거.
-                  · 실제 권한 SSOT 는 role_assignments — capability chips 영역에서 노출됨.
-                  · operator/admin/super_admin 권한 관리는 admin.neture.co.kr 전용. */}
 
               {/* 상태 */}
               <div style={fieldRowStyle}>
                 <span style={labelStyle}>상태</span>
-                {isEditing ? (
-                  <select
-                    value={editForm.status}
-                    onChange={(e) => setEditForm((f) => ({ ...f, status: e.target.value as MemberStatus }))}
-                    disabled={savingEdit}
-                    style={inputStyle}
-                  >
-                    <option value="pending">대기</option>
-                    <option value="active">활성</option>
-                    <option value="suspended">정지</option>
-                    <option value="rejected">반려</option>
-                    <option value="withdrawn">탈퇴</option>
-                  </select>
-                ) : (
-                  <span style={valueStyle}><StatusBadge status={selectedMember.status} /></span>
-                )}
+                <span style={valueStyle}><StatusBadge status={selectedMember.status} /></span>
               </div>
 
-              {/* 면허번호 — WO-O4O-KPA-OPERATOR-MEMBER-CANONICAL-EDIT-COMPLETE-V1:
-                  편집 모드에서 직접 수정 가능. backend PATCH /:id/info 가 license_number 처리. */}
-              {(isEditing || selectedMember.license_number) && (
+              {/* 면허번호 */}
+              {selectedMember.license_number && (
                 <div style={fieldRowStyle}>
                   <span style={labelStyle}>면허번호</span>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      value={editForm.license_number}
-                      onChange={(e) => setEditForm((f) => ({ ...f, license_number: e.target.value }))}
-                      placeholder="면허번호"
-                      disabled={savingEdit}
-                      style={inputStyle}
-                    />
-                  ) : (
-                    <span style={valueStyle}>{selectedMember.license_number}</span>
-                  )}
+                  <span style={valueStyle}>{selectedMember.license_number}</span>
                 </div>
               )}
 
-              {/* 직역(활동 유형) + 약국/근무처 정보
-                  WO-O4O-KPA-OPERATOR-ACTIVITYTYPE-STOREOWNER-REALIGNMENT-V1:
-                    operator 가 activity_type 을 수정. pharmacy_owner 전환 시 backend 가
-                    자동으로 store_owner role 부여/회수 + organization ensure 동기화.
-                    현재 store_owner 보유 상태는 capability chip 으로 노출됨. */}
+              {/* 직역 */}
               <div style={fieldRowStyle}>
                 <span style={labelStyle}>직역</span>
-                {isEditing ? (
-                  <div style={{ flex: 1 }}>
-                    <select
-                      value={editForm.activity_type}
-                      onChange={(e) => setEditForm((f) => ({ ...f, activity_type: e.target.value }))}
-                      disabled={savingEdit}
-                      style={inputStyle}
-                    >
-                      <option value="">-</option>
-                      <option value="pharmacy_owner">약국 개설자</option>
-                      <option value="pharmacy_employee">약국 근무 약사</option>
-                      <option value="hospital">병원 약사</option>
-                      <option value="manufacturer">제조업</option>
-                      <option value="importer">수입업</option>
-                      <option value="wholesaler">도매업</option>
-                      <option value="other_industry">산업체</option>
-                      <option value="government">공무원</option>
-                      <option value="school">학교</option>
-                      <option value="other">기타</option>
-                      <option value="inactive">비활동</option>
-                    </select>
-                    {editForm.activity_type === 'pharmacy_owner'
-                      && selectedMember.activity_type !== 'pharmacy_owner' && (
-                      <p style={{ fontSize: 11, color: '#0369a1', marginTop: 4 }}>
-                        약국 개설자로 지정 시, <strong>사업자번호와 약국명</strong>이 입력되어 있으면
-                        매장 운영 권한(store_owner)이 자동 부여됩니다.
-                        누락 시 경고가 표시되며 권한 부여는 보류됩니다.
-                      </p>
-                    )}
-                    {selectedMember.activity_type === 'pharmacy_owner'
-                      && editForm.activity_type !== 'pharmacy_owner' && (
-                      <p style={{ fontSize: 11, color: '#b45309', marginTop: 4 }}>
-                        다른 직역으로 변경하면 매장 운영 권한(store_owner)이 회수됩니다.
-                      </p>
-                    )}
-                  </div>
-                ) : (
-                  <span style={valueStyle}>
-                    {selectedMember.activity_type
-                      ? (ACTIVITY_TYPE_LABELS[selectedMember.activity_type] ?? selectedMember.activity_type)
-                      : '-'}
-                    {selectedMember.activity_type === 'pharmacy_owner' && (
-                      <span style={{ marginLeft: 6, fontSize: 11, padding: '1px 6px', borderRadius: 9999, background: '#fef3c7', color: '#92400e', border: '1px solid #fde68a' }}>
-                        개설약사
-                      </span>
-                    )}
-                  </span>
-                )}
+                <span style={valueStyle}>
+                  {selectedMember.activity_type
+                    ? (ACTIVITY_TYPE_LABELS[selectedMember.activity_type] ?? selectedMember.activity_type)
+                    : '-'}
+                  {selectedMember.activity_type === 'pharmacy_owner' && (
+                    <span style={{ marginLeft: 6, fontSize: 11, padding: '1px 6px', borderRadius: 9999, background: '#fef3c7', color: '#92400e', border: '1px solid #fde68a' }}>
+                      개설약사
+                    </span>
+                  )}
+                </span>
               </div>
 
-              {/* 현재 매장 운영 권한 — 표시 전용 (capability 보유 여부).
-                  WO-O4O-KPA-MEMBER-CAPABILITY-NICKNAME-UI-CANONICAL-CLEANUP-V1:
-                  '없음' → 'store_owner 미보유' — capability 미보유 사실을 기술적으로 명확히 표기. */}
+              {/* 매장 권한 */}
               <div style={fieldRowStyle}>
                 <span style={labelStyle}>매장 권한</span>
                 <span style={valueStyle}>
@@ -1515,237 +1112,43 @@ export default function MemberManagementPage() {
                 </span>
               </div>
 
-              {/* 약국 정보 — WO-O4O-KPA-OPERATOR-MEMBER-BUSINESS-INFO-EDIT-PAYLOAD-ALIGNMENT-V1:
-                  view/edit 모두 canonical 10 필드 완전 정합. edit 에서 개설자 연락처/대표자명/
-                  세금계산서 이메일 3개 추가 (PATCH /info payload 확장).
-                  정책 A: 빈 문자열 = 변경 없음. 정책 B: canonical key 만 write.
-                  canonical 10: 약국명/약국 전화번호/개설자 연락처/대표자명/담당자명/
-                  사업자등록번호/세금계산서 이메일/우편번호/기본주소/상세주소. */}
-              {isEditing ? (
-                editForm.activity_type === 'pharmacy_owner' ? (
+              {/* 약국/근무처 정보 */}
+              {selectedMember.activity_type === 'pharmacy_owner' ? (() => {
+                const bi = selectedMember.business_info;
+                const sAddr = bi?.storeAddress;
+                let addrZip = '', addrBase = '', addrDetail = '';
+                if (sAddr && (sAddr.zipCode || sAddr.baseAddress || sAddr.detailAddress)) {
+                  addrZip = sAddr.zipCode || '';
+                  addrBase = sAddr.baseAddress || '';
+                  addrDetail = sAddr.detailAddress || '';
+                } else if (bi?.zipCode || bi?.address || bi?.address2) {
+                  addrZip = bi.zipCode || ''; addrBase = bi.address || ''; addrDetail = bi.address2 || '';
+                } else {
+                  const addrRaw = (selectedMember.pharmacy_address || '').trim();
+                  const zipMatch = addrRaw.match(/^(\d{5})\s+(.+)$/);
+                  addrZip = zipMatch ? zipMatch[1] : ''; addrBase = zipMatch ? zipMatch[2] : addrRaw;
+                }
+                return (
                   <>
-                    {/* 1. 약국명 */}
-                    <div style={fieldRowStyle}>
-                      <span style={labelStyle}>약국명 *</span>
-                      <input
-                        type="text"
-                        value={editForm.pharmacy_name}
-                        onChange={(e) => setEditForm((f) => ({ ...f, pharmacy_name: e.target.value }))}
-                        placeholder="약국명 (store_owner 자동 부여 필수)"
-                        disabled={savingEdit}
-                        style={{
-                          ...inputStyle,
-                          borderColor: editForm.pharmacy_name.trim().length === 0 ? '#fca5a5' : inputStyle.border?.toString() ?? '#cbd5e1',
-                        }}
-                      />
-                    </div>
-                    {/* 2. 약국 전화번호 */}
-                    <div style={fieldRowStyle}>
-                      <span style={labelStyle}>약국 전화번호</span>
-                      <input
-                        type="text"
-                        value={editForm.pharmacy_phone}
-                        onChange={(e) => setEditForm((f) => ({ ...f, pharmacy_phone: e.target.value }))}
-                        placeholder="약국 전화번호 (예: 02-1234-5678)"
-                        disabled={savingEdit}
-                        style={inputStyle}
-                      />
-                    </div>
-                    {/* 3. 개설자 연락처 */}
-                    <div style={fieldRowStyle}>
-                      <span style={labelStyle}>개설자 연락처</span>
-                      <input
-                        type="text"
-                        value={editForm.ownerPhone}
-                        onChange={(e) => setEditForm((f) => ({ ...f, ownerPhone: e.target.value }))}
-                        placeholder="개설자 본인 연락처 (선택)"
-                        disabled={savingEdit}
-                        style={inputStyle}
-                      />
-                    </div>
-                    {/* 4. 대표자명 */}
-                    <div style={fieldRowStyle}>
-                      <span style={labelStyle}>대표자명</span>
-                      <input
-                        type="text"
-                        value={editForm.ceoName}
-                        onChange={(e) => setEditForm((f) => ({ ...f, ceoName: e.target.value }))}
-                        placeholder="사업자등록증 대표자명 (선택)"
-                        maxLength={50}
-                        disabled={savingEdit}
-                        style={inputStyle}
-                      />
-                    </div>
-                    {/* 5. 담당자명 */}
-                    <div style={fieldRowStyle}>
-                      <span style={labelStyle}>담당자명</span>
-                      <input
-                        type="text"
-                        value={editForm.contactName}
-                        onChange={(e) => setEditForm((f) => ({ ...f, contactName: e.target.value }))}
-                        placeholder="담당자 이름 (선택)"
-                        maxLength={50}
-                        disabled={savingEdit}
-                        style={inputStyle}
-                      />
-                    </div>
-                    {/* 6. 사업자등록번호 */}
-                    <div style={fieldRowStyle}>
-                      <span style={labelStyle}>사업자등록번호 *</span>
-                      <input
-                        type="text"
-                        value={editForm.business_number}
-                        onChange={(e) => setEditForm((f) => ({ ...f, business_number: e.target.value }))}
-                        placeholder="사업자등록번호 (store_owner 자동 부여 필수, 숫자만 추출됨)"
-                        disabled={savingEdit}
-                        style={{
-                          ...inputStyle,
-                          borderColor: editForm.business_number.replace(/[^0-9]/g, '').length === 0 ? '#fca5a5' : inputStyle.border?.toString() ?? '#cbd5e1',
-                        }}
-                      />
-                    </div>
-                    {/* 7. 세금계산서 이메일 */}
-                    <div style={fieldRowStyle}>
-                      <span style={labelStyle}>세금계산서 이메일</span>
-                      <input
-                        type="email"
-                        value={editForm.taxInvoiceEmail}
-                        onChange={(e) => setEditForm((f) => ({ ...f, taxInvoiceEmail: e.target.value }))}
-                        placeholder="세금계산서 수신 이메일 (선택)"
-                        maxLength={254}
-                        disabled={savingEdit}
-                        style={inputStyle}
-                      />
-                    </div>
-                    {/* 8-10. 우편번호 / 기본주소 / 상세주소 — AddressSearch (zipCode/address1/address2 분리).
-                        WO-O4O-KPA-PHARMACY-OWNER-ADDRESS-CANONICALIZE-V1:
-                        저장 시 backend 가 pharmacy_address 합성하여 kpa_members 동기화. */}
-                    <div style={{ ...fieldRowStyle, flexDirection: 'column', alignItems: 'flex-start' }}>
-                      <span style={{ ...labelStyle, marginBottom: 6 }}>약국 주소</span>
-                      <div style={{ width: '100%' }}>
-                        <AddressSearch
-                          zipCode={editForm.zipCode}
-                          address={editForm.address1}
-                          addressDetail={editForm.address2}
-                          onChange={({ zipCode, address, addressDetail }) =>
-                            setEditForm((f) => ({ ...f, zipCode, address1: address, address2: addressDetail }))
-                          }
-                          disabled={savingEdit}
-                        />
-                      </div>
-                    </div>
-                    {(editForm.pharmacy_name.trim().length === 0
-                      || editForm.business_number.replace(/[^0-9]/g, '').length === 0) && (
-                      <div style={{ ...fieldRowStyle, alignItems: 'flex-start' }}>
-                        <span style={labelStyle}></span>
-                        <p style={{ fontSize: 11, color: '#dc2626', margin: 0, flex: 1 }}>
-                          ⚠ 약국명과 사업자번호가 모두 있어야 매장 운영 권한(store_owner)이 자동 부여됩니다.
-                          누락 상태로 저장 시 권한 부여는 보류되며 경고가 표시됩니다.
-                        </p>
-                      </div>
-                    )}
-                    <p style={{ fontSize: 11, color: '#64748b', margin: '8px 0 0' }}>
-                      ※ 빈 입력으로 저장하면 기존 값이 보존됩니다 (변경 없음 정책). 명시적 비우기는 미지원.
-                    </p>
+                    <div style={fieldRowStyle}><span style={labelStyle}>약국명</span><span style={valueStyle}>{selectedMember.pharmacy_name || '-'}</span></div>
+                    <div style={fieldRowStyle}><span style={labelStyle}>약국 전화번호</span><span style={valueStyle}>{bi?.pharmacy_phone || '-'}</span></div>
+                    <div style={fieldRowStyle}><span style={labelStyle}>개설자 연락처</span><span style={valueStyle}>{bi?.ownerPhone || '-'}</span></div>
+                    <div style={fieldRowStyle}><span style={labelStyle}>대표자명</span><span style={valueStyle}>{bi?.ceoName || bi?.representativeName || '-'}</span></div>
+                    <div style={fieldRowStyle}><span style={labelStyle}>담당자명</span><span style={valueStyle}>{bi?.contactName || '-'}</span></div>
+                    <div style={fieldRowStyle}><span style={labelStyle}>사업자등록번호</span><span style={valueStyle}>{bi?.businessNumber || '-'}</span></div>
+                    <div style={fieldRowStyle}><span style={labelStyle}>세금계산서 이메일</span><span style={valueStyle}>{bi?.taxInvoiceEmail || bi?.taxEmail || '-'}</span></div>
+                    <div style={fieldRowStyle}><span style={labelStyle}>우편번호</span><span style={valueStyle}>{addrZip || '-'}</span></div>
+                    <div style={fieldRowStyle}><span style={labelStyle}>기본주소</span><span style={valueStyle}>{addrBase || '-'}</span></div>
+                    <div style={fieldRowStyle}><span style={labelStyle}>상세주소</span><span style={valueStyle}>{addrDetail || '-'}</span></div>
                   </>
-                ) : null
-              ) : selectedMember.activity_type === 'pharmacy_owner' ? (
-                /* VIEW — pharmacy_owner: canonical 10 필드 모두 표시.
-                   WO-O4O-KPA-OPERATOR-MEMBER-BUSINESS-INFO-STRUCTURED-PROJECTION-V1:
-                     heuristic 주소 분리 제거. business_info.storeAddress 우선,
-                     legacy zipCode/address/address2 fallback, 마지막에 pharmacy_address heuristic. */
-                (() => {
-                  const bi = selectedMember.business_info;
-                  const sAddr = bi?.storeAddress;
-                  let addrZip = '';
-                  let addrBase = '';
-                  let addrDetail = '';
-                  if (sAddr && (sAddr.zipCode || sAddr.baseAddress || sAddr.detailAddress)) {
-                    addrZip = sAddr.zipCode || '';
-                    addrBase = sAddr.baseAddress || '';
-                    addrDetail = sAddr.detailAddress || '';
-                  } else if (bi?.zipCode || bi?.address || bi?.address2) {
-                    // legacy split fields (backfill 안 된 회원 보호)
-                    addrZip = bi.zipCode || '';
-                    addrBase = bi.address || '';
-                    addrDetail = bi.address2 || '';
-                  } else {
-                    // 최후 fallback: pharmacy_address 합성 string heuristic (5자리 zipCode prefix)
-                    const addrRaw = (selectedMember.pharmacy_address || '').trim();
-                    const zipMatch = addrRaw.match(/^(\d{5})\s+(.+)$/);
-                    addrZip = zipMatch ? zipMatch[1] : '';
-                    addrBase = zipMatch ? zipMatch[2] : addrRaw;
-                    addrDetail = '';
-                  }
-                  return (
-                    <>
-                      {/* 1. 약국명 */}
-                      <div style={fieldRowStyle}>
-                        <span style={labelStyle}>약국명</span>
-                        <span style={valueStyle}>{selectedMember.pharmacy_name || '-'}</span>
-                      </div>
-                      {/* 2. 약국 전화번호 */}
-                      <div style={fieldRowStyle}>
-                        <span style={labelStyle}>약국 전화번호</span>
-                        <span style={valueStyle}>{bi?.pharmacy_phone || '-'}</span>
-                      </div>
-                      {/* 3. 개설자 연락처 */}
-                      <div style={fieldRowStyle}>
-                        <span style={labelStyle}>개설자 연락처</span>
-                        <span style={valueStyle}>{bi?.ownerPhone || '-'}</span>
-                      </div>
-                      {/* 4. 대표자명 */}
-                      <div style={fieldRowStyle}>
-                        <span style={labelStyle}>대표자명</span>
-                        <span style={valueStyle}>{bi?.ceoName || bi?.representativeName || '-'}</span>
-                      </div>
-                      {/* 5. 담당자명 */}
-                      <div style={fieldRowStyle}>
-                        <span style={labelStyle}>담당자명</span>
-                        <span style={valueStyle}>{bi?.contactName || '-'}</span>
-                      </div>
-                      {/* 6. 사업자등록번호 */}
-                      <div style={fieldRowStyle}>
-                        <span style={labelStyle}>사업자등록번호</span>
-                        <span style={valueStyle}>{bi?.businessNumber || '-'}</span>
-                      </div>
-                      {/* 7. 세금계산서 이메일 */}
-                      <div style={fieldRowStyle}>
-                        <span style={labelStyle}>세금계산서 이메일</span>
-                        <span style={valueStyle}>{bi?.taxInvoiceEmail || bi?.taxEmail || '-'}</span>
-                      </div>
-                      {/* 8. 우편번호 */}
-                      <div style={fieldRowStyle}>
-                        <span style={labelStyle}>우편번호</span>
-                        <span style={valueStyle}>{addrZip || '-'}</span>
-                      </div>
-                      {/* 9. 기본주소 */}
-                      <div style={fieldRowStyle}>
-                        <span style={labelStyle}>기본주소</span>
-                        <span style={valueStyle}>{addrBase || '-'}</span>
-                      </div>
-                      {/* 10. 상세주소 */}
-                      <div style={fieldRowStyle}>
-                        <span style={labelStyle}>상세주소</span>
-                        <span style={valueStyle}>{addrDetail || '-'}</span>
-                      </div>
-                    </>
-                  );
-                })()
-              ) : (
-                /* VIEW — 비-개설약사 (pharmacy_employee 등): 근무처 정보 최소 표시 */
+                );
+              })() : (
                 <>
                   {selectedMember.pharmacy_name && (
-                    <div style={fieldRowStyle}>
-                      <span style={labelStyle}>근무처명</span>
-                      <span style={valueStyle}>{selectedMember.pharmacy_name}</span>
-                    </div>
+                    <div style={fieldRowStyle}><span style={labelStyle}>근무처명</span><span style={valueStyle}>{selectedMember.pharmacy_name}</span></div>
                   )}
                   {selectedMember.pharmacy_address && (
-                    <div style={fieldRowStyle}>
-                      <span style={labelStyle}>근무처 주소</span>
-                      <span style={valueStyle}>{selectedMember.pharmacy_address}</span>
-                    </div>
+                    <div style={fieldRowStyle}><span style={labelStyle}>근무처 주소</span><span style={valueStyle}>{selectedMember.pharmacy_address}</span></div>
                   )}
                 </>
               )}
@@ -1756,9 +1159,7 @@ export default function MemberManagementPage() {
                 <span style={valueStyle}>{formatDate(selectedMember.joined_at || selectedMember.created_at)}</span>
               </div>
 
-              {/* 추가 권한 (capability chips) — 항상 표시 전용.
-                  WO-O4O-KPA-MEMBER-CAPABILITY-NICKNAME-UI-CANONICAL-CLEANUP-V1:
-                  label '권한' → '추가 권한'. capabilities 빈 배열일 때 '일반 회원' → '—'. */}
+              {/* 추가 권한 */}
               <div style={{ display: 'flex', gap: 12, marginBottom: 10, alignItems: 'flex-start' }}>
                 <span style={labelStyle}>추가 권한</span>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
@@ -1766,16 +1167,7 @@ export default function MemberManagementPage() {
                     const caps = sortCapabilities(selectedMember.capabilities ?? []);
                     if (caps.length === 0) return <span style={{ color: '#cbd5e1', fontSize: 13 }}>—</span>;
                     return caps.map((cap) => (
-                      <span
-                        key={cap}
-                        title={cap}
-                        style={{
-                          display: 'inline-flex', alignItems: 'center',
-                          padding: '2px 8px', fontSize: 11, fontWeight: 500,
-                          borderRadius: 9999,
-                          backgroundColor: '#eef2ff', border: '1px solid #c7d2fe', color: '#4338ca',
-                        }}
-                      >
+                      <span key={cap} title={cap} style={{ display: 'inline-flex', alignItems: 'center', padding: '2px 8px', fontSize: 11, fontWeight: 500, borderRadius: 9999, backgroundColor: '#eef2ff', border: '1px solid #c7d2fe', color: '#4338ca' }}>
                         {formatCapabilityLabel(cap)}
                       </span>
                     ));
@@ -1783,52 +1175,38 @@ export default function MemberManagementPage() {
                 </div>
               </div>
 
-              {/* 정보 수정 진입 / super_admin / withdrawn 차단 안내
-                  WO-O4O-OPERATOR-MEMBER-WITHDRAWN-TAB-ADD-V1:
-                    withdrawn 회원은 lifecycle 종료 — '정보 수정' hide + 완전삭제 안내 링크 노출 */}
-              {!isEditing && (
-                <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid #f1f5f9', display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
-                  {targetIsSuperAdmin ? (
+              {/* 정보 수정 / 차단 안내 */}
+              <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid #f1f5f9', display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+                {targetIsSuperAdmin ? (
+                  <span style={{ fontSize: 12, color: '#94a3b8', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                    <ShieldAlert size={14} />
+                    super_admin 권한을 보유한 회원은 본 화면에서 수정할 수 없습니다.
+                  </span>
+                ) : memberIsWithdrawn(selectedMember) ? (
+                  <>
                     <span style={{ fontSize: 12, color: '#94a3b8', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                       <ShieldAlert size={14} />
-                      super_admin 권한을 보유한 회원은 본 화면에서 수정할 수 없습니다.
+                      탈퇴 처리된 회원은 수정할 수 없습니다.
                     </span>
-                  ) : memberIsWithdrawn(selectedMember) ? (
-                    <>
-                      <span style={{ fontSize: 12, color: '#94a3b8', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                        <ShieldAlert size={14} />
-                        탈퇴 처리된 회원은 수정할 수 없습니다.
-                      </span>
-                      <a
-                        href="/admin/members"
-                        style={{ fontSize: 12, color: '#2563eb', textDecoration: 'underline' }}
-                      >
-                        관리자 회원관리로 이동
-                      </a>
-                    </>
-                  ) : (
-                    <button
-                      onClick={enterEditMode}
-                      style={{ fontSize: 13, color: '#2563eb', background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'inline-flex', alignItems: 'center', gap: 6 }}
-                    >
-                      <Pencil size={13} />
-                      정보 수정
-                    </button>
-                  )}
-                  {/* WO-O4O-KPA-ADMIN-MEMBER-MANAGEMENT-SEPARATION-V1:
-                      완전삭제 진입점은 /admin/members 로 이관되었으므로 본 Drawer 의 삭제 버튼 제거 */}
-                </div>
-              )}
+                    <a href="/admin/members" style={{ fontSize: 12, color: '#2563eb', textDecoration: 'underline' }}>
+                      관리자 회원관리로 이동
+                    </a>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => setEditModalOpen(true)}
+                    style={{ fontSize: 13, color: '#2563eb', background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                  >
+                    <Pencil size={13} />
+                    정보 수정
+                  </button>
+                )}
+              </div>
 
-              {/* WO-O4O-OPERATOR-MEMBERS-DETAIL-SURFACE-CANONICALIZATION-V1:
-                  Hybrid Canonical — Drawer 빠른 검토 + 전체 상세 페이지 (CommonUserDetailPage) 진입.
-                  KpaMember.user_id 로 /operator/users/:id 라우트 (OperatorRoutes.tsx:161) 연결. */}
+              {/* 전체 상세 페이지 */}
               {selectedMember.user_id && (
                 <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid #f1f5f9' }}>
-                  <a
-                    href={`/operator/users/${selectedMember.user_id}`}
-                    style={{ fontSize: 13, color: '#2563eb', textDecoration: 'none' }}
-                  >
+                  <a href={`/operator/users/${selectedMember.user_id}`} style={{ fontSize: 13, color: '#2563eb', textDecoration: 'none' }}>
                     전체 상세 페이지 →
                   </a>
                 </div>
@@ -1837,6 +1215,19 @@ export default function MemberManagementPage() {
           );
         })()}
       </BaseDetailDrawer>
+
+      {/* WO-O4O-OPERATOR-EDITUSER-MODAL-KPA-INTEGRATION-V1: KPA 회원 편집 독립 모달 */}
+      {editModalOpen && selectedMember && (
+        <KpaEditUserModal
+          member={selectedMember as KpaMemberForEdit}
+          makeRequest={kpaEditModalMakeRequest}
+          onClose={() => setEditModalOpen(false)}
+          onSuccess={() => {
+            setEditModalOpen(false);
+            void fetchMembers(memberPage);
+          }}
+        />
+      )}
     </div>
   );
 }

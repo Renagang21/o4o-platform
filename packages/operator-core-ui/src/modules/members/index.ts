@@ -13,6 +13,13 @@ export type {
   ApiRequestFn,
   CommonEditUserModalProps,
 } from './CommonEditUserModal';
+export { KpaEditUserModal } from './KpaEditUserModal';
+export type {
+  KpaMemberStatus,
+  KpaMemberBusinessInfo,
+  KpaMemberForEdit,
+  KpaEditUserModalProps,
+} from './KpaEditUserModal';
 export type {
   OperatorMembersConsolePageProps,
   MembersConsoleClient,

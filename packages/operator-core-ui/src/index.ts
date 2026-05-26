@@ -52,3 +52,12 @@ export type {
   ApiRequestFn,
   CommonEditUserModalProps,
 } from './modules/members';
+
+// KPA EditUserModal (WO-O4O-OPERATOR-EDITUSER-MODAL-KPA-INTEGRATION-V1)
+export { KpaEditUserModal } from './modules/members';
+export type {
+  KpaMemberStatus,
+  KpaMemberBusinessInfo,
+  KpaMemberForEdit,
+  KpaEditUserModalProps,
+} from './modules/members';
