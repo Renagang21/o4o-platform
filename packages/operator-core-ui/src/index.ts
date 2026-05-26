@@ -42,3 +42,13 @@ export type {
 // CMS Content Module (WO-O4O-CONTENT-CANONICAL-CROSS-SERVICE-ALIGNMENT-V1)
 export { CmsContentManager } from './modules/cms-content';
 export type { CmsContentManagerProps } from './modules/cms-content';
+
+// Common EditUserModal (WO-O4O-OPERATOR-EDITUSER-MODAL-PHASE1-NETURE-GP-KCOS-V1)
+export { CommonEditUserModal } from './modules/members';
+export type {
+  EditUserModalOption,
+  EditUserModalConfig,
+  ProfileClassificationConfig,
+  ApiRequestFn,
+  CommonEditUserModalProps,
+} from './modules/members';

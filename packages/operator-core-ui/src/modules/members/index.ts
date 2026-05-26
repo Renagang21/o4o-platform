@@ -5,6 +5,14 @@
  */
 
 export { OperatorMembersConsolePage } from './OperatorMembersConsolePage';
+export { CommonEditUserModal } from './CommonEditUserModal';
+export type {
+  EditUserModalOption,
+  EditUserModalConfig,
+  ProfileClassificationConfig,
+  ApiRequestFn,
+  CommonEditUserModalProps,
+} from './CommonEditUserModal';
 export type {
   OperatorMembersConsolePageProps,
   MembersConsoleClient,
