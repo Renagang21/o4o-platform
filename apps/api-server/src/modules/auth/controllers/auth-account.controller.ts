@@ -174,9 +174,13 @@ export class AuthAccountController extends BaseController {
         //    representativeName / taxEmail (legacy) 은 client 가 보내도 무시 (canonical key 만 저장).
         if (businessInfo && typeof businessInfo === 'object') {
           const allowedFields = [
-            'businessName', 'businessNumber', 'businessType', 'businessCategory',
-            'ceoName', 'taxInvoiceEmail', 'managerPhone',
-            'phone', 'storeAddress', 'address', 'address2', 'zipCode',
+            'businessName', 'businessNumber', 'businessType',
+            // Canonical (WO-O4O-BUSINESS-REGISTRATION-FIELD-NAMING-STANDARD-V1)
+            'businessItem', 'representativeName', 'taxInvoiceEmail', 'managerPhone', 'contactName',
+            'businessAddress', 'businessAddressDetail', 'zipCode',
+            'phone', 'storeAddress',
+            // Legacy read-fallback (accept writes for backward compat, canonical takes precedence)
+            'businessCategory', 'ceoName', 'address', 'address2',
           ];
           const sanitized: Record<string, any> = {};
           for (const key of allowedFields) {

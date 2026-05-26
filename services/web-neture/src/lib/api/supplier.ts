@@ -343,7 +343,8 @@ export interface SupplierProfile {
   managerName: string | null;
   managerPhone: string | null;
   businessType: string | null;
-  taxEmail: string | null;
+  businessItem: string | null;
+  taxInvoiceEmail: string | null;
   _prefilled?: boolean;
   // Contact
   contactEmail: string | null;
@@ -924,7 +925,8 @@ export const supplierProfileApi = {
     managerName?: string;
     managerPhone?: string;
     businessType?: string;
-    taxEmail?: string;
+    businessItem?: string;
+    taxInvoiceEmail?: string;
     // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
     minOrderAmount?: number | null;
     minOrderSurcharge?: number | null;

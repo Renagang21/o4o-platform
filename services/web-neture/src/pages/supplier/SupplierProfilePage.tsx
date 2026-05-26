@@ -80,10 +80,11 @@ export default function SupplierProfilePage() {
   const [representativeName, setRepresentativeName] = useState('');
   const [businessNumber, setBusinessNumber] = useState('');
   const [businessType, setBusinessType] = useState('');
+  const [businessItem, setBusinessItem] = useState('');
   const [businessZipCode, setBusinessZipCode] = useState('');
   const [businessAddress, setBusinessAddress] = useState('');
   const [businessAddressDetail, setBusinessAddressDetail] = useState('');
-  const [taxEmail, setTaxEmail] = useState('');
+  const [taxInvoiceEmail, setTaxInvoiceEmail] = useState('');
 
   // Section B: 담당자 정보
   const [managerName, setManagerName] = useState('');
@@ -117,10 +118,11 @@ export default function SupplierProfilePage() {
         setRepresentativeName(data.representativeName || '');
         setBusinessNumber(data.businessNumber || '');
         setBusinessType(data.businessType || '');
+        setBusinessItem(data.businessItem || '');
         setBusinessZipCode(data.businessZipCode || '');
         setBusinessAddress(data.businessAddress || '');
         setBusinessAddressDetail(data.businessAddressDetail || '');
-        setTaxEmail(data.taxEmail || '');
+        setTaxInvoiceEmail(data.taxInvoiceEmail || '');
         // Section B
         setManagerName(data.managerName || '');
         setManagerPhone(data.managerPhone || '');
@@ -158,7 +160,8 @@ export default function SupplierProfilePage() {
       businessAddress,
       businessAddressDetail,
       businessType,
-      taxEmail,
+      businessItem,
+      taxInvoiceEmail,
       // Section B
       managerName,
       managerPhone,
@@ -280,14 +283,26 @@ export default function SupplierProfilePage() {
             />
           </div>
 
-          {/* 업종 */}
+          {/* 업태 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">업종</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">업태</label>
             <input
               type="text"
               value={businessType}
               onChange={(e) => setBusinessType(e.target.value)}
-              placeholder="화장품 / 건강식품 / 의료기기 등"
+              placeholder="도소매 / 제조 / 서비스 등"
+              className={inputClass}
+            />
+          </div>
+
+          {/* 종목 */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">종목</label>
+            <input
+              type="text"
+              value={businessItem}
+              onChange={(e) => setBusinessItem(e.target.value)}
+              placeholder="의약품 / 화장품 / 건강식품 등"
               className={inputClass}
             />
           </div>
@@ -319,8 +334,8 @@ export default function SupplierProfilePage() {
             </label>
             <input
               type="email"
-              value={taxEmail}
-              onChange={(e) => setTaxEmail(e.target.value)}
+              value={taxInvoiceEmail}
+              onChange={(e) => setTaxInvoiceEmail(e.target.value)}
               placeholder="tax@company.com"
               className={inputClass}
             />

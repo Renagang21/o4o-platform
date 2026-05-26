@@ -100,8 +100,11 @@ export class NetureSupplier {
   @Column({ name: 'business_type', type: 'varchar', length: 100, nullable: true })
   businessType: string | null;
 
-  @Column({ name: 'tax_email', type: 'varchar', length: 255, nullable: true })
-  taxEmail: string | null;
+  @Column({ name: 'tax_invoice_email', type: 'varchar', length: 255, nullable: true })
+  taxInvoiceEmail: string | null;
+
+  @Column({ name: 'business_item', type: 'varchar', length: 100, nullable: true })
+  businessItem: string | null;
 
   // === B2B Order Condition (WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1) ===
 

@@ -303,7 +303,7 @@ export class NetureSupplierService {
 
   async getAllSuppliers(
     filters?: { status?: SupplierStatus },
-  ): Promise<Array<{ id: string; name: string; slug: string; status: SupplierStatus; contactEmail: string; userId: string; identityStatus: string | null; userEmail: string | null; representativeName: string | null; businessNumber: string | null; taxEmail: string | null; createdAt: Date; updatedAt: Date }>> {
+  ): Promise<Array<{ id: string; name: string; slug: string; status: SupplierStatus; contactEmail: string; userId: string; identityStatus: string | null; userEmail: string | null; representativeName: string | null; businessNumber: string | null; taxInvoiceEmail: string | null; createdAt: Date; updatedAt: Date }>> {
     try {
       const where: { status?: SupplierStatus } = {};
       if (filters?.status) where.status = filters.status;
@@ -339,7 +339,7 @@ export class NetureSupplierService {
           userEmail: userInfo?.email || null,
           representativeName: s.representativeName || null,
           businessNumber: s.businessNumber || null,
-          taxEmail: s.taxEmail || null,
+          taxInvoiceEmail: s.taxInvoiceEmail || null,
           createdAt: s.createdAt,
           updatedAt: s.updatedAt,
         };
@@ -501,9 +501,10 @@ export class NetureSupplierService {
           if (bi && typeof bi === 'object') {
             prefilled = {
               businessNumber: bi.businessNumber || null,
-              businessAddress: [bi.address, bi.address2].filter(Boolean).join(' ') || null,
+              // businessAddress canonical — address legacy fallback
+              businessAddress: bi.businessAddress || [bi.address, bi.address2].filter(Boolean).join(' ') || null,
               businessType: bi.businessType || null,
-              taxEmail: bi.email || null,
+              taxInvoiceEmail: bi.taxInvoiceEmail || null,
             };
           }
         } catch (prefillError) {
@@ -528,7 +529,7 @@ export class NetureSupplierService {
         managerName: supplier.managerName || null,
         managerPhone: supplier.managerPhone || null,
         businessType: supplier.businessType || prefilled.businessType || null,
-        taxEmail: supplier.taxEmail || prefilled.taxEmail || null,
+        taxInvoiceEmail: supplier.taxInvoiceEmail || prefilled.taxInvoiceEmail || null,
         _prefilled: Object.keys(prefilled).length > 0,
         // Contact (existing — supplier remains SSOT for contact visibility)
         contactEmail: supplier.contactEmail || null,
@@ -571,7 +572,8 @@ export class NetureSupplierService {
       managerName?: string;
       managerPhone?: string;
       businessType?: string;
-      taxEmail?: string;
+      businessItem?: string;
+      taxInvoiceEmail?: string;
       // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
       minOrderAmount?: number | null;
       minOrderSurcharge?: number | null;
@@ -592,13 +594,14 @@ export class NetureSupplierService {
       if (data.contactWebsiteVisibility !== undefined) supplier.contactWebsiteVisibility = data.contactWebsiteVisibility;
       if (data.contactKakaoVisibility !== undefined) supplier.contactKakaoVisibility = data.contactKakaoVisibility;
 
-      // Business profile fields (WO-NETURE-SUPPLIER-BUSINESS-PROFILE-FORM-ALIGNMENT-V1)
+      // Business profile fields (WO-O4O-BUSINESS-REGISTRATION-FIELD-NAMING-STANDARD-V1)
       // WO-O4O-NETURE-SUPPLIER-DEPRECATION-V1 Phase 5-B: businessNumber/businessAddress → org only
       if (data.representativeName !== undefined) supplier.representativeName = data.representativeName || null;
       if (data.managerName !== undefined) supplier.managerName = data.managerName || null;
       if (data.managerPhone !== undefined) supplier.managerPhone = data.managerPhone ? data.managerPhone.replace(/\D/g, '') : null;
       if (data.businessType !== undefined) supplier.businessType = data.businessType || null;
-      if (data.taxEmail !== undefined) supplier.taxEmail = data.taxEmail || null;
+      if (data.businessItem !== undefined) supplier.businessItem = data.businessItem || null;
+      if (data.taxInvoiceEmail !== undefined) supplier.taxInvoiceEmail = data.taxInvoiceEmail || null;
 
       // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1: B2B order condition
       if (data.minOrderAmount !== undefined) {
@@ -659,7 +662,8 @@ export class NetureSupplierService {
         managerName: supplier.managerName || null,
         managerPhone: supplier.managerPhone || null,
         businessType: supplier.businessType || null,
-        taxEmail: supplier.taxEmail || null,
+        businessItem: supplier.businessItem || null,
+        taxInvoiceEmail: supplier.taxInvoiceEmail || null,
         // Contact
         contactEmail: supplier.contactEmail || null,
         contactPhone: supplier.contactPhone || null,

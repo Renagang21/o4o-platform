@@ -132,24 +132,29 @@ export class AuthRegisterController extends BaseController {
           );
 
           // WO-O4O-GLYCOPHARM-SIGNUP-REFORM-V1: businessInfo 머지 (기존 정보 보존 + 신규 추가)
-          // WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1: ceoName/taxInvoiceEmail canonical, taxEmail→email overwrite 제거.
+          // WO-O4O-BUSINESS-REGISTRATION-FIELD-NAMING-STANDARD-V1: canonical fields
           const newBiz: Record<string, any> = {};
           const effectiveBusinessName = data.businessName || data.companyName;
           if (effectiveBusinessName) newBiz.businessName = effectiveBusinessName;
           if (data.businessNumber) newBiz.businessNumber = data.businessNumber;
           if (data.businessType) newBiz.businessType = data.businessType;
-          if (data.businessCategory) newBiz.businessCategory = data.businessCategory;
-          // 대표자명 — ceoName canonical (representativeName fallback read 만 유지)
-          const effectiveCeoName = data.ceoName ?? data.representativeName;
-          if (effectiveCeoName) newBiz.ceoName = effectiveCeoName;
-          // 세금계산서 이메일 — taxInvoiceEmail canonical (taxEmail fallback). email 필드는 덮어쓰지 않음
+          // 종목 — businessItem canonical (businessCategory fallback)
+          const effectiveBusinessItem = data.businessItem ?? data.businessCategory;
+          if (effectiveBusinessItem) newBiz.businessItem = effectiveBusinessItem;
+          // 대표자명 — representativeName canonical (ceoName fallback)
+          const effectiveRepresentativeName = data.representativeName ?? data.ceoName;
+          if (effectiveRepresentativeName) newBiz.representativeName = effectiveRepresentativeName;
+          // 세금계산서 이메일 — taxInvoiceEmail canonical (taxEmail fallback)
           const effectiveTaxInvoiceEmail = data.taxInvoiceEmail ?? data.taxEmail;
           if (effectiveTaxInvoiceEmail) newBiz.taxInvoiceEmail = effectiveTaxInvoiceEmail;
           if (data.contactName) newBiz.contactName = data.contactName;
           if (data.managerPhone) newBiz.managerPhone = data.managerPhone;
           if (data.zipCode) newBiz.zipCode = data.zipCode;
-          if (data.address1) newBiz.address = data.address1;
-          if (data.address2) newBiz.address2 = data.address2;
+          // 사업장 주소 — businessAddress canonical (address1 legacy fallback)
+          const effectiveBusinessAddress = data.businessAddress || data.address1;
+          if (effectiveBusinessAddress) newBiz.businessAddress = effectiveBusinessAddress;
+          const effectiveBusinessAddressDetail = data.businessAddressDetail || data.address2;
+          if (effectiveBusinessAddressDetail) newBiz.businessAddressDetail = effectiveBusinessAddressDetail;
           if (Object.keys(newBiz).length > 0) {
             const merged = { ...(existingUser.businessInfo || {}), ...newBiz };
             await manager.query(
@@ -213,7 +218,7 @@ export class AuthRegisterController extends BaseController {
         newUser.marketingAccepted = marketingAccepted;
 
         // businessInfo: 사업자 정보 + 면허번호 저장
-        // WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1: ceoName/taxInvoiceEmail canonical, taxEmail→email overwrite 제거.
+        // WO-O4O-BUSINESS-REGISTRATION-FIELD-NAMING-STANDARD-V1: canonical fields
         const effectiveBusinessName = data.businessName || data.companyName;
         const businessInfo: Record<string, any> = {};
         if (data.licenseNumber) {
@@ -228,15 +233,17 @@ export class AuthRegisterController extends BaseController {
         if (data.businessType) {
           businessInfo.businessType = data.businessType;
         }
-        if (data.businessCategory) {
-          businessInfo.businessCategory = data.businessCategory;
+        // 종목 — businessItem canonical (businessCategory fallback)
+        const effectiveBusinessItem = data.businessItem ?? data.businessCategory;
+        if (effectiveBusinessItem) {
+          businessInfo.businessItem = effectiveBusinessItem;
         }
-        // 대표자명 — ceoName canonical (representativeName fallback read 만)
-        const effectiveCeoName = data.ceoName ?? data.representativeName;
-        if (effectiveCeoName) {
-          businessInfo.ceoName = effectiveCeoName;
+        // 대표자명 — representativeName canonical (ceoName fallback)
+        const effectiveRepresentativeName = data.representativeName ?? data.ceoName;
+        if (effectiveRepresentativeName) {
+          businessInfo.representativeName = effectiveRepresentativeName;
         }
-        // 세금계산서 이메일 — taxInvoiceEmail canonical (taxEmail fallback). email 필드는 덮어쓰지 않음
+        // 세금계산서 이메일 — taxInvoiceEmail canonical (taxEmail fallback)
         const effectiveTaxInvoiceEmail = data.taxInvoiceEmail ?? data.taxEmail;
         if (effectiveTaxInvoiceEmail) {
           businessInfo.taxInvoiceEmail = effectiveTaxInvoiceEmail;
@@ -251,11 +258,14 @@ export class AuthRegisterController extends BaseController {
         if (data.zipCode) {
           businessInfo.zipCode = data.zipCode;
         }
-        if (data.address1) {
-          businessInfo.address = data.address1;
+        // 사업장 주소 — businessAddress canonical (address1 legacy fallback)
+        const effectiveBusinessAddress = data.businessAddress || data.address1;
+        if (effectiveBusinessAddress) {
+          businessInfo.businessAddress = effectiveBusinessAddress;
         }
-        if (data.address2) {
-          businessInfo.address2 = data.address2;
+        const effectiveBusinessAddressDetail = data.businessAddressDetail || data.address2;
+        if (effectiveBusinessAddressDetail) {
+          businessInfo.businessAddressDetail = effectiveBusinessAddressDetail;
         }
         // WO-O4O-STORE-PROFILE-UNIFICATION-V1: 구조화된 주소 dual write
         if (data.address1) {

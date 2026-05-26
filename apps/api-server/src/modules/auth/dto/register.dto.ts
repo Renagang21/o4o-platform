@@ -121,15 +121,15 @@ export class RegisterRequestDto {
   @IsString()
   businessName?: string;
 
-  /** 대표자명 (canonical) — WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1 */
-  @IsOptional()
-  @IsString()
-  ceoName?: string;
-
-  /** @deprecated ceoName 으로 통일. controller 에서 ceoName ?? representativeName fallback. */
+  /** 대표자명 (canonical) — WO-O4O-BUSINESS-REGISTRATION-FIELD-NAMING-STANDARD-V1 */
   @IsOptional()
   @IsString()
   representativeName?: string;
+
+  /** @deprecated representativeName 으로 통일. controller 에서 representativeName ?? ceoName fallback. */
+  @IsOptional()
+  @IsString()
+  ceoName?: string;
 
   @IsOptional()
   @IsString()
@@ -165,7 +165,12 @@ export class RegisterRequestDto {
   @IsString()
   managerPhone?: string;
 
-  /** GlycoPharm: 업종 */
+  /** 종목 (canonical, 사업자등록증 기준) — WO-O4O-BUSINESS-REGISTRATION-FIELD-NAMING-STANDARD-V1 */
+  @IsOptional()
+  @IsString()
+  businessItem?: string;
+
+  /** @deprecated businessItem 으로 통일. controller 에서 businessItem ?? businessCategory fallback. */
   @IsOptional()
   @IsString()
   businessCategory?: string;
@@ -175,12 +180,22 @@ export class RegisterRequestDto {
   @IsString()
   zipCode?: string;
 
-  /** GlycoPharm: 주소 */
+  /** 사업장 주소 (canonical) — WO-O4O-BUSINESS-REGISTRATION-FIELD-NAMING-STANDARD-V1 */
+  @IsOptional()
+  @IsString()
+  businessAddress?: string;
+
+  /** 사업장 상세주소 (canonical) */
+  @IsOptional()
+  @IsString()
+  businessAddressDetail?: string;
+
+  /** @deprecated address1 → businessAddress. legacy fallback 유지. */
   @IsOptional()
   @IsString()
   address1?: string;
 
-  /** GlycoPharm: 상세주소 */
+  /** @deprecated address2 → businessAddressDetail. legacy fallback 유지. */
   @IsOptional()
   @IsString()
   address2?: string;

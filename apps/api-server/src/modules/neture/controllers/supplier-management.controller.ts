@@ -184,7 +184,8 @@ export function createSupplierManagementController(dataSource: DataSource): Rout
         businessNumber, representativeName, businessAddress,
         // WO-O4O-POSTAL-CODE-ADDRESS-V1
         businessZipCode, businessAddressDetail,
-        managerName, managerPhone, businessType, taxEmail,
+        // WO-O4O-BUSINESS-REGISTRATION-FIELD-NAMING-STANDARD-V1
+        managerName, managerPhone, businessType, businessItem, taxInvoiceEmail,
         // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
         minOrderAmount, minOrderSurcharge, orderConditionNote,
       } = req.body;
@@ -194,7 +195,7 @@ export function createSupplierManagementController(dataSource: DataSource): Rout
         contactWebsiteVisibility, contactKakaoVisibility,
         businessNumber, representativeName, businessAddress,
         businessZipCode, businessAddressDetail,
-        managerName, managerPhone, businessType, taxEmail,
+        managerName, managerPhone, businessType, businessItem, taxInvoiceEmail,
         minOrderAmount, minOrderSurcharge, orderConditionNote,
       });
       if (!result) {

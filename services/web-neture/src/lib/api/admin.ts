@@ -86,7 +86,7 @@ export interface AdminSupplier {
   status: string;
   email: string;
   businessNumber?: string;
-  taxEmail?: string;
+  taxInvoiceEmail?: string;
   createdAt: string;
 }
 

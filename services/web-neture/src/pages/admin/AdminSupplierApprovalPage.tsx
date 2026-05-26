@@ -167,8 +167,8 @@ export default function AdminSupplierApprovalPage() {
                   <td className="px-6 py-4 text-sm text-slate-600">{s.businessNumber || '-'}</td>
                   <td className="px-6 py-4 text-sm text-slate-600">
                     <div>{s.email}</div>
-                    {s.taxEmail && s.taxEmail !== s.email && (
-                      <div className="text-xs text-slate-400 mt-0.5">세금: {s.taxEmail}</div>
+                    {s.taxInvoiceEmail && s.taxInvoiceEmail !== s.email && (
+                      <div className="text-xs text-slate-400 mt-0.5">세금: {s.taxInvoiceEmail}</div>
                     )}
                   </td>
                   <td className="px-6 py-4">

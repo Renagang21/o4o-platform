@@ -200,7 +200,8 @@ export class NetureService {
       managerName?: string;
       managerPhone?: string;
       businessType?: string;
-      taxEmail?: string;
+      businessItem?: string;
+      taxInvoiceEmail?: string;
       // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
       minOrderAmount?: number | null;
       minOrderSurcharge?: number | null;
