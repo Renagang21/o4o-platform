@@ -1,11 +1,13 @@
 /**
- * MyPageHub - 마이페이지 활동 허브
+ * MyPageHub - 마이페이지 (계정 중심 허브)
  *
  * WO-O4O-NETURE-MYPAGE-SPLIT-V1
  * WO-MYPAGE-IA-RESTRUCTURE-V1
+ * WO-O4O-NETURE-MYPAGE-KPA-CANONICAL-REALIGNMENT-V1
  *
- * 프로필 카드 중심 → 공급자 활동 허브로 전환.
- * 프로필 정보는 /mypage/profile에 집중, 여기서는 컴팩트 인사 + Quick Actions.
+ * O4O 기본 MyPage 구조(KPA-Society 기준)에 맞게 정렬.
+ * 공급자 업무 메뉴(상품/주문/정산 등)는 /supplier 대시보드에서 접근.
+ * 마이페이지는 개인 프로필·사업자 정보·설정 등 계정 중심 항목만 유지.
  */
 
 import { useNavigate } from 'react-router-dom';
@@ -14,47 +16,13 @@ import {
   UserCog,
   Settings,
   ChevronRight,
-  Plus,
-  Package,
-  ShoppingCart,
-  FlaskConical,
-  DollarSign,
-  ArrowRight,
-  BarChart3,
-  Users,
-  MessageSquare,
   Building2,
+  MessageSquare,
 } from 'lucide-react';
 import { useAuth, getNetureDashboardRoute, getNetureRoleLabel } from '../../contexts';
 import { useLoginModal } from '../../contexts/LoginModalContext';
 import { MyPageLayout, QuickActionsSection } from '@o4o/account-ui';
 import { Link } from 'react-router-dom';
-
-// ─── Quick Action 정의 ─────────────────────────────────────────────────────
-
-interface QuickAction {
-  label: string;
-  path: string;
-  icon: typeof Package;
-  color: string;
-}
-
-const SUPPLIER_ACTIONS: QuickAction[] = [
-  { label: '상품 등록', path: '/supplier/products/new', icon: Plus, color: '#3b82f6' },
-  { label: '상품 관리', path: '/supplier/products', icon: Package, color: '#6366f1' },
-  { label: '주문 관리', path: '/supplier/orders', icon: ShoppingCart, color: '#0891b2' },
-  { label: '유통 참여형 펀딩', path: '/supplier/market-trial', icon: FlaskConical, color: '#8b5cf6' },
-  { label: '정산 관리', path: '/account/supplier/settlements', icon: DollarSign, color: '#d97706' },
-];
-
-const PARTNER_ACTIONS: QuickAction[] = [
-  { label: '파트너 대시보드', path: '/partner/dashboard', icon: BarChart3, color: '#3b82f6' },
-  { label: '커미션 관리', path: '/supplier/partner-commissions', icon: DollarSign, color: '#059669' },
-  { label: '콘텐츠 라이브러리', path: '/supplier/library', icon: Package, color: '#6366f1' },
-  { label: '커뮤니티', path: '/supplier/forum', icon: Users, color: '#8b5cf6' },
-];
-
-// ─── Component ──────────────────────────────────────────────────────────────
 
 export default function MyPageHub() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -83,21 +51,11 @@ export default function MyPageHub() {
 
   const dashboardPath = getNetureDashboardRoute(user.roles);
   const roleLabel = getNetureRoleLabel(user.roles);
-  // dashboardPath가 '/'이면 대시보드 대상 역할이 없음
   const hasDashboard = dashboardPath !== '/';
 
   const isSupplier = user.roles.some(
     (r: string) => r === 'neture:supplier' || r === 'supplier',
   );
-  const isPartner = user.roles.some(
-    (r: string) => r === 'neture:partner' || r === 'partner',
-  );
-
-  const quickActions = isSupplier
-    ? SUPPLIER_ACTIONS
-    : isPartner
-      ? PARTNER_ACTIONS
-      : [];
 
   const handleLogout = async () => {
     await logout();
@@ -107,8 +65,7 @@ export default function MyPageHub() {
   return (
     <MyPageLayout
       title="마이페이지"
-      subtitle="주요 작업을 빠르게 시작하세요"
-      breadcrumb={[{ label: '홈', href: '/' }, { label: '마이페이지' }]}
+      subtitle="내 계정을 관리합니다"
     >
       {/* Compact Greeting Bar */}
       <div className="bg-white rounded-2xl shadow-sm p-5 mb-4">
@@ -138,37 +95,7 @@ export default function MyPageHub() {
         </div>
       </div>
 
-      {/* Role-based Quick Actions */}
-      {quickActions.length > 0 && (
-        <div className="bg-white rounded-2xl shadow-sm p-5 mb-4">
-          <h3 className="text-sm font-semibold text-gray-900 mb-3">주요 작업</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {quickActions.map((action) => {
-              const Icon = action.icon;
-              return (
-                <Link
-                  key={action.path}
-                  to={action.path}
-                  className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors group"
-                >
-                  <div
-                    className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
-                    style={{ backgroundColor: action.color }}
-                  >
-                    <Icon size={16} color="#fff" />
-                  </div>
-                  <span className="text-sm font-medium text-gray-700 flex-1 truncate">
-                    {action.label}
-                  </span>
-                  <ArrowRight className="w-3.5 h-3.5 text-gray-300 group-hover:text-gray-500 flex-shrink-0" />
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Navigation Cards */}
+      {/* Navigation Cards — 계정 중심 항목만 */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
         <Link
           to="/mypage/profile"
@@ -207,7 +134,7 @@ export default function MyPageHub() {
         </Link>
       </div>
 
-      {/* Quick Actions (Dashboard + Logout) */}
+      {/* Dashboard shortcut + Logout */}
       <QuickActionsSection
         dashboardPath={dashboardPath}
         dashboardLabel={`${roleLabel} 대시보드`}
