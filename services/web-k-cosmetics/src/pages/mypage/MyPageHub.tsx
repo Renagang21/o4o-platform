@@ -4,13 +4,38 @@
  * WO-O4O-KCOSMETICS-MYPAGE-SPLIT-V1
  */
 
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth, ROLE_LABELS, getKCosmeticsDashboardRoute } from '@/contexts/AuthContext';
-import { Mail, Phone, Shield, UserCog, Settings, ChevronRight, BookOpen, Award, Coins } from 'lucide-react';
+import { Mail, Phone, Shield, UserCog, Settings, ChevronRight, BookOpen, Award, Coins, Gift } from 'lucide-react';
 import { MyPageLayout, QuickActionsSection } from '@o4o/account-ui';
+import { appreciationApi, type AppreciationSend } from '@/api/appreciation';
 
 export default function MyPageHub() {
   const { user, isAuthenticated, logout } = useAuth();
+  const [receivedItems, setReceivedItems] = useState<AppreciationSend[]>([]);
+  const [sentItems, setSentItems] = useState<AppreciationSend[]>([]);
+  const [appreciationLoading, setAppreciationLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) return;
+    Promise.allSettled([
+      appreciationApi.getMyReceived({ limit: 5 }),
+      appreciationApi.getMySent({ limit: 5 }),
+    ]).then(([recRes, sentRes]) => {
+      if (recRes.status === 'fulfilled') {
+        const d = recRes.value.data?.data ?? recRes.value.data;
+        setReceivedItems(d?.items ?? []);
+      }
+      if (sentRes.status === 'fulfilled') {
+        const d = sentRes.value.data?.data ?? sentRes.value.data;
+        setSentItems(d?.items ?? []);
+      }
+    }).finally(() => setAppreciationLoading(false));
+  }, [user]);
+
+  const receivedTotal = receivedItems.reduce((s, i) => s + i.amount, 0);
+  const sentTotal = sentItems.reduce((s, i) => s + i.amount, 0);
 
   if (!isAuthenticated || !user) {
     return (
@@ -102,6 +127,50 @@ export default function MyPageHub() {
           <ChevronRight className="w-4 h-4 text-gray-300" />
         </Link>
       </div>
+
+      {/* Appreciation Activity Card */}
+      {!appreciationLoading && (
+        <div className="bg-white rounded-2xl shadow-sm overflow-hidden mb-4">
+          <div className="flex items-center gap-2 px-5 py-4 border-b border-gray-100">
+            <Gift className="w-4 h-4 text-amber-500" />
+            <h3 className="text-sm font-semibold text-gray-800">감사 활동</h3>
+          </div>
+          {receivedTotal === 0 && sentTotal === 0 ? (
+            <div className="px-5 py-6 text-center">
+              <p className="text-sm text-gray-400 mb-1">아직 받은 감사가 없습니다.</p>
+              <p className="text-xs text-gray-300">좋은 글과 자료를 공유하면 감사 포인트를 받을 수 있습니다.</p>
+            </div>
+          ) : (
+            <div className="p-5 space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-amber-50 rounded-xl px-4 py-3 text-center">
+                  <p className="text-xs text-amber-600 mb-1">받은 감사</p>
+                  <p className="text-xl font-bold text-amber-800">{receivedTotal.toLocaleString()}P</p>
+                  <p className="text-xs text-amber-500 mt-0.5">{receivedItems.length}건</p>
+                </div>
+                <div className="bg-gray-50 rounded-xl px-4 py-3 text-center">
+                  <p className="text-xs text-gray-500 mb-1">보낸 감사</p>
+                  <p className="text-xl font-bold text-gray-700">{sentTotal.toLocaleString()}P</p>
+                  <p className="text-xs text-gray-400 mt-0.5">{sentItems.length}건</p>
+                </div>
+              </div>
+              {receivedItems.filter(r => r.message).length > 0 && (
+                <div>
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">최근 받은 감사 메시지</p>
+                  <div className="space-y-2">
+                    {receivedItems.filter(r => r.message).slice(0, 3).map((r, i) => (
+                      <div key={i} className="flex justify-between items-center text-xs bg-amber-50 rounded-lg px-3 py-2">
+                        <span className="italic text-amber-700 flex-1 mr-2 truncate">"{r.message}"</span>
+                        <span className="font-semibold text-amber-600 whitespace-nowrap">+{r.amount}P</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Quick Actions */}
       <QuickActionsSection
