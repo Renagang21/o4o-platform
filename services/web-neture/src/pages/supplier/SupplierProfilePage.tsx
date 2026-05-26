@@ -27,6 +27,8 @@ import {
   BadgeCheck,
 } from 'lucide-react';
 
+import { supplierProfileApi, type SupplierProfile, type ContactVisibility } from '../../lib/api';
+
 const SUPPLIER_STATUS_CONFIG: Record<string, { label: string; cls: string }> = {
   pending:   { label: '승인 대기 중', cls: 'bg-amber-100 text-amber-700 border-amber-200' },
   active:    { label: '활성',         cls: 'bg-green-100 text-green-700 border-green-200' },
@@ -34,7 +36,6 @@ const SUPPLIER_STATUS_CONFIG: Record<string, { label: string; cls: string }> = {
   suspended: { label: '이용 정지',    cls: 'bg-red-100 text-red-700 border-red-200' },
   rejected:  { label: '거절됨',       cls: 'bg-gray-100 text-gray-600 border-gray-200' },
 };
-import { supplierProfileApi, type SupplierProfile, type ContactVisibility } from '../../lib/api';
 import { AddressSearch } from '@o4o/ui';
 
 const VISIBILITY_OPTIONS: { value: ContactVisibility; label: string; desc: string }[] = [

@@ -14,15 +14,7 @@ import SupplierProfilePage from '../supplier/SupplierProfilePage';
 
 export default function MyBusinessProfilePage() {
   return (
-    <MyPageLayout
-      title="사업자 정보"
-      subtitle="사업자 기본정보, 담당자 정보, 공개 연락처를 관리합니다"
-      breadcrumb={[
-        { label: '홈', href: '/' },
-        { label: '마이페이지', href: '/mypage' },
-        { label: '사업자 정보' },
-      ]}
-    >
+    <MyPageLayout>
       <SupplierProfilePage />
     </MyPageLayout>
   );

@@ -15,7 +15,8 @@
 
 import { Link, Outlet, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts';
-import { isAdminVaultAuthorized } from '../../utils/adminVaultAuth';
+import { hasAnyRole } from '@o4o/auth-utils';
+import { ADMIN_ROLES } from '../../lib/role-constants';
 import { Shield, FileText, Box, StickyNote, Home, MessageSquare } from 'lucide-react';
 
 export default function AdminVaultLayout() {
@@ -32,7 +33,7 @@ export default function AdminVaultLayout() {
   }
 
   // 인증되지 않았거나 권한 없음
-  if (!isAuthenticated || !isAdminVaultAuthorized(user?.email)) {
+  if (!isAuthenticated || !hasAnyRole(user?.roles ?? [], ADMIN_ROLES)) {
     return <Navigate to="/" replace />;
   }
 
