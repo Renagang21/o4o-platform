@@ -99,6 +99,13 @@ export class GlycopharmPharmacy {
   @Column({ name: 'storefront_blocks', type: 'jsonb', nullable: true })
   storefront_blocks?: StoreBlock[];
 
+  /**
+   * WO-O4O-GLYCOPHARM-ORG-BRIDGE-V1: Canonical organizations 연결
+   * Backfill: business_number 기준 매핑. 신규 데이터는 organizations 직접 생성.
+   */
+  @Column({ name: 'organization_id', type: 'uuid', nullable: true })
+  organization_id?: string | null;
+
   @CreateDateColumn({ type: 'timestamp' })
   created_at!: Date;
 
