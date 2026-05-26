@@ -185,6 +185,75 @@ const lmsHttp: LmsHttpClient = {
 const instructorClient = createLmsInstructorClient(lmsHttp);
 const learnerClient = createLmsLearnerClient(lmsHttp);
 
+// ─── Phase 3 Instructor 타입 (WO-O4O-GLYCOPHARM-LMS-PHASE3-INSTRUCTOR-PARITY-V1) ────────
+
+export type LessonType = 'video' | 'article' | 'quiz' | 'assignment';
+export type CourseVisibility = 'public' | 'members';
+export type CourseReusablePolicy = 'restricted' | 'platform';
+
+export interface InstructorCourseDetail extends LmsCourse {
+  tags?: string[];
+  visibility?: CourseVisibility;
+  requiresApproval?: boolean;
+  reusablePolicy?: CourseReusablePolicy;
+  rejectionReason?: string | null;
+}
+
+export interface InstructorLesson {
+  id: string;
+  courseId: string;
+  title: string;
+  description: string | null;
+  type: LessonType;
+  content: any;
+  videoUrl: string | null;
+  duration: number;
+  order: number;
+  isPublished: boolean;
+  isFree: boolean;
+}
+
+export interface PendingEnrollment {
+  id: string;
+  courseId: string;
+  userId: string;
+  userName?: string;
+  userEmail?: string;
+  enrolledAt: string;
+  status: string;
+  course?: { id: string; title: string };
+}
+
+export interface InstructorDashboardCourse extends LmsCourse {
+  enrolledCount?: number;
+  completionRate?: number;
+  pendingCount?: number;
+}
+
+export interface ParticipantItem {
+  enrollmentId: string;
+  userId: string;
+  userName: string;
+  enrolledAt: string;
+  status: string;
+  progressPercentage: number;
+  completedAt: string | null;
+  certificateIssued: boolean;
+  credited: boolean;
+  creditAmount: number | null;
+  creditedAt: string | null;
+}
+
+export interface ParticipantSummary {
+  total: number;
+  inProgress: number;
+  completed: number;
+  cancelled: number;
+  creditedCount?: number;
+  uncreditedCompletedCount?: number;
+  totalCredits?: number;
+}
+
 export const lmsApi = {
   // 강사 본인 강의 목록. 페이지(InstructorDashboardPage)는 현재 api.get 직접 호출 중이며,
   // 향후 정렬 작업에서 본 메서드로 마이그레이션한다 (이번 WO 범위 외).
@@ -304,76 +373,7 @@ export const lmsApi = {
     return data;
   },
 
-  // ─── Phase 3 Instructor 타입 (WO-O4O-GLYCOPHARM-LMS-PHASE3-INSTRUCTOR-PARITY-V1) ──────
-
-export type LessonType = 'video' | 'article' | 'quiz' | 'assignment';
-export type CourseVisibility = 'public' | 'members';
-export type CourseReusablePolicy = 'restricted' | 'platform';
-
-export interface InstructorCourseDetail extends LmsCourse {
-  tags?: string[];
-  visibility?: CourseVisibility;
-  requiresApproval?: boolean;
-  reusablePolicy?: CourseReusablePolicy;
-  rejectionReason?: string | null;
-}
-
-export interface InstructorLesson {
-  id: string;
-  courseId: string;
-  title: string;
-  description: string | null;
-  type: LessonType;
-  content: any;
-  videoUrl: string | null;
-  duration: number;
-  order: number;
-  isPublished: boolean;
-  isFree: boolean;
-}
-
-export interface PendingEnrollment {
-  id: string;
-  courseId: string;
-  userId: string;
-  userName?: string;
-  userEmail?: string;
-  enrolledAt: string;
-  status: string;
-  course?: { id: string; title: string };
-}
-
-export interface InstructorDashboardCourse extends LmsCourse {
-  enrolledCount?: number;
-  completionRate?: number;
-  pendingCount?: number;
-}
-
-export interface ParticipantItem {
-  enrollmentId: string;
-  userId: string;
-  userName: string;
-  enrolledAt: string;
-  status: string;
-  progressPercentage: number;
-  completedAt: string | null;
-  certificateIssued: boolean;
-  credited: boolean;
-  creditAmount: number | null;
-  creditedAt: string | null;
-}
-
-export interface ParticipantSummary {
-  total: number;
-  inProgress: number;
-  completed: number;
-  cancelled: number;
-  creditedCount?: number;
-  uncreditedCompletedCount?: number;
-  totalCredits?: number;
-}
-
-// ─── Operator 메서드 (WO-O4O-GLYCOPHARM-LMS-PHASE1-OPERATOR-PARITY-V1) ────
+  // ─── Operator 메서드 (WO-O4O-GLYCOPHARM-LMS-PHASE1-OPERATOR-PARITY-V1) ────
   // K-Cosmetics Canonical endpoint 기준. 백엔드 /lms/operator/courses/:id/* (glycopharm:operator 역할).
 
   operatorGetCourses: (params?: {
