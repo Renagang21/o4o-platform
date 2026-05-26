@@ -157,6 +157,9 @@ export const GLYCOPHARM_STORE_CONFIG: StoreDashboardConfig = {
         { key: 'content',      label: '콘텐츠 가져오기', subPath: '/content' },
         // WO-O4O-GLYCO-BLOG-INTRODUCE-V1: 전문 매장 운영자의 공개 콘텐츠 채널
         { key: 'content-blog', label: '블로그',         subPath: '/content/blog' },
+        // WO-O4O-STORE-EXECUTION-ASSETS-CROSSSERVICE-PHASE2-A-V1: KPA/K-Cosmetics 정렬
+        { key: 'pop',          label: 'POP',            subPath: '/pop' },
+        { key: 'qr',           label: 'QR 코드',        subPath: '/qr' },
         { key: 'channels',     label: '채널 관리',      subPath: '/channels' },
       ],
     },
