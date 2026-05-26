@@ -46,12 +46,12 @@ export const netureSeoRegistry: SeoRegistry = {
     ogType: 'website',
   },
   '/guide': {
-    title: '이용 가이드 — Neture',
-    description: '네뚜레 서비스 이용 방법 안내.',
+    title: '이용 안내 — Neture',
+    description: '공급자 · 파트너 · 유통 참여형 펀딩 · O4O 플랫폼 소개 · 기능별 이용 방법 안내.',
     ogType: 'website',
   },
   '/guide/intro': {
-    title: '네뚜레 소개 — 이용 가이드',
+    title: '네뚜레 소개 — 이용 안내',
     description: '네뚜레 플랫폼 구조와 O4O 개념 소개.',
     ogType: 'website',
   },
