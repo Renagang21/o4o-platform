@@ -62,6 +62,20 @@ export default function StoreAssetsPage() {
     navigate(`/store/content/${snapshotId}/edit`);
   }, [navigate]);
 
+  const handleBulkStatusChange = useCallback(async (ids: string[], status: AssetPublishStatus) => {
+    const results = await Promise.allSettled(
+      ids.map(id => storeAssetControlApi.updatePublishStatus(id, status)),
+    );
+    const succeededIds = new Set(
+      ids.filter((_, i) => results[i].status === 'fulfilled'),
+    );
+    if (succeededIds.size > 0) {
+      setAllItems(prev =>
+        prev.map(it => succeededIds.has(it.id) ? { ...it, publishStatus: status } : it),
+      );
+    }
+  }, []);
+
   return (
     <StoreAssetsPanel
       items={allItems}
@@ -71,6 +85,7 @@ export default function StoreAssetsPage() {
       onRefresh={fetchItems}
       onToggleStatus={handleToggleStatus}
       onEdit={handleEdit}
+      onBulkStatusChange={handleBulkStatusChange}
       dashboardPath="/store"
       contentListPath="/store/content"
     />

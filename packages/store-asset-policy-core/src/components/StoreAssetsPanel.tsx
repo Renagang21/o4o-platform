@@ -7,7 +7,7 @@
  * Data fetching and API calls remain in each service.
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
   FileText,
@@ -22,11 +22,15 @@ import {
   Tv,
   Megaphone,
   AlertTriangle,
+  CheckCircle2,
+  EyeOff,
+  FileEdit,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import { BaseTable } from '@o4o/ui';
+import { BaseTable, ActionBar } from '@o4o/ui';
 import type {
   StoreAssetItem,
+  AssetPublishStatus,
   TabKey,
   StatusFilter,
   PolicyFilter,
@@ -54,6 +58,8 @@ export interface StoreAssetsPanelProps {
   onRefresh: () => void;
   onToggleStatus: (item: StoreAssetItem) => void;
   onEdit: (snapshotId: string) => void;
+  /** Bulk status change handler — fan-out in each service's StoreAssetsPage */
+  onBulkStatusChange?: (ids: string[], status: AssetPublishStatus) => Promise<void>;
   /** Back link to dashboard (default: '/store') */
   dashboardPath?: string;
   /** Link to full content list, used in forced-expiring banner (default: '/store/content') */
@@ -143,6 +149,7 @@ export function StoreAssetsPanel({
   onRefresh,
   onToggleStatus,
   onEdit,
+  onBulkStatusChange,
   dashboardPath = '/store',
   contentListPath = '/store/content',
 }: StoreAssetsPanelProps) {
@@ -157,6 +164,10 @@ export function StoreAssetsPanel({
   const [channelFilter, setChannelFilter] = useState<ChannelFilter>('all');
   const [sortKey, setSortKey] = useState<SortKey>(isForcedExpiringView ? 'forced-first' : 'newest');
   const [page, setPage] = useState(1);
+
+  // Regular section bulk selection (excludes ForcedSection items)
+  const [selectedRegularKeys, setSelectedRegularKeys] = useState<Set<string>>(new Set());
+  const [bulkUpdating, setBulkUpdating] = useState(false);
 
   // Tab-filtered base items
   const tabItems = useMemo(() => {
@@ -188,7 +199,38 @@ export function StoreAssetsPanel({
     return regularItems.slice(start, start + PAGE_LIMIT);
   }, [regularItems, page]);
 
-  useEffect(() => { setPage(1); }, [activeTab, statusFilter, channelFilter, policyFilter, sortKey]);
+  useEffect(() => {
+    setPage(1);
+    setSelectedRegularKeys(new Set());
+  }, [activeTab, statusFilter, channelFilter, policyFilter, sortKey]);
+
+  // Cross-page selection: merge current-page changes into full selection state
+  const pagedItemIds = useMemo(() => new Set(pagedItems.map(i => i.id)), [pagedItems]);
+
+  const currentPageSelectedKeys = useMemo(
+    () => new Set([...selectedRegularKeys].filter(id => pagedItemIds.has(id))),
+    [selectedRegularKeys, pagedItemIds],
+  );
+
+  const handlePageSelectionChange = useCallback((newPageKeys: Set<string>) => {
+    setSelectedRegularKeys(prev => {
+      const next = new Set(prev);
+      for (const id of pagedItemIds) next.delete(id);
+      for (const id of newPageKeys) next.add(id);
+      return next;
+    });
+  }, [pagedItemIds]);
+
+  const handleBulkStatus = useCallback(async (status: AssetPublishStatus) => {
+    if (!onBulkStatusChange || selectedRegularKeys.size === 0 || bulkUpdating) return;
+    setBulkUpdating(true);
+    try {
+      await onBulkStatusChange(Array.from(selectedRegularKeys), status);
+      setSelectedRegularKeys(new Set());
+    } finally {
+      setBulkUpdating(false);
+    }
+  }, [onBulkStatusChange, selectedRegularKeys, bulkUpdating]);
 
   const handleTabChange = (tab: TabKey) => {
     setActiveTab(tab);
@@ -335,6 +377,35 @@ export function StoreAssetsPanel({
                 </div>
               )}
               <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
+                {onBulkStatusChange && (
+                  <ActionBar
+                    selectedCount={selectedRegularKeys.size}
+                    onClearSelection={() => setSelectedRegularKeys(new Set())}
+                    actions={[
+                      {
+                        key: 'publish',
+                        label: '선택 게시',
+                        icon: <CheckCircle2 size={14} />,
+                        onClick: () => handleBulkStatus('published'),
+                        disabled: bulkUpdating,
+                      },
+                      {
+                        key: 'hide',
+                        label: '선택 숨김',
+                        icon: <EyeOff size={14} />,
+                        onClick: () => handleBulkStatus('hidden'),
+                        disabled: bulkUpdating,
+                      },
+                      {
+                        key: 'draft',
+                        label: '선택 초안',
+                        icon: <FileEdit size={14} />,
+                        onClick: () => handleBulkStatus('draft'),
+                        disabled: bulkUpdating,
+                      },
+                    ]}
+                  />
+                )}
                 <BaseTable<StoreAssetItem>
                   columns={getAssetColumns({ updatingId, onToggleStatus, onEdit })}
                   data={pagedItems}
@@ -343,6 +414,9 @@ export function StoreAssetsPanel({
                   headerClassName="bg-slate-50"
                   bodyClassName="bg-white divide-y divide-slate-100"
                   thClassName="px-4 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider"
+                  selectable={!!onBulkStatusChange}
+                  selectedKeys={currentPageSelectedKeys}
+                  onSelectionChange={handlePageSelectionChange}
                 />
               </div>
             </>
