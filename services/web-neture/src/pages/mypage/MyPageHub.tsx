@@ -23,6 +23,7 @@ import {
   BarChart3,
   Users,
   MessageSquare,
+  Building2,
 } from 'lucide-react';
 import { useAuth, getNetureDashboardRoute, getNetureRoleLabel } from '../../contexts';
 import { useLoginModal } from '../../contexts/LoginModalContext';
@@ -177,6 +178,17 @@ export default function MyPageHub() {
           <span className="text-sm font-medium text-gray-700 flex-1">프로필 편집</span>
           <ChevronRight className="w-4 h-4 text-gray-300" />
         </Link>
+        {/* WO-O4O-SUPPLIER-MYPAGE-CANONICAL-PROFILE-ALIGNMENT-V1 */}
+        {isSupplier && (
+          <Link
+            to="/mypage/business-profile"
+            className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm hover:bg-gray-50 transition-colors"
+          >
+            <Building2 className="w-5 h-5 text-primary-500" />
+            <span className="text-sm font-medium text-gray-700 flex-1">사업자 정보</span>
+            <ChevronRight className="w-4 h-4 text-gray-300" />
+          </Link>
+        )}
         <Link
           to="/forum"
           className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm hover:bg-gray-50 transition-colors"

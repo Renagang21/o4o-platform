@@ -24,7 +24,16 @@ import {
   MapPin,
   Info,
   ShoppingCart,
+  BadgeCheck,
 } from 'lucide-react';
+
+const SUPPLIER_STATUS_CONFIG: Record<string, { label: string; cls: string }> = {
+  pending:   { label: '승인 대기 중', cls: 'bg-amber-100 text-amber-700 border-amber-200' },
+  active:    { label: '활성',         cls: 'bg-green-100 text-green-700 border-green-200' },
+  approved:  { label: '승인됨',       cls: 'bg-blue-100 text-blue-700 border-blue-200' },
+  suspended: { label: '이용 정지',    cls: 'bg-red-100 text-red-700 border-red-200' },
+  rejected:  { label: '거절됨',       cls: 'bg-gray-100 text-gray-600 border-gray-200' },
+};
 import { supplierProfileApi, type SupplierProfile, type ContactVisibility } from '../../lib/api';
 import { AddressSearch } from '@o4o/ui';
 
@@ -194,9 +203,19 @@ export default function SupplierProfilePage() {
     );
   }
 
+  const statusCfg = profile?.status ? SUPPLIER_STATUS_CONFIG[profile.status] : null;
+
   return (
     <div className="max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold text-gray-900 mb-2">사업자 프로필 관리</h1>
+      <div className="flex items-center justify-between mb-2">
+        <h1 className="text-2xl font-bold text-gray-900">사업자 프로필 관리</h1>
+        {statusCfg && (
+          <span className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-full border ${statusCfg.cls}`}>
+            <BadgeCheck className="w-3.5 h-3.5" />
+            {statusCfg.label}
+          </span>
+        )}
+      </div>
       <p className="text-sm text-gray-500 mb-6">
         사업자 기본정보, 담당자 정보, 외부 공개 연락처를 관리합니다.
       </p>

@@ -120,6 +120,8 @@ import { RegisterPendingPage } from './pages/RegisterPendingPage';
 import MyPageHub from './pages/mypage/MyPageHub';
 import MyProfilePage from './pages/mypage/MyProfilePage';
 import MySettingsPage from './pages/mypage/MySettingsPage';
+// WO-O4O-SUPPLIER-MYPAGE-CANONICAL-PROFILE-ALIGNMENT-V1
+import MyBusinessProfilePage from './pages/mypage/MyBusinessProfilePage';
 import PartnershipRequestListPage from './pages/partners/requests/PartnershipRequestListPage';
 import PartnershipRequestDetailPage from './pages/partners/requests/PartnershipRequestDetailPage';
 import PartnershipRequestCreatePage from './pages/partners/requests/PartnershipRequestCreatePage';
@@ -619,6 +621,8 @@ function App() {
               <Route path="/mypage" element={<MyPageHub />} />
               <Route path="/mypage/profile" element={<MyProfilePage />} />
               <Route path="/mypage/settings" element={<MySettingsPage />} />
+              {/* WO-O4O-SUPPLIER-MYPAGE-CANONICAL-PROFILE-ALIGNMENT-V1: 사업자 정보 */}
+              <Route path="/mypage/business-profile" element={<MyBusinessProfilePage />} />
               <Route path="/supplier" element={<SupplierLandingPage />} />
               <Route path="/partner" element={<PartnerLandingPage />} />
               <Route path="/contact" element={<ContactPage />} />
