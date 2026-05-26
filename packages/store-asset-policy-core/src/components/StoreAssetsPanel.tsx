@@ -232,6 +232,40 @@ export function StoreAssetsPanel({
     }
   }, [onBulkStatusChange, selectedRegularKeys, bulkUpdating]);
 
+  // Regular section columns: prepend _select checkbox column when bulk actions are enabled.
+  // assetColumns is shared with ForcedSection (no selection), so we extend here only.
+  const regularColumns = useMemo(() => {
+    const base = getAssetColumns({ updatingId, onToggleStatus, onEdit });
+    if (!onBulkStatusChange) return base;
+    return [
+      {
+        key: '_select' as const,
+        header: '',
+        system: true as const,
+        width: 44,
+        render: (_val: unknown, row: StoreAssetItem) => {
+          const checked = selectedRegularKeys.has(row.id);
+          return (
+            <input
+              type="checkbox"
+              checked={checked}
+              onChange={() => {
+                setSelectedRegularKeys(prev => {
+                  const next = new Set(prev);
+                  if (checked) next.delete(row.id);
+                  else next.add(row.id);
+                  return next;
+                });
+              }}
+              style={{ cursor: 'pointer' }}
+            />
+          );
+        },
+      },
+      ...base,
+    ];
+  }, [updatingId, onToggleStatus, onEdit, onBulkStatusChange, selectedRegularKeys]);
+
   const handleTabChange = (tab: TabKey) => {
     setActiveTab(tab);
     setStatusFilter('all');
@@ -407,7 +441,7 @@ export function StoreAssetsPanel({
                   />
                 )}
                 <BaseTable<StoreAssetItem>
-                  columns={getAssetColumns({ updatingId, onToggleStatus, onEdit })}
+                  columns={regularColumns}
                   data={pagedItems}
                   rowKey={(item) => item.id}
                   rowClassName={assetRowClassName}
