@@ -1,190 +1,297 @@
 /**
- * Instructor Dashboard Page — GlycoPharm LMS
- * WO-GLYCOPHARM-INSTRUCTOR-OPERATOR-V1
+ * InstructorDashboardPage — 강사 대시보드 (KPA 정렬)
  *
- * GET /lms/instructor/courses — requireAuth + requireInstructor
+ * WO-O4O-GLYCOPHARM-LMS-PHASE3-INSTRUCTOR-PARITY-V1
+ *
+ * 구성:
+ *  1. KPI 4 카드 (총 강의 / 총 수강생 / 평균 완료율 / 승인 대기)
+ *  2. 승인 대기 수강신청 목록 (승인/거절)
+ *  3. 내 강의 목록 (편집/수강자 진입)
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   BookOpen,
   Users,
   GraduationCap,
   Clock,
-  AlertCircle,
-  Loader2,
+  Plus,
   ChevronRight,
-  BarChart2,
 } from 'lucide-react';
-import { lmsApi, type LmsCourse } from '@/api/lms';
+import {
+  lmsApi,
+  type InstructorDashboardCourse,
+  type PendingEnrollment,
+} from '@/api/lms';
 
-interface InstructorCourseStats {
-  enrolledCount?: number;
-  completionRate?: number;
+const C = {
+  primary: '#16a34a',
+  primaryLight: '#dcfce7',
+  primaryDark: '#15803d',
+};
+
+const STATUS_LABEL: Record<string, string> = {
+  draft: '초안',
+  pending_review: '검토 중',
+  published: '공개',
+  rejected: '반려됨',
+  archived: '종료',
+};
+
+const STATUS_COLOR: Record<string, { bg: string; color: string }> = {
+  draft:          { bg: '#f3f4f6', color: '#374151' },
+  pending_review: { bg: '#dbeafe', color: '#1d4ed8' },
+  published:      { bg: '#dcfce7', color: '#15803d' },
+  rejected:       { bg: '#fee2e2', color: '#b91c1c' },
+  archived:       { bg: '#f3f4f6', color: '#6b7280' },
+};
+
+function KpiCard({ label, value, sub, accent, icon }: {
+  label: string; value: string | number; sub?: string; accent: string; icon: React.ReactNode;
+}) {
+  return (
+    <div style={{
+      backgroundColor: '#fff',
+      borderRadius: 12,
+      padding: '20px 24px',
+      boxShadow: '0 1px 4px rgba(0,0,0,0.07)',
+      borderLeft: `4px solid ${accent}`,
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+        <div style={{ padding: 6, borderRadius: 8, backgroundColor: `${accent}18` }}>
+          {icon}
+        </div>
+        <span style={{ fontSize: 13, color: '#6b7280', fontWeight: 500 }}>{label}</span>
+      </div>
+      <p style={{ fontSize: 30, fontWeight: 700, color: '#111827', margin: 0 }}>
+        {typeof value === 'number' ? value.toLocaleString() : value}
+      </p>
+      {sub && <p style={{ fontSize: 12, color: '#9ca3af', margin: '4px 0 0' }}>{sub}</p>}
+    </div>
+  );
 }
-
-type InstructorCourse = LmsCourse & InstructorCourseStats;
 
 export default function InstructorDashboardPage() {
   const navigate = useNavigate();
-  const [courses, setCourses] = useState<InstructorCourse[]>([]);
+  const [courses, setCourses] = useState<InstructorDashboardCourse[]>([]);
+  const [pendingEnrollments, setPendingEnrollments] = useState<PendingEnrollment[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [enrollmentLoading, setEnrollmentLoading] = useState<Record<string, boolean>>({});
 
-  useEffect(() => {
-    let cancelled = false;
-
-    const fetchCourses = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        // WO-O4O-LMS-V2-COMMONIZATION-CLEANUP-V1: lmsApi factory 위임으로 전환 (이전: api.get 직접 호출).
-        const res = await lmsApi.getInstructorCourses();
-        if (!cancelled) {
-          setCourses((res.data ?? []) as InstructorCourse[]);
-        }
-      } catch {
-        if (!cancelled) {
-          setError('강의 목록을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.');
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-
-    fetchCourses();
-    return () => { cancelled = true; };
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [courseRes, enrollRes] = await Promise.all([
+        lmsApi.instructorDashboardCourses(),
+        lmsApi.instructorPendingEnrollments({ limit: 10 }),
+      ]);
+      const courseList = courseRes?.data ?? (courseRes as any)?.courses ?? [];
+      setCourses(Array.isArray(courseList) ? courseList : []);
+      const enrollList = enrollRes?.data?.enrollments ?? enrollRes?.data?.data ?? enrollRes?.data ?? [];
+      setPendingEnrollments(Array.isArray(enrollList) ? enrollList : []);
+    } catch {
+      // silent — partial load
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  const totalEnrolled = courses.reduce((sum, c) => sum + (c.enrolledCount ?? 0), 0);
-  const publishedCount = courses.filter(c => c.isPublished).length;
+  useEffect(() => { loadData(); }, [loadData]);
+
+  const handleApprove = async (id: string) => {
+    setEnrollmentLoading((p) => ({ ...p, [id]: true }));
+    try {
+      await lmsApi.instructorApproveEnrollment(id);
+      setPendingEnrollments((p) => p.filter((e) => e.id !== id));
+    } catch {
+      alert('승인에 실패했습니다.');
+    } finally {
+      setEnrollmentLoading((p) => ({ ...p, [id]: false }));
+    }
+  };
+
+  const handleReject = async (id: string) => {
+    if (!confirm('이 수강신청을 거절하시겠습니까?')) return;
+    setEnrollmentLoading((p) => ({ ...p, [id]: true }));
+    try {
+      await lmsApi.instructorRejectEnrollment(id);
+      setPendingEnrollments((p) => p.filter((e) => e.id !== id));
+    } catch {
+      alert('거절에 실패했습니다.');
+    } finally {
+      setEnrollmentLoading((p) => ({ ...p, [id]: false }));
+    }
+  };
+
+  const totalEnrolled = courses.reduce((s, c) => s + (c.enrolledCount ?? 0), 0);
+  const avgCompletion = courses.length > 0
+    ? Math.round(courses.reduce((s, c) => s + (c.completionRate ?? 0), 0) / courses.length)
+    : 0;
+  const pendingCount = pendingEnrollments.length;
 
   return (
-    <div className="max-w-5xl mx-auto py-8 px-4 space-y-8">
+    <div style={{ maxWidth: 960, margin: '0 auto', padding: '32px 20px' }}>
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
-          <GraduationCap className="w-7 h-7 text-primary-600" />
-          강사 대시보드
-        </h1>
-        <p className="text-slate-500 mt-1">내 강의를 관리하고 현황을 확인합니다.</p>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
+        <div>
+          <h1 style={{ fontSize: 22, fontWeight: 700, color: '#111827', margin: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
+            <GraduationCap size={22} color={C.primary} />
+            강사 대시보드
+          </h1>
+          <p style={{ fontSize: 13, color: '#6b7280', margin: '4px 0 0' }}>내 강의를 관리하고 수강생 현황을 확인합니다.</p>
+        </div>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button
+            onClick={() => navigate('/instructor/courses/new')}
+            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', backgroundColor: C.primary, color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+          >
+            <Plus size={14} /> 새 강의
+          </button>
+          <button
+            onClick={() => navigate('/instructor/courses')}
+            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', backgroundColor: '#f3f4f6', color: '#374151', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+          >
+            강의 목록 <ChevronRight size={14} />
+          </button>
+        </div>
       </div>
 
       {/* KPI Cards */}
-      {!loading && !error && (
-        <div className="grid grid-cols-3 gap-4">
-          <div className="bg-white rounded-2xl shadow-sm p-5">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 bg-primary-50 rounded-lg">
-                <BookOpen className="w-5 h-5 text-primary-600" />
-              </div>
-              <span className="text-sm text-slate-500 font-medium">총 강의</span>
-            </div>
-            <p className="text-3xl font-bold text-slate-800">{courses.length}</p>
-            <p className="text-xs text-slate-400 mt-1">공개 {publishedCount}개</p>
-          </div>
-          <div className="bg-white rounded-2xl shadow-sm p-5">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 bg-green-50 rounded-lg">
-                <Users className="w-5 h-5 text-green-600" />
-              </div>
-              <span className="text-sm text-slate-500 font-medium">총 수강생</span>
-            </div>
-            <p className="text-3xl font-bold text-slate-800">{totalEnrolled}</p>
-            <p className="text-xs text-slate-400 mt-1">누적 수강신청</p>
-          </div>
-          <div className="bg-white rounded-2xl shadow-sm p-5">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 bg-blue-50 rounded-lg">
-                <BarChart2 className="w-5 h-5 text-blue-600" />
-              </div>
-              <span className="text-sm text-slate-500 font-medium">공개율</span>
-            </div>
-            <p className="text-3xl font-bold text-slate-800">
-              {courses.length > 0 ? Math.round((publishedCount / courses.length) * 100) : 0}%
-            </p>
-            <p className="text-xs text-slate-400 mt-1">{publishedCount}/{courses.length} 공개</p>
-          </div>
+      {!loading && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 14, marginBottom: 28 }}>
+          <KpiCard label="총 강의" value={courses.length} sub={`공개 ${courses.filter(c => c.isPublished).length}개`} accent={C.primary} icon={<BookOpen size={16} color={C.primary} />} />
+          <KpiCard label="총 수강생" value={totalEnrolled} sub="누적 수강신청" accent="#3b82f6" icon={<Users size={16} color="#3b82f6" />} />
+          <KpiCard label="평균 완료율" value={`${avgCompletion}%`} sub="활성 강의 기준" accent="#8b5cf6" icon={<GraduationCap size={16} color="#8b5cf6" />} />
+          <KpiCard label="승인 대기" value={pendingCount} sub="수강신청 검토 필요" accent="#f59e0b" icon={<Clock size={16} color="#f59e0b" />} />
         </div>
       )}
 
-      {/* Loading */}
       {loading && (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
-        </div>
+        <div style={{ textAlign: 'center', padding: '60px 0', color: '#9ca3af' }}>불러오는 중...</div>
       )}
 
-      {/* Error */}
-      {!loading && error && (
-        <div className="bg-white rounded-2xl shadow-sm p-8 text-center">
-          <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-3" />
-          <p className="text-slate-600">{error}</p>
+      {/* Pending Enrollments */}
+      {!loading && pendingEnrollments.length > 0 && (
+        <div style={{ backgroundColor: '#fff', borderRadius: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 24 }}>
+          <div style={{ padding: '16px 20px', borderBottom: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <h2 style={{ fontSize: 15, fontWeight: 700, color: '#111827', margin: 0 }}>승인 대기 수강신청</h2>
+            <span style={{ padding: '1px 8px', backgroundColor: '#fef3c7', color: '#92400e', borderRadius: 10, fontSize: 12, fontWeight: 600 }}>
+              {pendingCount}건
+            </span>
+          </div>
+          <div style={{ divide: 'divide' }}>
+            {pendingEnrollments.map((e) => (
+              <div key={e.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 20px', borderBottom: '1px solid #f9fafb' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: 14, fontWeight: 600, color: '#111827', margin: 0, truncate: 'true' }}>
+                    {e.userName || e.userEmail || e.userId}
+                  </p>
+                  <p style={{ fontSize: 12, color: '#9ca3af', margin: '2px 0 0' }}>
+                    {e.course?.title ?? e.courseId} · {new Date(e.enrolledAt).toLocaleDateString('ko-KR')}
+                  </p>
+                </div>
+                <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                  <button
+                    disabled={!!enrollmentLoading[e.id]}
+                    onClick={() => handleApprove(e.id)}
+                    style={{ padding: '6px 14px', backgroundColor: C.primary, color: '#fff', border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer', opacity: enrollmentLoading[e.id] ? 0.6 : 1 }}
+                  >
+                    승인
+                  </button>
+                  <button
+                    disabled={!!enrollmentLoading[e.id]}
+                    onClick={() => handleReject(e.id)}
+                    style={{ padding: '6px 14px', backgroundColor: '#fee2e2', color: '#dc2626', border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer', opacity: enrollmentLoading[e.id] ? 0.6 : 1 }}
+                  >
+                    거절
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
       {/* Course List */}
-      {!loading && !error && (
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-100">
-            <h2 className="font-semibold text-slate-800">내 강의 목록</h2>
+      {!loading && (
+        <div style={{ backgroundColor: '#fff', borderRadius: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
+          <div style={{ padding: '16px 20px', borderBottom: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <h2 style={{ fontSize: 15, fontWeight: 700, color: '#111827', margin: 0 }}>내 강의 목록</h2>
+            <button
+              onClick={() => navigate('/instructor/courses')}
+              style={{ fontSize: 12, color: C.primary, background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}
+            >
+              전체 보기 →
+            </button>
           </div>
-
           {courses.length === 0 ? (
-            <div className="py-16 text-center">
-              <BookOpen className="w-12 h-12 text-slate-200 mx-auto mb-3" />
-              <p className="text-slate-500">등록된 강의가 없습니다.</p>
+            <div style={{ textAlign: 'center', padding: '48px 20px' }}>
+              <BookOpen size={40} color="#d1d5db" style={{ marginBottom: 12 }} />
+              <p style={{ fontSize: 14, color: '#6b7280', margin: '0 0 16px' }}>등록된 강의가 없습니다.</p>
+              <button
+                onClick={() => navigate('/instructor/courses/new')}
+                style={{ padding: '8px 20px', backgroundColor: C.primary, color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+              >
+                첫 강의 만들기
+              </button>
             </div>
           ) : (
-            <div className="divide-y divide-slate-50">
-              {courses.map((course) => (
+            <>
+              {courses.slice(0, 5).map((course) => (
                 <div
                   key={course.id}
-                  onClick={() => navigate(`/education/${course.id}`)}
-                  className="flex items-center gap-4 px-6 py-4 hover:bg-slate-50 cursor-pointer transition-colors"
+                  style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 20px', borderBottom: '1px solid #f9fafb', cursor: 'pointer' }}
+                  onClick={() => navigate(`/instructor/courses/${course.id}`)}
                 >
-                  {/* Thumbnail */}
-                  <div className="w-16 h-16 rounded-xl bg-slate-100 flex-shrink-0 overflow-hidden flex items-center justify-center">
-                    {course.thumbnail ? (
-                      <img src={course.thumbnail} alt={course.title} className="w-full h-full object-cover" />
-                    ) : (
-                      <BookOpen className="w-6 h-6 text-slate-300" />
-                    )}
+                  <div style={{ width: 48, height: 48, borderRadius: 8, backgroundColor: '#f3f4f6', flexShrink: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {course.thumbnail
+                      ? <img src={course.thumbnail} alt={course.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      : <BookOpen size={20} color="#d1d5db" />
+                    }
                   </div>
-
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                        course.isPublished
-                          ? 'bg-green-50 text-green-700'
-                          : 'bg-slate-100 text-slate-500'
-                      }`}>
-                        {course.isPublished ? '공개' : '비공개'}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                      <span style={{ fontSize: 14, fontWeight: 600, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {course.title}
+                      </span>
+                      <span style={{ padding: '1px 8px', borderRadius: 10, fontSize: 11, fontWeight: 600, flexShrink: 0, ...(STATUS_COLOR[course.status] ?? STATUS_COLOR.draft) }}>
+                        {STATUS_LABEL[course.status] ?? course.status}
                       </span>
                     </div>
-                    <h3 className="font-medium text-slate-800 truncate">{course.title}</h3>
-                    <div className="flex items-center gap-3 mt-1 text-xs text-slate-400">
-                      {course.duration > 0 && (
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          {course.duration}분
-                        </span>
-                      )}
-                      {course.enrolledCount !== undefined && (
-                        <span className="flex items-center gap-1">
-                          <Users className="w-3 h-3" />
-                          {course.enrolledCount}명 수강
-                        </span>
-                      )}
+                    <div style={{ display: 'flex', gap: 14, fontSize: 12, color: '#9ca3af' }}>
+                      {course.enrolledCount !== undefined && <span>{course.enrolledCount}명 수강</span>}
+                      {course.completionRate !== undefined && <span>완료율 {Math.round(course.completionRate)}%</span>}
+                      {course.duration > 0 && <span><Clock size={10} style={{ marginRight: 2 }} />{course.duration}분</span>}
                     </div>
                   </div>
-
-                  <ChevronRight className="w-4 h-4 text-slate-300 flex-shrink-0" />
+                  <div style={{ display: 'flex', gap: 8, flexShrink: 0 }} onClick={(e) => e.stopPropagation()}>
+                    <button
+                      onClick={() => navigate(`/instructor/courses/${course.id}`)}
+                      style={{ padding: '5px 12px', backgroundColor: '#ede9fe', color: '#5b21b6', border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
+                    >
+                      편집
+                    </button>
+                    <button
+                      onClick={() => navigate(`/instructor/courses/${course.id}/enrollments`)}
+                      style={{ padding: '5px 12px', backgroundColor: '#e0f2fe', color: '#0369a1', border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
+                    >
+                      수강자
+                    </button>
+                  </div>
                 </div>
               ))}
-            </div>
+              {courses.length > 5 && (
+                <div style={{ textAlign: 'center', padding: '12px 0' }}>
+                  <button
+                    onClick={() => navigate('/instructor/courses')}
+                    style={{ fontSize: 13, color: C.primary, background: 'none', border: 'none', cursor: 'pointer', fontWeight: 500 }}
+                  >
+                    {courses.length - 5}개 더 보기 →
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
       )}

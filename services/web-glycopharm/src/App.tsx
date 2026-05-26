@@ -228,6 +228,10 @@ const CourseDetailPage = lazy(() => import('@/pages/education/CourseDetailPage')
 const ResourcesPage = lazy(() => import('@/pages/resources/ResourcesPage').then(m => ({ default: m.ResourcesPage })));
 // WO-GLYCOPHARM-INSTRUCTOR-OPERATOR-V1
 const InstructorDashboardPage = lazy(() => import('@/pages/instructor/InstructorDashboardPage'));
+// WO-O4O-GLYCOPHARM-LMS-PHASE3-INSTRUCTOR-PARITY-V1
+const InstructorCoursesPage = lazy(() => import('@/pages/instructor/InstructorCoursesPage'));
+const InstructorCourseEditPage = lazy(() => import('@/pages/instructor/InstructorCourseEditPage'));
+const InstructorEnrollmentsPage = lazy(() => import('@/pages/instructor/InstructorEnrollmentsPage'));
 // WO-O4O-GLYCOPHARM-LMS-PHASE1-OPERATOR-PARITY-V1: OperatorLmsCoursesPage로 교체
 const OperatorLmsCoursesPage = lazy(() => import('@/pages/operator/OperatorLmsCoursesPage'));
 
@@ -262,6 +266,10 @@ const StorePopPage = lazy(() => import('@/pages/store-management/StorePopPage'))
 
 // WO-O4O-GLYCOPHARM-QR-STORE-EXECUTION-V1
 const StoreQrPage = lazy(() => import('@/pages/store/StoreQrPage'));
+
+// WO-O4O-STORE-LIBRARY-CROSSSERVICE-PHASE2-B-V1: 내 자료함
+const StoreLibraryContentsPage = lazy(() => import('@/pages/store-management/StoreLibraryContentsPage'));
+const StoreLibraryResourcesPage = lazy(() => import('@/pages/store-management/StoreLibraryResourcesPage'));
 
 // Loading fallback
 function PageLoading() {
@@ -443,10 +451,30 @@ function AppRoutes() {
         {/* WO-O4O-GLYCOPHARM-CONTENT-RESOURCES-ROUTE-ALIGNMENT-V1: top-level canonical paths */}
         <Route path="content" element={<HubContentListPage />} />
         <Route path="resources" element={<ResourcesPage />} />
-        {/* Instructor Dashboard — WO-GLYCOPHARM-INSTRUCTOR-OPERATOR-V1 */}
+        {/* Instructor — WO-GLYCOPHARM-INSTRUCTOR-OPERATOR-V1 + WO-O4O-GLYCOPHARM-LMS-PHASE3-INSTRUCTOR-PARITY-V1 */}
         <Route path="instructor" element={
-          <RoleGuard allowedRoles={['lms:instructor', 'glycopharm:admin', 'platform:super_admin']}>
+          <RoleGuard allowedRoles={['lms:instructor', 'glycopharm:admin', 'glycopharm:operator', 'platform:super_admin']}>
             <InstructorDashboardPage />
+          </RoleGuard>
+        } />
+        <Route path="instructor/courses" element={
+          <RoleGuard allowedRoles={['lms:instructor', 'glycopharm:admin', 'glycopharm:operator', 'platform:super_admin']}>
+            <InstructorCoursesPage />
+          </RoleGuard>
+        } />
+        <Route path="instructor/courses/new" element={
+          <RoleGuard allowedRoles={['lms:instructor', 'glycopharm:admin', 'glycopharm:operator', 'platform:super_admin']}>
+            <InstructorCourseEditPage />
+          </RoleGuard>
+        } />
+        <Route path="instructor/courses/:courseId" element={
+          <RoleGuard allowedRoles={['lms:instructor', 'glycopharm:admin', 'glycopharm:operator', 'platform:super_admin']}>
+            <InstructorCourseEditPage />
+          </RoleGuard>
+        } />
+        <Route path="instructor/courses/:courseId/enrollments" element={
+          <RoleGuard allowedRoles={['lms:instructor', 'glycopharm:admin', 'glycopharm:operator', 'platform:super_admin']}>
+            <InstructorEnrollmentsPage />
           </RoleGuard>
         } />
         <Route path="contact" element={<ContactPage />} />
@@ -729,6 +757,9 @@ function AppRoutes() {
         <Route path="pop" element={<StorePopPage />} />
         {/* QR 관리 (WO-O4O-GLYCOPHARM-QR-STORE-EXECUTION-V1) */}
         <Route path="qr" element={<StoreQrPage />} />
+        {/* 내 자료함 (WO-O4O-STORE-LIBRARY-CROSSSERVICE-PHASE2-B-V1) */}
+        <Route path="library/contents" element={<StoreLibraryContentsPage />} />
+        <Route path="library/resources" element={<StoreLibraryResourcesPage />} />
         <Route path="management" element={<PharmacyManagement />} />
         <Route path="management/b2b" element={<PharmacyB2BProducts />} />
       </Route>

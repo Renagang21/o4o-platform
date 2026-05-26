@@ -304,7 +304,76 @@ export const lmsApi = {
     return data;
   },
 
-  // ─── Operator 메서드 (WO-O4O-GLYCOPHARM-LMS-PHASE1-OPERATOR-PARITY-V1) ────
+  // ─── Phase 3 Instructor 타입 (WO-O4O-GLYCOPHARM-LMS-PHASE3-INSTRUCTOR-PARITY-V1) ──────
+
+export type LessonType = 'video' | 'article' | 'quiz' | 'assignment';
+export type CourseVisibility = 'public' | 'members';
+export type CourseReusablePolicy = 'restricted' | 'platform';
+
+export interface InstructorCourseDetail extends LmsCourse {
+  tags?: string[];
+  visibility?: CourseVisibility;
+  requiresApproval?: boolean;
+  reusablePolicy?: CourseReusablePolicy;
+  rejectionReason?: string | null;
+}
+
+export interface InstructorLesson {
+  id: string;
+  courseId: string;
+  title: string;
+  description: string | null;
+  type: LessonType;
+  content: any;
+  videoUrl: string | null;
+  duration: number;
+  order: number;
+  isPublished: boolean;
+  isFree: boolean;
+}
+
+export interface PendingEnrollment {
+  id: string;
+  courseId: string;
+  userId: string;
+  userName?: string;
+  userEmail?: string;
+  enrolledAt: string;
+  status: string;
+  course?: { id: string; title: string };
+}
+
+export interface InstructorDashboardCourse extends LmsCourse {
+  enrolledCount?: number;
+  completionRate?: number;
+  pendingCount?: number;
+}
+
+export interface ParticipantItem {
+  enrollmentId: string;
+  userId: string;
+  userName: string;
+  enrolledAt: string;
+  status: string;
+  progressPercentage: number;
+  completedAt: string | null;
+  certificateIssued: boolean;
+  credited: boolean;
+  creditAmount: number | null;
+  creditedAt: string | null;
+}
+
+export interface ParticipantSummary {
+  total: number;
+  inProgress: number;
+  completed: number;
+  cancelled: number;
+  creditedCount?: number;
+  uncreditedCompletedCount?: number;
+  totalCredits?: number;
+}
+
+// ─── Operator 메서드 (WO-O4O-GLYCOPHARM-LMS-PHASE1-OPERATOR-PARITY-V1) ────
   // K-Cosmetics Canonical endpoint 기준. 백엔드 /lms/operator/courses/:id/* (glycopharm:operator 역할).
 
   operatorGetCourses: (params?: {
@@ -342,6 +411,91 @@ export const lmsApi = {
 
   operatorHardDeleteCourse: async (id: string): Promise<{ success: boolean; data: { deleted: boolean } }> => {
     const { data } = await api.delete<{ success: boolean; data: { deleted: boolean } }>(`/lms/operator/courses/${id}/hard`);
+    return data;
+  },
+
+  // ─── Instructor 메서드 (WO-O4O-GLYCOPHARM-LMS-PHASE3-INSTRUCTOR-PARITY-V1) ──
+
+  instructorDashboardCourses: async (): Promise<{ data: InstructorDashboardCourse[] }> => {
+    const { data } = await api.get<any>('/lms/instructor/dashboard/courses');
+    return data;
+  },
+
+  instructorPendingEnrollments: async (params?: Record<string, unknown>): Promise<any> => {
+    const { data } = await api.get<any>('/lms/instructor/enrollments', { params: { status: 'pending', ...params } });
+    return data;
+  },
+
+  instructorApproveEnrollment: async (id: string): Promise<any> => {
+    const { data } = await api.post<any>(`/lms/instructor/enrollments/${id}/approve`);
+    return data;
+  },
+
+  instructorRejectEnrollment: async (id: string, reason?: string): Promise<any> => {
+    const { data } = await api.post<any>(`/lms/instructor/enrollments/${id}/reject`, reason ? { reason } : undefined);
+    return data;
+  },
+
+  instructorGetCourse: async (id: string): Promise<InstructorCourseDetail> => {
+    const { data } = await api.get<any>(`/lms/courses/${id}`);
+    return data?.data?.course ?? data?.data ?? data;
+  },
+
+  instructorCreateCourse: async (dto: { title: string; description?: string; tags?: string[]; visibility?: CourseVisibility; requiresApproval?: boolean; reusablePolicy?: CourseReusablePolicy }): Promise<InstructorCourseDetail> => {
+    const { data } = await api.post<any>('/lms/courses', dto);
+    return data?.data?.course ?? data?.data ?? data;
+  },
+
+  instructorUpdateCourse: async (id: string, dto: { title?: string; description?: string; tags?: string[]; visibility?: CourseVisibility; requiresApproval?: boolean; reusablePolicy?: CourseReusablePolicy }): Promise<InstructorCourseDetail> => {
+    const { data } = await api.patch<any>(`/lms/courses/${id}`, dto);
+    return data?.data?.course ?? data?.data ?? data;
+  },
+
+  instructorDeleteCourse: async (id: string): Promise<void> => {
+    await api.delete(`/lms/courses/${id}`);
+  },
+
+  instructorGetLessons: async (courseId: string): Promise<InstructorLesson[]> => {
+    const { data } = await api.get<any>(`/lms/instructor/courses/${courseId}/lessons`);
+    const lessons = data?.data ?? data;
+    return Array.isArray(lessons) ? lessons : [];
+  },
+
+  instructorCreateLesson: async (courseId: string, dto: { title: string; type: LessonType; description?: string | null; content?: string | null; videoUrl?: string | null; order?: number; duration?: number }): Promise<any> => {
+    const { data } = await api.post<any>(`/lms/courses/${courseId}/lessons`, dto);
+    return data;
+  },
+
+  instructorUpdateLesson: async (lessonId: string, dto: { title?: string; description?: string | null; content?: string | null; videoUrl?: string | null; duration?: number }): Promise<any> => {
+    const { data } = await api.patch<any>(`/lms/lessons/${lessonId}`, dto);
+    return data;
+  },
+
+  instructorDeleteLesson: async (lessonId: string): Promise<void> => {
+    await api.delete(`/lms/lessons/${lessonId}`);
+  },
+
+  instructorReorderLessons: async (courseId: string, lessonIds: string[]): Promise<void> => {
+    await api.post(`/lms/courses/${courseId}/lessons/reorder`, { lessonIds });
+  },
+
+  instructorSubmitForReview: async (id: string): Promise<any> => {
+    const { data } = await api.post<any>(`/lms/courses/${id}/submit-review`);
+    return data;
+  },
+
+  instructorArchiveCourse: async (id: string): Promise<any> => {
+    const { data } = await api.post<any>(`/lms/courses/${id}/archive`);
+    return data;
+  },
+
+  instructorGetParticipants: async (courseId: string, params?: { status?: string; page?: number; limit?: number; query?: string; credited?: boolean }): Promise<any> => {
+    const { data } = await api.get<any>(`/lms/instructor/participants/${courseId}`, { params });
+    return data;
+  },
+
+  instructorGetParticipantsSummary: async (courseId: string): Promise<any> => {
+    const { data } = await api.get<any>(`/lms/instructor/participants/${courseId}/summary`);
     return data;
   },
 };
