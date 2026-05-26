@@ -15,8 +15,8 @@ export const ROLE_LABELS: Record<string, string> = {
   supplier: '공급자',
   'neture:partner': '파트너',
   partner: '파트너',
-  'neture:seller': '셀러',
-  seller: '셀러',
+  'neture:seller': '매장 경영자',
+  seller: '매장 경영자',
   user: '사용자',
 };
 
