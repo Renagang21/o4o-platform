@@ -101,6 +101,7 @@ const ResourcesPage = lazy(() => import('@/pages/resources/ResourcesPage').then(
 
 // Content Library (WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1)
 const ContentLibraryPage = lazy(() => import('@/pages/library/ContentLibraryPage'));
+const ContentLibraryDetailPage = lazy(() => import('@/pages/library/ContentDetailPage'));
 
 // Signage Content Hub (WO-SIGNAGE-CONTENT-HUB-V1)
 const SignageContentHubPage = lazy(() => import('@/pages/signage/ContentHubPage'));
@@ -294,6 +295,7 @@ function AppRoutes() {
 
         {/* WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1 */}
         <Route path="library/content" element={<ContentLibraryPage />} />
+        <Route path="library/content/:id" element={<ContentLibraryDetailPage />} />
 
         {/* Forum */}
         <Route path="forum" element={<ForumHubPage />} />

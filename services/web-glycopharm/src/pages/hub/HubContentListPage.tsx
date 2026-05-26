@@ -31,6 +31,7 @@ function apiItemToContentHubItem(item: HubContentItemResponse): ContentHubItem {
           year: 'numeric', month: 'short', day: 'numeric',
         })
       : null,
+    createdBy: item.authorId ?? null,
   };
 }
 
@@ -39,19 +40,16 @@ function apiItemToContentHubItem(item: HubContentItemResponse): ContentHubItem {
 function GlycoContentCard({ item, ctx }: { item: ContentHubItem; ctx: ContentHubItemContext }) {
   const isCopying = ctx.copyingId === item.id;
   const alreadyCopied = ctx.copiedIds.has(item.id);
+  const navigate = useNavigate();
 
   const handleClick = () => {
-    if (item.href) window.open(item.href, '_blank', 'noopener');
+    navigate(`/hub/content/${item.id}`, { state: { item } });
   };
 
   return (
     <div
       onClick={handleClick}
-      className={`bg-white rounded-lg border border-slate-200 overflow-hidden transition-all ${
-        item.href
-          ? 'cursor-pointer hover:shadow-md hover:border-primary-200'
-          : 'opacity-80'
-      }`}
+      className="bg-white rounded-lg border border-slate-200 overflow-hidden transition-all cursor-pointer hover:shadow-md hover:border-primary-200"
     >
       {/* Thumbnail */}
       {item.thumbnail ? (

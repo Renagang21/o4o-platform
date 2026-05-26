@@ -150,6 +150,7 @@ const InvoicesPage = lazy(() => import('@/pages/operator/InvoicesPage'));
 const GlycoStoreHubPage = lazy(() => import('@/pages/hub/StoreHubPage').then(m => ({ default: m.StoreHubPage })));
 const HubB2BCatalogPage = lazy(() => import('@/pages/hub/HubB2BCatalogPage').then(m => ({ default: m.HubB2BCatalogPage })));
 const HubContentListPage = lazy(() => import('@/pages/hub/HubContentListPage').then(m => ({ default: m.HubContentListPage })));
+const HubContentDetailPage = lazy(() => import('@/pages/hub/HubContentDetailPage'));
 // WO-O4O-GLYCOPHARM-EVENT-OFFERS-HUB-CANONICAL-ALIGNMENT-V1
 const HubEventOffersPage = lazy(() => import('@/pages/hub/HubEventOffersPage').then(m => ({ default: m.HubEventOffersPage })));
 // WO-O4O-STORE-HUB-CROSS-SERVICE-COMMONIZATION-PHASE1-V1
@@ -452,6 +453,7 @@ function AppRoutes() {
         <Route path="lms/:id" element={<LmsCourseRedirect />} />
         {/* WO-O4O-GLYCOPHARM-CONTENT-RESOURCES-ROUTE-ALIGNMENT-V1: top-level canonical paths */}
         <Route path="content" element={<HubContentListPage />} />
+        <Route path="hub/content/:id" element={<HubContentDetailPage />} />
         <Route path="resources" element={<ResourcesPage />} />
         {/* Instructor — WO-GLYCOPHARM-INSTRUCTOR-OPERATOR-V1 + WO-O4O-GLYCOPHARM-LMS-PHASE3-INSTRUCTOR-PARITY-V1 */}
         <Route path="instructor" element={

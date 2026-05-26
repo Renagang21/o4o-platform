@@ -9,7 +9,7 @@
  */
 
 import { useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   ContentHubTemplate,
   type ContentHubConfig,
@@ -39,12 +39,14 @@ function apiItemToContentHubItem(item: HubContentItemResponse): ContentHubItem {
         })
       : null,
     isPinned: item.isPinned,
+    createdBy: item.authorId ?? null,
   };
 }
 
 // ─── Card Grid Renderer ───────────────────────────────────────────────────────
 
 function CardGrid({ items, ctx }: { items: ContentHubItem[]; ctx: ContentHubItemContext }) {
+  const navigate = useNavigate();
   return (
     <div className="grid grid-cols-2 gap-4">
       {items.map((item) => {
@@ -53,8 +55,8 @@ function CardGrid({ items, ctx }: { items: ContentHubItem[]; ctx: ContentHubItem
         return (
           <Card
             key={item.id}
-            onClick={() => item.href && window.open(item.href, '_blank', 'noopener')}
-            className={`overflow-hidden ${item.href ? 'cursor-pointer' : 'cursor-default'}`}
+            onClick={() => navigate(`/library/content/${item.id}`, { state: { item } })}
+            className="overflow-hidden cursor-pointer"
           >
             {item.thumbnail ? (
               <div className="w-full h-[140px] bg-slate-50 overflow-hidden">
