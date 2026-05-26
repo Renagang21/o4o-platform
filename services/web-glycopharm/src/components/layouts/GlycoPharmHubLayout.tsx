@@ -10,9 +10,13 @@
  */
 
 import { NavLink, Outlet } from 'react-router-dom';
-import { Home, ShoppingCart, Monitor, FileText, Tag } from 'lucide-react';
+import { Home, ShoppingCart, Monitor, FileText, Tag, BookOpen, Megaphone, QrCode } from 'lucide-react';
 
-const HUB_MENU = [
+type HubMenuItem =
+  | { key: string; label: string; desc: string; icon: React.ComponentType<{ className?: string }>; to: string; end: boolean; badge?: undefined }
+  | { key: string; label: string; desc: string; icon: React.ComponentType<{ className?: string }>; badge: string; to?: undefined; end?: undefined };
+
+const HUB_MENU: HubMenuItem[] = [
   {
     key: 'home',
     label: '홈',
@@ -44,6 +48,28 @@ const HUB_MENU = [
     icon: FileText,
     to: '/store-hub/content',
     end: false,
+  },
+  {
+    key: 'blog',
+    label: '블로그',
+    desc: '운영자 블로그를 탐색하고 내 매장에 가져갑니다',
+    icon: BookOpen,
+    to: '/store-hub/blog',
+    end: false,
+  },
+  {
+    key: 'pop',
+    label: 'POP',
+    desc: '매장용 POP 자료를 탐색합니다',
+    icon: Megaphone,
+    badge: '준비 중',
+  },
+  {
+    key: 'qr',
+    label: 'QR 코드',
+    desc: 'QR 코드 자료를 탐색합니다',
+    icon: QrCode,
+    badge: '준비 중',
   },
   {
     key: 'event-offers',

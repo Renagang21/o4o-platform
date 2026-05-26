@@ -132,3 +132,8 @@ export async function fetchStoreCapabilities(): Promise<StoreCapabilityOverview[
   );
   return res.data ?? [];
 }
+
+export async function getStoreSlug(): Promise<string | null> {
+  const res = await request<{ success: boolean; data: { slug: string | null } }>('/store-hub/slug');
+  return res.data?.slug ?? null;
+}

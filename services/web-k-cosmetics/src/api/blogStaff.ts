@@ -135,3 +135,30 @@ export async function updateBlogSettings(
   });
   return json.data as StaffBlogSettings;
 }
+
+// ─────────────────────────────────────────────────────
+// HUB Import (WO-O4O-STORE-HUB-CROSS-SERVICE-COMMONIZATION-PHASE1-V1)
+// ─────────────────────────────────────────────────────
+
+export interface ImportedBlogPost {
+  id: string;
+  title: string;
+  status: string;
+  importSource: {
+    operatorPostId: string;
+    importedAt: string;
+  };
+}
+
+export async function importOperatorBlog(
+  slug: string,
+  sourceBlogId: string,
+  service?: string,
+): Promise<ImportedBlogPost> {
+  const url = `${getApiBase(service)}/stores/${encodeURIComponent(slug)}/blog/staff/import`;
+  const json = await authFetch(url, {
+    method: 'POST',
+    body: JSON.stringify({ sourceBlogId }),
+  });
+  return json.data as ImportedBlogPost;
+}

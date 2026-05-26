@@ -74,6 +74,8 @@ const HubB2BPage = lazy(() => import('@/pages/hub/HubB2BPage').then(m => ({ defa
 const HubContentPage = lazy(() => import('@/pages/hub/HubContentPage').then(m => ({ default: m.HubContentPage })));
 const HubSignagePage = lazy(() => import('@/pages/hub/HubSignagePage').then(m => ({ default: m.HubSignagePage })));
 const HubEventOffersPage = lazy(() => import('@/pages/hub/HubEventOffersPage').then(m => ({ default: m.HubEventOffersPage })));
+// WO-O4O-STORE-HUB-CROSS-SERVICE-COMMONIZATION-PHASE1-V1
+const HubBlogLibraryPage = lazy(() => import('@/pages/hub/HubBlogLibraryPage').then(m => ({ default: m.HubBlogLibraryPage })));
 
 // Forum Pages
 const ForumHubPage = lazy(() => import('@/pages/forum').then(m => ({ default: m.ForumHubPage })));
@@ -126,6 +128,8 @@ const StoreBlogPostPage = lazy(() => import('@/pages/store/StoreBlogPostPage'));
 const StoreBlogManagePage = lazy(() => import('@/pages/store/StoreBlogManagePage'));
 const StorePopPage = lazy(() => import('@/pages/store/StorePopPage'));
 const StoreQrPage = lazy(() => import('@/pages/store/StoreQrPage'));
+// WO-O4O-STORE-HUB-CROSS-SERVICE-COMMONIZATION-PHASE1-V1
+const StoreAssetsPage = lazy(() => import('@/pages/store/StoreAssetsPage'));
 
 // Admin Dashboard (WO-O4O-KCOS-ADMIN-DASHBOARD-DEDICATED-V1)
 const KCosmeticsAdminDashboard = lazy(() => import('@/pages/admin/KCosmeticsAdminDashboard'));
@@ -405,11 +409,21 @@ function AppRoutes() {
 
         {/* Hub (WO-O4O-STOREHUB-STRUCTURE-ALIGNMENT-V1: KCosmeticsHubLayout + nested routes) */}
         {/* WO-O4O-HUB-TO-STORE-HUB-RENAMING-V1: /hub → /store-hub canonical */}
-        <Route path="store-hub" element={<KCosmeticsHubLayout />}>
+        {/* WO-O4O-STORE-HUB-CROSS-SERVICE-COMMONIZATION-PHASE1-V1: RoleGuard 접근 보호 추가 */}
+        <Route
+          path="store-hub"
+          element={
+            <RoleGuard allowedRoles={['cosmetics:store_owner', 'cosmetics:operator', 'cosmetics:admin', 'platform:super_admin']}>
+              <KCosmeticsHubLayout />
+            </RoleGuard>
+          }
+        >
           <Route index element={<KCosmeticsHubPage />} />
           <Route path="b2b" element={<HubB2BPage />} />
           <Route path="content" element={<HubContentPage />} />
           <Route path="signage" element={<HubSignagePage />} />
+          {/* WO-O4O-STORE-HUB-CROSS-SERVICE-COMMONIZATION-PHASE1-V1: 블로그 탭 추가 */}
+          <Route path="blog" element={<HubBlogLibraryPage />} />
           <Route path="event-offers" element={<HubEventOffersPage />} />
         </Route>
 
@@ -511,7 +525,8 @@ function AppRoutes() {
         <Route path="signage" element={<StoreSignagePage />} />
         <Route path="orders" element={<StorePlaceholderPage title="주문 관리" />} />
         <Route path="billing" element={<StorePlaceholderPage title="정산/인보이스" />} />
-        <Route path="content" element={<StorePlaceholderPage title="콘텐츠 관리" />} />
+        {/* WO-O4O-STORE-HUB-CROSS-SERVICE-COMMONIZATION-PHASE1-V1: placeholder → StoreAssetsPanel */}
+        <Route path="content" element={<StoreAssetsPage />} />
         {/* Interest 관리 (WO-O4O-TABLET-INTEREST-UX-REFACTOR-V1) */}
         <Route path="interest-requests" element={<InterestRequestsPage />} />
         <Route path="settings" element={<StoreSettingsPage />} />

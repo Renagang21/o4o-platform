@@ -111,3 +111,8 @@ export async function fetchStoreCapabilities(): Promise<StoreCapabilityOverview[
   const res = await api.get('/glycopharm/store-hub/capabilities');
   return res.data?.data ?? [];
 }
+
+export async function getStoreSlug(): Promise<string | null> {
+  const res = await api.get('/glycopharm/store-hub/slug');
+  return res.data?.data?.slug ?? null;
+}

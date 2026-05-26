@@ -152,7 +152,10 @@ const HubB2BCatalogPage = lazy(() => import('@/pages/hub/HubB2BCatalogPage').the
 const HubContentListPage = lazy(() => import('@/pages/hub/HubContentListPage').then(m => ({ default: m.HubContentListPage })));
 // WO-O4O-GLYCOPHARM-EVENT-OFFERS-HUB-CANONICAL-ALIGNMENT-V1
 const HubEventOffersPage = lazy(() => import('@/pages/hub/HubEventOffersPage').then(m => ({ default: m.HubEventOffersPage })));
+// WO-O4O-STORE-HUB-CROSS-SERVICE-COMMONIZATION-PHASE1-V1
+const HubBlogLibraryPage = lazy(() => import('@/pages/hub/HubBlogLibraryPage').then(m => ({ default: m.HubBlogLibraryPage })));
 import { GlycoPharmHubLayout } from '@/components/layouts/GlycoPharmHubLayout';
+import { GlycoHubGuard } from '@/components/auth/GlycoHubGuard';
 
 // Guide pages (shared components — WO-O4O-GUIDE-COMMON-AND-GLYCOPHARM-HOME-V1)
 import {
@@ -461,11 +464,14 @@ function AppRoutes() {
         <Route path="b2b/supply" element={<SupplyPage />} />
         {/* Hub Exploration — sidebar layout (WO-O4O-GLYCOPHARM-KPA-STYLE-UX-REFINE-P1-V1) */}
         {/* WO-O4O-HUB-TO-STORE-HUB-RENAMING-V1: /hub → /store-hub */}
-        <Route path="store-hub" element={<GlycoPharmHubLayout />}>
+        {/* WO-O4O-STORE-HUB-CROSS-SERVICE-COMMONIZATION-PHASE1-V1: GlycoHubGuard 접근 보호 추가 */}
+        <Route path="store-hub" element={<GlycoHubGuard><GlycoPharmHubLayout /></GlycoHubGuard>}>
           <Route index element={<GlycoStoreHubPage />} />
           <Route path="b2b" element={<HubB2BCatalogPage />} />
           <Route path="content" element={<HubContentListPage />} />
           <Route path="signage" element={<Navigate to="/store/signage/library" replace />} />
+          {/* WO-O4O-STORE-HUB-CROSS-SERVICE-COMMONIZATION-PHASE1-V1: 블로그 탭 추가 */}
+          <Route path="blog" element={<HubBlogLibraryPage />} />
           {/* WO-O4O-GLYCOPHARM-EVENT-OFFERS-HUB-CANONICAL-ALIGNMENT-V1 */}
           <Route path="event-offers" element={<HubEventOffersPage />} />
         </Route>

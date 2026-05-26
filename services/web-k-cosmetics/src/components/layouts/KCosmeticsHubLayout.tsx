@@ -10,9 +10,13 @@
  */
 
 import { NavLink, Outlet } from 'react-router-dom';
-import { Home, ShoppingCart, Monitor, FileText, Megaphone } from 'lucide-react';
+import { Home, ShoppingCart, Monitor, FileText, Megaphone, BookOpen, QrCode } from 'lucide-react';
 
-const HUB_MENU = [
+type HubMenuItem =
+  | { key: string; label: string; desc: string; icon: React.ComponentType<{ className?: string }>; to: string; end: boolean; badge?: undefined }
+  | { key: string; label: string; desc: string; icon: React.ComponentType<{ className?: string }>; badge: string; to?: undefined; end?: undefined };
+
+const HUB_MENU: HubMenuItem[] = [
   {
     key: 'home',
     label: '홈',
@@ -46,6 +50,28 @@ const HUB_MENU = [
     end: false,
   },
   {
+    key: 'blog',
+    label: '블로그',
+    desc: '운영자 블로그를 탐색하고 내 매장에 가져갑니다',
+    icon: BookOpen,
+    to: '/store-hub/blog',
+    end: false,
+  },
+  {
+    key: 'pop',
+    label: 'POP',
+    desc: '매장용 POP 자료를 탐색합니다',
+    icon: Megaphone,
+    badge: '준비 중',
+  },
+  {
+    key: 'qr',
+    label: 'QR 코드',
+    desc: 'QR 코드 자료를 탐색합니다',
+    icon: QrCode,
+    badge: '준비 중',
+  },
+  {
     key: 'event-offers',
     label: '캠페인·이벤트',
     desc: '플랫폼 캠페인에 참여합니다',
@@ -70,10 +96,29 @@ export function KCosmeticsHubLayout() {
             <nav className="py-2">
               {HUB_MENU.map((item) => {
                 const Icon = item.icon;
+                if (item.badge) {
+                  return (
+                    <div
+                      key={item.key}
+                      className="flex items-start gap-3 px-4 py-3 opacity-50 cursor-not-allowed"
+                    >
+                      <Icon className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-sm text-slate-500">{item.label}</span>
+                          <span className="px-1.5 py-0.5 text-[10px] font-medium bg-slate-100 text-slate-400 rounded">
+                            {item.badge}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-400 mt-0.5 line-clamp-2">{item.desc}</p>
+                      </div>
+                    </div>
+                  );
+                }
                 return (
                   <NavLink
                     key={item.key}
-                    to={item.to}
+                    to={item.to!}
                     end={item.end}
                     className={({ isActive }) =>
                       `flex items-start gap-3 px-4 py-3 transition-colors relative ${

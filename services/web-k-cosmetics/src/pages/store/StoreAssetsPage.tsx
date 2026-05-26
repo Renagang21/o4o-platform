@@ -1,0 +1,94 @@
+/**
+ * StoreAssetsPage — K-Cosmetics 매장 자산 운영 대시보드
+ *
+ * WO-O4O-STORE-HUB-CROSS-SERVICE-COMMONIZATION-PHASE1-V1
+ *
+ * GlycoPharm StoreAssetsPage 패턴 동일.
+ * Thin wrapper over @o4o/store-asset-policy-core StoreAssetsPanel.
+ * Data fetching via K-Cosmetics API client; policy/rendering from core.
+ */
+
+import { useState, useCallback, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { StoreAssetsPanel, canToggleStatus } from '@o4o/store-asset-policy-core';
+import type { StoreAssetItem, AssetPublishStatus } from '@o4o/store-asset-policy-core';
+import { storeAssetControlApi } from '@/api/assetSnapshot';
+
+export default function StoreAssetsPage() {
+  const navigate = useNavigate();
+  const [allItems, setAllItems] = useState<StoreAssetItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  const fetchItems = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await storeAssetControlApi.list({ limit: 200 });
+      setAllItems(res.data.items || []);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Unknown error');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchItems(); }, [fetchItems]);
+
+  const handleToggleStatus = useCallback(async (item: StoreAssetItem) => {
+    if (item.isForced) return;
+    if (!canToggleStatus(item)) return;
+
+    const cycle: AssetPublishStatus[] = ['draft', 'published', 'hidden'];
+    const currentIdx = cycle.indexOf(item.publishStatus);
+    const nextStatus = cycle[(currentIdx + 1) % cycle.length];
+
+    setUpdatingId(item.id);
+    try {
+      const res = await storeAssetControlApi.updatePublishStatus(item.id, nextStatus);
+      setAllItems(prev =>
+        prev.map(it =>
+          it.id === item.id ? { ...it, publishStatus: res.data.publishStatus } : it,
+        ),
+      );
+    } catch {
+      // Silently fail
+    } finally {
+      setUpdatingId(null);
+    }
+  }, []);
+
+  const handleEdit = useCallback((snapshotId: string) => {
+    navigate(`/store/content/${snapshotId}/edit`);
+  }, [navigate]);
+
+  const handleBulkStatusChange = useCallback(async (ids: string[], status: AssetPublishStatus) => {
+    const results = await Promise.allSettled(
+      ids.map(id => storeAssetControlApi.updatePublishStatus(id, status)),
+    );
+    const succeededIds = new Set(
+      ids.filter((_, i) => results[i].status === 'fulfilled'),
+    );
+    if (succeededIds.size > 0) {
+      setAllItems(prev =>
+        prev.map(it => succeededIds.has(it.id) ? { ...it, publishStatus: status } : it),
+      );
+    }
+  }, []);
+
+  return (
+    <StoreAssetsPanel
+      items={allItems}
+      loading={loading}
+      error={error}
+      updatingId={updatingId}
+      onRefresh={fetchItems}
+      onToggleStatus={handleToggleStatus}
+      onEdit={handleEdit}
+      onBulkStatusChange={handleBulkStatusChange}
+      dashboardPath="/store"
+      contentListPath="/store/content"
+    />
+  );
+}
