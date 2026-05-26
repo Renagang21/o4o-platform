@@ -17,8 +17,8 @@ import { useEffect, useMemo, useRef, useState, useCallback, type CSSProperties }
 import { Link } from 'react-router-dom';
 import { BookOpen, Sparkles, Trash2, Search, FileText, Info } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
-import { DataTable, Pagination } from '@o4o/operator-ux-core';
-import type { ListColumnDef } from '@o4o/operator-ux-core';
+import { Pagination } from '@o4o/operator-ux-core';
+import { DataTable, type Column, ActionBar } from '@o4o/ui';
 import {
   storeAssetControlApi,
   storeLibraryApi,
@@ -380,13 +380,14 @@ function DocumentsSection({
     }
   }, [selected, rows, onRemoveSnapshots, onAfterRemove]);
 
-  const columns: ListColumnDef<DocumentRow>[] = useMemo(
+  // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-STANDARD-TABLE-V1: @o4o/ui Column<T>
+  const columns = useMemo<Column<DocumentRow>[]>(
     () => [
       {
         key: 'title',
-        header: '제목',
+        title: '제목',
         sortable: true,
-        sortAccessor: (row) => row.title,
+        sorter: (a, b) => a.title.localeCompare(b.title),
         render: (_v, row) => (
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
             {row.origin === 'direct' ? (
@@ -421,35 +422,33 @@ function DocumentsSection({
       },
       {
         key: 'authorName',
-        header: '작성자',
+        title: '작성자',
         width: '140px',
         sortable: true,
-        sortAccessor: (row) => row.authorName,
+        sorter: (a, b) => a.authorName.localeCompare(b.authorName),
         render: (_v, row) => <span style={styles.metaText}>{row.authorName}</span>,
       },
       {
         key: 'sourceType',
-        header: '원본 유형',
+        title: '원본 유형',
         width: '180px',
         sortable: true,
-        sortAccessor: (row) => SOURCE_TYPE_LABEL[row.sourceType],
+        sorter: (a, b) => SOURCE_TYPE_LABEL[a.sourceType].localeCompare(SOURCE_TYPE_LABEL[b.sourceType]),
         render: (_v, row) => <span style={styles.metaText}>{SOURCE_TYPE_LABEL[row.sourceType]}</span>,
       },
       {
         key: 'createdAt',
-        header: '가져온 날짜',
+        title: '가져온 날짜',
         width: '120px',
         sortable: true,
-        sortAccessor: (row) => row.createdAt,
+        sorter: (a, b) => a.createdAt.localeCompare(b.createdAt),
         render: (_v, row) => <span style={styles.metaText}>{formatDate(row.createdAt)}</span>,
       },
       {
         key: '_actions',
-        header: '액션',
-        system: true,
-        align: 'center',
+        title: '액션',
+        align: 'center' as const,
         width: '80px',
-        onCellClick: () => {},
         // WO-O4O-STORE-LIBRARY-CONTENTS-DIRECT-CONTENT-REENTRY-UX-V1:
         // direct 콘텐츠는 편집 가능 — action label 을 "편집"으로 분기
         render: (_v, row) => (
@@ -494,36 +493,38 @@ function DocumentsSection({
         </div>
       </div>
 
-      {selected.size > 0 && (
-        <div style={styles.toolbar}>
-          <span style={{ fontSize: 13, color: colors.neutral700 }}>{selected.size}개 선택됨</span>
-          <div style={{ flex: 1 }} />
-          <button type="button" onClick={handleStart} style={styles.startBtn}>
-            <Sparkles size={14} />
-            {startButtonLabel ?? '제작 시작'}
-          </button>
-          {showRemoveButton && (
-            <button type="button" onClick={handleRemove} style={styles.bulkDeleteBtn}>
-              <Trash2 size={14} />
-              선택 삭제
-            </button>
-          )}
-          <button type="button" onClick={() => setSelected(new Set())} style={styles.clearBtn}>
-            선택 해제
-          </button>
-        </div>
-      )}
+      {/* WO-O4O-KPA-STORE-LIBRARY-CONTENTS-STANDARD-TABLE-V1: custom toolbar → @o4o/ui ActionBar */}
+      <ActionBar
+        selectedCount={selected.size}
+        onClearSelection={() => setSelected(new Set())}
+        actions={[
+          {
+            key: 'start',
+            label: startButtonLabel ?? '제작 시작',
+            icon: <Sparkles size={14} />,
+            onClick: handleStart,
+            disabled: selected.size === 0,
+          },
+          ...(showRemoveButton ? [{
+            key: 'remove',
+            label: '선택 삭제',
+            icon: <Trash2 size={14} />,
+            variant: 'danger' as const,
+            onClick: handleRemove,
+          }] : []),
+        ]}
+      />
 
       <DataTable<DocumentRow>
         columns={columns}
-        data={rows}
+        dataSource={rows}
         rowKey="selectionKey"
         loading={loading}
-        emptyMessage={searchQuery ? '검색 결과가 없습니다' : '가져온 문서형 콘텐츠가 없습니다'}
-        tableId={mode === 'modal' ? 'kpa-store-library-documents-modal' : 'kpa-store-library-documents'}
-        selectable
-        selectedKeys={selected}
-        onSelectionChange={setSelected}
+        emptyText={searchQuery ? '검색 결과가 없습니다' : '가져온 문서형 콘텐츠가 없습니다'}
+        rowSelection={{
+          selectedRowKeys: Array.from(selected),
+          onChange: (keys: string[]) => setSelected(new Set(keys)),
+        }}
       />
 
       <Pagination
@@ -643,13 +644,14 @@ function LessonsSection({
     }
   }, [selected, rows, onRemoveSnapshots, onAfterRemove]);
 
-  const columns: ListColumnDef<LessonRow>[] = useMemo(
+  // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-STANDARD-TABLE-V1: @o4o/ui Column<T>
+  const columns = useMemo<Column<LessonRow>[]>(
     () => [
       {
         key: 'title',
-        header: '강의명',
+        title: '강의명',
         sortable: true,
-        sortAccessor: (row) => row.title,
+        sorter: (a, b) => a.title.localeCompare(b.title),
         render: (_v, row) => (
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
             <BookOpen size={14} style={{ color: colors.primary, flexShrink: 0 }} />
@@ -667,38 +669,36 @@ function LessonsSection({
       },
       {
         key: 'instructorName',
-        header: '강사',
+        title: '강사',
         width: '140px',
         sortable: true,
-        sortAccessor: (row) => row.instructorName,
+        sorter: (a, b) => a.instructorName.localeCompare(b.instructorName),
         render: (_v, row) => <span style={styles.metaText}>{row.instructorName}</span>,
       },
       {
         key: 'lessonCount',
-        header: '레슨 수',
+        title: '레슨 수',
         width: '90px',
-        align: 'center',
+        align: 'center' as const,
         sortable: true,
-        sortAccessor: (row) => row.lessonCount ?? -1,
+        sorter: (a, b) => (a.lessonCount ?? -1) - (b.lessonCount ?? -1),
         render: (_v, row) => (
           <span style={styles.metaText}>{row.lessonCount == null ? '-' : `${row.lessonCount}개`}</span>
         ),
       },
       {
         key: 'createdAt',
-        header: '가져온 날짜',
+        title: '가져온 날짜',
         width: '120px',
         sortable: true,
-        sortAccessor: (row) => row.createdAt,
+        sorter: (a, b) => a.createdAt.localeCompare(b.createdAt),
         render: (_v, row) => <span style={styles.metaText}>{formatDate(row.createdAt)}</span>,
       },
       {
         key: '_actions',
-        header: '액션',
-        system: true,
-        align: 'center',
+        title: '액션',
+        align: 'center' as const,
         width: '80px',
-        onCellClick: () => {},
         render: (_v, row) => (
           <a
             href={row.href}
@@ -738,36 +738,38 @@ function LessonsSection({
         </div>
       </div>
 
-      {selected.size > 0 && (
-        <div style={styles.toolbar}>
-          <span style={{ fontSize: 13, color: colors.neutral700 }}>{selected.size}개 선택됨</span>
-          <div style={{ flex: 1 }} />
-          <button type="button" onClick={handleStart} style={styles.startBtn}>
-            <Sparkles size={14} />
-            {startButtonLabel ?? '제작 시작'}
-          </button>
-          {showRemoveButton && (
-            <button type="button" onClick={handleRemove} style={styles.bulkDeleteBtn}>
-              <Trash2 size={14} />
-              선택 삭제
-            </button>
-          )}
-          <button type="button" onClick={() => setSelected(new Set())} style={styles.clearBtn}>
-            선택 해제
-          </button>
-        </div>
-      )}
+      {/* WO-O4O-KPA-STORE-LIBRARY-CONTENTS-STANDARD-TABLE-V1: custom toolbar → @o4o/ui ActionBar */}
+      <ActionBar
+        selectedCount={selected.size}
+        onClearSelection={() => setSelected(new Set())}
+        actions={[
+          {
+            key: 'start',
+            label: startButtonLabel ?? '제작 시작',
+            icon: <Sparkles size={14} />,
+            onClick: handleStart,
+            disabled: selected.size === 0,
+          },
+          ...(showRemoveButton ? [{
+            key: 'remove',
+            label: '선택 삭제',
+            icon: <Trash2 size={14} />,
+            variant: 'danger' as const,
+            onClick: handleRemove,
+          }] : []),
+        ]}
+      />
 
       <DataTable<LessonRow>
         columns={columns}
-        data={rows}
+        dataSource={rows}
         rowKey="selectionKey"
         loading={loading}
-        emptyMessage={searchQuery ? '검색 결과가 없습니다' : '가져온 강의가 없습니다'}
-        tableId={mode === 'modal' ? 'kpa-store-library-lessons-modal' : 'kpa-store-library-lessons'}
-        selectable
-        selectedKeys={selected}
-        onSelectionChange={setSelected}
+        emptyText={searchQuery ? '검색 결과가 없습니다' : '가져온 강의가 없습니다'}
+        rowSelection={{
+          selectedRowKeys: Array.from(selected),
+          onChange: (keys: string[]) => setSelected(new Set(keys)),
+        }}
       />
 
       <Pagination
