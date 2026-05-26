@@ -4,7 +4,7 @@
  * WO-O4O-OPERATOR-STORES-CORE-EXTRACTION-V1
  * 설계 기준: docs/architecture/OPERATOR-CORE-DESIGN-V1.md §4
  *
- * 3 서비스(KPA, GlycoPharm, K-Cosmetics) 공통 Store 모델 + 주입 인터페이스.
+ * 4 서비스(KPA, GlycoPharm, K-Cosmetics, Neture) 공통 Store 모델 + 주입 인터페이스.
  * 서비스별 차이는 generic 확장 + Adapter / Config / Slot 패턴으로 흡수한다.
  */
 
@@ -95,7 +95,7 @@ export interface StoresApi<T extends OperatorStoreBase = OperatorStoreBase> {
  * 동일 컨셉. 표현 제어만 책임 — 데이터 로직은 Adapter 가 담당한다.
  */
 export interface StoresConfig {
-  serviceKey: 'kpa-society' | 'glycopharm' | 'k-cosmetics';
+  serviceKey: 'kpa-society' | 'glycopharm' | 'k-cosmetics' | 'neture';
   terminology: {
     /** 단일 매장 라벨 (예: "약국" / "매장") */
     storeLabel: string;
