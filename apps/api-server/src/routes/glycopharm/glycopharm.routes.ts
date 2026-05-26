@@ -42,6 +42,7 @@ import { createPharmacyStoreConfigController } from '../o4o-store/controllers/ph
 import { createProductMarketingController } from '../o4o-store/controllers/product-marketing.controller.js';
 import { createAssetSnapshotController } from '../o4o-store/controllers/asset-snapshot.controller.js';
 import { createStoreAssetControlController } from '../o4o-store/controllers/store-asset-control.controller.js';
+import { createStoreExecutionAssetsController } from '../o4o-store/controllers/store-execution-assets.controller.js'; // WO-O4O-STORE-EXECUTION-ASSETS-CROSSSERVICE-PHASE2-D-V1
 import { createPublishedAssetsController } from '../o4o-store/controllers/published-assets.controller.js';
 import { createPharmacyController, createB2BController } from './controllers/pharmacy.controller.js';
 import { createCustomerRequestController } from './controllers/customer-request.controller.js'; // Phase 1: Common Request
@@ -363,6 +364,9 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
 
   // Store Asset Control
   router.use('/store-assets', createStoreAssetControlController(dataSource, coreRequireAuth as any));
+
+  // Store Execution Assets — 제작 자료 (WO-O4O-STORE-EXECUTION-ASSETS-CROSSSERVICE-PHASE2-D-V1)
+  router.use('/', createStoreExecutionAssetsController(dataSource, coreRequireAuth as any, 'glycopharm'));
 
   // Store Content — 콘텐츠 오버라이드
   router.use('/store-contents', createStoreContentController(dataSource, coreRequireAuth as any));
