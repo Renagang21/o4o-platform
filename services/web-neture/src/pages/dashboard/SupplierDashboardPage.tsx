@@ -74,7 +74,7 @@ export function SupplierDashboardPage() {
             <span style={styles.menuIcon}>💳</span>
             <span style={styles.menuLabel}>정산 내역</span>
           </Link>
-          <Link to="/supplier/profile" style={styles.menuCard}>
+          <Link to="/mypage/business-profile" style={styles.menuCard}>
             <span style={styles.menuIcon}>🏢</span>
             <span style={styles.menuLabel}>업체 정보</span>
           </Link>

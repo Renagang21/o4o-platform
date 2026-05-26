@@ -427,7 +427,7 @@ const QUICK_LINKS = [
   { label: '라이브러리', path: '/supplier/library' },
   { label: '판매자 신청', path: '/supplier/requests' },
   { label: '정산 현황', path: '/supplier/orders' },
-  { label: '프로필 관리', path: '/supplier/profile' },
+  { label: '사업자 정보', path: '/mypage/business-profile' },
 ];
 
 function inferActionPath(action: string, navigate: (path: string) => void) {
@@ -442,7 +442,7 @@ function inferActionPath(action: string, navigate: (path: string) => void) {
     navigate('/supplier/requests');
   } else if (lower.includes('trial') || lower.includes('시범') || lower.includes('트라이얼')) {
     navigate('/supplier/market-trial');
-  } else if (lower.includes('프로필') || lower.includes('profile')) {
-    navigate('/supplier/profile');
+  } else if (lower.includes('프로필') || lower.includes('profile') || lower.includes('사업자')) {
+    navigate('/mypage/business-profile');
   }
 }

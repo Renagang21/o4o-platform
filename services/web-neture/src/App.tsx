@@ -151,9 +151,7 @@ const SupplierProductsPage = lazy(() =>
 const SupplierOrdersPage = lazy(() =>
   import('./pages/supplier').then((m) => ({ default: m.SupplierOrdersPage }))
 );
-const SupplierProfilePage = lazy(() =>
-  import('./pages/supplier').then((m) => ({ default: m.SupplierProfilePage }))
-);
+// WO-O4O-SUPPLIER-MYPAGE-PROFILE-REDIRECT-V1: SupplierProfilePage lazy import 제거 (라우트 → Navigate 전환)
 const MyHandledProductsPage = lazy(() =>
   import('./pages/seller/MyHandledProductsPage')
 );
@@ -723,7 +721,8 @@ function App() {
               <Route path="/supplier/csv-import" element={<SupplierCsvImportPage />} />
               {/* WO-NETURE-B2B-CONTENT-MANAGEMENT-V1 */}
               <Route path="/supplier/b2b-content" element={<SupplierB2BContentPage />} />
-              <Route path="/supplier/profile" element={<SupplierProfilePage />} />
+              {/* WO-O4O-SUPPLIER-MYPAGE-PROFILE-REDIRECT-V1: /mypage/business-profile로 통합 */}
+              <Route path="/supplier/profile" element={<Navigate to="/mypage/business-profile" replace />} />
               {/* WO-O4O-MARKET-TRIAL-PHASE1-V1 + WO-MARKET-TRIAL-SUPPLIER-RESULTS-AND-FEEDBACK-V1 */}
               {/* Event Offer 현황 — 공급자 지원 허브 (WO-O4O-EVENT-OFFER-NETURE-ROLE-UX-ALIGNMENT-V1) */}
               <Route path="/supplier/event-offers" element={<SupplierEventOfferPage />} />
@@ -1014,7 +1013,7 @@ function App() {
             <Route path="/workspace/supplier/orders" element={<Navigate to="/supplier/orders" replace />} />
             <Route path="/workspace/supplier/requests" element={<Navigate to="/supplier/requests" replace />} />
             <Route path="/workspace/supplier/library" element={<Navigate to="/supplier/library" replace />} />
-            <Route path="/workspace/supplier/profile" element={<Navigate to="/supplier/profile" replace />} />
+            <Route path="/workspace/supplier/profile" element={<Navigate to="/mypage/business-profile" replace />} />
             <Route path="/workspace/supplier/*" element={<Navigate to="/supplier" replace />} />
 
             {/* Partner Dashboard 리다이렉트 */}
