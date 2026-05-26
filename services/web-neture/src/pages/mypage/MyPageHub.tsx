@@ -4,25 +4,20 @@
  * WO-O4O-NETURE-MYPAGE-SPLIT-V1
  * WO-MYPAGE-IA-RESTRUCTURE-V1
  * WO-O4O-NETURE-MYPAGE-KPA-CANONICAL-REALIGNMENT-V1
+ * WO-O4O-NETURE-MYPAGE-KPA-UI-STRUCTURE-ALIGNMENT-V1
  *
- * O4O 기본 MyPage 구조(KPA-Society 기준)에 맞게 정렬.
+ * KPA-Society MyDashboardPage 구조 기준 정렬:
+ *   - 프로필 요약 카드 (avatar 대형, 이름, 이메일, 역할 배지, 프로필 수정 버튼)
+ *   - 최근 활동 섹션 (빈 상태)
+ *   - 하단 아이콘형 바로가기 메뉴
  * 공급자 업무 메뉴(상품/주문/정산 등)는 /supplier 대시보드에서 접근.
- * 마이페이지는 개인 프로필·사업자 정보·설정 등 계정 중심 항목만 유지.
  */
 
-import { useNavigate } from 'react-router-dom';
-import {
-  User,
-  UserCog,
-  Settings,
-  ChevronRight,
-  Building2,
-  MessageSquare,
-} from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { User } from 'lucide-react';
 import { useAuth, getNetureDashboardRoute, getNetureRoleLabel } from '../../contexts';
 import { useLoginModal } from '../../contexts/LoginModalContext';
 import { MyPageLayout, QuickActionsSection } from '@o4o/account-ui';
-import { Link } from 'react-router-dom';
 
 export default function MyPageHub() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -52,89 +47,91 @@ export default function MyPageHub() {
   const dashboardPath = getNetureDashboardRoute(user.roles);
   const roleLabel = getNetureRoleLabel(user.roles);
   const hasDashboard = dashboardPath !== '/';
-
   const isSupplier = user.roles.some(
     (r: string) => r === 'neture:supplier' || r === 'supplier',
   );
 
-  const handleLogout = async () => {
-    await logout();
+  const handleLogout = () => {
+    logout();
     navigate('/workspace');
   };
 
   return (
     <MyPageLayout
       title="마이페이지"
-      subtitle="내 계정을 관리합니다"
+      breadcrumb={[{ label: '홈', href: '/' }, { label: '마이페이지' }]}
+      width="wide"
     >
-      {/* Compact Greeting Bar */}
-      <div className="bg-white rounded-2xl shadow-sm p-5 mb-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
-              <span className="text-base font-bold text-primary-700">
-                {user.name?.charAt(0) || '?'}
-              </span>
-            </div>
-            <div className="min-w-0">
-              <p className="text-sm font-semibold text-gray-900 truncate">
-                {user.name}님, 안녕하세요
-              </p>
-              <span className="inline-block mt-0.5 px-2 py-0.5 bg-primary-50 text-primary-700 rounded text-xs font-medium">
+      {/* 프로필 요약 카드 */}
+      <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
+        <div className="flex items-center gap-5">
+          <div className="w-20 h-20 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0 text-4xl">
+            👤
+          </div>
+          <div className="flex-1 min-w-0">
+            <h2 className="text-xl font-bold text-gray-900 truncate">{user.name}</h2>
+            <p className="text-sm text-gray-500 mt-1 truncate">{user.email}</p>
+            <div className="flex gap-2 mt-2 flex-wrap">
+              <span className="px-2.5 py-1 bg-primary-600 text-white rounded text-xs font-medium">
                 {roleLabel}
               </span>
+              {isSupplier && (
+                <span className="px-2.5 py-1 bg-gray-100 text-gray-700 rounded text-xs font-medium">
+                  공급사
+                </span>
+              )}
             </div>
           </div>
           <Link
             to="/mypage/profile"
-            className="flex items-center gap-1 text-sm text-primary-600 hover:text-primary-700 font-medium whitespace-nowrap flex-shrink-0"
+            className="flex-shrink-0 px-5 py-2.5 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 transition-colors"
           >
-            프로필 보기
-            <ChevronRight className="w-4 h-4" />
+            프로필 수정
           </Link>
         </div>
       </div>
 
-      {/* Navigation Cards — 계정 중심 항목만 */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+      {/* 최근 활동 */}
+      <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
+        <h3 className="text-base font-semibold text-gray-900 mb-4">최근 활동</h3>
+        <p className="text-sm text-gray-400 text-center py-8">최근 활동이 없습니다.</p>
+      </div>
+
+      {/* 하단 바로가기 */}
+      <div className="flex flex-wrap gap-3 mb-6">
         <Link
           to="/mypage/profile"
-          className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm hover:bg-gray-50 transition-colors"
+          className="flex-1 min-w-[80px] flex flex-col items-center py-4 px-2 bg-gray-50 rounded-2xl text-gray-700 no-underline hover:bg-gray-100 transition-colors"
         >
-          <UserCog className="w-5 h-5 text-primary-500" />
-          <span className="text-sm font-medium text-gray-700 flex-1">프로필 편집</span>
-          <ChevronRight className="w-4 h-4 text-gray-300" />
+          <span className="text-3xl mb-2">👤</span>
+          <span className="text-sm">프로필</span>
         </Link>
-        {/* WO-O4O-SUPPLIER-MYPAGE-CANONICAL-PROFILE-ALIGNMENT-V1 */}
+        <Link
+          to="/forum"
+          className="flex-1 min-w-[80px] flex flex-col items-center py-4 px-2 bg-gray-50 rounded-2xl text-gray-700 no-underline hover:bg-gray-100 transition-colors"
+        >
+          <span className="text-3xl mb-2">💬</span>
+          <span className="text-sm">포럼</span>
+        </Link>
         {isSupplier && (
           <Link
             to="/mypage/business-profile"
-            className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm hover:bg-gray-50 transition-colors"
+            className="flex-1 min-w-[80px] flex flex-col items-center py-4 px-2 bg-gray-50 rounded-2xl text-gray-700 no-underline hover:bg-gray-100 transition-colors"
           >
-            <Building2 className="w-5 h-5 text-primary-500" />
-            <span className="text-sm font-medium text-gray-700 flex-1">사업자 정보</span>
-            <ChevronRight className="w-4 h-4 text-gray-300" />
+            <span className="text-3xl mb-2">🏢</span>
+            <span className="text-sm">사업자 정보</span>
           </Link>
         )}
         <Link
-          to="/forum"
-          className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm hover:bg-gray-50 transition-colors"
-        >
-          <MessageSquare className="w-5 h-5 text-primary-500" />
-          <span className="text-sm font-medium text-gray-700 flex-1">포럼</span>
-          <ChevronRight className="w-4 h-4 text-gray-300" />
-        </Link>
-        <Link
           to="/mypage/settings"
-          className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm hover:bg-gray-50 transition-colors"
+          className="flex-1 min-w-[80px] flex flex-col items-center py-4 px-2 bg-gray-50 rounded-2xl text-gray-700 no-underline hover:bg-gray-100 transition-colors"
         >
-          <Settings className="w-5 h-5 text-primary-500" />
-          <span className="text-sm font-medium text-gray-700 flex-1">설정</span>
-          <ChevronRight className="w-4 h-4 text-gray-300" />
+          <span className="text-3xl mb-2">⚙️</span>
+          <span className="text-sm">설정</span>
         </Link>
       </div>
 
-      {/* Dashboard shortcut + Logout */}
+      {/* 대시보드 바로가기 + 로그아웃 */}
       <QuickActionsSection
         dashboardPath={dashboardPath}
         dashboardLabel={`${roleLabel} 대시보드`}
