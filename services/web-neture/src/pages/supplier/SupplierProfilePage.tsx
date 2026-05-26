@@ -204,7 +204,9 @@ export default function SupplierProfilePage() {
     );
   }
 
-  const statusCfg = profile?.status ? SUPPLIER_STATUS_CONFIG[profile.status] : null;
+  const statusCfg = profile?.status
+    ? SUPPLIER_STATUS_CONFIG[profile.status.toLowerCase()]
+    : null;
 
   return (
     <div className="max-w-2xl mx-auto">
