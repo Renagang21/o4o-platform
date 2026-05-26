@@ -238,6 +238,12 @@ const OperatorResourcesPage = lazy(() => import('@/pages/operator/OperatorResour
 const MyPageHub = lazy(() => import('@/pages/mypage/MyPageHub'));
 const MyProfilePage = lazy(() => import('@/pages/mypage/MyProfilePage'));
 const MySettingsPage = lazy(() => import('@/pages/mypage/MySettingsPage'));
+// MyPage LMS (WO-O4O-GLYCOPHARM-LMS-PHASE2-LEARNER-FRONTEND-V1)
+const MyEnrollmentsPage = lazy(() => import('@/pages/mypage/MyEnrollmentsPage'));
+const MyCertificatesPage = lazy(() => import('@/pages/mypage/MyCertificatesPage'));
+const MyCreditsPage = lazy(() => import('@/pages/mypage/MyCreditsPage'));
+// Lesson Player (WO-O4O-GLYCOPHARM-LMS-PHASE2-LEARNER-FRONTEND-V1)
+const LmsLessonPage = lazy(() => import('@/pages/education/LmsLessonPage'));
 
 
 // Apply Pages (API 연동)
@@ -431,6 +437,8 @@ function AppRoutes() {
         {/* WO-O4O-LMS-ROUTING-UNIFICATION-V1: Canonical /lms/course/:id 정렬 */}
         <Route path="lms" element={<EducationPage />} />
         <Route path="lms/course/:id" element={<CourseDetailPage />} />
+        {/* WO-O4O-GLYCOPHARM-LMS-PHASE2-LEARNER-FRONTEND-V1: 레슨 플레이어 */}
+        <Route path="lms/course/:courseId/lesson/:lessonId" element={<LmsLessonPage />} />
         <Route path="lms/:id" element={<LmsCourseRedirect />} />
         {/* WO-O4O-GLYCOPHARM-CONTENT-RESOURCES-ROUTE-ALIGNMENT-V1: top-level canonical paths */}
         <Route path="content" element={<HubContentListPage />} />
@@ -492,6 +500,22 @@ function AppRoutes() {
         <Route path="mypage/settings" element={
           <SoftGuard feature="mypage">
             <MySettingsPage />
+          </SoftGuard>
+        } />
+        {/* WO-O4O-GLYCOPHARM-LMS-PHASE2-LEARNER-FRONTEND-V1: MyPage LMS */}
+        <Route path="mypage/enrollments" element={
+          <SoftGuard feature="mypage">
+            <MyEnrollmentsPage />
+          </SoftGuard>
+        } />
+        <Route path="mypage/certificates" element={
+          <SoftGuard feature="mypage">
+            <MyCertificatesPage />
+          </SoftGuard>
+        } />
+        <Route path="mypage/credits" element={
+          <SoftGuard feature="mypage">
+            <MyCreditsPage />
           </SoftGuard>
         } />
 

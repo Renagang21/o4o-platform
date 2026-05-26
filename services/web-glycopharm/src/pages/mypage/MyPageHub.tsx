@@ -17,6 +17,9 @@ import {
   UserCog,
   Settings,
   ChevronRight,
+  BookOpen,
+  Award,
+  Coins,
 } from 'lucide-react';
 import { MyPageLayout, QuickActionsSection } from '@o4o/account-ui';
 
@@ -107,6 +110,34 @@ export default function MyPageHub() {
         >
           <Settings className="w-5 h-5 text-primary-500" />
           <span className="text-sm font-medium text-gray-700 flex-1">설정</span>
+          <ChevronRight className="w-4 h-4 text-gray-300" />
+        </Link>
+      </div>
+
+      {/* LMS Navigation Cards */}
+      <div className="grid grid-cols-1 gap-3 mb-4">
+        <Link
+          to="/mypage/enrollments"
+          className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm hover:bg-gray-50 transition-colors"
+        >
+          <BookOpen className="w-5 h-5 text-primary-500" />
+          <span className="text-sm font-medium text-gray-700 flex-1">내 강의</span>
+          <ChevronRight className="w-4 h-4 text-gray-300" />
+        </Link>
+        <Link
+          to="/mypage/certificates"
+          className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm hover:bg-gray-50 transition-colors"
+        >
+          <Award className="w-5 h-5 text-primary-500" />
+          <span className="text-sm font-medium text-gray-700 flex-1">수료증</span>
+          <ChevronRight className="w-4 h-4 text-gray-300" />
+        </Link>
+        <Link
+          to="/mypage/credits"
+          className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm hover:bg-gray-50 transition-colors"
+        >
+          <Coins className="w-5 h-5 text-primary-500" />
+          <span className="text-sm font-medium text-gray-700 flex-1">크레딧 / 포인트</span>
           <ChevronRight className="w-4 h-4 text-gray-300" />
         </Link>
       </div>

@@ -132,6 +132,33 @@ export interface LmsCertificate {
   issuedAt: string;
   courseTitle?: string;
   userName?: string;
+  certificateNumber?: string;
+  courseName?: string;
+  course?: { title: string };
+}
+
+// WO-O4O-GLYCOPHARM-LMS-PHASE2-LEARNER-FRONTEND-V1
+export interface LmsQuizResult {
+  score: number;
+  passed: boolean;
+  correctCount: number;
+  total: number;
+  creditsEarned: number;
+}
+
+export interface LmsAssignment {
+  id: string;
+  lessonId: string;
+  instructions: string | null;
+  dueDate: string | null;
+}
+
+export interface LmsAssignmentSubmission {
+  id: string;
+  assignmentId: string;
+  userId: string;
+  content: string;
+  submittedAt: string;
 }
 
 // ─── 공통 instructor client (WO-O4O-LMS-CLIENT-EXTRACTION-V1-SCOPED) ────────
@@ -241,6 +268,39 @@ export const lmsApi = {
       `/lms/certificates/${certificateId}/download`,
       { responseType: 'blob' },
     );
+    return data;
+  },
+
+  // ─── Phase 2 학습자 메서드 (WO-O4O-GLYCOPHARM-LMS-PHASE2-LEARNER-FRONTEND-V1) ──
+
+  getMyEnrollments: (params?: Record<string, unknown>) =>
+    learnerClient.getMyEnrollments(params),
+
+  cancelEnrollment: async (enrollmentId: string) => {
+    const { data } = await api.post(`/lms/enrollments/${enrollmentId}/cancel`);
+    return data;
+  },
+
+  getLesson: async (_courseId: string, lessonId: string) => {
+    const { data } = await api.get(`/lms/lessons/${lessonId}`);
+    return data;
+  },
+
+  getMyCertificates: (params?: { page?: number; limit?: number }) =>
+    api.get<any>('/lms/certificates', { params }),
+
+  getAssignmentForLesson: async (lessonId: string) => {
+    const { data } = await api.get(`/lms/lessons/${lessonId}/assignment`);
+    return data;
+  },
+
+  submitAssignment: async (assignmentId: string, content: string) => {
+    const { data } = await api.post(`/lms/assignments/${assignmentId}/submit`, { content });
+    return data;
+  },
+
+  getMyAssignmentSubmission: async (assignmentId: string) => {
+    const { data } = await api.get(`/lms/assignments/${assignmentId}/my`);
     return data;
   },
 
