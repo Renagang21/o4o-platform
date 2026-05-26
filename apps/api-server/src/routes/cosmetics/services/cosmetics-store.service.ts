@@ -145,21 +145,35 @@ export class CosmeticsStoreService {
         }
 
         // WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1: Create organizations record
-        const orgId = crypto.randomUUID();
-        await queryRunner.query(`
-          INSERT INTO organizations (id, name, code, type, level, path, "isActive",
-            address, phone, business_number, metadata, "createdAt", "updatedAt")
-          VALUES ($1, $2, $3, 'store', 0, $4, true, $5, $6, $7, $8, NOW(), NOW())
-        `, [
-          orgId,
-          application.storeName,
-          storeCode,
-          '/' + storeCode,
-          application.address || null,
-          application.contactPhone || null,
-          application.businessNumber,
-          JSON.stringify({ serviceKey: 'cosmetics' }),
-        ]);
+        // WO-O4O-COSMETICS-ORG-REUSE-AND-ENROLLMENT-V1:
+        //   같은 사업자번호로 이미 등록된 organization 이 있으면 재사용한다 (GlycoPharm 등 다른 서비스
+        //   가입 흐름에서 만들어진 동일 사업자 organization 을 공유). business_number 는 application
+        //   단계에서 normalize 되어 저장돼 있다 (utils/business-number.ts).
+        //   organizations.business_number 컬럼은 UNIQUE 제약이 없어 raw SELECT 기반 lookup 만 필요.
+        let orgId: string;
+        const existingOrgRows = await queryRunner.query(
+          `SELECT id FROM organizations WHERE business_number = $1 LIMIT 1`,
+          [application.businessNumber],
+        );
+        if (existingOrgRows.length > 0) {
+          orgId = existingOrgRows[0].id;
+        } else {
+          orgId = crypto.randomUUID();
+          await queryRunner.query(`
+            INSERT INTO organizations (id, name, code, type, level, path, "isActive",
+              address, phone, business_number, metadata, "createdAt", "updatedAt")
+            VALUES ($1, $2, $3, 'store', 0, $4, true, $5, $6, $7, $8, NOW(), NOW())
+          `, [
+            orgId,
+            application.storeName,
+            storeCode,
+            '/' + storeCode,
+            application.address || null,
+            application.contactPhone || null,
+            application.businessNumber,
+            JSON.stringify({ serviceKey: 'cosmetics' }),
+          ]);
+        }
 
         const store = queryRunner.manager.create('CosmeticsStore', {
           name: application.storeName,
@@ -196,6 +210,16 @@ export class CosmeticsStoreService {
           userId: application.applicantUserId,
           role: 'owner',
           isPrimary: false,
+        }, queryRunner);
+
+        // WO-O4O-COSMETICS-ORG-REUSE-AND-ENROLLMENT-V1:
+        //   organization_service_enrollments 에 k-cosmetics 서비스 등록.
+        //   helper 는 ON CONFLICT (organization_id, service_code) DO NOTHING 으로 멱등 처리되므로
+        //   동일 사업자 재승인 / 다른 시나리오 중복 호출 시에도 안전.
+        //   service_code 명칭은 frontend AuthContext serviceKey 와 동일한 'k-cosmetics' 사용.
+        await organizationOpsService.enrollService({
+          organizationId: orgId,
+          serviceCode: 'k-cosmetics',
         }, queryRunner);
 
         await queryRunner.commitTransaction();
