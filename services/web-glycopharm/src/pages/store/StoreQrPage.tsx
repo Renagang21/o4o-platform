@@ -18,7 +18,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import type { ProductionRouterState } from '@/types/production';
 import {
   ArrowLeft,
   QrCode,
@@ -114,22 +115,30 @@ async function qrFetch<T>(path: string, options?: RequestInit): Promise<T> {
 
 export default function StoreQrPage() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [items, setItems] = useState<QrItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showCreate, setShowCreate] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const [form, setForm] = useState<CreateQrForm>({
-    title: '',
-    description: '',
-    landingType: 'link',
-    landingTargetId: '',
-    slug: '',
+  // Prefill from library router state if present
+  const initFormFromState = (): CreateQrForm => {
+    const prod = (location.state as ProductionRouterState | null)?.production;
+    if (prod?.source?.items?.length) {
+      const item = prod.source.items[0];
+      return { title: item.title, description: item.description ?? '', landingType: 'link', landingTargetId: '', slug: generateSlug(item.title) };
+    }
+    return { title: '', description: '', landingType: 'link', landingTargetId: '', slug: '' };
+  };
+
+  const [showCreate, setShowCreate] = useState(() => {
+    const prod = (location.state as ProductionRouterState | null)?.production;
+    return !!(prod?.source?.items?.length);
   });
+  const [form, setForm] = useState<CreateQrForm>(initFormFromState);
   const [creating, setCreating] = useState(false);
 
   // ─── Load QR list ───────────────────────────────────────────────────────

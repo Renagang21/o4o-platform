@@ -17,7 +17,8 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import type { ProductionRouterState } from '@/types/production';
 import {
   ArrowLeft,
   Megaphone,
@@ -62,6 +63,7 @@ const TEMPLATES = [
 
 export default function StorePopPage() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Step 1: supplier items
   const [items, setItems] = useState<SupplierItem[]>([]);
@@ -69,8 +71,15 @@ export default function StorePopPage() {
   const [itemsError, setItemsError] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-  // Step 2: AI content
-  const [aiPrompt, setAiPrompt] = useState('');
+  // Step 2: AI content — prefill from library router state if present
+  const [aiPrompt, setAiPrompt] = useState(() => {
+    const prod = (location.state as ProductionRouterState | null)?.production;
+    if (prod?.source?.items?.length) {
+      const item = prod.source.items[0];
+      return [item.title, item.description].filter(Boolean).join('\n');
+    }
+    return '';
+  });
   const [aiGenerating, setAiGenerating] = useState(false);
   const [popAiContent, setPopAiContent] = useState<PopAiContent | null>(null);
 
