@@ -25,6 +25,18 @@ export type { GuideBlockProps, GuideBlockVariant } from './GuideBlock';
 export { LessonCardPreview } from './LessonCardPreview';
 export type { LessonCardPreviewProps, LessonCardPreviewVariant } from './LessonCardPreview';
 
+/* WO-O4O-APPRECIATION-PANEL-COMPONENT-EXTRACTION-V1: 감사 포인트 공통 컴포넌트 (Forum/LMS/Content 공용) */
+export { AppreciationPanel } from './AppreciationPanel';
+export type {
+  AppreciationPanelProps,
+  AppreciationTargetType,
+  AppreciationSummaryData,
+  AppreciationRecentItem,
+  AppreciationApi,
+  AppreciationTheme,
+  AppreciationVariant,
+} from './AppreciationPanel';
+
 /* WO-O4O-GUIDE-CLIENT-EXTRACTION-V1: guide_contents API client + GuideEditableSection (Base) */
 export * from './guide-client';
 
