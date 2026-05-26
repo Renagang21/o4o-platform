@@ -270,6 +270,8 @@ const StoreQrPage = lazy(() => import('@/pages/store/StoreQrPage'));
 // WO-O4O-STORE-LIBRARY-CROSSSERVICE-PHASE2-B-V1: 내 자료함
 const StoreLibraryContentsPage = lazy(() => import('@/pages/store-management/StoreLibraryContentsPage'));
 const StoreLibraryResourcesPage = lazy(() => import('@/pages/store-management/StoreLibraryResourcesPage'));
+// WO-O4O-STORE-PRODUCTION-MATERIALS-CROSSSERVICE-PHASE2-C-V1: 제작 자료
+const StoreProductionMaterialsPage = lazy(() => import('@/pages/store-management/StoreProductionMaterialsPage'));
 
 // Loading fallback
 function PageLoading() {
@@ -757,9 +759,10 @@ function AppRoutes() {
         <Route path="pop" element={<StorePopPage />} />
         {/* QR 관리 (WO-O4O-GLYCOPHARM-QR-STORE-EXECUTION-V1) */}
         <Route path="qr" element={<StoreQrPage />} />
-        {/* 내 자료함 (WO-O4O-STORE-LIBRARY-CROSSSERVICE-PHASE2-B-V1) */}
+        {/* 내 자료함 (WO-O4O-STORE-LIBRARY-CROSSSERVICE-PHASE2-B-V1 / PHASE2-C-V1) */}
         <Route path="library/contents" element={<StoreLibraryContentsPage />} />
         <Route path="library/resources" element={<StoreLibraryResourcesPage />} />
+        <Route path="library/production-materials" element={<StoreProductionMaterialsPage />} />
         <Route path="management" element={<PharmacyManagement />} />
         <Route path="management/b2b" element={<PharmacyB2BProducts />} />
       </Route>

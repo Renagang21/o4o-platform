@@ -131,6 +131,8 @@ const StoreQrPage = lazy(() => import('@/pages/store/StoreQrPage'));
 // WO-O4O-STORE-LIBRARY-CROSSSERVICE-PHASE2-B-V1: 내 자료함
 const StoreLibraryContentsPage = lazy(() => import('@/pages/store/StoreLibraryContentsPage'));
 const StoreLibraryResourcesPage = lazy(() => import('@/pages/store/StoreLibraryResourcesPage'));
+// WO-O4O-STORE-PRODUCTION-MATERIALS-CROSSSERVICE-PHASE2-C-V1: 제작 자료
+const StoreProductionMaterialsPage = lazy(() => import('@/pages/store/StoreProductionMaterialsPage'));
 // WO-O4O-STORE-HUB-CROSS-SERVICE-COMMONIZATION-PHASE1-V1
 const StoreAssetsPage = lazy(() => import('@/pages/store/StoreAssetsPage'));
 
@@ -537,9 +539,10 @@ function AppRoutes() {
         <Route path="content/blog" element={<StoreBlogManagePage />} />
         <Route path="pop" element={<StorePopPage />} />
         <Route path="qr" element={<StoreQrPage />} />
-        {/* 내 자료함 (WO-O4O-STORE-LIBRARY-CROSSSERVICE-PHASE2-B-V1) */}
+        {/* 내 자료함 (WO-O4O-STORE-LIBRARY-CROSSSERVICE-PHASE2-B-V1 / PHASE2-C-V1) */}
         <Route path="library/contents" element={<StoreLibraryContentsPage />} />
         <Route path="library/resources" element={<StoreLibraryResourcesPage />} />
+        <Route path="library/production-materials" element={<StoreProductionMaterialsPage />} />
       </Route>
 
       {/* Store public blog routes (WO-O4O-KCOS-STORE-EXECUTION-CANONICAL-ALIGNMENT-V1) */}
