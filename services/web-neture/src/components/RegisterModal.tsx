@@ -1,11 +1,14 @@
 /**
  * RegisterModal - 회원가입 모달
- * WO-O4O-AUTH-MODAL-SIGNUP-ROLE-UPDATE-V1
+ * WO-O4O-NETURE-REGISTRATION-UX-ALIGNMENT-V1
  *
- * 2단계 구조:
- * Step 1: 역할 선택 (supplier, partner, seller)
- * Step 2: 회원 정보 입력
- * Step 3: 완료 확인
+ * 3단계 구조:
+ * Step 1: 기본 정보 입력 (이메일, 비밀번호, 이름, 휴대폰)
+ * Step 2: 참여 유형 선택 + 유형별 추가 정보
+ * Step 3: 가입 신청 완료 / 승인 대기 안내
+ *
+ * 모든 가입자는 pending으로 생성 → 운영자 승인 후 active.
+ * 자동 로그인 없음.
  */
 
 import { useState, useEffect } from 'react';
@@ -24,27 +27,27 @@ function formatBusinessNumber(digits: string): string {
 const roleOptions: Array<{ role: SignupRole; label: string; description: string; emoji: string }> = [
   {
     role: 'user',
-    label: '일반 사용자',
-    description: '서비스를 이용하는 일반 사용자',
+    label: '일반 이용자',
+    description: '플랫폼을 이용하는 일반 회원',
     emoji: '👤',
+  },
+  {
+    role: 'seller',
+    label: '매장 경영자',
+    description: '매장을 운영하는 경영자',
+    emoji: '🏪',
   },
   {
     role: 'supplier',
     label: '공급자',
-    description: '제품을 공급하는 공급사/제조사',
+    description: '제품을 공급하는 공급사·제조사',
     emoji: '🏭',
   },
   {
     role: 'partner',
     label: '파트너',
-    description: '제품을 홍보하는 파트너',
+    description: '마케팅·협업으로 참여하는 파트너',
     emoji: '🤝',
-  },
-  {
-    role: 'seller',
-    label: '셀러',
-    description: '매장을 운영하는 판매자',
-    emoji: '🏪',
   },
 ];
 
@@ -57,6 +60,10 @@ const SERVICE_LABELS: Record<string, string> = {
   'k-cosmetics': 'K-Cosmetics', 'kpa-society': 'KPA-Society', platform: 'O4O 플랫폼',
 };
 
+const INPUT_CLASS =
+  'w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-shadow';
+const INPUT_CLASS_BG = INPUT_CLASS + ' bg-white';
+
 export default function RegisterModal({ isOpen }: RegisterModalProps) {
   const { closeModal, openLoginModal } = useLoginModal();
   const [step, setStep] = useState(1);
@@ -65,7 +72,10 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [existingAccountMode, setExistingAccountMode] = useState(false);
-  const [existingServices, setExistingServices] = useState<Array<{key: string, status: string}>>([]);
+  const [existingServices, setExistingServices] = useState<Array<{ key: string; status: string }>>([]);
+  const [emailAlreadyJoined, setEmailAlreadyJoined] = useState(false);
+  const [autoCloseCount, setAutoCloseCount] = useState(3);
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -76,11 +86,9 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
     companyName: '',
     businessNumber: '',
     businessType: '',
-    // 공급자 사업자 정보
     representativeName: '',
     businessAddress: '',
     businessAddressDetail: '',
-    // 공급자 담당자/세금계산서
     contactName: '',
     contactPhone: '',
     taxInvoiceEmail: '',
@@ -89,7 +97,6 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
     agreeMarketing: false,
   });
 
-  // 모달 열릴 때 초기화
   useEffect(() => {
     if (isOpen) {
       setStep(1);
@@ -99,6 +106,7 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
       setError(null);
       setExistingAccountMode(false);
       setExistingServices([]);
+      setEmailAlreadyJoined(false);
       setFormData({
         email: '',
         password: '',
@@ -122,8 +130,6 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
     }
   }, [isOpen]);
 
-  // Step 3: 가입 완료 후 3초 뒤 자동 종료
-  const [autoCloseCount, setAutoCloseCount] = useState(3);
   useEffect(() => {
     if (step !== 3) return;
     setAutoCloseCount(3);
@@ -140,7 +146,6 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
     return () => clearInterval(interval);
   }, [step, closeModal]);
 
-  // ESC 키로 닫기 + 배경 스크롤 방지
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === 'Escape') closeModal();
@@ -165,8 +170,13 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
     if (name === 'phone' || name === 'businessNumber' || name === 'contactPhone') {
       value = value.replace(/\D/g, '');
     }
+    if (name === 'email') {
+      setEmailAlreadyJoined(false);
+      setExistingAccountMode(false);
+      setError(null);
+    }
 
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }));
@@ -175,26 +185,26 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
   const handleEmailBlur = async () => {
     if (!formData.email || !formData.email.includes('@')) return;
     try {
-      const { data: result } = await api.post('/auth/check-email', { email: formData.email, service: 'neture' });
+      const { data: result } = await api.post('/auth/check-email', {
+        email: formData.email,
+        service: 'neture',
+      });
       if (result.success && result.data.exists) {
         if (result.data.alreadyJoined) {
+          setEmailAlreadyJoined(true);
           setError('이미 Neture 서비스에 가입된 계정입니다. 로그인해 주세요.');
         } else {
+          setEmailAlreadyJoined(false);
           setExistingAccountMode(true);
           setExistingServices(result.data.services || []);
           setError(null);
         }
       } else {
+        setEmailAlreadyJoined(false);
         setExistingAccountMode(false);
         setExistingServices([]);
       }
     } catch { /* silent */ }
-  };
-
-  const handleRoleSelect = (role: SignupRole) => {
-    setSelectedRole(role);
-    setStep(2);
-    setError(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -209,7 +219,6 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
         phone: formData.phone.replace(/\D/g, ''),
         role: selectedRole,
         service: 'neture',
-        // 공급자 사업자 정보 필드 매핑
         ...(selectedRole === 'supplier' && {
           representativeName: formData.representativeName,
           taxInvoiceEmail: formData.taxInvoiceEmail,
@@ -222,7 +231,12 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
 
       setStep(3);
     } catch (err: unknown) {
-      const axiosErr = err as { response?: { status?: number; data?: { code?: string; error?: string; services?: Array<{key: string, status: string}> } } };
+      const axiosErr = err as {
+        response?: {
+          status?: number;
+          data?: { code?: string; error?: string; services?: Array<{ key: string; status: string }> };
+        };
+      };
       const status = axiosErr.response?.status;
       const data = axiosErr.response?.data;
       if (status === 401 && data?.code === 'PASSWORD_MISMATCH') {
@@ -253,19 +267,28 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
   };
   const isPasswordStrong = Object.values(passwordChecks).every(Boolean);
 
-  const isFormValid = () => {
-    const base = formData.email && formData.password && formData.lastName && formData.firstName &&
-      formData.phone && formData.phone.length >= 10 && formData.phone.length <= 11 &&
-      (selectedRole === 'user' || formData.companyName) && formData.agreeTerms && formData.agreePrivacy;
-    const supplierExtra = selectedRole !== 'supplier' || (
-      formData.representativeName.trim() &&
-      formData.taxInvoiceEmail.trim() &&
-      formData.contactName.trim() &&
-      formData.contactPhone.length >= 10 &&
-      formData.businessAddress.trim()
-    );
-    if (existingAccountMode) return base && supplierExtra && formData.password.length > 0;
-    return base && supplierExtra && isPasswordStrong && formData.password === formData.passwordConfirm;
+  const isStep1Valid = () => {
+    if (emailAlreadyJoined) return false;
+    if (!formData.email || !formData.email.includes('@')) return false;
+    if (!formData.lastName.trim() || !formData.firstName.trim()) return false;
+    if (!formData.phone || formData.phone.length < 10 || formData.phone.length > 11) return false;
+    if (existingAccountMode) return formData.password.length > 0;
+    return isPasswordStrong && formData.password === formData.passwordConfirm;
+  };
+
+  const isStep2Valid = () => {
+    if (!selectedRole || !formData.agreeTerms || !formData.agreePrivacy) return false;
+    if (selectedRole === 'user') return true;
+    if (!formData.companyName.trim()) return false;
+    if (selectedRole === 'supplier') {
+      return (
+        formData.representativeName.trim() !== '' &&
+        formData.contactName.trim() !== '' &&
+        formData.contactPhone.length >= 10 &&
+        formData.businessAddress.trim() !== ''
+      );
+    }
+    return true;
   };
 
   if (!isOpen) return null;
@@ -275,17 +298,15 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
       className="fixed inset-0 z-50 flex items-center justify-center"
       onClick={(e) => e.target === e.currentTarget && closeModal()}
     >
-      {/* 반투명 배경 */}
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
 
-      {/* 모달 카드 */}
       <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-hidden flex flex-col">
         {/* 헤더 */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
           <div className="flex items-center gap-3">
             {step === 2 && (
               <button
-                onClick={() => setStep(1)}
+                onClick={() => { setStep(1); setError(null); }}
                 className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 <ArrowLeft className="w-5 h-5" />
@@ -294,7 +315,7 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
             <span className="text-2xl">🌿</span>
             <div>
               <h2 className="text-lg font-bold text-gray-900">
-                {step === 3 ? '가입 완료' : '회원가입'}
+                {step === 3 ? '가입 신청 완료' : '회원가입'}
               </h2>
               <p className="text-xs text-gray-500">Neture 유통 정보 플랫폼</p>
             </div>
@@ -310,21 +331,25 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
         {/* 프로그레스 바 */}
         {step < 3 && (
           <div className="flex items-center justify-center gap-2 px-6 py-3 border-b border-gray-50 shrink-0">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
-              step >= 1 ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-500'
-            }`}>
+            <div
+              className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
+                step >= 1 ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-500'
+              }`}
+            >
               {step > 1 ? '✓' : '1'}
             </div>
             <div className={`w-12 h-1 rounded ${step >= 2 ? 'bg-green-600' : 'bg-gray-200'}`} />
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
-              step >= 2 ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-500'
-            }`}>
+            <div
+              className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
+                step >= 2 ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-500'
+              }`}
+            >
               2
             </div>
           </div>
         )}
 
-        {/* 본문 (스크롤) */}
+        {/* 본문 */}
         <div className="flex-1 overflow-y-auto p-6">
           {error && (
             <div className="p-3 bg-red-50 border border-red-200 rounded-lg mb-4">
@@ -332,52 +357,10 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
             </div>
           )}
 
-          {/* Step 1: 역할 선택 */}
+          {/* ── Step 1: 기본 정보 입력 ── */}
           {step === 1 && (
-            <div className="text-center">
-              <h3 className="text-base font-semibold text-gray-700 mb-5">
-                어떤 역할로 가입하시겠습니까?
-              </h3>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-                {roleOptions.map((option) => (
-                  <button
-                    key={option.role}
-                    onClick={() => handleRoleSelect(option.role)}
-                    className="p-4 border-2 border-gray-200 rounded-xl bg-white hover:border-green-500 hover:shadow-md transition-all text-center group"
-                  >
-                    <span className="text-3xl block mb-2">{option.emoji}</span>
-                    <h4 className="text-sm font-semibold text-gray-900 mb-1 group-hover:text-green-700">
-                      {option.label}
-                    </h4>
-                    <p className="text-xs text-gray-500 leading-tight">{option.description}</p>
-                  </button>
-                ))}
-              </div>
-              <p className="text-sm text-gray-500">
-                이미 계정이 있으신가요?{' '}
-                <button
-                  onClick={() => openLoginModal()}
-                  className="text-green-600 font-medium hover:text-green-700 transition-colors"
-                >
-                  로그인
-                </button>
-              </p>
-            </div>
-          )}
-
-          {/* Step 2: 회원 정보 입력 */}
-          {step === 2 && (
-            <form id="register-form" onSubmit={handleSubmit} className="space-y-4">
-              {/* 선택된 역할 표시 */}
-              <div className="flex items-center gap-2 px-4 py-3 bg-green-50 rounded-lg text-sm text-green-800">
-                <span className="text-lg">
-                  {roleOptions.find(r => r.role === selectedRole)?.emoji}
-                </span>
-                <span className="font-medium">
-                  {roleOptions.find(r => r.role === selectedRole)?.label}
-                </span>
-                <span>으로 가입합니다</span>
-              </div>
+            <div className="space-y-4">
+              <p className="text-sm text-gray-500">기본 계정 정보를 입력해주세요.</p>
 
               {/* 이메일 */}
               <div>
@@ -391,20 +374,30 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                   onChange={handleInputChange}
                   onBlur={handleEmailBlur}
                   placeholder="example@company.com"
-                  required
-                  className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-shadow"
+                  autoComplete="email"
+                  className={INPUT_CLASS}
                 />
               </div>
 
               {existingAccountMode && (
                 <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-4 text-sm">
                   <p className="font-semibold">이미 O4O 플랫폼 계정이 존재합니다</p>
-                  <p className="mt-1 text-xs text-blue-600">기존 비밀번호를 입력하면 Neture 서비스 가입이 진행됩니다.</p>
+                  <p className="mt-1 text-xs text-blue-600">
+                    기존 비밀번호를 입력하면 Neture 서비스 가입이 진행됩니다.
+                  </p>
                   {existingServices.length > 0 && (
-                    <p className="mt-1 text-xs text-gray-500">가입된 서비스: {existingServices.map(s => SERVICE_LABELS[s.key] || s.key).join(', ')}</p>
+                    <p className="mt-1 text-xs text-gray-500">
+                      가입된 서비스: {existingServices.map((s) => SERVICE_LABELS[s.key] || s.key).join(', ')}
+                    </p>
                   )}
-                  <div className="mt-2 text-xs space-x-3">
-                    <button type="button" onClick={() => openLoginModal()} className="text-green-600 hover:underline">로그인</button>
+                  <div className="mt-2 text-xs">
+                    <button
+                      type="button"
+                      onClick={() => openLoginModal()}
+                      className="text-green-600 hover:underline"
+                    >
+                      로그인
+                    </button>
                   </div>
                 </div>
               )}
@@ -413,7 +406,8 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
               <div className={existingAccountMode ? '' : 'grid grid-cols-2 gap-3'}>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {existingAccountMode ? '기존 비밀번호' : '비밀번호'} <span className="text-red-500">*</span>
+                    {existingAccountMode ? '기존 비밀번호' : '비밀번호'}{' '}
+                    <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <input
@@ -422,8 +416,8 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                       value={formData.password}
                       onChange={handleInputChange}
                       placeholder={existingAccountMode ? 'O4O 계정 비밀번호 입력' : '8자 이상'}
-                      required
-                      className="w-full px-4 py-3 pr-10 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-shadow"
+                      autoComplete="new-password"
+                      className={INPUT_CLASS + ' pr-10'}
                     />
                     <button
                       type="button"
@@ -452,225 +446,417 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                   )}
                 </div>
                 {!existingAccountMode && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    비밀번호 확인 <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="password"
-                    name="passwordConfirm"
-                    value={formData.passwordConfirm}
-                    onChange={handleInputChange}
-                    placeholder="비밀번호 재입력"
-                    required
-                    className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-shadow"
-                  />
-                  {formData.passwordConfirm.length > 0 && formData.password !== formData.passwordConfirm && (
-                    <p className="mt-1 text-xs text-red-500">비밀번호가 일치하지 않습니다</p>
-                  )}
-                </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      비밀번호 확인 <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="password"
+                      name="passwordConfirm"
+                      value={formData.passwordConfirm}
+                      onChange={handleInputChange}
+                      placeholder="비밀번호 재입력"
+                      autoComplete="new-password"
+                      className={INPUT_CLASS}
+                    />
+                    {formData.passwordConfirm.length > 0 &&
+                      formData.password !== formData.passwordConfirm && (
+                        <p className="mt-1 text-xs text-red-500">비밀번호가 일치하지 않습니다</p>
+                      )}
+                  </div>
                 )}
               </div>
 
-              {/* 성 + 이름 */}
-              <div className="grid grid-cols-4 gap-3">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    성 <span className="text-red-500">*</span>
-                  </label>
+              {/* 이름 (성 + 이름) */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  이름 <span className="text-red-500">*</span>
+                </label>
+                <div className="grid grid-cols-[1fr_3fr] gap-2">
                   <input
                     type="text"
                     name="lastName"
                     value={formData.lastName}
                     onChange={handleInputChange}
-                    placeholder="홍"
-                    required
-                    className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-shadow"
+                    placeholder="성"
+                    className={INPUT_CLASS}
                   />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {selectedRole === 'user' ? '이름' : '담당자명'} <span className="text-red-500">*</span>
-                  </label>
                   <input
                     type="text"
                     name="firstName"
                     value={formData.firstName}
                     onChange={handleInputChange}
-                    placeholder="길동"
-                    required
-                    className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-shadow"
+                    placeholder="이름"
+                    className={INPUT_CLASS}
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    핸드폰 번호 <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleInputChange}
-                    placeholder="숫자만 입력"
-                    required
-                    className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-shadow"
-                  />
-                  {formData.phone.length > 0 && (formData.phone.length < 10 || formData.phone.length > 11) && (
+              </div>
+
+              {/* 휴대폰 번호 */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  휴대폰 번호 <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  placeholder="숫자만 입력 (010xxxxxxxx)"
+                  className={INPUT_CLASS}
+                />
+                {formData.phone.length > 0 &&
+                  (formData.phone.length < 10 || formData.phone.length > 11) && (
                     <p className="mt-1 text-xs text-red-500">10~11자리 숫자를 입력해주세요</p>
                   )}
-                </div>
               </div>
 
-              {/* 사업자 정보 — 일반 사용자는 표시하지 않음 */}
-              {selectedRole !== 'user' && (
-              <div className="p-4 bg-gray-50 rounded-lg space-y-3">
-                <h4 className="text-sm font-semibold text-gray-700">사업자 기본정보</h4>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    회사명 <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="companyName"
-                    value={formData.companyName}
-                    onChange={handleInputChange}
-                    placeholder="OO주식회사"
-                    required
-                    className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-shadow bg-white"
-                  />
-                </div>
+              <p className="text-center text-sm text-gray-500 pt-1">
+                이미 계정이 있으신가요?{' '}
+                <button
+                  type="button"
+                  onClick={() => openLoginModal()}
+                  className="text-green-600 font-medium hover:text-green-700 transition-colors"
+                >
+                  로그인
+                </button>
+              </p>
+            </div>
+          )}
+
+          {/* ── Step 2: 참여 유형 선택 + 추가 정보 ── */}
+          {step === 2 && (
+            <form id="register-form" onSubmit={handleSubmit} className="space-y-5">
+              {/* 역할 선택 카드 */}
+              <div>
+                <p className="text-sm font-medium text-gray-700 mb-3">
+                  참여 유형을 선택해주세요. <span className="text-red-500">*</span>
+                </p>
                 <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      사업자등록번호
-                    </label>
-                    <input
-                      type="text"
-                      name="businessNumber"
-                      value={formatBusinessNumber(formData.businessNumber)}
-                      onChange={handleInputChange}
-                      placeholder="숫자만 입력"
-                      maxLength={12}
-                      className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-shadow bg-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      업종
-                    </label>
-                    <select
-                      name="businessType"
-                      value={formData.businessType}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-shadow bg-white"
+                  {roleOptions.map((option) => (
+                    <button
+                      key={option.role}
+                      type="button"
+                      onClick={() => { setSelectedRole(option.role); setError(null); }}
+                      className={`p-4 border-2 rounded-xl bg-white transition-all text-center group ${
+                        selectedRole === option.role
+                          ? 'border-green-500 shadow-md bg-green-50'
+                          : 'border-gray-200 hover:border-green-400 hover:shadow-sm'
+                      }`}
                     >
-                      <option value="">선택</option>
-                      <option value="cosmetics">화장품</option>
-                      <option value="health">건강식품</option>
-                      <option value="medical">의료기기</option>
-                      <option value="food">식품</option>
-                      <option value="other">기타</option>
-                    </select>
-                  </div>
-                </div>
-
-                {/* 공급자 전용 추가 사업자 정보 */}
-                {selectedRole === 'supplier' && (
-                  <>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        대표자명 <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="representativeName"
-                        value={formData.representativeName}
-                        onChange={handleInputChange}
-                        placeholder="홍길동"
-                        className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-shadow bg-white"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        사업장 주소 <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="businessAddress"
-                        value={formData.businessAddress}
-                        onChange={handleInputChange}
-                        placeholder="서울시 강남구 테헤란로 123"
-                        className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-shadow bg-white"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        상세주소
-                      </label>
-                      <input
-                        type="text"
-                        name="businessAddressDetail"
-                        value={formData.businessAddressDetail}
-                        onChange={handleInputChange}
-                        placeholder="5층 502호 (선택)"
-                        className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-shadow bg-white"
-                      />
-                    </div>
-                  </>
-                )}
-              </div>
-              )}
-
-              {/* 담당자/세금계산서 정보 — 공급자만 */}
-              {selectedRole === 'supplier' && (
-              <div className="p-4 bg-blue-50 rounded-lg space-y-3">
-                <h4 className="text-sm font-semibold text-gray-700">담당자 / 세금계산서 정보</h4>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      담당자명 <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="contactName"
-                      value={formData.contactName}
-                      onChange={handleInputChange}
-                      placeholder="김담당"
-                      className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-shadow bg-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      담당자 휴대폰 <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="tel"
-                      name="contactPhone"
-                      value={formData.contactPhone}
-                      onChange={handleInputChange}
-                      placeholder="숫자만 입력"
-                      className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-shadow bg-white"
-                    />
-                    {formData.contactPhone.length > 0 && formData.contactPhone.length < 10 && (
-                      <p className="mt-1 text-xs text-red-500">10자리 이상 입력해주세요</p>
-                    )}
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    세금계산서 이메일 <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    name="taxInvoiceEmail"
-                    value={formData.taxInvoiceEmail}
-                    onChange={handleInputChange}
-                    placeholder="tax@company.com"
-                    className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-shadow bg-white"
-                  />
-                  <p className="mt-1 text-xs text-gray-400">세금계산서 수신용 이메일 (로그인 이메일과 달라도 됩니다)</p>
+                      <span className="text-3xl block mb-2">{option.emoji}</span>
+                      <h4
+                        className={`text-sm font-semibold mb-1 ${
+                          selectedRole === option.role
+                            ? 'text-green-700'
+                            : 'text-gray-900 group-hover:text-green-700'
+                        }`}
+                      >
+                        {option.label}
+                      </h4>
+                      <p className="text-xs text-gray-500 leading-tight">{option.description}</p>
+                    </button>
+                  ))}
                 </div>
               </div>
+
+              {/* 유형별 추가 정보 */}
+              {selectedRole && selectedRole !== 'user' && (
+                <div className="p-4 bg-gray-50 rounded-xl space-y-3">
+                  <h4 className="text-sm font-semibold text-gray-700">
+                    {selectedRole === 'seller'
+                      ? '매장 정보'
+                      : selectedRole === 'supplier'
+                      ? '공급자 정보'
+                      : '파트너 정보'}
+                  </h4>
+
+                  {/* 매장 경영자 */}
+                  {selectedRole === 'seller' && (
+                    <>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          매장명 <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="companyName"
+                          value={formData.companyName}
+                          onChange={handleInputChange}
+                          placeholder="OO 매장"
+                          className={INPUT_CLASS_BG}
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">업종</label>
+                          <select
+                            name="businessType"
+                            value={formData.businessType}
+                            onChange={handleInputChange}
+                            className={INPUT_CLASS_BG}
+                          >
+                            <option value="">선택</option>
+                            <option value="cosmetics">화장품</option>
+                            <option value="health">건강식품</option>
+                            <option value="medical">의료기기</option>
+                            <option value="food">식품</option>
+                            <option value="other">기타</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            매장 지역
+                          </label>
+                          <input
+                            type="text"
+                            name="businessAddress"
+                            value={formData.businessAddress}
+                            onChange={handleInputChange}
+                            placeholder="서울 강남구"
+                            className={INPUT_CLASS_BG}
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            담당자명
+                          </label>
+                          <input
+                            type="text"
+                            name="contactName"
+                            value={formData.contactName}
+                            onChange={handleInputChange}
+                            placeholder="홍길동"
+                            className={INPUT_CLASS_BG}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            담당자 연락처
+                          </label>
+                          <input
+                            type="tel"
+                            name="contactPhone"
+                            value={formData.contactPhone}
+                            onChange={handleInputChange}
+                            placeholder="숫자만 입력"
+                            className={INPUT_CLASS_BG}
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {/* 공급자 */}
+                  {selectedRole === 'supplier' && (
+                    <>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          회사명 <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="companyName"
+                          value={formData.companyName}
+                          onChange={handleInputChange}
+                          placeholder="OO주식회사"
+                          className={INPUT_CLASS_BG}
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            대표자명 <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            name="representativeName"
+                            value={formData.representativeName}
+                            onChange={handleInputChange}
+                            placeholder="홍길동"
+                            className={INPUT_CLASS_BG}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">업종</label>
+                          <select
+                            name="businessType"
+                            value={formData.businessType}
+                            onChange={handleInputChange}
+                            className={INPUT_CLASS_BG}
+                          >
+                            <option value="">선택</option>
+                            <option value="cosmetics">화장품</option>
+                            <option value="health">건강식품</option>
+                            <option value="medical">의료기기</option>
+                            <option value="food">식품</option>
+                            <option value="other">기타</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          사업장 주소 <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="businessAddress"
+                          value={formData.businessAddress}
+                          onChange={handleInputChange}
+                          placeholder="서울시 강남구 테헤란로 123"
+                          className={INPUT_CLASS_BG}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          상세주소
+                        </label>
+                        <input
+                          type="text"
+                          name="businessAddressDetail"
+                          value={formData.businessAddressDetail}
+                          onChange={handleInputChange}
+                          placeholder="5층 502호 (선택)"
+                          className={INPUT_CLASS_BG}
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            담당자명 <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            name="contactName"
+                            value={formData.contactName}
+                            onChange={handleInputChange}
+                            placeholder="김담당"
+                            className={INPUT_CLASS_BG}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            담당자 연락처 <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="tel"
+                            name="contactPhone"
+                            value={formData.contactPhone}
+                            onChange={handleInputChange}
+                            placeholder="숫자만 입력"
+                            className={INPUT_CLASS_BG}
+                          />
+                          {formData.contactPhone.length > 0 &&
+                            formData.contactPhone.length < 10 && (
+                              <p className="mt-1 text-xs text-red-500">10자리 이상 입력해주세요</p>
+                            )}
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          사업자등록번호
+                        </label>
+                        <input
+                          type="text"
+                          name="businessNumber"
+                          value={formatBusinessNumber(formData.businessNumber)}
+                          onChange={handleInputChange}
+                          placeholder="숫자만 입력 (선택)"
+                          maxLength={12}
+                          className={INPUT_CLASS_BG}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          세금계산서 이메일
+                        </label>
+                        <input
+                          type="email"
+                          name="taxInvoiceEmail"
+                          value={formData.taxInvoiceEmail}
+                          onChange={handleInputChange}
+                          placeholder="tax@company.com (선택)"
+                          className={INPUT_CLASS_BG}
+                        />
+                        <p className="mt-1 text-xs text-gray-400">
+                          세금계산서 수신용 이메일 (로그인 이메일과 달라도 됩니다)
+                        </p>
+                      </div>
+                    </>
+                  )}
+
+                  {/* 파트너 */}
+                  {selectedRole === 'partner' && (
+                    <>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          활동명 / 회사명 <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="companyName"
+                          value={formData.companyName}
+                          onChange={handleInputChange}
+                          placeholder="OO 마케팅, OO 에이전시 등"
+                          className={INPUT_CLASS_BG}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          활동 분야
+                        </label>
+                        <select
+                          name="businessType"
+                          value={formData.businessType}
+                          onChange={handleInputChange}
+                          className={INPUT_CLASS_BG}
+                        >
+                          <option value="">선택</option>
+                          <option value="cosmetics">화장품·뷰티</option>
+                          <option value="health">건강·식품</option>
+                          <option value="medical">의료·헬스케어</option>
+                          <option value="food">식품·음료</option>
+                          <option value="other">기타</option>
+                        </select>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            담당자명
+                          </label>
+                          <input
+                            type="text"
+                            name="contactName"
+                            value={formData.contactName}
+                            onChange={handleInputChange}
+                            placeholder="홍길동"
+                            className={INPUT_CLASS_BG}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            담당자 연락처
+                          </label>
+                          <input
+                            type="tel"
+                            name="contactPhone"
+                            value={formData.contactPhone}
+                            onChange={handleInputChange}
+                            placeholder="숫자만 입력"
+                            className={INPUT_CLASS_BG}
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {/* 민감 정보 안내 */}
+                  <p className="text-xs text-gray-400 pt-1">
+                    세무, 계약, 정산 또는 공식 거래가 필요한 경우 추가 정보는 별도 안내에 따라 제출하실 수 있습니다.
+                  </p>
+                </div>
               )}
 
               {/* 동의 항목 */}
@@ -682,11 +868,18 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                     checked={formData.agreeTerms}
                     onChange={handleInputChange}
                     className="w-4 h-4 mt-0.5 text-green-600 border-gray-300 rounded focus:ring-green-500"
-                    required
                   />
                   <span>
                     <span className="text-red-500">*</span> 이용약관에 동의합니다{' '}
-                    <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-green-600 hover:text-green-700 underline" onClick={(e) => e.stopPropagation()}>(보기)</a>
+                    <a
+                      href="/terms"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-green-600 hover:text-green-700 underline"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      (보기)
+                    </a>
                   </span>
                 </label>
                 <label className="flex items-start gap-2 text-sm text-gray-600 cursor-pointer">
@@ -696,11 +889,18 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                     checked={formData.agreePrivacy}
                     onChange={handleInputChange}
                     className="w-4 h-4 mt-0.5 text-green-600 border-gray-300 rounded focus:ring-green-500"
-                    required
                   />
                   <span>
                     <span className="text-red-500">*</span> 개인정보처리방침에 동의합니다{' '}
-                    <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-green-600 hover:text-green-700 underline" onClick={(e) => e.stopPropagation()}>(보기)</a>
+                    <a
+                      href="/privacy"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-green-600 hover:text-green-700 underline"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      (보기)
+                    </a>
                   </span>
                 </label>
                 <label className="flex items-start gap-2 text-sm text-gray-600 cursor-pointer">
@@ -714,25 +914,20 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                   <span>마케팅 정보 수신에 동의합니다 (선택)</span>
                 </label>
               </div>
-
             </form>
           )}
 
-          {/* Step 3: 완료 → 3초 후 자동 종료 */}
+          {/* ── Step 3: 가입 신청 완료 ── */}
           {step === 3 && (
             <div className="text-center py-8">
               <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
-                {selectedRole === 'user' ? '가입이 완료되었습니다' : '가입 신청이 완료되었습니다'}
-              </h3>
-              <p className="text-sm text-gray-500 mb-4 leading-relaxed">
-                {selectedRole === 'user'
-                  ? '로그인하여 서비스를 이용하실 수 있습니다.'
-                  : <>운영자 승인 후 서비스를 이용하실 수 있습니다.<br />승인 완료 시 이메일로 안내드리겠습니다.</>}
-              </p>
-              <p className="text-xs text-gray-400 mb-6">
-                {autoCloseCount}초 후 자동으로 닫힙니다
-              </p>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">가입 신청이 접수되었습니다</h3>
+              <div className="text-sm text-gray-500 space-y-2 mb-6 leading-relaxed">
+                <p>운영자 확인 후 서비스 이용이 가능합니다.</p>
+                <p>승인 결과는 안내 메시지 또는 이메일로 확인하실 수 있습니다.</p>
+                <p className="text-xs text-gray-400">승인 전에는 로그인이 제한될 수 있습니다.</p>
+              </div>
+              <p className="text-xs text-gray-400 mb-6">{autoCloseCount}초 후 자동으로 닫힙니다</p>
               <button
                 onClick={closeModal}
                 className="px-8 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors"
@@ -743,16 +938,28 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
           )}
         </div>
 
-        {/* 고정 Footer — Step 2에서만 표시 */}
+        {/* 고정 Footer */}
+        {step === 1 && (
+          <div className="shrink-0 border-t border-gray-100 px-6 py-4 bg-white">
+            <button
+              type="button"
+              disabled={!isStep1Valid()}
+              onClick={() => { setStep(2); setError(null); }}
+              className="w-full py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              다음
+            </button>
+          </div>
+        )}
         {step === 2 && (
           <div className="shrink-0 border-t border-gray-100 px-6 py-4 bg-white">
             <button
               type="submit"
               form="register-form"
-              disabled={!isFormValid() || loading}
+              disabled={!isStep2Valid() || loading}
               className="w-full py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? '가입 처리 중...' : '가입하기'}
+              {loading ? '가입 처리 중...' : '가입 신청하기'}
             </button>
             <p className="text-center text-sm text-gray-500 mt-2">
               이미 계정이 있으신가요?{' '}
