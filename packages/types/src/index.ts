@@ -118,3 +118,7 @@ export * from './storefront-config.js';
 
 // Export hub content types (WO-O4O-HUB-CONTENT-QUERY-SERVICE-PHASE1-V2)
 export * from './hub-content.js';
+
+// Export store production router state types (WO-O4O-STORE-PRODUCTION-TYPES-COMMONIZATION-PHASE2-F-V1)
+// canonical 출처 — KPA / GlycoPharm / K-Cosmetics 가 re-export 하여 사용
+export * from './production.js';

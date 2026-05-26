@@ -30,23 +30,22 @@
 
 import { Megaphone, QrCode, BookOpen, FileText, type LucideIcon } from 'lucide-react';
 import type { ProductionOutputConstraints } from './productionTemplates';
+// WO-O4O-STORE-PRODUCTION-TYPES-COMMONIZATION-PHASE2-F-V1:
+//   4 개 router state 타입의 canonical 출처는 @o4o/types/production.
+//   기존 사용처 (이 파일에서 import 하던 코드들) 호환을 위해 re-export 유지.
+import type {
+  ProductionTarget,
+  ProductionSourceItem,
+  ProductionSource,
+  ProductionRouterState,
+} from '@o4o/types/production';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export type ProductionTarget = 'pop' | 'qr' | 'blog' | 'product-description';
-
-export interface ProductionSourceItem {
-  id: string;
-  title: string;
-  description?: string | null;
-  /** 원본 종류: snapshot(asset_snapshots) | direct(kpa_store_contents) | library(store_execution_assets) */
-  origin: 'snapshot' | 'direct' | 'library';
-}
-
-export interface ProductionSource {
-  fromLibrary: 'contents' | 'resources';
-  items: ProductionSourceItem[];
-}
+// WO-O4O-STORE-PRODUCTION-TYPES-COMMONIZATION-PHASE2-F-V1:
+//   ProductionTarget / ProductionSourceItem / ProductionSource / ProductionRouterState
+//   정의를 @o4o/types/production 으로 이동 (canonical). 본 모듈에서는 호환을 위해 re-export.
+export type { ProductionTarget, ProductionSourceItem, ProductionSource, ProductionRouterState };
 
 export interface ProductionTargetMeta {
   key: ProductionTarget;
@@ -152,19 +151,9 @@ export function findProductionTarget(key: ProductionTarget): ProductionTargetMet
 
 // ─── Router state helper ─────────────────────────────────────────────────────
 
-export interface ProductionRouterState {
-  production: {
-    source: ProductionSource;
-    target: ProductionTarget;
-    /**
-     * WO-O4O-STORE-PRODUCTION-TEMPLATE-REGISTRY-V1:
-     * 선택된 template id. 미지정 시 target의 defaultTemplateId 사용.
-     * 수신측(StorePopPage/PharmacyBlogPage/ProductionMaterialEditorPage)에서
-     * findTemplate(selectedTemplateId)로 template 조회 후 AI/editor에 적용.
-     */
-    selectedTemplateId?: string;
-  };
-}
+// WO-O4O-STORE-PRODUCTION-TYPES-COMMONIZATION-PHASE2-F-V1:
+//   ProductionRouterState 정의는 @o4o/types/production canonical. 본 모듈 상단에서 re-export.
+//   selectedTemplateId 의 의미 (수신측이 findTemplate(selectedTemplateId) 로 조회 후 적용) 는 변경 없음.
 
 /**
  * 표준 router state payload 빌더.

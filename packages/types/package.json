@@ -35,6 +35,10 @@
     "./hub-content": {
       "types": "./dist/hub-content.d.ts",
       "import": "./dist/hub-content.js"
+    },
+    "./production": {
+      "types": "./dist/production.d.ts",
+      "import": "./dist/production.js"
     }
   },
   "sideEffects": false,

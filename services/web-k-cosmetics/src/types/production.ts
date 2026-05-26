@@ -1,28 +1,15 @@
 /**
  * Production Router State Types — K-Cosmetics
  *
- * WO-O4O-STORE-LIBRARY-CONTENT-TO-EXECUTION-PHASE2-E-V1
- *
- * KPA의 ProductionRouterState 구조와 호환되도록 정의.
- * 추후 @o4o/types 공식 이동은 Phase 3 대상.
+ * WO-O4O-STORE-LIBRARY-CONTENT-TO-EXECUTION-PHASE2-E-V1 (초기 로컬 정의)
+ * WO-O4O-STORE-PRODUCTION-TYPES-COMMONIZATION-PHASE2-F-V1 (2026-05-26):
+ *   로컬 중복 정의 제거 → @o4o/types/production canonical re-export.
+ *   기존 사용처의 `import { ... } from '../types/production'` 경로 호환 유지.
  */
 
-export interface ProductionSourceItem {
-  id: string;
-  title: string;
-  description?: string | null;
-  origin: 'snapshot' | 'direct' | 'library';
-}
-
-export interface ProductionSource {
-  fromLibrary: 'contents' | 'resources';
-  items: ProductionSourceItem[];
-}
-
-export interface ProductionRouterState {
-  production: {
-    source: ProductionSource;
-    target: 'pop' | 'qr' | 'blog' | 'product-description';
-    selectedTemplateId?: string;
-  };
-}
+export type {
+  ProductionTarget,
+  ProductionSourceItem,
+  ProductionSource,
+  ProductionRouterState,
+} from '@o4o/types/production';
