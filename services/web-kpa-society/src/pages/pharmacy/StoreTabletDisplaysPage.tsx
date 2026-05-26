@@ -15,7 +15,7 @@
  *      - kiosk runtime 은 매장의 첫 active tablet row 의 값을 사용 (public API)
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Loader2, Tablet, ChevronUp, ChevronDown, X, Plus,
@@ -36,6 +36,7 @@ import {
   saveTabletIdlePlaylist,
 } from '../../api/tabletDisplays';
 import type { Tablet as TabletType, ProductPool } from '../../api/tabletDisplays';
+import { DataTable, type Column, ActionBar } from '@o4o/ui';
 
 // ==================== Types ====================
 
@@ -79,6 +80,10 @@ export default function StoreTabletDisplaysPage() {
   const [registerLocation, setRegisterLocation] = useState('');
   const [registering, setRegistering] = useState(false);
   const [deletingTabletId, setDeletingTabletId] = useState<string | null>(null);
+
+  // WO-O4O-KPA-STORE-TABLET-DISPLAYS-STANDARD-TABLE-V1: DataTable 행 선택 (bulk delete)
+  const [selectedTabletKeys, setSelectedTabletKeys] = useState<string[]>([]);
+  const [bulkDeleting, setBulkDeleting] = useState(false);
 
   // Toast
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -242,6 +247,32 @@ export default function StoreTabletDisplaysPage() {
     }
   };
 
+  // WO-O4O-KPA-STORE-TABLET-DISPLAYS-STANDARD-TABLE-V1: bulk delete fan-out
+  const handleBulkDeleteTablets = useCallback(async () => {
+    if (selectedTabletKeys.length === 0 || bulkDeleting) return;
+    if (!window.confirm(`선택한 ${selectedTabletKeys.length}개 태블릿을 삭제하시겠습니까?\n삭제 후에는 해당 진열 구성도 함께 사라집니다.`)) return;
+    setBulkDeleting(true);
+    try {
+      const settled = await Promise.allSettled(selectedTabletKeys.map((id) => deleteTablet(id)));
+      const successIds = new Set(selectedTabletKeys.filter((_, i) => settled[i].status === 'fulfilled'));
+      if (successIds.size > 0) {
+        const remaining = tablets.filter((t) => !successIds.has(t.id));
+        setTablets(remaining);
+        if (selectedTabletId && successIds.has(selectedTabletId)) {
+          setSelectedTabletId(remaining.length > 0 ? remaining[0].id : null);
+        }
+        setSelectedTabletKeys([]);
+        setToast({ type: 'success', message: `${successIds.size}개 태블릿이 삭제되었습니다.` });
+      }
+      const failCount = settled.filter((r) => r.status === 'rejected').length;
+      if (failCount > 0) {
+        setToast({ type: 'error', message: `${failCount}개 삭제에 실패했습니다.` });
+      }
+    } finally {
+      setBulkDeleting(false);
+    }
+  }, [selectedTabletKeys, bulkDeleting, tablets, selectedTabletId]);
+
   // Idle changes detection (shallow JSON compare)
   const idleHasChanges = JSON.stringify(idleItems) !== JSON.stringify(idleInitial);
 
@@ -357,6 +388,61 @@ export default function StoreTabletDisplaysPage() {
       setDeletingTabletId(null);
     }
   };
+
+  // WO-O4O-KPA-STORE-TABLET-DISPLAYS-STANDARD-TABLE-V1: 태블릿 목록 DataTable 컬럼 정의
+  const tabletColumns = useMemo<Column<TabletType>[]>(() => [
+    {
+      key: 'name',
+      title: '태블릿명',
+      render: (_v, t) => (
+        <span style={{ fontWeight: t.id === selectedTabletId ? 700 : 500, color: '#0f172a' }}>
+          {t.name}
+        </span>
+      ),
+    },
+    {
+      key: 'location',
+      title: '위치',
+      render: (_v, t) => (
+        <span style={{ color: t.location ? '#334155' : '#94a3b8' }}>
+          {t.location || '—'}
+        </span>
+      ),
+    },
+    {
+      key: 'created_at',
+      title: '등록일',
+      render: (_v, t) => (
+        <span style={{ color: '#64748b', fontSize: '13px' }}>
+          {new Date(t.created_at).toLocaleDateString('ko-KR')}
+        </span>
+      ),
+    },
+    {
+      key: 'action',
+      title: '액션',
+      align: 'center' as const,
+      width: '80px',
+      render: (_v, t) => (
+        <button
+          onClick={(e) => { e.stopPropagation(); handleDeleteTablet(t.id, t.name); }}
+          disabled={deletingTabletId === t.id || bulkDeleting}
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: '4px',
+            padding: '3px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: 500,
+            color: '#dc2626', background: '#fef2f2', border: '1px solid #fecaca',
+            cursor: 'pointer', opacity: deletingTabletId === t.id ? 0.5 : 1,
+          }}
+          title="태블릿 삭제"
+        >
+          {deletingTabletId === t.id
+            ? <Loader2 style={{ width: 12, height: 12 }} />
+            : <X style={{ width: 12, height: 12 }} />}
+          삭제
+        </button>
+      ),
+    },
+  ], [selectedTabletId, deletingTabletId, bulkDeleting, handleDeleteTablet]);
 
   return (
     <div className="space-y-6">
@@ -491,45 +577,50 @@ export default function StoreTabletDisplaysPage() {
         </div>
       )}
 
-      {/* Tablet selector + editor */}
+      {/* Tablet list DataTable + editor */}
       {!loadingTablets && tablets.length > 0 && (
         <>
-          {/* Tablet selector + delete */}
-          <div className="flex items-center gap-3 flex-wrap">
-            <label className="text-sm font-medium text-slate-700">태블릿:</label>
-            <select
-              value={selectedTabletId || ''}
-              onChange={(e) => setSelectedTabletId(e.target.value)}
-              className="px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-            >
-              {tablets.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name} {t.location ? `(${t.location})` : ''}
-                </option>
-              ))}
-            </select>
-            {/* WO-O4O-STORE-TABLET-REGISTER-UI-V1: 선택된 태블릿 삭제 */}
-            {selectedTabletId && (
-              <button
-                onClick={() => {
-                  const t = tablets.find((tb) => tb.id === selectedTabletId);
-                  if (t) handleDeleteTablet(t.id, t.name);
-                }}
-                disabled={deletingTabletId === selectedTabletId}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 disabled:opacity-50 transition-colors"
-                title="현재 태블릿 삭제"
-              >
-                {deletingTabletId === selectedTabletId
-                  ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  : <X className="w-3.5 h-3.5" />}
-                태블릿 삭제
-              </button>
-            )}
-            {hasChanges && (
-              <span className="text-xs text-amber-600 font-medium bg-amber-50 px-2 py-1 rounded">
-                변경사항 있음
-              </span>
-            )}
+          {/* WO-O4O-KPA-STORE-TABLET-DISPLAYS-STANDARD-TABLE-V1: 태블릿 목록 DataTable */}
+          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+            <div className="px-4 py-3 border-b bg-slate-50 flex items-center justify-between">
+              <h3 className="text-sm font-bold text-slate-700 flex items-center gap-2">
+                <Tablet className="w-4 h-4 text-teal-600" />
+                태블릿 목록 ({tablets.length})
+              </h3>
+              {hasChanges && (
+                <span className="text-xs text-amber-600 font-medium bg-amber-50 px-2 py-1 rounded">
+                  변경사항 있음
+                </span>
+              )}
+            </div>
+            <ActionBar
+              selectedCount={selectedTabletKeys.length}
+              onClearSelection={() => setSelectedTabletKeys([])}
+              actions={[
+                {
+                  key: 'delete',
+                  label: '삭제',
+                  icon: <X className="w-4 h-4" />,
+                  variant: 'danger',
+                  onClick: handleBulkDeleteTablets,
+                  disabled: bulkDeleting,
+                },
+              ]}
+            />
+            <DataTable<TabletType>
+              columns={tabletColumns}
+              dataSource={tablets}
+              rowKey="id"
+              rowSelection={{
+                selectedRowKeys: selectedTabletKeys,
+                onChange: setSelectedTabletKeys,
+              }}
+              onRowClick={(t) => setSelectedTabletId(t.id)}
+              onRow={(t) => ({
+                className: t.id === selectedTabletId ? 'bg-teal-50' : '',
+              })}
+              emptyText="등록된 태블릿이 없습니다"
+            />
           </div>
 
           {/* Loading pool */}
