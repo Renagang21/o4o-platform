@@ -162,15 +162,18 @@ export class OperatorRegistrationService {
           const representativeName = bizInfo?.ceoName || userRow?.name || null;
           const businessNumber = bizInfo?.businessNumber || null;
           const businessAddress = bizInfo?.address || null;
+          // WO-O4O-NETURE-SUPPLIER-APPROVAL-TAX-EMAIL-FIX-V1:
+          // taxInvoiceEmail(businessInfo) → tax_email(neture_suppliers) 이관
+          const taxEmail = bizInfo?.taxInvoiceEmail || null;
 
           // WO-NETURE-SUPPLIER-APPROVAL-TWO-STEP-ACTIVATION-V1:
           // 가입 승인 시 PENDING으로 생성 → 운영자가 별도 공급 승인 후 ACTIVE
           const [insertedSupplier] = await queryRunner.query(
-            `INSERT INTO neture_suppliers (user_id, slug, contact_email, contact_phone, representative_name, business_number, business_address, status, approved_by, approved_at, created_at, updated_at)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, 'PENDING', NULL, NULL, NOW(), NOW())
+            `INSERT INTO neture_suppliers (user_id, slug, contact_email, contact_phone, representative_name, business_number, business_address, tax_email, status, approved_by, approved_at, created_at, updated_at)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'PENDING', NULL, NULL, NOW(), NOW())
              ON CONFLICT (user_id) DO NOTHING
              RETURNING id`,
-            [userId, slug, contactEmail, contactPhone, representativeName, businessNumber, businessAddress],
+            [userId, slug, contactEmail, contactPhone, representativeName, businessNumber, businessAddress, taxEmail],
           );
 
           // organization 연동 (businessName이 있는 경우)
