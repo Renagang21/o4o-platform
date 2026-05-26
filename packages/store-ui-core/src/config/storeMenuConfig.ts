@@ -99,6 +99,11 @@ export const COSMETICS_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'pop',            label: 'POP',     subPath: '/pop' },
       { key: 'qr',             label: 'QR 코드', subPath: '/qr' },
     ]},
+    // WO-O4O-STORE-LIBRARY-CROSSSERVICE-PHASE2-B-V1: 내 자료함 기본 진입 구조
+    { label: '내 자료함', items: [
+      { key: 'library-contents',  label: '콘텐츠', subPath: '/library/contents' },
+      { key: 'library-resources', label: '자료',   subPath: '/library/resources' },
+    ]},
     { label: '설정', items: [
       { key: 'settings', label: '매장 설정', subPath: '/settings' },
     ]},
@@ -161,6 +166,14 @@ export const GLYCOPHARM_STORE_CONFIG: StoreDashboardConfig = {
         { key: 'pop',          label: 'POP',            subPath: '/pop' },
         { key: 'qr',           label: 'QR 코드',        subPath: '/qr' },
         { key: 'channels',     label: '채널 관리',      subPath: '/channels' },
+      ],
+    },
+    // WO-O4O-STORE-LIBRARY-CROSSSERVICE-PHASE2-B-V1: 내 자료함 기본 진입 구조
+    {
+      label: '내 자료함',
+      items: [
+        { key: 'library-contents',  label: '콘텐츠', subPath: '/library/contents' },
+        { key: 'library-resources', label: '자료',   subPath: '/library/resources' },
       ],
     },
     {
