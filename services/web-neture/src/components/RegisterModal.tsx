@@ -16,7 +16,10 @@ import { X, Eye, EyeOff, CheckCircle, ArrowLeft } from 'lucide-react';
 import { useLoginModal } from '../contexts';
 import { api } from '../lib/apiClient';
 
-type SignupRole = 'supplier' | 'partner' | 'seller' | 'user';
+// WO-O4O-NETURE-SELLER-LEGACY-CLEANUP-TO-STORE-OWNER-PARTICIPANT-V1:
+// 'seller' (legacy) → 'store_owner' (Neture 내부 participant type, 권한 role 아님).
+// neture:store_owner role 은 생성하지 않으며, 다른 서비스 store_owner 와 연결하지 않는다.
+type SignupRole = 'supplier' | 'partner' | 'store_owner' | 'user';
 
 function formatBusinessNumber(digits: string): string {
   if (digits.length <= 3) return digits;
@@ -32,7 +35,7 @@ const roleOptions: Array<{ role: SignupRole; label: string; description: string;
     emoji: '👤',
   },
   {
-    role: 'seller',
+    role: 'store_owner',
     label: '매장 경영자',
     description: '매장을 운영하는 경영자',
     emoji: '🏪',
@@ -564,7 +567,7 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
               {selectedRole && selectedRole !== 'user' && (
                 <div className="p-4 bg-gray-50 rounded-xl space-y-3">
                   <h4 className="text-sm font-semibold text-gray-700">
-                    {selectedRole === 'seller'
+                    {selectedRole === 'store_owner'
                       ? '매장 정보'
                       : selectedRole === 'supplier'
                       ? '공급자 정보'
@@ -572,7 +575,7 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                   </h4>
 
                   {/* 매장 경영자 */}
-                  {selectedRole === 'seller' && (
+                  {selectedRole === 'store_owner' && (
                     <>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">

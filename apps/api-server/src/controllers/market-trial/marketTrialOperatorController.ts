@@ -1321,8 +1321,11 @@ export class MarketTrialOperatorController {
         if (v === 'fulfilled') return '이행 완료';
         return v;
       };
+      // WO-O4O-NETURE-SELLER-LEGACY-CLEANUP-TO-STORE-OWNER-PARTICIPANT-V1:
+      // 'store_owner' = canonical, 'seller' = legacy fallback (기존 row 호환).
+      // 사용자 화면 라벨은 두 값 모두 "매장 경영자" 로 통일.
       const participantTypeLabel = (v: string) => {
-        if (v === 'seller') return '판매자';
+        if (v === 'store_owner' || v === 'seller') return '매장 경영자';
         if (v === 'partner') return '파트너';
         return v;
       };

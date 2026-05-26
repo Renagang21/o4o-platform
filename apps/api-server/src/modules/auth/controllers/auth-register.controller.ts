@@ -50,7 +50,10 @@ export class AuthRegisterController extends BaseController {
       const smRepository = AppDataSource.getRepository(ServiceMembership);
 
       // Phase 3: membershipType에 따라 role 분기
-      const VALID_ROLES = ['super_admin', 'admin', 'vendor', 'seller', 'user', 'business', 'partner', 'supplier', 'manager', 'customer', 'pharmacy'];
+      // WO-O4O-NETURE-SELLER-LEGACY-CLEANUP-TO-STORE-OWNER-PARTICIPANT-V1:
+      // 'store_owner' = Neture 내부 participant type (권한 role 아님). 'seller' 는 legacy 호환 유지.
+      // neture:store_owner role 은 생성하지 않으며 다른 서비스 store_owner 와 연결하지 않는다.
+      const VALID_ROLES = ['super_admin', 'admin', 'vendor', 'seller', 'store_owner', 'user', 'business', 'partner', 'supplier', 'manager', 'customer', 'pharmacy'];
       const rawRole = data.membershipType === 'student'
         ? 'user'
         : (data.role || 'customer');

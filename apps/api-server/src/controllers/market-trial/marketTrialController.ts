@@ -602,10 +602,13 @@ export class MarketTrialController {
       }
 
       // Create participation
+      // WO-O4O-NETURE-SELLER-LEGACY-CLEANUP-TO-STORE-OWNER-PARTICIPANT-V1:
+      // 'store_owner' = Neture 내부 participant type (Market Trial 참여자 구분).
+      // 기존 'seller' row 는 호환 유지 (operator UI label 매핑이 양쪽 모두 처리).
       const participation = MarketTrialController.participantRepo.create({
         marketTrialId: id,
         participantId: userId,
-        participantType: 'seller', // WO-O4O-MARKET-TRIAL-PHASE1-V1: seller only
+        participantType: 'store_owner', // WO-O4O-MARKET-TRIAL-PHASE1-V1: participant type — store_owner
         contributionAmount: 0,
         rewardType,
         rewardStatus: 'pending',

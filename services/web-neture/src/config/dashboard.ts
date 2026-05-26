@@ -7,6 +7,10 @@
 
 import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
 
+// WO-O4O-NETURE-SELLER-LEGACY-CLEANUP-TO-STORE-OWNER-PARTICIPANT-V1:
+// store_owner 가 canonical (Neture 내부 participant type, 권한 role 아님).
+// seller / neture:seller 는 기존 데이터 호환을 위한 legacy fallback.
+// neture:store_owner role 은 만들지 않으며 다른 서비스 store_owner 와 연결하지 않는다.
 export const ROLE_LABELS: Record<string, string> = {
   'platform:super_admin': '최고 관리자',
   'neture:admin': '관리자',
@@ -15,8 +19,9 @@ export const ROLE_LABELS: Record<string, string> = {
   supplier: '공급자',
   'neture:partner': '파트너',
   partner: '파트너',
-  'neture:seller': '매장 경영자',
-  seller: '매장 경영자',
+  store_owner: '매장 경영자',          // canonical
+  'neture:seller': '매장 경영자',      // legacy fallback
+  seller: '매장 경영자',               // legacy fallback
   user: '사용자',
 };
 
@@ -28,8 +33,9 @@ export const NETURE_ROLE_PRIORITY = [
   'supplier',            // legacy: 가입 시 supplier로 저장됨
   'neture:partner',
   'partner',             // legacy: 가입 시 partner로 저장됨
-  'neture:seller',
-  'seller',              // legacy: 가입 시 seller로 저장됨
+  'store_owner',         // canonical
+  'neture:seller',       // legacy fallback
+  'seller',              // legacy: 기존 데이터 호환
 ] as const;
 
 export const NETURE_DASHBOARD_MAP: Record<string, string> = {
@@ -40,7 +46,8 @@ export const NETURE_DASHBOARD_MAP: Record<string, string> = {
   'supplier': '/supplier/dashboard',   // legacy
   'neture:partner': '/partner/dashboard',
   'partner': '/partner/dashboard',     // legacy
-  'neture:seller': '/seller/overview',
+  'store_owner': '/seller/overview',   // canonical (route path rename 은 후속 WO)
+  'neture:seller': '/seller/overview', // legacy fallback
   'seller': '/seller/overview',        // legacy
 };
 
