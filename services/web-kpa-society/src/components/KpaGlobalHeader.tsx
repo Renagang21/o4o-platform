@@ -52,7 +52,7 @@ function getUserDisplayName(user: UserType | null): string {
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export function KpaGlobalHeader() {
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading } = useAuth();
   const { openLoginModal, openRegisterModal } = useAuthModal();
   const navigate = useNavigate();
   const [creditBalance, setCreditBalance] = useState<number | null>(null);
@@ -132,6 +132,7 @@ export function KpaGlobalHeader() {
       }}
       publicNav={computedNav}
       user={headerUser}
+      isAuthenticated={isLoading || !!user}
       onLogin={openLoginModal}
       onRegister={openRegisterModal}
       onLogout={handleLogout}
