@@ -9,9 +9,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
+import { AppreciationPanel } from '@o4o/shared-space-ui';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { lmsApi, normalizeEnrollment } from '../../api/lms';
-import { appreciationApi } from '../../api/appreciation';
+import { appreciationPanelApi } from '../../api/appreciation';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 import type { Course, Lesson, Enrollment } from '../../types';
@@ -28,8 +29,16 @@ export function LmsCourseDetailPage() {
   // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-POLICY-V1: 회원제 강의 + 비로그인 → 로그인 유도
   const [needLogin, setNeedLogin] = useState(false);
   const [enrolling, setEnrolling] = useState(false);
-  // WO-O4O-APPRECIATION-CULTURE-UI-PHASE1-V1
-  const [appreciationSummary, setAppreciationSummary] = useState<{ totalAmount: number; count: number } | null>(null);
+
+  // WO-O4O-KPA-APPRECIATION-LMS-CONTENT-EXPANSION-V1: AppreciationPanel onError 핸들러
+  // KPA apiClient err.message 패턴 (Glyco/K-Cos 의 err.response.data.error 와 다름)
+  const handleAppreciationError = (err: any) => {
+    const msg = err?.message || '';
+    if (msg.includes('INSUFFICIENT_BALANCE') || msg.includes('부족')) toast.error('포인트가 부족합니다');
+    else if (msg.includes('SELF')) toast.error('자신의 강의에는 감사 포인트를 보낼 수 없습니다');
+    else if (msg.includes('INVALID')) toast.error('금액은 1P 이상이어야 합니다');
+    else toast.error('감사 포인트 전송에 실패했습니다');
+  };
 
   useEffect(() => {
     if (id) loadData();
@@ -55,9 +64,6 @@ export function LmsCourseDetailPage() {
       } catch {
         setLessons([]);
       }
-
-      // WO-O4O-APPRECIATION-CULTURE-UI-PHASE1-V1: 감사 집계
-      appreciationApi.getSummary('lms_course', id!).then((r) => setAppreciationSummary(r.data)).catch(() => {});
 
       // 진행 정보 확인 (로그인 시)
       if (user) {
@@ -201,15 +207,6 @@ export function LmsCourseDetailPage() {
               <span>⏱ {Math.floor(course.duration / 60)}시간 {course.duration % 60}분</span>
               <span>·</span>
               <span>{course.enrollmentCount}명 진행중</span>
-              {/* WO-O4O-APPRECIATION-CULTURE-UI-PHASE1-V1 */}
-              {appreciationSummary && appreciationSummary.totalAmount > 0 && (
-                <>
-                  <span>·</span>
-                  <span style={{ color: '#92400e', fontWeight: 500 }}>
-                    🎁 감사 {appreciationSummary.totalAmount.toLocaleString()}P · 👥 {appreciationSummary.count}명
-                  </span>
-                </>
-              )}
             </div>
 
             <div style={styles.description}>
@@ -217,6 +214,21 @@ export function LmsCourseDetailPage() {
               <p style={styles.descriptionText}>{course.description}</p>
             </div>
           </Card>
+
+          {/* WO-O4O-KPA-APPRECIATION-LMS-CONTENT-EXPANSION-V1: 공통 AppreciationPanel */}
+          <div style={{ marginTop: '16px' }}>
+            <AppreciationPanel
+              targetType="lms_course"
+              targetId={course.id}
+              api={appreciationPanelApi}
+              currentUserId={user?.id ?? null}
+              theme="blue"
+              variant="inline"
+              buttonLabel="🎁 강사에게 감사하기"
+              onSent={({ amount }) => toast.success(`${amount}P 감사 포인트를 전달했습니다 🎁`)}
+              onError={handleAppreciationError}
+            />
+          </div>
 
           {/* 순서 목록 */}
           <Card padding="large" style={{ marginTop: '24px' }}>

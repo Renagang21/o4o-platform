@@ -8,8 +8,9 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { AppreciationPanel } from '@o4o/shared-space-ui';
 import { contentApi, type ContentItem } from '../../api/content';
-import { appreciationApi } from '../../api/appreciation';
+import { appreciationPanelApi } from '../../api/appreciation';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
 
@@ -40,9 +41,6 @@ export function ContentDetailPage() {
   const [likeCount, setLikeCount] = useState(0);
   const [recommending, setRecommending] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
-  // WO-O4O-APPRECIATION-CULTURE-UI-PHASE1-V1
-  const [appreciationSummary, setAppreciationSummary] = useState<{ totalAmount: number; count: number } | null>(null);
-  const [appreciationRecent, setAppreciationRecent] = useState<{ amount: number; message?: string; createdAt: string }[]>([]);
 
   useEffect(() => {
     if (!id) return;
@@ -60,16 +58,17 @@ export function ContentDetailPage() {
 
     // Track view
     contentApi.trackView(id).catch(() => {});
-
-    // WO-O4O-APPRECIATION-CULTURE-UI-PHASE1-V1: 감사 집계 + 최근 메시지
-    Promise.allSettled([
-      appreciationApi.getSummary('content', id),
-      appreciationApi.getRecent('content', id),
-    ]).then(([sumRes, recentRes]) => {
-      if (sumRes.status === 'fulfilled') setAppreciationSummary(sumRes.value.data);
-      if (recentRes.status === 'fulfilled') setAppreciationRecent(recentRes.value.data?.items ?? []);
-    });
   }, [id]);
+
+  // WO-O4O-KPA-APPRECIATION-LMS-CONTENT-EXPANSION-V1: AppreciationPanel onError 핸들러
+  // KPA apiClient err.message 패턴
+  const handleAppreciationError = (err: any) => {
+    const msg = err?.message || '';
+    if (msg.includes('INSUFFICIENT_BALANCE') || msg.includes('부족')) toast.error('포인트가 부족합니다');
+    else if (msg.includes('SELF')) toast.error('자신의 콘텐츠에는 감사 포인트를 보낼 수 없습니다');
+    else if (msg.includes('INVALID')) toast.error('금액은 1P 이상이어야 합니다');
+    else toast.error('감사 포인트 전송에 실패했습니다');
+  };
 
   const handleRecommend = async () => {
     if (!isAuthenticated || !id) {
@@ -217,29 +216,24 @@ export function ContentDetailPage() {
               ✏️ 수정
             </Link>
           )}
-
-          {/* WO-O4O-APPRECIATION-CULTURE-UI-PHASE1-V1: 감사 집계 */}
-          {appreciationSummary && appreciationSummary.totalAmount > 0 && (
-            <span style={cStyles.appreciationStat}>
-              🎁 {appreciationSummary.totalAmount.toLocaleString()}P · 👥 {appreciationSummary.count}명
-            </span>
-          )}
         </div>
 
-        {/* WO-O4O-APPRECIATION-CULTURE-UI-PHASE1-V1: 최근 감사 메시지 */}
-        {appreciationRecent.length > 0 && (
-          <div style={cStyles.recentBlock}>
-            <p style={cStyles.recentLabel}>최근 감사</p>
-            {appreciationRecent.map((r, i) => (
-              <div key={i} style={cStyles.recentRow}>
-                <span style={cStyles.recentMsg}>
-                  "{r.message!.length > 60 ? r.message!.slice(0, 60) + '…' : r.message}"
-                </span>
-                <span style={cStyles.recentAmt}>+{r.amount}P</span>
-              </div>
-            ))}
-          </div>
-        )}
+        {/* WO-O4O-KPA-APPRECIATION-LMS-CONTENT-EXPANSION-V1: 공통 AppreciationPanel */}
+        <div style={{ marginTop: '20px' }}>
+          <AppreciationPanel
+            targetType="content"
+            targetId={content.id}
+            api={appreciationPanelApi}
+            currentUserId={user?.id ?? null}
+            canSend={!!content.created_by}
+            disabledReason="작성자 정보가 없어 감사하기를 사용할 수 없습니다."
+            theme="blue"
+            variant="inline"
+            buttonLabel="🎁 작성자에게 감사하기"
+            onSent={({ amount }) => toast.success(`${amount}P 감사 포인트를 전달했습니다 🎁`)}
+            onError={handleAppreciationError}
+          />
+        </div>
       </article>
     </div>
   );
@@ -436,56 +430,6 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: 8,
     textDecoration: 'none',
     transition: 'all 0.15s',
-  },
-};
-
-// WO-O4O-APPRECIATION-CULTURE-UI-PHASE1-V1
-const cStyles: Record<string, React.CSSProperties> = {
-  appreciationStat: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    padding: '6px 12px',
-    backgroundColor: '#fffbeb',
-    border: '1px solid #fde68a',
-    borderRadius: '20px',
-    fontSize: '13px',
-    color: '#92400e',
-    fontWeight: 500,
-  },
-  recentBlock: {
-    marginTop: '20px',
-    padding: '16px 20px',
-    backgroundColor: '#fffbeb',
-    borderRadius: '10px',
-    border: '1px solid #fde68a',
-  },
-  recentLabel: {
-    margin: '0 0 10px',
-    fontSize: '12px',
-    fontWeight: 600,
-    color: '#b45309',
-    textTransform: 'uppercase',
-    letterSpacing: '0.05em',
-  },
-  recentRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '5px 0',
-    borderBottom: '1px solid #fef3c7',
-  },
-  recentMsg: {
-    fontSize: '13px',
-    color: '#78350f',
-    fontStyle: 'italic',
-    flex: 1,
-    marginRight: '12px',
-  },
-  recentAmt: {
-    fontSize: '13px',
-    fontWeight: 600,
-    color: '#92400e',
-    whiteSpace: 'nowrap',
   },
 };
 
