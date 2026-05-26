@@ -440,6 +440,7 @@ export class HubContentQueryService {
       imageUrl: c.imageUrl ?? null,
       linkUrl: c.linkUrl ?? null,
       authorRole: role,
+      authorId: c.createdBy ?? null,
       visibilityScope: c.visibilityScope || 'platform',
       isPinned: c.isPinned ?? false,
     };

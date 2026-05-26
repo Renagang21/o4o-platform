@@ -58,6 +58,7 @@ export interface HubContentItemResponse {
   imageUrl?: string | null;
   linkUrl?: string | null;
   authorRole?: string;
+  authorId?: string | null;
   visibilityScope?: string;
   isPinned?: boolean;
 
