@@ -228,7 +228,8 @@ const CourseDetailPage = lazy(() => import('@/pages/education/CourseDetailPage')
 const ResourcesPage = lazy(() => import('@/pages/resources/ResourcesPage').then(m => ({ default: m.ResourcesPage })));
 // WO-GLYCOPHARM-INSTRUCTOR-OPERATOR-V1
 const InstructorDashboardPage = lazy(() => import('@/pages/instructor/InstructorDashboardPage'));
-const LmsCoursesPage = lazy(() => import('@/pages/operator/LmsCoursesPage'));
+// WO-O4O-GLYCOPHARM-LMS-PHASE1-OPERATOR-PARITY-V1: OperatorLmsCoursesPage로 교체
+const OperatorLmsCoursesPage = lazy(() => import('@/pages/operator/OperatorLmsCoursesPage'));
 
 // WO-O4O-GLYCOPHARM-AI-CONTENT-ACTIVATION-V1
 const OperatorResourcesPage = lazy(() => import('@/pages/operator/OperatorResourcesPage'));
@@ -608,8 +609,10 @@ function AppRoutes() {
         <Route path="guide-contents" element={<OperatorGuideContentsPage />} />
         {/* Content Management 공지/뉴스 (WO-O4O-CONTENT-CANONICAL-CROSS-SERVICE-ALIGNMENT-V1) */}
         <Route path="content-management" element={<OperatorContentPage />} />
-        {/* LMS Management (WO-GLYCOPHARM-INSTRUCTOR-OPERATOR-V1) */}
-        <Route path="lms/courses" element={<LmsCoursesPage />} />
+        {/* LMS Management (WO-O4O-GLYCOPHARM-LMS-PHASE1-OPERATOR-PARITY-V1) */}
+        {/* canonical: /operator/lms — legacy /operator/lms/courses redirect 유지 */}
+        <Route path="lms" element={<OperatorLmsCoursesPage />} />
+        <Route path="lms/courses" element={<Navigate to="/operator/lms" replace />} />
         {/* Resources Management + AI Content (WO-O4O-GLYCOPHARM-AI-CONTENT-ACTIVATION-V1) */}
         <Route path="resources" element={<OperatorResourcesPage />} />
         {/* Settings */}

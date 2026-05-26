@@ -4,6 +4,7 @@
  * WO-GLYCOPHARM-LESSON-QUIZ-LEARNING-V1
  * WO-O4O-LMS-CLIENT-EXTRACTION-V1-SCOPED: getInstructorCourses 만 @o4o/lms-client factory 사용.
  *   기존 학습자 메서드(unwrap 패턴 포함)는 그대로 유지.
+ * WO-O4O-GLYCOPHARM-LMS-PHASE1-OPERATOR-PARITY-V1: operator 메서드 추가.
  *
  * 전역 LMS 엔드포인트 /api/v1/lms/* 사용
  * kpaLmsScopeGuard는 GET 요청을 통과시킴 — 백엔드 변경 불필요
@@ -34,7 +35,11 @@ export interface LmsCourse {
   status: string;
   duration: number;
   instructorId: string | null;
+  instructorName?: string;
+  instructor?: { id: string; name: string };
   isPublished: boolean;
+  category?: string;
+  lessonCount?: number;
   createdAt: string;
 }
 
@@ -236,6 +241,47 @@ export const lmsApi = {
       `/lms/certificates/${certificateId}/download`,
       { responseType: 'blob' },
     );
+    return data;
+  },
+
+  // ─── Operator 메서드 (WO-O4O-GLYCOPHARM-LMS-PHASE1-OPERATOR-PARITY-V1) ────
+  // K-Cosmetics Canonical endpoint 기준. 백엔드 /lms/operator/courses/:id/* (glycopharm:operator 역할).
+
+  operatorGetCourses: (params?: {
+    search?: string;
+    status?: string;
+    page?: number;
+    limit?: number;
+  }) =>
+    learnerClient.getCourses<LmsCourse>({
+      ...(params?.search ? { search: params.search } : {}),
+      ...(params?.status ? { status: params.status } : {}),
+      ...(params?.page ? { page: params.page } : {}),
+      ...(params?.limit ? { limit: params.limit } : {}),
+    }),
+
+  operatorApproveCourse: async (id: string): Promise<{ success: boolean; data: { course: LmsCourse } }> => {
+    const { data } = await api.post<{ success: boolean; data: { course: LmsCourse } }>(`/lms/operator/courses/${id}/approve`);
+    return data;
+  },
+
+  operatorRejectCourse: async (id: string, reason: string): Promise<{ success: boolean; data: { course: LmsCourse } }> => {
+    const { data } = await api.post<{ success: boolean; data: { course: LmsCourse } }>(`/lms/operator/courses/${id}/reject`, { reason });
+    return data;
+  },
+
+  operatorUnpublishCourse: async (id: string): Promise<{ success: boolean; data: { course: LmsCourse } }> => {
+    const { data } = await api.post<{ success: boolean; data: { course: LmsCourse } }>(`/lms/operator/courses/${id}/unpublish`);
+    return data;
+  },
+
+  operatorArchiveCourse: async (id: string): Promise<{ success: boolean; data: { course: LmsCourse } }> => {
+    const { data } = await api.post<{ success: boolean; data: { course: LmsCourse } }>(`/lms/operator/courses/${id}/archive`);
+    return data;
+  },
+
+  operatorHardDeleteCourse: async (id: string): Promise<{ success: boolean; data: { deleted: boolean } }> => {
+    const { data } = await api.delete<{ success: boolean; data: { deleted: boolean } }>(`/lms/operator/courses/${id}/hard`);
     return data;
   },
 };
