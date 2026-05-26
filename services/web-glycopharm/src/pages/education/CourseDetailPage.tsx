@@ -26,7 +26,8 @@ import { lmsApi, type LmsCourse, type LmsLesson, type LmsQuiz, type QuizSubmitRe
 import { useAuth } from '@/contexts/AuthContext';
 import { useLoginModal } from '@/contexts/LoginModalContext';
 import { toast } from '@o4o/error-handling';
-import { appreciationApi, type AppreciationSummary, type AppreciationSend } from '@/api/appreciation';
+import { AppreciationPanel } from '@o4o/shared-space-ui';
+import { appreciationPanelApi } from '@/api/appreciation';
 
 // ── 레슨 콘텐츠 렌더러 ───────────────────────────────────────────────────────
 function LessonContent({ lesson }: { lesson: LmsLesson }) {
@@ -238,21 +239,13 @@ function QuizPanel({
 export default function CourseDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const { openLoginModal } = useLoginModal();
 
   // Course state
   const [course, setCourse] = useState<LmsCourse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Appreciation state
-  const [showAppreciation, setShowAppreciation] = useState(false);
-  const [appreciationAmount, setAppreciationAmount] = useState<number | ''>('');
-  const [appreciationMsg, setAppreciationMsg] = useState('');
-  const [isSendingAppreciation, setIsSendingAppreciation] = useState(false);
-  const [appreciationSummary, setAppreciationSummary] = useState<AppreciationSummary | null>(null);
-  const [appreciationRecent, setAppreciationRecent] = useState<AppreciationSend[]>([]);
 
   // Enrollment state
   const [enrolled, setEnrolled] = useState(false);
@@ -295,21 +288,6 @@ export default function CourseDetailPage() {
       .then((res) => { if (res.data.enrollment) setEnrolled(true); })
       .catch(() => {}); // 404 = not enrolled
   }, [id, isAuthenticated]);
-
-  // ── Appreciation 로드 ──────────────────────────────────────────────────────
-  useEffect(() => {
-    if (!id) return;
-    Promise.allSettled([
-      appreciationApi.getSummary('lms_course', id),
-      appreciationApi.getRecent('lms_course', id),
-    ]).then(([sumRes, recentRes]) => {
-      if (sumRes.status === 'fulfilled') setAppreciationSummary(sumRes.value.data?.data ?? sumRes.value.data);
-      if (recentRes.status === 'fulfilled') {
-        const d = recentRes.value.data?.data ?? recentRes.value.data;
-        setAppreciationRecent(d?.items ?? []);
-      }
-    });
-  }, [id]);
 
   // ── 레슨 목록 조회 (enrolled 후) ───────────────────────────────────────────
   useEffect(() => {
@@ -414,35 +392,12 @@ export default function CourseDetailPage() {
     }
   };
 
-  // ── Appreciation 전송 ─────────────────────────────────────────────────────
-  const handleSendAppreciation = async () => {
-    if (!course || !isAuthenticated || isSendingAppreciation) return;
-    const amt = Number(appreciationAmount);
-    if (!amt || amt < 1) { toast.error('금액은 1P 이상이어야 합니다'); return; }
-    try {
-      setIsSendingAppreciation(true);
-      await appreciationApi.send({ targetType: 'lms_course', targetId: course.id, amount: amt, message: appreciationMsg.trim() || undefined });
-      toast.success(`${amt}P 감사 포인트를 전달했습니다 🎁`);
-      setShowAppreciation(false);
-      setAppreciationAmount('');
-      setAppreciationMsg('');
-      const [sumRes, recentRes] = await Promise.allSettled([
-        appreciationApi.getSummary('lms_course', course.id),
-        appreciationApi.getRecent('lms_course', course.id),
-      ]);
-      if (sumRes.status === 'fulfilled') setAppreciationSummary(sumRes.value.data?.data ?? sumRes.value.data);
-      if (recentRes.status === 'fulfilled') {
-        const d = recentRes.value.data?.data ?? recentRes.value.data;
-        setAppreciationRecent(d?.items ?? []);
-      }
-    } catch (err: any) {
-      const msg = String(err?.response?.data?.error || err?.message || '');
-      if (msg.includes('INSUFFICIENT_BALANCE') || msg.includes('부족')) toast.error('포인트가 부족합니다');
-      else if (msg.includes('SELF')) toast.error('자신의 강의에는 감사 포인트를 보낼 수 없습니다');
-      else toast.error('감사 포인트 전송에 실패했습니다');
-    } finally {
-      setIsSendingAppreciation(false);
-    }
+  // WO-O4O-APPRECIATION-GLYCO-KCOS-MIGRATION-V1: AppreciationPanel onError 핸들러
+  const handleAppreciationError = (err: any) => {
+    const msg = String(err?.response?.data?.error || err?.message || '');
+    if (msg.includes('INSUFFICIENT_BALANCE') || msg.includes('부족')) toast.error('포인트가 부족합니다');
+    else if (msg.includes('SELF')) toast.error('자신의 강의에는 감사 포인트를 보낼 수 없습니다');
+    else toast.error('감사 포인트 전송에 실패했습니다');
   };
 
   // ── Loading ──────────────────────────────────────────────────────────────
@@ -607,78 +562,19 @@ export default function CourseDetailPage() {
         </div>
       </div>
 
-      {/* Appreciation 버튼 + 집계 */}
-      <div className="flex items-center gap-3 mb-4">
-        {isAuthenticated ? (
-          <button
-            onClick={() => setShowAppreciation(true)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium border border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors"
-          >
-            🎁 강사에게 감사하기
-            {appreciationSummary && appreciationSummary.totalAmount > 0 && (
-              <span className="text-xs opacity-75">{appreciationSummary.totalAmount.toLocaleString()}P · {appreciationSummary.count}명</span>
-            )}
-          </button>
-        ) : (
-          appreciationSummary && appreciationSummary.totalAmount > 0 && (
-            <span className="text-sm text-amber-700">🎁 {appreciationSummary.totalAmount.toLocaleString()}P · {appreciationSummary.count}명</span>
-          )
-        )}
-      </div>
+      {/* WO-O4O-APPRECIATION-GLYCO-KCOS-MIGRATION-V1: 공통 AppreciationPanel */}
+      <AppreciationPanel
+        targetType="lms_course"
+        targetId={course.id}
+        api={appreciationPanelApi}
+        currentUserId={isAuthenticated ? (user?.id ?? null) : null}
+        theme="emerald"
+        variant="inline"
+        buttonLabel="🎁 강사에게 감사하기"
+        onSent={({ amount }) => toast.success(`${amount}P 감사 포인트를 전달했습니다 🎁`)}
+        onError={handleAppreciationError}
+      />
 
-      {/* Appreciation 집계 + 최근 메시지 */}
-      {appreciationSummary && appreciationSummary.totalAmount > 0 && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl px-5 py-4 mb-6">
-          <div className="flex items-center gap-3 text-sm text-amber-800 mb-2">
-            <span>🎁 감사 <strong>{appreciationSummary.totalAmount.toLocaleString()}P</strong></span>
-            <span className="text-amber-300">·</span>
-            <span>👥 <strong>{appreciationSummary.count}명</strong></span>
-          </div>
-          {appreciationRecent.filter(r => r.message).length > 0 && (
-            <div className="border-t border-amber-200 pt-2 mt-2 space-y-1">
-              <p className="text-[11px] font-semibold text-amber-600 uppercase tracking-wide mb-1">최근 감사</p>
-              {appreciationRecent.filter(r => r.message).map((r, i) => (
-                <div key={i} className="flex justify-between items-center text-xs text-amber-700">
-                  <span className="italic flex-1 mr-2">"{r.message!.length > 60 ? r.message!.slice(0, 60) + '…' : r.message}"</span>
-                  <span className="font-semibold whitespace-nowrap">+{r.amount}P</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Appreciation 모달 */}
-      {showAppreciation && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50" onClick={() => setShowAppreciation(false)}>
-          <div className="bg-white rounded-xl shadow-2xl p-7 w-[360px] max-w-[90vw]" onClick={e => e.stopPropagation()}>
-            <h3 className="text-lg font-semibold text-gray-900 mb-1">🎁 강사에게 감사 포인트 보내기</h3>
-            <p className="text-sm text-gray-500 mb-5">강사에게 감사의 마음을 포인트로 전달할 수 있습니다.</p>
-            <div className="flex gap-2 mb-3">
-              {[10, 30, 50].map(p => (
-                <button key={p} onClick={() => setAppreciationAmount(p)}
-                  className={`flex-1 py-2.5 rounded-lg text-sm font-medium border transition-colors ${appreciationAmount === p ? 'border-amber-400 bg-amber-50 text-amber-800' : 'border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100'}`}>
-                  {p}P
-                </button>
-              ))}
-            </div>
-            <input type="number" min={1} placeholder="직접 입력 (1P 이상)" value={appreciationAmount}
-              onChange={e => setAppreciationAmount(e.target.value === '' ? '' : Number(e.target.value))}
-              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm mb-3 focus:outline-none focus:border-primary-400" />
-            <textarea placeholder="감사 메시지 (선택)" rows={3} value={appreciationMsg}
-              onChange={e => setAppreciationMsg(e.target.value)}
-              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm mb-5 resize-y focus:outline-none focus:border-primary-400" />
-            <div className="flex gap-2 justify-end">
-              <button onClick={() => { setShowAppreciation(false); setAppreciationAmount(''); setAppreciationMsg(''); }}
-                className="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200">취소</button>
-              <button onClick={handleSendAppreciation} disabled={isSendingAppreciation || !appreciationAmount}
-                className="px-5 py-2.5 bg-amber-500 text-white rounded-lg text-sm font-semibold hover:bg-amber-600 disabled:opacity-50">
-                {isSendingAppreciation ? '전송 중...' : `${appreciationAmount || 0}P 보내기`}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Lesson section */}
       {enrolled && (

@@ -13,7 +13,8 @@ import { toast } from '@o4o/error-handling';
 import { lmsApi, normalizeEnrollment } from '../../api/lms';
 import { useAuth } from '../../contexts/AuthContext';
 import type { LmsCourse, LmsLesson, LmsEnrollment } from '../../api/lms';
-import { appreciationApi, type AppreciationSummary, type AppreciationSend } from '@/api/appreciation';
+import { AppreciationPanel } from '@o4o/shared-space-ui';
+import { appreciationPanelApi } from '@/api/appreciation';
 
 // ─── 색상/타이포 (KPA colors/typography 대응) ────────────────────────────────
 
@@ -40,30 +41,9 @@ export default function LmsCourseDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [enrolling, setEnrolling] = useState(false);
 
-  // Appreciation state
-  const [showAppreciation, setShowAppreciation] = useState(false);
-  const [appreciationAmount, setAppreciationAmount] = useState<number | ''>('');
-  const [appreciationMsg, setAppreciationMsg] = useState('');
-  const [isSendingAppreciation, setIsSendingAppreciation] = useState(false);
-  const [appreciationSummary, setAppreciationSummary] = useState<AppreciationSummary | null>(null);
-  const [appreciationRecent, setAppreciationRecent] = useState<AppreciationSend[]>([]);
 
   useEffect(() => {
     if (id) loadData();
-  }, [id]);
-
-  useEffect(() => {
-    if (!id) return;
-    Promise.allSettled([
-      appreciationApi.getSummary('lms_course', id),
-      appreciationApi.getRecent('lms_course', id),
-    ]).then(([sumRes, recentRes]) => {
-      if (sumRes.status === 'fulfilled') setAppreciationSummary(sumRes.value.data?.data ?? sumRes.value.data);
-      if (recentRes.status === 'fulfilled') {
-        const d = recentRes.value.data?.data ?? recentRes.value.data;
-        setAppreciationRecent(d?.items ?? []);
-      }
-    });
   }, [id]);
 
   const loadData = async () => {
@@ -119,34 +99,12 @@ export default function LmsCourseDetailPage() {
     }
   };
 
-  const handleSendAppreciation = async () => {
-    if (!course || !user || isSendingAppreciation) return;
-    const amt = Number(appreciationAmount);
-    if (!amt || amt < 1) { toast.error('금액은 1P 이상이어야 합니다'); return; }
-    try {
-      setIsSendingAppreciation(true);
-      await appreciationApi.send({ targetType: 'lms_course', targetId: course.id, amount: amt, message: appreciationMsg.trim() || undefined });
-      toast.success(`${amt}P 감사 포인트를 전달했습니다 🎁`);
-      setShowAppreciation(false);
-      setAppreciationAmount('');
-      setAppreciationMsg('');
-      const [sumRes, recentRes] = await Promise.allSettled([
-        appreciationApi.getSummary('lms_course', course.id),
-        appreciationApi.getRecent('lms_course', course.id),
-      ]);
-      if (sumRes.status === 'fulfilled') setAppreciationSummary(sumRes.value.data?.data ?? sumRes.value.data);
-      if (recentRes.status === 'fulfilled') {
-        const d = recentRes.value.data?.data ?? recentRes.value.data;
-        setAppreciationRecent(d?.items ?? []);
-      }
-    } catch (err: any) {
-      const msg = String(err?.response?.data?.error || err?.message || '');
-      if (msg.includes('INSUFFICIENT_BALANCE') || msg.includes('부족')) toast.error('포인트가 부족합니다');
-      else if (msg.includes('SELF')) toast.error('자신의 강의에는 감사 포인트를 보낼 수 없습니다');
-      else toast.error('감사 포인트 전송에 실패했습니다');
-    } finally {
-      setIsSendingAppreciation(false);
-    }
+  // WO-O4O-APPRECIATION-GLYCO-KCOS-MIGRATION-V1: AppreciationPanel onError 핸들러
+  const handleAppreciationError = (err: any) => {
+    const msg = String(err?.response?.data?.error || err?.message || '');
+    if (msg.includes('INSUFFICIENT_BALANCE') || msg.includes('부족')) toast.error('포인트가 부족합니다');
+    else if (msg.includes('SELF')) toast.error('자신의 강의에는 감사 포인트를 보낼 수 없습니다');
+    else toast.error('감사 포인트 전송에 실패했습니다');
   };
 
   // ─── Loading / Error ────────────────────────────────────────────────────────
@@ -225,67 +183,19 @@ export default function LmsCourseDetailPage() {
             )}
           </div>
 
-          {/* Appreciation 버튼 + 집계 */}
-          <div style={AS.row}>
-            {user ? (
-              <button style={AS.button} onClick={() => setShowAppreciation(true)}>
-                🎁 강사에게 감사하기
-                {appreciationSummary && appreciationSummary.totalAmount > 0 && (
-                  <span style={AS.buttonBadge}>{appreciationSummary.totalAmount.toLocaleString()}P · {appreciationSummary.count}명</span>
-                )}
-              </button>
-            ) : (
-              appreciationSummary && appreciationSummary.totalAmount > 0 && (
-                <span style={AS.countLabel}>🎁 {appreciationSummary.totalAmount.toLocaleString()}P · {appreciationSummary.count}명</span>
-              )
-            )}
-          </div>
+          {/* WO-O4O-APPRECIATION-GLYCO-KCOS-MIGRATION-V1: 공통 AppreciationPanel */}
+          <AppreciationPanel
+            targetType="lms_course"
+            targetId={course.id}
+            api={appreciationPanelApi}
+            currentUserId={user?.id ?? null}
+            theme="pink"
+            variant="inline"
+            buttonLabel="🎁 강사에게 감사하기"
+            onSent={({ amount }) => toast.success(`${amount}P 감사 포인트를 전달했습니다 🎁`)}
+            onError={handleAppreciationError}
+          />
 
-          {appreciationSummary && appreciationSummary.totalAmount > 0 && (
-            <div style={AS.cultureBlock}>
-              <div style={AS.stats}>
-                <span>🎁 감사 <strong>{appreciationSummary.totalAmount.toLocaleString()}P</strong></span>
-                <span style={{ color: '#d97706' }}>·</span>
-                <span>👥 <strong>{appreciationSummary.count}명</strong></span>
-              </div>
-              {appreciationRecent.filter(r => r.message).length > 0 && (
-                <div style={AS.messages}>
-                  <p style={AS.messagesLabel}>최근 감사</p>
-                  {appreciationRecent.filter(r => r.message).map((r, i) => (
-                    <div key={i} style={AS.messageRow}>
-                      <span style={AS.messageText}>"{r.message!.length > 60 ? r.message!.slice(0, 60) + '…' : r.message}"</span>
-                      <span style={AS.messageAmount}>+{r.amount}P</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {showAppreciation && (
-            <div style={AS.overlay} onClick={() => setShowAppreciation(false)}>
-              <div style={AS.modal} onClick={e => e.stopPropagation()}>
-                <h3 style={AS.modalTitle}>🎁 강사에게 감사 포인트 보내기</h3>
-                <p style={AS.modalDesc}>강사에게 감사의 마음을 포인트로 전달할 수 있습니다.</p>
-                <div style={AS.presets}>
-                  {[10, 30, 50].map(p => (
-                    <button key={p} style={{ ...AS.presetBtn, ...(appreciationAmount === p ? AS.presetBtnActive : {}) }} onClick={() => setAppreciationAmount(p)}>{p}P</button>
-                  ))}
-                </div>
-                <input type="number" min={1} placeholder="직접 입력 (1P 이상)" value={appreciationAmount}
-                  onChange={e => setAppreciationAmount(e.target.value === '' ? '' : Number(e.target.value))} style={AS.input} />
-                <textarea placeholder="감사 메시지 (선택)" rows={3} value={appreciationMsg}
-                  onChange={e => setAppreciationMsg(e.target.value)} style={AS.textarea} />
-                <div style={AS.modalActions}>
-                  <button style={AS.cancelBtn} onClick={() => { setShowAppreciation(false); setAppreciationAmount(''); setAppreciationMsg(''); }}>취소</button>
-                  <button style={{ ...AS.sendBtn, ...(isSendingAppreciation || !appreciationAmount ? { opacity: 0.5 } : {}) }}
-                    onClick={handleSendAppreciation} disabled={isSendingAppreciation || !appreciationAmount}>
-                    {isSendingAppreciation ? '전송 중...' : `${appreciationAmount || 0}P 보내기`}
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* 레슨 목록 */}
           <div style={{ ...S.card, marginTop: '24px' }}>
@@ -370,34 +280,6 @@ export default function LmsCourseDetailPage() {
     </div>
   );
 }
-
-// ─── Appreciation Styles ─────────────────────────────────────────────────────
-
-const AS: Record<string, React.CSSProperties> = {
-  row: { display: 'flex', alignItems: 'center', gap: 12, margin: '16px 0 8px' },
-  button: { display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 18px', borderRadius: 24, fontSize: 14, fontWeight: 500, border: '1px solid #fde68a', backgroundColor: '#fffbeb', color: '#92400e', cursor: 'pointer' },
-  buttonBadge: { fontSize: 12, opacity: 0.75 },
-  countLabel: { fontSize: 14, color: '#92400e' },
-  cultureBlock: { padding: '14px 18px', backgroundColor: '#fffbeb', border: '1px solid #fde68a', borderRadius: 10, marginBottom: 20 },
-  stats: { display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, color: '#92400e' },
-  messages: { marginTop: 10, paddingTop: 10, borderTop: '1px solid #fde68a' },
-  messagesLabel: { margin: '0 0 6px', fontSize: 11, fontWeight: 600, color: '#b45309', textTransform: 'uppercase', letterSpacing: '0.05em' },
-  messageRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '5px 0', borderBottom: '1px solid #fef3c7' },
-  messageText: { fontSize: 13, color: '#78350f', fontStyle: 'italic', flex: 1, marginRight: 12 },
-  messageAmount: { fontSize: 13, fontWeight: 600, color: '#92400e', whiteSpace: 'nowrap' },
-  overlay: { position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 },
-  modal: { backgroundColor: '#fff', borderRadius: 12, padding: '28px 24px', width: 360, maxWidth: '90vw', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' },
-  modalTitle: { margin: '0 0 6px', fontSize: 18, fontWeight: 600, color: '#1f2937' },
-  modalDesc: { margin: '0 0 18px', fontSize: 14, color: '#6b7280' },
-  presets: { display: 'flex', gap: 8, marginBottom: 10 },
-  presetBtn: { flex: 1, padding: '9px 0', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: 14, fontWeight: 500, cursor: 'pointer', backgroundColor: '#f9fafb', color: '#374151' },
-  presetBtnActive: { border: '1px solid #f59e0b', backgroundColor: '#fffbeb', color: '#92400e' },
-  input: { width: '100%', padding: '9px 12px', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: 14, marginBottom: 10, boxSizing: 'border-box' },
-  textarea: { width: '100%', padding: '9px 12px', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: 14, resize: 'vertical', marginBottom: 18, boxSizing: 'border-box' },
-  modalActions: { display: 'flex', gap: 8, justifyContent: 'flex-end' },
-  cancelBtn: { padding: '9px 18px', backgroundColor: '#f3f4f6', color: '#374151', border: 'none', borderRadius: 8, fontSize: 14, cursor: 'pointer' },
-  sendBtn: { padding: '9px 18px', backgroundColor: '#f59e0b', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer' },
-};
 
 // ─── Styles (KPA styles 기준, colors/typography 인라인화) ────────────────────
 

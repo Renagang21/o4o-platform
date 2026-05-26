@@ -274,12 +274,6 @@ export function AppreciationPanel(props: AppreciationPanelProps) {
     ? recent.filter((r) => r.message).slice(0, recentLimit)
     : [];
 
-  const summaryChip = hasSummary && summary ? (
-    <span className={`text-xs ${t.chipText}`}>
-      🎁 {summary.totalAmount.toLocaleString()}P · {summary.count}명
-    </span>
-  ) : null;
-
   // ─── Render: inline variant (Forum / LMS) ──────────────────────────────────
 
   if (variant === 'inline') {
