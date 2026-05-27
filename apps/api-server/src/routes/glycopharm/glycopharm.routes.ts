@@ -28,6 +28,8 @@ import { createOperatorBlogController } from '../o4o-store/controllers/operator-
 import { createOperatorPopController } from '../o4o-store/controllers/operator-pop.controller.js';
 // WO-O4O-GLYCOPHARM-STORE-HUB-QR-BACKEND-FOUNDATION-V1
 import { createOperatorQrController } from '../o4o-store/controllers/operator-qr.controller.js';
+// WO-O4O-GLYCOPHARM-LMS-QUALIFICATION-BACKEND-FOUNDATION-V1
+import { createQualificationController } from '../kpa/controllers/qualification.controller.js';
 import { createLayoutController } from '../o4o-store/controllers/layout.controller.js'; // WO-STORE-BLOCK-ENGINE-V1
 import { createStoreSettingsController } from '../o4o-store/controllers/store-settings.controller.js'; // WO-STORE-COMMON-SETTINGS-FOUNDATION-V1
 // WO-O4O-GLYCOPHARM-STORE-HUB-ADOPTION-V1
@@ -439,6 +441,16 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
     'glycopharm',
   );
   router.use('/operator/qr', glycopharmOperatorQrController);
+
+  // WO-O4O-GLYCOPHARM-LMS-QUALIFICATION-BACKEND-FOUNDATION-V1
+  // /api/v1/glycopharm/qualifications — LMS 강사 자격 신청/승인 (GlycoPharm 분리)
+  // 권한: glycopharm:operator / glycopharm:admin / platform:admin / platform:super_admin
+  router.use('/qualifications', createQualificationController(
+    dataSource,
+    coreRequireAuth as any,
+    requireGlycopharmScope,
+    'glycopharm',
+  ));
 
   // ============================================================================
   // Store Layout Block Engine (WO-STORE-BLOCK-ENGINE-V1)

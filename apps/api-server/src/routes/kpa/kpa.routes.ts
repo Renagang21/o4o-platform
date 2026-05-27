@@ -196,8 +196,8 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // Admin Force Asset routes (WO-KPA-A-ASSET-CONTROL-EXTENSION-V2)
   router.use('/admin/force-assets', createAdminForceAssetController(dataSource, coreRequireAuth as any, requireKpaScope));
 
-  // Qualification System (WO-O4O-QUALIFICATION-SYSTEM-V1)
-  router.use('/qualifications', createQualificationController(dataSource, coreRequireAuth as any, requireKpaScope));
+  // Qualification System (WO-O4O-QUALIFICATION-SYSTEM-V1 / WO-O4O-GLYCOPHARM-LMS-QUALIFICATION-BACKEND-FOUNDATION-V1)
+  router.use('/qualifications', createQualificationController(dataSource, coreRequireAuth as any, requireKpaScope, 'kpa-society'));
 
   // Instructor Dashboard (WO-O4O-INSTRUCTOR-DASHBOARD-V1)
   router.use('/instructor', createInstructorDashboardController(dataSource, coreRequireAuth as any));

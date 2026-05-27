@@ -36,6 +36,8 @@ export function createQualificationController(
   dataSource: DataSource,
   requireAuth: AuthMiddleware,
   requireScope: ScopeMiddleware,
+  /** WO-O4O-GLYCOPHARM-LMS-QUALIFICATION-BACKEND-FOUNDATION-V1: 서비스 격리 키 */
+  serviceKey: string,
 ): Router {
   const router = Router();
   const qualRepo = dataSource.getRepository(MemberQualification);
@@ -82,6 +84,7 @@ export function createQualificationController(
                 qualification_type: qualType,
                 status: 'pending',
                 request_data: existing.metadata || requestData,
+                service_key: serviceKey,
               });
               await reqRepo.save(recoveryReq);
               console.warn(`[Qualification] recovered missing qualification_request for user=${userId} type=${qualType}`);
@@ -123,6 +126,7 @@ export function createQualificationController(
             qualification_type: qualType,
             status: 'pending',
             request_data: requestData,
+            service_key: serviceKey,
           });
           return txReqRepo.save(qReq);
         });
@@ -202,6 +206,10 @@ export function createQualificationController(
         const params: any[] = [];
         let pidx = 1;
 
+        // service_key 격리: 이 controller 인스턴스의 서비스만 조회
+        conditions.push(`r.service_key = $${pidx++}`);
+        params.push(serviceKey);
+
         if (status) {
           conditions.push(`r.status = $${pidx++}`);
           params.push(status);
@@ -265,6 +273,10 @@ export function createQualificationController(
           res.status(404).json({ success: false, error: '신청 이력을 찾을 수 없습니다.', code: 'NOT_FOUND' });
           return;
         }
+        if (existing.service_key !== serviceKey) {
+          res.status(404).json({ success: false, error: '신청 이력을 찾을 수 없습니다.', code: 'NOT_FOUND' });
+          return;
+        }
         await reqRepo.delete({ id: req.params.id });
         res.json({ success: true, data: { id: req.params.id, deleted: true } });
       } catch (error: any) {
@@ -295,7 +307,7 @@ export function createQualificationController(
       for (const id of ids) {
         try {
           const existing = await reqRepo.findOne({ where: { id } });
-          if (!existing) {
+          if (!existing || existing.service_key !== serviceKey) {
             results.push({ id, status: 'skipped', error: 'Not found' });
             continue;
           }
@@ -327,7 +339,7 @@ export function createQualificationController(
     async (req: AuthRequest, res: Response): Promise<void> => {
       try {
         const qReq = await reqRepo.findOne({ where: { id: req.params.id } });
-        if (!qReq) {
+        if (!qReq || qReq.service_key !== serviceKey) {
           res.status(404).json({ success: false, error: '신청을 찾을 수 없습니다.' });
           return;
         }

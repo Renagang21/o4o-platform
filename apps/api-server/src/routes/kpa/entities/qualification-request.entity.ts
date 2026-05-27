@@ -27,6 +27,10 @@ export class QualificationRequest {
   @Column({ type: 'uuid' })
   user_id!: string;
 
+  /** WO-O4O-GLYCOPHARM-LMS-QUALIFICATION-BACKEND-FOUNDATION-V1: 신청 출처 서비스 */
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  service_key!: string | null;
+
   @Column({ type: 'varchar', length: 50 })
   qualification_type!: string;
 
