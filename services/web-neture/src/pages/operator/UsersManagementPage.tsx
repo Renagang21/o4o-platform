@@ -46,13 +46,17 @@ function getDashboardAccessLabels(u: UserData): string[] {
   if (tokens.has('platform:super_admin') || tokens.has('neture:admin') || tokens.has('admin')) {
     labels.push('관리자 대시보드');
   }
-  if (tokens.has('neture:operator') || tokens.has('operator')) labels.push('운영 대시보드');
+  // WO-O4O-NETURE-ADMIN-OPERATOR-DASHBOARD-AND-MEMBER-TYPE-FIX-V1: "운영 대시보드" → "운영자 대시보드"
+  if (tokens.has('neture:operator') || tokens.has('operator')) labels.push('운영자 대시보드');
   if (tokens.has('neture:supplier') || tokens.has('supplier')) labels.push('공급자 대시보드');
   if (tokens.has('neture:partner') || tokens.has('partner')) labels.push('파트너 대시보드');
   return labels;
 }
 
-const NETURE_ROLE_DISPLAY: Record<string, string> = { customer: 'consumer' };
+// WO-O4O-NETURE-ADMIN-OPERATOR-DASHBOARD-AND-MEMBER-TYPE-FIX-V1:
+// customer → consumer 매핑 제거 — Neture 는 "소비자" 회원 유형을 사용하지 않는다.
+// 기존 데이터에 customer role 이 남아 있다면 raw 키 그대로 표시 (정렬 후 데이터 보정 별도).
+const NETURE_ROLE_DISPLAY: Record<string, string> = {};
 
 // ─── Client adapter ──────────────────────────────────────────
 

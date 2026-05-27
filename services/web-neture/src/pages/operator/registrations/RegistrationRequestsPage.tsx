@@ -29,7 +29,9 @@ import { OperatorActionType } from '@o4o/types';
 import { operatorRegistrationApi } from '../../../lib/api';
 
 type RequestStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'ALL';
-type UserRole = 'supplier' | 'partner' | 'consumer' | 'seller' | 'pharmacist' | 'ALL';
+// WO-O4O-NETURE-ADMIN-OPERATOR-DASHBOARD-AND-MEMBER-TYPE-FIX-V1:
+// Neture 회원 유형에서 'consumer' 제거. 'user' 는 백엔드가 role 미지정 시 fallback 으로만 사용.
+type UserRole = 'supplier' | 'partner' | 'user' | 'seller' | 'pharmacist' | 'ALL';
 
 interface RegistrationRequest {
   id: string;
@@ -71,6 +73,9 @@ function mapStatus(raw: string | undefined): 'PENDING' | 'APPROVED' | 'REJECTED'
   }
 }
 
+// WO-O4O-NETURE-ADMIN-OPERATOR-DASHBOARD-AND-MEMBER-TYPE-FIX-V1:
+// 'consumer' 라벨 제거 — Neture 는 "소비자" 회원 유형을 사용하지 않는다.
+// seller / pharmacist 는 기존 데이터(legacy) 표시 호환을 위해 라벨만 유지.
 const roleLabels: Record<string, string> = {
   ALL: '전체',
   admin: '관리자',
@@ -78,7 +83,6 @@ const roleLabels: Record<string, string> = {
   supplier: '공급자',
   partner: '파트너',
   user: '사용자',
-  consumer: '소비자',
   seller: '판매자',
   pharmacist: '약사회원',
 };
@@ -121,7 +125,9 @@ export default function RegistrationRequestsPage() {
         email: r.email || '',
         name: r.name || '',
         phone: r.phone || '',
-        role: (r.role as UserRole) || 'consumer',
+        // WO-O4O-NETURE-ADMIN-OPERATOR-DASHBOARD-AND-MEMBER-TYPE-FIX-V1:
+        // 백엔드가 role 을 빈 값으로 반환할 때 'consumer' 대신 'user' fallback.
+        role: (r.role as UserRole) || 'user',
         service: r.service || 'neture',
         companyName: r.companyName,
         businessNumber: r.businessNumber,

@@ -29,7 +29,6 @@ import {
   NETURE_CONTEXTUAL_NAV,
   filterContextualNav,
 } from '../config/navigation';
-import { getNetureDashboardRoute } from '../config/dashboard';
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function getUserDisplayName(user: any): string {
@@ -61,11 +60,6 @@ export function NetureGlobalHeader() {
   const isOperator = isAuthenticated && user?.roles?.some((r: string) => OPERATOR_OR_ABOVE_ROLES.includes(r));
   const isSupplier = isAuthenticated && user?.roles?.some((r: string) => SUPPLIER_ONLY_ROLES.includes(r));
   const isPartner = isAuthenticated && user?.roles?.some((r: string) => PARTNER_ONLY_ROLES.includes(r));
-
-  const hasDashboardRole = isAdmin || isOperator || isSupplier || isPartner;
-  const dashboardPath = hasDashboardRole && user?.roles
-    ? getNetureDashboardRoute(user.roles)
-    : '/';
 
   // WO-O4O-COMMON-MENU-VISIBILITY-POLICY-IMPL-V1: operator/admin은 모든 메뉴를 본다
   const contextualNav = filterContextualNav(NETURE_CONTEXTUAL_NAV, {
@@ -116,10 +110,18 @@ export function NetureGlobalHeader() {
           {/* WO-O4O-NETURE-SUPPLIER-DASHBOARD-ENTRY-AND-MEMBER-LIST-CLEANUP-V1:
               역할 동시 보유 사용자(operator + supplier 등)도 각 대시보드에
               개별 진입할 수 있도록 항목을 역할별로 분리. 각 항목은 자기 역할의
-              canonical route 로 직접 연결. */}
-          {isOperator && (
-            <GlobalHeaderMenuItem to={dashboardPath} icon={<Shield className="w-4 h-4" />}>
-              운영 대시보드
+              canonical route 로 직접 연결.
+              WO-O4O-NETURE-ADMIN-OPERATOR-DASHBOARD-AND-MEMBER-TYPE-FIX-V1:
+              admin / operator 진입을 분리. admin 은 /admin (관리자 대시보드),
+              operator-only 는 /operator (운영자 대시보드). */}
+          {isAdmin && (
+            <GlobalHeaderMenuItem to="/admin" icon={<Shield className="w-4 h-4" />}>
+              관리자 대시보드
+            </GlobalHeaderMenuItem>
+          )}
+          {isOperator && !isAdmin && (
+            <GlobalHeaderMenuItem to="/operator" icon={<Shield className="w-4 h-4" />}>
+              운영자 대시보드
             </GlobalHeaderMenuItem>
           )}
           {isSupplier && (
