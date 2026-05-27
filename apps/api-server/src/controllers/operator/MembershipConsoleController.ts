@@ -872,8 +872,7 @@ export class MembershipConsoleController {
       const ds = AppDataSource;
 
       const userRows = await ds.query(
-        `SELECT id, email, "firstName", "lastName", name, status
-         FROM users WHERE id = $1`,
+        `SELECT id, email, name, status FROM users WHERE id = $1`,
         [userId],
       );
 
@@ -883,7 +882,7 @@ export class MembershipConsoleController {
       }
 
       const u = userRows[0];
-      const displayName = u.name || `${u.lastName || ''}${u.firstName || ''}`.trim() || u.email;
+      const displayName = u.name || u.email;
 
       const [memberships, forumPosts, forumComments, auditLogs] = await Promise.all([
         ds.query(`SELECT COUNT(*)::int AS cnt FROM service_memberships WHERE user_id = $1`, [userId]),
