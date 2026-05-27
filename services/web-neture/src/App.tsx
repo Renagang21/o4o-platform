@@ -891,7 +891,8 @@ function App() {
               <Route path="/admin/orders" element={<OrdersManagementPage />} />
               <Route path="/admin/ai-report" element={<OperatorAiReportPage />} />
               <Route path="/admin/settings/notifications" element={<EmailNotificationSettingsPage />} />
-              <Route path="/admin/applications" element={<RegistrationRequestsPage />} />
+              {/* WO-O4O-NETURE-ADMIN-OPERATOR-URL-SEPARATION-V1: 가입 승인은 operator 업무 → /operator/applications */}
+              <Route path="/admin/applications" element={<Navigate to="/operator/applications" replace />} />
               <Route path="/admin/community" element={<ForumManagementPage />} />
               <Route path="/admin/forum-delete-requests" element={<ForumDeleteRequestsPage />} />
               <Route path="/admin/forum-analytics" element={<ForumAnalyticsPage />} />

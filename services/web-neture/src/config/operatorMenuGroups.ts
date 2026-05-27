@@ -111,16 +111,28 @@ export function filterMenuByRole(
 }
 
 /**
+ * operator 업무 경로 — admin 메뉴에서도 /operator/* 그대로 유지.
+ * WO-O4O-NETURE-ADMIN-OPERATOR-URL-SEPARATION-V1:
+ *   이 경로들은 operator 업무이므로 admin layout에서 접근해도 /operator/* URL 사용.
+ *   /admin/* 에 동일 경로가 있으면 /operator/* 로 redirect됨.
+ */
+const KEEP_AS_OPERATOR_PATHS = new Set([
+  '/operator/applications', // 가입 승인 — operator 업무
+  '/operator/market-trial', // 유통 참여형 펀딩 — operator 업무 (/admin/market-trial 이미 redirect 중)
+]);
+
+/**
  * Admin 전용 메뉴 생성
  * WO-O4O-ROLE-ROUTE-ISOLATION-V1
  * 모든 항목 (adminOnly 포함) + /operator → /admin prefix 치환
+ * WO-O4O-NETURE-ADMIN-OPERATOR-URL-SEPARATION-V1: operator 업무 경로는 /operator/* 유지
  */
 export function getAdminMenu(): Partial<Record<OperatorGroupKey, OperatorMenuItem[]>> {
   const result: Partial<Record<OperatorGroupKey, OperatorMenuItem[]>> = {};
   for (const [key, items] of Object.entries(UNIFIED_MENU) as [OperatorGroupKey, UnifiedMenuItem[]][]) {
     result[key] = items.map(({ adminOnly: _, path, ...rest }) => ({
       ...rest,
-      path: path.replace(/^\/operator/, '/admin'),
+      path: KEEP_AS_OPERATOR_PATHS.has(path) ? path : path.replace(/^\/operator/, '/admin'),
     }));
   }
   return result;

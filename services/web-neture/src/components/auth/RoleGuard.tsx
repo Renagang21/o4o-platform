@@ -16,11 +16,12 @@ import {
   NETURE_ROLES,
   ADMIN_ROLES,
   OPERATOR_ROLES,
+  OPERATOR_OR_ABOVE_ROLES,
   SUPPLIER_ROLES,
 } from '../../lib/role-constants';
 
 // re-export for backward compat — 기존 import 유지
-export { NETURE_ROLES, ADMIN_ROLES, OPERATOR_ROLES, SUPPLIER_ROLES };
+export { NETURE_ROLES, ADMIN_ROLES, OPERATOR_ROLES, OPERATOR_OR_ABOVE_ROLES, SUPPLIER_ROLES };
 
 // ─── RouteGuard (통합 컴포넌트) ───
 
@@ -124,16 +125,17 @@ export function RoleGuard({ children, allowedRoles, fallback = '/login' }: Legac
 
 /**
  * OperatorRoute — RouteGuard wrapper (하위 호환)
+ *
+ * WO-O4O-NETURE-ADMIN-OPERATOR-URL-SEPARATION-V1:
+ *   admin 역할도 /operator/* 접근 허용 (KPA-Society 정렬).
+ *   operator 업무(가입 승인 등)는 /operator/* 에서 수행, /admin/* 는 admin 전용 기능만.
+ *   기존 redirectMap 제거 — admin이 /operator/* 에서 차단되던 구조 해소.
  */
 export function OperatorRoute({ children, fallback = '/login' }: Omit<LegacyGuardProps, 'allowedRoles'>) {
   return (
     <RouteGuard
-      allowedRoles={OPERATOR_ROLES}
+      allowedRoles={OPERATOR_OR_ABOVE_ROLES}
       requireMembership="neture"
-      redirectMap={{
-        [NETURE_ROLES.ADMIN]: '/admin',
-        [NETURE_ROLES.PLATFORM_SUPER_ADMIN]: '/admin',
-      }}
       fallback={fallback}
     >
       {children}
