@@ -68,7 +68,7 @@ const Login: FC = () => {
     }
 
     try {
-      await login({ email, password });
+      await login({ email, password, serviceKey: 'neture' });
       
       toast.success('관리자 로그인 성공!');
     } catch (error: any) {

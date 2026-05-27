@@ -163,7 +163,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({
     checkInitialAuth();
   }, [authClient, ssoClient, strategy]);
 
-  const login = async (credentials: { email: string; password: string }) => {
+  const login = async (credentials: { email: string; password: string; serviceKey?: string }) => {
     try {
       setIsLoading(true);
       setError(null);
