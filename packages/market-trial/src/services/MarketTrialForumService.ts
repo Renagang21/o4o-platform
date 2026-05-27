@@ -9,7 +9,7 @@
  * - Manage forum-trial mapping
  */
 
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 import {
   MarketTrial,
   TrialStatus,
@@ -76,13 +76,13 @@ export class MarketTrialForumService {
       return ForumUserRole.SUPPLIER;
     }
 
-    // Check if user is a seller participant
+    // Check if user is a seller/store_owner participant
     if (user.sellerId) {
       const sellerParticipant = await this.participantRepo.findOne({
         where: {
           marketTrialId: trial.id,
           participantId: user.sellerId,
-          participantType: ParticipantType.SELLER,
+          participantType: In([ParticipantType.STORE_OWNER, ParticipantType.SELLER]),
         },
       });
       if (sellerParticipant) {

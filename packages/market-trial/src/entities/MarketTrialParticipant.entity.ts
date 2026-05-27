@@ -18,13 +18,12 @@ import {
   Index,
 } from 'typeorm';
 
-/**
- * Participant Type
- * Only SELLER or PARTNER as specified in Work Order.
- */
 export enum ParticipantType {
-  SELLER = 'seller',
+  /** WO-O4O-NETURE-MARKET-TRIAL-PARTICIPANT-ENUM-FIX-V1: primary type for store owners */
+  STORE_OWNER = 'store_owner',
   PARTNER = 'partner',
+  /** Legacy: pre-existing rows stored as 'seller'. Keep for backward compatibility. */
+  SELLER = 'seller',
 }
 
 @Entity('market_trial_participants')

@@ -173,7 +173,7 @@ export function createMarketTrialController(dataSource: DataSource): Router {
       // Validate participant type
       const participantType = participantTypeRaw === 'partner'
         ? ParticipantType.PARTNER
-        : ParticipantType.SELLER;
+        : ParticipantType.STORE_OWNER;
 
       const participation = await service.participate(req.params.id, {
         participantId,

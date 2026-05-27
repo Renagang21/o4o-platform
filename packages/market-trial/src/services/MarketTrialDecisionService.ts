@@ -12,7 +12,7 @@
  * SellerListing 자동 생성 로직 제거. Market Trial은 "검증 도메인"으로 한정.
  */
 
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 import {
   MarketTrialDecision,
   DecisionType,
@@ -85,22 +85,23 @@ export class MarketTrialDecisionService {
 
   /**
    * Validate that participant exists in this trial
+   * acceptedTypes: array to support STORE_OWNER + SELLER legacy fallback
    */
   private async validateParticipant(
     trialId: string,
     participantId: string,
-    expectedType: ParticipantType
+    acceptedTypes: ParticipantType[]
   ): Promise<MarketTrialParticipant> {
     const participant = await this.participantRepo.findOne({
       where: {
         marketTrialId: trialId,
         participantId: participantId,
-        participantType: expectedType,
+        participantType: In(acceptedTypes),
       },
     });
 
     if (!participant) {
-      throw new Error(`Participant not found or not a ${expectedType}`);
+      throw new Error(`Participant not found or not a ${acceptedTypes.join('/')}`);
     }
 
     return participant;
@@ -113,8 +114,8 @@ export class MarketTrialDecisionService {
     // Validate trial status
     await this.validateTrialStatus(trialId);
 
-    // Validate participant
-    await this.validateParticipant(trialId, dto.participantId, ParticipantType.SELLER);
+    // Validate participant — accept STORE_OWNER (current) and SELLER (legacy)
+    await this.validateParticipant(trialId, dto.participantId, [ParticipantType.STORE_OWNER, ParticipantType.SELLER]);
 
     // Check for duplicate decision
     if (await this.hasDecisionAlready(trialId, dto.participantId)) {
@@ -129,7 +130,7 @@ export class MarketTrialDecisionService {
       const decision = decisionRepo.create({
         marketTrialId: trialId,
         participantId: dto.participantId,
-        participantType: ParticipantType.SELLER,
+        participantType: ParticipantType.STORE_OWNER,
         decision: dto.decision,
         selectedSellerIds: null,
       });
