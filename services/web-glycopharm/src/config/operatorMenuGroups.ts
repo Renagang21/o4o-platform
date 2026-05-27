@@ -39,6 +39,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   stores: [
     { label: '약국 관리', path: '/operator/pharmacies' },
     { label: '매장 관리', path: '/operator/stores' },
+    // WO-O4O-GLYCOPHARM-OPERATOR-STORE-CHANNELS-V1
+    { label: '채널 관리', path: '/operator/store-channels' },
   ],
   orders: [{ label: '주문 관리', path: '/operator/orders' }],
   content: [
@@ -118,6 +120,7 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
   stores: [
     { label: '약국 관리', path: '/operator/pharmacies' },
     { label: '매장 관리', path: '/operator/stores' },
+    { label: '채널 관리', path: '/operator/store-channels' },
   ],
   orders: [{ label: '주문 관리', path: '/operator/orders' }],
   content: [
