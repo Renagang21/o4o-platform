@@ -9,7 +9,7 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import type { ProductionRouterState } from '@/types/production';
+import { parseProductionRouterState } from '@o4o/store-ui-core';
 import {
   ArrowLeft,
   Megaphone,
@@ -59,7 +59,7 @@ export default function StorePopPage() {
 
   // Prefill from library router state if present
   const [aiPrompt, setAiPrompt] = useState(() => {
-    const prod = (location.state as ProductionRouterState | null)?.production;
+    const prod = parseProductionRouterState(location.state);
     if (prod?.source?.items?.length) {
       const item = prod.source.items[0];
       return [item.title, item.description].filter(Boolean).join('\n');

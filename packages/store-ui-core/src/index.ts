@@ -41,3 +41,6 @@ export { MENU_CAPABILITY_MAP, resolveStoreMenu } from './config/menuCapabilityMa
 // Engine (WO-STORE-AI-INSIGHT-LAYER-V1)
 export type { StoreInsight, StoreInsightAction, StoreInsightInput, InsightLevel } from './engine/storeInsightEngine';
 export { computeStoreInsights } from './engine/storeInsightEngine';
+
+// Production Router Utils (WO-O4O-STORE-PRODUCTION-ROUTER-UTILS-COMMONIZATION-PHASE2-G-V1)
+export { buildProductionState, composeSourceTextFromItems, parseProductionRouterState, useProductionRouterState } from './utils/productionUtils';

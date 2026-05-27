@@ -12,7 +12,7 @@ import { useEffect, useState, useCallback, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, RefreshCw, Megaphone, QrCode } from 'lucide-react';
 import { assetSnapshotApi, type AssetSnapshotItem } from '../../api/assetSnapshot';
-import type { ProductionRouterState } from '@/types/production';
+import { buildProductionState } from '@o4o/store-ui-core';
 
 export default function StoreLibraryContentsPage() {
   const navigate = useNavigate();
@@ -35,20 +35,18 @@ export default function StoreLibraryContentsPage() {
   useEffect(() => { fetchItems(); }, [fetchItems]);
 
   const handleStartProduction = (item: AssetSnapshotItem, target: 'pop' | 'qr') => {
-    const state: ProductionRouterState = {
-      production: {
-        source: {
-          fromLibrary: 'contents',
-          items: [{
-            id: item.id,
-            title: item.title,
-            description: (item.contentJson as Record<string, unknown>)?.description as string | null ?? null,
-            origin: 'snapshot',
-          }],
-        },
-        target,
+    const state = buildProductionState({
+      target,
+      source: {
+        fromLibrary: 'contents',
+        items: [{
+          id: item.id,
+          title: item.title,
+          description: (item.contentJson as Record<string, unknown>)?.description as string | null ?? null,
+          origin: 'snapshot',
+        }],
       },
-    };
+    });
     setActionOpenId(null);
     navigate(`/store/${target}`, { state });
   };

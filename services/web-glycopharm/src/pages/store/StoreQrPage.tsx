@@ -19,7 +19,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import type { ProductionRouterState } from '@/types/production';
+import { parseProductionRouterState } from '@o4o/store-ui-core';
 import {
   ArrowLeft,
   QrCode,
@@ -126,7 +126,7 @@ export default function StoreQrPage() {
 
   // Prefill from library router state if present
   const initFormFromState = (): CreateQrForm => {
-    const prod = (location.state as ProductionRouterState | null)?.production;
+    const prod = parseProductionRouterState(location.state);
     if (prod?.source?.items?.length) {
       const item = prod.source.items[0];
       return { title: item.title, description: item.description ?? '', landingType: 'link', landingTargetId: '', slug: generateSlug(item.title) };
@@ -135,8 +135,7 @@ export default function StoreQrPage() {
   };
 
   const [showCreate, setShowCreate] = useState(() => {
-    const prod = (location.state as ProductionRouterState | null)?.production;
-    return !!(prod?.source?.items?.length);
+    return !!(parseProductionRouterState(location.state)?.source?.items?.length);
   });
   const [form, setForm] = useState<CreateQrForm>(initFormFromState);
   const [creating, setCreating] = useState(false);
