@@ -12,7 +12,7 @@ import { useState } from 'react';
 import { Building2, Mail, Phone, User, FileText, CheckCircle, Send } from '@/components/icons';
 import { api } from '../../lib/apiClient';
 
-type ServiceInterest = 'DIGITAL_SIGNAGE' | 'PHARMACY_SUPPLY' | 'ADVERTISEMENT';
+type ServiceInterest = 'DIGITAL_SIGNAGE' | 'BEAUTY_SUPPLY' | 'ADVERTISEMENT';
 
 interface ApplicationForm {
   companyName: string;
@@ -31,7 +31,7 @@ const SERVICE_OPTIONS: { value: ServiceInterest; label: string; description: str
     description: '매장 내 디지털 디스플레이 광고',
   },
   {
-    value: 'PHARMACY_SUPPLY',
+    value: 'BEAUTY_SUPPLY',
     label: '화장품 공급',
     description: '화장품 및 뷰티 제품 공급',
   },

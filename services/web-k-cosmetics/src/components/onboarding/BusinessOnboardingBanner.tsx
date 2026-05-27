@@ -2,7 +2,7 @@
  * BusinessOnboardingBanner
  * WO-BUSINESS-SERVICE-ONBOARDING-UNIFIED-V1
  *
- * K-Cosmetics 매장/약국 운영자 온보딩 배너
+ * K-Cosmetics 매장 경영자 온보딩 배너
  * 가드: 로그인 상태 AND operator/partner 역할이 아닌 사용자
  * CTA: 기존 /partners/apply 페이지로 이동
  */

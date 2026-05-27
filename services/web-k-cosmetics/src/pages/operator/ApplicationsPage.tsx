@@ -1,51 +1,71 @@
 /**
- * ApplicationsPage - K-Cosmetics 신청 관리
+ * ApplicationsPage - K-Cosmetics 매장 가입신청 관리
  *
- * Spike: WO-COSMETICS-TABLE-UI-SPIKE-V1
- * 축약 Table UI 적합성 테스트 (7→4 컬럼)
+ * WO-O4O-COSMETICS-ORG-REUSE-AND-ENROLLMENT-V1:
+ * 모의 데이터 → 실제 API 연결
+ * GET /api/v1/cosmetics/stores/admin/applications (cosmetics:admin scope)
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BaseDetailDrawer } from '@o4o/ui';
 import { DataTable } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
+import { api } from '../../lib/apiClient';
 
 interface Application {
-  id: number;
+  id: string;
   storeName: string;
-  owner: string;
-  phone: string;
-  type: string;
-  status: string;
-  appliedDate: string;
+  ownerName: string;
+  contactPhone?: string;
+  businessNumber: string;
+  address?: string;
+  region?: string;
+  note?: string;
+  status: 'SUBMITTED' | 'APPROVED' | 'REJECTED';
+  createdAt: string;
+  reviewedAt?: string;
+  rejectionReason?: string;
 }
 
-const applications: Application[] = [
-  { id: 1, storeName: '뷰티마트 잠실점', owner: '김미영', phone: '010-1234-5678', type: '신규입점', status: '검토중', appliedDate: '2024-01-15' },
-  { id: 2, storeName: '코스메 선릉점', owner: '이정은', phone: '010-2345-6789', type: '신규입점', status: '승인대기', appliedDate: '2024-01-14' },
-  { id: 3, storeName: '스킨랩 역삼점', owner: '박수진', phone: '010-3456-7890', type: '브랜드추가', status: '승인완료', appliedDate: '2024-01-13' },
-  { id: 4, storeName: '메이크업샵 강남점', owner: '최혜원', phone: '010-4567-8901', type: '신규입점', status: '반려', appliedDate: '2024-01-12' },
-  { id: 5, storeName: '뷰티센터 홍대점', owner: '정다은', phone: '010-5678-9012', type: '계약갱신', status: '검토중', appliedDate: '2024-01-11' },
-];
-
-const statusColors: Record<string, string> = {
-  '검토중': 'bg-blue-100 text-blue-700',
-  '승인대기': 'bg-yellow-100 text-yellow-700',
-  '승인완료': 'bg-green-100 text-green-700',
-  '반려': 'bg-red-100 text-red-700',
+const STATUS_LABEL: Record<string, string> = {
+  SUBMITTED: '검토중',
+  APPROVED: '승인완료',
+  REJECTED: '반려',
 };
 
-const typeColors: Record<string, string> = {
-  '신규입점': 'bg-pink-100 text-pink-700',
-  '브랜드추가': 'bg-purple-100 text-purple-700',
-  '계약갱신': 'bg-indigo-100 text-indigo-700',
+const statusColors: Record<string, string> = {
+  SUBMITTED: 'bg-blue-100 text-blue-700',
+  APPROVED: 'bg-green-100 text-green-700',
+  REJECTED: 'bg-red-100 text-red-700',
 };
 
 export default function ApplicationsPage() {
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
 
-  const statuses = ['all', '검토중', '승인대기', '승인완료', '반려'];
+  useEffect(() => {
+    const fetchApplications = async () => {
+      try {
+        setLoading(true);
+        setFetchError(null);
+        const res = await api.get('/cosmetics/stores/admin/applications', {
+          params: { limit: 100 },
+        });
+        setApplications(res.data?.data || []);
+      } catch (err: any) {
+        const msg = err?.response?.data?.error?.message || err?.response?.data?.error || '신청 목록을 불러오지 못했습니다.';
+        setFetchError(typeof msg === 'string' ? msg : '신청 목록을 불러오지 못했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchApplications();
+  }, []);
+
+  const statuses = ['all', 'SUBMITTED', 'APPROVED', 'REJECTED'];
 
   const filteredApplications = applications.filter(app =>
     statusFilter === 'all' || app.status === statusFilter
@@ -58,27 +78,25 @@ export default function ApplicationsPage() {
       render: (_v, app) => (
         <div>
           <p className="font-medium text-slate-800">{app.storeName}</p>
-          <p className="text-sm text-slate-600 mt-1">{app.owner}</p>
+          <p className="text-sm text-slate-600 mt-1">{app.ownerName}</p>
         </div>
       ),
     },
     {
-      key: 'type',
-      header: '신청 내용',
-      render: (_v, app) => (
-        <div>
-          <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${typeColors[app.type] ?? 'bg-slate-100 text-slate-600'}`}>
-            {app.type}
-          </span>
-          <p className="text-sm text-slate-500 mt-1">{app.appliedDate}</p>
-        </div>
-      ),
-    },
-    {
-      key: 'phone',
+      key: 'contactPhone',
       header: '연락처',
       width: '150px',
-      render: (_v, app) => <p className="text-sm text-slate-600">{app.phone}</p>,
+      render: (_v, app) => <p className="text-sm text-slate-600">{app.contactPhone || '-'}</p>,
+    },
+    {
+      key: 'createdAt',
+      header: '신청일',
+      width: '130px',
+      render: (_v, app) => (
+        <p className="text-sm text-slate-600">
+          {new Date(app.createdAt).toLocaleDateString('ko-KR')}
+        </p>
+      ),
     },
     {
       key: 'status',
@@ -87,11 +105,27 @@ export default function ApplicationsPage() {
       align: 'center',
       render: (_v, app) => (
         <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${statusColors[app.status] ?? 'bg-slate-100 text-slate-600'}`}>
-          {app.status}
+          {STATUS_LABEL[app.status] ?? app.status}
         </span>
       ),
     },
   ];
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-600" />
+      </div>
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-red-700 text-sm">
+        {fetchError}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -99,7 +133,7 @@ export default function ApplicationsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">신청 관리</h1>
-          <p className="text-slate-500 mt-1">매장 입점 및 변경 신청을 관리합니다</p>
+          <p className="text-slate-500 mt-1">매장 가입신청을 검토하고 승인합니다</p>
         </div>
       </div>
 
@@ -111,15 +145,15 @@ export default function ApplicationsPage() {
         </div>
         <div className="bg-white rounded-xl p-4 border border-slate-100">
           <p className="text-sm text-slate-500">검토중</p>
-          <p className="text-2xl font-bold text-blue-600">{applications.filter(a => a.status === '검토중').length}</p>
-        </div>
-        <div className="bg-white rounded-xl p-4 border border-slate-100">
-          <p className="text-sm text-slate-500">승인대기</p>
-          <p className="text-2xl font-bold text-yellow-600">{applications.filter(a => a.status === '승인대기').length}</p>
+          <p className="text-2xl font-bold text-blue-600">{applications.filter(a => a.status === 'SUBMITTED').length}</p>
         </div>
         <div className="bg-white rounded-xl p-4 border border-slate-100">
           <p className="text-sm text-slate-500">승인완료</p>
-          <p className="text-2xl font-bold text-green-600">{applications.filter(a => a.status === '승인완료').length}</p>
+          <p className="text-2xl font-bold text-green-600">{applications.filter(a => a.status === 'APPROVED').length}</p>
+        </div>
+        <div className="bg-white rounded-xl p-4 border border-slate-100">
+          <p className="text-sm text-slate-500">반려</p>
+          <p className="text-2xl font-bold text-red-600">{applications.filter(a => a.status === 'REJECTED').length}</p>
         </div>
       </div>
 
@@ -136,7 +170,7 @@ export default function ApplicationsPage() {
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
-              {status === 'all' ? '전체' : status}
+              {status === 'all' ? '전체' : STATUS_LABEL[status]}
             </button>
           ))}
         </div>
@@ -145,7 +179,7 @@ export default function ApplicationsPage() {
       <DataTable<Application>
         columns={columns}
         data={filteredApplications}
-        rowKey={(row) => String(row.id)}
+        rowKey={(row) => row.id}
         emptyMessage="신청이 없습니다"
         onRowClick={(app) => setSelectedApp(app)}
         tableId="kcos-applications"
@@ -161,11 +195,16 @@ export default function ApplicationsPage() {
         {selectedApp && (
           <div className="space-y-1">
             {[
-              { label: '신청자', value: selectedApp.owner },
-              { label: '신청 유형', value: selectedApp.type },
-              { label: '상태', value: selectedApp.status },
-              { label: '연락처', value: selectedApp.phone },
-              { label: '신청일', value: selectedApp.appliedDate },
+              { label: '대표자', value: selectedApp.ownerName },
+              { label: '상태', value: STATUS_LABEL[selectedApp.status] ?? selectedApp.status },
+              { label: '사업자번호', value: selectedApp.businessNumber },
+              { label: '연락처', value: selectedApp.contactPhone || '-' },
+              { label: '주소', value: selectedApp.address || '-' },
+              { label: '지역', value: selectedApp.region || '-' },
+              { label: '신청일', value: new Date(selectedApp.createdAt).toLocaleDateString('ko-KR') },
+              ...(selectedApp.reviewedAt ? [{ label: '검토일', value: new Date(selectedApp.reviewedAt).toLocaleDateString('ko-KR') }] : []),
+              ...(selectedApp.rejectionReason ? [{ label: '반려 사유', value: selectedApp.rejectionReason }] : []),
+              ...(selectedApp.note ? [{ label: '메모', value: selectedApp.note }] : []),
             ].map((item) => (
               <div key={item.label} style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
                 <span style={{ fontWeight: 600, color: '#64748b', minWidth: 80, flexShrink: 0 }}>{item.label}</span>
