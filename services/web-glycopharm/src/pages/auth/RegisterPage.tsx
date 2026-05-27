@@ -1,752 +1,89 @@
 /**
- * RegisterPage — GlycoPharm 회원가입 (3단계)
+ * RegisterPage — GlycoPharm 가입신청 진입 화면
+ *
+ * WO-O4O-GLYCOPHARM-REGISTER-MODAL-FLOW-V1:
+ *   /register 페이지를 가입 안내 화면으로 교체.
+ *   실제 가입신청 폼은 RegisterFlowModal 에서 진행 (3단계 유지).
  *
  * WO-O4O-GLYCOPHARM-REGISTRATION-ROLE-TYPE-ALIGNMENT-V1:
- *   KPA-Society 방식에 맞춰 단계형 가입 흐름 도입.
- *   1단계: 공통 정보 / 2단계: 참여 유형 선택 / 3단계: 유형별 추가 정보
- *
- * 참여 유형:
- *   - 약사/근무약사: glycopharm:pharmacist (매장 접근 없음)
- *   - 약국 경영자: glycopharm:store_owner (승인 후 매장 HUB / 내 매장 이용 가능)
- *
- * Identity V2 password separation (WO-O4O-EXISTING-ACCOUNT-SERVICE-PASSWORD-SEPARATION-V1):
- *   기존 계정 추가 가입: currentPassword(본인확인) + servicePassword(GlycoPharm 전용)
+ *   1단계(공통정보) → 2단계(참여유형) → 3단계(유형별 추가정보) 구조 유지.
  */
 
 import { useState } from 'react';
-import { useNavigate, NavLink } from 'react-router-dom';
-import {
-  Activity,
-  Mail,
-  Lock,
-  User,
-  Phone,
-  Eye,
-  EyeOff,
-  CheckCircle2,
-  Circle,
-  ArrowLeft,
-  ArrowRight,
-  X,
-  Building2,
-  Stethoscope,
-} from 'lucide-react';
-import { api } from '../../lib/apiClient';
-import { AddressSearch } from '@o4o/ui';
-
-const SERVICE_LABELS: Record<string, string> = {
-  neture: 'Neture', glycopharm: 'GlycoPharm', glucoseview: 'GlucoseView',
-  'k-cosmetics': 'K-Cosmetics', 'kpa-society': 'KPA-Society', platform: 'O4O 플랫폼',
-};
-
-type Step = 1 | 2 | 3;
-type ParticipationType = 'pharmacist' | 'pharmacy_owner';
+import { NavLink } from 'react-router-dom';
+import { Activity, Stethoscope, Building2, ShieldCheck, Clock } from 'lucide-react';
+import { RegisterFlowModal } from './RegisterFlowModal';
 
 export default function RegisterPage() {
-  const navigate = useNavigate();
-  const [step, setStep] = useState<Step>(1);
-  const [participationType, setParticipationType] = useState<ParticipationType | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [registrationComplete, setRegistrationComplete] = useState(false);
-  const [existingAccountMode, setExistingAccountMode] = useState(false);
-  const [existingServices, setExistingServices] = useState<Array<{key: string, status: string}>>([]);
-  const [termsModal, setTermsModal] = useState<'terms' | 'privacy' | null>(null);
-
-  const [formData, setFormData] = useState({
-    // 공통 정보 (step 1)
-    lastName: '',
-    firstName: '',
-    nickname: '',
-    email: '',
-    password: '',
-    passwordConfirm: '',
-    currentPassword: '',
-    servicePassword: '',
-    servicePasswordConfirm: '',
-    phone: '',
-    // 약사/근무약사 추가 정보 (step 3A)
-    licenseNumber: '',
-    // 약국 경영자 추가 정보 (step 3B)
-    businessName: '',
-    representativeName: '',
-    businessNumber: '',
-    taxEmail: '',
-    businessType: '',
-    businessCategory: '',
-    zipCode: '',
-    address1: '',
-    address2: '',
-    // 약관
-    agreeTerms: false,
-    agreePrivacy: false,
-    agreeMarketing: false,
-  });
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    const numericFields = ['phone', 'businessNumber'];
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : numericFields.includes(name) ? value.replace(/\D/g, '') : value,
-    }));
-  };
-
-  const passwordChecks = {
-    length: formData.password.length >= 8,
-    letter: /[a-zA-Z]/.test(formData.password),
-    number: /\d/.test(formData.password),
-    special: /[^A-Za-z\d\s]/.test(formData.password),
-  };
-  const isPasswordStrong = Object.values(passwordChecks).every(Boolean);
-
-  const servicePasswordChecks = {
-    length: formData.servicePassword.length >= 8,
-    letter: /[a-zA-Z]/.test(formData.servicePassword),
-    number: /\d/.test(formData.servicePassword),
-    special: /[^A-Za-z\d\s]/.test(formData.servicePassword),
-  };
-  const isServicePasswordStrong = Object.values(servicePasswordChecks).every(Boolean);
-
-  const isPhoneValid = /^\d{10,11}$/.test(formData.phone);
-
-  const handleEmailBlur = async () => {
-    if (!formData.email || !formData.email.includes('@')) return;
-    try {
-      const res = await api.post<{ success: boolean; data: { exists: boolean; alreadyJoined?: boolean; services?: Array<{key: string, status: string}> } }>('/auth/check-email', { email: formData.email, service: 'glycopharm' });
-      const result = res.data;
-      if (result.success && result.data.exists) {
-        if (result.data.alreadyJoined) {
-          setError('이미 GlycoPharm 서비스에 가입된 계정입니다. 로그인해 주세요.');
-        } else {
-          setExistingAccountMode(true);
-          setExistingServices(result.data.services || []);
-          setError(null);
-        }
-      } else {
-        setExistingAccountMode(false);
-        setExistingServices([]);
-      }
-    } catch { /* silent */ }
-  };
-
-  const isStep1Valid = () => {
-    const base = formData.lastName && formData.firstName && formData.nickname
-      && formData.email && isPhoneValid;
-    const pwValid = existingAccountMode
-      ? formData.currentPassword.length > 0
-        && isServicePasswordStrong
-        && formData.servicePassword === formData.servicePasswordConfirm
-      : isPasswordStrong && formData.password === formData.passwordConfirm;
-    return !!(base && pwValid);
-  };
-
-  const isStep3Valid = () => {
-    const terms = formData.agreeTerms && formData.agreePrivacy;
-    if (participationType === 'pharmacist') return terms;
-    if (participationType === 'pharmacy_owner') {
-      return terms && !!(formData.businessName && formData.businessNumber
-        && formData.taxEmail && formData.representativeName);
-    }
-    return false;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setIsLoading(true);
-
-    try {
-      const commonFields = {
-        email: formData.email,
-        ...(existingAccountMode
-          ? {
-              password: formData.currentPassword,
-              currentPassword: formData.currentPassword,
-              servicePassword: formData.servicePassword,
-            }
-          : {
-              password: formData.password,
-              passwordConfirm: formData.passwordConfirm,
-            }),
-        lastName: formData.lastName,
-        firstName: formData.firstName,
-        nickname: formData.nickname,
-        phone: formData.phone.replace(/\D/g, ''),
-        service: 'glycopharm',
-        tos: formData.agreeTerms,
-        privacyAccepted: formData.agreePrivacy,
-        marketingAccepted: formData.agreeMarketing,
-      };
-
-      if (participationType === 'pharmacist') {
-        await api.post('/auth/register', {
-          ...commonFields,
-          role: 'user',
-          subRole: 'staff_pharmacist',
-          ...(formData.licenseNumber ? { licenseNumber: formData.licenseNumber } : {}),
-        });
-      } else {
-        // pharmacy_owner
-        await api.post('/auth/register', {
-          ...commonFields,
-          role: 'pharmacy',
-          businessName: formData.businessName,
-          representativeName: formData.representativeName,
-          businessNumber: formData.businessNumber,
-          taxEmail: formData.taxEmail,
-          ...(formData.licenseNumber ? { licenseNumber: formData.licenseNumber } : {}),
-          ...(formData.businessType ? { businessType: formData.businessType } : {}),
-          ...(formData.businessCategory ? { businessCategory: formData.businessCategory } : {}),
-          ...(formData.zipCode ? { zipCode: formData.zipCode } : {}),
-          ...(formData.address1 ? { address1: formData.address1 } : {}),
-          ...(formData.address2 ? { address2: formData.address2 } : {}),
-        });
-      }
-
-      setRegistrationComplete(true);
-      void navigate;
-    } catch (err: any) {
-      if (err.response?.data) {
-        const data = err.response.data;
-        const status = err.response.status;
-        if (status === 401 && data.code === 'PASSWORD_MISMATCH') {
-          setExistingAccountMode(true);
-          if (data.services) setExistingServices(data.services);
-          setError('비밀번호가 일치하지 않습니다. O4O 계정 가입 시 사용한 기존 비밀번호를 입력해주세요.');
-          setStep(1);
-        } else if (status === 409) {
-          if (data.code === 'SERVICE_ALREADY_JOINED') {
-            setError('이미 GlycoPharm 서비스에 가입된 계정입니다. 로그인해 주세요.');
-          } else {
-            setError('이미 가입된 이메일입니다. 기존 계정으로 로그인해 주세요.');
-          }
-          setStep(1);
-        } else {
-          let msg = data.error || data.message || '가입 신청에 실패했습니다.';
-          if (data.details && Array.isArray(data.details) && data.details.length > 0) {
-            const fieldErrors = data.details
-              .map((d: { property?: string; constraints?: Record<string, string> }) => {
-                const msgs = d.constraints ? Object.values(d.constraints).join(', ') : d.property;
-                return `${d.property}: ${msgs}`;
-              })
-              .join('\n');
-            msg += '\n' + fieldErrors;
-          }
-          setError(msg);
-        }
-      } else {
-        setError('가입 신청에 실패했습니다.');
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // ── 완료 화면 ──
-  if (registrationComplete) {
-    return (
-      <div className="min-h-screen flex items-center justify-center px-4 bg-white">
-        <div className="max-w-md text-center">
-          <CheckCircle2 className="w-16 h-16 text-blue-600 mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-slate-800 mb-2">가입 신청 완료</h2>
-          <p className="text-slate-500 mb-6">
-            {participationType === 'pharmacist' ? (
-              <>약사 회원 가입 신청이 접수되었습니다.<br />운영자 승인 후 이용하실 수 있습니다.</>
-            ) : (
-              <>약국 경영자 가입 신청이 접수되었습니다.<br />운영자 승인 후 매장 HUB와 내 매장 메뉴를 이용하실 수 있습니다.</>
-            )}
-          </p>
-          <NavLink
-            to="/login"
-            className="inline-block px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors"
-          >
-            로그인 페이지로
-          </NavLink>
-        </div>
-      </div>
-    );
-  }
-
-  const stepLabel = ['공통 정보', '참여 유형', '추가 정보'];
+  const [modalOpen, setModalOpen] = useState(false);
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 bg-white">
-      <div className="w-full max-w-lg">
-        <NavLink to="/" className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 mb-6">
-          <ArrowLeft className="w-4 h-4" />
-          홈으로
-        </NavLink>
-
-        {/* Header */}
-        <div className="text-center mb-6">
-          <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center">
-              <Activity className="w-8 h-8 text-white" />
-            </div>
-          </div>
-          <h1 className="text-2xl font-bold text-slate-800">회원가입</h1>
-          <p className="text-slate-500 mt-1">GlycoPharm 가입신청</p>
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col items-center justify-center px-4 py-16">
+      {/* Logo / Brand */}
+      <div className="flex flex-col items-center mb-10">
+        <div className="w-20 h-20 rounded-2xl bg-blue-600 flex items-center justify-center mb-4 shadow-lg">
+          <Activity className="w-10 h-10 text-white" />
         </div>
-
-        {/* Step indicator */}
-        <div className="flex items-center justify-center gap-2 mb-6">
-          {([1, 2, 3] as Step[]).map((s, i) => (
-            <div key={s} className="flex items-center gap-2">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
-                step === s ? 'bg-blue-600 text-white' : step > s ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-400'
-              }`}>
-                {step > s ? <CheckCircle2 className="w-4 h-4" /> : s}
-              </div>
-              <span className={`text-xs hidden sm:inline ${step === s ? 'text-blue-600 font-medium' : 'text-slate-400'}`}>
-                {stepLabel[i]}
-              </span>
-              {s < 3 && <div className="w-8 h-px bg-slate-200" />}
-            </div>
-          ))}
-        </div>
-
-        <div className="bg-white rounded-2xl border border-slate-200 p-8">
-          {/* ─── STEP 1: 공통 정보 ─── */}
-          {step === 1 && (
-            <div className="space-y-5">
-              <h2 className="text-base font-semibold text-slate-800 mb-4">기본 정보를 입력해 주세요</h2>
-
-              {error && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-xl">
-                  <p className="text-sm text-red-600 whitespace-pre-line">{error}</p>
-                </div>
-              )}
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">성 <span className="text-red-500">*</span></label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                    <input type="text" name="lastName" value={formData.lastName} onChange={handleInputChange}
-                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="홍" required />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">이름 <span className="text-red-500">*</span></label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                    <input type="text" name="firstName" value={formData.firstName} onChange={handleInputChange}
-                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="길동" required />
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">닉네임 <span className="text-red-500">*</span></label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                  <input type="text" name="nickname" value={formData.nickname} onChange={handleInputChange}
-                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="서비스에서 사용할 닉네임" required />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">아이디 (이메일) <span className="text-red-500">*</span></label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                  <input type="email" name="email" value={formData.email} onChange={handleInputChange} onBlur={handleEmailBlur}
-                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="example@email.com" required />
-                </div>
-              </div>
-
-              {existingAccountMode && (
-                <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-xl p-4">
-                  <p className="font-semibold text-sm">이미 O4O 플랫폼 계정이 존재합니다</p>
-                  <p className="text-sm mt-1">
-                    기존 계정 확인을 위해 현재 사용 중인 비밀번호를 입력해 주세요.<br />
-                    GlycoPharm에서 사용할 비밀번호는 별도로 설정할 수 있습니다.
-                  </p>
-                  {existingServices.length > 0 && (
-                    <p className="text-xs mt-1 text-blue-600">
-                      가입된 서비스: {existingServices.map(s => SERVICE_LABELS[s.key] || s.key).join(', ')}
-                    </p>
-                  )}
-                  <div className="mt-2 text-xs space-x-2">
-                    <a href="/login" className="text-blue-700 underline">로그인</a>
-                    <span>·</span>
-                    <a href="/forgot-password" className="text-blue-700 underline">비밀번호 찾기</a>
-                  </div>
-                </div>
-              )}
-
-              {existingAccountMode ? (
-                <>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">기존 O4O 계정 비밀번호 <span className="text-red-500">*</span></label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                      <input type={showPassword ? 'text' : 'password'} name="currentPassword" value={formData.currentPassword} onChange={handleInputChange}
-                        className="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="현재 O4O 계정 비밀번호" required />
-                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2">
-                        {showPassword ? <EyeOff className="w-5 h-5 text-slate-400" /> : <Eye className="w-5 h-5 text-slate-400" />}
-                      </button>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">GlycoPharm 비밀번호 <span className="text-red-500">*</span></label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                      <input type="password" name="servicePassword" value={formData.servicePassword} onChange={handleInputChange}
-                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="GlycoPharm에서 사용할 비밀번호" required />
-                    </div>
-                    {formData.servicePassword && (
-                      <div className="mt-2 space-y-1">
-                        {(['length', 'letter', 'number', 'special'] as const).map((key) => {
-                          const labels = { length: '8자 이상', letter: '영문 포함', number: '숫자 포함', special: '특수문자 포함' };
-                          return (
-                            <div key={key} className="flex items-center gap-1.5">
-                              {servicePasswordChecks[key] ? <CheckCircle2 className="w-3.5 h-3.5 text-green-500" /> : <Circle className="w-3.5 h-3.5 text-slate-300" />}
-                              <span className={`text-xs ${servicePasswordChecks[key] ? 'text-green-600' : 'text-slate-400'}`}>{labels[key]}</span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">GlycoPharm 비밀번호 확인 <span className="text-red-500">*</span></label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                      <input type="password" name="servicePasswordConfirm" value={formData.servicePasswordConfirm} onChange={handleInputChange}
-                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="GlycoPharm 비밀번호 재입력" required />
-                    </div>
-                    {formData.servicePasswordConfirm && formData.servicePassword !== formData.servicePasswordConfirm && (
-                      <p className="text-xs text-red-500 mt-1">비밀번호가 일치하지 않습니다</p>
-                    )}
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">비밀번호 <span className="text-red-500">*</span></label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                      <input type={showPassword ? 'text' : 'password'} name="password" value={formData.password} onChange={handleInputChange}
-                        className="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="영문, 숫자, 특수문자 포함 8자 이상" required />
-                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2">
-                        {showPassword ? <EyeOff className="w-5 h-5 text-slate-400" /> : <Eye className="w-5 h-5 text-slate-400" />}
-                      </button>
-                    </div>
-                    {formData.password && (
-                      <div className="mt-2 space-y-1">
-                        {(['length', 'letter', 'number', 'special'] as const).map((key) => {
-                          const labels = { length: '8자 이상', letter: '영문 포함', number: '숫자 포함', special: '특수문자 포함' };
-                          return (
-                            <div key={key} className="flex items-center gap-1.5">
-                              {passwordChecks[key] ? <CheckCircle2 className="w-3.5 h-3.5 text-green-500" /> : <Circle className="w-3.5 h-3.5 text-slate-300" />}
-                              <span className={`text-xs ${passwordChecks[key] ? 'text-green-600' : 'text-slate-400'}`}>{labels[key]}</span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">비밀번호 확인 <span className="text-red-500">*</span></label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                      <input type="password" name="passwordConfirm" value={formData.passwordConfirm} onChange={handleInputChange}
-                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="비밀번호 재입력" required />
-                    </div>
-                    {formData.passwordConfirm && formData.password !== formData.passwordConfirm && (
-                      <p className="text-xs text-red-500 mt-1">비밀번호가 일치하지 않습니다</p>
-                    )}
-                  </div>
-                </>
-              )}
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">휴대전화 <span className="text-red-500">*</span></label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                  <input type="tel" name="phone" inputMode="numeric" value={formData.phone} onChange={handleInputChange}
-                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="숫자만 입력 (01012345678)" required />
-                </div>
-                {formData.phone && !isPhoneValid && (
-                  <p className="text-xs text-red-500 mt-1">휴대전화 번호는 10~11자리 숫자여야 합니다</p>
-                )}
-              </div>
-
-              <button
-                type="button"
-                disabled={!isStep1Valid()}
-                onClick={() => { setError(null); setStep(2); }}
-                className="w-full py-3 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
-              >
-                다음 단계
-                <ArrowRight className="w-4 h-4" />
-              </button>
-
-              <p className="text-center text-sm text-slate-500">
-                이미 계정이 있으신가요?{' '}
-                <NavLink to="/login" className="text-blue-600 font-medium hover:text-blue-700">로그인</NavLink>
-              </p>
-            </div>
-          )}
-
-          {/* ─── STEP 2: 참여 유형 선택 ─── */}
-          {step === 2 && (
-            <div className="space-y-5">
-              <div>
-                <button type="button" onClick={() => setStep(1)} className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 mb-4">
-                  <ArrowLeft className="w-4 h-4" />
-                  이전
-                </button>
-                <h2 className="text-base font-semibold text-slate-800 mb-2">참여 유형을 선택해 주세요</h2>
-                <p className="text-sm text-slate-500 mb-6">선택한 유형에 따라 추가 정보 입력 및 이용 가능한 서비스가 달라집니다.</p>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4">
-                <button
-                  type="button"
-                  onClick={() => { setParticipationType('pharmacist'); setStep(3); }}
-                  className="flex items-start gap-4 p-5 rounded-xl border-2 border-slate-200 hover:border-blue-400 hover:bg-blue-50 transition-all text-left"
-                >
-                  <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
-                    <Stethoscope className="w-6 h-6 text-blue-600" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-slate-800 mb-1">약사 / 근무약사</p>
-                    <p className="text-sm text-slate-500">약사 회원으로 가입합니다. 커뮤니티, 콘텐츠, 강의 등 일반 서비스를 이용할 수 있습니다.</p>
-                    <p className="text-xs text-slate-400 mt-2">승인 후 역할: 약사 회원</p>
-                  </div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => { setParticipationType('pharmacy_owner'); setStep(3); }}
-                  className="flex items-start gap-4 p-5 rounded-xl border-2 border-slate-200 hover:border-blue-400 hover:bg-blue-50 transition-all text-left"
-                >
-                  <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center shrink-0">
-                    <Building2 className="w-6 h-6 text-green-600" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-slate-800 mb-1">약국 경영자</p>
-                    <p className="text-sm text-slate-500">약국을 운영하는 경영자로 가입합니다. 사업자 정보 입력이 필요합니다.</p>
-                    <p className="text-xs text-slate-400 mt-2">승인 후 매장 HUB와 내 매장 메뉴를 이용하실 수 있습니다.</p>
-                  </div>
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* ─── STEP 3: 추가 정보 ─── */}
-          {step === 3 && (
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <button type="button" onClick={() => setStep(2)} className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 mb-4">
-                  <ArrowLeft className="w-4 h-4" />
-                  이전
-                </button>
-                <h2 className="text-base font-semibold text-slate-800 mb-1">
-                  {participationType === 'pharmacist' ? '약사 / 근무약사' : '약국 경영자'} 추가 정보
-                </h2>
-                <p className="text-sm text-slate-500 mb-4">
-                  {participationType === 'pharmacist'
-                    ? '약사 면허번호를 입력하시면 심사에 도움이 됩니다.'
-                    : '약국 정보와 사업자 정보를 입력해 주세요.'}
-                </p>
-              </div>
-
-              {error && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-xl">
-                  <p className="text-sm text-red-600 whitespace-pre-line">{error}</p>
-                </div>
-              )}
-
-              {/* 약사/근무약사 추가 정보 */}
-              {participationType === 'pharmacist' && (
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">약사 면허번호 <span className="text-slate-400 text-xs">(선택)</span></label>
-                  <input type="text" name="licenseNumber" value={formData.licenseNumber} onChange={handleInputChange}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="면허번호 입력 (선택 사항)" />
-                  <p className="text-xs text-slate-400 mt-1">면허번호는 운영자 심사 시 참고됩니다.</p>
-                </div>
-              )}
-
-              {/* 약국 경영자 추가 정보 */}
-              {participationType === 'pharmacy_owner' && (
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">약국명 <span className="text-red-500">*</span></label>
-                    <div className="relative">
-                      <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                      <input type="text" name="businessName" value={formData.businessName} onChange={handleInputChange}
-                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="건강약국" required />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">대표자명 <span className="text-red-500">*</span></label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                      <input type="text" name="representativeName" value={formData.representativeName} onChange={handleInputChange}
-                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="약국 대표자 이름" required />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">사업자등록번호 <span className="text-red-500">*</span></label>
-                    <input type="text" name="businessNumber" inputMode="numeric" value={formData.businessNumber} onChange={handleInputChange}
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="숫자만 입력 (1234567890)" maxLength={10} required />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">약사 면허번호 <span className="text-slate-400 text-xs">(선택)</span></label>
-                    <input type="text" name="licenseNumber" value={formData.licenseNumber} onChange={handleInputChange}
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="대표 약사 면허번호 (있는 경우)" />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">세금계산서 이메일 <span className="text-red-500">*</span></label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                      <input type="email" name="taxEmail" value={formData.taxEmail} onChange={handleInputChange}
-                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="tax@pharmacy.com" required />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">업태</label>
-                      <input type="text" name="businessType" value={formData.businessType} onChange={handleInputChange}
-                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="소매업" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">업종</label>
-                      <input type="text" name="businessCategory" value={formData.businessCategory} onChange={handleInputChange}
-                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="의약품" />
-                    </div>
-                  </div>
-
-                  <AddressSearch
-                    zipCode={formData.zipCode}
-                    address={formData.address1}
-                    addressDetail={formData.address2}
-                    onChange={({ zipCode, address, addressDetail }) =>
-                      setFormData(prev => ({ ...prev, zipCode, address1: address, address2: addressDetail }))
-                    }
-                    inputClassName="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-              )}
-
-              {/* 약관 동의 */}
-              <div className="space-y-3 pt-4 border-t">
-                <div className="flex items-start gap-3">
-                  <input type="checkbox" name="agreeTerms" checked={formData.agreeTerms} onChange={handleInputChange}
-                    className="mt-0.5 w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer" required />
-                  <span className="text-sm text-slate-600">
-                    <span className="text-red-500">* </span>
-                    <button type="button" onClick={() => setTermsModal('terms')} className="text-blue-600 underline hover:text-blue-700">이용약관</button>
-                    에 동의합니다
-                  </span>
-                </div>
-                <div className="flex items-start gap-3">
-                  <input type="checkbox" name="agreePrivacy" checked={formData.agreePrivacy} onChange={handleInputChange}
-                    className="mt-0.5 w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer" required />
-                  <span className="text-sm text-slate-600">
-                    <span className="text-red-500">* </span>
-                    <button type="button" onClick={() => setTermsModal('privacy')} className="text-blue-600 underline hover:text-blue-700">개인정보처리방침</button>
-                    에 동의합니다
-                  </span>
-                </div>
-                <label className="flex items-start gap-3 cursor-pointer">
-                  <input type="checkbox" name="agreeMarketing" checked={formData.agreeMarketing} onChange={handleInputChange}
-                    className="mt-0.5 w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
-                  <span className="text-sm text-slate-600">마케팅 정보 수신에 동의합니다 (선택)</span>
-                </label>
-              </div>
-
-              <button
-                type="submit"
-                disabled={!isStep3Valid() || isLoading}
-                className="w-full py-3 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isLoading ? '신청 처리 중...' : '가입신청'}
-              </button>
-            </form>
-          )}
-        </div>
-
-        {/* Terms / Privacy Modal */}
-        {termsModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setTermsModal(null)}>
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col" onClick={e => e.stopPropagation()}>
-              <div className="flex items-center justify-between p-5 border-b">
-                <h2 className="text-lg font-bold text-slate-800">
-                  {termsModal === 'terms' ? '이용약관' : '개인정보처리방침'}
-                </h2>
-                <button type="button" onClick={() => setTermsModal(null)} className="p-1 rounded-lg hover:bg-slate-100">
-                  <X className="w-5 h-5 text-slate-500" />
-                </button>
-              </div>
-              <div className="p-5 overflow-y-auto text-sm text-slate-700 leading-relaxed space-y-4">
-                {termsModal === 'terms' ? (
-                  <>
-                    <h3 className="font-bold text-base">제1조 (목적)</h3>
-                    <p>이 약관은 GlycoPharm(이하 "서비스")이 제공하는 혈당관리 플랫폼 서비스의 이용 조건 및 절차, 회사와 회원 간의 권리·의무 및 책임사항을 규정함을 목적으로 합니다.</p>
-                    <h3 className="font-bold text-base">제2조 (정의)</h3>
-                    <p>1. "서비스"란 GlycoPharm이 운영하는 혈당관리 플랫폼을 의미합니다.</p>
-                    <p>2. "회원"이란 본 약관에 동의하고 서비스 이용 계약을 체결한 자를 의미합니다.</p>
-                    <h3 className="font-bold text-base">제3조 (약관의 효력 및 변경)</h3>
-                    <p>본 약관은 서비스 화면에 게시하거나 기타의 방법으로 회원에게 공지함으로써 효력이 발생합니다.</p>
-                    <h3 className="font-bold text-base">제4조 (회원가입 및 서비스 이용)</h3>
-                    <p>1. 회원가입은 약사/근무약사 회원 또는 약국 경영자로 신청 가능합니다.</p>
-                    <p>2. 모든 회원은 운영자 승인 후 서비스를 이용하실 수 있습니다.</p>
-                    <p>3. 회원은 가입 시 정확한 정보를 제공해야 하며, 허위 정보 제공 시 서비스 이용이 제한될 수 있습니다.</p>
-                    <p className="text-xs text-slate-400 pt-4 border-t">시행일: 2026년 3월 17일</p>
-                  </>
-                ) : (
-                  <>
-                    <h3 className="font-bold text-base">1. 개인정보의 수집 및 이용 목적</h3>
-                    <p>GlycoPharm은 회원 가입 및 관리, 서비스 제공을 위하여 개인정보를 처리합니다.</p>
-                    <h3 className="font-bold text-base">2. 수집하는 개인정보 항목</h3>
-                    <p><strong>필수 항목:</strong> 이메일, 비밀번호, 성명, 닉네임, 휴대전화 번호</p>
-                    <p><strong>약국 경영자 추가 항목:</strong> 약국명, 사업자등록번호, 세금계산서 이메일, 업태, 업종, 주소</p>
-                    <h3 className="font-bold text-base">3. 개인정보의 보유 및 이용 기간</h3>
-                    <p>회원 탈퇴 시까지 보유하며, 관계 법령에 따라 일정 기간 보존이 필요한 경우 해당 기간 동안 보관합니다.</p>
-                    <h3 className="font-bold text-base">4. 정보주체의 권리</h3>
-                    <p>정보주체는 언제든지 개인정보 열람, 정정, 삭제, 처리 정지 요구를 할 수 있습니다.</p>
-                    <p className="text-xs text-slate-400 pt-4 border-t">시행일: 2026년 3월 17일</p>
-                  </>
-                )}
-              </div>
-              <div className="p-4 border-t">
-                <button type="button" onClick={() => setTermsModal(null)}
-                  className="w-full py-2.5 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition-colors">
-                  확인
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        <h1 className="text-3xl font-bold text-slate-800">GlycoPharm</h1>
+        <p className="text-slate-500 mt-2 text-center">약사와 약국 경영자를 위한 혈당관리 플랫폼</p>
       </div>
+
+      {/* 참여 유형 안내 카드 */}
+      <div className="w-full max-w-2xl grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+        <div className="bg-white rounded-2xl border border-blue-100 p-6 shadow-sm">
+          <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center mb-4">
+            <Stethoscope className="w-6 h-6 text-blue-600" />
+          </div>
+          <h3 className="font-semibold text-slate-800 mb-2">약사 / 근무약사</h3>
+          <p className="text-sm text-slate-500 leading-relaxed">
+            약사 회원으로 가입합니다.<br />
+            커뮤니티, 콘텐츠, 강의 등 일반 서비스를 이용하실 수 있습니다.
+          </p>
+        </div>
+        <div className="bg-white rounded-2xl border border-green-100 p-6 shadow-sm">
+          <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center mb-4">
+            <Building2 className="w-6 h-6 text-green-600" />
+          </div>
+          <h3 className="font-semibold text-slate-800 mb-2">약국 경영자</h3>
+          <p className="text-sm text-slate-500 leading-relaxed">
+            약국을 운영하는 경영자로 가입합니다.<br />
+            승인 후 매장 HUB와 내 매장 메뉴를 이용하실 수 있습니다.
+          </p>
+        </div>
+      </div>
+
+      {/* 안내 문구 */}
+      <div className="w-full max-w-2xl bg-white rounded-2xl border border-slate-100 p-5 mb-8 shadow-sm">
+        <div className="flex flex-col gap-3">
+          <div className="flex items-start gap-3">
+            <ShieldCheck className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
+            <p className="text-sm text-slate-600">가입신청 후 운영자 승인 절차를 거칩니다.</p>
+          </div>
+          <div className="flex items-start gap-3">
+            <Clock className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
+            <p className="text-sm text-slate-600">기존 O4O 계정이 있는 경우에도 GlycoPharm 비밀번호를 별도로 설정할 수 있습니다.</p>
+          </div>
+        </div>
+      </div>
+
+      {/* CTA */}
+      <div className="w-full max-w-md flex flex-col gap-3">
+        <button
+          onClick={() => setModalOpen(true)}
+          className="w-full py-4 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors shadow-sm text-lg"
+        >
+          가입신청 시작
+        </button>
+        <p className="text-center text-sm text-slate-500">
+          이미 가입하셨나요?{' '}
+          <NavLink to="/login" className="text-blue-600 font-medium hover:text-blue-700">
+            로그인
+          </NavLink>
+        </p>
+      </div>
+
+      {/* 가입신청 모달 */}
+      <RegisterFlowModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </div>
   );
 }
