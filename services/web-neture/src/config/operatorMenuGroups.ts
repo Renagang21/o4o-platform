@@ -113,31 +113,66 @@ export function filterMenuByRole(
 }
 
 /**
- * operator 업무 경로 — admin 메뉴에서도 /operator/* 그대로 유지.
- * WO-O4O-NETURE-ADMIN-OPERATOR-URL-SEPARATION-V1:
- *   이 경로들은 operator 업무이므로 admin layout에서 접근해도 /operator/* URL 사용.
- *   /admin/* 에 동일 경로가 있으면 /operator/* 로 redirect됨.
- */
-const KEEP_AS_OPERATOR_PATHS = new Set([
-  '/operator/applications', // 가입 승인 — operator 업무
-  '/operator/market-trial', // 유통 참여형 펀딩 — operator 업무 (/admin/market-trial 이미 redirect 중)
-]);
-
-/**
- * Admin 전용 메뉴 생성
- * WO-O4O-ROLE-ROUTE-ISOLATION-V1
- * 모든 항목 (adminOnly 포함) + /operator → /admin prefix 치환
- * WO-O4O-NETURE-ADMIN-OPERATOR-URL-SEPARATION-V1: operator 업무 경로는 /operator/* 유지
+ * Admin 전용 sidebar 메뉴
+ *
+ * WO-O4O-NETURE-ADMIN-DASHBOARD-ACTUAL-STRUCTURE-FIX-V1:
+ *   기존 getAdminMenu() 는 UNIFIED_MENU 의 모든 항목 (operator 업무 포함) 을 admin sidebar 에
+ *   /admin/* prefix 로 노출했다. 결과적으로 /admin 좌측 메뉴가 operator sidebar 의 superset 으로
+ *   보였다 ("operator 처럼 보임" 증상의 핵심).
+ *
+ *   본 함수는 admin 전용 항목 (UNIFIED_MENU 의 adminOnly: true 항목 + 회원 완전삭제) 만 뽑아 보여준다.
+ *   가입 승인 / 상품 관리 / 주문 관리 / 사이니지 / 포럼 / AI 리포트 같은 operator 업무는
+ *   admin sidebar 에서 제외되며, system group 의 "운영자 업무 →" 링크로 /operator 진입 안내.
+ *
+ *   /admin/* 라우트 자체는 보존 — 직접 URL 접근 시 admin 전용 페이지가 동작한다.
+ *   admin 계정이 operator 영역으로 진입하려면 /operator 로 이동 (AdminRoute 가 operator 업무를
+ *   별도 접근 차단하지 않음).
  */
 export function getAdminMenu(): Partial<Record<OperatorGroupKey, OperatorMenuItem[]>> {
-  const result: Partial<Record<OperatorGroupKey, OperatorMenuItem[]>> = {};
-  for (const [key, items] of Object.entries(UNIFIED_MENU) as [OperatorGroupKey, UnifiedMenuItem[]][]) {
-    result[key] = items.map(({ adminOnly: _, path, ...rest }) => ({
-      ...rest,
-      path: KEEP_AS_OPERATOR_PATHS.has(path) ? path : path.replace(/^\/operator/, '/admin'),
-    }));
-  }
-  return result;
+  return {
+    dashboard: [
+      { label: '관리자 대시보드', path: '/admin', exact: true },
+    ],
+    users: [
+      // WO-O4O-NETURE-ADMIN-MEMBER-HARD-DELETE-V1: admin 전용 완전삭제 관리
+      { label: '회원 완전삭제', path: '/admin/members' },
+      { label: '운영자 관리', path: '/admin/operators' },
+      { label: '문의 메시지', path: '/admin/contact-messages' },
+    ],
+    approvals: [
+      // admin 전용 승인 화면 (공급사 정식 승인 / 서비스 승인 등 — operator 의 "가입 승인" 과 별도 트랙)
+      { label: '공급사 승인', path: '/admin/admin-suppliers' },
+      { label: '서비스 승인', path: '/admin/service-approvals' },
+    ],
+    products: [
+      { label: '카테고리 관리', path: '/admin/categories' },
+      { label: '브랜드 관리', path: '/admin/brands' },
+      { label: '상품 데이터 정리', path: '/admin/product-cleanup' },
+      { label: '마스터 관리', path: '/admin/masters' },
+      { label: '카탈로그 일괄등록', path: '/admin/catalog-import' },
+      { label: '카테고리 매핑', path: '/admin/category-mapping-rules' },
+    ],
+    orders: [
+      { label: '파트너 현황', path: '/admin/partners' },
+      { label: '정산 관리', path: '/admin/settlements' },
+      { label: '파트너 정산', path: '/admin/partner-settlements' },
+      { label: '커미션 관리', path: '/admin/commissions' },
+    ],
+    content: [
+      { label: '커뮤니티 광고', path: '/admin/community-admin' },
+    ],
+    analytics: [
+      { label: 'AI 관리', path: '/admin/ai-admin' },
+      { label: 'AI 카드 규칙', path: '/admin/ai-card-rules' },
+      { label: 'AI 비즈팩', path: '/admin/ai-business-pack' },
+    ],
+    system: [
+      { label: '역할 관리', path: '/admin/roles' },
+      { label: '이메일 설정', path: '/admin/settings/email' },
+      // admin 계정이 operator 영역으로 진입하는 단일 게이트 (관리자 sidebar 에는 operator 업무를 직접 두지 않는다)
+      { label: '운영자 업무 →', path: '/operator' },
+    ],
+  };
 }
 
 // ─── Legacy export (하위호환, deprecated) ───
