@@ -20,6 +20,8 @@ import logger from '../../../utils/logger.js';
 import { hasAnyServiceRole } from '../../../utils/role.utils.js';
 import { autoListPublicProductsForOrg, autoListServiceProductsForOrg } from '../../../utils/auto-listing.utils.js';
 import { organizationOpsService } from '../../../modules/organization/services/organization-ops.service.js';
+// WO-O4O-GLYCOPHARM-PHARMACY-OWNER-APPROVAL-ROLE-SYNC-V1: Application 승인 시 user-level role 동기화
+import { roleAssignmentService } from '../../../modules/auth/services/role-assignment.service.js';
 
 interface AuthRequest extends Request {
   user?: {
@@ -409,6 +411,45 @@ export function createAdminController(
             logger.info(
               `[Glycopharm Admin] organization_members owner record created for user ${application.userId} → org ${createdOrg.id}`
             );
+
+            // WO-O4O-GLYCOPHARM-PHARMACY-OWNER-APPROVAL-ROLE-SYNC-V1:
+            // Application 승인 시 user-level service_memberships + role_assignments 동기화.
+            // Idempotent — Path B (pharmacist member 승인) 이 먼저 실행되었더라도 안전.
+            //   - service_memberships: UPSERT (이미 active 이면 approved_by/at 보존)
+            //   - role_assignments: assignRole 이 자체 reactivate 처리 → 중복 안전
+            try {
+              await dataSource.query(
+                `INSERT INTO service_memberships (user_id, service_key, status, role, approved_by, approved_at, created_at, updated_at)
+                 VALUES ($1, 'glycopharm', 'active', 'pharmacist', $2, NOW(), NOW(), NOW())
+                 ON CONFLICT (user_id, service_key) DO UPDATE
+                   SET status = 'active',
+                       approved_by = COALESCE(service_memberships.approved_by, EXCLUDED.approved_by),
+                       approved_at = COALESCE(service_memberships.approved_at, EXCLUDED.approved_at),
+                       updated_at = NOW()`,
+                [application.userId, userId ?? null],
+              );
+
+              await roleAssignmentService.assignRole({
+                userId: application.userId,
+                role: 'glycopharm:pharmacist',
+                assignedBy: userId,
+              });
+              await roleAssignmentService.assignRole({
+                userId: application.userId,
+                role: 'glycopharm:store_owner',
+                assignedBy: userId,
+              });
+
+              logger.info(
+                `[Glycopharm Admin] service_memberships + roles synced for user ${application.userId} (glycopharm:pharmacist + glycopharm:store_owner)`
+              );
+            } catch (syncError) {
+              // 조직/extension/enrollment 는 이미 생성 완료 — role sync 실패는 후속 재시도 가능
+              logger.error(
+                `[Glycopharm Admin] Role/membership sync failed for user ${application.userId}:`,
+                syncError
+              );
+            }
 
             // WO-NETURE-TIER1-AUTO-EXPANSION-BETA-V1: Tier 1 자동 확산
             autoListPublicProductsForOrg(dataSource, createdOrg.id, 'glycopharm')
