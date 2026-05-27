@@ -2,8 +2,9 @@
  * Store Execution Assets API Client — K-Cosmetics
  *
  * WO-O4O-STORE-EXECUTION-ASSETS-CROSSSERVICE-PHASE2-D-V1
+ * WO-O4O-PRODUCTION-AI-EDITOR-CROSSSERVICE-PHASE2-I-V1: createStoreExecutionAsset 추가
  *
- * GET /api/v1/cosmetics/store/assets
+ * GET/POST /api/v1/cosmetics/store/assets
  */
 
 import { api } from '../lib/apiClient';
@@ -36,6 +37,23 @@ export interface StoreAssetPaginatedResponse {
   page: number;
   limit: number;
   total: number;
+}
+
+export interface CreateStoreAssetParams {
+  title: string;
+  description?: string;
+  assetType?: AssetType;
+  sourceType?: string;
+  category?: string;
+  htmlContent?: string;
+  usageType?: UsageType;
+}
+
+export async function createStoreExecutionAsset(
+  params: CreateStoreAssetParams,
+): Promise<{ success: boolean; data: StoreExecutionAsset }> {
+  const res = await api.post('/cosmetics/store/assets', params);
+  return res.data as { success: boolean; data: StoreExecutionAsset };
 }
 
 export async function getStoreExecutionAssets(opts?: {

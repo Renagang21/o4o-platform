@@ -274,6 +274,8 @@ const StoreLibraryContentsPage = lazy(() => import('@/pages/store-management/Sto
 const StoreLibraryResourcesPage = lazy(() => import('@/pages/store-management/StoreLibraryResourcesPage'));
 // WO-O4O-STORE-PRODUCTION-MATERIALS-CROSSSERVICE-PHASE2-C-V1: 제작 자료
 const StoreProductionMaterialsPage = lazy(() => import('@/pages/store-management/StoreProductionMaterialsPage'));
+// WO-O4O-PRODUCTION-AI-EDITOR-CROSSSERVICE-PHASE2-I-V1: AI 제작 자료 편집
+const ProductionMaterialEditorPage = lazy(() => import('@/pages/store-management/ProductionMaterialEditorPage'));
 
 // Loading fallback
 function PageLoading() {
@@ -768,6 +770,7 @@ function AppRoutes() {
         <Route path="library/contents" element={<StoreLibraryContentsPage />} />
         <Route path="library/resources" element={<StoreLibraryResourcesPage />} />
         <Route path="library/production-materials" element={<StoreProductionMaterialsPage />} />
+        <Route path="library/production-materials/new" element={<ProductionMaterialEditorPage />} />
         <Route path="management" element={<PharmacyManagement />} />
         <Route path="management/b2b" element={<PharmacyB2BProducts />} />
       </Route>
