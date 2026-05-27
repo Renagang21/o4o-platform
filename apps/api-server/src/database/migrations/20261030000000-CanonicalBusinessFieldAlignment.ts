@@ -26,10 +26,11 @@ export class CanonicalBusinessFieldAlignment20261030000000 implements MigrationI
     );
 
     // 3. users.businessInfo JSONB 백필 — ceoName → representativeName
+    // businessInfo 컬럼이 json 타입이므로 jsonb_set 사용 전 ::jsonb 캐스트 필요
     await queryRunner.query(`
       UPDATE users
       SET "businessInfo" = jsonb_set(
-        "businessInfo",
+        "businessInfo"::jsonb,
         '{representativeName}',
         to_jsonb("businessInfo"->>'ceoName'),
         true
@@ -43,7 +44,7 @@ export class CanonicalBusinessFieldAlignment20261030000000 implements MigrationI
     await queryRunner.query(`
       UPDATE users
       SET "businessInfo" = jsonb_set(
-        "businessInfo",
+        "businessInfo"::jsonb,
         '{businessAddress}',
         to_jsonb("businessInfo"->>'address'),
         true
@@ -57,7 +58,7 @@ export class CanonicalBusinessFieldAlignment20261030000000 implements MigrationI
     await queryRunner.query(`
       UPDATE users
       SET "businessInfo" = jsonb_set(
-        "businessInfo",
+        "businessInfo"::jsonb,
         '{businessAddressDetail}',
         to_jsonb("businessInfo"->>'address2'),
         true
@@ -71,7 +72,7 @@ export class CanonicalBusinessFieldAlignment20261030000000 implements MigrationI
     await queryRunner.query(`
       UPDATE users
       SET "businessInfo" = jsonb_set(
-        "businessInfo",
+        "businessInfo"::jsonb,
         '{businessItem}',
         to_jsonb("businessInfo"->>'businessCategory'),
         true
