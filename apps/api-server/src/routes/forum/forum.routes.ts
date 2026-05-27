@@ -3,6 +3,7 @@ import { ForumPostController } from '../../controllers/forum/ForumPostController
 import { ForumDirectoryController } from '../../controllers/forum/ForumDirectoryController.js';
 import { ForumCommentController } from '../../controllers/forum/ForumCommentController.js';
 import { ForumModerationController } from '../../controllers/forum/ForumModerationController.js';
+import { ForumMembershipController } from '../../controllers/forum/ForumMembershipController.js';
 // @deprecated WO-PLATFORM-FORUM-APPROVAL-CORE-DECOUPLING-V1: Forum category request approval moved to KPA Extension (/api/v1/kpa/forum-requests/*)
 // import { createForumCategoryRequestRoutes } from '../../controllers/forum/ForumCategoryRequestController.js';
 import { authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
@@ -17,6 +18,7 @@ const postController = new ForumPostController();
 const forumDirectoryController = new ForumDirectoryController();
 const commentController = new ForumCommentController();
 const moderationController = new ForumModerationController();
+const membershipController = new ForumMembershipController();
 
 /**
  * Forum Routes - /api/v1/forum/*
@@ -122,6 +124,27 @@ router.put('/categories/:id', authenticate, forumDirectoryController.updateForum
 
 // Delete forum — direct delete no longer supported (410)
 router.delete('/categories/:id', authenticate, forumDirectoryController.deleteForum.bind(forumDirectoryController));
+
+// ============================================================================
+// Forum Membership — WO-O4O-FORUM-MEMBER-MANAGEMENT-BACKEND-CANONICALIZATION-V1
+// Closed forum join request + member management
+// ============================================================================
+// 가입 신청 (authenticated)
+router.post('/categories/:id/join-requests', authenticate, membershipController.requestJoin.bind(membershipController));
+
+// 대기 중 신청 목록 (owner only)
+router.get('/categories/:id/join-requests', authenticate, membershipController.listJoinRequests.bind(membershipController));
+
+// 승인 / 거절 (owner only)
+router.post('/categories/:id/join-requests/:requestId/approve', authenticate, membershipController.approveJoin.bind(membershipController));
+router.post('/categories/:id/join-requests/:requestId/reject', authenticate, membershipController.rejectJoin.bind(membershipController));
+
+// 회원 목록 / 제거 (owner only)
+router.get('/categories/:id/members', authenticate, membershipController.listMembers.bind(membershipController));
+router.delete('/categories/:id/members/:userId', authenticate, membershipController.removeMember.bind(membershipController));
+
+// 내 멤버십 상태 (optionalAuth — unauthenticated gets isMember:false)
+router.get('/categories/:id/membership-status', optionalAuth, membershipController.getMembershipStatus.bind(membershipController));
 
 // ============================================================================
 // Moderation (authenticated - admin/manager only)

@@ -2,9 +2,11 @@
  * KPA Forum Membership Service
  *
  * WO-KPA-A-FORUM-MEMBERSHIP-TABLE-AND-JOIN-API-V1
- * 폐쇄형 포럼(forumType='closed') 가입 신청/승인/거절/회원 관리
+ * WO-O4O-FORUM-MEMBER-MANAGEMENT-BACKEND-CANONICALIZATION-V1:
+ *   kpa_approval_requests → forum_join_requests (canonical service-agnostic table)
  *
- * - 가입 신청: kpa_approval_requests (entity_type='forum_member_join')
+ * 폐쇄형 포럼(forumType='closed') 가입 신청/승인/거절/회원 관리
+ * - 가입 신청: forum_join_requests
  * - 실제 멤버십: forum_category_members (role='owner'|'member')
  */
 
@@ -58,7 +60,7 @@ export class ForumMembershipService {
   // Public API
   // ---------------------------------------------------------------------------
 
-  /** 폐쇄형 포럼 가입 신청 → kpa_approval_requests */
+  /** 폐쇄형 포럼 가입 신청 → forum_join_requests */
   async requestJoin(
     categoryId: string,
     user: ForumMembershipUser,
@@ -87,41 +89,21 @@ export class ForumMembershipService {
 
     // Pending request exists?
     const [pendingReq] = await this.dataSource.query(
-      `SELECT id FROM kpa_approval_requests
-       WHERE entity_type = 'forum_member_join'
-         AND requester_id = $1
-         AND status = 'pending'
-         AND payload->>'forum_category_id' = $2
+      `SELECT id FROM forum_join_requests
+       WHERE forum_category_id = $1 AND user_id = $2 AND status = 'pending'
        LIMIT 1`,
-      [user.id, categoryId],
+      [categoryId, user.id],
     );
     if (pendingReq) {
       return { error: { status: 409, code: 'PENDING_REQUEST', message: 'Join request already pending' } };
     }
 
-    // organization_id from the forum (may be null for community forums)
-    const orgId = category.organization_id || '00000000-0000-0000-0000-000000000000';
-
     const [saved] = await this.dataSource.query(
-      `INSERT INTO kpa_approval_requests
-        (id, entity_type, organization_id, payload, status,
-         requester_id, requester_name, requester_email,
-         submitted_at, created_at, updated_at)
-       VALUES (gen_random_uuid(), 'forum_member_join', $1, $2, 'pending',
-               $3, $4, $5,
-               NOW(), NOW(), NOW())
+      `INSERT INTO forum_join_requests
+        (id, forum_category_id, user_id, status, created_at, updated_at)
+       VALUES (gen_random_uuid(), $1, $2, 'pending', NOW(), NOW())
        RETURNING *`,
-      [
-        orgId,
-        JSON.stringify({
-          forum_category_id: categoryId,
-          forum_name: category.name,
-          forum_slug: category.slug,
-        }),
-        user.id,
-        user.name || user.email || 'Unknown',
-        user.email || null,
-      ],
+      [categoryId, user.id],
     );
 
     return { data: saved };
@@ -140,20 +122,15 @@ export class ForumMembershipService {
       return { error: { status: 403, code: 'FORBIDDEN', message: 'Only the forum owner can approve members' } };
     }
 
-    const [ar] = await this.dataSource.query(
-      `SELECT id, status, requester_id, payload
-       FROM kpa_approval_requests
-       WHERE id = $1 AND entity_type = 'forum_member_join' AND status = 'pending'
+    const [jr] = await this.dataSource.query(
+      `SELECT id, status, user_id
+       FROM forum_join_requests
+       WHERE id = $1 AND forum_category_id = $2 AND status = 'pending'
        LIMIT 1`,
-      [requestId],
+      [requestId, categoryId],
     );
-    if (!ar) {
+    if (!jr) {
       return { error: { status: 404, code: 'NOT_FOUND', message: 'Join request not found or not pending' } };
-    }
-
-    const payload = typeof ar.payload === 'string' ? JSON.parse(ar.payload) : ar.payload;
-    if (payload.forum_category_id !== categoryId) {
-      return { error: { status: 400, code: 'MISMATCH', message: 'Request does not belong to this forum' } };
     }
 
     const queryRunner = this.dataSource.createQueryRunner();
@@ -161,25 +138,23 @@ export class ForumMembershipService {
     await queryRunner.startTransaction();
 
     try {
-      // 1. Update approval → approved
       await queryRunner.query(
-        `UPDATE kpa_approval_requests
-         SET status = 'approved', reviewed_by = $1, reviewed_at = NOW(), updated_at = NOW()
+        `UPDATE forum_join_requests
+         SET status = 'approved', reviewer_id = $1, reviewed_at = NOW(), updated_at = NOW()
          WHERE id = $2`,
         [user.id, requestId],
       );
 
-      // 2. Insert membership
       await queryRunner.query(
         `INSERT INTO forum_category_members
           (forum_category_id, user_id, role, joined_at, created_at, updated_at)
          VALUES ($1, $2, 'member', NOW(), NOW(), NOW())
          ON CONFLICT (forum_category_id, user_id) DO NOTHING`,
-        [categoryId, ar.requester_id],
+        [categoryId, jr.user_id],
       );
 
       await queryRunner.commitTransaction();
-      return { data: { requestId, status: 'approved', userId: ar.requester_id } };
+      return { data: { requestId, status: 'approved', userId: jr.user_id } };
     } catch (err) {
       await queryRunner.rollbackTransaction();
       throw err;
@@ -202,25 +177,19 @@ export class ForumMembershipService {
       return { error: { status: 403, code: 'FORBIDDEN', message: 'Only the forum owner can reject members' } };
     }
 
-    const [ar] = await this.dataSource.query(
-      `SELECT id, status, payload
-       FROM kpa_approval_requests
-       WHERE id = $1 AND entity_type = 'forum_member_join' AND status = 'pending'
+    const [jr] = await this.dataSource.query(
+      `SELECT id FROM forum_join_requests
+       WHERE id = $1 AND forum_category_id = $2 AND status = 'pending'
        LIMIT 1`,
-      [requestId],
+      [requestId, categoryId],
     );
-    if (!ar) {
+    if (!jr) {
       return { error: { status: 404, code: 'NOT_FOUND', message: 'Join request not found or not pending' } };
     }
 
-    const payload = typeof ar.payload === 'string' ? JSON.parse(ar.payload) : ar.payload;
-    if (payload.forum_category_id !== categoryId) {
-      return { error: { status: 400, code: 'MISMATCH', message: 'Request does not belong to this forum' } };
-    }
-
     await this.dataSource.query(
-      `UPDATE kpa_approval_requests
-       SET status = 'rejected', reviewed_by = $1, review_comment = $2, reviewed_at = NOW(), updated_at = NOW()
+      `UPDATE forum_join_requests
+       SET status = 'rejected', reviewer_id = $1, review_comment = $2, reviewed_at = NOW(), updated_at = NOW()
        WHERE id = $3`,
       [user.id, reviewComment || null, requestId],
     );
@@ -268,15 +237,12 @@ export class ForumMembershipService {
     }
 
     const rows = await this.dataSource.query(
-      `SELECT ar.id, ar.requester_id, ar.requester_name, ar.requester_email,
-              ar.status, ar.created_at,
-              u.name as user_display_name
-       FROM kpa_approval_requests ar
-       LEFT JOIN users u ON u.id = ar.requester_id
-       WHERE ar.entity_type = 'forum_member_join'
-         AND ar.status = 'pending'
-         AND ar.payload->>'forum_category_id' = $1
-       ORDER BY ar.created_at ASC`,
+      `SELECT jr.id, jr.user_id, jr.status, jr.message, jr.created_at,
+              u.name as user_name, u.email as user_email
+       FROM forum_join_requests jr
+       LEFT JOIN users u ON u.id = jr.user_id
+       WHERE jr.forum_category_id = $1 AND jr.status = 'pending'
+       ORDER BY jr.created_at ASC`,
       [categoryId],
     );
 
@@ -336,13 +302,10 @@ export class ForumMembershipService {
     }
 
     const [pending] = await this.dataSource.query(
-      `SELECT id FROM kpa_approval_requests
-       WHERE entity_type = 'forum_member_join'
-         AND requester_id = $1
-         AND status = 'pending'
-         AND payload->>'forum_category_id' = $2
+      `SELECT id FROM forum_join_requests
+       WHERE forum_category_id = $1 AND user_id = $2 AND status = 'pending'
        LIMIT 1`,
-      [userId, categoryId],
+      [categoryId, userId],
     );
 
     return { data: { isMember: false, role: null, pendingRequest: !!pending } };
