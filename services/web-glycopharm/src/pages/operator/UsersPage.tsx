@@ -70,6 +70,8 @@ interface DeleteRiskData {
   canHardDelete: boolean;
 }
 
+// WO-O4O-OPERATOR-MEMBERS-DELETE-ACTION-POLICY-FIX-V1:
+// 완전삭제(hard delete)는 admin 전용. operator 화면에서 탈퇴 처리만 표시.
 function GpDeleteRiskFlow({
   user,
   onClose,
@@ -81,8 +83,8 @@ function GpDeleteRiskFlow({
 }) {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<DeleteRiskData | null>(null);
+  const [confirming, setConfirming] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [confirmMode, setConfirmMode] = useState<'soft' | 'hard' | null>(null);
 
   useEffect(() => {
     api
@@ -92,18 +94,17 @@ function GpDeleteRiskFlow({
       .finally(() => setLoading(false));
   }, [user.id]);
 
-  const executeDelete = async () => {
-    if (!confirmMode) return;
+  const executeSoftDelete = async () => {
     setDeleting(true);
     try {
-      await api.delete(`/operator/members/${user.id}?mode=${confirmMode}`);
-      toast.success(confirmMode === 'soft' ? '탈퇴 처리 완료' : '완전 삭제 완료');
+      await api.delete(`/operator/members/${user.id}?mode=soft`);
+      toast.success('탈퇴 처리 완료');
       onDeleted();
     } catch (e: any) {
-      toast.error(e?.message || (confirmMode === 'soft' ? '처리 실패' : '삭제 실패'));
+      toast.error(e?.message || '처리 실패');
     } finally {
       setDeleting(false);
-      setConfirmMode(null);
+      setConfirming(false);
     }
   };
 
@@ -114,8 +115,8 @@ function GpDeleteRiskFlow({
       <div className="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <AlertCircle className="w-5 h-5 text-red-500" />
-            <h3 className="text-lg font-bold text-slate-900">회원 삭제 확인</h3>
+            <AlertCircle className="w-5 h-5 text-amber-500" />
+            <h3 className="text-lg font-bold text-slate-900">탈퇴 처리 확인</h3>
           </div>
           <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded">
             <X className="w-5 h-5 text-slate-400" />
@@ -136,51 +137,19 @@ function GpDeleteRiskFlow({
               </span>
             </div>
 
-            <div>
-              <p className="text-sm font-medium text-slate-700 mb-2">삭제 시 영향받는 데이터</p>
-              <div className="grid grid-cols-2 gap-2">
-                {[
-                  { label: '서비스 연결', value: data.risks.serviceMemberships },
-                  { label: '포럼 게시글', value: data.risks.forumPosts },
-                  { label: '포럼 댓글', value: data.risks.forumComments },
-                  { label: '감사 로그', value: data.risks.auditLogs },
-                ].map((item) => (
-                  <div
-                    key={item.label}
-                    className={`flex justify-between px-3 py-2 rounded text-sm ${
-                      item.value > 0 ? 'bg-amber-50 text-amber-700' : 'bg-slate-50 text-slate-500'
-                    }`}
-                  >
-                    <span>{item.label}</span>
-                    <span className="font-medium">{item.value}건</span>
-                  </div>
-                ))}
-              </div>
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+              <p className="text-sm text-amber-800">
+                탈퇴 처리하면 로그인이 차단되고 목록에서 제외됩니다. 필요 시 관리자를 통해 재활성화할 수 있습니다.
+              </p>
             </div>
-
-            {!data.canHardDelete && (
-              <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-                <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 shrink-0" />
-                <p className="text-xs text-red-700">
-                  포럼 게시글/댓글 또는 감사 로그가 있어 완전삭제가 제한됩니다. 탈퇴(비활성) 처리를 권장합니다.
-                </p>
-              </div>
-            )}
 
             <div className="flex flex-col gap-2 pt-2">
               <button
-                onClick={() => setConfirmMode('soft')}
+                onClick={() => setConfirming(true)}
                 disabled={deleting}
                 className="w-full px-4 py-2.5 text-sm font-medium text-amber-700 bg-amber-50 border border-amber-200 hover:bg-amber-100 rounded-lg disabled:opacity-50"
               >
                 탈퇴 처리 (비활성화)
-              </button>
-              <button
-                onClick={() => setConfirmMode('hard')}
-                disabled={deleting || !data.canHardDelete}
-                className="w-full px-4 py-2.5 text-sm font-medium text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                {!data.canHardDelete ? '완전삭제 불가 (연결 데이터 존재)' : '완전삭제 (되돌릴 수 없음)'}
               </button>
               <button
                 onClick={onClose}
@@ -190,19 +159,14 @@ function GpDeleteRiskFlow({
               </button>
             </div>
 
-            {/* Delete Confirm Dialog */}
             <ConfirmActionDialog
-              open={!!confirmMode}
-              onClose={() => setConfirmMode(null)}
-              onConfirm={executeDelete}
-              title={confirmMode === 'hard' ? '완전 삭제 확인' : '탈퇴 처리 확인'}
-              message={
-                confirmMode === 'hard'
-                  ? '이 회원 데이터를 완전히 삭제합니다.\n이 작업은 되돌릴 수 없습니다.'
-                  : '이 회원을 탈퇴(비활성) 처리하시겠습니까?'
-              }
-              confirmText={confirmMode === 'hard' ? '완전 삭제' : '탈퇴 처리'}
-              variant={confirmMode === 'hard' ? 'danger' : 'warning'}
+              open={confirming}
+              onClose={() => setConfirming(false)}
+              onConfirm={executeSoftDelete}
+              title="탈퇴 처리 확인"
+              message="이 회원을 탈퇴(비활성) 처리하시겠습니까?"
+              confirmText="탈퇴 처리"
+              variant="warning"
               loading={deleting}
             />
           </div>

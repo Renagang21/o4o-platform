@@ -77,14 +77,17 @@ function KcosDeleteFlow({
   const displayName =
     user.name || `${user.lastName || ''}${user.firstName || ''}`.trim() || user.email.split('@')[0];
 
+  // WO-O4O-OPERATOR-MEMBERS-DELETE-ACTION-POLICY-FIX-V1:
+  // mode 파라미터 없음 → 백엔드 default soft delete.
+  // 문구를 실제 동작(비활성화)에 맞게 수정.
   const handle = async () => {
     setLoading(true);
     try {
-      await api.delete(`/operator/members/${user.id}`);
-      toast.success('사용자가 삭제되었습니다.');
+      await api.delete(`/operator/members/${user.id}?mode=soft`);
+      toast.success('탈퇴 처리 완료. 필요 시 관리자를 통해 재활성화할 수 있습니다.');
       onDeleted();
     } catch (err: any) {
-      toast.error(err?.message || '삭제에 실패했습니다.');
+      toast.error(err?.message || '탈퇴 처리에 실패했습니다.');
     } finally {
       setLoading(false);
     }
@@ -95,10 +98,10 @@ function KcosDeleteFlow({
       open
       onClose={onClose}
       onConfirm={handle}
-      title="회원 삭제 확인"
-      message={`${displayName} (${user.email})\n\n이 사용자를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`}
-      confirmText="삭제"
-      variant="danger"
+      title="탈퇴 처리 확인"
+      message={`${displayName} (${user.email})\n\n이 회원을 탈퇴(비활성화) 처리하시겠습니까?\n탈퇴 처리 후 로그인이 차단되며, 필요 시 관리자를 통해 재활성화할 수 있습니다.`}
+      confirmText="탈퇴 처리"
+      variant="warning"
       loading={loading}
     />
   );

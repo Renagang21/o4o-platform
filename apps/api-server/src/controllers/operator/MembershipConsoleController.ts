@@ -931,6 +931,25 @@ export class MembershipConsoleController {
 
       // WO-NETURE-MEMBER-DELETE-SAFE-FLOW-V1: soft/hard 2단계 분리
       const mode = req.query.mode === 'hard' ? 'hard' as const : 'soft' as const;
+
+      // WO-O4O-OPERATOR-MEMBERS-DELETE-ACTION-POLICY-FIX-V1:
+      // hard delete는 service admin 이상만 허용.
+      // operator-only role(service:operator)은 soft delete만 가능.
+      if (mode === 'hard' && !scope.isPlatformAdmin) {
+        const userRoles: string[] = (req as any).user?.roles ?? [];
+        const hasAdminRole = userRoles.some(
+          (r) => r === 'platform:admin' || r === 'platform:super_admin' || r.endsWith(':admin'),
+        );
+        if (!hasAdminRole) {
+          res.status(403).json({
+            success: false,
+            error: 'Hard delete requires admin role. Use soft delete (mode=soft) for deactivation.',
+            code: 'HARD_DELETE_FORBIDDEN',
+          });
+          return;
+        }
+      }
+
       const deleted = await approvalService.deleteMember({
         userId,
         deletedBy,
