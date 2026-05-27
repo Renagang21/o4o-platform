@@ -36,6 +36,8 @@ import {
 import { API_BASE_URL } from '@/lib/apiClient';
 import { getAccessToken } from '@o4o/auth-client';
 import { toast } from '@o4o/error-handling';
+import type { ProductionTemplate } from '@o4o/types/production-template';
+import { findTemplate } from '@/config/productionTemplates';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -123,6 +125,12 @@ export default function StoreQrPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const [selectedTemplate] = useState<ProductionTemplate | null>(() => {
+    const prod = parseProductionRouterState(location.state);
+    const templateId = prod?.selectedTemplateId;
+    return templateId ? (findTemplate(templateId) ?? null) : null;
+  });
 
   // Prefill from library router state if present
   const initFormFromState = (): CreateQrForm => {
@@ -407,7 +415,12 @@ export default function StoreQrPage() {
         <div style={overlayStyle} onClick={(e) => { if (e.target === e.currentTarget) setShowCreate(false); }}>
           <div style={modalStyle}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-              <h2 style={{ fontSize: 17, fontWeight: 700, color: '#1e293b', margin: 0 }}>새 QR 코드 만들기</h2>
+              <div>
+                <h2 style={{ fontSize: 17, fontWeight: 700, color: '#1e293b', margin: 0 }}>새 QR 코드 만들기</h2>
+                {selectedTemplate && (
+                  <p style={{ fontSize: 12, color: '#0d9488', margin: '2px 0 0' }}>{selectedTemplate.name}</p>
+                )}
+              </div>
               <button onClick={() => setShowCreate(false)} style={closeBtnStyle}>
                 <X size={18} />
               </button>

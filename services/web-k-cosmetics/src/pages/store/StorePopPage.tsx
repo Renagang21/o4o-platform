@@ -24,6 +24,8 @@ import {
 import { api, API_BASE_URL } from '@/lib/apiClient';
 import { getAccessToken } from '@o4o/auth-client';
 import { toast } from '@o4o/error-handling';
+import type { ProductionTemplate } from '@o4o/types/production-template';
+import { findTemplate } from '../../config/productionTemplates';
 
 interface SupplierItem {
   id: string;
@@ -58,6 +60,12 @@ export default function StorePopPage() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   // Prefill from library router state if present
+  const [selectedTemplate] = useState<ProductionTemplate | null>(() => {
+    const prod = parseProductionRouterState(location.state);
+    const templateId = prod?.selectedTemplateId;
+    return templateId ? (findTemplate(templateId) ?? null) : null;
+  });
+
   const [aiPrompt, setAiPrompt] = useState(() => {
     const prod = parseProductionRouterState(location.state);
     if (prod?.source?.items?.length) {
@@ -127,8 +135,8 @@ export default function StorePopPage() {
           sourceHtml: `<p>${sourceText.replace(/\n/g, '</p><p>')}</p>`,
           useCase: 'pop',
           audience: 'customer',
-          tone: 'easy',
-          length: 'short',
+          tone: selectedTemplate?.forcedOptions?.tone ?? 'easy',
+          length: selectedTemplate?.forcedOptions?.length ?? 'short',
         }),
       });
 
