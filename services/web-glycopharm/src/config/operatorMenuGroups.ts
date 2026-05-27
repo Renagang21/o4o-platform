@@ -54,6 +54,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '약국 HUB 블로그', path: '/operator/blog' },
     { label: '약국 HUB POP', path: '/operator/pop' },
     { label: '약국 HUB QR', path: '/operator/qr' },
+    // WO-O4O-GLYCOPHARM-OPERATOR-SURVEYS-V1
+    { label: '설문조사 관리', path: '/operator/surveys' },
   ],
   signage: [
     { label: 'HQ 미디어', path: '/operator/signage/hq-media' },
@@ -132,6 +134,7 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     { label: '약국 HUB 블로그', path: '/operator/blog' },
     { label: '약국 HUB POP', path: '/operator/pop' },
     { label: '약국 HUB QR', path: '/operator/qr' },
+    { label: '설문조사 관리', path: '/operator/surveys' },
   ],
   signage: [
     { label: 'HQ 미디어', path: '/operator/signage/hq-media' },

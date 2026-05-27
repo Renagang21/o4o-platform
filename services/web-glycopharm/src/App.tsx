@@ -252,6 +252,8 @@ const OperatorQrWritePage = lazy(() => import('@/pages/operator/qr/OperatorQrWri
 const QualificationRequestsPage = lazy(() => import('@/pages/operator/QualificationRequestsPage'));
 const EventOfferManagePage = lazy(() => import('@/pages/operator/event-offer/EventOfferManagePage'));
 const OperatorStoreChannelsPage = lazy(() => import('@/pages/operator/store-channels/OperatorStoreChannelsPage'));
+const OperatorSurveyListPage = lazy(() => import('@/pages/operator/survey/OperatorSurveyListPage'));
+const OperatorSurveyCreatePage = lazy(() => import('@/pages/operator/survey/OperatorSurveyCreatePage'));
 
 // MyPage 3-split (WO-O4O-GLYCOPHARM-MYPAGE-SPLIT-V1)
 const MyPageHub = lazy(() => import('@/pages/mypage/MyPageHub'));
@@ -714,6 +716,9 @@ function AppRoutes() {
         <Route path="event-offers" element={<EventOfferManagePage />} />
         {/* Store Channels (WO-O4O-GLYCOPHARM-OPERATOR-STORE-CHANNELS-V1) */}
         <Route path="store-channels" element={<OperatorStoreChannelsPage />} />
+        {/* Surveys (WO-O4O-GLYCOPHARM-OPERATOR-SURVEYS-V1) */}
+        <Route path="surveys" element={<OperatorSurveyListPage />} />
+        <Route path="surveys/new" element={<OperatorSurveyCreatePage />} />
         {/* Settings */}
         <Route path="settings" element={<SettingsPage />} />
       </Route>
