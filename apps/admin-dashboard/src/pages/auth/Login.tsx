@@ -1,6 +1,6 @@
 import { FC, FormEvent, useEffect, useState } from 'react';
 import { Navigate, useLocation, useSearchParams, Link } from 'react-router-dom';
-import { Eye, EyeOff, Lock, Mail, AlertTriangle } from 'lucide-react';
+import { Eye, EyeOff, Lock, AlertTriangle } from 'lucide-react';
 import { useAuth } from '@o4o/auth-context';
 import toast from 'react-hot-toast';
 
@@ -133,9 +133,6 @@ const Login: FC = () => {
                 이메일 주소
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-500" />
-                </div>
                 <input
                   id="email"
                   name="email"
@@ -144,7 +141,7 @@ const Login: FC = () => {
                   required
                   value={email}
                   onChange={(e: any) => setEmail(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-3 bg-white/90 border border-gray-300 rounded-lg focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 focus:outline-none transition-all duration-200 text-gray-900 placeholder-gray-500"
+                  className="block w-full px-4 py-3 bg-white/90 border border-gray-300 rounded-lg focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 focus:outline-none transition-all duration-200 text-gray-900 placeholder-gray-500"
                   placeholder="admin@neture.co.kr"
                 />
               </div>
@@ -156,9 +153,6 @@ const Login: FC = () => {
                 비밀번호
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-500" />
-                </div>
                 <input
                   id="password"
                   name="password"
@@ -167,7 +161,7 @@ const Login: FC = () => {
                   required
                   value={password}
                   onChange={(e: any) => setPassword(e.target.value)}
-                  className="block w-full pl-10 pr-10 py-3 bg-white/90 border border-gray-300 rounded-lg focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 focus:outline-none transition-all duration-200 text-gray-900 placeholder-gray-500"
+                  className="block w-full pl-4 pr-10 py-3 bg-white/90 border border-gray-300 rounded-lg focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 focus:outline-none transition-all duration-200 text-gray-900 placeholder-gray-500"
                   placeholder="비밀번호를 입력하세요"
                 />
                 <button
