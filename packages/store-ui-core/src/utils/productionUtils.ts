@@ -25,21 +25,21 @@ import { useLocation } from 'react-router-dom';
 
 // ─── Inline types (sync with @o4o/types/production canonical) ─────────────────
 
-type ProductionTarget = 'pop' | 'qr' | 'blog' | 'product-description';
+export type ProductionTarget = 'pop' | 'qr' | 'blog' | 'product-description';
 
-interface ProductionSourceItem {
+export interface ProductionSourceItem {
   id: string;
   title: string;
   description?: string | null;
   origin: 'snapshot' | 'direct' | 'library';
 }
 
-interface ProductionSource {
+export interface ProductionSource {
   fromLibrary: 'contents' | 'resources';
   items: ProductionSourceItem[];
 }
 
-interface ProductionRouterState {
+export interface ProductionRouterState {
   production: {
     source: ProductionSource;
     target: ProductionTarget;

@@ -238,7 +238,12 @@ export class ForumMembershipService {
 
     const rows = await this.dataSource.query(
       `SELECT jr.id, jr.user_id, jr.status, jr.message, jr.created_at,
-              u.name as user_name, u.email as user_email
+              u.name  AS user_name,
+              u.email AS user_email,
+              u.name  AS user_display_name,
+              jr.user_id AS requester_id,
+              u.name  AS requester_name,
+              u.email AS requester_email
        FROM forum_join_requests jr
        LEFT JOIN users u ON u.id = jr.user_id
        WHERE jr.forum_category_id = $1 AND jr.status = 'pending'
