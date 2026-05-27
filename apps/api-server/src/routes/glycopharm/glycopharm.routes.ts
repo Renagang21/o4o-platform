@@ -28,6 +28,9 @@ import { createOperatorBlogController } from '../o4o-store/controllers/operator-
 import { createOperatorPopController } from '../o4o-store/controllers/operator-pop.controller.js';
 // WO-O4O-GLYCOPHARM-STORE-HUB-QR-BACKEND-FOUNDATION-V1
 import { createOperatorQrController } from '../o4o-store/controllers/operator-qr.controller.js';
+// WO-O4O-GLYCOPHARM-STORE-HUB-POP-QR-STAFF-BACKEND-V1: 매장 owner 가 운영자 HUB POP/QR 을 가져가는 staff import
+import { createStorePopStaffController } from '../o4o-store/controllers/pop.controller.js';
+import { createStoreQrStaffController } from '../o4o-store/controllers/qr.controller.js';
 // WO-O4O-GLYCOPHARM-LMS-QUALIFICATION-BACKEND-FOUNDATION-V1
 import { createQualificationController } from '../kpa/controllers/qualification.controller.js';
 import { createLayoutController } from '../o4o-store/controllers/layout.controller.js'; // WO-STORE-BLOCK-ENGINE-V1
@@ -442,6 +445,24 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
     'glycopharm',
   );
   router.use('/operator/qr', glycopharmOperatorQrController);
+
+  // WO-O4O-GLYCOPHARM-STORE-HUB-POP-QR-STAFF-BACKEND-V1: 매장 owner 가 운영자 HUB POP / QR 을 가져가는 staff import
+  // /api/v1/glycopharm/stores/:slug/pop/staff/*  (매장 store_pops 사본 CRUD + 가져오기)
+  // /api/v1/glycopharm/stores/:slug/qr/staff/import (운영자 QR template → store_qr_codes 사본 변환)
+  // KPA pattern mirror — controller 는 o4o-store 공통 위치, serviceKey='glycopharm' 주입.
+  const glycopharmStorePopStaffController = createStorePopStaffController(
+    dataSource,
+    coreRequireAuth as any,
+    'glycopharm',
+  );
+  router.use('/stores', glycopharmStorePopStaffController);
+
+  const glycopharmStoreQrStaffController = createStoreQrStaffController(
+    dataSource,
+    coreRequireAuth as any,
+    'glycopharm',
+  );
+  router.use('/stores', glycopharmStoreQrStaffController);
 
   // WO-O4O-GLYCOPHARM-LMS-QUALIFICATION-BACKEND-FOUNDATION-V1
   // /api/v1/glycopharm/qualifications — LMS 강사 자격 신청/승인 (GlycoPharm 분리)
