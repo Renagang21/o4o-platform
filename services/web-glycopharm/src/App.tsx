@@ -160,6 +160,9 @@ const HubContentDetailPage = lazy(() => import('@/pages/hub/HubContentDetailPage
 const HubEventOffersPage = lazy(() => import('@/pages/hub/HubEventOffersPage').then(m => ({ default: m.HubEventOffersPage })));
 // WO-O4O-STORE-HUB-CROSS-SERVICE-COMMONIZATION-PHASE1-V1
 const HubBlogLibraryPage = lazy(() => import('@/pages/hub/HubBlogLibraryPage').then(m => ({ default: m.HubBlogLibraryPage })));
+// WO-O4O-GLYCOPHARM-HUB-POP-QR-LIBRARY-PAGES-V1
+const HubPopLibraryPage = lazy(() => import('@/pages/hub/HubPopLibraryPage').then(m => ({ default: m.HubPopLibraryPage })));
+const HubQrLibraryPage = lazy(() => import('@/pages/hub/HubQrLibraryPage').then(m => ({ default: m.HubQrLibraryPage })));
 import { GlycoPharmHubLayout } from '@/components/layouts/GlycoPharmHubLayout';
 import { GlycoHubGuard } from '@/components/auth/GlycoHubGuard';
 
@@ -547,6 +550,9 @@ function AppRoutes() {
           <Route path="signage" element={<Navigate to="/store/signage/library" replace />} />
           {/* WO-O4O-STORE-HUB-CROSS-SERVICE-COMMONIZATION-PHASE1-V1: 블로그 탭 추가 */}
           <Route path="blog" element={<HubBlogLibraryPage />} />
+          {/* WO-O4O-GLYCOPHARM-HUB-POP-QR-LIBRARY-PAGES-V1: POP / QR 탭 추가 (조회 전용) */}
+          <Route path="pop" element={<HubPopLibraryPage />} />
+          <Route path="qr" element={<HubQrLibraryPage />} />
           {/* WO-O4O-GLYCOPHARM-EVENT-OFFERS-HUB-CANONICAL-ALIGNMENT-V1 */}
           <Route path="event-offers" element={<HubEventOffersPage />} />
         </Route>

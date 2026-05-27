@@ -57,19 +57,22 @@ const HUB_MENU: HubMenuItem[] = [
     to: '/store-hub/blog',
     end: false,
   },
+  // WO-O4O-GLYCOPHARM-HUB-POP-QR-LIBRARY-PAGES-V1: POP / QR Hub Library 페이지 활성화 (조회 전용)
   {
     key: 'pop',
     label: 'POP',
     desc: '매장용 POP 자료를 탐색합니다',
     icon: Megaphone,
-    badge: '준비 중',
+    to: '/store-hub/pop',
+    end: false,
   },
   {
     key: 'qr',
     label: 'QR 코드',
     desc: 'QR 코드 자료를 탐색합니다',
     icon: QrCode,
-    badge: '준비 중',
+    to: '/store-hub/qr',
+    end: false,
   },
   {
     key: 'event-offers',
