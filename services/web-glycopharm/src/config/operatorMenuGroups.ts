@@ -25,7 +25,7 @@ interface UnifiedMenuItem {
  */
 export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> = {
   dashboard: [{ label: '대시보드', path: '/operator', exact: true }],
-  users: [{ label: '회원 관리', path: '/operator/users' }],
+  users: [{ label: '회원 관리', path: '/operator/members' }],
   approvals: [
     { label: '신청 관리', path: '/operator/applications' },
     { label: '매장 승인', path: '/operator/store-approvals' },
@@ -96,7 +96,7 @@ export function filterMenuByRole(
 /** @deprecated Use UNIFIED_MENU + filterMenuByRole instead */
 export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuItem[]>> = {
   dashboard: [{ label: '대시보드', path: '/operator', exact: true }],
-  users: [{ label: '회원 관리', path: '/operator/users' }],
+  users: [{ label: '회원 관리', path: '/operator/members' }],
   approvals: [
     { label: '신청 관리', path: '/operator/applications' },
     { label: '매장 승인', path: '/operator/store-approvals' },

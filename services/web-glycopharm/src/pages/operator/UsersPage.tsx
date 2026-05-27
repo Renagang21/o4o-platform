@@ -1,16 +1,13 @@
 /**
- * Operator Users Page — GlycoPharm 회원 관리 (thin wrapper)
+ * Operator Members Page — GlycoPharm 회원 관리 (thin wrapper)
  *
  * WO-O4O-OPERATOR-MEMBERS-LIST-COMMONIZATION-V1:
- *   957-line 구현을 @o4o/operator-core-ui/modules/members 의 OperatorMembersConsolePage
- *   thin wrapper 로 정합. GP-specific 분기는 client adapter + slots 으로 흡수:
- *     - DeleteRiskModal (risk pre-check + soft/hard) → renderDeleteFlow slot
+ *   OperatorMembersConsolePage thin wrapper. GP-specific 분기는 client adapter + slots:
+ *     - GpDeleteRiskFlow (soft delete only) → renderDeleteFlow slot
  *     - EditUserModal → renderEditModal slot
- *     - 약국 / 당뇨인 역할 탭 → roleTabs prop
+ *     - 약사 / 약국 경영자 역할 탭 → roleTabs prop
  *
- * 선행:
- *   - WO-O4O-MEMBERSHIP-CONSOLE-V1 / WO-O4O-MEMBER-LIST-STANDARDIZATION-V1
- *   - WO-O4O-OPERATOR-MEMBERS-DETAIL-SURFACE-CANONICALIZATION-V1 (Hybrid Canonical)
+ * Route: /operator/members (canonical, WO-O4O-GLYCOPHARM-OPERATOR-ROUTE-CANONICALIZATION-V1)
  */
 
 import { useState, useEffect } from 'react';

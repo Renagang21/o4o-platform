@@ -641,7 +641,11 @@ function AppRoutes() {
         <Route path="store-approvals" element={<StoreApprovalsPage />} />
         <Route path="store-approvals/:id" element={<StoreApprovalDetailPage />} />
         <Route path="glycopharm-members" element={<GlycopharmMembersPage />} />
-        <Route path="users" element={<UsersPage />} />
+        {/* WO-O4O-GLYCOPHARM-OPERATOR-ROUTE-CANONICALIZATION-V1: canonical route */}
+        <Route path="members" element={<UsersPage />} />
+        <Route path="members/:id" element={<UserDetailPage />} />
+        {/* backward compat redirect: /operator/users → /operator/members */}
+        <Route path="users" element={<Navigate to="/operator/members" replace />} />
         <Route path="users/:id" element={<UserDetailPage />} />
         <Route path="ai-report" element={<AiReportPage />} />
         <Route path="ai-usage" element={<AiUsageDashboardPage />} />
