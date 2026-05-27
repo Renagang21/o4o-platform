@@ -115,7 +115,7 @@ function buildAdminPolicies(data: OperatorDashboardConfig): PolicyItem[] {
 // ─── Admin Quick Actions ─────────────────────────────────────
 
 const ADMIN_QUICK_ACTIONS: StructureAction[] = [
-  { id: 'users', label: '회원 관리', link: '/admin/users', icon: '👤', description: '회원 조회·관리' },
+  { id: 'users', label: '회원 관리', link: '/admin/members', icon: '👤', description: '회원 조회·탈퇴·완전삭제 관리' },
   { id: 'pharmacies', label: '약국 네트워크', link: '/admin/pharmacies', icon: '🏥', description: '약국 승인·네트워크 관리' },
   { id: 'settlements', label: '정산 관리', link: '/admin/settlements', icon: '💰', description: '정산 처리·내역 조회' },
   { id: 'invoices', label: '인보이스', link: '/admin/invoices', icon: '📄', description: '인보이스 발행·관리' },
@@ -145,7 +145,7 @@ const GOVERNANCE_LINKS: AdminLink[] = [
 
 const NETWORK_LINKS: AdminLink[] = [
   { label: '약국 네트워크', path: '/admin/pharmacies', icon: Building2, description: '약국 승인·네트워크 구조 관리' },
-  { label: '회원 관리', path: '/admin/users', icon: Users, description: '회원 조회·구조 관리' },
+  { label: '회원 관리', path: '/admin/members', icon: Users, description: '회원 조회·탈퇴·완전삭제 관리' },
 ];
 
 // ─── AdminBlock Component (BusinessBlock 패턴 재사용) ────────

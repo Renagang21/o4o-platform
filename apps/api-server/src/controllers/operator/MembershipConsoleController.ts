@@ -872,7 +872,7 @@ export class MembershipConsoleController {
       const ds = AppDataSource;
 
       const userRows = await ds.query(
-        `SELECT id, email, first_name AS "firstName", last_name AS "lastName", name, status
+        `SELECT id, email, "firstName", "lastName", name, status
          FROM users WHERE id = $1`,
         [userId],
       );

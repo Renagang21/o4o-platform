@@ -105,6 +105,8 @@ const RoleNotAvailablePage = lazy(() => import('@/pages/RoleNotAvailablePage'));
 
 // Admin Dashboard (WO-O4O-ADMIN-UX-GLYCOPHARM-PILOT-V1: 4-Block)
 const GlycoPharmAdminDashboard = lazy(() => import('@/pages/admin/GlycoPharmAdminDashboard'));
+// WO-O4O-GLYCOPHARM-OPERATOR-ADMIN-CONSOLE-KPA-ALIGNMENT-V1: Admin 회원 완전 삭제 관리
+const GlycoPharmAdminMembersPage = lazy(() => import('@/pages/admin/GlycoPharmAdminMembersPage'));
 
 // Operator Dashboard
 const GlycoPharmOperatorDashboard = lazy(() => import('@/pages/operator/GlycoPharmOperatorDashboard'));
@@ -611,6 +613,9 @@ function AppRoutes() {
       >
         <Route index element={<GlycoPharmAdminDashboard />} />
         <Route path="pharmacies" element={<PharmaciesPage />} />
+        {/* WO-O4O-GLYCOPHARM-OPERATOR-ADMIN-CONSOLE-KPA-ALIGNMENT-V1: Admin 회원 관리 (soft+hard delete) */}
+        <Route path="members" element={<GlycoPharmAdminMembersPage />} />
+        <Route path="members/:id" element={<UserDetailPage />} />
         <Route path="users" element={<UsersPage />} />
         <Route path="users/:id" element={<UserDetailPage />} />
         {/* WO-O4O-GLYCOPHARM-ADMIN-OPERATOR-MENU-REALIGNMENT-V1: Finance */}
