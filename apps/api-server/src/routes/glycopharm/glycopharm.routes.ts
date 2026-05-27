@@ -26,6 +26,8 @@ import { createBlogController } from '../o4o-store/controllers/blog.controller.j
 // WO-O4O-OPERATOR-BLOG-PUBLISHING-WRITE-API-V1: 운영자 HUB 게시 write API
 import { createOperatorBlogController } from '../o4o-store/controllers/operator-blog.controller.js';
 import { createOperatorPopController } from '../o4o-store/controllers/operator-pop.controller.js';
+// WO-O4O-GLYCOPHARM-STORE-HUB-QR-BACKEND-FOUNDATION-V1
+import { createOperatorQrController } from '../o4o-store/controllers/operator-qr.controller.js';
 import { createLayoutController } from '../o4o-store/controllers/layout.controller.js'; // WO-STORE-BLOCK-ENGINE-V1
 import { createStoreSettingsController } from '../o4o-store/controllers/store-settings.controller.js'; // WO-STORE-COMMON-SETTINGS-FOUNDATION-V1
 // WO-O4O-GLYCOPHARM-STORE-HUB-ADOPTION-V1
@@ -427,6 +429,16 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
     'glycopharm',
   );
   router.use('/operator/pop', glycopharmOperatorPopController);
+
+  // WO-O4O-GLYCOPHARM-STORE-HUB-QR-BACKEND-FOUNDATION-V1: 운영자 HUB QR template write API
+  // /api/v1/glycopharm/operator/qr/templates (운영자가 약국 HUB 에 게시하는 QR 템플릿)
+  // 권한: glycopharm:operator / glycopharm:admin / platform:admin / platform:super_admin
+  const glycopharmOperatorQrController = createOperatorQrController(
+    dataSource,
+    coreRequireAuth as any,
+    'glycopharm',
+  );
+  router.use('/operator/qr', glycopharmOperatorQrController);
 
   // ============================================================================
   // Store Layout Block Engine (WO-STORE-BLOCK-ENGINE-V1)
