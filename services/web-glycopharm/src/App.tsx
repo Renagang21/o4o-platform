@@ -240,6 +240,12 @@ const OperatorLmsCoursesPage = lazy(() => import('@/pages/operator/OperatorLmsCo
 // WO-O4O-GLYCOPHARM-AI-CONTENT-ACTIVATION-V1
 const OperatorResourcesPage = lazy(() => import('@/pages/operator/OperatorResourcesPage'));
 
+// WO-O4O-GLYCOPHARM-OPERATOR-STORE-HUB-WRITE-CAPABILITY-V1: Blog + POP HUB write
+const OperatorBlogListPage = lazy(() => import('@/pages/operator/blog/OperatorBlogListPage'));
+const OperatorBlogWritePage = lazy(() => import('@/pages/operator/blog/OperatorBlogWritePage'));
+const OperatorPopListPage = lazy(() => import('@/pages/operator/pop/OperatorPopListPage'));
+const OperatorPopWritePage = lazy(() => import('@/pages/operator/pop/OperatorPopWritePage'));
+
 // MyPage 3-split (WO-O4O-GLYCOPHARM-MYPAGE-SPLIT-V1)
 const MyPageHub = lazy(() => import('@/pages/mypage/MyPageHub'));
 const MyProfilePage = lazy(() => import('@/pages/mypage/MyProfilePage'));
@@ -680,6 +686,14 @@ function AppRoutes() {
         <Route path="lms/courses" element={<Navigate to="/operator/lms" replace />} />
         {/* Resources Management + AI Content (WO-O4O-GLYCOPHARM-AI-CONTENT-ACTIVATION-V1) */}
         <Route path="resources" element={<OperatorResourcesPage />} />
+        {/* Store HUB Blog write (WO-O4O-GLYCOPHARM-OPERATOR-STORE-HUB-WRITE-CAPABILITY-V1) */}
+        <Route path="blog" element={<OperatorBlogListPage />} />
+        <Route path="blog/new" element={<OperatorBlogWritePage />} />
+        <Route path="blog/:id/edit" element={<OperatorBlogWritePage />} />
+        {/* Store HUB POP write (WO-O4O-GLYCOPHARM-OPERATOR-STORE-HUB-WRITE-CAPABILITY-V1) */}
+        <Route path="pop" element={<OperatorPopListPage />} />
+        <Route path="pop/new" element={<OperatorPopWritePage />} />
+        <Route path="pop/:id/edit" element={<OperatorPopWritePage />} />
         {/* Settings */}
         <Route path="settings" element={<SettingsPage />} />
       </Route>

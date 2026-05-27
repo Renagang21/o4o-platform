@@ -44,6 +44,9 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '강의 관리', path: '/operator/lms/courses' },
     { label: '안내 문구 관리', path: '/operator/guide-contents' },
     { label: '공지/뉴스 관리', path: '/operator/content-management' },
+    // WO-O4O-GLYCOPHARM-OPERATOR-STORE-HUB-WRITE-CAPABILITY-V1
+    { label: '약국 HUB 블로그', path: '/operator/blog' },
+    { label: '약국 HUB POP', path: '/operator/pop' },
   ],
   signage: [
     { label: 'HQ 미디어', path: '/operator/signage/hq-media' },
@@ -113,6 +116,8 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     { label: '강의 관리', path: '/operator/lms/courses' },
     { label: '안내 문구 관리', path: '/operator/guide-contents' },
     { label: '공지/뉴스 관리', path: '/operator/content-management' },
+    { label: '약국 HUB 블로그', path: '/operator/blog' },
+    { label: '약국 HUB POP', path: '/operator/pop' },
   ],
   signage: [
     { label: 'HQ 미디어', path: '/operator/signage/hq-media' },
