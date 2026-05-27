@@ -33,7 +33,7 @@
 | `platform:` | 플랫폼 Core | `platform:super_admin` |
 | `kpa:` | KPA 약사회 | `kpa:admin`, `kpa:pharmacist`, `kpa:branch_admin`, `kpa:branch_operator` |
 | `neture:` | 네처 | `neture:admin`, `neture:operator`, `neture:seller`, `neture:supplier`, `neture:partner` |
-| `glycopharm:` | 글라이코팜 | `glycopharm:admin`, `glycopharm:operator` |
+| `glycopharm:` | 글라이코팜 | `glycopharm:admin`, `glycopharm:operator`, `glycopharm:pharmacist`, `glycopharm:store_owner` |
 | `glucoseview:` | 글루코스뷰 | `glucoseview:admin`, `glucoseview:operator` |
 | `cosmetics:` | K-화장품 | `cosmetics:admin`, `cosmetics:operator` |
 

@@ -26,14 +26,16 @@ import type { AuthContext } from '../auth/auth-context.js';
  * 서비스별 store_owner 권한을 가지는 role 목록.
  *
  * - kpa        : `kpa:store_owner` (약사회 가맹 약국 개설자)
- * - glycopharm : `glycopharm:store_owner` 또는 `glycopharm:pharmacist`
- *                (glycopharm 도메인에서 매장 경영자 = 약사 컨벤션 — role-constants.ts 참조.
- *                 WO-GLYCOPHARM-PHARMACY-ROLE-FINAL-CLEANUP-V1: PHARMACIST 단일 기준)
+ * - glycopharm : `glycopharm:store_owner` (약국 경영자)
+ *                WO-O4O-GLYCOPHARM-ROLE-VALUE-NORMALIZATION:
+ *                `glycopharm:pharmacist`(일반 약사/근무약사)는 매장 접근 권한 없음.
+ *                pharmacy_owner 승인 시 store_owner + pharmacist 둘 다 부여되므로
+ *                경영자 판단은 store_owner role 단독 기준 — glycopharm-member.service.ts 참조.
  * - cosmetics  : `cosmetics:store_owner`
  */
 const STORE_OWNER_ROLES_BY_SERVICE = {
   kpa: ['kpa:store_owner'],
-  glycopharm: ['glycopharm:store_owner', 'glycopharm:pharmacist'],
+  glycopharm: ['glycopharm:store_owner'],
   cosmetics: ['cosmetics:store_owner'],
 } as const;
 
