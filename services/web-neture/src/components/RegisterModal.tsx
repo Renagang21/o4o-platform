@@ -83,6 +83,10 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
     email: '',
     password: '',
     passwordConfirm: '',
+    // WO-O4O-EXISTING-ACCOUNT-SERVICE-PASSWORD-SEPARATION-V1
+    currentPassword: '',
+    servicePassword: '',
+    servicePasswordConfirm: '',
     lastName: '',
     firstName: '',
     phone: '',
@@ -114,6 +118,9 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
         email: '',
         password: '',
         passwordConfirm: '',
+        currentPassword: '',
+        servicePassword: '',
+        servicePasswordConfirm: '',
         lastName: '',
         firstName: '',
         phone: '',
@@ -217,11 +224,32 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
 
     try {
       await api.post('/auth/register', {
-        ...formData,
+        email: formData.email,
+        // WO-O4O-EXISTING-ACCOUNT-SERVICE-PASSWORD-SEPARATION-V1:
+        // existingAccount: currentPassword(본인확인) + servicePassword(새 서비스 credential)
+        // 신규: password 기존 방식 유지
+        ...(existingAccountMode
+          ? {
+              password: formData.currentPassword,
+              currentPassword: formData.currentPassword,
+              servicePassword: formData.servicePassword,
+            }
+          : {
+              password: formData.password,
+              passwordConfirm: formData.passwordConfirm,
+            }),
         name: `${formData.lastName}${formData.firstName}`,
+        lastName: formData.lastName,
+        firstName: formData.firstName,
         phone: formData.phone.replace(/\D/g, ''),
         role: selectedRole,
         service: 'neture',
+        companyName: formData.companyName,
+        businessNumber: formData.businessNumber,
+        businessType: formData.businessType,
+        agreeTerms: formData.agreeTerms,
+        agreePrivacy: formData.agreePrivacy,
+        agreeMarketing: formData.agreeMarketing,
         ...(selectedRole === 'supplier' && {
           representativeName: formData.representativeName,
           taxInvoiceEmail: formData.taxInvoiceEmail,
@@ -270,12 +298,27 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
   };
   const isPasswordStrong = Object.values(passwordChecks).every(Boolean);
 
+  // WO-O4O-EXISTING-ACCOUNT-SERVICE-PASSWORD-SEPARATION-V1: 새 서비스 비밀번호 검증
+  const servicePasswordChecks = {
+    length: formData.servicePassword.length >= 8,
+    letter: /[a-zA-Z]/.test(formData.servicePassword),
+    number: /\d/.test(formData.servicePassword),
+    special: /[^A-Za-z\d\s]/.test(formData.servicePassword),
+  };
+  const isServicePasswordStrong = Object.values(servicePasswordChecks).every(Boolean);
+
   const isStep1Valid = () => {
     if (emailAlreadyJoined) return false;
     if (!formData.email || !formData.email.includes('@')) return false;
     if (!formData.lastName.trim() || !formData.firstName.trim()) return false;
     if (!formData.phone || formData.phone.length < 10 || formData.phone.length > 11) return false;
-    if (existingAccountMode) return formData.password.length > 0;
+    // WO-O4O-EXISTING-ACCOUNT-SERVICE-PASSWORD-SEPARATION-V1:
+    // existingAccount: 기존 계정 확인 + 새 서비스 비밀번호 강도 + 확인 일치
+    if (existingAccountMode) {
+      return formData.currentPassword.length > 0 &&
+        isServicePasswordStrong &&
+        formData.servicePassword === formData.servicePasswordConfirm;
+    }
     return isPasswordStrong && formData.password === formData.passwordConfirm;
   };
 
@@ -405,50 +448,126 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                 </div>
               )}
 
-              {/* 비밀번호 */}
-              <div className={existingAccountMode ? '' : 'grid grid-cols-2 gap-3'}>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {existingAccountMode ? '기존 비밀번호' : '비밀번호'}{' '}
-                    <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      name="password"
-                      value={formData.password}
-                      onChange={handleInputChange}
-                      placeholder={existingAccountMode ? 'O4O 계정 비밀번호 입력' : '8자 이상'}
-                      autoComplete="new-password"
-                      className={INPUT_CLASS + ' pr-10'}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-gray-400 hover:text-gray-600 transition-colors"
-                      tabIndex={-1}
-                    >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                  {!existingAccountMode && formData.password.length > 0 && !isPasswordStrong && (
-                    <div className="mt-1 space-y-0.5 text-xs">
-                      <p className={passwordChecks.length ? 'text-green-600' : 'text-red-500'}>
-                        {passwordChecks.length ? '✓' : '✗'} 8자 이상
-                      </p>
-                      <p className={passwordChecks.letter ? 'text-green-600' : 'text-red-500'}>
-                        {passwordChecks.letter ? '✓' : '✗'} 영문 포함
-                      </p>
-                      <p className={passwordChecks.number ? 'text-green-600' : 'text-red-500'}>
-                        {passwordChecks.number ? '✓' : '✗'} 숫자 포함
-                      </p>
-                      <p className={passwordChecks.special ? 'text-green-600' : 'text-red-500'}>
-                        {passwordChecks.special ? '✓' : '✗'} 특수문자 포함
-                      </p>
+              {/* WO-O4O-EXISTING-ACCOUNT-SERVICE-PASSWORD-SEPARATION-V1:
+                  existingAccount: 기존 계정 확인 + Neture 새 비밀번호 + 확인
+                  신규: 비밀번호 + 확인 */}
+              {existingAccountMode ? (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      기존 O4O 계정 비밀번호 <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        name="currentPassword"
+                        value={formData.currentPassword}
+                        onChange={handleInputChange}
+                        placeholder="현재 O4O 계정 비밀번호"
+                        autoComplete="current-password"
+                        className={INPUT_CLASS + ' pr-10'}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-gray-400 hover:text-gray-600 transition-colors"
+                        tabIndex={-1}
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
                     </div>
-                  )}
-                </div>
-                {!existingAccountMode && (
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Neture 비밀번호 <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="password"
+                      name="servicePassword"
+                      value={formData.servicePassword}
+                      onChange={handleInputChange}
+                      placeholder="Neture에서 사용할 비밀번호 (8자 이상)"
+                      autoComplete="new-password"
+                      className={INPUT_CLASS}
+                    />
+                    {formData.servicePassword.length > 0 && !isServicePasswordStrong && (
+                      <div className="mt-1 space-y-0.5 text-xs">
+                        <p className={servicePasswordChecks.length ? 'text-green-600' : 'text-red-500'}>
+                          {servicePasswordChecks.length ? '✓' : '✗'} 8자 이상
+                        </p>
+                        <p className={servicePasswordChecks.letter ? 'text-green-600' : 'text-red-500'}>
+                          {servicePasswordChecks.letter ? '✓' : '✗'} 영문 포함
+                        </p>
+                        <p className={servicePasswordChecks.number ? 'text-green-600' : 'text-red-500'}>
+                          {servicePasswordChecks.number ? '✓' : '✗'} 숫자 포함
+                        </p>
+                        <p className={servicePasswordChecks.special ? 'text-green-600' : 'text-red-500'}>
+                          {servicePasswordChecks.special ? '✓' : '✗'} 특수문자 포함
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Neture 비밀번호 확인 <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="password"
+                      name="servicePasswordConfirm"
+                      value={formData.servicePasswordConfirm}
+                      onChange={handleInputChange}
+                      placeholder="Neture 비밀번호 재입력"
+                      autoComplete="new-password"
+                      className={INPUT_CLASS}
+                    />
+                    {formData.servicePasswordConfirm.length > 0 &&
+                      formData.servicePassword !== formData.servicePasswordConfirm && (
+                        <p className="mt-1 text-xs text-red-500">비밀번호가 일치하지 않습니다</p>
+                      )}
+                  </div>
+                </>
+              ) : (
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      비밀번호 <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        name="password"
+                        value={formData.password}
+                        onChange={handleInputChange}
+                        placeholder="8자 이상"
+                        autoComplete="new-password"
+                        className={INPUT_CLASS + ' pr-10'}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-gray-400 hover:text-gray-600 transition-colors"
+                        tabIndex={-1}
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                    {formData.password.length > 0 && !isPasswordStrong && (
+                      <div className="mt-1 space-y-0.5 text-xs">
+                        <p className={passwordChecks.length ? 'text-green-600' : 'text-red-500'}>
+                          {passwordChecks.length ? '✓' : '✗'} 8자 이상
+                        </p>
+                        <p className={passwordChecks.letter ? 'text-green-600' : 'text-red-500'}>
+                          {passwordChecks.letter ? '✓' : '✗'} 영문 포함
+                        </p>
+                        <p className={passwordChecks.number ? 'text-green-600' : 'text-red-500'}>
+                          {passwordChecks.number ? '✓' : '✗'} 숫자 포함
+                        </p>
+                        <p className={passwordChecks.special ? 'text-green-600' : 'text-red-500'}>
+                          {passwordChecks.special ? '✓' : '✗'} 특수문자 포함
+                        </p>
+                      </div>
+                    )}
+                  </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       비밀번호 확인 <span className="text-red-500">*</span>
@@ -467,8 +586,8 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                         <p className="mt-1 text-xs text-red-500">비밀번호가 일치하지 않습니다</p>
                       )}
                   </div>
-                )}
-              </div>
+                </div>
+              )}
 
               {/* 이름 (성 + 이름) */}
               <div>

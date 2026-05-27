@@ -23,6 +23,28 @@ export class RegisterRequestDto {
   @IsString()
   passwordConfirm?: string;
 
+  /**
+   * WO-O4O-EXISTING-ACCOUNT-SERVICE-PASSWORD-SEPARATION-V1
+   * 기존 계정 본인 확인용 비밀번호 — users.password 검증에 사용.
+   * existingAccount 가입 분기에서만 유효. 없으면 password fallback.
+   */
+  @IsOptional()
+  @IsString()
+  currentPassword?: string;
+
+  /**
+   * WO-O4O-EXISTING-ACCOUNT-SERVICE-PASSWORD-SEPARATION-V1
+   * 새 서비스 Credential 저장용 비밀번호 — service_credentials[serviceKey]에 저장.
+   * existingAccount 가입 분기에서만 유효. 없으면 password fallback.
+   */
+  @IsOptional()
+  @IsString()
+  @MinLength(8, { message: 'Service password must be at least 8 characters' })
+  @Matches(/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[^A-Za-z\d\s]).+$/, {
+    message: 'Service password must contain letter, number and special character',
+  })
+  servicePassword?: string;
+
   // --- 이름 필드 (서비스별 택일) ---
 
   /** KPA/GlycoPharm: 성 */

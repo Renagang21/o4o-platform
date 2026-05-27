@@ -92,7 +92,21 @@ export class AuthRegisterController extends BaseController {
         }
 
         // 2. 비밀번호 검증 (보안: 본인 확인)
-        const passwordMatch = await comparePassword(data.password, existingUser.password);
+        // WO-O4O-EXISTING-ACCOUNT-SERVICE-PASSWORD-SEPARATION-V1:
+        // currentPassword = 기존 계정 본인 확인용 (users.password 검증)
+        // newServicePassword = 새 서비스 credential 저장용 (service_credentials[serviceKey])
+        // 둘 다 없으면 password 단일 필드 fallback (legacy 호환)
+        const identityPassword = data.currentPassword ?? data.password;
+        const newServicePassword = data.servicePassword ?? data.password;
+        if (!data.currentPassword || !data.servicePassword) {
+          logger.warn('[AuthRegisterController.register] Existing account registration: missing currentPassword or servicePassword, falling back to legacy single-password flow', {
+            userId: existingUser.id,
+            serviceKey,
+            hasCurrentPassword: !!data.currentPassword,
+            hasServicePassword: !!data.servicePassword,
+          });
+        }
+        const passwordMatch = await comparePassword(identityPassword, existingUser.password);
         if (!passwordMatch) {
           // WO-O4O-AUTH-REGISTER-UX-IMPROVEMENT-V1: 기존 가입 서비스 목록 포함
           const existingMemberships = await smRepository.find({
@@ -120,16 +134,15 @@ export class AuthRegisterController extends BaseController {
           membership.role = effectiveRole;
           await txSmRepo.save(membership);
 
-          // WO-O4O-IDENTITY-V2-PHASE1-REGISTER-LOGIN-V1: Identity V2 dual-write
-          // 새 서비스의 credential 을 별도로 생성. 본인 확인은 위 단계에서 기존 password 로
-          // 완료되었고, Phase 1 정책상 새 서비스의 credential 도 같은 입력 password 로 생성한다
-          // (새 password 입력 UX 는 Phase 3 의 책임). 중복 row 대비하여 upsert.
+          // WO-O4O-EXISTING-ACCOUNT-SERVICE-PASSWORD-SEPARATION-V1: Identity V2 dual-write
+          // newServicePassword = servicePassword (새 서비스 전용) 또는 password (legacy fallback).
+          // 본인 확인은 위에서 identityPassword(=currentPassword ?? password)로 완료됨.
           const txCredRepo = manager.getRepository(ServiceCredential);
           await txCredRepo.upsert(
             {
               userId: existingUser.id,
               serviceKey,
-              passwordHash: await hashPassword(data.password),
+              passwordHash: await hashPassword(newServicePassword),
             },
             ['userId', 'serviceKey'],
           );

@@ -52,6 +52,10 @@ export default function RegisterPage() {
     email: '',
     password: '',
     passwordConfirm: '',
+    // WO-O4O-EXISTING-ACCOUNT-SERVICE-PASSWORD-SEPARATION-V1
+    currentPassword: '',
+    servicePassword: '',
+    servicePasswordConfirm: '',
     phone: '',
     businessName: '',
     businessNumber: '',
@@ -87,6 +91,16 @@ export default function RegisterPage() {
     special: /[^A-Za-z\d\s]/.test(formData.password),
   };
   const isPasswordStrong = Object.values(passwordChecks).every(Boolean);
+
+  // WO-O4O-EXISTING-ACCOUNT-SERVICE-PASSWORD-SEPARATION-V1: 새 서비스 비밀번호 검증
+  const servicePasswordChecks = {
+    length: formData.servicePassword.length >= 8,
+    letter: /[a-zA-Z]/.test(formData.servicePassword),
+    number: /\d/.test(formData.servicePassword),
+    special: /[^A-Za-z\d\s]/.test(formData.servicePassword),
+  };
+  const isServicePasswordStrong = Object.values(servicePasswordChecks).every(Boolean);
+
   const isPhoneValid = /^\d{10,11}$/.test(formData.phone);
 
   const handleEmailBlur = async () => {
@@ -117,8 +131,19 @@ export default function RegisterPage() {
     try {
       await api.post('/auth/register', {
         email: formData.email,
-        password: formData.password,
-        passwordConfirm: formData.passwordConfirm,
+        // WO-O4O-EXISTING-ACCOUNT-SERVICE-PASSWORD-SEPARATION-V1:
+        // existingAccount: currentPassword(본인확인) + servicePassword(새 서비스 credential)
+        // 신규: password 기존 방식 유지
+        ...(existingAccountMode
+          ? {
+              password: formData.currentPassword,
+              currentPassword: formData.currentPassword,
+              servicePassword: formData.servicePassword,
+            }
+          : {
+              password: formData.password,
+              passwordConfirm: formData.passwordConfirm,
+            }),
         lastName: formData.lastName,
         firstName: formData.firstName,
         nickname: formData.nickname,
@@ -187,8 +212,12 @@ export default function RegisterPage() {
   const isFormValid = () => {
     const baseFields = formData.lastName && formData.firstName && formData.nickname &&
       formData.email && isPhoneValid && formData.agreeTerms && formData.agreePrivacy;
+    // WO-O4O-EXISTING-ACCOUNT-SERVICE-PASSWORD-SEPARATION-V1:
+    // existingAccount: 기존 계정 비밀번호(currentPassword) + 새 서비스 비밀번호(servicePassword) + 확인 일치
     const passwordValid = existingAccountMode
-      ? formData.password.length > 0
+      ? formData.currentPassword.length > 0 &&
+        isServicePasswordStrong &&
+        formData.servicePassword === formData.servicePasswordConfirm
       : isPasswordStrong && formData.password === formData.passwordConfirm;
     const baseValid = baseFields && passwordValid;
     if (memberType === 'pharmacy') {
@@ -331,7 +360,10 @@ export default function RegisterPage() {
                 {existingAccountMode && (
                   <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-xl p-4">
                     <p className="font-semibold text-sm">이미 O4O 플랫폼 계정이 존재합니다</p>
-                    <p className="text-sm mt-1">기존 비밀번호를 입력하면 GlycoPharm 서비스 가입이 진행됩니다.</p>
+                    <p className="text-sm mt-1">
+                      기존 계정 확인을 위해 현재 사용 중인 비밀번호를 입력해 주세요.<br />
+                      GlycoPharm에서 사용할 비밀번호는 별도로 설정할 수 있습니다.
+                    </p>
                     {existingServices.length > 0 && (
                       <p className="text-xs mt-1 text-blue-600">
                         가입된 서비스: {existingServices.map(s => SERVICE_LABELS[s.key] || s.key).join(', ')}
@@ -345,71 +377,158 @@ export default function RegisterPage() {
                   </div>
                 )}
 
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    {existingAccountMode ? '기존 비밀번호' : '비밀번호'}
-                  </label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      name="password"
-                      value={formData.password}
-                      onChange={handleInputChange}
-                      className="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="영문, 숫자, 특수문자 포함 8자 이상"
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2"
-                    >
-                      {showPassword ? <EyeOff className="w-5 h-5 text-slate-400" /> : <Eye className="w-5 h-5 text-slate-400" />}
-                    </button>
-                  </div>
-                  {!existingAccountMode && formData.password && (
-                    <div className="mt-2 space-y-1">
-                      {[
-                        { key: 'length' as const, label: '8자 이상' },
-                        { key: 'letter' as const, label: '영문 포함' },
-                        { key: 'number' as const, label: '숫자 포함' },
-                        { key: 'special' as const, label: '특수문자 포함' },
-                      ].map(({ key, label }) => (
-                        <div key={key} className="flex items-center gap-1.5">
-                          {passwordChecks[key] ? (
-                            <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
-                          ) : (
-                            <Circle className="w-3.5 h-3.5 text-slate-300" />
-                          )}
-                          <span className={`text-xs ${passwordChecks[key] ? 'text-green-600' : 'text-slate-400'}`}>
-                            {label}
-                          </span>
-                        </div>
-                      ))}
+                {/* WO-O4O-EXISTING-ACCOUNT-SERVICE-PASSWORD-SEPARATION-V1:
+                    existingAccount: 기존 계정 확인 비밀번호 + GlycoPharm 새 비밀번호 + 확인
+                    신규: 비밀번호 + 확인 */}
+                {existingAccountMode ? (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        기존 O4O 계정 비밀번호 <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                        <input
+                          type={showPassword ? 'text' : 'password'}
+                          name="currentPassword"
+                          value={formData.currentPassword}
+                          onChange={handleInputChange}
+                          className="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="현재 O4O 계정 비밀번호"
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2"
+                        >
+                          {showPassword ? <EyeOff className="w-5 h-5 text-slate-400" /> : <Eye className="w-5 h-5 text-slate-400" />}
+                        </button>
+                      </div>
                     </div>
-                  )}
-                </div>
-
-                {!existingAccountMode && (
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">비밀번호 확인</label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                    <input
-                      type="password"
-                      name="passwordConfirm"
-                      value={formData.passwordConfirm}
-                      onChange={handleInputChange}
-                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="비밀번호 재입력"
-                      required
-                    />
-                  </div>
-                  {formData.passwordConfirm && formData.password !== formData.passwordConfirm && (
-                    <p className="text-xs text-red-500 mt-1">비밀번호가 일치하지 않습니다</p>
-                  )}
-                </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        GlycoPharm 비밀번호 <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                        <input
+                          type="password"
+                          name="servicePassword"
+                          value={formData.servicePassword}
+                          onChange={handleInputChange}
+                          className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="GlycoPharm에서 사용할 비밀번호"
+                          required
+                        />
+                      </div>
+                      {formData.servicePassword && (
+                        <div className="mt-2 space-y-1">
+                          {[
+                            { key: 'length' as const, label: '8자 이상' },
+                            { key: 'letter' as const, label: '영문 포함' },
+                            { key: 'number' as const, label: '숫자 포함' },
+                            { key: 'special' as const, label: '특수문자 포함' },
+                          ].map(({ key, label }) => (
+                            <div key={key} className="flex items-center gap-1.5">
+                              {servicePasswordChecks[key] ? (
+                                <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
+                              ) : (
+                                <Circle className="w-3.5 h-3.5 text-slate-300" />
+                              )}
+                              <span className={`text-xs ${servicePasswordChecks[key] ? 'text-green-600' : 'text-slate-400'}`}>
+                                {label}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        GlycoPharm 비밀번호 확인 <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                        <input
+                          type="password"
+                          name="servicePasswordConfirm"
+                          value={formData.servicePasswordConfirm}
+                          onChange={handleInputChange}
+                          className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="GlycoPharm 비밀번호 재입력"
+                          required
+                        />
+                      </div>
+                      {formData.servicePasswordConfirm && formData.servicePassword !== formData.servicePasswordConfirm && (
+                        <p className="text-xs text-red-500 mt-1">비밀번호가 일치하지 않습니다</p>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">비밀번호</label>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                        <input
+                          type={showPassword ? 'text' : 'password'}
+                          name="password"
+                          value={formData.password}
+                          onChange={handleInputChange}
+                          className="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="영문, 숫자, 특수문자 포함 8자 이상"
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2"
+                        >
+                          {showPassword ? <EyeOff className="w-5 h-5 text-slate-400" /> : <Eye className="w-5 h-5 text-slate-400" />}
+                        </button>
+                      </div>
+                      {formData.password && (
+                        <div className="mt-2 space-y-1">
+                          {[
+                            { key: 'length' as const, label: '8자 이상' },
+                            { key: 'letter' as const, label: '영문 포함' },
+                            { key: 'number' as const, label: '숫자 포함' },
+                            { key: 'special' as const, label: '특수문자 포함' },
+                          ].map(({ key, label }) => (
+                            <div key={key} className="flex items-center gap-1.5">
+                              {passwordChecks[key] ? (
+                                <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
+                              ) : (
+                                <Circle className="w-3.5 h-3.5 text-slate-300" />
+                              )}
+                              <span className={`text-xs ${passwordChecks[key] ? 'text-green-600' : 'text-slate-400'}`}>
+                                {label}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">비밀번호 확인</label>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                        <input
+                          type="password"
+                          name="passwordConfirm"
+                          value={formData.passwordConfirm}
+                          onChange={handleInputChange}
+                          className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="비밀번호 재입력"
+                          required
+                        />
+                      </div>
+                      {formData.passwordConfirm && formData.password !== formData.passwordConfirm && (
+                        <p className="text-xs text-red-500 mt-1">비밀번호가 일치하지 않습니다</p>
+                      )}
+                    </div>
+                  </>
                 )}
 
                 <div>
