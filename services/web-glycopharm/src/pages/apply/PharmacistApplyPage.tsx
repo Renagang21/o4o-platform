@@ -2,19 +2,22 @@
  * PharmacistApplyPage
  *
  * WO-GLYCOPHARM-MEMBER-REGISTER-FLOW-V1
- * 약사 회원 가입 신청 — subRole + licenseNumber + 약국 정보 입력
+ * 약사 회원 가입 신청 — 로그인 후 신청 페이지
  *
- * 접근: 로그인 사용자 (아직 glycopharm:pharmacist 역할 없음)
+ * WO-O4O-GLYCOPHARM-REGISTRATION-ROLE-TYPE-ALIGNMENT-V1:
+ *   pharmacy_owner subRole 제거 — 약국 경영자는 RegisterPage 단계형 흐름으로 신청.
+ *   본 페이지는 약사/근무약사 신청 전용.
+ *
+ * 접근: 로그인 사용자 (glycopharm:pharmacist 미보유)
  * 이미 신청한 경우 → 상태 표시
  */
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Stethoscope, Building2, Users, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { Stethoscope, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { glycopharmApi } from '@/api/glycopharm';
 import type { GlycopharmMemberRecord } from '@/api/glycopharm';
 
-type SubRole = 'pharmacy_owner' | 'staff_pharmacist';
 type PageStatus = 'loading' | 'idle' | 'submitting' | 'success' | 'already_applied' | 'error';
 
 const STATUS_LABEL: Record<string, { label: string; color: string }> = {
@@ -29,7 +32,6 @@ export default function PharmacistApplyPage() {
   const [existing, setExisting] = useState<GlycopharmMemberRecord | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const [subRole, setSubRole] = useState<SubRole>('pharmacy_owner');
   const [licenseNumber, setLicenseNumber] = useState('');
   const [pharmacyName, setPharmacyName] = useState('');
   const [pharmacyAddress, setPharmacyAddress] = useState('');
@@ -50,18 +52,12 @@ export default function PharmacistApplyPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!subRole) return;
-    if (subRole === 'pharmacy_owner' && !pharmacyName.trim()) {
-      setError('약국경영자는 약국명을 입력해주세요.');
-      return;
-    }
-
     setPageStatus('submitting');
     setError(null);
 
     try {
       await glycopharmApi.applyMembership({
-        subRole,
+        subRole: 'staff_pharmacist',
         licenseNumber: licenseNumber.trim() || undefined,
         pharmacyName: pharmacyName.trim() || undefined,
         pharmacyAddress: pharmacyAddress.trim() || undefined,
@@ -103,9 +99,7 @@ export default function PharmacistApplyPage() {
           <div className="bg-slate-50 rounded-xl p-4 text-left mb-6">
             <div className="flex justify-between text-sm mb-2">
               <span className="text-slate-500">직역</span>
-              <span className="text-slate-700 font-medium">
-                {existing.subRole === 'pharmacy_owner' ? '약국경영자' : '근무약사'}
-              </span>
+              <span className="text-slate-700 font-medium">약사 / 근무약사</span>
             </div>
             <div className="flex justify-between text-sm mb-2">
               <span className="text-slate-500">상태</span>
@@ -138,7 +132,7 @@ export default function PharmacistApplyPage() {
           <h2 className="text-xl font-bold text-slate-800 mb-2">신청 완료</h2>
           <p className="text-slate-500 mb-6">
             약사 회원 신청이 접수되었습니다.<br />
-            운영자 승인 후 약사 기능을 이용하실 수 있습니다.
+            운영자 승인 후 이용하실 수 있습니다.
           </p>
           <Link to="/" className="inline-block px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors text-sm font-medium">
             홈으로
@@ -163,40 +157,9 @@ export default function PharmacistApplyPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* 직역 선택 */}
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">직역 <span className="text-red-500">*</span></label>
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => setSubRole('pharmacy_owner')}
-                className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-colors ${
-                  subRole === 'pharmacy_owner'
-                    ? 'border-primary-500 bg-primary-50 text-primary-700'
-                    : 'border-slate-200 text-slate-600 hover:border-slate-300'
-                }`}
-              >
-                <Building2 className="w-6 h-6" />
-                <span className="text-sm font-medium">약국경영자</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setSubRole('staff_pharmacist')}
-                className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-colors ${
-                  subRole === 'staff_pharmacist'
-                    ? 'border-primary-500 bg-primary-50 text-primary-700'
-                    : 'border-slate-200 text-slate-600 hover:border-slate-300'
-                }`}
-              >
-                <Users className="w-6 h-6" />
-                <span className="text-sm font-medium">근무약사</span>
-              </button>
-            </div>
-          </div>
-
           {/* 면허번호 */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">약사 면허번호</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">약사 면허번호 <span className="text-slate-400 text-xs">(선택)</span></label>
             <input
               type="text"
               value={licenseNumber}
@@ -206,24 +169,21 @@ export default function PharmacistApplyPage() {
             />
           </div>
 
-          {/* 약국명 (경영자 필수) */}
+          {/* 근무 약국명 */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              약국명
-              {subRole === 'pharmacy_owner' && <span className="text-red-500 ml-1">*</span>}
-            </label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">근무 약국명 <span className="text-slate-400 text-xs">(선택)</span></label>
             <input
               type="text"
               value={pharmacyName}
               onChange={(e) => setPharmacyName(e.target.value)}
-              placeholder={subRole === 'pharmacy_owner' ? '약국명 입력 (필수)' : '약국명 입력 (선택)'}
+              placeholder="근무 중인 약국명 (선택)"
               className="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
             />
           </div>
 
           {/* 약국 주소 */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">약국 주소</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">약국 주소 <span className="text-slate-400 text-xs">(선택)</span></label>
             <input
               type="text"
               value={pharmacyAddress}

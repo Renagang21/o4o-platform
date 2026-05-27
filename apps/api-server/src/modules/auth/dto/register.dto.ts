@@ -92,6 +92,11 @@ export class RegisterRequestDto {
   @IsString()
   licenseNumber?: string;
 
+  /** WO-O4O-GLYCOPHARM-REGISTRATION-ROLE-TYPE-ALIGNMENT-V1: GlycoPharm 참여 유형 (staff_pharmacist | pharmacy_owner) */
+  @IsOptional()
+  @IsString()
+  subRole?: string;
+
   /**
    * WO-O4O-KPA-REGISTER-MODAL-ACTIVITY-AND-PHARMACY-OWNER-INTEGRATION-V1:
    * 약사 가입 단계 직역 (canonical UI 6종, backend enum 11종 부분집합).

@@ -617,6 +617,24 @@ export class AuthRegisterController extends BaseController {
     effectiveRole: string,
   ): Promise<void> {
     if (data.service !== 'glycopharm') return;
+
+    // WO-O4O-GLYCOPHARM-REGISTRATION-ROLE-TYPE-ALIGNMENT-V1:
+    // 약사/근무약사 신규 가입 시 glycopharm_members 레코드 생성 (pending)
+    if (data.subRole === 'staff_pharmacist') {
+      const existingMember = await manager.query(
+        `SELECT id FROM glycopharm_members WHERE user_id = $1 LIMIT 1`,
+        [userId],
+      );
+      if (existingMember.length > 0) return;
+
+      await manager.query(
+        `INSERT INTO glycopharm_members (id, user_id, membership_type, sub_role, status, metadata, created_at, updated_at)
+         VALUES (gen_random_uuid(), $1, 'pharmacist', 'staff_pharmacist', 'pending', $2::jsonb, NOW(), NOW())`,
+        [userId, JSON.stringify({ licenseNumber: data.licenseNumber || null })],
+      );
+      return;
+    }
+
     if (effectiveRole !== 'pharmacy') return;
 
     const businessName = data.businessName || data.companyName;
