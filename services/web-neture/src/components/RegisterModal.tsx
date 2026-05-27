@@ -19,7 +19,11 @@ import { api } from '../lib/apiClient';
 // WO-O4O-NETURE-SELLER-LEGACY-CLEANUP-TO-STORE-OWNER-PARTICIPANT-V1:
 // 'seller' (legacy) → 'store_owner' (Neture 내부 participant type, 권한 role 아님).
 // neture:store_owner role 은 생성하지 않으며, 다른 서비스 store_owner 와 연결하지 않는다.
-type SignupRole = 'supplier' | 'partner' | 'store_owner' | 'user';
+//
+// WO-O4O-NETURE-REGISTRATION-ROLE-SMOKING-GUN-FIX-V1:
+// Neture 신청 역할에서 'user' (일반 이용자) 제거. Neture 는 공급자/파트너/매장 경영자 3개 유형만
+// 신청 받는다. 소비자/일반 이용자는 Neture 회원 유형으로 사용하지 않는다.
+type SignupRole = 'supplier' | 'partner' | 'store_owner';
 
 function formatBusinessNumber(digits: string): string {
   if (digits.length <= 3) return digits;
@@ -27,13 +31,9 @@ function formatBusinessNumber(digits: string): string {
   return `${digits.slice(0, 3)}-${digits.slice(3, 5)}-${digits.slice(5, 10)}`;
 }
 
+// WO-O4O-NETURE-REGISTRATION-ROLE-SMOKING-GUN-FIX-V1:
+// 'user' (일반 이용자) 옵션 제거 — Neture 신청 역할은 공급자/파트너/매장 경영자만 노출.
 const roleOptions: Array<{ role: SignupRole; label: string; description: string; emoji: string }> = [
-  {
-    role: 'user',
-    label: '일반 이용자',
-    description: '플랫폼을 이용하는 일반 회원',
-    emoji: '👤',
-  },
   {
     role: 'store_owner',
     label: '매장 경영자',
@@ -323,8 +323,9 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
   };
 
   const isStep2Valid = () => {
+    // WO-O4O-NETURE-REGISTRATION-ROLE-SMOKING-GUN-FIX-V1: 'user' 분기 제거.
+    // 모든 신청 역할(store_owner / supplier / partner)이 companyName 을 필수로 한다.
     if (!selectedRole || !formData.agreeTerms || !formData.agreePrivacy) return false;
-    if (selectedRole === 'user') return true;
     if (!formData.companyName.trim()) return false;
     if (selectedRole === 'supplier') {
       return (
@@ -682,8 +683,8 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                 </div>
               </div>
 
-              {/* 유형별 추가 정보 */}
-              {selectedRole && selectedRole !== 'user' && (
+              {/* 유형별 추가 정보 — WO-O4O-NETURE-REGISTRATION-ROLE-SMOKING-GUN-FIX-V1: 'user' 분기 제거 */}
+              {selectedRole && (
                 <div className="p-4 bg-gray-50 rounded-xl space-y-3">
                   <h4 className="text-sm font-semibold text-gray-700">
                     {selectedRole === 'store_owner'

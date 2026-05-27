@@ -54,13 +54,31 @@ export class AuthRegisterController extends BaseController {
       // 'store_owner' = Neture 내부 participant type (권한 role 아님). 'seller' 는 legacy 호환 유지.
       // neture:store_owner role 은 생성하지 않으며 다른 서비스 store_owner 와 연결하지 않는다.
       const VALID_ROLES = ['super_admin', 'admin', 'vendor', 'seller', 'store_owner', 'user', 'business', 'partner', 'supplier', 'manager', 'customer', 'pharmacy'];
+
+      const rawServiceKey = data.service || 'platform';
+      // WO-O4O-KPA-MEMBERSHIP-SYNC-FIX-V1: canonical service_key — 'kpa' alias → 'kpa-society'
+      const serviceKey = rawServiceKey === 'kpa' ? 'kpa-society' : rawServiceKey;
+
+      // WO-O4O-NETURE-REGISTRATION-ROLE-SMOKING-GUN-FIX-V1:
+      // Neture 가입 신청은 신청 역할이 명시되어야 한다 — role 누락 시 'customer' 로 폴백하지 않는다.
+      // 허용 신청 role: supplier / partner / store_owner. (admin/operator 는 가입 신청 경로 미지원)
+      // 다른 서비스(KPA / GlycoPharm / K-Cosmetics)의 가입 흐름은 영향 없음 — 기존 fallback 유지.
+      const NETURE_ALLOWED_SIGNUP_ROLES = ['supplier', 'partner', 'store_owner'];
+      if (serviceKey === 'neture') {
+        if (!data.role || !NETURE_ALLOWED_SIGNUP_ROLES.includes(data.role)) {
+          return BaseController.error(
+            res,
+            'Neture 가입 신청 역할이 필요합니다. (supplier / partner / store_owner)',
+            400,
+            'NETURE_SIGNUP_ROLE_REQUIRED',
+          );
+        }
+      }
+
       const rawRole = data.membershipType === 'student'
         ? 'user'
         : (data.role || 'customer');
       const effectiveRole = VALID_ROLES.includes(rawRole) ? rawRole : 'user';
-      const rawServiceKey = data.service || 'platform';
-      // WO-O4O-KPA-MEMBERSHIP-SYNC-FIX-V1: canonical service_key — 'kpa' alias → 'kpa-society'
-      const serviceKey = rawServiceKey === 'kpa' ? 'kpa-society' : rawServiceKey;
 
       // WO-NETURE-REGISTER-IDENTITY-STABILIZATION-V1: Name normalization
       let resolvedName: string;
