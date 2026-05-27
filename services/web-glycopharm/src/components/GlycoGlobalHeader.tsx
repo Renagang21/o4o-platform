@@ -18,6 +18,8 @@ import { isStoreOwnerDual } from '@o4o/auth-utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { isPharmacistRole } from '@/lib/role-constants';
 import { useLoginModal } from '@/contexts/LoginModalContext';
+// WO-O4O-GLYCOPHARM-REGISTER-MODAL-ENTRY-FIX-V1
+import { useRegisterModal } from '@/contexts/RegisterModalContext';
 import {
   GLYCO_PUBLIC_NAV,
   GLYCO_CONTEXTUAL_NAV,
@@ -46,6 +48,7 @@ function getUserDisplayName(user: any): string {
 export function GlycoGlobalHeader() {
   const { user, isAuthenticated, logout } = useAuth();
   const { openLoginModal } = useLoginModal();
+  const { openRegisterModal } = useRegisterModal();
   const navigate = useNavigate();
 
   // 역할 판정
@@ -104,7 +107,7 @@ export function GlycoGlobalHeader() {
       contextualNav={contextualNav}
       user={headerUser}
       onLogin={openLoginModal}
-      onRegister={() => navigate('/register')}
+      onRegister={openRegisterModal}
       onLogout={handleLogout}
       utilitySlot={undefined}
       userMenuItems={

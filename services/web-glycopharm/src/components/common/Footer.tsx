@@ -1,7 +1,10 @@
 import { NavLink } from 'react-router-dom';
 import { Activity, Mail, Phone, MapPin } from 'lucide-react';
+// WO-O4O-GLYCOPHARM-REGISTER-MODAL-ENTRY-FIX-V1
+import { useRegisterModal } from '@/contexts/RegisterModalContext';
 
 export default function Footer() {
+  const { openRegisterModal } = useRegisterModal();
   return (
     <footer className="bg-slate-900 text-slate-300">
       {/* Main Footer */}
@@ -50,9 +53,13 @@ export default function Footer() {
             <h4 className="font-semibold text-white mb-4">참여하기</h4>
             <ul className="space-y-2">
               <li>
-                <NavLink to="/register" className="text-sm hover:text-white transition-colors">
+                <button
+                  type="button"
+                  onClick={openRegisterModal}
+                  className="text-sm hover:text-white transition-colors"
+                >
                   약국 입점 신청
-                </NavLink>
+                </button>
               </li>
               <li>
                 <NavLink to="/contact" className="text-sm hover:text-white transition-colors">

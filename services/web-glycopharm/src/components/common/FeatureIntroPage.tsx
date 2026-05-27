@@ -7,9 +7,10 @@
  * 로그인 페이지로 직접 보내지 않고, 기능을 설명한 뒤 로그인/회원가입 CTA를 제공.
  */
 
-import { NavLink } from 'react-router-dom';
 import { ArrowRight, Activity, Store, UserCircle, Users } from 'lucide-react';
 import { useLoginModal } from '@/contexts/LoginModalContext';
+// WO-O4O-GLYCOPHARM-REGISTER-MODAL-ENTRY-FIX-V1
+import { useRegisterModal } from '@/contexts/RegisterModalContext';
 
 type FeatureType = 'care' | 'store' | 'mypage';
 
@@ -47,6 +48,7 @@ export default function FeatureIntroPage({ feature }: FeatureIntroPageProps) {
   const config = FEATURE_CONFIG[feature];
   const Icon = config.icon;
   const { openLoginModal } = useLoginModal();
+  const { openRegisterModal } = useRegisterModal();
 
   return (
     <div className="min-h-[60vh] flex items-center justify-center px-4 py-12">
@@ -94,12 +96,13 @@ export default function FeatureIntroPage({ feature }: FeatureIntroPageProps) {
             로그인
             <ArrowRight className="w-4 h-4" />
           </button>
-          <NavLink
-            to="/register"
+          <button
+            type="button"
+            onClick={openRegisterModal}
             className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-slate-700 font-medium rounded-xl hover:bg-slate-100 transition-colors border border-slate-200"
           >
             회원가입
-          </NavLink>
+          </button>
         </div>
       </div>
     </div>

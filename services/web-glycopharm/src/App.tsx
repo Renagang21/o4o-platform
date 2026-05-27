@@ -9,6 +9,9 @@ const queryClient = new QueryClient({
 import { AuthProvider, useAuth, getGlycopharmDashboardRoute } from '@/contexts/AuthContext';
 import { GLYCOPHARM_ROLES } from '@/lib/role-constants';
 import { LoginModalProvider } from '@/contexts/LoginModalContext';
+// WO-O4O-GLYCOPHARM-REGISTER-MODAL-ENTRY-FIX-V1: /register 페이지 제거 + 모달 직접 호출
+import { RegisterModalProvider, useRegisterModal } from '@/contexts/RegisterModalContext';
+import { RegisterFlowModal } from '@/pages/auth/RegisterFlowModal';
 import LoginModal from '@/components/common/LoginModal';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
 import { TemplateProvider } from '@o4o/ui';
@@ -48,7 +51,7 @@ const ServiceDashboardPage = lazy(() => import('@/pages/service/ServiceDashboard
 
 // Auth & Public
 const ContactPage = lazy(() => import('@/pages/ContactPage'));
-const RegisterPage = lazy(() => import('@/pages/auth/RegisterPage'));
+// WO-O4O-GLYCOPHARM-REGISTER-MODAL-ENTRY-FIX-V1: RegisterPage 제거 — RegisterFlowModal 로 단일화
 const RoleSelectPage = lazy(() => import('@/pages/auth/RoleSelectPage'));
 
 // WO-O4O-GLYCOPHARM-PATIENT-SURFACE-REMOVAL-V1: Patient/pharmacist pages removed
@@ -437,6 +440,14 @@ function LmsCourseRedirect() {
   return <Navigate to={`/lms/course/${id}`} replace />;
 }
 
+// WO-O4O-GLYCOPHARM-REGISTER-MODAL-ENTRY-FIX-V1:
+//   전역 RegisterFlowModal 마운트 — RegisterModalContext 의 isRegisterModalOpen / closeRegisterModal 와 wiring.
+//   진입점(상단 메뉴 / 로그인 화면 / Footer 등) 은 useRegisterModal().openRegisterModal() 호출.
+function GlobalRegisterModal() {
+  const { isRegisterModalOpen, closeRegisterModal } = useRegisterModal();
+  return <RegisterFlowModal open={isRegisterModalOpen} onClose={closeRegisterModal} />;
+}
+
 // App Routes
 function AppRoutes() {
   return (
@@ -444,7 +455,10 @@ function AppRoutes() {
       {/* WO-O4O-GLYCOPHARM-HOME-KPA-ALIGNMENT-V1: / = Home 직접 연결 */}
       <Route path="handoff" element={<HandoffPage />} />
       <Route path="login" element={<LoginPage />} />
-      <Route path="register" element={<RegisterPage />} />
+      {/* WO-O4O-GLYCOPHARM-REGISTER-MODAL-ENTRY-FIX-V1: /register 라우트 제거.
+          가입신청은 상단 메뉴 / 로그인 화면의 버튼이 useRegisterModal().openRegisterModal() 로 직접 호출.
+          /register 직접 접근 시 홈으로 리다이렉트. */}
+      <Route path="register" element={<Navigate to="/" replace />} />
       <Route path="forgot-password" element={<AccountRecoveryPage />} />
       <Route path="reset-password" element={<ResetPasswordPage />} />
       <Route path="auth/verify-email" element={<VerifyEmailPage />} />
@@ -831,16 +845,20 @@ export default function App() {
       <BrowserRouter>
         <AuthProvider>
           <LoginModalProvider>
+            <RegisterModalProvider>
             {/* WO-O4O-TEMPLATE-PROVIDER-V1: 서비스 디자인 토큰 자동 주입 */}
             <TemplateProvider template={templates[glycopharmConfig.template]}>
             <O4OToastProvider />
             <LoginModal />
+            {/* WO-O4O-GLYCOPHARM-REGISTER-MODAL-ENTRY-FIX-V1: 전역 가입신청 모달 */}
+            <GlobalRegisterModal />
             {/* WO-O4O-POSTLOGINREDIRECT-CANONICALIZATION-V1: 역할 기반 redirect 단일화 */}
             <PostLoginRedirect />
             <Suspense fallback={<PageLoading />}>
               <AppRoutes />
             </Suspense>
             </TemplateProvider>
+            </RegisterModalProvider>
           </LoginModalProvider>
         </AuthProvider>
       </BrowserRouter>

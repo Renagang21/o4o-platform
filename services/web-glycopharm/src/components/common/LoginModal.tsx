@@ -21,6 +21,8 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { X, Mail, Lock, Eye, EyeOff, AlertCircle, Activity } from 'lucide-react';
 import { useAuth, GLYCOPHARM_ROLE_PRIORITY, GLYCOPHARM_DASHBOARD_MAP } from '@/contexts/AuthContext';
 import { useLoginModal } from '@/contexts/LoginModalContext';
+// WO-O4O-GLYCOPHARM-REGISTER-MODAL-ENTRY-FIX-V1
+import { useRegisterModal } from '@/contexts/RegisterModalContext';
 import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
 
 const REMEMBER_EMAIL_KEY = 'glycopharm_remember_email';
@@ -30,6 +32,7 @@ export default function LoginModal() {
   const location = useLocation();
   const { login } = useAuth();
   const { isLoginModalOpen, closeLoginModal, onLoginSuccess } = useLoginModal();
+  const { openRegisterModal } = useRegisterModal();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -224,13 +227,13 @@ export default function LoginModal() {
               비밀번호 찾기
             </Link>
             <span className="text-slate-300">|</span>
-            <Link
-              to="/register"
+            <button
+              type="button"
+              onClick={() => { handleClose(); openRegisterModal(); }}
               className="text-primary-600 font-medium hover:text-primary-700 transition-colors"
-              onClick={handleClose}
             >
               회원가입
-            </Link>
+            </button>
           </div>
         </div>
       </div>

@@ -10,6 +10,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useSearchParams, NavLink } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+// WO-O4O-GLYCOPHARM-REGISTER-MODAL-ENTRY-FIX-V1: 가입신청은 /register 페이지 대신 모달로
+import { useRegisterModal } from '@/contexts/RegisterModalContext';
 import { Activity, Mail, Lock, Eye, EyeOff, AlertCircle, ArrowLeft } from 'lucide-react';
 
 const REMEMBER_EMAIL_KEY = 'glycopharm_remember_email';
@@ -19,6 +21,7 @@ export default function LoginPage() {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const { login } = useAuth();
+  const { openRegisterModal } = useRegisterModal();
 
   const returnUrl = (location.state as any)?.from;
   // WO-GLYCOPHARM-ROLE-PREFIX-MIGRATION-V1:
@@ -129,12 +132,13 @@ export default function LoginPage() {
                   <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
                   <span>{error}</span>
                 </div>
-                <NavLink
-                  to="/register"
+                <button
+                  type="button"
+                  onClick={openRegisterModal}
                   className="block w-full py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 text-center transition-colors"
                 >
                   GlycoPharm 가입 신청하기
-                </NavLink>
+                </button>
               </div>
             )}
 
@@ -228,9 +232,13 @@ export default function LoginPage() {
           <div className="mt-6 pt-6 border-t border-slate-100">
             <p className="text-center text-sm text-slate-500">
               계정이 없으신가요?{' '}
-              <NavLink to="/register" className="text-blue-600 font-medium hover:text-blue-700">
+              <button
+                type="button"
+                onClick={openRegisterModal}
+                className="text-blue-600 font-medium hover:text-blue-700"
+              >
                 가입 신청
-              </NavLink>
+              </button>
             </p>
           </div>
         </div>
