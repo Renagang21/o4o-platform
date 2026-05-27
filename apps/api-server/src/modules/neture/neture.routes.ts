@@ -28,6 +28,7 @@ import { createAdminController, createProductImageController } from './controlle
 import { createAdminSettlementController } from './controllers/admin-settlement.controller.js';
 import { createPartnerController } from './controllers/partner.controller.js';
 import { createSellerController, createPartnerContractController } from './controllers/seller.controller.js';
+import { createSupplierContractController } from './controllers/supplier-contract.controller.js';
 import { createContactController } from './controllers/contact.controller.js';
 import { createOperatorRegistrationController } from './controllers/operator-registration.controller.js';
 import { createOperatorDashboardController } from './controllers/operator-dashboard.controller.js';
@@ -75,6 +76,8 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
   router.use('/supplier', createShipmentController(dataSource));
   router.use('/supplier', createInventoryController(dataSource));
   router.use('/supplier', createSupplierSettlementController(dataSource));
+  // WO-O4O-NETURE-SELLER-CONTRACT-TO-SUPPLIER-MIGRATION-V1: 공급자 계약 API
+  router.use('/supplier', createSupplierContractController(dataSource));
 
   // Admin domain
   router.use('/admin', createAdminController(dataSource));

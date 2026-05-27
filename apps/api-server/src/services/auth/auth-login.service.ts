@@ -156,16 +156,27 @@ export class AuthLoginService {
     // serviceKey 제공 시 해당 서비스에 가입된 멤버십이 존재하는지 확인.
     // 이 검증은 차후 email unique 제거(WO-O4O-EMAIL-UNIQUENESS-REDESIGN-V1) 이후
     // user 조회 자체를 (email + serviceKey) 기반으로 전환할 준비 단계이다.
+    //
+    // WO-O4O-ADMIN-DASHBOARD-PLATFORM-ADMIN-MEMBERSHIP-BYPASS-FIX-V1 (단기 패치):
+    // platform 관리자 역할(platform:super_admin, platform:admin, super_admin) 보유 계정은
+    // service_memberships 검증을 우회한다. admin.neture.co.kr 접근 자격은
+    // 특정 서비스 가입 여부가 아니라 platform 관리자 역할 보유 여부로 판단한다.
+    // 비밀번호 검증은 이후 단계에서 동일하게 수행된다.
     if (serviceKey) {
-      const smRepo = AppDataSource.getRepository(ServiceMembership);
-      const membership = await smRepo.findOne({
-        where: { userId: user.id, serviceKey },
-      });
-      if (!membership) {
-        await this.logLoginAttempt(user.id, email, ipAddress, userAgent, false, 'service_not_member');
-        const err: any = new Error(`이 계정은 ${serviceKey} 서비스에 가입되어 있지 않습니다.`);
-        err.code = 'SERVICE_NOT_MEMBER';
-        throw err;
+      const PLATFORM_ADMIN_ROLES = ['platform:super_admin', 'platform:admin', 'super_admin'];
+      const isPlatformAdmin = await roleAssignmentService.hasAnyRole(user.id, PLATFORM_ADMIN_ROLES);
+
+      if (!isPlatformAdmin) {
+        const smRepo = AppDataSource.getRepository(ServiceMembership);
+        const membership = await smRepo.findOne({
+          where: { userId: user.id, serviceKey },
+        });
+        if (!membership) {
+          await this.logLoginAttempt(user.id, email, ipAddress, userAgent, false, 'service_not_member');
+          const err: any = new Error(`이 계정은 ${serviceKey} 서비스에 가입되어 있지 않습니다.`);
+          err.code = 'SERVICE_NOT_MEMBER';
+          throw err;
+        }
       }
     }
 

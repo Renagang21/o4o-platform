@@ -2,24 +2,23 @@
  * SellerController — WO-O4O-ROUTES-REFACTOR-V1
  * Extracted from neture.routes.ts
  *
- * Routes:
+ * Routes (store_owner / 매장 경영자 기능):
  *   Seller Products:
- *     GET  /my-products                          (seller approved products)
- *     GET  /available-supply-products             (supply catalogue with approval state)
+ *     GET  /my-products                          (store_owner 승인 상품)
+ *     GET  /available-supply-products             (공급 카탈로그 + 승인 상태)
  *   Service-Product Applications:
- *     POST /service-products/:productId/apply     (apply for SERVICE product)
- *     GET  /service-applications                  (list seller service applications)
+ *     POST /service-products/:productId/apply     (SERVICE 상품 취급 신청)
+ *     GET  /service-applications                  (service 신청 목록)
  *   Dashboard:
- *     GET  /dashboard/ai-insight                  (seller dashboard AI insight)
- *   Contracts:
- *     GET  /contracts                             (seller contracts)
- *     POST /contracts/:id/terminate               (seller terminate contract)
- *     POST /contracts/:id/commission              (seller update commission rate)
+ *     GET  /dashboard/ai-insight                  (AI 인사이트)
  *   Orders:
- *     GET  /orders                                (seller order list)
- *     GET  /orders/:id                            (seller order detail)
- *     GET  /orders/:orderId/shipment              (seller shipment lookup)
- *     POST /orders                                (seller B2B order creation)
+ *     GET  /orders                                (주문 목록)
+ *     GET  /orders/:id                            (주문 상세)
+ *     GET  /orders/:orderId/shipment              (배송 조회)
+ *     POST /orders                                (B2B 주문 생성)
+ *
+ * 공급자 계약 API는 /supplier/contracts로 이동됨.
+ * → WO-O4O-NETURE-SELLER-CONTRACT-TO-SUPPLIER-MIGRATION-V1
  *
  * Partner Contracts (mounted separately at /partner prefix):
  *     GET  /contracts                             (partner contracts)
@@ -29,8 +28,8 @@ import { Router } from 'express';
 import type { Response, RequestHandler } from 'express';
 import type { DataSource } from 'typeorm';
 import { requireAuth } from '../../../middleware/auth.middleware.js';
-import { createRequireActiveSupplier, createRequireLinkedSupplier, createRequireActivePartner } from '../middleware/neture-identity.middleware.js';
-import type { SupplierRequest, AuthenticatedRequest } from '../middleware/neture-identity.middleware.js';
+import { createRequireActivePartner } from '../middleware/neture-identity.middleware.js';
+import type { AuthenticatedRequest } from '../middleware/neture-identity.middleware.js';
 import { NetureService } from '../neture.service.js';
 import { NetureService as LegacyNetureService } from '../../../routes/neture/services/neture.service.js';
 import { SellerService } from '../services/seller.service.js';
@@ -46,8 +45,6 @@ export function createSellerController(dataSource: DataSource): Router {
   const netureService = new NetureService();
   const legacyNetureService = new LegacyNetureService(dataSource);
   const approvalV2Service = new ProductApprovalV2Service(dataSource);
-  const requireLinkedSupplier = createRequireLinkedSupplier(dataSource);
-  const requireActiveSupplier = createRequireActiveSupplier(dataSource);
 
   // ==================== Seller Product Query (WO-S2S-FLOW-RECOVERY-PHASE3-V1 T1) ====================
 
@@ -226,76 +223,6 @@ export function createSellerController(dataSource: DataSource): Router {
         success: false,
         error: 'Failed to fetch seller dashboard insight',
       });
-    }
-  });
-
-  // ==================== Seller-Partner Contracts (WO-NETURE-SELLER-PARTNER-CONTRACT-V1) ====================
-
-  /**
-   * GET /contracts
-   * Seller 계약 목록 조회
-   * Query: ?status=active|terminated|expired
-   */
-  router.get('/contracts', requireAuth, requireLinkedSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const sellerId = (req as SupplierRequest).supplierId;
-
-      const { status } = req.query;
-      const contracts = await netureService.getSellerContracts(sellerId, status as string | undefined);
-      res.json({ success: true, data: contracts });
-    } catch (error) {
-      logger.error('[Neture API] Error fetching seller contracts:', error);
-      res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch contracts' });
-    }
-  });
-
-  /**
-   * POST /contracts/:id/terminate
-   * Seller가 계약 해지
-   */
-  router.post('/contracts/:id/terminate', requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const sellerId = (req as SupplierRequest).supplierId;
-
-      const { id } = req.params;
-      const result = await netureService.terminateContract(id, sellerId, 'seller');
-      res.json({ success: true, data: result });
-    } catch (error) {
-      const msg = (error as Error).message;
-      if (msg === 'CONTRACT_NOT_FOUND') {
-        return res.status(404).json({ success: false, error: 'NOT_FOUND', message: '계약을 찾을 수 없습니다.' });
-      }
-      if (msg === 'CONTRACT_NOT_ACTIVE') {
-        return res.status(400).json({ success: false, error: 'INVALID_STATUS', message: '활성 상태의 계약만 해지할 수 있습니다.' });
-      }
-      logger.error('[Neture API] Error terminating contract (seller):', error);
-      res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to terminate contract' });
-    }
-  });
-
-  /**
-   * POST /contracts/:id/commission
-   * 수수료 변경 (기존 계약 terminated → 신규 계약 생성)
-   */
-  router.post('/contracts/:id/commission', requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const sellerId = (req as SupplierRequest).supplierId;
-
-      const { id } = req.params;
-      const { commissionRate } = req.body;
-      if (commissionRate === undefined || typeof commissionRate !== 'number') {
-        return res.status(400).json({ success: false, error: 'BAD_REQUEST', message: 'commissionRate (number) is required' });
-      }
-
-      const result = await netureService.updateCommissionRate(id, commissionRate, sellerId);
-      res.json({ success: true, data: result });
-    } catch (error) {
-      const msg = (error as Error).message;
-      if (msg === 'ACTIVE_CONTRACT_NOT_FOUND') {
-        return res.status(404).json({ success: false, error: 'NOT_FOUND', message: '활성 계약을 찾을 수 없습니다.' });
-      }
-      logger.error('[Neture API] Error updating commission rate:', error);
-      res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to update commission rate' });
     }
   });
 
