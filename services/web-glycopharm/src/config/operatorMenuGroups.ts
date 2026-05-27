@@ -47,6 +47,7 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     // WO-O4O-GLYCOPHARM-OPERATOR-STORE-HUB-WRITE-CAPABILITY-V1
     { label: '약국 HUB 블로그', path: '/operator/blog' },
     { label: '약국 HUB POP', path: '/operator/pop' },
+    { label: '약국 HUB QR', path: '/operator/qr' },
   ],
   signage: [
     { label: 'HQ 미디어', path: '/operator/signage/hq-media' },
@@ -118,6 +119,7 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     { label: '공지/뉴스 관리', path: '/operator/content-management' },
     { label: '약국 HUB 블로그', path: '/operator/blog' },
     { label: '약국 HUB POP', path: '/operator/pop' },
+    { label: '약국 HUB QR', path: '/operator/qr' },
   ],
   signage: [
     { label: 'HQ 미디어', path: '/operator/signage/hq-media' },

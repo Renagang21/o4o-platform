@@ -245,6 +245,8 @@ const OperatorBlogListPage = lazy(() => import('@/pages/operator/blog/OperatorBl
 const OperatorBlogWritePage = lazy(() => import('@/pages/operator/blog/OperatorBlogWritePage'));
 const OperatorPopListPage = lazy(() => import('@/pages/operator/pop/OperatorPopListPage'));
 const OperatorPopWritePage = lazy(() => import('@/pages/operator/pop/OperatorPopWritePage'));
+const OperatorQrListPage = lazy(() => import('@/pages/operator/qr/OperatorQrListPage'));
+const OperatorQrWritePage = lazy(() => import('@/pages/operator/qr/OperatorQrWritePage'));
 
 // MyPage 3-split (WO-O4O-GLYCOPHARM-MYPAGE-SPLIT-V1)
 const MyPageHub = lazy(() => import('@/pages/mypage/MyPageHub'));
@@ -694,6 +696,10 @@ function AppRoutes() {
         <Route path="pop" element={<OperatorPopListPage />} />
         <Route path="pop/new" element={<OperatorPopWritePage />} />
         <Route path="pop/:id/edit" element={<OperatorPopWritePage />} />
+        {/* Store HUB QR write (WO-O4O-GLYCOPHARM-OPERATOR-QR-WRITE-FRONTEND-V1) */}
+        <Route path="qr" element={<OperatorQrListPage />} />
+        <Route path="qr/new" element={<OperatorQrWritePage />} />
+        <Route path="qr/:id/edit" element={<OperatorQrWritePage />} />
         {/* Settings */}
         <Route path="settings" element={<SettingsPage />} />
       </Route>
