@@ -51,7 +51,8 @@ const roleConfig: Record<string, RoleConfig> = {
         { label: '대시보드', path: '/admin', exact: true },
       ]},
       { label: 'Users', icon: Users, items: [
-        { label: '회원 관리', path: '/admin/users' },
+        // WO-O4O-GLYCOPHARM-OPERATOR-ADMIN-CONSOLE-KPA-ALIGNMENT-V1: /admin/members (soft+hard delete)
+        { label: '회원 관리', path: '/admin/members' },
       ]},
       { label: 'Approvals', icon: Store, items: [
         { label: '약국 네트워크', path: '/admin/pharmacies' },
