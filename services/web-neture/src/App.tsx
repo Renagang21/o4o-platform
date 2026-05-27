@@ -312,6 +312,8 @@ const EmailSettingsPage = lazy(() =>
 
 // Admin Operators
 const OperatorsPage = lazy(() => import('./pages/admin/OperatorsPage'));
+// WO-O4O-NETURE-ADMIN-MEMBER-HARD-DELETE-V1
+const AdminMemberManagementPage = lazy(() => import('./pages/admin/AdminMemberManagementPage'));
 
 // Admin Approval Pages
 const AdminSupplierApprovalPage = lazy(() => import('./pages/admin/AdminSupplierApprovalPage'));
@@ -922,6 +924,8 @@ function App() {
               {/* WO-NETURE-CURATION-PHASE3-FULL-REMOVAL-V1: /admin/curation 라우트 제거 */}
               <Route path="/admin/actions" element={<OperatorActionQueuePage />} />
               {/* Admin-only 페이지 */}
+              {/* WO-O4O-NETURE-ADMIN-MEMBER-HARD-DELETE-V1: admin 전용 완전삭제 관리 */}
+              <Route path="/admin/members" element={<AdminMemberManagementPage />} />
               <Route path="/admin/operators" element={<OperatorsPage />} />
               <Route path="/admin/contact-messages" element={<AdminContactMessagesPage />} />
               <Route path="/admin/service-approvals" element={<AdminServiceApprovalPage />} />

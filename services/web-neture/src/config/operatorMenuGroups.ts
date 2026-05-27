@@ -31,6 +31,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   users: [
     { label: '회원 관리', path: '/operator/users' },
     { label: '운영자 관리', path: '/operator/operators', adminOnly: true },
+    // WO-O4O-NETURE-ADMIN-MEMBER-HARD-DELETE-V1: admin 전용 완전삭제 관리
+    { label: '회원 완전삭제', path: '/operator/members', adminOnly: true },
     { label: '문의 메시지', path: '/operator/contact-messages', adminOnly: true },
   ],
   approvals: [
