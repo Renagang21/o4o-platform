@@ -247,6 +247,7 @@ const OperatorPopListPage = lazy(() => import('@/pages/operator/pop/OperatorPopL
 const OperatorPopWritePage = lazy(() => import('@/pages/operator/pop/OperatorPopWritePage'));
 const OperatorQrListPage = lazy(() => import('@/pages/operator/qr/OperatorQrListPage'));
 const OperatorQrWritePage = lazy(() => import('@/pages/operator/qr/OperatorQrWritePage'));
+const QualificationRequestsPage = lazy(() => import('@/pages/operator/QualificationRequestsPage'));
 
 // MyPage 3-split (WO-O4O-GLYCOPHARM-MYPAGE-SPLIT-V1)
 const MyPageHub = lazy(() => import('@/pages/mypage/MyPageHub'));
@@ -700,6 +701,8 @@ function AppRoutes() {
         <Route path="qr" element={<OperatorQrListPage />} />
         <Route path="qr/new" element={<OperatorQrWritePage />} />
         <Route path="qr/:id/edit" element={<OperatorQrWritePage />} />
+        {/* LMS Qualification (WO-O4O-GLYCOPHARM-OPERATOR-LMS-QUALIFICATION-WORKFLOW-V1) */}
+        <Route path="qualification-requests" element={<QualificationRequestsPage />} />
         {/* Settings */}
         <Route path="settings" element={<SettingsPage />} />
       </Route>
