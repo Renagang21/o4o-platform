@@ -154,7 +154,7 @@ export class MarketTrialDecisionService {
     await this.validateTrialStatus(trialId);
 
     // Validate participant
-    await this.validateParticipant(trialId, dto.participantId, ParticipantType.PARTNER);
+    await this.validateParticipant(trialId, dto.participantId, [ParticipantType.PARTNER]);
 
     // Check for duplicate decision
     if (await this.hasDecisionAlready(trialId, dto.participantId)) {
