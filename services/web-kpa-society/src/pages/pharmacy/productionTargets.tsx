@@ -29,6 +29,9 @@
  */
 
 import { Megaphone, QrCode, BookOpen, FileText, type LucideIcon } from 'lucide-react';
+// WO-O4O-PRODUCTION-TEMPLATE-REGISTRY-CROSSSERVICE-PHASE2-J-V1:
+//   ProductionOutputConstraints 는 @o4o/types/production-template canonical.
+//   productionTemplates.ts 는 re-export 를 유지하므로 경로 변경 불필요.
 import type { ProductionOutputConstraints } from './productionTemplates';
 // WO-O4O-STORE-PRODUCTION-TYPES-COMMONIZATION-PHASE2-F-V1:
 //   4 개 router state 타입의 canonical 출처는 @o4o/types/production.

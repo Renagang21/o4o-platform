@@ -122,3 +122,7 @@ export * from './hub-content.js';
 // Export store production router state types (WO-O4O-STORE-PRODUCTION-TYPES-COMMONIZATION-PHASE2-F-V1)
 // canonical 출처 — KPA / GlycoPharm / K-Cosmetics 가 re-export 하여 사용
 export * from './production.js';
+
+// Export store production template types (WO-O4O-PRODUCTION-TEMPLATE-REGISTRY-CROSSSERVICE-PHASE2-J-V1)
+// canonical 출처 — KPA / GlycoPharm / K-Cosmetics 서비스별 template registry 타입 기반
+export * from './production-template.js';

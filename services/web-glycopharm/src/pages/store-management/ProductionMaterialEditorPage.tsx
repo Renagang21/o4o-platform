@@ -2,8 +2,9 @@
  * ProductionMaterialEditorPage — AI 결과 검토/수정 전용 편집기 (GlycoPharm)
  *
  * WO-O4O-PRODUCTION-AI-EDITOR-CROSSSERVICE-PHASE2-I-V1
+ * WO-O4O-PRODUCTION-TEMPLATE-REGISTRY-CROSSSERVICE-PHASE2-J-V1:
+ *   selectedTemplateId → findTemplate → starterHtml fallback 추가.
  *
- * KPA ProductionMaterialEditorPage 를 기준으로 GlycoPharm 용으로 이식.
  * 저장: POST /api/v1/glycopharm/store/assets (createStoreExecutionAsset)
  * 저장 후: /store/library/production-materials 이동
  *
@@ -12,6 +13,7 @@
  *   generatedHtml?: string;
  *   title?: string;
  *   sourceMetadata?: { sourceContentId?: string; sourceTitle?: string; sourceOrigin?: string };
+ *   selectedTemplateId?: string;
  * }
  */
 
@@ -24,6 +26,7 @@ import { RichTextEditor } from '@o4o/content-editor';
 import type { EditorContent } from '@o4o/content-editor';
 import { getAccessToken } from '@o4o/auth-client';
 import { createStoreExecutionAsset } from '@/api/storeExecutionAssets';
+import { findTemplate } from '@/config/productionTemplates';
 
 // ─── 제작 유형 (GlycoPharm: POP/QR 2개) ─────────────────────────────────────
 
@@ -44,6 +47,7 @@ interface EditorPageState {
     sourceTitle?: string;
     sourceOrigin?: string;
   };
+  selectedTemplateId?: string;
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -53,7 +57,8 @@ export default function ProductionMaterialEditorPage() {
   const location = useLocation();
   const state = (location.state as EditorPageState | null) ?? {};
 
-  const initialHtml = state.generatedHtml ?? '';
+  const selectedTemplate = state.selectedTemplateId ? findTemplate(state.selectedTemplateId) : undefined;
+  const initialHtml = state.generatedHtml ?? selectedTemplate?.starterHtml ?? '';
 
   const [title, setTitle] = useState(state.title ?? '');
   const [selectedType, setSelectedType] = useState<ProductionType | null>(null);

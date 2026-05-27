@@ -39,6 +39,10 @@
     "./production": {
       "types": "./dist/production.d.ts",
       "import": "./dist/production.js"
+    },
+    "./production-template": {
+      "types": "./dist/production-template.d.ts",
+      "import": "./dist/production-template.js"
     }
   },
   "sideEffects": false,

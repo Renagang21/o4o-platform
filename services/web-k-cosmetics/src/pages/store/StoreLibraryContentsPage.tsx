@@ -8,6 +8,8 @@
  *   target config: POP/QR 2개.
  * WO-O4O-PRODUCTION-AI-EDITOR-CROSSSERVICE-PHASE2-I-V1:
  *   onAiAction 연결 — AiContentModal → ProductionMaterialEditorPage 흐름 추가.
+ * WO-O4O-PRODUCTION-TEMPLATE-REGISTRY-CROSSSERVICE-PHASE2-J-V1:
+ *   supportsTemplates: true + getTemplates 연결 — K-Cosmetics 전용 POP/QR 템플릿 registry.
  *
  * API: assetSnapshotApi.list({ type: 'content' }) → /cosmetics/assets?type=content
  */
@@ -24,6 +26,7 @@ import {
   type ProductionSource,
   composeSourceTextFromItems,
 } from '@o4o/store-ui-core';
+import { getTemplatesForTarget } from '../../config/productionTemplates';
 
 const COSMETICS_PRODUCTION_TARGETS: StartProductionTargetConfig[] = [
   {
@@ -32,7 +35,8 @@ const COSMETICS_PRODUCTION_TARGETS: StartProductionTargetConfig[] = [
     Icon: Megaphone,
     iconColor: '#f59e0b',
     route: '/store/pop',
-    supportsTemplates: false,
+    supportsTemplates: true,
+    defaultTemplateId: 'kcos-pop-beauty-expert',
   },
   {
     key: 'qr',
@@ -40,7 +44,8 @@ const COSMETICS_PRODUCTION_TARGETS: StartProductionTargetConfig[] = [
     Icon: QrCode,
     iconColor: '#0ea5e9',
     route: '/store/qr',
-    supportsTemplates: false,
+    supportsTemplates: true,
+    defaultTemplateId: 'kcos-qr-usage-guide',
   },
 ];
 
@@ -162,6 +167,7 @@ export default function StoreLibraryContentsPage() {
         targets={COSMETICS_PRODUCTION_TARGETS}
         onClose={() => setProductionSource(null)}
         onAiAction={handleAiAction}
+        getTemplates={getTemplatesForTarget}
       />
 
       <AiContentModal
