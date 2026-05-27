@@ -85,6 +85,8 @@ const ForumWritePage = lazy(() => import('@/pages/forum/ForumWritePage'));
 // WO-O4O-FORUM-MY-FORUM-EXPANSION-V1
 const MyForumDashboardPage = lazy(() => import('@/pages/forum/MyForumDashboardPage'));
 const ForumRequestCategoryPage = lazy(() => import('@/pages/forum/RequestCategoryPage'));
+// WO-O4O-FORUM-MEMBER-MANAGEMENT-EXPANSION-FRONTEND-V1
+const ForumMemberManagementPage = lazy(() => import('@/pages/forum/ForumMemberManagementPage'));
 
 // LMS (WO-KCOS-KPA-LMS-STEP1-ENABLE-V1 / WO-KCOS-KPA-LMS-STEP3-LESSON-PLAYER-V1)
 const EducationPage = lazy(() => import('@/pages/lms/EducationPage'));
@@ -315,6 +317,15 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <MyForumDashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        {/* WO-O4O-FORUM-MEMBER-MANAGEMENT-EXPANSION-FRONTEND-V1 */}
+        <Route
+          path="forum/my-dashboard/:forumId/members"
+          element={
+            <ProtectedRoute>
+              <ForumMemberManagementPage />
             </ProtectedRoute>
           }
         />

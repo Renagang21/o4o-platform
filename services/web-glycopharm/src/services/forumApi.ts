@@ -160,3 +160,69 @@ export async function fetchMyForumRequests(): Promise<{ success: boolean; data: 
     return { success: false, data: [] };
   }
 }
+
+// ============================================================================
+// Forum Membership API — WO-O4O-FORUM-MEMBER-MANAGEMENT-EXPANSION-FRONTEND-V1
+// Common endpoint: /api/v1/forum/categories/:id/...
+// ============================================================================
+
+export interface ForumJoinRequest {
+  id: string;
+  user_id: string;
+  requester_id: string;
+  requester_name: string | null;
+  requester_email: string | null;
+  user_display_name: string | null;
+  user_name: string | null;
+  user_email: string | null;
+  status: string;
+  message: string | null;
+  created_at: string;
+}
+
+export interface ForumMember {
+  id: string;
+  user_id: string;
+  role: 'owner' | 'member';
+  joined_at: string;
+  user_name: string | null;
+  user_email: string | null;
+}
+
+export const forumMembershipApi = {
+  getJoinRequests: (forumId: string) =>
+    api.get<{ success: boolean; data: ForumJoinRequest[] }>(
+      `/forum/categories/${forumId}/join-requests`,
+    ),
+
+  approveJoin: (forumId: string, requestId: string) =>
+    api.post<{ success: boolean; data: any }>(
+      `/forum/categories/${forumId}/join-requests/${requestId}/approve`,
+    ),
+
+  rejectJoin: (forumId: string, requestId: string, reviewComment?: string) =>
+    api.post<{ success: boolean; data: any }>(
+      `/forum/categories/${forumId}/join-requests/${requestId}/reject`,
+      { reviewComment },
+    ),
+
+  getMembers: (forumId: string) =>
+    api.get<{ success: boolean; data: ForumMember[] }>(
+      `/forum/categories/${forumId}/members`,
+    ),
+
+  removeMember: (forumId: string, userId: string) =>
+    api.delete<{ success: boolean; data: any }>(
+      `/forum/categories/${forumId}/members/${userId}`,
+    ),
+
+  requestJoin: (forumId: string) =>
+    api.post<{ success: boolean; data: any }>(
+      `/forum/categories/${forumId}/join-requests`,
+    ),
+
+  getMembershipStatus: (forumId: string) =>
+    api.get<{ success: boolean; data: { isMember: boolean; role: string | null; pendingRequest: boolean } }>(
+      `/forum/categories/${forumId}/membership-status`,
+    ),
+};

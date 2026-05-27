@@ -24,6 +24,7 @@ import {
   X,
   Save,
   Trash2,
+  Users,
 } from 'lucide-react';
 import {
   fetchMyForumRequests,
@@ -460,6 +461,15 @@ export default function MyForumDashboardPage() {
                     <div className="text-sm font-medium text-slate-700">{cat.postCount}</div>
                     <div className="text-xs text-slate-400">게시글</div>
                   </div>
+                  {cat.forumType === 'closed' && (
+                    <Link
+                      to={`/forum/my-dashboard/${cat.id}/members`}
+                      className="p-2 rounded-lg text-slate-400 hover:text-pink-600 hover:bg-pink-50 transition-colors"
+                      title="회원 관리"
+                    >
+                      <Users className="w-4 h-4" />
+                    </Link>
+                  )}
                   <button onClick={() => openEdit(cat)} className="p-2 rounded-lg text-slate-400 hover:text-pink-600 hover:bg-pink-50 transition-colors" title="포럼 정보 수정">
                     <Pencil className="w-4 h-4" />
                   </button>
