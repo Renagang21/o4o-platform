@@ -24,7 +24,6 @@ const GLYCOPHARM_CONFIG: EditUserModalConfig = {
   makeRequest,
   membershipRoleOptions: [
     { value: 'pharmacy', label: '약국' },
-    { value: 'customer', label: '당뇨인' },
     { value: 'supplier', label: '공급자' },
   ],
   adminRoleOptions: [

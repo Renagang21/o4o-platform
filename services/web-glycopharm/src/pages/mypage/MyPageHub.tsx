@@ -31,7 +31,6 @@ const roleLabels: Record<string, string> = {
   operator: '운영자',
   pharmacy: '약사',
   pharmacist: '약사',
-  customer: '당뇨인',
   supplier: '공급자',
   partner: '파트너',
   consumer: '소비자',

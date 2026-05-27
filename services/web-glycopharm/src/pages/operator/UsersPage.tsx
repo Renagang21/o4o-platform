@@ -222,9 +222,8 @@ export default function UsersPage() {
       serviceKey="glycopharm"
       client={gpMembersClient}
       roleTabs={[
-        // WO-GLYCOPHARM-PHARMACY-ROLE-FINAL-CLEANUP-V1: pharmacist 단일 기준
-        { key: 'pharmacy', label: '약국', roleFilter: ['glycopharm:pharmacist'] },
-        { key: 'customer', label: '당뇨인', roleFilter: ['customer'] },
+        { key: 'pharmacist', label: '약사', roleFilter: ['glycopharm:pharmacist'] },
+        { key: 'store_owner', label: '약국 경영자', roleFilter: ['glycopharm:store_owner'] },
       ]}
       renderEditModal={({ user, onClose, onSuccess }) => (
         <EditUserModal userId={user.id} onClose={onClose} onSuccess={onSuccess} />

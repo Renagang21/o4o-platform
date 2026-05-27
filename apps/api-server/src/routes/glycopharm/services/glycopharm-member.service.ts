@@ -58,7 +58,17 @@ export class GlycopharmMemberService {
       },
     });
 
-    return this.repo.save(member);
+    const saved = await this.repo.save(member);
+
+    // sync service_memberships so operator pending tab shows this application
+    await this.dataSource.query(
+      `INSERT INTO service_memberships (id, user_id, service_key, status, role, created_at, updated_at)
+       VALUES (gen_random_uuid(), $1, 'glycopharm', 'pending', 'pharmacist', NOW(), NOW())
+       ON CONFLICT (user_id, service_key) DO UPDATE SET status = 'pending', updated_at = NOW()`,
+      [userId],
+    );
+
+    return saved;
   }
 
   /**
@@ -82,6 +92,13 @@ export class GlycopharmMemberService {
     member.approvedAt = new Date();
     member.rejectionReason = null;
     await this.repo.save(member);
+
+    // sync service_memberships status to active
+    await this.dataSource.query(
+      `UPDATE service_memberships SET status = 'active', approved_by = $2, approved_at = NOW(), updated_at = NOW()
+       WHERE user_id = $1 AND service_key = 'glycopharm'`,
+      [member.userId, operatorId],
+    );
 
     // 역할 부여: glycopharm:pharmacist
     await this.roleAssignmentService.assignRole({
@@ -121,6 +138,13 @@ export class GlycopharmMemberService {
     member.status = 'rejected';
     member.rejectionReason = reason ?? null;
     await this.repo.save(member);
+
+    // sync service_memberships status to rejected
+    await this.dataSource.query(
+      `UPDATE service_memberships SET status = 'rejected', rejection_reason = $2, updated_at = NOW()
+       WHERE user_id = $1 AND service_key = 'glycopharm'`,
+      [member.userId, reason ?? null],
+    );
 
     return member;
   }
