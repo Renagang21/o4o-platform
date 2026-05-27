@@ -58,6 +58,7 @@ import { createInvoiceController } from './controllers/invoice.controller.js'; /
 import { createInvoiceDispatchController } from './controllers/invoice-dispatch.controller.js'; // Phase 3-E: Invoice Dispatch
 import { createGlycopharmCommunityHubController } from './controllers/glycopharm-community-hub.controller.js'; // WO-GLYCOPHARM-COMMUNITY-HUB-IMPLEMENTATION-V1
 import { createGlycopharmEventOfferController } from './controllers/event-offer.controller.js'; // WO-O4O-GLYCOPHARM-EVENT-OFFERS-BACKEND-CANONICAL-ALIGNMENT-V1
+import { createGlycopharmEventOfferOperatorController } from './controllers/event-offer-operator.controller.js'; // WO-O4O-GLYCOPHARM-OPERATOR-EVENT-OFFER-APPROVAL-V1
 import { createNewsController } from '../o4o-store/controllers/news.controller.js'; // WO-O4O-CONTENT-CANONICAL-CROSS-SERVICE-ALIGNMENT-V1
 import { createGlycopharmMemberController } from './controllers/glycopharm-member.controller.js'; // WO-GLYCOPHARM-MEMBER-REGISTER-FLOW-V1
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
@@ -484,6 +485,15 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   router.use('/event-offers', createGlycopharmEventOfferController(
     dataSource,
     coreRequireAuth as any,
+  ));
+
+  // WO-O4O-GLYCOPHARM-OPERATOR-EVENT-OFFER-APPROVAL-V1
+  // /api/v1/glycopharm/operator/event-offers — 운영자 Event Offer 승인/반려
+  // 권한: glycopharm:operator / glycopharm:admin / platform:admin / platform:super_admin
+  router.use('/operator/event-offers', createGlycopharmEventOfferOperatorController(
+    dataSource,
+    coreRequireAuth as any,
+    requireGlycopharmScope,
   ));
 
   // ============================================================================
