@@ -29,7 +29,6 @@ export function StatusBadge({ status }: { status: string }) {
 const ROLE_STYLES: Record<string, { label: string; color: string; bg: string }> = {
   // GlycoPharm
   pharmacy:    { label: '약국',   color: 'text-teal-700',   bg: 'bg-teal-50 border-teal-200' },
-  customer:    { label: '당뇨인', color: 'text-blue-700',   bg: 'bg-blue-50 border-blue-200' },
   // Neture
   supplier:    { label: '공급자', color: 'text-purple-700', bg: 'bg-purple-50 border-purple-200' },
   partner:     { label: '파트너', color: 'text-indigo-700', bg: 'bg-indigo-50 border-indigo-200' },

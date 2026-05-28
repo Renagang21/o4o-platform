@@ -117,6 +117,11 @@ export function GlycoGlobalHeader() {
               강의 대시보드
             </GlobalHeaderMenuItem>
           )}
+          {isAdmin && (
+            <GlobalHeaderMenuItem to="/admin" icon={<Shield className="w-4 h-4" />}>
+              관리 대시보드
+            </GlobalHeaderMenuItem>
+          )}
           {isOperator && (
             <GlobalHeaderMenuItem to="/operator" icon={<Shield className="w-4 h-4" />}>
               운영 대시보드

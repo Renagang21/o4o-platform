@@ -18,7 +18,6 @@ import {
   Building2,
   Truck,
   Shield,
-  Bell,
   Search,
   Store,
   DollarSign,
@@ -301,12 +300,6 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
 
             {/* Right Actions */}
             <div className="flex items-center gap-3">
-              {/* Notifications */}
-              <button className="relative p-2 rounded-xl hover:bg-slate-100 transition-colors">
-                <Bell className="w-5 h-5 text-slate-600" />
-                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
-              </button>
-
             </div>
           </div>
         </header>
