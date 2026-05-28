@@ -8,8 +8,39 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { OperatorDashboardLayout, type OperatorDashboardConfig } from '@o4o/operator-ux-core';
+import { AxisNavigationSection, type OperatorAxisGroup } from '@o4o/operator-core-ui';
 import { operatorApi } from '@/services/operatorApi';
 import { buildKCosmeticsOperatorConfig } from './operatorConfig';
+
+// WO-O4O-OPERATOR-DASHBOARD-AXIS-NAVIGATION-COMMONIZATION-V1
+const KCOS_AXES: OperatorAxisGroup[] = [
+  {
+    key: 'store-hub',
+    title: '매장 HUB 운영',
+    description: '매장 · 상품 · 주문 · 이벤트',
+    icon: '🏪',
+    tone: 'emerald',
+    links: [
+      { key: 'stores', label: '매장 관리', href: '/operator/stores' },
+      { key: 'products', label: '상품 관리', href: '/operator/products' },
+      { key: 'orders', label: '주문 관리', href: '/operator/orders' },
+      { key: 'event-offers', label: '이벤트 오퍼', href: '/operator/event-offers' },
+    ],
+  },
+  {
+    key: 'content',
+    title: '콘텐츠 운영',
+    description: '콘텐츠 · LMS · 자료실 · 사이니지',
+    icon: '📋',
+    tone: 'blue',
+    links: [
+      { key: 'content-management', label: '콘텐츠 관리', href: '/operator/content-management' },
+      { key: 'lms', label: '강의 관리', href: '/operator/lms' },
+      { key: 'resources', label: '자료실', href: '/operator/resources' },
+      { key: 'signage', label: '사이니지', href: '/operator/signage/hq-media' },
+    ],
+  },
+];
 
 export default function KCosmeticsOperatorDashboard() {
   const [config, setConfig] = useState<OperatorDashboardConfig | null>(null);
@@ -59,5 +90,11 @@ export default function KCosmeticsOperatorDashboard() {
     );
   }
 
-  return <OperatorDashboardLayout config={config} />;
+  return (
+    <div className="space-y-6">
+      {/* WO-O4O-OPERATOR-DASHBOARD-AXIS-NAVIGATION-COMMONIZATION-V1: 2축 운영 네비게이션 */}
+      <AxisNavigationSection axes={KCOS_AXES} />
+      <OperatorDashboardLayout config={config} />
+    </div>
+  );
 }

@@ -29,6 +29,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { OperatorDashboardLayout, type OperatorDashboardConfig } from '@o4o/operator-ux-core';
+import { AxisNavigationSection, type OperatorAxisGroup } from '@o4o/operator-core-ui';
 import { operatorApi } from '../../api/operator';
 import { apiClient } from '../../api/client';
 import { useAuth, getAccessToken } from '../../contexts/AuthContext';
@@ -138,97 +139,62 @@ export default function KpaOperatorDashboard() {
     );
   }
 
+  const axes: OperatorAxisGroup[] = extData ? buildKpaAxes(extData) : [];
+
   return (
     <div className="space-y-6">
-      {/* WO-O4O-KPA-OPERATOR-DASHBOARD-GUIDE-CARD-V1: 운영 철학 카드 — Dashboard
-          진입 → 운영 철학 → 운영 기능 순서로 인지. 기능보다 의미를 먼저 전달. */}
+      {/* WO-O4O-KPA-OPERATOR-DASHBOARD-GUIDE-CARD-V1: 운영 철학 카드 */}
       <OperatorRoleGuideCard />
       {/* WO-O4O-OPERATOR-DASHBOARD-COMMUNITY-STORE-HUB-SPLIT-V1: 2축 운영 네비게이션 */}
-      {extData && <AxisNavigationSection extData={extData} />}
+      {axes.length > 0 && <AxisNavigationSection axes={axes} />}
       <OperatorDashboardLayout config={config} />
     </div>
   );
 }
 
-// ─── 2축 운영 네비게이션 카드 ───────────────────────────────────────────────────
+// ─── KPA axes 생성 ────────────────────────────────────────────
 
-function AxisNavigationSection({ extData }: { extData: KpaExtendedData }) {
-  const summary = extData.summary;
-  const forumPending = summary?.forum?.pendingRequests ?? 0;
-  const contentPending = summary?.content?.pendingDraft ?? 0;
+function buildKpaAxes(extData: KpaExtendedData): OperatorAxisGroup[] {
+  const forumPending = extData.summary?.forum?.pendingRequests ?? 0;
+  const contentPending = extData.summary?.content?.pendingDraft ?? 0;
   const totalStores = extData.storeStats?.totalStores ?? 0;
 
-  const communityMetrics = [
-    { label: '회원 승인', value: extData.pendingMembers, link: '/operator/members', warn: extData.pendingMembers > 0 },
-    { label: '포럼 요청', value: forumPending, link: '/operator/forum-management', warn: forumPending > 0 },
-    { label: '콘텐츠 대기', value: contentPending, link: '/operator/content', warn: contentPending > 0 },
+  return [
+    {
+      key: 'community',
+      title: '커뮤니티 운영',
+      description: '포럼 · 회원 · 콘텐츠 · LMS · 자료실',
+      icon: '💬',
+      tone: 'blue',
+      metrics: [
+        { label: '회원 승인', value: extData.pendingMembers, href: '/operator/members', warn: extData.pendingMembers > 0 },
+        { label: '포럼 요청', value: forumPending, href: '/operator/forum-management', warn: forumPending > 0 },
+        { label: '콘텐츠 대기', value: contentPending, href: '/operator/content', warn: contentPending > 0 },
+      ],
+      links: [
+        { key: 'forum', label: '포럼 운영', href: '/operator/forum' },
+        { key: 'members', label: '회원 관리', href: '/operator/members' },
+        { key: 'lms', label: '강의 관리', href: '/operator/lms' },
+      ],
+    },
+    {
+      key: 'store-hub',
+      title: '매장 HUB 운영',
+      description: '매장 · 이벤트 오퍼 · 사이니지 · 상품 신청',
+      icon: '🏪',
+      tone: 'emerald',
+      metrics: [
+        { label: '상품 신청', value: extData.productApplicationPendingCount, href: '/operator/product-applications', warn: extData.productApplicationPendingCount > 0 },
+        { label: '약국 서비스', value: extData.pharmacyRequestCount, href: '/operator/pharmacy-requests', warn: extData.pharmacyRequestCount > 0 },
+        { label: '등록 매장', value: totalStores, href: '/operator/stores', warn: false },
+      ],
+      links: [
+        { key: 'stores', label: '매장 관리', href: '/operator/stores' },
+        { key: 'event-offers', label: '이벤트 오퍼', href: '/operator/event-offers' },
+        { key: 'signage', label: '사이니지', href: '/operator/signage/hq-media' },
+      ],
+    },
   ];
-
-  const storeMetrics = [
-    { label: '상품 신청', value: extData.productApplicationPendingCount, link: '/operator/product-applications', warn: extData.productApplicationPendingCount > 0 },
-    { label: '약국 서비스', value: extData.pharmacyRequestCount, link: '/operator/pharmacy-requests', warn: extData.pharmacyRequestCount > 0 },
-    { label: '등록 매장', value: totalStores, link: '/operator/stores', warn: false },
-  ];
-
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {/* 커뮤니티 운영 */}
-      <div className="bg-white rounded-xl border border-blue-100 p-5">
-        <div className="flex items-center gap-2 mb-1">
-          <span>💬</span>
-          <span className="text-sm font-semibold text-slate-800">커뮤니티 운영</span>
-        </div>
-        <p className="text-xs text-slate-400 mb-3">포럼 · 회원 · 콘텐츠 · LMS · 자료실</p>
-        <div className="grid grid-cols-3 gap-2 mb-3">
-          {communityMetrics.map((m) => (
-            <Link
-              key={m.link}
-              to={m.link}
-              className={`text-center py-2 px-1 rounded-lg text-xs border transition-colors hover:opacity-80 ${
-                m.warn ? 'border-amber-200 bg-amber-50' : 'border-slate-100 bg-slate-50'
-              }`}
-            >
-              <div className={`text-lg font-bold ${m.warn ? 'text-amber-600' : 'text-slate-500'}`}>{m.value}</div>
-              <div className="text-slate-500 mt-0.5">{m.label}</div>
-            </Link>
-          ))}
-        </div>
-        <div className="flex gap-2 flex-wrap">
-          <Link to="/operator/forum" className="text-xs px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors">포럼 운영</Link>
-          <Link to="/operator/members" className="text-xs px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors">회원 관리</Link>
-          <Link to="/operator/lms" className="text-xs px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors">강의 관리</Link>
-        </div>
-      </div>
-
-      {/* 매장 HUB 운영 */}
-      <div className="bg-white rounded-xl border border-emerald-100 p-5">
-        <div className="flex items-center gap-2 mb-1">
-          <span>🏪</span>
-          <span className="text-sm font-semibold text-slate-800">매장 HUB 운영</span>
-        </div>
-        <p className="text-xs text-slate-400 mb-3">매장 · 이벤트 오퍼 · 사이니지 · 상품 신청</p>
-        <div className="grid grid-cols-3 gap-2 mb-3">
-          {storeMetrics.map((m) => (
-            <Link
-              key={m.link}
-              to={m.link}
-              className={`text-center py-2 px-1 rounded-lg text-xs border transition-colors hover:opacity-80 ${
-                m.warn ? 'border-amber-200 bg-amber-50' : 'border-slate-100 bg-slate-50'
-              }`}
-            >
-              <div className={`text-lg font-bold ${m.warn ? 'text-amber-600' : 'text-slate-500'}`}>{m.value}</div>
-              <div className="text-slate-500 mt-0.5">{m.label}</div>
-            </Link>
-          ))}
-        </div>
-        <div className="flex gap-2 flex-wrap">
-          <Link to="/operator/stores" className="text-xs px-3 py-1.5 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 transition-colors">매장 관리</Link>
-          <Link to="/operator/event-offers" className="text-xs px-3 py-1.5 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 transition-colors">이벤트 오퍼</Link>
-          <Link to="/operator/signage/hq-media" className="text-xs px-3 py-1.5 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 transition-colors">사이니지</Link>
-        </div>
-      </div>
-    </div>
-  );
 }
 
 // ─── 운영 철학 가이드 카드 ─────────────────────────────────────────────────────

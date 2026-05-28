@@ -61,3 +61,12 @@ export type {
   KpaMemberForEdit,
   KpaEditUserModalProps,
 } from './modules/members';
+
+// Dashboard Modules (WO-O4O-OPERATOR-DASHBOARD-AXIS-NAVIGATION-COMMONIZATION-V1)
+export { AxisNavigationSection } from './dashboard/AxisNavigationSection';
+export type {
+  AxisMetric,
+  AxisLink,
+  OperatorAxisGroup,
+  AxisNavigationSectionProps,
+} from './dashboard/AxisNavigationSection';

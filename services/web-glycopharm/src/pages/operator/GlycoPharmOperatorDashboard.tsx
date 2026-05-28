@@ -19,6 +19,7 @@ import {
   OperatorDashboardLayout,
   type OperatorDashboardConfig,
 } from '@o4o/operator-ux-core';
+import { AxisNavigationSection, type OperatorAxisGroup } from '@o4o/operator-core-ui';
 import { fetchOperatorDashboard } from '../../api/operatorDashboard';
 import { buildGlycoPharmOperatorConfig } from './operatorConfig';
 import OperatorAlerts from '../../components/OperatorAlerts';
@@ -32,6 +33,35 @@ interface AlertItem {
   title: string;
   message: string;
 }
+
+// WO-O4O-OPERATOR-DASHBOARD-AXIS-NAVIGATION-COMMONIZATION-V1
+const GP_AXES: OperatorAxisGroup[] = [
+  {
+    key: 'community',
+    title: '커뮤니티 운영',
+    description: '포럼 · 회원 · 콘텐츠 · LMS',
+    icon: '💬',
+    tone: 'blue',
+    links: [
+      { key: 'forum', label: '포럼 운영', href: '/operator/forum-management' },
+      { key: 'members', label: '회원 관리', href: '/operator/members' },
+      { key: 'lms', label: '강의 관리', href: '/operator/lms' },
+    ],
+  },
+  {
+    key: 'pharmacy-hub',
+    title: '약국 HUB 운영',
+    description: '매장 · 신청 · 채널 · 설문',
+    icon: '🏥',
+    tone: 'emerald',
+    links: [
+      { key: 'stores', label: '매장 관리', href: '/operator/stores' },
+      { key: 'applications', label: '신청 관리', href: '/operator/applications' },
+      { key: 'channels', label: '채널 관리', href: '/operator/store-channels' },
+      { key: 'surveys', label: '설문 관리', href: '/operator/surveys' },
+    ],
+  },
+];
 
 // ─── Main Component ─────────────────────────────────────────
 
@@ -107,6 +137,9 @@ export default function GlycoPharmOperatorDashboard() {
           새로고침
         </button>
       </div>
+
+      {/* WO-O4O-OPERATOR-DASHBOARD-AXIS-NAVIGATION-COMMONIZATION-V1: 2축 운영 네비게이션 */}
+      <AxisNavigationSection axes={GP_AXES} />
 
       {/* Standard 5-Block Layout: KPI → AI Summary → Action Queue → Activity Log → Quick Actions */}
       <OperatorDashboardLayout config={config} />
