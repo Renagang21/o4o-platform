@@ -108,8 +108,8 @@ export default function AdminMemberManagementPage() {
       const res = await api.get<{ success: boolean; users: NMember[]; pagination: Pagination }>(
         `/operator/members?${params.toString()}`
       );
-      setMembers(res.users || []);
-      setPagination(res.pagination || { page, limit: 20, total: 0, totalPages: 1 });
+      setMembers(res.data.users || []);
+      setPagination(res.data.pagination || { page, limit: 20, total: 0, totalPages: 1 });
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : '회원 목록을 불러오지 못했습니다.');
     } finally {
