@@ -171,6 +171,10 @@ const OperatorContentPage = lazy(() => import('@/pages/operator/OperatorContentP
 // WO-KCOS-OPERATOR-LMS-BOOTSTRAP-V1
 const OperatorLmsCoursesPage = lazy(() => import('@/pages/operator/OperatorLmsCoursesPage'));
 
+// WO-O4O-KCOSMETICS-OPERATOR-SURVEYS-V1
+const OperatorSurveyListPage = lazy(() => import('@/pages/operator/survey/OperatorSurveyListPage'));
+const OperatorSurveyCreatePage = lazy(() => import('@/pages/operator/survey/OperatorSurveyCreatePage'));
+
 // WO-O4O-FORUM-OPERATOR-UNIFICATION-V1
 const ForumRequestsPage = lazy(() => import('@/pages/operator/ForumRequestsPage'));
 const ForumDeleteRequestsPage = lazy(() => import('@/pages/operator/ForumDeleteRequestsPage'));
@@ -534,6 +538,9 @@ function AppRoutes() {
         <Route path="content-management" element={<OperatorContentPage />} />
         {/* LMS 강의 관리 (WO-KCOS-OPERATOR-LMS-BOOTSTRAP-V1) */}
         <Route path="lms" element={<OperatorLmsCoursesPage />} />
+        {/* 설문조사 관리 (WO-O4O-KCOSMETICS-OPERATOR-SURVEYS-V1) */}
+        <Route path="surveys" element={<OperatorSurveyListPage />} />
+        <Route path="surveys/new" element={<OperatorSurveyCreatePage />} />
       </Route>
 
       {/* Store Owner Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1) */}

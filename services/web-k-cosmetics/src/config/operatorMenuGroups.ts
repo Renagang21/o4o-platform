@@ -39,6 +39,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '공지/뉴스 관리', path: '/operator/content-management' },
     // WO-O4O-OPERATOR-RESOURCES-CANONICAL-COMMONIZATION-V1
     { label: '자료실 관리', path: '/operator/resources' },
+    // WO-O4O-KCOSMETICS-OPERATOR-SURVEYS-V1
+    { label: '설문조사 관리', path: '/operator/surveys' },
   ],
   // WO-KCOS-OPERATOR-LMS-BOOTSTRAP-V1
   lms: [
