@@ -47,7 +47,7 @@ import {
   buildRowActions,
   useBatchAction,
 } from '@o4o/operator-ux-core';
-import type { ListColumnDef, MemberTab } from '@o4o/operator-ux-core';
+import type { ListColumnDef, MemberTab, BuiltAction } from '@o4o/operator-ux-core';
 import { toast } from '@o4o/error-handling';
 import type {
   MembersConsoleClient,
@@ -55,6 +55,8 @@ import type {
   PaginationData,
   UserData,
   MembersStatusTab,
+  MembersRowActionConfig,
+  MembersBulkActionConfig,
 } from './types';
 
 // ─── Helpers ─────────────────────────────────────────────────
@@ -216,6 +218,8 @@ export function OperatorMembersConsolePage({
   roleDisplayMap,
   extraColumn,
   extraColumns,
+  extraRowActions,
+  extraBulkActions,
   drawerExtraSections,
   renderEditModal,
   renderDeleteFlow,
@@ -363,6 +367,11 @@ export function OperatorMembersConsolePage({
     [selectedIds, users],
   );
 
+  const selectedUsers = useMemo(
+    () => users.filter((u) => selectedIds.has(u.id)),
+    [users, selectedIds],
+  );
+
   const handleBulkApprove = async () => {
     if (selectedApprovableIds.length === 0) return;
     const result = await batch.executeBatch(
@@ -420,6 +429,32 @@ export function OperatorMembersConsolePage({
 
   // ─── Bulk Action Bar ────────────────────────────────────────
 
+  const extraBulkActionItems = (extraBulkActions ?? []).map((action: MembersBulkActionConfig) => {
+    const targetIds = action.getTargetIds(selectedUsers);
+    const count = targetIds.length;
+    const label = typeof action.label === 'function' ? action.label(count) : action.label;
+    return {
+      key: action.key,
+      label,
+      onClick: async () => {
+        if (count === 0) return;
+        const result = await batch.executeBatch(action.executeBatch, targetIds);
+        if (result.successCount > 0) {
+          setSelectedIds(new Set());
+          fetchUsers(pagination.page);
+          fetchStats();
+        }
+      },
+      variant: (action.variant ?? 'default') as 'primary' | 'danger' | 'default',
+      icon: action.icon,
+      loading: batch.loading,
+      group: 'actions' as const,
+      visible: (!action.visible || action.visible(selectedUsers)) && count > 0,
+      disabled: count === 0 || batch.loading,
+      confirm: action.confirm,
+    };
+  });
+
   const bulkActions = [
     {
       key: 'approve',
@@ -449,6 +484,7 @@ export function OperatorMembersConsolePage({
         confirmText: '거부',
       },
     },
+    ...extraBulkActionItems,
   ];
 
   // ─── DataTable Columns ──────────────────────────────────────
@@ -518,24 +554,45 @@ export function OperatorMembersConsolePage({
     width: '60px',
     align: 'center',
     onCellClick: () => {}, // prevent row click from triggering drawer
-    render: (_v, user) =>
-      actionLoading === user.id ? (
-        <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
-      ) : (
+    render: (_v, user) => {
+      if (actionLoading === user.id) {
+        return <Loader2 className="w-4 h-4 animate-spin text-slate-400" />;
+      }
+      const coreActions = buildRowActions(
+        userActionPolicy,
+        user,
+        {
+          edit: () => setEditUser(user),
+          password: () => setPasswordUser(user),
+          delete: () => setDeleteTarget(user),
+        },
+        { icons: USER_ACTION_ICONS },
+      );
+      const additionalActions: BuiltAction[] = (extraRowActions ?? [])
+        .filter((a: MembersRowActionConfig) => !a.visible || a.visible(user))
+        .map((a: MembersRowActionConfig) => ({
+          key: a.key,
+          label: a.label,
+          variant: a.variant,
+          icon: a.icon,
+          divider: a.divider,
+          hidden: false,
+          disabled: false,
+          loading: false,
+          confirm: a.confirm,
+          onClick: async () => {
+            await a.onClick(user);
+            fetchUsers(pagination.page);
+            fetchStats();
+          },
+        }));
+      return (
         <RowActionMenu
-          actions={buildRowActions(
-            userActionPolicy,
-            user,
-            {
-              edit: () => setEditUser(user),
-              password: () => setPasswordUser(user),
-              delete: () => setDeleteTarget(user),
-            },
-            { icons: USER_ACTION_ICONS },
-          )}
+          actions={[...coreActions, ...additionalActions]}
           inlineMax={userActionPolicy.inlineMax}
         />
-      ),
+      );
+    },
   };
 
   const columns: ListColumnDef<UserData>[] = [...baseColumns, actionsColumn];

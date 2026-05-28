@@ -17,6 +17,7 @@
  */
 
 import { useState } from 'react';
+import { UserX, UserCheck, UserMinus } from 'lucide-react';
 import {
   OperatorMembersConsolePage,
   type MembersConsoleClient,
@@ -128,6 +129,99 @@ export default function UsersPage() {
       renderDeleteFlow={({ user, onClose, onDeleted }) => (
         <KcosDeleteFlow user={user} onClose={onClose} onDeleted={onDeleted} />
       )}
+      extraRowActions={[
+        {
+          key: 'suspend',
+          label: '정지',
+          variant: 'warning',
+          icon: <UserX size={14} />,
+          divider: true,
+          visible: (u) => u.status === 'active' || u.status === 'approved',
+          confirm: { title: '정지 확인', message: '이 회원을 정지하시겠습니까?', confirmText: '정지', variant: 'warning' },
+          onClick: async (u) => {
+            try {
+              await kcosMembersClient.updateStatus(u.id, 'suspended');
+              toast.success('정지 처리되었습니다.');
+            } catch (e: any) {
+              toast.error(e?.message || '정지 처리 실패');
+            }
+          },
+        },
+        {
+          key: 'restore',
+          label: '복원',
+          variant: 'default',
+          icon: <UserCheck size={14} />,
+          visible: (u) => u.status === 'suspended',
+          onClick: async (u) => {
+            try {
+              await kcosMembersClient.updateStatus(u.id, 'active');
+              toast.success('복원되었습니다.');
+            } catch (e: any) {
+              toast.error(e?.message || '복원 실패');
+            }
+          },
+        },
+      ]}
+      extraBulkActions={[
+        {
+          key: 'bulk-suspend',
+          label: (n) => `정지 (${n})`,
+          variant: 'danger',
+          icon: <UserX size={14} />,
+          getTargetIds: (users) =>
+            users.filter((u) => u.status === 'active' || u.status === 'approved').map((u) => u.id),
+          executeBatch: async (ids) => {
+            const { data } = await api.post('/operator/members/batch-status', { ids, status: 'suspended' });
+            return { data };
+          },
+          confirm: { title: '일괄 정지 확인', message: '선택한 회원을 정지 처리합니다.', confirmText: '정지', variant: 'danger' },
+        },
+        {
+          key: 'bulk-restore',
+          label: (n) => `복원 (${n})`,
+          variant: 'primary',
+          icon: <UserCheck size={14} />,
+          getTargetIds: (users) => users.filter((u) => u.status === 'suspended').map((u) => u.id),
+          executeBatch: async (ids) => {
+            const settled = await Promise.allSettled(
+              ids.map((id) => api.patch(`/operator/members/${id}/status`, { status: 'active' })),
+            );
+            return {
+              data: {
+                results: settled.map((r, i) => ({
+                  id: ids[i],
+                  status: r.status === 'fulfilled' ? ('success' as const) : ('failed' as const),
+                  error: r.status === 'rejected' ? (r.reason as any)?.message || '오류' : undefined,
+                })),
+              },
+            };
+          },
+        },
+        {
+          key: 'bulk-withdraw',
+          label: (n) => `탈퇴 처리 (${n})`,
+          variant: 'danger',
+          icon: <UserMinus size={14} />,
+          getTargetIds: (users) =>
+            users.filter((u) => ['active', 'approved', 'suspended', 'pending'].includes(u.status)).map((u) => u.id),
+          executeBatch: async (ids) => {
+            const settled = await Promise.allSettled(
+              ids.map((id) => api.delete(`/operator/members/${id}?mode=soft`)),
+            );
+            return {
+              data: {
+                results: settled.map((r, i) => ({
+                  id: ids[i],
+                  status: r.status === 'fulfilled' ? ('success' as const) : ('failed' as const),
+                  error: r.status === 'rejected' ? (r.reason as any)?.message || '오류' : undefined,
+                })),
+              },
+            };
+          },
+          confirm: { title: '일괄 탈퇴 처리 확인', message: '선택한 회원을 탈퇴(비활성화) 처리합니다.', confirmText: '탈퇴 처리', variant: 'danger' },
+        },
+      ]}
     />
   );
 }

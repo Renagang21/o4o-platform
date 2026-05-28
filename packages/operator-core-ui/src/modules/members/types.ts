@@ -10,7 +10,7 @@
  */
 
 import type { ReactNode } from 'react';
-import type { ListColumnDef } from '@o4o/operator-ux-core';
+import type { ListColumnDef, ActionConfirmConfig } from '@o4o/operator-ux-core';
 
 // ─── Entity ──────────────────────────────────────────────────
 
@@ -86,8 +86,8 @@ export interface MembersConsoleClient {
    * adapter 가 사용할 수 있도록 wrapper 가 전달 (User 외 service 는 무시 가능).
    */
   updateStatus(userId: string, status: string, currentStatus?: string, user?: UserData): Promise<void>;
-  /** Batch approve/reject. */
-  batchUpdateStatus(ids: string[], status: 'approved' | 'rejected'): Promise<any>;
+  /** Batch status change. Backend supports approved/rejected/suspended. */
+  batchUpdateStatus(ids: string[], status: 'approved' | 'rejected' | 'suspended'): Promise<any>;
   /** Update password (operator-as-user). */
   updatePassword(userId: string, password: string): Promise<void>;
 }
@@ -128,6 +128,45 @@ export interface DeleteFlowRenderProps {
   user: UserData;
   onClose: () => void;
   onDeleted: () => void;
+}
+
+// ─── Configurable Action Types ───────────────────────────────
+
+/** Extra row-level action appended after core edit/password/delete. */
+export interface MembersRowActionConfig {
+  key: string;
+  label: string;
+  variant?: 'default' | 'danger' | 'warning';
+  icon?: ReactNode;
+  divider?: boolean;
+  /** Return false to hide this action for the given user. */
+  visible?: (user: UserData) => boolean;
+  /** Optional inline confirm dialog before execution. */
+  confirm?: ActionConfirmConfig;
+  /** Called when the action is triggered. Wrap errors with toast inside; do not re-throw. */
+  onClick: (user: UserData) => void | Promise<void>;
+}
+
+/** Batch result shape expected by useBatchAction.executeBatch. */
+export interface MembersBatchResult {
+  data: { results: Array<{ id: string; status: 'success' | 'failed'; error?: string }> };
+}
+
+/** Extra bulk action shown in ActionBar when rows are selected. */
+export interface MembersBulkActionConfig {
+  key: string;
+  /** Static string or function receiving target count. */
+  label: string | ((count: number) => string);
+  variant?: 'primary' | 'danger' | 'default';
+  icon?: ReactNode;
+  /** Filter which selected users qualify; returns the ids to act on. */
+  getTargetIds: (selectedUsers: UserData[]) => string[];
+  /** Execute the batch operation. Fan-out or batch endpoint — service decides. */
+  executeBatch: (ids: string[]) => Promise<MembersBatchResult>;
+  /** Return false to hide the action button entirely. */
+  visible?: (selectedUsers: UserData[]) => boolean;
+  /** Confirm dialog shown before execution. */
+  confirm?: ActionConfirmConfig;
 }
 
 // ─── Wrapper Props ───────────────────────────────────────────
@@ -193,6 +232,18 @@ export interface OperatorMembersConsolePageProps {
    *   - K-Cos: simple confirm
    */
   renderDeleteFlow?: (props: DeleteFlowRenderProps) => ReactNode;
+
+  /**
+   * Extra row-level actions appended after core edit/password/delete in RowActionMenu.
+   * Use for status-change shortcuts (suspend, restore) that are service-specific.
+   */
+  extraRowActions?: MembersRowActionConfig[];
+
+  /**
+   * Extra bulk actions appended after the built-in approve/reject in ActionBar.
+   * Use for bulk suspend, restore, withdraw, etc.
+   */
+  extraBulkActions?: MembersBulkActionConfig[];
 
   /** DataTable tableId (for column persistence). Default: `{serviceKey}-operator-members`. */
   tableId?: string;
