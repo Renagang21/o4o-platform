@@ -30,6 +30,10 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '매장 관리', path: '/operator/stores' },
     // WO-O4O-KCOSMETICS-OPERATOR-STORE-CHANNELS-V1
     { label: '채널 관리', path: '/operator/store-channels' },
+    // WO-O4O-KCOSMETICS-OPERATOR-BLOG-POP-QR-BOOTSTRAP-V1
+    { label: '매장 HUB 블로그', path: '/operator/blog' },
+    { label: '매장 HUB POP', path: '/operator/pop' },
+    { label: '매장 HUB QR', path: '/operator/qr' },
   ],
   orders: [{ label: '주문 관리', path: '/operator/orders' }],
   content: [

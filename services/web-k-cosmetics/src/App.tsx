@@ -175,6 +175,14 @@ const OperatorLmsCoursesPage = lazy(() => import('@/pages/operator/OperatorLmsCo
 const OperatorSurveyListPage = lazy(() => import('@/pages/operator/survey/OperatorSurveyListPage'));
 const OperatorSurveyCreatePage = lazy(() => import('@/pages/operator/survey/OperatorSurveyCreatePage'));
 
+// WO-O4O-KCOSMETICS-OPERATOR-BLOG-POP-QR-BOOTSTRAP-V1
+const OperatorBlogListPage = lazy(() => import('@/pages/operator/blog/OperatorBlogListPage'));
+const OperatorBlogWritePage = lazy(() => import('@/pages/operator/blog/OperatorBlogWritePage'));
+const OperatorPopListPage = lazy(() => import('@/pages/operator/pop/OperatorPopListPage'));
+const OperatorPopWritePage = lazy(() => import('@/pages/operator/pop/OperatorPopWritePage'));
+const OperatorQrListPage = lazy(() => import('@/pages/operator/qr/OperatorQrListPage'));
+const OperatorQrWritePage = lazy(() => import('@/pages/operator/qr/OperatorQrWritePage'));
+
 // WO-O4O-FORUM-OPERATOR-UNIFICATION-V1
 const ForumRequestsPage = lazy(() => import('@/pages/operator/ForumRequestsPage'));
 const ForumDeleteRequestsPage = lazy(() => import('@/pages/operator/ForumDeleteRequestsPage'));
@@ -541,6 +549,16 @@ function AppRoutes() {
         {/* 설문조사 관리 (WO-O4O-KCOSMETICS-OPERATOR-SURVEYS-V1) */}
         <Route path="surveys" element={<OperatorSurveyListPage />} />
         <Route path="surveys/new" element={<OperatorSurveyCreatePage />} />
+        {/* 매장 HUB Blog / POP / QR (WO-O4O-KCOSMETICS-OPERATOR-BLOG-POP-QR-BOOTSTRAP-V1) */}
+        <Route path="blog" element={<OperatorBlogListPage />} />
+        <Route path="blog/new" element={<OperatorBlogWritePage />} />
+        <Route path="blog/:id/edit" element={<OperatorBlogWritePage />} />
+        <Route path="pop" element={<OperatorPopListPage />} />
+        <Route path="pop/new" element={<OperatorPopWritePage />} />
+        <Route path="pop/:id/edit" element={<OperatorPopWritePage />} />
+        <Route path="qr" element={<OperatorQrListPage />} />
+        <Route path="qr/new" element={<OperatorQrWritePage />} />
+        <Route path="qr/:id/edit" element={<OperatorQrWritePage />} />
       </Route>
 
       {/* Store Owner Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1) */}

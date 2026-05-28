@@ -34,6 +34,8 @@ import { createBlogController } from '../o4o-store/controllers/blog.controller.j
 // WO-O4O-OPERATOR-BLOG-PUBLISHING-WRITE-API-V1: 운영자 HUB 게시 write API
 import { createOperatorBlogController } from '../o4o-store/controllers/operator-blog.controller.js';
 import { createOperatorPopController } from '../o4o-store/controllers/operator-pop.controller.js';
+// WO-O4O-KCOSMETICS-OPERATOR-BLOG-POP-QR-BOOTSTRAP-V1: K-Cosmetics QR 운영자 write API
+import { createOperatorQrController } from '../o4o-store/controllers/operator-qr.controller.js';
 import { createProductMarketingController } from '../o4o-store/controllers/product-marketing.controller.js';
 import { createAssetSnapshotController } from '../o4o-store/controllers/asset-snapshot.controller.js';
 import { createStoreAssetControlController } from '../o4o-store/controllers/store-asset-control.controller.js';
@@ -164,6 +166,14 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
   router.use(
     '/operator/pop',
     createOperatorPopController(dataSource, coreRequireAuth as any, 'cosmetics'),
+  );
+
+  // WO-O4O-KCOSMETICS-OPERATOR-BLOG-POP-QR-BOOTSTRAP-V1: 운영자 HUB QR 템플릿 write API
+  // /api/v1/cosmetics/operator/qr/templates (운영자가 매장 HUB 에 게시하는 QR)
+  // 권한: cosmetics:operator / cosmetics:admin / platform:admin / platform:super_admin
+  router.use(
+    '/operator/qr',
+    createOperatorQrController(dataSource, coreRequireAuth as any, 'cosmetics'),
   );
 
   // Store Analytics (internal: /pharmacy/analytics/*)
