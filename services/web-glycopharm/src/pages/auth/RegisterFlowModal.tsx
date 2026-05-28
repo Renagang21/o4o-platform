@@ -33,11 +33,6 @@ import {
 import { api } from '../../lib/apiClient';
 import { AddressSearch } from '@o4o/ui';
 
-const SERVICE_LABELS: Record<string, string> = {
-  neture: 'Neture', glycopharm: 'GlycoPharm', glucoseview: 'GlucoseView',
-  'k-cosmetics': 'K-Cosmetics', 'kpa-society': 'KPA-Society', platform: 'O4O 플랫폼',
-};
-
 type Step = 1 | 2 | 3;
 type ParticipationType = 'pharmacist' | 'pharmacy_owner';
 
@@ -53,8 +48,7 @@ export function RegisterFlowModal({ open, onClose }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [registrationComplete, setRegistrationComplete] = useState(false);
-  const [existingAccountMode, setExistingAccountMode] = useState(false);
-  const [existingServices, setExistingServices] = useState<Array<{ key: string; status: string }>>([]);
+  const [emailAlreadyJoined, setEmailAlreadyJoined] = useState(false);
 
   const [formData, setFormData] = useState({
     lastName: '',
@@ -86,8 +80,7 @@ export function RegisterFlowModal({ open, onClose }: Props) {
       setParticipationType(null);
       setError(null);
       setRegistrationComplete(false);
-      setExistingAccountMode(false);
-      setExistingServices([]);
+      setEmailAlreadyJoined(false);
       setShowPassword(false);
       setFormData({
         lastName: '', firstName: '', nickname: '', email: '',
@@ -139,23 +132,23 @@ export function RegisterFlowModal({ open, onClose }: Props) {
         '/auth/check-email', { email: formData.email, service: 'glycopharm' }
       );
       const result = res.data;
-      if (result.success && result.data.exists) {
-        if (result.data.alreadyJoined) {
-          setError('이미 GlycoPharm 서비스에 가입된 계정입니다. 로그인해 주세요.');
+      if (result.success && result.data.alreadyJoined) {
+        setEmailAlreadyJoined(true);
+        const svc = result.data.services?.find(s => s.key === 'glycopharm');
+        if (svc?.status === 'pending') {
+          setError('GlycoPharm 가입 신청이 심사 중입니다. 승인을 기다려 주세요.');
         } else {
-          setExistingAccountMode(true);
-          setExistingServices(result.data.services || []);
-          setError(null);
+          setError('이미 GlycoPharm 서비스에 가입된 계정입니다. 로그인해 주세요.');
         }
       } else {
-        setExistingAccountMode(false);
-        setExistingServices([]);
+        setEmailAlreadyJoined(false);
+        setError(null);
       }
     } catch { /* silent */ }
   };
 
   const isStep1Valid = () => {
-    if (existingAccountMode) return false; // 기존 계정 → 로그인 필수, Step 진행 불가
+    if (emailAlreadyJoined) return false;
     const base = formData.lastName && formData.firstName && formData.nickname
       && formData.email && isPhoneValid;
     return !!(base && isPasswordStrong && formData.password === formData.passwordConfirm);
@@ -392,70 +385,40 @@ export function RegisterFlowModal({ open, onClose }: Props) {
                 </div>
               </div>
 
-              {existingAccountMode ? (
-                /* 기존 O4O 계정 감지 — 비밀번호 재입력 없이 로그인 유도 */
-                <div className="rounded-xl border-2 border-blue-300 bg-blue-50 p-4 space-y-3">
-                  <p className="font-semibold text-sm text-blue-800">이미 O4O 계정이 확인되었습니다</p>
-                  <p className="text-sm text-blue-700">
-                    로그인 후 GlycoPharm 이용 신청에 필요한 추가 정보만 입력하면 됩니다.
-                    비밀번호를 다시 입력하실 필요가 없습니다.
-                  </p>
-                  {existingServices.length > 0 && (
-                    <p className="text-xs text-blue-600">
-                      현재 이용 중인 서비스: {existingServices.map(s => SERVICE_LABELS[s.key] || s.key).join(', ')}
-                    </p>
-                  )}
-                  <div className="flex flex-col gap-2 pt-1">
-                    <NavLink
-                      to="/login"
-                      onClick={onClose}
-                      className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-colors"
-                    >
-                      로그인 후 신청 계속하기
-                    </NavLink>
-                    <NavLink to="/forgot-password" onClick={onClose} className="text-center text-xs text-blue-600 hover:underline">
-                      비밀번호를 잊으셨나요?
-                    </NavLink>
-                  </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">비밀번호 <span className="text-red-500">*</span></label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <input type={showPassword ? 'text' : 'password'} name="password" value={formData.password} onChange={handleInputChange}
+                    className="w-full pl-9 pr-9 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    placeholder="영문, 숫자, 특수문자 포함 8자 이상" required />
+                  <button type="button" onClick={() => setShowPassword(p => !p)} className="absolute right-3 top-1/2 -translate-y-1/2">
+                    {showPassword ? <EyeOff className="w-4 h-4 text-slate-400" /> : <Eye className="w-4 h-4 text-slate-400" />}
+                  </button>
                 </div>
-              ) : (
-                <>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1.5">비밀번호 <span className="text-red-500">*</span></label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                      <input type={showPassword ? 'text' : 'password'} name="password" value={formData.password} onChange={handleInputChange}
-                        className="w-full pl-9 pr-9 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                        placeholder="영문, 숫자, 특수문자 포함 8자 이상" required />
-                      <button type="button" onClick={() => setShowPassword(p => !p)} className="absolute right-3 top-1/2 -translate-y-1/2">
-                        {showPassword ? <EyeOff className="w-4 h-4 text-slate-400" /> : <Eye className="w-4 h-4 text-slate-400" />}
-                      </button>
-                    </div>
-                    {formData.password && (
-                      <div className="mt-1.5 grid grid-cols-2 gap-1">
-                        {PWD_CHECKS.map(({ key, label }) => (
-                          <div key={key} className="flex items-center gap-1">
-                            {passwordChecks[key] ? <CheckCircle2 className="w-3 h-3 text-green-500" /> : <Circle className="w-3 h-3 text-slate-300" />}
-                            <span className={`text-xs ${passwordChecks[key] ? 'text-green-600' : 'text-slate-400'}`}>{label}</span>
-                          </div>
-                        ))}
+                {formData.password && (
+                  <div className="mt-1.5 grid grid-cols-2 gap-1">
+                    {PWD_CHECKS.map(({ key, label }) => (
+                      <div key={key} className="flex items-center gap-1">
+                        {passwordChecks[key] ? <CheckCircle2 className="w-3 h-3 text-green-500" /> : <Circle className="w-3 h-3 text-slate-300" />}
+                        <span className={`text-xs ${passwordChecks[key] ? 'text-green-600' : 'text-slate-400'}`}>{label}</span>
                       </div>
-                    )}
+                    ))}
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1.5">비밀번호 확인 <span className="text-red-500">*</span></label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                      <input type="password" name="passwordConfirm" value={formData.passwordConfirm} onChange={handleInputChange}
-                        className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                        placeholder="비밀번호 재입력" required />
-                    </div>
-                    {formData.passwordConfirm && formData.password !== formData.passwordConfirm && (
-                      <p className="text-xs text-red-500 mt-1">비밀번호가 일치하지 않습니다</p>
-                    )}
-                  </div>
-                </>
-              )}
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">비밀번호 확인 <span className="text-red-500">*</span></label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <input type="password" name="passwordConfirm" value={formData.passwordConfirm} onChange={handleInputChange}
+                    className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    placeholder="비밀번호 재입력" required />
+                </div>
+                {formData.passwordConfirm && formData.password !== formData.passwordConfirm && (
+                  <p className="text-xs text-red-500 mt-1">비밀번호가 일치하지 않습니다</p>
+                )}
+              </div>
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">휴대전화 <span className="text-red-500">*</span></label>
@@ -651,7 +614,7 @@ export function RegisterFlowModal({ open, onClose }: Props) {
                 </button>
               )}
               <div className="flex-1" />
-              {step === 1 && !existingAccountMode && (
+              {step === 1 && (
                 <button
                   type="button"
                   disabled={!isStep1Valid()}

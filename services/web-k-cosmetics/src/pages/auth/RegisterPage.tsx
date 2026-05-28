@@ -24,19 +24,13 @@ const roleOptions: Array<{ role: UserRole; label: string; description: string; e
   },
 ];
 
-const SERVICE_LABELS: Record<string, string> = {
-  neture: 'Neture', glycopharm: 'GlycoPharm', glucoseview: 'GlucoseView',
-  'k-cosmetics': 'K-Cosmetics', 'kpa-society': 'KPA-Society', platform: 'O4O 플랫폼',
-};
-
 export default function RegisterPage() {
   const [step, setStep] = useState(1);
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [existingAccountMode, setExistingAccountMode] = useState(false);
-  const [existingServices, setExistingServices] = useState<Array<{key: string, status: string}>>([]);
+  const [emailAlreadyJoined, setEmailAlreadyJoined] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -66,17 +60,17 @@ export default function RegisterPage() {
     try {
       const res = await api.post('/auth/check-email', { email: formData.email, service: 'k-cosmetics' });
       const result = res.data;
-      if (result.success && result.data.exists) {
-        if (result.data.alreadyJoined) {
-          setError('이미 K-Cosmetics 서비스에 가입된 계정입니다. 로그인해 주세요.');
+      if (result.success && result.data.alreadyJoined) {
+        setEmailAlreadyJoined(true);
+        const svc = result.data.services?.find((s: { key: string; status: string }) => s.key === 'k-cosmetics');
+        if (svc?.status === 'pending') {
+          setError('K-Cosmetics 가입 신청이 심사 중입니다. 승인을 기다려 주세요.');
         } else {
-          setExistingAccountMode(true);
-          setExistingServices(result.data.services || []);
-          setError(null);
+          setError('이미 K-Cosmetics 서비스에 가입된 계정입니다. 로그인해 주세요.');
         }
       } else {
-        setExistingAccountMode(false);
-        setExistingServices([]);
+        setEmailAlreadyJoined(false);
+        setError(null);
       }
     } catch { /* silent */ }
   };
@@ -140,7 +134,7 @@ export default function RegisterPage() {
   const isPhoneValid = /^\d{10,11}$/.test(formData.phone);
 
   const isFormValid = () => {
-    if (existingAccountMode) return false; // 기존 계정 → 로그인 필수
+    if (emailAlreadyJoined) return false;
     const base = formData.email && formData.lastName && formData.firstName && formData.nickname &&
       formData.phone && isPhoneValid && formData.agreeTerms && formData.agreePrivacy;
     return !!(base && isPasswordStrong && formData.password === formData.passwordConfirm);
@@ -241,76 +235,52 @@ export default function RegisterPage() {
               />
             </div>
 
-            {existingAccountMode ? (
-              <div style={{ backgroundColor: '#eff6ff', border: '2px solid #93c5fd', padding: '16px', borderRadius: '12px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <strong style={{ color: '#1e40af', fontSize: '14px' }}>이미 O4O 계정이 확인되었습니다</strong>
-                <p style={{ color: '#1d4ed8', fontSize: '14px', margin: 0, lineHeight: '1.5' }}>
-                  로그인 후 K-Cosmetics 이용 신청에 필요한 추가 정보만 입력하면 됩니다.
-                  비밀번호를 다시 입력하실 필요가 없습니다.
-                </p>
-                {existingServices.length > 0 && (
-                  <p style={{ color: '#2563eb', fontSize: '12px', margin: 0 }}>
-                    현재 이용 중인 서비스: {existingServices.map(s => SERVICE_LABELS[s.key] || s.key).join(', ')}
-                  </p>
-                )}
-                <Link
-                  to="/login"
-                  style={{ display: 'block', textAlign: 'center', padding: '10px', backgroundColor: '#e91e63', color: '#fff', borderRadius: '8px', textDecoration: 'none', fontWeight: 600, fontSize: '14px' }}
-                >
-                  로그인 후 신청 계속하기
-                </Link>
-                <Link to="/forgot-password" style={{ textAlign: 'center', color: '#64748b', fontSize: '12px' }}>
-                  비밀번호를 잊으셨나요?
-                </Link>
-              </div>
-            ) : (
-              <div style={styles.inputRow}>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>비밀번호 *</label>
-                  <div style={styles.passwordWrapper}>
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      name="password"
-                      value={formData.password}
-                      onChange={handleInputChange}
-                      placeholder="영문, 숫자, 특수문자 포함 8자 이상"
-                      style={styles.input}
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      style={styles.eyeButton}
-                    >
-                      {showPassword ? '🙈' : '👁️'}
-                    </button>
-                  </div>
-                  {formData.password && (
-                    <ul style={styles.passwordChecklist}>
-                      <li style={passwordChecks.length ? styles.checkPass : styles.checkFail}>8자 이상</li>
-                      <li style={passwordChecks.letter ? styles.checkPass : styles.checkFail}>영문 포함</li>
-                      <li style={passwordChecks.number ? styles.checkPass : styles.checkFail}>숫자 포함</li>
-                      <li style={passwordChecks.special ? styles.checkPass : styles.checkFail}>특수문자 포함</li>
-                    </ul>
-                  )}
-                </div>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>비밀번호 확인 *</label>
+            <div style={styles.inputRow}>
+              <div style={styles.inputGroup}>
+                <label style={styles.label}>비밀번호 *</label>
+                <div style={styles.passwordWrapper}>
                   <input
-                    type="password"
-                    name="passwordConfirm"
-                    value={formData.passwordConfirm}
+                    type={showPassword ? 'text' : 'password'}
+                    name="password"
+                    value={formData.password}
                     onChange={handleInputChange}
-                    placeholder="비밀번호 재입력"
+                    placeholder="영문, 숫자, 특수문자 포함 8자 이상"
                     style={styles.input}
                     required
                   />
-                  {formData.passwordConfirm && formData.password !== formData.passwordConfirm && (
-                    <span style={styles.fieldError}>비밀번호가 일치하지 않습니다</span>
-                  )}
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={styles.eyeButton}
+                  >
+                    {showPassword ? '🙈' : '👁️'}
+                  </button>
                 </div>
+                {formData.password && (
+                  <ul style={styles.passwordChecklist}>
+                    <li style={passwordChecks.length ? styles.checkPass : styles.checkFail}>8자 이상</li>
+                    <li style={passwordChecks.letter ? styles.checkPass : styles.checkFail}>영문 포함</li>
+                    <li style={passwordChecks.number ? styles.checkPass : styles.checkFail}>숫자 포함</li>
+                    <li style={passwordChecks.special ? styles.checkPass : styles.checkFail}>특수문자 포함</li>
+                  </ul>
+                )}
               </div>
-            )}
+              <div style={styles.inputGroup}>
+                <label style={styles.label}>비밀번호 확인 *</label>
+                <input
+                  type="password"
+                  name="passwordConfirm"
+                  value={formData.passwordConfirm}
+                  onChange={handleInputChange}
+                  placeholder="비밀번호 재입력"
+                  style={styles.input}
+                  required
+                />
+                {formData.passwordConfirm && formData.password !== formData.passwordConfirm && (
+                  <span style={styles.fieldError}>비밀번호가 일치하지 않습니다</span>
+                )}
+              </div>
+            </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr 2fr', gap: '12px' }}>
               <div style={styles.inputGroup}>

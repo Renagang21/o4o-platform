@@ -58,11 +58,6 @@ interface RegisterModalProps {
   isOpen: boolean;
 }
 
-const SERVICE_LABELS: Record<string, string> = {
-  neture: 'Neture', glycopharm: 'GlycoPharm', glucoseview: 'GlucoseView',
-  'k-cosmetics': 'K-Cosmetics', 'kpa-society': 'KPA-Society', platform: 'O4O 플랫폼',
-};
-
 const INPUT_CLASS =
   'w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-shadow';
 const INPUT_CLASS_BG = INPUT_CLASS + ' bg-white';
@@ -74,8 +69,6 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [existingAccountMode, setExistingAccountMode] = useState(false);
-  const [existingServices, setExistingServices] = useState<Array<{ key: string; status: string }>>([]);
   const [emailAlreadyJoined, setEmailAlreadyJoined] = useState(false);
   const [autoCloseCount, setAutoCloseCount] = useState(3);
 
@@ -107,8 +100,6 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
       setShowPassword(false);
       setLoading(false);
       setError(null);
-      setExistingAccountMode(false);
-      setExistingServices([]);
       setEmailAlreadyJoined(false);
       setFormData({
         email: '',
@@ -175,7 +166,6 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
     }
     if (name === 'email') {
       setEmailAlreadyJoined(false);
-      setExistingAccountMode(false);
       setError(null);
     }
 
@@ -192,20 +182,17 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
         email: formData.email,
         service: 'neture',
       });
-      if (result.success && result.data.exists) {
-        if (result.data.alreadyJoined) {
-          setEmailAlreadyJoined(true);
-          setError('이미 Neture 서비스에 가입된 계정입니다. 로그인해 주세요.');
+      if (result.success && result.data.alreadyJoined) {
+        setEmailAlreadyJoined(true);
+        const svc = result.data.services?.find((s: { key: string; status: string }) => s.key === 'neture');
+        if (svc?.status === 'pending') {
+          setError('Neture 가입 신청이 심사 중입니다. 승인을 기다려 주세요.');
         } else {
-          setEmailAlreadyJoined(false);
-          setExistingAccountMode(true);
-          setExistingServices(result.data.services || []);
-          setError(null);
+          setError('이미 Neture 서비스에 가입된 계정입니다. 로그인해 주세요.');
         }
       } else {
         setEmailAlreadyJoined(false);
-        setExistingAccountMode(false);
-        setExistingServices([]);
+        setError(null);
       }
     } catch { /* silent */ }
   };
@@ -278,7 +265,6 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
 
   const isStep1Valid = () => {
     if (emailAlreadyJoined) return false;
-    if (existingAccountMode) return false; // 기존 계정 → 로그인 필수
     if (!formData.email || !formData.email.includes('@')) return false;
     if (!formData.lastName.trim() || !formData.firstName.trim()) return false;
     if (!formData.phone || formData.phone.length < 10 || formData.phone.length > 11) return false;
@@ -389,90 +375,66 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                 />
               </div>
 
-              {existingAccountMode ? (
-                <div className="rounded-xl border-2 border-green-300 bg-green-50 p-4 space-y-3">
-                  <p className="font-semibold text-sm text-green-800">이미 O4O 계정이 확인되었습니다</p>
-                  <p className="text-sm text-green-700">
-                    로그인 후 Neture 이용 신청에 필요한 추가 정보만 입력하면 됩니다.
-                    비밀번호를 다시 입력하실 필요가 없습니다.
-                  </p>
-                  {existingServices.length > 0 && (
-                    <p className="text-xs text-green-600">
-                      현재 이용 중인 서비스: {existingServices.map((s) => SERVICE_LABELS[s.key] || s.key).join(', ')}
-                    </p>
-                  )}
-                  <div className="flex flex-col gap-2 pt-1">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    비밀번호 <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      name="password"
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      placeholder="8자 이상"
+                      autoComplete="new-password"
+                      className={INPUT_CLASS + ' pr-10'}
+                    />
                     <button
                       type="button"
-                      onClick={() => { closeModal(); openLoginModal(); }}
-                      className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-green-600 rounded-xl hover:bg-green-700 transition-colors"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-gray-400 hover:text-gray-600 transition-colors"
+                      tabIndex={-1}
                     >
-                      로그인 후 신청 계속하기
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      비밀번호 <span className="text-red-500">*</span>
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={showPassword ? 'text' : 'password'}
-                        name="password"
-                        value={formData.password}
-                        onChange={handleInputChange}
-                        placeholder="8자 이상"
-                        autoComplete="new-password"
-                        className={INPUT_CLASS + ' pr-10'}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-gray-400 hover:text-gray-600 transition-colors"
-                        tabIndex={-1}
-                      >
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
+                  {formData.password.length > 0 && !isPasswordStrong && (
+                    <div className="mt-1 space-y-0.5 text-xs">
+                      <p className={passwordChecks.length ? 'text-green-600' : 'text-red-500'}>
+                        {passwordChecks.length ? '✓' : '✗'} 8자 이상
+                      </p>
+                      <p className={passwordChecks.letter ? 'text-green-600' : 'text-red-500'}>
+                        {passwordChecks.letter ? '✓' : '✗'} 영문 포함
+                      </p>
+                      <p className={passwordChecks.number ? 'text-green-600' : 'text-red-500'}>
+                        {passwordChecks.number ? '✓' : '✗'} 숫자 포함
+                      </p>
+                      <p className={passwordChecks.special ? 'text-green-600' : 'text-red-500'}>
+                        {passwordChecks.special ? '✓' : '✗'} 특수문자 포함
+                      </p>
                     </div>
-                    {formData.password.length > 0 && !isPasswordStrong && (
-                      <div className="mt-1 space-y-0.5 text-xs">
-                        <p className={passwordChecks.length ? 'text-green-600' : 'text-red-500'}>
-                          {passwordChecks.length ? '✓' : '✗'} 8자 이상
-                        </p>
-                        <p className={passwordChecks.letter ? 'text-green-600' : 'text-red-500'}>
-                          {passwordChecks.letter ? '✓' : '✗'} 영문 포함
-                        </p>
-                        <p className={passwordChecks.number ? 'text-green-600' : 'text-red-500'}>
-                          {passwordChecks.number ? '✓' : '✗'} 숫자 포함
-                        </p>
-                        <p className={passwordChecks.special ? 'text-green-600' : 'text-red-500'}>
-                          {passwordChecks.special ? '✓' : '✗'} 특수문자 포함
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      비밀번호 확인 <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="password"
-                      name="passwordConfirm"
-                      value={formData.passwordConfirm}
-                      onChange={handleInputChange}
-                      placeholder="비밀번호 재입력"
-                      autoComplete="new-password"
-                      className={INPUT_CLASS}
-                    />
-                    {formData.passwordConfirm.length > 0 &&
-                      formData.password !== formData.passwordConfirm && (
-                        <p className="mt-1 text-xs text-red-500">비밀번호가 일치하지 않습니다</p>
-                      )}
-                  </div>
+                  )}
                 </div>
-              )}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    비밀번호 확인 <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="password"
+                    name="passwordConfirm"
+                    value={formData.passwordConfirm}
+                    onChange={handleInputChange}
+                    placeholder="비밀번호 재입력"
+                    autoComplete="new-password"
+                    className={INPUT_CLASS}
+                  />
+                  {formData.passwordConfirm.length > 0 &&
+                    formData.password !== formData.passwordConfirm && (
+                      <p className="mt-1 text-xs text-red-500">비밀번호가 일치하지 않습니다</p>
+                    )}
+                </div>
+              </div>
 
               {/* 이름 (성 + 이름) */}
               <div>
@@ -946,7 +908,7 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
         </div>
 
         {/* 고정 Footer */}
-        {step === 1 && !existingAccountMode && (
+        {step === 1 && (
           <div className="shrink-0 border-t border-gray-100 px-6 py-4 bg-white">
             <button
               type="button"
