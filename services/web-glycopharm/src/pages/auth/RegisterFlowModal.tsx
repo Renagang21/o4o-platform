@@ -139,7 +139,7 @@ export function RegisterFlowModal({ open, onClose }: Props) {
       const result = res.data;
       if (result.success && result.data.alreadyJoined) {
         setEmailAlreadyJoined(true);
-        const svc = result.data.services?.find(s => s.key === 'glycopharm');
+        const svc = result.data.services?.find((s: { key: string; status: string }) => s.key === 'glycopharm');
         if (svc?.status === 'pending') {
           setError('GlycoPharm 가입 신청이 심사 중입니다. 승인을 기다려 주세요.');
         } else {
@@ -159,25 +159,40 @@ export function RegisterFlowModal({ open, onClose }: Props) {
     return !!(base && isPasswordStrong && formData.password === formData.passwordConfirm);
   };
 
+  // WO-O4O-GLYCOPHARM-PHARMACY-OWNER-REGISTRATION-BUTTON-E2E-FIX-V1:
+  //   단순 truthy 만 체크하던 기존 validation 을 강화한다.
+  //   - businessNumber: 정확히 10자리 숫자 (사업자등록번호 표준)
+  //   - taxEmail: 기본 email 패턴
+  //   강화 전: 형식 오류여도 버튼 enabled → 클릭 시 HTML5 native validation 이 silent 차단.
+  //   강화 후: 형식 오류면 버튼 disabled + missing fields 안내에 표시 → 사용자 인지 가능.
+  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const isBusinessNumberValid = formData.businessNumber.length === 10;
+  const isTaxEmailValid = EMAIL_REGEX.test(formData.taxEmail);
+
   const isStep3Valid = () => {
     const terms = formData.agreeTerms && formData.agreePrivacy;
     if (participationType === 'pharmacist') return terms;
     if (participationType === 'pharmacy_owner') {
-      return terms && !!(formData.businessName && formData.businessNumber
-        && formData.taxEmail && formData.representativeName);
+      return terms
+        && !!formData.businessName
+        && !!formData.representativeName
+        && isBusinessNumberValid
+        && isTaxEmailValid;
     }
     return false;
   };
 
-  // WO-O4O-GLYCOPHARM-REGISTER-STEP3-VALIDATION-UX-FIX-V1:
-  //   버튼 disabled 이유를 사용자에게 표시하기 위한 미입력 항목 목록.
+  // WO-O4O-GLYCOPHARM-REGISTER-STEP3-VALIDATION-UX-FIX-V1 (강화):
+  //   버튼 disabled 이유를 사용자에게 표시. 형식 오류도 missing 으로 노출.
   const getStep3MissingFields = (): string[] => {
     const missing: string[] = [];
     if (participationType === 'pharmacy_owner') {
       if (!formData.businessName) missing.push('약국명');
       if (!formData.representativeName) missing.push('대표자명');
       if (!formData.businessNumber) missing.push('사업자등록번호');
+      else if (!isBusinessNumberValid) missing.push('사업자등록번호(10자리 숫자)');
       if (!formData.taxEmail) missing.push('세금계산서 이메일');
+      else if (!isTaxEmailValid) missing.push('세금계산서 이메일(형식)');
     }
     if (!formData.agreeTerms) missing.push('이용약관 동의');
     if (!formData.agreePrivacy) missing.push('개인정보처리방침 동의');
