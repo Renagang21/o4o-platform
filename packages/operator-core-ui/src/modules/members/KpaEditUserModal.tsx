@@ -368,9 +368,9 @@ export function KpaEditUserModal({ member, makeRequest, onClose, onSuccess }: Kp
               />
             </div>
 
-            {/* 직역 (activity_type) */}
+            {/* 활동 유형 (activity_type) */}
             <div style={fieldStyle}>
-              <label style={labelStyle}>직역</label>
+              <label style={labelStyle}>활동 유형</label>
               <select
                 value={form.activity_type}
                 onChange={(e) => setForm((f) => ({ ...f, activity_type: e.target.value }))}
@@ -393,7 +393,7 @@ export function KpaEditUserModal({ member, makeRequest, onClose, onSuccess }: Kp
               {member.activity_type === 'pharmacy_owner'
                 && form.activity_type !== 'pharmacy_owner' && (
                 <p style={{ fontSize: 11, color: '#b45309', marginTop: 4 }}>
-                  다른 직역으로 변경하면 매장 운영 권한(store_owner)이 회수됩니다.
+                  다른 활동 유형으로 변경하면 매장 운영 권한(store_owner)이 회수됩니다.
                 </p>
               )}
             </div>
