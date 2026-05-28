@@ -785,7 +785,7 @@ export const glycopharmGuideFeatureResourcesProps: GuideFeatureManualPageProps =
   },
 };
 
-// ─── /guide/features/forum (GlycoPharm: /community 연결) ───────────────
+// ─── /guide/features/forum (GlycoPharm: /forum 연결) ───────────────
 
 export const glycopharmGuideFeatureForumProps: GuideFeatureManualPageProps = {
   hero: {
@@ -800,10 +800,10 @@ export const glycopharmGuideFeatureForumProps: GuideFeatureManualPageProps = {
     {
       step: '01',
       title: '커뮤니티 이동',
-      routeLabel: '/community',
+      routeLabel: '/forum',
       description: '커뮤니티 글 목록으로 진입해 검색과 탐색을 시작합니다.',
       items: [
-        { label: '커뮤니티 진입', detail: '/community 로 이동하면 카테고리별 글 목록이 표시됩니다.' },
+        { label: '커뮤니티 진입', detail: '/forum 으로 이동하면 카테고리별 글 목록이 표시됩니다.' },
         { label: '커뮤니티 글 목록', detail: '최신 글, 인기 글, 카테고리별 글을 확인합니다.' },
         { label: '검색과 목록 탐색', detail: '키워드 검색과 카테고리 필터로 원하는 글을 찾습니다.' },
       ],
