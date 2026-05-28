@@ -4,9 +4,13 @@
  * WO-KCOS-KPA-HOME-PORT-V1: KPA prefetchAll 패턴으로 단순화
  *   notices (CMS) + heroAds (community) 2개 병렬 호출
  *
+ * WO-O4O-GLYCOPHARM-KCOS-HOME-LATEST-UI-ALIGNMENT-V1:
+ *   /api/v1/cosmetics/home/latest 통합 최신 활동 피드 호출
+ *
  * 참조 패턴: web-kpa-society/src/api/home.ts
  */
 
+import { api } from '../lib/apiClient';
 import { cmsApi, CmsContent } from './cms';
 import { communityApi } from '../services/communityApi';
 import type { CommunityAd } from '../services/communityApi';
@@ -24,6 +28,15 @@ export interface HomeNotice {
 export interface HomePageData {
   notices: HomeNotice[];
   heroAds: CommunityAd[];
+}
+
+export interface LatestItem {
+  type: 'forum' | 'course' | 'content' | 'resource' | 'signage';
+  id: string;
+  title: string;
+  authorName?: string;
+  createdAt: string;
+  href: string;
 }
 
 // ── Mappers ────────────────────────────────────────────────────────────────
@@ -54,6 +67,22 @@ export const homeApi = {
       limit,
     });
     return (res.data || []).map(toHomeNotice);
+  },
+
+  /**
+   * 최신 활동 목록 — type=all|forum|course|content|resource|signage
+   *
+   * Backend: GET /api/v1/cosmetics/home/latest?type={type}&limit={limit}
+   * Response: { success: true, data: LatestItem[] }
+   */
+  async getLatest(params?: { type?: string; limit?: number }): Promise<LatestItem[]> {
+    const query = new URLSearchParams();
+    if (params?.type) query.set('type', params.type);
+    if (params?.limit) query.set('limit', String(params.limit));
+    const qs = query.toString();
+    const path = `/cosmetics/home/latest${qs ? `?${qs}` : ''}`;
+    const response = await api.get<{ success: boolean; data: LatestItem[] }>(path);
+    return response.data?.data || [];
   },
 
   /**

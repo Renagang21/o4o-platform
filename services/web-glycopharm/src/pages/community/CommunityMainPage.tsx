@@ -14,6 +14,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
+import { Loader2 } from 'lucide-react';
 import { apiClient } from '@/services/api';
 import {
   StandardHomeTemplate,
@@ -26,6 +28,9 @@ import {
 } from '@o4o/shared-space-ui';
 import type { NoticeItem } from '@o4o/shared-space-ui';
 import { PageContainer, Card, useTemplate } from '@o4o/ui';
+// WO-O4O-GLYCOPHARM-KCOS-HOME-LATEST-UI-ALIGNMENT-V1
+import { homeApi } from '@/api/home';
+import type { LatestItem } from '@/api/home';
 
 // ─── 서비스 전용 아이콘 ─────────────────────────────────────
 // ForumIcon, EducationIcon, ContentIcon, SignageIcon, ResourcesIcon → @o4o/shared-space-ui
@@ -65,6 +70,111 @@ interface ForumPostRaw {
   createdAt: string;
 }
 
+// ─── 최신 활동 섹션 (WO-O4O-GLYCOPHARM-KCOS-HOME-LATEST-UI-ALIGNMENT-V1) ──
+// KPA CommunityHomePage LatestActivitySection 패턴 mirror. emerald 테마.
+
+const LATEST_SUMMARY_LIMIT = 6;
+
+const LATEST_TABS = [
+  { key: 'all',      label: '전체',     shortcutHref: null,                       shortcutLabel: null },
+  { key: 'forum',    label: '포럼',     shortcutHref: '/forum',                   shortcutLabel: '포럼 바로가기' },
+  { key: 'course',   label: '강의',     shortcutHref: '/lms',                     shortcutLabel: '강의 바로가기' },
+  { key: 'content',  label: '콘텐츠',   shortcutHref: '/content',                 shortcutLabel: '콘텐츠 바로가기' },
+  { key: 'signage',  label: '사이니지', shortcutHref: '/store/signage/library',   shortcutLabel: '사이니지 바로가기' },
+  { key: 'resource', label: '자료실',   shortcutHref: '/resources',               shortcutLabel: '자료실 바로가기' },
+] as const;
+
+const LATEST_BADGE: Record<string, { label: string; cls: string }> = {
+  forum:    { label: '포럼',     cls: 'bg-blue-100 text-blue-700' },
+  course:   { label: '강의',     cls: 'bg-purple-100 text-purple-700' },
+  content:  { label: '콘텐츠',   cls: 'bg-emerald-100 text-emerald-700' },
+  resource: { label: '자료실',   cls: 'bg-amber-100 text-amber-700' },
+  signage:  { label: '사이니지', cls: 'bg-rose-100 text-rose-700' },
+};
+
+interface LatestSectionProps {
+  items: LatestItem[];
+  activeTab: string;
+  onTabChange: (tab: string) => void;
+  loading: boolean;
+}
+
+function LatestActivitySection({ items, activeTab, onTabChange, loading }: LatestSectionProps) {
+  const currentTab = LATEST_TABS.find((t) => t.key === activeTab);
+  const hasTabShortcut = !loading && items.length > 0 && currentTab?.shortcutHref;
+
+  return (
+    <div>
+      <div className="mb-4">
+        <h2 className="text-lg font-bold text-slate-800 m-0">최신글</h2>
+      </div>
+
+      {/* 탭 필터 */}
+      <div className="flex gap-2 flex-wrap mb-4">
+        {LATEST_TABS.map((t) => (
+          <button
+            key={t.key}
+            onClick={() => onTabChange(t.key)}
+            className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+              activeTab === t.key
+                ? 'bg-emerald-600 text-white'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* 목록 */}
+      {loading ? (
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
+        </div>
+      ) : items.length === 0 ? (
+        <div className="text-center py-8 text-slate-400 text-sm">등록된 글이 없습니다</div>
+      ) : (
+        <div className="divide-y divide-slate-100 bg-white rounded-lg border border-slate-200 overflow-hidden">
+          {items.map((item) => {
+            const badge = LATEST_BADGE[item.type];
+            const date = new Date(item.createdAt).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
+            return (
+              <Link
+                key={`${item.type}-${item.id}`}
+                to={item.href}
+                className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors no-underline group"
+              >
+                <span className={`shrink-0 inline-block px-2 py-0.5 text-xs font-semibold rounded ${badge?.cls ?? 'bg-slate-100 text-slate-600'}`}>
+                  {badge?.label ?? item.type}
+                </span>
+                <span className="flex-1 min-w-0 font-medium text-slate-800 truncate group-hover:text-emerald-700 transition-colors">
+                  {item.title}
+                </span>
+                {item.authorName && (
+                  <span className="shrink-0 text-xs text-slate-400 hidden sm:block">{item.authorName}</span>
+                )}
+                <span className="shrink-0 text-xs text-slate-400">{date}</span>
+              </Link>
+            );
+          })}
+        </div>
+      )}
+
+      {/* 탭별 바로가기 — 전체 탭은 요약 성격이므로 skip */}
+      {hasTabShortcut && (
+        <div className="mt-3 flex justify-end">
+          <Link
+            to={currentTab.shortcutHref!}
+            className="text-sm font-semibold text-emerald-700 hover:text-emerald-800 no-underline whitespace-nowrap"
+          >
+            {currentTab.shortcutLabel} →
+          </Link>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Main Component ─────────────────────────────────────────
 
 export default function CommunityMainPage() {
@@ -72,6 +182,10 @@ export default function CommunityMainPage() {
   const tpl = useTemplate();
   const [noticeItems, setNoticeItems] = useState<NoticeItem[]>([]);
   const [loading, setLoading] = useState(true);
+  // WO-O4O-GLYCOPHARM-KCOS-HOME-LATEST-UI-ALIGNMENT-V1
+  const [latestItems, setLatestItems] = useState<LatestItem[]>([]);
+  const [latestTab, setLatestTab] = useState('all');
+  const [latestLoading, setLatestLoading] = useState(true);
 
   const loadNotices = useCallback(async () => {
     setLoading(true);
@@ -94,6 +208,15 @@ export default function CommunityMainPage() {
   useEffect(() => {
     loadNotices();
   }, [loadNotices]);
+
+  // WO-O4O-GLYCOPHARM-KCOS-HOME-LATEST-UI-ALIGNMENT-V1
+  useEffect(() => {
+    setLatestLoading(true);
+    homeApi.getLatest({ type: latestTab, limit: LATEST_SUMMARY_LIMIT })
+      .then((res) => setLatestItems(res.data ?? []))
+      .catch(() => setLatestItems([]))
+      .finally(() => setLatestLoading(false));
+  }, [latestTab]);
 
   const iconCls = `flex items-center justify-center shrink-0 ${tpl?.icon?.wrapper ?? ''} ${tpl?.icon?.icon ?? 'text-primary'}`;
 
@@ -157,6 +280,14 @@ export default function CommunityMainPage() {
             </a>
           </Card>
         </>
+      }
+      latestSlot={
+        <LatestActivitySection
+          items={latestItems}
+          activeTab={latestTab}
+          onTabChange={setLatestTab}
+          loading={latestLoading}
+        />
       }
       appEntryCards={[
         { title: '포럼', description: '동료 약사와 질문·토론으로 전문성을 높이세요', href: '/forum', icon: <span className={iconCls}><ForumIcon /></span> },
