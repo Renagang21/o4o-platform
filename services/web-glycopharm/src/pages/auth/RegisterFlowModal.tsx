@@ -13,7 +13,9 @@
  */
 
 import { useState, useEffect } from 'react';
-import { NavLink } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useLoginModal } from '@/contexts/LoginModalContext';
+import { useRegisterModal } from '@/contexts/RegisterModalContext';
 import {
   Activity,
   Mail,
@@ -42,6 +44,9 @@ interface Props {
 }
 
 export function RegisterFlowModal({ open, onClose }: Props) {
+  const navigate = useNavigate();
+  const { openLoginModal } = useLoginModal();
+  const { closeRegisterModal } = useRegisterModal();
   const [step, setStep] = useState<Step>(1);
   const [participationType, setParticipationType] = useState<ParticipationType | null>(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -162,6 +167,21 @@ export function RegisterFlowModal({ open, onClose }: Props) {
         && formData.taxEmail && formData.representativeName);
     }
     return false;
+  };
+
+  // WO-O4O-GLYCOPHARM-REGISTER-STEP3-VALIDATION-UX-FIX-V1:
+  //   버튼 disabled 이유를 사용자에게 표시하기 위한 미입력 항목 목록.
+  const getStep3MissingFields = (): string[] => {
+    const missing: string[] = [];
+    if (participationType === 'pharmacy_owner') {
+      if (!formData.businessName) missing.push('약국명');
+      if (!formData.representativeName) missing.push('대표자명');
+      if (!formData.businessNumber) missing.push('사업자등록번호');
+      if (!formData.taxEmail) missing.push('세금계산서 이메일');
+    }
+    if (!formData.agreeTerms) missing.push('이용약관 동의');
+    if (!formData.agreePrivacy) missing.push('개인정보처리방침 동의');
+    return missing;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -316,12 +336,15 @@ export function RegisterFlowModal({ open, onClose }: Props) {
                 </p>
               )}
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <NavLink
-                  to="/login"
+                {/* WO-O4O-GLYCOPHARM-LOGIN-PAGE-TO-MODAL-ALIGNMENT-V1:
+                    /login 은 LoginGate 로 대체됨 — NavLink 대신 모달 직접 전환. */}
+                <button
+                  type="button"
+                  onClick={() => { closeRegisterModal(); navigate('/'); openLoginModal(); }}
                   className="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors"
                 >
-                  로그인으로 이동
-                </NavLink>
+                  로그인하기
+                </button>
                 <button
                   type="button"
                   onClick={onClose}
@@ -629,14 +652,24 @@ export function RegisterFlowModal({ open, onClose }: Props) {
                 <p className="text-xs text-slate-400">유형을 선택하면 자동으로 다음 단계로 이동합니다</p>
               )}
               {step === 3 && (
-                <button
-                  type="submit"
-                  form="register-step3"
-                  disabled={!isStep3Valid() || isLoading}
-                  className="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  {isLoading ? '신청 처리 중...' : '가입신청'}
-                </button>
+                <div className="flex flex-col items-end gap-1.5">
+                  {!isStep3Valid() && !isLoading && (() => {
+                    const missing = getStep3MissingFields();
+                    return missing.length > 0 ? (
+                      <p className="text-xs text-amber-600 text-right">
+                        {missing.join(', ')}을(를) 확인해 주세요.
+                      </p>
+                    ) : null;
+                  })()}
+                  <button
+                    type="submit"
+                    form="register-step3"
+                    disabled={!isStep3Valid() || isLoading}
+                    className="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {isLoading ? '신청 처리 중...' : '가입신청'}
+                  </button>
+                </div>
               )}
             </div>
           </div>
