@@ -82,14 +82,14 @@ export class NetureSupplier {
 
   // === Business Profile Fields (WO-NETURE-SUPPLIER-BUSINESS-PROFILE-FORM-ALIGNMENT-V1) ===
 
-  @Column({ name: 'business_number', type: 'varchar', length: 20, nullable: true })
+  // business_number and business_address were intentionally dropped from neture_suppliers
+  // by WO-O4O-NETURE-SUPPLIER-DEPRECATION-V1 (migration 20260327000300).
+  // These values now live in the organizations table — read via getOrgDataBatch().
   businessNumber: string | null;
+  businessAddress: string | null;
 
   @Column({ name: 'representative_name', type: 'varchar', length: 100, nullable: true })
   representativeName: string | null;
-
-  @Column({ name: 'business_address', type: 'text', nullable: true })
-  businessAddress: string | null;
 
   @Column({ name: 'manager_name', type: 'varchar', length: 100, nullable: true })
   managerName: string | null;

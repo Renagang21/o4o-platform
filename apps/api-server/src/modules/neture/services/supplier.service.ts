@@ -338,7 +338,7 @@ export class NetureSupplierService {
           identityStatus: userInfo?.status || null,
           userEmail: userInfo?.email || null,
           representativeName: s.representativeName || null,
-          businessNumber: s.businessNumber || null,
+          businessNumber: org?.business_number ?? null,
           taxInvoiceEmail: s.taxInvoiceEmail || null,
           createdAt: s.createdAt,
           updatedAt: s.updatedAt,
