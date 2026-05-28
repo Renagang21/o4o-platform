@@ -33,3 +33,8 @@ export type {
   EditModalRenderProps,
   DeleteFlowRenderProps,
 } from './types';
+export { MemberHardDeleteConfirmModal } from './components/MemberHardDeleteConfirmModal';
+export type {
+  MemberHardDeleteTarget,
+  MemberHardDeleteConfirmModalProps,
+} from './components/MemberHardDeleteConfirmModal';

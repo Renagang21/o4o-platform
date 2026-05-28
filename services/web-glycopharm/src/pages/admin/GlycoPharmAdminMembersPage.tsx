@@ -20,6 +20,8 @@ import {
   type MembersConsoleClient,
   type MembersConsoleListParams,
   type UserData,
+  MemberHardDeleteConfirmModal,
+  type MemberHardDeleteTarget,
 } from '@o4o/operator-core-ui/modules/members';
 import { toast } from '@o4o/error-handling';
 import { api } from '../../lib/apiClient';
@@ -227,15 +229,43 @@ function GpAdminDeleteFlow({
             </div>
 
             <ConfirmActionDialog
-              open={confirming}
+              open={confirming && selectedMode === 'soft'}
               onClose={() => { setConfirming(false); setSelectedMode(null); }}
               onConfirm={execute}
-              title={selectedMode === 'hard' ? '완전 삭제 최종 확인' : '탈퇴 처리 확인'}
+              title="탈퇴 처리 확인"
               message={confirmMessage}
-              confirmText={selectedMode === 'hard' ? '완전 삭제' : '탈퇴 처리'}
-              variant={selectedMode === 'hard' ? 'danger' : 'warning'}
+              confirmText="탈퇴 처리"
+              variant="warning"
               loading={deleting}
             />
+
+            <MemberHardDeleteConfirmModal
+              open={confirming && selectedMode === 'hard'}
+              member={
+                {
+                  id: user.id,
+                  name: displayName,
+                  email: user.email,
+                  status: riskData.user.status,
+                } as MemberHardDeleteTarget
+              }
+              serviceLabel="GlycoPharm"
+              loading={deleting}
+              onClose={() => { if (!deleting) { setConfirming(false); setSelectedMode(null); } }}
+              onConfirm={execute}
+            >
+              {!riskData.canHardDelete ? (
+                <div className="flex items-start gap-2 p-3 bg-red-50 border-2 border-red-300 rounded-lg">
+                  <AlertTriangle className="w-4 h-4 text-red-600 mt-0.5 shrink-0" />
+                  <div className="text-xs text-red-700 space-y-1">
+                    <p className="font-semibold">
+                      활동 데이터 (게시글 {riskData.risks.forumPosts}건 / 댓글 {riskData.risks.forumComments}건) 있음
+                    </p>
+                    <p>완전삭제 시 작성자 정보가 깨지거나 함께 삭제될 수 있습니다.</p>
+                  </div>
+                </div>
+              ) : null}
+            </MemberHardDeleteConfirmModal>
           </div>
         ) : (
           <div className="flex items-center gap-2 text-red-500 py-4 justify-center text-sm">
