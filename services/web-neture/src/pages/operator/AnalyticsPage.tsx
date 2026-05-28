@@ -35,9 +35,9 @@ const SERVICE_KEY = 'neture';
 const ACTION_LABELS: Record<string, string> = {
   'neture.operator.registration_approve': '가입 승인',
   'neture.operator.registration_reject': '가입 거부',
-  'neture.admin.supplier_approve': '공급사 승인',
-  'neture.admin.supplier_reject': '공급사 거부',
-  'neture.admin.supplier_deactivate': '공급사 비활성화',
+  'neture.admin.supplier_approve': '공급자 승인',
+  'neture.admin.supplier_reject': '공급자 거부',
+  'neture.admin.supplier_deactivate': '공급자 비활성화',
   'neture.admin.product_approve': '상품 승인',
   'neture.admin.product_reject': '상품 거절',
   'neture.admin.bulk_approve': '일괄 승인',
