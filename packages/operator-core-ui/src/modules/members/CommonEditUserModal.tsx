@@ -21,6 +21,11 @@ import {
 } from 'lucide-react';
 import { AddressSearch } from '@o4o/ui';
 
+// WO-O4O-GLYCOPHARM-OPERATOR-MEMBER-EDIT-INVALID-USERID-GUARD-V1:
+// userId prop 가 undefined / null / 빈 문자열 / 잘못된 UUID 형식일 때
+// `/operator/members/undefined` 같은 요청을 발생시켜 백엔드 500 을 유발하지 않도록 차단한다.
+const USER_ID_UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 // ─── Types ───────────────────────────────────────────────────
 
 export interface EditUserModalOption {
@@ -112,6 +117,17 @@ export function CommonEditUserModal({ userId, config, onClose, onSuccess }: Comm
   });
 
   useEffect(() => {
+    // WO-O4O-GLYCOPHARM-OPERATOR-MEMBER-EDIT-INVALID-USERID-GUARD-V1:
+    // 잘못된 userId 로 fetch 시도 시 `/operator/members/undefined` → 백엔드 500.
+    // fetch 자체를 차단하고 안내 메시지 표시.
+    if (!userId || !USER_ID_UUID_REGEX.test(userId)) {
+      if (typeof console !== 'undefined' && typeof console.warn === 'function') {
+        console.warn('[CommonEditUserModal] Invalid userId — fetch skipped', { userId });
+      }
+      setLoading(false);
+      setActionError('회원 ID가 없거나 유효하지 않아 정보를 불러올 수 없습니다. 목록을 새로고침 후 다시 시도해 주세요.');
+      return;
+    }
     (async () => {
       try {
         const data = await makeRequest('GET', `/operator/members/${userId}`) as any;

@@ -18,6 +18,17 @@ import { ActionLogService } from '@o4o/action-log-core';
 
 const approvalService = new MembershipApprovalService();
 
+// WO-O4O-GLYCOPHARM-OPERATOR-MEMBER-EDIT-INVALID-USERID-GUARD-V1:
+// :userId 라우트 파라미터가 UUID 형식인지 검증하여 PostgreSQL UUID 파싱 500 을 400 으로 정리한다.
+// 8 개 :userId 기반 endpoint 공통 사용.
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const isValidUuid = (s: unknown): s is string => typeof s === 'string' && UUID_REGEX.test(s);
+const INVALID_USER_ID_RESPONSE = {
+  success: false,
+  error: 'INVALID_USER_ID',
+  message: '유효하지 않은 회원 ID입니다.',
+};
+
 
 export class MembershipConsoleController {
   private actionLogService?: ActionLogService;
@@ -244,6 +255,10 @@ export class MembershipConsoleController {
     try {
       const scope: ServiceScope = (req as any).serviceScope;
       const { userId } = req.params;
+      if (!isValidUuid(userId)) {
+        res.status(400).json(INVALID_USER_ID_RESPONSE);
+        return;
+      }
 
       // WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1: Service boundary check
       if (!scope.isPlatformAdmin) {
@@ -442,6 +457,10 @@ export class MembershipConsoleController {
     try {
       const scope: ServiceScope = (req as any).serviceScope;
       const { userId } = req.params;
+      if (!isValidUuid(userId)) {
+        res.status(400).json(INVALID_USER_ID_RESPONSE);
+        return;
+      }
       const { status } = req.body;
       const updatedBy = (req as any).user?.id || null;
 
@@ -688,6 +707,10 @@ export class MembershipConsoleController {
     try {
       const scope: ServiceScope = (req as any).serviceScope;
       const { userId } = req.params;
+      if (!isValidUuid(userId)) {
+        res.status(400).json(INVALID_USER_ID_RESPONSE);
+        return;
+      }
       const reactivatedBy = (req as any).user?.id || null;
 
       if (!scope.isPlatformAdmin) {
@@ -747,6 +770,10 @@ export class MembershipConsoleController {
     try {
       const scope: ServiceScope = (req as any).serviceScope;
       const { userId } = req.params;
+      if (!isValidUuid(userId)) {
+        res.status(400).json(INVALID_USER_ID_RESPONSE);
+        return;
+      }
       // WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1: ceoName/taxInvoiceEmail/managerPhone canonical 수용.
       // taxEmail/representativeName 은 legacy alias — controller 에서 canonical key 로만 저장.
       const {
@@ -869,6 +896,10 @@ export class MembershipConsoleController {
   getDeleteRisk = async (req: Request, res: Response): Promise<void> => {
     try {
       const { userId } = req.params;
+      if (!isValidUuid(userId)) {
+        res.status(400).json(INVALID_USER_ID_RESPONSE);
+        return;
+      }
       const ds = AppDataSource;
 
       const userRows = await ds.query(
@@ -926,6 +957,10 @@ export class MembershipConsoleController {
     try {
       const scope: ServiceScope = (req as any).serviceScope;
       const { userId } = req.params;
+      if (!isValidUuid(userId)) {
+        res.status(400).json(INVALID_USER_ID_RESPONSE);
+        return;
+      }
       const deletedBy = (req as any).user?.id || null;
 
       // WO-NETURE-MEMBER-DELETE-SAFE-FLOW-V1: soft/hard 2단계 분리
@@ -983,6 +1018,10 @@ export class MembershipConsoleController {
     try {
       const scope: ServiceScope = (req as any).serviceScope;
       const { userId } = req.params;
+      if (!isValidUuid(userId)) {
+        res.status(400).json(INVALID_USER_ID_RESPONSE);
+        return;
+      }
       const { role } = req.body;
       const assignedBy = (req as any).user?.id || null;
 
@@ -1081,6 +1120,10 @@ export class MembershipConsoleController {
     try {
       const scope: ServiceScope = (req as any).serviceScope;
       const { userId, role } = req.params;
+      if (!isValidUuid(userId)) {
+        res.status(400).json(INVALID_USER_ID_RESPONSE);
+        return;
+      }
 
       if (!role) {
         res.status(400).json({ success: false, error: 'role is required' });
