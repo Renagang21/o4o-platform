@@ -14,10 +14,10 @@
  */
 
 import { Link, useNavigate } from 'react-router-dom';
-import { User } from 'lucide-react';
+import { User, UserCog, MessageSquare, Building2, Settings } from 'lucide-react';
 import { useAuth, getNetureDashboardRoute, getNetureRoleLabel } from '../../contexts';
 import { useLoginModal } from '../../contexts/LoginModalContext';
-import { MyPageLayout, QuickActionsSection, RoleBadgeGroup } from '@o4o/account-ui';
+import { MyPageLayout, QuickActionsSection, RoleBadgeGroup, MyPageHubCard } from '@o4o/account-ui';
 
 export default function MyPageHub() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -98,38 +98,30 @@ export default function MyPageHub() {
         <p className="text-sm text-gray-400 text-center py-8">최근 활동이 없습니다.</p>
       </div>
 
-      {/* 하단 바로가기 */}
-      <div className="flex flex-wrap gap-3 mb-6">
-        <Link
-          to="/mypage/profile"
-          className="flex-1 min-w-[80px] flex flex-col items-center py-4 px-2 bg-gray-50 rounded-2xl text-gray-700 no-underline hover:bg-gray-100 transition-colors"
-        >
-          <span className="text-3xl mb-2">👤</span>
-          <span className="text-sm">프로필</span>
-        </Link>
-        <Link
-          to="/forum"
-          className="flex-1 min-w-[80px] flex flex-col items-center py-4 px-2 bg-gray-50 rounded-2xl text-gray-700 no-underline hover:bg-gray-100 transition-colors"
-        >
-          <span className="text-3xl mb-2">💬</span>
-          <span className="text-sm">포럼</span>
-        </Link>
+      {/* 하단 바로가기 (WO-O4O-MYPAGE-HUB-CARD-CANONICAL-ALIGNMENT-V1) */}
+      <div className="grid grid-cols-2 gap-3 mb-6">
+        <MyPageHubCard
+          title="프로필"
+          href="/mypage/profile"
+          icon={<UserCog className="w-5 h-5" />}
+        />
+        <MyPageHubCard
+          title="포럼"
+          href="/forum"
+          icon={<MessageSquare className="w-5 h-5" />}
+        />
         {isSupplier && (
-          <Link
-            to="/mypage/business-profile"
-            className="flex-1 min-w-[80px] flex flex-col items-center py-4 px-2 bg-gray-50 rounded-2xl text-gray-700 no-underline hover:bg-gray-100 transition-colors"
-          >
-            <span className="text-3xl mb-2">🏢</span>
-            <span className="text-sm">사업자 정보</span>
-          </Link>
+          <MyPageHubCard
+            title="사업자 정보"
+            href="/mypage/business-profile"
+            icon={<Building2 className="w-5 h-5" />}
+          />
         )}
-        <Link
-          to="/mypage/settings"
-          className="flex-1 min-w-[80px] flex flex-col items-center py-4 px-2 bg-gray-50 rounded-2xl text-gray-700 no-underline hover:bg-gray-100 transition-colors"
-        >
-          <span className="text-3xl mb-2">⚙️</span>
-          <span className="text-sm">설정</span>
-        </Link>
+        <MyPageHubCard
+          title="설정"
+          href="/mypage/settings"
+          icon={<Settings className="w-5 h-5" />}
+        />
       </div>
 
       {/* 대시보드 바로가기 + 로그아웃 */}

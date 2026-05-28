@@ -19,6 +19,12 @@ export type {
   RoleBadgeGroupItem,
   RoleBadgeGroupProps,
 } from './components/RoleBadge.js';
+// WO-O4O-MYPAGE-HUB-CARD-CANONICAL-ALIGNMENT-V1
+export { MyPageHubCard } from './components/MyPageHubCard.js';
+export type {
+  MyPageHubCardProps,
+  MyPageHubCardIconTone,
+} from './components/MyPageHubCard.js';
 export type { MyPageNavItem } from './components/MyPageNavigation.js';
 export type { ProfileField } from './types.js';
 export type {

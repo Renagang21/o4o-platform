@@ -8,7 +8,6 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   Mail,
@@ -17,13 +16,12 @@ import {
   Shield,
   UserCog,
   Settings,
-  ChevronRight,
   BookOpen,
   Award,
   Coins,
   Gift,
 } from 'lucide-react';
-import { MyPageLayout, QuickActionsSection, RoleBadgeGroup } from '@o4o/account-ui';
+import { MyPageLayout, QuickActionsSection, RoleBadgeGroup, MyPageHubCard } from '@o4o/account-ui';
 import type { RoleBadgeTone } from '@o4o/account-ui';
 import { appreciationApi, type AppreciationSend } from '@/api/appreciation';
 
@@ -118,52 +116,37 @@ export default function MyPageHub() {
         </div>
       </div>
 
-      {/* Navigation Cards */}
+      {/* Navigation Cards (WO-O4O-MYPAGE-HUB-CARD-CANONICAL-ALIGNMENT-V1) */}
       <div className="grid grid-cols-2 gap-3 mb-4">
-        <Link
-          to="/mypage/profile"
-          className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm hover:bg-gray-50 transition-colors"
-        >
-          <UserCog className="w-5 h-5 text-primary-500" />
-          <span className="text-sm font-medium text-gray-700 flex-1">프로필 편집</span>
-          <ChevronRight className="w-4 h-4 text-gray-300" />
-        </Link>
-        <Link
-          to="/mypage/settings"
-          className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm hover:bg-gray-50 transition-colors"
-        >
-          <Settings className="w-5 h-5 text-primary-500" />
-          <span className="text-sm font-medium text-gray-700 flex-1">설정</span>
-          <ChevronRight className="w-4 h-4 text-gray-300" />
-        </Link>
+        <MyPageHubCard
+          title="프로필 편집"
+          href="/mypage/profile"
+          icon={<UserCog className="w-5 h-5" />}
+        />
+        <MyPageHubCard
+          title="설정"
+          href="/mypage/settings"
+          icon={<Settings className="w-5 h-5" />}
+        />
       </div>
 
       {/* LMS Navigation Cards */}
       <div className="grid grid-cols-1 gap-3 mb-4">
-        <Link
-          to="/mypage/enrollments"
-          className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm hover:bg-gray-50 transition-colors"
-        >
-          <BookOpen className="w-5 h-5 text-primary-500" />
-          <span className="text-sm font-medium text-gray-700 flex-1">내 강의</span>
-          <ChevronRight className="w-4 h-4 text-gray-300" />
-        </Link>
-        <Link
-          to="/mypage/certificates"
-          className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm hover:bg-gray-50 transition-colors"
-        >
-          <Award className="w-5 h-5 text-primary-500" />
-          <span className="text-sm font-medium text-gray-700 flex-1">수료증</span>
-          <ChevronRight className="w-4 h-4 text-gray-300" />
-        </Link>
-        <Link
-          to="/mypage/credits"
-          className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm hover:bg-gray-50 transition-colors"
-        >
-          <Coins className="w-5 h-5 text-primary-500" />
-          <span className="text-sm font-medium text-gray-700 flex-1">크레딧 / 포인트</span>
-          <ChevronRight className="w-4 h-4 text-gray-300" />
-        </Link>
+        <MyPageHubCard
+          title="내 강의"
+          href="/mypage/enrollments"
+          icon={<BookOpen className="w-5 h-5" />}
+        />
+        <MyPageHubCard
+          title="수료증"
+          href="/mypage/certificates"
+          icon={<Award className="w-5 h-5" />}
+        />
+        <MyPageHubCard
+          title="크레딧 / 포인트"
+          href="/mypage/credits"
+          icon={<Coins className="w-5 h-5" />}
+        />
       </div>
 
       {/* Appreciation Activity Card */}
