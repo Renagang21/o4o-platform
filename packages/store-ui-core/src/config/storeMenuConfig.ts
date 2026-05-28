@@ -90,7 +90,10 @@ export const COSMETICS_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'local-products', label: '자체 상품',    subPath: '/local-products' },
     ]},
     { label: '디지털 사이니지', items: [
-      { key: 'signage', label: '사이니지', subPath: '/signage' },
+      // WO-O4O-MY-STORE-SIGNAGE-SUBMENU-ALIGNMENT-V1: KPA/GP 기준 서브메뉴 정렬 (player 미구현 제외)
+      { key: 'signage-playlist',  label: '플레이리스트', subPath: '/signage/playlist' },
+      { key: 'signage-videos',    label: '동영상',       subPath: '/signage/videos' },
+      { key: 'signage-schedules', label: '스케줄',       subPath: '/signage/schedules' },
     ]},
     { label: '매장 실행', items: [
       { key: 'tablet-displays', label: '태블릿',  subPath: '/tablet-displays' },

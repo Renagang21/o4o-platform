@@ -580,7 +580,11 @@ function AppRoutes() {
         <Route path="tablet-displays" element={<StoreTabletDisplaysPage />} />
         {/* channels: 채널 관리 (WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1) */}
         <Route path="channels" element={<StoreChannelsPage />} />
-        <Route path="signage" element={<StoreSignagePage />} />
+        {/* WO-O4O-MY-STORE-SIGNAGE-SUBMENU-ALIGNMENT-V1: KPA/GP 기준 서브메뉴 정렬 (player 미구현 제외) */}
+        <Route path="signage" element={<Navigate to="playlist" replace />} />
+        <Route path="signage/playlist" element={<StoreSignagePage />} />
+        <Route path="signage/videos" element={<StoreSignagePage />} />
+        <Route path="signage/schedules" element={<StoreSignagePage />} />
         <Route path="orders" element={<StorePlaceholderPage title="주문 관리" />} />
         <Route path="billing" element={<StorePlaceholderPage title="정산/인보이스" />} />
         {/* WO-O4O-STORE-HUB-CROSS-SERVICE-COMMONIZATION-PHASE1-V1: placeholder → StoreAssetsPanel */}
