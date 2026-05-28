@@ -8,8 +8,11 @@
  * Main entry point for cosmetics API routes
  */
 
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
+import { ForumQueryService } from '../../modules/forum/index.js';
+import { SignageQueryService } from '../../modules/signage/index.js';
+import { asyncHandler } from '../../middleware/error-handler.js';
 import { createCosmeticsController } from './controllers/cosmetics.controller.js';
 // WO-O4O-OPERATOR-API-ARCHITECTURE-UNIFICATION-V1 (Phase 3): Standard operator path
 import { createCosmeticsOperatorDashboardController } from './controllers/operator-dashboard.controller.js';
@@ -238,6 +241,134 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
   // Operator: GET /news/admin/list, POST /news, PUT /news/:id,
   //           DELETE /news/:id, DELETE /news/:id/hard, batch ops
   // ============================================================================
+  // ============================================================================
+  // Home Routes — /api/v1/cosmetics/home/*
+  // WO-O4O-GLYCOPHARM-KCOS-HOME-LATEST-API-V1: 통합 최신 활동 피드
+  // ============================================================================
+  const homeRouter = Router();
+
+  const forumService = new ForumQueryService(dataSource, { scope: 'community' });
+  const signageService = new SignageQueryService(dataSource, {
+    serviceKey: 'k-cosmetics',
+    sources: ['hq', 'store'],
+  });
+
+  // GET /home/latest — 통합 최신 활동 피드
+  // ?type=all|forum|course|content|resource|signage  ?limit=20
+  homeRouter.get('/latest', optionalAuth as any, asyncHandler(async (req: Request, res: Response) => {
+    const filterType = ((req.query.type as string) || 'all').toLowerCase();
+    const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
+    const perLimit = filterType === 'all' ? 10 : limit;
+
+    type LatestItem = {
+      type: string;
+      id: string;
+      title: string;
+      authorName?: string;
+      createdAt: string;
+      href: string;
+    };
+    const items: LatestItem[] = [];
+    const tasks: Promise<void>[] = [];
+
+    if (filterType === 'all' || filterType === 'forum') {
+      tasks.push((async () => {
+        const posts = await forumService.listRecentPosts(perLimit);
+        for (const p of posts) {
+          items.push({
+            type: 'forum', id: p.id, title: p.title,
+            authorName: p.authorName || undefined,
+            createdAt: new Date(p.createdAt).toISOString(),
+            href: `/forum/post/${p.id}`,
+          });
+        }
+      })());
+    }
+
+    if (filterType === 'all' || filterType === 'course') {
+      tasks.push((async () => {
+        const rows: any[] = await dataSource.query(
+          `SELECT c.id, c.title, c.created_at, u.name AS author_name
+           FROM lms_courses c LEFT JOIN users u ON c.instructor_id = u.id
+           WHERE c.status = 'published' ORDER BY c.created_at DESC LIMIT $1`,
+          [perLimit],
+        );
+        for (const r of rows) {
+          items.push({
+            type: 'course', id: r.id, title: r.title,
+            authorName: r.author_name ?? undefined,
+            createdAt: new Date(r.created_at).toISOString(),
+            href: `/lms/course/${r.id}`,
+          });
+        }
+      })());
+    }
+
+    if (filterType === 'all' || filterType === 'content') {
+      tasks.push((async () => {
+        const rows: any[] = await dataSource.query(
+          `SELECT c.id, c.title, c.created_at,
+                  COALESCE(c.author_name, u.name) AS author_name
+           FROM cosmetics_contents c LEFT JOIN users u ON c.created_by = u.id
+           WHERE c.status = 'published' AND c.is_deleted = false
+             AND (c.sub_type IS NULL OR c.sub_type != 'resource')
+           ORDER BY c.created_at DESC LIMIT $1`,
+          [perLimit],
+        );
+        for (const r of rows) {
+          items.push({
+            type: 'content', id: r.id, title: r.title,
+            authorName: r.author_name ?? undefined,
+            createdAt: new Date(r.created_at).toISOString(),
+            href: `/library/content/${r.id}`,
+          });
+        }
+      })());
+    }
+
+    if (filterType === 'all' || filterType === 'resource') {
+      tasks.push((async () => {
+        const rows: any[] = await dataSource.query(
+          `SELECT c.id, c.title, c.created_at,
+                  COALESCE(c.author_name, u.name) AS author_name
+           FROM cosmetics_contents c LEFT JOIN users u ON c.created_by = u.id
+           WHERE c.status = 'published' AND c.is_deleted = false
+             AND c.sub_type = 'resource'
+           ORDER BY c.created_at DESC LIMIT $1`,
+          [perLimit],
+        );
+        for (const r of rows) {
+          items.push({
+            type: 'resource', id: r.id, title: r.title,
+            authorName: r.author_name ?? undefined,
+            createdAt: new Date(r.created_at).toISOString(),
+            href: `/resources`,
+          });
+        }
+      })());
+    }
+
+    if (filterType === 'all' || filterType === 'signage') {
+      tasks.push((async () => {
+        const signageData = await signageService.listForHome(perLimit, 0);
+        for (const m of signageData.media) {
+          items.push({
+            type: 'signage', id: m.id, title: m.name,
+            authorName: (m as any).uploaderName ?? undefined,
+            createdAt: new Date(m.createdAt).toISOString(),
+            href: `/store/signage/playlist`,
+          });
+        }
+      })());
+    }
+
+    await Promise.allSettled(tasks);
+    items.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    res.json({ success: true, data: items.slice(0, limit) });
+  }));
+
+  router.use('/home', homeRouter);
+
   router.use('/news', createNewsController(
     dataSource,
     coreRequireAuth as any,
