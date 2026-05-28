@@ -168,25 +168,33 @@ export class OperatorRegistrationService {
 
           // WO-NETURE-SUPPLIER-APPROVAL-TWO-STEP-ACTIVATION-V1:
           // 가입 승인 시 PENDING으로 생성 → 운영자가 별도 공급 승인 후 ACTIVE
+          // WO-O4O-NETURE-SUPPLIER-APPROVAL-INSERT-FIX-V1:
+          // business_number, business_address 컬럼은 migration 20260327000300으로 삭제됨.
+          // 해당 값은 organizations 테이블(org SSOT)에 저장한다.
           const [insertedSupplier] = await queryRunner.query(
-            `INSERT INTO neture_suppliers (user_id, slug, contact_email, contact_phone, representative_name, business_number, business_address, tax_invoice_email, status, approved_by, approved_at, created_at, updated_at)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'PENDING', NULL, NULL, NOW(), NOW())
+            `INSERT INTO neture_suppliers (user_id, slug, contact_email, contact_phone, representative_name, tax_invoice_email, status, approved_by, approved_at, created_at, updated_at)
+             VALUES ($1, $2, $3, $4, $5, $6, 'PENDING', NULL, NULL, NOW(), NOW())
              ON CONFLICT (user_id) DO NOTHING
              RETURNING id`,
-            [userId, slug, contactEmail, contactPhone, representativeName, businessNumber, businessAddress, taxInvoiceEmail],
+            [userId, slug, contactEmail, contactPhone, representativeName, taxInvoiceEmail],
           );
 
-          // organization 연동 (businessName이 있는 경우)
+          // organization 연동 (businessName이 있는 경우) — business_number, address org SSOT에 저장
           if (bizName && insertedSupplier?.id) {
             const orgCode = `neture-${slug}`;
             const orgPath = `/${orgCode}`;
-            // organizations 테이블은 camelCase 컬럼 (TypeORM SnakeNamingStrategy 미적용)
+            // organizations 테이블은 camelCase 컬럼 (TypeORM SnakeNamingStrategy 미적용),
+            // business_number / address 는 snake_case 컬럼 (organizations schema 기준)
             const [org] = await queryRunner.query(
-              `INSERT INTO organizations (name, code, type, "isActive", "createdAt", "updatedAt", level, path, "childrenCount")
-               VALUES ($1, $2, 'supplier', true, NOW(), NOW(), 0, $3, 0)
-               ON CONFLICT (code) DO UPDATE SET "isActive" = true, "updatedAt" = NOW()
+              `INSERT INTO organizations (name, code, type, "isActive", "createdAt", "updatedAt", level, path, "childrenCount", business_number, address)
+               VALUES ($1, $2, 'supplier', true, NOW(), NOW(), 0, $3, 0, $4, $5)
+               ON CONFLICT (code) DO UPDATE SET
+                 "isActive" = true,
+                 "updatedAt" = NOW(),
+                 business_number = COALESCE(EXCLUDED.business_number, organizations.business_number),
+                 address = COALESCE(EXCLUDED.address, organizations.address)
                RETURNING id`,
-              [bizName, orgCode, orgPath],
+              [bizName, orgCode, orgPath, businessNumber, businessAddress],
             );
             if (org?.id) {
               await queryRunner.query(
