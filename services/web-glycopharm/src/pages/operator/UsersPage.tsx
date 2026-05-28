@@ -186,6 +186,10 @@ export default function UsersPage() {
         { key: 'pharmacist', label: '약사', roleFilter: ['glycopharm:pharmacist'] },
         { key: 'store_owner', label: '약국 경영자', roleFilter: ['glycopharm:store_owner'] },
       ]}
+      statusTabs={[
+        { key: 'suspended', label: '정지', status: 'suspended' },
+        { key: 'withdrawn', label: '탈퇴', status: 'withdrawn' },
+      ]}
       renderEditModal={({ user, onClose, onSuccess }) => (
         <EditUserModal userId={user.id} onClose={onClose} onSuccess={onSuccess} />
       )}

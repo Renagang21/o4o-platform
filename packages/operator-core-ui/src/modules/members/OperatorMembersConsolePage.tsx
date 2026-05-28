@@ -215,6 +215,7 @@ export function OperatorMembersConsolePage({
   getPrimaryRole: getPrimaryRoleProp,
   roleDisplayMap,
   extraColumn,
+  extraColumns,
   drawerExtraSections,
   renderEditModal,
   renderDeleteFlow,
@@ -251,6 +252,7 @@ export function OperatorMembersConsolePage({
     pending: 0,
     rejected: 0,
     roleCounts: {} as Record<string, number>,
+    statusCounts: {} as Record<string, number>,
   });
 
   // ─── Fetch ──────────────────────────────────────────────────
@@ -293,17 +295,23 @@ export function OperatorMembersConsolePage({
         roleCounts[tab.key] = allUsers.filter((u) => tab.roleFilter.includes(getPrimaryRole(u))).length;
       });
 
+      const statusCounts: Record<string, number> = {};
+      (statusTabs ?? []).forEach((st) => {
+        statusCounts[st.key] = getCount(st.status);
+      });
+
       setStats({
         total: statsRes.statistics?.total || 0,
         active: getCount('active') + getCount('approved'),
         pending: getCount('pending'),
         rejected: getCount('rejected'),
         roleCounts,
+        statusCounts,
       });
     } catch {
       // stats failure is non-critical
     }
-  }, [client, roleTabs, getPrimaryRole]);
+  }, [client, roleTabs, statusTabs, getPrimaryRole]);
 
   useEffect(() => {
     fetchUsers(1);
@@ -404,6 +412,7 @@ export function OperatorMembersConsolePage({
       ...(statusTabs ?? []).map((st: MembersStatusTab) => ({
         key: st.key,
         label: st.label,
+        count: stats.statusCounts[st.key],
       })),
       { key: 'pending', label: '가입 신청', count: stats.pending },
     ];
@@ -478,7 +487,7 @@ export function OperatorMembersConsolePage({
       width: '220px',
     },
     roleColumn,
-    ...(extraColumn ? [extraColumn] : []),
+    ...(extraColumns ?? (extraColumn ? [extraColumn] : [])),
     {
       key: 'createdAt',
       header: '가입일',

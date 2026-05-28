@@ -118,6 +118,10 @@ export default function UsersPage() {
         { key: 'seller', label: '판매자', roleFilter: ['cosmetics:store_owner'] },
         { key: 'consumer', label: '소비자', roleFilter: ['consumer', 'customer'] },
       ]}
+      statusTabs={[
+        { key: 'suspended', label: '정지', status: 'suspended' },
+        { key: 'withdrawn', label: '탈퇴', status: 'withdrawn' },
+      ]}
       renderEditModal={({ user, onClose, onSuccess }) => (
         <EditUserModal userId={user.id} onClose={onClose} onSuccess={onSuccess} />
       )}

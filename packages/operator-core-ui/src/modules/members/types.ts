@@ -166,8 +166,15 @@ export interface OperatorMembersConsolePageProps {
   /**
    * Service-specific extra column. Inserted between role and createdAt.
    * Neture: dashboardAccess column.
+   * @deprecated Prefer extraColumns[] for multi-column extension.
    */
   extraColumn?: ListColumnDef<UserData>;
+
+  /**
+   * Service-specific extra columns (plural). Merged with extraColumn when both provided.
+   * Inserted between role and createdAt.
+   */
+  extraColumns?: ListColumnDef<UserData>[];
 
   /** Render service-specific drawer content sections (above footer link). */
   drawerExtraSections?: (user: UserData) => ReactNode;
