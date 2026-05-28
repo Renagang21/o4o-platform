@@ -28,6 +28,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   stores: [
     { label: '내 매장', path: '/operator/store-cockpit' },
     { label: '매장 관리', path: '/operator/stores' },
+    // WO-O4O-KCOSMETICS-OPERATOR-STORE-CHANNELS-V1
+    { label: '채널 관리', path: '/operator/store-channels' },
   ],
   orders: [{ label: '주문 관리', path: '/operator/orders' }],
   content: [
@@ -49,7 +51,7 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '템플릿', path: '/operator/signage/templates' },
   ],
   forum: [
-    { label: '커뮤니티 관리', path: '/operator/community' },
+    // WO-O4O-KCOSMETICS-OPERATOR-STORE-CHANNELS-V1: /operator/community dead link 제거 (route 없음)
     { label: '포럼 신청', path: '/operator/forum-requests' },
     { label: '삭제 요청', path: '/operator/forum-delete-requests' },
     { label: '포럼 분석', path: '/operator/forum-analytics' },

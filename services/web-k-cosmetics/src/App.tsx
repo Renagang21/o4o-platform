@@ -148,6 +148,8 @@ const KCosmeticsAdminDashboard = lazy(() => import('@/pages/admin/KCosmeticsAdmi
 const KCosmeticsOperatorDashboard = lazy(() => import('@/pages/operator/KCosmeticsOperatorDashboard'));
 const OperatorStoresPage = lazy(() => import('@/pages/operator/StoresPage'));
 const OperatorStoreDetailPage = lazy(() => import('@/pages/operator/StoreDetailPage'));
+// WO-O4O-KCOSMETICS-OPERATOR-STORE-CHANNELS-V1
+const OperatorStoreChannelsPage = lazy(() => import('@/pages/operator/store-channels/OperatorStoreChannelsPage'));
 const OperatorApplicationsPage = lazy(() => import('@/pages/operator/ApplicationsPage'));
 const OperatorProductsPage = lazy(() => import('@/pages/operator/ProductsPage'));
 const OperatorProductDetailPage = lazy(() => import('@/pages/operator/ProductDetailPage'));
@@ -492,6 +494,8 @@ function AppRoutes() {
         {/* 매장 관리 (WO-O4O-STORE-CONSOLE-V1) */}
         <Route path="stores" element={<OperatorStoresPage />} />
         <Route path="stores/:storeId" element={<OperatorStoreDetailPage />} />
+        {/* 채널 관리 (WO-O4O-KCOSMETICS-OPERATOR-STORE-CHANNELS-V1) */}
+        <Route path="store-channels" element={<OperatorStoreChannelsPage />} />
         <Route path="orders" element={<OperatorOrdersPage />} />
         {/* WO-O4O-EVENT-OFFER-KCOS-OPERATOR-APPROVAL-V1: 이벤트 오퍼 승인 */}
         <Route path="event-offers" element={<OperatorEventOfferApprovalsPage />} />
