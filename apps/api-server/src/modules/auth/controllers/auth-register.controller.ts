@@ -5,7 +5,7 @@
  * Freeze: WO-O4O-CORE-FREEZE-V1 (2026-03-11)
  */
 import { Request, Response } from 'express';
-import { hashPassword, comparePassword } from '../../../utils/auth.utils.js';
+import { hashPassword } from '../../../utils/auth.utils.js';
 import { BaseController } from '../../../common/base.controller.js';
 import { AppDataSource } from '../../../database/connection.js';
 import { User } from '../entities/User.js';
@@ -109,36 +109,16 @@ export class AuthRegisterController extends BaseController {
             'SERVICE_ALREADY_JOINED');
         }
 
-        // 2. 비밀번호 검증 (보안: 본인 확인)
-        // WO-O4O-EXISTING-ACCOUNT-SERVICE-PASSWORD-SEPARATION-V1:
-        // currentPassword = 기존 계정 본인 확인용 (users.password 검증)
-        // newServicePassword = 새 서비스 credential 저장용 (service_credentials[serviceKey])
-        // 둘 다 없으면 password 단일 필드 fallback (legacy 호환)
-        const identityPassword = data.currentPassword ?? data.password;
+        // WO-O4O-CROSSSERVICE-REGISTER-EXISTING-ACCOUNT-PASSWORD-REQUIREMENT-REMOVE-V1:
+        //   기존 O4O 계정 본인확인용 currentPassword 검증을 제거한다.
+        //   정책 (IR-O4O-EXISTING-ACCOUNT-SERVICE-REGISTRATION-CREDENTIAL-AUDIT-V1 §3 기준):
+        //   - 플랫폼 계정 존재 여부는 서비스 신청 차단 기준이 아니다.
+        //   - 해당 서비스 membership/application 상태(pending/active)로만 차단 판단 (위 단계 1에서 완료).
+        //   - 본인확인이 필요해질 경우 비밀번호 재입력이 아닌 별도 인증 수단(문자/이메일)을 추후 도입.
+        //   기존 user 의 users.password 는 그대로 유지(다른 서비스 로그인 영향 없음).
+        //   service_credentials 는 해당 서비스 전용으로 새 비밀번호로 upsert.
+        //   본인확인 미수행으로 인한 보안 trade-off 는 WO 본문 §3 기준 4·5 에서 명시적 결정됨.
         const newServicePassword = data.servicePassword ?? data.password;
-        if (!data.currentPassword || !data.servicePassword) {
-          logger.warn('[AuthRegisterController.register] Existing account registration: missing currentPassword or servicePassword, falling back to legacy single-password flow', {
-            userId: existingUser.id,
-            serviceKey,
-            hasCurrentPassword: !!data.currentPassword,
-            hasServicePassword: !!data.servicePassword,
-          });
-        }
-        const passwordMatch = await comparePassword(identityPassword, existingUser.password);
-        if (!passwordMatch) {
-          // WO-O4O-AUTH-REGISTER-UX-IMPROVEMENT-V1: 기존 가입 서비스 목록 포함
-          const existingMemberships = await smRepository.find({
-            where: { userId: existingUser.id },
-            select: ['serviceKey', 'status'],
-          });
-          return res.status(401).json({
-            success: false,
-            error: 'O4O 플랫폼에 이미 가입된 계정입니다. 기존 비밀번호를 입력해주세요.',
-            code: 'PASSWORD_MISMATCH',
-            existingAccount: true,
-            services: existingMemberships.map(m => ({ key: m.serviceKey, name: getServiceName(m.serviceKey), status: m.status })),
-          });
-        }
 
         // 3. 새 서비스 멤버십 추가 (트랜잭션)
         // WO-O4O-AUTH-REGISTER-UX-IMPROVEMENT-V1: RoleAssignment는 서비스 승인 시에만 생성
