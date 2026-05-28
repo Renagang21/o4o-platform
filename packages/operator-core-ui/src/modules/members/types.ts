@@ -105,6 +105,17 @@ export interface MembersRoleTab {
   roleFilter: string[];
 }
 
+/**
+ * Optional status tab. Passes `status` param to client.list().
+ * Used by Neture UsersManagementPage to add active/suspended/rejected/withdrawn tabs.
+ */
+export interface MembersStatusTab {
+  key: string;
+  label: string;
+  /** Status value passed to client.list({ status }) */
+  status: string;
+}
+
 // ─── Slots / Renderers ────────────────────────────────────────
 
 export interface EditModalRenderProps {
@@ -133,6 +144,12 @@ export interface OperatorMembersConsolePageProps {
 
   /** Type tabs (excluding 'all' and 'pending' — wrapper auto-adds those). */
   roleTabs: MembersRoleTab[];
+
+  /**
+   * Optional status tabs. If provided, inserted between role tabs and 'pending' tab.
+   * Each tab passes its `status` value to client.list().
+   */
+  statusTabs?: MembersStatusTab[];
 
   /**
    * Extract primary role for filtering & RoleBadge.

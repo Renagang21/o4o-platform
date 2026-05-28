@@ -203,6 +203,12 @@ export default function UsersManagementPage() {
         { key: 'partner', label: '파트너', roleFilter: ['partner', 'neture:partner'] },
         { key: 'seller', label: '셀러', roleFilter: ['seller', 'neture:seller'] },
       ]}
+      statusTabs={[
+        { key: 'status-active', label: '활성', status: 'active' },
+        { key: 'status-suspended', label: '정지', status: 'suspended' },
+        { key: 'status-rejected', label: '거절', status: 'rejected' },
+        { key: 'status-withdrawn', label: '탈퇴', status: 'withdrawn' },
+      ]}
       getPrimaryRole={getPrimaryRole}
       roleDisplayMap={NETURE_ROLE_DISPLAY}
       extraColumn={{

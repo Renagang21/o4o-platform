@@ -10,7 +10,7 @@
  * WO-O4O-OPERATOR-DATATABLE-SOURCE-ALIGN-V1: DataTable @o4o/ui → @o4o/operator-ux-core
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Users,
@@ -21,8 +21,10 @@ import {
   AlertCircle,
   X,
   MessageSquare,
+  UserCheck,
+  UserX,
 } from 'lucide-react';
-import { OperatorConfirmModal } from '@o4o/ui';
+import { OperatorConfirmModal, ActionBar } from '@o4o/ui';
 import { DataTable } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { OperatorActionType } from '@o4o/types';
@@ -114,6 +116,8 @@ export default function RegistrationRequestsPage() {
   const [editingNotes, setEditingNotes] = useState(false);
   const [notesValue, setNotesValue] = useState('');
   const [savingNotes, setSavingNotes] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkProcessing, setBulkProcessing] = useState(false);
 
   const fetchRequests = useCallback(async () => {
     try {
@@ -232,6 +236,46 @@ export default function RegistrationRequestsPage() {
     }
   };
 
+  const handleBulkApprove = async () => {
+    const ids = [...selectedIds].filter((id) => {
+      const r = requests.find((x) => x.id === id);
+      return r?.status === 'PENDING';
+    });
+    if (ids.length === 0) return;
+    setBulkProcessing(true);
+    setMessage(null);
+    try {
+      await operatorRegistrationApi.batchProcess(ids, 'approve');
+      setMessage({ type: 'success', text: `${ids.length}건 일괄 승인 완료` });
+      setSelectedIds(new Set());
+      await fetchRequests();
+    } catch {
+      setMessage({ type: 'error', text: '일괄 승인 처리 중 오류가 발생했습니다.' });
+    } finally {
+      setBulkProcessing(false);
+    }
+  };
+
+  const handleBulkReject = async () => {
+    const ids = [...selectedIds].filter((id) => {
+      const r = requests.find((x) => x.id === id);
+      return r?.status === 'PENDING';
+    });
+    if (ids.length === 0) return;
+    setBulkProcessing(true);
+    setMessage(null);
+    try {
+      await operatorRegistrationApi.batchProcess(ids, 'reject', '운영자 일괄 거부');
+      setMessage({ type: 'success', text: `${ids.length}건 일괄 거부 완료` });
+      setSelectedIds(new Set());
+      await fetchRequests();
+    } catch {
+      setMessage({ type: 'error', text: '일괄 거부 처리 중 오류가 발생했습니다.' });
+    } finally {
+      setBulkProcessing(false);
+    }
+  };
+
   const filteredRequests = requests.filter((request) => {
     const matchesSearch =
       request.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -246,18 +290,53 @@ export default function RegistrationRequestsPage() {
   const approvedCount = requests.filter((r) => r.status === 'APPROVED').length;
   const rejectedCount = requests.filter((r) => r.status === 'REJECTED').length;
 
+  const selectedPendingCount = useMemo(
+    () => [...selectedIds].filter((id) => requests.find((r) => r.id === id)?.status === 'PENDING').length,
+    [selectedIds, requests],
+  );
+
+  const handleToggleAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(new Set(filteredRequests.map((r) => r.id)));
+    } else {
+      setSelectedIds(new Set());
+    }
+  };
+
+  const handleToggleOne = (id: string, checked: boolean) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (checked) next.add(id);
+      else next.delete(id);
+      return next;
+    });
+  };
+
+  const allSelected = filteredRequests.length > 0 && filteredRequests.every((r) => selectedIds.has(r.id));
+  const someSelected = selectedIds.size > 0;
+
   // DataTable columns — pre-rendered ReactNode 셀 (key === field name 으로 row[key] 자동 매핑)
   const columns: ListColumnDef<Record<string, any>>[] = [
-    { key: 'applicant', header: '신청자', width: '30%' },
-    { key: 'company', header: '회사 / 면허', width: '20%' },
-    { key: 'date', header: '신청일', width: '15%' },
-    { key: 'status', header: '상태', width: '15%', align: 'center' },
-    { key: 'actions', header: '', width: '20%' },
+    { key: 'select', header: '', width: '48px', align: 'center' },
+    { key: 'applicant', header: '신청자', width: '28%' },
+    { key: 'company', header: '회사 / 면허', width: '18%' },
+    { key: 'date', header: '신청일', width: '14%' },
+    { key: 'status', header: '상태', width: '14%', align: 'center' },
+    { key: 'actions', header: '', width: '18%' },
   ];
 
   // DataTable rows
   const tableRows = filteredRequests.map((request) => ({
     id: request.id,
+    select: (
+      <input
+        type="checkbox"
+        checked={selectedIds.has(request.id)}
+        onChange={(e) => handleToggleOne(request.id, e.target.checked)}
+        className="w-4 h-4 accent-primary-600 cursor-pointer"
+        onClick={(e) => e.stopPropagation()}
+      />
+    ),
     applicant: (
       <div>
         <div className="font-medium text-gray-900">{request.name}</div>
@@ -461,8 +540,50 @@ export default function RegistrationRequestsPage() {
           </div>
         </div>
 
+        {/* Bulk Action Bar */}
+        {someSelected && (
+          <ActionBar
+            selectedCount={selectedIds.size}
+            actions={[
+              {
+                key: 'approve',
+                label: `일괄 승인 (${selectedPendingCount})`,
+                onClick: handleBulkApprove,
+                variant: 'primary' as const,
+                icon: <UserCheck size={14} />,
+                loading: bulkProcessing,
+                visible: selectedPendingCount > 0,
+                group: 'actions',
+              },
+              {
+                key: 'reject',
+                label: `일괄 거부 (${selectedPendingCount})`,
+                onClick: handleBulkReject,
+                variant: 'danger' as const,
+                icon: <UserX size={14} />,
+                loading: bulkProcessing,
+                visible: selectedPendingCount > 0,
+                group: 'actions',
+              },
+            ]}
+            onClearSelection={() => setSelectedIds(new Set())}
+          />
+        )}
+
         {/* Request List */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+          {/* 전체 선택 헤더 */}
+          <div className="flex items-center gap-3 px-4 py-2 border-b border-gray-100">
+            <input
+              type="checkbox"
+              checked={allSelected}
+              onChange={(e) => handleToggleAll(e.target.checked)}
+              className="w-4 h-4 accent-primary-600 cursor-pointer"
+            />
+            <span className="text-xs text-gray-500">
+              {someSelected ? `${selectedIds.size}건 선택됨` : '전체 선택'}
+            </span>
+          </div>
           <DataTable
             columns={columns}
             data={tableRows}

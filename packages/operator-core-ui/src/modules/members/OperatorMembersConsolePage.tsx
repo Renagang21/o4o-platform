@@ -54,6 +54,7 @@ import type {
   OperatorMembersConsolePageProps,
   PaginationData,
   UserData,
+  MembersStatusTab,
 } from './types';
 
 // ─── Helpers ─────────────────────────────────────────────────
@@ -210,6 +211,7 @@ export function OperatorMembersConsolePage({
   title = '회원 관리',
   description = '회원 승인, 상태 변경, 서비스 멤버십 관리',
   roleTabs,
+  statusTabs,
   getPrimaryRole: getPrimaryRoleProp,
   roleDisplayMap,
   extraColumn,
@@ -258,10 +260,12 @@ export function OperatorMembersConsolePage({
       setLoading(true);
       setError('');
       try {
+        const activeStatusTab = (statusTabs ?? []).find((t) => t.key === activeTab);
         const params = {
           page,
           limit: 20,
           ...(activeTab === 'pending' ? { status: 'pending' } : {}),
+          ...(activeStatusTab ? { status: activeStatusTab.status } : {}),
           ...(searchQuery ? { search: searchQuery } : {}),
         };
         const data = await client.list(params);
@@ -273,7 +277,7 @@ export function OperatorMembersConsolePage({
         setLoading(false);
       }
     },
-    [client, activeTab, searchQuery],
+    [client, activeTab, searchQuery, statusTabs],
   );
 
   const fetchStats = useCallback(async () => {
@@ -381,10 +385,11 @@ export function OperatorMembersConsolePage({
 
   const filteredUsers = useMemo(() => {
     if (activeTab === 'all' || activeTab === 'pending') return users;
+    if ((statusTabs ?? []).some((t) => t.key === activeTab)) return users; // server-filtered
     const tab = roleTabs.find((t) => t.key === activeTab);
     if (!tab || tab.roleFilter.length === 0) return users;
     return users.filter((u) => tab.roleFilter.includes(getPrimaryRole(u)));
-  }, [users, activeTab, roleTabs, getPrimaryRole]);
+  }, [users, activeTab, roleTabs, statusTabs, getPrimaryRole]);
 
   // ─── Tabs ───────────────────────────────────────────────────
 
@@ -396,9 +401,13 @@ export function OperatorMembersConsolePage({
         label: rt.label,
         count: stats.roleCounts[rt.key] ?? 0,
       })),
+      ...(statusTabs ?? []).map((st: MembersStatusTab) => ({
+        key: st.key,
+        label: st.label,
+      })),
       { key: 'pending', label: '가입 신청', count: stats.pending },
     ];
-  }, [roleTabs, stats]);
+  }, [roleTabs, statusTabs, stats]);
 
   // ─── Bulk Action Bar ────────────────────────────────────────
 

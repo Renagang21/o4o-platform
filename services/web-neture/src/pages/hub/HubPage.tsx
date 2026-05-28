@@ -45,7 +45,7 @@ const HUB_SECTIONS: HubSectionDefinition[] = [
         id: 'products',
         title: '상품 관리',
         description: '등록된 제품 현황을 확인하고 관리합니다.',
-        href: '/workspace/supplier/products',
+        href: '/supplier/dashboard',
         icon: '📦',
         signalKey: 'products',
       },
@@ -53,7 +53,7 @@ const HUB_SECTIONS: HubSectionDefinition[] = [
         id: 'requests',
         title: '요청 관리',
         description: '판매자 신청 및 공급 요청을 확인합니다.',
-        href: '/workspace/supplier/requests',
+        href: '/supplier/dashboard',
         icon: '📋',
         signalKey: 'requests',
       },
@@ -61,7 +61,7 @@ const HUB_SECTIONS: HubSectionDefinition[] = [
         id: 'settlements',
         title: '정산 현황',
         description: '파트너 정산 내역을 확인합니다.',
-        href: '/workspace/partner/settlements',
+        href: '/partner/dashboard',
         icon: '💰',
         signalKey: 'settlements',
       },
@@ -93,7 +93,7 @@ const HUB_SECTIONS: HubSectionDefinition[] = [
         id: 'partnership',
         title: '파트너십 관리',
         description: '파트너십 요청과 제휴를 관리합니다.',
-        href: '/workspace/partners/requests',
+        href: '/partner/dashboard',
         icon: '🤝',
         signalKey: 'partnership',
       },
@@ -101,21 +101,21 @@ const HUB_SECTIONS: HubSectionDefinition[] = [
         id: 'fee-policy',
         title: '수수료 정책',
         description: '서비스 수수료 및 정산 정책을 설정합니다.',
-        href: '/workspace/admin',
+        href: '/admin',
         icon: '📊',
       },
       {
         id: 'service-settings',
         title: '서비스 설정',
         description: '이메일, 알림 등 플랫폼 설정을 관리합니다.',
-        href: '/workspace/admin/settings/email',
+        href: '/operator/settings',
         icon: '⚙️',
       },
       {
         id: 'audit-log',
         title: '감사 로그',
         description: '운영자 활동 내역과 시스템 로그를 확인합니다.',
-        href: '/workspace/admin/operators',
+        href: '/admin',
         icon: '🛡️',
         signalKey: 'audit',
       },
@@ -123,7 +123,7 @@ const HUB_SECTIONS: HubSectionDefinition[] = [
         id: 'catalog-import',
         title: '카탈로그 임포트',
         description: '외부 상품 데이터를 일괄 등록합니다.',
-        href: '/workspace/admin/catalog-import',
+        href: '/admin',
         icon: '📥',
       },
     ],
@@ -566,7 +566,7 @@ export default function HubPage() {
           <span style={{ fontSize: '2rem' }}>🚫</span>
           <h2 style={styles.guardTitle}>접근 권한이 없습니다</h2>
           <p style={styles.guardMessage}>공급자, 파트너 또는 관리자 권한이 필요합니다.</p>
-          <Link to="/workspace" style={styles.backButton}>워크스페이스로 돌아가기</Link>
+          <Link to="/" style={styles.backButton}>홈으로 돌아가기</Link>
         </div>
       </div>
     );

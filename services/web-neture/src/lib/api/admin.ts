@@ -713,4 +713,13 @@ export const operatorRegistrationApi = {
     );
     return response.data;
   },
+
+  async batchProcess(ids: string[], action: 'approve' | 'reject', reason?: string): Promise<any> {
+    const response = await api.post('/neture/operator/registrations/batch', {
+      ids,
+      action,
+      ...(reason ? { reason } : {}),
+    });
+    return response.data;
+  },
 };

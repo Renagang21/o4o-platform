@@ -53,7 +53,7 @@ export default function MyPageHub() {
 
   const handleLogout = () => {
     logout();
-    navigate('/workspace');
+    navigate('/');
   };
 
   return (

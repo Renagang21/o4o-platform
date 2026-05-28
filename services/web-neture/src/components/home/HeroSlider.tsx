@@ -111,7 +111,7 @@ function StaticHero() {
           주문·결제 없이 조건과 기회를 투명하게 확인합니다.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link to="/workspace/suppliers" className="inline-flex items-center justify-center px-8 py-3 text-base font-medium rounded-md text-slate-500 bg-white hover:bg-primary-50 transition-colors">
+          <Link to="/suppliers" className="inline-flex items-center justify-center px-8 py-3 text-base font-medium rounded-md text-slate-500 bg-white hover:bg-primary-50 transition-colors">
             공급자 보기 <ArrowRight className="ml-2 w-5 h-5" />
           </Link>
           <Link to="/partners/requests" className="inline-flex items-center justify-center px-8 py-3 border-2 border-white text-base font-medium rounded-md text-white hover:bg-white hover:text-slate-500 transition-colors">
