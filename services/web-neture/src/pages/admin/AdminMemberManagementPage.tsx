@@ -137,12 +137,31 @@ export default function AdminMemberManagementPage() {
     });
   }, [members]);
 
+  // ── Operator role check helper ─────────────────────────────────────────────
+  const OPERATOR_ROLES_SET = new Set(['neture:operator', 'neture:admin']);
+
+  const getSelectedOperatorBlock = useCallback((): string | null => {
+    if (selectedIds.size !== 1) return null;
+    const [onlyId] = Array.from(selectedIds);
+    const target = members.find((m) => m.id === onlyId);
+    if (!target) return null;
+    const activeOpRole = target.roles.find((r) => OPERATOR_ROLES_SET.has(r));
+    return activeOpRole ?? null;
+  }, [selectedIds, members]);
+
   // ── Hard delete entry ─────────────────────────────────────────────────────
   const handleHardDelete = useCallback(() => {
     if (selectedIds.size !== 1) return;
     const [onlyId] = Array.from(selectedIds);
     const target = members.find((m) => m.id === onlyId);
     if (!target) return;
+    // Block delete if member has active operator role
+    const blockingRole = target.roles.find((r) => OPERATOR_ROLES_SET.has(r));
+    if (blockingRole) {
+      // toast import is not in this file — use window alert as fallback
+      alert(`이 계정은 '${blockingRole}' 운영자 권한을 보유하고 있습니다.\n운영자 관리(/admin/operators)에서 권한을 해제한 후 삭제해주세요.`);
+      return;
+    }
     setDeleteTarget({ id: onlyId, name: getDisplayName(target) });
   }, [selectedIds, members]);
 
@@ -289,16 +308,23 @@ export default function AdminMemberManagementPage() {
       {selectedIds.size > 0 && (
         <div className="flex items-center gap-3 mb-3 px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg">
           <span className="text-sm text-slate-600">{selectedIds.size}명 선택됨</span>
-          <button
-            type="button"
-            onClick={handleHardDelete}
-            disabled={selectedIds.size !== 1}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed"
-            title={selectedIds.size !== 1 ? '완전삭제는 1명 선택 시만 가능합니다' : '선택한 회원을 완전삭제합니다'}
-          >
-            <Trash2 className="w-4 h-4" />
-            {selectedIds.size === 1 ? '완전삭제' : '완전삭제 (1명만)'}
-          </button>
+          {getSelectedOperatorBlock() ? (
+            <div className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-lg">
+              <ShieldAlert className="w-4 h-4" />
+              운영자 권한 보유 — 먼저 운영자 관리에서 권한을 해제하세요
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={handleHardDelete}
+              disabled={selectedIds.size !== 1}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed"
+              title={selectedIds.size !== 1 ? '완전삭제는 1명 선택 시만 가능합니다' : '선택한 회원을 완전삭제합니다'}
+            >
+              <Trash2 className="w-4 h-4" />
+              {selectedIds.size === 1 ? '완전삭제' : '완전삭제 (1명만)'}
+            </button>
+          )}
           <button
             type="button"
             onClick={() => setSelectedIds(new Set())}

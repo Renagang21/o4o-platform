@@ -23,7 +23,21 @@ import { ForumQueryService } from '../../../modules/forum/index.js';
 import { SupplierStatus, PartnershipStatus } from '../../../modules/neture/entities/index.js';
 import { requireAuth, optionalAuth } from '../../../middleware/auth.middleware.js';
 import { requireNetureScope } from '../../../middleware/neture-scope.middleware.js';
+import { hashPassword } from '../../../utils/auth.utils.js';
 import logger from '../../../utils/logger.js';
+
+// WO-O4O-ADMIN-OPERATOR-SINGLE-FORM-AUTO-RESOLVE-REGISTRATION-FLOW-V1
+// service_memberships upsert helper — role_assignments 생성과 항상 함께 호출한다.
+async function upsertNetureMembership(ds: DataSource, userId: string, role: string): Promise<void> {
+  const roleSuffix = role.split(':')[1] || 'operator';
+  await ds.query(
+    `INSERT INTO service_memberships (id, user_id, service_key, status, role, created_at, updated_at)
+     VALUES (gen_random_uuid(), $1, 'neture', 'active', $2, NOW(), NOW())
+     ON CONFLICT (user_id, service_key) DO UPDATE
+       SET status = 'active', role = EXCLUDED.role, updated_at = NOW()`,
+    [userId, roleSuffix],
+  );
+}
 
 /**
  * Create Neture Controller (P1 - GET Only)
@@ -490,20 +504,21 @@ export function createNetureController(dataSource: DataSource): Router {
 
   /**
    * POST /admin/operators
-   * Neture 운영자 등록
+   * Neture 운영자 등록 (Auto-resolve)
    *
-   * WO-O4O-NETURE-OPERATOR-MGMT-P1-CREATE-OPERATOR-FLOW-V1:
-   *   - email 기준으로 기존 사용자 조회
-   *   - active role_assignment 있으면 ALREADY_OPERATOR
+   * WO-O4O-ADMIN-OPERATOR-SINGLE-FORM-AUTO-RESOLVE-REGISTRATION-FLOW-V1:
+   *   - email 기준으로 users 자동 판별
+   *   - user 없으면 password(필수) + name 으로 신규 생성 (isActive=true, status='active')
+   *   - user 있으면 기존 user 사용 (비밀번호 변경 없음)
+   *   - active role_assignment 있으면 ALREADY_OPERATOR (membership은 여전히 sync)
    *   - inactive role_assignment 있으면 is_active=true 복원
    *   - 없으면 신규 INSERT
-   *   - users.isActive 변경 없음
-   *   - 없는 email → USER_NOT_FOUND (임시계정 생성 금지)
+   *   - 두 경우 모두 service_memberships upsert (status='active')
    */
   router.post('/admin/operators', requireAuth, requireNetureScope('neture:admin'), async (req: Request, res: Response) => {
     try {
       const admin = (req as any).user;
-      const { email, name: _name, role } = req.body;
+      const { email, password, name, role } = req.body;
 
       // Input validation
       if (!email || !role) {
@@ -517,27 +532,50 @@ export function createNetureController(dataSource: DataSource): Router {
         });
       }
 
-      // Find user by email (case-insensitive)
-      const [targetUser] = await dataSource.query(
+      // Auto-resolve: find user by email (case-insensitive)
+      const [existingUser] = await dataSource.query(
         `SELECT id, name, email FROM users WHERE lower(email) = lower($1)`,
         [email.trim()]
       );
 
-      if (!targetUser) {
-        return res.status(404).json({
-          success: false,
-          error: `가입된 사용자를 찾을 수 없습니다: ${email}`,
-          code: 'USER_NOT_FOUND',
-        });
+      let userId: string;
+      let isNewUser = false;
+
+      if (!existingUser) {
+        // Require password for new user creation
+        if (!password || String(password).trim().length < 8) {
+          return res.status(400).json({
+            success: false,
+            error: '해당 이메일로 가입된 계정이 없습니다. 신규 계정 생성을 위해 비밀번호(8자 이상)를 입력해주세요.',
+            code: 'PASSWORD_REQUIRED',
+          });
+        }
+
+        const hashed = await hashPassword(String(password));
+        const displayName = (name && String(name).trim()) ? String(name).trim() : email.trim();
+
+        const [newUser] = await dataSource.query(
+          `INSERT INTO users (email, password, name, status, "isActive", "isEmailVerified", "createdAt", "updatedAt")
+           VALUES (lower($1), $2, $3, 'active', true, true, NOW(), NOW())
+           RETURNING id`,
+          [email.trim(), hashed, displayName],
+        );
+        userId = newUser.id;
+        isNewUser = true;
+        logger.info(`[Neture API] New user created for operator assignment: ${email} → ${role}`);
+      } else {
+        userId = existingUser.id;
       }
 
       // Check for existing active role_assignment
       const [activeRA] = await dataSource.query(
         `SELECT id FROM role_assignments WHERE user_id = $1 AND role = $2 AND is_active = true`,
-        [targetUser.id, role]
+        [userId, role]
       );
 
       if (activeRA) {
+        // Sync membership even if role already exists (gap fix)
+        await upsertNetureMembership(dataSource, userId, role);
         return res.status(409).json({
           success: false,
           error: '이미 해당 역할을 보유한 운영자입니다',
@@ -548,11 +586,10 @@ export function createNetureController(dataSource: DataSource): Router {
       // Check for existing inactive role_assignment → restore
       const [inactiveRA] = await dataSource.query(
         `SELECT id FROM role_assignments WHERE user_id = $1 AND role = $2 AND is_active = false`,
-        [targetUser.id, role]
+        [userId, role]
       );
 
       if (inactiveRA) {
-        // Restore existing row
         await dataSource.query(
           `UPDATE role_assignments
            SET is_active = true, assigned_by = $1, assigned_at = NOW(), updated_at = NOW()
@@ -560,24 +597,28 @@ export function createNetureController(dataSource: DataSource): Router {
           [admin.id, inactiveRA.id]
         );
       } else {
-        // Insert new role_assignment
         await dataSource.query(
           `INSERT INTO role_assignments
              (user_id, role, is_active, assigned_by, assigned_at, valid_from, scope_type, created_at, updated_at)
            VALUES ($1, $2, true, $3, NOW(), NOW(), 'global', NOW(), NOW())`,
-          [targetUser.id, role, admin.id]
+          [userId, role, admin.id]
         );
       }
 
-      logger.info(`[Neture API] Operator assigned: ${targetUser.email} → ${role} by ${admin.id}`);
+      // ALWAYS upsert service_memberships (gap fix — WO-O4O-ADMIN-OPERATOR-SINGLE-FORM-AUTO-RESOLVE-REGISTRATION-FLOW-V1)
+      await upsertNetureMembership(dataSource, userId, role);
+
+      const displayName = (name && String(name).trim()) ? String(name).trim() : (existingUser?.name || email.trim());
+      logger.info(`[Neture API] Operator assigned: ${email} → ${role} by ${admin.id} (isNewUser=${isNewUser}, restored=${!!inactiveRA})`);
 
       res.status(201).json({
         success: true,
         data: {
-          userId: targetUser.id,
-          name: targetUser.name || targetUser.email,
-          email: targetUser.email,
+          userId,
+          name: displayName,
+          email: email.trim(),
           role,
+          isNewUser,
           restored: !!inactiveRA,
         },
       });

@@ -66,9 +66,14 @@ export const adminOperatorApi = {
     }
   },
 
-  async createOperator(email: string, role: 'neture:admin' | 'neture:operator'): Promise<OperatorActionResult & { data?: { userId: string; name: string; email: string; role: string; restored: boolean } }> {
+  async createOperator(
+    email: string,
+    role: 'neture:admin' | 'neture:operator',
+    name?: string,
+    password?: string,
+  ): Promise<OperatorActionResult & { data?: { userId: string; name: string; email: string; role: string; isNewUser: boolean; restored: boolean } }> {
     try {
-      const response = await api.post('/neture/admin/operators', { email, role });
+      const response = await api.post('/neture/admin/operators', { email, role, name, password });
       return { success: true, data: response.data.data };
     } catch (error: any) {
       const data = error?.response?.data;

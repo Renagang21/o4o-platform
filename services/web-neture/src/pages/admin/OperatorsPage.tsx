@@ -33,6 +33,8 @@ export default function OperatorsPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [createEmail, setCreateEmail] = useState('');
+  const [createName, setCreateName] = useState('');
+  const [createPassword, setCreatePassword] = useState('');
   const [createRole, setCreateRole] = useState<'neture:admin' | 'neture:operator'>('neture:operator');
   const [createLoading, setCreateLoading] = useState(false);
 
@@ -64,18 +66,28 @@ export default function OperatorsPage() {
       return;
     }
     setCreateLoading(true);
-    const result = await adminOperatorApi.createOperator(createEmail.trim(), createRole);
+    const result = await adminOperatorApi.createOperator(
+      createEmail.trim(),
+      createRole,
+      createName.trim() || undefined,
+      createPassword.trim() || undefined,
+    );
     setCreateLoading(false);
     if (result.success) {
-      const msg = result.data?.restored ? '기존 운영자 권한이 복원되었습니다' : '운영자가 추가되었습니다';
+      let msg = '운영자가 추가되었습니다';
+      if (result.data?.restored) msg = '기존 운영자 권한이 복원되었습니다';
+      else if (result.data?.isNewUser) msg = '신규 계정이 생성되고 운영자 권한이 부여되었습니다';
+      else msg = '기존 계정에 운영자 권한이 추가되었습니다. 비밀번호는 기존 계정 비밀번호를 사용합니다.';
       toast.success(msg);
       setShowCreateModal(false);
       setCreateEmail('');
+      setCreateName('');
+      setCreatePassword('');
       setCreateRole('neture:operator');
       await loadOperators();
     } else {
-      const errMsg = result.code === 'USER_NOT_FOUND'
-        ? '해당 이메일로 가입된 계정이 없습니다'
+      const errMsg = result.code === 'PASSWORD_REQUIRED'
+        ? '신규 계정 생성을 위해 비밀번호(8자 이상)를 입력해주세요'
         : result.code === 'ALREADY_OPERATOR'
         ? '이미 활성 운영자입니다'
         : result.error || '운영자 추가에 실패했습니다';
@@ -310,26 +322,47 @@ export default function OperatorsPage() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold text-slate-800">운영자 추가</h2>
               <button
-                onClick={() => { setShowCreateModal(false); setCreateEmail(''); setCreateRole('neture:operator'); }}
+                onClick={() => { setShowCreateModal(false); setCreateEmail(''); setCreateName(''); setCreatePassword(''); setCreateRole('neture:operator'); }}
                 className="p-1 rounded-lg hover:bg-slate-100 text-slate-400"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
             <p className="text-sm text-slate-500 mb-4">
-              이미 가입된 계정의 이메일을 입력하세요. 해당 계정에 운영자 역할이 부여됩니다.
+              이메일을 입력하세요. 기존 계정이 있으면 해당 계정에 운영자 권한을 부여하고, 없으면 신규 계정을 생성합니다.
             </p>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">이메일</label>
+                <label className="block text-sm font-medium text-slate-700 mb-1">이메일 <span className="text-red-500">*</span></label>
                 <input
                   type="email"
                   value={createEmail}
                   onChange={(e) => setCreateEmail(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
                   placeholder="operator@example.com"
                   className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">이름</label>
+                <input
+                  type="text"
+                  value={createName}
+                  onChange={(e) => setCreateName(e.target.value)}
+                  placeholder="홍길동 (신규 계정 시 사용)"
+                  className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">비밀번호</label>
+                <input
+                  type="password"
+                  value={createPassword}
+                  onChange={(e) => setCreatePassword(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
+                  placeholder="8자 이상 — 신규 계정인 경우 필수, 기존 계정은 무시됩니다"
+                  className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+                <p className="text-xs text-slate-400 mt-1">기존 계정이 있으면 비밀번호를 변경하지 않습니다.</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">역할</label>
@@ -345,7 +378,7 @@ export default function OperatorsPage() {
             </div>
             <div className="flex gap-3 mt-6">
               <button
-                onClick={() => { setShowCreateModal(false); setCreateEmail(''); setCreateRole('neture:operator'); }}
+                onClick={() => { setShowCreateModal(false); setCreateEmail(''); setCreateName(''); setCreatePassword(''); setCreateRole('neture:operator'); }}
                 className="flex-1 px-4 py-2 border border-slate-200 rounded-lg text-slate-600 font-medium hover:bg-slate-50"
               >
                 취소
