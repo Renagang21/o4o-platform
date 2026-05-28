@@ -98,7 +98,6 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const config = roleConfig[role];
   const RoleIcon = config.icon;
 
@@ -308,47 +307,6 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
                 <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
               </button>
 
-              {/* User Menu */}
-              <div className="relative">
-                <button
-                  onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="flex items-center gap-2 p-2 rounded-xl hover:bg-slate-100 transition-colors"
-                >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center">
-                    <span className="text-white text-sm font-medium">
-                      {user?.name?.charAt(0) || '?'}
-                    </span>
-                  </div>
-                  <span className="hidden md:block text-sm font-medium text-slate-700">
-                    {user?.name}
-                  </span>
-                  <ChevronDown className="w-4 h-4 text-slate-400" />
-                </button>
-
-                {userMenuOpen && (
-                  <>
-                    <div
-                      className="fixed inset-0 z-40"
-                      onClick={() => setUserMenuOpen(false)}
-                    />
-                    <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border py-2 z-50">
-                      <NavLink
-                        to="/mypage"
-                        className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
-                        onClick={() => setUserMenuOpen(false)}
-                      >
-                        마이페이지
-                      </NavLink>
-                      <button
-                        onClick={handleLogout}
-                        className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                      >
-                        로그아웃
-                      </button>
-                    </div>
-                  </>
-                )}
-              </div>
             </div>
           </div>
         </header>
