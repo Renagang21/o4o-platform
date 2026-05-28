@@ -119,7 +119,7 @@ export function NetureGlobalHeader() {
               관리자 대시보드
             </GlobalHeaderMenuItem>
           )}
-          {isOperator && !isAdmin && (
+          {isOperator && (
             <GlobalHeaderMenuItem to="/operator" icon={<Shield className="w-4 h-4" />}>
               운영자 대시보드
             </GlobalHeaderMenuItem>
