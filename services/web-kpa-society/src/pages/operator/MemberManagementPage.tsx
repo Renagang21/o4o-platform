@@ -344,6 +344,8 @@ export default function MemberManagementPage() {
   // WO-O4O-OPERATOR-EDITUSER-MODAL-KPA-INTEGRATION-V1:
   //   Drawer 인라인 편집 제거 → KpaEditUserModal 독립 모달로 이전.
   const [editModalOpen, setEditModalOpen] = useState(false);
+  // editingMember: Drawer를 닫은 후 모달에 전달할 대상 — selectedMember 와 생명주기를 분리.
+  const [editingMember, setEditingMember] = useState<KpaMember | null>(null);
 
   // WO-O4O-KPA-MEMBER-BULK-ACTION-ALIGN-V1: bulk selection + batch hook
   //   - selectedIds: 현재 페이지 기준 회원 ID 집합 (canonical Set<string>)
@@ -458,7 +460,8 @@ export default function MemberManagementPage() {
       toast.error('탈퇴 처리된 회원은 수정할 수 없습니다.');
       return;
     }
-    setSelectedMember(m);
+    setEditingMember(m);
+    setSelectedMember(null);
     setEditModalOpen(true);
   }, [memberHasSuperAdmin, memberIsWithdrawn]);
 
@@ -472,10 +475,8 @@ export default function MemberManagementPage() {
     });
   }, [members]);
 
-  // Drawer 닫힘 시 편집 모달 해제
-  useEffect(() => {
-    if (!selectedMember) setEditModalOpen(false);
-  }, [selectedMember]);
+  // Drawer 닫힘 시 편집 모달 해제 불필요 — editingMember 가 모달 생명주기를 독립 관리.
+  // (editingMember 는 setSelectedMember(null) 이후에도 유지됨)
 
   // WO-O4O-KPA-MEMBER-BULK-ACTION-ALIGN-V1:
   //   sequential batch wrapper — 별도 backend bulk endpoint 없이 기존 PATCH /members/:id/status 를 N회 병렬 호출.
@@ -1194,7 +1195,11 @@ export default function MemberManagementPage() {
                   </>
                 ) : (
                   <button
-                    onClick={() => setEditModalOpen(true)}
+                    onClick={() => {
+                      setEditingMember(selectedMember);
+                      setSelectedMember(null);
+                      setEditModalOpen(true);
+                    }}
                     style={{ fontSize: 13, color: '#2563eb', background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'inline-flex', alignItems: 'center', gap: 6 }}
                   >
                     <Pencil size={13} />
@@ -1217,13 +1222,14 @@ export default function MemberManagementPage() {
       </BaseDetailDrawer>
 
       {/* WO-O4O-OPERATOR-EDITUSER-MODAL-KPA-INTEGRATION-V1: KPA 회원 편집 독립 모달 */}
-      {editModalOpen && selectedMember && (
+      {editModalOpen && editingMember && (
         <KpaEditUserModal
-          member={selectedMember as KpaMemberForEdit}
+          member={editingMember as KpaMemberForEdit}
           makeRequest={kpaEditModalMakeRequest}
-          onClose={() => setEditModalOpen(false)}
+          onClose={() => { setEditModalOpen(false); setEditingMember(null); }}
           onSuccess={() => {
             setEditModalOpen(false);
+            setEditingMember(null);
             void fetchMembers(memberPage);
           }}
         />
