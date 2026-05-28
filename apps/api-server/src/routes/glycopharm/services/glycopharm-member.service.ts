@@ -93,10 +93,17 @@ export class GlycopharmMemberService {
     member.rejectionReason = null;
     await this.repo.save(member);
 
-    // sync service_memberships status to active
+    // WO-O4O-GLYCOPHARM-APPROVED-MEMBER-LOGIN-MEMBERSHIP-FIX-V1:
+    // plain UPDATE → UPSERT: service_memberships 행이 없을 때 UPDATE 0 rows silent fail 방지.
+    // (약국경영자 경로 admin.controller.ts 와 동일 패턴)
     await this.dataSource.query(
-      `UPDATE service_memberships SET status = 'active', approved_by = $2, approved_at = NOW(), updated_at = NOW()
-       WHERE user_id = $1 AND service_key = 'glycopharm'`,
+      `INSERT INTO service_memberships (user_id, service_key, status, role, approved_by, approved_at, created_at, updated_at)
+       VALUES ($1, 'glycopharm', 'active', 'pharmacist', $2, NOW(), NOW(), NOW())
+       ON CONFLICT (user_id, service_key) DO UPDATE
+         SET status = 'active',
+             approved_by = COALESCE(service_memberships.approved_by, EXCLUDED.approved_by),
+             approved_at = COALESCE(service_memberships.approved_at, EXCLUDED.approved_at),
+             updated_at = NOW()`,
       [member.userId, operatorId],
     );
 
