@@ -158,6 +158,8 @@ const OperatorOrdersPage = lazy(() => import('@/pages/operator/OrdersPage'));
 const OperatorEventOfferApprovalsPage = lazy(() => import('@/pages/operator/EventOfferApprovalsPage'));
 const OperatorUsersPage = lazy(() => import('@/pages/operator/UsersPage'));
 const OperatorUserDetailPage = lazy(() => import('@/pages/operator/UserDetailPage'));
+// WO-O4O-KCOSMETICS-ADMIN-MEMBER-HARD-DELETE-V1
+const KCosmeticsAdminMembersPage = lazy(() => import('@/pages/admin/KCosmeticsAdminMembersPage'));
 const OperatorSettingsPage = lazy(() => import('@/pages/operator/SettingsPage'));
 const OperatorRoleManagementPage = lazy(() => import('@/pages/operator/RoleManagementPage'));
 const OperatorAiReportPage = lazy(() => import('@/pages/operator/AiReportPage'));
@@ -478,8 +480,8 @@ function AppRoutes() {
         <Route index element={<KCosmeticsAdminDashboard />} />
         <Route path="stores" element={<OperatorStoresPage />} />
         <Route path="stores/:storeId" element={<OperatorStoreDetailPage />} />
-        {/* 회원 관리 — canonical route (WO-O4O-K-COSMETICS-OPERATOR-ROUTE-CANONICALIZATION-V1) */}
-        <Route path="members" element={<OperatorUsersPage />} />
+        {/* 회원 관리 — admin 전용 완전삭제 포함 (WO-O4O-KCOSMETICS-ADMIN-MEMBER-HARD-DELETE-V1) */}
+        <Route path="members" element={<KCosmeticsAdminMembersPage />} />
         <Route path="members/:id" element={<OperatorUserDetailPage />} />
         {/* legacy /admin/users redirect */}
         <Route path="users" element={<Navigate to="/admin/members" replace />} />
