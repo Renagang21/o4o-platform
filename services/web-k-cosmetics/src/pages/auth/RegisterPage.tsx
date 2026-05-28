@@ -4,7 +4,7 @@
  */
 
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { api } from '../../lib/apiClient';
 
 type UserRole = 'consumer' | 'seller';
@@ -30,7 +30,6 @@ const SERVICE_LABELS: Record<string, string> = {
 };
 
 export default function RegisterPage() {
-  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -38,14 +37,11 @@ export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const [existingAccountMode, setExistingAccountMode] = useState(false);
   const [existingServices, setExistingServices] = useState<Array<{key: string, status: string}>>([]);
+  const [isSuccess, setIsSuccess] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     passwordConfirm: '',
-    // WO-O4O-EXISTING-ACCOUNT-SERVICE-PASSWORD-SEPARATION-V1
-    currentPassword: '',
-    servicePassword: '',
-    servicePasswordConfirm: '',
     lastName: '',
     firstName: '',
     nickname: '',
@@ -95,30 +91,11 @@ export default function RegisterPage() {
     setError(null);
     setLoading(true);
 
-    // WO-O4O-EXISTING-ACCOUNT-SERVICE-PASSWORD-SEPARATION-V1
-    const servicePasswordChecks = {
-      length: formData.servicePassword.length >= 8,
-      letter: /[a-zA-Z]/.test(formData.servicePassword),
-      number: /\d/.test(formData.servicePassword),
-      special: /[^A-Za-z\d\s]/.test(formData.servicePassword),
-    };
-
     try {
       const response = await api.post('/auth/register', {
         email: formData.email,
-        // WO-O4O-EXISTING-ACCOUNT-SERVICE-PASSWORD-SEPARATION-V1:
-        // existingAccount: currentPassword(본인확인) + servicePassword(새 서비스 credential)
-        // 신규: password 기존 방식 유지
-        ...(existingAccountMode
-          ? {
-              password: formData.currentPassword,
-              currentPassword: formData.currentPassword,
-              servicePassword: formData.servicePassword,
-            }
-          : {
-              password: formData.password,
-              passwordConfirm: formData.passwordConfirm,
-            }),
+        password: formData.password,
+        passwordConfirm: formData.passwordConfirm,
         name: `${formData.lastName}${formData.firstName}`,
         nickname: formData.nickname,
         lastName: formData.lastName,
@@ -132,16 +109,9 @@ export default function RegisterPage() {
         agreePrivacy: formData.agreePrivacy,
         agreeMarketing: formData.agreeMarketing,
       });
-      void servicePasswordChecks;
-
       const data = response.data;
 
       if (!data.success) {
-        if (data.code === 'PASSWORD_MISMATCH') {
-          setExistingAccountMode(true);
-          if (data.services) setExistingServices(data.services);
-          throw new Error('비밀번호가 일치하지 않습니다. O4O 계정 가입 시 사용한 기존 비밀번호를 입력해주세요.');
-        }
         if (response.status === 409) {
           if (data.code === 'SERVICE_ALREADY_JOINED') {
             throw new Error('이미 K-Cosmetics 서비스에 가입된 계정입니다. 로그인해 주세요.');
@@ -151,7 +121,7 @@ export default function RegisterPage() {
         throw new Error(data.error || '회원가입에 실패했습니다.');
       }
 
-      navigate('/');
+      setIsSuccess(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : '회원가입에 실패했습니다.');
     } finally {
@@ -169,25 +139,30 @@ export default function RegisterPage() {
 
   const isPhoneValid = /^\d{10,11}$/.test(formData.phone);
 
-  const isServicePasswordStrong = (
-    formData.servicePassword.length >= 8 &&
-    /[a-zA-Z]/.test(formData.servicePassword) &&
-    /\d/.test(formData.servicePassword) &&
-    /[^A-Za-z\d\s]/.test(formData.servicePassword)
-  );
-
   const isFormValid = () => {
+    if (existingAccountMode) return false; // 기존 계정 → 로그인 필수
     const base = formData.email && formData.lastName && formData.firstName && formData.nickname &&
       formData.phone && isPhoneValid && formData.agreeTerms && formData.agreePrivacy;
-    // WO-O4O-EXISTING-ACCOUNT-SERVICE-PASSWORD-SEPARATION-V1
-    if (existingAccountMode) {
-      return base &&
-        formData.currentPassword.length > 0 &&
-        isServicePasswordStrong &&
-        formData.servicePassword === formData.servicePasswordConfirm;
-    }
-    return base && isPasswordStrong && formData.password === formData.passwordConfirm;
+    return !!(base && isPasswordStrong && formData.password === formData.passwordConfirm);
   };
+
+  if (isSuccess) {
+    return (
+      <div style={styles.container}>
+        <div style={styles.card}>
+          <div style={styles.logo}>💄</div>
+          <h1 style={styles.title}>가입 신청 완료</h1>
+          <p style={{ fontSize: '14px', color: '#475569', lineHeight: '1.6', margin: '16px 0 24px' }}>
+            운영자 확인 후 서비스 이용이 가능합니다.<br />
+            승인 결과는 이메일로 안내드립니다.
+          </p>
+          <Link to="/" style={{ ...styles.link, display: 'inline-block', padding: '12px 32px', backgroundColor: '#e91e63', color: '#fff', borderRadius: '12px', textDecoration: 'none', fontWeight: 600 }}>
+            홈으로
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={styles.container}>
@@ -266,79 +241,28 @@ export default function RegisterPage() {
               />
             </div>
 
-            {existingAccountMode && (
-              <div style={{ backgroundColor: '#eff6ff', border: '1px solid #bfdbfe', color: '#1e40af', padding: '16px', borderRadius: '8px', fontSize: '14px', lineHeight: '1.5' }}>
-                <strong>이미 O4O 플랫폼 계정이 존재합니다</strong>
-                <p style={{ margin: '8px 0 4px', fontSize: '13px' }}>
-                  기존 계정 확인을 위해 현재 사용 중인 비밀번호를 입력해 주세요.<br />
-                  K-Cosmetics에서 사용할 비밀번호는 별도로 설정할 수 있습니다.
+            {existingAccountMode ? (
+              <div style={{ backgroundColor: '#eff6ff', border: '2px solid #93c5fd', padding: '16px', borderRadius: '12px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <strong style={{ color: '#1e40af', fontSize: '14px' }}>이미 O4O 계정이 확인되었습니다</strong>
+                <p style={{ color: '#1d4ed8', fontSize: '14px', margin: 0, lineHeight: '1.5' }}>
+                  로그인 후 K-Cosmetics 이용 신청에 필요한 추가 정보만 입력하면 됩니다.
+                  비밀번호를 다시 입력하실 필요가 없습니다.
                 </p>
                 {existingServices.length > 0 && (
-                  <p style={{ margin: '4px 0', fontSize: '12px', color: '#64748b' }}>가입된 서비스: {existingServices.map(s => SERVICE_LABELS[s.key] || s.key).join(', ')}</p>
+                  <p style={{ color: '#2563eb', fontSize: '12px', margin: 0 }}>
+                    현재 이용 중인 서비스: {existingServices.map(s => SERVICE_LABELS[s.key] || s.key).join(', ')}
+                  </p>
                 )}
-                <div style={{ marginTop: '8px', fontSize: '13px' }}>
-                  <Link to="/login" style={{ color: '#e91e63', marginRight: '12px' }}>로그인</Link>
-                  <Link to="/forgot-password" style={{ color: '#64748b' }}>비밀번호 찾기</Link>
-                </div>
+                <Link
+                  to="/login"
+                  style={{ display: 'block', textAlign: 'center', padding: '10px', backgroundColor: '#e91e63', color: '#fff', borderRadius: '8px', textDecoration: 'none', fontWeight: 600, fontSize: '14px' }}
+                >
+                  로그인 후 신청 계속하기
+                </Link>
+                <Link to="/forgot-password" style={{ textAlign: 'center', color: '#64748b', fontSize: '12px' }}>
+                  비밀번호를 잊으셨나요?
+                </Link>
               </div>
-            )}
-
-            {/* WO-O4O-EXISTING-ACCOUNT-SERVICE-PASSWORD-SEPARATION-V1 */}
-            {existingAccountMode ? (
-              <>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>기존 O4O 계정 비밀번호 *</label>
-                  <div style={styles.passwordWrapper}>
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      name="currentPassword"
-                      value={formData.currentPassword}
-                      onChange={handleInputChange}
-                      placeholder="현재 O4O 계정 비밀번호"
-                      style={styles.input}
-                      required
-                    />
-                    <button type="button" onClick={() => setShowPassword(!showPassword)} style={styles.eyeButton}>
-                      {showPassword ? '🙈' : '👁️'}
-                    </button>
-                  </div>
-                </div>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>K-Cosmetics 비밀번호 *</label>
-                  <input
-                    type="password"
-                    name="servicePassword"
-                    value={formData.servicePassword}
-                    onChange={handleInputChange}
-                    placeholder="K-Cosmetics에서 사용할 비밀번호"
-                    style={styles.input}
-                    required
-                  />
-                  {formData.servicePassword && (
-                    <ul style={styles.passwordChecklist}>
-                      <li style={formData.servicePassword.length >= 8 ? styles.checkPass : styles.checkFail}>8자 이상</li>
-                      <li style={/[a-zA-Z]/.test(formData.servicePassword) ? styles.checkPass : styles.checkFail}>영문 포함</li>
-                      <li style={/\d/.test(formData.servicePassword) ? styles.checkPass : styles.checkFail}>숫자 포함</li>
-                      <li style={/[^A-Za-z\d\s]/.test(formData.servicePassword) ? styles.checkPass : styles.checkFail}>특수문자 포함</li>
-                    </ul>
-                  )}
-                </div>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>K-Cosmetics 비밀번호 확인 *</label>
-                  <input
-                    type="password"
-                    name="servicePasswordConfirm"
-                    value={formData.servicePasswordConfirm}
-                    onChange={handleInputChange}
-                    placeholder="K-Cosmetics 비밀번호 재입력"
-                    style={styles.input}
-                    required
-                  />
-                  {formData.servicePasswordConfirm && formData.servicePassword !== formData.servicePasswordConfirm && (
-                    <span style={styles.fieldError}>비밀번호가 일치하지 않습니다</span>
-                  )}
-                </div>
-              </>
             ) : (
               <div style={styles.inputRow}>
                 <div style={styles.inputGroup}>

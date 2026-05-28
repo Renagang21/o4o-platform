@@ -83,10 +83,6 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
     email: '',
     password: '',
     passwordConfirm: '',
-    // WO-O4O-EXISTING-ACCOUNT-SERVICE-PASSWORD-SEPARATION-V1
-    currentPassword: '',
-    servicePassword: '',
-    servicePasswordConfirm: '',
     lastName: '',
     firstName: '',
     phone: '',
@@ -118,9 +114,6 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
         email: '',
         password: '',
         passwordConfirm: '',
-        currentPassword: '',
-        servicePassword: '',
-        servicePasswordConfirm: '',
         lastName: '',
         firstName: '',
         phone: '',
@@ -225,19 +218,8 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
     try {
       await api.post('/auth/register', {
         email: formData.email,
-        // WO-O4O-EXISTING-ACCOUNT-SERVICE-PASSWORD-SEPARATION-V1:
-        // existingAccount: currentPassword(본인확인) + servicePassword(새 서비스 credential)
-        // 신규: password 기존 방식 유지
-        ...(existingAccountMode
-          ? {
-              password: formData.currentPassword,
-              currentPassword: formData.currentPassword,
-              servicePassword: formData.servicePassword,
-            }
-          : {
-              password: formData.password,
-              passwordConfirm: formData.passwordConfirm,
-            }),
+        password: formData.password,
+        passwordConfirm: formData.passwordConfirm,
         name: `${formData.lastName}${formData.firstName}`,
         lastName: formData.lastName,
         firstName: formData.firstName,
@@ -270,11 +252,7 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
       };
       const status = axiosErr.response?.status;
       const data = axiosErr.response?.data;
-      if (status === 401 && data?.code === 'PASSWORD_MISMATCH') {
-        setExistingAccountMode(true);
-        if (data.services) setExistingServices(data.services);
-        setError('비밀번호가 일치하지 않습니다. O4O 계정 가입 시 사용한 기존 비밀번호를 입력해주세요.');
-      } else if (status === 409) {
+      if (status === 409) {
         if (data?.code === 'SERVICE_ALREADY_JOINED') {
           setError('이미 Neture 서비스에 가입된 계정입니다. 로그인해 주세요.');
         } else {
@@ -298,27 +276,12 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
   };
   const isPasswordStrong = Object.values(passwordChecks).every(Boolean);
 
-  // WO-O4O-EXISTING-ACCOUNT-SERVICE-PASSWORD-SEPARATION-V1: 새 서비스 비밀번호 검증
-  const servicePasswordChecks = {
-    length: formData.servicePassword.length >= 8,
-    letter: /[a-zA-Z]/.test(formData.servicePassword),
-    number: /\d/.test(formData.servicePassword),
-    special: /[^A-Za-z\d\s]/.test(formData.servicePassword),
-  };
-  const isServicePasswordStrong = Object.values(servicePasswordChecks).every(Boolean);
-
   const isStep1Valid = () => {
     if (emailAlreadyJoined) return false;
+    if (existingAccountMode) return false; // 기존 계정 → 로그인 필수
     if (!formData.email || !formData.email.includes('@')) return false;
     if (!formData.lastName.trim() || !formData.firstName.trim()) return false;
     if (!formData.phone || formData.phone.length < 10 || formData.phone.length > 11) return false;
-    // WO-O4O-EXISTING-ACCOUNT-SERVICE-PASSWORD-SEPARATION-V1:
-    // existingAccount: 기존 계정 확인 + 새 서비스 비밀번호 강도 + 확인 일치
-    if (existingAccountMode) {
-      return formData.currentPassword.length > 0 &&
-        isServicePasswordStrong &&
-        formData.servicePassword === formData.servicePasswordConfirm;
-    }
     return isPasswordStrong && formData.password === formData.passwordConfirm;
   };
 
@@ -426,107 +389,28 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                 />
               </div>
 
-              {existingAccountMode && (
-                <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-4 text-sm">
-                  <p className="font-semibold">이미 O4O 플랫폼 계정이 존재합니다</p>
-                  <p className="mt-1 text-xs text-blue-600">
-                    기존 비밀번호를 입력하면 Neture 서비스 가입이 진행됩니다.
+              {existingAccountMode ? (
+                <div className="rounded-xl border-2 border-green-300 bg-green-50 p-4 space-y-3">
+                  <p className="font-semibold text-sm text-green-800">이미 O4O 계정이 확인되었습니다</p>
+                  <p className="text-sm text-green-700">
+                    로그인 후 Neture 이용 신청에 필요한 추가 정보만 입력하면 됩니다.
+                    비밀번호를 다시 입력하실 필요가 없습니다.
                   </p>
                   {existingServices.length > 0 && (
-                    <p className="mt-1 text-xs text-gray-500">
-                      가입된 서비스: {existingServices.map((s) => SERVICE_LABELS[s.key] || s.key).join(', ')}
+                    <p className="text-xs text-green-600">
+                      현재 이용 중인 서비스: {existingServices.map((s) => SERVICE_LABELS[s.key] || s.key).join(', ')}
                     </p>
                   )}
-                  <div className="mt-2 text-xs">
+                  <div className="flex flex-col gap-2 pt-1">
                     <button
                       type="button"
-                      onClick={() => openLoginModal()}
-                      className="text-green-600 hover:underline"
+                      onClick={() => { closeModal(); openLoginModal(); }}
+                      className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-green-600 rounded-xl hover:bg-green-700 transition-colors"
                     >
-                      로그인
+                      로그인 후 신청 계속하기
                     </button>
                   </div>
                 </div>
-              )}
-
-              {/* WO-O4O-EXISTING-ACCOUNT-SERVICE-PASSWORD-SEPARATION-V1:
-                  existingAccount: 기존 계정 확인 + Neture 새 비밀번호 + 확인
-                  신규: 비밀번호 + 확인 */}
-              {existingAccountMode ? (
-                <>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      기존 O4O 계정 비밀번호 <span className="text-red-500">*</span>
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={showPassword ? 'text' : 'password'}
-                        name="currentPassword"
-                        value={formData.currentPassword}
-                        onChange={handleInputChange}
-                        placeholder="현재 O4O 계정 비밀번호"
-                        autoComplete="current-password"
-                        className={INPUT_CLASS + ' pr-10'}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-gray-400 hover:text-gray-600 transition-colors"
-                        tabIndex={-1}
-                      >
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Neture 비밀번호 <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="password"
-                      name="servicePassword"
-                      value={formData.servicePassword}
-                      onChange={handleInputChange}
-                      placeholder="Neture에서 사용할 비밀번호 (8자 이상)"
-                      autoComplete="new-password"
-                      className={INPUT_CLASS}
-                    />
-                    {formData.servicePassword.length > 0 && !isServicePasswordStrong && (
-                      <div className="mt-1 space-y-0.5 text-xs">
-                        <p className={servicePasswordChecks.length ? 'text-green-600' : 'text-red-500'}>
-                          {servicePasswordChecks.length ? '✓' : '✗'} 8자 이상
-                        </p>
-                        <p className={servicePasswordChecks.letter ? 'text-green-600' : 'text-red-500'}>
-                          {servicePasswordChecks.letter ? '✓' : '✗'} 영문 포함
-                        </p>
-                        <p className={servicePasswordChecks.number ? 'text-green-600' : 'text-red-500'}>
-                          {servicePasswordChecks.number ? '✓' : '✗'} 숫자 포함
-                        </p>
-                        <p className={servicePasswordChecks.special ? 'text-green-600' : 'text-red-500'}>
-                          {servicePasswordChecks.special ? '✓' : '✗'} 특수문자 포함
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Neture 비밀번호 확인 <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="password"
-                      name="servicePasswordConfirm"
-                      value={formData.servicePasswordConfirm}
-                      onChange={handleInputChange}
-                      placeholder="Neture 비밀번호 재입력"
-                      autoComplete="new-password"
-                      className={INPUT_CLASS}
-                    />
-                    {formData.servicePasswordConfirm.length > 0 &&
-                      formData.servicePassword !== formData.servicePasswordConfirm && (
-                        <p className="mt-1 text-xs text-red-500">비밀번호가 일치하지 않습니다</p>
-                      )}
-                  </div>
-                </>
               ) : (
                 <div className="grid grid-cols-2 gap-3">
                   <div>
@@ -1062,7 +946,7 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
         </div>
 
         {/* 고정 Footer */}
-        {step === 1 && (
+        {step === 1 && !existingAccountMode && (
           <div className="shrink-0 border-t border-gray-100 px-6 py-4 bg-white">
             <button
               type="button"
