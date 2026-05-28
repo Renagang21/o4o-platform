@@ -7,8 +7,9 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LoadingSpinner, EmptyState, Pagination, Card } from '../../components/common';
+import { Pagination, Card } from '../../components/common';
 import { MyPageLayout } from '../../layouts/MyPageLayout';
+import { MyPageLoadingState, MyPageEmptyState } from '@o4o/account-ui';
 import { creditApi } from '../../api/credit';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
@@ -57,7 +58,7 @@ export function MyCreditsPage() {
   if (!user) {
     return (
       <div className="w-full max-w-[1120px] mx-auto px-4 sm:px-5 lg:px-6 pb-10">
-        <EmptyState
+        <MyPageEmptyState
           icon="🔒"
           title="로그인이 필요합니다"
           description="크레딧을 확인하려면 로그인해주세요."
@@ -67,17 +68,18 @@ export function MyCreditsPage() {
   }
 
   if (loading) {
-    return <LoadingSpinner message="크레딧 정보를 불러오는 중..." />;
+    return <MyPageLoadingState message="크레딧 정보를 불러오는 중..." />;
   }
 
   if (error) {
     return (
       <div className="w-full max-w-[1120px] mx-auto px-4 sm:px-5 lg:px-6 pb-10">
-        <EmptyState
+        <MyPageEmptyState
           icon="⚠️"
           title="오류가 발생했습니다"
           description={error}
-          action={{ label: '다시 시도', onClick: loadData }}
+          actionLabel="다시 시도"
+          onAction={loadData}
         />
       </div>
     );
@@ -122,11 +124,12 @@ export function MyCreditsPage() {
       {/* Transaction History */}
       <h3 style={styles.sectionTitle}>적립 내역</h3>
       {transactions.length === 0 ? (
-        <EmptyState
+        <MyPageEmptyState
           icon="📋"
           title="적립 내역이 없습니다"
           description="학습 활동을 완료하면 크레딧이 적립됩니다."
-          action={{ label: '학습 시작', onClick: () => navigate('/lms') }}
+          actionLabel="학습 시작"
+          onAction={() => navigate('/lms')}
         />
       ) : (
         <>

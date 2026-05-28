@@ -7,7 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MyPageLayout } from '@o4o/account-ui';
+import { MyPageLayout, MyPageLoadingState, MyPageEmptyState } from '@o4o/account-ui';
 import { KCOS_MYPAGE_NAV_ITEMS } from './navItems';
 import { api } from '@/lib/apiClient';
 import { useAuth } from '@/contexts/AuthContext';
@@ -93,24 +93,18 @@ export default function MyCreditsPage() {
       {/* History */}
       <h3 className="text-sm font-semibold text-gray-700 mb-3">적립 내역</h3>
 
-      {loading && (
-        <div className="py-10 text-center text-sm text-gray-400">불러오는 중...</div>
-      )}
+      {loading && <MyPageLoadingState />}
 
       {!loading && error && (
         <div className="rounded-xl bg-red-50 p-4 text-sm text-red-600">{error}</div>
       )}
 
       {!loading && !error && transactions.length === 0 && (
-        <div className="py-10 text-center">
-          <p className="text-gray-400 text-sm mb-3">적립 내역이 없습니다.</p>
-          <button
-            onClick={() => navigate('/lms')}
-            className="px-4 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-          >
-            학습 시작
-          </button>
-        </div>
+        <MyPageEmptyState
+          description="적립 내역이 없습니다."
+          actionLabel="학습 시작"
+          onAction={() => navigate('/lms')}
+        />
       )}
 
       {!loading && !error && transactions.length > 0 && (

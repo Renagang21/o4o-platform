@@ -12,9 +12,9 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { LoadingSpinner, EmptyState, Card } from '../../components/common';
+import { Card } from '../../components/common';
 import { MyPageLayout } from '../../layouts/MyPageLayout';
-import { RoleBadgeGroup } from '@o4o/account-ui';
+import { RoleBadgeGroup, MyPageLoadingState, MyPageEmptyState } from '@o4o/account-ui';
 import { mypageApi } from '../../api';
 import { appreciationApi, type AppreciationSend } from '../../api/appreciation';
 import { useAuth } from '../../contexts';
@@ -94,7 +94,7 @@ export function MyDashboardPage() {
   if (!user) {
     return (
       <div className="w-full max-w-[1120px] mx-auto px-4 sm:px-5 lg:px-6 pb-10">
-        <EmptyState
+        <MyPageEmptyState
           icon="🔒"
           title="로그인이 필요합니다"
           description="마이페이지를 이용하려면 로그인해주세요."
@@ -104,17 +104,18 @@ export function MyDashboardPage() {
   }
 
   if (loading) {
-    return <LoadingSpinner message="정보를 불러오는 중..." />;
+    return <MyPageLoadingState message="정보를 불러오는 중..." />;
   }
 
   if (error) {
     return (
       <div className="w-full max-w-[1120px] mx-auto px-4 sm:px-5 lg:px-6 pb-10">
-        <EmptyState
+        <MyPageEmptyState
           icon="⚠️"
           title="오류가 발생했습니다"
           description={error}
-          action={{ label: '다시 시도', onClick: loadData }}
+          actionLabel="다시 시도"
+          onAction={loadData}
         />
       </div>
     );

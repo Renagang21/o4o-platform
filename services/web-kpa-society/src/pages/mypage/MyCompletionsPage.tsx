@@ -7,8 +7,9 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LoadingSpinner, EmptyState, Pagination, Card } from '../../components/common';
+import { Pagination, Card } from '../../components/common';
 import { MyPageLayout } from '../../layouts/MyPageLayout';
+import { MyPageLoadingState, MyPageEmptyState } from '@o4o/account-ui';
 import { lmsApi } from '../../api/lms';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
@@ -44,7 +45,7 @@ export function MyCompletionsPage() {
   if (!user) {
     return (
       <div className="w-full max-w-[1120px] mx-auto px-4 sm:px-5 lg:px-6 pb-10">
-        <EmptyState
+        <MyPageEmptyState
           icon="🔒"
           title="로그인이 필요합니다"
           description="수료 내역을 확인하려면 로그인해주세요."
@@ -54,17 +55,18 @@ export function MyCompletionsPage() {
   }
 
   if (loading) {
-    return <LoadingSpinner message="수료 내역을 불러오는 중..." />;
+    return <MyPageLoadingState message="수료 내역을 불러오는 중..." />;
   }
 
   if (error) {
     return (
       <div className="w-full max-w-[1120px] mx-auto px-4 sm:px-5 lg:px-6 pb-10">
-        <EmptyState
+        <MyPageEmptyState
           icon="⚠️"
           title="오류가 발생했습니다"
           description={error}
-          action={{ label: '다시 시도', onClick: loadData }}
+          actionLabel="다시 시도"
+          onAction={loadData}
         />
       </div>
     );
@@ -81,11 +83,12 @@ export function MyCompletionsPage() {
       ]}
     >
       {completions.length === 0 ? (
-        <EmptyState
+        <MyPageEmptyState
           icon="📋"
           title="수료 내역이 없습니다"
           description="코스를 완료하면 수료 기록이 자동으로 생성됩니다."
-          action={{ label: '코스 보기', onClick: () => navigate('/lms') }}
+          actionLabel="코스 보기"
+          onAction={() => navigate('/lms')}
         />
       ) : (
         <>

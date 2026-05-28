@@ -5,8 +5,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
-import { LoadingSpinner, EmptyState, Card } from '../../components/common';
+import { Card } from '../../components/common';
 import { MyPageLayout } from '../../layouts/MyPageLayout';
+import { MyPageLoadingState, MyPageEmptyState } from '@o4o/account-ui';
 import { mypageApi } from '../../api';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
@@ -95,7 +96,7 @@ export function MySettingsPage() {
   if (!user) {
     return (
       <div className="w-full max-w-[1120px] mx-auto px-4 sm:px-5 lg:px-6 pb-10">
-        <EmptyState
+        <MyPageEmptyState
           icon="🔒"
           title="로그인이 필요합니다"
           description="설정을 변경하려면 로그인해주세요."
@@ -105,17 +106,18 @@ export function MySettingsPage() {
   }
 
   if (loading) {
-    return <LoadingSpinner message="설정을 불러오는 중..." />;
+    return <MyPageLoadingState message="설정을 불러오는 중..." />;
   }
 
   if (error) {
     return (
       <div className="w-full max-w-[1120px] mx-auto px-4 sm:px-5 lg:px-6 pb-10">
-        <EmptyState
+        <MyPageEmptyState
           icon="⚠️"
           title="오류가 발생했습니다"
           description={error}
-          action={{ label: '다시 시도', onClick: loadData }}
+          actionLabel="다시 시도"
+          onAction={loadData}
         />
       </div>
     );

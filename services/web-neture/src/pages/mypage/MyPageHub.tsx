@@ -17,7 +17,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { User, UserCog, MessageSquare, Building2, Settings } from 'lucide-react';
 import { useAuth, getNetureDashboardRoute, getNetureRoleLabel } from '../../contexts';
 import { useLoginModal } from '../../contexts/LoginModalContext';
-import { MyPageLayout, QuickActionsSection, RoleBadgeGroup, MyPageHubCard } from '@o4o/account-ui';
+import { MyPageLayout, QuickActionsSection, RoleBadgeGroup, MyPageHubCard, MyPageEmptyState } from '@o4o/account-ui';
 
 export default function MyPageHub() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -95,7 +95,7 @@ export default function MyPageHub() {
       {/* 최근 활동 */}
       <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
         <h3 className="text-base font-semibold text-gray-900 mb-4">최근 활동</h3>
-        <p className="text-sm text-gray-400 text-center py-8">최근 활동이 없습니다.</p>
+        <MyPageEmptyState description="최근 활동이 없습니다." />
       </div>
 
       {/* 하단 바로가기 (WO-O4O-MYPAGE-HUB-CARD-CANONICAL-ALIGNMENT-V1) */}

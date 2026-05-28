@@ -7,7 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MyPageLayout } from '@o4o/account-ui';
+import { MyPageLayout, MyPageLoadingState, MyPageEmptyState } from '@o4o/account-ui';
 import { lmsApi } from '@/api/lms';
 import { api } from '@/lib/apiClient';
 import { useAuth } from '@/contexts/AuthContext';
@@ -81,24 +81,18 @@ export default function MyCertificatesPage() {
 
   return (
     <MyPageLayout title="학습 결과" subtitle="수료한 교육 과정의 수료증을 확인하세요">
-      {loading && (
-        <div className="py-10 text-center text-sm text-gray-400">불러오는 중...</div>
-      )}
+      {loading && <MyPageLoadingState />}
 
       {!loading && error && (
         <div className="rounded-xl bg-red-50 p-4 text-sm text-red-600">{error}</div>
       )}
 
       {!loading && !error && certificates.length === 0 && (
-        <div className="py-10 text-center">
-          <p className="text-gray-400 text-sm mb-3">완료한 강의가 없습니다.</p>
-          <button
-            onClick={() => navigate('/lms')}
-            className="px-4 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-          >
-            강의 둘러보기
-          </button>
-        </div>
+        <MyPageEmptyState
+          description="완료한 강의가 없습니다."
+          actionLabel="강의 둘러보기"
+          onAction={() => navigate('/lms')}
+        />
       )}
 
       {!loading && !error && certificates.length > 0 && (

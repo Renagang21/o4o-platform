@@ -15,8 +15,8 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LoadingSpinner, EmptyState } from '../../components/common';
 import { MyPageLayout } from '../../layouts/MyPageLayout';
+import { MyPageLoadingState, MyPageEmptyState } from '@o4o/account-ui';
 import { useAuth } from '../../contexts';
 import { lmsApi } from '../../api/lms';
 import { colors } from '../../styles/theme';
@@ -315,7 +315,7 @@ export function MyEnrollmentsPage() {
       </div>
 
       {/* 목록 */}
-      {loading && <LoadingSpinner />}
+      {loading && <MyPageLoadingState />}
 
       {!loading && error && (
         <div style={{ padding: '20px', color: '#ef4444', background: '#fef2f2', borderRadius: 8, fontSize: 14 }}>
@@ -324,10 +324,11 @@ export function MyEnrollmentsPage() {
       )}
 
       {!loading && !error && filtered.length === 0 && (
-        <EmptyState
+        <MyPageEmptyState
           title={filter === 'all' ? '수강 중인 강의가 없습니다' : '해당 상태의 강의가 없습니다'}
           description={filter === 'all' ? '강의 목록에서 관심 있는 강의를 찾아보세요.' : undefined}
-          action={filter === 'all' ? { label: '강의 둘러보기', onClick: () => navigate('/courses') } : undefined}
+          actionLabel={filter === 'all' ? '강의 둘러보기' : undefined}
+          onAction={filter === 'all' ? () => navigate('/courses') : undefined}
         />
       )}
 

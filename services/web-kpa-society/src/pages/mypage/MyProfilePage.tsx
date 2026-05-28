@@ -12,8 +12,9 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { AddressSearch } from '@o4o/ui';
-import { LoadingSpinner, EmptyState, Card } from '../../components/common';
+import { Card } from '../../components/common';
 import { MyPageLayout } from '../../layouts/MyPageLayout';
+import { MyPageLoadingState, MyPageEmptyState } from '@o4o/account-ui';
 import { mypageApi, type ProfileResponse } from '../../api';
 import { pharmacyRequestApi, type PharmacyRequest } from '../../api/pharmacyRequestApi';
 import { useAuth, ACTIVITY_TYPE_LABELS } from '../../contexts';
@@ -366,17 +367,17 @@ export function MyProfilePage() {
   if (!user) {
     return (
       <div className="w-full max-w-[1120px] mx-auto px-4 sm:px-5 lg:px-6 pb-10">
-        <EmptyState icon="🔒" title="로그인이 필요합니다" description="프로필을 확인하려면 로그인해주세요." />
+        <MyPageEmptyState icon="🔒" title="로그인이 필요합니다" description="프로필을 확인하려면 로그인해주세요." />
       </div>
     );
   }
 
-  if (loading) return <LoadingSpinner message="프로필을 불러오는 중..." />;
+  if (loading) return <MyPageLoadingState message="프로필을 불러오는 중..." />;
 
   if (error) {
     return (
       <div className="w-full max-w-[1120px] mx-auto px-4 sm:px-5 lg:px-6 pb-10">
-        <EmptyState icon="⚠️" title="오류가 발생했습니다" description={error} action={{ label: '다시 시도', onClick: loadData }} />
+        <MyPageEmptyState icon="⚠️" title="오류가 발생했습니다" description={error} actionLabel="다시 시도" onAction={loadData} />
       </div>
     );
   }

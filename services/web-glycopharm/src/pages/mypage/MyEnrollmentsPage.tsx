@@ -7,7 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MyPageLayout } from '@o4o/account-ui';
+import { MyPageLayout, MyPageLoadingState, MyPageEmptyState } from '@o4o/account-ui';
 import { lmsApi } from '@/api/lms';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -117,28 +117,18 @@ export default function MyEnrollmentsPage() {
         })}
       </div>
 
-      {loading && (
-        <div className="py-10 text-center text-sm text-gray-400">불러오는 중...</div>
-      )}
+      {loading && <MyPageLoadingState />}
 
       {!loading && error && (
         <div className="rounded-xl bg-red-50 p-4 text-sm text-red-600">{error}</div>
       )}
 
       {!loading && !error && filtered.length === 0 && (
-        <div className="py-10 text-center">
-          <p className="text-gray-400 text-sm mb-3">
-            {filter === 'all' ? '수강 중인 강의가 없습니다.' : '해당 상태의 강의가 없습니다.'}
-          </p>
-          {filter === 'all' && (
-            <button
-              onClick={() => navigate('/lms')}
-              className="px-4 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-            >
-              강의 둘러보기
-            </button>
-          )}
-        </div>
+        <MyPageEmptyState
+          description={filter === 'all' ? '수강 중인 강의가 없습니다.' : '해당 상태의 강의가 없습니다.'}
+          actionLabel={filter === 'all' ? '강의 둘러보기' : undefined}
+          onAction={filter === 'all' ? () => navigate('/lms') : undefined}
+        />
       )}
 
       {!loading && !error && filtered.length > 0 && (

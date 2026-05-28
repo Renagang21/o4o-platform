@@ -5,8 +5,9 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LoadingSpinner, EmptyState, Pagination, Card } from '../../components/common';
+import { Pagination, Card } from '../../components/common';
 import { MyPageLayout } from '../../layouts/MyPageLayout';
+import { MyPageLoadingState, MyPageEmptyState } from '@o4o/account-ui';
 import { mypageApi } from '../../api';
 import { useAuth, getAccessToken } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
@@ -83,7 +84,7 @@ export function MyCertificatesPage() {
   if (!user) {
     return (
       <div className="w-full max-w-[1120px] mx-auto px-4 sm:px-5 lg:px-6 pb-10">
-        <EmptyState
+        <MyPageEmptyState
           icon="🔒"
           title="로그인이 필요합니다"
           description="수료증을 확인하려면 로그인해주세요."
@@ -93,17 +94,18 @@ export function MyCertificatesPage() {
   }
 
   if (loading) {
-    return <LoadingSpinner message="수료증을 불러오는 중..." />;
+    return <MyPageLoadingState message="수료증을 불러오는 중..." />;
   }
 
   if (error) {
     return (
       <div className="w-full max-w-[1120px] mx-auto px-4 sm:px-5 lg:px-6 pb-10">
-        <EmptyState
+        <MyPageEmptyState
           icon="⚠️"
           title="오류가 발생했습니다"
           description={error}
-          action={{ label: '다시 시도', onClick: loadData }}
+          actionLabel="다시 시도"
+          onAction={loadData}
         />
       </div>
     );
@@ -121,11 +123,12 @@ export function MyCertificatesPage() {
       width="wide"
     >
       {certificates.length === 0 ? (
-        <EmptyState
+        <MyPageEmptyState
           icon="📋"
           title="완료 기록이 없습니다"
           description="안내 흐름을 완료하면 기록이 생성됩니다."
-          action={{ label: '안내 흐름 보기', onClick: () => navigate('/lms') }}
+          actionLabel="안내 흐름 보기"
+          onAction={() => navigate('/lms')}
         />
       ) : (
         <>
