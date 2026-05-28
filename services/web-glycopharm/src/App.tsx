@@ -8,7 +8,7 @@ const queryClient = new QueryClient({
 });
 import { AuthProvider, useAuth, getGlycopharmDashboardRoute } from '@/contexts/AuthContext';
 import { GLYCOPHARM_ROLES } from '@/lib/role-constants';
-import { LoginModalProvider } from '@/contexts/LoginModalContext';
+import { LoginModalProvider, useLoginModal } from '@/contexts/LoginModalContext';
 // WO-O4O-GLYCOPHARM-REGISTER-MODAL-ENTRY-FIX-V1: /register 페이지 제거 + 모달 직접 호출
 import { RegisterModalProvider, useRegisterModal } from '@/contexts/RegisterModalContext';
 import { RegisterFlowModal } from '@/pages/auth/RegisterFlowModal';
@@ -443,6 +443,31 @@ function LmsCourseRedirect() {
   return <Navigate to={`/lms/course/${id}`} replace />;
 }
 
+// WO-O4O-GLYCOPHARM-LOGIN-PAGE-TO-MODAL-ALIGNMENT-V1:
+//   /login 직접 접근 시 별도 로그인 페이지 대신 홈으로 이동 + 로그인 모달 자동 오픈.
+//   RoleGuard 가 state.from 으로 보내는 returnUrl 은 sessionStorage 에 보존 →
+//   LoginModal 로그인 성공 시 해당 경로로 복귀.
+const LOGIN_RETURN_URL_KEY = 'glycopharm_login_return_url';
+function LoginGate() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { openLoginModal } = useLoginModal();
+
+  useEffect(() => {
+    const returnUrl = (location.state as { from?: string } | null)?.from;
+    if (returnUrl) {
+      sessionStorage.setItem(LOGIN_RETURN_URL_KEY, returnUrl);
+    } else {
+      sessionStorage.removeItem(LOGIN_RETURN_URL_KEY);
+    }
+    navigate('/', { replace: true });
+    openLoginModal();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return null;
+}
+
 // WO-O4O-GLYCOPHARM-REGISTER-MODAL-ENTRY-FIX-V1:
 //   전역 RegisterFlowModal 마운트 — RegisterModalContext 의 isRegisterModalOpen / closeRegisterModal 와 wiring.
 //   진입점(상단 메뉴 / 로그인 화면 / Footer 등) 은 useRegisterModal().openRegisterModal() 호출.
@@ -457,7 +482,8 @@ function AppRoutes() {
     <Routes>
       {/* WO-O4O-GLYCOPHARM-HOME-KPA-ALIGNMENT-V1: / = Home 직접 연결 */}
       <Route path="handoff" element={<HandoffPage />} />
-      <Route path="login" element={<LoginPage />} />
+      {/* WO-O4O-GLYCOPHARM-LOGIN-PAGE-TO-MODAL-ALIGNMENT-V1: /login → 홈 + 로그인 모달 */}
+      <Route path="login" element={<LoginGate />} />
       {/* WO-O4O-GLYCOPHARM-REGISTER-MODAL-ENTRY-FIX-V1: /register 라우트 제거.
           가입신청은 상단 메뉴 / 로그인 화면의 버튼이 useRegisterModal().openRegisterModal() 로 직접 호출.
           /register 직접 접근 시 홈으로 리다이렉트. */}

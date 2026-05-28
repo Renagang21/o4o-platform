@@ -26,6 +26,7 @@ import { useRegisterModal } from '@/contexts/RegisterModalContext';
 import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
 
 const REMEMBER_EMAIL_KEY = 'glycopharm_remember_email';
+const LOGIN_RETURN_URL_KEY = 'glycopharm_login_return_url';
 
 export default function LoginModal() {
   const navigate = useNavigate();
@@ -72,9 +73,14 @@ export default function LoginModal() {
       setPassword('');
       closeLoginModal();
 
-      // WO-HOME-LIVE-PREVIEW-V1: /login 페이지에서만 역할 기반 이동
-      // Home(/)에서 로그인 시 → Home 유지 (데이터가 pharmacy-scoped로 갱신됨)
-      if (location.pathname === '/login') {
+      // WO-O4O-GLYCOPHARM-LOGIN-PAGE-TO-MODAL-ALIGNMENT-V1:
+      //   LoginGate 가 저장한 returnUrl 우선 복귀 → 없으면 역할 기반 대시보드로 이동.
+      const returnUrl = sessionStorage.getItem(LOGIN_RETURN_URL_KEY);
+      if (returnUrl) {
+        sessionStorage.removeItem(LOGIN_RETURN_URL_KEY);
+        navigate(returnUrl);
+      } else if (location.pathname === '/login') {
+        // legacy: LoginPage 가 직접 렌더된 경우 대비 (admin/login 등)
         navigate(getPrimaryDashboardRoute(loggedInUser.roles ?? [], GLYCOPHARM_ROLE_PRIORITY, GLYCOPHARM_DASHBOARD_MAP));
       }
 
@@ -90,6 +96,7 @@ export default function LoginModal() {
     setEmail('');
     setPassword('');
     setError('');
+    sessionStorage.removeItem(LOGIN_RETURN_URL_KEY);
     closeLoginModal();
   };
 
