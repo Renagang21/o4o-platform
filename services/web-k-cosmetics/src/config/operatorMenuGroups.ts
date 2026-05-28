@@ -17,7 +17,8 @@ export interface UnifiedMenuItem extends OperatorMenuItem {
 
 export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> = {
   dashboard: [{ label: '대시보드', path: '/operator', exact: true }],
-  users: [{ label: '회원 관리', path: '/operator/users' }],
+  // WO-O4O-K-COSMETICS-OPERATOR-ROUTE-CANONICALIZATION-V1: /operator/members (KPA/GlycoPharm canonical)
+  users: [{ label: '회원 관리', path: '/operator/members' }],
   approvals: [
     { label: '신청 관리', path: '/operator/applications' },
     // WO-O4O-EVENT-OFFER-KCOS-OPERATOR-APPROVAL-V1

@@ -4,7 +4,7 @@
  */
 
 import { lazy, Suspense, useRef, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 // WO-O4O-STORE-PRODUCTS-QUERYCLIENT-PROVIDER-ALIGN-V1
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider, useAuth, getKCosmeticsDashboardRoute } from '@/contexts/AuthContext';
@@ -464,8 +464,12 @@ function AppRoutes() {
         <Route index element={<KCosmeticsAdminDashboard />} />
         <Route path="stores" element={<OperatorStoresPage />} />
         <Route path="stores/:storeId" element={<OperatorStoreDetailPage />} />
-        <Route path="users" element={<OperatorUsersPage />} />
-        <Route path="users/:id" element={<OperatorUserDetailPage />} />
+        {/* 회원 관리 — canonical route (WO-O4O-K-COSMETICS-OPERATOR-ROUTE-CANONICALIZATION-V1) */}
+        <Route path="members" element={<OperatorUsersPage />} />
+        <Route path="members/:id" element={<OperatorUserDetailPage />} />
+        {/* legacy /admin/users redirect */}
+        <Route path="users" element={<Navigate to="/admin/members" replace />} />
+        <Route path="users/:id" element={<Navigate to="/admin/members" replace />} />
         <Route path="settings" element={<OperatorSettingsPage />} />
         {/* 역할 관리 (WO-O4O-ROLE-MANAGEMENT-UI-V1) */}
         <Route path="roles" element={<OperatorRoleManagementPage />} />
@@ -503,9 +507,12 @@ function AppRoutes() {
         <Route path="signage/templates" element={<SignageTemplatesPage />} />
         <Route path="signage/templates/:templateId" element={<SignageTemplateDetailPage />} />
         {/* WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: support route removed (mock) */}
-        {/* 회원 관리 (WO-O4O-MEMBERSHIP-CONSOLE-V1) */}
-        <Route path="users" element={<OperatorUsersPage />} />
-        <Route path="users/:id" element={<OperatorUserDetailPage />} />
+        {/* 회원 관리 — canonical route (WO-O4O-K-COSMETICS-OPERATOR-ROUTE-CANONICALIZATION-V1) */}
+        <Route path="members" element={<OperatorUsersPage />} />
+        <Route path="members/:id" element={<OperatorUserDetailPage />} />
+        {/* legacy redirect (WO-O4O-MEMBERSHIP-CONSOLE-V1) */}
+        <Route path="users" element={<Navigate to="/operator/members" replace />} />
+        <Route path="users/:id" element={<Navigate to="/operator/members" replace />} />
         {/* AI Report (WO-AI-SERVICE-OPERATOR-REPORT-V1) */}
         <Route path="ai-report" element={<OperatorAiReportPage />} />
         {/* Store Cockpit (WO-KCOS-STORES-PHASE3-STORE-COCKPIT-V1) */}
