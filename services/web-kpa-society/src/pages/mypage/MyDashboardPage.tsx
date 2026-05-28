@@ -14,6 +14,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { MyPageLayout } from '../../layouts/MyPageLayout';
+import { RoleBadgeGroup } from '@o4o/account-ui';
 import { mypageApi } from '../../api';
 import { appreciationApi, type AppreciationSend } from '../../api/appreciation';
 import { useAuth } from '../../contexts';
@@ -135,14 +136,20 @@ export function MyDashboardPage() {
             <h2 style={styles.userName}>{getUserDisplayName(user)}</h2>
             <p style={styles.userEmail}>{user.email}</p>
             <div style={styles.userMeta}>
-              {(user as any).organizationId && (
-                <span style={styles.orgBadge}>
-                  🏢 소속 분회
-                </span>
-              )}
-              <span style={styles.roleBadge}>
-                {user.roles.includes('admin') ? '관리자' : user.roles.includes('officer') ? '임원' : '회원'}
-              </span>
+              <RoleBadgeGroup
+                badges={[
+                  ...((user as any).organizationId
+                    ? [{ key: 'org', label: '🏢 소속 분회', tone: 'slate' as const, variant: 'soft' as const }]
+                    : []),
+                  {
+                    key: 'role',
+                    label: user.roles.includes('admin') ? '관리자' : user.roles.includes('officer') ? '임원' : '회원',
+                    tone: 'primary',
+                    variant: 'solid',
+                  },
+                ]}
+                size="md"
+              />
             </div>
           </div>
           <Link to="profile" style={styles.editButton}>

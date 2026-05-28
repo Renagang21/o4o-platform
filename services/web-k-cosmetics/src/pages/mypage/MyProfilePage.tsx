@@ -17,6 +17,7 @@ import {
   ProfileCard,
   ProfileInfoField,
 } from '@o4o/account-ui';
+import { KCOS_MYPAGE_NAV_ITEMS } from './navItems';
 
 export default function MyProfilePage() {
   const { user, isAuthenticated, updateUser } = useAuth();
@@ -67,7 +68,11 @@ export default function MyProfilePage() {
   };
 
   return (
-    <MyPageLayout title="마이페이지" subtitle="내 정보를 확인하고 관리할 수 있습니다">
+    <MyPageLayout
+      title="마이페이지"
+      subtitle="내 정보를 확인하고 관리할 수 있습니다"
+      navItems={KCOS_MYPAGE_NAV_ITEMS}
+    >
       <ProfileCard
         initial={user.name?.charAt(0) || '?'}
         name={user.name}

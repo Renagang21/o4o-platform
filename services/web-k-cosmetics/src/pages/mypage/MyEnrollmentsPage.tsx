@@ -8,6 +8,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MyPageLayout } from '@o4o/account-ui';
+import { KCOS_MYPAGE_NAV_ITEMS } from './navItems';
 import { lmsApi } from '@/api/lms';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -89,7 +90,11 @@ export default function MyEnrollmentsPage() {
   }
 
   return (
-    <MyPageLayout title="내 수강 목록" subtitle="신청하거나 진행 중인 강의를 확인하세요">
+    <MyPageLayout
+      title="내 수강 목록"
+      subtitle="신청하거나 진행 중인 강의를 확인하세요"
+      navItems={KCOS_MYPAGE_NAV_ITEMS}
+    >
       {/* Filter tabs */}
       <div className="flex flex-wrap gap-2 mb-5">
         {FILTERS.map((f) => {

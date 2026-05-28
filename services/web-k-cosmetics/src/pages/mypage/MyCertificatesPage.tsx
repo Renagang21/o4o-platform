@@ -8,6 +8,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MyPageLayout } from '@o4o/account-ui';
+import { KCOS_MYPAGE_NAV_ITEMS } from './navItems';
 import { lmsApi } from '@/api/lms';
 import { api } from '@/lib/apiClient';
 import { useAuth } from '@/contexts/AuthContext';
@@ -80,7 +81,11 @@ export default function MyCertificatesPage() {
   }
 
   return (
-    <MyPageLayout title="학습 결과" subtitle="수료한 교육 과정의 수료증을 확인하세요">
+    <MyPageLayout
+      title="학습 결과"
+      subtitle="수료한 교육 과정의 수료증을 확인하세요"
+      navItems={KCOS_MYPAGE_NAV_ITEMS}
+    >
       {loading && (
         <div className="py-10 text-center text-sm text-gray-400">불러오는 중...</div>
       )}

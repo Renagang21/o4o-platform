@@ -17,7 +17,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { User } from 'lucide-react';
 import { useAuth, getNetureDashboardRoute, getNetureRoleLabel } from '../../contexts';
 import { useLoginModal } from '../../contexts/LoginModalContext';
-import { MyPageLayout, QuickActionsSection } from '@o4o/account-ui';
+import { MyPageLayout, QuickActionsSection, RoleBadgeGroup } from '@o4o/account-ui';
 
 export default function MyPageHub() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -71,15 +71,16 @@ export default function MyPageHub() {
           <div className="flex-1 min-w-0">
             <h2 className="text-xl font-bold text-gray-900 truncate">{user.name}</h2>
             <p className="text-sm text-gray-500 mt-1 truncate">{user.email}</p>
-            <div className="flex gap-2 mt-2 flex-wrap">
-              <span className="px-2.5 py-1 bg-primary-600 text-white rounded text-xs font-medium">
-                {roleLabel}
-              </span>
-              {isSupplier && (
-                <span className="px-2.5 py-1 bg-gray-100 text-gray-700 rounded text-xs font-medium">
-                  공급자
-                </span>
-              )}
+            <div className="mt-2">
+              <RoleBadgeGroup
+                badges={[
+                  { key: 'role', label: roleLabel, tone: 'primary', variant: 'solid' },
+                  ...(isSupplier
+                    ? [{ key: 'supplier', label: '공급자', tone: 'slate' as const, variant: 'soft' as const }]
+                    : []),
+                ]}
+                size="md"
+              />
             </div>
           </div>
           <Link

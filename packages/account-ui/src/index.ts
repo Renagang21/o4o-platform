@@ -9,6 +9,16 @@ export { MyPageLayout } from './components/MyPageLayout.js';
 export type { MyPageBreadcrumbItem, MyPageLayoutWidth } from './components/MyPageLayout.js';
 export { SettingsSection } from './components/SettingsSection.js';
 export { GlobalUserProfileDropdown } from './components/GlobalUserProfileDropdown.js';
+// WO-O4O-MYPAGE-PHASE1-NAV-ROLEBADGE-CANONICALIZATION-V1
+export { RoleBadge, RoleBadgeGroup } from './components/RoleBadge.js';
+export type {
+  RoleBadgeProps,
+  RoleBadgeTone,
+  RoleBadgeSize,
+  RoleBadgeVariant,
+  RoleBadgeGroupItem,
+  RoleBadgeGroupProps,
+} from './components/RoleBadge.js';
 export type { MyPageNavItem } from './components/MyPageNavigation.js';
 export type { ProfileField } from './types.js';
 export type {

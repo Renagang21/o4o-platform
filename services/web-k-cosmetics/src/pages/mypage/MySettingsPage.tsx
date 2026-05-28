@@ -14,6 +14,7 @@ import { api } from '@/lib/apiClient';
 import { toast } from '@o4o/error-handling';
 import { Lock, LogOut } from 'lucide-react';
 import { MyPageLayout, SettingsSection, PasswordChangeModal } from '@o4o/account-ui';
+import { KCOS_MYPAGE_NAV_ITEMS } from './navItems';
 
 export default function MySettingsPage() {
   const { user, isAuthenticated, logoutAll } = useAuth();
@@ -68,7 +69,11 @@ export default function MySettingsPage() {
   };
 
   return (
-    <MyPageLayout title="마이페이지" subtitle="내 정보를 확인하고 관리할 수 있습니다">
+    <MyPageLayout
+      title="마이페이지"
+      subtitle="내 정보를 확인하고 관리할 수 있습니다"
+      navItems={KCOS_MYPAGE_NAV_ITEMS}
+    >
       <SettingsSection title="보안 설정" description="정기적인 비밀번호 변경을 권장합니다">
         <button
           onClick={() => setShowPasswordModal(true)}

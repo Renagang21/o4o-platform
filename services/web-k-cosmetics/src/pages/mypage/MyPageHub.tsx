@@ -8,7 +8,8 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth, ROLE_LABELS, getKCosmeticsDashboardRoute } from '@/contexts/AuthContext';
 import { Mail, Phone, Shield, UserCog, Settings, ChevronRight, BookOpen, Award, Coins, Gift } from 'lucide-react';
-import { MyPageLayout, QuickActionsSection } from '@o4o/account-ui';
+import { MyPageLayout, QuickActionsSection, RoleBadge } from '@o4o/account-ui';
+import { KCOS_MYPAGE_NAV_ITEMS } from './navItems';
 import { appreciationApi, type AppreciationSend } from '@/api/appreciation';
 
 export default function MyPageHub() {
@@ -57,7 +58,11 @@ export default function MyPageHub() {
   const roleLabel = ROLE_LABELS[user.roles[0]];
 
   return (
-    <MyPageLayout title="마이페이지" subtitle="내 정보를 확인하고 관리할 수 있습니다">
+    <MyPageLayout
+      title="마이페이지"
+      subtitle="내 정보를 확인하고 관리할 수 있습니다"
+      navItems={KCOS_MYPAGE_NAV_ITEMS}
+    >
       {/* Profile Summary (read-only) */}
       <div className="bg-white rounded-2xl shadow-sm overflow-hidden mb-4">
         <div className="bg-gradient-to-r from-primary-500 to-primary-600 px-6 py-8">
@@ -69,9 +74,7 @@ export default function MyPageHub() {
               <h2 className="text-xl font-bold text-white truncate">{user.name}</h2>
               <p className="text-primary-100 text-sm truncate">{user.email}</p>
               <div className="mt-2">
-                <span className="inline-block px-3 py-1 bg-white/20 rounded-full text-xs font-medium text-white">
-                  {roleLabel}
-                </span>
+                <RoleBadge label={roleLabel ?? '사용자'} tone="white-overlay" size="md" />
               </div>
             </div>
           </div>

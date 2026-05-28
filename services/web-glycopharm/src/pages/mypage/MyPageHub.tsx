@@ -23,7 +23,8 @@ import {
   Coins,
   Gift,
 } from 'lucide-react';
-import { MyPageLayout, QuickActionsSection } from '@o4o/account-ui';
+import { MyPageLayout, QuickActionsSection, RoleBadgeGroup } from '@o4o/account-ui';
+import type { RoleBadgeTone } from '@o4o/account-ui';
 import { appreciationApi, type AppreciationSend } from '@/api/appreciation';
 
 const roleLabels: Record<string, string> = {
@@ -36,12 +37,12 @@ const roleLabels: Record<string, string> = {
   consumer: '소비자',
 };
 
-const statusLabels: Record<string, { label: string; color: string }> = {
-  pending: { label: '승인 대기', color: '#ca8a04' },
-  approved: { label: '승인됨', color: '#16a34a' },
-  active: { label: '승인됨', color: '#16a34a' },
-  rejected: { label: '거부됨', color: '#dc2626' },
-  suspended: { label: '정지됨', color: '#6b7280' },
+const statusLabels: Record<string, { label: string; tone: RoleBadgeTone }> = {
+  pending: { label: '승인 대기', tone: 'amber' },
+  approved: { label: '승인됨', tone: 'emerald' },
+  active: { label: '승인됨', tone: 'emerald' },
+  rejected: { label: '거부됨', tone: 'rose' },
+  suspended: { label: '정지됨', tone: 'slate' },
 };
 
 export default function MyPageHub() {
@@ -95,18 +96,16 @@ export default function MyPageHub() {
             <div className="flex-1 min-w-0">
               <h2 className="text-xl font-bold text-white truncate">{displayName}</h2>
               <p className="text-primary-100 text-sm truncate">{user.email}</p>
-              <div className="flex items-center gap-2 mt-2">
-                <span className="inline-block px-3 py-1 bg-white/20 rounded-full text-xs font-medium text-white">
-                  {roleLabel}
-                </span>
-                {status.label && (
-                  <span
-                    className="inline-block px-2 py-0.5 rounded-full text-xs font-medium"
-                    style={{ backgroundColor: `${status.color}20`, color: status.color }}
-                  >
-                    {status.label}
-                  </span>
-                )}
+              <div className="mt-2">
+                <RoleBadgeGroup
+                  badges={[
+                    { key: 'role', label: roleLabel, tone: 'white-overlay', variant: 'solid' },
+                    ...(status.label
+                      ? [{ key: 'status', label: status.label, tone: status.tone, variant: 'soft' as const }]
+                      : []),
+                  ]}
+                  size="md"
+                />
               </div>
             </div>
           </div>
