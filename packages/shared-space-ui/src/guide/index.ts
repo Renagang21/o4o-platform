@@ -92,3 +92,19 @@ export {
   netureGuideFeatureForumResourcesProps,
   netureGuideFeatureCopilotDashboardProps,
 } from './copy/neture.js';
+
+// WO-O4O-CROSSSERVICE-HOME-LATEST-AND-GUIDE-ALIGNMENT-V1
+export {
+  kCosmeticsGuideIntroProps,
+  kCosmeticsGuideIntroStructureProps,
+  kCosmeticsGuideIntroKpaProps,
+  kCosmeticsGuideIntroOperationProps,
+  kCosmeticsGuideIntroConceptProps,
+  kCosmeticsGuideUsageProps,
+  kCosmeticsGuideFeaturesProps,
+  kCosmeticsGuideFeatureForumProps,
+  kCosmeticsGuideFeatureLmsProps,
+  kCosmeticsGuideFeatureContentProps,
+  kCosmeticsGuideFeatureResourcesProps,
+  kCosmeticsGuideFeatureSignageProps,
+} from './copy/k-cosmetics.js';

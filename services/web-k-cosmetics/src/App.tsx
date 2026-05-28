@@ -185,6 +185,30 @@ const OperatorPopWritePage = lazy(() => import('@/pages/operator/pop/OperatorPop
 const OperatorQrListPage = lazy(() => import('@/pages/operator/qr/OperatorQrListPage'));
 const OperatorQrWritePage = lazy(() => import('@/pages/operator/qr/OperatorQrWritePage'));
 
+// Guide pages (shared components — WO-O4O-CROSSSERVICE-HOME-LATEST-AND-GUIDE-ALIGNMENT-V1)
+import {
+  GuideIntroPage,
+  GuideIntroStructurePage,
+  GuideIntroKpaPage,
+  GuideIntroOperationPage,
+  GuideIntroConceptPage,
+  GuideUsagePage,
+  GuideFeaturesPage,
+  GuideFeatureManualPage,
+  kCosmeticsGuideIntroProps,
+  kCosmeticsGuideIntroStructureProps,
+  kCosmeticsGuideIntroKpaProps,
+  kCosmeticsGuideIntroOperationProps,
+  kCosmeticsGuideIntroConceptProps,
+  kCosmeticsGuideUsageProps,
+  kCosmeticsGuideFeaturesProps,
+  kCosmeticsGuideFeatureForumProps,
+  kCosmeticsGuideFeatureLmsProps,
+  kCosmeticsGuideFeatureContentProps,
+  kCosmeticsGuideFeatureResourcesProps,
+  kCosmeticsGuideFeatureSignageProps,
+} from '@o4o/shared-space-ui';
+
 // WO-O4O-FORUM-OPERATOR-UNIFICATION-V1
 const ForumRequestsPage = lazy(() => import('@/pages/operator/ForumRequestsPage'));
 const ForumDeleteRequestsPage = lazy(() => import('@/pages/operator/ForumDeleteRequestsPage'));
@@ -465,6 +489,20 @@ function AppRoutes() {
 
         {/* Services Routes */}
         <Route path="services/tourists" element={<TouristHubPage />} />
+
+        {/* Guide pages — WO-O4O-CROSSSERVICE-HOME-LATEST-AND-GUIDE-ALIGNMENT-V1 */}
+        <Route path="guide/intro" element={<GuideIntroPage {...kCosmeticsGuideIntroProps} />} />
+        <Route path="guide/intro/structure" element={<GuideIntroStructurePage {...kCosmeticsGuideIntroStructureProps} />} />
+        <Route path="guide/intro/kpa" element={<GuideIntroKpaPage {...kCosmeticsGuideIntroKpaProps} />} />
+        <Route path="guide/intro/operation" element={<GuideIntroOperationPage {...kCosmeticsGuideIntroOperationProps} />} />
+        <Route path="guide/intro/concept" element={<GuideIntroConceptPage {...kCosmeticsGuideIntroConceptProps} />} />
+        <Route path="guide/usage" element={<GuideUsagePage {...kCosmeticsGuideUsageProps} />} />
+        <Route path="guide/features" element={<GuideFeaturesPage {...kCosmeticsGuideFeaturesProps} />} />
+        <Route path="guide/features/forum" element={<GuideFeatureManualPage {...kCosmeticsGuideFeatureForumProps} />} />
+        <Route path="guide/features/lms" element={<GuideFeatureManualPage {...kCosmeticsGuideFeatureLmsProps} />} />
+        <Route path="guide/features/content" element={<GuideFeatureManualPage {...kCosmeticsGuideFeatureContentProps} />} />
+        <Route path="guide/features/resources" element={<GuideFeatureManualPage {...kCosmeticsGuideFeatureResourcesProps} />} />
+        <Route path="guide/features/signage" element={<GuideFeatureManualPage {...kCosmeticsGuideFeatureSignageProps} />} />
       </Route>
 
       {/* Admin Dashboard (WO-K-COSMETICS-ADMIN-AREA-V1: 구조 관리 영역 신설) */}
