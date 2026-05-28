@@ -89,6 +89,9 @@ export default function RegisterModal() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [licenseStatus, setLicenseStatus] = useState<'idle' | 'checking' | 'available' | 'duplicate'>('idle');
+  // WO-O4O-KPA-REGISTRATION-UX-ALIGN-WITH-GLYCOPHARM-V1:
+  //   email onBlur 시 /auth/check-email 호출로 중복/가입 상태 선제 안내 (GlycoPharm 패턴 도입).
+  const [emailAlreadyJoined, setEmailAlreadyJoined] = useState(false);
 
   const [formData, setFormData] = useState({
     // 공통
@@ -155,8 +158,42 @@ export default function RegisterModal() {
       });
       setError(null);
       setLicenseStatus('idle');
+      setEmailAlreadyJoined(false);
     }
   }, [isOpen]);
+
+  // WO-O4O-KPA-REGISTRATION-UX-ALIGN-WITH-GLYCOPHARM-V1:
+  //   email blur 시 /auth/check-email 으로 중복 / pending 상태 미리 안내.
+  //   alreadyJoined 인 경우 submit 차단 (isFormValid 에서 처리).
+  const handleEmailBlur = async () => {
+    if (!formData.email || !formData.email.includes('@')) return;
+    try {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+      const res = await fetch(`${baseUrl}/api/v1/auth/check-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.email, service: 'kpa-society' }),
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data?.success && data.data?.alreadyJoined) {
+        setEmailAlreadyJoined(true);
+        const svc = (data.data.services as Array<{ key: string; status: string }> | undefined)?.find(
+          (s) => s.key === 'kpa-society',
+        );
+        if (svc?.status === 'pending') {
+          setError('KPA Society 가입 신청이 심사 중입니다. 승인을 기다려 주세요.');
+        } else {
+          setError('이미 KPA Society 에 가입된 계정입니다. 로그인해 주세요.');
+        }
+      } else {
+        setEmailAlreadyJoined(false);
+        setError(null);
+      }
+    } catch {
+      /* silent — submit 시점에서 다시 검증됨 */
+    }
+  };
 
   const checkLicenseDuplicate = async (licenseNumber: string) => {
     if (!licenseNumber.trim()) { setLicenseStatus('idle'); return; }
@@ -276,12 +313,27 @@ export default function RegisterModal() {
   };
   const isPasswordStrong = Object.values(passwordChecks).every(Boolean);
 
+  // WO-O4O-KPA-REGISTRATION-UX-ALIGN-WITH-GLYCOPHARM-V1:
+  //   GlycoPharm 의 명시적 format validation 패턴을 도입.
+  //   - phone 정규식 (length 체크와 동일 결과지만 명시성 향상)
+  //   - businessNumber 10자리 정확 검증
+  //   - taxInvoiceEmail email 형식 검증 (입력된 경우만 — 선택 필드)
+  //   - email 기본 형식 검증
+  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const isEmailFormatValid = EMAIL_REGEX.test(formData.email);
+  const isPhoneValid = /^\d{10,11}$/.test(formData.phone);
+  const isBusinessNumberValid = formData.businessNumber.length === 10;
+  // taxInvoiceEmail 은 optional — 미입력 시 valid, 입력 시 형식 검증
+  const isTaxInvoiceEmailValid = formData.taxInvoiceEmail.length === 0 || EMAIL_REGEX.test(formData.taxInvoiceEmail);
+
   const isFormValid = () => {
+    if (emailAlreadyJoined) return false;
     const common =
-      formData.email && formData.password && isPasswordStrong &&
+      formData.email && isEmailFormatValid &&
+      formData.password && isPasswordStrong &&
       formData.password === formData.passwordConfirm &&
       formData.lastName && formData.firstName && formData.nickname &&
-      formData.phone.length >= 10 && formData.phone.length <= 11 &&
+      isPhoneValid &&
       formData.agreeTerms && formData.agreePrivacy;
     if (!common) return false;
 
@@ -291,10 +343,11 @@ export default function RegisterModal() {
       // 면허 미사용은 근무처 입력 불요
       if (formData.activityType === 'inactive') return true;
       if (formData.activityType === 'pharmacy_owner') {
-        // 개설약사: 약국명·사업자번호·대표자명(ceoName)·사업장 주소 필수
+        // 개설약사: 약국명·사업자번호(10자리)·대표자명·세금계산서 이메일 형식·사업장 주소 필수
         if (!formData.pharmacyName) return false;
-        if (!formData.businessNumber || formData.businessNumber.length < 10) return false;
+        if (!isBusinessNumberValid) return false;
         if (!formData.ceoName) return false;
+        if (!isTaxInvoiceEmailValid) return false;
         if (!formData.businessZipCode || !formData.businessAddress) return false;
         return true;
       }
@@ -306,6 +359,55 @@ export default function RegisterModal() {
       return !!formData.universityName;
     }
     return false;
+  };
+
+  // WO-O4O-KPA-REGISTRATION-UX-ALIGN-WITH-GLYCOPHARM-V1:
+  //   submit disabled 사유를 사용자에게 명시. 형식 오류도 별도 항목으로 노출.
+  //   GlycoPharm 의 missing fields amber 박스 패턴과 동일.
+  const getMissingFields = (): string[] => {
+    const missing: string[] = [];
+    if (emailAlreadyJoined) return missing; // 별도 error 박스로 안내 — 여기선 생략
+
+    // 공통
+    if (!formData.email) missing.push('이메일');
+    else if (!isEmailFormatValid) missing.push('이메일(형식)');
+    if (!formData.password) missing.push('비밀번호');
+    else if (!isPasswordStrong) missing.push('비밀번호(영문 소문자·숫자·특수문자 포함 8자 이상)');
+    if (formData.password && formData.passwordConfirm && formData.password !== formData.passwordConfirm) {
+      missing.push('비밀번호 확인(일치)');
+    } else if (!formData.passwordConfirm) {
+      missing.push('비밀번호 확인');
+    }
+    if (!formData.lastName) missing.push('성');
+    if (!formData.firstName) missing.push('이름');
+    if (!formData.nickname) missing.push('닉네임');
+    if (!formData.phone) missing.push('핸드폰 번호');
+    else if (!isPhoneValid) missing.push('핸드폰 번호(10~11자리 숫자)');
+    if (!formData.agreeTerms) missing.push('이용약관 동의');
+    if (!formData.agreePrivacy) missing.push('개인정보처리방침 동의');
+
+    if (memberType === 'pharmacist_member') {
+      if (!formData.licenseNumber) missing.push('약사면허번호');
+      else if (licenseStatus === 'duplicate') missing.push('약사면허번호(중복)');
+      if (!formData.activityType) missing.push('직역');
+      if (formData.activityType && formData.activityType !== 'inactive') {
+        if (formData.activityType === 'pharmacy_owner') {
+          if (!formData.pharmacyName) missing.push('약국명');
+          if (!formData.businessNumber) missing.push('사업자등록번호');
+          else if (!isBusinessNumberValid) missing.push('사업자등록번호(10자리 숫자)');
+          if (!formData.ceoName) missing.push('대표자명');
+          if (formData.taxInvoiceEmail && !isTaxInvoiceEmailValid) missing.push('세금계산서 이메일(형식)');
+          if (!formData.businessZipCode || !formData.businessAddress) missing.push('사업장 주소');
+        } else {
+          if (!formData.pharmacyName) missing.push('근무처명');
+          if (!formData.pharmacyAddress) missing.push('근무처 주소');
+        }
+      }
+    } else if (memberType === 'pharmacy_student_member') {
+      if (!formData.universityName) missing.push('재학 약학대학');
+    }
+
+    return missing;
   };
 
   const handleSwitchToLogin = (e: React.MouseEvent) => { e.preventDefault(); openLoginModal(); };
@@ -391,8 +493,12 @@ export default function RegisterModal() {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">이메일 <span className="text-red-500">*</span></label>
                     <input type="email" name="email" autoComplete="email" value={formData.email} onChange={handleInputChange}
+                      onBlur={handleEmailBlur}
                       placeholder="example@email.com" required
                       className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    {formData.email.length > 0 && !isEmailFormatValid && (
+                      <p className="text-xs text-red-500 mt-1">이메일 형식이 올바르지 않습니다.</p>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
@@ -640,6 +746,19 @@ export default function RegisterModal() {
                   </div>
                 )}
 
+                {/* WO-O4O-KPA-REGISTRATION-UX-ALIGN-WITH-GLYCOPHARM-V1:
+                    누락/형식 오류 항목을 amber 박스로 명시 (GlycoPharm 패턴). */}
+                {!isFormValid() && !loading && !emailAlreadyJoined && (() => {
+                  const missing = getMissingFields();
+                  return missing.length > 0 ? (
+                    <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                      <p className="text-xs text-amber-800">
+                        다음 항목을 확인해 주세요: {missing.join(', ')}
+                      </p>
+                    </div>
+                  ) : null;
+                })()}
+
                 <button type="submit" disabled={!isFormValid() || loading}
                   className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                   {loading ? '신청 처리 중...' : '가입 신청하기'}
@@ -666,10 +785,25 @@ export default function RegisterModal() {
                 <p className="text-sm text-blue-800 mt-1"><strong>회원 유형:</strong> {SUCCESS_TYPE_LABELS[memberType]}</p>
                 <p className="text-sm text-blue-800 mt-1">승인까지 1-2 영업일이 소요될 수 있습니다.</p>
               </div>
-              <button onClick={closeModal}
-                className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
-                확인
-              </button>
+              {/* WO-O4O-KPA-REGISTRATION-UX-ALIGN-WITH-GLYCOPHARM-V1:
+                  GlycoPharm 의 success UX 패턴 — "로그인하기" 직행 버튼 추가.
+                  approval 정책은 변경 없음 (승인 후에만 실제 로그인 가능). */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  type="button"
+                  onClick={() => { closeModal(); openLoginModal(); }}
+                  className="flex-1 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  로그인하기
+                </button>
+                <button
+                  type="button"
+                  onClick={closeModal}
+                  className="flex-1 py-3 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  닫기
+                </button>
+              </div>
             </div>
           )}
         </div>
