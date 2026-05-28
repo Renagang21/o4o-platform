@@ -29,10 +29,12 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: 'Action Queue', path: '/operator/actions' },
   ],
   users: [
-    { label: '회원 관리', path: '/operator/users' },
+    // WO-O4O-NETURE-MEMBER-MANAGEMENT-BULK-AND-ROUTE-ALIGNMENT-V1:
+    // 회원 관리 표준 경로를 /operator/members 로 통일. /operator/users 는 legacy alias 로 잔존.
+    { label: '회원 관리', path: '/operator/members' },
     { label: '운영자 관리', path: '/operator/operators', adminOnly: true },
     // WO-O4O-NETURE-ADMIN-MEMBER-HARD-DELETE-V1: admin 전용 완전삭제 관리
-    { label: '회원 완전삭제', path: '/operator/members', adminOnly: true },
+    { label: '회원 완전삭제', path: '/admin/members', adminOnly: true },
     { label: '문의 메시지', path: '/operator/contact-messages', adminOnly: true },
   ],
   approvals: [
@@ -182,7 +184,7 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     { label: '대시보드', path: '/operator', exact: true },
     { label: 'Action Queue', path: '/operator/actions' },
   ],
-  users: [{ label: '회원 관리', path: '/operator/users' }],
+  users: [{ label: '회원 관리', path: '/operator/members' }],
   approvals: [
     { label: '가입 승인', path: '/operator/applications' },
     { label: '유통 참여형 펀딩', path: '/operator/market-trial' },

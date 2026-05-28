@@ -5,7 +5,7 @@
  *
  * - 잘못 가입된 회원, 테스트 계정, 탈퇴 후 재가입 필요 회원 정리
  * - 완전삭제(hard delete): service_memberships + role_assignments 제거, users 비활성화
- * - 승인/반려/정지/비활성화(soft delete)는 /operator/users 에서 수행
+ * - 승인/반려/정지/비활성화(soft delete)는 /operator/members 에서 수행 (legacy: /operator/users)
  * - 단일 선택 시만 완전삭제 가능 (대량 삭제 제외)
  *
  * 진입: AdminRoute (neture:admin 또는 platform:super_admin)
@@ -233,7 +233,7 @@ export default function AdminMemberManagementPage() {
           <p>
             잘못 가입된 회원, 테스트 계정 등을 완전삭제합니다.
             승인·반려·정지·비활성화(soft delete)는{' '}
-            <a href="/operator/users" className="underline">운영자 회원관리</a>에서 수행하세요.
+            <a href="/operator/members" className="underline">운영자 회원관리</a>에서 수행하세요.
           </p>
         </div>
       </div>

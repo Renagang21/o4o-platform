@@ -17,6 +17,7 @@
  */
 
 import { useMemo, useState } from 'react';
+import { UserCheck, UserMinus, UserX } from 'lucide-react';
 import {
   OperatorMembersConsolePage,
   type MembersConsoleClient,
@@ -237,6 +238,68 @@ export default function UsersManagementPage() {
       renderDeleteFlow={({ user, onClose, onDeleted }) => (
         <NetureDeleteFlow user={user} onClose={onClose} onDeleted={onDeleted} />
       )}
+      /* WO-O4O-NETURE-MEMBER-MANAGEMENT-BULK-AND-ROUTE-ALIGNMENT-V1:
+         정지/복원/탈퇴 처리 bulk 작업. 승인/거절은 별도 RegistrationRequestsPage 트랙이므로 제외.
+         bulk hard delete 는 추가하지 않음 (admin 단건 정책 유지). */
+      extraBulkActions={[
+        {
+          key: 'bulk-suspend',
+          label: (n) => `정지 (${n})`,
+          variant: 'danger',
+          icon: <UserX size={14} />,
+          getTargetIds: (users) => users.filter((u) => u.status === 'active').map((u) => u.id),
+          executeBatch: async (ids) => {
+            const { data } = await api.post('/operator/members/batch-status', { ids, status: 'suspended' });
+            return { data };
+          },
+          confirm: { title: '일괄 정지 확인', message: '선택한 회원을 정지 처리합니다.', confirmText: '정지', variant: 'danger' },
+        },
+        {
+          key: 'bulk-restore',
+          label: (n) => `복원 (${n})`,
+          variant: 'primary',
+          icon: <UserCheck size={14} />,
+          getTargetIds: (users) => users.filter((u) => u.status === 'suspended').map((u) => u.id),
+          executeBatch: async (ids) => {
+            const settled = await Promise.allSettled(
+              ids.map((id) => api.patch(`/operator/members/${id}/status`, { status: 'active' })),
+            );
+            return {
+              data: {
+                results: settled.map((r, i) => ({
+                  id: ids[i],
+                  status: r.status === 'fulfilled' ? ('success' as const) : ('failed' as const),
+                  error: r.status === 'rejected' ? (r.reason as any)?.message || '오류' : undefined,
+                })),
+              },
+            };
+          },
+          confirm: { title: '일괄 복원 확인', message: '선택한 회원을 활성으로 복원합니다.', confirmText: '복원', variant: 'default' },
+        },
+        {
+          key: 'bulk-withdraw',
+          label: (n) => `탈퇴 처리 (${n})`,
+          variant: 'danger',
+          icon: <UserMinus size={14} />,
+          getTargetIds: (users) =>
+            users.filter((u) => ['active', 'suspended', 'pending'].includes(u.status)).map((u) => u.id),
+          executeBatch: async (ids) => {
+            const settled = await Promise.allSettled(
+              ids.map((id) => api.delete(`/operator/members/${id}?mode=soft`)),
+            );
+            return {
+              data: {
+                results: settled.map((r, i) => ({
+                  id: ids[i],
+                  status: r.status === 'fulfilled' ? ('success' as const) : ('failed' as const),
+                  error: r.status === 'rejected' ? (r.reason as any)?.message || '오류' : undefined,
+                })),
+              },
+            };
+          },
+          confirm: { title: '일괄 탈퇴 처리', message: '선택한 회원을 탈퇴(비활성) 처리합니다.', confirmText: '탈퇴 처리', variant: 'danger' },
+        },
+      ]}
     />
   );
 }

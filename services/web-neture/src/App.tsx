@@ -966,6 +966,10 @@ function App() {
             }>
               {/* ─── Operator 공통 라우트 (adminOnly 제외) ─── */}
               <Route path="/operator" element={<NetureOperatorDashboard />} />
+              {/* WO-O4O-NETURE-MEMBER-MANAGEMENT-BULK-AND-ROUTE-ALIGNMENT-V1:
+                  /operator/members 를 표준 경로로 추가. /operator/users 는 legacy alias 로 유지. */}
+              <Route path="/operator/members" element={<UsersManagementPage />} />
+              <Route path="/operator/members/:id" element={<UserDetailPage />} />
               <Route path="/operator/users" element={<UsersManagementPage />} />
               <Route path="/operator/users/:id" element={<UserDetailPage />} />
               <Route path="/operator/stores" element={<StoreManagementPage />} />
