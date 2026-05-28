@@ -47,6 +47,19 @@ export type { DisplayNameUser } from './utils/getUserDisplayName.js';
 
 // WO-O4O-NOTIFICATION-UI-CORE-V1
 export { NotificationBell } from './components/NotificationBell.js';
+// WO-O4O-MYPAGE-MY-REQUESTS-INBOX-COMPONENT-V1
+export { MyRequestsInbox } from './components/MyRequestsInbox.js';
+export type {
+  MyRequestItem,
+  MyRequestEntityType,
+  MyRequestStatus,
+  MyRequestTypeFilterTab,
+  MyRequestsInboxProps,
+} from './components/MyRequestsInbox.js';
+export { RequestStatusBadge, DEFAULT_STATUS_CONFIG } from './components/RequestStatusBadge.js';
+export type { RequestStatusBadgeProps, RequestStatusConfig } from './components/RequestStatusBadge.js';
+export { RequestTypeBadge, DEFAULT_TYPE_CONFIG } from './components/RequestTypeBadge.js';
+export type { RequestTypeBadgeProps, RequestTypeConfig } from './components/RequestTypeBadge.js';
 export type { NotificationBellProps } from './components/NotificationBell.js';
 export { useNotifications } from './notifications/useNotifications.js';
 export type {
