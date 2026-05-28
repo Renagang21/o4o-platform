@@ -6,7 +6,10 @@
  *
  * WO-O4O-GLYCOPHARM-REGISTRATION-ROLE-TYPE-ALIGNMENT-V1:
  *   1단계(공통정보) → 2단계(참여유형) → 3단계(유형별 추가정보) 구조 유지.
- *   Identity V2 password separation 유지.
+ *
+ * WO-O4O-GLYCOPHARM-EXISTING-ACCOUNT-APPLICATION-FLOW-V1:
+ *   기존 O4O 계정 감지 시 비밀번호 재입력 플로우 제거.
+ *   로그인 유도 → 로그인 후 신청 복귀 흐름으로 대체.
  */
 
 import { useState, useEffect } from 'react';
@@ -60,9 +63,6 @@ export function RegisterFlowModal({ open, onClose }: Props) {
     email: '',
     password: '',
     passwordConfirm: '',
-    currentPassword: '',
-    servicePassword: '',
-    servicePasswordConfirm: '',
     phone: '',
     licenseNumber: '',
     businessName: '',
@@ -92,7 +92,6 @@ export function RegisterFlowModal({ open, onClose }: Props) {
       setFormData({
         lastName: '', firstName: '', nickname: '', email: '',
         password: '', passwordConfirm: '',
-        currentPassword: '', servicePassword: '', servicePasswordConfirm: '',
         phone: '', licenseNumber: '',
         businessName: '', representativeName: '', businessNumber: '',
         taxEmail: '', businessType: '', businessCategory: '',
@@ -131,14 +130,6 @@ export function RegisterFlowModal({ open, onClose }: Props) {
   };
   const isPasswordStrong = Object.values(passwordChecks).every(Boolean);
 
-  const servicePasswordChecks = {
-    length: formData.servicePassword.length >= 8,
-    letter: /[a-zA-Z]/.test(formData.servicePassword),
-    number: /\d/.test(formData.servicePassword),
-    special: /[^A-Za-z\d\s]/.test(formData.servicePassword),
-  };
-  const isServicePasswordStrong = Object.values(servicePasswordChecks).every(Boolean);
-
   const isPhoneValid = /^\d{10,11}$/.test(formData.phone);
 
   const handleEmailBlur = async () => {
@@ -164,14 +155,10 @@ export function RegisterFlowModal({ open, onClose }: Props) {
   };
 
   const isStep1Valid = () => {
+    if (existingAccountMode) return false; // 기존 계정 → 로그인 필수, Step 진행 불가
     const base = formData.lastName && formData.firstName && formData.nickname
       && formData.email && isPhoneValid;
-    const pwValid = existingAccountMode
-      ? formData.currentPassword.length > 0
-        && isServicePasswordStrong
-        && formData.servicePassword === formData.servicePasswordConfirm
-      : isPasswordStrong && formData.password === formData.passwordConfirm;
-    return !!(base && pwValid);
+    return !!(base && isPasswordStrong && formData.password === formData.passwordConfirm);
   };
 
   const isStep3Valid = () => {
@@ -192,16 +179,8 @@ export function RegisterFlowModal({ open, onClose }: Props) {
     try {
       const commonFields = {
         email: formData.email,
-        ...(existingAccountMode
-          ? {
-              password: formData.currentPassword,
-              currentPassword: formData.currentPassword,
-              servicePassword: formData.servicePassword,
-            }
-          : {
-              password: formData.password,
-              passwordConfirm: formData.passwordConfirm,
-            }),
+        password: formData.password,
+        passwordConfirm: formData.passwordConfirm,
         lastName: formData.lastName,
         firstName: formData.firstName,
         nickname: formData.nickname,
@@ -241,12 +220,7 @@ export function RegisterFlowModal({ open, onClose }: Props) {
       if (err.response?.data) {
         const data = err.response.data;
         const status = err.response.status;
-        if (status === 401 && data.code === 'PASSWORD_MISMATCH') {
-          setExistingAccountMode(true);
-          if (data.services) setExistingServices(data.services);
-          setError('비밀번호가 일치하지 않습니다. O4O 계정 가입 시 사용한 기존 비밀번호를 입력해주세요.');
-          setStep(1);
-        } else if (status === 409) {
+        if (status === 409) {
           setError(data.code === 'SERVICE_ALREADY_JOINED'
             ? '이미 GlycoPharm 서비스에 가입된 계정입니다. 로그인해 주세요.'
             : '이미 가입된 이메일입니다. 기존 계정으로 로그인해 주세요.');
@@ -418,72 +392,32 @@ export function RegisterFlowModal({ open, onClose }: Props) {
                 </div>
               </div>
 
-              {existingAccountMode && (
-                <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-xl p-3">
-                  <p className="font-semibold text-sm">이미 O4O 플랫폼 계정이 존재합니다</p>
-                  <p className="text-xs mt-1">
-                    기존 계정 확인을 위해 현재 사용 중인 비밀번호를 입력해 주세요.<br />
-                    GlycoPharm에서 사용할 비밀번호는 별도로 설정할 수 있습니다.
+              {existingAccountMode ? (
+                /* 기존 O4O 계정 감지 — 비밀번호 재입력 없이 로그인 유도 */
+                <div className="rounded-xl border-2 border-blue-300 bg-blue-50 p-4 space-y-3">
+                  <p className="font-semibold text-sm text-blue-800">이미 O4O 계정이 확인되었습니다</p>
+                  <p className="text-sm text-blue-700">
+                    로그인 후 GlycoPharm 이용 신청에 필요한 추가 정보만 입력하면 됩니다.
+                    비밀번호를 다시 입력하실 필요가 없습니다.
                   </p>
                   {existingServices.length > 0 && (
-                    <p className="text-xs mt-1 text-blue-600">
-                      가입된 서비스: {existingServices.map(s => SERVICE_LABELS[s.key] || s.key).join(', ')}
+                    <p className="text-xs text-blue-600">
+                      현재 이용 중인 서비스: {existingServices.map(s => SERVICE_LABELS[s.key] || s.key).join(', ')}
                     </p>
                   )}
-                  <div className="mt-1.5 text-xs space-x-2">
-                    <NavLink to="/login" className="text-blue-700 underline">로그인</NavLink>
-                    <span>·</span>
-                    <NavLink to="/forgot-password" className="text-blue-700 underline">비밀번호 찾기</NavLink>
+                  <div className="flex flex-col gap-2 pt-1">
+                    <NavLink
+                      to="/login"
+                      onClick={onClose}
+                      className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-colors"
+                    >
+                      로그인 후 신청 계속하기
+                    </NavLink>
+                    <NavLink to="/forgot-password" onClick={onClose} className="text-center text-xs text-blue-600 hover:underline">
+                      비밀번호를 잊으셨나요?
+                    </NavLink>
                   </div>
                 </div>
-              )}
-
-              {existingAccountMode ? (
-                <>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1.5">기존 O4O 계정 비밀번호 <span className="text-red-500">*</span></label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                      <input type={showPassword ? 'text' : 'password'} name="currentPassword" value={formData.currentPassword} onChange={handleInputChange}
-                        className="w-full pl-9 pr-9 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                        placeholder="현재 O4O 계정 비밀번호" required />
-                      <button type="button" onClick={() => setShowPassword(p => !p)} className="absolute right-3 top-1/2 -translate-y-1/2">
-                        {showPassword ? <EyeOff className="w-4 h-4 text-slate-400" /> : <Eye className="w-4 h-4 text-slate-400" />}
-                      </button>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1.5">GlycoPharm 비밀번호 <span className="text-red-500">*</span></label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                      <input type="password" name="servicePassword" value={formData.servicePassword} onChange={handleInputChange}
-                        className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                        placeholder="GlycoPharm에서 사용할 비밀번호" required />
-                    </div>
-                    {formData.servicePassword && (
-                      <div className="mt-1.5 grid grid-cols-2 gap-1">
-                        {PWD_CHECKS.map(({ key, label }) => (
-                          <div key={key} className="flex items-center gap-1">
-                            {servicePasswordChecks[key] ? <CheckCircle2 className="w-3 h-3 text-green-500" /> : <Circle className="w-3 h-3 text-slate-300" />}
-                            <span className={`text-xs ${servicePasswordChecks[key] ? 'text-green-600' : 'text-slate-400'}`}>{label}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1.5">GlycoPharm 비밀번호 확인 <span className="text-red-500">*</span></label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                      <input type="password" name="servicePasswordConfirm" value={formData.servicePasswordConfirm} onChange={handleInputChange}
-                        className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                        placeholder="GlycoPharm 비밀번호 재입력" required />
-                    </div>
-                    {formData.servicePasswordConfirm && formData.servicePassword !== formData.servicePasswordConfirm && (
-                      <p className="text-xs text-red-500 mt-1">비밀번호가 일치하지 않습니다</p>
-                    )}
-                  </div>
-                </>
               ) : (
                 <>
                   <div>
@@ -717,7 +651,7 @@ export function RegisterFlowModal({ open, onClose }: Props) {
                 </button>
               )}
               <div className="flex-1" />
-              {step === 1 && (
+              {step === 1 && !existingAccountMode && (
                 <button
                   type="button"
                   disabled={!isStep1Valid()}
