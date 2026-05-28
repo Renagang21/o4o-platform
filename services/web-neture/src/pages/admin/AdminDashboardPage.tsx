@@ -65,5 +65,13 @@ export default function AdminDashboardPage() {
     );
   }
 
-  return <AdminDashboardLayout config={config} />;
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-slate-800">관리자 대시보드</h1>
+        <p className="text-sm text-slate-500 mt-1">구조 지표 · 정책 현황 · 거버넌스 경고</p>
+      </div>
+      <AdminDashboardLayout config={config} />
+    </div>
+  );
 }

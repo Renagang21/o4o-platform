@@ -28,6 +28,8 @@ export default function AdminSupplierApprovalPage() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [approveConfirmId, setApproveConfirmId] = useState<string | null>(null);
+  const [deactivateConfirmId, setDeactivateConfirmId] = useState<string | null>(null);
   const [rejectModal, setRejectModal] = useState<{ id: string; name: string } | null>(null);
   const [rejectReason, setRejectReason] = useState('');
 
@@ -42,8 +44,10 @@ export default function AdminSupplierApprovalPage() {
     loadSuppliers();
   }, [loadSuppliers]);
 
-  const handleApprove = async (id: string) => {
-    if (!confirm('이 공급자를 승인하시겠습니까?')) return;
+  const handleApprove = async () => {
+    if (!approveConfirmId) return;
+    const id = approveConfirmId;
+    setApproveConfirmId(null);
     setActionLoading(id);
     const ok = await adminSupplierApi.approveSupplier(id);
     setActionLoading(null);
@@ -60,8 +64,10 @@ export default function AdminSupplierApprovalPage() {
     if (ok) await loadSuppliers();
   };
 
-  const handleDeactivate = async (id: string) => {
-    if (!confirm('이 공급자를 비활성화하시겠습니까?')) return;
+  const handleDeactivate = async () => {
+    if (!deactivateConfirmId) return;
+    const id = deactivateConfirmId;
+    setDeactivateConfirmId(null);
     setActionLoading(id);
     const ok = await adminSupplierApi.deactivateSupplier(id);
     setActionLoading(null);
@@ -183,7 +189,7 @@ export default function AdminSupplierApprovalPage() {
                     {s.status === 'PENDING' && (
                       <>
                         <button
-                          onClick={() => handleApprove(s.id)}
+                          onClick={() => setApproveConfirmId(s.id)}
                           disabled={actionLoading === s.id}
                           className="text-emerald-600 hover:text-emerald-800 font-medium text-sm disabled:opacity-50"
                         >
@@ -200,7 +206,7 @@ export default function AdminSupplierApprovalPage() {
                     )}
                     {s.status === 'ACTIVE' && (
                       <button
-                        onClick={() => handleDeactivate(s.id)}
+                        onClick={() => setDeactivateConfirmId(s.id)}
                         disabled={actionLoading === s.id}
                         className="text-red-500 hover:text-red-700 font-medium text-sm disabled:opacity-50"
                       >
@@ -214,6 +220,52 @@ export default function AdminSupplierApprovalPage() {
           </table>
         )}
       </div>
+
+      {approveConfirmId && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-sm shadow-xl">
+            <h3 className="text-lg font-bold text-slate-800 mb-3">공급자 승인</h3>
+            <p className="text-sm text-slate-600 mb-5">이 공급자를 승인하시겠습니까?</p>
+            <div className="flex gap-2 justify-end">
+              <button
+                onClick={() => setApproveConfirmId(null)}
+                className="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleApprove}
+                className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+              >
+                승인
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deactivateConfirmId && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-sm shadow-xl">
+            <h3 className="text-lg font-bold text-amber-700 mb-3">공급자 비활성화</h3>
+            <p className="text-sm text-slate-600 mb-5">이 공급자를 비활성화하시겠습니까?</p>
+            <div className="flex gap-2 justify-end">
+              <button
+                onClick={() => setDeactivateConfirmId(null)}
+                className="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleDeactivate}
+                className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700"
+              >
+                비활성화
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {rejectModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">

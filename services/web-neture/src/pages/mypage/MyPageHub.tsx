@@ -77,7 +77,7 @@ export default function MyPageHub() {
               </span>
               {isSupplier && (
                 <span className="px-2.5 py-1 bg-gray-100 text-gray-700 rounded text-xs font-medium">
-                  공급사
+                  공급자
                 </span>
               )}
             </div>

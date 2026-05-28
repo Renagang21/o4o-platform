@@ -33,6 +33,7 @@ export default function AdminProductApprovalPage() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [approveConfirmId, setApproveConfirmId] = useState<string | null>(null);
   const [rejectModal, setRejectModal] = useState<{ id: string; name: string } | null>(null);
   const [rejectReason, setRejectReason] = useState('');
   const [detailProduct, setDetailProduct] = useState<AdminProduct | null>(null);
@@ -48,8 +49,10 @@ export default function AdminProductApprovalPage() {
     loadProducts();
   }, [loadProducts]);
 
-  const handleApprove = async (id: string) => {
-    if (!confirm('이 상품을 승인하시겠습니까?')) return;
+  const handleApprove = async () => {
+    if (!approveConfirmId) return;
+    const id = approveConfirmId;
+    setApproveConfirmId(null);
     setActionLoading(id);
     const ok = await adminProductApi.approveProduct(id);
     setActionLoading(null);
@@ -183,7 +186,7 @@ export default function AdminProductApprovalPage() {
                     {p.approvalStatus === 'PENDING' && (
                       <>
                         <button
-                          onClick={() => handleApprove(p.id)}
+                          onClick={() => setApproveConfirmId(p.id)}
                           disabled={actionLoading === p.id}
                           className="text-emerald-600 hover:text-emerald-800 font-medium text-sm disabled:opacity-50"
                         >
@@ -205,6 +208,29 @@ export default function AdminProductApprovalPage() {
           </table>
         )}
       </div>
+
+      {approveConfirmId && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-sm shadow-xl">
+            <h3 className="text-lg font-bold text-slate-800 mb-3">상품 승인</h3>
+            <p className="text-sm text-slate-600 mb-5">이 상품을 승인하시겠습니까?</p>
+            <div className="flex gap-2 justify-end">
+              <button
+                onClick={() => setApproveConfirmId(null)}
+                className="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleApprove}
+                className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+              >
+                승인
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {rejectModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -306,7 +332,7 @@ export default function AdminProductApprovalPage() {
               {detailProduct.approvalStatus === 'PENDING' && (
                 <>
                   <button
-                    onClick={() => { handleApprove(detailProduct.id); setDetailProduct(null); }}
+                    onClick={() => { setApproveConfirmId(detailProduct.id); setDetailProduct(null); }}
                     className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
                   >
                     승인

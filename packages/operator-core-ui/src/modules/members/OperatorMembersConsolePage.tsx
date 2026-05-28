@@ -491,7 +491,7 @@ export function OperatorMembersConsolePage({
 
   const roleColumn: ListColumnDef<UserData> = {
     key: 'role',
-    header: '역할',
+    header: '유형',
     width: '120px',
     render: (_v, user) => {
       const role = getPrimaryRole(user);
