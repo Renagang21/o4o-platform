@@ -302,6 +302,11 @@ export function MyDashboardPage() {
           <span style={styles.quickLinkIcon}>📜</span>
           <span>내 자격</span>
         </Link>
+        {/* WO-O4O-MYPAGE-MY-REQUESTS-HUB-CARD-ALIGNMENT-V1 */}
+        <Link to={`/mypage/my-requests`} style={styles.quickLink}>
+          <span style={styles.quickLinkIcon}>📋</span>
+          <span>내 신청</span>
+        </Link>
         <Link to={`/mypage/settings`} style={styles.quickLink}>
           <span style={styles.quickLinkIcon}>⚙️</span>
           <span>설정</span>

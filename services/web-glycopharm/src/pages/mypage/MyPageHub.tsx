@@ -20,6 +20,7 @@ import {
   Award,
   Coins,
   Gift,
+  ClipboardList,
 } from 'lucide-react';
 import { MyPageLayout, QuickActionsSection, RoleBadgeGroup, MyPageHubCard } from '@o4o/account-ui';
 import type { RoleBadgeTone } from '@o4o/account-ui';
@@ -146,6 +147,12 @@ export default function MyPageHub() {
           title="크레딧 / 포인트"
           href="/mypage/credits"
           icon={<Coins className="w-5 h-5" />}
+        />
+        {/* WO-O4O-MYPAGE-MY-REQUESTS-HUB-CARD-ALIGNMENT-V1 */}
+        <MyPageHubCard
+          title="내 신청"
+          href="/apply/my-applications"
+          icon={<ClipboardList className="w-5 h-5" />}
         />
       </div>
 
