@@ -223,7 +223,7 @@ export default function CommunityMainPage() {
   return (
     <StandardHomeTemplate
       heroSlot={
-        <div style={heroStyles.wrapper} className={`${t.hero.bg} ${t.hero.border} ${t.hero.padding}`}>
+        <div style={heroStyles.wrapper} className={`${t.hero.bg} ${t.hero.border} ${t.hero.padding} mb-8 md:mb-16`}>
           <PageContainer>
             <div style={heroStyles.inner}>
               <div style={heroStyles.titleGroup}>
