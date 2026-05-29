@@ -29,13 +29,12 @@ import { Router, Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
 import { requireAuth } from '../../../middleware/auth.middleware.js';
 import { requireNetureScope } from '../../../middleware/neture-scope.middleware.js';
-import { CopilotEngineService } from '../../../copilot/copilot-engine.service.js';
+import { generateRuleBasedInsights } from '../../../copilot/insight-rules.js';
 import logger from '../../../utils/logger.js';
 import type { KpiItem, ActionItem, ActivityItem, QuickActionItem, OperatorDashboardConfig } from '../../../types/operator-dashboard.types.js';
 
 export function createOperatorDashboardController(dataSource: DataSource): Router {
   const router = Router();
-  const copilotEngine = new CopilotEngineService();
 
   // Router-level guard: neture:operator (includes neture:admin via scopeRoleMapping)
   router.use(requireAuth);
@@ -195,7 +194,7 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
         { key: 'pending-settlements', label: '정산 대기', value: pendingSettlements, status: pendingSettlements > 0 ? 'warning' : 'neutral' },
       ];
 
-      // Block 2: AI Summary (Copilot Engine)
+      // Block 2: AI Summary (rule-based, no external AI call)
       const copilotMetrics = {
         stores: { active: activeOrgs, inactive: inactiveOrgs },
         suppliers: { active: activeSuppliers, pending: pendingSuppliers, total: totalSuppliers },
@@ -207,13 +206,7 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
         settlements: { pending: pendingSettlements },
         contacts: { unread: unreadMessages },
       };
-      const copilotUser = {
-        id: (_req as any).user?.id || '',
-        role: 'neture:operator',
-      };
-      const { insights: aiSummary } = await copilotEngine.generateInsights(
-        'neture', copilotMetrics, copilotUser,
-      );
+      const aiSummary = generateRuleBasedInsights('neture', copilotMetrics);
 
       // Block 3: Action Queue
       // WO-NETURE-OSA-PHASEA-DECISION-PRESSURE-REMOVE-V1: 'pending-products' (OSA 승인 대기) 항목 제거
