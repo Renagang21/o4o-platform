@@ -12,8 +12,11 @@
  */
 
 import { useNavigate } from 'react-router-dom';
+import { useCallback } from 'react';
 import { LayoutDashboard, UserCircle, Settings, GraduationCap, Shield } from 'lucide-react';
 import { GlobalHeader, GlobalHeaderMenuItem } from '@o4o/ui';
+import { NotificationBell, useNotifications } from '@o4o/account-ui';
+import type { NotificationItem } from '@o4o/account-ui';
 import { isStoreOwnerDual } from '@o4o/auth-utils';
 import { useAuth, getKCosmeticsDashboardRoute } from '@/contexts/AuthContext';
 import { useLoginModal } from '@/contexts/LoginModalContext';
@@ -22,6 +25,7 @@ import {
   KCOS_CONTEXTUAL_NAV,
   filterContextualNav,
 } from '@/config/navigation';
+import { notificationsApi } from '@/lib/api/notifications';
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function getUserDisplayName(user: any): string {
@@ -84,6 +88,22 @@ export function KCosGlobalHeader() {
     ? { displayName: getUserDisplayName(user), email: user.email }
     : null;
 
+  // WO-O4O-GLYCOPHARM-K-COSMETICS-NOTIFICATION-BELL-ACTIVATION-V1
+  const notif = useNotifications(notificationsApi, {
+    enabled: !!user,
+    serviceKey: 'k-cosmetics',
+  });
+
+  const handleNotificationClick = useCallback(
+    (n: NotificationItem) => {
+      const target = (n.metadata as Record<string, unknown> | undefined)?.targetUrl;
+      if (typeof target === 'string' && target.length > 0) {
+        navigate(target);
+      }
+    },
+    [navigate],
+  );
+
   const handleLogout = () => {
     logout();
     navigate('/');
@@ -105,7 +125,17 @@ export function KCosGlobalHeader() {
       onLogin={openLoginModal}
       onRegister={() => navigate('/register')}
       onLogout={handleLogout}
-      utilitySlot={undefined}
+      utilitySlot={user ? (
+        <NotificationBell
+          unreadCount={notif.unreadCount}
+          notifications={notif.notifications}
+          loading={notif.loading}
+          onOpen={notif.refetchList}
+          onItemClick={handleNotificationClick}
+          onMarkAsRead={notif.markAsRead}
+          onMarkAllAsRead={notif.markAllAsRead}
+        />
+      ) : undefined}
       userMenuItems={
         <>
           {/* 강의 대시보드 — 최상단 (WO-KCOS-LMS-INSTRUCTOR-BOOTSTRAP-V1) */}

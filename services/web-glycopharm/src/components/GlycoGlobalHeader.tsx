@@ -12,8 +12,11 @@
  */
 
 import { useNavigate } from 'react-router-dom';
+import { useCallback } from 'react';
 import { GraduationCap, LayoutDashboard, Settings, Shield } from 'lucide-react';
 import { GlobalHeader, GlobalHeaderMenuItem } from '@o4o/ui';
+import { NotificationBell, useNotifications } from '@o4o/account-ui';
+import type { NotificationItem } from '@o4o/account-ui';
 import { isStoreOwnerDual } from '@o4o/auth-utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { isPharmacistRole } from '@/lib/role-constants';
@@ -25,6 +28,7 @@ import {
   GLYCO_CONTEXTUAL_NAV,
   filterContextualNav,
 } from '@/config/navigation';
+import { notificationsApi } from '@/lib/api/notifications';
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 /**
@@ -97,6 +101,22 @@ export function GlycoGlobalHeader() {
       }
     : null;
 
+  // WO-O4O-GLYCOPHARM-K-COSMETICS-NOTIFICATION-BELL-ACTIVATION-V1
+  const notif = useNotifications(notificationsApi, {
+    enabled: !!user,
+    serviceKey: 'glycopharm',
+  });
+
+  const handleNotificationClick = useCallback(
+    (n: NotificationItem) => {
+      const target = (n.metadata as Record<string, unknown> | undefined)?.targetUrl;
+      if (typeof target === 'string' && target.length > 0) {
+        navigate(target);
+      }
+    },
+    [navigate],
+  );
+
   const handleLogout = () => {
     logout();
     navigate('/');
@@ -116,7 +136,17 @@ export function GlycoGlobalHeader() {
       onLogin={openLoginModal}
       onRegister={openRegisterModal}
       onLogout={handleLogout}
-      utilitySlot={undefined}
+      utilitySlot={user ? (
+        <NotificationBell
+          unreadCount={notif.unreadCount}
+          notifications={notif.notifications}
+          loading={notif.loading}
+          onOpen={notif.refetchList}
+          onItemClick={handleNotificationClick}
+          onMarkAsRead={notif.markAsRead}
+          onMarkAllAsRead={notif.markAllAsRead}
+        />
+      ) : undefined}
       userMenuItems={
         <>
           {(isInstructor || isAdmin) && (
