@@ -18,7 +18,7 @@ import { generateRuleBasedInsights } from './insight-rules.js';
 import type { AiSummaryItem } from '../types/operator-dashboard.types.js';
 
 /** Timeout for AI provider calls (ms) */
-const AI_TIMEOUT_MS = 3000;
+const AI_TIMEOUT_MS = 800;
 
 /**
  * Check if an AI provider API key is configured.

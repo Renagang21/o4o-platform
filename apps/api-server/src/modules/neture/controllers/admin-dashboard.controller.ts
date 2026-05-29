@@ -17,7 +17,7 @@ import { Router, Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
 import { requireAuth } from '../../../middleware/auth.middleware.js';
 import { requireNetureScope } from '../../../middleware/neture-scope.middleware.js';
-import { CopilotEngineService } from '../../../copilot/copilot-engine.service.js';
+import { generateRuleBasedInsights } from '../../../copilot/insight-rules.js';
 import logger from '../../../utils/logger.js';
 
 type AuthenticatedRequest = Request & {
@@ -26,7 +26,6 @@ type AuthenticatedRequest = Request & {
 
 export function createAdminDashboardController(dataSource: DataSource): Router {
   const router = Router();
-  const copilotEngine = new CopilotEngineService();
 
   router.use(requireAuth);
   router.use(requireNetureScope('neture:admin') as any);
@@ -143,7 +142,7 @@ export function createAdminDashboardController(dataSource: DataSource): Router {
         },
       ];
 
-      // === Block C: Governance Alerts (AI) ===
+      // === Block C: Governance Alerts (rule-based, no external AI call) ===
       const adminMetrics = {
         users: { total: totalUsers },
         suppliers: { active: activeSuppliers, pending: pendingSuppliers },
@@ -152,11 +151,7 @@ export function createAdminDashboardController(dataSource: DataSource): Router {
         partners: { active: activePartners, requests: partnerRequests },
         settlements: { pending: pendingSettlements },
       };
-      const { insights } = await copilotEngine.generateInsights(
-        'neture',
-        adminMetrics,
-        { id: userId, role: 'neture:admin' },
-      );
+      const insights = generateRuleBasedInsights('neture', adminMetrics);
       const governanceAlerts = insights.map((i) => ({
         id: i.id,
         message: i.message,
