@@ -289,6 +289,12 @@ export default function KCosmeticsAdminMembersPage() {
         { key: 'seller', label: '판매자', roleFilter: ['seller'] },
         { key: 'buyer', label: '구매자', roleFilter: ['consumer', 'buyer'] },
       ]}
+      statusTabs={[
+        { key: 'status-active',    label: '활성', status: 'active' },
+        { key: 'status-rejected',  label: '거절', status: 'rejected' },
+        { key: 'status-suspended', label: '정지', status: 'suspended' },
+        { key: 'status-withdrawn', label: '탈퇴', status: 'withdrawn' },
+      ]}
       renderDeleteFlow={({ user, onClose, onDeleted }) => (
         <KCosAdminDeleteFlow user={user} onClose={onClose} onDeleted={onDeleted} />
       )}

@@ -230,6 +230,21 @@ export class MembershipApprovalService {
         }
       }
 
+      // STEP5: WO-O4O-KCOSMETICS-MEMBERSHIP-APPROVAL-FLOW-STABILIZATION-V1
+      //   k-cosmetics 승인 시 cosmetics_members upsert (service_memberships 가 SSOT).
+      //   cosmetics_members.status CHECK: 'active' | 'suspended' | 'withdrawn' 만 허용.
+      //   row 없으면 skeleton 생성, 있으면 active 동기화 (sub_role 보존).
+      //   거절 시에는 cosmetics_members row 생성하지 않음 (rejectMembership 에서 처리 없음).
+      if (membership.service_key === 'k-cosmetics') {
+        logger.info('[APPROVAL][STEP5] cosmetics_members upsert', { userId });
+        await queryRunner.query(
+          `INSERT INTO cosmetics_members (user_id, membership_type, status, created_at, updated_at)
+           VALUES ($1, 'cosmetics_member', 'active', NOW(), NOW())
+           ON CONFLICT (user_id) DO UPDATE SET status = 'active', updated_at = NOW()`,
+          [userId]
+        );
+      }
+
       await queryRunner.commitTransaction();
 
       // 커밋 후 결과에 status 반영
