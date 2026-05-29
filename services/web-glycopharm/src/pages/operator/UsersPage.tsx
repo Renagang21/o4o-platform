@@ -187,8 +187,10 @@ export default function UsersPage() {
         { key: 'store_owner', label: '약국 경영자', roleFilter: ['glycopharm:store_owner'] },
       ]}
       statusTabs={[
-        { key: 'suspended', label: '정지', status: 'suspended' },
-        { key: 'withdrawn', label: '탈퇴', status: 'withdrawn' },
+        { key: 'status-active',    label: '승인',  status: 'active' },
+        { key: 'status-rejected',  label: '반려',  status: 'rejected' },
+        { key: 'status-suspended', label: '정지',  status: 'suspended' },
+        { key: 'status-withdrawn', label: '탈퇴',  status: 'withdrawn' },
       ]}
       renderEditModal={({ user, onClose, onSuccess }) => (
         <EditUserModal userId={user.id} onClose={onClose} onSuccess={onSuccess} />

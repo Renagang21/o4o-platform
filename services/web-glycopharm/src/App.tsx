@@ -122,7 +122,6 @@ const ApplicationDetailPage = lazy(() => import('@/pages/operator/ApplicationDet
 const StoreApprovalsPage = lazy(() => import('@/pages/operator/StoreApprovalsPage'));
 const StoreApprovalDetailPage = lazy(() => import('@/pages/operator/StoreApprovalDetailPage'));
 // StoreTemplateManagerPage 제거 — pharmacySlug="demo" 하드코딩으로 미완성 (글로벌 템플릿 저장소 미구현)
-const GlycopharmMembersPage = lazy(() => import('@/pages/operator/GlycopharmMembersPage'));
 const UsersPage = lazy(() => import('@/pages/operator/UsersPage'));
 const UserDetailPage = lazy(() => import('@/pages/operator/UserDetailPage'));
 const RoleManagementPage = lazy(() => import('@/pages/operator/RoleManagementPage'));
@@ -712,7 +711,8 @@ function AppRoutes() {
         <Route path="community" element={<CommunityManagementPage />} />
         <Route path="store-approvals" element={<StoreApprovalsPage />} />
         <Route path="store-approvals/:id" element={<StoreApprovalDetailPage />} />
-        <Route path="glycopharm-members" element={<GlycopharmMembersPage />} />
+        {/* legacy redirect: /operator/glycopharm-members → /operator/members */}
+        <Route path="glycopharm-members" element={<Navigate to="/operator/members" replace />} />
         {/* WO-O4O-GLYCOPHARM-OPERATOR-ROUTE-CANONICALIZATION-V1: canonical route */}
         <Route path="members" element={<UsersPage />} />
         <Route path="members/:id" element={<UserDetailPage />} />
