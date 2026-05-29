@@ -10,7 +10,7 @@
 import type { DataSource } from 'typeorm';
 import { GlycopharmApplication } from '../entities/glycopharm-application.entity.js';
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
-import type { CopilotEngineService } from '../../../copilot/copilot-engine.service.js';
+import { generateRuleBasedInsights } from '../../../copilot/insight-rules.js';
 import type { KpiItem, ActionItem, ActivityItem, QuickActionItem, OperatorDashboardConfig } from '../../../types/operator-dashboard.types.js';
 import { computeOperatorAlerts } from '../../../utils/operator-alert.utils.js';
 import logger from '../../../utils/logger.js';
@@ -22,7 +22,6 @@ import {
 
 export async function buildGlycoPharmDashboardConfig(
   dataSource: DataSource,
-  copilotEngine: CopilotEngineService,
   userId: string
 ): Promise<OperatorDashboardConfig> {
   const applicationRepo = dataSource.getRepository(GlycopharmApplication);
@@ -71,15 +70,13 @@ export async function buildGlycoPharmDashboardConfig(
     { key: 'total-orders', label: '총 주문', value: 0, status: 'neutral' }, // STUB: E-commerce Core 미통합
   ];
 
-  // Block 2: AI Summary (Copilot Engine)
+  // Block 2: AI Summary (rule-based, no external AI call)
   const copilotMetrics = {
     pharmacies: { active: activePharmacies, inactive: inactivePharmacies },
     applications: { pending: pendingApprovals },
     products: { active: activeProducts, draft: draftProducts, total: totalProducts },
   };
-  const { insights: aiSummary } = await copilotEngine.generateInsights(
-    'glycopharm', copilotMetrics, { id: userId, role: 'glycopharm:operator' },
-  );
+  const aiSummary = generateRuleBasedInsights('glycopharm', copilotMetrics);
 
   // Block 3: Action Queue
   const actionQueue: ActionItem[] = [

@@ -21,14 +21,13 @@ import type { DataSource } from 'typeorm';
 import { requireAuth } from '../../../middleware/auth.middleware.js';
 import { requireCosmeticsScope } from '../../../middleware/cosmetics-scope.middleware.js';
 import { CosmeticsStoreSummaryService } from '../services/cosmetics-store-summary.service.js';
-import { CopilotEngineService } from '../../../copilot/copilot-engine.service.js';
+import { generateRuleBasedInsights } from '../../../copilot/insight-rules.js';
 import logger from '../../../utils/logger.js';
 import type { KpiItem, AiSummaryItem, ActionItem, ActivityItem, QuickActionItem, OperatorDashboardConfig } from '../../../types/operator-dashboard.types.js';
 
 export function createCosmeticsOperatorDashboardController(dataSource: DataSource): Router {
   const router = Router();
   const storeSummaryService = new CosmeticsStoreSummaryService(dataSource);
-  const copilotEngine = new CopilotEngineService();
 
   // Router-level guard: cosmetics:operator (includes cosmetics:admin via scopeRoleMapping)
   router.use(requireAuth);
@@ -87,19 +86,13 @@ export function createCosmeticsOperatorDashboardController(dataSource: DataSourc
         { key: 'cms-published', label: '게시 콘텐츠', value: cms.published, status: 'neutral' },
       ];
 
-      // Block 2: AI Summary (Copilot Engine)
+      // Block 2: AI Summary (rule-based, no external AI call)
       const copilotMetrics = {
         products: { active: products.active, pending: products.pending, total: products.total },
         orders: { active: adminSummary.activeOrders },
         stores: { active: adminSummary.totalStores },
       };
-      const copilotUser = {
-        id: (_req as any).user?.id || '',
-        role: 'cosmetics:operator',
-      };
-      const { insights: aiSummary } = await copilotEngine.generateInsights(
-        'cosmetics', copilotMetrics, copilotUser,
-      );
+      const aiSummary = generateRuleBasedInsights('cosmetics', copilotMetrics);
 
       // Block 3: Action Queue
       const actionQueue: ActionItem[] = [

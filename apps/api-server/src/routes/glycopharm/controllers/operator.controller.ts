@@ -15,7 +15,6 @@ import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { GlycopharmApplication } from '../entities/glycopharm-application.entity.js';
 import { requireGlycopharmScope } from '../../../middleware/glycopharm-scope.middleware.js';
-import { CopilotEngineService } from '../../../copilot/copilot-engine.service.js';
 import { buildGlycoPharmDashboardConfig } from '../services/operator-dashboard.service.js';
 import type { ActionLogService } from '@o4o/action-log-core';
 import { createOperatorForumRequestController } from './operator-forum-request.controller.js';
@@ -29,7 +28,6 @@ export function createOperatorController(
   actionLogService?: ActionLogService
 ): Router {
   const router = Router();
-  const copilotEngine = new CopilotEngineService();
 
   router.use(requireAuth);
   router.use(requireGlycopharmScope('glycopharm:operator') as any);
@@ -41,7 +39,7 @@ export function createOperatorController(
   router.get('/dashboard', async (req: Request, res: Response): Promise<void> => {
     try {
       const userId = (req as any).user?.id || '';
-      const config = await buildGlycoPharmDashboardConfig(dataSource, copilotEngine, userId);
+      const config = await buildGlycoPharmDashboardConfig(dataSource, userId);
       res.json({ success: true, data: config });
     } catch (error: any) {
       console.error('Failed to get operator dashboard:', error);
