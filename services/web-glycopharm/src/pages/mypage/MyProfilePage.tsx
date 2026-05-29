@@ -27,7 +27,7 @@ import {
 const roleLabels: Record<string, string> = {
   admin: '관리자',
   operator: '운영자',
-  pharmacy: '약사',
+  pharmacy: '약국',
   pharmacist: '약사',
   supplier: '공급자',
   partner: '파트너',

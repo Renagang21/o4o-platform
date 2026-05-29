@@ -62,7 +62,14 @@ export function GlycoGlobalHeader() {
   const isInstructor = isAuthenticated && user?.roles?.some(
     (r: string) => r === 'lms:instructor',
   );
-  const isPharmacy = isAuthenticated && user?.roles?.some((r: string) => isPharmacistRole(r));
+  const isPharmacy = isAuthenticated && (
+    user?.roles?.some((r: string) => isPharmacistRole(r)) ||
+    // service_memberships.role = 'pharmacy' (활성 회원) 도 매장 접근 허용
+    user?.memberships?.some(
+      (m: any) => m.serviceKey === 'glycopharm' && m.role === 'pharmacy' &&
+        (m.status === 'active' || m.status === 'approved'),
+    )
+  );
   // WO-O4O-AUTH-UTILS-STORE-OWNER-DUAL-V1: glycopharm:store_owner 명시적 체크 추가
   // pharmacist(기존) OR store_owner(신규) 둘 다 매장 접근 가능
   const isStoreOwner = isAuthenticated && (
