@@ -133,18 +133,6 @@ export default function LoginModal() {
           </button>
         </div>
 
-        {/* 데모 계정 빠른 로그인 */}
-        <div className="mb-5 p-3 bg-emerald-50 border border-emerald-200 rounded-xl">
-          <p className="text-xs text-emerald-700 font-medium mb-2">🧪 테스트 계정으로 빠르게 시작하기</p>
-          <button
-            type="button"
-            onClick={() => { setEmail('renagang21@gmail.com'); setPassword('3Lz157727791!'); setError(''); }}
-            className="w-full py-2 text-sm font-medium text-emerald-700 bg-white border border-emerald-300 rounded-lg hover:bg-emerald-50 transition-colors"
-          >
-            데모 약국 계정으로 입력
-          </button>
-        </div>
-
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
           {error && (
@@ -215,6 +203,15 @@ export default function LoginModal() {
               이메일 저장
             </label>
           </div>
+
+          {/* 데모 계정 빠른 입력 */}
+          <button
+            type="button"
+            onClick={() => { setEmail('renagang21@gmail.com'); setPassword('3Lz157727791!'); setError(''); }}
+            className="w-full py-2.5 text-sm font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl hover:bg-emerald-100 transition-colors"
+          >
+            🧪 테스트 약국
+          </button>
 
           <button
             type="submit"
