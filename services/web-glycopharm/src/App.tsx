@@ -673,8 +673,8 @@ function AppRoutes() {
         {/* WO-O4O-GLYCOPHARM-OPERATOR-ADMIN-CONSOLE-KPA-ALIGNMENT-V1: Admin 회원 관리 (soft+hard delete) */}
         <Route path="members" element={<GlycoPharmAdminMembersPage />} />
         <Route path="members/:id" element={<UserDetailPage />} />
-        <Route path="users" element={<UsersPage />} />
-        <Route path="users/:id" element={<UserDetailPage />} />
+        <Route path="users" element={<Navigate to="/admin/members" replace />} />
+        <Route path="users/:id" element={<Navigate to="/admin/members" replace />} />
         {/* WO-O4O-GLYCOPHARM-ADMIN-OPERATOR-MENU-REALIGNMENT-V1: Finance */}
         <Route path="settlements" element={<SettlementsPage />} />
         <Route path="reports" element={<ReportsPage />} />

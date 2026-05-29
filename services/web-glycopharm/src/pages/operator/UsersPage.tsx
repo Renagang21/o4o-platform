@@ -86,7 +86,7 @@ function GpDeleteRiskFlow({
   useEffect(() => {
     api
       .get(`/operator/members/${user.id}/delete-risk`)
-      .then((r) => setData(r.data?.data ?? r.data))
+      .then((r: any) => setData(r.data?.data ?? r.data))
       .catch((e: any) => toast.error(e?.message || '리스크 조회 실패'))
       .finally(() => setLoading(false));
   }, [user.id]);
