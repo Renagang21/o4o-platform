@@ -3,12 +3,20 @@
  *
  * WO-O4O-OPERATOR-EDITUSER-MODAL-PHASE1-NETURE-GP-KCOS-V1
  *
- * Parameterized for Neture / GlycoPharm / K-Cosmetics.
- * KPA is excluded (MemberManagementPage Drawer structure — separate WO).
+ * users.id 기반의 Operator Membership Console 공통 편집 모달.
+ * 서비스별 차이(API 경로·역할 옵션·라벨·프로필 분류)는 EditUserModalConfig 로 주입한다.
+ *
+ * 지원 서비스: Neture / GlycoPharm / K-Cosmetics
+ *
+ * KPA 제외 사유:
+ *   - ID 기준: kpa_members.id (users.id 와 다름)
+ *   - 분리 API: PATCH /members/:id/info (기본 정보) + PATCH /members/:id/status (상태 변경)
+ *   - activity_type → store_owner 자동 연동 로직 등 KPA 전용 비즈니스 규칙 존재
+ *   → KpaEditUserModal 로 별도 유지. 통합 금지.
  *
  * Props:
- *   userId  — member to edit
- *   config  — service-specific options (makeRequest, role options, labels, profileClassification)
+ *   userId  — 편집 대상 users.id (UUID)
+ *   config  — 서비스별 주입 설정 (EditUserModalConfig 참조)
  */
 
 import { useState, useEffect } from 'react';
@@ -33,15 +41,24 @@ export interface EditUserModalOption {
   label: string;
 }
 
+/**
+ * 서비스별 추가 프로필 분류(sub_role) 설정.
+ *
+ * service_memberships.role / role_assignments 와 별도로 관리되는
+ * 도메인 테이블의 서브 역할을 편집할 때 사용한다.
+ *
+ * 현재 사용 서비스: K-Cosmetics (cosmetics_members.subRole — store_owner / store_staff)
+ */
 export interface ProfileClassificationConfig {
-  /** Section label e.g. "매장 역할" */
+  /** 섹션 헤더 레이블. e.g. "매장 역할" */
   label: string;
+  /** 선택 가능한 서브 역할 옵션 목록 (빈 값 "미지정" 은 컴포넌트가 자동 추가). */
   options: EditUserModalOption[];
-  /** Returns path to GET current classification e.g. (id) => `/cosmetics/members/${id}` */
+  /** 현재 분류 값을 가져올 경로 반환. e.g. (id) => `/cosmetics/members/${id}` */
   fetchPath: (userId: string) => string;
-  /** Returns path to PATCH classification e.g. (id) => `/cosmetics/members/${id}` */
+  /** 분류 값을 저장할 PATCH 경로 반환. e.g. (id) => `/cosmetics/members/${id}` */
   patchPath: (userId: string) => string;
-  /** Key in GET response data object. e.g. 'subRole' */
+  /** GET 응답 data 객체에서 값을 읽을 필드명. e.g. 'subRole' */
   responseField: string;
 }
 
@@ -51,20 +68,53 @@ export type ApiRequestFn = (
   data?: unknown,
 ) => Promise<unknown>;
 
+/**
+ * CommonEditUserModal 에 주입하는 서비스별 설정 객체.
+ *
+ * 각 서비스(Neture / GlycoPharm / K-Cosmetics)의 thin wrapper 파일에서
+ * 정적 상수로 정의하여 컴포넌트에 전달한다.
+ * UI · API · 페이로드 구조는 이 config 로만 달라지며, 컴포넌트 로직은 공통이다.
+ */
 export interface EditUserModalConfig {
-  /** Canonical service key. e.g. 'neture' | 'glycopharm' | 'k-cosmetics' */
+  /**
+   * 서비스 canonical 키.
+   * service_memberships 조회 및 역할 변경 API 경로에 사용된다.
+   * e.g. 'neture' | 'glycopharm' | 'k-cosmetics'
+   */
   serviceKey: string;
-  /** Injected API adapter. Paths are WITHOUT /api/v1 prefix. */
+  /**
+   * 서비스별 API 어댑터.
+   * 각 서비스의 authClient/api 인스턴스를 감싸 메서드·URL 규칙을 흡수한다.
+   * 경로는 /api/v1 접두사 없이 전달한다 (어댑터 내부에서 처리).
+   */
   makeRequest: ApiRequestFn;
-  /** service_memberships.role dropdown options */
+  /**
+   * service_memberships.role 드롭다운 옵션.
+   * 서비스마다 허용 역할이 다르므로 wrapper 에서 정의한다.
+   * e.g. Neture: [supplier, partner] / GP: [pharmacy, supplier] / K-Cos: [seller, consumer, ...]
+   */
   membershipRoleOptions: EditUserModalOption[];
-  /** role_assignments dropdown options (first value '' = 일반 회원) */
+  /**
+   * role_assignments 드롭다운 옵션.
+   * 첫 번째 항목은 반드시 value='' (일반 회원 — 역할 없음)이어야 한다.
+   * e.g. ['', 'neture:operator', 'neture:admin']
+   */
   adminRoleOptions: EditUserModalOption[];
-  /** Section header for business info. Default: "사업자 정보" */
+  /**
+   * 사업자/매장 정보 섹션 헤더 레이블.
+   * Default: "사업자 정보" (GP 는 "약국 정보" 로 오버라이드)
+   */
   businessInfoLabel?: string;
-  /** Field label for business name. Default: "사업자명" */
+  /**
+   * 사업자명 필드 레이블.
+   * Default: "사업자명" (GP 는 "약국명" 으로 오버라이드)
+   */
   businessNameLabel?: string;
-  /** Optional service-specific profile classification (sub_role). */
+  /**
+   * 서비스별 추가 프로필 분류 (도메인 테이블 sub_role).
+   * 현재 K-Cosmetics 만 사용 (cosmetics_members.subRole).
+   * 미제공 시 해당 섹션 렌더링 생략.
+   */
   profileClassification?: ProfileClassificationConfig;
 }
 

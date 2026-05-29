@@ -4,10 +4,14 @@
  * WO-O4O-OPERATOR-EDITUSER-MODAL-PHASE1-NETURE-GP-KCOS-V1
  * 공통 모달: @o4o/operator-core-ui CommonEditUserModal
  *
- * K-Cosmetics specific:
- *   - cosmetics_members.sub_role (store_owner / store_staff)
- *   - GET  /cosmetics/members/:userId  — sub_role 조회
- *   - PATCH /cosmetics/members/:userId — sub_role 저장
+ * 이 파일의 역할:
+ *   - K-Cosmetics 전용 EditUserModalConfig (KCOSMETICS_CONFIG) 정의 및 주입
+ *   - API 어댑터: K-Cosmetics api 인스턴스 래핑 (/api/v1 접두사 제거 처리)
+ *   - 회원 유형: seller / consumer / pharmacist / supplier / partner
+ *   - profileClassification 사용: cosmetics_members.subRole (store_owner / store_staff)
+ *     - GET  /cosmetics/members/:userId — subRole 조회
+ *     - PATCH /cosmetics/members/:userId — subRole 저장
+ *     → 3개 서비스 중 profileClassification 을 실제 사용하는 유일한 서비스
  */
 
 import { CommonEditUserModal, type EditUserModalConfig } from '@o4o/operator-core-ui';

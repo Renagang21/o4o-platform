@@ -6,6 +6,16 @@
  * MemberManagementPage Drawer 인라인 편집 로직을 독립 모달로 추출.
  * CommonEditUserModal 과 병렬 구조 (같은 members module 내 배치).
  *
+ * ─── CommonEditUserModal 통합 금지 원칙 ───────────────────────
+ * KPA 는 아래 구조 차이로 인해 CommonEditUserModal 적용 대상이 아니다.
+ * 해당 이유가 해소되지 않는 한 이 파일을 CommonEditUserModal 로 대체하지 말 것.
+ *
+ *   1. ID 기준: kpa_members.id — CommonEditUserModal 은 users.id 기반
+ *   2. 분리 API: /info (기본 정보) vs /status (상태) — CommonEditUserModal 은 단일 PUT
+ *   3. KPA 전용 비즈니스 로직: activity_type → store_owner 자동 부여/회수 + warnings[]
+ *   4. makeRequest 경로 기준: /api/v1/kpa 상대경로 (/members/...)
+ * ────────────────────────────────────────────────────────────────
+ *
  * KPA 특수 사항:
  *   - ID: kpa_members.id (또는 service_memberships.id) — users.id 아님
  *   - PATCH /members/:id/info  — 기본 정보 + 약국 정보 + activity_type

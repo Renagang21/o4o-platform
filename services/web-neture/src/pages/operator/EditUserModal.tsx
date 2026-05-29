@@ -3,6 +3,12 @@
  *
  * WO-O4O-OPERATOR-EDITUSER-MODAL-PHASE1-NETURE-GP-KCOS-V1
  * 공통 모달: @o4o/operator-core-ui CommonEditUserModal
+ *
+ * 이 파일의 역할:
+ *   - Neture 전용 EditUserModalConfig (NETURE_CONFIG) 정의 및 주입
+ *   - API 어댑터: Neture api 인스턴스 래핑 (baseURL 에 /api/v1 포함)
+ *   - 회원 유형: supplier / partner (customer·seller 제외 — 주석 참고)
+ *   - profileClassification: 없음 (Neture 는 sub_role 미사용)
  */
 
 import { CommonEditUserModal, type EditUserModalConfig } from '@o4o/operator-core-ui';
