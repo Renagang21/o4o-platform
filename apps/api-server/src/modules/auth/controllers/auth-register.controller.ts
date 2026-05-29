@@ -225,6 +225,42 @@ export class AuthRegisterController extends BaseController {
           }
         }
 
+        // WO-O4O-GLYCOPHARM-MEMBERSHIP-APPROVAL-NOTIFICATION-V1:
+        //   기존 계정 GlycoPharm 가입 신청 시 운영자(glycopharm:operator / glycopharm:admin) 알림.
+        //   KPA / K-Cosmetics 패턴과 동일 — best-effort.
+        if (serviceKey === 'glycopharm') {
+          try {
+            const operators: { userId: string }[] = await AppDataSource.query(
+              `SELECT DISTINCT user_id AS "userId"
+                 FROM role_assignments
+                WHERE role IN ('glycopharm:operator','glycopharm:admin')
+                  AND is_active = true
+                LIMIT 20`,
+            );
+            await Promise.allSettled(
+              operators.map((op) =>
+                notificationService.createNotification({
+                  userId: op.userId,
+                  type: 'member.registration_pending',
+                  title: 'GlycoPharm 신규 회원 승인 대기',
+                  message: '신규 회원 가입 신청이 접수되었습니다. 회원관리에서 승인 여부를 확인해 주세요.',
+                  serviceKey: 'glycopharm',
+                  actorId: existingUser.id,
+                  metadata: {
+                    userId: existingUser.id,
+                    targetUrl: '/operator/members?tab=status-pending',
+                  },
+                }),
+              ),
+            );
+          } catch (notifyError) {
+            logger.warn('[AuthRegisterController.register] GlycoPharm operator notification failed (best-effort)', {
+              error: notifyError instanceof Error ? notifyError.message : String(notifyError),
+              userId: existingUser.id,
+            });
+          }
+        }
+
         return BaseController.created(res, {
           message: '서비스 가입 신청이 완료되었습니다. 승인을 기다려주세요.',
           user: {
@@ -451,6 +487,42 @@ export class AuthRegisterController extends BaseController {
           );
         } catch (notifyError) {
           logger.warn('[AuthRegisterController.register] K-Cosmetics operator notification failed (best-effort)', {
+            error: notifyError instanceof Error ? notifyError.message : String(notifyError),
+            userId: user.id,
+          });
+        }
+      }
+
+      // WO-O4O-GLYCOPHARM-MEMBERSHIP-APPROVAL-NOTIFICATION-V1:
+      //   신규 계정 GlycoPharm 가입 신청 시 운영자(glycopharm:operator / glycopharm:admin) 알림.
+      //   KPA / K-Cosmetics 패턴과 동일 — best-effort.
+      if (serviceKey === 'glycopharm') {
+        try {
+          const operators: { userId: string }[] = await AppDataSource.query(
+            `SELECT DISTINCT user_id AS "userId"
+               FROM role_assignments
+              WHERE role IN ('glycopharm:operator','glycopharm:admin')
+                AND is_active = true
+              LIMIT 20`,
+          );
+          await Promise.allSettled(
+            operators.map((op) =>
+              notificationService.createNotification({
+                userId: op.userId,
+                type: 'member.registration_pending',
+                title: 'GlycoPharm 신규 회원 승인 대기',
+                message: '신규 회원 가입 신청이 접수되었습니다. 회원관리에서 승인 여부를 확인해 주세요.',
+                serviceKey: 'glycopharm',
+                actorId: user.id,
+                metadata: {
+                  userId: user.id,
+                  targetUrl: '/operator/members?tab=status-pending',
+                },
+              }),
+            ),
+          );
+        } catch (notifyError) {
+          logger.warn('[AuthRegisterController.register] GlycoPharm operator notification failed (best-effort)', {
             error: notifyError instanceof Error ? notifyError.message : String(notifyError),
             userId: user.id,
           });

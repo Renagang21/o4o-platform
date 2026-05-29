@@ -8,6 +8,8 @@
 import type { DataSource } from 'typeorm';
 import { GlycopharmMember } from '../entities/glycopharm-member.entity.js';
 import { RoleAssignmentService } from '../../../modules/auth/services/role-assignment.service.js';
+// WO-O4O-GLYCOPHARM-MEMBERSHIP-APPROVAL-NOTIFICATION-V1: 승인/거절 in-app 알림
+import { notificationService } from '../../../services/NotificationService.js';
 
 export interface ApplyMemberDto {
   subRole: 'pharmacy_owner' | 'staff_pharmacist';
@@ -123,6 +125,24 @@ export class GlycopharmMemberService {
       });
     }
 
+    // WO-O4O-GLYCOPHARM-MEMBERSHIP-APPROVAL-NOTIFICATION-V1: 승인 in-app 알림 (best-effort)
+    try {
+      await notificationService.createNotification({
+        userId: member.userId,
+        type: 'member.registration_approved',
+        title: 'GlycoPharm 가입 승인 완료',
+        message: 'GlycoPharm 서비스 가입이 승인되었습니다.',
+        serviceKey: 'glycopharm',
+        actorId: operatorId,
+        metadata: {
+          memberId: member.id,
+          targetUrl: '/mypage',
+        },
+      });
+    } catch (notifyError) {
+      console.warn('[GlycoPharm Notification] Approval notify failed (best-effort):', notifyError);
+    }
+
     return member;
   }
 
@@ -152,6 +172,25 @@ export class GlycopharmMemberService {
        WHERE user_id = $1 AND service_key = 'glycopharm'`,
       [member.userId, reason ?? null],
     );
+
+    // WO-O4O-GLYCOPHARM-MEMBERSHIP-APPROVAL-NOTIFICATION-V1: 거절 in-app 알림 (best-effort)
+    try {
+      await notificationService.createNotification({
+        userId: member.userId,
+        type: 'member.registration_rejected',
+        title: 'GlycoPharm 가입 신청 반려',
+        message: 'GlycoPharm 서비스 가입 신청이 반려되었습니다. 자세한 내용은 마이페이지에서 확인해 주세요.',
+        serviceKey: 'glycopharm',
+        actorId: operatorId,
+        metadata: {
+          memberId: member.id,
+          rejectionReason: reason ?? null,
+          targetUrl: '/mypage',
+        },
+      });
+    } catch (notifyError) {
+      console.warn('[GlycoPharm Notification] Rejection notify failed (best-effort):', notifyError);
+    }
 
     return member;
   }
