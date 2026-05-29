@@ -120,6 +120,7 @@ export default function UsersPage() {
         { key: 'consumer', label: '소비자', roleFilter: ['consumer', 'customer'] },
       ]}
       statusTabs={[
+        { key: 'status-active', label: '활성', status: 'active' },
         { key: 'suspended', label: '정지', status: 'suspended' },
         { key: 'withdrawn', label: '탈퇴', status: 'withdrawn' },
       ]}

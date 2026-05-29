@@ -12,6 +12,7 @@ const STATUS_STYLES: Record<string, { label: string; color: string; bg: string }
   pending:   { label: '대기', color: 'text-amber-700', bg: 'bg-amber-50 border-amber-200' },
   rejected:  { label: '반려', color: 'text-red-700',   bg: 'bg-red-50 border-red-200' },
   suspended: { label: '정지', color: 'text-red-700',   bg: 'bg-red-50 border-red-200' },
+  withdrawn: { label: '탈퇴',   color: 'text-slate-600', bg: 'bg-slate-100 border-slate-300' },
   inactive:  { label: '비활성', color: 'text-slate-500', bg: 'bg-slate-50 border-slate-200' },
 };
 

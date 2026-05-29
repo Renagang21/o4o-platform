@@ -1,467 +1,226 @@
 /**
- * GlycopharmMembersPage
+ * GlycopharmMembersPage — GlycoPharm operator 회원 관리 (공통 wrapper)
  *
- * WO-GLYCOPHARM-OPERATOR-MEMBER-MANAGEMENT-V1
- * WO-O4O-OPERATOR-DATATABLE-SOURCE-ALIGN-V1: DataTable @o4o/ui → @o4o/operator-ux-core
+ * WO-O4O-MEMBER-MANAGEMENT-STATUS-TABS-CANONICALIZATION-V1
  *
- * 운영자용 약사 회원 신청 목록 / 상세 / 승인 / 거절 화면
+ * 선행: 독립 구현(dropdown 필터) → OperatorMembersConsolePage wrapper 전환.
+ * Operator 권한: 승인/반려/정지/복원/탈퇴처리 가능, hard delete 불가 (admin 전용).
+ *
+ * 상태 탭: 승인(active) / 반려 / 정지 / 탈퇴 + 가입 신청(pending, wrapper 자동 추가)
+ *
+ * approved ↔ active 매핑:
+ *   - service_memberships.status 기준 조회 → 승인 탭은 status=active 사용
+ *   - approve 액션 → wrapper가 status='approved' 전달 → backend에서 active 변환 처리
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { UserCheck, UserX, UserMinus } from 'lucide-react';
 import {
-  Users, CheckCircle, XCircle, Filter, RefreshCw, AlertCircle,
-  ChevronLeft, ChevronRight,
-} from 'lucide-react';
-import { BaseDetailDrawer } from '@o4o/ui';
-import { DataTable } from '@o4o/operator-ux-core';
-import type { ListColumnDef } from '@o4o/operator-ux-core';
-import { glycopharmApi } from '@/api/glycopharm';
-import type { GlycopharmMemberRecord, GlycopharmMemberStatus } from '@/api/glycopharm';
-import StatusBadge from '../../components/common/StatusBadge';
-import PageHeader from '../../components/common/PageHeader';
+  OperatorMembersConsolePage,
+  type MembersConsoleClient,
+  type MembersConsoleListParams,
+  type UserData,
+} from '@o4o/operator-core-ui/modules/members';
+import { ConfirmActionDialog } from '@o4o/ui';
+import { toast } from '@o4o/error-handling';
+import { api } from '../../lib/apiClient';
+import EditUserModal from './EditUserModal';
 
-type SubRoleFilter = '' | 'pharmacy_owner' | 'staff_pharmacist';
+// ─── Client adapter ──────────────────────────────────────────
 
-const SUBROLE_LABEL: Record<string, string> = {
-  pharmacy_owner: '약국경영자',
-  staff_pharmacist: '근무약사',
+const gpOperatorClient: MembersConsoleClient = {
+  async list(params: MembersConsoleListParams) {
+    const usp = new URLSearchParams();
+    usp.set('page', String(params.page));
+    usp.set('limit', String(params.limit));
+    usp.set('serviceKey', 'glycopharm');
+    if (params.status) usp.set('status', params.status);
+    if (params.search) usp.set('search', params.search);
+    const { data } = await api.get(`/operator/members?${usp}`);
+    return { users: data.users || [], pagination: data.pagination };
+  },
+  async listAll() {
+    const { data } = await api.get('/operator/members?limit=1000&serviceKey=glycopharm');
+    return { users: data.users || [] };
+  },
+  async stats() {
+    const { data } = await api.get('/operator/members/stats?serviceKey=glycopharm');
+    return data;
+  },
+  async updateStatus(userId, status) {
+    await api.patch(`/operator/members/${userId}/status`, { status });
+  },
+  async batchUpdateStatus(ids, status) {
+    const { data } = await api.post('/operator/members/batch-status', { ids, status });
+    return data;
+  },
+  async updatePassword(userId, password) {
+    await api.put(`/operator/members/${userId}`, { password });
+  },
 };
 
+// ─── Soft delete flow (operator only — hard delete는 admin 전용) ──
 
-export default function GlycopharmMembersPage() {
-  const [members, setMembers] = useState<GlycopharmMemberRecord[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(0);
-  const totalPages = total > 0 ? Math.ceil(total / 20) : 0;
+function GpOperatorDeleteFlow({
+  user,
+  onClose,
+  onDeleted,
+}: {
+  user: UserData;
+  onClose: () => void;
+  onDeleted: () => void;
+}) {
+  const [loading, setLoading] = useState(false);
+  const displayName =
+    user.name || `${user.lastName || ''}${user.firstName || ''}`.trim() || user.email.split('@')[0];
 
-  // Filters
-  const [statusFilter, setStatusFilter] = useState<GlycopharmMemberStatus | ''>('');
-  const [subRoleFilter, setSubRoleFilter] = useState<SubRoleFilter>('');
-  const [keyword, setKeyword] = useState('');
-
-  // Detail modal
-  const [selected, setSelected] = useState<GlycopharmMemberRecord | null>(null);
-
-  // Approve confirm modal
-  const [approveTarget, setApproveTarget] = useState<GlycopharmMemberRecord | null>(null);
-
-  // Reject modal
-  const [rejectTarget, setRejectTarget] = useState<GlycopharmMemberRecord | null>(null);
-  const [rejectReason, setRejectReason] = useState('');
-
-  // Action state
-  const [actionLoading, setActionLoading] = useState(false);
-  const [actionError, setActionError] = useState<string | null>(null);
-
-  useEffect(() => {
-    loadMembers();
-  }, [statusFilter, subRoleFilter, page]);
-
-  const loadMembers = async () => {
+  const handle = async () => {
     setLoading(true);
-    setError(null);
     try {
-      const res = await glycopharmApi.listGlycopharmMembers({
-        status: statusFilter || undefined,
-        subRole: subRoleFilter || undefined,
-        page,
-        limit: 20,
-      });
-      setMembers(res.data.items);
-      setTotal(res.data.total);
+      await api.delete(`/operator/members/${user.id}?mode=soft`);
+      toast.success('탈퇴 처리 완료. 필요 시 관리자를 통해 재활성화할 수 있습니다.');
+      onDeleted();
     } catch (err: any) {
-      setError(err?.message || '목록을 불러오는데 실패했습니다.');
+      toast.error(err?.message || '탈퇴 처리에 실패했습니다.');
     } finally {
       setLoading(false);
     }
   };
 
-  const clearFilters = () => {
-    setStatusFilter('');
-    setSubRoleFilter('');
-    setKeyword('');
-    setPage(1);
-  };
-
-  // Client-side keyword filter (pharmacyName / licenseNumber)
-  const filtered = keyword.trim()
-    ? members.filter((m) => {
-        const q = keyword.trim().toLowerCase();
-        return (
-          m.metadata?.pharmacyName?.toLowerCase().includes(q) ||
-          m.metadata?.licenseNumber?.toLowerCase().includes(q)
-        );
-      })
-    : members;
-
-  const handleApprove = async () => {
-    if (!approveTarget) return;
-    setActionLoading(true);
-    setActionError(null);
-    try {
-      await glycopharmApi.approveMember(approveTarget.id);
-      setApproveTarget(null);
-      loadMembers();
-    } catch (err: any) {
-      setActionError(err?.response?.data?.error || '승인 처리 중 오류가 발생했습니다.');
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
-  const handleReject = async () => {
-    if (!rejectTarget) return;
-    setActionLoading(true);
-    setActionError(null);
-    try {
-      await glycopharmApi.rejectMember(rejectTarget.id, rejectReason.trim() || undefined);
-      setRejectTarget(null);
-      setRejectReason('');
-      loadMembers();
-    } catch (err: any) {
-      setActionError(err?.response?.data?.error || '거절 처리 중 오류가 발생했습니다.');
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
-  const openRejectModal = (record: GlycopharmMemberRecord) => {
-    setSelected(null);
-    setRejectReason('');
-    setActionError(null);
-    setRejectTarget(record);
-  };
-
-  const openApproveModal = (record: GlycopharmMemberRecord) => {
-    setSelected(null);
-    setActionError(null);
-    setApproveTarget(record);
-  };
-
-  const hasFilters = statusFilter || subRoleFilter;
-
-  const columns: ListColumnDef<GlycopharmMemberRecord>[] = [
-    {
-      key: 'membershipType',
-      header: '유형',
-      width: '80px',
-      render: () => '약사',
-    },
-    {
-      key: 'subRole',
-      header: '세부직역',
-      width: '130px',
-      render: (v) => (v ? (SUBROLE_LABEL[v as string] ?? v) : '-'),
-    },
-    {
-      key: 'licenseNumber',
-      header: '면허번호',
-      width: '130px',
-      render: (_v, r) => r.metadata?.licenseNumber || '-',
-    },
-    {
-      key: 'pharmacyName',
-      header: '약국명',
-      render: (_v, r) => r.metadata?.pharmacyName || '-',
-    },
-    {
-      key: 'status',
-      header: '상태',
-      width: '100px',
-      render: (v) => <StatusBadge status={v} />,
-    },
-    {
-      key: 'createdAt',
-      header: '신청일',
-      width: '110px',
-      sortable: true,
-      sortAccessor: (r) => new Date(r.createdAt).getTime(),
-      render: (v) => new Date(v).toLocaleDateString('ko-KR'),
-    },
-    {
-      key: '_actions',
-      header: '관리',
-      system: true,
-      width: '80px',
-      align: 'right',
-      render: (_v, record) => (
-        <div
-          className="flex items-center justify-end gap-1"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {record.status === 'pending' && (
-            <>
-              <button
-                onClick={() => openApproveModal(record)}
-                title="승인"
-                className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-              >
-                <CheckCircle className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => openRejectModal(record)}
-                title="거절"
-                className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-              >
-                <XCircle className="w-4 h-4" />
-              </button>
-            </>
-          )}
-        </div>
-      ),
-    },
-  ];
-
   return (
-    <div className="p-6">
-      <PageHeader
-        title="약사 회원 관리"
-        description="약사 회원 신청을 검토하고 승인/거절 처리합니다."
-        icon={<Users className="w-6 h-6 text-primary-600" />}
-        actions={
-          <button
-            onClick={() => { setPage(1); loadMembers(); }}
-            className="p-2 text-slate-500 hover:bg-slate-100 rounded-lg transition-colors"
-            title="새로고침"
-          >
-            <RefreshCw className="w-4 h-4" />
-          </button>
-        }
-      />
+    <ConfirmActionDialog
+      open
+      onClose={onClose}
+      onConfirm={handle}
+      title="탈퇴 처리 확인"
+      message={`${displayName} (${user.email})\n\n이 회원을 탈퇴(비활성화) 처리하시겠습니까?\n탈퇴 처리 후 로그인이 차단되며, 필요 시 관리자를 통해 재활성화할 수 있습니다.`}
+      confirmText="탈퇴 처리"
+      variant="warning"
+      loading={loading}
+    />
+  );
+}
 
-      {/* Filters */}
-      <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
-        <div className="flex items-center gap-2 mb-4">
-          <Filter className="w-5 h-5 text-slate-400" />
-          <span className="text-sm font-medium text-slate-700">필터</span>
-          {hasFilters && (
-            <button
-              onClick={clearFilters}
-              className="ml-auto text-sm text-primary-600 hover:text-primary-700"
-            >
-              필터 초기화
-            </button>
-          )}
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="block text-xs text-slate-500 mb-1">상태</label>
-            <select
-              value={statusFilter}
-              onChange={(e) => {
-                setStatusFilter(e.target.value as GlycopharmMemberStatus | '');
-                setPage(1);
-              }}
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-            >
-              <option value="">전체</option>
-              <option value="pending">대기</option>
-              <option value="approved">승인됨</option>
-              <option value="rejected">반려됨</option>
-              <option value="suspended">정지됨</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs text-slate-500 mb-1">세부직역</label>
-            <select
-              value={subRoleFilter}
-              onChange={(e) => {
-                setSubRoleFilter(e.target.value as SubRoleFilter);
-                setPage(1);
-              }}
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-            >
-              <option value="">전체</option>
-              <option value="pharmacy_owner">약국경영자</option>
-              <option value="staff_pharmacist">근무약사</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs text-slate-500 mb-1">검색 (약국명 / 면허번호)</label>
-            <input
-              type="text"
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              placeholder="약국명 또는 면허번호"
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-            />
-          </div>
-        </div>
-      </div>
+// ─── Main Component ──────────────────────────────────────────
 
-      {/* Stats */}
-      <div className="flex items-center gap-4 mb-4">
-        <span className="text-sm text-slate-500">
-          총 <span className="font-medium text-slate-700">{total}</span>건
-        </span>
-      </div>
-
-      {/* Error */}
-      {error && !loading && (
-        <div className="bg-white rounded-xl shadow-sm p-8 text-center mb-4">
-          <p className="text-red-600 mb-4">{error}</p>
-          <button
-            onClick={loadMembers}
-            className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
-          >
-            다시 시도
-          </button>
-        </div>
+export default function GlycopharmMembersPage() {
+  return (
+    <OperatorMembersConsolePage
+      serviceKey="glycopharm"
+      client={gpOperatorClient}
+      title="약사 회원 관리"
+      description="약사 회원 신청을 검토하고 승인/거절 처리합니다."
+      roleTabs={[
+        { key: 'pharmacist', label: '약사', roleFilter: ['pharmacist', 'pharmacy'] },
+      ]}
+      statusTabs={[
+        { key: 'status-active',    label: '승인',  status: 'active' },
+        { key: 'status-rejected',  label: '반려',  status: 'rejected' },
+        { key: 'status-suspended', label: '정지',  status: 'suspended' },
+        { key: 'status-withdrawn', label: '탈퇴',  status: 'withdrawn' },
+      ]}
+      renderEditModal={({ user, onClose, onSuccess }) => (
+        <EditUserModal userId={user.id} onClose={onClose} onSuccess={onSuccess} />
       )}
-
-      {/* Table */}
-      <div className="bg-white rounded-xl shadow-sm">
-        <DataTable<GlycopharmMemberRecord>
-          columns={columns}
-          data={filtered}
-          rowKey="id"
-          loading={loading}
-          onRowClick={(r) => setSelected(r)}
-          emptyMessage="등록된 약사 회원 신청이 없습니다"
-          tableId="glycopharm-operator-members"
-        />
-        {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-3 py-4 border-t border-slate-100">
-            <button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page <= 1}
-              className="flex items-center gap-1 px-3 py-2 border rounded-lg disabled:opacity-50 hover:bg-slate-50"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              이전
-            </button>
-            <span className="text-sm text-slate-600">
-              {page} / {totalPages}
-            </span>
-            <button
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page >= totalPages}
-              className="flex items-center gap-1 px-3 py-2 border rounded-lg disabled:opacity-50 hover:bg-slate-50"
-            >
-              다음
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* ── 상세 Drawer ── */}
-      <BaseDetailDrawer
-        open={!!selected}
-        onClose={() => setSelected(null)}
-        title={selected?.metadata?.pharmacyName || '회원 신청 상세'}
-        width={520}
-        actions={
-          selected?.status === 'pending'
-            ? [
-                { label: '거절', onClick: () => openRejectModal(selected), variant: 'danger' },
-                { label: '승인', onClick: () => openApproveModal(selected), variant: 'primary' },
-              ]
-            : []
-        }
-      >
-        {selected && (
-          <div style={{ fontSize: 14, color: '#374151' }}>
-            {[
-              { label: '사용자 ID', value: <span style={{ fontFamily: 'monospace', fontSize: 12 }}>{selected.userId}</span> },
-              { label: '회원 유형', value: '약사' },
-              { label: '세부직역', value: selected.subRole ? (SUBROLE_LABEL[selected.subRole] ?? selected.subRole) : '-' },
-              { label: '면허번호', value: selected.metadata?.licenseNumber || '-' },
-              { label: '약국명', value: selected.metadata?.pharmacyName || '-' },
-              { label: '약국 주소', value: selected.metadata?.pharmacyAddress || '-' },
-              { label: '상태', value: <StatusBadge status={selected.status} /> },
-              ...(selected.rejectionReason ? [{ label: '거절 사유', value: <span style={{ color: '#dc2626' }}>{selected.rejectionReason}</span> }] : []),
-              { label: '신청일', value: new Date(selected.createdAt).toLocaleDateString('ko-KR') },
-              ...(selected.approvedAt ? [{ label: '승인일', value: new Date(selected.approvedAt).toLocaleDateString('ko-KR') }] : []),
-            ].map((item) => (
-              <div key={item.label} style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
-                <span style={{ fontWeight: 600, color: '#64748b', minWidth: 80, flexShrink: 0 }}>{item.label}</span>
-                <span style={{ color: '#1e293b' }}>{item.value}</span>
-              </div>
-            ))}
-          </div>
-        )}
-      </BaseDetailDrawer>
-
-      {/* ── 승인 확인 모달 ── */}
-      {approveTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm">
-            <div className="px-6 py-5">
-              <h2 className="text-lg font-bold text-slate-800 mb-2">승인 확인</h2>
-              <p className="text-slate-500 text-sm">
-                이 회원 신청을 승인하시겠습니까?
-                승인 시 <strong className="text-slate-700">glycopharm:pharmacist</strong> 역할이 부여됩니다.
-              </p>
-              {actionError && (
-                <div className="mt-3 flex items-center gap-2 bg-red-50 text-red-700 rounded-lg px-3 py-2 text-sm">
-                  <AlertCircle className="w-4 h-4 shrink-0" />
-                  {actionError}
-                </div>
-              )}
-            </div>
-            <div className="flex gap-3 px-6 pb-6">
-              <button
-                onClick={() => { setApproveTarget(null); setActionError(null); }}
-                disabled={actionLoading}
-                className="flex-1 py-2.5 border border-slate-200 text-slate-700 rounded-xl font-medium hover:bg-slate-50 transition-colors disabled:opacity-50"
-              >
-                취소
-              </button>
-              <button
-                onClick={handleApprove}
-                disabled={actionLoading}
-                className="flex-1 py-2.5 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors disabled:opacity-50"
-              >
-                {actionLoading ? '처리 중...' : '승인'}
-              </button>
-            </div>
-          </div>
-        </div>
+      renderDeleteFlow={({ user, onClose, onDeleted }) => (
+        <GpOperatorDeleteFlow user={user} onClose={onClose} onDeleted={onDeleted} />
       )}
-
-      {/* ── 거절 모달 ── */}
-      {rejectTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm">
-            <div className="px-6 py-5">
-              <h2 className="text-lg font-bold text-slate-800 mb-2">거절 처리</h2>
-              <p className="text-slate-500 text-sm mb-3">거절 사유를 입력하면 신청자 화면에 표시됩니다.</p>
-              <textarea
-                value={rejectReason}
-                onChange={(e) => setRejectReason(e.target.value)}
-                placeholder="거절 사유 입력 (선택)"
-                rows={3}
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary-500"
-              />
-              {actionError && (
-                <div className="mt-3 flex items-center gap-2 bg-red-50 text-red-700 rounded-lg px-3 py-2 text-sm">
-                  <AlertCircle className="w-4 h-4 shrink-0" />
-                  {actionError}
-                </div>
-              )}
-            </div>
-            <div className="flex gap-3 px-6 pb-6">
-              <button
-                onClick={() => { setRejectTarget(null); setRejectReason(''); setActionError(null); }}
-                disabled={actionLoading}
-                className="flex-1 py-2.5 border border-slate-200 text-slate-700 rounded-xl font-medium hover:bg-slate-50 transition-colors disabled:opacity-50"
-              >
-                취소
-              </button>
-              <button
-                onClick={handleReject}
-                disabled={actionLoading}
-                className="flex-1 py-2.5 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition-colors disabled:opacity-50"
-              >
-                {actionLoading ? '처리 중...' : '거절'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+      extraRowActions={[
+        {
+          key: 'suspend',
+          label: '정지',
+          variant: 'warning',
+          icon: <UserX size={14} />,
+          divider: true,
+          visible: (u) => u.status === 'active' || u.status === 'approved',
+          confirm: { title: '정지 확인', message: '이 회원을 정지하시겠습니까?', confirmText: '정지', variant: 'warning' },
+          onClick: async (u) => {
+            try {
+              await gpOperatorClient.updateStatus(u.id, 'suspended');
+              toast.success('정지 처리되었습니다.');
+            } catch (e: any) {
+              toast.error(e?.message || '정지 처리 실패');
+            }
+          },
+        },
+        {
+          key: 'restore',
+          label: '복원',
+          variant: 'default',
+          icon: <UserCheck size={14} />,
+          visible: (u) => u.status === 'suspended',
+          onClick: async (u) => {
+            try {
+              await gpOperatorClient.updateStatus(u.id, 'approved');
+              toast.success('복원되었습니다.');
+            } catch (e: any) {
+              toast.error(e?.message || '복원 실패');
+            }
+          },
+        },
+      ]}
+      extraBulkActions={[
+        {
+          key: 'bulk-suspend',
+          label: (n) => `정지 (${n})`,
+          variant: 'danger',
+          icon: <UserX size={14} />,
+          getTargetIds: (users) =>
+            users.filter((u) => u.status === 'active' || u.status === 'approved').map((u) => u.id),
+          executeBatch: async (ids) => {
+            const { data } = await api.post('/operator/members/batch-status', { ids, status: 'suspended' });
+            return { data };
+          },
+          confirm: { title: '일괄 정지 확인', message: '선택한 회원을 정지 처리합니다.', confirmText: '정지', variant: 'danger' },
+        },
+        {
+          key: 'bulk-restore',
+          label: (n) => `복원 (${n})`,
+          variant: 'primary',
+          icon: <UserCheck size={14} />,
+          getTargetIds: (users) => users.filter((u) => u.status === 'suspended').map((u) => u.id),
+          executeBatch: async (ids) => {
+            const settled = await Promise.allSettled(
+              ids.map((id) => api.patch(`/operator/members/${id}/status`, { status: 'approved' })),
+            );
+            return {
+              data: {
+                results: settled.map((r, i) => ({
+                  id: ids[i],
+                  status: r.status === 'fulfilled' ? ('success' as const) : ('failed' as const),
+                  error: r.status === 'rejected' ? (r.reason as any)?.message || '오류' : undefined,
+                })),
+              },
+            };
+          },
+        },
+        {
+          key: 'bulk-withdraw',
+          label: (n) => `탈퇴 처리 (${n})`,
+          variant: 'danger',
+          icon: <UserMinus size={14} />,
+          getTargetIds: (users) =>
+            users
+              .filter((u) => ['active', 'approved', 'suspended', 'pending'].includes(u.status))
+              .map((u) => u.id),
+          executeBatch: async (ids) => {
+            const settled = await Promise.allSettled(
+              ids.map((id) => api.delete(`/operator/members/${id}?mode=soft`)),
+            );
+            return {
+              data: {
+                results: settled.map((r, i) => ({
+                  id: ids[i],
+                  status: r.status === 'fulfilled' ? ('success' as const) : ('failed' as const),
+                  error: r.status === 'rejected' ? (r.reason as any)?.message || '오류' : undefined,
+                })),
+              },
+            };
+          },
+          confirm: { title: '일괄 탈퇴 처리 확인', message: '선택한 회원을 탈퇴(비활성화) 처리합니다.', confirmText: '탈퇴 처리', variant: 'danger' },
+        },
+      ]}
+      tableId="glycopharm-operator-members"
+    />
   );
 }
