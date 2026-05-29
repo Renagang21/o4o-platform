@@ -811,10 +811,12 @@ function AppRoutes() {
       <Route path="store/:slug/blog/:postSlug" element={<StoreBlogPostPage />} />
 
       {/* Store Owner Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1) */}
+      {/* WO-O4O-GLYCOPHARM-STORE-OWNER-ROUTE-GUARD-FIX-V1:
+          glycopharm:store_owner 도 /store 접근 허용 — Header/dashboard redirect 정합 */}
       <Route
         path="store"
         element={
-          <ProtectedRoute allowedRoles={[GLYCOPHARM_ROLES.PHARMACIST]}>
+          <ProtectedRoute allowedRoles={[GLYCOPHARM_ROLES.PHARMACIST, GLYCOPHARM_ROLES.STORE_OWNER]}>
             <StoreLayoutWrapper />
           </ProtectedRoute>
         }
