@@ -269,7 +269,7 @@ const MyEnrollmentsPage = lazy(() => import('@/pages/mypage/MyEnrollmentsPage'))
 const MyCertificatesPage = lazy(() => import('@/pages/mypage/MyCertificatesPage'));
 const MyCreditsPage = lazy(() => import('@/pages/mypage/MyCreditsPage'));
 // WO-O4O-MYPAGE-MY-REQUESTS-INBOX-GLYCO-KCOS-ROUTE-V1
-const MyRequestsPage = lazy(() => import('@/pages/mypage/MyRequestsPage'));
+const MyRequestsInboxPage = lazy(() => import('@/pages/mypage/MyRequestsPage'));
 // Lesson Player (WO-O4O-GLYCOPHARM-LMS-PHASE2-LEARNER-FRONTEND-V1)
 const LmsLessonPage = lazy(() => import('@/pages/education/LmsLessonPage'));
 
@@ -620,7 +620,7 @@ function AppRoutes() {
         {/* WO-O4O-MYPAGE-MY-REQUESTS-INBOX-GLYCO-KCOS-ROUTE-V1 */}
         <Route path="mypage/my-requests" element={
           <SoftGuard feature="mypage">
-            <MyRequestsPage />
+            <MyRequestsInboxPage />
           </SoftGuard>
         } />
 
