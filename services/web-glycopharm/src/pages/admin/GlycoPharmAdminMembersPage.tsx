@@ -96,7 +96,7 @@ function GpAdminDeleteFlow({
   useEffect(() => {
     api
       .get(`/operator/members/${user.id}/delete-risk`)
-      .then((r) => setRiskData(r.data?.data ?? r.data))
+      .then((r: any) => setRiskData(r.data?.data ?? r.data))
       .catch((e: any) => toast.error(e?.message || '리스크 조회 실패'))
       .finally(() => setLoading(false));
   }, [user.id]);
@@ -286,15 +286,14 @@ export default function GlycoPharmAdminMembersPage() {
       serviceKey="glycopharm"
       client={adminMembersClient}
       roleTabs={[
-        { key: 'all', label: '전체' },
-        { key: 'pharmacist', label: '약사' },
-        { key: 'pharmacy_owner', label: '약국 경영자' },
+        { key: 'pharmacist', label: '약사', roleFilter: ['pharmacist', 'pharmacy'] },
+        { key: 'pharmacy_owner', label: '약국 경영자', roleFilter: ['pharmacy_owner'] },
       ]}
       renderDeleteFlow={({ user, onClose, onDeleted }) => (
         <GpAdminDeleteFlow user={user} onClose={onClose} onDeleted={onDeleted} />
       )}
-      renderEditModal={({ user, onClose, onSaved }) => (
-        <EditUserModal user={user} onClose={onClose} onSaved={onSaved} />
+      renderEditModal={({ user, onClose, onSuccess }) => (
+        <EditUserModal userId={user.id} onClose={onClose} onSuccess={onSuccess} />
       )}
       tableId="glycopharm-admin-members"
     />
