@@ -14,6 +14,7 @@ import { CosmeticsStoreSummaryService } from '../services/cosmetics-store-summar
 import { CosmeticsStorePlaylistService } from '../services/cosmetics-store-playlist.service.js';
 import { CosmeticsStoreInsightsService } from '../services/cosmetics-store-insights.service.js';
 import type { AuthRequest } from '../../../types/auth.js';
+import { cosmeticsStoreApplicationToCanonical } from '../utils/canonical-status.js';
 
 function errorResponse(
   res: Response,
@@ -334,7 +335,25 @@ export function createCosmeticsStoreController(
         const userId = authReq.user?.id || authReq.authUser?.id || '';
 
         const result = await service.getMyApplications(userId);
-        res.json(result);
+        // WO-O4O-MYPAGE-MY-REQUESTS-INBOX-BACKEND-FOUNDATION-V1: canonicalStatus 추가
+        const applications = (result.data || []).map((app) => ({
+          id: app.id,
+          applicantUserId: app.applicantUserId,
+          storeName: app.storeName,
+          businessNumber: app.businessNumber,
+          ownerName: app.ownerName,
+          contactPhone: app.contactPhone ?? null,
+          address: app.address ?? null,
+          region: app.region ?? null,
+          note: app.note ?? null,
+          status: app.status,
+          canonicalStatus: cosmeticsStoreApplicationToCanonical(app.status),
+          rejectionReason: app.rejectionReason ?? null,
+          reviewedAt: app.reviewedAt ?? null,
+          createdAt: app.createdAt,
+          updatedAt: app.updatedAt,
+        }));
+        res.json({ data: applications });
       } catch (error: any) {
         console.error('[CosmeticsStore] Get my applications error:', error);
         errorResponse(res, 500, 'STORE_500', 'Internal server error');

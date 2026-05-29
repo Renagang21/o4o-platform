@@ -17,6 +17,7 @@ import type { DataSource } from 'typeorm';
 import { body, query, validationResult } from 'express-validator';
 import { GlycopharmMemberService } from '../services/glycopharm-member.service.js';
 import { hasAnyServiceRole } from '../../../utils/role.utils.js';
+import { glycopharmMemberToCanonical } from '../utils/canonical-status.js';
 
 interface AuthRequest extends Request {
   user?: {
@@ -100,7 +101,26 @@ export function createGlycopharmMemberController(
     }
 
     const member = await memberService.getMyMembership(userId);
-    res.json({ success: true, data: member });
+    res.json({
+      success: true,
+      data: member
+        ? {
+            id: member.id,
+            userId: member.userId,
+            membershipType: member.membershipType,
+            subRole: member.subRole ?? null,
+            organizationId: member.organizationId ?? null,
+            status: member.status,
+            // WO-O4O-MYPAGE-MY-REQUESTS-INBOX-BACKEND-FOUNDATION-V1
+            canonicalStatus: glycopharmMemberToCanonical(member.status),
+            approvedAt: member.approvedAt ?? null,
+            rejectionReason: member.rejectionReason ?? null,
+            metadata: member.metadata ?? null,
+            createdAt: member.createdAt,
+            updatedAt: member.updatedAt,
+          }
+        : null,
+    });
   });
 
   // ─── GET /members (operator) ───────────────────────────────────

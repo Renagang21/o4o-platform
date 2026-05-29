@@ -9,6 +9,7 @@ import { Router, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { body, query, param, validationResult } from 'express-validator';
 import { normalizeBusinessNumber } from '../../../utils/business-number.js';
+import { glycopharmApplicationToCanonical } from '../utils/canonical-status.js';
 import { StoreSlugService, normalizeSlug } from '@o4o/platform-core/store-identity';
 import { GlycopharmApplication } from '../entities/glycopharm-application.entity.js';
 import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
@@ -265,6 +266,8 @@ export function createApplicationController(
             serviceTypes: app.serviceTypes,
             note: app.note,
             status: app.status,
+            // WO-O4O-MYPAGE-MY-REQUESTS-INBOX-BACKEND-FOUNDATION-V1
+            canonicalStatus: glycopharmApplicationToCanonical(app.status),
             rejectionReason: app.rejectionReason,
             submittedAt: app.submittedAt,
             decidedAt: app.decidedAt,
