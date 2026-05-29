@@ -51,12 +51,11 @@ const GP_AXES: OperatorAxisGroup[] = [
   {
     key: 'pharmacy-hub',
     title: '약국 HUB 운영',
-    description: '매장 · 신청 · 채널 · 설문',
+    description: '매장 · 채널 · 설문',
     icon: '🏥',
     tone: 'emerald',
     links: [
       { key: 'stores', label: '매장 관리', href: '/operator/stores' },
-      { key: 'applications', label: '신청 관리', href: '/operator/applications' },
       { key: 'channels', label: '채널 관리', href: '/operator/store-channels' },
       { key: 'surveys', label: '설문 관리', href: '/operator/surveys' },
     ],
@@ -125,7 +124,7 @@ export default function GlycoPharmOperatorDashboard() {
         <div>
           <h1 className="text-2xl font-bold text-slate-800">운영 대시보드</h1>
           <p className="text-sm text-slate-500 mt-1">
-            GlycoPharm 운영 실행 — 신청 처리 · 약국·매장 운영 · 콘텐츠 관리
+            GlycoPharm 운영 실행 — 약국·매장 운영 · 콘텐츠 관리
           </p>
         </div>
         <button

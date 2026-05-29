@@ -27,7 +27,6 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   dashboard: [{ label: '대시보드', path: '/operator', exact: true }],
   users: [{ label: '회원 관리', path: '/operator/members' }],
   approvals: [
-    { label: '신청 관리', path: '/operator/applications' },
     { label: '매장 승인', path: '/operator/store-approvals' },
     { label: '약사 회원 관리', path: '/operator/members' },
     // WO-O4O-GLYCOPHARM-OPERATOR-EVENT-OFFER-APPROVAL-V1
@@ -113,7 +112,6 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
   dashboard: [{ label: '대시보드', path: '/operator', exact: true }],
   users: [{ label: '회원 관리', path: '/operator/members' }],
   approvals: [
-    { label: '신청 관리', path: '/operator/applications' },
     { label: '매장 승인', path: '/operator/store-approvals' },
     { label: '약사 회원 관리', path: '/operator/members' },
     { label: '이벤트 오퍼 승인', path: '/operator/event-offers' },

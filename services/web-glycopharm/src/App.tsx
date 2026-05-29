@@ -694,8 +694,6 @@ function AppRoutes() {
       >
         <Route index element={<GlycoPharmOperatorDashboard />} />
         <Route path="pharmacies" element={<PharmaciesPage />} />
-        <Route path="applications" element={<ApplicationsPage />} />
-        <Route path="applications/:id" element={<ApplicationDetailPage />} />
         <Route path="products" element={<ProductsPage />} />
         <Route path="products/:productId" element={<ProductDetailPage />} />
         <Route path="stores" element={<OperatorStoresPage />} />
