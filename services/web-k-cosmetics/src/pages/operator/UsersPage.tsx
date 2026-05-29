@@ -120,6 +120,8 @@ export default function UsersPage() {
         { key: 'consumer', label: '소비자', roleFilter: ['consumer', 'customer'] },
       ]}
       statusTabs={[
+        // WO-O4O-KCOSMETICS-MEMBERSHIP-APPROVAL-FLOW-STABILIZATION-V1: pending 탭 추가
+        { key: 'status-pending',   label: '가입 신청', status: 'pending' },
         { key: 'status-active',    label: '활성', status: 'active' },
         { key: 'status-rejected',  label: '거절', status: 'rejected' },
         { key: 'status-suspended', label: '정지', status: 'suspended' },
