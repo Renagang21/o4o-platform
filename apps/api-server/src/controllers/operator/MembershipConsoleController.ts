@@ -210,7 +210,11 @@ export class MembershipConsoleController {
         // WO-GLYCOPHARM-MEMBER-REGISTRATION-PENDING-VISIBILITY-FIX-V1:
         // When filtering by membership status, reflect the matched membership status
         // so frontend action buttons (approve/reject) render correctly
-        let effectiveStatus = u.status;
+        // WO-O4O-GLYCOPHARM-OPERATOR-MEMBER-APPROVAL-ACTIVE-STATUS-FIX-V1:
+        // Prefer service membership status over global users.status.
+        // users.status may be 'deleted'/'inactive' while membership is 'active' —
+        // in a service-scoped operator view, the membership status is authoritative.
+        let effectiveStatus = memberships.length > 0 ? memberships[0].status : u.status;
         if (status && status !== 'all' && memberships.length > 0) {
           const matched = memberships.find((m: any) => m.status === status);
           if (matched) effectiveStatus = matched.status;

@@ -165,7 +165,7 @@ export class MembershipApprovalService {
       await queryRunner.query(
         `UPDATE users SET status = 'active', "isActive" = true,
          "approvedAt" = NOW(), "approvedBy" = $1, "updatedAt" = NOW()
-         WHERE id = $2 AND status IN ('PENDING', 'pending', 'ACTIVE', 'rejected')`,
+         WHERE id = $2 AND status IN ('PENDING', 'pending', 'ACTIVE', 'active', 'inactive', 'deleted', 'rejected')`,
         [approvedBy, userId]
       );
 
