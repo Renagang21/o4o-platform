@@ -50,7 +50,7 @@ export function AdminMemberDeleteModal({ userId, userName, onClose, onDeleted }:
   useEffect(() => {
     api
       .get<{ success: boolean; data: DeleteRiskData }>(`/operator/members/${userId}/delete-risk`)
-      .then((r: { data: DeleteRiskData }) => setRiskData(r.data))
+      .then(({ data }: { data: { success: boolean; data: DeleteRiskData } }) => setRiskData(data.data))
       .catch((e: Error) => setRiskError(e.message || '리스크 정보를 불러오지 못했습니다.'))
       .finally(() => setLoading(false));
   }, [userId]);
@@ -71,9 +71,9 @@ export function AdminMemberDeleteModal({ userId, userName, onClose, onDeleted }:
 
   const target: MemberHardDeleteTarget = {
     id: userId,
-    name: riskData?.user.name || userName,
-    email: riskData?.user.email ?? null,
-    status: riskData?.user.status ?? null,
+    name: riskData?.user?.name || userName,
+    email: riskData?.user?.email ?? null,
+    status: riskData?.user?.status ?? null,
   };
 
   const hasActivity = riskData
