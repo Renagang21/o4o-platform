@@ -191,6 +191,40 @@ export class AuthRegisterController extends BaseController {
           role: effectiveRole,
         });
 
+        // WO-O4O-KCOSMETICS-MEMBERSHIP-OPERATOR-NOTIFICATION-V1
+        if (serviceKey === 'k-cosmetics') {
+          try {
+            const operators: { userId: string }[] = await AppDataSource.query(
+              `SELECT DISTINCT user_id AS "userId"
+                 FROM role_assignments
+                WHERE role IN ('cosmetics:operator','cosmetics:admin')
+                  AND is_active = true
+                LIMIT 20`,
+            );
+            await Promise.allSettled(
+              operators.map((op) =>
+                notificationService.createNotification({
+                  userId: op.userId,
+                  type: 'member.registration_pending',
+                  title: '신규 K-Cosmetics 회원 가입 신청',
+                  message: `${resolvedName || data.email}님이 K-Cosmetics 회원 가입을 신청했습니다.`,
+                  serviceKey: 'k-cosmetics',
+                  actorId: existingUser.id,
+                  metadata: {
+                    userId: existingUser.id,
+                    targetUrl: '/operator/members?tab=status-pending',
+                  },
+                }),
+              ),
+            );
+          } catch (notifyError) {
+            logger.warn('[AuthRegisterController.register] K-Cosmetics operator notification failed (best-effort)', {
+              error: notifyError instanceof Error ? notifyError.message : String(notifyError),
+              userId: existingUser.id,
+            });
+          }
+        }
+
         return BaseController.created(res, {
           message: '서비스 가입 신청이 완료되었습니다. 승인을 기다려주세요.',
           user: {
@@ -383,6 +417,40 @@ export class AuthRegisterController extends BaseController {
           );
         } catch (notifyError) {
           logger.warn('[AuthRegisterController.register] Operator notification failed (best-effort)', {
+            error: notifyError instanceof Error ? notifyError.message : String(notifyError),
+            userId: user.id,
+          });
+        }
+      }
+
+      // WO-O4O-KCOSMETICS-MEMBERSHIP-OPERATOR-NOTIFICATION-V1
+      if (serviceKey === 'k-cosmetics') {
+        try {
+          const operators: { userId: string }[] = await AppDataSource.query(
+            `SELECT DISTINCT user_id AS "userId"
+               FROM role_assignments
+              WHERE role IN ('cosmetics:operator','cosmetics:admin')
+                AND is_active = true
+              LIMIT 20`,
+          );
+          await Promise.allSettled(
+            operators.map((op) =>
+              notificationService.createNotification({
+                userId: op.userId,
+                type: 'member.registration_pending',
+                title: '신규 K-Cosmetics 회원 가입 신청',
+                message: `${resolvedName || data.email}님이 K-Cosmetics 회원 가입을 신청했습니다.`,
+                serviceKey: 'k-cosmetics',
+                actorId: user.id,
+                metadata: {
+                  userId: user.id,
+                  targetUrl: '/operator/members?tab=status-pending',
+                },
+              }),
+            ),
+          );
+        } catch (notifyError) {
+          logger.warn('[AuthRegisterController.register] K-Cosmetics operator notification failed (best-effort)', {
             error: notifyError instanceof Error ? notifyError.message : String(notifyError),
             userId: user.id,
           });
