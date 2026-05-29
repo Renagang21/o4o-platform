@@ -7,7 +7,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth, ROLE_LABELS, getKCosmeticsDashboardRoute } from '@/contexts/AuthContext';
-import { Mail, Phone, Shield, UserCog, Settings, BookOpen, Award, Coins, Gift } from 'lucide-react';
+import { Mail, Phone, Shield, UserCog, Settings, BookOpen, Award, Coins, Gift, ClipboardList } from 'lucide-react';
 import { MyPageLayout, QuickActionsSection, RoleBadge, MyPageHubCard } from '@o4o/account-ui';
 import { KCOS_MYPAGE_NAV_ITEMS } from './navItems';
 import { appreciationApi, type AppreciationSend } from '@/api/appreciation';
@@ -113,6 +113,13 @@ export default function MyPageHub() {
           title="내 크레딧"
           href="/mypage/credits"
           icon={<Coins className="w-5 h-5" />}
+          className="col-span-2"
+        />
+        {/* WO-O4O-MYPAGE-MY-REQUESTS-INBOX-GLYCO-KCOS-ROUTE-V1 */}
+        <MyPageHubCard
+          title="내 신청"
+          href="/mypage/my-requests"
+          icon={<ClipboardList className="w-5 h-5" />}
           className="col-span-2"
         />
       </div>

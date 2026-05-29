@@ -148,10 +148,10 @@ export default function MyPageHub() {
           href="/mypage/credits"
           icon={<Coins className="w-5 h-5" />}
         />
-        {/* WO-O4O-MYPAGE-MY-REQUESTS-HUB-CARD-ALIGNMENT-V1 */}
+        {/* WO-O4O-MYPAGE-MY-REQUESTS-INBOX-GLYCO-KCOS-ROUTE-V1 */}
         <MyPageHubCard
           title="내 신청"
-          href="/apply/my-applications"
+          href="/mypage/my-requests"
           icon={<ClipboardList className="w-5 h-5" />}
         />
       </div>

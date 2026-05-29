@@ -67,6 +67,7 @@ import { createGlycopharmEventOfferController } from './controllers/event-offer.
 import { createGlycopharmEventOfferOperatorController } from './controllers/event-offer-operator.controller.js'; // WO-O4O-GLYCOPHARM-OPERATOR-EVENT-OFFER-APPROVAL-V1
 import { createNewsController } from '../o4o-store/controllers/news.controller.js'; // WO-O4O-CONTENT-CANONICAL-CROSS-SERVICE-ALIGNMENT-V1
 import { createGlycopharmMemberController } from './controllers/glycopharm-member.controller.js'; // WO-GLYCOPHARM-MEMBER-REGISTER-FLOW-V1
+import { createGlycopharmMypageController } from './controllers/mypage.controller.js'; // WO-O4O-MYPAGE-MY-REQUESTS-INBOX-GLYCO-KCOS-ROUTE-V1
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 import { hasAnyServiceRole, logLegacyRoleUsage } from '../../utils/role.utils.js';
 import { GLYCOPHARM_SCOPE_CONFIG } from '@o4o/security-core';
@@ -115,6 +116,13 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
     coreRequireAuth as any,
   );
   router.use('/', glycopharmMemberController);
+
+  // MyPage routes — WO-O4O-MYPAGE-MY-REQUESTS-INBOX-GLYCO-KCOS-ROUTE-V1
+  const glycopharmMypageController = createGlycopharmMypageController(
+    dataSource,
+    coreRequireAuth as any,
+  );
+  router.use('/mypage', glycopharmMypageController);
 
   // Forum Category Request routes removed — WO-O4O-FORUM-CATEGORY-DEAD-CODE-REMOVAL-V1
 

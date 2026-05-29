@@ -63,6 +63,8 @@ const MySettingsPage = lazy(() => import('@/pages/mypage/MySettingsPage'));
 const MyCreditsPage = lazy(() => import('@/pages/mypage/MyCreditsPage'));
 const MyEnrollmentsPage = lazy(() => import('@/pages/mypage/MyEnrollmentsPage'));
 const MyCertificatesPage = lazy(() => import('@/pages/mypage/MyCertificatesPage'));
+// WO-O4O-MYPAGE-MY-REQUESTS-INBOX-GLYCO-KCOS-ROUTE-V1
+const KcosMyRequestsPage = lazy(() => import('@/pages/mypage/MyRequestsPage'));
 
 // Partner Application (WO-PARTNER-APPLICATION-V1)
 const PartnerApplyPage = lazy(() => import('@/pages/partners/ApplyPage'));
@@ -452,6 +454,15 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <MyCertificatesPage />
+            </ProtectedRoute>
+          }
+        />
+        {/* WO-O4O-MYPAGE-MY-REQUESTS-INBOX-GLYCO-KCOS-ROUTE-V1 */}
+        <Route
+          path="mypage/my-requests"
+          element={
+            <ProtectedRoute>
+              <KcosMyRequestsPage />
             </ProtectedRoute>
           }
         />

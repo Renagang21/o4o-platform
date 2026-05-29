@@ -15,6 +15,7 @@ import type { MyPageNavItem } from '@o4o/account-ui';
 export const KCOS_MYPAGE_NAV_ITEMS: MyPageNavItem[] = [
   { label: '홈', path: '' },
   { label: '프로필', path: '/profile' },
+  { label: '내 신청', path: '/my-requests' },
   { label: '내 수강', path: '/enrollments' },
   { label: '학습 결과', path: '/certificates' },
   { label: '크레딧', path: '/credits' },
