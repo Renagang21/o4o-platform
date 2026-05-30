@@ -205,6 +205,9 @@ const StoreChannelsPage = lazy(() => import('@/pages/store/StoreChannelsPage'));
 // WO-STORE-BILLING-FOUNDATION-V1: 정산/인보이스
 const StoreBillingPage = lazy(() => import('@/pages/store-management/StoreBillingPage'));
 
+// WO-O4O-GLYCOPHARM-PHARMACY-PROFILE-EDIT-PAGE-V1
+const PharmacyInfoPage = lazy(() => import('@/pages/store/PharmacyInfoPage'));
+
 // WO-O4O-STORE-LOCAL-PRODUCT-UI-V1: 자체 상품 CRUD + 태블릿 진열 관리
 const StoreLocalProductsPage = lazy(() => import('@/pages/store-management/StoreLocalProductsPage'));
 const StoreTabletDisplaysPage = lazy(() => import('@/pages/store-management/StoreTabletDisplaysPage'));
@@ -850,6 +853,22 @@ function AppRoutes() {
         {/* WO-O4O-GLYCO-CARE-CLEANUP-V1: /store/services (PharmacyPatients) 라우트 제거.
             환자/Care 직접 관리 시스템은 현재 canonical 구조에 포함되지 않음. */}
         <Route path="settings" element={<PharmacySettings />} />
+        {/* WO-O4O-GLYCOPHARM-PHARMACY-PROFILE-EDIT-PAGE-V1:
+              약국 경영자 (store_owner) 만 접근 — 약국·사업자 정보 조회·수정 */}
+        <Route
+          path="info"
+          element={
+            <RoleGuard
+              allowedRoles={[
+                'glycopharm:store_owner',
+                GLYCOPHARM_ROLES.ADMIN,
+                GLYCOPHARM_ROLES.PLATFORM_SUPER_ADMIN,
+              ]}
+            >
+              <PharmacyInfoPage />
+            </RoleGuard>
+          }
+        />
         {/* WO-O4O-GLYCOPHARM-STORE-APPLY-DEAD-CODE-REMOVAL-V1:
             <Route path="apply" element={<StoreApplyPage />} /> 제거. dead code. */}
         {/* billing: 정산/인보이스 (WO-STORE-BILLING-FOUNDATION-V1) */}

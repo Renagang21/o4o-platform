@@ -184,8 +184,11 @@ export const GLYCOPHARM_STORE_CONFIG: StoreDashboardConfig = {
     {
       label: '경영',
       items: [
-        { key: 'management', label: '약국 경영', subPath: '/management' },
-        { key: 'billing',    label: '정산/인보이스', subPath: '/billing' },
+        { key: 'management',     label: '약국 경영', subPath: '/management' },
+        // WO-O4O-GLYCOPHARM-PHARMACY-PROFILE-EDIT-PAGE-V1:
+        //   약국 경영자 사업자 정보 조회/수정 — users.businessInfo SSOT
+        { key: 'pharmacy-info',  label: '약국/사업자 정보', subPath: '/info' },
+        { key: 'billing',        label: '정산/인보이스', subPath: '/billing' },
       ],
     },
     {
