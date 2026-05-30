@@ -3,6 +3,17 @@
  *
  * WO-GLYCOPHARM-MEMBER-REGISTER-FLOW-V1
  * 약사 회원 가입 신청 → 운영자 승인/거절 → 역할 부여 흐름
+ *
+ * WO-O4O-GLYCOPHARM-PHARMACY-OWNER-APPROVAL-FLOW-ENROLLMENT-CREATION-FIX-V1:
+ *   본 service 의 pharmacy_owner 승인은 기존에 service_memberships + role_assignments
+ *   (glycopharm:pharmacist + glycopharm:store_owner) 만 생성하고 organizations /
+ *   organization_service_enrollments / organization_members 는 생성하지 않아,
+ *   backend pharmacy-context middleware 및 store-hub guard 가 요구하는 4-tier 정합성을 충족하지 못함.
+ *   (선행 IR: docs/investigations/IR-O4O-GLYCOPHARM-STORE-PAGE-INTERNAL-API-AUTH-AND-COCKPIT-AUDIT-V1.md)
+ *
+ *   approveMember 의 pharmacy_owner 분기에서 organizationOpsService.ensureOrganizationWithOwnerAndService
+ *   를 호출하여 organization + owner + 'glycopharm' enrollment 를 idempotent 하게 생성하도록 보강.
+ *   기존 호출 측 입력(organizationId 또는 pharmacyName)에 따라 분기.
  */
 
 import type { DataSource } from 'typeorm';
@@ -10,6 +21,8 @@ import { GlycopharmMember } from '../entities/glycopharm-member.entity.js';
 import { RoleAssignmentService } from '../../../modules/auth/services/role-assignment.service.js';
 // WO-O4O-GLYCOPHARM-MEMBERSHIP-APPROVAL-NOTIFICATION-V1: 승인/거절 in-app 알림
 import { notificationService } from '../../../services/NotificationService.js';
+// WO-O4O-GLYCOPHARM-PHARMACY-OWNER-APPROVAL-FLOW-ENROLLMENT-CREATION-FIX-V1
+import { organizationOpsService } from '../../../modules/organization/services/organization-ops.service.js';
 
 export interface ApplyMemberDto {
   subRole: 'pharmacy_owner' | 'staff_pharmacist';
@@ -117,7 +130,59 @@ export class GlycopharmMemberService {
     });
 
     // WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1: pharmacy_owner → glycopharm:store_owner
+    // WO-O4O-GLYCOPHARM-PHARMACY-OWNER-APPROVAL-FLOW-ENROLLMENT-CREATION-FIX-V1:
+    //   role 부여만으로는 backend 4-tier 정합 불충족 (pharmacy-context middleware 가 organization +
+    //   organization_service_enrollments.glycopharm 을 요구). organization/enrollment/owner 동시 생성.
     if (member.subRole === 'pharmacy_owner') {
+      // ─── 4-tier 정합 보강: organization + owner + enrollment ───
+      // 입력 분기: applyMembership 에서 organizationId(기존 조직 연결) 또는 pharmacyName(신규 조직 생성) 중 하나가 보장됨.
+      // 둘 다 실패하면 기존 동작과 동일하게 role 만 부여하고 best-effort 경고 로깅.
+      try {
+        if (member.organizationId) {
+          // 기존 조직: enrollment + owner 만 보강 (멱등)
+          await organizationOpsService.enrollService({
+            organizationId: member.organizationId,
+            serviceCode: 'glycopharm',
+          });
+          await organizationOpsService.setOwner(member.organizationId, member.userId);
+        } else {
+          // 신규 조직: ensureOrganization + setOwner + enrollService 한꺼번에 (canonical helper)
+          const meta = (member.metadata ?? {}) as Record<string, unknown>;
+          const pharmacyName = typeof meta.pharmacyName === 'string' ? meta.pharmacyName : null;
+          if (pharmacyName) {
+            // code 패턴: 사용자 UUID 의 첫 12 hex (deterministic → 재실행 시 ensureOrganization 의 ON CONFLICT (code) 동일 row 반환)
+            const orgCode = `gp-pharm-${member.userId.replace(/-/g, '').substring(0, 12)}`;
+            await organizationOpsService.ensureOrganizationWithOwnerAndService(
+              {
+                name: pharmacyName,
+                code: orgCode,
+                type: 'pharmacy',
+                createdByUserId: member.userId,
+                metadata:
+                  typeof meta.pharmacyAddress === 'string'
+                    ? { address: meta.pharmacyAddress }
+                    : undefined,
+              },
+              member.userId,
+              'glycopharm',
+            );
+          } else {
+            console.warn(
+              `[GlycopharmMember] pharmacy_owner approval ${member.id} has neither organizationId nor metadata.pharmacyName — ` +
+                'organization/enrollment not created. (applyMembership 의 PHARMACY_INFO_REQUIRED 검사가 우회된 비정상 케이스)',
+            );
+          }
+        }
+      } catch (orgError) {
+        // organization/enrollment 생성 실패는 비차단 — role 부여는 계속 수행하여 부분 정합이라도 보장.
+        // 실패 사후 추적용 로그 (재시도 또는 manual recovery 가능).
+        console.error(
+          `[GlycopharmMember] organization/enrollment provisioning failed for pharmacy_owner ${member.id}:`,
+          orgError,
+        );
+      }
+
+      // role 부여 (기존 동작 유지)
       await this.roleAssignmentService.assignRole({
         userId: member.userId,
         role: 'glycopharm:store_owner',
