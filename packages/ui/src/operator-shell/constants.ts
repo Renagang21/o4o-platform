@@ -5,6 +5,8 @@
  * CLAUDE.md Section 11: 11-Capability Group 순서 고정.
  */
 
+// WO-O4O-OPERATOR-SHARED-CARE-TYPE-CONTRACT-REMOVAL-V1 (W5c-v2):
+//   HeartPulse import 제거 (STANDARD_GROUPS care entry 동반 제거).
 import {
   Home,
   Users,
@@ -18,7 +20,6 @@ import {
   Monitor,
   MessageSquare,
   BarChart3,
-  HeartPulse,
   Settings,
 } from 'lucide-react';
 import { OperatorCapability } from '@o4o/types';
@@ -53,6 +54,5 @@ export const STANDARD_GROUPS: StandardGroup[] = [
   { key: 'signage', label: 'Signage', icon: Monitor, capability: OperatorCapability.SIGNAGE },
   { key: 'forum', label: 'Forum', icon: MessageSquare, capability: OperatorCapability.COMMUNITY },
   { key: 'analytics', label: 'Analytics', icon: BarChart3, capability: OperatorCapability.ANALYTICS },
-  { key: 'care', label: 'Care', icon: HeartPulse, capability: OperatorCapability.CARE },
   { key: 'system', label: 'System', icon: Settings, capability: OperatorCapability.SETTINGS },
 ];

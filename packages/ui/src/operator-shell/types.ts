@@ -25,6 +25,8 @@ export interface OperatorMenuItem {
  * CLAUDE.md Section 11 표준 순서.
  * resources, lms — WO-KPA-LMS-INSTRUCTOR-APPROVAL-RELOCATE-V1 추가
  */
+// WO-O4O-OPERATOR-SHARED-CARE-TYPE-CONTRACT-REMOVAL-V1 (W5c-v2):
+//   'care' group key 제거. 5개 서비스 어디에도 active 메뉴 항목 0건이었음.
 export type OperatorGroupKey =
   | 'dashboard'
   | 'users'
@@ -38,7 +40,6 @@ export type OperatorGroupKey =
   | 'signage'
   | 'forum'
   | 'analytics'
-  | 'care'
   | 'system';
 
 /**

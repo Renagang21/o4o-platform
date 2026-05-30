@@ -154,7 +154,8 @@ export const GROUP_TO_DOMAIN: Record<OperatorGroupKey, OperatorDomainKey> = {
   signage: 'store_hub',
   forum: 'community',
   analytics: 'common',
-  care: 'common',
+  // WO-O4O-OPERATOR-SHARED-CARE-TYPE-CONTRACT-REMOVAL-V1 (W5c-v2):
+  //   care orphan mapping 제거 — OperatorGroupKey 에서 'care' 제거와 동반 정리.
   system: 'common',
 };
 
