@@ -72,3 +72,10 @@ export type {
   NotificationListParams,
   NotificationApiClient,
 } from './notifications/types.js';
+
+// WO-O4O-BUSINESS-REGISTRATION-COMMON-UI-COMPONENT-V1
+export { BusinessRegistrationFields } from './components/BusinessRegistrationFields.js';
+export type {
+  BusinessRegistrationFieldsProps,
+  BusinessRegistrationFieldsValue,
+} from './components/BusinessRegistrationFields.js';
