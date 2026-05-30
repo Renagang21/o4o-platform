@@ -1,34 +1,28 @@
 /**
  * Operator Alert Computation Helper
  *
- * WO-GLYCOPHARM-GLUCOSEVIEW-OPERATOR-ALERT-SYSTEM-V1
+ * WO-GLYCOPHARM-GLUCOSEVIEW-OPERATOR-ALERT-SYSTEM-V1 (origin)
+ * WO-O4O-GLYCOPHARM-BACKEND-CARE-ALERT-METRICS-CLEANUP-V1 (Care 잔재 제거):
+ *   IR-O4O-GLYCOPHARM-CARE-REINTRODUCTION-POLICY-V1 옵션 A 적용.
+ *   Care 메트릭 4개 + 규칙 4 블록 제거. 'care' type alert 더 이상 생성 안 함.
+ *   Frontend AlertItem type union 의 'care' 멤버 는 W5d-Frontend 에서 별도 정리 예정.
  *
  * Rule-based alert generation from dashboard metrics.
  * No persistent storage — alerts are computed at request time.
  *
- * Alert types: network | commerce | care | system
+ * Alert types (현재 활성): network | system
  * Alert levels: info | warning | critical
  */
 
 import type { OperatorAlertItem } from '../types/operator-dashboard.types.js';
 
 export interface OperatorAlertMetrics {
-  openCareAlerts: number;
-  careAdoptionRate: number;
-  highRiskPatients: number;
-  weeklyCareActivity: number;
   pendingApplications: number;
-  pendingApprovals?: number;  // pharmacists (GlucoseView)
+  pendingApprovals?: number;  // pharmacists (GlucoseView 잔재 — I-β 별도 트랙)
   draftProducts?: number;     // GlycoPharm
 }
 
 const THRESHOLDS = {
-  CARE_ALERTS_WARNING: 10,
-  CARE_ALERTS_CRITICAL: 30,
-  CARE_ADOPTION_LOW: 20,
-  HIGH_RISK_WARNING: 5,
-  HIGH_RISK_CRITICAL: 15,
-  WEEKLY_CARE_INACTIVE: 0,
   PENDING_APPS_INFO: 5,
   PENDING_APPROVALS_INFO: 5,
 };
@@ -36,65 +30,9 @@ const THRESHOLDS = {
 export function computeOperatorAlerts(metrics: OperatorAlertMetrics): OperatorAlertItem[] {
   const alerts: OperatorAlertItem[] = [];
 
-  // Care: Open alerts
-  if (metrics.openCareAlerts >= THRESHOLDS.CARE_ALERTS_CRITICAL) {
-    alerts.push({
-      id: 'care-alerts-critical',
-      type: 'care',
-      level: 'critical',
-      title: '케어 알림 급증',
-      message: `미처리 케어 알림이 ${metrics.openCareAlerts}건입니다. 즉시 확인이 필요합니다.`,
-    });
-  } else if (metrics.openCareAlerts >= THRESHOLDS.CARE_ALERTS_WARNING) {
-    alerts.push({
-      id: 'care-alerts-warning',
-      type: 'care',
-      level: 'warning',
-      title: '케어 알림 증가',
-      message: `미처리 케어 알림이 ${metrics.openCareAlerts}건입니다.`,
-    });
-  }
-
-  // Care: Adoption rate
-  if (metrics.careAdoptionRate > 0 && metrics.careAdoptionRate < THRESHOLDS.CARE_ADOPTION_LOW) {
-    alerts.push({
-      id: 'care-adoption-low',
-      type: 'care',
-      level: 'warning',
-      title: 'Care 도입률 저조',
-      message: `Care 도입률이 ${metrics.careAdoptionRate}%입니다. 약국 온보딩을 검토하세요.`,
-    });
-  }
-
-  // Care: High risk patients
-  if (metrics.highRiskPatients >= THRESHOLDS.HIGH_RISK_CRITICAL) {
-    alerts.push({
-      id: 'high-risk-critical',
-      type: 'care',
-      level: 'critical',
-      title: '고위험 환자 급증',
-      message: `고위험 환자가 ${metrics.highRiskPatients}명입니다. 케어 현황을 확인하세요.`,
-    });
-  } else if (metrics.highRiskPatients >= THRESHOLDS.HIGH_RISK_WARNING) {
-    alerts.push({
-      id: 'high-risk-warning',
-      type: 'care',
-      level: 'warning',
-      title: '고위험 환자 주의',
-      message: `고위험 환자가 ${metrics.highRiskPatients}명입니다.`,
-    });
-  }
-
-  // Care: Weekly activity
-  if (metrics.weeklyCareActivity === THRESHOLDS.WEEKLY_CARE_INACTIVE) {
-    alerts.push({
-      id: 'care-activity-inactive',
-      type: 'care',
-      level: 'warning',
-      title: '주간 Care 활동 없음',
-      message: '최근 7일간 Care 코칭 활동이 없습니다.',
-    });
-  }
+  // WO-O4O-GLYCOPHARM-BACKEND-CARE-ALERT-METRICS-CLEANUP-V1:
+  //   Care 규칙 4 블록 (Open alerts critical/warning, Adoption rate, High risk critical/warning,
+  //   Weekly activity) 제거. 'care' type alert 생성 path 0 건.
 
   // Network: Pending applications
   if (metrics.pendingApplications >= THRESHOLDS.PENDING_APPS_INFO) {

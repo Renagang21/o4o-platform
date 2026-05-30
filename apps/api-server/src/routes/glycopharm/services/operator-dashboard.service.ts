@@ -85,12 +85,11 @@ export async function buildGlycoPharmDashboardConfig(
   ];
 
   // Block 6: Operator Alerts
-  // WO-O4O-GLYCOPHARM-CARE-DEAD-CODE-REMOVAL-V1: Care 메트릭 → 0 (operator-alert.utils Phase 2에서 제거)
+  // WO-O4O-GLYCOPHARM-CARE-DEAD-CODE-REMOVAL-V1 (origin): Care 메트릭 → 0 STUB
+  // WO-O4O-GLYCOPHARM-BACKEND-CARE-ALERT-METRICS-CLEANUP-V1 (W5b):
+  //   operator-alert.utils 의 OperatorAlertMetrics 에서 Care 4개 필드 제거 완료 →
+  //   호출부 STUB 4개도 동시 제거. pendingApplications/draftProducts 만 유지.
   const operatorAlerts = computeOperatorAlerts({
-    openCareAlerts: 0,
-    careAdoptionRate: 0,
-    highRiskPatients: 0,
-    weeklyCareActivity: 0,
     pendingApplications: 0,
     draftProducts,
   });

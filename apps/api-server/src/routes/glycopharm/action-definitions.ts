@@ -71,9 +71,11 @@ export const glycopharmActionConfig: ServiceActionConfig = {
   executeHandlers: {},
   aiRuleGenerator: (counts) => {
     const actions: AiRuleAction[] = [];
-    // WO-CARE-ALERTS-BROKEN-BULK-RESOLVE-REMOVE-V1:
-    // 'ai-care-priority' (care-alerts > 3) 제거 — care-alerts 정의 자체가 사라져 카운트 항상 0
-    if ((counts['pending-apps'] || 0) > 0 && (counts['care-alerts'] || 0) === 0) {
+    // WO-CARE-ALERTS-BROKEN-BULK-RESOLVE-REMOVE-V1 (origin): 'ai-care-priority' 제거
+    // WO-O4O-GLYCOPHARM-BACKEND-CARE-ALERT-METRICS-CLEANUP-V1 (W5b):
+    //   `(counts['care-alerts'] || 0) === 0` always-true check 제거.
+    //   care-alerts ActionDefinition 자체가 부재하므로 카운트는 영원히 0 — 무의미한 가드.
+    if ((counts['pending-apps'] || 0) > 0) {
       actions.push({
         id: 'ai-app-review',
         type: 'approval',
