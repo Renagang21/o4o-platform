@@ -163,6 +163,9 @@ export class AuthRegisterController extends BaseController {
           if (effectiveTaxInvoiceEmail) newBiz.taxInvoiceEmail = effectiveTaxInvoiceEmail;
           if (data.contactName) newBiz.contactName = data.contactName;
           if (data.managerPhone) newBiz.managerPhone = data.managerPhone;
+          // 사업자 유형 / 개업일 — WO-O4O-CROSSSERVICE-BUSINESS-REGISTRATION-FORM-ALIGNMENT-V1
+          if (data.businessEntityType) newBiz.businessEntityType = data.businessEntityType;
+          if (data.businessStartDate) newBiz.businessStartDate = data.businessStartDate;
           if (data.zipCode) newBiz.zipCode = data.zipCode;
           // 사업장 주소 — businessAddress canonical (address1 legacy fallback)
           const effectiveBusinessAddress = data.businessAddress || data.address1;
@@ -337,6 +340,13 @@ export class AuthRegisterController extends BaseController {
         }
         if (data.managerPhone) {
           businessInfo.managerPhone = data.managerPhone;
+        }
+        // 사업자 유형 / 개업일 — WO-O4O-CROSSSERVICE-BUSINESS-REGISTRATION-FORM-ALIGNMENT-V1
+        if (data.businessEntityType) {
+          businessInfo.businessEntityType = data.businessEntityType;
+        }
+        if (data.businessStartDate) {
+          businessInfo.businessStartDate = data.businessStartDate;
         }
         // WO-O4O-POSTAL-CODE-ADDRESS-V1: zipCode 저장
         if (data.zipCode) {

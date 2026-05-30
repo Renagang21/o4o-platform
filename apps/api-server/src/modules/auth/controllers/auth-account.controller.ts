@@ -179,6 +179,9 @@ export class AuthAccountController extends BaseController {
             'businessItem', 'representativeName', 'taxInvoiceEmail', 'managerPhone', 'contactName',
             'businessAddress', 'businessAddressDetail', 'zipCode',
             'phone', 'storeAddress',
+            // 사업자 유형 / 개업일 (WO-O4O-CROSSSERVICE-BUSINESS-REGISTRATION-FORM-ALIGNMENT-V1)
+            // canonical: packages/types/src/business-registration.ts BusinessRegistrationInfo
+            'businessEntityType', 'businessStartDate',
             // Legacy read-fallback (accept writes for backward compat, canonical takes precedence)
             'businessCategory', 'ceoName', 'address', 'address2',
           ];

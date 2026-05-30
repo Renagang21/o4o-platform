@@ -202,6 +202,25 @@ export class RegisterRequestDto {
   @IsString()
   businessCategory?: string;
 
+  /**
+   * 사업자 유형 (사업자등록증 기준) — WO-O4O-CROSSSERVICE-BUSINESS-REGISTRATION-FORM-ALIGNMENT-V1
+   * canonical: packages/types/src/business-registration.ts BusinessEntityType
+   * 값: individual | corporation | simple_taxpayer | general_taxpayer | tax_exempt | non_profit | other
+   * 추가 검증은 frontend 폼 dropdown 으로 강제 (DTO 는 free string — 서비스별 확장 여지 보존).
+   */
+  @IsOptional()
+  @IsString()
+  businessEntityType?: string;
+
+  /**
+   * 개업일 (사업자등록증 기준 YYYY-MM-DD ISO date string)
+   * WO-O4O-CROSSSERVICE-BUSINESS-REGISTRATION-FORM-ALIGNMENT-V1
+   * canonical: packages/types/src/business-registration.ts BusinessRegistrationInfo.businessStartDate
+   */
+  @IsOptional()
+  @IsString()
+  businessStartDate?: string;
+
   /** WO-O4O-POSTAL-CODE-ADDRESS-V1: 우편번호 */
   @IsOptional()
   @IsString()
