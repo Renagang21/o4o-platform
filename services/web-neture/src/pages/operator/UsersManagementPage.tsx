@@ -31,9 +31,19 @@ import EditUserModal from './EditUserModal';
 // ─── Helpers — Neture-specific role/dashboard logic ──────────
 
 // WO-O4O-NETURE-ADMIN-USERS-SCOPE-FIX-V1: Neture membership role 만 사용
+// WO-O4O-NETURE-MEMBER-LIST-TYPE-PERMISSION-DISPLAY-ALIGNMENT-V1:
+//   "유형" 컬럼은 참여 유형(공급자/파트너/셀러)만 표시한다. operator/admin/user 등
+//   참여 유형이 아닌 membership.role 은 'general'(일반 회원)로 collapse 하여 raw 노출을 막는다.
+//   운영 권한·대시보드 접근은 별도 "대시보드 접근" 컬럼이 담당한다.
+//   ※ roleTabs.roleFilter 에는 operator/admin/user/general 이 없으므로 탭 카운트·필터 불변.
+const NETURE_PARTICIPANT_ROLES = new Set([
+  'supplier', 'partner', 'seller',
+  'neture:supplier', 'neture:partner', 'neture:seller',
+]);
 function getPrimaryRole(u: UserData): string {
   const m = u.memberships?.find((x) => x.serviceKey === 'neture');
-  return m?.role || 'user';
+  const role = m?.role || '';
+  return NETURE_PARTICIPANT_ROLES.has(role) ? role : 'general';
 }
 
 // WO-O4O-NETURE-SUPPLIER-DASHBOARD-ENTRY-AND-MEMBER-LIST-CLEANUP-V1
@@ -56,8 +66,9 @@ function getDashboardAccessLabels(u: UserData): string[] {
 
 // WO-O4O-NETURE-ADMIN-OPERATOR-DASHBOARD-AND-MEMBER-TYPE-FIX-V1:
 // customer → consumer 매핑 제거 — Neture 는 "소비자" 회원 유형을 사용하지 않는다.
-// 기존 데이터에 customer role 이 남아 있다면 raw 키 그대로 표시 (정렬 후 데이터 보정 별도).
-const NETURE_ROLE_DISPLAY: Record<string, string> = {};
+// WO-O4O-NETURE-MEMBER-LIST-TYPE-PERMISSION-DISPLAY-ALIGNMENT-V1:
+// 참여 유형이 아닌 membership.role 은 getPrimaryRole 에서 'general' 로 collapse → "일반 회원" 표시.
+const NETURE_ROLE_DISPLAY: Record<string, string> = { general: '일반 회원' };
 
 // ─── Client adapter ──────────────────────────────────────────
 
