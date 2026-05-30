@@ -10,7 +10,6 @@ import type {
   CartItem,
   StoreOrder,
   StoreApplication,
-  StoreApplicationForm,
   StoreApiResponse,
   StorePaginatedResponse,
   ServiceContext,
@@ -288,38 +287,16 @@ class StoreApiClient {
 
   // ============================================================================
   // Store Application API (약국용 - 인증 필요)
+  //
+  // WO-O4O-GLYCOPHARM-STORE-APPLY-DEAD-CODE-REMOVAL-V1:
+  //   소비자 측 submit/draft/getMyStoreApplication 3 메서드 제거.
+  //   StoreApplyPage (/store/apply) 가 dead code 로 확정 (5개월 0 제출 + UI 진입로 0)
+  //   되어 함께 삭제. operator/admin 측 API 는 그대로 보존 (list/detail/approve/
+  //   reject/supplement 5 메서드 + StoreApprovalsPage / StoreApprovalDetailPage 활용).
+  //
+  // 선행: IR-O4O-BUSINESS-REGISTRATION-FIELDS-CROSSSERVICE-AUDIT-V1 (P0 조사 결과)
+  //
   // ============================================================================
-
-  /**
-   * 판매 참여 신청서 조회 (임시저장 포함)
-   */
-  async getMyStoreApplication(): Promise<StoreApiResponse<StoreApplication | null>> {
-    return this.request('/glycopharm/store-applications/mine');
-  }
-
-  /**
-   * 판매 참여 신청서 임시저장
-   */
-  async saveStoreApplicationDraft(
-    form: Partial<StoreApplicationForm>
-  ): Promise<StoreApiResponse<StoreApplication>> {
-    return this.request('/glycopharm/store-applications/draft', {
-      method: 'POST',
-      body: JSON.stringify(form),
-    });
-  }
-
-  /**
-   * 판매 참여 신청서 제출
-   */
-  async submitStoreApplication(
-    form: StoreApplicationForm
-  ): Promise<StoreApiResponse<StoreApplication>> {
-    return this.request('/glycopharm/store-applications', {
-      method: 'POST',
-      body: JSON.stringify(form),
-    });
-  }
 
   // ============================================================================
   // Admin API (운영자용 - 인증 필요)

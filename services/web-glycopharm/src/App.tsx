@@ -198,8 +198,9 @@ const StoreOverviewPage = lazy(() => import('@/pages/store/StoreOverviewPage'));
 const StoreAssetsPage = lazy(() => import('@/pages/store/StoreAssetsPage'));
 const StoreChannelsPage = lazy(() => import('@/pages/store/StoreChannelsPage'));
 
-// Pharmacy Store Apply
-const StoreApplyPage = lazy(() => import('@/pages/store-management/StoreApplyPage'));
+// Pharmacy Store Apply — REMOVED (WO-O4O-GLYCOPHARM-STORE-APPLY-DEAD-CODE-REMOVAL-V1)
+// 5개월 사용 0 + UI 진입로 0 + validation 부재로 submit 자체 불가 (soft dead).
+// IR-O4O-BUSINESS-REGISTRATION-FIELDS-CROSSSERVICE-AUDIT-V1 의 P0 조사 결과 dead code 확정.
 
 // WO-STORE-BILLING-FOUNDATION-V1: 정산/인보이스
 const StoreBillingPage = lazy(() => import('@/pages/store-management/StoreBillingPage'));
@@ -840,7 +841,8 @@ function AppRoutes() {
         {/* WO-O4O-GLYCO-CARE-CLEANUP-V1: /store/services (PharmacyPatients) 라우트 제거.
             환자/Care 직접 관리 시스템은 현재 canonical 구조에 포함되지 않음. */}
         <Route path="settings" element={<PharmacySettings />} />
-        <Route path="apply" element={<StoreApplyPage />} />
+        {/* WO-O4O-GLYCOPHARM-STORE-APPLY-DEAD-CODE-REMOVAL-V1:
+            <Route path="apply" element={<StoreApplyPage />} /> 제거. dead code. */}
         {/* billing: 정산/인보이스 (WO-STORE-BILLING-FOUNDATION-V1) */}
         <Route path="billing" element={<StoreBillingPage />} />
         {/* Signage — WO-O4O-GLYCOPHARM-SIGNAGE-PHASE1-V1 + IA-RESTRUCTURE-V2 */}
