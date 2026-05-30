@@ -7,7 +7,8 @@
  * 이 파일의 역할:
  *   - K-Cosmetics 전용 EditUserModalConfig (KCOSMETICS_CONFIG) 정의 및 주입
  *   - API 어댑터: K-Cosmetics api 인스턴스 래핑 (/api/v1 접두사 제거 처리)
- *   - 회원 유형: seller / consumer / pharmacist / supplier / partner
+ *   - 회원 유형: seller / consumer / partner
+ *     (WO-O4O-KCOSMETICS-OPERATOR-VOCABULARY-PHARMACY-CLEANUP-V2: pharmacist/supplier 제거)
  *   - profileClassification 사용: cosmetics_members.subRole (store_owner / store_staff)
  *     - GET  /cosmetics/members/:userId — subRole 조회
  *     - PATCH /cosmetics/members/:userId — subRole 저장
@@ -33,8 +34,8 @@ const KCOSMETICS_CONFIG: EditUserModalConfig = {
   membershipRoleOptions: [
     { value: 'seller', label: '판매자' },
     { value: 'consumer', label: '소비자' },
-    { value: 'pharmacist', label: '약사' },
-    { value: 'supplier', label: '공급자' },
+    // WO-O4O-KCOSMETICS-OPERATOR-VOCABULARY-PHARMACY-CLEANUP-V2:
+    //   pharmacist/supplier 옵션 제거. K-Cos 자체 회원 분류로 부여 사례 0건.
     { value: 'partner', label: '파트너' },
   ],
   adminRoleOptions: [

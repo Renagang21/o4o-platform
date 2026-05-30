@@ -180,7 +180,9 @@ export default function StoreDetailPage() {
     return `${price.toLocaleString()}원`;
   };
 
-  const typeLabel: Record<string, string> = { pharmacy: '약국', store: '매장', branch: '지점' };
+  // WO-O4O-KCOSMETICS-OPERATOR-VOCABULARY-PHARMACY-CLEANUP-V2:
+  //   pharmacy: '약국' inline typeLabel 제거 — StoresPage 와 정합.
+  const typeLabel: Record<string, string> = { store: '매장', branch: '지점' };
 
   const channelLabel: Record<string, string> = {
     B2C: '온라인 스토어', KIOSK: '키오스크', TABLET: '태블릿', SIGNAGE: '사이니지',

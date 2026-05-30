@@ -61,6 +61,10 @@ function getPrimaryRole(u: UserData): string {
 }
 
 // 참여 유형 한글 라벨(bare/namespaced 모두). 미매핑 값은 RoleBadge 기본 처리.
+// WO-O4O-KCOSMETICS-OPERATOR-VOCABULARY-PHARMACY-CLEANUP-V2:
+//   KCOS_ROLE_DISPLAY 에서 pharmacist/supplier (K-Cos 자체 회원 분류) 제거.
+//   Tier 5 §4 데이터 검증으로 cosmetics pharmacist=0, cosmetics-membership supplier=0
+//   확인됨. lookup 실패 시 raw key fallback 안전.
 const KCOS_ROLE_DISPLAY: Record<string, string> = {
   general: '일반 회원',
   'cosmetics:store_owner': '판매자',
@@ -68,8 +72,6 @@ const KCOS_ROLE_DISPLAY: Record<string, string> = {
   seller: '판매자',
   consumer: '소비자',
   customer: '소비자',
-  pharmacist: '약사',
-  supplier: '공급자',
   partner: '파트너',
 };
 

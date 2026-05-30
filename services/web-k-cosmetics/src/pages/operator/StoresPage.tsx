@@ -50,8 +50,10 @@ const kCosStoresConfig: StoresConfig = {
   serviceKey: 'k-cosmetics',
   terminology: { storeLabel: '매장' },
   colorScheme: 'pink',
+  // WO-O4O-KCOSMETICS-OPERATOR-VOCABULARY-PHARMACY-CLEANUP-V2:
+  //   pharmacy: '약국' typeLabel 제거. Tier 5 §4 데이터 검증으로 cosmetics
+  //   storeType=pharmacy 사용 근거 없음 확인. K-Cosmetics 도메인 어휘 정합.
   typeLabels: {
-    pharmacy: '약국',
     store: '매장',
     branch: '지점',
   },
