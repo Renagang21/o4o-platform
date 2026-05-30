@@ -27,6 +27,7 @@ import {
   BadgeCheck,
 } from 'lucide-react';
 
+import { BusinessRegistrationFields } from '@o4o/account-ui';
 import { supplierProfileApi, type SupplierProfile, type ContactVisibility } from '../../lib/api';
 
 const SUPPLIER_STATUS_CONFIG: Record<string, { label: string; cls: string }> = {
@@ -283,29 +284,20 @@ export default function SupplierProfilePage() {
             />
           </div>
 
-          {/* 업태 */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">업태</label>
-            <input
-              type="text"
-              value={businessType}
-              onChange={(e) => setBusinessType(e.target.value)}
-              placeholder="도소매 / 제조 / 서비스 등"
-              className={inputClass}
-            />
-          </div>
-
-          {/* 종목 */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">종목</label>
-            <input
-              type="text"
-              value={businessItem}
-              onChange={(e) => setBusinessItem(e.target.value)}
-              placeholder="의약품 / 화장품 / 건강식품 등"
-              className={inputClass}
-            />
-          </div>
+          {/* 업태 / 종목 — WO-O4O-NETURE-SUPPLIER-PROFILE-BUSINESSREGISTRATIONFIELDS-REUSE-V1:
+                @o4o/account-ui 의 BusinessRegistrationFields 공통 컴포넌트 재사용.
+                기존 state (businessType / businessItem) 와 payload 구조는 그대로 유지. */}
+          <BusinessRegistrationFields
+            value={{
+              businessType,
+              businessItem,
+            }}
+            onChange={(patch) => {
+              if (patch.businessType !== undefined) setBusinessType(patch.businessType);
+              if (patch.businessItem !== undefined) setBusinessItem(patch.businessItem);
+            }}
+            includeFields={['businessType', 'businessItem']}
+          />
 
           {/* 사업장 주소 — WO-O4O-POSTAL-CODE-ADDRESS-V1 */}
           <div>
