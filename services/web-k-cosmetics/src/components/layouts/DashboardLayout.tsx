@@ -54,24 +54,9 @@ const icons = {
       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" x2="9" y1="12" y2="12" />
     </svg>
   ),
-  ChevronDown: ({ className }: { className?: string }) => (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="m6 9 6 6 6-6" />
-    </svg>
-  ),
   Shield: ({ className }: { className?: string }) => (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
-    </svg>
-  ),
-  Bell: ({ className }: { className?: string }) => (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-    </svg>
-  ),
-  Search: ({ className }: { className?: string }) => (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
     </svg>
   ),
   Home: ({ className }: { className?: string }) => (
@@ -219,11 +204,10 @@ const roleConfig: Record<string, RoleConfig> = {
 };
 
 export default function DashboardLayout({ role }: DashboardLayoutProps) {
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const config = roleConfig[role];
   if (!config) {
@@ -412,81 +396,19 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
 
       {/* Main Content */}
       <div className="lg:ml-64 pt-16">
-        {/* Dashboard Header — Layer B Context */}
-        <header className="sticky top-16 z-30 bg-white border-b">
-          <div className="flex items-center justify-between px-4 py-3">
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2 rounded-lg hover:bg-slate-100"
-            >
-              <icons.Menu className="w-6 h-6" />
-            </button>
-
-            {/* Search */}
-            <div className="hidden md:flex items-center flex-1 max-w-md mx-4">
-              <div className="relative w-full">
-                <icons.Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                <input
-                  type="text"
-                  placeholder="검색..."
-                  className="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-                />
-              </div>
-            </div>
-
-            {/* Right Actions */}
-            <div className="flex items-center gap-3">
-              {/* Notifications */}
-              <button className="relative p-2 rounded-xl hover:bg-slate-100 transition-colors">
-                <icons.Bell className="w-5 h-5 text-slate-600" />
-                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
-              </button>
-
-              {/* User Menu */}
-              <div className="relative">
-                <button
-                  onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="flex items-center gap-2 p-2 rounded-xl hover:bg-slate-100 transition-colors"
-                >
-                  <div className={`w-8 h-8 rounded-full bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center`}>
-                    <span className="text-white text-sm font-medium">
-                      {user?.name?.charAt(0) || '?'}
-                    </span>
-                  </div>
-                  <span className="hidden md:block text-sm font-medium text-slate-700">
-                    {user?.name}
-                  </span>
-                  <icons.ChevronDown className="w-4 h-4 text-slate-400" />
-                </button>
-
-                {userMenuOpen && (
-                  <>
-                    <div
-                      className="fixed inset-0 z-40"
-                      onClick={() => setUserMenuOpen(false)}
-                    />
-                    <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border py-2 z-50">
-                      <NavLink
-                        to="/mypage"
-                        className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
-                        onClick={() => setUserMenuOpen(false)}
-                      >
-                        마이페이지
-                      </NavLink>
-                      <button
-                        onClick={handleLogout}
-                        className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                      >
-                        로그아웃
-                      </button>
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        </header>
+        {/* Mobile-only sidebar toggle — desktop 숨김 (WO-O4O-KCOS-OPERATOR-LAYOUT-HEADER-CLEANUP-V1) */}
+        <div className="lg:hidden sticky top-16 z-20 bg-white border-b border-slate-200 px-4 py-2 flex items-center">
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(true)}
+            aria-label="사이드바 열기"
+            aria-expanded={sidebarOpen}
+            className="flex items-center gap-2 text-sm font-medium text-slate-700 hover:text-pink-600 transition-colors"
+          >
+            <icons.Menu className="w-5 h-5" />
+            메뉴
+          </button>
+        </div>
 
         {/* Page Content */}
         <main className="p-4 md:p-6">
