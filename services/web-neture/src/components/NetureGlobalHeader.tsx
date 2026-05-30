@@ -11,10 +11,12 @@
  *   - 사용자 드롭다운 메뉴 구성
  */
 
+import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Settings, Shield } from 'lucide-react';
 import { GlobalHeader, GlobalHeaderMenuItem } from '@o4o/ui';
 import { NotificationBell, useNotifications } from '@o4o/account-ui';
+import type { NotificationItem } from '@o4o/account-ui';
 import { notificationsApi, NOTIFICATION_SERVICE_KEY } from '../lib/api/notifications';
 import {
   ADMIN_ROLES,
@@ -55,6 +57,19 @@ export function NetureGlobalHeader() {
     enabled: isAuthenticated && !!user,
     serviceKey: NOTIFICATION_SERVICE_KEY,
   });
+
+  // WO-O4O-NETURE-GLOBAL-HEADER-OPERATOR-LABEL-AND-NOTIFICATION-CLICK-FIX-V1:
+  // 알림 항목 클릭 시 metadata.targetUrl 이 있으면 해당 경로로 이동.
+  // KPA / K-Cosmetics / GlycoPharm GlobalHeader 동일 패턴.
+  const handleNotificationClick = useCallback(
+    (n: NotificationItem) => {
+      const target = (n.metadata as Record<string, unknown> | undefined)?.targetUrl;
+      if (typeof target === 'string' && target.length > 0) {
+        navigate(target);
+      }
+    },
+    [navigate],
+  );
 
   const isAdmin = isAuthenticated && user?.roles?.some((r: string) => ADMIN_ROLES.includes(r));
   const isOperator = isAuthenticated && user?.roles?.some((r: string) => OPERATOR_OR_ABOVE_ROLES.includes(r));
@@ -99,6 +114,7 @@ export function NetureGlobalHeader() {
               notifications={notif.notifications}
               loading={notif.loading}
               onOpen={notif.refetchList}
+              onItemClick={handleNotificationClick}
               onMarkAsRead={notif.markAsRead}
               onMarkAllAsRead={notif.markAllAsRead}
             />
@@ -119,9 +135,11 @@ export function NetureGlobalHeader() {
               관리자 대시보드
             </GlobalHeaderMenuItem>
           )}
+          {/* WO-O4O-NETURE-GLOBAL-HEADER-OPERATOR-LABEL-AND-NOTIFICATION-CLICK-FIX-V1:
+              "운영자 대시보드" → "운영 대시보드" (KPA / K-Cosmetics / GlycoPharm canonical 정합) */}
           {isOperator && (
             <GlobalHeaderMenuItem to="/operator" icon={<Shield className="w-4 h-4" />}>
-              운영자 대시보드
+              운영 대시보드
             </GlobalHeaderMenuItem>
           )}
           {isSupplier && (
