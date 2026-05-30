@@ -1,17 +1,70 @@
 /**
- * K-Cosmetics MyPage API — 내 신청 내역 (frontend aggregation)
+ * K-Cosmetics MyPage API — 내 신청 내역 + 매장/사업자 정보
  *
  * WO-O4O-MYPAGE-MY-REQUESTS-INBOX-GLYCO-KCOS-ROUTE-V1
+ * WO-O4O-KCOSMETICS-STORE-PROFILE-EDIT-PAGE-V1
  *
  * Sources:
  *   1) GET /cosmetics/stores/application/me — 매장(파트너) 신청 (store_application)
  *   2) GET /lms/enrollments/me             — LMS 수강 신청 (course_enrollment)
+ *   3) GET /cosmetics/mypage/business-info — 매장 경영자 사업자 정보 (canonical)
+ *   4) PATCH /cosmetics/mypage/business-info — 매장 경영자 사업자 정보 수정
  *
  * 두 소스를 MyRequestItem[] 으로 정규화한 뒤 createdAt DESC 병합.
  */
 
 import { api } from '../lib/apiClient';
 import type { MyRequestItem } from '@o4o/account-ui';
+
+// ── WO-O4O-KCOSMETICS-STORE-PROFILE-EDIT-PAGE-V1 ─────────────────────────
+
+export interface CosmeticsBusinessInfo {
+  storeName: string | null;
+  businessRegistrationNumber: string | null;
+  businessName: string | null;
+  representativeName: string | null;
+  businessAddress: string | null;
+  businessPhone: string | null;
+  businessType: string | null;
+  businessItem: string | null;
+  businessEntityType: string | null;
+  businessStartDate: string | null;
+  taxInvoiceEmail: string | null;
+}
+
+export interface UpdateCosmeticsBusinessInfoPayload {
+  storeName?: string;
+  businessName?: string;
+  representativeName?: string;
+  businessAddress?: string;
+  businessPhone?: string;
+  businessType?: string;
+  businessItem?: string;
+  businessEntityType?: string;
+  businessStartDate?: string;
+  taxInvoiceEmail?: string;
+}
+
+export const cosmeticsMypageApi = {
+  getBusinessInfo: async (): Promise<CosmeticsBusinessInfo> => {
+    const { data } = await api.get<{ success: boolean; data: CosmeticsBusinessInfo }>(
+      '/cosmetics/mypage/business-info',
+    );
+    return data.data;
+  },
+
+  updateBusinessInfo: async (
+    payload: UpdateCosmeticsBusinessInfoPayload,
+  ): Promise<CosmeticsBusinessInfo> => {
+    const { data } = await api.patch<{ success: boolean; data: CosmeticsBusinessInfo }>(
+      '/cosmetics/mypage/business-info',
+      payload,
+    );
+    return data.data;
+  },
+};
+
+// ── 기존 (MyRequestsInbox) ──────────────────────────────────────────────
 
 function normalizeStoreApplication(app: any): MyRequestItem {
   return {
