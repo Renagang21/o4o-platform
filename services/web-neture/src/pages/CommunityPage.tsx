@@ -241,7 +241,7 @@ export default function CommunityPage() {
 
 function NetureHero() {
   return (
-    <section className="bg-gradient-to-br from-primary-600 to-primary-800 text-white">
+    <section className="bg-gradient-to-br from-primary-600 to-primary-800 text-white mb-16">
       <div className="max-w-5xl mx-auto px-4 py-16 text-center">
         <p className="text-sm font-semibold text-white/70 tracking-widest uppercase mb-3">
           O4O 공급자 · 운영자 · 파트너 플랫폼
