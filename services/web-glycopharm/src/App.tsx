@@ -811,11 +811,20 @@ function AppRoutes() {
 
       {/* Store Owner Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1) */}
       {/* WO-O4O-GLYCOPHARM-STORE-OWNER-ROUTE-GUARD-FIX-V1:
-          glycopharm:store_owner 도 /store 접근 허용 — Header/dashboard redirect 정합 */}
+          glycopharm:store_owner 도 /store 접근 허용 — Header/dashboard redirect 정합
+          WO-O4O-GLYCOPHARM-MY-STORE-MENU-FLICKER-FIX-V1:
+          operator/admin/super_admin 도 /store 진입 허용 — 헤더 visibility(isAdminOrOperator → 모든 메뉴 노출)와
+          정합 맞추지 않으면 클릭 시 가드가 / 로 되돌려 깜빡임 발생. K-Cosmetics 동일 정책 정렬. */}
       <Route
         path="store"
         element={
-          <ProtectedRoute allowedRoles={[GLYCOPHARM_ROLES.PHARMACIST, GLYCOPHARM_ROLES.STORE_OWNER]}>
+          <ProtectedRoute allowedRoles={[
+            GLYCOPHARM_ROLES.PHARMACIST,
+            GLYCOPHARM_ROLES.STORE_OWNER,
+            GLYCOPHARM_ROLES.OPERATOR,
+            GLYCOPHARM_ROLES.ADMIN,
+            GLYCOPHARM_ROLES.PLATFORM_SUPER_ADMIN,
+          ]}>
             <StoreLayoutWrapper />
           </ProtectedRoute>
         }
