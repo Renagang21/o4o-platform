@@ -49,13 +49,15 @@ import type { OperatorDashboardConfig, KpiItem } from '@o4o/operator-ux-core';
 
 // ─── Admin KPI 선택 (Operator와 다른 관점) ──────────────────
 
+// WO-O4O-GLYCOPHARM-ADMIN-DASHBOARD-PATIENT-KPI-WHITELIST-CLEANUP-V1:
+//   IR-O4O-GLYCOPHARM-OPERATOR-DASHBOARD-CARE-VOCABULARY-AUDIT-V1 W5a.
+//   total-patients / high-risk-patients / open-care-alerts 3개 키 제거.
+//   backend STUB pipeline / OperatorAlertMetrics interface / AlertItem.type='care' /
+//   OperatorCapability.CARE 는 Care 재도입 정책 (I-α) 결정 전까지 보존.
 const ADMIN_KPI_KEYS = new Set([
   'active-pharmacies',
   'pending-applications',
   'active-products',
-  'total-patients',
-  'high-risk-patients',
-  'open-care-alerts',
 ]);
 
 function buildStructureMetrics(kpis: KpiItem[]): StructureMetric[] {
