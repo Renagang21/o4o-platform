@@ -7,7 +7,8 @@
  * Single API call to /api/v1/neture/operator/dashboard returns all data.
  *
  * Block 구조:
- *  [1] KPI Grid       — 활성 약국, 공급사, 상품, 주문, 매출, 콘텐츠
+ *  [1] KPI Grid       — 활성 참여 조직, 공급사, 상품, 주문, 매출, 콘텐츠
+ *                       (WO-O4O-NETURE-OPERATOR-DASHBOARD-KPI-LABEL-DRIFT-FIX-V1: '약국' → '참여 조직')
  *  [2] AI Summary     — 상태 기반 인사이트 (승인 대기 등)
  *  [3] Action Queue   — 즉시 처리 항목
  *  [4] Activity Log   — 최근 주문/활동

@@ -184,7 +184,11 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
 
       // Block 1: KPIs (8개)
       const kpis: KpiItem[] = [
-        { key: 'active-orgs', label: '활성 약국', value: activeOrgs, status: 'neutral' },
+        // WO-O4O-NETURE-OPERATOR-DASHBOARD-KPI-LABEL-DRIFT-FIX-V1:
+        // KPA copy-paste 흔적 '활성 약국' → Neture 도메인 어휘 '활성 참여 조직' 으로 정렬.
+        // 데이터 출처 (organizations JOIN organization_service_enrollments WHERE service_code='neture')
+        // 는 그대로 — Neture 에 가입한 모든 참여 조직 (공급자/파트너/매장 등) 의 활성 수.
+        { key: 'active-orgs', label: '활성 참여 조직', value: activeOrgs, status: 'neutral' },
         { key: 'active-suppliers', label: '활성 공급사', value: activeSuppliers, status: 'neutral' },
         { key: 'active-products', label: '판매 상품', value: products.active, status: 'neutral' },
         { key: 'monthly-orders', label: '월간 주문', value: orders.total_orders, status: 'neutral' },
