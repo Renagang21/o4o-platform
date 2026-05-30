@@ -82,7 +82,7 @@ export function buildKpaOperatorConfig(
       label: '사이니지 검수 대기',
       value: signagePendingCount,
       status: signagePendingCount > 0 ? 'warning' : 'neutral',
-      link: '/operator/signage/content',
+      link: '/operator/signage/hq-media',
     },
     {
       key: 'pharmacy-requests',
@@ -174,7 +174,7 @@ export function buildKpaOperatorConfig(
       id: 'ai-signage-pending',
       message: `사이니지 ${signagePendingCount}건 검수 대기 — 확인이 필요합니다.`,
       level: signagePendingCount > 3 ? 'warning' : 'info',
-      link: '/operator/signage/content',
+      link: '/operator/signage/hq-media',
     });
   }
   if (isAdmin && serviceApplicationCount > 0) {
@@ -222,7 +222,7 @@ export function buildKpaOperatorConfig(
       id: 'aq-signage',
       label: '사이니지 검수 대기',
       count: signagePendingCount,
-      link: '/operator/signage/content',
+      link: '/operator/signage/hq-media',
     });
   }
   if (pharmacyRequestCount > 0) {
@@ -275,7 +275,7 @@ export function buildKpaOperatorConfig(
       id: `m-${m.id}`,
       message: `사이니지: ${m.name}`,
       timestamp: '',
-      link: '/operator/signage/content',
+      link: '/operator/signage/hq-media',
     });
   }
   // Operational events from recentActivity
@@ -309,7 +309,7 @@ export function buildKpaOperatorConfig(
     { id: 'qa-content', label: '콘텐츠 관리', link: '/operator/content', icon: '📝' },
     { id: 'qa-news', label: '공지사항', link: '/operator/news', icon: '📢' },
     { id: 'qa-forum', label: '포럼 관리', link: '/operator/forum-management', icon: '💬' },
-    { id: 'qa-signage', label: '사이니지', link: '/operator/signage/content', icon: '🖥️' },
+    { id: 'qa-signage', label: '사이니지', link: '/operator/signage/hq-media', icon: '🖥️' },
     // WO-O4O-OPERATOR-DASHBOARD-COMMUNITY-STORE-HUB-SPLIT-V1: 매장 HUB 운영 Quick Actions 복원
     { id: 'qa-stores', label: '매장 관리', link: '/operator/stores', icon: '🏪' },
     { id: 'qa-event-offers', label: '이벤트 오퍼', link: '/operator/event-offers', icon: '🎯' },
