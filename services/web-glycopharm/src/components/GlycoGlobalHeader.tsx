@@ -149,14 +149,21 @@ export function GlycoGlobalHeader() {
       ) : undefined}
       userMenuItems={
         <>
-          {(isInstructor || isAdmin) && (
+          {/* WO-O4O-GLYCOPHARM-GLOBAL-HEADER-PROFILE-MENU-ALIGNMENT-V1:
+              "강의 대시보드" 는 실제 lms:instructor 보유자에게만 노출.
+              이전 결선 `(isInstructor || isAdmin)` 는 관리자라는 이유만으로
+              강의 대시보드를 강제 노출시키는 메뉴 오염이었음 — 제거.
+              (KPA / K-Cosmetics canonical 정합) */}
+          {isInstructor && (
             <GlobalHeaderMenuItem to="/instructor" icon={<GraduationCap className="w-4 h-4" />}>
               강의 대시보드
             </GlobalHeaderMenuItem>
           )}
+          {/* WO-O4O-GLYCOPHARM-GLOBAL-HEADER-PROFILE-MENU-ALIGNMENT-V1:
+              관리자 라벨을 KPA / K-Cosmetics canonical "관리자 대시보드" 로 정렬. */}
           {isAdmin && (
             <GlobalHeaderMenuItem to="/admin" icon={<Shield className="w-4 h-4" />}>
-              관리 대시보드
+              관리자 대시보드
             </GlobalHeaderMenuItem>
           )}
           {isOperator && (
