@@ -26,6 +26,8 @@ import StoreLayout from '@/components/layouts/StoreLayout';
 import KioskLayout from '@/components/layouts/KioskLayout';
 import TabletLayout from '@/components/layouts/TabletLayout';
 import { RoleGuard, OperatorRoute } from '@/components/auth/RoleGuard';
+// WO-O4O-GLYCOPHARM-MY-STORE-MENU-MEMBERSHIP-GUARD-V1
+import { PharmacyStoreGuard } from '@/components/auth/PharmacyStoreGuard';
 
 // WO-O4O-STORE-PRODUCTS-SERVICE-ROUTING-V1: 매장 경영자용 매장 상품 관리 (공통 패키지)
 import { StoreProductsManagerPage } from '@o4o/store-products-ui';
@@ -813,23 +815,18 @@ function AppRoutes() {
       <Route path="store/:slug/blog/:postSlug" element={<StoreBlogPostPage />} />
 
       {/* Store Owner Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1) */}
-      {/* WO-O4O-GLYCOPHARM-STORE-OWNER-ROUTE-GUARD-FIX-V1:
-          glycopharm:store_owner 도 /store 접근 허용 — Header/dashboard redirect 정합
-          WO-O4O-GLYCOPHARM-MY-STORE-MENU-FLICKER-FIX-V1:
-          operator/admin/super_admin 도 /store 진입 허용 — 헤더 visibility(isAdminOrOperator → 모든 메뉴 노출)와
-          정합 맞추지 않으면 클릭 시 가드가 / 로 되돌려 깜빡임 발생. K-Cosmetics 동일 정책 정렬. */}
+      {/* WO-O4O-GLYCOPHARM-STORE-OWNER-ROUTE-GUARD-FIX-V1 + WO-O4O-GLYCOPHARM-MY-STORE-MENU-FLICKER-FIX-V1:
+          glycopharm:store_owner / operator / admin / super_admin 진입 보장.
+          WO-O4O-GLYCOPHARM-MY-STORE-MENU-MEMBERSHIP-GUARD-V1:
+          membership 기반 약국 회원 (service_memberships.glycopharm.role='pharmacy' status active|approved)
+          도 진입 허용 — 헤더 isPharmacy 정책과 정렬. allowedRoles 만 검사하던 ProtectedRoute 는
+          unprefixed 'pharmacy' role / membership 사용자를 거부 → '내 약국' 클릭 시 / 리다이렉트 (화면 변화 없음 증상). */}
       <Route
         path="store"
         element={
-          <ProtectedRoute allowedRoles={[
-            GLYCOPHARM_ROLES.PHARMACIST,
-            GLYCOPHARM_ROLES.STORE_OWNER,
-            GLYCOPHARM_ROLES.OPERATOR,
-            GLYCOPHARM_ROLES.ADMIN,
-            GLYCOPHARM_ROLES.PLATFORM_SUPER_ADMIN,
-          ]}>
+          <PharmacyStoreGuard>
             <StoreLayoutWrapper />
-          </ProtectedRoute>
+          </PharmacyStoreGuard>
         }
       >
         {/* WO-O4O-GLYCO-STORE-CANONICAL-ENTRY-ALIGN-V1: /store 인덱스 = 운영 홈 (canonical). */}
