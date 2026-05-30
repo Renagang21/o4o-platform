@@ -29,6 +29,11 @@ export interface PharmacyInfoData {
   contactName: string | null;
   managerPhone: string | null;
   storeSlug: string | null;
+  // WO-O4O-MYPAGE-BUSINESS-INFO-EDIT-P2-P4-ADD-V1: 사업자등록증 P2/P4 fields (users.businessInfo SSOT)
+  businessType: string | null;
+  businessItem: string | null;
+  businessEntityType: string | null;
+  businessStartDate: string | null;
 }
 
 export interface UpdatePharmacyInfoPayload {
@@ -40,6 +45,11 @@ export interface UpdatePharmacyInfoPayload {
   ceoName?: string;
   contactName?: string;
   managerPhone?: string;
+  // WO-O4O-MYPAGE-BUSINESS-INFO-EDIT-P2-P4-ADD-V1
+  businessType?: string;
+  businessItem?: string;
+  businessEntityType?: string;
+  businessStartDate?: string;
 }
 
 export async function getPharmacyInfo(): Promise<PharmacyInfoData | null> {

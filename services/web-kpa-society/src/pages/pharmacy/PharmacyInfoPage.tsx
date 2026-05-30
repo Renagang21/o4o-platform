@@ -11,6 +11,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Navigate } from 'react-router-dom';
 import { AddressSearch } from '@o4o/ui';
+import { BusinessRegistrationFields } from '@o4o/account-ui';
+import { getBusinessEntityTypeLabel } from '@o4o/types';
 import { colors, shadows, borderRadius } from '../../styles/theme';
 import {
   getPharmacyInfo,
@@ -23,6 +25,8 @@ type LoadState = 'loading' | 'loaded' | 'error';
 
 // WO-O4O-KPA-PHARMACY-INFO-VIEW-EDIT-CANONICAL-ALIGNMENT-V1:
 //   "담당자 전화" (managerPhone) UI 제거. API 타입/필드는 유지 — 기존 DB 값 보존.
+// WO-O4O-MYPAGE-BUSINESS-INFO-EDIT-P2-P4-ADD-V1:
+//   사업자등록증 P2/P4 fields (업태/종목/사업자유형/개업일) 표시·수정 추가.
 interface FormState {
   name: string;
   phone: string;
@@ -33,6 +37,11 @@ interface FormState {
   zipCode: string;
   baseAddress: string;
   detailAddress: string;
+  // P2/P4 사업자등록증 fields
+  businessType: string;
+  businessItem: string;
+  businessEntityType: string;
+  businessStartDate: string;
 }
 
 function dataToForm(data: PharmacyInfoData): FormState {
@@ -46,6 +55,10 @@ function dataToForm(data: PharmacyInfoData): FormState {
     zipCode: data.addressDetail?.zipCode || '',
     baseAddress: data.addressDetail?.baseAddress || '',
     detailAddress: data.addressDetail?.detailAddress || '',
+    businessType: data.businessType || '',
+    businessItem: data.businessItem || '',
+    businessEntityType: data.businessEntityType || '',
+    businessStartDate: data.businessStartDate || '',
   };
 }
 
@@ -57,7 +70,7 @@ export function PharmacyInfoPage() {
   const [data, setData] = useState<PharmacyInfoData | null>(null);
   const [loadState, setLoadState] = useState<LoadState>('loading');
   const [isEditMode, setIsEditMode] = useState(false);
-  const [form, setForm] = useState<FormState>({ name: '', phone: '', ownerPhone: '', ceoName: '', contactName: '', taxInvoiceEmail: '', zipCode: '', baseAddress: '', detailAddress: '' });
+  const [form, setForm] = useState<FormState>({ name: '', phone: '', ownerPhone: '', ceoName: '', contactName: '', taxInvoiceEmail: '', zipCode: '', baseAddress: '', detailAddress: '', businessType: '', businessItem: '', businessEntityType: '', businessStartDate: '' });
   const [isSaving, setIsSaving] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const [successMsg, setSuccessMsg] = useState('');
@@ -125,6 +138,8 @@ export function PharmacyInfoPage() {
       // WO-O4O-KPA-PHARMACY-INFO-VIEW-EDIT-CANONICAL-ALIGNMENT-V1:
       //   managerPhone payload 미전송 — backend 는 missing field 를 "변경 없음" 으로 처리하여
       //   기존 DB 값 보존. API 계약 (UpdatePharmacyInfoPayload) 자체는 그대로.
+      // WO-O4O-MYPAGE-BUSINESS-INFO-EDIT-P2-P4-ADD-V1:
+      //   P2/P4 4 fields 추가 — users.businessInfo SSOT 로 저장.
       await updatePharmacyInfo({
         name: form.name.trim(),
         phone: digitsOnly(form.phone) || undefined,
@@ -133,6 +148,10 @@ export function PharmacyInfoPage() {
         contactName: form.contactName.trim() || undefined,
         taxInvoiceEmail: form.taxInvoiceEmail.trim() || undefined,
         addressDetail,
+        businessType: form.businessType.trim() || undefined,
+        businessItem: form.businessItem.trim() || undefined,
+        businessEntityType: form.businessEntityType || undefined,
+        businessStartDate: form.businessStartDate || undefined,
       });
 
       await loadData();
@@ -267,6 +286,29 @@ export function PharmacyInfoPage() {
               />
             </div>
 
+            {/* WO-O4O-MYPAGE-BUSINESS-INFO-EDIT-P2-P4-ADD-V1:
+                  사업자등록증 P2/P4 fields — 공통 BusinessRegistrationFields 재사용 */}
+            <div style={styles.formGroup}>
+              <BusinessRegistrationFields
+                value={{
+                  businessType: form.businessType,
+                  businessItem: form.businessItem,
+                  businessEntityType: form.businessEntityType as any || undefined,
+                  businessStartDate: form.businessStartDate,
+                }}
+                onChange={(patch) => {
+                  setForm(prev => ({
+                    ...prev,
+                    ...(patch.businessType !== undefined ? { businessType: patch.businessType || '' } : {}),
+                    ...(patch.businessItem !== undefined ? { businessItem: patch.businessItem || '' } : {}),
+                    ...(patch.businessEntityType !== undefined ? { businessEntityType: patch.businessEntityType || '' } : {}),
+                    ...(patch.businessStartDate !== undefined ? { businessStartDate: patch.businessStartDate || '' } : {}),
+                  }));
+                }}
+                disabled={isSaving}
+              />
+            </div>
+
             <div style={styles.formDivider} />
 
             <div style={styles.formGroup}>
@@ -339,6 +381,25 @@ export function PharmacyInfoPage() {
             <div style={styles.infoRow}>
               <span style={styles.infoLabel}>세금계산서 이메일</span>
               <span style={styles.infoValue}>{data.taxInvoiceEmail || '-'}</span>
+            </div>
+            {/* WO-O4O-MYPAGE-BUSINESS-INFO-EDIT-P2-P4-ADD-V1: 사업자등록증 P2/P4 fields */}
+            <div style={styles.infoRow}>
+              <span style={styles.infoLabel}>업태</span>
+              <span style={styles.infoValue}>{data.businessType || '-'}</span>
+            </div>
+            <div style={styles.infoRow}>
+              <span style={styles.infoLabel}>종목</span>
+              <span style={styles.infoValue}>{data.businessItem || '-'}</span>
+            </div>
+            <div style={styles.infoRow}>
+              <span style={styles.infoLabel}>사업자 유형</span>
+              <span style={styles.infoValue}>
+                {data.businessEntityType ? getBusinessEntityTypeLabel(data.businessEntityType) : '-'}
+              </span>
+            </div>
+            <div style={styles.infoRow}>
+              <span style={styles.infoLabel}>개업일</span>
+              <span style={styles.infoValue}>{data.businessStartDate || '-'}</span>
             </div>
             {(data.addressDetail || data.address) ? (
               <>

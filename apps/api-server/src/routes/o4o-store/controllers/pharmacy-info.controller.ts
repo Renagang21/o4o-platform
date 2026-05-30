@@ -34,6 +34,12 @@ interface PharmacyInfoResponse {
   contactName: string | null;
   managerPhone: string | null;
   storeSlug: string | null;
+  // WO-O4O-MYPAGE-BUSINESS-INFO-EDIT-P2-P4-ADD-V1:
+  //   사업자등록증 P2/P4 fields — users.businessInfo JSONB SSOT (organizations.metadata 와 dual-write 안 함)
+  businessType: string | null;
+  businessItem: string | null;
+  businessEntityType: string | null;
+  businessStartDate: string | null;
 }
 
 function composeAddress(detail: StoreAddress | null | undefined): string | null {
@@ -96,7 +102,32 @@ export function createPharmacyInfoController(
       contactName: meta.contactName || null,
       managerPhone: meta.managerPhone || null,
       storeSlug: slugRecord?.slug ?? null,
+      // WO-O4O-MYPAGE-BUSINESS-INFO-EDIT-P2-P4-ADD-V1:
+      //   P2/P4 fields — users.businessInfo SSOT 에서 항상 별도 조회 (아래 블록)
+      businessType: null,
+      businessItem: null,
+      businessEntityType: null,
+      businessStartDate: null,
     };
+
+    // WO-O4O-MYPAGE-BUSINESS-INFO-EDIT-P2-P4-ADD-V1:
+    //   P2/P4 fields 는 users.businessInfo JSONB 가 SSOT. needsFallback 과 무관하게
+    //   항상 조회한다 (organizations.metadata 와 dual-write 안 함 — drift 방지).
+    if (userId) {
+      try {
+        const [user] = await dataSource.query(
+          `SELECT "businessInfo" FROM users WHERE id = $1`,
+          [userId]
+        );
+        const biz = user?.businessInfo;
+        if (biz) {
+          data.businessType = biz.businessType || null;
+          data.businessItem = biz.businessItem || null;
+          data.businessEntityType = biz.businessEntityType || null;
+          data.businessStartDate = biz.businessStartDate || null;
+        }
+      } catch { /* graceful degradation */ }
+    }
 
     // Fallback: if key fields are empty, try kpa_pharmacy_requests
     const needsFallback = !data.phone && !data.addressDetail && !data.businessNumber;
@@ -223,6 +254,21 @@ export function createPharmacyInfoController(
       if (digits && digits.length > 20) errors.push('managerPhone: 담당자 전화는 20자 이내');
     }
 
+    // WO-O4O-MYPAGE-BUSINESS-INFO-EDIT-P2-P4-ADD-V1: P2/P4 fields validation (모두 optional)
+    const VALID_ENTITY_TYPES = ['individual', 'corporation', 'simple_taxpayer', 'general_taxpayer', 'tax_exempt', 'non_profit', 'other'];
+    if (body.businessType !== undefined && body.businessType !== null && body.businessType !== '') {
+      if (typeof body.businessType !== 'string' || body.businessType.length > 100) errors.push('businessType: 업태는 100자 이내');
+    }
+    if (body.businessItem !== undefined && body.businessItem !== null && body.businessItem !== '') {
+      if (typeof body.businessItem !== 'string' || body.businessItem.length > 100) errors.push('businessItem: 종목은 100자 이내');
+    }
+    if (body.businessEntityType !== undefined && body.businessEntityType !== null && body.businessEntityType !== '') {
+      if (!VALID_ENTITY_TYPES.includes(body.businessEntityType)) errors.push('businessEntityType: 알 수 없는 사업자 유형');
+    }
+    if (body.businessStartDate !== undefined && body.businessStartDate !== null && body.businessStartDate !== '') {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(body.businessStartDate)) errors.push('businessStartDate: YYYY-MM-DD 형식이어야 합니다');
+    }
+
     if (errors.length > 0) {
       res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: errors.join('; ') } });
       return;
@@ -261,6 +307,35 @@ export function createPharmacyInfoController(
 
     await orgRepo.save(org);
 
+    // WO-O4O-MYPAGE-BUSINESS-INFO-EDIT-P2-P4-ADD-V1:
+    //   P2/P4 fields (businessType / businessItem / businessEntityType / businessStartDate) 만
+    //   users.businessInfo JSONB 에 별도 저장 (organizations.metadata 와 dual-write 안 함).
+    //   payload 에 포함된 키만 merge — 미포함 키는 변경 없음.
+    const bizPatch: Record<string, any> = {};
+    if (body.businessType !== undefined) bizPatch.businessType = body.businessType?.trim() || null;
+    if (body.businessItem !== undefined) bizPatch.businessItem = body.businessItem?.trim() || null;
+    if (body.businessEntityType !== undefined) bizPatch.businessEntityType = body.businessEntityType || null;
+    if (body.businessStartDate !== undefined) bizPatch.businessStartDate = body.businessStartDate || null;
+
+    let savedBiz: Record<string, any> = {};
+    if (Object.keys(bizPatch).length > 0) {
+      try {
+        await dataSource.query(
+          `UPDATE users
+             SET "businessInfo" = COALESCE("businessInfo", '{}'::jsonb) || $2::jsonb,
+                 "updatedAt" = NOW()
+           WHERE id = $1`,
+          [user.id, JSON.stringify(bizPatch)]
+        );
+      } catch (e) {
+        console.error('[Pharmacy Info] Failed to update users.businessInfo P2/P4 fields:', e);
+      }
+    }
+    try {
+      const [row] = await dataSource.query(`SELECT "businessInfo" FROM users WHERE id = $1`, [user.id]);
+      savedBiz = (row?.businessInfo as Record<string, any>) || {};
+    } catch { /* graceful */ }
+
     // Audit log
     try {
       const log = auditRepo.create({
@@ -296,6 +371,10 @@ export function createPharmacyInfoController(
         contactName: meta?.contactName || null,
         managerPhone: meta?.managerPhone || null,
         storeSlug: slugRecord?.slug ?? null,
+        businessType: savedBiz.businessType || null,
+        businessItem: savedBiz.businessItem || null,
+        businessEntityType: savedBiz.businessEntityType || null,
+        businessStartDate: savedBiz.businessStartDate || null,
       } satisfies PharmacyInfoResponse,
     });
   }));
