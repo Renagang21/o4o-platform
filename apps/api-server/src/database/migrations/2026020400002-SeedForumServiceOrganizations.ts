@@ -26,10 +26,13 @@ export class SeedForumServiceOrganizations1706745602002 implements MigrationInte
     }
 
     // GlycoPharm service organization
+    // WO-O4O-FORUM-ORGS-INVALID-UUID-HOTFIX-V1:
+    //   기존 ID 'a1b2c3d4-0001-4000-a000-forum00000001' 은 UUID 형식 위반으로 INSERT 실패.
+    //   유효 UUID 로 교체. fresh DB 안전성 목적이며, prod 정합은 별도 후속 마이그레이션이 보장.
     await queryRunner.query(`
       INSERT INTO organizations (id, name, code, type, level, path, metadata, "isActive", "childrenCount", "createdAt", "updatedAt")
       VALUES (
-        'a1b2c3d4-0001-4000-a000-forum00000001',
+        'a1b2c3d4-0001-4000-a000-91c0fa800001',
         'GlycoPharm',
         'FORUM_GLYCOPHARM',
         'division',

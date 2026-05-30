@@ -7,7 +7,9 @@ import { FC } from 'react';
  * Maps organizationId to a human-readable label with color coding.
  */
 
-const GLYCOPHARM_ORG_ID = 'a1b2c3d4-0001-4000-a000-forum00000001';
+// WO-O4O-FORUM-ORGS-INVALID-UUID-HOTFIX-V1: invalid UUID 'forum00000001' → valid hex.
+// Keep in sync with apps/api-server/src/controllers/forum/forum-organizations.ts (FORUM_ORGS.GLYCOPHARM).
+const GLYCOPHARM_ORG_ID = 'a1b2c3d4-0001-4000-a000-91c0fa800001';
 
 interface OrganizationBadgeProps {
   organizationId?: string | null;

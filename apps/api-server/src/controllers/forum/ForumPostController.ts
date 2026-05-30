@@ -63,9 +63,12 @@ export class ForumPostController extends ForumControllerBase {
         const BYPASS = ['kpa:admin', 'kpa:operator', 'platform:admin', 'platform:super_admin'];
         if (!roles.some((r) => BYPASS.includes(r))) {
           if (uid) {
+            // WO-O4O-FORUM-FCR-COLUMN-FIX-V1:
+            //   forum_category_requests 의 작성자 컬럼은 requester_id (2026012700002 migration).
+            //   기존 _fcr2.created_by 는 미존재 컬럼 — 로그인 사용자 호출 시 DB 에러 → 500.
             queryBuilder.andWhere(`(
               NOT EXISTS (SELECT 1 FROM forum_category_requests _fcr WHERE _fcr.id = post.forum_id AND _fcr.forum_type = 'closed')
-              OR EXISTS (SELECT 1 FROM forum_category_requests _fcr2 WHERE _fcr2.id = post.forum_id AND _fcr2.created_by = :closedUid)
+              OR EXISTS (SELECT 1 FROM forum_category_requests _fcr2 WHERE _fcr2.id = post.forum_id AND _fcr2.requester_id = :closedUid)
               OR EXISTS (SELECT 1 FROM forum_category_members fcm WHERE fcm.forum_category_id = post.forum_id AND fcm.user_id = :closedUid)
             )`, { closedUid: uid });
           } else {
