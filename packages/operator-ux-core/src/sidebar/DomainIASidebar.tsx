@@ -1,24 +1,20 @@
 /**
- * GlycoOperatorSidebar — GlycoPharm-only domain IA sidebar
+ * DomainIASidebar — Cross-service Operator domain IA sidebar
  *
- * WO-O4O-GLYCOPHARM-OPERATOR-MENU-ALIGN-WITH-KPA-V1
+ * WO-O4O-CROSSSERVICE-OPERATOR-SIDEBAR-COMMON-COMPONENT-V1
  *
  * 목적:
- *   GlycoPharm operator sidebar 를 KPA-Society 와 동일한 도메인 IA
- *   (커뮤니티 운영 / 매장 HUB 운영 / 운영 공통) 로 정렬.
- *   기존 공유 OperatorShell 의 flat 11-feature sidebar 를 GlycoPharm 전용
- *   custom sidebar 로 대체. packages/ui 무수정, cross-service 영향 0.
+ *   KPA-Society / GlycoPharm / K-Cosmetics 가 각각 보유하던 *OperatorSidebar.tsx
+ *   (동일 렌더링 로직, 컴포넌트명·props 명만 상이) 를 단일 공통 컴포넌트로 추출.
+ *   기능 변경 없음 — 직전 3개 서비스 sidebar 의 동작을 그대로 보존하는 중복 제거 리팩토링.
  *
- * 구성:
+ * 구성 (3개 서비스 sidebar 와 동일):
  *   - desktop: 도메인 헤딩 (커뮤니티 운영 / 매장 HUB 운영 / 운영 공통) + 그룹별 collapsible
  *   - mobile: 수평 탭 (도메인 헤딩 생략, 그룹 순서로 도메인 클러스터링)
  *   - capability + adminOnly 필터: 호출처(wrapper) 가 menuItems 사전 필터 수행
  *
- * 참고:
- *   본 컴포넌트는 KPA-Society 의 KpaOperatorSidebar 와 구조가 동일하다.
- *   메뉴 공통 컴포넌트 추출은 본 WO 범위 외 — 후속 IR 로 보고.
- *
  * STANDARD_GROUPS 의 icon / label 은 packages/ui 에서 import 하여 시각 일관성 유지.
+ * domain IA 메타데이터는 ./operatorDomainIA 에서 import.
  */
 
 import { useState, useMemo } from 'react';
@@ -37,7 +33,7 @@ import {
   GROUP_TO_DOMAIN,
   TOP_PINNED_GROUPS,
   type OperatorDomainKey,
-} from '../../config/operatorMenuGroups';
+} from './operatorDomainIA';
 
 // ─── Internal types ───────────────────────────────────────────────────────
 
@@ -57,7 +53,7 @@ interface ResolvedDomain {
 
 // ─── Props ────────────────────────────────────────────────────────────────
 
-export interface GlycoOperatorSidebarProps {
+export interface DomainIASidebarProps {
   /** capability + adminOnly 필터링이 끝난 menu 항목 */
   menuItems: Partial<Record<OperatorGroupKey, OperatorMenuItem[]>>;
   /** 서비스 활성 Capability 목록 (그룹 visibility 필터) */
@@ -68,11 +64,11 @@ export interface GlycoOperatorSidebarProps {
 
 // ─── Component ────────────────────────────────────────────────────────────
 
-export function GlycoOperatorSidebar({
+export function DomainIASidebar({
   menuItems,
   capabilities,
   sidebarTopOffset = 'top-6',
-}: GlycoOperatorSidebarProps) {
+}: DomainIASidebarProps) {
   const { pathname } = useLocation();
 
   // ── Resolve top-pinned groups (도메인 헤딩과 무관, sidebar 최상단 고정) ──

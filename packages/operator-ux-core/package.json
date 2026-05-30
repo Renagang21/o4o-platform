@@ -10,6 +10,7 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
+    "@o4o/types": "workspace:*",
     "@o4o/ui": "workspace:*"
   },
   "peerDependencies": {

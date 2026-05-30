@@ -117,60 +117,11 @@ export function filterMenuByRole(
   return filtered;
 }
 
-// ─── Domain IA mapping — WO-O4O-KPA-OPERATOR-SIDEBAR-DOMAIN-IA-RESTRUCTURE-V1 ───
-
-/** KPA operator sidebar 도메인 키.
- *  dashboard 의 2축 운영 (커뮤니티 / 매장 HUB) + 운영 공통 으로 IA 정렬.
- */
-export type OperatorDomainKey = 'community' | 'store_hub' | 'common';
-
-/** 도메인 헤딩 라벨 + 시각 토큰 */
-export const DOMAIN_LABELS: Record<OperatorDomainKey, { label: string; emoji: string }> = {
-  community: { label: '커뮤니티 운영', emoji: '💬' },
-  store_hub: { label: '매장 HUB 운영', emoji: '🏪' },
-  common: { label: '운영 공통', emoji: '⚙️' },
-};
-
-/** STANDARD_GROUPS key → 도메인 매핑.
- *  KPA 미사용 그룹(products/orders/care)도 안전한 default 도메인 지정.
- */
-export const GROUP_TO_DOMAIN: Record<OperatorGroupKey, OperatorDomainKey> = {
-  dashboard: 'common',
-  users: 'community',
-  approvals: 'store_hub',
-  products: 'store_hub',
-  stores: 'store_hub',
-  orders: 'store_hub',
-  content: 'community',
-  resources: 'community',
-  lms: 'community',
-  signage: 'store_hub',
-  forum: 'community',
-  analytics: 'common',
-  // WO-O4O-OPERATOR-SHARED-CARE-TYPE-CONTRACT-REMOVAL-V1 (W5c-v2):
-  //   care orphan mapping 제거 — OperatorGroupKey 에서 'care' 제거와 동반 정리.
-  system: 'common',
-};
-
-/** 도메인 별 그룹 표시 순서.
- *  WO 명시 sidebar 순서를 그룹 키 시퀀스로 변환.
- *  - community: 회원 → 포럼 → 콘텐츠 → LMS → 자료실
- *  - store_hub: 매장 → 상품/이벤트/협업(approvals) → 사이니지
- *  - common: 분석 → 시스템 (대시보드는 TOP_PINNED_GROUPS 에서 별도 처리)
- */
-export const DOMAIN_GROUP_ORDER: Record<OperatorDomainKey, OperatorGroupKey[]> = {
-  community: ['users', 'forum', 'content', 'lms', 'resources'],
-  store_hub: ['stores', 'approvals', 'signage'],
-  common: ['analytics', 'system'],
-};
-
-/** 도메인 표시 순서 (sidebar top → bottom) */
-export const DOMAIN_DISPLAY_ORDER: OperatorDomainKey[] = ['community', 'store_hub', 'common'];
-
-/** sidebar 최상단 고정 항목 — 도메인 헤딩과 무관하게 항상 sidebar 첫 영역에 노출.
- *  대시보드는 모든 도메인의 진입점이므로 sidebar 최상단에 단독 배치.
- */
-export const TOP_PINNED_GROUPS: OperatorGroupKey[] = ['dashboard'];
+// ─── Domain IA mapping ───
+// WO-O4O-CROSSSERVICE-OPERATOR-SIDEBAR-COMMON-COMPONENT-V1:
+//   Domain IA 메타데이터 (OperatorDomainKey / DOMAIN_LABELS / GROUP_TO_DOMAIN /
+//   DOMAIN_GROUP_ORDER / DOMAIN_DISPLAY_ORDER / TOP_PINNED_GROUPS) 는 3개 서비스 공통
+//   @o4o/operator-ux-core 의 sidebar/operatorDomainIA 로 이동. (중복 제거 — 노출 결과 불변)
 
 // ─── Legacy export (하위호환, deprecated) ───
 /** @deprecated Use UNIFIED_MENU + filterMenuByRole instead */

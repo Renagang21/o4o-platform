@@ -15,8 +15,8 @@ import { isAdminOrAbove } from '@o4o/auth-utils';
 import { useAuth } from '../../contexts/AuthContext';
 import { ENABLED_CAPABILITIES } from '../../config/operatorCapabilities';
 import { UNIFIED_MENU, filterMenuByRole } from '../../config/operatorMenuGroups';
+import { DomainIASidebar } from '@o4o/operator-ux-core';
 import { KpaGlobalHeader } from '../KpaGlobalHeader';
-import { KpaOperatorSidebar } from './KpaOperatorSidebar';
 
 export default function KpaOperatorLayoutWrapper() {
   // WO-O4O-KPA-OPERATOR-SIDEBAR-DOMAIN-IA-RESTRUCTURE-V1:
@@ -36,7 +36,7 @@ export default function KpaOperatorLayoutWrapper() {
       <KpaGlobalHeader />
       <div className="flex-1 max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex gap-6">
-          <KpaOperatorSidebar
+          <DomainIASidebar
             menuItems={menuItems}
             capabilities={ENABLED_CAPABILITIES}
             sidebarTopOffset="top-20"

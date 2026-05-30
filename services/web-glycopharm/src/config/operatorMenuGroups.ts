@@ -121,62 +121,11 @@ export function filterMenuByRole(
   return filtered;
 }
 
-// ─── Domain IA mapping — WO-O4O-GLYCOPHARM-OPERATOR-MENU-ALIGN-WITH-KPA-V1 ───
-//
-// KPA-Society 의 동일 메타데이터 구조 (WO-O4O-KPA-OPERATOR-SIDEBAR-DOMAIN-IA-RESTRUCTURE-V1)
-// 를 GlycoPharm 으로 이식. GlycoPharm 고유 그룹 products / orders 는 store_hub 도메인에 포함.
-
-/** GlycoPharm operator sidebar 도메인 키.
- *  KPA 와 동일한 2축 운영 (커뮤니티 / 매장 HUB) + 운영 공통 IA.
- */
-export type OperatorDomainKey = 'community' | 'store_hub' | 'common';
-
-/** 도메인 헤딩 라벨 + 시각 토큰 (KPA 와 동일) */
-export const DOMAIN_LABELS: Record<OperatorDomainKey, { label: string; emoji: string }> = {
-  community: { label: '커뮤니티 운영', emoji: '💬' },
-  store_hub: { label: '매장 HUB 운영', emoji: '🏪' },
-  common: { label: '운영 공통', emoji: '⚙️' },
-};
-
-/** STANDARD_GROUPS key → 도메인 매핑.
- *  KPA 의 매핑을 그대로 따른다 (products/orders 는 store_hub).
- */
-export const GROUP_TO_DOMAIN: Record<OperatorGroupKey, OperatorDomainKey> = {
-  dashboard: 'common',
-  users: 'community',
-  approvals: 'store_hub',
-  products: 'store_hub',
-  stores: 'store_hub',
-  orders: 'store_hub',
-  content: 'community',
-  resources: 'community',
-  lms: 'community',
-  signage: 'store_hub',
-  forum: 'community',
-  analytics: 'common',
-  // WO-O4O-OPERATOR-SHARED-CARE-TYPE-CONTRACT-REMOVAL-V1 (W5c-v2):
-  //   care orphan mapping 제거 — OperatorGroupKey 에서 'care' 제거와 동반 정리.
-  system: 'common',
-};
-
-/** 도메인 별 그룹 표시 순서.
- *  - community: 회원 → 포럼 → 콘텐츠 → LMS → 자료실 (KPA 동일)
- *  - store_hub: 매장 → 상품 → 주문 → 승인 → 사이니지 (KPA 의 [stores,approvals,signage] 사이에 products/orders 삽입)
- *  - common: 분석 → 시스템 (대시보드는 TOP_PINNED_GROUPS 별도)
- */
-export const DOMAIN_GROUP_ORDER: Record<OperatorDomainKey, OperatorGroupKey[]> = {
-  community: ['users', 'forum', 'content', 'lms', 'resources'],
-  store_hub: ['stores', 'products', 'orders', 'approvals', 'signage'],
-  common: ['analytics', 'system'],
-};
-
-/** 도메인 표시 순서 (sidebar top → bottom) */
-export const DOMAIN_DISPLAY_ORDER: OperatorDomainKey[] = ['community', 'store_hub', 'common'];
-
-/** sidebar 최상단 고정 항목 — 도메인 헤딩과 무관하게 항상 sidebar 첫 영역에 노출.
- *  대시보드는 모든 도메인의 진입점이므로 sidebar 최상단에 단독 배치.
- */
-export const TOP_PINNED_GROUPS: OperatorGroupKey[] = ['dashboard'];
+// ─── Domain IA mapping ───
+// WO-O4O-CROSSSERVICE-OPERATOR-SIDEBAR-COMMON-COMPONENT-V1:
+//   Domain IA 메타데이터 (OperatorDomainKey / DOMAIN_LABELS / GROUP_TO_DOMAIN /
+//   DOMAIN_GROUP_ORDER / DOMAIN_DISPLAY_ORDER / TOP_PINNED_GROUPS) 는 3개 서비스 공통
+//   @o4o/operator-ux-core 의 sidebar/operatorDomainIA 로 이동. (중복 제거 — 노출 결과 불변)
 
 // ─── Legacy export (하위호환, deprecated) ───
 /** @deprecated Use UNIFIED_MENU + filterMenuByRole instead */
