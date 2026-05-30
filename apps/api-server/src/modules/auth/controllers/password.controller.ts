@@ -20,12 +20,13 @@ export class PasswordController extends BaseController {
    * Allowed origins for password reset email links.
    * WO-O4O-DOMAIN-SSOT-CANONICALIZATION-V1:
    *   Main service canonical origins are sourced from service-catalog SSOT.
-   *   Non-catalog origins (glucoseview / admin sub-domain / localhost dev) are
-   *   declared explicitly to preserve previous behavior.
+   *   Non-catalog origins (admin sub-domain / localhost dev) are declared
+   *   explicitly to preserve previous behavior.
+   * WO-O4O-API-SERVER-AUTH-GLUCOSEVIEW-RESIDUE-CLEANUP-V1:
+   *   'https://glucoseview.co.kr' allowed origin 제거 (GlucoseView 서비스 폐기).
    */
   private static readonly ALLOWED_ORIGINS = [
     ...getServiceOrigins(),
-    'https://glucoseview.co.kr',
     'https://admin.neture.co.kr',
     'http://localhost:',
   ];
