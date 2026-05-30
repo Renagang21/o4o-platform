@@ -726,14 +726,32 @@ export class MembershipApprovalService {
       // STEP3: Domain profile sync — KPA 전용
       // kpa_members.status='withdrawn', identity_status='withdrawn'
       // 다른 서비스 profile 테이블 sync 는 추후 별도 WO
+      //
+      // WO-O4O-KPA-WITHDRAWN-LICENSE-CLEANUP-V1:
+      //   withdrawn 시 license_number 자동 NULL 처리.
+      //   - kpa_members.license_number 는 Partial UNIQUE index (NULL/'' 제외) 보유
+      //     → 탈퇴 회원이 license 를 계속 점유하면 재가입(본인 또는 다른 약사) 시
+      //       /check-license 가 차단 (status 무관 unique 정책 — IR §4)
+      //   - kpa_pharmacist_profiles.license_number 도 일관성 위해 같이 NULL
+      //   정책: active/pending/suspended/rejected 회원의 license 는 절대 변경하지 않음
+      //          (위 WHERE status NOT IN ('withdrawn') 가드로 이중 보호)
       const hasKpaSociety = affectedServiceKeys.includes('kpa-society');
       if (hasKpaSociety) {
-        logger.info('[WITHDRAW][STEP3] kpa_members projection sync', { userId });
+        logger.info('[WITHDRAW][STEP3] kpa_members projection sync + license cleanup', { userId });
 
         await queryRunner.query(
           `UPDATE kpa_members
-           SET status = 'withdrawn', identity_status = 'withdrawn', updated_at = NOW()
+           SET status = 'withdrawn', identity_status = 'withdrawn',
+               license_number = NULL, updated_at = NOW()
            WHERE user_id = $1 AND status NOT IN ('withdrawn')`,
+          [userId]
+        );
+
+        // kpa_pharmacist_profiles 의 license 도 일관성 정리 (SSOT mirror)
+        await queryRunner.query(
+          `UPDATE kpa_pharmacist_profiles
+           SET license_number = NULL, updated_at = NOW()
+           WHERE user_id = $1 AND license_number IS NOT NULL`,
           [userId]
         );
       }
