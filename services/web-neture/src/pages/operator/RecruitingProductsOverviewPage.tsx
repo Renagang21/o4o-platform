@@ -162,7 +162,7 @@ export default function RecruitingProductsOverviewPage() {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="상품명 / 약국명 검색"
+            placeholder="상품명 / 조직명 검색"
             className="w-full pl-10 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
@@ -183,7 +183,7 @@ export default function RecruitingProductsOverviewPage() {
           <thead>
             <tr className="bg-slate-50 text-left text-xs text-slate-500 uppercase border-b border-slate-200">
               <th className="px-4 py-3 font-medium">상품명</th>
-              <th className="px-4 py-3 font-medium">약국/공급자</th>
+              <th className="px-4 py-3 font-medium">조직/공급사</th>
               <th className="px-4 py-3 font-medium text-center">카테고리</th>
               <th className="px-4 py-3 font-medium text-right">가격</th>
               <th className="px-4 py-3 font-medium text-center">재고</th>
@@ -318,7 +318,7 @@ export default function RecruitingProductsOverviewPage() {
               </div>
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div className="bg-slate-50 rounded-lg p-3">
-                  <p className="text-xs text-slate-500">약국/공급자</p>
+                  <p className="text-xs text-slate-500">조직/공급사</p>
                   <p className="font-medium text-slate-800 mt-0.5">{detailProduct.pharmacy_name || '-'}</p>
                 </div>
                 <div className="bg-slate-50 rounded-lg p-3">

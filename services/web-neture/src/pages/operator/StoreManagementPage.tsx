@@ -51,7 +51,6 @@ const netureStoresConfig: StoresConfig = {
   terminology: { storeLabel: '매장' },
   colorScheme: 'primary',
   typeLabels: {
-    pharmacy: '약국',
     store: '매장',
     branch: '지점',
   },
