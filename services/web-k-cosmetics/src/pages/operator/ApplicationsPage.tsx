@@ -10,6 +10,7 @@ import { useState, useEffect } from 'react';
 import { BaseDetailDrawer } from '@o4o/ui';
 import { DataTable } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
+import { getBusinessEntityTypeLabel } from '@o4o/types';
 import { api } from '../../lib/apiClient';
 
 interface Application {
@@ -25,6 +26,14 @@ interface Application {
   createdAt: string;
   reviewedAt?: string;
   rejectionReason?: string;
+  // WO-O4O-OPERATOR-BUSINESS-REGISTRATION-DISPLAY-ALIGNMENT-V1:
+  //   users.businessInfo projection (backend service.getAllApplications 에서 enrich).
+  businessInfo?: {
+    businessType?: string | null;
+    businessItem?: string | null;
+    businessEntityType?: string | null;
+    businessStartDate?: string | null;
+  } | null;
 }
 
 const STATUS_LABEL: Record<string, string> = {
@@ -198,6 +207,10 @@ export default function ApplicationsPage() {
               { label: '대표자', value: selectedApp.ownerName },
               { label: '상태', value: STATUS_LABEL[selectedApp.status] ?? selectedApp.status },
               { label: '사업자번호', value: selectedApp.businessNumber },
+              { label: '사업자유형', value: getBusinessEntityTypeLabel(selectedApp.businessInfo?.businessEntityType) || '-' },
+              { label: '업태', value: selectedApp.businessInfo?.businessType || '-' },
+              { label: '업종', value: selectedApp.businessInfo?.businessItem || '-' },
+              { label: '개업일', value: selectedApp.businessInfo?.businessStartDate || '-' },
               { label: '연락처', value: selectedApp.contactPhone || '-' },
               { label: '주소', value: selectedApp.address || '-' },
               { label: '지역', value: selectedApp.region || '-' },

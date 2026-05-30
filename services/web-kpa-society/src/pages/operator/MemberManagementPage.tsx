@@ -41,6 +41,7 @@ import {
   type UserData,
 } from '@o4o/operator-core-ui/modules/members';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
+import { getBusinessEntityTypeLabel } from '@o4o/types';
 import { ACTIVITY_TYPE_LABELS } from '../../contexts/AuthContext';
 import { apiClient } from '../../api/client';
 
@@ -641,6 +642,10 @@ function KpaDrawerSections({ user }: { user: KpaUserData }) {
           <div style={fieldRowStyle}><span style={labelStyle}>대표자명</span><span style={valueStyle}>{bi?.ceoName || bi?.representativeName || '-'}</span></div>
           <div style={fieldRowStyle}><span style={labelStyle}>담당자명</span><span style={valueStyle}>{bi?.contactName || '-'}</span></div>
           <div style={fieldRowStyle}><span style={labelStyle}>사업자등록번호</span><span style={valueStyle}>{bi?.businessNumber || '-'}</span></div>
+          <div style={fieldRowStyle}><span style={labelStyle}>사업자유형</span><span style={valueStyle}>{getBusinessEntityTypeLabel(bi?.businessEntityType) || '-'}</span></div>
+          <div style={fieldRowStyle}><span style={labelStyle}>업태</span><span style={valueStyle}>{bi?.businessType || '-'}</span></div>
+          <div style={fieldRowStyle}><span style={labelStyle}>업종</span><span style={valueStyle}>{bi?.businessItem || '-'}</span></div>
+          <div style={fieldRowStyle}><span style={labelStyle}>개업일</span><span style={valueStyle}>{bi?.businessStartDate || '-'}</span></div>
           <div style={fieldRowStyle}><span style={labelStyle}>세금계산서 이메일</span><span style={valueStyle}>{bi?.taxInvoiceEmail || bi?.taxEmail || '-'}</span></div>
           <div style={fieldRowStyle}><span style={labelStyle}>우편번호</span><span style={valueStyle}>{addrZip || '-'}</span></div>
           <div style={fieldRowStyle}><span style={labelStyle}>기본주소</span><span style={valueStyle}>{addrBase || '-'}</span></div>

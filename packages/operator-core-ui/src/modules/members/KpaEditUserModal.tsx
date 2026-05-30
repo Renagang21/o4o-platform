@@ -52,6 +52,13 @@ export interface KpaMemberBusinessInfo {
     baseAddress?: string | null;
     detailAddress?: string | null;
   } | null;
+  // WO-O4O-OPERATOR-BUSINESS-REGISTRATION-DISPLAY-ALIGNMENT-V1:
+  //   사업자등록증 4 canonical 필드 — 가입 폼에서 users.businessInfo 에 저장된 후
+  //   GET /kpa/members 응답에 projection 되어 Drawer 등 operator UI 에서 표시.
+  businessType?: string | null;
+  businessItem?: string | null;
+  businessEntityType?: string | null;
+  businessStartDate?: string | null;
 }
 
 export interface KpaMemberForEdit {

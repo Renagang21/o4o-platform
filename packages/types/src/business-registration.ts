@@ -200,3 +200,29 @@ export type BusinessRegistrationInfoUpdateInput = Partial<BusinessRegistrationIn
 export type PharmacyBusinessRegistrationInfoInput = Partial<PharmacyBusinessRegistrationInfo>;
 export type StoreBusinessRegistrationInfoInput = Partial<StoreBusinessRegistrationInfo>;
 export type SupplierBusinessRegistrationInfoInput = Partial<SupplierBusinessRegistrationInfo>;
+
+// ─── Display Labels (Korean) ─────────────────────────────────
+
+/**
+ * 사업자 유형 한글 라벨.
+ * Operator/Admin 화면 및 사용자 화면 공통 표시 라벨.
+ *
+ * WO-O4O-OPERATOR-BUSINESS-REGISTRATION-DISPLAY-ALIGNMENT-V1 에서 도입.
+ */
+export const BUSINESS_ENTITY_TYPE_LABELS: Record<BusinessEntityType, string> = {
+  individual: '개인사업자',
+  corporation: '법인사업자',
+  simple_taxpayer: '간이과세자',
+  general_taxpayer: '일반과세자',
+  tax_exempt: '면세사업자',
+  non_profit: '비영리/단체',
+  other: '기타',
+};
+
+/**
+ * 사업자 유형 코드를 한글 라벨로 변환. 알 수 없는 값은 원본 그대로 반환.
+ */
+export function getBusinessEntityTypeLabel(value: string | null | undefined): string {
+  if (!value) return '';
+  return BUSINESS_ENTITY_TYPE_LABELS[value as BusinessEntityType] ?? value;
+}

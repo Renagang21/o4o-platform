@@ -725,6 +725,11 @@ export interface RegistrationRecord {
   businessAddress?: string;
   businessAddressDetail?: string;
   businessType?: string;
+  // WO-O4O-OPERATOR-BUSINESS-REGISTRATION-DISPLAY-ALIGNMENT-V1:
+  //   사업자등록증 3 canonical 추가 필드 (업태 businessType 는 기존). users.businessInfo 출처.
+  businessItem?: string;
+  businessEntityType?: string;
+  businessStartDate?: string;
   createdAt: string;
   processedAt?: string;
   processedBy?: string;

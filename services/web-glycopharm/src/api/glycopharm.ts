@@ -283,6 +283,17 @@ export interface AdminApplication extends GlycopharmApplication {
   userEmail?: string | null;
   userPhone?: string | null;
   metadata?: Record<string, any>;
+  /**
+   * WO-O4O-OPERATOR-BUSINESS-REGISTRATION-DISPLAY-ALIGNMENT-V1:
+   *   users.businessInfo 의 4 canonical 사업자등록증 필드 projection.
+   *   가입 폼에서 저장된 단일 출처. 응답 추가 (backend admin.controller).
+   */
+  businessInfo?: {
+    businessType?: string | null;
+    businessItem?: string | null;
+    businessEntityType?: string | null;
+    businessStartDate?: string | null;
+  } | null;
   createdAt?: string;
   updatedAt?: string;
 }

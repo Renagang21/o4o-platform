@@ -27,7 +27,7 @@ import {
 import { OperatorConfirmModal, ActionBar } from '@o4o/ui';
 import { DataTable } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
-import { OperatorActionType } from '@o4o/types';
+import { OperatorActionType, getBusinessEntityTypeLabel } from '@o4o/types';
 import { operatorRegistrationApi } from '../../../lib/api';
 
 type RequestStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'ALL';
@@ -53,6 +53,11 @@ interface RegistrationRequest {
   businessAddress?: string;
   businessAddressDetail?: string;
   businessType?: string;
+  // WO-O4O-OPERATOR-BUSINESS-REGISTRATION-DISPLAY-ALIGNMENT-V1:
+  //   사업자등록증 3 canonical 추가 (업태 businessType 는 기존). users.businessInfo 출처.
+  businessItem?: string;
+  businessEntityType?: string;
+  businessStartDate?: string;
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   createdAt: string;
   processedAt?: string;
@@ -143,6 +148,9 @@ export default function RegistrationRequestsPage() {
         businessAddress: r.businessAddress,
         businessAddressDetail: r.businessAddressDetail,
         businessType: r.businessType,
+        businessItem: r.businessItem,
+        businessEntityType: r.businessEntityType,
+        businessStartDate: r.businessStartDate,
         status: mapStatus(r.status),
         createdAt: r.createdAt || new Date().toISOString(),
         processedAt: r.processedAt,
@@ -653,10 +661,28 @@ export default function RegistrationRequestsPage() {
                       <div className="font-medium">{selectedRequest.representativeName}</div>
                     </div>
                   )}
+                  {selectedRequest.businessEntityType && (
+                    <div>
+                      <div className="text-sm text-gray-500">사업자유형</div>
+                      <div className="font-medium">{getBusinessEntityTypeLabel(selectedRequest.businessEntityType)}</div>
+                    </div>
+                  )}
                   {selectedRequest.businessType && (
                     <div>
-                      <div className="text-sm text-gray-500">업종</div>
+                      <div className="text-sm text-gray-500">업태</div>
                       <div className="font-medium">{selectedRequest.businessType}</div>
+                    </div>
+                  )}
+                  {selectedRequest.businessItem && (
+                    <div>
+                      <div className="text-sm text-gray-500">업종</div>
+                      <div className="font-medium">{selectedRequest.businessItem}</div>
+                    </div>
+                  )}
+                  {selectedRequest.businessStartDate && (
+                    <div>
+                      <div className="text-sm text-gray-500">개업일</div>
+                      <div className="font-medium">{selectedRequest.businessStartDate}</div>
                     </div>
                   )}
                   {selectedRequest.businessAddress && (

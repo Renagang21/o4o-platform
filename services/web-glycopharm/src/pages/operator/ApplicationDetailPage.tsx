@@ -19,7 +19,7 @@ import {
   Receipt,
 } from 'lucide-react';
 import { OperatorConfirmModal, useOperatorAction } from '@o4o/ui';
-import { OperatorActionType } from '@o4o/types';
+import { OperatorActionType, getBusinessEntityTypeLabel } from '@o4o/types';
 import { glycopharmApi } from '@/api/glycopharm';
 import type { AdminApplication, ServiceType, ApplicationStatus } from '@/api/glycopharm';
 
@@ -186,8 +186,10 @@ export default function ApplicationDetailPage() {
               <InfoField icon={FileText} label="사업자등록번호" value={application.businessNumber} />
               <InfoField icon={IdCard} label="약사 면허번호" value={application.metadata?.licenseNumber} />
               <InfoField icon={Receipt} label="세금계산서 이메일" value={application.metadata?.taxEmail} />
-              <InfoField icon={Briefcase} label="업태" value={application.metadata?.businessType} />
-              <InfoField icon={Briefcase} label="업종" value={application.metadata?.businessCategory} />
+              <InfoField icon={Briefcase} label="업태" value={application.businessInfo?.businessType ?? application.metadata?.businessType} />
+              <InfoField icon={Briefcase} label="업종" value={application.businessInfo?.businessItem ?? application.metadata?.businessCategory} />
+              <InfoField icon={Briefcase} label="사업자유형" value={getBusinessEntityTypeLabel(application.businessInfo?.businessEntityType) || undefined} />
+              <InfoField icon={Briefcase} label="개업일" value={application.businessInfo?.businessStartDate} />
               <InfoField
                 icon={MapPin}
                 label="주소"
