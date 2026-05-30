@@ -30,11 +30,11 @@ const makeRequest: EditUserModalConfig['makeRequest'] = async (method, path, dat
 const KCOSMETICS_CONFIG: EditUserModalConfig = {
   serviceKey: 'k-cosmetics',
   makeRequest,
+  // WO-O4O-KCOSMETICS-OPERATOR-VOCABULARY-PHARMACY-CLEANUP-V1:
+  //   pharmacist/supplier 옵션 제거. 데이터 검증 결과 cosmetics 스코프에 해당 role 보유자 0건.
   membershipRoleOptions: [
     { value: 'seller', label: '판매자' },
     { value: 'consumer', label: '소비자' },
-    { value: 'pharmacist', label: '약사' },
-    { value: 'supplier', label: '공급자' },
     { value: 'partner', label: '파트너' },
   ],
   adminRoleOptions: [

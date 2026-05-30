@@ -61,6 +61,9 @@ function getPrimaryRole(u: UserData): string {
 }
 
 // 참여 유형 한글 라벨(bare/namespaced 모두). 미매핑 값은 RoleBadge 기본 처리.
+// WO-O4O-KCOSMETICS-OPERATOR-VOCABULARY-PHARMACY-CLEANUP-V1:
+//   KPA/Glyco 계열 어휘 (pharmacist/supplier) 제거. 데이터 검증 결과 pharmacist 글로벌 0건,
+//   supplier 글로벌 3건이나 cosmetics 멤버십 보유 0건 — K-Cos UI 에서 노출될 데이터 없음.
 const KCOS_ROLE_DISPLAY: Record<string, string> = {
   general: '일반 회원',
   'cosmetics:store_owner': '판매자',
@@ -68,8 +71,6 @@ const KCOS_ROLE_DISPLAY: Record<string, string> = {
   seller: '판매자',
   consumer: '소비자',
   customer: '소비자',
-  pharmacist: '약사',
-  supplier: '공급자',
   partner: '파트너',
 };
 
