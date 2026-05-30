@@ -42,3 +42,15 @@ export { useServiceConfig } from './hooks/useServiceConfig.js';
 
 // Nav helpers (WO-O4O-COMMON-MENU-VISIBILITY-POLICY-IMPL-V1)
 export { isAdminOrOperator } from './nav/index.js';
+
+// Sidebar (WO-O4O-CROSSSERVICE-OPERATOR-SIDEBAR-COMMON-COMPONENT-V1)
+export {
+  DomainIASidebar,
+  type DomainIASidebarProps,
+  DOMAIN_LABELS,
+  DOMAIN_GROUP_ORDER,
+  DOMAIN_DISPLAY_ORDER,
+  GROUP_TO_DOMAIN,
+  TOP_PINNED_GROUPS,
+  type OperatorDomainKey,
+} from './sidebar/index.js';

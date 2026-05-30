@@ -10,12 +10,14 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
+    "@o4o/types": "workspace:*",
     "@o4o/ui": "workspace:*"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0",
-    "react-router-dom": "^6.0.0 || ^7.0.0"
+    "react-router-dom": "^6.0.0 || ^7.0.0",
+    "lucide-react": ">=0.300.0"
   },
   "devDependencies": {
     "typescript": "5.4.5"
