@@ -117,6 +117,11 @@ export default function RegisterModal() {
     contactName: '',           // WO-O4O-KPA-PHARMACY-CONTACT-NAME-FIELD-V1
     taxInvoiceEmail: '',       // canonical (legacy: taxEmail)
     managerPhone: '',          // canonical (신규)
+    // 사업자등록증 표준 4 필드 (WO-O4O-CROSSSERVICE-BUSINESS-REGISTRATION-FORM-ALIGNMENT-V1)
+    businessType: '',          // 업태 (예: 도매 및 소매)
+    businessItem: '',          // 종목 (예: 의약품 소매업)
+    businessEntityType: '',    // 사업자 유형 (canonical: BusinessEntityType)
+    businessStartDate: '',     // 개업일 YYYY-MM-DD
     // 개설약사 전용 — 사업장 주소 (StoreAddress 3-part)
     businessZipCode: '',
     businessAddress: '',
@@ -153,6 +158,7 @@ export default function RegisterModal() {
         licenseNumber: '',
         activityType: '', pharmacyName: '', pharmacyAddress: '', pharmacyPhone: '',
         businessNumber: '', ceoName: '', contactName: '', taxInvoiceEmail: '', managerPhone: '',
+        businessType: '', businessItem: '', businessEntityType: '', businessStartDate: '',
         businessZipCode: '', businessAddress: '', businessAddressDetail: '',
         universityName: '', studentYear: '',
       });
@@ -260,6 +266,11 @@ export default function RegisterModal() {
           if (formData.contactName) payload.contactName = formData.contactName;
           if (formData.taxInvoiceEmail) payload.taxInvoiceEmail = formData.taxInvoiceEmail;
           if (formData.managerPhone) payload.managerPhone = formData.managerPhone;
+          // 사업자등록증 표준 4 필드 (WO-O4O-CROSSSERVICE-BUSINESS-REGISTRATION-FORM-ALIGNMENT-V1)
+          if (formData.businessType) payload.businessType = formData.businessType;
+          if (formData.businessItem) payload.businessItem = formData.businessItem;
+          if (formData.businessEntityType) payload.businessEntityType = formData.businessEntityType;
+          if (formData.businessStartDate) payload.businessStartDate = formData.businessStartDate;
           // 사업장명/주소는 약국명/약국주소와 동일 (개설약사 = 사업장 == 약국)
           if (formData.pharmacyName) payload.businessName = formData.pharmacyName;
           if (formData.businessZipCode) payload.zipCode = formData.businessZipCode;
@@ -653,6 +664,42 @@ export default function RegisterModal() {
                           <input type="email" name="taxInvoiceEmail" value={formData.taxInvoiceEmail} onChange={handleInputChange}
                             placeholder="세금계산서 수신 이메일 (선택)"
                             className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                        </div>
+                        {/* 사업자등록증 표준 4 필드 — WO-O4O-CROSSSERVICE-BUSINESS-REGISTRATION-FORM-ALIGNMENT-V1 */}
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">업태</label>
+                            <input type="text" name="businessType" value={formData.businessType} onChange={handleInputChange}
+                              placeholder="예: 도매 및 소매 (선택)" maxLength={100}
+                              className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">종목</label>
+                            <input type="text" name="businessItem" value={formData.businessItem} onChange={handleInputChange}
+                              placeholder="예: 의약품 소매업 (선택)" maxLength={100}
+                              className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">사업자 유형</label>
+                            <select name="businessEntityType" value={formData.businessEntityType} onChange={handleInputChange}
+                              className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                              <option value="">선택 (선택사항)</option>
+                              <option value="individual">개인사업자</option>
+                              <option value="corporation">법인사업자</option>
+                              <option value="simple_taxpayer">간이과세자</option>
+                              <option value="general_taxpayer">일반과세자</option>
+                              <option value="tax_exempt">면세사업자</option>
+                              <option value="non_profit">비영리/단체</option>
+                              <option value="other">기타</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">개업일</label>
+                            <input type="date" name="businessStartDate" value={formData.businessStartDate} onChange={handleInputChange}
+                              className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                          </div>
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                           <div>

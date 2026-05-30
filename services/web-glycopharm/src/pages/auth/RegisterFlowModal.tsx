@@ -70,6 +70,10 @@ export function RegisterFlowModal({ open, onClose }: Props) {
     taxEmail: '',
     businessType: '',
     businessCategory: '',
+    // 사업자등록증 표준 추가 필드 (WO-O4O-CROSSSERVICE-BUSINESS-REGISTRATION-FORM-ALIGNMENT-V1)
+    businessItem: '',          // 종목 (businessCategory canonical 후속)
+    businessEntityType: '',    // 사업자 유형
+    businessStartDate: '',     // 개업일 YYYY-MM-DD
     zipCode: '',
     address1: '',
     address2: '',
@@ -93,6 +97,7 @@ export function RegisterFlowModal({ open, onClose }: Props) {
         phone: '', licenseNumber: '',
         businessName: '', representativeName: '', businessNumber: '',
         taxEmail: '', businessType: '', businessCategory: '',
+        businessItem: '', businessEntityType: '', businessStartDate: '',
         zipCode: '', address1: '', address2: '',
         agreeTerms: false, agreePrivacy: false, agreeMarketing: false,
       });
@@ -237,6 +242,10 @@ export function RegisterFlowModal({ open, onClose }: Props) {
           ...(formData.licenseNumber ? { licenseNumber: formData.licenseNumber } : {}),
           ...(formData.businessType ? { businessType: formData.businessType } : {}),
           ...(formData.businessCategory ? { businessCategory: formData.businessCategory } : {}),
+          // 사업자등록증 표준 추가 필드 (WO-O4O-CROSSSERVICE-BUSINESS-REGISTRATION-FORM-ALIGNMENT-V1)
+          ...(formData.businessItem ? { businessItem: formData.businessItem } : {}),
+          ...(formData.businessEntityType ? { businessEntityType: formData.businessEntityType } : {}),
+          ...(formData.businessStartDate ? { businessStartDate: formData.businessStartDate } : {}),
           ...(formData.zipCode ? { zipCode: formData.zipCode } : {}),
           ...(formData.address1 ? { address1: formData.address1 } : {}),
           ...(formData.address2 ? { address2: formData.address2 } : {}),
@@ -594,6 +603,28 @@ export function RegisterFlowModal({ open, onClose }: Props) {
                       <input type="text" name="businessCategory" value={formData.businessCategory} onChange={handleInputChange}
                         className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                         placeholder="의약품" />
+                    </div>
+                  </div>
+                  {/* 사업자 유형 / 개업일 — WO-O4O-CROSSSERVICE-BUSINESS-REGISTRATION-FORM-ALIGNMENT-V1 */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1.5">사업자 유형</label>
+                      <select name="businessEntityType" value={formData.businessEntityType} onChange={handleInputChange}
+                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                        <option value="">선택 (선택사항)</option>
+                        <option value="individual">개인사업자</option>
+                        <option value="corporation">법인사업자</option>
+                        <option value="simple_taxpayer">간이과세자</option>
+                        <option value="general_taxpayer">일반과세자</option>
+                        <option value="tax_exempt">면세사업자</option>
+                        <option value="non_profit">비영리/단체</option>
+                        <option value="other">기타</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1.5">개업일</label>
+                      <input type="date" name="businessStartDate" value={formData.businessStartDate} onChange={handleInputChange}
+                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
                     </div>
                   </div>
                   <AddressSearch

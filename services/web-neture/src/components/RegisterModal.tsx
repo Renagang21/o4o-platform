@@ -88,6 +88,10 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
     contactName: '',
     contactPhone: '',
     taxInvoiceEmail: '',
+    // 사업자등록증 표준 추가 필드 (WO-O4O-CROSSSERVICE-BUSINESS-REGISTRATION-FORM-ALIGNMENT-V1)
+    businessItem: '',          // 종목
+    businessEntityType: '',    // 사업자 유형
+    businessStartDate: '',     // 개업일 YYYY-MM-DD
     agreeTerms: false,
     agreePrivacy: false,
     agreeMarketing: false,
@@ -117,6 +121,9 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
         contactName: '',
         contactPhone: '',
         taxInvoiceEmail: '',
+        businessItem: '',
+        businessEntityType: '',
+        businessStartDate: '',
         agreeTerms: false,
         agreePrivacy: false,
         agreeMarketing: false,
@@ -226,6 +233,10 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
           managerPhone: formData.contactPhone,
           address1: formData.businessAddress,
           address2: formData.businessAddressDetail,
+          // 사업자등록증 표준 추가 필드 (WO-O4O-CROSSSERVICE-BUSINESS-REGISTRATION-FORM-ALIGNMENT-V1)
+          ...(formData.businessItem ? { businessItem: formData.businessItem } : {}),
+          ...(formData.businessEntityType ? { businessEntityType: formData.businessEntityType } : {}),
+          ...(formData.businessStartDate ? { businessStartDate: formData.businessStartDate } : {}),
         }),
       });
 
@@ -752,6 +763,49 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                         <p className="mt-1 text-xs text-gray-400">
                           세금계산서 수신용 이메일 (로그인 이메일과 달라도 됩니다)
                         </p>
+                      </div>
+                      {/* 사업자등록증 표준 추가 필드 — WO-O4O-CROSSSERVICE-BUSINESS-REGISTRATION-FORM-ALIGNMENT-V1 */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">종목</label>
+                        <input
+                          type="text"
+                          name="businessItem"
+                          value={formData.businessItem}
+                          onChange={handleInputChange}
+                          placeholder="예: 의약품 도매업 (선택)"
+                          maxLength={100}
+                          className={INPUT_CLASS_BG}
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">사업자 유형</label>
+                          <select
+                            name="businessEntityType"
+                            value={formData.businessEntityType}
+                            onChange={handleInputChange}
+                            className={INPUT_CLASS_BG}
+                          >
+                            <option value="">선택 (선택사항)</option>
+                            <option value="individual">개인사업자</option>
+                            <option value="corporation">법인사업자</option>
+                            <option value="simple_taxpayer">간이과세자</option>
+                            <option value="general_taxpayer">일반과세자</option>
+                            <option value="tax_exempt">면세사업자</option>
+                            <option value="non_profit">비영리/단체</option>
+                            <option value="other">기타</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">개업일</label>
+                          <input
+                            type="date"
+                            name="businessStartDate"
+                            value={formData.businessStartDate}
+                            onChange={handleInputChange}
+                            className={INPUT_CLASS_BG}
+                          />
+                        </div>
                       </div>
                     </>
                   )}
