@@ -221,15 +221,29 @@ function checkInactivity(
   }
 
   // Zero orders for commerce services
-  if (['neture', 'cosmetics'].includes(service)) {
-    const monthlyOrders = getNum(metrics, 'orders.monthly') || getNum(metrics, 'orders.active');
-    if (monthlyOrders === 0) {
-      items.push({
-        id: 'no-orders',
-        message: '최근 주문이 없습니다. 플랫폼 활동을 점검하세요.',
-        level: 'warning',
-      });
-    }
+  // WO-O4O-NETURE-OPERATOR-DASHBOARD-AI-SUMMARY-INACTIVITY-RULE-REFINE-V1:
+  //   Neture 는 zero-orders 단독 조건만으로 warning 을 띄우지 않는다.
+  //   서비스 초기/저활동 상태에서는 주문 0 건이 곧 장애가 아니라 정상 가능성이 크고,
+  //   "플랫폼 활동을 점검하세요" 처럼 모호한 문구는 운영자에게 행동 단서를 주지 못한다.
+  //   → severity 를 warning → info 로 낮추고 문구를 구체·중립적으로 변경.
+  //     실제 action item (supplier pending / 가입 승인 대기 등) 이 함께 있으면
+  //     기존 severity 정렬 (critical > warning > info) 에 의해 warning 항목이 먼저 표시되어
+  //     이 info 항목은 max 3 의 뒤로 밀린다 — 사용자가 원하는 "실제 action 우선" 동작 보장.
+  //   cosmetics 는 본 WO 범위 외 — 정책 미변경 (기존 warning 그대로).
+  const monthlyOrders = getNum(metrics, 'orders.monthly') || getNum(metrics, 'orders.active');
+
+  if (service === 'neture' && monthlyOrders === 0) {
+    items.push({
+      id: 'no-orders',
+      message: '최근 주문 데이터가 아직 충분하지 않습니다. 공급사 활성화·상품 노출 흐름을 먼저 확인하세요.',
+      level: 'info',
+    });
+  } else if (service === 'cosmetics' && monthlyOrders === 0) {
+    items.push({
+      id: 'no-orders',
+      message: '최근 주문이 없습니다. 플랫폼 활동을 점검하세요.',
+      level: 'warning',
+    });
   }
 
   return items;
