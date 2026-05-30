@@ -108,6 +108,11 @@ export {
   adminSupplierApi,
   // WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1: operator scope supplier API
   operatorSupplierApi,
+  // WO-O4O-NETURE-OPERATOR-CONTACT-MESSAGES-OPERATOR-SCOPE-V1: operator scope contact API
+  operatorContactApi,
+  type OperatorContactMessage,
+  type OperatorContactPagination,
+  type OperatorContactListParams,
   adminSettlementApi,
   adminCommissionApi,
   adminProductApi,

@@ -773,3 +773,67 @@ export const operatorRegistrationApi = {
     return response.data;
   },
 };
+
+// ==================== Operator Contact Messages ====================
+// WO-O4O-NETURE-OPERATOR-CONTACT-MESSAGES-OPERATOR-SCOPE-V1
+//   /admin/contact-messages 와 의도적으로 분리한 별도 endpoint. operator 화면 노출
+//   안전 필드만 응답. adminNotes / ipAddress / userAgent 없음. message 는 preview 만.
+
+export interface OperatorContactMessage {
+  id: string;
+  contactType: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  subject: string;
+  /** 본문 preview (앞 160자). 상세 처리는 admin 화면. */
+  messagePreview: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OperatorContactPagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface OperatorContactListParams {
+  contactType?: 'supplier' | 'partner' | 'service' | 'other';
+  status?: 'new' | 'in_progress' | 'resolved';
+  page?: number;
+  limit?: number;
+}
+
+export const operatorContactApi = {
+  async list(params: OperatorContactListParams = {}): Promise<{ items: OperatorContactMessage[]; pagination: OperatorContactPagination } | null> {
+    try {
+      const qs = new URLSearchParams();
+      if (params.contactType) qs.set('contactType', params.contactType);
+      if (params.status) qs.set('status', params.status);
+      if (params.page) qs.set('page', String(params.page));
+      if (params.limit) qs.set('limit', String(params.limit));
+      const suffix = qs.toString() ? `?${qs}` : '';
+      const response = await api.get(`/neture/operator/contact-messages${suffix}`);
+      return response.data?.data ?? null;
+    } catch (error: any) {
+      if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
+      console.warn('[Operator Contact API] Failed to list:', error);
+      return null;
+    }
+  },
+
+  /** supplier/partner 문의 일괄 mark-read (status='new' → 'in_progress'). */
+  async bulkMarkRead(): Promise<{ updated: number; scope: string[] } | null> {
+    try {
+      const response = await api.post('/neture/operator/actions/execute/inquiries-mark-read');
+      return response.data?.data ?? null;
+    } catch (error: any) {
+      if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
+      console.warn('[Operator Contact API] Failed to mark-read:', error);
+      return null;
+    }
+  },
+};

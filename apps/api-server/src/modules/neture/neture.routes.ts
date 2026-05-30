@@ -47,6 +47,7 @@ import { createOperatorSupplierQualityController } from './controllers/operator-
 import { createOperatorCategoryMappingController } from './controllers/operator-category-mapping.controller.js';
 import { createOperatorRecruitingController } from './controllers/operator-recruiting.controller.js';
 import { createOperatorSupplierController } from './controllers/operator-supplier.controller.js';
+import { createOperatorContactController } from './controllers/operator-contact.controller.js';
 import { CategoryMappingService } from './services/category-mapping.service.js';
 
 // Request type
@@ -170,6 +171,9 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
   // WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1
   // operator scope supplier activation (admin scope endpoints 와 별도 — 권한 확장 아님)
   router.use('/operator', createOperatorSupplierController(dataSource));
+  // WO-O4O-NETURE-OPERATOR-CONTACT-MESSAGES-OPERATOR-SCOPE-V1
+  // operator scope contact-messages list (admin endpoints 와 별도 — 권한 확장 아님)
+  router.use('/operator', createOperatorContactController(dataSource));
 
   // Partner domain (full paths included in controller: /partner/*, /admin/partners/*, /admin/partner-settlements/*)
   router.use('/', createPartnerController(dataSource));

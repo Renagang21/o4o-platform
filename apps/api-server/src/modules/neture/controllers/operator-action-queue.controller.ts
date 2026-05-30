@@ -276,20 +276,28 @@ export function createOperatorActionQueueController(dataSource: DataSource): Rou
 
   /**
    * POST /operator/actions/execute/inquiries-mark-read
+   *
+   * WO-O4O-NETURE-OPERATOR-CONTACT-MESSAGES-OPERATOR-SCOPE-V1:
+   *   기존: status='new' 전체 일괄 변환 → service/other 까지 함께 처리되어 operator 가
+   *         의도하지 않은 admin 영역 문의도 mark-read 되는 위험.
+   *   변경: contactType IN ('supplier','partner') 으로 범위 제한.
+   *         service/other 문의는 본 endpoint 에서 처리하지 않으며, admin 화면에서만 처리.
    */
   router.post('/actions/execute/inquiries-mark-read', async (_req: Request, res: Response): Promise<void> => {
     try {
+      // 컬럼 quoting: NetureContactMessage migration 이 camelCase 컬럼명 ("contactType", "updatedAt") 사용
       const updated = await dataSource.query(
         `UPDATE neture_contact_messages
-         SET status = 'in_progress', updated_at = NOW()
+         SET status = 'in_progress', "updatedAt" = NOW()
          WHERE status = 'new'
+           AND "contactType" IN ('supplier', 'partner')
          RETURNING id`,
       );
 
-      logger.info(`[Action Engine] inquiries-mark-read: updated=${updated.length}`);
+      logger.info(`[Action Engine] inquiries-mark-read (supplier/partner): updated=${updated.length}`);
       res.json({
         success: true,
-        data: { updated: updated.length },
+        data: { updated: updated.length, scope: ['supplier', 'partner'] },
       });
     } catch (error: any) {
       logger.error('[Action Engine] inquiries-mark-read error:', error);
