@@ -3,6 +3,12 @@
  *
  * WO-O4O-OPERATOR-UI-STANDARDIZATION-V1
  * WO-O4O-RBAC-GLOBAL-STANDARD-ROLL-OUT-V1: adminOnly 플래그 추가
+ * WO-O4O-GLYCOPHARM-OPERATOR-MENU-ALIGN-WITH-KPA-V1:
+ *   KPA-Society 의 도메인 IA (커뮤니티 운영 / 매장 HUB 운영 / 운영 공통) 기준으로
+ *   UNIFIED_MENU 그룹 재배치 + KPA 와 동일한 Domain IA 메타데이터 추가.
+ *   - content 그룹의 LMS 항목(강의/강사 승인/안내 문구) → 신규 lms 그룹
+ *   - content 그룹의 약국 HUB 블로그/POP/QR → stores 그룹
+ *   - GlycoPharm 고유 그룹 products / orders 는 store_hub 도메인에 포함
  *
  * 표준 11-그룹 키에 대한 라우트 매핑.
  * adminOnly 항목은 admin 역할만 표시.
@@ -35,26 +41,35 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
        Market Trial operator 콘솔은 미구현 → 메뉴/라우트에서 제거. 후속 별도 WO 예정. */
   ],
   products: [{ label: '상품 관리', path: '/operator/products' }],
+  // WO-O4O-GLYCOPHARM-OPERATOR-MENU-ALIGN-WITH-KPA-V1:
+  //   약국 HUB 블로그/POP/QR 을 stores 그룹으로 이동 (KPA-aligned).
+  //   Store Menu Canonical Tree V1 의 매장 HUB 운영 축에 정합.
   stores: [
     { label: '약국 관리', path: '/operator/pharmacies' },
     { label: '매장 관리', path: '/operator/stores' },
     // WO-O4O-GLYCOPHARM-OPERATOR-STORE-CHANNELS-V1
     { label: '채널 관리', path: '/operator/store-channels' },
-  ],
-  orders: [{ label: '주문 관리', path: '/operator/orders' }],
-  content: [
-    { label: '가이드라인 관리', path: '/operator/guidelines' },
-    { label: '강의 관리', path: '/operator/lms/courses' },
-    // WO-O4O-GLYCOPHARM-OPERATOR-LMS-QUALIFICATION-WORKFLOW-V1
-    { label: '강사 승인', path: '/operator/qualification-requests' },
-    { label: '안내 문구 관리', path: '/operator/guide-contents' },
-    { label: '공지/뉴스 관리', path: '/operator/content-management' },
-    // WO-O4O-GLYCOPHARM-OPERATOR-STORE-HUB-WRITE-CAPABILITY-V1
+    // WO-O4O-GLYCOPHARM-OPERATOR-STORE-HUB-WRITE-CAPABILITY-V1 (위치 재배치)
     { label: '약국 HUB 블로그', path: '/operator/blog' },
     { label: '약국 HUB POP', path: '/operator/pop' },
     { label: '약국 HUB QR', path: '/operator/qr' },
+  ],
+  orders: [{ label: '주문 관리', path: '/operator/orders' }],
+  // WO-O4O-GLYCOPHARM-OPERATOR-MENU-ALIGN-WITH-KPA-V1:
+  //   LMS / HUB 항목 분리 후 community 도메인 콘텐츠 축만 잔존.
+  content: [
+    { label: '가이드라인 관리', path: '/operator/guidelines' },
+    { label: '공지/뉴스 관리', path: '/operator/content-management' },
     // WO-O4O-GLYCOPHARM-OPERATOR-SURVEYS-V1
     { label: '설문조사 관리', path: '/operator/surveys' },
+  ],
+  // WO-O4O-GLYCOPHARM-OPERATOR-MENU-ALIGN-WITH-KPA-V1:
+  //   content 그룹에서 LMS 항목 분리 — KPA 와 동일한 별도 lms 그룹.
+  lms: [
+    { label: '강의 관리', path: '/operator/lms' },
+    // WO-O4O-GLYCOPHARM-OPERATOR-LMS-QUALIFICATION-WORKFLOW-V1
+    { label: '강사 승인', path: '/operator/qualification-requests' },
+    { label: '안내 문구 관리', path: '/operator/guide-contents' },
   ],
   signage: [
     { label: 'HQ 미디어', path: '/operator/signage/hq-media' },
@@ -106,6 +121,62 @@ export function filterMenuByRole(
   return filtered;
 }
 
+// ─── Domain IA mapping — WO-O4O-GLYCOPHARM-OPERATOR-MENU-ALIGN-WITH-KPA-V1 ───
+//
+// KPA-Society 의 동일 메타데이터 구조 (WO-O4O-KPA-OPERATOR-SIDEBAR-DOMAIN-IA-RESTRUCTURE-V1)
+// 를 GlycoPharm 으로 이식. GlycoPharm 고유 그룹 products / orders 는 store_hub 도메인에 포함.
+
+/** GlycoPharm operator sidebar 도메인 키.
+ *  KPA 와 동일한 2축 운영 (커뮤니티 / 매장 HUB) + 운영 공통 IA.
+ */
+export type OperatorDomainKey = 'community' | 'store_hub' | 'common';
+
+/** 도메인 헤딩 라벨 + 시각 토큰 (KPA 와 동일) */
+export const DOMAIN_LABELS: Record<OperatorDomainKey, { label: string; emoji: string }> = {
+  community: { label: '커뮤니티 운영', emoji: '💬' },
+  store_hub: { label: '매장 HUB 운영', emoji: '🏪' },
+  common: { label: '운영 공통', emoji: '⚙️' },
+};
+
+/** STANDARD_GROUPS key → 도메인 매핑.
+ *  KPA 의 매핑을 그대로 따른다 (products/orders 는 store_hub).
+ */
+export const GROUP_TO_DOMAIN: Record<OperatorGroupKey, OperatorDomainKey> = {
+  dashboard: 'common',
+  users: 'community',
+  approvals: 'store_hub',
+  products: 'store_hub',
+  stores: 'store_hub',
+  orders: 'store_hub',
+  content: 'community',
+  resources: 'community',
+  lms: 'community',
+  signage: 'store_hub',
+  forum: 'community',
+  analytics: 'common',
+  care: 'common',
+  system: 'common',
+};
+
+/** 도메인 별 그룹 표시 순서.
+ *  - community: 회원 → 포럼 → 콘텐츠 → LMS → 자료실 (KPA 동일)
+ *  - store_hub: 매장 → 상품 → 주문 → 승인 → 사이니지 (KPA 의 [stores,approvals,signage] 사이에 products/orders 삽입)
+ *  - common: 분석 → 시스템 (대시보드는 TOP_PINNED_GROUPS 별도)
+ */
+export const DOMAIN_GROUP_ORDER: Record<OperatorDomainKey, OperatorGroupKey[]> = {
+  community: ['users', 'forum', 'content', 'lms', 'resources'],
+  store_hub: ['stores', 'products', 'orders', 'approvals', 'signage'],
+  common: ['analytics', 'system'],
+};
+
+/** 도메인 표시 순서 (sidebar top → bottom) */
+export const DOMAIN_DISPLAY_ORDER: OperatorDomainKey[] = ['community', 'store_hub', 'common'];
+
+/** sidebar 최상단 고정 항목 — 도메인 헤딩과 무관하게 항상 sidebar 첫 영역에 노출.
+ *  대시보드는 모든 도메인의 진입점이므로 sidebar 최상단에 단독 배치.
+ */
+export const TOP_PINNED_GROUPS: OperatorGroupKey[] = ['dashboard'];
+
 // ─── Legacy export (하위호환, deprecated) ───
 /** @deprecated Use UNIFIED_MENU + filterMenuByRole instead */
 export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuItem[]>> = {
@@ -121,18 +192,20 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     { label: '약국 관리', path: '/operator/pharmacies' },
     { label: '매장 관리', path: '/operator/stores' },
     { label: '채널 관리', path: '/operator/store-channels' },
+    { label: '약국 HUB 블로그', path: '/operator/blog' },
+    { label: '약국 HUB POP', path: '/operator/pop' },
+    { label: '약국 HUB QR', path: '/operator/qr' },
   ],
   orders: [{ label: '주문 관리', path: '/operator/orders' }],
   content: [
     { label: '가이드라인 관리', path: '/operator/guidelines' },
-    { label: '강의 관리', path: '/operator/lms/courses' },
+    { label: '공지/뉴스 관리', path: '/operator/content-management' },
+    { label: '설문조사 관리', path: '/operator/surveys' },
+  ],
+  lms: [
+    { label: '강의 관리', path: '/operator/lms' },
     { label: '강사 승인', path: '/operator/qualification-requests' },
     { label: '안내 문구 관리', path: '/operator/guide-contents' },
-    { label: '공지/뉴스 관리', path: '/operator/content-management' },
-    { label: '약국 HUB 블로그', path: '/operator/blog' },
-    { label: '약국 HUB POP', path: '/operator/pop' },
-    { label: '약국 HUB QR', path: '/operator/qr' },
-    { label: '설문조사 관리', path: '/operator/surveys' },
   ],
   signage: [
     { label: 'HQ 미디어', path: '/operator/signage/hq-media' },
