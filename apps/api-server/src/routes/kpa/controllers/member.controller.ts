@@ -275,6 +275,10 @@ export function createMemberController(
           //   pharmacy_name + businessInfo.businessNumber / businessName 검색 확장.
           //   businessNumber 는 하이픈 포함/미포함 입력 모두 매칭하기 위해 양쪽에서
           //   숫자만 추출(REGEXP_REPLACE)한 정규화 ILIKE 도 함께 평가한다.
+          // WO-O4O-KPA-OPERATOR-MEMBER-SEARCH-LICENSE-SUPPORT-V1:
+          //   license_number 검색 추가 — operator 가 면허번호로 회원/잔존 데이터를 찾을 수 있도록.
+          //   동기: /check-license 가 "이미 등록" 차단했는데 운영자 리스트에는 license 로 검색
+          //   불가하여 정리 경로가 막힘 (IR-O4O-KPA-LICENSE-DUPLICATE-BLOCK-AUDIT-V1).
           const searchStr = typeof search === 'string' ? search : String(search);
           const searchPattern = `%${searchStr}%`;
           const digits = searchStr.replace(/\D/g, '');
@@ -283,6 +287,7 @@ export function createMemberController(
             `u.email ILIKE $${paramIdx}`,
             `u.nickname ILIKE $${paramIdx}`,
             `km.pharmacy_name ILIKE $${paramIdx}`,
+            `km.license_number ILIKE $${paramIdx}`,
             `(u."businessInfo"->>'businessName') ILIKE $${paramIdx}`,
             `(u."businessInfo"->>'businessNumber') ILIKE $${paramIdx}`,
           ];
