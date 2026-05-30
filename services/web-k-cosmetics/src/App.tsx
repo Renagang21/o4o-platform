@@ -121,7 +121,7 @@ const SignageTemplatesPage = lazy(() => import('@/pages/operator/signage/Templat
 const SignageTemplateDetailPage = lazy(() => import('@/pages/operator/signage/TemplateDetailPage'));
 
 // Store Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
-import { StoreDashboardLayout, StorePlaceholderPage, COSMETICS_STORE_CONFIG, resolveStoreMenu } from '@o4o/store-ui-core';
+import { StoreDashboardLayout, StorePlaceholderPage, COSMETICS_STORE_CONFIG, resolveStoreMenu, StoreOwnerGuard } from '@o4o/store-ui-core';
 import { useStoreCapabilities } from './hooks/useStoreCapabilities';
 
 // Store Settings (WO-STORE-COMMON-SETTINGS-KCOS-UI-V1)
@@ -247,6 +247,28 @@ function PageLoading() {
  * 실제 로직은 components/auth/RoleGuard.tsx (isSessionChecked + checkSession 포함)
  */
 const ProtectedRoute = RoleGuard;
+
+/**
+ * StoreOwnerRoute — K-Cosmetics /store 진입 가드
+ * WO-O4O-MY-STORE-CROSSSERVICE-CANONICAL-GUARD-ALIGNMENT-V1:
+ *   기존 inline ProtectedRoute(allowedRoles=[...role-only...]) → 공통 StoreOwnerGuard.
+ *   GlycoPharm canonical 의 3-way OR (role / membership / operator-or-above) 흡수.
+ *   K-Cosmetics 는 membership-based store_owner SSOT 미보유 — 현재는 role/operator 분기로만 통과되며,
+ *   향후 cosmetics 도 membership SSOT 도입 시 StoreOwnerGuard 의 cfg.membershipStoreOwnerRole 만 활성화하면 됨.
+ */
+function StoreOwnerRoute({ children }: { children: React.ReactNode }) {
+  const { user, isAuthenticated, isLoading } = useAuth();
+  return (
+    <StoreOwnerGuard
+      serviceKey="cosmetics"
+      user={user}
+      isAuthenticated={isAuthenticated}
+      isLoading={isLoading}
+    >
+      {children}
+    </StoreOwnerGuard>
+  );
+}
 
 // WO-K-COSMETICS-ROLEBASED-HOME-REMOVAL-V1:
 // RoleBasedHome 제거 — "/" 는 항상 사이트 홈 (역할 기반 자동 redirect 없음)
@@ -614,13 +636,15 @@ function AppRoutes() {
         <Route path="qr/:id/edit" element={<OperatorQrWritePage />} />
       </Route>
 
-      {/* Store Owner Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1) */}
+      {/* Store Owner Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
+          WO-O4O-MY-STORE-CROSSSERVICE-CANONICAL-GUARD-ALIGNMENT-V1:
+            inline ProtectedRoute(allowedRoles=[...role-only]) → 공통 StoreOwnerGuard wrapper. */}
       <Route
         path="store"
         element={
-          <ProtectedRoute allowedRoles={['cosmetics:store_owner', 'cosmetics:operator', 'cosmetics:admin', 'platform:super_admin']}>
+          <StoreOwnerRoute>
             <StoreLayoutWrapper />
-          </ProtectedRoute>
+          </StoreOwnerRoute>
         }
       >
         <Route index element={<StoreCockpitPage />} />

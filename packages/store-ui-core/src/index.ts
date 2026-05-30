@@ -49,3 +49,12 @@ export { buildProductionState, composeSourceTextFromItems, parseProductionRouter
 // Shared Production Modal (WO-O4O-START-PRODUCTION-MODAL-SHARED-COMPONENT-PHASE2-H-V1)
 export { StartProductionModal } from './components/StartProductionModal';
 export type { StartProductionModalProps, StartProductionTargetConfig, StartProductionTemplateItem } from './components/StartProductionModal';
+
+// Auth Guard (WO-O4O-MY-STORE-CROSSSERVICE-CANONICAL-GUARD-ALIGNMENT-V1)
+export { StoreOwnerGuard } from './auth/StoreOwnerGuard';
+export type {
+  StoreOwnerGuardProps,
+  StoreOwnerGuardUser,
+  StoreOwnerServiceKey,
+  StoreOwnerStaleRecovery,
+} from './auth/StoreOwnerGuard';
