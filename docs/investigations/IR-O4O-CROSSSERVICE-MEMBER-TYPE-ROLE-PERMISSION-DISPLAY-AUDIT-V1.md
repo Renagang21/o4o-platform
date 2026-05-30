@@ -120,40 +120,49 @@ export function RoleBadge({ role }: { role: string }) {
 - **KPA만** 리스트에서 "참여자 특성(활동 유형)"과 "플랫폼 권한(추가 권한)"을 명시적으로 2컬럼 분리 →
   사실상 KPA가 의도된(올바른) 분리 모델이고 나머지 3개가 미정렬.
 
+> 위 표는 IR 최초 조사 시점(**수정 전**) 상태다. **Neture는 §7에서 2컬럼 분리(회원 유형 / 운영 권한)로
+> 정렬 완료**됐다. GlycoPharm / K-Cosmetics는 아직 1컬럼 구조로, §8 후속 조사 대상이다.
+
 ---
 
-## 4. Neture 계정별 확인 — **미확인 / 추가 확인 필요**
+## 4. Neture 계정별 확인 — **브라우저 확인 완료 (DB 직접 확인 미완)**
 
-대상: `sohae21@naver.com`, `renagang21@gmail.com`
+대상: `renagang21@gmail.com`, `sohae21@naver.com`, `sohae2100@gmail.com`
 
-확인하려던 값: 두 계정의 `service_memberships.role`(neture) 및 `role_assignments.role`.
+### 4.1 브라우저 확인 결과 (수정 후, 라이브)
 
-**DB 조회 시도 결과 (미완):**
-- psql 설치 확인됨(PostgreSQL 17). Cloud SQL 인스턴스 확정: project **`netureyoutube`**,
-  `o4o-platform-db`, 34.64.96.252.
-- 직접 TCP는 방화벽 차단. `gcloud sql connect`로 현재 IP allowlist는 성공.
-- 그러나 **프로덕션 postgres 비밀번호 부재** — 로컬 `.env`는 `localhost`용이며 그 값으로는
-  `password authentication failed for user "postgres"`. 프로덕션 비번은 GitHub Secrets에 존재.
-- 따라서 실데이터 확정은 **프로덕션 자격증명 제공** 또는 **브라우저 확인**이 필요.
+`WO-O4O-NETURE-MEMBER-LIST-MODAL-PERMISSION-DISPLAY-CORRECTION-V1` 배포 후 브라우저 확인:
 
-**확인용 쿼리 (자격증명 확보 시):**
+| 계정 | 회원 유형 | 운영 권한 | 대시보드 접근 |
+|---|---|---|---|
+| `renagang21@gmail.com` | 공급자 | 일반 회원 | 공급자 대시보드 |
+| `sohae21@naver.com` | 공급자 | **운영자** | 운영자 대시보드, 공급자 대시보드 |
+| `sohae2100@gmail.com` | 일반 회원 | **관리자** | 관리자 대시보드, 운영자 대시보드 |
+
+→ `sohae21@naver.com`은 **참여 유형(공급자)과 운영 권한(운영자)을 동시에** 가지며, 화면에서 두 축이
+  분리되어 모두 정확히 표시된다. 수정 전에는 리스트 "유형"에 raw `operator`가, 모달 "운영 권한"에
+  잘못된 "일반 회원"이 표시됐다(= §2.4 분석 확정).
+
+### 4.2 DB 직접 확인 — 미완
+
+두 계정의 `service_memberships.role` / `role_assignments.role` 실데이터 직접 확인은 미완:
+- psql 설치 확인(PostgreSQL 17). Cloud SQL 인스턴스 확정: project **`netureyoutube`**, `o4o-platform-db`, 34.64.96.252.
+- 직접 TCP는 방화벽 차단. `gcloud sql connect`로 IP allowlist는 성공하나 **프로덕션 postgres 비밀번호 부재**
+  (로컬 `.env`는 localhost용 → `password authentication failed`). 프로덕션 비번은 GitHub Secrets.
+- 자격증명 확보 시 확인용 쿼리:
 ```sql
 SELECT u.email, sm.role AS membership_role, sm.status,
        ra.role AS assignment_role, ra.is_active
 FROM users u
 LEFT JOIN service_memberships sm ON sm.user_id = u.id AND sm.service_key = 'neture'
 LEFT JOIN role_assignments ra ON ra.user_id = u.id
-WHERE u.email IN ('sohae21@naver.com','renagang21@gmail.com')
+WHERE u.email IN ('sohae21@naver.com','renagang21@gmail.com','sohae2100@gmail.com')
 ORDER BY u.email, ra.role;
 ```
 
-**브라우저 확인 포인트 (Neture 운영자 → 회원 관리):**
-1. 두 계정의 리스트 "유형" 값이 raw `operator`/`admin`/`user` 인지, `공급자`/`파트너` 인지.
-2. 해당 계정 수정 모달의 "회원 유형" 드롭다운 선택값(공란 여부)과 "운영 권한" 값.
-3. 리스트 "유형" 값과 모달 "회원 유형" 값이 서로 다른지.
-
-> 예상: `sohae21@naver.com`의 리스트 "유형"이 `operator`로 보이고 모달 "운영 권한"에 운영자가
-> 선택돼 있다면, 본 분석(2.4)이 사실상 확정되고 Case D(데이터 혼입)도 강하게 시사된다.
+> **브라우저 거동 기준 결론**: `sohae21@naver.com`의 운영 권한은 **bare `operator`**(namespaced 아님)로,
+> 참여 유형(공급자)은 `role_assignments`에 존재한다 — 모달 운영 권한이 namespaced-only 매칭이라 "일반 회원",
+> 대시보드 접근은 bare를 인정해 "운영자"였던 거동으로 **사실상 확정**. DB 직접 확인만 미완.
 
 ---
 
@@ -164,7 +173,7 @@ ORDER BY u.email, ra.role;
 | **A** 프론트 라벨만 모호 | bare operator 미번역(영문) | 부분 — Case B의 표면 증상 |
 | **B** 프론트 표시 매핑 오류 | 리스트 "유형"이 회원유형/운영권한 축을 한 컬럼에 혼합 + `NETURE_ROLE_DISPLAY` 빈 매핑으로 raw 노출 | **확정** |
 | **C** API 응답 부족 | 리스트 API는 `roles[]`(role_assignments) + `memberships[].role` 모두 제공 — 데이터는 충분, 표시 선택의 문제 | 해당 없음 |
-| **D** 데이터 모델 혼입 | 일부 계정 `service_memberships.role`에 bare `operator` 저장 | **가능성 있음 — DB/브라우저 확인 필요** |
+| **D** 데이터 모델 혼입 | 일부 계정의 운영 권한이 bare `operator`(membership.role / roles[])로 저장되어 참여유형/운영권한 축이 혼입 | **브라우저 화면 기준 확인 — DB 직접 확인 미완** |
 | **E** 서비스별 구현 편차 | KPA만 2컬럼 분리, 나머지 3개 1컬럼 → 공통 표시 기준 부재 | **확정** |
 
 ---
@@ -179,30 +188,43 @@ ORDER BY u.email, ra.role;
 
 ---
 
-## 7. 잠정 후속 방향 (수정 미확정)
+## 7. Neture 수정 완료 (1차 UI 표시 정렬)
 
-1. **단기(표시) 수정** — Neture 리스트 "유형" 컬럼에서 raw `operator`/`admin`이 그대로 노출되지 않도록 한다.
-   가능하면 "회원 유형"과 "운영 권한"을 분리 표시한다.
-2. **공통화 수정** — Neture/GlycoPharm/K-Cosmetics가 공유하는 `OperatorMembersConsolePage` 계열에서
-   KPA처럼 "회원 유형/활동 유형"과 "추가 권한/운영 권한"을 분리하는 방향을 검토한다.
-3. **데이터 정합성 조사** — `service_memberships.role`에 bare `operator`가 들어가는 write-path를 별도 조사.
-   의도된 legacy 값인지, 승인/권한 부여 과정의 혼입인지 확인. (UI 수정과 분리)
+본 IR 후속으로 Neture는 2개 WO로 표시 정렬을 완료했다 (**데이터 모델/write-path 미수정 — 표시·초기값만**).
 
-### 권장 후속 2단계
-- **1단계 (본 문서)**: `IR-O4O-CROSSSERVICE-MEMBER-TYPE-ROLE-PERMISSION-DISPLAY-AUDIT-V1` 확정.
-- **2단계**: `WO-O4O-NETURE-MEMBER-LIST-TYPE-PERMISSION-DISPLAY-ALIGNMENT-V1`
-  — **데이터 모델은 손대지 않고 UI 표시 정렬부터.** `service_memberships.role`의 operator 혼입 원인까지
-  한 WO에 묶으면 범위가 커지고 기존 권한/승인 흐름에 영향 위험. 데이터 정합성은 별도 트랙.
+| WO | 내용 | 상태 |
+|---|---|---|
+| `WO-O4O-NETURE-MEMBER-LIST-TYPE-PERMISSION-DISPLAY-ALIGNMENT-V1` | "유형" 컬럼에서 raw operator/admin/user 노출 제거 (참여유형 외는 일반회원 collapse) | 완료·배포 |
+| `WO-O4O-NETURE-MEMBER-LIST-MODAL-PERMISSION-DISPLAY-CORRECTION-V1` | "회원 유형"/"운영 권한" 2컬럼 분리(KPA식) + 모달 운영 권한 초기값을 대시보드 기준과 일치(bare/namespaced 정규화, 관리자>운영자). 공통 컴포넌트는 additive/opt-in으로 타 서비스 무영향 | 완료·배포 |
 
----
-
-## 8. 미확인 항목 (추적)
-
-- [ ] `sohae21@naver.com` / `renagang21@gmail.com` 의 `service_memberships.role`(neture) 실제값 (DB 또는 브라우저).
-- [ ] bare `operator`가 `service_memberships.role`에 들어가는 write-path (Case D 확정/반증).
-- [ ] GlycoPharm / K-Cosmetics에서도 동일하게 운영 권한 값이 membership.role에 혼입되는 계정이 있는지.
+표시 기준(확정):
+- **회원 유형** = 참여 유형(공급자/파트너/셀러/일반 회원). tokens(roles[] ∪ user.role ∪ neture membership.role)에서 참여유형 우선 도출.
+- **운영 권한** = 관리자/운영자/일반 회원. 동일 tokens에서 관리자>운영자, bare/namespaced 모두 인정.
+- **대시보드 접근** = 실제 접근 가능 대시보드(기존 유지).
+- 세 컬럼 + 모달 운영 권한이 **동일 신호**를 사용해 일치한다.
 
 ---
 
-*본 IR은 코드 분석 기반으로 작성됨. DB 실데이터 확인 항목은 위 §4·§8에 "미확인"으로 명시.*
-*코드 수정 없음. 커밋 여부는 사용자 지시에 따름.*
+## 8. 후속 방향
+
+1. **Neture**: 1차 UI 표시 정렬 완료(§7).
+2. **다음 단계 — GlycoPharm / K-Cosmetics 조사** (별도 IR 또는 WO, **바로 수정 금지**):
+   - Neture와 동일하게 리스트가 `membership.role` 1컬럼 구조인지.
+   - 모달 "운영 권한" 표시가 실제 대시보드 접근(bare operator/admin)과 일치하는지 — namespaced-only 매칭 동일 결함 여부.
+   - 운영 권한 값이 membership.role / roles[]에 혼입된 계정이 있는지.
+   - 필요 시 KPA(2컬럼 분리 모델)를 기준으로 비교.
+3. **데이터 정합성(Case D) — 별도 트랙**: `service_memberships.role`(또는 roles[])에 bare `operator`/`admin`이
+   들어가는 write-path 조사. 의도된 legacy인지, 승인/권한 부여 과정의 혼입인지. UI 표시와 분리.
+
+---
+
+## 9. 미확인 항목 (추적)
+
+- [ ] 3계정의 `service_memberships.role` / `role_assignments.role` DB 실데이터 (브라우저 거동 기준 확인됨, DB 직접 미완).
+- [ ] bare `operator`/`admin`가 membership.role / roles[]에 들어가는 write-path (Case D 데이터 원인).
+- [ ] GlycoPharm / K-Cosmetics 동일 구조·동일 모달 결함 여부.
+
+---
+
+*코드 분석 + 라이브 브라우저 확인 기반. DB 직접 확인 항목은 §4.2·§9에 "미완"으로 명시.*
+*본 보강은 IR 문서만 수정. 코드 변경 없음.*
