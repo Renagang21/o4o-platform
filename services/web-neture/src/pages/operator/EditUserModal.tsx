@@ -42,6 +42,9 @@ const NETURE_CONFIG: EditUserModalConfig = {
     { value: 'neture:operator', label: '운영자' },
     { value: 'neture:admin', label: '관리자' },
   ],
+  // WO-O4O-NETURE-MEMBER-LIST-MODAL-PERMISSION-DISPLAY-CORRECTION-V1:
+  // 운영 권한 초기값을 "대시보드 접근" 기준과 일치(bare operator/admin·membership.role 포함 정규화).
+  normalizeAdminRoleDisplay: true,
   businessInfoLabel: '사업자 정보',
   businessNameLabel: '사업자명',
 };

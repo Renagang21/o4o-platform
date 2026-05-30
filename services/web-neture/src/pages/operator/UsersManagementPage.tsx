@@ -30,29 +30,38 @@ import EditUserModal from './EditUserModal';
 
 // ─── Helpers — Neture-specific role/dashboard logic ──────────
 
-// WO-O4O-NETURE-ADMIN-USERS-SCOPE-FIX-V1: Neture membership role 만 사용
-// WO-O4O-NETURE-MEMBER-LIST-TYPE-PERMISSION-DISPLAY-ALIGNMENT-V1:
-//   "유형" 컬럼은 참여 유형(공급자/파트너/셀러)만 표시한다. operator/admin/user 등
-//   참여 유형이 아닌 membership.role 은 'general'(일반 회원)로 collapse 하여 raw 노출을 막는다.
-//   운영 권한·대시보드 접근은 별도 "대시보드 접근" 컬럼이 담당한다.
-//   ※ roleTabs.roleFilter 에는 operator/admin/user/general 이 없으므로 탭 카운트·필터 불변.
-const NETURE_PARTICIPANT_ROLES = new Set([
-  'supplier', 'partner', 'seller',
-  'neture:supplier', 'neture:partner', 'neture:seller',
-]);
-function getPrimaryRole(u: UserData): string {
-  const m = u.memberships?.find((x) => x.serviceKey === 'neture');
-  const role = m?.role || '';
-  return NETURE_PARTICIPANT_ROLES.has(role) ? role : 'general';
-}
-
-// WO-O4O-NETURE-SUPPLIER-DASHBOARD-ENTRY-AND-MEMBER-LIST-CLEANUP-V1
-function getDashboardAccessLabels(u: UserData): string[] {
-  const tokens = new Set<string>([
+// WO-O4O-NETURE-MEMBER-LIST-MODAL-PERMISSION-DISPLAY-CORRECTION-V1:
+//   회원 유형(참여 유형)과 운영 권한을 분리 표시한다. 두 축 모두 동일한 token 집합
+//   (role_assignments roles[] ∪ user.role ∪ neture membership.role)에서 도출하여
+//   "대시보드 접근" 컬럼 기준과 일치시킨다. 데이터(membership.role / role_assignments)는
+//   수정하지 않고 표시만 정렬한다.
+function netureTokens(u: UserData): Set<string> {
+  return new Set<string>([
     ...(u.roles ?? []),
     ...(u.role ? [u.role] : []),
     ...(u.memberships ?? []).filter((m) => m.serviceKey === 'neture').map((m) => m.role),
   ]);
+}
+
+// "회원 유형" 컬럼 + roleTabs 필터용. 참여 유형(공급자/파트너/셀러)만 도출, 없으면 general(일반 회원).
+// operator/admin 등 운영 권한은 여기서 제외 — 별도 "운영 권한" 컬럼이 담당한다.
+const NETURE_PARTICIPANT_ROLES: ReadonlyArray<string> = ['supplier', 'partner', 'seller'];
+function getPrimaryRole(u: UserData): string {
+  const t = netureTokens(u);
+  return NETURE_PARTICIPANT_ROLES.find((r) => t.has(r) || t.has(`neture:${r}`)) ?? 'general';
+}
+
+// "운영 권한" 컬럼용. 관리자 > 운영자 우선순위. bare/namespaced 모두 인정(대시보드 로직과 동일).
+function getOperatorRole(u: UserData): '관리자' | '운영자' | null {
+  const t = netureTokens(u);
+  if (t.has('platform:super_admin') || t.has('neture:admin') || t.has('admin')) return '관리자';
+  if (t.has('neture:operator') || t.has('operator')) return '운영자';
+  return null;
+}
+
+// WO-O4O-NETURE-SUPPLIER-DASHBOARD-ENTRY-AND-MEMBER-LIST-CLEANUP-V1
+function getDashboardAccessLabels(u: UserData): string[] {
+  const tokens = netureTokens(u);
   const labels: string[] = [];
   if (tokens.has('platform:super_admin') || tokens.has('neture:admin') || tokens.has('admin')) {
     labels.push('관리자 대시보드');
@@ -223,26 +232,47 @@ export default function UsersManagementPage() {
       ]}
       getPrimaryRole={getPrimaryRole}
       roleDisplayMap={NETURE_ROLE_DISPLAY}
-      extraColumn={{
-        key: 'dashboardAccess',
-        header: '대시보드 접근',
-        width: '200px',
-        render: (_v, user) => {
-          const labels = getDashboardAccessLabels(user);
-          if (labels.length === 0) {
-            return <span className="text-xs text-slate-400">접근 불가</span>;
-          }
-          return (
-            <div className="flex flex-wrap gap-1">
-              {labels.map((label) => (
-                <span key={label} className="px-1.5 py-0.5 rounded text-xs bg-slate-100 text-slate-700">
-                  {label}
-                </span>
-              ))}
-            </div>
-          );
+      roleColumnHeader="회원 유형"
+      extraColumns={[
+        {
+          key: 'operatorRole',
+          header: '운영 권한',
+          width: '120px',
+          render: (_v, user) => {
+            const op = getOperatorRole(user);
+            if (!op) return <span className="text-xs text-slate-400">일반 회원</span>;
+            const cls =
+              op === '관리자'
+                ? 'bg-rose-50 border-rose-200 text-rose-700'
+                : 'bg-violet-50 border-violet-200 text-violet-700';
+            return (
+              <span className={`inline-flex items-center px-2 py-0.5 rounded-full border text-xs font-medium ${cls}`}>
+                {op}
+              </span>
+            );
+          },
         },
-      }}
+        {
+          key: 'dashboardAccess',
+          header: '대시보드 접근',
+          width: '200px',
+          render: (_v, user) => {
+            const labels = getDashboardAccessLabels(user);
+            if (labels.length === 0) {
+              return <span className="text-xs text-slate-400">접근 불가</span>;
+            }
+            return (
+              <div className="flex flex-wrap gap-1">
+                {labels.map((label) => (
+                  <span key={label} className="px-1.5 py-0.5 rounded text-xs bg-slate-100 text-slate-700">
+                    {label}
+                  </span>
+                ))}
+              </div>
+            );
+          },
+        },
+      ]}
       renderEditModal={({ user, onClose, onSuccess }) => (
         <EditUserModal userId={user.id} onClose={onClose} onSuccess={onSuccess} />
       )}

@@ -216,6 +216,7 @@ export function OperatorMembersConsolePage({
   statusTabs,
   getPrimaryRole: getPrimaryRoleProp,
   roleDisplayMap,
+  roleColumnHeader = '유형',
   extraColumn,
   extraColumns,
   extraRowActions,
@@ -491,7 +492,7 @@ export function OperatorMembersConsolePage({
 
   const roleColumn: ListColumnDef<UserData> = {
     key: 'role',
-    header: '유형',
+    header: roleColumnHeader,
     width: '120px',
     render: (_v, user) => {
       const role = getPrimaryRole(user);

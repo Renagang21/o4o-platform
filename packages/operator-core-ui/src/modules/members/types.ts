@@ -203,6 +203,14 @@ export interface OperatorMembersConsolePageProps {
   roleDisplayMap?: Record<string, string>;
 
   /**
+   * Optional header label for the role column. Default: '유형'.
+   * Neture(WO-O4O-NETURE-MEMBER-LIST-MODAL-PERMISSION-DISPLAY-CORRECTION-V1):
+   *   '회원 유형' — 참여 유형(공급자/파트너/셀러/일반 회원)만 표시하고
+   *   운영 권한은 별도 컬럼으로 분리하므로 컬럼명을 명확히 한다.
+   */
+  roleColumnHeader?: string;
+
+  /**
    * Service-specific extra column. Inserted between role and createdAt.
    * Neture: dashboardAccess column.
    * @deprecated Prefer extraColumns[] for multi-column extension.

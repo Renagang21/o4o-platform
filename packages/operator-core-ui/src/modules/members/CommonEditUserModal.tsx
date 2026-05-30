@@ -116,6 +116,16 @@ export interface EditUserModalConfig {
    * 미제공 시 해당 섹션 렌더링 생략.
    */
   profileClassification?: ProfileClassificationConfig;
+  /**
+   * 운영 권한 초기값(selectedAdminRole) 도출 시 bare role(e.g. 'operator')과
+   * service_memberships.role 까지 포함해 adminRoleOptions 의 namespaced 값으로 정규화한다.
+   * WO-O4O-NETURE-MEMBER-LIST-MODAL-PERMISSION-DISPLAY-CORRECTION-V1:
+   *   일부 계정은 운영 권한이 bare 'operator'/'admin' 또는 membership.role 에 들어 있어,
+   *   기존 namespaced-only 매칭으로는 "일반 회원"으로 잘못 표시된다(대시보드 접근은 운영자 표시).
+   *   opt-in 서비스에 한해 표시 초기값을 대시보드 기준과 일치시킨다(저장 로직은 불변).
+   * Default: false (GlycoPharm/K-Cosmetics 무영향).
+   */
+  normalizeAdminRoleDisplay?: boolean;
 }
 
 export interface CommonEditUserModalProps {
@@ -133,6 +143,7 @@ export function CommonEditUserModal({ userId, config, onClose, onSuccess }: Comm
     makeRequest,
     membershipRoleOptions,
     adminRoleOptions,
+    normalizeAdminRoleDisplay = false,
     businessInfoLabel = '사업자 정보',
     businessNameLabel = '사업자명',
     profileClassification,
@@ -192,9 +203,28 @@ export function CommonEditUserModal({ userId, config, onClose, onSuccess }: Comm
         const activeRoles: string[] = (data.roles || [])
           .filter((r: any) => r.isActive)
           .map((r: any) => r.role);
-        const adminRole = activeRoles.find((r: string) =>
-          adminRoleOptions.some(opt => opt.value && opt.value === r)
-        ) || '';
+        let adminRole: string;
+        if (normalizeAdminRoleDisplay) {
+          // WO-O4O-NETURE-MEMBER-LIST-MODAL-PERMISSION-DISPLAY-CORRECTION-V1:
+          // 표시 초기값을 "대시보드 접근" 기준과 일치시킨다. role_assignments 의 bare role 과
+          // service_memberships.role 까지 후보로 포함해 namespaced adminRoleOptions 로 정규화.
+          // 관리자 > 운영자 우선순위. currentAdminRole 도 동일 값으로 두어 미변경 저장 시 no-op.
+          const candidates = [...activeRoles, svcMembership?.role].filter(Boolean) as string[];
+          const matchValue = (raw: string): string =>
+            adminRoleOptions.find(
+              (opt) => opt.value && (opt.value === raw || opt.value === `${serviceKey}:${raw}`),
+            )?.value || '';
+          const matched = candidates.map(matchValue).filter(Boolean);
+          adminRole =
+            matched.find((v) => v.endsWith(':admin')) ??
+            matched.find((v) => v.endsWith(':operator')) ??
+            matched[0] ??
+            '';
+        } else {
+          adminRole = activeRoles.find((r: string) =>
+            adminRoleOptions.some(opt => opt.value && opt.value === r)
+          ) || '';
+        }
         setCurrentAdminRole(adminRole);
         setSelectedAdminRole(adminRole);
 
