@@ -38,6 +38,9 @@ const GLYCOPHARM_CONFIG: EditUserModalConfig = {
     { value: 'glycopharm:operator', label: '운영자' },
     { value: 'glycopharm:admin', label: '관리자' },
   ],
+  // WO-O4O-GLYCOPHARM-KCOS-MEMBER-LIST-MODAL-PERMISSION-DISPLAY-ALIGNMENT-V1:
+  // 운영 권한 초기값을 리스트 운영 권한 기준과 일치(bare operator/admin·membership.role 포함 정규화).
+  normalizeAdminRoleDisplay: true,
   businessInfoLabel: '약국 정보',
   businessNameLabel: '약국명',
 };

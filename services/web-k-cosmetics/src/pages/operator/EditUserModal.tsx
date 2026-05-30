@@ -42,6 +42,10 @@ const KCOSMETICS_CONFIG: EditUserModalConfig = {
     { value: 'cosmetics:operator', label: '운영자' },
     { value: 'cosmetics:admin', label: '관리자' },
   ],
+  // WO-O4O-GLYCOPHARM-KCOS-MEMBER-LIST-MODAL-PERMISSION-DISPLAY-ALIGNMENT-V1:
+  // 운영 권한 초기값을 리스트 운영 권한 기준과 일치(bare/namespaced 정규화 — suffix 매칭으로
+  // cosmetics:/k-cosmetics: prefix 혼재도 인식).
+  normalizeAdminRoleDisplay: true,
   businessInfoLabel: '사업자 정보',
   businessNameLabel: '사업자명',
   profileClassification: {

@@ -210,10 +210,12 @@ export function CommonEditUserModal({ userId, config, onClose, onSuccess }: Comm
           // service_memberships.role 까지 후보로 포함해 namespaced adminRoleOptions 로 정규화.
           // 관리자 > 운영자 우선순위. currentAdminRole 도 동일 값으로 두어 미변경 저장 시 no-op.
           const candidates = [...activeRoles, svcMembership?.role].filter(Boolean) as string[];
+          // prefix 무관 매칭: bare 'operator' / 'neture:operator' / 'cosmetics:operator' 등
+          // 마지막 세그먼트(suffix)로 adminRoleOptions 와 대조한다. 서비스별 role prefix 가
+          // serviceKey 와 불일치(K-Cosmetics: serviceKey 'k-cosmetics' vs role 'cosmetics:*')해도 인식.
+          const lastSeg = (r: string): string => (r.includes(':') ? r.slice(r.lastIndexOf(':') + 1) : r);
           const matchValue = (raw: string): string =>
-            adminRoleOptions.find(
-              (opt) => opt.value && (opt.value === raw || opt.value === `${serviceKey}:${raw}`),
-            )?.value || '';
+            adminRoleOptions.find((opt) => opt.value && lastSeg(opt.value) === lastSeg(raw))?.value || '';
           const matched = candidates.map(matchValue).filter(Boolean);
           adminRole =
             matched.find((v) => v.endsWith(':admin')) ??

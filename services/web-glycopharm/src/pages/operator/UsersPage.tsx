@@ -23,6 +23,54 @@ import { toast } from '@o4o/error-handling';
 import { api } from '../../lib/apiClient';
 import EditUserModal from './EditUserModal';
 
+// ─── Role display helpers ────────────────────────────────────
+// WO-O4O-GLYCOPHARM-KCOS-MEMBER-LIST-MODAL-PERMISSION-DISPLAY-ALIGNMENT-V1:
+//   회원 유형(참여 유형)과 운영 권한을 분리 표시(Neture 패턴 재사용). 두 축 모두 동일 token
+//   (role_assignments roles[] ∪ user.role ∪ glycopharm membership.role)에서 도출. 데이터 미수정.
+function gpTokens(u: UserData): Set<string> {
+  return new Set<string>([
+    ...(u.roles ?? []),
+    ...(u.role ? [u.role] : []),
+    ...(u.memberships ?? []).filter((m) => m.serviceKey === 'glycopharm').map((m) => m.role),
+  ]);
+}
+
+// 운영 권한/미지정 성격의 role — "회원 유형"에서 제외(운영 권한 컬럼이 담당).
+const GP_OPERATIONAL = new Set([
+  'operator', 'admin', 'user',
+  'glycopharm:operator', 'glycopharm:admin', 'platform:super_admin',
+]);
+
+// "회원 유형" 컬럼 + roleTabs 필터용. 참여 유형은 그대로 반환해 roleTabs 매칭을 유지하고,
+// 운영 권한/미지정 값만 'general'(일반 회원)로 collapse 한다(raw operator/admin 노출 방지).
+function getPrimaryRole(u: UserData): string {
+  const m = u.memberships?.find((x) => x.serviceKey === 'glycopharm');
+  const role = m?.role || u.roles?.[0] || '';
+  if (!role || GP_OPERATIONAL.has(role)) return 'general';
+  return role;
+}
+
+// 참여 유형 한글 라벨(bare/namespaced 모두). 미매핑 값은 RoleBadge 기본 처리.
+const GP_ROLE_DISPLAY: Record<string, string> = {
+  general: '일반 회원',
+  'glycopharm:pharmacist': '약사',
+  pharmacist: '약사',
+  'glycopharm:store_owner': '약국 경영자',
+  store_owner: '약국 경영자',
+  'glycopharm:pharmacy': '약국',
+  pharmacy: '약국',
+  'glycopharm:supplier': '공급자',
+  supplier: '공급자',
+};
+
+// "운영 권한" 컬럼용. 관리자 > 운영자 우선순위. bare/namespaced 모두 인정.
+function getOperatorRole(u: UserData): '관리자' | '운영자' | null {
+  const t = gpTokens(u);
+  if (t.has('platform:super_admin') || t.has('glycopharm:admin') || t.has('admin')) return '관리자';
+  if (t.has('glycopharm:operator') || t.has('operator')) return '운영자';
+  return null;
+}
+
 // ─── Client adapter ──────────────────────────────────────────
 
 const gpMembersClient: MembersConsoleClient = {
@@ -182,9 +230,32 @@ export default function UsersPage() {
     <OperatorMembersConsolePage
       serviceKey="glycopharm"
       client={gpMembersClient}
+      getPrimaryRole={getPrimaryRole}
+      roleDisplayMap={GP_ROLE_DISPLAY}
+      roleColumnHeader="회원 유형"
+      extraColumns={[
+        {
+          key: 'operatorRole',
+          header: '운영 권한',
+          width: '120px',
+          render: (_v, user) => {
+            const op = getOperatorRole(user);
+            if (!op) return <span className="text-xs text-slate-400">일반 회원</span>;
+            const cls =
+              op === '관리자'
+                ? 'bg-rose-50 border-rose-200 text-rose-700'
+                : 'bg-violet-50 border-violet-200 text-violet-700';
+            return (
+              <span className={`inline-flex items-center px-2 py-0.5 rounded-full border text-xs font-medium ${cls}`}>
+                {op}
+              </span>
+            );
+          },
+        },
+      ]}
       roleTabs={[
-        { key: 'pharmacist', label: '약사', roleFilter: ['glycopharm:pharmacist'] },
-        { key: 'store_owner', label: '약국 경영자', roleFilter: ['glycopharm:store_owner'] },
+        { key: 'pharmacist', label: '약사', roleFilter: ['glycopharm:pharmacist', 'pharmacist'] },
+        { key: 'store_owner', label: '약국 경영자', roleFilter: ['glycopharm:store_owner', 'store_owner'] },
       ]}
       statusTabs={[
         { key: 'status-active',    label: '승인',  status: 'active' },

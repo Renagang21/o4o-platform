@@ -29,6 +29,60 @@ import { toast } from '@o4o/error-handling';
 import { api } from '../../lib/apiClient';
 import EditUserModal from './EditUserModal';
 
+// ─── Role display helpers ────────────────────────────────────
+// WO-O4O-GLYCOPHARM-KCOS-MEMBER-LIST-MODAL-PERMISSION-DISPLAY-ALIGNMENT-V1:
+//   회원 유형(참여 유형)과 운영 권한을 분리 표시(Neture 패턴 재사용). 동일 token
+//   (role_assignments roles[] ∪ user.role ∪ k-cosmetics membership.role)에서 도출. 데이터 미수정.
+//   ※ K-Cosmetics 는 role prefix 가 'cosmetics:' / 'k-cosmetics:' 로 혼재되어 양쪽 모두 인식한다.
+//   ※ subRole(매장 경영자/근무자)은 cosmetics_members.subRole 의 별도 축으로 모달에서만 다룬다.
+function kcosTokens(u: UserData): Set<string> {
+  return new Set<string>([
+    ...(u.roles ?? []),
+    ...(u.role ? [u.role] : []),
+    ...(u.memberships ?? []).filter((m) => m.serviceKey === 'k-cosmetics').map((m) => m.role),
+  ]);
+}
+
+// 운영 권한/미지정 성격의 role — "회원 유형"에서 제외(운영 권한 컬럼이 담당).
+const KCOS_OPERATIONAL = new Set([
+  'operator', 'admin', 'user',
+  'cosmetics:operator', 'cosmetics:admin',
+  'k-cosmetics:operator', 'k-cosmetics:admin',
+  'platform:super_admin',
+]);
+
+// "회원 유형" 컬럼 + roleTabs 필터용. 참여 유형은 그대로 반환해 roleTabs 매칭을 유지하고,
+// 운영 권한/미지정 값만 'general'(일반 회원)로 collapse 한다(raw operator/admin 노출 방지).
+function getPrimaryRole(u: UserData): string {
+  const m = u.memberships?.find((x) => x.serviceKey === 'k-cosmetics');
+  const role = m?.role || u.roles?.[0] || '';
+  if (!role || KCOS_OPERATIONAL.has(role)) return 'general';
+  return role;
+}
+
+// 참여 유형 한글 라벨(bare/namespaced 모두). 미매핑 값은 RoleBadge 기본 처리.
+const KCOS_ROLE_DISPLAY: Record<string, string> = {
+  general: '일반 회원',
+  'cosmetics:store_owner': '판매자',
+  store_owner: '판매자',
+  seller: '판매자',
+  consumer: '소비자',
+  customer: '소비자',
+  pharmacist: '약사',
+  supplier: '공급자',
+  partner: '파트너',
+};
+
+// "운영 권한" 컬럼용. 관리자 > 운영자 우선순위. cosmetics:/k-cosmetics:/bare 모두 인정.
+function getOperatorRole(u: UserData): '관리자' | '운영자' | null {
+  const t = kcosTokens(u);
+  if (t.has('platform:super_admin') || t.has('cosmetics:admin') || t.has('k-cosmetics:admin') || t.has('admin')) {
+    return '관리자';
+  }
+  if (t.has('cosmetics:operator') || t.has('k-cosmetics:operator') || t.has('operator')) return '운영자';
+  return null;
+}
+
 // ─── Client adapter ──────────────────────────────────────────
 
 const kcosMembersClient: MembersConsoleClient = {
@@ -115,8 +169,31 @@ export default function UsersPage() {
     <OperatorMembersConsolePage
       serviceKey="k-cosmetics"
       client={kcosMembersClient}
+      getPrimaryRole={getPrimaryRole}
+      roleDisplayMap={KCOS_ROLE_DISPLAY}
+      roleColumnHeader="회원 유형"
+      extraColumns={[
+        {
+          key: 'operatorRole',
+          header: '운영 권한',
+          width: '120px',
+          render: (_v, user) => {
+            const op = getOperatorRole(user);
+            if (!op) return <span className="text-xs text-slate-400">일반 회원</span>;
+            const cls =
+              op === '관리자'
+                ? 'bg-rose-50 border-rose-200 text-rose-700'
+                : 'bg-violet-50 border-violet-200 text-violet-700';
+            return (
+              <span className={`inline-flex items-center px-2 py-0.5 rounded-full border text-xs font-medium ${cls}`}>
+                {op}
+              </span>
+            );
+          },
+        },
+      ]}
       roleTabs={[
-        { key: 'seller', label: '판매자', roleFilter: ['cosmetics:store_owner'] },
+        { key: 'seller', label: '판매자', roleFilter: ['cosmetics:store_owner', 'seller', 'store_owner'] },
         { key: 'consumer', label: '소비자', roleFilter: ['consumer', 'customer'] },
       ]}
       statusTabs={[
