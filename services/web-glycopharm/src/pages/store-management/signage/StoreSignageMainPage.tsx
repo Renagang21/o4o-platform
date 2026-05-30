@@ -603,7 +603,7 @@ export default function StoreSignageMainPage() {
         </div>
         <div className="flex gap-2">
           <button
-            onClick={() => navigate('/store/signage/library')}
+            onClick={() => navigate('/store/marketing/signage/library')}
             className="flex items-center gap-2 px-3 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
           >
             <ExternalLink className="w-4 h-4" />
@@ -647,7 +647,7 @@ export default function StoreSignageMainPage() {
       {/* ─── 운영 흐름 배너 ──────────────── */}
       <div className="flex items-center gap-0 mb-6 mt-3 text-xs text-slate-400 select-none">
         <button
-          onClick={() => navigate('/store/signage/library')}
+          onClick={() => navigate('/store/marketing/signage/library')}
           className="flex items-center gap-1 px-3 py-1.5 rounded-full transition-colors hover:text-slate-600"
         >
           <ExternalLink className="w-3 h-3" /> ① 콘텐츠 허브
@@ -1290,7 +1290,7 @@ export default function StoreSignageMainPage() {
       {!loading && !error && items.length === 0 && (
         <div className="flex gap-2 mb-6">
           <button
-            onClick={() => navigate('/store/signage/library')}
+            onClick={() => navigate('/store/marketing/signage/library')}
             className="px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100"
           >
             콘텐츠 허브에서 가져오기
@@ -1375,7 +1375,7 @@ export default function StoreSignageMainPage() {
               <p className="text-sm">동영상이 없습니다.</p>
               <p className="text-xs mt-1">콘텐츠 허브에서 콘텐츠를 가져와주세요.</p>
               <button
-                onClick={() => navigate('/store/signage/library')}
+                onClick={() => navigate('/store/marketing/signage/library')}
                 className="mt-4 px-4 py-2 text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50"
               >
                 콘텐츠 허브 열기

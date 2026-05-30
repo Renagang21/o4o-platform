@@ -411,7 +411,7 @@ export default function StoreSignagePage() {
         </div>
         <div className="flex gap-2">
           <button
-            onClick={() => navigate('/store/signage/library')}
+            onClick={() => navigate('/store/marketing/signage/library')}
             className="flex items-center gap-2 px-3 py-2 text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50"
           >
             <Monitor className="w-4 h-4" />
@@ -703,7 +703,7 @@ export default function StoreSignagePage() {
       {!loading && !error && (
         <div className="flex gap-2 mb-6">
           <button
-            onClick={() => navigate('/store/signage/library')}
+            onClick={() => navigate('/store/marketing/signage/library')}
             className="px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100"
           >
             HUB에서 가져오기
@@ -787,7 +787,7 @@ export default function StoreSignagePage() {
               <p className="text-sm">사이니지 자산이 없습니다.</p>
               <p className="text-xs mt-1">HUB에서 사이니지 콘텐츠를 가져와주세요.</p>
               <button
-                onClick={() => navigate('/store/signage/library')}
+                onClick={() => navigate('/store/marketing/signage/library')}
                 className="mt-4 px-4 py-2 text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50"
               >
                 HUB으로 이동

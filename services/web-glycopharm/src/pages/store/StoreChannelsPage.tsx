@@ -839,7 +839,7 @@ export function StoreChannelsPage() {
         </button>
         {activeTab === 'SIGNAGE' && (
           <button
-            onClick={() => navigate('/store/signage')}
+            onClick={() => navigate('/store/marketing/signage/playlist')}
             className="px-3 py-1.5 text-xs font-medium text-purple-700 bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100"
           >
             사이니지 운영

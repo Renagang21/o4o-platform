@@ -270,7 +270,7 @@ export function HubQrLibraryPage() {
           <span>
             가져온 QR 은{' '}
             <button
-              onClick={() => navigate('/store/qr')}
+              onClick={() => navigate('/store/marketing/qr')}
               className="text-emerald-700 hover:underline font-medium"
             >
               내 매장 QR

@@ -145,20 +145,22 @@ export const GLYCOPHARM_STORE_CONFIG: StoreDashboardConfig = {
         { key: 'products',        label: '상품 관리',    subPath: '/products' },
         // WO-O4O-STORE-PRODUCTS-SERVICE-ROUTING-V1: ProductMaster 기반 매장 진열
         { key: 'my-products',     label: '내 매장 상품', subPath: '/my-products' },
-        { key: 'local-products',  label: '자체 상품',    subPath: '/local-products' },
+        // WO-O4O-GLYCOPHARM-STORE-PATH-NESTED-MIGRATION-V1: commerce nested canonical 정렬
+        { key: 'local-products',  label: '자체 상품',    subPath: '/commerce/local-products' },
         { key: 'b2b-order',       label: 'B2B 주문',     subPath: '/b2b-order' },
-        { key: 'orders',          label: '주문 내역',    subPath: '/orders' },
-        { key: 'tablet-displays', label: '태블릿',        subPath: '/tablet-displays' },
+        { key: 'orders',          label: '주문 내역',    subPath: '/commerce/orders' },
+        { key: 'tablet-displays', label: '태블릿',        subPath: '/commerce/tablet-displays' },
         { key: 'requests',        label: '고객 요청',    subPath: '/requests' },
       ],
     },
     {
       label: '디지털 사이니지',
+      // WO-O4O-GLYCOPHARM-STORE-PATH-NESTED-MIGRATION-V1: marketing/signage nested canonical 정렬
       items: [
-        { key: 'signage-playlist',  label: '플레이리스트', subPath: '/signage/playlist' },
-        { key: 'signage-videos',    label: '동영상',       subPath: '/signage/videos' },
-        { key: 'signage-schedules', label: '스케줄',       subPath: '/signage/schedules' },
-        { key: 'signage-player',    label: 'TV 재생',      subPath: '/signage/player' },
+        { key: 'signage-playlist',  label: '플레이리스트', subPath: '/marketing/signage/playlist' },
+        { key: 'signage-videos',    label: '동영상',       subPath: '/marketing/signage/videos' },
+        { key: 'signage-schedules', label: '스케줄',       subPath: '/marketing/signage/schedules' },
+        { key: 'signage-player',    label: 'TV 재생',      subPath: '/marketing/signage/player' },
       ],
     },
     {
@@ -169,9 +171,9 @@ export const GLYCOPHARM_STORE_CONFIG: StoreDashboardConfig = {
         { key: 'content',      label: '콘텐츠 가져오기', subPath: '/content' },
         // WO-O4O-GLYCO-BLOG-INTRODUCE-V1: 전문 매장 운영자의 공개 콘텐츠 채널
         { key: 'content-blog', label: '블로그',         subPath: '/content/blog' },
-        // WO-O4O-STORE-EXECUTION-ASSETS-CROSSSERVICE-PHASE2-A-V1: KPA/K-Cosmetics 정렬
-        { key: 'pop',          label: 'POP',            subPath: '/pop' },
-        { key: 'qr',           label: 'QR 코드',        subPath: '/qr' },
+        // WO-O4O-GLYCOPHARM-STORE-PATH-NESTED-MIGRATION-V1: marketing nested canonical 정렬
+        { key: 'pop',          label: 'POP',            subPath: '/marketing/pop' },
+        { key: 'qr',           label: 'QR 코드',        subPath: '/marketing/qr' },
         { key: 'channels',     label: '채널 관리',      subPath: '/channels' },
       ],
     },

@@ -270,7 +270,7 @@ export function HubPopLibraryPage() {
           <span>
             가져온 POP 은{' '}
             <button
-              onClick={() => navigate('/store/pop')}
+              onClick={() => navigate('/store/marketing/pop')}
               className="text-emerald-700 hover:underline font-medium"
             >
               내 매장 POP

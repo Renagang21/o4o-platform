@@ -322,6 +322,20 @@ function PageLoading() {
 const ProtectedRoute = RoleGuard;
 
 // Service User Protected Route (Phase 2: WO-AUTH-SERVICE-IDENTITY-PHASE2-GLYCOPHARM)
+/**
+ * WO-O4O-GLYCOPHARM-STORE-PATH-NESTED-MIGRATION-V1
+ * Dynamic-param-aware redirect wrapper. ':paramName' placeholder 를 actual URL param 값으로 치환.
+ * Usage: <ParamRedirect to="/store/marketing/signage/play/:playlistId" />
+ */
+function ParamRedirect({ to }: { to: string }) {
+  const params = useParams();
+  const target = Object.entries(params).reduce(
+    (acc, [k, v]) => acc.split(`:${k}`).join(v ?? ''),
+    to,
+  );
+  return <Navigate to={target} replace />;
+}
+
 function ServiceUserProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isServiceUserAuthenticated, isLoading } = useAuth();
   const location = useLocation();
@@ -580,7 +594,7 @@ function AppRoutes() {
           <Route index element={<GlycoStoreHubPage />} />
           <Route path="b2b" element={<HubB2BCatalogPage />} />
           <Route path="content" element={<HubContentListPage />} />
-          <Route path="signage" element={<Navigate to="/store/signage/library" replace />} />
+          <Route path="signage" element={<Navigate to="/store/marketing/signage/library" replace />} />
           {/* WO-O4O-STORE-HUB-CROSS-SERVICE-COMMONIZATION-PHASE1-V1: 블로그 탭 추가 */}
           <Route path="blog" element={<HubBlogLibraryPage />} />
           {/* WO-O4O-GLYCOPHARM-HUB-POP-QR-LIBRARY-PAGES-V1: POP / QR 탭 추가 (조회 전용) */}
@@ -839,11 +853,14 @@ function AppRoutes() {
             <StoreProductsManagerPage />
           </RoleGuard>
         } />
-        <Route path="local-products" element={<StoreLocalProductsPage />} />
-        <Route path="tablet-displays" element={<StoreTabletDisplaysPage />} />
+        {/* WO-O4O-GLYCOPHARM-STORE-PATH-NESTED-MIGRATION-V1:
+              commerce / marketing / library 영역 nested canonical 정렬.
+              기존 flat path 는 아래 redirect alias 로 유지. */}
+        <Route path="commerce/local-products" element={<StoreLocalProductsPage />} />
+        <Route path="commerce/tablet-displays" element={<StoreTabletDisplaysPage />} />
+        <Route path="commerce/orders" element={<PharmacyOrders />} />
         {/* channels: 채널 관리 (WO-O4O-GLYCOPHARM-STORE-HUB-ADOPTION-V1) */}
         <Route path="channels" element={<StoreChannelsPage />} />
-        <Route path="orders" element={<PharmacyOrders />} />
         <Route path="content" element={<StoreAssetsPage />} />
         {/* Blog (WO-O4O-GLYCO-BLOG-INTRODUCE-V1) — staff 작성/관리 */}
         <Route path="content/blog" element={<PharmacyBlogPage />} />
@@ -870,26 +887,29 @@ function AppRoutes() {
             <Route path="apply" element={<StoreApplyPage />} /> 제거. dead code. */}
         {/* billing: 정산/인보이스 (WO-STORE-BILLING-FOUNDATION-V1) */}
         <Route path="billing" element={<StoreBillingPage />} />
+        {/* WO-O4O-GLYCOPHARM-STORE-PATH-NESTED-MIGRATION-V1:
+              Signage → /store/marketing/signage/* canonical (KPA 정합).
+              기존 /store/signage/* flat path 는 아래 redirect alias 로 유지. */}
         {/* Signage — WO-O4O-GLYCOPHARM-SIGNAGE-PHASE1-V1 + IA-RESTRUCTURE-V2 */}
-        <Route path="signage" element={<Navigate to="playlist" replace />} />
-        <Route path="signage/playlist" element={<StoreSignageMainPage />} />
-        <Route path="signage/videos" element={<StoreSignageMainPage />} />
-        <Route path="signage/schedules" element={<StoreSignageMainPage />} />
-        <Route path="signage/player" element={<SignagePlayerSelectPage />} />
-        <Route path="signage/play/:playlistId" element={<SignagePlaybackPage />} />
+        <Route path="marketing/signage" element={<Navigate to="/store/marketing/signage/playlist" replace />} />
+        <Route path="marketing/signage/playlist" element={<StoreSignageMainPage />} />
+        <Route path="marketing/signage/videos" element={<StoreSignageMainPage />} />
+        <Route path="marketing/signage/schedules" element={<StoreSignageMainPage />} />
+        <Route path="marketing/signage/player" element={<SignagePlayerSelectPage />} />
+        <Route path="marketing/signage/play/:playlistId" element={<SignagePlaybackPage />} />
         {/* Legacy signage routes (maintained for backward compat) */}
-        <Route path="signage/library" element={<ContentLibraryPage />} />
-        <Route path="signage/playlist/:id" element={<SignagePlaylistDetailPage />} />
-        <Route path="signage/media/:id" element={<SignageMediaDetailPage />} />
-        <Route path="signage/preview" element={<SignagePreviewPage />} />
+        <Route path="marketing/signage/library" element={<ContentLibraryPage />} />
+        <Route path="marketing/signage/playlist/:id" element={<SignagePlaylistDetailPage />} />
+        <Route path="marketing/signage/media/:id" element={<SignageMediaDetailPage />} />
+        <Route path="marketing/signage/preview" element={<SignagePreviewPage />} />
         {/* Extensions */}
         <Route path="b2b-order" element={<B2BOrderPage />} />
         <Route path="requests" element={<CustomerRequestsPage />} />
         <Route path="funnel" element={<FunnelPage />} />
         {/* POP 생성 (WO-O4O-GLYCOPHARM-POP-STORE-EXECUTION-V1) */}
-        <Route path="pop" element={<StorePopPage />} />
+        <Route path="marketing/pop" element={<StorePopPage />} />
         {/* QR 관리 (WO-O4O-GLYCOPHARM-QR-STORE-EXECUTION-V1) */}
-        <Route path="qr" element={<StoreQrPage />} />
+        <Route path="marketing/qr" element={<StoreQrPage />} />
         {/* 내 자료함 (WO-O4O-STORE-LIBRARY-CROSSSERVICE-PHASE2-B-V1 / PHASE2-C-V1) */}
         <Route path="library/contents" element={<StoreLibraryContentsPage />} />
         <Route path="library/resources" element={<StoreLibraryResourcesPage />} />
@@ -897,6 +917,26 @@ function AppRoutes() {
         <Route path="library/production-materials/new" element={<ProductionMaterialEditorPage />} />
         <Route path="management" element={<PharmacyManagement />} />
         <Route path="management/b2b" element={<PharmacyB2BProducts />} />
+
+        {/* WO-O4O-GLYCOPHARM-STORE-PATH-NESTED-MIGRATION-V1:
+              기존 flat path → nested canonical redirect alias.
+              사용자 북마크 / 기존 link 호환. 단순 Navigate replace 사용.
+              dynamic :param 은 ParamRedirect 사용. */}
+        <Route path="pop"               element={<Navigate to="/store/marketing/pop" replace />} />
+        <Route path="qr"                element={<Navigate to="/store/marketing/qr" replace />} />
+        <Route path="signage"           element={<Navigate to="/store/marketing/signage/playlist" replace />} />
+        <Route path="signage/playlist"  element={<Navigate to="/store/marketing/signage/playlist" replace />} />
+        <Route path="signage/videos"    element={<Navigate to="/store/marketing/signage/videos" replace />} />
+        <Route path="signage/schedules" element={<Navigate to="/store/marketing/signage/schedules" replace />} />
+        <Route path="signage/player"    element={<Navigate to="/store/marketing/signage/player" replace />} />
+        <Route path="signage/library"   element={<Navigate to="/store/marketing/signage/library" replace />} />
+        <Route path="signage/preview"   element={<Navigate to="/store/marketing/signage/preview" replace />} />
+        <Route path="signage/play/:playlistId" element={<ParamRedirect to="/store/marketing/signage/play/:playlistId" />} />
+        <Route path="signage/playlist/:id"     element={<ParamRedirect to="/store/marketing/signage/playlist/:id" />} />
+        <Route path="signage/media/:id"        element={<ParamRedirect to="/store/marketing/signage/media/:id" />} />
+        <Route path="local-products"    element={<Navigate to="/store/commerce/local-products" replace />} />
+        <Route path="orders"            element={<Navigate to="/store/commerce/orders" replace />} />
+        <Route path="tablet-displays"   element={<Navigate to="/store/commerce/tablet-displays" replace />} />
       </Route>
 
       {/* 404 */}

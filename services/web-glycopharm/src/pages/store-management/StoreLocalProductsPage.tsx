@@ -169,7 +169,7 @@ export default function StoreLocalProductsPage() {
           </p>
         </div>
         <button
-          onClick={() => navigate('/store/tablet-displays')}
+          onClick={() => navigate('/store/commerce/tablet-displays')}
           className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-teal-700 bg-teal-50 rounded-xl hover:bg-teal-100 transition-colors"
         >
           <Tablet className="w-4 h-4" />
