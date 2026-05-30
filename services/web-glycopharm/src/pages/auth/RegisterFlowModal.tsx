@@ -34,6 +34,7 @@ import {
 } from 'lucide-react';
 import { api } from '../../lib/apiClient';
 import { AddressSearch } from '@o4o/ui';
+import { BusinessRegistrationFields } from '@o4o/account-ui';
 
 type Step = 1 | 2 | 3;
 type ParticipationType = 'pharmacist' | 'pharmacy_owner';
@@ -591,42 +592,25 @@ export function RegisterFlowModal({ open, onClose }: Props) {
                         placeholder="tax@pharmacy.com" required />
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1.5">업태</label>
-                      <input type="text" name="businessType" value={formData.businessType} onChange={handleInputChange}
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                        placeholder="소매업" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1.5">업종</label>
-                      <input type="text" name="businessCategory" value={formData.businessCategory} onChange={handleInputChange}
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                        placeholder="의약품" />
-                    </div>
-                  </div>
-                  {/* 사업자 유형 / 개업일 — WO-O4O-CROSSSERVICE-BUSINESS-REGISTRATION-FORM-ALIGNMENT-V1 */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1.5">사업자 유형</label>
-                      <select name="businessEntityType" value={formData.businessEntityType} onChange={handleInputChange}
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
-                        <option value="">선택 (선택사항)</option>
-                        <option value="individual">개인사업자</option>
-                        <option value="corporation">법인사업자</option>
-                        <option value="simple_taxpayer">간이과세자</option>
-                        <option value="general_taxpayer">일반과세자</option>
-                        <option value="tax_exempt">면세사업자</option>
-                        <option value="non_profit">비영리/단체</option>
-                        <option value="other">기타</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1.5">개업일</label>
-                      <input type="date" name="businessStartDate" value={formData.businessStartDate} onChange={handleInputChange}
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
-                    </div>
-                  </div>
+                  {/* 사업자등록증 표준 4 필드 — WO-O4O-BUSINESS-REGISTRATION-COMMON-UI-COMPONENT-V1 (P3)
+                      legacy businessCategory state 는 businessItem 과 동기 유지 (P2 payload 호환). */}
+                  <BusinessRegistrationFields
+                    value={{
+                      businessType: formData.businessType,
+                      businessItem: formData.businessItem,
+                      businessEntityType: formData.businessEntityType,
+                      businessStartDate: formData.businessStartDate,
+                    }}
+                    onChange={(patch) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        ...patch,
+                        ...(patch.businessItem !== undefined ? { businessCategory: patch.businessItem } : {}),
+                      }))
+                    }
+                    inputClassName="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    labelClassName="block text-sm font-medium text-slate-700 mb-1.5"
+                  />
                   <AddressSearch
                     zipCode={formData.zipCode}
                     address={formData.address1}

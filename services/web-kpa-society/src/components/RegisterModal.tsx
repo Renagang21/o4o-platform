@@ -18,6 +18,7 @@
 import { useState, useEffect } from 'react';
 import { X, Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
 import { AddressSearch } from '@o4o/ui';
+import { BusinessRegistrationFields } from '@o4o/account-ui';
 import { useAuthModal } from '../contexts/AuthModalContext';
 
 type MemberType = 'pharmacist_member' | 'pharmacy_student_member';
@@ -665,42 +666,16 @@ export default function RegisterModal() {
                             placeholder="세금계산서 수신 이메일 (선택)"
                             className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                         </div>
-                        {/* 사업자등록증 표준 4 필드 — WO-O4O-CROSSSERVICE-BUSINESS-REGISTRATION-FORM-ALIGNMENT-V1 */}
-                        <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">업태</label>
-                            <input type="text" name="businessType" value={formData.businessType} onChange={handleInputChange}
-                              placeholder="예: 도매 및 소매 (선택)" maxLength={100}
-                              className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">종목</label>
-                            <input type="text" name="businessItem" value={formData.businessItem} onChange={handleInputChange}
-                              placeholder="예: 의약품 소매업 (선택)" maxLength={100}
-                              className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">사업자 유형</label>
-                            <select name="businessEntityType" value={formData.businessEntityType} onChange={handleInputChange}
-                              className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                              <option value="">선택 (선택사항)</option>
-                              <option value="individual">개인사업자</option>
-                              <option value="corporation">법인사업자</option>
-                              <option value="simple_taxpayer">간이과세자</option>
-                              <option value="general_taxpayer">일반과세자</option>
-                              <option value="tax_exempt">면세사업자</option>
-                              <option value="non_profit">비영리/단체</option>
-                              <option value="other">기타</option>
-                            </select>
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">개업일</label>
-                            <input type="date" name="businessStartDate" value={formData.businessStartDate} onChange={handleInputChange}
-                              className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                          </div>
-                        </div>
+                        {/* 사업자등록증 표준 4 필드 — WO-O4O-BUSINESS-REGISTRATION-COMMON-UI-COMPONENT-V1 (P3) */}
+                        <BusinessRegistrationFields
+                          value={{
+                            businessType: formData.businessType,
+                            businessItem: formData.businessItem,
+                            businessEntityType: formData.businessEntityType,
+                            businessStartDate: formData.businessStartDate,
+                          }}
+                          onChange={(patch) => setFormData((prev) => ({ ...prev, ...patch }))}
+                        />
                         <div className="grid grid-cols-2 gap-3">
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">약국 전화</label>

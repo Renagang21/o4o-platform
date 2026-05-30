@@ -13,6 +13,7 @@
 
 import { useState, useEffect } from 'react';
 import { X, Eye, EyeOff, CheckCircle, ArrowLeft } from 'lucide-react';
+import { BusinessRegistrationFields } from '@o4o/account-ui';
 import { useLoginModal } from '../contexts';
 import { api } from '../lib/apiClient';
 
@@ -764,49 +765,18 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                           세금계산서 수신용 이메일 (로그인 이메일과 달라도 됩니다)
                         </p>
                       </div>
-                      {/* 사업자등록증 표준 추가 필드 — WO-O4O-CROSSSERVICE-BUSINESS-REGISTRATION-FORM-ALIGNMENT-V1 */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">종목</label>
-                        <input
-                          type="text"
-                          name="businessItem"
-                          value={formData.businessItem}
-                          onChange={handleInputChange}
-                          placeholder="예: 의약품 도매업 (선택)"
-                          maxLength={100}
-                          className={INPUT_CLASS_BG}
-                        />
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">사업자 유형</label>
-                          <select
-                            name="businessEntityType"
-                            value={formData.businessEntityType}
-                            onChange={handleInputChange}
-                            className={INPUT_CLASS_BG}
-                          >
-                            <option value="">선택 (선택사항)</option>
-                            <option value="individual">개인사업자</option>
-                            <option value="corporation">법인사업자</option>
-                            <option value="simple_taxpayer">간이과세자</option>
-                            <option value="general_taxpayer">일반과세자</option>
-                            <option value="tax_exempt">면세사업자</option>
-                            <option value="non_profit">비영리/단체</option>
-                            <option value="other">기타</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">개업일</label>
-                          <input
-                            type="date"
-                            name="businessStartDate"
-                            value={formData.businessStartDate}
-                            onChange={handleInputChange}
-                            className={INPUT_CLASS_BG}
-                          />
-                        </div>
-                      </div>
+                      {/* 사업자등록증 표준 추가 필드 — WO-O4O-BUSINESS-REGISTRATION-COMMON-UI-COMPONENT-V1 (P3)
+                          Neture supplier 의 기존 businessType select (카테고리 선택 — cosmetics/health 등)는 의미가
+                          canonical "업태" (free text) 와 다르므로 그대로 유지. includeFields 로 나머지 3 필드만 공통화. */}
+                      <BusinessRegistrationFields
+                        value={{
+                          businessItem: formData.businessItem,
+                          businessEntityType: formData.businessEntityType,
+                          businessStartDate: formData.businessStartDate,
+                        }}
+                        onChange={(patch) => setFormData((prev) => ({ ...prev, ...patch }))}
+                        includeFields={['businessItem', 'businessEntityType', 'businessStartDate']}
+                      />
                     </>
                   )}
 

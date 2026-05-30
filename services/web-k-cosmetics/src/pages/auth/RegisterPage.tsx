@@ -5,6 +5,7 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { BusinessRegistrationFields } from '@o4o/account-ui';
 import { api } from '../../lib/apiClient';
 
 type UserRole = 'consumer' | 'seller';
@@ -378,57 +379,16 @@ export default function RegisterPage() {
                     style={styles.input}
                   />
                 </div>
-                {/* 사업자등록증 표준 4 필드 — WO-O4O-CROSSSERVICE-BUSINESS-REGISTRATION-FORM-ALIGNMENT-V1 */}
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>업태</label>
-                  <input
-                    type="text"
-                    name="businessType"
-                    value={formData.businessType}
-                    onChange={handleInputChange}
-                    placeholder="예: 도매 및 소매 (선택)"
-                    style={styles.input}
-                  />
-                </div>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>종목</label>
-                  <input
-                    type="text"
-                    name="businessItem"
-                    value={formData.businessItem}
-                    onChange={handleInputChange}
-                    placeholder="예: 화장품 소매업 (선택)"
-                    style={styles.input}
-                  />
-                </div>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>사업자 유형</label>
-                  <select
-                    name="businessEntityType"
-                    value={formData.businessEntityType}
-                    onChange={handleInputChange}
-                    style={styles.input}
-                  >
-                    <option value="">선택 (선택사항)</option>
-                    <option value="individual">개인사업자</option>
-                    <option value="corporation">법인사업자</option>
-                    <option value="simple_taxpayer">간이과세자</option>
-                    <option value="general_taxpayer">일반과세자</option>
-                    <option value="tax_exempt">면세사업자</option>
-                    <option value="non_profit">비영리/단체</option>
-                    <option value="other">기타</option>
-                  </select>
-                </div>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>개업일</label>
-                  <input
-                    type="date"
-                    name="businessStartDate"
-                    value={formData.businessStartDate}
-                    onChange={handleInputChange}
-                    style={styles.input}
-                  />
-                </div>
+                {/* 사업자등록증 표준 4 필드 — WO-O4O-BUSINESS-REGISTRATION-COMMON-UI-COMPONENT-V1 (P3) */}
+                <BusinessRegistrationFields
+                  value={{
+                    businessType: formData.businessType,
+                    businessItem: formData.businessItem,
+                    businessEntityType: formData.businessEntityType,
+                    businessStartDate: formData.businessStartDate,
+                  }}
+                  onChange={(patch) => setFormData((prev) => ({ ...prev, ...patch }))}
+                />
               </div>
             )}
 

@@ -22,7 +22,7 @@
  * 라벨 SSOT: @o4o/types BUSINESS_ENTITY_TYPE_LABELS.
  */
 
-import type { ChangeEvent } from 'react';
+import type { ChangeEvent, ReactElement } from 'react';
 import {
   type BusinessEntityType,
   BUSINESS_ENTITY_TYPE_LABELS,
@@ -35,12 +35,14 @@ export interface BusinessRegistrationFieldsValue {
   businessStartDate?: string;
 }
 
+export type BusinessRegistrationFieldKey = keyof BusinessRegistrationFieldsValue;
+
 export interface BusinessRegistrationFieldsProps {
   value: BusinessRegistrationFieldsValue;
   /** Patch 방식 onChange — 부모 setState 에서 spread 로 흡수. */
   onChange: (patch: Partial<BusinessRegistrationFieldsValue>) => void;
   disabled?: boolean;
-  /** true 면 4 필드 모두 html required + label 에 * 표시. */
+  /** true 면 렌더된 필드 모두 html required + label 에 * 표시. */
   required?: boolean;
   /** outer container className override. */
   className?: string;
@@ -50,6 +52,12 @@ export interface BusinessRegistrationFieldsProps {
   labelClassName?: string;
   /** "선택" placeholder 라벨 (사업자 유형 select). */
   entityTypePlaceholder?: string;
+  /**
+   * 렌더할 필드 화이트리스트. 미지정 시 4 필드 전체 (default).
+   * 기존 폼이 businessType 등을 별도로 가진 경우 부분 렌더용.
+   * 예: ['businessItem', 'businessEntityType', 'businessStartDate']
+   */
+  includeFields?: BusinessRegistrationFieldKey[];
 }
 
 const DEFAULT_INPUT_CLASS =
@@ -61,6 +69,13 @@ const ENTITY_TYPE_OPTIONS = (
   Object.entries(BUSINESS_ENTITY_TYPE_LABELS) as Array<[BusinessEntityType, string]>
 ).map(([value, label]) => ({ value, label }));
 
+const ALL_FIELDS: BusinessRegistrationFieldKey[] = [
+  'businessType',
+  'businessItem',
+  'businessEntityType',
+  'businessStartDate',
+];
+
 export function BusinessRegistrationFields({
   value,
   onChange,
@@ -70,82 +85,105 @@ export function BusinessRegistrationFields({
   inputClassName,
   labelClassName,
   entityTypePlaceholder = '선택 (선택사항)',
+  includeFields,
 }: BusinessRegistrationFieldsProps) {
   const inputCls = inputClassName ?? DEFAULT_INPUT_CLASS;
   const labelCls = labelClassName ?? DEFAULT_LABEL_CLASS;
   const containerCls = className ?? DEFAULT_CONTAINER_CLASS;
 
-  const handle = (key: keyof BusinessRegistrationFieldsValue) =>
+  const visible = new Set<BusinessRegistrationFieldKey>(
+    includeFields && includeFields.length > 0 ? includeFields : ALL_FIELDS,
+  );
+
+  const handle = (key: BusinessRegistrationFieldKey) =>
     (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
       onChange({ [key]: e.target.value });
     };
 
   const requiredMark = required ? <span className="text-red-500"> *</span> : null;
 
+  const fieldNodes: Record<BusinessRegistrationFieldKey, ReactElement> = {
+    businessType: (
+      <div key="businessType">
+        <label className={labelCls}>업태{requiredMark}</label>
+        <input
+          type="text"
+          name="businessType"
+          value={value.businessType ?? ''}
+          onChange={handle('businessType')}
+          disabled={disabled}
+          required={required}
+          placeholder="예: 도매 및 소매"
+          maxLength={100}
+          className={inputCls}
+        />
+      </div>
+    ),
+    businessItem: (
+      <div key="businessItem">
+        <label className={labelCls}>종목{requiredMark}</label>
+        <input
+          type="text"
+          name="businessItem"
+          value={value.businessItem ?? ''}
+          onChange={handle('businessItem')}
+          disabled={disabled}
+          required={required}
+          placeholder="예: 의약품 소매업"
+          maxLength={100}
+          className={inputCls}
+        />
+      </div>
+    ),
+    businessEntityType: (
+      <div key="businessEntityType">
+        <label className={labelCls}>사업자 유형{requiredMark}</label>
+        <select
+          name="businessEntityType"
+          value={value.businessEntityType ?? ''}
+          onChange={handle('businessEntityType')}
+          disabled={disabled}
+          required={required}
+          className={inputCls}
+        >
+          <option value="">{entityTypePlaceholder}</option>
+          {ENTITY_TYPE_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+      </div>
+    ),
+    businessStartDate: (
+      <div key="businessStartDate">
+        <label className={labelCls}>개업일{requiredMark}</label>
+        <input
+          type="date"
+          name="businessStartDate"
+          value={value.businessStartDate ?? ''}
+          onChange={handle('businessStartDate')}
+          disabled={disabled}
+          required={required}
+          className={inputCls}
+        />
+      </div>
+    ),
+  };
+
+  const visibleOrdered = ALL_FIELDS.filter((k) => visible.has(k));
+  const pairs: BusinessRegistrationFieldKey[][] = [];
+  for (let i = 0; i < visibleOrdered.length; i += 2) {
+    pairs.push(visibleOrdered.slice(i, i + 2));
+  }
+
   return (
     <div className={containerCls}>
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className={labelCls}>업태{requiredMark}</label>
-          <input
-            type="text"
-            name="businessType"
-            value={value.businessType ?? ''}
-            onChange={handle('businessType')}
-            disabled={disabled}
-            required={required}
-            placeholder="예: 도매 및 소매"
-            maxLength={100}
-            className={inputCls}
-          />
+      {pairs.map((pair, idx) => (
+        <div key={idx} className="grid grid-cols-2 gap-3">
+          {pair.map((k) => fieldNodes[k])}
         </div>
-        <div>
-          <label className={labelCls}>종목{requiredMark}</label>
-          <input
-            type="text"
-            name="businessItem"
-            value={value.businessItem ?? ''}
-            onChange={handle('businessItem')}
-            disabled={disabled}
-            required={required}
-            placeholder="예: 의약품 소매업"
-            maxLength={100}
-            className={inputCls}
-          />
-        </div>
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className={labelCls}>사업자 유형{requiredMark}</label>
-          <select
-            name="businessEntityType"
-            value={value.businessEntityType ?? ''}
-            onChange={handle('businessEntityType')}
-            disabled={disabled}
-            required={required}
-            className={inputCls}
-          >
-            <option value="">{entityTypePlaceholder}</option>
-            {ENTITY_TYPE_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label className={labelCls}>개업일{requiredMark}</label>
-          <input
-            type="date"
-            name="businessStartDate"
-            value={value.businessStartDate ?? ''}
-            onChange={handle('businessStartDate')}
-            disabled={disabled}
-            required={required}
-            className={inputCls}
-          />
-        </div>
-      </div>
+      ))}
     </div>
   );
 }
