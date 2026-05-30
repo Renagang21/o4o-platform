@@ -14,6 +14,7 @@ import logger from '../../utils/logger.js';
 import { MembershipApprovalService } from '../../services/approval/MembershipApprovalService.js';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
 import { roleService } from '../../modules/auth/services/role.service.js';
+import { isOperationalRole } from '../../types/roles.js';
 import { ActionLogService } from '@o4o/action-log-core';
 
 const approvalService = new MembershipApprovalService();
@@ -799,6 +800,18 @@ export class MembershipConsoleController {
 
       // 0. Membership role update (service_memberships.role)
       if (membershipRole && typeof membershipRole === 'string') {
+        // WO-O4O-MEMBER-ROLE-WRITE-PATH-HARDENING-V1:
+        // service_memberships.role 은 참여 유형 축이다. 운영 권한(operator/admin/super_admin,
+        // bare·namespaced 무관)을 이 컬럼에 저장하면 축이 혼입된다(IR-O4O-BARE-OPERATOR-ADMIN-WRITE-PATH-AUDIT-V1).
+        // 운영 권한은 role_assignments 경로(POST/DELETE /operator/members/:id/roles)에서만 관리한다.
+        if (isOperationalRole(membershipRole)) {
+          res.status(400).json({
+            success: false,
+            error: '운영 권한(operator/admin)은 회원 유형으로 저장할 수 없습니다. 운영 권한은 별도 경로에서 관리됩니다.',
+            code: 'INVALID_MEMBERSHIP_ROLE',
+          });
+          return;
+        }
         // Platform admin은 scope.serviceKeys가 빈 배열 → 프론트에서 전달한 키 사용
         const serviceKey = req.body.membershipServiceKey || scope.serviceKeys[0];
         if (serviceKey) {

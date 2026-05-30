@@ -168,6 +168,28 @@ export function isKpaRoleType(role: string): role is KpaRole {
 }
 
 /**
+ * 운영 권한(operator / admin / super_admin) 성격의 role 인지 판정한다.
+ * bare('operator', 'admin') 와 namespaced('neture:operator', 'platform:super_admin',
+ * 'glycopharm:admin', 'cosmetics:operator') 를 모두 인식한다(마지막 세그먼트 기준).
+ *
+ * WO-O4O-MEMBER-ROLE-WRITE-PATH-HARDENING-V1:
+ *   운영 권한은 role_assignments(canonical) 축에서만 관리한다. 참여 유형 축인
+ *   service_memberships.role 에 운영 권한이 저장되는 것을 막는 write-path 가드에 사용.
+ *
+ * @example
+ * isOperationalRole('operator')           // true
+ * isOperationalRole('neture:operator')    // true
+ * isOperationalRole('platform:super_admin') // true
+ * isOperationalRole('supplier')           // false
+ * isOperationalRole('glycopharm:store_owner') // false
+ */
+export function isOperationalRole(role: string): boolean {
+  if (!role) return false;
+  const seg = role.includes(':') ? role.slice(role.lastIndexOf(':') + 1) : role;
+  return seg === 'operator' || seg === 'admin' || seg === 'super_admin';
+}
+
+/**
  * Role metadata for documentation and validation
  */
 export interface RoleMetadata {
