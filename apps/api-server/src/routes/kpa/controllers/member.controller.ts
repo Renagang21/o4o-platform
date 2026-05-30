@@ -445,11 +445,22 @@ export function createMemberController(
 
         // WO-O4O-KPA-MEMBER-PROFILE-CAPABILITY-COLUMN-ADD-V1:
         //   role_assignments 의 active role 을 user_id 별 batch 조회 후 attach.
+        // WO-O4O-KPA-MEMBER-ROLE-BADGE-SERVICE-FILTER-V1:
+        //   KPA 회원관리 화면의 "추가 권한" 컬럼은 KPA scope 만 표시 (cross-service leak 방지).
+        //   - kpa:* (KPA 서비스 권한)
+        //   - platform:super_admin (운영자가 식별해야 할 플랫폼 관리자)
+        //   다른 service role (supplier, neture:*, glycopharm:*, lms:instructor, pharmacy 등) 은
+        //   KPA 운영자 mental model 외이므로 응답에서 제외.
+        //   (역할 자체는 그대로 보존 — 부여/삭제 로직 미변경.)
+        //   IR: docs/investigations/IR-O4O-KPA-MEMBER-ROLE-BADGE-CROSSSERVICE-LEAK-AUDIT-V1.md
         const userIds = members.map((m) => m.user_id).filter((id): id is string => Boolean(id));
         const capabilityMap = new Map<string, string[]>();
         if (userIds.length > 0) {
           const raRows = await dataSource.query(
-            `SELECT user_id, role FROM role_assignments WHERE user_id = ANY($1::uuid[]) AND is_active = true`,
+            `SELECT user_id, role FROM role_assignments
+             WHERE user_id = ANY($1::uuid[])
+               AND is_active = true
+               AND (role LIKE 'kpa:%' OR role = 'platform:super_admin')`,
             [userIds],
           );
           for (const row of raRows as Array<{ user_id: string; role: string }>) {
