@@ -247,6 +247,27 @@ export default function StoreOverviewPage() {
             </button>
           </div>
 
+          {/* WO-O4O-STORE-DASHBOARD-ORDER-METRICS-SAFE-FALLBACK-V1:
+              주문/매출 데이터가 미준비 상태인 경우 silent 0 거짓 신호 대신 명시 안내.
+              backend cockpit/today-actions 가 meta.featureStatus='not_ready' 응답 시 노출. */}
+          {!loading && !cockpitData.orderMetricsReady && (
+            <section className="mb-6">
+              <Card className="p-4 bg-amber-50 border border-amber-200">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-amber-900 m-0 mb-1">
+                      주문/매출 지표를 준비 중입니다.
+                    </p>
+                    <p className="text-[13px] text-amber-700 m-0">
+                      현재 이 지표는 준비 중입니다. 다른 내 약국 기능은 계속 이용할 수 있습니다.
+                    </p>
+                  </div>
+                </div>
+              </Card>
+            </section>
+          )}
+
           {/* AI Summary 카드 */}
           <section className="mb-8">
             <h2 className="text-lg font-semibold text-slate-800 mb-4 mt-0">AI 운영 요약</h2>

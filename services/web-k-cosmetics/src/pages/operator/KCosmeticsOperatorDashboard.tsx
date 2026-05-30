@@ -44,6 +44,8 @@ const KCOS_AXES: OperatorAxisGroup[] = [
 
 export default function KCosmeticsOperatorDashboard() {
   const [config, setConfig] = useState<OperatorDashboardConfig | null>(null);
+  // WO-O4O-STORE-DASHBOARD-ORDER-METRICS-SAFE-FALLBACK-V1
+  const [orderMetricsReady, setOrderMetricsReady] = useState<boolean>(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -51,9 +53,10 @@ export default function KCosmeticsOperatorDashboard() {
     setLoading(true);
     setError(null);
     try {
-      const data = await operatorApi.getDashboardSummary();
-      if (data) {
-        setConfig(buildKCosmeticsOperatorConfig(data));
+      const result = await operatorApi.getDashboardSummary();
+      if (result.config) {
+        setConfig(buildKCosmeticsOperatorConfig(result.config));
+        setOrderMetricsReady(result.orderMetricsReady);
       } else {
         setError('데이터를 불러올 수 없습니다.');
       }
@@ -94,6 +97,26 @@ export default function KCosmeticsOperatorDashboard() {
     <div className="space-y-6">
       {/* WO-O4O-OPERATOR-DASHBOARD-AXIS-NAVIGATION-COMMONIZATION-V1: 2축 운영 네비게이션 */}
       <AxisNavigationSection axes={KCOS_AXES} />
+
+      {/* WO-O4O-STORE-DASHBOARD-ORDER-METRICS-SAFE-FALLBACK-V1:
+          주문/매출 지표 미준비 (백엔드 meta.featureStatus='not_ready') 상태 안내.
+          KPI 카드의 '진행 주문 0' / '월간 매출 0' 거짓 신호 대신 명시. */}
+      {!orderMetricsReady && (
+        <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
+          <div className="flex items-start gap-3">
+            <span className="text-amber-600 text-lg leading-none mt-0.5">⚠</span>
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-amber-900 m-0 mb-1">
+                주문/매출 지표를 준비 중입니다.
+              </p>
+              <p className="text-[13px] text-amber-700 m-0">
+                현재 이 지표는 준비 중입니다. 다른 운영자 기능은 계속 이용할 수 있습니다.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <OperatorDashboardLayout config={config} />
     </div>
   );

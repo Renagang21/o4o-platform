@@ -22,6 +22,14 @@ import { runAIInsight } from '@o4o/ai-core';
 import type { ActionLogService } from '@o4o/action-log-core';
 import type { AuthRequest } from '../../../types/auth.js';
 import logger from '../../../utils/logger.js';
+// WO-O4O-STORE-DASHBOARD-ORDER-METRICS-SAFE-FALLBACK-V1:
+// ecommerce_orders 부재 (PG 42P01) 에 한해 응답을 success + meta.featureStatus='not_ready'
+// 로 격하한다. 다른 오류는 기존 500 처리 유지. 근거: IR-O4O-ECOMMERCE-ORDERS-TABLE-CROSSSERVICE-IMPACT-V1.
+import {
+  isMissingOrderTable,
+  READY_META,
+  NOT_READY_META,
+} from '../../../utils/order-metrics-fallback.js';
 
 type AuthMiddleware = RequestHandler;
 type ScopeMiddleware = (scope: string) => RequestHandler;
@@ -254,8 +262,22 @@ export function createCockpitController(
           applicationAlerts,
         };
 
-        res.json({ success: true, data: response });
+        res.json({ success: true, data: response, meta: READY_META });
       } catch (error: any) {
+        // WO-O4O-STORE-DASHBOARD-ORDER-METRICS-SAFE-FALLBACK-V1: ecommerce_orders 부재 대응
+        if (isMissingOrderTable(error)) {
+          logger.warn('[Cockpit] today-actions: order table not ready', { code: error?.code });
+          const empty: TodayActions = {
+            todayOrders: 0,
+            pendingOrders: 0,
+            pendingReceiveOrders: 0,
+            pendingRequests: 0,
+            operatorNotices: 0,
+            applicationAlerts: 0,
+          };
+          res.json({ success: true, data: empty, meta: NOT_READY_META });
+          return;
+        }
         logger.error('[Cockpit] Failed to get today actions', { error: error.message });
         res.status(500).json({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' });
       }
@@ -396,8 +418,14 @@ export function createCockpitController(
         }
 
         const summary = await summaryEngine.getSummary(pharmacy.id);
-        res.json({ success: true, data: summary });
+        res.json({ success: true, data: summary, meta: READY_META });
       } catch (error: any) {
+        // WO-O4O-STORE-DASHBOARD-ORDER-METRICS-SAFE-FALLBACK-V1
+        if (isMissingOrderTable(error)) {
+          logger.warn('[Cockpit] store-kpi: order table not ready', { code: error?.code });
+          res.json({ success: true, data: null, meta: NOT_READY_META });
+          return;
+        }
         logger.error('[Cockpit] Failed to get store KPI', { error: error.message });
         res.status(500).json({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' });
       }
@@ -441,8 +469,14 @@ export function createCockpitController(
         ]);
 
         const insights = insightsEngine.generate({ summary, lastMonthRevenue });
-        res.json({ success: true, data: insights });
+        res.json({ success: true, data: insights, meta: READY_META });
       } catch (error: any) {
+        // WO-O4O-STORE-DASHBOARD-ORDER-METRICS-SAFE-FALLBACK-V1
+        if (isMissingOrderTable(error)) {
+          logger.warn('[Cockpit] store-insights: order table not ready', { code: error?.code });
+          res.json({ success: true, data: null, meta: NOT_READY_META });
+          return;
+        }
         logger.error('[Cockpit] Failed to get store insights', { error: error.message });
         res.status(500).json({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' });
       }

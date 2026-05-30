@@ -175,8 +175,11 @@ export default function KCosmeticsAdminDashboard() {
     setLoading(true);
     setError(null);
     try {
+      // WO-O4O-STORE-DASHBOARD-ORDER-METRICS-SAFE-FALLBACK-V1:
+      // operatorApi.getDashboardSummary 가 { config, orderMetricsReady } 로 반환 변경.
+      // 본 admin dashboard 는 orderMetricsReady 활용 안 함 (W-future 확장 후보) — config 만 set.
       const result = await operatorApi.getDashboardSummary();
-      setData(result);
+      setData(result.config);
     } catch {
       setError('관리자 권한이 필요하거나 데이터를 불러올 수 없습니다.');
     }

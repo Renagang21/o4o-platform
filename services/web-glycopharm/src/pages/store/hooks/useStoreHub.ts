@@ -55,13 +55,28 @@ export interface CockpitData {
   productStats: {
     total: number;
   } | null;
+  /**
+   * WO-O4O-STORE-DASHBOARD-ORDER-METRICS-SAFE-FALLBACK-V1:
+   * 백엔드 응답의 `meta.featureStatus === 'not_ready'` 로 결정.
+   * true = 정상 데이터, false = 주문 데이터 준비 중 (테이블 부재).
+   * 카드 단위 silent 0 표시 차단을 위해 UI 가 본 flag 를 확인해 "준비 중" 안내로 분기한다.
+   */
+  orderMetricsReady: boolean;
 }
 
 // ─── Signal Adapter ───
 
 function buildGlycoSignals(data: CockpitData): Record<string, HubSignal> {
   const signals: Record<string, HubSignal> = {};
-  const { aiSummary, todayActions } = data;
+  const { aiSummary, todayActions, orderMetricsReady } = data;
+
+  // WO-O4O-STORE-DASHBOARD-ORDER-METRICS-SAFE-FALLBACK-V1:
+  // 주문 데이터 미준비 시 매출/주문 카드 신호를 "준비 중" 으로 명시.
+  // 거짓 0 표시 (todayOrders=0, pending=0) 대신 사용자에게 진행 상태 노출.
+  if (!orderMetricsReady) {
+    signals['glycopharm.revenue'] = createSignal('info', { label: '준비 중' });
+    signals['glycopharm.pending_requests'] = createSignal('info', { label: '준비 중' });
+  }
 
   // AI Summary 신호 (pulse: critical일 때만 — UX Guidelines §4.4)
   if (aiSummary) {
@@ -77,8 +92,8 @@ function buildGlycoSignals(data: CockpitData): Record<string, HubSignal> {
     });
   }
 
-  // 매출 신호
-  if (todayActions) {
+  // 매출 신호 (주문 데이터 준비된 경우만)
+  if (todayActions && orderMetricsReady) {
     if (todayActions.todayOrders > 0) {
       signals['glycopharm.revenue'] = createSignal('info', {
         label: '오늘 주문',
@@ -159,6 +174,8 @@ export function useStoreHub() {
     todayActions: null,
     signageStats: null,
     productStats: null,
+    // 초기값 true — 응답이 not_ready 면 false 로 전환.
+    orderMetricsReady: true,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -190,12 +207,22 @@ export function useStoreHub() {
       const franchiseData = signageRes.status === 'fulfilled'
         ? (signageRes.value.data as any)?.data : null;
 
+      // WO-O4O-STORE-DASHBOARD-ORDER-METRICS-SAFE-FALLBACK-V1:
+      // 백엔드가 ecommerce_orders 부재 시 응답 body 의 meta.featureStatus = 'not_ready' 를
+      // 부착. 두 cockpit endpoint (today-actions, ai-summary 는 영향 없음) 중 today-actions
+      // 의 meta 를 읽어 orderMetricsReady 결정. fetch 자체가 rejected (네트워크/401 등) 인
+      // 경우는 기존과 같이 silent — 데이터 미준비 신호와 구분.
+      const actionsBody =
+        actionsRes.status === 'fulfilled' ? ((actionsRes.value.data as any) ?? null) : null;
+      const orderMetricsReady = actionsBody?.meta?.featureStatus !== 'not_ready';
+
       setCockpitData({
         aiSummary: aiRes.status === 'fulfilled' ? (aiRes.value.data as any)?.data : null,
-        todayActions: actionsRes.status === 'fulfilled' ? (actionsRes.value.data as any)?.data : null,
+        todayActions: actionsBody?.data ?? null,
         signageStats: franchiseData?.signage ?? null,
         productStats: productsRes.status === 'fulfilled'
           ? { total: (productsRes.value.data as any)?.data?.total ?? 0 } : null,
+        orderMetricsReady,
       });
     } catch {
       setError('운영 데이터를 불러오지 못했습니다.');

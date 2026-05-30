@@ -17,6 +17,12 @@ import { DataSource } from 'typeorm';
 import { requireAuth, requireAdmin } from '../../common/middleware/auth.middleware.js';
 import { PhysicalStoreService } from './physical-store.service.js';
 import { generatePhysicalStoreInsights } from './physical-store-insights.service.js';
+// WO-O4O-STORE-DASHBOARD-ORDER-METRICS-SAFE-FALLBACK-V1
+import {
+  isMissingOrderTable,
+  READY_META,
+  NOT_READY_META,
+} from '../../utils/order-metrics-fallback.js';
 
 export function createPhysicalStoreRoutes(dataSource: DataSource): Router {
   const router = Router();
@@ -46,8 +52,14 @@ export function createPhysicalStoreRoutes(dataSource: DataSource): Router {
       const page = Math.max(parseInt(req.query.page as string) || 1, 1);
       const limit = Math.min(Math.max(parseInt(req.query.limit as string) || 20, 1), 100);
       const result = await service.listPhysicalStores(page, limit);
-      res.json({ success: true, data: result });
+      res.json({ success: true, data: result, meta: READY_META });
     } catch (error: any) {
+      // WO-O4O-STORE-DASHBOARD-ORDER-METRICS-SAFE-FALLBACK-V1
+      if (isMissingOrderTable(error)) {
+        console.warn('[PhysicalStore] list: order table not ready', { code: error?.code });
+        res.json({ success: true, data: { items: [], total: 0, page: 1, limit: 0 }, meta: NOT_READY_META });
+        return;
+      }
       console.error('[PhysicalStore] list error:', error);
       res.status(500).json({
         success: false,
@@ -68,8 +80,14 @@ export function createPhysicalStoreRoutes(dataSource: DataSource): Router {
           code: 'PHYSICAL_STORE_NOT_FOUND',
         });
       }
-      res.json({ success: true, data: summary });
+      res.json({ success: true, data: summary, meta: READY_META });
     } catch (error: any) {
+      // WO-O4O-STORE-DASHBOARD-ORDER-METRICS-SAFE-FALLBACK-V1
+      if (isMissingOrderTable(error)) {
+        console.warn('[PhysicalStore] summary: order table not ready', { code: error?.code });
+        res.json({ success: true, data: null, meta: NOT_READY_META });
+        return;
+      }
       console.error('[PhysicalStore] summary error:', error);
       res.status(500).json({
         success: false,
@@ -109,8 +127,14 @@ export function createPhysicalStoreRoutes(dataSource: DataSource): Router {
         lastMonth: lastMonthStats,
       });
 
-      res.json({ success: true, data: insights });
+      res.json({ success: true, data: insights, meta: READY_META });
     } catch (error: any) {
+      // WO-O4O-STORE-DASHBOARD-ORDER-METRICS-SAFE-FALLBACK-V1
+      if (isMissingOrderTable(error)) {
+        console.warn('[PhysicalStore] insights: order table not ready', { code: error?.code });
+        res.json({ success: true, data: null, meta: NOT_READY_META });
+        return;
+      }
       console.error('[PhysicalStore] insights error:', error);
       res.status(500).json({
         success: false,

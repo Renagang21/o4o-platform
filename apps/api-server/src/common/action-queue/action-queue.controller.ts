@@ -16,6 +16,12 @@ import { buildActionQueue } from './action-queue.factory.js';
 import { generateAiActions } from './action-queue-ai.service.js';
 import { getDismissedActionIds } from './action-queue-dismiss.js';
 import logger from '../../utils/logger.js';
+// WO-O4O-STORE-DASHBOARD-ORDER-METRICS-SAFE-FALLBACK-V1
+import {
+  isMissingOrderTable,
+  READY_META,
+  NOT_READY_META,
+} from '../../utils/order-metrics-fallback.js';
 
 type AuthenticatedRequest = Request & { user?: { id: string } };
 
@@ -38,12 +44,22 @@ export function createActionQueueRouter(
       const dismissedIds = await getDismissedActionIds(dataSource, userId, config.serviceKey);
 
       // 2. count 쿼리 실행 → AI 입력
+      // WO-O4O-STORE-DASHBOARD-ORDER-METRICS-SAFE-FALLBACK-V1:
+      // ecommerce_orders 부재 (42P01) 에 한해 별도 flag 수집 — 응답 meta 에 부착.
+      // 다른 오류는 기존과 동일하게 silent 0 (action queue 의 cross-service 정책 유지).
+      let orderMetricsReady = true;
       const countResults = await Promise.all(
         config.definitions.map(async (def) => {
           try {
             const rows = await dataSource.query(def.query, def.queryParams);
             return { id: def.id, count: rows[0]?.cnt || 0 };
-          } catch { return { id: def.id, count: 0 }; }
+          } catch (err) {
+            if (isMissingOrderTable(err)) {
+              orderMetricsReady = false;
+              logger.warn(`[${config.serviceKey} ActionQueue] ${def.id}: order table not ready`);
+            }
+            return { id: def.id, count: 0 };
+          }
         }),
       );
       const counts: Record<string, number> = {};
@@ -60,7 +76,12 @@ export function createActionQueueRouter(
         dataSource, config.definitions, aiActions, dismissedIds, executeHandlerIds,
       );
 
-      res.json({ success: true, data: result });
+      // WO-O4O-STORE-DASHBOARD-ORDER-METRICS-SAFE-FALLBACK-V1: meta 부착
+      res.json({
+        success: true,
+        data: result,
+        meta: orderMetricsReady ? READY_META : NOT_READY_META,
+      });
     } catch (error: any) {
       logger.error(`[${config.serviceKey} ActionQueue] Error:`, error);
       res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: error.message });

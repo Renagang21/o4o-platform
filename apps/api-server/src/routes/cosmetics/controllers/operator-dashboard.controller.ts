@@ -23,6 +23,12 @@ import { requireCosmeticsScope } from '../../../middleware/cosmetics-scope.middl
 import { CosmeticsStoreSummaryService } from '../services/cosmetics-store-summary.service.js';
 import { generateRuleBasedInsights } from '../../../copilot/insight-rules.js';
 import logger from '../../../utils/logger.js';
+// WO-O4O-STORE-DASHBOARD-ORDER-METRICS-SAFE-FALLBACK-V1
+import {
+  isMissingOrderTable,
+  READY_META,
+  NOT_READY_META,
+} from '../../../utils/order-metrics-fallback.js';
 import type { KpiItem, AiSummaryItem, ActionItem, ActivityItem, QuickActionItem, OperatorDashboardConfig } from '../../../types/operator-dashboard.types.js';
 
 export function createCosmeticsOperatorDashboardController(dataSource: DataSource): Router {
@@ -39,6 +45,11 @@ export function createCosmeticsOperatorDashboardController(dataSource: DataSourc
    */
   router.get('/dashboard', async (_req: Request, res: Response): Promise<void> => {
     try {
+      // WO-O4O-STORE-DASHBOARD-ORDER-METRICS-SAFE-FALLBACK-V1:
+      // adminSummary 의 ecommerce_orders 의존 분기. 테이블 부재 (42P01) 면
+      // featureStatus='not_ready' 로 응답을 격하 — silent 0 거짓 신호 차단.
+      let orderMetricsReady = true;
+
       // === Parallel data fetch ===
       const [
         adminSummary,
@@ -48,7 +59,12 @@ export function createCosmeticsOperatorDashboardController(dataSource: DataSourc
       ] = await Promise.all([
         // 1. Store & order summary (reuses existing service)
         storeSummaryService.getAdminSummary().catch((e) => {
-          logger.warn('[CosmeticsDashboard] adminSummary failed:', e.message);
+          if (isMissingOrderTable(e)) {
+            orderMetricsReady = false;
+            logger.warn('[CosmeticsDashboard] adminSummary: order table not ready', { code: e?.code });
+          } else {
+            logger.warn('[CosmeticsDashboard] adminSummary failed:', e.message);
+          }
           return { totalStores: 0, activeOrders: 0, monthlyRevenue: 0, recentOrders: [] };
         }),
 
@@ -124,8 +140,16 @@ export function createCosmeticsOperatorDashboardController(dataSource: DataSourc
         quickActions,
       };
 
-      res.json({ success: true, data: response });
+      // WO-O4O-STORE-DASHBOARD-ORDER-METRICS-SAFE-FALLBACK-V1: meta 부착
+      res.json({
+        success: true,
+        data: response,
+        meta: orderMetricsReady ? READY_META : NOT_READY_META,
+      });
     } catch (error: any) {
+      // WO-O4O-STORE-DASHBOARD-ORDER-METRICS-SAFE-FALLBACK-V1: 다른 raw query (cosmetics_products,
+      // cms_contents 등) 이 잘못된 isMissingOrderTable 검사로 위장되지 않도록, 본 catch 의
+      // top-level 에서는 order-table 분기를 적용하지 않는다. adminSummary 분기는 위 .catch() 에서 처리.
       console.error('[K-Cosmetics Operator Dashboard] Error:', error);
       res.status(500).json({
         error: { code: 'INTERNAL_ERROR', message: error.message },
