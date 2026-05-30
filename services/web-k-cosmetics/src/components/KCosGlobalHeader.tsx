@@ -147,17 +147,22 @@ export function KCosGlobalHeader() {
               강의 대시보드
             </GlobalHeaderMenuItem>
           )}
-          {/* WO-O4O-KCOS-GLOBAL-HEADER-PROFILE-MENU-ALIGNMENT-V1:
-             admin/operator 라벨·경로 분기. isOperator 는 admin 포함이므로 isAdmin 우선. */}
-          {isAdmin ? (
+          {/* WO-O4O-KCOS-PROFILE-DASHBOARD-LINK-FIX-V1:
+              관리자/운영자 — 역할별 독립 표시 (KPA canonical
+              WO-O4O-ROLE-BASED-PROFILE-MENU-CANONICALIZATION-V1 정합).
+              legacy ternary(admin 이면 운영 대시보드 숨김) 제거 — admin/operator 동시
+              보유 시 두 항목 모두 노출. 둘 다 미보유 시에만 일반 대시보드 fallback. */}
+          {isAdmin && (
             <GlobalHeaderMenuItem to="/admin" icon={<Shield className="w-4 h-4" />}>
               관리자 대시보드
             </GlobalHeaderMenuItem>
-          ) : isOperator ? (
+          )}
+          {isOperator && (
             <GlobalHeaderMenuItem to="/operator" icon={<Shield className="w-4 h-4" />}>
               운영 대시보드
             </GlobalHeaderMenuItem>
-          ) : (
+          )}
+          {!isAdmin && !isOperator && (
             <GlobalHeaderMenuItem to={dashboardPath} icon={<LayoutDashboard className="w-4 h-4" />}>
               대시보드
             </GlobalHeaderMenuItem>
