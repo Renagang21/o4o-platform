@@ -55,6 +55,8 @@ import { createCosmeticsEventOfferController } from './controllers/event-offer.c
 import { createCosmeticsContentsRouter, createCosmeticsOperatorResourcesRouter } from './controllers/resources.controller.js';
 // WO-O4O-KCOS-COSMETICS-MEMBER-PROFILE-FOUNDATION-V1: profile classification (sub_role) Operator API
 import { createCosmeticsMemberController } from './controllers/cosmetics-member.controller.js';
+// WO-O4O-KCOSMETICS-STORE-PROFILE-EDIT-PAGE-V1: 매장 경영자 사업자 정보 조회·수정
+import { createCosmeticsMypageController } from './controllers/cosmetics-mypage.controller.js';
 // WO-O4O-CONTENT-CANONICAL-CROSS-SERVICE-ALIGNMENT-V1
 import { createNewsController } from '../o4o-store/controllers/news.controller.js';
 import { authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
@@ -232,6 +234,13 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
   //   PATCH /api/v1/cosmetics/members/:userId      (operator — subRole 설정)
   // ============================================================================
   router.use('/', createCosmeticsMemberController(dataSource, coreRequireAuth as any));
+
+  // ============================================================================
+  // MyPage Routes (WO-O4O-KCOSMETICS-STORE-PROFILE-EDIT-PAGE-V1)
+  //   GET   /api/v1/cosmetics/mypage/business-info — 매장 경영자 사업자 정보 조회
+  //   PATCH /api/v1/cosmetics/mypage/business-info — 매장 경영자 사업자 정보 수정
+  // ============================================================================
+  router.use('/mypage', createCosmeticsMypageController(dataSource, coreRequireAuth as any));
 
   // ============================================================================
   // News/Content Routes (CMS 공지/뉴스) — /api/v1/cosmetics/news/*

@@ -126,6 +126,8 @@ import { useStoreCapabilities } from './hooks/useStoreCapabilities';
 
 // Store Settings (WO-STORE-COMMON-SETTINGS-KCOS-UI-V1)
 const StoreSettingsPage = lazy(() => import('@/pages/store/StoreSettingsPage'));
+// WO-O4O-KCOSMETICS-STORE-PROFILE-EDIT-PAGE-V1
+const StoreInfoPage = lazy(() => import('@/pages/store/StoreInfoPage'));
 
 // WO-O4O-KCOS-STORE-EXECUTION-CANONICAL-ALIGNMENT-V1: Blog / POP / QR
 const StoreBlogPage = lazy(() => import('@/pages/store/StoreBlogPage'));
@@ -641,6 +643,18 @@ function AppRoutes() {
         {/* Interest 관리 (WO-O4O-TABLET-INTEREST-UX-REFACTOR-V1) */}
         <Route path="interest-requests" element={<InterestRequestsPage />} />
         <Route path="settings" element={<StoreSettingsPage />} />
+        {/* WO-O4O-KCOSMETICS-STORE-PROFILE-EDIT-PAGE-V1:
+              매장 경영자 (store_owner) 만 접근 — 매장·사업자 정보 조회·수정 */}
+        <Route
+          path="info"
+          element={
+            <RoleGuard
+              allowedRoles={['cosmetics:store_owner', 'cosmetics:admin', 'platform:super_admin']}
+            >
+              <StoreInfoPage />
+            </RoleGuard>
+          }
+        />
         {/* WO-O4O-KCOS-STORE-EXECUTION-CANONICAL-ALIGNMENT-V1: Blog / POP / QR */}
         <Route path="content/blog" element={<StoreBlogManagePage />} />
         <Route path="pop" element={<StorePopPage />} />
