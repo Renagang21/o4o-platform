@@ -25,6 +25,11 @@ import type { HubSectionDefinition } from '@o4o/hub-core';
 import { computeStoreInsights } from '@o4o/store-ui-core';
 import type { StoreInsight } from '@o4o/store-ui-core';
 import { Card } from '@o4o/ui';
+// WO-O4O-GLYCOPHARM-MY-STORE-DASHBOARD-LABEL-ALIGN-WITH-KPA-V1:
+// 사용자-facing 문구는 operator-ux-core 의 glycopharmConfig.uiText 단일 SSOT 를 사용한다.
+// (이전: title "의료 운영 허브" 하드코딩 — KPA 의 "내 약국 홈" canonical 과 불일치, 의료/Care 영역과
+//   혼동 가능. 본 SSOT 는 KPA `storeHomeTitle/Subtitle` 과 동일 패턴.)
+import { glycopharmConfig } from '@o4o/operator-ux-core';
 import {
   BrainCircuit,
   TrendingUp,
@@ -221,8 +226,8 @@ export default function StoreOverviewPage() {
 
   return (
     <HubLayout
-      title="의료 운영 허브"
-      subtitle="AI 기반 약국 운영 현황을 한눈에 확인하고 실행하세요"
+      title={glycopharmConfig.uiText.storeHomeTitle}
+      subtitle={glycopharmConfig.uiText.storeHomeSubtitle}
       sections={HUB_SECTIONS}
       userRoles={userRoles}
       signals={signals}
@@ -268,7 +273,7 @@ export default function StoreOverviewPage() {
           {!loading && <InsightBlock insights={insights} onNavigate={navigate} />}
         </>
       }
-      footerNote="허브는 각 기능의 진입점입니다. QuickAction 버튼으로 즉시 실행하거나, 카드를 클릭하여 상세 페이지로 이동하세요."
+      footerNote="각 카드는 해당 기능의 진입점입니다. QuickAction 버튼으로 즉시 실행하거나, 카드를 클릭하여 상세 페이지로 이동하세요."
     />
   );
 }
