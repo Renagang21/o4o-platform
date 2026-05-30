@@ -106,6 +106,8 @@ export {
 export {
   adminOperatorApi,
   adminSupplierApi,
+  // WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1: operator scope supplier API
+  operatorSupplierApi,
   adminSettlementApi,
   adminCommissionApi,
   adminProductApi,

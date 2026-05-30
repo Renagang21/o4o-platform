@@ -212,7 +212,9 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
       // WO-NETURE-OSA-PHASEA-DECISION-PRESSURE-REMOVE-V1: 'pending-products' (OSA 승인 대기) 항목 제거
       const actionQueue: ActionItem[] = [
         { id: 'pending-regs', label: '가입 승인 대기', count: pendingRegs, link: '/operator/applications' },
-        { id: 'pending-suppliers', label: '공급사 승인 대기', count: pendingSuppliers, link: '/operator/admin-suppliers' },
+        // WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1:
+        // dead link 정정 — operator scope 신규 페이지로 연결
+        { id: 'pending-suppliers', label: '공급사 승인 대기', count: pendingSuppliers, link: '/operator/suppliers' },
         { id: 'partner-requests', label: '파트너 요청', count: partnerRequests, link: '/operator/applications' },
         { id: 'unread-messages', label: '미확인 문의', count: unreadMessages, link: '/operator/contact-messages' },
       ];

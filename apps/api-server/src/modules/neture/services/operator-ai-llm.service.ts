@@ -46,7 +46,8 @@ const ACTION_MAP: Record<string, {
   // WO-NETURE-OSA-PHASEA-DECISION-PRESSURE-REMOVE-V1: product (OSA 일괄 승인) 액션 매핑 제거
   supplier: {
     actionType: 'NAVIGATE',
-    actionUrl: '/operator/admin-suppliers',
+    // WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1: dead link 정정
+    actionUrl: '/operator/suppliers',
     actionLabel: '공급사 관리',
   },
 };

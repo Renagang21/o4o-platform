@@ -137,7 +137,9 @@ export function createOperatorActionQueueController(dataSource: DataSource): Rou
           description: '신규 공급사 등록 요청이 대기 중입니다.',
           count: pendingSuppliers,
           oldest: pendingSuppliersRow[0]?.oldest || null,
-          actionUrl: '/operator/admin-suppliers',
+          // WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1:
+          // dead link 정정 — operator scope 신규 페이지로 연결
+          actionUrl: '/operator/suppliers',
           actionLabel: '공급사 관리',
           alwaysHigh: true,
           actionType: 'NAVIGATE',

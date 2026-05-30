@@ -460,6 +460,8 @@ const SignageTemplateDetailPage = lazy(() => import('./pages/operator/signage/Te
 const HomepageCmsPage = lazy(() => import('./pages/operator/HomepageCmsPage'));
 // Operator Guide Contents (WO-O4O-OPERATOR-GUIDE-CONTENTS-CORE-EXTRACTION-V1)
 const OperatorGuideContentsPage = lazy(() => import('./pages/operator/OperatorGuideContentsPage'));
+// WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1
+const OperatorSupplierApprovalPage = lazy(() => import('./pages/operator/OperatorSupplierApprovalPage'));
 
 // Content Library (WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1)
 const ContentLibraryPage = lazy(() => import('./pages/library/ContentLibraryPage'));
@@ -1006,6 +1008,8 @@ function App() {
               <Route path="/operator/product-approvals" element={<OperatorProductApprovalPage />} />
               {/* WO-NETURE-CURATION-PHASE3-FULL-REMOVAL-V1: /operator/curation 라우트 제거 */}
               <Route path="/operator/actions" element={<OperatorActionQueuePage />} />
+              {/* WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1: operator scope supplier activation */}
+              <Route path="/operator/suppliers" element={<OperatorSupplierApprovalPage />} />
             </Route>
 
             {/* ================================================================

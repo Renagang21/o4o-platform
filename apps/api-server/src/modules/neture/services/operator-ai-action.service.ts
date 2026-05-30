@@ -121,7 +121,8 @@ export class OperatorAiActionService {
         priority: 'medium',
         confidence: 0.75,
         actionType: 'NAVIGATE',
-        actionUrl: '/operator/admin-suppliers',
+        // WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1: dead link 정정
+        actionUrl: '/operator/suppliers',
         actionLabel: '공급사 관리',
       });
     }

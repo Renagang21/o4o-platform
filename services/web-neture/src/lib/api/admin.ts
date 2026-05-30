@@ -141,6 +141,51 @@ export const adminSupplierApi = {
   },
 };
 
+// ==================== Operator Supplier ====================
+// WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1
+//   /admin/suppliers/* 와 동일한 NetureService 를 호출하지만 backend 가 operator scope guard
+//   로 별도 노출하는 endpoint. AdminSupplier 와 schema 동일 — 타입 재사용.
+//   admin 의 deactivate 는 의도적으로 operator 노출 제외 (활성 공급자 비활성화는 admin 정책).
+
+export const operatorSupplierApi = {
+  async getSuppliers(status?: string): Promise<AdminSupplier[]> {
+    try {
+      const qs = status ? `?status=${status}` : '';
+      const response = await api.get(`/neture/operator/suppliers${qs}`);
+      return response.data.data || [];
+    } catch (error: any) {
+      if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
+      console.warn('[Operator API] Failed to fetch suppliers:', error);
+      return [];
+    }
+  },
+
+  async getPendingSuppliers(): Promise<AdminSupplier[]> {
+    try {
+      const response = await api.get('/neture/operator/suppliers/pending');
+      return response.data.data || [];
+    } catch (error: any) {
+      if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
+      console.warn('[Operator API] Failed to fetch pending suppliers:', error);
+      return [];
+    }
+  },
+
+  async approveSupplier(id: string): Promise<boolean> {
+    try {
+      await api.post(`/neture/operator/suppliers/${id}/approve`);
+      return true;
+    } catch { return false; }
+  },
+
+  async rejectSupplier(id: string, reason?: string): Promise<boolean> {
+    try {
+      await api.post(`/neture/operator/suppliers/${id}/reject`, { reason });
+      return true;
+    } catch { return false; }
+  },
+};
+
 // ==================== Admin Settlement ====================
 
 const ADMIN_SETTLEMENT_KPI_DEFAULT: AdminSettlementKpi = {

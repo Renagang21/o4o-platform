@@ -41,7 +41,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '가입 승인', path: '/operator/applications' },
     { label: '유통 참여형 펀딩', path: '/operator/market-trial' },
     { label: '서비스 승인', path: '/operator/service-approvals', adminOnly: true },
-    { label: '공급자 승인', path: '/operator/admin-suppliers' },
+    // WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1: dead link 정정
+    { label: '공급자 활성화', path: '/operator/suppliers' },
   ],
   // WO-NETURE-OPERATOR-PRODUCTS-UNIFIED-LIST-FINAL-V1: Products 영역 단일 통합
   products: [
