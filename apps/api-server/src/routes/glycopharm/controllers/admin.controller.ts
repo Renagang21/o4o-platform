@@ -562,6 +562,22 @@ export function createAdminController(
           ? await extRepo.findOne({ where: { organization_id: pharmacy.id } })
           : null;
 
+        // WO-O4O-OPERATOR-BUSINESS-REGISTRATION-DISPLAY-ALIGNMENT-V1:
+        //   가입 폼이 users.businessInfo 에 저장한 4 canonical 사업자등록증 필드
+        //   (업태/종목/사업자유형/개업일) 를 application detail 응답에 projection.
+        //   기존 application.metadata 와는 별개로 user-side businessInfo 단일 출처.
+        const userBusinessInfo = (appUser?.businessInfo && typeof appUser.businessInfo === 'object')
+          ? (appUser.businessInfo as Record<string, unknown>)
+          : null;
+        const businessInfoProjection = userBusinessInfo
+          ? {
+              businessType: (userBusinessInfo.businessType as string | undefined) ?? null,
+              businessItem: (userBusinessInfo.businessItem as string | undefined) ?? null,
+              businessEntityType: (userBusinessInfo.businessEntityType as string | undefined) ?? null,
+              businessStartDate: (userBusinessInfo.businessStartDate as string | undefined) ?? null,
+            }
+          : null;
+
         res.json({
           success: true,
           application: {
@@ -581,6 +597,7 @@ export function createAdminController(
             decidedAt: application.decidedAt,
             decidedBy: application.decidedBy,
             metadata: application.metadata,
+            businessInfo: businessInfoProjection,
             createdAt: application.createdAt,
             updatedAt: application.updatedAt,
           },

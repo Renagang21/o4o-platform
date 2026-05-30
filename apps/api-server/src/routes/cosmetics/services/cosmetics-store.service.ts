@@ -323,8 +323,37 @@ export class CosmeticsStoreService {
     const limit = Math.min(query.limit || 20, 100);
     const totalPages = Math.ceil(total / limit);
 
+    // WO-O4O-OPERATOR-BUSINESS-REGISTRATION-DISPLAY-ALIGNMENT-V1:
+    //   각 application 의 applicantUserId 로 users.businessInfo 를 bulk 조회 후
+    //   4 canonical 사업자등록증 필드 (업태/종목/사업자유형/개업일) 만 projection 하여
+    //   응답에 businessInfo 객체로 부착. operator/admin Drawer 표시 용.
+    const userIds = Array.from(new Set(applications.map((a) => a.applicantUserId).filter(Boolean)));
+    const userBusinessMap = new Map<string, Record<string, string | null>>();
+    if (userIds.length > 0) {
+      const rows = await this.dataSource.query(
+        `SELECT id, "businessInfo" FROM users WHERE id = ANY($1::uuid[])`,
+        [userIds],
+      );
+      for (const row of rows as Array<{ id: string; businessInfo: Record<string, unknown> | null }>) {
+        const bi = row.businessInfo;
+        if (bi && typeof bi === 'object') {
+          userBusinessMap.set(row.id, {
+            businessType: (bi.businessType as string | undefined) ?? null,
+            businessItem: (bi.businessItem as string | undefined) ?? null,
+            businessEntityType: (bi.businessEntityType as string | undefined) ?? null,
+            businessStartDate: (bi.businessStartDate as string | undefined) ?? null,
+          });
+        }
+      }
+    }
+
+    const enriched = applications.map((app) => ({
+      ...app,
+      businessInfo: userBusinessMap.get(app.applicantUserId) ?? null,
+    }));
+
     return {
-      data: applications,
+      data: enriched,
       meta: {
         page,
         limit,

@@ -48,6 +48,11 @@ export class OperatorRegistrationService {
               u."businessInfo"->>'address' AS "businessAddress",
               u."businessInfo"->>'address2' AS "businessAddressDetail",
               u."businessInfo"->>'businessType' AS "businessType",
+              -- WO-O4O-OPERATOR-BUSINESS-REGISTRATION-DISPLAY-ALIGNMENT-V1:
+              --   사업자등록증 4 canonical 중 businessType 외 3 필드 추가 projection.
+              u."businessInfo"->>'businessItem' AS "businessItem",
+              u."businessInfo"->>'businessEntityType' AS "businessEntityType",
+              u."businessInfo"->>'businessStartDate' AS "businessStartDate",
               sm.service_key AS "service",
               u."createdAt" AS "createdAt",
               sm.approved_at AS "processedAt",

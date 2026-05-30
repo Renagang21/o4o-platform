@@ -410,6 +410,13 @@ export function createMemberController(
                       detailAddress: storeAddressRaw.detailAddress ?? null,
                     }
                   : null,
+                // WO-O4O-OPERATOR-BUSINESS-REGISTRATION-DISPLAY-ALIGNMENT-V1:
+                //   사업자등록증 4 canonical 필드 (업태/종목/사업자유형/개업일).
+                //   가입 폼에서 users.businessInfo 에 저장됨 — operator 가 승인 판단에 활용.
+                businessType: businessInfo.businessType ?? null,
+                businessItem: businessInfo.businessItem ?? null,
+                businessEntityType: businessInfo.businessEntityType ?? null,
+                businessStartDate: businessInfo.businessStartDate ?? null,
               }
             : null;
           return {
