@@ -2,7 +2,7 @@
  * SignagePlaybackPage — GlycoPharm
  * WO-O4O-GLYCOPHARM-SIGNAGE-PHASE1-V1
  *
- * /store/signage/play/:playlistId
+ * /store/marketing/signage/play/:playlistId
  * 단일 Playlist fullscreen 루프 재생
  *
  * WO-O4O-SIGNAGE-PLAYLIST-FULLSCREEN-CORE-PROMOTION-V1:

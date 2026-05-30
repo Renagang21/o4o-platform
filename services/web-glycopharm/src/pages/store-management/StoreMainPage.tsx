@@ -56,12 +56,12 @@ const QUICK_ACTIONS = [
   // WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1: Market Trial은 Neture 통합 허브로 진입
   { label: '유통 참여형 펀딩 (Market Trial)', icon: Tag, desc: 'Neture 허브에서 참여', path: '/store/market-trial', color: '#0d9488' },
   { label: '상품 관리', icon: Package, desc: '상품 목록 및 등록', path: '/store/products', color: '#7c3aed' },
-  { label: '사이니지', icon: Tv, desc: '디지털 디스플레이 관리', path: '/store/signage', color: '#2563eb' },
+  { label: '사이니지', icon: Tv, desc: '디지털 디스플레이 관리', path: '/store/marketing/signage/playlist', color: '#2563eb' },
   { label: '콘텐츠', icon: FileText, desc: '콘텐츠 가져오기', path: '/store/content', color: '#ec4899' },
   // WO-O4O-GLYCOPHARM-POP-STORE-EXECUTION-V1: POP 생성 진입점
-  { label: 'POP 생성', icon: Megaphone, desc: 'AI 문구로 약국 POP PDF 생성', path: '/store/pop', color: '#ea580c' },
+  { label: 'POP 생성', icon: Megaphone, desc: 'AI 문구로 약국 POP PDF 생성', path: '/store/marketing/pop', color: '#ea580c' },
   // WO-O4O-GLYCOPHARM-QR-STORE-EXECUTION-V1: QR 관리 진입점
-  { label: 'QR 관리', icon: QrCode, desc: 'QR 코드 생성 및 관리', path: '/store/qr', color: '#0d9488' },
+  { label: 'QR 관리', icon: QrCode, desc: 'QR 코드 생성 및 관리', path: '/store/marketing/qr', color: '#0d9488' },
   { label: '설정', icon: Settings, desc: '약국 설정 관리', path: '/store/settings', color: '#64748b' },
 ];
 
@@ -70,7 +70,7 @@ const QUICK_ACTIONS = [
 function inferActionPath(label: string): string | null {
   const lower = label.toLowerCase();
   if (lower.includes('상품') || lower.includes('product')) return '/store/products';
-  if (lower.includes('주문') || lower.includes('order')) return '/store/orders';
+  if (lower.includes('주문') || lower.includes('order')) return '/store/commerce/orders';
   if (lower.includes('콘텐츠') || lower.includes('content')) return '/store/content';
   if (lower.includes('설정') || lower.includes('setting')) return '/store/settings';
   return null;

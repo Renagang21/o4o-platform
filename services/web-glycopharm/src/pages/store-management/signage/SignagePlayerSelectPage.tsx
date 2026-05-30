@@ -2,7 +2,7 @@
  * SignagePlayerSelectPage — GlycoPharm
  * WO-KPA-STORE-SIGNAGE-IA-RESTRUCTURE-V2
  *
- * /store/signage/player
+ * /store/marketing/signage/player
  * 게시된 플레이리스트 목록 → 새 탭 fullscreen 재생
  */
 
@@ -42,7 +42,7 @@ export function SignagePlayerSelectPage() {
   }, [playlists, keyword]);
 
   const handlePlay = (playlistId: string) => {
-    window.open(`/store/signage/play/${playlistId}`, '_blank');
+    window.open(`/store/marketing/signage/play/${playlistId}`, '_blank');
   };
 
   const columns: Column<StorePlaylist>[] = [

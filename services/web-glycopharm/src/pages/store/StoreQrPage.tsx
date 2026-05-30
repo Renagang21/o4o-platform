@@ -13,7 +13,7 @@
  *   - QR 이미지 다운로드 (GET /glycopharm/pharmacy/qr/:id/image)
  *   - 랜딩 URL 복사
  *
- * 진입점: /store → StoreMainPage QUICK_ACTIONS → /store/qr
+ * 진입점: /store → StoreMainPage QUICK_ACTIONS → /store/marketing/qr
  * 권한: PHARMACIST (StoreLayoutWrapper ProtectedRoute)
  */
 

@@ -57,7 +57,7 @@ export default function ContentLibraryPage() {
         >
           + 콘텐츠 등록
         </button>
-        <NavLink to="/store/signage/my" style={styles.myPageLink}>
+        <NavLink to="/store/marketing/signage/playlist" style={styles.myPageLink}>
           My Page →
         </NavLink>
       </div>

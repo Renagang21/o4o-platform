@@ -12,7 +12,7 @@
  *   3. 레이아웃/템플릿 선택
  *   4. POP PDF 생성 (POST /glycopharm/pharmacy/pop/generate, aiContent 포함)
  *
- * 진입점: /store → StoreMainPage QUICK_ACTIONS → /store/pop
+ * 진입점: /store → StoreMainPage QUICK_ACTIONS → /store/marketing/pop
  * 권한: PHARMACIST (StoreLayoutWrapper ProtectedRoute)
  */
 

@@ -10,7 +10,7 @@
  *  [Tab 2] 내 플레이리스트 (playlist)  — store-playlists CRUD + item 관리
  *  [Tab 3] 스케줄         (schedules) — Schedule CRUD + 시간표 기반 재생
  *
- * 콘텐츠 탐색은 /store/signage/library (ContentLibraryPage) 에서 수행
+ * 콘텐츠 탐색은 /store/marketing/signage/library (ContentLibraryPage) 에서 수행
  *
  * organizationId: user.pharmacyId (GlycoPharm pharmacy = organization)
  * API: /api/signage/glycopharm/... (shared serviceKey route)
@@ -236,9 +236,9 @@ export default function StoreSignageMainPage() {
 
   const navigateTab = (tab: ActiveTab) => {
     const map: Record<ActiveTab, string> = {
-      playlist: '/store/signage/playlist',
-      assets: '/store/signage/videos',
-      schedules: '/store/signage/schedules',
+      playlist: '/store/marketing/signage/playlist',
+      assets: '/store/marketing/signage/videos',
+      schedules: '/store/marketing/signage/schedules',
     };
     navigate(map[tab], { replace: true });
   };
