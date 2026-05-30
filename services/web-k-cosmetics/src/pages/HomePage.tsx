@@ -51,7 +51,7 @@ const LATEST_TABS = [
   { key: 'forum',    label: '포럼',     shortcutHref: '/forum',                   shortcutLabel: '포럼 바로가기' },
   { key: 'course',   label: '강의',     shortcutHref: '/lms',                     shortcutLabel: '강의 바로가기' },
   { key: 'content',  label: '콘텐츠',   shortcutHref: '/library/content',         shortcutLabel: '콘텐츠 바로가기' },
-  { key: 'signage',  label: '사이니지', shortcutHref: '/store/signage/playlist',  shortcutLabel: '사이니지 바로가기' },
+  { key: 'signage',  label: '사이니지', shortcutHref: '/store/marketing/signage/playlist',  shortcutLabel: '사이니지 바로가기' },
   { key: 'resource', label: '자료실',   shortcutHref: '/resources',               shortcutLabel: '자료실 바로가기' },
 ] as const;
 

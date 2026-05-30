@@ -87,20 +87,23 @@ export const COSMETICS_STORE_CONFIG: StoreDashboardConfig = {
     { label: '상품', items: [
       // WO-O4O-STORE-PRODUCTS-SERVICE-ROUTING-V1: ProductMaster 기반 매장 진열
       { key: 'my-products',    label: '내 매장 상품', subPath: '/my-products' },
-      { key: 'local-products', label: '자체 상품',    subPath: '/local-products' },
+      // WO-O4O-KCOSMETICS-STORE-PATH-NESTED-MIGRATION-V1: commerce nested canonical 정렬
+      { key: 'local-products', label: '자체 상품',    subPath: '/commerce/local-products' },
     ]},
     { label: '디지털 사이니지', items: [
       // WO-O4O-MY-STORE-SIGNAGE-SUBMENU-ALIGNMENT-V1: KPA/GP 기준 서브메뉴 정렬 (player 미구현 제외)
-      { key: 'signage-playlist',  label: '플레이리스트', subPath: '/signage/playlist' },
-      { key: 'signage-videos',    label: '동영상',       subPath: '/signage/videos' },
-      { key: 'signage-schedules', label: '스케줄',       subPath: '/signage/schedules' },
+      // WO-O4O-KCOSMETICS-STORE-PATH-NESTED-MIGRATION-V1: marketing/signage nested canonical 정렬
+      { key: 'signage-playlist',  label: '플레이리스트', subPath: '/marketing/signage/playlist' },
+      { key: 'signage-videos',    label: '동영상',       subPath: '/marketing/signage/videos' },
+      { key: 'signage-schedules', label: '스케줄',       subPath: '/marketing/signage/schedules' },
     ]},
     { label: '매장 실행', items: [
-      { key: 'tablet-displays', label: '태블릿',  subPath: '/tablet-displays' },
+      // WO-O4O-KCOSMETICS-STORE-PATH-NESTED-MIGRATION-V1: commerce/marketing nested canonical 정렬
+      { key: 'tablet-displays', label: '태블릿',  subPath: '/commerce/tablet-displays' },
       // WO-O4O-KCOS-STORE-EXECUTION-CANONICAL-ALIGNMENT-V1: Blog/POP/QR KPA delta 정렬
       { key: 'content-blog',   label: '블로그',  subPath: '/content/blog' },
-      { key: 'pop',            label: 'POP',     subPath: '/pop' },
-      { key: 'qr',             label: 'QR 코드', subPath: '/qr' },
+      { key: 'pop',            label: 'POP',     subPath: '/marketing/pop' },
+      { key: 'qr',             label: 'QR 코드', subPath: '/marketing/qr' },
     ]},
     // WO-O4O-STORE-LIBRARY-CROSSSERVICE-PHASE2-B-V1 / PHASE2-C-V1: 내 자료함
     { label: '내 자료함', items: [

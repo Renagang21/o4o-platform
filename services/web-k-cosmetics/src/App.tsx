@@ -627,17 +627,20 @@ function AppRoutes() {
         {/* WO-O4O-STORE-PRODUCTS-SERVICE-ROUTING-V1: 내 매장 상품 (ProductMaster + Listing).
             상위 ProtectedRoute 가 cosmetics:store_owner 포함 게이트. */}
         <Route path="my-products" element={<StoreProductsManagerPage />} />
-        <Route path="local-products" element={<StoreLocalProductsPage />} />
-        <Route path="tablet-displays" element={<StoreTabletDisplaysPage />} />
         {/* channels: 채널 관리 (WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1) */}
         <Route path="channels" element={<StoreChannelsPage />} />
-        {/* WO-O4O-MY-STORE-SIGNAGE-SUBMENU-ALIGNMENT-V1: KPA/GP 기준 서브메뉴 정렬 (player 미구현 제외) */}
-        <Route path="signage" element={<Navigate to="playlist" replace />} />
-        <Route path="signage/playlist" element={<StoreSignagePage />} />
-        <Route path="signage/videos" element={<StoreSignagePage />} />
-        <Route path="signage/schedules" element={<StoreSignagePage />} />
-        <Route path="orders" element={<StorePlaceholderPage title="주문 관리" />} />
-        <Route path="billing" element={<StorePlaceholderPage title="정산/인보이스" />} />
+        {/* WO-O4O-KCOSMETICS-STORE-PATH-NESTED-MIGRATION-V1:
+              KPA canonical 정합 — nested canonical routes (commerce/* · marketing/*) 가 실제 page 를 렌더한다.
+              flat path 는 본 블록 하단의 redirect alias 그룹에서 nested canonical 으로 redirect.
+            WO-O4O-MY-STORE-SIGNAGE-SUBMENU-ALIGNMENT-V1: KPA/GP 기준 서브메뉴 정렬 (player 미구현 제외) */}
+        <Route path="commerce/local-products" element={<StoreLocalProductsPage />} />
+        <Route path="commerce/tablet-displays" element={<StoreTabletDisplaysPage />} />
+        <Route path="commerce/orders" element={<StorePlaceholderPage title="주문 관리" />} />
+        <Route path="commerce/billing" element={<StorePlaceholderPage title="정산/인보이스" />} />
+        <Route path="marketing/signage" element={<Navigate to="playlist" replace />} />
+        <Route path="marketing/signage/playlist" element={<StoreSignagePage />} />
+        <Route path="marketing/signage/videos" element={<StoreSignagePage />} />
+        <Route path="marketing/signage/schedules" element={<StoreSignagePage />} />
         {/* WO-O4O-STORE-HUB-CROSS-SERVICE-COMMONIZATION-PHASE1-V1: placeholder → StoreAssetsPanel */}
         <Route path="content" element={<StoreAssetsPage />} />
         {/* Interest 관리 (WO-O4O-TABLET-INTEREST-UX-REFACTOR-V1) */}
@@ -657,13 +660,27 @@ function AppRoutes() {
         />
         {/* WO-O4O-KCOS-STORE-EXECUTION-CANONICAL-ALIGNMENT-V1: Blog / POP / QR */}
         <Route path="content/blog" element={<StoreBlogManagePage />} />
-        <Route path="pop" element={<StorePopPage />} />
-        <Route path="qr" element={<StoreQrPage />} />
+        {/* WO-O4O-KCOSMETICS-STORE-PATH-NESTED-MIGRATION-V1: POP/QR nested canonical (marketing/*) */}
+        <Route path="marketing/pop" element={<StorePopPage />} />
+        <Route path="marketing/qr" element={<StoreQrPage />} />
         {/* 내 자료함 (WO-O4O-STORE-LIBRARY-CROSSSERVICE-PHASE2-B-V1 / PHASE2-C-V1) */}
         <Route path="library/contents" element={<StoreLibraryContentsPage />} />
         <Route path="library/resources" element={<StoreLibraryResourcesPage />} />
         <Route path="library/production-materials" element={<StoreProductionMaterialsPage />} />
         <Route path="library/production-materials/new" element={<ProductionMaterialEditorPage />} />
+        {/* WO-O4O-KCOSMETICS-STORE-PATH-NESTED-MIGRATION-V1:
+              Legacy flat paths → nested canonical redirect aliases.
+              북마크 / 외부 링크 호환을 위해 유지. 신규 코드는 nested canonical 을 사용한다. */}
+        <Route path="local-products"   element={<Navigate to="/store/commerce/local-products" replace />} />
+        <Route path="tablet-displays"  element={<Navigate to="/store/commerce/tablet-displays" replace />} />
+        <Route path="orders"           element={<Navigate to="/store/commerce/orders" replace />} />
+        <Route path="billing"          element={<Navigate to="/store/commerce/billing" replace />} />
+        <Route path="signage"          element={<Navigate to="/store/marketing/signage/playlist" replace />} />
+        <Route path="signage/playlist" element={<Navigate to="/store/marketing/signage/playlist" replace />} />
+        <Route path="signage/videos"   element={<Navigate to="/store/marketing/signage/videos" replace />} />
+        <Route path="signage/schedules" element={<Navigate to="/store/marketing/signage/schedules" replace />} />
+        <Route path="pop"              element={<Navigate to="/store/marketing/pop" replace />} />
+        <Route path="qr"               element={<Navigate to="/store/marketing/qr" replace />} />
       </Route>
 
       {/* Store public blog routes (WO-O4O-KCOS-STORE-EXECUTION-CANONICAL-ALIGNMENT-V1) */}

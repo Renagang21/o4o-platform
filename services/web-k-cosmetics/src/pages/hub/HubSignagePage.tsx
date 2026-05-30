@@ -19,7 +19,7 @@ export function HubSignagePage() {
         매장 디스플레이에 활용할 미디어를 탐색합니다.
       </p>
       <a
-        href="/store/signage"
+        href="/store/marketing/signage/playlist"
         className="inline-flex items-center gap-2 px-5 py-2.5 bg-pink-600 text-white text-sm font-medium rounded-lg hover:bg-pink-700 transition-colors"
       >
         사이니지 관리 보기

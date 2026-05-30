@@ -247,7 +247,7 @@ export default function StoreTabletDisplaysPage() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <button
-            onClick={() => navigate('/store/local-products')}
+            onClick={() => navigate('/store/commerce/local-products')}
             className="p-2 rounded-lg hover:bg-slate-100"
           >
             <ArrowLeft className="w-5 h-5 text-slate-500" />

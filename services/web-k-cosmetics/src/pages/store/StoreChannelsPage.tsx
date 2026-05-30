@@ -274,7 +274,7 @@ function ChannelPublicUrlCard({
     if (channelType === 'KIOSK') {
       return { url: null, label: '키오스크', guidance: '키오스크는 별도 공개 URL이 없습니다. B2C 스토어 또는 태블릿 채널을 통해 고객이 접근합니다.', guidanceLink: null };
     }
-    return { url: null, label: '사이니지', guidance: '재생 화면은 사이니지 관리에서 플레이리스트를 선택하여 실행합니다.', guidanceLink: '/store/signage' };
+    return { url: null, label: '사이니지', guidance: '재생 화면은 사이니지 관리에서 플레이리스트를 선택하여 실행합니다.', guidanceLink: '/store/marketing/signage/playlist' };
   };
 
   const { url, label, guidance, guidanceLink } = getChannelUrl();
