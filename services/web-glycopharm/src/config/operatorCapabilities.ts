@@ -15,6 +15,10 @@ import { OperatorCapability } from '@o4o/types';
  *   본 WO 는 정책 추가가 아닌 정합 회복 (philosophy / 3-role flow / 공통 구조
  *   원칙 / HUB Publishing / Store Menu Canonical 4 SSOT 와 정합).
  */
+// WO-O4O-GLYCOPHARM-FRONTEND-CARE-TYPE-UNION-CLEANUP-V1 (W5d-Frontend):
+//   ENABLED_CAPABILITIES 에서 OperatorCapability.CARE 제거. backend (W5b) 가 Care alert
+//   생성을 중단하고 menu/route 도 0건이므로 visible effect 0. enum 자체 (packages/types)
+//   는 W5c-v2 에서 별도 제거 (5개 서비스 typecheck 필요).
 export const ENABLED_CAPABILITIES: OperatorCapability[] = [
   OperatorCapability.USER_MANAGEMENT,
   OperatorCapability.MEMBERSHIP_APPROVAL,
@@ -23,6 +27,5 @@ export const ENABLED_CAPABILITIES: OperatorCapability[] = [
   OperatorCapability.SIGNAGE,
   OperatorCapability.STORE_MANAGEMENT,
   OperatorCapability.ANALYTICS,
-  OperatorCapability.CARE,
   OperatorCapability.SETTINGS,
 ];

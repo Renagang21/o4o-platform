@@ -361,8 +361,11 @@ function ServiceUserProtectedRoute({ children }: { children: React.ReactNode }) 
  * 로그인 + 권한 불일치 → / 리다이렉트
  * 로그인 + 권한 일치 → children 렌더
  */
+// WO-O4O-GLYCOPHARM-FRONTEND-CARE-TYPE-UNION-CLEANUP-V1 (W5d-Frontend):
+//   feature union 에서 'care' 제거 — backend Care alert pipeline 정리 (W5b commit 1c65e0ad0) 와 정합.
+//   실제 SoftGuard 호출은 feature='mypage' 만 사용 중 — 'care' 호출 0건이므로 type 좁히기 안전.
 function SoftGuard({ feature, allowedRoles, children }: {
-  feature: 'care' | 'store' | 'mypage';
+  feature: 'store' | 'mypage';
   allowedRoles?: string[];
   children: React.ReactNode;
 }) {

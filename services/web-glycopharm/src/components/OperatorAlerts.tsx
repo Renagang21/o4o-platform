@@ -9,9 +9,12 @@
 
 import { AlertTriangle, AlertCircle, Info } from 'lucide-react';
 
+// WO-O4O-GLYCOPHARM-FRONTEND-CARE-TYPE-UNION-CLEANUP-V1 (W5d-Frontend):
+//   AlertItem type union 에서 'care' 멤버 제거. backend (W5b) 가 'care' type alert 를
+//   더 이상 생성하지 않으므로 frontend type 도 정합. Care 재도입 시 새 Care Core 설계.
 interface OperatorAlertItem {
   id: string;
-  type: 'network' | 'commerce' | 'care' | 'system';
+  type: 'network' | 'commerce' | 'system';
   level: 'info' | 'warning' | 'critical';
   title: string;
   message: string;

@@ -26,9 +26,11 @@ import OperatorAlerts from '../../components/OperatorAlerts';
 
 // ─── Types ──────────────────────────────────────────────────
 
+// WO-O4O-GLYCOPHARM-FRONTEND-CARE-TYPE-UNION-CLEANUP-V1 (W5d-Frontend):
+//   AlertItem type union 에서 'care' 멤버 제거 (OperatorAlerts.tsx 와 정합).
 interface AlertItem {
   id: string;
-  type: 'network' | 'commerce' | 'care' | 'system';
+  type: 'network' | 'commerce' | 'system';
   level: 'info' | 'warning' | 'critical';
   title: string;
   message: string;

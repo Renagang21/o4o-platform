@@ -7,12 +7,16 @@
  * 로그인 페이지로 직접 보내지 않고, 기능을 설명한 뒤 로그인/회원가입 CTA를 제공.
  */
 
-import { ArrowRight, Activity, Store, UserCircle, Users } from 'lucide-react';
+import { ArrowRight, Activity, Store, UserCircle } from 'lucide-react';
 import { useLoginModal } from '@/contexts/LoginModalContext';
 // WO-O4O-GLYCOPHARM-REGISTER-MODAL-ENTRY-FIX-V1
 import { useRegisterModal } from '@/contexts/RegisterModalContext';
 
-type FeatureType = 'care' | 'store' | 'mypage';
+// WO-O4O-GLYCOPHARM-FRONTEND-CARE-TYPE-UNION-CLEANUP-V1 (W5d-Frontend):
+//   FeatureType 에서 'care' 제거 + FEATURE_CONFIG.care 안내 카드 제거.
+//   App.tsx 의 SoftGuard 호출은 feature='mypage' 만 사용 — 'care' 호출 0건.
+//   Care 재도입 시 새 Care Core 의 UI 안내로 별도 설계 (IR-O4O-CARE-CORE-REINTRODUCTION-ARCHITECTURE-V1).
+type FeatureType = 'store' | 'mypage';
 
 const FEATURE_CONFIG: Record<FeatureType, {
   icon: typeof Activity;
@@ -20,12 +24,6 @@ const FEATURE_CONFIG: Record<FeatureType, {
   description: string;
   details: string[];
 }> = {
-  care: {
-    icon: Users,
-    title: '당뇨인 관리 기능',
-    description: '혈당 분석, 상담 기록, 성과 추적 등\n약국 중심 당뇨인 데이터 관리 기능을 제공합니다.',
-    details: ['당뇨인 등록·관리', 'CGM 데이터 분석', '맞춤 코칭·상담', '성과 리포트'],
-  },
   store: {
     icon: Store,
     title: '약국 운영 관리',
