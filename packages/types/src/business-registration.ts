@@ -153,7 +153,7 @@ export interface BusinessRegistrationInfo {
  * KPA-Society / GlycoPharm 약국 사업자 확장.
  * pharmacy 도메인 특화 필드 (약사면허 / 요양기관번호 등).
  */
-export interface PharmacyBusinessInfo extends BusinessRegistrationInfo {
+export interface PharmacyBusinessRegistrationInfo extends BusinessRegistrationInfo {
   /** 약국명 (businessName 과 별개로 noted 용 — service 정책 결정) */
   pharmacyName?: string;
   /** 약사면허번호 */
@@ -166,7 +166,7 @@ export interface PharmacyBusinessInfo extends BusinessRegistrationInfo {
  * K-Cosmetics 매장 사업자 확장.
  * store/retail 도메인 특화 필드.
  */
-export interface StoreBusinessInfo extends BusinessRegistrationInfo {
+export interface StoreBusinessRegistrationInfo extends BusinessRegistrationInfo {
   /** 매장명 (businessName 과 별개로 노출 용) */
   storeName?: string;
   /** 매장 유형 (예: "직영", "가맹", "온라인", "오프라인" 등) */
@@ -179,7 +179,7 @@ export interface StoreBusinessInfo extends BusinessRegistrationInfo {
  * Neture 공급자 / 파트너 사업자 확장.
  * B2B supplier / partner 도메인 특화 필드.
  */
-export interface SupplierBusinessInfo extends BusinessRegistrationInfo {
+export interface SupplierBusinessRegistrationInfo extends BusinessRegistrationInfo {
   /** 공급자 유형 (예: "manufacturer", "distributor", "wholesaler") */
   supplierType?: string;
   /** 파트너 유형 (예: "agency", "consultant", "service") */
@@ -197,6 +197,6 @@ export interface SupplierBusinessInfo extends BusinessRegistrationInfo {
 export type BusinessRegistrationInfoInput = Partial<BusinessRegistrationInfo>;
 export type BusinessRegistrationInfoUpdateInput = Partial<BusinessRegistrationInfo>;
 
-export type PharmacyBusinessInfoInput = Partial<PharmacyBusinessInfo>;
-export type StoreBusinessInfoInput = Partial<StoreBusinessInfo>;
-export type SupplierBusinessInfoInput = Partial<SupplierBusinessInfo>;
+export type PharmacyBusinessRegistrationInfoInput = Partial<PharmacyBusinessRegistrationInfo>;
+export type StoreBusinessRegistrationInfoInput = Partial<StoreBusinessRegistrationInfo>;
+export type SupplierBusinessRegistrationInfoInput = Partial<SupplierBusinessRegistrationInfo>;
