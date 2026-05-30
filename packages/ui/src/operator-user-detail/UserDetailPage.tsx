@@ -1,8 +1,9 @@
 /**
  * UserDetailPage — 공통 회원 상세 컴포넌트
  * WO-O4O-USER-DETAIL-PAGE-COMMONIZATION-V1
+ * WO-O4O-SHARED-PACKAGES-GLUCOSEVIEW-RESIDUE-CLEANUP-V1: GlucoseView 제거
  *
- * 5개 서비스(Neture, GlycoPharm, K-Cosmetics, KPA, GlucoseView) 공통.
+ * 4개 서비스(Neture, GlycoPharm, K-Cosmetics, KPA) 공통.
  * 서비스별 차이는 config + actions + apiAdapter로 주입.
  */
 
@@ -45,9 +46,9 @@ const STATUS_MAP: Record<string, { label: string; color: string; bg: string }> =
   inactive: { label: '비활성', color: 'text-slate-500', bg: 'bg-slate-100' },
 };
 
+// WO-O4O-SHARED-PACKAGES-GLUCOSEVIEW-RESIDUE-CLEANUP-V1: glucoseview entry 제거
 const SERVICE_LABELS: Record<string, string> = {
   glycopharm: 'GlycoPharm',
-  glucoseview: 'GlucoseView',
   'k-cosmetics': 'K-Cosmetics',
   neture: 'Neture',
   'kpa-society': 'KPA Society',

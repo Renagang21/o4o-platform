@@ -66,14 +66,7 @@ const mockCostData: CostDashboardData = {
       avgCost: 1.3,
       packageCompliance: 70,
     },
-    {
-      serviceId: 'glucoseview',
-      serviceName: '글루코스뷰',
-      requests: 2150,
-      cost: 2365.0,
-      avgCost: 1.1,
-      packageCompliance: 80,
-    },
+    // WO-O4O-SHARED-PACKAGES-GLUCOSEVIEW-RESIDUE-CLEANUP-V1: glucoseview entry 제거
     {
       serviceId: 'kpa-society',
       serviceName: 'KPA 약사회',

@@ -41,13 +41,7 @@ const SUPPORTED_SERVICES: ServiceUsageInfo[] = [
     description: '화장품 유통 플랫폼',
     usageAreas: ['상품 상세 설명', '메인 배너', '프로모션 영역'],
   },
-  {
-    id: 'glucoseview',
-    name: 'GlucoseView',
-    icon: '📊',
-    description: '혈당 관리 플랫폼',
-    usageAreas: ['파트너 소개 영역', '서비스 안내'],
-  },
+  // WO-O4O-SHARED-PACKAGES-GLUCOSEVIEW-RESIDUE-CLEANUP-V1: glucoseview entry 제거
 ];
 
 interface Props {

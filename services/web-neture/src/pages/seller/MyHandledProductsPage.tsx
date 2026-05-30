@@ -12,10 +12,10 @@ import { useState, useEffect } from 'react';
 import { Package, Building2, Calendar, Tag, Layers, AlertCircle, Loader2 } from 'lucide-react';
 import { sellerApi, type SellerApprovedProduct } from '../../lib/api';
 
+// WO-O4O-SHARED-PACKAGES-GLUCOSEVIEW-RESIDUE-CLEANUP-V1: glucoseview icon 제거
 const SERVICE_ICONS: Record<string, string> = {
   glycopharm: '🏥',
   'k-cosmetics': '💄',
-  glucoseview: '📊',
 };
 
 const PURPOSE_LABELS: Record<string, { label: string; color: string; bgColor: string }> = {

@@ -13,10 +13,10 @@ import { useState, useEffect } from 'react';
 import { ShoppingBag, ExternalLink, Info, Users, Clock, Mail, ChevronDown, ChevronUp, Compass } from 'lucide-react';
 import { supplierApi, type OrderSummaryResponse, type ServiceSummary } from '../../lib/api';
 
+// WO-O4O-SHARED-PACKAGES-GLUCOSEVIEW-RESIDUE-CLEANUP-V1: glucoseview icon 제거
 const SERVICE_ICONS: Record<string, string> = {
   glycopharm: '🏥',
   'k-cosmetics': '💄',
-  glucoseview: '📊',
 };
 
 const formatDate = (dateStr: string | null): string => {

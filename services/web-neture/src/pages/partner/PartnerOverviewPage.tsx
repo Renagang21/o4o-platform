@@ -20,18 +20,17 @@ import { Compass, Info, ExternalLink, Users, Megaphone, ArrowRight, AlertCircle,
 import { AiSummaryButton } from '../../components/ai';
 import { dashboardApi, partnerDashboardApi, type PartnerDashboardSummary, type PartnerDashboardItem, type BrowsableContent, type LinkedContent } from '../../lib/api';
 
+// WO-O4O-SHARED-PACKAGES-GLUCOSEVIEW-RESIDUE-CLEANUP-V1: glucoseview URL/icon/label entries 제거
 // 서비스 URL 설정
 const SERVICE_URLS: Record<string, string> = {
   glycopharm: 'https://glycopharm.co.kr/partner',
   'k-cosmetics': 'https://k-cosmetics.site/partner',
-  glucoseview: 'https://glucoseview.co.kr/partner',
 };
 
 // 서비스 아이콘 설정
 const SERVICE_ICONS: Record<string, string> = {
   glycopharm: '🏥',
   'k-cosmetics': '💄',
-  glucoseview: '📊',
 };
 
 // 빈 데이터 상태 컴포넌트
@@ -56,7 +55,6 @@ const CATEGORY_LABELS: Record<string, string> = {
 const SERVICE_LABELS: Record<string, string> = {
   glycopharm: 'GlycoPharm',
   'k-cosmetics': 'K-Cosmetics',
-  glucoseview: 'GlucoseView',
 };
 
 type SortOption = 'recent' | 'oldest' | 'name';

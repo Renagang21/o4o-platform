@@ -152,25 +152,7 @@ const mockContextAssets: ContextAsset[] = [
     updatedAt: '2026-01-12T15:00:00Z',
     createdBy: 'admin',
   },
-  {
-    id: 'ca-7',
-    type: 'brand',
-    title: '글루코스뷰 서비스 소개',
-    summary: 'CGM 기반 실시간 혈당 모니터링 서비스',
-    content: '<p>글루코스뷰는 연속혈당측정기와 연동하여...</p>',
-    imageUrl: '/images/brand-glucoseview.jpg',
-    linkUrl: '/about/glucoseview',
-    serviceScope: ['glycopharm'],
-    pageTypes: ['home', 'content'],
-    purposeTags: ['branding', 'information'],
-    experimentTags: ['none'],
-    status: 'inactive',
-    exposureCount: 892,
-    lastExposedAt: '2026-01-10T12:00:00Z',
-    createdAt: '2026-01-01T09:00:00Z',
-    updatedAt: '2026-01-10T12:30:00Z',
-    createdBy: 'admin',
-  },
+  // WO-O4O-SHARED-PACKAGES-GLUCOSEVIEW-RESIDUE-CLEANUP-V1: ca-7 글루코스뷰 카드 mock entry 제거
 ];
 
 // ===== 유틸 함수 =====

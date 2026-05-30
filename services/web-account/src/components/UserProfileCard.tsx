@@ -21,8 +21,7 @@ const ROLE_LABELS: Record<string, string> = {
   'k-cosmetics:operator': 'K-Cosmetics 운영자',
   'glycopharm:admin': 'GlycoPharm 관리자',
   'glycopharm:operator': 'GlycoPharm 운영자',
-  'glucoseview:admin': 'GlucoseView 관리자',
-  'glucoseview:operator': 'GlucoseView 운영자',
+  // WO-O4O-SHARED-PACKAGES-GLUCOSEVIEW-RESIDUE-CLEANUP-V1: glucoseview:admin / glucoseview:operator 제거
   user: '사용자',
 };
 

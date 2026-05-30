@@ -23,12 +23,12 @@ import {
 /**
  * Service keys for policy ownership (same as slug)
  */
+// WO-O4O-SHARED-PACKAGES-GLUCOSEVIEW-RESIDUE-CLEANUP-V1: 'glucoseview' 제거
 export type StorePolicyServiceKey =
   | 'glycopharm'
   | 'cosmetics'
   | 'kpa'
-  | 'neture'
-  | 'glucoseview';
+  | 'neture';
 
 /**
  * Platform Store Policy Entity

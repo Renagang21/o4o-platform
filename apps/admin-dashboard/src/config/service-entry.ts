@@ -72,7 +72,8 @@ export const SERVICE_ENTRY_DEFAULTS: Record<ServiceEntryPoint, ServiceEntryConfi
     displayName: '혈당관리 프로그램',
     description: '약국 서비스의 특수 프로그램 (혈당관리)',
     isProgram: true,
-    routePatterns: ['/admin/glucoseview', '/admin/glucosecare', '/admin/glycocare'],
+    // WO-O4O-SHARED-PACKAGES-GLUCOSEVIEW-RESIDUE-CLEANUP-V1: '/admin/glucoseview' alias 제거
+    routePatterns: ['/admin/glucosecare', '/admin/glycocare'],
   },
   forum: {
     entry: 'forum',

@@ -87,14 +87,7 @@ const mockServiceSummaries: ServiceQualitySummary[] = [
     lastUpdated: '2026-01-16T09:15:00Z',
     currentAssets: { brand: 2, product: 10, non_product: 8, content: 3 },
   },
-  {
-    serviceId: 'glucoseview',
-    serviceName: '글루코스뷰 (GlucoseView)',
-    signalCounts: { high: 1, medium: 1, low: 1 },
-    pendingRequests: 0,
-    lastUpdated: '2026-01-16T08:45:00Z',
-    currentAssets: { brand: 2, product: 4, non_product: 8, content: 6 },
-  },
+  // WO-O4O-SHARED-PACKAGES-GLUCOSEVIEW-RESIDUE-CLEANUP-V1: glucoseview entry 제거
   {
     serviceId: 'k-cosmetics',
     serviceName: 'K-코스메틱 (K-Cosmetics)',

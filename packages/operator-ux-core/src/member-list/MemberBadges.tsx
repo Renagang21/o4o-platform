@@ -47,8 +47,7 @@ const ROLE_STYLES: Record<string, { label: string; color: string; bg: string }> 
   'neture:supplier':      { label: '공급자', color: 'text-purple-700', bg: 'bg-purple-50 border-purple-200' },
   'neture:partner':       { label: '파트너', color: 'text-indigo-700', bg: 'bg-indigo-50 border-indigo-200' },
   'neture:seller':        { label: '셀러',   color: 'text-orange-700', bg: 'bg-orange-50 border-orange-200' },
-  'glucoseview:admin':    { label: '관리자',   color: 'text-rose-700', bg: 'bg-rose-50 border-rose-200' },
-  'glucoseview:operator': { label: '운영자',   color: 'text-violet-700', bg: 'bg-violet-50 border-violet-200' },
+  // WO-O4O-SHARED-PACKAGES-GLUCOSEVIEW-RESIDUE-CLEANUP-V1: glucoseview:admin / glucoseview:operator 제거
   'k-cosmetics:admin':    { label: '관리자',   color: 'text-rose-700', bg: 'bg-rose-50 border-rose-200' },
   'k-cosmetics:operator': { label: '운영자',   color: 'text-violet-700', bg: 'bg-violet-50 border-violet-200' },
   'kpa:admin':            { label: '관리자',   color: 'text-rose-700', bg: 'bg-rose-50 border-rose-200' },
@@ -69,9 +68,9 @@ export function RoleBadge({ role }: { role: string }) {
 
 // ── Service Badge ──
 
+// WO-O4O-SHARED-PACKAGES-GLUCOSEVIEW-RESIDUE-CLEANUP-V1: glucoseview entry 제거
 const SERVICE_LABELS: Record<string, string> = {
   glycopharm: 'GlycoPharm',
-  glucoseview: 'GlucoseView',
   'k-cosmetics': 'K-Cosmetics',
   neture: 'Neture',
   'kpa-society': 'KPA',
