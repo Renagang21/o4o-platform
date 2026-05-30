@@ -53,11 +53,14 @@ export function KCosGlobalHeader() {
   const isOperator = isAuthenticated && user?.roles?.some(
     (r: string) => r === 'cosmetics:operator' || r === 'cosmetics:admin' || r === 'platform:super_admin',
   );
-  // WO-KCOS-LMS-INSTRUCTOR-BOOTSTRAP-V1: lms:instructor 또는 admin 진입 허용
+  // WO-O4O-KCOS-GLOBAL-HEADER-PROFILE-MENU-ALIGNMENT-V1:
+  // "강의 대시보드" 는 실제 lms:instructor 역할 보유자에게만 노출한다.
+  // 이전 결선 `showInstructor = isInstructor || isAdmin` 은 관리자라는 이유만으로
+  // 강의 대시보드를 강제 노출시키는 메뉴 오염이었음 — 제거.
   const isInstructor = isAuthenticated && user?.roles?.some(
     (r: string) => r === 'lms:instructor',
   );
-  const showInstructor = isInstructor || isAdmin;
+  const showInstructor = isInstructor;
 
   // WO-O4O-AUTH-UTILS-STORE-OWNER-DUAL-V1: cosmetics:store_owner 부분 helper 적용
   // isStoreManager = 매장 경영자 OR 관리/운영 역할 (광의)
@@ -144,9 +147,14 @@ export function KCosGlobalHeader() {
               강의 대시보드
             </GlobalHeaderMenuItem>
           )}
-          {/* WO-O4O-OPERATOR-MENU-COMMONIZATION-V1: 운영자 이상은 전용 라벨 표시 */}
-          {isOperator ? (
-            <GlobalHeaderMenuItem to={dashboardPath} icon={<Shield className="w-4 h-4" />}>
+          {/* WO-O4O-KCOS-GLOBAL-HEADER-PROFILE-MENU-ALIGNMENT-V1:
+             admin/operator 라벨·경로 분기. isOperator 는 admin 포함이므로 isAdmin 우선. */}
+          {isAdmin ? (
+            <GlobalHeaderMenuItem to="/admin" icon={<Shield className="w-4 h-4" />}>
+              관리자 대시보드
+            </GlobalHeaderMenuItem>
+          ) : isOperator ? (
+            <GlobalHeaderMenuItem to="/operator" icon={<Shield className="w-4 h-4" />}>
               운영 대시보드
             </GlobalHeaderMenuItem>
           ) : (
