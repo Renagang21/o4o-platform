@@ -109,7 +109,10 @@ export const COSMETICS_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'library-production-materials', label: '제작 자료', subPath: '/library/production-materials' },
     ]},
     { label: '설정', items: [
-      { key: 'settings', label: '매장 설정', subPath: '/settings' },
+      // WO-O4O-KCOSMETICS-STORE-PROFILE-EDIT-PAGE-V1:
+      //   매장 경영자 사업자 정보 조회/수정 — users.businessInfo SSOT
+      { key: 'store-info', label: '매장/사업자 정보', subPath: '/info' },
+      { key: 'settings',   label: '매장 설정',        subPath: '/settings' },
     ]},
   ],
 };
