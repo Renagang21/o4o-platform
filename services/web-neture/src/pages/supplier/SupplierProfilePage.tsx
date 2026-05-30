@@ -82,6 +82,9 @@ export default function SupplierProfilePage() {
   const [businessNumber, setBusinessNumber] = useState('');
   const [businessType, setBusinessType] = useState('');
   const [businessItem, setBusinessItem] = useState('');
+  // WO-O4O-NETURE-SUPPLIER-PROFILE-P4-FIELDS-ADD-V1: 사업자 유형 / 개업일
+  const [businessEntityType, setBusinessEntityType] = useState('');
+  const [businessStartDate, setBusinessStartDate] = useState('');
   const [businessZipCode, setBusinessZipCode] = useState('');
   const [businessAddress, setBusinessAddress] = useState('');
   const [businessAddressDetail, setBusinessAddressDetail] = useState('');
@@ -120,6 +123,9 @@ export default function SupplierProfilePage() {
         setBusinessNumber(data.businessNumber || '');
         setBusinessType(data.businessType || '');
         setBusinessItem(data.businessItem || '');
+        // WO-O4O-NETURE-SUPPLIER-PROFILE-P4-FIELDS-ADD-V1
+        setBusinessEntityType(data.businessEntityType || '');
+        setBusinessStartDate(data.businessStartDate || '');
         setBusinessZipCode(data.businessZipCode || '');
         setBusinessAddress(data.businessAddress || '');
         setBusinessAddressDetail(data.businessAddressDetail || '');
@@ -162,6 +168,9 @@ export default function SupplierProfilePage() {
       businessAddressDetail,
       businessType,
       businessItem,
+      // WO-O4O-NETURE-SUPPLIER-PROFILE-P4-FIELDS-ADD-V1
+      businessEntityType: businessEntityType || undefined,
+      businessStartDate: businessStartDate || undefined,
       taxInvoiceEmail,
       // Section B
       managerName,
@@ -284,19 +293,24 @@ export default function SupplierProfilePage() {
             />
           </div>
 
-          {/* 업태 / 종목 — WO-O4O-NETURE-SUPPLIER-PROFILE-BUSINESSREGISTRATIONFIELDS-REUSE-V1:
-                @o4o/account-ui 의 BusinessRegistrationFields 공통 컴포넌트 재사용.
-                기존 state (businessType / businessItem) 와 payload 구조는 그대로 유지. */}
+          {/* 사업자등록증 4 fields — WO-O4O-NETURE-SUPPLIER-PROFILE-BUSINESSREGISTRATIONFIELDS-REUSE-V1
+                + WO-O4O-NETURE-SUPPLIER-PROFILE-P4-FIELDS-ADD-V1:
+                @o4o/account-ui 공통 BusinessRegistrationFields 4 fields 모두 노출.
+                businessType / businessItem 는 neture_suppliers 컬럼,
+                businessEntityType / businessStartDate 는 users.businessInfo JSONB SSOT. */}
           <BusinessRegistrationFields
             value={{
               businessType,
               businessItem,
+              businessEntityType: (businessEntityType as any) || undefined,
+              businessStartDate,
             }}
             onChange={(patch) => {
               if (patch.businessType !== undefined) setBusinessType(patch.businessType);
               if (patch.businessItem !== undefined) setBusinessItem(patch.businessItem);
+              if (patch.businessEntityType !== undefined) setBusinessEntityType(patch.businessEntityType || '');
+              if (patch.businessStartDate !== undefined) setBusinessStartDate(patch.businessStartDate || '');
             }}
-            includeFields={['businessType', 'businessItem']}
           />
 
           {/* 사업장 주소 — WO-O4O-POSTAL-CODE-ADDRESS-V1 */}

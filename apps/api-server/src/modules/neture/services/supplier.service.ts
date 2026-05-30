@@ -485,13 +485,19 @@ export class NetureSupplierService {
 
       // WO-NETURE-SUPPLIER-BUSINESS-PROFILE-FORM-ALIGNMENT-V1: pre-fill from users.businessInfo
       let prefilled: Record<string, string | null> = {};
+      // WO-O4O-NETURE-SUPPLIER-PROFILE-P4-FIELDS-ADD-V1:
+      //   users.businessInfo SSOT 인 P4 fields 를 별도 보관 (needsPrefill 과 무관하게 항상 조회).
+      let p4Fields: { businessEntityType: string | null; businessStartDate: string | null } = {
+        businessEntityType: null,
+        businessStartDate: null,
+      };
       const needsPrefill =
         supplier.userId &&
         !org?.business_number &&
         !supplier.representativeName &&
         !org?.address;
 
-      if (needsPrefill) {
+      if (supplier.userId) {
         try {
           const rows = await AppDataSource.query(
             `SELECT "businessInfo" FROM users WHERE id = $1 LIMIT 1`,
@@ -499,16 +505,22 @@ export class NetureSupplierService {
           );
           const bi = rows[0]?.businessInfo;
           if (bi && typeof bi === 'object') {
-            prefilled = {
-              businessNumber: bi.businessNumber || null,
-              // businessAddress canonical — address legacy fallback
-              businessAddress: bi.businessAddress || [bi.address, bi.address2].filter(Boolean).join(' ') || null,
-              businessType: bi.businessType || null,
-              taxInvoiceEmail: bi.taxInvoiceEmail || null,
+            p4Fields = {
+              businessEntityType: bi.businessEntityType || null,
+              businessStartDate: bi.businessStartDate || null,
             };
+            if (needsPrefill) {
+              prefilled = {
+                businessNumber: bi.businessNumber || null,
+                // businessAddress canonical — address legacy fallback
+                businessAddress: bi.businessAddress || [bi.address, bi.address2].filter(Boolean).join(' ') || null,
+                businessType: bi.businessType || null,
+                taxInvoiceEmail: bi.taxInvoiceEmail || null,
+              };
+            }
           }
         } catch (prefillError) {
-          logger.warn('[NetureSupplierService] Pre-fill from businessInfo failed:', prefillError);
+          logger.warn('[NetureSupplierService] users.businessInfo read failed:', prefillError);
         }
       }
 
@@ -529,6 +541,9 @@ export class NetureSupplierService {
         managerName: supplier.managerName || null,
         managerPhone: supplier.managerPhone || null,
         businessType: supplier.businessType || prefilled.businessType || null,
+        // WO-O4O-NETURE-SUPPLIER-PROFILE-P4-FIELDS-ADD-V1: users.businessInfo SSOT
+        businessEntityType: p4Fields.businessEntityType,
+        businessStartDate: p4Fields.businessStartDate,
         taxInvoiceEmail: supplier.taxInvoiceEmail || prefilled.taxInvoiceEmail || null,
         _prefilled: Object.keys(prefilled).length > 0,
         // Contact (existing — supplier remains SSOT for contact visibility)
@@ -574,6 +589,10 @@ export class NetureSupplierService {
       businessType?: string;
       businessItem?: string;
       taxInvoiceEmail?: string;
+      // WO-O4O-NETURE-SUPPLIER-PROFILE-P4-FIELDS-ADD-V1
+      //   사업자등록증 P4 fields — neture_suppliers 컬럼 부재로 인해 users.businessInfo JSONB 저장
+      businessEntityType?: string;
+      businessStartDate?: string;
       // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
       minOrderAmount?: number | null;
       minOrderSurcharge?: number | null;
@@ -651,6 +670,33 @@ export class NetureSupplierService {
       // WO-O4O-NETURE-SUPPLIER-DEPRECATION-V1 Phase 5-B: read org for canonical fields
       const org = await this.getOrgData(supplier.organizationId);
 
+      // WO-O4O-NETURE-SUPPLIER-PROFILE-P4-FIELDS-ADD-V1:
+      //   businessEntityType / businessStartDate 는 users.businessInfo JSONB 에 jsonb_set 으로 merge.
+      //   payload 에 포함된 키만 update — 미포함 키는 변경 없음. organizations 와 dual-write 안 함.
+      const bizPatch: Record<string, unknown> = {};
+      if (data.businessEntityType !== undefined) bizPatch.businessEntityType = data.businessEntityType || null;
+      if (data.businessStartDate !== undefined) bizPatch.businessStartDate = data.businessStartDate || null;
+      let savedBiz: Record<string, unknown> = {};
+      if (supplier.userId && Object.keys(bizPatch).length > 0) {
+        try {
+          await AppDataSource.query(
+            `UPDATE users
+               SET "businessInfo" = COALESCE("businessInfo", '{}'::jsonb) || $2::jsonb,
+                   "updatedAt" = NOW()
+             WHERE id = $1`,
+            [supplier.userId, JSON.stringify(bizPatch)],
+          );
+        } catch (e) {
+          logger.error('[NetureSupplierService] Failed to update users.businessInfo P4 fields:', e);
+        }
+      }
+      if (supplier.userId) {
+        try {
+          const rows = await AppDataSource.query(`SELECT "businessInfo" FROM users WHERE id = $1`, [supplier.userId]);
+          savedBiz = (rows[0]?.businessInfo as Record<string, unknown>) || {};
+        } catch { /* graceful */ }
+      }
+
       return {
         id: supplier.id,
         // Business profile — org SSOT
@@ -663,6 +709,9 @@ export class NetureSupplierService {
         managerPhone: supplier.managerPhone || null,
         businessType: supplier.businessType || null,
         businessItem: supplier.businessItem || null,
+        // WO-O4O-NETURE-SUPPLIER-PROFILE-P4-FIELDS-ADD-V1: users.businessInfo JSONB SSOT
+        businessEntityType: (savedBiz.businessEntityType as string | null) || null,
+        businessStartDate: (savedBiz.businessStartDate as string | null) || null,
         taxInvoiceEmail: supplier.taxInvoiceEmail || null,
         // Contact
         contactEmail: supplier.contactEmail || null,

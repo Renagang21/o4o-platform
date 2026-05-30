@@ -202,6 +202,9 @@ export class NetureService {
       businessType?: string;
       businessItem?: string;
       taxInvoiceEmail?: string;
+      // WO-O4O-NETURE-SUPPLIER-PROFILE-P4-FIELDS-ADD-V1
+      businessEntityType?: string;
+      businessStartDate?: string;
       // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
       minOrderAmount?: number | null;
       minOrderSurcharge?: number | null;

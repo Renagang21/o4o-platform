@@ -344,6 +344,9 @@ export interface SupplierProfile {
   managerPhone: string | null;
   businessType: string | null;
   businessItem: string | null;
+  // WO-O4O-NETURE-SUPPLIER-PROFILE-P4-FIELDS-ADD-V1
+  businessEntityType: string | null;
+  businessStartDate: string | null;
   taxInvoiceEmail: string | null;
   _prefilled?: boolean;
   // Contact
@@ -927,6 +930,9 @@ export const supplierProfileApi = {
     businessType?: string;
     businessItem?: string;
     taxInvoiceEmail?: string;
+    // WO-O4O-NETURE-SUPPLIER-PROFILE-P4-FIELDS-ADD-V1
+    businessEntityType?: string;
+    businessStartDate?: string;
     // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
     minOrderAmount?: number | null;
     minOrderSurcharge?: number | null;

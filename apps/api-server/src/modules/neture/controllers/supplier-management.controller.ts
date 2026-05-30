@@ -186,6 +186,9 @@ export function createSupplierManagementController(dataSource: DataSource): Rout
         businessZipCode, businessAddressDetail,
         // WO-O4O-BUSINESS-REGISTRATION-FIELD-NAMING-STANDARD-V1
         managerName, managerPhone, businessType, businessItem, taxInvoiceEmail,
+        // WO-O4O-NETURE-SUPPLIER-PROFILE-P4-FIELDS-ADD-V1: 사업자등록증 P4 fields
+        //   (저장 위치: users.businessInfo JSONB — neture_suppliers 컬럼 부재로 인한 결정)
+        businessEntityType, businessStartDate,
         // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
         minOrderAmount, minOrderSurcharge, orderConditionNote,
       } = req.body;
@@ -196,6 +199,7 @@ export function createSupplierManagementController(dataSource: DataSource): Rout
         businessNumber, representativeName, businessAddress,
         businessZipCode, businessAddressDetail,
         managerName, managerPhone, businessType, businessItem, taxInvoiceEmail,
+        businessEntityType, businessStartDate,
         minOrderAmount, minOrderSurcharge, orderConditionNote,
       });
       if (!result) {
