@@ -8,6 +8,7 @@
  */
 
 import type { OperatorGroupKey, OperatorMenuItem } from '@o4o/ui';
+import type { OperatorDomainIAConfig } from '@o4o/operator-ux-core';
 
 /** 통합 메뉴 항목 — adminOnly 플래그 포함 */
 interface UnifiedMenuItem {
@@ -216,4 +217,80 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
   system: [
     { label: '알림 설정', path: '/operator/settings/notifications' },
   ],
+};
+
+// ─── Neture Operator Domain IA — WO-O4O-NETURE-OPERATOR-DOMAIN-IA-META-ADD-V1 ───
+//
+// IR-O4O-NETURE-OPERATOR-DOMAIN-IA-DESIGN-V1 에서 확정한 Neture(Supplier/B2B) 축 4-domain.
+// KPA 계열(커뮤니티/매장 HUB/운영 공통)을 재사용하지 않고 Neture 전용 domain IA 를 정의한다.
+// 본 메타는 향후 DomainIASidebar + OperatorAreaShell 이행 시 domainIAConfig 로 주입한다.
+// 현 시점 Neture 는 아직 OperatorShell(flat) 사용 — 본 추가만으로 화면 노출은 변하지 않는다.
+
+/** Neture operator sidebar 도메인 키 (Supplier/B2B 축). */
+export type NetureOperatorDomainKey =
+  | 'supply_distribution'
+  | 'commerce_settlement'
+  | 'community_content'
+  | 'common';
+
+/** 도메인 헤딩 라벨 + 시각 토큰 */
+export const NETURE_DOMAIN_LABELS: Record<NetureOperatorDomainKey, { label: string; emoji: string }> = {
+  supply_distribution: { label: '공급·유통 운영', emoji: '📦' },
+  commerce_settlement: { label: '커머스·정산 운영', emoji: '💳' },
+  community_content: { label: '커뮤니티·콘텐츠 운영', emoji: '💬' },
+  common: { label: '운영 공통', emoji: '⚙️' },
+};
+
+/** STANDARD_GROUPS key → Neture 도메인 매핑.
+ *  Neture 미사용 group(resources/lms)도 안전 default 지정 — 메뉴 항목이 없으므로 노출 결과에 영향 없음.
+ */
+export const NETURE_GROUP_TO_DOMAIN: Record<OperatorGroupKey, NetureOperatorDomainKey> = {
+  dashboard: 'common', // top-pin 별도 처리 (NETURE_TOP_PINNED_GROUPS)
+  approvals: 'supply_distribution',
+  products: 'supply_distribution',
+  orders: 'commerce_settlement',
+  stores: 'commerce_settlement',
+  users: 'community_content',
+  forum: 'community_content',
+  content: 'community_content',
+  signage: 'community_content',
+  resources: 'community_content', // 미사용 — 안전 default
+  lms: 'community_content', // 미사용 — 안전 default
+  analytics: 'common',
+  system: 'common',
+};
+
+/** 도메인 별 그룹 표시 순서.
+ *  - 공급·유통: 승인(가입/유통펀딩/공급자활성화) → 상품
+ *  - 커머스·정산: 주문 → 매장
+ *  - 커뮤니티·콘텐츠: 회원 → 포럼 → 콘텐츠 → 사이니지
+ *  - 운영 공통: 분석/AI → 시스템 (대시보드는 TOP_PINNED 별도)
+ */
+export const NETURE_DOMAIN_GROUP_ORDER: Record<NetureOperatorDomainKey, OperatorGroupKey[]> = {
+  supply_distribution: ['approvals', 'products'],
+  commerce_settlement: ['orders', 'stores'],
+  community_content: ['users', 'forum', 'content', 'signage'],
+  common: ['analytics', 'system'],
+};
+
+/** 도메인 표시 순서 (sidebar top → bottom) */
+export const NETURE_DOMAIN_DISPLAY_ORDER: NetureOperatorDomainKey[] = [
+  'supply_distribution',
+  'commerce_settlement',
+  'community_content',
+  'common',
+];
+
+/** sidebar 최상단 고정 그룹 — 대시보드(+Action Queue)는 도메인 헤딩과 무관하게 최상단. */
+export const NETURE_TOP_PINNED_GROUPS: OperatorGroupKey[] = ['dashboard'];
+
+/** Neture 전용 domain IA config — DomainIASidebar/OperatorAreaShell 의 domainIAConfig 로 주입.
+ *  @o4o/operator-ux-core 의 OperatorDomainIAConfig 와 타입 호환.
+ */
+export const NETURE_OPERATOR_DOMAIN_IA: OperatorDomainIAConfig = {
+  labels: NETURE_DOMAIN_LABELS,
+  groupToDomain: NETURE_GROUP_TO_DOMAIN,
+  groupOrder: NETURE_DOMAIN_GROUP_ORDER,
+  displayOrder: NETURE_DOMAIN_DISPLAY_ORDER,
+  topPinnedGroups: NETURE_TOP_PINNED_GROUPS,
 };
