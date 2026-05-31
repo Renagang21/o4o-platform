@@ -5,10 +5,28 @@
  * WO-KPI-SERVICE-KEY-ISOLATION-V1
  *
  * Implements StoreDataAdapter for GlycoPharm pharmacies.
- * Queries ecommerce_orders by pharmacy store_id + metadata.serviceKey = 'glycopharm'.
  *
- * This adapter provides the data foundation for future GlycoPharm
- * cockpit KPI and insights endpoints (separate WO).
+ * WO-O4O-STORE-KPI-DASHBOARD-CHECKOUT-ORDERS-ALIGNMENT-V1 (Track A):
+ *   Migrated from legacy `ecommerce_orders` + `ecommerce_order_items` (table absent
+ *   in production — see IR-O4O-ECOMMERCE-ORDERS-TABLE-CROSSSERVICE-IMPACT-V1) to
+ *   canonical `checkout_orders` + `CheckoutOrder.items[]` JSONB.
+ *
+ * 정렬 정책 (IR-O4O-ECOMMERCE-ORDERS-VS-CHECKOUT-ORDERS-SCHEMA-DIFF-V1):
+ *   - GlycoPharm pharmacy.id == organizations.id == checkout_orders.sellerOrganizationId
+ *     (OrganizationStore == @Entity('organizations'); 1:1 직접 매핑).
+ *   - service scope: `metadata->>'serviceKey' = 'glycopharm'` (filter 유지).
+ *   - 매출 인정 양성 조건: `co.status = 'paid'` (legacy `status != 'cancelled'` 회피 —
+ *     REFUNDED 포함 위험).
+ *   - item-level 집계: `CROSS JOIN jsonb_array_elements(co.items)` 패턴
+ *     (KPA event-offer.service.ts:309-326 / kpa-checkout.controller.ts:442-450 검증).
+ *   - channel: legacy `o.channel` 컬럼 부재 → `co.metadata->>'channel'` 로 정렬.
+ *   - controller-layer safe-fallback (`isMissingOrderTable`) 보존 — checkout_orders 가
+ *     production 존재 (2026-04-14 created) 이므로 본 adapter 는 정상 응답하나, fallback
+ *     은 future regression 방어용으로 유지.
+ *
+ * Track A 제외 영역:
+ *   - 결제 트랜잭션 / payment hook / FOR UPDATE (Track C — 별도 hardening WO)
+ *   - K-Cos action-queue active-orders 정책 (Track B)
  */
 
 import { DataSource } from 'typeorm';
@@ -28,19 +46,20 @@ export class GlycopharmStoreDataAdapter implements StoreDataAdapter {
     to?: Date,
   ): Promise<{ count: number; revenue: number }> {
     const params: any[] = [storeId, from.toISOString()];
-    let dateFilter = `AND "createdAt" >= $2`;
+    let dateFilter = `AND co."createdAt" >= $2`;
     if (to) {
       params.push(to.toISOString());
-      dateFilter += ` AND "createdAt" < $3`;
+      dateFilter += ` AND co."createdAt" < $3`;
     }
 
     const result = await this.dataSource.query(
-      `SELECT COUNT(*)::int as count, COALESCE(SUM("totalAmount"), 0)::numeric as revenue
-       FROM ecommerce_orders
-       WHERE store_id = $1
-         AND metadata->>'serviceKey' = 'glycopharm'
+      `SELECT COUNT(*)::int as count,
+              COALESCE(SUM(co."totalAmount"), 0)::numeric as revenue
+       FROM checkout_orders co
+       WHERE co."sellerOrganizationId" = $1
+         AND co.metadata->>'serviceKey' = 'glycopharm'
          ${dateFilter}
-         AND status != 'cancelled'`,
+         AND co.status = 'paid'`,
       params,
     );
 
@@ -53,15 +72,15 @@ export class GlycopharmStoreDataAdapter implements StoreDataAdapter {
   async getChannelBreakdown(storeId: string, from: Date): Promise<ChannelBreakdown[]> {
     const rows = await this.dataSource.query(
       `SELECT
-         COALESCE(channel, 'unknown') as channel,
+         COALESCE(co.metadata->>'channel', 'unknown') as channel,
          COUNT(*)::int as "orderCount",
-         COALESCE(SUM("totalAmount"), 0)::numeric as revenue
-       FROM ecommerce_orders
-       WHERE store_id = $1
-         AND metadata->>'serviceKey' = 'glycopharm'
-         AND "createdAt" >= $2
-         AND status != 'cancelled'
-       GROUP BY channel
+         COALESCE(SUM(co."totalAmount"), 0)::numeric as revenue
+       FROM checkout_orders co
+       WHERE co."sellerOrganizationId" = $1
+         AND co.metadata->>'serviceKey' = 'glycopharm'
+         AND co."createdAt" >= $2
+         AND co.status = 'paid'
+       GROUP BY co.metadata->>'channel'
        ORDER BY revenue DESC`,
       [storeId, from.toISOString()],
     );
@@ -75,25 +94,27 @@ export class GlycopharmStoreDataAdapter implements StoreDataAdapter {
 
   /**
    * WO-STORE-LOCAL-PRODUCT-HARDENING-V1: KPI 오염 방지
-   * 이 쿼리는 ecommerce_order_items만 집계한다.
+   * 이 쿼리는 checkout_orders.items JSONB 만 집계한다.
    * StoreLocalProduct(store_local_products)는 Display Domain이며
-   * ecommerce_order_items에 진입할 수 없으므로 KPI에 포함되지 않는다.
-   * → store_local_products 오염 경로 없음 (구조적 보장)
+   * checkout 도메인에 진입할 수 없으므로 KPI 에 포함되지 않는다.
+   *
+   * WO-O4O-STORE-KPI-DASHBOARD-CHECKOUT-ORDERS-ALIGNMENT-V1: JSONB 패턴.
+   * legacy ecommerce_order_items JOIN → jsonb_array_elements(co.items) CROSS JOIN.
    */
   async getTopProducts(storeId: string, limit: number, from: Date): Promise<TopProduct[]> {
     const rows = await this.dataSource.query(
       `SELECT
-         oi."productId" as "productId",
-         oi."productName" as "productName",
-         SUM(oi.quantity)::int as quantity,
-         SUM(oi.subtotal)::numeric as revenue
-       FROM ecommerce_order_items oi
-       INNER JOIN ecommerce_orders o ON o.id = oi."orderId"
-       WHERE o.store_id = $1
-         AND o.metadata->>'serviceKey' = 'glycopharm'
-         AND o."createdAt" >= $2
-         AND o.status != 'cancelled'
-       GROUP BY oi."productId", oi."productName"
+         item->>'productId' as "productId",
+         item->>'productName' as "productName",
+         SUM((item->>'quantity')::int)::int as quantity,
+         SUM((item->>'subtotal')::numeric)::numeric as revenue
+       FROM checkout_orders co
+       CROSS JOIN jsonb_array_elements(co.items) AS item
+       WHERE co."sellerOrganizationId" = $1
+         AND co.metadata->>'serviceKey' = 'glycopharm'
+         AND co."createdAt" >= $2
+         AND co.status = 'paid'
+       GROUP BY item->>'productId', item->>'productName'
        ORDER BY revenue DESC
        LIMIT $3`,
       [storeId, from.toISOString(), limit],
@@ -108,12 +129,22 @@ export class GlycopharmStoreDataAdapter implements StoreDataAdapter {
   }
 
   async getRecentOrders(storeId: string, limit: number): Promise<RecentOrder[]> {
+    // Recent orders 는 결제 완료 외 상태 (created, pending_payment, cancelled, refunded)
+    // 도 운영자가 보고 싶어할 수 있음 — Track A 정책: 매출 KPI 는 paid 양성 조건이나,
+    // recent orders 목록은 lifecycle 가시성 우선. cancelled/refunded 제외만 적용.
     const rows = await this.dataSource.query(
-      `SELECT id, "orderNumber", "totalAmount", status, channel, "createdAt"
-       FROM ecommerce_orders
-       WHERE store_id = $1
-         AND metadata->>'serviceKey' = 'glycopharm'
-       ORDER BY "createdAt" DESC
+      `SELECT
+         co.id,
+         co."orderNumber",
+         co."totalAmount",
+         co.status,
+         co.metadata->>'channel' as channel,
+         co."createdAt"
+       FROM checkout_orders co
+       WHERE co."sellerOrganizationId" = $1
+         AND co.metadata->>'serviceKey' = 'glycopharm'
+         AND co.status NOT IN ('cancelled', 'refunded')
+       ORDER BY co."createdAt" DESC
        LIMIT $2`,
       [storeId, limit],
     );
@@ -131,10 +162,10 @@ export class GlycopharmStoreDataAdapter implements StoreDataAdapter {
   async getTotalOrderCount(storeId: string): Promise<number> {
     const result = await this.dataSource.query(
       `SELECT COUNT(*)::int as count
-       FROM ecommerce_orders
-       WHERE store_id = $1
-         AND metadata->>'serviceKey' = 'glycopharm'
-         AND status != 'cancelled'`,
+       FROM checkout_orders co
+       WHERE co."sellerOrganizationId" = $1
+         AND co.metadata->>'serviceKey' = 'glycopharm'
+         AND co.status = 'paid'`,
       [storeId],
     );
 
@@ -143,13 +174,13 @@ export class GlycopharmStoreDataAdapter implements StoreDataAdapter {
 
   async getRevenueBetween(storeId: string, from: Date, to: Date): Promise<number> {
     const result = await this.dataSource.query(
-      `SELECT COALESCE(SUM("totalAmount"), 0)::numeric as revenue
-       FROM ecommerce_orders
-       WHERE store_id = $1
-         AND metadata->>'serviceKey' = 'glycopharm'
-         AND "createdAt" >= $2
-         AND "createdAt" < $3
-         AND status != 'cancelled'`,
+      `SELECT COALESCE(SUM(co."totalAmount"), 0)::numeric as revenue
+       FROM checkout_orders co
+       WHERE co."sellerOrganizationId" = $1
+         AND co.metadata->>'serviceKey' = 'glycopharm'
+         AND co."createdAt" >= $2
+         AND co."createdAt" < $3
+         AND co.status = 'paid'`,
       [storeId, from.toISOString(), to.toISOString()],
     );
 

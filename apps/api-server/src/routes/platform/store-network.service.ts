@@ -8,6 +8,23 @@
  * for platform admin network-level dashboard.
  *
  * Uses bulk SQL queries per service (not per-store adapter calls) for performance.
+ *
+ * WO-O4O-STORE-KPI-DASHBOARD-CHECKOUT-ORDERS-ALIGNMENT-V1 (Track A):
+ *   Migrated from legacy `ecommerce_orders` (table absent in production) to
+ *   canonical `checkout_orders`.
+ *
+ * 정렬 정책:
+ *   - cross-service aggregation 은 `metadata->>'serviceKey'` 단일 filter 로 단순화.
+ *     subquery JOIN (`store_id IN (SELECT id FROM ...)`) 제거.
+ *   - Top stores 의 store name 은 service-specific subquery (cosmetics_stores 또는
+ *     organizations) 로 LEFT JOIN. canonical sellerOrganizationId 가 모든 매장에
+ *     채워졌다고 가정 — 신규 주문 생성 시점 보장 책임은 checkout flow.
+ *     · Cosmetics: cosmetics_stores 의 organization_id 가 NULL 인 store 는
+ *       Top stores 목록에 자동 제외 (organization bridge 부재 시 결과 누락).
+ *     · GlycoPharm: organizations.id 직접 매핑 ✅.
+ *   - 매출 인정 양성 조건: `status = 'paid'`.
+ *   - functional index 권장: idx_checkout_orders_servicekey_status_createdat
+ *     ((metadata->>'serviceKey'), status, "createdAt") — 별도 migration WO.
  */
 
 import { DataSource } from 'typeorm';
@@ -107,21 +124,18 @@ export class StoreNetworkService {
     fromISO: string,
     toISO: string,
   ): Promise<{ revenue: number; orders: number }> {
-    const storeSubquery =
-      service === 'cosmetics'
-        ? `SELECT id FROM cosmetics.cosmetics_stores`
-        : `SELECT o.id FROM organizations o JOIN organization_service_enrollments ose ON ose.organization_id = o.id AND ose.service_code = 'glycopharm'`;
-
+    // WO-O4O-STORE-KPI-DASHBOARD-CHECKOUT-ORDERS-ALIGNMENT-V1:
+    // metadata->>'serviceKey' 단일 filter — subquery JOIN 불필요.
     const result = await this.dataSource.query(
       `SELECT
          COUNT(*)::int as "orderCount",
-         COALESCE(SUM("totalAmount"), 0)::numeric as revenue
-       FROM ecommerce_orders
-       WHERE store_id IN (${storeSubquery})
-         AND "createdAt" >= $1
-         AND "createdAt" < $2
-         AND status != 'cancelled'`,
-      [fromISO, toISO],
+         COALESCE(SUM(co."totalAmount"), 0)::numeric as revenue
+       FROM checkout_orders co
+       WHERE co.metadata->>'serviceKey' = $1
+         AND co."createdAt" >= $2
+         AND co."createdAt" < $3
+         AND co.status = 'paid'`,
+      [service, fromISO, toISO],
     );
 
     return {
@@ -149,6 +163,9 @@ export class StoreNetworkService {
   // ---- Cosmetics bulk queries ----
 
   private async getCosmeticsServiceStats(monthStartISO: string) {
+    // WO-O4O-STORE-KPI-DASHBOARD-CHECKOUT-ORDERS-ALIGNMENT-V1:
+    // store count 는 service-specific (cosmetics_stores) — 변경 없음.
+    // 주문 집계는 checkout_orders + metadata->>'serviceKey' filter.
     const [storeResult, orderResult] = await Promise.all([
       this.dataSource.query(
         `SELECT COUNT(*)::int as count
@@ -158,11 +175,11 @@ export class StoreNetworkService {
       this.dataSource.query(
         `SELECT
            COUNT(*)::int as "orderCount",
-           COALESCE(SUM("totalAmount"), 0)::numeric as revenue
-         FROM ecommerce_orders
-         WHERE store_id IN (SELECT id FROM cosmetics.cosmetics_stores)
-           AND "createdAt" >= $1
-           AND status != 'cancelled'`,
+           COALESCE(SUM(co."totalAmount"), 0)::numeric as revenue
+         FROM checkout_orders co
+         WHERE co.metadata->>'serviceKey' = 'cosmetics'
+           AND co."createdAt" >= $1
+           AND co.status = 'paid'`,
         [monthStartISO],
       ),
     ]);
@@ -175,6 +192,7 @@ export class StoreNetworkService {
   }
 
   private async getGlycopharmServiceStats(monthStartISO: string) {
+    // WO-O4O-STORE-KPI-DASHBOARD-CHECKOUT-ORDERS-ALIGNMENT-V1: 동일 패턴.
     const [storeResult, orderResult] = await Promise.all([
       this.dataSource.query(
         `SELECT COUNT(*)::int as count
@@ -185,11 +203,11 @@ export class StoreNetworkService {
       this.dataSource.query(
         `SELECT
            COUNT(*)::int as "orderCount",
-           COALESCE(SUM("totalAmount"), 0)::numeric as revenue
-         FROM ecommerce_orders
-         WHERE store_id IN (SELECT o.id FROM organizations o JOIN organization_service_enrollments ose ON ose.organization_id = o.id AND ose.service_code = 'glycopharm')
-           AND "createdAt" >= $1
-           AND status != 'cancelled'`,
+           COALESCE(SUM(co."totalAmount"), 0)::numeric as revenue
+         FROM checkout_orders co
+         WHERE co.metadata->>'serviceKey' = 'glycopharm'
+           AND co."createdAt" >= $1
+           AND co.status = 'paid'`,
         [monthStartISO],
       ),
     ]);
@@ -204,18 +222,22 @@ export class StoreNetworkService {
   // ---- Top stores per service ----
 
   private async getCosmeticsTopStores(monthStartISO: string, limit: number): Promise<TopStore[]> {
+    // WO-O4O-STORE-KPI-DASHBOARD-CHECKOUT-ORDERS-ALIGNMENT-V1:
+    // checkout_orders.sellerOrganizationId GROUP BY + cosmetics_stores 의 name lookup.
+    // cosmetics_stores.organization_id 가 NULL 인 store 는 자동 제외 (INNER JOIN).
     const rows = await this.dataSource.query(
       `SELECT
-         o.store_id as "storeId",
+         co."sellerOrganizationId" as "storeId",
          s.name as "storeName",
          COUNT(*)::int as "monthlyOrders",
-         COALESCE(SUM(o."totalAmount"), 0)::numeric as "monthlyRevenue"
-       FROM ecommerce_orders o
-       INNER JOIN cosmetics.cosmetics_stores s ON s.id = o.store_id
-       WHERE o."createdAt" >= $1
-         AND o.status != 'cancelled'
-         AND o.store_id IS NOT NULL
-       GROUP BY o.store_id, s.name
+         COALESCE(SUM(co."totalAmount"), 0)::numeric as "monthlyRevenue"
+       FROM checkout_orders co
+       INNER JOIN cosmetics.cosmetics_stores s ON s.organization_id = co."sellerOrganizationId"
+       WHERE co.metadata->>'serviceKey' = 'cosmetics'
+         AND co."createdAt" >= $1
+         AND co.status = 'paid'
+         AND co."sellerOrganizationId" IS NOT NULL
+       GROUP BY co."sellerOrganizationId", s.name
        ORDER BY "monthlyRevenue" DESC
        LIMIT $2`,
       [monthStartISO, limit],
@@ -231,18 +253,21 @@ export class StoreNetworkService {
   }
 
   private async getGlycopharmTopStores(monthStartISO: string, limit: number): Promise<TopStore[]> {
+    // WO-O4O-STORE-KPI-DASHBOARD-CHECKOUT-ORDERS-ALIGNMENT-V1:
+    // GlycoPharm pharmacy.id == organizations.id == sellerOrganizationId 직접 매핑.
     const rows = await this.dataSource.query(
       `SELECT
-         o.store_id as "storeId",
+         co."sellerOrganizationId" as "storeId",
          p.name as "storeName",
          COUNT(*)::int as "monthlyOrders",
-         COALESCE(SUM(o."totalAmount"), 0)::numeric as "monthlyRevenue"
-       FROM ecommerce_orders o
-       INNER JOIN organizations p ON p.id = o.store_id
-       WHERE o."createdAt" >= $1
-         AND o.status != 'cancelled'
-         AND o.store_id IS NOT NULL
-       GROUP BY o.store_id, p.name
+         COALESCE(SUM(co."totalAmount"), 0)::numeric as "monthlyRevenue"
+       FROM checkout_orders co
+       INNER JOIN organizations p ON p.id = co."sellerOrganizationId"
+       WHERE co.metadata->>'serviceKey' = 'glycopharm'
+         AND co."createdAt" >= $1
+         AND co.status = 'paid'
+         AND co."sellerOrganizationId" IS NOT NULL
+       GROUP BY co."sellerOrganizationId", p.name
        ORDER BY "monthlyRevenue" DESC
        LIMIT $2`,
       [monthStartISO, limit],

@@ -8,6 +8,24 @@
  * KPI aggregation for store dashboards.
  * Uses StoreSummaryEngine from @o4o/store-core with a Cosmetics-specific adapter.
  * All queries filter by metadata->>'serviceKey' = 'cosmetics' to prevent cross-service KPI contamination.
+ *
+ * WO-O4O-STORE-KPI-DASHBOARD-CHECKOUT-ORDERS-ALIGNMENT-V1 (Track A):
+ *   Migrated from legacy `ecommerce_orders` + `ecommerce_order_items` (table absent
+ *   in production) to canonical `checkout_orders` + `CheckoutOrder.items[]` JSONB.
+ *
+ * 정렬 정책:
+ *   - K-Cosmetics 의 caller 가 전달하는 storeId 는 `cosmetics_stores.id` (cosmetics 스키마 PK).
+ *   - canonical `checkout_orders.sellerOrganizationId` 는 `organizations.id` UUID.
+ *   - bridge: `cosmetics_stores.organization_id` (nullable UUID — WO-O4O-COSMETICS-STORE-HUB-
+ *     ADOPTION-V1). subquery 로 nested lookup.
+ *   - **주의 (caller 안내)**: `cosmetics_stores.organization_id` 가 NULL 인 store 는
+ *     매칭 안 됨 → 빈 결과 / 0 metrics. organization bridge 가 누락된 store 의 KPI 를
+ *     보려면 organization 연결 보강이 선행되어야 함.
+ *   - service scope: `metadata->>'serviceKey' = 'cosmetics'` 유지.
+ *   - 매출 인정 양성 조건: `co.status = 'paid'`.
+ *   - item-level 집계: `CROSS JOIN jsonb_array_elements(co.items)`.
+ *   - channel: `co.metadata->>'channel'`.
+ *   - controller-layer safe-fallback 보존.
  */
 
 import { DataSource } from 'typeorm';
@@ -29,8 +47,18 @@ export type {
 } from '@o4o/store-core';
 
 // ============================================================================
-// Cosmetics Adapter — implements StoreDataAdapter with ecommerce_orders SQL
+// Cosmetics Adapter — implements StoreDataAdapter with checkout_orders SQL
 // ============================================================================
+
+/**
+ * K-Cos store → organization bridge subquery snippet.
+ * `cosmetics_stores.id = $1 AND organization_id IS NOT NULL` 인 경우에만 organization_id 반환.
+ * 매핑 부재 시 빈 결과 셋 (caller 가 KPI 0 으로 받음 — silent 0 가 아닌 정상 미매칭).
+ */
+const ORG_FROM_COSMETICS_STORE = `(
+  SELECT organization_id FROM cosmetics.cosmetics_stores
+  WHERE id = $1 AND organization_id IS NOT NULL
+)`;
 
 export class CosmeticsStoreDataAdapter implements StoreDataAdapter {
   constructor(private dataSource: DataSource) {}
@@ -41,19 +69,20 @@ export class CosmeticsStoreDataAdapter implements StoreDataAdapter {
     to?: Date,
   ): Promise<{ count: number; revenue: number }> {
     const params: any[] = [storeId, from.toISOString()];
-    let dateFilter = `AND "createdAt" >= $2`;
+    let dateFilter = `AND co."createdAt" >= $2`;
     if (to) {
       params.push(to.toISOString());
-      dateFilter += ` AND "createdAt" < $3`;
+      dateFilter += ` AND co."createdAt" < $3`;
     }
 
     const result = await this.dataSource.query(
-      `SELECT COUNT(*)::int as count, COALESCE(SUM("totalAmount"), 0)::numeric as revenue
-       FROM ecommerce_orders
-       WHERE store_id = $1
-         AND metadata->>'serviceKey' = 'cosmetics'
+      `SELECT COUNT(*)::int as count,
+              COALESCE(SUM(co."totalAmount"), 0)::numeric as revenue
+       FROM checkout_orders co
+       WHERE co."sellerOrganizationId" = ${ORG_FROM_COSMETICS_STORE}
+         AND co.metadata->>'serviceKey' = 'cosmetics'
          ${dateFilter}
-         AND status != 'cancelled'`,
+         AND co.status = 'paid'`,
       params,
     );
 
@@ -66,15 +95,15 @@ export class CosmeticsStoreDataAdapter implements StoreDataAdapter {
   async getChannelBreakdown(storeId: string, from: Date): Promise<ChannelBreakdown[]> {
     const rows = await this.dataSource.query(
       `SELECT
-         COALESCE(channel, 'unknown') as channel,
+         COALESCE(co.metadata->>'channel', 'unknown') as channel,
          COUNT(*)::int as "orderCount",
-         COALESCE(SUM("totalAmount"), 0)::numeric as revenue
-       FROM ecommerce_orders
-       WHERE store_id = $1
-         AND metadata->>'serviceKey' = 'cosmetics'
-         AND "createdAt" >= $2
-         AND status != 'cancelled'
-       GROUP BY channel
+         COALESCE(SUM(co."totalAmount"), 0)::numeric as revenue
+       FROM checkout_orders co
+       WHERE co."sellerOrganizationId" = ${ORG_FROM_COSMETICS_STORE}
+         AND co.metadata->>'serviceKey' = 'cosmetics'
+         AND co."createdAt" >= $2
+         AND co.status = 'paid'
+       GROUP BY co.metadata->>'channel'
        ORDER BY revenue DESC`,
       [storeId, from.toISOString()],
     );
@@ -88,25 +117,24 @@ export class CosmeticsStoreDataAdapter implements StoreDataAdapter {
 
   /**
    * WO-STORE-LOCAL-PRODUCT-HARDENING-V1: KPI 오염 방지
-   * 이 쿼리는 ecommerce_order_items만 집계한다.
-   * StoreLocalProduct(store_local_products)는 Display Domain이며
-   * ecommerce_order_items에 진입할 수 없으므로 KPI에 포함되지 않는다.
-   * → store_local_products 오염 경로 없음 (구조적 보장)
+   * 이 쿼리는 checkout_orders.items JSONB 만 집계한다.
+   *
+   * WO-O4O-STORE-KPI-DASHBOARD-CHECKOUT-ORDERS-ALIGNMENT-V1: JSONB 패턴.
    */
   async getTopProducts(storeId: string, limit: number, from: Date): Promise<TopProduct[]> {
     const rows = await this.dataSource.query(
       `SELECT
-         oi."productId" as "productId",
-         oi."productName" as "productName",
-         SUM(oi.quantity)::int as quantity,
-         SUM(oi.subtotal)::numeric as revenue
-       FROM ecommerce_order_items oi
-       INNER JOIN ecommerce_orders o ON o.id = oi."orderId"
-       WHERE o.store_id = $1
-         AND o.metadata->>'serviceKey' = 'cosmetics'
-         AND o."createdAt" >= $2
-         AND o.status != 'cancelled'
-       GROUP BY oi."productId", oi."productName"
+         item->>'productId' as "productId",
+         item->>'productName' as "productName",
+         SUM((item->>'quantity')::int)::int as quantity,
+         SUM((item->>'subtotal')::numeric)::numeric as revenue
+       FROM checkout_orders co
+       CROSS JOIN jsonb_array_elements(co.items) AS item
+       WHERE co."sellerOrganizationId" = ${ORG_FROM_COSMETICS_STORE}
+         AND co.metadata->>'serviceKey' = 'cosmetics'
+         AND co."createdAt" >= $2
+         AND co.status = 'paid'
+       GROUP BY item->>'productId', item->>'productName'
        ORDER BY revenue DESC
        LIMIT $3`,
       [storeId, from.toISOString(), limit],
@@ -121,12 +149,20 @@ export class CosmeticsStoreDataAdapter implements StoreDataAdapter {
   }
 
   async getRecentOrders(storeId: string, limit: number): Promise<RecentOrder[]> {
+    // Track A 정책: recent orders 는 lifecycle 가시성 우선. cancelled/refunded 제외.
     const rows = await this.dataSource.query(
-      `SELECT id, "orderNumber", "totalAmount", status, channel, "createdAt"
-       FROM ecommerce_orders
-       WHERE store_id = $1
-         AND metadata->>'serviceKey' = 'cosmetics'
-       ORDER BY "createdAt" DESC
+      `SELECT
+         co.id,
+         co."orderNumber",
+         co."totalAmount",
+         co.status,
+         co.metadata->>'channel' as channel,
+         co."createdAt"
+       FROM checkout_orders co
+       WHERE co."sellerOrganizationId" = ${ORG_FROM_COSMETICS_STORE}
+         AND co.metadata->>'serviceKey' = 'cosmetics'
+         AND co.status NOT IN ('cancelled', 'refunded')
+       ORDER BY co."createdAt" DESC
        LIMIT $2`,
       [storeId, limit],
     );
@@ -144,10 +180,10 @@ export class CosmeticsStoreDataAdapter implements StoreDataAdapter {
   async getTotalOrderCount(storeId: string): Promise<number> {
     const result = await this.dataSource.query(
       `SELECT COUNT(*)::int as count
-       FROM ecommerce_orders
-       WHERE store_id = $1
-         AND metadata->>'serviceKey' = 'cosmetics'
-         AND status != 'cancelled'`,
+       FROM checkout_orders co
+       WHERE co."sellerOrganizationId" = ${ORG_FROM_COSMETICS_STORE}
+         AND co.metadata->>'serviceKey' = 'cosmetics'
+         AND co.status = 'paid'`,
       [storeId],
     );
 
@@ -156,13 +192,13 @@ export class CosmeticsStoreDataAdapter implements StoreDataAdapter {
 
   async getRevenueBetween(storeId: string, from: Date, to: Date): Promise<number> {
     const result = await this.dataSource.query(
-      `SELECT COALESCE(SUM("totalAmount"), 0)::numeric as revenue
-       FROM ecommerce_orders
-       WHERE store_id = $1
-         AND metadata->>'serviceKey' = 'cosmetics'
-         AND "createdAt" >= $2
-         AND "createdAt" < $3
-         AND status != 'cancelled'`,
+      `SELECT COALESCE(SUM(co."totalAmount"), 0)::numeric as revenue
+       FROM checkout_orders co
+       WHERE co."sellerOrganizationId" = ${ORG_FROM_COSMETICS_STORE}
+         AND co.metadata->>'serviceKey' = 'cosmetics'
+         AND co."createdAt" >= $2
+         AND co."createdAt" < $3
+         AND co.status = 'paid'`,
       [storeId, from.toISOString(), to.toISOString()],
     );
 
@@ -193,7 +229,17 @@ export class CosmeticsStoreSummaryService {
 
   /**
    * Aggregate summary across all stores (for admin dashboard).
-   * Cosmetics-specific — queries cosmetics_stores directly.
+   * Cosmetics-specific — bulk aggregation via metadata->>'serviceKey' filter.
+   *
+   * WO-O4O-STORE-KPI-DASHBOARD-CHECKOUT-ORDERS-ALIGNMENT-V1:
+   *   bulk 의 경우 sellerOrganizationId 별 lookup 불필요 — service-level filter 면
+   *   충분. cosmetics_stores 의 organization_id 부재 store 의 주문은 자동 제외됨.
+   *
+   * activeOrders 정의:
+   *   - canonical checkout_orders 에는 legacy 의 'processing', 'shipped', 'confirmed' 가
+   *     없음 (Track B 의 NEEDS_POLICY 대상 — action queue active-orders 의미 결정).
+   *   - 본 Track A 에서는 monthlyRevenue 와 동일한 paid 기준 적용 — silent 0 거짓
+   *     신호 회피. 다른 정의가 필요하면 Track B WO 에서 확정.
    */
   async getAdminSummary(): Promise<{
     totalStores: number;
@@ -210,33 +256,35 @@ export class CosmeticsStoreSummaryService {
        WHERE status = 'approved'`,
     );
 
+    // Track A: active = paid (Track B 에서 재정의 대상)
     const activeResult = await this.dataSource.query(
       `SELECT COUNT(*)::int as count
-       FROM ecommerce_orders
-       WHERE store_id IS NOT NULL
-         AND store_id IN (SELECT id FROM cosmetics.cosmetics_stores)
-         AND metadata->>'serviceKey' = 'cosmetics'
-         AND status IN ('created', 'pending_payment', 'paid', 'confirmed', 'processing', 'shipped')`,
+       FROM checkout_orders co
+       WHERE co.metadata->>'serviceKey' = 'cosmetics'
+         AND co.status = 'paid'`,
     );
 
     const revenueResult = await this.dataSource.query(
-      `SELECT COALESCE(SUM("totalAmount"), 0)::numeric as revenue
-       FROM ecommerce_orders
-       WHERE store_id IS NOT NULL
-         AND store_id IN (SELECT id FROM cosmetics.cosmetics_stores)
-         AND metadata->>'serviceKey' = 'cosmetics'
-         AND "createdAt" >= $1
-         AND status != 'cancelled'`,
+      `SELECT COALESCE(SUM(co."totalAmount"), 0)::numeric as revenue
+       FROM checkout_orders co
+       WHERE co.metadata->>'serviceKey' = 'cosmetics'
+         AND co."createdAt" >= $1
+         AND co.status = 'paid'`,
       [monthStart.toISOString()],
     );
 
     const recentRows = await this.dataSource.query(
-      `SELECT o.id, o."orderNumber", o."totalAmount", o.status, o.channel, o."createdAt"
-       FROM ecommerce_orders o
-       WHERE o.store_id IS NOT NULL
-         AND o.store_id IN (SELECT id FROM cosmetics.cosmetics_stores)
-         AND o.metadata->>'serviceKey' = 'cosmetics'
-       ORDER BY o."createdAt" DESC
+      `SELECT
+         co.id,
+         co."orderNumber",
+         co."totalAmount",
+         co.status,
+         co.metadata->>'channel' as channel,
+         co."createdAt"
+       FROM checkout_orders co
+       WHERE co.metadata->>'serviceKey' = 'cosmetics'
+         AND co.status NOT IN ('cancelled', 'refunded')
+       ORDER BY co."createdAt" DESC
        LIMIT 5`,
     );
 

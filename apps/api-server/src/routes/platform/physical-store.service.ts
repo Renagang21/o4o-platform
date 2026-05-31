@@ -5,6 +5,21 @@
  *
  * Links Cosmetics stores and GlycoPharm pharmacies by normalized business_number
  * into unified "Physical Stores" for cross-service KPI aggregation.
+ *
+ * WO-O4O-STORE-KPI-DASHBOARD-CHECKOUT-ORDERS-ALIGNMENT-V1 (Track A):
+ *   Migrated from legacy `ecommerce_orders` to canonical `checkout_orders`.
+ *
+ * 정렬 정책:
+ *   - `physical_store_links.service_store_id` 는 service-specific PK:
+ *     · cosmetics: `cosmetics_stores.id`
+ *     · glycopharm: `organizations.id`
+ *   - canonical `checkout_orders.sellerOrganizationId` = `organizations.id`.
+ *   - bridge inline CASE:
+ *     · cosmetics: subquery `cosmetics_stores.organization_id` lookup
+ *     · glycopharm: 직접 cast
+ *   - cosmetics_stores.organization_id 가 NULL 이면 매칭 실패 → 0 orders (정상).
+ *   - 매출 인정 양성 조건: `status = 'paid'`.
+ *   - safe-fallback (route-level) 보존.
  */
 
 import { DataSource } from 'typeorm';
@@ -174,7 +189,10 @@ export class PhysicalStoreService {
     );
     const total = countResult[0]?.total || 0;
 
-    // Fetch stores with linked services and KPI
+    // WO-O4O-STORE-KPI-DASHBOARD-CHECKOUT-ORDERS-ALIGNMENT-V1:
+    // checkout_orders.sellerOrganizationId 와 physical_store_links.service_store_id 간
+    // bridge: cosmetics 인 경우 cosmetics_stores.organization_id, glycopharm 인 경우
+    // service_store_id 자체 (organizations.id 직접).
     const rows = await this.dataSource.query(
       `SELECT
          ps.id as "physicalStoreId",
@@ -188,21 +206,39 @@ export class PhysicalStoreService {
            '[]'::json
          ) as services,
          COALESCE(
-           (SELECT SUM(o."totalAmount")
-            FROM ecommerce_orders o
-            INNER JOIN physical_store_links psl ON psl.service_store_id = o.store_id
+           (SELECT SUM(co."totalAmount")
+            FROM checkout_orders co
+            INNER JOIN physical_store_links psl
+              ON co."sellerOrganizationId" = (
+                CASE
+                  WHEN psl.service_type = 'cosmetics'
+                    THEN (SELECT organization_id FROM cosmetics.cosmetics_stores WHERE id = psl.service_store_id)
+                  WHEN psl.service_type = 'glycopharm'
+                    THEN psl.service_store_id::uuid
+                  ELSE NULL
+                END
+              )
             WHERE psl.physical_store_id = ps.id
-              AND o."createdAt" >= $1
-              AND o.status != 'cancelled'),
+              AND co."createdAt" >= $1
+              AND co.status = 'paid'),
            0
          )::numeric as "monthlyRevenue",
          COALESCE(
            (SELECT COUNT(*)
-            FROM ecommerce_orders o
-            INNER JOIN physical_store_links psl ON psl.service_store_id = o.store_id
+            FROM checkout_orders co
+            INNER JOIN physical_store_links psl
+              ON co."sellerOrganizationId" = (
+                CASE
+                  WHEN psl.service_type = 'cosmetics'
+                    THEN (SELECT organization_id FROM cosmetics.cosmetics_stores WHERE id = psl.service_store_id)
+                  WHEN psl.service_type = 'glycopharm'
+                    THEN psl.service_store_id::uuid
+                  ELSE NULL
+                END
+              )
             WHERE psl.physical_store_id = ps.id
-              AND o."createdAt" >= $1
-              AND o.status != 'cancelled'),
+              AND co."createdAt" >= $1
+              AND co.status = 'paid'),
            0
          )::int as "monthlyOrders"
        FROM physical_stores ps
@@ -242,7 +278,8 @@ export class PhysicalStoreService {
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
 
-    // Fetch linked services with their KPI
+    // WO-O4O-STORE-KPI-DASHBOARD-CHECKOUT-ORDERS-ALIGNMENT-V1:
+    // 동일 bridge 패턴 — service_type 별 organizationId resolution.
     const linkRows = await this.dataSource.query(
       `SELECT
          psl.service_type as "serviceType",
@@ -255,19 +292,35 @@ export class PhysicalStoreService {
            ELSE 'Unknown'
          END as "storeName",
          COALESCE(
-           (SELECT SUM(o."totalAmount")
-            FROM ecommerce_orders o
-            WHERE o.store_id = psl.service_store_id
-              AND o."createdAt" >= $2
-              AND o.status != 'cancelled'),
+           (SELECT SUM(co."totalAmount")
+            FROM checkout_orders co
+            WHERE co."sellerOrganizationId" = (
+              CASE
+                WHEN psl.service_type = 'cosmetics'
+                  THEN (SELECT organization_id FROM cosmetics.cosmetics_stores WHERE id = psl.service_store_id)
+                WHEN psl.service_type = 'glycopharm'
+                  THEN psl.service_store_id::uuid
+                ELSE NULL
+              END
+            )
+              AND co."createdAt" >= $2
+              AND co.status = 'paid'),
            0
          )::numeric as "monthlyRevenue",
          COALESCE(
            (SELECT COUNT(*)
-            FROM ecommerce_orders o
-            WHERE o.store_id = psl.service_store_id
-              AND o."createdAt" >= $2
-              AND o.status != 'cancelled'),
+            FROM checkout_orders co
+            WHERE co."sellerOrganizationId" = (
+              CASE
+                WHEN psl.service_type = 'cosmetics'
+                  THEN (SELECT organization_id FROM cosmetics.cosmetics_stores WHERE id = psl.service_store_id)
+                WHEN psl.service_type = 'glycopharm'
+                  THEN psl.service_store_id::uuid
+                ELSE NULL
+              END
+            )
+              AND co."createdAt" >= $2
+              AND co.status = 'paid'),
            0
          )::int as "monthlyOrders"
        FROM physical_store_links psl
@@ -306,17 +359,27 @@ export class PhysicalStoreService {
     fromISO: string,
     toISO: string,
   ): Promise<{ totalRevenue: number; totalOrders: number; services: Array<{ serviceType: string; revenue: number; orders: number }> }> {
+    // WO-O4O-STORE-KPI-DASHBOARD-CHECKOUT-ORDERS-ALIGNMENT-V1:
+    // LEFT JOIN bridge — service_type 별 organizationId resolution.
     const rows = await this.dataSource.query(
       `SELECT
          psl.service_type as "serviceType",
-         COALESCE(SUM(o."totalAmount"), 0)::numeric as revenue,
-         COUNT(o.id)::int as orders
+         COALESCE(SUM(co."totalAmount"), 0)::numeric as revenue,
+         COUNT(co.id)::int as orders
        FROM physical_store_links psl
-       LEFT JOIN ecommerce_orders o
-         ON o.store_id = psl.service_store_id
-         AND o."createdAt" >= $2
-         AND o."createdAt" < $3
-         AND o.status != 'cancelled'
+       LEFT JOIN checkout_orders co
+         ON co."sellerOrganizationId" = (
+           CASE
+             WHEN psl.service_type = 'cosmetics'
+               THEN (SELECT organization_id FROM cosmetics.cosmetics_stores WHERE id = psl.service_store_id)
+             WHEN psl.service_type = 'glycopharm'
+               THEN psl.service_store_id::uuid
+             ELSE NULL
+           END
+         )
+         AND co."createdAt" >= $2
+         AND co."createdAt" < $3
+         AND co.status = 'paid'
        WHERE psl.physical_store_id = $1
        GROUP BY psl.service_type`,
       [physicalStoreId, fromISO, toISO],
