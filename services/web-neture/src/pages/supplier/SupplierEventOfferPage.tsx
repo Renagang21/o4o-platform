@@ -33,8 +33,8 @@ const GUIDE_PAGE_KEY = 'supplier.event-offer.editor';
 const SERVICE_KEY = 'neture';
 
 // WO-O4O-EVENT-OFFER-MULTI-SERVICE-PROPOSAL-V1
+// WO-O4O-GLYCOPHARM-EVENT-OFFER-SUPPLIER-PROPOSAL-MAPPING-V1: GlycoPharm 활성화
 // 대상 서비스 선택 옵션. backend의 TARGET_TO_EVENT_OFFER_KEY와 정합.
-// GlycoPharm은 backend event offer 컨텍스트 미정의 → disabled.
 type ProposeTarget = {
   key: string;
   label: string;
@@ -44,7 +44,7 @@ type ProposeTarget = {
 const PROPOSE_TARGETS: ProposeTarget[] = [
   { key: 'kpa-society', label: 'KPA Society', enabled: true },
   { key: 'k-cosmetics', label: 'K-Cosmetics', enabled: true },
-  { key: 'glycopharm',  label: 'GlycoPharm',  enabled: false, hint: '준비 중' },
+  { key: 'glycopharm',  label: 'GlycoPharm',  enabled: true },
 ];
 
 const TARGET_LABEL: Record<string, string> = {
@@ -52,8 +52,9 @@ const TARGET_LABEL: Record<string, string> = {
   'k-cosmetics': 'K-Cosmetics',
   'glycopharm':  'GlycoPharm',
   // event-offer service keys (status display용 fallback)
-  'kpa-groupbuy':            'KPA Society',
-  'k-cosmetics-event-offer': 'K-Cosmetics',
+  'kpa-groupbuy':              'KPA Society',
+  'k-cosmetics-event-offer':   'K-Cosmetics',
+  'glycopharm-event-offer':    'GlycoPharm',
 };
 
 // WO-O4O-EVENT-OFFER-MULTI-SERVICE-PROPOSAL-V1
@@ -61,6 +62,7 @@ const TARGET_LABEL: Record<string, string> = {
 const EVENT_KEY_TO_LABEL: Record<string, string> = {
   'kpa-groupbuy':            'KPA Society',
   'k-cosmetics-event-offer': 'K-Cosmetics',
+  'glycopharm-event-offer':  'GlycoPharm',
 };
 
 const PROPOSAL_STATUS_MESSAGE: Record<string, string> = {
