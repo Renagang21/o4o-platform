@@ -476,6 +476,13 @@ export function createCheckoutController(
 
         try {
           // 6a. sales_limit 검증 (PAID 기준 + FOR UPDATE)
+          // WO-O4O-GLYCOPHARM-CHECKOUT-SALES-LIMIT-HARDENING-V1 (Track C):
+          // legacy `ecommerce_order_items JOIN ecommerce_orders` → canonical
+          // `checkout_orders + jsonb_array_elements(co.items)` (KPA kpa-checkout
+          // controller.ts:442-450 패턴 mirror). pharmacy.id = organizations.id
+          // = checkout_orders.sellerId (KPA 와 동일 — sellerId varchar100 에
+          // organization UUID 저장). status 소문자 'paid' canonical enum 정합.
+          // FOR UPDATE OF co 로 동시성 lock 의미 유지.
           if (channelMappings.length > 0) {
             const productsWithLimit = channelMappings.filter((m) => m.sales_limit !== null);
 
@@ -485,13 +492,14 @@ export function createCheckoutController(
 
               // PAID 주문만 카운트 + FOR UPDATE로 동시성 보호
               const soldResult: Array<{ sold: number }> = await queryRunner.query(
-                `SELECT COALESCE(SUM(oi.quantity), 0)::int AS sold
-                 FROM ecommerce_order_items oi
-                 JOIN ecommerce_orders o ON o.id = oi."orderId"
-                 WHERE oi."productId" = $1
-                   AND o."sellerId" = $2
-                   AND o.status = 'PAID'
-                 FOR UPDATE OF o`,
+                `SELECT COALESCE(SUM((item->>'quantity')::int), 0)::int AS sold
+                 FROM checkout_orders co,
+                      jsonb_array_elements(co.items) AS item
+                 WHERE item->>'productId' = $1
+                   AND co."sellerId" = $2
+                   AND co.status = 'paid'
+                   AND co.metadata->>'serviceKey' = 'glycopharm'
+                 FOR UPDATE OF co`,
                 [mapping.product_id, pharmacy.id]
               );
 

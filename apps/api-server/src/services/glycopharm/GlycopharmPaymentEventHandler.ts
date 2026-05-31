@@ -221,13 +221,20 @@ export class GlycopharmPaymentEventHandler {
       if (salesLimit === undefined) continue;
 
       // 현재 PAID 판매량 조회
+      // WO-O4O-GLYCOPHARM-CHECKOUT-SALES-LIMIT-HARDENING-V1 (Track C):
+      // legacy ecommerce_order_items JOIN ecommerce_orders → canonical
+      // checkout_orders + jsonb_array_elements(co.items) (KPA kpa-checkout
+      // controller.ts:442-450 패턴 mirror — payment.confirmed hook 컨텍스트
+      // 이므로 FOR UPDATE 미사용. 본 query 는 결제 후 사후 검증 — 트랜잭션
+      // 외부). serviceKey filter 추가 — cross-service 누수 차단.
       const soldResult: Array<{ sold: number }> = await this.dataSource.query(
-        `SELECT COALESCE(SUM(oi.quantity), 0)::int AS sold
-         FROM ecommerce_order_items oi
-         JOIN ecommerce_orders o ON o.id = oi."orderId"
-         WHERE oi."productId" = $1
-           AND o."sellerId" = $2
-           AND o.status = 'PAID'`,
+        `SELECT COALESCE(SUM((item->>'quantity')::int), 0)::int AS sold
+         FROM checkout_orders co,
+              jsonb_array_elements(co.items) AS item
+         WHERE item->>'productId' = $1
+           AND co."sellerId" = $2
+           AND co.status = 'paid'
+           AND co.metadata->>'serviceKey' = 'glycopharm'`,
         [item.productId, order.sellerId]
       );
 
