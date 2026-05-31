@@ -5,9 +5,11 @@
  * WO-O4O-OPERATOR-ACTION-STANDARDIZATION-V1
  */
 
-export { OperatorShell } from './OperatorShell';
+// WO-O4O-UI-OPERATOR-SHELL-COMPONENT-REMOVAL-V1:
+//   OperatorShell 컴포넌트 제거 (런타임 소비자 0 — KPA/GlycoPharm/K-Cosmetics/Neture 의
+//   operator·admin layout 이 모두 @o4o/operator-ux-core 의 OperatorAreaShell + DomainIASidebar 로 이행 완료).
+//   STANDARD_GROUPS / OperatorGroupKey / OperatorMenuItem / action 컴포넌트는 공통 자산으로 유지.
 export type {
-  OperatorShellProps,
   OperatorMenuItem,
   OperatorGroupKey,
 } from './types';
