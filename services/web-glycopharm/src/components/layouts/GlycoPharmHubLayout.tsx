@@ -26,9 +26,10 @@ const HUB_MENU: HubMenuItem[] = [
     end: true,
   },
   {
+    // WO-O4O-GLYCOPHARM-STORE-HUB-B2B-CATALOG-KPA-ALIGNMENT-V1: KPA canonical 정합
     key: 'b2b',
-    label: 'B2B 상품',
-    desc: '공급사 상품을 탐색하고 약국에 신청합니다',
+    label: '상품 카탈로그',
+    desc: '공급 가능 상품 탐색 · 내 매장에 추가',
     icon: ShoppingCart,
     to: '/store-hub/b2b',
     end: false,
