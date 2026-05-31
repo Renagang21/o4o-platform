@@ -196,6 +196,13 @@ export class GlycopharmPaymentEventHandler {
     if (items.length === 0) return null;
 
     // 해당 채널의 sales_limit 매핑 조회
+    // WO-O4O-GLYCOPHARM-PAYMENT-HOOK-SERVICEKEY-FIX-V1: GlycoPharm payment hook
+    // must scope OPL to GlycoPharm service listings (Option β).
+    // Event Offer listings included — they may carry GlycoPharm sellable items.
+    // Legacy 'kpa' literal (KPA copy 잔재 — 2026-02-16 73948d30e 도입 후 2026-04-11
+    // NormalizeKpaServiceKeys migration 누락 — IR-O4O-GLYCOPHARM-PAYMENT-HOOK-
+    // SERVICEKEY-AUDIT-V1) 제거. kpa-society 포함 여부는 후속 cross-service audit
+    // (IR-O4O-ORGANIZATION-PRODUCT-LISTINGS-SERVICEKEY-CROSSSERVICE-AUDIT-V1) 대상.
     const channelMappings: Array<{
       offer_id: string;
       sales_limit: number | null;
@@ -205,7 +212,7 @@ export class GlycopharmPaymentEventHandler {
        JOIN organization_product_listings opl ON opl.id = opc.product_listing_id
        WHERE opc.channel_id = $1
          AND opl.organization_id = $2
-         AND opl.service_key = 'kpa'
+         AND opl.service_key IN ('glycopharm', 'glycopharm-event-offer')
          AND opc.is_active = true
          AND opc.sales_limit IS NOT NULL`,
       [metadata.channelId, metadata.pharmacyId]
