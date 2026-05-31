@@ -39,6 +39,9 @@ import { createOperatorBlogController } from '../o4o-store/controllers/operator-
 import { createOperatorPopController } from '../o4o-store/controllers/operator-pop.controller.js';
 // WO-O4O-KCOSMETICS-OPERATOR-BLOG-POP-QR-BOOTSTRAP-V1: K-Cosmetics QR 운영자 write API
 import { createOperatorQrController } from '../o4o-store/controllers/operator-qr.controller.js';
+// WO-O4O-KCOS-STORE-HUB-POP-QR-PORT-V1: 매장 HUB POP/QR 가져가기(staff import) — 공유 컨트롤러 mount (GlycoPharm mirror)
+import { createStorePopStaffController } from '../o4o-store/controllers/pop.controller.js';
+import { createStoreQrStaffController } from '../o4o-store/controllers/qr.controller.js';
 import { createProductMarketingController } from '../o4o-store/controllers/product-marketing.controller.js';
 import { createAssetSnapshotController } from '../o4o-store/controllers/asset-snapshot.controller.js';
 import { createStoreAssetControlController } from '../o4o-store/controllers/store-asset-control.controller.js';
@@ -180,6 +183,13 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
     '/operator/qr',
     createOperatorQrController(dataSource, coreRequireAuth as any, 'cosmetics'),
   );
+
+  // WO-O4O-KCOS-STORE-HUB-POP-QR-PORT-V1: 매장 HUB POP/QR 가져가기 (staff import)
+  //   /api/v1/cosmetics/stores/:slug/pop/staff/import (운영자 HUB POP → store_pops 사본)
+  //   /api/v1/cosmetics/stores/:slug/qr/staff/import  (운영자 HUB QR  → store_qr_codes 사본)
+  //   GlycoPharm/KPA 와 동일한 o4o-store 공통 컨트롤러를 serviceKey='cosmetics' 로 mount (신규 API 아님).
+  router.use('/stores', createStorePopStaffController(dataSource, coreRequireAuth as any, 'cosmetics'));
+  router.use('/stores', createStoreQrStaffController(dataSource, coreRequireAuth as any, 'cosmetics'));
 
   // Store Analytics (internal: /pharmacy/analytics/*)
   // WO-O4O-STORE-OWNER-BACKCOMPAT-CALLERS-MIGRATION-V1: serviceKey='cosmetics' 명시 (canonical)

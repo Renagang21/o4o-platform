@@ -59,18 +59,21 @@ const HUB_MENU: HubMenuItem[] = [
     end: false,
   },
   {
+    // WO-O4O-KCOS-STORE-HUB-POP-QR-PORT-V1: 준비 중 → 실제 페이지 연결 (KPA/GlycoPharm canonical)
     key: 'pop',
     label: 'POP',
-    desc: '매장용 POP 자료를 탐색합니다',
+    desc: '운영자 POP 자료를 탐색하고 내 매장에 가져갑니다',
     icon: Megaphone,
-    badge: '준비 중',
+    to: '/store-hub/pop',
+    end: false,
   },
   {
     key: 'qr',
     label: 'QR 코드',
-    desc: 'QR 코드 자료를 탐색합니다',
+    desc: 'QR 자료를 탐색하고 내 매장에 가져갑니다',
     icon: QrCode,
-    badge: '준비 중',
+    to: '/store-hub/qr',
+    end: false,
   },
   {
     key: 'event-offers',

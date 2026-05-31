@@ -78,6 +78,9 @@ const HubSignagePage = lazy(() => import('@/pages/hub/HubSignagePage').then(m =>
 const HubEventOffersPage = lazy(() => import('@/pages/hub/HubEventOffersPage').then(m => ({ default: m.HubEventOffersPage })));
 // WO-O4O-STORE-HUB-CROSS-SERVICE-COMMONIZATION-PHASE1-V1
 const HubBlogLibraryPage = lazy(() => import('@/pages/hub/HubBlogLibraryPage').then(m => ({ default: m.HubBlogLibraryPage })));
+// WO-O4O-KCOS-STORE-HUB-POP-QR-PORT-V1: 매장 HUB POP/QR 가져가기 페이지
+const HubPopLibraryPage = lazy(() => import('@/pages/hub/HubPopLibraryPage').then(m => ({ default: m.HubPopLibraryPage })));
+const HubQrLibraryPage = lazy(() => import('@/pages/hub/HubQrLibraryPage').then(m => ({ default: m.HubQrLibraryPage })));
 
 // Forum Pages
 const ForumHubPage = lazy(() => import('@/pages/forum').then(m => ({ default: m.ForumHubPage })));
@@ -519,6 +522,9 @@ function AppRoutes() {
           <Route path="signage" element={<HubSignagePage />} />
           {/* WO-O4O-STORE-HUB-CROSS-SERVICE-COMMONIZATION-PHASE1-V1: 블로그 탭 추가 */}
           <Route path="blog" element={<HubBlogLibraryPage />} />
+          {/* WO-O4O-KCOS-STORE-HUB-POP-QR-PORT-V1: POP/QR 가져가기 (KPA/GlycoPharm canonical) */}
+          <Route path="pop" element={<HubPopLibraryPage />} />
+          <Route path="qr" element={<HubQrLibraryPage />} />
           <Route path="event-offers" element={<HubEventOffersPage />} />
         </Route>
 
