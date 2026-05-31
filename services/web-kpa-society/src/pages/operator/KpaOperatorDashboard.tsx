@@ -3,47 +3,50 @@
  *
  * WO-O4O-OPERATOR-UX-KPA-A-PILOT-V1:
  *   @o4o/operator-ux-core 기반 5-Block 구조로 전환.
- *   "콘텐츠 흐름형" — Activity Log + Quick Actions 강조.
- *
- * WO-O4O-KPA-A-ADMIN-ROLE-SPLIT-V1:
- *   Admin/Operator 역할별 UI 차등 적용.
- *   5-Block 구조 유지, Adapter 레벨에서 역할 분기.
  *
  * WO-O4O-OPERATOR-KPA-MIGRATION-V1:
  *   Config builder를 operatorConfig.ts로 분리.
- *   Dashboard 컴포넌트는 fetch + state + render만 담당.
  *
- * Block 구조:
- *  [1] KPI Grid       — 콘텐츠, 포럼, 사이니지, 가입대기 (+Admin: 회원수, 서비스신청)
- *  [2] AI Summary     — 상태 기반 인사이트 (LLM 미호출)
- *  [3] Action Queue   — 즉시 처리 항목 (+Admin: 권한요청, 정책점검)
- *  [4] Activity Log   — 최근 콘텐츠/포럼/사이니지 활동 (핵심)
- *  [5] Quick Actions  — Hub 기능 흡수 (+Admin: 회원관리, 서비스승인, 정책설정)
+ * WO-O4O-KPA-OPERATOR-DASHBOARD-FRONTEND-ADAPTER-V1:
+ *   IR-O4O-KPA-OPERATOR-DASHBOARD-API-5BLOCK-UNIFICATION-V1 (Option B) Adapter.
+ *   신규 backend /operator/dashboard endpoint 의 OperatorDashboardConfig pass-through 사용.
+ *   기존 7 fetch → 2 fetch (dashboard + storeStats — AxisNavigation 의 '등록 매장' metric 용).
+ *   isAdmin role-aware 응답은 backend 가 처리 (KPI/AI/Action/QuickActions 분기 backend 측).
+ *   AxisNavigation + OperatorRoleGuideCard 는 frontend 유지 (I3 + I1 정합).
  *
- * WO-KPA-A-OPERATOR-DASHBOARD-REFINE-V1:
- *   KPA-a 운영 업무 기준 5-Block 정비. 상품 신청 fetch 추가.
+ * Block 구조 (backend 반환):
+ *  [1] KPI Grid       — backend kpis
+ *  [2] AI Summary     — backend aiSummary (rule-based, LLM 미호출)
+ *  [3] Action Queue   — backend actionQueue
+ *  [4] Activity Log   — backend activityLog
+ *  [5] Quick Actions  — backend quickActions
  *
- * API 재사용: operatorApi.getSummary() + apiClient (members, product-applications)
+ * Frontend 추가 요소:
+ *  - OperatorRoleGuideCard (static, KPA only)
+ *  - AxisNavigationSection (kpis 에서 metrics 파생 + storeStats 의 totalStores 만 별도 fetch)
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { OperatorDashboardLayout, type OperatorDashboardConfig } from '@o4o/operator-ux-core';
+import {
+  OperatorDashboardLayout,
+  type OperatorDashboardConfig,
+  type KpiItem,
+} from '@o4o/operator-ux-core';
 import { AxisNavigationSection, type OperatorAxisGroup } from '@o4o/operator-core-ui';
 import { operatorApi } from '../../api/operator';
-import { apiClient } from '../../api/client';
-import { useAuth, getAccessToken } from '../../contexts/AuthContext';
-import { ROLES } from '../../lib/role-constants';
-import { buildKpaOperatorConfig, type KpaExtendedData } from './operatorConfig';
+import { getAccessToken } from '../../contexts/AuthContext';
 
 const PLATFORM_API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 
-export default function KpaOperatorDashboard() {
-  const { user } = useAuth();
-  const isAdmin = user?.roles?.includes(ROLES.KPA_ADMIN) ?? false;
+interface StoreStats {
+  totalStores: number;
+  activeStores: number;
+}
 
+export default function KpaOperatorDashboard() {
   const [config, setConfig] = useState<OperatorDashboardConfig | null>(null);
-  const [extData, setExtData] = useState<KpaExtendedData | null>(null);
+  const [storeStats, setStoreStats] = useState<StoreStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -51,67 +54,44 @@ export default function KpaOperatorDashboard() {
     setLoading(true);
     setError(null);
     try {
-      // Promise.allSettled: 개별 실패로 전체가 중단되지 않음
+      // WO-O4O-KPA-OPERATOR-DASHBOARD-FRONTEND-ADAPTER-V1:
+      //   기본 dashboard 1 fetch + AxisNavigation '등록 매장' metric 용 storeStats 1 보조 fetch
+      //   (backend dashboard response 에 totalStores 미포함 — Foundation WO 정합 유지).
+      //   Promise.allSettled 로 개별 실패 격리.
       const token = getAccessToken();
       const storeHeaders: HeadersInit = {
         'Content-Type': 'application/json',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       };
-      const fetches: Promise<any>[] = [
-        operatorApi.getSummary(),
-        apiClient.get('/members', { status: 'pending', pageSize: 1 }),
-        apiClient.get('/pharmacy-requests/pending', { limit: 1 }),
-        // WO-O4O-STORE-HUB-OPERATOR-INTEGRATION-V1: Store stats
-        // WO-O4O-OPERATOR-CONSOLE-SERVICEKEY-ALIGNMENT-V1: serviceKey 명시 (F6 Boundary Policy platform admin 400 차단).
-        fetch(`${PLATFORM_API_BASE}/api/v1/operator/stores?limit=1&serviceKey=kpa-society`, { headers: storeHeaders }).then(r => r.ok ? r.json() : null),
-        // WO-KPA-A-OPERATOR-DASHBOARD-REFINE-V1: 상품 신청 통계
-        apiClient.get('/operator/product-applications/stats'),
-      ];
-      // WO-O4O-KPA-A-ADMIN-ROLE-SPLIT-V1: Admin용 추가 데이터 fetch
-      if (isAdmin) {
-        fetches.push(
-          apiClient.get('/members', { pageSize: 1 }),
-          apiClient.get('/organization-join-requests/pending', { limit: 1 }),
-        );
-      }
 
-      const results = await Promise.allSettled(fetches);
+      const results = await Promise.allSettled([
+        operatorApi.getDashboard(),
+        // WO-O4O-OPERATOR-CONSOLE-SERVICEKEY-ALIGNMENT-V1: serviceKey 명시 (F6 Boundary Policy)
+        fetch(`${PLATFORM_API_BASE}/api/v1/operator/stores?limit=1&serviceKey=kpa-society`, { headers: storeHeaders })
+          .then((r) => (r.ok ? r.json() : null)),
+      ]);
 
-      const summaryRes = results[0].status === 'fulfilled' ? results[0].value : null;
-      const membersRes = results[1].status === 'fulfilled' ? results[1].value : null;
-      const pharmacyReqRes = results[2].status === 'fulfilled' ? results[2].value : null;
-      const storeRes = results[3].status === 'fulfilled' ? results[3].value : null;
-      const productAppStatsRes = results[4].status === 'fulfilled' ? results[4].value : null;
-      const totalMembersRes = isAdmin && results[5]?.status === 'fulfilled' ? results[5].value : null;
-      const serviceAppsRes = isAdmin && results[6]?.status === 'fulfilled' ? results[6].value : null;
+      const dashRes = results[0].status === 'fulfilled' ? results[0].value : null;
+      const storeRes = results[1].status === 'fulfilled' ? results[1].value : null;
 
-      // Log individual failures
       results.forEach((r, i) => {
         if (r.status === 'rejected') {
           console.error(`[KPA-a Dashboard] fetch[${i}] failed:`, r.reason);
         }
       });
 
-      const extData: KpaExtendedData = {
-        summary: summaryRes?.data ?? null,
-        pendingMembers: (membersRes as any)?.total ?? (membersRes as any)?.data?.total ?? 0,
-        totalMembers: (totalMembersRes as any)?.total ?? (totalMembersRes as any)?.data?.total ?? 0,
-        serviceApplicationCount: (serviceAppsRes as any)?.data?.pagination?.total ?? 0,
-        pharmacyRequestCount: (pharmacyReqRes as any)?.data?.pagination?.total ?? 0,
-        // WO-O4O-STORE-HUB-OPERATOR-INTEGRATION-V1
-        storeStats: storeRes?.stats ?? null,
-        // WO-KPA-A-OPERATOR-DASHBOARD-REFINE-V1: 상품 신청 대기
-        productApplicationPendingCount: (productAppStatsRes as any)?.data?.pending ?? 0,
-      };
-
-      setExtData(extData);
-      setConfig(buildKpaOperatorConfig(extData, isAdmin));
+      if (!dashRes?.data) {
+        setError('운영자 권한이 필요하거나 데이터를 불러올 수 없습니다.');
+      } else {
+        setConfig(dashRes.data);
+        setStoreStats((storeRes as any)?.stats ?? null);
+      }
     } catch (err) {
       console.error('Failed to fetch operator dashboard:', err);
       setError('데이터를 불러오지 못했습니다.');
     }
     setLoading(false);
-  }, [isAdmin]);
+  }, []);
 
   useEffect(() => {
     fetchData();
@@ -139,25 +119,44 @@ export default function KpaOperatorDashboard() {
     );
   }
 
-  const axes: OperatorAxisGroup[] = extData ? buildKpaAxes(extData) : [];
+  const axes = buildKpaAxesFromConfig(config, storeStats);
 
   return (
     <div className="space-y-6">
-      {/* WO-O4O-KPA-OPERATOR-DASHBOARD-GUIDE-CARD-V1: 운영 철학 카드 */}
+      {/* WO-O4O-KPA-OPERATOR-DASHBOARD-GUIDE-CARD-V1: 운영 철학 카드 (KPA only, frontend static) */}
       <OperatorRoleGuideCard />
-      {/* WO-O4O-OPERATOR-DASHBOARD-COMMUNITY-STORE-HUB-SPLIT-V1: 2축 운영 네비게이션 */}
+      {/* WO-O4O-OPERATOR-DASHBOARD-COMMUNITY-STORE-HUB-SPLIT-V1: 2축 운영 네비게이션 (frontend 유지 — I3 정합) */}
       {axes.length > 0 && <AxisNavigationSection axes={axes} />}
       <OperatorDashboardLayout config={config} />
     </div>
   );
 }
 
-// ─── KPA axes 생성 ────────────────────────────────────────────
+// ─── KPA axes 생성 (backend dashboard config 에서 metrics 파생) ────────────────
+// WO-O4O-KPA-OPERATOR-DASHBOARD-FRONTEND-ADAPTER-V1:
+//   기존 buildKpaAxes(extData) 는 8개의 source 필드를 사용했으나, Adapter 단계에서는
+//   dashboardConfig.kpis (key 매칭) 5개 + storeStats.totalStores 1개로 파생.
+//   축 자체의 title/description/icon/tone/links 는 frontend static 유지 (I3 정합).
 
-function buildKpaAxes(extData: KpaExtendedData): OperatorAxisGroup[] {
-  const forumPending = extData.summary?.forum?.pendingRequests ?? 0;
-  const contentPending = extData.summary?.content?.pendingDraft ?? 0;
-  const totalStores = extData.storeStats?.totalStores ?? 0;
+function getKpiValue(kpis: KpiItem[], key: string): number {
+  const item = kpis.find((k) => k.key === key);
+  if (!item) return 0;
+  const v = item.value;
+  if (typeof v === 'number') return v;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function buildKpaAxesFromConfig(
+  config: OperatorDashboardConfig,
+  storeStats: StoreStats | null,
+): OperatorAxisGroup[] {
+  const pendingMembers = getKpiValue(config.kpis, 'pending');
+  const forumPending = getKpiValue(config.kpis, 'forum');
+  const contentPending = getKpiValue(config.kpis, 'content');
+  const productApplicationPending = getKpiValue(config.kpis, 'product-applications');
+  const pharmacyRequest = getKpiValue(config.kpis, 'pharmacy-requests');
+  const totalStores = storeStats?.totalStores ?? 0;
 
   return [
     {
@@ -167,7 +166,7 @@ function buildKpaAxes(extData: KpaExtendedData): OperatorAxisGroup[] {
       icon: '💬',
       tone: 'blue',
       metrics: [
-        { label: '회원 승인', value: extData.pendingMembers, href: '/operator/members', warn: extData.pendingMembers > 0 },
+        { label: '회원 승인', value: pendingMembers, href: '/operator/members', warn: pendingMembers > 0 },
         { label: '포럼 요청', value: forumPending, href: '/operator/forum-management', warn: forumPending > 0 },
         { label: '콘텐츠 대기', value: contentPending, href: '/operator/content', warn: contentPending > 0 },
       ],
@@ -184,8 +183,8 @@ function buildKpaAxes(extData: KpaExtendedData): OperatorAxisGroup[] {
       icon: '🏪',
       tone: 'emerald',
       metrics: [
-        { label: '상품 신청', value: extData.productApplicationPendingCount, href: '/operator/product-applications', warn: extData.productApplicationPendingCount > 0 },
-        { label: '약국 서비스', value: extData.pharmacyRequestCount, href: '/operator/pharmacy-requests', warn: extData.pharmacyRequestCount > 0 },
+        { label: '상품 신청', value: productApplicationPending, href: '/operator/product-applications', warn: productApplicationPending > 0 },
+        { label: '약국 서비스', value: pharmacyRequest, href: '/operator/pharmacy-requests', warn: pharmacyRequest > 0 },
         { label: '등록 매장', value: totalStores, href: '/operator/stores', warn: false },
       ],
       links: [
@@ -198,11 +197,7 @@ function buildKpaAxes(extData: KpaExtendedData): OperatorAxisGroup[] {
 }
 
 // ─── 운영 철학 가이드 카드 ─────────────────────────────────────────────────────
-// WO-O4O-KPA-OPERATOR-DASHBOARD-GUIDE-CARD-V1:
-// Dashboard 진입 직후 "운영자는 무엇을 하는 사람인가" 를 전달. 기존 5-Block /
-// AxisNavigationSection 의 카드 문법 재사용 (bg-white rounded-xl + p-5 + emoji
-// icon + title + 설명 + Link). 모바일 1열 자동 stack. 색조 indigo — 기존
-// blue (커뮤니티 운영) / emerald (매장 HUB 운영) 와 시각적으로 구분.
+// WO-O4O-KPA-OPERATOR-DASHBOARD-GUIDE-CARD-V1: KPA only static. frontend 유지 (I1 정합).
 
 function OperatorRoleGuideCard() {
   return (

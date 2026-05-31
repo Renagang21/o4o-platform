@@ -2,9 +2,14 @@
  * Operator API - KPA Society
  *
  * 운영자 실사용 화면 1단계: 대시보드 요약 API
+ *
+ * WO-O4O-KPA-OPERATOR-DASHBOARD-FRONTEND-ADAPTER-V1:
+ *   getDashboard() 추가 — 신규 backend /operator/dashboard 5-Block endpoint 호출.
+ *   기존 getSummary() 는 호환성 유지 (다른 사용처가 있을 수 있음).
  */
 
 import { apiClient } from './client';
+import type { OperatorDashboardConfig } from '@o4o/operator-ux-core';
 
 // Content summary item
 interface ContentItem {
@@ -145,9 +150,19 @@ interface DistrictOperatorSummaryResponse {
   data: DistrictOperatorSummary;
 }
 
+// WO-O4O-KPA-OPERATOR-DASHBOARD-FRONTEND-ADAPTER-V1
+interface OperatorDashboardResponse {
+  success: boolean;
+  data: OperatorDashboardConfig;
+}
+
 export const operatorApi = {
   getSummary: () =>
     apiClient.get<OperatorSummaryResponse>('/operator/summary'),
+
+  // WO-O4O-KPA-OPERATOR-DASHBOARD-FRONTEND-ADAPTER-V1
+  getDashboard: () =>
+    apiClient.get<OperatorDashboardResponse>('/operator/dashboard'),
 
   getForumAnalytics: () =>
     apiClient.get<ForumAnalyticsResponse>('/operator/forum-analytics'),
