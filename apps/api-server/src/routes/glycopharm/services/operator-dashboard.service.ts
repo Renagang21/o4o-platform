@@ -18,12 +18,18 @@ import {
   buildAuditActivityItems,
   mergeActivityLog,
 } from '../../../utils/operator-dashboard-queries.js';
+// WO-O4O-GLYCOPHARM-OPERATOR-DASHBOARD-EVENT-OFFER-ACTION-QUEUE-V1
+import { EventOfferService } from '../../kpa/services/event-offer.service.js';
+import { SERVICE_KEYS } from '../../../constants/service-keys.js';
 
 export async function buildGlycoPharmDashboardConfig(
   dataSource: DataSource,
   userId: string
 ): Promise<OperatorDashboardConfig> {
   const productRepo = dataSource.getRepository(GlycopharmProduct);
+
+  // WO-O4O-GLYCOPHARM-OPERATOR-DASHBOARD-EVENT-OFFER-ACTION-QUEUE-V1
+  const eventOfferService = new EventOfferService(dataSource);
 
   // === Parallel data fetch (service-specific + shared audit) ===
   // WO-O4O-GLYCOPHARM-CARE-DEAD-CODE-REMOVAL-V1: care/patient_health_profiles 쿼리 제거
@@ -33,6 +39,7 @@ export async function buildGlycoPharmDashboardConfig(
     activeProducts,
     draftProducts,
     recentAuditActions,
+    eventOfferPending,
   // WO-O4O-DASHBOARD-QUERY-STABILITY-V1: individual .catch() per query
   ] = await Promise.all([
     dataSource.query(`
@@ -46,6 +53,9 @@ export async function buildGlycoPharmDashboardConfig(
     productRepo.count({ where: { status: 'active' } }).catch((e) => { logger.warn('[GlycoPharmDashboard] activeProducts failed:', e.message); return 0; }),
     productRepo.count({ where: { status: 'draft' } }).catch((e) => { logger.warn('[GlycoPharmDashboard] draftProducts failed:', e.message); return 0; }),
     fetchRecentAuditActions(dataSource, 'glycopharm').catch((e) => { logger.warn('[GlycoPharmDashboard] auditActions failed:', e.message); return []; }),
+    // WO-O4O-GLYCOPHARM-OPERATOR-DASHBOARD-EVENT-OFFER-ACTION-QUEUE-V1
+    eventOfferService.countPendingListings(SERVICE_KEYS.GLYCOPHARM_EVENT_OFFER)
+      .catch((e) => { logger.warn('[GlycoPharmDashboard] eventOfferPending failed:', e.message); return 0; }),
   ]);
 
   const activePharmacies = pharmacyCounts.find(r => r.is_active === true)?.cnt || 0;
@@ -67,9 +77,20 @@ export async function buildGlycoPharmDashboardConfig(
   const aiSummary = generateRuleBasedInsights('glycopharm', copilotMetrics);
 
   // Block 3: Action Queue
+  // WO-O4O-GLYCOPHARM-OPERATOR-DASHBOARD-EVENT-OFFER-ACTION-QUEUE-V1:
+  //   공급자(Neture) 가 GlycoPharm 에 제안한 이벤트 오퍼 승인 대기.
+  //   pending > 0 일 때만 노출. link 는 기존 /operator/event-offers route.
   const actionQueue: ActionItem[] = [
     { id: 'draft-products', label: '임시저장 상품', count: draftProducts, link: '/operator/products?status=draft' },
   ];
+  if (eventOfferPending > 0) {
+    actionQueue.push({
+      id: 'event-offer-pending',
+      label: '이벤트 오퍼 승인 대기',
+      count: eventOfferPending,
+      link: '/operator/event-offers',
+    });
+  }
 
   // Block 4: Activity Log
   const activityLog = mergeActivityLog(

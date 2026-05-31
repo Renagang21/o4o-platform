@@ -1199,6 +1199,24 @@ export class EventOfferService {
   }
 
   /**
+   * COUNT pending listings — operator dashboard Action Queue 등에서 count 만 필요할 때.
+   *
+   * WO-O4O-GLYCOPHARM-OPERATOR-DASHBOARD-EVENT-OFFER-ACTION-QUEUE-V1
+   *   listPendingListings 가 list + total 을 함께 반환하므로 count-only 호출 시
+   *   불필요한 list query 가 실행됨 → count-only 메서드 분리.
+   * status='pending' AND service_key 필터.
+   */
+  async countPendingListings(serviceKey: string): Promise<number> {
+    const rows = await this.dataSource.query(
+      `SELECT COUNT(*)::int AS total
+       FROM organization_product_listings opl
+       WHERE opl.service_key = $1 AND opl.status = 'pending'`,
+      [serviceKey],
+    );
+    return rows[0]?.total ?? 0;
+  }
+
+  /**
    * GET pending listings — operator approval queue
    * status='pending' AND service_key 필터.
    */
