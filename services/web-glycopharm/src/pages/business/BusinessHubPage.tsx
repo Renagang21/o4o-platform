@@ -52,7 +52,7 @@ const ENTRY_CARDS: { icon: typeof Activity; title: string; desc: string; to: str
     icon: ListChecks,
     title: '사전 준비 체크리스트',
     desc: '무료혈당기 사업, 표시물·CI, 제품 등록, 약관·정책, 테스트 약국 환경 등 가입자 모집 전 준비 항목을 확인합니다.',
-    to: '/business/bloodcare#prep-checklist',
+    to: '/business/preparation',
   },
 ];
 

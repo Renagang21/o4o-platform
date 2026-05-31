@@ -26,7 +26,6 @@ import {
   Truck,
   Building2,
   HeartHandshake,
-  CheckCircle2,
   ArrowRight,
 } from 'lucide-react';
 
@@ -158,23 +157,6 @@ const PARTICIPANTS: { icon: typeof Users; title: string; desc: string; checks: s
     desc: '사업 준비, 안내문 검토, 콘텐츠 정리, 참여 약국 확대, 사업 운영 지원 등에 참여할 수 있습니다.',
     checks: ['사업 검토', '콘텐츠 정리 지원', '참여 약국 확대 지원', '외부 협력 사업 검토'],
   },
-];
-
-const NEXT_CHECKLIST = [
-  '무료혈당기 서비스 구성 범위',
-  '무료혈당기 CI 및 약국 부착물 제작 범위',
-  'B2B 전자상거래 등록 제품',
-  '서비스별 등록 제품',
-  '판매자 모집 방식',
-  '이벤트 오퍼 준비 방식',
-  '이용약관',
-  '개인정보처리방침',
-  '무료혈당기 사업 참여 안내',
-  '혈당관리 지원약국 참여 약관',
-  '테스트 약국 아이디 구성',
-  '초기 홍보 및 가입자 모집 방식',
-  '설문조사 주제',
-  'Market Trial 기반 제품 개발 후보',
 ];
 
 export default function BloodCareBusinessStatusPage() {
@@ -487,17 +469,32 @@ export default function BloodCareBusinessStatusPage() {
           </div>
         </section>
 
-        {/* 6. 다음 확인 사항 */}
+        {/* 6. 다음 확인 사항 — 요약 + CTA
+            WO-O4O-GLYCOPHARM-BUSINESS-PREPARATION-PAGE-SPLIT-V1: 상세는 /business/preparation 로 분리.
+            anchor(#prep-checklist)는 /business 허브·기존 링크 호환 위해 유지. */}
         <section id="prep-checklist" className="scroll-mt-20">
           <h2 className="text-lg font-bold text-slate-800 mb-1">다음 확인 사항</h2>
           <p className="text-sm text-slate-500 mb-6">사전 준비 단계에서 함께 점검할 항목입니다.</p>
-          <div className="bg-white rounded-xl border border-slate-100 shadow-sm divide-y divide-slate-100">
-            {NEXT_CHECKLIST.map((item) => (
-              <div key={item} className="flex items-center gap-3 px-6 py-4">
-                <CheckCircle2 className="w-5 h-5 text-slate-300 flex-shrink-0" />
-                <span className="text-sm text-slate-700">{item}</span>
+
+          <div className="bg-white rounded-xl border border-primary-100 shadow-sm p-6">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center flex-shrink-0">
+                  <ClipboardList className="w-5 h-5 text-primary-600" />
+                </div>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  가입자 모집 전에 준비해야 할 항목은 사전 준비 페이지에서 한곳에 정리합니다.
+                  무료혈당기 사업, 표시물·CI, 제품 등록, 약관·정책, 약국 HUB 콘텐츠, 테스트 약국 환경을 함께 확인합니다.
+                </p>
               </div>
-            ))}
+              <Link
+                to="/business/preparation"
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-primary-600 text-white text-sm font-medium hover:bg-primary-700 transition-colors shadow-sm flex-shrink-0"
+              >
+                사전 준비 자세히 보기
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
           </div>
         </section>
       </div>
