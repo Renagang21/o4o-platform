@@ -192,13 +192,14 @@ export default function BloodCareBusinessStatusPage() {
                   <ClipboardList className="w-4 h-4" />
                   사전 준비 항목 보기
                 </Link>
-                <a
-                  href="#discussion-board"
+                {/* WO-O4O-GLYCOPHARM-BUSINESS-FORUM-LINK-PAGE-V1: 사업 논의 진입 페이지로 정렬 */}
+                <Link
+                  to="/business/forum"
                   className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-white border border-slate-200 text-slate-700 text-sm font-medium hover:bg-slate-50 transition-colors"
                 >
                   <MessageSquare className="w-4 h-4" />
                   사업 논의 게시판 보기
-                </a>
+                </Link>
                 <Link
                   to="/forum/write"
                   className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-white border border-slate-200 text-slate-700 text-sm font-medium hover:bg-slate-50 transition-colors"
@@ -342,7 +343,7 @@ export default function BloodCareBusinessStatusPage() {
                 </div>
                 <div className="flex flex-col sm:flex-row flex-wrap gap-2 lg:flex-shrink-0">
                   <Link
-                    to="/forum/posts"
+                    to="/business/forum"
                     className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-primary-600 text-white text-sm font-medium hover:bg-primary-700 transition-colors"
                   >
                     전체 게시판 보기
@@ -356,7 +357,7 @@ export default function BloodCareBusinessStatusPage() {
                     새 의견 작성
                   </Link>
                   <Link
-                    to="/forum/posts"
+                    to="/business/forum"
                     className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-white border border-slate-200 text-slate-700 text-sm font-medium hover:bg-slate-50 transition-colors"
                   >
                     <Megaphone className="w-4 h-4" />

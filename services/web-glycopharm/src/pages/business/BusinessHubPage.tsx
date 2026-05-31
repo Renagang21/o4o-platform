@@ -40,7 +40,7 @@ const ENTRY_CARDS: { icon: typeof Activity; title: string; desc: string; to: str
     icon: MessageSquare,
     title: '사업 논의 게시판',
     desc: '사업 준비와 진행 과정에서 필요한 의견을 남기고 확인하는 공간입니다.',
-    to: '/forum/posts',
+    to: '/business/forum',
   },
   {
     icon: PackageOpen,
@@ -103,7 +103,7 @@ export default function BusinessHubPage() {
               혈당관리 사업 추진 현황 보기
             </Link>
             <Link
-              to="/forum/posts"
+              to="/business/forum"
               className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-white border border-slate-200 text-slate-700 text-sm font-medium hover:bg-slate-50 transition-colors"
             >
               <MessageSquare className="w-4 h-4" />

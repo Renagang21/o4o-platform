@@ -288,7 +288,7 @@ export default function BusinessPreparationPage() {
               { icon: Activity, label: '혈당관리 약국 사업 추진 현황', to: '/business/bloodcare' },
               { icon: PackageOpen, label: '제품 등록 및 공급자 협의 준비', to: '/business/products' },
               { icon: ArrowLeft, label: '사업 진행 허브', to: '/business' },
-              { icon: MessageSquare, label: '사업 논의 게시판', to: '/forum/posts' },
+              { icon: MessageSquare, label: '사업 논의 게시판', to: '/business/forum' },
             ].map((link) => {
               const Icon = link.icon;
               return (

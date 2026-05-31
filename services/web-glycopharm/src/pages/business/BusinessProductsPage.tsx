@@ -268,7 +268,7 @@ export default function BusinessProductsPage() {
               </div>
               <p className="text-sm font-semibold text-slate-800 mt-3">사업 진행 허브</p>
             </Link>
-            <Link to="/forum/posts" className="group block rounded-xl p-5 bg-white border border-slate-100 shadow-sm hover:border-primary-200 transition-colors">
+            <Link to="/business/forum" className="group block rounded-xl p-5 bg-white border border-slate-100 shadow-sm hover:border-primary-200 transition-colors">
               <div className="flex items-center justify-between">
                 <MessageSquare className="w-5 h-5 text-slate-600" />
                 <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-primary-500 transition-colors" />
