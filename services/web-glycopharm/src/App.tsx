@@ -55,6 +55,8 @@ const ServiceDashboardPage = lazy(() => import('@/pages/service/ServiceDashboard
 const ContactPage = lazy(() => import('@/pages/ContactPage'));
 // WO-O4O-GLYCOPHARM-BLOODCARE-BUSINESS-STATUS-PAGE-V1: 혈당관리 약국 사업 추진 현황
 const BloodCareBusinessStatusPage = lazy(() => import('@/pages/business/BloodCareBusinessStatusPage'));
+// WO-O4O-GLYCOPHARM-BUSINESS-HUB-ROUTE-AND-PAGE-V1: 사업 진행 허브 (/business)
+const BusinessHubPage = lazy(() => import('@/pages/business/BusinessHubPage'));
 // WO-O4O-GLYCOPHARM-REGISTER-MODAL-ENTRY-FIX-V1: RegisterPage 제거 — RegisterFlowModal 로 단일화
 const RoleSelectPage = lazy(() => import('@/pages/auth/RoleSelectPage'));
 
@@ -571,6 +573,8 @@ function AppRoutes() {
           </RoleGuard>
         } />
         <Route path="contact" element={<ContactPage />} />
+        {/* WO-O4O-GLYCOPHARM-BUSINESS-HUB-ROUTE-AND-PAGE-V1: 사업 진행 허브 (공개) */}
+        <Route path="business" element={<BusinessHubPage />} />
         {/* WO-O4O-GLYCOPHARM-BLOODCARE-BUSINESS-STATUS-PAGE-V1: 혈당관리 약국 사업 추진 현황 (공개) */}
         <Route path="business/bloodcare" element={<BloodCareBusinessStatusPage />} />
         {/* WO-O4O-GLYCOPHARM-MENU-CANONICAL-ALIGN-V1: 모바일 약국 경영 허브 */}

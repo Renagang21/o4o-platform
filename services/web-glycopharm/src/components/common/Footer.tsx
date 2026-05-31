@@ -47,7 +47,7 @@ export default function Footer() {
               </li>
               {/* WO-O4O-GLYCOPHARM-BLOODCARE-BUSINESS-STATUS-PAGE-V1 */}
               <li>
-                <NavLink to="/business/bloodcare" className="text-sm hover:text-white transition-colors">
+                <NavLink to="/business" className="text-sm hover:text-white transition-colors">
                   혈당관리 약국 사업
                 </NavLink>
               </li>
