@@ -3,39 +3,32 @@
  *
  * WO-O4O-ROLE-ROUTE-ISOLATION-V1
  * WO-O4O-GLOBAL-LAYOUT-UNIFICATION-V1: GlobalHeader 추가, OperatorShell 헤더 제거
- *
- * operator 전용 레이아웃. adminOnly 항목 제외.
- * GlobalHeader(Layer A) + OperatorShell Sidebar(Layer C) 구조.
+ * WO-O4O-NETURE-OPERATOR-SIDEBAR-LAYOUT-MIGRATION-V1:
+ *   legacy OperatorShell(flat sidebar) → @o4o/operator-ux-core 의 OperatorAreaShell + DomainIASidebar 이행.
+ *   Neture 전용 4-domain IA(NETURE_OPERATOR_DOMAIN_IA) 를 domainIAConfig 로 주입.
+ *   NetureGlobalHeader 는 header slot 으로 유지. operator 전용(adminOnly 제외) 정책 보존 —
+ *   filterMenuByRole(UNIFIED_MENU, false). footer 는 제거 (KPA/GlycoPharm/K-Cosmetics operator 정합).
  */
 
-import { Outlet, useNavigate } from 'react-router-dom';
-import { OperatorShell } from '@o4o/ui';
-import { useAuth } from '../../contexts/AuthContext';
+import { OperatorAreaShell } from '@o4o/operator-ux-core';
 import { ENABLED_CAPABILITIES } from '../../config/operatorCapabilities';
-import { UNIFIED_MENU, filterMenuByRole } from '../../config/operatorMenuGroups';
+import {
+  UNIFIED_MENU,
+  filterMenuByRole,
+  NETURE_OPERATOR_DOMAIN_IA,
+} from '../../config/operatorMenuGroups';
 import { NetureGlobalHeader } from '../NetureGlobalHeader';
 
 export default function OperatorLayoutWrapper() {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-
+  // operator sidebar 는 operator-scope 메뉴만 (admin 항목은 AdminLayoutWrapper 별도) — isAdmin=false 보존.
   const menuItems = filterMenuByRole(UNIFIED_MENU, false);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <NetureGlobalHeader />
-      <OperatorShell
-        serviceName="Neture"
-        menuItems={menuItems}
-        capabilities={ENABLED_CAPABILITIES}
-        dashboardLink="/operator"
-        user={user ? { name: user.name || '', email: user.email } : null}
-        onLogout={() => { logout(); navigate('/'); }}
-        renderHeader={() => null}
-        sidebarTopOffset="top-20"
-      >
-        <Outlet />
-      </OperatorShell>
-    </div>
+    <OperatorAreaShell
+      header={<NetureGlobalHeader />}
+      menuItems={menuItems}
+      capabilities={ENABLED_CAPABILITIES}
+      domainIAConfig={NETURE_OPERATOR_DOMAIN_IA}
+    />
   );
 }
