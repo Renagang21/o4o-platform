@@ -183,13 +183,15 @@ export default function BloodCareBusinessStatusPage() {
               </p>
 
               <div className="flex flex-col sm:flex-row flex-wrap gap-3 mt-8">
-                <a
-                  href="#prep-checklist"
+                {/* WO-O4O-GLYCOPHARM-BLOODCARE-HERO-PREP-BUTTON-DIRECT-LINK-FIX-V1:
+                    /business/preparation 분리 후 Hero 버튼은 요약 섹션을 거치지 않고 바로 이동. */}
+                <Link
+                  to="/business/preparation"
                   className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-primary-600 text-white text-sm font-medium hover:bg-primary-700 transition-colors shadow-sm"
                 >
                   <ClipboardList className="w-4 h-4" />
                   사전 준비 항목 보기
-                </a>
+                </Link>
                 <a
                   href="#discussion-board"
                   className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-white border border-slate-200 text-slate-700 text-sm font-medium hover:bg-slate-50 transition-colors"
