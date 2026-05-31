@@ -30,6 +30,7 @@ import { Outlet } from 'react-router-dom';
 import type { OperatorGroupKey, OperatorMenuItem } from '@o4o/ui';
 import type { OperatorCapability } from '@o4o/types';
 import { DomainIASidebar } from '../sidebar/DomainIASidebar';
+import type { OperatorDomainIAConfig } from '../sidebar/operatorDomainIA';
 
 export interface OperatorAreaShellProps {
   /** 서비스별 GlobalHeader 브릿지 (예: <KpaGlobalHeader/>) */
@@ -42,6 +43,9 @@ export interface OperatorAreaShellProps {
   sidebarTopOffset?: string;
   /** content. 미지정 시 <Outlet/> (route element layout 기본) */
   children?: ReactNode;
+  /** 서비스별 domain IA. 미주입 시 DomainIASidebar 의 default(KPA 계열) — 기존 3 서비스 무변화.
+   *  WO-O4O-OPERATOR-UX-CORE-DOMAINIASIDEBAR-IA-CONFIG-PARAM-V1 */
+  domainIAConfig?: OperatorDomainIAConfig;
 }
 
 export function OperatorAreaShell({
@@ -50,6 +54,7 @@ export function OperatorAreaShell({
   capabilities,
   sidebarTopOffset = 'top-20',
   children,
+  domainIAConfig,
 }: OperatorAreaShellProps) {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -60,6 +65,7 @@ export function OperatorAreaShell({
             menuItems={menuItems}
             capabilities={capabilities}
             sidebarTopOffset={sidebarTopOffset}
+            domainIAConfig={domainIAConfig}
           />
           <main className="flex-1 min-w-0">{children ?? <Outlet />}</main>
         </div>

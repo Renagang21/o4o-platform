@@ -63,3 +63,40 @@ export const DOMAIN_DISPLAY_ORDER: OperatorDomainKey[] = ['community', 'store_hu
  *  대시보드는 모든 도메인의 진입점이므로 sidebar 최상단에 단독 배치.
  */
 export const TOP_PINNED_GROUPS: OperatorGroupKey[] = ['dashboard'];
+
+// ─── Domain IA Config (서비스별 주입) — WO-O4O-OPERATOR-UX-CORE-DOMAINIASIDEBAR-IA-CONFIG-PARAM-V1 ───
+
+/**
+ * Operator sidebar domain IA config — 위 5개 메타데이터를 한 묶음으로 정의.
+ *
+ * DomainIASidebar 가 서비스별 domain IA 를 주입받기 위한 타입. 도메인 키는 서비스마다
+ * 다를 수 있으므로(KPA 계열 = community/store_hub/common, Neture = 공급·유통/커머스·정산/…)
+ * `string` 으로 일반화한다. group key 는 공통 OperatorGroupKey 를 유지한다.
+ */
+export interface OperatorDomainIAConfig {
+  /** 도메인 키 → 헤딩 라벨 + emoji */
+  labels: Record<string, { label: string; emoji: string }>;
+  /** STANDARD_GROUPS key → 도메인 키 */
+  groupToDomain: Record<OperatorGroupKey, string>;
+  /** 도메인 키 → 그룹 표시 순서 */
+  groupOrder: Record<string, OperatorGroupKey[]>;
+  /** 도메인 표시 순서 (sidebar top → bottom) */
+  displayOrder: string[];
+  /** sidebar 최상단 고정 그룹 */
+  topPinnedGroups: OperatorGroupKey[];
+}
+
+/**
+ * Default domain IA — KPA-Society / GlycoPharm / K-Cosmetics 계열
+ * (커뮤니티 운영 / 매장 HUB 운영 / 운영 공통).
+ *
+ * DomainIASidebar 가 `domainIAConfig` prop 미주입 시 사용한다. 기존 3개 서비스는
+ * 이 default 를 그대로 사용하므로 출력이 완전히 동일하다 (무변화 보장).
+ */
+export const DEFAULT_OPERATOR_DOMAIN_IA: OperatorDomainIAConfig = {
+  labels: DOMAIN_LABELS,
+  groupToDomain: GROUP_TO_DOMAIN,
+  groupOrder: DOMAIN_GROUP_ORDER,
+  displayOrder: DOMAIN_DISPLAY_ORDER,
+  topPinnedGroups: TOP_PINNED_GROUPS,
+};

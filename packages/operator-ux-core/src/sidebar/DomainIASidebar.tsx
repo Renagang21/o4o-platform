@@ -27,12 +27,8 @@ import {
 } from '@o4o/ui';
 import type { OperatorCapability } from '@o4o/types';
 import {
-  DOMAIN_DISPLAY_ORDER,
-  DOMAIN_GROUP_ORDER,
-  DOMAIN_LABELS,
-  GROUP_TO_DOMAIN,
-  TOP_PINNED_GROUPS,
-  type OperatorDomainKey,
+  DEFAULT_OPERATOR_DOMAIN_IA,
+  type OperatorDomainIAConfig,
 } from './operatorDomainIA';
 
 // ─── Internal types ───────────────────────────────────────────────────────
@@ -45,7 +41,7 @@ interface ResolvedGroup {
 }
 
 interface ResolvedDomain {
-  key: OperatorDomainKey;
+  key: string;
   label: string;
   emoji: string;
   groups: ResolvedGroup[];
@@ -60,6 +56,9 @@ export interface DomainIASidebarProps {
   capabilities: OperatorCapability[];
   /** sidebar sticky 오프셋 Tailwind 클래스 (default: 'top-6'). GlobalHeader 사용 시 'top-20' */
   sidebarTopOffset?: string;
+  /** 서비스별 domain IA. 미주입 시 DEFAULT_OPERATOR_DOMAIN_IA (KPA 계열) 사용 — 기존 3 서비스 무변화.
+   *  WO-O4O-OPERATOR-UX-CORE-DOMAINIASIDEBAR-IA-CONFIG-PARAM-V1 */
+  domainIAConfig?: OperatorDomainIAConfig;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────
@@ -68,13 +67,14 @@ export function DomainIASidebar({
   menuItems,
   capabilities,
   sidebarTopOffset = 'top-6',
+  domainIAConfig = DEFAULT_OPERATOR_DOMAIN_IA,
 }: DomainIASidebarProps) {
   const { pathname } = useLocation();
 
   // ── Resolve top-pinned groups (도메인 헤딩과 무관, sidebar 최상단 고정) ──
   const resolvedTopGroups: ResolvedGroup[] = useMemo(() => {
     const out: ResolvedGroup[] = [];
-    for (const groupKey of TOP_PINNED_GROUPS) {
+    for (const groupKey of domainIAConfig.topPinnedGroups) {
       const items = menuItems[groupKey];
       if (!items || items.length === 0) continue;
       const standard = STANDARD_GROUPS.find((g) => g.key === groupKey);
@@ -83,17 +83,17 @@ export function DomainIASidebar({
       out.push({ key: groupKey, label: standard.label, icon: standard.icon, items });
     }
     return out;
-  }, [menuItems, capabilities]);
+  }, [menuItems, capabilities, domainIAConfig]);
 
   // ── Resolve visible domains × groups (STANDARD_GROUPS 의 icon/label 재사용) ──
   const resolvedDomains: ResolvedDomain[] = useMemo(() => {
-    return DOMAIN_DISPLAY_ORDER
+    return domainIAConfig.displayOrder
       .map((domainKey): ResolvedDomain | null => {
-        const groupOrder = DOMAIN_GROUP_ORDER[domainKey];
+        const groupOrder = domainIAConfig.groupOrder[domainKey] ?? [];
         const groups: ResolvedGroup[] = [];
 
         for (const groupKey of groupOrder) {
-          if (GROUP_TO_DOMAIN[groupKey] !== domainKey) continue;
+          if (domainIAConfig.groupToDomain[groupKey] !== domainKey) continue;
           const items = menuItems[groupKey];
           if (!items || items.length === 0) continue;
 
@@ -113,11 +113,12 @@ export function DomainIASidebar({
 
         if (groups.length === 0) return null;
 
-        const meta = DOMAIN_LABELS[domainKey];
+        const meta = domainIAConfig.labels[domainKey];
+        if (!meta) return null;
         return { key: domainKey, label: meta.label, emoji: meta.emoji, groups };
       })
       .filter((d): d is ResolvedDomain => d !== null);
-  }, [menuItems, capabilities]);
+  }, [menuItems, capabilities, domainIAConfig]);
 
   // ── Active detection ──
   const isItemActive = (path: string, exact?: boolean) => {
