@@ -46,7 +46,7 @@ const ENTRY_CARDS: { icon: typeof Activity; title: string; desc: string; to: str
     icon: PackageOpen,
     title: '제품 등록 및 공급자 협의 준비',
     desc: '공급자와 운영자가 O4O를 어떤 사업 도구로 활용할지 협의하고, 제품 등록과 판매자 모집 방향을 검토하는 영역입니다.',
-    to: '/business/bloodcare#prep-product-supplier',
+    to: '/business/products',
   },
   {
     icon: ListChecks,

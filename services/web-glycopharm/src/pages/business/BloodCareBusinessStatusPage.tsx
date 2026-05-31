@@ -28,8 +28,6 @@ import {
   HeartHandshake,
   CheckCircle2,
   ArrowRight,
-  Lightbulb,
-  ListChecks,
 } from 'lucide-react';
 
 const STAGES = [
@@ -159,97 +157,6 @@ const PARTICIPANTS: { icon: typeof Users; title: string; desc: string; checks: s
     title: '협력기관·도우미',
     desc: '사업 준비, 안내문 검토, 콘텐츠 정리, 참여 약국 확대, 사업 운영 지원 등에 참여할 수 있습니다.',
     checks: ['사업 검토', '콘텐츠 정리 지원', '참여 약국 확대 지원', '외부 협력 사업 검토'],
-  },
-];
-
-// 사전 준비 상세 — 제품 등록 및 공급자 협의 준비 (WO-...-PREP-PRODUCT-SUPPLIER-SECTION-ALIGNMENT-V1)
-// 공급자에게 공유할 O4O 활용 요소
-const PREP_O4O_USES = [
-  '설문조사 등 시장조사',
-  '약국 내 QR-code 활용',
-  '약국 내 POP 활용',
-  '약국 HUB 콘텐츠 진열',
-  '매장이 운영하는 블로그 활용',
-  '전자상거래를 통한 제품 판매',
-  '이벤트 오퍼',
-  'Market Trial 기반 제품 검증 및 개발',
-  '향후 파트너 서비스 연계 가능성',
-];
-
-// 제품 등록 전 운영자·공급자가 함께 검토할 질문
-const PREP_REVIEW_QUESTIONS = [
-  '어떤 제품을 우선 등록할 것인가',
-  '해당 제품이 GlycoPharm 사업과 어떤 관련이 있는가',
-  'B2B 공통 제품으로 등록할 것인가',
-  'GlycoPharm 서비스별 제품으로 별도 노출할 것인가',
-  '이벤트 오퍼 대상이 될 수 있는가',
-  '설문조사나 시장조사와 연결할 수 있는가',
-  'QR-code, POP, 블로그 등 매장 실행 콘텐츠가 필요한가',
-  'Market Trial 기반 제품 개발 또는 검증으로 확장할 수 있는가',
-  '판매자 모집이 필요한 제품인가',
-  '판매자 모집을 언제, 어떤 조건으로 진행할 것인가',
-];
-
-// 3개 하위 흐름
-const PREP_SUBFLOWS: {
-  num: string;
-  title: string;
-  lead: string;
-  desc: string;
-  note?: string;
-  points: string[];
-}[] = [
-  {
-    num: '3-1',
-    title: 'B2B 제품 등록 준비',
-    lead: 'O4O 서비스 전체에서 공통으로 활용할 수 있는 제품을 등록하는 단계입니다.',
-    desc: '혈당관리 관련 제품 중 약국이 기본적으로 구매하거나 취급할 수 있는 제품을 검토합니다. B2B 등록은 이후 서비스별 제품 노출, 이벤트 오퍼, 판매자 모집, 무재고 판매 등으로 확장될 수 있는 기반입니다.',
-    points: [
-      'B2B 공통 제품으로 등록할 제품',
-      '공급 가격과 공급 조건',
-      '주문 및 배송 방식',
-      '약국 경영자에게 제공할 제품 설명',
-      '제품 이미지와 기본 자료',
-      '향후 이벤트 오퍼 전환 가능성',
-      '다른 O4O 서비스에서도 활용 가능한지 여부',
-    ],
-  },
-  {
-    num: '3-2',
-    title: '서비스별 제품 등록 준비',
-    lead: 'GlycoPharm의 성격에 맞게 제품을 노출하고 운영하는 단계입니다.',
-    desc: '같은 제품이라도 GlycoPharm에서는 혈당관리, 당뇨관리, 약국 상담, 무료혈당기 사업, 혈당관리 지원약국 사업과 연결되는 방식으로 설명되어야 합니다.',
-    note: '공급자와 협의, 공급자 가입, 제품 등록, 제품 등재 진행 상황을 운영자가 점검합니다.',
-    points: [
-      '공급자와 제품 등록 협의 여부',
-      '공급자 가입 여부',
-      '제품 기본 정보 준비 여부',
-      '제품 이미지와 설명 자료 준비 여부',
-      'GlycoPharm 서비스 내 노출 방식',
-      '약국 HUB 콘텐츠와의 연결 여부',
-      'QR-code, POP, 블로그 등 매장 활용 콘텐츠 필요 여부',
-      '이벤트 오퍼 또는 Market Trial 연계 가능성',
-      '제품 등록 완료 여부',
-      '제품 등재 후 검토 및 수정 필요 여부',
-    ],
-  },
-  {
-    num: '3-3',
-    title: '판매자 모집 준비',
-    lead: '기본적으로 공급자가 준비해야 할 사업 요소이며, 운영자는 공급자와 협의하여 추진 여부와 시기를 정합니다.',
-    desc: '판매자 모집은 제품 등록 이후 자동으로 진행되는 것이 아니라, 공급자의 준비 상태와 사업 의지, 운영자의 사업 일정, 약국 경영자의 관심도에 따라 추진 여부와 시기를 결정합니다.',
-    points: [
-      '해당 제품이 판매자 모집 대상인지 여부',
-      '공급자가 판매자 모집을 원하는지 여부',
-      '판매자 모집 시기',
-      '참여 약국 또는 매장 경영자의 조건',
-      '판매자에게 제공할 혜택 또는 조건',
-      '제품 공급 방식',
-      '이벤트 오퍼와의 연결 여부',
-      '무재고 판매 가능성',
-      '약국 내 홍보 콘텐츠 제공 여부',
-      '판매자 모집 안내문 필요 여부',
-    ],
   },
 ];
 
@@ -397,99 +304,33 @@ export default function BloodCareBusinessStatusPage() {
           </div>
         </section>
 
-        {/* 2-B. 제품 등록 및 공급자 협의 준비 (사전 준비 상세)
-            WO-O4O-GLYCOPHARM-BLOODCARE-PREP-PRODUCT-SUPPLIER-SECTION-ALIGNMENT-V1 */}
+        {/* 2-B. 제품 등록 및 공급자 협의 준비 — 요약 + CTA
+            WO-O4O-GLYCOPHARM-BUSINESS-PRODUCTS-PAGE-SPLIT-V1: 상세는 /business/products 로 분리.
+            anchor(#prep-product-supplier)는 /business 허브·기존 링크 호환 위해 유지. */}
         <section id="prep-product-supplier" className="scroll-mt-20">
           <h2 className="text-lg font-bold text-slate-800 mb-1">제품 등록 및 공급자 협의 준비</h2>
           <p className="text-sm text-slate-500 mb-6">사전 준비 단계에서 운영자와 공급자가 함께 검토하는 영역입니다.</p>
 
-          {/* 의미 framing — 제품 등록은 단순 상품 등록이 아니다 */}
-          <div className="bg-white rounded-xl border border-primary-100 shadow-sm p-6 mb-5">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center flex-shrink-0">
-                <Lightbulb className="w-5 h-5 text-primary-600" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-slate-800 mb-2">
-                  제품 등록은 단순 상품 등록이 아니라, 공급자와 운영자가 O4O를 어떤 사업 도구로 활용할지 먼저 이해하고 기획하는 단계입니다.
-                </p>
+          <div className="bg-white rounded-xl border border-primary-100 shadow-sm p-6">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center flex-shrink-0">
+                  <PackageOpen className="w-5 h-5 text-primary-600" />
+                </div>
                 <p className="text-sm text-slate-600 leading-relaxed">
-                  어떤 제품을 어떤 방식으로 등록할지는 운영자가 공급자와 먼저 협의합니다. 이때 공급자에게 현재 O4O 서비스의 개요,
-                  활용 방법, 마케팅 활용 가능성, 약국 현장 실행 방식 등을 공유하는 것이 필요합니다.
-                </p>
-                <p className="text-sm text-slate-600 leading-relaxed mt-2">
-                  공급자와 운영자 모두 O4O가 단순 유통 서비스가 아니라 시장조사, 매장 실행, 콘텐츠 활용, 전자상거래, 이벤트 오퍼,
-                  Market Trial, 향후 파트너 서비스까지 연결될 수 있는 사업 도구라는 점을 이해해야 합니다.
+                  제품 등록은 단순 상품 등록이 아니라, 공급자와 운영자가 O4O를 어떤 사업 도구로 활용할지 먼저 이해하고 기획하는 단계입니다.
+                  O4O 활용 요소, 제품 등록 전 검토 질문, B2B·서비스별 제품 등록·판매자 모집 하위 흐름 등 상세 내용은
+                  제품 등록 및 공급자 협의 준비 페이지에서 확인합니다.
                 </p>
               </div>
+              <Link
+                to="/business/products"
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-primary-600 text-white text-sm font-medium hover:bg-primary-700 transition-colors shadow-sm flex-shrink-0"
+              >
+                제품 등록 및 공급자 협의 준비 보기
+                <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
-          </div>
-
-          {/* 공급자에게 공유할 O4O 활용 요소 + 함께 검토할 질문 (2열) */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
-            <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-6">
-              <p className="text-sm font-semibold text-slate-700 mb-3">공급자에게 공유할 O4O 활용 요소</p>
-              <div className="flex flex-wrap gap-2">
-                {PREP_O4O_USES.map((u) => (
-                  <span
-                    key={u}
-                    className="inline-flex items-center px-3 py-1 rounded-full bg-primary-50 text-primary-700 text-xs font-medium"
-                  >
-                    {u}
-                  </span>
-                ))}
-              </div>
-            </div>
-            <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-6">
-              <div className="flex items-center gap-2 mb-3">
-                <ListChecks className="w-4 h-4 text-slate-500" />
-                <p className="text-sm font-semibold text-slate-700">제품 등록 전 함께 검토할 질문</p>
-              </div>
-              <ul className="space-y-2">
-                {PREP_REVIEW_QUESTIONS.map((q) => (
-                  <li key={q} className="flex items-start gap-2 text-sm text-slate-600">
-                    <span className="mt-1.5 w-1 h-1 rounded-full bg-slate-300 flex-shrink-0" />
-                    <span className="leading-relaxed">{q}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          {/* 3개 하위 흐름 */}
-          <div className="space-y-4">
-            {PREP_SUBFLOWS.map((flow) => (
-              <div key={flow.num} className="bg-white rounded-xl border border-slate-100 shadow-sm p-6">
-                <div className="flex items-start gap-3 mb-3">
-                  <span className="flex-shrink-0 inline-flex items-center justify-center px-2.5 h-7 rounded-md bg-primary-600 text-white text-xs font-bold">
-                    {flow.num}
-                  </span>
-                  <div>
-                    <h3 className="font-semibold text-slate-800">{flow.title}</h3>
-                    <p className="text-sm text-primary-700 mt-0.5">{flow.lead}</p>
-                  </div>
-                </div>
-                <p className="text-sm text-slate-600 leading-relaxed">{flow.desc}</p>
-                {flow.note && (
-                  <p className="text-sm text-slate-700 font-medium bg-primary-50 border border-primary-100 rounded-lg px-3 py-2 mt-3">
-                    {flow.note}
-                  </p>
-                )}
-                <div className="mt-4">
-                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">검토 항목</p>
-                  <div className="flex flex-wrap gap-2">
-                    {flow.points.map((p) => (
-                      <span
-                        key={p}
-                        className="inline-flex items-center px-2.5 py-1 rounded-md bg-slate-50 border border-slate-100 text-slate-600 text-xs"
-                      >
-                        {p}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ))}
           </div>
         </section>
 

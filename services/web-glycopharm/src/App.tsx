@@ -57,6 +57,8 @@ const ContactPage = lazy(() => import('@/pages/ContactPage'));
 const BloodCareBusinessStatusPage = lazy(() => import('@/pages/business/BloodCareBusinessStatusPage'));
 // WO-O4O-GLYCOPHARM-BUSINESS-HUB-ROUTE-AND-PAGE-V1: 사업 진행 허브 (/business)
 const BusinessHubPage = lazy(() => import('@/pages/business/BusinessHubPage'));
+// WO-O4O-GLYCOPHARM-BUSINESS-PRODUCTS-PAGE-SPLIT-V1: 제품 등록 및 공급자 협의 준비 (/business/products)
+const BusinessProductsPage = lazy(() => import('@/pages/business/BusinessProductsPage'));
 // WO-O4O-GLYCOPHARM-REGISTER-MODAL-ENTRY-FIX-V1: RegisterPage 제거 — RegisterFlowModal 로 단일화
 const RoleSelectPage = lazy(() => import('@/pages/auth/RoleSelectPage'));
 
@@ -577,6 +579,8 @@ function AppRoutes() {
         <Route path="business" element={<BusinessHubPage />} />
         {/* WO-O4O-GLYCOPHARM-BLOODCARE-BUSINESS-STATUS-PAGE-V1: 혈당관리 약국 사업 추진 현황 (공개) */}
         <Route path="business/bloodcare" element={<BloodCareBusinessStatusPage />} />
+        {/* WO-O4O-GLYCOPHARM-BUSINESS-PRODUCTS-PAGE-SPLIT-V1: 제품 등록 및 공급자 협의 준비 (공개) */}
+        <Route path="business/products" element={<BusinessProductsPage />} />
         {/* WO-O4O-GLYCOPHARM-MENU-CANONICAL-ALIGN-V1: 모바일 약국 경영 허브 */}
         <Route path="mobile/pharmacy" element={<MobilePharmacyPage />} />
 
