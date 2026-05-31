@@ -35,7 +35,11 @@ import { StoreSlugService } from '@o4o/platform-core/store-identity';
 //
 // 노출 필수 조건:
 // 1. organization_channels.status = 'APPROVED' AND channel_type = 'B2C'
-// 2. organization_product_listings.is_active = true AND service_key = 'kpa-society'
+// 2. organization_product_listings.is_active = true
+//    AND service_key IN ('glycopharm', 'glycopharm-event-offer')
+//    (WO-O4O-GLYCOPHARM-OPL-SERVICEKEY-ALIGNMENT-V1: Option β — Legacy 'kpa-society'
+//     literal 은 KPA copy 잔재. IR-O4O-ORGANIZATION-PRODUCT-LISTINGS-SERVICEKEY-
+//     CROSSSERVICE-AUDIT-V1 / WO-O4O-GLYCOPHARM-PAYMENT-HOOK-SERVICEKEY-FIX-V1 정합.)
 // 3. organization_product_channels.is_active = true
 // 4. supplier_product_offers.is_active = true AND neture_suppliers.status = 'ACTIVE'
 //
@@ -113,7 +117,7 @@ async function queryVisibleProducts(
      INNER JOIN organization_product_listings opl
        ON opl.offer_id = spo.id
        AND opl.organization_id = $1
-       AND opl.service_key = 'kpa-society'
+       AND opl.service_key IN ('glycopharm', 'glycopharm-event-offer')
        AND opl.is_active = true
      INNER JOIN organization_product_channels opc
        ON opc.product_listing_id = opl.id
@@ -150,7 +154,7 @@ async function queryVisibleProducts(
      INNER JOIN organization_product_listings opl
        ON opl.offer_id = spo.id
        AND opl.organization_id = $1
-       AND opl.service_key = 'kpa-society'
+       AND opl.service_key IN ('glycopharm', 'glycopharm-event-offer')
        AND opl.is_active = true
      INNER JOIN organization_product_channels opc
        ON opc.product_listing_id = opl.id
@@ -268,7 +272,7 @@ export function createStoreController(dataSource: DataSource): Router {
          INNER JOIN organization_product_listings opl
            ON opl.offer_id = spo.id
            AND opl.organization_id = $1
-           AND opl.service_key = 'kpa-society'
+           AND opl.service_key IN ('glycopharm', 'glycopharm-event-offer')
            AND opl.is_active = true
          INNER JOIN organization_product_channels opc
            ON opc.product_listing_id = opl.id

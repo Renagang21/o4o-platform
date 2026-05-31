@@ -368,6 +368,10 @@ export function createCheckoutController(
         // 3-B. Distribution policy 검증 (WO-O4O-DISTRIBUTION-GAP-HARDENING-V1)
         // PRIVATE 제품: allowed_seller_ids에 organizationId 포함 필수
         // ================================================================
+        // WO-O4O-GLYCOPHARM-OPL-SERVICEKEY-ALIGNMENT-V1:
+        // GlycoPharm OPL scope = ('glycopharm', 'glycopharm-event-offer') — Option β.
+        // Legacy 'kpa-society' literal (KPA copy 잔재 —
+        // IR-O4O-ORGANIZATION-PRODUCT-LISTINGS-SERVICEKEY-CROSSSERVICE-AUDIT-V1) 제거.
         const privateDistProducts: Array<{
           product_id: string;
           allowed_seller_ids: string[] | null;
@@ -376,7 +380,7 @@ export function createCheckoutController(
            FROM organization_product_listings opl
            JOIN supplier_product_offers spo ON spo.id = opl.offer_id
            WHERE opl.organization_id = $1
-             AND opl.service_key = 'kpa-society'
+             AND opl.service_key IN ('glycopharm', 'glycopharm-event-offer')
              AND opl.offer_id::text = ANY($2::text[])
              AND spo.distribution_type = 'PRIVATE'`,
           [pharmacy.id, productIds]
@@ -395,6 +399,7 @@ export function createCheckoutController(
         // ================================================================
         // 4. 상품-채널 매핑 검증 (Phase D)
         // ================================================================
+        // WO-O4O-GLYCOPHARM-OPL-SERVICEKEY-ALIGNMENT-V1: Option β scope.
         const channelMappings: Array<{
           product_listing_id: string;
           product_id: string;
@@ -410,7 +415,7 @@ export function createCheckoutController(
              ON oc.id = opc.channel_id
            WHERE opc.channel_id = $1
              AND opl.organization_id = $2
-             AND opl.service_key = 'kpa-society'
+             AND opl.service_key IN ('glycopharm', 'glycopharm-event-offer')
              AND opl.is_active = true
              AND opc.is_active = true
              AND oc.status = 'APPROVED'`,
