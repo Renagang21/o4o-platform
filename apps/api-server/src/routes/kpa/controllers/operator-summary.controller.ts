@@ -19,8 +19,10 @@ import { KPA_SCOPE_CONFIG } from '@o4o/security-core';
 import { createMembershipScopeGuard } from '../../../common/middleware/membership-guard.middleware.js';
 import { KpaMember } from '../entities/kpa-member.entity.js';
 import { KpaApplication } from '../entities/kpa-application.entity.js';
-// WO-KPA-A-OPERATOR-DASHBOARD-FIRST-STABILIZATION-V1: CopilotEngineService import 제거
-// /operator/dashboard 엔드포인트 삭제 — 프론트엔드 미사용 (프론트는 /operator/summary 사용)
+// WO-O4O-KPA-OPERATOR-DASHBOARD-API-5BLOCK-FOUNDATION-V1:
+//   IR-O4O-KPA-OPERATOR-DASHBOARD-API-5BLOCK-UNIFICATION-V1 (Option B) Foundation.
+//   /operator/dashboard 재도입 — 기존 /operator/summary 와 병행 운영, frontend Adapter WO 단계에서 전환.
+import { buildKpaOperatorDashboardConfig } from '../services/operator-dashboard.service.js';
 
 interface OperatorSummaryServices {
   contentService: ContentQueryService;
@@ -249,6 +251,42 @@ export function createOperatorSummaryController(
         recentActivity,
       },
     });
+  }));
+
+  /**
+   * GET /operator/dashboard
+   * WO-O4O-KPA-OPERATOR-DASHBOARD-API-5BLOCK-FOUNDATION-V1
+   *   IR-O4O-KPA-OPERATOR-DASHBOARD-API-5BLOCK-UNIFICATION-V1 (Option B) Foundation.
+   *
+   * Cross-service 5-Block dashboard 응답 (`OperatorDashboardConfig`).
+   *   - 기존 /operator/summary 의 17 query 재사용 (3 module service + 14 raw)
+   *   - 추가 6 보조 query (members pending / pharmacy-requests pending / store stats /
+   *     product-applications pending / [admin] total members / [admin] organization-join)
+   *   - frontend `buildKpaOperatorConfig` 의 5-Block 조립 logic 동일 적용
+   *   - isAdmin role-aware (KPI 2 / AI summary 1 / Action Queue 1 / Quick Actions 3 추가)
+   *
+   * 포함하지 않음 (I3 정책 + I1 권고):
+   *   - AxisNavigationSection axes — frontend 유지 (buildKpaAxes)
+   *   - OperatorRoleGuideCard content — frontend static 유지
+   *
+   * 기존 /operator/summary 미변경 — frontend Adapter WO 단계에서 전환 전까지 양립.
+   */
+  router.get('/dashboard', asyncHandler(async (req: Request, res: Response) => {
+    const user = (req as any).user;
+    const userId: string = user?.id ?? '';
+    const roles: string[] = Array.isArray(user?.roles) ? user.roles : [];
+    const isAdmin = roles.some(
+      (r) => r === 'kpa:admin' || r === 'platform:super_admin',
+    );
+
+    const data = await buildKpaOperatorDashboardConfig(
+      dataSource,
+      { contentService, signageService, forumService },
+      userId,
+      isAdmin,
+    );
+
+    res.json({ success: true, data });
   }));
 
   /**
