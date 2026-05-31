@@ -10,12 +10,11 @@
  */
 
 import { useMemo } from 'react';
-import { Outlet } from 'react-router-dom';
 import { isAdminOrAbove } from '@o4o/auth-utils';
+import { OperatorAreaShell } from '@o4o/operator-ux-core';
 import { useAuth } from '../../contexts/AuthContext';
 import { ENABLED_CAPABILITIES } from '../../config/operatorCapabilities';
 import { UNIFIED_MENU, filterMenuByRole } from '../../config/operatorMenuGroups';
-import { DomainIASidebar } from '@o4o/operator-ux-core';
 import { KpaGlobalHeader } from '../KpaGlobalHeader';
 
 export default function KpaOperatorLayoutWrapper() {
@@ -32,20 +31,10 @@ export default function KpaOperatorLayoutWrapper() {
   );
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <KpaGlobalHeader />
-      <div className="flex-1 max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="flex gap-6">
-          <DomainIASidebar
-            menuItems={menuItems}
-            capabilities={ENABLED_CAPABILITIES}
-            sidebarTopOffset="top-20"
-          />
-          <main className="flex-1 min-w-0">
-            <Outlet />
-          </main>
-        </div>
-      </div>
-    </div>
+    <OperatorAreaShell
+      header={<KpaGlobalHeader />}
+      menuItems={menuItems}
+      capabilities={ENABLED_CAPABILITIES}
+    />
   );
 }

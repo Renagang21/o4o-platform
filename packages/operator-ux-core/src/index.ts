@@ -45,3 +45,6 @@ export { isAdminOrOperator } from './nav/index.js';
 
 // Operator Sidebar Module (WO-O4O-CROSSSERVICE-OPERATOR-SIDEBAR-COMMON-COMPONENT-V1)
 export * from './sidebar/index';
+
+// Operator Area Layout Module (WO-O4O-CROSSSERVICE-OPERATOR-LAYOUT-WRAPPER-COMMON-COMPONENT-V1)
+export * from './layout/index';
