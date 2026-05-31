@@ -54,6 +54,13 @@ const STAGES = [
   },
 ];
 
+// Hero 우측 요약 카드 — 사업 진행 3단계 (현재/다음/후속)
+const HERO_STAGE_SUMMARY: { title: string; phase: string; desc: string; current: boolean }[] = [
+  { title: '사전 준비', phase: '현재 단계', desc: '서비스·상품·콘텐츠·약관·테스트 환경 준비', current: true },
+  { title: '초기 오픈', phase: '다음 단계', desc: '약국 경영자 모집과 초기 참여 유도', current: false },
+  { title: '사업 확장', phase: '후속 단계', desc: '이벤트 오퍼, 제품 사업, 혈당관리 지원약국으로 확대', current: false },
+];
+
 const BOARD_CATEGORIES = [
   '공지사항',
   '사업 준비',
@@ -173,44 +180,88 @@ const NEXT_CHECKLIST = [
 export default function BloodCareBusinessStatusPage() {
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* 1. Hero */}
-      <section className="bg-white border-b border-slate-100">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-50 text-primary-700 text-xs font-medium mb-4">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary-500" />
-            현재 단계: 사전 준비
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-4">
-            혈당관리 약국 사업 추진 현황
-          </h1>
-          <p className="text-slate-500 text-sm sm:text-base leading-relaxed max-w-3xl">
-            GlycoPharm 혈당관리 약국 사업의 준비 상황, 오픈 계획, 참여 안내, 논의 내용을 함께 확인하는 공간입니다.
-            운영자, 공급자, 약국 경영자, 협력기관, 내부 도우미는 이 페이지에서 현재 사업 단계와 준비 항목을 확인하고
-            필요한 의견을 남길 수 있습니다.
-          </p>
+      {/* 1. Hero — WO-O4O-GLYCOPHARM-BLOODCARE-HERO-VISUAL-CLARITY-FIX-V1:
+          연한 녹색 배경 + 좌(설명/버튼) · 우(사업 진행 요약 카드) 2열 구조로 대표 안내 영역 명확화 */}
+      <section className="bg-gradient-to-br from-primary-50 via-primary-50/40 to-white border-b border-primary-100">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+          <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-8 lg:gap-12 items-center">
+            {/* 좌측: 배지 · 제목 · 설명 · 버튼 */}
+            <div>
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary-600 text-white text-sm font-medium mb-5 shadow-sm">
+                <span className="w-2 h-2 rounded-full bg-white/90" />
+                현재 단계: 사전 준비
+              </div>
+              <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4 leading-tight">
+                혈당관리 약국 사업 추진 현황
+              </h1>
+              <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
+                GlycoPharm 혈당관리 약국 사업의 준비 상황, 오픈 계획, 참여 안내, 논의 내용을 함께 확인하는 공간입니다.
+                운영자, 공급자, 약국 경영자, 협력기관, 내부 도우미는 이 페이지에서 현재 사업 단계와 준비 항목을 확인하고
+                필요한 의견을 남길 수 있습니다.
+              </p>
 
-          <div className="flex flex-col sm:flex-row flex-wrap gap-3 mt-8">
-            <a
-              href="#prep-checklist"
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-primary-600 text-white text-sm font-medium hover:bg-primary-700 transition-colors"
-            >
-              <ClipboardList className="w-4 h-4" />
-              사전 준비 항목 보기
-            </a>
-            <a
-              href="#discussion-board"
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-white border border-slate-200 text-slate-700 text-sm font-medium hover:bg-slate-50 transition-colors"
-            >
-              <MessageSquare className="w-4 h-4" />
-              사업 논의 게시판 보기
-            </a>
-            <Link
-              to="/forum/write"
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-white border border-slate-200 text-slate-700 text-sm font-medium hover:bg-slate-50 transition-colors"
-            >
-              <PenLine className="w-4 h-4" />
-              새 의견 작성
-            </Link>
+              <div className="flex flex-col sm:flex-row flex-wrap gap-3 mt-8">
+                <a
+                  href="#prep-checklist"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-primary-600 text-white text-sm font-medium hover:bg-primary-700 transition-colors shadow-sm"
+                >
+                  <ClipboardList className="w-4 h-4" />
+                  사전 준비 항목 보기
+                </a>
+                <a
+                  href="#discussion-board"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-white border border-slate-200 text-slate-700 text-sm font-medium hover:bg-slate-50 transition-colors"
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  사업 논의 게시판 보기
+                </a>
+                <Link
+                  to="/forum/write"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-white border border-slate-200 text-slate-700 text-sm font-medium hover:bg-slate-50 transition-colors"
+                >
+                  <PenLine className="w-4 h-4" />
+                  새 의견 작성
+                </Link>
+              </div>
+            </div>
+
+            {/* 우측: 사업 진행 요약 카드 */}
+            <div className="bg-white rounded-2xl border border-primary-100 shadow-sm p-6">
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-4">사업 진행 요약</p>
+              <ol className="space-y-3">
+                {HERO_STAGE_SUMMARY.map((s, i) => (
+                  <li
+                    key={s.title}
+                    className={`flex items-start gap-3 rounded-xl p-3 ${
+                      s.current ? 'bg-primary-50 ring-1 ring-primary-100' : 'bg-slate-50'
+                    }`}
+                  >
+                    <span
+                      className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
+                        s.current ? 'bg-primary-600 text-white' : 'bg-white text-slate-400 border border-slate-200'
+                      }`}
+                    >
+                      {i + 1}
+                    </span>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className={`text-sm font-semibold ${s.current ? 'text-primary-700' : 'text-slate-700'}`}>
+                          {s.title}
+                        </span>
+                        <span
+                          className={`text-[11px] font-medium px-1.5 py-0.5 rounded-full ${
+                            s.current ? 'bg-primary-600 text-white' : 'bg-slate-200 text-slate-500'
+                          }`}
+                        >
+                          {s.phase}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-500 leading-relaxed mt-1">{s.desc}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </div>
           </div>
         </div>
       </section>
