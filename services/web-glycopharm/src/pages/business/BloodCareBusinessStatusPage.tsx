@@ -36,6 +36,8 @@ const STAGES = [
     desc: '가입자를 받기 전 서비스, 상품, 콘텐츠, 약관, 테스트 환경을 준비하는 단계',
     sub: '약국 경영자가 가입했을 때 빈 화면을 보는 것이 아니라 실제로 확인하고 참여할 수 있는 내용을 먼저 준비합니다.',
     active: true,
+    // WO-O4O-GLYCOPHARM-BLOODCARE-STAGE-CARD-LINK-FIX-V1: 상세 페이지 연결
+    to: '/business/preparation' as string | null,
   },
   {
     icon: Rocket,
@@ -43,6 +45,7 @@ const STAGES = [
     desc: '약국 경영자에게 서비스를 알리고 가입과 테스트 참여를 유도하는 단계',
     sub: '약업신문 등 운영사업자의 홍보 채널을 활용하여 서비스 체험, 가입, 초기 참여를 유도합니다.',
     active: false,
+    to: null as string | null,
   },
   {
     icon: TrendingUp,
@@ -50,6 +53,7 @@ const STAGES = [
     desc: '가입자 기반을 바탕으로 이벤트 오퍼, 제품 등록, 판매자 모집, 혈당관리 지원약국 사업으로 확대하는 단계',
     sub: '가입자와 공급자 협의가 일정 수준 확보되면 본격적인 제품 사업과 대표 사업으로 확장합니다.',
     active: false,
+    to: null as string | null,
   },
 ];
 
@@ -259,13 +263,8 @@ export default function BloodCareBusinessStatusPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {STAGES.map((stage) => {
               const Icon = stage.icon;
-              return (
-                <div
-                  key={stage.title}
-                  className={`relative rounded-xl p-6 border shadow-sm ${
-                    stage.active ? 'bg-white border-primary-200 ring-1 ring-primary-100' : 'bg-white border-slate-100'
-                  }`}
-                >
+              const cardContent = (
+                <>
                   <div
                     className={`w-10 h-10 rounded-lg flex items-center justify-center mb-4 ${
                       stage.active ? 'bg-primary-100' : 'bg-slate-100'
@@ -283,6 +282,32 @@ export default function BloodCareBusinessStatusPage() {
                   </div>
                   <p className="text-sm text-slate-600 leading-relaxed mb-2">{stage.desc}</p>
                   <p className="text-xs text-slate-400 leading-relaxed">{stage.sub}</p>
+                  {stage.to ? (
+                    <p className="text-xs font-medium text-primary-600 mt-3">자세히 보기 →</p>
+                  ) : (
+                    <p className="text-xs text-slate-300 mt-3">상세 페이지 준비 예정</p>
+                  )}
+                </>
+              );
+
+              if (stage.to) {
+                return (
+                  <Link
+                    key={stage.title}
+                    to={stage.to}
+                    className="relative rounded-xl p-6 border shadow-sm bg-white border-primary-200 ring-1 ring-primary-100 hover:shadow-md hover:border-primary-300 transition-shadow cursor-pointer block"
+                  >
+                    {cardContent}
+                  </Link>
+                );
+              }
+
+              return (
+                <div
+                  key={stage.title}
+                  className="relative rounded-xl p-6 border shadow-sm bg-white border-slate-100 cursor-default"
+                >
+                  {cardContent}
                 </div>
               );
             })}
