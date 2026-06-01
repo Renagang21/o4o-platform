@@ -29,7 +29,14 @@ export interface NetureContextualNavItem extends GlobalHeaderNavItem {
   visibleWhen: 'supplier' | 'partner' | 'operator' | 'admin';
 }
 
-export const NETURE_CONTEXTUAL_NAV: NetureContextualNavItem[] = [];
+// WO-O4O-NETURE-CONTEXTUAL-NAV-SUPPLIER-PARTNER-INTEGRATION-V1
+// supplier/partner 역할 사용자가 상단 nav 에서 자신의 워크스페이스(대시보드)로 바로 진입.
+// Neture 는 공급자·파트너 조직 중심 — store owner / 매장 허브 구조를 적용하지 않는다.
+// operator/admin 은 filterContextualNav 정책상 두 항목 모두 노출(전체 진입 허용).
+export const NETURE_CONTEXTUAL_NAV: NetureContextualNavItem[] = [
+  { label: '공급자 대시보드', href: '/supplier/dashboard', visibleWhen: 'supplier' },
+  { label: '파트너 대시보드', href: '/partner/dashboard', visibleWhen: 'partner' },
+];
 
 // ─── Filter Helper ───────────────────────────────────────────────────────────
 
