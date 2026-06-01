@@ -27,6 +27,7 @@ import {
   PaymentStatus,
 } from '@o4o/ecommerce-core';
 import logger from '../../utils/logger.js';
+import { GLYCOPHARM_OPL_SERVICE_KEYS } from '../../constants/service-keys.js';
 
 interface ProcessingResult {
   success: boolean;
@@ -212,10 +213,10 @@ export class GlycopharmPaymentEventHandler {
        JOIN organization_product_listings opl ON opl.id = opc.product_listing_id
        WHERE opc.channel_id = $1
          AND opl.organization_id = $2
-         AND opl.service_key IN ('glycopharm', 'glycopharm-event-offer')
+         AND opl.service_key = ANY($3)
          AND opc.is_active = true
          AND opc.sales_limit IS NOT NULL`,
-      [metadata.channelId, metadata.pharmacyId]
+      [metadata.channelId, metadata.pharmacyId, GLYCOPHARM_OPL_SERVICE_KEYS]
     );
 
     if (channelMappings.length === 0) return null;

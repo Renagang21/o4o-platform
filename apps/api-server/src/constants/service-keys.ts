@@ -27,3 +27,13 @@ export const SERVICE_KEYS = {
 } as const;
 
 export type ServiceKey = typeof SERVICE_KEYS[keyof typeof SERVICE_KEYS];
+
+/**
+ * WO-O4O-OPL-SERVICEKEY-CANONICAL-CONSTANTS-V1
+ * OPL visibility gate에서 허용하는 GlycoPharm serviceKey 목록.
+ * store.controller / checkout.controller / GlycopharmPaymentEventHandler 3곳에서 공용.
+ */
+export const GLYCOPHARM_OPL_SERVICE_KEYS = [
+  SERVICE_KEYS.GLYCOPHARM,
+  SERVICE_KEYS.GLYCOPHARM_EVENT_OFFER,
+] as const satisfies string[];

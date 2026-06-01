@@ -28,6 +28,7 @@ import { authenticate } from '../../../middleware/auth.middleware.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import type { ListProductsQueryDto } from '../dto/index.js';
 import { StoreSlugService } from '@o4o/platform-core/store-identity';
+import { GLYCOPHARM_OPL_SERVICE_KEYS } from '../../../constants/service-keys.js';
 
 // ============================================================================
 // WO-O4O-STOREFRONT-VISIBILITY-GATE-FIX-V1
@@ -71,8 +72,9 @@ async function queryVisibleProducts(
   const offset = (page - 1) * limit;
 
   const conditions: string[] = [];
-  const params: any[] = [pharmacyId];
-  let paramIdx = 2;
+  // WO-O4O-OPL-SERVICEKEY-CANONICAL-CONSTANTS-V1: $2 = OPL serviceKey allowlist
+  const params: any[] = [pharmacyId, GLYCOPHARM_OPL_SERVICE_KEYS];
+  let paramIdx = 3;
 
   if (options.category) {
     conditions.push(`pm.brand_name = $${paramIdx}`);
@@ -117,7 +119,7 @@ async function queryVisibleProducts(
      INNER JOIN organization_product_listings opl
        ON opl.offer_id = spo.id
        AND opl.organization_id = $1
-       AND opl.service_key IN ('glycopharm', 'glycopharm-event-offer')
+       AND opl.service_key = ANY($2)
        AND opl.is_active = true
      INNER JOIN organization_product_channels opc
        ON opc.product_listing_id = opl.id
@@ -154,7 +156,7 @@ async function queryVisibleProducts(
      INNER JOIN organization_product_listings opl
        ON opl.offer_id = spo.id
        AND opl.organization_id = $1
-       AND opl.service_key IN ('glycopharm', 'glycopharm-event-offer')
+       AND opl.service_key = ANY($2)
        AND opl.is_active = true
      INNER JOIN organization_product_channels opc
        ON opc.product_listing_id = opl.id
@@ -272,7 +274,7 @@ export function createStoreController(dataSource: DataSource): Router {
          INNER JOIN organization_product_listings opl
            ON opl.offer_id = spo.id
            AND opl.organization_id = $1
-           AND opl.service_key IN ('glycopharm', 'glycopharm-event-offer')
+           AND opl.service_key = ANY($2)
            AND opl.is_active = true
          INNER JOIN organization_product_channels opc
            ON opc.product_listing_id = opl.id
@@ -285,7 +287,7 @@ export function createStoreController(dataSource: DataSource): Router {
            AND s.status = 'ACTIVE'
          GROUP BY pm.brand_name
          ORDER BY "productCount" DESC`,
-        [pharmacy.id]
+        [pharmacy.id, GLYCOPHARM_OPL_SERVICE_KEYS]
       );
 
       const data = categories.map((c: any, idx: number) => ({

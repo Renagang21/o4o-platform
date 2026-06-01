@@ -23,6 +23,7 @@ import logger from '../../../utils/logger.js';
 import { opsMetrics, OPS } from '../../../services/ops-metrics.service.js';
 import { validateSupplierSellerRelation } from '../../../core/checkout/checkout-guard.service.js';
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
+import { GLYCOPHARM_OPL_SERVICE_KEYS } from '../../../constants/service-keys.js';
 import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 import {
   EcommerceOrder,
@@ -380,10 +381,10 @@ export function createCheckoutController(
            FROM organization_product_listings opl
            JOIN supplier_product_offers spo ON spo.id = opl.offer_id
            WHERE opl.organization_id = $1
-             AND opl.service_key IN ('glycopharm', 'glycopharm-event-offer')
-             AND opl.offer_id::text = ANY($2::text[])
+             AND opl.service_key = ANY($2)
+             AND opl.offer_id::text = ANY($3::text[])
              AND spo.distribution_type = 'PRIVATE'`,
-          [pharmacy.id, productIds]
+          [pharmacy.id, GLYCOPHARM_OPL_SERVICE_KEYS, productIds]
         );
 
         for (const pp of privateDistProducts) {
@@ -415,11 +416,11 @@ export function createCheckoutController(
              ON oc.id = opc.channel_id
            WHERE opc.channel_id = $1
              AND opl.organization_id = $2
-             AND opl.service_key IN ('glycopharm', 'glycopharm-event-offer')
+             AND opl.service_key = ANY($3)
              AND opl.is_active = true
              AND opc.is_active = true
              AND oc.status = 'APPROVED'`,
-          [b2cChannelId, pharmacy.id]
+          [b2cChannelId, pharmacy.id, GLYCOPHARM_OPL_SERVICE_KEYS]
         );
 
         // Soft check: only enforce if mappings exist for this channel
