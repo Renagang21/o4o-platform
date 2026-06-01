@@ -5,6 +5,10 @@
  * - 약국 목록 및 상태 관리
  * - 지역별/등급별 필터링
  * - 약국 성과 모니터링
+ *
+ * WO-O4O-GLYCOPHARM-PHARMACIES-PAGE-BATCH-UI-ALIGNMENT-V1:
+ *   row action을 커스텀 dropdown → RowActionMenu 표준 패턴으로 교체.
+ *   ActionBar는 이미 표준 패턴 적용 완료 — 유지.
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -12,7 +16,6 @@ import {
   Store,
   Search,
   MapPin,
-  MoreVertical,
   Star,
   TrendingUp,
   TrendingDown,
@@ -23,8 +26,9 @@ import {
   ShoppingCart,
   BarChart3,
   Loader2,
+  BarChart2,
 } from 'lucide-react';
-import { ActionBar } from '@o4o/ui';
+import { ActionBar, RowActionMenu } from '@o4o/ui';
 import { DataTable } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import {
@@ -75,9 +79,7 @@ export default function PharmaciesPage() {
   const [regionFilter, setRegionFilter] = useState<string>('all');
   const [tierFilter, setTierFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedPharmacy, setSelectedPharmacy] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [isBulkProcessing] = useState(false);
 
   // API data state
   const [pharmacies, setPharmacies] = useState<OperatorPharmacy[]>([]);
@@ -338,8 +340,8 @@ export default function PharmaciesPage() {
           </div>
         </div>
 
-        {/* Bulk Actions */}
-        {(() => {
+        {/* Bulk Actions — ActionBar 표준 패턴 (WO-O4O-GLYCOPHARM-PHARMACIES-PAGE-BATCH-UI-ALIGNMENT-V1) */}
+        {selectedIds.size > 0 && (() => {
           const selectedActiveCount = [...selectedIds].filter(id => {
             const p = pharmacies.find(ph => ph.id === id);
             return p?.status === 'active';
@@ -357,18 +359,20 @@ export default function PharmaciesPage() {
                   ...(selectedActiveCount > 0 ? [{
                     key: 'suspend',
                     label: `일시 정지 (${selectedActiveCount})`,
-                    onClick: () => { /* TODO: wire up pharmacy status API */ },
+                    onClick: () => { /* operator pharmacy status API 연결 필요 */ },
                     variant: 'warning' as const,
                     icon: <Clock size={14} />,
-                    loading: isBulkProcessing,
+                    group: 'actions' as const,
+                    visible: true,
                   }] : []),
                   ...(selectedInactiveCount > 0 ? [{
                     key: 'activate',
                     label: `활성화 (${selectedInactiveCount})`,
-                    onClick: () => { /* TODO: wire up pharmacy status API */ },
+                    onClick: () => { /* operator pharmacy status API 연결 필요 */ },
                     variant: 'primary' as const,
                     icon: <CheckCircle size={14} />,
-                    loading: isBulkProcessing,
+                    group: 'actions' as const,
+                    visible: true,
                   }] : []),
                 ]}
               />
@@ -449,30 +453,41 @@ export default function PharmaciesPage() {
             {
               key: 'actions',
               header: '액션',
+              system: true,
               width: '60px',
               align: 'right',
               onCellClick: () => {},
               render: (_v, p) => (
-                <div className="relative flex justify-end">
-                  <button onClick={() => setSelectedPharmacy(selectedPharmacy === p.id ? null : p.id)} className="p-2 rounded-lg hover:bg-slate-100 transition-colors">
-                    <MoreVertical className="w-4 h-4 text-slate-400" />
-                  </button>
-                  {selectedPharmacy === p.id && (
-                    <>
-                      <div className="fixed inset-0 z-10" onClick={() => setSelectedPharmacy(null)} />
-                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border py-2 z-20">
-                        <button className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50">주문 내역</button>
-                        <button className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50">성과 분석</button>
-                        <hr className="my-1" />
-                        {p.status === 'active' ? (
-                          <button className="w-full px-4 py-2 text-left text-sm text-amber-600 hover:bg-amber-50">일시 정지</button>
-                        ) : (
-                          <button className="w-full px-4 py-2 text-left text-sm text-green-600 hover:bg-green-50">활성화</button>
-                        )}
-                      </div>
-                    </>
-                  )}
-                </div>
+                <RowActionMenu
+                  actions={[
+                    {
+                      key: 'orders',
+                      label: '주문 내역',
+                      icon: <ShoppingCart size={14} />,
+                      onClick: () => { /* 주문 내역 상세 진입 */ },
+                    },
+                    {
+                      key: 'analytics',
+                      label: '성과 분석',
+                      icon: <BarChart2 size={14} />,
+                      onClick: () => { /* 성과 분석 진입 */ },
+                      divider: true,
+                    },
+                    ...(p.status === 'active' ? [{
+                      key: 'suspend',
+                      label: '일시 정지',
+                      icon: <Clock size={14} />,
+                      variant: 'warning' as const,
+                      onClick: () => { /* operator pharmacy status API 연결 필요 */ },
+                    }] : [{
+                      key: 'activate',
+                      label: '활성화',
+                      icon: <CheckCircle size={14} />,
+                      variant: 'primary' as const,
+                      onClick: () => { /* operator pharmacy status API 연결 필요 */ },
+                    }]),
+                  ]}
+                />
               ),
             },
           ];
