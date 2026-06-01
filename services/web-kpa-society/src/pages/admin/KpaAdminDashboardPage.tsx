@@ -3,41 +3,38 @@
  *
  * WO-O4O-KPA-ADMIN-DASHBOARD-CANONICAL-SEPARATION-V1
  *
- * operator dashboard(KpaOperatorDashboardPage) 와 완전 분리된 admin 전용 요약 허브.
- * - 시각 강조: 인디고(#4f46e5) 기반 — operator 블루(#2563eb)와 구분
- * - 구조: 요약 KPI + 승인 대기 목록 + 빠른 이동 링크
- * - 복잡한 5-Block 구조 없이 관리자 역할에 맞는 간결한 허브 형태 제공
+ * WO-O4O-KPA-ADMIN-DASHBOARD-ADMIN-UX-CORE-MIGRATION-V1:
+ *   독자 JSX 구현 → @o4o/admin-ux-core AdminDashboardLayout 4-Block 정합 (Neture/GP/KCOS 정렬).
+ *   - A Structure Snapshot: 활성 회원 / 승인 대기 / 등록 분회 KPI
+ *   - B Policy Overview: KPA admin 정책 설정 개념 없음 → 빈 배열(미표시)
+ *   - C Governance Alerts: 전용 데이터 소스 없음 → 빈 배열("구조 이상 없음")
+ *   - D Structure Actions: 회원 관리 / 운영 대시보드 진입
+ *   최근 가입 신청 목록(분회 신청 detail)은 KPA 특수 섹션으로 레이아웃 하단 유지.
+ *   operatorApi.getDistrictSummary(10) / AdminAuthGuard / route / 권한 구조 무변경.
+ *   indigo 헤더 + kpa:admin 배지(시각 정체성) 유지.
  */
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ShieldCheck,
-  Users,
-  Clock,
   ExternalLink,
   AlertTriangle,
-  CheckCircle2,
-  ChevronRight,
 } from 'lucide-react';
+import {
+  AdminDashboardLayout,
+  type AdminDashboardConfig,
+  type StructureMetric,
+  type StructureAction,
+} from '@o4o/admin-ux-core';
 import { operatorApi, type DistrictOperatorSummary } from '../../api/operator';
 
-// ─── 빠른 이동 링크 정의 ────────────────────────────────────────────────────
+// ─── Structure Actions (빠른 이동 — Block D) ───────────────────────────────
 
-const QUICK_LINKS = [
-  {
-    label: '회원 관리',
-    desc: '가입 신청 승인·반려·정지 처리',
-    to: '/operator/members',
-    external: true,
-  },
-  {
-    label: '운영 대시보드',
-    desc: 'operator 공간에서 운영 현황 확인',
-    to: '/operator',
-    external: true,
-  },
-] as const;
+const STRUCTURE_ACTIONS: StructureAction[] = [
+  { id: 'members', label: '회원 관리', link: '/operator/members', icon: '👤', description: '가입 신청 승인·반려·정지 처리' },
+  { id: 'operator', label: '운영 대시보드', link: '/operator', icon: '📊', description: 'operator 공간에서 운영 현황 확인' },
+];
 
 // ─── 날짜 포맷 ──────────────────────────────────────────────────────────────
 
@@ -63,10 +60,35 @@ export function KpaAdminDashboardPage() {
   const kpis = summary?.kpis;
   const pendingList = summary?.pendingRequests?.items ?? [];
 
+  // ── admin-ux-core 4-Block config (WO-O4O-KPA-ADMIN-DASHBOARD-ADMIN-UX-CORE-MIGRATION-V1) ──
+  // WO-O4O-KPA-ADMIN-DASHBOARD-TOTALMEMBERS-LABEL-FIX-V1:
+  //   '활성 회원' = kpa_members.status='active' 만. lifecycle 전체는 회원관리 화면 참조.
+  const structureMetrics: StructureMetric[] = kpis
+    ? [
+        { key: 'active-members', label: '활성 회원', value: kpis.totalMembers, status: 'stable' },
+        {
+          key: 'pending-approvals',
+          label: '승인 대기',
+          value: kpis.pendingApprovals,
+          status: kpis.pendingApprovals > 0 ? 'attention' : 'stable',
+        },
+        { key: 'total-branches', label: '등록 분회', value: kpis.totalBranches, status: 'stable' },
+      ]
+    : [];
+
+  const adminConfig: AdminDashboardConfig = {
+    structureMetrics,
+    // KPA admin 은 정책 설정(configured/not_configured) 개념 없음 → 빈 배열(미표시)
+    policies: [],
+    // 전용 거버넌스 경고 데이터 소스 없음 → 빈 배열("구조 이상 없음")
+    governanceAlerts: [],
+    structureActions: STRUCTURE_ACTIONS,
+  };
+
   return (
     <div className="max-w-5xl mx-auto px-6 py-8 space-y-8">
 
-      {/* ── 헤더 ── */}
+      {/* ── 헤더 (KPA 시각 정체성 — indigo + kpa:admin 배지) ── */}
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-lg bg-indigo-600 flex items-center justify-center shrink-0">
           <ShieldCheck className="w-5 h-5 text-white" />
@@ -80,7 +102,7 @@ export function KpaAdminDashboardPage() {
         </span>
       </div>
 
-      {/* ── KPI 요약 ── */}
+      {/* ── 4-Block 표준 레이아웃 (A Snapshot → B Policy → C GovernanceAlerts → D Actions) ── */}
       {loading ? (
         <div className="grid grid-cols-3 gap-4">
           {[1, 2, 3].map(i => (
@@ -92,43 +114,11 @@ export function KpaAdminDashboardPage() {
           <AlertTriangle className="w-4 h-4 shrink-0" />
           {error}
         </div>
-      ) : kpis ? (
-        <div className="grid grid-cols-3 gap-4">
-          <div className="bg-white border border-slate-200 rounded-xl p-5">
-            {/* WO-O4O-KPA-ADMIN-DASHBOARD-TOTALMEMBERS-LABEL-FIX-V1:
-                실제 count 는 kpa_members.status='active' 만 — 라벨 "전체 회원" → "활성 회원" 정렬.
-                lifecycle 전체(승인 대기 / 정지 / 반려 / 탈퇴 포함) 카운트는 회원관리 화면 참조. */}
-            <div className="flex items-center gap-2 mb-1">
-              <Users className="w-4 h-4 text-slate-400" />
-              <span
-                className="text-xs text-slate-500"
-                title="활성 상태(active)인 회원만 카운트합니다. 승인 대기 / 정지 / 반려 / 탈퇴를 포함한 lifecycle 전체 회원 수는 회원관리 화면을 확인하세요."
-              >
-                활성 회원
-              </span>
-            </div>
-            <p className="text-2xl font-bold text-slate-900">{kpis.totalMembers.toLocaleString()}</p>
-          </div>
-          <div className={`border rounded-xl p-5 ${kpis.pendingApprovals > 0 ? 'bg-amber-50 border-amber-200' : 'bg-white border-slate-200'}`}>
-            <div className="flex items-center gap-2 mb-1">
-              <Clock className={`w-4 h-4 ${kpis.pendingApprovals > 0 ? 'text-amber-500' : 'text-slate-400'}`} />
-              <span className={`text-xs ${kpis.pendingApprovals > 0 ? 'text-amber-700' : 'text-slate-500'}`}>승인 대기</span>
-            </div>
-            <p className={`text-2xl font-bold ${kpis.pendingApprovals > 0 ? 'text-amber-700' : 'text-slate-900'}`}>
-              {kpis.pendingApprovals}
-            </p>
-          </div>
-          <div className="bg-white border border-slate-200 rounded-xl p-5">
-            <div className="flex items-center gap-2 mb-1">
-              <CheckCircle2 className="w-4 h-4 text-slate-400" />
-              <span className="text-xs text-slate-500">등록 분회</span>
-            </div>
-            <p className="text-2xl font-bold text-slate-900">{kpis.totalBranches}</p>
-          </div>
-        </div>
-      ) : null}
+      ) : (
+        <AdminDashboardLayout config={adminConfig} />
+      )}
 
-      {/* ── 승인 대기 목록 ── */}
+      {/* ── 최근 가입 신청 목록 (KPA 특수 섹션 — 분회 신청 detail, 레이아웃 외부 유지) ── */}
       <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
           <h2 className="text-sm font-semibold text-slate-700">최근 가입 신청</h2>
@@ -159,29 +149,6 @@ export function KpaAdminDashboardPage() {
             ))}
           </ul>
         )}
-      </div>
-
-      {/* ── 빠른 이동 ── */}
-      <div>
-        <h2 className="text-sm font-semibold text-slate-700 mb-3">빠른 이동</h2>
-        <div className="grid grid-cols-2 gap-3">
-          {QUICK_LINKS.map(link => (
-            <Link
-              key={link.to}
-              to={link.to}
-              className="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-xl hover:border-indigo-300 hover:bg-indigo-50 transition-colors group"
-            >
-              <div>
-                <div className="flex items-center gap-1.5">
-                  <span className="text-sm font-medium text-slate-800 group-hover:text-indigo-700">{link.label}</span>
-                  {link.external && <ExternalLink className="w-3 h-3 text-slate-400 group-hover:text-indigo-500" />}
-                </div>
-                <p className="text-xs text-slate-400 mt-0.5">{link.desc}</p>
-              </div>
-              <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-indigo-400" />
-            </Link>
-          ))}
-        </div>
       </div>
 
     </div>
