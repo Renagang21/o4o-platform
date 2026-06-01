@@ -10,13 +10,17 @@
  *   [5] Governance    — 역할·권한 구조 관리
  *   [6] Network       — 약국 네트워크·회원 구조 관리
  *
+ * WO-O4O-GLYCOPHARM-ADMIN-DASHBOARD-LAYOUT-WRAPPER-V1:
+ *   admin-ux-core 블록 개별 렌더링 → AdminDashboardLayout wrapper 적용 (Neture 정합).
+ *   4-Block 표준(A:Snapshot → B:Policy → C:GovernanceAlerts → D:Actions) 구조로 정렬.
+ *   누락돼 있던 C(GovernanceAlerts) 블록 채움(현재 데이터 없음 → 빈 배열, "구조 이상 없음").
+ *   Phase 2 Finance/Governance/Network 섹션은 레이아웃 하단에 유지(공통 추출은 후속 WO).
+ *
  * Block 구조:
- *  [1] Structure Snapshot (KPI) — 플랫폼 구조 지표 (Admin 관점 6개)
- *  [2] Policy Overview (Action Queue) — Admin 점검·처리 항목
- *  [3] Structure Actions (Quick Actions) — 핵심 관리 기능 바로가기 (6개)
- *  [4] Finance        — 정산·청구 리포트·인보이스 진입점
- *  [5] Governance     — 역할·권한 관리 진입점
- *  [6] Network        — 약국 네트워크·회원 구조 진입점
+ *  AdminDashboardLayout: A Structure Snapshot → B Policy Overview → C Governance Alerts → D Structure Actions
+ *  [+] Finance        — 정산·청구 리포트·인보이스 진입점 (Phase 2, 레이아웃 외부 유지)
+ *  [+] Governance     — 역할·권한 관리 진입점 (Phase 2)
+ *  [+] Network        — 약국 네트워크·회원 구조 진입점 (Phase 2)
  *
  * API: fetchOperatorDashboard() → Admin 관점으로 재매핑
  */
@@ -37,12 +41,11 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import {
-  StructureSnapshotBlock,
-  PolicyOverviewBlock,
-  StructureActionBlock,
+  AdminDashboardLayout,
   type StructureMetric,
   type PolicyItem,
   type StructureAction,
+  type AdminDashboardConfig,
 } from '@o4o/admin-ux-core';
 import { fetchOperatorDashboard } from '@/api/operatorDashboard';
 import type { OperatorDashboardConfig, KpiItem } from '@o4o/operator-ux-core';
@@ -254,8 +257,13 @@ export default function GlycoPharmAdminDashboard() {
     );
   }
 
-  const structureMetrics = buildStructureMetrics(data.kpis);
-  const policies = buildAdminPolicies(data);
+  const adminConfig: AdminDashboardConfig = {
+    structureMetrics: buildStructureMetrics(data.kpis),
+    policies: buildAdminPolicies(data),
+    // GovernanceAlerts: GlycoPharm admin 전용 거버넌스 경고 데이터 소스 없음 → 빈 배열("구조 이상 없음")
+    governanceAlerts: [],
+    structureActions: ADMIN_QUICK_ACTIONS,
+  };
 
   // Phase 2: Network 블록 요약 수치 (기존 KPI에서 추출)
   const activePharmacies = getKpiValue(data.kpis, 'active-pharmacies');
@@ -290,16 +298,10 @@ export default function GlycoPharmAdminDashboard() {
         </button>
       </div>
 
-      {/* Block 1: Structure Snapshot (Admin KPI) */}
-      <StructureSnapshotBlock items={structureMetrics} />
+      {/* 4-Block 표준 레이아웃: A Snapshot → B Policy → C GovernanceAlerts → D Actions */}
+      <AdminDashboardLayout config={adminConfig} />
 
-      {/* Block 2: Policy Overview (Admin Action Queue) */}
-      <PolicyOverviewBlock items={policies} />
-
-      {/* Block 3: Structure Actions (Admin Quick Actions) */}
-      <StructureActionBlock items={ADMIN_QUICK_ACTIONS} />
-
-      {/* Block 4-5: Finance + Governance (Phase 2) — 2열 그리드 */}
+      {/* Phase 2: Finance + Governance — 2열 그리드 (레이아웃 외부, 후속 공통 추출 대상) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Block 4: Finance */}
         <AdminBlock
