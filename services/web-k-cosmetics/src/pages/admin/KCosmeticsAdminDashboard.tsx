@@ -5,11 +5,15 @@
  *   KCosmeticsOperatorDashboard(5-block) 재사용에서 분리.
  *   admin-ux-core 4-block 구조로 K-Cosmetics Admin 전용 뷰 신설.
  *
+ * WO-O4O-KCOS-ADMIN-DASHBOARD-LAYOUT-WRAPPER-V1:
+ *   admin-ux-core 블록 개별 렌더링 → AdminDashboardLayout wrapper 적용 (Neture/GlycoPharm 정합).
+ *   4-Block 표준(A:Snapshot → B:Policy → C:GovernanceAlerts → D:Actions) 구조로 정렬.
+ *   누락돼 있던 C(GovernanceAlerts) 블록 채움(현재 데이터 없음 → 빈 배열, "구조 이상 없음").
+ *   Governance/Network 섹션은 레이아웃 하단에 유지(공통 추출은 후속 WO).
+ *
  * Block 구조:
- *  [A] Structure Snapshot (KPI) — 플랫폼 구조 지표 (Admin 관점)
- *  [B] Policy Overview (Action Queue) — Admin 점검·처리 항목
- *  [C] Structure Actions (Quick Actions) — 핵심 관리 기능 바로가기
- *  [D] Governance/Network — 역할·권한 + 회원·매장 구조 진입점
+ *  AdminDashboardLayout: A Structure Snapshot → B Policy Overview → C Governance Alerts → D Structure Actions
+ *  [+] Governance/Network — 역할·권한 + 회원·매장 구조 진입점 (레이아웃 외부 유지)
  *
  * API: operatorApi.getDashboardSummary() → Admin 관점으로 재매핑
  */
@@ -26,12 +30,11 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import {
-  StructureSnapshotBlock,
-  PolicyOverviewBlock,
-  StructureActionBlock,
+  AdminDashboardLayout,
   type StructureMetric,
   type PolicyItem,
   type StructureAction,
+  type AdminDashboardConfig,
 } from '@o4o/admin-ux-core';
 import { operatorApi } from '@/services/operatorApi';
 import type { OperatorDashboardConfig, KpiItem } from '@o4o/operator-ux-core';
@@ -212,8 +215,13 @@ export default function KCosmeticsAdminDashboard() {
     );
   }
 
-  const structureMetrics = buildStructureMetrics(data.kpis);
-  const policies = buildAdminPolicies(data);
+  const adminConfig: AdminDashboardConfig = {
+    structureMetrics: buildStructureMetrics(data.kpis),
+    policies: buildAdminPolicies(data),
+    // GovernanceAlerts: K-Cosmetics admin 전용 거버넌스 경고 데이터 소스 없음 → 빈 배열("구조 이상 없음")
+    governanceAlerts: [],
+    structureActions: ADMIN_QUICK_ACTIONS,
+  };
 
   return (
     <div className="space-y-6">
@@ -235,16 +243,10 @@ export default function KCosmeticsAdminDashboard() {
         </button>
       </div>
 
-      {/* Block A: Structure Snapshot (Admin KPI) */}
-      <StructureSnapshotBlock items={structureMetrics} />
+      {/* 4-Block 표준 레이아웃: A Snapshot → B Policy → C GovernanceAlerts → D Actions */}
+      <AdminDashboardLayout config={adminConfig} />
 
-      {/* Block B: Policy Overview (Admin Action Queue) */}
-      <PolicyOverviewBlock items={policies} />
-
-      {/* Block C: Structure Actions (Admin Quick Actions) */}
-      <StructureActionBlock items={ADMIN_QUICK_ACTIONS} />
-
-      {/* Block D: Governance + Network — 2열 그리드 */}
+      {/* Governance + Network — 2열 그리드 (레이아웃 외부, 후속 공통 추출 대상) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <AdminBlock
           title="거버넌스 · 권한 관리"
