@@ -174,6 +174,8 @@ const HubBlogLibraryPage = lazy(() => import('@/pages/hub/HubBlogLibraryPage').t
 // WO-O4O-GLYCOPHARM-HUB-POP-QR-LIBRARY-PAGES-V1
 const HubPopLibraryPage = lazy(() => import('@/pages/hub/HubPopLibraryPage').then(m => ({ default: m.HubPopLibraryPage })));
 const HubQrLibraryPage = lazy(() => import('@/pages/hub/HubQrLibraryPage').then(m => ({ default: m.HubQrLibraryPage })));
+// WO-O4O-GLYCOPHARM-STORE-HUB-SIGNAGE-WRAPPER-V1
+const HubSignageLibraryPage = lazy(() => import('@/pages/hub/HubSignageLibraryPage').then(m => ({ default: m.HubSignageLibraryPage })));
 import { GlycoPharmHubLayout } from '@/components/layouts/GlycoPharmHubLayout';
 import { GlycoHubGuard } from '@/components/auth/GlycoHubGuard';
 
@@ -617,7 +619,8 @@ function AppRoutes() {
           <Route index element={<GlycoStoreHubPage />} />
           <Route path="b2b" element={<HubB2BCatalogPage />} />
           <Route path="content" element={<HubContentListPage />} />
-          <Route path="signage" element={<Navigate to="/store/marketing/signage/library" replace />} />
+          {/* WO-O4O-GLYCOPHARM-STORE-HUB-SIGNAGE-WRAPPER-V1: redirect 제거, wrapper page 렌더 */}
+          <Route path="signage" element={<HubSignageLibraryPage />} />
           {/* WO-O4O-STORE-HUB-CROSS-SERVICE-COMMONIZATION-PHASE1-V1: 블로그 탭 추가 */}
           <Route path="blog" element={<HubBlogLibraryPage />} />
           {/* WO-O4O-GLYCOPHARM-HUB-POP-QR-LIBRARY-PAGES-V1: POP / QR 탭 추가 (조회 전용) */}
