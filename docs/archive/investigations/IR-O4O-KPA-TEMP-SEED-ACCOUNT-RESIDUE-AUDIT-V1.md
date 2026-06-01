@@ -94,7 +94,7 @@ Grep "kcos-admin@|kcos-operator@|glyco-operator@|neture-operator@|super-admin@" 
 
 | # | 파일 | 위반 표현 | 분류 |
 |---|------|----------|:----:|
-| B1 | [`docs/reset/O4O-PLATFORM-RESET-EXECUTION-PLAN-V1.md:18`](docs/reset/O4O-PLATFORM-RESET-EXECUTION-PLAN-V1.md#L18) | "복구 \| CI/CD main 배포 → BootstrapCanonicalSeedAccounts migration 자동 실행" | **B 정정** |
+| B1 | [`docs/archive/reports/O4O-PLATFORM-RESET-EXECUTION-PLAN-V1.md:18`](docs/archive/reports/O4O-PLATFORM-RESET-EXECUTION-PLAN-V1.md#L18) | "복구 \| CI/CD main 배포 → BootstrapCanonicalSeedAccounts migration 자동 실행" | **B 정정** |
 | B2 | 동 파일:182 | "CI/CD가 BootstrapCanonicalSeedAccounts migration을 자동 실행한다" | **B 정정** |
 | B3 | 동 파일:203-205 | "kpa-admin@o4o.com / kpa-operator@o4o.com / phamacy1@o4o.com" smoke test 표 — **production 검증 절차에 임시 계정 로그인 명시** | **B 정정** |
 
@@ -290,7 +290,7 @@ Grep -r "kcos-admin@|kcos-operator@|glyco-operator@|neture-operator@|super-admin
 - `services/web-glycopharm/src/pages/auth/LoginPage.tsx:213-244`
 - `scripts/verify/verify-ai-content-modal.mjs:14-15`
 - `e2e/registration-approval-login.spec.ts:13,102,161,221,298`
-- `docs/reset/O4O-PLATFORM-RESET-EXECUTION-PLAN-V1.md:18,182,191,203-205`
+- `docs/archive/reports/O4O-PLATFORM-RESET-EXECUTION-PLAN-V1.md:18,182,191,203-205`
 
 ### 13.3 production API 사실 확인 (CHECK-V1 결과)
 
