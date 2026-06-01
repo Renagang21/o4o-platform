@@ -124,7 +124,7 @@ const SignageTemplatesPage = lazy(() => import('@/pages/operator/signage/Templat
 const SignageTemplateDetailPage = lazy(() => import('@/pages/operator/signage/TemplateDetailPage'));
 
 // Store Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
-import { StoreDashboardLayout, StorePlaceholderPage, COSMETICS_STORE_CONFIG, resolveStoreMenu, StoreOwnerGuard } from '@o4o/store-ui-core';
+import { StoreDashboardLayout, COSMETICS_STORE_CONFIG, resolveStoreMenu, StoreOwnerGuard } from '@o4o/store-ui-core';
 import { useStoreCapabilities } from './hooks/useStoreCapabilities';
 
 // Store Settings (WO-STORE-COMMON-SETTINGS-KCOS-UI-V1)
@@ -149,6 +149,8 @@ const ProductionMaterialEditorPage = lazy(() => import('@/pages/store/Production
 const StoreProductDescriptionsPage = lazy(() => import('@/pages/store/StoreProductDescriptionsPage'));
 // WO-O4O-KCOSMETICS-STORE-ORDERS-FRONTEND-ALIGNMENT-V1: 매장 주문 관리
 const StoreOrdersPage = lazy(() => import('@/pages/store/StoreOrdersPage'));
+// WO-O4O-KCOSMETICS-STORE-REVENUE-SUMMARY-FRONTEND-V1: 매출 요약 (참고용)
+const StoreRevenueSummaryPage = lazy(() => import('@/pages/store/StoreRevenueSummaryPage'));
 // WO-O4O-STORE-HUB-CROSS-SERVICE-COMMONIZATION-PHASE1-V1
 const StoreAssetsPage = lazy(() => import('@/pages/store/StoreAssetsPage'));
 
@@ -670,7 +672,7 @@ function AppRoutes() {
         <Route path="commerce/local-products" element={<StoreLocalProductsPage />} />
         <Route path="commerce/tablet-displays" element={<StoreTabletDisplaysPage />} />
         <Route path="commerce/orders" element={<StoreOrdersPage />} />
-        <Route path="commerce/billing" element={<StorePlaceholderPage title="정산/인보이스" />} />
+        <Route path="commerce/billing" element={<StoreRevenueSummaryPage />} />
         <Route path="marketing/signage" element={<Navigate to="playlist" replace />} />
         <Route path="marketing/signage/playlist" element={<StoreSignagePage />} />
         <Route path="marketing/signage/videos" element={<StoreSignagePage />} />

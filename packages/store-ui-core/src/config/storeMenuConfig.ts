@@ -91,6 +91,8 @@ export const COSMETICS_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'local-products', label: '자체 상품',    subPath: '/commerce/local-products' },
       // WO-O4O-KCOSMETICS-STORE-ORDERS-FRONTEND-ALIGNMENT-V1: 매장 주문 관리
       { key: 'orders',         label: '주문 내역',    subPath: '/commerce/orders' },
+      // WO-O4O-KCOSMETICS-STORE-REVENUE-SUMMARY-FRONTEND-V1: 매출 요약 (참고용, 정산 확정 아님)
+      { key: 'billing',        label: '매출 요약',    subPath: '/commerce/billing' },
     ]},
     { label: '디지털 사이니지', items: [
       // WO-O4O-MY-STORE-SIGNAGE-SUBMENU-ALIGNMENT-V1: KPA/GP 기준 서브메뉴 정렬 (player 미구현 제외)
