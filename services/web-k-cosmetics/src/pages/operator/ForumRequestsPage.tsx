@@ -13,9 +13,11 @@ import {
   Clock,
   ChevronDown,
   Loader2,
+  CheckCircle,
+  XCircle,
 } from 'lucide-react';
-import { BaseDetailDrawer } from '@o4o/ui';
-import { DataTable } from '@o4o/operator-ux-core';
+import { BaseDetailDrawer, ActionBar, BulkResultModal } from '@o4o/ui';
+import { DataTable, useBatchAction } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { toast } from '@o4o/error-handling';
 import { forumOperatorApi } from '@/services/forumApi';
@@ -72,8 +74,19 @@ export default function ForumRequestsPage() {
   const [reviewComment, setReviewComment] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // WO-O4O-GLYCOPHARM-KCOS-FORUM-REQUEST-BULK-PARITY-V1:
+  //   ForumDeleteRequestsPage 와 동일 조작 질서 — checkbox selection + ActionBar + bulk 승인/거절.
+  //   revision(보완)은 의견 필수이므로 bulk 대상에서 제외. backend batch 부재 → review fan-out.
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const batch = useBatchAction();
+
   useEffect(() => {
     loadRequests();
+  }, [statusFilter]);
+
+  // 필터 변경 시 선택 초기화
+  useEffect(() => {
+    setSelectedIds(new Set());
   }, [statusFilter]);
 
   const loadRequests = async () => {
@@ -121,6 +134,44 @@ export default function ForumRequestsPage() {
       toast.error('처리 중 오류가 발생했습니다.');
     } finally {
       setIsProcessing(false);
+    }
+  };
+
+  // ─── Bulk Actions (review fan-out, 보완 제외) ───
+
+  const selectedReviewableCount = [...selectedIds].filter((id) => {
+    const r = requests.find((req) => req.id === id);
+    return r ? isReviewable(r.status) : false;
+  }).length;
+
+  const runBulk = async (action: 'approve' | 'reject') => {
+    const targetIds = [...selectedIds].filter((id) => {
+      const r = requests.find((req) => req.id === id);
+      return r ? isReviewable(r.status) : false;
+    });
+    if (targetIds.length === 0) return;
+    const result = await batch.executeBatch(async (ids) => {
+      const settled = await Promise.allSettled(
+        ids.map((id) => forumOperatorApi.review(id, { action })),
+      );
+      return {
+        data: {
+          results: settled.map((r, i) => {
+            if (r.status === 'rejected') {
+              return { id: ids[i], status: 'failed' as const, error: (r.reason as any)?.message || '오류' };
+            }
+            const val = r.value as { success?: boolean; error?: string };
+            if (val && val.success === false) {
+              return { id: ids[i], status: 'failed' as const, error: val.error || '처리 실패' };
+            }
+            return { id: ids[i], status: 'success' as const };
+          }),
+        },
+      };
+    }, targetIds);
+    if (result.successCount > 0) {
+      setSelectedIds(new Set());
+      loadRequests();
     }
   };
 
@@ -226,6 +277,43 @@ export default function ForumRequestsPage() {
         </div>
       </div>
 
+      {/* Bulk ActionBar + 결과 모달 */}
+      <ActionBar
+        selectedCount={selectedIds.size}
+        onClearSelection={() => setSelectedIds(new Set())}
+        actions={[
+          {
+            key: 'approve',
+            label: `승인 (${selectedReviewableCount})`,
+            onClick: () => runBulk('approve'),
+            variant: 'primary' as const,
+            icon: <CheckCircle size={14} />,
+            loading: batch.loading,
+            group: 'actions',
+            tooltip: '선택된 신청을 일괄 승인합니다',
+            visible: selectedReviewableCount > 0,
+          },
+          {
+            key: 'reject',
+            label: `거절 (${selectedReviewableCount})`,
+            onClick: () => runBulk('reject'),
+            variant: 'danger' as const,
+            icon: <XCircle size={14} />,
+            loading: batch.loading,
+            group: 'actions',
+            tooltip: '선택된 신청을 일괄 거절합니다',
+            visible: selectedReviewableCount > 0,
+          },
+        ]}
+      />
+
+      <BulkResultModal
+        open={batch.showResult}
+        onClose={() => { batch.clearResult(); loadRequests(); }}
+        result={batch.result}
+        onRetry={() => { batch.retryFailed(); }}
+      />
+
       <DataTable<RequestData>
         columns={columns}
         data={filteredRequests}
@@ -234,6 +322,9 @@ export default function ForumRequestsPage() {
         onRowClick={(req) => { setSelectedRequest(req); setReviewComment(''); }}
         emptyMessage="검색 조건에 맞는 신청이 없습니다"
         tableId="kcos-forum-requests"
+        selectable
+        selectedKeys={selectedIds}
+        onSelectionChange={setSelectedIds}
       />
 
       <BaseDetailDrawer
