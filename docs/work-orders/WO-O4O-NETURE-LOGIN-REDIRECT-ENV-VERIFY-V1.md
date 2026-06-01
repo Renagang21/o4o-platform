@@ -210,7 +210,7 @@ const handleLoginSuccess = (role?: string, roles?: string[]) => {
 
 ## 이전 관련 문서
 
-- `docs/audit/IR-O4O-NETURE-LOGIN-REDIRECT-TRACE-AUDIT-V1.md` — 전체 리다이렉트 흐름 감사
+- `docs/archive/audits/IR-O4O-NETURE-LOGIN-REDIRECT-TRACE-AUDIT-V1.md` — 전체 리다이렉트 흐름 감사
 - WO-O4O-NETURE-AUTH-ROLE-REDIRECT-FIX-V1 (`a0e119703`) — 역할 정렬 수정
 - WO-O4O-NETURE-LOGIN-ROLE-DATA-VERIFY-V1 — DB→API→Frontend 데이터 검증
 

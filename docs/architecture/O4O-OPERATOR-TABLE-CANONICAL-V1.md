@@ -4,7 +4,7 @@
 > 신규 개발 및 기존 화면 전환 시 반드시 이 문서를 따른다.
 
 **작성일:** 2026-05-07  
-**기반 조사:** `docs/investigations/IR-O4O-OPERATOR-TABLE-CANONICAL-GAP-AUDIT-V1.md`  
+**기반 조사:** `docs/archive/investigations/IR-O4O-OPERATOR-TABLE-CANONICAL-GAP-AUDIT-V1.md`  
 **상태:** ACTIVE  
 
 ---
@@ -713,7 +713,7 @@ row click → drawer open + checkbox selection 동시 설정 시:
 
 | 문서 | 경로 |
 |------|------|
-| Gap 조사 결과 | `docs/investigations/IR-O4O-OPERATOR-TABLE-CANONICAL-GAP-AUDIT-V1.md` |
+| Gap 조사 결과 | `docs/archive/investigations/IR-O4O-OPERATOR-TABLE-CANONICAL-GAP-AUDIT-V1.md` |
 | Operator Dashboard 표준 | `docs/platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md` |
 | Operator DataTable 정책 | `docs/architecture/OPERATOR-DATATABLE-POLICY-V1.md` |
 | HUB Template Standard | `docs/platform/hub/O4O-HUB-TEMPLATE-STANDARD-V1.md` |

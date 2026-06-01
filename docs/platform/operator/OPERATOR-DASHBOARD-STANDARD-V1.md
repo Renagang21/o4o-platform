@@ -381,7 +381,7 @@ Neture의 `/workspace/operator` 접두사는 레거시이며 신규 서비스에
 
 ---
 
-> 📄 근거: `docs/audit/IR-O4O-ADMIN-OPERATOR-ROLE-ARCHITECTURE-AUDIT-V1.md`
+> 📄 근거: `docs/archive/audits/IR-O4O-ADMIN-OPERATOR-ROLE-ARCHITECTURE-AUDIT-V1.md`
 > 📄 참조: `docs/baseline/BASELINE-OPERATOR-OS-V1.md`
 
 *Version: 1.1*

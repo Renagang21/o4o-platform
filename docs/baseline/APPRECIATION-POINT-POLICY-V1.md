@@ -4,7 +4,7 @@
 > 이 문서는 구현 WO의 계약 기준이다.
 >
 > **상태**: 확정 (2026-05-22)
-> **근거 조사**: `docs/investigations/IR-O4O-APPRECIATION-POINT-LIKE-SYSTEM-AUDIT-V1.md`
+> **근거 조사**: `docs/archive/investigations/IR-O4O-APPRECIATION-POINT-LIKE-SYSTEM-AUDIT-V1.md`
 > **정책 WO**: WO-O4O-APPRECIATION-POINT-POLICY-FINALIZATION-V1
 
 ---

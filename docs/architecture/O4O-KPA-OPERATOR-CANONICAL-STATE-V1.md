@@ -8,8 +8,8 @@
 - 기준 브랜치: `main` (`2f3f67f02` 시점)
 - 분류: Architecture · KPA-Society · Operator
 - 자매 IR
-  - [IR-O4O-KPA-OPERATOR-LIST-CANONICAL-RECHECK-V1](../investigations/IR-O4O-KPA-OPERATOR-LIST-CANONICAL-RECHECK-V1.md) — 본 문서의 origin 조사
-  - [IR-O4O-KPA-ROLE-CAPABILITY-AND-APPROVAL-CANONICAL-AUDIT-V1](../investigations/IR-O4O-KPA-ROLE-CAPABILITY-AND-APPROVAL-CANONICAL-AUDIT-V1.md) — Profile/Capability/Membership 분리
+  - [IR-O4O-KPA-OPERATOR-LIST-CANONICAL-RECHECK-V1](../archive/investigations/IR-O4O-KPA-OPERATOR-LIST-CANONICAL-RECHECK-V1.md) — 본 문서의 origin 조사
+  - [IR-O4O-KPA-ROLE-CAPABILITY-AND-APPROVAL-CANONICAL-AUDIT-V1](../archive/investigations/IR-O4O-KPA-ROLE-CAPABILITY-AND-APPROVAL-CANONICAL-AUDIT-V1.md) — Profile/Capability/Membership 분리
 
 ---
 

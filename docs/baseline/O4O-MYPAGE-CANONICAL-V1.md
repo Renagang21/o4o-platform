@@ -2,11 +2,11 @@
 
 > **Baseline — 계정 관리 UI 의 canonical 위치 고정 문서.**
 >
-> 본 문서는 [IR-O4O-MYPAGE-VS-ACCOUNT-CENTER-CANONICAL-V1](../investigations/IR-O4O-MYPAGE-VS-ACCOUNT-CENTER-CANONICAL-V1.md) 의 **Option D** 채택을 baseline 으로 승격하여, 향후 web-account 에 비밀번호 / 프로필 / 서비스별 기능을 과도하게 추가하는 drift 를 방지한다.
+> 본 문서는 [IR-O4O-MYPAGE-VS-ACCOUNT-CENTER-CANONICAL-V1](../archive/investigations/IR-O4O-MYPAGE-VS-ACCOUNT-CENTER-CANONICAL-V1.md) 의 **Option D** 채택을 baseline 으로 승격하여, 향후 web-account 에 비밀번호 / 프로필 / 서비스별 기능을 과도하게 추가하는 drift 를 방지한다.
 
 - **버전:** V1 (2026-05-24)
 - **상태:** Baseline (Locked)
-- **선행 산출물:** [IR-O4O-MYPAGE-VS-ACCOUNT-CENTER-CANONICAL-V1](../investigations/IR-O4O-MYPAGE-VS-ACCOUNT-CENTER-CANONICAL-V1.md)
+- **선행 산출물:** [IR-O4O-MYPAGE-VS-ACCOUNT-CENTER-CANONICAL-V1](../archive/investigations/IR-O4O-MYPAGE-VS-ACCOUNT-CENTER-CANONICAL-V1.md)
 - **상위 SSOT:**
   - `CLAUDE.md` (사업 철학 priority chain)
   - [O4O-IDENTITY-ARCHITECTURE-V2](../architecture/O4O-IDENTITY-ARCHITECTURE-V2.md) (4-Layer 모델)
@@ -179,10 +179,10 @@
 
 ## 부록 — 참조
 
-- 결정 근거 IR: [IR-O4O-MYPAGE-VS-ACCOUNT-CENTER-CANONICAL-V1](../investigations/IR-O4O-MYPAGE-VS-ACCOUNT-CENTER-CANONICAL-V1.md)
-- 위치 규정 CHECK: [CHECK-O4O-WEB-ACCOUNT-ENTRY-FLOW-REGRESSION-V1](../investigations/CHECK-O4O-WEB-ACCOUNT-ENTRY-FLOW-REGRESSION-V1.md)
+- 결정 근거 IR: [IR-O4O-MYPAGE-VS-ACCOUNT-CENTER-CANONICAL-V1](../archive/investigations/IR-O4O-MYPAGE-VS-ACCOUNT-CENTER-CANONICAL-V1.md)
+- 위치 규정 CHECK: [CHECK-O4O-WEB-ACCOUNT-ENTRY-FLOW-REGRESSION-V1](../archive/checks/CHECK-O4O-WEB-ACCOUNT-ENTRY-FLOW-REGRESSION-V1.md)
 - Identity V2: [O4O-IDENTITY-ARCHITECTURE-V2](../architecture/O4O-IDENTITY-ARCHITECTURE-V2.md)
-- Handoff 정책: [IR-O4O-AUTH-HANDOFF-POLICY-AUDIT-V1](../investigations/IR-O4O-AUTH-HANDOFF-POLICY-AUDIT-V1.md)
+- Handoff 정책: [IR-O4O-AUTH-HANDOFF-POLICY-AUDIT-V1](../archive/investigations/IR-O4O-AUTH-HANDOFF-POLICY-AUDIT-V1.md)
 - Boundary Policy: `docs/architecture/O4O-BOUNDARY-POLICY-V1.md`
 - 사업 철학: [O4O-BUSINESS-PHILOSOPHY-V1](O4O-BUSINESS-PHILOSOPHY-V1.md)
 - web-account 위치 규정 (memory): `web-account 는 legacy 가 아니라 각 서비스에서 진입하는 계정센터`

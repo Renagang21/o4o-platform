@@ -346,7 +346,7 @@ Phase 2 (HUB/Store 경계)  ←── Phase 1 완료 후 KPA 구조가 안정되
 
 | 문서 | 역할 |
 |------|------|
-| `docs/audit/IR-O4O-STORE-SIGNAGE-CURRENT-STATE-AUDIT-V1.md` | 현황 감사 (본 WO의 근거) |
+| `docs/archive/audits/IR-O4O-STORE-SIGNAGE-CURRENT-STATE-AUDIT-V1.md` | 현황 감사 (본 WO의 근거) |
 | `docs/kpa/IR-KPA-SIGNAGE-CURRENT-STATE-AUDIT-V1.md` | KPA 한정 현황 감사 |
 | `docs/kpa/WO-KPA-SIGNAGE-DEAD-CODE-RETIREMENT-PLAN-V1.md` | Dead code 제거 계획 |
 | `docs/kpa/WO-KPA-SIGNAGE-IA-RESTRUCTURE-DRAFT-V1.md` | KPA IA 재설계 초안 |

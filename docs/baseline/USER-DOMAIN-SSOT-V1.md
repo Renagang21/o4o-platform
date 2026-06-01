@@ -203,7 +203,7 @@ SELECT u.* FROM users u WHERE u.service_key = $1
 | `docs/rbac/RBAC-FREEZE-DECLARATION-V1.md` | RBAC SSOT (F9) |
 | `docs/architecture/O4O-CORE-FREEZE-V1.md` | Core 모듈 동결 (F10) |
 | `docs/architecture/O4O-BOUNDARY-POLICY-V1.md` | 경계 정책 (F6) |
-| `docs/audit/IR-O4O-USER-DOMAIN-AUDIT-V1.md` | 전수 조사 결과 |
+| `docs/archive/audits/IR-O4O-USER-DOMAIN-AUDIT-V1.md` | 전수 조사 결과 |
 | `docs/platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md` | Admin/Operator 역할 표준 |
 
 ---

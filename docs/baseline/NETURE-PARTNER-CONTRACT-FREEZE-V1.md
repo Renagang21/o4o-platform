@@ -160,8 +160,8 @@ Application(pending) → approve → Transaction {
 | 문서 | 경로 |
 |------|------|
 | 계약 아키텍처 설계 | `docs/architecture/SELLER-PARTNER-CONTRACT-ARCHITECTURE-V1.md` |
-| 파트너 구조 조사 | `docs/investigations/IR-NETURE-PARTNER-STRUCTURE-INVESTIGATION-V1.md` |
-| 계약 검증 리포트 | `docs/investigations/IR-NETURE-SELLER-PARTNER-CONTRACT-VALIDATION-V1.md` |
+| 파트너 구조 조사 | `docs/archive/investigations/IR-NETURE-PARTNER-STRUCTURE-INVESTIGATION-V1.md` |
+| 계약 검증 리포트 | `docs/archive/investigations/IR-NETURE-SELLER-PARTNER-CONTRACT-VALIDATION-V1.md` |
 
 ---
 
