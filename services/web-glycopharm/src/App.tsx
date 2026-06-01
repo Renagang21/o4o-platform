@@ -318,6 +318,8 @@ const StoreProductionMaterialsPage = lazy(() => import('@/pages/store-management
 const ProductionMaterialEditorPage = lazy(() => import('@/pages/store-management/ProductionMaterialEditorPage'));
 // WO-O4O-MY-STORE-PRODUCT-DESCRIPTION-CROSSSERVICE-ALIGNMENT-V1: 약국 상품 설명
 const StoreProductDescriptionsPage = lazy(() => import('@/pages/store-management/StoreProductDescriptionsPage'));
+// WO-O4O-STORE-MARKETING-ANALYTICS-CROSSSERVICE-V1: 마케팅 분석
+const StoreMarketingAnalyticsPage = lazy(() => import('@/pages/store-management/StoreMarketingAnalyticsPage').then(m => ({ default: m.StoreMarketingAnalyticsPage })));
 
 // Loading fallback
 function PageLoading() {
@@ -938,6 +940,8 @@ function AppRoutes() {
         <Route path="marketing/pop" element={<StorePopPage />} />
         {/* QR 관리 (WO-O4O-GLYCOPHARM-QR-STORE-EXECUTION-V1) */}
         <Route path="marketing/qr" element={<StoreQrPage />} />
+        {/* 마케팅 분석 (WO-O4O-STORE-MARKETING-ANALYTICS-CROSSSERVICE-V1) */}
+        <Route path="analytics/marketing" element={<StoreMarketingAnalyticsPage />} />
         {/* 내 자료함 (WO-O4O-STORE-LIBRARY-CROSSSERVICE-PHASE2-B-V1 / PHASE2-C-V1) */}
         <Route path="library/contents" element={<StoreLibraryContentsPage />} />
         <Route path="library/resources" element={<StoreLibraryResourcesPage />} />

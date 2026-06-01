@@ -119,6 +119,10 @@ export const COSMETICS_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'library-resources',            label: '자료',        subPath: '/library/resources' },
       { key: 'library-production-materials', label: '매장 제작 자료', subPath: '/library/production-materials' },
     ]},
+    // WO-O4O-STORE-MARKETING-ANALYTICS-CROSSSERVICE-V1: 마케팅 분석
+    { label: '분석', items: [
+      { key: 'analytics-marketing', label: '마케팅 분석', subPath: '/analytics/marketing' },
+    ]},
     { label: '설정', items: [
       // WO-O4O-KCOSMETICS-STORE-PROFILE-EDIT-PAGE-V1:
       //   매장 경영자 사업자 정보 조회/수정 — users.businessInfo SSOT
@@ -197,6 +201,13 @@ export const GLYCOPHARM_STORE_CONFIG: StoreDashboardConfig = {
         { key: 'library-contents',             label: '콘텐츠',   subPath: '/library/contents' },
         { key: 'library-resources',            label: '자료',     subPath: '/library/resources' },
         { key: 'library-production-materials', label: '제작 자료', subPath: '/library/production-materials' },
+      ],
+    },
+    {
+      label: '분석',
+      // WO-O4O-STORE-MARKETING-ANALYTICS-CROSSSERVICE-V1: 마케팅 분석
+      items: [
+        { key: 'analytics-marketing', label: '마케팅 분석', subPath: '/analytics/marketing' },
       ],
     },
     {

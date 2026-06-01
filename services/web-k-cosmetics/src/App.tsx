@@ -147,6 +147,8 @@ const StoreProductionMaterialsPage = lazy(() => import('@/pages/store/StoreProdu
 const ProductionMaterialEditorPage = lazy(() => import('@/pages/store/ProductionMaterialEditorPage'));
 // WO-O4O-MY-STORE-PRODUCT-DESCRIPTION-CROSSSERVICE-ALIGNMENT-V1: 매장 상품 설명
 const StoreProductDescriptionsPage = lazy(() => import('@/pages/store/StoreProductDescriptionsPage'));
+// WO-O4O-STORE-MARKETING-ANALYTICS-CROSSSERVICE-V1: 마케팅 분석
+const StoreMarketingAnalyticsPage = lazy(() => import('@/pages/store/StoreMarketingAnalyticsPage').then(m => ({ default: m.StoreMarketingAnalyticsPage })));
 // WO-O4O-KCOSMETICS-STORE-ORDERS-FRONTEND-ALIGNMENT-V1: 매장 주문 관리
 const StoreOrdersPage = lazy(() => import('@/pages/store/StoreOrdersPage'));
 // WO-O4O-KCOSMETICS-STORE-REVENUE-SUMMARY-FRONTEND-V1: 매출 요약 (참고용)
@@ -716,6 +718,8 @@ function AppRoutes() {
         {/* WO-O4O-KCOSMETICS-STORE-PATH-NESTED-MIGRATION-V1: POP/QR nested canonical (marketing/*) */}
         <Route path="marketing/pop" element={<StorePopPage />} />
         <Route path="marketing/qr" element={<StoreQrPage />} />
+        {/* 마케팅 분석 (WO-O4O-STORE-MARKETING-ANALYTICS-CROSSSERVICE-V1) */}
+        <Route path="analytics/marketing" element={<StoreMarketingAnalyticsPage />} />
         {/* 내 자료함 (WO-O4O-STORE-LIBRARY-CROSSSERVICE-PHASE2-B-V1 / PHASE2-C-V1) */}
         <Route path="library/contents" element={<StoreLibraryContentsPage />} />
         <Route path="library/resources" element={<StoreLibraryResourcesPage />} />
