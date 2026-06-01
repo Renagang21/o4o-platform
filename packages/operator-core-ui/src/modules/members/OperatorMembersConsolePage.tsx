@@ -224,6 +224,7 @@ export function OperatorMembersConsolePage({
   drawerExtraSections,
   renderEditModal,
   renderDeleteFlow,
+  searchPlaceholder,
   tableId,
 }: OperatorMembersConsolePageProps) {
   const getPrimaryRole = useMemo(
@@ -690,6 +691,7 @@ export function OperatorMembersConsolePage({
         search={search}
         onSearchChange={setSearch}
         onSearch={(q) => setSearchQuery(q)}
+        {...(searchPlaceholder !== undefined && { searchPlaceholder })}
         headerActions={
           <button
             onClick={() => {

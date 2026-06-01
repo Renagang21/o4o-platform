@@ -211,6 +211,13 @@ export interface OperatorMembersConsolePageProps {
   roleColumnHeader?: string;
 
   /**
+   * Search input placeholder. Default: '이름, 이메일로 검색' (MemberListLayout default).
+   * Backend searches: firstName, lastName, email, name — customise per service if needed.
+   * WO-O4O-MEMBER-MANAGEMENT-WRAPPER-SEARCH-PLACEHOLDER-PROP-V1
+   */
+  searchPlaceholder?: string;
+
+  /**
    * Service-specific extra column. Inserted between role and createdAt.
    * Neture: dashboardAccess column.
    * @deprecated Prefer extraColumns[] for multi-column extension.
