@@ -110,6 +110,8 @@ export const COSMETICS_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'content-blog',   label: '블로그',  subPath: '/content/blog' },
       { key: 'pop',            label: 'POP',     subPath: '/marketing/pop' },
       { key: 'qr',             label: 'QR 코드', subPath: '/marketing/qr' },
+      // WO-O4O-STORE-PRODUCT-DESCRIPTIONS-CROSSSERVICE-V1: 상품 상세설명 관리
+      { key: 'product-descriptions', label: '상품 상세설명', subPath: '/library/product-descriptions' },
     ]},
     // WO-O4O-STORE-LIBRARY-CROSSSERVICE-PHASE2-B-V1 / PHASE2-C-V1: 내 자료함
     { label: '내 자료함', items: [
@@ -183,6 +185,8 @@ export const GLYCOPHARM_STORE_CONFIG: StoreDashboardConfig = {
         // WO-O4O-GLYCOPHARM-STORE-PATH-NESTED-MIGRATION-V1: marketing nested canonical 정렬
         { key: 'pop',          label: 'POP',            subPath: '/marketing/pop' },
         { key: 'qr',           label: 'QR 코드',        subPath: '/marketing/qr' },
+        // WO-O4O-STORE-PRODUCT-DESCRIPTIONS-CROSSSERVICE-V1: 상품 상세설명 관리
+        { key: 'product-descriptions', label: '상품 상세설명', subPath: '/library/product-descriptions' },
         { key: 'channels',     label: '채널 관리',      subPath: '/channels' },
       ],
     },
