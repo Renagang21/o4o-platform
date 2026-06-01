@@ -9,7 +9,8 @@
  * 범위:
  *   - POP 2개 (당뇨 정보형, 일반형)
  *   - QR 2개 (혈당 관리형, 제품 안내형)
- *   - blog / product-description 은 GlycoPharm 현재 미노출 (Phase 2-J 제외)
+ *   - blog 은 GlycoPharm 현재 미노출 (별도 WO 예정)
+ *   - product-description: WO-O4O-MY-STORE-PRODUCT-DESCRIPTION-CROSSSERVICE-ALIGNMENT-V1 에서 추가
  *
  * 타입: @o4o/types/production-template (공통 canonical)
  * 사용처: StoreLibraryContentsPage → StartProductionModal → getTemplates prop
@@ -118,6 +119,66 @@ export const GLYCOPHARM_TEMPLATE_REGISTRY: ProductionTemplate[] = [
       '제품명, 주요 기능, 상담 안내를 간결하게 포함하며, ' +
       '과장된 효능 표현은 사용하지 마세요.',
   },
+
+  // ─── Product Description (2개) ─────────────────────────────────────────────
+  // WO-O4O-MY-STORE-PRODUCT-DESCRIPTION-CROSSSERVICE-ALIGNMENT-V1
+  // GlycoPharm 사용자-facing 문구는 "내 약국" 표현 유지 (약국 전용 서비스)
+  // ⚠️ "내 매장"으로 일괄 치환 금지
+
+  {
+    id: 'glyco-product-desc-diabetes',
+    target: 'product-description',
+    name: '당뇨 관련 상품',
+    description: '혈당 측정기·당뇨 관련 건강기능식품·CGM 등 약국 상품 상세설명',
+    style: '약국 상품형',
+    tags: ['pharmacy', 'diabetes', 'glucometer', 'product'],
+    forcedOptions: { length: 'medium', tone: 'professional' },
+    outputConstraints: {
+      maxBodyLength: 500,
+      allowedLengths: ['short', 'medium', 'long'],
+      requiredFields: ['title', 'body'],
+    },
+    systemPromptOverride:
+      '약국에서 판매하는 혈당 측정기, 당뇨 관련 건강기능식품, CGM 등 상품의 상세설명을 작성합니다. ' +
+      '제품명, 주요 기능, 사용 대상, 복용/사용 방법을 명확하고 신뢰감 있게 안내하세요. ' +
+      '과장된 효능 표현과 진단·처방 행위로 오해될 표현은 사용하지 마세요. ' +
+      '약사가 환자에게 직접 설명하는 전문적이고 친근한 어조를 유지합니다.',
+    starterHtml:
+      '<h2>상품명</h2>' +
+      '<p>주요 특징과 대상 고객을 간략히 소개합니다.</p>' +
+      '<h3>제품 특징</h3>' +
+      '<ul><li>특징 1</li><li>특징 2</li><li>특징 3</li></ul>' +
+      '<h3>사용 방법</h3>' +
+      '<p>사용 방법을 안내합니다.</p>',
+  },
+
+  {
+    id: 'glyco-product-desc-general',
+    target: 'product-description',
+    name: '일반 약국 상품',
+    description: '약국 취급 일반 의약품·건강식품·의료기기 범용 상세설명',
+    style: '범용형',
+    tags: ['pharmacy', 'general', 'health', 'product'],
+    forcedOptions: { length: 'medium', tone: 'professional' },
+    outputConstraints: {
+      maxBodyLength: 500,
+      allowedLengths: ['short', 'medium', 'long'],
+      requiredFields: ['title', 'body'],
+    },
+    systemPromptOverride:
+      '약국에서 취급하는 일반 의약품, 건강기능식품, 의료기기 등 상품의 상세설명을 작성합니다. ' +
+      '제품의 주요 성분·기능·용도를 고객이 이해하기 쉽게 안내하세요. ' +
+      '효능 과대 표현 없이 정확한 정보를 전달하며, ' +
+      '복용 시 주의사항이나 약사 상담 안내를 포함합니다.',
+    starterHtml:
+      '<h2>상품명</h2>' +
+      '<p>상품 소개를 작성합니다.</p>' +
+      '<h3>주요 성분 및 기능</h3>' +
+      '<ul><li>성분/기능 1</li><li>성분/기능 2</li></ul>' +
+      '<h3>주의사항</h3>' +
+      '<p>주의사항을 안내합니다.</p>',
+  },
+
 ];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────

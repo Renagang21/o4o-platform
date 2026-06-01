@@ -316,6 +316,8 @@ const StoreLibraryResourcesPage = lazy(() => import('@/pages/store-management/St
 const StoreProductionMaterialsPage = lazy(() => import('@/pages/store-management/StoreProductionMaterialsPage'));
 // WO-O4O-PRODUCTION-AI-EDITOR-CROSSSERVICE-PHASE2-I-V1: AI 제작 자료 편집
 const ProductionMaterialEditorPage = lazy(() => import('@/pages/store-management/ProductionMaterialEditorPage'));
+// WO-O4O-MY-STORE-PRODUCT-DESCRIPTION-CROSSSERVICE-ALIGNMENT-V1: 약국 상품 설명
+const StoreProductDescriptionsPage = lazy(() => import('@/pages/store-management/StoreProductDescriptionsPage'));
 
 // Loading fallback
 function PageLoading() {
@@ -941,6 +943,8 @@ function AppRoutes() {
         <Route path="library/resources" element={<StoreLibraryResourcesPage />} />
         <Route path="library/production-materials" element={<StoreProductionMaterialsPage />} />
         <Route path="library/production-materials/new" element={<ProductionMaterialEditorPage />} />
+        {/* WO-O4O-MY-STORE-PRODUCT-DESCRIPTION-CROSSSERVICE-ALIGNMENT-V1: 약국 상품 설명 */}
+        <Route path="library/product-descriptions" element={<StoreProductDescriptionsPage />} />
         <Route path="management" element={<PharmacyManagement />} />
         <Route path="management/b2b" element={<PharmacyB2BProducts />} />
 

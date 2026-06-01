@@ -145,6 +145,8 @@ const StoreLibraryResourcesPage = lazy(() => import('@/pages/store/StoreLibraryR
 const StoreProductionMaterialsPage = lazy(() => import('@/pages/store/StoreProductionMaterialsPage'));
 // WO-O4O-PRODUCTION-AI-EDITOR-CROSSSERVICE-PHASE2-I-V1: AI 제작 자료 편집
 const ProductionMaterialEditorPage = lazy(() => import('@/pages/store/ProductionMaterialEditorPage'));
+// WO-O4O-MY-STORE-PRODUCT-DESCRIPTION-CROSSSERVICE-ALIGNMENT-V1: 매장 상품 설명
+const StoreProductDescriptionsPage = lazy(() => import('@/pages/store/StoreProductDescriptionsPage'));
 // WO-O4O-STORE-HUB-CROSS-SERVICE-COMMONIZATION-PHASE1-V1
 const StoreAssetsPage = lazy(() => import('@/pages/store/StoreAssetsPage'));
 
@@ -698,6 +700,8 @@ function AppRoutes() {
         <Route path="library/resources" element={<StoreLibraryResourcesPage />} />
         <Route path="library/production-materials" element={<StoreProductionMaterialsPage />} />
         <Route path="library/production-materials/new" element={<ProductionMaterialEditorPage />} />
+        {/* WO-O4O-MY-STORE-PRODUCT-DESCRIPTION-CROSSSERVICE-ALIGNMENT-V1: 매장 상품 설명 */}
+        <Route path="library/product-descriptions" element={<StoreProductDescriptionsPage />} />
         {/* WO-O4O-KCOSMETICS-STORE-PATH-NESTED-MIGRATION-V1:
               Legacy flat paths → nested canonical redirect aliases.
               북마크 / 외부 링크 호환을 위해 유지. 신규 코드는 nested canonical 을 사용한다. */}

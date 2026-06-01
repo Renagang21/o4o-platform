@@ -10,7 +10,8 @@
  * 범위:
  *   - POP 2개 (뷰티 전문가형, 신제품 홍보형)
  *   - QR 2개 (제품 사용법형, 성분 안내형)
- *   - blog / product-description 은 K-Cosmetics 현재 미노출 (Phase 2-J 제외)
+ *   - blog 은 K-Cosmetics 현재 미노출 (별도 WO 예정)
+ *   - product-description: WO-O4O-MY-STORE-PRODUCT-DESCRIPTION-CROSSSERVICE-ALIGNMENT-V1 에서 추가
  *
  * 타입: @o4o/types/production-template (공통 canonical)
  * 사용처: StoreLibraryContentsPage → StartProductionModal → getTemplates prop
@@ -120,6 +121,68 @@ export const COSMETICS_TEMPLATE_REGISTRY: ProductionTemplate[] = [
       '성분명과 기대 효과를 정확하게 안내하되, ' +
       '의학적 효과를 보장하는 표현은 사용하지 마세요.',
   },
+
+  // ─── Product Description (2개) ─────────────────────────────────────────────
+  // WO-O4O-MY-STORE-PRODUCT-DESCRIPTION-CROSSSERVICE-ALIGNMENT-V1
+  // K-Cosmetics 사용자-facing 문구는 "내 매장" 표현 사용 (매장 서비스)
+  // ⚠️ "내 약국" 또는 약국 전용 문구 사용 금지
+
+  {
+    id: 'kcos-product-desc-skincare',
+    target: 'product-description',
+    name: '스킨케어 상품',
+    description: '세럼·크림·토너 등 기초 스킨케어 제품의 매장 상세설명',
+    style: '스킨케어형',
+    tags: ['cosmetics', 'skincare', 'serum', 'cream', 'product'],
+    forcedOptions: { length: 'medium', tone: 'professional' },
+    outputConstraints: {
+      maxBodyLength: 500,
+      allowedLengths: ['short', 'medium', 'long'],
+      requiredFields: ['title', 'body'],
+    },
+    systemPromptOverride:
+      '화장품 매장에서 판매하는 스킨케어 제품의 상세설명을 작성합니다. ' +
+      '제품명, 주요 성분, 기대 효과, 사용 방법, 추천 피부 타입을 명확하고 매력적으로 안내하세요. ' +
+      '고객이 제품을 신뢰하고 구매 결정을 내리도록 돕는 전문적인 어조를 사용합니다. ' +
+      '의학적 치료 효과를 보장하는 표현은 사용하지 마세요.',
+    starterHtml:
+      '<h2>상품명</h2>' +
+      '<p>제품의 핵심 가치를 소개합니다.</p>' +
+      '<h3>주요 성분 및 기대 효과</h3>' +
+      '<ul><li>성분/효과 1</li><li>성분/효과 2</li><li>성분/효과 3</li></ul>' +
+      '<h3>사용 방법</h3>' +
+      '<p>사용 순서와 방법을 안내합니다.</p>' +
+      '<h3>추천 피부 타입</h3>' +
+      '<p>적합한 피부 타입을 안내합니다.</p>',
+  },
+
+  {
+    id: 'kcos-product-desc-general',
+    target: 'product-description',
+    name: '일반 화장품',
+    description: '메이크업·바디케어·헤어 등 화장품 매장 범용 상세설명',
+    style: '범용형',
+    tags: ['cosmetics', 'makeup', 'body', 'hair', 'product'],
+    forcedOptions: { length: 'medium', tone: 'friendly' },
+    outputConstraints: {
+      maxBodyLength: 500,
+      allowedLengths: ['short', 'medium', 'long'],
+      requiredFields: ['title', 'body'],
+    },
+    systemPromptOverride:
+      '화장품 매장에서 판매하는 다양한 뷰티 제품의 상세설명을 작성합니다. ' +
+      '제품의 특징, 주요 기능, 사용 방법을 친근하고 이해하기 쉽게 안내하세요. ' +
+      '고객의 뷰티 니즈를 충족할 수 있도록 제품의 매력을 자연스럽게 전달합니다. ' +
+      '허위·과장 표현 없이 정직하게 작성합니다.',
+    starterHtml:
+      '<h2>상품명</h2>' +
+      '<p>제품을 간략히 소개합니다.</p>' +
+      '<h3>제품 특징</h3>' +
+      '<ul><li>특징 1</li><li>특징 2</li></ul>' +
+      '<h3>사용 방법</h3>' +
+      '<p>사용 방법을 안내합니다.</p>',
+  },
+
 ];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
