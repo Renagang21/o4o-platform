@@ -1,20 +1,23 @@
 /**
- * HubContentListPage — GlycoPharm 콘텐츠 라이브러리
+ * HubContentListPage — GlycoPharm Store HUB 콘텐츠 라이브러리
  *
  * WO-O4O-CONTENT-HUB-TEMPLATE-FOUNDATION-V1
+ * WO-O4O-GLYCOPHARM-STORE-HUB-CONTENT-COPY-API-FIX-V1:
+ *   dashboardCopyApi → assetSnapshotApi.copy({ assetType:'cms' }) 전환.
+ *   KPA/K-Cosmetics canonical copy 흐름 정렬.
+ *   - /hub/content/:id 구 경로 카드 이동 제거
+ *   - infoLinks /store-hub/content 허브 루프 → /store/library/contents
  *
  * ContentHubTemplate + GlycoPharm adapter + 카드 그리드 renderItems.
- * GlycoPharm 전용 API(apiClient, dashboardCopyApi)와 카드 레이아웃은
- * glycoContentHubConfig에만 위치한다.
  */
 
 import { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Check, Loader2, Download, FileText, ExternalLink, Image as ImageIcon } from 'lucide-react';
+import { toast } from '@o4o/error-handling';
 import { ContentHubTemplate, type ContentHubConfig, type ContentHubItem, type ContentHubItemContext } from '@o4o/shared-space-ui';
 import { hubContentApi, type HubContentItemResponse } from '@/api/hubContent';
+import { assetSnapshotApi } from '@/api/assetSnapshot';
 import { useAuth } from '@/contexts/AuthContext';
-import { dashboardCopyApi } from '@/api/dashboardCopy';
 
 // ─── Adapter ──────────────────────────────────────────────────────────────────
 
@@ -40,16 +43,10 @@ function apiItemToContentHubItem(item: HubContentItemResponse): ContentHubItem {
 function GlycoContentCard({ item, ctx }: { item: ContentHubItem; ctx: ContentHubItemContext }) {
   const isCopying = ctx.copyingId === item.id;
   const alreadyCopied = ctx.copiedIds.has(item.id);
-  const navigate = useNavigate();
-
-  const handleClick = () => {
-    navigate(`/hub/content/${item.id}`, { state: { item } });
-  };
 
   return (
     <div
-      onClick={handleClick}
-      className="bg-white rounded-lg border border-slate-200 overflow-hidden transition-all cursor-pointer hover:shadow-md hover:border-primary-200"
+      className="bg-white rounded-lg border border-slate-200 overflow-hidden transition-all hover:shadow-md hover:border-primary-200"
     >
       {/* Thumbnail */}
       {item.thumbnail ? (
@@ -130,7 +127,7 @@ function GlycoCardGrid(items: ContentHubItem[], ctx: ContentHubItemContext) {
 
 // ─── GlycoPharm Config ────────────────────────────────────────────────────────
 
-function useGlycoContentHubConfig(userId?: string, navigate?: (path: string) => void): ContentHubConfig {
+function useGlycoContentHubConfig(userId?: string): ContentHubConfig {
   return useMemo(() => ({
     serviceKey: 'glycopharm',
 
@@ -171,32 +168,27 @@ function useGlycoContentHubConfig(userId?: string, navigate?: (path: string) => 
     loadCopiedIds: async () => {
       if (!userId) return new Set<string>();
       try {
-        const ids = await dashboardCopyApi.getCopiedSourceIds(userId);
-        return new Set<string>(ids);
+        const res = await assetSnapshotApi.list({ type: 'cms', limit: 200 });
+        return new Set<string>((res.data?.items || []).map((i: { sourceAssetId: string }) => i.sourceAssetId));
       } catch {
         return new Set<string>();
       }
     },
 
     onCopy: async (item) => {
-      if (!userId) return;
-      await dashboardCopyApi.copyAsset({
-        sourceType: 'hub_content',
-        sourceId: item.id,
-        targetDashboardId: userId,
-      });
-      if (navigate && confirm('내 콘텐츠에 복사되었습니다.\n내 콘텐츠로 이동하시겠습니까?')) {
-        navigate('/store-hub/content');
-      }
+      await assetSnapshotApi.copy({ sourceAssetId: item.id, assetType: 'cms' });
+      toast.success(`"${item.title}" 이(가) 내 약국에 복사되었습니다.`);
     },
 
-    copyLabel: '내 콘텐츠로',
-    copiedLabel: '가져옴',
-    copyingLabel: '복사 중',
+    copyLabel: '내 약국에 복사',
+    copiedLabel: '복사 완료',
+    copyingLabel: '복사 중...',
+    afterCopyAction: { label: '작업하러 가기 →', href: '/store/library/contents' },
 
     renderItems: GlycoCardGrid,
 
-    infoLinks: [{ label: '내 콘텐츠 관리', href: '/store-hub/content' }],
+    infoText: '복사된 콘텐츠는 ',
+    infoLinks: [{ label: '내 약국 > 자산 관리', href: '/store/library/contents' }],
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }), [userId]);
 }
@@ -205,8 +197,7 @@ function useGlycoContentHubConfig(userId?: string, navigate?: (path: string) => 
 
 export function HubContentListPage() {
   const { user } = useAuth();
-  const navigate = useNavigate();
-  const config = useGlycoContentHubConfig(user?.id, navigate);
+  const config = useGlycoContentHubConfig(user?.id);
   return <ContentHubTemplate config={config} />;
 }
 
