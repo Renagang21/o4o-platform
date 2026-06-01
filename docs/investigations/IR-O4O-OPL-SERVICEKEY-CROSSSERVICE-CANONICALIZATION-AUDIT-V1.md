@@ -164,3 +164,74 @@ git status: 다른 세션 WIP 미접촉.
 
 *작성: Claude Code (2026-06-01)*  
 *read-only 조사 — 코드/DB/source/migration 수정 없음*
+
+---
+
+## Addendum — KPA kpa/kpa-society 이중키 gate 추가 발견 및 결론 보정
+
+**추가 조사 일자**: 2026-06-01 (V1 본문 이후)
+**성격**: read-only — 코드 수정 없음. 기존 V1 결론 보정.
+
+### A-1. 추가 발견 요약
+
+본 V1 본문(§2)은 KPA OPL serviceKey를 `kpa-society`(checkout) vs `kpa-groupbuy`(groupbuy)의 **의도적 흐름 분리**로 판단하고, "KPA에는 GlycoPharm식 다중키 gate가 없다 / 추가 작업 대부분 불필요"로 결론냈다.
+
+그러나 추가 조사에서 **별개의 `kpa` ↔ `kpa-society` 이중키 drift**가 확인되었다. 이는 V1 본문이 다루지 않은 차원이며, "다중키 gate 없음" 결론과 충돌한다.
+
+### A-2. 코드 근거
+
+| 위치 | 패턴 | 평가 |
+|------|------|:---:|
+| `apps/api-server/src/routes/platform/store-public/store-public-utils.ts:25-26` | `resolveServiceKeys(serviceKey)` → `serviceKey === 'kpa'`이면 `['kpa', 'kpa-society']` 반환 | **이중키 gate** |
+| `store-public-utils.ts:294` | `opl.service_key = $2` (단일키) | ⚠️ 단일 |
+| `store-public-utils.ts:330` | `opl.service_key = $2` (단일키) | ⚠️ 단일 |
+| `apps/api-server/src/routes/kpa/controllers/kpa-checkout.controller.ts:373` | `opl.service_key = 'kpa-society'` (literal) | ⚠️ literal |
+
+**`resolveServiceKeys` 주석 (L20-23)**:
+```
+platform_store_slugs.service_key = 'kpa'
+organization_product_listings.service_key = 'kpa-society'
+두 테이블 간 불일치 보정: OPL 조회 시 'kpa-society'도 포함.
+```
+
+→ `platform_store_slugs`는 `'kpa'`, OPL은 `'kpa-society'`로 **테이블 간 serviceKey 불일치**가 존재하며, 이를 보정하기 위해 공개 storefront 목록 경로는 `['kpa', 'kpa-society']` 이중키 gate(`= ANY($n)`)를 사용한다.
+
+### A-3. 호출부 검증
+
+- `resolveServiceKeys`는 `store-public-product.handler.ts`(공개 storefront 상품 **목록** 경로)에서 호출되어 `queryVisibleProducts(... = ANY($n))`로 이중키 적용 → **목록 경로는 이중키 정상**.
+- 그러나 `store-public-utils.ts:294, :330`(detail/utils 계열 쿼리)은 단일 `= $2`, `kpa-checkout.controller.ts:373`은 literal `'kpa-society'` → **이중키 미적용**.
+
+### A-4. KPA 내부 3패턴 혼재
+
+KPA OPL/storefront/checkout 흐름에는 다음 3가지 serviceKey 처리 방식이 혼재한다:
+1. `kpa` 단일키 (platform_store_slugs 측)
+2. `kpa-society` literal (checkout, 일부 utils)
+3. `['kpa', 'kpa-society']` 이중키 gate (storefront 목록, resolveServiceKeys)
+
+### A-5. 결론 보정
+
+**기존 V1 결론**:
+> KPA는 `kpa-society`와 `kpa-groupbuy`가 서로 다른 흐름이므로 다중키 gate 없음 / 추가 작업 대부분 불필요 (판정 E).
+
+**보정 결론**:
+> `kpa-society`와 `kpa-groupbuy`의 **흐름 분리는 유효하며 유지**한다(V1 §2 판단 보존). 그러나 이와 **별개로** `kpa`와 `kpa-society`가 같은 공개 storefront/OPL 연결 흐름에서 이중키로 묶이는 구간이 존재하고, 그 처리 방식이 목록(이중키) / detail·utils(단일키) / checkout(literal)로 혼재한다. 따라서 **KPA `kpa` ↔ `kpa-society`는 C급 serviceKey canonical drift로 재분류**한다.
+
+> 단, `resolveServiceKeys` helper가 이미 canonical 보정 의도를 담고 있으므로, 전면 재설계가 아니라 **helper 재사용/명시적 보정으로 정합 가능**하다. checkout literal은 결제/주문 영향이 있어 **즉시 수정하지 않고 별도 IR로 분리**한다.
+
+### A-6. 후속 WO/IR 후보 (보정 추가)
+
+| WO/IR | 범위 | 위험도 | 우선순위 |
+|-------|------|:---:|:---:|
+| `WO-O4O-KPA-STORE-PUBLIC-SERVICEKEY-DRIFT-ALIGNMENT-V1` | `store-public-utils.ts` 내 이중키 helper(`resolveServiceKeys`) 사용 위치와 단일 `= $2`(L294/L330) 비교 위치 정합. 공개 storefront list/detail 계열 우선. backend/API contract 변경 없이 helper 재사용 또는 명시적 보정. | 낮음~중간 | 중간 |
+| `IR-O4O-KPA-CHECKOUT-SERVICEKEY-LITERAL-AUDIT-V1` | `kpa-checkout.controller.ts:373` literal `'kpa-society'`의 정당성 조사. checkout은 결제/주문 영향이 있어 즉시 수정하지 않고 별도 IR로 분리. | 중간 (결제 영향) | 중간 |
+
+**권장 진행 순서**: (1) storefront list/detail serviceKey drift 정합(저위험) → (2) checkout literal 별도 IR(결제 영향 신중) → (3) 필요 시 OPL serviceKey canonical 정책 문서화/CHECK.
+
+### A-7. K-Cosmetics 재확인
+
+V1 §3 결론 유지. K-Cosmetics는 `organization_product_listings` 미사용(cosmetics 전용 테이블), `kpa`/`kpa-society` 류 테이블 불일치 없음 → 본 addendum 영향 없음. 판정 A 유지.
+
+---
+
+*Addendum 작성: Claude Code (2026-06-01)*  
+*read-only 보강 — 코드/DB/source/migration 수정 없음. 기존 V1 결론 보존 + 보정.*
