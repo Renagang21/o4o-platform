@@ -5,6 +5,13 @@
  *   Admin 전용 회원 관리. Operator (/operator/members)는 soft delete(탈퇴처리)만 가능.
  *   Admin (/admin/members)는 soft delete + hard delete(완전삭제) 모두 가능.
  *
+ * WO-O4O-MEMBER-MANAGEMENT-ADMIN-ROLETAB-STATUSTAB-ALIGNMENT-V1:
+ *   roleTabs/statusTabs/extraColumns/getPrimaryRole를 operator UsersPage 기준과 정렬.
+ *   roleFilter: cosmetics:store_owner/store_owner/customer 추가, buyer key → consumer.
+ *   statusTabs: pending(가입 신청) 탭 추가.
+ *   extraColumns: 운영 권한 컬럼 추가.
+ *   ※ pharmacist/supplier K-Cos 자체 회원 분류 재도입 금지 (WO-O4O-KCOSMETICS-OPERATOR-VOCABULARY-PHARMACY-CLEANUP-V2)
+ *
  * Hard delete 정책:
  *   - users row 삭제 포함 (service_memberships, role_assignments, cosmetics 관련 데이터)
  *   - 포럼 활동(게시글/댓글) 있으면 경고 표시
@@ -26,6 +33,51 @@ import {
 import { toast } from '@o4o/error-handling';
 import { api } from '../../lib/apiClient';
 import EditUserModal from '../operator/EditUserModal';
+
+// ─── Role display helpers (operator UsersPage 기준 정렬) ──────
+// WO-O4O-MEMBER-MANAGEMENT-ADMIN-ROLETAB-STATUSTAB-ALIGNMENT-V1
+
+function kcosAdminTokens(u: UserData): Set<string> {
+  return new Set<string>([
+    ...(u.roles ?? []),
+    ...(u.role ? [u.role] : []),
+    ...(u.memberships ?? []).filter((m) => m.serviceKey === 'k-cosmetics').map((m) => m.role),
+  ]);
+}
+
+const KCOS_ADMIN_OPERATIONAL = new Set([
+  'operator', 'admin', 'user',
+  'cosmetics:operator', 'cosmetics:admin',
+  'k-cosmetics:operator', 'k-cosmetics:admin',
+  'platform:super_admin',
+]);
+
+function kcosAdminGetPrimaryRole(u: UserData): string {
+  const m = u.memberships?.find((x) => x.serviceKey === 'k-cosmetics');
+  const role = m?.role || u.roles?.[0] || '';
+  if (!role || KCOS_ADMIN_OPERATIONAL.has(role)) return 'general';
+  return role;
+}
+
+// ※ pharmacist/supplier K-Cos 자체 회원 분류 미포함 (WO-O4O-KCOSMETICS-OPERATOR-VOCABULARY-PHARMACY-CLEANUP-V2)
+const KCOS_ADMIN_ROLE_DISPLAY: Record<string, string> = {
+  general: '일반 회원',
+  'cosmetics:store_owner': '판매자',
+  store_owner: '판매자',
+  seller: '판매자',
+  consumer: '소비자',
+  customer: '소비자',
+  partner: '파트너',
+};
+
+function getKcosAdminOperatorRole(u: UserData): '관리자' | '운영자' | null {
+  const t = kcosAdminTokens(u);
+  if (t.has('platform:super_admin') || t.has('cosmetics:admin') || t.has('k-cosmetics:admin') || t.has('admin')) {
+    return '관리자';
+  }
+  if (t.has('cosmetics:operator') || t.has('k-cosmetics:operator') || t.has('operator')) return '운영자';
+  return null;
+}
 
 // ─── Client adapter ──────────────────────────────────────────
 
@@ -285,15 +337,43 @@ export default function KCosmeticsAdminMembersPage() {
     <OperatorMembersConsolePage
       serviceKey="k-cosmetics"
       client={adminMembersClient}
+      getPrimaryRole={kcosAdminGetPrimaryRole}
+      roleDisplayMap={KCOS_ADMIN_ROLE_DISPLAY}
+      roleColumnHeader="회원 유형"
       roleTabs={[
-        { key: 'seller', label: '판매자', roleFilter: ['seller'] },
-        { key: 'buyer', label: '구매자', roleFilter: ['consumer', 'buyer'] },
+        // WO-O4O-MEMBER-MANAGEMENT-ADMIN-ROLETAB-STATUSTAB-ALIGNMENT-V1:
+        //   cosmetics:store_owner/store_owner 추가, buyer key → consumer (operator 기준 정렬)
+        //   ※ pharmacist/supplier K-Cos 자체 회원 분류 미도입 (WO-O4O-KCOSMETICS-OPERATOR-VOCABULARY-PHARMACY-CLEANUP-V2)
+        { key: 'seller', label: '판매자', roleFilter: ['cosmetics:store_owner', 'seller', 'store_owner'] },
+        { key: 'consumer', label: '소비자', roleFilter: ['consumer', 'customer'] },
       ]}
       statusTabs={[
+        // pending 탭 추가 — operator 기준 정렬
+        { key: 'status-pending',   label: '가입 신청', status: 'pending' },
         { key: 'status-active',    label: '활성', status: 'active' },
         { key: 'status-rejected',  label: '거절', status: 'rejected' },
         { key: 'status-suspended', label: '정지', status: 'suspended' },
         { key: 'status-withdrawn', label: '탈퇴', status: 'withdrawn' },
+      ]}
+      extraColumns={[
+        {
+          key: 'operatorRole',
+          header: '운영 권한',
+          width: '120px',
+          render: (_v: unknown, user: UserData) => {
+            const op = getKcosAdminOperatorRole(user);
+            if (!op) return <span className="text-xs text-slate-400">일반 회원</span>;
+            const cls =
+              op === '관리자'
+                ? 'bg-rose-50 border-rose-200 text-rose-700'
+                : 'bg-violet-50 border-violet-200 text-violet-700';
+            return (
+              <span className={`inline-flex items-center px-2 py-0.5 rounded-full border text-xs font-medium ${cls}`}>
+                {op}
+              </span>
+            );
+          },
+        },
       ]}
       renderDeleteFlow={({ user, onClose, onDeleted }) => (
         <KCosAdminDeleteFlow user={user} onClose={onClose} onDeleted={onDeleted} />

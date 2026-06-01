@@ -5,6 +5,12 @@
  *   Admin 전용 회원 관리. Operator (/operator/members)는 soft delete(탈퇴처리)만 가능.
  *   Admin (/admin/members)는 soft delete + hard delete(완전삭제) 모두 가능.
  *
+ * WO-O4O-MEMBER-MANAGEMENT-ADMIN-ROLETAB-STATUSTAB-ALIGNMENT-V1:
+ *   roleTabs/statusTabs/extraColumns/getPrimaryRole를 operator UsersPage 기준과 정렬.
+ *   roleFilter: glycopharm:pharmacist/store_owner canonical 추가.
+ *   statusTabs: 승인/반려/정지/탈퇴 4개 추가.
+ *   extraColumns: 운영 권한 컬럼 추가 (Neture 패턴).
+ *
  * Hard delete 정책:
  *   - users row 삭제 포함 (service_memberships, role_assignments, glycopharm 관련 데이터)
  *   - 포럼 활동(게시글/댓글) 있으면 경고 표시
@@ -26,6 +32,48 @@ import {
 import { toast } from '@o4o/error-handling';
 import { api } from '../../lib/apiClient';
 import EditUserModal from '../operator/EditUserModal';
+
+// ─── Role display helpers (operator UsersPage 기준 정렬) ──────
+// WO-O4O-MEMBER-MANAGEMENT-ADMIN-ROLETAB-STATUSTAB-ALIGNMENT-V1
+
+function gpAdminTokens(u: UserData): Set<string> {
+  return new Set<string>([
+    ...(u.roles ?? []),
+    ...(u.role ? [u.role] : []),
+    ...(u.memberships ?? []).filter((m) => m.serviceKey === 'glycopharm').map((m) => m.role),
+  ]);
+}
+
+const GP_ADMIN_OPERATIONAL = new Set([
+  'operator', 'admin', 'user',
+  'glycopharm:operator', 'glycopharm:admin', 'platform:super_admin',
+]);
+
+function gpAdminGetPrimaryRole(u: UserData): string {
+  const m = u.memberships?.find((x) => x.serviceKey === 'glycopharm');
+  const role = m?.role || u.roles?.[0] || '';
+  if (!role || GP_ADMIN_OPERATIONAL.has(role)) return 'general';
+  return role;
+}
+
+const GP_ADMIN_ROLE_DISPLAY: Record<string, string> = {
+  general: '일반 회원',
+  'glycopharm:pharmacist': '약사',
+  pharmacist: '약사',
+  'glycopharm:store_owner': '약국 경영자',
+  store_owner: '약국 경영자',
+  'glycopharm:pharmacy': '약국',
+  pharmacy: '약국',
+  'glycopharm:supplier': '공급자',
+  supplier: '공급자',
+};
+
+function getGpAdminOperatorRole(u: UserData): '관리자' | '운영자' | null {
+  const t = gpAdminTokens(u);
+  if (t.has('platform:super_admin') || t.has('glycopharm:admin') || t.has('admin')) return '관리자';
+  if (t.has('glycopharm:operator') || t.has('operator')) return '운영자';
+  return null;
+}
 
 // ─── Client adapter ──────────────────────────────────────────
 
@@ -285,9 +333,40 @@ export default function GlycoPharmAdminMembersPage() {
     <OperatorMembersConsolePage
       serviceKey="glycopharm"
       client={adminMembersClient}
+      getPrimaryRole={gpAdminGetPrimaryRole}
+      roleDisplayMap={GP_ADMIN_ROLE_DISPLAY}
+      roleColumnHeader="회원 유형"
       roleTabs={[
-        { key: 'pharmacist', label: '약사', roleFilter: ['pharmacist', 'pharmacy'] },
-        { key: 'pharmacy_owner', label: '약국 경영자', roleFilter: ['pharmacy_owner'] },
+        // WO-O4O-MEMBER-MANAGEMENT-ADMIN-ROLETAB-STATUSTAB-ALIGNMENT-V1:
+        //   canonical glycopharm:pharmacist/store_owner 추가 (operator 기준 정렬)
+        { key: 'pharmacist', label: '약사', roleFilter: ['glycopharm:pharmacist', 'pharmacist', 'pharmacy'] },
+        { key: 'store_owner', label: '약국 경영자', roleFilter: ['glycopharm:store_owner', 'store_owner', 'pharmacy_owner'] },
+      ]}
+      statusTabs={[
+        { key: 'status-active',    label: '승인',  status: 'active' },
+        { key: 'status-rejected',  label: '반려',  status: 'rejected' },
+        { key: 'status-suspended', label: '정지',  status: 'suspended' },
+        { key: 'status-withdrawn', label: '탈퇴',  status: 'withdrawn' },
+      ]}
+      extraColumns={[
+        {
+          key: 'operatorRole',
+          header: '운영 권한',
+          width: '120px',
+          render: (_v: unknown, user: UserData) => {
+            const op = getGpAdminOperatorRole(user);
+            if (!op) return <span className="text-xs text-slate-400">일반 회원</span>;
+            const cls =
+              op === '관리자'
+                ? 'bg-rose-50 border-rose-200 text-rose-700'
+                : 'bg-violet-50 border-violet-200 text-violet-700';
+            return (
+              <span className={`inline-flex items-center px-2 py-0.5 rounded-full border text-xs font-medium ${cls}`}>
+                {op}
+              </span>
+            );
+          },
+        },
       ]}
       renderDeleteFlow={({ user, onClose, onDeleted }) => (
         <GpAdminDeleteFlow user={user} onClose={onClose} onDeleted={onDeleted} />
