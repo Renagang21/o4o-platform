@@ -144,7 +144,7 @@ role_assignments 테이블 구조 변경
 | 승인 후 로그인 | 4/4 성공 (status=approved, roles=["customer"]) |
 | UI 회원관리 | GlycoPharm 완전 동작 |
 
-상세: `docs/work-orders/WO-O4O-E2E-REGISTRATION-APPROVAL-LOGIN-TEST-V1-REPORT.md` Round 4 섹션
+상세: `docs/archive/work-orders/WO-O4O-E2E-REGISTRATION-APPROVAL-LOGIN-TEST-V1-REPORT.md` Round 4 섹션
 
 ---
 
