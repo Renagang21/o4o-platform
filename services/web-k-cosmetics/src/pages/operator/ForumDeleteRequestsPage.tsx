@@ -7,9 +7,9 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Trash2, Clock } from 'lucide-react';
-import { BaseDetailDrawer } from '@o4o/ui';
-import { DataTable } from '@o4o/operator-ux-core';
+import { Trash2, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { BaseDetailDrawer, ActionBar, BulkResultModal } from '@o4o/ui';
+import { DataTable, useBatchAction } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { toast } from '@o4o/error-handling';
 import { forumOperatorApi } from '@/services/forumApi';
@@ -65,6 +65,12 @@ export default function ForumDeleteRequestsPage() {
   const [guideDesc, setGuideDesc] = useState<string | null>(null);
   const [guideSteps, setGuideSteps] = useState<string[] | null>(null);
 
+  // WO-O4O-GLYCOPHARM-KCOS-FORUM-DELETE-REQUEST-BULK-PARITY-V1:
+  //   KPA/Neture 조작 질서 정렬 — checkbox selection + ActionBar + bulk 처리.
+  //   backend batch endpoint 부재 → 단건 approveDelete/rejectDelete fan-out (Promise.allSettled).
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const batch = useBatchAction();
+
   useEffect(() => {
     let cancelled = false;
     fetchGuidePageContent(SERVICE_KEY, GUIDE_PAGE_KEY)
@@ -85,6 +91,11 @@ export default function ForumDeleteRequestsPage() {
 
   useEffect(() => {
     loadRequests();
+  }, [statusFilter]);
+
+  // 필터 변경 시 선택 초기화
+  useEffect(() => {
+    setSelectedIds(new Set());
   }, [statusFilter]);
 
   const loadRequests = async () => {
@@ -121,6 +132,45 @@ export default function ForumDeleteRequestsPage() {
       toast.error('처리 중 오류가 발생했습니다.');
     } finally {
       setIsProcessing(false);
+    }
+  };
+
+  // ─── Bulk Actions (단건 endpoint fan-out) ───
+
+  const selectedPendingCount = [...selectedIds].filter((id) => {
+    const r = requests.find((req) => req.id === id);
+    return r?.deleteRequestStatus === 'pending';
+  }).length;
+
+  const runBulk = async (action: 'approve' | 'reject') => {
+    const pendingIds = [...selectedIds].filter((id) => {
+      const r = requests.find((req) => req.id === id);
+      return r?.deleteRequestStatus === 'pending';
+    });
+    if (pendingIds.length === 0) return;
+    const fn = action === 'approve' ? forumOperatorApi.approveDelete : forumOperatorApi.rejectDelete;
+    const data = action === 'reject' ? { reviewComment: '일괄 반려' } : undefined;
+    const result = await batch.executeBatch(async (ids) => {
+      const settled = await Promise.allSettled(ids.map((id) => fn(id, data)));
+      return {
+        data: {
+          results: settled.map((r, i) => {
+            if (r.status === 'rejected') {
+              return { id: ids[i], status: 'failed' as const, error: (r.reason as any)?.message || '오류' };
+            }
+            // forumOperatorApi 응답: { success, error } — success=false 면 실패 처리
+            const val = r.value as { success?: boolean; error?: string };
+            if (val && val.success === false) {
+              return { id: ids[i], status: 'failed' as const, error: val.error || '처리 실패' };
+            }
+            return { id: ids[i], status: 'success' as const };
+          }),
+        },
+      };
+    }, pendingIds);
+    if (result.successCount > 0) {
+      setSelectedIds(new Set());
+      loadRequests();
     }
   };
 
@@ -224,6 +274,43 @@ export default function ForumDeleteRequestsPage() {
         ))}
       </div>
 
+      {/* Bulk ActionBar + 결과 모달 */}
+      <ActionBar
+        selectedCount={selectedIds.size}
+        onClearSelection={() => setSelectedIds(new Set())}
+        actions={[
+          {
+            key: 'approve',
+            label: `삭제 승인 (${selectedPendingCount})`,
+            onClick: () => runBulk('approve'),
+            variant: 'primary' as const,
+            icon: <CheckCircle size={14} />,
+            loading: batch.loading,
+            group: 'actions',
+            tooltip: '선택된 삭제 요청을 일괄 승인합니다',
+            visible: selectedPendingCount > 0,
+          },
+          {
+            key: 'reject',
+            label: `반려 (${selectedPendingCount})`,
+            onClick: () => runBulk('reject'),
+            variant: 'danger' as const,
+            icon: <XCircle size={14} />,
+            loading: batch.loading,
+            group: 'actions',
+            tooltip: '선택된 삭제 요청을 일괄 반려합니다',
+            visible: selectedPendingCount > 0,
+          },
+        ]}
+      />
+
+      <BulkResultModal
+        open={batch.showResult}
+        onClose={() => { batch.clearResult(); loadRequests(); }}
+        result={batch.result}
+        onRetry={() => { batch.retryFailed(); }}
+      />
+
       <DataTable<DeleteRequestData>
         columns={columns}
         data={requests}
@@ -232,6 +319,9 @@ export default function ForumDeleteRequestsPage() {
         onRowClick={(req) => { setSelectedRequest(req); setReviewComment(''); }}
         emptyMessage="삭제 요청이 없습니다"
         tableId="kcos-forum-delete-requests"
+        selectable
+        selectedKeys={selectedIds}
+        onSelectionChange={setSelectedIds}
       />
 
       <BaseDetailDrawer
