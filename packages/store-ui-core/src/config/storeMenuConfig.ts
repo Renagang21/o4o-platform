@@ -107,9 +107,9 @@ export const COSMETICS_STORE_CONFIG: StoreDashboardConfig = {
     ]},
     // WO-O4O-STORE-LIBRARY-CROSSSERVICE-PHASE2-B-V1 / PHASE2-C-V1: 내 자료함
     { label: '내 자료함', items: [
-      { key: 'library-contents',             label: '콘텐츠',   subPath: '/library/contents' },
-      { key: 'library-resources',            label: '자료',     subPath: '/library/resources' },
-      { key: 'library-production-materials', label: '제작 자료', subPath: '/library/production-materials' },
+      { key: 'library-contents',             label: '콘텐츠',      subPath: '/library/contents' },
+      { key: 'library-resources',            label: '자료',        subPath: '/library/resources' },
+      { key: 'library-production-materials', label: '매장 제작 자료', subPath: '/library/production-materials' },
     ]},
     { label: '설정', items: [
       // WO-O4O-KCOSMETICS-STORE-PROFILE-EDIT-PAGE-V1:
