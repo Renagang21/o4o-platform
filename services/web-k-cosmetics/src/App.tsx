@@ -750,9 +750,13 @@ function AppRoutes() {
         <Route path="qr"               element={<Navigate to="/store/marketing/qr" replace />} />
       </Route>
 
-      {/* Store public blog routes (WO-O4O-KCOS-STORE-EXECUTION-CANONICAL-ALIGNMENT-V1) */}
-      <Route path="store/:slug/blog" element={<StoreBlogPage />} />
-      <Route path="store/:slug/blog/:postSlug" element={<StoreBlogPostPage />} />
+      {/* Store public blog routes (WO-O4O-KCOS-STORE-EXECUTION-CANONICAL-ALIGNMENT-V1)
+          WO-O4O-SERVICE-PAGE-FOOTER-COVERAGE-AUDIT-AND-FIX-V1: 공개 사용자-facing 페이지 →
+          MainLayout(헤더+Footer)으로 감싸 플랫폼 정보/지원 연락처 노출 */}
+      <Route element={<MainLayout />}>
+        <Route path="store/:slug/blog" element={<StoreBlogPage />} />
+        <Route path="store/:slug/blog/:postSlug" element={<StoreBlogPostPage />} />
+      </Route>
 
       {/* Tablet Kiosk — Public, no auth (WO-O4O-TABLET-INTEREST-UX-REFACTOR-V1) */}
       <Route path="tablet/:slug" element={<TabletStorePage />} />

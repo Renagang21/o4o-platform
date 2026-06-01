@@ -1029,20 +1029,48 @@ function NotFoundPage() {
       <p style={{ color: '#64748B', marginTop: '8px' }}>
         요청하신 페이지가 존재하지 않거나 이동되었습니다.
       </p>
-      <a
-        href="/"
-        style={{
-          display: 'inline-block',
-          marginTop: '24px',
-          padding: '12px 24px',
-          backgroundColor: '#2563EB',
-          color: '#fff',
-          textDecoration: 'none',
-          borderRadius: '6px',
-        }}
-      >
-        홈으로 돌아가기
-      </a>
+      {/* WO-O4O-SERVICE-PAGE-FOOTER-COVERAGE-AUDIT-AND-FIX-V1: 404 minimal 복귀 네비 */}
+      <div style={{ marginTop: '24px', display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+        <a
+          href="/"
+          style={{
+            display: 'inline-block',
+            padding: '12px 24px',
+            backgroundColor: '#2563EB',
+            color: '#fff',
+            textDecoration: 'none',
+            borderRadius: '6px',
+          }}
+        >
+          홈으로 돌아가기
+        </a>
+        <a
+          href="/forum"
+          style={{
+            display: 'inline-block',
+            padding: '12px 24px',
+            border: '1px solid #CBD5E1',
+            color: '#334155',
+            textDecoration: 'none',
+            borderRadius: '6px',
+          }}
+        >
+          커뮤니티
+        </a>
+        <a
+          href="/guide/intro"
+          style={{
+            display: 'inline-block',
+            padding: '12px 24px',
+            border: '1px solid #CBD5E1',
+            color: '#334155',
+            textDecoration: 'none',
+            borderRadius: '6px',
+          }}
+        >
+          이용 가이드
+        </a>
+      </div>
     </div>
   );
 }
