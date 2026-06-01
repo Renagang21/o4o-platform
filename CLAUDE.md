@@ -403,7 +403,7 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | **Operator HUB Content Publishing Standard V1** (RichTextEditor 기반 항목별 게시 — Source Ingestion 보류) | `docs/baseline/O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1.md` |
 | **Store Menu Canonical Tree V1** (매장 HUB ↔ 내 매장 메뉴 같은 축 정렬 — 6 항목, 설문 V1 외) | `docs/baseline/O4O-STORE-MENU-CANONICAL-TREE-V1.md` |
 | **Operator Core Design V1** | `docs/architecture/OPERATOR-CORE-DESIGN-V1.md` |
-| **Operator Core Extraction Verify Checklist V1** | `docs/architecture/OPERATOR-CORE-EXTRACTION-VERIFY-CHECKLIST-V1.md` |
+| **Operator Core Extraction Verify Checklist V1** | `docs/archive/reports/OPERATOR-CORE-EXTRACTION-VERIFY-CHECKLIST-V1.md` |
 | **Guide sectionKey 충돌 정책** | `docs/architecture/O4O-GUIDE-SECTIONKEY-CONFLICT-POLICY-V1.md` |
 | **Guide Schema Validation** | `docs/architecture/O4O-GUIDE-SCHEMA-VALIDATION-V1.md` |
 | **Guide sectionKey Migration** | `docs/architecture/O4O-GUIDE-SECTIONKEY-MIGRATION-V1.md` |
