@@ -15,9 +15,6 @@ manual/
   glycopharm/         GlycoPharm
     operator/         운영자 매뉴얼
     assets/           스크린샷
-  glucoseview/        GlucoseView
-    operator/         운영자 매뉴얼
-    assets/           스크린샷
   k-cosmetics/        K-Cosmetics
     operator/         운영자 매뉴얼
     assets/           스크린샷
