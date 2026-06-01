@@ -147,6 +147,8 @@ const StoreProductionMaterialsPage = lazy(() => import('@/pages/store/StoreProdu
 const ProductionMaterialEditorPage = lazy(() => import('@/pages/store/ProductionMaterialEditorPage'));
 // WO-O4O-MY-STORE-PRODUCT-DESCRIPTION-CROSSSERVICE-ALIGNMENT-V1: 매장 상품 설명
 const StoreProductDescriptionsPage = lazy(() => import('@/pages/store/StoreProductDescriptionsPage'));
+// WO-O4O-KCOSMETICS-STORE-ORDERS-FRONTEND-ALIGNMENT-V1: 매장 주문 관리
+const StoreOrdersPage = lazy(() => import('@/pages/store/StoreOrdersPage'));
 // WO-O4O-STORE-HUB-CROSS-SERVICE-COMMONIZATION-PHASE1-V1
 const StoreAssetsPage = lazy(() => import('@/pages/store/StoreAssetsPage'));
 
@@ -667,7 +669,7 @@ function AppRoutes() {
             WO-O4O-MY-STORE-SIGNAGE-SUBMENU-ALIGNMENT-V1: KPA/GP 기준 서브메뉴 정렬 (player 미구현 제외) */}
         <Route path="commerce/local-products" element={<StoreLocalProductsPage />} />
         <Route path="commerce/tablet-displays" element={<StoreTabletDisplaysPage />} />
-        <Route path="commerce/orders" element={<StorePlaceholderPage title="주문 관리" />} />
+        <Route path="commerce/orders" element={<StoreOrdersPage />} />
         <Route path="commerce/billing" element={<StorePlaceholderPage title="정산/인보이스" />} />
         <Route path="marketing/signage" element={<Navigate to="playlist" replace />} />
         <Route path="marketing/signage/playlist" element={<StoreSignagePage />} />
