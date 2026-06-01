@@ -4,7 +4,7 @@
  */
 
 import { lazy, Suspense, useRef, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, useParams } from 'react-router-dom';
 // WO-O4O-STORE-PRODUCTS-QUERYCLIENT-PROVIDER-ALIGN-V1
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider, useAuth, getKCosmeticsDashboardRoute } from '@/contexts/AuthContext';
@@ -232,6 +232,9 @@ const ForumAnalyticsPage = lazy(() => import('@/pages/operator/ForumAnalyticsPag
 const StoreChannelsPage = lazy(() => import('@/pages/store/StoreChannelsPage'));
 // WO-O4O-SIGNAGE-STORE-ACTION-EXPANSION-V1
 const StoreSignagePage = lazy(() => import('@/pages/store/StoreSignagePage'));
+// WO-O4O-KCOSMETICS-SIGNAGE-PLAYER-V1
+const SignagePlayerSelectPage = lazy(() => import('@/pages/store/signage/SignagePlayerSelectPage').then(m => ({ default: m.SignagePlayerSelectPage })));
+const SignagePlaybackPage = lazy(() => import('@/pages/store/signage/SignagePlaybackPage'));
 
 // WO-O4O-STORE-LOCAL-PRODUCT-UI-V1: 자체 상품 CRUD + 태블릿 진열 관리
 const StoreLocalProductsPage = lazy(() => import('@/pages/store/StoreLocalProductsPage'));
@@ -240,6 +243,17 @@ const StoreTabletDisplaysPage = lazy(() => import('@/pages/store/StoreTabletDisp
 // WO-O4O-TABLET-INTEREST-UX-REFACTOR-V1: Tablet 키오스크 + Interest 관리
 const TabletStorePage = lazy(() => import('@/pages/tablet/TabletStorePage'));
 const InterestRequestsPage = lazy(() => import('@/pages/store/InterestRequestsPage'));
+
+/**
+ * ParamRedirect — :param이 포함된 redirect alias 처리
+ * WO-O4O-KCOSMETICS-SIGNAGE-PLAYER-V1: flat signage/play/:playlistId → canonical 경로 보존
+ * Usage: <ParamRedirect to="/store/marketing/signage/play/:playlistId" />
+ */
+function ParamRedirect({ to }: { to: string }) {
+  const params = useParams<Record<string, string>>();
+  const target = to.replace(/:(\w+)/g, (_, key) => params[key] ?? '');
+  return <Navigate to={target} replace />;
+}
 
 // Loading fallback
 function PageLoading() {
@@ -677,6 +691,9 @@ function AppRoutes() {
         <Route path="marketing/signage/playlist" element={<StoreSignagePage />} />
         <Route path="marketing/signage/videos" element={<StoreSignagePage />} />
         <Route path="marketing/signage/schedules" element={<StoreSignagePage />} />
+        {/* WO-O4O-KCOSMETICS-SIGNAGE-PLAYER-V1: TV 재생 (player select + fullscreen playback) */}
+        <Route path="marketing/signage/player" element={<SignagePlayerSelectPage />} />
+        <Route path="marketing/signage/play/:playlistId" element={<SignagePlaybackPage />} />
         {/* WO-O4O-STORE-HUB-CROSS-SERVICE-COMMONIZATION-PHASE1-V1: placeholder → StoreAssetsPanel */}
         <Route path="content" element={<StoreAssetsPage />} />
         {/* Interest 관리 (WO-O4O-TABLET-INTEREST-UX-REFACTOR-V1) */}
@@ -717,6 +734,8 @@ function AppRoutes() {
         <Route path="signage/playlist" element={<Navigate to="/store/marketing/signage/playlist" replace />} />
         <Route path="signage/videos"   element={<Navigate to="/store/marketing/signage/videos" replace />} />
         <Route path="signage/schedules" element={<Navigate to="/store/marketing/signage/schedules" replace />} />
+        <Route path="signage/player"   element={<Navigate to="/store/marketing/signage/player" replace />} />
+        <Route path="signage/play/:playlistId" element={<ParamRedirect to="/store/marketing/signage/play/:playlistId" />} />
         <Route path="pop"              element={<Navigate to="/store/marketing/pop" replace />} />
         <Route path="qr"               element={<Navigate to="/store/marketing/qr" replace />} />
       </Route>

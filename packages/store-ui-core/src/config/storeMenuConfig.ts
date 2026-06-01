@@ -95,11 +95,13 @@ export const COSMETICS_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'billing',        label: '매출 요약',    subPath: '/commerce/billing' },
     ]},
     { label: '디지털 사이니지', items: [
-      // WO-O4O-MY-STORE-SIGNAGE-SUBMENU-ALIGNMENT-V1: KPA/GP 기준 서브메뉴 정렬 (player 미구현 제외)
+      // WO-O4O-MY-STORE-SIGNAGE-SUBMENU-ALIGNMENT-V1: KPA/GP 기준 서브메뉴 정렬
       // WO-O4O-KCOSMETICS-STORE-PATH-NESTED-MIGRATION-V1: marketing/signage nested canonical 정렬
+      // WO-O4O-KCOSMETICS-SIGNAGE-PLAYER-V1: TV 재생 메뉴 추가
       { key: 'signage-playlist',  label: '플레이리스트', subPath: '/marketing/signage/playlist' },
       { key: 'signage-videos',    label: '동영상',       subPath: '/marketing/signage/videos' },
       { key: 'signage-schedules', label: '스케줄',       subPath: '/marketing/signage/schedules' },
+      { key: 'signage-player',    label: 'TV 재생',      subPath: '/marketing/signage/player' },
     ]},
     { label: '매장 실행', items: [
       // WO-O4O-KCOSMETICS-STORE-PATH-NESTED-MIGRATION-V1: commerce/marketing nested canonical 정렬
