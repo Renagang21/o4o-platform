@@ -26,11 +26,9 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
 import {
   RefreshCw,
   Loader2,
-  ChevronRight,
   DollarSign,
   FileText,
   Receipt,
@@ -38,14 +36,15 @@ import {
   ShieldCheck,
   Building2,
   Users,
-  type LucideIcon,
 } from 'lucide-react';
 import {
   AdminDashboardLayout,
+  AdminLinkBlock,
   type StructureMetric,
   type PolicyItem,
   type StructureAction,
   type AdminDashboardConfig,
+  type AdminBlockLink,
 } from '@o4o/admin-ux-core';
 import { fetchOperatorDashboard } from '@/api/operatorDashboard';
 import type { OperatorDashboardConfig, KpiItem } from '@o4o/operator-ux-core';
@@ -129,82 +128,26 @@ const ADMIN_QUICK_ACTIONS: StructureAction[] = [
 ];
 
 // ─── Phase 2: Business Block Definitions ─────────────────────
+// WO-O4O-ADMIN-UX-CORE-ADMIN-BLOCK-EXTRACTION-V1: 로컬 AdminBlock 제거 →
+//   공통 AdminLinkBlock(@o4o/admin-ux-core) 사용. icon 은 ReactNode 로 주입.
 
-interface AdminLink {
-  label: string;
-  path: string;
-  icon: LucideIcon;
-  description: string;
-}
+const ICON_CLS = 'w-4 h-4 text-slate-500';
 
-const FINANCE_LINKS: AdminLink[] = [
-  { label: '정산 관리', path: '/admin/settlements', icon: DollarSign, description: '정산 처리·내역 조회' },
-  { label: '청구 리포트', path: '/admin/reports', icon: FileBarChart, description: '청구 데이터 분석·리포트' },
-  { label: '청구 미리보기', path: '/admin/billing-preview', icon: FileText, description: '청구 확정 전 미리보기' },
-  { label: '인보이스', path: '/admin/invoices', icon: Receipt, description: '인보이스 발행·관리' },
+const FINANCE_LINKS: AdminBlockLink[] = [
+  { label: '정산 관리', path: '/admin/settlements', icon: <DollarSign className={ICON_CLS} />, description: '정산 처리·내역 조회' },
+  { label: '청구 리포트', path: '/admin/reports', icon: <FileBarChart className={ICON_CLS} />, description: '청구 데이터 분석·리포트' },
+  { label: '청구 미리보기', path: '/admin/billing-preview', icon: <FileText className={ICON_CLS} />, description: '청구 확정 전 미리보기' },
+  { label: '인보이스', path: '/admin/invoices', icon: <Receipt className={ICON_CLS} />, description: '인보이스 발행·관리' },
 ];
 
-const GOVERNANCE_LINKS: AdminLink[] = [
-  { label: '역할 관리', path: '/admin/roles', icon: ShieldCheck, description: '역할·권한 구조 정의·관리' },
+const GOVERNANCE_LINKS: AdminBlockLink[] = [
+  { label: '역할 관리', path: '/admin/roles', icon: <ShieldCheck className={ICON_CLS} />, description: '역할·권한 구조 정의·관리' },
 ];
 
-const NETWORK_LINKS: AdminLink[] = [
-  { label: '약국 네트워크', path: '/admin/pharmacies', icon: Building2, description: '약국 승인·네트워크 구조 관리' },
-  { label: '회원 관리', path: '/admin/members', icon: Users, description: '회원 조회·탈퇴·완전삭제 관리' },
+const NETWORK_LINKS: AdminBlockLink[] = [
+  { label: '약국 네트워크', path: '/admin/pharmacies', icon: <Building2 className={ICON_CLS} />, description: '약국 승인·네트워크 구조 관리' },
+  { label: '회원 관리', path: '/admin/members', icon: <Users className={ICON_CLS} />, description: '회원 조회·탈퇴·완전삭제 관리' },
 ];
-
-// ─── AdminBlock Component (BusinessBlock 패턴 재사용) ────────
-
-function AdminBlock({
-  title,
-  description,
-  links,
-  stats,
-}: {
-  title: string;
-  description: string;
-  links: AdminLink[];
-  stats?: { label: string; value: number | string }[];
-}) {
-  return (
-    <section className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
-      <div className="px-5 py-4 border-b border-slate-100">
-        <h2 className="text-base font-semibold text-slate-800">{title}</h2>
-        <p className="text-xs text-slate-500 mt-0.5">{description}</p>
-      </div>
-
-      {stats && stats.length > 0 && (
-        <div className="px-5 py-3 border-b border-slate-100 flex gap-6">
-          {stats.map((s) => (
-            <div key={s.label} className="text-center">
-              <div className="text-lg font-bold text-slate-800">{s.value}</div>
-              <div className="text-[11px] text-slate-500">{s.label}</div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      <div className="divide-y divide-slate-50">
-        {links.map((link) => (
-          <Link
-            key={link.path}
-            to={link.path}
-            className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors group"
-          >
-            <div className="p-1.5 rounded-lg bg-slate-50 group-hover:bg-slate-100 transition-colors">
-              <link.icon className="w-4 h-4 text-slate-500" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium text-slate-700">{link.label}</div>
-              <div className="text-xs text-slate-400">{link.description}</div>
-            </div>
-            <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-500 transition-colors" />
-          </Link>
-        ))}
-      </div>
-    </section>
-  );
-}
 
 // ─── Helper ──────────────────────────────────────────────────
 
@@ -301,17 +244,17 @@ export default function GlycoPharmAdminDashboard() {
       {/* 4-Block 표준 레이아웃: A Snapshot → B Policy → C GovernanceAlerts → D Actions */}
       <AdminDashboardLayout config={adminConfig} />
 
-      {/* Phase 2: Finance + Governance — 2열 그리드 (레이아웃 외부, 후속 공통 추출 대상) */}
+      {/* Phase 2: Finance + Governance — 2열 그리드 (레이아웃 외부, 공통 AdminLinkBlock) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Block 4: Finance */}
-        <AdminBlock
+        <AdminLinkBlock
           title="재무 · 청구 관리"
           description="정산, 청구 자료, 인보이스 흐름을 관리합니다."
           links={FINANCE_LINKS}
         />
 
         {/* Block 5: Governance */}
-        <AdminBlock
+        <AdminLinkBlock
           title="거버넌스 · 권한 관리"
           description="역할과 권한 구조를 관리합니다."
           links={GOVERNANCE_LINKS}
@@ -319,7 +262,7 @@ export default function GlycoPharmAdminDashboard() {
       </div>
 
       {/* Block 6: Network (Phase 2) */}
-      <AdminBlock
+      <AdminLinkBlock
         title="약국 네트워크 · 회원 구조"
         description="서비스 구조의 핵심 네트워크 대상을 관리합니다."
         links={NETWORK_LINKS}

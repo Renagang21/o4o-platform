@@ -26,3 +26,11 @@ export { StructureSnapshotBlock } from './blocks/StructureSnapshotBlock';
 export { PolicyOverviewBlock } from './blocks/PolicyOverviewBlock';
 export { GovernanceAlertBlock } from './blocks/GovernanceAlertBlock';
 export { StructureActionBlock } from './blocks/StructureActionBlock';
+
+// Admin 사업 진입점 섹션 (4-Block 외부 — WO-O4O-ADMIN-UX-CORE-ADMIN-BLOCK-EXTRACTION-V1)
+export { AdminLinkBlock } from './blocks/AdminLinkBlock';
+export type {
+  AdminLinkBlockProps,
+  AdminBlockLink,
+  AdminBlockStat,
+} from './blocks/AdminLinkBlock';

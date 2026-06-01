@@ -19,22 +19,21 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
 import {
   RefreshCw,
   Loader2,
-  ChevronRight,
   ShieldCheck,
   Store,
   Users,
-  type LucideIcon,
 } from 'lucide-react';
 import {
   AdminDashboardLayout,
+  AdminLinkBlock,
   type StructureMetric,
   type PolicyItem,
   type StructureAction,
   type AdminDashboardConfig,
+  type AdminBlockLink,
 } from '@o4o/admin-ux-core';
 import { operatorApi } from '@/services/operatorApi';
 import type { OperatorDashboardConfig, KpiItem } from '@o4o/operator-ux-core';
@@ -112,59 +111,19 @@ const ADMIN_QUICK_ACTIONS: StructureAction[] = [
   { id: 'settings', label: '설정', link: '/admin/settings', icon: '⚙️', description: '서비스 정책·설정' },
 ];
 
-// ─── Admin Block 컴포넌트 ─────────────────────────────────────
+// ─── Admin Block 정의 ─────────────────────────────────────────
+// WO-O4O-ADMIN-UX-CORE-ADMIN-BLOCK-EXTRACTION-V1: 로컬 AdminBlock 제거 →
+//   공통 AdminLinkBlock(@o4o/admin-ux-core) 사용. icon 은 ReactNode 로 주입.
 
-interface AdminLink {
-  label: string;
-  path: string;
-  icon: LucideIcon;
-  description: string;
-}
+const ICON_CLS = 'w-4 h-4 text-slate-500';
 
-function AdminBlock({
-  title,
-  description,
-  links,
-}: {
-  title: string;
-  description: string;
-  links: AdminLink[];
-}) {
-  return (
-    <section className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
-      <div className="px-5 py-4 border-b border-slate-100">
-        <h2 className="text-base font-semibold text-slate-800">{title}</h2>
-        <p className="text-xs text-slate-500 mt-0.5">{description}</p>
-      </div>
-      <div className="divide-y divide-slate-50">
-        {links.map((link) => (
-          <Link
-            key={link.path}
-            to={link.path}
-            className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors group"
-          >
-            <div className="p-1.5 rounded-lg bg-slate-50 group-hover:bg-slate-100 transition-colors">
-              <link.icon className="w-4 h-4 text-slate-500" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium text-slate-700">{link.label}</div>
-              <div className="text-xs text-slate-400">{link.description}</div>
-            </div>
-            <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-500 transition-colors" />
-          </Link>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-const GOVERNANCE_LINKS: AdminLink[] = [
-  { label: '역할 관리', path: '/admin/roles', icon: ShieldCheck, description: '역할·권한 구조 정의·관리' },
+const GOVERNANCE_LINKS: AdminBlockLink[] = [
+  { label: '역할 관리', path: '/admin/roles', icon: <ShieldCheck className={ICON_CLS} />, description: '역할·권한 구조 정의·관리' },
 ];
 
-const NETWORK_LINKS: AdminLink[] = [
-  { label: '매장 관리', path: '/admin/stores', icon: Store, description: '매장 승인·구조 관리' },
-  { label: '회원 관리', path: '/admin/users', icon: Users, description: '회원 조회·구조 관리' },
+const NETWORK_LINKS: AdminBlockLink[] = [
+  { label: '매장 관리', path: '/admin/stores', icon: <Store className={ICON_CLS} />, description: '매장 승인·구조 관리' },
+  { label: '회원 관리', path: '/admin/users', icon: <Users className={ICON_CLS} />, description: '회원 조회·구조 관리' },
 ];
 
 // ─── Main Component ──────────────────────────────────────────
@@ -246,14 +205,14 @@ export default function KCosmeticsAdminDashboard() {
       {/* 4-Block 표준 레이아웃: A Snapshot → B Policy → C GovernanceAlerts → D Actions */}
       <AdminDashboardLayout config={adminConfig} />
 
-      {/* Governance + Network — 2열 그리드 (레이아웃 외부, 후속 공통 추출 대상) */}
+      {/* Governance + Network — 2열 그리드 (레이아웃 외부, 공통 AdminLinkBlock) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <AdminBlock
+        <AdminLinkBlock
           title="거버넌스 · 권한 관리"
           description="역할과 권한 구조를 관리합니다."
           links={GOVERNANCE_LINKS}
         />
-        <AdminBlock
+        <AdminLinkBlock
           title="회원 · 매장 구조"
           description="서비스 구조의 핵심 대상을 관리합니다."
           links={NETWORK_LINKS}
