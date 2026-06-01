@@ -1,23 +1,23 @@
 /**
- * HubContentPage — K-Cosmetics 콘텐츠/자료 탐색 (StoreHub 내부)
+ * HubContentPage — K-Cosmetics Store HUB 콘텐츠 라이브러리
  *
  * WO-O4O-STOREHUB-STRUCTURE-ALIGNMENT-V1: wrapper page 초기 추가
  * WO-O4O-KCOSMETICS-STORE-HUB-CONTENT-CANONICAL-ALIGNMENT-V1:
- *   GlycoPharm HubContentListPage canonical 패턴 이식.
- *   - ContentHubTemplate (@o4o/shared-space-ui)
+ *   KPA HubContentLibraryPage canonical 패턴 이식.
+ *   - ContentHubTemplate (@o4o/shared-space-ui) + single-action 정책 유지
  *   - hubContentApi (SERVICE_KEY='k-cosmetics', @/lib/api/hubContent)
- *   - dashboardCopyApi (sourceType='hub_content', @/lib/api/dashboardCopy)
- *   - /library/content 단순 이탈 wrapper 제거
+ *   - assetSnapshotApi.copy({ assetType: 'cms' }) — canonical O4O Store Layer
+ *   - dashboardCopyApi 제거 (legacy dashboard API 대체 완료)
  *
  * /store-hub/content 진입점 — CMS 콘텐츠 목록 탐색 + 내 매장에 복사.
  */
 
 import { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { FileText, Image as ImageIcon, Check, Loader2, Download, ExternalLink } from 'lucide-react';
+import { toast } from '@o4o/error-handling';
 import { ContentHubTemplate, type ContentHubConfig, type ContentHubItem, type ContentHubItemContext } from '@o4o/shared-space-ui';
 import { hubContentApi, type HubContentItemResponse } from '@/lib/api/hubContent';
-import { dashboardCopyApi } from '@/lib/api/dashboardCopy';
+import { assetSnapshotApi } from '@/api/assetSnapshot';
 import { useAuth } from '@/contexts/AuthContext';
 
 // ─── Adapter ──────────────────────────────────────────────────────────────────
@@ -165,29 +165,27 @@ function useKCosContentHubConfig(userId?: string): ContentHubConfig {
     loadCopiedIds: async () => {
       if (!userId) return new Set<string>();
       try {
-        const ids = await dashboardCopyApi.getCopiedSourceIds(userId);
-        return new Set<string>(ids);
+        const res = await assetSnapshotApi.list({ type: 'cms', limit: 200 });
+        return new Set<string>((res.data?.items || []).map((i: { sourceAssetId: string }) => i.sourceAssetId));
       } catch {
         return new Set<string>();
       }
     },
 
     onCopy: async (item) => {
-      if (!userId) return;
-      await dashboardCopyApi.copyAsset({
-        sourceType: 'hub_content',
-        sourceId: item.id,
-        targetDashboardId: userId,
-      });
+      await assetSnapshotApi.copy({ sourceAssetId: item.id, assetType: 'cms' });
+      toast.success(`"${item.title}" 이(가) 내 매장에 복사되었습니다.`);
     },
 
-    copyLabel: '내 매장으로',
-    copiedLabel: '가져옴',
-    copyingLabel: '복사 중',
+    copyLabel: '내 매장에 복사',
+    copiedLabel: '복사 완료',
+    copyingLabel: '복사 중...',
+    afterCopyAction: { label: '작업하러 가기 →', href: '/store/library/contents' },
 
     renderItems: KCosCardGrid,
 
-    infoLinks: [{ label: '내 콘텐츠 관리', href: '/store-hub/content' }],
+    infoText: '복사된 콘텐츠는 ',
+    infoLinks: [{ label: '내 매장 > 자산 관리', href: '/store/library/contents' }],
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }), [userId]);
 }
@@ -196,8 +194,6 @@ function useKCosContentHubConfig(userId?: string): ContentHubConfig {
 
 export function HubContentPage() {
   const { user } = useAuth();
-  const navigate = useNavigate();
-  void navigate; // navigate 미사용 경고 방지
   const config = useKCosContentHubConfig(user?.id);
   return <ContentHubTemplate config={config} />;
 }
