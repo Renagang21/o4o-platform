@@ -124,7 +124,7 @@ Phase2: Redis 기반 이동 가능 (지금은 변경하지 않음)
 | Payment (Cosmetics, Legacy) | `apps/api-server/src/routes/cosmetics/controllers/cosmetics-payment.controller.ts` |
 | Event Handler (GlycoPharm) | `apps/api-server/src/services/glycopharm/GlycopharmPaymentEventHandler.ts` |
 | Retail Stable Spec | `docs/platform/architecture/O4O-RETAIL-STABLE-V1.md` |
-| E2E 조사 보고서 | `docs/investigation/IR-O4O-CHECKOUT-END-TO-END-STRUCTURE-V1.md` |
+| E2E 조사 보고서 | `docs/investigations/IR-O4O-CHECKOUT-END-TO-END-STRUCTURE-V1.md` |
 
 ---
 

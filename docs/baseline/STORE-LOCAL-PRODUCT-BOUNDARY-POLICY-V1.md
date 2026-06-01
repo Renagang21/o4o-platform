@@ -145,7 +145,7 @@ StoreLocalProduct는 이 철학을 구현하는 Display Layer이다.
 
 ### 검증 보고서
 
-- [IR-STORE-LOCAL-PRODUCT-HARDENING-VERIFICATION-V1](../../docs/investigation/IR-STORE-LOCAL-PRODUCT-HARDENING-VERIFICATION-V1.md)
+- [IR-STORE-LOCAL-PRODUCT-HARDENING-VERIFICATION-V1](../../docs/investigations/IR-STORE-LOCAL-PRODUCT-HARDENING-VERIFICATION-V1.md)
 
 ---
 

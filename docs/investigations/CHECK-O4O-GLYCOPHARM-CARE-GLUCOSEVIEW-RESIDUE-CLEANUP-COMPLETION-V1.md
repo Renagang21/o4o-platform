@@ -287,7 +287,7 @@ glucosecare routePatterns 의 `'/admin/glucoseview'` alias 제거 ✅
 
 | 위치 | 분류 | 비고 |
 |------|:----:|------|
-| `docs/investigations/IR-*.md`, `docs/architecture/*`, `docs/rbac/RBAC-ROLE-CATALOG-V1.md`, `docs/investigation/IR-GLYCOPHARM-WEB-CURRENT-STATE-AUDIT-PHASE1-V1.md` | F | 정책/감사 문서 |
+| `docs/investigations/IR-*.md`, `docs/architecture/*`, `docs/rbac/RBAC-ROLE-CATALOG-V1.md`, `docs/investigations/IR-GLYCOPHARM-WEB-CURRENT-STATE-AUDIT-PHASE1-V1.md` | F | 정책/감사 문서 |
 | migration 파일 다수 (1737100*, 1771200000016, 1739700000000, 20260205070000, 20260600000000 등) | F | 이미 실행된 변경 이력 |
 | `apps/api-server/src/config/service-scopes.ts`, `bootstrap/register-routes.ts:812`, `utils/scope-assignment.utils.ts:68` | F | 정리 사유 trace |
 | `packages/cms-core/CmsContent.entity.ts:48`, `Channel.entity.ts:56` | F | entity docstring |

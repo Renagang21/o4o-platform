@@ -180,7 +180,7 @@ POST /api/v1/care/ai-chat       → 502 (sync fallback 시도)
 
 ## 참조
 
-- IR: `docs/investigation/IR-O4O-GLYCOPHARM-CARE-AI-REPEATED-REQUEST-REVERIFY-V1.md`
+- IR: `docs/investigations/IR-O4O-GLYCOPHARM-CARE-AI-REPEATED-REQUEST-REVERIFY-V1.md`
 - 대상 파일: `services/web-glycopharm/src/pages/care/CareAiChatPanel.tsx`
 - API 클라이언트: `services/web-glycopharm/src/api/pharmacy.ts`
 - Auth 클라이언트: `packages/auth-client/src/client.js`
