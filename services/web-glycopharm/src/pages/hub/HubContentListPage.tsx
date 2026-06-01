@@ -177,10 +177,10 @@ function useGlycoContentHubConfig(userId?: string): ContentHubConfig {
 
     onCopy: async (item) => {
       await assetSnapshotApi.copy({ sourceAssetId: item.id, assetType: 'cms' });
-      toast.success(`"${item.title}" 이(가) 내 약국에 복사되었습니다.`);
+      toast.success(`"${item.title}" 이(가) 내 매장에 복사되었습니다.`);
     },
 
-    copyLabel: '내 약국에 복사',
+    copyLabel: '내 매장에 복사',
     copiedLabel: '복사 완료',
     copyingLabel: '복사 중...',
     afterCopyAction: { label: '작업하러 가기 →', href: '/store/library/contents' },
@@ -188,7 +188,7 @@ function useGlycoContentHubConfig(userId?: string): ContentHubConfig {
     renderItems: GlycoCardGrid,
 
     infoText: '복사된 콘텐츠는 ',
-    infoLinks: [{ label: '내 약국 > 자산 관리', href: '/store/library/contents' }],
+    infoLinks: [{ label: '내 매장 > 자산 관리', href: '/store/library/contents' }],
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }), [userId]);
 }
