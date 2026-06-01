@@ -318,6 +318,9 @@ const StoreProductionMaterialsPage = lazy(() => import('@/pages/store-management
 const ProductionMaterialEditorPage = lazy(() => import('@/pages/store-management/ProductionMaterialEditorPage'));
 // WO-O4O-MY-STORE-PRODUCT-DESCRIPTION-CROSSSERVICE-ALIGNMENT-V1: 약국 상품 설명
 const StoreProductDescriptionsPage = lazy(() => import('@/pages/store-management/StoreProductDescriptionsPage'));
+// WO-O4O-PRODUCT-MARKETING-POP-BUILDER-EXTRACTION-V1: 상품 마케팅 자산 + POP 빌더
+const ProductMarketingPage = lazy(() => import('@/pages/store-management/ProductMarketingPage').then(m => ({ default: m.ProductMarketingPage })));
+const ProductPopBuilderPage = lazy(() => import('@/pages/store-management/ProductPopBuilderPage').then(m => ({ default: m.ProductPopBuilderPage })));
 // WO-O4O-STORE-MARKETING-ANALYTICS-CROSSSERVICE-V1: 마케팅 분석
 const StoreMarketingAnalyticsPage = lazy(() => import('@/pages/store-management/StoreMarketingAnalyticsPage').then(m => ({ default: m.StoreMarketingAnalyticsPage })));
 
@@ -949,6 +952,9 @@ function AppRoutes() {
         <Route path="library/production-materials/new" element={<ProductionMaterialEditorPage />} />
         {/* WO-O4O-MY-STORE-PRODUCT-DESCRIPTION-CROSSSERVICE-ALIGNMENT-V1: 약국 상품 설명 */}
         <Route path="library/product-descriptions" element={<StoreProductDescriptionsPage />} />
+        {/* WO-O4O-PRODUCT-MARKETING-POP-BUILDER-EXTRACTION-V1: 상품별 마케팅 자산 + POP 빌더 */}
+        <Route path="commerce/products/:productId/marketing" element={<ProductMarketingPage />} />
+        <Route path="commerce/products/:productId/pop" element={<ProductPopBuilderPage />} />
         <Route path="management" element={<PharmacyManagement />} />
         <Route path="management/b2b" element={<PharmacyB2BProducts />} />
 

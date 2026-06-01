@@ -147,6 +147,9 @@ const StoreProductionMaterialsPage = lazy(() => import('@/pages/store/StoreProdu
 const ProductionMaterialEditorPage = lazy(() => import('@/pages/store/ProductionMaterialEditorPage'));
 // WO-O4O-MY-STORE-PRODUCT-DESCRIPTION-CROSSSERVICE-ALIGNMENT-V1: 매장 상품 설명
 const StoreProductDescriptionsPage = lazy(() => import('@/pages/store/StoreProductDescriptionsPage'));
+// WO-O4O-PRODUCT-MARKETING-POP-BUILDER-EXTRACTION-V1: 상품 마케팅 자산 + POP 빌더
+const ProductMarketingPage = lazy(() => import('@/pages/store/ProductMarketingPage').then(m => ({ default: m.ProductMarketingPage })));
+const ProductPopBuilderPage = lazy(() => import('@/pages/store/ProductPopBuilderPage').then(m => ({ default: m.ProductPopBuilderPage })));
 // WO-O4O-STORE-MARKETING-ANALYTICS-CROSSSERVICE-V1: 마케팅 분석
 const StoreMarketingAnalyticsPage = lazy(() => import('@/pages/store/StoreMarketingAnalyticsPage').then(m => ({ default: m.StoreMarketingAnalyticsPage })));
 // WO-O4O-KCOSMETICS-STORE-ORDERS-FRONTEND-ALIGNMENT-V1: 매장 주문 관리
@@ -727,6 +730,9 @@ function AppRoutes() {
         <Route path="library/production-materials/new" element={<ProductionMaterialEditorPage />} />
         {/* WO-O4O-MY-STORE-PRODUCT-DESCRIPTION-CROSSSERVICE-ALIGNMENT-V1: 매장 상품 설명 */}
         <Route path="library/product-descriptions" element={<StoreProductDescriptionsPage />} />
+        {/* WO-O4O-PRODUCT-MARKETING-POP-BUILDER-EXTRACTION-V1: 상품별 마케팅 자산 + POP 빌더 */}
+        <Route path="commerce/products/:productId/marketing" element={<ProductMarketingPage />} />
+        <Route path="commerce/products/:productId/pop" element={<ProductPopBuilderPage />} />
         {/* WO-O4O-KCOSMETICS-STORE-PATH-NESTED-MIGRATION-V1:
               Legacy flat paths → nested canonical redirect aliases.
               북마크 / 외부 링크 호환을 위해 유지. 신규 코드는 nested canonical 을 사용한다. */}
