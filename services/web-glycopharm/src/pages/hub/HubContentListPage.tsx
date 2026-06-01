@@ -177,6 +177,8 @@ function useGlycoContentHubConfig(userId?: string): ContentHubConfig {
 
     onCopy: async (item) => {
       await assetSnapshotApi.copy({ sourceAssetId: item.id, assetType: 'cms' });
+      // GlycoPharm 사용자-facing 문구는 "내 약국" 표현 유지 (WO-O4O-GLYCOPHARM-HUBCONTENT-PHARMACY-LABEL-RESTORE-AND-GUARD-V1)
+      // ⚠️ "내 매장"으로 일괄 치환 금지 — GlycoPharm은 약국 전용 서비스
       toast.success(`"${item.title}" 이(가) 내 약국에 복사되었습니다.`);
     },
 
