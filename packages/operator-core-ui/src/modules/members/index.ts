@@ -38,3 +38,9 @@ export type {
   MemberHardDeleteTarget,
   MemberHardDeleteConfirmModalProps,
 } from './components/MemberHardDeleteConfirmModal';
+export { OperatorMemberDeleteFlow } from './OperatorMemberDeleteFlow';
+export type {
+  OperatorMemberDeleteFlowProps,
+  NormalizedDeleteRisk,
+  DeleteFlowRiskItem,
+} from './OperatorMemberDeleteFlow';
