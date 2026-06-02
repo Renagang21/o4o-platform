@@ -12,7 +12,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Plus, Search, X, Loader2, ShoppingBag, AlertTriangle,
-  Edit2, Trash2, ChevronLeft, ChevronRight, Tablet, BarChart3,
+  Edit2, Trash2, ChevronLeft, ChevronRight, Tablet, BarChart3, FileText,
 } from 'lucide-react';
 import { BaseTable, type O4OColumn } from '@o4o/ui';
 import {
@@ -263,6 +263,13 @@ export default function StoreLocalProductsPage() {
             title="마케팅 자산"
           >
             <BarChart3 className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => navigate(`/store/commerce/products/${product.id}/pop`)}
+            className="p-1.5 rounded-lg hover:bg-purple-50 text-slate-500 hover:text-purple-600"
+            title="POP 만들기"
+          >
+            <FileText className="w-4 h-4" />
           </button>
           {product.is_active && (
             <button
