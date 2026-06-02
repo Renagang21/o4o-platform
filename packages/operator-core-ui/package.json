@@ -13,7 +13,8 @@
     "./modules/cms-content": "./src/modules/cms-content/index.ts",
     "./modules/resources": "./src/modules/resources/index.ts",
     "./modules/members": "./src/modules/members/index.ts",
-    "./modules/forum-delete-requests": "./src/modules/forum-delete-requests/index.ts"
+    "./modules/forum-delete-requests": "./src/modules/forum-delete-requests/index.ts",
+    "./modules/forum-requests": "./src/modules/forum-requests/index.ts"
   },
   "dependencies": {
     "@o4o/content-editor": "workspace:*",
