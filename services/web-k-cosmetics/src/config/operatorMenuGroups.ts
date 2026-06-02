@@ -66,6 +66,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: 'HQ 미디어', path: '/operator/signage/hq-media' },
     { label: 'HQ 플레이리스트', path: '/operator/signage/hq-playlists' },
     { label: '템플릿', path: '/operator/signage/templates' },
+    // WO-O4O-KCOSMETICS-OPERATOR-MENU-FORCED-CONTENT-ADD-V1
+    { label: '강제 콘텐츠', path: '/operator/signage/forced-content' },
   ],
   forum: [
     // WO-O4O-KCOSMETICS-OPERATOR-STORE-CHANNELS-V1: /operator/community dead link 제거 (route 없음)

@@ -122,6 +122,7 @@ const HqPlaylistsPage = lazy(() => import('@/pages/operator/signage/HqPlaylistsP
 const HqPlaylistDetailPage = lazy(() => import('@/pages/operator/signage/HqPlaylistDetailPage'));
 const SignageTemplatesPage = lazy(() => import('@/pages/operator/signage/TemplatesPage'));
 const SignageTemplateDetailPage = lazy(() => import('@/pages/operator/signage/TemplateDetailPage'));
+const ForcedContentPage = lazy(() => import('@/pages/operator/signage/ForcedContentPage'));
 
 // Store Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
 import { StoreDashboardLayout, COSMETICS_STORE_CONFIG, resolveStoreMenu, StoreOwnerGuard } from '@o4o/store-ui-core';
@@ -628,6 +629,7 @@ function AppRoutes() {
         <Route path="signage/hq-playlists/:playlistId" element={<HqPlaylistDetailPage />} />
         <Route path="signage/templates" element={<SignageTemplatesPage />} />
         <Route path="signage/templates/:templateId" element={<SignageTemplateDetailPage />} />
+        <Route path="signage/forced-content" element={<ForcedContentPage />} />
         {/* WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: support route removed (mock) */}
         {/* 회원 관리 — canonical route (WO-O4O-K-COSMETICS-OPERATOR-ROUTE-CANONICALIZATION-V1) */}
         <Route path="members" element={<OperatorUsersPage />} />
