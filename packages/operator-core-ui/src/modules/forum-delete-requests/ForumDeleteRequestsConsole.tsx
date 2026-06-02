@@ -178,7 +178,14 @@ export function OperatorForumDeleteRequestsConsolePage({
     if (pendingIds.length === 0) return;
     const fn = action === 'approve' ? client.approve : client.reject;
     const data = action === 'reject' ? { reviewComment: '일괄 반려' } : undefined;
+    // WO-O4O-OPERATOR-FORUM-CONSOLE-BATCH-CLIENT-OPTION-V1:
+    //   batch endpoint 제공 시(예: Neture) 1회 호출, 미제공 시(GP/K-Cos) 기존 per-id fan-out.
+    const batchFn = action === 'approve' ? client.batchApprove : client.batchReject;
     const result = await batch.executeBatch(async (ids) => {
+      if (batchFn) {
+        // raw batch 응답을 그대로 반환 — useBatchAction 이 results 를 파싱.
+        return batchFn(ids, data);
+      }
       const settled = await Promise.allSettled(ids.map((id) => fn(id, data)));
       return {
         data: {

@@ -52,6 +52,17 @@ export interface ForumDeleteRequestsConsoleClient {
   list(params: { status?: ForumDeleteRequestStatus }): Promise<ForumDeleteRequest[]>;
   approve(id: string, data?: { reviewComment?: string }): Promise<ForumDeleteReviewResult>;
   reject(id: string, data?: { reviewComment?: string }): Promise<ForumDeleteReviewResult>;
+
+  /**
+   * WO-O4O-OPERATOR-FORUM-CONSOLE-BATCH-CLIENT-OPTION-V1 (optional):
+   * 서비스가 실제 batch endpoint 를 보유하면 제공한다(예: Neture).
+   * 제공 시 bulk 승인은 per-id fan-out 대신 이 메서드를 1회 호출한다.
+   * 미제공 시(GP/K-Cos) 기존 fan-out(approve × Promise.allSettled) 유지.
+   * 반환은 raw batch 응답 — useBatchAction 이 res.data.results / res.data.data.results 를 파싱한다.
+   */
+  batchApprove?(ids: string[], data?: { reviewComment?: string }): Promise<unknown>;
+  /** Optional batch reject endpoint. 미제공 시 fan-out 유지. 위 batchApprove 와 동일 규약. */
+  batchReject?(ids: string[], data?: { reviewComment?: string }): Promise<unknown>;
 }
 
 // ─── Guide (optional dynamic content) ────────────────────────

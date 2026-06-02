@@ -174,7 +174,14 @@ export function OperatorForumRequestsConsolePage({
       return r ? isReviewable(r.status) : false;
     });
     if (targetIds.length === 0) return;
+    // WO-O4O-OPERATOR-FORUM-CONSOLE-BATCH-CLIENT-OPTION-V1:
+    //   batch endpoint 제공 시(예: Neture) 1회 호출, 미제공 시(GP/K-Cos) 기존 per-id fan-out.
+    //   보완(revision)은 여기(approve/reject)에 포함되지 않음 — bulk 제외 정책 유지.
     const result = await batch.executeBatch(async (ids) => {
+      if (client.batchReview) {
+        // raw batch 응답을 그대로 반환 — useBatchAction 이 results 를 파싱.
+        return client.batchReview(ids, action);
+      }
       const settled = await Promise.allSettled(ids.map((id) => client.review(id, { action })));
       return {
         data: {
