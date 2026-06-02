@@ -113,8 +113,6 @@ const SupplyPage = lazy(() => import('@/pages/b2b').then(m => ({ default: m.Supp
 // Forum Post Detail (WO-O4O-GLYCOPHARM-KPA-STYLE-UX-REFINE-P3-V1)
 const ForumPostDetailPage = lazy(() => import('@/pages/forum/ForumPostDetailPage'));
 
-const OperatorForumManagementPage = lazy(() => import('@/pages/operator/forum-management').then(m => ({ default: m.OperatorForumManagementPage })));
-
 // Role Not Available Page
 const RoleNotAvailablePage = lazy(() => import('@/pages/RoleNotAvailablePage'));
 
@@ -758,7 +756,7 @@ function AppRoutes() {
         <Route path="forum-delete-requests" element={<ForumDeleteRequestsPage />} />
         {/* WO-O4O-FORUM-ANALYTICS-UNIFICATION-V1 */}
         <Route path="forum-analytics" element={<ForumAnalyticsPage />} />
-        <Route path="forum-management" element={<OperatorForumManagementPage />} />
+        {/* WO-O4O-GLYCOPHARM-FORUM-MANAGEMENT-ORPHAN-REMOVAL-V1: mock-only forum-management route 제거 */}
         <Route path="community" element={<CommunityManagementPage />} />
         <Route path="store-approvals" element={<StoreApprovalsPage />} />
         <Route path="store-approvals/:id" element={<StoreApprovalDetailPage />} />

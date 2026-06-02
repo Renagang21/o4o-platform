@@ -45,7 +45,7 @@ const GP_AXES: OperatorAxisGroup[] = [
     icon: '💬',
     tone: 'blue',
     links: [
-      { key: 'forum', label: '포럼 운영', href: '/operator/forum-management' },
+      { key: 'forum', label: '포럼 신청 관리', href: '/operator/forum-requests' },
       { key: 'members', label: '회원 관리', href: '/operator/members' },
       { key: 'lms', label: '강의 관리', href: '/operator/lms' },
     ],

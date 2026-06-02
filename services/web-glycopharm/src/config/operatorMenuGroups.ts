@@ -80,7 +80,7 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '강제 콘텐츠', path: '/operator/signage/forced-content' },
   ],
   forum: [
-    { label: '포럼 관리', path: '/operator/forum-management' },
+    // WO-O4O-GLYCOPHARM-FORUM-MANAGEMENT-ORPHAN-REMOVAL-V1: mock-only '포럼 관리'(forum-management) 제거 — canonical 신청/삭제요청/분석만 유지
     { label: '포럼 신청', path: '/operator/forum-requests' },
     { label: '포럼 삭제 요청', path: '/operator/forum-delete-requests' },
     { label: '커뮤니티 관리', path: '/operator/community' },
@@ -166,7 +166,7 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     { label: '강제 콘텐츠', path: '/operator/signage/forced-content' },
   ],
   forum: [
-    { label: '포럼 관리', path: '/operator/forum-management' },
+    // WO-O4O-GLYCOPHARM-FORUM-MANAGEMENT-ORPHAN-REMOVAL-V1: mock-only '포럼 관리'(forum-management) 제거 — canonical 신청/삭제요청/분석만 유지
     { label: '포럼 신청', path: '/operator/forum-requests' },
     { label: '포럼 삭제 요청', path: '/operator/forum-delete-requests' },
     { label: '커뮤니티 관리', path: '/operator/community' },
