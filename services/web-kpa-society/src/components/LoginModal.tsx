@@ -104,11 +104,13 @@ export default function LoginModal() {
       if (onLoginSuccess) {
         onLoginSuccess();
       } else {
-        // WO-O4O-ROLE-BASED-POST-LOGIN-REDIRECT-V1: 역할 기반 기본 진입 화면
-        // - 약국 경영자(isStoreOwner) → /store
-        // - 운영자/관리자 → 기존 흐름 유지 (redirect 없음)
-        // - 일반 회원 → 현재 화면 유지 (커뮤니티 철학)
-        // Note: isStoreOwner가 login API 응답에 없는 경우 fetchKpaContext() 완료 후
+        // WO-O4O-KPA-POSTLOGIN-STOREOWNER-DASHBOARD-ALIGNMENT-V1: 역할 기반 기본 진입 화면
+        // (O4O 공통 철학 정렬 — 약국 경영자는 GlycoPharm/K-Cosmetics 와 동일하게 /store 시작)
+        // - kpa:store_owner → /store (내 약국)
+        // - super_admin/admin → /admin, operator → /operator
+        // - 일반 회원/약사/약대생 → 현재 화면 유지 (커뮤니티)
+        // 매핑 SSOT: config/dashboard.ts (getKpaPostLoginRoute / KPA_DASHBOARD_MAP).
+        // Note: 역할이 login API 응답에 없는 경우 fetchKpaContext() 완료 후
         //       App.tsx의 PostLoginRedirect가 fallback으로 처리
         const redirectTo = getKpaPostLoginRoute(loggedInUser);
         if (redirectTo) {
