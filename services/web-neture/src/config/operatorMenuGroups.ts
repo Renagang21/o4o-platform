@@ -33,7 +33,9 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     // WO-O4O-NETURE-MEMBER-MANAGEMENT-BULK-AND-ROUTE-ALIGNMENT-V1:
     // 회원 관리 표준 경로를 /operator/members 로 통일. /operator/users 는 legacy alias 로 잔존.
     { label: '회원 관리', path: '/operator/members' },
-    { label: '운영자 관리', path: '/operator/operators', adminOnly: true },
+    // WO-O4O-NETURE-OPERATOR-SIDEBAR-DEAD-LINKS-CLEANUP-V1: adminOnly 항목은 /operator/* 라우트가
+    // 없으므로 실제 존재하는 /admin/* 로 정정 (회원 완전삭제 와 동일 패턴). 권한자에게만 노출.
+    { label: '운영자 관리', path: '/admin/operators', adminOnly: true },
     // WO-O4O-NETURE-ADMIN-MEMBER-HARD-DELETE-V1: admin 전용 완전삭제 관리
     { label: '회원 완전삭제', path: '/admin/members', adminOnly: true },
     // WO-O4O-NETURE-OPERATOR-CONTACT-MESSAGES-OPERATOR-SCOPE-V1: dead link 해소 + operator 노출
@@ -42,7 +44,7 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   approvals: [
     { label: '가입 승인', path: '/operator/applications' },
     { label: '유통 참여형 펀딩', path: '/operator/market-trial' },
-    { label: '서비스 승인', path: '/operator/service-approvals', adminOnly: true },
+    { label: '서비스 승인', path: '/admin/service-approvals', adminOnly: true },
     // WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1: dead link 정정
     { label: '공급자 활성화', path: '/operator/suppliers' },
   ],
@@ -50,11 +52,12 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   products: [
     { label: '상품 관리', path: '/operator/all-registered-products' },
     // WO-NETURE-CURATION-PHASE1-DECISION-PRESSURE-REMOVE-V1: 큐레이션 메뉴 비노출 (운영자 통제 최소화)
-    { label: '카테고리 관리', path: '/operator/categories', adminOnly: true },
-    { label: '브랜드 관리', path: '/operator/brands', adminOnly: true },
-    { label: '상품 데이터 정리', path: '/operator/product-cleanup', adminOnly: true },
-    { label: '마스터 관리', path: '/operator/masters', adminOnly: true },
-    { label: '카탈로그 일괄등록', path: '/operator/catalog-import', adminOnly: true },
+    { label: '카테고리 관리', path: '/admin/categories', adminOnly: true },
+    { label: '브랜드 관리', path: '/admin/brands', adminOnly: true },
+    { label: '상품 데이터 정리', path: '/admin/product-cleanup', adminOnly: true },
+    { label: '마스터 관리', path: '/admin/masters', adminOnly: true },
+    { label: '카탈로그 일괄등록', path: '/admin/catalog-import', adminOnly: true },
+    // category-mapping-rules 는 /operator 라우트가 실제 존재하므로 유지.
     { label: '카테고리 매핑', path: '/operator/category-mapping-rules', adminOnly: true },
   ],
   stores: [
@@ -62,15 +65,15 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   ],
   orders: [
     { label: '주문 관리', path: '/operator/orders' },
-    { label: '파트너 현황', path: '/operator/partners', adminOnly: true },
-    { label: '정산 관리', path: '/operator/settlements', adminOnly: true },
-    { label: '파트너 정산', path: '/operator/partner-settlements', adminOnly: true },
-    { label: '커미션 관리', path: '/operator/commissions', adminOnly: true },
+    { label: '파트너 현황', path: '/admin/partners', adminOnly: true },
+    { label: '정산 관리', path: '/admin/settlements', adminOnly: true },
+    { label: '파트너 정산', path: '/admin/partner-settlements', adminOnly: true },
+    { label: '커미션 관리', path: '/admin/commissions', adminOnly: true },
   ],
   content: [
     { label: '홈페이지 CMS', path: '/operator/homepage-cms' },
     { label: '안내 문구 관리', path: '/operator/guide-contents' },
-    { label: '커뮤니티 광고', path: '/operator/community-admin', adminOnly: true },
+    { label: '커뮤니티 광고', path: '/admin/community-admin', adminOnly: true },
   ],
   signage: [
     { label: '사이니지', path: '/operator/signage/hq-media' },
@@ -87,14 +90,14 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: 'Asset Quality', path: '/operator/ai/asset-quality' },
     { label: '운영 분석', path: '/operator/analytics' },
     { label: '공급자 품질', path: '/operator/supplier-quality' },
-    { label: 'AI 관리', path: '/operator/ai-admin', adminOnly: true },
-    { label: 'AI 카드 규칙', path: '/operator/ai-card-rules', adminOnly: true },
-    { label: 'AI 비즈팩', path: '/operator/ai-business-pack', adminOnly: true },
+    { label: 'AI 관리', path: '/admin/ai-admin', adminOnly: true },
+    { label: 'AI 카드 규칙', path: '/admin/ai-card-rules', adminOnly: true },
+    { label: 'AI 비즈팩', path: '/admin/ai-business-pack', adminOnly: true },
   ],
   system: [
     { label: '알림 설정', path: '/operator/settings/notifications' },
-    { label: '역할 관리', path: '/operator/roles', adminOnly: true },
-    { label: '이메일 설정', path: '/operator/settings/email', adminOnly: true },
+    { label: '역할 관리', path: '/admin/roles', adminOnly: true },
+    { label: '이메일 설정', path: '/admin/settings/email', adminOnly: true },
   ],
 };
 
