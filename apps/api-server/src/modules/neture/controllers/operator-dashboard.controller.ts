@@ -31,7 +31,7 @@ import { requireAuth } from '../../../middleware/auth.middleware.js';
 import { requireNetureScope } from '../../../middleware/neture-scope.middleware.js';
 import { generateRuleBasedInsights } from '../../../copilot/insight-rules.js';
 import logger from '../../../utils/logger.js';
-import type { KpiItem, ActionItem, ActivityItem, QuickActionItem, OperatorDashboardConfig } from '../../../types/operator-dashboard.types.js';
+import type { KpiItem, ActionQueueItem, ActivityItem, QuickActionItem, OperatorDashboardConfig } from '../../../types/operator-dashboard.types.js';
 
 export function createOperatorDashboardController(dataSource: DataSource): Router {
   const router = Router();
@@ -59,6 +59,8 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
         settlementCount,
         contactCount,
         partnerRequestCount,
+        pendingProductCount,
+        pendingTrialCount,
       ] = await Promise.all([
         // 1. Organizations enrolled in neture
         dataSource.query(`
@@ -161,6 +163,23 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
           FROM neture_partnership_requests
           WHERE status = 'OPEN'
         `).catch(() => [{ cnt: 0 }]) as Promise<Array<{ cnt: number }>>,
+
+        // 12. Pending product offers (상품 승인 대기 — /operator/product-approvals 소스)
+        // WO-O4O-NETURE-OPERATOR-DASHBOARD-V2-IA-REBUILD-V1: supplier_product_offers.approval_status='PENDING'
+        // (서비스 승인 pending = offer_service_approvals 와는 별개 — product-approvals 페이지와 동일 소스)
+        dataSource.query(`
+          SELECT COUNT(*)::int AS cnt
+          FROM supplier_product_offers
+          WHERE approval_status = 'PENDING'
+        `).catch(() => [{ cnt: 0 }]) as Promise<Array<{ cnt: number }>>,
+
+        // 13. Pending market trials (Market Trial 심사 대기 — SUBMITTED → 운영자 심사)
+        // WO-O4O-NETURE-OPERATOR-DASHBOARD-V2-IA-REBUILD-V1: market_trials.status='submitted'
+        dataSource.query(`
+          SELECT COUNT(*)::int AS cnt
+          FROM market_trials
+          WHERE status = 'submitted'
+        `).catch(() => [{ cnt: 0 }]) as Promise<Array<{ cnt: number }>>,
       ]);
 
       // === Parse results ===
@@ -179,23 +198,35 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
       const pendingSettlements = settlementCount[0]?.cnt || 0;
       const unreadMessages = contactCount[0]?.cnt || 0;
       const partnerRequests = partnerRequestCount[0]?.cnt || 0;
+      // WO-O4O-NETURE-OPERATOR-DASHBOARD-V2-IA-REBUILD-V1: 승인 큐 분리 소스
+      const pendingProducts = pendingProductCount[0]?.cnt || 0;          // supplier_product_offers.approval_status='PENDING'
+      const pendingServiceApprovals = products.pending;                  // offer_service_approvals.approval_status='pending' (service_key='neture')
+      const pendingTrials = pendingTrialCount[0]?.cnt || 0;              // market_trials.status='submitted'
 
       // === Build 5-block response ===
 
-      // Block 1: KPIs (8개)
+      // Block 1: KPIs — WO-O4O-NETURE-OPERATOR-DASHBOARD-V2-IA-REBUILD-V1
+      // Neture 운영 흐름 축으로 재배열: 공급자/파트너 → 상품/콘텐츠 → Market Trial → 주문/정산 → 조직.
+      // 실제 존재하는 /operator/* 라우트에만 link 부착 (정산/파트너는 operator 라우트 없음 → link 없음, 요약만).
+      // KPI-LABEL-DRIFT-FIX-V1: '활성 약국' → '활성 참여 조직' (organizations JOIN organization_service_enrollments WHERE service_code='neture').
       const kpis: KpiItem[] = [
-        // WO-O4O-NETURE-OPERATOR-DASHBOARD-KPI-LABEL-DRIFT-FIX-V1:
-        // KPA copy-paste 흔적 '활성 약국' → Neture 도메인 어휘 '활성 참여 조직' 으로 정렬.
-        // 데이터 출처 (organizations JOIN organization_service_enrollments WHERE service_code='neture')
-        // 는 그대로 — Neture 에 가입한 모든 참여 조직 (공급자/파트너/매장 등) 의 활성 수.
-        { key: 'active-orgs', label: '활성 참여 조직', value: activeOrgs, status: 'neutral' },
-        { key: 'active-suppliers', label: '활성 공급사', value: activeSuppliers, status: 'neutral' },
-        { key: 'active-products', label: '판매 상품', value: products.active, status: 'neutral' },
-        { key: 'monthly-orders', label: '월간 주문', value: orders.total_orders, status: 'neutral' },
-        { key: 'monthly-revenue', label: '월간 매출', value: orders.total_revenue, status: 'neutral' },
-        { key: 'cms-published', label: '게시 콘텐츠', value: cms.published, status: 'neutral' },
+        // ── 공급자 / 파트너 상태 ──
+        { key: 'active-suppliers', label: '활성 공급사', value: activeSuppliers, status: 'neutral', link: '/operator/suppliers' },
+        { key: 'pending-suppliers', label: '공급사 승인 대기', value: pendingSuppliers, status: pendingSuppliers > 0 ? 'warning' : 'neutral', link: '/operator/suppliers' },
         { key: 'active-partners', label: '활성 파트너', value: activePartners, status: 'neutral' },
+        { key: 'partner-requests', label: '파트너 요청', value: partnerRequests, status: partnerRequests > 0 ? 'warning' : 'neutral' },
+        // ── 상품 / 콘텐츠 상태 ──
+        { key: 'active-products', label: '판매 상품', value: products.active, status: 'neutral', link: '/operator/all-registered-products' },
+        { key: 'pending-products', label: '승인 대기 상품', value: pendingProducts, status: pendingProducts > 0 ? 'warning' : 'neutral', link: '/operator/product-approvals' },
+        { key: 'cms-published', label: '게시 콘텐츠', value: cms.published, status: 'neutral', link: '/operator/homepage-cms' },
+        // ── Market Trial ──
+        { key: 'pending-trials', label: 'Market Trial 심사 대기', value: pendingTrials, status: pendingTrials > 0 ? 'warning' : 'neutral', link: '/operator/market-trial' },
+        // ── 주문 / 정산 (정산 상세는 admin — operator 는 요약만) ──
+        { key: 'monthly-orders', label: '월간 주문', value: orders.total_orders, status: 'neutral', link: '/operator/orders' },
+        { key: 'monthly-revenue', label: '월간 매출', value: orders.total_revenue, status: 'neutral' },
         { key: 'pending-settlements', label: '정산 대기', value: pendingSettlements, status: pendingSettlements > 0 ? 'warning' : 'neutral' },
+        // ── 참여 조직 ──
+        { key: 'active-orgs', label: '활성 참여 조직', value: activeOrgs, status: 'neutral', link: '/operator/members' },
       ];
 
       // Block 2: AI Summary (rule-based, no external AI call)
@@ -212,15 +243,43 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
       };
       const aiSummary = generateRuleBasedInsights('neture', copilotMetrics);
 
-      // Block 3: Action Queue
-      // WO-NETURE-OSA-PHASEA-DECISION-PRESSURE-REMOVE-V1: 'pending-products' (OSA 승인 대기) 항목 제거
-      const actionQueue: ActionItem[] = [
-        { id: 'pending-regs', label: '가입 승인 대기', count: pendingRegs, link: '/operator/applications' },
-        // WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1:
-        // dead link 정정 — operator scope 신규 페이지로 연결
-        { id: 'pending-suppliers', label: '공급사 승인 대기', count: pendingSuppliers, link: '/operator/suppliers' },
-        { id: 'partner-requests', label: '파트너 요청', count: partnerRequests, link: '/operator/applications' },
-        { id: 'unread-messages', label: '미확인 문의', count: unreadMessages, link: '/operator/contact-messages' },
+      // Block 3: Action Queue (오늘 처리할 일) — WO-O4O-NETURE-OPERATOR-DASHBOARD-V2-IA-REBUILD-V1
+      // 승인 업무를 한 곳에 모아 "표시명 + 건수 + 이동 경로 + 출처 설명" 으로 안내.
+      // enhanced 모드(priority 부여)로 렌더 → title/description 노출.
+      // 핵심: '공급사 승인 대기' 가 회원 관리가 아니라 별도 2단계 승인임을 description 으로 명시 (혼선 해소).
+      // '파트너 요청' 은 operator scope 전용 라우트가 없어 큐에서 제외하고 KPI(파트너 요청) 숫자로만 노출.
+      const aq = (
+        id: string,
+        title: string,
+        count: number,
+        link: string,
+        description: string,
+      ): ActionQueueItem => ({
+        id,
+        label: title,
+        title,
+        count,
+        link,
+        description,
+        source: 'SYSTEM',
+        priority: count > 0 ? 'medium' : 'low',
+        actionType: 'NAVIGATE',
+        actionUrl: link,
+        actionLabel: '바로 이동',
+      });
+      const actionQueue: ActionQueueItem[] = [
+        aq('pending-regs', '가입 승인 대기', pendingRegs, '/operator/applications',
+          'Neture 가입 신청자의 승인을 처리합니다. (service_memberships 가입 대기)'),
+        aq('pending-suppliers', '공급사 승인 대기', pendingSuppliers, '/operator/suppliers',
+          '가입 승인 후 공급자 프로필 승인이 필요한 대상입니다. 회원 관리에는 이미 "활성 회원"으로 표시되므로 이 큐에서 처리합니다.'),
+        aq('pending-products', '상품 승인 대기', pendingProducts, '/operator/product-approvals',
+          '공급자가 등록한 상품(offer)의 승인을 처리합니다.'),
+        aq('pending-service-approvals', '서비스 승인 대기', pendingServiceApprovals, '/operator/product-service-approvals',
+          '상품의 서비스별 노출 승인을 처리합니다.'),
+        aq('pending-trials', 'Market Trial 심사 대기', pendingTrials, '/operator/market-trial',
+          '제출된 Market Trial 의 모집 시작(심사)을 처리합니다.'),
+        aq('unread-messages', '미확인 문의', unreadMessages, '/operator/contact-messages',
+          '접수된 문의 중 아직 확인하지 않은 건입니다.'),
       ];
 
       // Block 4: Activity Log (multi-source: orders, suppliers, products, partners, contacts)
@@ -233,15 +292,19 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
         timestamp: a.created_at,
       }));
 
-      // Block 5: Quick Actions (7개)
+      // Block 5: Quick Actions (빠른 이동) — WO-O4O-NETURE-OPERATOR-DASHBOARD-V2-IA-REBUILD-V1
+      // 실제 존재하는 /operator/* 라우트로만 연결 (App.tsx 검증 완료). icon 은 QuickActionBlock 이
+      // 문자열을 그대로 렌더하므로 emoji 사용 (기존 'store' 등은 단어 그대로 노출되던 문제 정리).
       const quickActions: QuickActionItem[] = [
-        { id: 'manage-suppliers', label: '공급사 관리', link: '/operator/supply', icon: 'store' },
-        { id: 'manage-products', label: '상품 관리', link: '/operator/supply', icon: 'package' },
-        { id: 'manage-orders', label: '주문 관리', link: '/operator/orders', icon: 'shopping-cart' },
-        { id: 'manage-content', label: '콘텐츠 관리', link: '/operator/homepage-cms', icon: 'file-text' },
-        { id: 'manage-signage', label: '사이니지', link: '/operator/signage/hq-media', icon: 'monitor' },
-        { id: 'manage-forum', label: '포럼 관리', link: '/operator/community', icon: 'message-square' },
-        { id: 'manage-registrations', label: '가입 관리', link: '/operator/applications', icon: 'user-check' },
+        { id: 'go-members', label: '회원 관리', link: '/operator/members', icon: '👥' },
+        { id: 'go-applications', label: '가입 신청', link: '/operator/applications', icon: '📝' },
+        { id: 'go-suppliers', label: '공급사 승인', link: '/operator/suppliers', icon: '🏪' },
+        { id: 'go-product-approvals', label: '상품 승인', link: '/operator/product-approvals', icon: '📦' },
+        { id: 'go-service-approvals', label: '서비스 승인', link: '/operator/product-service-approvals', icon: '✅' },
+        { id: 'go-market-trial', label: 'Market Trial', link: '/operator/market-trial', icon: '🧪' },
+        { id: 'go-content', label: '콘텐츠 관리', link: '/operator/homepage-cms', icon: '📰' },
+        { id: 'go-signage', label: '사이니지', link: '/operator/signage/hq-media', icon: '🖥️' },
+        { id: 'go-analytics', label: '분석', link: '/operator/analytics', icon: '📊' },
       ];
 
       const response: OperatorDashboardConfig = {
