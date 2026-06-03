@@ -8,14 +8,13 @@
  */
 
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   Mail,
   Phone,
   Building2,
   Shield,
-  UserCog,
-  Settings,
   BookOpen,
   Award,
   Coins,
@@ -84,32 +83,41 @@ export default function MyPageHub() {
   const initial = user.lastName?.charAt(0) || user.name?.charAt(0) || '?';
 
   return (
-    <MyPageLayout title="마이페이지">
-      {/* Profile Summary Card (read-only) */}
-      <div className="bg-white rounded-2xl shadow-sm overflow-hidden mb-4">
-        <div className="bg-gradient-to-r from-primary-500 to-primary-600 px-6 py-8">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-              <span className="text-2xl font-bold text-white">{initial}</span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <h2 className="text-xl font-bold text-white truncate">{displayName}</h2>
-              <p className="text-primary-100 text-sm truncate">{user.email}</p>
-              <div className="mt-2">
-                <RoleBadgeGroup
-                  badges={[
-                    { key: 'role', label: roleLabel, tone: 'white-overlay', variant: 'solid' },
-                    ...(status.label
-                      ? [{ key: 'status', label: status.label, tone: status.tone, variant: 'soft' as const }]
-                      : []),
-                  ]}
-                  size="md"
-                />
-              </div>
+    <MyPageLayout
+      title="마이페이지"
+      width="wide"
+      breadcrumb={[{ label: '홈', href: '/' }, { label: '마이페이지' }]}
+    >
+      {/* Profile Summary Card — KPA-Society 정렬: 흰색 카드 + 좌측 아바타 + 정보 + 우측 수정 버튼 */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+        <div className="flex items-center gap-5">
+          <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+            <span className="text-3xl font-bold text-gray-400">{initial}</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <h2 className="text-xl font-bold text-gray-900 truncate">{displayName}</h2>
+            <p className="text-sm text-gray-500 truncate mt-0.5">{user.email}</p>
+            <div className="mt-2">
+              <RoleBadgeGroup
+                badges={[
+                  { key: 'role', label: roleLabel, tone: 'primary', variant: 'solid' },
+                  ...(status.label
+                    ? [{ key: 'status', label: status.label, tone: status.tone, variant: 'soft' as const }]
+                    : []),
+                ]}
+                size="md"
+              />
             </div>
           </div>
+          <Link
+            to="/mypage/profile"
+            className="flex-shrink-0 px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition-colors"
+          >
+            프로필 수정
+          </Link>
         </div>
-        <div className="p-6 space-y-3">
+        {/* 상세 정보 — 새 흰색 카드 구조 안에서 재배치 (이메일/연락처/역할/상태 보존) */}
+        <div className="mt-5 pt-5 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1">
           <InfoRow icon={<Mail className="w-4 h-4 text-gray-400" />} label="이메일" value={user.email} />
           <InfoRow icon={<Phone className="w-4 h-4 text-gray-400" />} label="연락처" value={user.phone || '-'} />
           <InfoRow icon={<Building2 className="w-4 h-4 text-gray-400" />} label="역할" value={roleLabel} />
@@ -117,22 +125,8 @@ export default function MyPageHub() {
         </div>
       </div>
 
-      {/* Navigation Cards (WO-O4O-MYPAGE-HUB-CARD-CANONICAL-ALIGNMENT-V1) */}
-      <div className="grid grid-cols-2 gap-3 mb-4">
-        <MyPageHubCard
-          title="프로필 편집"
-          href="/mypage/profile"
-          icon={<UserCog className="w-5 h-5" />}
-        />
-        <MyPageHubCard
-          title="설정"
-          href="/mypage/settings"
-          icon={<Settings className="w-5 h-5" />}
-        />
-      </div>
-
-      {/* LMS Navigation Cards */}
-      <div className="grid grid-cols-1 gap-3 mb-4">
+      {/* LMS Navigation Cards — KPA 흰색 카드 그리드 정렬 (프로필/설정은 상단 탭·수정 버튼으로 일원화) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
         <MyPageHubCard
           title="내 강의"
           href="/mypage/enrollments"
@@ -158,7 +152,7 @@ export default function MyPageHub() {
 
       {/* Appreciation Activity Card */}
       {!appreciationLoading && (
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden mb-4">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
           <div className="flex items-center gap-2 px-5 py-4 border-b border-gray-100">
             <Gift className="w-4 h-4 text-amber-500" />
             <h3 className="text-sm font-semibold text-gray-800">감사 활동</h3>
