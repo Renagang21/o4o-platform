@@ -6,7 +6,7 @@
  *
  * Operator creates forced content that is automatically injected
  * into ALL store playlists during the specified period.
- * API: /api/signage/k-cosmetics/hq/forced-content
+ * API: /api/signage/cosmetics/hq/forced-content
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
@@ -14,7 +14,10 @@ import { api, API_BASE_URL } from '@/lib/apiClient';
 import { Shield, RefreshCw, Plus, Trash2, Search, Edit2, X, Check } from 'lucide-react';
 import { DataTable, type Column } from '@o4o/ui';
 
-const SERVICE_KEY = 'k-cosmetics';
+// WO-O4O-SIGNAGE-FORCED-CONTENT-KCOSMETICS-SERVICEKEY-FIX-V1:
+//   signage backend(signage-role.middleware validServiceKeys)는 'cosmetics'를 표준 serviceKey로
+//   사용한다. 기존 'k-cosmetics'는 INVALID_SERVICE_KEY(400)로 거부되었다. signage 표준에 정렬.
+const SERVICE_KEY = 'cosmetics';
 const BASE = `${API_BASE_URL}/api/signage/${SERVICE_KEY}`;
 
 interface ForcedContentItem {
