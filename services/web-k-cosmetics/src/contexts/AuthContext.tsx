@@ -86,6 +86,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // WO-O4O-STORE-OWNER-GUARD-CHECKSESSION-FIX-V1:
+  //   mount 시 1회 세션 부트스트랩. RoleGuard 를 거치지 않는 경로(StoreOwnerRoute /store/*)에서도
+  //   isLoading 이 해제되도록 — cold load/새로고침 무한 로딩 해소. GlycoPharm/KPA AuthContext canonical 정합.
+  //   내부 가드(isSessionChecked + sessionCheckInProgressRef)로 RoleGuard lazy 호출과 중복되지 않는다.
+  useEffect(() => {
+    void checkSession();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string; code?: string; role?: UserRole; roles?: UserRole[] }> => {
     try {
       setIsLoading(true);
