@@ -98,8 +98,8 @@ export default function MyPageHub() {
         <MyPageEmptyState description="최근 활동이 없습니다." />
       </div>
 
-      {/* 하단 바로가기 (WO-O4O-MYPAGE-HUB-CARD-CANONICAL-ALIGNMENT-V1) */}
-      <div className="grid grid-cols-2 gap-3 mb-6">
+      {/* 하단 바로가기 (WO-O4O-MYPAGE-HUB-CARD-CANONICAL-ALIGNMENT-V1) — 모바일 1열 / 데스크톱 2열 */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
         <MyPageHubCard
           title="프로필"
           href="/mypage/profile"

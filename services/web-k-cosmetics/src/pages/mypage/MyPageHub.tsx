@@ -88,7 +88,7 @@ export default function MyPageHub() {
         <div className="mt-5 pt-5 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1">
           <InfoRow icon={<Mail className="w-4 h-4 text-gray-400" />} label="이메일" value={user.email} />
           <InfoRow icon={<Phone className="w-4 h-4 text-gray-400" />} label="연락처" value={user.phone || '미등록'} />
-          <InfoRow icon={<Shield className="w-4 h-4 text-gray-400" />} label="역할" value={roleLabel} />
+          <InfoRow icon={<Shield className="w-4 h-4 text-gray-400" />} label="역할" value={roleLabel ?? '사용자'} />
         </div>
       </div>
 
