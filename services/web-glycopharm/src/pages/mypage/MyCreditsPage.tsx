@@ -63,7 +63,7 @@ export default function MyCreditsPage() {
   }
 
   return (
-    <MyPageLayout title="내 크레딧" subtitle="학습 활동으로 획득한 크레딧을 확인하세요">
+    <MyPageLayout title="내 크레딧" subtitle="학습 활동으로 획득한 크레딧을 확인하세요" width="wide">
       {/* Balance */}
       <div className="bg-white rounded-2xl shadow-sm p-8 mb-4 text-center">
         <p className="text-sm text-gray-400 mb-2">보유 크레딧</p>

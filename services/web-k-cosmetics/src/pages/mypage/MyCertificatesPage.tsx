@@ -84,6 +84,7 @@ export default function MyCertificatesPage() {
     <MyPageLayout
       title="학습 결과"
       subtitle="수료한 교육 과정의 수료증을 확인하세요"
+      width="wide"
       navItems={KCOS_MYPAGE_NAV_ITEMS}
     >
       {loading && <MyPageLoadingState />}

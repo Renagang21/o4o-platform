@@ -89,7 +89,7 @@ export default function MyEnrollmentsPage() {
   }
 
   return (
-    <MyPageLayout title="내 수강 목록" subtitle="신청하거나 진행 중인 강의를 확인하세요">
+    <MyPageLayout title="내 수강 목록" subtitle="신청하거나 진행 중인 강의를 확인하세요" width="wide">
       {/* Filter tabs */}
       <div className="flex flex-wrap gap-2 mb-5">
         {FILTERS.map((f) => {

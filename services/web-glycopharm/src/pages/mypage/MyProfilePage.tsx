@@ -102,7 +102,7 @@ export default function MyProfilePage() {
   };
 
   return (
-    <MyPageLayout title="마이페이지">
+    <MyPageLayout title="마이페이지" width="form">
       <ProfileCard
         initial={user.lastName?.charAt(0) || user.name?.charAt(0) || '?'}
         name={displayName}

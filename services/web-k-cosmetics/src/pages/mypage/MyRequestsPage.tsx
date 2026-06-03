@@ -46,6 +46,7 @@ export default function MyRequestsPage() {
     <MyPageLayout
       title="내 신청 내역"
       subtitle="매장 입점 및 수강 신청 내역을 확인합니다"
+      width="wide"
       navItems={KCOS_MYPAGE_NAV_ITEMS}
     >
       <MyRequestsInbox

@@ -73,6 +73,7 @@ export default function MyProfilePage() {
     <MyPageLayout
       title="마이페이지"
       subtitle="기본 정보를 확인하고 수정할 수 있습니다"
+      width="form"
       breadcrumb={[{ label: '홈', href: '/' }, { label: '마이페이지', href: '/mypage' }, { label: '프로필' }]}
     >
       <ProfileCard

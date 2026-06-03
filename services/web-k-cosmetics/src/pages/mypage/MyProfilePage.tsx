@@ -71,6 +71,7 @@ export default function MyProfilePage() {
     <MyPageLayout
       title="마이페이지"
       subtitle="내 정보를 확인하고 관리할 수 있습니다"
+      width="form"
       navItems={KCOS_MYPAGE_NAV_ITEMS}
     >
       <ProfileCard

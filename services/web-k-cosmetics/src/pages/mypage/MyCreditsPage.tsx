@@ -67,6 +67,7 @@ export default function MyCreditsPage() {
     <MyPageLayout
       title="내 크레딧"
       subtitle="학습 활동으로 획득한 크레딧을 확인하세요"
+      width="wide"
       navItems={KCOS_MYPAGE_NAV_ITEMS}
     >
       {/* Balance */}

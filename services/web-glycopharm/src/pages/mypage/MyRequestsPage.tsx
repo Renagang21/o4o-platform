@@ -43,7 +43,7 @@ export default function MyRequestsPage() {
   }, [loadData]);
 
   return (
-    <MyPageLayout title="내 신청 내역" subtitle="회원 신청 및 약국 참여 신청 내역을 확인합니다">
+    <MyPageLayout title="내 신청 내역" subtitle="회원 신청 및 약국 참여 신청 내역을 확인합니다" width="wide">
       <MyRequestsInbox
         items={items}
         loading={loading}

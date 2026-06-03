@@ -64,7 +64,7 @@ export default function MySettingsPage() {
   };
 
   return (
-    <MyPageLayout title="마이페이지">
+    <MyPageLayout title="마이페이지" width="form">
       {/* Security */}
       <SettingsSection title="보안 설정">
         <button

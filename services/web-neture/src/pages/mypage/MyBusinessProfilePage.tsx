@@ -14,7 +14,7 @@ import SupplierProfilePage from '../supplier/SupplierProfilePage';
 
 export default function MyBusinessProfilePage() {
   return (
-    <MyPageLayout>
+    <MyPageLayout width="form">
       <SupplierProfilePage />
     </MyPageLayout>
   );

@@ -93,6 +93,7 @@ export default function MyEnrollmentsPage() {
     <MyPageLayout
       title="내 수강 목록"
       subtitle="신청하거나 진행 중인 강의를 확인하세요"
+      width="wide"
       navItems={KCOS_MYPAGE_NAV_ITEMS}
     >
       {/* Filter tabs */}
