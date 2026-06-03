@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Edit3, Check, X, Loader2 } from 'lucide-react';
+import { RoleBadge } from './RoleBadge.js';
 
 interface ProfileCardProps {
   initial: string;
@@ -31,43 +32,41 @@ export function ProfileCard({
   children,
 }: ProfileCardProps) {
   return (
-    <div className="bg-white rounded-2xl shadow-sm overflow-hidden mb-4">
-      {/* Gradient Header */}
-      <div className="bg-gradient-to-r from-primary-500 to-primary-600 px-6 py-8">
-        <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-            <span className="text-2xl font-bold text-white">{initial}</span>
-          </div>
-          <div className="flex-1 min-w-0">
-            <h2 className="text-xl font-bold text-white truncate">{name}</h2>
-            <p className="text-primary-100 text-sm truncate">{email}</p>
-            <div className="flex items-center gap-2 mt-2">
-              <span className="inline-block px-3 py-1 bg-white/20 rounded-full text-xs font-medium text-white">
-                {roleLabel}
-              </span>
-              {statusLabel && (
-                <span
-                  className="inline-block px-2 py-0.5 rounded-full text-xs font-medium"
-                  style={statusColor ? { backgroundColor: `${statusColor}20`, color: statusColor } : undefined}
-                >
-                  {statusLabel}
-                </span>
-              )}
-            </div>
-          </div>
-          {!isEditing && (
-            <button
-              onClick={onEdit}
-              className="p-2 bg-white/20 rounded-lg hover:bg-white/30 transition-colors flex-shrink-0"
-            >
-              <Edit3 className="w-5 h-5 text-white" />
-            </button>
-          )}
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-4">
+      {/* 중립 헤더 — KPA 톤 정렬: 대형 컬러 배너 제거, 좌측 회색 아바타 + 정보 + 우측 수정 버튼.
+          서비스 브랜드 컬러는 역할 badge 의 작은 accent(RoleBadge soft) 로만 유지. */}
+      <div className="flex items-center gap-5">
+        <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+          <span className="text-3xl font-bold text-gray-400">{initial}</span>
         </div>
+        <div className="flex-1 min-w-0">
+          <h2 className="text-xl font-bold text-gray-900 truncate">{name}</h2>
+          <p className="text-sm text-gray-500 truncate mt-0.5">{email}</p>
+          <div className="flex items-center gap-2 mt-2">
+            <RoleBadge label={roleLabel} tone="primary" variant="soft" size="md" />
+            {statusLabel && (
+              <span
+                className="inline-block px-2 py-0.5 rounded-full text-xs font-medium"
+                style={statusColor ? { backgroundColor: `${statusColor}20`, color: statusColor } : undefined}
+              >
+                {statusLabel}
+              </span>
+            )}
+          </div>
+        </div>
+        {!isEditing && (
+          <button
+            onClick={onEdit}
+            aria-label="프로필 수정"
+            className="flex-shrink-0 p-2 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors"
+          >
+            <Edit3 className="w-5 h-5" />
+          </button>
+        )}
       </div>
 
-      {/* Profile Info */}
-      <div className="p-6">
+      {/* Profile Info — 헤더와 divider 로 구분 */}
+      <div className="mt-5 pt-5 border-t border-gray-100">
         <h3 className="text-sm font-semibold text-gray-900 mb-4">기본 정보</h3>
         <div className="space-y-4">
           {children}
