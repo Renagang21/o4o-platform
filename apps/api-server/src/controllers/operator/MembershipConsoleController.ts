@@ -1092,21 +1092,17 @@ export class MembershipConsoleController {
           res.status(403).json({ success: false, error: 'Cannot assign roles outside your service scope' });
           return;
         }
-        // 2. Admin role restriction — only service admins can manage admin-level roles
-        if (roleEntity.isAdminRole) {
-          const userRoles: string[] = (req as any).user?.roles || [];
-          const callerIsServiceAdmin = scope.rolePrefixes.some(
-            (p: string) => userRoles.includes(`${p}:admin`)
-          );
-          if (!callerIsServiceAdmin) {
-            res.status(403).json({ success: false, error: 'Only admins can manage admin-level roles' });
-            return;
-          }
-          // 3. Self-assignment prevention for admin roles
-          if (assignedBy === userId) {
-            res.status(403).json({ success: false, error: 'Cannot assign admin role to yourself' });
-            return;
-          }
+        // 2. Operator/Admin tier restriction (WO-O4O-NETURE-OPERATOR-ROLE-ASSIGNMENT-AUTHORITY-LOCK-V1)
+        //    운영자·관리자 권한 부여(role_assignments write)는 platform admin (admin.neture.co.kr) 전용이다.
+        //    서비스 operator/admin 은 operator/admin tier 역할을 부여할 수 없다(F9 RBAC SSOT / F11 거버넌스 경계).
+        //    부여·회수는 admin-dashboard 의 POST/PUT /admin/users 경로에서만 수행한다.
+        if (roleEntity.isAdminRole || roleEntity.roleKey === 'operator') {
+          res.status(403).json({
+            success: false,
+            error: '운영자·관리자 권한 부여는 플랫폼 관리자(admin)에서만 가능합니다.',
+            code: 'ROLE_ASSIGNMENT_PLATFORM_ADMIN_ONLY',
+          });
+          return;
         }
       }
 
@@ -1185,22 +1181,17 @@ export class MembershipConsoleController {
           res.status(403).json({ success: false, error: 'Cannot remove roles outside your service scope' });
           return;
         }
-        // 2. Admin role restriction — only service admins can manage admin-level roles
-        if (roleEntity.isAdminRole) {
-          const userRoles: string[] = (req as any).user?.roles || [];
-          const callerIsServiceAdmin = scope.rolePrefixes.some(
-            (p: string) => userRoles.includes(`${p}:admin`)
-          );
-          if (!callerIsServiceAdmin) {
-            res.status(403).json({ success: false, error: 'Only admins can manage admin-level roles' });
-            return;
-          }
-          // 3. Self-removal prevention for admin roles
-          const requesterId = (req as any).user?.id;
-          if (requesterId === userId) {
-            res.status(403).json({ success: false, error: 'Cannot remove your own admin role' });
-            return;
-          }
+        // 2. Operator/Admin tier restriction (WO-O4O-NETURE-OPERATOR-ROLE-ASSIGNMENT-AUTHORITY-LOCK-V1)
+        //    운영자·관리자 권한 회수(role_assignments write)는 platform admin (admin.neture.co.kr) 전용이다.
+        //    서비스 operator/admin 은 operator/admin tier 역할을 회수할 수 없다(F9 RBAC SSOT / F11 거버넌스 경계).
+        //    부여·회수는 admin-dashboard 의 DELETE /admin/users/:id/role-assignments/:role 경로에서만 수행한다.
+        if (roleEntity.isAdminRole || roleEntity.roleKey === 'operator') {
+          res.status(403).json({
+            success: false,
+            error: '운영자·관리자 권한 회수는 플랫폼 관리자(admin)에서만 가능합니다.',
+            code: 'ROLE_ASSIGNMENT_PLATFORM_ADMIN_ONLY',
+          });
+          return;
         }
       }
 

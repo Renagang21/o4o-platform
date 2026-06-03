@@ -95,7 +95,10 @@ export interface EditUserModalConfig {
    */
   membershipRoleOptions: EditUserModalOption[];
   /**
-   * role_assignments 드롭다운 옵션.
+   * role_assignments 표시용 옵션 (label 매핑 + 보유 역할 매칭).
+   * WO-O4O-NETURE-OPERATOR-ROLE-ASSIGNMENT-AUTHORITY-LOCK-V1:
+   *   operator console 에서 운영 권한은 표시 전용이다(부여·회수는 platform admin 전용).
+   *   이 옵션은 보유 role_assignments 를 라벨 배지로 렌더링하는 데만 사용된다.
    * 첫 번째 항목은 반드시 value='' (일반 회원 — 역할 없음)이어야 한다.
    * e.g. ['', 'neture:operator', 'neture:admin']
    */
@@ -156,8 +159,10 @@ export function CommonEditUserModal({ userId, config, onClose, onSuccess }: Comm
 
   const [membershipRole, setMembershipRole] = useState('');
   const [originalMembershipRole, setOriginalMembershipRole] = useState('');
-  const [currentAdminRole, setCurrentAdminRole] = useState('');
-  const [selectedAdminRole, setSelectedAdminRole] = useState('');
+  // WO-O4O-NETURE-OPERATOR-ROLE-ASSIGNMENT-AUTHORITY-LOCK-V1:
+  //   운영 권한(role_assignments)은 operator console 에서 표시 전용이다.
+  //   부여·회수는 platform admin (admin.neture.co.kr) 전용 → 변경 상태(selected) 없이 보유 역할만 보관.
+  const [displayAdminRoles, setDisplayAdminRoles] = useState<string[]>([]);
 
   const [profileValue, setProfileValue] = useState('');
   const [originalProfileValue, setOriginalProfileValue] = useState('');
@@ -199,16 +204,18 @@ export function CommonEditUserModal({ userId, config, onClose, onSuccess }: Comm
         setMembershipRole(svcMembership?.role || '');
         setOriginalMembershipRole(svcMembership?.role || '');
 
-        // admin role (role_assignments)
+        // admin role (role_assignments) — 표시 전용, 다중 역할 손실 없이 전부 수집.
+        // WO-O4O-NETURE-OPERATOR-ROLE-ASSIGNMENT-AUTHORITY-LOCK-V1:
+        //   기존 단일 select 는 운영자+관리자 동시 보유를 하나로 평면화했다.
+        //   부여·회수는 platform admin 전용이므로 여기서는 보유 역할 전체를 배지로 표시한다.
         const activeRoles: string[] = (data.roles || [])
           .filter((r: any) => r.isActive)
           .map((r: any) => r.role);
-        let adminRole: string;
+        let matchedRoleValues: string[];
         if (normalizeAdminRoleDisplay) {
           // WO-O4O-NETURE-MEMBER-LIST-MODAL-PERMISSION-DISPLAY-CORRECTION-V1:
-          // 표시 초기값을 "대시보드 접근" 기준과 일치시킨다. role_assignments 의 bare role 과
+          // 표시를 "대시보드 접근" 기준과 일치시킨다. role_assignments 의 bare role 과
           // service_memberships.role 까지 후보로 포함해 namespaced adminRoleOptions 로 정규화.
-          // 관리자 > 운영자 우선순위. currentAdminRole 도 동일 값으로 두어 미변경 저장 시 no-op.
           const candidates = [...activeRoles, svcMembership?.role].filter(Boolean) as string[];
           // prefix 무관 매칭: bare 'operator' / 'neture:operator' / 'cosmetics:operator' 등
           // 마지막 세그먼트(suffix)로 adminRoleOptions 와 대조한다. 서비스별 role prefix 가
@@ -216,19 +223,17 @@ export function CommonEditUserModal({ userId, config, onClose, onSuccess }: Comm
           const lastSeg = (r: string): string => (r.includes(':') ? r.slice(r.lastIndexOf(':') + 1) : r);
           const matchValue = (raw: string): string =>
             adminRoleOptions.find((opt) => opt.value && lastSeg(opt.value) === lastSeg(raw))?.value || '';
-          const matched = candidates.map(matchValue).filter(Boolean);
-          adminRole =
-            matched.find((v) => v.endsWith(':admin')) ??
-            matched.find((v) => v.endsWith(':operator')) ??
-            matched[0] ??
-            '';
+          matchedRoleValues = candidates.map(matchValue).filter(Boolean);
         } else {
-          adminRole = activeRoles.find((r: string) =>
+          matchedRoleValues = activeRoles.filter((r: string) =>
             adminRoleOptions.some(opt => opt.value && opt.value === r)
-          ) || '';
+          );
         }
-        setCurrentAdminRole(adminRole);
-        setSelectedAdminRole(adminRole);
+        // dedup + adminRoleOptions 정의 순서(운영자 → 관리자)로 정렬해 표시한다.
+        const orderedRoles = adminRoleOptions
+          .filter((opt) => opt.value && matchedRoleValues.includes(opt.value))
+          .map((opt) => opt.value);
+        setDisplayAdminRoles(orderedRoles);
 
         // business info
         const biz = u.businessInfo || {};
@@ -306,15 +311,9 @@ export function CommonEditUserModal({ userId, config, onClose, onSuccess }: Comm
       }
       await makeRequest('PUT', `/operator/members/${userId}`, payload);
 
-      // admin role change
-      if (selectedAdminRole !== currentAdminRole) {
-        if (currentAdminRole) {
-          await makeRequest('DELETE', `/operator/members/${userId}/roles/${encodeURIComponent(currentAdminRole)}`).catch(() => {});
-        }
-        if (selectedAdminRole) {
-          await makeRequest('POST', `/operator/members/${userId}/roles`, { role: selectedAdminRole });
-        }
-      }
+      // WO-O4O-NETURE-OPERATOR-ROLE-ASSIGNMENT-AUTHORITY-LOCK-V1:
+      //   운영 권한(role_assignments) 변경 로직 제거. 부여·회수는 platform admin 전용.
+      //   (기존 DELETE→POST 단일 덮어쓰기는 다중 역할 손실 위험이 있어 함께 폐기)
 
       // profile classification change (e.g. K-Cosmetics sub_role)
       if (profileClassification && profileValue !== originalProfileValue) {
@@ -396,19 +395,27 @@ export function CommonEditUserModal({ userId, config, onClose, onSuccess }: Comm
               )}
             </div>
 
-            {/* 운영 권한 */}
+            {/* 운영 권한 — 읽기 전용. 부여·회수는 platform admin(admin.neture.co.kr) 전용. */}
+            {/* WO-O4O-NETURE-OPERATOR-ROLE-ASSIGNMENT-AUTHORITY-LOCK-V1 */}
             <div className="pt-3 border-t">
               <h4 className="text-sm font-semibold text-slate-700 mb-3">운영 권한</h4>
-              <select value={selectedAdminRole} onChange={(e) => setSelectedAdminRole(e.target.value)} className={inputCls}>
-                {adminRoleOptions.map(opt => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
-              {selectedAdminRole !== currentAdminRole && (
-                <p className="text-xs text-amber-600 mt-1">
-                  권한이 변경됩니다: {currentAdminRole ? adminRoleOptions.find(o => o.value === currentAdminRole)?.label || currentAdminRole : '일반 회원'} → {selectedAdminRole ? adminRoleOptions.find(o => o.value === selectedAdminRole)?.label || selectedAdminRole : '일반 회원'}
-                </p>
-              )}
+              <div className="flex flex-wrap gap-2">
+                {displayAdminRoles.length > 0 ? (
+                  displayAdminRoles.map((value) => (
+                    <span key={value}
+                      className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-primary-50 text-primary-700 border border-primary-200">
+                      {adminRoleOptions.find((o) => o.value === value)?.label || value}
+                    </span>
+                  ))
+                ) : (
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
+                    {adminRoleOptions.find((o) => !o.value)?.label || '일반 회원'}
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-slate-400 mt-2">
+                운영자·관리자 권한 부여·회수는 플랫폼 관리자(admin)에서만 가능합니다.
+              </p>
             </div>
 
             {/* 서비스별 프로필 분류 (e.g. K-Cosmetics sub_role) */}
