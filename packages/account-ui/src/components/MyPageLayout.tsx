@@ -27,9 +27,14 @@ interface MyPageLayoutProps {
   children: ReactNode;
 }
 
+/**
+ * Canonical MyPage 외곽 폭 — KPA-Society `layouts/MyPageLayout` 기준 정렬.
+ *   - 'wide' / 'list' / 'form' : outer 1120px ('form' 은 children 을 860px inner 로 제한)
+ *   - width 미지정              : 기존 호환 위해 4xl 유지 (서브페이지 폼 과폭 방지)
+ */
 function getOuterMaxWidth(width?: MyPageLayoutWidth): string {
   if (!width) return 'max-w-4xl';
-  return width === 'form' ? 'max-w-4xl' : 'max-w-[1120px]';
+  return 'max-w-[1120px]';
 }
 
 export function MyPageLayout({
@@ -44,37 +49,42 @@ export function MyPageLayout({
 }: MyPageLayoutProps) {
   const outerMaxWidth = getOuterMaxWidth(width);
   const hasBreadcrumb = breadcrumb && breadcrumb.length > 0;
+  const hasHeader = Boolean(title) || hasBreadcrumb;
 
   return (
-    <div className={`${outerMaxWidth} mx-auto py-10 px-4`}>
-      {hasBreadcrumb && (
-        <nav className="mb-3 text-sm text-gray-500" aria-label="breadcrumb">
-          <ol className="flex items-center flex-wrap gap-1">
-            {breadcrumb!.map((item, idx) => {
-              const isLast = idx === breadcrumb!.length - 1;
-              return (
-                <li key={`${item.label}-${idx}`} className="flex items-center gap-1">
-                  {idx > 0 && <span className="text-gray-300">/</span>}
-                  {!isLast && item.href ? (
-                    <a href={item.href} className="text-gray-500 hover:text-gray-700 transition-colors">
-                      {item.label}
-                    </a>
-                  ) : (
-                    <span className={isLast ? 'text-gray-800 font-medium' : 'text-gray-500'}>
-                      {item.label}
-                    </span>
-                  )}
-                </li>
-              );
-            })}
-          </ol>
-        </nav>
-      )}
-      {title && (
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
+    // KPA 정렬: 상단 패딩은 PageHeader(py-8)가 제공, 좌우는 반응형 패딩, 하단 pb-10
+    <div className={`${outerMaxWidth} mx-auto px-4 sm:px-5 lg:px-6 pb-10`}>
+      {/* PageHeader block — breadcrumb / title / 하단 divider (KPA canonical rhythm) */}
+      {hasHeader && (
+        <div className="py-8 border-b border-gray-300 mb-6">
+          {hasBreadcrumb && (
+            <nav className="mb-3 text-xs text-gray-500" aria-label="breadcrumb">
+              <ol className="flex items-center flex-wrap">
+                {breadcrumb!.map((item, idx) => {
+                  const isLast = idx === breadcrumb!.length - 1;
+                  return (
+                    <li key={`${item.label}-${idx}`} className="flex items-center">
+                      {idx > 0 && <span className="mx-2 text-gray-300">/</span>}
+                      {!isLast && item.href ? (
+                        <a href={item.href} className="text-gray-500 hover:text-gray-700 transition-colors">
+                          {item.label}
+                        </a>
+                      ) : (
+                        <span className={isLast ? 'text-gray-700' : 'text-gray-500'}>
+                          {item.label}
+                        </span>
+                      )}
+                    </li>
+                  );
+                })}
+              </ol>
+            </nav>
+          )}
+          {title && (
+            <h1 className="text-3xl font-semibold text-gray-900 m-0">{title}</h1>
+          )}
           {subtitle && (
-            <p className="text-sm text-gray-500 mt-1">{subtitle}</p>
+            <p className="text-base text-gray-500 mt-2">{subtitle}</p>
           )}
         </div>
       )}
