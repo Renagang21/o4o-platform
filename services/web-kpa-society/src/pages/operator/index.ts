@@ -5,7 +5,9 @@
 
 export { default as KpaOperatorDashboard } from './KpaOperatorDashboard';
 export { default as OperatorAiReportPage } from './OperatorAiReportPage';
-export { default as ForumManagementPage } from './ForumManagementPage';
+// WO-O4O-KPA-FORUM-MANAGEMENT-TAB-DECOMPOSITION-V1: ForumManagementPage 2탭 → 신청/목록 분리
+export { default as ForumRequestsManagementPage } from './ForumRequestsManagementPage';
+export { default as ForumCategoriesManagementPage } from './ForumCategoriesManagementPage';
 export { default as ForumDeleteRequestsPage } from './ForumDeleteRequestsPage';
 export { LegalManagementPage } from './LegalManagementPage';
 

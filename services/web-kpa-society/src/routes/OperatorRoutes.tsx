@@ -16,7 +16,7 @@
  */
 
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { OperatorAiReportPage, ForumManagementPage, ForumDeleteRequestsPage, LegalManagementPage, ForumAnalyticsDashboard, ContentManagementPage, AuditLogPage, MemberManagementPage, PharmacyRequestManagementPage, ProductApplicationManagementPage, CommunityManagementPage, QualificationRequestsPage, OperatorLmsCoursesPage, OperatorResourcesPage } from '../pages/operator';
+import { OperatorAiReportPage, ForumRequestsManagementPage, ForumCategoriesManagementPage, ForumDeleteRequestsPage, LegalManagementPage, ForumAnalyticsDashboard, ContentManagementPage, AuditLogPage, MemberManagementPage, PharmacyRequestManagementPage, ProductApplicationManagementPage, CommunityManagementPage, QualificationRequestsPage, OperatorLmsCoursesPage, OperatorResourcesPage } from '../pages/operator';
 // WO-KPA-A-OPERATOR-DASHBOARD-FIRST-STABILIZATION-V1: UsersPage → /operator/members redirect
 import UserDetailPage from '../pages/operator/UserDetailPage';
 import RoleManagementPage from '../pages/operator/RoleManagementPage';
@@ -77,8 +77,11 @@ export function OperatorRoutes() {
           {/* AI 리포트 */}
           <Route path="ai-report" element={<OperatorAiReportPage />} />
 
-          {/* 포럼 관리 */}
-          <Route path="forum-management" element={<ForumManagementPage />} />
+          {/* 포럼 신청 관리 / 포럼 목록 관리 (WO-O4O-KPA-FORUM-MANAGEMENT-TAB-DECOMPOSITION-V1: 2탭 분리) */}
+          <Route path="forum-requests" element={<ForumRequestsManagementPage />} />
+          <Route path="forum-categories" element={<ForumCategoriesManagementPage />} />
+          {/* 레거시: 기존 결합 화면 → 신청 관리로 redirect */}
+          <Route path="forum-management" element={<Navigate to="/operator/forum-requests" replace />} />
 
           {/* 커뮤니티 관리 (WO-O4O-OPERATOR-ROUTE-REFINEMENT-V1: community-management → community) */}
           <Route path="community" element={<CommunityManagementPage />} />

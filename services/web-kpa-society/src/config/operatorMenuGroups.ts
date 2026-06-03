@@ -83,7 +83,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   // WO-KPA-OPERATOR-FORUM-MENU-ORDER-V1: 포럼 운영(허브)을 최상단으로 이동
   forum: [
     { label: '포럼 운영', path: '/operator/forum' },
-    { label: '포럼 관리', path: '/operator/forum-management' },
+    { label: '포럼 신청 관리', path: '/operator/forum-requests' },
+    { label: '포럼 목록 관리', path: '/operator/forum-categories' },
     { label: '삭제 요청', path: '/operator/forum-delete-requests' },
     { label: '포럼 분석', path: '/operator/forum-analytics' },
   ],
@@ -163,7 +164,8 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
   // WO-KPA-OPERATOR-FORUM-MENU-ORDER-V1: 포럼 운영(허브)을 최상단으로 이동
   forum: [
     { label: '포럼 운영', path: '/operator/forum' },
-    { label: '포럼 관리', path: '/operator/forum-management' },
+    { label: '포럼 신청 관리', path: '/operator/forum-requests' },
+    { label: '포럼 목록 관리', path: '/operator/forum-categories' },
     { label: '삭제 요청', path: '/operator/forum-delete-requests' },
     { label: '포럼 분석', path: '/operator/forum-analytics' },
   ],
