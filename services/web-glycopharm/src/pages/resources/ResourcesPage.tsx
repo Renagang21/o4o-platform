@@ -11,7 +11,7 @@
 
 import { useMemo } from 'react';
 import { ResourcesHubTemplate, type ResourcesHubConfig, type ResourcesHubItem } from '@o4o/shared-space-ui';
-import { glycoResourcesApi } from '@/api/resources';
+import { glycoResourcesApi, type GlycoResourceItem } from '@/api/resources';
 
 // ─── GlycoPharm Config ────────────────────────────────────────────────────────
 
@@ -28,7 +28,7 @@ function useGlycoResourcesConfig(): ResourcesHubConfig {
       try {
         const res = await glycoResourcesApi.list({ page, limit, search, sort: 'latest' });
         const d = res.data?.data;
-        const items = (d?.items ?? []).map((item): ResourcesHubItem => {
+        const items = (d?.items ?? []).map((item: GlycoResourceItem): ResourcesHubItem => {
           // usage_type → actionType 매핑 (KPA 패턴)
           let actionType: 'view' | 'download' | 'external' | 'copy' | undefined;
           if (item.usage_type === 'LINK') actionType = 'external';

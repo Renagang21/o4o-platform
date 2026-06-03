@@ -760,6 +760,8 @@ function AppRoutes() {
         <Route path="community" element={<CommunityManagementPage />} />
         <Route path="store-approvals" element={<StoreApprovalsPage />} />
         <Route path="store-approvals/:id" element={<StoreApprovalDetailPage />} />
+        <Route path="applications" element={<ApplicationsPage />} />
+        <Route path="applications/:id" element={<ApplicationDetailPage />} />
         {/* legacy redirect: /operator/glycopharm-members → /operator/members */}
         <Route path="glycopharm-members" element={<Navigate to="/operator/members" replace />} />
         {/* WO-O4O-GLYCOPHARM-OPERATOR-ROUTE-CANONICALIZATION-V1: canonical route */}

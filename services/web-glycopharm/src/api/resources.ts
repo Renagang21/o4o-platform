@@ -13,7 +13,7 @@ export interface GlycoResourceItem {
   id: string;
   title: string;
   summary: string | null;
-  blocks: object[];
+  blocks: { type: string; content?: string; url?: string; items?: string[] }[];
   tags: string[];
   category: string | null;
   thumbnail_url: string | null;

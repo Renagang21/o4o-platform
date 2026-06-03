@@ -29,8 +29,8 @@ function apiItemToContentHubItem(item: HubContentItemResponse): ContentHubItem {
     thumbnail: item.thumbnailUrl || item.imageUrl,
     href: item.linkUrl || null,
     type: item.cmsType || null,
-    date: item.publishedAt || item.createdAt
-      ? new Date(item.publishedAt || item.createdAt).toLocaleDateString('ko-KR', {
+    date: item.createdAt
+      ? new Date(item.createdAt).toLocaleDateString('ko-KR', {
           year: 'numeric', month: 'short', day: 'numeric',
         })
       : null,

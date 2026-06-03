@@ -100,7 +100,7 @@ export function GlycoPharmHubLayout() {
             <nav className="py-2">
               {HUB_MENU.map((item) => {
                 const Icon = item.icon;
-                if (item.badge) {
+                if (item.badge !== undefined) {
                   return (
                     <div
                       key={item.key}

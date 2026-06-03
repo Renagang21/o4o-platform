@@ -21,7 +21,6 @@ import type { HubContentItemResponse } from '@o4o/types/hub-content';
 import { getStoreSlug } from '@/api/storeHub';
 import { importOperatorBlog } from '@/api/blogStaff';
 
-const SERVICE_KEY = 'glycopharm';
 const PAGE_LIMIT = 20;
 
 export function HubBlogLibraryPage() {
@@ -59,7 +58,6 @@ export function HubBlogLibraryPage() {
     setError(null);
     try {
       const res = await hubContentApi.list({
-        serviceKey: SERVICE_KEY,
         sourceDomain: 'blog',
         page,
         limit: PAGE_LIMIT,

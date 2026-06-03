@@ -27,7 +27,8 @@ import {
   saveProductAiContent,
   generateProductAiContent,
 } from '@/api/productAiContent';
-import { findTemplate, type ProductionTemplate } from '@/config/productionTemplates';
+import { findTemplate } from '@/config/productionTemplates';
+import type { ProductionTemplate } from '@o4o/types/production-template';
 
 const POLL_DELAY_MS = 4000;
 

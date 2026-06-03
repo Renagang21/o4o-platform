@@ -180,11 +180,11 @@ export default function InstructorDashboardPage() {
               {pendingCount}건
             </span>
           </div>
-          <div style={{ divide: 'divide' }}>
+          <div>
             {pendingEnrollments.map((e) => (
               <div key={e.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 20px', borderBottom: '1px solid #f9fafb' }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: 14, fontWeight: 600, color: '#111827', margin: 0, truncate: 'true' }}>
+                  <p style={{ fontSize: 14, fontWeight: 600, color: '#111827', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {e.userName || e.userEmail || e.userId}
                   </p>
                   <p style={{ fontSize: 12, color: '#9ca3af', margin: '2px 0 0' }}>

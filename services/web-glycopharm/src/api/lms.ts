@@ -89,7 +89,7 @@ export interface LmsLesson {
   courseId: string;
   title: string;
   description: string | null;
-  type: 'article' | 'video';
+  type: LessonType;
   content: any;
   videoUrl: string | null;
   duration: number;
@@ -300,22 +300,22 @@ export const lmsApi = {
   // Phase 4 (V2 extraction) 후 페이지 마이그레이션이 끝나면 제거 예정.
 
   /** @deprecated LMS-CLIENT-CONVENTION-V1: use `getCourse` instead. */
-  getCourseById(id: string): Promise<LmsCourse> {
+  getCourseById(id: string): Promise<LmsApiResponse<{ course: LmsCourse }>> {
     return this.getCourse(id);
   },
 
   /** @deprecated LMS-CLIENT-CONVENTION-V1: use `getLessons` instead. */
-  getLessonsByCourse(courseId: string): Promise<LmsLesson[]> {
+  getLessonsByCourse(courseId: string): Promise<LmsApiResponse<LmsLesson[]>> {
     return this.getLessons(courseId);
   },
 
   /** @deprecated LMS-CLIENT-CONVENTION-V1: use `getEnrollmentByCourse` instead. */
-  getMyEnrollment(courseId: string): Promise<LmsEnrollment | null> {
+  getMyEnrollment(courseId: string): Promise<LmsApiResponse<{ enrollment: LmsEnrollment }>> {
     return this.getEnrollmentByCourse(courseId);
   },
 
   /** @deprecated LMS-CLIENT-CONVENTION-V1: use `getQuizForLesson` instead. */
-  getLessonQuiz(lessonId: string): Promise<LmsQuiz | null> {
+  getLessonQuiz(lessonId: string): Promise<LmsApiResponse<{ quiz: LmsQuiz }>> {
     return this.getQuizForLesson(lessonId);
   },
 

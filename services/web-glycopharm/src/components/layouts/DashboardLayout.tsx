@@ -93,7 +93,7 @@ const roleConfig: Record<string, RoleConfig> = {
 };
 
 export default function DashboardLayout({ role }: DashboardLayoutProps) {
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
