@@ -645,47 +645,52 @@ export function createCosmeticsOrderController(
         const offset = (page - 1) * limit;
 
         // Build DB query
+        // WO-O4O-KCOSMETICS-ORDERS-NO-STORE-RESPONSE-FIX-V1:
+        //   alias 를 'order'(PostgreSQL 예약어) → 'o' 로 변경. raw JSONB fragment
+        //   ("order.metadata->>'serviceKey'") 는 TypeORM 이 alias 를 자동 quote 하지 않아
+        //   예약어 alias 가 그대로 노출 → "syntax error at or near order" 로 목록 조회가 항상 500 이었다.
+        //   alias 변경으로 쿼리가 정상 실행되며, 주문이 없는 사용자는 자연히 200 + empty 를 받는다.
         const orderRepo = dataSource.getRepository(EcommerceOrder);
         const qb = orderRepo
-          .createQueryBuilder('order')
-          .leftJoinAndSelect('order.items', 'items')
-          .where('order.buyerId = :buyerId', { buyerId })
-          .andWhere('order.orderType = :orderType', { orderType: OrderType.RETAIL })
-          .andWhere("order.metadata->>'serviceKey' = :serviceKey", { serviceKey: 'cosmetics' });
+          .createQueryBuilder('o')
+          .leftJoinAndSelect('o.items', 'items')
+          .where('o.buyerId = :buyerId', { buyerId })
+          .andWhere('o.orderType = :orderType', { orderType: OrderType.RETAIL })
+          .andWhere("o.metadata->>'serviceKey' = :serviceKey", { serviceKey: 'cosmetics' });
 
         // Channel filter (indexed column)
         if (filters.channel) {
-          qb.andWhere('order.channel = :channel', { channel: filters.channel });
+          qb.andWhere('o.channel = :channel', { channel: filters.channel });
         }
 
         // Status filter
         if (filters.status) {
-          qb.andWhere('order.status = :status', { status: filters.status });
+          qb.andWhere('o.status = :status', { status: filters.status });
         }
 
         // Travel-specific JSONB filters
         if (filters.guideId) {
-          qb.andWhere("order.metadata->'travel'->>'guideId' = :guideId", {
+          qb.andWhere("o.metadata->'travel'->>'guideId' = :guideId", {
             guideId: filters.guideId,
           });
         }
         if (filters.tourSessionId) {
-          qb.andWhere("order.metadata->'travel'->>'tourSessionId' = :tourSessionId", {
+          qb.andWhere("o.metadata->'travel'->>'tourSessionId' = :tourSessionId", {
             tourSessionId: filters.tourSessionId,
           });
         }
         if (filters.taxRefundEligible !== undefined) {
-          qb.andWhere("order.metadata->'travel'->'taxRefund'->>'eligible' = :eligible", {
+          qb.andWhere("o.metadata->'travel'->'taxRefund'->>'eligible' = :eligible", {
             eligible: String(filters.taxRefundEligible),
           });
         }
         if (filters.taxRefundStatus) {
-          qb.andWhere("order.metadata->'travel'->'taxRefund'->>'status' = :taxRefundStatus", {
+          qb.andWhere("o.metadata->'travel'->'taxRefund'->>'status' = :taxRefundStatus", {
             taxRefundStatus: filters.taxRefundStatus,
           });
         }
 
-        qb.orderBy('order.createdAt', 'DESC')
+        qb.orderBy('o.createdAt', 'DESC')
           .take(limit)
           .skip(offset);
 
@@ -752,14 +757,15 @@ export function createCosmeticsOrderController(
           return errorResponse(res, 401, 'UNAUTHORIZED', 'User not authenticated');
         }
 
+        // WO-O4O-KCOSMETICS-ORDERS-NO-STORE-RESPONSE-FIX-V1: alias 'order'(예약어) → 'o' (위 목록과 동일 사유)
         const orderRepo = dataSource.getRepository(EcommerceOrder);
         const order = await orderRepo
-          .createQueryBuilder('order')
-          .leftJoinAndSelect('order.items', 'items')
-          .where('order.id = :orderId', { orderId: req.params.id })
-          .andWhere('order.buyerId = :buyerId', { buyerId })
-          .andWhere('order.orderType = :orderType', { orderType: OrderType.RETAIL })
-          .andWhere("order.metadata->>'serviceKey' = :serviceKey", { serviceKey: 'cosmetics' })
+          .createQueryBuilder('o')
+          .leftJoinAndSelect('o.items', 'items')
+          .where('o.id = :orderId', { orderId: req.params.id })
+          .andWhere('o.buyerId = :buyerId', { buyerId })
+          .andWhere('o.orderType = :orderType', { orderType: OrderType.RETAIL })
+          .andWhere("o.metadata->>'serviceKey' = :serviceKey", { serviceKey: 'cosmetics' })
           .getOne();
 
         if (!order) {
