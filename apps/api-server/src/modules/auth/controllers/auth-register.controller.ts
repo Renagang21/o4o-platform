@@ -80,6 +80,17 @@ export class AuthRegisterController extends BaseController {
         : (data.role || 'customer');
       const effectiveRole = VALID_ROLES.includes(rawRole) ? rawRole : 'user';
 
+      // WO-O4O-KCOSMETICS-SELLER-STORE-OWNER-WRITEPATH-FIX-V1:
+      //   K-Cosmetics 에서 "판매자" = 매장 경영자. canonical role 은 cosmetics:store_owner 이다
+      //   (2026-09 BackfillStoreOwnerRoles / CleanupKCosmeticsSellerRole 통합 마이그레이션 기준).
+      //   가입 write-path 가 legacy 'seller' 를 새로 생성하던 것을 가입 시점부터 정규화하여,
+      //   멤버십 승인 시 그대로 cosmetics:store_owner 가 부여되도록 한다.
+      //   (다른 서비스의 seller/legacy role 은 영향 없음 — serviceKey 로 한정.)
+      const SELLER_LEGACY_ROLES = ['seller', 'cosmetics:seller', 'k-cosmetics:seller'];
+      const membershipRole = serviceKey === 'k-cosmetics' && SELLER_LEGACY_ROLES.includes(effectiveRole)
+        ? 'cosmetics:store_owner'
+        : effectiveRole;
+
       // WO-NETURE-REGISTER-IDENTITY-STABILIZATION-V1: Name normalization
       let resolvedName: string;
       let resolvedLastName: string | undefined;
@@ -129,7 +140,7 @@ export class AuthRegisterController extends BaseController {
           membership.userId = existingUser.id;
           membership.serviceKey = serviceKey;
           membership.status = 'pending';
-          membership.role = effectiveRole;
+          membership.role = membershipRole;
           await txSmRepo.save(membership);
 
           // WO-O4O-EXISTING-ACCOUNT-SERVICE-PASSWORD-SEPARATION-V1: Identity V2 dual-write
@@ -381,7 +392,7 @@ export class AuthRegisterController extends BaseController {
         membership.userId = newUser.id;
         membership.serviceKey = serviceKey;
         membership.status = 'pending';
-        membership.role = effectiveRole;
+        membership.role = membershipRole;
         await txSmRepo.save(membership);
 
         // WO-O4O-IDENTITY-V2-PHASE1-REGISTER-LOGIN-V1: Identity V2 dual-write

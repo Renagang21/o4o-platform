@@ -170,7 +170,18 @@ export class MembershipApprovalService {
       );
 
       // STEP3: Ensure role_assignment exists (idempotent — ON CONFLICT updates timestamp)
-      const memberRole = membership.role || 'member';
+      let memberRole = membership.role || 'member';
+      // WO-O4O-KCOSMETICS-SELLER-STORE-OWNER-WRITEPATH-FIX-V1:
+      //   K-Cosmetics 판매자 = 매장 경영자. canonical role 은 cosmetics:store_owner.
+      //   write-path 정규화(auth-register) 이전에 생성된 legacy 'seller' 변종 멤버십도
+      //   승인 시점에 정규화하여 cosmetics:store_owner 가 부여되도록 한다
+      //   (2026-09 BackfillStoreOwnerRoles / CleanupKCosmeticsSellerRole 통합 마이그레이션 정렬).
+      if (
+        membership.service_key === 'k-cosmetics' &&
+        ['seller', 'cosmetics:seller', 'k-cosmetics:seller'].includes(memberRole)
+      ) {
+        memberRole = 'cosmetics:store_owner';
+      }
       logger.info('[APPROVAL][STEP3] role INSERT', { userId, role: memberRole });
 
       await queryRunner.query(

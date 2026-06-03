@@ -5,7 +5,7 @@
  * Business logic for store management
  */
 
-import { DataSource } from 'typeorm';
+import { DataSource, QueryRunner } from 'typeorm';
 import { normalizeBusinessNumber } from '../../../utils/business-number.js';
 import { StoreSlugService } from '@o4o/platform-core/store-identity';
 import { CosmeticsStoreRepository } from '../repositories/cosmetics-store.repository.js';
@@ -126,115 +126,24 @@ export class CosmeticsStoreService {
           },
         );
 
-        // Create store
-        const storeCode = this.generateStoreCode();
-
-        // WO-CORE-STORE-SLUG-INTEGRATION-V1 + TRANSACTION-HARDENING: Use Core StoreSlugService with manager
-        const slugService = new StoreSlugService(queryRunner.manager);
-
-        // WO-CORE-STORE-REQUESTED-SLUG-V1: Use requestedSlug if available
-        let slug: string;
-        if (application.requestedSlug) {
-          const availability = await slugService.checkAvailability(application.requestedSlug);
-          if (!availability.available) {
-            throw new Error(`Requested slug '${application.requestedSlug}' is no longer available: ${availability.reason}`);
-          }
-          slug = application.requestedSlug;
-        } else {
-          slug = await slugService.generateUniqueSlug(application.storeName);
-        }
-
-        // WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1: Create organizations record
-        // WO-O4O-COSMETICS-ORG-REUSE-AND-ENROLLMENT-V1:
-        //   같은 사업자번호로 이미 등록된 organization 이 있으면 재사용한다 (GlycoPharm 등 다른 서비스
-        //   가입 흐름에서 만들어진 동일 사업자 organization 을 공유). business_number 는 application
-        //   단계에서 normalize 되어 저장돼 있다 (utils/business-number.ts).
-        //   organizations.business_number 컬럼은 UNIQUE 제약이 없어 raw SELECT 기반 lookup 만 필요.
-        let orgId: string;
-        const existingOrgRows = await queryRunner.query(
-          `SELECT id FROM organizations WHERE business_number = $1 LIMIT 1`,
-          [application.businessNumber],
-        );
-        if (existingOrgRows.length > 0) {
-          orgId = existingOrgRows[0].id;
-        } else {
-          orgId = crypto.randomUUID();
-          await queryRunner.query(`
-            INSERT INTO organizations (id, name, code, type, level, path, "isActive",
-              address, phone, business_number, metadata, "createdAt", "updatedAt")
-            VALUES ($1, $2, $3, 'store', 0, $4, true, $5, $6, $7, $8, NOW(), NOW())
-          `, [
-            orgId,
-            application.storeName,
-            storeCode,
-            '/' + storeCode,
-            application.address || null,
-            application.contactPhone || null,
-            application.businessNumber,
-            JSON.stringify({ serviceKey: 'cosmetics' }),
-          ]);
-        }
-
-        const store = queryRunner.manager.create('CosmeticsStore', {
-          name: application.storeName,
-          code: storeCode,
-          slug,
+        // WO-O4O-KCOSMETICS-SELLER-STORE-OWNER-WRITEPATH-FIX-V1:
+        //   store/org/member/enrollment 생성은 canonical provisioning 헬퍼로 공유한다.
+        //   (판매자 승인 자동 provision: ensureStoreContextForOwner 와 동일 경로 — createStoreWithOrg.)
+        const savedStore = await this.createStoreWithOrg(queryRunner, {
+          applicantUserId: application.applicantUserId,
+          storeName: application.storeName,
           businessNumber: application.businessNumber,
           ownerName: application.ownerName,
           contactPhone: application.contactPhone,
           address: application.address,
           region: application.region,
-          status: CosmeticsStoreStatus.APPROVED,
-          organization_id: orgId,
+          requestedSlug: application.requestedSlug,
         });
-        const savedStore = await queryRunner.manager.save('CosmeticsStore', store);
-
-        // Register slug in platform-wide registry
-        await slugService.reserveSlug({
-          storeId: (savedStore as any).id,
-          serviceKey: 'cosmetics',
-          slug,
-        });
-
-        // Create owner member (cosmetics_store_members)
-        const member = queryRunner.manager.create('CosmeticsStoreMember', {
-          storeId: (savedStore as any).id,
-          userId: application.applicantUserId,
-          role: CosmeticsStoreMemberRole.OWNER,
-        });
-        await queryRunner.manager.save('CosmeticsStoreMember', member);
-
-        // WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1 → WO-O4O-ORGANIZATION-SERVICE-CENTRALIZATION-V1
-        await organizationOpsService.addMember({
-          organizationId: orgId,
-          userId: application.applicantUserId,
-          role: 'owner',
-          isPrimary: false,
-        }, queryRunner);
-
-        // WO-O4O-COSMETICS-ORG-REUSE-AND-ENROLLMENT-V1:
-        //   organization_service_enrollments 에 k-cosmetics 서비스 등록.
-        //   helper 는 ON CONFLICT (organization_id, service_code) DO NOTHING 으로 멱등 처리되므로
-        //   동일 사업자 재승인 / 다른 시나리오 중복 호출 시에도 안전.
-        //   service_code 명칭은 frontend AuthContext serviceKey 와 동일한 'k-cosmetics' 사용.
-        await organizationOpsService.enrollService({
-          organizationId: orgId,
-          serviceCode: 'k-cosmetics',
-        }, queryRunner);
 
         await queryRunner.commitTransaction();
 
         // WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1: cosmetics:store_owner 역할 부여 (트랜잭션 후)
-        try {
-          const roleAssignmentService = new RoleAssignmentService();
-          await roleAssignmentService.assignRole({
-            userId: application.applicantUserId,
-            role: 'cosmetics:store_owner',
-            assignedBy: reviewedBy,
-          });
-        } catch (err) {
-          console.error('[CosmeticsStoreService] Failed to assign cosmetics:store_owner role:', err);
-        }
+        await this.ensureStoreOwnerRole(application.applicantUserId, reviewedBy);
 
         return { data: { application: { ...application, status: 'approved' }, store: savedStore } };
       } catch (error) {
@@ -253,6 +162,242 @@ export class CosmeticsStoreService {
       });
 
       return { data: { application: { ...application, status: 'rejected' } } };
+    }
+  }
+
+  // ============================================================================
+  // Store Provisioning (canonical)
+  // WO-O4O-KCOSMETICS-SELLER-STORE-OWNER-WRITEPATH-FIX-V1
+  // ============================================================================
+
+  /**
+   * store + organization + members + service enrollment 를 트랜잭션 내에서 생성한다.
+   * reviewApplication(매장 신청 승인)과 ensureStoreContextForOwner(판매자 승인 자동 provision)가
+   * 공유하는 canonical provisioning 로직. organization 은 사업자번호 기준 재사용(멱등).
+   */
+  private async createStoreWithOrg(
+    queryRunner: QueryRunner,
+    input: {
+      applicantUserId: string;
+      storeName: string;
+      businessNumber: string;
+      ownerName: string;
+      contactPhone?: string | null;
+      address?: string | null;
+      region?: string | null;
+      requestedSlug?: string | null;
+    },
+  ) {
+    const storeCode = this.generateStoreCode();
+
+    // WO-CORE-STORE-SLUG-INTEGRATION-V1: Core StoreSlugService with manager
+    const slugService = new StoreSlugService(queryRunner.manager);
+
+    // WO-CORE-STORE-REQUESTED-SLUG-V1: Use requestedSlug if available
+    let slug: string;
+    if (input.requestedSlug) {
+      const availability = await slugService.checkAvailability(input.requestedSlug);
+      if (!availability.available) {
+        throw new Error(`Requested slug '${input.requestedSlug}' is no longer available: ${availability.reason}`);
+      }
+      slug = input.requestedSlug;
+    } else {
+      slug = await slugService.generateUniqueSlug(input.storeName);
+    }
+
+    // WO-O4O-COSMETICS-ORG-REUSE-AND-ENROLLMENT-V1:
+    //   같은 사업자번호로 이미 등록된 organization 이 있으면 재사용한다.
+    let orgId: string;
+    const existingOrgRows = await queryRunner.query(
+      `SELECT id FROM organizations WHERE business_number = $1 LIMIT 1`,
+      [input.businessNumber],
+    );
+    if (existingOrgRows.length > 0) {
+      orgId = existingOrgRows[0].id;
+    } else {
+      orgId = crypto.randomUUID();
+      await queryRunner.query(`
+        INSERT INTO organizations (id, name, code, type, level, path, "isActive",
+          address, phone, business_number, metadata, "createdAt", "updatedAt")
+        VALUES ($1, $2, $3, 'store', 0, $4, true, $5, $6, $7, $8, NOW(), NOW())
+      `, [
+        orgId,
+        input.storeName,
+        storeCode,
+        '/' + storeCode,
+        input.address || null,
+        input.contactPhone || null,
+        input.businessNumber,
+        JSON.stringify({ serviceKey: 'cosmetics' }),
+      ]);
+    }
+
+    const store = queryRunner.manager.create('CosmeticsStore', {
+      name: input.storeName,
+      code: storeCode,
+      slug,
+      businessNumber: input.businessNumber,
+      ownerName: input.ownerName,
+      contactPhone: input.contactPhone,
+      address: input.address,
+      region: input.region,
+      status: CosmeticsStoreStatus.APPROVED,
+      organization_id: orgId,
+    });
+    const savedStore = await queryRunner.manager.save('CosmeticsStore', store);
+
+    // Register slug in platform-wide registry
+    await slugService.reserveSlug({
+      storeId: (savedStore as any).id,
+      serviceKey: 'cosmetics',
+      slug,
+    });
+
+    // Create owner member (cosmetics_store_members)
+    const member = queryRunner.manager.create('CosmeticsStoreMember', {
+      storeId: (savedStore as any).id,
+      userId: input.applicantUserId,
+      role: CosmeticsStoreMemberRole.OWNER,
+    });
+    await queryRunner.manager.save('CosmeticsStoreMember', member);
+
+    // organization_members + organization_service_enrollments (멱등 helper)
+    await organizationOpsService.addMember({
+      organizationId: orgId,
+      userId: input.applicantUserId,
+      role: 'owner',
+      isPrimary: false,
+    }, queryRunner);
+    await organizationOpsService.enrollService({
+      organizationId: orgId,
+      serviceCode: 'k-cosmetics',
+    }, queryRunner);
+
+    return savedStore;
+  }
+
+  /** cosmetics:store_owner 역할 부여 (멱등 — assignRole 은 기존 row 재활성화). 실패해도 흐름 비차단. */
+  private async ensureStoreOwnerRole(userId: string, assignedBy: string | null) {
+    try {
+      const roleAssignmentService = new RoleAssignmentService();
+      await roleAssignmentService.assignRole({
+        userId,
+        role: 'cosmetics:store_owner',
+        assignedBy: assignedBy ?? undefined,
+      });
+    } catch (err) {
+      console.error('[CosmeticsStoreService] Failed to assign cosmetics:store_owner role:', err);
+    }
+  }
+
+  /**
+   * 동일 사업자번호 store 가 이미 존재할 때, 사용자를 해당 store 의 owner 로 연결한다 (멱등).
+   * (org member + enrollment + cosmetics:store_owner 역할까지 보강.)
+   */
+  private async linkOwnerToStore(storeId: string, userId: string, assignedBy: string | null) {
+    const existing = await this.repository.findMemberByStoreAndUserIncludingInactive(storeId, userId);
+    if (existing) {
+      if (!existing.isActive || existing.role !== CosmeticsStoreMemberRole.OWNER) {
+        await this.repository.reactivateMember(existing.id, CosmeticsStoreMemberRole.OWNER);
+      }
+    } else {
+      await this.repository.createMember({
+        storeId,
+        userId,
+        role: CosmeticsStoreMemberRole.OWNER,
+      });
+    }
+
+    const rows = await this.dataSource.query(
+      `SELECT organization_id FROM cosmetics.cosmetics_stores WHERE id = $1 LIMIT 1`,
+      [storeId],
+    );
+    const orgId = rows[0]?.organization_id;
+    if (orgId) {
+      await organizationOpsService.addMember({
+        organizationId: orgId,
+        userId,
+        role: 'owner',
+        isPrimary: false,
+      });
+      await organizationOpsService.enrollService({
+        organizationId: orgId,
+        serviceCode: 'k-cosmetics',
+      });
+    }
+
+    await this.ensureStoreOwnerRole(userId, assignedBy);
+  }
+
+  /**
+   * 판매자(=매장 경영자) 승인 시 내 매장 context 를 자동 생성/보강한다 (멱등).
+   * 별도 /cosmetics/stores/apply 승인 없이 store/org/member/enrollment + cosmetics:store_owner 준비.
+   *   - 이미 매장 보유 → 역할만 보강
+   *   - 동일 사업자번호 store 존재 → 해당 store 에 owner 로 연결
+   *   - 그 외 → businessInfo 로부터 신규 store/org context 생성
+   *   - businessNumber 부재 시 store 생성 불가(NOT NULL/UNIQUE) → 역할만 보강
+   */
+  async ensureStoreContextForOwner(
+    userId: string,
+    assignedBy: string | null,
+  ): Promise<{ provisioned: boolean; reason: string; storeId?: string }> {
+    // 0. 이미 매장 보유 → 멱등 종료
+    const existingStores = await this.repository.findStoresByUserId(userId);
+    if (existingStores.length > 0) {
+      await this.ensureStoreOwnerRole(userId, assignedBy);
+      return { provisioned: false, reason: 'ALREADY_HAS_STORE', storeId: existingStores[0].id };
+    }
+
+    // 1. businessInfo 로부터 store 입력 파생
+    const userRows = await this.dataSource.query(
+      `SELECT id, name, phone, "businessInfo" AS "businessInfo" FROM users WHERE id = $1 LIMIT 1`,
+      [userId],
+    );
+    if (userRows.length === 0) {
+      return { provisioned: false, reason: 'USER_NOT_FOUND' };
+    }
+    const u = userRows[0];
+    const biz = (u.businessInfo as Record<string, any>) || {};
+    const rawBN = biz.businessNumber;
+    if (!rawBN) {
+      // businessNumber 없으면 store 생성 불가 → 역할만 보강 (메뉴/가드는 통과, cockpit 은 no-store)
+      await this.ensureStoreOwnerRole(userId, assignedBy);
+      return { provisioned: false, reason: 'NO_BUSINESS_NUMBER' };
+    }
+    const businessNumber = normalizeBusinessNumber(rawBN);
+    const storeName = biz.businessName || `${u.name || ''}`.trim() || '내 매장';
+    const ownerName = biz.representativeName || u.name || storeName;
+    const contactPhone = biz.managerPhone || u.phone || null;
+    const address = biz.businessAddress || null;
+
+    // 2. 동일 사업자번호 store 존재 → 연결 (멱등)
+    const existingStore = await this.repository.findStoreByBusinessNumber(businessNumber);
+    if (existingStore) {
+      await this.linkOwnerToStore(existingStore.id, userId, assignedBy);
+      return { provisioned: true, reason: 'LINKED_EXISTING_STORE', storeId: existingStore.id };
+    }
+
+    // 3. 신규 store/org context 생성
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const savedStore = await this.createStoreWithOrg(queryRunner, {
+        applicantUserId: userId,
+        storeName,
+        businessNumber,
+        ownerName,
+        contactPhone,
+        address,
+      });
+      await queryRunner.commitTransaction();
+      await this.ensureStoreOwnerRole(userId, assignedBy);
+      return { provisioned: true, reason: 'CREATED', storeId: (savedStore as any).id };
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
     }
   }
 

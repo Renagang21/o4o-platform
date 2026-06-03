@@ -370,6 +370,34 @@ export class MembershipConsoleController {
   };
 
   /**
+   * WO-O4O-KCOSMETICS-SELLER-STORE-OWNER-WRITEPATH-FIX-V1:
+   *   K-Cosmetics 판매자(=매장 경영자) 승인 직후 내 매장 context 를 자동 생성/보강한다 (멱등).
+   *   별도 /cosmetics/stores/apply 승인 없이 store/org/member/enrollment + cosmetics:store_owner 준비.
+   *   비-cosmetics / 소비자(consumer) 멤버십은 대상 아님. 실패해도 승인 흐름은 비차단(best-effort).
+   *   (legacy 'seller' 변종도 대상 — 승인 시 role 은 store_owner 로 정규화되므로 store context 도 함께 보강.)
+   */
+  private async ensureCosmeticsStoreContext(membership: any): Promise<void> {
+    try {
+      if (!membership || membership.service_key !== 'k-cosmetics') return;
+      const role = String(membership.role || '');
+      const STORE_OWNER_ROLES = ['cosmetics:store_owner', 'seller', 'cosmetics:seller', 'k-cosmetics:seller'];
+      if (!STORE_OWNER_ROLES.includes(role)) return;
+      const userId = membership.user_id;
+      if (!userId) return;
+
+      const { CosmeticsStoreService } = await import('../../routes/cosmetics/services/cosmetics-store.service.js');
+      const svc = new CosmeticsStoreService(AppDataSource);
+      const result = await svc.ensureStoreContextForOwner(userId, null);
+      logger.info('[MembershipConsole] cosmetics store context ensured', { userId, ...result });
+    } catch (err) {
+      logger.error('[MembershipConsole] ensureCosmeticsStoreContext failed', {
+        userId: membership?.user_id,
+        error: err instanceof Error ? err.message : String(err),
+      });
+    }
+  }
+
+  /**
    * PATCH /api/v1/operator/members/:membershipId/approve
    * 서비스 멤버십 승인
    */
@@ -390,6 +418,10 @@ export class MembershipConsoleController {
         res.status(404).json({ success: false, error: 'Membership not found or already active' });
         return;
       }
+
+      // WO-O4O-KCOSMETICS-SELLER-STORE-OWNER-WRITEPATH-FIX-V1:
+      //   K-Cosmetics 판매자(=매장 경영자) 승인 시 내 매장 context 자동 provision (멱등, 비차단).
+      await this.ensureCosmeticsStoreContext(membership);
 
       const serviceKey = membership.service_key || scope.serviceKeys[0] || 'platform';
       this.getActionLogService()?.logSuccess(serviceKey, approvedBy || 'unknown', `${serviceKey}.operator.member_approve`, {
@@ -497,12 +529,14 @@ export class MembershipConsoleController {
 
         if (pendingMemberships.length > 0) {
           for (const m of pendingMemberships) {
-            await approvalService.approveMembership({
+            const approved = await approvalService.approveMembership({
               membershipId: m.id,
               approvedBy: updatedBy,
               isPlatformAdmin: scope.isPlatformAdmin,
               serviceKeys: scope.serviceKeys,
             });
+            // WO-O4O-KCOSMETICS-SELLER-STORE-OWNER-WRITEPATH-FIX-V1: 판매자 승인 시 내 매장 context 자동 provision
+            await this.ensureCosmeticsStoreContext(approved);
           }
         } else {
           // No pending memberships — just activate user (idempotent)
@@ -626,12 +660,14 @@ export class MembershipConsoleController {
 
             if (pendingMemberships.length > 0) {
               for (const m of pendingMemberships) {
-                await approvalService.approveMembership({
+                const approved = await approvalService.approveMembership({
                   membershipId: m.id,
                   approvedBy: updatedBy,
                   isPlatformAdmin: scope.isPlatformAdmin,
                   serviceKeys: scope.serviceKeys,
                 });
+                // WO-O4O-KCOSMETICS-SELLER-STORE-OWNER-WRITEPATH-FIX-V1: 판매자 승인 시 내 매장 context 자동 provision
+                await this.ensureCosmeticsStoreContext(approved);
               }
             } else {
               await AppDataSource.query(
