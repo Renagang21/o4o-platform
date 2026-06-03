@@ -644,58 +644,64 @@ export function createCosmeticsOrderController(
         const limit = Math.min(filters.limit || 20, 100);
         const offset = (page - 1) * limit;
 
-        // Build DB query
-        // WO-O4O-KCOSMETICS-ORDERS-NO-STORE-RESPONSE-FIX-V1:
-        //   alias 를 'order'(PostgreSQL 예약어) → 'o' 로 변경. raw JSONB fragment
-        //   ("order.metadata->>'serviceKey'") 는 TypeORM 이 alias 를 자동 quote 하지 않아
-        //   예약어 alias 가 그대로 노출 → "syntax error at or near order" 로 목록 조회가 항상 500 이었다.
-        //   alias 변경으로 쿼리가 정상 실행되며, 주문이 없는 사용자는 자연히 200 + empty 를 받는다.
-        const orderRepo = dataSource.getRepository(EcommerceOrder);
-        const qb = orderRepo
-          .createQueryBuilder('o')
-          .leftJoinAndSelect('o.items', 'items')
-          .where('o.buyerId = :buyerId', { buyerId })
-          .andWhere('o.orderType = :orderType', { orderType: OrderType.RETAIL })
-          .andWhere("o.metadata->>'serviceKey' = :serviceKey", { serviceKey: 'cosmetics' });
+        // WO-O4O-COSMETICS-ORDERS-CANONICAL-CHECKOUT-ALIGNMENT-V1:
+        //   canonical 주문 원장은 checkout_orders(CheckoutOrder) 다. off-contract EcommerceOrder
+        //   (ecommerce_orders — 프로덕션 미존재, "relation does not exist")를 제거하고
+        //   checkout_orders 기준으로 정렬한다. 서비스 격리 metadata->>'serviceKey'='cosmetics' 유지,
+        //   기존 buyerId 스코프 보존(의미 변경 없음). 응답 shape(StoreOrder)는 불변.
+        //   Boundary Guard: raw SQL 은 parameter binding 만 사용(string interpolation 금지).
+        const whereClauses: string[] = [
+          'co."buyerId" = $1',
+          "co.metadata->>'serviceKey' = 'cosmetics'",
+        ];
+        const params: any[] = [buyerId];
 
-        // Channel filter (indexed column)
         if (filters.channel) {
-          qb.andWhere('o.channel = :channel', { channel: filters.channel });
+          params.push(filters.channel);
+          whereClauses.push(`co.metadata->>'channel' = $${params.length}`);
         }
-
-        // Status filter
         if (filters.status) {
-          qb.andWhere('o.status = :status', { status: filters.status });
+          params.push(filters.status);
+          whereClauses.push(`co.status = $${params.length}`);
         }
-
-        // Travel-specific JSONB filters
         if (filters.guideId) {
-          qb.andWhere("o.metadata->'travel'->>'guideId' = :guideId", {
-            guideId: filters.guideId,
-          });
+          params.push(filters.guideId);
+          whereClauses.push(`co.metadata->'travel'->>'guideId' = $${params.length}`);
         }
         if (filters.tourSessionId) {
-          qb.andWhere("o.metadata->'travel'->>'tourSessionId' = :tourSessionId", {
-            tourSessionId: filters.tourSessionId,
-          });
+          params.push(filters.tourSessionId);
+          whereClauses.push(`co.metadata->'travel'->>'tourSessionId' = $${params.length}`);
         }
         if (filters.taxRefundEligible !== undefined) {
-          qb.andWhere("o.metadata->'travel'->'taxRefund'->>'eligible' = :eligible", {
-            eligible: String(filters.taxRefundEligible),
-          });
+          params.push(String(filters.taxRefundEligible));
+          whereClauses.push(`co.metadata->'travel'->'taxRefund'->>'eligible' = $${params.length}`);
         }
         if (filters.taxRefundStatus) {
-          qb.andWhere("o.metadata->'travel'->'taxRefund'->>'status' = :taxRefundStatus", {
-            taxRefundStatus: filters.taxRefundStatus,
-          });
+          params.push(filters.taxRefundStatus);
+          whereClauses.push(`co.metadata->'travel'->'taxRefund'->>'status' = $${params.length}`);
         }
 
-        qb.orderBy('o.createdAt', 'DESC')
-          .take(limit)
-          .skip(offset);
+        const whereSql = whereClauses.join(' AND ');
 
-        const [orders, total] = await qb.getManyAndCount();
+        const countRows: Array<{ count: number }> = await dataSource.query(
+          `SELECT COUNT(*)::int AS count FROM checkout_orders co WHERE ${whereSql}`,
+          params,
+        );
+        const total = Number(countRows[0]?.count || 0);
         const totalPages = Math.ceil(total / limit);
+
+        const rows: Array<Record<string, any>> = await dataSource.query(
+          `SELECT co.id, co."orderNumber", co.status, co."paymentStatus",
+                  co."totalAmount", co.metadata->>'channel' AS channel,
+                  co.metadata->>'storeName' AS "storeName",
+                  jsonb_array_length(COALESCE(co.items, '[]'::jsonb)) AS "itemCount",
+                  co."createdAt"
+           FROM checkout_orders co
+           WHERE ${whereSql}
+           ORDER BY co."createdAt" DESC
+           LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
+          [...params, limit, offset],
+        );
 
         // Build applied filters info
         const appliedFilters: Record<string, any> = { buyerId };
@@ -714,20 +720,17 @@ export function createCosmeticsOrderController(
 
         res.json({
           success: true,
-          data: orders.map((order) => {
-            const meta = order.metadata as CosmeticsOrderMetadata & { serviceKey: string };
-            return {
-              id: order.id,
-              orderNumber: order.orderNumber,
-              status: order.status,
-              paymentStatus: order.paymentStatus,
-              totalAmount: Number(order.totalAmount),
-              channel: meta?.channel,
-              storeName: meta?.storeName,
-              itemCount: (order.items as unknown[])?.length || 0,
-              createdAt: order.createdAt,
-            };
-          }),
+          data: rows.map((row) => ({
+            id: row.id,
+            orderNumber: row.orderNumber,
+            status: row.status,
+            paymentStatus: row.paymentStatus,
+            totalAmount: Number(row.totalAmount),
+            channel: row.channel ?? undefined,
+            storeName: row.storeName ?? undefined,
+            itemCount: Number(row.itemCount) || 0,
+            createdAt: row.createdAt,
+          })),
           pagination: { page, limit, total, totalPages },
           filters: appliedFilters,
         });
@@ -757,36 +760,41 @@ export function createCosmeticsOrderController(
           return errorResponse(res, 401, 'UNAUTHORIZED', 'User not authenticated');
         }
 
-        // WO-O4O-KCOSMETICS-ORDERS-NO-STORE-RESPONSE-FIX-V1: alias 'order'(예약어) → 'o' (위 목록과 동일 사유)
-        const orderRepo = dataSource.getRepository(EcommerceOrder);
-        const order = await orderRepo
-          .createQueryBuilder('o')
-          .leftJoinAndSelect('o.items', 'items')
-          .where('o.id = :orderId', { orderId: req.params.id })
-          .andWhere('o.buyerId = :buyerId', { buyerId })
-          .andWhere('o.orderType = :orderType', { orderType: OrderType.RETAIL })
-          .andWhere("o.metadata->>'serviceKey' = :serviceKey", { serviceKey: 'cosmetics' })
-          .getOne();
+        // WO-O4O-COSMETICS-ORDERS-CANONICAL-CHECKOUT-ALIGNMENT-V1:
+        //   canonical checkout_orders 기준 단건 조회. items 는 checkout_orders.items JSONB.
+        //   buyerId 스코프 + serviceKey 격리 유지. 응답 shape(StoreOrderDetail) 불변.
+        const detailRows: Array<Record<string, any>> = await dataSource.query(
+          `SELECT co.id, co."orderNumber", co.status, co."paymentStatus",
+                  co.subtotal, co."shippingFee", co.discount, co."totalAmount",
+                  co.metadata, co."shippingAddress", co.items,
+                  co."paidAt", co."createdAt", co."updatedAt"
+           FROM checkout_orders co
+           WHERE co.id = $1 AND co."buyerId" = $2
+             AND co.metadata->>'serviceKey' = 'cosmetics'
+           LIMIT 1`,
+          [req.params.id, buyerId],
+        );
 
+        const order = detailRows[0];
         if (!order) {
           return errorResponse(res, 404, 'ORDER_NOT_FOUND', 'Order not found');
         }
 
-        const metadata = order.metadata as CosmeticsOrderMetadata & { serviceKey: string };
+        const metadata = (order.metadata || {}) as CosmeticsOrderMetadata & { serviceKey: string };
+        const orderItems: any[] = Array.isArray(order.items) ? order.items : [];
 
         res.json({
           success: true,
           data: {
             id: order.id,
             orderNumber: order.orderNumber,
-            orderType: order.orderType,
             status: order.status,
             paymentStatus: order.paymentStatus,
             subtotal: Number(order.subtotal),
             shippingFee: Number(order.shippingFee),
             discount: Number(order.discount),
             totalAmount: Number(order.totalAmount),
-            currency: order.currency,
+            currency: 'KRW', // checkout_orders 에는 currency 컬럼 없음 — 단일 통화(KRW) 고정
             channel: metadata?.channel,
             store: metadata?.storeId ? {
               id: metadata.storeId,
@@ -795,14 +803,14 @@ export function createCosmeticsOrderController(
             fulfillment: metadata?.fulfillment,
             travel: metadata?.travel,
             shippingAddress: order.shippingAddress,
-            items: (order.items as EcommerceOrderItem[])?.map((item) => ({
-              id: item.id,
+            items: orderItems.map((item: any, idx: number) => ({
+              id: item.id ?? `${order.id}-${idx}`,
               productId: item.productId,
               productName: item.productName,
               sku: item.sku,
               quantity: item.quantity,
               unitPrice: Number(item.unitPrice),
-              discount: Number(item.discount),
+              discount: Number(item.discount ?? 0),
               subtotal: Number(item.subtotal),
               options: item.options,
               metadata: item.metadata,
