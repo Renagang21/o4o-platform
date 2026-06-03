@@ -7,7 +7,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth, ROLE_LABELS, getKCosmeticsDashboardRoute } from '@/contexts/AuthContext';
-import { Mail, Phone, Shield, UserCog, Settings, BookOpen, Award, Coins, Gift, ClipboardList } from 'lucide-react';
+import { Mail, Phone, Shield, BookOpen, Award, Coins, Gift, ClipboardList } from 'lucide-react';
 import { MyPageLayout, QuickActionsSection, RoleBadge, MyPageHubCard } from '@o4o/account-ui';
 import { KCOS_MYPAGE_NAV_ITEMS } from './navItems';
 import { appreciationApi, type AppreciationSend } from '@/api/appreciation';
@@ -60,44 +60,40 @@ export default function MyPageHub() {
   return (
     <MyPageLayout
       title="마이페이지"
-      subtitle="내 정보를 확인하고 관리할 수 있습니다"
+      width="wide"
+      breadcrumb={[{ label: '홈', href: '/' }, { label: '마이페이지' }]}
       navItems={KCOS_MYPAGE_NAV_ITEMS}
     >
-      {/* Profile Summary (read-only) */}
-      <div className="bg-white rounded-2xl shadow-sm overflow-hidden mb-4">
-        <div className="bg-gradient-to-r from-primary-500 to-primary-600 px-6 py-8">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-              <span className="text-2xl font-bold text-white">{user.name?.charAt(0) || '?'}</span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <h2 className="text-xl font-bold text-white truncate">{user.name}</h2>
-              <p className="text-primary-100 text-sm truncate">{user.email}</p>
-              <div className="mt-2">
-                <RoleBadge label={roleLabel ?? '사용자'} tone="white-overlay" size="md" />
-              </div>
+      {/* Profile Summary Card — KPA-Society 정렬: 흰색 카드 + 좌측 아바타 + 정보 + 우측 수정 버튼 */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+        <div className="flex items-center gap-5">
+          <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+            <span className="text-3xl font-bold text-gray-400">{user.name?.charAt(0) || '?'}</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <h2 className="text-xl font-bold text-gray-900 truncate">{user.name}</h2>
+            <p className="text-sm text-gray-500 truncate mt-0.5">{user.email}</p>
+            <div className="mt-2">
+              <RoleBadge label={roleLabel ?? '사용자'} tone="primary" variant="solid" size="md" />
             </div>
           </div>
+          <Link
+            to="/mypage/profile"
+            className="flex-shrink-0 px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition-colors"
+          >
+            프로필 수정
+          </Link>
         </div>
-        <div className="p-6 space-y-3">
+        {/* 상세 정보 — 새 흰색 카드 구조 안에서 재배치 (이메일/연락처/역할 보존) */}
+        <div className="mt-5 pt-5 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1">
           <InfoRow icon={<Mail className="w-4 h-4 text-gray-400" />} label="이메일" value={user.email} />
           <InfoRow icon={<Phone className="w-4 h-4 text-gray-400" />} label="연락처" value={user.phone || '미등록'} />
           <InfoRow icon={<Shield className="w-4 h-4 text-gray-400" />} label="역할" value={roleLabel} />
         </div>
       </div>
 
-      {/* Navigation Cards (WO-O4O-MYPAGE-HUB-CARD-CANONICAL-ALIGNMENT-V1) */}
-      <div className="grid grid-cols-2 gap-3 mb-4">
-        <MyPageHubCard
-          title="프로필 편집"
-          href="/mypage/profile"
-          icon={<UserCog className="w-5 h-5" />}
-        />
-        <MyPageHubCard
-          title="설정"
-          href="/mypage/settings"
-          icon={<Settings className="w-5 h-5" />}
-        />
+      {/* Feature Cards — KPA 흰색 카드 그리드 정렬 (프로필/설정은 상단 탭·수정 버튼으로 일원화) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
         {/* LMS MyPage (WO-O4O-KCOS-LMS-MYPAGE-CANONICAL-ALIGNMENT-V1) */}
         <MyPageHubCard
           title="내 수강"
@@ -113,20 +109,18 @@ export default function MyPageHub() {
           title="내 크레딧"
           href="/mypage/credits"
           icon={<Coins className="w-5 h-5" />}
-          className="col-span-2"
         />
         {/* WO-O4O-MYPAGE-MY-REQUESTS-INBOX-GLYCO-KCOS-ROUTE-V1 */}
         <MyPageHubCard
           title="내 신청"
           href="/mypage/my-requests"
           icon={<ClipboardList className="w-5 h-5" />}
-          className="col-span-2"
         />
       </div>
 
       {/* Appreciation Activity Card */}
       {!appreciationLoading && (
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden mb-4">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
           <div className="flex items-center gap-2 px-5 py-4 border-b border-gray-100">
             <Gift className="w-4 h-4 text-amber-500" />
             <h3 className="text-sm font-semibold text-gray-800">감사 활동</h3>

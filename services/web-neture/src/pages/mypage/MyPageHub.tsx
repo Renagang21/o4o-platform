@@ -62,10 +62,10 @@ export default function MyPageHub() {
       breadcrumb={[{ label: '홈', href: '/' }, { label: '마이페이지' }]}
       width="wide"
     >
-      {/* 프로필 요약 카드 */}
-      <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
+      {/* 프로필 요약 카드 — KPA-Society 정렬 (서비스 색은 배지 포인트 컬러로만 유지, 아바타는 중립 회색) */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
         <div className="flex items-center gap-5">
-          <div className="w-20 h-20 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0 text-4xl">
+          <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 text-4xl">
             👤
           </div>
           <div className="flex-1 min-w-0">
@@ -93,7 +93,7 @@ export default function MyPageHub() {
       </div>
 
       {/* 최근 활동 */}
-      <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
         <h3 className="text-base font-semibold text-gray-900 mb-4">최근 활동</h3>
         <MyPageEmptyState description="최근 활동이 없습니다." />
       </div>
