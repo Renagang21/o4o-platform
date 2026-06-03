@@ -1,6 +1,6 @@
 # O4O Operator Core Design V1
 
-> **상위 문서**: `CLAUDE.md` · `docs/architecture/OPERATOR-INTEGRATION-STATE-V1.md` · `docs/architecture/OPERATOR-DATATABLE-POLICY-V1.md`
+> **상위 문서**: `CLAUDE.md` · `docs/baseline/O4O-BUSINESS-PHILOSOPHY-V1.md` · `docs/baseline/O4O-3-ROLE-FLOW-BASELINE-V1.md` · `docs/architecture/OPERATOR-INTEGRATION-STATE-V1.md` · `docs/architecture/OPERATOR-DATATABLE-POLICY-V1.md`
 > **선행 IR**: IR-O4O-OPERATOR-CORE-DESIGN-V1
 > **버전**: V1
 > **작성일**: 2026-05-03
@@ -8,6 +8,9 @@
 > **WO**: WO-O4O-OPERATOR-CORE-DESIGN-DOC-V1
 >
 > 본 문서는 신규 패키지 `@o4o/operator-core-ui` 의 구조·설계 원칙·인터페이스·마이그레이션 전략을 고정한다. 이후 모든 Operator 공통화 작업(Stores 모듈 추출, Users 모듈, Forum Analytics 모듈)은 본 문서를 기준으로 검토한다. 본 문서는 IR-O4O-OPERATOR-CORE-DESIGN-V1 의 결과를 **그대로** 문서화한 것이며, 설계 변경 없이 정전(stationary)되어 있다.
+
+> **Canonical 정렬 (2026-05-23):**
+> 본 문서는 Operator UI 모듈의 **기술 설계** 이다. Operator 의 **사업적 정의** 는 [`O4O-BUSINESS-PHILOSOPHY-V1 §3.2`](../baseline/O4O-BUSINESS-PHILOSOPHY-V1.md) — **"서비스 운영 사업자"** 이다. 본 패키지가 다루는 Stores / Users / Products / Orders / AI Report / Applications 모듈은 PHILOSOPHY §3.2 의 7가지 책임(공급자 자료 수신·구성·AI 활용·매장 실행 자산 제작·큐레이션·매장 지원·운영 수익 모델)을 지원하는 UI 구성 요소다.
 
 ---
 

@@ -24,11 +24,16 @@ Platform Layer       → platform:admin, platform:super_admin
 
 ---
 
-## 2. Admin vs Operator 철학
+## 2. Admin vs Operator 철학 (Guard / RBAC 관점)
+
+> **Canonical 정렬 (2026-05-23):**
+> 본 §2 의 "Admin vs Operator" 는 **Guard / RBAC 행위 패턴** 의 구분이다. Operator 의 **사업적 정의** 는 [`O4O-BUSINESS-PHILOSOPHY-V1 §3.2`](O4O-BUSINESS-PHILOSOPHY-V1.md) — **"서비스 운영 사업자"** 이다 (공급자 자료 수신·등록 / AI 활용 / 매장 실행 자산 제작 / 큐레이션 / 매장 지원 / 운영 수익 모델 구축).
+>
+> 본 표의 "상태를 관리하는 역할" 은 Guard 관점의 행위 분류일 뿐, Operator 의 사업적 범위가 "단순 상태 관리" 로 축소되었다는 의미가 아니다.
 
 | 구분 | Admin | Operator |
 |------|-------|----------|
-| 핵심 | **구조를 만드는 역할** | **상태를 관리하는 역할** |
+| 핵심 | **구조를 만드는 역할** | **상태를 관리하는 역할** (Guard 행위 — 사업적 정의는 PHILOSOPHY §3.2) |
 | 행위 | 구조 생성/삭제, 역할 부여, 정책 변경 | 콘텐츠 CRUD, 상태 변경, 운영 조회 |
 | UX | 4-Block (구조 관리) | 5-Block (상태 운영) |
 | 진입 빈도 | 낮음 | 높음 |

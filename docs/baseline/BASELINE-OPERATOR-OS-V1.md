@@ -5,6 +5,9 @@
 > **Status**: FROZEN
 > **CLAUDE.md Section**: 20
 
+> **Canonical 정렬 (2026-05-23):**
+> 본 문서는 Operator OS 의 **기술 인프라 baseline** (Core Packages / Hub UX / Trigger / Signal) 이다. Operator 의 **사업적 정의** 는 [`O4O-BUSINESS-PHILOSOPHY-V1 §3.2`](O4O-BUSINESS-PHILOSOPHY-V1.md) — **"서비스 운영 사업자"** 이다. 본 baseline 의 기술 구성 요소는 PHILOSOPHY §3.2 의 7가지 책임을 지원하기 위한 OS layer 이다.
+
 ---
 
 ## 1. Frozen Core Packages

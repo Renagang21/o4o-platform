@@ -37,14 +37,25 @@ HUB는 내부 도메인 구현과 무관하게
 type HubProducer = 'operator' | 'supplier' | 'community' | 'store';
 ```
 
+> **Canonical 정렬 (2026-05-23):**
+> [`O4O-3-ROLE-FLOW-BASELINE-V1`](O4O-3-ROLE-FLOW-BASELINE-V1.md) 기준 Canonical Producer 는 **`operator` / `community` / `store`** 3종이다. `supplier` Producer 는 **legacy / 명문화된 예외** 로 분류된다.
+>
+> Canonical 흐름:
+>
+> ```text
+> 공급자 → 오프라인 전달 → Operator 등록 → HUB
+> ```
+>
+> 자세한 내용은 본 문서 §6.3 및 [`O4O-3-ROLE-FLOW-BASELINE-V1 §6.1`](O4O-3-ROLE-FLOW-BASELINE-V1.md) 참조.
+
 ### 3.2 도메인별 매핑
 
-| HUB Producer | CMS (authorRole)   | Signage (source) |
-| ------------ | ------------------ | ---------------- |
-| operator     | admin / service_admin | hq               |
-| supplier     | supplier           | supplier         |
-| community    | community          | community        |
-| store        | (visibility=store) | store            |
+| HUB Producer | CMS (authorRole)   | Signage (source) | 상태 |
+| ------------ | ------------------ | ---------------- | ---- |
+| operator     | admin / service_admin | hq               | Canonical |
+| supplier     | supplier           | supplier         | **Legacy (명문화된 예외)** |
+| community    | community          | community        | Canonical |
+| store        | (visibility=store) | store            | Canonical |
 
 ---
 
@@ -108,7 +119,12 @@ visibility IN ('global','service')
 serviceKey = current
 ```
 
-### 6.3 공급자
+### 6.3 공급자 (Legacy / 명문화된 예외)
+
+> **Canonical 정렬 (2026-05-23):**
+> 본 탭은 [`O4O-3-ROLE-FLOW-BASELINE-V1`](O4O-3-ROLE-FLOW-BASELINE-V1.md) 기준 비-Canonical 영역이다. 현재 코드에 잔존하는 `producer='supplier'` 콘텐츠를 표시하기 위해 유지되나, **신규 콘텐츠는 Operator 가 등록한 supplier-origin 콘텐츠** (`producer='operator'`) 로 전환되어야 한다.
+>
+> 단계적 전환 계획은 §10.5 참조.
 
 ```
 producer = 'supplier'
@@ -176,6 +192,7 @@ HUB는:
 2. CMS/Signage 필드명 정규화 여부 (중기 과제)
 3. HubContentQueryService 통합 레이어 도입
 4. Store 콘텐츠 HUB 노출 정책 재검토
+5. **`producer='supplier'` 정책의 단계적 전환** — `O4O-3-ROLE-FLOW-BASELINE-V1` 의 Canonical 흐름 (`공급자 → 오프라인 전달 → Operator 등록 → HUB`) 으로 정렬. 현 단계는 legacy / 명문화된 예외로 유지하며, 신규 흐름은 `producer='operator'` 로 등록된 supplier-origin 콘텐츠를 사용한다. 별도 IR/WO 로 전환 일정 확정 예정.
 
 ---
 

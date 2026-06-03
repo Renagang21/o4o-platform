@@ -157,6 +157,38 @@ role_assignments 테이블 구조 변경
 
 ---
 
+## 5-A. Identity Architecture V2 채택과의 관계 (2026-05-23 추가)
+
+[O4O-IDENTITY-ARCHITECTURE-V2.md](O4O-IDENTITY-ARCHITECTURE-V2.md) 가 **Canonical Identity Baseline** 으로 채택됨에 따라 (2026-05-23, [DECISION-O4O-IDENTITY-ARCHITECTURE-V2-ADOPTION-V1](../decisions/DECISION-O4O-IDENTITY-ARCHITECTURE-V2-ADOPTION-V1.md)), 본 F10 Freeze 와의 관계를 명시한다.
+
+### 5-A.1 F10 영향 범위
+
+V2 의 핵심 변경 (Credential 의 서비스 범위 독립) 은 **Auth Core 의 구조 확장** 을 수반한다:
+
+| V2 변경 항목 | F10 영향 | 명시적 예외 승인 필요 |
+|-------------|---------|--------------------|
+| `service_credentials` 신규 테이블 신설 (Auth Core 확장) | **HIGH** | ✅ **필수** |
+| `users.password` 컬럼 deprecation / 제거 | **HIGH** | ✅ **필수** |
+| `login` / `register` / `change` / `reset` 컨트롤러의 dual-read 또는 분기 로직 | **HIGH** | ✅ **필수** |
+| `service_memberships` 구조 자체 변경 | 없음 (V2 도 유지) | 해당 없음 |
+| `role_assignments` 구조 자체 변경 | 없음 (V2 도 유지) | 해당 없음 |
+
+### 5-A.2 명시적 예외 승인 절차
+
+Identity V2 의 Phase 1 이후 구현 WO 들은 **본 F10 Freeze 의 명시적 예외 승인 절차**를 거쳐 진행한다:
+
+1. **선행 조건**: V2 Canonical 문서 채택 완료 (2026-05-23 — 완료)
+2. **WO 생성**: 후속 구현 WO 작성 (예: `WO-O4O-IDENTITY-V2-PHASE1-SCHEMA-V1`)
+3. **F10 예외 승인 요청**: WO 본문에 "F10 예외 승인 사유" 명시 — V2 Canonical 인용
+4. **이해관계자 승인**: 사용자/책임자의 명시적 승인 (구두 또는 문서)
+5. **E2E 재검증 의무**: V2 모델 도입 후 §4 의 검증 항목 (회원가입 / 운영자 승인 / 승인 후 로그인 / UI 회원관리) **전부 재검증** 필수
+
+### 5-A.3 Identity V2 와 무관한 Core 변경
+
+V2 와 관련 없는 Auth / Membership / Approval / RBAC Core 변경은 **기존 F10 절차 그대로** 진행한다 (§3.1 수정 금지 원칙 + CORE_CHANGE_REQUIRED).
+
+---
+
 ## 6. Core Registry
 
 파일: `apps/api-server/src/core/core-modules.ts`
@@ -168,3 +200,4 @@ role_assignments 테이블 구조 변경
 *Freeze Date: 2026-03-11*
 *Verified by: E2E Round 4*
 *Status: Active*
+*Updated: 2026-05-23 — Identity V2 Canonical 채택과의 관계 (§5-A) 추가. Freeze 자체는 변경 없음.*

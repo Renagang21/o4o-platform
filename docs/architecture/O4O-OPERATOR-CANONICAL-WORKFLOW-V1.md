@@ -4,6 +4,11 @@
 > Verified through KPA Society (10 pages) and Neture (2 pages) operator implementations.
 > This document records only what has been built and confirmed — no speculative extensions.
 
+> **Canonical 정렬 (2026-05-23):**
+> 본 문서는 Operator 콘솔의 **UX 워크플로 패턴** (목록 유지형 / drawer 기반 / bulk action) 을 정의한다. Operator 의 **사업적 정의** 는 [`O4O-BUSINESS-PHILOSOPHY-V1 §3.2`](../baseline/O4O-BUSINESS-PHILOSOPHY-V1.md) — **"서비스 운영 사업자"** 이다.
+>
+> 본 §1 에 기술된 "대량 스캔 → 승인/반려/처리" 워크플로는 Operator 책임 7가지 중 **검수·상태 관리 측면** 을 다루는 UX 패턴이다. Operator 의 사업적 책임(공급자 자료 등록·AI 활용·매장 실행 자산 제작·큐레이션·매장 지원·운영 수익 모델 구축)은 본 워크플로 외에 별도 UX 가 필요하다 (후속 정렬 대상 — [`O4O-3-ROLE-FLOW-BASELINE-V1 §2`](../baseline/O4O-3-ROLE-FLOW-BASELINE-V1.md) 책임 매트릭스 참조).
+
 ---
 
 ## 1. 목적 및 배경

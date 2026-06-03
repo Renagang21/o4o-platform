@@ -21,10 +21,14 @@ Neture 도메인의 1차 구조를 기준선으로 확정한다.
 ## 2. 도메인 정의
 
 - Neture는 **공급자 중심 유통 플랫폼**이다.
-- 공급자는 **콘텐츠 생산자가 아니다.** (CMS Producer 역할 없음)
+- 공급자는 **매장 실행 자산 생산자가 아니다.**
+- 공급자는 **원천 자료 보유자**이다 (브랜드 자료 / 상품 정보 / 광고 / 공식 영상 / 카탈로그).
+- 원천 자료 전달은 **O4O 내부 직접 Producer 진입이 아니라, 오프라인 전달 → Operator 등록** 구조를 기본으로 한다.
 - 공급자 자료실(`neture_supplier_contents`)은 **자산 저장소**이며, HUB 실행 콘텐츠가 아니다.
 - HUB 자동 연동은 존재하지 않는다.
 - 상품 구조는 **ProductMaster(물리 상품 SSOT) + SupplierProductOffer(유통 조건)** 이원 구조이다.
+
+> **Canonical 정렬 (2026-05-23):** 본 §2 의 공급자 책임 정의는 [`O4O-BUSINESS-PHILOSOPHY-V1 §3.1`](baseline/O4O-BUSINESS-PHILOSOPHY-V1.md) 및 [`O4O-3-ROLE-FLOW-BASELINE-V1 §1.1, §3`](baseline/O4O-3-ROLE-FLOW-BASELINE-V1.md) 와 일치한다. "콘텐츠 생산자가 아니다" 의 정밀 표현은 "매장 실행 자산 생산자가 아니다 + O4O 내부 직접 Producer 진입 없음" 이다.
 
 ---
 
