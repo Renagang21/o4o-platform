@@ -4,7 +4,7 @@
 |------|------|
 | 작성일 | 2026-06-03 |
 | 우선순위 | P1 |
-| 상태 | **✅ 완료 (commit `b1b280bbf`, push 완료 — API Server 배포/검증 대기)** |
+| 상태 | **⚠️ 부분 완료 (alias fix 배포·검증 = syntax error 소멸, commit `b1b280bbf`). 단 orders 목록은 더 깊은 갭 `relation "ecommerce_orders" does not exist`(프로덕션 테이블 부재)로 여전히 500 — DB/install 영역, 별도 승인 필요. §9 참조** |
 | 분류 | bug fix (backend SQL) |
 | 근거 | `CHECK-O4O-KCOSMETICS-STORE-HUB-LIVE-SMOKE-V1` §7-3 (orders no-store 500) |
 
@@ -56,3 +56,20 @@ QueryFailedError ... getManyAndCount
 ## 8. 남은 이슈 / 후속
 - (관찰) 동일 reserved-alias + JSONB raw fragment 패턴이 다른 cosmetics 쿼리에 더 있는지 점검 후보.
 - signage serviceKey 표준 통일 IR / cosmetics:store_owner 테스트 계정 확보 (별도).
+
+## 9. 배포 후 검증 — alias fix 확인 + 더 깊은 갭 발견 (2026-06-03)
+
+API Server 배포 success (run 26873017495, commit b1b280bbf, 리비전 `o4o-core-api-01983-l9d` 100% 서빙). 라이브 재검증:
+
+- ✅ **alias fix 작동 확인**: 프로덕션 로그의 생성 SQL 이 `FROM "ecommerce_orders" "o" ... AND o.metadata->>'serviceKey'` 로 바뀜 → **"syntax error at or near order" 완전 소멸**. 본 WO 의 수정은 정확했다.
+- ❌ **그러나 orders 목록 여전히 500** — 동일 요청에서 syntax error 대신 **새 에러 노출**:
+  ```
+  error: relation "ecommerce_orders" does not exist
+  ```
+  (cache-buster 직접 호출로 재현, 리비전 01983 한정 로그 확인.)
+- **해석**: 그동안 syntax error 가 파싱 단계에서 먼저 터져 이 문제를 가리고 있었다. alias 정상화로 파싱이 통과하자 **프로덕션 DB 에 `ecommerce_orders` 테이블이 없다**는 사실이 드러남. 즉 cosmetics orders 목록은 **처음부터 한 번도 동작한 적 없음**(1차 syntax → 2차 missing table).
+- 엔티티는 `@Entity('ecommerce_orders')`(public). 테이블 생성은 ecommerce-core lifecycle `install.ts` 담당, 마이그레이션들은 ALTER 만. → **install/마이그레이션 갭으로 base 테이블 미생성**(또는 search_path 밖) 추정.
+
+### 남은 블로커 (별도 WO + 승인 필요)
+- `ecommerce_orders` / `ecommerce_order_items` (및 연관) **프로덕션 테이블 생성** 필요 — ecommerce-core install 실행 또는 base 마이그레이션. **DB 변경이므로 CLAUDE.md §0 상 사용자 승인 필수.** 본 WO 범위(DB/migration 제외) 밖.
+- 후속 WO 후보: `WO-O4O-ECOMMERCE-ORDERS-TABLE-PROVISION-V1`(가칭) — 영향 범위(cosmetics 뿐 아니라 glycopharm/checkout 등 ecommerce-core 주문 전반) 조사 선행.
