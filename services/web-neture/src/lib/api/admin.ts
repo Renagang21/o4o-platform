@@ -93,6 +93,9 @@ export interface AdminSupplier {
   businessNumber?: string;
   taxInvoiceEmail?: string;
   createdAt: string;
+  // WO-O4O-NETURE-OPERATOR-MEMBER-SUPPLIER-STATUS-VISIBILITY-V1:
+  // backend(getAllSuppliers)는 userId 를 내려주나 타입에 누락돼 있던 것을 명시 (회원 목록 매핑용).
+  userId?: string;
 }
 
 export const adminSupplierApi = {

@@ -16,7 +16,8 @@
  *   - WO-O4O-OPERATOR-MEMBERS-DETAIL-SURFACE-CANONICALIZATION-V1 (Hybrid Canonical)
  */
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { UserCheck, UserMinus, UserX } from 'lucide-react';
 import {
   OperatorMembersConsolePage,
@@ -26,6 +27,7 @@ import {
 } from '@o4o/operator-core-ui/modules/members';
 import { toast } from '@o4o/error-handling';
 import { api } from '@/lib/apiClient';
+import { operatorSupplierApi } from '@/lib/api/admin';
 import EditUserModal from './EditUserModal';
 
 // ─── Helpers — Neture-specific role/dashboard logic ──────────
@@ -78,6 +80,17 @@ function getDashboardAccessLabels(u: UserData): string[] {
 // WO-O4O-NETURE-MEMBER-LIST-TYPE-PERMISSION-DISPLAY-ALIGNMENT-V1:
 // 참여 유형이 아닌 membership.role 은 getPrimaryRole 에서 'general' 로 collapse → "일반 회원" 표시.
 const NETURE_ROLE_DISPLAY: Record<string, string> = { general: '일반 회원' };
+
+// ─── 공급자 프로필 상태 (WO-O4O-NETURE-OPERATOR-MEMBER-SUPPLIER-STATUS-VISIBILITY-V1) ──────────
+// "회원 상태"(service_memberships, 좌측 상태 컬럼)와 "공급자 프로필 상태"(neture_suppliers.status)는
+// 별개 단계다. 회원=active 인데 공급자 프로필=PENDING 인 조합은 정상이며, 공급사 승인 화면에서 처리한다.
+// 본 컬럼은 표시만 한다 — 승인/거절 mutation 없음. 출처: GET /neture/operator/suppliers (userId→status).
+const SUPPLIER_STATUS_META: Record<string, { label: string; cls: string }> = {
+  PENDING: { label: '승인대기', cls: 'bg-amber-50 border-amber-200 text-amber-700' },
+  ACTIVE: { label: '승인완료', cls: 'bg-emerald-50 border-emerald-200 text-emerald-700' },
+  REJECTED: { label: '거절', cls: 'bg-rose-50 border-rose-200 text-rose-700' },
+  INACTIVE: { label: '비활성', cls: 'bg-slate-50 border-slate-200 text-slate-600' },
+};
 
 // ─── Client adapter ──────────────────────────────────────────
 
@@ -215,6 +228,30 @@ function NetureDeleteFlow({
 // ─── Main Component ──────────────────────────────────────────
 
 export default function UsersManagementPage() {
+  // WO-O4O-NETURE-OPERATOR-MEMBER-SUPPLIER-STATUS-VISIBILITY-V1:
+  // 회원 목록에 "공급자 프로필 상태"를 함께 보여주기 위해 neture_suppliers 상태를 userId→status 로 1회 로드.
+  // 표시 보강용 — 실패해도 회원 목록 자체에는 영향 없음(컬럼만 '—' 로 표시).
+  const [supplierStatusMap, setSupplierStatusMap] = useState<Map<string, string>>(new Map());
+  useEffect(() => {
+    let cancelled = false;
+    operatorSupplierApi
+      .getSuppliers()
+      .then((suppliers) => {
+        if (cancelled) return;
+        const m = new Map<string, string>();
+        for (const s of suppliers) {
+          if (s.userId) m.set(s.userId, s.status);
+        }
+        setSupplierStatusMap(m);
+      })
+      .catch(() => {
+        /* 표시 보강용 — 조회 실패 시 컬럼은 '—' 로 노출 */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <OperatorMembersConsolePage
       serviceKey="neture"
@@ -250,6 +287,41 @@ export default function UsersManagementPage() {
                 {op}
               </span>
             );
+          },
+        },
+        {
+          // WO-O4O-NETURE-OPERATOR-MEMBER-SUPPLIER-STATUS-VISIBILITY-V1:
+          // "회원 상태"(좌측)와 별개인 "공급자 프로필 승인 상태". active 회원 + 승인대기 조합은 정상이며
+          // 승인대기 배지는 /operator/suppliers(공급사 승인) 로 안내한다. (이 화면에서 승인 처리는 하지 않음)
+          key: 'supplierProfile',
+          header: '공급자 프로필',
+          width: '120px',
+          render: (_v, user) => {
+            const st = supplierStatusMap.get(user.id);
+            if (!st) return <span className="text-xs text-slate-300">—</span>;
+            const meta = SUPPLIER_STATUS_META[st] ?? {
+              label: st,
+              cls: 'bg-slate-50 border-slate-200 text-slate-600',
+            };
+            const badge = (
+              <span
+                className={`inline-flex items-center px-2 py-0.5 rounded-full border text-xs font-medium ${meta.cls}`}
+              >
+                {meta.label}
+              </span>
+            );
+            if (st === 'PENDING') {
+              return (
+                <Link
+                  to="/operator/suppliers"
+                  title="회원 가입은 승인됨 · 공급자 프로필 승인이 필요합니다. 공급사 승인 화면에서 처리하세요."
+                  className="no-underline"
+                >
+                  {badge}
+                </Link>
+              );
+            }
+            return badge;
           },
         },
         {
