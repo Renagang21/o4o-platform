@@ -10,6 +10,7 @@ export type {
   ForumRequestsConsoleClient,
   ForumRequest,
   ForumRequestStatus,
+  ForumRequestExtendedStatus,
   ForumRequestReviewAction,
   ForumRequestReviewResult,
 } from './types';

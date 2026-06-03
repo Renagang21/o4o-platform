@@ -41,19 +41,33 @@ import { toast } from '@o4o/error-handling';
 import type {
   OperatorForumRequestsConsolePageProps,
   ForumRequest,
-  ForumRequestStatus,
+  ForumRequestExtendedStatus,
 } from './types';
 
 // ─── Config ──────────────────────────────────────────────────
 
-type StatusFilter = ForumRequestStatus | 'all';
+type StatusFilter = ForumRequestExtendedStatus | 'all';
 
-const STATUS_CONFIG: Record<ForumRequestStatus, { label: string; color: string; bgColor: string }> = {
+// WO-O4O-KPA-FORUM-REQUESTS-CONSOLE-CONVERGENCE-WITH-STATE-EXTENSION-V1:
+//   base 4-state + 확장 3-state default. 서비스가 statusConfig 로 색/라벨 override 가능(병합).
+const DEFAULT_STATUS_CONFIG: Record<ForumRequestExtendedStatus, { label: string; color: string; bgColor: string }> = {
   pending: { label: '대기 중', color: 'text-yellow-700', bgColor: 'bg-yellow-100' },
   revision_requested: { label: '보완 요청', color: 'text-orange-700', bgColor: 'bg-orange-100' },
   approved: { label: '승인됨', color: 'text-green-700', bgColor: 'bg-green-100' },
   rejected: { label: '거절됨', color: 'text-red-700', bgColor: 'bg-red-100' },
+  // 확장 상태 (KPA 등) — 미사용 서비스는 노출되지 않음
+  creating: { label: '처리 중', color: 'text-indigo-700', bgColor: 'bg-indigo-100' },
+  completed: { label: '승인됨', color: 'text-green-700', bgColor: 'bg-green-100' },
+  failed: { label: '생성 실패', color: 'text-red-700', bgColor: 'bg-red-100' },
 };
+
+const DEFAULT_STATUS_FILTER_OPTIONS: { value: StatusFilter; label: string }[] = [
+  { value: 'all', label: '모든 상태' },
+  { value: 'pending', label: '대기 중' },
+  { value: 'revision_requested', label: '보완 요청' },
+  { value: 'approved', label: '승인됨' },
+  { value: 'rejected', label: '거절됨' },
+];
 
 const DEFAULT_TITLE = '포럼 신청 관리';
 const DEFAULT_DESCRIPTION = '포럼 생성 요청을 검토하고 승인/거절/보완요청하세요';
@@ -69,7 +83,8 @@ function formatDate(dateString: string): string {
   });
 }
 
-function isReviewable(status: ForumRequestStatus): boolean {
+// 확장 상태(creating/completed/failed)는 review 대상 아님 — base reviewable 만 true.
+function isReviewable(status: ForumRequestExtendedStatus): boolean {
   return status === 'pending' || status === 'revision_requested';
 }
 
@@ -83,7 +98,17 @@ export function OperatorForumRequestsConsolePage({
   headerIcon,
   searchPlaceholder = DEFAULT_SEARCH_PLACEHOLDER,
   tableId,
+  statusConfig: statusConfigOverride,
+  statusFilterOptions,
+  extraColumns,
+  canRecreate,
+  recreateActionLabel = '재생성',
+  renderDetailExtra,
 }: OperatorForumRequestsConsolePageProps) {
+  // WO-O4O-KPA-...-STATE-EXTENSION-V1: default 위에 서비스 override 병합.
+  const statusConfig = { ...DEFAULT_STATUS_CONFIG, ...statusConfigOverride };
+  const filterOptions = statusFilterOptions ?? DEFAULT_STATUS_FILTER_OPTIONS;
+
   const [requests, setRequests] = useState<ForumRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -121,7 +146,9 @@ export function OperatorForumRequestsConsolePage({
     const q = searchQuery.toLowerCase();
     return (
       request.name.toLowerCase().includes(q) ||
-      request.requesterName.toLowerCase().includes(q)
+      request.requesterName.toLowerCase().includes(q) ||
+      // tags 보유 서비스(예: KPA)는 태그도 검색 매칭 — 미보유 시 무시(동작 불변)
+      (request.tags?.some((t) => t.toLowerCase().includes(q)) ?? false)
     );
   });
 
@@ -154,6 +181,26 @@ export function OperatorForumRequestsConsolePage({
           action === 'reject' ? '거절 완료' :
           '보완 요청 완료',
         );
+      }
+    } catch {
+      toast.error('처리 중 오류가 발생했습니다.');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  // ─── Recreate (optional, 단건 전용 — KPA failed 복구) ──────
+  const handleRecreate = async () => {
+    if (!selectedRequest || !client.recreate) return;
+    setIsProcessing(true);
+    try {
+      const res = await client.recreate(selectedRequest.id);
+      if (!res.ok) {
+        toast.error(res.error || '재생성 실패');
+      } else {
+        await loadRequests();
+        setSelectedRequest(null);
+        toast.success('재생성 요청 완료');
       }
     } catch {
       toast.error('처리 중 오류가 발생했습니다.');
@@ -215,6 +262,8 @@ export function OperatorForumRequestsConsolePage({
         </div>
       ),
     },
+    // WO-O4O-KPA-...-STATE-EXTENSION-V1: optional 추가 컬럼(예: KPA 포럼유형/태그) — 포럼명 뒤 삽입
+    ...(extraColumns ?? []),
     {
       key: 'requesterName',
       header: '신청자',
@@ -238,7 +287,7 @@ export function OperatorForumRequestsConsolePage({
       header: '상태',
       width: '120px',
       render: (_v, req) => {
-        const s = STATUS_CONFIG[req.status] || STATUS_CONFIG.pending;
+        const s = statusConfig[req.status] || statusConfig.pending;
         return (
           <span className={`px-3 py-1 text-xs font-medium rounded-full ${s.bgColor} ${s.color}`}>
             {s.label}
@@ -311,11 +360,9 @@ export function OperatorForumRequestsConsolePage({
             onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
             className="pl-4 pr-8 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-300 focus:border-slate-400 appearance-none bg-white"
           >
-            <option value="all">모든 상태</option>
-            <option value="pending">대기 중</option>
-            <option value="revision_requested">보완 요청</option>
-            <option value="approved">승인됨</option>
-            <option value="rejected">거절됨</option>
+            {filterOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
           </select>
           <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
         </div>
@@ -378,15 +425,17 @@ export function OperatorForumRequestsConsolePage({
         onClose={() => { setSelectedRequest(null); setReviewComment(''); }}
         title={selectedRequest?.name ?? ''}
         width={560}
-        actions={
-          selectedRequest && isReviewable(selectedRequest.status)
-            ? [
-                { label: '보완', onClick: () => handleReview('revision'), variant: 'default' as const, loading: isProcessing, disabled: isProcessing },
-                { label: '거절', onClick: () => handleReview('reject'), variant: 'danger' as const, loading: isProcessing, disabled: isProcessing },
-                { label: '승인', onClick: () => handleReview('approve'), variant: 'primary' as const, loading: isProcessing, disabled: isProcessing },
-              ]
-            : []
-        }
+        actions={selectedRequest ? [
+          ...(isReviewable(selectedRequest.status) ? [
+            { label: '보완', onClick: () => handleReview('revision'), variant: 'default' as const, loading: isProcessing, disabled: isProcessing },
+            { label: '거절', onClick: () => handleReview('reject'), variant: 'danger' as const, loading: isProcessing, disabled: isProcessing },
+            { label: '승인', onClick: () => handleReview('approve'), variant: 'primary' as const, loading: isProcessing, disabled: isProcessing },
+          ] : []),
+          // WO-O4O-KPA-...-STATE-EXTENSION-V1: optional 재생성 (failed 복구 — 단건 전용)
+          ...(client.recreate && (canRecreate?.(selectedRequest) ?? false) ? [
+            { label: recreateActionLabel, onClick: handleRecreate, variant: 'default' as const, loading: isProcessing, disabled: isProcessing },
+          ] : []),
+        ] : []}
       >
         {selectedRequest && (
           <div className="space-y-4">
@@ -449,6 +498,9 @@ export function OperatorForumRequestsConsolePage({
                 )}
               </div>
             )}
+
+            {/* WO-O4O-KPA-...-STATE-EXTENSION-V1: optional 추가 상세(예: KPA 포럼유형/태그/생성오류/슬러그) */}
+            {renderDetailExtra?.(selectedRequest)}
           </div>
         )}
       </BaseDetailDrawer>
