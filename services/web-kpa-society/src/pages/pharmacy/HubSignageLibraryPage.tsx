@@ -346,12 +346,23 @@ export function HubSignageLibraryPage() {
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
       {/* Hero */}
-      <header className="mb-6 pb-5 border-b-2 border-slate-200">
-        <h1 className="text-2xl font-bold text-slate-900">플랫폼 사이니지</h1>
-        <p className="mt-1.5 text-sm text-slate-500">
-          디지털 사이니지 미디어와 플레이리스트를 탐색하고 내 매장에 추가합니다.
-          추가 후 사이니지 운영 화면에서 재생 스케줄을 설정하세요.
-        </p>
+      {/* WO-KPA-STORE-HUB-ASSET-CREATE-ACTION-RESTORE-V1:
+          플랫폼 자료 "가져오기"(행별 내 매장에 추가)와 "내 약국용 직접 만들기"를 분리 노출 */}
+      <header className="mb-6 pb-5 border-b-2 border-slate-200 flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">플랫폼 사이니지</h1>
+          <p className="mt-1.5 text-sm text-slate-500">
+            플랫폼 사이니지 미디어·플레이리스트를 탐색해 내 매장에 추가하거나,
+            내 약국 전용 플레이리스트를 직접 구성하세요.
+          </p>
+        </div>
+        <Link
+          to="/store/marketing/signage/playlist"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 shrink-0"
+        >
+          <Plus className="w-4 h-4" />
+          플레이리스트 만들기
+        </Link>
       </header>
 
       {/* View Tabs (미디어 / 플레이리스트) */}

@@ -18,7 +18,7 @@
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Download, X, ExternalLink, Megaphone } from 'lucide-react';
+import { Download, X, ExternalLink, Megaphone, Plus } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { ActionBar, BaseDetailDrawer, BulkResultModal } from '@o4o/ui';
 import { DataTable, useBatchAction } from '@o4o/operator-ux-core';
@@ -210,12 +210,24 @@ export function HubPopLibraryPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
-      <header className="mb-6 pb-5 border-b-2 border-slate-200">
-        <h1 className="text-2xl font-bold text-slate-900">매장 HUB POP</h1>
-        <p className="mt-1.5 text-sm text-slate-500">
-          KPA 운영자가 발행한 POP 콘텐츠입니다. 선택해 일괄 가져가기 또는 행 클릭으로 단건 가져가기를 할 수 있습니다.
-          가져온 POP 은 매장 소유이며, 초안 상태로 복사되어 자유롭게 수정할 수 있습니다.
-        </p>
+      {/* WO-KPA-STORE-HUB-ASSET-CREATE-ACTION-RESTORE-V1:
+          플랫폼 자료 "가져가기"와 "내 약국용 직접 만들기"를 분리 노출 */}
+      <header className="mb-6 pb-5 border-b-2 border-slate-200 flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">매장 HUB POP</h1>
+          <p className="mt-1.5 text-sm text-slate-500">
+            KPA 운영자가 발행한 POP 을 선택해 내 매장으로 가져가거나(초안 사본),
+            내 약국용 POP 을 직접 만드세요.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => navigate('/store/marketing/pop')}
+          className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 shrink-0"
+        >
+          <Plus className="w-4 h-4" />
+          POP 만들기
+        </button>
       </header>
 
       {slugResolved && !slug && (
