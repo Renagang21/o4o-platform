@@ -125,4 +125,20 @@ docs/investigations/CHECK-O4O-KPA-STORE-HUB-ICON-ALIGNMENT-V1.md
 
 ---
 
-*Phase 1 적용 — 코드 변경은 KPA 약국 운영 허브 2파일 + 공통 템플릿 타입 1줄 위드닝으로 제한.*
+---
+
+## 10. 후속 보정 — AI 맞춤 추천 아이콘 (2026-06-04)
+
+KPA `/store-hub` desktop smoke 결과 사이드바·카드 아이콘은 정상 확인. 단 **AI 맞춤 추천 박스의 로봇 emoji(🤖)** 만 lucide 흐름과 따로 떠 보여 후속 보정.
+
+- **원인**: 🤖는 KPA `StoreHubPage`가 아니라 공통 `StoreHubTemplate`의 `DefaultAiPlaceholder`에 하드코딩(`aiBlock`은 icon 미전달 → 기본값 렌더).
+- **방식**: 공통 템플릿 `aiBlock`에 **선택적 `icon?: React.ReactNode` 가산**, `DefaultAiPlaceholder`는 `aiBlock?.icon ?? <span>🤖</span>` 로 렌더. KPA만 `<Sparkles size={28} color="#2563EB" />` 전달.
+- **결정 근거(기준 문서 §5)**: AI 추천=`Sparkles`, 자동화/봇 실행=`Bot`. 본 영역은 "데이터 분석 기반 추천(준비 중)"이라 `Bot`(캐릭터·챗봇 오해)보다 `Sparkles`가 적합.
+- **타 서비스 영향 0**: GlycoPharm/K-Cosmetics는 `icon` 미전달 → 기존 🤖 유지(Phase 7 제거 대상). 가산적 optional 필드라 회귀 불가.
+- **불변**: 준비 중 배지·문구·박스 스타일·아이콘 배경 blue tint·기능 동작.
+- **수정 파일**: `packages/shared-space-ui/src/StoreHubTemplate.tsx`(aiBlock.icon 추가 + 렌더 분기), `services/web-kpa-society/src/pages/pharmacy/StoreHubPage.tsx`(Sparkles 전달).
+- **검증**: `tsc --noEmit` exit 0 (PASS).
+
+---
+
+*Phase 1 적용 — 코드 변경은 KPA 약국 운영 허브 2파일 + 공통 템플릿(icon 타입 위드닝 + aiBlock.icon 가산)으로 제한.*

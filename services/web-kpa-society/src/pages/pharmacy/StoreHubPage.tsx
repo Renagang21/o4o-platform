@@ -10,7 +10,7 @@
 
 import { StoreHubTemplate, type StoreHubConfig } from '@o4o/shared-space-ui';
 import { kpaConfig } from '@o4o/operator-ux-core';
-import { PackageSearch, MonitorPlay, Files, BadgePercent, Store } from 'lucide-react';
+import { PackageSearch, MonitorPlay, Files, BadgePercent, Store, Sparkles } from 'lucide-react';
 import { GuideEditableSection } from '../../components/guide';
 
 const { terminology, uiText } = kpaConfig;
@@ -76,6 +76,7 @@ const kpaStoreHubConfig: StoreHubConfig = {
   ],
 
   aiBlock: {
+    icon: <Sparkles size={28} color={ICON_COLOR} />,
     title: 'AI 맞춤 추천',
     badge: '준비 중',
     desc: '매장 운영 데이터를 기반으로 지금 필요한 상품·콘텐츠·사이니지를 자동으로 추천하는 기능을 준비 중입니다.',

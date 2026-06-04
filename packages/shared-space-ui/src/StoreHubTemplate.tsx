@@ -68,6 +68,8 @@ export interface StoreHubConfig {
     desc?: string;
     features?: string[];
     badge?: string;
+    /** WO-O4O-KPA-STORE-HUB-ICON-ALIGNMENT-V1 후속: AI 아이콘 override. 미전달 시 기본 emoji(🤖) 유지 (타 서비스 무영향, Phase 7 제거 대상) */
+    icon?: React.ReactNode;
   };
 
   /** Store CTA Block */
@@ -234,7 +236,7 @@ function DefaultAiPlaceholder({ aiBlock }: DefaultAiPlaceholderProps) {
   return (
     <div style={st.aiPlaceholder}>
       <div style={st.aiIconWrap}>
-        <span style={{ fontSize: 28 }}>🤖</span>
+        {aiBlock?.icon ?? <span style={{ fontSize: 28 }}>🤖</span>}
       </div>
       <div style={st.aiBody}>
         <div style={st.aiTitleRow}>
