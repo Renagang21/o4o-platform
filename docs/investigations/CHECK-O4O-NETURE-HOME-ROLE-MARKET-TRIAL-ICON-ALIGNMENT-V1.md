@@ -67,11 +67,23 @@ cd services/web-neture && npx tsc --noEmit   # exit 0 (PASS)
 
 ---
 
-## 8. desktop/mobile smoke 결과
+## 8. desktop/mobile smoke 결과 — **PASS (배포 후 라이브 검증 완료, 2026-06-04)**
 
-- **정적 검증 PASS**: 대상 4파일 emoji literal 0건 (rg exit 1, 주석 포함 0건).
-- **라이브 브라우저 smoke: 미수행 (배포 후로 이연).** Home(`/`)·Supplier(`/supplier`)·Partner(`/partner`) 랜딩과 Register 모달은 공개 페이지이므로 배포 후 무인증 확인 가능.
-- **배포 후 확인 권장**: ① Home Market Trial CTA = FlaskConical ② Supplier 카테고리 Package 렌더 ③ Partner 활동 lucide 렌더 ④ Register 역할 3종 lucide(선택 시 green) ⑤ 내 매장/매장 실행 문맥 미추가 ⑥ mobile 아이콘·텍스트 미겹침 ⑦ 라우트·클릭 회귀 없음.
+Playwright 라이브 검증(공개 페이지, 무인증). 전 항목 PASS.
+
+| 영역 | 결과 |
+|------|------|
+| Home Market Trial CTA (`/`) | ✅ `🧪` 제거 → lucide `FlaskConical` 렌더 (a11y `img`, emoji span 제거 확인) |
+| Supplier 카테고리 (`/supplier`) | ✅ `💊🩺🧴🏠` 제거 → `Package`(blue) 4종 렌더. 흐름/혜택 기존 lucide 정상 |
+| Partner 활동 예시 (`/partner`) | ✅ `⭐📢📱🖼️` 제거 → `Star`/`Share2`/`QrCode`/`ImageIcon`(emerald) 렌더 |
+| Register 역할 선택 (`/register` 2단계) | ✅ `🏪🏭🤝` 제거 → `Store`/`Factory`/`Handshake` 렌더 (desktop + **mobile 390px 겹침 없음**) |
+
+- 정적 검증: 대상 4파일 emoji literal 0건 (rg exit 1, 주석 포함).
+- **Neture 도메인 가드**: 내 매장/Store Blog/매장 실행 문맥 **신규 추가 없음** 확인. 공급자/파트너/Market Trial framing 유지.
+- console: `/api/v1/auth/me` 401(인증 상태 폴링, benign — Phase 4 무관) 외 critical error 없음. 라우트/CTA 네비게이션 정상.
+- 스크린샷: `neture-supplier-landing.png` / `neture-partner-landing.png` / `neture-register-role-icons.png` / `neture-register-role-mobile.png` (작업 트리 untracked).
+
+> 참고(범위 밖): Neture `/admin` 대시보드 Quick Actions 가 lucide 아이콘명을 **텍스트**(`users`/`shield`/`store`/`dollar-sign`/`percent`/`key`)로 노출 — 별도 결함, **Operator/Admin Quick Actions 후속**(§10)에 해당. 본 Phase 4 범위 아님.
 
 ---
 
