@@ -216,6 +216,9 @@ export function CommunityHomePage() {
               badge: '약사·약국 O4O 플랫폼',
               title: '정보를 매장 실행 경쟁력으로 연결합니다',
               subtitle: 'AI · 운영자 자료 · 매장 도구를 연결해 작은 약국도 경쟁력을 만듭니다',
+              // WO-KPA-HOME-HERO-COLOR-COMPOSITION-REFINE-V1:
+              // blue band + 떠 있는 white card + 은은한 accent 로 시각 계층 강화 (문구·구조 동일)
+              decorated: true,
             }}
           />
         </PageHero>

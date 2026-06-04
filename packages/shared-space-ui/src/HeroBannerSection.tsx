@@ -37,6 +37,14 @@ export interface HeroBannerFallback {
   bgColor?: string;
   /** fallback hero 테두리 색. 기본값 var(--color-border-default, #e2e8f0) */
   borderColor?: string;
+  /**
+   * WO-KPA-HOME-HERO-COLOR-COMPOSITION-REFINE-V1
+   * 장식형 fallback hero. true 일 때 외부 blue band + 떠 있는 white card +
+   * 은은한 gradient/circle accent 로 렌더링한다 (텍스트/구조 동일, 색상 계층만 강화).
+   * 미지정 시 기존 평면 fallback 을 그대로 유지한다 (다른 서비스 영향 없음).
+   * blue 계열 accent 는 KPA 브랜드 톤 기준 — opt-in 서비스만 사용한다.
+   */
+  decorated?: boolean;
 }
 
 export interface HeroBannerSectionProps {
@@ -66,6 +74,26 @@ export function HeroBannerSection({ ads, fallback }: HeroBannerSectionProps) {
   // No ads: show service-specific static hero
   if (ads.length === 0) {
     const primary = fallback.primaryColor ?? 'var(--color-primary, #2563EB)';
+
+    // WO-KPA-HOME-HERO-COLOR-COMPOSITION-REFINE-V1:
+    // 장식형 — 외부 blue→white band 위에 떠 있는 white card + 은은한 accent.
+    // 텍스트 가독성 우선: 장식은 zIndex 0, 콘텐츠는 zIndex 1.
+    if (fallback.decorated) {
+      return (
+        <section style={styles.decoratedBand}>
+          <div style={styles.decoratedCard}>
+            <div style={styles.accentCircle} aria-hidden="true" />
+            <div style={styles.accentWave} aria-hidden="true" />
+            <div style={styles.decoratedContent}>
+              <span style={styles.decoratedBadge}>{fallback.badge}</span>
+              <h1 style={styles.decoratedTitle}>{fallback.title}</h1>
+              <p style={styles.decoratedSubtitle}>{fallback.subtitle}</p>
+            </div>
+          </div>
+        </section>
+      );
+    }
+
     return (
       <section
         style={{
@@ -227,6 +255,86 @@ const styles: Record<string, CSSProperties> = {
   subtitle: {
     color: '#475569',
     fontSize: 16,
+    margin: 0,
+  },
+
+  // ─── WO-KPA-HOME-HERO-COLOR-COMPOSITION-REFINE-V1 (decorated fallback) ───
+  // 외부 band: 부드러운 blue→white→blue gradient. 하단 콘텐츠와 자연스럽게 연결.
+  decoratedBand: {
+    borderRadius: 20,
+    padding: 'clamp(14px, 3.5vw, 28px)',
+    background: 'linear-gradient(160deg, #eff6ff 0%, #ffffff 46%, #f1f6fe 100%)',
+    marginBottom: 0,
+  },
+  // 내부 card: white + blue tint, 연한 blue-gray border, soft shadow → 떠 있는 느낌.
+  decoratedCard: {
+    position: 'relative',
+    overflow: 'hidden',
+    borderRadius: 16,
+    padding: 'clamp(40px, 7vw, 64px) clamp(20px, 5vw, 40px)',
+    background: 'linear-gradient(180deg, #ffffff 0%, #fafcff 100%)',
+    border: '1px solid #dbe7fb',
+    boxShadow:
+      '0 10px 28px -14px rgba(37,99,235,0.20), 0 2px 6px -2px rgba(15,23,42,0.06)',
+    textAlign: 'center' as const,
+  },
+  // 우상단 pale-blue radial circle (장식, 텍스트 비침범).
+  accentCircle: {
+    position: 'absolute',
+    top: -90,
+    right: -70,
+    width: 260,
+    height: 260,
+    pointerEvents: 'none',
+    background:
+      'radial-gradient(circle, rgba(96,165,250,0.20) 0%, rgba(96,165,250,0) 70%)',
+    zIndex: 0,
+  },
+  // 좌하단 soft wave gradient.
+  accentWave: {
+    position: 'absolute',
+    bottom: -60,
+    left: -50,
+    width: 240,
+    height: 200,
+    pointerEvents: 'none',
+    background:
+      'radial-gradient(ellipse at bottom left, rgba(37,99,235,0.12) 0%, rgba(37,99,235,0) 70%)',
+    zIndex: 0,
+  },
+  decoratedContent: {
+    position: 'relative',
+    zIndex: 1,
+    maxWidth: 640,
+    margin: '0 auto',
+  },
+  // Badge: vivid blue gradient + white text.
+  decoratedBadge: {
+    display: 'inline-block',
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 700,
+    letterSpacing: 0.2,
+    padding: '5px 14px',
+    borderRadius: 20,
+    marginBottom: 18,
+    background: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
+    boxShadow: '0 4px 10px -3px rgba(37,99,235,0.45)',
+  },
+  // Headline: strong navy.
+  decoratedTitle: {
+    fontSize: 'clamp(24px, 4.2vw, 32px)',
+    fontWeight: 800,
+    letterSpacing: -0.3,
+    lineHeight: 1.25,
+    color: '#1e3a8a',
+    margin: '0 0 14px',
+  },
+  // Sub headline: slate.
+  decoratedSubtitle: {
+    color: '#475569',
+    fontSize: 'clamp(15px, 2.5vw, 17px)',
+    lineHeight: 1.6,
     margin: 0,
   },
 };
