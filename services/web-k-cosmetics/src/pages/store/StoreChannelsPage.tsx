@@ -21,9 +21,9 @@ import {
   ShieldAlert,
   Lock,
   Monitor,
-  Smartphone,
   Tablet,
   Globe,
+  Tv,
   Plus,
   X,
   Package,
@@ -71,7 +71,7 @@ const CHANNEL_TABS: { type: ChannelType; label: string; Icon: typeof Globe; asse
   { type: 'B2C', label: '온라인 스토어', Icon: Globe, assetKey: 'home' },
   { type: 'KIOSK', label: '키오스크', Icon: Monitor, assetKey: null },
   { type: 'TABLET', label: '태블릿', Icon: Tablet, assetKey: null },
-  { type: 'SIGNAGE', label: '사이니지', Icon: Smartphone, assetKey: 'signage' },
+  { type: 'SIGNAGE', label: '사이니지', Icon: Tv, assetKey: 'signage' },
 ];
 
 const PRODUCT_CHANNEL_TYPES: ChannelType[] = ['B2C', 'KIOSK'];
@@ -673,11 +673,14 @@ export function StoreChannelsPage() {
         <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">상품을 어디에 보여줄지 선택하세요</p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {([
-            { type: 'B2C', icon: '🌐', label: '온라인 판매', sub: '고객이 온라인으로 구매' },
-            { type: 'TABLET', icon: '📱', label: '매장 태블릿', sub: '매장에서 상품 안내·상담' },
-            { type: 'KIOSK', icon: '🖥️', label: '키오스크', sub: '고객이 직접 탐색' },
-            { type: 'SIGNAGE', icon: '📺', label: '사이니지', sub: '화면(TV)에 콘텐츠 표시' },
-          ] as const).map(item => (
+            // Phase 3 K-Cosmetics: emoji → lucide (CHANNEL_TABS 와 채널 타입별 동일, SIGNAGE=Tv)
+            { type: 'B2C', Icon: Globe, label: '온라인 판매', sub: '고객이 온라인으로 구매' },
+            { type: 'TABLET', Icon: Tablet, label: '매장 태블릿', sub: '매장에서 상품 안내·상담' },
+            { type: 'KIOSK', Icon: Monitor, label: '키오스크', sub: '고객이 직접 탐색' },
+            { type: 'SIGNAGE', Icon: Tv, label: '사이니지', sub: '화면(TV)에 콘텐츠 표시' },
+          ] as const).map(item => {
+            const Icon = item.Icon;
+            return (
             <button
               key={item.type}
               onClick={() => setActiveTab(item.type)}
@@ -687,11 +690,12 @@ export function StoreChannelsPage() {
                   : 'border-slate-200 bg-white hover:border-slate-300'
               }`}
             >
-              <span className="text-lg">{item.icon}</span>
+              <Icon size={20} className={activeTab === item.type ? 'text-pink-700' : 'text-slate-500'} />
               <span className={`text-xs font-semibold ${activeTab === item.type ? 'text-pink-700' : 'text-slate-700'}`}>{item.label}</span>
               <span className="text-[11px] text-slate-400 leading-tight">{item.sub}</span>
             </button>
-          ))}
+            );
+          })}
         </div>
         {CHANNEL_DESC[activeTab] && (
           <p className="mt-3 text-xs text-slate-500 border-t border-slate-200 pt-3">

@@ -21,7 +21,6 @@ import {
   ShieldAlert,
   Lock,
   Monitor,
-  Smartphone,
   Tablet,
   Globe,
   Tv,
@@ -72,7 +71,7 @@ const CHANNEL_TABS: { type: ChannelType; label: string; Icon: typeof Globe; asse
   { type: 'B2C', label: '온라인 스토어', Icon: Globe, assetKey: 'home' },
   { type: 'KIOSK', label: '키오스크', Icon: Monitor, assetKey: null },
   { type: 'TABLET', label: '태블릿', Icon: Tablet, assetKey: null },
-  { type: 'SIGNAGE', label: '사이니지', Icon: Smartphone, assetKey: 'signage' },
+  { type: 'SIGNAGE', label: '사이니지', Icon: Tv, assetKey: 'signage' },
 ];
 
 const PRODUCT_CHANNEL_TYPES: ChannelType[] = ['B2C', 'KIOSK'];

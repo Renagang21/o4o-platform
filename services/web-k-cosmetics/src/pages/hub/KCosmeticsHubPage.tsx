@@ -10,9 +10,16 @@
 
 import { StoreHubTemplate, type StoreHubConfig } from '@o4o/shared-space-ui';
 import { kcosmeticsConfig } from '@o4o/operator-ux-core';
+import { PackageSearch, MonitorPlay, Files, BadgePercent, Store, Sparkles } from 'lucide-react';
 import { GuideEditableSection } from '../../components/guide';
 
 const { terminology, uiText } = kcosmeticsConfig;
+
+// WO-O4O-GLYCOPHARM-STORE-HUB-CHANNEL-ICON-ALIGNMENT-V1 → Phase 3 K-Cosmetics:
+// O4O-GLOBAL-ICON-SYSTEM-STANDARD-V1 — emoji 제거, lucide line icon 통일 (K-Cosmetics rose/pink tone §4)
+const ICON_COLOR = '#DB2777'; // pink-600 (KCos 정체성 tone)
+const CARD_ICON_SIZE = 22;
+const CTA_ICON_SIZE = 28;
 
 // WO-O4O-SERVICE-INLINE-EDIT-PORT-GK-V1: 서비스 페이지 설명 영역 인라인 편집
 const PAGE_KEY = 'store-hub';
@@ -39,28 +46,28 @@ const kcosStoreHubConfig: StoreHubConfig = {
   resourceSectionDesc: editable('resource-section-description', `플랫폼 자원을 탐색하고 ${terminology.myStoreLabel}으로 가져가세요`),
   resourceCards: [
     {
-      icon: '🛒',
+      icon: <PackageSearch size={CARD_ICON_SIZE} color={ICON_COLOR} />,
       title: 'B2B 상품 리스트',
       desc: '공급사 상품을 탐색하고 매장에 신청합니다',
       href: '/store-hub/b2b',
       actionLabel: '상품 탐색',
     },
     {
-      icon: '🖥️',
+      icon: <MonitorPlay size={CARD_ICON_SIZE} color={ICON_COLOR} />,
       title: '디지털 사이니지',
       desc: '매장 디스플레이에 활용할 미디어를 탐색합니다',
       href: '/store-hub/signage',
       actionLabel: '사이니지 탐색',
     },
     {
-      icon: '📄',
+      icon: <Files size={CARD_ICON_SIZE} color={ICON_COLOR} />,
       title: '콘텐츠/자료',
       desc: 'CMS 콘텐츠를 탐색하고 내 매장에 복사합니다',
       href: '/store-hub/content',
       actionLabel: '콘텐츠 탐색',
     },
     {
-      icon: '📋',
+      icon: <BadgePercent size={CARD_ICON_SIZE} color={ICON_COLOR} />,
       title: '캠페인 · 이벤트',
       desc: '플랫폼 캠페인에 참여합니다',
       href: '/store-hub/event-offers',
@@ -69,6 +76,7 @@ const kcosStoreHubConfig: StoreHubConfig = {
   ],
 
   aiBlock: {
+    icon: <Sparkles size={28} color={ICON_COLOR} />,
     title: 'AI 맞춤 추천',
     badge: '준비 중',
     desc: '매장 운영 데이터를 기반으로 지금 필요한 상품·콘텐츠·사이니지를 자동으로 추천하는 기능을 준비 중입니다.',
@@ -80,7 +88,7 @@ const kcosStoreHubConfig: StoreHubConfig = {
   },
 
   storeCtaBlock: {
-    icon: '💄',
+    icon: <Store size={CTA_ICON_SIZE} color={ICON_COLOR} />,
     title: `${terminology.myStoreLabel}으로 이동`,
     desc: `탐색한 상품·콘텐츠·사이니지의 실제 설정과 운영은 ${terminology.myStoreLabel}에서 합니다`,
     buttonLabel: `${terminology.myStoreLabel} 관리 →`,
