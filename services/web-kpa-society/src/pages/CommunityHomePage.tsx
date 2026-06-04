@@ -255,11 +255,14 @@ export function CommunityHomePage() {
           loading={latestLoading}
         />
       }
+      // WO-O4O-KPA-HOME-VALUE-CARDS-AFTER-GUIDE-V1:
+      //   "내 역할로 시작하기"는 성격상 이용 가이드(역할별 안내)에 가까우므로
+      //   별도 서비스 진입처럼 보이지 않도록 "이용 가이드(Help)" 아래로 이동.
+      valueGuidePlacement="after-help"
       valueGuideSlot={
         // WO-O4O-KPA-HOME-VALUE-CARDS-V1:
-        // "내 역할로 시작하기" — Hero("여기는 무엇을 하는 곳인가") 와
-        // AppEntry("실제로 시작하기") 사이의 중간 단계. 사용자가 자기 역할을
-        // 선택해 /guide/for/{store-owner,operator,member} 진입.
+        // "내 역할로 시작하기" — 사용자가 자기 역할을 선택해
+        // /guide/for/{store-owner,operator,member} 진입.
         // AppEntrySection 패턴 재사용 — 데스크탑 3열 / 태블릿 2+1 / 모바일 stack.
         <AppEntrySection
           title="내 역할로 시작하기"

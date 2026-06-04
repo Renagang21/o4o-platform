@@ -61,6 +61,15 @@ export interface StandardHomeTemplateProps {
    */
   valueGuideSlot?: ReactNode;
 
+  /**
+   * valueGuideSlot 배치 위치.
+   * - 'before-app-entry' (기본): 최신 활동 아래 · 서비스 바로가기 위 (WO-O4O-KPA-HOME-VALUE-CARDS-V1 원본 위치)
+   * - 'after-help': 이용 가이드(Help) 아래 — "내 역할로 시작하기"를 안내 가이드 다음으로 내리는 서비스용
+   *   (WO-O4O-KPA-HOME-VALUE-CARDS-AFTER-GUIDE-V1).
+   * 미전달 서비스는 기존 위치 유지 (영향 0).
+   */
+  valueGuidePlacement?: 'before-app-entry' | 'after-help';
+
   /** AppEntry 카드 목록 */
   appEntryCards: AppEntrySectionProps['cards'];
   appEntryOnCardClick?: AppEntrySectionProps['onCardClick'];
@@ -86,11 +95,23 @@ export function StandardHomeTemplate({
   noticesGap = 'gap-4',
   latestSlot,
   valueGuideSlot,
+  valueGuidePlacement = 'before-app-entry',
   appEntryCards,
   appEntryOnCardClick,
   cta,
   help,
 }: StandardHomeTemplateProps) {
+  const valueGuideAfterHelp = valueGuidePlacement === 'after-help' && !!valueGuideSlot;
+
+  const valueGuideBlock = (isLast: boolean) =>
+    valueGuideSlot ? (
+      <PageSection last={isLast}>
+        <PageContainer>
+          {valueGuideSlot}
+        </PageContainer>
+      </PageSection>
+    ) : null;
+
   return (
     <div style={styles.page}>
       {/* 1. Hero — 서비스별 완전 위임 */}
@@ -126,15 +147,10 @@ export function StandardHomeTemplate({
         </PageSection>
       )}
 
-      {/* 3-1. 가치 / 역할별 활용 안내 — 선택적 슬롯
-              WO-O4O-KPA-HOME-VALUE-CARDS-V1: AppEntry 진입 전 "내 역할로 시작하기" */}
-      {valueGuideSlot && (
-        <PageSection>
-          <PageContainer>
-            {valueGuideSlot}
-          </PageContainer>
-        </PageSection>
-      )}
+      {/* 3-1. 가치 / 역할별 활용 안내 — 선택적 슬롯 (기본 위치)
+              WO-O4O-KPA-HOME-VALUE-CARDS-V1: AppEntry 진입 전 "내 역할로 시작하기".
+              valueGuidePlacement='after-help' 인 서비스는 Help 아래로 이동(아래 블록 7). */}
+      {!valueGuideAfterHelp && valueGuideBlock(false)}
 
       {/* 4. 서비스 바로가기 */}
       <PageSection>
@@ -155,11 +171,15 @@ export function StandardHomeTemplate({
       </PageSection>
 
       {/* 6. Help */}
-      <PageSection last>
+      <PageSection last={!valueGuideAfterHelp}>
         <PageContainer>
           <O4OHelpSection {...help} />
         </PageContainer>
       </PageSection>
+
+      {/* 7. 가치 / 역할별 활용 안내 — 'after-help' 배치 시 Help 아래
+              WO-O4O-KPA-HOME-VALUE-CARDS-AFTER-GUIDE-V1 */}
+      {valueGuideAfterHelp && valueGuideBlock(true)}
     </div>
   );
 }
