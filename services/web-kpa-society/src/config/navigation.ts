@@ -17,10 +17,6 @@ import { kpaConfig } from '@o4o/operator-ux-core';
 
 export const KPA_BASE_NAV: GlobalHeaderNavItem[] = [
   { label: '커뮤니티', href: '/' },
-  // WO-O4O-KPA-MAIN-NAV-GUIDE-ENTRY-V1:
-  // 사용자가 메인 메뉴에서 O4O 가치·역할별 활용 가이드를 직접 발견할 수 있도록
-  // "이용 가이드" 항목 추가. Neture 패턴 정합 (web-neture/navigation.ts).
-  { label: '이용 가이드', href: '/guide/intro' },
 ];
 
 export const KPA_ABOUT_NAV_ITEM: GlobalHeaderNavItem = { label: 'About', href: '/about' };
