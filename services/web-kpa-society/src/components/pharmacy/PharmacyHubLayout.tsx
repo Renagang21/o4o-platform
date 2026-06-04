@@ -15,29 +15,42 @@
 
 import { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Menu } from 'lucide-react';
+import {
+  Menu,
+  Home,
+  PackageSearch,
+  MonitorPlay,
+  BadgePercent,
+  Files,
+  Newspaper,
+  Megaphone,
+  QrCode,
+  type LucideIcon,
+} from 'lucide-react';
 import { colors } from '../../styles/theme';
 
 interface HubMenuItem {
   label: string;
   path: string;
-  icon: string;
+  // WO-O4O-KPA-STORE-HUB-ICON-ALIGNMENT-V1:
+  // O4O-GLOBAL-ICON-SYSTEM-STANDARD-V1 — emoji 제거, lucide line icon 통일
+  icon: LucideIcon;
   description: string;
 }
 
 const HUB_MENU_ITEMS: HubMenuItem[] = [
-  { label: '홈', path: '/store-hub', icon: '\u{1F3E0}', description: '자원 탐색 허브 · 운영 흐름 안내' },
-  { label: '상품 카탈로그', path: '/store-hub/b2b', icon: '\u{1F6D2}', description: '공급 가능 상품 탐색 · 내 매장에 추가' },
-  { label: '디지털 사이니지', path: '/store-hub/signage', icon: '\u{1F5A5}\uFE0F', description: '사이니지 미디어 · 플레이리스트' },
-  { label: '이벤트/특가', path: '/store-hub/event-offers', icon: '\u{1F6CD}\uFE0F', description: 'KPA-Society 이벤트 상품' },
-  { label: '콘텐츠/자료', path: '/store-hub/content', icon: '\u{1F4C4}', description: 'CMS 콘텐츠 탐색 · 복사' },
+  { label: '홈', path: '/store-hub', icon: Home, description: '자원 탐색 허브 · 운영 흐름 안내' },
+  { label: '상품 카탈로그', path: '/store-hub/b2b', icon: PackageSearch, description: '공급 가능 상품 탐색 · 내 매장에 추가' },
+  { label: '디지털 사이니지', path: '/store-hub/signage', icon: MonitorPlay, description: '사이니지 미디어 · 플레이리스트' },
+  { label: '이벤트/특가', path: '/store-hub/event-offers', icon: BadgePercent, description: 'KPA-Society 이벤트 상품' },
+  { label: '콘텐츠/자료', path: '/store-hub/content', icon: Files, description: 'CMS 콘텐츠 탐색 · 복사' },
   // WO-O4O-STORE-HUB-BLOG-CONTENT-IMPORT-V1: 매장 HUB 블로그 진열 + 가져가기
-  { label: '블로그', path: '/store-hub/blog', icon: '\u{1F4DD}', description: '운영자 게시 블로그 · 내 매장으로 가져가기' },
+  { label: '블로그', path: '/store-hub/blog', icon: Newspaper, description: '운영자 게시 블로그 · 내 매장으로 가져가기' },
   // WO-O4O-KPA-STORE-HUB-POP-CONTENT-IMPORT-V1: 매장 HUB POP 진열 + 가져가기
-  { label: 'POP', path: '/store-hub/pop', icon: '\u{1F4E2}', description: '운영자 게시 POP · 내 매장으로 가져가기' },
+  { label: 'POP', path: '/store-hub/pop', icon: Megaphone, description: '운영자 게시 POP · 내 매장으로 가져가기' },
   // WO-O4O-KPA-STORE-HUB-QR-CONTENT-IMPORT-V1: 매장 HUB QR 진열 + 가져가기
   // 매장 사본은 기존 StoreQRPage (/store/marketing/qr) 가 그대로 표시 — 별도 사본 관리 화면 없음.
-  { label: 'QR-code', path: '/store-hub/qr', icon: '\u{1F4F1}', description: '운영자 게시 QR 템플릿 · 내 매장으로 가져가기' },
+  { label: 'QR-code', path: '/store-hub/qr', icon: QrCode, description: '운영자 게시 QR 템플릿 · 내 매장으로 가져가기' },
 ];
 
 function isMenuActive(pathname: string, menuPath: string): boolean {
@@ -96,6 +109,7 @@ export function PharmacyHubLayout() {
         <nav style={layoutStyles.nav}>
           {HUB_MENU_ITEMS.map(item => {
             const active = isMenuActive(pathname, item.path);
+            const Icon = item.icon;
             return (
               <Link
                 key={item.path}
@@ -106,7 +120,9 @@ export function PharmacyHubLayout() {
                   ...(active ? layoutStyles.menuItemActive : {}),
                 }}
               >
-                <span style={layoutStyles.menuIcon}>{item.icon}</span>
+                <span style={layoutStyles.menuIcon}>
+                  <Icon size={18} color={active ? colors.primary : colors.neutral600} />
+                </span>
                 <div style={layoutStyles.menuText}>
                   <span
                     style={{

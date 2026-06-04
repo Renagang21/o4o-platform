@@ -25,7 +25,8 @@ import { Link } from 'react-router-dom';
 // ─── Data Interfaces ─────────────────────────────────────────────────────────
 
 export interface StoreHubResourceCard {
-  icon: string;
+  /** WO-O4O-KPA-STORE-HUB-ICON-ALIGNMENT-V1: ReactNode 허용 (emoji string · lucide element 모두 유효) */
+  icon: React.ReactNode;
   title: string;
   desc: string;
   href: string;
@@ -71,7 +72,8 @@ export interface StoreHubConfig {
 
   /** Store CTA Block */
   storeCtaBlock?: {
-    icon?: string;
+    /** WO-O4O-KPA-STORE-HUB-ICON-ALIGNMENT-V1: ReactNode 허용 (emoji string · lucide element 모두 유효) */
+    icon?: React.ReactNode;
     title: string;
     desc: string;
     buttonLabel: string;
