@@ -75,15 +75,18 @@ export function HeroBannerSection({ ads, fallback }: HeroBannerSectionProps) {
   if (ads.length === 0) {
     const primary = fallback.primaryColor ?? 'var(--color-primary, #2563EB)';
 
-    // WO-KPA-HOME-HERO-COLOR-COMPOSITION-REFINE-V1:
-    // 장식형 — 외부 blue→white band 위에 떠 있는 white card + 은은한 accent.
-    // 텍스트 가독성 우선: 장식은 zIndex 0, 콘텐츠는 zIndex 1.
+    // WO-KPA-HOME-HERO-COLOR-COMPOSITION-REFINE-V2:
+    // card-based visual hero — 일관된 soft blue band 위에 명확히 떠 있는 white card.
+    // band 는 끝까지 blue 톤을 유지해 white card 가 또렷이 대비되도록 한다 (V1: 중앙이
+    // white 로 fade 되어 card 대비가 사라졌던 문제 해소).
+    // 장식(wave/circle/dots)은 zIndex 0, 콘텐츠는 zIndex 1 — 가독성 우선.
     if (fallback.decorated) {
       return (
         <section style={styles.decoratedBand}>
           <div style={styles.decoratedCard}>
             <div style={styles.accentCircle} aria-hidden="true" />
             <div style={styles.accentWave} aria-hidden="true" />
+            <div style={styles.accentDots} aria-hidden="true" />
             <div style={styles.decoratedContent}>
               <span style={styles.decoratedBadge}>{fallback.badge}</span>
               <h1 style={styles.decoratedTitle}>{fallback.title}</h1>
@@ -258,54 +261,75 @@ const styles: Record<string, CSSProperties> = {
     margin: 0,
   },
 
-  // ─── WO-KPA-HOME-HERO-COLOR-COMPOSITION-REFINE-V1 (decorated fallback) ───
-  // 외부 band: 부드러운 blue→white→blue gradient. 하단 콘텐츠와 자연스럽게 연결.
+  // ─── WO-KPA-HOME-HERO-COLOR-COMPOSITION-REFINE-V2 (decorated fallback) ───
+  // 외부 band: 끝까지 유지되는 soft blue. 하단만 살짝 연해져 콘텐츠와 연결.
+  // (V1 은 중앙이 white 로 fade → white card 대비 소실. V2 는 blue 유지.)
   decoratedBand: {
-    borderRadius: 20,
-    padding: 'clamp(14px, 3.5vw, 28px)',
-    background: 'linear-gradient(160deg, #eff6ff 0%, #ffffff 46%, #f1f6fe 100%)',
+    borderRadius: 24,
+    padding: 'clamp(20px, 4vw, 40px)',
+    background: 'linear-gradient(180deg, #dbeafe 0%, #e6f0ff 55%, #f4f9ff 100%)',
     marginBottom: 0,
   },
-  // 내부 card: white + blue tint, 연한 blue-gray border, soft shadow → 떠 있는 느낌.
+  // 내부 card: 또렷한 white + 가시적 blue border + 뚜렷한 soft shadow → 떠 있는 느낌.
+  // minHeight + flex 중앙정렬로 "대표 섹션" 밀도감 확보.
   decoratedCard: {
     position: 'relative',
     overflow: 'hidden',
-    borderRadius: 16,
-    padding: 'clamp(40px, 7vw, 64px) clamp(20px, 5vw, 40px)',
-    background: 'linear-gradient(180deg, #ffffff 0%, #fafcff 100%)',
-    border: '1px solid #dbe7fb',
+    borderRadius: 24,
+    minHeight: 'clamp(260px, 32vw, 340px)',
+    padding: 'clamp(40px, 7vw, 72px) clamp(22px, 5vw, 48px)',
+    display: 'flex',
+    flexDirection: 'column' as const,
+    alignItems: 'center',
+    justifyContent: 'center',
+    background: '#ffffff',
+    border: '1px solid #c7dbf8',
     boxShadow:
-      '0 10px 28px -14px rgba(37,99,235,0.20), 0 2px 6px -2px rgba(15,23,42,0.06)',
+      '0 24px 50px -22px rgba(37,99,235,0.38), 0 8px 18px -10px rgba(37,99,235,0.20)',
     textAlign: 'center' as const,
   },
-  // 우상단 pale-blue radial circle (장식, 텍스트 비침범).
+  // 우측 큰 pale-blue circle (뚜렷하게 보이도록 강화).
   accentCircle: {
     position: 'absolute',
-    top: -90,
-    right: -70,
-    width: 260,
-    height: 260,
+    top: -110,
+    right: -90,
+    width: 340,
+    height: 340,
     pointerEvents: 'none',
     background:
-      'radial-gradient(circle, rgba(96,165,250,0.20) 0%, rgba(96,165,250,0) 70%)',
+      'radial-gradient(circle, rgba(96,165,250,0.50) 0%, rgba(96,165,250,0.16) 45%, rgba(96,165,250,0) 72%)',
     zIndex: 0,
   },
-  // 좌하단 soft wave gradient.
+  // 좌하단 soft wave/blob gradient (강화).
   accentWave: {
     position: 'absolute',
-    bottom: -60,
-    left: -50,
-    width: 240,
-    height: 200,
+    bottom: -90,
+    left: -70,
+    width: 360,
+    height: 300,
     pointerEvents: 'none',
     background:
-      'radial-gradient(ellipse at bottom left, rgba(37,99,235,0.12) 0%, rgba(37,99,235,0) 70%)',
+      'radial-gradient(ellipse at bottom left, rgba(59,130,246,0.34) 0%, rgba(59,130,246,0.12) 50%, rgba(59,130,246,0) 72%)',
+    zIndex: 0,
+  },
+  // 우상단 dot pattern (작은 blue dots).
+  accentDots: {
+    position: 'absolute',
+    top: 26,
+    left: 30,
+    width: 104,
+    height: 80,
+    pointerEvents: 'none',
+    backgroundImage:
+      'radial-gradient(circle, rgba(37,99,235,0.32) 1.6px, transparent 1.7px)',
+    backgroundSize: '15px 15px',
+    opacity: 0.65,
     zIndex: 0,
   },
   decoratedContent: {
     position: 'relative',
     zIndex: 1,
-    maxWidth: 640,
+    maxWidth: 680,
     margin: '0 auto',
   },
   // Badge: vivid blue gradient + white text.
