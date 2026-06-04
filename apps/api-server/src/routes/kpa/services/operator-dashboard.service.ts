@@ -610,21 +610,25 @@ function buildConfig(
   validLog.splice(15);
 
   // Block 5: Quick Actions
+  // WO-O4O-DASHBOARD-ACTION-ICON-VOCAB-STANDARDIZE-V1 (Phase B):
+  //   emoji icon → lucide-name 정렬. ActionIcon vocabulary 16종 안에서 매핑.
+  //   ActionIcon 의 Phase A fallback 은 유지되므로 GlycoPharm/K-Cos/Neture 의
+  //   기존 emoji 또는 미매핑 lucide-name 은 회귀 0.
   const quickActions: QuickActionItem[] = [
-    { id: 'qa-members', label: '회원 관리', link: '/operator/members', icon: '🧑‍💼' },
-    { id: 'qa-pharmacy-requests', label: '약국 서비스 신청', link: '/operator/pharmacy-requests', icon: '💊' },
-    { id: 'qa-product-apps', label: '상품 신청 관리', link: '/operator/product-applications', icon: '🛒' },
-    { id: 'qa-content', label: '콘텐츠 관리', link: '/operator/content', icon: '📝' },
-    { id: 'qa-news', label: '공지사항', link: '/operator/news', icon: '📢' },
-    { id: 'qa-forum', label: '포럼 관리', link: '/operator/forum-management', icon: '💬' },
-    { id: 'qa-signage', label: '사이니지', link: '/operator/signage/hq-media', icon: '🖥️' },
-    { id: 'qa-stores', label: '매장 관리', link: '/operator/stores', icon: '🏪' },
-    { id: 'qa-event-offers', label: '이벤트 오퍼', link: '/operator/event-offers', icon: '🎯' },
+    { id: 'qa-members', label: '회원 관리', link: '/operator/members', icon: 'users' },
+    { id: 'qa-pharmacy-requests', label: '약국 서비스 신청', link: '/operator/pharmacy-requests', icon: 'clipboard-list' },
+    { id: 'qa-product-apps', label: '상품 신청 관리', link: '/operator/product-applications', icon: 'shopping-cart' },
+    { id: 'qa-content', label: '콘텐츠 관리', link: '/operator/content', icon: 'file-text' },
+    { id: 'qa-news', label: '공지사항', link: '/operator/news', icon: 'megaphone' },
+    { id: 'qa-forum', label: '포럼 관리', link: '/operator/forum-management', icon: 'message-square' },
+    { id: 'qa-signage', label: '사이니지', link: '/operator/signage/hq-media', icon: 'monitor-play' },
+    { id: 'qa-stores', label: '매장 관리', link: '/operator/stores', icon: 'store' },
+    { id: 'qa-event-offers', label: '이벤트 오퍼', link: '/operator/event-offers', icon: 'badge-percent' },
     ...(isAdmin
       ? [
-          { id: 'qa-community', label: 'Home 편집', link: '/operator/community', icon: '🏠' },
-          { id: 'qa-roles', label: '역할 관리', link: '/operator/roles', icon: '🔑' },
-          { id: 'qa-audit', label: '감사 로그', link: '/operator/audit-logs', icon: '📋' },
+          { id: 'qa-community', label: 'Home 편집', link: '/operator/community', icon: 'home' },
+          { id: 'qa-roles', label: '역할 관리', link: '/operator/roles', icon: 'key' },
+          { id: 'qa-audit', label: '감사 로그', link: '/operator/audit-logs', icon: 'scroll-text' },
         ]
       : []),
   ];

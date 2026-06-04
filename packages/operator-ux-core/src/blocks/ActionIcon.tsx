@@ -6,6 +6,14 @@
  *  - lucide-name(kebab) → lucide 컴포넌트 매핑 렌더
  *  - emoji 등 비-ASCII → 기존처럼 그대로 통과 (KPA emoji 회귀 0)
  *  - 매핑에 없는 name-like(ASCII) → 텍스트 노출 방지 위해 생략
+ *
+ * WO-O4O-DASHBOARD-ACTION-ICON-VOCAB-STANDARDIZE-V1 (Phase B):
+ * KPA backend quickActions 의 12 emoji 가 lucide-name 으로 정렬됨에 따라
+ * vocabulary 16종 (Phase A 9 + Phase B 7) 으로 확장.
+ *  - 신규 7종: clipboard-list / megaphone / message-square / monitor-play /
+ *             badge-percent / home / scroll-text
+ *  - Phase A 의 emoji fallback / NAME_LIKE skip 동작은 유지 (GlycoPharm/K-Cos/
+ *    Neture 의 기존 emoji 또는 미매핑 lucide-name 회귀 0).
  */
 import {
   Users,
@@ -17,6 +25,13 @@ import {
   Package,
   FileText,
   ShoppingCart,
+  ClipboardList,
+  Megaphone,
+  MessageSquare,
+  MonitorPlay,
+  BadgePercent,
+  Home,
+  ScrollText,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -30,6 +45,14 @@ const ICON_NAME_MAP: Record<string, LucideIcon> = {
   package: Package,
   'file-text': FileText,
   'shopping-cart': ShoppingCart,
+  // WO-O4O-DASHBOARD-ACTION-ICON-VOCAB-STANDARDIZE-V1 (Phase B): KPA 12 icon 정렬용
+  'clipboard-list': ClipboardList,
+  megaphone: Megaphone,
+  'message-square': MessageSquare,
+  'monitor-play': MonitorPlay,
+  'badge-percent': BadgePercent,
+  home: Home,
+  'scroll-text': ScrollText,
 };
 
 // ASCII 영문/숫자/하이픈만 = lucide-name 후보
