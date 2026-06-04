@@ -109,10 +109,14 @@ icon: '🏥'  내 약국 CTA (storeCtaBlock)
 | B2C | 🌐 | `Globe` | `Globe` |
 | TABLET | 📱 | `Tablet` | `Tablet` |
 | KIOSK | 🖥️ | `Monitor` | `Monitor` |
-| SIGNAGE | 📺 | `Smartphone` | `Tv` *(아래 주의)* |
+| SIGNAGE | 📺 | `Smartphone` | **`Tv` (결정)** |
 
-> **SIGNAGE 주의:** 현재 `CHANNEL_TABS`는 SIGNAGE에 `Smartphone`을 매핑하고 있으나 이는 의미가 어긋난다(사이니지=화면/TV). 기준 문서 §5는 사이니지=`MonitorPlay`. 가이드 블록 SIGNAGE는 **`Tv`(또는 `MonitorPlay`)** 권장.
-> 단, `CHANNEL_TABS`의 SIGNAGE=`Smartphone` 자체를 바꾸는 것은 **본 WO 범위 밖**(탭 변경 금지). 가이드 블록과 탭의 SIGNAGE 아이콘 불일치가 부담되면, 별도 후속 WO로 `CHANNEL_TABS` SIGNAGE 정정 제안만 CHECK 문서에 남긴다.
+> **SIGNAGE 결정 (2026-06-04 확정):**
+> - **Channels 가이드 블록 SIGNAGE → `Tv`** — 가이드 문맥(화면/TV에 콘텐츠 표시)에서 의미가 가장 명확. (코드 착수 시 재논의 없이 이대로 적용.)
+> - **Store Hub 디지털 사이니지 → `MonitorPlay`** — 기준 문서 §5 표준 유지(§5.1 그대로).
+> - **`CHANNEL_TABS`의 SIGNAGE=`Smartphone`은 본 WO 범위 밖** — 탭 변경 금지. 이 불일치는 건드리지 않고, 별도 후속 WO로 `CHANNEL_TABS` SIGNAGE 정정 제안만 CHECK 문서 §9에 기록한다.
+>
+> 결과적으로 사이니지 아이콘은 표면별로 의도적으로 다르다: **Store Hub=`MonitorPlay`(자원 탐색 카드) / Channels 가이드=`Tv`(채널 선택)**. 둘 다 lucide line icon이며 emoji가 아니라는 점이 핵심이다.
 
 **렌더 변경:** 가이드 블록은 현재 `<span className="text-lg">{item.icon}</span>`로 emoji를 렌더한다. → `icon`을 lucide 컴포넌트 참조로 바꾸고 `<Icon size={20} />` 형태로 렌더. active(선택) 상태 색상(`text-blue-700`)과 일관되게 처리.
 
