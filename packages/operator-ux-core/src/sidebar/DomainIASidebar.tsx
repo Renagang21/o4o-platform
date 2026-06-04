@@ -19,7 +19,7 @@
 
 import { useState, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronRight, Menu, X } from 'lucide-react';
 import {
   STANDARD_GROUPS,
   type OperatorGroupKey,
@@ -155,19 +155,105 @@ export function DomainIASidebar({
     });
   };
 
-  // ── Mobile: flat tab list (top-pinned 우선 + 도메인 순서로 그룹 정렬, 헤딩 생략) ──
-  const flatGroupsForMobile = useMemo(
-    () => [...resolvedTopGroups, ...resolvedDomains.flatMap((d) => d.groups)],
-    [resolvedTopGroups, resolvedDomains],
-  );
+  // ── Mobile drawer open state ──
+  // WO-O4O-OPERATOR-MOBILE-NAV-DRAWER-V1: 모바일 가로 스크롤 탭 → 햄버거 drawer.
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const closeMobile = () => setMobileOpen(false);
 
-  return (
+  // ── Shared nav content ──
+  // 데스크톱 <aside> 와 모바일 drawer 가 동일 트리를 재사용 (도메인 헤딩 + 그룹 collapsible
+  // + 하위 항목 전체). onNavigate: 모바일 drawer 에서 항목 클릭 시 drawer 닫기 (desktop 미전달).
+  const renderNav = (onNavigate?: () => void) => (
     <>
-      {/* ── Desktop Sidebar ── */}
-      <aside className="w-60 flex-shrink-0 hidden md:block">
-        <nav className={`bg-white rounded-xl border border-gray-200 overflow-hidden sticky ${sidebarTopOffset}`}>
-          {/* Top-pinned (대시보드) — 도메인 헤딩 외부, 최상단 고정 */}
-          {resolvedTopGroups.map((group) => {
+      {/* Top-pinned (대시보드) — 도메인 헤딩 외부, 최상단 고정 */}
+      {resolvedTopGroups.map((group) => {
+        const Icon = group.icon;
+        const active = isGroupActive(group);
+        const isOpen = openGroups.has(group.key);
+        const isSingle = group.items.length === 1;
+
+        if (isSingle) {
+          const item = group.items[0];
+          const itemActive = isItemActive(item.path, item.exact);
+          return (
+            <Link
+              key={group.key}
+              to={item.path}
+              onClick={onNavigate}
+              className={`flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors border-l-2 ${
+                itemActive
+                  ? 'bg-blue-50 text-blue-600 border-blue-600'
+                  : 'text-gray-600 border-transparent hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <Icon size={18} />
+              {item.label}
+            </Link>
+          );
+        }
+
+        return (
+          <div key={group.key}>
+            <button
+              type="button"
+              onClick={() => toggleGroup(group.key)}
+              className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors border-l-2 ${
+                active
+                  ? 'text-blue-600 border-blue-600'
+                  : 'text-gray-600 border-transparent hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <Icon size={18} />
+              <span className="flex-1 text-left">{group.label}</span>
+              {isOpen ? (
+                <ChevronDown className="w-4 h-4 text-gray-400" />
+              ) : (
+                <ChevronRight className="w-4 h-4 text-gray-400" />
+              )}
+            </button>
+            {isOpen && (
+              <div className="pb-1">
+                {group.items.map((item) => {
+                  const itemActive = isItemActive(item.path, item.exact);
+                  return (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      onClick={onNavigate}
+                      className={`block pl-11 pr-4 py-2 text-sm transition-colors ${
+                        itemActive
+                          ? 'text-blue-600 bg-blue-50 font-medium'
+                          : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                      }`}
+                    >
+                      {item.label}
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })}
+
+      {resolvedDomains.map((domain, domainIdx) => (
+        <div key={domain.key}>
+          {/* Domain heading — top-pinned 존재 여부와 관계 없이 첫 도메인부터 separator */}
+          <div
+            className={`px-4 py-2 ${
+              domainIdx > 0 || resolvedTopGroups.length > 0
+                ? 'border-t border-gray-100'
+                : ''
+            } bg-gray-50/60`}
+          >
+            <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-gray-500">
+              <span aria-hidden>{domain.emoji}</span>
+              <span>{domain.label}</span>
+            </div>
+          </div>
+
+          {/* Groups inside domain */}
+          {domain.groups.map((group) => {
             const Icon = group.icon;
             const active = isGroupActive(group);
             const isOpen = openGroups.has(group.key);
@@ -180,6 +266,7 @@ export function DomainIASidebar({
                 <Link
                   key={group.key}
                   to={item.path}
+                  onClick={onNavigate}
                   className={`flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors border-l-2 ${
                     itemActive
                       ? 'bg-blue-50 text-blue-600 border-blue-600'
@@ -211,6 +298,7 @@ export function DomainIASidebar({
                     <ChevronRight className="w-4 h-4 text-gray-400" />
                   )}
                 </button>
+
                 {isOpen && (
                   <div className="pb-1">
                     {group.items.map((item) => {
@@ -219,6 +307,7 @@ export function DomainIASidebar({
                         <Link
                           key={item.path}
                           to={item.path}
+                          onClick={onNavigate}
                           className={`block pl-11 pr-4 py-2 text-sm transition-colors ${
                             itemActive
                               ? 'text-blue-600 bg-blue-50 font-medium'
@@ -234,121 +323,67 @@ export function DomainIASidebar({
               </div>
             );
           })}
+        </div>
+      ))}
+    </>
+  );
 
-          {resolvedDomains.map((domain, domainIdx) => (
-            <div key={domain.key}>
-              {/* Domain heading — top-pinned 존재 여부와 관계 없이 첫 도메인부터 separator */}
-              <div
-                className={`px-4 py-2 ${
-                  domainIdx > 0 || resolvedTopGroups.length > 0
-                    ? 'border-t border-gray-100'
-                    : ''
-                } bg-gray-50/60`}
-              >
-                <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-gray-500">
-                  <span aria-hidden>{domain.emoji}</span>
-                  <span>{domain.label}</span>
-                </div>
-              </div>
-
-              {/* Groups inside domain */}
-              {domain.groups.map((group) => {
-                const Icon = group.icon;
-                const active = isGroupActive(group);
-                const isOpen = openGroups.has(group.key);
-                const isSingle = group.items.length === 1;
-
-                if (isSingle) {
-                  const item = group.items[0];
-                  const itemActive = isItemActive(item.path, item.exact);
-                  return (
-                    <Link
-                      key={group.key}
-                      to={item.path}
-                      className={`flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors border-l-2 ${
-                        itemActive
-                          ? 'bg-blue-50 text-blue-600 border-blue-600'
-                          : 'text-gray-600 border-transparent hover:bg-gray-50 hover:text-gray-900'
-                      }`}
-                    >
-                      <Icon size={18} />
-                      {item.label}
-                    </Link>
-                  );
-                }
-
-                return (
-                  <div key={group.key}>
-                    <button
-                      type="button"
-                      onClick={() => toggleGroup(group.key)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors border-l-2 ${
-                        active
-                          ? 'text-blue-600 border-blue-600'
-                          : 'text-gray-600 border-transparent hover:bg-gray-50 hover:text-gray-900'
-                      }`}
-                    >
-                      <Icon size={18} />
-                      <span className="flex-1 text-left">{group.label}</span>
-                      {isOpen ? (
-                        <ChevronDown className="w-4 h-4 text-gray-400" />
-                      ) : (
-                        <ChevronRight className="w-4 h-4 text-gray-400" />
-                      )}
-                    </button>
-
-                    {isOpen && (
-                      <div className="pb-1">
-                        {group.items.map((item) => {
-                          const itemActive = isItemActive(item.path, item.exact);
-                          return (
-                            <Link
-                              key={item.path}
-                              to={item.path}
-                              className={`block pl-11 pr-4 py-2 text-sm transition-colors ${
-                                itemActive
-                                  ? 'text-blue-600 bg-blue-50 font-medium'
-                                  : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
-                              }`}
-                            >
-                              {item.label}
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          ))}
+  return (
+    <>
+      {/* ── Desktop Sidebar (md 이상) ── */}
+      <aside className="w-60 flex-shrink-0 hidden md:block">
+        <nav className={`bg-white rounded-xl border border-gray-200 overflow-hidden sticky ${sidebarTopOffset}`}>
+          {renderNav()}
         </nav>
       </aside>
 
-      {/* ── Mobile Navigation (horizontal tabs, no domain heading) ── */}
-      <div className="md:hidden w-full mb-4">
-        <nav className="flex gap-1 overflow-x-auto bg-white rounded-xl border border-gray-200 p-1">
-          {flatGroupsForMobile.map((group) => {
-            const Icon = group.icon;
-            const active = isGroupActive(group);
-            const firstPath = group.items[0].path;
-            return (
-              <Link
-                key={group.key}
-                to={firstPath}
-                className={`flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg whitespace-nowrap transition-colors ${
-                  active
-                    ? 'bg-blue-50 text-blue-600'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                <Icon size={14} />
-                {group.label}
-              </Link>
-            );
-          })}
-        </nav>
+      {/* ── Mobile: 햄버거 토글 바 (md 미만) ── */}
+      <div className="md:hidden mb-4">
+        <button
+          type="button"
+          onClick={() => setMobileOpen(true)}
+          aria-label="운영자 메뉴 열기"
+          aria-expanded={mobileOpen}
+          aria-controls="operator-mobile-drawer"
+          className="w-full flex items-center gap-2 px-4 py-3 bg-white rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+        >
+          <Menu className="w-5 h-5" />
+          운영자 메뉴
+        </button>
       </div>
+
+      {/* ── Mobile: backdrop ── */}
+      {mobileOpen && (
+        <div
+          className="md:hidden fixed inset-0 z-40 bg-black/40"
+          onClick={closeMobile}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* ── Mobile: slide-in drawer (데스크톱과 동일 IA 재사용) ── */}
+      <aside
+        id="operator-mobile-drawer"
+        className={`md:hidden fixed left-0 top-0 bottom-0 z-50 w-72 max-w-[85%] bg-white shadow-xl flex flex-col transition-transform duration-200 ease-out ${
+          mobileOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+        aria-hidden={!mobileOpen}
+      >
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 flex-shrink-0">
+          <span className="text-sm font-semibold text-gray-700">운영자 메뉴</span>
+          <button
+            type="button"
+            onClick={closeMobile}
+            aria-label="메뉴 닫기"
+            className="p-1 text-gray-400 hover:text-gray-700 transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        <nav className="flex-1 overflow-y-auto">
+          {renderNav(closeMobile)}
+        </nav>
+      </aside>
     </>
   );
 }

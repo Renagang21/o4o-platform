@@ -60,7 +60,8 @@ export function OperatorAreaShell({
     <div className="min-h-screen flex flex-col bg-gray-50">
       {header}
       <div className="flex-1 max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="flex gap-6">
+        {/* WO-O4O-OPERATOR-MOBILE-NAV-DRAWER-V1: mobile column(토글 바 위 → 본문) / desktop row */}
+        <div className="flex flex-col md:flex-row md:gap-6">
           <DomainIASidebar
             menuItems={menuItems}
             capabilities={capabilities}
