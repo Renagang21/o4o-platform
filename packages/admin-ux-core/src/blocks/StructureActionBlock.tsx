@@ -6,6 +6,7 @@
  */
 
 import type { StructureAction } from '../types';
+import { ActionIcon } from './ActionIcon';
 
 export function StructureActionBlock({ items }: { items: StructureAction[] }) {
   if (items.length === 0) return null;
@@ -20,7 +21,7 @@ export function StructureActionBlock({ items }: { items: StructureAction[] }) {
             href={item.link}
             className="flex items-center gap-3 bg-white border border-slate-200 rounded-2xl px-4 py-3 hover:bg-slate-50 hover:border-slate-300 transition-colors"
           >
-            {item.icon && <span className="text-lg">{item.icon}</span>}
+            <ActionIcon icon={item.icon} />
             <div className="min-w-0">
               <span className="text-sm font-medium text-slate-700 block">{item.label}</span>
               {item.description && (
