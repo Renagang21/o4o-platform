@@ -32,6 +32,9 @@ import {
   BadgePercent,
   Home,
   ScrollText,
+  BarChart3,
+  Building2,
+  Settings,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -53,6 +56,10 @@ const ICON_NAME_MAP: Record<string, LucideIcon> = {
   'badge-percent': BadgePercent,
   home: Home,
   'scroll-text': ScrollText,
+  // WO-O4O-ADMIN-QUICKACTION-FRONTEND-CONVERGE-V1 (Phase C): KPA/GP admin 8 emoji 정렬용
+  'bar-chart-3': BarChart3,
+  'building-2': Building2,
+  settings: Settings,
 };
 
 // ASCII 영문/숫자/하이픈만 = lucide-name 후보

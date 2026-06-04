@@ -31,9 +31,11 @@ import { operatorApi, type DistrictOperatorSummary } from '../../api/operator';
 
 // ─── Structure Actions (빠른 이동 — Block D) ───────────────────────────────
 
+// WO-O4O-ADMIN-QUICKACTION-FRONTEND-CONVERGE-V1 (Phase C):
+//   admin Structure Actions emoji → lucide-name 정렬. ActionIcon vocabulary 19종 안.
 const STRUCTURE_ACTIONS: StructureAction[] = [
-  { id: 'members', label: '회원 관리', link: '/operator/members', icon: '👤', description: '가입 신청 승인·반려·정지 처리' },
-  { id: 'operator', label: '운영 대시보드', link: '/operator', icon: '📊', description: 'operator 공간에서 운영 현황 확인' },
+  { id: 'members', label: '회원 관리', link: '/operator/members', icon: 'users', description: '가입 신청 승인·반려·정지 처리' },
+  { id: 'operator', label: '운영 대시보드', link: '/operator', icon: 'bar-chart-3', description: 'operator 공간에서 운영 현황 확인' },
 ];
 
 // ─── 날짜 포맷 ──────────────────────────────────────────────────────────────

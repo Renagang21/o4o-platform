@@ -118,13 +118,15 @@ function buildAdminPolicies(data: OperatorDashboardConfig): PolicyItem[] {
 
 // ─── Admin Quick Actions ─────────────────────────────────────
 
+// WO-O4O-ADMIN-QUICKACTION-FRONTEND-CONVERGE-V1 (Phase C):
+//   admin Structure Actions emoji → lucide-name 정렬. ActionIcon vocabulary 19종 안.
 const ADMIN_QUICK_ACTIONS: StructureAction[] = [
-  { id: 'users', label: '회원 관리', link: '/admin/members', icon: '👤', description: '회원 조회·탈퇴·완전삭제 관리' },
-  { id: 'pharmacies', label: '약국 네트워크', link: '/admin/pharmacies', icon: '🏥', description: '약국 승인·네트워크 관리' },
-  { id: 'settlements', label: '정산 관리', link: '/admin/settlements', icon: '💰', description: '정산 처리·내역 조회' },
-  { id: 'invoices', label: '인보이스', link: '/admin/invoices', icon: '📄', description: '인보이스 발행·관리' },
-  { id: 'roles', label: '역할 관리', link: '/admin/roles', icon: '🛡️', description: '역할·권한 구조 관리' },
-  { id: 'settings', label: '설정', link: '/admin/settings', icon: '⚙️', description: '시스템 설정' },
+  { id: 'users', label: '회원 관리', link: '/admin/members', icon: 'users', description: '회원 조회·탈퇴·완전삭제 관리' },
+  { id: 'pharmacies', label: '약국 네트워크', link: '/admin/pharmacies', icon: 'building-2', description: '약국 승인·네트워크 관리' },
+  { id: 'settlements', label: '정산 관리', link: '/admin/settlements', icon: 'dollar-sign', description: '정산 처리·내역 조회' },
+  { id: 'invoices', label: '인보이스', link: '/admin/invoices', icon: 'file-text', description: '인보이스 발행·관리' },
+  { id: 'roles', label: '역할 관리', link: '/admin/roles', icon: 'shield', description: '역할·권한 구조 관리' },
+  { id: 'settings', label: '설정', link: '/admin/settings', icon: 'settings', description: '시스템 설정' },
 ];
 
 // ─── Phase 2: Business Block Definitions ─────────────────────
