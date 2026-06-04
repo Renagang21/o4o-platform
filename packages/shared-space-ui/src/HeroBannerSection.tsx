@@ -261,69 +261,70 @@ const styles: Record<string, CSSProperties> = {
     margin: 0,
   },
 
-  // ─── WO-KPA-HOME-HERO-COLOR-COMPOSITION-REFINE-V2 (decorated fallback) ───
-  // 외부 band: 끝까지 유지되는 soft blue. 하단만 살짝 연해져 콘텐츠와 연결.
-  // (V1 은 중앙이 white 로 fade → white card 대비 소실. V2 는 blue 유지.)
+  // ─── WO-KPA-HOME-HERO-COLOR-COMPOSITION-REFINE-V3 (decorated fallback) ───
+  // V3: white 중심 + 절제된 blue 포인트로 재정비. (V2 는 band·accent 의 blue 가
+  // 넓고 강해 전체가 한 덩어리 파란 배경처럼 무거웠음.)
+  // 외부 band: 거의 white 에 가까운 cool 톤 → 하단을 white 로 fade 해 콘텐츠와 연결.
   decoratedBand: {
     borderRadius: 24,
-    padding: 'clamp(20px, 4vw, 40px)',
-    background: 'linear-gradient(180deg, #dbeafe 0%, #e6f0ff 55%, #f4f9ff 100%)',
+    padding: 'clamp(14px, 2.5vw, 26px)',
+    background: 'linear-gradient(180deg, #f6faff 0%, #ffffff 52%, #f8fbff 100%)',
     marginBottom: 0,
   },
-  // 내부 card: 또렷한 white + 가시적 blue border + 뚜렷한 soft shadow → 떠 있는 느낌.
-  // minHeight + flex 중앙정렬로 "대표 섹션" 밀도감 확보.
+  // 내부 card: white 중심 + 아주 연한 border + 중립(neutral) soft shadow.
+  // (V2 의 진한 blue shadow 가 band 와 겹쳐 무거웠음 → slate 계열 shadow 로 정리.)
   decoratedCard: {
     position: 'relative',
     overflow: 'hidden',
     borderRadius: 24,
-    minHeight: 'clamp(260px, 32vw, 340px)',
-    padding: 'clamp(40px, 7vw, 72px) clamp(22px, 5vw, 48px)',
+    minHeight: 'clamp(240px, 27vw, 300px)',
+    padding: 'clamp(36px, 6vw, 60px) clamp(22px, 5vw, 44px)',
     display: 'flex',
     flexDirection: 'column' as const,
     alignItems: 'center',
     justifyContent: 'center',
     background: '#ffffff',
-    border: '1px solid #c7dbf8',
+    border: '1px solid #e7edf6',
     boxShadow:
-      '0 24px 50px -22px rgba(37,99,235,0.38), 0 8px 18px -10px rgba(37,99,235,0.20)',
+      '0 18px 44px -26px rgba(15,23,42,0.22), 0 4px 12px -8px rgba(15,23,42,0.08)',
     textAlign: 'center' as const,
   },
-  // 우측 큰 pale-blue circle (뚜렷하게 보이도록 강화).
+  // 우측 pale-blue circle — 절제된 포인트 (크기·강도 축소).
   accentCircle: {
     position: 'absolute',
-    top: -110,
-    right: -90,
-    width: 340,
-    height: 340,
+    top: -90,
+    right: -70,
+    width: 240,
+    height: 240,
     pointerEvents: 'none',
     background:
-      'radial-gradient(circle, rgba(96,165,250,0.50) 0%, rgba(96,165,250,0.16) 45%, rgba(96,165,250,0) 72%)',
+      'radial-gradient(circle, rgba(96,165,250,0.18) 0%, rgba(96,165,250,0.05) 48%, rgba(96,165,250,0) 72%)',
     zIndex: 0,
   },
-  // 좌하단 soft wave/blob gradient (강화).
+  // 좌하단 soft wave — card 하단에 아주 약하게만.
   accentWave: {
     position: 'absolute',
-    bottom: -90,
-    left: -70,
-    width: 360,
-    height: 300,
+    bottom: -80,
+    left: -60,
+    width: 280,
+    height: 220,
     pointerEvents: 'none',
     background:
-      'radial-gradient(ellipse at bottom left, rgba(59,130,246,0.34) 0%, rgba(59,130,246,0.12) 50%, rgba(59,130,246,0) 72%)',
+      'radial-gradient(ellipse at bottom left, rgba(99,102,241,0.10) 0%, rgba(99,102,241,0.03) 52%, rgba(99,102,241,0) 72%)',
     zIndex: 0,
   },
-  // 우상단 dot pattern (작은 blue dots).
+  // 좌상단 dot pattern — 은은하게 (강조 아님).
   accentDots: {
     position: 'absolute',
     top: 26,
     left: 30,
-    width: 104,
-    height: 80,
+    width: 96,
+    height: 72,
     pointerEvents: 'none',
     backgroundImage:
-      'radial-gradient(circle, rgba(37,99,235,0.32) 1.6px, transparent 1.7px)',
+      'radial-gradient(circle, rgba(37,99,235,0.20) 1.5px, transparent 1.6px)',
     backgroundSize: '15px 15px',
-    opacity: 0.65,
+    opacity: 0.5,
     zIndex: 0,
   },
   decoratedContent: {
