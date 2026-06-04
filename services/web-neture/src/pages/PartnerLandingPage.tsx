@@ -70,12 +70,14 @@ const activityFlow = [
   { icon: Wallet, label: '파트너 수익', desc: '커미션 정산' },
 ];
 
-/* ── 파트너 활동 예시 ── */
+/* ── 파트너 활동 예시 ──
+ * WO-O4O-NETURE-HOME-ROLE-MARKET-TRIAL-ICON-ALIGNMENT-V1:
+ * emoji 렌더 제거 → 이미 정의된 lucide(Star/Share2/QrCode/ImageIcon) 실제 렌더. */
 const activityExamples = [
-  { emoji: '⭐', icon: Star, name: '제품 리뷰', desc: '제품 사용 후기를 작성하여 공유' },
-  { emoji: '📢', icon: Share2, name: 'SNS 홍보', desc: 'SNS 채널을 통해 제품 홍보' },
-  { emoji: '📱', icon: QrCode, name: 'QR 홍보', desc: 'QR 코드를 활용한 오프라인 홍보' },
-  { emoji: '🖼️', icon: ImageIcon, name: '매장 콘텐츠 공유', desc: '매장에서 사용할 콘텐츠 공유' },
+  { icon: Star, name: '제품 리뷰', desc: '제품 사용 후기를 작성하여 공유' },
+  { icon: Share2, name: 'SNS 홍보', desc: 'SNS 채널을 통해 제품 홍보' },
+  { icon: QrCode, name: 'QR 홍보', desc: 'QR 코드를 활용한 오프라인 홍보' },
+  { icon: ImageIcon, name: '매장 콘텐츠 공유', desc: '매장에서 사용할 콘텐츠 공유' },
 ];
 
 /* ── 참여 절차 ── */
@@ -245,7 +247,7 @@ export default function PartnerLandingPage() {
                 key={ex.name}
                 className="bg-white rounded-xl border border-gray-200 p-6 text-center hover:border-emerald-200 transition-colors"
               >
-                <span className="text-3xl mb-3 block">{ex.emoji}</span>
+                <span className="mb-3 flex justify-center"><ex.icon size={28} className="text-emerald-600" /></span>
                 <span className="text-sm font-semibold text-gray-900 block mb-1">{ex.name}</span>
                 <span className="text-xs text-gray-500">{ex.desc}</span>
               </div>

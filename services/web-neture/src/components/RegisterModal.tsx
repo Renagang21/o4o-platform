@@ -12,7 +12,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { X, Eye, EyeOff, CheckCircle, ArrowLeft } from 'lucide-react';
+import { X, Eye, EyeOff, CheckCircle, ArrowLeft, Store, Factory, Handshake, type LucideIcon } from 'lucide-react';
 import { BusinessRegistrationFields } from '@o4o/account-ui';
 import { useLoginModal } from '../contexts';
 import { api } from '../lib/apiClient';
@@ -34,24 +34,25 @@ function formatBusinessNumber(digits: string): string {
 
 // WO-O4O-NETURE-REGISTRATION-ROLE-SMOKING-GUN-FIX-V1:
 // 'user' (일반 이용자) 옵션 제거 — Neture 신청 역할은 공급자/파트너/매장 경영자만 노출.
-const roleOptions: Array<{ role: SignupRole; label: string; description: string; emoji: string }> = [
+// WO-O4O-NETURE-HOME-ROLE-MARKET-TRIAL-ICON-ALIGNMENT-V1: 역할 emoji → lucide
+const roleOptions: Array<{ role: SignupRole; label: string; description: string; Icon: LucideIcon }> = [
   {
     role: 'store_owner',
     label: '매장 경영자',
     description: '매장을 운영하는 경영자',
-    emoji: '🏪',
+    Icon: Store,
   },
   {
     role: 'supplier',
     label: '공급자',
     description: '제품을 공급하는 공급사·제조사',
-    emoji: '🏭',
+    Icon: Factory,
   },
   {
     role: 'partner',
     label: '파트너',
     description: '마케팅·협업으로 참여하는 파트너',
-    emoji: '🤝',
+    Icon: Handshake,
   },
 ];
 
@@ -525,7 +526,12 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                           : 'border-gray-200 hover:border-green-400 hover:shadow-sm'
                       }`}
                     >
-                      <span className="text-3xl block mb-2">{option.emoji}</span>
+                      <span className="mb-2 flex justify-center">
+                        <option.Icon
+                          size={28}
+                          className={selectedRole === option.role ? 'text-green-600' : 'text-gray-500'}
+                        />
+                      </span>
                       <h4
                         className={`text-sm font-semibold mb-1 ${
                           selectedRole === option.role

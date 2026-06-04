@@ -66,12 +66,14 @@ const flowSteps = [
   { icon: Users, label: 'Customer', desc: '고객' },
 ];
 
-/* ── 공급 가능한 제품 ── */
+/* ── 공급 가능한 제품 ──
+ * WO-O4O-NETURE-HOME-ROLE-MARKET-TRIAL-ICON-ALIGNMENT-V1:
+ * 카테고리 emoji 제거 → 중립 lucide(Package). 의미 과적합(Pill/Stethoscope) 회피, 라벨 중심. */
 const productCategories = [
-  { emoji: '💊', name: '건강기능식품' },
-  { emoji: '🩺', name: '의료기기' },
-  { emoji: '🧴', name: '화장품' },
-  { emoji: '🏠', name: '생활용품' },
+  { Icon: Package, name: '건강기능식품' },
+  { Icon: Package, name: '의료기기' },
+  { Icon: Package, name: '화장품' },
+  { Icon: Package, name: '생활용품' },
 ];
 
 /* ── 가입 절차 ── */
@@ -206,7 +208,7 @@ export default function SupplierLandingPage() {
                 key={cat.name}
                 className="bg-gray-50 rounded-xl border border-gray-200 p-6 text-center hover:border-blue-200 transition-colors"
               >
-                <span className="text-3xl mb-3 block">{cat.emoji}</span>
+                <span className="mb-3 flex justify-center"><cat.Icon size={28} className="text-blue-600" /></span>
                 <span className="text-sm font-semibold text-gray-900">{cat.name}</span>
               </div>
             ))}

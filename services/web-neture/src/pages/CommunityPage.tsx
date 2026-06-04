@@ -16,7 +16,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Loader2, Layers, Users, TrendingUp } from 'lucide-react';
+import { Loader2, Layers, Users, TrendingUp, FlaskConical } from 'lucide-react';
 import { useTemplate } from '@o4o/ui';
 import {
   StandardHomeTemplate,
@@ -206,7 +206,8 @@ export default function CommunityPage() {
           'Neture가 운영하는 참여형 프로그램입니다. 공급자·운영자·매장이 함께 신제품 유통 가능성을 검증합니다',
         href: '/market-trial',
         linkLabel: 'Market Trial 보기 →',
-        icon: <span>🧪</span>,
+        // WO-O4O-NETURE-HOME-ROLE-MARKET-TRIAL-ICON-ALIGNMENT-V1: emoji → lucide FlaskConical (Market Trial 표준)
+        icon: <FlaskConical size={28} className="text-primary" />,
         accentColor: 'var(--color-primary)',
         accentBg: 'var(--color-primary-light, #eff6ff)',
         external: false,
