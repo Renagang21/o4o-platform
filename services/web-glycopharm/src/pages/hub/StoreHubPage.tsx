@@ -10,9 +10,16 @@
 
 import { StoreHubTemplate, type StoreHubConfig } from '@o4o/shared-space-ui';
 import { glycopharmConfig } from '@o4o/operator-ux-core';
+import { PackageSearch, MonitorPlay, Files, BadgePercent, Store } from 'lucide-react';
 import { GuideEditableSection } from '../../components/guide';
 
 const { terminology, uiText } = glycopharmConfig;
+
+// WO-O4O-GLYCOPHARM-STORE-HUB-CHANNEL-ICON-ALIGNMENT-V1 (Phase 2):
+// O4O-GLOBAL-ICON-SYSTEM-STANDARD-V1 — emoji 제거, lucide line icon 통일 (GlycoPharm blue tone)
+const ICON_COLOR = '#2563EB'; // StoreHubTemplate accent 정합 (GlycoPharm 미오버라이드 → 화면 accent 동일)
+const CARD_ICON_SIZE = 22;
+const CTA_ICON_SIZE = 28;
 
 // WO-O4O-SERVICE-INLINE-EDIT-PORT-GK-V1: 서비스 페이지 설명 영역 인라인 편집
 const PAGE_KEY = 'store-hub';
@@ -39,28 +46,28 @@ const glycoStoreHubConfig: StoreHubConfig = {
   resourceSectionDesc: editable('resource-section-description', `플랫폼 자원을 탐색하고 ${terminology.myStoreLabel}으로 가져가세요`),
   resourceCards: [
     {
-      icon: '🛒',
+      icon: <PackageSearch size={CARD_ICON_SIZE} color={ICON_COLOR} />,
       title: 'B2B 상품 카탈로그',
       desc: '공급사 상품을 탐색하고 약국 취급을 신청합니다',
       href: '/store-hub/b2b',
       actionLabel: '상품 탐색',
     },
     {
-      icon: '🖥️',
+      icon: <MonitorPlay size={CARD_ICON_SIZE} color={ICON_COLOR} />,
       title: '디지털 사이니지',
       desc: '혈당관리 관련 사이니지 미디어를 탐색해 매장에 추가합니다',
       href: '/store-hub/signage',
       actionLabel: '사이니지 탐색',
     },
     {
-      icon: '📄',
+      icon: <Files size={CARD_ICON_SIZE} color={ICON_COLOR} />,
       title: '콘텐츠/자료',
       desc: '플랫폼 콘텐츠를 탐색하고 내 매장에 복사합니다',
       href: '/store-hub/content',
       actionLabel: '콘텐츠 탐색',
     },
     {
-      icon: '🛍️',
+      icon: <BadgePercent size={CARD_ICON_SIZE} color={ICON_COLOR} />,
       title: '이벤트/특가',
       desc: 'GlycoPharm 이벤트 상품을 확인하고 신청합니다',
       href: '/store-hub/event-offers',
@@ -80,7 +87,7 @@ const glycoStoreHubConfig: StoreHubConfig = {
   },
 
   storeCtaBlock: {
-    icon: '🏥',
+    icon: <Store size={CTA_ICON_SIZE} color={ICON_COLOR} />,
     title: `${terminology.myStoreLabel}으로 이동`,
     desc: `탐색한 상품·콘텐츠·사이니지의 실제 설정과 운영은 ${terminology.myStoreLabel}에서 합니다`,
     buttonLabel: `${terminology.myStoreLabel} 관리 →`,
