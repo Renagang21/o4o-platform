@@ -26,7 +26,7 @@
 
 import { useEffect, useState, useCallback, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Layers, Trash2, RefreshCw, FileEdit, Plus } from 'lucide-react';
+import { Layers, Trash2, RefreshCw, FileEdit, Plus, Megaphone, QrCode, PenLine, MonitorPlay, ChevronDown } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { AiContentModal } from '@o4o/content-editor';
 import { directContentApi } from '../../api/assetSnapshot';
@@ -92,6 +92,47 @@ function fromLabel(f?: string) {
   return f ? (FROM_LABELS[f] ?? '직접 작성') : '직접 작성';
 }
 
+// ─── WO-KPA-STORE-CONTENT-LIBRARY-CROSS-CREATE-CTA-V1 ─────────────────────────
+// 제작 자료를 기반으로 POP·QR·블로그·사이니지 제작 화면으로 바로 이동(교차 진입).
+// 기존 제작 화면(route)만 재사용 — 신규 API/DB 없음. (IR Phase 1)
+const CROSS_CREATE: { key: string; label: string; icon: typeof Megaphone; to: string }[] = [
+  { key: 'pop',     label: 'POP 만들기',      icon: Megaphone,   to: '/store/marketing/pop' },
+  { key: 'qr',      label: 'QR-code 만들기',  icon: QrCode,      to: '/store/marketing/qr' },
+  { key: 'blog',    label: '블로그 글쓰기',    icon: PenLine,     to: '/store/content/blog' },
+  { key: 'signage', label: '사이니지에 추가',  icon: MonitorPlay, to: '/store/marketing/signage/playlist' },
+];
+
+function RowUseMenu({ onPick }: { onPick: (to: string) => void }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ position: 'relative' }}>
+      <button type="button" onClick={() => setOpen((v) => !v)} style={styles.useBtn}>
+        활용하기 <ChevronDown size={13} />
+      </button>
+      {open && (
+        <>
+          <div style={styles.menuBackdrop} onClick={() => setOpen(false)} />
+          <div style={styles.menu}>
+            {CROSS_CREATE.map((c) => {
+              const Icon = c.icon;
+              return (
+                <button
+                  key={c.key}
+                  type="button"
+                  style={styles.menuItem}
+                  onClick={() => { setOpen(false); onPick(c.to); }}
+                >
+                  <Icon size={14} /> {c.label}
+                </button>
+              );
+            })}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 // ─── 컴포넌트 ─────────────────────────────────────────────────────────────────
 
 export default function StoreProductionMaterialsPage() {
@@ -114,6 +155,17 @@ export default function StoreProductionMaterialsPage() {
   >(null);
 
   const openSelectModal = useCallback(() => setSelectModalOpen(true), []);
+
+  // WO-KPA-STORE-CONTENT-LIBRARY-CROSS-CREATE-CTA-V1:
+  // 제작 자료를 source 로 전달하며 제작 화면으로 이동. 대상 화면이 state 를 읽지 않아도 안전(무시됨).
+  const goCreate = useCallback(
+    (to: string, item: ProductionMaterialItem) => {
+      navigate(to, {
+        state: { source: { kind: 'production-material', itemId: item.id, title: item.title, purpose: item.purpose } },
+      });
+    },
+    [navigate],
+  );
 
   const handleSelectConfirm = useCallback((selectedItems: ProductionSourceItem[]) => {
     if (selectedItems.length === 0) return;
@@ -296,6 +348,12 @@ export default function StoreProductionMaterialsPage() {
         </div>
       </div>
 
+      {/* WO-KPA-STORE-CONTENT-LIBRARY-CROSS-CREATE-CTA-V1: 재사용 안내 */}
+      <div style={styles.infoBox}>
+        저장된 제작 자료는 보관용이 아니라 <strong>POP · QR-code · 블로그 · 사이니지</strong> 제작에 다시 활용할 수 있는 원본입니다.
+        각 항목의 <strong>활용하기</strong>에서 바로 시작하세요.
+      </div>
+
       {/* Batch toolbar */}
       {!loading && !error && items.length > 0 && selected.size > 0 && (
         <div style={styles.toolbar}>
@@ -361,6 +419,7 @@ export default function StoreProductionMaterialsPage() {
             <div style={{ ...styles.col, width: 80 }}>상태</div>
             <div style={{ ...styles.col, width: 100 }}>생성 출처</div>
             <div style={{ ...styles.col, width: 100 }}>최근 수정일</div>
+            <div style={{ ...styles.col, width: 116 }}>활용</div>
             <div style={{ ...styles.col, width: 44 }} />
           </div>
 
@@ -404,6 +463,9 @@ export default function StoreProductionMaterialsPage() {
                   <span style={styles.metaText}>
                     {item.updatedAt ? new Date(item.updatedAt).toLocaleDateString('ko-KR') : '-'}
                   </span>
+                </div>
+                <div style={{ ...styles.col, width: 116 }}>
+                  <RowUseMenu onPick={(to) => goCreate(to, item)} />
                 </div>
                 <div style={{ ...styles.col, width: 44 }}>
                   <button
@@ -520,6 +582,61 @@ const styles: Record<string, CSSProperties> = {
     fontSize: '13px',
     color: colors.neutral700,
     cursor: 'pointer',
+  },
+  infoBox: {
+    padding: '10px 14px',
+    background: '#EFF6FF',
+    border: '1px solid #DBEAFE',
+    borderRadius: '8px',
+    fontSize: '13px',
+    color: colors.neutral600,
+    lineHeight: 1.6,
+    marginBottom: '12px',
+  },
+  useBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '4px',
+    padding: '5px 10px',
+    background: colors.white,
+    border: `1px solid ${colors.neutral300}`,
+    borderRadius: '6px',
+    fontSize: '12px',
+    fontWeight: 500,
+    color: colors.neutral700,
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+  },
+  menuBackdrop: {
+    position: 'fixed',
+    inset: 0,
+    zIndex: 40,
+  },
+  menu: {
+    position: 'absolute',
+    top: 'calc(100% + 4px)',
+    right: 0,
+    zIndex: 41,
+    minWidth: '168px',
+    padding: '4px',
+    background: colors.white,
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: '8px',
+    boxShadow: '0 8px 24px -8px rgba(15,23,42,0.18)',
+  },
+  menuItem: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    width: '100%',
+    padding: '8px 10px',
+    background: 'transparent',
+    border: 'none',
+    borderRadius: '6px',
+    fontSize: '13px',
+    color: colors.neutral700,
+    cursor: 'pointer',
+    textAlign: 'left',
   },
   toolbar: {
     display: 'flex',

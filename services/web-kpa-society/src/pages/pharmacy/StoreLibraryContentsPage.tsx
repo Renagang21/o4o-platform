@@ -22,7 +22,7 @@
 
 import { useState, useCallback, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, RefreshCw, PenSquare } from 'lucide-react';
+import { BookOpen, RefreshCw, PenSquare, Megaphone, QrCode, PenLine, MonitorPlay } from 'lucide-react';
 import { AiContentModal } from '@o4o/content-editor';
 import { storeAssetControlApi } from '../../api/assetSnapshot';
 import { getAccessToken } from '../../contexts/AuthContext';
@@ -31,6 +31,16 @@ import { StartProductionModal, type ProductionSource, type ProductionSourceItem 
 import { CreateContentFromResourcesModal } from './CreateContentFromResourcesModal';
 import { composeSourceTextFromItems } from './productionTargets';
 import { StoreContentsSelector } from './StoreContentsSelector';
+
+// ─── WO-KPA-STORE-CONTENT-LIBRARY-CROSS-CREATE-CTA-V1 ─────────────────────────
+// 콘텐츠를 기반으로 POP·QR·블로그·사이니지 제작 화면으로 바로 이동(교차 진입).
+// 기존 제작 화면(route)만 재사용 — 신규 API/DB 없음. (IR Phase 1)
+const QUICK_CREATE: { key: string; label: string; icon: typeof Megaphone; to: string }[] = [
+  { key: 'pop',     label: 'POP 만들기',      icon: Megaphone,   to: '/store/marketing/pop' },
+  { key: 'qr',      label: 'QR-code 만들기',  icon: QrCode,      to: '/store/marketing/qr' },
+  { key: 'blog',    label: '블로그 글쓰기',    icon: PenLine,     to: '/store/content/blog' },
+  { key: 'signage', label: '사이니지에 추가',  icon: MonitorPlay, to: '/store/marketing/signage/playlist' },
+];
 
 export default function StoreLibraryContentsPage() {
   const navigate = useNavigate();
@@ -119,6 +129,25 @@ export default function StoreLibraryContentsPage() {
             <RefreshCw size={14} />
             새로고침
           </button>
+        </div>
+      </div>
+
+      {/* WO-KPA-STORE-CONTENT-LIBRARY-CROSS-CREATE-CTA-V1: 재사용 안내 + 바로 만들기 진입 */}
+      <div style={styles.useBanner}>
+        <p style={styles.useBannerText}>
+          내 자료함의 콘텐츠는 보관용이 아니라 <strong>POP · QR-code · 블로그 · 사이니지</strong> 제작에 다시 활용할 수 있는 원본입니다.
+          항목을 선택해 "제작 시작"으로 만들거나, 아래에서 제작 화면으로 바로 이동하세요.
+        </p>
+        <div style={styles.useBannerActions}>
+          {QUICK_CREATE.map((c) => {
+            const Icon = c.icon;
+            return (
+              <button key={c.key} type="button" onClick={() => navigate(c.to)} style={styles.useChip}>
+                <Icon size={13} />
+                {c.label}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -230,6 +259,40 @@ const styles: Record<string, CSSProperties> = {
     border: `1px solid ${colors.neutral300}`,
     borderRadius: '6px',
     fontSize: '13px',
+    color: colors.neutral700,
+    cursor: 'pointer',
+  },
+  useBanner: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px',
+    padding: '12px 14px',
+    background: '#EFF6FF',
+    border: '1px solid #DBEAFE',
+    borderRadius: '8px',
+    marginBottom: '16px',
+  },
+  useBannerText: {
+    fontSize: '13px',
+    color: colors.neutral600,
+    lineHeight: 1.6,
+    margin: 0,
+  },
+  useBannerActions: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '8px',
+  },
+  useChip: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '6px 12px',
+    background: colors.white,
+    border: `1px solid ${colors.neutral300}`,
+    borderRadius: '6px',
+    fontSize: '13px',
+    fontWeight: 500,
     color: colors.neutral700,
     cursor: 'pointer',
   },
