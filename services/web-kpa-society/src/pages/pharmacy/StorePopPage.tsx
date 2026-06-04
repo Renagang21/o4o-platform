@@ -238,16 +238,16 @@ export function StorePopPage() {
     : '/api/v1/kpa';
 
   const handleGenerate = async () => {
-    const libraryItems = popItems.filter((p) => p.origin === 'library');
-    const otherCount = popItems.length - libraryItems.length;
-
-    if (libraryItems.length === 0) {
-      toast.error('PDF 출력은 "내 자료함 → 자료" 항목만 지원합니다');
+    // WO-KPA-POP-CONTENT-TO-PDF-GENERATION-V1:
+    //   파일형 자료(library)뿐 아니라 콘텐츠(direct/snapshot)도 POP 입력으로 전달.
+    //   origin 별로 백엔드 source 필드에 분기 — 백엔드가 id 로 organization 격리 조회한다.
+    if (popItems.length === 0) {
+      toast.error('POP로 만들 자료를 먼저 선택해 주세요');
       return;
     }
-    if (otherCount > 0) {
-      toast(`콘텐츠 항목 ${otherCount}개는 PDF 출력에서 제외됩니다`);
-    }
+    const libraryItemIds = popItems.filter((p) => p.origin === 'library').map((p) => p.id);
+    const directContentItemIds = popItems.filter((p) => p.origin === 'direct').map((p) => p.id);
+    const snapshotItemIds = popItems.filter((p) => p.origin === 'snapshot').map((p) => p.id);
 
     const token = getAccessToken();
     const authHeaders: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
@@ -259,7 +259,9 @@ export function StorePopPage() {
         headers: { 'Content-Type': 'application/json', ...authHeaders },
         credentials: 'include',
         body: JSON.stringify({
-          libraryItemIds: libraryItems.map((p) => p.id),
+          ...(libraryItemIds.length ? { libraryItemIds } : {}),
+          ...(directContentItemIds.length ? { directContentItemIds } : {}),
+          ...(snapshotItemIds.length ? { snapshotItemIds } : {}),
           qrId: selectedQrId || undefined,
           layout,
           // WO-O4O-POP-TEMPLATE-WORKFLOW-V1: template + AI 문구 전달
@@ -268,7 +270,7 @@ export function StorePopPage() {
           // WO-KPA-POP-RESULT-PERSIST-AND-CONTENT-PDF-PATH-V1:
           // 생성 결과를 내 자료함(매장 제작 자료)에 저장 → 다시 열기/재출력 가능.
           save: true,
-          title: popAiContent?.title || libraryItems[0]?.title || 'POP',
+          title: popAiContent?.title || popItems[0]?.title || 'POP',
         }),
       });
       if (!resp.ok) throw new Error('Generate failed');
@@ -310,8 +312,8 @@ export function StorePopPage() {
             )}
           </div>
           <p style={styles.subtitle}>선택된 자료에 QR 코드를 연결하여 POP 광고를 PDF로 출력합니다</p>
-          {/* WO-KPA-POP-RESULT-PERSIST-AND-CONTENT-PDF-PATH-V1:
-              POP 결과 저장 도입 안내 (Phase 2-A). 콘텐츠 기반 입력은 후속 WO. */}
+          {/* WO-KPA-POP-CONTENT-TO-PDF-GENERATION-V1:
+              파일형 자료 + 콘텐츠/매장 제작 자료 모두 POP 입력으로 지원 (Phase 2). */}
           <p
             style={{
               display: 'inline-block',
@@ -326,8 +328,8 @@ export function StorePopPage() {
               lineHeight: 1.6,
             }}
           >
+            파일형 자료뿐 아니라 <strong>내 자료함의 콘텐츠와 매장 제작 자료</strong>를 바탕으로 POP를 만들 수 있습니다.
             생성한 POP는 <strong>내 자료함 → 매장 제작 자료</strong>에 저장되어 다시 열고 출력할 수 있습니다.
-            현재 PDF 출력은 파일형 자료를 기준으로 하며, 콘텐츠 기반 POP 출력은 후속 단계에서 보강됩니다.
           </p>
         </div>
       </div>

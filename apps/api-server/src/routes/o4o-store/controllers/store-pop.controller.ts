@@ -21,6 +21,10 @@ import { DataSource, In } from 'typeorm';
 import { StoreExecutionAsset } from '../../platform/entities/store-execution-asset.entity.js';
 import { StoreQrCode } from '../../platform/entities/store-qr-code.entity.js';
 import { NetureSupplierLibraryItem } from '../../../modules/neture/entities/NetureSupplierLibraryItem.entity.js';
+// WO-KPA-POP-CONTENT-TO-PDF-GENERATION-V1: 콘텐츠/제작자료(직접 작성·스냅샷)를 POP 입력으로 확장.
+//   origin 어휘(@o4o/types/production)와 1:1 매핑되는 테이블에서 organization 격리 조회.
+import { KpaStoreContent } from '../../kpa/entities/kpa-store-content.entity.js';
+import { AssetSnapshot } from '../../../modules/asset-snapshot/entities/asset-snapshot.entity.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
 import { generatePopPdf } from '../../../services/pop-generator.service.js';
@@ -38,6 +42,70 @@ const IMAGE_MIME_TYPES = new Set([
   'image/webp', 'image/svg+xml', 'image/bmp',
 ]);
 
+// POP 본문에 넣을 콘텐츠 텍스트 최대 길이(생성기 template 이 추가 truncate 수행).
+const POP_BODY_MAX_LEN = 500;
+
+/**
+ * WO-KPA-POP-CONTENT-TO-PDF-GENERATION-V1
+ * HTML/리치 텍스트를 POP 문구용 plain text 로 변환.
+ * script/style 제거 → 태그 제거 → 기본 엔티티 디코드 → 공백 정리.
+ */
+function htmlToPlainText(html: string): string {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * WO-KPA-POP-CONTENT-TO-PDF-GENERATION-V1
+ * 콘텐츠 본문(content_json jsonb 또는 html 문자열)에서 POP 문구용 plain text 추출.
+ * 다양한 저장 형태(html / body / blocks)를 안전하게 수용한다.
+ */
+function extractContentText(contentJson: unknown, maxLen = POP_BODY_MAX_LEN): string | null {
+  if (!contentJson) return null;
+  if (typeof contentJson === 'string') {
+    const t = htmlToPlainText(contentJson);
+    return t ? t.slice(0, maxLen) : null;
+  }
+  if (typeof contentJson !== 'object') return null;
+  const obj = contentJson as Record<string, any>;
+
+  // 1) html 필드 우선 (RichTextEditor 산출물의 기본 형태)
+  if (typeof obj.html === 'string' && obj.html.trim()) {
+    const t = htmlToPlainText(obj.html);
+    if (t) return t.slice(0, maxLen);
+  }
+  // 2) 평문 본문 후보
+  for (const k of ['body', 'text', 'content', 'description', 'summary']) {
+    if (typeof obj[k] === 'string' && obj[k].trim()) {
+      const t = htmlToPlainText(obj[k]);
+      if (t) return t.slice(0, maxLen);
+    }
+  }
+  // 3) 블록 에디터 형식 (blocks 배열)
+  if (Array.isArray(obj.blocks)) {
+    const parts: string[] = [];
+    for (const b of obj.blocks) {
+      if (!b || typeof b !== 'object') continue;
+      const bb = b as Record<string, any>;
+      const cand = bb.text ?? bb.content ?? bb.data?.text ?? bb.data?.html;
+      if (typeof cand === 'string' && cand.trim()) parts.push(htmlToPlainText(cand));
+    }
+    const joined = parts.join(' ').replace(/\s+/g, ' ').trim();
+    if (joined) return joined.slice(0, maxLen);
+  }
+  return null;
+}
+
 export function createStorePopController(
   dataSource: DataSource,
   requireAuth: AuthMiddleware,
@@ -50,6 +118,9 @@ export function createStorePopController(
   const libraryRepo = dataSource.getRepository(StoreExecutionAsset);
   const qrRepo = dataSource.getRepository(StoreQrCode);
   const supplierLibraryRepo = dataSource.getRepository(NetureSupplierLibraryItem);
+  // WO-KPA-POP-CONTENT-TO-PDF-GENERATION-V1: 콘텐츠/제작자료 source resolver 용 repo
+  const directContentRepo = dataSource.getRepository(KpaStoreContent);
+  const snapshotRepo = dataSource.getRepository(AssetSnapshot);
   const requirePharmacyOwner = createRequireStoreOwner(dataSource, serviceKey);
 
   // ─── GET /pharmacy/pop/source/supplier-items — 공급자 공개 자료 목록 ──
@@ -94,6 +165,11 @@ export function createStorePopController(
         // WO-KPA-POP-RESULT-PERSIST-AND-CONTENT-PDF-PATH-V1: opt-in 저장
         save,
         title,
+        // WO-KPA-POP-CONTENT-TO-PDF-GENERATION-V1: 콘텐츠/제작자료 입력 확장.
+        //   origin 어휘와 1:1 매핑 — direct=kpa_store_contents / snapshot=o4o_asset_snapshots.
+        //   (execution-asset 형 제작자료는 기존 libraryItemIds 로 자연 분기.)
+        directContentItemIds,
+        snapshotItemIds,
       } = req.body as {
         libraryItemIds?: string[];
         supplierItemIds?: string[];
@@ -103,25 +179,33 @@ export function createStorePopController(
         aiContent?: PopAiContent;
         save?: boolean;
         title?: string;
+        directContentItemIds?: string[];
+        snapshotItemIds?: string[];
       };
 
       const hasLibraryItems = Array.isArray(libraryItemIds) && libraryItemIds.length > 0;
       const hasSupplierItems = Array.isArray(supplierItemIds) && supplierItemIds.length > 0;
+      const hasDirectContent = Array.isArray(directContentItemIds) && directContentItemIds.length > 0;
+      const hasSnapshotItems = Array.isArray(snapshotItemIds) && snapshotItemIds.length > 0;
 
       // 최소 1개 소스 필요
-      if (!hasLibraryItems && !hasSupplierItems) {
+      if (!hasLibraryItems && !hasSupplierItems && !hasDirectContent && !hasSnapshotItems) {
         res.status(400).json({
           success: false,
           error: {
             code: 'VALIDATION_ERROR',
-            message: 'libraryItemIds 또는 supplierItemIds 중 하나 이상 필요합니다.',
+            message: 'libraryItemIds / supplierItemIds / directContentItemIds / snapshotItemIds 중 하나 이상 필요합니다.',
           },
         });
         return;
       }
 
       // 총 아이템 수 제한
-      const totalCount = (libraryItemIds?.length ?? 0) + (supplierItemIds?.length ?? 0);
+      const totalCount =
+        (libraryItemIds?.length ?? 0) +
+        (supplierItemIds?.length ?? 0) +
+        (directContentItemIds?.length ?? 0) +
+        (snapshotItemIds?.length ?? 0);
       if (totalCount > 8) {
         res.status(400).json({
           success: false,
@@ -139,14 +223,59 @@ export function createStorePopController(
           where: { id: In(libraryItemIds), organizationId, isActive: true },
         });
         for (const item of libraryItems) {
+          // WO-KPA-POP-CONTENT-TO-PDF-GENERATION-V1:
+          //   생성형 콘텐츠 제작자료(assetType=content, html_content 보유, fileUrl 없음)도
+          //   본문 텍스트를 POP 문구로 반영. 파일형 자산은 기존과 동일(description 우선).
+          const description =
+            item.description || extractContentText(item.htmlContent) || null;
           popItems.push({
             title: item.title,
-            description: item.description || null,
+            description,
             imageUrl: item.fileUrl || null,
             qrUrl: null,
             qrLabel: null,
             layout: validLayout as 'A4' | 'A5',
             // WO-O4O-POP-TEMPLATE-WORKFLOW-V1
+            templateId: templateId || undefined,
+            aiContent: aiContent || undefined,
+          });
+        }
+      }
+
+      // ── 직접 작성 콘텐츠 (origin=direct → kpa_store_contents) ──
+      //   organization_id 격리 조회. content_json → POP 문구 plain text 추출.
+      if (hasDirectContent) {
+        const directItems = await directContentRepo.find({
+          where: { id: In(directContentItemIds!), organization_id: organizationId },
+        });
+        for (const item of directItems) {
+          popItems.push({
+            title: item.title,
+            description: extractContentText(item.content_json),
+            imageUrl: null,
+            qrUrl: null,
+            qrLabel: null,
+            layout: validLayout as 'A4' | 'A5',
+            templateId: templateId || undefined,
+            aiContent: aiContent || undefined,
+          });
+        }
+      }
+
+      // ── 가져온 콘텐츠 스냅샷 (origin=snapshot → o4o_asset_snapshots) ──
+      //   organization_id 격리 조회. content_json → POP 문구 plain text 추출.
+      if (hasSnapshotItems) {
+        const snapshotItems = await snapshotRepo.find({
+          where: { id: In(snapshotItemIds!), organizationId },
+        });
+        for (const item of snapshotItems) {
+          popItems.push({
+            title: item.title,
+            description: extractContentText(item.contentJson),
+            imageUrl: null,
+            qrUrl: null,
+            qrLabel: null,
+            layout: validLayout as 'A4' | 'A5',
             templateId: templateId || undefined,
             aiContent: aiContent || undefined,
           });

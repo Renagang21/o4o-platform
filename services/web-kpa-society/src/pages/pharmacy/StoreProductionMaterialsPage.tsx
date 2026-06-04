@@ -38,7 +38,7 @@ import { getAccessToken } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
 import { SelectContentsForProductionModal } from './SelectContentsForProductionModal';
 import { StartProductionModal, type ProductionSource, type ProductionSourceItem } from './StartProductionModal';
-import { composeSourceTextFromItems } from './productionTargets';
+import { composeSourceTextFromItems, buildProductionState } from './productionTargets';
 
 // ─── 타입 ─────────────────────────────────────────────────────────────────────
 
@@ -160,8 +160,24 @@ export default function StoreProductionMaterialsPage() {
 
   // WO-KPA-STORE-CONTENT-LIBRARY-CROSS-CREATE-CTA-V1:
   // 제작 자료를 source 로 전달하며 제작 화면으로 이동. 대상 화면이 state 를 읽지 않아도 안전(무시됨).
+  // WO-KPA-POP-CONTENT-TO-PDF-GENERATION-V1:
+  //   POP 진입은 canonical production state 로 전달해 StorePopPage 가 항목을 실제 로드하도록 한다.
+  //   sourceKind → origin 매핑: direct-content=kpa_store_contents(direct) / execution-asset=store_execution_assets(library).
   const goCreate = useCallback(
     (to: string, item: ProductionMaterialItem) => {
+      if (to === '/store/marketing/pop') {
+        const origin = item.sourceKind === 'direct-content' ? 'direct' : 'library';
+        navigate(to, {
+          state: buildProductionState({
+            target: 'pop',
+            source: {
+              fromLibrary: 'contents',
+              items: [{ id: item.id, title: item.title, origin }],
+            },
+          }),
+        });
+        return;
+      }
       navigate(to, {
         state: { source: { kind: 'production-material', itemId: item.id, title: item.title, purpose: item.purpose } },
       });
