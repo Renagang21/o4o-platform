@@ -57,22 +57,23 @@ services/web-neture         npx tsc --noEmit   # exit 0 (consumer 회귀 없음,
 
 ---
 
-## 6. desktop/mobile smoke 결과
+## 6. desktop/mobile smoke 결과 — **PASS (배포 후 라이브 검증 완료, 2026-06-04)**
 
-- **정적/타입 검증 PASS.**
-- **라이브 브라우저 smoke: 미수행 (배포 후로 이연).** operator 라우트는 인증 게이트 + 미배포. 기존 테스트 계정 smoke blocker.
-- **배포 후 확인 권장 (4서비스 + Neture Admin, 모두 공통 컴포넌트 → 일괄):**
-  ```text
-  desktop(md+): 좌측 세로 sidebar 동일 유지(회귀 없음)
-  mobile(390px):
-    - 가로 스크롤 탭 제거 확인
-    - "운영자 메뉴" 햄버거 → drawer slide-in
-    - drawer 내 도메인 헤딩 + 그룹 collapsible + 하위 항목 전체 접근 가능
-    - active 상태 정상 / 메뉴 클릭 시 drawer 자동 닫힘 + 라우팅
-    - backdrop·X 버튼으로 닫힘
-    - 본문 밀림/가로 스크롤 없음
-  대상: KPA /operator · GlycoPharm /operator · K-Cosmetics /operator · Neture /operator · Neture /admin
-  ```
+Playwright(operator 계정) 라이브 검증. 공통 컴포넌트이므로 GlycoPharm `/operator` 전 흐름 + Neture `/admin`(AdminLayoutWrapper 경로) 교차 검증.
+
+**GlycoPharm `/operator` (390px mobile):**
+- ✅ 가로 스크롤 탭 **제거 확인** — "☰ 운영자 메뉴" 햄버거 바만 노출, 본문 밀림/가로 스크롤 없음
+- ✅ 햄버거 클릭 → drawer slide-in. 도메인 헤딩(커뮤니티 운영 / 매장 HUB 운영 / 운영 공통) + 그룹 + lucide 아이콘 + 대시보드 active 강조
+- ✅ **하위 항목 전체 접근 (핵심 결함 해소)** — Forum 그룹 펼침 → 포럼 신청 / 포럼 삭제 요청 / 커뮤니티 관리 / **포럼 분석** 4개 노출. 기존 가로 탭은 `items[0]`(포럼 신청)만 링크했음
+- ✅ 하위 항목(포럼 분석) 클릭 → `/operator/forum-analytics` 라우팅 + **drawer 자동 닫힘**(`onNavigate=closeMobile`)
+
+**GlycoPharm `/operator` (1280px desktop):**
+- ✅ 좌측 세로 sidebar 동일 유지(회귀 없음), 햄버거 없음, 그룹 collapsible + active(포럼 분석 blue) 정상
+
+**Neture `/admin` (390px mobile, AdminLayoutWrapper → DomainIASidebar):**
+- ✅ 햄버거 + drawer 정상. Neture 전용 도메인 IA(공급·유통 운영 / 커머스·정산 운영 / 커뮤니티·콘텐츠 운영 / 운영 공통) + 그룹 + backdrop 렌더 — **operator 외 admin 경로도 동일 적용 확인**
+
+**KPA / K-Cosmetics `/operator`:** 동일 공통 컴포넌트 + 동일 wrapper 패턴(`OperatorAreaShell`) → 위 검증으로 커버(코드 경로 동일).
 
 ---
 
