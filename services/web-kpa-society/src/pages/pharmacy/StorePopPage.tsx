@@ -265,13 +265,18 @@ export function StorePopPage() {
           // WO-O4O-POP-TEMPLATE-WORKFLOW-V1: template + AI 문구 전달
           templateId: selectedTemplate?.id,
           ...(popAiContent ? { aiContent: popAiContent } : {}),
+          // WO-KPA-POP-RESULT-PERSIST-AND-CONTENT-PDF-PATH-V1:
+          // 생성 결과를 내 자료함(매장 제작 자료)에 저장 → 다시 열기/재출력 가능.
+          save: true,
+          title: popAiContent?.title || libraryItems[0]?.title || 'POP',
         }),
       });
       if (!resp.ok) throw new Error('Generate failed');
-      const blob = await resp.blob();
-      const url = URL.createObjectURL(blob);
-      window.open(url, '_blank');
-      setTimeout(() => URL.revokeObjectURL(url), 60000);
+      const result = await resp.json();
+      const fileUrl: string | undefined = result?.data?.fileUrl;
+      if (!fileUrl) throw new Error('No fileUrl in response');
+      window.open(fileUrl, '_blank');
+      toast.success('POP가 생성되어 내 자료함 → 매장 제작 자료에 저장되었습니다. 언제든 다시 출력할 수 있습니다.');
     } catch {
       toast.error('POP PDF 생성에 실패했습니다');
     } finally {
@@ -305,24 +310,24 @@ export function StorePopPage() {
             )}
           </div>
           <p style={styles.subtitle}>선택된 자료에 QR 코드를 연결하여 POP 광고를 PDF로 출력합니다</p>
-          {/* WO-KPA-STORE-CONTENT-LIBRARY-CROSS-CREATE-CTA-V1:
-              PDF 제약을 토스트에만 의존하지 않고 화면에서 사전 안내 (IR Phase 1) */}
+          {/* WO-KPA-POP-RESULT-PERSIST-AND-CONTENT-PDF-PATH-V1:
+              POP 결과 저장 도입 안내 (Phase 2-A). 콘텐츠 기반 입력은 후속 WO. */}
           <p
             style={{
               display: 'inline-block',
               fontSize: '12px',
-              color: '#92400E',
-              background: '#FFFBEB',
-              border: '1px solid #FDE68A',
+              color: '#1E40AF',
+              background: '#EFF6FF',
+              border: '1px solid #BFDBFE',
               borderRadius: '6px',
               padding: '8px 10px',
               margin: '10px 0 0',
-              maxWidth: '560px',
+              maxWidth: '600px',
               lineHeight: 1.6,
             }}
           >
-            PDF 출력은 현재 <strong>내 자료함 → 자료</strong>의 파일형 자료를 기준으로 지원됩니다.
-            콘텐츠 기반 POP 출력은 후속 단계에서 보강됩니다.
+            생성한 POP는 <strong>내 자료함 → 매장 제작 자료</strong>에 저장되어 다시 열고 출력할 수 있습니다.
+            현재 PDF 출력은 파일형 자료를 기준으로 하며, 콘텐츠 기반 POP 출력은 후속 단계에서 보강됩니다.
           </p>
         </div>
       </div>

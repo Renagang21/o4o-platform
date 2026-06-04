@@ -26,7 +26,7 @@
 
 import { useEffect, useState, useCallback, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Layers, Trash2, RefreshCw, FileEdit, Plus, Megaphone, QrCode, PenLine, MonitorPlay, ChevronDown } from 'lucide-react';
+import { Layers, Trash2, RefreshCw, FileEdit, Plus, Megaphone, QrCode, PenLine, MonitorPlay, ChevronDown, ExternalLink } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { AiContentModal } from '@o4o/content-editor';
 import { directContentApi } from '../../api/assetSnapshot';
@@ -49,6 +49,8 @@ interface ProductionMaterialItem {
   purpose?: string;
   stage?: string;
   createdFrom?: string;
+  /** WO-KPA-POP-RESULT-PERSIST-AND-CONTENT-PDF-PATH-V1: 파일형 결과(저장된 POP PDF 등) 재출력용 URL */
+  fileUrl?: string | null;
   /** 삭제 API 분기용: kpa_store_contents | store_execution_assets */
   sourceKind: 'direct-content' | 'execution-asset';
 }
@@ -233,6 +235,7 @@ export default function StoreProductionMaterialsPage() {
           purpose: it.category ?? undefined,
           stage: 'finalized',
           createdFrom: 'ai',
+          fileUrl: it.fileUrl ?? undefined,
           sourceKind: 'execution-asset',
         }));
 
@@ -419,6 +422,7 @@ export default function StoreProductionMaterialsPage() {
             <div style={{ ...styles.col, width: 80 }}>상태</div>
             <div style={{ ...styles.col, width: 100 }}>생성 출처</div>
             <div style={{ ...styles.col, width: 100 }}>최근 수정일</div>
+            <div style={{ ...styles.col, width: 70 }}>출력</div>
             <div style={{ ...styles.col, width: 116 }}>활용</div>
             <div style={{ ...styles.col, width: 44 }} />
           </div>
@@ -463,6 +467,22 @@ export default function StoreProductionMaterialsPage() {
                   <span style={styles.metaText}>
                     {item.updatedAt ? new Date(item.updatedAt).toLocaleDateString('ko-KR') : '-'}
                   </span>
+                </div>
+                <div style={{ ...styles.col, width: 70 }}>
+                  {item.fileUrl ? (
+                    <a
+                      href={item.fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={styles.openBtn}
+                      title="PDF 열기"
+                    >
+                      <ExternalLink size={13} />
+                      출력
+                    </a>
+                  ) : (
+                    <span style={{ ...styles.metaText, color: colors.neutral300 }}>-</span>
+                  )}
                 </div>
                 <div style={{ ...styles.col, width: 116 }}>
                   <RowUseMenu onPick={(to) => goCreate(to, item)} />
@@ -605,6 +625,17 @@ const styles: Record<string, CSSProperties> = {
     fontWeight: 500,
     color: colors.neutral700,
     cursor: 'pointer',
+    whiteSpace: 'nowrap',
+  },
+  openBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '4px',
+    padding: '5px 8px',
+    fontSize: '12px',
+    fontWeight: 500,
+    color: colors.primary,
+    textDecoration: 'none',
     whiteSpace: 'nowrap',
   },
   menuBackdrop: {

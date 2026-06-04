@@ -25,6 +25,8 @@ import { asyncHandler } from '../../../middleware/error-handler.js';
 import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
 import { generatePopPdf } from '../../../services/pop-generator.service.js';
 import type { PopGenerateInput, PopAiContent } from '../../../services/pop-generator.service.js';
+// WO-KPA-POP-RESULT-PERSIST-AND-CONTENT-PDF-PATH-V1: 생성 POP PDF durable 저장(GCS)
+import { MediaLibraryService } from '../../../modules/media/services/media-library.service.js';
 
 type AuthMiddleware = RequestHandler;
 
@@ -89,6 +91,9 @@ export function createStorePopController(
         // WO-O4O-POP-TEMPLATE-WORKFLOW-V1
         templateId,
         aiContent,
+        // WO-KPA-POP-RESULT-PERSIST-AND-CONTENT-PDF-PATH-V1: opt-in 저장
+        save,
+        title,
       } = req.body as {
         libraryItemIds?: string[];
         supplierItemIds?: string[];
@@ -96,6 +101,8 @@ export function createStorePopController(
         layout?: string;
         templateId?: string;
         aiContent?: PopAiContent;
+        save?: boolean;
+        title?: string;
       };
 
       const hasLibraryItems = Array.isArray(libraryItemIds) && libraryItemIds.length > 0;
@@ -192,6 +199,54 @@ export function createStorePopController(
       }
 
       const pdfBuffer = await generatePopPdf(popItems);
+
+      // WO-KPA-POP-RESULT-PERSIST-AND-CONTENT-PDF-PATH-V1:
+      // opt-in 저장 — 생성 PDF 를 GCS durable 업로드 후 store_execution_assets
+      // (file / generated / pop) 로 보관 → "매장 제작 자료" 에 자동 노출 + 재출력.
+      // save 미지정 시 기존 blob 응답 유지(back-compat, 기존 호출 회귀 0).
+      if (save) {
+        const userId = (req as any).authContext?.userId || (req as any).user?.id;
+        const assetTitle =
+          typeof title === 'string' && title.trim()
+            ? title.trim().slice(0, 300)
+            : `${popItems[0]?.title ?? 'POP'} POP`;
+
+        const mediaService = new MediaLibraryService(dataSource);
+        const media = await mediaService.upload(
+          {
+            buffer: pdfBuffer,
+            originalname: `${assetTitle}.pdf`,
+            mimetype: 'application/pdf',
+            size: pdfBuffer.length,
+          },
+          userId,
+          serviceKey,
+          'pop',
+        );
+
+        const assetRepo = dataSource.getRepository(StoreExecutionAsset);
+        const asset = assetRepo.create({
+          organizationId,
+          title: assetTitle,
+          description: 'POP 제작 결과',
+          fileUrl: media.url,
+          fileName: media.fileName,
+          fileSize: media.fileSize ?? pdfBuffer.length,
+          mimeType: 'application/pdf',
+          category: 'pop',
+          assetType: 'file',
+          usageType: 'pop',
+          sourceType: 'generated',
+          isActive: true,
+        });
+        await assetRepo.save(asset);
+
+        res.json({
+          success: true,
+          data: { assetId: asset.id, fileUrl: media.url, title: asset.title },
+        });
+        return;
+      }
 
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', 'attachment; filename="pop-print.pdf"');
