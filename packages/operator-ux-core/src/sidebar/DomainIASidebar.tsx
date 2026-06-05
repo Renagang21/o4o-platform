@@ -19,7 +19,18 @@
 
 import { useState, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ChevronDown, ChevronRight, Menu, X } from 'lucide-react';
+import {
+  ChevronDown,
+  ChevronRight,
+  Menu,
+  X,
+  MessagesSquare,
+  Store,
+  Settings,
+  Package,
+  CreditCard,
+  type LucideIcon,
+} from 'lucide-react';
 import {
   STANDARD_GROUPS,
   type OperatorGroupKey,
@@ -30,6 +41,19 @@ import {
   DEFAULT_OPERATOR_DOMAIN_IA,
   type OperatorDomainIAConfig,
 } from './operatorDomainIA';
+
+// ─── Domain heading icons ─────────────────────────────────────────────────
+// WO-O4O-DOMAIN-IA-SIDEBAR-HEADING-ICON-ALIGNMENT-V1 (IR Option A):
+// config 데이터(DOMAIN_LABELS / NETURE_DOMAIN_LABELS)의 emoji 는 그대로 두고,
+// 렌더 시점에 domain key → lucide 로 치환한다. 미매핑 key 는 emoji fallback.
+const DOMAIN_HEADING_ICONS: Record<string, LucideIcon> = {
+  community: MessagesSquare,
+  community_content: MessagesSquare,
+  store_hub: Store,
+  common: Settings,
+  supply_distribution: Package,
+  commerce_settlement: CreditCard,
+};
 
 // ─── Internal types ───────────────────────────────────────────────────────
 
@@ -247,7 +271,14 @@ export function DomainIASidebar({
             } bg-gray-50/60`}
           >
             <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-gray-500">
-              <span aria-hidden>{domain.emoji}</span>
+              {(() => {
+                const DomainIcon = DOMAIN_HEADING_ICONS[domain.key];
+                return DomainIcon ? (
+                  <DomainIcon size={13} aria-hidden className="text-gray-500" />
+                ) : (
+                  <span aria-hidden>{domain.emoji}</span>
+                );
+              })()}
               <span>{domain.label}</span>
             </div>
           </div>
