@@ -361,6 +361,20 @@ Store Side Standards ┐
 
 **검증:** `store-ui-core` typecheck PASS (`npx tsc --noEmit`, EXIT 0).
 
+### 12.2 WO-O4O-STORE-MENU-CANONICAL-TREE-ALIGNMENT-V2 (2026-06-05)
+
+§12.1 후속. 라벨/그룹/순서 최종 정리 — **메뉴 재배치 한정**. 상세: `docs/investigations/CHECK-O4O-STORE-MENU-CANONICAL-TREE-ALIGNMENT-V2.md`
+
+**핵심:**
+- `상품·거래` 그룹(거래·주문 대상)을 **최상단 핵심**으로 정렬.
+- 용어 구분 명문화: **"상품" = 거래·주문 대상**(상품·거래 그룹) / **"제품" = 활성화 자료 제작 기준 데이터**(활성화 그룹, 앵커 `내 매장/약국 제품`).
+- 활성화에 `상품 설명` 추가(라우트 확인된 서비스). 매출/정산은 분석·경영 영역으로.
+- **원칙: 데드링크 0 / 실기능 은폐 0.** 라우트 없는 항목(거래 신청·상품 성과·노출 설정)은 미추가, 실기능(퍼널/경영/정산/태블릿/상담요청)은 보존.
+- 사이드바 active 판정에 `management` `end` 처리 추가(prefix 중복 하이라이트 방지).
+- 데드링크 정리: GP `/products`·`/market-trial`(미마운트) 제거.
+
+**검증:** `store-ui-core` typecheck PASS. 신규 데드링크 0(전 항목 마운트 라우트 1:1).
+
 ---
 
 **작성:** O4O Platform Team

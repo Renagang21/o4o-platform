@@ -240,7 +240,9 @@ export function StoreSidebar({
                           <NavLink
                             key={item.key}
                             to={fullPath}
-                            end={item.key === 'dashboard' || item.key === 'home'}
+                            // 'management'(/store/management) 은 정확 일치만 active —
+                            // '상품'(/store/management/b2b) 과 prefix 중복 하이라이트 방지 (V2).
+                            end={item.key === 'dashboard' || item.key === 'home' || item.key === 'management'}
                             onClick={onItemClick}
                             className={({ isActive }) =>
                               `flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
