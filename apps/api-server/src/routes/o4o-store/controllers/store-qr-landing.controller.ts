@@ -26,8 +26,11 @@ import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { createHash } from 'crypto';
 import { StoreQrCode } from '../../platform/entities/store-qr-code.entity.js';
+import { StoreExecutionAsset } from '../../platform/entities/store-execution-asset.entity.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
+// WO-KPA-STORE-ASSET-DERIVATION-QR-BLOG-WRITEPATH-V1: 원본(library)→qr_code 관계 기록
+import { recordDerivations } from '../services/store-asset-derivation.service.js';
 import { generateQrPng, generateQrSvg, generateQrPrintPdf } from '../../../services/qr-print.service.js';
 import type { QrPrintItem } from '../../../services/qr-print.service.js';
 import { generateProductFlyer } from '../../../services/qr-flyer.service.js';
@@ -596,6 +599,29 @@ export function createStoreQrLandingController(
       });
 
       const saved = await qrRepo.save(item);
+
+      // WO-KPA-STORE-ASSET-DERIVATION-QR-BLOG-WRITEPATH-V1:
+      //   QR 가 라이브러리 자료(libraryItemId)에서 만들어진 경우 원본→qr_code 관계 best-effort 기록.
+      //   service_key + organization_id 기준(POP/read endpoint 와 동일 organizationId). 실패해도 생성 응답 무영향.
+      if (libraryItemId) {
+        try {
+          const userId = (req as any).authContext?.userId || (req as any).user?.id;
+          const lib = await dataSource.getRepository(StoreExecutionAsset).findOne({
+            where: { id: libraryItemId, organizationId },
+          });
+          await recordDerivations(dataSource, {
+            serviceKey: serviceKey ?? 'kpa',
+            organizationId,
+            createdBy: userId ?? null,
+            derivedKind: 'qr_code',
+            derivedId: saved.id,
+            derivedTitle: saved.title,
+            sources: [{ kind: 'store_execution_asset', id: libraryItemId, title: lib?.title ?? null }],
+          });
+        } catch (derivationErr) {
+          console.error('[store-qr] derivation record failed (non-blocking)', derivationErr);
+        }
+      }
 
       // WO-O4O-PRODUCT-MARKETING-GRAPH-V1: Auto-link QR → Product
       if (landingType === 'product' && resolvedLandingTargetId) {
