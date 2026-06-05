@@ -255,18 +255,18 @@ export function CommunityHomePage() {
           loading={latestLoading}
         />
       }
-      // WO-O4O-HOME-VALUE-GUIDE-PLACEMENT-STANDARD-V1:
-      //   Home 표준 = 역할/시작 카드가 이용 가이드보다 먼저(before-app-entry).
-      //   사용자가 먼저 자기 역할로 시작점을 고른 뒤 상세 가이드로 내려가는 흐름.
-      //   (이전 WO-O4O-KPA-HOME-VALUE-CARDS-AFTER-GUIDE-V1 의 after-help 를 표준에 맞춰 정렬)
-      valueGuidePlacement="before-app-entry"
+      // WO-O4O-KPA-HOME-ROLE-USAGE-MANUAL-RECLASSIFY-V1:
+      //   이 영역은 작업 시작 진입(CTA)이 아니라 "사용자 유형별 활용 안내(매뉴얼)" 다.
+      //   따라서 상단 진입 영역이 아니라 이용 가이드 영역(after-help)에 배치한다.
+      //   (KPA 한정 재해석 — Neture 의 역할 카드는 시작 진입 성격이라 before-app-entry 유지)
+      valueGuidePlacement="after-help"
       valueGuideSlot={
-        // WO-O4O-KPA-HOME-VALUE-CARDS-V1:
-        // "내 역할로 시작하기" — 사용자가 자기 역할을 선택해
-        // /guide/for/{store-owner,operator,member} 진입.
+        // WO-O4O-KPA-HOME-VALUE-CARDS-V1 / RECLASSIFY-V1:
+        // "내 역할에 따른 활용 방법" — 역할(매장 경영자/운영자/커뮤니티 참여자)별로
+        // KPA-Society 활용 안내. /guide/for/{store-owner,operator,member} 로 연결.
         // AppEntrySection 패턴 재사용 — 데스크탑 3열 / 태블릿 2+1 / 모바일 stack.
         <AppEntrySection
-          title="내 역할로 시작하기"
+          title="내 역할에 따른 활용 방법"
           accentColor="var(--color-primary)"
           cards={[
             {
