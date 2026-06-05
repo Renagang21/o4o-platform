@@ -62,6 +62,8 @@ export function O4OHelpSection({
   servicesTitle = '다른 서비스 보기',
   serviceItems,
   currentServiceKey,
+  showUsage = true,
+  showServices = true,
 }: O4OHelpSectionProps) {
   const resolvedServiceItems = serviceItems
     ?? (currentServiceKey
@@ -99,27 +101,31 @@ export function O4OHelpSection({
   return (
     <section style={styles.section}>
       {/* Block 1: 사용 방법 */}
-      <div style={styles.block}>
-        <h2 style={styles.blockTitle}>{usageTitle}</h2>
-        <div className="ss-help-usage-grid">
-          {usageItems.map((item) => (
-            <UsageCard key={item.title} item={item} />
-          ))}
+      {showUsage && (
+        <div style={styles.block}>
+          <h2 style={styles.blockTitle}>{usageTitle}</h2>
+          <div className="ss-help-usage-grid">
+            {usageItems.map((item) => (
+              <UsageCard key={item.title} item={item} />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Divider */}
-      <div style={styles.divider} />
+      {/* Divider — 두 블록이 모두 보일 때만 */}
+      {showUsage && showServices && <div style={styles.divider} />}
 
       {/* Block 2: 다른 서비스 */}
-      <div style={styles.block}>
-        <h2 style={styles.blockTitle}>{servicesTitle}</h2>
-        <div className="ss-help-service-grid">
-          {resolvedServiceItems.map((item) => (
-            <ServiceCard key={item.title} item={item} />
-          ))}
+      {showServices && (
+        <div style={styles.block}>
+          <h2 style={styles.blockTitle}>{servicesTitle}</h2>
+          <div className="ss-help-service-grid">
+            {resolvedServiceItems.map((item) => (
+              <ServiceCard key={item.title} item={item} />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </section>
   );
 }

@@ -27,6 +27,7 @@ import {
   HeroBannerSection,
   StandardHomeTemplate,
   AppEntrySection,
+  O4OHelpSection,
   ForumIcon,
   EducationIcon,
   ContentIcon,
@@ -265,6 +266,9 @@ export function CommunityHomePage() {
         // "내 역할에 따른 활용 방법" — 역할(매장 경영자/운영자/커뮤니티 참여자)별로
         // KPA-Society 활용 안내. /guide/for/{store-owner,operator,member} 로 연결.
         // AppEntrySection 패턴 재사용 — 데스크탑 3열 / 태블릿 2+1 / 모바일 stack.
+        // WO-O4O-KPA-HOME-OTHER-SERVICES-SECTION-ALIGNMENT-V1: 역할 카드 아래에
+        //   "다른 서비스 소개"(보조 안내)를 Home 맨 아래로 배치.
+        <>
         <AppEntrySection
           title="내 역할에 따른 활용 방법"
           accentColor="var(--color-primary)"
@@ -289,6 +293,14 @@ export function CommunityHomePage() {
             },
           ]}
         />
+        {/* "다른 서비스 소개" — O4O 생태계 다른 서비스 보조 안내. O4OHelpSection
+            services-only(Block 2) 재사용으로 카드 스타일·링크·필터 동일 유지. */}
+        <O4OHelpSection
+          showUsage={false}
+          servicesTitle="다른 서비스 소개"
+          currentServiceKey="kpa-society"
+        />
+        </>
       }
       appEntryCards={[
         { title: '포럼', description: '동료 약사와 질문·토론으로 전문성을 높이세요', href: '/forum', icon: <span className={iconCls}><ForumIcon /></span> },
@@ -312,6 +324,9 @@ export function CommunityHomePage() {
       help={{
         currentServiceKey: 'kpa-society',
         usageTitle: 'KPA-Society 이용 가이드',
+        // WO-O4O-KPA-HOME-OTHER-SERVICES-SECTION-ALIGNMENT-V1: 다른 서비스 블록은
+        //   Home 맨 아래(valueGuideSlot 하단)로 이동했으므로 Help 슬롯에서는 숨김.
+        showServices: false,
         usageItems: [
           { title: 'O4O 개요', description: 'O4O 서비스 구조와 KPA-Society의 역할', href: '/guide/intro' },
           { title: '서비스 활용 방법', description: '상품, 콘텐츠, 고객 응대 기반 매장 운영 방식', href: '/guide/usage' },

@@ -181,6 +181,10 @@ export interface O4OHelpSectionProps {
   serviceItems?: O4OHelpServiceItem[];
   /** 현재 서비스 키. 일치하는 카드는 목록에서 제외된다. */
   currentServiceKey?: string;
+  /** 사용 방법(Block 1) 렌더 여부. 기본 true. 두 블록을 분리 배치하는 서비스용. */
+  showUsage?: boolean;
+  /** 다른 서비스(Block 2) 렌더 여부. 기본 true. 두 블록을 분리 배치하는 서비스용. */
+  showServices?: boolean;
 }
 
 /* ------------------------------------------------------------------ */
