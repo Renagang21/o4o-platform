@@ -29,6 +29,8 @@ import type {
 import { StoreBlogSettings } from '../../glycopharm/entities/store-blog-settings.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import { StoreSlugService } from '@o4o/platform-core/store-identity';
+// WO-KPA-STORE-ASSET-DERIVATION-BLOG-WRITEPATH-V1: 원본(source)→blog_post 관계 기록
+import { recordDerivations } from '../services/store-asset-derivation.service.js';
 
 const DEFAULT_SERVICE_KEY = 'glycopharm';
 
@@ -180,7 +182,8 @@ export function createBlogController(
       const { slug } = req.params;
       const authReq = req as unknown as AuthRequest;
       const userId = authReq.user?.id || authReq.authUser?.id;
-      const { title, content, excerpt, slug: postSlug } = req.body;
+      // WO-KPA-STORE-ASSET-DERIVATION-BLOG-WRITEPATH-V1: optional sourceItems (원본 관계 기록용)
+      const { title, content, excerpt, slug: postSlug, sourceItems } = req.body;
 
       if (!title || !content) {
         res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'title and content are required' } });
@@ -218,6 +221,29 @@ export function createBlogController(
       });
 
       const saved = await blogRepo.save(post);
+
+      // WO-KPA-STORE-ASSET-DERIVATION-BLOG-WRITEPATH-V1:
+      //   원본(source)→blog_post 관계 best-effort 기록. sourceItems 미전달 시 미기록(기존 동작 100%).
+      //   organization_id = pharmacy.id ( = organizations.id, derivation/read endpoint 와 정합).
+      //   실패해도 블로그 생성 응답을 막지 않는다(보조 트래킹).
+      if (Array.isArray(sourceItems) && sourceItems.length > 0) {
+        try {
+          await recordDerivations(dataSource, {
+            serviceKey,
+            organizationId: pharmacy.id,
+            createdBy: userId ?? null,
+            derivedKind: 'blog_post',
+            derivedId: saved.id,
+            derivedTitle: saved.title,
+            sources: sourceItems
+              .filter((s: any) => s && s.id && s.kind)
+              .map((s: any) => ({ kind: s.kind, id: s.id, title: s.title ?? null })),
+          });
+        } catch (derivationErr) {
+          console.error('[store-blog] derivation record failed (non-blocking)', derivationErr);
+        }
+      }
+
       res.status(201).json({ success: true, data: saved });
     } catch (err: any) {
       res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: err.message } });

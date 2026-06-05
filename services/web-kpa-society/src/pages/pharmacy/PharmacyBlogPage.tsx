@@ -69,6 +69,8 @@ function formatDate(dateStr: string): string {
 
 export function PharmacyBlogPage({ service }: { service?: string }) {
   const location = useLocation();
+  // WO-KPA-STORE-ASSET-DERIVATION-BLOG-WRITEPATH-V1: 원본 자료(source)를 최초 create 까지 보존
+  const [pendingSourceItems, setPendingSourceItems] = useState<{ kind: string; id: string; title?: string }[]>([]);
   const [slug, setSlug] = useState<string | null>(null);
   const [posts, setPosts] = useState<StaffBlogPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -173,6 +175,18 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
       setEditorExcerpt(first.description?.slice(0, 120) || '');
       setEditorSlug('');
       setMode('editor');
+      // WO-KPA-STORE-ASSET-DERIVATION-BLOG-WRITEPATH-V1:
+      //   origin → derivation source_kind 매핑 후 보존(최초 create 시 1회 전달).
+      const ORIGIN_TO_KIND: Record<string, string> = {
+        snapshot: 'content_snapshot',
+        direct: 'content_direct',
+        library: 'store_execution_asset',
+      };
+      setPendingSourceItems(
+        items
+          .filter((it) => it.id && it.origin && ORIGIN_TO_KIND[it.origin])
+          .map((it) => ({ kind: ORIGIN_TO_KIND[it.origin as string], id: it.id, title: it.title })),
+      );
       window.history.replaceState({}, document.title);
     } else if (template) {
       // 소스 없이 템플릿만 선택하고 진입한 경우 (빈 에디터 + starterHtml)
@@ -222,7 +236,10 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
           content: editorContent,
           excerpt: editorExcerpt || undefined,
           slug: editorSlug || undefined,
+          // WO-KPA-STORE-ASSET-DERIVATION-BLOG-WRITEPATH-V1: 최초 create 시에만 원본 관계 전달
+          sourceItems: pendingSourceItems.length > 0 ? pendingSourceItems : undefined,
         }, service);
+        setPendingSourceItems([]);
       }
       setMode('list');
       await loadPosts();

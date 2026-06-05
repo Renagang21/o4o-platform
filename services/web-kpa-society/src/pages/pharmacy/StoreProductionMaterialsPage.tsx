@@ -267,6 +267,21 @@ export default function StoreProductionMaterialsPage() {
         });
         return;
       }
+      // WO-KPA-STORE-ASSET-DERIVATION-BLOG-WRITEPATH-V1:
+      //   블로그 진입도 canonical production state 로 전달 → 블로그 페이지가 원본 관계(blog_post) 기록.
+      if (to === '/store/content/blog') {
+        const origin = item.sourceKind === 'direct-content' ? 'direct' : 'library';
+        navigate(to, {
+          state: buildProductionState({
+            target: 'blog',
+            source: {
+              fromLibrary: 'contents',
+              items: [{ id: item.id, title: item.title, origin }],
+            },
+          }),
+        });
+        return;
+      }
       navigate(to, {
         state: { source: { kind: 'production-material', itemId: item.id, title: item.title, purpose: item.purpose } },
       });

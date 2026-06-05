@@ -59,7 +59,14 @@ export async function fetchStaffBlogPosts(
 
 export async function createBlogPost(
   slug: string,
-  body: { title: string; content: string; excerpt?: string; slug?: string },
+  // WO-KPA-STORE-ASSET-DERIVATION-BLOG-WRITEPATH-V1: optional sourceItems (원본 관계 기록용)
+  body: {
+    title: string;
+    content: string;
+    excerpt?: string;
+    slug?: string;
+    sourceItems?: { kind: string; id: string; title?: string }[];
+  },
   service?: string,
 ): Promise<StaffBlogPost> {
   const url = `${getApiBase(service)}/stores/${encodeURIComponent(slug)}/blog/staff`;
