@@ -31,6 +31,8 @@ import { generatePopPdf } from '../../../services/pop-generator.service.js';
 import type { PopGenerateInput, PopAiContent } from '../../../services/pop-generator.service.js';
 // WO-KPA-POP-RESULT-PERSIST-AND-CONTENT-PDF-PATH-V1: 생성 POP PDF durable 저장(GCS)
 import { MediaLibraryService } from '../../../modules/media/services/media-library.service.js';
+// WO-KPA-STORE-ASSET-DERIVATION-TABLE-V1: 원본→파생(pop_pdf) 관계 기록
+import { recordDerivations } from '../services/store-asset-derivation.service.js';
 
 type AuthMiddleware = RequestHandler;
 
@@ -369,6 +371,31 @@ export function createStorePopController(
           isActive: true,
         });
         await assetRepo.save(asset);
+
+        // WO-KPA-STORE-ASSET-DERIVATION-TABLE-V1:
+        //   원본(직접작성/스냅샷/라이브러리) → 파생(pop_pdf) 관계 best-effort 기록.
+        //   관계 기록 실패는 POP 생성/저장 응답을 막지 않는다(보조 트래킹).
+        //   supplierItemIds 는 org-owned source 가 아니므로 제외.
+        try {
+          const derivationSources = [
+            ...(directContentItemIds ?? []).map((id) => ({ kind: 'content_direct', id })),
+            ...(snapshotItemIds ?? []).map((id) => ({ kind: 'content_snapshot', id })),
+            ...(libraryItemIds ?? []).map((id) => ({ kind: 'store_execution_asset', id })),
+          ];
+          if (derivationSources.length > 0) {
+            await recordDerivations(dataSource, {
+              serviceKey: serviceKey ?? 'kpa',
+              organizationId,
+              createdBy: userId ?? null,
+              derivedKind: 'pop_pdf',
+              derivedId: asset.id,
+              derivedTitle: asset.title,
+              sources: derivationSources,
+            });
+          }
+        } catch (derivationErr) {
+          console.error('[store-pop] derivation record failed (non-blocking)', derivationErr);
+        }
 
         res.json({
           success: true,

@@ -13,6 +13,8 @@ export { StoreTablet } from './store-tablet.entity.js';
 export { StoreTabletDisplay } from './store-tablet-display.entity.js';
 export { TabletInterestRequest, InterestRequestStatus } from './tablet-interest-request.entity.js';
 export { StoreExecutionAsset } from './store-execution-asset.entity.js';
+// WO-KPA-STORE-ASSET-DERIVATION-TABLE-V1: 원본↔파생 관계 추적
+export { StoreAssetDerivation } from './store-asset-derivation.entity.js';
 export { StoreQrCode } from './store-qr-code.entity.js';
 export { StoreQrScanEvent } from './store-qr-scan-event.entity.js';
 export { ProductMarketingAsset } from './product-marketing-asset.entity.js';

@@ -26,6 +26,8 @@
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { StoreExecutionAsset } from '../../platform/entities/store-execution-asset.entity.js';
+// WO-KPA-STORE-ASSET-DERIVATION-TABLE-V1: 원본↔파생 관계 조회
+import { StoreAssetDerivation } from '../../platform/entities/store-asset-derivation.entity.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
 
@@ -93,6 +95,45 @@ export function createStoreExecutionAssetsController(
           total,
         },
       });
+    }),
+  );
+
+  // ─── GET /store/asset-derivations — 원본↔파생 관계 조회 ──────
+  // WO-KPA-STORE-ASSET-DERIVATION-TABLE-V1:
+  //   derivedKind+derivedId (결과물 기준 원본 역추적) 또는
+  //   sourceKind+sourceId (원본 기준 파생 결과) 로 조회. org 격리. 내부/검증·후속 UI 용.
+  router.get(
+    '/store/asset-derivations',
+    requireAuth,
+    requirePharmacyOwner,
+    asyncHandler(async (req: Request, res: Response) => {
+      const organizationId = (req as any).organizationId;
+      const sourceKind = (req.query.sourceKind as string || '').trim();
+      const sourceId = (req.query.sourceId as string || '').trim();
+      const derivedKind = (req.query.derivedKind as string || '').trim();
+      const derivedId = (req.query.derivedId as string || '').trim();
+
+      const repo = dataSource.getRepository(StoreAssetDerivation);
+      const qb = repo.createQueryBuilder('d')
+        .where('d.organizationId = :organizationId', { organizationId });
+
+      if (derivedKind && derivedId) {
+        qb.andWhere('d.derivedKind = :derivedKind AND d.derivedId = :derivedId', { derivedKind, derivedId });
+      } else if (sourceKind && sourceId) {
+        qb.andWhere('d.sourceKind = :sourceKind AND d.sourceId = :sourceId', { sourceKind, sourceId });
+      } else {
+        res.status(400).json({
+          success: false,
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: 'sourceKind+sourceId 또는 derivedKind+derivedId 가 필요합니다.',
+          },
+        });
+        return;
+      }
+
+      const items = await qb.orderBy('d.createdAt', 'DESC').take(100).getMany();
+      res.json({ success: true, data: { items } });
     }),
   );
 

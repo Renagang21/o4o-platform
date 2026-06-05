@@ -350,6 +350,7 @@ import {
   StoreTabletDisplay,
   TabletInterestRequest,
   StoreExecutionAsset,
+  StoreAssetDerivation, // WO-KPA-STORE-ASSET-DERIVATION-TABLE-V1
   StoreQrCode,
   StoreQrScanEvent,
   ProductMarketingAsset,
@@ -986,6 +987,8 @@ export const AppDataSource = new DataSource({
     // STORE EXECUTION ASSETS ENTITY (WO-KPA-STORE-ASSET-STRUCTURE-REFACTOR-V1)
     // ============================================================================
     StoreExecutionAsset,
+    // WO-KPA-STORE-ASSET-DERIVATION-TABLE-V1: 원본↔파생 관계 추적
+    StoreAssetDerivation,
     // ============================================================================
     // STORE QR CODE ENTITY (WO-O4O-QR-LANDING-PAGE-V1)
     // ============================================================================
