@@ -7,12 +7,15 @@
  * - 외부 서비스로 연결
  */
 
+import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import { FlaskConical } from 'lucide-react';
 import { colors, borderRadius } from '../styles/theme';
 import { kpaConfig } from '@o4o/operator-ux-core';
 
 interface ServiceBannerProps {
-  icon: string;
+  // string(emoji) 또는 ReactNode(lucide) 모두 허용 — 기존 emoji 배너 하위 호환 유지
+  icon: ReactNode;
   title: string;
   description: string;
   linkUrl: string;
@@ -133,7 +136,7 @@ export function ExternalServiceSection() {
         {/* WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1
             Market Trial 실행은 Neture로 통합. KPA에서는 외부 진입점만 유지. */}
         <ServiceBanner
-          icon="🧪"
+          icon={<FlaskConical size={22} />}
           title="유통 참여형 펀딩 (Market Trial) 참여"
           description="공급자의 신제품을 먼저 체험하고 의견을 공유하세요. (Neture 통합 허브)"
           linkUrl="https://neture.co.kr/market-trial"

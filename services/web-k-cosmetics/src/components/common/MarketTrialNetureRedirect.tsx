@@ -11,6 +11,7 @@
  */
 
 import { useEffect, useMemo } from 'react';
+import { FlaskConical } from 'lucide-react';
 
 const NETURE_BASE = 'https://neture.co.kr';
 
@@ -27,7 +28,8 @@ export default function MarketTrialNetureRedirect() {
 
   return (
     <div style={styles.container}>
-      <div style={styles.icon}>🧪</div>
+      {/* O4O-GLOBAL-ICON-SYSTEM-STANDARD-V1: Market Trial 표준 아이콘 */}
+      <div style={styles.icon}><FlaskConical size={56} /></div>
       <h1 style={styles.title}>유통 참여형 펀딩 (Market Trial)은 Neture에서 운영됩니다</h1>
       <p style={styles.description}>Neture 통합 허브로 이동 중입니다...</p>
       <a href={target} style={styles.link}>

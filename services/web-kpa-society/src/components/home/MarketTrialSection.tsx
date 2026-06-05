@@ -9,6 +9,7 @@
  */
 
 import { useEffect } from 'react';
+import { FlaskConical } from 'lucide-react';
 import { colors, spacing, borderRadius, shadows } from '../../styles/theme';
 
 const hoverStyles = `
@@ -42,7 +43,8 @@ export function MarketTrialSection() {
         className="market-trial-card"
       >
         <div style={styles.iconWrap}>
-          <span style={styles.icon}>🧪</span>
+          {/* O4O-GLOBAL-ICON-SYSTEM-STANDARD-V1: Market Trial 표준 아이콘 */}
+          <FlaskConical size={20} color={colors.accentGreen} />
         </div>
         <div style={styles.content}>
           <div style={styles.headline}>유통 참여형 펀딩 (Market Trial) 참여</div>

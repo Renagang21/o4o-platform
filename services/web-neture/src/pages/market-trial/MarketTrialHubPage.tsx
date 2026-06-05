@@ -14,6 +14,7 @@
 
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { FlaskConical } from 'lucide-react';
 import {
   getTrials,
   getMyParticipations,
@@ -383,7 +384,8 @@ function TrialCard({
 function EmptySection({ isAuthenticated }: { isAuthenticated: boolean }) {
   return (
     <div style={s.emptyBox}>
-      <div style={s.emptyIcon}>🧪</div>
+      {/* O4O-GLOBAL-ICON-SYSTEM-STANDARD-V1: Market Trial 표준 아이콘 */}
+      <div style={s.emptyIcon}><FlaskConical size={24} color="#9CA3AF" /></div>
       <p style={s.emptyTitle}>현재 모집 중인 유통 참여형 펀딩이 없습니다</p>
       <p style={s.emptyDesc}>
         공급자의 새로운 유통 참여형 펀딩이 등록되면 이곳에 표시됩니다.
