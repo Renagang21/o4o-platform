@@ -218,6 +218,9 @@ export function createStorePopController(
 
       const validLayout = layout === 'A5' ? 'A5' : 'A4';
       const popItems: PopGenerateInput[] = [];
+      // WO-KPA-STORE-ASSET-DERIVATION-SOURCE-TITLE-FILL-V1:
+      //   source id → title 맵. derivation 기록 시 source_title 채움(원본 보기 모달 표시 품질).
+      const sourceTitleById = new Map<string, string>();
 
       // ── 매장 Library items 조회 (organizationId boundary) ────
       if (hasLibraryItems) {
@@ -225,6 +228,7 @@ export function createStorePopController(
           where: { id: In(libraryItemIds), organizationId, isActive: true },
         });
         for (const item of libraryItems) {
+          sourceTitleById.set(item.id, item.title);
           // WO-KPA-POP-CONTENT-TO-PDF-GENERATION-V1:
           //   생성형 콘텐츠 제작자료(assetType=content, html_content 보유, fileUrl 없음)도
           //   본문 텍스트를 POP 문구로 반영. 파일형 자산은 기존과 동일(description 우선).
@@ -251,6 +255,7 @@ export function createStorePopController(
           where: { id: In(directContentItemIds!), organization_id: organizationId },
         });
         for (const item of directItems) {
+          sourceTitleById.set(item.id, item.title);
           popItems.push({
             title: item.title,
             description: extractContentText(item.content_json),
@@ -271,6 +276,7 @@ export function createStorePopController(
           where: { id: In(snapshotItemIds!), organizationId },
         });
         for (const item of snapshotItems) {
+          sourceTitleById.set(item.id, item.title);
           popItems.push({
             title: item.title,
             description: extractContentText(item.contentJson),
@@ -378,9 +384,9 @@ export function createStorePopController(
         //   supplierItemIds 는 org-owned source 가 아니므로 제외.
         try {
           const derivationSources = [
-            ...(directContentItemIds ?? []).map((id) => ({ kind: 'content_direct', id })),
-            ...(snapshotItemIds ?? []).map((id) => ({ kind: 'content_snapshot', id })),
-            ...(libraryItemIds ?? []).map((id) => ({ kind: 'store_execution_asset', id })),
+            ...(directContentItemIds ?? []).map((id) => ({ kind: 'content_direct', id, title: sourceTitleById.get(id) ?? null })),
+            ...(snapshotItemIds ?? []).map((id) => ({ kind: 'content_snapshot', id, title: sourceTitleById.get(id) ?? null })),
+            ...(libraryItemIds ?? []).map((id) => ({ kind: 'store_execution_asset', id, title: sourceTitleById.get(id) ?? null })),
           ];
           if (derivationSources.length > 0) {
             await recordDerivations(dataSource, {
