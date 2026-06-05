@@ -255,10 +255,11 @@ export function CommunityHomePage() {
           loading={latestLoading}
         />
       }
-      // WO-O4O-KPA-HOME-VALUE-CARDS-AFTER-GUIDE-V1:
-      //   "내 역할로 시작하기"는 성격상 이용 가이드(역할별 안내)에 가까우므로
-      //   별도 서비스 진입처럼 보이지 않도록 "이용 가이드(Help)" 아래로 이동.
-      valueGuidePlacement="after-help"
+      // WO-O4O-HOME-VALUE-GUIDE-PLACEMENT-STANDARD-V1:
+      //   Home 표준 = 역할/시작 카드가 이용 가이드보다 먼저(before-app-entry).
+      //   사용자가 먼저 자기 역할로 시작점을 고른 뒤 상세 가이드로 내려가는 흐름.
+      //   (이전 WO-O4O-KPA-HOME-VALUE-CARDS-AFTER-GUIDE-V1 의 after-help 를 표준에 맞춰 정렬)
+      valueGuidePlacement="before-app-entry"
       valueGuideSlot={
         // WO-O4O-KPA-HOME-VALUE-CARDS-V1:
         // "내 역할로 시작하기" — 사용자가 자기 역할을 선택해
