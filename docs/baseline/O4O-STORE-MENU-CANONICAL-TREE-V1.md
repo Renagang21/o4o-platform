@@ -258,9 +258,9 @@ direct      = store_direct       (매장 직접 작성)
 
 ### 9.3 Phase 3 — 매장 메뉴 통합 (UI 측)
 
-| # | WO | 사유 |
-|---|----|------|
-| **W9** | `WO-O4O-STORE-MENU-IMPLEMENTATION-V1` (가칭) | 매장 측 메뉴 구조를 본 V1 의 6 항목 축으로 통합 정렬 — 서비스별 `storeMenuTree.ts` canonical 적용 |
+| # | WO | 사유 | 상태 |
+|---|----|------|------|
+| **W9** | `WO-O4O-MY-STORE-PRODUCT-CENTERED-ACTIVATION-V1` (구 가칭 `WO-O4O-STORE-MENU-IMPLEMENTATION-V1`) | 매장 측 메뉴 구조를 본 V1 축으로 통합 정렬 — `packages/store-ui-core/src/config/storeMenuConfig.ts` canonical 적용 | **1차 완료 (2026-06-05)** — §12 참조 |
 
 ### 9.4 Phase 4 — 설문 (별도 트랙)
 
@@ -325,6 +325,41 @@ Store Side Standards ┐
 | Drift Guard 8건 | ✅ §8 |
 | 후속 WO 권장 순서 (4 Phase) | ✅ §9 |
 | 우선순위 체인 위치 | ✅ §10 |
+
+---
+
+## 12. 구현 로그 (W9 — 메뉴 축 정렬)
+
+### 12.1 WO-O4O-MY-STORE-PRODUCT-CENTERED-ACTIVATION-V1 1차 (2026-06-05)
+
+§9.3 W9 의 1차 구현. **메뉴 재배치 한정** — 신규 화면 제작 없음, 모든 항목 subPath(라우트) 불변, 섹션 그룹/순서/라벨만 정렬.
+
+**적용 파일:** `packages/store-ui-core/src/config/storeMenuConfig.ts` (3개 config)
+
+**공통 축 (KPA 기준):**
+
+```text
+(무라벨)        홈 / 대시보드
+운영           공급자(O4O) 상품 · 주문 · [매출/정산]
+활성화          내 매장(약국) 상품 ★ · [자체 상품] · [상품 상세설명] · 블로그 · POP · QR
+자료함          콘텐츠 · 자료 · 매장 제작 자료
+디지털 사이니지   플레이리스트 · 동영상 · 스케줄 · TV 재생   (변경 없음)
+채널/마케팅     채널 관리 · 태블릿 · 상담요청 · [펀딩/퍼널 등]
+분석           마케팅 분석
+[경영(GP)]      약국 경영 · 정산
+설정           매장(약국) 정보 · 매장 설정
+```
+
+**핵심 이동:** `내 매장(약국) 상품` 을 commerce(운영) 그룹에서 분리해 **"활성화" 그룹의 앵커**로 이동, 제품 파생 콘텐츠(블로그/POP/QR/상품설명)를 그 아래로 모음. 사이니지는 제품 파생이 아니므로 분리 유지(SMT 드리프트 가드 정합).
+
+**라벨:** KPA/GlycoPharm = "약국 운영/약국 활성화/약국 자료함", K-Cosmetics = "매장 운영/매장 활성화/내 자료함".
+
+**1차 범위 외 (2차 후보):**
+- 제품 row action 통일(상품설명/POP/QR/블로그/활용자료) — 화면 로직이라 분리
+- KPA `상품 상세설명` 사이드 노출 — 라우트 마운트 확인 후 활성화에 추가
+- 항목 라벨 전면 통일(내 매장 상품 ↔ 내 약국 제품 등)
+
+**검증:** `store-ui-core` typecheck PASS (`npx tsc --noEmit`, EXIT 0).
 
 ---
 

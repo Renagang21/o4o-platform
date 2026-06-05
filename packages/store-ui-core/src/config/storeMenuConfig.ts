@@ -12,6 +12,24 @@
  *   display    → signage
  *   services   → (settings 하위로 강등)
  *   (신규)      → channels
+ *
+ * WO-O4O-MY-STORE-PRODUCT-CENTERED-ACTIVATION-V1 (2026-06-05):
+ *   O4O-STORE-MENU-CANONICAL-TREE-V1 §9.3 의 W9 구현 (매장 메뉴 축 정렬).
+ *   3개 서비스(KPA / GlycoPharm / K-Cosmetics) 사이드 메뉴를 동일 축으로 재배치:
+ *     (무라벨)        홈 / 대시보드
+ *     운영           공급자(O4O) 상품 · 주문 · [매출/정산]
+ *     활성화          내 매장(약국) 상품 ★ · [자체 상품] · [상품 상세설명] · 블로그 · POP · QR
+ *     자료함          콘텐츠 · 자료 · 매장 제작 자료
+ *     디지털 사이니지   플레이리스트 · 동영상 · 스케줄 · TV 재생   (변경 없음)
+ *     채널/마케팅     채널 관리 · 태블릿 · 상담요청 · [펀딩/퍼널 등]
+ *     분석           마케팅 분석
+ *     [경영(GP)]      약국 경영 · 정산
+ *     설정           매장(약국) 정보 · 매장 설정
+ *   핵심 이동: 내 매장(약국) 상품을 commerce(운영) → "활성화" 그룹 앵커로 이동,
+ *             제품 파생 콘텐츠(블로그/POP/QR/상품설명)를 그 아래로 모음.
+ *   모든 항목의 subPath(라우트)는 불변 — 섹션 그룹/순서/라벨만 재배치.
+ *   라벨: KPA/GlycoPharm = "약국 운영/약국 활성화/약국 자료함", K-Cosmetics = "매장 운영/매장 활성화/내 자료함".
+ *   사이니지는 분리 유지(제품 파생 아님) — 변경 없음.
  */
 
 export type StoreMenuKey =
@@ -69,10 +87,10 @@ export const ALL_STORE_MENUS: StoreMenuItemDef[] = [
 /**
  * K-Cosmetics Store Config
  * WO-KCOS-KPA-CANONICAL-MENU-ALIGN-V1: flat → section mode 전환
- *   KPA canonical 기준 5섹션 구조
- * WO-O4O-TABLET-MENU-STRUCTURE-ALIGN-V1:
- *   - "콘텐츠/태블릿" 그룹 → "매장 실행" (콘텐츠 항목 부재로 정합성 회복)
- *   - "태블릿 진열" → "태블릿" (매장 내 device 단위 통합 표현)
+ * WO-O4O-TABLET-MENU-STRUCTURE-ALIGN-V1: 태블릿 표현 통합
+ * WO-O4O-MY-STORE-PRODUCT-CENTERED-ACTIVATION-V1 (2026-06-05):
+ *   매장 운영(주문·매출) / 매장 활성화(내 매장 상품·자체 상품·상품설명·블로그·POP·QR) 축 정렬.
+ *   태블릿 → 채널 그룹으로 이동.
  */
 export const COSMETICS_STORE_CONFIG: StoreDashboardConfig = {
   serviceKey: 'cosmetics',
@@ -81,37 +99,25 @@ export const COSMETICS_STORE_CONFIG: StoreDashboardConfig = {
   enabledMenus: ['dashboard'],   // section 모드에서는 미사용, 하위 호환용으로 유지
   menuSections: [
     { label: '', items: [
-      { key: 'home',     label: '홈',       subPath: '' },
-      { key: 'channels', label: '채널 관리', subPath: '/channels' },
+      { key: 'home', label: '홈', subPath: '' },
     ]},
-    { label: '상품', items: [
-      // WO-O4O-STORE-PRODUCTS-SERVICE-ROUTING-V1: ProductMaster 기반 매장 진열
-      { key: 'my-products',    label: '내 매장 상품', subPath: '/my-products' },
-      // WO-O4O-KCOSMETICS-STORE-PATH-NESTED-MIGRATION-V1: commerce nested canonical 정렬
-      { key: 'local-products', label: '자체 상품',    subPath: '/commerce/local-products' },
+    { label: '매장 운영', items: [
       // WO-O4O-KCOSMETICS-STORE-ORDERS-FRONTEND-ALIGNMENT-V1: 매장 주문 관리
-      { key: 'orders',         label: '주문 내역',    subPath: '/commerce/orders' },
+      { key: 'orders',  label: '주문 내역', subPath: '/commerce/orders' },
       // WO-O4O-KCOSMETICS-STORE-REVENUE-SUMMARY-FRONTEND-V1: 매출 요약 (참고용, 정산 확정 아님)
-      { key: 'billing',        label: '매출 요약',    subPath: '/commerce/billing' },
+      { key: 'billing', label: '매출 요약', subPath: '/commerce/billing' },
     ]},
-    { label: '디지털 사이니지', items: [
-      // WO-O4O-MY-STORE-SIGNAGE-SUBMENU-ALIGNMENT-V1: KPA/GP 기준 서브메뉴 정렬
-      // WO-O4O-KCOSMETICS-STORE-PATH-NESTED-MIGRATION-V1: marketing/signage nested canonical 정렬
-      // WO-O4O-KCOSMETICS-SIGNAGE-PLAYER-V1: TV 재생 메뉴 추가
-      { key: 'signage-playlist',  label: '플레이리스트', subPath: '/marketing/signage/playlist' },
-      { key: 'signage-videos',    label: '동영상',       subPath: '/marketing/signage/videos' },
-      { key: 'signage-schedules', label: '스케줄',       subPath: '/marketing/signage/schedules' },
-      { key: 'signage-player',    label: 'TV 재생',      subPath: '/marketing/signage/player' },
-    ]},
-    { label: '매장 실행', items: [
-      // WO-O4O-KCOSMETICS-STORE-PATH-NESTED-MIGRATION-V1: commerce/marketing nested canonical 정렬
-      { key: 'tablet-displays', label: '태블릿',  subPath: '/commerce/tablet-displays' },
-      // WO-O4O-KCOS-STORE-EXECUTION-CANONICAL-ALIGNMENT-V1: Blog/POP/QR KPA delta 정렬
-      { key: 'content-blog',   label: '블로그',  subPath: '/content/blog' },
-      { key: 'pop',            label: 'POP',     subPath: '/marketing/pop' },
-      { key: 'qr',             label: 'QR 코드', subPath: '/marketing/qr' },
+    { label: '매장 활성화', items: [
+      // WO-O4O-STORE-PRODUCTS-SERVICE-ROUTING-V1: ProductMaster 기반 매장 진열 — 활성화 앵커
+      { key: 'my-products',    label: '내 매장 상품', subPath: '/my-products' },
+      // WO-O4O-KCOSMETICS-STORE-PATH-NESTED-MIGRATION-V1: 매장 자체 보유 제품
+      { key: 'local-products', label: '자체 상품',    subPath: '/commerce/local-products' },
       // WO-O4O-STORE-PRODUCT-DESCRIPTIONS-CROSSSERVICE-V1: 상품 상세설명 관리
       { key: 'product-descriptions', label: '상품 상세설명', subPath: '/library/product-descriptions' },
+      // WO-O4O-KCOS-STORE-EXECUTION-CANONICAL-ALIGNMENT-V1: 제품 파생 콘텐츠
+      { key: 'content-blog', label: '블로그',  subPath: '/content/blog' },
+      { key: 'pop',          label: 'POP',     subPath: '/marketing/pop' },
+      { key: 'qr',           label: 'QR 코드', subPath: '/marketing/qr' },
     ]},
     // WO-O4O-STORE-LIBRARY-CROSSSERVICE-PHASE2-B-V1 / PHASE2-C-V1: 내 자료함
     { label: '내 자료함', items: [
@@ -119,13 +125,23 @@ export const COSMETICS_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'library-resources',            label: '자료',        subPath: '/library/resources' },
       { key: 'library-production-materials', label: '매장 제작 자료', subPath: '/library/production-materials' },
     ]},
+    { label: '디지털 사이니지', items: [
+      // WO-O4O-MY-STORE-SIGNAGE-SUBMENU-ALIGNMENT-V1 / WO-O4O-KCOSMETICS-SIGNAGE-PLAYER-V1
+      { key: 'signage-playlist',  label: '플레이리스트', subPath: '/marketing/signage/playlist' },
+      { key: 'signage-videos',    label: '동영상',       subPath: '/marketing/signage/videos' },
+      { key: 'signage-schedules', label: '스케줄',       subPath: '/marketing/signage/schedules' },
+      { key: 'signage-player',    label: 'TV 재생',      subPath: '/marketing/signage/player' },
+    ]},
+    { label: '채널', items: [
+      { key: 'channels',        label: '채널 관리', subPath: '/channels' },
+      { key: 'tablet-displays', label: '태블릿',    subPath: '/commerce/tablet-displays' },
+    ]},
     // WO-O4O-STORE-MARKETING-ANALYTICS-CROSSSERVICE-V1: 마케팅 분석
     { label: '분석', items: [
       { key: 'analytics-marketing', label: '마케팅 분석', subPath: '/analytics/marketing' },
     ]},
     { label: '설정', items: [
-      // WO-O4O-KCOSMETICS-STORE-PROFILE-EDIT-PAGE-V1:
-      //   매장 경영자 사업자 정보 조회/수정 — users.businessInfo SSOT
+      // WO-O4O-KCOSMETICS-STORE-PROFILE-EDIT-PAGE-V1: users.businessInfo SSOT
       { key: 'store-info', label: '매장/사업자 정보', subPath: '/info' },
       { key: 'settings',   label: '매장 설정',        subPath: '/settings' },
     ]},
@@ -134,12 +150,11 @@ export const COSMETICS_STORE_CONFIG: StoreDashboardConfig = {
 
 /**
  * GlycoPharm Store Config
- * WO-O4O-GLYCOPHARM-NAVIGATION-AND-STORE-STRUCTURE-REFINE-V1:
- *   flat enabledMenus → 섹션형 menuSections (4개 그룹)
- *   개요 / 운영 / 마케팅·콘텐츠 / 경영 / 설정
- * WO-O4O-TABLET-MENU-STRUCTURE-ALIGN-V1:
- *   - "태블릿 진열" → "태블릿" (매장 내 device 단위 통합 표현)
- *   - 사이니지 "재생" → "TV 재생" (TV fullscreen playback 의미 명확화)
+ * WO-O4O-GLYCOPHARM-NAVIGATION-AND-STORE-STRUCTURE-REFINE-V1: flat → 섹션형
+ * WO-O4O-TABLET-MENU-STRUCTURE-ALIGN-V1: 태블릿/사이니지 표현 통합
+ * WO-O4O-MY-STORE-PRODUCT-CENTERED-ACTIVATION-V1 (2026-06-05):
+ *   약국 운영(상품 관리·B2B·주문) / 약국 활성화(내 약국 상품·자체 상품·상품설명·블로그·POP·QR) 축 정렬.
+ *   마케팅·콘텐츠 그룹의 제품 파생 콘텐츠 → 활성화로 이동, 펀딩/퍼널/채널은 마케팅·채널 그룹 유지.
  */
 export const GLYCOPHARM_STORE_CONFIG: StoreDashboardConfig = {
   serviceKey: 'glycopharm',
@@ -147,122 +162,70 @@ export const GLYCOPHARM_STORE_CONFIG: StoreDashboardConfig = {
   basePath: '/store',
   enabledMenus: ['dashboard'],   // section 모드에서는 미사용, 하위 호환용으로 유지
   menuSections: [
-    {
-      label: '',
-      items: [
-        // WO-O4O-GLYCO-STORE-CANONICAL-ENTRY-ALIGN-V1: /store 인덱스 = 운영 홈 (canonical 정렬)
-        { key: 'dashboard', label: '대시보드', subPath: '' },
-      ],
-    },
-    {
-      label: '운영',
-      items: [
-        { key: 'products',        label: '상품 관리',    subPath: '/products' },
-        // WO-O4O-STORE-PRODUCTS-SERVICE-ROUTING-V1: ProductMaster 기반 매장 진열
-        { key: 'my-products',     label: '내 매장 상품', subPath: '/my-products' },
-        // WO-O4O-GLYCOPHARM-STORE-PATH-NESTED-MIGRATION-V1: commerce nested canonical 정렬
-        { key: 'local-products',  label: '자체 상품',    subPath: '/commerce/local-products' },
-        { key: 'b2b-order',       label: 'B2B 주문',     subPath: '/b2b-order' },
-        { key: 'orders',          label: '주문 내역',    subPath: '/commerce/orders' },
-        { key: 'tablet-displays', label: '태블릿',        subPath: '/commerce/tablet-displays' },
-        { key: 'requests',        label: '고객 요청',    subPath: '/requests' },
-      ],
-    },
-    {
-      label: '디지털 사이니지',
-      // WO-O4O-GLYCOPHARM-STORE-PATH-NESTED-MIGRATION-V1: marketing/signage nested canonical 정렬
-      items: [
-        { key: 'signage-playlist',  label: '플레이리스트', subPath: '/marketing/signage/playlist' },
-        { key: 'signage-videos',    label: '동영상',       subPath: '/marketing/signage/videos' },
-        { key: 'signage-schedules', label: '스케줄',       subPath: '/marketing/signage/schedules' },
-        { key: 'signage-player',    label: 'TV 재생',      subPath: '/marketing/signage/player' },
-      ],
-    },
-    {
-      label: '마케팅·콘텐츠',
-      items: [
-        { key: 'market-trial', label: '유통 참여형 펀딩', subPath: '/market-trial' },
-        { key: 'funnel',       label: '전환 퍼널',      subPath: '/funnel' },
-        { key: 'content',      label: '콘텐츠 가져오기', subPath: '/content' },
-        // WO-O4O-GLYCO-BLOG-INTRODUCE-V1: 전문 매장 운영자의 공개 콘텐츠 채널
-        { key: 'content-blog', label: '블로그',         subPath: '/content/blog' },
-        // WO-O4O-GLYCOPHARM-STORE-PATH-NESTED-MIGRATION-V1: marketing nested canonical 정렬
-        { key: 'pop',          label: 'POP',            subPath: '/marketing/pop' },
-        { key: 'qr',           label: 'QR 코드',        subPath: '/marketing/qr' },
-        // WO-O4O-STORE-PRODUCT-DESCRIPTIONS-CROSSSERVICE-V1: 상품 상세설명 관리
-        { key: 'product-descriptions', label: '상품 상세설명', subPath: '/library/product-descriptions' },
-        { key: 'channels',     label: '채널 관리',      subPath: '/channels' },
-      ],
-    },
-    // WO-O4O-STORE-LIBRARY-CROSSSERVICE-PHASE2-B-V1 / PHASE2-C-V1: 내 자료함
-    {
-      label: '내 자료함',
-      items: [
-        { key: 'library-contents',             label: '콘텐츠',   subPath: '/library/contents' },
-        { key: 'library-resources',            label: '자료',     subPath: '/library/resources' },
-        { key: 'library-production-materials', label: '제작 자료', subPath: '/library/production-materials' },
-      ],
-    },
-    {
-      label: '분석',
-      // WO-O4O-STORE-MARKETING-ANALYTICS-CROSSSERVICE-V1: 마케팅 분석
-      items: [
-        { key: 'analytics-marketing', label: '마케팅 분석', subPath: '/analytics/marketing' },
-      ],
-    },
-    {
-      label: '경영',
-      items: [
-        { key: 'management',     label: '약국 경영', subPath: '/management' },
-        // WO-O4O-GLYCOPHARM-PHARMACY-PROFILE-EDIT-PAGE-V1:
-        //   약국 경영자 사업자 정보 조회/수정 — users.businessInfo SSOT
-        { key: 'pharmacy-info',  label: '약국/사업자 정보', subPath: '/info' },
-        { key: 'billing',        label: '정산/인보이스', subPath: '/billing' },
-      ],
-    },
-    {
-      label: '설정',
-      items: [
-        { key: 'settings', label: '설정', subPath: '/settings' },
-      ],
-    },
+    { label: '', items: [
+      // WO-O4O-GLYCO-STORE-CANONICAL-ENTRY-ALIGN-V1: /store 인덱스 = 운영 홈
+      { key: 'dashboard', label: '대시보드', subPath: '' },
+    ]},
+    { label: '약국 운영', items: [
+      { key: 'products',  label: '공급자 상품', subPath: '/products' },
+      { key: 'b2b-order', label: 'B2B 주문',   subPath: '/b2b-order' },
+      { key: 'orders',    label: '주문 내역',   subPath: '/commerce/orders' },
+    ]},
+    { label: '약국 활성화', items: [
+      // WO-O4O-STORE-PRODUCTS-SERVICE-ROUTING-V1: ProductMaster 기반 매장 진열 — 활성화 앵커
+      { key: 'my-products',    label: '내 약국 상품', subPath: '/my-products' },
+      // WO-O4O-GLYCOPHARM-STORE-PATH-NESTED-MIGRATION-V1: 매장 자체 보유 제품
+      { key: 'local-products', label: '자체 상품',    subPath: '/commerce/local-products' },
+      // WO-O4O-STORE-PRODUCT-DESCRIPTIONS-CROSSSERVICE-V1: 상품 상세설명 관리
+      { key: 'product-descriptions', label: '상품 상세설명', subPath: '/library/product-descriptions' },
+      // WO-O4O-GLYCO-BLOG-INTRODUCE-V1 / marketing nested canonical: 제품 파생 콘텐츠
+      { key: 'content-blog', label: '블로그',  subPath: '/content/blog' },
+      { key: 'pop',          label: 'POP',     subPath: '/marketing/pop' },
+      { key: 'qr',           label: 'QR 코드', subPath: '/marketing/qr' },
+    ]},
+    // WO-O4O-STORE-LIBRARY-CROSSSERVICE-PHASE2-B-V1 / PHASE2-C-V1: 약국 자료함
+    { label: '약국 자료함', items: [
+      { key: 'library-contents',             label: '콘텐츠',   subPath: '/library/contents' },
+      { key: 'library-resources',            label: '자료',     subPath: '/library/resources' },
+      { key: 'library-production-materials', label: '제작 자료', subPath: '/library/production-materials' },
+    ]},
+    { label: '디지털 사이니지', items: [
+      { key: 'signage-playlist',  label: '플레이리스트', subPath: '/marketing/signage/playlist' },
+      { key: 'signage-videos',    label: '동영상',       subPath: '/marketing/signage/videos' },
+      { key: 'signage-schedules', label: '스케줄',       subPath: '/marketing/signage/schedules' },
+      { key: 'signage-player',    label: 'TV 재생',      subPath: '/marketing/signage/player' },
+    ]},
+    { label: '마케팅·채널', items: [
+      { key: 'market-trial', label: '유통 참여형 펀딩', subPath: '/market-trial' },
+      { key: 'funnel',       label: '전환 퍼널',      subPath: '/funnel' },
+      { key: 'content',      label: '콘텐츠 가져오기', subPath: '/content' },
+      { key: 'channels',     label: '채널 관리',      subPath: '/channels' },
+    ]},
+    // WO-O4O-STORE-MARKETING-ANALYTICS-CROSSSERVICE-V1: 마케팅 분석
+    { label: '분석', items: [
+      { key: 'analytics-marketing', label: '마케팅 분석', subPath: '/analytics/marketing' },
+    ]},
+    { label: '경영', items: [
+      { key: 'management',    label: '약국 경영',       subPath: '/management' },
+      // WO-O4O-GLYCOPHARM-PHARMACY-PROFILE-EDIT-PAGE-V1: users.businessInfo SSOT
+      { key: 'pharmacy-info', label: '약국/사업자 정보', subPath: '/info' },
+      { key: 'billing',       label: '정산/인보이스',    subPath: '/billing' },
+    ]},
+    { label: '설정', items: [
+      { key: 'settings', label: '설정', subPath: '/settings' },
+    ]},
   ],
 };
 
 /**
- * KPA-Society Store Config
- * WO-STORE-SIDEBAR-RESTRUCTURE-V1:
- *   - 7섹션/15항목 → 6섹션/14항목 재구성
- *   - 홈 단독 / 상품·주문 / 매장 실행 / 채널 / 자료·분석 / 설정
- *   - 자체 상품·매장 진열 상품 사이드바 제거 (라우트 유지)
- *   - 라벨 변경: QR 관리→QR 코드, 채널 현황→B2B 사이트, 매장 사이니지→디지털 사이니지
- *   - 약국 정보 설정 그룹으로 이동
- * WO-KPA-STORE-MENU-NORMALIZATION-V1:
- *   - "상품 관리" → "공급 상품" 명칭 변경
- *   - "주문 관리" → "주문 내역" 명칭 변경
- *   - "내 매장 상품" (/commerce/local-products) 메뉴 추가 (기존 라우트 활성화)
- *   - "자료실" 제거 (route 미연결 상태)
- *   - 채널 관리/상담 요청 → 매장 실행 그룹으로 이동
- *   - 태블릿 진열/블로그 → 매장 실행 그룹으로 통합
- * WO-O4O-KPA-STORE-MATERIALS-AND-PRODUCTIONS-CANONICAL-ALIGN-V1:
- *   - "내 자료함" 그룹 정리: 강좌 제거 → 콘텐츠/자료 2개 (canonical)
- *   - 상품 상세설명 신규 라우트 (/store/marketing/product-descriptions) 연결
- * WO-O4O-KPA-STORE-PRODUCTION-ENTRY-CANONICAL-CORRECTION-V1:
- *   - "내 제작물" 그룹 제거 (제작 시작 진입점은 "내 자료함"으로 통일)
- *   - POP / QR 코드 / 블로그 / 상품 상세설명 메뉴는 결과물 관리 전용으로
- *     매장 실행 그룹 내 개별 메뉴로 유지
- * WO-O4O-TABLET-MENU-STRUCTURE-ALIGN-V1:
- *   - "태블릿 진열" → "태블릿" (매장 내 device 단위 통합 표현, 매장당 복수 tablet 전제)
- *   - 사이니지 "재생" → "TV 재생" (TV fullscreen playback 의미 명확화)
- *   - Tablet은 매장 내 interactive device, Signage는 TV 전용 재생.
- *     Playlist는 두 도메인이 공통으로 사용 가능한 자산 (현재 signage 하위 유지).
- * WO-O4O-KPA-STORE-SIDEBAR-PRODUCTION-MENU-REMOVE-V1:
- *   - "매장 실행" 그룹 → "채널" 으로 재명명 (운영 기능 중심으로 축소)
- *   - 채널 그룹은 채널 관리 / 태블릿 / 상담 요청 3개 항목만 유지
- *   - 다음 메뉴 항목 제거 (라우트 및 페이지 컴포넌트는 유지 — deep-link 호환):
- *       상품 정보 제작, POP, QR 코드, 블로그, 상품 상세설명
- *   - 제작 진입은 후속 WO에서 "내 자료함 > 매장 제작 자료" 통합 모달로 일원화 예정
- *   - IR: docs/investigations/IR-O4O-STORE-PRODUCTION-ASSET-RESTRUCTURE-V1.md
+ * KPA-Society Store Config (canonical reference)
+ * WO-STORE-SIDEBAR-RESTRUCTURE-V1 / WO-KPA-STORE-MENU-NORMALIZATION-V1 등 이전 정렬 이력 생략.
+ * WO-O4O-MY-STORE-PRODUCT-CENTERED-ACTIVATION-V1 (2026-06-05):
+ *   O4O-STORE-MENU-CANONICAL-TREE-V1 §9.3 W9 — 3개 서비스 메뉴 축 정렬의 기준(reference).
+ *   "상품 관리" 그룹 분해 → 약국 운영(공급자 상품·주문) + 약국 활성화(내 약국 상품·블로그·POP·QR).
+ *   기존 "매장 실행"(블로그/POP/QR) 그룹은 약국 활성화로 흡수.
+ *   상품 상세설명은 KPA 라우트 마운트 미확인으로 활성화에서 제외(데드링크 방지) — 2차 후보.
+ *   사이니지/채널/분석/설정 유지. 모든 subPath 불변.
  */
 export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
   serviceKey: 'kpa-society',
@@ -273,25 +236,20 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
     { label: '', items: [
       { key: 'home', label: '홈', subPath: '' },
     ]},
-    // WO-O4O-STORE-SIDEBAR-MENU-UX-IMPROVEMENT-V1: 섹션 라벨을 기능 중심 명칭으로 정렬
-    // WO-O4O-KPA-STORE-PRODUCT-MENU-LABEL-RENAME-V1: canonical naming 정렬
-    // WO-O4O-KPA-STORE-PRODUCT-MENU-SIMPLIFICATION-V1: 상품 관리 메뉴 2개로 단순화
-    //   직접 등록 상품(local-products) 메뉴 제거 — route(/commerce/local-products)는 유지
-    { label: '상품 관리', items: [
+    { label: '약국 운영', items: [
       { key: 'products',    label: '공급자 상품', subPath: '/commerce/products' },
-      { key: 'my-products', label: '내 매장 상품', subPath: '/my-products' },
       { key: 'orders',      label: '주문 내역',   subPath: '/commerce/orders' },
     ]},
-    // WO-O4O-STORE-SIDEBAR-MENU-UX-IMPROVEMENT-V1:
-    //   "내 자료함" → "마케팅 자료함" (제작 시작 진입 의미 명확화)
-    //   "자료" → "디지털 자료" (PDF/이미지/문서/복사 자료 등 저장 성격 명시)
-    //   "콘텐츠" 라벨은 유지 (이미 사용자에 익숙, AI 콘텐츠 흐름과 연결)
-    // 매장이 커뮤니티/공급자에서 가져와 보유한 source/reference 보관함.
-    // 제작 시작(POP/QR/블로그/상품 상세설명)은 본 그룹에서만 진입.
-    // (강좌/레슨형 콘텐츠는 콘텐츠 항목 내부에서 type 표시만, 별도 그룹 금지)
-    // WO-O4O-KPA-STORE-LIBRARY-MENU-LABEL-RESTORE-V1: 그룹명 "마케팅 자료함" → "내 자료함", 항목명 "디지털 자료" → "자료"
-    // WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-LIBRARY-TAB-V1: "매장 제작 자료" 항목 추가
-    { label: '내 자료함', items: [
+    // 약국 활성화 — 내 약국 상품을 앵커로, 제품 파생 콘텐츠(블로그/POP/QR)를 함께 배치.
+    // WO-O4O-KPA-STORE-MENU-BLOG-POP-QR-ALIGNMENT-V1 의 라우트/페이지/API 그대로 사용.
+    { label: '약국 활성화', items: [
+      { key: 'my-products',  label: '내 약국 상품', subPath: '/my-products' },
+      { key: 'content-blog', label: '블로그',      subPath: '/content/blog' },
+      { key: 'pop',          label: 'POP',        subPath: '/marketing/pop' },
+      { key: 'qr',           label: 'QR-code',    subPath: '/marketing/qr' },
+    ]},
+    // WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-LIBRARY-TAB-V1: "매장 제작 자료" 항목 포함
+    { label: '약국 자료함', items: [
       { key: 'library-contents',              label: '콘텐츠',       subPath: '/library/contents' },
       { key: 'library-resources',             label: '자료',         subPath: '/library/resources' },
       { key: 'library-production-materials',  label: '매장 제작 자료', subPath: '/library/production-materials' },
@@ -302,24 +260,11 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'signage-schedules', label: '스케줄',       subPath: '/marketing/signage/schedules' },
       { key: 'signage-player',    label: 'TV 재생',      subPath: '/marketing/signage/player' },
     ]},
-    // 채널 — 매장 운영 기능 (채널 관리 / 태블릿 / 상담 요청).
-    // 태블릿: 매장 내 interactive device. 매장당 복수 tablet 전제.
-    //         (idle playlist 연결은 후속 WO에서 도입)
+    // 채널 — 매장 운영 보조 기능 (채널 관리 / 태블릿 / 상담 요청).
     { label: '채널', items: [
       { key: 'channels',         label: '채널 관리', subPath: '/channels' },
       { key: 'tablet-displays',  label: '태블릿',    subPath: '/commerce/tablet-displays' },
       { key: 'requests',         label: '상담 요청', subPath: '/requests' },
-    ]},
-    // 매장 실행 — Store Menu Canonical 의 실행 자산 진입점.
-    // WO-O4O-KPA-STORE-MENU-BLOG-POP-QR-ALIGNMENT-V1 (2026-05-24):
-    //   기존 WO-O4O-KPA-STORE-SIDEBAR-PRODUCTION-MENU-REMOVE-V1 의 "내 자료함 > 매장 제작 자료
-    //   모달 통합" 후속이 미완성이어서 진입점 부재 상태. 라우트/페이지/API 가 모두 존재하므로
-    //   Store Menu Canonical 정합을 위해 sidebar 직접 노출로 복원.
-    //   (운영자/HUB 측 POP/QR 신설은 별도 WO 후보 — WO-O4O-KPA-POP-PUBLISHING-V1 등.)
-    { label: '매장 실행', items: [
-      { key: 'content-blog', label: '블로그',   subPath: '/content/blog' },
-      { key: 'pop',          label: 'POP',     subPath: '/marketing/pop' },
-      { key: 'qr',           label: 'QR-code', subPath: '/marketing/qr' },
     ]},
     { label: '분석', items: [
       { key: 'analytics-marketing', label: '마케팅 분석', subPath: '/analytics/marketing' },
