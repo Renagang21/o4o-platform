@@ -95,6 +95,17 @@ Core → Extension → Feature → Service
 - `authClient.api.get()` / `authClient.api.post()` 필수
 - 환경변수 직접 사용 금지, 하드코딩 URL 금지
 
+### Shared Module / Core+Extension Change Rule
+
+공통 모듈, 공통 config, 공통 sidebar/menu, 공통 layout, 공통 capability/permission map, core+extension contract를 수정할 때는 **단일 서비스 기준으로 완료 판단하지 않는다.**
+
+- 반드시 해당 모듈의 **모든 소비처를 먼저 식별**하고, KPA-Society / GlycoPharm / K-Cosmetics / Neture 및 관련 admin/operator/store/forum/store-hub/mypage 소비 영역에 미치는 영향을 확인한다.
+- KPA-only / GlycoPharm-only / K-Cosmetics-only / Neture-only 임시 예외로 해결하지 말고, **공통 정책 문제인지 먼저 판단**한다.
+- route, role, capability, visibility, feature flag, extension contract 필터를 함께 검증한다 (빈 그룹/빈 block 제거로 화면에서 사라질 가능성 포함).
+- DB backfill / migration / capability 주입으로 UI 정책 문제를 임시 해결하지 않는다. route 없는 메뉴는 노출하지 않고, route 있는 실기능 메뉴는 숨기지 않는다 (데드링크 0 / 기능 은폐 0).
+
+> 📄 세부 절차: `docs/baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md`
+
 ---
 
 ## 2. TypeORM Entity – ESM Rules (FROZEN)
@@ -386,6 +397,7 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | **디버그 SSR 테스트 페이지** | `docs/platform/debug/DEBUG-SSR-TEST-PAGE-GUIDE-V1.md` |
 | **User/Operator Freeze** | `docs/architecture/USER-OPERATOR-FREEZE-V1.md` |
 | **O4O 공통 구조 원칙** | `docs/o4o-common-structure.md` |
+| **Shared Module Change Protocol** | `docs/baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md` |
 | **HUB Template Standard** | `docs/platform/hub/O4O-HUB-TEMPLATE-STANDARD-V1.md` |
 | **Event Offer 공통 도메인** | `docs/baseline/EVENT-OFFER-COMMON-DOMAIN-V1.md` |
 | **Event Offer Store 통합** | `docs/baseline/EVENT-OFFER-STORE-INTEGRATION-V1.md` |
