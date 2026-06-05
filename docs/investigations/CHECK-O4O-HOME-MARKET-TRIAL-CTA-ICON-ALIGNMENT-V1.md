@@ -50,11 +50,18 @@ services/web-k-cosmetics   npx tsc --noEmit   # exit 0
 
 ---
 
-## 6. desktop/mobile smoke 결과
+## 6. desktop/mobile smoke 결과 — **PASS (배포 후 라이브 검증, 2026-06-05)**
 
-- **정적 검증 PASS** (대상 2파일 CTA emoji 제거, FlaskConical 렌더 코드 확인).
-- **라이브 smoke: 배포 후.** Home(`/`)은 **공개 페이지**라 무인증 확인 가능.
-- **배포 후 확인**: KPA `/` · K-Cosmetics `/` 하단 Market Trial CTA 가 FlaskConical(플라스크) 아이콘으로 표시(🧪 아님), Neture 와 동일. 링크/문구 회귀 없음.
+Playwright 무인증 공개 Home 검증:
+
+| 대상 | 결과 |
+|------|------|
+| KPA `/` | ✅ Market Trial CTA `🧪` 제거 → **FlaskConical**(blue, KPA primary) 렌더 |
+| K-Cosmetics `/` | ✅ Market Trial CTA `🧪` 제거 → **FlaskConical**(pink, KCos primary) 렌더 |
+| Neture `/` (회귀 확인) | ✅ 기존 FlaskConical 유지 |
+
+- 링크(`https://neture.co.kr`)/문구/섹션 회귀 없음. console: `api.neture.co.kr/auth/me` 401(cross-service 인증 폴링, benign) 외 critical error 없음.
+- 스크린샷: `home-kpa-market-trial-cta.png` / `home-kcos-market-trial-cta.png` (작업 트리 untracked).
 
 ---
 

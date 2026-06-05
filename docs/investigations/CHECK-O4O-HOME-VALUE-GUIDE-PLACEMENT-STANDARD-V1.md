@@ -51,15 +51,13 @@ services/web-kpa-society   npx tsc --noEmit   # exit 0
 
 ---
 
-## 6. desktop/mobile smoke 결과
+## 6. desktop/mobile smoke 결과 — **PASS (배포 후 라이브 검증, 2026-06-05)**
 
-- **정적 검증 PASS** (placement 1줄 변경, tsc 0).
-- **라이브 smoke: 배포 후.** KPA Home(`/`)은 공개 페이지 — 무인증 확인 가능.
-- **배포 후 확인**:
-  - KPA Home 에서 **"내 역할로 시작하기" 역할 카드가 "이용 가이드(KPA-Society 이용 가이드)"보다 위**로 이동했는지
-  - 역할 카드 내용/링크/순서 회귀 없음, 다른 섹션 회귀 없음
-  - Neture Home(`/`) 기존 before-app-entry 회귀 없음(공통 템플릿 동작 확인)
-  - desktop/mobile 모두
+Playwright 무인증 공개 Home 검증:
+- **KPA `/`**: 섹션 순서 = Hero → 공지/최신글 → **내 역할로 시작하기**(역할 3카드) → 서비스 바로가기 → Market Trial CTA → **KPA-Society 이용 가이드**. → **역할 카드가 이용 가이드보다 위**로 이동 확인 ✅ (이전 after-help = 가이드 아래 → 정렬 완료).
+- 역할 카드 내용/링크(`/guide/for/*`)/순서 회귀 없음, 다른 섹션 회귀 없음.
+- **Neture `/`(회귀 확인)**: 내 역할로 시작하기(공급자/MT/파트너)가 "Neture 이용 안내" 위에 유지 → before-app-entry 회귀 없음 ✅ (공통 템플릿 동작 정상).
+- console: cross-service 401(benign) 외 critical error 없음.
 
 ---
 
