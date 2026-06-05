@@ -16,7 +16,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
+import { Loader2, FlaskConical } from 'lucide-react';
 import { PageHero, Card, useTemplate } from '@o4o/ui';
 import {
   HeroBannerSection,
@@ -238,7 +238,8 @@ export function HomePage() {
         description: '서비스 참여자와 함께 제품을 다듬고, 좋은 조건의 유통 환경을 만들어가는 참여형 프로그램',
         href: 'https://neture.co.kr',
         linkLabel: 'Neture에서 보기 →',
-        icon: <span>🧪</span>,
+        // O4O-GLOBAL-ICON-SYSTEM-STANDARD-V1: Market Trial 표준 아이콘 (Neture 기준 정렬)
+        icon: <FlaskConical size={28} className="text-primary" />,
         accentColor: 'var(--color-primary)',
         accentBg: 'var(--color-primary-light, #fdf2f8)',
         external: true,
