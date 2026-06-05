@@ -158,20 +158,8 @@ export interface SellerWorkflowSessionDto {
   createdAt: Date;
 }
 
-/**
- * 캠페인 DTO
- */
-export interface CosmeticsCampaignDto {
-  id: string;
-  name: string;
-  description?: string;
-  startDate: Date;
-  endDate: Date;
-  targetSkinTypes?: string[];
-  targetConcerns?: string[];
-  products: string[];
-  isActive: boolean;
-}
+// CosmeticsCampaignDto REMOVED — WO-O4O-COSMETICS-SIGNAGE-PRODUCT-RELATION-REMOVE-V1
+//   campaign(product 결합) dead 경로 제거. 사용처 없던 고아 DTO.
 
 /**
  * 브랜드 DTO

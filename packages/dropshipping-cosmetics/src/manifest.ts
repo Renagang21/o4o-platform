@@ -342,9 +342,10 @@ export const cosmeticsExtensionManifest = {
     'cosmetics_concerns',
     'cosmetics_ingredients',
     'cosmetics_categories',
-    'cosmetics_signage_playlists',
+    // 'cosmetics_signage_playlists' / 'cosmetics_campaigns' REMOVED
+    //   WO-O4O-COSMETICS-SIGNAGE-PRODUCT-RELATION-REMOVE-V1 — product 결합 dead 경로
+    //   (마이그레이션 없음, prod DB 부재 라이브 확인). 매장 사이니지는 cosmetics_store_playlists.
     'cosmetics_seller_workflow_sessions',
-    'cosmetics_campaigns',
   ],
 
   // ===== 삭제 정책 =====
@@ -364,9 +365,9 @@ export const cosmeticsExtensionManifest = {
       './backend/entities/concern.entity',
       './backend/entities/ingredient.entity',
       './backend/entities/category.entity',
-      './backend/entities/signage-playlist.entity',
+      // signage-playlist.entity / campaign.entity REMOVED
+      //   WO-O4O-COSMETICS-SIGNAGE-PRODUCT-RELATION-REMOVE-V1 (product 결합 dead 경로)
       './backend/entities/seller-workflow-session.entity',
-      './backend/entities/campaign.entity',
     ],
     services: [
       'CosmeticsMetadataService',

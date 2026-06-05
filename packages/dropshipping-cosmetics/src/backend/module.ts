@@ -2,6 +2,11 @@
  * Cosmetics Extension Backend Module
  *
  * Exports entities and routes for API server integration
+ *
+ * WO-O4O-COSMETICS-SIGNAGE-PRODUCT-RELATION-REMOVE-V1 (2026-06-05):
+ *   product 직접 결합 dead 경로 제거 — CosmeticsSignagePlaylist / CosmeticsCampaign
+ *   entity·service·route·controller 및 본 모듈 등록을 삭제.
+ *   활성 매장 사이니지는 api-server o4o-store /store-playlists (snapshot/signage-media) — 본 패키지 무관.
  */
 
 import type { DataSource } from 'typeorm';
@@ -13,9 +18,7 @@ import {
   CosmeticsConcern,
   CosmeticsIngredient,
   CosmeticsCategory,
-  CosmeticsSignagePlaylist,
   CosmeticsSellerWorkflowSession,
-  CosmeticsCampaign,
 } from './entities/index.js';
 import { createCosmeticsFilterRoutes } from './routes/cosmetics-filter.routes.js';
 // createInfluencerRoutineRoutes REMOVED - Routine CRUD moved to cosmetics-partner-extension (Phase 7-Y)
@@ -23,9 +26,8 @@ import { createSignageRoutes } from './routes/signage.routes.js';
 import { createRecommendationRoutes } from './routes/recommendation.routes.js';
 import { createBrandRoutes } from './routes/brand.routes.js';
 import { createDictionaryRoutes } from './routes/dictionary.routes.js';
-import { createSignagePlaylistRoutes } from './routes/signage-playlist.routes.js';
+// createSignagePlaylistRoutes / createCampaignRoutes REMOVED (WO-O4O-COSMETICS-SIGNAGE-PRODUCT-RELATION-REMOVE-V1)
 import { createSellerWorkflowRoutes } from './routes/seller-workflow.routes.js';
-import { createCampaignRoutes } from './routes/campaign.routes.js';
 
 export function createCosmeticsModule(dataSource: DataSource) {
   return {
@@ -41,9 +43,7 @@ export function createCosmeticsModule(dataSource: DataSource) {
       CosmeticsConcern,
       CosmeticsIngredient,
       CosmeticsCategory,
-      CosmeticsSignagePlaylist,
       CosmeticsSellerWorkflowSession,
-      CosmeticsCampaign,
     ],
 
     // Express routes (initialized with DataSource)
@@ -69,17 +69,10 @@ export function createCosmeticsModule(dataSource: DataSource) {
         path: '/api/v1/cosmetics',
         router: createDictionaryRoutes(dataSource),
       },
-      {
-        path: '/api/v1/cosmetics',
-        router: createSignagePlaylistRoutes(dataSource),
-      },
+      // signage-playlist / campaign routes REMOVED (product 결합 dead 경로)
       {
         path: '/api/v1/cosmetics',
         router: createSellerWorkflowRoutes(dataSource),
-      },
-      {
-        path: '/api/v1/cosmetics',
-        router: createCampaignRoutes(dataSource),
       },
     ],
   };
@@ -94,9 +87,7 @@ export const CosmeticsEntities = [
   CosmeticsConcern,
   CosmeticsIngredient,
   CosmeticsCategory,
-  CosmeticsSignagePlaylist,
   CosmeticsSellerWorkflowSession,
-  CosmeticsCampaign,
 ];
 
 export default createCosmeticsModule;
