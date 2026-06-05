@@ -34,6 +34,10 @@ import {
   getStoreExecutionAssets,
   deleteStoreExecutionAsset,
 } from '../../api/storeExecutionAssets';
+// WO-KPA-STORE-LIBRARY-RESULT-UNIFIED-VIEW-V1: 결과물(QR/블로그) 읽기 통합 — 기존 list API 병합
+import { getStoreQrCodes, deleteStoreQrCode } from '../../api/storeQr';
+import { fetchStaffBlogPosts } from '../../api/blogStaff';
+import { getStoreSlug } from '../../api/pharmacyInfo';
 import { getAccessToken } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
 import { SelectContentsForProductionModal } from './SelectContentsForProductionModal';
@@ -41,6 +45,9 @@ import { StartProductionModal, type ProductionSource, type ProductionSourceItem 
 import { composeSourceTextFromItems, buildProductionState } from './productionTargets';
 
 // ─── 타입 ─────────────────────────────────────────────────────────────────────
+
+// WO-KPA-STORE-LIBRARY-RESULT-UNIFIED-VIEW-V1: 결과물 유형 (제작자료 / QR / 블로그)
+type ResultKind = 'material' | 'qr' | 'blog';
 
 interface ProductionMaterialItem {
   id: string;
@@ -51,8 +58,15 @@ interface ProductionMaterialItem {
   createdFrom?: string;
   /** WO-KPA-POP-RESULT-PERSIST-AND-CONTENT-PDF-PATH-V1: 파일형 결과(저장된 POP PDF 등) 재출력용 URL */
   fileUrl?: string | null;
-  /** 삭제 API 분기용: kpa_store_contents | store_execution_assets */
-  sourceKind: 'direct-content' | 'execution-asset';
+  // WO-KPA-STORE-LIBRARY-RESULT-UNIFIED-VIEW-V1
+  kind: ResultKind;
+  /** blog status (draft/published/archived) 또는 QR 활성 상태 라벨 */
+  status?: string;
+  /** QR/블로그 행 → 원본 관리 화면 이동 경로 */
+  href?: string;
+  scanCount?: number;
+  /** 삭제 API 분기용 */
+  sourceKind: 'direct-content' | 'execution-asset' | 'qr' | 'blog';
 }
 
 // ─── 메타 레이블 헬퍼 ────────────────────────────────────────────────────────
@@ -72,6 +86,19 @@ const STAGE_LABELS: Record<string, { label: string; bg: string; fg: string }> = 
   draft:     { label: '초안',  bg: '#F3F4F6', fg: '#6B7280' },
   finalized: { label: '완성',  bg: '#DCFCE7', fg: '#16A34A' },
   archived:  { label: '보관',  bg: '#FEF3C7', fg: '#D97706' },
+};
+
+// WO-KPA-STORE-LIBRARY-RESULT-UNIFIED-VIEW-V1: 유형 배지 + 블로그 상태 라벨
+const KIND_BADGE: Record<ResultKind, { label: string; bg: string; fg: string }> = {
+  material: { label: '제작 자료', bg: '#EEF2FF', fg: '#4338CA' },
+  qr:       { label: 'QR-code',  bg: '#ECFEFF', fg: '#0E7490' },
+  blog:     { label: '블로그',   bg: '#ECFDF5', fg: '#047857' },
+};
+
+const BLOG_STATUS_LABELS: Record<string, { label: string; bg: string; fg: string }> = {
+  draft:     { label: '초안', bg: '#F3F4F6', fg: '#6B7280' },
+  published: { label: '발행', bg: '#DCFCE7', fg: '#16A34A' },
+  archived:  { label: '보관', bg: '#FEF3C7', fg: '#D97706' },
 };
 
 const FROM_LABELS: Record<string, string> = {
@@ -224,10 +251,14 @@ export default function StoreProductionMaterialsPage() {
     setError(null);
     try {
       // WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-LIST-SOURCE-ALIGN-V1
-      // 두 소스 병렬 페치. 한쪽 실패해도 다른 쪽은 표시.
-      const [directRes, assetsRes] = await Promise.all([
+      // WO-KPA-STORE-LIBRARY-RESULT-UNIFIED-VIEW-V1: 결과물(QR/블로그) 읽기 병합.
+      //   각 소스 독립 .catch→null (한쪽 실패해도 나머지 표시). 블로그는 slug 필요.
+      const slug = await getStoreSlug().catch(() => null);
+      const [directRes, assetsRes, qrRes, blogRes] = await Promise.all([
         directContentApi.list().catch(() => null),
         getStoreExecutionAssets({ limit: 100 }).catch(() => null),
+        getStoreQrCodes({ limit: 50 }).catch(() => null),
+        slug ? fetchStaffBlogPosts(slug, { limit: 50 }).catch(() => null) : Promise.resolve(null),
       ]);
 
       const directItems: ProductionMaterialItem[] = ((directRes?.data ?? []) as any[])
@@ -239,6 +270,7 @@ export default function StoreProductionMaterialsPage() {
           purpose: it.purpose ?? it.contentJson?.purpose,
           stage: it.stage ?? it.contentJson?.stage,
           createdFrom: it.createdFrom ?? it.contentJson?.createdFrom,
+          kind: 'material',
           sourceKind: 'direct-content',
         }));
 
@@ -252,10 +284,40 @@ export default function StoreProductionMaterialsPage() {
           stage: 'finalized',
           createdFrom: 'ai',
           fileUrl: it.fileUrl ?? undefined,
+          kind: 'material',
           sourceKind: 'execution-asset',
         }));
 
-      const merged = [...directItems, ...executionItems].sort(
+      // WO-KPA-STORE-LIBRARY-RESULT-UNIFIED-VIEW-V1: QR 결과물 (store_qr_codes, organization 격리)
+      const qrItems: ProductionMaterialItem[] = ((qrRes?.data?.items ?? []) as any[])
+        .map((it: any): ProductionMaterialItem => ({
+          id: it.id,
+          title: it.title,
+          updatedAt: it.updatedAt ?? it.createdAt,
+          purpose: 'qr',
+          status: it.isActive ? '활성' : '비활성',
+          createdFrom: 'qr',
+          href: '/store/marketing/qr',
+          scanCount: it.scanCount,
+          kind: 'qr',
+          sourceKind: 'qr',
+        }));
+
+      // WO-KPA-STORE-LIBRARY-RESULT-UNIFIED-VIEW-V1: 블로그 결과물 (store_blog_posts, store slug 격리)
+      const blogItems: ProductionMaterialItem[] = ((blogRes?.data ?? []) as any[])
+        .map((it: any): ProductionMaterialItem => ({
+          id: it.id,
+          title: it.title,
+          updatedAt: it.updatedAt ?? it.createdAt,
+          purpose: 'blog',
+          status: it.status,
+          createdFrom: 'blog',
+          href: '/store/content/blog',
+          kind: 'blog',
+          sourceKind: 'blog',
+        }));
+
+      const merged = [...directItems, ...executionItems, ...qrItems, ...blogItems].sort(
         (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
       );
 
@@ -272,11 +334,14 @@ export default function StoreProductionMaterialsPage() {
 
   // ─── 선택 ─────────────────────────────────────────────────────────────────
 
-  const allSelected = items.length > 0 && items.every((it) => selected.has(it.id));
+  // WO-KPA-STORE-LIBRARY-RESULT-UNIFIED-VIEW-V1: 선택/일괄삭제는 제작자료(material) 행에만 적용.
+  //   (QR=soft delete 개별 / 블로그=hard delete 는 본 화면 미노출 → 블로그 관리 화면에서 처리)
+  const materialItems = items.filter((it) => it.kind === 'material');
+  const allSelected = materialItems.length > 0 && materialItems.every((it) => selected.has(it.id));
 
   const toggleAll = () => {
     if (allSelected) setSelected(new Set());
-    else setSelected(new Set(items.map((it) => it.id)));
+    else setSelected(new Set(materialItems.map((it) => it.id)));
   };
 
   const toggleOne = (id: string) => {
@@ -301,6 +366,21 @@ export default function StoreProductionMaterialsPage() {
       }
       setItems((prev) => prev.filter((it) => it.id !== id));
       setSelected((prev) => { const n = new Set(prev); n.delete(id); return n; });
+      toast.success('삭제되었습니다');
+    } catch (e: any) {
+      toast.error(e?.message || '삭제에 실패했습니다');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  // WO-KPA-STORE-LIBRARY-RESULT-UNIFIED-VIEW-V1: QR soft delete (store_qr_codes.is_active=false)
+  const handleDeleteQr = async (id: string) => {
+    if (!confirm('이 QR-code를 삭제하시겠습니까?')) return;
+    setDeletingId(id);
+    try {
+      await deleteStoreQrCode(id);
+      setItems((prev) => prev.filter((it) => it.id !== id));
       toast.success('삭제되었습니다');
     } catch (e: any) {
       toast.error(e?.message || '삭제에 실패했습니다');
@@ -367,10 +447,10 @@ export default function StoreProductionMaterialsPage() {
         </div>
       </div>
 
-      {/* WO-KPA-STORE-CONTENT-LIBRARY-CROSS-CREATE-CTA-V1: 재사용 안내 */}
+      {/* WO-KPA-STORE-LIBRARY-RESULT-UNIFIED-VIEW-V1: POP·QR·블로그 결과물 통합 안내 */}
       <div style={styles.infoBox}>
-        저장된 제작 자료는 보관용이 아니라 <strong>POP · QR-code · 블로그 · 사이니지</strong> 제작에 다시 활용할 수 있는 원본입니다.
-        각 항목의 <strong>활용하기</strong>에서 바로 시작하세요.
+        제작한 <strong>POP · QR-code · 블로그</strong> 결과물을 한 곳에서 확인하고 다시 활용하세요.
+        제작 자료는 <strong>활용하기</strong>로 새 결과물을 만들 수 있고, QR·블로그는 <strong>열기</strong>로 관리 화면에서 수정합니다.
       </div>
 
       {/* Batch toolbar */}
@@ -438,7 +518,7 @@ export default function StoreProductionMaterialsPage() {
             <div style={{ ...styles.col, width: 80 }}>상태</div>
             <div style={{ ...styles.col, width: 100 }}>생성 출처</div>
             <div style={{ ...styles.col, width: 100 }}>최근 수정일</div>
-            <div style={{ ...styles.col, width: 70 }}>출력</div>
+            <div style={{ ...styles.col, width: 70 }}>출력/열기</div>
             <div style={{ ...styles.col, width: 116 }}>활용</div>
             <div style={{ ...styles.col, width: 44 }} />
           </div>
@@ -446,10 +526,16 @@ export default function StoreProductionMaterialsPage() {
           {/* 테이블 행 */}
           {items.map((item) => {
             const isSelected = selected.has(item.id);
+            const isMaterial = item.kind === 'material';
+            const kindBadge = KIND_BADGE[item.kind];
             const stage = stageInfo(item.stage);
+            const blogStatus =
+              item.kind === 'blog'
+                ? (BLOG_STATUS_LABELS[item.status ?? 'draft'] ?? BLOG_STATUS_LABELS.draft)
+                : null;
             return (
               <div
-                key={item.id}
+                key={`${item.kind}-${item.id}`}
                 style={{
                   ...styles.tableRow,
                   background: isSelected ? '#F5F3FF' : colors.white,
@@ -457,27 +543,45 @@ export default function StoreProductionMaterialsPage() {
                 }}
               >
                 <div style={{ ...styles.col, width: 28 }}>
-                  <input
-                    type="checkbox"
-                    checked={isSelected}
-                    onChange={() => toggleOne(item.id)}
-                    style={styles.checkbox}
-                    aria-label={`${item.title} 선택`}
-                  />
+                  {isMaterial ? (
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => toggleOne(item.id)}
+                      style={styles.checkbox}
+                      aria-label={`${item.title} 선택`}
+                    />
+                  ) : null}
                 </div>
-                <div style={{ ...styles.col, flex: 3, minWidth: 0 }}>
+                <div style={{ ...styles.col, flex: 3, minWidth: 0, gap: 8 }}>
+                  <span style={{ ...styles.kindBadge, background: kindBadge.bg, color: kindBadge.fg }}>
+                    {kindBadge.label}
+                  </span>
                   <span style={styles.titleCell}>{item.title}</span>
                 </div>
                 <div style={{ ...styles.col, width: 110 }}>
                   <span style={styles.metaText}>{purposeLabel(item.purpose)}</span>
                 </div>
                 <div style={{ ...styles.col, width: 80 }}>
-                  <span style={{ ...styles.stageBadge, background: stage.bg, color: stage.fg }}>
-                    {stage.label}
-                  </span>
+                  {isMaterial ? (
+                    <span style={{ ...styles.stageBadge, background: stage.bg, color: stage.fg }}>
+                      {stage.label}
+                    </span>
+                  ) : blogStatus ? (
+                    <span style={{ ...styles.stageBadge, background: blogStatus.bg, color: blogStatus.fg }}>
+                      {blogStatus.label}
+                    </span>
+                  ) : item.kind === 'qr' ? (
+                    <span style={styles.metaText}>
+                      {item.status ?? '-'}
+                      {typeof item.scanCount === 'number' ? ` · ${item.scanCount}회` : ''}
+                    </span>
+                  ) : (
+                    <span style={styles.metaText}>-</span>
+                  )}
                 </div>
                 <div style={{ ...styles.col, width: 100 }}>
-                  <span style={styles.metaText}>{fromLabel(item.createdFrom)}</span>
+                  <span style={styles.metaText}>{isMaterial ? fromLabel(item.createdFrom) : '-'}</span>
                 </div>
                 <div style={{ ...styles.col, width: 100 }}>
                   <span style={styles.metaText}>
@@ -496,22 +600,42 @@ export default function StoreProductionMaterialsPage() {
                       <ExternalLink size={13} />
                       출력
                     </a>
+                  ) : item.href ? (
+                    <button type="button" onClick={() => navigate(item.href!)} style={styles.openBtn} title="열기">
+                      <ExternalLink size={13} />
+                      열기
+                    </button>
                   ) : (
                     <span style={{ ...styles.metaText, color: colors.neutral300 }}>-</span>
                   )}
                 </div>
                 <div style={{ ...styles.col, width: 116 }}>
-                  <RowUseMenu onPick={(to) => goCreate(to, item)} />
+                  {isMaterial ? (
+                    <RowUseMenu onPick={(to) => goCreate(to, item)} />
+                  ) : (
+                    <span style={{ ...styles.metaText, color: colors.neutral300 }}>-</span>
+                  )}
                 </div>
                 <div style={{ ...styles.col, width: 44 }}>
-                  <button
-                    onClick={() => handleDeleteOne(item.id, item.sourceKind)}
-                    disabled={deletingId === item.id}
-                    style={styles.deleteBtn}
-                    title="삭제"
-                  >
-                    <Trash2 size={14} />
-                  </button>
+                  {isMaterial ? (
+                    <button
+                      onClick={() => handleDeleteOne(item.id, item.sourceKind)}
+                      disabled={deletingId === item.id}
+                      style={styles.deleteBtn}
+                      title="삭제"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  ) : item.kind === 'qr' ? (
+                    <button
+                      onClick={() => handleDeleteQr(item.id)}
+                      disabled={deletingId === item.id}
+                      style={styles.deleteBtn}
+                      title="삭제"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  ) : null}
                 </div>
               </div>
             );
@@ -653,6 +777,19 @@ const styles: Record<string, CSSProperties> = {
     color: colors.primary,
     textDecoration: 'none',
     whiteSpace: 'nowrap',
+    background: 'transparent',
+    border: 'none',
+    cursor: 'pointer',
+  },
+  kindBadge: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    padding: '2px 7px',
+    fontSize: '11px',
+    fontWeight: 600,
+    borderRadius: '4px',
+    whiteSpace: 'nowrap',
+    flexShrink: 0,
   },
   menuBackdrop: {
     position: 'fixed',
