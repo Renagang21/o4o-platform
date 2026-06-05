@@ -9,7 +9,7 @@
 
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { FlaskConical } from 'lucide-react';
+import { Store, GraduationCap, CalendarDays, FlaskConical } from 'lucide-react';
 import { colors, borderRadius } from '../styles/theme';
 import { kpaConfig } from '@o4o/operator-ux-core';
 
@@ -96,7 +96,7 @@ export function ExternalServiceSection() {
       </p>
       <div style={{ marginBottom: '24px' }}>
         <ServiceBanner
-          icon="💊"
+          icon={<Store size={22} />}
           title={kpaConfig.uiText.homePrimaryCTA}
           description="B2B 구매, 약국 몰 관리, 연결 서비스를 통합 관리합니다."
           linkUrl="/pharmacy"
@@ -114,7 +114,7 @@ export function ExternalServiceSection() {
       </p>
       <div style={styles.bannerGrid}>
         <ServiceBanner
-          icon="🎓"
+          icon={<GraduationCap size={22} />}
           title="교육/연수 서비스"
           description="약사 연수교육, 보수교육, 전문교육 과정을 제공합니다."
           linkUrl="/lms"
@@ -124,7 +124,7 @@ export function ExternalServiceSection() {
           isInternal={true}
         />
         <ServiceBanner
-          icon="🛒"
+          icon={<CalendarDays size={22} />}
           title="이벤트 상품"
           description="약국 운영에 필요한 물품을 합리적인 가격에 이벤트로 제공합니다."
           linkUrl="/hub/event-offers"
