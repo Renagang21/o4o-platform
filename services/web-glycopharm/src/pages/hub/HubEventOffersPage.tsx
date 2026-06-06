@@ -9,6 +9,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { Loader2, Tag, ShoppingCart } from 'lucide-react';
+import { toast } from '@o4o/error-handling';
 import {
   glycopharmEventOfferApi,
   type EnrichedEventOffer,
@@ -40,6 +41,7 @@ export function HubEventOffersPage() {
   const [offers, setOffers] = useState<EnrichedEventOffer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [orderingId, setOrderingId] = useState<string | null>(null);
 
   const loadOffers = useCallback(async () => {
     setLoading(true);
@@ -68,6 +70,27 @@ export function HubEventOffersPage() {
   useEffect(() => {
     loadOffers();
   }, [loadOffers]);
+
+  // 바로 주문 — 관심/참여 신청이 아니라 즉시 실주문(participate) 생성.
+  // 성공 시 잔여 수량 반영을 위해 목록을 새로고침한다.
+  const handleOrder = useCallback(
+    async (offer: EnrichedEventOffer) => {
+      if (orderingId) return; // 중복 클릭 방지
+      setOrderingId(offer.id);
+      try {
+        await glycopharmEventOfferApi.participate(offer.id, 1);
+        toast.success(`"${offer.productName}" 주문이 완료되었습니다.`);
+        await loadOffers();
+      } catch (err: any) {
+        toast.error(
+          err?.response?.data?.error?.message || err?.message || '주문에 실패했습니다.',
+        );
+      } finally {
+        setOrderingId(null);
+      }
+    },
+    [orderingId, loadOffers],
+  );
 
   return (
     <div className="space-y-6">
@@ -148,12 +171,17 @@ export function HubEventOffersPage() {
                   <div className="flex justify-end">
                     <button
                       type="button"
-                      disabled
-                      title="주문 제품 추가는 준비 중입니다."
-                      className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md border border-slate-200 text-slate-400 bg-slate-50 cursor-not-allowed"
+                      onClick={() => handleOrder(offer)}
+                      disabled={orderingId === offer.id}
+                      title="이벤트 오퍼를 바로 주문합니다."
+                      className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md border border-teal-200 text-teal-700 bg-teal-50 hover:bg-teal-100 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
                     >
-                      <ShoppingCart size={12} />
-                      추가 (준비 중)
+                      {orderingId === offer.id ? (
+                        <Loader2 size={12} className="animate-spin" />
+                      ) : (
+                        <ShoppingCart size={12} />
+                      )}
+                      {orderingId === offer.id ? '주문 중...' : '바로 주문'}
                     </button>
                   </div>
                 </div>

@@ -39,6 +39,19 @@ export interface EnrichedEventOffersResponse {
   pagination: { page: number; limit: number; total: number; totalPages: number };
 }
 
+/** 이벤트 오퍼 바로 주문(participate) 응답 — checkoutService.createOrder() 결과 스냅샷 */
+export interface EventOfferOrderResult {
+  orderId: string;
+  orderNumber: string;
+  status: string;
+  totalAmount: number;
+}
+
+export interface EventOfferOrderResponse {
+  success: boolean;
+  data: EventOfferOrderResult;
+}
+
 export const cosmeticsEventOfferApi = {
   /**
    * approved + 진행중인 K-Cos Event Offer 목록.
@@ -54,4 +67,15 @@ export const cosmeticsEventOfferApi = {
       `/cosmetics/event-offers/enriched?${qs.toString()}`,
     );
   },
+
+  /**
+   * 승인·진행 중인 이벤트 오퍼를 바로 주문한다.
+   * 관심/참여 신청이 아니라 즉시 실주문(checkoutService.createOrder()) 생성.
+   * Backend: POST /api/v1/cosmetics/event-offers/:id/participate (WO-O4O-EVENT-OFFER-GLYCO-KCOS-STORE-ORDER-ENABLE-V1)
+   */
+  participate: (id: string, quantity = 1) =>
+    api.post<EventOfferOrderResponse>(
+      `/cosmetics/event-offers/${id}/participate`,
+      { quantity },
+    ),
 };
