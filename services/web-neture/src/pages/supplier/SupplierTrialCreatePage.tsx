@@ -162,6 +162,16 @@ export default function SupplierTrialCreatePage({
       </h1>
       <p className="text-sm text-gray-500 mb-6">매장 참여를 설득하는 제안서를 작성하세요.</p>
 
+      {/* WO-O4O-NETURE-DISTRIBUTION-FUNDING-SUPPLIER-DESIGN-FIELDS-V1: 설계 안내 */}
+      <div className="mb-6 p-4 bg-violet-50 border border-violet-200 rounded-lg text-sm text-violet-900 space-y-1.5">
+        <p className="font-semibold">유통참여형 펀딩은 투자형 펀딩이 아닙니다.</p>
+        <ul className="list-disc list-inside space-y-1 text-violet-800 text-[13px]">
+          <li>개발비 전체를 모으는 것이 목적이 아니라 <b>제품 정산을 통한 초기 매장 랜딩</b>이 목적입니다. 목표 금액보다 <b>몇 개 매장에 들어갈지(목표 매장 수)</b>를 먼저 설계하세요.</li>
+          <li>참여금(송금)은 <b>Neture 운영자가 수령</b>하며, 송금 완료자 명단을 제품 개발자에게 공유합니다. 온라인 결제는 제공하지 않습니다.</li>
+          <li>제품 개발자는 <b>포럼 운영 주체</b>로서 참여자 검토·소통·미송금자 처리를 담당합니다.</li>
+        </ul>
+      </div>
+
       {error && (
         <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
           {error}
@@ -253,6 +263,18 @@ export default function SupplierTrialCreatePage({
             <p className="text-xs text-gray-500 mt-0.5">매장에서 이 상품을 어떻게 판매할지 구체적으로 작성해주세요</p>
           </div>
 
+          {/* WO-O4O-NETURE-DISTRIBUTION-FUNDING-SUPPLIER-DESIGN-FIELDS-V1: 설계 체크리스트 */}
+          <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-600">
+            <p className="font-medium text-gray-700 mb-1.5">아래 설계 항목을 함께 작성하면 좋습니다</p>
+            <ul className="list-disc list-inside space-y-0.5">
+              <li>목표 매장 수, 참여자에게 제공할 제품 구성(제품명·수량·정산 기준 가격·배송 시점)</li>
+              <li>제품 정산 기준 — 소비자가가 아니라 도매 공급가격 또는 그 이하</li>
+              <li>포럼 운영 방식 — 제품 개발 진행·정산 조건·송금 기한 안내</li>
+              <li>송금 기한과 미송금자 처리 기준(일정 기간 내 미송금 시 포럼에서 제외)</li>
+              <li>피드백 수집 방식, 매장 실행자료(POP·QR·블로그 소개 문구) 제공 계획</li>
+            </ul>
+          </div>
+
           <div>
             <div className="flex items-center justify-between mb-1">
               <label className="block text-sm font-medium text-gray-700">
@@ -313,6 +335,7 @@ export default function SupplierTrialCreatePage({
               placeholder="예: 시험 참여 매장에 정식 제품 1박스 제공"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
+            <p className="text-xs text-gray-400 mt-1">제품 정산(제품 제공)을 중심으로 작성하세요. 정산 제품명·예상 수량·정산 기준 가격·배송 예정 시점을 함께 적으면 좋습니다. 현금 보상은 투자형으로 오해될 수 있으니 신중히 선택하세요.</p>
           </div>
 
           {/* 펀딩 구조 — WO-MARKET-TRIAL-CROWDFUNDING-CORE-ALIGNMENT-V1 */}
@@ -320,6 +343,7 @@ export default function SupplierTrialCreatePage({
             <div>
               <h3 className="text-sm font-semibold text-blue-800">펀딩 구조 설정</h3>
               <p className="text-xs text-blue-600 mt-1">매장이 제품 단가로 참여하면, 설정한 리워드 비율만큼 추가 혜택을 받을 수 있습니다.</p>
+              <p className="text-xs text-blue-600 mt-1">금액보다 <b>목표 매장 수</b>를 먼저 정하고, 제품 정산은 소비자가가 아니라 <b>도매 공급가격 또는 그 이하</b> 기준으로 설계하는 것이 바람직합니다. 참여금은 Neture 운영자가 오프라인으로 안내·수령합니다.</p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -335,6 +359,7 @@ export default function SupplierTrialCreatePage({
                   placeholder="예: 1000000"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
+                <p className="text-xs text-gray-400 mt-1">개발비 전체가 아니라 초기 매장 랜딩 규모 기준. Neture 운영자가 오프라인으로 안내하는 송금 목표입니다.</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -348,6 +373,7 @@ export default function SupplierTrialCreatePage({
                   placeholder="예: 2000"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
+                <p className="text-xs text-gray-400 mt-1">1인당 권장 참여금액(정산 기준금액). 온라인 결제 금액이 아니라 Neture 운영자가 오프라인으로 안내하는 기준이며, 매장이 부담 없이 참여할 수준으로 설정하세요.</p>
               </div>
             </div>
 
@@ -367,6 +393,7 @@ export default function SupplierTrialCreatePage({
                 />
                 <span className="text-sm text-gray-500">% (0 = 리워드 없음)</span>
               </div>
+              <p className="text-xs text-gray-400 mt-1">리워드는 제품 정산 구성(수량·잔액) 계산의 참고값입니다.</p>
             </div>
 
             {/* 계산 미리보기 */}
@@ -400,6 +427,7 @@ export default function SupplierTrialCreatePage({
               placeholder="예: 50"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
+            <p className="text-xs text-gray-400 mt-1">포럼·제품 정산 대상으로 관리할 참여자(매장) 수의 상한입니다. 목표 매장 수와 같게 잡거나, 운영 여력을 고려해 더 낮게 설정할 수 있습니다.</p>
           </div>
 
           {/* 모집 기간 */}
@@ -431,7 +459,7 @@ export default function SupplierTrialCreatePage({
             {fieldErrors.funding && <p className="text-xs text-red-500 mt-1">{fieldErrors.funding}</p>}
           </div>
 
-          {/* Trial 기간 */}
+          {/* 진행 기간 */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               진행 기간 (일) <span className="text-red-500">*</span>

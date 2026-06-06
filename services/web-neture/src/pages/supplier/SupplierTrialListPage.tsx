@@ -76,6 +76,10 @@ export default function SupplierTrialListPage() {
       {trials.length === 0 ? (
         <div style={s.emptyBox}>
           <p style={s.empty}>등록된 유통참여형 펀딩이 없습니다.</p>
+          {/* WO-O4O-NETURE-DISTRIBUTION-FUNDING-SUPPLIER-DESIGN-FIELDS-V1 */}
+          <p style={{ fontSize: '13px', color: '#6B7280', lineHeight: 1.6, maxWidth: 460, margin: '0 auto 16px', textAlign: 'center' }}>
+            유통참여형 펀딩은 제품 개발 이후 매장 랜딩을 만들기 위한 참여형 유통 프로그램입니다. 목표 금액보다 <strong>목표 매장 수</strong>와 <strong>제품 정산 구조</strong>를 먼저 설계해 보세요.
+          </p>
           <button style={s.createBtn} onClick={() => navigate('/supplier/market-trial/new')}>
             유통참여형 펀딩 등록하기
           </button>

@@ -336,6 +336,10 @@ export default function SupplierTrialDetailPage() {
                 </div>
               );
             })()}
+          {/* WO-O4O-NETURE-DISTRIBUTION-FUNDING-SUPPLIER-DESIGN-FIELDS-V1: 운영 모델 안내 */}
+          <p style={{ fontSize: '12px', color: '#6B7280', lineHeight: 1.6, margin: '10px 0 0 0' }}>
+            참여금(송금)은 <strong>Neture 운영자가 수령</strong>하고 송금 완료자 명단을 공유합니다(온라인 결제 미제공). 제품 개발 진행·정산 조건·송금 기한·미송금자 처리는 <strong>제품 개발자가 포럼에서 운영</strong>합니다. 제품 정산 기준·정산 제품 구성·매장 활용 방식은 상세 설명/판매 시나리오 영역에 작성한 내용으로 안내하세요.
+          </p>
         </div>
       )}
 
