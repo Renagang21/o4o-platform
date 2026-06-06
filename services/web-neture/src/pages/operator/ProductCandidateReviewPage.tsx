@@ -114,6 +114,11 @@ export default function ProductCandidateReviewPage() {
   const [linkDisplayName, setLinkDisplayName] = useState('');
   const [linkMessage, setLinkMessage] = useState<string | null>(null);
 
+  // 의약품 분류 refine (F4)
+  const [refineCategory, setRefineCategory] = useState('');
+  const [refineNote, setRefineNote] = useState('');
+  const [refineMessage, setRefineMessage] = useState<string | null>(null);
+
   const load = useCallback(async () => {
     setLoading(true);
     const res = await operatorProductCandidateApi.list({
@@ -193,6 +198,32 @@ export default function ProductCandidateReviewPage() {
       await operatorProductCandidateApi.archive(detail.id);
       setDetail(null);
       await load();
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleRefine = async () => {
+    if (!detail || !detail.matchedProductMasterId) return;
+    setActionLoading(true);
+    setRefineMessage(null);
+    try {
+      const payload = { drugCategory: (refineCategory || null) as 'otc' | 'rx' | 'quasi_drug' | 'drug_unspecified' | null, note: refineNote.trim() || undefined };
+      const result = await operatorProductCandidateApi.refineDrugCategory(detail.id, payload);
+      if (result) {
+        setRefineMessage('분류가 저장되었습니다.');
+        await refreshDetail(detail.id);
+        await load();
+      } else {
+        setRefineMessage('분류 저장에 실패했습니다.');
+      }
+    } catch (e: any) {
+      const code = e?.response?.data?.error;
+      setRefineMessage(
+        code === 'DRUG_CATEGORY_REGULATORY_CONFLICT'
+          ? '규제 유형과 충돌합니다 (의약품만 OTC/Rx 지정 가능).'
+          : '분류 저장 중 오류가 발생했습니다.',
+      );
     } finally {
       setActionLoading(false);
     }
@@ -413,6 +444,9 @@ export default function ProductCandidateReviewPage() {
           setLinkServiceKey(row.serviceKey || '');
           setLinkDisplayName('');
           setLinkMessage(null);
+          setRefineCategory(row.classification?.drugCategory || '');
+          setRefineNote('');
+          setRefineMessage(null);
         }}
         tableId="neture-product-candidates"
       />
@@ -470,6 +504,52 @@ export default function ProductCandidateReviewPage() {
                   <p className="mt-2 text-[11px] text-slate-400">분류·정책은 안내용입니다. 등록/판매/노출 권한을 자동으로 변경하지 않습니다.</p>
                 </div>
               )}
+
+              {/* F4: 의약품 분류 refine (matched master 한정) */}
+              <div className="border-t border-slate-100 pt-4">
+                <label className="block text-sm font-medium text-slate-700 mb-1">의약품 분류 수정 (검토)</label>
+                {!detail.matchedProductMasterId ? (
+                  <p className="text-xs text-slate-400">기존 상품에 먼저 매칭해야 분류를 수정할 수 있습니다.</p>
+                ) : (
+                  <>
+                    <div className="flex gap-2">
+                      <select
+                        value={refineCategory}
+                        onChange={(e) => setRefineCategory(e.target.value)}
+                        className="px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="">미지정</option>
+                        <option value="drug_unspecified">의약품 미분류</option>
+                        <option value="otc">비처방의약품</option>
+                        <option value="rx">처방의약품</option>
+                        <option value="quasi_drug">의약외품</option>
+                      </select>
+                      <input
+                        type="text"
+                        value={refineNote}
+                        onChange={(e) => setRefineNote(e.target.value)}
+                        placeholder="메모 (선택)"
+                        className="flex-1 px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                      <button
+                        onClick={handleRefine}
+                        disabled={actionLoading}
+                        className="px-3 py-1.5 bg-slate-700 text-white rounded-lg text-sm font-medium hover:bg-slate-800 disabled:opacity-50"
+                      >
+                        분류 저장
+                      </button>
+                    </div>
+                    {refineCategory === 'rx' && (
+                      <div className="mt-2 rounded-lg bg-red-50 border border-red-100 p-2 text-xs text-red-700">
+                        처방의약품으로 분류하면 고객 공개 노출·온라인 판매·광고 노출은 기본 차단 상태로 유지됩니다.
+                        이번 변경은 분류 표시와 검토 정책에만 반영됩니다.
+                      </div>
+                    )}
+                    {refineMessage && <p className="mt-1 text-xs text-slate-500">{refineMessage}</p>}
+                    <p className="mt-1 text-[11px] text-slate-400">이 분류 변경은 노출·판매 권한을 열지 않습니다. 온라인 판매/고객 노출은 별도 검토 정책이 필요합니다.</p>
+                  </>
+                )}
+              </div>
               {/* Info grid */}
               <dl className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
                 <Field label="식별자 유형" value={detail.identifierType} />

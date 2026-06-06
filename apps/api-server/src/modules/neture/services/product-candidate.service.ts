@@ -481,6 +481,70 @@ export class ProductCandidateService {
   }
 
   /**
+   * 매칭된 ProductMaster 의 drug_category 를 운영자가 refine (F4).
+   *
+   * WO-O4O-OPERATOR-PRODUCT-DRUG-CATEGORY-REFINE-UX-F4-V1
+   *
+   * 분류/검토 정보 변경일 뿐 판매/노출 권한 변경 아님. ProductMaster 신규 생성·regulatoryType 변경 없음.
+   * regulatoryType 충돌 가드: 의약품(DRUG)만 otc/rx/drug_unspecified, 의약외품(QUASI)도 quasi_drug 허용.
+   */
+  async refineCandidateDrugCategory(
+    candidateId: string,
+    input: { drugCategory: ProductDrugCategory | null; note?: string | null; reviewedBy?: string | null },
+  ): Promise<{
+    candidate: ProductCandidateWithClassification;
+    classification: CandidateClassification;
+    productMaster: { id: string; name: string; regulatoryType: string; drugCategory: ProductDrugCategory | null };
+  }> {
+    const candidate = await this.getCandidate(candidateId);
+    if (!candidate) throw new Error('CANDIDATE_NOT_FOUND');
+    if (candidate.candidateStatus === 'rejected' || candidate.candidateStatus === 'archived') {
+      throw new Error('CANDIDATE_NOT_REFINABLE');
+    }
+    if (!candidate.matchedProductMasterId) throw new Error('CANDIDATE_NOT_MATCHED');
+
+    const target = input.drugCategory;
+    const ALLOWED: (ProductDrugCategory | null)[] = ['otc', 'rx', 'quasi_drug', 'drug_unspecified', null];
+    if (!ALLOWED.includes(target)) throw new Error('INVALID_DRUG_CATEGORY');
+
+    const master = await this.masterRepo.findOne({ where: { id: candidate.matchedProductMasterId } });
+    if (!master) throw new Error('PRODUCT_MASTER_NOT_FOUND');
+
+    // regulatoryType 충돌 가드 (영문 코드 + 한글 별칭 모두 수용). regulatoryType 자체는 변경하지 않는다.
+    const reg = (master.regulatoryType ?? '').trim();
+    const isDrug = ['DRUG', '의약품'].includes(reg);
+    const isQuasi = ['QUASI_DRUG', '의약외품'].includes(reg);
+    if (target === 'otc' || target === 'rx' || target === 'drug_unspecified') {
+      if (!isDrug) throw new Error('DRUG_CATEGORY_REGULATORY_CONFLICT');
+    } else if (target === 'quasi_drug') {
+      if (!isDrug && !isQuasi) throw new Error('DRUG_CATEGORY_REGULATORY_CONFLICT');
+    }
+    // target === null 은 항상 허용 (분류 초기화)
+
+    const prev = master.drugCategory ?? null;
+    master.drugCategory = target;
+    await this.masterRepo.save(master);
+
+    const refineNote = `[drug-category-refine] ${prev ?? '∅'} → ${target ?? 'null'} by operator${input.note ? ` | ${input.note}` : ''}`;
+    candidate.reviewNote = refineNote;
+    candidate.reviewedBy = input.reviewedBy ?? candidate.reviewedBy ?? null;
+    candidate.reviewedAt = new Date();
+    await this.repo.save(candidate);
+
+    const [enriched] = await this.withClassification([candidate]);
+    return {
+      candidate: enriched,
+      classification: enriched.classification,
+      productMaster: {
+        id: master.id,
+        name: master.name,
+        regulatoryType: master.regulatoryType,
+        drugCategory: master.drugCategory ?? null,
+      },
+    };
+  }
+
+  /**
    * 신규 ProductMaster 승격 — guarded skeleton.
    *
    * 이번 WO 에서는 실제 ProductMaster 생성을 하지 않는다 (미검증 데이터의 SSOT 오염 방지).

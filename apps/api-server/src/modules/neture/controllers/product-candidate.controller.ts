@@ -170,6 +170,25 @@ export function createProductCandidateController(dataSource: DataSource): Router
     }
   }) as RequestHandler);
 
+  // POST /:id/refine-drug-category — 매칭된 ProductMaster 의 의약품 분류 refine
+  // WO-O4O-OPERATOR-PRODUCT-DRUG-CATEGORY-REFINE-UX-F4-V1
+  router.post('/:id/refine-drug-category', (async (req: Request, res: Response) => {
+    try {
+      const { drugCategory, note } = req.body ?? {};
+      if (drugCategory === undefined) {
+        return res.status(400).json({ success: false, error: 'DRUG_CATEGORY_REQUIRED' });
+      }
+      const result = await service.refineCandidateDrugCategory(req.params.id, {
+        drugCategory: drugCategory ?? null,
+        note: note ?? null,
+        reviewedBy: userId(req),
+      });
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return handleMutationError(res, error, 'refine-drug-category');
+    }
+  }) as RequestHandler);
+
   // POST /:id/link-to-listing — 매칭된 후보를 약국/매장 활용 상품으로 연결
   // WO-O4O-PRODUCT-CANDIDATE-TO-STORE-PHARMACY-LISTING-V1
   router.post('/:id/link-to-listing', (async (req: Request, res: Response) => {
@@ -203,7 +222,10 @@ function handleMutationError(res: Response, error: unknown, op: string): Respons
   if (message.endsWith('_REQUIRED')) {
     return res.status(400).json({ success: false, error: message });
   }
-  if (message.includes('NOT_LINKABLE') || message.includes('NOT_MATCHED')) {
+  if (message.startsWith('INVALID_')) {
+    return res.status(400).json({ success: false, error: message });
+  }
+  if (message.includes('NOT_LINKABLE') || message.includes('NOT_MATCHED') || message.includes('NOT_REFINABLE') || message.includes('CONFLICT')) {
     return res.status(409).json({ success: false, error: message });
   }
   if (message.startsWith('NOT_IMPLEMENTED')) {

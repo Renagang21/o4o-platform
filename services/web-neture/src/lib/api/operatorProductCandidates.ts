@@ -47,6 +47,20 @@ export interface LinkToListingResult {
   alreadyExisted: boolean;
 }
 
+// WO-O4O-OPERATOR-PRODUCT-DRUG-CATEGORY-REFINE-UX-F4-V1
+export type RefineDrugCategoryValue = 'otc' | 'rx' | 'quasi_drug' | 'drug_unspecified' | null;
+
+export interface RefineDrugCategoryPayload {
+  drugCategory: RefineDrugCategoryValue;
+  note?: string;
+}
+
+export interface RefineDrugCategoryResult {
+  candidate: ProductCandidate;
+  classification: CandidateClassification;
+  productMaster: { id: string; name: string; regulatoryType: string; drugCategory: ProductDrugCategory | null };
+}
+
 export type ProductCandidateMatchStatus =
   | 'unmatched'
   | 'exact_identifier_match'
@@ -196,6 +210,12 @@ export const operatorProductCandidateApi = {
   /** POST /:id/link-to-listing — 매칭된 후보를 약국/매장 활용 상품으로 연결 */
   async linkToListing(id: string, payload: LinkToListingPayload): Promise<LinkToListingResult | null> {
     const res = await api.post(`${BASE}/${id}/link-to-listing`, payload);
+    return res.data?.data ?? null;
+  },
+
+  /** POST /:id/refine-drug-category — 매칭된 ProductMaster 의 의약품 분류 refine (F4) */
+  async refineDrugCategory(id: string, payload: RefineDrugCategoryPayload): Promise<RefineDrugCategoryResult | null> {
+    const res = await api.post(`${BASE}/${id}/refine-drug-category`, payload);
     return res.data?.data ?? null;
   },
 };
