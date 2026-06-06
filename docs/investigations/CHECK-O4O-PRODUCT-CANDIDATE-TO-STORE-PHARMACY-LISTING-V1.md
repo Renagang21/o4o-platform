@@ -141,7 +141,7 @@
 
 | # | 항목 |
 |---|---|
-| F1 | 브라우저 라이브 smoke (활용 상품 추가 → 내 약국/매장 노출 확인) |
+| F1 | 브라우저 라이브 smoke (활용 상품 추가 → 내 약국/매장 노출 확인) — 2026-06-06 부분 수행: 배포·페이지 렌더·`linked` 탭·API(create/archive) end-to-end PASS. link-to-listing 시각 검증은 service-scoped operator 계정 부재로 보류(전 계정 platform:super_admin → page list 무scope 400). 상세는 [`CHECK-O4O-OPERATOR-PRODUCT-CANDIDATE-REVIEW-UI-V1`](CHECK-O4O-OPERATOR-PRODUCT-CANDIDATE-REVIEW-UI-V1.md) §10.1 |
 | F2 | 조직 검색 picker (현재 organizationId 직접 입력) |
 | F3 | listing/profile 생성 결과 상세 요약 표시(현재 메시지 + rawPayload.link) |
 | F4 | 약국/매장 self-service 후보 활용 전환(operator 외) |
