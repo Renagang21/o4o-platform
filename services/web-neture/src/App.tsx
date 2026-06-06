@@ -436,6 +436,10 @@ const OperatorActionQueuePage = lazy(() =>
 const OperatorProductApprovalPage = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.OperatorProductApprovalPage }))
 );
+// WO-O4O-OPERATOR-PRODUCT-CANDIDATE-REVIEW-UI-V1 (Phase 5)
+const ProductCandidateReviewPage = lazy(() =>
+  import('./pages/operator').then((m) => ({ default: m.ProductCandidateReviewPage }))
+);
 
 // WO-NETURE-CATEGORY-MANAGEMENT-V1
 const CategoryManagementPage = lazy(() =>
@@ -1008,6 +1012,8 @@ function App() {
               <Route path="/operator/market-trial/:id" element={<MarketTrialApprovalDetailPage />} />
               <Route path="/operator/product-service-approvals" element={<ProductServiceApprovalPage />} />
               <Route path="/operator/product-approvals" element={<OperatorProductApprovalPage />} />
+              {/* WO-O4O-OPERATOR-PRODUCT-CANDIDATE-REVIEW-UI-V1 (Phase 5) */}
+              <Route path="/operator/product-candidates" element={<ProductCandidateReviewPage />} />
               {/* WO-NETURE-CURATION-PHASE3-FULL-REMOVAL-V1: /operator/curation 라우트 제거 */}
               <Route path="/operator/actions" element={<OperatorActionQueuePage />} />
               {/* WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1: operator scope supplier activation */}

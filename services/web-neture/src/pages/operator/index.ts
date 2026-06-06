@@ -38,6 +38,8 @@ export { default as ProductServiceApprovalPage } from './ProductServiceApprovalP
 export { default as OperatorActionQueuePage } from './OperatorActionQueuePage';
 // WO-O4O-NETURE-PRODUCT-APPROVAL-UI-V1
 export { default as OperatorProductApprovalPage } from './OperatorProductApprovalPage';
+// WO-O4O-OPERATOR-PRODUCT-CANDIDATE-REVIEW-UI-V1 (Phase 5)
+export { default as ProductCandidateReviewPage } from './ProductCandidateReviewPage';
 // WO-O4O-NETURE-SUPPLIER-QUALITY-REPORT-V1
 export { default as SupplierQualityPage } from './SupplierQualityPage';
 // WO-NETURE-CATEGORY-MAPPING-RULE-SYSTEM-V1

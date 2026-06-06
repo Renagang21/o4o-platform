@@ -1,0 +1,457 @@
+/**
+ * ProductCandidateReviewPage — Operator 상품 후보 검토 (Phase 5)
+ *
+ * WO-O4O-OPERATOR-PRODUCT-CANDIDATE-REVIEW-UI-V1
+ *
+ * Phase 3 product_candidates 큐 + Phase 4 mobile draft → candidate 흐름을 운영자가 검토.
+ * 기존 /api/v1/operator/product-candidates API 사용 — backend 변경 없음.
+ *
+ * 액션: 재매칭 / 수동매칭(기존 Master 연결) / 반려 / 보관.
+ * 금지: 신규 ProductMaster 생성 UI, 자동 승인 UI.
+ */
+
+import { useState, useCallback, useEffect } from 'react';
+import { DataTable } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
+import { GuideBlock } from '@o4o/shared-space-ui';
+import {
+  operatorProductCandidateApi,
+  type ProductCandidate,
+  type ProductCandidateStatus,
+  type ProductCandidateMatchStatus,
+  type ProductCandidateSourceType,
+} from '../../lib/api/operatorProductCandidates';
+
+// ─── Constants ───
+
+const STATUS_TABS: { key: 'all' | ProductCandidateStatus; label: string }[] = [
+  { key: 'all', label: '전체' },
+  { key: 'pending', label: '대기' },
+  { key: 'reviewing', label: '검토중' },
+  { key: 'matched', label: '매칭됨' },
+  { key: 'rejected', label: '반려' },
+  { key: 'archived', label: '보관' },
+];
+
+const STATUS_BADGE: Record<string, { label: string; cls: string }> = {
+  pending: { label: '대기', cls: 'bg-amber-50 text-amber-700' },
+  reviewing: { label: '검토중', cls: 'bg-blue-50 text-blue-700' },
+  matched: { label: '매칭됨', cls: 'bg-green-50 text-green-700' },
+  approved_new_master: { label: '신규승격', cls: 'bg-emerald-50 text-emerald-700' },
+  rejected: { label: '반려', cls: 'bg-red-50 text-red-700' },
+  merged: { label: '병합', cls: 'bg-slate-100 text-slate-600' },
+  archived: { label: '보관', cls: 'bg-slate-100 text-slate-500' },
+};
+
+const MATCH_BADGE: Record<string, { label: string; cls: string }> = {
+  unmatched: { label: '미매칭', cls: 'bg-slate-100 text-slate-500' },
+  exact_identifier_match: { label: '식별자 일치', cls: 'bg-green-50 text-green-700' },
+  possible_identifier_match: { label: '식별자 후보', cls: 'bg-teal-50 text-teal-700' },
+  possible_text_match: { label: '이름 후보', cls: 'bg-indigo-50 text-indigo-700' },
+  conflict: { label: '충돌', cls: 'bg-orange-50 text-orange-700' },
+  no_match: { label: '결과없음', cls: 'bg-slate-100 text-slate-500' },
+  manually_matched: { label: '수동매칭', cls: 'bg-green-50 text-green-700' },
+};
+
+const SOURCE_LABEL: Record<ProductCandidateSourceType, string> = {
+  supplier_web: '공급자',
+  pharmacy_web: '약국',
+  store_web: '매장',
+  mobile_draft: '모바일',
+  csv_import: 'CSV',
+  xlsx_import: 'XLSX',
+  operator_import: '운영자',
+  external_api: '외부API',
+  unknown: '미상',
+};
+
+function Badge({ map, value }: { map: Record<string, { label: string; cls: string }>; value: string }) {
+  const b = map[value] || { label: value, cls: 'bg-slate-100 text-slate-600' };
+  return <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${b.cls}`}>{b.label}</span>;
+}
+
+// ─── Component ───
+
+export default function ProductCandidateReviewPage() {
+  const [items, setItems] = useState<ProductCandidate[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [statusFilter, setStatusFilter] = useState<'all' | ProductCandidateStatus>('all');
+  const [matchFilter, setMatchFilter] = useState<'all' | ProductCandidateMatchStatus>('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [actionLoading, setActionLoading] = useState(false);
+
+  const [detail, setDetail] = useState<ProductCandidate | null>(null);
+  const [manualMasterId, setManualMasterId] = useState('');
+  const [rejectReason, setRejectReason] = useState('');
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const res = await operatorProductCandidateApi.list({
+      status: statusFilter === 'all' ? undefined : statusFilter,
+      matchStatus: matchFilter === 'all' ? undefined : matchFilter,
+      limit: 100,
+    });
+    setItems(res.items);
+    setLoading(false);
+  }, [statusFilter, matchFilter]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  // 클라이언트 측 검색 (backend 는 text 검색 미지원 — 로드된 페이지 내 필터)
+  const filtered = items.filter((c) => {
+    const term = searchTerm.trim().toLowerCase();
+    if (!term) return true;
+    return (
+      (c.candidateName || '').toLowerCase().includes(term) ||
+      (c.identifierValue || '').toLowerCase().includes(term) ||
+      (c.normalizedIdentifierValue || '').toLowerCase().includes(term)
+    );
+  });
+
+  // ─── Actions ───
+
+  const refreshDetail = async (id: string) => {
+    const fresh = await operatorProductCandidateApi.get(id);
+    setDetail(fresh);
+  };
+
+  const handleMatch = async () => {
+    if (!detail) return;
+    setActionLoading(true);
+    try {
+      await operatorProductCandidateApi.match(detail.id);
+      await refreshDetail(detail.id);
+      await load();
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleManualMatch = async () => {
+    if (!detail || !manualMasterId.trim()) return;
+    setActionLoading(true);
+    try {
+      await operatorProductCandidateApi.manualMatch(detail.id, manualMasterId.trim());
+      setManualMasterId('');
+      await refreshDetail(detail.id);
+      await load();
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleReject = async () => {
+    if (!detail) return;
+    setActionLoading(true);
+    try {
+      await operatorProductCandidateApi.reject(detail.id, rejectReason || undefined);
+      setRejectReason('');
+      setDetail(null);
+      await load();
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleArchive = async () => {
+    if (!detail) return;
+    setActionLoading(true);
+    try {
+      await operatorProductCandidateApi.archive(detail.id);
+      setDetail(null);
+      await load();
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // ─── Columns ───
+
+  const columns: ListColumnDef<ProductCandidate>[] = [
+    {
+      key: 'candidateName',
+      header: '후보명',
+      sortable: true,
+      render: (_v, row) => (
+        <div>
+          <p className="font-medium text-slate-800">{row.candidateName || '(이름 없음)'}</p>
+          <p className="text-xs text-slate-400 mt-0.5">{row.id.slice(0, 8)}...</p>
+        </div>
+      ),
+    },
+    {
+      key: 'identifierValue',
+      header: '식별자',
+      render: (_v, row) =>
+        row.identifierValue ? (
+          <span className="text-xs text-slate-600">
+            {row.identifierType ? `${row.identifierType}: ` : ''}{row.identifierValue}
+          </span>
+        ) : (
+          <span className="text-xs text-slate-300">-</span>
+        ),
+    },
+    {
+      key: 'sourceType',
+      header: '출처',
+      align: 'center',
+      width: '90px',
+      render: (v) => <span className="text-xs text-slate-600">{SOURCE_LABEL[v as ProductCandidateSourceType] || v}</span>,
+    },
+    {
+      key: 'serviceKey',
+      header: '서비스',
+      align: 'center',
+      width: '90px',
+      render: (v) => <span className="text-xs text-slate-500">{v || '-'}</span>,
+    },
+    {
+      key: 'candidateStatus',
+      header: '상태',
+      align: 'center',
+      width: '90px',
+      sortable: true,
+      render: (v) => <Badge map={STATUS_BADGE} value={v} />,
+    },
+    {
+      key: 'matchStatus',
+      header: '매칭',
+      align: 'center',
+      width: '100px',
+      render: (v) => <Badge map={MATCH_BADGE} value={v} />,
+    },
+    {
+      key: 'confidenceScore',
+      header: '신뢰도',
+      align: 'center',
+      width: '70px',
+      render: (v) => <span className="text-xs text-slate-500">{v ? Number(v).toFixed(2) : '-'}</span>,
+    },
+    {
+      key: 'createdAt',
+      header: '생성일',
+      width: '110px',
+      sortable: true,
+      sortAccessor: (row) => new Date(row.createdAt).getTime(),
+      render: (v) => <span className="text-xs text-slate-500">{new Date(v).toLocaleDateString('ko-KR')}</span>,
+    },
+  ];
+
+  // ─── Counts ───
+  const pendingCount = items.filter((c) => c.candidateStatus === 'pending').length;
+  const matchedCount = items.filter((c) => c.candidateStatus === 'matched').length;
+  const conflictCount = items.filter((c) => c.matchStatus === 'conflict').length;
+
+  return (
+    <div>
+      {/* Header */}
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-slate-900">상품 후보 검토</h1>
+        <p className="text-sm text-slate-500 mt-1">
+          모바일·공급자·웹·import 로 수집된 상품 후보를 검토하고 기존 상품에 연결하거나 반려/보관합니다.
+        </p>
+      </div>
+
+      <GuideBlock
+        variant="info"
+        title="상품 후보 검토 절차를 안내합니다."
+        description="후보는 아직 정식 상품(ProductMaster)으로 확정되지 않은 수집 데이터입니다. 검토 후 기존 상품에 연결하거나 반려/보관합니다."
+        steps={[
+          '대기/검토중 후보를 선택해 식별자·이름·출처를 확인합니다',
+          '재매칭으로 Identifier Core 기반 자동 매칭을 다시 시도합니다',
+          '수동매칭으로 기존 상품(ProductMaster ID)에 직접 연결합니다',
+          '부적합한 후보는 사유와 함께 반려하거나 보관합니다',
+        ]}
+        compact
+      />
+
+      {/* Stats */}
+      <div className="grid grid-cols-4 gap-4 my-6">
+        {[
+          { label: '전체', value: items.length, color: 'bg-slate-50 text-slate-700' },
+          { label: '대기', value: pendingCount, color: 'bg-amber-50 text-amber-700' },
+          { label: '매칭됨', value: matchedCount, color: 'bg-green-50 text-green-700' },
+          { label: '충돌', value: conflictCount, color: 'bg-orange-50 text-orange-700' },
+        ].map((s) => (
+          <div key={s.label} className={`rounded-lg p-4 ${s.color}`}>
+            <div className="text-sm font-medium">{s.label}</div>
+            <div className="text-2xl font-bold mt-1">{s.value}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-wrap items-center gap-4 mb-4">
+        <div className="flex gap-1">
+          {STATUS_TABS.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setStatusFilter(tab.key)}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                statusFilter === tab.key ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+        <select
+          value={matchFilter}
+          onChange={(e) => setMatchFilter(e.target.value as 'all' | ProductCandidateMatchStatus)}
+          className="px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="all">매칭 전체</option>
+          <option value="unmatched">미매칭</option>
+          <option value="exact_identifier_match">식별자 일치</option>
+          <option value="possible_identifier_match">식별자 후보</option>
+          <option value="possible_text_match">이름 후보</option>
+          <option value="conflict">충돌</option>
+          <option value="no_match">결과없음</option>
+          <option value="manually_matched">수동매칭</option>
+        </select>
+        <input
+          type="text"
+          placeholder="후보명, 식별자 검색..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="flex-1 max-w-xs px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      {/* DataTable */}
+      <DataTable<ProductCandidate>
+        columns={columns}
+        data={filtered}
+        rowKey="id"
+        loading={loading}
+        emptyMessage={items.length === 0 ? '검토할 상품 후보가 없습니다' : '검색 결과가 없습니다'}
+        onRowClick={(row) => { setDetail(row); setManualMasterId(''); setRejectReason(''); }}
+        tableId="neture-product-candidates"
+      />
+
+      {/* Detail Modal */}
+      {detail && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
+          <div className="bg-white rounded-xl w-full max-w-2xl shadow-xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-start justify-between p-5 border-b border-slate-100">
+              <div>
+                <h3 className="text-lg font-bold text-slate-900">{detail.candidateName || '(이름 없음)'}</h3>
+                <p className="text-xs text-slate-400 mt-1">{detail.id}</p>
+              </div>
+              <div className="flex gap-2">
+                <Badge map={STATUS_BADGE} value={detail.candidateStatus} />
+                <Badge map={MATCH_BADGE} value={detail.matchStatus} />
+              </div>
+            </div>
+
+            <div className="p-5 space-y-4">
+              {/* Info grid */}
+              <dl className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
+                <Field label="식별자 유형" value={detail.identifierType} />
+                <Field label="식별자 값" value={detail.identifierValue} />
+                <Field label="정규화 값" value={detail.normalizedIdentifierValue} />
+                <Field label="출처" value={SOURCE_LABEL[detail.sourceType] || detail.sourceType} />
+                <Field label="서비스" value={detail.serviceKey} />
+                <Field label="조직" value={detail.organizationId} />
+                <Field label="브랜드" value={detail.candidateBrand} />
+                <Field label="제조사" value={detail.candidateManufacturer} />
+                <Field label="카테고리" value={detail.candidateCategory} />
+                <Field label="규격/단위" value={[detail.candidateSpec, detail.candidateUnit].filter(Boolean).join(' / ')} />
+                <Field label="가격" value={detail.candidatePrice} />
+                <Field label="신뢰도" value={detail.confidenceScore ? Number(detail.confidenceScore).toFixed(4) : null} />
+                <Field label="매칭된 상품(Master)" value={detail.matchedProductMasterId} />
+                <Field label="매칭된 식별자" value={detail.matchedIdentifierId} />
+                <Field label="생성일" value={new Date(detail.createdAt).toLocaleString('ko-KR')} />
+                <Field label="검토 메모" value={detail.reviewNote} />
+              </dl>
+
+              {detail.candidateImageUrl && (
+                <img src={detail.candidateImageUrl} alt="후보 이미지" className="max-h-40 rounded-lg border border-slate-100" />
+              )}
+
+              {/* 재매칭 */}
+              <div className="border-t border-slate-100 pt-4">
+                <button
+                  onClick={handleMatch}
+                  disabled={actionLoading}
+                  className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
+                >
+                  재매칭 실행
+                </button>
+                <span className="ml-2 text-xs text-slate-400">Identifier Core 기반 자동 매칭을 다시 시도합니다 (자동 승격 아님)</span>
+              </div>
+
+              {/* 수동 매칭 */}
+              <div className="border-t border-slate-100 pt-4">
+                <label className="block text-sm font-medium text-slate-700 mb-1">수동 매칭 — 기존 상품(ProductMaster) ID</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={manualMasterId}
+                    onChange={(e) => setManualMasterId(e.target.value)}
+                    placeholder="ProductMaster UUID"
+                    className="flex-1 px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <button
+                    onClick={handleManualMatch}
+                    disabled={actionLoading || !manualMasterId.trim()}
+                    className="px-3 py-1.5 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50"
+                  >
+                    연결
+                  </button>
+                </div>
+              </div>
+
+              {/* 반려 */}
+              <div className="border-t border-slate-100 pt-4">
+                <label className="block text-sm font-medium text-slate-700 mb-1">반려 사유 (선택)</label>
+                <textarea
+                  value={rejectReason}
+                  onChange={(e) => setRejectReason(e.target.value)}
+                  placeholder="반려 사유를 입력하세요"
+                  className="w-full border border-slate-200 rounded-lg p-2 text-sm resize-none h-16 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-between gap-2 p-5 border-t border-slate-100">
+              <button
+                onClick={() => setDetail(null)}
+                className="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-200"
+              >
+                닫기
+              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleArchive}
+                  disabled={actionLoading}
+                  className="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-300 disabled:opacity-50"
+                >
+                  보관
+                </button>
+                <button
+                  onClick={handleReject}
+                  disabled={actionLoading}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50"
+                >
+                  반려
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Field({ label, value }: { label: string; value: string | null | undefined }) {
+  return (
+    <div>
+      <dt className="text-xs text-slate-400">{label}</dt>
+      <dd className="text-slate-700 break-all">{value || <span className="text-slate-300">-</span>}</dd>
+    </div>
+  );
+}

@@ -51,6 +51,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   // WO-NETURE-OPERATOR-PRODUCTS-UNIFIED-LIST-FINAL-V1: Products 영역 단일 통합
   products: [
     { label: '상품 관리', path: '/operator/all-registered-products' },
+    // WO-O4O-OPERATOR-PRODUCT-CANDIDATE-REVIEW-UI-V1 (Phase 5): 모바일·공급자·import 후보 검토
+    { label: '상품 후보 검토', path: '/operator/product-candidates' },
     // WO-NETURE-CURATION-PHASE1-DECISION-PRESSURE-REMOVE-V1: 큐레이션 메뉴 비노출 (운영자 통제 최소화)
     { label: '카테고리 관리', path: '/admin/categories', adminOnly: true },
     { label: '브랜드 관리', path: '/admin/brands', adminOnly: true },
