@@ -1,5 +1,7 @@
 # CHECK-O4O-STORE-ASSET-DERIVATION-VIEWER-COMPONENT-EXTRACT-V1
 
+> **최종 판정: PASS** (2026-06-06, KPA 라이브 UI smoke 통과 — §7 참조)
+>
 > **WO**: `WO-O4O-STORE-ASSET-DERIVATION-VIEWER-COMPONENT-EXTRACT-V1`
 > **목적**: KPA `StoreProductionMaterialsPage`의 인라인 "원본 보기" 모달을 공통 컴포넌트 `StoreAssetDerivationViewer`(@o4o/store-ui-core)로 추출하고, **KPA에 먼저 재적용**해 회귀 0 확인.
 > **작성일**: 2026-06-06
@@ -41,10 +43,26 @@ KPA 원본 보기 모달(상태머신 + 조회 + 모달 JSX + source_kind 라벨
 - `@o4o/store-ui-core` tsc --noEmit: **0 errors**
 - `web-kpa-society` tsc -b: **0 errors** (pre-existing vite.config TS18003 제외 — 다른 세션 산출물, 본 WO 무관)
 
-## 7. Browser Smoke Result
+## 7. Browser Smoke Result — **PASS** (2026-06-06, kpa-society-web `01270-46r`)
 
-- 정적 검증: 마크업/스타일/로직 동일 이관 + 타입 0 errors.
-- 라이브 smoke: kpa-society-web 배포 후 `/store/library/production-materials`에서 POP/QR/블로그 원본 보기 + empty + 기존 출력/활용하기/삭제/열기 회귀 확인 — **배포 파이프라인 통과 후 수행 항목**(본 문서에 결과 추기 예정). 추출이 충실해 회귀 위험 낮음.
+KPA store_owner(sohae2100) 로그인 → `/store/library/production-materials` 라이브 검증:
+
+| 항목 | 결과 |
+|---|---|
+| 페이지 렌더 | ✅ 제작 자료 목록 정상(블로그 행 표시) |
+| 블로그 행 "원본 보기" → 모달 열림 | ✅ 공통 viewer 모달 정상 |
+| 모달 헤더/타이틀 | ✅ "원본 자료" + 본문 "블로그 · 테스트"(kindLabel·title) |
+| derivedKind 매핑 end-to-end | ✅ 요청 `GET /kpa/store/asset-derivations?derivedKind=blog_post&derivedId=…` **200** |
+| empty state | ✅ "연결된 원본 정보가 없습니다." + 보조 안내(이 블로그는 derivation 미기록) |
+| 개발자 용어 비노출 | ✅ blog_post/relation 등 미노출 |
+| 모달 닫기 | ✅ 닫힘 정상 |
+| mobile 390px | ✅ 오버레이+중앙 카드 뷰포트 내 맞춤, 텍스트 줄바꿈 정상, overflow/깨짐 없음 |
+| 회귀(열기/활용/출력 액션) | ✅ 열기 버튼·활용 컬럼·bulk 선택 유지 |
+| console critical error | ✅ viewer 관련 없음 |
+
+**노트(데이터·환경)**:
+- 이 매장에는 **블로그 행 1건만** 존재(POP/QR 행 없음) → POP/QR 원본 보기는 데이터 부재로 직접 관측 불가. 단 viewer는 동일 컴포넌트로 derivedKind만 다르며, 블로그 경로(blog_post)가 요청→200→렌더까지 end-to-end 확인됨. 또한 이 블로그는 derivation 미기록이라 **populated source 목록은 관측 불가**(목록 렌더는 KPA 원본 코드 verbatim 이관).
+- 최초 클릭 시 derivation 호출이 **401**(브라우저 세션 토큰 만료 — `/auth/me`·`/auth/refresh` 동반 401)이었고 모달은 graceful empty로 degrade. **페이지 새로고침(세션 재확보) 후 동일 호출 200 확인** → 401은 transient 세션 이슈(코드/viewer 무관, 추출 전 KPA 동작과 동일).
 
 ## 8. Regression Check
 
