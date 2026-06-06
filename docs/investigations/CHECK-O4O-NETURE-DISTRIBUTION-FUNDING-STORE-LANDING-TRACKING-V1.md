@@ -68,7 +68,8 @@ PASS (구현·정적검증·보안 회귀 확인 완료, 운영자 화면 smoke 
 
 - 참여자에 `storeId/organizationId` FK 부재 → "어느 매장"을 직접 식별 못함(IR G6 부분).
 - `listingId`/`adopted` 는 **연결 신호**일 뿐 실제 매장 도입 완료 보증 아님.
-- 따라서 1차는 **자동 확정 금지** — 운영자가 신호를 참고해 제품 개발자와 확인. 실제 store/org 식별·랜딩 완료일·확인자는 V2(§14).
+- **참여자 정산 선택권 우선**(SSOT [`INITIAL-OPERATION-MODEL-V1 §3-A`](../baseline/O4O-DISTRIBUTION-FUNDING-INITIAL-OPERATION-MODEL-V1.md) 추가): 제품 정산을 선택한 참여자만 제품 제공·매장 랜딩 추적 대상이며, 수익/현금성 정산 선택자는 랜딩 대상에서 제외한다. 운영자 안내 문구에 반영(제품 정산 선택자만 랜딩 추적).
+- 따라서 1차는 **자동 확정 금지** + 신호 표시까지만. 선택권 기반 상태 분기(요약 카운트를 제품 정산 선택자 기준으로 분리 등)·store/org 식별·랜딩 완료일·확인자는 V2/G7(§14).
 
 ## 10. TypeScript 결과
 
