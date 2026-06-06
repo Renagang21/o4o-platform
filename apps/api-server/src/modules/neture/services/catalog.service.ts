@@ -8,6 +8,16 @@ import {
   ProductImage,
 } from '../entities/index.js';
 import logger from '../../../utils/logger.js';
+// WO-O4O-PRODUCT-DRUG-CATEGORY-ACTIVE-MODEL-F1-V1
+import { PRODUCT_DRUG_CATEGORIES } from '../utils/product-type.util.js';
+import type { ProductDrugCategory } from '../utils/product-type.util.js';
+
+/** drug_category 입력 정규화 — 허용값만 통과, 그 외 null */
+function normalizeDrugCategory(raw?: string | null): ProductDrugCategory | null {
+  if (!raw) return null;
+  const v = raw.trim().toLowerCase();
+  return (PRODUCT_DRUG_CATEGORIES as string[]).includes(v) ? (v as ProductDrugCategory) : null;
+}
 
 /**
  * NetureCatalogService
@@ -96,6 +106,8 @@ export class NetureCatalogService {
       manufacturerName?: string;
       name?: string;
       mfdsPermitNumber?: string | null;
+      // WO-O4O-PRODUCT-DRUG-CATEGORY-ACTIVE-MODEL-F1-V1: OTC/Rx/QUASI active 분류 (optional)
+      drugCategory?: string | null;
     }
   ): Promise<{ success: boolean; data?: ProductMaster; error?: string }> {
     // 1. GTIN 검증
@@ -148,6 +160,8 @@ export class NetureCatalogService {
         mfdsProductId: barcode, // MFDS 미연동 시 barcode를 ID로 사용
         isMfdsVerified: false,
         mfdsSyncedAt: null,
+        // WO-O4O-PRODUCT-DRUG-CATEGORY-ACTIVE-MODEL-F1-V1: 제공 시 active 분류 저장 (없으면 null)
+        drugCategory: normalizeDrugCategory(manualData.drugCategory),
       });
 
       const saved = await this.masterRepo.save(master);
@@ -208,6 +222,10 @@ export class NetureCatalogService {
     }
     if ('tags' in updates && Array.isArray(updates.tags)) {
       master.tags = updates.tags as string[];
+    }
+    // WO-O4O-PRODUCT-DRUG-CATEGORY-ACTIVE-MODEL-F1-V1: 의약품 분류 refine 허용 (mutable, 허용값만)
+    if ('drugCategory' in updates) {
+      master.drugCategory = normalizeDrugCategory(updates.drugCategory as string | null);
     }
 
     const saved = await this.masterRepo.save(master);

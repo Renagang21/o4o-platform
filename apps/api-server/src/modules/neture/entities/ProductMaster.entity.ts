@@ -24,6 +24,7 @@ import type { ProductCategory } from './ProductCategory.entity.js';
 import type { Brand } from './Brand.entity.js';
 import type { ProductImage } from './ProductImage.entity.js';
 import type { ProductIdentifier } from './ProductIdentifier.entity.js';
+import type { ProductDrugCategory } from '../utils/product-type.util.js';
 
 @Entity('product_masters')
 export class ProductMaster {
@@ -37,6 +38,16 @@ export class ProductMaster {
   /** MFDS 기반 규제 유형 (자동 설정) — immutable */
   @Column({ name: 'regulatory_type', type: 'varchar', length: 50 })
   regulatoryType: string;
+
+  /**
+   * 의약품 세부 분류 (active 런타임 판정용) — WO-O4O-PRODUCT-DRUG-CATEGORY-ACTIVE-MODEL-F1-V1
+   *
+   * regulatoryType 이 'DRUG'까지만 구분하는 한계를 보완. OTC/Rx/QUASI 를 런타임에서 판정.
+   * mutable (검토 중 drug_unspecified → otc 등 refine 가능). null = 미설정(비의약품 등).
+   * 값: non_drug | otc | rx | quasi_drug | drug_unspecified (varchar, DB enum 아님)
+   */
+  @Column({ name: 'drug_category', type: 'varchar', length: 32, nullable: true })
+  drugCategory: ProductDrugCategory | null;
 
   /** 식약처 공식 제품명 — immutable */
   @Column({ name: 'regulatory_name', type: 'varchar', length: 255 })

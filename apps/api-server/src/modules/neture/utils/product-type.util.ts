@@ -16,6 +16,27 @@
  *   - Rx(처방의약품) 등록 루트는 본 WO 범위 밖 — 분류만 제공하고 등록/판매는 막는다.
  */
 
+/**
+ * active ProductMaster.drug_category 저장값 (application-level union, DB enum 아님).
+ * WO-O4O-PRODUCT-DRUG-CATEGORY-ACTIVE-MODEL-F1-V1
+ *
+ * regulatoryType('DRUG'까지만 구분) 위에서 OTC/Rx 를 런타임 판정하기 위한 active 컬럼값.
+ */
+export type ProductDrugCategory =
+  | 'non_drug'
+  | 'otc'
+  | 'rx'
+  | 'quasi_drug'
+  | 'drug_unspecified';
+
+export const PRODUCT_DRUG_CATEGORIES: ProductDrugCategory[] = [
+  'non_drug',
+  'otc',
+  'rx',
+  'quasi_drug',
+  'drug_unspecified',
+];
+
 /** 제품 유형 분류 (application-level union, DB enum 아님) */
 export type ProductTypeClass =
   | 'non_drug' // 비의약품 (GENERAL/COSMETIC 등)
@@ -68,7 +89,7 @@ function norm(v?: string | null): string {
   return (v ?? '').toString().trim().toLowerCase();
 }
 
-/** 명시적 의약품 분류 문자열 → ProductTypeClass (otc/etc/quasi) */
+/** 명시적 의약품 분류 문자열 → ProductTypeClass (active drug_category / otc·etc·quasi 별칭) */
 function fromDrugCategory(raw: string): ProductTypeClass | null {
   switch (raw) {
     case 'otc':
@@ -84,6 +105,10 @@ function fromDrugCategory(raw: string): ProductTypeClass | null {
     case 'quasi_drug':
     case '의약외품':
       return 'quasi_drug';
+    case 'drug_unspecified':
+      return 'drug_unspecified';
+    case 'non_drug':
+      return 'non_drug';
     default:
       return null;
   }
