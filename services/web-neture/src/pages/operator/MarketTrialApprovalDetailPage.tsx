@@ -269,7 +269,7 @@ export default function MarketTrialApprovalDetailPage() {
       });
       await loadParticipants(id, filter);
     } catch (err: any) {
-      setError(err.response?.data?.message || err.message || '결제 상태 변경에 실패했습니다.');
+      setError(err.response?.data?.message || err.message || '입금 확인 상태 변경에 실패했습니다.');
     } finally {
       setUpdatingPaymentId(null);
     }
@@ -1062,23 +1062,27 @@ function ParticipantSection({
       {/* WO-NETURE-MARKET-TRIAL-PAYMENT-READINESS-V1: 결제(수기 송금/PG-ready) 상태 관리 섹션 */}
       {PAYMENT_VISIBLE_STATUSES.includes(trialStatus) && totalCount > 0 && (
         <div className="mt-4 border-t border-gray-100 pt-4">
-          <div className="flex items-center gap-2 mb-3">
-            <h3 className="text-sm font-semibold text-gray-700">결제 상태 관리</h3>
-            <span className="text-xs text-gray-500">PG 미연동 — 수기 송금 확인 위주</span>
+          <div className="flex items-center flex-wrap gap-2 mb-3">
+            <h3 className="text-sm font-semibold text-gray-700">오프라인 입금 관리</h3>
+            <span className="text-xs text-gray-500">PG 미연동 — 운영자 오프라인 입금 확인</span>
+            {/* WO-O4O-NETURE-DISTRIBUTION-FUNDING-OFFLINE-PAYMENT-LEDGER-V1: 송금 완료자 요약 */}
+            <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
+              입금 확인 완료 {participants.filter((p) => (p.paymentStatus ?? 'unpaid') === 'paid').length}명 / {totalCount}명
+            </span>
           </div>
-          {/* WO-O4O-NETURE-DISTRIBUTION-FUNDING-OFFLINE-OPERATION-SAFETY-V1: 오프라인 운영 기준 */}
+          {/* WO-O4O-NETURE-DISTRIBUTION-FUNDING-OFFLINE-OPERATION-SAFETY-V1 / OFFLINE-PAYMENT-LEDGER-V1: 오프라인 운영 + 송금 통제 기준 */}
           <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2 mb-3">
-            초기 유통참여형 펀딩은 온라인 결제 없이 운영자가 오프라인 입금 확인과 제품 정산 상태를 관리합니다.
+            초기 유통참여형 펀딩은 온라인 결제 없이 운영자가 오프라인 입금 확인과 제품 정산 상태를 관리합니다. 송금은 Neture가 수령하며, 입금 확인 완료자 명단은 제품 개발자에게 공유됩니다. 아래 상태 변경은 온라인 결제가 아니라 오프라인 입금 확인 기록이며, 잘못 처리한 경우 되돌릴 수 있습니다.
           </p>
           <div className="overflow-x-auto -mx-4 sm:-mx-5">
             <table className="w-full text-sm min-w-[820px]">
               <thead>
                 <tr className="border-b border-gray-100">
                   <th className="text-left py-2 px-4 text-xs font-medium text-gray-500">이름</th>
-                  <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">결제 상태</th>
+                  <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">입금 상태</th>
                   <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">방법</th>
                   <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">금액</th>
-                  <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">결제일</th>
+                  <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">입금일</th>
                   <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">확인일</th>
                   <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">메모</th>
                   <th className="text-right py-2 px-4 text-xs font-medium text-gray-500">액션</th>
@@ -1114,7 +1118,7 @@ function ParticipantSection({
                           <button
                             onClick={() => {
                               const ref = window.prompt('송금 메모/참조 (선택, 예: 은행 입금번호)', p.paymentReference || '') ?? undefined;
-                              const amtStr = window.prompt('결제 금액 (원, 선택)', p.paidAmount != null ? String(p.paidAmount) : '');
+                              const amtStr = window.prompt('입금 확인 금액 (원, 선택)', p.paidAmount != null ? String(p.paidAmount) : '');
                               const amt = amtStr && amtStr.trim() !== '' ? Number(amtStr) : undefined;
                               const note = window.prompt('운영자 메모 (선택)', p.paymentNote || '') ?? undefined;
                               const nowIso = new Date().toISOString();

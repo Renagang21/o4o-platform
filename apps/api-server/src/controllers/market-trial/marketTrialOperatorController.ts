@@ -1295,6 +1295,14 @@ export class MarketTrialOperatorController {
         participantType: string;
         rewardType: string | null;
         rewardStatus: string;
+        contributionAmount: string | number | null;
+        paymentStatus: string | null;
+        paidAmount: string | number | null;
+        confirmedAt: Date | null;
+        paymentReference: string | null;
+        settlementChoice: string | null;
+        settlementStatus: string | null;
+        customerConversionStatus: string | null;
         createdAt: Date;
       }> = await ds.query(
         `SELECT
@@ -1302,6 +1310,14 @@ export class MarketTrialOperatorController {
            p."participantType",
            p."rewardType",
            p."rewardStatus",
+           p."contributionAmount",
+           p."paymentStatus",
+           p."paidAmount",
+           p."confirmedAt",
+           p."paymentReference",
+           p."settlementChoice",
+           p."settlementStatus",
+           p."customerConversionStatus",
            p."createdAt"
          FROM market_trial_participants p
          LEFT JOIN users u ON u.id = p."participantId"
@@ -1339,8 +1355,19 @@ export class MarketTrialOperatorController {
         return `${y}-${m}-${day} ${h}:${min}`;
       };
 
+      // WO-O4O-NETURE-DISTRIBUTION-FUNDING-OFFLINE-PAYMENT-LEDGER-V1:
+      // 오프라인 입금/정산 컬럼 보강 (송금 완료자 명단 공유용). 온라인 결제 아님.
+      const paymentStatusLabel = (v: string | null) =>
+        ({ unpaid: '입금 전', pending: '입금 확인 대기', paid: '입금 확인 완료', failed: '입금 확인 실패', canceled: '참여 취소', refunded: '환불 처리됨' } as Record<string, string>)[v || 'unpaid'] || v || '입금 전';
+      const settlementStatusLabel = (v: string | null) =>
+        ({ pending: '대기', choice_pending: '선택 대기', choice_completed: '선택 완료', offline_review: '운영 확인 중', offline_settled: '정산 완료' } as Record<string, string>)[v || 'pending'] || v || '-';
+      const settlementChoiceLabel = (v: string | null) => (v === 'product' ? '제품 수령' : v === 'cash' ? '금액 환급' : '-');
+      const conversionLabel = (v: string | null) =>
+        ({ none: '-', interested: '관심', considering: '검토', adopted: '도입', first_order: '첫 주문' } as Record<string, string>)[v || 'none'] || v || '-';
+      const won = (n: string | number | null) => (n != null && n !== '' ? `${Number(n).toLocaleString()}원` : '-');
+
       // CSV header + rows
-      const header = ['참여자명', '참여자유형', '보상방식', '보상상태', '참여일', 'Trial제목', 'Trial상태'];
+      const header = ['참여자명', '참여자유형', '보상방식', '보상상태', '참여금', '입금상태', '입금확인금액', '입금확인일', '입금참조', '정산선택', '정산상태', '거래선단계', '참여일', '유통참여형 펀딩 제목', '상태'];
       const trialTitle = (trial.title || '').replace(/"/g, '""');
       const trialStatusLabel: Record<string, string> = {
         draft: '작성 중', submitted: '심사 대기',
@@ -1354,6 +1381,14 @@ export class MarketTrialOperatorController {
         `"${participantTypeLabel(r.participantType)}"`,
         `"${rewardTypeLabel(r.rewardType)}"`,
         `"${rewardStatusLabel(r.rewardStatus)}"`,
+        `"${won(r.contributionAmount)}"`,
+        `"${paymentStatusLabel(r.paymentStatus)}"`,
+        `"${won(r.paidAmount)}"`,
+        `"${r.confirmedAt ? fmtDate(r.confirmedAt) : '-'}"`,
+        `"${(r.paymentReference || '-').replace(/"/g, '""')}"`,
+        `"${settlementChoiceLabel(r.settlementChoice)}"`,
+        `"${settlementStatusLabel(r.settlementStatus)}"`,
+        `"${conversionLabel(r.customerConversionStatus)}"`,
         `"${fmtDate(r.createdAt)}"`,
         `"${trialTitle}"`,
         `"${trialStatusText}"`,

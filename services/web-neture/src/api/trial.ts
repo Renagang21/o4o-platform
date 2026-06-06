@@ -85,13 +85,15 @@ export type SettlementStatus =
 export type PaymentStatus =
   | 'unpaid' | 'pending' | 'paid' | 'failed' | 'canceled' | 'refunded';
 
+// WO-O4O-NETURE-DISTRIBUTION-FUNDING-OFFLINE-PAYMENT-LEDGER-V1:
+// 온라인 결제가 아니라 운영자 오프라인 입금 확인 기준 용어.
 export const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {
-  unpaid: '미결제',
-  pending: '결제 대기',
-  paid: '결제 완료',
-  failed: '결제 실패',
-  canceled: '결제 취소',
-  refunded: '환불 완료',
+  unpaid: '입금 전',
+  pending: '입금 확인 대기',
+  paid: '입금 확인 완료',
+  failed: '입금 확인 실패',
+  canceled: '참여 취소',
+  refunded: '환불 처리됨',
 };
 
 export interface TrialParticipant {
