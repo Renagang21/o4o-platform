@@ -155,7 +155,7 @@ crowdfunding 코어(02-22) → conversion/listing(04-15) → customerConversion 
 |---|---|:---:|---|
 | G1 | shipping/fulfillment **무인증** 라우터 | 🔴 최상(보안) | 배송지 PII 노출 + 주문생성 가능, Boundary 위반 |
 | G2 | **투자형 아님 고지** 전 펀딩 화면 부재 | 🔴 높음(컴플) | 금융투자 오해 리스크 |
-| G3 | **참여 대상 제한 부재**(eligibleRoles 미적용, store/org 식별 없음) | 🔴 높음 | 프로그램 목적과 불일치(누구나 참여) |
+| G3 | **참여 대상 제한 부재**(eligibleRoles 미적용, store/org 식별 없음) | 🟡 보류 | **재분류(2026-06-06)**: 초기 운영 모델 = 누구나 신청 + **제품 개발자 검토·포럼 승인**으로 사람-게이트. 시스템 자격 제한은 운영 유연성 저하 → **보류**. (→ [`INITIAL-OPERATION-MODEL-V1`](../baseline/O4O-DISTRIBUTION-FUNDING-INITIAL-OPERATION-MODEL-V1.md)) |
 | G4 | **실제 참여금 결제 미연결**(join 0원, PG/checkout 없음) | 🟡 운영 보류 | **재분류(2026-06-06)**: 초기 운영 방침=오프라인 수기 입금/정산 → PG/checkout 은 결함이 아니라 **장기 보류**. 단 온라인 결제 미제공을 사용자에 고지 필요 → `WO-…-OFFLINE-OPERATION-SAFETY-V1` 에서 처리 |
 | G5 | 공급자 제안 설계 필드 부족(목표 매장수·per-store limit·도매가 기준·정산 제품 구성) | 🟡 중 | 펀딩 구조 설계 불충분 |
 | G6 | 매장 랜딩 **매장 식별** 약함(참여자 store/org FK 없음) | 🟡 중 | 핵심 KPI "몇 개 매장 랜딩" 정밀 추적 불가 |
@@ -184,18 +184,19 @@ crowdfunding 코어(02-22) → conversion/listing(04-15) → customerConversion 
 
 ## 15. 우선순위 (WO §11)
 
-1. **G1 보안 핫픽스** — 운영 노출 PII/주문생성 위험, 최우선.
-2. **G2 고지 + G9 문구**(UX-CLARITY) — DB/API 무변경, 사용자 오해 방지 우선.
-3. **G3 참여 대상 제한**(ELIGIBILITY-GATE) — 프로그램 정체성.
-4. **G5 공급자 설계 필드**(DESIGN-FIELDS).
-5. **G6 매장 랜딩 추적**(STORE-LANDING).
-6. **G7 운영자 심사**(REVIEW-CHECKLIST).
-7. (병행/낮음) G8, G10, G11 정리.
-8. **(장기 보류) G4 결제/PG** — 오프라인 운영 방침 확정으로 PG/checkout 은 실제 필요성 확인 후 별도 고도화.
+> **우선순위는 [`O4O-DISTRIBUTION-FUNDING-INITIAL-OPERATION-MODEL-V1`](../baseline/O4O-DISTRIBUTION-FUNDING-INITIAL-OPERATION-MODEL-V1.md) §6 으로 재정렬(2026-06-06).**
+
+1. **완료**: G1 보안 + G2/G9 오프라인·투자형 고지 (`OFFLINE-OPERATION-SAFETY-V1`).
+2. **보류**: G3 참여 대상 제한 / 포럼 자동 gate / 입금확인 자동 상태머신 — 초기 운영 모델상 사람-게이트(제품 개발자 검토·포럼 승인)로 대체.
+3. **다음**: **G5 공급자 설계 필드**(DESIGN-FIELDS) — 목표 매장 수·1인당 권장 금액·정산 기준·정산 제품 구성·송금 후 포럼 운영·미송금자 처리. **1차 설명 필드·안내 중심**.
+4. **그다음**: **운영자 송금 내역 관리** — Neture 운영자 송금 수령·완료자 명단·제품 개발자 공유.
+5. **그다음**: G6 매장 랜딩 추적.
+6. **장기 보류**: G4 PG/checkout, 포럼 자동 연동.
+7. (병행/낮음) G7, G8, G10, G11 정리.
 
 원칙: 기존 기능·내부 Market Trial 코드명 유지, 외부 표기 유통참여형 펀딩 유지, 결제/DB 변경은 IR 후 별도 WO로.
 
-> **재분류 메모 (2026-06-06)**: 초기 운영 방침은 **오프라인 운영자 수기 관리**(참여금 확인·제품 정산·배송/이행). 따라서 G4(PG/checkout)는 즉시 결함이 아니라 **장기 보류**로 재분류. 후속 1순위는 G1 보안 핫픽스 + G2 오프라인/투자형-아님 고지 → `WO-O4O-NETURE-DISTRIBUTION-FUNDING-OFFLINE-OPERATION-SAFETY-V1` 에서 G1·G2(+G9 bare Trial) 처리 완료. (CHECK 동명 문서 참조)
+> **재분류 메모 (2026-06-06)**: 초기 운영 모델은 **사람 중심 + 자동화 최소**(제품 개발자 포럼 운영 + Neture 운영자 송금 통제). 따라서 IR 의 "스켈레톤" 판정은 결함이 아니라 **초기 운영 모델에 부합**으로 재해석한다. G3(참여 대상 제한)·포럼 자동 gate 는 **보류**, G4(PG/checkout)는 **장기 보류**. G1 보안 + G2 고지(+G9)는 `OFFLINE-OPERATION-SAFETY-V1` 로 완료. 운영 모델 SSOT = [`O4O-DISTRIBUTION-FUNDING-INITIAL-OPERATION-MODEL-V1`](../baseline/O4O-DISTRIBUTION-FUNDING-INITIAL-OPERATION-MODEL-V1.md).
 
 ---
 
