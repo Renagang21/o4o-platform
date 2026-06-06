@@ -26,9 +26,10 @@
 
 import { useEffect, useState, useCallback, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Layers, Trash2, RefreshCw, FileEdit, Plus, Megaphone, QrCode, PenLine, MonitorPlay, ChevronDown, ExternalLink, Link2, X, Loader2 } from 'lucide-react';
+import { Layers, Trash2, RefreshCw, FileEdit, Plus, Megaphone, QrCode, PenLine, MonitorPlay, ChevronDown, ExternalLink, Link2 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { AiContentModal } from '@o4o/content-editor';
+import { StoreAssetDerivationViewer, resultKindToDerivedKind } from '@o4o/store-ui-core';
 import { directContentApi } from '../../api/assetSnapshot';
 import {
   getStoreExecutionAssets,
@@ -39,7 +40,7 @@ import { getStoreQrCodes, deleteStoreQrCode } from '../../api/storeQr';
 import { fetchStaffBlogPosts } from '../../api/blogStaff';
 import { getStoreSlug } from '../../api/pharmacyInfo';
 // WO-KPA-STORE-ASSET-DERIVATION-VIEWER-UI-V1: 원본↔파생 관계 조회
-import { getStoreAssetDerivations, type StoreAssetDerivation } from '../../api/storeAssetDerivations';
+import { getStoreAssetDerivations } from '../../api/storeAssetDerivations';
 import { getAccessToken } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
 import { SelectContentsForProductionModal } from './SelectContentsForProductionModal';
@@ -103,17 +104,8 @@ const BLOG_STATUS_LABELS: Record<string, { label: string; bg: string; fg: string
   archived:  { label: '보관', bg: '#FEF3C7', fg: '#D97706' },
 };
 
-// WO-KPA-STORE-ASSET-DERIVATION-VIEWER-UI-V1: source_kind → 사용자 문구 (개발자 용어 비노출)
-const SOURCE_KIND_LABELS: Record<string, string> = {
-  content_snapshot: '콘텐츠',
-  content_direct: '콘텐츠',
-  library_resource: '자료',
-  production_material: '매장 제작 자료',
-  store_execution_asset: '자료',
-};
-function sourceKindLabel(k: string) {
-  return SOURCE_KIND_LABELS[k] ?? '자료';
-}
+// WO-O4O-STORE-ASSET-DERIVATION-VIEWER-COMPONENT-EXTRACT-V1:
+//   source_kind → 사용자 문구 매핑은 공통 StoreAssetDerivationViewer 의 기본 맵으로 이관.
 
 const FROM_LABELS: Record<string, string> = {
   contents:           '콘텐츠',
@@ -211,33 +203,25 @@ export default function StoreProductionMaterialsPage() {
   const [selected, setSelected]     = useState<Set<string>>(new Set());
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  // WO-KPA-STORE-ASSET-DERIVATION-VIEWER-UI-V1: 원본 보기 모달 (결과물 → 원본 역추적)
-  // WO-KPA-STORE-ASSET-DERIVATION-VIEWER-QR-BLOG-EXTEND-V1: POP 외 QR-code/블로그 행도 동일 viewer 사용.
-  //   결과물 종류(ResultKind) → store_asset_derivations.derivedKind 매핑.
+  // WO-KPA-STORE-ASSET-DERIVATION-VIEWER-UI-V1 / QR-BLOG-EXTEND-V1: 원본 보기 (결과물 → 원본 역추적).
+  // WO-O4O-STORE-ASSET-DERIVATION-VIEWER-COMPONENT-EXTRACT-V1:
+  //   모달/상태/조회를 공통 StoreAssetDerivationViewer 로 이관. 페이지는 대상(target)만 보유하고,
+  //   viewer 가 fetch/loading/empty 를 자체 처리한다. KPA fetch client 는 fetchDerivations 로 주입.
   const [derivOpen, setDerivOpen] = useState(false);
   const [derivTarget, setDerivTarget] = useState<{ id: string; title: string; kind: ResultKind } | null>(null);
-  const [derivItems, setDerivItems] = useState<StoreAssetDerivation[]>([]);
-  const [derivLoading, setDerivLoading] = useState(false);
-  const [derivError, setDerivError] = useState<string | null>(null);
 
-  const openDerivations = useCallback(async (item: ProductionMaterialItem) => {
+  const openDerivations = useCallback((item: ProductionMaterialItem) => {
     setDerivTarget({ id: item.id, title: item.title, kind: item.kind });
     setDerivOpen(true);
-    setDerivLoading(true);
-    setDerivError(null);
-    setDerivItems([]);
-    try {
-      // ResultKind('material'|'qr'|'blog') → derivedKind 매핑. material(=POP 결과물)은 기존대로 pop_pdf.
-      const derivedKind =
-        item.kind === 'qr' ? 'qr_code' : item.kind === 'blog' ? 'blog_post' : 'pop_pdf';
-      const res = await getStoreAssetDerivations({ derivedKind, derivedId: item.id });
-      setDerivItems(res?.data?.items ?? []);
-    } catch {
-      setDerivError('원본 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
-    } finally {
-      setDerivLoading(false);
-    }
   }, []);
+
+  const fetchDerivations = useCallback(
+    async ({ derivedKind, derivedId }: { derivedKind: string; derivedId: string }) => {
+      const res = await getStoreAssetDerivations({ derivedKind, derivedId });
+      return { items: res?.data?.items ?? [] };
+    },
+    [],
+  );
 
   // WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-SELECTOR-MODAL-V1:
   // 콘텐츠/강의 선택 → StartProductionModal → AiContentModal → editor 의 canonical 흐름.
@@ -772,56 +756,17 @@ export default function StoreProductionMaterialsPage() {
         })()}
       />
 
-      {/* WO-KPA-STORE-ASSET-DERIVATION-VIEWER-UI-V1: 원본 보기 모달 */}
-      {derivOpen && (
-        <div style={styles.modalOverlay} onClick={() => setDerivOpen(false)}>
-          <div style={styles.modalCard} onClick={(e) => e.stopPropagation()}>
-            <div style={styles.modalHeader}>
-              <span style={styles.modalTitle}>
-                <Link2 size={16} style={{ color: colors.primary }} />
-                원본 자료
-              </span>
-              <button type="button" onClick={() => setDerivOpen(false)} style={styles.modalClose} aria-label="닫기">
-                <X size={16} />
-              </button>
-            </div>
-            <div style={styles.modalBody}>
-              {derivTarget && (
-                <p style={styles.modalTargetTitle}>
-                  {derivTarget.kind === 'qr' ? 'QR-code' : derivTarget.kind === 'blog' ? '블로그' : 'POP'} · {derivTarget.title}
-                </p>
-              )}
-              {derivLoading ? (
-                <div style={styles.modalState}>
-                  <Loader2 size={18} style={{ color: colors.neutral400 }} /> 불러오는 중...
-                </div>
-              ) : derivError ? (
-                <div style={{ ...styles.modalState, color: '#DC2626' }}>{derivError}</div>
-              ) : derivItems.length === 0 ? (
-                <div style={styles.modalEmpty}>
-                  연결된 원본 정보가 없습니다.
-                  <span style={styles.modalEmptySub}>
-                    이전 버전에서 생성되었거나 원본 관계가 기록되지 않은 자료일 수 있습니다.
-                  </span>
-                </div>
-              ) : (
-                <>
-                  <p style={styles.modalIntro}>
-                    이 자료는 아래 {derivItems.length}개의 원본 자료를 바탕으로 만들어졌습니다.
-                  </p>
-                  <ul style={styles.modalList}>
-                    {derivItems.map((d) => (
-                      <li key={d.id} style={styles.modalListItem}>
-                        <span style={styles.modalSourceBadge}>{sourceKindLabel(d.sourceKind)}</span>
-                        <span style={styles.modalSourceTitle}>{d.sourceTitle || '제목 없는 자료'}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
+      {/* WO-O4O-STORE-ASSET-DERIVATION-VIEWER-COMPONENT-EXTRACT-V1: 공통 원본 보기 뷰어로 교체 */}
+      {derivTarget && (
+        <StoreAssetDerivationViewer
+          open={derivOpen}
+          onClose={() => setDerivOpen(false)}
+          derivedKind={resultKindToDerivedKind(derivTarget.kind)}
+          derivedId={derivTarget.id}
+          title={derivTarget.title}
+          kindLabel={derivTarget.kind === 'qr' ? 'QR-code' : derivTarget.kind === 'blog' ? '블로그' : 'POP'}
+          fetchDerivations={fetchDerivations}
+        />
       )}
     </div>
   );
@@ -980,123 +925,8 @@ const styles: Record<string, CSSProperties> = {
     paddingTop: '4px',
     borderTop: `1px solid ${colors.neutral100}`,
   },
-  // ── WO-KPA-STORE-ASSET-DERIVATION-VIEWER-UI-V1: 원본 보기 모달 ──
-  modalOverlay: {
-    position: 'fixed',
-    inset: 0,
-    zIndex: 60,
-    background: 'rgba(15,23,42,0.45)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '16px',
-  },
-  modalCard: {
-    width: '100%',
-    maxWidth: '440px',
-    maxHeight: '80vh',
-    overflowY: 'auto',
-    background: colors.white,
-    borderRadius: '12px',
-    boxShadow: '0 24px 60px -20px rgba(15,23,42,0.4)',
-  },
-  modalHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '16px 18px',
-    borderBottom: `1px solid ${colors.neutral200}`,
-  },
-  modalTitle: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '8px',
-    fontSize: '15px',
-    fontWeight: 600,
-    color: colors.neutral800,
-  },
-  modalClose: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '28px',
-    height: '28px',
-    background: 'transparent',
-    border: 'none',
-    color: colors.neutral400,
-    cursor: 'pointer',
-    borderRadius: '6px',
-  },
-  modalBody: {
-    padding: '16px 18px',
-  },
-  modalTargetTitle: {
-    fontSize: '13px',
-    fontWeight: 600,
-    color: colors.neutral700,
-    margin: '0 0 12px',
-  },
-  modalState: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    padding: '20px 0',
-    fontSize: '14px',
-    color: colors.neutral500,
-  },
-  modalEmpty: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '6px',
-    padding: '12px 0',
-    fontSize: '14px',
-    color: colors.neutral600,
-  },
-  modalEmptySub: {
-    fontSize: '12px',
-    color: colors.neutral400,
-    lineHeight: 1.6,
-  },
-  modalIntro: {
-    fontSize: '13px',
-    color: colors.neutral600,
-    margin: '0 0 10px',
-  },
-  modalList: {
-    listStyle: 'none',
-    margin: 0,
-    padding: 0,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
-  },
-  modalListItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    padding: '10px 12px',
-    background: colors.neutral50,
-    border: `1px solid ${colors.neutral200}`,
-    borderRadius: '8px',
-  },
-  modalSourceBadge: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    padding: '2px 8px',
-    fontSize: '11px',
-    fontWeight: 600,
-    borderRadius: '4px',
-    background: '#EEF2FF',
-    color: '#4338CA',
-    flexShrink: 0,
-  },
-  modalSourceTitle: {
-    fontSize: '14px',
-    color: colors.neutral800,
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
-  },
+  // 원본 보기 모달 스타일은 공통 StoreAssetDerivationViewer(@o4o/store-ui-core)로 이관됨
+  // (WO-O4O-STORE-ASSET-DERIVATION-VIEWER-COMPONENT-EXTRACT-V1).
   toolbar: {
     display: 'flex',
     alignItems: 'center',

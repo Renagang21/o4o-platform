@@ -35,6 +35,14 @@ export type { StoreTopBarProps, StoreNavItem } from './components/StoreTopBar';
 export { StoreSidebar } from './components/StoreSidebar';
 export type { StoreSidebarProps } from './components/StoreSidebar';
 
+// 원본 보기 (Store Asset Derivation) 공통 뷰어 — WO-O4O-STORE-ASSET-DERIVATION-VIEWER-COMPONENT-EXTRACT-V1
+export { StoreAssetDerivationViewer, resultKindToDerivedKind } from './components/StoreAssetDerivationViewer';
+export type {
+  StoreAssetDerivationViewerProps,
+  StoreAssetDerivationItem,
+  StoreResultKind,
+} from './components/StoreAssetDerivationViewer';
+
 // Capability Menu Integration (WO-O4O-CAPABILITY-MENU-INTEGRATION-V1)
 export { MENU_CAPABILITY_MAP, resolveStoreMenu } from './config/menuCapabilityMap';
 
