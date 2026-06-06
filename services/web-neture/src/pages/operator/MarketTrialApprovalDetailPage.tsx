@@ -209,7 +209,7 @@ export default function MarketTrialApprovalDetailPage() {
       await createListingFromTrialParticipant(id, participant.id);
       await loadParticipants(id, filter);
     } catch (err: any) {
-      setError(err.response?.data?.message || err.message || '매장 진열 등록에 실패했습니다.');
+      setError(err.response?.data?.message || err.message || '활용 상품 연결에 실패했습니다.');
     } finally {
       setCreatingListingId(null);
     }
@@ -222,7 +222,7 @@ export default function MarketTrialApprovalDetailPage() {
       await updateParticipantConversionStatus(id, participant.id, newStatus);
       await loadParticipants(id, filter);
     } catch (err: any) {
-      setError(err.response?.data?.message || err.message || '전환 상태 변경에 실패했습니다.');
+      setError(err.response?.data?.message || err.message || '매장 랜딩 단계 변경에 실패했습니다.');
     } finally {
       setUpdatingConversionId(null);
     }
@@ -780,18 +780,19 @@ const FILTER_OPTIONS: { value: ParticipantFilter; label: string; group?: string 
   { value: 'cash',      label: '현금 보상' },
   { value: 'pending',   label: '이행 대기' },
   { value: 'fulfilled', label: '이행 완료' },
-  { value: 'conv_interested',  label: '관심', group: 'conv' },
+  { value: 'conv_interested',  label: '관심 확인', group: 'conv' },
   { value: 'conv_considering', label: '취급 검토', group: 'conv' },
-  { value: 'conv_adopted',     label: '취급 시작', group: 'conv' },
+  { value: 'conv_adopted',     label: '매장 도입', group: 'conv' },
   { value: 'conv_first_order', label: '첫 주문', group: 'conv' },
 ];
 
+// WO-O4O-NETURE-DISTRIBUTION-FUNDING-STORE-LANDING-TRACKING-V1: 매장 랜딩 단계 라벨
 const CONVERSION_STATUS_LABELS: Record<CustomerConversionStatus, string> = {
-  none: '참여만',
-  interested: '관심 있음',
+  none: '랜딩 전',
+  interested: '관심 확인',
   considering: '취급 검토',
-  adopted: '취급 시작',
-  first_order: '첫 주문',
+  adopted: '매장 도입',
+  first_order: '첫 주문 · 랜딩',
 };
 
 const CONVERSION_STATUS_COLORS: Record<CustomerConversionStatus, string> = {
@@ -946,6 +947,29 @@ function ParticipantSection({
         </div>
       )}
 
+      {/* WO-O4O-NETURE-DISTRIBUTION-FUNDING-STORE-LANDING-TRACKING-V1: 매장 랜딩 파이프라인 요약 + 안내 */}
+      {totalCount > 0 && filter === 'all' && (
+        <div className="flex flex-wrap items-center gap-1.5 mb-2">
+          <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
+            입금 확인 완료 {participants.filter((p) => (p.paymentStatus ?? 'unpaid') === 'paid').length}명
+          </span>
+          <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-violet-100 text-violet-700">
+            제품 정산 완료 {participants.filter((p) => p.settlementStatus === 'offline_settled').length}명
+          </span>
+          <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
+            매장 도입 {participants.filter((p) => { const c = p.customerConversionStatus ?? 'none'; return c === 'adopted' || c === 'first_order'; }).length}명
+          </span>
+          <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700">
+            활용 상품 연결 {participants.filter((p) => !!p.listingId).length}건
+          </span>
+        </div>
+      )}
+      {totalCount > 0 && (
+        <p className="text-xs text-gray-500 mb-3">
+          입금 확인 완료자는 제품 정산 대상이 됩니다. <strong>매장 랜딩은 자동 확정되지 않습니다</strong> — 제품 정산·활용 상품 연결 상태를 참고해 운영자가 실제 매장 도입 여부를 확인하고, 필요하면 제품 개발자와 함께 확정합니다.
+        </p>
+      )}
+
       {totalCount === 0 ? (
         <p className="text-sm text-gray-400 text-center py-6">
           아직 이행 관리 대상 참여자가 없습니다.
@@ -963,9 +987,9 @@ function ParticipantSection({
                 <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">유형</th>
                 <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">보상</th>
                 <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">이행</th>
-                <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">거래선 단계</th>
+                <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">매장 랜딩 단계</th>
                 {trialConverted && (
-                  <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">진열 상태</th>
+                  <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">활용 상품 연결</th>
                 )}
                 <th className="text-left py-2 px-4 text-xs font-medium text-gray-500">참여일</th>
                 <th className="text-right py-2 px-4 text-xs font-medium text-gray-500">이행</th>
@@ -1020,7 +1044,7 @@ function ParticipantSection({
                       <td className="py-2.5 px-2">
                         {p.listingId ? (
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
-                            진열 완료
+                            활용 상품 연결됨
                           </span>
                         ) : listingEligible ? (
                           <button
@@ -1028,7 +1052,7 @@ function ParticipantSection({
                             disabled={isCreatingListing}
                             className="px-2 py-0.5 text-xs text-white bg-indigo-600 rounded hover:bg-indigo-700 disabled:opacity-50"
                           >
-                            {isCreatingListing ? '...' : '진열 등록'}
+                            {isCreatingListing ? '...' : '활용 상품 연결'}
                           </button>
                         ) : (
                           <span className="text-xs text-gray-300">-</span>
@@ -1449,12 +1473,12 @@ function FunnelSection({ funnel }: { funnel: TrialFunnel }) {
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-5 mb-4">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-gray-700">거래선 전환 퍼널</h3>
+        <h3 className="text-sm font-semibold text-gray-700">매장 랜딩 전환 퍼널</h3>
         <div className="flex gap-3 text-xs text-gray-500">
-          <span>취급률 <strong className="text-green-600">{adoptedRate}%</strong></span>
+          <span>매장 도입률 <strong className="text-green-600">{adoptedRate}%</strong></span>
           <span>첫주문률 <strong className="text-green-700">{firstOrderRate}%</strong></span>
           {funnel.listingCount > 0 && (
-            <span>진열 <strong className="text-indigo-600">{funnel.listingCount}건</strong></span>
+            <span>활용 상품 연결 <strong className="text-indigo-600">{funnel.listingCount}건</strong></span>
           )}
         </div>
       </div>

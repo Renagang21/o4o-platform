@@ -1303,6 +1303,7 @@ export class MarketTrialOperatorController {
         settlementChoice: string | null;
         settlementStatus: string | null;
         customerConversionStatus: string | null;
+        listingId: string | null;
         createdAt: Date;
       }> = await ds.query(
         `SELECT
@@ -1318,6 +1319,7 @@ export class MarketTrialOperatorController {
            p."settlementChoice",
            p."settlementStatus",
            p."customerConversionStatus",
+           p."listingId",
            p."createdAt"
          FROM market_trial_participants p
          LEFT JOIN users u ON u.id = p."participantId"
@@ -1363,11 +1365,11 @@ export class MarketTrialOperatorController {
         ({ pending: '대기', choice_pending: '선택 대기', choice_completed: '선택 완료', offline_review: '운영 확인 중', offline_settled: '정산 완료' } as Record<string, string>)[v || 'pending'] || v || '-';
       const settlementChoiceLabel = (v: string | null) => (v === 'product' ? '제품 수령' : v === 'cash' ? '금액 환급' : '-');
       const conversionLabel = (v: string | null) =>
-        ({ none: '-', interested: '관심', considering: '검토', adopted: '도입', first_order: '첫 주문' } as Record<string, string>)[v || 'none'] || v || '-';
+        ({ none: '랜딩 전', interested: '관심 확인', considering: '취급 검토', adopted: '매장 도입', first_order: '첫 주문' } as Record<string, string>)[v || 'none'] || v || '-';
       const won = (n: string | number | null) => (n != null && n !== '' ? `${Number(n).toLocaleString()}원` : '-');
 
       // CSV header + rows
-      const header = ['참여자명', '참여자유형', '보상방식', '보상상태', '참여금', '입금상태', '입금확인금액', '입금확인일', '입금참조', '정산선택', '정산상태', '거래선단계', '참여일', '유통참여형 펀딩 제목', '상태'];
+      const header = ['참여자명', '참여자유형', '보상방식', '보상상태', '참여금', '입금상태', '입금확인금액', '입금확인일', '입금참조', '정산선택', '정산상태', '매장랜딩단계', '활용상품연결', '참여일', '유통참여형 펀딩 제목', '상태'];
       const trialTitle = (trial.title || '').replace(/"/g, '""');
       const trialStatusLabel: Record<string, string> = {
         draft: '작성 중', submitted: '심사 대기',
@@ -1389,6 +1391,7 @@ export class MarketTrialOperatorController {
         `"${settlementChoiceLabel(r.settlementChoice)}"`,
         `"${settlementStatusLabel(r.settlementStatus)}"`,
         `"${conversionLabel(r.customerConversionStatus)}"`,
+        `"${r.listingId ? '연결됨' : '-'}"`,
         `"${fmtDate(r.createdAt)}"`,
         `"${trialTitle}"`,
         `"${trialStatusText}"`,
