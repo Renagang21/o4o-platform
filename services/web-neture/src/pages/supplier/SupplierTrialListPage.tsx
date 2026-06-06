@@ -75,9 +75,9 @@ export default function SupplierTrialListPage() {
 
       {trials.length === 0 ? (
         <div style={s.emptyBox}>
-          <p style={s.empty}>등록된 Trial이 없습니다.</p>
+          <p style={s.empty}>등록된 유통참여형 펀딩이 없습니다.</p>
           <button style={s.createBtn} onClick={() => navigate('/supplier/market-trial/new')}>
-            Trial 등록하기
+            유통참여형 펀딩 등록하기
           </button>
         </div>
       ) : (

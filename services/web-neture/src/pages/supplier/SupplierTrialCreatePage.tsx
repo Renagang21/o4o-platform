@@ -94,7 +94,7 @@ export default function SupplierTrialCreatePage({
       }
     }
     if (!fundingStartAt || !fundingEndAt) errors.funding = '모집 기간을 설정해주세요.';
-    if (!trialPeriodDays || Number(trialPeriodDays) <= 0) errors.trialPeriodDays = 'Trial 기간(일)을 입력해주세요.';
+    if (!trialPeriodDays || Number(trialPeriodDays) <= 0) errors.trialPeriodDays = '진행 기간(일)을 입력해주세요.';
 
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
@@ -137,7 +137,7 @@ export default function SupplierTrialCreatePage({
       if (mode === 'edit' && trialId) {
         await updateTrial(trialId, payload);
         navigate(`/supplier/market-trial/${trialId}`, {
-          state: { message: 'Trial이 수정되었습니다.' },
+          state: { message: '유통참여형 펀딩이 수정되었습니다.' },
         });
       } else {
         const created = await createTrial(payload);
@@ -145,11 +145,11 @@ export default function SupplierTrialCreatePage({
           await submitTrial(created.id);
         }
         navigate('/supplier/dashboard', {
-          state: { message: autoSubmit ? 'Trial이 제출되었습니다.' : 'Trial이 저장되었습니다.' },
+          state: { message: autoSubmit ? '유통참여형 펀딩이 제출되었습니다.' : '유통참여형 펀딩이 저장되었습니다.' },
         });
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || err.message || 'Trial 생성에 실패했습니다.');
+      setError(err.response?.data?.message || err.message || '유통참여형 펀딩 생성에 실패했습니다.');
     } finally {
       setLoading(false);
     }
@@ -434,7 +434,7 @@ export default function SupplierTrialCreatePage({
           {/* Trial 기간 */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Trial 기간 (일) <span className="text-red-500">*</span>
+              진행 기간 (일) <span className="text-red-500">*</span>
             </label>
             <input
               type="number"

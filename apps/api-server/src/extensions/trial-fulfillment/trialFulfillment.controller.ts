@@ -5,9 +5,10 @@
  * participationsStore 의존 제거, TypeORM repo 기반으로 전환.
  */
 
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { DataSource, Repository } from 'typeorm';
 import { MarketTrialParticipant } from '@o4o/market-trial';
+import { requireNetureScope } from '../../middleware/neture-scope.middleware.js';
 import logger from '../../utils/logger.js';
 import {
   createFulfillment,
@@ -34,6 +35,36 @@ export class TrialFulfillmentController {
     this.dataSource = ds;
     this.participantRepo = ds.getRepository(MarketTrialParticipant);
   }
+
+  /**
+   * 권한 미들웨어: 참여 당사자(participantId === user.id) 또는 Neture 운영자만 허용.
+   * participationId 단독 접근 차단 (Boundary Policy §7).
+   * WO-O4O-NETURE-DISTRIBUTION-FUNDING-OFFLINE-OPERATION-SAFETY-V1.
+   */
+  static async requireOwnerOrOperator(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = (req as any).user?.id;
+      if (!userId) {
+        return res.status(401).json({ success: false, message: 'Authentication required' });
+      }
+      const { participationId } = req.params;
+      const participation = await TrialFulfillmentController.participantRepo.findOne({
+        where: { id: participationId },
+      });
+      if (!participation) {
+        return res.status(404).json({ success: false, message: 'Participation not found' });
+      }
+      if (participation.participantId === userId) {
+        return next();
+      }
+      return TrialFulfillmentController.netureOperatorScope(req, res, next);
+    } catch (error) {
+      console.error('[TrialFulfillment] Authorization error:', error);
+      return res.status(500).json({ success: false, message: 'Authorization failed' });
+    }
+  }
+
+  private static netureOperatorScope = requireNetureScope('neture:operator') as any;
 
   /**
    * Participation 조회 헬퍼

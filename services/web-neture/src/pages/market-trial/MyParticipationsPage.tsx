@@ -423,6 +423,21 @@ export function MyParticipationsPage() {
         </p>
       </div>
 
+      {/* WO-O4O-NETURE-DISTRIBUTION-FUNDING-OFFLINE-OPERATION-SAFETY-V1: 오프라인 입금/정산 안내 */}
+      <div
+        style={{
+          backgroundColor: '#FFF7ED',
+          border: '1px solid #FED7AA',
+          borderRadius: '8px',
+          padding: '12px 14px',
+          marginBottom: '20px',
+        }}
+      >
+        <p style={{ fontSize: '0.8125rem', color: '#9A3412', lineHeight: 1.6, margin: 0 }}>
+          참여금 입금 확인과 제품 정산 상태는 Neture 운영자가 오프라인으로 확인한 뒤 반영합니다. 온라인 결제는 아직 제공하지 않습니다.
+        </p>
+      </div>
+
       <GuideBlock
         variant="info"
         title={guideTitle ?? '참여 내역 확인 안내'}
@@ -576,7 +591,7 @@ export function MyParticipationsPage() {
                       alignSelf: 'center',
                     }}
                   >
-                    Trial 보기 →
+                    유통참여형 펀딩 보기 →
                   </Link>
                 </div>
               </div>

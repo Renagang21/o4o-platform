@@ -191,14 +191,14 @@ export default function SupplierDashboardPage() {
             to="/supplier/market-trial/new"
             className="inline-flex items-center gap-1.5 px-4 py-2 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 transition-colors"
           >
-            Trial 생성하기
+            유통참여형 펀딩 생성하기
             <ArrowRight size={14} />
           </Link>
           <Link
             to="/supplier/market-trial"
             className="inline-flex items-center gap-1.5 px-4 py-2 bg-white text-violet-700 text-sm font-medium rounded-lg border border-violet-200 hover:bg-violet-100 transition-colors"
           >
-            Trial 관리
+            유통참여형 펀딩 관리
           </Link>
         </div>
       </div>

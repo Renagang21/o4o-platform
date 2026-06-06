@@ -1066,6 +1066,10 @@ function ParticipantSection({
             <h3 className="text-sm font-semibold text-gray-700">결제 상태 관리</h3>
             <span className="text-xs text-gray-500">PG 미연동 — 수기 송금 확인 위주</span>
           </div>
+          {/* WO-O4O-NETURE-DISTRIBUTION-FUNDING-OFFLINE-OPERATION-SAFETY-V1: 오프라인 운영 기준 */}
+          <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2 mb-3">
+            초기 유통참여형 펀딩은 온라인 결제 없이 운영자가 오프라인 입금 확인과 제품 정산 상태를 관리합니다.
+          </p>
           <div className="overflow-x-auto -mx-4 sm:-mx-5">
             <table className="w-full text-sm min-w-[820px]">
               <thead>

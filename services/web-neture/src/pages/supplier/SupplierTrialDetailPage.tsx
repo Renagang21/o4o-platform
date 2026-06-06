@@ -69,10 +69,10 @@ const NEXT_ACTION: Record<string, { title: string; desc: string }> = {
   },
   fulfilled: {
     title: '이행이 완료되었습니다',
-    desc: '모든 보상 지급이 완료되었습니다. 최종 결과를 확인하고 다음 Trial을 준비하세요.',
+    desc: '모든 보상 지급이 완료되었습니다. 최종 결과를 확인하고 다음 유통참여형 펀딩을 준비하세요.',
   },
   closed: {
-    title: 'Trial이 종료되었습니다',
+    title: '유통참여형 펀딩이 종료되었습니다',
     desc: '최종 결과 데이터를 참고하여 향후 제품 개발에 활용하세요.',
   },
 };
@@ -120,7 +120,7 @@ export default function SupplierTrialDetailPage() {
         if (err?.response?.status === 403) {
           setError('접근 권한이 없습니다.');
         } else if (err?.response?.status === 404) {
-          setError('Trial을 찾을 수 없습니다.');
+          setError('유통참여형 펀딩을 찾을 수 없습니다.');
         } else {
           setError('결과를 불러오지 못했습니다.');
         }
@@ -156,7 +156,7 @@ export default function SupplierTrialDetailPage() {
     <div style={s.container}>
       {/* 상단 네비 */}
       <button style={s.backLink} onClick={() => navigate('/supplier/market-trial')}>
-        ← 내 Trial 목록
+        ← 내 유통참여형 펀딩 목록
       </button>
 
       {/* 헤더 */}
@@ -395,7 +395,7 @@ export default function SupplierTrialDetailPage() {
               <span style={{ ...s.muted, marginLeft: '6px' }}>개 매장 진열 등록</span>
             </div>
             <span style={{ fontSize: '13px', color: '#6B7280' }}>
-              ← Trial 참여자 매장에서 이 상품을 실제로 취급 시작
+              ← 유통참여형 펀딩 참여자 매장에서 이 상품을 실제로 취급 시작
             </span>
           </div>
         </div>
@@ -484,7 +484,7 @@ export default function SupplierTrialDetailPage() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
                 <span style={{ ...s.convBadge, backgroundColor: '#059669' }}>상품 전환 완료</span>
               </div>
-              <p style={s.muted}>이 Trial은 정규 상품으로 전환되었습니다.</p>
+              <p style={s.muted}>이 유통참여형 펀딩은 정규 상품으로 전환되었습니다.</p>
               {(trial as any).convertedProductName && (
                 <p style={{ fontSize: '15px', fontWeight: 600, color: '#111827', margin: '4px 0 0 0' }}>
                   연결 상품: {(trial as any).convertedProductName}
@@ -499,7 +499,7 @@ export default function SupplierTrialDetailPage() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                 <span style={{ ...s.convBadge, backgroundColor: '#3B82F6' }}>상품 전환 검토 중</span>
               </div>
-              <p style={s.muted}>운영자가 이 Trial의 상품 전환 여부를 검토하고 있습니다.</p>
+              <p style={s.muted}>운영자가 이 유통참여형 펀딩의 상품 전환 여부를 검토하고 있습니다.</p>
             </div>
           )}
         </div>
@@ -512,13 +512,13 @@ export default function SupplierTrialDetailPage() {
             style={s.primaryBtn}
             onClick={() => navigate(`/supplier/market-trial/${id}/edit`)}
           >
-            이 Trial 수정하기
+            이 유통참여형 펀딩 수정하기
           </button>
           <button
             style={{ ...s.primaryBtn, backgroundColor: '#6B7280' }}
             onClick={() => navigate(`/supplier/market-trial/new`)}
           >
-            새 Trial 등록
+            새 유통참여형 펀딩 등록
           </button>
         </div>
       )}

@@ -23,12 +23,12 @@ export default function SupplierTrialEditPage() {
     getTrial(id)
       .then((t) => {
         if (t.status !== 'draft') {
-          setError('초안 상태의 Trial만 수정할 수 있습니다.');
+          setError('초안 상태의 유통참여형 펀딩만 수정할 수 있습니다.');
           return;
         }
         setTrial(t);
       })
-      .catch(() => setError('Trial을 불러오지 못했습니다.'))
+      .catch(() => setError('유통참여형 펀딩을 불러오지 못했습니다.'))
       .finally(() => setLoading(false));
   }, [id]);
 

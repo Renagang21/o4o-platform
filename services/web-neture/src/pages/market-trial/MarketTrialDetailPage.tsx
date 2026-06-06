@@ -347,6 +347,27 @@ export function MarketTrialDetailPage() {
       >
         <h3 style={s.cardHeaderText}>참여 신청</h3>
 
+        {/* WO-O4O-NETURE-DISTRIBUTION-FUNDING-OFFLINE-OPERATION-SAFETY-V1: 오프라인 운영 + 투자형 아님 고지 */}
+        <div
+          style={{
+            backgroundColor: '#FFF7ED',
+            border: '1px solid #FED7AA',
+            borderRadius: '8px',
+            padding: '12px 14px',
+            marginBottom: '14px',
+          }}
+        >
+          <p style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#9A3412', margin: '0 0 4px 0' }}>
+            오프라인 운영 안내
+          </p>
+          <p style={{ fontSize: '0.75rem', color: '#9A3412', lineHeight: 1.6, margin: 0 }}>
+            현재 유통참여형 펀딩의 참여금 확인과 제품 정산은 Neture 운영자가 별도로 안내·확인합니다. 온라인 결제는 아직 제공하지 않으며, 참여 신청 후 운영자 안내에 따라 오프라인으로 진행됩니다.
+          </p>
+          <p style={{ fontSize: '0.6875rem', color: '#B45309', lineHeight: 1.6, margin: '8px 0 0 0' }}>
+            ※ 유통참여형 펀딩은 금융투자 상품이 아닙니다. 참여자는 주식·채권·배당·이자·원금 상환 같은 금융적 권리를 받지 않으며, 프로그램 조건에 따라 제품 정산과 초기 참여 혜택을 받습니다.
+          </p>
+        </div>
+
         {hasJoined && (
           <div>
             <div style={s.joinedBox}>
