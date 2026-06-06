@@ -7,14 +7,14 @@
  * 상단 메뉴 단순화(Home / 이용 안내 / Contact Us)에 따라
  * /guide가 통합 이용 안내 허브 역할을 맡는다.
  *
- * 제거된 상단 메뉴(Supplier / Partner / O4O 소개 / 유통 참여형 펀딩)의
+ * 제거된 상단 메뉴(Supplier / Partner / O4O 소개 / 유통참여형 펀딩)의
  * 안내 기능을 이 허브에서 흡수한다.
  *
  * 포함 항목:
  *   01. Neture 둘러보기
  *   02. 공급자 이용 안내 (역할 설명 + 시작 가이드 + 문의 진입)
  *   03. 파트너 이용 안내 (역할 설명 + 프로그램 가이드 + 문의 진입)
- *   04. 유통 참여형 펀딩
+ *   04. 유통참여형 펀딩
  *   05. 상품 등록 & 유통
  *   06. Event Offer
  *   07. Forum & 자료실
@@ -38,7 +38,7 @@ const homeProps: GuideFeaturesPageProps = {
     eyebrow: '이용 안내',
     title: 'Neture 이용 안내',
     description:
-      'Neture의 구조와 참여 방법, 기능별 사용 방법을 안내합니다. 공급자 · 파트너 · 유통 참여형 펀딩 · 플랫폼 소개까지 아래 항목을 선택해 이동하세요.',
+      'Neture의 구조와 참여 방법, 기능별 사용 방법을 안내합니다. 공급자 · 파트너 · 유통참여형 펀딩 · 플랫폼 소개까지 아래 항목을 선택해 이동하세요.',
     flowBarTitle: '안내 영역',
     flowLabels: ['Neture 개요', '공급자', '파트너', '유통 펀딩', '상품', 'Event', 'Forum', 'Copilot', 'O4O 소개'],
   },
@@ -79,12 +79,12 @@ const homeProps: GuideFeaturesPageProps = {
     },
     {
       step: '04',
-      title: '유통 참여형 펀딩',
+      title: '유통참여형 펀딩',
       primaryRoute: '/guide/features/market-trial',
-      description: 'Market Trial — 오프라인 실행 시나리오 포함 펀딩. 모집 · 진행 · 정산 흐름.',
+      description: '유통참여형 펀딩 — 오프라인 실행 시나리오 포함 펀딩. 모집 · 진행 · 정산 흐름.',
       items: [
-        { label: 'Market Trial 보러 가기', route: '/market-trial' },
-        { label: 'Market Trial 이용 방법', route: '/guide/features/market-trial' },
+        { label: '유통참여형 펀딩 보러 가기', route: '/market-trial' },
+        { label: '유통참여형 펀딩 이용 방법', route: '/guide/features/market-trial' },
       ],
       linkTo: '/guide/features/market-trial',
     },

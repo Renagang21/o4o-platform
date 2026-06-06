@@ -1,5 +1,5 @@
 /**
- * MyParticipationsPage — Neture 내 유통 참여형 펀딩(Market Trial) 참여 내역
+ * MyParticipationsPage — Neture 내 유통참여형 펀딩(Market Trial) 참여 내역
  *
  * WO-NETURE-MARKET-TRIAL-PARTICIPANT-PAGES-V1
  * KPA-Society MyParticipationsPage.tsx → Neture canonical 이식
@@ -413,10 +413,10 @@ export function MyParticipationsPage() {
     <div style={{ maxWidth: '820px', margin: '0 auto', padding: '32px 16px 64px' }}>
       <div style={{ marginBottom: '24px' }}>
         <Link to="/market-trial" style={{ fontSize: '0.875rem', color: '#6B7280', textDecoration: 'none' }}>
-          ← 유통 참여형 펀딩 허브
+          ← 유통참여형 펀딩 허브
         </Link>
         <h1 style={{ margin: '8px 0 4px', fontSize: '1.5rem', fontWeight: 700, color: '#111827' }}>
-          내가 참여한 유통 참여형 펀딩
+          내가 참여한 유통참여형 펀딩
         </h1>
         <p style={{ margin: 0, color: '#6B7280', fontSize: '0.9375rem' }}>
           참여 내역, 예상 정산 정보, 선택 현황을 확인합니다.
@@ -426,7 +426,7 @@ export function MyParticipationsPage() {
       <GuideBlock
         variant="info"
         title={guideTitle ?? '참여 내역 확인 안내'}
-        description={guideDesc ?? '유통 참여형 펀딩의 정산 현황과 선택 가능한 옵션을 확인합니다.'}
+        description={guideDesc ?? '유통참여형 펀딩의 정산 현황과 선택 가능한 옵션을 확인합니다.'}
         steps={guideSteps ?? [
           '상단 KPI에서 전체 참여 수와 처리 대기 건수를 확인합니다.',
           '\'선택 대기\' 상태인 항목은 제품 수령 또는 금액 환급을 선택해 주세요.',
@@ -467,10 +467,10 @@ export function MyParticipationsPage() {
             color: '#9CA3AF',
           }}
         >
-          참여한 유통 참여형 펀딩이 없습니다.
+          참여한 유통참여형 펀딩이 없습니다.
           <div style={{ marginTop: '12px' }}>
             <Link to="/market-trial" style={{ color: '#10B981', fontWeight: 600, textDecoration: 'none' }}>
-              유통 참여형 펀딩 허브 →
+              유통참여형 펀딩 허브 →
             </Link>
           </div>
         </div>

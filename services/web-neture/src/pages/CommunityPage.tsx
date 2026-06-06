@@ -151,14 +151,14 @@ export default function CommunityPage() {
             {
               title: '공급자로 참여하기',
               description:
-                '제품·서비스를 O4O 플랫폼에 공급하고 Market Trial을 통해 유통 가능성을 검증합니다',
+                '제품·서비스를 O4O 플랫폼에 공급하고 유통참여형 펀딩을 통해 유통 가능성을 검증합니다',
               href: '/supplier',
               icon: <span className={iconCls}><Layers size={24} /></span>,
             },
             {
-              title: 'Market Trial 보기',
+              title: '유통참여형 펀딩 보기',
               description:
-                '진행 중인 유통 참여형 펀딩을 확인하고 공급자·운영자·매장이 함께 참여합니다',
+                '진행 중인 유통참여형 펀딩을 확인하고 공급자·운영자·매장이 함께 참여합니다',
               href: '/market-trial',
               icon: <span className={iconCls}><TrendingUp size={24} /></span>,
             },
@@ -175,8 +175,8 @@ export default function CommunityPage() {
 
       appEntryCards={[
         {
-          title: 'Market Trial',
-          description: '진행 중인 유통 참여형 펀딩에 참여하세요',
+          title: '유통참여형 펀딩',
+          description: '진행 중인 유통참여형 펀딩에 참여하세요',
           href: '/market-trial',
           icon: <span className={iconCls}><TrendingUp size={24} /></span>,
         },
@@ -201,11 +201,11 @@ export default function CommunityPage() {
       ]}
 
       cta={{
-        title: '유통 참여형 펀딩 (Market Trial)',
+        title: '유통참여형 펀딩',
         description:
           'Neture가 운영하는 참여형 프로그램입니다. 공급자·운영자·매장이 함께 신제품 유통 가능성을 검증합니다',
         href: '/market-trial',
-        linkLabel: 'Market Trial 보기 →',
+        linkLabel: '유통참여형 펀딩 보기 →',
         // WO-O4O-NETURE-HOME-ROLE-MARKET-TRIAL-ICON-ALIGNMENT-V1: emoji → lucide FlaskConical (Market Trial 표준)
         icon: <FlaskConical size={28} className="text-primary" />,
         accentColor: 'var(--color-primary)',
@@ -224,7 +224,7 @@ export default function CommunityPage() {
           },
           {
             title: '서비스 활용 방법',
-            description: '공급자, Market Trial, 파트너 협력 방식을 안내합니다',
+            description: '공급자, 유통참여형 펀딩, 파트너 협력 방식을 안내합니다',
             href: '/guide/usage',
           },
           {
@@ -264,7 +264,7 @@ function NetureHero() {
             to="/market-trial"
             className="px-5 py-2.5 bg-primary-500 text-white font-semibold rounded-lg hover:bg-primary-400 border border-white/30 transition-colors no-underline text-sm"
           >
-            Market Trial 보기
+            유통참여형 펀딩 보기
           </Link>
           <Link
             to="/guide"

@@ -130,7 +130,7 @@ const BUSINESS_ITEMS: {
   },
   {
     icon: FlaskConical,
-    title: 'Market Trial 기반 당뇨 관련 제품 개발',
+    title: '유통참여형 펀딩 기반 당뇨 관련 제품 개발',
     desc: '약국 경영자와 고객 반응을 기반으로 당뇨 관련 제품의 기획, 검증, 개선을 진행하는 참여형 제품 개발 사업입니다.',
     sub: 'GlycoPharm은 단순 유통을 넘어 약국 현장 반응을 제품 개발과 검증에 연결할 수 있습니다.',
   },
@@ -147,7 +147,7 @@ const PARTICIPANTS: { icon: typeof Users; title: string; desc: string; checks: s
     icon: Truck,
     title: '공급자',
     desc: '혈당관리 관련 제품과 원천 자료를 제공하고, B2B 제품 등록, 이벤트 오퍼, 무료혈당기 사업 등에 협력합니다.',
-    checks: ['제품 자료 제공', '공급 조건 협의', '이벤트 오퍼 협의', 'Market Trial 참여 가능성 검토'],
+    checks: ['제품 자료 제공', '공급 조건 협의', '이벤트 오퍼 협의', '유통참여형 펀딩 참여 가능성 검토'],
   },
   {
     icon: Building2,

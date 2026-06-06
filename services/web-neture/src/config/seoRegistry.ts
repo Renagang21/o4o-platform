@@ -26,8 +26,8 @@ export const netureSeoRegistry: SeoRegistry = {
     ogType: 'website',
   },
   '/market-trial': {
-    title: '유통 참여형 펀딩 — Neture',
-    description: '공급자와 매장이 함께하는 유통 참여형 펀딩.',
+    title: '유통참여형 펀딩 — Neture',
+    description: '공급자와 매장이 함께하는 유통참여형 펀딩.',
     ogType: 'website',
   },
   '/supplier': {
@@ -47,7 +47,7 @@ export const netureSeoRegistry: SeoRegistry = {
   },
   '/guide': {
     title: '이용 안내 — Neture',
-    description: '공급자 · 파트너 · 유통 참여형 펀딩 · O4O 플랫폼 소개 · 기능별 이용 방법 안내.',
+    description: '공급자 · 파트너 · 유통참여형 펀딩 · O4O 플랫폼 소개 · 기능별 이용 방법 안내.',
     ogType: 'website',
   },
   '/guide/intro': {

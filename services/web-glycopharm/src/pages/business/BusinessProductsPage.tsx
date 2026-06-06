@@ -24,7 +24,7 @@ const O4O_USES = [
   '매장이 운영하는 블로그 활용',
   '전자상거래를 통한 제품 판매',
   '이벤트 오퍼',
-  'Market Trial 기반 제품 검증 및 개발',
+  '유통참여형 펀딩 기반 제품 검증 및 개발',
   '향후 파트너 서비스 연계 가능성',
 ];
 
@@ -37,7 +37,7 @@ const REVIEW_QUESTIONS = [
   '이벤트 오퍼 대상이 될 수 있는가',
   '설문조사나 시장조사와 연결할 수 있는가',
   'QR-code, POP, 블로그 등 매장 실행 콘텐츠가 필요한가',
-  'Market Trial 기반 제품 개발 또는 검증으로 확장할 수 있는가',
+  '유통참여형 펀딩 기반 제품 개발 또는 검증으로 확장할 수 있는가',
   '판매자 모집이 필요한 제품인가',
   '판매자 모집을 언제, 어떤 조건으로 진행할 것인가',
 ];
@@ -73,7 +73,7 @@ const SUBFLOWS: { num: string; title: string; lead: string; desc: string; note?:
       'GlycoPharm 서비스 내 노출 방식',
       '약국 HUB 콘텐츠와의 연결 여부',
       'QR-code, POP, 블로그 등 매장 활용 콘텐츠 필요 여부',
-      '이벤트 오퍼 또는 Market Trial 연계 가능성',
+      '이벤트 오퍼 또는 유통참여형 펀딩 연계 가능성',
       '제품 등록 완료 여부',
       '제품 등재 후 검토 및 수정 필요 여부',
     ],
@@ -120,7 +120,7 @@ export default function BusinessProductsPage() {
           <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4 leading-tight">제품 등록 및 공급자 협의 준비</h1>
           <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-3xl">
             혈당관리 약국 사업에서 제품 등록은 공급자와 운영자가 제품을 O4O 안에서 어떻게 활용할지 먼저 협의하는 과정입니다.
-            제품을 단순히 등록하는 것을 넘어 시장조사, 매장 실행, 콘텐츠 활용, 전자상거래, 이벤트 오퍼, Market Trial 가능성까지 함께 검토합니다.
+            제품을 단순히 등록하는 것을 넘어 시장조사, 매장 실행, 콘텐츠 활용, 전자상거래, 이벤트 오퍼, 유통참여형 펀딩 가능성까지 함께 검토합니다.
           </p>
 
           <div className="flex flex-col sm:flex-row flex-wrap gap-3 mt-8">
@@ -161,7 +161,7 @@ export default function BusinessProductsPage() {
                 </p>
                 <p className="text-sm text-slate-600 leading-relaxed mt-2">
                   공급자와 운영자 모두 O4O가 단순 유통 서비스가 아니라 시장조사, 매장 실행, 콘텐츠 활용, 전자상거래, 이벤트 오퍼,
-                  Market Trial, 향후 파트너 서비스까지 연결될 수 있는 사업 도구라는 점을 이해해야 합니다.
+                  유통참여형 펀딩, 향후 파트너 서비스까지 연결될 수 있는 사업 도구라는 점을 이해해야 합니다.
                 </p>
               </div>
             </div>

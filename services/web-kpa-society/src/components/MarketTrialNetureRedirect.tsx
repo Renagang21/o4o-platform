@@ -32,7 +32,7 @@ export function MarketTrialNetureRedirect() {
     <div style={styles.container}>
       {/* O4O-GLOBAL-ICON-SYSTEM-STANDARD-V1: Market Trial 표준 아이콘 */}
       <div style={styles.icon}><FlaskConical size={48} /></div>
-      <h1 style={styles.title}>유통 참여형 펀딩 (Market Trial)은 Neture에서 운영됩니다</h1>
+      <h1 style={styles.title}>유통참여형 펀딩은 Neture에서 운영됩니다</h1>
       <p style={styles.description}>Neture로 이동 중입니다...</p>
       <a href={target} style={styles.link}>
         자동 이동되지 않으면 여기를 클릭하세요 →

@@ -15,7 +15,7 @@ import type { GlobalHeaderNavItem } from '@o4o/ui';
 
 // WO-O4O-NETURE-HEADER-AND-GUIDE-CONSOLIDATION-V1
 // 상단 메뉴 3개로 단순화.
-// Supplier / Partner / 유통 참여형 펀딩 / O4O 소개는 /guide(이용 안내) 허브 안에서 진입.
+// Supplier / Partner / 유통참여형 펀딩 / O4O 소개는 /guide(이용 안내) 허브 안에서 진입.
 export const NETURE_PUBLIC_NAV: GlobalHeaderNavItem[] = [
   { label: 'Home', href: '/' },
   { label: '이용 안내', href: '/guide' },

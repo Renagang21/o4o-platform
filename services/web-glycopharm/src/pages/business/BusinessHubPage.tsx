@@ -63,7 +63,7 @@ const BUSINESS_ITEMS: { icon: typeof Activity; title: string; desc: string }[] =
   { icon: PackageOpen, title: '제품 등록 및 판매자 모집', desc: 'B2B·서비스별 제품 등록과 판매자 모집' },
   { icon: Ticket, title: '이벤트 오퍼', desc: '공급자 협의 기반 제품 프로모션' },
   { icon: FileBarChart, title: '설문조사 및 초기 참여 사업', desc: '관심도·수요 확인 초기 참여' },
-  { icon: FlaskConical, title: 'Market Trial 기반 당뇨 관련 제품 개발', desc: '약국 현장 반응 기반 참여형 제품 개발 (실행은 Neture)' },
+  { icon: FlaskConical, title: '유통참여형 펀딩 기반 당뇨 관련 제품 개발', desc: '약국 현장 반응 기반 참여형 제품 개발 (실행은 Neture)' },
 ];
 
 // 향후 확장 예정 안내 — Phase 1 에서 라우트/페이지 미생성
@@ -72,7 +72,7 @@ const FUTURE_AREAS = [
   '사전 준비',
   '사업 논의 게시판',
   '무료혈당기 사업',
-  'Market Trial 기반 제품 개발 안내',
+  '유통참여형 펀딩 기반 제품 개발 안내',
 ];
 
 export default function BusinessHubPage() {
@@ -88,7 +88,7 @@ export default function BusinessHubPage() {
           <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4 leading-tight">혈당관리 약국 사업</h1>
           <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-3xl">
             GlycoPharm 혈당관리 약국 사업은 약국 경영자가 혈당관리 관련 제품, 콘텐츠, 이벤트, 시장조사,
-            Market Trial 기반 제품 개발 등을 단계적으로 활용할 수 있도록 준비하는 사업입니다.
+            유통참여형 펀딩 기반 제품 개발 등을 단계적으로 활용할 수 있도록 준비하는 사업입니다.
           </p>
           <p className="text-slate-500 text-sm leading-relaxed max-w-3xl mt-2">
             이 허브에서는 현재 사업 추진 현황과 주요 준비 항목을 확인하고, 세부 사업 페이지와 논의 공간으로 이동할 수 있습니다.

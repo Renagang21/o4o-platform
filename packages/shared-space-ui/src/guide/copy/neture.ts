@@ -49,7 +49,7 @@ export const netureGuideIntroProps: GuideIntroPageProps = {
       items: [
         { label: '공급자 주도 플랫폼', detail: '유통 범위 · 이벤트 · 가격 전략을 공급자가 직접 구성합니다.' },
         { label: '콘텐츠 기반 유통', detail: 'B2B 콘텐츠 · 포럼 · 자료실이 유통의 핵심 채널입니다.' },
-        { label: '오프라인 실행 연결', detail: 'Event Offer · Market Trial로 매장 실행과 연결됩니다.' },
+        { label: '오프라인 실행 연결', detail: 'Event Offer · 유통참여형 펀딩으로 매장 실행과 연결됩니다.' },
       ],
     },
     {
@@ -111,7 +111,7 @@ export const netureGuideIntroStructureProps: GuideIntroStructurePageProps = {
         tasks: [
           '상품 등록 및 콘텐츠 작성',
           '유통 범위와 가격 등급 결정',
-          'Event Offer 및 Market Trial 제안',
+          'Event Offer 및 유통참여형 펀딩 제안',
           '파트너와 계약 기반 협업',
         ],
       },
@@ -128,7 +128,7 @@ export const netureGuideIntroStructureProps: GuideIntroStructurePageProps = {
         tasks: [
           '승인된 상품 선택 및 진열',
           '고객 안내 및 상담',
-          'Event Offer · Market Trial 참여',
+          'Event Offer · 유통참여형 펀딩 참여',
         ],
       },
     ],
@@ -149,7 +149,7 @@ export const netureGuideIntroStructureProps: GuideIntroStructurePageProps = {
     items: [
       '상품 등록 및 유통 정책 설정',
       'B2B · B2C 콘텐츠 및 자료실',
-      'Event Offer · Market Trial',
+      'Event Offer · 유통참여형 펀딩',
       '파트너 계약 기반 협업',
     ],
   },
@@ -193,7 +193,7 @@ export const netureGuideIntroNetureProps: GuideIntroKpaPageProps = {
       },
       {
         label: '오프라인 실행 연결',
-        summary: 'Event Offer · Market Trial로 온라인 등록이 실제 매장 실행과 연결됩니다.',
+        summary: 'Event Offer · 유통참여형 펀딩으로 온라인 등록이 실제 매장 실행과 연결됩니다.',
       },
     ],
   },
@@ -205,7 +205,7 @@ export const netureGuideIntroNetureProps: GuideIntroKpaPageProps = {
     subFlow: [
       { from: '상품 등록', mid: '품질 검수', to: '유통 정책 적용' },
       { from: 'Event Offer 제안', mid: '다중 서비스 승인', to: '매장 이벤트 실행' },
-      { from: 'Market Trial 작성', mid: '매장 참여 모집', to: '오프라인 진열 · 판매' },
+      { from: '유통참여형 펀딩 작성', mid: '매장 참여 모집', to: '오프라인 진열 · 판매' },
     ],
   },
   roleSummary: {
@@ -214,7 +214,7 @@ export const netureGuideIntroNetureProps: GuideIntroKpaPageProps = {
       '공급자로 가입하여 상품을 등록하고 유통 범위를 직접 선택합니다.',
       'B2B · B2C 콘텐츠를 작성하여 매장에 상품 정보와 운영 자료를 전달합니다.',
       'Event Offer로 여러 매장에 동시에 이벤트 참여를 제안합니다.',
-      'Market Trial로 오프라인 실행 시나리오를 포함한 유통 펀딩을 운영합니다.',
+      '유통참여형 펀딩으로 오프라인 실행 시나리오를 포함한 유통 펀딩을 운영합니다.',
       '파트너와 계약 기반으로 협력하여 콘텐츠 확산과 레퍼럴을 관리합니다.',
     ],
   },
@@ -276,7 +276,7 @@ export const netureGuideIntroOperationProps: GuideIntroOperationPageProps = {
     items: [
       '가입 · 상품 · 서비스 노출 단계별 승인',
       '콘텐츠 정책 및 자료 관리',
-      'Event Offer · Market Trial 검토 및 운영',
+      'Event Offer · 유통참여형 펀딩 검토 및 운영',
     ],
   },
   bottomNav: {
@@ -345,7 +345,7 @@ export const netureGuideIntroConceptProps: GuideIntroConceptPageProps = {
       },
       {
         label: '오프라인 실행 지원',
-        summary: 'Market Trial의 진열 안내 · 고객 멘트 · 기대 효과가 매장 현장을 지원합니다.',
+        summary: '유통참여형 펀딩의 진열 안내 · 고객 멘트 · 기대 효과가 매장 현장을 지원합니다.',
       },
     ],
   },
@@ -369,7 +369,7 @@ export const netureGuideIntroConceptProps: GuideIntroConceptPageProps = {
       },
       {
         label: '매장 실행',
-        items: ['온라인 종결', '오프라인 시나리오 포함 (Market Trial)'],
+        items: ['온라인 종결', '오프라인 시나리오 포함 (유통참여형 펀딩)'],
         dim: false,
       },
     ],
@@ -464,17 +464,17 @@ export const netureGuideUsageProps: GuideUsagePageProps = {
     },
     {
       step: '04',
-      title: 'Event Offer · Market Trial 제안',
+      title: 'Event Offer · 유통참여형 펀딩 제안',
       routeLabel: '/supplier/event-offers · /supplier/market-trial',
       description:
-        '이벤트 오퍼와 유통 참여형 펀딩으로 매장의 적극적 참여를 이끌어 냅니다.',
+        '이벤트 오퍼와 유통참여형 펀딩으로 매장의 적극적 참여를 이끌어 냅니다.',
       items: [
         {
           label: 'Event Offer',
           detail: '여러 서비스(KPA Society · K-Cosmetics 등)의 매장에 동시에 이벤트를 제안합니다.',
         },
         {
-          label: 'Market Trial',
+          label: '유통참여형 펀딩',
           detail: '진열 · 고객 안내 · 할인 · 기대 효과를 담은 오프라인 실행 시나리오를 제안합니다.',
         },
       ],
@@ -521,7 +521,7 @@ export const netureGuideFeaturesProps: GuideFeaturesPageProps = {
       '상품',
       'B2B 콘텐츠',
       'Event Offer',
-      'Market Trial',
+      '유통참여형 펀딩',
       '파트너',
       'Forum / 자료실',
       'Copilot',
@@ -566,11 +566,11 @@ export const netureGuideFeaturesProps: GuideFeaturesPageProps = {
     },
     {
       step: '05',
-      title: '유통 참여형 펀딩 (Market Trial)',
+      title: '유통참여형 펀딩',
       primaryRoute: '/market-trial',
       description:
-        '오프라인 실행 시나리오를 포함한 유통 참여형 펀딩을 운영하는 방법을 안내합니다.',
-      items: [{ label: 'Market Trial 이용 방법', route: '/guide/features/market-trial' }],
+        '오프라인 실행 시나리오를 포함한 유통참여형 펀딩을 운영하는 방법을 안내합니다.',
+      items: [{ label: '유통참여형 펀딩 이용 방법', route: '/guide/features/market-trial' }],
       linkTo: '/guide/features/market-trial',
     },
     {
@@ -999,10 +999,10 @@ export const netureGuideFeatureEventOfferProps: GuideFeatureManualPageProps = {
 export const netureGuideFeatureMarketTrialProps: GuideFeatureManualPageProps = {
   hero: {
     eyebrow: '기능별 이용 방법',
-    title: '유통 참여형 펀딩 (Market Trial)',
+    title: '유통참여형 펀딩',
     description:
       '매장이 실제로 참여하는 오프라인 실행 기반의 유통 펀딩 방법을 안내합니다. 공급자가 진열 · 고객 안내 · 할인 조건까지 포함한 실행 시나리오를 제안하고, 매장이 참여 여부를 결정합니다.',
-    primaryAction: { label: 'Market Trial 로 이동 →', to: '/market-trial' },
+    primaryAction: { label: '유통참여형 펀딩으로 이동 →', to: '/market-trial' },
     flowBarTitle: '운영 흐름',
     flowLabels: ['Trial 작성', '오프라인 시나리오', '제출 · 승인', '매장 참여', '실행 · 정산'],
   },

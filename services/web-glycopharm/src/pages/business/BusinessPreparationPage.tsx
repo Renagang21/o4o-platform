@@ -68,7 +68,7 @@ const PREP_AREAS: {
     num: '3-3',
     icon: PackageOpen,
     title: '제품 등록 및 공급자 협의 준비',
-    desc: '공급자와 운영자는 어떤 제품을 어떤 방식으로 등록할지 먼저 협의합니다. 이 과정에서 O4O의 시장조사, QR-code, POP, 약국 HUB 콘텐츠, 블로그, 전자상거래, 이벤트 오퍼, Market Trial 가능성을 함께 검토합니다.',
+    desc: '공급자와 운영자는 어떤 제품을 어떤 방식으로 등록할지 먼저 협의합니다. 이 과정에서 O4O의 시장조사, QR-code, POP, 약국 HUB 콘텐츠, 블로그, 전자상거래, 이벤트 오퍼, 유통참여형 펀딩 가능성을 함께 검토합니다.',
     isProductSummary: true,
   },
   {
@@ -136,7 +136,7 @@ const PREP_CHECKLIST = [
   '테스트 약국 아이디 구성',
   '초기 홍보 및 가입자 모집 방식',
   '설문조사 주제',
-  'Market Trial 기반 제품 개발 후보',
+  '유통참여형 펀딩 기반 제품 개발 후보',
 ];
 
 export default function BusinessPreparationPage() {

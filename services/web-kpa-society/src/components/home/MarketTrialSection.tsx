@@ -47,7 +47,7 @@ export function MarketTrialSection() {
           <FlaskConical size={20} color={colors.accentGreen} />
         </div>
         <div style={styles.content}>
-          <div style={styles.headline}>유통 참여형 펀딩 (Market Trial) 참여</div>
+          <div style={styles.headline}>유통참여형 펀딩 참여</div>
           <div style={styles.subline}>
             공급자가 제안한 신제품을 먼저 체험해 보세요.
           </div>

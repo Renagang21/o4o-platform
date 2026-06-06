@@ -105,7 +105,7 @@ const fallbackNotices: Notice[] = [
   },
   {
     id: '2',
-    title: '[안내] Market Trial 참여 가이드',
+    title: '[안내] 유통참여형 펀딩 참여 가이드',
     date: '2026.01.05',
     isPinned: true,
     link: '/forum',

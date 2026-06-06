@@ -234,7 +234,7 @@ export function HomePage() {
         { title: '디지털 사이니지', description: '매장 디지털 사이니지 콘텐츠를 관리하세요', href: '/signage', icon: <span className={iconCls}><SignageIcon /></span> },
       ]}
       cta={{
-        title: '유통 참여형 펀딩 (Market Trial)',
+        title: '유통참여형 펀딩',
         description: '서비스 참여자와 함께 제품을 다듬고, 좋은 조건의 유통 환경을 만들어가는 참여형 프로그램',
         href: 'https://neture.co.kr',
         linkLabel: 'Neture에서 보기 →',

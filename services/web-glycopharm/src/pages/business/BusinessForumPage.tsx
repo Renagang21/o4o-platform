@@ -26,13 +26,13 @@ const TOPICS = [
   '약관·정책',
   '설문조사 및 초기 참여 사업',
   '이벤트 오퍼',
-  'Market Trial 기반 제품 개발 아이디어',
+  '유통참여형 펀딩 기반 제품 개발 아이디어',
   '약국 모집과 테스트 참여',
   '협력기관 논의',
 ];
 
 // 제목 prefix 예시
-const TITLE_PREFIXES = ['[무료혈당기]', '[제품등록]', '[약관]', '[홍보]', '[Market Trial]'];
+const TITLE_PREFIXES = ['[무료혈당기]', '[제품등록]', '[약관]', '[홍보]', '[유통참여형 펀딩]'];
 
 // 관련 사업 페이지
 const RELATED = [
@@ -120,7 +120,7 @@ export default function BusinessForumPage() {
               ))}
             </div>
             <p className="text-xs text-slate-400 leading-relaxed mt-4">
-              Market Trial 기반 당뇨 관련 제품 개발은 아이디어 수준으로 논의할 수 있습니다. 실제 Market Trial 실행은 Neture가 담당합니다.
+              유통참여형 펀딩 기반 당뇨 관련 제품 개발은 아이디어 수준으로 논의할 수 있습니다. 실제 유통참여형 펀딩 실행은 Neture가 담당합니다.
             </p>
           </div>
         </section>
