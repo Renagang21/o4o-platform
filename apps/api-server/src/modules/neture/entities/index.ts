@@ -26,6 +26,13 @@ export {
   type MobileProductDraftStatus,
   type MobileProductDraftSourceApp,
 } from './MobileProductDraft.entity.js';
+// WO-O4O-PRODUCT-DRUG-EXTENSION-PERSISTENCE-V1: Drug Extension
+export {
+  ProductDrugExtension,
+  type AdvertisingReviewStatus,
+  type TabletDisplayPolicy,
+  type PublicDisplayPolicy,
+} from './ProductDrugExtension.entity.js';
 export { ProductAlias, AliasSource } from './ProductAlias.entity.js';
 export { ProductCategory } from './ProductCategory.entity.js';
 export { Brand } from './Brand.entity.js';

@@ -90,6 +90,17 @@ export interface DrugDisplayPolicy {
   advertisingReviewStatus: 'not_reviewed' | 'needs_review' | 'approved_limited' | 'rejected' | 'blocked';
 }
 
+export interface CandidateDrugExtensionSummary {
+  hasDrugExtension: boolean;
+  verificationStatus: string;
+  advertisingReviewStatus: string;
+  pharmacyOnly: boolean;
+  customerDisplayAllowed: boolean;
+  tabletDisplayAllowed: string;
+  onlineSaleAllowed: boolean;
+  publicDisplayPolicy: string;
+}
+
 export interface CandidateClassification {
   productTypeClass: ProductTypeClass;
   drugCategory: ProductDrugCategory | null;
@@ -97,6 +108,8 @@ export interface CandidateClassification {
   isOtcRegistrable: boolean;
   isRxClass: boolean;
   basis: 'matched_master' | 'inferred';
+  /** WO-O4O-PRODUCT-DRUG-EXTENSION-PERSISTENCE-V1: 저장된 의약품 확장 요약 (없으면 null) */
+  drugExtension?: CandidateDrugExtensionSummary | null;
 }
 
 export interface ProductCandidate {

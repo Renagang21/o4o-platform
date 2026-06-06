@@ -34,6 +34,20 @@ import {
   isRxClass as isRxClassFn,
 } from '../utils/product-type.util.js';
 import type { ProductTypeClass, ProductDrugCategory, DrugDisplayPolicy } from '../utils/product-type.util.js';
+// WO-O4O-PRODUCT-DRUG-EXTENSION-PERSISTENCE-V1
+import { ProductDrugExtensionService } from './product-drug-extension.service.js';
+
+/** classification 에 부착하는 drug extension 요약 (표시용 — 권한 아님) */
+export interface CandidateDrugExtensionSummary {
+  hasDrugExtension: boolean;
+  verificationStatus: string;
+  advertisingReviewStatus: string;
+  pharmacyOnly: boolean;
+  customerDisplayAllowed: boolean;
+  tabletDisplayAllowed: string;
+  onlineSaleAllowed: boolean;
+  publicDisplayPolicy: string;
+}
 
 /**
  * 후보 분류 결과 (표시/검토용 — 판매/노출 권한을 여는 로직 아님). F3.
@@ -47,6 +61,8 @@ export interface CandidateClassification {
   isOtcRegistrable: boolean;
   isRxClass: boolean;
   basis: 'matched_master' | 'inferred';
+  /** WO-O4O-PRODUCT-DRUG-EXTENSION-PERSISTENCE-V1: 저장된 의약품 확장 요약 (없으면 null) */
+  drugExtension?: CandidateDrugExtensionSummary | null;
 }
 
 export type ProductCandidateWithClassification = ProductCandidate & { classification: CandidateClassification };
@@ -94,11 +110,13 @@ export class ProductCandidateService {
   private readonly repo: Repository<ProductCandidate>;
   private readonly masterRepo: Repository<ProductMaster>;
   private readonly identifierService: ProductIdentifierService;
+  private readonly drugExtensionService: ProductDrugExtensionService;
 
   constructor(private readonly dataSource: DataSource) {
     this.repo = dataSource.getRepository(ProductCandidate);
     this.masterRepo = dataSource.getRepository(ProductMaster);
     this.identifierService = new ProductIdentifierService(dataSource);
+    this.drugExtensionService = new ProductDrugExtensionService(dataSource);
   }
 
   /** 후보 생성 (status=pending, match_status=unmatched). 매칭은 별도 호출. */
@@ -153,6 +171,7 @@ export class ProductCandidateService {
   async withClassification(items: ProductCandidate[]): Promise<ProductCandidateWithClassification[]> {
     const masterIds = [...new Set(items.map((c) => c.matchedProductMasterId).filter((v): v is string => !!v))];
     const masterMap = new Map<string, { regulatoryType: string | null; drugCategory: string | null }>();
+    const extMap = new Map<string, CandidateDrugExtensionSummary>();
     if (masterIds.length > 0) {
       const rows: Array<{ id: string; regulatory_type: string | null; drug_category: string | null }> =
         await this.dataSource.query(
@@ -160,6 +179,30 @@ export class ProductCandidateService {
           [masterIds],
         );
       for (const r of rows) masterMap.set(r.id, { regulatoryType: r.regulatory_type, drugCategory: r.drug_category });
+
+      // WO-O4O-PRODUCT-DRUG-EXTENSION-PERSISTENCE-V1: drug extension 요약 batch 로드
+      const extRows: Array<{
+        product_master_id: string; verification_status: string; advertising_review_status: string;
+        pharmacy_only: boolean; customer_display_allowed: boolean; tablet_display_allowed: string;
+        online_sale_allowed: boolean; public_display_policy: string;
+      }> = await this.dataSource.query(
+        `SELECT product_master_id, verification_status, advertising_review_status, pharmacy_only,
+                customer_display_allowed, tablet_display_allowed, online_sale_allowed, public_display_policy
+           FROM product_drug_extensions WHERE product_master_id = ANY($1) AND deleted_at IS NULL`,
+        [masterIds],
+      );
+      for (const e of extRows) {
+        extMap.set(e.product_master_id, {
+          hasDrugExtension: true,
+          verificationStatus: e.verification_status,
+          advertisingReviewStatus: e.advertising_review_status,
+          pharmacyOnly: e.pharmacy_only,
+          customerDisplayAllowed: e.customer_display_allowed,
+          tabletDisplayAllowed: e.tablet_display_allowed,
+          onlineSaleAllowed: e.online_sale_allowed,
+          publicDisplayPolicy: e.public_display_policy,
+        });
+      }
     }
 
     return items.map((c) => {
@@ -183,6 +226,7 @@ export class ProductCandidateService {
         isOtcRegistrable: isOtcRegistrableClass(productTypeClass),
         isRxClass: isRxClassFn(productTypeClass),
         basis,
+        drugExtension: (c.matchedProductMasterId && extMap.get(c.matchedProductMasterId)) || null,
       };
       return Object.assign(c, { classification });
     });
@@ -524,6 +568,13 @@ export class ProductCandidateService {
     const prev = master.drugCategory ?? null;
     master.drugCategory = target;
     await this.masterRepo.save(master);
+
+    // WO-O4O-PRODUCT-DRUG-EXTENSION-PERSISTENCE-V1: 의약품 분류면 extension 보장/동기화 (best-effort)
+    try {
+      await this.drugExtensionService.ensureForProductMaster(master.id);
+    } catch {
+      // extension 생성 실패는 refine 자체를 막지 않는다 (분류는 이미 저장됨)
+    }
 
     const refineNote = `[drug-category-refine] ${prev ?? '∅'} → ${target ?? 'null'} by operator${input.note ? ` | ${input.note}` : ''}`;
     candidate.reviewNote = refineNote;

@@ -16,6 +16,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  OneToOne,
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
@@ -25,6 +26,7 @@ import type { Brand } from './Brand.entity.js';
 import type { ProductImage } from './ProductImage.entity.js';
 import type { ProductIdentifier } from './ProductIdentifier.entity.js';
 import type { ProductDrugCategory } from '../utils/product-type.util.js';
+import type { ProductDrugExtension } from './ProductDrugExtension.entity.js';
 
 @Entity('product_masters')
 export class ProductMaster {
@@ -130,4 +132,11 @@ export class ProductMaster {
    */
   @OneToMany('ProductIdentifier', 'productMaster')
   identifiers?: ProductIdentifier[];
+
+  /**
+   * 의약품 확장 (1:1) — WO-O4O-PRODUCT-DRUG-EXTENSION-PERSISTENCE-V1
+   * 상세/검증/출처/노출·광고·판매 정책. extension 측이 owning(FK 보유).
+   */
+  @OneToOne('ProductDrugExtension', 'productMaster')
+  drugExtension?: ProductDrugExtension | null;
 }

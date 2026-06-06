@@ -502,6 +502,15 @@ export default function ProductCandidateReviewPage() {
                     )}
                   </div>
                   <p className="mt-2 text-[11px] text-slate-400">분류·정책은 안내용입니다. 등록/판매/노출 권한을 자동으로 변경하지 않습니다.</p>
+                  {detail.classification.drugExtension?.hasDrugExtension && (
+                    <div className="mt-2 flex flex-wrap items-center gap-1.5 border-t border-slate-200 pt-2 text-xs">
+                      <span className="font-medium text-slate-600">의약품 상세</span>
+                      <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-600">검증: {detail.classification.drugExtension.verificationStatus}</span>
+                      <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-600">광고: {detail.classification.drugExtension.advertisingReviewStatus}</span>
+                      <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-600">공개: {detail.classification.drugExtension.publicDisplayPolicy}</span>
+                      <span className="text-slate-300">상세 검토는 후속 화면에서 관리</span>
+                    </div>
+                  )}
                 </div>
               )}
 
