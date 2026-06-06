@@ -251,6 +251,17 @@ Channel / POP / QR 노출
 
 > 📄 route 구조 상세: `docs/architecture/STORE-PRODUCTS-CANONICAL-V1.md`
 
+### 13.4 노출 위치 재확인 (2026-06-06)
+
+`IR-O4O-EVENT-OFFER-CURRENT-STATE-AUDIT-V1` 조사 중 제기된 "이벤트 오퍼를 상품 리스트 **탭**으로 이전" 제안(WO-...-AUDIT-AND-FOUNDATION-ALIGNMENT §4)은 **채택하지 않는다.** §13의 독립 canonical route 구조를 그대로 유지한다.
+
+확정 사항:
+- ✅ **독립 페이지 `/store-hub/event-offers` 유지** (KPA / GlycoPharm / K-Cosmetics).
+- ❌ 상품 리스트(`/store/my-products`) 탭으로 이전하지 않음.
+- 이벤트 오퍼 **홍보**는 상품 리스트 UI가 아니라 **운영자 안내/공지/알림**(공지사항·운영자 안내·매장 허브 안내 카드·뉴스/소식)으로 처리.
+
+근거: 허브=공급계층 / 스토어=실행계층 분리(Store Layer 원칙), 코드 복잡도 0. GlycoPharm·K-Cosmetics 매장 바로주문은 `WO-O4O-EVENT-OFFER-GLYCO-KCOS-STORE-ORDER-ENABLE-V1`(commit `f999b53cd`)에서 독립 페이지 구조를 유지한 채 활성화 완료.
+
 ---
 
 ## 한 줄 결론

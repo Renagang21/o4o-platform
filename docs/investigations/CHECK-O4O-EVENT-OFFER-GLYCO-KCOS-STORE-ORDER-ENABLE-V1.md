@@ -112,7 +112,7 @@ const handleOrder = useCallback(async (offer) => {
 ## 8. 범위 밖 (이번 WO 미포함)
 - KPA Society 화면 개편(기존 주문 흐름 보유 → 대상 외).
 - 공급자별 물류비/무료배송 grouping (IR §9-D / WO §11 제외 — 별도 후속 WO).
-- 노출 위치 탭 vs 독립 페이지 정책 충돌 해소 (IR §9-A — 사용자 결정 대기, 본 WO는 독립 페이지 유지).
+- 노출 위치 탭 vs 독립 페이지 정책 충돌 → **결정됨(2026-06-06): 독립 페이지 유지** (IR §9-A, baseline `EVENT-OFFER-STORE-INTEGRATION-V1 §13.4` 반영). 본 WO는 그 결정대로 독립 페이지 유지.
 - GlycoPharm·K-Cos 공급자 생성 화면(Neture 경유 설계 — 부재가 정합).
 
 ---
