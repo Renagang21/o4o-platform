@@ -137,3 +137,7 @@ docs/local/*.local.md
 
 # Verification script outputs (screenshots, findings JSON — reproducible by re-running the script)
 scripts/verify/output/
+
+# Vite config build artifacts — source is vite.config.ts (services/web-* 는 .ts 만 추적)
+services/web-*/vite.config.js
+services/web-*/vite.config.d.ts
