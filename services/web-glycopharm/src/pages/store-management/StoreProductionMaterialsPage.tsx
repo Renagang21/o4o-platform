@@ -10,8 +10,10 @@
  */
 
 import { useEffect, useState, useCallback, type CSSProperties } from 'react';
-import { FileEdit, RefreshCw, Trash2 } from 'lucide-react';
+import { FileEdit, RefreshCw, Trash2, Link2 } from 'lucide-react';
+import { StoreAssetDerivationViewer } from '@o4o/store-ui-core';
 import { getStoreExecutionAssets, type StoreExecutionAsset } from '@/api/storeExecutionAssets';
+import { api } from '@/lib/apiClient';
 
 const USAGE_LABELS: Record<string, string> = {
   pop: 'POP',
@@ -31,6 +33,20 @@ export default function StoreProductionMaterialsPage() {
   const [items, setItems] = useState<StoreExecutionAsset[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // WO-O4O-GLYCOPHARM-STORE-ASSET-DERIVATION-VIEWER-ADOPT-V1:
+  //   공통 StoreAssetDerivationViewer(@o4o/store-ui-core) 적용. viewer 는 endpoint 미인지 —
+  //   glyco api client 로 fetchDerivations 주입. POP 결과물(usageType='pop')은
+  //   store_execution_assets.id = derivation derivedId(pop_pdf) 와 일치하므로 원본 보기 가능.
+  const [derivTarget, setDerivTarget] = useState<{ id: string; title: string } | null>(null);
+
+  const fetchDerivations = useCallback(
+    async ({ derivedKind, derivedId }: { derivedKind: string; derivedId: string }) => {
+      const res = await api.get('/glycopharm/store/asset-derivations', { params: { derivedKind, derivedId } });
+      return { items: res.data?.data?.items ?? res.data?.items ?? [] };
+    },
+    [],
+  );
 
   const fetchItems = useCallback(async () => {
     setLoading(true);
@@ -96,15 +112,38 @@ export default function StoreProductionMaterialsPage() {
       ) : (
         <div style={styles.list}>
           {items.map((item) => (
-            <AssetRow key={item.id} item={item} />
+            <AssetRow
+              key={item.id}
+              item={item}
+              onViewSource={(it) => setDerivTarget({ id: it.id, title: it.title })}
+            />
           ))}
         </div>
+      )}
+
+      {/* WO-O4O-GLYCOPHARM-STORE-ASSET-DERIVATION-VIEWER-ADOPT-V1: 공통 원본 보기 뷰어 */}
+      {derivTarget && (
+        <StoreAssetDerivationViewer
+          open
+          onClose={() => setDerivTarget(null)}
+          derivedKind="pop_pdf"
+          derivedId={derivTarget.id}
+          title={derivTarget.title}
+          kindLabel="POP"
+          fetchDerivations={fetchDerivations}
+        />
       )}
     </div>
   );
 }
 
-function AssetRow({ item }: { item: StoreExecutionAsset }) {
+function AssetRow({
+  item,
+  onViewSource,
+}: {
+  item: StoreExecutionAsset;
+  onViewSource: (item: StoreExecutionAsset) => void;
+}) {
   const usageLabel = item.usageType ? (USAGE_LABELS[item.usageType] ?? item.usageType) : '—';
   const typeLabel = ASSET_TYPE_LABELS[item.assetType] ?? item.assetType;
   const date = item.updatedAt ? new Date(item.updatedAt).toLocaleDateString('ko-KR') : '—';
@@ -124,6 +163,12 @@ function AssetRow({ item }: { item: StoreExecutionAsset }) {
         </div>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+        {item.usageType === 'pop' && (
+          <button style={styles.viewSourceBtn} title="원본 보기" onClick={() => onViewSource(item)}>
+            <Link2 size={13} />
+            원본 보기
+          </button>
+        )}
         <button style={styles.actionBtn} title="삭제" disabled>
           <Trash2 size={14} />
         </button>
@@ -237,6 +282,19 @@ const styles: Record<string, CSSProperties> = {
     background: '#eff6ff',
     color: '#2563eb',
     borderRadius: '4px',
+  },
+  viewSourceBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '4px',
+    padding: '5px 10px',
+    background: '#ffffff',
+    border: '1px solid #e2e8f0',
+    borderRadius: '6px',
+    fontSize: '12px',
+    color: '#475569',
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
   },
   actionBtn: {
     display: 'inline-flex',
