@@ -222,6 +222,7 @@ import {
   ProductMaster,
   ProductIdentifier, // WO-O4O-PRODUCT-IDENTIFIER-CORE-V1
   ProductCandidate, // WO-O4O-PRODUCT-CANDIDATE-REVIEW-QUEUE-V1
+  MobileProductDraft, // WO-O4O-MOBILE-PRODUCT-DRAFT-TO-CANDIDATE-V1
   ProductCategory,
   Brand,
   SupplierProductOffer,
@@ -766,6 +767,7 @@ export const AppDataSource = new DataSource({
     ProductMaster,
     ProductIdentifier, // WO-O4O-PRODUCT-IDENTIFIER-CORE-V1
     ProductCandidate, // WO-O4O-PRODUCT-CANDIDATE-REVIEW-QUEUE-V1
+    MobileProductDraft, // WO-O4O-MOBILE-PRODUCT-DRAFT-TO-CANDIDATE-V1
     ProductCategory,
     Brand,
     SupplierProductOffer,

@@ -419,6 +419,15 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Product Candidate Review Queue routes:', productCandidateError);
     }
 
+    // 24-e3. Register Mobile Product Draft routes (WO-O4O-MOBILE-PRODUCT-DRAFT-TO-CANDIDATE-V1, Phase 4)
+    try {
+      const { createMobileProductDraftController } = await import('../modules/neture/controllers/mobile-product-draft.controller.js');
+      app.use('/api/v1/mobile/product-drafts', createMobileProductDraftController(dataSource));
+      logger.info('✅ Mobile Product Draft routes registered at /api/v1/mobile/product-drafts');
+    } catch (mobileProductDraftError) {
+      logger.error('Failed to register Mobile Product Draft routes:', mobileProductDraftError);
+    }
+
     // 24-f. Register Operator Store Console routes (WO-O4O-STORE-CONSOLE-V1)
     app.use('/api/v1/operator/stores', operatorStoreRoutes);
     logger.info('✅ Operator Store Console routes registered at /api/v1/operator/stores');

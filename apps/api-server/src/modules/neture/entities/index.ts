@@ -18,6 +18,14 @@ export {
   type ProductCandidateStatus,
   type ProductCandidateMatchStatus,
 } from './ProductCandidate.entity.js';
+// WO-O4O-MOBILE-PRODUCT-DRAFT-TO-CANDIDATE-V1: Mobile Product Draft (Phase 4)
+export {
+  MobileProductDraft,
+  MOBILE_PRODUCT_DRAFT_STATUSES,
+  MOBILE_PRODUCT_DRAFT_SOURCE_APPS,
+  type MobileProductDraftStatus,
+  type MobileProductDraftSourceApp,
+} from './MobileProductDraft.entity.js';
 export { ProductAlias, AliasSource } from './ProductAlias.entity.js';
 export { ProductCategory } from './ProductCategory.entity.js';
 export { Brand } from './Brand.entity.js';
