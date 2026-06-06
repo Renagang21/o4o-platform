@@ -29,6 +29,7 @@ const STATUS_TABS: { key: 'all' | ProductCandidateStatus; label: string }[] = [
   { key: 'pending', label: '대기' },
   { key: 'reviewing', label: '검토중' },
   { key: 'matched', label: '매칭됨' },
+  { key: 'linked', label: '활용연결' },
   { key: 'rejected', label: '반려' },
   { key: 'archived', label: '보관' },
 ];
@@ -37,6 +38,7 @@ const STATUS_BADGE: Record<string, { label: string; cls: string }> = {
   pending: { label: '대기', cls: 'bg-amber-50 text-amber-700' },
   reviewing: { label: '검토중', cls: 'bg-blue-50 text-blue-700' },
   matched: { label: '매칭됨', cls: 'bg-green-50 text-green-700' },
+  linked: { label: '활용연결', cls: 'bg-emerald-50 text-emerald-700' },
   approved_new_master: { label: '신규승격', cls: 'bg-emerald-50 text-emerald-700' },
   rejected: { label: '반려', cls: 'bg-red-50 text-red-700' },
   merged: { label: '병합', cls: 'bg-slate-100 text-slate-600' },
@@ -83,6 +85,12 @@ export default function ProductCandidateReviewPage() {
   const [detail, setDetail] = useState<ProductCandidate | null>(null);
   const [manualMasterId, setManualMasterId] = useState('');
   const [rejectReason, setRejectReason] = useState('');
+
+  // 활용 상품 연결 (link-to-listing)
+  const [linkOrgId, setLinkOrgId] = useState('');
+  const [linkServiceKey, setLinkServiceKey] = useState('');
+  const [linkDisplayName, setLinkDisplayName] = useState('');
+  const [linkMessage, setLinkMessage] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -162,6 +170,34 @@ export default function ProductCandidateReviewPage() {
       await operatorProductCandidateApi.archive(detail.id);
       setDetail(null);
       await load();
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleLink = async () => {
+    if (!detail || !detail.matchedProductMasterId) return;
+    if (!linkOrgId.trim() || !linkServiceKey.trim()) {
+      setLinkMessage('조직 ID와 서비스 키가 필요합니다.');
+      return;
+    }
+    setActionLoading(true);
+    setLinkMessage(null);
+    try {
+      const result = await operatorProductCandidateApi.linkToListing(detail.id, {
+        organizationId: linkOrgId.trim(),
+        serviceKey: linkServiceKey.trim(),
+        displayName: linkDisplayName.trim() || undefined,
+      });
+      if (result) {
+        setLinkMessage(result.alreadyExisted ? '이미 추가된 활용 상품입니다.' : '활용 상품으로 추가되었습니다.');
+        await refreshDetail(detail.id);
+        await load();
+      } else {
+        setLinkMessage('연결에 실패했습니다.');
+      }
+    } catch {
+      setLinkMessage('연결 중 오류가 발생했습니다.');
     } finally {
       setActionLoading(false);
     }
@@ -327,7 +363,15 @@ export default function ProductCandidateReviewPage() {
         rowKey="id"
         loading={loading}
         emptyMessage={items.length === 0 ? '검토할 상품 후보가 없습니다' : '검색 결과가 없습니다'}
-        onRowClick={(row) => { setDetail(row); setManualMasterId(''); setRejectReason(''); }}
+        onRowClick={(row) => {
+          setDetail(row);
+          setManualMasterId('');
+          setRejectReason('');
+          setLinkOrgId(row.organizationId || '');
+          setLinkServiceKey(row.serviceKey || '');
+          setLinkDisplayName('');
+          setLinkMessage(null);
+        }}
         tableId="neture-product-candidates"
       />
 
@@ -402,6 +446,51 @@ export default function ProductCandidateReviewPage() {
                     연결
                   </button>
                 </div>
+              </div>
+
+              {/* 활용 상품으로 추가 (link-to-listing) */}
+              <div className="border-t border-slate-100 pt-4">
+                <label className="block text-sm font-medium text-slate-700 mb-1">활용 상품으로 추가 (내 약국/내 매장)</label>
+                {!detail.matchedProductMasterId ? (
+                  <p className="text-xs text-slate-400">매칭된 상품(ProductMaster)이 있어야 활용 상품으로 추가할 수 있습니다. 먼저 재매칭/수동매칭하세요.</p>
+                ) : (
+                  <>
+                    <div className="grid grid-cols-2 gap-2">
+                      <input
+                        type="text"
+                        value={linkOrgId}
+                        onChange={(e) => setLinkOrgId(e.target.value)}
+                        placeholder="조직 ID (organizationId)"
+                        className="px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                      <input
+                        type="text"
+                        value={linkServiceKey}
+                        onChange={(e) => setLinkServiceKey(e.target.value)}
+                        placeholder="서비스 키 (예: kpa)"
+                        className="px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <input
+                      type="text"
+                      value={linkDisplayName}
+                      onChange={(e) => setLinkDisplayName(e.target.value)}
+                      placeholder="매장 표시명 (선택, 미입력 시 후보명/상품명)"
+                      className="w-full mt-2 px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <div className="flex items-center gap-2 mt-2">
+                      <button
+                        onClick={handleLink}
+                        disabled={actionLoading || !linkOrgId.trim() || !linkServiceKey.trim()}
+                        className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 disabled:opacity-50"
+                      >
+                        활용 상품으로 추가
+                      </button>
+                      {linkMessage && <span className="text-xs text-slate-500">{linkMessage}</span>}
+                    </div>
+                    <p className="mt-1 text-xs text-slate-400">기존 상품(Master)을 매장 활용 상품(StoreProductProfile + Listing)으로 추가합니다. 신규 상품 생성 아님.</p>
+                  </>
+                )}
               </div>
 
               {/* 반려 */}

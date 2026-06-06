@@ -296,6 +296,122 @@ export class ProductCandidateService {
   }
 
   /**
+   * 매칭된 candidate 를 약국/매장 활용 상품으로 연결.
+   *
+   * WO-O4O-PRODUCT-CANDIDATE-TO-STORE-PHARMACY-LISTING-V1
+   *
+   * 이미 매칭된 ProductMaster 를 기준으로 StoreProductProfile + OrganizationProductListing 을
+   * idempotent upsert 한다. ProductMaster/ProductIdentifier/SupplierProductOffer 를 생성하지 않으며,
+   * offer 없이 master-only listing 으로 추가한다 (canonical: store-product-library master 등록).
+   *
+   * - 중복(organization + master)은 ON CONFLICT DO NOTHING + lookup 으로 멱등 처리.
+   * - candidate_status='linked', reviewedBy/reviewedAt 기록, rawPayload.link 에 결과 적재.
+   */
+  async linkCandidateToOrganizationListing(
+    candidateId: string,
+    input: {
+      organizationId: string;
+      serviceKey: string;
+      storeId?: string | null;
+      displayName?: string | null;
+      displayDescription?: string | null;
+      note?: string | null;
+      reviewedBy?: string | null;
+    },
+  ): Promise<{
+    candidate: ProductCandidate;
+    storeProductProfile: Record<string, unknown> | null;
+    organizationProductListing: Record<string, unknown> | null;
+    alreadyExisted: boolean;
+  }> {
+    const candidate = await this.getCandidate(candidateId);
+    if (!candidate) throw new Error('CANDIDATE_NOT_FOUND');
+    if (candidate.candidateStatus === 'rejected' || candidate.candidateStatus === 'archived') {
+      throw new Error('CANDIDATE_NOT_LINKABLE');
+    }
+    if (!candidate.matchedProductMasterId) throw new Error('CANDIDATE_NOT_MATCHED');
+    if (!input.organizationId) throw new Error('ORGANIZATION_ID_REQUIRED');
+    if (!input.serviceKey) throw new Error('SERVICE_KEY_REQUIRED');
+
+    const masterId = candidate.matchedProductMasterId;
+    const masterRows: Array<{ id: string; name: string | null }> = await this.dataSource.query(
+      `SELECT id, name FROM product_masters WHERE id = $1`,
+      [masterId],
+    );
+    if (masterRows.length === 0) throw new Error('PRODUCT_MASTER_NOT_FOUND');
+    const masterName = masterRows[0].name;
+
+    // ── StoreProductProfile upsert (UNIQUE org+master) ──
+    const displayName = input.displayName || candidate.candidateName || masterName || null;
+    const description = input.displayDescription ?? null;
+    let profileCreated = true;
+    let profileRows: Record<string, unknown>[] = await this.dataSource.query(
+      `INSERT INTO store_product_profiles
+        (id, organization_id, master_id, display_name, description, is_active, created_at, updated_at)
+       VALUES (gen_random_uuid(), $1, $2, $3, $4, true, NOW(), NOW())
+       ON CONFLICT (organization_id, master_id) DO NOTHING
+       RETURNING *`,
+      [input.organizationId, masterId, displayName, description],
+    );
+    if (profileRows.length === 0) {
+      profileCreated = false;
+      profileRows = await this.dataSource.query(
+        `SELECT * FROM store_product_profiles WHERE organization_id = $1 AND master_id = $2 LIMIT 1`,
+        [input.organizationId, masterId],
+      );
+    }
+
+    // ── OrganizationProductListing upsert (master-only, offer_id NULL) ──
+    let listingCreated = true;
+    let listingRows: Record<string, unknown>[] = await this.dataSource.query(
+      `INSERT INTO organization_product_listings
+        (id, organization_id, service_key, master_id, offer_id, is_active, price, created_at, updated_at)
+       VALUES (gen_random_uuid(), $1, $3, $2, NULL, true, NULL, NOW(), NOW())
+       ON CONFLICT (organization_id, service_key, master_id) WHERE offer_id IS NULL DO NOTHING
+       RETURNING *`,
+      [input.organizationId, masterId, input.serviceKey],
+    );
+    if (listingRows.length === 0) {
+      listingCreated = false;
+      listingRows = await this.dataSource.query(
+        `SELECT * FROM organization_product_listings
+         WHERE organization_id = $1 AND service_key = $3 AND master_id = $2 AND offer_id IS NULL
+         LIMIT 1`,
+        [input.organizationId, masterId, input.serviceKey],
+      );
+    }
+
+    const alreadyExisted = !listingCreated && !profileCreated;
+
+    // ── candidate 갱신 ──
+    candidate.candidateStatus = 'linked';
+    candidate.reviewedBy = input.reviewedBy ?? candidate.reviewedBy ?? null;
+    candidate.reviewedAt = new Date();
+    if (input.note) candidate.reviewNote = input.note;
+    candidate.rawPayload = {
+      ...(candidate.rawPayload ?? {}),
+      link: {
+        organizationId: input.organizationId,
+        serviceKey: input.serviceKey,
+        storeId: input.storeId ?? null,
+        masterId,
+        listingId: (listingRows[0] as { id?: string })?.id ?? null,
+        profileId: (profileRows[0] as { id?: string })?.id ?? null,
+        listingCreated,
+        profileCreated,
+      },
+    };
+    const saved = await this.repo.save(candidate);
+
+    return {
+      candidate: saved,
+      storeProductProfile: profileRows[0] ?? null,
+      organizationProductListing: listingRows[0] ?? null,
+      alreadyExisted,
+    };
+  }
+
+  /**
    * 신규 ProductMaster 승격 — guarded skeleton.
    *
    * 이번 WO 에서는 실제 ProductMaster 생성을 하지 않는다 (미검증 데이터의 SSOT 오염 방지).

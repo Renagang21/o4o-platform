@@ -60,6 +60,7 @@ export type ProductCandidateStatus =
   | 'pending'
   | 'reviewing'
   | 'matched'
+  | 'linked' // WO-O4O-PRODUCT-CANDIDATE-TO-STORE-PHARMACY-LISTING-V1: 약국/매장 활용 상품으로 연결됨
   | 'approved_new_master'
   | 'rejected'
   | 'merged'
@@ -69,6 +70,7 @@ export const PRODUCT_CANDIDATE_STATUSES: ProductCandidateStatus[] = [
   'pending',
   'reviewing',
   'matched',
+  'linked',
   'approved_new_master',
   'rejected',
   'merged',

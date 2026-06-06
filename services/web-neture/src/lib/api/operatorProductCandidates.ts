@@ -25,10 +25,27 @@ export type ProductCandidateStatus =
   | 'pending'
   | 'reviewing'
   | 'matched'
+  | 'linked'
   | 'approved_new_master'
   | 'rejected'
   | 'merged'
   | 'archived';
+
+export interface LinkToListingPayload {
+  organizationId: string;
+  serviceKey: string;
+  storeId?: string;
+  displayName?: string;
+  displayDescription?: string;
+  note?: string;
+}
+
+export interface LinkToListingResult {
+  candidate: ProductCandidate;
+  storeProductProfile: Record<string, unknown> | null;
+  organizationProductListing: Record<string, unknown> | null;
+  alreadyExisted: boolean;
+}
 
 export type ProductCandidateMatchStatus =
   | 'unmatched'
@@ -142,6 +159,12 @@ export const operatorProductCandidateApi = {
   /** POST /:id/archive */
   async archive(id: string): Promise<ProductCandidate | null> {
     const res = await api.post(`${BASE}/${id}/archive`);
+    return res.data?.data ?? null;
+  },
+
+  /** POST /:id/link-to-listing — 매칭된 후보를 약국/매장 활용 상품으로 연결 */
+  async linkToListing(id: string, payload: LinkToListingPayload): Promise<LinkToListingResult | null> {
+    const res = await api.post(`${BASE}/${id}/link-to-listing`, payload);
     return res.data?.data ?? null;
   },
 };

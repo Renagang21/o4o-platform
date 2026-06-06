@@ -166,6 +166,28 @@ export function createProductCandidateController(dataSource: DataSource): Router
     }
   }) as RequestHandler);
 
+  // POST /:id/link-to-listing — 매칭된 후보를 약국/매장 활용 상품으로 연결
+  // WO-O4O-PRODUCT-CANDIDATE-TO-STORE-PHARMACY-LISTING-V1
+  router.post('/:id/link-to-listing', (async (req: Request, res: Response) => {
+    try {
+      const { organizationId, serviceKey, storeId, displayName, displayDescription, note } = req.body ?? {};
+      if (!organizationId) return res.status(400).json({ success: false, error: 'ORGANIZATION_ID_REQUIRED' });
+      if (!serviceKey) return res.status(400).json({ success: false, error: 'SERVICE_KEY_REQUIRED' });
+      const result = await service.linkCandidateToOrganizationListing(req.params.id, {
+        organizationId,
+        serviceKey,
+        storeId: storeId ?? null,
+        displayName: displayName ?? null,
+        displayDescription: displayDescription ?? null,
+        note: note ?? null,
+        reviewedBy: userId(req),
+      });
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return handleMutationError(res, error, 'link-to-listing');
+    }
+  }) as RequestHandler);
+
   return router;
 }
 
@@ -173,6 +195,12 @@ function handleMutationError(res: Response, error: unknown, op: string): Respons
   const message = error instanceof Error ? error.message : String(error);
   if (message.includes('NOT_FOUND')) {
     return res.status(404).json({ success: false, error: message });
+  }
+  if (message.endsWith('_REQUIRED')) {
+    return res.status(400).json({ success: false, error: message });
+  }
+  if (message.includes('NOT_LINKABLE') || message.includes('NOT_MATCHED')) {
+    return res.status(409).json({ success: false, error: message });
   }
   if (message.startsWith('NOT_IMPLEMENTED')) {
     return res.status(501).json({ success: false, error: message });
