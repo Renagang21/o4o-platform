@@ -211,21 +211,26 @@ export default function StoreProductionMaterialsPage() {
   const [selected, setSelected]     = useState<Set<string>>(new Set());
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  // WO-KPA-STORE-ASSET-DERIVATION-VIEWER-UI-V1: 원본 보기 모달 (POP 결과물 → 원본 역추적)
+  // WO-KPA-STORE-ASSET-DERIVATION-VIEWER-UI-V1: 원본 보기 모달 (결과물 → 원본 역추적)
+  // WO-KPA-STORE-ASSET-DERIVATION-VIEWER-QR-BLOG-EXTEND-V1: POP 외 QR-code/블로그 행도 동일 viewer 사용.
+  //   결과물 종류(ResultKind) → store_asset_derivations.derivedKind 매핑.
   const [derivOpen, setDerivOpen] = useState(false);
-  const [derivTarget, setDerivTarget] = useState<{ id: string; title: string } | null>(null);
+  const [derivTarget, setDerivTarget] = useState<{ id: string; title: string; kind: ResultKind } | null>(null);
   const [derivItems, setDerivItems] = useState<StoreAssetDerivation[]>([]);
   const [derivLoading, setDerivLoading] = useState(false);
   const [derivError, setDerivError] = useState<string | null>(null);
 
   const openDerivations = useCallback(async (item: ProductionMaterialItem) => {
-    setDerivTarget({ id: item.id, title: item.title });
+    setDerivTarget({ id: item.id, title: item.title, kind: item.kind });
     setDerivOpen(true);
     setDerivLoading(true);
     setDerivError(null);
     setDerivItems([]);
     try {
-      const res = await getStoreAssetDerivations({ derivedKind: 'pop_pdf', derivedId: item.id });
+      // ResultKind('material'|'qr'|'blog') → derivedKind 매핑. material(=POP 결과물)은 기존대로 pop_pdf.
+      const derivedKind =
+        item.kind === 'qr' ? 'qr_code' : item.kind === 'blog' ? 'blog_post' : 'pop_pdf';
+      const res = await getStoreAssetDerivations({ derivedKind, derivedId: item.id });
       setDerivItems(res?.data?.items ?? []);
     } catch {
       setDerivError('원본 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
@@ -696,6 +701,18 @@ export default function StoreProductionMaterialsPage() {
                           : undefined
                       }
                     />
+                  ) : item.kind === 'qr' || item.kind === 'blog' ? (
+                    /* WO-KPA-STORE-ASSET-DERIVATION-VIEWER-QR-BLOG-EXTEND-V1:
+                       QR-code/블로그 행도 동일 read-only 원본 보기 viewer 제공 */
+                    <button
+                      type="button"
+                      onClick={() => openDerivations(item)}
+                      style={styles.openBtn}
+                      title="원본 보기"
+                    >
+                      <Link2 size={13} />
+                      원본 보기
+                    </button>
                   ) : (
                     <span style={{ ...styles.metaText, color: colors.neutral300 }}>-</span>
                   )}
@@ -769,7 +786,11 @@ export default function StoreProductionMaterialsPage() {
               </button>
             </div>
             <div style={styles.modalBody}>
-              {derivTarget && <p style={styles.modalTargetTitle}>POP · {derivTarget.title}</p>}
+              {derivTarget && (
+                <p style={styles.modalTargetTitle}>
+                  {derivTarget.kind === 'qr' ? 'QR-code' : derivTarget.kind === 'blog' ? '블로그' : 'POP'} · {derivTarget.title}
+                </p>
+              )}
               {derivLoading ? (
                 <div style={styles.modalState}>
                   <Loader2 size={18} style={{ color: colors.neutral400 }} /> 불러오는 중...
@@ -786,7 +807,7 @@ export default function StoreProductionMaterialsPage() {
               ) : (
                 <>
                   <p style={styles.modalIntro}>
-                    이 POP는 아래 {derivItems.length}개의 자료를 바탕으로 만들어졌습니다.
+                    이 자료는 아래 {derivItems.length}개의 원본 자료를 바탕으로 만들어졌습니다.
                   </p>
                   <ul style={styles.modalList}>
                     {derivItems.map((d) => (
