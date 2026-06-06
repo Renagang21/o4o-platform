@@ -231,6 +231,43 @@ export const cardStyles: Record<string, CSSProperties> = {
   taskDot: { width: 5, height: 5, borderRadius: '50%', backgroundColor: '#2563eb', flexShrink: 0 },
 };
 
+// ─── Card index (카드 목차 — WO-O4O-NETURE-DISTRIBUTION-FUNDING-GUIDE-CARD-DETAIL-PAGES-V1) ──
+export const indexStyles: Record<string, CSSProperties> = {
+  wrap: {
+    backgroundColor: '#f8fafc',
+    border: '1px solid #e2e8f0',
+    borderRadius: 12,
+    padding: '22px 24px',
+  },
+  title: { fontSize: '1rem', fontWeight: 700, color: '#0f172a', margin: '0 0 12px 0' },
+  leadList: { margin: '0 0 18px 0', padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 8 },
+  leadItem: { display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: '0.875rem', color: '#334155', lineHeight: 1.6 },
+  leadDot: { width: 6, height: 6, borderRadius: '50%', backgroundColor: '#7c3aed', flexShrink: 0, marginTop: 7 },
+  card: {
+    backgroundColor: '#ffffff',
+    border: '1px solid #e2e8f0',
+    borderRadius: 10,
+    padding: '16px 18px',
+    textDecoration: 'none',
+    display: 'block',
+    transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+    cursor: 'pointer',
+  },
+  cardHead: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 6 },
+  cardTitle: { fontSize: '0.9375rem', fontWeight: 700, color: '#1e293b', wordBreak: 'keep-all' },
+  audienceTag: {
+    flexShrink: 0,
+    fontSize: '0.6875rem',
+    fontWeight: 600,
+    color: '#6d28d9',
+    backgroundColor: '#f3e8ff',
+    borderRadius: 999,
+    padding: '2px 8px',
+    whiteSpace: 'nowrap',
+  },
+  cardSummary: { fontSize: '0.8125rem', color: '#64748b', lineHeight: 1.6, margin: 0 },
+};
+
 // ─── Flow blocks ──────────────────────────────────────────────────────────
 
 export const flowStyles: Record<string, CSSProperties> = {

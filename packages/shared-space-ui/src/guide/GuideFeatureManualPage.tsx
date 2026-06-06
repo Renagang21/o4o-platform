@@ -10,9 +10,9 @@
 import { Link } from 'react-router-dom';
 import { PageSection, PageContainer } from '@o4o/ui';
 import type { GuideFeatureManualPageProps } from './types.js';
-import { heroStyles, sectionStyles, cardStyles, bottomNavStyles } from './styles.js';
+import { heroStyles, sectionStyles, cardStyles, bottomNavStyles, indexStyles } from './styles.js';
 
-export function GuideFeatureManualPage({ hero, sections, bottomNav, renderText }: GuideFeatureManualPageProps) {
+export function GuideFeatureManualPage({ hero, index, sections, bottomNav, renderText }: GuideFeatureManualPageProps) {
   return (
     <div>
       {/* Hero */}
@@ -48,11 +48,46 @@ export function GuideFeatureManualPage({ hero, sections, bottomNav, renderText }
         </div>
       </div>
 
+      {/* Card index (선택적 카드 목차) */}
+      {index && index.cards.length > 0 && (
+        <PageSection>
+          <PageContainer>
+            <div style={indexStyles.wrap}>
+              {index.title && <h2 style={indexStyles.title}>{index.title}</h2>}
+              {index.lead && index.lead.length > 0 && (
+                <ul style={indexStyles.leadList}>
+                  {index.lead.map((line) => (
+                    <li key={line} style={indexStyles.leadItem}>
+                      <span style={indexStyles.leadDot} />
+                      <span>{line}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <div style={cardStyles.gridLg}>
+                {index.cards.map((card) => (
+                  <a key={card.to} href={card.to} style={indexStyles.card}>
+                    <div style={indexStyles.cardHead}>
+                      <span style={indexStyles.cardTitle}>{card.title}</span>
+                      {card.audience && <span style={indexStyles.audienceTag}>{card.audience}</span>}
+                    </div>
+                    <p style={indexStyles.cardSummary}>{card.summary}</p>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </PageContainer>
+        </PageSection>
+      )}
+
       {/* Step Sections */}
       {sections.map((section, idx) => (
         <PageSection key={section.step} last={idx === sections.length - 1}>
           <PageContainer>
-            <div style={sectionStyles.wrapLg}>
+            <div
+              style={section.id ? { ...sectionStyles.wrapLg, scrollMarginTop: 88 } : sectionStyles.wrapLg}
+              id={section.id}
+            >
               <div style={sectionStyles.headerLg}>
                 <span style={sectionStyles.numberBadge}>{section.step}</span>
                 <h2 style={sectionStyles.titleLg}>{section.title}</h2>

@@ -55,6 +55,11 @@ export const netureSeoRegistry: SeoRegistry = {
     description: '네뚜레 플랫폼 구조와 O4O 개념 소개.',
     ogType: 'website',
   },
+  '/guide/features/market-trial': {
+    title: '유통참여형 펀딩 이용 방법 — Neture',
+    description: '제품 정산을 통해 초기 매장 랜딩을 만드는 참여형 유통 프로그램. 공급자·참여 매장·운영자 관점과 참여 절차, 자주 묻는 질문을 안내합니다.',
+    ogType: 'article',
+  },
   '/o4o': {
     title: 'O4O 플랫폼 소개 — Neture',
     description: 'O4O(Online for Offline) 플랫폼의 개념과 네뚜레의 역할.',

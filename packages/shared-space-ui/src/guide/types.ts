@@ -250,6 +250,24 @@ export interface GuideFeatureManualSection {
   routeLabel?: string;     // 표시용 라우트 라벨 (선택)
   description: string;
   items: GuideLabelDetailItem[];
+  /**
+   * 선택적 anchor id. 지정 시 섹션 wrapper 에 `id` 를 부여하여
+   * 카드 목차(index)의 `to: '#<id>'` 에서 같은 페이지 내 스크롤 이동 대상이 된다.
+   * WO-O4O-NETURE-DISTRIBUTION-FUNDING-GUIDE-CARD-DETAIL-PAGES-V1.
+   * 미지정 시 기존 동작 유지.
+   */
+  id?: string;
+}
+
+/**
+ * 카드 목차 항목 (선택적). Hero 아래에 클릭 가능한 요약 카드 그리드로 렌더되며,
+ * `to` 는 같은 페이지 섹션 anchor(`#<section.id>`) 또는 외부 라우트를 가리킨다.
+ */
+export interface GuideManualIndexCard {
+  title: string;
+  audience?: string;   // '공급자' | '매장 경영자' | '운영자' | '공통' 등 대상자 태그
+  summary: string;     // 1~2줄 요약
+  to: string;          // '#overview' 또는 라우트
 }
 
 export interface GuideFeatureManualPageProps {
@@ -260,6 +278,15 @@ export interface GuideFeatureManualPageProps {
     primaryAction: GuideNavLink;      // { label: '포럼으로 이동 →', to: '/forum' }
     flowBarTitle?: string;
     flowLabels?: string[];
+  };
+  /**
+   * 선택적 카드 목차. 지정 시 Hero 아래에 핵심 요약(lead)과 클릭형 카드 그리드를 렌더한다.
+   * 미지정 시 기존 레이아웃(Hero → 섹션 → nav) 그대로 유지 — 모든 기존 소비처는 무영향.
+   */
+  index?: {
+    title?: string;        // '한눈에 보기' 등
+    lead?: string[];       // 핵심 요약 (3개 등) — 카드 위 강조 목록
+    cards: GuideManualIndexCard[];
   };
   sections: GuideFeatureManualSection[];
   bottomNav: {
