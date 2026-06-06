@@ -52,8 +52,8 @@ const NEXT_ACTION: Record<string, { title: string; desc: string }> = {
     desc: '내용을 완성하고 "제출"하여 Neture 운영자의 검토를 요청하세요.',
   },
   submitted: {
-    title: 'Neture 운영자가 검토 중입니다',
-    desc: '검토 완료 후 승인되면 바로 모집이 시작됩니다. 별도 조치는 필요 없습니다.',
+    title: 'Neture 운영자가 심사 중입니다',
+    desc: 'Neture 운영자 심사 후 승인되면 공개·모집이 시작됩니다. 승인 전에는 참여자에게 공개되지 않습니다. 보완이 필요하면 안내를 받을 수 있습니다.',
   },
   recruiting: {
     title: '참여자 모집 중입니다',

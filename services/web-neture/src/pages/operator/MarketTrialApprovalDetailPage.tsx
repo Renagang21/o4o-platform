@@ -335,7 +335,7 @@ export default function MarketTrialApprovalDetailPage() {
       setShowStatusModal(false);
       await loadAll();
     } catch (err: any) {
-      setError(err.response?.data?.message || err.message || 'Trial 상태 변경에 실패했습니다.');
+      setError(err.response?.data?.message || err.message || '유통참여형 펀딩 상태 변경에 실패했습니다.');
     } finally {
       setActionLoading(false);
     }
@@ -416,7 +416,7 @@ export default function MarketTrialApprovalDetailPage() {
           />
         )}
         <InfoRow label="모집 기간" value={`${fmtDate(trial.startDate)} ~ ${fmtDate(trial.endDate)}`} />
-        <InfoRow label="Trial 기간" value={trial.trialPeriodDays ? `${trial.trialPeriodDays}일` : '-'} />
+        <InfoRow label="진행 기간" value={trial.trialPeriodDays ? `${trial.trialPeriodDays}일` : '-'} />
 
         {/* Reward Options */}
         {trial.rewardOptions && trial.rewardOptions.length > 0 && (
@@ -478,7 +478,7 @@ export default function MarketTrialApprovalDetailPage() {
       {/* Trial Status Control (non-submitted states) */}
       {nextTransition && !isSubmitted && (
         <div className="bg-white border border-gray-200 rounded-lg p-4 mb-4">
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">Trial 진행 관리</h3>
+          <h3 className="text-sm font-semibold text-gray-700 mb-3">유통참여형 펀딩 진행 관리</h3>
           <div className="flex flex-col sm:flex-row gap-3">
             <button
               onClick={() => setShowStatusModal(true)}
@@ -490,7 +490,7 @@ export default function MarketTrialApprovalDetailPage() {
           </div>
           {allFulfilled && trial.status !== 'fulfilled' && trial.status !== 'closed' && (
             <p className="mt-2 text-xs text-green-600">
-              모든 참여자 이행이 완료되었습니다. Trial 상태 전환을 검토해주세요.
+              모든 참여자 이행이 완료되었습니다. 유통참여형 펀딩 상태 전환을 검토해주세요.
             </p>
           )}
         </div>
@@ -503,38 +503,58 @@ export default function MarketTrialApprovalDetailPage() {
         onConvertClick={openConvertModal}
       />
 
-      {/* Approve/Reject buttons */}
+      {/* Approve/Reject buttons + 승인 전 확인사항 — WO-O4O-NETURE-DISTRIBUTION-FUNDING-OPERATOR-PREAPPROVAL-CHECKLIST-V1 */}
       {isSubmitted && (
-        <div className="flex flex-col sm:flex-row gap-3 mt-6">
-          <button
-            onClick={handleApprove}
-            disabled={actionLoading}
-            className="flex-1 sm:flex-none px-5 py-2.5 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50"
-          >
-            {actionLoading ? '처리 중...' : '승인'}
-          </button>
-          <button
-            onClick={() => setShowRejectModal(true)}
-            disabled={actionLoading}
-            className="flex-1 sm:flex-none px-5 py-2.5 text-sm text-red-600 bg-white border border-red-300 rounded-lg hover:bg-red-50 disabled:opacity-50"
-          >
-            반려
-          </button>
-        </div>
+        <>
+          <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+            <h3 className="text-sm font-semibold text-amber-900 mb-1">승인 전 확인사항</h3>
+            <p className="text-xs text-amber-800 leading-relaxed mb-2">
+              유통참여형 펀딩은 Neture가 송금 흐름을 관리하는 참여형 유통 프로그램이며, <strong>운영자 승인 후에만 공개·모집</strong>됩니다. 제품 성공 가능성을 보증하는 심사가 아니라, 투자형 오해 방지·송금 흐름·정산 선택권·포럼 운영 가능성·제품 제공 위험을 확인하는 최소 운영 심사입니다.
+            </p>
+            <ul className="text-xs text-amber-900 space-y-1">
+              <li>☐ 투자형 펀딩으로 오해될 표현(지분·배당·이자·원금 보장·확정 수익)이 없는가</li>
+              <li>☐ 송금은 Neture 운영자가 받는 구조와 맞는가 (제품 개발자 직접 수령으로 안내하지 않는가)</li>
+              <li>☐ 참여자의 제품/수익 정산 선택권과 충돌하지 않는가 (제품 정산 선택자만 매장 랜딩 추적)</li>
+              <li>☐ 제품 정산 조건·정산 제품 구성·기준 가격이 설명되어 있는가</li>
+              <li>☐ 포럼 운영 방식·송금 기한·미송금자 처리 기준이 설명되어 있는가</li>
+              <li>☐ 제품 제공 지연 또는 불가 시 안내 기준이 있는가</li>
+              <li>☐ 표시·광고·인증상 위험(의약품·건기식·화장품·의료기기 등 규제 품목)이 커 보이지 않는가</li>
+            </ul>
+            <p className="text-xs text-amber-700 mt-2">승인하면 이 유통참여형 펀딩은 공개·모집 상태로 전환됩니다.</p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3 mt-4">
+            <button
+              onClick={handleApprove}
+              disabled={actionLoading}
+              className="flex-1 sm:flex-none px-5 py-2.5 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+            >
+              {actionLoading ? '처리 중...' : '승인'}
+            </button>
+            <button
+              onClick={() => setShowRejectModal(true)}
+              disabled={actionLoading}
+              className="flex-1 sm:flex-none px-5 py-2.5 text-sm text-red-600 bg-white border border-red-300 rounded-lg hover:bg-red-50 disabled:opacity-50"
+            >
+              반려
+            </button>
+          </div>
+        </>
       )}
 
       {/* Reject Modal */}
       {showRejectModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">Trial 반려</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">유통참여형 펀딩 반려</h3>
             <textarea
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
               placeholder="반려 사유를 입력해주세요."
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 mb-4"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 mb-1"
             />
+            {/* WO-O4O-NETURE-DISTRIBUTION-FUNDING-OPERATOR-PREAPPROVAL-CHECKLIST-V1 */}
+            <p className="text-xs text-gray-500 mb-4">투자형 오해·송금 흐름·정산 조건·포럼 운영 기준 중 보완이 필요한 부분을 구체적으로 작성해 주세요.</p>
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => setShowRejectModal(false)}
