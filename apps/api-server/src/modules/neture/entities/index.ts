@@ -1,5 +1,13 @@
 export { NetureSupplier, SupplierStatus, ContactVisibility } from './NetureSupplier.entity.js';
 export { ProductMaster } from './ProductMaster.entity.js';
+// WO-O4O-PRODUCT-IDENTIFIER-CORE-V1: Identifier Core (Phase 2)
+export {
+  ProductIdentifier,
+  PRODUCT_IDENTIFIER_TYPES,
+  PRODUCT_IDENTIFIER_VERIFICATION_STATUSES,
+  type ProductIdentifierType,
+  type ProductIdentifierVerificationStatus,
+} from './ProductIdentifier.entity.js';
 export { ProductAlias, AliasSource } from './ProductAlias.entity.js';
 export { ProductCategory } from './ProductCategory.entity.js';
 export { Brand } from './Brand.entity.js';

@@ -220,6 +220,7 @@ import { StoreLibraryItem } from '../routes/platform/entities/store-library-item
 import {
   NetureSupplier,
   ProductMaster,
+  ProductIdentifier, // WO-O4O-PRODUCT-IDENTIFIER-CORE-V1
   ProductCategory,
   Brand,
   SupplierProductOffer,
@@ -762,6 +763,7 @@ export const AppDataSource = new DataSource({
     // ============================================================================
     NetureSupplier,
     ProductMaster,
+    ProductIdentifier, // WO-O4O-PRODUCT-IDENTIFIER-CORE-V1
     ProductCategory,
     Brand,
     SupplierProductOffer,

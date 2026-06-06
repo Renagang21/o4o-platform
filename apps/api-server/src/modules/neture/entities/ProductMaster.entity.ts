@@ -23,6 +23,7 @@ import type { SupplierProductOffer } from './SupplierProductOffer.entity.js';
 import type { ProductCategory } from './ProductCategory.entity.js';
 import type { Brand } from './Brand.entity.js';
 import type { ProductImage } from './ProductImage.entity.js';
+import type { ProductIdentifier } from './ProductIdentifier.entity.js';
 
 @Entity('product_masters')
 export class ProductMaster {
@@ -110,4 +111,12 @@ export class ProductMaster {
   /** 이 Master에 연결된 상품 이미지 목록 (WO-O4O-NETURE-PRODUCT-IMAGE-STRUCTURE-V1) */
   @OneToMany('ProductImage', 'master')
   images: ProductImage[];
+
+  /**
+   * 이 Master에 연결된 식별자 목록 (Identifier Core — WO-O4O-PRODUCT-IDENTIFIER-CORE-V1)
+   *
+   * additive 계층. primary 식별자는 barcode 컬럼의 mirror 이며, barcode 컬럼/UNIQUE 는 유지된다.
+   */
+  @OneToMany('ProductIdentifier', 'productMaster')
+  identifiers?: ProductIdentifier[];
 }
