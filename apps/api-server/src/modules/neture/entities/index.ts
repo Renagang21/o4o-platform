@@ -8,6 +8,16 @@ export {
   type ProductIdentifierType,
   type ProductIdentifierVerificationStatus,
 } from './ProductIdentifier.entity.js';
+// WO-O4O-PRODUCT-CANDIDATE-REVIEW-QUEUE-V1: Product Candidate Review Queue (Phase 3)
+export {
+  ProductCandidate,
+  PRODUCT_CANDIDATE_SOURCE_TYPES,
+  PRODUCT_CANDIDATE_STATUSES,
+  PRODUCT_CANDIDATE_MATCH_STATUSES,
+  type ProductCandidateSourceType,
+  type ProductCandidateStatus,
+  type ProductCandidateMatchStatus,
+} from './ProductCandidate.entity.js';
 export { ProductAlias, AliasSource } from './ProductAlias.entity.js';
 export { ProductCategory } from './ProductCategory.entity.js';
 export { Brand } from './Brand.entity.js';

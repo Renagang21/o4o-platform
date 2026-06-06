@@ -410,6 +410,15 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     app.use('/api/v1/operator/products', operatorProductRoutes);
     logger.info('✅ Operator Product Console routes registered at /api/v1/operator/products');
 
+    // 24-e2. Register Product Candidate Review Queue routes (WO-O4O-PRODUCT-CANDIDATE-REVIEW-QUEUE-V1, Phase 3)
+    try {
+      const { createProductCandidateController } = await import('../modules/neture/controllers/product-candidate.controller.js');
+      app.use('/api/v1/operator/product-candidates', createProductCandidateController(dataSource));
+      logger.info('✅ Product Candidate Review Queue routes registered at /api/v1/operator/product-candidates');
+    } catch (productCandidateError) {
+      logger.error('Failed to register Product Candidate Review Queue routes:', productCandidateError);
+    }
+
     // 24-f. Register Operator Store Console routes (WO-O4O-STORE-CONSOLE-V1)
     app.use('/api/v1/operator/stores', operatorStoreRoutes);
     logger.info('✅ Operator Store Console routes registered at /api/v1/operator/stores');
