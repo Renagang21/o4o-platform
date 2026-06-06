@@ -20,6 +20,7 @@ import {
   type ProductCandidateStatus,
   type ProductCandidateMatchStatus,
   type ProductCandidateSourceType,
+  type ProductTypeClass,
 } from '../../lib/api/operatorProductCandidates';
 
 // ─── Constants ───
@@ -55,6 +56,26 @@ const MATCH_BADGE: Record<string, { label: string; cls: string }> = {
   manually_matched: { label: '수동매칭', cls: 'bg-green-50 text-green-700' },
 };
 
+// WO-O4O-PRODUCT-TYPE-CLASSIFICATION-WIRING-F3-V1
+const PRODUCT_TYPE_BADGE: Record<string, { label: string; cls: string }> = {
+  non_drug: { label: '비의약품', cls: 'bg-slate-100 text-slate-600' },
+  otc_drug: { label: '비처방의약품', cls: 'bg-amber-50 text-amber-700' },
+  rx_drug: { label: '처방의약품', cls: 'bg-red-50 text-red-700' },
+  quasi_drug: { label: '의약외품', cls: 'bg-teal-50 text-teal-700' },
+  health_functional: { label: '건강기능식품', cls: 'bg-indigo-50 text-indigo-700' },
+  drug_unspecified: { label: '의약품 미분류', cls: 'bg-orange-50 text-orange-700' },
+  unknown: { label: '미상', cls: 'bg-slate-100 text-slate-400' },
+};
+
+const PRODUCT_TYPE_FILTERS: { key: 'all' | ProductTypeClass; label: string }[] = [
+  { key: 'all', label: '분류 전체' },
+  { key: 'non_drug', label: '비의약품' },
+  { key: 'otc_drug', label: '비처방의약품' },
+  { key: 'rx_drug', label: '처방의약품' },
+  { key: 'drug_unspecified', label: '의약품 미분류' },
+  { key: 'quasi_drug', label: '의약외품' },
+];
+
 const SOURCE_LABEL: Record<ProductCandidateSourceType, string> = {
   supplier_web: '공급자',
   pharmacy_web: '약국',
@@ -79,6 +100,7 @@ export default function ProductCandidateReviewPage() {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<'all' | ProductCandidateStatus>('all');
   const [matchFilter, setMatchFilter] = useState<'all' | ProductCandidateMatchStatus>('all');
+  const [typeFilter, setTypeFilter] = useState<'all' | ProductTypeClass>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
 
@@ -109,6 +131,7 @@ export default function ProductCandidateReviewPage() {
 
   // 클라이언트 측 검색 (backend 는 text 검색 미지원 — 로드된 페이지 내 필터)
   const filtered = items.filter((c) => {
+    if (typeFilter !== 'all' && (c.classification?.productTypeClass ?? 'unknown') !== typeFilter) return false;
     const term = searchTerm.trim().toLowerCase();
     if (!term) return true;
     return (
@@ -237,6 +260,16 @@ export default function ProductCandidateReviewPage() {
       render: (v) => <span className="text-xs text-slate-600">{SOURCE_LABEL[v as ProductCandidateSourceType] || v}</span>,
     },
     {
+      key: '_productType',
+      header: '분류',
+      align: 'center',
+      width: '110px',
+      render: (_v, row) => {
+        const cls = row.classification?.productTypeClass ?? 'unknown';
+        return <Badge map={PRODUCT_TYPE_BADGE} value={cls} />;
+      },
+    },
+    {
       key: 'serviceKey',
       header: '서비스',
       align: 'center',
@@ -347,6 +380,15 @@ export default function ProductCandidateReviewPage() {
           <option value="no_match">결과없음</option>
           <option value="manually_matched">수동매칭</option>
         </select>
+        <select
+          value={typeFilter}
+          onChange={(e) => setTypeFilter(e.target.value as 'all' | ProductTypeClass)}
+          className="px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          {PRODUCT_TYPE_FILTERS.map((f) => (
+            <option key={f.key} value={f.key}>{f.label}</option>
+          ))}
+        </select>
         <input
           type="text"
           placeholder="후보명, 식별자 검색..."
@@ -384,13 +426,50 @@ export default function ProductCandidateReviewPage() {
                 <h3 className="text-lg font-bold text-slate-900">{detail.candidateName || '(이름 없음)'}</h3>
                 <p className="text-xs text-slate-400 mt-1">{detail.id}</p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2 justify-end">
                 <Badge map={STATUS_BADGE} value={detail.candidateStatus} />
                 <Badge map={MATCH_BADGE} value={detail.matchStatus} />
+                <Badge map={PRODUCT_TYPE_BADGE} value={detail.classification?.productTypeClass ?? 'unknown'} />
               </div>
             </div>
 
             <div className="p-5 space-y-4">
+              {/* F3: 상품 분류 + 기본 노출/판매 정책 (표시용 — 권한 변경 아님) */}
+              {detail.classification && (
+                <div className="rounded-lg border border-slate-100 bg-slate-50 p-3">
+                  <div className="flex flex-wrap items-center gap-2 text-xs">
+                    <span className="font-medium text-slate-600">상품 분류</span>
+                    <Badge map={PRODUCT_TYPE_BADGE} value={detail.classification.productTypeClass} />
+                    {detail.classification.drugCategory && (
+                      <span className="text-slate-400">drug_category: {detail.classification.drugCategory}</span>
+                    )}
+                    <span className="text-slate-300">
+                      ({detail.classification.basis === 'matched_master' ? '매칭 상품 기준' : '후보 추론'})
+                    </span>
+                  </div>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {detail.classification.displayPolicy.pharmacyOnly && (
+                      <span className="px-2 py-0.5 rounded text-xs bg-blue-50 text-blue-700">약국 전용</span>
+                    )}
+                    {!detail.classification.displayPolicy.customerDisplayAllowed && (
+                      <span className="px-2 py-0.5 rounded text-xs bg-red-50 text-red-700">고객 노출 제한</span>
+                    )}
+                    {!detail.classification.displayPolicy.onlineSaleAllowed && (
+                      <span className="px-2 py-0.5 rounded text-xs bg-red-50 text-red-700">온라인 판매 차단</span>
+                    )}
+                    {detail.classification.displayPolicy.advertisingReviewStatus === 'needs_review' && (
+                      <span className="px-2 py-0.5 rounded text-xs bg-amber-50 text-amber-700">광고 검토 필요</span>
+                    )}
+                    {detail.classification.displayPolicy.advertisingReviewStatus === 'blocked' && (
+                      <span className="px-2 py-0.5 rounded text-xs bg-red-50 text-red-700">광고 차단</span>
+                    )}
+                    {detail.classification.isRxClass && (
+                      <span className="px-2 py-0.5 rounded text-xs bg-red-100 text-red-800 font-medium">처방의약품 — 온라인 판매/노출 불가</span>
+                    )}
+                  </div>
+                  <p className="mt-2 text-[11px] text-slate-400">분류·정책은 안내용입니다. 등록/판매/노출 권한을 자동으로 변경하지 않습니다.</p>
+                </div>
+              )}
               {/* Info grid */}
               <dl className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
                 <Field label="식별자 유형" value={detail.identifierType} />

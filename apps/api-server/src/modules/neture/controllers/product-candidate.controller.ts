@@ -65,7 +65,9 @@ export function createProductCandidateController(dataSource: DataSource): Router
         page: page ? Number(page) : undefined,
         limit: limit ? Number(limit) : undefined,
       });
-      return res.json({ success: true, data: result });
+      // WO-O4O-PRODUCT-TYPE-CLASSIFICATION-WIRING-F3-V1: 분류 부착 (표시용)
+      const items = await service.withClassification(result.items);
+      return res.json({ success: true, data: { items, total: result.total } });
     } catch (error) {
       logger.error('[ProductCandidate] list error:', error);
       return res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
@@ -77,7 +79,9 @@ export function createProductCandidateController(dataSource: DataSource): Router
     try {
       const candidate = await service.getCandidate(req.params.id);
       if (!candidate) return res.status(404).json({ success: false, error: 'CANDIDATE_NOT_FOUND' });
-      return res.json({ success: true, data: candidate });
+      // WO-O4O-PRODUCT-TYPE-CLASSIFICATION-WIRING-F3-V1: 분류 부착 (표시용)
+      const [enriched] = await service.withClassification([candidate]);
+      return res.json({ success: true, data: enriched });
     } catch (error) {
       logger.error('[ProductCandidate] detail error:', error);
       return res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });

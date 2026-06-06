@@ -26,6 +26,30 @@ import { ProductMaster } from '../entities/ProductMaster.entity.js';
 import { ProductIdentifierService } from './product-identifier.service.js';
 import type { ProductIdentifierType } from '../entities/ProductIdentifier.entity.js';
 import { normalizeIdentifier } from '../utils/product-identifier.util.js';
+// WO-O4O-PRODUCT-TYPE-CLASSIFICATION-WIRING-F3-V1
+import {
+  classifyProductType,
+  getDefaultDrugDisplayPolicy,
+  isOtcRegistrable as isOtcRegistrableClass,
+  isRxClass as isRxClassFn,
+} from '../utils/product-type.util.js';
+import type { ProductTypeClass, ProductDrugCategory, DrugDisplayPolicy } from '../utils/product-type.util.js';
+
+/**
+ * 후보 분류 결과 (표시/검토용 — 판매/노출 권한을 여는 로직 아님). F3.
+ *  - basis 'matched_master': matchedProductMaster 의 regulatoryType + drugCategory 기준
+ *  - basis 'inferred': matched master 없음 → candidate rawPayload 추론 (확정 아님)
+ */
+export interface CandidateClassification {
+  productTypeClass: ProductTypeClass;
+  drugCategory: ProductDrugCategory | null;
+  displayPolicy: DrugDisplayPolicy;
+  isOtcRegistrable: boolean;
+  isRxClass: boolean;
+  basis: 'matched_master' | 'inferred';
+}
+
+export type ProductCandidateWithClassification = ProductCandidate & { classification: CandidateClassification };
 
 export interface CreateCandidateInput {
   serviceKey?: string | null;
@@ -117,6 +141,51 @@ export class ProductCandidateService {
 
   async getCandidate(id: string): Promise<ProductCandidate | null> {
     return this.repo.findOne({ where: { id, deletedAt: IsNull() } });
+  }
+
+  /**
+   * 후보 목록/단건에 분류(classification)를 부착한다 (F3 — 표시/검토용).
+   *
+   * matchedProductMaster 가 있으면 그 regulatoryType + drugCategory 로 분류(basis=matched_master),
+   * 없으면 candidate rawPayload 로 추론(basis=inferred). matched 의 master 는 batch 로 1회 조회(N+1 회피).
+   * ProductMaster/Candidate 를 변경하지 않는다 (읽기만).
+   */
+  async withClassification(items: ProductCandidate[]): Promise<ProductCandidateWithClassification[]> {
+    const masterIds = [...new Set(items.map((c) => c.matchedProductMasterId).filter((v): v is string => !!v))];
+    const masterMap = new Map<string, { regulatoryType: string | null; drugCategory: string | null }>();
+    if (masterIds.length > 0) {
+      const rows: Array<{ id: string; regulatory_type: string | null; drug_category: string | null }> =
+        await this.dataSource.query(
+          `SELECT id, regulatory_type, drug_category FROM product_masters WHERE id = ANY($1)`,
+          [masterIds],
+        );
+      for (const r of rows) masterMap.set(r.id, { regulatoryType: r.regulatory_type, drugCategory: r.drug_category });
+    }
+
+    return items.map((c) => {
+      const master = c.matchedProductMasterId ? masterMap.get(c.matchedProductMasterId) : undefined;
+      let productTypeClass: ProductTypeClass;
+      let drugCategory: ProductDrugCategory | null;
+      let basis: 'matched_master' | 'inferred';
+      if (master) {
+        productTypeClass = classifyProductType({ regulatoryType: master.regulatoryType, drugCategory: master.drugCategory });
+        drugCategory = (master.drugCategory as ProductDrugCategory | null) ?? null;
+        basis = 'matched_master';
+      } else {
+        productTypeClass = classifyProductType({ rawPayload: c.rawPayload });
+        drugCategory = null;
+        basis = 'inferred';
+      }
+      const classification: CandidateClassification = {
+        productTypeClass,
+        drugCategory,
+        displayPolicy: getDefaultDrugDisplayPolicy(productTypeClass),
+        isOtcRegistrable: isOtcRegistrableClass(productTypeClass),
+        isRxClass: isRxClassFn(productTypeClass),
+        basis,
+      };
+      return Object.assign(c, { classification });
+    });
   }
 
   async findCandidates(filter: FindCandidatesFilter): Promise<{ items: ProductCandidate[]; total: number }> {

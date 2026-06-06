@@ -56,6 +56,35 @@ export type ProductCandidateMatchStatus =
   | 'no_match'
   | 'manually_matched';
 
+// WO-O4O-PRODUCT-TYPE-CLASSIFICATION-WIRING-F3-V1
+export type ProductTypeClass =
+  | 'non_drug'
+  | 'otc_drug'
+  | 'rx_drug'
+  | 'quasi_drug'
+  | 'health_functional'
+  | 'drug_unspecified'
+  | 'unknown';
+
+export type ProductDrugCategory = 'non_drug' | 'otc' | 'rx' | 'quasi_drug' | 'drug_unspecified';
+
+export interface DrugDisplayPolicy {
+  pharmacyOnly: boolean;
+  customerDisplayAllowed: boolean;
+  tabletDisplayAllowed: boolean | 'limited';
+  onlineSaleAllowed: boolean;
+  advertisingReviewStatus: 'not_reviewed' | 'needs_review' | 'approved_limited' | 'rejected' | 'blocked';
+}
+
+export interface CandidateClassification {
+  productTypeClass: ProductTypeClass;
+  drugCategory: ProductDrugCategory | null;
+  displayPolicy: DrugDisplayPolicy;
+  isOtcRegistrable: boolean;
+  isRxClass: boolean;
+  basis: 'matched_master' | 'inferred';
+}
+
 export interface ProductCandidate {
   id: string;
   serviceKey: string | null;
@@ -86,6 +115,8 @@ export interface ProductCandidate {
   reviewedAt: string | null;
   createdAt: string;
   updatedAt: string;
+  /** F3: 표시/검토용 분류 (백엔드 부착, 판매/노출 권한 아님) */
+  classification?: CandidateClassification;
 }
 
 export interface ProductCandidateListFilter {
