@@ -15,8 +15,8 @@
  * - 신규: 자기 SPO 중에서 KPA 이벤트로 제안 (POST /kpa/supplier/event-offers)
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Tag, ChevronLeft, ChevronRight, Package, Plus, X, Loader2 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { netureEventOfferApi, supplierKpaEventOfferApi } from '../../lib/api';
@@ -131,6 +131,7 @@ function extractErrorCode(err: unknown): string | null {
 
 export default function SupplierEventOfferPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams(); // WO-O4O-...-BINDING-V2: 선택 상품 query
 
   const [guideTitle, setGuideTitle] = useState<string | null>(null);
   const [guideDesc, setGuideDesc] = useState<string | null>(null);
@@ -302,6 +303,30 @@ export default function SupplierEventOfferPage() {
     setProposingId(null);
     resetEventConditionInputs();
   }, [resetEventConditionInputs]);
+
+  // WO-O4O-NETURE-SUPPLIER-EVENT-FUNDING-WORKSPACE-BINDING-V2:
+  //   제품 목록에서 선택 상품으로 진입(?supplierProductId/&masterId) 시
+  //   제안 모달 자동 오픈 + 매칭 SPO 자동 선택 (프론트 전용 바인딩, 백엔드 무변경).
+  const bindProductId = searchParams.get('supplierProductId');
+  const bindMasterId = searchParams.get('masterId');
+  const autoOpenedRef = useRef(false);
+  const autoSelectedRef = useRef(false);
+
+  useEffect(() => {
+    if (autoOpenedRef.current) return;
+    if (!bindProductId && !bindMasterId) return;
+    autoOpenedRef.current = true;
+    handleOpenPropose();
+  }, [bindProductId, bindMasterId, handleOpenPropose]);
+
+  useEffect(() => {
+    if (autoSelectedRef.current) return;
+    if (!proposeOpen || proposableOffers.length === 0) return;
+    if (!bindProductId && !bindMasterId) return;
+    autoSelectedRef.current = true; // 1회만 자동 선택 (이후 사용자 선택 존중)
+    const match = proposableOffers.find((o) => o.id === bindProductId || o.masterId === bindMasterId);
+    if (match) setSelectedOfferId(match.id);
+  }, [proposeOpen, proposableOffers, bindProductId, bindMasterId]);
 
   // WO-O4O-EVENT-OFFER-MULTI-SERVICE-PROPOSAL-V1
   // WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1: 이벤트 조건 입력 → API 전달
