@@ -390,13 +390,13 @@ export default function SupplierTrialDetailPage() {
       {/* 매장 진열 현황 (WO-MARKET-TRIAL-LISTING-AUTOLINK-V1) */}
       {isResultPhase && (summary.listingCount ?? 0) > 0 && (
         <div style={s.section}>
-          <h2 style={s.sectionTitle}>매장 진열 현황</h2>
+          <h2 style={s.sectionTitle}>활용 상품 연결 현황</h2>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <div>
               <span style={{ fontSize: '32px', fontWeight: 700, color: '#059669' }}>
                 {summary.listingCount}
               </span>
-              <span style={{ ...s.muted, marginLeft: '6px' }}>개 매장 진열 등록</span>
+              <span style={{ ...s.muted, marginLeft: '6px' }}>개 매장 활용 상품 연결</span>
             </div>
             <span style={{ fontSize: '13px', color: '#6B7280' }}>
               ← 유통참여형 펀딩 참여자 매장에서 이 상품을 실제로 취급 시작
@@ -415,15 +415,15 @@ export default function SupplierTrialDetailPage() {
         const firstOrderRate = total > 0 ? Math.round((firstOrderCount / total) * 100) : 0;
         return (
           <div style={s.section}>
-            <h2 style={s.sectionTitle}>거래선 전환 현황</h2>
+            <h2 style={s.sectionTitle}>매장 랜딩 현황</h2>
             {/* Conversion rate summary */}
             <div style={{ display: 'flex', gap: '20px', marginBottom: '16px', flexWrap: 'wrap' }}>
               <div style={s.rateCard}>
-                <span style={s.rateLabel}>취급 전환율</span>
+                <span style={s.rateLabel}>매장 도입률</span>
                 <span style={{ ...s.rateValue, color: adoptedRate > 0 ? '#059669' : '#9CA3AF' }}>
                   {adoptedRate}%
                 </span>
-                <span style={s.rateSub}>참여자 중 취급 시작 이상</span>
+                <span style={s.rateSub}>참여자 중 매장 도입 이상</span>
               </div>
               <div style={s.rateCard}>
                 <span style={s.rateLabel}>첫 주문 전환율</span>
@@ -434,7 +434,7 @@ export default function SupplierTrialDetailPage() {
               </div>
               {(summary.listingCount ?? 0) > 0 && (
                 <div style={s.rateCard}>
-                  <span style={s.rateLabel}>진열 등록률</span>
+                  <span style={s.rateLabel}>활용 상품 연결률</span>
                   <span style={{ ...s.rateValue, color: '#4F46E5' }}>
                     {Math.round(((summary.listingCount ?? 0) / total) * 100)}%
                   </span>

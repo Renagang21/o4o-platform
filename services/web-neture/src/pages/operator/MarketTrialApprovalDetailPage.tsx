@@ -1559,7 +1559,7 @@ function TrialKpiBar({ kpi }: { kpi: MarketTrialDetailKpi }) {
         </div>
         <div className="text-center">
           <p className="text-base font-bold text-purple-700">{fmtRate(kpi.paymentCompletionRate)}</p>
-          <p className="text-xs text-gray-500 mt-0.5">결제 완료율</p>
+          <p className="text-xs text-gray-500 mt-0.5">입금 확인 완료율</p>
           <p className="text-xs text-gray-400 mt-0.5">
             완료 {kpi.paidParticipantCount} · 환불 {kpi.refundCount}
           </p>

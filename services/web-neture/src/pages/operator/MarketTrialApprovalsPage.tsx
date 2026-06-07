@@ -55,7 +55,7 @@ export default function MarketTrialApprovalsPage() {
       {/* 상단 페이지 탭 */}
       <div className="flex gap-1 mb-6 border-b border-gray-200">
         <PageTabButton active={pageTab === 'trials'} onClick={() => setPageTab('trials')}>
-          Trial 관리
+          유통참여형 펀딩 관리
         </PageTabButton>
         <PageTabButton active={pageTab === 'forum-failures'} onClick={() => setPageTab('forum-failures')}>
           포럼 연계 실패
@@ -166,8 +166,8 @@ function TrialsPanel() {
       ) : trials.length === 0 ? (
         <div className="text-center py-12 text-gray-400">
           {filter
-            ? `"${FILTER_TABS.find((t) => t.value === filter)?.label}" 상태의 Trial이 없습니다.`
-            : 'Trial이 없습니다.'}
+            ? `"${FILTER_TABS.find((t) => t.value === filter)?.label}" 상태의 유통참여형 펀딩이 없습니다.`
+            : '유통참여형 펀딩이 없습니다.'}
         </div>
       ) : (
         <div className="space-y-3">
@@ -194,7 +194,7 @@ function KpiBar({ kpi }: { kpi: MarketTrialKpiSnapshot }) {
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
       <div className="bg-white border border-gray-200 rounded-lg p-3 text-center">
         <p className="text-lg font-bold text-gray-900">{fmt(kpi.totalTrials)}</p>
-        <p className="text-xs text-gray-500 mt-0.5">전체 Trial</p>
+        <p className="text-xs text-gray-500 mt-0.5">전체 유통참여형 펀딩</p>
         <p className="text-xs text-gray-400 mt-0.5">
           모집 중 <span className="font-medium text-green-600">{kpi.recruitingTrials}</span>
           {' · '}심사 <span className="font-medium text-yellow-600">
@@ -206,7 +206,7 @@ function KpiBar({ kpi }: { kpi: MarketTrialKpiSnapshot }) {
         <p className="text-lg font-bold text-blue-700">{fmt(kpi.totalParticipants)}</p>
         <p className="text-xs text-gray-500 mt-0.5">누적 참여자</p>
         <p className="text-xs text-gray-400 mt-0.5">
-          결제 완료 <span className="font-medium text-blue-600">{fmt(kpi.paidParticipantCount)}</span>
+          입금 확인 완료 <span className="font-medium text-blue-600">{fmt(kpi.paidParticipantCount)}</span>
         </p>
       </div>
       <div className="bg-white border border-gray-200 rounded-lg p-3 text-center">
@@ -218,7 +218,7 @@ function KpiBar({ kpi }: { kpi: MarketTrialKpiSnapshot }) {
       </div>
       <div className="bg-white border border-gray-200 rounded-lg p-3 text-center">
         <p className="text-lg font-bold text-purple-700">{fmtRate(kpi.paymentCompletionRate)}</p>
-        <p className="text-xs text-gray-500 mt-0.5">결제 완료율</p>
+        <p className="text-xs text-gray-500 mt-0.5">입금 확인 완료율</p>
         <p className="text-xs text-gray-400 mt-0.5">
           환불 <span className="font-medium text-red-500">{kpi.refundCount}</span>건
         </p>
@@ -434,7 +434,7 @@ function ForumSyncFailuresPanel() {
               <tr className="bg-gray-50 border-b border-gray-200">
                 <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 whitespace-nowrap">상태</th>
                 <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 whitespace-nowrap">심각도</th>
-                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Trial</th>
+                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">유통참여형 펀딩</th>
                 <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 whitespace-nowrap">단계</th>
                 <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">에러 메시지</th>
                 <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 whitespace-nowrap">발생 시각</th>
