@@ -67,3 +67,35 @@ export function getSupplierProductType(key: string | null | undefined): Supplier
   if (!key) return undefined;
   return SUPPLIER_PRODUCT_TYPES.find((t) => t.key === key);
 }
+
+/* ------------------------------------------------------------------ */
+/*  제품 활용(후속 공급활동) 액션 — WO-O4O-NETURE-SUPPLIER-OFFER-MODE-SELECTION-V1  */
+/* ------------------------------------------------------------------ */
+
+export type SupplierOfferAction = 'supply' | 'recruit' | 'event' | 'funding';
+
+/** 후속 액션 메타 (라벨/이동경로/구현여부). ready=false 는 준비 중(비활성). */
+export const SUPPLIER_OFFER_ACTION_META: Record<SupplierOfferAction, { label: string; path?: string; ready: boolean }> = {
+  supply: { label: '일반 공급 오퍼', path: '/supplier/supply-offers', ready: true },
+  recruit: { label: '판매자 모집 (준비 중)', ready: false },
+  event: { label: '이벤트 오퍼', path: '/supplier/event-offers', ready: true },
+  funding: { label: '유통참여형 펀딩 후보', path: '/supplier/market-trial/new', ready: true },
+};
+
+/**
+ * 제품의 regulatoryType 기준 허용 후속 액션.
+ *
+ * - DRUG(의약품: 비처방·처방) → 검토 중심(restricted), 후속 공급활동 미제공.
+ * - 그 외(비의약품·의약외품·건기식·화장품·기타) → 전체 액션.
+ *
+ * 한계: 목록 응답에 drugCategory 가 없어 otc/rx/미분류 세분 게이트는 불가
+ *       (DRUG 은 모두 검토 중심으로 안전 처리). 세분화는 후속 WO.
+ */
+export function getAllowedOfferActions(regulatoryType?: string | null): {
+  restricted: boolean;
+  actions: SupplierOfferAction[];
+} {
+  const reg = (regulatoryType || '').trim().toUpperCase();
+  if (reg === 'DRUG') return { restricted: true, actions: [] };
+  return { restricted: false, actions: ['supply', 'recruit', 'event', 'funding'] };
+}

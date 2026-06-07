@@ -25,6 +25,8 @@ import {
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { supplierApi, productApi, type SupplierProduct, type SupplierProductPurpose } from '../../lib/api';
 import ProductDetailDrawer from './ProductDetailDrawer';
+// WO-O4O-NETURE-SUPPLIER-OFFER-MODE-SELECTION-V1
+import { getAllowedOfferActions, SUPPLIER_OFFER_ACTION_META, type SupplierOfferAction } from '../../lib/supplierProductTypes';
 import MediaPickerModal from '../../components/common/MediaPickerModal';
 import {
   APPROVAL_STATUS_BADGE,
@@ -848,8 +850,47 @@ export default function SupplierProductsPage() {
       ),
     };
 
-    return [selectCol, detailCol, previewCol, ...cols];
-  }, [products, selectedIds, highlightRowId]);
+    // WO-O4O-NETURE-SUPPLIER-OFFER-MODE-SELECTION-V1: 제품 유형별 후속 활용 액션
+    const offerActionsCol: ListColumnDef<SupplierProduct> = {
+      key: '_offerActions' as any,
+      header: '후속 작업',
+      width: '160px',
+      render: (_v: any, row: SupplierProduct) => {
+        const gate = getAllowedOfferActions(row.regulatoryType);
+        if (gate.restricted) {
+          // 의약품(비처방·처방) → 검토 중심. 자동 공급/이벤트/펀딩 연결 안 함.
+          return <span className="text-xs text-slate-400" title="의약품은 운영자 검토 후 약국 대상 유통 정보 단위로만 관리됩니다.">운영자 검토 대상</span>;
+        }
+        return (
+          <select
+            value=""
+            onClick={(e) => e.stopPropagation()}
+            onChange={(e) => {
+              const action = e.target.value as SupplierOfferAction | '';
+              e.currentTarget.value = '';
+              if (!action) return;
+              const meta = SUPPLIER_OFFER_ACTION_META[action];
+              if (!meta?.ready || !meta.path) return; // 준비 중 → no-op
+              navigate(meta.path);
+            }}
+            className="w-full text-xs border border-slate-200 rounded px-2 py-1 bg-white text-slate-600 focus:outline-none focus:ring-1 focus:ring-blue-400"
+          >
+            <option value="">활용 선택…</option>
+            {gate.actions.map((a) => {
+              const meta = SUPPLIER_OFFER_ACTION_META[a];
+              return (
+                <option key={a} value={a} disabled={!meta.ready}>
+                  {meta.label}
+                </option>
+              );
+            })}
+          </select>
+        );
+      },
+    };
+
+    return [selectCol, detailCol, previewCol, offerActionsCol, ...cols];
+  }, [products, selectedIds, highlightRowId, navigate]);
 
   // WO-NETURE-SUPPLIER-PRODUCT-VISIBILITY-STATUS-UX-ALIGNMENT-V1: client-side visibility filter
   const filteredProducts = useMemo(() => {
