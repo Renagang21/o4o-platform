@@ -24,3 +24,5 @@ export { GuideO4OOverviewPage } from './GuideO4OOverviewPage';
 export { GuideForOperatorPage } from './GuideForOperatorPage';
 // WO-O4O-NETURE-GUIDE-BUSINESS-ACTOR-PHASE2-V1
 export { GuideForSellerPage } from './GuideForSellerPage';
+// WO-O4O-NETURE-BUSINESS-GUIDE-PHARMACY-NETWORK-V1
+export { GuideBusinessPharmacyNetworkPage } from './GuideBusinessPharmacyNetworkPage';

@@ -96,6 +96,8 @@ export {
   netureGuideForOperatorProps,
   // WO-O4O-NETURE-GUIDE-BUSINESS-ACTOR-PHASE2-V1
   netureGuideForSellerProps,
+  // WO-O4O-NETURE-BUSINESS-GUIDE-PHARMACY-NETWORK-V1
+  netureGuideBusinessPharmacyNetworkProps,
 } from './copy/neture.js';
 
 // WO-O4O-CROSSSERVICE-HOME-LATEST-AND-GUIDE-ALIGNMENT-V1
