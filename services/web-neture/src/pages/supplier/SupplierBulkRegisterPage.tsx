@@ -8,7 +8,7 @@
  * (유형별 전용 파서/저장은 후속: WO-O4O-NETURE-SUPPLIER-BULK-UPLOAD-TEMPLATE-V1)
  */
 import { useState, useCallback } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AlertTriangle, Upload, FileSpreadsheet, Download, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
 import {
   SUPPLIER_PRODUCT_TYPES,
@@ -17,6 +17,7 @@ import {
   type SupplierProductTypeDef,
 } from '../../lib/supplierProductTypes';
 import { validateBulkCsv, type BulkValidationResult, type BulkRowStatus } from '../../lib/bulkUploadValidation';
+import { submitBulkCandidates, type BulkCandidateSubmitResult } from '../../lib/api/supplier';
 
 /** 유형별 CSV 템플릿(헤더만) 다운로드 — 백엔드 없이 클라이언트 생성 */
 function downloadTemplate(t: SupplierProductTypeDef) {
@@ -40,6 +41,7 @@ const ROW_STATUS_META: Record<BulkRowStatus, { label: string; cls: string; Icon:
 };
 
 export default function SupplierBulkRegisterPage() {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const initialKey = searchParams.get('productType');
   const [selected, setSelected] = useState<SupplierProductTypeDef | null>(
@@ -51,11 +53,40 @@ export default function SupplierBulkRegisterPage() {
   const [parseError, setParseError] = useState<string | null>(null);
   const [result, setResult] = useState<BulkValidationResult | null>(null);
 
+  // WO-O4O-NETURE-SUPPLIER-BULK-UPLOAD-SAVE-V3: 저장(후보 제출) 상태
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitResult, setSubmitResult] = useState<BulkCandidateSubmitResult | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
   const resetUpload = useCallback(() => {
     setFileName(null);
     setParseError(null);
     setResult(null);
+    setConfirmOpen(false);
+    setSubmitResult(null);
+    setSubmitError(null);
   }, []);
+
+  const handleSubmit = useCallback(async () => {
+    if (!selected || !result || result.hasError) return;
+    const rows = result.rows
+      .filter((r) => r.status !== 'error')
+      .map((r) => ({ rowNumber: r.rowNumber, fields: r.fields, raw: r.raw }));
+    if (rows.length === 0) return;
+    setSubmitting(true);
+    setSubmitError(null);
+    try {
+      const res = await submitBulkCandidates(selected.key, rows);
+      setSubmitResult(res);
+      setConfirmOpen(false);
+    } catch (err) {
+      const e = err as { response?: { data?: { message?: string; error?: string } }; message?: string };
+      setSubmitError(e.response?.data?.message || e.response?.data?.error || e.message || '제출에 실패했습니다.');
+    } finally {
+      setSubmitting(false);
+    }
+  }, [selected, result]);
 
   const handleSelectType = (t: SupplierProductTypeDef) => {
     setSelected(t);
@@ -183,7 +214,12 @@ export default function SupplierBulkRegisterPage() {
             {parseError && <p className="mt-2 text-xs text-red-600">{parseError}</p>}
           </div>
 
-          {result && <BulkPreview result={result} />}
+          {result && (
+            <BulkPreview
+              result={result}
+              onRequestSave={() => { setSubmitError(null); setConfirmOpen(true); }}
+            />
+          )}
 
           {/* 보조 진입 */}
           <div className="flex flex-wrap gap-2 mt-3">
@@ -195,11 +231,136 @@ export default function SupplierBulkRegisterPage() {
             </Link>
           </div>
           <p className="mt-3 text-[11px] text-slate-400">
-            대량 등록 <strong>저장 기능은 유형별 검증 기준을 반영해 준비 중</strong>입니다(BULK-UPLOAD-SAVE-V3). 현재는 업로드 파일의 형식과 오류를 미리 확인할 수 있습니다.
+            제출된 제품은 즉시 확정 등록되지 않고 <strong>운영자 검토용 후보</strong>로 저장됩니다. 운영자 검토 또는 기존 제품 매칭 과정을 거칩니다(BULK-UPLOAD-SAVE-V3).
           </p>
         </div>
       )}
+
+      {/* 저장 전 확인 모달 — WO-O4O-NETURE-SUPPLIER-BULK-UPLOAD-SAVE-V3 */}
+      {confirmOpen && selected && result && (
+        <ConfirmDialog
+          typeLabel={selected.label}
+          isRx={!!selected.rx}
+          isDrug={selected.regulatoryType === 'DRUG'}
+          total={result.totalRows}
+          ok={result.okCount}
+          warning={result.warningCount}
+          error={result.errorCount}
+          submitting={submitting}
+          submitError={submitError}
+          onCancel={() => setConfirmOpen(false)}
+          onConfirm={handleSubmit}
+        />
+      )}
+
+      {/* 저장 결과 모달 */}
+      {submitResult && (
+        <ResultDialog
+          result={submitResult}
+          onClose={() => setSubmitResult(null)}
+          onGoList={() => navigate('/supplier/products')}
+          onContinue={resetUpload}
+        />
+      )}
     </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  저장 전 확인 / 결과 모달                                              */
+/* ------------------------------------------------------------------ */
+
+function ModalShell({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      <div className="w-full max-w-md rounded-xl bg-white p-5 shadow-xl">{children}</div>
+    </div>
+  );
+}
+
+function ConfirmDialog(props: {
+  typeLabel: string; isRx: boolean; isDrug: boolean;
+  total: number; ok: number; warning: number; error: number;
+  submitting: boolean; submitError: string | null;
+  onCancel: () => void; onConfirm: () => void;
+}) {
+  const saveable = props.ok + props.warning;
+  return (
+    <ModalShell>
+      <h3 className="text-base font-semibold text-slate-900 mb-2">제품 후보 제출 확인</h3>
+      <p className="text-xs text-slate-500 leading-relaxed mb-3">
+        대량 등록은 제품을 즉시 확정 등록하지 않습니다. 검증된 제품 후보를 제출하고, <strong>운영자 검토 또는 기존 제품 매칭</strong> 과정을 거칩니다.
+      </p>
+      <div className="rounded-md bg-slate-50 border border-slate-200 p-3 text-sm text-slate-700 space-y-1 mb-3">
+        <div>제품 유형: <strong>{props.typeLabel}</strong></div>
+        <div>제출 대상: <strong>{saveable}건</strong> (정상 {props.ok} · 경고 {props.warning})</div>
+        {props.error > 0 && <div className="text-red-600">오류 {props.error}건은 제출에서 제외됩니다.</div>}
+      </div>
+      {props.isDrug && (
+        <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-md p-2 mb-3">
+          {props.isRx
+            ? '처방의약품은 운영자 검토 대상으로 저장되며, 일반 판매·고객 노출·이벤트·펀딩에 자동 연결되지 않습니다. 유효기간·일련번호·lot·재고 정보는 수집하지 않습니다.'
+            : '의약품은 운영자 검토 대상으로 저장되며, 일반 공급/이벤트/펀딩에 자동 연결되지 않습니다.'}
+        </p>
+      )}
+      {props.submitError && <p className="text-xs text-red-600 mb-2">{props.submitError}</p>}
+      <div className="flex justify-end gap-2">
+        <button onClick={props.onCancel} disabled={props.submitting}
+          className="px-3 py-2 rounded-lg text-sm font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 disabled:opacity-50">
+          취소
+        </button>
+        <button onClick={props.onConfirm} disabled={props.submitting}
+          className="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50">
+          {props.submitting ? '제출 중…' : `${saveable}건 제출`}
+        </button>
+      </div>
+    </ModalShell>
+  );
+}
+
+function ResultDialog(props: {
+  result: BulkCandidateSubmitResult;
+  onClose: () => void; onGoList: () => void; onContinue: () => void;
+}) {
+  const { result } = props;
+  return (
+    <ModalShell>
+      <h3 className="text-base font-semibold text-slate-900 mb-3">제출 결과</h3>
+      <div className="grid grid-cols-2 gap-2 text-sm mb-3">
+        <div className="rounded-md bg-slate-50 border border-slate-200 p-2">전체 <strong>{result.total}</strong></div>
+        <div className="rounded-md bg-emerald-50 border border-emerald-200 p-2 text-emerald-700">생성 <strong>{result.created}</strong></div>
+        <div className="rounded-md bg-amber-50 border border-amber-200 p-2 text-amber-700">중복 가능 <strong>{result.duplicate}</strong></div>
+        <div className="rounded-md bg-red-50 border border-red-200 p-2 text-red-700">실패 <strong>{result.failed}</strong></div>
+      </div>
+      {result.results.some((r) => r.status !== 'created') && (
+        <div className="max-h-40 overflow-y-auto rounded-md border border-slate-200 mb-3">
+          <table className="w-full text-xs">
+            <tbody>
+              {result.results.filter((r) => r.status !== 'created').map((r) => (
+                <tr key={r.rowNumber} className="border-b border-slate-100">
+                  <td className="py-1.5 px-2 text-slate-400">#{r.rowNumber}</td>
+                  <td className="py-1.5 px-2 text-slate-700">{r.status}</td>
+                  <td className="py-1.5 px-2 text-slate-500">{r.message || '-'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+      <p className="text-xs text-slate-500 mb-3">
+        제출된 후보는 운영자 검토 또는 기존 제품 매칭을 거쳐 활용됩니다.
+      </p>
+      <div className="flex justify-end gap-2">
+        <button onClick={props.onContinue}
+          className="px-3 py-2 rounded-lg text-sm font-medium bg-slate-100 text-slate-700 hover:bg-slate-200">
+          대량 등록 계속하기
+        </button>
+        <button onClick={props.onGoList}
+          className="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700">
+          제품 목록으로 이동
+        </button>
+      </div>
+    </ModalShell>
   );
 }
 
@@ -207,7 +368,9 @@ export default function SupplierBulkRegisterPage() {
 /*  미리보기 — WO-O4O-NETURE-SUPPLIER-BULK-UPLOAD-PARSE-V2                */
 /* ------------------------------------------------------------------ */
 
-function BulkPreview({ result }: { result: BulkValidationResult }) {
+function BulkPreview({ result, onRequestSave }: { result: BulkValidationResult; onRequestSave: () => void }) {
+  const saveableCount = result.okCount + result.warningCount;
+  const canSave = !result.hasError && saveableCount > 0;
   return (
     <div className="rounded-lg border border-slate-200 bg-white p-4 mb-3">
       {/* 요약 */}
@@ -285,20 +448,22 @@ function BulkPreview({ result }: { result: BulkValidationResult }) {
         </div>
       )}
 
-      {/* 저장 버튼 — V2 미제공 (저장은 V3) */}
+      {/* 저장(후보 제출) — WO-O4O-NETURE-SUPPLIER-BULK-UPLOAD-SAVE-V3 */}
       <div className="mt-4 flex items-center gap-3">
         <button
           type="button"
-          disabled
-          title="저장 기능은 준비 중입니다 (BULK-UPLOAD-SAVE-V3)"
-          className="px-4 py-2 rounded-lg text-sm font-medium bg-slate-200 text-slate-400 cursor-not-allowed"
+          disabled={!canSave}
+          onClick={onRequestSave}
+          className={`px-4 py-2 rounded-lg text-sm font-medium ${
+            canSave ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+          }`}
         >
-          저장 (준비 중)
+          제품 후보 제출 ({saveableCount}건)
         </button>
         {result.hasError ? (
-          <span className="text-xs text-red-600">오류가 있어 저장할 수 없습니다. 오류를 수정한 뒤 다시 업로드하세요.</span>
+          <span className="text-xs text-red-600">오류가 있어 제출할 수 없습니다. 오류를 수정한 뒤 다시 업로드하세요.</span>
         ) : (
-          <span className="text-xs text-slate-500">검증을 통과했습니다. 저장 연결은 후속(V3)에서 제공됩니다.</span>
+          <span className="text-xs text-slate-500">제출하면 제품을 즉시 확정 등록하지 않고, 운영자 검토용 후보로 저장합니다.</span>
         )}
       </div>
     </div>

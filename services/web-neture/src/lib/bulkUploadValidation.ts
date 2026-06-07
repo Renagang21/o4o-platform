@@ -165,6 +165,10 @@ export interface BulkRowResult {
   price: string;
   status: BulkRowStatus;
   messages: string[];
+  /** WO-..-SAVE-V3: 정규화 필드(표준 한글명 → 값). 저장 payload 빌드용 */
+  fields: Record<string, string>;
+  /** WO-..-SAVE-V3: 원본 헤더 → 값 (서버 재검증·보존용) */
+  raw: Record<string, string>;
 }
 
 export interface BulkValidationResult {
@@ -318,7 +322,20 @@ export function validateBulkCsv(typeKey: string, csvText: string): BulkValidatio
     else if (status === 'warning') warningCount++;
     else errorCount++;
 
-    rows.push({ rowNumber: rows.length + 1, productName, makerOrBrand, sku, code, price, status, messages });
+    // 정규화 필드(표준 한글명 → 값) + 원본(헤더 → 값) — 저장 payload/서버 재검증용
+    const fields: Record<string, string> = {};
+    headerIndex.forEach((idx, canonical) => {
+      const v = (raw[idx] ?? '').trim();
+      if (v) fields[canonical] = v;
+    });
+    const rawMap: Record<string, string> = {};
+    rawHeader.forEach((h, i) => {
+      const key = (h ?? '').trim();
+      const v = (raw[i] ?? '').trim();
+      if (key && v) rawMap[key] = v;
+    });
+
+    rows.push({ rowNumber: rows.length + 1, productName, makerOrBrand, sku, code, price, status, messages, fields, raw: rawMap });
   }
 
   const hasError = headerErrors.length > 0 || errorCount > 0;

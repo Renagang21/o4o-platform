@@ -1155,3 +1155,38 @@ export interface SpotPricePolicy {
   createdAt: string;
   updatedAt: string;
 }
+
+/* ──────────────────────────────────────────────────────────────────────────
+ * WO-O4O-NETURE-SUPPLIER-BULK-UPLOAD-SAVE-V3
+ * 검증 통과 bulk row → ProductCandidate(안전 후보) 제출. ProductMaster 직접 생성 아님.
+ * ────────────────────────────────────────────────────────────────────────── */
+
+export interface BulkCandidateRowInput {
+  rowNumber: number;
+  fields: Record<string, string>;
+  raw: Record<string, string>;
+}
+
+export interface BulkCandidateResultRow {
+  rowNumber: number;
+  status: 'created' | 'duplicate' | 'failed' | 'skipped' | 'review_required';
+  candidateId?: string;
+  message?: string;
+}
+
+export interface BulkCandidateSubmitResult {
+  total: number;
+  created: number;
+  duplicate: number;
+  failed: number;
+  results: BulkCandidateResultRow[];
+}
+
+/** 검증 통과 row 를 안전 후보(ProductCandidate)로 제출. 오류 row 는 호출 전 제외할 것. */
+export async function submitBulkCandidates(
+  productType: string,
+  rows: BulkCandidateRowInput[],
+): Promise<BulkCandidateSubmitResult> {
+  const res = await api.post('/neture/supplier/products/bulk-candidates', { productType, rows });
+  return res.data.data as BulkCandidateSubmitResult;
+}
