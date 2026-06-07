@@ -225,7 +225,11 @@ function handleMutationError(res: Response, error: unknown, op: string): Respons
   if (message.startsWith('INVALID_')) {
     return res.status(400).json({ success: false, error: message });
   }
-  if (message.includes('NOT_LINKABLE') || message.includes('NOT_MATCHED') || message.includes('NOT_REFINABLE') || message.includes('CONFLICT')) {
+  if (
+    message.includes('NOT_LINKABLE') || message.includes('NOT_MATCHED') ||
+    message.includes('NOT_REFINABLE') || message.includes('CONFLICT') ||
+    message.includes('RX_LISTING_BLOCKED') // WO-O4O-NETURE-SUPPLIER-OTC-PHARMACY-SUPPLY-GATE-V1
+  ) {
     return res.status(409).json({ success: false, error: message });
   }
   if (message.startsWith('NOT_IMPLEMENTED')) {

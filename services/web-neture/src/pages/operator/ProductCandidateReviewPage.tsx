@@ -300,8 +300,14 @@ export default function ProductCandidateReviewPage() {
       } else {
         setLinkMessage('연결에 실패했습니다.');
       }
-    } catch {
-      setLinkMessage('연결 중 오류가 발생했습니다.');
+    } catch (e: any) {
+      // WO-O4O-NETURE-SUPPLIER-OTC-PHARMACY-SUPPLY-GATE-V1: Rx 차단 안내
+      const code = e?.response?.data?.error;
+      setLinkMessage(
+        typeof code === 'string' && code.includes('RX_LISTING_BLOCKED')
+          ? '처방의약품은 매장 활용 상품으로 연결할 수 없습니다.'
+          : '연결 중 오류가 발생했습니다.',
+      );
     } finally {
       setActionLoading(false);
     }
@@ -592,6 +598,9 @@ export default function ProductCandidateReviewPage() {
                 </div>
               )}
 
+              {/* WO-O4O-NETURE-SUPPLIER-OTC-PHARMACY-SUPPLY-GATE-V1: 의약품 공급 gate 안내 */}
+              <SupplyGateNotice candidate={detail} />
+
               {/* WO-..-BULK-OPERATOR-REVIEW-V4: 공급자 대량 등록 정보 + CSV row 요약 */}
               <BulkDetailSection candidate={detail} />
 
@@ -792,6 +801,36 @@ function Field({ label, value }: { label: string; value: string | null | undefin
       <dd className="text-slate-700 break-all">{value || <span className="text-slate-300">-</span>}</dd>
     </div>
   );
+}
+
+// ─── WO-O4O-NETURE-SUPPLIER-OTC-PHARMACY-SUPPLY-GATE-V1 ───
+// 의약품 후보(OTC/Rx/미분류) 공급 gate 안내. classification.productTypeClass 기준. 비의약품은 미렌더.
+function SupplyGateNotice({ candidate }: { candidate: ProductCandidate }) {
+  const cls = candidate.classification?.productTypeClass;
+  if (cls === 'otc_drug') {
+    return (
+      <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
+        <strong>비처방 의약품(OTC) 후보입니다.</strong> 일반 매장 공급·이벤트 오퍼·유통참여형 펀딩으로 자동 연결하지 마세요.
+        <strong> 약국 매장 유형 대상 공급 후보로만</strong> 검토하세요. 고객 노출·온라인 판매는 별도 검토 정책이 필요합니다.
+      </div>
+    );
+  }
+  if (cls === 'rx_drug') {
+    return (
+      <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-800">
+        <strong>처방의약품(Rx) 후보입니다.</strong> O4O에서는 제품/유통 정보 단위로만 관리하며, 일반 판매·고객 노출·이벤트 오퍼·유통참여형 펀딩으로 연결하지 않습니다.
+        활용 상품(매장 listing) 연결도 차단됩니다.
+      </div>
+    );
+  }
+  if (cls === 'drug_unspecified') {
+    return (
+      <div className="rounded-lg border border-orange-200 bg-orange-50 p-3 text-xs text-orange-800">
+        <strong>의약품 분류가 필요합니다.</strong> 비처방/처방 여부가 확정되기 전까지 후속 공급 활동을 진행하지 마세요. 아래 "의약품 분류 수정"으로 분류를 확정하세요.
+      </div>
+    );
+  }
+  return null;
 }
 
 // ─── WO-O4O-NETURE-SUPPLIER-BULK-OPERATOR-REVIEW-V4 ───

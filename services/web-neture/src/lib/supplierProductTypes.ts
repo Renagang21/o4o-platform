@@ -144,6 +144,79 @@ export function getAllowedOfferActions(
   return { restricted: false, actions: ['supply', 'recruit', 'event', 'funding'] };
 }
 
+/* ------------------------------------------------------------------ */
+/*  의약품 공급 Gate — WO-O4O-NETURE-SUPPLIER-OTC-PHARMACY-SUPPLY-GATE-V1  */
+/* ------------------------------------------------------------------ */
+
+export type DrugGateCategory = 'non_drug' | 'quasi_drug' | 'otc' | 'rx' | 'drug_unspecified';
+
+export interface DrugSupplyGate {
+  category: DrugGateCategory;
+  /** DRUG(의약품) regulatoryType 여부 */
+  isDrug: boolean;
+  /** 후속 공급 액션(공급/이벤트/펀딩) 차단 여부 — V1: 의약품 전부 차단 유지 */
+  offerActionsBlocked: boolean;
+  /** OTC: 운영자 검토 후 약국 매장 유형 대상 공급 후보 */
+  pharmacyReviewCandidate: boolean;
+  /** 목록 "후속 작업" 칸 짧은 라벨 */
+  shortLabel: string;
+  /** 상세/툴팁 안내 문구 */
+  notice: string;
+}
+
+/**
+ * 제품의 regulatoryType + drugCategory 기준 의약품 공급 gate (표시/정책 판단용).
+ *
+ * V1 정책 (OTC-PHARMACY-SUPPLY-GATE-V1):
+ *  - OTC(비처방) → 운영자 검토 후 "약국 매장 유형 대상 공급 후보". 일반매장/고객노출/이벤트/펀딩 자동 연결 안 함.
+ *  - Rx(처방) → 운영자 검토 전용. 모든 후속 공급 활동 차단.
+ *  - drug_unspecified/미분류 → 분류 필요. 모든 후속 공급 활동 차단.
+ *  - 의약외품/비의약품 → 기존 흐름(액션 허용).
+ *
+ * V1 은 **표시만 세분화**하고 액션은 의약품 전부 계속 차단한다(getAllowedOfferActions 와 정합).
+ */
+export function getDrugSupplyGate(
+  arg?: string | null | { regulatoryType?: string | null; drugCategory?: string | null },
+): DrugSupplyGate {
+  const regulatoryType = typeof arg === 'object' && arg !== null ? arg.regulatoryType : arg;
+  const drugCategory = typeof arg === 'object' && arg !== null ? arg.drugCategory : null;
+  const reg = (regulatoryType || '').trim().toUpperCase();
+  const cat = (drugCategory || '').trim().toLowerCase();
+
+  if (reg === 'DRUG') {
+    if (cat === 'otc') {
+      return {
+        category: 'otc', isDrug: true, offerActionsBlocked: true, pharmacyReviewCandidate: true,
+        shortLabel: '약국 대상 공급 후보 (검토 후)',
+        notice: '비처방 의약품(OTC)은 운영자 검토 후 약국 매장 유형 대상으로만 공급 후보가 됩니다. 일반 매장 공급·고객 노출·이벤트 오퍼·유통참여형 펀딩으로 자동 연결되지 않습니다.',
+      };
+    }
+    if (cat === 'rx') {
+      return {
+        category: 'rx', isDrug: true, offerActionsBlocked: true, pharmacyReviewCandidate: false,
+        shortLabel: '운영자 검토 전용 · 공급 차단',
+        notice: '처방의약품(Rx)은 제품/유통 정보 단위로만 관리하며, 일반 판매·고객 노출·이벤트 오퍼·유통참여형 펀딩으로 연결하지 않습니다. 모든 후속 공급 활동이 차단됩니다.',
+      };
+    }
+    // null / drug_unspecified / 기타
+    return {
+      category: 'drug_unspecified', isDrug: true, offerActionsBlocked: true, pharmacyReviewCandidate: false,
+      shortLabel: '의약품 분류 필요',
+      notice: '의약품 분류가 확정되기 전까지 모든 후속 공급 활동이 차단됩니다. 운영자가 비처방/처방 여부를 확정해야 합니다.',
+    };
+  }
+  if (reg === 'QUASI_DRUG') {
+    return {
+      category: 'quasi_drug', isDrug: false, offerActionsBlocked: false, pharmacyReviewCandidate: false,
+      shortLabel: '', notice: '',
+    };
+  }
+  return {
+    category: 'non_drug', isDrug: false, offerActionsBlocked: false, pharmacyReviewCandidate: false,
+    shortLabel: '', notice: '',
+  };
+}
+
 /**
  * 공급자 목록 표시용 제품 유형 라벨 (regulatoryType + drugCategory 조합).
  * WO-O4O-NETURE-SUPPLIER-PRODUCT-LIST-DRUGCATEGORY-EXPOSURE-V1

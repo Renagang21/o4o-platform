@@ -447,12 +447,23 @@ export class ProductCandidateService {
     if (!input.serviceKey) throw new Error('SERVICE_KEY_REQUIRED');
 
     const masterId = candidate.matchedProductMasterId;
-    const masterRows: Array<{ id: string; name: string | null }> = await this.dataSource.query(
-      `SELECT id, name FROM product_masters WHERE id = $1`,
-      [masterId],
-    );
+    const masterRows: Array<{ id: string; name: string | null; regulatory_type: string | null; drug_category: string | null }> =
+      await this.dataSource.query(
+        `SELECT id, name, regulatory_type, drug_category FROM product_masters WHERE id = $1`,
+        [masterId],
+      );
     if (masterRows.length === 0) throw new Error('PRODUCT_MASTER_NOT_FOUND');
     const masterName = masterRows[0].name;
+
+    // WO-O4O-NETURE-SUPPLIER-OTC-PHARMACY-SUPPLY-GATE-V1:
+    //   처방의약품(Rx)은 매장 활용 상품(listing)으로 연결할 수 없다 (제품/유통 정보 단위로만 관리).
+    //   master regulatory/drugCategory 우선, 없으면 candidate rawPayload 로 분류.
+    const linkClass = classifyProductType({
+      regulatoryType: masterRows[0].regulatory_type,
+      drugCategory: masterRows[0].drug_category,
+      rawPayload: candidate.rawPayload,
+    });
+    if (isRxClassFn(linkClass)) throw new Error('RX_LISTING_BLOCKED');
 
     // ── StoreProductProfile upsert (UNIQUE org+master) ──
     const displayName = input.displayName || candidate.candidateName || masterName || null;

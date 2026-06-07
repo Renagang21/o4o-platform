@@ -26,7 +26,7 @@ import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { supplierApi, productApi, type SupplierProduct, type SupplierProductPurpose } from '../../lib/api';
 import ProductDetailDrawer from './ProductDetailDrawer';
 // WO-O4O-NETURE-SUPPLIER-OFFER-MODE-SELECTION-V1
-import { getAllowedOfferActions, getSupplierProductTypeLabel, SUPPLIER_OFFER_ACTION_META, buildOfferActionUrl, type SupplierOfferAction } from '../../lib/supplierProductTypes';
+import { getAllowedOfferActions, getDrugSupplyGate, getSupplierProductTypeLabel, SUPPLIER_OFFER_ACTION_META, buildOfferActionUrl, type SupplierOfferAction } from '../../lib/supplierProductTypes';
 import MediaPickerModal from '../../components/common/MediaPickerModal';
 import {
   APPROVAL_STATUS_BADGE,
@@ -860,8 +860,18 @@ export default function SupplierProductsPage() {
       render: (_v: any, row: SupplierProduct) => {
         const gate = getAllowedOfferActions({ regulatoryType: row.regulatoryType, drugCategory: row.drugCategory });
         if (gate.restricted) {
-          // 의약품(비처방·처방) → 검토 중심. 자동 공급/이벤트/펀딩 연결 안 함.
-          return <span className="text-xs text-slate-400" title="의약품은 운영자 검토 후 약국 대상 유통 정보 단위로만 관리됩니다.">운영자 검토 대상</span>;
+          // WO-O4O-NETURE-SUPPLIER-OTC-PHARMACY-SUPPLY-GATE-V1:
+          //   의약품 후속작업 표시를 OTC/Rx/미분류로 세분화 (액션은 계속 차단).
+          const drugGate = getDrugSupplyGate({ regulatoryType: row.regulatoryType, drugCategory: row.drugCategory });
+          const cls =
+            drugGate.category === 'otc' ? 'text-amber-600'
+            : drugGate.category === 'rx' ? 'text-red-500'
+            : 'text-orange-500';
+          return (
+            <span className={`text-xs ${cls}`} title={drugGate.notice}>
+              {drugGate.shortLabel || '운영자 검토 대상'}
+            </span>
+          );
         }
         return (
           <select
