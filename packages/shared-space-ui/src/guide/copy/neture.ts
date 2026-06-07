@@ -1597,6 +1597,7 @@ export const netureGuideForOperatorProps: GuideFeatureManualPageProps = {
       { title: '이벤트 오퍼 운영 안내 →', audience: '공통', summary: '이벤트 오퍼를 왜 운영 · 참여하는가 — 유통질서 · 특별 공급 조건 안내서로 이동.', to: '/guide/business/event-offer' },
       { title: '운영자 승인 상품 운영 안내 →', audience: '공통', summary: '새 제품을 운영자가 검토해 참여 매장이 도입하는 구조 — 승인 상품 안내서로 이동.', to: '/guide/business/approved-product' },
       { title: '판매자 모집 운영 안내 →', audience: '공통', summary: '세 주체가 함께 판매 네트워크를 형성하는 이유 · 구조 — 판매자 모집 안내서로 이동.', to: '/guide/business/seller-recruitment' },
+      { title: '유통참여형 펀딩 운영 안내 →', audience: '공통', summary: '출시 전 · 초기 제품의 시장 검증 · 초기 유통망 형성 — 유통참여형 펀딩 안내서로 이동.', to: '/guide/business/market-trial' },
     ],
   },
   sections: [
@@ -3133,6 +3134,197 @@ export const netureGuideBusinessSellerRecruitmentProps: GuideFeatureManualPagePr
         { label: '4. 판매자 모집', detail: '제품을 다룰 매장을 대상 · 조건을 정해 모집합니다.' },
         { label: '5. 운영자 협력', detail: '운영자와 협력해 검토 · 연결 · 지원을 진행합니다.' },
         { label: '6. 참여 매장 확보', detail: '참여 매장을 확보하고 지속적인 관계로 이어갑니다.' },
+      ],
+    },
+  ],
+  bottomNav: {
+    prev: { label: '← 운영자 가이드', to: '/guide/for-operator' },
+    home: { label: '이용 안내로', to: '/guide' },
+  },
+};
+
+// ─── /guide/business/market-trial (유통참여형 펀딩 운영 안내) ────────────
+// WO-O4O-NETURE-BUSINESS-GUIDE-MARKET-TRIAL-V1
+// 일곱 번째 사업 운영 안내서. 출시 전·초기 제품 — 공급자 중심 시장 검증·초기 유통망.
+
+export const netureGuideBusinessMarketTrialProps: GuideFeatureManualPageProps = {
+  hero: {
+    eyebrow: '사업 운영 안내',
+    title: '유통참여형 펀딩 운영 안내',
+    description:
+      '공급자가 새로운 제품을 시장에 소개하고, 초기 참여 매장을 확보하며, 시장 반응을 확인하는 과정을 설명합니다. 펀딩 등록 방법이나 투자 설명이 아닙니다. 이미 출시된 제품을 다루는 다른 안내서와 달리, 유통참여형 펀딩은 출시 전 · 초기 단계 제품을 다루는 공급자 중심 운영 구조입니다.',
+    primaryAction: { label: '운영 참여 검토 신청 →', to: '/o4o/apply' },
+    flowBarTitle: '안내 흐름',
+    flowLabels: ['소개 어려움', '무엇인가', '3주체 목적', '콘텐츠', '모집 · 오퍼 연계', '시작'],
+  },
+  index: {
+    title: '유통참여형 펀딩 운영 한눈에 보기',
+    lead: [
+      '유통참여형 펀딩은 투자 상품이 아니라 공급자 중심의 시장 검증 구조입니다.',
+      '출시 전 · 초기 단계 제품의 시장 반응을 확인하고 초기 참여 매장을 확보합니다.',
+      '핵심은 자금 조달이 아니라 제품의 초기 유통망 형성입니다.',
+    ],
+    cards: [
+      { title: '이 문서의 대상', audience: '공통', summary: '공급자 · 운영자 · 참여 매장.', to: '#audience' },
+      { title: '새 제품 소개는 왜 어려운가', audience: '공급자', summary: '시장 반응 · 초기 판매처 · 정보 전달 · 홍보 비용.', to: '#why-hard' },
+      { title: '유통참여형 펀딩은 무엇인가', audience: '공통', summary: '공급자 중심 시장 검증 · 초기 유통망 — 투자 상품 아님.', to: '#what' },
+      { title: '공급자는 왜 활용하는가', audience: '공급자', summary: '제품 검증 · 초기 매장 · 시장 반응 · 브랜드 소개.', to: '#supplier-why' },
+      { title: '운영자는 왜 참여하는가', audience: '운영자', summary: '공급자 지원 · 매장 연결 · 콘텐츠 · 네트워크 활성화.', to: '#operator-why' },
+      { title: '참여 매장은 왜 참여하는가', audience: '매장', summary: '신규 제품 확인 · 초기 도입 기회 · 운영자 지원.', to: '#store-why' },
+      { title: '콘텐츠와 유통참여형 펀딩', audience: '공통', summary: '신규 제품은 콘텐츠가 특히 중요합니다.', to: '#content' },
+      { title: '유통참여형 펀딩과 판매자 모집', audience: '공통', summary: '초기 판매자 확보 · 판매 네트워크 형성.', to: '#recruit-relation' },
+      { title: '유통참여형 펀딩과 이벤트 오퍼', audience: '공통', summary: '초기 제품과 출시 후 제품 — 서로 다른 구조.', to: '#event-relation' },
+      { title: '실제 운영 흐름', audience: '공통', summary: '공급자 → 유통참여형 펀딩 → 운영자 → 참여 매장 → 소비자.', to: '#flow' },
+      { title: '시작 방법', audience: '공통', summary: '제품 · 콘텐츠 → 운영자 협력 → 매장 모집 → 시장 검증.', to: '#start' },
+    ],
+  },
+  sections: [
+    {
+      id: 'audience',
+      step: '01',
+      title: '이 문서의 대상',
+      description:
+        '이 문서는 새로운 · 초기 단계 제품을 시장에 소개하려는 주체와, 그 초기 유통을 함께 만드는 주체를 위한 것입니다.',
+      items: [
+        { label: '공급자', detail: '제조사 · 수입사 · 브랜드사 · 도매상 등 새 제품을 시장에 소개하려는 사업자.' },
+        { label: '운영자', detail: '공급자를 지원하고 참여 매장을 연결하는 네트워크 운영자.' },
+        { label: '참여 매장', detail: '새 제품을 먼저 확인 · 도입하려는 매장.' },
+      ],
+    },
+    {
+      id: 'why-hard',
+      step: '02',
+      title: '새로운 제품을 시장에 소개하는 것은 왜 어려운가',
+      description:
+        '공급자가 새 제품을 출시할 때는 여러 어려움을 만납니다. 유통참여형 펀딩은 이 문제를 함께 푸는 운영 구조입니다.',
+      items: [
+        { label: '시장 반응 확인', detail: '출시 전에는 제품이 시장에서 어떻게 받아들여질지 알기 어렵습니다.' },
+        { label: '초기 판매처 확보', detail: '아직 검증되지 않은 제품을 다룰 초기 매장을 찾기 어렵습니다.' },
+        { label: '제품 정보 전달', detail: '새 제품일수록 매장 · 소비자에게 설명할 정보 전달이 어렵습니다.' },
+        { label: '콘텐츠 준비', detail: '제품을 설명할 콘텐츠를 처음부터 준비하는 부담이 큽니다.' },
+        { label: '홍보 비용', detail: '초기 홍보 · 영업 비용 부담이 큽니다.' },
+      ],
+    },
+    {
+      id: 'what',
+      step: '03',
+      title: '유통참여형 펀딩은 무엇인가',
+      description:
+        '유통참여형 펀딩은 공급자 중심으로 새 제품의 시장 반응을 확인하고 초기 유통망을 만드는 운영 구조입니다. 투자 수익을 약속하는 금융 상품이 아닙니다.',
+      items: [
+        { label: '공급자 중심 구조', detail: '공급자가 새 제품을 소개하고 초기 유통을 만드는 것을 중심으로 합니다.' },
+        { label: '투자 상품이 아님', detail: '주식 · 배당 · 이자 같은 금융 수익을 약속하지 않습니다. 목적은 자금 조달이 아닙니다.' },
+        { label: '시장 검증 구조', detail: '제품의 시장 반응 · 매장 수요 · 소비자 관심을 확인합니다.' },
+        { label: '초기 유통망 형성', detail: '핵심은 제품이 실제 매장에 처음 도입되는 초기 유통망을 만드는 것입니다.' },
+      ],
+    },
+    {
+      id: 'supplier-why',
+      step: '04',
+      title: '공급자는 왜 활용하는가',
+      description:
+        '공급자에게 유통참여형 펀딩은 새 제품을 검증하고 초기 매장을 확보하는 통로입니다.',
+      items: [
+        { label: '제품 검증', detail: '출시 전 · 초기 제품의 시장성을 검증합니다.' },
+        { label: '초기 매장 확보', detail: '제품을 처음 다룰 초기 참여 매장을 확보합니다.' },
+        { label: '시장 반응 확인', detail: '매장 · 소비자 반응을 확인해 제품 · 전략을 다듬습니다.' },
+        { label: '콘텐츠 활용', detail: '제품 콘텐츠를 함께 제공해 매장 활용 · 소비자 설명을 돕습니다.' },
+        { label: '신규 브랜드 소개', detail: '새 브랜드를 매장 · 소비자에게 소개합니다.' },
+      ],
+    },
+    {
+      id: 'operator-why',
+      step: '05',
+      title: '운영자는 왜 참여하는가',
+      description:
+        '운영자에게 유통참여형 펀딩은 공급자를 지원하고 네트워크를 활성화하는 운영 활동입니다.',
+      items: [
+        { label: '공급자 지원', detail: '공급자의 초기 제품 소개 · 검증을 지원합니다.' },
+        { label: '참여 매장 연결', detail: '제품에 맞는 참여 매장을 연결합니다.' },
+        { label: '콘텐츠 운영', detail: '제품 콘텐츠를 정리 · 제공해 매장 활용을 돕습니다.' },
+        { label: '네트워크 활성화', detail: '새 제품 · 참여 기회로 매장 네트워크를 활성화합니다.' },
+      ],
+    },
+    {
+      id: 'store-why',
+      step: '06',
+      title: '참여 매장은 왜 참여하는가',
+      description:
+        '참여 매장에게 유통참여형 펀딩은 새 제품을 먼저 확인하고 초기에 도입할 기회입니다.',
+      items: [
+        { label: '신규 제품 확인', detail: '새로운 제품을 남보다 먼저 확인합니다.' },
+        { label: '초기 도입 기회', detail: '초기 단계에 제품을 도입할 기회를 얻습니다.' },
+        { label: '제품 정보 확보', detail: '제품 설명 · 자료를 함께 확보합니다.' },
+        { label: '운영자 지원 활용', detail: '운영자의 지원을 받아 도입 · 판매를 진행합니다.' },
+      ],
+    },
+    {
+      id: 'content',
+      step: '07',
+      title: '콘텐츠와 유통참여형 펀딩',
+      description:
+        '신규 제품은 콘텐츠가 특히 중요합니다. 소비자가 처음 보는 제품일수록 설명 · 안내 자료가 있어야 매장이 다루고 소비자가 이해할 수 있습니다.',
+      items: [
+        { label: '제품 설명서', detail: '제품 특징 · 사용법 설명자료.' },
+        { label: '이미지', detail: '매장 안내 · 온라인 · 인쇄용 제품 이미지.' },
+        { label: 'POP', detail: '매장 내 비치 · 부착 안내물.' },
+        { label: 'QR', detail: '제품 · 건강 정보로 연결되는 QR 자료.' },
+        { label: '블로그', detail: '소비자 설명에 쓰는 글 콘텐츠.' },
+        { label: '영상', detail: '제품 소개 · 사용법 영상.' },
+        { label: '교육자료', detail: '직원 · 고객 교육 자료.' },
+        { label: '건강정보 자료', detail: '제품과 관련된 건강 정보 자료.' },
+      ],
+    },
+    {
+      id: 'recruit-relation',
+      step: '08',
+      title: '유통참여형 펀딩과 판매자 모집',
+      description:
+        '유통참여형 펀딩은 판매자 모집과 연결될 수 있습니다. 초기 단계에서 확보한 참여 매장이 판매 네트워크의 출발점이 됩니다.',
+      items: [
+        { label: '신규 제품', detail: '유통참여형 펀딩은 새 제품의 초기 단계를 다룹니다.' },
+        { label: '초기 판매자 확보', detail: '초기 참여 매장이 첫 판매자가 됩니다.' },
+        { label: '판매 네트워크 형성', detail: '초기 매장을 기반으로 판매자 모집으로 네트워크를 넓힐 수 있습니다.' },
+      ],
+    },
+    {
+      id: 'event-relation',
+      step: '09',
+      title: '유통참여형 펀딩과 이벤트 오퍼',
+      description:
+        '유통참여형 펀딩과 이벤트 오퍼는 서로 다른 운영 구조입니다. 다루는 제품 단계가 다릅니다.',
+      items: [
+        { label: '초기 제품', detail: '유통참여형 펀딩은 출시 전 · 초기 단계 제품을 다룹니다.' },
+        { label: '출시 후 제품', detail: '이벤트 오퍼는 이미 출시된 기존 제품을 다룹니다.' },
+        { label: '특별 공급 조건', detail: '검증을 거쳐 출시된 후에는 이벤트 오퍼의 특별 공급 조건으로 이어질 수 있습니다.' },
+      ],
+    },
+    {
+      id: 'flow',
+      step: '10',
+      title: '실제 운영 흐름',
+      description:
+        '실제 운영은 공급자의 유통참여형 펀딩에서 시작해 운영자 · 참여 매장을 거쳐 소비자에게 닿습니다.',
+      items: [
+        { label: '공급자', detail: '새 제품과 콘텐츠 · 조건을 준비해 유통참여형 펀딩을 시작합니다.' },
+        { label: '유통참여형 펀딩', detail: '시장 검증과 초기 유통망 형성을 목적으로 운영합니다.' },
+        { label: '운영자', detail: '공급자를 지원하고 참여 매장을 연결 · 지원합니다.' },
+        { label: '참여 매장', detail: '새 제품을 초기에 확인 · 도입하고 콘텐츠를 활용합니다.' },
+        { label: '소비자', detail: '매장에서 제품 · 건강 정보를 전달받아 이해하고 구매합니다.' },
+      ],
+    },
+    {
+      id: 'start',
+      step: '11',
+      title: '시작 방법',
+      description:
+        '처음 시작할 때는 아래 순서를 따르면 됩니다. 가능한 것부터 시작하면 됩니다.',
+      items: [
+        { label: '1. 제품 준비', detail: '시장에 소개할 새 · 초기 제품과 조건을 준비합니다.' },
+        { label: '2. 콘텐츠 준비', detail: '제품 설명 · 매장 활용 콘텐츠를 준비합니다.' },
+        { label: '3. 운영자 협력', detail: '운영자와 협력해 참여 매장 연결 · 지원을 준비합니다.' },
+        { label: '4. 참여 매장 모집', detail: '제품을 먼저 다룰 초기 참여 매장을 모집합니다.' },
+        { label: '5. 시장 검증', detail: '매장 · 소비자 반응을 확인해 다음 유통 단계로 이어갑니다.' },
       ],
     },
   ],

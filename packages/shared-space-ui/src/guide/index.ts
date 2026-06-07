@@ -108,6 +108,8 @@ export {
   netureGuideBusinessApprovedProductProps,
   // WO-O4O-NETURE-BUSINESS-GUIDE-SELLER-RECRUITMENT-V1
   netureGuideBusinessSellerRecruitmentProps,
+  // WO-O4O-NETURE-BUSINESS-GUIDE-MARKET-TRIAL-V1
+  netureGuideBusinessMarketTrialProps,
 } from './copy/neture.js';
 
 // WO-O4O-CROSSSERVICE-HOME-LATEST-AND-GUIDE-ALIGNMENT-V1
