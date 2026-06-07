@@ -504,6 +504,8 @@ const GuideForSellerPage = lazy(() => import('./pages/guide').then(m => ({ defau
 const GuideBusinessPharmacyNetworkPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideBusinessPharmacyNetworkPage })));
 // WO-O4O-NETURE-BUSINESS-GUIDE-SUPPLIER-NETWORK-V1
 const GuideBusinessSupplierNetworkPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideBusinessSupplierNetworkPage })));
+// WO-O4O-NETURE-BUSINESS-GUIDE-CONTENT-NETWORK-V1
+const GuideBusinessContentNetworkPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideBusinessContentNetworkPage })));
 
 // Loading fallback
 function PageLoading() {
@@ -680,6 +682,8 @@ function App() {
               <Route path="/guide/business/pharmacy-network" element={<GuideBusinessPharmacyNetworkPage />} />
               {/* WO-O4O-NETURE-BUSINESS-GUIDE-SUPPLIER-NETWORK-V1 */}
               <Route path="/guide/business/supplier-network" element={<GuideBusinessSupplierNetworkPage />} />
+              {/* WO-O4O-NETURE-BUSINESS-GUIDE-CONTENT-NETWORK-V1 */}
+              <Route path="/guide/business/content-network" element={<GuideBusinessContentNetworkPage />} />
               <Route path="/guide/intro" element={<GuideIntroPage />} />
               <Route path="/guide/intro/structure" element={<GuideIntroStructurePage />} />
               <Route path="/guide/intro/neture" element={<GuideIntroNeturePage />} />

@@ -28,3 +28,5 @@ export { GuideForSellerPage } from './GuideForSellerPage';
 export { GuideBusinessPharmacyNetworkPage } from './GuideBusinessPharmacyNetworkPage';
 // WO-O4O-NETURE-BUSINESS-GUIDE-SUPPLIER-NETWORK-V1
 export { GuideBusinessSupplierNetworkPage } from './GuideBusinessSupplierNetworkPage';
+// WO-O4O-NETURE-BUSINESS-GUIDE-CONTENT-NETWORK-V1
+export { GuideBusinessContentNetworkPage } from './GuideBusinessContentNetworkPage';
