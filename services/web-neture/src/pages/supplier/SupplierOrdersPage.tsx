@@ -10,7 +10,8 @@
  */
 
 import { useState, useEffect } from 'react';
-import { ShoppingBag, ExternalLink, Info, Users, Clock, Mail, ChevronDown, ChevronUp, Compass } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ShoppingBag, ExternalLink, Info, Users, Clock, Mail, ChevronDown, ChevronUp, Compass, Truck, ArrowRight } from 'lucide-react';
 import { supplierApi, type OrderSummaryResponse, type ServiceSummary } from '../../lib/api';
 
 // WO-O4O-SHARED-PACKAGES-GLUCOSEVIEW-RESIDUE-CLEANUP-V1: glucoseview icon 제거
@@ -120,6 +121,24 @@ export default function SupplierOrdersPage() {
           </div>
         </div>
       </div>
+
+      {/* 주문 처리 workspace 진입 — WO-O4O-NETURE-SUPPLIER-ORDER-WORKSPACE-IA-LINK-V1 */}
+      <Link to="/account/supplier/orders" style={styles.fulfillCard}>
+        <div style={styles.fulfillIcon}>
+          <Truck size={24} style={{ color: '#2563eb' }} />
+        </div>
+        <div style={{ flex: 1 }}>
+          <p style={styles.fulfillTitle}>주문 처리 · 배송 workspace 열기</p>
+          <p style={styles.fulfillText}>
+            Neture 주문의 주문 확인 · 배송 준비 · 송장 등록 · 배송 완료를 처리합니다.
+            <br />
+            <span style={styles.fulfillNote}>
+              이벤트 오퍼 주문은 별도 결제 원장(checkout_orders) 기반으로 관리되어, 통합 표시는 주문 테이블 경계 정리 이후 반영됩니다.
+            </span>
+          </p>
+        </div>
+        <ArrowRight size={20} style={{ color: '#2563eb', flexShrink: 0 }} />
+      </Link>
 
       {/* Service List */}
       {loading ? (
@@ -331,6 +350,45 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#1e40af',
     margin: 0,
     lineHeight: 1.6,
+  },
+  // WO-O4O-NETURE-SUPPLIER-ORDER-WORKSPACE-IA-LINK-V1
+  fulfillCard: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '14px',
+    backgroundColor: '#ffffff',
+    border: '1px solid #bfdbfe',
+    borderRadius: '12px',
+    padding: '18px 22px',
+    marginBottom: '24px',
+    textDecoration: 'none',
+    cursor: 'pointer',
+  },
+  fulfillIcon: {
+    width: '44px',
+    height: '44px',
+    borderRadius: '10px',
+    backgroundColor: '#eff6ff',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  fulfillTitle: {
+    fontSize: '15px',
+    fontWeight: 600,
+    color: '#1e293b',
+    margin: '0 0 4px 0',
+  },
+  fulfillText: {
+    fontSize: '13px',
+    color: '#475569',
+    margin: 0,
+    lineHeight: 1.6,
+  },
+  fulfillNote: {
+    fontSize: '12px',
+    color: '#94a3b8',
   },
   sectionTitle: {
     fontSize: '16px',
