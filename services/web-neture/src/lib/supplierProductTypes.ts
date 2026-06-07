@@ -91,13 +91,45 @@ export const SUPPLIER_OFFER_ACTION_META: Record<SupplierOfferAction, { label: st
  * 한계: 목록 응답에 drugCategory 가 없어 otc/rx/미분류 세분 게이트는 불가
  *       (DRUG 은 모두 검토 중심으로 안전 처리). 세분화는 후속 WO.
  */
-export function getAllowedOfferActions(regulatoryType?: string | null): {
-  restricted: boolean;
-  actions: SupplierOfferAction[];
-} {
+/**
+ * 후속 액션 게이트.
+ * WO-O4O-NETURE-SUPPLIER-OFFER-MODE-SELECTION-V1 (regulatoryType)
+ * WO-O4O-NETURE-SUPPLIER-PRODUCT-LIST-DRUGCATEGORY-EXPOSURE-V1 (drugCategory 수용 — 보수 정책 유지)
+ *
+ * DRUG(의약품: otc/rx/drug_unspecified/미분류) → 검토 중심(restricted). 그 외 → 전체 액션.
+ * drugCategory 는 향후 세분 정책용으로 받되, 본 V1 에서 gate 를 완화하지 않는다.
+ *
+ * 하위호환: 문자열(regulatoryType) 단독 인자도 허용.
+ */
+export function getAllowedOfferActions(
+  arg?: string | null | { regulatoryType?: string | null; drugCategory?: string | null },
+): { restricted: boolean; actions: SupplierOfferAction[] } {
+  const regulatoryType = typeof arg === 'object' && arg !== null ? arg.regulatoryType : arg;
   const reg = (regulatoryType || '').trim().toUpperCase();
   if (reg === 'DRUG') return { restricted: true, actions: [] };
   return { restricted: false, actions: ['supply', 'recruit', 'event', 'funding'] };
+}
+
+/**
+ * 공급자 목록 표시용 제품 유형 라벨 (regulatoryType + drugCategory 조합).
+ * WO-O4O-NETURE-SUPPLIER-PRODUCT-LIST-DRUGCATEGORY-EXPOSURE-V1
+ *
+ * 기타(COSMETIC/HEALTH_FUNCTIONAL/MEDICAL_DEVICE 등)는 null 반환 → 호출처가 기존 라벨로 fallback.
+ */
+export function getSupplierProductTypeLabel(
+  regulatoryType?: string | null,
+  drugCategory?: string | null,
+): string | null {
+  const reg = (regulatoryType || '').trim().toUpperCase();
+  const cat = (drugCategory || '').trim().toLowerCase();
+  if (reg === 'DRUG') {
+    if (cat === 'otc') return '비처방 의약품';
+    if (cat === 'rx') return '처방의약품';
+    return '의약품 분류 필요'; // drug_unspecified 또는 미설정
+  }
+  if (reg === 'QUASI_DRUG') return '의약외품';
+  if (reg === 'GENERAL' || reg === '') return '비의약품';
+  return null; // 기타 → 호출처 fallback
 }
 
 /** 후속 액션 진입 시 선택 상품 context 를 전달하는 query 파라미터 키 (생성 화면이 읽음) */

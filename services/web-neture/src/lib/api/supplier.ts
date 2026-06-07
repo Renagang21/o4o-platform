@@ -111,6 +111,8 @@ export interface SupplierProduct {
   // WO-NETURE-SUPPLIER-EDIT-UI-CONSISTENCY-FIX-V1
   stockQuantity?: number;
   regulatoryType?: string;
+  // WO-O4O-NETURE-SUPPLIER-PRODUCT-LIST-DRUGCATEGORY-EXPOSURE-V1: Product Core drug_category 노출 (additive)
+  drugCategory?: string | null;
   regulatoryName?: string;
   mfdsPermitNumber?: string | null;
   manufacturerName?: string | null;

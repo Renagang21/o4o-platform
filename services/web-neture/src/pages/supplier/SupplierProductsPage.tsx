@@ -26,7 +26,7 @@ import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { supplierApi, productApi, type SupplierProduct, type SupplierProductPurpose } from '../../lib/api';
 import ProductDetailDrawer from './ProductDetailDrawer';
 // WO-O4O-NETURE-SUPPLIER-OFFER-MODE-SELECTION-V1
-import { getAllowedOfferActions, SUPPLIER_OFFER_ACTION_META, buildOfferActionUrl, type SupplierOfferAction } from '../../lib/supplierProductTypes';
+import { getAllowedOfferActions, getSupplierProductTypeLabel, SUPPLIER_OFFER_ACTION_META, buildOfferActionUrl, type SupplierOfferAction } from '../../lib/supplierProductTypes';
 import MediaPickerModal from '../../components/common/MediaPickerModal';
 import {
   APPROVAL_STATUS_BADGE,
@@ -709,12 +709,14 @@ export default function SupplierProductsPage() {
       align: 'center' as const,
       render: (v: any, row: SupplierProduct) => {
         if (!v) return <span className="text-xs text-slate-300">-</span>;
-        const label = REGULATORY_TYPE_LABELS[v] || v;
+        // WO-O4O-NETURE-SUPPLIER-PRODUCT-LIST-DRUGCATEGORY-EXPOSURE-V1: drugCategory 조합 라벨
+        const label = getSupplierProductTypeLabel(v, row.drugCategory) ?? REGULATORY_TYPE_LABELS[v] ?? v;
+        const isDrug = String(v).toUpperCase() === 'DRUG';
         return (
           <button
             onClick={(e) => { e.stopPropagation(); setRegulatoryProduct(row); }}
-            className="text-[10px] px-1.5 py-0.5 rounded bg-violet-50 text-violet-700 hover:bg-violet-100 truncate"
-            title="규제 정보 보기"
+            className={`text-[10px] px-1.5 py-0.5 rounded truncate ${isDrug ? 'bg-amber-50 text-amber-700 hover:bg-amber-100' : 'bg-violet-50 text-violet-700 hover:bg-violet-100'}`}
+            title="규제/분류 정보 보기"
           >
             {label}
           </button>
@@ -856,7 +858,7 @@ export default function SupplierProductsPage() {
       header: '후속 작업',
       width: '160px',
       render: (_v: any, row: SupplierProduct) => {
-        const gate = getAllowedOfferActions(row.regulatoryType);
+        const gate = getAllowedOfferActions({ regulatoryType: row.regulatoryType, drugCategory: row.drugCategory });
         if (gate.restricted) {
           // 의약품(비처방·처방) → 검토 중심. 자동 공급/이벤트/펀딩 연결 안 함.
           return <span className="text-xs text-slate-400" title="의약품은 운영자 검토 후 약국 대상 유통 정보 단위로만 관리됩니다.">운영자 검토 대상</span>;
