@@ -2,32 +2,32 @@
  * Operator Orders Page (Order Management)
  *
  * 세미-프랜차이즈 주문 관리
- * - 약국 B2B 주문 모니터링
- * - 주문 상태 관리
- * - 배송 추적
+ * - 약국 B2B 주문 모니터링 (조회 전용)
  *
  * WO-GLYCOPHARM-ORDERS-API: Real database queries (no mock data)
+ * WO-O4O-OPERATOR-ORDER-MOCK-SURFACE-GUARD-V1:
+ *   미구현 주문 상태 처리(확인/배송/취소/송장) action 및 bulk no-op 제거 → 조회 전용으로 전환.
+ *   목록 조회는 기존 실 client(getOperatorOrders) 유지 — 단 backend 는 E-commerce Core 연동 전
+ *   legacy stub(빈 목록)이므로 "주문 상태 처리 기능 준비 중" 안내를 명시한다.
+ *   상태 처리 기능은 backend operator 주문 상태 API 계약(WO-O4O-OPERATOR-ORDER-API-CONTRACT-V1, 예정) 후 제공.
+ *   IR 근거: IR-O4O-OPERATOR-ORDER-SETTLEMENT-SURFACE-AUDIT-V1 (GP OrdersPage = E + F).
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import {
   ShoppingCart,
   Search,
-  MoreVertical,
   Package,
   Truck,
   CheckCircle,
   Clock,
-  XCircle,
   FileText,
   RefreshCw,
-  Download,
   Calendar,
   Store,
   AlertCircle,
   Loader2,
 } from 'lucide-react';
-import { ActionBar } from '@o4o/ui';
 import { DataTable } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { glycopharmApi, type OperatorOrder, type OperatorOrderStats, type OrderStatus } from '@/api/glycopharm';
@@ -70,9 +70,6 @@ export default function OrdersPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [, setTotalPages] = useState(1);
   const [totalOrders, setTotalOrders] = useState(0);
-  const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [isBulkProcessing] = useState(false);
 
   const itemsPerPage = 10;
 
@@ -128,11 +125,6 @@ export default function OrdersPage() {
     fetchOrders();
   }, [fetchOrders]);
 
-  // Reset selection on tab/filter/search change
-  useEffect(() => {
-    setSelectedIds(new Set());
-  }, [activeTab, dateFilter, searchTerm]);
-
   // Tab counts (based on stats)
   const tabs = [
     { id: 'all' as const, label: '전체', count: totalOrders },
@@ -168,24 +160,29 @@ export default function OrdersPage() {
     <div className="space-y-6">
       <PageHeader
         title="주문 관리"
-        description="약국 B2B 주문 현황 및 처리"
+        description="약국 B2B 주문 현황 (조회 전용)"
         actions={
-          <>
-            <button className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors text-sm">
-              <Download className="w-4 h-4" />
-              내보내기
-            </button>
-            <button
-              onClick={fetchOrders}
-              disabled={isLoading}
-              className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors text-sm disabled:opacity-50"
-            >
-              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-              새로고침
-            </button>
-          </>
+          <button
+            onClick={fetchOrders}
+            disabled={isLoading}
+            className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors text-sm disabled:opacity-50"
+          >
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+            새로고침
+          </button>
         }
       />
+
+      {/* 준비중 안내 — 상태 처리 기능 미구현 (조회 전용) */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start gap-3">
+        <AlertCircle className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+        <div className="flex-1">
+          <p className="text-sm font-medium text-blue-800">주문 상태 처리 기능 준비 중</p>
+          <p className="text-xs text-blue-600 mt-0.5">
+            현재는 주문 조회만 가능합니다. 주문 확인·배송·취소·송장 등 상태 처리 기능은 E-commerce Core 연동 후 제공됩니다.
+          </p>
+        </div>
+      </div>
 
       {/* Error Banner */}
       {error && (
@@ -333,53 +330,7 @@ export default function OrdersPage() {
           </div>
         </div>
 
-        {/* Bulk Actions */}
-        {(() => {
-          const selectedPendingCount = [...selectedIds].filter(id => {
-            const o = orders.find(ord => ord.id === id);
-            return o?.status === 'pending';
-          }).length;
-          const selectedProcessingCount = [...selectedIds].filter(id => {
-            const o = orders.find(ord => ord.id === id);
-            return o?.status === 'processing';
-          }).length;
-          return (
-            <div className="px-4 pt-3">
-              <ActionBar
-                selectedCount={selectedIds.size}
-                onClearSelection={() => setSelectedIds(new Set())}
-                actions={[
-                  ...(selectedPendingCount > 0 ? [{
-                    key: 'confirm',
-                    label: `주문 확인 (${selectedPendingCount})`,
-                    onClick: () => { /* TODO: wire up order status API */ },
-                    variant: 'primary' as const,
-                    icon: <CheckCircle size={14} />,
-                    loading: isBulkProcessing,
-                  }] : []),
-                  ...(selectedProcessingCount > 0 ? [{
-                    key: 'ship',
-                    label: `배송 시작 (${selectedProcessingCount})`,
-                    onClick: () => { /* TODO: wire up order status API */ },
-                    variant: 'primary' as const,
-                    icon: <Truck size={14} />,
-                    loading: isBulkProcessing,
-                  }] : []),
-                  ...(selectedPendingCount > 0 ? [{
-                    key: 'cancel',
-                    label: `주문 취소 (${selectedPendingCount})`,
-                    onClick: () => { /* TODO: wire up order status API */ },
-                    variant: 'danger' as const,
-                    icon: <XCircle size={14} />,
-                    loading: isBulkProcessing,
-                  }] : []),
-                ]}
-              />
-            </div>
-          );
-        })()}
-
-        {/* Table */}
+        {/* Table (조회 전용 — 상태 처리 action 미제공) */}
         {(() => {
           const columns: ListColumnDef<OperatorOrder>[] = [
             {
@@ -450,31 +401,6 @@ export default function OrdersPage() {
                 </div>
               ),
             },
-            {
-              key: 'actions',
-              header: '액션',
-              width: '60px',
-              align: 'right',
-              onCellClick: () => {},
-              render: (_v, o) => (
-                <div className="relative flex justify-end">
-                  <button onClick={() => setSelectedOrder(selectedOrder === o.id ? null : o.id)} className="p-2 rounded-lg hover:bg-slate-100 transition-colors">
-                    <MoreVertical className="w-4 h-4 text-slate-400" />
-                  </button>
-                  {selectedOrder === o.id && (
-                    <>
-                      <div className="fixed inset-0 z-10" onClick={() => setSelectedOrder(null)} />
-                      <div className="absolute right-0 mt-2 w-44 bg-white rounded-lg shadow-lg border py-2 z-20">
-                        {o.status === 'pending' && <button className="w-full px-4 py-2 text-left text-sm text-blue-600 hover:bg-blue-50 flex items-center gap-2"><CheckCircle className="w-4 h-4" />주문 확인</button>}
-                        {o.status === 'processing' && <button className="w-full px-4 py-2 text-left text-sm text-indigo-600 hover:bg-indigo-50 flex items-center gap-2"><Truck className="w-4 h-4" />배송 시작</button>}
-                        <button className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"><FileText className="w-4 h-4" />송장 출력</button>
-                        {['pending', 'confirmed'].includes(o.status) && (<><hr className="my-1" /><button className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"><XCircle className="w-4 h-4" />주문 취소</button></>)}
-                      </div>
-                    </>
-                  )}
-                </div>
-              ),
-            },
           ];
 
           const totalPages = Math.ceil(totalOrders / itemsPerPage);
@@ -487,9 +413,6 @@ export default function OrdersPage() {
                 rowKey="id"
                 loading={isLoading}
                 emptyMessage="자료가 없습니다"
-                selectable
-                selectedKeys={selectedIds}
-                onSelectionChange={setSelectedIds}
               />
               {totalPages > 1 && (
                 <div className="flex items-center justify-between px-4 py-3 border-t border-slate-200">
