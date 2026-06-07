@@ -884,6 +884,15 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Forum Post Cleanup routes:', forumCleanupError);
     }
 
+    // Order Canonical Table Diagnostic endpoint (WO-O4O-ORDER-CANONICAL-TABLE-DIAGNOSTIC-ENDPOINT-V1)
+    try {
+      const { createOrderCanonicalTableDiagnosticRouter } = await import('../routes/debug/order-canonical-table.controller.js');
+      app.use('/__debug__/order-canonical-table', createOrderCanonicalTableDiagnosticRouter(dataSource));
+      logger.info('✅ Order Canonical Table Diagnostic endpoint registered at /__debug__/order-canonical-table');
+    } catch (orderCanonicalDiagError) {
+      logger.error('Failed to register Order Canonical Table Diagnostic routes:', orderCanonicalDiagError);
+    }
+
     // 38. Register Platform Hub routes (WO-PLATFORM-GLOBAL-HUB-V1)
     try {
       const { createPlatformHubController } = await import('../modules/platform/platform-hub.controller.js');
