@@ -495,6 +495,9 @@ const GuideFeatureMarketTrialPage = lazy(() => import('./pages/guide').then(m =>
 const GuideFeaturePartnerProgramPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideFeaturePartnerProgramPage })));
 const GuideFeatureForumResourcesPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideFeatureForumResourcesPage })));
 const GuideFeatureCopilotDashboardPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideFeatureCopilotDashboardPage })));
+// WO-O4O-NETURE-GUIDE-BUSINESS-ACTOR-IA-PHASE1-V1
+const GuideO4OOverviewPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideO4OOverviewPage })));
+const GuideForOperatorPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideForOperatorPage })));
 
 // Loading fallback
 function PageLoading() {
@@ -662,6 +665,9 @@ function App() {
 
               {/* Guide — Neture 공개 이용 가이드 (WO-O4O-NETURE-GUIDE-IA-AND-WRAPPER-PAGES-V1) */}
               <Route path="/guide" element={<GuideHomePage />} />
+              {/* WO-O4O-NETURE-GUIDE-BUSINESS-ACTOR-IA-PHASE1-V1 */}
+              <Route path="/guide/o4o-overview" element={<GuideO4OOverviewPage />} />
+              <Route path="/guide/for-operator" element={<GuideForOperatorPage />} />
               <Route path="/guide/intro" element={<GuideIntroPage />} />
               <Route path="/guide/intro/structure" element={<GuideIntroStructurePage />} />
               <Route path="/guide/intro/neture" element={<GuideIntroNeturePage />} />

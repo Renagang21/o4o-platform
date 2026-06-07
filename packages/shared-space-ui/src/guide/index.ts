@@ -91,6 +91,9 @@ export {
   netureGuideFeaturePartnerProgramProps,
   netureGuideFeatureForumResourcesProps,
   netureGuideFeatureCopilotDashboardProps,
+  // WO-O4O-NETURE-GUIDE-BUSINESS-ACTOR-IA-PHASE1-V1
+  netureGuideO4OOverviewProps,
+  netureGuideForOperatorProps,
 } from './copy/neture.js';
 
 // WO-O4O-CROSSSERVICE-HOME-LATEST-AND-GUIDE-ALIGNMENT-V1

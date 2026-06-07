@@ -19,3 +19,6 @@ export { GuideFeatureMarketTrialPage } from './GuideFeatureMarketTrialPage';
 export { GuideFeaturePartnerProgramPage } from './GuideFeaturePartnerProgramPage';
 export { GuideFeatureForumResourcesPage } from './GuideFeatureForumResourcesPage';
 export { GuideFeatureCopilotDashboardPage } from './GuideFeatureCopilotDashboardPage';
+// WO-O4O-NETURE-GUIDE-BUSINESS-ACTOR-IA-PHASE1-V1
+export { GuideO4OOverviewPage } from './GuideO4OOverviewPage';
+export { GuideForOperatorPage } from './GuideForOperatorPage';

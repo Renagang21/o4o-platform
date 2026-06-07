@@ -11,15 +11,17 @@
  * 안내 기능을 이 허브에서 흡수한다.
  *
  * 포함 항목:
- *   01. Neture 둘러보기
- *   02. 공급자 이용 안내 (역할 설명 + 시작 가이드 + 문의 진입)
- *   03. 파트너 이용 안내 (역할 설명 + 프로그램 가이드 + 문의 진입)
- *   04. 유통참여형 펀딩
- *   05. 상품 등록 & 유통
- *   06. Event Offer
- *   07. Forum & 자료실
- *   08. 공급자 Copilot
- *   09. O4O 플랫폼 소개
+ *   01. O4O 개요 (모든 사업자 공통 입구)          [WO-...-BUSINESS-ACTOR-IA-PHASE1-V1]
+ *   02. Neture 둘러보기
+ *   03. 공급자 이용 안내 (역할 설명 + 시작 가이드 + 문의 진입)
+ *   04. 파트너 이용 안내 (역할 설명 + 프로그램 가이드 + 문의 진입)
+ *   05. 운영자 이용 안내 (매장 네트워크 운영자 가이드)  [WO-...-BUSINESS-ACTOR-IA-PHASE1-V1]
+ *   06. 유통참여형 펀딩
+ *   07. 상품 등록 & 유통
+ *   08. Event Offer
+ *   09. Forum & 자료실
+ *   10. 공급자 Copilot
+ *   11. O4O 플랫폼 소개
  */
 
 import { GuideFeaturesPage as Shared, netureGuideFeaturesProps } from '@o4o/shared-space-ui';
@@ -40,11 +42,19 @@ const homeProps: GuideFeaturesPageProps = {
     description:
       'Neture의 구조와 참여 방법, 기능별 사용 방법을 안내합니다. 공급자 · 파트너 · 유통참여형 펀딩 · 플랫폼 소개까지 아래 항목을 선택해 이동하세요.',
     flowBarTitle: '안내 영역',
-    flowLabels: ['Neture 개요', '공급자', '파트너', '유통 펀딩', '상품', 'Event', 'Forum', 'Copilot', 'O4O 소개'],
+    flowLabels: ['O4O 개요', 'Neture 개요', '공급자', '파트너', '운영자', '유통 펀딩', '상품', 'Event', 'Forum', 'Copilot', 'O4O 소개'],
   },
   groups: [
     {
       step: '01',
+      title: 'O4O 개요',
+      primaryRoute: '/guide/o4o-overview',
+      description: 'O4O는 매장 판매 환경을 만드는 서비스입니다. 모든 사업자가 먼저 읽는 공통 입구.',
+      items: [{ label: 'O4O 개요 보기', route: '/guide/o4o-overview' }],
+      linkTo: '/guide/o4o-overview',
+    },
+    {
+      step: '02',
       title: 'Neture 둘러보기',
       primaryRoute: '/guide/intro',
       description: '공급자 · 운영자 · 매장 구조와 Neture의 역할을 한눈에.',
@@ -52,7 +62,7 @@ const homeProps: GuideFeaturesPageProps = {
       linkTo: '/guide/intro',
     },
     {
-      step: '02',
+      step: '03',
       title: '공급자 이용 안내',
       primaryRoute: '/supplier',
       description:
@@ -65,7 +75,7 @@ const homeProps: GuideFeaturesPageProps = {
       linkTo: '/supplier',
     },
     {
-      step: '03',
+      step: '04',
       title: '파트너 이용 안내',
       primaryRoute: '/partner',
       description:
@@ -78,7 +88,19 @@ const homeProps: GuideFeaturesPageProps = {
       linkTo: '/partner',
     },
     {
-      step: '04',
+      step: '05',
+      title: '운영자 이용 안내',
+      primaryRoute: '/guide/for-operator',
+      description:
+        '운영자는 매장 네트워크를 구성 · 운영하는 사업자입니다. 협동조합 · 협동조합 준비 그룹 · 세미 프랜차이즈 · 전문 네트워크 운영자를 위한 운영 매뉴얼입니다.',
+      items: [
+        { label: '매장 네트워크 운영자 가이드', route: '/guide/for-operator' },
+        { label: '운영 참여 검토 신청', route: '/o4o/apply' },
+      ],
+      linkTo: '/guide/for-operator',
+    },
+    {
+      step: '06',
       title: '유통참여형 펀딩',
       primaryRoute: '/guide/features/market-trial',
       description: '유통참여형 펀딩 — 오프라인 실행 시나리오 포함 펀딩. 모집 · 진행 · 정산 흐름.',
@@ -89,7 +111,7 @@ const homeProps: GuideFeaturesPageProps = {
       linkTo: '/guide/features/market-trial',
     },
     {
-      step: '05',
+      step: '07',
       title: '상품 등록 & 유통',
       primaryRoute: '/guide/features/product-registration',
       description: '바코드 기반 상품 등록 · 가격 등급 설정 · 유통 범위 선택.',
@@ -97,7 +119,7 @@ const homeProps: GuideFeaturesPageProps = {
       linkTo: '/guide/features/product-registration',
     },
     {
-      step: '06',
+      step: '08',
       title: 'Event Offer 제안하기',
       primaryRoute: '/guide/features/event-offer',
       description: '이벤트 오퍼 다중 서비스 동시 제안.',
@@ -105,7 +127,7 @@ const homeProps: GuideFeaturesPageProps = {
       linkTo: '/guide/features/event-offer',
     },
     {
-      step: '07',
+      step: '09',
       title: 'Forum & 자료실',
       primaryRoute: '/guide/features/forum-resources',
       description: '커뮤니티와 자료실 활용 방법.',
@@ -113,7 +135,7 @@ const homeProps: GuideFeaturesPageProps = {
       linkTo: '/guide/features/forum-resources',
     },
     {
-      step: '08',
+      step: '10',
       title: '공급자 Copilot',
       primaryRoute: '/guide/features/copilot-dashboard',
       description: 'KPI 확인 · 운영 요약 · 추천 액션.',
@@ -121,7 +143,7 @@ const homeProps: GuideFeaturesPageProps = {
       linkTo: '/guide/features/copilot-dashboard',
     },
     {
-      step: '09',
+      step: '11',
       title: 'O4O 플랫폼 소개',
       primaryRoute: '/o4o',
       description: 'O4O(Online for Offline) 플랫폼의 개념 · 구조 · 업종별 활용 방법.',
