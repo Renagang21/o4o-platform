@@ -9,8 +9,27 @@
  */
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { AlertTriangle, Upload, FileSpreadsheet } from 'lucide-react';
-import { SUPPLIER_PRODUCT_TYPES, type SupplierProductTypeDef } from '../../lib/supplierProductTypes';
+import { AlertTriangle, Upload, FileSpreadsheet, Download } from 'lucide-react';
+import {
+  SUPPLIER_PRODUCT_TYPES,
+  getBulkTemplateColumns,
+  buildBulkTemplateCsv,
+  type SupplierProductTypeDef,
+} from '../../lib/supplierProductTypes';
+
+/** 유형별 CSV 템플릿(헤더만) 다운로드 — 백엔드 없이 클라이언트 생성 */
+function downloadTemplate(t: SupplierProductTypeDef) {
+  const csv = buildBulkTemplateCsv(t.key);
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `bulk-template_${t.key}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
 
 export default function SupplierBulkRegisterPage() {
   const [searchParams] = useSearchParams();
@@ -66,17 +85,42 @@ export default function SupplierBulkRegisterPage() {
         <div className="rounded-lg border border-slate-200 bg-white p-5">
           <h2 className="font-semibold text-slate-800 mb-2">{selected.label} — 대량 등록</h2>
           <ul className="text-sm text-slate-600 space-y-1.5 mb-4 list-disc pl-5">
-            <li>이 유형 전용 템플릿(컬럼 구성)은 준비 중입니다. 현재는 공통 CSV/엑셀 업로드를 사용합니다.</li>
+            <li>아래 <strong>{selected.label} 전용 템플릿</strong>을 받아 작성한 뒤 업로드하세요.</li>
             <li>업로드 파일에는 <strong>{selected.label}만</strong> 포함하세요 (다른 유형 혼합 금지).</li>
             {selected.pharmacyTarget && <li>약국 대상 의약품류는 업로드 후 <strong>운영자 검토</strong>를 거쳐 공개됩니다.</li>}
-            {selected.rx && <li>처방의약품은 유통 정보화 범위로만 등록되며 일반 공급오퍼/이벤트/펀딩에 자동 연결되지 않습니다.</li>}
+            {selected.rx && (
+              <li>
+                처방의약품은 <strong>유통 정보화 범위(제품/유통 단위)</strong>로만 등록됩니다 —
+                유효기간·일련번호(lot/serial)·재고 이력 컬럼은 템플릿에 없으며 입력받지 않습니다.
+                일반 공급오퍼/이벤트/펀딩에 자동 연결되지 않습니다.
+              </li>
+            )}
           </ul>
+
+          {/* 유형별 템플릿 컬럼 + 다운로드 */}
+          <div className="rounded-md border border-slate-200 bg-slate-50 p-3 mb-4">
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <span className="text-xs font-semibold text-slate-600">{selected.label} 템플릿 컬럼</span>
+              <button
+                onClick={() => downloadTemplate(selected)}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-medium hover:bg-emerald-700"
+              >
+                <Download className="w-3.5 h-3.5" /> CSV 템플릿 다운로드
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-1">
+              {getBulkTemplateColumns(selected.key).map((col) => (
+                <span key={col} className="text-[11px] px-1.5 py-0.5 rounded bg-white border border-slate-200 text-slate-600">{col}</span>
+              ))}
+            </div>
+          </div>
+
           <div className="flex flex-wrap gap-2">
             <Link
               to="/supplier/csv-import"
               className="inline-flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700"
             >
-              <Upload className="w-4 h-4" /> CSV/엑셀 업로드로 이동
+              <Upload className="w-4 h-4" /> 작성한 파일 업로드로 이동
             </Link>
             <Link
               to="/supplier/products/import-assistant"
@@ -86,7 +130,7 @@ export default function SupplierBulkRegisterPage() {
             </Link>
           </div>
           <p className="mt-3 text-[11px] text-slate-400">
-            유형별 전용 템플릿·검증은 후속 단계에서 제공됩니다 (WO-O4O-NETURE-SUPPLIER-BULK-UPLOAD-TEMPLATE-V1).
+            템플릿은 헤더(컬럼) 기준입니다. 유형별 전용 파서·검증·저장은 후속 단계에서 제공됩니다 (V2).
           </p>
         </div>
       )}

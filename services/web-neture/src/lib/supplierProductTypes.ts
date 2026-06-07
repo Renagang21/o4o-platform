@@ -69,6 +69,40 @@ export function getSupplierProductType(key: string | null | undefined): Supplier
 }
 
 /* ------------------------------------------------------------------ */
+/*  유형별 대량 등록 CSV 템플릿 — WO-O4O-NETURE-SUPPLIER-BULK-UPLOAD-TEMPLATE-V1  */
+/* ------------------------------------------------------------------ */
+
+/**
+ * 유형별 CSV 템플릿 헤더 컬럼.
+ *
+ * 처방의약품(rx)에는 lot/유효기간/일련번호/재고 이력 컬럼을 넣지 않는다 —
+ * O4O는 유통 정보화 플랫폼으로 처방의약품도 제품/유통 단위로만 다룬다.
+ */
+export const SUPPLIER_BULK_TEMPLATE_COLUMNS: Record<SupplierProductTypeDef['key'], string[]> = {
+  non_drug: ['제품명', '브랜드', '제조사', '공급자상품코드', '바코드', '규격', '단위', '기본공급가', '제품설명', '이미지URL'],
+  quasi_drug: ['제품명', '브랜드', '제조사', '공급자상품코드', '바코드또는표준코드', '품목신고번호', '규격', '단위', '기본공급가', '제품설명', '이미지URL'],
+  otc_drug: ['제품명', '제조사', '공급자상품코드', '의약품표준코드', '보험코드', '포장단위', '성분명', '함량', '제형', '기본공급가', '약국대상여부'],
+  // 처방의약품: lot/유효기간/일련번호/재고 컬럼 없음 (유통 정보화 범위)
+  rx_drug: ['제품명', '제조사', '공급자상품코드', '의약품표준코드', '보험코드', '포장단위', '성분명', '함량', '제형', '기본공급가', '공급메모'],
+  unclassified: ['제품명', '브랜드', '제조사', '공급자상품코드', '바코드', '기본공급가', '비고'],
+};
+
+/** O4O 유통 정보화 범위상 대량 등록 템플릿에서 절대 받지 않는 컬럼(특히 처방의약품) */
+export const SUPPLIER_BULK_EXCLUDED_COLUMNS = ['lot', 'lot_no', 'expiry_date', '유효기간', 'serial_number', '일련번호', 'warehouse_location', '재고', 'traceability_status'];
+
+export function getBulkTemplateColumns(key: string | null | undefined): string[] {
+  const def = getSupplierProductType(key);
+  return def ? SUPPLIER_BULK_TEMPLATE_COLUMNS[def.key] : [];
+}
+
+/** 헤더만 담은 CSV 문자열 생성 (UTF-8 BOM 포함 — Excel 한글 호환) */
+export function buildBulkTemplateCsv(key: string): string {
+  const cols = getBulkTemplateColumns(key);
+  const header = cols.map((c) => (/[",\n]/.test(c) ? `"${c.replace(/"/g, '""')}"` : c)).join(',');
+  return `﻿${header}\r\n`;
+}
+
+/* ------------------------------------------------------------------ */
 /*  제품 활용(후속 공급활동) 액션 — WO-O4O-NETURE-SUPPLIER-OFFER-MODE-SELECTION-V1  */
 /* ------------------------------------------------------------------ */
 
