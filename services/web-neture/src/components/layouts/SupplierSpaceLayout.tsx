@@ -57,13 +57,16 @@ const SUPPLIER_SIDEBAR_GROUPS: SidebarGroup[] = [
   {
     label: '제품 관리',
     icon: Package,
+    // WO-O4O-NETURE-SUPPLIER-MENU-ASSISTANT-IA-CLEANUP-V1: IA 권장안 D 정렬.
+    //   상품 등록 도우미→등록 도우미, B2B 콘텐츠→제품 콘텐츠 관리.
+    //   CSV Import 는 독립 주요 메뉴에서 제거(대량 등록으로 흡수) — 라우트 /supplier/csv-import 는
+    //   보존(직접 접근 시 안전 안내+대량 등록 CTA). 메뉴 진입점만 제거.
     items: [
       { label: '제품 목록', path: '/supplier/products' },
       { label: '제품 등록', path: '/supplier/products/register' },
       { label: '대량 등록', path: '/supplier/products/bulk' },
-      { label: '상품 등록 도우미', path: '/supplier/products/import-assistant' },
-      { label: 'CSV Import', path: '/supplier/csv-import' },
-      { label: 'B2B 콘텐츠', path: '/supplier/b2b-content' },
+      { label: '등록 도우미', path: '/supplier/products/import-assistant' },
+      { label: '제품 콘텐츠 관리', path: '/supplier/b2b-content' },
     ],
   },
   {

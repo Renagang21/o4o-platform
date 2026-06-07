@@ -11,6 +11,7 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom'; // WO-O4O-NETURE-SUPPLIER-MENU-ASSISTANT-IA-CLEANUP-V1
 import { csvImportApi, type CsvBatch, type CsvBatchDetail, type CsvBatchRow, computeBatchQuality, QUALITY_WARNING_LABELS, countBatchSuggestions, SUGGESTION_FIELD_LABELS } from '../../lib/api/csvImport';
 import EditImportRowDrawer from '../../components/import/EditImportRowDrawer';
 
@@ -428,7 +429,20 @@ export default function SupplierCsvImportPage() {
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">상품 일괄 등록</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-3">상품 일괄 등록</h1>
+
+      {/* WO-O4O-NETURE-SUPPLIER-MENU-ASSISTANT-IA-CLEANUP-V1: legacy 안전 안내 + 대량 등록 유도 */}
+      <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+        <p className="font-medium">이 CSV Import 는 기존(공통) 등록 방식입니다.</p>
+        <p className="mt-1 text-amber-700">
+          제품 유형별 분리와 의약품 안전 검증을 위해 앞으로는 <strong>대량 등록</strong> 메뉴를 사용해 주세요.
+          비의약품·의약외품·비처방 의약품·처방의약품은 <strong>각각 다른 템플릿</strong>으로 등록해야 하며,
+          <strong> 의약품·처방의약품 등록에는 이 화면을 사용하지 마세요.</strong>
+        </p>
+        <Link to="/supplier/products/bulk" className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-700">
+          유형별 대량 등록으로 이동 →
+        </Link>
+      </div>
 
       {/* ═══ Section 1: Template Download ═══ */}
       <section className="bg-white border border-gray-200 rounded-xl p-6 mb-6">

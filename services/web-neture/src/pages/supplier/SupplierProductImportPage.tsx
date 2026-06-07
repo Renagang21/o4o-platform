@@ -12,6 +12,8 @@ import { RichTextEditor } from '@o4o/content-editor';
 import { parseProductHtml } from '../../lib/product-import/parser';
 import { saveDraft } from '../../lib/product-import/storage';
 import type { ParsedProductData, ImportDraft } from '../../lib/product-import/types';
+// WO-O4O-NETURE-SUPPLIER-MENU-ASSISTANT-IA-CLEANUP-V1
+import { SUPPLIER_PRODUCT_TYPES, type SupplierProductTypeDef } from '../../lib/supplierProductTypes';
 import { productApi, type CategoryTreeItem } from '../../lib/api';
 
 /* ------------------------------------------------------------------ */
@@ -90,6 +92,8 @@ export default function SupplierProductImportPage() {
   const [o4oIsPublic, setO4oIsPublic] = useState(false);
   const [o4oServiceKeys, setO4oServiceKeys] = useState<string[]>([]);
   const [o4oRegulatoryType, setO4oRegulatoryType] = useState('GENERAL');
+  // WO-O4O-NETURE-SUPPLIER-MENU-ASSISTANT-IA-CLEANUP-V1: 분석 전 제품 유형 선택
+  const [productType, setProductType] = useState<SupplierProductTypeDef | null>(null);
 
   useEffect(() => {
     productApi.getCategories().then(setCategories);
@@ -174,11 +178,15 @@ export default function SupplierProductImportPage() {
       priceGeneral: o4oPriceGeneral || undefined,
       isPublic: o4oIsPublic,
       serviceKeys: o4oServiceKeys.length > 0 ? o4oServiceKeys : undefined,
-      regulatoryType: o4oRegulatoryType !== 'GENERAL' ? o4oRegulatoryType : undefined,
+      // WO-O4O-NETURE-SUPPLIER-MENU-ASSISTANT-IA-CLEANUP-V1: 선택 유형 우선, 없으면 기존 설정
+      regulatoryType:
+        (productType?.regulatoryType || undefined) ??
+        (o4oRegulatoryType !== 'GENERAL' ? o4oRegulatoryType : undefined),
     };
 
     saveDraft(draft);
-    navigate('/supplier/products/new');
+    // 선택 유형을 정식 wizard 로 전달(유형-우선 IA 정합)
+    navigate(productType ? `/supplier/products/new?productType=${productType.key}` : '/supplier/products/new');
   }, [
     parsed,
     name,
@@ -199,6 +207,7 @@ export default function SupplierProductImportPage() {
     o4oIsPublic,
     o4oServiceKeys,
     o4oRegulatoryType,
+    productType,
   ]);
 
   /* ---------------------------------------------------------------- */
@@ -328,19 +337,55 @@ export default function SupplierProductImportPage() {
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-xl font-bold text-slate-900">
-          상품 등록 도우미
+          등록 도우미
         </h1>
+        {/* WO-O4O-NETURE-SUPPLIER-MENU-ASSISTANT-IA-CLEANUP-V1: 보조 기능 안내(자동 등록 아님) */}
+        <div className="mt-2 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600">
+          등록 도우미는 제품을 <strong>자동 등록하는 기능이 아닙니다.</strong> 외부 상품 페이지·HTML·기존 설명에서
+          제품명·브랜드·설명·이미지 후보를 추출해 <strong>정식 제품 등록 Wizard 입력을 돕는 보조 기능</strong>입니다.
+          최종 제출 전에는 반드시 내용을 확인하세요.
+        </div>
         <div className="mt-2">
           <strong className="text-sm text-slate-700">사용 방법</strong>
           <ol className="mt-1 ml-4 list-decimal text-sm text-slate-500 space-y-0.5">
-            <li>외부 쇼핑몰 상품 페이지를 엽니다</li>
-            <li>Ctrl+A → Ctrl+C 로 전체 복사합니다</li>
-            <li>아래에 붙여넣고 [분석하기]를 클릭합니다</li>
+            <li>제품 유형을 먼저 선택합니다</li>
+            <li>외부 상품 페이지를 Ctrl+A → Ctrl+C 로 복사합니다</li>
+            <li>아래에 붙여넣고 [분석하기] → 확인 후 [정식 등록으로 계속]</li>
           </ol>
-          <p className="mt-2 text-sm text-slate-400">
-            외부 상품 정보를 기반으로 빠르게 등록할 수 있습니다
-          </p>
         </div>
+      </div>
+
+      {/* WO-O4O-NETURE-SUPPLIER-MENU-ASSISTANT-IA-CLEANUP-V1: 제품 유형 선택(분석 전) + 유형별 경고 */}
+      <div className="mb-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <h2 className="mb-1 text-base font-semibold text-slate-800">제품 유형 선택</h2>
+        <p className="mb-3 text-xs text-slate-500">유형에 따라 검토 절차와 안내가 달라집니다. 정식 등록 화면으로 그대로 이어집니다.</p>
+        <div className="grid sm:grid-cols-2 gap-2">
+          {SUPPLIER_PRODUCT_TYPES.map((t) => {
+            const active = productType?.key === t.key;
+            return (
+              <button
+                key={t.key}
+                onClick={() => setProductType(t)}
+                className={`text-left rounded-lg border p-3 transition-colors ${active ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-300' : 'border-slate-200 hover:border-slate-300'}`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-slate-800">{t.label}</span>
+                  {t.pharmacyTarget && <span className="text-[11px] px-1.5 py-0.5 rounded bg-amber-50 text-amber-700">약국 대상</span>}
+                </div>
+                <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{t.desc}</p>
+              </button>
+            );
+          })}
+        </div>
+        {productType && (
+          <div className={`mt-3 rounded-md border px-3 py-2 text-xs ${productType.rx ? 'border-amber-300 bg-amber-50 text-amber-800' : productType.pharmacyTarget ? 'border-blue-200 bg-blue-50 text-blue-800' : 'border-slate-200 bg-slate-50 text-slate-600'}`}>
+            {productType.key === 'non_drug' && '일반 매장·약국 매장 유형에 공급 가능한 일반 제품입니다.'}
+            {productType.key === 'quasi_drug' && '의약외품은 등록 후 운영자 검토가 필요할 수 있습니다. 효능·효과/신고·허가 문구는 제출 전 확인하세요.'}
+            {productType.key === 'otc_drug' && '비처방 의약품은 약국 매장 유형 중심으로 검토되며, 운영자 검토 전까지 일반 공급 활동으로 자동 연결되지 않습니다.'}
+            {productType.key === 'rx_drug' && '처방의약품은 일반 판매·고객 노출·이벤트 오퍼·유통참여형 펀딩으로 자동 연결되지 않습니다. O4O는 처방의약품을 제품/유통 정보 단위로만 다루며 유효기간·일련번호·lot 정보를 수집하지 않습니다.'}
+            {productType.key === 'unclassified' && '유형이 확실하지 않으면 운영자 검토 대상으로 초안을 생성합니다. 검토 전까지 후속 공급 활동으로 자동 연결되지 않습니다.'}
+          </div>
+        )}
       </div>
 
       {/* Input Card */}
