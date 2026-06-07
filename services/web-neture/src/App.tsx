@@ -216,6 +216,10 @@ const SupplierRequestCategoryPage = lazy(() =>
 
 // Supplier Product Create
 const SupplierProductCreatePage = lazy(() => import('./pages/supplier/SupplierProductCreatePage'));
+// WO-O4O-NETURE-SUPPLIER-PRODUCT-REGISTRATION-IA-V1
+const SupplierProductRegisterEntryPage = lazy(() => import('./pages/supplier/SupplierProductRegisterEntryPage'));
+const SupplierBulkRegisterPage = lazy(() => import('./pages/supplier/SupplierBulkRegisterPage'));
+const SupplierSupplyOffersPage = lazy(() => import('./pages/supplier/SupplierSupplyOffersPage'));
 
 // WO-O4O-PRODUCT-IMPORT-ASSISTANT-V1: Import Assistant
 const SupplierProductImportPage = lazy(() => import('./pages/supplier/SupplierProductImportPage'));
@@ -722,6 +726,10 @@ function App() {
               <Route path="/supplier/products/library" element={<SupplierProductLibraryPage />} />
               <Route path="/supplier/products/import-assistant" element={<SupplierProductImportPage />} />
               <Route path="/supplier/products/new" element={<SupplierProductCreatePage />} />
+              {/* WO-O4O-NETURE-SUPPLIER-PRODUCT-REGISTRATION-IA-V1 */}
+              <Route path="/supplier/products/register" element={<SupplierProductRegisterEntryPage />} />
+              <Route path="/supplier/products/bulk" element={<SupplierBulkRegisterPage />} />
+              <Route path="/supplier/supply-offers" element={<SupplierSupplyOffersPage />} />
               <Route path="/supplier/orders" element={<SupplierOrdersPage />} />
               <Route path="/supplier/library" element={<SupplierLibraryPage />} />
               <Route path="/supplier/library/new" element={<SupplierLibraryFormPage />} />

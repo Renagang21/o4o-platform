@@ -94,7 +94,8 @@ export default function SupplierProductCreatePage() {
     priceGeneral: importDraft?.priceGeneral ?? '',
     consumerReferencePrice: importDraft?.consumerReferencePrice ?? '',
     stockQty: '',
-    regulatoryType: importDraft?.regulatoryType ?? 'GENERAL',
+    // WO-O4O-NETURE-SUPPLIER-PRODUCT-REGISTRATION-IA-V1: 등록 진입에서 선택한 유형 prefill
+    regulatoryType: importDraft?.regulatoryType ?? searchParams.get('regulatoryType') ?? 'GENERAL',
     regulatoryName: '',
     mfdsPermitNumber: '',
     specification: importDraft?.specification ?? '',

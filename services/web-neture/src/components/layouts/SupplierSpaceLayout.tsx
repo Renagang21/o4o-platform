@@ -19,6 +19,9 @@ import {
   FlaskConical,
   CreditCard,
   MessageSquare,
+  Boxes,
+  Tag,
+  Settings,
   ChevronRight,
   ChevronDown,
 } from 'lucide-react';
@@ -41,6 +44,10 @@ export type SupplierSpaceOutletContext = {
 type SidebarItem = { label: string; path: string; exact?: boolean };
 type SidebarGroup = { label: string; icon: LucideIcon; items: SidebarItem[] };
 
+// WO-O4O-NETURE-SUPPLIER-PRODUCT-REGISTRATION-IA-V1:
+//   제품 관리 / 공급 오퍼 / 유통참여형 펀딩 / 이벤트 오퍼 / 주문·배송 / 설정 으로 IA 재구성.
+//   - 제품 등록은 유형-우선 진입(/supplier/products/register) 으로 통일.
+//   - 모든 항목은 실제 라우트로 연결 (데드링크 0). 기존 실기능 메뉴(Finance/Community) 유지.
 const SUPPLIER_SIDEBAR_GROUPS: SidebarGroup[] = [
   {
     label: 'Overview',
@@ -48,29 +55,49 @@ const SUPPLIER_SIDEBAR_GROUPS: SidebarGroup[] = [
     items: [{ label: 'Dashboard', path: '/supplier/dashboard', exact: true }],
   },
   {
-    label: 'Products',
+    label: '제품 관리',
     icon: Package,
     items: [
-      { label: '상품 관리', path: '/supplier/products' },
+      { label: '제품 목록', path: '/supplier/products' },
+      { label: '제품 등록', path: '/supplier/products/register' },
+      { label: '대량 등록', path: '/supplier/products/bulk' },
       { label: '상품 등록 도우미', path: '/supplier/products/import-assistant' },
       { label: 'CSV Import', path: '/supplier/csv-import' },
       { label: 'B2B 콘텐츠', path: '/supplier/b2b-content' },
     ],
   },
   {
-    label: 'Orders',
-    icon: ShoppingCart,
-    items: [{ label: '주문 현황', path: '/supplier/orders' }],
+    label: '공급 오퍼',
+    icon: Boxes,
+    items: [{ label: '공급 오퍼', path: '/supplier/supply-offers' }],
   },
   {
     label: '유통참여형 펀딩',
     icon: FlaskConical,
-    items: [{ label: '유통참여형 펀딩', path: '/supplier/market-trial' }],
+    items: [
+      { label: '펀딩 목록', path: '/supplier/market-trial' },
+      { label: '새 펀딩 개설', path: '/supplier/market-trial/new' },
+    ],
+  },
+  {
+    label: '이벤트 오퍼',
+    icon: Tag,
+    items: [{ label: '이벤트 오퍼', path: '/supplier/event-offers' }],
+  },
+  {
+    label: '주문·배송',
+    icon: ShoppingCart,
+    items: [{ label: '주문 현황', path: '/supplier/orders' }],
   },
   {
     label: 'Finance',
     icon: CreditCard,
     items: [{ label: 'Partner Commissions', path: '/supplier/partner-commissions' }],
+  },
+  {
+    label: '설정',
+    icon: Settings,
+    items: [{ label: '공급자 정보', path: '/mypage/business-profile' }],
   },
   // WO-O4O-SUPPLIER-CONTENT-PRODUCER-UI-CLEANUP-V1 (2026-05-23):
   //   "Content > Library" 메뉴 제거. 공급자는 O4O 내부 Producer 가 아니다 —
