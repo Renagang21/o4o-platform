@@ -1590,6 +1590,7 @@ export const netureGuideForOperatorProps: GuideFeatureManualPageProps = {
       { title: '콘텐츠 운영의 현실', audience: '공통', summary: '좋은 콘텐츠는 공급자가 보유한 경우가 많고, 운영자는 이를 확보 · 정리해 제공합니다.', to: '#content-reality' },
       { title: '판매자 모집', audience: '공통', summary: '제품을 다룰 매장을 모집해 운영 기반을 만듭니다.', to: '#recruit' },
       { title: '주문 · 배송 · 정산', audience: '공통', summary: '주문에서 정산까지의 흐름과 운영자 역할입니다.', to: '#settlement' },
+      { title: '서비스 운영자의 자체 제품 운영', audience: '운영자', summary: '자체 제품 기획 — 공급 · 배송은 직접 또는 협력 공급업체.', to: '#own-product' },
       { title: '서비스 운영 사업자 형태 예시', audience: '공통', summary: '판매자 기반 · 공급자 기반 운영자 형태 예시.', to: '#examples' },
       { title: 'Business Guide (사업 운영 안내) →', audience: '공통', summary: '약국 · 공급자 네트워크 · 콘텐츠 · 이벤트 오퍼 · 승인 상품 · 판매자 모집 · 유통참여형 펀딩 — 7개 사업 운영 안내서 모음으로 이동.', to: '/guide/business' },
     ],
@@ -1759,8 +1760,22 @@ export const netureGuideForOperatorProps: GuideFeatureManualPageProps = {
       ],
     },
     {
-      id: 'examples',
+      id: 'own-product',
       step: '13',
+      title: '서비스 운영자의 자체 제품 운영',
+      description:
+        '운영자는 외부 공급자의 제품을 소개하는 데만 머물지 않습니다. 참여 매장의 니드와 판매 현장의 의견을 바탕으로 자체 제품을 기획할 수 있고, 공급 · 배송은 직접 하거나 협력 공급업체에 맡길 수 있습니다. 이 점에서 운영자는 물류 없는 세미 프랜차이즈 성격을 가질 수 있습니다.',
+      items: [
+        { label: '자체 제품 기획', detail: '참여 매장의 니드 · 소비자 반응 · 현장 의견을 바탕으로 네트워크 전용 제품을 기획할 수 있습니다.' },
+        { label: '직접 배송은 필수가 아님', detail: '운영자가 반드시 직접 물류 · 배송을 담당해야 하는 것은 아닙니다.' },
+        { label: '협력 공급업체 활용', detail: '제품을 기존 공급업체 · 제조사 · 도매상 · 총판에 전달해 공급 · 배송을 맡길 수 있습니다.' },
+        { label: '제품 권리 · 운영 수익', detail: '운영자는 제품 기획 · 권리 · 네트워크 운영에서 수익을 갖고, 공급업체는 공급 · 배송을 담당합니다.' },
+        { label: '두 가지 선택', detail: '(A) 운영자가 직접 공급 · 배송까지 겸하거나, (B) 운영자는 기획 · 운영을 맡고 공급업체가 공급 · 배송을 담당합니다. 선택 사항입니다.' },
+      ],
+    },
+    {
+      id: 'examples',
+      step: '14',
       title: '서비스 운영 사업자 형태 예시',
       description:
         '운영자(서비스 운영 사업자)는 한 가지 출신이 아닙니다. 이미 매장을 가진 쪽(판매자 기반)에서 출발할 수도, 이미 공급망을 가진 쪽(공급자 기반)에서 출발할 수도 있습니다. 아래는 가능한 형태의 예시일 뿐, 특정 조직이나 성공사례가 아닙니다.',
@@ -2014,6 +2029,7 @@ export const netureGuideBusinessPharmacyNetworkProps: GuideFeatureManualPageProp
       { title: '참여 약국은 무엇을 하는가', audience: '약국', summary: '내 매장 · HUB · 승인 상품 · 오퍼 · 콘텐츠 · 소비자 응대.', to: '#store-do' },
       { title: '콘텐츠 운영은 어떻게 이루어지나', audience: '공통', summary: '공급자 보유 자료 중심 + 직접 · 조합원 · 외부 전문가.', to: '#content' },
       { title: '이벤트 오퍼는 무엇인가', audience: '중요', summary: '최저가 공동구매가 아니라 특별 공급 조건.', to: '#event' },
+      { title: '약국 네트워크의 자체 제품 가능성', audience: '약국', summary: '전용 제품 기획 — 공급 · 배송은 직접 또는 협력 공급업체.', to: '#own-product' },
       { title: '실제 운영 흐름', audience: '공통', summary: '공급자 → 운영자 → 참여 약국 → 소비자.', to: '#flow' },
       { title: '시작 방법', audience: '공통', summary: '운영자 등록 → 약국 확보 → 공급자 협력 → 콘텐츠 → 운영.', to: '#start' },
     ],
@@ -2256,8 +2272,21 @@ export const netureGuideBusinessPharmacyNetworkProps: GuideFeatureManualPageProp
       ],
     },
     {
-      id: 'flow',
+      id: 'own-product',
       step: '18',
+      title: '약국 네트워크의 자체 제품 가능성',
+      description:
+        '약국 네트워크는 제품을 저렴하게 구매하기 위한 조직에만 머물 필요가 없습니다. 참여 약국의 니드와 고객 반응을 바탕으로 네트워크 전용 제품을 기획할 수 있고, 공급 · 배송은 직접 하거나 협력 공급업체가 맡을 수 있습니다.',
+      items: [
+        { label: '단순 공동구매를 넘어', detail: '저렴한 구매에 머물지 않고, 장기적으로 차별화된 전용 제품으로 나아갈 수 있습니다.' },
+        { label: '네트워크 전용 제품 기획', detail: '참여 약국 니드 · 고객 반응을 바탕으로 전용 제품(예: 네트워크 전용 건강기능식품)을 기획할 수 있습니다.' },
+        { label: '공급 · 배송은 선택', detail: '운영자가 직접 공급할 수도 있고, 협력 공급업체를 통해 공급 · 배송할 수도 있습니다.' },
+        { label: '장기 차별화', detail: '협동조합 준비 그룹이나 약국 네트워크가 장기적으로 차별화된 제품을 만들 수 있습니다.' },
+      ],
+    },
+    {
+      id: 'flow',
+      step: '19',
       title: '실제 운영 흐름',
       description:
         '실제 운영은 공급자 → 운영자 → 참여 약국 → 소비자로 이어집니다. 각 단계의 역할은 다음과 같습니다.',
@@ -2270,7 +2299,7 @@ export const netureGuideBusinessPharmacyNetworkProps: GuideFeatureManualPageProp
     },
     {
       id: 'start',
-      step: '19',
+      step: '20',
       title: '시작 방법',
       description:
         '처음 시작할 때는 아래 순서를 따르면 됩니다. 한 번에 다 갖추지 않아도 되고, 가능한 것부터 시작하면 됩니다.',
@@ -2322,6 +2351,7 @@ export const netureGuideBusinessSupplierNetworkProps: GuideFeatureManualPageProp
       { title: '콘텐츠는 왜 중요한가', audience: '공통', summary: '좋은 콘텐츠를 가장 많이 가진 쪽은 공급자입니다.', to: '#content' },
       { title: '이벤트 오퍼는 왜 하는가', audience: '중요', summary: '저가 판매가 아니라 매장 진입 · 제품 도입 · 대체를 위한 조건.', to: '#event' },
       { title: '유통참여형 펀딩은 무엇인가', audience: '공급자', summary: '공급자가 독자 운영 — 개발 · 검증 · 초기 매장 확보.', to: '#funding' },
+      { title: '운영자 제품과 공급업체의 협력', audience: '공급자', summary: '운영자 제품을 함께 공급하면 주문 기회가 늘어납니다.', to: '#operator-product' },
       { title: '실제 운영 흐름', audience: '공통', summary: '공급자 → 운영자 → 참여 매장 → 소비자.', to: '#flow' },
       { title: '시작 방법', audience: '공급자', summary: '등록 → 제품 · 콘텐츠 → 모집 · 오퍼 → 운영자 협력 · 매장 지원.', to: '#start' },
     ],
@@ -2456,8 +2486,21 @@ export const netureGuideBusinessSupplierNetworkProps: GuideFeatureManualPageProp
       ],
     },
     {
-      id: 'flow',
+      id: 'operator-product',
       step: '10',
+      title: '운영자 제품과 공급업체의 협력',
+      description:
+        '운영자가 자체 제품을 기획하는 경우, 기존 공급업체는 경쟁자가 아니라 협력자가 될 수 있습니다. 운영자 제품을 함께 공급하는 것은 공급업체에도 이점이 있습니다.',
+      items: [
+        { label: '운영자 제품 함께 공급', detail: '공급업체는 운영자가 기획한 제품의 공급 · 배송을 맡을 수 있습니다.' },
+        { label: '기존 제품 주문 기회 증가', detail: '운영자 제품을 함께 주문받으면 참여 매장의 관심 · 주문 기회가 늘어, 공급업체 자신의 제품 주문도 늘어날 수 있습니다.' },
+        { label: '보완 상품', detail: '운영자 제품은 공급업체의 기존 제품 주문을 늘리는 계기가 될 수 있습니다.' },
+        { label: '경쟁이 아니라 협력', detail: '운영자와 공급업체는 제품 공급과 네트워크 운영에서 협력 관계가 될 수 있습니다.' },
+      ],
+    },
+    {
+      id: 'flow',
+      step: '11',
       title: '실제 운영 흐름',
       description:
         '실제 운영은 공급자 → 운영자 → 참여 매장 → 소비자로 이어집니다. 각 단계의 역할은 다음과 같습니다.',
@@ -2470,7 +2513,7 @@ export const netureGuideBusinessSupplierNetworkProps: GuideFeatureManualPageProp
     },
     {
       id: 'start',
-      step: '11',
+      step: '12',
       title: '시작 방법',
       description:
         '처음 시작할 때는 아래 순서를 따르면 됩니다. 한 번에 다 갖추지 않아도 되고, 가능한 것부터 시작하면 됩니다.',
@@ -3300,6 +3343,7 @@ export const netureGuideBusinessMarketTrialProps: GuideFeatureManualPageProps = 
       { title: '콘텐츠와 유통참여형 펀딩', audience: '공통', summary: '신규 제품은 콘텐츠가 특히 중요합니다.', to: '#content' },
       { title: '유통참여형 펀딩과 판매자 모집', audience: '공통', summary: '초기 판매자 확보 · 판매 네트워크 형성.', to: '#recruit-relation' },
       { title: '유통참여형 펀딩과 이벤트 오퍼', audience: '공통', summary: '초기 제품과 출시 후 제품 — 서로 다른 구조.', to: '#event-relation' },
+      { title: '운영자 자체 제품과 유통참여형 펀딩', audience: '운영자', summary: '운영자 제품의 초기 매장 확보에도 활용 — 투자 아님.', to: '#operator-product' },
       { title: '실제 운영 흐름', audience: '공통', summary: '공급자 → 유통참여형 펀딩 → 운영자 → 참여 매장 → 소비자.', to: '#flow' },
       { title: '시작 방법', audience: '공통', summary: '제품 · 콘텐츠 → 운영자 협력 → 매장 모집 → 시장 검증.', to: '#start' },
     ],
@@ -3426,8 +3470,21 @@ export const netureGuideBusinessMarketTrialProps: GuideFeatureManualPageProps = 
       ],
     },
     {
-      id: 'flow',
+      id: 'operator-product',
       step: '10',
+      title: '서비스 운영자의 자체 제품과 유통참여형 펀딩',
+      description:
+        '유통참여형 펀딩은 외부 공급자만 활용하는 구조가 아닙니다. 서비스 운영자가 자체 제품을 기획해 초기 참여 매장을 확보할 때도 활용할 수 있습니다. 투자나 자금 조달이 아니라 제품 검증 · 초기 유통망 형성이 핵심입니다.',
+      items: [
+        { label: '운영자 자체 제품 활용', detail: '운영자가 기획한 제품의 초기 참여 매장을 확보하는 데 활용할 수 있습니다.' },
+        { label: '직접 또는 협력', detail: '운영자가 직접 공급자로 참여할 수도 있고, 협력 공급업체와 함께 운영할 수도 있습니다.' },
+        { label: '투자가 아님', detail: '투자 상품 · 자금 조달이 아니라 제품 검증과 초기 유통망 형성입니다.' },
+        { label: '제품 기획 관점', detail: '제품 기획 · 시장 검증 · 초기 유통망 형성의 관점으로 활용합니다.' },
+      ],
+    },
+    {
+      id: 'flow',
+      step: '11',
       title: '실제 운영 흐름',
       description:
         '실제 운영은 공급자의 유통참여형 펀딩에서 시작해 운영자 · 참여 매장을 거쳐 소비자에게 닿습니다.',
@@ -3441,7 +3498,7 @@ export const netureGuideBusinessMarketTrialProps: GuideFeatureManualPageProps = 
     },
     {
       id: 'start',
-      step: '11',
+      step: '12',
       title: '시작 방법',
       description:
         '처음 시작할 때는 아래 순서를 따르면 됩니다. 가능한 것부터 시작하면 됩니다.',
