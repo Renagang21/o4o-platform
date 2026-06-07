@@ -32,3 +32,5 @@ export { GuideBusinessSupplierNetworkPage } from './GuideBusinessSupplierNetwork
 export { GuideBusinessContentNetworkPage } from './GuideBusinessContentNetworkPage';
 // WO-O4O-NETURE-BUSINESS-GUIDE-EVENT-OFFER-V1
 export { GuideBusinessEventOfferPage } from './GuideBusinessEventOfferPage';
+// WO-O4O-NETURE-BUSINESS-GUIDE-APPROVED-PRODUCT-V1
+export { GuideBusinessApprovedProductPage } from './GuideBusinessApprovedProductPage';

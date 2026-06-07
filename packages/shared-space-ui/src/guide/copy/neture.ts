@@ -1595,6 +1595,7 @@ export const netureGuideForOperatorProps: GuideFeatureManualPageProps = {
       { title: '공급자 네트워크 운영 안내 →', audience: '공급자', summary: '도매 · 제조 · 수입사가 매장을 지원하는 서비스를 운영한다면 — 공급자 기반 운영 안내서로 이동.', to: '/guide/business/supplier-network' },
       { title: '콘텐츠 네트워크 운영 안내 →', audience: '공통', summary: '콘텐츠를 중심으로 공급자 · 운영자 · 매장이 연결되는 운영 구조 — 콘텐츠 운영 안내서로 이동.', to: '/guide/business/content-network' },
       { title: '이벤트 오퍼 운영 안내 →', audience: '공통', summary: '이벤트 오퍼를 왜 운영 · 참여하는가 — 유통질서 · 특별 공급 조건 안내서로 이동.', to: '/guide/business/event-offer' },
+      { title: '운영자 승인 상품 운영 안내 →', audience: '공통', summary: '새 제품을 운영자가 검토해 참여 매장이 도입하는 구조 — 승인 상품 안내서로 이동.', to: '/guide/business/approved-product' },
     ],
   },
   sections: [
@@ -2742,6 +2743,200 @@ export const netureGuideBusinessEventOfferProps: GuideFeatureManualPageProps = {
         { label: '4. 참여 매장 모집', detail: '오퍼에 참여할 매장을 모집하고 조건을 안내합니다.' },
         { label: '5. 운영', detail: '오퍼를 진행하고 매장 참여 · 공급을 조율합니다.' },
         { label: '6. 결과 확인', detail: '매장 반응 · 참여 결과를 확인하고 다음 운영에 반영합니다.' },
+      ],
+    },
+  ],
+  bottomNav: {
+    prev: { label: '← 운영자 가이드', to: '/guide/for-operator' },
+    home: { label: '이용 안내로', to: '/guide' },
+  },
+};
+
+// ─── /guide/business/approved-product (운영자 승인 상품 운영 안내) ───────
+// WO-O4O-NETURE-BUSINESS-GUIDE-APPROVED-PRODUCT-V1
+// 다섯 번째 사업 운영 안내서. 새 제품 → 운영자 검토 → 참여 매장 도입.
+
+export const netureGuideBusinessApprovedProductProps: GuideFeatureManualPageProps = {
+  hero: {
+    eyebrow: '사업 운영 안내',
+    title: '운영자 승인 상품 운영 안내',
+    description:
+      '공급자 · 운영자 · 참여 매장이 운영자 승인 상품을 왜 활용하는지 설명합니다. 상품 등록 방법이나 승인 기능 사용법이 아닙니다. 이벤트 오퍼가 "기존 제품의 특별 공급 조건"이라면, 운영자 승인 상품은 "새로운 제품을 운영자가 검토해 참여 매장이 안심하고 도입하는" 구조에 가깝습니다.',
+    primaryAction: { label: '운영 참여 검토 신청 →', to: '/o4o/apply' },
+    flowBarTitle: '안내 흐름',
+    flowLabels: ['도입 어려움', '무엇인가', '3주체 목적', '콘텐츠', '모집 관계', '시작'],
+  },
+  index: {
+    title: '운영자 승인 상품 운영 한눈에 보기',
+    lead: [
+      '새로운 제품을 매장이 직접 다 검토하기는 어렵습니다.',
+      '운영자가 참여 매장을 대신해 제품을 검토하고 정리합니다.',
+      '매장은 운영자 검토를 신뢰의 근거로 삼아 새 제품을 안심하고 도입합니다.',
+    ],
+    cards: [
+      { title: '이 문서의 대상', audience: '공통', summary: '공급자 · 운영자 · 참여 매장.', to: '#audience' },
+      { title: '새 제품 도입은 왜 어려운가', audience: '공통', summary: '제품 수 · 검토 시간 · 정보 부족 · 설명 부담.', to: '#why-hard' },
+      { title: '운영자 승인 상품은 무엇인가', audience: '공통', summary: '단순 승인 기능이 아니라 세 주체의 구조.', to: '#what' },
+      { title: '공급자는 왜 활용하는가', audience: '공급자', summary: '신규 제품 소개 · 매장 진입 · 경쟁 제품 대체.', to: '#supplier-why' },
+      { title: '운영자는 왜 활용하는가', audience: '운영자', summary: '참여 매장 지원 · 제품 검토 · 정보 정리 · 네트워크 운영.', to: '#operator-why' },
+      { title: '참여 매장은 왜 활용하는가', audience: '매장', summary: '검토 시간 절약 · 제품/콘텐츠 확보 · 운영자 지원.', to: '#store-why' },
+      { title: '콘텐츠와 운영자 승인 상품', audience: '공통', summary: '새 제품 도입에는 콘텐츠가 중요합니다.', to: '#content' },
+      { title: '판매자 모집과의 관계', audience: '공통', summary: '모집 · 서비스 한정 판매 · 승인 상품의 연결.', to: '#recruit-relation' },
+      { title: '실제 운영 흐름', audience: '공통', summary: '공급자 → 운영자 검토 → 참여 매장 → 소비자.', to: '#flow' },
+      { title: '운영자 승인 상품과 네트워크', audience: '공통', summary: '협동조합 · 전문 · 지역 · 공급자 기반 네트워크.', to: '#network' },
+      { title: '시작 방법', audience: '공통', summary: '공급자 협력 → 제품 검토 → 콘텐츠 → 매장 안내 → 운영.', to: '#start' },
+    ],
+  },
+  sections: [
+    {
+      id: 'audience',
+      step: '01',
+      title: '이 문서의 대상',
+      description:
+        '이 문서는 새로운 제품을 매장에 소개 · 도입하려는 주체와, 그 검토를 대신해 줄 운영을 준비하는 주체를 위한 것입니다.',
+      items: [
+        { label: '공급자', detail: '새로운 제품을 소개 · 도입하려는 도매 · 제조 · 수입 · 브랜드사.' },
+        { label: '운영자', detail: '협동조합 준비 그룹 · 약국 네트워크 운영자 등 참여 매장을 대신해 제품을 검토 · 정리하는 주체.' },
+        { label: '참여 매장', detail: '새 제품을 검토 · 도입하려는 매장.' },
+      ],
+    },
+    {
+      id: 'why-hard',
+      step: '02',
+      title: '새로운 제품을 도입하는 것은 왜 어려운가',
+      description:
+        '매장이 새 제품을 직접 다 검토하기는 현실적으로 어렵습니다. 그래서 운영자의 검토가 의미를 가집니다.',
+      items: [
+        { label: '제품 수가 많다', detail: '다품종 시장에서는 검토할 새 제품이 끊임없이 많습니다.' },
+        { label: '검토 시간이 부족하다', detail: '매장은 일상 운영만으로도 바빠 제품 검토 시간을 내기 어렵습니다.' },
+        { label: '정보가 부족하다', detail: '제품을 판단할 정보 · 자료가 충분하지 않은 경우가 많습니다.' },
+        { label: '기존 제품을 쉽게 중단할 수 없다', detail: '새 제품을 들이려면 기존 제품 · 진열을 조정해야 하는 부담이 있습니다.' },
+        { label: '소비자 설명이 필요하다', detail: '새 제품은 소비자에게 설명할 자료 · 준비가 필요합니다.' },
+      ],
+    },
+    {
+      id: 'what',
+      step: '03',
+      title: '운영자 승인 상품은 무엇인가',
+      description:
+        '운영자 승인 상품은 단순한 승인 기능이 아니라, 공급자 · 운영자 · 참여 매장이 함께 활용하는 구조입니다. 운영자가 참여 매장을 대신해 제품을 검토하고, 매장은 그 검토를 신뢰의 근거로 삼습니다.',
+      items: [
+        { label: '공급자', detail: '새 제품과 자료 · 조건을 운영자에게 제출합니다.' },
+        { label: '운영자', detail: '제품 · 자료 · 조건 · 표시광고 위험을 검토하고 승인 · 정리합니다.' },
+        { label: '참여 매장', detail: '운영자 검토를 신뢰의 근거로 새 제품을 안심하고 검토 · 도입합니다.' },
+      ],
+    },
+    {
+      id: 'supplier-why',
+      step: '04',
+      title: '공급자는 왜 활용하는가',
+      description:
+        '공급자에게 운영자 승인 상품은 새로운 제품을 신뢰 있게 매장에 소개하는 통로입니다.',
+      items: [
+        { label: '신규 제품 소개', detail: '새 제품을 운영자 검토를 거쳐 신뢰 있게 소개합니다.' },
+        { label: '신규 매장 진입', detail: '검토된 상품으로 새 매장에 진입할 가능성을 높입니다.' },
+        { label: '경쟁 제품 대체', detail: '매장의 경쟁 제품을 자사 제품으로 대체할 기회를 만듭니다.' },
+        { label: '제품 정보 전달', detail: '제품 · 건강 정보를 운영자 · 매장에 전달합니다.' },
+        { label: '판매자 모집', detail: '검토된 상품을 다룰 매장을 모집하는 기반이 됩니다.' },
+      ],
+    },
+    {
+      id: 'operator-why',
+      step: '05',
+      title: '운영자는 왜 활용하는가',
+      description:
+        '운영자에게 승인 상품은 참여 매장을 지원하는 핵심 운영 활동입니다.',
+      items: [
+        { label: '참여 매장 지원', detail: '매장이 직접 못 하는 제품 검토를 대신해 지원합니다.' },
+        { label: '제품 검토', detail: '제품 · 자료 · 조건 · 위험을 검토해 매장에 나갈 상품을 가립니다.' },
+        { label: '정보 정리', detail: '제품 정보를 매장이 바로 쓸 수 있게 정리합니다.' },
+        { label: '콘텐츠 제공', detail: '검토한 상품의 콘텐츠를 함께 제공합니다.' },
+        { label: '네트워크 운영', detail: '승인 상품을 축으로 매장 네트워크를 운영합니다.' },
+      ],
+    },
+    {
+      id: 'store-why',
+      step: '06',
+      title: '참여 매장은 왜 활용하는가',
+      description:
+        '참여 매장에게 승인 상품은 검토 부담을 덜고 새 제품을 안심하고 도입하는 방법입니다.',
+      items: [
+        { label: '검토 시간 절약', detail: '운영자가 검토했으므로 매장의 검토 부담이 줄어듭니다.' },
+        { label: '제품 정보 확보', detail: '정리된 제품 정보를 함께 받습니다.' },
+        { label: '콘텐츠 확보', detail: '제품 설명 · 매장 활용 콘텐츠를 함께 받습니다.' },
+        { label: '신규 제품 검토', detail: '새 제품을 부담 없이 검토 · 도입할 수 있습니다.' },
+        { label: '운영자 지원 활용', detail: '운영자의 지원을 받아 도입 · 판매를 진행합니다.' },
+      ],
+    },
+    {
+      id: 'content',
+      step: '07',
+      title: '콘텐츠와 운영자 승인 상품',
+      description:
+        '새로운 제품 도입에는 콘텐츠가 특히 중요합니다. 소비자가 처음 보는 제품일수록 설명 · 안내 자료가 있어야 매장이 다룰 수 있습니다.',
+      items: [
+        { label: '제품 설명서', detail: '제품 특징 · 사용법을 담은 설명자료.' },
+        { label: '이미지', detail: '매장 안내 · 온라인 · 인쇄용 제품 이미지.' },
+        { label: 'POP', detail: '매장 내 비치 · 부착 안내물.' },
+        { label: 'QR', detail: '제품 · 건강 정보로 연결되는 QR 자료.' },
+        { label: '블로그', detail: '소비자 설명에 쓰는 글 콘텐츠.' },
+        { label: '영상', detail: '제품 소개 · 사용법 영상.' },
+        { label: '교육자료', detail: '직원 · 고객 교육 자료.' },
+        { label: '상담자료', detail: '소비자 상담 시 활용하는 설명자료.' },
+        { label: '건강정보 자료', detail: '제품과 관련된 건강 정보 자료.' },
+      ],
+    },
+    {
+      id: 'recruit-relation',
+      step: '08',
+      title: '판매자 모집과의 관계',
+      description:
+        '판매자 모집 · 서비스 한정 판매 · 운영자 승인 상품은 서로 다른 기능이지만, 새 제품을 매장에 연결하는 과정에서 함께 연결될 수 있습니다.',
+      items: [
+        { label: '판매자 모집', detail: '제품을 다룰 매장을 모집해 유통 기반을 만듭니다.' },
+        { label: '서비스 한정 판매', detail: '특정 네트워크 · 참여 매장에 한정해 제품을 공급합니다.' },
+        { label: '운영자 승인 상품', detail: '운영자가 검토 · 승인한 상품을 매장이 안심하고 다룹니다.' },
+        { label: '연결되는 방식', detail: '승인 상품을 축으로 매장을 모집하고, 특정 매장에 한정 공급하는 식으로 연결할 수 있습니다.' },
+      ],
+    },
+    {
+      id: 'flow',
+      step: '09',
+      title: '실제 운영 흐름',
+      description:
+        '실제 운영은 공급자의 제품 제출에서 시작해 운영자 검토 · 참여 매장을 거쳐 소비자에게 닿습니다.',
+      items: [
+        { label: '공급자', detail: '새 제품과 자료 · 조건을 운영자에게 제출합니다.' },
+        { label: '운영자 검토', detail: '제품 · 자료 · 조건 · 위험을 검토해 승인 · 정리하고 콘텐츠를 준비합니다.' },
+        { label: '참여 매장', detail: '승인 상품을 검토 · 도입하고 콘텐츠를 활용해 판매합니다.' },
+        { label: '소비자', detail: '매장에서 제품 · 건강 정보를 전달받아 이해하고 구매합니다.' },
+      ],
+    },
+    {
+      id: 'network',
+      step: '10',
+      title: '운영자 승인 상품과 네트워크',
+      description:
+        '운영자 승인 상품은 여러 형태의 네트워크 위에서 운영될 수 있습니다. 아래는 형태의 예시이며, 특정 조직 사례가 아닙니다.',
+      items: [
+        { label: '협동조합', detail: '조합이 운영자로서 제품을 검토 · 승인해 조합원 매장에 제공합니다.' },
+        { label: '전문 네트워크', detail: '특정 분야 전문 네트워크가 전문성을 기준으로 제품을 검토합니다.' },
+        { label: '지역 네트워크', detail: '지역 단위 네트워크가 지역 매장에 맞는 제품을 검토 · 제공합니다.' },
+        { label: '공급자 기반 네트워크', detail: '공급자가 운영자가 되어 자사 · 협력 제품을 검토 · 제공합니다.' },
+      ],
+    },
+    {
+      id: 'start',
+      step: '11',
+      title: '시작 방법',
+      description:
+        '처음 시작할 때는 아래 순서를 따르면 됩니다. 가능한 것부터 시작하면 됩니다.',
+      items: [
+        { label: '1. 공급자 협력', detail: '제품을 제출할 공급자와 협력합니다.' },
+        { label: '2. 제품 검토', detail: '제품 · 자료 · 조건 · 위험을 검토해 승인 상품을 가립니다.' },
+        { label: '3. 콘텐츠 확보', detail: '제품 설명 · 매장 활용 콘텐츠를 확보합니다.' },
+        { label: '4. 참여 매장 안내', detail: '승인 상품을 참여 매장에 안내합니다.' },
+        { label: '5. 운영', detail: '도입 · 판매를 지원하고 매장 반응을 다음 검토에 반영합니다.' },
       ],
     },
   ],
