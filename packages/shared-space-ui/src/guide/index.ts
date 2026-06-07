@@ -102,6 +102,8 @@ export {
   netureGuideBusinessSupplierNetworkProps,
   // WO-O4O-NETURE-BUSINESS-GUIDE-CONTENT-NETWORK-V1
   netureGuideBusinessContentNetworkProps,
+  // WO-O4O-NETURE-BUSINESS-GUIDE-EVENT-OFFER-V1
+  netureGuideBusinessEventOfferProps,
 } from './copy/neture.js';
 
 // WO-O4O-CROSSSERVICE-HOME-LATEST-AND-GUIDE-ALIGNMENT-V1

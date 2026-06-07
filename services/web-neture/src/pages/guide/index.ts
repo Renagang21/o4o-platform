@@ -30,3 +30,5 @@ export { GuideBusinessPharmacyNetworkPage } from './GuideBusinessPharmacyNetwork
 export { GuideBusinessSupplierNetworkPage } from './GuideBusinessSupplierNetworkPage';
 // WO-O4O-NETURE-BUSINESS-GUIDE-CONTENT-NETWORK-V1
 export { GuideBusinessContentNetworkPage } from './GuideBusinessContentNetworkPage';
+// WO-O4O-NETURE-BUSINESS-GUIDE-EVENT-OFFER-V1
+export { GuideBusinessEventOfferPage } from './GuideBusinessEventOfferPage';
