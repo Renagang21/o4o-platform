@@ -1998,6 +1998,12 @@ export const netureGuideBusinessPharmacyNetworkProps: GuideFeatureManualPageProp
       { title: '이 문서의 대상', audience: '공통', summary: '여러 약국이 함께 운영을 준비하는 그룹.', to: '#audience' },
       { title: '처음에 생각하는 것', audience: '공통', summary: '모이면 저렴 · 공동구매 경쟁력 · 좋은 제품 확보.', to: '#expectation' },
       { title: '실제 운영에서 만나는 문제', audience: '공통', summary: '제품 확보 · 공급 협상 · 인력 · 콘텐츠 · 참여 유지 · 수익 구조.', to: '#challenge' },
+      { title: '약국 네트워크는 어떻게 시작되는가', audience: '시작', summary: '큰 조직이 필요하지 않습니다 — 공통 관심사가 출발점.', to: '#how-start' },
+      { title: '초기에 가장 먼저 하는 일', audience: '시작', summary: '공통 관심사 · 공급자 · 운영 방식 · 콘텐츠 검토.', to: '#first-steps' },
+      { title: '콘텐츠는 언제 시작하는가', audience: '시작', summary: '초기부터 가능 — 대규모 이후만이 아닙니다.', to: '#when-content' },
+      { title: '이벤트 오퍼는 언제 활용하는가', audience: '시작', summary: '출발점이 아니라 운영 도구 중 하나.', to: '#when-event' },
+      { title: '운영자 승인 상품은 언제 활용하는가', audience: '시작', summary: '네트워크 운영 과정에서 활용.', to: '#when-approved' },
+      { title: '무엇을 운영하게 되는가', audience: '시작', summary: '콘텐츠 · 승인 상품 · 모집 · 오퍼 · 펀딩으로 확장.', to: '#what-operate' },
       { title: 'O4O는 무엇을 제공하는가', audience: '공통', summary: '운영자가 목적에 맞게 쓰는 운영 수단들.', to: '#o4o-offer' },
       { title: '운영자는 실제로 무엇을 하는가', audience: '운영자', summary: '공급자 협력 · 콘텐츠 확보 · 승인 상품 · 오퍼 · 매장 지원.', to: '#operator-do' },
       { title: '참여 약국은 무엇을 하는가', audience: '약국', summary: '내 매장 · HUB · 승인 상품 · 오퍼 · 콘텐츠 · 소비자 응대.', to: '#store-do' },
@@ -2049,8 +2055,86 @@ export const netureGuideBusinessPharmacyNetworkProps: GuideFeatureManualPageProp
       ],
     },
     {
-      id: 'o4o-offer',
+      id: 'how-start',
       step: '04',
+      title: '약국 네트워크는 어떻게 시작되는가',
+      description:
+        '처음부터 큰 조직이 필요한 것은 아닙니다. 공통 관심사를 가진 약국들이 모이는 것이 출발점이 될 수 있습니다. 소규모로 시작해 참여 약국을 넓히고 운영 구조를 안정화해 가면 됩니다.',
+      items: [
+        { label: '이미 서로 알고 있는 약국들', detail: '평소 알고 지내는 약국들이 함께 시작할 수 있습니다.' },
+        { label: '특정 분야 관심 약국들', detail: '같은 분야(예: 특정 건강 영역)에 관심 있는 약국들이 모일 수 있습니다.' },
+        { label: '지역 기반 약국들', detail: '같은 지역의 약국들이 출발점이 될 수 있습니다.' },
+        { label: '특정 고객군 관심 약국들', detail: '특정 고객군(예: 시니어 · 관광객)에 관심 있는 약국들이 모일 수 있습니다.' },
+      ],
+    },
+    {
+      id: 'first-steps',
+      step: '05',
+      title: '초기 단계에서 가장 먼저 하는 일',
+      description:
+        '처음부터 많은 기능을 운영할 필요는 없습니다. 초기에는 아래를 먼저 정리하면 됩니다.',
+      items: [
+        { label: '참여 약국 간 공통 관심사 확인', detail: '무엇을 함께 하려는지 공통 관심사를 확인합니다.' },
+        { label: '공급자 협력 검토', detail: '어떤 공급자와 협력할 수 있을지 검토합니다.' },
+        { label: '운영 방식 정리', detail: '누가 무엇을 맡을지 운영 방식을 정리합니다.' },
+        { label: '콘텐츠 확보 검토', detail: '어떤 콘텐츠를 확보 · 활용할지 검토합니다.' },
+      ],
+    },
+    {
+      id: 'when-content',
+      step: '06',
+      title: '콘텐츠는 언제 시작하는가',
+      description:
+        '콘텐츠는 대규모 조직이 된 이후에만 가능한 활동이 아닙니다. 초기 단계부터 시작할 수 있습니다.',
+      items: [
+        { label: '초기부터 가능', detail: '소규모 단계에서도 콘텐츠 운영을 시작할 수 있습니다.' },
+        { label: '공급자 자료 활용 가능', detail: '공급자가 보유한 자료를 활용하면 부담이 적습니다.' },
+        { label: '운영자 제작 가능', detail: '운영자가 직접 콘텐츠를 만들 수 있습니다.' },
+        { label: '참여 약국 참여 가능', detail: '참여 약국이 함께 콘텐츠를 만들 수 있습니다.' },
+      ],
+    },
+    {
+      id: 'when-event',
+      step: '07',
+      title: '이벤트 오퍼는 언제 활용하는가',
+      description:
+        '이벤트 오퍼는 출발점이 아니라 운영 도구 중 하나입니다. 일정 조건이 갖춰진 뒤 활용하는 것이 자연스럽습니다.',
+      items: [
+        { label: '참여 약국이 일정 수준 확보된 이후', detail: '참여 약국이 어느 정도 모인 뒤 활용합니다.' },
+        { label: '공급자 협력 이후', detail: '공급자와의 협력이 이뤄진 뒤 활용합니다.' },
+        { label: '특정 제품 검토 이후', detail: '함께 다룰 제품이 정해진 뒤 활용합니다.' },
+      ],
+    },
+    {
+      id: 'when-approved',
+      step: '08',
+      title: '운영자 승인 상품은 언제 활용하는가',
+      description:
+        '운영자 승인 상품은 네트워크 운영 과정에서 활용할 수 있습니다.',
+      items: [
+        { label: '신규 제품 검토', detail: '새 제품을 검토할 때 활용합니다.' },
+        { label: '참여 약국 의견 수렴', detail: '참여 약국 의견을 모아 다룰 제품을 가립니다.' },
+        { label: '콘텐츠 제공', detail: '승인 상품의 콘텐츠를 함께 제공합니다.' },
+        { label: '판매자 모집 연계', detail: '판매자 모집과 연계해 활용합니다.' },
+      ],
+    },
+    {
+      id: 'what-operate',
+      step: '09',
+      title: '약국 네트워크는 무엇을 운영하게 되는가',
+      description:
+        '운영이 자리 잡으면 아래 운영 구조들을 점차 함께 운영하게 됩니다. 각 항목은 별도 안내서로 자세히 다룹니다.',
+      items: [
+        { label: '콘텐츠', detail: '콘텐츠를 중심으로 매장을 지원합니다 (콘텐츠 네트워크 운영 안내).' },
+        { label: '운영자 승인 상품', detail: '새 제품을 검토해 참여 약국이 도입합니다 (운영자 승인 상품 운영 안내).' },
+        { label: '판매자 모집', detail: '제품을 다룰 약국을 모아 판매 네트워크를 형성합니다 (판매자 모집 운영 안내).' },
+        { label: '이벤트 오퍼', detail: '출시된 제품의 특별 공급 조건을 제공합니다 (이벤트 오퍼 운영 안내).' },
+        { label: '유통참여형 펀딩', detail: '출시 전 · 초기 제품의 시장 검증을 합니다 (유통참여형 펀딩 운영 안내).' },
+      ],
+    },
+    {
+      id: 'o4o-offer',
+      step: '10',
       title: 'O4O는 무엇을 제공하는가',
       description:
         'O4O는 위 운영 과제를 푸는 데 쓸 수 있는 수단을 제공합니다. 기능 자체보다, 운영자가 어떤 목적으로 사용하는지를 기준으로 보면 됩니다.',
@@ -2067,7 +2151,7 @@ export const netureGuideBusinessPharmacyNetworkProps: GuideFeatureManualPageProp
     },
     {
       id: 'operator-do',
-      step: '05',
+      step: '11',
       title: '운영자는 실제로 무엇을 하는가',
       description:
         '운영자는 단순 관리자가 아니라, 참여 약국이 활용할 수 있는 환경을 구성하는 사업 주체입니다. 아래가 운영자의 실제 일입니다.',
@@ -2082,7 +2166,7 @@ export const netureGuideBusinessPharmacyNetworkProps: GuideFeatureManualPageProp
     },
     {
       id: 'store-do',
-      step: '06',
+      step: '12',
       title: '참여 약국은 무엇을 하는가',
       description:
         '참여 약국은 새로운 일을 만들지 않아도 됩니다. 운영자가 구성해 둔 것을 골라 내 매장에 적용하면 됩니다.',
@@ -2097,7 +2181,7 @@ export const netureGuideBusinessPharmacyNetworkProps: GuideFeatureManualPageProp
     },
     {
       id: 'content',
-      step: '07',
+      step: '13',
       title: '콘텐츠 운영은 어떻게 이루어지나',
       description:
         '좋은 콘텐츠는 운영자가 다 만들어야 하는 것이 아닙니다. 제품을 가장 잘 아는 공급자가 이미 보유한 경우가 많고, 운영자는 이를 확보 · 정리해 약국에 제공합니다. 직접 · 조합원 · 외부 전문가 제작은 이를 보완합니다.',
@@ -2112,7 +2196,7 @@ export const netureGuideBusinessPharmacyNetworkProps: GuideFeatureManualPageProp
     },
     {
       id: 'event',
-      step: '08',
+      step: '14',
       title: '이벤트 오퍼는 무엇인가',
       description:
         '이벤트 오퍼는 약국 네트워크에서 가장 많이 오해하는 부분입니다. "많이 모이면 무조건 저렴하게 산다"는 기대와 실제 의미는 다릅니다.',
@@ -2125,7 +2209,7 @@ export const netureGuideBusinessPharmacyNetworkProps: GuideFeatureManualPageProp
     },
     {
       id: 'flow',
-      step: '09',
+      step: '15',
       title: '실제 운영 흐름',
       description:
         '실제 운영은 공급자 → 운영자 → 참여 약국 → 소비자로 이어집니다. 각 단계의 역할은 다음과 같습니다.',
@@ -2138,7 +2222,7 @@ export const netureGuideBusinessPharmacyNetworkProps: GuideFeatureManualPageProp
     },
     {
       id: 'start',
-      step: '10',
+      step: '16',
       title: '시작 방법',
       description:
         '처음 시작할 때는 아래 순서를 따르면 됩니다. 한 번에 다 갖추지 않아도 되고, 가능한 것부터 시작하면 됩니다.',
