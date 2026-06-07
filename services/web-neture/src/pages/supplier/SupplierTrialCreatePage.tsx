@@ -10,7 +10,7 @@
  */
 
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { RichTextEditor } from '@o4o/content-editor';
 import { createTrial, submitTrial, updateTrial } from '../../api/trial';
 import type { CreateTrialPayload, Trial } from '../../api/trial';
@@ -42,6 +42,7 @@ export default function SupplierTrialCreatePage({
   initialData,
 }: SupplierTrialFormProps = {}) {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams(); // WO-O4O-...-SUPPLIER-PRODUCT-REFERENCE-V1: 선택 상품 masterId
 
   const [title, setTitle] = useState(initialData?.title || '');
   // WO-MARKET-TRIAL-PROPOSAL-STRUCTURE-V1
@@ -134,6 +135,10 @@ export default function SupplierTrialCreatePage({
         targetAmount: targetAmount ? Number(targetAmount) : undefined,
         trialUnitPrice: trialUnitPrice ? Number(trialUnitPrice) : undefined,
         rewardRate: Number(rewardRate) || 0,
+        // WO-O4O-NETURE-MARKET-TRIAL-SUPPLIER-PRODUCT-REFERENCE-V1:
+        //   제품 목록에서 진입 시 선택 상품(ProductMaster id=masterId)을 soft 참조로 저장.
+        //   생성 모드에서만, query 에 있을 때만 (직접 메뉴 진입/수정 시 미전달).
+        productId: mode === 'edit' ? undefined : (searchParams.get('masterId') || undefined),
       };
 
       if (mode === 'edit' && trialId) {

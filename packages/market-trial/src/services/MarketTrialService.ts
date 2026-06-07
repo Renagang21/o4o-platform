@@ -22,6 +22,11 @@ import {
 export interface CreateTrialDto {
   supplierId: string;
   supplierName?: string;
+  /**
+   * Optional ProductMaster reference — WO-O4O-NETURE-MARKET-TRIAL-SUPPLIER-PRODUCT-REFERENCE-V1
+   * 공급자 제품 목록에서 선택한 상품(ProductMaster id, = 목록 masterId)으로 펀딩 개설 시 soft 참조.
+   */
+  productId?: string | null;
   title: string;
   /** One-liner proposal — WO-MARKET-TRIAL-PROPOSAL-STRUCTURE-V1 */
   oneLiner?: string;
@@ -216,6 +221,8 @@ export class MarketTrialService {
     const trial = this.trialRepo.create({
       supplierId: dto.supplierId,
       supplierName: dto.supplierName || undefined,
+      // WO-O4O-NETURE-MARKET-TRIAL-SUPPLIER-PRODUCT-REFERENCE-V1: 선택 상품 soft 참조 (없으면 미설정)
+      productId: dto.productId || undefined,
       title: dto.title,
       oneLiner: dto.oneLiner || null,
       videoUrl: dto.videoUrl || null,

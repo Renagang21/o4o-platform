@@ -144,6 +144,8 @@ export class MarketTrialController {
         title, oneLiner, videoUrl, description, outcomeSnapshot,
         maxParticipants, fundingStartAt, fundingEndAt, trialPeriodDays,
         targetAmount, trialUnitPrice, rewardRate, salesScenarioContent,
+        // WO-O4O-NETURE-MARKET-TRIAL-SUPPLIER-PRODUCT-REFERENCE-V1
+        productId,
       } = req.body;
 
       if (!title || !fundingStartAt || !fundingEndAt || !trialPeriodDays) {
@@ -156,6 +158,8 @@ export class MarketTrialController {
       const trial = await MarketTrialController.trialService.createTrial({
         supplierId: userId,
         supplierName: userName,
+        // WO-O4O-NETURE-MARKET-TRIAL-SUPPLIER-PRODUCT-REFERENCE-V1: 선택 상품(ProductMaster) soft 참조
+        productId: productId || undefined,
         title,
         oneLiner: oneLiner || undefined,
         videoUrl: videoUrl || undefined,

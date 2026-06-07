@@ -156,6 +156,8 @@ export interface ParticipantListResponse {
 
 export interface CreateTrialPayload {
   title: string;
+  // WO-O4O-NETURE-MARKET-TRIAL-SUPPLIER-PRODUCT-REFERENCE-V1: 선택 공급자 상품(ProductMaster id) soft 참조
+  productId?: string | null;
   // WO-MARKET-TRIAL-PROPOSAL-STRUCTURE-V1
   oneLiner?: string;
   // WO-MARKET-TRIAL-VIDEO-FIELD-V1

@@ -48,9 +48,10 @@ export class MarketTrial {
   supplierId!: string;
 
   /**
-   * Product being trialed (Optional)
-   * References dropshipping_product_masters.id
-   * @deprecated Trial-상품 FK 의존 제거 정책에 따라 optional로 변경
+   * Optional ProductMaster reference for supplier product-based funding.
+   * References product_masters.id (= 공급자 제품 목록의 masterId).
+   * Soft reference — 공급자가 등록 상품을 기준으로 펀딩을 개설할 때 사용. 결과 약속은 outcomeSnapshot 이 담당하므로
+   * FK 강결합/필수는 아니다(nullable). WO-O4O-NETURE-MARKET-TRIAL-SUPPLIER-PRODUCT-REFERENCE-V1.
    */
   @Column({ type: 'uuid', nullable: true })
   @Index()
