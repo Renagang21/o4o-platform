@@ -1591,13 +1591,7 @@ export const netureGuideForOperatorProps: GuideFeatureManualPageProps = {
       { title: '판매자 모집', audience: '공통', summary: '제품을 다룰 매장을 모집해 운영 기반을 만듭니다.', to: '#recruit' },
       { title: '주문 · 배송 · 정산', audience: '공통', summary: '주문에서 정산까지의 흐름과 운영자 역할입니다.', to: '#settlement' },
       { title: '서비스 운영 사업자 형태 예시', audience: '공통', summary: '판매자 기반 · 공급자 기반 운영자 형태 예시.', to: '#examples' },
-      { title: '약국 네트워크 운영 안내 →', audience: '약국', summary: '여러 약국이 함께 운영을 준비한다면 — 업종별 사업 운영 안내서로 이동.', to: '/guide/business/pharmacy-network' },
-      { title: '공급자 네트워크 운영 안내 →', audience: '공급자', summary: '도매 · 제조 · 수입사가 매장을 지원하는 서비스를 운영한다면 — 공급자 기반 운영 안내서로 이동.', to: '/guide/business/supplier-network' },
-      { title: '콘텐츠 네트워크 운영 안내 →', audience: '공통', summary: '콘텐츠를 중심으로 공급자 · 운영자 · 매장이 연결되는 운영 구조 — 콘텐츠 운영 안내서로 이동.', to: '/guide/business/content-network' },
-      { title: '이벤트 오퍼 운영 안내 →', audience: '공통', summary: '이벤트 오퍼를 왜 운영 · 참여하는가 — 유통질서 · 특별 공급 조건 안내서로 이동.', to: '/guide/business/event-offer' },
-      { title: '운영자 승인 상품 운영 안내 →', audience: '공통', summary: '새 제품을 운영자가 검토해 참여 매장이 도입하는 구조 — 승인 상품 안내서로 이동.', to: '/guide/business/approved-product' },
-      { title: '판매자 모집 운영 안내 →', audience: '공통', summary: '세 주체가 함께 판매 네트워크를 형성하는 이유 · 구조 — 판매자 모집 안내서로 이동.', to: '/guide/business/seller-recruitment' },
-      { title: '유통참여형 펀딩 운영 안내 →', audience: '공통', summary: '출시 전 · 초기 제품의 시장 검증 · 초기 유통망 형성 — 유통참여형 펀딩 안내서로 이동.', to: '/guide/business/market-trial' },
+      { title: 'Business Guide (사업 운영 안내) →', audience: '공통', summary: '약국 · 공급자 네트워크 · 콘텐츠 · 이벤트 오퍼 · 승인 상품 · 판매자 모집 · 유통참여형 펀딩 — 7개 사업 운영 안내서 모음으로 이동.', to: '/guide/business' },
     ],
   },
   sections: [
@@ -3325,6 +3319,70 @@ export const netureGuideBusinessMarketTrialProps: GuideFeatureManualPageProps = 
         { label: '3. 운영자 협력', detail: '운영자와 협력해 참여 매장 연결 · 지원을 준비합니다.' },
         { label: '4. 참여 매장 모집', detail: '제품을 먼저 다룰 초기 참여 매장을 모집합니다.' },
         { label: '5. 시장 검증', detail: '매장 · 소비자 반응을 확인해 다음 유통 단계로 이어갑니다.' },
+      ],
+    },
+  ],
+  bottomNav: {
+    prev: { label: '← 운영자 가이드', to: '/guide/for-operator' },
+    home: { label: '이용 안내로', to: '/guide' },
+  },
+};
+
+// ─── /guide/business (Business Guide 허브) ──────────────────────────────
+// WO-O4O-NETURE-BUSINESS-GUIDE-HUB-V1
+// 7개 사업 운영 안내서를 독립 체계로 묶는 허브. 역할 Guide와 분리.
+
+export const netureGuideBusinessHubProps: GuideFeatureManualPageProps = {
+  hero: {
+    eyebrow: '사업 운영 안내',
+    title: 'Business Guide',
+    description:
+      'Business Guide는 O4O 기능 사용법을 설명하는 문서가 아니라, 실제 사업을 어떻게 운영하는지를 설명하는 안내서입니다. "누가 운영하는가"(네트워크 운영)부터 콘텐츠 · 이벤트 오퍼 · 운영자 승인 상품 · 판매자 모집 · 유통참여형 펀딩 같은 O4O 핵심 운영 구조까지 안내합니다.',
+    primaryAction: { label: '운영 참여 검토 신청 →', to: '/o4o/apply' },
+    flowBarTitle: '구성',
+    flowLabels: ['네트워크 운영', '운영 구조'],
+  },
+  index: {
+    title: 'Business Guide 한눈에 보기',
+    lead: [
+      'Business Guide는 O4O 기능 설명이 아니라 실제 사업 운영 방법 안내서입니다.',
+      '"누가 운영하는가"(네트워크 운영)와 "무엇으로 운영하는가"(운영 구조)로 나뉩니다.',
+      '아래 카드를 선택해 각 안내서로 이동하세요.',
+    ],
+    cards: [
+      { title: '약국 네트워크 운영 안내', audience: '네트워크 운영', summary: '여러 약국이 함께 서비스를 운영하는 방법 (매장 기반).', to: '/guide/business/pharmacy-network' },
+      { title: '공급자 네트워크 운영 안내', audience: '네트워크 운영', summary: '공급자가 매장 네트워크를 운영하는 방법 (공급자 기반).', to: '/guide/business/supplier-network' },
+      { title: '콘텐츠 네트워크 운영 안내', audience: '운영 구조', summary: '콘텐츠를 중심으로 공급자 · 운영자 · 매장이 연결되는 구조.', to: '/guide/business/content-network' },
+      { title: '이벤트 오퍼 운영 안내', audience: '운영 구조', summary: '출시된 제품의 특별 공급 조건 — 유통질서.', to: '/guide/business/event-offer' },
+      { title: '운영자 승인 상품 운영 안내', audience: '운영 구조', summary: '새 제품을 운영자가 검토해 참여 매장이 도입.', to: '/guide/business/approved-product' },
+      { title: '판매자 모집 운영 안내', audience: '운영 구조', summary: '세 주체가 함께 판매 네트워크를 형성.', to: '/guide/business/seller-recruitment' },
+      { title: '유통참여형 펀딩 운영 안내', audience: '운영 구조', summary: '출시 전 · 초기 제품의 시장 검증 · 초기 유통망.', to: '/guide/business/market-trial' },
+    ],
+  },
+  sections: [
+    {
+      id: 'network',
+      step: '01',
+      title: '네트워크 운영',
+      description:
+        '누가 O4O 서비스를 운영하는가에 대한 안내입니다. 운영의 주체와 출신(매장 기반 · 공급자 기반)을 다룹니다.',
+      items: [
+        { label: '약국 네트워크 운영 안내', detail: '협동조합 · 약국 모임 등 여러 약국이 함께 서비스를 운영하는 방법 (매장 기반 운영자).' },
+        { label: '공급자 네트워크 운영 안내', detail: '도매 · 제조 · 수입사가 매장을 지원하는 서비스를 운영하는 방법 (공급자 기반 운영자).' },
+      ],
+    },
+    {
+      id: 'structure',
+      step: '02',
+      title: '운영 구조',
+      description:
+        'O4O의 핵심 운영 수단입니다. 콘텐츠를 중심으로 제품이 매장에 연결되는 다섯 가지 운영 구조를 다룹니다.',
+      items: [
+        { label: '콘텐츠 네트워크 운영 안내', detail: '콘텐츠를 중심으로 세 주체가 연결되고, 콘텐츠 운영이 사업 모델이 되는 구조.' },
+        { label: '이벤트 오퍼 운영 안내', detail: '출시된 제품을 특정 참여 매장에 제공하는 특별 공급 조건 — 유통질서.' },
+        { label: '운영자 승인 상품 운영 안내', detail: '새 제품을 운영자가 검토해 참여 매장이 안심하고 도입하는 구조.' },
+        { label: '판매자 모집 운영 안내', detail: '공급자 · 운영자 · 참여 매장이 함께 판매 네트워크를 형성하는 구조.' },
+        { label: '유통참여형 펀딩 운영 안내', detail: '출시 전 · 초기 제품의 시장 검증과 초기 유통망 형성 — 투자 상품 아님.' },
       ],
     },
   ],

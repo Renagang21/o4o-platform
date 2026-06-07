@@ -514,6 +514,8 @@ const GuideBusinessApprovedProductPage = lazy(() => import('./pages/guide').then
 const GuideBusinessSellerRecruitmentPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideBusinessSellerRecruitmentPage })));
 // WO-O4O-NETURE-BUSINESS-GUIDE-MARKET-TRIAL-V1
 const GuideBusinessMarketTrialPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideBusinessMarketTrialPage })));
+// WO-O4O-NETURE-BUSINESS-GUIDE-HUB-V1
+const GuideBusinessHubPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideBusinessHubPage })));
 
 // Loading fallback
 function PageLoading() {
@@ -700,6 +702,8 @@ function App() {
               <Route path="/guide/business/seller-recruitment" element={<GuideBusinessSellerRecruitmentPage />} />
               {/* WO-O4O-NETURE-BUSINESS-GUIDE-MARKET-TRIAL-V1 */}
               <Route path="/guide/business/market-trial" element={<GuideBusinessMarketTrialPage />} />
+              {/* WO-O4O-NETURE-BUSINESS-GUIDE-HUB-V1 */}
+              <Route path="/guide/business" element={<GuideBusinessHubPage />} />
               <Route path="/guide/intro" element={<GuideIntroPage />} />
               <Route path="/guide/intro/structure" element={<GuideIntroStructurePage />} />
               <Route path="/guide/intro/neture" element={<GuideIntroNeturePage />} />
