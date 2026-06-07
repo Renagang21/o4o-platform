@@ -1615,11 +1615,13 @@ export const netureGuideForOperatorProps: GuideFeatureManualPageProps = {
       step: '02',
       title: 'O4O에서 운영자의 역할',
       description:
-        '운영자는 공급자와 매장 사이에 위치합니다. 공급자의 원천 자료를 매장이 실제로 쓸 수 있는 형태로 바꾸고, 매장이 부담 없이 좋은 제품을 다루도록 연결하는 것이 핵심 역할입니다.',
+        '운영자는 공급자와 매장 사이에 위치합니다. 공급자의 원천 자료를 매장이 실제로 쓸 수 있는 형태로 바꾸고, 매장이 부담 없이 좋은 제품을 다루도록 연결하는 것이 핵심 역할입니다. 운영자는 모든 실무를 직접 수행하는 담당자가 아니라, 자원을 연결하는 사업 주체입니다.',
       items: [
-        { label: '연결자', detail: '공급자의 제품 · 자료와 매장의 판매 현장을 잇습니다.' },
+        { label: '사업 주체', detail: '참여 매장이 활용할 수 있는 환경을 구성하고 운영으로 수익 모델을 만드는 능동적 사업 주체입니다.' },
+        { label: '연결 주체', detail: '공급자의 제품 · 자료와 매장의 판매 현장을 잇습니다. 핵심은 대신하는 것이 아니라 연결하는 것입니다.' },
         { label: '실행 자산 제작', detail: '원천 자료를 매장이 그대로 쓸 수 있는 실행 자산으로 만듭니다.' },
         { label: '품질 관문', detail: '매장에 나갈 상품 · 자료를 검토 · 승인해 신뢰를 보장합니다.' },
+        { label: '모든 실무 담당자가 아님', detail: '콘텐츠 제작 · 상품 검토 · 영업 · 상담을 모두 직접 하지 않습니다. 공급자 · 참여자 · 외부 전문가의 자원을 연결해 운영합니다.' },
         { label: '매장 결정 존중', detail: '무엇을 노출 · 활용할지 최종 선택은 매장에 있습니다. 운영자는 지원자입니다.' },
       ],
     },
@@ -2005,7 +2007,10 @@ export const netureGuideBusinessPharmacyNetworkProps: GuideFeatureManualPageProp
       { title: '운영자 승인 상품은 언제 활용하는가', audience: '시작', summary: '네트워크 운영 과정에서 활용.', to: '#when-approved' },
       { title: '무엇을 운영하게 되는가', audience: '시작', summary: '콘텐츠 · 승인 상품 · 모집 · 오퍼 · 펀딩으로 확장.', to: '#what-operate' },
       { title: 'O4O는 무엇을 제공하는가', audience: '공통', summary: '운영자가 목적에 맞게 쓰는 운영 수단들.', to: '#o4o-offer' },
-      { title: '운영자는 실제로 무엇을 하는가', audience: '운영자', summary: '공급자 협력 · 콘텐츠 확보 · 승인 상품 · 오퍼 · 매장 지원.', to: '#operator-do' },
+      { title: '운영자는 실제로 무엇을 하는가', audience: '운영자', summary: '공급자 협력 · 콘텐츠 확보 · 승인 상품 · 오퍼 · 매장 지원 · 운영 정책.', to: '#operator-do' },
+      { title: '직접 하지 않아도 되는 일', audience: '운영자', summary: '모든 콘텐츠 · 검토 · 영업 · 상담을 혼자 하지 않습니다.', to: '#not-alone' },
+      { title: '운영자는 무엇을 연결하는가', audience: '운영자', summary: '대신하는 것이 아니라 자원을 연결합니다.', to: '#connect' },
+      { title: '네트워크가 커져도 운영 가능한 이유', audience: '운영자', summary: '공급자 참여 · 콘텐츠 재사용 · 매장 활용 · 표준화.', to: '#scalable' },
       { title: '참여 약국은 무엇을 하는가', audience: '약국', summary: '내 매장 · HUB · 승인 상품 · 오퍼 · 콘텐츠 · 소비자 응대.', to: '#store-do' },
       { title: '콘텐츠 운영은 어떻게 이루어지나', audience: '공통', summary: '공급자 보유 자료 중심 + 직접 · 조합원 · 외부 전문가.', to: '#content' },
       { title: '이벤트 오퍼는 무엇인가', audience: '중요', summary: '최저가 공동구매가 아니라 특별 공급 조건.', to: '#event' },
@@ -2162,11 +2167,54 @@ export const netureGuideBusinessPharmacyNetworkProps: GuideFeatureManualPageProp
         { label: '이벤트 오퍼 운영', detail: '참여 약국을 위한 특별 공급 조건을 공급자와 조율해 운영합니다.' },
         { label: '참여 매장 지원', detail: '약국의 활용 질문 · 운영 이슈를 지원합니다.' },
         { label: '매장 HUB 운영', detail: '상품 · 자료 · 콘텐츠를 HUB에 구성해 약국에 전달합니다.' },
+        { label: '판매자 모집 지원', detail: '제품을 다룰 약국 모집을 지원합니다.' },
+        { label: '운영 정책 정리', detail: '무엇을 어떤 매장에 어떻게 제공할지 운영 정책을 정리합니다.' },
+      ],
+    },
+    {
+      id: 'not-alone',
+      step: '12',
+      title: '운영자가 직접 하지 않아도 되는 일',
+      description:
+        '처음 운영을 준비하는 분들이 가장 걱정하는 부분입니다. 운영자는 모든 일을 혼자 직접 수행하는 구조가 아닙니다. 아래 일들은 운영자가 다 떠안지 않아도 됩니다.',
+      items: [
+        { label: '모든 콘텐츠 직접 제작', detail: '콘텐츠는 공급자가 제공하거나, 참여 약국이 함께 만들거나, 외부 전문가를 활용할 수 있습니다.' },
+        { label: '모든 상품 직접 검토', detail: '상품 검토는 공급자 자료와 참여 약국 의견을 활용할 수 있습니다.' },
+        { label: '모든 공급자 영업', detail: '공급자가 먼저 제안하거나 협력을 통해 확보할 수 있습니다.' },
+        { label: '모든 매장 운영', detail: '매장 운영은 참여 약국이 각자 맡습니다. 운영자는 지원합니다.' },
+        { label: '모든 상담 수행', detail: '소비자 상담은 매장이 하며, 운영자는 상담 자료를 제공합니다.' },
+        { label: '모든 마케팅 수행', detail: '마케팅 자료는 공급자 · 외부 자원을 활용할 수 있습니다.' },
+      ],
+    },
+    {
+      id: 'connect',
+      step: '13',
+      title: '운영자는 무엇을 연결하는가',
+      description:
+        '운영자의 핵심 역할은 모든 일을 대신하는 것이 아니라, 필요한 자원을 연결하는 것입니다.',
+      items: [
+        { label: '공급자', detail: '제품 · 콘텐츠 · 공급 조건을 가진 공급자를 연결합니다.' },
+        { label: '콘텐츠', detail: '흩어진 콘텐츠를 모아 매장이 바로 쓸 수 있게 연결합니다.' },
+        { label: '참여 매장', detail: '제품 · 자료를 활용할 참여 매장을 연결합니다.' },
+        { label: '소비자', detail: '매장을 통해 제품 · 건강 정보가 소비자에게 닿게 합니다.' },
+      ],
+    },
+    {
+      id: 'scalable',
+      step: '14',
+      title: '네트워크가 커져도 운영 가능한 이유',
+      description:
+        'O4O는 소규모 조직만을 위한 구조가 아닙니다. 네트워크가 커져도 운영자가 감당할 수 있는 이유는 다음과 같습니다.',
+      items: [
+        { label: '공급자 참여', detail: '공급자가 자료 · 콘텐츠를 직접 제공해 운영자 부담이 줄어듭니다.' },
+        { label: '콘텐츠 재사용', detail: '한 번 확보한 콘텐츠를 여러 매장이 함께 활용합니다.' },
+        { label: '참여 매장 활용', detail: '매장 운영 · 상담은 각 매장이 맡습니다.' },
+        { label: '운영 구조 표준화', detail: '표준 운영 구조 위에서 반복 작업이 줄어듭니다.' },
       ],
     },
     {
       id: 'store-do',
-      step: '12',
+      step: '15',
       title: '참여 약국은 무엇을 하는가',
       description:
         '참여 약국은 새로운 일을 만들지 않아도 됩니다. 운영자가 구성해 둔 것을 골라 내 매장에 적용하면 됩니다.',
@@ -2181,7 +2229,7 @@ export const netureGuideBusinessPharmacyNetworkProps: GuideFeatureManualPageProp
     },
     {
       id: 'content',
-      step: '13',
+      step: '16',
       title: '콘텐츠 운영은 어떻게 이루어지나',
       description:
         '좋은 콘텐츠는 운영자가 다 만들어야 하는 것이 아닙니다. 제품을 가장 잘 아는 공급자가 이미 보유한 경우가 많고, 운영자는 이를 확보 · 정리해 약국에 제공합니다. 직접 · 조합원 · 외부 전문가 제작은 이를 보완합니다.',
@@ -2196,7 +2244,7 @@ export const netureGuideBusinessPharmacyNetworkProps: GuideFeatureManualPageProp
     },
     {
       id: 'event',
-      step: '14',
+      step: '17',
       title: '이벤트 오퍼는 무엇인가',
       description:
         '이벤트 오퍼는 약국 네트워크에서 가장 많이 오해하는 부분입니다. "많이 모이면 무조건 저렴하게 산다"는 기대와 실제 의미는 다릅니다.',
@@ -2209,7 +2257,7 @@ export const netureGuideBusinessPharmacyNetworkProps: GuideFeatureManualPageProp
     },
     {
       id: 'flow',
-      step: '15',
+      step: '18',
       title: '실제 운영 흐름',
       description:
         '실제 운영은 공급자 → 운영자 → 참여 약국 → 소비자로 이어집니다. 각 단계의 역할은 다음과 같습니다.',
@@ -2222,7 +2270,7 @@ export const netureGuideBusinessPharmacyNetworkProps: GuideFeatureManualPageProp
     },
     {
       id: 'start',
-      step: '16',
+      step: '19',
       title: '시작 방법',
       description:
         '처음 시작할 때는 아래 순서를 따르면 됩니다. 한 번에 다 갖추지 않아도 되고, 가능한 것부터 시작하면 됩니다.',
