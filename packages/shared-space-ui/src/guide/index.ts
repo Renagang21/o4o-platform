@@ -98,6 +98,8 @@ export {
   netureGuideForSellerProps,
   // WO-O4O-NETURE-BUSINESS-GUIDE-PHARMACY-NETWORK-V1
   netureGuideBusinessPharmacyNetworkProps,
+  // WO-O4O-NETURE-BUSINESS-GUIDE-SUPPLIER-NETWORK-V1
+  netureGuideBusinessSupplierNetworkProps,
 } from './copy/neture.js';
 
 // WO-O4O-CROSSSERVICE-HOME-LATEST-AND-GUIDE-ALIGNMENT-V1
