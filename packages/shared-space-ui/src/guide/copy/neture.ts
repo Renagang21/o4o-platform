@@ -1436,6 +1436,7 @@ export const netureGuideO4OOverviewProps: GuideFeatureManualPageProps = {
       { title: 'O4O 대상 제품의 특징', audience: '공통', summary: '유통비용 · 정보 전달 · 공급자의 필요라는 공통점이 있습니다.', to: '#product' },
       { title: 'O4O가 해결하려는 것', audience: '공통', summary: '유통비용을 낮추고 좋은 제품의 시장 진입을 돕습니다.', to: '#problem' },
       { title: '공급자 · 운영자 · 판매자', audience: '공통', summary: '세 주체와 파트너가 각자의 역할로 협력합니다.', to: '#roles' },
+      { title: '누가 O4O를 운영할 수 있는가', audience: '공통', summary: '조직 형태가 아니라 가진 자산으로 판단 — 매장 · 공급망 · 전문성 · 고객군.', to: '#service-operator' },
       { title: 'O4O 주요 운영 방식', audience: '공통', summary: '승인 상품 · 이벤트 오퍼 · 판매자 모집 · 유통참여형 펀딩 · 매장 HUB · 내 매장.', to: '#operations' },
       { title: '누가 활용하나', audience: '공통', summary: '공급자 · 운영자 · 판매자 · 파트너가 활용합니다.', to: '#actors' },
     ],
@@ -1508,8 +1509,22 @@ export const netureGuideO4OOverviewProps: GuideFeatureManualPageProps = {
       ],
     },
     {
-      id: 'operations',
+      id: 'service-operator',
       step: '06',
+      title: '누가 O4O를 활용하여 서비스를 운영할 수 있는가',
+      description:
+        'O4O는 협동조합 같은 특정 조직 형태를 요구하지 않습니다. 중요한 것은 "지금 어떤 자산을 가지고 있는가"입니다. 아래 중 하나라도 해당된다면, 당신은 O4O를 활용해 서비스를 운영하는 운영자가 될 수 있습니다. (사업자 유형별 상세 안내는 O4O 플랫폼 소개에서 확인하세요.)',
+      items: [
+        { label: '이미 참여 매장을 가지고 있는가', detail: '협동조합 준비 그룹 · 지역 약국 모임 · 전문약사 그룹 · 관광객 대상 약국 네트워크 · 화장품 전문매장 네트워크 · 창고형 약국 협의체 등. 이미 여러 매장과 관계가 있다면 이벤트 오퍼 · 운영자 승인 상품 · 콘텐츠 운영 · 매장 HUB를 운영할 수 있습니다.' },
+        { label: '이미 공급망을 가지고 있는가', detail: '도매상 · 제조사 · 수입사 · 총판 · 브랜드사 등. 이미 제품과 거래 매장을 보유하고 있다면 판매자 모집 · 이벤트 오퍼 · 콘텐츠 제공 · 운영자 서비스를 운영할 수 있습니다.' },
+        { label: '특정 분야의 전문성을 가지고 있는가', detail: '당뇨 · 영양 · 여성건강 · 스포츠 영양 · 피부관리 등. 전문성을 중심으로 전문 네트워크를 운영할 수 있습니다.' },
+        { label: '특정 고객군을 가지고 있는가', detail: '관광객 · 시니어 · 특정 질환군 · 특정 라이프스타일 그룹 등. 특정 고객군에 특화된 서비스를 운영할 수 있습니다.' },
+        { label: '핵심은 조직 형태가 아니라 자산', detail: 'O4O는 특정 조직 형태를 위한 서비스가 아닙니다. 중요한 것은 어떤 자산을 가지고 있으며, 참여 매장에게 어떤 가치를 제공할 수 있는가입니다.' },
+      ],
+    },
+    {
+      id: 'operations',
+      step: '07',
       title: 'O4O 주요 운영 방식',
       description:
         'O4O는 제품이 매장에 도달하는 여러 운영 방식을 제공합니다. 각 방식은 제품 단계와 매장 상황에 따라 선택해 활용합니다.',
@@ -1524,7 +1539,7 @@ export const netureGuideO4OOverviewProps: GuideFeatureManualPageProps = {
     },
     {
       id: 'actors',
-      step: '07',
+      step: '08',
       title: '누가 O4O를 활용하나',
       description:
         '아래 네 주체가 O4O를 활용합니다. 자신의 입장에 맞는 가이드로 이동해 구체적인 활용 방법을 확인할 수 있습니다.',
@@ -1575,7 +1590,7 @@ export const netureGuideForOperatorProps: GuideFeatureManualPageProps = {
       { title: '콘텐츠 운영의 현실', audience: '공통', summary: '좋은 콘텐츠는 공급자가 보유한 경우가 많고, 운영자는 이를 확보 · 정리해 제공합니다.', to: '#content-reality' },
       { title: '판매자 모집', audience: '공통', summary: '제품을 다룰 매장을 모집해 운영 기반을 만듭니다.', to: '#recruit' },
       { title: '주문 · 배송 · 정산', audience: '공통', summary: '주문에서 정산까지의 흐름과 운영자 역할입니다.', to: '#settlement' },
-      { title: '적용 예시', audience: '공통', summary: '협동조합 · 세미 프랜차이즈 · 전문 네트워크 예시.', to: '#examples' },
+      { title: '서비스 운영 사업자 형태 예시', audience: '공통', summary: '판매자 기반 · 공급자 기반 운영자 형태 예시.', to: '#examples' },
     ],
   },
   sections: [
@@ -1743,13 +1758,13 @@ export const netureGuideForOperatorProps: GuideFeatureManualPageProps = {
     {
       id: 'examples',
       step: '13',
-      title: '적용 예시',
+      title: '서비스 운영 사업자 형태 예시',
       description:
-        '운영자 모델은 한 가지 형태가 아닙니다. 같은 O4O 운영 구조 위에서 아래와 같은 형태로 적용할 수 있습니다. 특정 조직이나 성공사례가 아니라, 적용 가능한 형태의 예시입니다.',
+        '운영자(서비스 운영 사업자)는 한 가지 출신이 아닙니다. 이미 매장을 가진 쪽(판매자 기반)에서 출발할 수도, 이미 공급망을 가진 쪽(공급자 기반)에서 출발할 수도 있습니다. 아래는 가능한 형태의 예시일 뿐, 특정 조직이나 성공사례가 아닙니다.',
       items: [
-        { label: '협동조합', detail: '조합원 매장이 함께 참여하고, 조합이 운영자로서 자료 확보 · 구성 · 승인 · 정산을 담당합니다. 조합원이 콘텐츠 제작에 참여할 수도 있습니다.' },
-        { label: '세미 프랜차이즈', detail: '본부가 운영자로서 통일된 자료 · 상품 · 콘텐츠를 제공하되, 인테리어 · 운영을 강하게 강제하지 않고 매장 자율을 존중하는 느슨한 결합입니다.' },
-        { label: '전문 네트워크', detail: '특정 분야 전문가 · 사업자가 네트워크를 구성해 전문 콘텐츠 · 제품을 매장에 공급하고, 매장은 전문성을 보강합니다.' },
+        { label: '판매자 기반 서비스 운영 사업자', detail: '협동조합 · 관광객 대상 약국 네트워크 · 창고형 약국 네트워크 · 화장품 전문매장 네트워크 · 전문약사 네트워크 · 지역 약국 네트워크 등. 매장들이 뭉쳐 운영자가 되는 형태입니다.' },
+        { label: '공급자 기반 서비스 운영 사업자', detail: '도매상 · 제조사 · 수입사 · 총판 · 브랜드사 등. 이미 가진 제품과 거래선 · 네트워크를 기반으로 운영자가 되는 형태입니다.' },
+        { label: '결합 방식은 다양', detail: '세미 프랜차이즈처럼 느슨한 결합부터 협동조합 같은 공동 운영까지, 결합 방식은 자유롭게 선택할 수 있습니다.' },
         { label: '공통 원칙', detail: '어떤 형태든 매장 자율 존중 · 공급자 유통질서 존중 · 좋은 콘텐츠 확보 중심이라는 점은 동일합니다.' },
       ],
     },
