@@ -93,6 +93,54 @@ function Badge({ map, value }: { map: Record<string, { label: string; cls: strin
   return <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${b.cls}`}>{b.label}</span>;
 }
 
+// ─── WO-O4O-NETURE-SUPPLIER-BULK-OPERATOR-REVIEW-V4 ───
+// 공급자 대량 등록(BULK-UPLOAD-SAVE-V3)으로 저장된 후보 식별/요약. rawPayload null 안전.
+
+/** bulk rawPayload 의 productType(프론트 key) → 한글 라벨 */
+const BULK_PRODUCT_TYPE_LABEL: Record<string, string> = {
+  non_drug: '비의약품',
+  quasi_drug: '의약외품',
+  otc_drug: '비처방 의약품',
+  rx_drug: '처방의약품',
+  unclassified: '미분류 / 운영자 검토',
+};
+
+interface BulkInfo {
+  isBulk: boolean;
+  productType?: string;
+  productTypeLabel?: string;
+  regulatoryType?: string | null;
+  drugCategory?: string | null;
+  rowNumber?: number;
+  supplierId?: string;
+  duplicateInBatch?: boolean;
+  fields?: Record<string, string>;
+}
+
+function str(v: unknown): string | undefined {
+  return typeof v === 'string' && v.trim() ? v : undefined;
+}
+
+/** 후보가 공급자 대량 등록 출처인지 + 요약 정보 추출 (rawPayload null/누락 안전) */
+function getBulkInfo(c: ProductCandidate): BulkInfo {
+  const p = c.rawPayload ?? {};
+  const isBulk = p['source'] === 'supplier_bulk_upload' || (c.sourceLabel ?? '').includes('대량 등록');
+  if (!isBulk) return { isBulk: false };
+  const productType = str(p['productType']) ?? str(p['product_type']);
+  const rowNumberRaw = p['rowNumber'];
+  return {
+    isBulk: true,
+    productType,
+    productTypeLabel: productType ? BULK_PRODUCT_TYPE_LABEL[productType] ?? productType : undefined,
+    regulatoryType: str(p['regulatoryType']) ?? null,
+    drugCategory: str(p['drugCategory']) ?? str(p['drug_category']) ?? null,
+    rowNumber: typeof rowNumberRaw === 'number' ? rowNumberRaw : undefined,
+    supplierId: str(p['supplierId']),
+    duplicateInBatch: p['duplicateInBatch'] === true,
+    fields: (p['fields'] && typeof p['fields'] === 'object') ? (p['fields'] as Record<string, string>) : undefined,
+  };
+}
+
 // ─── Component ───
 
 export default function ProductCandidateReviewPage() {
@@ -101,6 +149,7 @@ export default function ProductCandidateReviewPage() {
   const [statusFilter, setStatusFilter] = useState<'all' | ProductCandidateStatus>('all');
   const [matchFilter, setMatchFilter] = useState<'all' | ProductCandidateMatchStatus>('all');
   const [typeFilter, setTypeFilter] = useState<'all' | ProductTypeClass>('all');
+  const [bulkOnly, setBulkOnly] = useState(false); // WO-..-BULK-OPERATOR-REVIEW-V4: 공급자 대량 등록만
   const [searchTerm, setSearchTerm] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
 
@@ -137,6 +186,7 @@ export default function ProductCandidateReviewPage() {
   // 클라이언트 측 검색 (backend 는 text 검색 미지원 — 로드된 페이지 내 필터)
   const filtered = items.filter((c) => {
     if (typeFilter !== 'all' && (c.classification?.productTypeClass ?? 'unknown') !== typeFilter) return false;
+    if (bulkOnly && !getBulkInfo(c).isBulk) return false;
     const term = searchTerm.trim().toLowerCase();
     if (!term) return true;
     return (
@@ -264,12 +314,26 @@ export default function ProductCandidateReviewPage() {
       key: 'candidateName',
       header: '후보명',
       sortable: true,
-      render: (_v, row) => (
-        <div>
-          <p className="font-medium text-slate-800">{row.candidateName || '(이름 없음)'}</p>
-          <p className="text-xs text-slate-400 mt-0.5">{row.id.slice(0, 8)}...</p>
-        </div>
-      ),
+      render: (_v, row) => {
+        const bulk = getBulkInfo(row);
+        return (
+          <div>
+            <p className="font-medium text-slate-800">{row.candidateName || '(이름 없음)'}</p>
+            <div className="flex flex-wrap items-center gap-1 mt-0.5">
+              {bulk.isBulk && (
+                <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-medium bg-violet-50 text-violet-700">공급자 대량 등록</span>
+              )}
+              {bulk.isBulk && bulk.rowNumber != null && (
+                <span className="inline-block px-1.5 py-0.5 rounded text-[10px] bg-slate-100 text-slate-500">CSV row {bulk.rowNumber}</span>
+              )}
+              {bulk.duplicateInBatch && (
+                <span className="inline-block px-1.5 py-0.5 rounded text-[10px] bg-amber-50 text-amber-700">중복 가능</span>
+              )}
+              <span className="text-xs text-slate-400">{row.id.slice(0, 8)}...</span>
+            </div>
+          </div>
+        );
+      },
     },
     {
       key: 'identifierValue',
@@ -287,8 +351,12 @@ export default function ProductCandidateReviewPage() {
       key: 'sourceType',
       header: '출처',
       align: 'center',
-      width: '90px',
-      render: (v) => <span className="text-xs text-slate-600">{SOURCE_LABEL[v as ProductCandidateSourceType] || v}</span>,
+      width: '110px',
+      render: (v, row) => (
+        <span className="text-xs text-slate-600">
+          {row.sourceLabel || SOURCE_LABEL[v as ProductCandidateSourceType] || v}
+        </span>
+      ),
     },
     {
       key: '_productType',
@@ -420,6 +488,16 @@ export default function ProductCandidateReviewPage() {
             <option key={f.key} value={f.key}>{f.label}</option>
           ))}
         </select>
+        {/* WO-..-BULK-OPERATOR-REVIEW-V4: 공급자 대량 등록만 */}
+        <label className="flex items-center gap-1.5 text-sm text-slate-600 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={bulkOnly}
+            onChange={(e) => setBulkOnly(e.target.checked)}
+            className="rounded border-slate-300 text-violet-600 focus:ring-violet-500"
+          />
+          공급자 대량 등록만
+        </label>
         <input
           type="text"
           placeholder="후보명, 식별자 검색..."
@@ -513,6 +591,9 @@ export default function ProductCandidateReviewPage() {
                   )}
                 </div>
               )}
+
+              {/* WO-..-BULK-OPERATOR-REVIEW-V4: 공급자 대량 등록 정보 + CSV row 요약 */}
+              <BulkDetailSection candidate={detail} />
 
               {/* F4: 의약품 분류 refine (matched master 한정) */}
               <div className="border-t border-slate-100 pt-4">
@@ -709,6 +790,70 @@ function Field({ label, value }: { label: string; value: string | null | undefin
     <div>
       <dt className="text-xs text-slate-400">{label}</dt>
       <dd className="text-slate-700 break-all">{value || <span className="text-slate-300">-</span>}</dd>
+    </div>
+  );
+}
+
+// ─── WO-O4O-NETURE-SUPPLIER-BULK-OPERATOR-REVIEW-V4 ───
+// 공급자 대량 등록 후보 요약(제품유형/분류/CSV row/공급자/주요 fields) + rawPayload 원문 접기.
+// bulk 가 아니어도 rawPayload 가 있으면 원문만 접기로 제공. rawPayload null 안전.
+
+const BULK_FIELD_ORDER = [
+  '제품명', '제조사', '브랜드', '공급자상품코드', '의약품표준코드', '바코드또는표준코드', '바코드',
+  '보험코드', '포장단위', '성분명', '함량', '제형', '규격', '단위', '기본공급가', '제품설명', '공급메모', '비고',
+];
+
+function BulkDetailSection({ candidate }: { candidate: ProductCandidate }) {
+  const bulk = getBulkInfo(candidate);
+  const raw = candidate.rawPayload;
+  const hasRaw = raw && typeof raw === 'object' && Object.keys(raw).length > 0;
+  if (!bulk.isBulk && !hasRaw) return null;
+
+  const fields = bulk.fields ?? {};
+  const fieldKeys = BULK_FIELD_ORDER.filter((k) => (fields[k] ?? '').trim());
+
+  return (
+    <div className="border-t border-slate-100 pt-4">
+      {bulk.isBulk && (
+        <div className="rounded-lg border border-violet-100 bg-violet-50/50 p-3">
+          <div className="flex flex-wrap items-center gap-2 mb-2">
+            <span className="px-2 py-0.5 rounded text-xs font-medium bg-violet-100 text-violet-800">공급자 대량 등록</span>
+            {bulk.productTypeLabel && (
+              <span className="px-2 py-0.5 rounded text-xs bg-white border border-violet-200 text-violet-700">{bulk.productTypeLabel}</span>
+            )}
+            {bulk.rowNumber != null && (
+              <span className="px-2 py-0.5 rounded text-xs bg-white border border-slate-200 text-slate-500">CSV row {bulk.rowNumber}</span>
+            )}
+            {bulk.duplicateInBatch && (
+              <span className="px-2 py-0.5 rounded text-xs bg-amber-50 text-amber-700">중복 가능 — 검토 필요</span>
+            )}
+          </div>
+          <dl className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-sm">
+            <Field label="제품 유형" value={bulk.productTypeLabel} />
+            <Field label="규제 유형(regulatoryType)" value={bulk.regulatoryType} />
+            <Field label="의약품 분류(drugCategory)" value={bulk.drugCategory} />
+            <Field label="공급자 ID" value={bulk.supplierId} />
+          </dl>
+
+          {fieldKeys.length > 0 && (
+            <div className="mt-3">
+              <p className="text-xs font-medium text-slate-500 mb-1">CSV 행 요약</p>
+              <dl className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm">
+                {fieldKeys.map((k) => <Field key={k} label={k} value={fields[k]} />)}
+              </dl>
+            </div>
+          )}
+        </div>
+      )}
+
+      {hasRaw && (
+        <details className="mt-2">
+          <summary className="cursor-pointer text-xs text-slate-500 hover:text-slate-700">원본 rawPayload 보기</summary>
+          <pre className="mt-2 max-h-60 overflow-auto rounded-lg bg-slate-900 text-slate-100 text-[11px] p-3 whitespace-pre-wrap break-all">
+            {JSON.stringify(raw, null, 2)}
+          </pre>
+        </details>
+      )}
     </div>
   );
 }
