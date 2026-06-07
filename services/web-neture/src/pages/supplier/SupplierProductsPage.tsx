@@ -26,7 +26,7 @@ import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { supplierApi, productApi, type SupplierProduct, type SupplierProductPurpose } from '../../lib/api';
 import ProductDetailDrawer from './ProductDetailDrawer';
 // WO-O4O-NETURE-SUPPLIER-OFFER-MODE-SELECTION-V1
-import { getAllowedOfferActions, SUPPLIER_OFFER_ACTION_META, type SupplierOfferAction } from '../../lib/supplierProductTypes';
+import { getAllowedOfferActions, SUPPLIER_OFFER_ACTION_META, buildOfferActionUrl, type SupplierOfferAction } from '../../lib/supplierProductTypes';
 import MediaPickerModal from '../../components/common/MediaPickerModal';
 import {
   APPROVAL_STATUS_BADGE,
@@ -871,7 +871,16 @@ export default function SupplierProductsPage() {
               if (!action) return;
               const meta = SUPPLIER_OFFER_ACTION_META[action];
               if (!meta?.ready || !meta.path) return; // 준비 중 → no-op
-              navigate(meta.path);
+              // 선택 상품 context 를 query 로 전달 (이벤트/펀딩 생성 화면 prefill)
+              const url = buildOfferActionUrl(action, {
+                id: row.id,
+                masterId: row.masterId,
+                name: row.name,
+                brandName: row.brandName,
+                priceGeneral: row.priceGeneral,
+                regulatoryType: row.regulatoryType,
+              });
+              navigate(url ?? meta.path);
             }}
             className="w-full text-xs border border-slate-200 rounded px-2 py-1 bg-white text-slate-600 focus:outline-none focus:ring-1 focus:ring-blue-400"
           >

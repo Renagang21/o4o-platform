@@ -28,6 +28,8 @@ import type {
 } from '../../lib/api';
 import { GuideBlock } from '@o4o/shared-space-ui';
 import { fetchGuidePageContent } from '../../api/guideContent';
+// WO-O4O-NETURE-SUPPLIER-EVENT-FUNDING-WORKSPACE-PREFILL-V1
+import SelectedSupplierProductBanner from '../../components/supplier/SelectedSupplierProductBanner';
 
 const GUIDE_PAGE_KEY = 'supplier.event-offer.editor';
 const SERVICE_KEY = 'neture';
@@ -430,6 +432,9 @@ export default function SupplierEventOfferPage() {
         ]}
         compact
       />
+
+      {/* WO-O4O-NETURE-SUPPLIER-EVENT-FUNDING-WORKSPACE-PREFILL-V1: 선택 상품 context */}
+      <SelectedSupplierProductBanner kind="event" />
 
       {/* WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1: 내 제안 현황 */}
       {(proposalsLoading || myProposals.length > 0) && (

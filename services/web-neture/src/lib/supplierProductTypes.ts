@@ -99,3 +99,31 @@ export function getAllowedOfferActions(regulatoryType?: string | null): {
   if (reg === 'DRUG') return { restricted: true, actions: [] };
   return { restricted: false, actions: ['supply', 'recruit', 'event', 'funding'] };
 }
+
+/** 후속 액션 진입 시 선택 상품 context 를 전달하는 query 파라미터 키 (생성 화면이 읽음) */
+export interface OfferActionProductContext {
+  id: string;
+  masterId?: string | null;
+  name?: string | null;
+  brandName?: string | null;
+  priceGeneral?: number | null;
+  regulatoryType?: string | null;
+}
+
+/**
+ * 후속 액션 이동 URL 빌더 — 선택 공급자 상품 context 를 query 로 전달.
+ * WO-O4O-NETURE-SUPPLIER-EVENT-FUNDING-WORKSPACE-PREFILL-V1
+ * ready=false(준비중) 또는 path 없으면 null.
+ */
+export function buildOfferActionUrl(action: SupplierOfferAction, product: OfferActionProductContext): string | null {
+  const meta = SUPPLIER_OFFER_ACTION_META[action];
+  if (!meta.ready || !meta.path) return null;
+  const p = new URLSearchParams();
+  p.set('supplierProductId', product.id);
+  if (product.masterId) p.set('masterId', product.masterId);
+  if (product.name) p.set('name', product.name);
+  if (product.brandName) p.set('brand', product.brandName);
+  if (product.priceGeneral != null) p.set('price', String(product.priceGeneral));
+  if (product.regulatoryType) p.set('regulatoryType', product.regulatoryType);
+  return `${meta.path}?${p.toString()}`;
+}

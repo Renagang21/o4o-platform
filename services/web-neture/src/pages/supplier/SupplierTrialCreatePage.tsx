@@ -14,6 +14,8 @@ import { useNavigate } from 'react-router-dom';
 import { RichTextEditor } from '@o4o/content-editor';
 import { createTrial, submitTrial, updateTrial } from '../../api/trial';
 import type { CreateTrialPayload, Trial } from '../../api/trial';
+// WO-O4O-NETURE-SUPPLIER-EVENT-FUNDING-WORKSPACE-PREFILL-V1
+import SelectedSupplierProductBanner from '../../components/supplier/SelectedSupplierProductBanner';
 
 // WO-MARKET-TRIAL-SALES-SCENARIO-EDITOR-V1
 const SALES_SCENARIO_TEMPLATE = `<h3>1. 진열 위치 및 방법</h3>
@@ -161,6 +163,9 @@ export default function SupplierTrialCreatePage({
         {mode === 'edit' ? '유통참여형 펀딩 수정' : '유통참여형 펀딩 등록'}
       </h1>
       <p className="text-sm text-gray-500 mb-6">매장 참여를 설득하는 제안서를 작성하세요.</p>
+
+      {/* WO-O4O-NETURE-SUPPLIER-EVENT-FUNDING-WORKSPACE-PREFILL-V1: 선택 상품 context */}
+      <SelectedSupplierProductBanner kind="funding" />
 
       {/* WO-O4O-NETURE-DISTRIBUTION-FUNDING-SUPPLIER-DESIGN-FIELDS-V1: 설계 안내 */}
       <div className="mb-6 p-4 bg-violet-50 border border-violet-200 rounded-lg text-sm text-violet-900 space-y-1.5">
