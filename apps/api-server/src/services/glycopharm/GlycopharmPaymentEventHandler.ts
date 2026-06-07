@@ -20,12 +20,13 @@ import {
   PaymentCompletedEvent,
   PaymentFailedEvent,
 } from '../payment/PaymentEventHub.js';
+// WO-O4O-SERVICE-ORDER-FULL-CHECKOUT-ALIGN-V1: canonical checkout_orders 정렬 (ecommerce_orders 미존재 — H1).
+// create/payment controller 와 동일 원장(CheckoutOrder)을 조회·갱신해야 결제완료 전이가 동작한다.
 import {
-  EcommerceOrder,
-  EcommerceOrderItem,
-  OrderStatus,
-  PaymentStatus,
-} from '@o4o/ecommerce-core';
+  CheckoutOrder,
+  CheckoutOrderStatus,
+  CheckoutPaymentStatus,
+} from '../../entities/checkout/CheckoutOrder.entity.js';
 import logger from '../../utils/logger.js';
 import { GLYCOPHARM_OPL_SERVICE_KEYS } from '../../constants/service-keys.js';
 
@@ -37,12 +38,12 @@ interface ProcessingResult {
 }
 
 export class GlycopharmPaymentEventHandler {
-  private orderRepository: Repository<EcommerceOrder>;
+  private orderRepository: Repository<CheckoutOrder>;
   private processedPayments: Set<string> = new Set();
   private initialized: boolean = false;
 
   constructor(private dataSource: DataSource) {
-    this.orderRepository = dataSource.getRepository(EcommerceOrder);
+    this.orderRepository = dataSource.getRepository(CheckoutOrder);
   }
 
   initialize(): void {
@@ -120,7 +121,7 @@ export class GlycopharmPaymentEventHandler {
       };
     }
 
-    if (order.status === OrderStatus.PAID || order.status === OrderStatus.CONFIRMED) {
+    if (order.status === CheckoutOrderStatus.PAID) {
       return {
         success: true,
         orderId: event.orderId,
@@ -129,7 +130,7 @@ export class GlycopharmPaymentEventHandler {
       };
     }
 
-    if (order.status !== OrderStatus.CREATED && order.status !== OrderStatus.PENDING_PAYMENT) {
+    if (order.status !== CheckoutOrderStatus.CREATED && order.status !== CheckoutOrderStatus.PENDING_PAYMENT) {
       return {
         success: false,
         orderId: event.orderId,
@@ -144,8 +145,8 @@ export class GlycopharmPaymentEventHandler {
     // ================================================================
     const limitExceeded = await this.checkSalesLimitBeforePaid(order);
     if (limitExceeded) {
-      order.status = OrderStatus.CANCELLED;
-      order.paymentStatus = PaymentStatus.FAILED;
+      order.status = CheckoutOrderStatus.CANCELLED;
+      order.paymentStatus = CheckoutPaymentStatus.FAILED;
       await this.orderRepository.save(order);
 
       logger.warn('[GlycopharmPaymentEventHandler] Order cancelled: sales_limit exceeded at confirm', {
@@ -162,8 +163,8 @@ export class GlycopharmPaymentEventHandler {
       };
     }
 
-    order.status = OrderStatus.PAID;
-    order.paymentStatus = PaymentStatus.PAID;
+    order.status = CheckoutOrderStatus.PAID;
+    order.paymentStatus = CheckoutPaymentStatus.PAID;
     order.paymentMethod = event.paymentMethod;
     order.paidAt = event.approvedAt;
 
@@ -184,16 +185,15 @@ export class GlycopharmPaymentEventHandler {
    * 한도 미초과 또는 매핑 없음 → null 반환.
    */
   private async checkSalesLimitBeforePaid(
-    order: EcommerceOrder,
+    order: CheckoutOrder,
   ): Promise<{ productId: string; salesLimit: number; currentSold: number; quantity: number } | null> {
     const metadata = order.metadata as { channelId?: string; pharmacyId?: string } | null;
     if (!metadata?.channelId || !metadata?.pharmacyId) {
       return null; // 채널 정보 없으면 검증 스킵
     }
 
-    // 주문 아이템 조회
-    const orderItemRepo = this.dataSource.getRepository(EcommerceOrderItem);
-    const items = await orderItemRepo.find({ where: { orderId: order.id } });
+    // 주문 아이템 (checkout_orders.items jsonb)
+    const items = order.items ?? [];
     if (items.length === 0) return null;
 
     // 해당 채널의 sales_limit 매핑 조회
@@ -280,8 +280,8 @@ export class GlycopharmPaymentEventHandler {
         return;
       }
 
-      if (order.status === OrderStatus.CREATED || order.status === OrderStatus.PENDING_PAYMENT) {
-        order.paymentStatus = PaymentStatus.FAILED;
+      if (order.status === CheckoutOrderStatus.CREATED || order.status === CheckoutOrderStatus.PENDING_PAYMENT) {
+        order.paymentStatus = CheckoutPaymentStatus.FAILED;
         await this.orderRepository.save(order);
 
         logger.info(`${logPrefix} Payment failed for order (paymentStatus set to FAILED)`, {

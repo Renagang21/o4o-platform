@@ -18,7 +18,9 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { body, param, validationResult } from 'express-validator';
 import { DataSource } from 'typeorm';
 import { PaymentCoreService } from '@o4o/payment-core';
-import { EcommerceOrder, OrderStatus } from '@o4o/ecommerce-core/entities';
+// WO-O4O-SERVICE-ORDER-FULL-CHECKOUT-ALIGN-V1: 주문 lookup 을 canonical checkout_orders 로 정렬
+// (ecommerce_orders 미존재 — H1). create 와 동일 원장 사용해야 결제완료 시 주문 조회 가능.
+import { CheckoutOrder, CheckoutOrderStatus } from '../../../entities/checkout/CheckoutOrder.entity.js';
 import { TypeORMPaymentRepository } from '../../../services/payment/adapters/TypeORMPaymentRepository.js';
 import { TossPaymentProviderAdapter } from '../../../services/payment/adapters/TossPaymentProviderAdapter.js';
 import { EventHubPaymentPublisher } from '../../../services/payment/adapters/EventHubPaymentPublisher.js';
@@ -52,7 +54,7 @@ function handleValidationErrors(req: Request, res: Response): boolean {
 /**
  * 주문명 생성 (Toss 결제창 표시용)
  */
-function generateOrderName(order: EcommerceOrder): string {
+function generateOrderName(order: CheckoutOrder): string {
   if (!order.items || order.items.length === 0) {
     return '약국 주문';
   }
@@ -69,7 +71,7 @@ export function createGlycopharmPaymentController(
   requireAuth: (req: Request, res: Response, next: NextFunction) => void,
 ): Router {
   const router = Router();
-  const orderRepository = dataSource.getRepository(EcommerceOrder);
+  const orderRepository = dataSource.getRepository(CheckoutOrder);
 
   // Adapter 인스턴스 생성 + PaymentCoreService 조립
   const repository = new TypeORMPaymentRepository(dataSource);
@@ -106,7 +108,6 @@ export function createGlycopharmPaymentController(
         // 주문 조회 및 소유권 확인
         const order = await orderRepository.findOne({
           where: { id: orderId, buyerId: userId },
-          relations: ['items'],
         });
 
         if (!order) {
@@ -114,7 +115,7 @@ export function createGlycopharmPaymentController(
         }
 
         // 결제 가능 상태 확인
-        if (order.status !== OrderStatus.CREATED && order.status !== OrderStatus.PENDING_PAYMENT) {
+        if (order.status !== CheckoutOrderStatus.CREATED && order.status !== CheckoutOrderStatus.PENDING_PAYMENT) {
           return errorResponse(res, 400, 'ORDER_NOT_PAYABLE', 'Order is not in payable state', {
             currentStatus: order.status,
           });
@@ -125,7 +126,7 @@ export function createGlycopharmPaymentController(
           orderId: order.id,
           orderName: generateOrderName(order),
           amount: Number(order.totalAmount),
-          currency: order.currency,
+          currency: 'KRW',
           successUrl,
           failUrl,
           sourceService: 'glycopharm',
@@ -290,14 +291,13 @@ export function createGlycopharmPaymentController(
 
         const order = await orderRepository.findOne({
           where: { id: req.params.orderId, buyerId: userId },
-          relations: ['items'],
         });
 
         if (!order) {
           return errorResponse(res, 404, 'ORDER_NOT_FOUND', 'Order not found');
         }
 
-        if (order.status !== OrderStatus.CREATED && order.status !== OrderStatus.PENDING_PAYMENT) {
+        if (order.status !== CheckoutOrderStatus.CREATED && order.status !== CheckoutOrderStatus.PENDING_PAYMENT) {
           return errorResponse(res, 400, 'ORDER_NOT_PAYABLE', 'Order is not payable', {
             currentStatus: order.status,
           });
@@ -310,7 +310,7 @@ export function createGlycopharmPaymentController(
             orderNumber: order.orderNumber,
             orderName: generateOrderName(order),
             amount: Number(order.totalAmount),
-            currency: order.currency,
+            currency: 'KRW',
             clientKey: process.env.TOSS_PAYMENTS_CLIENT_KEY || 'test_ck_test_key',
           },
         });

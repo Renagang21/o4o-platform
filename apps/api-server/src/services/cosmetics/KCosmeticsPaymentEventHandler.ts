@@ -24,11 +24,13 @@ import {
   PaymentFailedEvent,
   PaymentEventType,
 } from '../payment/PaymentEventHub.js';
+// WO-O4O-SERVICE-ORDER-FULL-CHECKOUT-ALIGN-V1: canonical checkout_orders 정렬 (ecommerce_orders 미존재 — H1).
+// create/payment controller 와 동일 원장(CheckoutOrder)을 조회·갱신해야 결제완료 전이가 동작한다.
 import {
-  EcommerceOrder,
-  OrderStatus,
-  PaymentStatus,
-} from '@o4o/ecommerce-core';
+  CheckoutOrder,
+  CheckoutOrderStatus,
+  CheckoutPaymentStatus,
+} from '../../entities/checkout/CheckoutOrder.entity.js';
 import logger from '../../utils/logger.js';
 
 /**
@@ -47,12 +49,12 @@ interface ProcessingResult {
  * K-Cosmetics 서비스의 결제 이벤트 핸들러
  */
 export class KCosmeticsPaymentEventHandler {
-  private orderRepository: Repository<EcommerceOrder>;
+  private orderRepository: Repository<CheckoutOrder>;
   private processedPayments: Set<string> = new Set(); // 중복 처리 방지
   private initialized: boolean = false;
 
   constructor(private dataSource: DataSource) {
-    this.orderRepository = dataSource.getRepository(EcommerceOrder);
+    this.orderRepository = dataSource.getRepository(CheckoutOrder);
   }
 
   /**
@@ -150,7 +152,7 @@ export class KCosmeticsPaymentEventHandler {
     }
 
     // 2. 이미 결제된 주문인지 확인
-    if (order.status === OrderStatus.PAID || order.status === OrderStatus.CONFIRMED) {
+    if (order.status === CheckoutOrderStatus.PAID) {
       return {
         success: true,
         orderId: event.orderId,
@@ -160,7 +162,7 @@ export class KCosmeticsPaymentEventHandler {
     }
 
     // 3. 결제 가능한 상태인지 확인
-    if (order.status !== OrderStatus.CREATED && order.status !== OrderStatus.PENDING_PAYMENT) {
+    if (order.status !== CheckoutOrderStatus.CREATED && order.status !== CheckoutOrderStatus.PENDING_PAYMENT) {
       return {
         success: false,
         orderId: event.orderId,
@@ -170,8 +172,8 @@ export class KCosmeticsPaymentEventHandler {
     }
 
     // 4. 주문 상태 업데이트
-    order.status = OrderStatus.PAID;
-    order.paymentStatus = PaymentStatus.PAID;
+    order.status = CheckoutOrderStatus.PAID;
+    order.paymentStatus = CheckoutPaymentStatus.PAID;
     order.paymentMethod = event.paymentMethod;
     order.paidAt = event.approvedAt;
 
@@ -209,10 +211,10 @@ export class KCosmeticsPaymentEventHandler {
       }
 
       // 주문 상태가 'created' 또는 'pending_payment'인 경우 결제 상태만 실패로 변경
-      if (order.status === OrderStatus.CREATED || order.status === OrderStatus.PENDING_PAYMENT) {
+      if (order.status === CheckoutOrderStatus.CREATED || order.status === CheckoutOrderStatus.PENDING_PAYMENT) {
         // 결제 실패 시 주문은 그대로 유지 (사용자가 다시 결제 시도 가능)
         // paymentStatus만 FAILED로 변경
-        order.paymentStatus = PaymentStatus.FAILED;
+        order.paymentStatus = CheckoutPaymentStatus.FAILED;
         await this.orderRepository.save(order);
 
         logger.info(`${logPrefix} Payment failed for order (paymentStatus set to FAILED)`, {

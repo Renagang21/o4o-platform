@@ -17,16 +17,14 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { body, query, param, validationResult } from 'express-validator';
 import { DataSource, Brackets } from 'typeorm';
+// WO-O4O-SERVICE-ORDER-FULL-CHECKOUT-ALIGN-V1: canonical checkout_orders 정렬 (ecommerce_orders 미존재 — H1).
+// create 를 CheckoutOrder 기준으로 정렬. list/get 은 이미 checkout_orders raw SQL.
 import {
-  EcommerceOrder,
-  EcommerceOrderItem,
-  OrderType,
-  OrderStatus,
-  PaymentStatus,
-  BuyerType,
-  SellerType,
+  CheckoutOrder,
+  CheckoutOrderStatus,
+  CheckoutPaymentStatus,
   type ShippingAddress,
-} from '@o4o/ecommerce-core/entities';
+} from '../../../entities/checkout/CheckoutOrder.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import logger from '../../../utils/logger.js';
 import { opsMetrics, OPS } from '../../../services/ops-metrics.service.js';
@@ -314,7 +312,8 @@ async function createCoreOrder(
   dto: {
     buyerId: string;
     sellerId: string;
-    orderType: OrderType;
+    /** @deprecated EcommerceOrder.orderType 잔재 — CheckoutOrder 미사용(serviceKey 는 metadata) */
+    orderType?: unknown;
     items: Array<{
       productId?: string;
       productName: string;
@@ -332,7 +331,7 @@ async function createCoreOrder(
     channel?: string;
     storeId?: string;
   }
-): Promise<EcommerceOrder> {
+): Promise<CheckoutOrder> {
   const subtotal = dto.items.reduce((sum, item) => {
     return sum + (item.quantity * item.unitPrice - (item.discount || 0));
   }, 0);
@@ -341,53 +340,38 @@ async function createCoreOrder(
   const discount = dto.discount || 0;
   const totalAmount = subtotal + shippingFee - discount;
 
-  const orderRepo = manager.getRepository(EcommerceOrder);
-  const orderItemRepo = manager.getRepository(EcommerceOrderItem);
+  // WO-O4O-SERVICE-ORDER-FULL-CHECKOUT-ALIGN-V1: CheckoutOrder(checkout_orders) 로 적재.
+  // items jsonb 인라인. channel/storeId 는 metadata 에 보존(list/get 가 metadata->>'channel' 사용).
+  // supplierId 는 CheckoutOrder 필수 — retail 주문이라 sellerId 동일값 사용.
+  const orderRepo = manager.getRepository(CheckoutOrder);
 
   const order = orderRepo.create({
     orderNumber: generateOrderNumber(),
     buyerId: dto.buyerId,
-    buyerType: BuyerType.USER,
     sellerId: dto.sellerId,
-    sellerType: SellerType.ORGANIZATION,
-    orderType: dto.orderType,
+    supplierId: dto.sellerId,
+    items: dto.items.map((itemDto) => ({
+      productId: itemDto.productId ?? '',
+      productName: itemDto.productName,
+      quantity: itemDto.quantity,
+      unitPrice: itemDto.unitPrice,
+      subtotal: itemDto.quantity * itemDto.unitPrice - (itemDto.discount || 0),
+    })),
     subtotal,
     shippingFee,
     discount,
     totalAmount,
-    currency: 'KRW',
-    paymentStatus: PaymentStatus.PENDING,
-    status: OrderStatus.CREATED,
+    status: CheckoutOrderStatus.CREATED,
+    paymentStatus: CheckoutPaymentStatus.PENDING,
     shippingAddress: dto.shippingAddress,
     metadata: dto.metadata,
-    channel: dto.channel,
-    storeId: dto.storeId,
-    orderSource: 'online',
   });
 
   const savedOrder = await orderRepo.save(order);
 
-  const items = dto.items.map((itemDto) =>
-    orderItemRepo.create({
-      orderId: savedOrder.id,
-      productId: itemDto.productId,
-      productName: itemDto.productName,
-      sku: itemDto.sku,
-      quantity: itemDto.quantity,
-      unitPrice: itemDto.unitPrice,
-      discount: itemDto.discount || 0,
-      subtotal: itemDto.quantity * itemDto.unitPrice - (itemDto.discount || 0),
-      options: itemDto.options,
-      metadata: itemDto.metadata,
-    })
-  );
-
-  await orderItemRepo.save(items);
-
-  logger.info('[EcommerceCore] Cosmetics order created:', {
+  logger.info('[CheckoutOrder] Cosmetics order created:', {
     orderId: savedOrder.id,
     orderNumber: savedOrder.orderNumber,
-    orderType: savedOrder.orderType,
     sellerId: savedOrder.sellerId,
     totalAmount: savedOrder.totalAmount,
   });
@@ -511,7 +495,7 @@ export function createCosmeticsOrderController(
         }
 
         // 트랜잭션으로 Order + Items 원자적 생성
-        let savedOrder!: EcommerceOrder;
+        let savedOrder!: CheckoutOrder;
 
         await dataSource.transaction(async (manager) => {
           const metadata: Record<string, unknown> = {
@@ -522,7 +506,6 @@ export function createCosmeticsOrderController(
           savedOrder = await createCoreOrder(manager, {
             buyerId,
             sellerId: dto.sellerId,
-            orderType: OrderType.RETAIL,
             items: dto.items.map((item) => ({
               productId: item.productId,
               productName: item.productName,
@@ -576,14 +559,14 @@ export function createCosmeticsOrderController(
           data: {
             orderId: savedOrder.id,
             orderNumber: savedOrder.orderNumber,
-            orderType: savedOrder.orderType,
+            orderType: 'RETAIL',
             status: savedOrder.status,
             paymentStatus: savedOrder.paymentStatus,
             subtotal: Number(savedOrder.subtotal),
             shippingFee: Number(savedOrder.shippingFee),
             discount: Number(savedOrder.discount),
             totalAmount: Number(savedOrder.totalAmount),
-            currency: savedOrder.currency,
+            currency: 'KRW',
             channel: dto.metadata.channel,
             items: dto.items.map((item) => ({
               productId: item.productId,

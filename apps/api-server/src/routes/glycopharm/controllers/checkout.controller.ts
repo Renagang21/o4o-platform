@@ -17,7 +17,7 @@
 
 import { Router, Request, Response, NextFunction } from 'express';
 import { body, validationResult } from 'express-validator';
-import { DataSource, In, Brackets } from 'typeorm';
+import { DataSource, In } from 'typeorm';
 import type { AuthRequest } from '../../../types/auth.js';
 import logger from '../../../utils/logger.js';
 import { opsMetrics, OPS } from '../../../services/ops-metrics.service.js';
@@ -25,16 +25,15 @@ import { validateSupplierSellerRelation } from '../../../core/checkout/checkout-
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
 import { GLYCOPHARM_OPL_SERVICE_KEYS } from '../../../constants/service-keys.js';
 import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
+// WO-O4O-SERVICE-ORDER-FULL-CHECKOUT-ALIGN-V1: 프로덕션 canonical 주문 원장 = checkout_orders
+// (ecommerce_orders 미존재 — IR-O4O-ORDER-CANONICAL-TABLE-CONFIRM-V1 / CHECK-...-DIAGNOSTIC-RESULT-V1 H1 확정).
+// create/list/get 를 CheckoutOrder 기준으로 정렬. payment controller/handler 도 동일 원장 사용.
 import {
-  EcommerceOrder,
-  EcommerceOrderItem,
-  OrderType,
-  OrderStatus,
-  PaymentStatus,
-  BuyerType,
-  SellerType,
+  CheckoutOrder,
+  CheckoutOrderStatus,
+  CheckoutPaymentStatus,
   type ShippingAddress,
-} from '@o4o/ecommerce-core/entities';
+} from '../../../entities/checkout/CheckoutOrder.entity.js';
 
 // ============================================================================
 // Type Definitions
@@ -142,7 +141,8 @@ async function createCoreOrder(
   dto: {
     buyerId: string;
     sellerId: string;
-    orderType: OrderType;
+    /** @deprecated EcommerceOrder.orderType 잔재 — CheckoutOrder 에는 미사용(serviceKey 는 metadata) */
+    orderType?: unknown;
     items: Array<{
       productId?: string;
       productName: string;
@@ -158,7 +158,7 @@ async function createCoreOrder(
     metadata?: Record<string, unknown>;
     orderSource?: string;
   }
-): Promise<EcommerceOrder> {
+): Promise<CheckoutOrder> {
   const subtotal = dto.items.reduce((sum, item) => {
     return sum + (item.quantity * item.unitPrice - (item.discount || 0));
   }, 0);
@@ -167,50 +167,37 @@ async function createCoreOrder(
   const discount = dto.discount || 0;
   const totalAmount = subtotal + shippingFee - discount;
 
-  const orderRepo = manager.getRepository(EcommerceOrder);
-  const orderItemRepo = manager.getRepository(EcommerceOrderItem);
+  // WO-O4O-SERVICE-ORDER-FULL-CHECKOUT-ALIGN-V1: CheckoutOrder(checkout_orders) 로 적재.
+  // items 는 jsonb 인라인. supplierId 는 CheckoutOrder 필수 — retail 주문이라 sellerId 동일값 사용.
+  const orderRepo = manager.getRepository(CheckoutOrder);
 
   const order = orderRepo.create({
     orderNumber: generateOrderNumber(),
     buyerId: dto.buyerId,
-    buyerType: BuyerType.USER,
     sellerId: dto.sellerId,
-    sellerType: SellerType.ORGANIZATION,
-    orderType: dto.orderType,
+    supplierId: dto.sellerId,
+    items: dto.items.map((itemDto) => ({
+      productId: itemDto.productId ?? '',
+      productName: itemDto.productName,
+      quantity: itemDto.quantity,
+      unitPrice: itemDto.unitPrice,
+      subtotal: itemDto.quantity * itemDto.unitPrice - (itemDto.discount || 0),
+    })),
     subtotal,
     shippingFee,
     discount,
     totalAmount,
-    currency: 'KRW',
-    paymentStatus: PaymentStatus.PENDING,
-    status: OrderStatus.CREATED,
+    status: CheckoutOrderStatus.CREATED,
+    paymentStatus: CheckoutPaymentStatus.PENDING,
     shippingAddress: dto.shippingAddress,
     metadata: dto.metadata,
-    orderSource: dto.orderSource,
   });
 
   const savedOrder = await orderRepo.save(order);
 
-  const items = dto.items.map((itemDto) =>
-    orderItemRepo.create({
-      orderId: savedOrder.id,
-      productId: itemDto.productId,
-      productName: itemDto.productName,
-      sku: itemDto.sku,
-      quantity: itemDto.quantity,
-      unitPrice: itemDto.unitPrice,
-      discount: itemDto.discount || 0,
-      subtotal: itemDto.quantity * itemDto.unitPrice - (itemDto.discount || 0),
-      metadata: itemDto.metadata,
-    })
-  );
-
-  await orderItemRepo.save(items);
-
-  logger.info('[EcommerceCore] Order created:', {
+  logger.info('[CheckoutOrder] Order created:', {
     orderId: savedOrder.id,
     orderNumber: savedOrder.orderNumber,
-    orderType: savedOrder.orderType,
     sellerId: savedOrder.sellerId,
     totalAmount: savedOrder.totalAmount,
   });
@@ -539,7 +526,6 @@ export function createCheckoutController(
           const savedOrder = await createCoreOrder(queryRunner.manager, {
             buyerId,
             sellerId: pharmacy.id,
-            orderType: OrderType.RETAIL,
             items: orderItems,
             shippingAddress: dto.shippingAddress
               ? {
@@ -564,7 +550,6 @@ export function createCheckoutController(
           logger.info('[GlycoPharm Checkout] Order created:', {
             orderId: savedOrder.id,
             orderNumber: savedOrder.orderNumber,
-            orderType: savedOrder.orderType,
             buyerId,
             pharmacyId: pharmacy.id,
             channelId: b2cChannelId,
@@ -577,14 +562,14 @@ export function createCheckoutController(
             data: {
               orderId: savedOrder.id,
               orderNumber: savedOrder.orderNumber,
-              orderType: savedOrder.orderType,
+              orderType: 'RETAIL',
               status: savedOrder.status,
               paymentStatus: savedOrder.paymentStatus,
               subtotal: savedOrder.subtotal,
               shippingFee: savedOrder.shippingFee,
               discount: savedOrder.discount,
               totalAmount: savedOrder.totalAmount,
-              currency: savedOrder.currency,
+              currency: 'KRW',
               pharmacy: {
                 id: pharmacy.id,
                 name: pharmacy.name,
@@ -640,20 +625,13 @@ export function createCheckoutController(
         const limit = Math.min(Number(req.query.limit) || 20, 100);
         const offset = (page - 1) * limit;
 
-        const orderRepo = dataSource.getRepository(EcommerceOrder);
+        // WO-O4O-SERVICE-ORDER-FULL-CHECKOUT-ALIGN-V1: checkout_orders + metadata.serviceKey 기준.
+        // legacy OrderType.GLYCOPHARM 분기 제거 — ecommerce_orders 미존재(H1)이므로 해당 row 없음.
+        const orderRepo = dataSource.getRepository(CheckoutOrder);
         const [orders, total] = await orderRepo
           .createQueryBuilder('order')
-          .leftJoinAndSelect('order.items', 'items')
           .where('order.buyerId = :buyerId', { buyerId })
-          .andWhere(
-            new Brackets((qb) => {
-              qb.where('order.orderType = :glycopharm', { glycopharm: OrderType.GLYCOPHARM })
-                .orWhere(
-                  "order.orderType = :retail AND order.metadata->>'serviceKey' = :serviceKey",
-                  { retail: OrderType.RETAIL, serviceKey: 'glycopharm' }
-                );
-            })
-          )
+          .andWhere("order.metadata->>'serviceKey' = :serviceKey", { serviceKey: 'glycopharm' })
           .orderBy('order.createdAt', 'DESC')
           .take(limit)
           .skip(offset)
@@ -708,21 +686,13 @@ export function createCheckoutController(
           return errorResponse(res, 401, 'UNAUTHORIZED', 'User not authenticated');
         }
 
-        const orderRepoForGet = dataSource.getRepository(EcommerceOrder);
+        // WO-O4O-SERVICE-ORDER-FULL-CHECKOUT-ALIGN-V1: checkout_orders + metadata.serviceKey 기준.
+        const orderRepoForGet = dataSource.getRepository(CheckoutOrder);
         const order = await orderRepoForGet
           .createQueryBuilder('order')
-          .leftJoinAndSelect('order.items', 'items')
           .where('order.id = :orderId', { orderId })
           .andWhere('order.buyerId = :buyerId', { buyerId })
-          .andWhere(
-            new Brackets((qb) => {
-              qb.where('order.orderType = :glycopharm', { glycopharm: OrderType.GLYCOPHARM })
-                .orWhere(
-                  "order.orderType = :retail AND order.metadata->>'serviceKey' = :serviceKey",
-                  { retail: OrderType.RETAIL, serviceKey: 'glycopharm' }
-                );
-            })
-          )
+          .andWhere("order.metadata->>'serviceKey' = :serviceKey", { serviceKey: 'glycopharm' })
           .getOne();
 
         if (!order) {
@@ -736,14 +706,14 @@ export function createCheckoutController(
           data: {
             id: order.id,
             orderNumber: order.orderNumber,
-            orderType: order.orderType,
+            orderType: 'RETAIL',
             status: order.status,
             paymentStatus: order.paymentStatus,
             subtotal: order.subtotal,
             shippingFee: order.shippingFee,
             discount: order.discount,
             totalAmount: order.totalAmount,
-            currency: order.currency,
+            currency: 'KRW',
             pharmacy: {
               id: metadata?.pharmacyId,
               name: metadata?.pharmacyName,
@@ -751,14 +721,11 @@ export function createCheckoutController(
             },
             deliveryMethod: metadata?.deliveryMethod,
             shippingAddress: order.shippingAddress,
-            items: (order.items as EcommerceOrderItem[])?.map((item) => ({
-              id: item.id,
+            items: order.items?.map((item) => ({
               productId: item.productId,
               productName: item.productName,
-              sku: item.sku,
               quantity: item.quantity,
               unitPrice: item.unitPrice,
-              discount: item.discount,
               subtotal: item.subtotal,
             })),
             paidAt: order.paidAt,
@@ -786,12 +753,13 @@ export function createCheckoutController(
     requireAuth,
     async (_req: Request, res: Response) => {
       try {
+        // WO-O4O-SERVICE-ORDER-FULL-CHECKOUT-ALIGN-V1: canonical checkout_orders 기준.
         const result = await dataSource.query(
-          `UPDATE ecommerce_orders
+          `UPDATE checkout_orders
            SET status = 'cancelled',
+               "cancelledAt" = NOW(),
                "updatedAt" = NOW()
            WHERE status = 'created'
-             AND "orderType" = 'RETAIL'
              AND metadata->>'serviceKey' = 'glycopharm'
              AND "createdAt" < NOW() - INTERVAL '15 minutes'
            RETURNING id, "orderNumber"`,
