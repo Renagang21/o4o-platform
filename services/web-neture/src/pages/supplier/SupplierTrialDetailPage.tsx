@@ -189,6 +189,25 @@ export default function SupplierTrialDetailPage() {
         </div>
       </div>
 
+      {/* 연결 제품 — WO-O4O-NETURE-MARKET-TRIAL-PRODUCT-REFERENCE-DISPLAY-V2 */}
+      {trial.product && (
+        <div style={s.productSection}>
+          <h2 style={{ fontSize: '16px', fontWeight: 600, color: '#3730A3', margin: '0 0 10px 0' }}>
+            연결 제품
+          </h2>
+          <p style={{ fontSize: '16px', fontWeight: 600, color: '#1E1B4B', margin: '0 0 4px 0' }}>
+            {trial.product.name}
+          </p>
+          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', fontSize: '13px', color: '#4338CA' }}>
+            {trial.product.manufacturerName && <span>제조사: {trial.product.manufacturerName}</span>}
+            {trial.product.regulatoryType && <span>유형: {trial.product.regulatoryType}</span>}
+          </div>
+          <p style={{ fontSize: '12px', color: '#6366F1', margin: '10px 0 0 0', lineHeight: 1.6 }}>
+            이 펀딩은 위 등록 제품을 기준으로 개설되었습니다. 실제 정산 제품 구성·결과 약속은 상세 설명과 결과 약속 영역을 따릅니다.
+          </p>
+        </div>
+      )}
+
       {/* 대표 영상 — WO-MARKET-TRIAL-VIDEO-FIELD-V1 */}
       {trial.videoUrl && (() => {
         const video = parseVideoEmbed(trial.videoUrl);
@@ -769,6 +788,14 @@ const s: Record<string, React.CSSProperties> = {
     backgroundColor: '#F5F3FF',
     borderRadius: '12px',
     border: '1px solid #DDD6FE',
+    marginBottom: '16px',
+  },
+  // WO-O4O-NETURE-MARKET-TRIAL-PRODUCT-REFERENCE-DISPLAY-V2
+  productSection: {
+    padding: '16px 20px',
+    backgroundColor: '#EEF2FF',
+    borderRadius: '12px',
+    border: '1px solid #C7D2FE',
     marginBottom: '16px',
   },
   settlementPreview: {

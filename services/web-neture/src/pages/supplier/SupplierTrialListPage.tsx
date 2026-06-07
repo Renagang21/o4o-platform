@@ -106,6 +106,13 @@ export default function SupplierTrialListPage() {
                 </span>
               </div>
               <h2 style={s.cardTitle}>{trial.title}</h2>
+              {/* WO-O4O-NETURE-MARKET-TRIAL-PRODUCT-REFERENCE-DISPLAY-V2: 연결 제품 표시 */}
+              {trial.product && (
+                <div style={s.productRef}>
+                  <span style={s.productRefLabel}>연결 제품</span>
+                  <span style={s.productRefName}>{trial.product.name}</span>
+                </div>
+              )}
               {trial.description && (
                 <p style={s.cardDesc}>{trial.description.slice(0, 80)}{trial.description.length > 80 ? '...' : ''}</p>
               )}
@@ -227,6 +234,27 @@ const s: Record<string, React.CSSProperties> = {
     color: '#6B7280',
     margin: '0 0 12px 0',
     lineHeight: 1.5,
+  },
+  // WO-O4O-NETURE-MARKET-TRIAL-PRODUCT-REFERENCE-DISPLAY-V2
+  productRef: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    margin: '0 0 10px 0',
+    padding: '3px 10px',
+    backgroundColor: '#EEF2FF',
+    border: '1px solid #C7D2FE',
+    borderRadius: '6px',
+  },
+  productRefLabel: {
+    fontSize: '11px',
+    fontWeight: 600,
+    color: '#4F46E5',
+  },
+  productRefName: {
+    fontSize: '13px',
+    color: '#3730A3',
+    fontWeight: 500,
   },
   cardMeta: {
     display: 'flex',

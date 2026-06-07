@@ -408,6 +408,13 @@ export default function MarketTrialApprovalDetailPage() {
       {/* Trial Info */}
       <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-5 space-y-4 mb-4">
         <InfoRow label="공급자" value={trial.supplierName || trial.supplierId} />
+        {/* WO-O4O-NETURE-MARKET-TRIAL-PRODUCT-REFERENCE-DISPLAY-V2: 연결 제품 표시 */}
+        {trial.product && (
+          <InfoRow
+            label="연결 제품"
+            value={`${trial.product.name}${trial.product.manufacturerName ? ` (${trial.product.manufacturerName})` : ''}`}
+          />
+        )}
         {trial.description && <InfoRow label="설명" value={trial.description} />}
         {trial.outcomeSnapshot && (
           <InfoRow

@@ -15,9 +15,25 @@ export type TrialStatus =
   | 'draft' | 'submitted' | 'recruiting'
   | 'development' | 'outcome_confirming' | 'fulfilled' | 'closed';
 
+/**
+ * WO-O4O-NETURE-MARKET-TRIAL-PRODUCT-REFERENCE-DISPLAY-V2:
+ * 펀딩에 연결된 공급자 등록 제품(ProductMaster) 표시용 요약. 가격/재고 미포함.
+ */
+export interface TrialProductRef {
+  id: string;
+  name: string;
+  regulatoryType: string | null;
+  drugCategory: string | null;
+  manufacturerName: string | null;
+}
+
 export interface Trial {
   id: string;
   title: string;
+  // WO-O4O-NETURE-MARKET-TRIAL-SUPPLIER-PRODUCT-REFERENCE-V1 / DISPLAY-V2:
+  // 공급자가 등록 상품 기준으로 개설한 펀딩의 soft 참조. 없으면 둘 다 null.
+  productId?: string | null;
+  product?: TrialProductRef | null;
   // WO-MARKET-TRIAL-PROPOSAL-STRUCTURE-V1
   oneLiner?: string | null;
   // WO-MARKET-TRIAL-VIDEO-FIELD-V1

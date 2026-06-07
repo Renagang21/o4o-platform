@@ -144,7 +144,16 @@ export class MarketTrialOperatorController {
       qb.orderBy('trial.createdAt', 'DESC');
       const trials = await qb.getMany();
 
-      res.json({ success: true, data: trials.map(toOperatorTrialDTO) });
+      // WO-O4O-NETURE-MARKET-TRIAL-PRODUCT-REFERENCE-DISPLAY-V2: 연결 제품 batch 조회
+      const productMap = await buildOperatorProductRefMap(
+        MarketTrialOperatorController.dataSource,
+        trials.map((t) => t.productId),
+      );
+
+      res.json({
+        success: true,
+        data: trials.map((t) => toOperatorTrialDTO(t, productMap.get(t.productId ?? ''))),
+      });
     } catch (error) {
       console.error('Operator list trials error:', error);
       res.status(500).json({ success: false, message: 'Failed to list trials' });
@@ -239,10 +248,16 @@ export class MarketTrialOperatorController {
         }
       }
 
+      // WO-O4O-NETURE-MARKET-TRIAL-PRODUCT-REFERENCE-DISPLAY-V2: 연결 제품 조회
+      const productMap = await buildOperatorProductRefMap(
+        MarketTrialOperatorController.dataSource,
+        [trial.productId],
+      );
+
       res.json({
         success: true,
         data: {
-          ...toOperatorTrialDTO(trial),
+          ...toOperatorTrialDTO(trial, productMap.get(trial.productId ?? '')),
           forumLink,
         },
       });
@@ -1694,7 +1709,59 @@ function toForumSyncFailureDTO(f: MarketTrialForumSyncFailure) {
   };
 }
 
-function toOperatorTrialDTO(trial: MarketTrial) {
+/**
+ * WO-O4O-NETURE-MARKET-TRIAL-PRODUCT-REFERENCE-DISPLAY-V2:
+ * 연결 제품(ProductMaster) 표시용 요약 (표시 전용 — 가격/재고 미포함).
+ */
+interface OperatorTrialProductRef {
+  id: string;
+  name: string;
+  regulatoryType: string | null;
+  drugCategory: string | null;
+  manufacturerName: string | null;
+}
+
+/**
+ * productId(soft 참조) → ProductMaster 요약 batch 조회.
+ * Raw SQL + parameter binding. 실패/부재는 표시 누락으로만 degrade.
+ */
+async function buildOperatorProductRefMap(
+  ds: DataSource | null,
+  productIds: Array<string | null | undefined>,
+): Promise<Map<string, OperatorTrialProductRef>> {
+  const ids = Array.from(new Set(productIds.filter((x): x is string => !!x)));
+  if (!ds || ids.length === 0) return new Map();
+  try {
+    const rows: Array<{
+      id: string;
+      name: string;
+      regulatory_type: string | null;
+      drug_category: string | null;
+      manufacturer_name: string | null;
+    }> = await ds.query(
+      `SELECT id, name, regulatory_type, drug_category, manufacturer_name
+       FROM product_masters WHERE id = ANY($1)`,
+      [ids],
+    );
+    return new Map(
+      rows.map((r) => [
+        r.id,
+        {
+          id: r.id,
+          name: r.name,
+          regulatoryType: r.regulatory_type,
+          drugCategory: r.drug_category,
+          manufacturerName: r.manufacturer_name,
+        },
+      ]),
+    );
+  } catch (error) {
+    console.error('buildOperatorProductRefMap error (product display degraded):', error);
+    return new Map();
+  }
+}
+
+function toOperatorTrialDTO(trial: MarketTrial, productRef?: OperatorTrialProductRef | null) {
   return {
     id: trial.id,
     title: trial.title,
@@ -1710,6 +1777,9 @@ function toOperatorTrialDTO(trial: MarketTrial) {
     startDate: trial.fundingStartAt ? new Date(trial.fundingStartAt).toISOString() : undefined,
     endDate: trial.fundingEndAt ? new Date(trial.fundingEndAt).toISOString() : undefined,
     trialPeriodDays: trial.trialPeriodDays,
+    // WO-O4O-NETURE-MARKET-TRIAL-PRODUCT-REFERENCE-DISPLAY-V2: 연결 제품 (표시 전용)
+    productId: trial.productId || null,
+    product: productRef || null,
     // WO-MARKET-TRIAL-TO-PRODUCT-CONVERSION-FLOW-V1
     convertedProductId: trial.convertedProductId || null,
     convertedProductName: trial.convertedProductName || null,

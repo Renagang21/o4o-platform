@@ -265,7 +265,16 @@ export class MarketTrialController {
         order: { createdAt: 'DESC' },
       });
 
-      res.json({ success: true, data: trials.map((t) => toTrialDTO(t)) });
+      // WO-O4O-NETURE-MARKET-TRIAL-PRODUCT-REFERENCE-DISPLAY-V2: 연결 제품 batch 조회
+      const productMap = await buildProductRefMap(
+        MarketTrialController.dataSource,
+        trials.map((t) => t.productId),
+      );
+
+      res.json({
+        success: true,
+        data: trials.map((t) => toTrialDTO(t, undefined, productMap.get(t.productId ?? ''))),
+      });
     } catch (error) {
       console.error('Get my trials error:', error);
       res.status(500).json({ success: false, message: 'Failed to get trials' });
@@ -362,9 +371,15 @@ export class MarketTrialController {
       const trialIds = evaluated.map((t) => t.id);
       const forumMap = await buildForumPostMap(MarketTrialController.forumRepo, trialIds);
 
+      // WO-O4O-NETURE-MARKET-TRIAL-PRODUCT-REFERENCE-DISPLAY-V2: 연결 제품 batch 조회
+      const productMap = await buildProductRefMap(
+        MarketTrialController.dataSource,
+        evaluated.map((t) => t.productId),
+      );
+
       res.json({
         success: true,
-        data: evaluated.map((t) => toTrialDTO(t, forumMap.get(t.id))),
+        data: evaluated.map((t) => toTrialDTO(t, forumMap.get(t.id), productMap.get(t.productId ?? ''))),
       });
     } catch (error) {
       console.error('Get trials error:', error);
@@ -399,9 +414,12 @@ export class MarketTrialController {
         where: { marketTrialId: id },
       });
 
+      // WO-O4O-NETURE-MARKET-TRIAL-PRODUCT-REFERENCE-DISPLAY-V2: 연결 제품 조회
+      const productMap = await buildProductRefMap(MarketTrialController.dataSource, [evaluated.productId]);
+
       res.json({
         success: true,
-        data: toTrialDTO(evaluated, forumMapping?.forumId),
+        data: toTrialDTO(evaluated, forumMapping?.forumId, productMap.get(evaluated.productId ?? '')),
       });
     } catch (error) {
       console.error('Get trial error:', error);
@@ -509,10 +527,13 @@ export class MarketTrialController {
         where: { marketTrialId: id },
       });
 
+      // WO-O4O-NETURE-MARKET-TRIAL-PRODUCT-REFERENCE-DISPLAY-V2: 연결 제품 조회
+      const productMap = await buildProductRefMap(MarketTrialController.dataSource, [trial.productId]);
+
       res.json({
         success: true,
         data: {
-          trial: toTrialDTO(trial, forumMapping?.forumId),
+          trial: toTrialDTO(trial, forumMapping?.forumId, productMap.get(trial.productId ?? '')),
           summary: {
             totalCount,
             productCount,
@@ -759,8 +780,13 @@ export class MarketTrialController {
 /**
  * Convert trial entity to legacy-compatible DTO format
  * WO-MARKET-TRIAL-KPA-DETAIL-AND-FORUM-DEEP-LINK-V1: forumPostId 추가
+ * WO-O4O-NETURE-MARKET-TRIAL-PRODUCT-REFERENCE-DISPLAY-V2: productId/product (표시 전용 soft 참조) 추가
  */
-function toTrialDTO(trial: MarketTrial, forumPostId?: string | null): any {
+function toTrialDTO(
+  trial: MarketTrial,
+  forumPostId?: string | null,
+  productRef?: TrialProductRef | null,
+): any {
   const targetAmount = Number(trial.targetAmount) || 0;
   const currentAmount = Number(trial.currentAmount) || 0;
   const trialUnitPrice = Number(trial.trialUnitPrice) || 0;
@@ -802,6 +828,11 @@ function toTrialDTO(trial: MarketTrial, forumPostId?: string | null): any {
     endDate: trial.fundingEndAt ? new Date(trial.fundingEndAt).toISOString() : undefined,
     deadline: trial.fundingEndAt ? new Date(trial.fundingEndAt).toISOString() : undefined,
     forumPostId: forumPostId || undefined,
+    // WO-O4O-NETURE-MARKET-TRIAL-PRODUCT-REFERENCE-DISPLAY-V2:
+    // 공급자가 등록 상품(ProductMaster) 기준으로 개설한 펀딩의 연결 제품 표시.
+    // productId 없는 기존 펀딩은 둘 다 null. 가격/원본 복제 없음.
+    productId: trial.productId || null,
+    product: productRef || null,
     // WO-MARKET-TRIAL-TO-PRODUCT-CONVERSION-FLOW-V1
     convertedProductId: trial.convertedProductId || null,
     convertedProductName: trial.convertedProductName || null,
@@ -832,6 +863,59 @@ async function buildForumPostMap(
     .where('mtf.marketTrialId IN (:...ids)', { ids: trialIds })
     .getMany();
   return new Map(mappings.map((m) => [m.marketTrialId, m.forumId]));
+}
+
+/**
+ * WO-O4O-NETURE-MARKET-TRIAL-PRODUCT-REFERENCE-DISPLAY-V2:
+ * 연결 제품(ProductMaster) 표시용 요약. 가격/재고 등 운영 데이터는 담지 않는다(표시 전용).
+ */
+export interface TrialProductRef {
+  id: string;
+  name: string;
+  regulatoryType: string | null;
+  drugCategory: string | null;
+  manufacturerName: string | null;
+}
+
+/**
+ * productId(soft 참조)로 연결된 ProductMaster 요약을 batch 조회한다.
+ * - Raw SQL + parameter binding (Boundary Policy Guard Rule 2).
+ * - 조회 실패/제품 부재는 표시 누락으로만 degrade — 펀딩 목록/상세 자체는 깨지지 않는다.
+ */
+async function buildProductRefMap(
+  ds: DataSource | null,
+  productIds: Array<string | null | undefined>,
+): Promise<Map<string, TrialProductRef>> {
+  const ids = Array.from(new Set(productIds.filter((x): x is string => !!x)));
+  if (!ds || ids.length === 0) return new Map();
+  try {
+    const rows: Array<{
+      id: string;
+      name: string;
+      regulatory_type: string | null;
+      drug_category: string | null;
+      manufacturer_name: string | null;
+    }> = await ds.query(
+      `SELECT id, name, regulatory_type, drug_category, manufacturer_name
+       FROM product_masters WHERE id = ANY($1)`,
+      [ids],
+    );
+    return new Map(
+      rows.map((r) => [
+        r.id,
+        {
+          id: r.id,
+          name: r.name,
+          regulatoryType: r.regulatory_type,
+          drugCategory: r.drug_category,
+          manufacturerName: r.manufacturer_name,
+        },
+      ]),
+    );
+  } catch (error) {
+    console.error('buildProductRefMap error (product display degraded):', error);
+    return new Map();
+  }
 }
 
 /**
