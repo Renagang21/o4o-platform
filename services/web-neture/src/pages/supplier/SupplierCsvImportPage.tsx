@@ -439,6 +439,10 @@ export default function SupplierCsvImportPage() {
           비의약품·의약외품·비처방 의약품·처방의약품은 <strong>각각 다른 템플릿</strong>으로 등록해야 하며,
           <strong> 의약품·처방의약품 등록에는 이 화면을 사용하지 마세요.</strong>
         </p>
+        <p className="mt-1 text-amber-700">
+          {/* WO-O4O-NETURE-SUPPLIER-BULK-UPLOAD-PARSE-V2 */}
+          대량 등록 화면에서는 이제 <strong>업로드 파일을 저장 전에 유형별로 검증·미리보기</strong>할 수 있습니다.
+        </p>
         <Link to="/supplier/products/bulk" className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-700">
           유형별 대량 등록으로 이동 →
         </Link>
