@@ -28,6 +28,8 @@ import { useAuth } from '../../contexts';
 import MediaPickerModal from '../../components/common/MediaPickerModal';
 import { loadAndClearDraft } from '../../lib/product-import/storage';
 import { GuideBlock } from '@o4o/shared-space-ui';
+// WO-O4O-NETURE-SUPPLIER-PRODUCT-REGISTRATION-WIZARD-V2
+import { getSupplierProductType } from '../../lib/supplierProductTypes';
 import { fetchGuidePageContent } from '../../api/guideContent';
 
 const GUIDE_PAGE_KEY = 'supplier.product.editor';
@@ -77,6 +79,13 @@ export default function SupplierProductCreatePage() {
 
   // WO-O4O-PRODUCT-IMPORT-ASSISTANT-V1: Import Assistant에서 전달된 초안 읽기 (single-use)
   const importDraft = useMemo(() => loadAndClearDraft(), []);
+
+  // WO-O4O-NETURE-SUPPLIER-PRODUCT-REGISTRATION-WIZARD-V2: 진입에서 선택한 제품 유형
+  const productType = useMemo(() => getSupplierProductType(searchParams.get('productType')), [searchParams]);
+  // 의약품류(약국 대상) 또는 미분류 → 검토 중심(자동 공급오퍼/이벤트/펀딩 연결 제외)
+  const isReviewOriented = !!productType && (productType.pharmacyTarget === true || productType.key === 'unclassified');
+  // 등록 완료 상태 (성공 시 유형별 다음-작업 패널 표시)
+  const [registered, setRegistered] = useState<{ name: string } | null>(null);
 
   const [currentStep, setCurrentStep] = useState(1);
   const [form, setForm] = useState<FormData>({
@@ -345,7 +354,8 @@ export default function SupplierProductCreatePage() {
       }
       if (thumbnailSource?.kind === 'file') URL.revokeObjectURL(thumbnailSource.preview);
       contentItems.forEach((item) => { if (item.kind === 'file') URL.revokeObjectURL(item.preview); });
-      navigate('/supplier/products');
+      // WO-O4O-NETURE-SUPPLIER-PRODUCT-REGISTRATION-WIZARD-V2: 유형별 다음-작업 패널로 전환
+      setRegistered({ name: form.marketingName.trim() });
     } else {
       setSubmitError(result.error || '상품 등록에 실패했습니다.');
     }
@@ -403,6 +413,61 @@ export default function SupplierProductCreatePage() {
     throw new Error(res.error || '이미지 업로드 실패');
   }, []);
 
+  // WO-O4O-NETURE-SUPPLIER-PRODUCT-REGISTRATION-WIZARD-V2: 등록 완료 — 유형별 다음 작업 안내
+  if (registered) {
+    const reviewOnly = isReviewOriented;
+    return (
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+        <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-5">
+          <h1 className="text-xl font-bold text-emerald-800">제품 등록 완료</h1>
+          <p className="text-sm text-emerald-700 mt-1">
+            <strong>{registered.name || '제품'}</strong>이(가) 등록되었습니다
+            {productType ? ` (유형: ${productType.label})` : ''}.
+          </p>
+          {reviewOnly && (
+            <p className="text-xs text-emerald-700/80 mt-2">
+              {productType?.rx
+                ? '처방의약품은 운영자 검토 후 약국 대상 유통 정보 단위로만 관리됩니다. 일반 판매·고객 노출·이벤트 오퍼·유통참여형 펀딩으로 자동 연결되지 않습니다.'
+                : '약국 대상 의약품류/미분류 제품은 운영자 검토 후 노출 범위가 결정됩니다.'}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <div className="text-xs font-semibold text-slate-500 mb-2">다음 작업</div>
+          <div className="grid sm:grid-cols-2 gap-2">
+            <button onClick={() => navigate('/supplier/products')} className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-medium text-slate-800 hover:border-blue-400 hover:bg-blue-50">
+              제품 목록으로 이동
+            </button>
+            <button onClick={() => navigate('/supplier/products/register')} className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-medium text-slate-800 hover:border-blue-400 hover:bg-blue-50">
+              다른 제품 등록
+            </button>
+            {reviewOnly ? (
+              <button onClick={() => navigate('/supplier/products')} className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-medium text-slate-800 hover:border-blue-400 hover:bg-blue-50">
+                운영자 검토 상태 확인
+              </button>
+            ) : (
+              <>
+                <button onClick={() => navigate('/supplier/supply-offers')} className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-medium text-slate-800 hover:border-blue-400 hover:bg-blue-50">
+                  일반 공급 오퍼 만들기
+                </button>
+                <button onClick={() => navigate('/supplier/event-offers')} className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-medium text-slate-800 hover:border-blue-400 hover:bg-blue-50">
+                  이벤트 오퍼 만들기
+                </button>
+                <button onClick={() => navigate('/supplier/market-trial/new')} className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-medium text-slate-800 hover:border-blue-400 hover:bg-blue-50">
+                  유통참여형 펀딩 후보로 사용
+                </button>
+              </>
+            )}
+          </div>
+          <p className="mt-3 text-xs text-slate-400">
+            공급 오퍼·이벤트 오퍼·유통참여형 펀딩은 등록된 제품을 활용하는 별도 활동입니다.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       <div>
@@ -422,6 +487,31 @@ export default function SupplierProductCreatePage() {
         ]}
         compact
       />
+
+      {/* WO-O4O-NETURE-SUPPLIER-PRODUCT-REGISTRATION-WIZARD-V2: 제품 유형별 안내/경고 */}
+      {productType && (
+        <div className={`rounded-lg border px-4 py-3 text-sm ${
+          productType.rx
+            ? 'border-amber-300 bg-amber-50 text-amber-800'
+            : isReviewOriented
+              ? 'border-blue-200 bg-blue-50 text-blue-800'
+              : 'border-slate-200 bg-slate-50 text-slate-700'
+        }`}>
+          <div className="font-semibold">선택한 제품 유형: {productType.label}</div>
+          <p className="mt-1 leading-relaxed">
+            {productType.key === 'non_drug' && '일반 매장 및 약국 매장 유형에 공급 가능한 일반 제품입니다.'}
+            {productType.key === 'quasi_drug' && '의약외품입니다. 품목/신고 관련 정보 입력을 권장합니다.'}
+            {productType.key === 'otc_drug' && '비처방 의약품(OTC)입니다. 약국 매장 유형 중심으로 검토되며, 일반 매장 노출·온라인 판매는 제한될 수 있습니다.'}
+            {productType.key === 'rx_drug' && '처방의약품입니다. 일반 판매·고객 노출·이벤트 오퍼·유통참여형 펀딩으로 자동 연결되지 않으며, 운영자 검토 후 약국 대상 유통 정보 단위로만 관리됩니다.'}
+            {productType.key === 'unclassified' && '분류가 확정되지 않은 제품입니다. 등록 후 운영자가 검토해 유형을 확정합니다.'}
+          </p>
+          {productType.pharmacyTarget && (
+            <p className="mt-1 text-xs opacity-80">
+              O4O는 유통 정보화 플랫폼으로, 의약품도 제품/유통 단위로만 다룹니다. 재고·유효기간·일련번호·이력추적은 입력받지 않습니다.
+            </p>
+          )}
+        </div>
+      )}
 
       {/* WO-O4O-PRODUCT-IMPORT-ASSISTANT-V1: Import Assistant 초안 알림 */}
       {importDraft && (
