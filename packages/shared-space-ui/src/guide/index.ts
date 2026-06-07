@@ -94,6 +94,8 @@ export {
   // WO-O4O-NETURE-GUIDE-BUSINESS-ACTOR-IA-PHASE1-V1
   netureGuideO4OOverviewProps,
   netureGuideForOperatorProps,
+  // WO-O4O-NETURE-GUIDE-BUSINESS-ACTOR-PHASE2-V1
+  netureGuideForSellerProps,
 } from './copy/neture.js';
 
 // WO-O4O-CROSSSERVICE-HOME-LATEST-AND-GUIDE-ALIGNMENT-V1

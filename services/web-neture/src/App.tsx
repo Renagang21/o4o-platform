@@ -498,6 +498,8 @@ const GuideFeatureCopilotDashboardPage = lazy(() => import('./pages/guide').then
 // WO-O4O-NETURE-GUIDE-BUSINESS-ACTOR-IA-PHASE1-V1
 const GuideO4OOverviewPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideO4OOverviewPage })));
 const GuideForOperatorPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideForOperatorPage })));
+// WO-O4O-NETURE-GUIDE-BUSINESS-ACTOR-PHASE2-V1
+const GuideForSellerPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideForSellerPage })));
 
 // Loading fallback
 function PageLoading() {
@@ -668,6 +670,8 @@ function App() {
               {/* WO-O4O-NETURE-GUIDE-BUSINESS-ACTOR-IA-PHASE1-V1 */}
               <Route path="/guide/o4o-overview" element={<GuideO4OOverviewPage />} />
               <Route path="/guide/for-operator" element={<GuideForOperatorPage />} />
+              {/* WO-O4O-NETURE-GUIDE-BUSINESS-ACTOR-PHASE2-V1 */}
+              <Route path="/guide/for-seller" element={<GuideForSellerPage />} />
               <Route path="/guide/intro" element={<GuideIntroPage />} />
               <Route path="/guide/intro/structure" element={<GuideIntroStructurePage />} />
               <Route path="/guide/intro/neture" element={<GuideIntroNeturePage />} />

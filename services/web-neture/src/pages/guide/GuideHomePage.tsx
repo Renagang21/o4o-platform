@@ -16,12 +16,13 @@
  *   03. 공급자 이용 안내 (역할 설명 + 시작 가이드 + 문의 진입)
  *   04. 파트너 이용 안내 (역할 설명 + 프로그램 가이드 + 문의 진입)
  *   05. 운영자 이용 안내 (매장 네트워크 운영자 가이드)  [WO-...-BUSINESS-ACTOR-IA-PHASE1-V1]
- *   06. 유통참여형 펀딩
- *   07. 상품 등록 & 유통
- *   08. Event Offer
- *   09. Forum & 자료실
- *   10. 공급자 Copilot
- *   11. O4O 플랫폼 소개
+ *   06. 판매자 / 매장 가이드 (내 매장 활용 가이드)        [WO-...-BUSINESS-ACTOR-PHASE2-V1]
+ *   07. 유통참여형 펀딩
+ *   08. 상품 등록 & 유통
+ *   09. Event Offer
+ *   10. Forum & 자료실
+ *   11. 공급자 Copilot
+ *   12. O4O 플랫폼 소개
  */
 
 import { GuideFeaturesPage as Shared, netureGuideFeaturesProps } from '@o4o/shared-space-ui';
@@ -42,7 +43,7 @@ const homeProps: GuideFeaturesPageProps = {
     description:
       'Neture의 구조와 참여 방법, 기능별 사용 방법을 안내합니다. 공급자 · 파트너 · 유통참여형 펀딩 · 플랫폼 소개까지 아래 항목을 선택해 이동하세요.',
     flowBarTitle: '안내 영역',
-    flowLabels: ['O4O 개요', 'Neture 개요', '공급자', '파트너', '운영자', '유통 펀딩', '상품', 'Event', 'Forum', 'Copilot', 'O4O 소개'],
+    flowLabels: ['O4O 개요', 'Neture 개요', '공급자', '파트너', '운영자', '판매자', '유통 펀딩', '상품', 'Event', 'Forum', 'Copilot', 'O4O 소개'],
   },
   groups: [
     {
@@ -101,6 +102,18 @@ const homeProps: GuideFeaturesPageProps = {
     },
     {
       step: '06',
+      title: '판매자 / 매장 가이드',
+      primaryRoute: '/guide/for-seller',
+      description:
+        '내 매장에서 제품 · 콘텐츠 · 오퍼를 활용하는 방법. 운영자와 공급자가 제공한 상품 · POP · QR · 블로그 · 사이니지 자료를 매장에 적용하고 이벤트 오퍼 · 승인 상품을 활용하는 흐름을 안내합니다.',
+      items: [
+        { label: '내 매장 활용 가이드', route: '/guide/for-seller' },
+        { label: '내 매장으로 이동', route: '/store/my-products' },
+      ],
+      linkTo: '/guide/for-seller',
+    },
+    {
+      step: '07',
       title: '유통참여형 펀딩',
       primaryRoute: '/guide/features/market-trial',
       description: '유통참여형 펀딩 — 오프라인 실행 시나리오 포함 펀딩. 모집 · 진행 · 정산 흐름.',
@@ -111,7 +124,7 @@ const homeProps: GuideFeaturesPageProps = {
       linkTo: '/guide/features/market-trial',
     },
     {
-      step: '07',
+      step: '08',
       title: '상품 등록 & 유통',
       primaryRoute: '/guide/features/product-registration',
       description: '바코드 기반 상품 등록 · 가격 등급 설정 · 유통 범위 선택.',
@@ -119,7 +132,7 @@ const homeProps: GuideFeaturesPageProps = {
       linkTo: '/guide/features/product-registration',
     },
     {
-      step: '08',
+      step: '09',
       title: 'Event Offer 제안하기',
       primaryRoute: '/guide/features/event-offer',
       description: '이벤트 오퍼 다중 서비스 동시 제안.',
@@ -127,7 +140,7 @@ const homeProps: GuideFeaturesPageProps = {
       linkTo: '/guide/features/event-offer',
     },
     {
-      step: '09',
+      step: '10',
       title: 'Forum & 자료실',
       primaryRoute: '/guide/features/forum-resources',
       description: '커뮤니티와 자료실 활용 방법.',
@@ -135,7 +148,7 @@ const homeProps: GuideFeaturesPageProps = {
       linkTo: '/guide/features/forum-resources',
     },
     {
-      step: '10',
+      step: '11',
       title: '공급자 Copilot',
       primaryRoute: '/guide/features/copilot-dashboard',
       description: 'KPI 확인 · 운영 요약 · 추천 액션.',
@@ -143,7 +156,7 @@ const homeProps: GuideFeaturesPageProps = {
       linkTo: '/guide/features/copilot-dashboard',
     },
     {
-      step: '11',
+      step: '12',
       title: 'O4O 플랫폼 소개',
       primaryRoute: '/o4o',
       description: 'O4O(Online for Offline) 플랫폼의 개념 · 구조 · 업종별 활용 방법.',

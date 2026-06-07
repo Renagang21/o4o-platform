@@ -22,3 +22,5 @@ export { GuideFeatureCopilotDashboardPage } from './GuideFeatureCopilotDashboard
 // WO-O4O-NETURE-GUIDE-BUSINESS-ACTOR-IA-PHASE1-V1
 export { GuideO4OOverviewPage } from './GuideO4OOverviewPage';
 export { GuideForOperatorPage } from './GuideForOperatorPage';
+// WO-O4O-NETURE-GUIDE-BUSINESS-ACTOR-PHASE2-V1
+export { GuideForSellerPage } from './GuideForSellerPage';
