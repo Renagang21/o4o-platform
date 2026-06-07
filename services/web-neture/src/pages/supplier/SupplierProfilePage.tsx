@@ -109,6 +109,15 @@ export default function SupplierProfilePage() {
   const [minOrderSurcharge, setMinOrderSurcharge] = useState('');
   const [orderConditionNote, setOrderConditionNote] = useState('');
 
+  // Section E: 배송 정책 (WO-O4O-NETURE-SUPPLIER-SHIPPING-SETTING-FOUNDATION-V1)
+  const [baseShippingFee, setBaseShippingFee] = useState('');
+  const [freeShippingThreshold, setFreeShippingThreshold] = useState('');
+  const [averageDispatchDays, setAverageDispatchDays] = useState('');
+  const [returnExchangeNotice, setReturnExchangeNotice] = useState('');
+  const [shippingStandard, setShippingStandard] = useState('');
+  const [shippingIsland, setShippingIsland] = useState('');
+  const [shippingMountain, setShippingMountain] = useState('');
+
   // Pre-fill indicator
   const [prefilled, setPrefilled] = useState(false);
 
@@ -146,6 +155,14 @@ export default function SupplierProfilePage() {
         setMinOrderAmount(data.minOrderAmount != null ? String(data.minOrderAmount) : '');
         setMinOrderSurcharge(data.minOrderSurcharge != null ? String(data.minOrderSurcharge) : '');
         setOrderConditionNote(data.orderConditionNote || '');
+        // Section E: 배송 정책
+        setBaseShippingFee(data.baseShippingFee != null ? String(data.baseShippingFee) : '');
+        setFreeShippingThreshold(data.freeShippingThreshold != null ? String(data.freeShippingThreshold) : '');
+        setAverageDispatchDays(data.averageDispatchDays != null ? String(data.averageDispatchDays) : '');
+        setReturnExchangeNotice(data.returnExchangeNotice || '');
+        setShippingStandard(data.shippingStandard || '');
+        setShippingIsland(data.shippingIsland || '');
+        setShippingMountain(data.shippingMountain || '');
         // Pre-fill
         setPrefilled(!!data._prefilled);
       }
@@ -188,6 +205,14 @@ export default function SupplierProfilePage() {
       minOrderAmount: minOrderAmount.trim() === '' ? null : Number(minOrderAmount.replace(/[^\d]/g, '')),
       minOrderSurcharge: minOrderSurcharge.trim() === '' ? null : Number(minOrderSurcharge.replace(/[^\d]/g, '')),
       orderConditionNote: orderConditionNote.trim() === '' ? null : orderConditionNote,
+      // Section E: 배송 정책 (저장만 — 배송비 계산 미적용)
+      baseShippingFee: baseShippingFee.trim() === '' ? null : Number(baseShippingFee.replace(/[^\d]/g, '')),
+      freeShippingThreshold: freeShippingThreshold.trim() === '' ? null : Number(freeShippingThreshold.replace(/[^\d]/g, '')),
+      averageDispatchDays: averageDispatchDays.trim() === '' ? null : Number(averageDispatchDays.replace(/[^\d]/g, '')),
+      returnExchangeNotice: returnExchangeNotice.trim() === '' ? null : returnExchangeNotice,
+      shippingStandard: shippingStandard.trim() === '' ? null : shippingStandard,
+      shippingIsland: shippingIsland.trim() === '' ? null : shippingIsland,
+      shippingMountain: shippingMountain.trim() === '' ? null : shippingMountain,
     });
 
     setSaving(false);
@@ -511,6 +536,106 @@ export default function SupplierProfilePage() {
               className={inputClass}
             />
             <p className="mt-1 text-xs text-gray-400">주문 조건 모달과 장바구니에 함께 표시됩니다.</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Section E: 배송 정책 — WO-O4O-NETURE-SUPPLIER-SHIPPING-SETTING-FOUNDATION-V1 */}
+      <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4">
+        <h2 className="flex items-center gap-2 text-base font-semibold text-gray-800 mb-2">
+          <ShoppingCart className="w-5 h-5 text-gray-500" />
+          배송 정책
+        </h2>
+        <p className="text-xs text-gray-500 mb-2">
+          공급자별 기본 배송비, 무료배송 기준, 출고 안내, 반품/교환 안내를 설정합니다.
+        </p>
+        <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 text-xs text-amber-800 mb-5 space-y-1">
+          <p>이번 단계에서는 주문 화면의 <strong>배송비 계산에 자동 반영되지 않으며</strong>, 향후 주문/배송 계산 기능에서 활용됩니다.</p>
+          <p>향후 배송비 계산이 적용되면, 같은 공급자의 일반 상품과 이벤트 오퍼 상품은 <strong>공급자별 주문금액에 함께 포함</strong>되는 것을 기본 기준으로 합니다. 다른 공급자의 주문금액은 해당 공급자의 무료배송 기준에 포함되지 않습니다.</p>
+          <p>유통참여형 펀딩은 온라인 주문·배송 계산 대상이 아니며, 배송 정책 적용 범위에서 제외됩니다.</p>
+        </div>
+        <div className="space-y-5">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">기본 배송비 (원)</label>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={baseShippingFee}
+                onChange={(e) => setBaseShippingFee(e.target.value.replace(/[^\d]/g, ''))}
+                placeholder="예: 3000"
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">무료배송 기준 금액 (원)</label>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={freeShippingThreshold}
+                onChange={(e) => setFreeShippingThreshold(e.target.value.replace(/[^\d]/g, ''))}
+                placeholder="예: 50000"
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">평균 출고 소요일 (일)</label>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={averageDispatchDays}
+                onChange={(e) => setAverageDispatchDays(e.target.value.replace(/[^\d]/g, ''))}
+                placeholder="예: 2"
+                className={inputClass}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">일반 배송 안내 (선택)</label>
+            <textarea
+              value={shippingStandard}
+              onChange={(e) => setShippingStandard(e.target.value)}
+              placeholder="예: 평일 14시 이전 주문 시 당일 출고"
+              rows={2}
+              maxLength={500}
+              className={inputClass}
+            />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">제주/도서산간 안내 (선택)</label>
+              <textarea
+                value={shippingIsland}
+                onChange={(e) => setShippingIsland(e.target.value)}
+                placeholder="예: 제주/도서산간 추가 배송비 협의"
+                rows={2}
+                maxLength={500}
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">산간지역 안내 (선택)</label>
+              <textarea
+                value={shippingMountain}
+                onChange={(e) => setShippingMountain(e.target.value)}
+                placeholder="예: 일부 산간지역 배송 지연 가능"
+                rows={2}
+                maxLength={500}
+                className={inputClass}
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">반품/교환 안내 (선택)</label>
+            <textarea
+              value={returnExchangeNotice}
+              onChange={(e) => setReturnExchangeNotice(e.target.value)}
+              placeholder="예: 단순 변심 반품은 수령 후 7일 이내, 왕복 배송비 구매자 부담"
+              rows={3}
+              maxLength={1000}
+              className={inputClass}
+            />
           </div>
         </div>
       </div>

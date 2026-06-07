@@ -559,6 +559,14 @@ export class NetureSupplierService {
         minOrderAmount: supplier.minOrderAmount ?? null,
         minOrderSurcharge: supplier.minOrderSurcharge ?? null,
         orderConditionNote: supplier.orderConditionNote ?? null,
+        // WO-O4O-NETURE-SUPPLIER-SHIPPING-SETTING-FOUNDATION-V1: 배송 정책 (저장/조회 foundation)
+        baseShippingFee: supplier.baseShippingFee ?? null,
+        freeShippingThreshold: supplier.freeShippingThreshold ?? null,
+        averageDispatchDays: supplier.averageDispatchDays ?? null,
+        returnExchangeNotice: supplier.returnExchangeNotice ?? null,
+        shippingStandard: supplier.shippingStandard ?? null,
+        shippingIsland: supplier.shippingIsland ?? null,
+        shippingMountain: supplier.shippingMountain ?? null,
       };
     } catch (error) {
       logger.error('[NetureSupplierService] Error fetching supplier profile:', error);
@@ -597,6 +605,14 @@ export class NetureSupplierService {
       minOrderAmount?: number | null;
       minOrderSurcharge?: number | null;
       orderConditionNote?: string | null;
+      // WO-O4O-NETURE-SUPPLIER-SHIPPING-SETTING-FOUNDATION-V1: 배송 정책 (저장 foundation)
+      baseShippingFee?: number | null;
+      freeShippingThreshold?: number | null;
+      averageDispatchDays?: number | null;
+      returnExchangeNotice?: string | null;
+      shippingStandard?: string | null;
+      shippingIsland?: string | null;
+      shippingMountain?: string | null;
     },
   ) {
     try {
@@ -631,6 +647,29 @@ export class NetureSupplierService {
       }
       if (data.orderConditionNote !== undefined) {
         supplier.orderConditionNote = data.orderConditionNote ? data.orderConditionNote.trim() : null;
+      }
+
+      // WO-O4O-NETURE-SUPPLIER-SHIPPING-SETTING-FOUNDATION-V1: 배송 정책 (저장만, 계산 미적용)
+      if (data.baseShippingFee !== undefined) {
+        supplier.baseShippingFee = data.baseShippingFee == null || data.baseShippingFee < 0 ? null : data.baseShippingFee;
+      }
+      if (data.freeShippingThreshold !== undefined) {
+        supplier.freeShippingThreshold = data.freeShippingThreshold == null || data.freeShippingThreshold < 0 ? null : data.freeShippingThreshold;
+      }
+      if (data.averageDispatchDays !== undefined) {
+        supplier.averageDispatchDays = data.averageDispatchDays == null || data.averageDispatchDays < 0 ? null : data.averageDispatchDays;
+      }
+      if (data.returnExchangeNotice !== undefined) {
+        supplier.returnExchangeNotice = data.returnExchangeNotice ? data.returnExchangeNotice.trim() : null;
+      }
+      if (data.shippingStandard !== undefined) {
+        supplier.shippingStandard = data.shippingStandard ? data.shippingStandard.trim() : null;
+      }
+      if (data.shippingIsland !== undefined) {
+        supplier.shippingIsland = data.shippingIsland ? data.shippingIsland.trim() : null;
+      }
+      if (data.shippingMountain !== undefined) {
+        supplier.shippingMountain = data.shippingMountain ? data.shippingMountain.trim() : null;
       }
 
       // WO-O4O-NETURE-SUPPLIER-DEPRECATION-V1 Phase 5-B: org-only write (no supplier reverse-sync)

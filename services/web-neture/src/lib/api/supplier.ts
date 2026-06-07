@@ -364,6 +364,14 @@ export interface SupplierProfile {
   minOrderAmount: number | null;
   minOrderSurcharge: number | null;
   orderConditionNote: string | null;
+  // WO-O4O-NETURE-SUPPLIER-SHIPPING-SETTING-FOUNDATION-V1: 배송 정책 (저장/조회 foundation)
+  baseShippingFee?: number | null;
+  freeShippingThreshold?: number | null;
+  averageDispatchDays?: number | null;
+  returnExchangeNotice?: string | null;
+  shippingStandard?: string | null;
+  shippingIsland?: string | null;
+  shippingMountain?: string | null;
 }
 
 // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
@@ -939,6 +947,14 @@ export const supplierProfileApi = {
     minOrderAmount?: number | null;
     minOrderSurcharge?: number | null;
     orderConditionNote?: string | null;
+    // WO-O4O-NETURE-SUPPLIER-SHIPPING-SETTING-FOUNDATION-V1
+    baseShippingFee?: number | null;
+    freeShippingThreshold?: number | null;
+    averageDispatchDays?: number | null;
+    returnExchangeNotice?: string | null;
+    shippingStandard?: string | null;
+    shippingIsland?: string | null;
+    shippingMountain?: string | null;
   }): Promise<{ success: boolean; error?: string }> {
     try {
       const response = await api.patch('/neture/supplier/profile', data);

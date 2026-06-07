@@ -209,6 +209,14 @@ export class NetureService {
       minOrderAmount?: number | null;
       minOrderSurcharge?: number | null;
       orderConditionNote?: string | null;
+      // WO-O4O-NETURE-SUPPLIER-SHIPPING-SETTING-FOUNDATION-V1
+      baseShippingFee?: number | null;
+      freeShippingThreshold?: number | null;
+      averageDispatchDays?: number | null;
+      returnExchangeNotice?: string | null;
+      shippingStandard?: string | null;
+      shippingIsland?: string | null;
+      shippingMountain?: string | null;
     },
   ) {
     return this.supplierService.updateSupplierProfile(supplierId, data);

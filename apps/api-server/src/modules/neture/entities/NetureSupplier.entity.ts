@@ -48,13 +48,13 @@ export class NetureSupplier {
   moq: string;
 
   @Column({ name: 'shipping_standard', type: 'text', nullable: true })
-  shippingStandard: string;
+  shippingStandard: string | null;
 
   @Column({ name: 'shipping_island', type: 'text', nullable: true })
-  shippingIsland: string;
+  shippingIsland: string | null;
 
   @Column({ name: 'shipping_mountain', type: 'text', nullable: true })
-  shippingMountain: string;
+  shippingMountain: string | null;
 
   @Column({ name: 'contact_email', nullable: true })
   contactEmail: string;
@@ -116,6 +116,25 @@ export class NetureSupplier {
 
   @Column({ name: 'order_condition_note', type: 'text', nullable: true })
   orderConditionNote: string | null;
+
+  // === 배송 정책 Foundation (WO-O4O-NETURE-SUPPLIER-SHIPPING-SETTING-FOUNDATION-V1) ===
+  // 저장/조회 foundation 만 — V1 에서 checkout 배송비 계산에 사용하지 않는다.
+
+  /** 기본 배송비 */
+  @Column({ name: 'base_shipping_fee', type: 'integer', nullable: true })
+  baseShippingFee: number | null;
+
+  /** 무료배송 기준 금액 (공급자별) */
+  @Column({ name: 'free_shipping_threshold', type: 'integer', nullable: true })
+  freeShippingThreshold: number | null;
+
+  /** 평균 출고 소요일 */
+  @Column({ name: 'average_dispatch_days', type: 'integer', nullable: true })
+  averageDispatchDays: number | null;
+
+  /** 반품/교환 안내 */
+  @Column({ name: 'return_exchange_notice', type: 'text', nullable: true })
+  returnExchangeNotice: string | null;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

@@ -191,6 +191,9 @@ export function createSupplierManagementController(dataSource: DataSource): Rout
         businessEntityType, businessStartDate,
         // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
         minOrderAmount, minOrderSurcharge, orderConditionNote,
+        // WO-O4O-NETURE-SUPPLIER-SHIPPING-SETTING-FOUNDATION-V1
+        baseShippingFee, freeShippingThreshold, averageDispatchDays, returnExchangeNotice,
+        shippingStandard, shippingIsland, shippingMountain,
       } = req.body;
       const result = await netureService.updateSupplierProfile(supplierId, {
         contactEmail, contactPhone, contactWebsite, contactKakao,
@@ -201,6 +204,8 @@ export function createSupplierManagementController(dataSource: DataSource): Rout
         managerName, managerPhone, businessType, businessItem, taxInvoiceEmail,
         businessEntityType, businessStartDate,
         minOrderAmount, minOrderSurcharge, orderConditionNote,
+        baseShippingFee, freeShippingThreshold, averageDispatchDays, returnExchangeNotice,
+        shippingStandard, shippingIsland, shippingMountain,
       });
       if (!result) {
         return res.status(404).json({ success: false, error: 'SUPPLIER_NOT_FOUND' });
