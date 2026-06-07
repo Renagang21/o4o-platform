@@ -1596,6 +1596,7 @@ export const netureGuideForOperatorProps: GuideFeatureManualPageProps = {
       { title: '콘텐츠 네트워크 운영 안내 →', audience: '공통', summary: '콘텐츠를 중심으로 공급자 · 운영자 · 매장이 연결되는 운영 구조 — 콘텐츠 운영 안내서로 이동.', to: '/guide/business/content-network' },
       { title: '이벤트 오퍼 운영 안내 →', audience: '공통', summary: '이벤트 오퍼를 왜 운영 · 참여하는가 — 유통질서 · 특별 공급 조건 안내서로 이동.', to: '/guide/business/event-offer' },
       { title: '운영자 승인 상품 운영 안내 →', audience: '공통', summary: '새 제품을 운영자가 검토해 참여 매장이 도입하는 구조 — 승인 상품 안내서로 이동.', to: '/guide/business/approved-product' },
+      { title: '판매자 모집 운영 안내 →', audience: '공통', summary: '세 주체가 함께 판매 네트워크를 형성하는 이유 · 구조 — 판매자 모집 안내서로 이동.', to: '/guide/business/seller-recruitment' },
     ],
   },
   sections: [
@@ -2937,6 +2938,201 @@ export const netureGuideBusinessApprovedProductProps: GuideFeatureManualPageProp
         { label: '3. 콘텐츠 확보', detail: '제품 설명 · 매장 활용 콘텐츠를 확보합니다.' },
         { label: '4. 참여 매장 안내', detail: '승인 상품을 참여 매장에 안내합니다.' },
         { label: '5. 운영', detail: '도입 · 판매를 지원하고 매장 반응을 다음 검토에 반영합니다.' },
+      ],
+    },
+  ],
+  bottomNav: {
+    prev: { label: '← 운영자 가이드', to: '/guide/for-operator' },
+    home: { label: '이용 안내로', to: '/guide' },
+  },
+};
+
+// ─── /guide/business/seller-recruitment (판매자 모집 운영 안내) ──────────
+// WO-O4O-NETURE-BUSINESS-GUIDE-SELLER-RECRUITMENT-V1
+// 여섯 번째 사업 운영 안내서. 세 주체가 함께 판매 네트워크를 형성하는 이유·구조.
+
+export const netureGuideBusinessSellerRecruitmentProps: GuideFeatureManualPageProps = {
+  hero: {
+    eyebrow: '사업 운영 안내',
+    title: '판매자 모집 운영 안내',
+    description:
+      '공급자 · 운영자 · 참여 매장이 판매자 모집을 왜 활용하는지, 어떤 목적으로 운영하는지 설명합니다. 기능 사용법이나 단순 입점 · 영업 모집 방법이 아닙니다. 세 주체가 함께 판매 네트워크를 형성하는 이유와 구조를 설명하는 운영 안내서이며, 운영자 승인 상품 · 콘텐츠 · 이벤트 오퍼와 자연스럽게 연결됩니다.',
+    primaryAction: { label: '운영 참여 검토 신청 →', to: '/o4o/apply' },
+    flowBarTitle: '안내 흐름',
+    flowLabels: ['처음 접근', '무엇인가', '3주체 목적', '승인 상품 연계', '콘텐츠 · 오퍼', '시작'],
+  },
+  index: {
+    title: '판매자 모집 운영 한눈에 보기',
+    lead: [
+      '판매자 모집은 단순 입점 모집 · 판매처 늘리기가 아닙니다.',
+      '공급자 · 운영자 · 참여 매장이 함께 판매 네트워크를 형성하는 과정입니다.',
+      '제품 등록만으로 이루어지지 않고, 콘텐츠 · 검토 · 조건이 함께합니다.',
+    ],
+    cards: [
+      { title: '이 문서의 대상', audience: '공통', summary: '공급자 · 운영자 · 참여 매장.', to: '#audience' },
+      { title: '처음에 생각하는 것', audience: '공급자', summary: '광고 · 쇼핑몰 등록 · 판매처 늘리기.', to: '#misread' },
+      { title: 'O4O의 판매자 모집은 무엇인가', audience: '공통', summary: '단순 입점 모집이 아니라 판매 네트워크 형성.', to: '#what' },
+      { title: '공급자는 왜 하는가', audience: '공급자', summary: '신규 매장 · 제품 도입 · 인지도 · 지역 · 전문 매장.', to: '#supplier-why' },
+      { title: '운영자는 왜 하는가', audience: '운영자', summary: '참여 매장 지원 · 네트워크 확대 · 승인 상품 · 콘텐츠.', to: '#operator-why' },
+      { title: '참여 매장은 왜 참여하는가', audience: '매장', summary: '새 제품 검토 · 운영자 검토 활용 · 차별화 상품.', to: '#store-why' },
+      { title: '판매자 모집과 운영자 승인 상품', audience: '공통', summary: '신규 제품 → 운영자 검토 → 참여 매장 도입.', to: '#approved-relation' },
+      { title: '판매자 모집과 콘텐츠', audience: '공통', summary: '제품 등록만으로 안 됩니다 — 콘텐츠가 함께.', to: '#content' },
+      { title: '판매자 모집과 이벤트 오퍼', audience: '공통', summary: '서로 다른 구조이지만 함께 활용될 수 있습니다.', to: '#event-relation' },
+      { title: '실제 운영 흐름', audience: '공통', summary: '공급자 → 모집 제안 → 운영자 → 참여 매장 → 소비자.', to: '#flow' },
+      { title: '시작 방법', audience: '공통', summary: '등록 → 제품 · 콘텐츠 → 모집 → 운영자 협력 → 매장 확보.', to: '#start' },
+    ],
+  },
+  sections: [
+    {
+      id: 'audience',
+      step: '01',
+      title: '이 문서의 대상',
+      description:
+        '이 문서는 제품을 판매할 매장을 찾는 주체, 그 연결을 운영하는 주체, 새 제품을 검토하려는 매장을 위한 것입니다.',
+      items: [
+        { label: '공급자', detail: '제조사 · 수입사 · 브랜드사 · 도매상 · 총판 등 제품을 판매할 매장을 찾는 사업자.' },
+        { label: '운영자', detail: '협동조합 · 약국 네트워크 운영자 · 전문 네트워크 운영자 등 공급자와 매장을 연결하는 주체.' },
+        { label: '참여 매장', detail: '약국 · 전문매장 · 기타 판매점 등 새 제품을 검토 · 판매하려는 매장.' },
+      ],
+    },
+    {
+      id: 'misread',
+      step: '02',
+      title: '많은 공급자들이 처음에 생각하는 것',
+      description:
+        '새 제품을 출시하면 보통 익숙한 방법을 먼저 떠올립니다. 여기서는 옳고 그름을 판단하지 않고, 일반적으로 생각하는 접근을 정리합니다.',
+      items: [
+        { label: '광고를 하면 된다', detail: '광고로 알리면 판매가 따라올 것이라 생각하기 쉽습니다.' },
+        { label: '쇼핑몰에 등록하면 된다', detail: '쇼핑몰에 올리면 팔릴 것이라 기대하기 쉽습니다.' },
+        { label: '판매처가 늘어나면 된다', detail: '판매처 수만 늘리면 될 것이라 생각하기 쉽습니다.' },
+      ],
+    },
+    {
+      id: 'what',
+      step: '03',
+      title: 'O4O의 판매자 모집은 무엇인가',
+      description:
+        'O4O의 판매자 모집은 단순 입점 모집이 아닙니다. 공급자 · 운영자 · 참여 매장이 함께 활용하는 운영 구조이며, 판매 네트워크를 형성하는 과정입니다.',
+      items: [
+        { label: '공급자', detail: '제품을 다룰 매장을 찾고, 검토 · 조건 · 콘텐츠를 준비합니다.' },
+        { label: '운영자', detail: '공급자와 매장을 연결하고, 검토 · 지원으로 네트워크를 만듭니다.' },
+        { label: '참여 매장', detail: '제시된 제품 · 조건을 검토하고 참여 여부를 판단합니다.' },
+      ],
+    },
+    {
+      id: 'supplier-why',
+      step: '04',
+      title: '공급자는 왜 판매자 모집을 하는가',
+      description:
+        '공급자에게 판매자 모집은 제품을 다룰 매장을 신뢰 있게 확보하는 과정입니다.',
+      items: [
+        { label: '신규 매장 확보', detail: '제품을 취급할 새 매장을 확보합니다.' },
+        { label: '신규 제품 도입', detail: '새 제품을 매장에 도입시킵니다.' },
+        { label: '브랜드 인지도 확대', detail: '브랜드를 더 많은 매장 · 소비자에게 알립니다.' },
+        { label: '지역 확장', detail: '특정 지역으로 판매 매장을 확장합니다.' },
+        { label: '전문 매장 확보', detail: '제품에 맞는 전문 매장을 확보합니다.' },
+        { label: '제품 정보 전달', detail: '제품 · 건강 정보를 매장에 전달합니다.' },
+      ],
+    },
+    {
+      id: 'operator-why',
+      step: '05',
+      title: '운영자는 왜 판매자 모집을 하는가',
+      description:
+        '운영자에게 판매자 모집은 네트워크를 키우고 참여 매장을 지원하는 핵심 운영 활동입니다.',
+      items: [
+        { label: '참여 매장 지원', detail: '좋은 제품 · 조건을 매장에 연결해 지원합니다.' },
+        { label: '네트워크 확대', detail: '참여 매장을 늘려 운영 기반을 키웁니다.' },
+        { label: '승인 상품 운영', detail: '검토 · 승인한 상품을 다룰 매장을 모읍니다.' },
+        { label: '콘텐츠 운영', detail: '제품 콘텐츠를 함께 제공해 매장 활용을 돕습니다.' },
+        { label: '공급자 협력', detail: '공급자의 목적을 이해하고 매장 연결을 조율합니다.' },
+      ],
+    },
+    {
+      id: 'store-why',
+      step: '06',
+      title: '참여 매장은 왜 참여하는가',
+      description:
+        '참여 매장에게 판매자 모집은 검토된 새 제품과 자료를 확보하는 기회입니다.',
+      items: [
+        { label: '새로운 제품 검토', detail: '새 제품을 부담 없이 검토 · 도입할 수 있습니다.' },
+        { label: '운영자 검토 활용', detail: '운영자가 검토한 제품이라 안심하고 봅니다.' },
+        { label: '콘텐츠 확보', detail: '제품 설명 · 매장 활용 콘텐츠를 함께 받습니다.' },
+        { label: '판매 기회 확보', detail: '좋은 제품 · 자료로 새 판매 기회를 만듭니다.' },
+        { label: '차별화 상품 확보', detail: '다른 매장과 차별화할 제품을 확보합니다.' },
+      ],
+    },
+    {
+      id: 'approved-relation',
+      step: '07',
+      title: '판매자 모집과 운영자 승인 상품',
+      description:
+        '판매자 모집은 운영자 승인 상품과 자연스럽게 연결됩니다. 새 제품이 운영자 검토를 거쳐 참여 매장에 도입되는 흐름이 판매자 모집의 한 축입니다.',
+      items: [
+        { label: '신규 제품', detail: '공급자가 새 제품을 운영자에게 제출합니다.' },
+        { label: '운영자 검토', detail: '운영자가 제품을 검토 · 승인하고 정리합니다.' },
+        { label: '참여 매장 도입', detail: '모집된 참여 매장이 승인 상품을 검토 · 도입합니다.' },
+        { label: '연결 구조', detail: '승인 상품을 축으로 매장을 모집하면, 매장은 검토된 제품을 안심하고 받습니다.' },
+      ],
+    },
+    {
+      id: 'content',
+      step: '08',
+      title: '판매자 모집과 콘텐츠',
+      description:
+        '판매자 모집은 제품 등록만으로 이루어지지 않습니다. 콘텐츠가 함께 제공될 때 매장이 제품을 다루기 쉬워지고 모집 효과가 높아집니다.',
+      items: [
+        { label: '제품 설명서', detail: '제품 특징 · 사용법 설명자료.' },
+        { label: '이미지', detail: '매장 안내 · 온라인 · 인쇄용 제품 이미지.' },
+        { label: 'POP', detail: '매장 내 비치 · 부착 안내물.' },
+        { label: 'QR', detail: '제품 · 건강 정보로 연결되는 QR 자료.' },
+        { label: '블로그', detail: '소비자 설명에 쓰는 글 콘텐츠.' },
+        { label: '영상', detail: '제품 소개 · 사용법 영상.' },
+        { label: '교육자료', detail: '직원 · 고객 교육 자료.' },
+        { label: '상담자료', detail: '소비자 상담 시 활용하는 설명자료.' },
+        { label: '건강정보 자료', detail: '제품과 관련된 건강 정보 자료.' },
+      ],
+    },
+    {
+      id: 'event-relation',
+      step: '09',
+      title: '판매자 모집과 이벤트 오퍼',
+      description:
+        '판매자 모집과 이벤트 오퍼는 서로 다른 구조이지만 함께 활용될 수 있습니다. 모집으로 매장을 확보하고, 이벤트 오퍼로 참여를 유도하는 식으로 연결됩니다.',
+      items: [
+        { label: '신규 제품', detail: '판매자 모집은 새 제품을 다룰 매장을 찾는 데 강합니다.' },
+        { label: '기존 제품', detail: '이벤트 오퍼는 기존 제품을 좋은 조건으로 다루게 하는 데 강합니다.' },
+        { label: '특별 공급 조건', detail: '이벤트 오퍼의 특별 공급 조건으로 모집된 매장의 참여를 유도할 수 있습니다.' },
+        { label: '참여 유도', detail: '두 구조를 함께 써서 매장 확보와 참여를 동시에 만들 수 있습니다.' },
+      ],
+    },
+    {
+      id: 'flow',
+      step: '10',
+      title: '실제 운영 흐름',
+      description:
+        '실제 운영은 공급자의 모집 제안에서 시작해 운영자 · 참여 매장을 거쳐 소비자에게 닿습니다.',
+      items: [
+        { label: '공급자', detail: '제품 · 콘텐츠 · 조건을 준비하고 모집을 제안합니다.' },
+        { label: '판매자 모집 제안', detail: '제품을 다룰 매장의 조건 · 대상을 정해 제안합니다.' },
+        { label: '운영자', detail: '제품을 검토 · 정리하고 매장을 모집 · 연결 · 지원합니다.' },
+        { label: '참여 매장', detail: '제품 · 조건을 검토하고 참여해 콘텐츠를 활용해 판매합니다.' },
+        { label: '소비자', detail: '매장에서 제품 · 건강 정보를 전달받아 이해하고 구매합니다.' },
+      ],
+    },
+    {
+      id: 'start',
+      step: '11',
+      title: '시작 방법',
+      description:
+        '처음 시작할 때는 아래 순서를 따르면 됩니다. 가능한 것부터 시작하면 됩니다.',
+      items: [
+        { label: '1. 공급자 등록', detail: '공급자로 참여를 등록합니다.' },
+        { label: '2. 제품 준비', detail: '매장에 제안할 제품과 조건을 준비합니다.' },
+        { label: '3. 콘텐츠 준비', detail: '제품 설명 · 매장 활용 콘텐츠를 준비합니다.' },
+        { label: '4. 판매자 모집', detail: '제품을 다룰 매장을 대상 · 조건을 정해 모집합니다.' },
+        { label: '5. 운영자 협력', detail: '운영자와 협력해 검토 · 연결 · 지원을 진행합니다.' },
+        { label: '6. 참여 매장 확보', detail: '참여 매장을 확보하고 지속적인 관계로 이어갑니다.' },
       ],
     },
   ],
