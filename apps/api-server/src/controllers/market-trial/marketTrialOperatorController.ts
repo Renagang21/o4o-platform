@@ -1401,11 +1401,14 @@ export class MarketTrialOperatorController {
       const bom = '\uFEFF';
       const csv = bom + [header.join(','), ...csvRows].join('\n');
 
-      const safeTitle = (trial.title || 'trial').replace(/[^a-zA-Z0-9가-힣_-]/g, '_').slice(0, 30);
-      const filename = `market-trial-${safeTitle}-participants.csv`;
+      // WO-…-SMOKE-DATA-FLOW: Content-Disposition 헤더는 ASCII 만 허용 — 한글 제목 시 ERR_INVALID_CHAR(500) 방지.
+      // ascii fallback filename + RFC 5987 filename*(UTF-8) 으로 한글 파일명 제공.
+      const asciiTitle = (trial.title || 'trial').replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 30) || 'trial';
+      const filename = `market-trial-${asciiTitle}-participants.csv`;
+      const utf8Filename = encodeURIComponent(`유통참여형펀딩-참여자-${(trial.title || '').slice(0, 30)}.csv`);
 
       res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"; filename*=UTF-8''${utf8Filename}`);
       res.send(csv);
     } catch (error) {
       console.error('Operator export participants CSV error:', error);
