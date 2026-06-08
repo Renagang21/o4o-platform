@@ -237,27 +237,31 @@ export interface OperatorPharmaciesResponse {
   };
 }
 
+// WO-O4O-OPERATOR-ORDER-VIEW-FRONTEND-WIRE-V1:
+// view-only operator orders API (GET /glycopharm/operator/orders) 의 PII-safe 응답 shape.
+// canonical 원장 checkout_orders 기준. 상태변경/배송/PII 필드 없음.
 export interface OperatorOrder {
   id: string;
   orderNumber: string;
-  pharmacyName: string;
-  pharmacyRegion: string;
-  items: number;
+  /** checkout_orders.status: created | pending_payment | paid | refunded | cancelled */
+  status: string;
+  /** checkout_orders.paymentStatus: pending | paid | failed | refunded */
+  paymentStatus: string;
   totalAmount: number;
-  status: OrderStatus;
-  paymentStatus: PaymentStatus;
+  itemCount: number;
+  channel: string | null;
+  storeName: string | null;
+  /** PII 미노출 — 항상 null */
+  buyerLabel: string | null;
   createdAt: string;
-  estimatedDelivery?: string;
-  trackingNumber?: string;
 }
 
 export interface OperatorOrderStats {
-  todayOrders: number;
-  todayRevenue: number;
-  pendingOrders: number;
-  processingOrders: number;
-  shippedOrders: number;
-  avgOrderValue: number;
+  total: number;
+  paid: number;
+  pending: number;
+  cancelled: number;
+  totalAmount: number;
 }
 
 export interface OperatorOrdersResponse {
@@ -511,21 +515,27 @@ class GlycopharmApiClient {
    * 운영자 주문 목록 조회
    */
   async getOperatorOrders(params?: {
-    status?: OrderStatus;
     page?: number;
     limit?: number;
-    dateFilter?: string;
+    status?: string;
+    paymentStatus?: string;
     search?: string;
+    dateFrom?: string;
+    dateTo?: string;
   }): Promise<OperatorOrdersResponse> {
+    // WO-O4O-OPERATOR-ORDER-VIEW-FRONTEND-WIRE-V1: view-only operator orders endpoint.
+    // 기존 legacy stub(/operator/recent-orders) → checkout_orders 기반 /operator/orders 연결.
     const searchParams = new URLSearchParams();
-    if (params?.status) searchParams.set('status', params.status);
     if (params?.page) searchParams.set('page', params.page.toString());
     if (params?.limit) searchParams.set('limit', params.limit.toString());
-    if (params?.dateFilter) searchParams.set('dateFilter', params.dateFilter);
+    if (params?.status) searchParams.set('status', params.status);
+    if (params?.paymentStatus) searchParams.set('paymentStatus', params.paymentStatus);
     if (params?.search) searchParams.set('search', params.search);
+    if (params?.dateFrom) searchParams.set('dateFrom', params.dateFrom);
+    if (params?.dateTo) searchParams.set('dateTo', params.dateTo);
 
     const queryString = searchParams.toString();
-    const endpoint = `/glycopharm/operator/recent-orders${queryString ? `?${queryString}` : ''}`;
+    const endpoint = `/glycopharm/operator/orders${queryString ? `?${queryString}` : ''}`;
 
     return this.request(endpoint);
   }
