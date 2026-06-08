@@ -248,6 +248,7 @@ const StoreProductLibraryPage = lazy(() => import('./pages/store/StoreProductLib
 // WO-O4O-STORE-PRODUCTS-SERVICE-ROUTING-V1: 매장 경영자용 매장 상품 관리 (공통 패키지).
 // 기존 StoreListingsPage(부분 기능)와 병행 운영 — 통합 판단은 후속 Phase.
 import { StoreProductsManagerPage } from '@o4o/store-products-ui';
+import { GuideBackLink } from './components/GuideBackLink';
 // Neture Event Offer — 공급자 현황 허브 (WO-O4O-EVENT-OFFER-NETURE-ROLE-UX-ALIGNMENT-V1)
 const SupplierEventOfferPage = lazy(() => import('./pages/supplier/SupplierEventOfferPage'));
 
@@ -876,7 +877,7 @@ function App() {
               <Route path="/store/manage/products/library" element={<StoreProductLibraryPage />} />
               {/* WO-O4O-STORE-PRODUCTS-SERVICE-ROUTING-V1: 공통 패키지 기반 풀 기능 페이지.
                   Backend requireStoreOwner(role_assignments)가 실제 게이트. */}
-              <Route path="/store/my-products" element={<StoreProductsManagerPage />} />
+              <Route path="/store/my-products" element={<StoreProductsManagerPage guideSlot={<GuideBackLink to="/guide/for-seller#what-store" label="내 매장 활용 안내" />} />} />
               {/* removed: /store/event-offers — WO-O4O-EVENT-OFFER-NETURE-ROLE-UX-ALIGNMENT-V1 */}
             </Route>
 

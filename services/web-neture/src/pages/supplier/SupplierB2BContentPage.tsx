@@ -10,6 +10,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { GuideBackLink } from '../../components/GuideBackLink';
 import { supplierApi, type SupplierProduct } from '../../lib/api/supplier';
 import B2BContentDrawer from '../../components/supplier/B2BContentDrawer';
 
@@ -76,6 +77,7 @@ export default function SupplierB2BContentPage() {
         <p className="text-sm text-gray-500 mt-1">
           도매/파트너용 상품 설명을 별도로 관리합니다. B2B 설명이 없으면 B2C 설명이 자동으로 사용됩니다.
         </p>
+        <div className="mt-2"><GuideBackLink to="/guide/features/b2b-content" label="B2B 콘텐츠 이용 안내" /></div>
       </div>
 
       {/* Summary */}

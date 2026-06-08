@@ -14,6 +14,7 @@
  */
 
 import { Link } from 'react-router-dom';
+import { GuideBackLink } from '../components/GuideBackLink';
 import {
   Megaphone,
   Link2,
@@ -139,7 +140,8 @@ export default function PartnerLandingPage() {
       {/* ── 2. 파트너 프로그램 소개 ── */}
       <section className="py-16 bg-white">
         <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-2xl font-bold text-gray-900 text-center mb-10">파트너 프로그램</h2>
+          <h2 className="text-2xl font-bold text-gray-900 text-center mb-2">파트너 프로그램</h2>
+          <div className="text-center mb-10"><GuideBackLink to="/guide/features/partner-program" label="파트너 프로그램 이용 안내" /></div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {programCards.map((c) => (
               <div

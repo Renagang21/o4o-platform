@@ -15,6 +15,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { GuideBackLink } from '../../components/GuideBackLink';
 import { useAuth } from '../../contexts/AuthContext';
 import { contentAssetApi, dashboardApi } from '../../lib/api';
 import { HubLayout, createSignal, createActionSignal } from '@o4o/hub-core';
@@ -581,7 +582,7 @@ export default function HubPage() {
       signals={signals}
       onCardClick={(href) => navigate(href)}
       onActionTrigger={handleActionTrigger}
-      beforeSections={<SellerInsightCards insight={signalData?.sellerInsight} />}
+      beforeSections={<><div style={{ marginBottom: 12 }}><GuideBackLink to="/guide/for-seller#hub" label="매장 HUB 이용 안내" /></div><SellerInsightCards insight={signalData?.sellerInsight} /></>}
       footerNote="허브는 각 기능의 진입점입니다. 상세 작업은 각 페이지에서 진행해주세요."
     />
   );

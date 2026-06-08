@@ -482,11 +482,18 @@ export interface StoreProductsManagerPageProps {
   /** 외곽 padding 커스터마이징(서비스별 layout과 정합 맞출 때) */
   containerClassName?: string;
 
+  /**
+   * 헤더 아래에 렌더할 선택적 슬롯 — 서비스별 Guide 백링크 등에 사용.
+   * WO-O4O-NETURE-WORKSPACE-TO-GUIDE-BACKLINK-V1. 미지정 시 렌더 안 함(기존 무영향).
+   */
+  guideSlot?: ReactNode;
+
 }
 
 export default function StoreProductsManagerPage({
   headerSlot,
   containerClassName = 'p-6',
+  guideSlot,
 }: StoreProductsManagerPageProps = {}) {
   const [activeModal, setActiveModal] = useState<ActiveModal>(null);
   const [selectedListing, setSelectedListing] = useState<StoreListingItem | null>(null);
@@ -674,6 +681,8 @@ export default function StoreProductsManagerPage({
           ]}
         />
       )}
+
+      {guideSlot && <div className="mb-3">{guideSlot}</div>}
 
       <div className="mb-4 flex items-start gap-3 rounded-lg border border-blue-100 bg-blue-50 p-3">
         <Package size={16} className="mt-0.5 flex-shrink-0 text-blue-500" />

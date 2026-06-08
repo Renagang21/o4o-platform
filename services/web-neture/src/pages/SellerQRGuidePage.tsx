@@ -11,6 +11,7 @@
  */
 
 import { useState, useRef, useCallback } from 'react';
+import { GuideBackLink } from '../components/GuideBackLink';
 import { QRCodeCanvas } from 'qrcode.react';
 
 // Base URL for QR codes (production URL)
@@ -155,6 +156,7 @@ export default function SellerQRGuidePage() {
             <br />
             QR 코드를 직접 생성하고 PNG로 다운로드할 수 있습니다.
           </p>
+          <div style={{ marginTop: 8 }}><GuideBackLink to="/guide/for-seller#qr" label="QR 활용 이용 안내" /></div>
         </header>
 
         {/* QR Code Generation Hub */}

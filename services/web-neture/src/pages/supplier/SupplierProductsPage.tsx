@@ -14,6 +14,7 @@
 
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
+import { GuideBackLink } from '../../components/GuideBackLink';
 import type { SupplierSpaceOutletContext } from '../../components/layouts/SupplierSpaceLayout';
 import { Search, Plus, Sparkles, ImagePlus, X, Eye, Send, FileText, Info, Tag } from 'lucide-react';
 import { ContentRenderer } from '@o4o/content-editor';
@@ -1099,6 +1100,7 @@ export default function SupplierProductsPage() {
           <p className="text-sm text-slate-500 mt-1">
             공급하는 제품을 관리하고, 가격 및 유통 정책을 설정합니다.
           </p>
+          <div className="mt-2"><GuideBackLink to="/guide/features/product-registration" label="상품 등록 이용 안내" /></div>
         </div>
         <div className="flex gap-2">
           <button

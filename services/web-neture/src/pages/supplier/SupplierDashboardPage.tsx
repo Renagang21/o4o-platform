@@ -16,6 +16,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { GuideBackLink } from '../../components/GuideBackLink';
 import { FlaskConical, ArrowRight } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import {
@@ -119,6 +120,7 @@ export default function SupplierDashboardPage() {
           <p className="text-sm text-slate-500 mt-1">
             {user?.name || '공급자'}님의 상품 성과와 매장 확산 현황을 AI가 분석합니다.
           </p>
+          <div className="mt-2"><GuideBackLink to="/guide/features/copilot-dashboard" label="Copilot 이용 안내" /></div>
         </div>
         <button
           onClick={fetchData}

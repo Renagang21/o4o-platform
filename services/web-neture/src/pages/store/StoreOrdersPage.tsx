@@ -13,6 +13,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { GuideBackLink } from '../../components/GuideBackLink';
 import { ClipboardList, Search, RefreshCw, ChevronLeft, ChevronRight, Package } from 'lucide-react';
 import { storeApi, sellerApi } from '../../lib/api';
 import type { StoreOrder, StoreOrderItem } from '../../lib/api';
@@ -217,6 +218,7 @@ export default function StoreOrdersPage() {
           <span style={{ marginLeft: 8 }}>주문 내역</span>
           {total > 0 && <span style={styles.totalCount}>{total}건</span>}
         </h1>
+        <div style={{ marginTop: 8 }}><GuideBackLink to="/guide/for-seller#settlement" label="주문·배송 이용 안내" /></div>
       </div>
 
       <GuideBlock

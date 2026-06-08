@@ -17,6 +17,7 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { GuideBackLink } from '../../components/GuideBackLink';
 import { Tag, ChevronLeft, ChevronRight, Package, Plus, X, Loader2 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { netureEventOfferApi, supplierKpaEventOfferApi } from '../../lib/api';
@@ -428,6 +429,7 @@ export default function SupplierEventOfferPage() {
             <div>
               <h1 className="text-xl font-bold text-slate-800">이벤트 오퍼 현황</h1>
               <p className="text-xs text-slate-500 mt-0.5">등록된 이벤트 오퍼 상태 및 조건 확인</p>
+              <div className="mt-1"><GuideBackLink to="/guide/features/event-offer" label="Event Offer 이용 안내" /></div>
             </div>
           </div>
         </div>

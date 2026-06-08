@@ -7,6 +7,7 @@
 
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { GuideBackLink } from '../../components/GuideBackLink';
 import { getMyTrials } from '../../api/trial';
 import type { Trial } from '../../api/trial';
 
@@ -67,6 +68,7 @@ export default function SupplierTrialListPage() {
         <div>
           <h1 style={s.title}>내 유통참여형 펀딩</h1>
           <p style={s.subtitle}>등록한 체험단 목록을 확인하고 결과를 조회합니다.</p>
+          <div style={{ marginTop: 8 }}><GuideBackLink to="/guide/features/market-trial" label="유통참여형 펀딩 이용 안내" /></div>
         </div>
         <button style={s.createBtn} onClick={() => navigate('/supplier/market-trial/new')}>
           + 새 펀딩 등록

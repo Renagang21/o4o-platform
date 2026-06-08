@@ -11,6 +11,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { GuideBackLink } from '../../components/GuideBackLink';
 import { ShoppingBag, ExternalLink, Info, Users, Clock, Mail, ChevronDown, ChevronUp, Compass, Truck, ArrowRight, Lock } from 'lucide-react';
 import { supplierApi, type OrderSummaryResponse, type ServiceSummary } from '../../lib/api';
 import type { UnifiedSupplierOrder } from '../../lib/api/supplier';
@@ -116,6 +117,7 @@ export default function SupplierOrdersPage() {
           <p style={styles.subtitle}>
             서비스별 주문 현황을 확인하고, 필요한 서비스로 바로 이동합니다
           </p>
+          <div style={{ marginTop: 8 }}><GuideBackLink to="/guide" label="이용 안내" /></div>
         </div>
       </div>
 

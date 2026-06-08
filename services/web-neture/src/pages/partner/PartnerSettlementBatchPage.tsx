@@ -10,6 +10,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { GuideBackLink } from '../../components/GuideBackLink';
 import {
   ArrowLeft,
   Wallet,
@@ -95,6 +96,7 @@ export function PartnerSettlementBatchPage() {
         <div>
           <h1 style={styles.title}>정산 내역</h1>
           <p style={styles.subtitle}>커미션 정산 배치 및 지급 현황을 확인합니다</p>
+          <div style={{ marginTop: 8 }}><GuideBackLink to="/guide/features/partner-program" label="파트너 프로그램 이용 안내" /></div>
         </div>
       </div>
 
