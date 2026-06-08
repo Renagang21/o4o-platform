@@ -20,6 +20,7 @@ import { Router, Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
 import { requireAuth } from '../../../middleware/auth.middleware.js';
 import { requireCosmeticsScope } from '../../../middleware/cosmetics-scope.middleware.js';
+import { queryOperatorOrders } from '../../common/order/operatorOrderQuery.js';
 import { CosmeticsStoreSummaryService } from '../services/cosmetics-store-summary.service.js';
 import { generateRuleBasedInsights } from '../../../copilot/insight-rules.js';
 import logger from '../../../utils/logger.js';
@@ -151,6 +152,33 @@ export function createCosmeticsOperatorDashboardController(dataSource: DataSourc
       // cms_contents 등) 이 잘못된 isMissingOrderTable 검사로 위장되지 않도록, 본 catch 의
       // top-level 에서는 order-table 분기를 적용하지 않는다. adminSummary 분기는 위 .catch() 에서 처리.
       console.error('[K-Cosmetics Operator Dashboard] Error:', error);
+      res.status(500).json({
+        error: { code: 'INTERNAL_ERROR', message: error.message },
+      });
+    }
+  });
+
+  /**
+   * GET /operator/orders
+   * WO-O4O-OPERATOR-ORDER-VIEW-API-V1 — view-only 주문 목록.
+   * canonical 원장 checkout_orders + metadata.serviceKey='cosmetics' (서버 고정).
+   * buyer-scope `/cosmetics/orders` 와 별개의 operator-scope 조회.
+   * 상태변경 없음. PII 미노출. empty(row 0)에서도 200 + 빈 목록.
+   */
+  router.get('/orders', async (req: Request, res: Response): Promise<void> => {
+    try {
+      const result = await queryOperatorOrders(dataSource, 'cosmetics', {
+        page: req.query.page as string,
+        limit: req.query.limit as string,
+        status: (req.query.status as string) || null,
+        paymentStatus: (req.query.paymentStatus as string) || null,
+        search: (req.query.search as string) || null,
+        dateFrom: (req.query.dateFrom as string) || null,
+        dateTo: (req.query.dateTo as string) || null,
+      });
+      res.json({ success: true, data: result });
+    } catch (error: any) {
+      console.error('[K-Cosmetics Operator Orders] Error:', error);
       res.status(500).json({
         error: { code: 'INTERNAL_ERROR', message: error.message },
       });

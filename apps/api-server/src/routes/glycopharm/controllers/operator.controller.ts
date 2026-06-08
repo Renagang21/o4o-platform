@@ -16,6 +16,7 @@ import { DataSource } from 'typeorm';
 import { GlycopharmApplication } from '../entities/glycopharm-application.entity.js';
 import { requireGlycopharmScope } from '../../../middleware/glycopharm-scope.middleware.js';
 import { buildGlycoPharmDashboardConfig } from '../services/operator-dashboard.service.js';
+import { queryOperatorOrders } from '../../common/order/operatorOrderQuery.js';
 import type { ActionLogService } from '@o4o/action-log-core';
 import { createOperatorForumRequestController } from './operator-forum-request.controller.js';
 import { createOperatorForumDeleteRequestController } from './operator-forum-delete-request.controller.js';
@@ -67,6 +68,32 @@ export function createOperatorController(
       });
     } catch (error: any) {
       console.error('Failed to list operator pharmacies:', error);
+      res.status(500).json({
+        error: { code: 'INTERNAL_ERROR', message: error.message },
+      });
+    }
+  });
+
+  /**
+   * GET /operator/orders
+   * WO-O4O-OPERATOR-ORDER-VIEW-API-V1 — view-only 주문 목록.
+   * canonical 원장 checkout_orders + metadata.serviceKey='glycopharm' (서버 고정).
+   * 상태변경 없음. PII 미노출. empty(row 0)에서도 200 + 빈 목록.
+   */
+  router.get('/orders', async (req: Request, res: Response): Promise<void> => {
+    try {
+      const result = await queryOperatorOrders(dataSource, 'glycopharm', {
+        page: req.query.page as string,
+        limit: req.query.limit as string,
+        status: (req.query.status as string) || null,
+        paymentStatus: (req.query.paymentStatus as string) || null,
+        search: (req.query.search as string) || null,
+        dateFrom: (req.query.dateFrom as string) || null,
+        dateTo: (req.query.dateTo as string) || null,
+      });
+      res.json({ success: true, data: result });
+    } catch (error: any) {
+      console.error('Failed to get operator orders:', error);
       res.status(500).json({
         error: { code: 'INTERNAL_ERROR', message: error.message },
       });
