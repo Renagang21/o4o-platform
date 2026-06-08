@@ -56,9 +56,15 @@ export class SupplierUnifiedOrderService {
     let checkoutRows: UnifiedSupplierOrder[] = [];
 
     if (wantNeture) {
-      netureRows = await this.queryNetureOrders(supplierId);
-      if (netureRows.length >= PER_SOURCE_CAP) {
-        console.warn(`[unified-orders] supplier ${supplierId} neture_orders hit cap ${PER_SOURCE_CAP}; total may be capped`);
+      try {
+        netureRows = await this.queryNetureOrders(supplierId);
+        if (netureRows.length >= PER_SOURCE_CAP) {
+          console.warn(`[unified-orders] supplier ${supplierId} neture_orders hit cap ${PER_SOURCE_CAP}; total may be capped`);
+        }
+      } catch (e) {
+        // neture_orders 조회 실패 → checkout 단독으로 degrade (읽기 view 안정성 우선)
+        console.warn('[unified-orders] neture_orders query failed, degrading:', e);
+        netureRows = [];
       }
     }
 
@@ -90,18 +96,18 @@ export class SupplierUnifiedOrderService {
       `SELECT o.id::text AS id, o.order_number, o.status::text AS status,
               o.total_amount, o.shipping_fee, o.final_amount,
               o.orderer_name, o.created_at, o.updated_at,
-              (SELECT COUNT(*)::int FROM neture_order_items oi2
+              (SELECT COUNT(*)::int FROM neture.neture_order_items oi2
                  JOIN supplier_product_offers spo2 ON spo2.id = oi2.product_id::uuid
                  WHERE oi2.order_id = o.id AND spo2.supplier_id = $1) AS item_count,
               (SELECT COALESCE(jsonb_agg(jsonb_build_object(
                         'name', oi3.product_name, 'quantity', oi3.quantity,
                         'unitPrice', oi3.unit_price, 'lineTotal', oi3.total_price)), '[]'::jsonb)
-                 FROM neture_order_items oi3
+                 FROM neture.neture_order_items oi3
                  JOIN supplier_product_offers spo3 ON spo3.id = oi3.product_id::uuid
                  WHERE oi3.order_id = o.id AND spo3.supplier_id = $1) AS items_preview
        FROM neture_orders o
        WHERE EXISTS (
-         SELECT 1 FROM neture_order_items oi
+         SELECT 1 FROM neture.neture_order_items oi
          JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
          WHERE oi.order_id = o.id AND spo.supplier_id = $1
        )
