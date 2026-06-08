@@ -64,7 +64,6 @@ export default function ProductsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const fetchProducts = useCallback(async () => {
     setIsLoading(true);
@@ -105,11 +104,6 @@ export default function ProductsPage() {
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
-
-  // Reset selection on search/page change
-  useEffect(() => {
-    setSelectedIds(new Set());
-  }, [searchTerm, currentPage]);
 
   const handleSearch = () => {
     setSearchTerm(searchInput);
@@ -291,9 +285,6 @@ export default function ProductsPage() {
           emptyMessage="상품 데이터가 없습니다"
           onRowClick={(row) => navigate(`/operator/products/${row.id}`)}
           tableId="cosmetics-products"
-          selectable
-          selectedKeys={selectedIds}
-          onSelectionChange={setSelectedIds}
         />
 
         {/* Pagination */}
