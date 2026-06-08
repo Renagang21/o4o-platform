@@ -3522,56 +3522,74 @@ export const netureGuideBusinessMarketTrialProps: GuideFeatureManualPageProps = 
 // 7개 사업 운영 안내서를 독립 체계로 묶는 허브. 역할 Guide와 분리.
 
 export const netureGuideBusinessHubProps: GuideFeatureManualPageProps = {
+  // WO-O4O-NETURE-BUSINESS-GUIDE-HUB-RECLASSIFICATION-V1
+  // 2계층(네트워크 운영 / 운영 구조) → 3계층(사업 모델 / 운영 도구 / 수익 구조) IA 재분류.
+  // 7개 하위 가이드 route·본문 불변. 수익 구조는 안내 문구만(신규 가이드 없음).
   hero: {
     eyebrow: '사업 운영 안내',
     title: 'Business Guide',
     description:
-      'Business Guide는 O4O 기능 사용법을 설명하는 문서가 아니라, 실제 사업을 어떻게 운영하는지를 설명하는 안내서입니다. "누가 운영하는가"(네트워크 운영)부터 콘텐츠 · 이벤트 오퍼 · 운영자 승인 상품 · 판매자 모집 · 유통참여형 펀딩 같은 O4O 핵심 운영 구조까지 안내합니다.',
+      'Business Guide는 O4O 기능 사용법이 아니라 실제 사업을 어떻게 운영하는지를 설명하는 안내서입니다. "무엇을 하는 사업인가"(사업 모델) → "어떻게 운영하는가"(운영 도구) → "무엇으로 수익을 얻는가"(수익 구조) 순서로 안내합니다.',
     primaryAction: { label: '운영 참여 검토 신청 →', to: '/o4o/apply' },
     flowBarTitle: '구성',
-    flowLabels: ['네트워크 운영', '운영 구조'],
+    flowLabels: ['사업 모델', '운영 도구', '수익 구조'],
   },
   index: {
     title: 'Business Guide 한눈에 보기',
     lead: [
       'Business Guide는 O4O 기능 설명이 아니라 실제 사업 운영 방법 안내서입니다.',
-      '"누가 운영하는가"(네트워크 운영)와 "무엇으로 운영하는가"(운영 구조)로 나뉩니다.',
-      '아래 카드를 선택해 각 안내서로 이동하세요.',
+      '사업 모델(무엇을 하는가) · 운영 도구(어떻게 운영하는가) · 수익 구조(무엇으로 버는가) 3단계로 구성됩니다.',
+      '아래 카드를 선택해 각 안내서로 이동하세요. (수익 구조 안내서는 준비 중)',
     ],
     cards: [
-      { title: '약국 네트워크 운영 안내', audience: '네트워크 운영', summary: '여러 약국이 함께 서비스를 운영하는 방법 (매장 기반).', to: '/guide/business/pharmacy-network' },
-      { title: '공급자 네트워크 운영 안내', audience: '네트워크 운영', summary: '공급자가 매장 네트워크를 운영하는 방법 (공급자 기반).', to: '/guide/business/supplier-network' },
-      { title: '콘텐츠 네트워크 운영 안내', audience: '운영 구조', summary: '콘텐츠를 중심으로 공급자 · 운영자 · 매장이 연결되는 구조.', to: '/guide/business/content-network' },
-      { title: '이벤트 오퍼 운영 안내', audience: '운영 구조', summary: '출시된 제품의 특별 공급 조건 — 유통질서.', to: '/guide/business/event-offer' },
-      { title: '운영자 승인 상품 운영 안내', audience: '운영 구조', summary: '새 제품을 운영자가 검토해 참여 매장이 도입.', to: '/guide/business/approved-product' },
-      { title: '판매자 모집 운영 안내', audience: '운영 구조', summary: '세 주체가 함께 판매 네트워크를 형성.', to: '/guide/business/seller-recruitment' },
-      { title: '유통참여형 펀딩 운영 안내', audience: '운영 구조', summary: '출시 전 · 초기 제품의 시장 검증 · 초기 유통망.', to: '/guide/business/market-trial' },
+      { title: '약국 네트워크 운영 안내', audience: '사업 모델', summary: '여러 약국이 함께 서비스를 운영하는 방법 (매장 기반).', to: '/guide/business/pharmacy-network' },
+      { title: '공급자 네트워크 운영 안내', audience: '사업 모델', summary: '공급자가 매장 네트워크를 운영하는 방법 (공급자 기반).', to: '/guide/business/supplier-network' },
+      { title: '콘텐츠 네트워크 운영 안내', audience: '운영 도구', summary: '콘텐츠를 중심으로 공급자 · 운영자 · 매장이 연결되는 운영 방식.', to: '/guide/business/content-network' },
+      { title: '운영자 승인 상품 운영 안내', audience: '운영 도구', summary: '새 제품을 운영자가 검토해 참여 매장이 도입.', to: '/guide/business/approved-product' },
+      { title: '이벤트 오퍼 운영 안내', audience: '운영 도구', summary: '출시된 제품의 특별 공급 조건 — 유통질서.', to: '/guide/business/event-offer' },
+      { title: '판매자 모집 운영 안내', audience: '운영 도구', summary: '세 주체가 함께 판매 네트워크를 형성.', to: '/guide/business/seller-recruitment' },
+      { title: '유통참여형 펀딩 운영 안내', audience: '운영 도구', summary: '공급자 주도 — 출시 전 · 초기 제품의 시장 검증 · 초기 유통망.', to: '/guide/business/market-trial' },
     ],
   },
   sections: [
     {
+      // id 유지(anchor #network 보존) — 라벨만 '사업 모델'로 재분류
       id: 'network',
       step: '01',
-      title: '네트워크 운영',
+      title: '사업 모델 — 무엇을 하는 사업인가',
       description:
-        '누가 O4O 서비스를 운영하는가에 대한 안내입니다. 운영의 주체와 출신(매장 기반 · 공급자 기반)을 다룹니다.',
+        '운영자가 실제로 어떤 사업을 운영할 수 있는지 설명합니다. 운영의 주체와 출신(매장 기반 · 공급자 기반)을 다룹니다. 자체 제품 / 서비스 전용 상품 사업은 별도 안내서로 준비 중입니다.',
       items: [
         { label: '약국 네트워크 운영 안내', detail: '협동조합 · 약국 모임 등 여러 약국이 함께 서비스를 운영하는 방법 (매장 기반 운영자).' },
         { label: '공급자 네트워크 운영 안내', detail: '도매 · 제조 · 수입사가 매장을 지원하는 서비스를 운영하는 방법 (공급자 기반 운영자).' },
       ],
     },
     {
+      // id 유지(anchor #structure 보존) — 라벨만 '운영 도구'로 재분류
       id: 'structure',
       step: '02',
-      title: '운영 구조',
+      title: '운영 도구 — 어떻게 운영하는가',
       description:
-        'O4O의 핵심 운영 수단입니다. 콘텐츠를 중심으로 제품이 매장에 연결되는 다섯 가지 운영 구조를 다룹니다.',
+        '사업 모델을 운영하기 위해 활용하는 기능과 구조입니다. 콘텐츠를 중심으로 제품이 매장에 연결되는 운영 수단을 다룹니다.',
       items: [
-        { label: '콘텐츠 네트워크 운영 안내', detail: '콘텐츠를 중심으로 세 주체가 연결되고, 콘텐츠 운영이 사업 모델이 되는 구조.' },
-        { label: '이벤트 오퍼 운영 안내', detail: '출시된 제품을 특정 참여 매장에 제공하는 특별 공급 조건 — 유통질서.' },
+        { label: '콘텐츠 네트워크 운영 안내', detail: '콘텐츠를 중심으로 세 주체가 연결되는 운영 방식 — 운영 도구의 기반.' },
         { label: '운영자 승인 상품 운영 안내', detail: '새 제품을 운영자가 검토해 참여 매장이 안심하고 도입하는 구조.' },
+        { label: '이벤트 오퍼 운영 안내', detail: '출시된 제품을 특정 참여 매장에 제공하는 특별 공급 조건 — 유통질서.' },
         { label: '판매자 모집 운영 안내', detail: '공급자 · 운영자 · 참여 매장이 함께 판매 네트워크를 형성하는 구조.' },
-        { label: '유통참여형 펀딩 운영 안내', detail: '출시 전 · 초기 제품의 시장 검증과 초기 유통망 형성 — 투자 상품 아님.' },
+        { label: '유통참여형 펀딩 운영 안내', detail: '공급자 주도 — 출시 전 · 초기 제품의 시장 검증과 초기 유통망 형성 (투자 상품 아님).' },
+      ],
+    },
+    {
+      // 신규 — 수익 구조 축. 안내 문구만, 별도 가이드는 준비 중(신규 페이지 없음).
+      id: 'revenue',
+      step: '03',
+      title: '수익 구조 — 무엇으로 수익을 얻는가',
+      description:
+        '운영자가 수익을 만드는 구조를 설명합니다. 위 사업 모델과 운영 도구가 실제 수익으로 이어지는 경로입니다. 상세 안내서는 준비 중입니다.',
+      items: [
+        { label: '자체 제품 / 서비스 전용 상품 판매', detail: '운영자가 기획한 제품의 판매 마진 — 검증된 직접 수익원. (안내서 준비 중)' },
+        { label: '파트너 커미션 · 정산', detail: '판매 네트워크에서 발생하는 거래 커미션과 정산 — 검증된 직접 수익원. (안내서 준비 중)' },
+        { label: '운영 패키지 · 구독 · 광고 · 유료 강좌', detail: '매장 지원 패키지 · 구독 · 광고 · 유료 강좌 등 추가 수익 모델. (준비 중)' },
       ],
     },
   ],
