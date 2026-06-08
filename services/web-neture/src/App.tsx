@@ -504,6 +504,8 @@ const GuideForSellerPage = lazy(() => import('./pages/guide').then(m => ({ defau
 const GuideBusinessPharmacyNetworkPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideBusinessPharmacyNetworkPage })));
 // WO-O4O-NETURE-BUSINESS-GUIDE-SUPPLIER-NETWORK-V1
 const GuideBusinessSupplierNetworkPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideBusinessSupplierNetworkPage })));
+// WO-O4O-NETURE-BUSINESS-GUIDE-OWN-PRODUCT-V1
+const GuideBusinessOwnProductPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideBusinessOwnProductPage })));
 // WO-O4O-NETURE-BUSINESS-GUIDE-CONTENT-NETWORK-V1
 const GuideBusinessContentNetworkPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideBusinessContentNetworkPage })));
 // WO-O4O-NETURE-BUSINESS-GUIDE-EVENT-OFFER-V1
@@ -692,6 +694,8 @@ function App() {
               <Route path="/guide/business/pharmacy-network" element={<GuideBusinessPharmacyNetworkPage />} />
               {/* WO-O4O-NETURE-BUSINESS-GUIDE-SUPPLIER-NETWORK-V1 */}
               <Route path="/guide/business/supplier-network" element={<GuideBusinessSupplierNetworkPage />} />
+              {/* WO-O4O-NETURE-BUSINESS-GUIDE-OWN-PRODUCT-V1 */}
+              <Route path="/guide/business/own-product" element={<GuideBusinessOwnProductPage />} />
               {/* WO-O4O-NETURE-BUSINESS-GUIDE-CONTENT-NETWORK-V1 */}
               <Route path="/guide/business/content-network" element={<GuideBusinessContentNetworkPage />} />
               {/* WO-O4O-NETURE-BUSINESS-GUIDE-EVENT-OFFER-V1 */}

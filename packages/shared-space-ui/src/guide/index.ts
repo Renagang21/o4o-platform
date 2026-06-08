@@ -100,6 +100,8 @@ export {
   netureGuideBusinessPharmacyNetworkProps,
   // WO-O4O-NETURE-BUSINESS-GUIDE-SUPPLIER-NETWORK-V1
   netureGuideBusinessSupplierNetworkProps,
+  // WO-O4O-NETURE-BUSINESS-GUIDE-OWN-PRODUCT-V1
+  netureGuideBusinessOwnProductProps,
   // WO-O4O-NETURE-BUSINESS-GUIDE-CONTENT-NETWORK-V1
   netureGuideBusinessContentNetworkProps,
   // WO-O4O-NETURE-BUSINESS-GUIDE-EVENT-OFFER-V1
