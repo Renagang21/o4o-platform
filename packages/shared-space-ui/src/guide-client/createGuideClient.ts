@@ -34,6 +34,15 @@ export interface GuideClient {
     sectionKey: string,
     content: string,
   ): Promise<void>;
+  /**
+   * 운영자 override 제거 → 코드 기본 콘텐츠로 복귀.
+   * WO-O4O-NETURE-GUIDE-SECTION-BODY-EDITOR-V1
+   */
+  deleteGuideContent(
+    serviceKey: string,
+    pageKey: string,
+    sectionKey: string,
+  ): Promise<void>;
 }
 
 function resolveDefaultBaseUrl(): string {
@@ -90,5 +99,26 @@ export function createGuideClient(options: GuideClientOptions = {}): GuideClient
     clearGuidePageCache(serviceKey, pageKey);
   };
 
-  return { fetchGuidePageContent, clearGuidePageCache, saveGuideContent };
+  const deleteGuideContent: GuideClient['deleteGuideContent'] = async (
+    serviceKey,
+    pageKey,
+    sectionKey,
+  ) => {
+    const token = getAccessToken?.();
+    const qs = `serviceKey=${encodeURIComponent(serviceKey)}&pageKey=${encodeURIComponent(pageKey)}&sectionKey=${encodeURIComponent(sectionKey)}`;
+    const resp = await fetch(`${baseUrl}/contents?${qs}`, {
+      method: 'DELETE',
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error((err as { error?: string })?.error ?? '기본값 복귀에 실패했습니다.');
+    }
+    // 제거 후 캐시 무효화
+    clearGuidePageCache(serviceKey, pageKey);
+  };
+
+  return { fetchGuidePageContent, clearGuidePageCache, saveGuideContent, deleteGuideContent };
 }

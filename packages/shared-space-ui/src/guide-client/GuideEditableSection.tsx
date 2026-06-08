@@ -45,6 +45,10 @@ export function GuideEditableSection({
   const [editorValue, setEditorValue] = useState('');
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [reverting, setReverting] = useState(false);
+
+  // 운영자 override 존재 여부 — 있을 때만 "기본값으로 복귀" 노출
+  const hasOverride = dbContent !== null;
 
   // 페이지 마운트 시 해당 페이지 전체 콘텐츠 1회 fetch
   const fetchedRef = useRef(false);
@@ -80,6 +84,25 @@ export function GuideEditableSection({
       setSaveError(e instanceof Error ? e.message : '저장 오류');
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handleRevert() {
+    if (reverting) return;
+    // override 제거 → 코드 기본 콘텐츠로 복귀
+    if (typeof window !== 'undefined' &&
+        !window.confirm('이 섹션의 수정본을 제거하고 기본 콘텐츠로 되돌릴까요?')) {
+      return;
+    }
+    setReverting(true);
+    setSaveError(null);
+    try {
+      await client.deleteGuideContent(serviceKey, pageKey, sectionKey);
+      setDbContent(null); // null → defaultContent 렌더
+    } catch (e: unknown) {
+      setSaveError(e instanceof Error ? e.message : '기본값 복귀 오류');
+    } finally {
+      setReverting(false);
     }
   }
 
@@ -122,6 +145,37 @@ export function GuideEditableSection({
           >
             ✏ 수정
           </button>
+        )}
+
+        {/* 운영자 기본값 복귀 버튼 — override 가 있을 때만 표시 */}
+        {canEdit && hasOverride && (
+          <button
+            onClick={handleRevert}
+            disabled={reverting}
+            title="수정본을 제거하고 기본 콘텐츠로 복귀"
+            style={{
+              marginTop: 6,
+              marginLeft: 6,
+              display: 'inline-flex',
+              alignItems: 'center',
+              padding: '2px 8px',
+              fontSize: 11,
+              lineHeight: 1,
+              background: '#fff',
+              border: '1px solid #ccc',
+              borderRadius: 3,
+              cursor: reverting ? 'not-allowed' : 'pointer',
+              color: '#888',
+              opacity: reverting ? 0.7 : 1,
+            }}
+          >
+            {reverting ? '복귀 중...' : '↩ 기본값으로 복귀'}
+          </button>
+        )}
+
+        {/* 복귀 단계 오류 — 모달 밖에서 표시 */}
+        {canEdit && !modalOpen && saveError && (
+          <span style={{ marginLeft: 8, color: '#d32f2f', fontSize: 11 }}>{saveError}</span>
         )}
       </div>
 

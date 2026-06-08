@@ -9,6 +9,10 @@
  * POST /api/v1/guide/contents
  *   → section 내용 저장/갱신 (operator 이상 권한 필요)
  *
+ * DELETE /api/v1/guide/contents?serviceKey=...&pageKey=...&sectionKey=...
+ *   → section 오버라이드 제거 → 코드 기본 콘텐츠로 복귀 (operator 이상 권한 필요)
+ *   (WO-O4O-NETURE-GUIDE-SECTION-BODY-EDITOR-V1)
+ *
  * 권한: requireAuth + 최소 1개의 *:operator 또는 *:admin 역할
  */
 
@@ -106,6 +110,50 @@ export function createGuideContentsRouter(dataSource: DataSource): Router {
       });
       const saved = await repo().save(created);
       return res.status(201).json({ success: true, data: { id: saved.id, updated: false } });
+    })
+  );
+
+  // DELETE /contents?serviceKey=xxx&pageKey=yyy&sectionKey=zzz — remove one override
+  // Requires: authenticated + operator/admin role
+  // override 제거 → 코드 기본 콘텐츠로 복귀 (실제 row 삭제, 기본값은 코드에 존재)
+  router.delete(
+    '/contents',
+    requireAuth as any,
+    asyncHandler(async (req: Request, res: Response) => {
+      const user = (req as any).user;
+      const roles: string[] = user?.roles ?? [];
+
+      if (!isOperatorOrAbove(roles)) {
+        return res.status(403).json({
+          success: false,
+          error: '운영자 이상 권한이 필요합니다.',
+          code: 'FORBIDDEN',
+        });
+      }
+
+      const serviceKey = String(req.query.serviceKey ?? '').trim();
+      const pageKey = String(req.query.pageKey ?? '').trim();
+      const sectionKey = String(req.query.sectionKey ?? '').trim();
+
+      if (!serviceKey || !pageKey || !sectionKey) {
+        return res.status(400).json({
+          success: false,
+          error: 'serviceKey, pageKey, sectionKey 는 필수입니다.',
+          code: 'BAD_REQUEST',
+        });
+      }
+
+      const existing = await repo().findOne({
+        where: { serviceKey, pageKey, sectionKey },
+      });
+
+      // 이미 없으면(=기본값 상태) idempotent 성공 처리
+      if (!existing) {
+        return res.json({ success: true, data: { removed: false } });
+      }
+
+      await repo().delete(existing.id);
+      return res.json({ success: true, data: { removed: true } });
     })
   );
 
