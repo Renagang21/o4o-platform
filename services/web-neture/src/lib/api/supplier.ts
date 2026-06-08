@@ -389,6 +389,36 @@ export interface ProfileCompleteness {
   missing: string[];
 }
 
+// WO-O4O-NETURE-SUPPLIER-ORDER-UNIFIED-VIEW-V1 (read-only 통합 주문 조회)
+export interface UnifiedSupplierOrder {
+  id: string;
+  source: 'neture_order' | 'checkout_order';
+  orderNumber: string | null;
+  serviceKey: string | null;
+  orderType: 'neture' | 'event_offer' | 'service_checkout';
+  status: string | null;
+  paymentStatus: string | null;
+  fulfillmentStatus: string | null;
+  supplierId: string;
+  buyerName: string | null;
+  buyerOrganizationName: string | null;
+  subtotal: number;
+  shippingFee: number;
+  totalAmount: number;
+  itemCount: number;
+  itemsPreview: Array<{ name: string; quantity: number; unitPrice?: number | null; lineTotal?: number | null }>;
+  createdAt: string;
+  updatedAt: string | null;
+  canFulfill: boolean;
+  fulfillmentUrl: string | null;
+  readOnlyReason: string | null;
+}
+
+export interface UnifiedOrdersResponse {
+  data: UnifiedSupplierOrder[];
+  meta: { page: number; limit: number; total: number; totalPages: number };
+}
+
 // ==================== Supplier API ====================
 
 export const supplierApi = {
@@ -690,6 +720,23 @@ export const supplierApi = {
       return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
     } catch (error) {
       console.warn('[Supplier API] Failed to fetch orders:', error);
+      return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
+    }
+  },
+
+  // WO-O4O-NETURE-SUPPLIER-ORDER-UNIFIED-VIEW-V1: neture_orders + checkout_orders 통합 조회(읽기)
+  async getUnifiedOrders(params?: { page?: number; limit?: number; source?: 'neture' | 'checkout' | 'all' }): Promise<UnifiedOrdersResponse> {
+    try {
+      const searchParams = new URLSearchParams();
+      if (params?.page) searchParams.set('page', String(params.page));
+      if (params?.limit) searchParams.set('limit', String(params.limit));
+      if (params?.source) searchParams.set('source', params.source);
+      const qs = searchParams.toString();
+      const response = await api.get(`/neture/supplier/orders/unified${qs ? `?${qs}` : ''}`);
+      const result = response.data;
+      return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
+    } catch (error) {
+      console.warn('[Supplier API] Failed to fetch unified orders:', error);
       return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
     }
   },

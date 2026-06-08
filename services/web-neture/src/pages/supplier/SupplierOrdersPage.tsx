@@ -11,8 +11,25 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingBag, ExternalLink, Info, Users, Clock, Mail, ChevronDown, ChevronUp, Compass, Truck, ArrowRight } from 'lucide-react';
+import { ShoppingBag, ExternalLink, Info, Users, Clock, Mail, ChevronDown, ChevronUp, Compass, Truck, ArrowRight, Lock } from 'lucide-react';
 import { supplierApi, type OrderSummaryResponse, type ServiceSummary } from '../../lib/api';
+import type { UnifiedSupplierOrder } from '../../lib/api/supplier';
+
+const formatKRW = (v: number | null | undefined): string =>
+  `₩${Number(v ?? 0).toLocaleString('ko-KR')}`;
+
+// 주문 출처/유형 배지 라벨·색상
+const SOURCE_BADGE: Record<string, { label: string; bg: string; color: string }> = {
+  neture: { label: 'Neture 주문', bg: '#dbeafe', color: '#1d4ed8' },
+  event_offer: { label: '이벤트 오퍼 주문', bg: '#ede9fe', color: '#6d28d9' },
+  service_checkout: { label: '서비스 주문', bg: '#f1f5f9', color: '#475569' },
+};
+
+const ORDER_STATUS_LABEL: Record<string, string> = {
+  created: '주문접수', pending_payment: '결제대기', paid: '결제완료',
+  preparing: '준비중', shipped: '배송중', delivered: '배송완료',
+  cancelled: '취소', refunded: '환불',
+};
 
 // WO-O4O-SHARED-PACKAGES-GLUCOSEVIEW-RESIDUE-CLEANUP-V1: glucoseview icon 제거
 const SERVICE_ICONS: Record<string, string> = {
@@ -56,6 +73,12 @@ export default function SupplierOrdersPage() {
   const [loading, setLoading] = useState(true);
   const [expandedService, setExpandedService] = useState<string | null>(null);
 
+  // WO-O4O-NETURE-SUPPLIER-ORDER-UNIFIED-VIEW-V1: 통합 주문(읽기) 상태
+  const [unifiedOrders, setUnifiedOrders] = useState<UnifiedSupplierOrder[]>([]);
+  const [unifiedLoading, setUnifiedLoading] = useState(true);
+  const [unifiedTotal, setUnifiedTotal] = useState(0);
+  const [sourceFilter, setSourceFilter] = useState<'all' | 'neture' | 'checkout'>('all');
+
   useEffect(() => {
     const fetchSummary = async () => {
       setLoading(true);
@@ -65,6 +88,17 @@ export default function SupplierOrdersPage() {
     };
     fetchSummary();
   }, []);
+
+  useEffect(() => {
+    const fetchUnified = async () => {
+      setUnifiedLoading(true);
+      const result = await supplierApi.getUnifiedOrders({ page: 1, limit: 20, source: sourceFilter });
+      setUnifiedOrders(result.data);
+      setUnifiedTotal(result.meta.total);
+      setUnifiedLoading(false);
+    };
+    fetchUnified();
+  }, [sourceFilter]);
 
   const toggleExpand = (serviceId: string) => {
     setExpandedService(expandedService === serviceId ? null : serviceId);
@@ -133,12 +167,21 @@ export default function SupplierOrdersPage() {
             Neture 주문의 주문 확인 · 배송 준비 · 송장 등록 · 배송 완료를 처리합니다.
             <br />
             <span style={styles.fulfillNote}>
-              이벤트 오퍼 주문은 별도 결제 원장(checkout_orders) 기반으로 관리되어, 통합 표시는 주문 테이블 경계 정리 이후 반영됩니다.
+              이벤트 오퍼 주문은 아래 "통합 주문 보기"에서 함께 확인할 수 있으며(읽기 전용), 배송 처리 통합은 후속 작업에서 다룹니다.
             </span>
           </p>
         </div>
         <ArrowRight size={20} style={{ color: '#2563eb', flexShrink: 0 }} />
       </Link>
+
+      {/* 통합 주문 보기 (읽기) — WO-O4O-NETURE-SUPPLIER-ORDER-UNIFIED-VIEW-V1 */}
+      <UnifiedOrdersSection
+        orders={unifiedOrders}
+        loading={unifiedLoading}
+        total={unifiedTotal}
+        sourceFilter={sourceFilter}
+        onChangeFilter={setSourceFilter}
+      />
 
       {/* Service List */}
       {loading ? (
@@ -308,6 +351,109 @@ function ServiceCard({
   );
 }
 
+// 통합 주문 보기 섹션 (읽기) — neture_orders + checkout_orders
+function UnifiedOrdersSection({
+  orders,
+  loading,
+  total,
+  sourceFilter,
+  onChangeFilter,
+}: {
+  orders: UnifiedSupplierOrder[];
+  loading: boolean;
+  total: number;
+  sourceFilter: 'all' | 'neture' | 'checkout';
+  onChangeFilter: (f: 'all' | 'neture' | 'checkout') => void;
+}) {
+  const FILTERS: Array<{ key: 'all' | 'neture' | 'checkout'; label: string }> = [
+    { key: 'all', label: '전체' },
+    { key: 'neture', label: 'Neture 주문' },
+    { key: 'checkout', label: '이벤트/서비스 주문' },
+  ];
+
+  return (
+    <div style={styles.unifiedCard}>
+      <div style={styles.unifiedHeader}>
+        <div>
+          <h2 style={styles.unifiedTitle}>통합 주문 보기</h2>
+          <p style={styles.unifiedSubtitle}>
+            Neture 주문과 이벤트 오퍼·서비스 주문을 한 곳에서 확인합니다. (읽기 전용 · 총 {total}건)
+          </p>
+        </div>
+        <div style={styles.filterRow}>
+          {FILTERS.map((f) => (
+            <button
+              key={f.key}
+              onClick={() => onChangeFilter(f.key)}
+              style={{
+                ...styles.filterBtn,
+                ...(sourceFilter === f.key ? styles.filterBtnActive : {}),
+              }}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {loading ? (
+        <div style={styles.unifiedLoading}>주문을 불러오는 중...</div>
+      ) : orders.length === 0 ? (
+        <div style={styles.unifiedEmpty}>표시할 주문이 없습니다.</div>
+      ) : (
+        <div style={styles.unifiedList}>
+          {orders.map((o) => {
+            const badge = SOURCE_BADGE[o.orderType] || SOURCE_BADGE.service_checkout;
+            const firstItem = o.itemsPreview[0]?.name;
+            const itemLabel = firstItem
+              ? o.itemCount > 1 ? `${firstItem} 외 ${o.itemCount - 1}건` : firstItem
+              : `${o.itemCount}개 상품`;
+            return (
+              <div key={`${o.source}-${o.id}`} style={styles.orderRow}>
+                <div style={styles.orderMain}>
+                  <div style={styles.orderTopLine}>
+                    <span style={{ ...styles.sourceBadge, backgroundColor: badge.bg, color: badge.color }}>
+                      {badge.label}
+                    </span>
+                    <span style={styles.orderNumber}>{o.orderNumber || o.id.slice(0, 8)}</span>
+                    {o.status && (
+                      <span style={styles.orderStatus}>{ORDER_STATUS_LABEL[o.status] || o.status}</span>
+                    )}
+                  </div>
+                  <p style={styles.orderItems}>{itemLabel}</p>
+                  <p style={styles.orderMeta}>
+                    {o.buyerOrganizationName || o.buyerName || '구매자 정보 없음'}
+                    {' · '}
+                    {formatDate(o.createdAt)}
+                  </p>
+                </div>
+                <div style={styles.orderRight}>
+                  <p style={styles.orderTotal}>{formatKRW(o.totalAmount)}</p>
+                  <p style={styles.orderShipping}>배송비 {formatKRW(o.shippingFee)}</p>
+                  {o.canFulfill && o.fulfillmentUrl ? (
+                    <Link to={o.fulfillmentUrl} style={styles.orderActionBtn}>
+                      주문 처리 <ArrowRight size={13} />
+                    </Link>
+                  ) : (
+                    <span style={styles.orderReadonly} title={o.readOnlyReason || '읽기 전용'}>
+                      <Lock size={12} /> 읽기 전용
+                    </span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      <p style={styles.unifiedFootnote}>
+        이벤트 오퍼·서비스 주문은 checkout_orders 기반으로, 현재 화면에서는 확인만 가능합니다.
+        배송 처리·송장·정산 통합은 후속 작업에서 다룹니다.
+      </p>
+    </div>
+  );
+}
+
 const styles: Record<string, React.CSSProperties> = {
   header: {
     display: 'flex',
@@ -395,6 +541,165 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 600,
     color: '#475569',
     margin: '0 0 16px 0',
+  },
+  // WO-O4O-NETURE-SUPPLIER-ORDER-UNIFIED-VIEW-V1
+  unifiedCard: {
+    backgroundColor: '#fff',
+    border: '1px solid #e2e8f0',
+    borderRadius: '12px',
+    padding: '20px 22px',
+    marginBottom: '24px',
+  },
+  unifiedHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    gap: '16px',
+    flexWrap: 'wrap',
+    marginBottom: '16px',
+  },
+  unifiedTitle: {
+    fontSize: '16px',
+    fontWeight: 600,
+    color: '#1e293b',
+    margin: '0 0 4px 0',
+  },
+  unifiedSubtitle: {
+    fontSize: '13px',
+    color: '#64748b',
+    margin: 0,
+  },
+  filterRow: {
+    display: 'flex',
+    gap: '6px',
+  },
+  filterBtn: {
+    fontSize: '12px',
+    fontWeight: 500,
+    color: '#64748b',
+    backgroundColor: '#f1f5f9',
+    border: '1px solid #e2e8f0',
+    borderRadius: '6px',
+    padding: '6px 12px',
+    cursor: 'pointer',
+  },
+  filterBtnActive: {
+    color: '#fff',
+    backgroundColor: '#3b82f6',
+    borderColor: '#3b82f6',
+  },
+  unifiedLoading: {
+    textAlign: 'center',
+    padding: '32px',
+    color: '#64748b',
+    fontSize: '14px',
+  },
+  unifiedEmpty: {
+    textAlign: 'center',
+    padding: '32px',
+    color: '#94a3b8',
+    fontSize: '14px',
+  },
+  unifiedList: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px',
+  },
+  orderRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: '16px',
+    border: '1px solid #e2e8f0',
+    borderRadius: '10px',
+    padding: '14px 16px',
+  },
+  orderMain: {
+    flex: 1,
+    minWidth: 0,
+  },
+  orderTopLine: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    flexWrap: 'wrap',
+    marginBottom: '6px',
+  },
+  sourceBadge: {
+    fontSize: '11px',
+    fontWeight: 600,
+    padding: '2px 8px',
+    borderRadius: '4px',
+  },
+  orderNumber: {
+    fontSize: '13px',
+    fontWeight: 600,
+    color: '#1e293b',
+  },
+  orderStatus: {
+    fontSize: '12px',
+    color: '#64748b',
+    backgroundColor: '#f1f5f9',
+    padding: '2px 8px',
+    borderRadius: '4px',
+  },
+  orderItems: {
+    fontSize: '13px',
+    color: '#475569',
+    margin: '0 0 4px 0',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  },
+  orderMeta: {
+    fontSize: '12px',
+    color: '#94a3b8',
+    margin: 0,
+  },
+  orderRight: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-end',
+    gap: '4px',
+    flexShrink: 0,
+  },
+  orderTotal: {
+    fontSize: '15px',
+    fontWeight: 700,
+    color: '#1e293b',
+    margin: 0,
+  },
+  orderShipping: {
+    fontSize: '12px',
+    color: '#94a3b8',
+    margin: 0,
+  },
+  orderActionBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
+    fontSize: '12px',
+    fontWeight: 500,
+    color: '#fff',
+    backgroundColor: '#3b82f6',
+    padding: '6px 12px',
+    borderRadius: '6px',
+    textDecoration: 'none',
+    marginTop: '4px',
+  },
+  orderReadonly: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
+    fontSize: '12px',
+    color: '#94a3b8',
+    marginTop: '4px',
+  },
+  unifiedFootnote: {
+    fontSize: '12px',
+    color: '#94a3b8',
+    margin: '16px 0 0 0',
+    lineHeight: 1.6,
   },
   statsRow: {
     display: 'grid',

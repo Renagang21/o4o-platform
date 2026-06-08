@@ -11,6 +11,7 @@ import { requireAuth } from '../../../middleware/auth.middleware.js';
 import { createRequireActiveSupplier, createRequireLinkedSupplier } from '../middleware/neture-identity.middleware.js';
 import type { SupplierRequest, AuthenticatedRequest } from '../middleware/neture-identity.middleware.js';
 import { SupplierOrderService } from '../services/supplier-order.service.js';
+import { SupplierUnifiedOrderService } from '../services/supplier-unified-order.service.js';
 import { NetureOrderStatus } from '../../../routes/neture/entities/neture-order.entity.js';
 import { NetureService as LegacyNetureService } from '../../../routes/neture/services/neture.service.js';
 import logger from '../../../utils/logger.js';
@@ -20,6 +21,7 @@ const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12
 export function createSupplierOrderController(dataSource: DataSource): Router {
   const router = Router();
   const service = new SupplierOrderService(dataSource);
+  const unifiedOrderService = new SupplierUnifiedOrderService(dataSource);
   const legacyNetureService = new LegacyNetureService(dataSource);
   const requireActiveSupplier = createRequireActiveSupplier(dataSource);
   const requireLinkedSupplier = createRequireLinkedSupplier(dataSource);
@@ -67,6 +69,23 @@ export function createSupplierOrderController(dataSource: DataSource): Router {
     } catch (error) {
       logger.error('[Neture API] Error fetching supplier orders:', error);
       res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch supplier orders' });
+    }
+  });
+
+  // GET /supplier/orders/unified — WO-O4O-NETURE-SUPPLIER-ORDER-UNIFIED-VIEW-V1 (read-only)
+  // 반드시 /orders/:id 보다 먼저 등록 (그렇지 않으면 'unified'가 :id로 매칭됨)
+  router.get('/orders/unified', requireAuth, requireLinkedSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const supplierId = (req as SupplierRequest).supplierId;
+      const page = Math.max(1, Number(req.query.page) || 1);
+      const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 20));
+      const rawSource = String(req.query.source || 'all');
+      const source = (['neture', 'checkout', 'all'].includes(rawSource) ? rawSource : 'all') as 'neture' | 'checkout' | 'all';
+      const result = await unifiedOrderService.listUnifiedOrders(supplierId, { page, limit, source });
+      res.json({ success: true, ...result });
+    } catch (error) {
+      logger.error('[Neture API] Error fetching unified supplier orders:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch unified orders' });
     }
   });
 
