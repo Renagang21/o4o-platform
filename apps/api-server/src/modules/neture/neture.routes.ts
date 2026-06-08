@@ -90,9 +90,10 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
   /**
    * GET /api/v1/neture/operator/all-offers
    * WO-NETURE-OPERATOR-ALL-OFFERS-VIEW-FOUNDATION-V1
-   * 전체 등록 상품 조회 — operator sub-router 가드에 잡히지 않도록 먼저 등록
+   * 전체 등록 상품 조회 — operator sub-router 보다 먼저 등록(중복 마운트 회피)하되,
+   * operator scope guard 는 명시적으로 적용한다 (WO-O4O-NETURE-ALL-OFFERS-SCOPE-GUARD-FIX-V1).
    */
-  router.get('/operator/all-offers', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/operator/all-offers', requireAuth, requireNetureScope('neture:operator') as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user?.id;
       if (!userId) {
@@ -120,8 +121,9 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
   /**
    * PATCH /api/v1/neture/operator/all-offers/batch-active
    * 운영자 일괄 활성/비활성 토글
+   * WO-O4O-NETURE-ALL-OFFERS-SCOPE-GUARD-FIX-V1: operator scope guard 명시 적용.
    */
-  router.patch('/operator/all-offers/batch-active', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  router.patch('/operator/all-offers/batch-active', requireAuth, requireNetureScope('neture:operator') as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user?.id;
       if (!userId) {
