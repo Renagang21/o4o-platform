@@ -21,6 +21,10 @@ import {
 } from '../entities/checkout/CheckoutPayment.entity.js';
 import { OrderLog, OrderAction } from '../entities/checkout/OrderLog.entity.js';
 import logger from '../utils/logger.js';
+import {
+  calculateSupplierShippingFee,
+  type SupplierShippingPolicy,
+} from './shipping/supplier-shipping.js';
 
 /**
  * 주문 아이템
@@ -45,6 +49,12 @@ export interface CreateOrderDto {
   items: OrderItem[];
   shippingAddress?: ShippingAddress;
   metadata?: Record<string, any>;
+  /**
+   * 공급자 배송 정책 (WO-O4O-NETURE-SUPPLIER-SHIPPING-CALCULATION-V2).
+   * 전달되면 supplierId 기준 배송비를 계산한다. 미전달 시 0원(fallback) — 기존 동작 유지.
+   * checkout(core)은 neture 엔티티를 import 하지 않으므로 호출자가 정책을 주입한다.
+   */
+  shippingPolicy?: SupplierShippingPolicy | null;
 }
 
 /**
@@ -118,7 +128,10 @@ class CheckoutService {
     await this.ensureInitialized();
 
     const subtotal = dto.items.reduce((sum, item) => sum + item.subtotal, 0);
-    const shippingFee = 0;
+    // WO-O4O-NETURE-SUPPLIER-SHIPPING-CALCULATION-V2:
+    // supplierId 기준 배송 정책을 호출자가 dto.shippingPolicy 로 주입하면 계산한다.
+    // 미전달 시 fallback(0원) — 정책 없는 기존 checkout 흐름은 동작 불변.
+    const shippingFee = calculateSupplierShippingFee(subtotal, dto.shippingPolicy).shippingFee;
     const discount = 0;
     const totalAmount = subtotal + shippingFee - discount;
 

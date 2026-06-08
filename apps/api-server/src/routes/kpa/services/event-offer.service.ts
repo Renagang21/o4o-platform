@@ -576,7 +576,8 @@ export class EventOfferService {
     // ── Step 2: Supplier product 검증 ────────────────────────────────────
     const productRows = await this.dataSource.query(
       `SELECT spo.id AS spo_id, spo.supplier_id, spo.price_general, spo.is_active,
-              spo.approval_status, s.status AS supplier_status, pm.name
+              spo.approval_status, s.status AS supplier_status, pm.name,
+              s.base_shipping_fee, s.free_shipping_threshold
        FROM supplier_product_offers spo
        JOIN neture_suppliers s  ON s.id  = spo.supplier_id
        JOIN product_masters pm  ON pm.id = spo.master_id
@@ -709,6 +710,13 @@ export class EventOfferService {
           unitPrice,
           subtotal: quantity * unitPrice,
         }],
+        // WO-O4O-NETURE-SUPPLIER-SHIPPING-CALCULATION-V2:
+        // 공급자 배송 정책 주입 → checkout 이 supplierId 기준 배송비 계산.
+        // 정책 미설정(null) 이면 checkout fallback(0원).
+        shippingPolicy: {
+          baseShippingFee: product.base_shipping_fee != null ? Number(product.base_shipping_fee) : null,
+          freeShippingThreshold: product.free_shipping_threshold != null ? Number(product.free_shipping_threshold) : null,
+        },
         metadata: {
           serviceKey: preListing.service_key,
           productListingId: preListing.id,

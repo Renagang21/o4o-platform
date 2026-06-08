@@ -27,6 +27,7 @@ import {
   NeturePaymentMethod,
 } from '../entities/neture-order.entity.js';
 import { NetureOrderItem } from '../entities/neture-order-item.entity.js';
+import { calculateSupplierShippingFee } from '../../../services/shipping/supplier-shipping.js';
 import {
   ProductDto,
   PartnerDto,
@@ -541,6 +542,12 @@ export class NetureService {
     // 2. 검증 게이트 + 서버 가격 계산
     let totalAmount = 0;
     const orderItems: Partial<NetureOrderItem>[] = [];
+    // WO-O4O-NETURE-SUPPLIER-SHIPPING-CALCULATION-V2:
+    // 공급자별 subtotal 집계 → 공급자 정책 기준 배송비 계산(혼합 공급자 주문 지원).
+    const supplierSubtotals = new Map<
+      string,
+      { subtotal: number; baseShippingFee: number | null; freeShippingThreshold: number | null }
+    >();
 
     for (const item of data.items) {
       const offer = productMap.get(item.product_id);
@@ -603,6 +610,19 @@ export class NetureService {
       const itemTotal = unitPrice * item.quantity;
       totalAmount += itemTotal;
 
+      // 공급자별 subtotal/정책 집계 (Gate 3 에서 offer.supplier 존재 보장)
+      const sid = offer.supplierId;
+      const acc = supplierSubtotals.get(sid);
+      if (acc) {
+        acc.subtotal += itemTotal;
+      } else {
+        supplierSubtotals.set(sid, {
+          subtotal: itemTotal,
+          baseShippingFee: offer.supplier?.baseShippingFee ?? null,
+          freeShippingThreshold: offer.supplier?.freeShippingThreshold ?? null,
+        });
+      }
+
       orderItems.push({
         productId: offer.id,
         productName,
@@ -614,8 +634,16 @@ export class NetureService {
       });
     }
 
-    // 3. 배송비 계산 (5만원 이상 무료배송)
-    const shippingFee = totalAmount >= 50000 ? 0 : 3000;
+    // 3. 배송비 계산 (WO-O4O-NETURE-SUPPLIER-SHIPPING-CALCULATION-V2)
+    // 공급자별 subtotal 에 각 공급자 정책(base/free threshold)을 적용해 합산.
+    // 정책 미설정 공급자는 fallback(0원) — 기존 5만/3000 고정식은 제거됨.
+    let shippingFee = 0;
+    for (const grp of supplierSubtotals.values()) {
+      shippingFee += calculateSupplierShippingFee(grp.subtotal, {
+        baseShippingFee: grp.baseShippingFee,
+        freeShippingThreshold: grp.freeShippingThreshold,
+      }).shippingFee;
+    }
     const finalAmount = totalAmount + shippingFee;
 
     // 4. 주문 생성 (단일 트랜잭션: order + items + 재고 예약 원자성 보장)
