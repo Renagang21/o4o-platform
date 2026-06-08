@@ -6,7 +6,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { FileCheck, Trash2 } from 'lucide-react';
-import { RowActionMenu, ActionBar, BaseDetailDrawer } from '@o4o/ui';
+import { RowActionMenu, ActionBar, BaseDetailDrawer, BulkResultModal } from '@o4o/ui';
 import { DataTable, defineActionPolicy, buildRowActions, useBatchAction } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import {
@@ -341,6 +341,14 @@ export default function QualificationRequestsPage() {
             visible: selectedIds.size > 0,
           },
         ]}
+      />
+
+      {/* WO-O4O-OPERATOR-QUALIFICATION-BULK-RESULT-MODAL-V1: bulk 결과 표준 표시 */}
+      <BulkResultModal
+        open={batch.showResult}
+        onClose={() => { batch.clearResult(); load(); }}
+        result={batch.result}
+        onRetry={() => { batch.retryFailed(); }}
       />
 
       <DataTable<QualificationRequest>
