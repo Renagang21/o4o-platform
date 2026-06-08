@@ -13,6 +13,7 @@ import { eventOfferApi } from '../../api';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 import type { EventOfferItem } from '../../types';
+import { calcFreeShippingProgress, formatWon } from '../../utils/freeShipping';
 
 export function EventOfferDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -129,6 +130,12 @@ export function EventOfferDetailPage() {
               <span style={styles.price}>{formatPrice(product.unitPrice)}</span>
             </div>
 
+            {/* 무료배송 안내 — WO-O4O-NETURE-SUPPLIER-FREE-SHIPPING-PROGRESS-UI-V1 */}
+            <FreeShippingNotice
+              unitPrice={product.unitPrice}
+              policy={product.shippingPolicy}
+            />
+
             <div style={styles.actionSection}>
               {hasStore ? (
                 <button
@@ -169,6 +176,46 @@ export function EventOfferDetailPage() {
           </Card>
         </div>
       </div>
+    </div>
+  );
+}
+
+// 무료배송 안내 (읽기 전용 표시) — WO-O4O-NETURE-SUPPLIER-FREE-SHIPPING-PROGRESS-UI-V1
+function FreeShippingNotice({
+  unitPrice,
+  policy,
+}: {
+  unitPrice: number | null;
+  policy?: { baseShippingFee: number | null; freeShippingThreshold: number | null } | null;
+}) {
+  // 이 화면은 수량 1로 참여하므로 주문금액 = 단가.
+  const subtotal = Number(unitPrice ?? 0);
+  const progress = calcFreeShippingProgress({
+    subtotal,
+    baseShippingFee: policy?.baseShippingFee ?? null,
+    freeShippingThreshold: policy?.freeShippingThreshold ?? null,
+  });
+
+  const accent = progress.freeShippingApplied ? '#15803d' : '#7C3AED';
+
+  return (
+    <div style={styles.shipBox}>
+      {progress.hasThreshold && (
+        <>
+          <div style={styles.shipRow}>
+            <span style={styles.shipLabel}>무료배송 기준</span>
+            <span style={styles.shipValue}>{formatWon(policy?.freeShippingThreshold)}</span>
+          </div>
+          <div style={styles.shipRow}>
+            <span style={styles.shipLabel}>현재 주문금액</span>
+            <span style={styles.shipValue}>{formatWon(subtotal)}</span>
+          </div>
+        </>
+      )}
+      <p style={{ ...styles.shipMessage, color: accent }}>{progress.message}</p>
+      <p style={styles.shipNote}>
+        이벤트 오퍼 상품도 같은 공급자의 주문금액에 포함됩니다. 다른 공급자의 상품 금액은 이 공급자의 무료배송 기준에 포함되지 않습니다.
+      </p>
     </div>
   );
 }
@@ -267,6 +314,40 @@ const styles: Record<string, React.CSSProperties> = {
     color: colors.neutral900,
   },
   actionSection: {},
+  // WO-O4O-NETURE-SUPPLIER-FREE-SHIPPING-PROGRESS-UI-V1
+  shipBox: {
+    backgroundColor: colors.neutral50,
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: '8px',
+    padding: '14px 16px',
+    marginBottom: '20px',
+  },
+  shipRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '6px',
+  },
+  shipLabel: {
+    fontSize: '13px',
+    color: colors.neutral500,
+  },
+  shipValue: {
+    fontSize: '13px',
+    fontWeight: 600,
+    color: colors.neutral800,
+  },
+  shipMessage: {
+    fontSize: '14px',
+    fontWeight: 600,
+    margin: '8px 0 0 0',
+  },
+  shipNote: {
+    fontSize: '12px',
+    color: colors.neutral500,
+    margin: '8px 0 0 0',
+    lineHeight: 1.5,
+  },
   orderButton: {
     width: '100%',
     padding: '16px',

@@ -357,6 +357,14 @@ export interface EventOfferItem {
   perStoreLimit: number | null;
   /** OPL.source_type — Store Listing 진입 경로 식별자 (예: 'event-offer', null=레거시) */
   sourceType: string | null;
+  /**
+   * 공급자 배송 정책 (WO-O4O-NETURE-SUPPLIER-FREE-SHIPPING-PROGRESS-UI-V1).
+   * 무료배송 기준/남은 금액 안내 표시용. null 필드 = 정책 미설정.
+   */
+  shippingPolicy?: {
+    baseShippingFee: number | null;
+    freeShippingThreshold: number | null;
+  } | null;
 }
 
 // WO-O4O-GROUPBUY-LISTING-VIEWMODEL-PHASE1-V1: Generic Store Listing alias

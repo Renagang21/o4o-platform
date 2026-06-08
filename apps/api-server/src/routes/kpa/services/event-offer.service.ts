@@ -489,6 +489,8 @@ export class EventOfferService {
          COALESCE(opl.event_price, spo.price_general, opl.price)::numeric AS "unitPrice",
          COALESCE(pm.name, '(상품명 없음)')  AS "productName",
          COALESCE(org.name, '(공급사 없음)') AS "supplierName",
+         ns.base_shipping_fee        AS "baseShippingFee",
+         ns.free_shipping_threshold  AS "freeShippingThreshold",
          opl.source_type AS "sourceType"
        FROM organization_product_listings opl
        LEFT JOIN supplier_product_offers spo ON spo.id = opl.offer_id
@@ -529,6 +531,12 @@ export class EventOfferService {
       perStoreLimit: r.perStoreLimit !== null ? Number(r.perStoreLimit) : null,
       // WO-O4O-GROUPBUY-LISTING-VIEWMODEL-PHASE1-V1
       sourceType: r.sourceType ?? null,
+      // WO-O4O-NETURE-SUPPLIER-FREE-SHIPPING-PROGRESS-UI-V1 (additive, read-only)
+      // 공급자 배송 정책 — 무료배송 안내 표시용. 계산 로직 변경 없음.
+      shippingPolicy: {
+        baseShippingFee: r.baseShippingFee != null ? Number(r.baseShippingFee) : null,
+        freeShippingThreshold: r.freeShippingThreshold != null ? Number(r.freeShippingThreshold) : null,
+      },
     };
   }
 
