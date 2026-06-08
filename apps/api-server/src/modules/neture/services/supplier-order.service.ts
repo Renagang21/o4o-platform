@@ -35,7 +35,7 @@ export class SupplierOrderService {
          COUNT(DISTINCT o.id) FILTER (WHERE o.status = 'preparing')::int AS pending_shipping,
          COUNT(DISTINCT o.id)::int AS total_orders
        FROM neture_orders o
-       JOIN neture_order_items oi ON oi.order_id = o.id
+       JOIN neture.neture_order_items oi ON oi.order_id = o.id
        JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
        WHERE spo.supplier_id = $1`,
       [supplierId],
@@ -65,11 +65,11 @@ export class SupplierOrderService {
                 o.id, o.order_number, o.status, o.total_amount, o.shipping_fee,
                 o.final_amount, o.orderer_name, o.orderer_phone, o.orderer_email,
                 o.shipping, o.note, o.created_at, o.updated_at,
-                (SELECT COUNT(*)::int FROM neture_order_items oi2
+                (SELECT COUNT(*)::int FROM neture.neture_order_items oi2
                  JOIN supplier_product_offers spo2 ON spo2.id = oi2.product_id::uuid
                  WHERE oi2.order_id = o.id AND spo2.supplier_id = $1) AS item_count
          FROM neture_orders o
-         JOIN neture_order_items oi ON oi.order_id = o.id
+         JOIN neture.neture_order_items oi ON oi.order_id = o.id
          JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
          WHERE spo.supplier_id = $1 ${statusClause}
          ORDER BY o.created_at DESC, o.id
@@ -79,7 +79,7 @@ export class SupplierOrderService {
       this.dataSource.query(
         `SELECT COUNT(DISTINCT o.id)::int AS total
          FROM neture_orders o
-         JOIN neture_order_items oi ON oi.order_id = o.id
+         JOIN neture.neture_order_items oi ON oi.order_id = o.id
          JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
          WHERE spo.supplier_id = $1 ${statusClause}`,
         baseParams,
@@ -103,7 +103,7 @@ export class SupplierOrderService {
 
   async validateOwnership(orderId: string, supplierId: string): Promise<boolean> {
     const ownerCheck = await this.dataSource.query(
-      `SELECT COUNT(*)::int AS cnt FROM neture_order_items oi
+      `SELECT COUNT(*)::int AS cnt FROM neture.neture_order_items oi
        JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
        WHERE oi.order_id = $1 AND spo.supplier_id = $2`,
       [orderId, supplierId],
