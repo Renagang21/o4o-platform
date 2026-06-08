@@ -112,6 +112,8 @@ export {
   netureGuideBusinessSellerRecruitmentProps,
   // WO-O4O-NETURE-BUSINESS-GUIDE-MARKET-TRIAL-V1
   netureGuideBusinessMarketTrialProps,
+  // WO-O4O-NETURE-BUSINESS-GUIDE-OPERATOR-REVENUE-V1
+  netureGuideBusinessOperatorRevenueProps,
   // WO-O4O-NETURE-BUSINESS-GUIDE-HUB-V1
   netureGuideBusinessHubProps,
 } from './copy/neture.js';

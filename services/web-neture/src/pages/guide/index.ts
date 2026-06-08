@@ -40,5 +40,7 @@ export { GuideBusinessApprovedProductPage } from './GuideBusinessApprovedProduct
 export { GuideBusinessSellerRecruitmentPage } from './GuideBusinessSellerRecruitmentPage';
 // WO-O4O-NETURE-BUSINESS-GUIDE-MARKET-TRIAL-V1
 export { GuideBusinessMarketTrialPage } from './GuideBusinessMarketTrialPage';
+// WO-O4O-NETURE-BUSINESS-GUIDE-OPERATOR-REVENUE-V1
+export { GuideBusinessOperatorRevenuePage } from './GuideBusinessOperatorRevenuePage';
 // WO-O4O-NETURE-BUSINESS-GUIDE-HUB-V1
 export { GuideBusinessHubPage } from './GuideBusinessHubPage';
