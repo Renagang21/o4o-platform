@@ -834,7 +834,7 @@ export const netureGuideFeatureB2BContentProps: GuideFeatureManualPageProps = {
     eyebrow: '기능별 이용 방법',
     title: 'B2B 콘텐츠',
     description:
-      '매장 담당자에게 전달하는 B2B 콘텐츠를 작성하고 활용하는 방법을 안내합니다. 충실한 B2B 콘텐츠는 매장 현장 상담의 품질을 높입니다.',
+      '매장 담당자에게 전달하는 B2B 콘텐츠를 작성하고 활용하는 방법을 안내합니다. 충실한 B2B 콘텐츠는 매장 현장 상담의 품질을 높입니다. 이 문서는 기능 사용 방법을 설명합니다 — 콘텐츠로 사업을 운영하는 관점은 Business Guide의 「콘텐츠 네트워크 운영 안내」(/guide/business/content-network)를 참고하세요.',
     primaryAction: { label: 'B2B 콘텐츠로 이동 →', to: '/supplier/b2b-content' },
     flowBarTitle: '작성 흐름',
     flowLabels: ['상품 선택', '내용 작성', '저장 · 매장 노출'],
@@ -906,7 +906,7 @@ export const netureGuideFeatureEventOfferProps: GuideFeatureManualPageProps = {
     eyebrow: '기능별 이용 방법',
     title: 'Event Offer 제안하기',
     description:
-      '여러 서비스의 매장에 동시에 이벤트를 제안하는 방법을 안내합니다. 공급자가 기간 · 수량 · 대상 서비스를 설정하고 제안하면, 각 서비스 운영자가 검토 후 매장에 이벤트가 노출됩니다.',
+      '여러 서비스의 매장에 동시에 이벤트를 제안하는 방법을 안내합니다. 공급자가 기간 · 수량 · 대상 서비스를 설정하고 제안하면, 각 서비스 운영자가 검토 후 매장에 이벤트가 노출됩니다. 이 문서는 기능 사용 방법을 설명합니다 — 이벤트 오퍼를 사업으로 운영하는 관점은 Business Guide의 「이벤트 오퍼 운영 안내」(/guide/business/event-offer)를 참고하세요.',
     primaryAction: { label: 'Event Offer 로 이동 →', to: '/supplier/event-offers' },
     flowBarTitle: '제안 흐름',
     flowLabels: ['상품 선택', '서비스 선택', '기간 · 수량 설정', '제안 · 승인 · 실행'],
@@ -1001,7 +1001,7 @@ export const netureGuideFeatureMarketTrialProps: GuideFeatureManualPageProps = {
     eyebrow: '기능별 이용 방법',
     title: '유통참여형 펀딩',
     description:
-      '유통참여형 펀딩은 공급자가 제품 개발 또는 유통 준비 단계에서 매장 경영자의 소액 참여를 받고, 개발 완료 후 제품으로 정산하여 초기 매장 도입(매장 랜딩)을 확보하도록 돕는 Neture의 참여형 유통 프로그램입니다. 개발비 전체를 모으는 것이 핵심이 아니라, 제품이 실제 매장에 처음 들어가도록 만드는 것이 핵심입니다.',
+      '유통참여형 펀딩은 공급자가 제품 개발 또는 유통 준비 단계에서 매장 경영자의 소액 참여를 받고, 개발 완료 후 제품으로 정산하여 초기 매장 도입(매장 랜딩)을 확보하도록 돕는 Neture의 참여형 유통 프로그램입니다. 개발비 전체를 모으는 것이 핵심이 아니라, 제품이 실제 매장에 처음 들어가도록 만드는 것이 핵심입니다. 이 문서는 기능 사용 방법을 설명합니다 — 유통참여형 펀딩을 사업으로 운영하는 관점은 Business Guide의 「유통참여형 펀딩 운영 안내」(/guide/business/market-trial)를 참고하세요.',
     primaryAction: { label: '유통참여형 펀딩으로 이동 →', to: '/market-trial' },
     flowBarTitle: '진행 흐름',
     flowLabels: ['공급자 제안', '운영자 검토', '매장 참여', '제품 정산', '매장 랜딩'],
@@ -1014,6 +1014,7 @@ export const netureGuideFeatureMarketTrialProps: GuideFeatureManualPageProps = {
       '참여자는 매장 경영자 또는 매장 랜딩이 가능한 사업자가 중심입니다.',
     ],
     cards: [
+      { title: '사업 운영 방법 보기', audience: '관련 안내', summary: '유통참여형 펀딩을 사업으로 운영하는 관점은 Business Guide에서.', to: '/guide/business/market-trial' },
       { title: '유통참여형 펀딩이란?', audience: '공통', summary: '제품 정산을 통해 초기 매장 랜딩을 만드는 참여형 유통 프로그램입니다.', to: '#overview' },
       { title: '왜 매장 랜딩이 중요한가?', audience: '공통', summary: '매장 진입비용이 높은 제품에게 첫 매장 진입은 성공의 첫 관문입니다.', to: '#store-landing' },
       { title: '공급자는 어떻게 활용하나?', audience: '공급자', summary: '목표 매장 수와 제품 정산 조건을 중심으로 프로그램을 설계합니다.', to: '#supplier' },
@@ -1565,7 +1566,7 @@ export const netureGuideForOperatorProps: GuideFeatureManualPageProps = {
     eyebrow: '이용 안내',
     title: '매장 네트워크 운영자 가이드',
     description:
-      '운영자는 매장 네트워크를 구성하고 운영하는 사업자입니다. 협동조합 · 협동조합 준비 그룹 · 세미 프랜차이즈 · 전문 네트워크 운영자가 여기에 해당합니다. 이 문서는 설득이나 제안서가 아니라, 운영자가 실제로 무엇을 어떻게 하는지 설명하는 운영 매뉴얼입니다.',
+      '운영자는 매장 네트워크를 구성하고 운영하는 사업자입니다. 협동조합 · 협동조합 준비 그룹 · 세미 프랜차이즈 · 전문 네트워크 운영자가 여기에 해당합니다. 이 문서는 설득이나 제안서가 아니라, 운영자가 실제로 무엇을 어떻게 하는지 설명하는 운영 매뉴얼입니다. 운영자의 역할 · 실무 · 참여자 관계는 이 가이드에서 다루고, 사업 모델 · 운영 도구 · 수익 구조는 Business Guide(/guide/business)에서 다룹니다 — 두 문서는 역할 안내와 사업 안내로 역할이 나뉩니다.',
     primaryAction: { label: '운영 참여 검토 신청 →', to: '/o4o/apply' },
     flowBarTitle: '운영 흐름',
     flowLabels: ['자료 수신', '구성 · 제작', '승인 상품', '매장 모집', '이벤트 · 펀딩', '정산 · 지원'],
@@ -2737,7 +2738,7 @@ export const netureGuideBusinessContentNetworkProps: GuideFeatureManualPageProps
     eyebrow: '사업 운영 안내',
     title: '콘텐츠 네트워크 운영 안내',
     description:
-      '공급자 · 운영자 · 참여 매장이 콘텐츠를 활용해 소비자에게 제품 정보와 건강 정보를 전달하는 환경을 어떻게 구성하는지 설명합니다. 콘텐츠 제작 툴 사용법 · 블로그 작성법 · 디자인 제작 방법이 아니라, 콘텐츠를 중심으로 세 주체가 연결되는 O4O 운영 구조를 설명하는 안내서입니다.',
+      '공급자 · 운영자 · 참여 매장이 콘텐츠를 활용해 소비자에게 제품 정보와 건강 정보를 전달하는 환경을 어떻게 구성하는지 설명합니다. 콘텐츠 제작 툴 사용법 · 블로그 작성법 · 디자인 제작 방법이 아니라, 콘텐츠를 중심으로 세 주체가 연결되는 O4O 운영 구조를 설명하는 안내서입니다. 이 문서는 사업 운영 방법을 설명합니다 — 콘텐츠 작성 · 활용 기능 사용법은 기능 Guide의 「B2B 콘텐츠」(/guide/features/b2b-content)를 참고하세요.',
     primaryAction: { label: '운영 참여 검토 신청 →', to: '/o4o/apply' },
     flowBarTitle: '안내 흐름',
     flowLabels: ['왜 콘텐츠', '누가 만드나', '어디에 있나', '운영자 · 매장', '수익 구조', '시작'],
@@ -2750,6 +2751,7 @@ export const netureGuideBusinessContentNetworkProps: GuideFeatureManualPageProps
       '콘텐츠 운영은 비용이 아니라 운영자의 사업 모델이 될 수 있습니다.',
     ],
     cards: [
+      { title: '기능 사용 방법 보기', audience: '관련 안내', summary: '콘텐츠 작성 · 활용 기능 사용법은 기능 Guide에서.', to: '/guide/features/b2b-content' },
       { title: '이 문서의 대상', audience: '공통', summary: '운영자 · 공급자 · 네트워크 운영자.', to: '#audience' },
       { title: '왜 콘텐츠가 중요한가', audience: '공통', summary: '소비자는 제품 차이를 알기 어렵고, 매장 설명이 판매를 좌우.', to: '#why' },
       { title: '콘텐츠는 누가 만드는가', audience: '공통', summary: '공급자 · 운영자 · 참여 매장 · 외부 전문가.', to: '#who-makes' },
@@ -2934,7 +2936,7 @@ export const netureGuideBusinessEventOfferProps: GuideFeatureManualPageProps = {
     eyebrow: '사업 운영 안내',
     title: '이벤트 오퍼 운영 안내',
     description:
-      '공급자 · 운영자 · 참여 매장이 이벤트 오퍼를 왜 활용하는지, 어떤 목적으로 운영하는지 설명합니다. 기능 사용법이나 공동구매 운영법이 아닙니다. 특히 "많이 모이면 무조건 싸게 산다"는 일반적 인식과, O4O의 유통질서 · 특별 공급 조건 개념의 차이를 정리하는 운영 안내서입니다.',
+      '공급자 · 운영자 · 참여 매장이 이벤트 오퍼를 왜 활용하는지, 어떤 목적으로 운영하는지 설명합니다. 기능 사용법이나 공동구매 운영법이 아닙니다. 특히 "많이 모이면 무조건 싸게 산다"는 일반적 인식과, O4O의 유통질서 · 특별 공급 조건 개념의 차이를 정리하는 운영 안내서입니다. 이 문서는 사업 운영 방법을 설명합니다 — 이벤트를 제안 · 설정하는 기능 사용법은 기능 Guide의 「Event Offer 제안하기」(/guide/features/event-offer)를 참고하세요.',
     primaryAction: { label: '운영 참여 검토 신청 →', to: '/o4o/apply' },
     flowBarTitle: '안내 흐름',
     flowLabels: ['처음 인식', '무엇인가', '3주체 목적', '유통질서', '특별 공급 조건', '시작'],
@@ -2947,6 +2949,7 @@ export const netureGuideBusinessEventOfferProps: GuideFeatureManualPageProps = {
       '이벤트 오퍼는 특정 운영자 · 특정 참여 매장에 제공되는 특별 공급 조건에 가깝습니다.',
     ],
     cards: [
+      { title: '기능 사용 방법 보기', audience: '관련 안내', summary: '이벤트 제안 · 설정 기능 사용법은 기능 Guide에서.', to: '/guide/features/event-offer' },
       { title: '이 문서의 대상', audience: '공통', summary: '공급자 · 운영자 · 참여 매장.', to: '#audience' },
       { title: '처음에 생각하는 것', audience: '공통', summary: '공동구매 · 대량구매 할인 · 많이 모이면 저렴.', to: '#misread' },
       { title: 'O4O의 이벤트 오퍼는 무엇인가', audience: '공통', summary: '단순 공동구매 기능이 아니라 세 주체의 운영 구조.', to: '#what' },
@@ -3515,7 +3518,7 @@ export const netureGuideBusinessMarketTrialProps: GuideFeatureManualPageProps = 
     eyebrow: '사업 운영 안내',
     title: '유통참여형 펀딩 운영 안내',
     description:
-      '공급자가 새로운 제품을 시장에 소개하고, 초기 참여 매장을 확보하며, 시장 반응을 확인하는 과정을 설명합니다. 펀딩 등록 방법이나 투자 설명이 아닙니다. 이미 출시된 제품을 다루는 다른 안내서와 달리, 유통참여형 펀딩은 출시 전 · 초기 단계 제품을 다루는 공급자 중심 운영 구조입니다.',
+      '공급자가 새로운 제품을 시장에 소개하고, 초기 참여 매장을 확보하며, 시장 반응을 확인하는 과정을 설명합니다. 펀딩 등록 방법이나 투자 설명이 아닙니다. 이미 출시된 제품을 다루는 다른 안내서와 달리, 유통참여형 펀딩은 출시 전 · 초기 단계 제품을 다루는 공급자 중심 운영 구조입니다. 이 문서는 사업 운영 방법을 설명합니다 — 펀딩 진행 · 참여 기능 사용법은 기능 Guide의 「유통참여형 펀딩」(/guide/features/market-trial)을 참고하세요.',
     primaryAction: { label: '운영 참여 검토 신청 →', to: '/o4o/apply' },
     flowBarTitle: '안내 흐름',
     flowLabels: ['소개 어려움', '무엇인가', '3주체 목적', '콘텐츠', '모집 · 오퍼 연계', '시작'],
@@ -3528,6 +3531,7 @@ export const netureGuideBusinessMarketTrialProps: GuideFeatureManualPageProps = 
       '핵심은 자금 조달이 아니라 제품의 초기 유통망 형성입니다.',
     ],
     cards: [
+      { title: '기능 사용 방법 보기', audience: '관련 안내', summary: '펀딩 진행 · 참여 기능 사용법은 기능 Guide에서.', to: '/guide/features/market-trial' },
       { title: '이 문서의 대상', audience: '공통', summary: '공급자 · 운영자 · 참여 매장.', to: '#audience' },
       { title: '새 제품 소개는 왜 어려운가', audience: '공급자', summary: '시장 반응 · 초기 판매처 · 정보 전달 · 홍보 비용.', to: '#why-hard' },
       { title: '유통참여형 펀딩은 무엇인가', audience: '공통', summary: '공급자 중심 시장 검증 · 초기 유통망 — 투자 상품 아님.', to: '#what' },

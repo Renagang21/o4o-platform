@@ -74,7 +74,7 @@ const homeProps: GuideFeaturesPageProps = {
       title: 'O4O 기능 설명',
       primaryRoute: '/guide/features',
       description:
-        '사업 모델이 아니라 O4O에서 제공하는 개별 기능의 사용 방법입니다. 각 기능이 O4O에서 어떻게 구현되는지 매뉴얼 수준으로 안내합니다.',
+        '사업 모델이 아니라 O4O에서 제공하는 개별 기능의 사용 방법입니다. 각 기능이 O4O에서 어떻게 구현되는지 매뉴얼 수준으로 안내합니다. 아래는 핵심 기능이며, 공급자 시작 가이드 · 파트너 프로그램 가이드는 각각 「공급자 참여 안내」 · 「파트너 안내」에 있습니다. 전체 기능 목록은 「기능 전체 보기」(/guide/features)에서 확인할 수 있습니다.',
       items: [
         { label: '상품 등록 & 유통', route: '/guide/features/product-registration' },
         { label: '콘텐츠(B2B) 운영', route: '/guide/features/b2b-content' },
