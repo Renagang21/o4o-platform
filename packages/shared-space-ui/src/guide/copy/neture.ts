@@ -2546,7 +2546,7 @@ export const netureGuideBusinessOwnProductProps: GuideFeatureManualPageProps = {
       '서비스 운영자가 자체 제품 · 서비스 전용 상품 · 공동 기획 상품으로 자신만의 사업을 만드는 구조를 설명하는 안내서입니다. 제품 개발 · 제조 · 등록 방법이 아니라, 왜 자체 제품을 기획하는지 · 어떤 형태가 가능한지 · 어떻게 운영하는지를 다룹니다. 운영자가 반드시 제조 · 물류를 직접 해야 한다는 오해를 교정하고, 물류 없는 세미 프랜차이즈형 사업 모델을 설명합니다. 제안서 · 홍보 · 성공사례가 아닙니다.',
     primaryAction: { label: '운영 참여 검토 신청 →', to: '/o4o/apply' },
     flowBarTitle: '안내 흐름',
-    flowLabels: ['왜', '무엇을', '두 방식', '협력', '콘텐츠', '흐름', '시작'],
+    flowLabels: ['왜', '무엇을', '두 방식', '협력', '콘텐츠', '펀딩', '흐름', '시작'],
   },
   index: {
     title: '자체 제품 운영 한눈에 보기',
@@ -2564,6 +2564,7 @@ export const netureGuideBusinessOwnProductProps: GuideFeatureManualPageProps = {
       { title: '물류 없는 세미 프랜차이즈', audience: '공통', summary: '제품 · 콘텐츠 · 네트워크는 운영자, 물류는 공급업체.', to: '#semi-franchise' },
       { title: '공급업체와 경쟁 관계인가', audience: '공통', summary: '아니다 — 추가 주문 · 거래가 생기는 협력 구조.', to: '#cooperation' },
       { title: '콘텐츠와의 관계', audience: '공통', summary: '제품만으로는 운영되지 않음 — 설명 · 활용 · 교육 자료.', to: '#content' },
+      { title: '유통참여형 펀딩과의 관계', audience: '중요', summary: '공급자 중심 기능 — 운영자는 겸업 · 협력 시 활용.', to: '#funding' },
       { title: '운영 흐름', audience: '공통', summary: '운영자 기획 → 공급업체 협력 → 참여 매장 → 소비자.', to: '#flow' },
       { title: '네트워크 확대', audience: '공통', summary: '자체 제품이 네트워크 정체성을 형성.', to: '#network' },
       { title: '시작 방법', audience: '시작', summary: '작은 규모 · 특정 분야 · 특정 고객군 중심으로 시작.', to: '#start' },
@@ -2670,8 +2671,21 @@ export const netureGuideBusinessOwnProductProps: GuideFeatureManualPageProps = {
       ],
     },
     {
-      id: 'flow',
+      // WO-O4O-NETURE-BUSINESS-GUIDE-OWN-PRODUCT-V1 §9 — 유통참여형 펀딩과의 관계
+      id: 'funding',
       step: '09',
+      title: '유통참여형 펀딩과의 관계',
+      description:
+        '유통참여형 펀딩은 자체 제품 전용 기능이 아닙니다. 기본적으로 공급자가 주도하는 Neture 기능이며, 자체 제품과는 운영자가 공급자 역할을 겸하거나 협력 공급업체와 함께 제품을 운영할 때 연결됩니다.',
+      items: [
+        { label: '공급자 중심 기능', detail: '유통참여형 펀딩은 운영자 전용 기능이 아니라, 기본적으로 공급자가 주도하는 Neture 기능입니다.' },
+        { label: '운영자 활용 조건', detail: '운영자가 공급자 역할을 겸하거나(A안) 협력 공급업체와 함께 제품을 운영할 때 활용할 수 있습니다.' },
+        { label: '목적', detail: '투자나 자금 조달이 아니라 초기 매장 확보와 시장 검증이 목적입니다 — 투자 상품이 아닙니다.' },
+      ],
+    },
+    {
+      id: 'flow',
+      step: '10',
       title: '운영 흐름',
       description:
         '자체 제품의 실제 운영은 다음 흐름으로 이어집니다. 각 단계의 역할이 분리되어 있어 운영자가 모든 것을 직접 하지 않아도 됩니다.',
@@ -2684,7 +2698,7 @@ export const netureGuideBusinessOwnProductProps: GuideFeatureManualPageProps = {
     },
     {
       id: 'network',
-      step: '10',
+      step: '11',
       title: '네트워크 확대',
       description:
         '자체 제품은 단순한 매출 수단을 넘어, 네트워크의 정체성을 형성하는 데 기여합니다.',
@@ -2696,7 +2710,7 @@ export const netureGuideBusinessOwnProductProps: GuideFeatureManualPageProps = {
     },
     {
       id: 'start',
-      step: '11',
+      step: '12',
       title: '시작 방법',
       description:
         '자체 제품은 크게 시작할 필요가 없습니다. 작은 규모 · 특정 분야 · 특정 고객군을 중심으로 시작할 수 있습니다.',
