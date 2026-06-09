@@ -3,7 +3,8 @@
 > `WO-O4O-EVENT-OFFER-TO-CART-PHASE1A-FOLLOWUP-V1` 결과.
 > KPA 이벤트오퍼 buyer UX(상세·목록·일괄·진입점)를 canonical Store Cart "장바구니 담기"
 > 흐름으로 정렬. checkout 확정/주문 생성/수량 차감은 미구현(Phase 1b).
-> **결과: 코드 PASS (tsc 0). live 브라우저 smoke는 배포 후.** — 2026-06-09
+> **결과: PASS** — tsc 0 · live 브라우저 smoke 통과 (active offer 부재로 목록 "담기" 버튼 시각
+> 클릭만 잔여, graceful). — 2026-06-09
 
 ---
 
@@ -56,7 +57,20 @@ buildEventOfferCartPayload(item, qty) => {
 - `web-kpa-society` `tsc --noEmit` → **0 errors** ✅
 - buyer 측 `.participate(` 직접 주문 호출 **0건** (api 정의·cancel·my-participation 제외) ✅
 - backend 무변경 ✅
-- live 브라우저 smoke: **배포 후 수행** (사이드바 "내 장바구니" → /store-hub/cart, 목록 "담기"/일괄 "담기" 동작, active offer 부재 시 graceful empty).
+
+### 5.1 live 브라우저 smoke (배포 후 — 2026-06-09, `kpa-society-web-01303`)
+
+| 항목 | 결과 |
+|------|:----:|
+| store-hub 사이드바 "내 장바구니" nav 노출 (이벤트/특가 ↔ 콘텐츠 사이) | ✅ |
+| 사이드바 "내 장바구니" 클릭 → `/store-hub/cart` 이동·렌더 (dead link 아님) | ✅ |
+| 이벤트오퍼 목록 툴바 "🛒 내 장바구니" 링크 노출 → `/store-hub/cart` | ✅ |
+| 목록 배너 문구 cart 언어로 갱신 ("장바구니에 담은 뒤 내 장바구니에서 확인") | ✅ |
+| `/store-hub/cart` graceful empty 렌더 | ✅ |
+
+> **미실증(graceful)**: KPA active/전체 이벤트오퍼 0건 → 목록 행 "담기"/일괄 "담기" 버튼 시각
+> 클릭 미수행(목록 empty 정상). cart add/qty/remove UI 는 Phase 1a live smoke(시드 item)에서 검증됨.
+> WO §6.2 "active offer 부재" 수용 기준 충족.
 
 ## 6. 회귀 무영향
 
@@ -79,11 +93,11 @@ buildEventOfferCartPayload(item, qty) => {
 
 ## 8. 잔여 / 후속
 
-- **live 브라우저 smoke** 배포 후 (active KPA event offer 부재면 graceful empty + 진입점/렌더 확인).
+- 실제 KPA 이벤트오퍼 등록 후 목록 "담기"/일괄 "담기" 시각 클릭 1회만 잔여(graceful).
 - **Phase 1b** `WO-O4O-STORE-CART-CHECKOUT-CONFIRMATION-V1`: checkout 확정, 공급자별 createOrder
   N분할, event_offer 최종 검증, 수량 차감 시점 이전, participate legacy 격하, sellerOrganizationId resolve.
 - **Phase 1c** `WO-O4O-EVENT-OFFER-TO-CART-CROSSSERVICE-V2`: Glyco/KCos.
 
 ---
 
-*Date: 2026-06-09 · Status: 코드 PASS (live 브라우저 smoke 배포 후)*
+*Date: 2026-06-09 · Status: PASS (목록 "담기" 버튼 시각 클릭만 잔여 — active offer 부재)*
