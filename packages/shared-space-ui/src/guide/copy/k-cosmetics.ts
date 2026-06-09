@@ -332,7 +332,7 @@ export const kCosmeticsGuideUsageProps: GuideUsagePageProps = {
       title: '상품 확보',
       routeLabel: '/store/commerce/products',
       description:
-        '플랫폼 B2B 카탈로그에서 취급할 상품을 선택해 내 매장에 추가합니다. 승인 후 소매가를 설정하고 노출을 활성화하면 판매 준비가 완료됩니다.',
+        '플랫폼 B2B 카탈로그에서 취급할 상품을 선택해 내 매장에 추가합니다. 승인 후 소매가를 설정하고 노출을 켜면 매장 페이지·채널·태블릿에 상품이 소개됩니다. (주문·결제 연동은 현재 준비 중이며 제공 범위에 따라 단계적으로 확장됩니다.)',
       items: [
         {
           label: 'B2B 카탈로그 탐색',
