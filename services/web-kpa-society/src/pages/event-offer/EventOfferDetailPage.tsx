@@ -9,11 +9,20 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
-import { eventOfferApi } from '../../api';
+import { eventOfferApi, storeCartApi } from '../../api';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 import type { EventOfferItem } from '../../types';
 import { calcFreeShippingProgress, formatWon } from '../../utils/freeShipping';
+
+// 이 서비스의 canonical store cart serviceKey (service-catalog 기준)
+const CART_SERVICE_KEY = 'kpa-society';
+
+// uuid 컬럼(eventOfferId/organizationProductListingId/supplierProductOfferId)에
+// 비-uuid 값을 보내면 DB 오류가 나므로, uuid 형태일 때만 보존한다.
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const asUuid = (v: string | null | undefined): string | null =>
+  v && UUID_RE.test(v) ? v : null;
 
 export function EventOfferDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -22,9 +31,46 @@ export function EventOfferDetailPage() {
   const [product, setProduct] = useState<EventOfferItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [participating, setParticipating] = useState(false);
+  // WO-O4O-EVENT-OFFER-TO-CART-MIGRATION-V1 (Phase 1a)
+  const [quantity, setQuantity] = useState(1);
+  const [adding, setAdding] = useState(false);
+  const [added, setAdded] = useState(false);
 
   const hasStore = user?.isStoreOwner === true;
+
+  // 1회 주문 한도(있으면)로 수량 상한 — total/store 한도 최종 검증은 checkout 확정 Phase.
+  const maxQty = product?.perOrderLimit && product.perOrderLimit > 0 ? product.perOrderLimit : null;
+  const clampQty = (n: number) => {
+    const v = Math.max(1, Math.floor(n) || 1);
+    return maxQty ? Math.min(v, maxQty) : v;
+  };
+
+  const handleAddToCart = async () => {
+    if (!product || adding) return;
+    setAdding(true);
+    try {
+      await storeCartApi.addItem(CART_SERVICE_KEY, {
+        sourceType: 'event_offer',
+        supplierId: product.supplierId ?? null,
+        // uuid 컬럼은 형태 검증 후 보존(아니면 null)
+        supplierProductOfferId: asUuid(product.offerId),
+        organizationProductListingId: asUuid(product.id),
+        eventOfferId: asUuid(product.id),
+        productName: product.productName,
+        quantity,
+        pricingSource: 'event_offer',
+        // 표시용 스냅샷 — checkout 확정 시 재검증
+        priceSnapshot:
+          product.eventPrice ?? product.unitPrice ?? product.generalPrice ?? 0,
+      });
+      setAdded(true);
+      toast.success('장바구니에 담았습니다.');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : '장바구니 담기에 실패했습니다.');
+    } finally {
+      setAdding(false);
+    }
+  };
 
   useEffect(() => {
     if (id) loadData();
@@ -133,30 +179,71 @@ export function EventOfferDetailPage() {
             {/* 무료배송 안내 — WO-O4O-NETURE-SUPPLIER-FREE-SHIPPING-PROGRESS-UI-V1 */}
             <FreeShippingNotice
               unitPrice={product.unitPrice}
+              quantity={quantity}
               policy={product.shippingPolicy}
             />
 
             <div style={styles.actionSection}>
               {hasStore ? (
-                <button
-                  style={{ ...styles.orderButton, opacity: participating ? 0.7 : 1 }}
-                  disabled={participating}
-                  onClick={async () => {
-                    if (participating) return;
-                    setParticipating(true);
-                    try {
-                      await eventOfferApi.participate(id!, 1);
-                      toast.success('이벤트 참여가 완료되었습니다.');
-                      navigate('/store-hub/event-offers');
-                    } catch (err) {
-                      toast.error(err instanceof Error ? err.message : '이벤트 참여에 실패했습니다.');
-                    } finally {
-                      setParticipating(false);
-                    }
-                  }}
-                >
-                  {participating ? '참여 중...' : '주문하기'}
-                </button>
+                added ? (
+                  // WO-O4O-EVENT-OFFER-TO-CART-MIGRATION-V1 (Phase 1a): 담은 후 안내
+                  <div style={styles.addedBox}>
+                    <p style={styles.addedTitle}>✅ 장바구니에 담았습니다</p>
+                    <button style={styles.orderButton} onClick={() => navigate('/store-hub/cart')}>
+                      장바구니 보기
+                    </button>
+                    <button
+                      style={styles.secondaryButton}
+                      onClick={() => setAdded(false)}
+                    >
+                      계속 담기
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    {/* 수량 선택 */}
+                    <div style={styles.qtyRow}>
+                      <span style={styles.qtyLabel}>수량</span>
+                      <div style={styles.qtyStepper}>
+                        <button
+                          type="button"
+                          style={styles.qtyBtn}
+                          disabled={quantity <= 1}
+                          onClick={() => setQuantity((q) => clampQty(q - 1))}
+                        >
+                          −
+                        </button>
+                        <input
+                          style={styles.qtyInput}
+                          type="number"
+                          min={1}
+                          max={maxQty ?? undefined}
+                          value={quantity}
+                          onChange={(e) => setQuantity(clampQty(Number(e.target.value)))}
+                        />
+                        <button
+                          type="button"
+                          style={styles.qtyBtn}
+                          disabled={maxQty != null && quantity >= maxQty}
+                          onClick={() => setQuantity((q) => clampQty(q + 1))}
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                    {maxQty != null && (
+                      <p style={styles.qtyHint}>1회 최대 {maxQty}개</p>
+                    )}
+
+                    <button
+                      style={{ ...styles.orderButton, opacity: adding ? 0.7 : 1 }}
+                      disabled={adding}
+                      onClick={handleAddToCart}
+                    >
+                      {adding ? '담는 중...' : '장바구니 담기'}
+                    </button>
+                  </>
+                )
               ) : user ? (
                 <div style={styles.noStoreNotice}>
                   <p style={styles.noStoreText}>매장 등록 후 참여 가능합니다</p>
@@ -183,13 +270,16 @@ export function EventOfferDetailPage() {
 // 무료배송 안내 (읽기 전용 표시) — WO-O4O-NETURE-SUPPLIER-FREE-SHIPPING-PROGRESS-UI-V1
 function FreeShippingNotice({
   unitPrice,
+  quantity = 1,
   policy,
 }: {
   unitPrice: number | null;
+  // WO-O4O-EVENT-OFFER-TO-CART-MIGRATION-V1 (Phase 1a): 수량 선택 반영
+  quantity?: number;
   policy?: { baseShippingFee: number | null; freeShippingThreshold: number | null } | null;
 }) {
-  // 이 화면은 수량 1로 참여하므로 주문금액 = 단가.
-  const subtotal = Number(unitPrice ?? 0);
+  // 주문금액 = 단가 × 수량(선택 수량).
+  const subtotal = Number(unitPrice ?? 0) * Math.max(1, quantity);
   const progress = calcFreeShippingProgress({
     subtotal,
     baseShippingFee: policy?.baseShippingFee ?? null,
@@ -356,6 +446,75 @@ const styles: Record<string, React.CSSProperties> = {
     border: 'none',
     borderRadius: '8px',
     fontSize: '16px',
+    fontWeight: 600,
+    cursor: 'pointer',
+  },
+  // WO-O4O-EVENT-OFFER-TO-CART-MIGRATION-V1 (Phase 1a)
+  qtyRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '8px',
+  },
+  qtyLabel: {
+    fontSize: '14px',
+    color: colors.neutral700,
+    fontWeight: 500,
+  },
+  qtyStepper: {
+    display: 'flex',
+    alignItems: 'center',
+    border: `1px solid ${colors.neutral300}`,
+    borderRadius: '8px',
+    overflow: 'hidden',
+  },
+  qtyBtn: {
+    width: '40px',
+    height: '40px',
+    border: 'none',
+    backgroundColor: colors.neutral50,
+    fontSize: '18px',
+    fontWeight: 600,
+    color: colors.neutral700,
+    cursor: 'pointer',
+  },
+  qtyInput: {
+    width: '56px',
+    height: '40px',
+    border: 'none',
+    borderLeft: `1px solid ${colors.neutral200}`,
+    borderRight: `1px solid ${colors.neutral200}`,
+    textAlign: 'center',
+    fontSize: '15px',
+    fontWeight: 600,
+    color: colors.neutral900,
+  },
+  qtyHint: {
+    fontSize: '12px',
+    color: colors.neutral500,
+    margin: '0 0 16px',
+    textAlign: 'right',
+  },
+  addedBox: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px',
+  },
+  addedTitle: {
+    fontSize: '15px',
+    fontWeight: 600,
+    color: '#15803d',
+    margin: '0 0 4px',
+    textAlign: 'center',
+  },
+  secondaryButton: {
+    width: '100%',
+    padding: '12px',
+    backgroundColor: colors.white,
+    color: '#7C3AED',
+    border: '1px solid #7C3AED',
+    borderRadius: '8px',
+    fontSize: '15px',
     fontWeight: 600,
     cursor: 'pointer',
   },

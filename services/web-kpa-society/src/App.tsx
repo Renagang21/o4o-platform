@@ -89,6 +89,8 @@ const SurveyDetailPage = lazy(() => import('./pages/survey/SurveyDetailPage'));
 //   /demo/event-offers 라우트는 canonical 로 redirect.
 const EventOfferDetailPage = lazy(() => import('./pages/event-offer/EventOfferDetailPage').then(m => ({ default: m.EventOfferDetailPage })));
 const KpaEventOfferPage = lazy(() => import('./pages/event-offer/KpaEventOfferPage').then(m => ({ default: m.KpaEventOfferPage })));
+// WO-O4O-EVENT-OFFER-TO-CART-MIGRATION-V1 (Phase 1a): canonical store cart 확인 화면
+const StoreCartPage = lazy(() => import('./pages/store-cart/StoreCartPage').then(m => ({ default: m.StoreCartPage })));
 // Supplier pages — Phase 2 lazy
 const SupplierEventOfferPage = lazy(() => import('./pages/supplier/SupplierEventOfferPage').then(m => ({ default: m.SupplierEventOfferPage })));
 
@@ -680,6 +682,8 @@ function App() {
             <Route path="b2b" element={<HubB2BCatalogPage />} />
             <Route path="signage" element={<HubSignageLibraryPage />} />
             <Route path="event-offers" element={<PharmacyOwnerOnlyGuard><KpaEventOfferPage /></PharmacyOwnerOnlyGuard>} />
+            {/* WO-O4O-EVENT-OFFER-TO-CART-MIGRATION-V1 (Phase 1a): 내 장바구니 */}
+            <Route path="cart" element={<PharmacyOwnerOnlyGuard><StoreCartPage /></PharmacyOwnerOnlyGuard>} />
             <Route path="content" element={<HubContentLibraryPage />} />
             {/* WO-O4O-STORE-HUB-BLOG-CONTENT-IMPORT-V1: 매장 HUB 블로그 진열 + 가져가기 */}
             <Route path="blog" element={<HubBlogLibraryPage />} />

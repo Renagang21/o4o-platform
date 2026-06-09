@@ -16,3 +16,11 @@ export { participationApi } from './participation';
 export { homeApi } from './home';
 export { dashboardApi, type DashboardAssetSourceType, type CopyAssetRequest, type CopyOptions, type DashboardAsset, type DashboardSortType, type DashboardKpi } from './dashboard';
 export { resourcesApi, type ResourceItem, type ResourceListResponse } from './resources';
+// WO-O4O-EVENT-OFFER-TO-CART-MIGRATION-V1 (Phase 1a): canonical store cart
+export {
+  storeCartApi,
+  type StoreCartItem,
+  type CartSourceType,
+  type CartPricingSource,
+  type SupplierGroup,
+} from './storeCart';
