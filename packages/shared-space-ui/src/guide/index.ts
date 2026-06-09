@@ -53,6 +53,8 @@ export {
   kpaGuideFeatureStoreProps,
   kpaGuideFeatureLmsProps,
   kpaGuideFeatureQrTabletProps,
+  kpaGuideFeaturePopProps,
+  kpaGuideFeatureProductionMaterialsProps,
   kpaGuideFeatureSurveyProps,
   // WO-O4O-KPA-GUIDE-FOR-ROLE-V1: 역할별 Value Guide
   kpaGuideForStoreOwnerProps,

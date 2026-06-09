@@ -507,7 +507,7 @@ export const kpaGuideFeaturesProps: GuideFeaturesPageProps = {
     title: '기능별 이용 방법',
     description: 'KPA-Society 주요 기능을 카테고리별로 정리했습니다. 필요한 기능을 선택해 바로 이동합니다.',
     flowBarTitle: '기능 카테고리',
-    flowLabels: ['커뮤니티', '강의', '콘텐츠', '자료실', '설문조사', '매장 운영', '사이니지', 'QR · Tablet'],
+    flowLabels: ['커뮤니티', '강의', '콘텐츠', '자료실', '설문조사', '매장 운영', '사이니지', 'QR · Tablet', 'POP', '제작 자료'],
   },
   groups: [
     {
@@ -604,6 +604,30 @@ export const kpaGuideFeaturesProps: GuideFeaturesPageProps = {
         { label: '마케팅 분석', route: '/store/analytics/marketing' },
       ],
       linkTo: '/guide/features/qr',
+    },
+    {
+      step: '09',
+      title: 'POP 제작',
+      primaryRoute: '/store/marketing/pop',
+      description: '내 자료함의 자료를 바탕으로 매장 POP 인쇄물을 만들어 진열대·상담대·계산대에 활용합니다.',
+      items: [
+        { label: 'POP 제작 이용 방법', route: '/guide/features/pop' },
+        { label: 'POP 제작', route: '/store/marketing/pop' },
+        { label: '내 자료함(제작 자료)', route: '/guide/features/production-materials' },
+      ],
+      linkTo: '/guide/features/pop',
+    },
+    {
+      step: '10',
+      title: '매장 제작 자료',
+      primaryRoute: '/store/library/production-materials',
+      description: '직접 만든 POP·QR·블로그 결과물을 한 곳에서 확인하고 다시 활용·재제작합니다.',
+      items: [
+        { label: '매장 제작 자료 이용 방법', route: '/guide/features/production-materials' },
+        { label: '내 자료함 열기', route: '/store/library/production-materials' },
+        { label: 'POP 제작 이용 방법', route: '/guide/features/pop' },
+      ],
+      linkTo: '/guide/features/production-materials',
     },
   ],
   bottomNav: {
@@ -1064,6 +1088,175 @@ export const kpaGuideFeatureQrTabletProps: GuideFeatureManualPageProps = {
   },
 };
 
+// ─── /guide/features/pop ───────────────────────────────────────────────
+// WO-O4O-KPA-STORE-POP-AND-PRODUCTION-MATERIALS-GUIDE-V1:
+//   실제 StorePopPage 흐름 기준. 제작 시작은 내 자료함에서만 진입(빈 화면 시작 없음),
+//   자료 origin 3종(자료/커뮤니티 콘텐츠/직접 작성), 템플릿·AI 문구(선택), QR 연결(선택),
+//   A4/A5, 생성 결과는 매장 제작 자료에 저장. 결제·주문과 분리.
+
+export const kpaGuideFeaturePopProps: GuideFeatureManualPageProps = {
+  hero: {
+    eyebrow: '기능별 이용 방법',
+    title: 'POP 제작 이용 방법',
+    description: '내 자료함의 자료를 바탕으로 매장 POP 인쇄물을 만들어 진열대·상담대·계산대·입구에 활용합니다',
+    primaryAction: { label: 'POP 제작으로 이동 →', to: '/store/marketing/pop' },
+    flowBarTitle: '이용 흐름',
+    flowLabels: ['제작 개요', '자료함에서 시작', '자료 선택', '템플릿·AI 문구', 'QR·레이아웃', '출력·저장'],
+  },
+  sections: [
+    {
+      step: '01',
+      title: 'POP 제작 개요',
+      description: 'POP는 빈 화면에서 만들지 않고, 내 자료함에 모인 자료(상품·콘텐츠·직접 작성 문안)를 바탕으로 만듭니다. 만든 POP는 다시 내 자료함(매장 제작 자료)에 저장되어 언제든 다시 출력할 수 있습니다.',
+      items: [
+        { label: '자료 기반 제작', detail: '내 자료함의 자료·콘텐츠를 골라 POP로 구성합니다.' },
+        { label: 'AI 문구 보조', detail: '선택한 자료를 바탕으로 POP 문구 초안을 AI가 만들어 줍니다(선택).' },
+        { label: '결과 자동 저장', detail: '생성한 POP PDF는 매장 제작 자료에 저장되어 다시 열고 출력할 수 있습니다.' },
+      ],
+    },
+    {
+      step: '02',
+      title: '내 자료함에서 시작',
+      routeLabel: '/store/library/production-materials',
+      description: 'POP 제작은 내 자료함(매장 제작 자료)에서 시작합니다. 자료 행의 "활용하기 → POP 만들기"를 누르거나, 내 자료함의 콘텐츠를 골라 제작을 시작하면 선택한 자료가 POP 화면으로 함께 전달됩니다.',
+      items: [
+        { label: '활용하기 → POP 만들기', detail: '매장 제작 자료 목록에서 자료의 "활용하기" 메뉴로 POP 화면에 바로 보냅니다.' },
+        { label: '내 자료함 → 콘텐츠', detail: '/store/library/contents 에서 자료를 골라 POP에 사용합니다.' },
+        { label: '빈 화면 시작 없음', detail: 'POP는 선택한 자료가 있어야 만들 수 있습니다. 자료가 없으면 먼저 자료함에서 자료를 준비합니다.' },
+      ],
+    },
+    {
+      step: '03',
+      title: 'POP에 넣을 자료 선택',
+      routeLabel: '/store/marketing/pop',
+      description: 'POP 화면에는 선택한 자료가 카드로 표시됩니다. 자료 유형은 세 가지이며, 필요 없는 자료는 제거할 수 있습니다.',
+      items: [
+        { label: '자료', detail: '내 자료함에 저장된 파일·자료(library)입니다.' },
+        { label: '커뮤니티 콘텐츠', detail: '커뮤니티·운영자 콘텐츠 스냅샷을 POP 문구의 바탕으로 사용합니다.' },
+        { label: '직접 작성 콘텐츠', detail: '매장이 직접 작성한 문안을 POP에 사용합니다.' },
+      ],
+    },
+    {
+      step: '04',
+      title: '템플릿과 AI 문구',
+      description: '선택한 템플릿 스타일에 맞춰 AI가 POP 문구(제목·핵심 포인트·짧은 문구·본문)를 만들어 줍니다. AI 문구를 만들지 않으면 자료의 제목·설명을 그대로 사용합니다.',
+      items: [
+        { label: '템플릿 적용', detail: '자료함에서 고른 템플릿(모던 등) 스타일이 POP 레이아웃에 적용됩니다.' },
+        { label: 'AI 문구 생성(선택)', detail: '"AI 문구 만들기"로 초안을 만들고, 내용을 확인·수정한 뒤 사용합니다. 재생성·제거도 가능합니다.' },
+        { label: '초안 확인', detail: 'AI 문구는 초안입니다. 매장 상황에 맞게 확인한 뒤 출력합니다.' },
+      ],
+    },
+    {
+      step: '05',
+      title: 'QR 연결과 레이아웃',
+      routeLabel: '/store/marketing/qr',
+      description: '이미 만든 QR 코드를 POP에 함께 넣어 고객이 스캔하도록 할 수 있습니다(선택). 인쇄 레이아웃은 A4(1장 1개) 또는 A5(1장 2개) 중 선택합니다.',
+      items: [
+        { label: 'QR 연결(선택)', detail: '/store/marketing/qr 에서 만든 QR 코드를 POP에 포함합니다.' },
+        { label: '레이아웃 선택', detail: 'A4(1장에 1개) 또는 A5(1장에 2개)를 고릅니다.' },
+      ],
+    },
+    {
+      step: '06',
+      title: '출력 · 자료함 저장 · 매장 활용',
+      routeLabel: '/store/library/production-materials',
+      description: 'POP PDF를 생성하면 새 탭에서 열리고 내 자료함 → 매장 제작 자료에 저장됩니다. 저장된 POP는 언제든 다시 출력할 수 있습니다. 인쇄해 진열대·상담대·계산대·입구 안내물로 활용합니다.',
+      items: [
+        { label: 'PDF 출력', detail: '"POP PDF 생성"으로 인쇄용 PDF를 만듭니다.' },
+        { label: '자료함에 저장', detail: '생성 결과는 매장 제작 자료에 저장되어 다시 열고 재출력할 수 있습니다.' },
+        { label: '매장 활용', detail: '인쇄해 진열대·상담대·계산대·입구 안내물로 부착·비치합니다.' },
+        { label: '결제·주문과 분리', detail: 'POP는 정보 안내물입니다. 결제·주문과 직접 연결되지 않습니다.' },
+      ],
+    },
+  ],
+  bottomNav: {
+    prev: { label: '← 기능별 이용 방법', to: '/guide/features' },
+    home: { label: '홈으로', to: '/' },
+  },
+};
+
+// ─── /guide/features/production-materials ──────────────────────────────
+// WO-O4O-KPA-STORE-POP-AND-PRODUCTION-MATERIALS-GUIDE-V1:
+//   실제 StoreProductionMaterialsPage 흐름 기준. 결과 저장소(POP/QR/블로그 통합),
+//   원본 보기(derivation), 활용하기(CROSS_CREATE: POP/QR/블로그/사이니지),
+//   새 제작 자료 만들기(콘텐츠·강의 선택 → AI 초안 → 편집 → 저장). 삭제 분기 정확 반영.
+
+export const kpaGuideFeatureProductionMaterialsProps: GuideFeatureManualPageProps = {
+  hero: {
+    eyebrow: '기능별 이용 방법',
+    title: '매장 제작 자료(내 자료함) 이용 방법',
+    description: '직접 만든 POP·QR·블로그 결과물을 한 곳에서 확인하고, 원본을 추적하거나 다시 활용·재제작합니다',
+    primaryAction: { label: '내 자료함으로 이동 →', to: '/store/library/production-materials' },
+    flowBarTitle: '이용 흐름',
+    flowLabels: ['자료함 개요', '결과물 확인', '원본 보기', '활용하기', '새 제작 시작', '반복 활용'],
+  },
+  sections: [
+    {
+      step: '01',
+      title: '내 자료함 개요',
+      description: '매장 제작 자료는 매장이 직접 만든 결과물의 보관함입니다. 단순 파일 목록이 아니라, POP·QR·블로그 결과물을 한 목록에 모아 다시 열어 출력하거나 새 결과물로 이어 만들 수 있습니다.',
+      items: [
+        { label: '결과물 보관함', detail: '매장 실행 자료를 모아두고 다시 쓰는 곳입니다.' },
+        { label: '통합 목록', detail: 'POP·상품 상세 등 제작 자료, QR 코드, 블로그 글이 최근 수정 순으로 함께 표시됩니다.' },
+      ],
+    },
+    {
+      step: '02',
+      title: '결과물 확인',
+      routeLabel: '/store/library/production-materials',
+      description: '목록에서 각 결과물의 유형·용도·상태·생성 출처·수정일을 확인합니다. 파일형 결과(POP PDF 등)는 "출력", QR·블로그는 "열기"로 관리 화면으로 이동합니다.',
+      items: [
+        { label: '유형 구분', detail: '제작 자료 · QR-code · 블로그 배지로 결과물 종류를 구분합니다.' },
+        { label: '용도·상태', detail: '용도(POP/QR/블로그 등)와 상태(초안/완성/보관, 블로그 발행 여부)를 봅니다.' },
+        { label: '출력·열기', detail: '저장된 POP는 "출력"으로 다시 PDF를 열고, QR·블로그는 "열기"로 관리 화면에서 수정합니다.' },
+      ],
+    },
+    {
+      step: '03',
+      title: '원본 보기 — 어디서 만들어졌는지',
+      description: '각 결과물이 어떤 원천(콘텐츠·자료·직접 작성·AI)에서 만들어졌는지 "원본 보기"로 추적합니다. 같은 원본에서 만든 결과물의 연결을 확인할 수 있습니다.',
+      items: [
+        { label: '원본 추적', detail: '"원본 보기"로 결과물의 출처 콘텐츠·자료를 확인합니다.' },
+        { label: 'POP·QR·블로그 공통', detail: '제작 자료뿐 아니라 QR·블로그 결과물도 원본 보기를 제공합니다.' },
+      ],
+    },
+    {
+      step: '04',
+      title: '활용하기 — 이어서 만들기',
+      description: '제작 자료의 "활용하기" 메뉴로 같은 자료를 바탕으로 다른 결과물을 이어 만듭니다. 블로그 · QR · POP · 사이니지로 자료가 연결됩니다.',
+      items: [
+        { label: 'POP 만들기', detail: '자료를 POP 화면으로 보내 인쇄물을 만듭니다(/store/marketing/pop). 이용 방법은 POP 제작 가이드 참고.' },
+        { label: 'QR-code 만들기', detail: 'QR 화면으로 이동해 QR을 만듭니다(/store/marketing/qr).' },
+        { label: '블로그 글쓰기', detail: '자료를 바탕으로 매장 블로그 글을 씁니다(/store/content/blog).' },
+        { label: '사이니지에 추가', detail: '사이니지 플레이리스트에 추가합니다(/store/marketing/signage/playlist).' },
+      ],
+    },
+    {
+      step: '05',
+      title: '새 제작 자료 시작',
+      description: '"새 제작 자료 만들기"로 내 자료함의 콘텐츠나 강의를 골라 AI 초안을 만들고 편집해 저장합니다. 빈 화면이 아니라 원천 자료에서 시작하는 흐름입니다.',
+      items: [
+        { label: '콘텐츠·강의 선택', detail: '"새 제작 자료 만들기"에서 바탕이 될 콘텐츠·강의를 고릅니다.' },
+        { label: 'AI 초안 → 편집', detail: 'AI가 초안을 만들면 편집 화면에서 다듬어 저장합니다.' },
+        { label: '저장 후 목록 표시', detail: '저장한 제작 자료는 목록 상단에 나타나 다시 활용할 수 있습니다.' },
+      ],
+    },
+    {
+      step: '06',
+      title: '반복 활용 · 정리',
+      description: '저장된 결과물을 매장 고객 안내 자료로 반복해서 출력·열람·재사용합니다. 더 이상 쓰지 않는 제작 자료는 정리합니다.',
+      items: [
+        { label: '반복 출력·재사용', detail: '같은 POP·자료를 필요할 때마다 다시 출력해 매장에 활용합니다.' },
+        { label: '선택·정리', detail: '제작 자료 행은 선택해 한 번에 삭제할 수 있습니다. QR은 개별 삭제, 블로그는 블로그 관리 화면에서 정리합니다.' },
+      ],
+    },
+  ],
+  bottomNav: {
+    prev: { label: '← 기능별 이용 방법', to: '/guide/features' },
+    home: { label: '홈으로', to: '/' },
+  },
+};
+
 // ─── /guide/features/lms ──────────────────────────────────────────────
 // WO-O4O-KPA-GUIDE-LMS-MANUAL-REFRESH-V1: 실제 구현 기준 전면 정비
 // - 강의 → 레슨 2단계 구조 (Chapter 제거)
@@ -1380,10 +1573,10 @@ export const kpaGuideForStoreOwnerProps: GuideUsagePageProps = {
       description:
         '직원이 적어도 디지털 도구로 매장 마케팅 자산을 만듭니다. POP 는 AI 보조로 빠르게 초안을 만들 수 있습니다.',
       items: [
-        { label: 'POP 제작', detail: '/store/marketing/pop — AI 보조 초안 + 템플릿' },
-        { label: 'QR 코드', detail: '/store/marketing/qr — 자동 생성 + 배경/테마 + 인쇄' },
-        { label: '디지털 사이니지', detail: '/store/marketing/signage/playlist — 매장 TV 플레이리스트' },
-        { label: '매장 제작 자료', detail: '/store/library/production-materials — 직접 만든 자료 보관' },
+        { label: 'POP 제작', detail: '/store/marketing/pop — 내 자료함 자료 기반 + AI 문구 보조 (이용 방법: /guide/features/pop)' },
+        { label: 'QR 코드', detail: '/store/marketing/qr — 자동 생성 + 배경/테마 + 인쇄 (이용 방법: /guide/features/qr)' },
+        { label: '디지털 사이니지', detail: '/store/marketing/signage/playlist — 매장 TV 플레이리스트 (이용 방법: /guide/features/signage)' },
+        { label: '매장 제작 자료', detail: '/store/library/production-materials — 만든 POP·QR·블로그 보관·재활용 (이용 방법: /guide/features/production-materials)' },
       ],
     },
     {
