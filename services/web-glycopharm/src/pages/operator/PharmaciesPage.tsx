@@ -1,14 +1,13 @@
 /**
  * Operator Pharmacies Page (Pharmacy Network Management)
  *
- * 세미-프랜차이즈 약국 네트워크 관리
- * - 약국 목록 및 상태 관리
- * - 지역별/등급별 필터링
- * - 약국 성과 모니터링
+ * 세미-프랜차이즈 약국 네트워크 관리 (조회 전용)
+ * - 등록 약국 현황 조회 + 지역별/등급별 필터링
  *
- * WO-O4O-GLYCOPHARM-PHARMACIES-PAGE-BATCH-UI-ALIGNMENT-V1:
- *   row action을 커스텀 dropdown → RowActionMenu 표준 패턴으로 교체.
- *   ActionBar는 이미 표준 패턴 적용 완료 — 유지.
+ * WO-O4O-GLYCOPHARM-PHARMACIES-DEAD-SURFACE-CLEANUP-V1:
+ *   backend(GET /operator/pharmacies)가 stub(준비 중)이고 상태변경 API가 없어,
+ *   동작하지 않던 selectable / bulk ActionBar / RowActionMenu(주문내역·성과분석·일시정지·활성화)를
+ *   제거하고 "약국 상태 관리 준비 중" 안내로 정리. 조회/필터/페이지네이션은 유지.
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -26,9 +25,7 @@ import {
   ShoppingCart,
   BarChart3,
   Loader2,
-  BarChart2,
 } from 'lucide-react';
-import { ActionBar, RowActionMenu } from '@o4o/ui';
 import { DataTable } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import {
@@ -79,7 +76,6 @@ export default function PharmaciesPage() {
   const [regionFilter, setRegionFilter] = useState<string>('all');
   const [tierFilter, setTierFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   // API data state
   const [pharmacies, setPharmacies] = useState<OperatorPharmacy[]>([]);
@@ -142,11 +138,6 @@ export default function PharmaciesPage() {
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [activeTab, regionFilter, tierFilter, searchTerm]);
-
-  // Reset selection on filter changes
-  useEffect(() => {
-    setSelectedIds(new Set());
   }, [activeTab, regionFilter, tierFilter, searchTerm]);
 
   // Calculate tab counts from stats
@@ -340,45 +331,20 @@ export default function PharmaciesPage() {
           </div>
         </div>
 
-        {/* Bulk Actions — ActionBar 표준 패턴 (WO-O4O-GLYCOPHARM-PHARMACIES-PAGE-BATCH-UI-ALIGNMENT-V1) */}
-        {selectedIds.size > 0 && (() => {
-          const selectedActiveCount = [...selectedIds].filter(id => {
-            const p = pharmacies.find(ph => ph.id === id);
-            return p?.status === 'active';
-          }).length;
-          const selectedInactiveCount = [...selectedIds].filter(id => {
-            const p = pharmacies.find(ph => ph.id === id);
-            return p?.status !== 'active';
-          }).length;
-          return (
-            <div className="px-4 pt-3">
-              <ActionBar
-                selectedCount={selectedIds.size}
-                onClearSelection={() => setSelectedIds(new Set())}
-                actions={[
-                  ...(selectedActiveCount > 0 ? [{
-                    key: 'suspend',
-                    label: `일시 정지 (${selectedActiveCount})`,
-                    onClick: () => { /* operator pharmacy status API 연결 필요 */ },
-                    variant: 'warning' as const,
-                    icon: <Clock size={14} />,
-                    group: 'actions' as const,
-                    visible: true,
-                  }] : []),
-                  ...(selectedInactiveCount > 0 ? [{
-                    key: 'activate',
-                    label: `활성화 (${selectedInactiveCount})`,
-                    onClick: () => { /* operator pharmacy status API 연결 필요 */ },
-                    variant: 'primary' as const,
-                    icon: <CheckCircle size={14} />,
-                    group: 'actions' as const,
-                    visible: true,
-                  }] : []),
-                ]}
-              />
+        {/* WO-O4O-GLYCOPHARM-PHARMACIES-DEAD-SURFACE-CLEANUP-V1:
+            약국 관리 backend(GET /operator/pharmacies)는 현재 stub(준비 중)이며 상태변경 API가 없다.
+            동작하지 않던 dead selectable / bulk / row action 을 제거하고 조회 전용 안내로 정리. */}
+        <div className="px-4 pt-3">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="text-sm font-medium text-blue-800">약국 상태 관리 기능 준비 중</p>
+              <p className="text-xs text-blue-600 mt-0.5">
+                현재 화면에서는 등록 약국 현황을 조회하는 용도로만 제공됩니다. 일시정지 · 활성화 · 주문 내역 · 성과 분석 작업은 후속 약국 관리 API 연동 후 제공됩니다.
+              </p>
             </div>
-          );
-        })()}
+          </div>
+        </div>
 
         {/* Table */}
         {(() => {
@@ -450,46 +416,6 @@ export default function PharmaciesPage() {
                 </div>
               ),
             },
-            {
-              key: 'actions',
-              header: '액션',
-              system: true,
-              width: '60px',
-              align: 'right',
-              onCellClick: () => {},
-              render: (_v, p) => (
-                <RowActionMenu
-                  actions={[
-                    {
-                      key: 'orders',
-                      label: '주문 내역',
-                      icon: <ShoppingCart size={14} />,
-                      onClick: () => { /* 주문 내역 상세 진입 */ },
-                    },
-                    {
-                      key: 'analytics',
-                      label: '성과 분석',
-                      icon: <BarChart2 size={14} />,
-                      onClick: () => { /* 성과 분석 진입 */ },
-                      divider: true,
-                    },
-                    ...(p.status === 'active' ? [{
-                      key: 'suspend',
-                      label: '일시 정지',
-                      icon: <Clock size={14} />,
-                      variant: 'warning' as const,
-                      onClick: () => { /* operator pharmacy status API 연결 필요 */ },
-                    }] : [{
-                      key: 'activate',
-                      label: '활성화',
-                      icon: <CheckCircle size={14} />,
-                      variant: 'primary' as const,
-                      onClick: () => { /* operator pharmacy status API 연결 필요 */ },
-                    }]),
-                  ]}
-                />
-              ),
-            },
           ];
 
           const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -502,9 +428,6 @@ export default function PharmaciesPage() {
                 rowKey="id"
                 loading={isLoading}
                 emptyMessage="자료가 없습니다"
-                selectable
-                selectedKeys={selectedIds}
-                onSelectionChange={setSelectedIds}
               />
               {totalPages > 1 && (
                 <div className="flex items-center justify-between px-4 py-3 border-t border-slate-200">

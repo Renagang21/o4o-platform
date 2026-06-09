@@ -115,7 +115,7 @@ const homeProps: GuideFeaturesPageProps = {
       title: '판매자 / 매장 이용 안내',
       primaryRoute: '/guide/for-seller',
       description:
-        '매장이 O4O를 실제 매장에서 활용하는 흐름입니다. 매장 HUB 확인 · 내 매장 설정 · 콘텐츠/QR/사이니지 활용 · 운영자 승인 상품 확인 · 이벤트 오퍼 참여 · 주문/배송 확인을 안내합니다.',
+        '매장이 O4O를 실제 매장에서 활용하는 흐름입니다. Neture에서는 상품 확인 · 장바구니 · 주문 · 배송 확인과 매장 HUB 자료 수신, O4O 참여 QR 생성을 중심으로 안내합니다. POP · 블로그 · 사이니지 제작 등 매장 제작 도구는 서비스별 제공 범위가 다릅니다.',
       items: [
         { label: '내 매장 활용 가이드', route: '/guide/for-seller' },
         { label: '매장 HUB', route: '/workspace/hub' },
