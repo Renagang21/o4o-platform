@@ -233,6 +233,17 @@ export interface GuideFeaturesPageProps {
     flowBarTitle: string;
     flowLabels: string[];
   };
+  /**
+   * 선택적 카드 목차. 지정 시 Hero 아래·그룹 섹션 위에 클릭형 카드 그리드를 렌더한다.
+   * Guide Home 에서 "사업자 유형별 안내" 같은 진입 카드를 노출하는 용도.
+   * 미지정 시 기존 레이아웃 그대로 — 모든 기존 소비처(KPA/GP/KCos)는 무영향.
+   * WO-O4O-NETURE-GUIDE-BUSINESS-OPERATOR-CARDS-V1.
+   */
+  index?: {
+    title?: string;
+    lead?: string[];
+    cards: GuideManualIndexCard[];
+  };
   groups: GuideFeatureGroup[];
   bottomNav: {
     prev: GuideNavLink;     // '← 서비스 활용 방법'

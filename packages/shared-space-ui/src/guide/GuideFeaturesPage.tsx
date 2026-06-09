@@ -7,9 +7,9 @@
 import { Link } from 'react-router-dom';
 import { PageSection, PageContainer } from '@o4o/ui';
 import type { GuideFeaturesPageProps } from './types.js';
-import { heroStyles, sectionStyles, cardStyles, bottomNavStyles } from './styles.js';
+import { heroStyles, sectionStyles, cardStyles, bottomNavStyles, indexStyles } from './styles.js';
 
-export function GuideFeaturesPage({ hero, groups, bottomNav, renderText }: GuideFeaturesPageProps) {
+export function GuideFeaturesPage({ hero, index, groups, bottomNav, renderText }: GuideFeaturesPageProps) {
   return (
     <div>
       {/* Hero */}
@@ -31,6 +31,38 @@ export function GuideFeaturesPage({ hero, groups, bottomNav, renderText }: Guide
           </div>
         </div>
       </div>
+
+      {/* Card index (선택적 카드 목차 — 사업자 유형 등) */}
+      {index && index.cards.length > 0 && (
+        <PageSection>
+          <PageContainer>
+            <div style={indexStyles.wrap}>
+              {index.title && <h2 style={indexStyles.title}>{index.title}</h2>}
+              {index.lead && index.lead.length > 0 && (
+                <ul style={indexStyles.leadList}>
+                  {index.lead.map((line) => (
+                    <li key={line} style={indexStyles.leadItem}>
+                      <span style={indexStyles.leadDot} />
+                      <span>{line}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <div style={cardStyles.gridLg}>
+                {index.cards.map((card) => (
+                  <a key={card.to} href={card.to} style={indexStyles.card}>
+                    <div style={indexStyles.cardHead}>
+                      <span style={indexStyles.cardTitle}>{card.title}</span>
+                      {card.audience && <span style={indexStyles.audienceTag}>{card.audience}</span>}
+                    </div>
+                    <p style={indexStyles.cardSummary}>{card.summary}</p>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </PageContainer>
+        </PageSection>
+      )}
 
       {/* Group Sections */}
       {groups.map((group, idx) => (

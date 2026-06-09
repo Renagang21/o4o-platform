@@ -43,6 +43,28 @@ const homeProps: GuideFeaturesPageProps = {
     flowBarTitle: '안내 영역',
     flowLabels: ['O4O 이해', '서비스 운영자', '기능 설명', '사업 안내', '공급자', '판매자/매장', '파트너'],
   },
+  // WO-O4O-NETURE-GUIDE-BUSINESS-OPERATOR-CARDS-V1:
+  //   "내가 어떤 사업자로 O4O를 활용할 수 있는가"를 첫 화면에서 바로 찾도록 사업자 유형 카드를
+  //   Hero 바로 아래에 노출. 각 카드는 기존 Business/운영자/판매자 Guide 로만 연결(데드링크 0).
+  //   미구현(KCos commerce) 완료 표현·의료행위 표현 회피. 문의는 /contact (o4o/apply 미사용).
+  index: {
+    title: '어떤 사업자가 O4O로 사업을 운영할 수 있나요?',
+    lead: [
+      'O4O는 기능 모음이 아니라, 좋은 제품이 실제 매장에서 움직이도록 만드는 사업 구조입니다.',
+      '먼저 내 유형을 찾고 어떤 사업을 만들 수 있는지 확인한 뒤, 아래 운영자 · 기능 · 사업 안내로 이동하세요.',
+    ],
+    cards: [
+      { title: '약국 협동조합', audience: '약국 네트워크', summary: '여러 약국이 함께 쓸 상품 · 콘텐츠 · 안내 자료를 운영하고, 약국별 QR · POP · 블로그 · 사이니지로 고객 안내를 통일합니다.', to: '/guide/business/pharmacy-network' },
+      { title: '관광지 약국', audience: '약국 네트워크', summary: '관광객이 필요한 일반 제품과 사용 정보를 쉽게 이해하도록 다국어 안내 · QR · 타블렛으로 매장 접점을 만듭니다.', to: '/guide/business/pharmacy-network' },
+      { title: '관광지 화장품 매장', audience: '판매자 · 매장', summary: '관광객에게 상품 설명 · 성분 · 사용법 · 체험 안내를 제공하고 QR · POP · 블로그 · 사이니지로 매장 접점을 강화합니다.', to: '/guide/for-seller' },
+      { title: '오프라인 거래선 유통업체', audience: '공급자 네트워크', summary: '기존 거래처 매장에 상품 정보 · 콘텐츠 · 주문 흐름을 제공해, 단순 납품을 넘어 매장 운영을 지원하는 사업자가 됩니다.', to: '/guide/business/supplier-network' },
+      { title: '의료기관 · 약국 공간/TV 마케팅 업체', audience: '콘텐츠 네트워크', summary: '약국 · 건강관리 공간의 TV · 타블렛 · POP를 정보 제공 · 제품 안내 · 판매 환경으로 전환합니다(활용 범위는 계약 · 법규에 따릅니다).', to: '/guide/business/content-network' },
+      { title: '전문약사 그룹', audience: '콘텐츠 네트워크', summary: '전문 분야 건강정보 · 제품 설명 · 상담 보조 자료를 만들어 약국 네트워크에 제공합니다(상담 보조 · 정보 제공 중심).', to: '/guide/business/content-network' },
+      { title: '지역 네트워크 운영자', audience: '서비스 운영자', summary: '지역 상권 · 약국 · 매장 · 공급자 · 콘텐츠를 묶어 지역 특화 상품 · 안내 · 공동 홍보를 운영합니다.', to: '/guide/for-operator' },
+      { title: '콘텐츠 기반 사업자', audience: '콘텐츠 네트워크', summary: '건강정보 · 제품정보 · 교육 · 매장 안내 콘텐츠를 매장 실행 자료로 전환해 공급자 · 운영자 · 매장이 활용하게 합니다.', to: '/guide/business/content-network' },
+      { title: '내 사업에 맞는 활용 상담', audience: '문의', summary: '내 사업에 O4O를 어떻게 적용할 수 있을지 궁금하면 문의해 주세요.', to: '/contact' },
+    ],
+  },
   groups: [
     {
       step: '01',
