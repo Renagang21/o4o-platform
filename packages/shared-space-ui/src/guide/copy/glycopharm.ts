@@ -482,7 +482,7 @@ export const glycopharmGuideFeaturesProps: GuideFeaturesPageProps = {
     title: '기능별 이용 방법',
     description: 'GlycoPharm 주요 기능을 카테고리별로 정리했습니다. 필요한 기능을 선택해 바로 이동합니다.',
     flowBarTitle: '기능 카테고리',
-    flowLabels: ['커뮤니티', '콘텐츠', '자료실', '매장 운영', '사이니지', 'QR · Tablet'],
+    flowLabels: ['커뮤니티', '콘텐츠', '자료실', '매장 운영', '사이니지', 'QR · Tablet', 'POP', '블로그', '제작 자료'],
   },
   groups: [
     {
@@ -551,6 +551,41 @@ export const glycopharmGuideFeaturesProps: GuideFeaturesPageProps = {
         { label: '마케팅 분석', route: '/store/analytics/marketing' },
       ],
       linkTo: '/store/marketing/qr',
+    },
+    {
+      step: '07',
+      title: 'POP 제작',
+      primaryRoute: '/store/marketing/pop',
+      description: '내 자료함의 자료를 바탕으로 약국 안내 POP를 만들어 진열대·상담대·창구에 활용합니다.',
+      items: [
+        { label: 'POP 제작 이용 방법', route: '/guide/features/pop' },
+        { label: 'POP 제작', route: '/store/marketing/pop' },
+        { label: '매장 블로그 이용 방법', route: '/guide/features/blog' },
+      ],
+      linkTo: '/guide/features/pop',
+    },
+    {
+      step: '08',
+      title: '매장 블로그',
+      primaryRoute: '/store/content/blog',
+      description: '건강정보·고객 안내 글을 작성·발행하고 QR·POP·사이니지와 연결해 매장 안내에 활용합니다.',
+      items: [
+        { label: '매장 블로그 이용 방법', route: '/guide/features/blog' },
+        { label: '블로그 관리', route: '/store/content/blog' },
+        { label: 'POP 제작 이용 방법', route: '/guide/features/pop' },
+      ],
+      linkTo: '/guide/features/blog',
+    },
+    {
+      step: '09',
+      title: '제작 자료',
+      primaryRoute: '/store/library/production-materials',
+      description: '만든 POP·QR·블로그 등 매장 실행 자산을 한 곳에서 확인하고 POP는 원본을 추적합니다.',
+      items: [
+        { label: '제작 자료 이용 방법', route: '/guide/features/production-materials' },
+        { label: '제작 자료 열기', route: '/store/library/production-materials' },
+      ],
+      linkTo: '/guide/features/production-materials',
     },
   ],
   bottomNav: {
@@ -848,6 +883,231 @@ export const glycopharmGuideFeatureForumProps: GuideFeatureManualPageProps = {
         { label: '사례 확인', detail: '동일 상황의 사례를 검색해 적용 방향을 정합니다.' },
         { label: '매장 운영 참고', detail: '진열·상담·판매에 적용할 노하우를 모읍니다.' },
         { label: '커뮤니티 정보 축적', detail: '경험과 답변이 매장 운영 자산으로 누적됩니다.' },
+      ],
+    },
+  ],
+  bottomNav: {
+    prev: { label: '← 기능별 이용 방법', to: '/guide/features' },
+    home: { label: '홈으로', to: '/' },
+  },
+};
+
+// ─── /guide/features/pop ───────────────────────────────────────────────
+// WO-O4O-GP-KCOS-STORE-PRODUCTION-GUIDE-PORT-V1: KPA 구조 이식(GlycoPharm 톤).
+//   실제 StorePopPage 기준. 건강정보·고객 안내 톤, 진단·치료 표현 회피.
+
+export const glycopharmGuideFeaturePopProps: GuideFeatureManualPageProps = {
+  hero: {
+    eyebrow: '기능별 이용 방법',
+    title: 'POP 제작 이용 방법',
+    description: '내 자료함의 자료를 바탕으로 약국 안내 POP를 만들어 진열대·상담대·창구 안내에 활용합니다',
+    primaryAction: { label: 'POP 제작으로 이동 →', to: '/store/marketing/pop' },
+    flowBarTitle: '이용 흐름',
+    flowLabels: ['제작 개요', '자료 선택', '템플릿·AI 문구', 'QR·레이아웃', '출력·저장'],
+  },
+  index: {
+    title: '함께 보면 좋은 가이드',
+    cards: [
+      { title: '매장 블로그 이용 방법', audience: '연결', summary: '건강정보·안내 글을 QR·POP로 이어 활용합니다.', to: '/guide/features/blog' },
+      { title: '제작 자료 이용 방법', audience: '보관', summary: '만든 POP를 내 자료함에서 다시 확인합니다.', to: '/guide/features/production-materials' },
+      { title: '디지털 사이니지 이용 방법', audience: '노출', summary: '같은 안내를 매장 화면으로 보여줍니다.', to: '/guide/features/signage' },
+    ],
+  },
+  sections: [
+    {
+      step: '01',
+      title: 'POP 제작 개요',
+      description: 'POP는 빈 화면이 아니라 내 자료함의 자료(상품·건강정보·안내 콘텐츠)를 바탕으로 만듭니다. 만든 POP는 제작 자료에 저장되어 다시 출력할 수 있습니다.',
+      items: [
+        { label: '자료 기반 제작', detail: '내 자료함의 자료·콘텐츠를 골라 POP로 구성합니다.' },
+        { label: 'AI 문구 보조', detail: '선택한 자료를 바탕으로 안내 문구 초안을 AI가 만들어 줍니다(선택).' },
+        { label: '결과 저장', detail: '생성한 POP는 제작 자료에 저장되어 다시 출력할 수 있습니다.' },
+      ],
+    },
+    {
+      step: '02',
+      title: '자료 선택',
+      routeLabel: '/store/library/contents',
+      description: '내 자료함 → 콘텐츠에서 POP에 담을 자료를 고른 뒤 POP 제작을 시작합니다. 자료가 없으면 먼저 자료함에 자료를 준비합니다.',
+      items: [
+        { label: '내 자료함 → 콘텐츠', detail: 'POP에 사용할 자료를 자료함에서 선택합니다.' },
+        { label: '선택 자료 확인', detail: 'POP 화면에서 담긴 자료를 확인하고 필요 없는 자료는 제거합니다.' },
+      ],
+    },
+    {
+      step: '03',
+      title: '템플릿과 AI 문구',
+      description: '템플릿 스타일에 맞춰 AI가 안내 문구 초안을 만들어 줍니다. AI 문구를 만들지 않으면 자료의 제목·설명을 그대로 사용합니다. 고객 안내·건강정보 제공 수준으로 작성하고 진단·치료로 읽히는 표현은 피합니다.',
+      items: [
+        { label: '템플릿 적용', detail: '고른 템플릿 스타일이 POP 레이아웃에 적용됩니다.' },
+        { label: 'AI 문구 생성(선택)', detail: '초안을 만든 뒤 내용을 확인·수정해 사용합니다.' },
+        { label: '안내 톤 유지', detail: '고객 안내·건강정보 수준으로 작성하고 의료행위 표현은 피합니다.' },
+      ],
+    },
+    {
+      step: '04',
+      title: 'QR 연결과 레이아웃',
+      routeLabel: '/store/marketing/qr',
+      description: '이미 만든 QR 코드를 POP에 함께 넣을 수 있습니다(선택). 인쇄 레이아웃은 A4(1장 1개) 또는 A5(1장 2개)에서 고릅니다.',
+      items: [
+        { label: 'QR 연결(선택)', detail: '/store/marketing/qr 에서 만든 QR을 POP에 포함합니다.' },
+        { label: '레이아웃 선택', detail: 'A4 또는 A5를 고릅니다.' },
+      ],
+    },
+    {
+      step: '05',
+      title: '출력 · 저장 · 활용',
+      routeLabel: '/store/library/production-materials',
+      description: 'POP PDF를 생성하면 새 탭에서 열리고 제작 자료에 저장됩니다. 인쇄해 진열대·상담대·창구 안내물로 활용합니다.',
+      items: [
+        { label: 'PDF 출력', detail: '인쇄용 PDF를 만듭니다.' },
+        { label: '제작 자료 저장', detail: '결과는 제작 자료에 저장되어 다시 출력할 수 있습니다.' },
+        { label: '결제·주문과 분리', detail: 'POP는 안내물입니다. 결제·주문과 직접 연결되지 않습니다.' },
+      ],
+    },
+  ],
+  bottomNav: {
+    prev: { label: '← 기능별 이용 방법', to: '/guide/features' },
+    home: { label: '홈으로', to: '/' },
+  },
+};
+
+// ─── /guide/features/blog ──────────────────────────────────────────────
+
+export const glycopharmGuideFeatureBlogProps: GuideFeatureManualPageProps = {
+  hero: {
+    eyebrow: '기능별 이용 방법',
+    title: '매장 블로그 이용 방법',
+    description: '건강정보·고객 안내 글을 작성해 발행하고, QR·POP·사이니지와 연결해 약국 고객 안내와 전문성에 활용합니다',
+    primaryAction: { label: '블로그 관리로 이동 →', to: '/store/content/blog' },
+    flowBarTitle: '이용 흐름',
+    flowLabels: ['블로그 관리', '글 작성', 'AI 보조', '발행·공개', '연결 활용'],
+  },
+  index: {
+    title: '함께 보면 좋은 가이드',
+    cards: [
+      { title: 'POP 제작 이용 방법', audience: '연결', summary: '블로그·QR을 담은 POP를 인쇄해 매장에 부착합니다.', to: '/guide/features/pop' },
+      { title: '제작 자료 이용 방법', audience: '보관', summary: '작성한 블로그를 내 자료함에서 다시 확인합니다.', to: '/guide/features/production-materials' },
+      { title: '디지털 사이니지 이용 방법', audience: '노출', summary: '같은 안내를 매장 화면으로 보여줍니다.', to: '/guide/features/signage' },
+    ],
+  },
+  sections: [
+    {
+      step: '01',
+      title: '블로그 관리 화면',
+      routeLabel: '/store/content/blog',
+      description: '블로그 관리 화면에서 게시글을 상태별(임시저장·발행됨·보관)로 보고, "블로그 글 만들기"로 새 글을 작성하거나 "블로그 설정"으로 블로그 정보를 관리합니다.',
+      items: [
+        { label: '상태별 목록', detail: '전체·임시저장·발행됨·보관 필터로 게시글을 관리합니다.' },
+        { label: '블로그 글 만들기', detail: '새 게시글 작성 화면을 엽니다.' },
+        { label: '블로그 설정', detail: '블로그 이름·소개·대표 이미지·기본 템플릿을 설정합니다.' },
+      ],
+    },
+    {
+      step: '02',
+      title: '글 작성',
+      routeLabel: '/store/content/blog',
+      description: '제목과 본문을 작성합니다. 본문은 서식·이미지를 넣을 수 있는 편집기로 작성하며, 슬러그(URL)와 요약은 선택 입력입니다. 건강정보·고객 안내 글로 작성하고, 진단·치료·복약 지시처럼 읽히는 표현은 피합니다.',
+      items: [
+        { label: '제목·본문', detail: '제목과 본문(서식·이미지 지원)을 작성합니다. 슬러그·요약은 선택입니다.' },
+        { label: '안내 톤 유지', detail: '고객 안내·건강정보 제공 수준으로 작성합니다.' },
+      ],
+    },
+    {
+      step: '03',
+      title: 'AI 콘텐츠 보조 (선택)',
+      description: '"AI로 정리하기"는 URL이나 자료를 정리해 초안을 다듬어 주는 보조 도구입니다. 자동으로 글을 만들어 게시하지 않으며, 최종 글은 직접 작성·검토합니다.',
+      items: [
+        { label: '정리·다듬기 보조', detail: 'URL·자료를 정리해 초안 문장을 다듬습니다. 자동 생성기가 아닙니다.' },
+        { label: '직접 검토 후 저장', detail: 'AI 결과는 초안입니다. 본문을 확인·수정한 뒤 저장합니다. 자동 발행은 하지 않습니다.' },
+      ],
+    },
+    {
+      step: '04',
+      title: '임시 저장 · 발행 · 공개',
+      routeLabel: '/store/:slug/blog',
+      description: '저장하면 임시저장(초안) 상태가 됩니다. 목록에서 "발행"하면 공개되고, 발행 글은 공개 URL로 고객이 직접 볼 수 있습니다. URL 복사·미리보기로 확인하고, 노출을 멈출 글은 "보관"합니다.',
+      items: [
+        { label: '임시 저장 → 발행', detail: '작성한 글은 임시저장 후 목록에서 발행합니다.' },
+        { label: '공개 URL', detail: '발행 글은 /store/:slug/blog/:postSlug 로 공개됩니다. URL 복사·미리보기를 제공합니다.' },
+        { label: '보관', detail: '노출을 멈출 글은 보관 처리합니다.' },
+      ],
+    },
+    {
+      step: '05',
+      title: 'QR · POP · 사이니지로 연결',
+      routeLabel: '/store/marketing/qr',
+      description: '발행한 블로그의 공개 URL을 QR 코드의 "외부 링크" 대상으로 지정하면 고객이 QR을 스캔해 블로그로 들어옵니다. 그 QR을 POP에 담아 인쇄·부착하고, 같은 내용을 사이니지에서 보여줄 수 있습니다.',
+      items: [
+        { label: 'QR 외부 링크 연결', detail: '/store/marketing/qr 에서 "외부 링크"로 블로그 공개 URL을 지정합니다.' },
+        { label: 'POP에 담기', detail: '/store/marketing/pop 에서 QR을 포함한 POP를 만들어 매장에 부착합니다.' },
+        { label: '사이니지 노출', detail: '같은 내용을 매장 화면에서 고객에게 보여줍니다.' },
+      ],
+    },
+  ],
+  bottomNav: {
+    prev: { label: '← 기능별 이용 방법', to: '/guide/features' },
+    home: { label: '홈으로', to: '/' },
+  },
+};
+
+// ─── /guide/features/production-materials ──────────────────────────────
+// 실제 StoreProductionMaterialsPage(Phase 2-D) 기준: generated 결과물 읽기 목록 +
+// POP 원본 보기. 활용하기·새 제작 버튼·일괄삭제 없음(삭제 준비 중). 과장 금지.
+
+export const glycopharmGuideFeatureProductionMaterialsProps: GuideFeatureManualPageProps = {
+  hero: {
+    eyebrow: '기능별 이용 방법',
+    title: '제작 자료(내 자료함) 이용 방법',
+    description: '만든 POP·QR·블로그·상품 상세 등 매장 실행 자산을 한 곳에서 확인하고, POP는 어떤 자료에서 만들었는지 원본을 추적합니다',
+    primaryAction: { label: '제작 자료로 이동 →', to: '/store/library/production-materials' },
+    flowBarTitle: '이용 흐름',
+    flowLabels: ['자료함 개요', '결과물 확인', '원본 보기', '새 제작 시작'],
+  },
+  index: {
+    title: '함께 보면 좋은 가이드',
+    cards: [
+      { title: 'POP 제작 이용 방법', audience: '제작', summary: '자료를 POP 인쇄물로 만듭니다.', to: '/guide/features/pop' },
+      { title: '매장 블로그 이용 방법', audience: '제작', summary: '건강정보·안내 글을 작성합니다.', to: '/guide/features/blog' },
+      { title: '디지털 사이니지 이용 방법', audience: '노출', summary: '자료·콘텐츠를 매장 화면에 올립니다.', to: '/guide/features/signage' },
+    ],
+  },
+  sections: [
+    {
+      step: '01',
+      title: '제작 자료 개요',
+      description: '제작 자료는 매장이 만든 결과물(POP·QR·블로그·상품 상세 등)을 모아 보는 목록입니다. 만든 자산을 한 곳에서 확인하는 보관·확인 중심 화면입니다.',
+      items: [
+        { label: '결과물 모아 보기', detail: '매장 실행 자산을 한 목록에서 확인합니다.' },
+        { label: '용도 구분', detail: 'POP·QR·사이니지·배너·공지 등 용도와 자료 유형(파일·콘텐츠·외부 링크)을 배지로 구분합니다.' },
+      ],
+    },
+    {
+      step: '02',
+      title: '결과물 확인',
+      routeLabel: '/store/library/production-materials',
+      description: '목록에서 각 결과물의 제목·유형·용도·수정일을 확인합니다. 새로고침으로 최신 목록을 다시 불러옵니다.',
+      items: [
+        { label: '유형·용도 배지', detail: '자료 유형과 용도를 배지로 표시합니다.' },
+        { label: '최근 수정일', detail: '결과물이 마지막으로 갱신된 날짜를 봅니다.' },
+      ],
+    },
+    {
+      step: '03',
+      title: '원본 보기',
+      description: 'POP 결과물은 "원본 보기"로 어떤 자료에서 만들어졌는지 추적할 수 있습니다.',
+      items: [
+        { label: 'POP 원본 추적', detail: 'POP 결과물의 출처 자료를 확인합니다.' },
+      ],
+    },
+    {
+      step: '04',
+      title: '새 제작은 자료함 콘텐츠에서 시작',
+      routeLabel: '/store/library/contents',
+      description: '새 제작 자료는 이 화면이 아니라 내 자료함 → 콘텐츠에서 자료를 고른 뒤 POP·블로그 등으로 시작합니다. 이 화면은 만든 결과물을 보관·확인하는 곳입니다. 목록의 일부 관리 기능(삭제 등)은 준비 중입니다.',
+      items: [
+        { label: '콘텐츠에서 시작', detail: '내 자료함 → 콘텐츠에서 자료를 골라 제작을 시작합니다.' },
+        { label: '보관·확인 중심', detail: '이 화면은 결과물 보관·확인 용도입니다. 일부 관리 기능은 준비 중입니다.' },
       ],
     },
   ],

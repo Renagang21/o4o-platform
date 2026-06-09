@@ -226,6 +226,9 @@ import {
   kCosmeticsGuideFeatureContentProps,
   kCosmeticsGuideFeatureResourcesProps,
   kCosmeticsGuideFeatureSignageProps,
+  kCosmeticsGuideFeaturePopProps,
+  kCosmeticsGuideFeatureBlogProps,
+  kCosmeticsGuideFeatureProductionMaterialsProps,
 } from '@o4o/shared-space-ui';
 
 // WO-O4O-FORUM-OPERATOR-UNIFICATION-V1
@@ -570,6 +573,9 @@ function AppRoutes() {
         <Route path="guide/features/content" element={<GuideFeatureManualPage {...kCosmeticsGuideFeatureContentProps} />} />
         <Route path="guide/features/resources" element={<GuideFeatureManualPage {...kCosmeticsGuideFeatureResourcesProps} />} />
         <Route path="guide/features/signage" element={<GuideFeatureManualPage {...kCosmeticsGuideFeatureSignageProps} />} />
+        <Route path="guide/features/pop" element={<GuideFeatureManualPage {...kCosmeticsGuideFeaturePopProps} />} />
+        <Route path="guide/features/blog" element={<GuideFeatureManualPage {...kCosmeticsGuideFeatureBlogProps} />} />
+        <Route path="guide/features/production-materials" element={<GuideFeatureManualPage {...kCosmeticsGuideFeatureProductionMaterialsProps} />} />
       </Route>
 
       {/* Admin Dashboard (WO-K-COSMETICS-ADMIN-AREA-V1: 구조 관리 영역 신설) */}

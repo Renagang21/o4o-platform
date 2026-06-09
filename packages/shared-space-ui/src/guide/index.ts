@@ -75,6 +75,9 @@ export {
   glycopharmGuideFeatureResourcesProps,
   glycopharmGuideFeatureContentProps,
   glycopharmGuideFeatureSignageProps,
+  glycopharmGuideFeaturePopProps,
+  glycopharmGuideFeatureBlogProps,
+  glycopharmGuideFeatureProductionMaterialsProps,
 } from './copy/glycopharm.js';
 
 // WO-O4O-NETURE-GUIDE-IA-AND-WRAPPER-PAGES-V1
@@ -135,4 +138,7 @@ export {
   kCosmeticsGuideFeatureContentProps,
   kCosmeticsGuideFeatureResourcesProps,
   kCosmeticsGuideFeatureSignageProps,
+  kCosmeticsGuideFeaturePopProps,
+  kCosmeticsGuideFeatureBlogProps,
+  kCosmeticsGuideFeatureProductionMaterialsProps,
 } from './copy/k-cosmetics.js';

@@ -198,6 +198,9 @@ import {
   glycopharmGuideFeatureResourcesProps,
   glycopharmGuideFeatureContentProps,
   glycopharmGuideFeatureSignageProps,
+  glycopharmGuideFeaturePopProps,
+  glycopharmGuideFeatureBlogProps,
+  glycopharmGuideFeatureProductionMaterialsProps,
 } from '@o4o/shared-space-ui';
 
 // Store Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
@@ -611,6 +614,9 @@ function AppRoutes() {
         <Route path="guide/features/resources" element={<GuideFeatureManualPage {...glycopharmGuideFeatureResourcesProps} />} />
         <Route path="guide/features/content" element={<GuideFeatureManualPage {...glycopharmGuideFeatureContentProps} />} />
         <Route path="guide/features/signage" element={<GuideFeatureManualPage {...glycopharmGuideFeatureSignageProps} />} />
+        <Route path="guide/features/pop" element={<GuideFeatureManualPage {...glycopharmGuideFeaturePopProps} />} />
+        <Route path="guide/features/blog" element={<GuideFeatureManualPage {...glycopharmGuideFeatureBlogProps} />} />
+        <Route path="guide/features/production-materials" element={<GuideFeatureManualPage {...glycopharmGuideFeatureProductionMaterialsProps} />} />
 
         <Route path="apply" element={<PharmacyApplyPage />} />
         <Route path="apply/pharmacist" element={<PharmacistApplyPage />} />
