@@ -149,6 +149,7 @@ const GuideFeatureSignagePage = lazy(() => import('./pages/guide/GuideFeatureSig
 const GuideFeatureQrTabletPage = lazy(() => import('./pages/guide/GuideFeatureQrTabletPage').then(m => ({ default: m.GuideFeatureQrTabletPage })));
 const GuideFeaturePopPage = lazy(() => import('./pages/guide/GuideFeaturePopPage').then(m => ({ default: m.GuideFeaturePopPage })));
 const GuideFeatureProductionMaterialsPage = lazy(() => import('./pages/guide/GuideFeatureProductionMaterialsPage').then(m => ({ default: m.GuideFeatureProductionMaterialsPage })));
+const GuideFeatureBlogPage = lazy(() => import('./pages/guide/GuideFeatureBlogPage').then(m => ({ default: m.GuideFeatureBlogPage })));
 const GuideFeatureStorePage = lazy(() => import('./pages/guide/GuideFeatureStorePage').then(m => ({ default: m.GuideFeatureStorePage })));
 const GuideFeatureLmsPage = lazy(() => import('./pages/guide/GuideFeatureLmsPage').then(m => ({ default: m.GuideFeatureLmsPage })));
 // WO-O4O-KPA-GUIDE-SURVEY-MANUAL-NEW-V1
@@ -613,6 +614,7 @@ function App() {
           <Route path="/guide/features/qr" element={<Layout serviceName={SERVICE_NAME}><GuideFeatureQrTabletPage /></Layout>} />
           <Route path="/guide/features/pop" element={<Layout serviceName={SERVICE_NAME}><GuideFeaturePopPage /></Layout>} />
           <Route path="/guide/features/production-materials" element={<Layout serviceName={SERVICE_NAME}><GuideFeatureProductionMaterialsPage /></Layout>} />
+          <Route path="/guide/features/blog" element={<Layout serviceName={SERVICE_NAME}><GuideFeatureBlogPage /></Layout>} />
           <Route path="/guide/features/store" element={<Layout serviceName={SERVICE_NAME}><GuideFeatureStorePage /></Layout>} />
           <Route path="/guide/features/lms" element={<Layout serviceName={SERVICE_NAME}><GuideFeatureLmsPage /></Layout>} />
           {/* WO-O4O-KPA-GUIDE-SURVEY-MANUAL-NEW-V1 */}

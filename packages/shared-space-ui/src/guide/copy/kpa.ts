@@ -507,7 +507,7 @@ export const kpaGuideFeaturesProps: GuideFeaturesPageProps = {
     title: '기능별 이용 방법',
     description: 'KPA-Society 주요 기능을 카테고리별로 정리했습니다. 필요한 기능을 선택해 바로 이동합니다.',
     flowBarTitle: '기능 카테고리',
-    flowLabels: ['커뮤니티', '강의', '콘텐츠', '자료실', '설문조사', '매장 운영', '사이니지', 'QR · Tablet', 'POP', '제작 자료'],
+    flowLabels: ['커뮤니티', '강의', '콘텐츠', '자료실', '설문조사', '매장 운영', '사이니지', 'QR · Tablet', 'POP', '제작 자료', '블로그'],
   },
   groups: [
     {
@@ -613,6 +613,7 @@ export const kpaGuideFeaturesProps: GuideFeaturesPageProps = {
       items: [
         { label: 'POP 제작 이용 방법', route: '/guide/features/pop' },
         { label: 'POP 제작', route: '/store/marketing/pop' },
+        { label: '매장 블로그 이용 방법', route: '/guide/features/blog' },
         { label: '내 자료함(제작 자료)', route: '/guide/features/production-materials' },
       ],
       linkTo: '/guide/features/pop',
@@ -626,8 +627,22 @@ export const kpaGuideFeaturesProps: GuideFeaturesPageProps = {
         { label: '매장 제작 자료 이용 방법', route: '/guide/features/production-materials' },
         { label: '내 자료함 열기', route: '/store/library/production-materials' },
         { label: 'POP 제작 이용 방법', route: '/guide/features/pop' },
+        { label: '매장 블로그 이용 방법', route: '/guide/features/blog' },
       ],
       linkTo: '/guide/features/production-materials',
+    },
+    {
+      step: '11',
+      title: '매장 블로그',
+      primaryRoute: '/store/content/blog',
+      description: '제품 안내·건강 정보·고객 안내 글을 작성·발행하고 QR·POP·사이니지와 연결해 매장 안내에 활용합니다.',
+      items: [
+        { label: '매장 블로그 이용 방법', route: '/guide/features/blog' },
+        { label: '블로그 관리', route: '/store/content/blog' },
+        { label: 'QR · Tablet 이용 방법', route: '/guide/features/qr' },
+        { label: 'POP 제작 이용 방법', route: '/guide/features/pop' },
+      ],
+      linkTo: '/guide/features/blog',
     },
   ],
   bottomNav: {
@@ -1017,6 +1032,14 @@ export const kpaGuideFeatureQrTabletProps: GuideFeatureManualPageProps = {
     flowBarTitle: '이용 흐름',
     flowLabels: ['기능 개요', 'QR 진입', 'Tablet 화면', '직원 처리', '활용 시나리오', '주의 사항'],
   },
+  index: {
+    title: '함께 보면 좋은 가이드',
+    cards: [
+      { title: 'POP 제작 이용 방법', audience: '연결', summary: 'QR을 POP 인쇄물에 담아 매장에 부착합니다.', to: '/guide/features/pop' },
+      { title: '매장 블로그 이용 방법', audience: '연결', summary: '발행 블로그를 QR(외부 링크)로 연결해 고객을 유입합니다.', to: '/guide/features/blog' },
+      { title: '매장 제작 자료 이용 방법', audience: '보관·재사용', summary: '만든 QR을 내 자료함에서 다시 확인하고 활용합니다.', to: '/guide/features/production-materials' },
+    ],
+  },
   sections: [
     {
       step: '01',
@@ -1102,6 +1125,14 @@ export const kpaGuideFeaturePopProps: GuideFeatureManualPageProps = {
     primaryAction: { label: 'POP 제작으로 이동 →', to: '/store/marketing/pop' },
     flowBarTitle: '이용 흐름',
     flowLabels: ['제작 개요', '자료함에서 시작', '자료 선택', '템플릿·AI 문구', 'QR·레이아웃', '출력·저장'],
+  },
+  index: {
+    title: '함께 보면 좋은 가이드',
+    cards: [
+      { title: 'QR · Tablet 이용 방법', audience: '연결', summary: 'POP에 담을 QR 코드를 만듭니다.', to: '/guide/features/qr' },
+      { title: '매장 블로그 이용 방법', audience: '연결', summary: '블로그 글을 QR·POP로 이어 매장 안내에 활용합니다.', to: '/guide/features/blog' },
+      { title: '매장 제작 자료 이용 방법', audience: '시작·보관', summary: 'POP 제작은 내 자료함에서 시작하고, 결과도 자료함에 저장됩니다.', to: '/guide/features/production-materials' },
+    ],
   },
   sections: [
     {
@@ -1190,6 +1221,15 @@ export const kpaGuideFeatureProductionMaterialsProps: GuideFeatureManualPageProp
     flowBarTitle: '이용 흐름',
     flowLabels: ['자료함 개요', '결과물 확인', '원본 보기', '활용하기', '새 제작 시작', '반복 활용'],
   },
+  index: {
+    title: '함께 보면 좋은 가이드',
+    cards: [
+      { title: 'POP 제작 이용 방법', audience: '활용', summary: '자료를 POP 인쇄물로 만듭니다.', to: '/guide/features/pop' },
+      { title: 'QR · Tablet 이용 방법', audience: '활용', summary: '자료를 QR로 연결해 고객을 유입합니다.', to: '/guide/features/qr' },
+      { title: '매장 블로그 이용 방법', audience: '활용', summary: '자료를 바탕으로 매장 블로그 글을 씁니다.', to: '/guide/features/blog' },
+      { title: '디지털 사이니지 이용 방법', audience: '활용', summary: '자료·콘텐츠를 매장 화면 플레이리스트에 올립니다.', to: '/guide/features/signage' },
+    ],
+  },
   sections: [
     {
       step: '01',
@@ -1248,6 +1288,102 @@ export const kpaGuideFeatureProductionMaterialsProps: GuideFeatureManualPageProp
       items: [
         { label: '반복 출력·재사용', detail: '같은 POP·자료를 필요할 때마다 다시 출력해 매장에 활용합니다.' },
         { label: '선택·정리', detail: '제작 자료 행은 선택해 한 번에 삭제할 수 있습니다. QR은 개별 삭제, 블로그는 블로그 관리 화면에서 정리합니다.' },
+      ],
+    },
+  ],
+  bottomNav: {
+    prev: { label: '← 기능별 이용 방법', to: '/guide/features' },
+    home: { label: '홈으로', to: '/' },
+  },
+};
+
+// ─── /guide/features/blog ──────────────────────────────────────────────
+// WO-O4O-KPA-STORE-BLOG-AND-CROSS-LINK-GUIDE-V1:
+//   실제 PharmacyBlogPage(/store/content/blog) 흐름 기준. 임시저장→발행→보관,
+//   AI는 "정리·다듬기" 보조(자동 생성·자동 발행 아님), 공개 URL, 자료함 연계(원본 기록),
+//   발행 블로그 공개 URL을 QR(외부 링크)로 연결 → POP·사이니지로 확장. 의료행위 표현 회피.
+
+export const kpaGuideFeatureBlogProps: GuideFeatureManualPageProps = {
+  hero: {
+    eyebrow: '기능별 이용 방법',
+    title: '매장 블로그 이용 방법',
+    description: '제품 안내·건강 정보·고객 안내 글을 작성해 발행하고, QR·POP·사이니지와 연결해 매장 고객 안내와 전문성에 활용합니다',
+    primaryAction: { label: '블로그 관리로 이동 →', to: '/store/content/blog' },
+    flowBarTitle: '이용 흐름',
+    flowLabels: ['블로그 관리', '글 작성', 'AI 보조', '발행·공개', '연결 활용', '관리·재사용'],
+  },
+  index: {
+    title: '함께 보면 좋은 가이드',
+    cards: [
+      { title: 'QR · Tablet 이용 방법', audience: '연결', summary: '발행한 블로그를 QR(외부 링크)로 연결해 고객 유입 경로를 만듭니다.', to: '/guide/features/qr' },
+      { title: 'POP 제작 이용 방법', audience: '연결', summary: '블로그·QR을 담은 POP를 인쇄해 매장에 부착합니다.', to: '/guide/features/pop' },
+      { title: '매장 제작 자료 이용 방법', audience: '보관·재사용', summary: '작성한 블로그를 내 자료함에서 다시 확인하고 활용합니다.', to: '/guide/features/production-materials' },
+    ],
+  },
+  sections: [
+    {
+      step: '01',
+      title: '블로그 관리 화면',
+      routeLabel: '/store/content/blog',
+      description: '블로그 관리 화면에서 게시글 목록을 상태별(임시저장·발행됨·보관)로 보고, "블로그 글 만들기"로 새 글을 작성하거나 "블로그 설정"으로 블로그 정보를 관리합니다.',
+      items: [
+        { label: '상태별 목록', detail: '전체·임시저장·발행됨·보관 필터로 게시글을 관리합니다.' },
+        { label: '블로그 글 만들기', detail: '새 게시글 작성 화면을 엽니다.' },
+        { label: '블로그 설정', detail: '블로그 이름·소개·대표 이미지·기본 템플릿을 설정합니다.' },
+      ],
+    },
+    {
+      step: '02',
+      title: '글 작성',
+      routeLabel: '/store/content/blog',
+      description: '제목·본문을 작성합니다. 본문은 서식·이미지를 넣을 수 있는 편집기로 작성하며, 슬러그(URL)와 요약은 선택 입력입니다. 내 자료함에서 "활용하기 → 블로그 글쓰기"로 들어오면 고른 자료가 본문에 채워지고, 어떤 자료에서 만들었는지 기록됩니다.',
+      items: [
+        { label: '제목·본문', detail: '제목과 본문(서식·이미지 지원)을 작성합니다. 슬러그·요약은 선택입니다.' },
+        { label: '자료함에서 시작', detail: '내 자료함의 자료를 바탕으로 글을 시작하면 본문이 자동으로 채워집니다.' },
+        { label: '원본 기록', detail: '어떤 콘텐츠·자료에서 만들었는지 기록되어 나중에 "원본 보기"로 확인할 수 있습니다.' },
+      ],
+    },
+    {
+      step: '03',
+      title: 'AI 콘텐츠 보조 (선택)',
+      description: '"AI로 정리하기"는 URL이나 자료를 정리해 칼럼 초안을 다듬어 주는 보조 도구입니다. 자동으로 글을 만들어 게시하지 않으며, 최종 글은 직접 작성·검토합니다. 고객 안내·전문성 강화 목적의 정보 글로 작성하고, 진단·치료 등 의료행위로 읽히는 표현은 피합니다.',
+      items: [
+        { label: '정리·다듬기 보조', detail: 'URL·자료를 정리해 초안 문장을 다듬습니다. 자동 생성기가 아닙니다.' },
+        { label: '직접 검토 후 저장', detail: 'AI 결과는 초안입니다. 본문을 확인·수정한 뒤 저장합니다. 자동 발행은 하지 않습니다.' },
+        { label: '안내 톤 유지', detail: '고객 안내·정보 제공 수준으로 작성하고 의료행위처럼 읽히는 표현은 피합니다.' },
+      ],
+    },
+    {
+      step: '04',
+      title: '임시 저장 · 발행 · 공개',
+      routeLabel: '/store/:slug/blog',
+      description: '저장하면 임시저장(초안) 상태가 됩니다. 목록에서 "발행"하면 공개되고, 발행 글은 공개 URL로 고객이 직접 볼 수 있습니다. URL 복사·미리보기로 확인하고, 더 이상 노출하지 않을 글은 "보관"합니다.',
+      items: [
+        { label: '임시 저장 → 발행', detail: '작성한 글은 임시저장 후 목록에서 발행합니다.' },
+        { label: '공개 URL', detail: '발행 글은 /store/:slug/blog/:postSlug 로 공개됩니다. URL 복사·미리보기를 제공합니다.' },
+        { label: '보관', detail: '노출을 멈출 글은 보관 처리합니다.' },
+      ],
+    },
+    {
+      step: '05',
+      title: 'QR · POP · 사이니지로 연결',
+      routeLabel: '/store/marketing/qr',
+      description: '발행한 블로그의 공개 URL을 QR 코드의 "외부 링크" 대상으로 지정하면 고객이 QR을 스캔해 블로그로 들어옵니다. 그 QR을 POP에 담아 인쇄·부착하고, 같은 내용을 사이니지·타블렛에서 보여줄 수 있습니다.',
+      items: [
+        { label: 'QR 외부 링크 연결', detail: '/store/marketing/qr 에서 "외부 링크"로 블로그 공개 URL을 지정합니다.' },
+        { label: 'POP에 담기', detail: '/store/marketing/pop 에서 QR을 포함한 POP를 만들어 매장에 부착합니다.' },
+        { label: '사이니지·타블렛 노출', detail: '같은 내용을 매장 화면에서 고객에게 보여줍니다.' },
+      ],
+    },
+    {
+      step: '06',
+      title: '제작 자료에서 관리 · 재사용',
+      routeLabel: '/store/library/production-materials',
+      description: '작성한 블로그 글은 내 자료함(매장 제작 자료) 목록에도 나타나, 어떤 자료에서 만들었는지 "원본 보기"로 확인하고 다시 활용할 수 있습니다. 게시글은 수정·발행·보관·삭제하거나 여러 건을 한 번에 관리합니다.',
+      items: [
+        { label: '자료함에서 확인', detail: '블로그 결과물이 매장 제작 자료 목록에 함께 표시됩니다.' },
+        { label: '원본 보기', detail: '어떤 콘텐츠·자료에서 만들었는지 추적합니다.' },
+        { label: '수정·발행·보관·삭제', detail: '게시글을 개별 또는 일괄(발행·보관·삭제)로 관리합니다.' },
       ],
     },
   ],
@@ -1586,7 +1722,7 @@ export const kpaGuideForStoreOwnerProps: GuideUsagePageProps = {
       description:
         '매장 블로그로 단골 고객과 신규 고객에게 정보를 전달합니다. 운영자 자료를 그대로 쓰거나 매장 톤에 맞게 편집할 수 있습니다.',
       items: [
-        { label: '매장 블로그 작성', detail: '/store/content/blog — 게시물 작성/편집' },
+        { label: '매장 블로그 작성', detail: '/store/content/blog — 게시물 작성/편집 (이용 방법: /guide/features/blog)' },
         { label: '외부 공개 URL', detail: '/store/:slug/blog — 고객이 직접 조회 가능' },
         { label: '상품 상세 자료', detail: '/store/marketing/product-descriptions — 상품별 설명·효과·사용법' },
       ],
