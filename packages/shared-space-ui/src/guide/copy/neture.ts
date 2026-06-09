@@ -1824,6 +1824,7 @@ export const netureGuideForSellerProps: GuideFeatureManualPageProps = {
       { title: 'QR 활용', audience: '매장', summary: 'O4O 참여를 알리는 QR을 생성해 인쇄·배치합니다(QR 생성기). 제품 QR 제작은 매장 서비스.', to: '#qr' },
       { title: '블로그 · 콘텐츠 활용', audience: '매장', summary: '직접 만들지 않아도 제공받은 콘텐츠로 소비자 설명과 신뢰를 만듭니다.', to: '#blog' },
       { title: '디지털사이니지 활용', audience: '매장', summary: '서비스별 제공 범위가 다릅니다 — 화면 제작·편성은 매장 전용 서비스에서 제공.', to: '#signage' },
+      { title: '타블렛(태블릿) 활용', audience: '매장', summary: '고객 상담·상품 안내·QR/콘텐츠 표시 활용. 전용 기능 제공은 서비스별로 다름.', to: '#tablet' },
       { title: '상품 주문과 배송 확인', audience: '매장', summary: '상품 확인 → 장바구니 → 주문 → 공급자 배송 → 매장에서 상태 확인.', to: '#settlement' },
       { title: '매장에서 실제로 시작하는 방법', audience: '매장', summary: '네트워크 참여 → 내 매장 접속 → HUB 확인 → 자료 적용 → 오퍼/상품 참여.', to: '#start' },
     ],
@@ -1957,8 +1958,22 @@ export const netureGuideForSellerProps: GuideFeatureManualPageProps = {
       ],
     },
     {
-      id: 'settlement',
+      // WO-O4O-NETURE-GUIDE-FOR-SELLER-CARD-EXPANSION-V1 — 타블렛 활용 (Neture 직접 기능 아님, 활용 방식 안내)
+      id: 'tablet',
       step: '10',
+      title: '타블렛(태블릿) 활용',
+      description:
+        '타블렛(태블릿)은 매장에서 고객 상담 · 상품 안내 · QR 연결 · 콘텐츠 표시에 활용하는 매장 실행 도구입니다. Neture는 타블렛 전용 기능을 직접 제공하지 않으며, 도구 제공 범위는 서비스별로 다릅니다 — 아래는 매장에서의 일반적 활용 방식 안내입니다.',
+      items: [
+        { label: '고객 상담 보조', detail: '상담 시 타블렛으로 상품 정보 · 설명 자료를 함께 보여줍니다.' },
+        { label: '상품 안내', detail: '진열대 · 계산대에서 상품 정보를 화면으로 안내합니다.' },
+        { label: 'QR · 콘텐츠 연결', detail: 'QR이나 제공받은 콘텐츠를 타블렛으로 바로 띄워 보여줍니다.' },
+        { label: '제공 범위는 서비스별', detail: '타블렛 전용 도구 · 기능 제공 여부는 매장 전용 서비스에 따릅니다.' },
+      ],
+    },
+    {
+      id: 'settlement',
+      step: '11',
       title: '상품 주문과 배송 확인',
       description:
         'Neture에서 매장이 실제로 쓰는 핵심 흐름입니다 — 상품을 확인하고 장바구니에 담아 주문하면, 공급자 배송으로 이어지고 매장에서 주문 · 배송 상태를 확인합니다.',
@@ -1972,7 +1987,7 @@ export const netureGuideForSellerProps: GuideFeatureManualPageProps = {
     },
     {
       id: 'start',
-      step: '11',
+      step: '12',
       title: '매장에서 실제로 시작하는 방법',
       description:
         '처음 시작할 때는 아래 순서를 따르면 됩니다. 한 번에 다 할 필요 없이, 필요한 것부터 골라 매장에 적용해 보세요.',
