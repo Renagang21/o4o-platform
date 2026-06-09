@@ -3,7 +3,8 @@
 > `WO-O4O-EVENT-OFFER-TO-CART-MIGRATION-V1` **Phase 1a** 결과.
 > KPA 이벤트오퍼 buyer 상세 화면의 primary action 을 `participate()` 직접 주문에서
 > canonical Store Cart "장바구니 담기" 로 1차 전환.
-> **결과: 코드 PASS (tsc 0 / API smoke PASS), live 브라우저 검증은 frontend 배포 후.** — 2026-06-09
+> **결과: PASS** — tsc 0 · cart API smoke · live 브라우저 cart 화면 smoke 통과.
+> (이벤트오퍼 detail "담기" 버튼 시각 클릭만 active offer 부재로 잔여 — graceful) — 2026-06-09
 
 ---
 
@@ -66,9 +67,24 @@
 | groups 묶음 조회 | ✅ supplierCount=1 |
 | clear (테스트 데이터 정리) | ✅ removed=1 |
 
-### 4.3 live 브라우저 visual smoke
-- frontend(`web-kpa-society`) 배포 후 수행 예정. (수량 선택 → 장바구니 담기 → 성공 CTA →
-  `/store-hub/cart` 목록 확인). active KPA event offer 부재 시 graceful empty 로 기록.
+### 4.3 live 브라우저 visual smoke (배포 후 수행 — 2026-06-09)
+
+배포: CI success → `kpa-society-web-01299-l8k` (03:28Z, 커밋 이후). 계정: store owner(sohae2100).
+
+| 항목 | 결과 |
+|------|:----:|
+| `/store-hub/cart` 라우트 렌더 (store-hub 레이아웃 + PharmacyOwnerOnlyGuard 통과) | ✅ |
+| 빈 장바구니 graceful empty (🛒 + "이벤트 상품 보기" CTA) | ✅ |
+| 공급자별 묶음 렌더 (seed 2 event_offer items, 공급자 A/B 분리) | ✅ |
+| `event_offer` → "이벤트" 라벨 + priceSnapshot 표시 | ✅ |
+| 소계/합계 계산 (9,800×2=19,600 / 15,000×1 / 합계 34,600) | ✅ |
+| 수량 stepper min(1) 비활성 + 증가(2→3) → PATCH → 소계 29,400·합계 44,400 반영 | ✅ |
+| 장바구니 비우기 → 빈 상태 복귀 (테스트 데이터 정리) | ✅ |
+
+> **미실증(graceful)**: KPA 에 active/전체 이벤트오퍼가 **0건** 이라, 이벤트오퍼 **상세 화면의
+> "장바구니 담기" 버튼·성공 CTA** 시각 클릭은 수행 불가. 목록은 정상 empty 렌더 확인. 담기 흐름은
+> 코드(tsc) + cart API smoke(§4.2) + cart 화면(시드 item 으로 §4.3) 으로 간접 검증됨.
+> 실제 이벤트오퍼 등록 후 detail 버튼 클릭 1회만 잔여.
 
 ## 5. 회귀 무영향
 
@@ -101,4 +117,4 @@
 
 ---
 
-*Date: 2026-06-09 · Status: 코드 PASS (live 브라우저 검증 배포 후 대기)*
+*Date: 2026-06-09 · Status: PASS (이벤트오퍼 detail 버튼 시각 클릭만 잔여 — active offer 부재)*
