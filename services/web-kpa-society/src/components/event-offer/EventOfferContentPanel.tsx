@@ -24,7 +24,8 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { LoadingSpinner, EmptyState, Pagination } from '../common';
-import { eventOfferApi } from '../../api';
+import { eventOfferApi, storeCartApi } from '../../api';
+import { CART_SERVICE_KEY, buildEventOfferCartPayload } from '../../utils/eventOfferCart';
 import { useAuth } from '../../contexts';
 import { colors } from '../../styles/theme';
 import type { EventOfferItem, EventOfferStatus } from '../../types';
@@ -166,11 +167,17 @@ export function EventOfferContentPanel({ compact = false }: EventOfferContentPan
     return msg || err?.message || '주문에 실패했습니다.';
   };
 
+  // WO-O4O-EVENT-OFFER-TO-CART-PHASE1A-FOLLOWUP-V1: participate 직접주문 → cart 담기.
+  // 1회 주문 한도(perOrderLimit) 상한 적용. participate API/service 는 미삭제(legacy 유지).
+  const clampToLimit = (item: EventOfferItem, qty: number) => {
+    const v = Math.max(1, qty || 1);
+    return item.perOrderLimit && item.perOrderLimit > 0 ? Math.min(v, item.perOrderLimit) : v;
+  };
+
   const handleDirectOrder = async (item: EventOfferItem) => {
     try {
-      await eventOfferApi.participate(item.id, 1);
-      toast.success(`"${item.productName}" 주문이 완료되었습니다.`);
-      loadData();
+      await storeCartApi.addItem(CART_SERVICE_KEY, buildEventOfferCartPayload(item, clampToLimit(item, 1)));
+      toast.success(`"${item.productName}" 장바구니에 담았습니다.`);
     } catch (err: any) {
       toast.error(parseOrderError(err));
     }
@@ -180,9 +187,9 @@ export function EventOfferContentPanel({ compact = false }: EventOfferContentPan
     setOrdering(true);
     const results: OrderResult[] = [];
     for (const item of supplierItems) {
-      const qty = orderQuantities[item.id] || 1;
+      const qty = clampToLimit(item, orderQuantities[item.id] || 1);
       try {
-        await eventOfferApi.participate(item.id, qty);
+        await storeCartApi.addItem(CART_SERVICE_KEY, buildEventOfferCartPayload(item, qty));
         results.push({ itemId: item.id, success: true });
       } catch (err: any) {
         results.push({
@@ -194,13 +201,12 @@ export function EventOfferContentPanel({ compact = false }: EventOfferContentPan
     }
     const successCount = results.filter(r => r.success).length;
     const failCount = results.filter(r => !r.success).length;
-    if (failCount === 0) toast.success(`${successCount}건 주문이 완료되었습니다.`);
-    else toast.error(`${successCount}건 성공, ${failCount}건 실패`);
+    if (failCount === 0) toast.success(`선택한 이벤트오퍼 ${successCount}건을 장바구니에 담았습니다.`);
+    else toast.error(`${successCount}건 담기 성공, ${failCount}건 실패`);
     setOrdering(false);
     setSelectedIds(new Set());
     setOrderPanelOpen(false);
     setOrderQuantities({});
-    loadData();
   };
 
   const handleOrderAll = async () => {
@@ -308,7 +314,7 @@ export function EventOfferContentPanel({ compact = false }: EventOfferContentPan
                 style={selectionOrderBtn}
                 onClick={() => setOrderPanelOpen(!orderPanelOpen)}
               >
-                {orderPanelOpen ? '패널 닫기' : '선택 주문'}
+                {orderPanelOpen ? '패널 닫기' : '선택 담기'}
               </button>
             </div>
           )}
@@ -390,7 +396,7 @@ export function EventOfferContentPanel({ compact = false }: EventOfferContentPan
                     <span style={disabledText}>매진</span>
                   ) : isOrderable && hasStore ? (
                     <button style={orderBtn} onClick={() => handleDirectOrder(item)}>
-                      내 매장에 추가
+                      장바구니 담기
                     </button>
                   ) : isOrderable && !hasStore ? (
                     <span style={disabledText}>매장 필요</span>
@@ -417,13 +423,13 @@ export function EventOfferContentPanel({ compact = false }: EventOfferContentPan
           {orderPanelOpen && selectedIds.size > 0 && (
             <div style={orderPanel}>
               <div style={orderPanelHeader}>
-                <h3 style={orderPanelTitle}>공급업체별 주문</h3>
+                <h3 style={orderPanelTitle}>공급업체별 장바구니 담기</h3>
                 <button
                   style={orderAllBtn}
                   disabled={ordering}
                   onClick={handleOrderAll}
                 >
-                  {ordering ? '주문 처리중...' : `전체 주문 (${selectedIds.size}건)`}
+                  {ordering ? '담는 중...' : `전체 담기 (${selectedIds.size}건)`}
                 </button>
               </div>
 
@@ -475,7 +481,7 @@ export function EventOfferContentPanel({ compact = false }: EventOfferContentPan
                       disabled={ordering}
                       onClick={() => handleBatchOrder(groupItems)}
                     >
-                      {ordering ? '처리중...' : '주문하기'}
+                      {ordering ? '담는 중...' : '장바구니 담기'}
                     </button>
                   </div>
                 </div>

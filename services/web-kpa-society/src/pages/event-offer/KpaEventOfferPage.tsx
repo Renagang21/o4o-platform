@@ -16,9 +16,10 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { PageHeader, LoadingSpinner, EmptyState, Pagination } from '../../components/common';
-import { eventOfferApi } from '../../api';
+import { eventOfferApi, storeCartApi } from '../../api';
 import { useAuth } from '../../contexts';
 import { colors } from '../../styles/theme';
+import { CART_SERVICE_KEY, buildEventOfferCartPayload } from '../../utils/eventOfferCart';
 import { PLATFORM_ROLES, hasAnyRole } from '../../lib/role-constants';
 import { kpaConfig } from '@o4o/operator-ux-core';
 import type { EventOfferItem, EventOfferStatus, EventOfferStats } from '../../types';
@@ -170,13 +171,19 @@ export function KpaEventOfferPage() {
     });
   };
 
+  // WO-O4O-EVENT-OFFER-TO-CART-PHASE1A-FOLLOWUP-V1: participate 직접주문 → cart 담기.
+  // 1회 주문 한도(perOrderLimit) 가 있으면 상한 적용. participate API/service 는 미삭제(legacy 유지).
+  const clampToLimit = (item: EventOfferItem, qty: number) => {
+    const v = Math.max(1, qty || 1);
+    return item.perOrderLimit && item.perOrderLimit > 0 ? Math.min(v, item.perOrderLimit) : v;
+  };
+
   const handleDirectOrder = async (item: EventOfferItem) => {
     try {
-      await eventOfferApi.participate(item.id, 1);
-      toast.success(`"${item.productName}" 주문이 완료되었습니다.`);
-      loadData();
+      await storeCartApi.addItem(CART_SERVICE_KEY, buildEventOfferCartPayload(item, clampToLimit(item, 1)));
+      toast.success(`"${item.productName}" 장바구니에 담았습니다.`);
     } catch (err: any) {
-      toast.error(err?.response?.data?.error?.message || err?.message || '주문에 실패했습니다.');
+      toast.error(err?.response?.data?.error?.message || err?.message || '장바구니에 담지 못했습니다.');
     }
   };
 
@@ -185,15 +192,15 @@ export function KpaEventOfferPage() {
     const results: OrderResult[] = [];
 
     for (const item of supplierItems) {
-      const qty = orderQuantities[item.id] || 1;
+      const qty = clampToLimit(item, orderQuantities[item.id] || 1);
       try {
-        await eventOfferApi.participate(item.id, qty);
+        await storeCartApi.addItem(CART_SERVICE_KEY, buildEventOfferCartPayload(item, qty));
         results.push({ itemId: item.id, success: true });
       } catch (err: any) {
         results.push({
           itemId: item.id,
           success: false,
-          error: err?.response?.data?.error?.message || err?.message || '주문 실패',
+          error: err?.response?.data?.error?.message || err?.message || '담기 실패',
         });
       }
     }
@@ -202,16 +209,15 @@ export function KpaEventOfferPage() {
     const failCount = results.filter(r => !r.success).length;
 
     if (failCount === 0) {
-      toast.success(`${successCount}건 주문이 완료되었습니다.`);
+      toast.success(`선택한 이벤트오퍼 ${successCount}건을 장바구니에 담았습니다.`);
     } else {
-      toast.error(`${successCount}건 성공, ${failCount}건 실패`);
+      toast.error(`${successCount}건 담기 성공, ${failCount}건 실패`);
     }
 
     setOrdering(false);
     setSelectedIds(new Set());
     setOrderPanelOpen(false);
     setOrderQuantities({});
-    loadData();
   };
 
   const handleOrderAll = async () => {
@@ -318,8 +324,8 @@ export function KpaEventOfferPage() {
             <p style={styles.bannerTitle}>kpa-society 이벤트 전용 상품입니다.</p>
             <p style={styles.bannerDesc}>
               {hasStore
-                ? '상품을 선택하고 이벤트 공간에서 바로 주문할 수 있습니다.'
-                : '매장 등록 후 주문에 참여할 수 있습니다.'}
+                ? '상품을 선택해 장바구니에 담은 뒤 내 장바구니에서 확인할 수 있습니다.'
+                : '매장 등록 후 장바구니에 담을 수 있습니다.'}
             </p>
           </div>
         </div>
@@ -360,6 +366,12 @@ export function KpaEventOfferPage() {
             <option key={name} value={name}>{name}</option>
           ))}
         </select>
+        {/* WO-O4O-EVENT-OFFER-TO-CART-PHASE1A-FOLLOWUP-V1: 내 장바구니 진입점 */}
+        {hasStore && (
+          <Link to="/store-hub/cart" style={styles.cartLink}>
+            🛒 내 장바구니
+          </Link>
+        )}
       </div>
 
       {items.length === 0 && !searchQuery && !supplierFilter ? (
@@ -382,7 +394,7 @@ export function KpaEventOfferPage() {
                 style={styles.selectionOrderBtn}
                 onClick={() => setOrderPanelOpen(!orderPanelOpen)}
               >
-                {orderPanelOpen ? '패널 닫기' : '선택 주문'}
+                {orderPanelOpen ? '패널 닫기' : '선택 담기'}
               </button>
             </div>
           )}
@@ -486,7 +498,7 @@ export function KpaEventOfferPage() {
                       style={styles.orderBtn}
                       onClick={() => handleDirectOrder(item)}
                     >
-                      주문
+                      담기
                     </button>
                   ) : isOrderable && !hasStore ? (
                     <span style={styles.disabledText}>매장 필요</span>
@@ -515,13 +527,13 @@ export function KpaEventOfferPage() {
           {orderPanelOpen && selectedIds.size > 0 && (
             <div style={styles.orderPanel}>
               <div style={styles.orderPanelHeader}>
-                <h3 style={styles.orderPanelTitle}>공급업체별 주문</h3>
+                <h3 style={styles.orderPanelTitle}>공급업체별 장바구니 담기</h3>
                 <button
                   style={styles.orderAllBtn}
                   disabled={ordering}
                   onClick={handleOrderAll}
                 >
-                  {ordering ? '주문 처리중...' : `전체 주문 (${selectedIds.size}건)`}
+                  {ordering ? '담는 중...' : `전체 담기 (${selectedIds.size}건)`}
                 </button>
               </div>
 
@@ -568,7 +580,7 @@ export function KpaEventOfferPage() {
                       disabled={ordering}
                       onClick={() => handleBatchOrder(groupItems)}
                     >
-                      {ordering ? '처리중...' : '주문하기'}
+                      {ordering ? '담는 중...' : '장바구니 담기'}
                     </button>
                   </div>
                 </div>
@@ -694,6 +706,20 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: colors.white,
     cursor: 'pointer',
     minWidth: '160px',
+  },
+  cartLink: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '10px 16px',
+    border: `1px solid #7C3AED`,
+    borderRadius: '8px',
+    fontSize: '14px',
+    fontWeight: 600,
+    color: '#7C3AED',
+    backgroundColor: colors.white,
+    textDecoration: 'none',
+    whiteSpace: 'nowrap',
   },
   // Selection bar
   selectionBar: {

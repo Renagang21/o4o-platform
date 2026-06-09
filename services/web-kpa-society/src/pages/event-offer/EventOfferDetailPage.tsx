@@ -14,15 +14,7 @@ import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 import type { EventOfferItem } from '../../types';
 import { calcFreeShippingProgress, formatWon } from '../../utils/freeShipping';
-
-// 이 서비스의 canonical store cart serviceKey (service-catalog 기준)
-const CART_SERVICE_KEY = 'kpa-society';
-
-// uuid 컬럼(eventOfferId/organizationProductListingId/supplierProductOfferId)에
-// 비-uuid 값을 보내면 DB 오류가 나므로, uuid 형태일 때만 보존한다.
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const asUuid = (v: string | null | undefined): string | null =>
-  v && UUID_RE.test(v) ? v : null;
+import { CART_SERVICE_KEY, buildEventOfferCartPayload } from '../../utils/eventOfferCart';
 
 export function EventOfferDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -49,20 +41,7 @@ export function EventOfferDetailPage() {
     if (!product || adding) return;
     setAdding(true);
     try {
-      await storeCartApi.addItem(CART_SERVICE_KEY, {
-        sourceType: 'event_offer',
-        supplierId: product.supplierId ?? null,
-        // uuid 컬럼은 형태 검증 후 보존(아니면 null)
-        supplierProductOfferId: asUuid(product.offerId),
-        organizationProductListingId: asUuid(product.id),
-        eventOfferId: asUuid(product.id),
-        productName: product.productName,
-        quantity,
-        pricingSource: 'event_offer',
-        // 표시용 스냅샷 — checkout 확정 시 재검증
-        priceSnapshot:
-          product.eventPrice ?? product.unitPrice ?? product.generalPrice ?? 0,
-      });
+      await storeCartApi.addItem(CART_SERVICE_KEY, buildEventOfferCartPayload(product, quantity));
       setAdded(true);
       toast.success('장바구니에 담았습니다.');
     } catch (err) {
