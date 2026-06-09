@@ -29,7 +29,7 @@ import { useNavigate } from 'react-router-dom';
 import { Layers, Trash2, RefreshCw, FileEdit, Plus, Megaphone, QrCode, PenLine, MonitorPlay, ChevronDown, ExternalLink, Link2 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { AiContentModal } from '@o4o/content-editor';
-import { StoreAssetDerivationViewer, resultKindToDerivedKind } from '@o4o/store-ui-core';
+import { StoreAssetDerivationViewer, resultKindToDerivedKind, GuideBackLink } from '@o4o/store-ui-core';
 import { directContentApi } from '../../api/assetSnapshot';
 import {
   getStoreExecutionAssets,
@@ -496,6 +496,7 @@ export default function StoreProductionMaterialsPage() {
             AI로 생성하거나 편집한 POP·QR·블로그·상품 상세설명 제작 결과물을 관리합니다.
             새 제작 자료를 만들려면 <strong>내 자료함 → 콘텐츠</strong>에서 콘텐츠 또는 강의를 선택한 뒤 제작 작업을 시작합니다.
           </p>
+          <div style={{ marginTop: 8 }}><GuideBackLink to="/guide/features/production-materials" label="제작 자료 활용 방법" /></div>
         </div>
         <div style={styles.headerActions}>
           <button

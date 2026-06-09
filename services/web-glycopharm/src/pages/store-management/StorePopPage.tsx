@@ -18,7 +18,7 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { parseProductionRouterState } from '@o4o/store-ui-core';
+import { parseProductionRouterState, GuideBackLink } from '@o4o/store-ui-core';
 import {
   ArrowLeft,
   Megaphone,
@@ -246,6 +246,7 @@ export default function StorePopPage() {
           <p style={{ fontSize: 13, color: '#64748b', margin: '4px 0 0' }}>
             공급자 자료와 AI 문구를 결합하여 약국 POP PDF를 생성합니다
           </p>
+          <div style={{ marginTop: 8 }}><GuideBackLink to="/guide/features/pop" label="POP 제작 방법" /></div>
         </div>
       </div>
 

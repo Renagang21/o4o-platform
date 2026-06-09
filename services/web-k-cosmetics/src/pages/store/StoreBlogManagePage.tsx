@@ -13,6 +13,7 @@
  */
 
 import { useEffect, useState, useCallback } from 'react';
+import { GuideBackLink } from '@o4o/store-ui-core';
 import {
   fetchStaffBlogPosts,
   createBlogPost,
@@ -503,6 +504,7 @@ export default function StoreBlogManagePage() {
           <p style={{ fontSize: '14px', color: '#64748b', marginTop: '4px' }}>
             매장 블로그 게시글을 관리합니다.
           </p>
+          <div style={{ marginTop: 8 }}><GuideBackLink to="/guide/features/blog" label="블로그 작성 방법" /></div>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           <button

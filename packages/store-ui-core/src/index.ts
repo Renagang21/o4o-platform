@@ -30,6 +30,8 @@ export { StoreDashboardLayout } from './layout/StoreDashboardLayout';
 
 // Components
 export { StorePlaceholderPage } from './components/StorePlaceholderPage';
+export { GuideBackLink } from './components/GuideBackLink';
+export type { GuideBackLinkProps } from './components/GuideBackLink';
 export { StoreTopBar } from './components/StoreTopBar';
 export type { StoreTopBarProps, StoreNavItem } from './components/StoreTopBar';
 export { StoreSidebar } from './components/StoreSidebar';

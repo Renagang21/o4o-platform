@@ -11,7 +11,7 @@
 
 import { useEffect, useState, useCallback, type CSSProperties } from 'react';
 import { FileEdit, RefreshCw, Trash2, Link2 } from 'lucide-react';
-import { StoreAssetDerivationViewer } from '@o4o/store-ui-core';
+import { StoreAssetDerivationViewer, GuideBackLink } from '@o4o/store-ui-core';
 import { getStoreExecutionAssets, type StoreExecutionAsset } from '../../api/storeExecutionAssets';
 import { api } from '@/lib/apiClient';
 
@@ -79,6 +79,7 @@ export default function StoreProductionMaterialsPage() {
           <p style={styles.subtitle}>
             POP·QR·블로그·상품 상세설명 등 매장 실행 자산을 관리합니다.
           </p>
+          <div style={{ marginTop: 8 }}><GuideBackLink to="/guide/features/production-materials" label="제작 자료 활용 방법" /></div>
         </div>
         <button onClick={fetchItems} style={styles.refreshBtn} disabled={loading}>
           <RefreshCw size={14} />

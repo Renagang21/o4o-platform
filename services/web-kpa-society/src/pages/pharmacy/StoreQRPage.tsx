@@ -40,6 +40,7 @@ import type { StoreQrCode, QrAnalyticsData } from '../../api/storeQr';
 import { getListings } from '../../api/pharmacyProducts';
 import { fetchLocalProducts } from '../../api/localProducts';
 import { getAccessToken } from '../../contexts/AuthContext';
+import { GuideBackLink } from '@o4o/store-ui-core';
 
 const LANDING_TYPE_OPTIONS: { value: string; label: string }[] = [
   { value: 'product', label: '제품' },
@@ -399,6 +400,7 @@ export function StoreQRPage() {
           </div>
           <h1 style={styles.title}>QR 코드</h1>
           <p style={styles.subtitle}>매장에 부착·재사용할 QR 코드를 모아 출력합니다</p>
+          <div style={{ marginTop: 8 }}><GuideBackLink to="/guide/features/qr" label="QR 활용 방법" /></div>
         </div>
         {/* WO-O4O-KPA-STORE-PRODUCTION-ENTRY-CANONICAL-CORRECTION-V1:
             "QR 코드 생성" 신규 진입 버튼 제거 — 제작 시작은 "내 자료함"에서만. */}

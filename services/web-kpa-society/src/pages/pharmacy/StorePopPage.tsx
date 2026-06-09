@@ -42,6 +42,7 @@ import { getAccessToken } from '../../contexts/AuthContext';
 import { findTemplate } from './productionTemplates';
 import type { ProductionTemplate } from './productionTemplates';
 import type { ProductionRouterState } from './productionTargets';
+import { GuideBackLink } from '@o4o/store-ui-core';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -312,6 +313,7 @@ export function StorePopPage() {
             )}
           </div>
           <p style={styles.subtitle}>선택된 자료에 QR 코드를 연결하여 POP 광고를 PDF로 출력합니다</p>
+          <div style={{ marginTop: 8 }}><GuideBackLink to="/guide/features/pop" label="POP 제작 방법" /></div>
           {/* WO-KPA-POP-CONTENT-TO-PDF-GENERATION-V1:
               파일형 자료 + 콘텐츠/매장 제작 자료 모두 POP 입력으로 지원 (Phase 2). */}
           <p

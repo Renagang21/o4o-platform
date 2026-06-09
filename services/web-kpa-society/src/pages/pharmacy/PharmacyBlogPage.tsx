@@ -36,6 +36,7 @@ import type { ProductionTemplate } from './productionTemplates';
 import { DataTable, type Column, ActionBar, BulkResultModal } from '@o4o/ui';
 import { useBatchAction } from '@o4o/operator-ux-core';
 import { Send, Archive as ArchiveIcon, Trash2 } from 'lucide-react';
+import { GuideBackLink } from '@o4o/store-ui-core';
 
 // WO-O4O-KPA-STORE-BLOG-AI-WIRING-V1: HTML 첫 heading 추출 (AI title fallback)
 function extractTitleFromHtml(html: string): string {
@@ -731,6 +732,7 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
           <p style={{ fontSize: '14px', color: '#64748b', marginTop: '4px' }}>
             매장 블로그 게시글을 관리합니다.
           </p>
+          <div style={{ marginTop: 8 }}><GuideBackLink to="/guide/features/blog" label="블로그 작성 방법" /></div>
         </div>
         {/* WO-O4O-KPA-STORE-BLOG-META-V1: 블로그 설정 진입 */}
         {/* WO-O4O-STORE-CREATION-CTA-EMPTY-STATE-FIX-V1: "블로그 글 만들기" CTA 복원 */}

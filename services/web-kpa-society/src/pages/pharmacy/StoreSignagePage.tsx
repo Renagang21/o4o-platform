@@ -21,6 +21,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { GuideBackLink } from '@o4o/store-ui-core';
 import {
   Monitor,
   Loader2,
@@ -878,6 +879,7 @@ export function StoreSignagePage() {
           </div>
           <h1 className="text-2xl font-bold text-slate-900">사이니지 운영</h1>
           <p className="text-sm text-slate-500 mt-1">동영상을 등록하고, 플레이리스트로 구성하고, 스케줄을 적용합니다</p>
+          <div className="mt-2"><GuideBackLink to="/guide/features/signage" label="사이니지 운영 방법" /></div>
         </div>
         <div className="flex gap-2">
           <button
