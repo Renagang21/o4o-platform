@@ -66,6 +66,7 @@ import { createStorePolicyRoutes } from '../routes/platform/store-policy.routes.
 import { createUnifiedStorePublicRoutes } from '../routes/platform/unified-store-public.routes.js';
 import { createStoreLocalProductRoutes } from '../routes/platform/store-local-product.routes.js';
 import { createStoreTabletRoutes } from '../routes/platform/store-tablet.routes.js';
+import { createStoreCartRoutes } from '../routes/cart/store-cart.routes.js';
 import userRoleRoutes from '../routes/user-role.routes.js';
 import { createRoleApplicationController } from '../routes/v2/role-application.controller.js';
 import organizationRoutes from '../routes/organization.routes.js';
@@ -302,6 +303,10 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     app.use('/api/v1/store', createStoreLocalProductRoutes(dataSource));
     app.use('/api/v1/store', createStoreTabletRoutes(dataSource));
     logger.info('✅ Store Local Product & Tablet Display routes registered at /api/v1/store/*');
+
+    // WO-O4O-STORE-CANONICAL-CART-CHECKOUT-FOUNDATION-V1: canonical store cart foundation
+    app.use('/api/v1/store', createStoreCartRoutes(dataSource));
+    logger.info('✅ Store Canonical Cart routes registered at /api/v1/store/cart/:serviceKey/*');
 
     // WO-O4O-STORE-TABLET-LEGACY-CLEANUP-V1: Removed tablet-operator.controller.ts (unused by any frontend)
 

@@ -411,6 +411,8 @@ import { EcommerceOrder, EcommerceOrderItem, EcommercePayment } from '@o4o/ecomm
 import { CheckoutOrder } from '../entities/checkout/CheckoutOrder.entity.js';
 import { CheckoutPayment } from '../entities/checkout/CheckoutPayment.entity.js';
 import { OrderLog } from '../entities/checkout/OrderLog.entity.js';
+// WO-O4O-STORE-CANONICAL-CART-CHECKOUT-FOUNDATION-V1
+import { StoreCartItem } from '../entities/cart/StoreCartItem.entity.js';
 
 // ============================================================================
 // ORGANIZATION-CORE ENTITIES (Phase 4: Entities-only Re-introduction)
@@ -890,6 +892,8 @@ export const AppDataSource = new DataSource({
     CheckoutOrder,
     CheckoutPayment,
     OrderLog,
+    // WO-O4O-STORE-CANONICAL-CART-CHECKOUT-FOUNDATION-V1 — canonical store cart foundation
+    StoreCartItem,
     // ============================================================================
     // ORGANIZATION-CORE ENTITIES (Phase 4: Entities-only Re-introduction)
     // ============================================================================
