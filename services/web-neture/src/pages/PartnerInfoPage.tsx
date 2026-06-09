@@ -69,7 +69,7 @@ export function PartnerInfoPage() {
         <p style={styles.o4oBannerText}>
           o4o 플랫폼의 구조와 철학을 먼저 확인해 보세요.
         </p>
-        <Link to="/o4o" style={styles.o4oBannerLink}>
+        <Link to="/guide/o4o-overview" style={styles.o4oBannerLink}>
           o4o 플랫폼 소개 보기 →
         </Link>
       </div>

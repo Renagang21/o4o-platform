@@ -80,23 +80,6 @@ import PartnerOverviewInfoPage from './pages/PartnerOverviewInfoPage';
 
 // Test Guide Pages (o4o 공통 - 다중 서비스) — removed
 
-// o4o Public Site Pages
-import O4OMainPage from './pages/o4o/O4OMainPage';
-// WO-O4O-NETURE-OTHER-TARGETS-ABSORB-V1: OtherTargetsPage → /o4o 메인 흡수 후 redirect.
-//   기타 업종 안내는 메인 DetailEntrySection 의 7번째 카드로 흡수. App.tsx import 만 제거.
-import SiteOperatorPage from './pages/o4o/SiteOperatorPage';
-import {
-  PharmacyTargetPage,
-  ClinicTargetPage,
-  SalonTargetPage,
-  OpticalTargetPage,
-  DentalTargetPage,
-} from './pages/o4o/targets';
-// WO-O4O-NETURE-APPLY-PAGE-CONSOLIDATION-V1:
-//   /o4o/business-inquiry + /o4o/consultation → /o4o/apply 통합. 두 page component 파일은
-//   보존 (deprecated), App.tsx 의 import 만 제거 후 redirect 로 처리.
-import O4OApplyPage from './pages/o4o/O4OApplyPage';
-
 // Admin Vault Pages
 import {
   VaultOverviewPage,
@@ -729,37 +712,9 @@ function App() {
               <Route path="/guide/features/forum-resources" element={<GuideFeatureForumResourcesPage />} />
               <Route path="/guide/features/copilot-dashboard" element={<GuideFeatureCopilotDashboardPage />} />
 
-              {/* ── O4O 소개 영역 — WO-O4O-ABOUT-URL-SEMANTIC-ALIGNMENT-V1 ──
-                  NetureLayout 통일: About 이동 후 레이아웃 이탈 방지
-               */}
-              <Route path="/o4o" element={<O4OMainPage />} />
-              {/* WO-O4O-NETURE-CONCEPT-PAGES-DEPRECATE-V1: /o4o/intro → /o4o redirect (메인 흡수) */}
-              <Route path="/o4o/intro" element={<Navigate to="/o4o" replace />} />
-              {/* WO-O4O-NETURE-OTHER-TARGETS-ABSORB-V1: 메인 DetailEntrySection 7번째 카드 흡수 후 redirect */}
-              <Route path="/o4o/other-targets" element={<Navigate to="/o4o" replace />} />
-              <Route path="/o4o/site-operator" element={<SiteOperatorPage />} />
-              <Route path="/o4o/targets/pharmacy" element={<PharmacyTargetPage />} />
-              <Route path="/o4o/targets/clinic" element={<ClinicTargetPage />} />
-              <Route path="/o4o/targets/salon" element={<SalonTargetPage />} />
-              <Route path="/o4o/targets/optical" element={<OpticalTargetPage />} />
-              <Route path="/o4o/targets/dental" element={<DentalTargetPage />} />
-              {/* WO-O4O-NETURE-APPLY-PAGE-CONSOLIDATION-V1: 통합 진입 + 기존 2 경로 redirect */}
-              <Route path="/o4o/apply" element={<O4OApplyPage />} />
-              <Route path="/o4o/business-inquiry" element={<Navigate to="/o4o/apply" replace />} />
-              <Route path="/o4o/consultation" element={<Navigate to="/o4o/apply" replace />} />
-              {/* WO-O4O-NETURE-CONCEPT-PAGES-DEPRECATE-V1:
-                  concept / principle / structure / services / channel-map → /o4o 메인으로 흡수 후 redirect.
-                  페이지 파일은 보존 (App.tsx import 만 제거). */}
-              <Route path="/o4o/concepts" element={<Navigate to="/o4o" replace />} />
-              <Route path="/o4o/channel-map" element={<Navigate to="/o4o" replace />} />
-              <Route path="/o4o/principles" element={<Navigate to="/o4o" replace />} />
-              <Route path="/o4o/structure" element={<Navigate to="/o4o" replace />} />
-              <Route path="/o4o/services" element={<Navigate to="/o4o" replace />} />
-              {/* WO-O4O-NETURE-CHANNEL-PAGES-ABSORB-V1: targets/* 흡수 후 redirect */}
-              <Route path="/o4o/channels/pharmacy" element={<Navigate to="/o4o/targets/pharmacy" replace />} />
-              <Route path="/o4o/channels/optical" element={<Navigate to="/o4o/targets/optical" replace />} />
-              <Route path="/o4o/channels/medical" element={<Navigate to="/o4o/targets/clinic" replace />} />
-              <Route path="/o4o/channels/dental" element={<Navigate to="/o4o/targets/dental" replace />} />
+              {/* WO-O4O-NETURE-O4O-LEGACY-PAGE-DELETE-V1: /o4o 레거시 페이지 트리(소개/신청/
+                  site-operator/targets/channels) 전면 삭제. O4O 설명은 /guide 체계로, 사업
+                  문의는 /contact 로 이관. 구 URL 은 별도 redirect WO 에서 처리. */}
             </Route>
 
             {/* ================================================================
@@ -1110,7 +1065,6 @@ function App() {
             <Route path="/suppliers" element={<Navigate to="/" replace />} />
             <Route path="/partners/requests" element={<Navigate to="/workspace/partners/requests" replace />} />
             <Route path="/partners/info" element={<Navigate to="/workspace/partners/info" replace />} />
-            <Route path="/platform/principles" element={<Navigate to="/o4o/principles" replace />} />
             {/* /content, /content/:id — NetureLayout 내 /content 라우트로 처리됨 (레거시 redirect 제거) */}
             <Route path="/my-content" element={<Navigate to="/workspace/my-content" replace />} />
 

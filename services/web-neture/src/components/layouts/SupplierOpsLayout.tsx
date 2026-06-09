@@ -214,7 +214,7 @@ export default function SupplierOpsLayout() {
             <div className="text-center sm:text-left">
               <p>&copy; 2026 Neture. 공급자·파트너 연결 서비스</p>
               <p className="mt-1 text-xs text-gray-400">
-                <Link to="/o4o" className="hover:text-primary-600">
+                <Link to="/guide/o4o-overview" className="hover:text-primary-600">
                   o4o 플랫폼 소개
                 </Link>
                 {' · '}

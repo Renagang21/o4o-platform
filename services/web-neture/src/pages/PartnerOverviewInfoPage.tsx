@@ -204,7 +204,7 @@ export default function PartnerOverviewInfoPage() {
             <br />
             먼저 플랫폼 소개 페이지를 확인하세요.
           </p>
-          <Link to="/o4o" style={styles.ctaButton}>
+          <Link to="/guide/o4o-overview" style={styles.ctaButton}>
             o4o 플랫폼 소개 보기
           </Link>
         </section>

@@ -207,7 +207,7 @@ export default function SellerOverviewPage() {
             <br />
             구조를 이해한 뒤 참여 여부를 판단하셔도 늦지 않습니다.
           </p>
-          <Link to="/o4o" style={styles.ctaButton}>
+          <Link to="/guide/o4o-overview" style={styles.ctaButton}>
             o4o 플랫폼 소개 보기
           </Link>
         </section>

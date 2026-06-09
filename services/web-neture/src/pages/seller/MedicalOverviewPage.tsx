@@ -378,7 +378,7 @@ function NextStepSection() {
         공감이 전제되지 않으면 다음 단계로 진행하지 않습니다.
       </p>
       <div style={styles.ctaGroup}>
-        <Link to="/o4o" style={styles.ctaPrimary}>
+        <Link to="/guide/o4o-overview" style={styles.ctaPrimary}>
           o4o 플랫폼 소개 보기
         </Link>
       </div>

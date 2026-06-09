@@ -53,7 +53,6 @@ const homeProps: GuideFeaturesPageProps = {
       items: [
         { label: 'O4O 개요', route: '/guide/o4o-overview' },
         { label: 'O4O 전반 둘러보기', route: '/guide/intro' },
-        { label: 'O4O 플랫폼 소개', route: '/o4o' },
       ],
       linkTo: '/guide/o4o-overview',
     },

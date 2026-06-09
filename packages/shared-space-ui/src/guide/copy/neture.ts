@@ -635,7 +635,7 @@ export const netureGuideFeatureSupplierOnboardingProps: GuideFeatureManualPagePr
         },
         {
           label: 'Business Inquiry',
-          detail: '/o4o/business-inquiry에서 가입 의사와 취급 상품군을 전달합니다.',
+          detail: '/contact에서 가입 의사와 취급 상품군을 전달합니다.',
         },
         {
           label: '직접 문의',
@@ -1420,7 +1420,7 @@ export const netureGuideO4OOverviewProps: GuideFeatureManualPageProps = {
     title: 'O4O 개요',
     description:
       'O4O는 매장 판매 환경을 만드는 서비스입니다. 좋은 제품이 매장에서 잘 설명되고, 고객이 이해하고, 실제로 판매되도록 — 공급자 · 운영자 · 판매자 · 파트너가 각자의 역할로 함께 만드는 구조입니다. 모든 사업자가 먼저 읽는 공통 입구입니다.',
-    primaryAction: { label: 'O4O 플랫폼 자세히 보기 →', to: '/o4o' },
+    primaryAction: { label: '전체 가이드 보기 →', to: '/guide' },
     flowBarTitle: '이해 흐름',
     flowLabels: ['대상 시장', '제품 특징', '해결 과제', '3자 구조', '운영 방식', '활용 사업자'],
   },
@@ -1567,7 +1567,7 @@ export const netureGuideForOperatorProps: GuideFeatureManualPageProps = {
     title: '매장 네트워크 운영자 가이드',
     description:
       '운영자는 매장 네트워크를 구성하고 운영하는 사업자입니다. 협동조합 · 협동조합 준비 그룹 · 세미 프랜차이즈 · 전문 네트워크 운영자가 여기에 해당합니다. 이 문서는 설득이나 제안서가 아니라, 운영자가 실제로 무엇을 어떻게 하는지 설명하는 운영 매뉴얼입니다. 운영자의 역할 · 실무 · 참여자 관계는 이 가이드에서 다루고, 사업 모델 · 운영 도구 · 수익 구조는 Business Guide(/guide/business)에서 다룹니다 — 두 문서는 역할 안내와 사업 안내로 역할이 나뉩니다.',
-    primaryAction: { label: '운영 참여 검토 신청 →', to: '/o4o/apply' },
+    primaryAction: { label: '운영 참여 검토 신청 →', to: '/contact' },
     flowBarTitle: '운영 흐름',
     flowLabels: ['자료 수신', '구성 · 제작', '승인 상품', '매장 모집', '이벤트 · 펀딩', '정산 · 지원'],
   },
@@ -2017,7 +2017,7 @@ export const netureGuideBusinessPharmacyNetworkProps: GuideFeatureManualPageProp
     title: '약국 네트워크 운영 안내',
     description:
       '여러 약국이 함께 무언가를 해보려는 그룹을 위한 운영 안내서입니다. 협동조합 준비 그룹 · 지역 약국 모임 · 전문약사 네트워크 · 관광객 대상 약국 네트워크 · 창고형 약국 네트워크 등이 대상이며, 협동조합 전용 문서가 아닙니다. 처음 기대하는 것, 실제로 만나는 문제, O4O로 할 수 있는 것, 운영자가 해야 할 일을 설명합니다. 제안서 · 홍보 · 성공사례가 아니라 운영 안내 문서입니다.',
-    primaryAction: { label: '운영 참여 검토 신청 →', to: '/o4o/apply' },
+    primaryAction: { label: '운영 참여 검토 신청 →', to: '/contact' },
     flowBarTitle: '안내 흐름',
     flowLabels: ['처음 기대', '실제 과제', 'O4O 활용', '운영자 역할', '참여 약국', '시작'],
   },
@@ -2347,7 +2347,7 @@ export const netureGuideBusinessSupplierNetworkProps: GuideFeatureManualPageProp
     title: '공급자 네트워크 운영 안내',
     description:
       '도매상 · 제조사 · 수입사 · 총판 · 브랜드사 등 공급자가 O4O를 활용해 매장을 지원하는 서비스를 운영하는 방법을 설명합니다. O4O는 쇼핑몰 · 입점몰 · 드랍쉬핑 · 공동구매 플랫폼과 다릅니다. 상품 등록법 같은 기능 매뉴얼이 아니라, 공급자가 어떻게 서비스 운영자가 될 수 있는지를 설명하는 사업 운영 안내서입니다.',
-    primaryAction: { label: '운영 참여 검토 신청 →', to: '/o4o/apply' },
+    primaryAction: { label: '운영 참여 검토 신청 →', to: '/contact' },
     flowBarTitle: '안내 흐름',
     flowLabels: ['처음 오해', '제품 특징', '공급자 니드', 'O4O 활용', '콘텐츠 · 오퍼', '시작'],
   },
@@ -2561,7 +2561,7 @@ export const netureGuideBusinessOwnProductProps: GuideFeatureManualPageProps = {
     title: '자체 제품 · 서비스 전용 상품 운영 안내',
     description:
       '서비스 운영자가 자체 제품 · 서비스 전용 상품 · 공동 기획 상품으로 자신만의 사업을 만드는 구조를 설명하는 안내서입니다. 제품 개발 · 제조 · 등록 방법이 아니라, 왜 자체 제품을 기획하는지 · 어떤 형태가 가능한지 · 어떻게 운영하는지를 다룹니다. 운영자가 반드시 제조 · 물류를 직접 해야 한다는 오해를 교정하고, 물류 없는 세미 프랜차이즈형 사업 모델을 설명합니다. 제안서 · 홍보 · 성공사례가 아닙니다.',
-    primaryAction: { label: '운영 참여 검토 신청 →', to: '/o4o/apply' },
+    primaryAction: { label: '운영 참여 검토 신청 →', to: '/contact' },
     flowBarTitle: '안내 흐름',
     flowLabels: ['왜', '무엇을', '두 방식', '협력', '콘텐츠', '펀딩', '흐름', '시작'],
   },
@@ -2755,7 +2755,7 @@ export const netureGuideBusinessContentNetworkProps: GuideFeatureManualPageProps
     title: '콘텐츠 네트워크 운영 안내',
     description:
       '공급자 · 운영자 · 참여 매장이 콘텐츠를 활용해 소비자에게 제품 정보와 건강 정보를 전달하는 환경을 어떻게 구성하는지 설명합니다. 콘텐츠 제작 툴 사용법 · 블로그 작성법 · 디자인 제작 방법이 아니라, 콘텐츠를 중심으로 세 주체가 연결되는 O4O 운영 구조를 설명하는 안내서입니다. 이 문서는 사업 운영 방법을 설명합니다 — 콘텐츠 작성 · 활용 기능 사용법은 기능 Guide의 「B2B 콘텐츠」(/guide/features/b2b-content)를 참고하세요.',
-    primaryAction: { label: '운영 참여 검토 신청 →', to: '/o4o/apply' },
+    primaryAction: { label: '운영 참여 검토 신청 →', to: '/contact' },
     flowBarTitle: '안내 흐름',
     flowLabels: ['왜 콘텐츠', '누가 만드나', '어디에 있나', '운영자 · 매장', '수익 구조', '시작'],
   },
@@ -2953,7 +2953,7 @@ export const netureGuideBusinessEventOfferProps: GuideFeatureManualPageProps = {
     title: '이벤트 오퍼 운영 안내',
     description:
       '공급자 · 운영자 · 참여 매장이 이벤트 오퍼를 왜 활용하는지, 어떤 목적으로 운영하는지 설명합니다. 기능 사용법이나 공동구매 운영법이 아닙니다. 특히 "많이 모이면 무조건 싸게 산다"는 일반적 인식과, O4O의 유통질서 · 특별 공급 조건 개념의 차이를 정리하는 운영 안내서입니다. 이 문서는 사업 운영 방법을 설명합니다 — 이벤트를 제안 · 설정하는 기능 사용법은 기능 Guide의 「Event Offer 제안하기」(/guide/features/event-offer)를 참고하세요.',
-    primaryAction: { label: '운영 참여 검토 신청 →', to: '/o4o/apply' },
+    primaryAction: { label: '운영 참여 검토 신청 →', to: '/contact' },
     flowBarTitle: '안내 흐름',
     flowLabels: ['처음 인식', '무엇인가', '3주체 목적', '유통질서', '특별 공급 조건', '시작'],
   },
@@ -3146,7 +3146,7 @@ export const netureGuideBusinessApprovedProductProps: GuideFeatureManualPageProp
     title: '운영자 승인 상품 운영 안내',
     description:
       '공급자 · 운영자 · 참여 매장이 운영자 승인 상품을 왜 활용하는지 설명합니다. 상품 등록 방법이나 승인 기능 사용법이 아닙니다. 이벤트 오퍼가 "기존 제품의 특별 공급 조건"이라면, 운영자 승인 상품은 "새로운 제품을 운영자가 검토해 참여 매장이 안심하고 도입하는" 구조에 가깝습니다.',
-    primaryAction: { label: '운영 참여 검토 신청 →', to: '/o4o/apply' },
+    primaryAction: { label: '운영 참여 검토 신청 →', to: '/contact' },
     flowBarTitle: '안내 흐름',
     flowLabels: ['도입 어려움', '무엇인가', '3주체 목적', '콘텐츠', '모집 관계', '시작'],
   },
@@ -3340,7 +3340,7 @@ export const netureGuideBusinessSellerRecruitmentProps: GuideFeatureManualPagePr
     title: '판매자 모집 운영 안내',
     description:
       '공급자 · 운영자 · 참여 매장이 판매자 모집을 왜 활용하는지, 어떤 목적으로 운영하는지 설명합니다. 기능 사용법이나 단순 입점 · 영업 모집 방법이 아닙니다. 세 주체가 함께 판매 네트워크를 형성하는 이유와 구조를 설명하는 운영 안내서이며, 운영자 승인 상품 · 콘텐츠 · 이벤트 오퍼와 자연스럽게 연결됩니다.',
-    primaryAction: { label: '운영 참여 검토 신청 →', to: '/o4o/apply' },
+    primaryAction: { label: '운영 참여 검토 신청 →', to: '/contact' },
     flowBarTitle: '안내 흐름',
     flowLabels: ['처음 접근', '무엇인가', '3주체 목적', '승인 상품 연계', '콘텐츠 · 오퍼', '시작'],
   },
@@ -3535,7 +3535,7 @@ export const netureGuideBusinessMarketTrialProps: GuideFeatureManualPageProps = 
     title: '유통참여형 펀딩 운영 안내',
     description:
       '공급자가 새로운 제품을 시장에 소개하고, 초기 참여 매장을 확보하며, 시장 반응을 확인하는 과정을 설명합니다. 펀딩 등록 방법이나 투자 설명이 아닙니다. 이미 출시된 제품을 다루는 다른 안내서와 달리, 유통참여형 펀딩은 출시 전 · 초기 단계 제품을 다루는 공급자 중심 운영 구조입니다. 이 문서는 사업 운영 방법을 설명합니다 — 펀딩 진행 · 참여 기능 사용법은 기능 Guide의 「유통참여형 펀딩」(/guide/features/market-trial)을 참고하세요.',
-    primaryAction: { label: '운영 참여 검토 신청 →', to: '/o4o/apply' },
+    primaryAction: { label: '운영 참여 검토 신청 →', to: '/contact' },
     flowBarTitle: '안내 흐름',
     flowLabels: ['소개 어려움', '무엇인가', '3주체 목적', '콘텐츠', '모집 · 오퍼 연계', '시작'],
   },
@@ -3746,7 +3746,7 @@ export const netureGuideBusinessOperatorRevenueProps: GuideFeatureManualPageProp
     title: '운영자 수익 구조 안내',
     description:
       '서비스 운영자가 어떤 방식으로 사업 수익을 만들 수 있는지 설명하는 안내서입니다. "얼마를 벌 수 있는가"가 아니라 "어떤 구조로 수익을 만드는가"를 다룹니다. 현재 O4O에서 실제 가능한 수익 구조와 앞으로 확장 가능한 수익 모델을 명확히 구분합니다. 수익 예측 · 성공 사례 · 투자 제안이 아닙니다.',
-    primaryAction: { label: '운영 참여 검토 신청 →', to: '/o4o/apply' },
+    primaryAction: { label: '운영 참여 검토 신청 →', to: '/contact' },
     flowBarTitle: '안내 흐름',
     flowLabels: ['왜', '모델 vs 수익', '검증된 수익', '도구 관계', '준비 단계', '성장', '핵심'],
   },
@@ -3921,7 +3921,7 @@ export const netureGuideBusinessHubProps: GuideFeatureManualPageProps = {
     title: 'Business Guide',
     description:
       'Business Guide는 O4O 기능 사용법이 아니라 실제 사업을 어떻게 운영하는지를 설명하는 안내서입니다. "무엇을 하는 사업인가"(사업 모델) → "어떻게 운영하는가"(운영 도구) → "무엇으로 수익을 얻는가"(수익 구조) 순서로 안내합니다.',
-    primaryAction: { label: '운영 참여 검토 신청 →', to: '/o4o/apply' },
+    primaryAction: { label: '운영 참여 검토 신청 →', to: '/contact' },
     flowBarTitle: '구성',
     flowLabels: ['사업 모델', '운영 도구', '수익 구조'],
   },

@@ -98,7 +98,7 @@ export default function ConceptsPage() {
             <Link to="/" className="text-slate-500 hover:text-slate-700">
               메인으로
             </Link>
-            <Link to="/o4o" className="text-primary-600 hover:text-primary-700">
+            <Link to="/guide/o4o-overview" className="text-primary-600 hover:text-primary-700">
               o4o 소개
             </Link>
           </div>

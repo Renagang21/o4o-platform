@@ -112,7 +112,7 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
 
   const handleGoToApply = () => {
     onClose();
-    navigate('/o4o/apply');
+    navigate('/contact');
   };
 
   if (!isOpen) return null;

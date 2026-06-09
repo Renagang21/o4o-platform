@@ -269,7 +269,7 @@ export default function ChannelSalesStructurePage() {
         <section style={styles.nextStep} className="no-print">
           <h2 style={styles.nextStepTitle}>더 알아보기</h2>
           <div style={styles.nextStepLinks}>
-            <Link to="/o4o" style={styles.ctaButton}>
+            <Link to="/guide/o4o-overview" style={styles.ctaButton}>
               o4o 플랫폼 소개
             </Link>
             <Link to="/channel/dental" style={styles.ctaButtonSecondary}>

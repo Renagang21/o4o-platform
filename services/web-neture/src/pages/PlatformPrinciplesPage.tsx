@@ -212,7 +212,7 @@ export function PlatformPrinciplesPage() {
           <Link to="/channel/structure" style={styles.relatedLink}>
             채널·판매 구조 →
           </Link>
-          <Link to="/o4o" style={styles.relatedLink}>
+          <Link to="/guide/o4o-overview" style={styles.relatedLink}>
             o4o 플랫폼 소개 →
           </Link>
         </div>
