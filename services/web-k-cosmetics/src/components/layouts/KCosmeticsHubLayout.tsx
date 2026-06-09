@@ -83,6 +83,15 @@ const HUB_MENU: HubMenuItem[] = [
     to: '/store-hub/event-offers',
     end: false,
   },
+  // WO-O4O-EVENT-OFFER-TO-CART-CROSSSERVICE-V2: 내 장바구니
+  {
+    key: 'cart',
+    label: '내 장바구니',
+    desc: '장바구니에 담은 상품 확인 · 주문 확정',
+    icon: ShoppingCart,
+    to: '/store-hub/cart',
+    end: false,
+  },
 ];
 
 export function KCosmeticsHubLayout() {

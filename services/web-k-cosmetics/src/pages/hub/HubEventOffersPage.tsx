@@ -11,12 +11,15 @@
  */
 
 import { useEffect, useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { Loader2, Tag, ShoppingCart } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import {
   cosmeticsEventOfferApi,
   type EnrichedEventOffer,
 } from '@/api/eventOffer';
+import { storeCartApi } from '@/api/storeCart';
+import { CART_SERVICE_KEY, buildEventOfferCartPayload } from '@/utils/eventOfferCart';
 
 const STATUS_BADGE: Record<string, { label: string; cls: string }> = {
   active:   { label: '진행중', cls: 'bg-green-100 text-green-700' },
@@ -74,35 +77,44 @@ export function HubEventOffersPage() {
     loadOffers();
   }, [loadOffers]);
 
-  // 바로 주문 — 관심/참여 신청이 아니라 즉시 실주문(participate) 생성.
-  // 성공 시 잔여 수량 반영을 위해 목록을 새로고침한다.
-  const handleOrder = useCallback(
+  // WO-O4O-EVENT-OFFER-TO-CART-CROSSSERVICE-V2: 직접 주문(participate) → canonical 장바구니 담기.
+  // 1회 주문 한도 상한 적용. participate API 는 미삭제(legacy 유지).
+  const handleAddToCart = useCallback(
     async (offer: EnrichedEventOffer) => {
       if (orderingId) return; // 중복 클릭 방지
+      const qty =
+        offer.perOrderLimit && offer.perOrderLimit > 0 ? Math.min(1, offer.perOrderLimit) : 1;
       setOrderingId(offer.id);
       try {
-        await cosmeticsEventOfferApi.participate(offer.id, 1);
-        toast.success(`"${offer.productName}" 주문이 완료되었습니다.`);
-        await loadOffers();
+        await storeCartApi.addItem(CART_SERVICE_KEY, buildEventOfferCartPayload(offer, qty));
+        toast.success(`"${offer.productName}" 장바구니에 담았습니다.`);
       } catch (err: any) {
         toast.error(
-          err?.response?.data?.error?.message || err?.message || '주문에 실패했습니다.',
+          err?.response?.data?.error?.message || err?.message || '장바구니에 담지 못했습니다.',
         );
       } finally {
         setOrderingId(null);
       }
     },
-    [orderingId, loadOffers],
+    [orderingId],
   );
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-slate-800">이벤트 오퍼</h1>
-        <p className="text-slate-500 mt-1 text-sm">
-          승인된 이벤트 오퍼를 확인하고 매장에 추가 가능한 상품을 관리합니다.
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800">이벤트 오퍼</h1>
+          <p className="text-slate-500 mt-1 text-sm">
+            승인된 이벤트 오퍼를 장바구니에 담아 내 장바구니에서 주문 확정합니다.
+          </p>
+        </div>
+        <Link
+          to="/store-hub/cart"
+          className="shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 text-sm font-semibold rounded-lg border border-pink-200 text-pink-700 bg-white hover:bg-pink-50 transition-colors"
+        >
+          <ShoppingCart size={15} /> 내 장바구니
+        </Link>
       </div>
 
       {error && (
@@ -174,9 +186,9 @@ export function HubEventOffersPage() {
                   <div className="flex justify-end">
                     <button
                       type="button"
-                      onClick={() => handleOrder(offer)}
+                      onClick={() => handleAddToCart(offer)}
                       disabled={orderingId === offer.id}
-                      title="이벤트 오퍼를 바로 주문합니다."
+                      title="이벤트 오퍼를 장바구니에 담습니다."
                       className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md border border-pink-200 text-pink-700 bg-pink-50 hover:bg-pink-100 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
                     >
                       {orderingId === offer.id ? (
@@ -184,7 +196,7 @@ export function HubEventOffersPage() {
                       ) : (
                         <ShoppingCart size={12} />
                       )}
-                      {orderingId === offer.id ? '주문 중...' : '바로 주문'}
+                      {orderingId === offer.id ? '담는 중...' : '장바구니 담기'}
                     </button>
                   </div>
                 </div>

@@ -28,9 +28,16 @@ import {
 import { checkoutService } from '../checkout.service.js';
 import { SERVICE_KEYS } from '../../constants/service-keys.js';
 
-/** cart serviceKey(플랫폼 키) → event-offer(OPL) service_key */
+/**
+ * cart serviceKey(플랫폼 키) → event-offer(OPL) service_key.
+ * WO-O4O-EVENT-OFFER-TO-CART-CROSSSERVICE-V2: Glyco/KCos 확장.
+ *   Glyco/KCos event-offer 는 동일한 EventOfferService 를 각 service_key 로 재사용하므로
+ *   매핑만 추가하면 reserve/createOrder/store-link(STORE_SERVICE_KEY_MAP) 가 그대로 동작한다.
+ */
 const CART_TO_EVENT_OFFER_SERVICE_KEY: Record<string, string> = {
   [SERVICE_KEYS.KPA_SOCIETY]: SERVICE_KEYS.KPA_GROUPBUY, // 'kpa-society' → 'kpa-groupbuy'
+  [SERVICE_KEYS.GLYCOPHARM]: SERVICE_KEYS.GLYCOPHARM_EVENT_OFFER, // 'glycopharm' → 'glycopharm-event-offer'
+  [SERVICE_KEYS.K_COSMETICS]: SERVICE_KEYS.K_COSMETICS_EVENT_OFFER, // 'k-cosmetics' → 'k-cosmetics-event-offer'
 };
 
 export interface CheckoutConfirmScope {
