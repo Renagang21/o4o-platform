@@ -366,8 +366,10 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
   /**
    * GET /api/v1/neture/operator/supply-products
    * WO-O4O-SERVICE-OPERATOR-SUPPLY-DASHBOARD-IMPLEMENTATION-V1
+   * WO-O4O-NETURE-SUPPLY-PRODUCTS-SCOPE-GUARD-FIX-V1: operator sub-router 보다 뒤에 등록된
+   *   standalone route 라 scope guard 미상속 → operator scope guard 명시 적용.
    */
-  router.get('/operator/supply-products', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/operator/supply-products', requireAuth, requireNetureScope('neture:operator') as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user?.id;
       if (!userId) {
