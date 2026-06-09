@@ -166,6 +166,8 @@ export class CheckoutOrder {
     quantity: number;
     unitPrice: number;
     subtotal: number;
+    // WO-O4O-STORE-CART-CHECKOUT-CONFIRMATION-V1: line item 단위 출처/추적 메타데이터
+    metadata?: Record<string, any>;
   }[];
 
   /**

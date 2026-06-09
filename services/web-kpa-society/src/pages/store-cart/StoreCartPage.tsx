@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { storeCartApi, type SupplierGroup } from '../../api';
+import type { CheckoutConfirmResult } from '../../api/storeCart';
 import { colors, typography } from '../../styles/theme';
 
 const CART_SERVICE_KEY = 'kpa-society';
@@ -27,6 +28,9 @@ export function StoreCartPage() {
   const [groups, setGroups] = useState<SupplierGroup[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
+  // WO-O4O-STORE-CART-CHECKOUT-CONFIRMATION-V1 (Phase 1b)
+  const [confirming, setConfirming] = useState(false);
+  const [confirmResult, setConfirmResult] = useState<CheckoutConfirmResult | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -83,6 +87,27 @@ export function StoreCartPage() {
     }
   };
 
+  const confirmCheckout = async () => {
+    if (confirming || busy || groups.length === 0) return;
+    setConfirming(true);
+    setConfirmResult(null);
+    try {
+      const res = await storeCartApi.checkoutConfirm(CART_SERVICE_KEY);
+      setConfirmResult(res.data);
+      if (res.data.createdOrders.length > 0) {
+        toast.success(`${res.data.createdOrders.length}개 공급자 주문이 생성되었습니다.`);
+      }
+      if (res.data.failedItems.length > 0) {
+        toast.error(`${res.data.failedItems.length}개 항목은 주문하지 못했습니다.`);
+      }
+      await load(); // 성공 항목 제거 반영
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : '주문 확정에 실패했습니다.');
+    } finally {
+      setConfirming(false);
+    }
+  };
+
   if (loading) {
     return <LoadingSpinner message="장바구니를 불러오는 중..." />;
   }
@@ -100,6 +125,37 @@ export function StoreCartPage() {
           { label: '내 장바구니' },
         ]}
       />
+
+      {/* 주문 확정 결과 (Phase 1b) */}
+      {confirmResult && (
+        <Card padding="large" style={{ marginBottom: '16px' }}>
+          {confirmResult.createdOrders.length > 0 && (
+            <>
+              <p style={styles.resultTitle}>✅ 생성된 주문 (공급자별)</p>
+              {confirmResult.createdOrders.map((o) => (
+                <div key={o.orderId} style={styles.resultRow}>
+                  <span style={styles.resultOrderNo}>{o.orderNumber}</span>
+                  <span style={styles.resultMeta}>
+                    {o.itemCount}개 품목 · 배송비 {formatWon(o.shippingFee)}
+                  </span>
+                  <span style={styles.resultTotal}>{formatWon(o.totalAmount)}</span>
+                </div>
+              ))}
+            </>
+          )}
+          {confirmResult.failedItems.length > 0 && (
+            <>
+              <p style={{ ...styles.resultTitle, color: '#B91C1C', marginTop: confirmResult.createdOrders.length ? '16px' : 0 }}>
+                ⚠️ 주문하지 못한 항목
+              </p>
+              {confirmResult.failedItems.map((f) => (
+                <p key={f.itemId} style={styles.resultFail}>· {f.message}</p>
+              ))}
+              <p style={styles.resultFailNote}>실패한 항목은 장바구니에 그대로 남아 있습니다.</p>
+            </>
+          )}
+        </Card>
+      )}
 
       {itemCount === 0 ? (
         <EmptyState
@@ -169,12 +225,21 @@ export function StoreCartPage() {
               <span style={styles.totalValue}>{formatWon(grandTotal)}</span>
             </div>
             <p style={styles.notice}>
-              표시 금액은 담을 때의 스냅샷입니다. 최종 가격·재고·배송비는 주문 확정 단계에서
-              공급자별로 다시 확인됩니다. (주문/결제 확정 기능은 준비 중)
+              표시 금액은 담을 때의 스냅샷입니다. 최종 가격·재고·배송비는 주문 확정 시 공급자별로
+              다시 검증되어 공급자 단위 주문으로 생성됩니다.
             </p>
-            <button style={styles.clearBtn} disabled={busy} onClick={clearAll}>
-              장바구니 비우기
-            </button>
+            <div style={styles.actionRow}>
+              <button
+                style={{ ...styles.confirmBtn, opacity: confirming || busy ? 0.7 : 1 }}
+                disabled={confirming || busy}
+                onClick={confirmCheckout}
+              >
+                {confirming ? '주문 확정 중...' : '주문 확정'}
+              </button>
+              <button style={styles.clearBtn} disabled={busy || confirming} onClick={clearAll}>
+                장바구니 비우기
+              </button>
+            </div>
           </Card>
         </>
       )}
@@ -289,6 +354,21 @@ const styles: Record<string, React.CSSProperties> = {
     lineHeight: 1.6,
     margin: '0 0 16px',
   },
+  actionRow: {
+    display: 'flex',
+    gap: '12px',
+    alignItems: 'center',
+  },
+  confirmBtn: {
+    padding: '12px 28px',
+    backgroundColor: '#7C3AED',
+    color: colors.white,
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '15px',
+    fontWeight: 600,
+    cursor: 'pointer',
+  },
   clearBtn: {
     padding: '10px 20px',
     backgroundColor: colors.white,
@@ -298,5 +378,46 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '14px',
     fontWeight: 500,
     cursor: 'pointer',
+  },
+  resultTitle: {
+    fontSize: '15px',
+    fontWeight: 700,
+    color: '#15803d',
+    margin: '0 0 12px',
+  },
+  resultRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    padding: '8px 0',
+    borderBottom: `1px solid ${colors.neutral100}`,
+  },
+  resultOrderNo: {
+    fontSize: '14px',
+    fontWeight: 600,
+    color: colors.neutral900,
+    flex: 1,
+  },
+  resultMeta: {
+    fontSize: '12px',
+    color: colors.neutral500,
+  },
+  resultTotal: {
+    fontSize: '14px',
+    fontWeight: 700,
+    color: colors.neutral900,
+    minWidth: '90px',
+    textAlign: 'right',
+  },
+  resultFail: {
+    fontSize: '13px',
+    color: '#B91C1C',
+    margin: '0 0 4px',
+    lineHeight: 1.5,
+  },
+  resultFailNote: {
+    fontSize: '12px',
+    color: colors.neutral500,
+    margin: '6px 0 0',
   },
 };

@@ -35,6 +35,12 @@ export interface OrderItem {
   quantity: number;
   unitPrice: number;
   subtotal: number;
+  /**
+   * line item 단위 출처/추적 메타데이터 (WO-O4O-STORE-CART-CHECKOUT-CONFIRMATION-V1).
+   * jsonb 컬럼에 그대로 저장된다. 공급자 병합 주문에서 item별 source(event_offer 등)·
+   * eventOfferId·organizationProductListingId·cartItemId·priceSnapshot 등을 보존한다.
+   */
+  metadata?: Record<string, any>;
 }
 
 /**

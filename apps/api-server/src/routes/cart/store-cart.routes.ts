@@ -29,12 +29,17 @@ import {
   CartError,
   type CartScope,
 } from '../../services/cart/store-cart.service.js';
+import {
+  EventOfferCartCheckoutService,
+  CartCheckoutError,
+} from '../../services/cart/event-offer-cart-checkout.service.js';
 
 type AuthMiddleware = RequestHandler;
 
 export function createStoreCartRoutes(dataSource: DataSource): Router {
   const router = Router();
   const service = new StoreCartService(dataSource);
+  const checkoutService = new EventOfferCartCheckoutService(dataSource);
   const validServiceKeys = new Set(getAllServiceKeys());
 
   // Lazy-load requireAuth to avoid circular import (store-local-product 패턴과 동일)
@@ -88,6 +93,10 @@ export function createStoreCartRoutes(dataSource: DataSource): Router {
     if (error instanceof CartError) {
       const status = error.code === 'NOT_FOUND' ? 404 : 400;
       res.status(status).json({ success: false, error: error.message, code: error.code });
+      return;
+    }
+    if (error instanceof CartCheckoutError) {
+      res.status(400).json({ success: false, error: error.message, code: error.code });
       return;
     }
     console.error(`[StoreCart] ${context} error:`, error);
@@ -170,6 +179,27 @@ export function createStoreCartRoutes(dataSource: DataSource): Router {
         res.json({ success: true, data: preview });
       } catch (error) {
         handleError(res, error, 'GET checkout-preview');
+      }
+    },
+  );
+
+  // WO-O4O-STORE-CART-CHECKOUT-CONFIRMATION-V1 (Phase 1b):
+  // cart 항목(KPA event_offer)을 공급자별 주문으로 확정. 주문/재고를 실제로 변경하므로 POST.
+  router.post(
+    '/cart/:serviceKey/checkout-confirm',
+    async (req: Request, res: Response): Promise<void> => {
+      const scope = await resolveScope(req, res);
+      if (!scope) return;
+      try {
+        const body = req.body ?? {};
+        const itemIds = Array.isArray(body.itemIds)
+          ? body.itemIds.filter((x: unknown): x is string => typeof x === 'string')
+          : undefined;
+        const note = typeof body.note === 'string' ? body.note : undefined;
+        const result = await checkoutService.confirm(scope, { itemIds, note });
+        res.json({ success: true, data: result });
+      } catch (error) {
+        handleError(res, error, 'POST checkout-confirm');
       }
     },
   );

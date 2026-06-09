@@ -72,6 +72,32 @@ interface ApiOk<T> {
   data: T;
 }
 
+// WO-O4O-STORE-CART-CHECKOUT-CONFIRMATION-V1 (Phase 1b)
+export interface CreatedOrderSummary {
+  orderId: string;
+  orderNumber: string;
+  supplierId: string;
+  sellerOrganizationId: string;
+  subtotal: number;
+  shippingFee: number;
+  totalAmount: number;
+  itemCount: number;
+  cartItemIds: string[];
+}
+
+export interface FailedCartItem {
+  itemId: string;
+  reason: string;
+  message: string;
+}
+
+export interface CheckoutConfirmResult {
+  serviceKey: string;
+  createdOrders: CreatedOrderSummary[];
+  failedItems: FailedCartItem[];
+  removedCartItemIds: string[];
+}
+
 export const storeCartApi = {
   /** 장바구니 담기 */
   addItem: (serviceKey: string, input: AddCartItemInput) =>
@@ -102,4 +128,11 @@ export const storeCartApi = {
   /** 비우기 */
   clear: (serviceKey: string) =>
     coreApiClient.delete<ApiOk<{ removed: number }>>(`/store/cart/${serviceKey}`),
+
+  /** 주문 확정 — 공급자별 주문 생성 (Phase 1b). itemIds 미지정 시 전체. */
+  checkoutConfirm: (serviceKey: string, input?: { itemIds?: string[]; note?: string }) =>
+    coreApiClient.post<ApiOk<CheckoutConfirmResult>>(
+      `/store/cart/${serviceKey}/checkout-confirm`,
+      input ?? {},
+    ),
 };

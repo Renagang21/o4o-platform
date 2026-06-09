@@ -15,7 +15,7 @@
  * - User participation (order creation via checkoutService)
  */
 
-import type { DataSource, Repository } from 'typeorm';
+import type { DataSource, Repository, QueryRunner } from 'typeorm';
 import { OrganizationProductListing } from '../../../modules/store-core/entities/organization-product-listing.entity.js';
 import { SERVICE_KEYS } from '../../../constants/service-keys.js';
 import { CheckoutOrder } from '../../../entities/checkout/CheckoutOrder.entity.js';
@@ -110,6 +110,54 @@ const UPCOMING_OFFER_CLAUSE = `
   AND (opl.end_at IS NULL OR NOW() <= opl.end_at)
 `.trim();
 
+/**
+ * 매장(buyer)별 특정 listing 누적 주문 수량 집계 SQL.
+ *
+ * WO-O4O-STORE-CART-CHECKOUT-CONFIRMATION-V1:
+ *   - 상태 제외 정정: 'canceled'/'failed'(오타·결제상태) → CheckoutOrderStatus 의 'cancelled'/'refunded'.
+ *   - line-item 기준 집계: 공급자 병합 주문은 주문레벨 metadata.productListingId 가 없으므로
+ *     item metadata(elem->'metadata'->>'productListingId') 로 카운트. metadata 가 없는 레거시 주문만
+ *     주문레벨 metadata.productListingId 로 fallback(이중계수 방지).
+ *   - jsonb_typeof='array' 가드: items 가 배열 아닌 레거시 row 에서 jsonb_array_elements 오류 방지.
+ * $1 = buyerId, $2 = listingId
+ */
+const STORE_ORDERED_QTY_SQL = `
+  SELECT COALESCE(SUM((elem->>'quantity')::int), 0)::int AS total_ordered
+  FROM checkout_orders co
+  CROSS JOIN LATERAL jsonb_array_elements(
+    CASE WHEN jsonb_typeof(co.items) = 'array' THEN co.items ELSE '[]'::jsonb END
+  ) AS elem
+  WHERE co."buyerId" = $1
+    AND co.status NOT IN ('cancelled', 'refunded')
+    AND (
+      elem->'metadata'->>'productListingId' = $2
+      OR (
+        co.metadata->>'productListingId' = $2
+        AND NOT (co.items @> '[{"metadata":{}}]'::jsonb)
+      )
+    )
+`.trim();
+
+// ─── Order context (helper 반환형) ────────────────────────────────────────────
+
+/**
+ * lock 전 결정되는 이벤트오퍼 주문 컨텍스트 (단가/공급자/판매 org/배송정책).
+ * WO-O4O-STORE-CART-CHECKOUT-CONFIRMATION-V1: participate + cart checkout-confirm 공용.
+ */
+export interface EventOfferOrderContext {
+  listingId: string;
+  serviceKey: string;
+  /** opl.organization_id — sellerId / sellerOrganizationId */
+  organizationId: string;
+  masterId: string;
+  /** opl.offer_id — SupplierProductOffer.id (= createOrder productId) */
+  offerId: string;
+  supplierId: string;
+  productName: string;
+  unitPrice: number;
+  shippingPolicy: { baseShippingFee: number | null; freeShippingThreshold: number | null };
+}
+
 // ─── Service ─────────────────────────────────────────────────────────────────
 
 export class EventOfferService {
@@ -117,6 +165,19 @@ export class EventOfferService {
 
   constructor(private dataSource: DataSource) {
     this.listingRepo = dataSource.getRepository(OrganizationProductListing);
+  }
+
+  /**
+   * 매장(buyer)별 특정 listing 누적 주문 수량. dataSource 또는 활성 queryRunner 로 실행 가능.
+   * WO-O4O-STORE-CART-CHECKOUT-CONFIRMATION-V1: per_store_limit 게이트/가용표시 공용.
+   */
+  private async countStoreOrderedQuantity(
+    exec: { query: (sql: string, params: unknown[]) => Promise<any[]> },
+    buyerId: string,
+    listingId: string,
+  ): Promise<number> {
+    const [row] = await exec.query(STORE_ORDERED_QTY_SQL, [buyerId, listingId]);
+    return Number(row?.total_ordered ?? 0);
   }
 
   /**
@@ -389,18 +450,7 @@ export class EventOfferService {
     // 2. 매장 누적 주문량 조회
     let alreadyOrdered = 0;
     if (perStoreLimit !== null) {
-      const [storeRow] = await this.dataSource.query(
-        `SELECT COALESCE(
-           SUM((elem->>'quantity')::int), 0
-         )::int AS total_ordered
-         FROM checkout_orders co
-         CROSS JOIN jsonb_array_elements(co.items) AS elem
-         WHERE co."buyerId" = $1
-           AND co.metadata->>'productListingId' = $2
-           AND co.status NOT IN ('canceled', 'failed')`,
-        [userId, listingId],
-      );
-      alreadyOrdered = Number(storeRow?.total_ordered ?? 0);
+      alreadyOrdered = await this.countStoreOrderedQuantity(this.dataSource, userId, listingId);
     }
 
     // 3. 매장별 잔여 한도
@@ -559,11 +609,79 @@ export class EventOfferService {
   ): Promise<{ orderId: string; orderNumber: string; status: string; totalAmount: number }> {
     const quantity = Math.max(1, parseInt(String(data?.quantity)) || 1);
 
-    // ── Step 1: Supplier product 정보 사전 조회 (lock 전) ──────────────────
-    // listing은 lock 이후 재조회하므로 여기서는 supplier 정보만 가져옴
-    // (supplier 정보는 별도 row라 lock 범위 밖에서 조회해도 안전)
-    // → listing 먼저 찾아서 offer_id 확보
-    // WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1: event_price 도 동시 로드
+    // ── Step 1-2: lock 전 listing/supplier 검증 + 단가 결정 ──────────────
+    const ctx = await this.loadEventOfferContext(listingId, serviceKey);
+
+    // ── Step 3: 수량 제한 검증 + total_quantity 원자적 차감 (단일 listing 트랜잭션) ──
+    const qr = this.dataSource.createQueryRunner();
+    await qr.connect();
+    await qr.startTransaction();
+    let decrementedQty = 0;
+    try {
+      decrementedQty = (
+        await this.reserveEventOfferListing(qr, { listingId, serviceKey, userId, quantity })
+      ).decrementedQty;
+      await qr.commitTransaction();
+    } catch (e) {
+      if (qr.isTransactionActive) await qr.rollbackTransaction();
+      throw e;
+    } finally {
+      await qr.release();
+    }
+
+    // ── Step 4: 주문 생성 (checkoutService 경유 — CLAUDE.md 규칙) ────────
+    try {
+      const savedOrder = await checkoutService.createOrder({
+        buyerId: userId,
+        sellerId: ctx.organizationId,
+        supplierId: ctx.supplierId,
+        items: [{
+          productId: ctx.offerId,
+          productName: ctx.productName,
+          quantity,
+          unitPrice: ctx.unitPrice,
+          subtotal: quantity * ctx.unitPrice,
+        }],
+        shippingPolicy: ctx.shippingPolicy,
+        metadata: {
+          serviceKey: ctx.serviceKey,
+          productListingId: ctx.listingId,
+          productName: ctx.productName,
+          productId: ctx.offerId,
+        },
+      });
+
+      // ── Step 6: 매장 진열 자동 등록 (best-effort) — WO-O4O-EVENT-OFFER-STORE-PRODUCT-LINK-V1
+      await this.tryLinkStoreProduct({
+        userId,
+        eventServiceKey: serviceKey,
+        eventListingId: ctx.listingId,
+        masterId: ctx.masterId,
+        offerId: ctx.offerId,
+      });
+
+      return {
+        orderId: savedOrder.id,
+        orderNumber: savedOrder.orderNumber,
+        status: savedOrder.status,
+        totalAmount: savedOrder.totalAmount,
+      };
+    } catch (orderErr) {
+      // ── Step 5: 주문 실패 시 차감량 보상 (compensation) ────────────────
+      if (decrementedQty > 0) await this.incrementListingQuantity(listingId, decrementedQty);
+      throw orderErr;
+    }
+  }
+
+  /**
+   * lock 전 listing/supplier 검증 + 주문 단가/배송정책 결정 (재고 잠금·차감 없음).
+   * WO-O4O-STORE-CART-CHECKOUT-CONFIRMATION-V1: participate 와 cart checkout-confirm 공용.
+   * supplier 정보는 별도 row 라 lock 범위 밖에서 조회해도 안전(원래 participate 주석 유지).
+   */
+  async loadEventOfferContext(
+    listingId: string,
+    serviceKey: string,
+  ): Promise<EventOfferOrderContext> {
     const preLockRows = await this.dataSource.query(
       `SELECT opl.id, opl.offer_id, opl.master_id, opl.organization_id, opl.service_key,
               opl.status, opl.start_at, opl.end_at, opl.event_price
@@ -581,7 +699,6 @@ export class EventOfferService {
     }
     const preListing = preLockRows[0];
 
-    // ── Step 2: Supplier product 검증 ────────────────────────────────────
     const productRows = await this.dataSource.query(
       `SELECT spo.id AS spo_id, spo.supplier_id, spo.price_general, spo.is_active,
               spo.approval_status, s.status AS supplier_status, pm.name,
@@ -598,175 +715,119 @@ export class EventOfferService {
     if (product.approval_status !== 'APPROVED') throw new EventOfferError(400, 'Product is not approved', 'PRODUCT_NOT_APPROVED');
     if (product.supplier_status !== 'ACTIVE') throw new EventOfferError(400, 'Supplier is not active', 'SUPPLIER_INACTIVE');
 
-    // WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1
-    // 진행 중(active) 이벤트 주문 단가 = event_price (있으면) ?? price_general (레거시 fallback)
-    // 일반 공급가는 절대 변경되지 않는다 — 단가는 checkout_orders.items[].unitPrice 스냅샷에만 반영.
+    // 단가 = event_price (있으면) ?? price_general (레거시 fallback). 일반 공급가는 불변 — 스냅샷에만 반영.
     const eventPrice = preListing.event_price != null ? Number(preListing.event_price) : null;
     const unitPrice = eventPrice ?? Number(product.price_general ?? 0);
     if (unitPrice <= 0) throw new EventOfferError(400, 'Invalid product price', 'INVALID_PRICE');
 
-    // ── Step 3: 수량 제한 검증 + total_quantity 원자적 차감 ──────────────
-    // SELECT FOR UPDATE → 동시 주문 시 race condition 방지
-    const qr = this.dataSource.createQueryRunner();
-    await qr.connect();
-    await qr.startTransaction();
+    return {
+      listingId: preListing.id,
+      serviceKey: preListing.service_key,
+      organizationId: preListing.organization_id,
+      masterId: preListing.master_id,
+      offerId: preListing.offer_id,
+      supplierId: product.supplier_id,
+      productName: product.name || '',
+      unitPrice,
+      shippingPolicy: {
+        baseShippingFee: product.base_shipping_fee != null ? Number(product.base_shipping_fee) : null,
+        freeShippingThreshold: product.free_shipping_threshold != null ? Number(product.free_shipping_threshold) : null,
+      },
+    };
+  }
 
-    let decremented = false;
+  /**
+   * 활성 queryRunner 트랜잭션 안에서 listing 재고를 잠그고(FOR UPDATE) 한도 검증 후 차감한다.
+   * WO-O4O-STORE-CART-CHECKOUT-CONFIRMATION-V1: participate(단일) 와 cart checkout-confirm(공급자 그룹) 공용.
+   * 검증 실패 시 EventOfferError 를 throw 한다(트랜잭션 정리는 호출자 책임).
+   * 반환 decrementedQty: 차감한 수량(보상용). total_quantity 가 null(무제한)이면 0.
+   */
+  async reserveEventOfferListing(
+    qr: QueryRunner,
+    params: { listingId: string; serviceKey: string; userId: string; quantity: number },
+  ): Promise<{ decrementedQty: number }> {
+    const { listingId, serviceKey, userId, quantity } = params;
 
-    try {
-      // Row 잠금 + 최신 수량 정보 획득
-      const [listing] = await qr.query(
-        `SELECT id, offer_id, organization_id, service_key, status,
-                start_at, end_at, total_quantity, per_store_limit, per_order_limit
-         FROM organization_product_listings
-         WHERE id = $1 AND service_key = $2
-           AND status = 'approved'
-           AND (start_at IS NULL OR NOW() >= start_at)
-           AND (end_at   IS NULL OR NOW() <= end_at)
-         FOR UPDATE`,
-        [listingId, serviceKey],
-      );
-      if (!listing) {
-        await qr.rollbackTransaction();
-        throw new EventOfferError(404, '이벤트를 찾을 수 없거나 진행 중이 아닙니다.');
-      }
-
-      // (A) per_order_limit: 1회 주문 수량 상한
-      if (listing.per_order_limit !== null && quantity > Number(listing.per_order_limit)) {
-        await qr.rollbackTransaction();
-        throw new EventOfferError(
-          400,
-          `1회 최대 ${listing.per_order_limit}개까지 주문 가능합니다.`,
-          'PER_ORDER_LIMIT_EXCEEDED',
-        );
-      }
-
-      // (B) total_quantity: 잔여 수량 검증
-      if (listing.total_quantity !== null) {
-        const remaining = Number(listing.total_quantity);
-        if (remaining <= 0) {
-          await qr.rollbackTransaction();
-          throw new EventOfferError(400, '판매 종료된 이벤트입니다.', 'SOLD_OUT');
-        }
-        if (remaining < quantity) {
-          await qr.rollbackTransaction();
-          throw new EventOfferError(
-            400,
-            `잔여 수량이 ${remaining}개입니다. 수량을 줄여 다시 시도해 주세요.`,
-            'INSUFFICIENT_QUANTITY',
-          );
-        }
-      }
-
-      // (C) per_store_limit: 매장별 누적 구매 상한
-      if (listing.per_store_limit !== null) {
-        const [storeRow] = await qr.query(
-          `SELECT COALESCE(
-             SUM((elem->>'quantity')::int), 0
-           )::int AS total_ordered
-           FROM checkout_orders co
-           CROSS JOIN jsonb_array_elements(co.items) AS elem
-           WHERE co."buyerId" = $1
-             AND co.metadata->>'productListingId' = $2
-             AND co.status NOT IN ('canceled', 'failed')`,
-          [userId, listingId],
-        );
-        const alreadyOrdered = Number(storeRow?.total_ordered ?? 0);
-        const perStoreLimit = Number(listing.per_store_limit);
-        if (alreadyOrdered + quantity > perStoreLimit) {
-          const canOrder = perStoreLimit - alreadyOrdered;
-          await qr.rollbackTransaction();
-          throw new EventOfferError(
-            400,
-            canOrder <= 0
-              ? '매장 구매 한도를 이미 초과하였습니다.'
-              : `매장 구매 한도까지 ${canOrder}개 더 주문 가능합니다.`,
-            'PER_STORE_LIMIT_EXCEEDED',
-          );
-        }
-      }
-
-      // (D) total_quantity 원자적 차감 (수량 있는 경우만)
-      if (listing.total_quantity !== null) {
-        await qr.query(
-          `UPDATE organization_product_listings
-           SET total_quantity = total_quantity - $1, updated_at = NOW()
-           WHERE id = $2`,
-          [quantity, listingId],
-        );
-        decremented = true;
-      }
-
-      await qr.commitTransaction();
-    } catch (e) {
-      if (qr.isTransactionActive) await qr.rollbackTransaction();
-      throw e;
-    } finally {
-      await qr.release();
+    const [listing] = await qr.query(
+      `SELECT id, offer_id, organization_id, service_key, status,
+              start_at, end_at, total_quantity, per_store_limit, per_order_limit
+       FROM organization_product_listings
+       WHERE id = $1 AND service_key = $2
+         AND status = 'approved'
+         AND (start_at IS NULL OR NOW() >= start_at)
+         AND (end_at   IS NULL OR NOW() <= end_at)
+       FOR UPDATE`,
+      [listingId, serviceKey],
+    );
+    if (!listing) {
+      throw new EventOfferError(404, '이벤트를 찾을 수 없거나 진행 중이 아닙니다.');
     }
 
-    // ── Step 4: 주문 생성 (checkoutService 경유 — CLAUDE.md 규칙) ────────
-    try {
-      const savedOrder = await checkoutService.createOrder({
-        buyerId: userId,
-        sellerId: preListing.organization_id,
-        supplierId: product.supplier_id,
-        items: [{
-          productId: preListing.offer_id,
-          productName: product.name || '',
-          quantity,
-          unitPrice,
-          subtotal: quantity * unitPrice,
-        }],
-        // WO-O4O-NETURE-SUPPLIER-SHIPPING-CALCULATION-V2:
-        // 공급자 배송 정책 주입 → checkout 이 supplierId 기준 배송비 계산.
-        // 정책 미설정(null) 이면 checkout fallback(0원).
-        shippingPolicy: {
-          baseShippingFee: product.base_shipping_fee != null ? Number(product.base_shipping_fee) : null,
-          freeShippingThreshold: product.free_shipping_threshold != null ? Number(product.free_shipping_threshold) : null,
-        },
-        metadata: {
-          serviceKey: preListing.service_key,
-          productListingId: preListing.id,
-          productName: product.name || '',
-          productId: preListing.offer_id,
-        },
-      });
+    // (A) per_order_limit
+    if (listing.per_order_limit !== null && quantity > Number(listing.per_order_limit)) {
+      throw new EventOfferError(
+        400,
+        `1회 최대 ${listing.per_order_limit}개까지 주문 가능합니다.`,
+        'PER_ORDER_LIMIT_EXCEEDED',
+      );
+    }
 
-      // ── Step 6: 매장 진열 자동 등록 (best-effort) ────────────────────
-      // WO-O4O-EVENT-OFFER-STORE-PRODUCT-LINK-V1
-      // 주문 트랜잭션은 이미 commit됨. 매장 등록 실패는 non-blocking — 사용자에게는
-      // 주문 성공이 우선. 실패 시 trace만 남기고 계속 진행한다.
-      // service_key 매핑이 없으면 (예: Neture event-offer) 후처리 자체를 skip.
-      await this.tryLinkStoreProduct({
-        userId,
-        eventServiceKey: serviceKey,
-        eventListingId: preListing.id,
-        masterId: preListing.master_id,
-        offerId: preListing.offer_id,
-      });
-
-      return {
-        orderId: savedOrder.id,
-        orderNumber: savedOrder.orderNumber,
-        status: savedOrder.status,
-        totalAmount: savedOrder.totalAmount,
-      };
-    } catch (orderErr) {
-      // ── Step 5: 주문 실패 시 차감량 보상 (compensation) ────────────────
-      if (decremented) {
-        try {
-          await this.dataSource.query(
-            `UPDATE organization_product_listings
-             SET total_quantity = total_quantity + $1, updated_at = NOW()
-             WHERE id = $2`,
-            [quantity, listingId],
-          );
-        } catch (compErr) {
-          console.error('[EventOfferService] Compensation increment failed:', compErr);
-        }
+    // (B) total_quantity 잔여
+    if (listing.total_quantity !== null) {
+      const remaining = Number(listing.total_quantity);
+      if (remaining <= 0) {
+        throw new EventOfferError(400, '판매 종료된 이벤트입니다.', 'SOLD_OUT');
       }
-      throw orderErr;
+      if (remaining < quantity) {
+        throw new EventOfferError(
+          400,
+          `잔여 수량이 ${remaining}개입니다. 수량을 줄여 다시 시도해 주세요.`,
+          'INSUFFICIENT_QUANTITY',
+        );
+      }
+    }
+
+    // (C) per_store_limit (누적 — 정정된 line-item 기준 SQL)
+    if (listing.per_store_limit !== null) {
+      const alreadyOrdered = await this.countStoreOrderedQuantity(qr, userId, listingId);
+      const perStoreLimit = Number(listing.per_store_limit);
+      if (alreadyOrdered + quantity > perStoreLimit) {
+        const canOrder = perStoreLimit - alreadyOrdered;
+        throw new EventOfferError(
+          400,
+          canOrder <= 0
+            ? '매장 구매 한도를 이미 초과하였습니다.'
+            : `매장 구매 한도까지 ${canOrder}개 더 주문 가능합니다.`,
+          'PER_STORE_LIMIT_EXCEEDED',
+        );
+      }
+    }
+
+    // (D) 원자적 차감 (수량 있는 경우만)
+    if (listing.total_quantity !== null) {
+      await qr.query(
+        `UPDATE organization_product_listings
+         SET total_quantity = total_quantity - $1, updated_at = NOW()
+         WHERE id = $2`,
+        [quantity, listingId],
+      );
+      return { decrementedQty: quantity };
+    }
+    return { decrementedQty: 0 };
+  }
+
+  /** 차감 보상(increment back). best-effort — 실패해도 throw 하지 않음. */
+  async incrementListingQuantity(listingId: string, qty: number): Promise<void> {
+    if (qty <= 0) return;
+    try {
+      await this.dataSource.query(
+        `UPDATE organization_product_listings
+         SET total_quantity = total_quantity + $1, updated_at = NOW()
+         WHERE id = $2`,
+        [qty, listingId],
+      );
+    } catch (compErr) {
+      console.error('[EventOfferService] Compensation increment failed:', compErr);
     }
   }
 
@@ -783,7 +844,8 @@ export class EventOfferService {
   // TODO: 추후 retry/repair API 도입 시 주문 → 매장 등록 누락 케이스 일괄 보정.
   // TODO: 이미 매장에 있는 listing의 price 필드 갱신 정책 결정 (현재는 skip 유지).
 
-  private async tryLinkStoreProduct(params: {
+  // WO-O4O-STORE-CART-CHECKOUT-CONFIRMATION-V1: cart checkout-confirm 오케스트레이터도 재사용 (public)
+  async tryLinkStoreProduct(params: {
     userId: string;
     eventServiceKey: string;
     eventListingId: string;
