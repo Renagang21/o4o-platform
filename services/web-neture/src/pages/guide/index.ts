@@ -47,3 +47,4 @@ export { GuideBusinessHubPage } from './GuideBusinessHubPage';
 export { GuideBusinessActorPlaceholderPage } from './GuideBusinessActorPlaceholderPage';
 export { GuideBusinessPharmacyCoopPage } from './GuideBusinessPharmacyCoopPage';
 export { GuideBusinessTouristStorePage } from './GuideBusinessTouristStorePage';
+export { GuideBusinessForeignCustomerStorePage } from './GuideBusinessForeignCustomerStorePage';

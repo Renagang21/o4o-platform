@@ -510,6 +510,8 @@ const GuideBusinessActorPlaceholderPage = lazy(() => import('./pages/guide').the
 const GuideBusinessPharmacyCoopPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideBusinessPharmacyCoopPage })));
 // WO-O4O-NETURE-BUSINESS-TOURIST-STORE-DETAIL-PAGE-V1: 관광지 약국/화장품 매장 전용 상세 페이지
 const GuideBusinessTouristStorePage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideBusinessTouristStorePage })));
+// WO-O4O-NETURE-BUSINESS-FOREIGN-CUSTOMER-STORE-DETAIL-PAGE-V1: 외국인 고객 지역 매장 전용 상세 페이지
+const GuideBusinessForeignCustomerStorePage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideBusinessForeignCustomerStorePage })));
 
 // Loading fallback
 function PageLoading() {
@@ -705,7 +707,7 @@ function App() {
               {/* WO-O4O-MAIN-BUSINESS-ACTOR-CARDS-ROUTE-SCAFFOLD-V1: 사업자별 상세 placeholder (본문 추후 작성) */}
               <Route path="/guide/business/pharmacy-coop" element={<GuideBusinessPharmacyCoopPage />} />
               <Route path="/guide/business/tourist-store" element={<GuideBusinessTouristStorePage />} />
-              <Route path="/guide/business/foreign-customer-store" element={<GuideBusinessActorPlaceholderPage title="외국인 고객이 많은 지역 매장" />} />
+              <Route path="/guide/business/foreign-customer-store" element={<GuideBusinessForeignCustomerStorePage />} />
               <Route path="/guide/business/warehouse-pharmacy" element={<GuideBusinessActorPlaceholderPage title="창고형 약국" />} />
               <Route path="/guide/intro" element={<GuideIntroPage />} />
               <Route path="/guide/intro/structure" element={<GuideIntroStructurePage />} />
