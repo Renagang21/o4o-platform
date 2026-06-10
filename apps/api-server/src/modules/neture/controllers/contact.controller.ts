@@ -16,10 +16,19 @@ import type { DataSource } from 'typeorm';
 import { NetureContactMessage } from '../entities/NetureContactMessage.entity.js';
 import { requireAuth } from '../../../middleware/auth.middleware.js';
 import { requireNetureScope } from '../../../middleware/neture-scope.middleware.js';
+import { notificationService } from '../../../services/NotificationService.js';
 import logger from '../../../utils/logger.js';
 
 const VALID_CONTACT_TYPES = ['supplier', 'partner', 'service', 'other'] as const;
 const VALID_STATUSES = ['new', 'in_progress', 'resolved'] as const;
+
+/** contactType → 운영자 알림용 한글 라벨. */
+const CONTACT_TYPE_LABELS: Record<string, string> = {
+  supplier: '공급자',
+  partner: '파트너',
+  service: '서비스',
+  other: '기타',
+};
 
 export function createContactController(dataSource: DataSource): Router {
   const router = Router();
@@ -67,6 +76,39 @@ export function createContactController(dataSource: DataSource): Router {
       await repo.save(entity);
 
       logger.info(`[Neture Contact] New message: ${entity.id} (${contactType})`);
+
+      // ── Operator notification (best-effort) ──
+      // WO-O4O-NETURE-CONTACT-INQUIRY-OPERATOR-NOTIFICATION-V1:
+      //   Contact us 는 공개 문의 창구 — 모든 contactType 을 neture:operator + neture:admin 에게 알린다.
+      //   알림 실패가 문의 접수(저장)를 실패시키지 않도록 try/catch 로 격리.
+      try {
+        const operators: { userId: string }[] = await dataSource.query(
+          `SELECT DISTINCT user_id AS "userId"
+             FROM role_assignments
+            WHERE role IN ('neture:operator','neture:admin')
+              AND is_active = true
+            LIMIT 50`,
+        );
+        const typeLabel = CONTACT_TYPE_LABELS[entity.contactType] || entity.contactType;
+        await Promise.allSettled(
+          operators.map((op) =>
+            notificationService.createNotification({
+              userId: op.userId,
+              type: 'contact.new',
+              title: '새 문의가 접수되었습니다',
+              message: `[${typeLabel}] ${entity.subject}`,
+              serviceKey: 'neture',
+              metadata: {
+                contactMessageId: entity.id,
+                contactType: entity.contactType,
+                targetUrl: '/operator/contact-messages?status=new',
+              },
+            }),
+          ),
+        );
+      } catch (notifyError) {
+        logger.warn('[Neture Contact] operator notification failed (best-effort):', notifyError);
+      }
 
       return res.status(201).json({
         success: true,

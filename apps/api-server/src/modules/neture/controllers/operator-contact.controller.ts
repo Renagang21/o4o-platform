@@ -10,7 +10,10 @@
  * Routes (mount: /operator):
  *   GET /operator/contact-messages
  *     · list + pagination + filter (contactType / status)
- *     · default contactType = supplier+partner (operator 우선 영역)
+ *     · WO-O4O-NETURE-CONTACT-INQUIRY-OPERATOR-NOTIFICATION-V1:
+ *       default contactType = 전체 (supplier/partner/service/other).
+ *       Contact us 는 공개 문의 창구이므로 operator 가 모든 유형의 신규 문의를 놓치지 않도록 한다.
+ *       (이전: default = supplier+partner. supplier/partner 우선은 selectable 필터로만 유지)
  *     · operator 화면 노출 안전 필드만 SELECT — adminNotes / ipAddress / userAgent 0
  *     · message 본문은 preview (앞 160자) 만 반환 — 상세 처리는 admin
  *
@@ -31,10 +34,11 @@ import { requireNetureScope } from '../../../middleware/neture-scope.middleware.
 import { NetureContactMessage } from '../entities/NetureContactMessage.entity.js';
 import logger from '../../../utils/logger.js';
 
-/** operator 가 직접 처리할 contactType 기본 집합 — supplier / partner 우선. */
-const OPERATOR_DEFAULT_TYPES = ['supplier', 'partner'] as const;
-
-/** WO §1 정책 — operator 화면에는 service/other 까지는 filter 로 조회 가능하되 default 는 supplier/partner. */
+/**
+ * operator 화면 default 조회 집합 — 전체 contactType.
+ * WO-O4O-NETURE-CONTACT-INQUIRY-OPERATOR-NOTIFICATION-V1: Contact us 공개 문의는 유형 무관하게
+ * operator 가 기본 목록에서 모두 보여야 한다. (이전 supplier+partner 제한 폐기)
+ */
 const ALL_CONTACT_TYPES = ['supplier', 'partner', 'service', 'other'] as const;
 const VALID_STATUSES = ['new', 'in_progress', 'resolved'] as const;
 
@@ -64,7 +68,7 @@ export function createOperatorContactController(dataSource: DataSource): Router 
    * GET /operator/contact-messages
    *
    * Query:
-   *   contactType : supplier | partner | service | other (단일) — default 미지정 시 supplier+partner
+   *   contactType : supplier | partner | service | other (단일) — default 미지정 시 전체 유형
    *   status      : new | in_progress | resolved (단일) — default 미지정 시 전체
    *   page        : default 1
    *   limit       : default 20, max 100
@@ -101,10 +105,8 @@ export function createOperatorContactController(dataSource: DataSource): Router 
           });
         }
         qb.andWhere('msg.contactType = :contactType', { contactType });
-      } else {
-        // default = supplier+partner (operator 우선 영역)
-        qb.andWhere('msg.contactType IN (:...defaultTypes)', { defaultTypes: [...OPERATOR_DEFAULT_TYPES] });
       }
+      // default (contactType 미지정) = 전체 유형. 별도 WHERE 추가 없음 — operator 가 모든 신규 문의를 본다.
 
       // status 필터
       if (status && typeof status === 'string') {

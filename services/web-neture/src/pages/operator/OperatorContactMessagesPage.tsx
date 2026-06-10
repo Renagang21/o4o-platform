@@ -7,9 +7,9 @@
  * 선행 WO : WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1 (operator scope 분리 패턴)
  *
  * 운영자가 할 수 있는 일:
- *  - 문의 목록 조회 (default = supplier+partner)
+ *  - 문의 목록 조회 (default = 전체 유형 — WO-O4O-NETURE-CONTACT-INQUIRY-OPERATOR-NOTIFICATION-V1)
  *  - contactType / status 필터
- *  - supplier/partner 문의 일괄 mark-read 처리
+ *  - supplier/partner 문의 일괄 mark-read 처리 (service/other 는 admin 개별 처리)
  *
  * 운영자가 할 수 없는 일 (admin 으로 escalate):
  *  - 개별 status 변경
@@ -109,7 +109,7 @@ export default function OperatorContactMessagesPage() {
     new Date(iso).toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
 
   const contactTypeOptions: Array<{ value: ContactTypeFilter; label: string }> = [
-    { value: '', label: '공급자 + 파트너 (기본)' },
+    { value: '', label: '전체 문의 (기본)' },
     { value: 'supplier', label: '공급자' },
     { value: 'partner', label: '파트너' },
     { value: 'service', label: '서비스' },
@@ -128,7 +128,7 @@ export default function OperatorContactMessagesPage() {
       <div>
         <h1 className="text-2xl font-bold text-slate-900">문의 메시지 (운영자)</h1>
         <p className="text-slate-500 mt-1">
-          공급자 / 파트너 문의를 빠르게 확인하고 일괄 처리합니다. 개별 상세 처리·메모는 관리자 화면에서 진행하세요.
+          Contact us 로 접수된 모든 문의(공급자 · 파트너 · 서비스 · 기타)를 확인합니다. 개별 상세 처리·메모는 관리자 화면에서 진행하세요.
         </p>
       </div>
 
