@@ -45,3 +45,4 @@ export { GuideBusinessOperatorRevenuePage } from './GuideBusinessOperatorRevenue
 // WO-O4O-NETURE-BUSINESS-GUIDE-HUB-V1
 export { GuideBusinessHubPage } from './GuideBusinessHubPage';
 export { GuideBusinessActorPlaceholderPage } from './GuideBusinessActorPlaceholderPage';
+export { GuideBusinessPharmacyCoopPage } from './GuideBusinessPharmacyCoopPage';
