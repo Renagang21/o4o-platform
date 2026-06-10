@@ -48,16 +48,16 @@ const homeProps: GuideFeaturesPageProps = {
   //   기능 나열·복잡한 사업자 분류 금지. 각 카드는 기존 Business/판매자 Guide 로만 연결(데드링크 0),
   //   마지막 카드는 하단 안내 + 상담 CTA(/contact). 의료행위·KCos commerce 완료 표현 회피. /o4o(/apply) 미사용.
   index: {
-    title: 'O4O 기반 사업 운영 예',
+    title: 'O4O 사업 적용 예시',
     lead: [
-      'O4O는 특정 업종 하나를 위한 서비스가 아닙니다. 상품 · 거래선 · 매장 · 콘텐츠를 가진 사업자가 자기 상황에 맞게 조합해 사업을 운영할 수 있는 플랫폼입니다.',
+      'O4O는 특정 업종 하나를 위한 서비스가 아닙니다. 상품 · 거래선 · 매장 · 콘텐츠를 가진 사업자가 자기 상황에 맞게 조합해 사업에 적용할 수 있는 플랫폼입니다.',
     ],
     cards: [
-      { title: '약국들의 협동조합', audience: '약국 네트워크', summary: '회원 약국이 함께 활용할 상품과 안내 콘텐츠를 운영합니다. 공동 상품 · 특가 · 교육 자료 · 매장 안내물을 각 약국이 쉽게 활용하도록 연결합니다.', to: '/guide/business/pharmacy-coop' },
-      { title: '관광지 약국 / 화장품 가게', audience: '판매자 · 매장', summary: '관광객에게 제품 설명과 사용법을 쉽게 전달합니다. 다국어 안내 · QR · 영상 · 매장 화면을 활용해 짧은 체류 시간 안에 상품을 이해하도록 돕습니다.', to: '/guide/business/tourist-store' },
-      { title: '외국인 고객이 많은 지역 매장', audience: '판매자 · 매장', summary: '외국인 근로자나 장기 체류 고객에게 제품 정보를 쉽게 안내합니다. 언어 장벽이 있는 고객도 제품 설명 · 사용법 · 주의사항을 매장에서 확인할 수 있게 합니다.', to: '/guide/business/foreign-customer-store' },
-      { title: '창고형 약국', audience: '약국 네트워크', summary: '많은 상품을 단순 진열하는 데서 끝내지 않고, 상품별 설명과 추천 정보를 함께 제공합니다. QR · POP · 화면 안내를 활용해 고객이 필요한 제품을 더 쉽게 찾고 이해하도록 돕습니다.', to: '/guide/business/warehouse-pharmacy' },
-      { title: '내 사업에 맞는 운영 방식 상담하기', audience: '문의', summary: '위 예시는 일부입니다. O4O는 사업자가 가진 상품 · 거래선 · 매장 · 콘텐츠 구조에 맞춰 다양한 방식으로 조합해 사업 운영에 활용할 수 있습니다. 내 사업에 맞는 운영 방식을 상담하려면 문의해 주세요.', to: '/contact' },
+      { title: '약국들의 협동조합', audience: '약국 네트워크', summary: '회원 약국이 함께 활용할 상품 · 콘텐츠 · 매장 안내 자료를 운영합니다.', to: '/guide/business/pharmacy-coop' },
+      { title: '관광지 약국 / 화장품 가게', audience: '판매자 · 매장', summary: '관광객에게 제품 설명과 사용법을 쉽게 안내합니다.', to: '/guide/business/tourist-store' },
+      { title: '외국인 고객이 많은 지역 매장', audience: '판매자 · 매장', summary: '외국인 고객에게 제품 정보와 사용법을 여러 언어로 안내합니다.', to: '/guide/business/foreign-customer-store' },
+      { title: '창고형 약국', audience: '약국 네트워크', summary: '많은 상품을 고객이 쉽게 찾고 이해하도록 안내합니다.', to: '/guide/business/warehouse-pharmacy' },
+      { title: '내 사업에 맞는 운영 방식 상담하기', audience: '문의', summary: '내 사업 구조에 맞는 O4O 적용 방식을 상담합니다.', to: '/contact' },
     ],
   },
   groups: [
