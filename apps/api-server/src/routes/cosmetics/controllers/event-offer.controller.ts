@@ -361,6 +361,10 @@ export function createCosmeticsEventOfferController(
   /**
    * POST /:id/participate — Create participation order
    * STORE_SERVICE_KEY_MAP에 의해 'k-cosmetics' 매장 진열로 자동 연결
+   *
+   * @deprecated WO-O4O-EVENT-OFFER-PARTICIPATE-LEGACY-DEMOTION-V1
+   *   Buyer 주문 canonical entry 는 Store Cart checkout-confirm 이다. 이 route 는 legacy/호환 경로
+   *   (buyer UI 직접 호출 0건). route 미삭제.
    */
   router.post(
     '/:id/participate',

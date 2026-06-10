@@ -593,6 +593,14 @@ export class EventOfferService {
   /**
    * POST /:id/participate — Create event offer order via checkoutService
    *
+   * @deprecated WO-O4O-EVENT-OFFER-PARTICIPATE-LEGACY-DEMOTION-V1
+   *   Buyer 주문의 canonical entry 는 Store Cart checkout-confirm 으로 이전됨:
+   *   StoreCartItem(sourceType='event_offer') → POST /store/cart/:serviceKey/checkout-confirm
+   *   → (supplier, sellerOrg) 그룹별 checkoutService.createOrder.
+   *   이 method 는 단건 직접 주문 legacy/호환 경로다 (KPA/Glyco/KCos buyer UI 직접 호출 0건).
+   *   검증/차감 로직은 loadEventOfferContext + reserveEventOfferListing helper 로 분리되어
+   *   checkout-confirm 오케스트레이터가 재사용한다. 동작·에러코드는 보존한다. route 미삭제.
+   *
    * WO-EVENT-OFFER-FIX-V1: checkout_orders 사용, metadata.serviceKey 전파
    * WO-O4O-EVENT-OFFER-CORE-REFORM-V1: total_quantity 검증
    * WO-O4O-EVENT-OFFER-QUANTITY-LIMITS-V1:

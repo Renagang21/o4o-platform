@@ -87,6 +87,10 @@ export function createGlycopharmEventOfferController(
 
   /**
    * POST /:id/participate — 참여 주문 생성
+   *
+   * @deprecated WO-O4O-EVENT-OFFER-PARTICIPATE-LEGACY-DEMOTION-V1
+   *   Buyer 주문 canonical entry 는 Store Cart checkout-confirm 이다. 이 route 는 legacy/호환 경로
+   *   (buyer UI 직접 호출 0건). route 미삭제.
    */
   router.post('/:id/participate', requireAuth,
     asyncHandler(async (req: Request, res: Response) => {

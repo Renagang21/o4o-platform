@@ -61,7 +61,12 @@ export const eventOfferApi = {
   getOffer: (id: string) =>
     apiClient.get<ApiResponse<LegacyEventOffer>>(`/groupbuy/${id}`),
 
-  // 참여하기
+  /**
+   * @deprecated WO-O4O-EVENT-OFFER-PARTICIPATE-LEGACY-DEMOTION-V1
+   * Buyer 주문 진입은 canonical Store Cart 흐름으로 이전됨:
+   *   장바구니 담기 → /store-hub/cart → checkout-confirm.
+   * 이 method 는 legacy/internal 호환용으로만 유지한다 (buyer UI 직접 호출 0건).
+   */
   participate: (id: string, quantity: number) =>
     apiClient.post<ApiResponse<EventOfferParticipation>>(`/groupbuy/${id}/participate`, {
       quantity,

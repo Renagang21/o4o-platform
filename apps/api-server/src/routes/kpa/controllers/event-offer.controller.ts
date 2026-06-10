@@ -123,6 +123,10 @@ export function createEventOfferController(
   /**
    * POST /:id/participate — Create participation order
    * listing.service_key -> Order.metadata.serviceKey 전파 보장
+   *
+   * @deprecated WO-O4O-EVENT-OFFER-PARTICIPATE-LEGACY-DEMOTION-V1
+   *   Buyer 주문 canonical entry 는 Store Cart checkout-confirm 이다. 이 route 는 legacy/호환 경로
+   *   (buyer UI 직접 호출 0건). route 미삭제 — 후속 RETIREMENT-V2 에서 제거 검토.
    */
   router.post('/:id/participate', authenticate,
     asyncHandler(async (req: Request, res: Response) => {
