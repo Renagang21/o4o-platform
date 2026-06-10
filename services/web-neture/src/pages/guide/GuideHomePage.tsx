@@ -47,6 +47,10 @@ const homeProps: GuideFeaturesPageProps = {
   //   기능 설명보다 먼저 "O4O 기반으로 어떤 사업 운영 장면을 만들 수 있는가"를 보여주는 대표 예시 4개.
   //   기능 나열·복잡한 사업자 분류 금지. 각 카드는 기존 Business/판매자 Guide 로만 연결(데드링크 0),
   //   마지막 카드는 하단 안내 + 상담 CTA(/contact). 의료행위·KCos commerce 완료 표현 회피. /o4o(/apply) 미사용.
+  // WO-O4O-NETURE-GUIDE-BUSINESS-EXAMPLES-BOTTOM-SECTION-FIX-V1:
+  //   "사업 적용 예시"는 첫 진입 설명이 아니라 전체 가이드(O4O 이해 → … → 파트너)를 본 뒤
+  //   "내 상황엔 어떻게 적용하나"를 확인하는 마무리 섹션 → indexPosition='bottom' 으로 맨 하단 이동.
+  indexPosition: 'bottom',
   index: {
     title: 'O4O 사업 적용 예시',
     lead: [

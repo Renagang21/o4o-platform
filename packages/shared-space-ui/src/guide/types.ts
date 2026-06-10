@@ -244,6 +244,12 @@ export interface GuideFeaturesPageProps {
     lead?: string[];
     cards: GuideManualIndexCard[];
   };
+  /**
+   * index(카드 목차) 렌더 위치. WO-O4O-NETURE-GUIDE-BUSINESS-EXAMPLES-BOTTOM-SECTION-FIX-V1.
+   *   'top'    : Hero 아래·그룹 위 (기본값 — 기존 동작, 모든 기존 소비처 무영향)
+   *   'bottom' : 그룹 섹션 아래·bottomNav 위 (전체 가이드를 본 뒤 "내 사업에 적용" 마무리 섹션)
+   */
+  indexPosition?: 'top' | 'bottom';
   groups: GuideFeatureGroup[];
   bottomNav: {
     prev: GuideNavLink;     // '← 서비스 활용 방법'

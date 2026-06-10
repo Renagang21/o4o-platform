@@ -9,7 +9,45 @@ import { PageSection, PageContainer } from '@o4o/ui';
 import type { GuideFeaturesPageProps } from './types.js';
 import { heroStyles, sectionStyles, cardStyles, bottomNavStyles, indexStyles } from './styles.js';
 
-export function GuideFeaturesPage({ hero, index, groups, bottomNav, renderText }: GuideFeaturesPageProps) {
+export function GuideFeaturesPage({ hero, index, indexPosition = 'top', groups, bottomNav, renderText }: GuideFeaturesPageProps) {
+  const atBottom = indexPosition === 'bottom';
+
+  // Card index (선택적 카드 목차 — 사업자 유형 / 사업 적용 예시 등)
+  // WO-O4O-NETURE-GUIDE-BUSINESS-EXAMPLES-BOTTOM-SECTION-FIX-V1: 'top'(기본) 또는 'bottom' 렌더.
+  //   - top    : WO-O4O-GUIDE-HERO-SECTION-SPACING-STANDARD-V1 에 따라 첫 섹션 paddingTop(32) 밀착 보정.
+  //   - bottom : 그룹 아래 마지막 섹션 — paddingTop 보정 불필요, last 로 하단 여백 제거.
+  const indexSection =
+    index && index.cards.length > 0 ? (
+      <PageSection style={atBottom ? undefined : { paddingTop: 32 }} last={atBottom}>
+        <PageContainer>
+          <div style={indexStyles.wrap}>
+            {index.title && <h2 style={indexStyles.title}>{index.title}</h2>}
+            {index.lead && index.lead.length > 0 && (
+              <ul style={indexStyles.leadList}>
+                {index.lead.map((line) => (
+                  <li key={line} style={indexStyles.leadItem}>
+                    <span style={indexStyles.leadDot} />
+                    <span>{line}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <div style={cardStyles.gridLg}>
+              {index.cards.map((card) => (
+                <a key={card.to} href={card.to} style={indexStyles.card}>
+                  <div style={indexStyles.cardHead}>
+                    <span style={indexStyles.cardTitle}>{card.title}</span>
+                    {card.audience && <span style={indexStyles.audienceTag}>{card.audience}</span>}
+                  </div>
+                  <p style={indexStyles.cardSummary}>{card.summary}</p>
+                </a>
+              ))}
+            </div>
+          </div>
+        </PageContainer>
+      </PageSection>
+    ) : null;
+
   return (
     <div>
       {/* Hero */}
@@ -32,42 +70,12 @@ export function GuideFeaturesPage({ hero, index, groups, bottomNav, renderText }
         </div>
       </div>
 
-      {/* Card index (선택적 카드 목차 — 사업자 유형 등) */}
-      {/* WO-O4O-GUIDE-HERO-SECTION-SPACING-STANDARD-V1: index 0px 밀착 보정 — 첫 섹션 paddingTop(32) */}
-      {index && index.cards.length > 0 && (
-        <PageSection style={{ paddingTop: 32 }}>
-          <PageContainer>
-            <div style={indexStyles.wrap}>
-              {index.title && <h2 style={indexStyles.title}>{index.title}</h2>}
-              {index.lead && index.lead.length > 0 && (
-                <ul style={indexStyles.leadList}>
-                  {index.lead.map((line) => (
-                    <li key={line} style={indexStyles.leadItem}>
-                      <span style={indexStyles.leadDot} />
-                      <span>{line}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-              <div style={cardStyles.gridLg}>
-                {index.cards.map((card) => (
-                  <a key={card.to} href={card.to} style={indexStyles.card}>
-                    <div style={indexStyles.cardHead}>
-                      <span style={indexStyles.cardTitle}>{card.title}</span>
-                      {card.audience && <span style={indexStyles.audienceTag}>{card.audience}</span>}
-                    </div>
-                    <p style={indexStyles.cardSummary}>{card.summary}</p>
-                  </a>
-                ))}
-              </div>
-            </div>
-          </PageContainer>
-        </PageSection>
-      )}
+      {/* Card index — top (기본) */}
+      {!atBottom && indexSection}
 
       {/* Group Sections */}
       {groups.map((group, idx) => (
-        <PageSection key={group.step} last={idx === groups.length - 1}>
+        <PageSection key={group.step} last={!atBottom && idx === groups.length - 1}>
           <PageContainer>
             <div style={sectionStyles.wrapLg}>
               <div style={sectionStyles.headerLg}>
@@ -94,6 +102,9 @@ export function GuideFeaturesPage({ hero, index, groups, bottomNav, renderText }
           </PageContainer>
         </PageSection>
       ))}
+
+      {/* Card index — bottom ("내 사업에 적용" 마무리 섹션) */}
+      {atBottom && indexSection}
 
       {/* Bottom nav */}
       <div style={bottomNavStyles.wrap}>
