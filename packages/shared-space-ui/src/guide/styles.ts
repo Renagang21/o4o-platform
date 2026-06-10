@@ -12,8 +12,11 @@ import type { CSSProperties } from 'react';
 // ─── Hero ─────────────────────────────────────────────────────────────────
 
 export const heroStyles: Record<string, CSSProperties> = {
-  hero: { backgroundColor: '#1e293b', padding: '56px 0 56px' },
-  heroLg: { backgroundColor: '#1e293b', padding: '64px 0 64px' },
+  // WO-O4O-GUIDE-HERO-SECTION-SPACING-STANDARD-V1: Hero → 첫 본문 사이 공통 gap.
+  //   가이드 컴포넌트는 PageHero(mb-16)를 우회하므로 hero 자체에 하단 여백을 둔다.
+  //   첫 섹션의 paddingTop(wrapLg 32 / index PageSection 32)과 합쳐 ~48px 일관 간격.
+  hero: { backgroundColor: '#1e293b', padding: '56px 0 56px', marginBottom: 16 },
+  heroLg: { backgroundColor: '#1e293b', padding: '64px 0 64px', marginBottom: 16 },
   heroInner: { maxWidth: 720, margin: '0 auto', padding: '0 24px' },
   eyebrow: {
     fontSize: '0.8125rem',

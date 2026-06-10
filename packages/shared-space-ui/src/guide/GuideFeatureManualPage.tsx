@@ -49,8 +49,9 @@ export function GuideFeatureManualPage({ hero, index, sections, bottomNav, rende
       </div>
 
       {/* Card index (선택적 카드 목차) */}
+      {/* WO-O4O-GUIDE-HERO-SECTION-SPACING-STANDARD-V1: index 0px 밀착 보정 — 첫 섹션 paddingTop(32) */}
       {index && index.cards.length > 0 && (
-        <PageSection>
+        <PageSection style={{ paddingTop: 32 }}>
           <PageContainer>
             <div style={indexStyles.wrap}>
               {index.title && <h2 style={indexStyles.title}>{index.title}</h2>}
