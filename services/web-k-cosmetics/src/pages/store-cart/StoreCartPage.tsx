@@ -97,7 +97,10 @@ export function StoreCartPage() {
     }
   };
 
-  const grandTotal = groups.reduce((s, g) => s + g.displaySubtotal, 0);
+  // WO-O4O-STORE-CART-SUPPLIER-GROUP-SHIPPING-PREVIEW-V1
+  const itemsSubtotal = groups.reduce((s, g) => s + g.displaySubtotal, 0);
+  const shippingTotal = groups.reduce((s, g) => s + (g.shipping?.shippingFee ?? 0), 0);
+  const grandTotal = itemsSubtotal + shippingTotal;
   const itemCount = groups.reduce((s, g) => s + g.itemCount, 0);
 
   return (
@@ -208,12 +211,43 @@ export function StoreCartPage() {
                   </button>
                 </div>
               ))}
+
+              {/* WO-O4O-STORE-CART-SUPPLIER-GROUP-SHIPPING-PREVIEW-V1 */}
+              {group.shipping && (
+                <div className="mt-3 pt-3 border-t border-slate-100 text-sm">
+                  <div className="flex justify-between py-0.5 text-slate-500">
+                    <span>상품금액</span><span>{won(group.displaySubtotal)}</span>
+                  </div>
+                  <div className="flex justify-between py-0.5 text-slate-500">
+                    <span>배송비</span>
+                    <span>{group.shipping.freeShippingApplied ? '무료' : won(group.shipping.shippingFee)}</span>
+                  </div>
+                  <div className="flex justify-between py-0.5 font-semibold text-slate-900">
+                    <span>공급자 합계</span><span>{won(group.displayTotal)}</span>
+                  </div>
+                  {group.shipping.freeShippingApplied ? (
+                    <p className="text-xs text-pink-600 mt-1">무료배송 기준을 충족했습니다.</p>
+                  ) : group.shipping.remainingForFreeShipping != null ? (
+                    <p className="text-xs text-pink-600 mt-1">
+                      {won(group.shipping.remainingForFreeShipping)} 더 담으면 무료배송 (기준 {won(group.shipping.freeShippingThreshold)})
+                    </p>
+                  ) : !group.shipping.policyConfigured ? (
+                    <p className="text-xs text-slate-400 mt-1">배송 정책 미설정 — 배송비 0원으로 표시됩니다.</p>
+                  ) : null}
+                </div>
+              )}
             </div>
           ))}
 
           <div className="bg-white rounded-xl border border-slate-100 p-5">
-            <div className="flex justify-between items-center mb-3">
-              <span className="text-base font-semibold text-slate-700">표시 합계 ({itemCount}개)</span>
+            <div className="flex justify-between items-center py-1 text-sm text-slate-500">
+              <span>상품 합계 ({itemCount}개)</span><span>{won(itemsSubtotal)}</span>
+            </div>
+            <div className="flex justify-between items-center py-1 text-sm text-slate-500">
+              <span>배송비 합계</span><span>{won(shippingTotal)}</span>
+            </div>
+            <div className="flex justify-between items-center mb-3 mt-2 pt-2 border-t border-slate-200">
+              <span className="text-base font-semibold text-slate-700">총 주문 예정 금액</span>
               <span className="text-xl font-bold text-slate-900">{won(grandTotal)}</span>
             </div>
             <p className="text-xs text-slate-500 mb-4 leading-relaxed">

@@ -27,6 +27,12 @@ import {
   type CartSourceType,
   type CartPricingSource,
 } from '../../entities/cart/StoreCartItem.entity.js';
+import {
+  calculateSupplierShippingFee,
+  type SupplierShippingPolicy,
+} from '../shipping/supplier-shipping.js';
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const VALID_SOURCE_TYPES: CartSourceType[] = [
   'regular',
@@ -63,6 +69,20 @@ export interface UpdateCartItemInput {
   quantity: number;
 }
 
+/**
+ * 공급자별 배송비 미리보기 (WO-O4O-STORE-CART-SUPPLIER-GROUP-SHIPPING-PREVIEW-V1).
+ * 공급자별 subtotal + 정책 기준 계산. 표시용 — checkout 확정 시 snapshot 으로 재계산된다.
+ */
+export interface SupplierGroupShipping {
+  shippingFee: number;
+  freeShippingApplied: boolean;
+  freeShippingThreshold: number | null;
+  /** 무료배송까지 남은 금액(원). 기준 없거나 충족 시 null. */
+  remainingForFreeShipping: number | null;
+  /** 공급자 배송 정책(baseShippingFee) 설정 여부. false 면 0원 fallback. */
+  policyConfigured: boolean;
+}
+
 /** 공급자별 묶음 — 배송비/무료배송/주문 분할의 단위 */
 export interface SupplierGroup {
   supplierId: string | null;
@@ -71,6 +91,10 @@ export interface SupplierGroup {
   totalQuantity: number;
   /** priceSnapshot 기준 표시용 소계(원). 신뢰 금액 아님. */
   displaySubtotal: number;
+  /** WO-...-SHIPPING-PREVIEW-V1: 공급자별 배송비 미리보기 */
+  shipping: SupplierGroupShipping;
+  /** displaySubtotal + shipping.shippingFee (표시용 공급자 합계) */
+  displayTotal: number;
 }
 
 /**
@@ -102,7 +126,11 @@ export interface CheckoutPreview {
   organizationId: string | null;
   suppliers: SupplierGroup[];
   draftOrders: DraftSupplierOrder[];
-  /** 전체 표시용 소계(원). 신뢰 금액 아님 — checkout 확정 시 재계산. */
+  /** 상품 합계(원, 배송비 제외) = Σ supplier.displaySubtotal */
+  displayItemsSubtotal: number;
+  /** 배송비 합계(원) = Σ supplier.shipping.shippingFee (WO-...-SHIPPING-PREVIEW-V1) */
+  displayShippingTotal: number;
+  /** 전체 표시용 합계(원) = 상품 + 배송비. 신뢰 금액 아님 — checkout 확정 시 재계산. */
   displayGrandTotal: number;
   /** 가격/재고/배송비는 확정 단계에서 재검증된다는 명시 플래그 */
   pricingRevalidationRequired: true;
@@ -213,6 +241,57 @@ export class StoreCartService {
     return result.affected ?? 0;
   }
 
+  /**
+   * 공급자 배송 정책 batch 조회 (supplierId = NetureSupplier.id).
+   * WO-O4O-STORE-CART-SUPPLIER-GROUP-SHIPPING-PREVIEW-V1.
+   * cart.supplierId 는 varchar 이므로 uuid 형태만 조회. 조회 실패/미설정 → 정책 없음(0원 fallback).
+   */
+  private async loadShippingPolicies(
+    supplierIds: Array<string | null>,
+  ): Promise<Map<string, SupplierShippingPolicy>> {
+    const ids = [...new Set(supplierIds.filter((s): s is string => !!s && UUID_RE.test(s)))];
+    const map = new Map<string, SupplierShippingPolicy>();
+    if (!ids.length) return map;
+    try {
+      const rows: Array<{ id: string; base_shipping_fee: number | null; free_shipping_threshold: number | null }> =
+        await this.dataSource.query(
+          `SELECT id::text AS id, base_shipping_fee, free_shipping_threshold
+           FROM neture_suppliers WHERE id::text = ANY($1)`,
+          [ids],
+        );
+      for (const r of rows) {
+        map.set(r.id, {
+          baseShippingFee: r.base_shipping_fee != null ? Number(r.base_shipping_fee) : null,
+          freeShippingThreshold: r.free_shipping_threshold != null ? Number(r.free_shipping_threshold) : null,
+        });
+      }
+    } catch (e) {
+      // 정책 조회 실패 → 전체 fallback(0원). preview 안정성 우선.
+      console.warn('[StoreCart] loadShippingPolicies failed, fallback 0원:', e);
+    }
+    return map;
+  }
+
+  /** displaySubtotal + 공급자 정책으로 배송비 미리보기 산출 */
+  private buildGroupShipping(
+    displaySubtotal: number,
+    policy: SupplierShippingPolicy | undefined,
+  ): SupplierGroupShipping {
+    const r = calculateSupplierShippingFee(displaySubtotal, policy ?? null);
+    const threshold = policy?.freeShippingThreshold ?? null;
+    const remainingForFreeShipping =
+      threshold != null && !r.freeShippingApplied && displaySubtotal > 0
+        ? Math.max(0, threshold - displaySubtotal)
+        : null;
+    return {
+      shippingFee: r.shippingFee,
+      freeShippingApplied: r.freeShippingApplied,
+      freeShippingThreshold: threshold,
+      remainingForFreeShipping,
+      policyConfigured: policy != null && policy.baseShippingFee != null,
+    };
+  }
+
   /** 공급자별 grouping — 배송비/무료배송/주문 분할의 기준 단위 */
   async groupBySupplier(scope: CartScope): Promise<SupplierGroup[]> {
     const items = await this.list(scope);
@@ -225,18 +304,29 @@ export class StoreCartService {
       else buckets.set(key, [item]);
     }
 
+    const policies = await this.loadShippingPolicies(
+      Array.from(buckets.values()).map((g) => g[0].supplierId ?? null),
+    );
+
     return Array.from(buckets.values()).map((groupItems) => {
+      const supplierId = groupItems[0].supplierId ?? null;
       const totalQuantity = groupItems.reduce((sum, i) => sum + i.quantity, 0);
       const displaySubtotal = groupItems.reduce(
         (sum, i) => sum + i.priceSnapshot * i.quantity,
         0,
       );
+      const shipping = this.buildGroupShipping(
+        displaySubtotal,
+        supplierId ? policies.get(supplierId) : undefined,
+      );
       return {
-        supplierId: groupItems[0].supplierId ?? null,
+        supplierId,
         items: groupItems,
         itemCount: groupItems.length,
         totalQuantity,
         displaySubtotal,
+        shipping,
+        displayTotal: displaySubtotal + shipping.shippingFee,
       };
     });
   }
@@ -270,13 +360,17 @@ export class StoreCartService {
       })),
     }));
 
-    const displayGrandTotal = suppliers.reduce((sum, g) => sum + g.displaySubtotal, 0);
+    const displayItemsSubtotal = suppliers.reduce((sum, g) => sum + g.displaySubtotal, 0);
+    const displayShippingTotal = suppliers.reduce((sum, g) => sum + g.shipping.shippingFee, 0);
+    const displayGrandTotal = displayItemsSubtotal + displayShippingTotal;
 
     return {
       scope,
       organizationId,
       suppliers,
       draftOrders,
+      displayItemsSubtotal,
+      displayShippingTotal,
       displayGrandTotal,
       pricingRevalidationRequired: true,
     };

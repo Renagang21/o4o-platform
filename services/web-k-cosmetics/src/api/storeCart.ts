@@ -50,12 +50,23 @@ export interface AddCartItemInput {
   priceSnapshot?: number;
 }
 
+// WO-O4O-STORE-CART-SUPPLIER-GROUP-SHIPPING-PREVIEW-V1
+export interface SupplierGroupShipping {
+  shippingFee: number;
+  freeShippingApplied: boolean;
+  freeShippingThreshold: number | null;
+  remainingForFreeShipping: number | null;
+  policyConfigured: boolean;
+}
+
 export interface SupplierGroup {
   supplierId: string | null;
   items: StoreCartItem[];
   itemCount: number;
   totalQuantity: number;
   displaySubtotal: number;
+  shipping: SupplierGroupShipping;
+  displayTotal: number;
 }
 
 export interface CreatedOrderSummary {

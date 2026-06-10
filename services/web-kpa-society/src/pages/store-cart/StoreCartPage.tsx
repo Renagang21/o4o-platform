@@ -112,7 +112,10 @@ export function StoreCartPage() {
     return <LoadingSpinner message="장바구니를 불러오는 중..." />;
   }
 
-  const grandTotal = groups.reduce((sum, g) => sum + g.displaySubtotal, 0);
+  // WO-O4O-STORE-CART-SUPPLIER-GROUP-SHIPPING-PREVIEW-V1: 상품/배송비/총액 분리
+  const itemsSubtotal = groups.reduce((sum, g) => sum + g.displaySubtotal, 0);
+  const shippingTotal = groups.reduce((sum, g) => sum + (g.shipping?.shippingFee ?? 0), 0);
+  const grandTotal = itemsSubtotal + shippingTotal;
   const itemCount = groups.reduce((sum, g) => sum + g.itemCount, 0);
 
   return (
@@ -216,12 +219,52 @@ export function StoreCartPage() {
                   </button>
                 </div>
               ))}
+
+              {/* WO-O4O-STORE-CART-SUPPLIER-GROUP-SHIPPING-PREVIEW-V1: 공급자별 배송비 */}
+              {group.shipping && (
+                <div style={styles.shipBox}>
+                  <div style={styles.shipRow}>
+                    <span style={styles.shipLabel}>상품금액</span>
+                    <span style={styles.shipValue}>{formatWon(group.displaySubtotal)}</span>
+                  </div>
+                  <div style={styles.shipRow}>
+                    <span style={styles.shipLabel}>배송비</span>
+                    <span style={styles.shipValue}>
+                      {group.shipping.freeShippingApplied ? '무료' : formatWon(group.shipping.shippingFee)}
+                    </span>
+                  </div>
+                  <div style={styles.shipRow}>
+                    <span style={styles.shipTotalLabel}>공급자 합계</span>
+                    <span style={styles.shipTotalValue}>{formatWon(group.displayTotal)}</span>
+                  </div>
+                  {group.shipping.freeShippingApplied ? (
+                    <p style={styles.shipNote}>무료배송 기준을 충족했습니다.</p>
+                  ) : group.shipping.remainingForFreeShipping != null ? (
+                    <p style={styles.shipNote}>
+                      {formatWon(group.shipping.remainingForFreeShipping)} 더 담으면 무료배송 (기준{' '}
+                      {formatWon(group.shipping.freeShippingThreshold)})
+                    </p>
+                  ) : !group.shipping.policyConfigured ? (
+                    <p style={styles.shipNoteMuted}>
+                      배송 정책이 설정되지 않아 배송비가 0원으로 표시됩니다. 주문 전 확인이 필요할 수 있습니다.
+                    </p>
+                  ) : null}
+                </div>
+              )}
             </Card>
           ))}
 
           <Card padding="large">
+            <div style={styles.subRow}>
+              <span style={styles.subLabel}>상품 합계 ({itemCount}개)</span>
+              <span style={styles.subValue}>{formatWon(itemsSubtotal)}</span>
+            </div>
+            <div style={styles.subRow}>
+              <span style={styles.subLabel}>배송비 합계</span>
+              <span style={styles.subValue}>{formatWon(shippingTotal)}</span>
+            </div>
             <div style={styles.totalRow}>
-              <span style={styles.totalLabel}>표시 합계 ({itemCount}개)</span>
+              <span style={styles.totalLabel}>총 주문 예정 금액</span>
               <span style={styles.totalValue}>{formatWon(grandTotal)}</span>
             </div>
             <p style={styles.notice}>
@@ -333,11 +376,38 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
     textDecoration: 'underline',
   },
+  shipBox: {
+    marginTop: '12px',
+    paddingTop: '12px',
+    borderTop: `1px solid ${colors.neutral100}`,
+  },
+  shipRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '3px 0',
+  },
+  shipLabel: { fontSize: '13px', color: colors.neutral500 },
+  shipValue: { fontSize: '13px', color: colors.neutral700, fontWeight: 500 },
+  shipTotalLabel: { fontSize: '14px', color: colors.neutral800, fontWeight: 600 },
+  shipTotalValue: { fontSize: '14px', color: colors.neutral900, fontWeight: 700 },
+  shipNote: { fontSize: '12px', color: '#7C3AED', margin: '6px 0 0' },
+  shipNoteMuted: { fontSize: '12px', color: colors.neutral400, margin: '6px 0 0', lineHeight: 1.5 },
+  subRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '4px 0',
+  },
+  subLabel: { fontSize: '14px', color: colors.neutral500 },
+  subValue: { fontSize: '14px', color: colors.neutral700, fontWeight: 500 },
   totalRow: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: '12px',
+    margin: '8px 0 12px',
+    paddingTop: '8px',
+    borderTop: `1px solid ${colors.neutral200}`,
   },
   totalLabel: {
     ...typography.headingM,

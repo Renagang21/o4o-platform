@@ -58,6 +58,15 @@ export interface AddCartItemInput {
   priceSnapshot?: number;
 }
 
+// WO-O4O-STORE-CART-SUPPLIER-GROUP-SHIPPING-PREVIEW-V1
+export interface SupplierGroupShipping {
+  shippingFee: number;
+  freeShippingApplied: boolean;
+  freeShippingThreshold: number | null;
+  remainingForFreeShipping: number | null;
+  policyConfigured: boolean;
+}
+
 export interface SupplierGroup {
   supplierId: string | null;
   items: StoreCartItem[];
@@ -65,6 +74,10 @@ export interface SupplierGroup {
   totalQuantity: number;
   /** priceSnapshot 기준 표시용 소계(원). 신뢰 금액 아님. */
   displaySubtotal: number;
+  /** 공급자별 배송비 미리보기 (표시용 — 확정 시 재계산) */
+  shipping: SupplierGroupShipping;
+  /** displaySubtotal + shipping.shippingFee */
+  displayTotal: number;
 }
 
 interface ApiOk<T> {
