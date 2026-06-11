@@ -18,7 +18,11 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { body, param, validationResult } from 'express-validator';
 import { DataSource } from 'typeorm';
 import { PaymentCoreService } from '@o4o/payment-core';
-import { CheckoutOrder, CheckoutOrderStatus } from '../../../entities/checkout/CheckoutOrder.entity.js';
+import {
+  CheckoutOrder,
+  CheckoutOrderStatus,
+  CheckoutPaymentStatus,
+} from '../../../entities/checkout/CheckoutOrder.entity.js';
 import { TypeORMPaymentRepository } from '../../../services/payment/adapters/TypeORMPaymentRepository.js';
 import { TossPaymentProviderAdapter } from '../../../services/payment/adapters/TossPaymentProviderAdapter.js';
 import { EventHubPaymentPublisher } from '../../../services/payment/adapters/EventHubPaymentPublisher.js';
@@ -71,12 +75,51 @@ export function createNetureB2bPaymentController(
   const publisher = new EventHubPaymentPublisher();
   const paymentService = new PaymentCoreService(repository, provider, publisher);
 
-  // POST /prepare — 결제 세션 생성
+  /**
+   * paymentGroupId 로 결제 가능한 group orders 조회·검증 (WO-O4O-MULTI-SUPPLIER-CART-PAYMENT-AGGREGATION-V1).
+   * 모두 동일 buyer · neture_b2b_checkout · payable(pending) 이어야 한다.
+   */
+  async function loadPayableGroup(
+    paymentGroupId: string,
+    userId: string,
+  ): Promise<{ orders?: CheckoutOrder[]; totalAmount?: number; error?: { status: number; code: string; message: string; details?: Record<string, unknown> } }> {
+    const orders = await orderRepository
+      .createQueryBuilder('o')
+      .where("o.metadata->>'paymentGroupId' = :pg", { pg: paymentGroupId })
+      .andWhere('o."buyerId" = :userId', { userId })
+      .getMany();
+    if (orders.length === 0) {
+      return { error: { status: 404, code: 'PAYMENT_GROUP_NOT_FOUND', message: 'Payment group not found' } };
+    }
+    for (const o of orders) {
+      if (!isNetureB2bOrder(o)) {
+        return { error: { status: 400, code: 'NOT_B2B_CHECKOUT_ORDER', message: 'Group contains non-B2B order' } };
+      }
+      if (
+        o.paymentStatus !== CheckoutPaymentStatus.PENDING ||
+        (o.status !== CheckoutOrderStatus.CREATED && o.status !== CheckoutOrderStatus.PENDING_PAYMENT)
+      ) {
+        return {
+          error: {
+            status: 400,
+            code: 'PAYMENT_GROUP_NOT_PAYABLE',
+            message: `Order ${o.id} is not in payable state`,
+            details: { currentStatus: o.status, paymentStatus: o.paymentStatus },
+          },
+        };
+      }
+    }
+    const totalAmount = orders.reduce((sum, o) => sum + Number(o.totalAmount), 0);
+    return { orders, totalAmount };
+  }
+
+  // POST /prepare — 결제 세션 생성 (단일 orderId XOR 다중공급자 paymentGroupId)
   router.post(
     '/prepare',
     requireAuth,
     [
-      body('orderId').notEmpty().isUUID(),
+      body('orderId').optional().isUUID(),
+      body('paymentGroupId').optional().isString(),
       body('successUrl').notEmpty().isURL(),
       body('failUrl').notEmpty().isURL(),
     ],
@@ -86,7 +129,59 @@ export function createNetureB2bPaymentController(
         const userId = (req as AuthRequest).user?.id || (req as AuthRequest).authUser?.id;
         if (!userId) return errorResponse(res, 401, 'UNAUTHORIZED', 'Authentication required');
 
-        const { orderId, successUrl, failUrl } = req.body;
+        const { orderId, paymentGroupId, successUrl, failUrl } = req.body;
+
+        // ── group 결제 경로 (다중 공급자 1회 결제) ──
+        if (paymentGroupId) {
+          const { orders, totalAmount, error } = await loadPayableGroup(paymentGroupId, userId);
+          if (error) return errorResponse(res, error.status, error.code, error.message, error.details);
+          const orderName =
+            orders!.length === 1
+              ? generateOrderName(orders![0])
+              : `${generateOrderName(orders![0])} 외 ${orders!.length - 1}건`;
+
+          const payment = await paymentService.prepare({
+            orderId: paymentGroupId, // PG/event orderId 슬롯 = paymentGroupId
+            orderName,
+            amount: totalAmount!,
+            currency: 'KRW',
+            successUrl,
+            failUrl,
+            sourceService: NETURE_B2B_SOURCE_SERVICE,
+            metadata: {
+              paymentGroupId,
+              paymentGroupSource: 'multi_supplier_cart',
+              checkoutOrderIds: orders!.map((o) => o.id),
+              orderCount: orders!.length,
+              groupTotalAmount: totalAmount,
+            },
+          });
+
+          logger.info('[Neture B2B Payment] Group payment prepared', {
+            paymentId: payment.id,
+            paymentGroupId,
+            orderCount: orders!.length,
+            amount: totalAmount,
+          });
+
+          return res.status(201).json({
+            success: true,
+            data: {
+              paymentId: payment.id,
+              transactionId: payment.transactionId,
+              paymentGroupId,
+              orderCount: orders!.length,
+              amount: totalAmount,
+              clientKey: (payment.metadata as Record<string, unknown>)?.clientKey,
+              isTestMode: (payment.metadata as Record<string, unknown>)?.isTestMode,
+            },
+          });
+        }
+
+        // ── 단일 order 결제 경로 (기존, 무회귀) ──
+        if (!orderId) {
+          return errorResponse(res, 400, 'MISSING_PAYMENT_TARGET', 'orderId or paymentGroupId required');
+        }
         const order = await orderRepository.findOne({ where: { id: orderId, buyerId: userId } });
         if (!order) return errorResponse(res, 404, 'ORDER_NOT_FOUND', 'Order not found');
         if (!isNetureB2bOrder(order)) {
@@ -141,7 +236,8 @@ export function createNetureB2bPaymentController(
     [
       body('paymentId').notEmpty().isUUID(),
       body('paymentKey').notEmpty().isString(),
-      body('orderId').notEmpty().isUUID(),
+      body('orderId').optional().isUUID(),
+      body('paymentGroupId').optional().isString(),
     ],
     async (req: Request, res: Response) => {
       try {
@@ -149,7 +245,46 @@ export function createNetureB2bPaymentController(
         const userId = (req as AuthRequest).user?.id || (req as AuthRequest).authUser?.id;
         if (!userId) return errorResponse(res, 401, 'UNAUTHORIZED', 'Authentication required');
 
-        const { paymentId, paymentKey, orderId } = req.body;
+        const { paymentId, paymentKey, orderId, paymentGroupId } = req.body;
+
+        // ── group 결제 confirm (PG orderId 슬롯 = paymentGroupId) ──
+        if (paymentGroupId) {
+          // 소유권 확인: 해당 group 의 주문이 이 buyer 소유여야 함
+          const owned = await orderRepository
+            .createQueryBuilder('o')
+            .where("o.metadata->>'paymentGroupId' = :pg", { pg: paymentGroupId })
+            .andWhere('o."buyerId" = :userId', { userId })
+            .getCount();
+          if (owned === 0) return errorResponse(res, 404, 'PAYMENT_GROUP_NOT_FOUND', 'Payment group not found');
+
+          // PaymentCore.confirm: PG orderId = paymentGroupId, internalOrderId = paymentGroupId
+          // → payment.completed(serviceKey='neture-b2b', orderId=paymentGroupId)
+          // → NetureB2bCheckoutPaymentEventHandler 가 group orders 재조회·전이·bridge
+          const payment = await paymentService.confirm(paymentId, paymentKey, paymentGroupId, paymentGroupId);
+
+          logger.info('[Neture B2B Payment] Group payment confirmed', {
+            paymentId: payment.id,
+            paymentGroupId,
+            status: payment.status,
+          });
+
+          return res.json({
+            success: true,
+            data: {
+              paymentId: payment.id,
+              paymentGroupId,
+              status: payment.status,
+              paidAmount: payment.paidAmount,
+              paymentMethod: payment.paymentMethod,
+              paidAt: payment.paidAt,
+            },
+          });
+        }
+
+        // ── 단일 order confirm (기존, 무회귀) ──
+        if (!orderId) {
+          return errorResponse(res, 400, 'MISSING_PAYMENT_TARGET', 'orderId or paymentGroupId required');
+        }
         const order = await orderRepository.findOne({ where: { id: orderId, buyerId: userId } });
         if (!order) return errorResponse(res, 404, 'ORDER_NOT_FOUND', 'Order not found');
         if (!isNetureB2bOrder(order)) {

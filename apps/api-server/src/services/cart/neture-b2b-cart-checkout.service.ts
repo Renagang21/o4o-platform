@@ -19,6 +19,7 @@
  * P2a 한정: serviceKey='neture', orderType=STORE_RESTOCK 만. DIRECT_TO_CUSTOMER(PII/consent)는
  *   별도 후속(cart item 에 order_type 개념 없음 → 전부 STORE_RESTOCK 으로 취급).
  */
+import { randomUUID } from 'crypto';
 import { DataSource, Repository, In } from 'typeorm';
 import { StoreCartItem } from '../../entities/cart/StoreCartItem.entity.js';
 import { checkoutService } from '../checkout.service.js';
@@ -52,6 +53,7 @@ export interface B2BCreatedOrderSummary {
   itemCount: number;
   cartItemIds: string[];
   paymentStatus: string;
+  paymentGroupId: string;
 }
 
 export interface B2BFailedCartItem {
@@ -63,6 +65,11 @@ export interface B2BFailedCartItem {
 
 export interface B2BCheckoutResult {
   serviceKey: string;
+  /** 다중 공급자 1회 결제 단위 (WO-O4O-MULTI-SUPPLIER-CART-PAYMENT-AGGREGATION-V1) */
+  paymentGroupId: string;
+  /** group total = Σ createdOrders.totalAmount (사용자 1회 결제 예정 금액) */
+  groupTotalAmount: number;
+  orderCount: number;
   createdOrders: B2BCreatedOrderSummary[];
   failedItems: B2BFailedCartItem[];
   removedCartItemIds: string[];
@@ -154,8 +161,20 @@ export class NetureB2BCartCheckoutService {
       candidates.push(it);
     }
 
+    // WO-O4O-MULTI-SUPPLIER-CART-PAYMENT-AGGREGATION-V1: 다중 공급자 1회 결제 단위.
+    // 이 confirm 으로 생성되는 모든 checkout_order 를 하나의 paymentGroupId 로 묶는다.
+    const paymentGroupId = `pg_${randomUUID()}`;
+
     if (candidates.length === 0) {
-      return { serviceKey: scope.serviceKey, createdOrders: [], failedItems, removedCartItemIds: [] };
+      return {
+        serviceKey: scope.serviceKey,
+        paymentGroupId,
+        groupTotalAmount: 0,
+        orderCount: 0,
+        createdOrders: [],
+        failedItems,
+        removedCartItemIds: [],
+      };
     }
 
     // 3. SupplierProductOffer enrich (서버 가격/상태/공급자 정책 재조회)
@@ -289,6 +308,9 @@ export class NetureB2BCartCheckoutService {
             supplierProductOfferIds: group.map((v) => v.offer.id),
             pricingRevalidationRequired: true,
             fulfillmentVisibility: 'hidden_until_paid',
+            // 다중 공급자 1회 결제 group (WO-O4O-MULTI-SUPPLIER-CART-PAYMENT-AGGREGATION-V1)
+            paymentGroupId,
+            paymentGroupSource: 'multi_supplier_cart',
             ...(input.note ? { note: input.note } : {}),
           },
         });
@@ -312,6 +334,7 @@ export class NetureB2BCartCheckoutService {
           itemCount: lineItems.length,
           cartItemIds: cartIds,
           paymentStatus: savedOrder.paymentStatus,
+          paymentGroupId,
         });
       } catch (orderErr: any) {
         for (const v of group) {
@@ -325,6 +348,16 @@ export class NetureB2BCartCheckoutService {
       }
     }
 
-    return { serviceKey: scope.serviceKey, createdOrders, failedItems, removedCartItemIds };
+    const groupTotalAmount = createdOrders.reduce((sum, o) => sum + Number(o.totalAmount), 0);
+
+    return {
+      serviceKey: scope.serviceKey,
+      paymentGroupId,
+      groupTotalAmount,
+      orderCount: createdOrders.length,
+      createdOrders,
+      failedItems,
+      removedCartItemIds,
+    };
   }
 }

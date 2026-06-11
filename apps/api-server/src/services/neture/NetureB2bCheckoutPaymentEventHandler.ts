@@ -85,69 +85,41 @@ export class NetureB2bCheckoutPaymentEventHandler {
       return;
     }
     try {
-      const order = await this.orderRepository.findOne({ where: { id: event.orderId } });
-      if (!order) {
-        // checkout_order 가 아니면(예: legacy neture_order id) graceful skip
-        logger.warn(`${logPrefix} Order not found`, { orderId: event.orderId });
-        return;
-      }
-      if (!this.isNetureB2bOrder(order)) {
-        // serviceKey='neture-b2b' 인데 B2B 주문이 아니면 처리하지 않음(안전장치)
-        logger.warn(`${logPrefix} Not a neture_b2b_checkout order; skip`, { orderId: event.orderId });
-        return;
-      }
-      if (order.status === CheckoutOrderStatus.PAID) {
+      // event.orderId 는 (a) 단일 checkout_order id 이거나 (b) paymentGroupId 다.
+      // (WO-O4O-MULTI-SUPPLIER-CART-PAYMENT-AGGREGATION-V1)
+      const single = await this.orderRepository.findOne({ where: { id: event.orderId } });
+      if (single) {
+        if (!this.isNetureB2bOrder(single)) {
+          // serviceKey='neture-b2b' 인데 B2B 주문이 아니면 처리하지 않음(안전장치)
+          logger.warn(`${logPrefix} Not a neture_b2b_checkout order; skip`, { orderId: event.orderId });
+          return;
+        }
+        await this.transitionAndBridge(single, event, logPrefix);
         this.processedPayments.add(eventKey);
-        return; // idempotent
-      }
-      if (
-        order.status !== CheckoutOrderStatus.CREATED &&
-        order.status !== CheckoutOrderStatus.PENDING_PAYMENT
-      ) {
-        logger.warn(`${logPrefix} Order not in payable state`, {
-          orderId: event.orderId,
-          status: order.status,
-        });
+        setTimeout(() => this.processedPayments.delete(eventKey), 60 * 60 * 1000);
         return;
       }
 
-      order.status = CheckoutOrderStatus.PAID;
-      order.paymentStatus = CheckoutPaymentStatus.PAID;
-      order.paymentMethod = event.paymentMethod;
-      order.paidAt = event.approvedAt;
-      await this.orderRepository.save(order);
-
+      // group 결제: event.orderId = paymentGroupId → group orders 재조회(N건 전이·bridge)
+      const groupOrders = await this.orderRepository
+        .createQueryBuilder('o')
+        .where("o.metadata->>'paymentGroupId' = :pg", { pg: event.orderId })
+        .getMany();
+      const b2bGroup = groupOrders.filter((o) => this.isNetureB2bOrder(o));
+      if (b2bGroup.length === 0) {
+        // checkout_order 도 아니고 group 도 아니면 graceful skip(예: legacy neture_order id)
+        logger.warn(`${logPrefix} No order/group found`, { orderId: event.orderId });
+        return;
+      }
+      logger.info(`${logPrefix} group paid transition`, {
+        paymentGroupId: event.orderId,
+        orderCount: b2bGroup.length,
+      });
+      for (const o of b2bGroup) {
+        await this.transitionAndBridge(o, event, logPrefix);
+      }
       this.processedPayments.add(eventKey);
       setTimeout(() => this.processedPayments.delete(eventKey), 60 * 60 * 1000);
-
-      logger.info(`${logPrefix} Order marked paid`, {
-        orderId: order.id,
-        orderNumber: order.orderNumber,
-      });
-
-      // WO-O4O-CHECKOUT-ORDER-TO-NETURE-FULFILLMENT-BRIDGE-V1 (P2c):
-      // 결제 완료 후 공급자 fulfillment 로 bridge (best-effort — 실패해도 paid 유지, 공급자 미노출).
-      try {
-        const result = await this.bridgeService.bridgeCheckoutOrderToNetureFulfillment({
-          checkoutOrderId: order.id,
-        });
-        if (result.bridged) {
-          logger.info(`${logPrefix} bridged to neture fulfillment`, {
-            orderId: order.id,
-            netureOrderId: result.netureOrderId,
-          });
-        } else {
-          logger.warn(`${logPrefix} bridge skipped`, {
-            orderId: order.id,
-            reason: result.skippedReason,
-          });
-        }
-      } catch (bridgeErr) {
-        logger.error(`${logPrefix} bridge error (order remains paid, supplier hidden)`, {
-          orderId: order.id,
-          error: bridgeErr instanceof Error ? bridgeErr.message : 'Unknown error',
-        });
-      }
     } catch (error) {
       logger.error(`${logPrefix} Processing failed`, {
         orderId: event.orderId,
@@ -156,21 +128,89 @@ export class NetureB2bCheckoutPaymentEventHandler {
     }
   }
 
+  /**
+   * 단일 checkout_order paid 전이(payable 한정·idempotent) + fulfillment bridge(best-effort).
+   * 단일/그룹 경로 공용. cancelled/refunded 는 전이·bridge 금지.
+   */
+  private async transitionAndBridge(
+    order: CheckoutOrder,
+    event: PaymentCompletedEvent,
+    logPrefix: string,
+  ): Promise<void> {
+    if (
+      order.status === CheckoutOrderStatus.CREATED ||
+      order.status === CheckoutOrderStatus.PENDING_PAYMENT
+    ) {
+      order.status = CheckoutOrderStatus.PAID;
+      order.paymentStatus = CheckoutPaymentStatus.PAID;
+      order.paymentMethod = event.paymentMethod;
+      order.paidAt = event.approvedAt;
+      await this.orderRepository.save(order);
+      logger.info(`${logPrefix} Order marked paid`, {
+        orderId: order.id,
+        orderNumber: order.orderNumber,
+      });
+    } else if (order.status !== CheckoutOrderStatus.PAID) {
+      // cancelled/refunded → 전이·bridge 금지
+      logger.warn(`${logPrefix} Order not in payable state`, {
+        orderId: order.id,
+        status: order.status,
+      });
+      return;
+    }
+    // 이미 PAID 면 전이는 skip(idempotent)하되 bridge 는 재시도(bridge 자체 idempotent).
+
+    // WO-O4O-CHECKOUT-ORDER-TO-NETURE-FULFILLMENT-BRIDGE-V1 (P2c):
+    // 결제 완료 후 공급자 fulfillment 로 bridge (best-effort — 실패해도 paid 유지, 공급자 미노출).
+    try {
+      const result = await this.bridgeService.bridgeCheckoutOrderToNetureFulfillment({
+        checkoutOrderId: order.id,
+      });
+      if (result.bridged) {
+        logger.info(`${logPrefix} bridged to neture fulfillment`, {
+          orderId: order.id,
+          netureOrderId: result.netureOrderId,
+        });
+      } else {
+        logger.warn(`${logPrefix} bridge skipped`, {
+          orderId: order.id,
+          reason: result.skippedReason,
+        });
+      }
+    } catch (bridgeErr) {
+      logger.error(`${logPrefix} bridge error (order remains paid, supplier hidden)`, {
+        orderId: order.id,
+        error: bridgeErr instanceof Error ? bridgeErr.message : 'Unknown error',
+      });
+    }
+  }
+
   private async handlePaymentFailed(event: PaymentFailedEvent): Promise<void> {
     const logPrefix = '[NetureB2bCheckoutPaymentEventHandler] payment.failed';
     try {
-      const order = await this.orderRepository.findOne({ where: { id: event.orderId } });
-      if (!order || !this.isNetureB2bOrder(order)) return;
-      if (
-        order.status === CheckoutOrderStatus.CREATED ||
-        order.status === CheckoutOrderStatus.PENDING_PAYMENT
-      ) {
-        order.paymentStatus = CheckoutPaymentStatus.FAILED;
-        await this.orderRepository.save(order);
-        logger.info(`${logPrefix} paymentStatus set to FAILED`, {
-          orderId: event.orderId,
-          errorCode: event.errorCode,
-        });
+      // 단일 order 또는 group(paymentGroupId) 모두 대상
+      const single = await this.orderRepository.findOne({ where: { id: event.orderId } });
+      const targets =
+        single && this.isNetureB2bOrder(single)
+          ? [single]
+          : (
+              await this.orderRepository
+                .createQueryBuilder('o')
+                .where("o.metadata->>'paymentGroupId' = :pg", { pg: event.orderId })
+                .getMany()
+            ).filter((o) => this.isNetureB2bOrder(o));
+      for (const order of targets) {
+        if (
+          order.status === CheckoutOrderStatus.CREATED ||
+          order.status === CheckoutOrderStatus.PENDING_PAYMENT
+        ) {
+          order.paymentStatus = CheckoutPaymentStatus.FAILED;
+          await this.orderRepository.save(order);
+          logger.info(`${logPrefix} paymentStatus set to FAILED`, {
+            orderId: order.id,
+            errorCode: event.errorCode,
+          });
+        }
       }
     } catch (error) {
       logger.error(`${logPrefix} Processing failed`, {
