@@ -78,4 +78,4 @@ GlycoPharm 서비스 안내 페이지와 동일한 Tailwind 구조를 재사용.
 
 ## commit hash
 
-- (commit 후 기재)
+- `7bda9ece9` — feat(k-cosmetics): add service guide page (WO-O4O-KCOS-SERVICE-GUIDE-PAGE-V1)
