@@ -134,10 +134,24 @@ export class NetureSettlementService {
   // ─────────────────────────────────────────────
 
   /**
-   * 정산 일괄 계산 (delivered 주문 기반)
+   * 정산 일괄 계산 (배송 완료 + 결제/수금 확인 주문 기반)
+   *
+   * WO-O4O-SUPPLIER-SETTLEMENT-READINESS-GUARD-V1
+   * (상위: IR-O4O-STORE-ORDER-PAYMENT-READINESS-MODEL-V1)
+   *
+   * 정산 대상 = delivered AND payment/collection readiness (+ 미정산).
+   * legacy 의 "delivered 만 보면 정산" 흐름은 일반 전자상거래 원칙과 맞지 않으므로 제거하고,
+   * 결제(또는 명시적 수금) 확인된 주문만 정산 후보로 한다. sourceType/pricingSource 와 무관.
+   *
+   * readiness 판단 (§10.1 주의):
+   *   delivered 주문은 status 가 'delivered' 로 덮여 'paid' 가 아니므로 status='paid' 는 쓰지 않는다.
+   *   - paid_at IS NOT NULL                       : online 결제(NeturePaymentEventHandler) 흔적
+   *   - metadata.paymentStatus='paid'|paymentReady : checkout_order-origin / future bridge 주문
+   *   - metadata.collectionStatus='confirmed'      : V2 collectionStatus 모델 대비(future-compatible)
+   * → 결제 확인 없이 delivered 만 된 주문(legacy 우회·테스트)은 정산에서 제외된다. (pre-launch: 0건이 정상)
    */
   async calculateSettlements(periodStart: string, periodEnd: string) {
-    // Find delivered orders not in any settlement, grouped by supplier
+    // Find delivered AND payment/collection-ready orders not in any settlement, grouped by supplier
     const supplierAggregates = await this.dataSource.query(
       `SELECT
          spo.supplier_id,
@@ -148,6 +162,12 @@ export class NetureSettlementService {
        JOIN neture_order_items oi ON oi.order_id = o.id
        JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
        WHERE o.status = 'delivered'
+         AND (
+           o.paid_at IS NOT NULL
+           OR o.metadata->>'paymentStatus' = 'paid'
+           OR o.metadata->>'paymentReady' = 'true'
+           OR o.metadata->>'collectionStatus' = 'confirmed'
+         )
          AND o.updated_at >= $1::date
          AND o.updated_at < ($2::date + INTERVAL '1 day')
          AND NOT EXISTS (
@@ -163,7 +183,7 @@ export class NetureSettlementService {
       return {
         success: true,
         data: { created: 0, settlements: [] },
-        message: 'No unsettled delivered orders found in the given period.',
+        message: 'No unsettled, payment-ready delivered orders found in the given period.',
       };
     }
 
