@@ -18,6 +18,14 @@ import logger from '../../../utils/logger.js';
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+// WO-O4O-SUPPLIER-FULFILLMENT-PAYMENT-READINESS-GUARD-V1
+// 배송 흐름 진입 상태(이 상태로의 전이/송장 생성은 payment readiness 확인 대상)
+const FULFILLMENT_TARGET_STATUSES = new Set<string>([
+  NetureOrderStatus.PREPARING,
+  NetureOrderStatus.SHIPPED,
+  NetureOrderStatus.DELIVERED,
+]);
+
 export function createSupplierOrderController(dataSource: DataSource): Router {
   const router = Router();
   const service = new SupplierOrderService(dataSource);
@@ -155,6 +163,20 @@ export function createSupplierOrderController(dataSource: DataSource): Router {
         });
       }
 
+      // WO-O4O-SUPPLIER-FULFILLMENT-PAYMENT-READINESS-GUARD-V1
+      // checkout-origin 주문은 payment/collection readiness 확인 전 배송 흐름 진입 차단.
+      // (legacy neture_orders 는 비대상 — getFulfillmentReadiness 가 fulfillmentReady=true 반환)
+      if (FULFILLMENT_TARGET_STATUSES.has(status)) {
+        const readiness = await service.getFulfillmentReadiness(orderId);
+        if (readiness.isCheckoutOrigin && !readiness.fulfillmentReady) {
+          return res.status(403).json({
+            success: false,
+            error: 'FULFILLMENT_NOT_PAYMENT_READY',
+            message: '결제 또는 수금 확인 전 주문은 배송 처리를 시작할 수 없습니다.',
+          });
+        }
+      }
+
       const updated = await legacyNetureService.updateOrderStatus(orderId, { status });
       if (!updated) {
         return res.status(500).json({ success: false, error: 'UPDATE_FAILED', message: 'Failed to update order status' });
@@ -192,6 +214,17 @@ export function createSupplierOrderController(dataSource: DataSource): Router {
       }
       if (currentOrder.status !== NetureOrderStatus.PREPARING) {
         return res.status(403).json({ success: false, error: 'INVALID_STATE', message: `Order must be in 'preparing' state (current: ${currentOrder.status})` });
+      }
+
+      // WO-O4O-SUPPLIER-FULFILLMENT-PAYMENT-READINESS-GUARD-V1
+      // 상태 전이를 우회한 송장 생성으로 미결제 checkout-origin 주문이 배송되는 것을 차단.
+      const readiness = await service.getFulfillmentReadiness(orderId);
+      if (readiness.isCheckoutOrigin && !readiness.fulfillmentReady) {
+        return res.status(403).json({
+          success: false,
+          error: 'FULFILLMENT_NOT_PAYMENT_READY',
+          message: '결제 또는 수금 확인 전 주문은 배송 처리를 시작할 수 없습니다.',
+        });
       }
 
       const result = await service.createShipment(orderId, supplierId, { carrier_code, carrier_name, tracking_number });

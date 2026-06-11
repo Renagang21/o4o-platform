@@ -185,9 +185,13 @@ export class SupplierUnifiedOrderService {
       itemsPreview: Array.isArray(o.items_preview) ? o.items_preview : [],
       createdAt: o.created_at,
       updatedAt: o.updated_at ?? null,
+      // WO-O4O-SUPPLIER-FULFILLMENT-PAYMENT-READINESS-GUARD-V1
+      // checkout_orders 는 fulfillment bridge 가 도입되기 전까지 read-only(canFulfill=false)를 유지한다.
+      // bridge 도입 시 fulfillable 판정은 payment/collection readiness(paymentStatus='paid' 등,
+      // IR-O4O-STORE-ORDER-PAYMENT-READINESS-MODEL-V1) 충족 주문에 한정해야 한다. paymentStatus 는 위에서 노출.
       canFulfill: false,
       fulfillmentUrl: null,
-      readOnlyReason: '이벤트 오퍼/서비스 주문은 checkout_orders 기반이며, 배송 처리 통합은 후속 작업입니다.',
+      readOnlyReason: '결제 확인 및 공급자 배송 연결(bridge)이 완료된 주문만 배송 처리할 수 있습니다. checkout 주문 배송 통합은 후속 작업입니다.',
     }));
   }
 }
