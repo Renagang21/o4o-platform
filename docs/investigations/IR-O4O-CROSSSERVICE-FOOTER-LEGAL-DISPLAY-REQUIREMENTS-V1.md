@@ -221,4 +221,4 @@
 | 운영 주체 | KPA/Neture `㈜쓰리라이프존 108-86-02873` / GP/KCos placeholder |
 | 최대 위험 | GP/KCos placeholder 법정정보 노출 + 운영주체 불일치 + 중개자 고지 미검토 |
 | git status | working tree clean (외부 세션 WIP 미접촉) |
-| commit hash | (commit 후 기재) |
+| commit hash | `b55530d62` |
