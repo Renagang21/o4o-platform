@@ -559,6 +559,13 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       const netureRoutes = createNetureRoutes(dataSource);
       app.use('/api/v1/neture', netureRoutes);
       logger.info('✅ Neture routes registered at /api/v1/neture');
+
+      // WO-O4O-NETURE-B2B-PAYMENT-FLOW-V1 (P2b): B2B checkout_order 결제 완료 → paid 전이 핸들러
+      const { initializeNetureB2bCheckoutPaymentHandler } = await import(
+        '../services/neture/NetureB2bCheckoutPaymentEventHandler.js'
+      );
+      initializeNetureB2bCheckoutPaymentHandler(dataSource);
+      logger.info('✅ NetureB2bCheckoutPaymentEventHandler initialized');
     } catch (netureError) {
       logger.error('Failed to register Neture routes:', netureError);
     }

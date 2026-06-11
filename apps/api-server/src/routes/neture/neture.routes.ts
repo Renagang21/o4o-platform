@@ -19,6 +19,8 @@ import { createStorePlaylistController } from '../o4o-store/controllers/store-pl
 import { createNetureEventOfferController } from './controllers/event-offer.controller.js';
 // WO-O4O-EVENT-OFFER-MULTI-SERVICE-PROPOSAL-V1
 import { createSupplierEventOfferProposalsController } from './controllers/supplier-event-offer-proposals.controller.js';
+// WO-O4O-NETURE-B2B-PAYMENT-FLOW-V1 (P2b): B2B checkout_order 결제(payment-first)
+import { createNetureB2bPaymentController } from './controllers/neture-b2b-payment.controller.js';
 // WO-O4O-NETURE-BLOG-RETIRE-V1: createBlogController('neture') 등록 제거.
 // Neture 는 Blog 를 운영 대상으로 두지 않으며 canonical 콘텐츠 채널은 Forum + Content + AI editor.
 // store_blog_posts / store_blog_settings entity 와 KPA Blog 흐름 자체는 영향 없음.
@@ -63,6 +65,13 @@ export function createNetureRoutes(dataSource: DataSource): Router {
     '/supplier',
     createSupplierEventOfferProposalsController(dataSource, requireAuth as any),
   );
+
+  // ============================================================================
+  // Neture B2B Checkout Payment — WO-O4O-NETURE-B2B-PAYMENT-FLOW-V1 (P2b)
+  // /api/v1/neture/b2b/payments/{prepare,confirm,order/:orderId}
+  // checkout_orders(metadata.source='neture_b2b_checkout') 결제 → payment.completed(serviceKey='neture-b2b')
+  // ============================================================================
+  router.use('/b2b/payments', createNetureB2bPaymentController(dataSource, requireAuth as any));
 
   // WO-O4O-NETURE-BLOG-RETIRE-V1: Blog 라우트 미등록.
   // Neture 는 Blog 를 운영 대상으로 두지 않음. /api/v1/neture/stores/:slug/blog/* endpoint 미노출.
