@@ -116,20 +116,23 @@ export default function GlycoPharmOperatorDashboard() {
     );
   }
 
+  // WO-O4O-OPERATOR-DASHBOARD-ABOVE-BLOCK-SLOT-V1:
+  //   부가 섹션 [Alert] → [Axis] 을 공통 layout slot(aboveBlocks)으로 이관.
+  //   순서 컨벤션 유지: [Alert/Notice] → [Axis] → [5-block].
+  //   (P1 에서 GP 단독 page header 제거 — shell/sidebar 가 컨텍스트 제공.)
   return (
-    <div className="space-y-6">
-      {/* WO-O4O-OPERATOR-DASHBOARD-AUX-SECTION-P1-ALIGNMENT-V1:
-          GP 단독 page header(h1+새로고침) 제거 — 타 3서비스(KPA/KCos/Neture)와 동일하게
-          dashboard 본체 안에서는 별도 h1 없이 간다(shell/sidebar 가 컨텍스트 제공).
-          부가 섹션 순서 컨벤션 정렬: [Alert/Notice] → [Axis] → [5-block]. */}
-      {/* Operator Alerts (rule-based, above standard 5-Block) */}
-      <OperatorAlerts alerts={alerts} />
-
-      {/* WO-O4O-OPERATOR-DASHBOARD-AXIS-NAVIGATION-COMMONIZATION-V1: 2축 운영 네비게이션 */}
-      <AxisNavigationSection axes={GP_AXES} />
-
-      {/* Standard 5-Block Layout: KPI → AI Summary → Action Queue → Activity Log → Quick Actions */}
-      <OperatorDashboardLayout config={config} />
-    </div>
+    <OperatorDashboardLayout
+      config={{
+        ...config,
+        aboveBlocks: (
+          <>
+            {/* Operator Alerts (rule-based) */}
+            <OperatorAlerts alerts={alerts} />
+            {/* WO-O4O-OPERATOR-DASHBOARD-AXIS-NAVIGATION-COMMONIZATION-V1: 2축 운영 네비게이션 */}
+            <AxisNavigationSection axes={GP_AXES} />
+          </>
+        ),
+      }}
+    />
   );
 }

@@ -115,15 +115,21 @@ export default function KCosmeticsOperatorDashboard() {
     </div>
   ) : null;
 
+  // WO-O4O-OPERATOR-DASHBOARD-ABOVE-BLOCK-SLOT-V1:
+  //   부가 섹션 [Notice] → [Axis] 을 공통 layout slot(aboveBlocks)으로 이관.
   return (
-    <div className="space-y-6">
-      {/* 부가 섹션: [Alert/Notice] → [Axis] → [5-block] */}
-      {orderMetricsNotice}
-
-      {/* WO-O4O-OPERATOR-DASHBOARD-AXIS-NAVIGATION-COMMONIZATION-V1: 2축 운영 네비게이션 */}
-      <AxisNavigationSection axes={KCOS_AXES} />
-
-      <OperatorDashboardLayout config={config} />
-    </div>
+    <OperatorDashboardLayout
+      config={{
+        ...config,
+        aboveBlocks: (
+          <>
+            {/* 부가 섹션: [Alert/Notice] → [Axis] → [5-block] */}
+            {orderMetricsNotice}
+            {/* WO-O4O-OPERATOR-DASHBOARD-AXIS-NAVIGATION-COMMONIZATION-V1: 2축 운영 네비게이션 */}
+            <AxisNavigationSection axes={KCOS_AXES} />
+          </>
+        ),
+      }}
+    />
   );
 }

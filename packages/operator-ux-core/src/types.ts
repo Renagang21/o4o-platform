@@ -7,6 +7,8 @@
  * 각 Block은 서비스 중립적이며, 데이터만 주입하면 동작한다.
  */
 
+import type { ReactNode } from 'react';
+
 // ─── Block 1: KPI Grid ───
 
 export interface KpiItem {
@@ -86,4 +88,11 @@ export interface OperatorDashboardConfig {
   actionQueue: ActionItem[];
   activityLog: ActivityItem[];
   quickActions: QuickActionItem[];
+  /**
+   * WO-O4O-OPERATOR-DASHBOARD-ABOVE-BLOCK-SLOT-V1:
+   *   5-block 위에 렌더할 서비스별 부가 섹션(Alert/Notice → Axis → ...) optional slot.
+   *   backend data contract 가 아니라 frontend 렌더 노드 — 서비스가 render 시점에 주입한다.
+   *   미지정 시 기존 5-block 렌더와 완전히 동일.
+   */
+  aboveBlocks?: ReactNode;
 }

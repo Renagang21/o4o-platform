@@ -121,14 +121,23 @@ export default function KpaOperatorDashboard() {
 
   const axes = buildKpaAxesFromConfig(config, storeStats);
 
+  // WO-O4O-OPERATOR-DASHBOARD-ABOVE-BLOCK-SLOT-V1:
+  //   GuideCard + AxisNavigation 의 시각 위치는 유지하되 렌더 책임만 공통 layout slot 으로 이관.
+  //   (GuideCard 위치/무게 조정은 후속 별도 WO — 이번 P2 는 구조 공통화만.)
   return (
-    <div className="space-y-6">
-      {/* WO-O4O-KPA-OPERATOR-DASHBOARD-GUIDE-CARD-V1: 운영 철학 카드 (KPA only, frontend static) */}
-      <OperatorRoleGuideCard />
-      {/* WO-O4O-OPERATOR-DASHBOARD-COMMUNITY-STORE-HUB-SPLIT-V1: 2축 운영 네비게이션 (frontend 유지 — I3 정합) */}
-      {axes.length > 0 && <AxisNavigationSection axes={axes} />}
-      <OperatorDashboardLayout config={config} />
-    </div>
+    <OperatorDashboardLayout
+      config={{
+        ...config,
+        aboveBlocks: (
+          <>
+            {/* WO-O4O-KPA-OPERATOR-DASHBOARD-GUIDE-CARD-V1: 운영 철학 카드 (KPA only, frontend static) */}
+            <OperatorRoleGuideCard />
+            {/* WO-O4O-OPERATOR-DASHBOARD-COMMUNITY-STORE-HUB-SPLIT-V1: 2축 운영 네비게이션 (frontend 유지 — I3 정합) */}
+            {axes.length > 0 && <AxisNavigationSection axes={axes} />}
+          </>
+        ),
+      }}
+    />
   );
 }
 

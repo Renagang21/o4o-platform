@@ -28,6 +28,10 @@ export function OperatorDashboardLayout({
 }) {
   return (
     <div className="space-y-6">
+      {/* WO-O4O-OPERATOR-DASHBOARD-ABOVE-BLOCK-SLOT-V1:
+          5-block 위 부가 섹션(Alert/Notice → Axis ...) optional slot.
+          미지정 시 아무것도 렌더하지 않아 기존 동작과 동일. */}
+      {config.aboveBlocks}
       <KpiGrid items={config.kpis} />
       <AiSummaryBlock items={config.aiSummary ?? []} />
       <ActionQueueBlock

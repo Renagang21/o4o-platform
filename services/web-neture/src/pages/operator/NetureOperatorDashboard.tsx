@@ -101,11 +101,13 @@ export default function NetureOperatorDashboard() {
     );
   }
 
+  // WO-O4O-OPERATOR-DASHBOARD-ABOVE-BLOCK-SLOT-V1: 부가 섹션(Axis)을 공통 layout slot 으로 이관.
   return (
-    <div className="space-y-6">
-      {/* WO-O4O-OPERATOR-DASHBOARD-AUX-SECTION-P1-ALIGNMENT-V1: 2축 운영 네비게이션 */}
-      <AxisNavigationSection axes={NETURE_AXES} />
-      <OperatorDashboardLayout config={config} />
-    </div>
+    <OperatorDashboardLayout
+      config={{
+        ...config,
+        aboveBlocks: <AxisNavigationSection axes={NETURE_AXES} />,
+      }}
+    />
   );
 }
