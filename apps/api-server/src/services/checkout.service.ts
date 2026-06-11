@@ -61,6 +61,13 @@ export interface CreateOrderDto {
    * checkout(core)은 neture 엔티티를 import 하지 않으므로 호출자가 정책을 주입한다.
    */
   shippingPolicy?: SupplierShippingPolicy | null;
+  /**
+   * 확정 배송비 snapshot (WO-O4O-CHECKOUT-CREATEORDER-SHIPPING-RESPONSIBILITY-CLEANUP-V1).
+   * 호출자(cart orchestrator)가 cart preview 와 동일 기준으로 계산한 배송비를 직접 전달.
+   * 제공 시 createOrder 는 이 값을 그대로 snapshot 으로 저장한다(배송비를 새로 결정하지 않음).
+   * 미제공 시 shippingPolicy 기반 계산으로 fallback(기존 동작). 음수/비정수는 무시되어 fallback.
+   */
+  shippingFeeSnapshot?: number;
 }
 
 /**
@@ -134,10 +141,14 @@ class CheckoutService {
     await this.ensureInitialized();
 
     const subtotal = dto.items.reduce((sum, item) => sum + item.subtotal, 0);
-    // WO-O4O-NETURE-SUPPLIER-SHIPPING-CALCULATION-V2:
-    // supplierId 기준 배송 정책을 호출자가 dto.shippingPolicy 로 주입하면 계산한다.
-    // 미전달 시 fallback(0원) — 정책 없는 기존 checkout 흐름은 동작 불변.
-    const shippingFee = calculateSupplierShippingFee(subtotal, dto.shippingPolicy).shippingFee;
+    // WO-O4O-CHECKOUT-CREATEORDER-SHIPPING-RESPONSIBILITY-CLEANUP-V1:
+    // 호출자가 확정 배송비(shippingFeeSnapshot)를 넘기면 그대로 snapshot 저장(배송비 재결정 안 함).
+    // 미전달/비유효 시에만 shippingPolicy 기반 계산으로 fallback(기존 동작 불변).
+    const snapshot = dto.shippingFeeSnapshot;
+    const shippingFee =
+      typeof snapshot === 'number' && Number.isFinite(snapshot) && snapshot >= 0
+        ? Math.trunc(snapshot)
+        : calculateSupplierShippingFee(subtotal, dto.shippingPolicy).shippingFee;
     const discount = 0;
     const totalAmount = subtotal + shippingFee - discount;
 

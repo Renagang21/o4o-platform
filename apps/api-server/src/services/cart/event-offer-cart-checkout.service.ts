@@ -26,6 +26,7 @@ import {
   type EventOfferOrderContext,
 } from '../../routes/kpa/services/event-offer.service.js';
 import { checkoutService } from '../checkout.service.js';
+import { calculateSupplierShippingFee } from '../shipping/supplier-shipping.js';
 import { SERVICE_KEYS } from '../../constants/service-keys.js';
 
 /**
@@ -247,6 +248,15 @@ export class EventOfferCartCheckoutService {
         },
       }));
 
+      // WO-O4O-CHECKOUT-CREATEORDER-SHIPPING-RESPONSIBILITY-CLEANUP-V1:
+      // 배송비는 orchestrator(=cart preview 와 동일 기준)에서 계산해 snapshot 으로 전달한다.
+      // createOrder 는 이 값을 그대로 저장(배송비 재결정 안 함). preview 와 동일 fn·정책·subtotal → 정렬 보장.
+      const groupSubtotal = lineItems.reduce((sum, li) => sum + li.subtotal, 0);
+      const shippingFeeSnapshot = calculateSupplierShippingFee(
+        groupSubtotal,
+        first.shippingPolicy,
+      ).shippingFee;
+
       try {
         const savedOrder = await checkoutService.createOrder({
           buyerId: scope.buyerId,
@@ -255,6 +265,7 @@ export class EventOfferCartCheckoutService {
           sellerOrganizationId: first.organizationId,
           items: lineItems,
           shippingPolicy: first.shippingPolicy,
+          shippingFeeSnapshot,
           metadata: {
             source: 'store_cart_checkout',
             serviceKey: eventServiceKey,
