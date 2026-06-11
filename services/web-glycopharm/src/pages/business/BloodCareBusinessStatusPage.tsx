@@ -7,7 +7,7 @@
 // 본 작업 범위: /business/bloodcare 페이지 본문 재작성 (내용 정렬).
 //   - 라우트(/business/bloodcare) · 푸터 메뉴는 기존 유지.
 //   - 전용 게시판/포럼 카테고리 신설, 최근 논의 실제 연동, 운영자 CMS 편집, 세부 페이지/권한 분리는 후속 작업.
-//   - 게시판 섹션은 기존 포럼 경로(/forum/posts, /forum/write)로 연결.
+//   - 게시판 섹션은 사업 논의 전용 경로(/business/forum, /business/forum/write)로 연결 (BOARD-SEPARATION-V1).
 import { Link } from 'react-router-dom';
 import {
   Activity,
@@ -205,11 +205,11 @@ export default function BloodCareBusinessStatusPage() {
                   사업 논의 게시판 보기
                 </Link>
                 <Link
-                  to="/forum/write"
+                  to="/business/forum/write"
                   className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-white border border-slate-200 text-slate-700 text-sm font-medium hover:bg-slate-50 transition-colors"
                 >
                   <PenLine className="w-4 h-4" />
-                  새 의견 작성
+                  사업 의견 작성
                 </Link>
               </div>
             </div>
@@ -375,11 +375,11 @@ export default function BloodCareBusinessStatusPage() {
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                   <Link
-                    to="/forum/write"
+                    to="/business/forum/write"
                     className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-white border border-slate-200 text-slate-700 text-sm font-medium hover:bg-slate-50 transition-colors"
                   >
                     <PenLine className="w-4 h-4" />
-                    새 의견 작성
+                    사업 의견 작성
                   </Link>
                   <Link
                     to="/business/forum"

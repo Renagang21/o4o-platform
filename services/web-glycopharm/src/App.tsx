@@ -63,6 +63,8 @@ const BusinessProductsPage = lazy(() => import('@/pages/business/BusinessProduct
 const BusinessPreparationPage = lazy(() => import('@/pages/business/BusinessPreparationPage'));
 // WO-O4O-GLYCOPHARM-BUSINESS-FORUM-LINK-PAGE-V1: 사업 논의 게시판 진입 (/business/forum)
 const BusinessForumPage = lazy(() => import('@/pages/business/BusinessForumPage'));
+// WO-O4O-GLYCOPHARM-BUSINESS-DISCUSSION-BOARD-SEPARATION-V1: 사업 의견 작성 (/business/forum/write) — 일반 포럼 분리
+const BusinessForumWritePage = lazy(() => import('@/pages/business/BusinessForumWritePage'));
 // WO-O4O-GLYCOPHARM-REGISTER-MODAL-ENTRY-FIX-V1: RegisterPage 제거 — RegisterFlowModal 로 단일화
 const RoleSelectPage = lazy(() => import('@/pages/auth/RoleSelectPage'));
 
@@ -601,6 +603,8 @@ function AppRoutes() {
         <Route path="business/preparation" element={<BusinessPreparationPage />} />
         {/* WO-O4O-GLYCOPHARM-BUSINESS-FORUM-LINK-PAGE-V1: 사업 논의 게시판 진입 (공개) */}
         <Route path="business/forum" element={<BusinessForumPage />} />
+        {/* WO-O4O-GLYCOPHARM-BUSINESS-DISCUSSION-BOARD-SEPARATION-V1: 사업 논의 전용 글쓰기 */}
+        <Route path="business/forum/write" element={<BusinessForumWritePage />} />
         {/* WO-O4O-GLYCOPHARM-MENU-CANONICAL-ALIGN-V1: 모바일 약국 경영 허브 */}
         <Route path="mobile/pharmacy" element={<MobilePharmacyPage />} />
 
