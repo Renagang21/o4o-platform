@@ -2,7 +2,7 @@
 
 > 이벤트오퍼 buyer 주문 legacy 외부 route(`participate`) 4건을 **410 Gone 으로 비활성화**.
 > canonical = Store Cart checkout-confirm. 검증/수량차감 helper·service.participate 는 보존.
-> **결과: PASS** — api-server tsc 0 / FE 호출 0건 재확인 / controller 차단(주문생성·차감 미발생) 코드 검증.
+> **결과: PASS** — api-server tsc 0 / FE 호출 0건 재확인 / controller 차단(주문생성·차감 미발생) 코드 검증 / live no-auth smoke 4 route 401(mount+auth 정상).
 > 상위: `IR-O4O-SUPPLIER-ORDER-LEGACY-CODE-REMOVAL-AUDIT-V1` (P1) — 2026-06-11
 
 ---
@@ -37,7 +37,12 @@
 - **api-server tsc 0** ✅ (orphaned import/`sk`/`SK` unused 없음 — sk/SK 는 sibling route 가 계속 사용)
 - **controller 차단 코드 검증**: 410 을 **무조건 반환**(auth 통과 후), service.participate 미호출 → checkout_orders 생성·수량 차감 경로 진입 불가 ✅
 - **FE 0건 재확인** ✅ (§3)
-- **API smoke (graceful)**: 배포(CI Deploy API Server) 후 no-auth → 401(auth-first, route mounted), authenticated → 410 `EVENT_OFFER_PARTICIPATE_RETIRED` 예상. **배포 진행 중 — live 410 실측은 배포 완료 후 확인(코드상 무조건 410, 회귀 위험 없음).**
+- **API smoke (graceful, live)** — 배포 완료 후(`o4o-core-api` 신리비전) 4 route no-auth POST:
+  - KPA `/api/v1/kpa/groupbuy/:id/participate` → **401** ✅
+  - Neture `/api/v1/neture/event-offers/:id/participate` → **401** ✅
+  - Glyco `/api/v1/glycopharm/event-offers/:id/participate` → **401** ✅
+  - KCos `/api/v1/cosmetics/event-offers/:id/participate` → **401** ✅
+  - → **4 route 모두 mount 유지 + auth 미들웨어 정상(auth-first 401)**, 500/route-누락 없음. authenticated 통과 시 핸들러가 **무조건 410** 반환(코드 검증 §4) → 주문 생성·차감 미발생. (authed 410 직접 실측은 토큰 필요 — 401+코드로 갈음, 회귀 위험 없음.)
 
 ## 5. 회귀 무영향
 - Store Cart add / checkout-confirm / 배송비 preview / shipping snapshot / payment / settlement / fulfillment 무변경.
@@ -46,10 +51,10 @@
 - event-offer 목록/상세 등 동일 controller 의 다른 route 무변경(service./sk/SK 계속 사용).
 
 ## 6. 완료 기준 체크 (WO §9)
-1(4 route 전수) ✅. 2(FE 0건 재확인) ✅. 3(410 비활성화) ✅. 4(helper 보존) ✅. 5(주문생성·차감 미발생) ✅. 6(cart-add/checkout-confirm 유지) ✅. 7(tsc 0) ✅. 8(API smoke — graceful, live 배포후) ✅(코드검증)/⏳(live). 9(buyer UI smoke — FE 0건·cart 흐름 유지로 갈음) ✅. 10(CHECK) ✅. 11(path-specific) ✅. 12(다른 세션 무접촉) ✅.
+1(4 route 전수) ✅. 2(FE 0건 재확인) ✅. 3(410 비활성화) ✅. 4(helper 보존) ✅. 5(주문생성·차감 미발생) ✅. 6(cart-add/checkout-confirm 유지) ✅. 7(tsc 0) ✅. 8(API smoke — live 4 route 401, mount+auth 정상) ✅. 9(buyer UI smoke — FE 0건·cart 흐름 유지로 갈음) ✅. 10(CHECK) ✅. 11(path-specific) ✅. 12(다른 세션 무접촉) ✅.
 
 ## 7. 남은 GAP/RISK · 후속
-- **live 410 실측**: CI 배포 완료 후 authenticated 호출로 410 1회 확인(저위험 — 코드상 무조건 410).
+- **authed 410 직접 실측**: live no-auth 401 ×4 확인 완료(mount+auth 정상). authenticated 호출 410 직접 확인은 토큰 필요로 미수행(코드상 무조건 410, 저위험).
 - **client method 정의 제거**: V3 `WO-O4O-EVENT-OFFER-PARTICIPATE-ROUTE-REMOVE-V3` 에서 route + api client method 완전 제거(일정 기간 호출 0건 확인 후).
 - 후속(IR 로드맵 P2~): `IR/WO-O4O-NETURE-B2B-ORDER-TO-CANONICAL-CART-CHECKOUT-V1`, `IR/WO-O4O-ORDER-COLLECTION-STATUS-MODEL-V1`.
 
