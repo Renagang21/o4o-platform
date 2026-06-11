@@ -315,46 +315,34 @@ export function createSellerController(dataSource: DataSource): Router {
   });
 
   /**
-   * POST /orders
-   * WO-O4O-STORE-CART-PAGE-V1: 판매자 B2B 주문 생성 — 6-gate 검증 + 서버 가격 강제
-   * WO-O4O-PARTNER-HUB-CORE-V1: referral_token → Order Attribution + Commission Snapshot
+   * POST /orders — RETIRED (410 Gone)
+   *
+   * WO-O4O-NETURE-B2B-LEGACY-SELLER-ORDER-ROUTE-RETIREMENT-V1 (P2e):
+   *   Neture B2B buyer 의 legacy 직접 주문 생성 route 비활성화.
+   *   buyer 주문은 canonical Store Cart 에서 공급자별 배송비가 포함된 장바구니 총액을
+   *   결제하고(checkout-confirm-b2b → paymentGroupId → /store/payment), 결제 완료 후
+   *   공급자별 주문으로 분리되어 supplier fulfillment bridge 로 전달된다.
+   *
+   *   이 handler 는 더 이상 주문을 생성하지 않는다:
+   *     - legacyNetureService.createOrder 미호출
+   *     - neture_orders insert / 재고 차감 / 공급자 노출 없음
+   *     - requireAuth 유지(auth-first): no-auth → 401 / authenticated → 410
+   *
+   *   read/fulfillment route(GET /orders, GET /orders/:id, GET /orders/:orderId/shipment)
+   *   와 legacy service(neture_orders supplier fulfillment record)는 보존한다.
+   *   완전 삭제는 일정 기간 호출 0건 확인 후 별도 WO(...-REMOVE-V2).
+   *
+   * 이전 동작 (참고): WO-O4O-STORE-CART-PAGE-V1 6-gate 주문 생성 +
+   *   WO-O4O-PARTNER-HUB-CORE-V1 referral attribution. canonical cutover(P2d-2)로 대체됨.
    */
-  router.post('/orders', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const userId = req.user?.id;
-      if (!userId) {
-        return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
-      }
-
-      // IR-NETURE-B2B-DIRECT-SHIPPING-ORDER-FLOW-AUDIT-V1 Phase 2: order_type, customer_info pass-through
-      const { items, shipping, orderer_name, orderer_phone, orderer_email, note, referral_token, order_type, customer_info } = req.body;
-
-      if (!items || !Array.isArray(items) || items.length === 0) {
-        return res.status(400).json({ success: false, error: 'VALIDATION_ERROR', message: 'Items required' });
-      }
-      if (!shipping || !orderer_name || !orderer_phone) {
-        return res.status(400).json({ success: false, error: 'VALIDATION_ERROR', message: 'Shipping info and orderer info required' });
-      }
-
-      const order = await legacyNetureService.createOrder(
-        { items, shipping, orderer_name, orderer_phone, orderer_email, note, order_type, customer_info },
-        userId,
-      );
-
-      // === POST-CREATION: Referral Attribution + Commission Snapshot (WO-O4O-PARTNER-HUB-CORE-V1) ===
-      if (referral_token && order?.id) {
-        try {
-          await sellerService.processReferralAttribution(order.id, order.order_number, referral_token);
-        } catch (attrErr) {
-          logger.warn('[Partner Commission] Attribution failed (non-blocking):', attrErr);
-        }
-      }
-
-      res.status(201).json({ success: true, data: order });
-    } catch (error: any) {
-      logger.error('[Neture API] Error creating seller order:', error);
-      res.status(400).json({ success: false, error: 'ORDER_CREATION_FAILED', message: error.message });
-    }
+  router.post('/orders', requireAuth, async (_req: AuthenticatedRequest, res: Response) => {
+    return res.status(410).json({
+      success: false,
+      code: 'NETURE_B2B_LEGACY_SELLER_ORDER_RETIRED',
+      message: 'B2B 주문은 장바구니 결제를 통해 진행해 주세요.',
+      canonicalAction: 'store_cart_checkout_b2b',
+      canonicalRoute: '/api/v1/store/cart/neture/checkout-confirm-b2b',
+    });
   });
 
   return router;
