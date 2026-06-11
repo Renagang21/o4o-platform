@@ -117,6 +117,15 @@ export function createStoreExecutionAssetsController(
       const qb = repo.createQueryBuilder('d')
         .where('d.organizationId = :organizationId', { organizationId });
 
+      // WO-O4O-STORE-ASSET-DERIVATION-READ-SERVICEKEY-FILTER-V1:
+      //   write-path 는 service_key 로 격리하나 read 가 organizationId 단독이라
+      //   동일 org 가 복수 서비스에 걸리면 cross-service derivation 이 노출될 수 있다.
+      //   서비스 mount(kpa/glycopharm/cosmetics)는 serviceKey 를 주입하므로 read 도
+      //   동일 경계를 적용한다. (serviceKey 미주입 mount 는 없으나, 방어적으로 조건부 적용.)
+      if (serviceKey) {
+        qb.andWhere('d.serviceKey = :serviceKey', { serviceKey });
+      }
+
       if (derivedKind && derivedId) {
         qb.andWhere('d.derivedKind = :derivedKind AND d.derivedId = :derivedId', { derivedKind, derivedId });
       } else if (sourceKind && sourceId) {
