@@ -292,11 +292,11 @@ export default function StoreLocalProductsPage() {
         <div>
           <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
             <ShoppingBag className="w-7 h-7 text-teal-600" />
-            자체 상품 관리
+            매장 취급 상품
             <span className="text-base font-normal text-slate-400">({total})</span>
           </h1>
           <p className="text-sm text-slate-500 mt-1">
-            매장에서 직접 등록하는 상품입니다. Display Domain 전용 — 결제/주문 시스템과 연결되지 않습니다.
+            O4O 주문과 무관하게 매장에서 자체적으로 취급·진열하는 상품입니다. 결제/주문 시스템과 연결되지 않습니다.
           </p>
         </div>
         <button
@@ -372,12 +372,12 @@ export default function StoreLocalProductsPage() {
         <div className="text-center py-16 bg-white rounded-2xl shadow-sm">
           <ShoppingBag className="w-16 h-16 text-slate-200 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-slate-800 mb-2">
-            {debouncedSearch ? '검색 결과가 없습니다' : '등록된 자체 상품이 없습니다'}
+            {debouncedSearch ? '검색 결과가 없습니다' : '등록된 매장 취급 상품이 없습니다'}
           </h3>
           <p className="text-slate-500 mb-6">
             {debouncedSearch
               ? '다른 검색어로 시도해 보세요.'
-              : '매장에서 직접 판매하는 상품을 등록해 보세요.'}
+              : '매장에서 자체적으로 취급하는 상품을 등록해 보세요.'}
           </p>
           {!debouncedSearch && (
             <button
