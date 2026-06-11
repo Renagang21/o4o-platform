@@ -33,6 +33,7 @@ import {
   EventOfferCartCheckoutService,
   CartCheckoutError,
 } from '../../services/cart/event-offer-cart-checkout.service.js';
+import { NetureB2BCartCheckoutService } from '../../services/cart/neture-b2b-cart-checkout.service.js';
 
 type AuthMiddleware = RequestHandler;
 
@@ -40,6 +41,7 @@ export function createStoreCartRoutes(dataSource: DataSource): Router {
   const router = Router();
   const service = new StoreCartService(dataSource);
   const checkoutService = new EventOfferCartCheckoutService(dataSource);
+  const b2bCheckoutService = new NetureB2BCartCheckoutService(dataSource);
   const validServiceKeys = new Set(getAllServiceKeys());
 
   // Lazy-load requireAuth to avoid circular import (store-local-product 패턴과 동일)
@@ -200,6 +202,29 @@ export function createStoreCartRoutes(dataSource: DataSource): Router {
         res.json({ success: true, data: result });
       } catch (error) {
         handleError(res, error, 'POST checkout-confirm');
+      }
+    },
+  );
+
+  // WO-O4O-NETURE-B2B-CHECKOUT-ORCHESTRATOR-V1 (P2a, payment-first):
+  // Neture B2B/regular cart 항목을 공급자별 checkout_orders 로 생성(paymentStatus='pending').
+  // 결제 완료 전 공급자 미노출 · collectionStatus 미사용 · fulfillment bridge 없음(후속).
+  // event_offer checkout-confirm 과 분리된 별도 엔드포인트(회귀 방지).
+  router.post(
+    '/cart/:serviceKey/checkout-confirm-b2b',
+    async (req: Request, res: Response): Promise<void> => {
+      const scope = await resolveScope(req, res);
+      if (!scope) return;
+      try {
+        const body = req.body ?? {};
+        const itemIds = Array.isArray(body.itemIds)
+          ? body.itemIds.filter((x: unknown): x is string => typeof x === 'string')
+          : undefined;
+        const note = typeof body.note === 'string' ? body.note : undefined;
+        const result = await b2bCheckoutService.confirm(scope, { itemIds, note });
+        res.json({ success: true, data: result });
+      } catch (error) {
+        handleError(res, error, 'POST checkout-confirm-b2b');
       }
     },
   );
