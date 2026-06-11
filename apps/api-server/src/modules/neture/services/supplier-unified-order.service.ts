@@ -162,6 +162,11 @@ export class SupplierUnifiedOrderService {
        LEFT JOIN users u ON u.id = co."buyerId"
        LEFT JOIN organizations org ON org.id = co."sellerOrganizationId"
        WHERE co."supplierId" = $1
+         -- WO-O4O-KPA-SUPPLIER-UNIFIED-ORDER-CHECKOUT-PAYMENT-VISIBILITY-FIX-V1:
+         -- payment-first — 결제 전(paymentStatus != 'paid') checkout_order 는 공급자에게 노출하지 않는다.
+         -- 'paid' 주문은 대부분 bridge 되어 neture_orders 로 노출(아래 dedup 제외)되며, 아직 bridge 안 된
+         -- paid 주문만 read-only(canFulfill=false)로 남는다. pending/failed 는 완전 제외.
+         AND co."paymentStatus" = 'paid'
          -- WO-O4O-CHECKOUT-ORDER-TO-NETURE-FULFILLMENT-BRIDGE-V1: bridge 된 checkout_order 는
          -- neture_orders row 로 노출되므로 checkout 소스에서 제외(중복 표시 방지).
          AND NOT EXISTS (
