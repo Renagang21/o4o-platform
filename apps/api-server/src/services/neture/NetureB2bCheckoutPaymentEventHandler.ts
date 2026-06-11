@@ -34,6 +34,7 @@ import {
   CheckoutPaymentStatus,
 } from '../../entities/checkout/CheckoutOrder.entity.js';
 import logger from '../../utils/logger.js';
+import { CheckoutFulfillmentBridgeService } from './checkout-fulfillment-bridge.service.js';
 
 /** Neture B2B checkout 결제 sourceService/serviceKey (legacy 'neture' 와 분리) */
 const NETURE_B2B_SERVICE_KEY = 'neture-b2b';
@@ -42,11 +43,13 @@ const NETURE_B2B_ORDER_SOURCE = 'neture_b2b_checkout';
 
 export class NetureB2bCheckoutPaymentEventHandler {
   private orderRepository: Repository<CheckoutOrder>;
+  private bridgeService: CheckoutFulfillmentBridgeService;
   private processedPayments: Set<string> = new Set();
   private initialized = false;
 
   constructor(private dataSource: DataSource) {
     this.orderRepository = dataSource.getRepository(CheckoutOrder);
+    this.bridgeService = new CheckoutFulfillmentBridgeService(dataSource);
   }
 
   initialize(): void {
@@ -121,6 +124,30 @@ export class NetureB2bCheckoutPaymentEventHandler {
         orderId: order.id,
         orderNumber: order.orderNumber,
       });
+
+      // WO-O4O-CHECKOUT-ORDER-TO-NETURE-FULFILLMENT-BRIDGE-V1 (P2c):
+      // 결제 완료 후 공급자 fulfillment 로 bridge (best-effort — 실패해도 paid 유지, 공급자 미노출).
+      try {
+        const result = await this.bridgeService.bridgeCheckoutOrderToNetureFulfillment({
+          checkoutOrderId: order.id,
+        });
+        if (result.bridged) {
+          logger.info(`${logPrefix} bridged to neture fulfillment`, {
+            orderId: order.id,
+            netureOrderId: result.netureOrderId,
+          });
+        } else {
+          logger.warn(`${logPrefix} bridge skipped`, {
+            orderId: order.id,
+            reason: result.skippedReason,
+          });
+        }
+      } catch (bridgeErr) {
+        logger.error(`${logPrefix} bridge error (order remains paid, supplier hidden)`, {
+          orderId: order.id,
+          error: bridgeErr instanceof Error ? bridgeErr.message : 'Unknown error',
+        });
+      }
     } catch (error) {
       logger.error(`${logPrefix} Processing failed`, {
         orderId: event.orderId,

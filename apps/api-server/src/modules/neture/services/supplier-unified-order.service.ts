@@ -162,6 +162,11 @@ export class SupplierUnifiedOrderService {
        LEFT JOIN users u ON u.id = co."buyerId"
        LEFT JOIN organizations org ON org.id = co."sellerOrganizationId"
        WHERE co."supplierId" = $1
+         -- WO-O4O-CHECKOUT-ORDER-TO-NETURE-FULFILLMENT-BRIDGE-V1: bridge 된 checkout_order 는
+         -- neture_orders row 로 노출되므로 checkout 소스에서 제외(중복 표시 방지).
+         AND NOT EXISTS (
+           SELECT 1 FROM neture_orders no2 WHERE no2.metadata->>'checkoutOrderId' = co.id::text
+         )
        ORDER BY co."createdAt" DESC
        LIMIT ${PER_SOURCE_CAP}`,
       [supplierId],
