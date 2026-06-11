@@ -696,8 +696,10 @@ function AppRoutes() {
       >
         <Route index element={<StoreCockpitPage />} />
         {/* WO-O4O-STORE-PRODUCTS-SERVICE-ROUTING-V1: 내 매장 상품 (ProductMaster + Listing).
-            상위 ProtectedRoute 가 cosmetics:store_owner 포함 게이트. */}
-        <Route path="my-products" element={<StoreProductsManagerPage />} />
+            상위 ProtectedRoute 가 cosmetics:store_owner 포함 게이트.
+            WO-O4O-MY-STORE-CANONICAL-MENU-LABEL-ALIGNMENT-3SERVICES-V1: OrganizationProductListing 기반
+            O4O 주문 가능 상품 화면 — 포괄 heading "내 매장 상품" 대신 데이터 성격 명시 주입 (매장 기준, "약국" 미사용). */}
+        <Route path="my-products" element={<StoreProductsManagerPage title="O4O 주문 가능 상품" description="공급자 또는 운영자 승인 후 매장에서 반복 주문할 수 있는 O4O 공급 상품을 관리합니다." />} />
         {/* channels: 채널 관리 (WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1) */}
         <Route path="channels" element={<StoreChannelsPage />} />
         {/* WO-O4O-KCOSMETICS-STORE-PATH-NESTED-MIGRATION-V1:
