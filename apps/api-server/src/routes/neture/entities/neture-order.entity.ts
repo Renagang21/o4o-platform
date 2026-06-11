@@ -161,6 +161,19 @@ export class NetureOrder {
   @Column({ name: 'customer_info', type: 'jsonb', nullable: true })
   customerInfo?: NetureCustomerInfo | null;
 
+  /**
+   * WO-O4O-ORDER-COLLECTION-STATUS-METADATA-CONTRACT-V1:
+   *   checkout_order → neture fulfillment bridge 가 생성할 주문의 metadata 계약(V1):
+   *     {
+   *       source: 'checkout_order', sourceOrderType: 'checkout_order', checkoutOrderId: string,
+   *       paymentStatus?: 'paid'|'pending'|'failed'|'refunded', paymentReady?: boolean,
+   *       collectionStatus?: 'confirmed',
+   *       collectionMethod?: 'invoice'|'operator_confirmed'|'manual_bank_transfer',
+   *       collectionConfirmedAt?: string, collectionConfirmedBy?: string,
+   *     }
+   *   collectionStatus='confirmed' 는 fulfillment(getFulfillmentReadiness)·settlement(calculateSettlements)
+   *   guard 가 readiness 로 인정한다(paymentStatus='paid' 와 OR). 계약/헬퍼: `services/order-collection-status.ts`.
+   */
   @Column({ type: 'jsonb', nullable: true })
   metadata?: Record<string, any> | null;
 

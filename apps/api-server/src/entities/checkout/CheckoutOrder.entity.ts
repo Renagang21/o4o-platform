@@ -172,6 +172,14 @@ export class CheckoutOrder {
 
   /**
    * 추가 메타데이터
+   *
+   * WO-O4O-ORDER-COLLECTION-STATUS-METADATA-CONTRACT-V1:
+   *   수금 확인 계약(V1)을 metadata 로 표현한다(컬럼 미추가). 계약/헬퍼는
+   *   `services/order-collection-status.ts` 참조.
+   *   - collectionStatus='confirmed' 이면 fulfillment/settlement readiness 로 인정된다
+   *     (paymentStatus='paid' 와 OR 관계). B2B/인보이스/운영자 확인 주문에 사용.
+   *   - 필드: collectionStatus / collectionMethod / collectionConfirmedAt / collectionConfirmedBy.
+   *   - 기존 metadata 는 덮어쓰지 말고 merge 한다.
    */
   @Column({ type: 'jsonb', nullable: true })
   metadata?: Record<string, any>;
