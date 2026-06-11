@@ -104,35 +104,39 @@ interface ApiOk<T> {
 
 export const storeCartApi = {
   addItem: (serviceKey: string, input: AddCartItemInput) =>
-    api.post<ApiOk<StoreCartItem>>(`/store/cart/${serviceKey}/items`, input).then((r) => r.data),
+    api
+      .post<ApiOk<StoreCartItem>>(`/store/cart/${serviceKey}/items`, input)
+      .then((r: { data: ApiOk<StoreCartItem> }) => r.data),
 
   list: (serviceKey: string) =>
     api
       .get<ApiOk<{ items: StoreCartItem[]; total: number }>>(`/store/cart/${serviceKey}/items`)
-      .then((r) => r.data),
+      .then((r: { data: ApiOk<{ items: StoreCartItem[]; total: number }> }) => r.data),
 
   groupBySupplier: (serviceKey: string) =>
     api
       .get<ApiOk<{ groups: SupplierGroup[]; supplierCount: number }>>(
         `/store/cart/${serviceKey}/groups`,
       )
-      .then((r) => r.data),
+      .then((r: { data: ApiOk<{ groups: SupplierGroup[]; supplierCount: number }> }) => r.data),
 
   updateQuantity: (serviceKey: string, id: string, quantity: number) =>
     api
       .patch<ApiOk<StoreCartItem>>(`/store/cart/${serviceKey}/items/${id}`, { quantity })
-      .then((r) => r.data),
+      .then((r: { data: ApiOk<StoreCartItem> }) => r.data),
 
   removeItem: (serviceKey: string, id: string) =>
     api
       .delete<ApiOk<{ removed: boolean }>>(`/store/cart/${serviceKey}/items/${id}`)
-      .then((r) => r.data),
+      .then((r: { data: ApiOk<{ removed: boolean }> }) => r.data),
 
   clear: (serviceKey: string) =>
-    api.delete<ApiOk<{ removed: number }>>(`/store/cart/${serviceKey}`).then((r) => r.data),
+    api
+      .delete<ApiOk<{ removed: number }>>(`/store/cart/${serviceKey}`)
+      .then((r: { data: ApiOk<{ removed: number }> }) => r.data),
 
   checkoutConfirm: (serviceKey: string, input?: { itemIds?: string[]; note?: string }) =>
     api
       .post<ApiOk<CheckoutConfirmResult>>(`/store/cart/${serviceKey}/checkout-confirm`, input ?? {})
-      .then((r) => r.data),
+      .then((r: { data: ApiOk<CheckoutConfirmResult> }) => r.data),
 };
