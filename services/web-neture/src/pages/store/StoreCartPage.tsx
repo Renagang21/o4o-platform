@@ -1,1152 +1,212 @@
 /**
- * StoreCartPage — O4O B2B 장바구니
+ * StoreCartPage — O4O B2B 장바구니 (canonical Store Cart)
  *
- * WO-O4O-STORE-CART-PAGE-V1
- * WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1: 공급자별 주문 조건 가시화
+ * WO-O4O-NETURE-B2B-CANONICAL-CART-CHECKOUT-PHASE1-V1 (P2d-2)
  *
- * 구성:
- * - 공급자별 그룹화된 장바구니
- * - 수량 조절 / 삭제
- * - 공급자별 최소 주문 금액 / 미달 시 물류비 안내 (실제 결제 반영 ✗)
- * - 공급자별 주문하기 (배송 정보 입력 → POST /seller/orders)
- * - 모바일 반응형
+ * legacy localStorage cart + /neture/seller/orders 직접 주문 생성 → canonical Store Cart
+ * (/api/v1/store/cart/neture/*) + checkout-confirm-b2b + paymentGroupId 결제 페이지 연결.
+ *
+ * payment-first: 결제 전 주문은 공급자에게 보이지 않는다. 다중 공급자라도 결제는 1회.
  */
+import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ShoppingCart, Trash2, Minus, Plus, Package } from 'lucide-react';
+import { storeCart, type SupplierGroupDto } from '../../lib/api/storeCart';
 
-import { useState, useMemo, useCallback, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { ShoppingCart, Trash2, Minus, Plus, Package, X, Truck, AlertCircle, CheckCircle2, Info, Store as StoreIcon, User } from 'lucide-react';
-import { useCart } from '../../lib/cart';
-import { storeApi, supplierProfileApi } from '../../lib/api';
-import type { StoreOrderShipping, SupplierOrderCondition, NetureOrderType, NetureCustomerInfo } from '../../lib/api';
-import type { SupplierGroup, CartItem } from '../../lib/cart';
-import { getReferralToken, clearReferralToken } from '../../lib/referral';
-import SupplierConditionModal from '../../components/common/SupplierConditionModal';
-
-// ============================================================================
-// Helpers
-// ============================================================================
-
-function formatPrice(value: number): string {
-  return value.toLocaleString('ko-KR');
+function won(v: number): string {
+  return `₩${(Number(v) || 0).toLocaleString('ko-KR')}`;
 }
-
-// ============================================================================
-// Quantity Control
-// ============================================================================
-
-function QuantityControl({ quantity, onChange }: { quantity: number; onChange: (q: number) => void }) {
-  return (
-    <div style={styles.qtyControl}>
-      <button
-        style={styles.qtyBtn}
-        onClick={() => onChange(Math.max(1, quantity - 1))}
-        disabled={quantity <= 1}
-      >
-        <Minus size={14} />
-      </button>
-      <input
-        type="number"
-        value={quantity}
-        onChange={(e) => {
-          const v = parseInt(e.target.value, 10);
-          if (!isNaN(v) && v >= 1 && v <= 1000) onChange(v);
-        }}
-        style={styles.qtyInput}
-        min={1}
-        max={1000}
-      />
-      <button
-        style={styles.qtyBtn}
-        onClick={() => onChange(Math.min(1000, quantity + 1))}
-        disabled={quantity >= 1000}
-      >
-        <Plus size={14} />
-      </button>
-    </div>
-  );
-}
-
-// ============================================================================
-// Cart Item Row
-// ============================================================================
-
-function CartItemRow({ item, onUpdateQty, onRemove }: {
-  item: CartItem;
-  onUpdateQty: (offerId: string, qty: number) => void;
-  onRemove: (offerId: string) => void;
-}) {
-  const itemTotal = item.priceGeneral * item.quantity;
-
-  return (
-    <div style={styles.itemRow}>
-      {/* Image */}
-      <div style={styles.itemImage}>
-        {item.imageUrl ? (
-          <img src={item.imageUrl} alt={item.name} style={styles.thumbnail} />
-        ) : (
-          <div style={styles.placeholderImg}>
-            <Package size={20} color="#94a3b8" />
-          </div>
-        )}
-      </div>
-
-      {/* Info */}
-      <div style={styles.itemInfo}>
-        <div style={styles.itemName}>{item.name}</div>
-        <div style={styles.itemPrice}>₩{formatPrice(item.priceGeneral)}</div>
-      </div>
-
-      {/* Quantity */}
-      <QuantityControl
-        quantity={item.quantity}
-        onChange={(q) => onUpdateQty(item.offerId, q)}
-      />
-
-      {/* Subtotal */}
-      <div style={styles.itemSubtotal}>₩{formatPrice(itemTotal)}</div>
-
-      {/* Delete */}
-      <button style={styles.deleteBtn} onClick={() => onRemove(item.offerId)} title="삭제">
-        <Trash2 size={16} />
-      </button>
-    </div>
-  );
-}
-
-// ============================================================================
-// Shipping Modal
-// ============================================================================
-
-const INITIAL_SHIPPING: StoreOrderShipping = {
-  recipient_name: '',
-  phone: '',
-  postal_code: '',
-  address: '',
-  address_detail: '',
-  delivery_note: '',
-};
-
-// IR-NETURE-B2B-DIRECT-SHIPPING-ORDER-FLOW-AUDIT-V1 Phase 3
-// 주문 시 입력받는 모든 정보를 단일 객체로 부모에 전달
-export interface ShippingModalSubmitData {
-  shipping: StoreOrderShipping;
-  ordererName: string;
-  ordererPhone: string;
-  orderType: NetureOrderType;
-  customerInfo?: NetureCustomerInfo; // DIRECT_TO_CUSTOMER 시에만
-}
-
-function ShippingModal({ onSubmit, onClose, loading }: {
-  onSubmit: (data: ShippingModalSubmitData) => void;
-  onClose: () => void;
-  loading: boolean;
-}) {
-  const [shipping, setShipping] = useState<StoreOrderShipping>(INITIAL_SHIPPING);
-  const [ordererName, setOrdererName] = useState('');
-  const [ordererPhone, setOrdererPhone] = useState('');
-
-  // IR-NETURE-B2B-DIRECT-SHIPPING-ORDER-FLOW-AUDIT-V1 Phase 3
-  const [orderType, setOrderType] = useState<NetureOrderType>('STORE_RESTOCK');
-  const [customerName, setCustomerName] = useState('');
-  const [customerPhone, setCustomerPhone] = useState('');
-  const [consent, setConsent] = useState(false);
-
-  // 직배송 모드 진입 시 customer_info를 shipping 정보로 prefill (사용자 수정 가능)
-  useEffect(() => {
-    if (orderType === 'DIRECT_TO_CUSTOMER') {
-      setCustomerName((prev) => prev || shipping.recipient_name || '');
-      setCustomerPhone((prev) => prev || shipping.phone || '');
-    }
-  }, [orderType, shipping.recipient_name, shipping.phone]);
-
-  const isShippingValid =
-    !!shipping.recipient_name && !!shipping.phone && !!shipping.postal_code && !!shipping.address;
-  const isOrdererValid = !!ordererName && !!ordererPhone;
-  const isCustomerInfoValid =
-    orderType === 'STORE_RESTOCK' ||
-    (customerName.trim().length > 0 && customerPhone.trim().length > 0 && consent);
-
-  const isValid = isShippingValid && isOrdererValid && isCustomerInfoValid;
-
-  const handleSubmit = () => {
-    const data: ShippingModalSubmitData = {
-      shipping,
-      ordererName,
-      ordererPhone,
-      orderType,
-      customerInfo:
-        orderType === 'DIRECT_TO_CUSTOMER'
-          ? {
-              name: customerName.trim(),
-              phone: customerPhone.trim(),
-              consent_at: new Date().toISOString(),
-            }
-          : undefined,
-    };
-    onSubmit(data);
-  };
-
-  return (
-    <div style={styles.modalOverlay} onClick={onClose}>
-      <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
-        <div style={styles.modalHeader}>
-          <h3 style={styles.modalTitle}>배송 정보 입력</h3>
-          <button style={styles.modalClose} onClick={onClose}><X size={20} /></button>
-        </div>
-
-        <div style={styles.modalBody}>
-          {/* IR-NETURE-B2B-DIRECT-SHIPPING-ORDER-FLOW-AUDIT-V1 Phase 3: 주문 유형 선택 */}
-          <div style={styles.sectionLabel}>주문 유형</div>
-          <div style={styles.orderTypeRow}>
-            <label
-              style={{
-                ...styles.orderTypeOption,
-                ...(orderType === 'STORE_RESTOCK' ? styles.orderTypeOptionActive : {}),
-              }}
-            >
-              <input
-                type="radio"
-                name="orderType"
-                value="STORE_RESTOCK"
-                checked={orderType === 'STORE_RESTOCK'}
-                onChange={() => setOrderType('STORE_RESTOCK')}
-                style={styles.radioInput}
-              />
-              <StoreIcon size={16} style={{ marginRight: 6 }} />
-              <span style={styles.orderTypeLabel}>매장 입고</span>
-              <span style={styles.orderTypeHint}>매장으로 배송</span>
-            </label>
-            <label
-              style={{
-                ...styles.orderTypeOption,
-                ...(orderType === 'DIRECT_TO_CUSTOMER' ? styles.orderTypeOptionActive : {}),
-              }}
-            >
-              <input
-                type="radio"
-                name="orderType"
-                value="DIRECT_TO_CUSTOMER"
-                checked={orderType === 'DIRECT_TO_CUSTOMER'}
-                onChange={() => setOrderType('DIRECT_TO_CUSTOMER')}
-                style={styles.radioInput}
-              />
-              <User size={16} style={{ marginRight: 6 }} />
-              <span style={styles.orderTypeLabel}>고객 직배송</span>
-              <span style={styles.orderTypeHint}>고객 주소로 배송</span>
-            </label>
-          </div>
-
-          <div style={{ ...styles.sectionLabel, marginTop: 20 }}>주문자 정보</div>
-          <div style={styles.formRow}>
-            <label style={styles.label}>이름 *</label>
-            <input style={styles.input} value={ordererName} onChange={(e) => setOrdererName(e.target.value)} placeholder="주문자 이름" />
-          </div>
-          <div style={styles.formRow}>
-            <label style={styles.label}>연락처 *</label>
-            <input style={styles.input} value={ordererPhone} onChange={(e) => setOrdererPhone(e.target.value)} placeholder="010-0000-0000" />
-          </div>
-
-          <div style={{ ...styles.sectionLabel, marginTop: 20 }}>배송지 정보</div>
-          <div style={styles.formRow}>
-            <label style={styles.label}>수령인 *</label>
-            <input style={styles.input} value={shipping.recipient_name} onChange={(e) => setShipping({ ...shipping, recipient_name: e.target.value })} placeholder="수령인 이름" />
-          </div>
-          <div style={styles.formRow}>
-            <label style={styles.label}>연락처 *</label>
-            <input style={styles.input} value={shipping.phone} onChange={(e) => setShipping({ ...shipping, phone: e.target.value })} placeholder="010-0000-0000" />
-          </div>
-          <div style={styles.formRow}>
-            <label style={styles.label}>우편번호 *</label>
-            <input style={styles.input} value={shipping.postal_code} onChange={(e) => setShipping({ ...shipping, postal_code: e.target.value })} placeholder="12345" />
-          </div>
-          <div style={styles.formRow}>
-            <label style={styles.label}>주소 *</label>
-            <input style={styles.input} value={shipping.address} onChange={(e) => setShipping({ ...shipping, address: e.target.value })} placeholder="기본 주소" />
-          </div>
-          <div style={styles.formRow}>
-            <label style={styles.label}>상세주소</label>
-            <input style={styles.input} value={shipping.address_detail || ''} onChange={(e) => setShipping({ ...shipping, address_detail: e.target.value })} placeholder="상세 주소" />
-          </div>
-          <div style={styles.formRow}>
-            <label style={styles.label}>배송메모</label>
-            <input style={styles.input} value={shipping.delivery_note || ''} onChange={(e) => setShipping({ ...shipping, delivery_note: e.target.value })} placeholder="배송 시 요청사항" />
-          </div>
-
-          {/* IR-NETURE-B2B-DIRECT-SHIPPING-ORDER-FLOW-AUDIT-V1 Phase 3: 직배송 시 고객 정보 */}
-          {orderType === 'DIRECT_TO_CUSTOMER' && (
-            <>
-              <div style={{ ...styles.sectionLabel, marginTop: 20 }}>고객 정보 (개인정보 처리)</div>
-              <div style={styles.customerInfoNote}>
-                <Info size={14} style={{ marginRight: 6, flexShrink: 0 }} />
-                <span>고객 직배송 시 고객 개인정보 수집·이용에 대한 동의가 필요합니다.</span>
-              </div>
-              <div style={styles.formRow}>
-                <label style={styles.label}>고객 이름 *</label>
-                <input
-                  style={styles.input}
-                  value={customerName}
-                  onChange={(e) => setCustomerName(e.target.value)}
-                  placeholder="고객 이름"
-                />
-              </div>
-              <div style={styles.formRow}>
-                <label style={styles.label}>고객 연락처 *</label>
-                <input
-                  style={styles.input}
-                  value={customerPhone}
-                  onChange={(e) => setCustomerPhone(e.target.value)}
-                  placeholder="010-0000-0000"
-                />
-              </div>
-              <label style={styles.consentLabel}>
-                <input
-                  type="checkbox"
-                  checked={consent}
-                  onChange={(e) => setConsent(e.target.checked)}
-                  style={styles.consentCheckbox}
-                />
-                <span>고객의 개인정보(이름·연락처) 수집 및 직배송 처리에 동의합니다. *</span>
-              </label>
-            </>
-          )}
-        </div>
-
-        <div style={styles.modalFooter}>
-          <button style={styles.cancelBtn} onClick={onClose} disabled={loading}>취소</button>
-          <button
-            style={{ ...styles.orderBtn, opacity: isValid && !loading ? 1 : 0.5 }}
-            disabled={!isValid || loading}
-            onClick={handleSubmit}
-          >
-            {loading ? '주문 처리 중...' : '주문하기'}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ============================================================================
-// Supplier Group Card
-// ============================================================================
-
-function SupplierGroupCard({ supplierId, group, condition, onUpdateQty, onRemove, onOrder, onShowCondition }: {
-  supplierId: string;
-  group: SupplierGroup;
-  condition: SupplierOrderCondition | null | undefined;
-  onUpdateQty: (offerId: string, qty: number) => void;
-  onRemove: (offerId: string) => void;
-  onOrder: (supplierId: string) => void;
-  onShowCondition: () => void;
-}) {
-  const subtotal = useMemo(
-    () => group.items.reduce((sum, i) => sum + i.priceGeneral * i.quantity, 0),
-    [group.items],
-  );
-
-  const minOrder = condition?.minOrderAmount ?? null;
-  const surcharge = condition?.minOrderSurcharge ?? null;
-  const note = condition?.note ?? null;
-  const hasMinOrder = minOrder != null && minOrder > 0;
-  const hasSurcharge = surcharge != null && surcharge > 0;
-  const shortfall = hasMinOrder ? Math.max(0, minOrder - subtotal) : 0;
-  const isMet = !hasMinOrder || subtotal >= minOrder;
-
-  return (
-    <div style={styles.groupCard}>
-      {/* Header */}
-      <div style={styles.groupHeader}>
-        <div style={styles.groupName}>
-          <Truck size={18} color="#6366f1" />
-          <button
-            type="button"
-            onClick={onShowCondition}
-            style={styles.supplierNameBtn}
-          >
-            {group.supplierName}
-          </button>
-          <span style={styles.groupCount}>{group.items.length}개 상품</span>
-        </div>
-      </div>
-
-      {/* Items */}
-      <div style={styles.groupItems}>
-        {group.items.map((item) => (
-          <CartItemRow
-            key={item.offerId}
-            item={item}
-            onUpdateQty={onUpdateQty}
-            onRemove={onRemove}
-          />
-        ))}
-      </div>
-
-      {/* Summary */}
-      <div style={styles.groupSummary}>
-        <div style={styles.summaryRow}>
-          <span>소계</span>
-          <span style={styles.summarySubtotal}>₩{formatPrice(subtotal)}</span>
-        </div>
-
-        {/* 공급자 주문 조건 — WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1 */}
-        {(hasMinOrder || hasSurcharge || note) ? (
-          <div style={styles.conditionBox}>
-            <div style={styles.conditionHeader}>
-              <Info size={13} color="#475569" />
-              <span style={{ marginLeft: 4 }}>공급자 주문 조건</span>
-            </div>
-
-            {hasMinOrder && (
-              <div style={styles.summaryRow}>
-                <span>최소 주문 금액</span>
-                <span>
-                  ₩{formatPrice(minOrder)}
-                  {isMet ? (
-                    <span style={styles.metBadge}>
-                      <CheckCircle2 size={12} /> 충족
-                    </span>
-                  ) : (
-                    <span style={styles.shortBadge}>
-                      <AlertCircle size={12} /> ₩{formatPrice(shortfall)} 부족
-                    </span>
-                  )}
-                </span>
-              </div>
-            )}
-
-            {hasSurcharge && (
-              <div style={styles.summaryRow}>
-                <span>미달 시 물류비</span>
-                <span style={!isMet ? styles.activeSurcharge : styles.inactiveSurcharge}>
-                  +₩{formatPrice(surcharge)}
-                </span>
-              </div>
-            )}
-
-            {note && (
-              <div style={styles.conditionNote}>{note}</div>
-            )}
-
-            <div style={styles.conditionDisclaimer}>
-              ※ 안내 정보입니다. 실제 결제 반영은 별도 단계에서 처리됩니다.
-            </div>
-          </div>
-        ) : (
-          <div style={styles.noConditionBox}>
-            이 공급자는 주문 조건이 설정되어 있지 않습니다.
-          </div>
-        )}
-
-        <button style={styles.orderBtn} onClick={() => onOrder(supplierId)}>
-          주문하기
-        </button>
-      </div>
-    </div>
-  );
-}
-
-// ============================================================================
-// Empty State
-// ============================================================================
-
-function EmptyCart() {
-  return (
-    <div style={styles.empty}>
-      <ShoppingCart size={48} color="#cbd5e1" />
-      <h3 style={styles.emptyTitle}>장바구니가 비어있습니다</h3>
-      <p style={styles.emptyText}>공급 상품을 둘러보고 장바구니에 담아보세요.</p>
-      <Link to="/content" style={styles.browseBtn}>
-        상품 둘러보기
-      </Link>
-    </div>
-  );
-}
-
-// ============================================================================
-// Main Page
-// ============================================================================
 
 export default function StoreCartPage() {
-  const { items, grouped, updateQty, remove, removeSupplier, clear } = useCart();
-  const [orderingSupplierId, setOrderingSupplierId] = useState<string | null>(null);
-  const [orderLoading, setOrderLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const [groups, setGroups] = useState<SupplierGroupDto[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [failed, setFailed] = useState<Array<{ productName: string; reason: string }>>([]);
 
-  // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
-  const [conditions, setConditions] = useState<Map<string, SupplierOrderCondition | null>>(new Map());
-  const [conditionTarget, setConditionTarget] = useState<{ id: string; name: string } | null>(null);
-
-  // 공급자별 주문 조건 일괄 조회 (장바구니에 포함된 공급자만)
-  useEffect(() => {
-    const supplierIds = Array.from(grouped.keys()).filter((id) => !conditions.has(id));
-    if (supplierIds.length === 0) return;
-    let cancelled = false;
-    Promise.all(
-      supplierIds.map((id) =>
-        supplierProfileApi.getOrderCondition(id).then((c) => [id, c] as const),
-      ),
-    ).then((results) => {
-      if (cancelled) return;
-      setConditions((prev) => {
-        const next = new Map(prev);
-        for (const [id, c] of results) next.set(id, c);
-        return next;
-      });
-    });
-    return () => { cancelled = true; };
-  }, [grouped, conditions]);
-
-  // 결제 반영 X — 단순 소계 합산 (안내 가이드라인 준수)
-  const grandTotal = useMemo(() => {
-    let total = 0;
-    for (const [, group] of grouped) {
-      total += group.items.reduce((s, i) => s + i.priceGeneral * i.quantity, 0);
+  const load = useCallback(async () => {
+    try {
+      const { groups } = await storeCart.listGroups();
+      setGroups(groups);
+      setError(null);
+    } catch (e: any) {
+      setError(e?.message || '장바구니를 불러오지 못했습니다.');
+    } finally {
+      setLoading(false);
     }
-    return total;
-  }, [grouped]);
-
-  const handleOrder = useCallback((supplierId: string) => {
-    setOrderingSupplierId(supplierId);
-    setErrorMessage(null);
   }, []);
 
-  // IR-NETURE-B2B-DIRECT-SHIPPING-ORDER-FLOW-AUDIT-V1 Phase 3: order_type/customer_info 전송
-  const handleSubmitOrder = useCallback(async (data: ShippingModalSubmitData) => {
-    if (!orderingSupplierId) return;
-    const group = grouped.get(orderingSupplierId);
-    if (!group) return;
+  useEffect(() => {
+    load();
+  }, [load]);
 
-    setOrderLoading(true);
-    setErrorMessage(null);
+  const itemsSubtotal = groups.reduce((s, g) => s + g.displaySubtotal, 0);
+  const shippingTotal = groups.reduce((s, g) => s + g.shipping.shippingFee, 0);
+  const grandTotal = itemsSubtotal + shippingTotal;
+  const itemCount = groups.reduce((s, g) => s + g.itemCount, 0);
 
-    const referralToken = getReferralToken();
-    const result = await storeApi.createOrder({
-      items: group.items.map((i) => ({ product_id: i.offerId, quantity: i.quantity })),
-      shipping: data.shipping,
-      orderer_name: data.ordererName,
-      orderer_phone: data.ordererPhone,
-      order_type: data.orderType,
-      ...(data.customerInfo ? { customer_info: data.customerInfo } : {}),
-      ...(referralToken ? { referral_token: referralToken } : {}),
-    });
-
-    setOrderLoading(false);
-
-    if (result.success) {
-      clearReferralToken();
-      removeSupplier(orderingSupplierId);
-      setOrderingSupplierId(null);
-      setSuccessMessage(`${group.supplierName} 주문이 완료되었습니다.`);
-      setTimeout(() => setSuccessMessage(null), 4000);
-    } else {
-      setErrorMessage(result.error || '주문에 실패했습니다.');
+  const onQty = useCallback(async (itemId: string, qty: number) => {
+    if (qty < 1 || qty > 1000) return;
+    setBusy(true);
+    try {
+      await storeCart.updateQuantity(itemId, qty);
+      await load();
+    } catch (e: any) {
+      setError(e?.message || '수량 변경 실패');
+    } finally {
+      setBusy(false);
     }
-  }, [orderingSupplierId, grouped, removeSupplier]);
+  }, [load]);
 
-  if (items.length === 0 && !successMessage) {
-    return (
-      <div style={styles.page}>
-        <h1 style={styles.pageTitle}>
-          <ShoppingCart size={24} />
-          <span style={{ marginLeft: 8 }}>장바구니</span>
-        </h1>
-        <EmptyCart />
-      </div>
-    );
-  }
+  const onRemove = useCallback(async (itemId: string) => {
+    setBusy(true);
+    try {
+      await storeCart.removeItem(itemId);
+      await load();
+    } catch (e: any) {
+      setError(e?.message || '삭제 실패');
+    } finally {
+      setBusy(false);
+    }
+  }, [load]);
 
-  const supplierEntries = Array.from(grouped.entries());
+  const onClear = useCallback(async () => {
+    setBusy(true);
+    try {
+      await storeCart.clear();
+      await load();
+    } catch (e: any) {
+      setError(e?.message || '비우기 실패');
+    } finally {
+      setBusy(false);
+    }
+  }, [load]);
+
+  const onCheckout = useCallback(async () => {
+    if (busy || itemCount === 0) return;
+    setBusy(true);
+    setError(null);
+    setFailed([]);
+    try {
+      const result = await storeCart.checkoutConfirmB2B();
+      if (result.failedItems?.length) {
+        setFailed(result.failedItems.map((f) => ({ productName: f.productName, reason: f.reason })));
+      }
+      if (result.createdOrders?.length && result.paymentGroupId) {
+        navigate(`/store/payment?paymentGroupId=${encodeURIComponent(result.paymentGroupId)}`);
+        return;
+      }
+      // 생성된 주문 없음(전부 실패) → cart 유지, 실패 사유 표시
+      await load();
+    } catch (e: any) {
+      setError(e?.message || '주문 확정에 실패했습니다.');
+    } finally {
+      setBusy(false);
+    }
+  }, [busy, itemCount, navigate, load]);
 
   return (
-    <div style={styles.page}>
-      {/* Header */}
-      <div style={styles.header}>
-        <h1 style={styles.pageTitle}>
-          <ShoppingCart size={24} />
-          <span style={{ marginLeft: 8 }}>장바구니</span>
-          {items.length > 0 && <span style={styles.cartCount}>{items.length}</span>}
+    <div className="mx-auto max-w-3xl p-4">
+      <div className="mb-4 flex items-center justify-between">
+        <h1 className="flex items-center gap-2 text-xl font-bold text-gray-900">
+          <ShoppingCart size={22} /> 장바구니
+          {itemCount > 0 && <span className="rounded-full bg-emerald-100 px-2 text-sm text-emerald-700">{itemCount}</span>}
         </h1>
-        {items.length > 0 && (
-          <button style={styles.clearAllBtn} onClick={clear}>
-            전체 삭제
+        {groups.length > 0 && (
+          <button type="button" onClick={onClear} disabled={busy} className="text-sm text-gray-500 hover:text-gray-700">
+            비우기
           </button>
         )}
       </div>
 
-      {/* Success Message */}
-      {successMessage && (
-        <div style={styles.successBanner}>
-          {successMessage}
+      {loading && <p className="text-gray-500">불러오는 중...</p>}
+      {!loading && error && <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</div>}
+
+      {!loading && groups.length === 0 && !error && (
+        <div className="rounded-xl border border-gray-200 bg-white p-8 text-center text-gray-500">
+          <Package size={28} className="mx-auto mb-2 text-gray-400" />
+          장바구니가 비어 있습니다.
         </div>
       )}
 
-      {/* Supplier Groups */}
-      {supplierEntries.map(([supplierId, group]) => (
-        <SupplierGroupCard
-          key={supplierId}
-          supplierId={supplierId}
-          group={group}
-          condition={conditions.get(supplierId)}
-          onUpdateQty={updateQty}
-          onRemove={remove}
-          onOrder={handleOrder}
-          onShowCondition={() => setConditionTarget({ id: supplierId, name: group.supplierName })}
-        />
-      ))}
-
-      {/* Grand Total — 소계 합산 (결제 반영 X) */}
-      {items.length > 0 && (
-        <div style={styles.grandTotal}>
-          <span style={styles.grandTotalLabel}>전체 소계 ({supplierEntries.length}개 공급자)</span>
-          <span style={styles.grandTotalValue}>₩{formatPrice(grandTotal)}</span>
+      {!loading && failed.length > 0 && (
+        <div className="mb-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-800">
+          <p className="font-semibold">주문할 수 없는 항목이 있어 장바구니에 남겨두었습니다.</p>
+          <ul className="mt-1 list-disc pl-5">
+            {failed.map((f, i) => (
+              <li key={i}>{f.productName}: {f.reason}</li>
+            ))}
+          </ul>
         </div>
       )}
 
-      {/* Shipping Modal */}
-      {orderingSupplierId && (
-        <ShippingModal
-          loading={orderLoading}
-          onClose={() => { setOrderingSupplierId(null); setErrorMessage(null); }}
-          onSubmit={handleSubmitOrder}
-        />
-      )}
+      {!loading && groups.length > 0 && (
+        <>
+          {groups.map((g, gi) => (
+            <div key={g.supplierId ?? `group-${gi}`} className="mb-3 rounded-xl border border-gray-200 bg-white p-4">
+              <div className="mb-2 text-sm font-semibold text-gray-700">공급자별 묶음 {gi + 1} · {g.itemCount}개 상품</div>
+              {g.items.map((it) => (
+                <div key={it.id} className="flex items-center gap-3 border-b border-gray-50 py-2 last:border-0">
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-sm text-gray-900">{it.productName}</div>
+                    <div className="text-xs text-gray-500">{won(it.priceSnapshot)}</div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <button type="button" onClick={() => onQty(it.id, it.quantity - 1)} disabled={busy || it.quantity <= 1} className="rounded border border-gray-200 p-1 disabled:opacity-40">
+                      <Minus size={14} />
+                    </button>
+                    <span className="w-8 text-center text-sm">{it.quantity}</span>
+                    <button type="button" onClick={() => onQty(it.id, it.quantity + 1)} disabled={busy || it.quantity >= 1000} className="rounded border border-gray-200 p-1 disabled:opacity-40">
+                      <Plus size={14} />
+                    </button>
+                  </div>
+                  <div className="w-20 text-right text-sm font-medium text-gray-900">{won(it.priceSnapshot * it.quantity)}</div>
+                  <button type="button" onClick={() => onRemove(it.id)} disabled={busy} className="text-gray-400 hover:text-red-500" title="삭제">
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              ))}
+              <div className="mt-2 space-y-1 border-t border-gray-100 pt-2 text-sm">
+                <div className="flex justify-between text-gray-500"><span>상품금액</span><span>{won(g.displaySubtotal)}</span></div>
+                <div className="flex justify-between text-gray-500">
+                  <span>배송비</span>
+                  <span>{g.shipping.freeShippingApplied ? '무료' : won(g.shipping.shippingFee)}</span>
+                </div>
+                {!g.shipping.freeShippingApplied && g.shipping.remainingForFreeShipping != null && (
+                  <div className="text-xs text-emerald-600">{won(g.shipping.remainingForFreeShipping)} 더 담으면 무료배송</div>
+                )}
+                <div className="flex justify-between font-semibold text-gray-900"><span>공급자 합계</span><span>{won(g.displayTotal)}</span></div>
+              </div>
+            </div>
+          ))}
 
-      {/* Supplier condition modal — WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1 */}
-      <SupplierConditionModal
-        open={!!conditionTarget}
-        supplierId={conditionTarget?.id ?? null}
-        fallbackName={conditionTarget?.name}
-        onClose={() => setConditionTarget(null)}
-      />
+          <div className="rounded-xl border border-gray-200 bg-white p-4">
+            <div className="flex justify-between text-sm text-gray-500"><span>상품 합계</span><span>{won(itemsSubtotal)}</span></div>
+            <div className="flex justify-between text-sm text-gray-500"><span>배송비 합계</span><span>{won(shippingTotal)}</span></div>
+            <div className="mt-2 flex justify-between border-t border-gray-100 pt-2 text-base font-bold text-gray-900">
+              <span>총 결제 예정 금액</span><span className="text-emerald-600">{won(grandTotal)}</span>
+            </div>
+          </div>
 
-      {/* Error message inside modal area */}
-      {errorMessage && orderingSupplierId && (
-        <div style={styles.errorOverlay}>
-          <div style={styles.errorBanner}>{errorMessage}</div>
-        </div>
+          <div className="mt-3 rounded-lg bg-emerald-50 p-3 text-xs text-emerald-800">
+            여러 공급자의 상품도 한 번에 결제됩니다. 배송비는 공급자별 상품금액 기준으로 계산됩니다.
+            <br />
+            결제 완료 후 공급자에게 주문이 전달됩니다. 결제 전에는 공급자가 주문을 확인할 수 없습니다.
+          </div>
+
+          <button
+            type="button"
+            onClick={onCheckout}
+            disabled={busy || itemCount === 0}
+            className={`mt-3 w-full rounded-xl px-4 py-3 text-base font-bold text-white ${
+              busy || itemCount === 0 ? 'cursor-not-allowed bg-gray-400' : 'bg-emerald-600 hover:bg-emerald-700'
+            }`}
+          >
+            {busy ? '처리 중...' : `${won(grandTotal)} 결제 진행`}
+          </button>
+        </>
       )}
     </div>
   );
 }
-
-// ============================================================================
-// Styles
-// ============================================================================
-
-const styles: Record<string, React.CSSProperties> = {
-  page: {
-    maxWidth: 900,
-    margin: '0 auto',
-    padding: '24px 16px',
-  },
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  pageTitle: {
-    display: 'flex',
-    alignItems: 'center',
-    fontSize: 22,
-    fontWeight: 700,
-    color: '#0f172a',
-    margin: 0,
-  },
-  cartCount: {
-    marginLeft: 8,
-    fontSize: 14,
-    fontWeight: 600,
-    backgroundColor: '#6366f1',
-    color: '#fff',
-    borderRadius: 12,
-    padding: '2px 8px',
-  },
-  clearAllBtn: {
-    padding: '8px 16px',
-    fontSize: 13,
-    color: '#dc2626',
-    backgroundColor: 'transparent',
-    border: '1px solid #fecaca',
-    borderRadius: 8,
-    cursor: 'pointer',
-  },
-
-  // Supplier Group
-  groupCard: {
-    border: '1px solid #e2e8f0',
-    borderRadius: 12,
-    marginBottom: 20,
-    overflow: 'hidden',
-    backgroundColor: '#fff',
-  },
-  groupHeader: {
-    padding: '14px 20px',
-    backgroundColor: '#f8fafc',
-    borderBottom: '1px solid #e2e8f0',
-  },
-  groupName: {
-    display: 'flex',
-    alignItems: 'center',
-    fontSize: 15,
-    fontWeight: 600,
-    color: '#1e293b',
-  },
-  groupCount: {
-    marginLeft: 8,
-    fontSize: 12,
-    color: '#94a3b8',
-    fontWeight: 400,
-  },
-  groupItems: {
-    padding: '8px 0',
-  },
-
-  // Item Row
-  itemRow: {
-    display: 'flex',
-    alignItems: 'center',
-    padding: '12px 20px',
-    gap: 16,
-    borderBottom: '1px solid #f1f5f9',
-  },
-  itemImage: {
-    flexShrink: 0,
-    width: 48,
-    height: 48,
-  },
-  thumbnail: {
-    width: 48,
-    height: 48,
-    borderRadius: 8,
-    objectFit: 'cover' as const,
-  },
-  placeholderImg: {
-    width: 48,
-    height: 48,
-    borderRadius: 8,
-    backgroundColor: '#f1f5f9',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  itemInfo: {
-    flex: 1,
-    minWidth: 0,
-  },
-  itemName: {
-    fontSize: 14,
-    fontWeight: 500,
-    color: '#1e293b',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap' as const,
-  },
-  itemPrice: {
-    fontSize: 13,
-    color: '#64748b',
-    marginTop: 2,
-  },
-  itemSubtotal: {
-    fontSize: 14,
-    fontWeight: 600,
-    color: '#1e293b',
-    minWidth: 90,
-    textAlign: 'right' as const,
-  },
-  deleteBtn: {
-    padding: 6,
-    border: 'none',
-    background: 'none',
-    color: '#94a3b8',
-    cursor: 'pointer',
-    borderRadius: 6,
-    flexShrink: 0,
-  },
-
-  // Quantity
-  qtyControl: {
-    display: 'flex',
-    alignItems: 'center',
-    border: '1px solid #e2e8f0',
-    borderRadius: 8,
-    overflow: 'hidden',
-    flexShrink: 0,
-  },
-  qtyBtn: {
-    width: 32,
-    height: 32,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    border: 'none',
-    backgroundColor: '#f8fafc',
-    cursor: 'pointer',
-    color: '#475569',
-  },
-  qtyInput: {
-    width: 44,
-    height: 32,
-    textAlign: 'center' as const,
-    border: 'none',
-    borderLeft: '1px solid #e2e8f0',
-    borderRight: '1px solid #e2e8f0',
-    fontSize: 14,
-    fontWeight: 500,
-    outline: 'none',
-  },
-
-  // Group Summary
-  groupSummary: {
-    padding: '16px 20px',
-    backgroundColor: '#f8fafc',
-    borderTop: '1px solid #e2e8f0',
-  },
-  summaryRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    fontSize: 14,
-    color: '#475569',
-    marginBottom: 6,
-  },
-  summarySubtotal: {
-    fontSize: 15,
-    fontWeight: 600,
-    color: '#0f172a',
-  },
-  supplierNameBtn: {
-    marginLeft: 8,
-    padding: 0,
-    fontSize: 15,
-    fontWeight: 600,
-    color: '#1e293b',
-    background: 'none',
-    border: 'none',
-    cursor: 'pointer',
-    textDecoration: 'underline',
-    textDecorationColor: 'rgba(99,102,241,0.3)',
-    textUnderlineOffset: 3,
-  },
-  conditionBox: {
-    marginTop: 12,
-    padding: 12,
-    backgroundColor: '#f8fafc',
-    border: '1px solid #e2e8f0',
-    borderRadius: 8,
-    marginBottom: 12,
-  },
-  conditionHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    fontSize: 12,
-    fontWeight: 600,
-    color: '#475569',
-    marginBottom: 8,
-  },
-  metBadge: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: 3,
-    marginLeft: 8,
-    padding: '2px 6px',
-    fontSize: 11,
-    fontWeight: 600,
-    color: '#15803d',
-    backgroundColor: '#dcfce7',
-    borderRadius: 4,
-  },
-  shortBadge: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: 3,
-    marginLeft: 8,
-    padding: '2px 6px',
-    fontSize: 11,
-    fontWeight: 600,
-    color: '#b45309',
-    backgroundColor: '#fef3c7',
-    borderRadius: 4,
-  },
-  activeSurcharge: {
-    color: '#b45309',
-    fontWeight: 600,
-  },
-  inactiveSurcharge: {
-    color: '#94a3b8',
-  },
-  conditionNote: {
-    marginTop: 8,
-    padding: 8,
-    fontSize: 12,
-    color: '#475569',
-    backgroundColor: '#fff',
-    border: '1px solid #e2e8f0',
-    borderRadius: 6,
-    whiteSpace: 'pre-line' as const,
-    lineHeight: 1.5,
-  },
-  conditionDisclaimer: {
-    marginTop: 8,
-    fontSize: 11,
-    color: '#94a3b8',
-    lineHeight: 1.4,
-  },
-  noConditionBox: {
-    marginTop: 12,
-    padding: 10,
-    fontSize: 12,
-    color: '#94a3b8',
-    backgroundColor: '#f8fafc',
-    border: '1px dashed #e2e8f0',
-    borderRadius: 8,
-    textAlign: 'center' as const,
-    marginBottom: 12,
-  },
-
-  // Buttons
-  orderBtn: {
-    width: '100%',
-    padding: '12px 0',
-    fontSize: 15,
-    fontWeight: 600,
-    color: '#fff',
-    backgroundColor: '#6366f1',
-    border: 'none',
-    borderRadius: 8,
-    cursor: 'pointer',
-  },
-  cancelBtn: {
-    padding: '10px 20px',
-    fontSize: 14,
-    color: '#64748b',
-    backgroundColor: '#f1f5f9',
-    border: 'none',
-    borderRadius: 8,
-    cursor: 'pointer',
-  },
-  browseBtn: {
-    display: 'inline-block',
-    marginTop: 16,
-    padding: '10px 24px',
-    fontSize: 14,
-    fontWeight: 500,
-    color: '#fff',
-    backgroundColor: '#6366f1',
-    borderRadius: 8,
-    textDecoration: 'none',
-  },
-
-  // Grand Total
-  grandTotal: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '20px 24px',
-    backgroundColor: '#f8fafc',
-    border: '2px solid #e2e8f0',
-    borderRadius: 12,
-    marginTop: 8,
-  },
-  grandTotalLabel: {
-    fontSize: 16,
-    fontWeight: 600,
-    color: '#475569',
-  },
-  grandTotalValue: {
-    fontSize: 22,
-    fontWeight: 700,
-    color: '#0f172a',
-  },
-
-  // Empty
-  empty: {
-    textAlign: 'center' as const,
-    padding: '60px 20px',
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: 600,
-    color: '#334155',
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  emptyText: {
-    fontSize: 14,
-    color: '#94a3b8',
-    margin: 0,
-  },
-
-  // Modal
-  modalOverlay: {
-    position: 'fixed' as const,
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 1000,
-    padding: 16,
-  },
-  modal: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    width: '100%',
-    maxWidth: 480,
-    maxHeight: '90vh',
-    overflow: 'auto',
-  },
-  modalHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '16px 20px',
-    borderBottom: '1px solid #e2e8f0',
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 700,
-    color: '#0f172a',
-    margin: 0,
-  },
-  modalClose: {
-    padding: 4,
-    border: 'none',
-    background: 'none',
-    cursor: 'pointer',
-    color: '#94a3b8',
-  },
-  modalBody: {
-    padding: 20,
-  },
-  modalFooter: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    gap: 8,
-    padding: '16px 20px',
-    borderTop: '1px solid #e2e8f0',
-  },
-  sectionLabel: {
-    fontSize: 13,
-    fontWeight: 600,
-    color: '#6366f1',
-    marginBottom: 12,
-    textTransform: 'uppercase' as const,
-    letterSpacing: 0.5,
-  },
-  formRow: {
-    marginBottom: 12,
-  },
-  label: {
-    display: 'block',
-    fontSize: 13,
-    fontWeight: 500,
-    color: '#475569',
-    marginBottom: 4,
-  },
-  input: {
-    width: '100%',
-    padding: '10px 12px',
-    fontSize: 14,
-    border: '1px solid #e2e8f0',
-    borderRadius: 8,
-    outline: 'none',
-    boxSizing: 'border-box' as const,
-  },
-
-  // IR-NETURE-B2B-DIRECT-SHIPPING-ORDER-FLOW-AUDIT-V1 Phase 3: 주문 유형 선택 + 동의
-  orderTypeRow: {
-    display: 'flex',
-    gap: 8,
-  },
-  orderTypeOption: {
-    flex: 1,
-    display: 'flex',
-    alignItems: 'center',
-    flexWrap: 'wrap' as const,
-    padding: '12px 14px',
-    border: '1px solid #e2e8f0',
-    borderRadius: 8,
-    cursor: 'pointer',
-    backgroundColor: '#fff',
-    transition: 'all 0.15s',
-  },
-  orderTypeOptionActive: {
-    borderColor: '#6366f1',
-    backgroundColor: '#eef2ff',
-  },
-  radioInput: {
-    marginRight: 8,
-    cursor: 'pointer',
-  },
-  orderTypeLabel: {
-    fontSize: 14,
-    fontWeight: 600,
-    color: '#1e293b',
-  },
-  orderTypeHint: {
-    flexBasis: '100%',
-    fontSize: 11,
-    color: '#94a3b8',
-    marginTop: 4,
-    marginLeft: 30,
-  },
-  customerInfoNote: {
-    display: 'flex',
-    alignItems: 'flex-start',
-    padding: '10px 12px',
-    backgroundColor: '#fef3c7',
-    color: '#92400e',
-    borderRadius: 8,
-    fontSize: 12,
-    marginBottom: 12,
-    lineHeight: 1.5,
-  },
-  consentLabel: {
-    display: 'flex',
-    alignItems: 'flex-start',
-    gap: 8,
-    padding: '10px 12px',
-    backgroundColor: '#f8fafc',
-    border: '1px solid #e2e8f0',
-    borderRadius: 8,
-    fontSize: 13,
-    color: '#475569',
-    cursor: 'pointer',
-  },
-  consentCheckbox: {
-    marginTop: 2,
-    flexShrink: 0,
-    cursor: 'pointer',
-  },
-
-  // Messages
-  successBanner: {
-    padding: '12px 20px',
-    backgroundColor: '#dcfce7',
-    color: '#15803d',
-    borderRadius: 8,
-    fontSize: 14,
-    fontWeight: 500,
-    marginBottom: 16,
-  },
-  errorOverlay: {
-    position: 'fixed' as const,
-    bottom: 20,
-    left: '50%',
-    transform: 'translateX(-50%)',
-    zIndex: 1100,
-  },
-  errorBanner: {
-    padding: '12px 24px',
-    backgroundColor: '#fef2f2',
-    color: '#dc2626',
-    borderRadius: 8,
-    fontSize: 14,
-    fontWeight: 500,
-    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-  },
-};

@@ -17,7 +17,7 @@ import { GuideBackLink } from '../../components/GuideBackLink';
 import { ClipboardList, Search, RefreshCw, ChevronLeft, ChevronRight, Package } from 'lucide-react';
 import { storeApi, sellerApi } from '../../lib/api';
 import type { StoreOrder, StoreOrderItem } from '../../lib/api';
-import { addToCart } from '../../lib/cart';
+import { storeCart } from '../../lib/api/storeCart';
 import { GuideBlock } from '@o4o/shared-space-ui';
 import { fetchGuidePageContent } from '../../api/guideContent';
 
@@ -178,14 +178,14 @@ export default function StoreOrdersPage() {
       for (const item of order.items) {
         const matched = productMap.get(item.product_id);
         if (matched) {
-          addToCart({
-            offerId: item.product_id,
-            name: item.product_name,
-            priceGeneral: matched.priceGeneral || item.unit_price,
+          // WO-O4O-NETURE-B2B-CANONICAL-CART-CHECKOUT-PHASE1-V1: canonical Store Cart 로 담기(b2b)
+          await storeCart.addItem({
+            supplierProductOfferId: item.product_id,
             supplierId: matched.supplierId,
-            supplierName: matched.supplierName,
-            imageUrl: matched.primaryImageUrl || null,
-          }, item.quantity);
+            productName: item.product_name,
+            priceSnapshot: matched.priceGeneral || item.unit_price,
+            quantity: item.quantity,
+          });
           addedCount++;
         } else {
           unavailableCount++;

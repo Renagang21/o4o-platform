@@ -42,7 +42,7 @@ import {
 } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import { api } from '../../lib/api/index.js';
-import { addToCart } from '../../lib/cart.js';
+import { storeCart } from '../../lib/api/storeCart';
 import { captureReferralToken } from '../../lib/referral.js';
 
 // ── Types ──
@@ -118,18 +118,22 @@ export default function StoreProductPage() {
     })();
   }, [offerId, storeSlug, productSlug, searchParams]);
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (!product) return;
-    addToCart({
-      offerId: product.offer_id,
-      name: product.product_name,
-      imageUrl: product.image_url,
-      priceGeneral: displayPrice,
-      supplierId: product.supplier_id || product.offer_id,
-      supplierName: product.supplier_name,
-    }, quantity);
-    setAdded(true);
-    setTimeout(() => setAdded(false), 2000);
+    try {
+      // WO-O4O-NETURE-B2B-CANONICAL-CART-CHECKOUT-PHASE1-V1: canonical Store Cart 로 담기(b2b)
+      await storeCart.addItem({
+        supplierProductOfferId: product.offer_id,
+        supplierId: product.supplier_id || product.offer_id,
+        productName: product.product_name,
+        priceSnapshot: displayPrice,
+        quantity,
+      });
+      setAdded(true);
+      setTimeout(() => setAdded(false), 2000);
+    } catch {
+      // 담기 실패 — 조용히 무시(UI 상태 미변경)
+    }
   };
 
   const handleShare = async () => {
