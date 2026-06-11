@@ -28,6 +28,10 @@ export type CartSourceType =
   | 'operator_approved'
   | 'b2b'
   | 'event_offer'
+  // 'seller_recruitment': 매장 취급 신청/공급 승인(ProductApproval) 도메인의 legacy/internal sourceType.
+  // 실제 의미는 승인 전 신청 상태이며 주문 경로가 아니다(승인 전에는 주문 가능 상품으로 취급하지 않음).
+  // Neture 제휴 'neture_partner_recruitments'(파트너 모집)와는 무관하다.
+  // 경계 근거: IR-O4O-SELLER-RECRUITMENT-TO-SUPPLY-APPROVAL-FLOW-V1 / WO-O4O-SELLER-RECRUITMENT-TERMINOLOGY-BOUNDARY-FIX-V1.
   | 'seller_recruitment';
 
 export type CartPricingSource = 'regular' | 'event_offer';

@@ -4,7 +4,7 @@
  * WO-O4O-HUB-TO-STORE-UX-BRIDGE-V1
  * WO-O4O-KCOS-STORE-HUB-B2B-CATALOG-KPA-ALIGNMENT-V1:
  *   KPA-Society canonical 정렬 — 로컬 raw 테이블(품목 탭) → @o4o/operator-ux-core DataTable
- *   + checkbox multi-select + ActionBar(bulk 내 매장에 추가). 유통유형 탭(전체/B2B/운영자/판매자 모집).
+ *   + checkbox multi-select + ActionBar(bulk 내 매장에 추가). 유통유형 탭(전체/B2B/운영자/공급 승인 대상).
  *   품목(화장품/뷰티디바이스/…) 탭 제거 — 품목·대상·노출 제어는 Neture 공급자/운영자 영역 책임.
  *   공급 가능 상품을 탐색하고 "내 매장에 추가"하는 공통 화면으로 정렬.
  */
@@ -27,7 +27,9 @@ const DISTRIBUTION_TABS: { key: string; label: string }[] = [
   { key: 'all', label: '전체' },
   { key: 'SERVICE', label: 'B2B' },
   { key: 'operator', label: '운영자' },
-  { key: 'PRIVATE', label: '판매자 모집' },
+  // WO-O4O-SELLER-RECRUITMENT-TERMINOLOGY-BOUNDARY-FIX-V1: PRIVATE = 공급자 지정 비공개 공급(매장 취급 신청/공급 승인 대상).
+  // 구 '판매자 모집' 은 Neture 제휴(neture_partner_recruitments, 파트너 모집)와 혼동되어 '공급 승인 대상' 으로 정정.
+  { key: 'PRIVATE', label: '공급 승인 대상' },
 ];
 
 const PAGE_LIMIT = 20;

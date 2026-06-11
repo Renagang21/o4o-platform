@@ -51,7 +51,10 @@ const DISTRIBUTION_TABS: { key: string; label: string }[] = [
   { key: 'all', label: '전체' },
   { key: 'SERVICE', label: 'B2B' },
   { key: 'operator', label: '운영자' },
-  { key: 'PRIVATE', label: '판매자 모집' },
+  // WO-O4O-SELLER-RECRUITMENT-TERMINOLOGY-BOUNDARY-FIX-V1: PRIVATE = 공급자가 allowed_seller_ids 로 지정한
+  // 비공개 공급. 매장 입장에선 취급 신청/공급 승인 대상이다(ProductApproval 흐름). 구 '판매자 모집' 은 Neture
+  // 제휴 'neture_partner_recruitments'(파트너 모집)와 혼동되어 '공급 승인 대상' 으로 정정.
+  { key: 'PRIVATE', label: '공급 승인 대상' },
 ];
 
 const PAGE_LIMIT = 20;

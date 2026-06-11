@@ -39,6 +39,8 @@ const VALID_SOURCE_TYPES: CartSourceType[] = [
   'operator_approved',
   'b2b',
   'event_offer',
+  // 'seller_recruitment': legacy/internal — 매장 취급 신청/공급 승인(ProductApproval) 전 상태. 주문 경로 아님.
+  // Neture 제휴(neture_partner_recruitments, 파트너 모집)와 무관. 근거: WO-O4O-SELLER-RECRUITMENT-TERMINOLOGY-BOUNDARY-FIX-V1.
   'seller_recruitment',
 ];
 
