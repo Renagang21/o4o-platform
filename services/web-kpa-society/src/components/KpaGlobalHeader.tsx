@@ -22,6 +22,7 @@ import { useAuth, type User as UserType } from '../contexts';
 import { useAuthModal } from '../contexts/LoginModalContext';
 import {
   KPA_BASE_NAV,
+  KPA_SERVICE_GUIDE_NAV_ITEM,
   KPA_ABOUT_NAV_ITEM,
   KPA_CONTACT_NAV_ITEM,
   KPA_CONTEXTUAL_NAV,
@@ -99,12 +100,14 @@ export function KpaGlobalHeader() {
   const isStoreOwner = isStoreOwnerDual(user?.roles ?? [], 'kpa:store_owner', user?.isStoreOwner);
 
   // WO-O4O-KPA-WEB-MENU-STRUCTURE-PHASE1-V1: 상태별 통합 nav 조합
-  // 비로그인: 커뮤니티 / About / Contact
-  // 로그인:   커뮤니티 / [내 매장] / [약국 HUB] / About
+  // 비로그인: 커뮤니티 / 서비스 안내 / About / Contact
+  // 로그인:   커뮤니티 / [내 매장] / [약국 HUB] / 서비스 안내 / About
+  // WO-O4O-KPA-SOCIETY-SERVICE-GUIDE-PAGE-V1: contextual 항목 뒤, About 앞에 "서비스 안내" 삽입.
   const roleItems = filterContextualNav(KPA_CONTEXTUAL_NAV, { isStoreOwner });
   const computedNav = [
     ...KPA_BASE_NAV,
     ...roleItems,
+    KPA_SERVICE_GUIDE_NAV_ITEM,
     KPA_ABOUT_NAV_ITEM,
     ...(user ? [] : [KPA_CONTACT_NAV_ITEM]),
   ];

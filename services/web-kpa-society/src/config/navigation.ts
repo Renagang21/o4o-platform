@@ -19,6 +19,8 @@ export const KPA_BASE_NAV: GlobalHeaderNavItem[] = [
   { label: '커뮤니티', href: '/' },
 ];
 
+// WO-O4O-KPA-SOCIETY-SERVICE-GUIDE-PAGE-V1: 서비스 안내 단일 진입점 (커뮤니티 중심 공개 안내)
+export const KPA_SERVICE_GUIDE_NAV_ITEM: GlobalHeaderNavItem = { label: '서비스 안내', href: '/service-guide' };
 export const KPA_ABOUT_NAV_ITEM: GlobalHeaderNavItem = { label: 'About', href: '/about' };
 export const KPA_CONTACT_NAV_ITEM: GlobalHeaderNavItem = { label: 'Contact', href: '/contact' };
 

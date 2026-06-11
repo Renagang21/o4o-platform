@@ -168,6 +168,8 @@ const HomeLatestPage = lazy(() => import('./pages/HomeLatestPage').then(m => ({ 
 const AboutPage = lazy(() => import('./pages/about/AboutPage'));
 // Contact Page (WO-O4O-KPA-CONTACT-PAGE-IMPLEMENTATION-V1)
 const ContactPage = lazy(() => import('./pages/contact/ContactPage'));
+// Service Guide Page (WO-O4O-KPA-SOCIETY-SERVICE-GUIDE-PAGE-V1) — 약사·약대생 커뮤니티 중심 공개 안내
+const ServiceGuidePage = lazy(() => import('./pages/service-guide/ServiceGuidePage'));
 
 // Community Hub — /community는 Home으로 리다이렉트 (WO-KPA-A-PUBLIC-HOME-INTEGRATION-AND-MENU-SIMPLIFICATION-V1)
 
@@ -885,6 +887,8 @@ function App() {
           {/* Info Pages — WO-O4O-KPA-WEB-MENU-STRUCTURE-PHASE1-V1 (stub) */}
           <Route path="/about" element={<Layout serviceName={SERVICE_NAME}><AboutPage /></Layout>} />
           <Route path="/contact" element={<Layout serviceName={SERVICE_NAME}><ContactPage /></Layout>} />
+          {/* WO-O4O-KPA-SOCIETY-SERVICE-GUIDE-PAGE-V1: 서비스 안내 (공개) */}
+          <Route path="/service-guide" element={<Layout serviceName={SERVICE_NAME}><ServiceGuidePage /></Layout>} />
 
           {/* Legal (이용약관/개인정보처리방침) - WO-KPA-LEGAL-PAGES-V1 */}
           <Route path="/policy" element={<Layout serviceName={SERVICE_NAME}><PolicyPage /></Layout>} />
