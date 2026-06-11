@@ -1,10 +1,11 @@
 // WO-O4O-GLYCOPHARM-BUSINESS-PAGE-ROADMAP-REWRITE-V1
 //
 // /business — 서비스 소개가 아니라 "혈당관리 약국 사업 추진 스케줄"(참여자용 로드맵).
-//   대상: 공급업체 · 운영자 · 초기 참여 약국 · 콘텐츠/강의/세미나 참여자 · 향후 협력 후보.
+//   대상: 공급업체 · 운영자 · 한국당뇨협회 · 초기 참여 약국 · 콘텐츠/강의/세미나 참여자.
 //   1차 사전 설명 세미나를 가장 앞 단계로 배치(참여자가 O4O를 모르므로 준비 전에 먼저 설명).
 //   운영 수익은 약국 구독료가 아니라 공급자 마케팅 지원 + 자체/전용 제품 운영 우선.
-//   후속 기능(주문 후보 도구 등)은 "검토" 수준, 한국당뇨협회 등 외부 협력은 미확정으로 표기.
+//   후속 기능(주문 후보 도구 등)은 "검토" 수준. 한국당뇨협회는 혈당관리 지원약국 사업의 필수 참여 주체이며,
+//   초기/중간 세미나 참여 + 제품·콘텐츠·거래 흐름 안정 후 함께 사업 진행하는 후속 단계로 표기.
 //   기존 실제 route(/business/bloodcare, /forum, /products, /preparation)만 연결 — dead link 금지.
 import { Link } from 'react-router-dom';
 import {
@@ -31,7 +32,7 @@ const STAGES: { no: string; title: string }[] = [
   { no: '04', title: '초기 약국 테스트와 요구사항 정리' },
   { no: '05', title: '2차 참여자 세미나' },
   { no: '06', title: '전문 매체 및 약국 경영자 홍보' },
-  { no: '07', title: '거래 발생 후 외부 협력 확대' },
+  { no: '07', title: '한국당뇨협회와 함께 하는 사업 진행' },
   { no: '08', title: '확장 세미나 및 후속 사업 도입' },
 ];
 
@@ -90,7 +91,7 @@ export default function BusinessHubPage() {
           </p>
           <p className="text-slate-500 text-sm leading-relaxed max-w-3xl mt-2">
             1차 사전 설명 세미나에서 O4O 구조와 참여자 역할을 먼저 정리한 뒤, 공급자 · 제품 · 콘텐츠 준비, 약국 HUB 등록,
-            초기 약국 테스트, 전문 매체 홍보, 외부 협력 확대 순서로 진행합니다.
+            초기 약국 테스트, 전문 매체 홍보, 한국당뇨협회와 함께 하는 사업 진행 순서로 진행합니다.
           </p>
 
           <div className="flex flex-col sm:flex-row flex-wrap gap-3 mt-8">
@@ -116,7 +117,7 @@ export default function BusinessHubPage() {
         {/* 2. 현재 추진 단계 요약 (8단계 타임라인) */}
         <section>
           <h2 className="text-lg font-bold text-slate-800 mb-1">추진 단계 한눈에 보기</h2>
-          <p className="text-sm text-slate-500 mb-6">사전 설명 세미나에서 시작해 준비 · 테스트 · 홍보 · 협력 확대 순서로 진행합니다.</p>
+          <p className="text-sm text-slate-500 mb-6">사전 설명 세미나에서 시작해 준비 · 테스트 · 홍보 · 한국당뇨협회 사업 순서로 진행합니다.</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {STAGES.map((s) => (
               <div key={s.no} className="rounded-xl bg-white border border-slate-100 shadow-sm p-4">
@@ -137,7 +138,7 @@ export default function BusinessHubPage() {
           <div className="grid gap-5 md:grid-cols-2">
             <div className="rounded-xl bg-white border border-primary-100 p-5">
               <p className="font-semibold text-slate-800 mb-3">대상</p>
-              <Bullets items={['공급업체', '운영자', '초기 참여 약국', '콘텐츠 · 강의 참여자', '향후 협력 후보']} />
+              <Bullets items={['공급업체', '운영자', '한국당뇨협회', '초기 참여 약국', '콘텐츠 · 강의 참여자']} />
             </div>
             <div className="rounded-xl bg-white border border-primary-100 p-5">
               <p className="font-semibold text-slate-800 mb-3">설명할 내용</p>
@@ -147,7 +148,7 @@ export default function BusinessHubPage() {
                   '공급자 · 운영자 · 약국의 역할과 초기 참여 방식',
                   '제품 · 콘텐츠 준비 기준',
                   '이벤트 오퍼 · 판매자 선별 제품 · 유통참여형 펀딩 활용 방향',
-                  '운영자 수익의 우선 방향',
+                  '한국당뇨협회와 함께 하는 혈당관리 지원약국 사업 방향',
                 ]}
               />
             </div>
@@ -205,11 +206,11 @@ export default function BusinessHubPage() {
           <div className="grid gap-5 md:grid-cols-2">
             <div className="rounded-xl bg-white border border-primary-100 p-5">
               <p className="font-semibold text-slate-800 mb-3">목적</p>
-              <Bullets items={['초기 약국 · 제품 · 콘텐츠 반응 공유', '이벤트 오퍼 · 판매자 선별 제품 보완', '약국 요구사항 정리', '전문 매체 홍보 전 보완 사항 확인']} />
+              <Bullets items={['초기 약국 · 제품 · 콘텐츠 반응 공유', '이벤트 오퍼 · 판매자 선별 제품 보완', '약국 요구사항 정리', '한국당뇨협회와 함께 진행할 혈당관리 지원약국 사업 준비 수준 확인', '전문 매체 홍보 전 보완 사항 확인']} />
             </div>
             <div className="rounded-xl bg-white border border-primary-100 p-5">
               <p className="font-semibold text-slate-800 mb-3">대상</p>
-              <Bullets items={['공급업체 · 운영자', '초기 참여 약국', '필요 시 추가 공급업체', '콘텐츠 · 강의 참여자']} />
+              <Bullets items={['공급업체 · 운영자', '초기 참여 약국', '한국당뇨협회', '필요 시 추가 공급업체', '콘텐츠 · 강의 참여자']} />
             </div>
           </div>
         </section>
@@ -225,15 +226,16 @@ export default function BusinessHubPage() {
           </div>
         </section>
 
-        {/* 9. 거래 발생 후 외부 협력 확대 */}
+        {/* 9. 한국당뇨협회와 함께 하는 사업 진행 (거래 흐름 안정 후) */}
         <section>
-          <StageHeader no="07" icon={Network} title="거래 발생 후 외부 협력 확대" />
+          <StageHeader no="07" icon={Network} title="한국당뇨협회와 함께 하는 사업 진행" />
           <p className="text-sm text-slate-600 leading-relaxed mb-5 max-w-3xl">
-            공급업체와 제품이 일정 수준 확보되고 약국에서 실제 거래 · 반응이 발생한 뒤에 검토하는 단계입니다.
+            제품 · 콘텐츠 · 거래 흐름이 일정 수준 안정되면 한국당뇨협회와 함께 혈당관리 지원약국 사업을 진행합니다.
+            이 단계에서는 참여 약국 확대, 지원약국 운영 기준, 교육 · 콘텐츠 · 홍보 방향을 함께 정리합니다.
           </p>
           <div className="rounded-xl bg-white border border-slate-100 shadow-sm p-5">
-            <Bullets items={['한국당뇨협회 등 외부 협력 검토(미확정)', '관련 단체 · 커뮤니티와 협력 가능성 검토', '추가 공급업체 참여 확대']} />
-            <p className="mt-3 text-xs text-slate-400 leading-relaxed">외부 협력은 확정된 것이 아니라, 거래와 반응이 발생한 뒤 검토하는 가능성입니다.</p>
+            <Bullets items={['한국당뇨협회와 함께 혈당관리 지원약국 사업 진행', '참여 약국 확대 · 지원약국 운영 기준 정리', '교육 · 콘텐츠 · 홍보 방향 정리', '추가 공급업체 참여 확대']} />
+            <p className="mt-3 text-xs text-slate-400 leading-relaxed">한국당뇨협회는 혈당관리 지원약국 사업의 중요한 참여 주체이며, 제품 · 콘텐츠 · 거래 흐름이 안정된 뒤 함께 진행하는 단계입니다.</p>
           </div>
         </section>
 
