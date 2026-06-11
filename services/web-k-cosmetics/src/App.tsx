@@ -55,6 +55,8 @@ const SupplyPage = lazy(() => import('@/pages').then(m => ({ default: m.SupplyPa
 const TouristHubPage = lazy(() => import('@/pages').then(m => ({ default: m.TouristHubPage })));
 const RegisterPage = lazy(() => import('@/pages/auth/RegisterPage'));
 const PartnerInfoPage = lazy(() => import('@/pages/PartnerInfoPage'));
+// WO-O4O-KCOS-SERVICE-GUIDE-PAGE-V1: 서비스 안내 (공개)
+const ServiceGuidePage = lazy(() => import('@/pages/ServiceGuidePage'));
 // MyPage 3-split (WO-O4O-KCOSMETICS-MYPAGE-SPLIT-V1)
 const MyPageHub = lazy(() => import('@/pages/mypage/MyPageHub'));
 const MyProfilePage = lazy(() => import('@/pages/mypage/MyProfilePage'));
@@ -389,6 +391,8 @@ function AppRoutes() {
         <Route path="reset-password" element={<ResetPasswordPage />} />
         <Route path="auth/verify-email" element={<VerifyEmailPage />} />
         <Route path="contact" element={<ContactPage />} />
+        {/* WO-O4O-KCOS-SERVICE-GUIDE-PAGE-V1: 서비스 안내 (공개) */}
+        <Route path="service-guide" element={<ServiceGuidePage />} />
         {/* WO-O4O-KCOS-MENU-CANONICAL-ALIGN-V1: 모바일 매장 경영 허브 */}
         <Route path="mobile/store" element={<MobileStorePage />} />
         <Route path="partners" element={<PartnerInfoPage />} />

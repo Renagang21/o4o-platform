@@ -16,6 +16,8 @@ import { kcosmeticsConfig } from '@o4o/operator-ux-core';
 // WO-O4O-KCOS-MENU-CANONICAL-ALIGN-V1: 커뮤니티 단일 진입점
 export const KCOS_PUBLIC_NAV: GlobalHeaderNavItem[] = [
   { label: '커뮤니티', href: '/' },
+  // WO-O4O-KCOS-SERVICE-GUIDE-PAGE-V1: 서비스 안내 단일 진입점 (About/Contact 분리 메뉴 대신)
+  { label: '서비스 안내', href: '/service-guide' },
 ];
 
 // ─── Contextual Nav ──────────────────────────────────────────────────────────
