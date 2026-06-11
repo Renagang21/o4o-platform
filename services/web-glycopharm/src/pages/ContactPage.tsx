@@ -1,4 +1,4 @@
-import { Mail, Phone, MapPin, Clock, Building2, FileText } from 'lucide-react';
+import { Mail, Clock, Building2, FileText } from 'lucide-react';
 
 export default function ContactPage() {
   return (
@@ -77,16 +77,6 @@ export default function ContactPage() {
             <div className="p-6 space-y-4">
               <div className="flex items-start gap-4">
                 <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
-                  <Phone className="w-4 h-4 text-slate-500" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-slate-800">대표전화</p>
-                  <p className="text-sm text-slate-500">02-0000-0000</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
                   <Clock className="w-4 h-4 text-slate-500" />
                 </div>
                 <div>
@@ -94,29 +84,12 @@ export default function ContactPage() {
                   <p className="text-sm text-slate-500">평일 09:00 - 18:00 (주말/공휴일 휴무)</p>
                 </div>
               </div>
-
-              <div className="flex items-start gap-4">
-                <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
-                  <MapPin className="w-4 h-4 text-slate-500" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-slate-800">주소</p>
-                  <p className="text-sm text-slate-500">서울특별시 서초구 강남대로 000, 0층</p>
-                </div>
-              </div>
             </div>
           </div>
 
-          {/* 사업자 정보 */}
-          <div className="mt-10 bg-slate-100 rounded-xl p-6">
-            <h3 className="text-sm font-semibold text-slate-700 mb-4">사업자 정보</h3>
-            <div className="grid sm:grid-cols-2 gap-x-8 gap-y-2 text-sm text-slate-600">
-              <p><span className="text-slate-500">상호:</span> (주)글라이코팜</p>
-              <p><span className="text-slate-500">대표:</span> 홍길동</p>
-              <p><span className="text-slate-500">사업자등록번호:</span> 000-00-00000</p>
-              <p><span className="text-slate-500">통신판매업:</span> 2025-서울서초-0000</p>
-            </div>
-          </div>
+          {/* WO-O4O-GP-KCOS-FOOTER-PLACEHOLDER-LEGAL-INFO-SUPPRESSION-V1:
+              미확인 법정정보(상호/대표자/사업자등록번호/통신판매업 신고번호/대표전화/주소 placeholder)
+              공개 노출 제거. 실값 임의작성 금지 — 실값 확정 후 ServiceLegalProfile 기반 재도입 (후속 WO). */}
 
           {/* 안내 문구 */}
           <p className="mt-10 text-center text-xs text-slate-400">

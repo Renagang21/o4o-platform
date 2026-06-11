@@ -61,7 +61,6 @@ export default function Footer() {
               </li>
             </ul>
             <div style={styles.contact}>
-              <p style={styles.phone}>📞 02-0000-0000</p>
               <p style={styles.hours}>평일 09:00 - 18:00</p>
             </div>
           </div>
@@ -73,13 +72,10 @@ export default function Footer() {
         <div style={styles.bottomContainer}>
           <div style={styles.bottomContent}>
             <p style={styles.copyright}>&copy; 2025 K-Cosmetics. All rights reserved.</p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <p style={styles.address}>📍 서울특별시 서초구 강남대로 000, 0층</p>
-            </div>
           </div>
-          <div style={styles.businessInfo}>
-            <p>(주)케이코스메틱스 | 대표: 홍길동 | 사업자등록번호: 000-00-00000</p>
-          </div>
+          {/* WO-O4O-GP-KCOS-FOOTER-PLACEHOLDER-LEGAL-INFO-SUPPRESSION-V1:
+              미확인 법정정보(대표자/사업자등록번호/주소/전화 placeholder) 공개 노출 제거.
+              실값 임의작성 금지 — 실값 확정 후 ServiceLegalProfile 기반 동적 푸터로 재도입 (후속 WO). */}
         </div>
       </div>
     </footer>

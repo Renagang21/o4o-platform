@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { Activity, Mail, Phone, MapPin } from 'lucide-react';
+import { Activity, Mail } from 'lucide-react';
 // WO-O4O-GLYCOPHARM-REGISTER-MODAL-ENTRY-FIX-V1
 import { useRegisterModal } from '@/contexts/RegisterModalContext';
 
@@ -86,11 +86,7 @@ export default function Footer() {
               </li>
             </ul>
             <div className="mt-4 pt-4 border-t border-slate-700">
-              <p className="text-sm flex items-center gap-2">
-                <Phone className="w-4 h-4" />
-                02-0000-0000
-              </p>
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-slate-500">
                 평일 09:00 - 18:00
               </p>
             </div>
@@ -105,20 +101,10 @@ export default function Footer() {
             <div className="flex flex-col md:flex-row items-center gap-4 text-sm text-slate-500">
               <p>&copy; 2025 GlycoPharm. All rights reserved.</p>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 text-xs text-slate-600">
-                <MapPin className="w-3 h-3" />
-                <span>서울특별시 서초구 강남대로 000, 0층</span>
-              </div>
-            </div>
           </div>
-
-          {/* 사업자 정보 */}
-          <div className="mt-4 pt-4 border-t border-slate-800 text-xs text-slate-600 text-center md:text-left">
-            <p>
-              (주)글라이코팜 | 대표: 홍길동 | 사업자등록번호: 000-00-00000 | 통신판매업: 2025-서울서초-0000
-            </p>
-          </div>
+          {/* WO-O4O-GP-KCOS-FOOTER-PLACEHOLDER-LEGAL-INFO-SUPPRESSION-V1:
+              미확인 법정정보(대표자/사업자등록번호/통신판매업 신고번호/주소/전화 placeholder) 공개 노출 제거.
+              실값 임의작성 금지 — 실값 확정 후 ServiceLegalProfile 기반 동적 푸터로 재도입 (후속 WO). */}
         </div>
       </div>
     </footer>
