@@ -92,4 +92,4 @@ GlycoPharm / K-Cosmetics 서비스 안내 페이지와 동일한 Tailwind 형식
 
 ## commit hash
 
-- (commit 후 기재)
+- `78f21d0f6` — feat(kpa-society): add community-centric service guide page (WO-O4O-KPA-SOCIETY-SERVICE-GUIDE-PAGE-V1)
