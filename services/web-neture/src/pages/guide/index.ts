@@ -48,3 +48,6 @@ export { GuideBusinessPharmacyCoopPage } from './GuideBusinessPharmacyCoopPage';
 export { GuideBusinessTouristStorePage } from './GuideBusinessTouristStorePage';
 export { GuideBusinessForeignCustomerStorePage } from './GuideBusinessForeignCustomerStorePage';
 export { GuideBusinessWarehousePharmacyPage } from './GuideBusinessWarehousePharmacyPage';
+export { GuideServiceKpaSocietyPage } from './GuideServiceKpaSocietyPage';
+export { GuideServiceGlycoPharmPage } from './GuideServiceGlycoPharmPage';
+export { GuideServiceKCosmeticsPage } from './GuideServiceKCosmeticsPage';

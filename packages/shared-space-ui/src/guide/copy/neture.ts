@@ -3992,3 +3992,222 @@ export const netureGuideBusinessHubProps: GuideFeatureManualPageProps = {
     home: { label: '이용 안내로', to: '/guide' },
   },
 };
+
+// ─── /guide/services/* (현재 운영 중인 O4O 서비스 소개) ──────────────────
+// WO-O4O-NETURE-GUIDE-ACTIVE-SERVICE-CARDS-AND-PAGES-V1.
+//   GuideFeatureManualPage + GuideEditableSection 으로 운영자 수정 가능. 도메인은 service-catalog 기준.
+//   KPA=약국·약사 커뮤니티(약사회 지부/분회 아님), GP=혈당관리 약국(진단·치료 아님, "내 약국"),
+//   KCos=화장품 매장(주문·결제 완료 표현 회피).
+
+export const netureGuideServiceKpaSocietyProps: GuideFeatureManualPageProps = {
+  hero: {
+    eyebrow: '현재 운영 중인 O4O 서비스',
+    title: 'KPA Society',
+    description: '약국과 약사 커뮤니티를 기반으로 콘텐츠 · 교육 · 매장 활용 자료를 운영하는 O4O 서비스입니다.',
+    primaryAction: { label: '상담하기 →', to: '/contact' },
+    flowBarTitle: '서비스 흐름',
+    flowLabels: ['서비스 개요', '접근 도메인', '참여 대상', 'O4O 활용', '주요 활용 영역'],
+  },
+  index: {
+    title: '관련 안내',
+    cards: [
+      { title: 'O4O 이해', audience: '공통', summary: 'O4O 개념과 구조를 먼저 봅니다.', to: '/guide/o4o-overview' },
+      { title: '판매자 / 매장 이용 안내', audience: '매장', summary: '매장에서 O4O를 활용하는 흐름.', to: '/guide/for-seller' },
+      { title: '기능별 이용 방법', audience: '기능', summary: 'QR · POP · 블로그 · 사이니지 · 타블렛 등.', to: '/guide/features' },
+      { title: '문의하기', audience: '문의', summary: '도입 · 적용 방식을 상담합니다.', to: '/contact' },
+    ],
+  },
+  sections: [
+    {
+      step: '01',
+      title: '서비스 개요',
+      description: 'KPA Society는 약국과 약사가 모이는 커뮤니티를 기반으로, 운영자가 정리한 콘텐츠 · 교육 자료 · 매장 활용 자료를 약국이 활용하도록 연결하는 O4O 서비스입니다.',
+      items: [
+        { label: '커뮤니티 기반', detail: '약국 · 약사 커뮤니티에서 정보와 경험을 나눕니다.' },
+        { label: '콘텐츠 · 교육', detail: '운영자가 콘텐츠와 교육 자료를 준비해 제공합니다.' },
+        { label: '매장 활용', detail: '약국이 고객 안내에 쓸 수 있는 자료로 이어집니다.' },
+      ],
+    },
+    {
+      step: '02',
+      title: '접근 도메인',
+      description: '아래 도메인에서 서비스에 접속합니다.',
+      items: [{ label: '접속 도메인', detail: 'kpa-society.co.kr' }],
+    },
+    {
+      step: '03',
+      title: '참여 대상',
+      description: '다음 대상자가 서비스에 참여합니다.',
+      items: [
+        { label: '운영자', detail: '콘텐츠 · 자료를 정리해 약국에 제공합니다.' },
+        { label: '공급자', detail: '제품과 자료를 운영자와 협력해 전달합니다.' },
+        { label: '약국 경영자', detail: '제공된 자료를 매장에서 고객 안내에 활용합니다.' },
+        { label: '커뮤니티 회원', detail: '약사 커뮤니티에서 정보 · 경험을 나눕니다.' },
+      ],
+    },
+    {
+      step: '04',
+      title: 'O4O 활용 구조',
+      description: '공급자 → 운영자 → 약국으로 이어지는 콘텐츠 · 자료 흐름을 따릅니다.',
+      items: [
+        { label: '상품 · 콘텐츠 · 매장 HUB 연결', detail: '운영자가 자료를 매장 HUB로 전달합니다.' },
+        { label: '매장 접점 활용', detail: 'QR · POP · 블로그 · 사이니지 · 타블렛에 콘텐츠를 적용합니다.' },
+        { label: '운영자 준비 흐름', detail: '개별 약국이 모든 자료를 직접 만들지 않고 운영자가 준비합니다.' },
+      ],
+    },
+    {
+      step: '05',
+      title: '주요 활용 영역',
+      description: '약국이 실제로 활용하는 영역입니다.',
+      items: [
+        { label: '약국 · 약사 커뮤니티', detail: '질문 · 답변 · 경험 공유.' },
+        { label: '콘텐츠 · 교육', detail: '전문 콘텐츠와 교육 자료.' },
+        { label: '매장 활용 자료', detail: 'QR · POP · 블로그 · 사이니지 · 타블렛 · 제작자료.' },
+      ],
+    },
+  ],
+  bottomNav: { prev: { label: '← 이용 안내', to: '/guide' }, home: { label: '홈으로', to: '/' } },
+};
+
+export const netureGuideServiceGlycopharmProps: GuideFeatureManualPageProps = {
+  hero: {
+    eyebrow: '현재 운영 중인 O4O 서비스',
+    title: 'GlycoPharm',
+    description: '혈당관리 약국을 중심으로 상품 · 콘텐츠 · 고객 안내 자료를 연결하는 약국 O4O 서비스입니다.',
+    primaryAction: { label: '상담하기 →', to: '/contact' },
+    flowBarTitle: '서비스 흐름',
+    flowLabels: ['서비스 개요', '접근 도메인', '참여 대상', 'O4O 활용', '주요 활용 영역'],
+  },
+  index: {
+    title: '관련 안내',
+    cards: [
+      { title: 'O4O 이해', audience: '공통', summary: 'O4O 개념과 구조를 먼저 봅니다.', to: '/guide/o4o-overview' },
+      { title: '판매자 / 매장 이용 안내', audience: '약국', summary: '내 약국에서 O4O를 활용하는 흐름.', to: '/guide/for-seller' },
+      { title: '기능별 이용 방법', audience: '기능', summary: 'QR · POP · 블로그 · 사이니지 · 타블렛 등.', to: '/guide/features' },
+      { title: '문의하기', audience: '문의', summary: '도입 · 적용 방식을 상담합니다.', to: '/contact' },
+    ],
+  },
+  sections: [
+    {
+      step: '01',
+      title: '서비스 개요',
+      description: 'GlycoPharm은 혈당관리 약국을 중심으로 관련 상품과 건강정보 콘텐츠, 고객 안내 자료를 연결하는 약국 전용 O4O 서비스입니다. 고객 안내와 상담 보조에 활용하며, 진단 · 치료 · 복약 지시를 대신하지 않습니다.',
+      items: [
+        { label: '혈당관리 약국 중심', detail: '관련 상품과 건강정보를 내 약국에서 안내합니다.' },
+        { label: '고객 안내 · 상담 보조', detail: '제품 설명과 건강정보로 약사 상담을 보조합니다.' },
+        { label: '약국 전용', detail: '사용자 화면은 "내 약국" 기준으로 운영됩니다.' },
+      ],
+    },
+    {
+      step: '02',
+      title: '접근 도메인',
+      description: '아래 도메인에서 서비스에 접속합니다.',
+      items: [{ label: '접속 도메인', detail: 'glycopharm.co.kr' }],
+    },
+    {
+      step: '03',
+      title: '참여 대상',
+      description: '다음 대상자가 서비스에 참여합니다.',
+      items: [
+        { label: '운영자', detail: '상품 · 콘텐츠를 정리해 내 약국에 제공합니다.' },
+        { label: '공급자', detail: '관련 제품과 자료를 운영자와 협력해 전달합니다.' },
+        { label: '약국 경영자', detail: '내 약국에서 고객 안내 · 상담 보조에 활용합니다.' },
+        { label: '커뮤니티 회원', detail: '정보 · 경험을 나눕니다.' },
+      ],
+    },
+    {
+      step: '04',
+      title: 'O4O 활용 구조',
+      description: '공급자 → 운영자 → 내 약국으로 이어지는 상품 · 콘텐츠 흐름을 따릅니다.',
+      items: [
+        { label: '상품 · 건강정보 콘텐츠', detail: '혈당관리 관련 상품과 건강정보를 콘텐츠로 정리합니다.' },
+        { label: '매장 HUB · 내 약국 활용', detail: '운영자가 자료를 매장 HUB로 전달해 내 약국에서 활용합니다.' },
+        { label: '매장 접점 활용', detail: 'QR · POP · 블로그 · 사이니지 · 타블렛에 적용합니다.' },
+      ],
+    },
+    {
+      step: '05',
+      title: '주요 활용 영역',
+      description: '내 약국에서 활용하는 영역입니다.',
+      items: [
+        { label: '혈당관리 상품 · 콘텐츠', detail: '관련 상품과 콘텐츠 운영.' },
+        { label: '건강정보 고객 안내', detail: '고객 안내 · 상담 보조 자료(진단 · 치료 아님).' },
+        { label: '매장 활용 자료', detail: 'QR · POP · 블로그 · 사이니지 · 타블렛.' },
+        { label: '공급자 · 약국 연결', detail: '공급자와 내 약국을 연결합니다.' },
+      ],
+    },
+  ],
+  bottomNav: { prev: { label: '← 이용 안내', to: '/guide' }, home: { label: '홈으로', to: '/' } },
+};
+
+export const netureGuideServiceKcosmeticsProps: GuideFeatureManualPageProps = {
+  hero: {
+    eyebrow: '현재 운영 중인 O4O 서비스',
+    title: 'K-Cosmetics',
+    description: '화장품 매장에서 상품 설명 · 콘텐츠 · QR · POP · 사이니지 · 타블렛을 활용하도록 돕는 O4O 서비스입니다.',
+    primaryAction: { label: '상담하기 →', to: '/contact' },
+    flowBarTitle: '서비스 흐름',
+    flowLabels: ['서비스 개요', '접근 도메인', '참여 대상', 'O4O 활용', '주요 활용 영역'],
+  },
+  index: {
+    title: '관련 안내',
+    cards: [
+      { title: 'O4O 이해', audience: '공통', summary: 'O4O 개념과 구조를 먼저 봅니다.', to: '/guide/o4o-overview' },
+      { title: '판매자 / 매장 이용 안내', audience: '매장', summary: '매장에서 O4O를 활용하는 흐름.', to: '/guide/for-seller' },
+      { title: '기능별 이용 방법', audience: '기능', summary: 'QR · POP · 블로그 · 사이니지 · 타블렛 등.', to: '/guide/features' },
+      { title: '문의하기', audience: '문의', summary: '도입 · 적용 방식을 상담합니다.', to: '/contact' },
+    ],
+  },
+  sections: [
+    {
+      step: '01',
+      title: '서비스 개요',
+      description: 'K-Cosmetics는 화장품 매장에서 상품 소개와 콘텐츠, 매장 안내 자료를 활용하도록 돕는 O4O 서비스입니다. 상품 소개 · 콘텐츠 · 고객 응대 보조 중심이며, 주문 · 결제 연동은 제공 범위에 따라 단계적으로 확장됩니다.',
+      items: [
+        { label: '상품 소개 중심', detail: '성분 · 사용법 · 체험 안내를 콘텐츠로 제공합니다.' },
+        { label: '매장 안내 자료', detail: 'QR · POP · 사이니지 · 타블렛으로 고객에게 보여줍니다.' },
+        { label: '단계적 확장', detail: '주문 · 결제 연동은 완료 기능이 아니라 단계적으로 확장됩니다.' },
+      ],
+    },
+    {
+      step: '02',
+      title: '접근 도메인',
+      description: '아래 도메인에서 서비스에 접속합니다.',
+      items: [{ label: '접속 도메인', detail: 'k-cosmetics.site' }],
+    },
+    {
+      step: '03',
+      title: '참여 대상',
+      description: '다음 대상자가 서비스에 참여합니다.',
+      items: [
+        { label: '운영자', detail: '상품 · 콘텐츠를 정리해 매장에 제공합니다.' },
+        { label: '공급자', detail: '제품 정보와 자료를 운영자와 협력해 전달합니다.' },
+        { label: '매장 경영자', detail: '매장에서 상품 소개 · 고객 응대 보조에 활용합니다.' },
+        { label: '커뮤니티 회원', detail: '정보 · 경험을 나눕니다.' },
+      ],
+    },
+    {
+      step: '04',
+      title: 'O4O 활용 구조',
+      description: '공급자 → 운영자 → 매장으로 이어지는 상품 · 콘텐츠 흐름을 따릅니다.',
+      items: [
+        { label: '상품 소개 · 콘텐츠', detail: '성분 · 사용법 · 체험 안내를 콘텐츠로 정리합니다.' },
+        { label: '매장 HUB · 내 매장 활용', detail: '운영자가 자료를 매장 HUB로 전달합니다.' },
+        { label: '매장 접점 활용', detail: 'QR · POP · 블로그 · 사이니지 · 타블렛에 적용합니다.' },
+        { label: '다국어 콘텐츠 확장', detail: '필요에 따라 다국어 콘텐츠로 확장할 수 있습니다.' },
+      ],
+    },
+    {
+      step: '05',
+      title: '주요 활용 영역',
+      description: '매장에서 활용하는 영역입니다.',
+      items: [
+        { label: '상품 소개', detail: '성분 · 사용법 · 체험 안내.' },
+        { label: '매장 활용 자료', detail: 'QR · POP · 블로그 · 사이니지 · 타블렛.' },
+        { label: '다국어 콘텐츠 확장', detail: '외국인 고객 안내로 확장 가능.' },
+        { label: '공급자 · 매장 연결', detail: '공급자와 매장을 연결합니다.' },
+      ],
+    },
+  ],
+  bottomNav: { prev: { label: '← 이용 안내', to: '/guide' }, home: { label: '홈으로', to: '/' } },
+};

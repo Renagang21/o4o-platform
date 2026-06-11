@@ -64,6 +64,20 @@ const homeProps: GuideFeaturesPageProps = {
       { title: '내 사업에 맞는 운영 방식 상담하기', audience: '문의', summary: '내 사업 구조에 맞는 O4O 적용 방식을 상담합니다.', to: '/contact' },
     ],
   },
+  // WO-O4O-NETURE-GUIDE-ACTIVE-SERVICE-CARDS-AND-PAGES-V1:
+  //   "사업 적용 예시"(앞으로 어떻게 적용하나) 위에, 실제 운영 중인 O4O 서비스를 먼저 보여준다.
+  //   각 카드는 /guide/services/* 소개 페이지로 연결.
+  serviceShowcase: {
+    title: '현재 운영 중인 O4O 서비스',
+    lead: [
+      'O4O는 하나의 서비스가 아니라 여러 업종과 운영 목적에 맞게 적용되는 플랫폼입니다. 현재 다음 서비스가 O4O 기반으로 운영되고 있습니다.',
+    ],
+    cards: [
+      { title: 'KPA Society', audience: '약국 · 약사', summary: '약국과 약사 커뮤니티를 기반으로 콘텐츠 · 교육 · 매장 활용 자료를 운영하는 O4O 서비스입니다.', to: '/guide/services/kpa-society' },
+      { title: 'GlycoPharm', audience: '약국', summary: '혈당관리 약국을 중심으로 상품 · 콘텐츠 · 고객 안내 자료를 연결하는 약국 O4O 서비스입니다.', to: '/guide/services/glycopharm' },
+      { title: 'K-Cosmetics', audience: '화장품 매장', summary: '화장품 매장에서 상품 설명 · 콘텐츠 · QR · POP · 사이니지 · 타블렛을 활용하도록 돕는 O4O 서비스입니다.', to: '/guide/services/k-cosmetics' },
+    ],
+  },
   groups: [
     {
       step: '01',

@@ -9,8 +9,40 @@ import { PageSection, PageContainer } from '@o4o/ui';
 import type { GuideFeaturesPageProps } from './types.js';
 import { heroStyles, sectionStyles, cardStyles, bottomNavStyles, indexStyles } from './styles.js';
 
-export function GuideFeaturesPage({ hero, index, indexPosition = 'top', groups, bottomNav, renderText }: GuideFeaturesPageProps) {
+export function GuideFeaturesPage({ hero, index, indexPosition = 'top', serviceShowcase, groups, bottomNav, renderText }: GuideFeaturesPageProps) {
   const atBottom = indexPosition === 'bottom';
+
+  // WO-O4O-NETURE-GUIDE-ACTIVE-SERVICE-CARDS-AND-PAGES-V1: "현재 운영 중인 O4O 서비스" 쇼케이스.
+  //   그룹 아래·index(bottom) 위에 렌더. 박스(indexStyles.wrap) 없이 섹션 헤더 + 카드 그리드 → 사업 적용 예시와 구분.
+  const showcaseSection =
+    serviceShowcase && serviceShowcase.cards.length > 0 ? (
+      <PageSection style={{ paddingTop: 32 }}>
+        <PageContainer>
+          {serviceShowcase.title && <h2 style={indexStyles.title}>{serviceShowcase.title}</h2>}
+          {serviceShowcase.lead && serviceShowcase.lead.length > 0 && (
+            <ul style={indexStyles.leadList}>
+              {serviceShowcase.lead.map((line) => (
+                <li key={line} style={indexStyles.leadItem}>
+                  <span style={indexStyles.leadDot} />
+                  <span>{line}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+          <div style={cardStyles.gridLg}>
+            {serviceShowcase.cards.map((card) => (
+              <a key={card.to} href={card.to} style={indexStyles.card}>
+                <div style={indexStyles.cardHead}>
+                  <span style={indexStyles.cardTitle}>{card.title}</span>
+                  {card.audience && <span style={indexStyles.audienceTag}>{card.audience}</span>}
+                </div>
+                <p style={indexStyles.cardSummary}>{card.summary}</p>
+              </a>
+            ))}
+          </div>
+        </PageContainer>
+      </PageSection>
+    ) : null;
 
   // Card index (선택적 카드 목차 — 사업자 유형 / 사업 적용 예시 등)
   // WO-O4O-NETURE-GUIDE-BUSINESS-EXAMPLES-BOTTOM-SECTION-FIX-V1: 'top'(기본) 또는 'bottom' 렌더.
@@ -102,6 +134,9 @@ export function GuideFeaturesPage({ hero, index, indexPosition = 'top', groups, 
           </PageContainer>
         </PageSection>
       ))}
+
+      {/* 현재 운영 중인 O4O 서비스 — 그룹 아래·사업 적용 예시 위 */}
+      {showcaseSection}
 
       {/* Card index — bottom ("내 사업에 적용" 마무리 섹션) */}
       {atBottom && indexSection}

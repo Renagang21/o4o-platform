@@ -122,6 +122,9 @@ export {
   netureGuideBusinessOperatorRevenueProps,
   // WO-O4O-NETURE-BUSINESS-GUIDE-HUB-V1
   netureGuideBusinessHubProps,
+  netureGuideServiceKpaSocietyProps,
+  netureGuideServiceGlycopharmProps,
+  netureGuideServiceKcosmeticsProps,
 } from './copy/neture.js';
 
 // WO-O4O-CROSSSERVICE-HOME-LATEST-AND-GUIDE-ALIGNMENT-V1

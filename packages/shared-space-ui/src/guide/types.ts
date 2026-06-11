@@ -250,6 +250,16 @@ export interface GuideFeaturesPageProps {
    *   'bottom' : 그룹 섹션 아래·bottomNav 위 (전체 가이드를 본 뒤 "내 사업에 적용" 마무리 섹션)
    */
   indexPosition?: 'top' | 'bottom';
+  /**
+   * 선택적 "현재 운영 중인 O4O 서비스" 쇼케이스 카드. 지정 시 그룹 섹션 아래·index(bottom) 위에
+   * 카드 그리드(제목+요약, 클릭형)를 렌더. index(사업 적용 예시)와 구분되도록 박스 없이 표시.
+   * 미지정 시 무영향(KPA/GP/KCos 등 기존 소비처). WO-O4O-NETURE-GUIDE-ACTIVE-SERVICE-CARDS-AND-PAGES-V1.
+   */
+  serviceShowcase?: {
+    title?: string;
+    lead?: string[];
+    cards: GuideManualIndexCard[];
+  };
   groups: GuideFeatureGroup[];
   bottomNav: {
     prev: GuideNavLink;     // '← 서비스 활용 방법'
