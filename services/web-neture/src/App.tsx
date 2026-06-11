@@ -221,6 +221,10 @@ const SupplierSettlementsPage = lazy(() => import('./pages/account/SupplierSettl
 // Store (WO-O4O-STORE-CART-PAGE-V1 + WO-O4O-STORE-ORDERS-PAGE-V1 + WO-O4O-STORE-ORDER-DETAIL-PAGE-V1)
 const StoreCartPage = lazy(() => import('./pages/store/StoreCartPage'));
 const StoreOrdersPage = lazy(() => import('./pages/store/StoreOrdersPage'));
+// WO-O4O-NETURE-B2B-PAYMENT-WIDGET-UI-V1 (P2d-1): B2B paymentGroupId 결제
+const StorePaymentPage = lazy(() => import('./pages/store/StorePaymentPage'));
+const StorePaymentSuccessPage = lazy(() => import('./pages/store/StorePaymentSuccessPage'));
+const StorePaymentFailPage = lazy(() => import('./pages/store/StorePaymentFailPage'));
 const StoreOrderDetailPage = lazy(() => import('./pages/store/StoreOrderDetailPage'));
 // WO-O4O-NETURE-BLOG-RETIRE-V1: Neture Blog 운영 대상 아님 — public Blog page/route 제거.
 // Neture canonical 콘텐츠 채널은 Forum + Content + AI editor 로 유지.
@@ -846,6 +850,10 @@ function App() {
               <Route path="/store/:storeSlug/product/:productSlug" element={<StoreProductPage />} />
               {/* WO-O4O-NETURE-BLOG-RETIRE-V1: Neture Blog public route 제거 (canonical = Forum + Content + AI editor) */}
               <Route path="/store/cart" element={<StoreCartPage />} />
+              {/* WO-O4O-NETURE-B2B-PAYMENT-WIDGET-UI-V1 (P2d-1): paymentGroupId 기준 1회 결제 */}
+              <Route path="/store/payment" element={<StorePaymentPage />} />
+              <Route path="/store/payment/success" element={<StorePaymentSuccessPage />} />
+              <Route path="/store/payment/fail" element={<StorePaymentFailPage />} />
               <Route path="/store/orders" element={<StoreOrdersPage />} />
               <Route path="/store/orders/:id" element={<StoreOrderDetailPage />} />
               {/* Store Owner Manage (WO-O4O-STORE-PRODUCT-LIBRARY-INTEGRATION-V1) */}
