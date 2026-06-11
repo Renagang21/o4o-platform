@@ -504,14 +504,14 @@ const GuideBusinessMarketTrialPage = lazy(() => import('./pages/guide').then(m =
 const GuideBusinessOperatorRevenuePage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideBusinessOperatorRevenuePage })));
 // WO-O4O-NETURE-BUSINESS-GUIDE-HUB-V1
 const GuideBusinessHubPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideBusinessHubPage })));
-// WO-O4O-MAIN-BUSINESS-ACTOR-CARDS-ROUTE-SCAFFOLD-V1: 사업자별 카드 → 전용 placeholder 상세 페이지
-const GuideBusinessActorPlaceholderPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideBusinessActorPlaceholderPage })));
 // WO-O4O-NETURE-BUSINESS-PHARMACY-COOP-DETAIL-PAGE-V1: 약국들의 협동조합 전용 상세 페이지
 const GuideBusinessPharmacyCoopPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideBusinessPharmacyCoopPage })));
 // WO-O4O-NETURE-BUSINESS-TOURIST-STORE-DETAIL-PAGE-V1: 관광지 약국/화장품 매장 전용 상세 페이지
 const GuideBusinessTouristStorePage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideBusinessTouristStorePage })));
 // WO-O4O-NETURE-BUSINESS-FOREIGN-CUSTOMER-STORE-DETAIL-PAGE-V1: 외국인 고객 지역 매장 전용 상세 페이지
 const GuideBusinessForeignCustomerStorePage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideBusinessForeignCustomerStorePage })));
+// WO-O4O-NETURE-BUSINESS-WAREHOUSE-PHARMACY-DETAIL-PAGE-V1: 창고형 약국 전용 상세 페이지
+const GuideBusinessWarehousePharmacyPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideBusinessWarehousePharmacyPage })));
 
 // Loading fallback
 function PageLoading() {
@@ -708,7 +708,7 @@ function App() {
               <Route path="/guide/business/pharmacy-coop" element={<GuideBusinessPharmacyCoopPage />} />
               <Route path="/guide/business/tourist-store" element={<GuideBusinessTouristStorePage />} />
               <Route path="/guide/business/foreign-customer-store" element={<GuideBusinessForeignCustomerStorePage />} />
-              <Route path="/guide/business/warehouse-pharmacy" element={<GuideBusinessActorPlaceholderPage title="창고형 약국" />} />
+              <Route path="/guide/business/warehouse-pharmacy" element={<GuideBusinessWarehousePharmacyPage />} />
               <Route path="/guide/intro" element={<GuideIntroPage />} />
               <Route path="/guide/intro/structure" element={<GuideIntroStructurePage />} />
               <Route path="/guide/intro/neture" element={<GuideIntroNeturePage />} />

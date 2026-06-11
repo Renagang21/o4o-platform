@@ -44,7 +44,7 @@ export { GuideBusinessMarketTrialPage } from './GuideBusinessMarketTrialPage';
 export { GuideBusinessOperatorRevenuePage } from './GuideBusinessOperatorRevenuePage';
 // WO-O4O-NETURE-BUSINESS-GUIDE-HUB-V1
 export { GuideBusinessHubPage } from './GuideBusinessHubPage';
-export { GuideBusinessActorPlaceholderPage } from './GuideBusinessActorPlaceholderPage';
 export { GuideBusinessPharmacyCoopPage } from './GuideBusinessPharmacyCoopPage';
 export { GuideBusinessTouristStorePage } from './GuideBusinessTouristStorePage';
 export { GuideBusinessForeignCustomerStorePage } from './GuideBusinessForeignCustomerStorePage';
+export { GuideBusinessWarehousePharmacyPage } from './GuideBusinessWarehousePharmacyPage';
