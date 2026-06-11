@@ -649,6 +649,12 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       app.use('/api/v1/kpa', kpaRoutes);
       logger.info('✅ KPA routes registered at /api/v1/kpa');
 
+      // WO-O4O-KPA-PAYMENT-EVENT-HANDLER-FIX-V1: KPA 결제 이벤트 핸들러 초기화(누락 복구)
+      // payment.completed(serviceKey='kpa') → checkout_orders paid 전이. 미등록 시 paymentStatus=pending 잔존 버그.
+      const { initializeKpaPaymentHandler } = await import('../services/kpa/KpaPaymentEventHandler.js');
+      initializeKpaPaymentHandler(dataSource);
+      logger.info('✅ KpaPaymentEventHandler initialized');
+
       // 31-b. Register KPA Join Inquiry public routes (WO-KPA-JOIN-CONVERSION-V1)
       const kpaJoinPublicRoutes = createKpaJoinPublicRoutes(dataSource);
       app.use('/api/v1/join', kpaJoinPublicRoutes);
