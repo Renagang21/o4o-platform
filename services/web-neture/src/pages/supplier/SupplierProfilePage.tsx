@@ -548,12 +548,33 @@ export default function SupplierProfilePage() {
         </h2>
         <p className="text-xs text-gray-500 mb-2">
           공급자별 기본 배송비, 무료배송 기준, 출고 안내, 반품/교환 안내를 설정합니다.
+          장바구니·주문에서 공급자별 상품금액(같은 공급자의 일반·이벤트 상품 합산) 기준으로 배송비가 계산되며,
+          다른 공급자 금액은 무료배송 기준에 포함되지 않습니다. 유통참여형 펀딩은 적용 대상이 아닙니다.
         </p>
-        <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 text-xs text-amber-800 mb-5 space-y-1">
-          <p>이번 단계에서는 주문 화면의 <strong>배송비 계산에 자동 반영되지 않으며</strong>, 향후 주문/배송 계산 기능에서 활용됩니다.</p>
-          <p>향후 배송비 계산이 적용되면, 같은 공급자의 일반 상품과 이벤트 오퍼 상품은 <strong>공급자별 주문금액에 함께 포함</strong>되는 것을 기본 기준으로 합니다. 다른 공급자의 주문금액은 해당 공급자의 무료배송 기준에 포함되지 않습니다.</p>
-          <p>유통참여형 펀딩은 온라인 주문·배송 계산 대상이 아니며, 배송 정책 적용 범위에서 제외됩니다.</p>
-        </div>
+        {/* WO-O4O-SUPPLIER-SHIPPING-POLICY-ONBOARDING-NOTICE-V1: 미설정 시 0원 fallback 경고 */}
+        {baseShippingFee.trim() === '' ? (
+          <div className="rounded-lg bg-red-50 border border-red-200 p-3 text-xs text-red-700 mb-5 space-y-1">
+            <p className="font-semibold">⚠️ 기본 배송비가 설정되지 않았습니다.</p>
+            <p>
+              현재 기본 배송비가 비어 있어 <strong>장바구니와 주문에서 배송비가 0원으로 계산</strong>됩니다.
+              공급 상품 주문의 실제 배송비 반영을 위해 기본 배송비를 입력해 주세요.
+            </p>
+            {freeShippingThreshold.trim() === '' && (
+              <p>· 무료배송 기준 금액을 입력하면 매장이 “얼마 더 담으면 무료배송”인지 확인할 수 있습니다. 무료배송을 운영하지 않으면 비워둘 수 있습니다.</p>
+            )}
+            {averageDispatchDays.trim() === '' && (
+              <p>· 평균 출고 소요일을 입력하면 매장 경영자가 주문 전 예상 배송 일정을 이해하는 데 도움이 됩니다.</p>
+            )}
+          </div>
+        ) : (
+          <div className="rounded-lg bg-emerald-50 border border-emerald-200 p-3 text-xs text-emerald-700 mb-5 space-y-1">
+            <p className="font-semibold">✅ 기본 배송비가 설정되어 있습니다.</p>
+            <p>장바구니와 주문에서 공급자별 상품금액을 기준으로 배송비가 계산됩니다.</p>
+            {freeShippingThreshold.trim() === '' && (
+              <p className="text-emerald-600">· 무료배송 기준은 선택 입력입니다. 입력 시 매장이 무료배송까지 남은 금액을 확인할 수 있습니다.</p>
+            )}
+          </div>
+        )}
         <div className="space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
