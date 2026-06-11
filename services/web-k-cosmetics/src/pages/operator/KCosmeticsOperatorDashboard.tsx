@@ -93,29 +93,35 @@ export default function KCosmeticsOperatorDashboard() {
     );
   }
 
+  // WO-O4O-OPERATOR-DASHBOARD-AUX-SECTION-P1-ALIGNMENT-V1:
+  //   notice 를 부가 섹션(alert/notice 역할)으로 명시 — GP OperatorAlerts 와 동일 역할군.
+  //   부가 섹션 순서 컨벤션 정렬: [Alert/Notice] → [Axis] → [5-block].
+  // WO-O4O-STORE-DASHBOARD-ORDER-METRICS-SAFE-FALLBACK-V1:
+  //   주문/매출 지표 미준비 (백엔드 meta.featureStatus='not_ready') 상태 안내.
+  //   KPI 카드의 '진행 주문 0' / '월간 매출 0' 거짓 신호 대신 명시.
+  const orderMetricsNotice = !orderMetricsReady ? (
+    <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
+      <div className="flex items-start gap-3">
+        <span className="text-amber-600 text-lg leading-none mt-0.5">⚠</span>
+        <div className="flex-1">
+          <p className="text-sm font-semibold text-amber-900 m-0 mb-1">
+            주문/매출 지표를 준비 중입니다.
+          </p>
+          <p className="text-[13px] text-amber-700 m-0">
+            현재 이 지표는 준비 중입니다. 다른 운영자 기능은 계속 이용할 수 있습니다.
+          </p>
+        </div>
+      </div>
+    </div>
+  ) : null;
+
   return (
     <div className="space-y-6">
+      {/* 부가 섹션: [Alert/Notice] → [Axis] → [5-block] */}
+      {orderMetricsNotice}
+
       {/* WO-O4O-OPERATOR-DASHBOARD-AXIS-NAVIGATION-COMMONIZATION-V1: 2축 운영 네비게이션 */}
       <AxisNavigationSection axes={KCOS_AXES} />
-
-      {/* WO-O4O-STORE-DASHBOARD-ORDER-METRICS-SAFE-FALLBACK-V1:
-          주문/매출 지표 미준비 (백엔드 meta.featureStatus='not_ready') 상태 안내.
-          KPI 카드의 '진행 주문 0' / '월간 매출 0' 거짓 신호 대신 명시. */}
-      {!orderMetricsReady && (
-        <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
-          <div className="flex items-start gap-3">
-            <span className="text-amber-600 text-lg leading-none mt-0.5">⚠</span>
-            <div className="flex-1">
-              <p className="text-sm font-semibold text-amber-900 m-0 mb-1">
-                주문/매출 지표를 준비 중입니다.
-              </p>
-              <p className="text-[13px] text-amber-700 m-0">
-                현재 이 지표는 준비 중입니다. 다른 운영자 기능은 계속 이용할 수 있습니다.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
 
       <OperatorDashboardLayout config={config} />
     </div>

@@ -14,7 +14,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { RefreshCw, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import {
   OperatorDashboardLayout,
   type OperatorDashboardConfig,
@@ -118,26 +118,12 @@ export default function GlycoPharmOperatorDashboard() {
 
   return (
     <div className="space-y-6">
+      {/* WO-O4O-OPERATOR-DASHBOARD-AUX-SECTION-P1-ALIGNMENT-V1:
+          GP 단독 page header(h1+새로고침) 제거 — 타 3서비스(KPA/KCos/Neture)와 동일하게
+          dashboard 본체 안에서는 별도 h1 없이 간다(shell/sidebar 가 컨텍스트 제공).
+          부가 섹션 순서 컨벤션 정렬: [Alert/Notice] → [Axis] → [5-block]. */}
       {/* Operator Alerts (rule-based, above standard 5-Block) */}
       <OperatorAlerts alerts={alerts} />
-
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">운영 대시보드</h1>
-          <p className="text-sm text-slate-500 mt-1">
-            GlycoPharm 운영 실행 — 약국·매장 운영 · 콘텐츠 관리
-          </p>
-        </div>
-        <button
-          onClick={fetchData}
-          disabled={loading}
-          className="flex items-center gap-2 px-3 py-2 text-sm border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50"
-        >
-          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-          새로고침
-        </button>
-      </div>
 
       {/* WO-O4O-OPERATOR-DASHBOARD-AXIS-NAVIGATION-COMMONIZATION-V1: 2축 운영 네비게이션 */}
       <AxisNavigationSection axes={GP_AXES} />
