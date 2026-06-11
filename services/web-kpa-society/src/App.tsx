@@ -924,8 +924,10 @@ function App() {
             <Route path="commerce/orderable" element={<Navigate to="/store-hub/b2b" replace />} />
             <Route path="commerce/products" element={<PharmacyB2BPage />} />
             <Route path="commerce/products/b2c" element={<PharmacySellPage />} />
-            {/* WO-O4O-STORE-PRODUCTS-SERVICE-ROUTING-V1: 내 매장 상품 (ProductMaster + Listing) */}
-            <Route path="my-products" element={<PharmacyOwnerOnlyGuard><StoreProductsManagerPage /></PharmacyOwnerOnlyGuard>} />
+            {/* WO-O4O-STORE-PRODUCTS-SERVICE-ROUTING-V1: 내 매장 상품 (ProductMaster + Listing)
+                WO-O4O-STORE-PRODUCTS-MANAGER-HEADING-PROP-ALIGNMENT-V1: OrganizationProductListing 기반
+                기본 O4O 주문 가능 상품 화면 — 포괄 heading "내 매장 상품" 대신 의미를 명시 주입. */}
+            <Route path="my-products" element={<PharmacyOwnerOnlyGuard><StoreProductsManagerPage title="O4O 주문 가능 상품" description="공급자 또는 운영자 승인 후 약국에서 반복 주문할 수 있는 O4O 공급 상품을 관리합니다." /></PharmacyOwnerOnlyGuard>} />
             {/* WO-O4O-STORE-HUB-LEGACY-LIST-CLEANUP-V1: suppliers 라우트 제거 (mock-only, /store-hub/b2b 와 redundant) */}
             <Route path="commerce/products/:productId/marketing" element={<ProductMarketingPage />} />
             {/* WO-O4O-AI-AUTO-POP-BUILDER-V1: 상품 POP 만들기 (AI prefill + 편집 + PDF) */}

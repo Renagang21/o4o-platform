@@ -468,6 +468,17 @@ type ActiveModal = null | 'register' | 'price' | 'desc' | 'channel' | 'image';
 
 export interface StoreProductsManagerPageProps {
   /**
+   * 기본 헤더 제목. 미지정 시 '내 매장 상품'.
+   * WO-O4O-STORE-PRODUCTS-MANAGER-HEADING-PROP-ALIGNMENT-V1:
+   *   서비스별 의미(예: KPA = O4O 주문 가능 상품)를 명시적으로 주입할 수 있도록 prop화.
+   *   `headerSlot` 지정 시에는 무시된다(슬롯이 헤더 전체를 대체).
+   */
+  title?: string;
+
+  /** 기본 헤더 설명(subtitle). 미지정 시 기존 문구 유지. `headerSlot` 지정 시 무시. */
+  description?: string;
+
+  /**
    * 페이지 헤더를 서비스별 컴포넌트로 대체할 때 사용한다.
    * 미지정 시 패키지 내부 기본 헤더(neutral Tailwind)가 렌더링된다.
    *
@@ -491,6 +502,8 @@ export interface StoreProductsManagerPageProps {
 }
 
 export default function StoreProductsManagerPage({
+  title = '내 매장 상품',
+  description = '진열 상품을 관리하고 채널별 노출을 제어하세요.',
   headerSlot,
   containerClassName = 'p-6',
   guideSlot,
@@ -673,8 +686,8 @@ export default function StoreProductsManagerPage({
         headerSlot({ onRegister: handleRegister, onRefresh: handleRefresh })
       ) : (
         <DefaultHeader
-          title="내 매장 상품"
-          subtitle="진열 상품을 관리하고 채널별 노출을 제어하세요."
+          title={title}
+          subtitle={description}
           actions={[
             { id: 'register', label: '내 매장 상품 등록', icon: <Plus size={14} />, onClick: handleRegister, variant: 'primary' },
             { id: 'refresh', label: '새로고침', icon: <RefreshCw size={14} />, onClick: handleRefresh },
