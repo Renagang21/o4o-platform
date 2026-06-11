@@ -16,7 +16,7 @@
 import { Router, Request, Response, RequestHandler } from 'express';
 import type { DataSource } from 'typeorm';
 import { asyncHandler } from '../../../middleware/error-handler.js';
-import { EventOfferService, EventOfferError } from '../../kpa/services/event-offer.service.js';
+import { EventOfferService } from '../../kpa/services/event-offer.service.js';
 import { SERVICE_KEYS } from '../../../constants/service-keys.js';
 
 export function createGlycopharmEventOfferController(
@@ -86,36 +86,20 @@ export function createGlycopharmEventOfferController(
   }));
 
   /**
-   * POST /:id/participate — 참여 주문 생성
+   * POST /:id/participate — RETIRED (WO-O4O-EVENT-OFFER-PARTICIPATE-ROUTE-RETIREMENT-V2)
    *
-   * @deprecated WO-O4O-EVENT-OFFER-PARTICIPATE-LEGACY-DEMOTION-V1
-   *   Buyer 주문 canonical entry 는 Store Cart checkout-confirm 이다. 이 route 는 legacy/호환 경로
-   *   (buyer UI 직접 호출 0건). route 미삭제.
+   * 이벤트오퍼 buyer 주문 canonical entry 는 Store Cart checkout-confirm 이다.
+   * 이 legacy 외부 route 는 더 이상 주문을 생성하지 않고 410 Gone 을 반환한다.
+   * (검증/수량차감 helper 는 cart-confirm 이 사용하므로 service 에 보존.)
    */
   router.post('/:id/participate', requireAuth,
-    asyncHandler(async (req: Request, res: Response) => {
-      const user = (req as any).user;
-      if (!user?.id) {
-        res.status(401).json({ success: false, error: { message: 'Unauthorized' } });
-        return;
-      }
-
-      try {
-        const result = await service.participate(req.params.id, user.id, {
-          quantity: req.body?.quantity,
-        }, sk);
-
-        res.status(201).json({ success: true, data: result });
-      } catch (err) {
-        if (err instanceof EventOfferError) {
-          res.status(err.statusCode).json({
-            success: false,
-            error: { message: err.message, ...(err.code ? { code: err.code } : {}) },
-          });
-          return;
-        }
-        throw err;
-      }
+    asyncHandler(async (_req: Request, res: Response) => {
+      res.status(410).json({
+        success: false,
+        code: 'EVENT_OFFER_PARTICIPATE_RETIRED',
+        message: '이벤트오퍼 주문은 장바구니를 통해 진행해 주세요.',
+        canonicalAction: 'store_cart_checkout',
+      });
     })
   );
 
