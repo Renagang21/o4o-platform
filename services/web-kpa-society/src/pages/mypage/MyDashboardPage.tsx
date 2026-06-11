@@ -195,15 +195,16 @@ export function MyDashboardPage() {
             </div>
           </Card>
         </Link>
-        <Link to={`/event-offers/history`} style={styles.summaryLink}>
-          <Card padding="medium">
-            <div style={styles.summaryItem}>
-              <span style={styles.summaryIcon}>🛒</span>
-              <span style={styles.summaryValue}>{summary?.eventOfferParticipations || summary?.groupbuyParticipations || 0}</span>
-              <span style={styles.summaryLabel}>이벤트</span>
-            </div>
-          </Card>
-        </Link>
+        {/* WO-O4O-MYPAGE-TIER1-DEAD-STUB-CLEANUP-V1:
+            /event-offers/history route 미정의 dead link 였음. Card 만 유지 — 참여 수 표시.
+            전용 이력 페이지 도입 시 별도 WO 로 link 재추가. */}
+        <Card padding="medium">
+          <div style={styles.summaryItem}>
+            <span style={styles.summaryIcon}>🛒</span>
+            <span style={styles.summaryValue}>{summary?.eventOfferParticipations || summary?.groupbuyParticipations || 0}</span>
+            <span style={styles.summaryLabel}>이벤트</span>
+          </div>
+        </Card>
       </div>
 
       {/* Market Trial 위젯 제거 — WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1

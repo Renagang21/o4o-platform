@@ -1,10 +1,14 @@
 /**
- * MySettingsPage - 보안 / 알림 / 계정 관리
+ * MySettingsPage - 보안 / 계정 관리
  *
  * WO-O4O-GLYCOPHARM-MYPAGE-SPLIT-V1
  *
- * /mypage/settings — 비밀번호 변경, 2FA, 알림 설정, 계정 탈퇴 등
- * 기존 MyPage.tsx의 하단 보안/계정 섹션을 분리.
+ * WO-O4O-MYPAGE-TIER1-DEAD-STUB-CLEANUP-V1:
+ *   no-op stub 3건 정비.
+ *   - 2단계 인증 버튼 → onClick 없는 button → 정직 표시 (button → div, "준비 중" 명시)
+ *   - 알림 설정 섹션 → handler 0, 별도 page 없음. 섹션 자체 제거.
+ *   - 계정 탈퇴 버튼 → handler 0, 위험 no-op. 제거.
+ *   비밀번호 변경 / 모든 기기 로그아웃 등 실제 기능은 유지.
  */
 
 import { useState } from 'react';
@@ -76,18 +80,15 @@ export default function MySettingsPage() {
             <span className="text-sm text-gray-700">비밀번호 변경</span>
           </div>
         </button>
-        <button className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+        {/* WO-O4O-MYPAGE-TIER1-DEAD-STUB-CLEANUP-V1:
+            2단계 인증 → button(no-op) → div 로 변경 + "준비 중" 정직 표시. API 도입 시 별도 WO. */}
+        <div className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-xl opacity-60 cursor-not-allowed">
           <span className="text-sm text-gray-700">2단계 인증</span>
-          <span className="text-xs text-gray-400">비활성화</span>
-        </button>
+          <span className="text-xs text-gray-400">준비 중</span>
+        </div>
       </SettingsSection>
 
-      {/* Notifications */}
-      <SettingsSection title="알림 설정">
-        <button className="w-full text-left p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
-          <span className="text-sm text-gray-700">알림 설정</span>
-        </button>
-      </SettingsSection>
+      {/* WO-O4O-MYPAGE-TIER1-DEAD-STUB-CLEANUP-V1: 알림 설정 섹션 제거 (handler 0). API 도입 시 재추가. */}
 
       {/* Account */}
       <SettingsSection title="계정 관리">
@@ -102,9 +103,7 @@ export default function MySettingsPage() {
           </div>
           {loggingOutAll && <span className="text-xs text-gray-400">처리 중...</span>}
         </button>
-        <button className="w-full text-left p-4 bg-red-50 rounded-xl hover:bg-red-100 transition-colors">
-          <span className="text-sm text-red-600">계정 탈퇴</span>
-        </button>
+        {/* WO-O4O-MYPAGE-TIER1-DEAD-STUB-CLEANUP-V1: 계정 탈퇴 button 제거 (handler 0, 위험 no-op). API 도입 시 별도 WO. */}
       </SettingsSection>
 
       {/* Password Change Modal */}

@@ -1,5 +1,10 @@
 /**
  * MySettingsPage - 설정 페이지
+ *
+ * WO-O4O-MYPAGE-TIER1-DEAD-STUB-CLEANUP-V1:
+ *   `계정 탈퇴` mock action 제거. mypageApi.requestWithdraw() 미구현 상태에서
+ *   사용자에게 "탈퇴 요청 접수됨" 으로 성공 표시하는 위험 mock 이었음.
+ *   백엔드 API 도입 시 재추가 (별도 WO).
  */
 
 import { useState, useEffect } from 'react';
@@ -20,9 +25,6 @@ export function MySettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showWithdrawModal, setShowWithdrawModal] = useState(false);
-  const [withdrawReason, setWithdrawReason] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (user) loadData();
@@ -68,28 +70,6 @@ export function MySettingsPage() {
       navigate('/');
     } catch (err) {
       toast.error('로그아웃에 실패했습니다. 다시 시도해주세요.');
-    }
-  };
-
-  const handleWithdrawRequest = async () => {
-    if (!withdrawReason.trim()) {
-      toast.error('탈퇴 사유를 입력해주세요.');
-      return;
-    }
-
-    try {
-      setIsSubmitting(true);
-      // TODO: 실제 API 연동 시 mypageApi.requestWithdraw() 호출
-      // await mypageApi.requestWithdraw({ reason: withdrawReason });
-
-      // 현재는 알림만 표시
-      toast.success('탈퇴 요청이 접수되었습니다. 운영자 검토 후 처리됩니다. 처리 결과는 등록된 이메일로 안내됩니다.');
-      setShowWithdrawModal(false);
-      setWithdrawReason('');
-    } catch (err) {
-      toast.error('탈퇴 요청에 실패했습니다. 다시 시도해주세요.');
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -200,56 +180,11 @@ export function MySettingsPage() {
           >
             모든 기기에서 로그아웃
           </button>
-          <button
-            style={styles.dangerButton}
-            onClick={() => setShowWithdrawModal(true)}
-          >
-            계정 탈퇴
-          </button>
+          {/* WO-O4O-MYPAGE-TIER1-DEAD-STUB-CLEANUP-V1:
+              `계정 탈퇴` 버튼 제거. mypageApi.requestWithdraw() backend 미구현 상태에서
+              사용자에게 mock 성공 표시하던 위험 action. API 도입 시 별도 WO 로 재추가. */}
         </div>
       </Card>
-
-      {/* 탈퇴 요청 모달 */}
-      {showWithdrawModal && (
-        <div style={styles.modalOverlay}>
-          <div style={styles.modal}>
-            <h3 style={styles.modalTitle}>계정 탈퇴 요청</h3>
-            <p style={styles.modalDesc}>
-              탈퇴 요청은 운영자 검토 후 처리됩니다.<br />
-              지부/분회 탈퇴는 관리자 승인이 필요합니다.
-            </p>
-            <div style={styles.field}>
-              <label style={styles.label}>탈퇴 사유</label>
-              <textarea
-                style={styles.textarea}
-                value={withdrawReason}
-                onChange={e => setWithdrawReason(e.target.value)}
-                placeholder="탈퇴 사유를 입력해주세요"
-                rows={4}
-              />
-            </div>
-            <div style={styles.modalActions}>
-              <button
-                style={styles.cancelButton}
-                onClick={() => {
-                  setShowWithdrawModal(false);
-                  setWithdrawReason('');
-                }}
-                disabled={isSubmitting}
-              >
-                취소
-              </button>
-              <button
-                style={styles.submitButton}
-                onClick={handleWithdrawRequest}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? '요청 중...' : '탈퇴 요청'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </MyPageLayout>
   );
 }
@@ -324,79 +259,5 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
     textAlign: 'left',
   },
-  modalOverlay: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 1000,
-  },
-  modal: {
-    backgroundColor: colors.white,
-    borderRadius: '12px',
-    padding: '24px',
-    width: '90%',
-    maxWidth: '400px',
-    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
-  },
-  modalTitle: {
-    ...typography.headingM,
-    color: colors.neutral900,
-    marginTop: 0,
-    marginBottom: '8px',
-  },
-  modalDesc: {
-    ...typography.bodyM,
-    color: colors.neutral600,
-    marginBottom: '20px',
-    lineHeight: '1.5',
-  },
-  field: {
-    marginBottom: '20px',
-  },
-  label: {
-    display: 'block',
-    marginBottom: '8px',
-    fontWeight: 500,
-    color: colors.neutral700,
-    fontSize: '14px',
-  },
-  textarea: {
-    width: '100%',
-    padding: '12px',
-    border: `1px solid ${colors.neutral300}`,
-    borderRadius: '8px',
-    fontSize: '14px',
-    boxSizing: 'border-box',
-    resize: 'vertical',
-    fontFamily: 'inherit',
-  },
-  modalActions: {
-    display: 'flex',
-    gap: '12px',
-    justifyContent: 'flex-end',
-  },
-  cancelButton: {
-    padding: '10px 20px',
-    backgroundColor: colors.neutral100,
-    color: colors.neutral700,
-    border: 'none',
-    borderRadius: '6px',
-    fontSize: '14px',
-    cursor: 'pointer',
-  },
-  submitButton: {
-    padding: '10px 20px',
-    backgroundColor: colors.accentRed,
-    color: colors.white,
-    border: 'none',
-    borderRadius: '6px',
-    fontSize: '14px',
-    cursor: 'pointer',
-  },
+  // WO-O4O-MYPAGE-TIER1-DEAD-STUB-CLEANUP-V1: 탈퇴 모달 관련 styles 제거 (mock action 제거 동반)
 };
