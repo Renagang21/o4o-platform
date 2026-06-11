@@ -79,4 +79,4 @@ GlycoPharm에 "서비스 안내" 페이지를 추가한다. 상단 메뉴에는 
 
 ## commit hash
 
-- (commit 후 기재)
+- `d63aa54c2` — feat(glycopharm): add service guide page (WO-O4O-GLYCOPHARM-SERVICE-GUIDE-PAGE-V1)
