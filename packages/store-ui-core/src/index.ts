@@ -87,6 +87,18 @@ export type {
 export { EventOffersHubList } from './components/event-offers/EventOffersHubList';
 export type { EventOffersHubListProps, EventOfferHubItem, EventOffersHubAccent } from './components/event-offers/EventOffersHubList';
 
+// Store Hub B2B 상품 카탈로그 공통 (WO-O4O-STORE-HUB-B2B-CATALOG-GP-KCOS-COMMON-COMPONENT-EXTRACTION-V1)
+export { B2BCatalogHub } from './components/b2b-catalog/B2BCatalogHub';
+export type {
+  B2BCatalogHubProps,
+  B2BCatalogHubLabels,
+  B2BCatalogProduct,
+  B2BCatalogApi,
+  B2BCatalogGetParams,
+  B2BCatalogListResponse,
+  B2BCatalogAccent,
+} from './components/b2b-catalog/B2BCatalogHub';
+
 // Shared Production Modal (WO-O4O-START-PRODUCTION-MODAL-SHARED-COMPONENT-PHASE2-H-V1)
 export { StartProductionModal } from './components/StartProductionModal';
 export type { StartProductionModalProps, StartProductionTargetConfig, StartProductionTemplateItem } from './components/StartProductionModal';

@@ -2974,6 +2974,15 @@ importers:
 
   packages/store-ui-core:
     dependencies:
+      '@o4o/error-handling':
+        specifier: workspace:*
+        version: link:../error-handling
+      '@o4o/operator-ux-core':
+        specifier: workspace:*
+        version: link:../operator-ux-core
+      '@o4o/ui':
+        specifier: workspace:*
+        version: link:../ui
       lucide-react:
         specifier: '>=0.300.0'
         version: 0.523.0(react@19.2.0)
