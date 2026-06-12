@@ -11,6 +11,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { PageSection, PageContainer } from '@o4o/ui';
+// WO-O4O-FORUM-LIST-SHARED-PRIMITIVES-V1: 공통 상대시간 유틸
+import { formatForumDate as formatDate } from '@o4o/shared-space-ui';
 import {
   fetchForumPosts,
   fetchPinnedPosts,
@@ -50,18 +52,6 @@ function toDisplayPost(post: ApiForumPost): DisplayPost {
   };
 }
 
-function formatDate(dateString: string): string {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diff = now.getTime() - date.getTime();
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  if (days > 7) return date.toLocaleDateString('ko-KR');
-  if (days > 0) return `${days}일 전`;
-  const hours = Math.floor(diff / (1000 * 60 * 60));
-  if (hours > 0) return `${hours}시간 전`;
-  const minutes = Math.floor(diff / (1000 * 60));
-  return minutes > 0 ? `${minutes}분 전` : '방금 전';
-}
 
 const TYPE_BADGES: Record<PostType, { label: string; className: string }> = {
   announcement: { label: '공지', className: 'bg-red-50 text-red-600' },

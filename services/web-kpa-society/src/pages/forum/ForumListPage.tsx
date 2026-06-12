@@ -27,21 +27,10 @@ import { appreciationApi } from '../../api/appreciation';
 import { useAuth } from '../../contexts';
 import type { ForumInfo, ForumPost } from '../../types';
 import { buildAiClipboardText, stripHtml, blocksToText } from '../../utils/ai-clipboard';
+// WO-O4O-FORUM-LIST-SHARED-PRIMITIVES-V1: 공통 상대시간 유틸
+import { formatForumDate as formatDate } from '@o4o/shared-space-ui';
 
 const PAGE_SIZE = 10;
-
-function formatDate(dateString: string): string {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diff = now.getTime() - date.getTime();
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  if (days > 7) return date.toLocaleDateString('ko-KR');
-  if (days > 0) return `${days}일 전`;
-  const hours = Math.floor(diff / (1000 * 60 * 60));
-  if (hours > 0) return `${hours}시간 전`;
-  const minutes = Math.floor(diff / (1000 * 60));
-  return minutes > 0 ? `${minutes}분 전` : '방금 전';
-}
 
 // ── ForumCombobox ──────────────────────────────────────────────────────────
 
