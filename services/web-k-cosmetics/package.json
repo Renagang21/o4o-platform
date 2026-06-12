@@ -14,7 +14,6 @@
     "@o4o/admin-ux-core": "workspace:*",
     "@o4o/content-editor": "workspace:*",
     "@o4o/error-handling": "workspace:*",
-    "@o4o/forum-core": "workspace:*",
     "@o4o/ai-components": "workspace:*",
     "@o4o/auth-client": "workspace:*",
     "@o4o/auth-utils": "workspace:*",
