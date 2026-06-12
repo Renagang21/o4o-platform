@@ -785,7 +785,7 @@ export async function fetchMyForumRequests(): Promise<{ success: boolean; data: 
 }
 
 export async function createForumCategoryRequest(
-  data: { name: string; description: string; reason?: string },
+  data: { name: string; description: string; reason?: string; tags?: string[] },
 ): Promise<{ success: boolean; data?: any; error?: string }> {
   try {
     const response = await api.post('/forum/category-requests', {

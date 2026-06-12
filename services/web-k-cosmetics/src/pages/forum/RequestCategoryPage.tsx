@@ -13,6 +13,7 @@ import {
   Send,
   AlertCircle,
   CheckCircle,
+  X,
 } from 'lucide-react';
 import { createForumCategoryRequest } from '@/services/forumApi';
 
@@ -28,15 +29,39 @@ export default function RequestCategoryPage() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [formData, setFormData] = useState<CategoryRequestForm>({ name: '', description: '', reason: '' });
-  const [errors, setErrors] = useState<Partial<CategoryRequestForm>>({});
+  const [errors, setErrors] = useState<Partial<CategoryRequestForm & { tags: string }>>({});
+
+  // 태그 상태 (자유입력 — O4O Tag Policy V1, backend TAGS_REQUIRED 정렬)
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState('');
+
+  const addTag = (value: string) => {
+    const tag = value.trim().replace(/^#/, '');
+    if (!tag || tag.length > 30 || selectedTags.includes(tag) || selectedTags.length >= 5) return;
+    setSelectedTags((prev) => [...prev, tag]);
+    setTagInput('');
+    if (errors.tags) setErrors((prev) => ({ ...prev, tags: undefined }));
+  };
+
+  const removeTag = (tag: string) => {
+    setSelectedTags((prev) => prev.filter((t) => t !== tag));
+  };
+
+  const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      addTag(tagInput);
+    }
+  };
 
   const validateForm = (): boolean => {
-    const newErrors: Partial<CategoryRequestForm> = {};
+    const newErrors: Partial<CategoryRequestForm & { tags: string }> = {};
     if (!formData.name.trim()) newErrors.name = '포럼 이름을 입력해주세요';
     else if (formData.name.length < 2) newErrors.name = '포럼 이름은 2자 이상이어야 합니다';
     else if (formData.name.length > 50) newErrors.name = '포럼 이름은 50자 이하여야 합니다';
     if (!formData.description.trim()) newErrors.description = '포럼 설명을 입력해주세요';
     else if (formData.description.length < 10) newErrors.description = '포럼 설명은 10자 이상이어야 합니다';
+    if (selectedTags.length === 0) newErrors.tags = '태그를 1개 이상 입력해주세요.';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -51,6 +76,7 @@ export default function RequestCategoryPage() {
         name: formData.name.trim(),
         description: formData.description.trim(),
         reason: formData.reason?.trim() || undefined,
+        tags: selectedTags,
       });
       if (!response.success) {
         setSubmitError(response.error || '신청에 실패했습니다.');
@@ -121,6 +147,24 @@ export default function RequestCategoryPage() {
             <label htmlFor="reason" className="block text-sm font-medium text-slate-700 mb-2">신청 사유 <span className="text-slate-400">(선택)</span></label>
             <textarea id="reason" value={formData.reason} onChange={(e) => setFormData({ ...formData, reason: e.target.value })} placeholder="이 포럼이 필요한 이유를 설명해주세요 (선택사항)" rows={3}
               className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent resize-none" />
+          </div>
+          {/* Tags (자유입력) */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">태그 <span className="text-red-500">*</span></label>
+            <p className="text-xs text-slate-500 mb-3">포럼을 찾고 분류하는 데 사용할 태그를 1개 이상 입력하세요. Enter 또는 쉼표로 추가합니다. (최대 5개)</p>
+            <div className={`flex flex-wrap gap-2 items-center px-3 py-2 rounded-lg border ${errors.tags ? 'border-red-300' : 'border-slate-200'} focus-within:ring-2 focus-within:ring-pink-500 focus-within:border-transparent bg-white min-h-[44px]`}>
+              {selectedTags.map((tag) => (
+                <span key={tag} className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-pink-100 text-pink-700 text-sm font-medium">
+                  {tag}
+                  <button type="button" onClick={() => removeTag(tag)} className="ml-0.5 hover:text-pink-900 transition-colors" aria-label={`${tag} 제거`}>
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </span>
+              ))}
+              <input type="text" value={tagInput} onChange={(e) => setTagInput(e.target.value)} onKeyDown={handleTagKeyDown} onBlur={() => { if (tagInput.trim()) addTag(tagInput); }}
+                placeholder={selectedTags.length === 0 ? '예: 피부상담, 화장품, 매장운영' : ''} className="flex-1 min-w-[120px] py-1 text-sm outline-none bg-transparent" />
+            </div>
+            {errors.tags && <p className="mt-2 text-sm text-red-600 flex items-center gap-1"><AlertCircle className="w-4 h-4" />{errors.tags}</p>}
           </div>
         </div>
 

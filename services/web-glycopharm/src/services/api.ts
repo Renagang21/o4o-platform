@@ -179,7 +179,7 @@ export const displayApi = {
 // WO-O4O-FORUM-REQUEST-UNIFICATION-PHASE1-V1: 공통 API + GlycoPharm operator API
 export const forumRequestApi = {
   // User APIs — /api/v1/forum/category-requests/*
-  create: (data: { name: string; description: string; reason?: string }) =>
+  create: (data: { name: string; description: string; reason?: string; tags?: string[] }) =>
     apiClient.post<unknown>('/api/v1/forum/category-requests', {
       ...data,
       serviceCode: 'glycopharm',
