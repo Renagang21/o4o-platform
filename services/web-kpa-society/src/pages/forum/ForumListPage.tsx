@@ -27,8 +27,8 @@ import { appreciationApi } from '../../api/appreciation';
 import { useAuth } from '../../contexts';
 import type { ForumInfo, ForumPost } from '../../types';
 import { buildAiClipboardText, stripHtml, blocksToText } from '../../utils/ai-clipboard';
-// WO-O4O-FORUM-LIST-SHARED-PRIMITIVES-V1: 공통 상대시간 유틸
-import { formatForumDate as formatDate } from '@o4o/shared-space-ui';
+// WO-O4O-FORUM-LIST-SHARED-PRIMITIVES-V1 / WO-O4O-FORUM-LIST-PAGINATION-UNIFY-V1: 공통 유틸·페이지네이션
+import { formatForumDate as formatDate, HubPagination } from '@o4o/shared-space-ui';
 
 const PAGE_SIZE = 10;
 
@@ -512,18 +512,6 @@ export function ForumListPage() {
     </div>
   );
 
-  // ── Pagination numbers ──
-
-  const pageNumbers = useMemo(() => {
-    const pages: number[] = [];
-    const maxVisible = 5;
-    let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
-    const end = Math.min(totalPages, start + maxVisible - 1);
-    if (end - start + 1 < maxVisible) start = Math.max(1, end - maxVisible + 1);
-    for (let i = start; i <= end; i++) pages.push(i);
-    return pages;
-  }, [currentPage, totalPages]);
-
   // Active filter chips
   const activeChips: { label: string; onRemove: () => void }[] = [];
   if (forumParam && selectedForumName) {
@@ -751,33 +739,19 @@ export function ForumListPage() {
         )}
       </div>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-1 py-6">
-          <button onClick={() => goToPage(1)} disabled={currentPage === 1}
-            className={`inline-flex items-center justify-center min-w-[36px] h-9 px-2 text-sm font-medium rounded-md border transition-all ${
-              currentPage === 1 ? 'text-slate-300 cursor-default opacity-50 bg-white border-slate-200' : 'text-slate-600 bg-white border-slate-200 cursor-pointer hover:bg-slate-50'
-            }`}>&laquo;</button>
-          <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}
-            className={`inline-flex items-center justify-center min-w-[36px] h-9 px-2 text-sm font-medium rounded-md border transition-all ${
-              currentPage === 1 ? 'text-slate-300 cursor-default opacity-50 bg-white border-slate-200' : 'text-slate-600 bg-white border-slate-200 cursor-pointer hover:bg-slate-50'
-            }`}>&lsaquo;</button>
-          {pageNumbers.map(p => (
-            <button key={p} onClick={() => goToPage(p)}
-              className={`inline-flex items-center justify-center min-w-[36px] h-9 px-2 text-sm font-medium rounded-md border transition-all cursor-pointer ${
-                p === currentPage ? 'bg-primary text-white border-primary' : 'text-slate-600 bg-white border-slate-200 hover:bg-slate-50'
-              }`}>{p}</button>
-          ))}
-          <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages}
-            className={`inline-flex items-center justify-center min-w-[36px] h-9 px-2 text-sm font-medium rounded-md border transition-all ${
-              currentPage === totalPages ? 'text-slate-300 cursor-default opacity-50 bg-white border-slate-200' : 'text-slate-600 bg-white border-slate-200 cursor-pointer hover:bg-slate-50'
-            }`}>&rsaquo;</button>
-          <button onClick={() => goToPage(totalPages)} disabled={currentPage === totalPages}
-            className={`inline-flex items-center justify-center min-w-[36px] h-9 px-2 text-sm font-medium rounded-md border transition-all ${
-              currentPage === totalPages ? 'text-slate-300 cursor-default opacity-50 bg-white border-slate-200' : 'text-slate-600 bg-white border-slate-200 cursor-pointer hover:bg-slate-50'
-            }`}>&raquo;</button>
-        </div>
-      )}
+      {/* Pagination — WO-O4O-FORUM-LIST-PAGINATION-UNIFY-V1: 공통 HubPagination */}
+      <div className="py-6">
+        <HubPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={goToPage}
+          showFirstLast
+          showPageInfo={false}
+          align="center"
+          bordered={false}
+          accentColor="var(--color-primary)"
+        />
+      </div>
       </PageContainer>
     </PageSection>
   );

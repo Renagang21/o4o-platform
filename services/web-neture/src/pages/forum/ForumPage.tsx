@@ -7,11 +7,11 @@
  * 검색 + 카테고리/유형 필터 + 정렬
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { PageSection, PageContainer } from '@o4o/ui';
-// WO-O4O-FORUM-LIST-SHARED-PRIMITIVES-V1: 공통 상대시간 유틸
-import { formatForumDate as formatDate } from '@o4o/shared-space-ui';
+// WO-O4O-FORUM-LIST-SHARED-PRIMITIVES-V1 / WO-O4O-FORUM-LIST-PAGINATION-UNIFY-V1: 공통 유틸·페이지네이션
+import { formatForumDate as formatDate, HubPagination } from '@o4o/shared-space-ui';
 import {
   fetchForumPosts,
   fetchPinnedPosts,
@@ -206,15 +206,6 @@ export function ForumPage({ boardSlug, title: customTitle, description: customDe
   };
 
   // Pagination range
-  const pageNumbers = useMemo(() => {
-    const pages: number[] = [];
-    const maxVisible = 5;
-    let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
-    const end = Math.min(totalPages, start + maxVisible - 1);
-    if (end - start + 1 < maxVisible) start = Math.max(1, end - maxVisible + 1);
-    for (let i = start; i <= end; i++) pages.push(i);
-    return pages;
-  }, [currentPage, totalPages]);
 
   return (
     <PageSection last>
@@ -415,38 +406,19 @@ export function ForumPage({ boardSlug, title: customTitle, description: customDe
             </table>
           </div>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div style={s.pagination}>
-              <button
-                onClick={() => goToPage(1)}
-                disabled={currentPage === 1}
-                style={{ ...s.pageBtn, ...(currentPage === 1 ? s.pageBtnDisabled : {}) }}
-              >«</button>
-              <button
-                onClick={() => goToPage(currentPage - 1)}
-                disabled={currentPage === 1}
-                style={{ ...s.pageBtn, ...(currentPage === 1 ? s.pageBtnDisabled : {}) }}
-              >‹</button>
-              {pageNumbers.map(p => (
-                <button
-                  key={p}
-                  onClick={() => goToPage(p)}
-                  style={{ ...s.pageBtn, ...(p === currentPage ? s.pageBtnActive : {}) }}
-                >{p}</button>
-              ))}
-              <button
-                onClick={() => goToPage(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                style={{ ...s.pageBtn, ...(currentPage === totalPages ? s.pageBtnDisabled : {}) }}
-              >›</button>
-              <button
-                onClick={() => goToPage(totalPages)}
-                disabled={currentPage === totalPages}
-                style={{ ...s.pageBtn, ...(currentPage === totalPages ? s.pageBtnDisabled : {}) }}
-              >»</button>
-            </div>
-          )}
+          {/* Pagination — WO-O4O-FORUM-LIST-PAGINATION-UNIFY-V1: 공통 HubPagination */}
+          <div style={s.pagination}>
+            <HubPagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={goToPage}
+              showFirstLast
+              showPageInfo={false}
+              align="center"
+              bordered={false}
+              accentColor={PRIMARY}
+            />
+          </div>
         </>
       )}
 
@@ -560,19 +532,6 @@ const s: Record<string, React.CSSProperties> = {
   pagination: {
     display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '4px',
     padding: '24px 0',
-  },
-  pageBtn: {
-    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-    minWidth: '36px', height: '36px', padding: '0 8px',
-    fontSize: '14px', fontWeight: 500, color: '#475569',
-    backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '6px',
-    cursor: 'pointer', transition: 'all 0.15s',
-  } as React.CSSProperties,
-  pageBtnActive: {
-    backgroundColor: PRIMARY, color: '#fff', borderColor: PRIMARY,
-  },
-  pageBtnDisabled: {
-    color: '#cbd5e1', cursor: 'default', opacity: 0.5,
   },
 
   // Empty

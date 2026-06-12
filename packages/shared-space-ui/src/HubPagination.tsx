@@ -18,6 +18,26 @@ export interface HubPaginationProps {
   /** 페이지 정보 텍스트 표시 여부 (기본 true) */
   showPageInfo?: boolean;
   disabled?: boolean;
+  /**
+   * WO-O4O-FORUM-LIST-PAGINATION-UNIFY-V1
+   * 처음/마지막(« ») 버튼 표시 (기본 false — 기존 HUB 소비처 무변경).
+   */
+  showFirstLast?: boolean;
+  /**
+   * WO-O4O-FORUM-LIST-PAGINATION-UNIFY-V1
+   * 현재 페이지 강조 색 (CSS color, 예: 'var(--color-primary)'). 미지정 시 기본 파랑(#2563EB) 유지.
+   */
+  accentColor?: string;
+  /**
+   * WO-O4O-FORUM-LIST-PAGINATION-UNIFY-V1
+   * 정렬: 'between'(기본 — 페이지정보 좌/버튼 우, HUB 푸터) | 'center'(가운데 정렬).
+   */
+  align?: 'between' | 'center';
+  /**
+   * WO-O4O-FORUM-LIST-PAGINATION-UNIFY-V1
+   * 상단 구분선 표시 (기본 true — 기존 HUB 소비처 무변경).
+   */
+  bordered?: boolean;
 }
 
 export function HubPagination({
@@ -26,20 +46,40 @@ export function HubPagination({
   onPageChange,
   showPageInfo = true,
   disabled = false,
+  showFirstLast = false,
+  accentColor,
+  align = 'between',
+  bordered = true,
 }: HubPaginationProps) {
   if (totalPages <= 1) return null;
 
   const pages = buildPageNumbers(currentPage, totalPages);
 
+  const wrapperStyle: React.CSSProperties = {
+    ...st.wrapper,
+    ...(align === 'center' ? { justifyContent: 'center' } : {}),
+    ...(bordered ? {} : { borderTop: 'none' }),
+  };
+
   return (
-    <div style={st.wrapper}>
+    <div style={wrapperStyle}>
       {showPageInfo && (
         <span style={st.pageInfo}>{currentPage} / {totalPages} 페이지</span>
       )}
       <div style={st.buttons}>
+        {showFirstLast && (
+          <PgButton
+            onClick={() => onPageChange(1)}
+            disabled={disabled || currentPage === 1}
+            ariaLabel="처음 페이지"
+          >
+            &laquo;
+          </PgButton>
+        )}
         <PgButton
           onClick={() => onPageChange(Math.max(1, currentPage - 1))}
           disabled={disabled || currentPage === 1}
+          ariaLabel="이전 페이지"
         >
           &lsaquo;
         </PgButton>
@@ -48,6 +88,7 @@ export function HubPagination({
             key={p}
             onClick={() => onPageChange(p)}
             active={p === currentPage}
+            accentColor={accentColor}
             disabled={disabled}
           >
             {p}
@@ -56,9 +97,19 @@ export function HubPagination({
         <PgButton
           onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
           disabled={disabled || currentPage === totalPages}
+          ariaLabel="다음 페이지"
         >
           &rsaquo;
         </PgButton>
+        {showFirstLast && (
+          <PgButton
+            onClick={() => onPageChange(totalPages)}
+            disabled={disabled || currentPage === totalPages}
+            ariaLabel="마지막 페이지"
+          >
+            &raquo;
+          </PgButton>
+        )}
       </div>
     </div>
   );
@@ -66,16 +117,27 @@ export function HubPagination({
 
 // ─── Internal ────────────────────────────────────────────────────────────────
 
-function PgButton({ onClick, disabled, active, children }: {
-  onClick: () => void; disabled?: boolean; active?: boolean; children: React.ReactNode;
+function PgButton({ onClick, disabled, active, accentColor, ariaLabel, children }: {
+  onClick: () => void;
+  disabled?: boolean;
+  active?: boolean;
+  accentColor?: string;
+  ariaLabel?: string;
+  children: React.ReactNode;
 }) {
+  const activeStyle: React.CSSProperties = active
+    ? (accentColor
+        ? { backgroundColor: accentColor, color: WHITE, borderColor: accentColor }
+        : st.btnActive)
+    : {};
   return (
     <button
       onClick={onClick}
       disabled={disabled}
+      aria-label={ariaLabel}
       style={{
         ...st.btn,
-        ...(active ? st.btnActive : {}),
+        ...activeStyle,
         ...(disabled ? st.btnDisabled : {}),
       }}
     >
