@@ -13,6 +13,10 @@ export { O4OHelpSection } from './O4OHelpSection';
 export { SignagePreviewSection } from './SignagePreviewSection';
 export { ContentHighlightSection } from './ContentHighlightSection';
 
+// WO-O4O-CROSSSERVICE-POLICY-ROUTES-V1: 공개 정책 문서(약관/개인정보) 뷰어
+export { PolicyDocumentViewer } from './legal/PolicyDocumentViewer';
+export type { PolicyDocumentViewerProps, PolicyDocumentDto } from './legal/PolicyDocumentViewer';
+
 /* HUB common components */
 export { HubPagination } from './HubPagination';
 export type { HubPaginationProps } from './HubPagination';
