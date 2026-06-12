@@ -64,18 +64,29 @@ GP/KCos 의 공개 문의가 화면 제출(mailto/정적)에서 끝나지 않고
 - **제외**(후속 `WO-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1`). entity 에 handled_*/internal_note 필드만 미리 둠(nullable).
 
 ## 13. 테스트 문의 생성 여부
-- (배포 후 smoke 시 기재)
+- smoke 로 **GP/KCos 각 1건의 [SMOKE] 테스트 문의**(email `smoke-test@example.com`, 제목 `[SMOKE] … 문의 접수+알림 검증`) 생성됨.
+  status='received'. **삭제 endpoint 미존재(Admin UI 후속)** — 명확히 [SMOKE] 표기. 후속 Admin 관리 WO 에서 정리 가능.
+  honeypot/validation smoke 는 미저장(실데이터 0).
 
 ## 14. 검증 결과
 - tsc: api-server 0 / web-glycopharm 0 / web-k-cosmetics 0 ✅
 - build: web-glycopharm 0 / web-k-cosmetics 0 ✅
-- migration: additive(배포 시 CI/CD 자동) — 실행 검증은 배포 후.
+- **배포**: Deploy API Server (Cloud Run) success + Deploy Web Services success → migration 자동 실행됨.
+- **public API smoke (no-write)**: unknown serviceKey→`404 UNKNOWN_SERVICE` · 동의 누락→`400 PRIVACY_CONSENT_REQUIRED` ·
+  잘못된 이메일→`400 INVALID_EMAIL` · honeypot 채움→`201 {id:null}`(미저장) ✅
 
-## 15. 브라우저 smoke 결과
-- (배포 후 갱신)
+## 15. 브라우저 smoke 결과 (프로덕션 end-to-end)
+| 서비스 | 결과 |
+|--------|------|
+| **GlycoPharm** | `/contact` 폼 렌더(유형/필드/약국명/동의+/privacy/honeypot) → [SMOKE] 제출 → "문의가 접수되었습니다." → GP admin 로그인 → 알림벨 "새 문의가 접수되었습니다 / [서비스 이용 문의] [SMOKE] GP …" ✅ |
+| **K-Cosmetics** | `/contact` 폼 렌더(매장명 라벨, **하드코딩 사업자번호 카드 제거 확인**) → [SMOKE] 제출 → 성공 → KCos admin 로그인 → 알림벨 "새 문의가 접수되었습니다 / [서비스 이용 문의] [SMOKE] KCos …" ✅ |
+- serviceKey 'k-cosmetics'→'cosmetics' role broadcast 정상(KCos admin 에게 알림 도달). 접수 저장 + 운영자 in-app 알림 end-to-end 확인.
 
 ## 16. commit hash
-- (커밋 후 기재)
+- 구현 + CHECK: `9acfbb58c` (api-server + web deploy success)
+- CHECK smoke 반영: (본 커밋)
+- 동시 세션 혼입 방지: `git commit -- <10 명시 경로>` 로 커밋, shared-space-ui/index.ts 의 타 세션 `formatForumDate` export 는
+  커밋 전 임시 제거 → 내 export 만 커밋 → 복원(타 세션 WIP 보존). connection.ts diff 도 내 ContactInquiry 추가만 확인.
 
 ---
 
