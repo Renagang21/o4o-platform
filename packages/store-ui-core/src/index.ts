@@ -70,6 +70,10 @@ export type { BuyerCheckoutTone, BuyerCheckoutStatusDisplay } from './utils/buye
 export { BuyerOrderStatusBadge } from './components/buyer-orders/BuyerOrderStatusBadge';
 export type { BuyerOrderStatusBadgeProps } from './components/buyer-orders/BuyerOrderStatusBadge';
 
+// 매장 취급 상품(local-products) 공통 presentation (WO-O4O-MY-STORE-LOCAL-PRODUCTS-COMMON-COMPONENT-EXTRACTION-V1)
+export { LocalProductBadge, LOCAL_PRODUCT_BADGE_OPTIONS } from './components/local-products/LocalProductBadge';
+export type { LocalProductBadgeProps, LocalProductBadgeOption, LocalProductBadgeType } from './components/local-products/LocalProductBadge';
+
 // Shared Production Modal (WO-O4O-START-PRODUCTION-MODAL-SHARED-COMPONENT-PHASE2-H-V1)
 export { StartProductionModal } from './components/StartProductionModal';
 export type { StartProductionModalProps, StartProductionTargetConfig, StartProductionTemplateItem } from './components/StartProductionModal';

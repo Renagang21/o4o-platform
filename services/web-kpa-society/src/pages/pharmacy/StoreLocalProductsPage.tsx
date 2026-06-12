@@ -24,15 +24,10 @@ import {
 import type { LocalProduct, LocalProductInput, BadgeType } from '../../api/localProducts';
 // WO-KPA-STORE-LOCAL-PRODUCT-RICHTEXT-INTEGRATION-V1: AI 정리 기능 활성화
 import { RichTextEditor } from '@o4o/content-editor';
+// WO-O4O-MY-STORE-LOCAL-PRODUCTS-COMMON-COMPONENT-EXTRACTION-V1: 공통 배지/옵션
+import { LOCAL_PRODUCT_BADGE_OPTIONS as BADGE_OPTIONS, LocalProductBadge } from '@o4o/store-ui-core';
 
 // ==================== Constants ====================
-
-const BADGE_OPTIONS: { value: BadgeType; label: string; color: string }[] = [
-  { value: 'none', label: '없음', color: 'bg-slate-100 text-slate-600' },
-  { value: 'new', label: 'NEW', color: 'bg-blue-100 text-blue-700' },
-  { value: 'recommend', label: '추천', color: 'bg-green-100 text-green-700' },
-  { value: 'event', label: '이벤트', color: 'bg-orange-100 text-orange-700' },
-];
 
 const PAGE_SIZE = 20;
 
@@ -218,16 +213,7 @@ export default function StoreLocalProductsPage() {
       header: 'Badge',
       width: 80,
       align: 'center',
-      render: (_, product) =>
-        product.badge_type !== 'none' ? (
-          <span
-            className={`inline-block px-2 py-0.5 text-xs font-medium rounded-full ${
-              BADGE_OPTIONS.find((b) => b.value === product.badge_type)?.color || ''
-            }`}
-          >
-            {BADGE_OPTIONS.find((b) => b.value === product.badge_type)?.label}
-          </span>
-        ) : null,
+      render: (_, product) => <LocalProductBadge badgeType={product.badge_type} />,
     },
     {
       key: 'is_active',
