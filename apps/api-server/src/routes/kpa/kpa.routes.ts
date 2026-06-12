@@ -209,6 +209,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   router.use('/', createCourseRequestController(dataSource, coreRequireAuth as any, requireKpaScope));
 
   // Forum Requests (WO-O4O-ROUTES-REFACTOR-V1)
+  // @deprecated WO-O4O-FORUM-REQUEST-API-DEDUP-V1 — legacy /kpa/forum-requests/* (kpa_approval_requests).
+  // Canonical is /api/v1/forum/category-requests/* + /api/v1/forum/operator/* (forum_category_requests).
+  // No frontend caller; retained for back-compat. Route retirement deferred to follow-up WO.
   router.use('/', createForumRequestController(dataSource, coreRequireAuth as any, requireKpaScope));
 
   // Community Hub — Ads/Sponsors (WO-KPA-A-COMMUNITY-HUB-IMPLEMENTATION-V1)

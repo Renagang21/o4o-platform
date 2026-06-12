@@ -3,6 +3,17 @@
  *
  * WO-O4O-ROUTES-REFACTOR-V1: Extracted from kpa.routes.ts (F1-F8)
  * 포럼 카테고리 요청 생성/조회/승인/거절/보완요청
+ *
+ * @deprecated WO-O4O-FORUM-REQUEST-API-DEDUP-V1 — Mounted at /api/v1/kpa/forum-requests/*
+ * and /api/v1/kpa/branches/:branchId/forum-requests/*, this controller stores requests in
+ * `kpa_approval_requests` (entity_type='forum_category') via the KPA-local ForumRequestService.
+ * It is SUPERSEDED by the canonical cross-service request API:
+ *   - User:     /api/v1/forum/category-requests/*        (forum-category-request.routes.ts)
+ *   - Operator: /api/v1/forum/operator/requests*         (operator-forum.routes.ts)
+ * both backed by the shared services/forum/ForumRequestService → `forum_category_requests` (SSOT).
+ * No frontend (services/web-*) calls these legacy routes; the KPA frontend uses the canonical API
+ * (serviceCode='kpa-society'). Routes are RETAINED (not removed) for back-compat / branch-scoped
+ * approval capability; route retirement is deferred to a follow-up WO. Do not add new callers.
  */
 
 import { Router, Request, Response, RequestHandler } from 'express';
