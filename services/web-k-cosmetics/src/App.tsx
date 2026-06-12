@@ -191,6 +191,8 @@ const OperatorSettingsPage = lazy(() => import('@/pages/operator/SettingsPage'))
 const ServiceLegalSettingsPage = lazy(() => import('@/pages/admin/ServiceLegalSettingsPage'));
 // WO-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1
 const ContactInquiriesPage = lazy(() => import('@/pages/admin/ContactInquiriesPage'));
+// WO-O4O-SERVICE-CONTACT-SETTINGS-ADMIN-V1
+const ServiceContactSettingsPage = lazy(() => import('@/pages/admin/ServiceContactSettingsPage'));
 const OperatorRoleManagementPage = lazy(() => import('@/pages/operator/RoleManagementPage'));
 const OperatorAiReportPage = lazy(() => import('@/pages/operator/AiReportPage'));
 const StoreCockpitPage = lazy(() => import('@/pages/operator/StoreCockpitPage'));
@@ -620,6 +622,8 @@ function AppRoutes() {
         <Route path="settings/legal-terms" element={<ServiceLegalSettingsPage />} />
         {/* WO-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1 */}
         <Route path="contact-inquiries" element={<ContactInquiriesPage />} />
+        {/* WO-O4O-SERVICE-CONTACT-SETTINGS-ADMIN-V1 */}
+        <Route path="settings/contact" element={<ServiceContactSettingsPage />} />
         {/* 역할 관리 (WO-O4O-ROLE-MANAGEMENT-UI-V1) */}
         <Route path="roles" element={<OperatorRoleManagementPage />} />
       </Route>

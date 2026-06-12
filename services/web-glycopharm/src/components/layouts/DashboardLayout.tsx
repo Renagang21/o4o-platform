@@ -71,6 +71,8 @@ const roleConfig: Record<string, RoleConfig> = {
         { label: '법정정보·약관 설정', path: '/admin/settings/legal-terms' },
         // WO-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1
         { label: '문의 관리', path: '/admin/contact-inquiries' },
+        // WO-O4O-SERVICE-CONTACT-SETTINGS-ADMIN-V1
+        { label: '문의 설정', path: '/admin/settings/contact' },
       ]},
     ],
   },

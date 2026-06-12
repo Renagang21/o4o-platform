@@ -206,6 +206,8 @@ import { ServicePolicyDocument } from '../modules/service-legal/entities/Service
 
 // CONTACT INQUIRY ENTITY (WO-O4O-CONTACT-DELIVERY-AND-NOTIFICATION-V1)
 import { ContactInquiry } from '../modules/contact-inquiry/entities/ContactInquiry.entity.js';
+// SERVICE CONTACT SETTINGS ENTITY (WO-O4O-SERVICE-CONTACT-SETTINGS-ADMIN-V1)
+import { ServiceContactSettings } from '../modules/contact-inquiry/entities/ServiceContactSettings.entity.js';
 
 // ============================================================================
 // PLATFORM STORE IDENTITY ENTITIES (WO-CORE-STORE-SLUG-SYSTEM-V1)
@@ -753,6 +755,8 @@ export const AppDataSource = new DataSource({
     ServicePolicyDocument,
     // CONTACT INQUIRY (WO-O4O-CONTACT-DELIVERY-AND-NOTIFICATION-V1)
     ContactInquiry,
+    // SERVICE CONTACT SETTINGS (WO-O4O-SERVICE-CONTACT-SETTINGS-ADMIN-V1)
+    ServiceContactSettings,
     // ============================================================================
     // PLATFORM STORE IDENTITY ENTITIES (WO-CORE-STORE-SLUG-SYSTEM-V1)
     // ============================================================================
