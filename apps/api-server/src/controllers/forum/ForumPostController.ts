@@ -4,6 +4,8 @@ import { PostStatus } from '@o4o/forum-core/entities';
 import { normalizeContent, blocksToText, normalizeMetadata } from '@o4o/forum-core';
 import logger from '../../utils/logger.js';
 import { ForumControllerBase } from './ForumControllerBase.js';
+// WO-O4O-FORUM-AUTHOR-PII-GUARD-V1 (S2): author-or-platform-admin edit/delete check
+import { isPlatformAdmin } from '../../utils/role.utils.js';
 
 /**
  * ForumPostController
@@ -323,7 +325,7 @@ export class ForumPostController extends ForumControllerBase {
     try {
       const { id } = req.params;
       const userId = (req as any).user?.id;
-      const userRole = (req as any).user?.roles?.[0] || 'user'; // Phase3-D
+      const userRoles: string[] = (req as any).user?.roles || []; // WO-O4O-FORUM-AUTHOR-PII-GUARD-V1
 
       if (!userId) {
         res.status(401).json({
@@ -342,8 +344,10 @@ export class ForumPostController extends ForumControllerBase {
         return;
       }
 
-      // Check permission
-      if (!['admin', 'manager'].includes(userRole) && post.authorId !== userId) {
+      // Check permission — WO-O4O-FORUM-AUTHOR-PII-GUARD-V1 (S2)
+      // Author-only self-service; platform admin/super_admin retained as governance override.
+      // Service operator moderation is handled via dedicated /forum/operator/* endpoints.
+      if (post.authorId !== userId && !isPlatformAdmin(userRoles)) {
         res.status(403).json({
           success: false,
           error: 'Permission denied',
@@ -419,7 +423,7 @@ export class ForumPostController extends ForumControllerBase {
     try {
       const { id } = req.params;
       const userId = (req as any).user?.id;
-      const userRole = (req as any).user?.roles?.[0] || 'user'; // Phase3-D
+      const userRoles: string[] = (req as any).user?.roles || []; // WO-O4O-FORUM-AUTHOR-PII-GUARD-V1
 
       if (!userId) {
         res.status(401).json({
@@ -438,8 +442,10 @@ export class ForumPostController extends ForumControllerBase {
         return;
       }
 
-      // Check permission
-      if (!['admin', 'manager'].includes(userRole) && post.authorId !== userId) {
+      // Check permission — WO-O4O-FORUM-AUTHOR-PII-GUARD-V1 (S2)
+      // Author-only self-service; platform admin/super_admin retained as governance override.
+      // Service operator moderation is handled via dedicated /forum/operator/* endpoints.
+      if (post.authorId !== userId && !isPlatformAdmin(userRoles)) {
         res.status(403).json({
           success: false,
           error: 'Permission denied',

@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { CommentStatus } from '@o4o/forum-core/entities';
 import logger from '../../utils/logger.js';
 import { ForumControllerBase } from './ForumControllerBase.js';
+// WO-O4O-FORUM-AUTHOR-PII-GUARD-V1 (S2): author-or-platform-admin edit/delete check
+import { isPlatformAdmin } from '../../utils/role.utils.js';
 
 /**
  * ForumCommentController
@@ -189,7 +191,7 @@ export class ForumCommentController extends ForumControllerBase {
   async updateComment(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user?.id;
-      const userRole = (req as any).user?.roles?.[0] || 'user'; // Phase3-D
+      const userRoles: string[] = (req as any).user?.roles || []; // WO-O4O-FORUM-AUTHOR-PII-GUARD-V1
       if (!userId) {
         res.status(401).json({ success: false, error: 'Unauthorized' });
         return;
@@ -213,8 +215,8 @@ export class ForumCommentController extends ForumControllerBase {
         return;
       }
 
-      // Author or admin/manager can edit
-      if (!['admin', 'manager'].includes(userRole) && comment.authorId !== userId) {
+      // WO-O4O-FORUM-AUTHOR-PII-GUARD-V1 (S2): author-only; platform admin governance override
+      if (comment.authorId !== userId && !isPlatformAdmin(userRoles)) {
         res.status(403).json({ success: false, error: 'Permission denied' });
         return;
       }
@@ -245,7 +247,7 @@ export class ForumCommentController extends ForumControllerBase {
   async deleteComment(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user?.id;
-      const userRole = (req as any).user?.roles?.[0] || 'user'; // Phase3-D
+      const userRoles: string[] = (req as any).user?.roles || []; // WO-O4O-FORUM-AUTHOR-PII-GUARD-V1
       if (!userId) {
         res.status(401).json({ success: false, error: 'Unauthorized' });
         return;
@@ -259,7 +261,8 @@ export class ForumCommentController extends ForumControllerBase {
         return;
       }
 
-      if (!['admin', 'manager'].includes(userRole) && comment.authorId !== userId) {
+      // WO-O4O-FORUM-AUTHOR-PII-GUARD-V1 (S2): author-only; platform admin governance override
+      if (comment.authorId !== userId && !isPlatformAdmin(userRoles)) {
         res.status(403).json({ success: false, error: 'Permission denied' });
         return;
       }

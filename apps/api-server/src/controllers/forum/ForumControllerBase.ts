@@ -7,6 +7,10 @@ import { ForumComment } from '@o4o/forum-core/entities';
 import { User } from '../../modules/auth/entities/User.js';
 import type { SelectQueryBuilder } from 'typeorm';
 import type { ForumContext } from '../../middleware/forum-context.middleware.js';
+// WO-O4O-FORUM-AUTHOR-PII-GUARD-V1: service-aware closed-forum bypass
+import { resolveRolePrefixFromCanonicalServiceKey } from '@o4o/security-core';
+import { isPlatformAdmin, isServiceOperator } from '../../utils/role.utils.js';
+import type { ServiceKey } from '../../types/roles.js';
 
 /**
  * ForumControllerBase
@@ -115,8 +119,9 @@ export class ForumControllerBase {
     userRoles: string[],
   ): Promise<{ allowed: boolean; forumType?: string }> {
     // WO-O4O-FORUM-CATEGORY-CLEANUP-V1: query forum_category_requests (not forum_category)
+    // WO-O4O-FORUM-AUTHOR-PII-GUARD-V1: include service_code for service-scoped bypass
     const [forum] = await AppDataSource.query(
-      `SELECT id, forum_type, requester_id FROM forum_category_requests WHERE id = $1 LIMIT 1`,
+      `SELECT id, forum_type, requester_id, service_code FROM forum_category_requests WHERE id = $1 LIMIT 1`,
       [forumId],
     );
     if (!forum) return { allowed: true }; // 404 handled by caller
@@ -124,9 +129,16 @@ export class ForumControllerBase {
       return { allowed: true, forumType: forum.forum_type };
     }
 
-    // Admin / operator bypass
-    const BYPASS_ROLES = ['kpa:admin', 'kpa:operator', 'platform:admin', 'platform:super_admin'];
-    if (userRoles.some((r) => BYPASS_ROLES.includes(r))) {
+    // Admin / operator bypass — WO-O4O-FORUM-AUTHOR-PII-GUARD-V1 (S3)
+    // Platform admin/super_admin bypass globally; service operators/admins bypass
+    // ONLY for closed forums belonging to their own service (no cross-service bypass).
+    const rolePrefix = forum.service_code
+      ? resolveRolePrefixFromCanonicalServiceKey(forum.service_code)
+      : null;
+    const bypass =
+      isPlatformAdmin(userRoles) ||
+      (rolePrefix ? isServiceOperator(userRoles, rolePrefix as ServiceKey) : false);
+    if (bypass) {
       return { allowed: true, forumType: 'closed' };
     }
 
@@ -164,6 +176,14 @@ export class ForumControllerBase {
     'provider_id',
     'approvedAt',
     'approvedBy',
+    // WO-O4O-FORUM-AUTHOR-PII-GUARD-V1 (S1): strip author PII from public forum responses.
+    // Public author display uses name/nickname/avatar only; email/phone/real-name are PII.
+    // Opt-in contact fields (contactEnabled, kakaoOpenChatUrl, kakaoChannelUrl) are retained
+    // because the showContactOnPost feature gates and renders them client-side.
+    'email',
+    'phone',
+    'firstName',
+    'lastName',
   ];
 
   /** Strip sensitive fields from a user object (in-place mutation, safe for serialization) */
