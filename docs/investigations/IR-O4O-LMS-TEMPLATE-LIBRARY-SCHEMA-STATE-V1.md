@@ -12,7 +12,7 @@
 | 컴포넌트 | 상태 | 판정 |
 |----------|------|:---:|
 | **StoreContent / StoreContentBlock / ContentAnalytics** (icc entity) + 그 orphaned migration(Phase1 삭제됨) | live 경로 0(Phase1 후 icc 자체 미마운트 StoreContentService + connection.ts 등록만), kpa_store_contents 로 대체 | **B 제거** (icc 내부 수술, lms-core 무영향) |
-| **lms_template_*** orphaned migration + `Template` entity(icc) + `/lms/templates*` route + lms `TemplateService` | route **마운트됨**·frontend 소비자 **0**·테이블 미적용. operator template/curation 로드맵 가능성 | **C 보류** (로드맵 확인 필요) |
+| **lms_template_*** orphaned migration + `Template` entity(icc) + `/lms/templates*` route + lms `TemplateService` | route **마운트됨**·frontend 소비자 **0**·테이블 미적용. operator template/curation 로드맵 가능성 | **B 제거 (확정)** — product 결정 2026-06-12: 미사용 확정 |
 | **lms_instructor_applications** orphaned migration + `InstructorApplication`(lms-core) | InstructorController **마운트**(apply/applications)이나 frontend 는 `/kpa/qualifications`(별개 live) 사용. 단 동 컨트롤러가 live course/enrollment 도 담당 | **얽힘 → 별도 audit** (clean cleanup 아님) |
 
 > 즉 **store-content/analytics 라인 = 제거 가능**, **template library = 로드맵 결정 보류**, **instructor application = live 컨트롤러와 얽혀 단독 정리 부적합**. 단일 A/B/C 아님 — 라인별로 분리 권고.
@@ -57,7 +57,7 @@ Neture B2B / PaymentCore / o4o_payments / operator_action_dismissals
 
 ## 9. 최종 판정
 1. **store-content/analytics icc 라인 → 제거(B)**. blast radius: icc `entities/store/*`·`entities/analytics/ContentAnalytics`·`services/StoreContentService`·`index.ts initStoreContentService`·`entities/index.ts`·`entities/store/index.ts`·`entities/analytics/index.ts` 배럴 + api-server `connection.ts` 등록. **lms-core 재노출 없음 확인**(Survey/ContentBundle/Course/Lesson 만). Shared Module Change Protocol 적용(icc 소비처 = api-server + lms-core, 후자 무영향).
-2. **template library(lms_template_* + Template entity + /lms/templates + lms TemplateService) → 보류(C)**. operator template/curation 로드맵 사용 여부 **product 결정 필요**. 미사용 확정 시 store/analytics 와 동일 패턴으로 제거.
+2. **template library(lms_template_* + Template entity + /lms/templates + lms TemplateService) → 제거(B, 확정)**. ~~보류(C)~~ → **product 결정(2026-06-12): 미사용 확정**(frontend 0·운영 화면 0·테이블 미적용·활성화 기획 없음). store/analytics 와 동일 패턴으로 함께 제거. lms_template_* orphaned migration(010/011) + Template entity(icc) + lms TemplateService/TemplateController + /lms/templates route 제거. `SeedContentTemplates`(022, seed=E)는 별도 취급.
 3. **lms_instructor_applications → 별도 audit**. InstructorController 가 live course/enrollment 도 담당 → application 부분만 떼는 건 라우트 수술. frontend 는 kpa qualification 사용(중복). 단독 IR(`IR-O4O-LMS-INSTRUCTOR-APPLICATION-STATE-V1`) 권고.
 4. **SeedContentTemplates(022) → E**(seed) 단독 삭제 금지.
 
