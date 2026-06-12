@@ -1074,12 +1074,14 @@ function ParticipantSection({
                             활용 상품 연결됨
                           </span>
                         ) : listingEligible ? (
+                          // WO-O4O-MARKET-TRIAL-CONVERSION-DISABLE-V1: 매장 상품 전환(매장 진열) 신규 실행 중단(Neture-only).
                           <button
                             onClick={() => onCreateListing(p)}
-                            disabled={isCreatingListing}
-                            className="px-2 py-0.5 text-xs text-white bg-indigo-600 rounded hover:bg-indigo-700 disabled:opacity-50"
+                            disabled
+                            title="유통참여형 펀딩은 Neture 전용 — 매장 상품 전환(매장 진열)은 중단되었습니다."
+                            className="px-2 py-0.5 text-xs text-gray-400 bg-gray-100 rounded cursor-not-allowed"
                           >
-                            {isCreatingListing ? '...' : '활용 상품 연결'}
+                            {isCreatingListing ? '...' : '전환 중단'}
                           </button>
                         ) : (
                           <span className="text-xs text-gray-300">-</span>

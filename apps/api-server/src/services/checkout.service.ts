@@ -542,6 +542,13 @@ export const checkoutService = new CheckoutService();
  *   - Notify the trial supplier
  */
 async function tryConnectOrderToTrial(order: CheckoutOrder): Promise<void> {
+  // WO-O4O-MARKET-TRIAL-CONVERSION-DISABLE-V1:
+  // 유통참여형 펀딩 = Neture 전용. Store 주문을 trial 로 역연결해 participant 를
+  // first_order 로 승격하는 흐름은 Store 통합 퍼널이므로 Neture-only 경계 정책에 따라 중단한다.
+  // (일반 checkout 주문 처리에는 영향 없음 — 본 hook 만 no-op.)
+  return;
+
+  // eslint-disable-next-line no-unreachable -- 정책 비활성화. 기존 역연결 로직 보존(정의 재확인 시 참조).
   if (!order.sellerOrganizationId || !order.items?.length) return;
 
   const ds = AppDataSource;

@@ -1099,6 +1099,18 @@ export class MarketTrialOperatorController {
    */
   static async createListingFromParticipant(req: AuthRequest, res: Response) {
     try {
+      // WO-O4O-MARKET-TRIAL-CONVERSION-DISABLE-V1:
+      // 유통참여형 펀딩 = Neture 전용. 참여자(약국) 매장 org 으로의 OPL 전환(매장 진열)은
+      // Store 통합 퍼널이므로 Neture-only 경계 정책에 따라 신규 실행을 중단한다.
+      // (기존 source_type='market_trial' OPL 데이터는 본 변경에서 건드리지 않는다.)
+      return res.status(409).json({
+        success: false,
+        error: 'Market Trial listing conversion is disabled by Neture-only boundary policy.',
+        message: '유통참여형 펀딩은 Neture 전용 참여/정산 기능이며, 매장 상품 전환(매장 진열)은 중단되었습니다.',
+        code: 'MARKET_TRIAL_CONVERSION_DISABLED',
+      });
+
+      // eslint-disable-next-line no-unreachable -- 정책 비활성화. 기존 로직 보존(추후 정의 재확인 시 참조).
       const { id, participantId } = req.params;
       const { price } = req.body;
       const ds = MarketTrialOperatorController.dataSource!;
