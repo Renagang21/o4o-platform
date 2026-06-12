@@ -64,11 +64,20 @@
 - tsc: web-glycopharm 0 / web-k-cosmetics 0 ✅ (공통 viewer 소스 포함)
 - build: web-glycopharm 0 / web-k-cosmetics 0 ✅
 
-## 16. 브라우저 smoke 결과
-- (배포 후 갱신)
+## 16. 브라우저 smoke 결과 (프로덕션, 로그아웃 공개 접근)
+| URL | 결과 |
+|-----|------|
+| glycopharm.co.kr/terms | "이용약관" + "현재 공개된 문서가 없습니다." (placeholder 없음, GP 레이아웃 정상). API `/public/services/glycopharm/policies/terms` 404→empty ✅ |
+| glycopharm.co.kr/privacy | "개인정보처리방침" + empty state ✅ |
+| k-cosmetics.site/terms | "이용약관" + empty state, KCos 레이아웃 정상. `/public/services/k-cosmetics/policies/terms` 404→empty ✅ |
+| k-cosmetics.site/privacy | "개인정보처리방침" + empty state ✅ |
+| neture.co.kr/terms | 기존 CMS LegalPage 그대로 렌더("이용약관") — **변경 없음, 정상 유지** ✅ |
+| KPA | 기존 `/policy`·`/privacy`(localStorage) 미접촉(제외) |
+- 미게시 상태에서 가짜 약관/placeholder 노출 0. published 문서가 입력되면 자동 표시(viewer 가 API content 렌더).
 
 ## 17. commit hash
-- (커밋 후 기재)
+- 구현 + CHECK: `b26c61807`
+- CHECK smoke 반영: (본 커밋)
 
 ---
 
