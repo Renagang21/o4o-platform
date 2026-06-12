@@ -869,9 +869,9 @@ export function LmsLessonPage() {
               <strong>{course?.title}</strong>의 모든 단계를 완료했습니다.<br />
               수료증이 발급되었습니다.
             </p>
-            <div style={{ marginBottom: '16px', padding: '10px 16px', backgroundColor: '#fefce8', border: '1px solid #fde047', borderRadius: '8px', fontSize: '14px', color: '#854d0e', textAlign: 'center' as const }}>
-              ⭐ +50 크레딧이 적립되었습니다
-            </div>
+            {/* WO-O4O-LMS-COMPLETION-REWARD-POLICY-SEPARATION-V1:
+                reward 는 강사/운영자가 설정한 경우에만 지급되므로 수료 시 고정 크레딧 적립 문구를 노출하지 않는다.
+                (지급된 크레딧은 레슨/퀴즈 단계의 동적 안내로만 표시) */}
             {/* WO-KPA-LMS-UX-QUICK-WINS-V1: 수료 CTA 정리 */}
             <div style={styles.modalActions}>
               <Link

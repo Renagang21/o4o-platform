@@ -12,6 +12,10 @@ import logger from '../../../utils/logger.js';
 import { CompletionService } from './CompletionService.js';
 // WO-O4O-LMS-COURSE-REAPPROVAL-FLOW-V1
 import { CourseService } from './CourseService.js';
+// WO-O4O-LMS-COMPLETION-REWARD-POLICY-SEPARATION-V1: reward 는 정책 설정 시에만 지급
+import { CreditSourceType } from '../../credit/entities/CreditTransaction.js';
+import { CREDIT_DESCRIPTIONS } from '../../credit/credit-constants.js';
+import { resolveRewardAmount, grantRewardIfConfigured } from './RewardPolicyService.js';
 
 /**
  * AssignmentService
@@ -293,6 +297,12 @@ export class AssignmentService {
     progress.attempts = (progress.attempts || 0) + 1;
     await this.progressRepository.save(progress);
 
+    // WO-O4O-LMS-COMPLETION-REWARD-POLICY-SEPARATION-V1: UI 체크표시용 completedLessonIds 미러 동기화
+    const mirrorIds: string[] = enrollment.metadata?.completedLessonIds || [];
+    if (!mirrorIds.includes(lessonId)) {
+      enrollment.metadata = { ...(enrollment.metadata || {}), completedLessonIds: [...mirrorIds, lessonId] };
+    }
+
     const completedCount = await this.progressRepository.count({
       where: { enrollmentId: enrollment.id, status: ProgressStatus.COMPLETED },
     });
@@ -301,6 +311,25 @@ export class AssignmentService {
     });
 
     enrollment.updateProgress(completedCount, totalLessons);
+
+    // WO-O4O-LMS-COMPLETION-REWARD-POLICY-SEPARATION-V1:
+    // reward 정책 해석을 위한 course/lesson 컨텍스트(serviceKey 포함). reward 는 정책 설정 시에만 지급.
+    const assignmentCourse: any = await CourseService.getInstance().getCourse(courseId);
+    const assignmentServiceKey: string = assignmentCourse?.serviceKey ?? 'kpa-society';
+    const assignmentLesson = await this.lessonRepository.findOne({ where: { id: lessonId } });
+
+    // lesson_complete reward (정책 설정 시에만)
+    const lessonCompleteAmount = resolveRewardAmount('lesson_complete', { lesson: assignmentLesson, course: assignmentCourse });
+    await grantRewardIfConfigured({
+      event: 'lesson_complete',
+      amount: lessonCompleteAmount,
+      userId,
+      sourceType: CreditSourceType.LESSON_COMPLETE,
+      sourceId: lessonId,
+      referenceKey: `lesson_complete:${userId}:${lessonId}`,
+      description: CREDIT_DESCRIPTIONS.LESSON_COMPLETE,
+      serviceKey: assignmentServiceKey,
+    });
 
     if (completedCount >= totalLessons && totalLessons > 0) {
       enrollment.complete(enrollment.averageQuizScore ?? undefined);
@@ -314,6 +343,19 @@ export class AssignmentService {
           error: (err as Error).message,
         });
       }
+
+      // course_complete reward (정책 설정 시에만, path-independent — D1 해소)
+      const courseCompleteAmount = resolveRewardAmount('course_complete', { course: assignmentCourse });
+      await grantRewardIfConfigured({
+        event: 'course_complete',
+        amount: courseCompleteAmount,
+        userId,
+        sourceType: CreditSourceType.COURSE_COMPLETE,
+        sourceId: courseId,
+        referenceKey: `course_complete:${userId}:${courseId}`,
+        description: CREDIT_DESCRIPTIONS.COURSE_COMPLETE,
+        serviceKey: assignmentServiceKey,
+      });
     }
 
     await this.enrollmentRepository.save(enrollment);

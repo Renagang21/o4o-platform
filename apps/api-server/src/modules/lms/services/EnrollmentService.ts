@@ -1,11 +1,15 @@
 import { Repository } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
 import { BaseService } from '../../../common/base.service.js';
-import { Enrollment, EnrollmentStatus } from '@o4o/lms-core';
+import { Enrollment, EnrollmentStatus, Progress, ProgressStatus } from '@o4o/lms-core';
 import { CourseService } from './CourseService.js';
 import { CompletionService } from './CompletionService.js';
 import { sanitizeUserFields } from '../utils/sanitize-user.js';
 import logger from '../../../utils/logger.js';
+// WO-O4O-LMS-COMPLETION-REWARD-POLICY-SEPARATION-V1: reward 는 정책 설정 시에만 지급
+import { CreditSourceType } from '../../credit/entities/CreditTransaction.js';
+import { CREDIT_DESCRIPTIONS } from '../../credit/credit-constants.js';
+import { resolveRewardAmount, grantRewardIfConfigured } from './RewardPolicyService.js';
 
 export interface EnrollCourseRequest {
   courseId: string;
@@ -347,5 +351,107 @@ export class EnrollmentService extends BaseService<Enrollment> {
 
     enrollment.addTimeSpent(minutes);
     await this.enrollmentRepository.save(enrollment);
+  }
+
+  /**
+   * WO-O4O-LMS-COMPLETION-REWARD-POLICY-SEPARATION-V1
+   *
+   * video/article 레슨 완료를 **canonical 저장소(lms_progress)** 에 기록한다.
+   * (quiz/assignment 와 동일한 Progress 경로 — 완료 카운트 단일화, metadata.completedLessonIds divergence 해소)
+   *
+   * - Progress upsert → complete (canonical)
+   * - completedLessonIds 미러 동기화 (UI 체크표시 backward-compat)
+   * - 진도 재계산 = Progress COMPLETED 카운트 기준 (3경로 공통)
+   * - reward(lesson_complete / course_complete) 는 **rewardPolicy 설정 시에만** 지급(미설정 → 미지급, 오류 아님)
+   * - reward 실패는 completion 을 rollback 하지 않음
+   * - 마지막 레슨 완료 시 자동 수료(enrollment.complete + Completion + 인증서) 체인
+   *
+   * threshold(video 70% / article 80%·30s) 검증은 호출부(EnrollmentController)에서 이미 통과한 뒤 호출된다.
+   */
+  async recordLessonProgressCompletion(
+    userId: string,
+    courseId: string,
+    lessonId: string,
+  ): Promise<Enrollment | null> {
+    const enrollment = await this.enrollmentRepository.findOne({ where: { userId, courseId } });
+    if (!enrollment) return null;
+
+    const progressRepo = AppDataSource.getRepository(Progress);
+    const lessonRepo = AppDataSource.getRepository('Lesson');
+
+    // canonical: Progress upsert → complete
+    let progress = await progressRepo.findOne({ where: { enrollmentId: enrollment.id, lessonId } });
+    if (!progress) {
+      progress = progressRepo.create({
+        enrollmentId: enrollment.id,
+        lessonId,
+        status: ProgressStatus.IN_PROGRESS,
+        startedAt: new Date(),
+      });
+    }
+    progress.complete();
+    await progressRepo.save(progress);
+
+    // mirror: completedLessonIds (UI 체크표시 backward-compat)
+    const mirrorIds: string[] = enrollment.metadata?.completedLessonIds || [];
+    if (!mirrorIds.includes(lessonId)) {
+      enrollment.metadata = { ...(enrollment.metadata || {}), completedLessonIds: [...mirrorIds, lessonId] };
+    }
+
+    // 진도 재계산 = canonical Progress 카운트 기준 (혼합형 강의에서도 일관)
+    const completedCount = await progressRepo.count({
+      where: { enrollmentId: enrollment.id, status: ProgressStatus.COMPLETED },
+    });
+    const currentTotal = await lessonRepo
+      .createQueryBuilder('lesson')
+      .where('lesson.courseId = :courseId', { courseId })
+      .andWhere('lesson.isPublished = :isPublished', { isPublished: true })
+      .getCount();
+    const totalLessons = currentTotal || enrollment.totalLessons || 1;
+    enrollment.updateProgress(completedCount, totalLessons);
+
+    // reward 컨텍스트 (정책 해석 + serviceKey)
+    const course: any = await this.courseService.getCourse(courseId);
+    const serviceKey: string = course?.serviceKey ?? 'kpa-society';
+    const lesson = await lessonRepo.findOne({ where: { id: lessonId } });
+
+    // lesson_complete reward — 정책 설정 시에만
+    await grantRewardIfConfigured({
+      event: 'lesson_complete',
+      amount: resolveRewardAmount('lesson_complete', { lesson, course }),
+      userId,
+      sourceType: CreditSourceType.LESSON_COMPLETE,
+      sourceId: lessonId,
+      referenceKey: `lesson_complete:${userId}:${lessonId}`,
+      description: CREDIT_DESCRIPTIONS.LESSON_COMPLETE,
+      serviceKey,
+    });
+
+    // 자동 수료 체인 + course_complete reward(path-independent, 정책 설정 시에만)
+    if (completedCount >= totalLessons && totalLessons > 0 && enrollment.status !== EnrollmentStatus.COMPLETED) {
+      enrollment.complete(enrollment.averageQuizScore ?? undefined);
+      try {
+        await CompletionService.getInstance().createCompletion(userId, courseId, enrollment.id);
+      } catch (chainErr) {
+        logger.warn('[LMS] Auto-completion chain error (video/article)', {
+          userId,
+          courseId,
+          error: (chainErr as Error).message,
+        });
+      }
+      await grantRewardIfConfigured({
+        event: 'course_complete',
+        amount: resolveRewardAmount('course_complete', { course }),
+        userId,
+        sourceType: CreditSourceType.COURSE_COMPLETE,
+        sourceId: courseId,
+        referenceKey: `course_complete:${userId}:${courseId}`,
+        description: CREDIT_DESCRIPTIONS.COURSE_COMPLETE,
+        serviceKey,
+      });
+    }
+
+    await this.enrollmentRepository.save(enrollment);
+    return this.getEnrollment(enrollment.id);
   }
 }

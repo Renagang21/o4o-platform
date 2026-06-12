@@ -3,7 +3,6 @@ import { BaseController } from '../../../common/base.controller.js';
 import { EnrollmentService } from '../services/EnrollmentService.js';
 import { AppDataSource } from '../../../database/connection.js';
 import logger from '../../../utils/logger.js';
-import { CompletionService } from '../services/CompletionService.js';
 
 /**
  * EnrollmentController
@@ -317,55 +316,12 @@ export class EnrollmentController extends BaseController {
           }
         }
 
-        // ── 정책 통과 → 기존 완료 처리 흐름 (변경 없음) ──
-        // Track completed lesson IDs in metadata
-        const completedIds: string[] = enrollment.metadata?.completedLessonIds || [];
-        if (!completedIds.includes(lessonId)) {
-          completedIds.push(lessonId);
-          // WO-O4O-LMS-INTEGRITY-PATCH-V1: 레슨 추가/삭제 반영을 위해 현재 시점 공개 레슨 수 동적 조회
-          const currentTotalLessons = await AppDataSource.getRepository('Lesson')
-            .createQueryBuilder('lesson')
-            .where('lesson.courseId = :courseId', { courseId })
-            .andWhere('lesson.isPublished = :isPublished', { isPublished: true })
-            .getCount();
-          const totalLessons = currentTotalLessons || enrollment.totalLessons || 1;
-          const completedLessons = completedIds.length;
-          // WO-LMS-PROGRESS-COMPLETION-AUTO-CHAIN-V1: progressPercentage 자동 계산
-          const progressPercentage = totalLessons > 0
-            ? Math.floor((completedLessons / totalLessons) * 100)
-            : 0;
-          await service.updateEnrollment(enrollment.id, {
-            completedLessons,
-            totalLessons,
-            progressPercentage,
-          });
-          // Save metadata separately via repo.update
-          const repo = (service as any).enrollmentRepository;
-          await repo.update(enrollment.id, {
-            metadata: { ...enrollment.metadata, completedLessonIds: completedIds },
-          });
-
-          // WO-LMS-PROGRESS-COMPLETION-AUTO-CHAIN-V1: 마지막 레슨 완료 시 자동 수료 체인
-          if (completedLessons >= totalLessons && enrollment.status !== 'completed') {
-            try {
-              const completedEnrollment = await service.completeEnrollment(enrollment.id);
-              const completionService = CompletionService.getInstance();
-              await completionService.createCompletion(
-                userId,
-                courseId,
-                completedEnrollment.id,
-              );
-              logger.info('[LMS] Auto-completion chain triggered', { userId, courseId });
-            } catch (chainErr) {
-              // 체인 실패는 진도 저장을 롤백하지 않음 — 로그만 기록
-              logger.warn('[LMS] Auto-completion chain error', {
-                error: (chainErr as Error).message,
-                userId,
-                courseId,
-              });
-            }
-          }
-        }
+        // ── 정책 통과 → 완료 처리 ──
+        // WO-O4O-LMS-COMPLETION-REWARD-POLICY-SEPARATION-V1:
+        // canonical 완료 기록(lms_progress) + completedLessonIds 미러 + 진도 재계산(Progress 카운트)
+        // + 정책 기반 reward(rewardPolicy 미설정 시 미지급) + 자동 수료 체인 — EnrollmentService 로 일원화.
+        // (quiz/assignment 와 동일 canonical 경로 → 완료 카운트 divergence 해소)
+        await service.recordLessonProgressCompletion(userId, courseId, lessonId);
       }
 
       const updated = await service.getEnrollment(enrollment.id);

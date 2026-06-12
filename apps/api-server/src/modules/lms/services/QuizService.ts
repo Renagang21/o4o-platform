@@ -5,10 +5,10 @@ import { Progress, ProgressStatus, Enrollment, EnrollmentStatus } from '@o4o/lms
 import type { QuizQuestion, QuizAnswer } from '@o4o/lms-core';
 import logger from '../../../utils/logger.js';
 // WO-O4O-CREDIT-SYSTEM-V1
-// WO-O4O-POINT-CORE-SEPARATION-V1: CreditService 직접 호출 제거, PointService facade 경유.
-import { PointService } from '../../point/services/PointService.js';
 import { CreditSourceType } from '../../credit/entities/CreditTransaction.js';
-import { CREDIT_REWARDS, CREDIT_DESCRIPTIONS } from '../../credit/credit-constants.js';
+import { CREDIT_DESCRIPTIONS } from '../../credit/credit-constants.js';
+// WO-O4O-LMS-COMPLETION-REWARD-POLICY-SEPARATION-V1: reward 는 정책 설정 시에만 지급
+import { resolveRewardAmount, grantRewardIfConfigured } from './RewardPolicyService.js';
 // WO-O4O-COMPLETION-V1
 import { CompletionService } from './CompletionService.js';
 // WO-O4O-LMS-COURSE-REAPPROVAL-FLOW-V1
@@ -167,26 +167,27 @@ export class QuizService {
     // WO-O4O-LMS-SERVICEKEY-CONTEXT-V1: resolve course.serviceKey to prevent cross-service budget drain
     // null serviceKey = legacy course → fallback to 'kpa-society' for backward compat
     let courseServiceKey: string | null = null;
+    let quizCourse: any = null;
     if (quiz.courseId) {
-      const quizCourse = await CourseService.getInstance().getCourse(quiz.courseId);
+      quizCourse = await CourseService.getInstance().getCourse(quiz.courseId);
       courseServiceKey = quizCourse?.serviceKey ?? null;
     }
+    // WO-O4O-LMS-COMPLETION-REWARD-POLICY-SEPARATION-V1:
+    // quiz_pass reward 는 quiz/course 의 rewardPolicy 가 설정된 경우에만 지급(미설정 → 미지급, 오류 아님).
     let creditsEarned = 0;
     if (passed) {
-      try {
-        const quizCredit = await PointService.getInstance().grantPoint({
-          userId,
-          amount: CREDIT_REWARDS.QUIZ_PASS,
-          sourceType: CreditSourceType.QUIZ_PASS,
-          sourceId: quizId,
-          referenceKey: `quiz_pass:${userId}:${quizId}`,
-          description: CREDIT_DESCRIPTIONS.QUIZ_PASS,
-          serviceKey: courseServiceKey ?? 'kpa-society',
-        });
-        if (quizCredit) creditsEarned += CREDIT_REWARDS.QUIZ_PASS;
-      } catch (creditError) {
-        logger.warn('[Quiz] Point grant failed (quiz_pass)', { quizId, userId, error: (creditError as Error).message });
-      }
+      const quizPassAmount = resolveRewardAmount('quiz_pass', { quiz, course: quizCourse });
+      const granted = await grantRewardIfConfigured({
+        event: 'quiz_pass',
+        amount: quizPassAmount,
+        userId,
+        sourceType: CreditSourceType.QUIZ_PASS,
+        sourceId: quizId,
+        referenceKey: `quiz_pass:${userId}:${quizId}`,
+        description: CREDIT_DESCRIPTIONS.QUIZ_PASS,
+        serviceKey: courseServiceKey ?? 'kpa-society',
+      });
+      if (granted) creditsEarned += quizPassAmount;
     }
 
     logger.info(`[Quiz] Submitted`, {
@@ -292,26 +293,35 @@ export class QuizService {
     progress.attempts = (progress.attempts || 0) + 1;
     await this.progressRepository.save(progress);
 
-    // WO-O4O-CREDIT-SYSTEM-V1 / WO-O4O-POINT-CORE-SEPARATION-V1: 포인트 지급 (PointService facade)
+    // WO-O4O-LMS-COMPLETION-REWARD-POLICY-SEPARATION-V1:
+    // canonical 완료 저장소(lms_progress)와 별개로, UI 체크표시용 completedLessonIds 미러를 동기화한다.
+    const mirrorIds: string[] = enrollment.metadata?.completedLessonIds || [];
+    if (!mirrorIds.includes(lessonId)) {
+      enrollment.metadata = { ...(enrollment.metadata || {}), completedLessonIds: [...mirrorIds, lessonId] };
+    }
+
     // WO-O4O-LMS-SERVICEKEY-CONTEXT-V1: resolve course.serviceKey; null = legacy KPA fallback
     let lessonCourseServiceKey: string | null = null;
+    let lessonCourse: any = null;
     if (courseId) {
-      const lessonCourse = await CourseService.getInstance().getCourse(courseId);
+      lessonCourse = await CourseService.getInstance().getCourse(courseId);
       lessonCourseServiceKey = lessonCourse?.serviceKey ?? null;
     }
-    try {
-      await PointService.getInstance().grantPoint({
-        userId,
-        amount: CREDIT_REWARDS.LESSON_COMPLETE,
-        sourceType: CreditSourceType.LESSON_COMPLETE,
-        sourceId: lessonId,
-        referenceKey: `lesson_complete:${userId}:${lessonId}`,
-        description: CREDIT_DESCRIPTIONS.LESSON_COMPLETE,
-        serviceKey: lessonCourseServiceKey ?? 'kpa-society',
-      });
-    } catch (creditError) {
-      logger.warn('[Quiz] Point grant failed (lesson_complete)', { lessonId, userId, error: (creditError as Error).message });
-    }
+
+    // WO-O4O-LMS-COMPLETION-REWARD-POLICY-SEPARATION-V1:
+    // lesson_complete reward 는 lesson/course 의 rewardPolicy 가 설정된 경우에만 지급(미설정 → 미지급, 오류 아님).
+    const lessonEntity = await this.lessonRepository.findOne({ where: { id: lessonId } });
+    const lessonCompleteAmount = resolveRewardAmount('lesson_complete', { lesson: lessonEntity, course: lessonCourse });
+    await grantRewardIfConfigured({
+      event: 'lesson_complete',
+      amount: lessonCompleteAmount,
+      userId,
+      sourceType: CreditSourceType.LESSON_COMPLETE,
+      sourceId: lessonId,
+      referenceKey: `lesson_complete:${userId}:${lessonId}`,
+      description: CREDIT_DESCRIPTIONS.LESSON_COMPLETE,
+      serviceKey: lessonCourseServiceKey ?? 'kpa-society',
+    });
 
     // Update enrollment progress
     const completedCount = await this.progressRepository.count({
@@ -354,22 +364,21 @@ export class QuizService {
       //   운영자 수동 보상 기능은 현재 단계에서 지원하지 않는다.
       //   승인/감사 정책 확정 전까지 수동 지급 관련 로직/엔드포인트 추가 금지.
       // ────────────────────────────────────────────────────────────────────────────────
-      // WO-O4O-LMS-COURSE-COMPLETE-SERVICEKEY-HOTFIX-V1: dynamic serviceKey resolution
-      // (quiz_pass / lesson_complete 와 동일 패턴, lessonCourseServiceKey 재사용)
-      // null serviceKey = legacy course → fallback to 'kpa-society' for backward compat
-      try {
-        await PointService.getInstance().grantPoint({
-          userId,
-          amount: CREDIT_REWARDS.COURSE_COMPLETE,
-          sourceType: CreditSourceType.COURSE_COMPLETE,
-          sourceId: courseId,
-          referenceKey: `course_complete:${userId}:${courseId}`,
-          description: CREDIT_DESCRIPTIONS.COURSE_COMPLETE,
-          serviceKey: lessonCourseServiceKey ?? 'kpa-society',
-        });
-      } catch (creditError) {
-        logger.warn('[Quiz] Point grant failed (course_complete)', { courseId, userId, error: (creditError as Error).message });
-      }
+      // WO-O4O-LMS-COMPLETION-REWARD-POLICY-SEPARATION-V1:
+      // course_complete reward 는 course 의 rewardPolicy.courseComplete 가 설정된 경우에만 1회 지급.
+      // referenceKey UNIQUE + dedup 으로 재완료 재지급 차단. 미설정 → 미지급(오류 아님).
+      // serviceKey: null = legacy course → fallback 'kpa-society'.
+      const courseCompleteAmount = resolveRewardAmount('course_complete', { course: lessonCourse });
+      await grantRewardIfConfigured({
+        event: 'course_complete',
+        amount: courseCompleteAmount,
+        userId,
+        sourceType: CreditSourceType.COURSE_COMPLETE,
+        sourceId: courseId,
+        referenceKey: `course_complete:${userId}:${courseId}`,
+        description: CREDIT_DESCRIPTIONS.COURSE_COMPLETE,
+        serviceKey: lessonCourseServiceKey ?? 'kpa-society',
+      });
 
       // WO-O4O-COMPLETION-V1: Auto-create completion record + certificate
       try {
