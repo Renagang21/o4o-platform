@@ -25,24 +25,17 @@ import {
   type StoreOrder,
   type StoreOrderDetail,
 } from '@/api/storeOrders';
+// 3서비스 공통 buyer checkout 상태 표시 매핑 (WO-O4O-STORE-CHECKOUT-STATUS-LABEL-ALIGNMENT-V1)
+import {
+  BUYER_CHECKOUT_STATUS_TABS,
+  getBuyerCheckoutStatusDisplay,
+  getBuyerPaymentStatusLabel,
+  BUYER_CHECKOUT_TONE_HEX,
+} from '@o4o/store-ui-core';
 
 const PAGE_SIZE = 20;
 
-const STATUS_TABS = [
-  { key: 'all', label: '전체' },
-  { key: 'created', label: '접수' },
-  { key: 'pending_payment', label: '결제대기' },
-  { key: 'paid', label: '결제완료' },
-  { key: 'cancelled', label: '취소' },
-] as const;
-
-const STATUS_LABEL: Record<string, { label: string; color: string; bg: string }> = {
-  created:         { label: '접수',    color: '#2563EB', bg: '#DBEAFE' },
-  pending_payment: { label: '결제대기', color: '#D97706', bg: '#FEF3C7' },
-  paid:            { label: '결제완료', color: '#059669', bg: '#D1FAE5' },
-  cancelled:       { label: '취소',    color: '#DC2626', bg: '#FEE2E2' },
-  refunded:        { label: '환불',    color: '#6B7280', bg: '#F3F4F6' },
-};
+const STATUS_TABS = BUYER_CHECKOUT_STATUS_TABS;
 
 const CHANNEL_LABEL: Record<string, string> = {
   local:  '매장',
@@ -206,11 +199,9 @@ export default function StoreOrdersPage() {
             </thead>
             <tbody>
               {orders.map((order) => {
-                const statusBadge = STATUS_LABEL[order.status] || {
-                  label: order.status,
-                  color: '#6B7280',
-                  bg: '#F3F4F6',
-                };
+                const statusDisplay = getBuyerCheckoutStatusDisplay(order.status);
+                const statusHex = BUYER_CHECKOUT_TONE_HEX[statusDisplay.tone];
+                const statusBadge = { label: statusDisplay.label, color: statusHex.color, bg: statusHex.bg };
                 const isSelected = order.id === selectedId;
                 return (
                   <tr
@@ -261,7 +252,7 @@ export default function StoreOrdersPage() {
                     </td>
                     <td style={{ ...s.td, textAlign: 'center' }}>
                       <span style={{ fontSize: 12, color: '#6B7280' }}>
-                        {order.paymentStatus ?? '-'}
+                        {getBuyerPaymentStatusLabel(order.paymentStatus)}
                       </span>
                     </td>
                   </tr>
@@ -331,12 +322,12 @@ export default function StoreOrdersPage() {
               <div style={s.detailRow}>
                 <span style={s.detailLabel}>주문 상태</span>
                 <span style={s.detailValue}>
-                  {STATUS_LABEL[detail.status]?.label ?? detail.status}
+                  {getBuyerCheckoutStatusDisplay(detail.status).label}
                 </span>
               </div>
               <div style={s.detailRow}>
                 <span style={s.detailLabel}>결제 상태</span>
-                <span style={s.detailValue}>{detail.paymentStatus}</span>
+                <span style={s.detailValue}>{getBuyerPaymentStatusLabel(detail.paymentStatus)}</span>
               </div>
               <div style={s.detailRow}>
                 <span style={s.detailLabel}>채널</span>

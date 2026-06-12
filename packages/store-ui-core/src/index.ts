@@ -56,6 +56,16 @@ export { computeStoreInsights } from './engine/storeInsightEngine';
 export type { ProductionTarget, ProductionSourceItem, ProductionSource, ProductionRouterState } from './utils/productionUtils';
 export { buildProductionState, composeSourceTextFromItems, parseProductionRouterState, useProductionRouterState } from './utils/productionUtils';
 
+// Buyer Checkout Status 표시 매핑 (WO-O4O-STORE-CHECKOUT-STATUS-LABEL-ALIGNMENT-V1)
+export {
+  getBuyerCheckoutStatusDisplay,
+  getBuyerCheckoutStatusLabel,
+  getBuyerPaymentStatusLabel,
+  BUYER_CHECKOUT_TONE_HEX,
+  BUYER_CHECKOUT_STATUS_TABS,
+} from './utils/buyerCheckoutStatus';
+export type { BuyerCheckoutTone, BuyerCheckoutStatusDisplay } from './utils/buyerCheckoutStatus';
+
 // Shared Production Modal (WO-O4O-START-PRODUCTION-MODAL-SHARED-COMPONENT-PHASE2-H-V1)
 export { StartProductionModal } from './components/StartProductionModal';
 export type { StartProductionModalProps, StartProductionTargetConfig, StartProductionTemplateItem } from './components/StartProductionModal';

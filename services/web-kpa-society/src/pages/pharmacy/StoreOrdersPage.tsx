@@ -19,24 +19,12 @@ import { RefreshCw, AlertCircle } from 'lucide-react';
 import { getBuyerOrders } from '../../api/checkout';
 import type { BuyerOrder } from '../../api/checkout';
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
+// 3서비스 공통 buyer checkout 상태 표시 매핑 (WO-O4O-STORE-CHECKOUT-STATUS-LABEL-ALIGNMENT-V1)
+import { BUYER_CHECKOUT_STATUS_TABS, getBuyerCheckoutStatusDisplay, BUYER_CHECKOUT_TONE_HEX } from '@o4o/store-ui-core';
 
-// ── 상태 정의 (CheckoutOrderStatus enum 기준) ──
+// ── 상태 정의 (3서비스 공통 매핑) ──
 
-const STATUS_TABS = [
-  { key: 'all', label: '전체' },
-  { key: 'created', label: '접수' },
-  { key: 'pending_payment', label: '결제대기' },
-  { key: 'paid', label: '결제완료' },
-  { key: 'cancelled', label: '취소' },
-] as const;
-
-const STATUS_BADGE: Record<string, { label: string; color: string; bg: string }> = {
-  created: { label: '접수', color: colors.primary, bg: '#DBEAFE' },
-  pending_payment: { label: '결제대기', color: colors.accentYellow, bg: '#FEF3C7' },
-  paid: { label: '결제완료', color: colors.accentGreen, bg: '#D1FAE5' },
-  refunded: { label: '환불', color: colors.neutral500, bg: colors.neutral100 },
-  cancelled: { label: '취소', color: '#ef4444', bg: '#FEE2E2' },
-};
+const STATUS_TABS = BUYER_CHECKOUT_STATUS_TABS;
 
 const PAGE_SIZE = 20;
 
@@ -135,7 +123,8 @@ export function StoreOrdersPage() {
       width: '100px',
       align: 'center' as const,
       render: (_v: unknown, row: BuyerOrder) => {
-        const badge = STATUS_BADGE[row.status] || { label: row.status, color: colors.neutral500, bg: colors.neutral100 };
+        const display = getBuyerCheckoutStatusDisplay(row.status);
+        const hex = BUYER_CHECKOUT_TONE_HEX[display.tone];
         return (
           <span style={{
             display: 'inline-block',
@@ -143,10 +132,10 @@ export function StoreOrdersPage() {
             borderRadius: '12px',
             fontSize: '12px',
             fontWeight: 500,
-            color: badge.color,
-            backgroundColor: badge.bg,
+            color: hex.color,
+            backgroundColor: hex.bg,
           }}>
-            {badge.label}
+            {display.label}
           </span>
         );
       },

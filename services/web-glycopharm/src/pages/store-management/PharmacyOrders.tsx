@@ -33,22 +33,24 @@ function deriveState(order: { status: string; paymentStatus: string }): {
   color: string;
   icon: typeof Clock;
 } {
+  // 라벨은 3서비스 공통 매핑(WO-O4O-STORE-CHECKOUT-STATUS-LABEL-ALIGNMENT-V1)과 정렬.
+  // GP 는 buyer 결제 중심 파생 상태를 유지(payment-aware collapse).
   const s = (order.status || '').toLowerCase();
   const p = (order.paymentStatus || '').toLowerCase();
   if (s === 'cancelled' || s === 'canceled' || s === 'refunded') {
-    return { key: 'cancelled', label: s === 'refunded' ? '환불' : '취소', color: 'red', icon: XCircle };
+    return { key: 'cancelled', label: s === 'refunded' ? '환불 완료' : '주문 취소', color: 'red', icon: XCircle };
   }
   if (p === 'paid' || s === 'paid' || s === 'completed' || s === 'fulfilled') {
-    return { key: 'paid', label: '결제완료', color: 'green', icon: CheckCircle2 };
+    return { key: 'paid', label: '결제 완료', color: 'green', icon: CheckCircle2 };
   }
-  return { key: 'pending', label: '결제대기', color: 'yellow', icon: Clock };
+  return { key: 'pending', label: '결제 대기', color: 'yellow', icon: Clock };
 }
 
 const statusTabs: { key: 'all' | DerivedKey; label: string }[] = [
   { key: 'all', label: '전체' },
-  { key: 'paid', label: '결제완료' },
-  { key: 'pending', label: '결제대기' },
-  { key: 'cancelled', label: '취소/환불' },
+  { key: 'paid', label: '결제 완료' },
+  { key: 'pending', label: '결제 대기' },
+  { key: 'cancelled', label: '주문 취소/환불' },
 ];
 
 interface BuyerOrdersKpi {
