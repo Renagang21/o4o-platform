@@ -66,6 +66,10 @@ export {
 } from './utils/buyerCheckoutStatus';
 export type { BuyerCheckoutTone, BuyerCheckoutStatusDisplay } from './utils/buyerCheckoutStatus';
 
+// Buyer 주문 내역 공통 presentation 컴포넌트 (WO-O4O-STORE-BUYER-ORDERS-COMMON-COMPONENT-EXTRACTION-V1)
+export { BuyerOrderStatusBadge } from './components/buyer-orders/BuyerOrderStatusBadge';
+export type { BuyerOrderStatusBadgeProps } from './components/buyer-orders/BuyerOrderStatusBadge';
+
 // Shared Production Modal (WO-O4O-START-PRODUCTION-MODAL-SHARED-COMPONENT-PHASE2-H-V1)
 export { StartProductionModal } from './components/StartProductionModal';
 export type { StartProductionModalProps, StartProductionTargetConfig, StartProductionTemplateItem } from './components/StartProductionModal';

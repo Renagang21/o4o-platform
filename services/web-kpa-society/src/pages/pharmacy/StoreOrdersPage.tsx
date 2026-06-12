@@ -20,7 +20,7 @@ import { getBuyerOrders } from '../../api/checkout';
 import type { BuyerOrder } from '../../api/checkout';
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
 // 3서비스 공통 buyer checkout 상태 표시 매핑 (WO-O4O-STORE-CHECKOUT-STATUS-LABEL-ALIGNMENT-V1)
-import { BUYER_CHECKOUT_STATUS_TABS, getBuyerCheckoutStatusDisplay, BUYER_CHECKOUT_TONE_HEX } from '@o4o/store-ui-core';
+import { BUYER_CHECKOUT_STATUS_TABS, BuyerOrderStatusBadge } from '@o4o/store-ui-core';
 
 // ── 상태 정의 (3서비스 공통 매핑) ──
 
@@ -122,23 +122,7 @@ export function StoreOrdersPage() {
       title: '상태',
       width: '100px',
       align: 'center' as const,
-      render: (_v: unknown, row: BuyerOrder) => {
-        const display = getBuyerCheckoutStatusDisplay(row.status);
-        const hex = BUYER_CHECKOUT_TONE_HEX[display.tone];
-        return (
-          <span style={{
-            display: 'inline-block',
-            padding: '2px 8px',
-            borderRadius: '12px',
-            fontSize: '12px',
-            fontWeight: 500,
-            color: hex.color,
-            backgroundColor: hex.bg,
-          }}>
-            {display.label}
-          </span>
-        );
-      },
+      render: (_v: unknown, row: BuyerOrder) => <BuyerOrderStatusBadge status={row.status} />,
     },
     {
       key: 'createdAt',

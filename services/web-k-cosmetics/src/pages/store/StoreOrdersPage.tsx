@@ -30,7 +30,7 @@ import {
   BUYER_CHECKOUT_STATUS_TABS,
   getBuyerCheckoutStatusDisplay,
   getBuyerPaymentStatusLabel,
-  BUYER_CHECKOUT_TONE_HEX,
+  BuyerOrderStatusBadge,
 } from '@o4o/store-ui-core';
 
 const PAGE_SIZE = 20;
@@ -199,9 +199,6 @@ export default function StoreOrdersPage() {
             </thead>
             <tbody>
               {orders.map((order) => {
-                const statusDisplay = getBuyerCheckoutStatusDisplay(order.status);
-                const statusHex = BUYER_CHECKOUT_TONE_HEX[statusDisplay.tone];
-                const statusBadge = { label: statusDisplay.label, color: statusHex.color, bg: statusHex.bg };
                 const isSelected = order.id === selectedId;
                 return (
                   <tr
@@ -238,17 +235,7 @@ export default function StoreOrdersPage() {
                       </span>
                     </td>
                     <td style={{ ...s.td, textAlign: 'center' }}>
-                      <span style={{
-                        display: 'inline-block',
-                        padding: '2px 8px',
-                        borderRadius: 12,
-                        fontSize: 12,
-                        fontWeight: 500,
-                        color: statusBadge.color,
-                        background: statusBadge.bg,
-                      }}>
-                        {statusBadge.label}
-                      </span>
+                      <BuyerOrderStatusBadge status={order.status} />
                     </td>
                     <td style={{ ...s.td, textAlign: 'center' }}>
                       <span style={{ fontSize: 12, color: '#6B7280' }}>
