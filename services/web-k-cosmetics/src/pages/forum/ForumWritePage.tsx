@@ -5,22 +5,20 @@
  * WO-O4O-FORUM-TAG-CANONICAL-ALIGNMENT-V1: category 제거 (KPA Canonical 정렬)
  *
  * Route: /forum/write
- * Uses textarea (no rich editor dependency).
- * Converts plain text to Block[] format for API submission.
+ * WO-O4O-FORUM-WRITE-FORM-COMMONIZATION-V1: @o4o/shared-space-ui ForumWriteForm 기반(create-only).
+ * RichTextEditor HTML 을 그대로 전송 — 백엔드 normalizeContent 가 Block[] 정규화.
  */
 
-import { useState, CSSProperties } from 'react';
+import { CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { createForumPost } from '../../services/forumApi';
 import { toast } from '@o4o/error-handling';
-// WO-O4O-FORUM-WRITE-EDITOR-CONTENT-PARITY-V1: RichTextEditor + blocks 정렬(KPA/Neture 와 동일)
-import { RichTextEditor } from '@o4o/content-editor';
-import { htmlToBlocks } from '@o4o/forum-core/utils';
+// WO-O4O-FORUM-WRITE-FORM-COMMONIZATION-V1: 공통 글쓰기 폼(create-only)
+import { ForumWriteForm } from '@o4o/shared-space-ui';
+import type { ForumWriteFormPayload, ForumWriteFormPostTypeOption } from '@o4o/shared-space-ui';
 
-type PostType = 'discussion' | 'question' | 'guide' | 'poll' | 'announcement';
-
-const POST_TYPES: { value: PostType; label: string }[] = [
+const POST_TYPES: ForumWriteFormPostTypeOption[] = [
   { value: 'discussion', label: 'Discussion' },
   { value: 'question', label: 'Question' },
   { value: 'guide', label: 'Guide' },
@@ -31,32 +29,14 @@ const POST_TYPES: { value: PostType; label: string }[] = [
 export default function ForumWritePage() {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
-  const [submitting, setSubmitting] = useState(false);
 
-  const [title, setTitle] = useState('');
-  const [postType, setPostType] = useState<PostType>('discussion');
-  const [content, setContent] = useState('');
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!title.trim()) {
-      toast.error('Please enter a title.');
-      return;
-    }
-    const isEmpty = !content || content === '<p></p>' || content.replace(/<[^>]*>/g, '').trim() === '';
-    if (isEmpty) {
-      toast.error('Please enter content.');
-      return;
-    }
-
+  const handleCreate = async (payload: ForumWriteFormPayload) => {
     try {
-      setSubmitting(true);
-      const blocks = htmlToBlocks(content);
       const data = await createForumPost({
-        title: title.trim(),
-        type: postType,
-        content: blocks,
+        title: payload.title,
+        type: payload.type ?? 'discussion',
+        // 백엔드 normalizeContent 가 HTML→Block[] 정규화 (forum-core 프론트 의존 제거)
+        content: payload.editorHtml,
       });
 
       if (data.success && data.data?.id) {
@@ -66,8 +46,6 @@ export default function ForumWritePage() {
       }
     } catch (err: any) {
       toast.error(err.response?.data?.error || 'Network error. Please try again.');
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -97,67 +75,26 @@ export default function ForumWritePage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={styles.form}>
-          {/* Post Type */}
-          <div style={styles.field}>
-            <label style={styles.label}>Post Type</label>
-            <select
-              value={postType}
-              onChange={(e) => setPostType(e.target.value as PostType)}
-              style={styles.select}
-            >
-              {POST_TYPES.map((t) => (
-                <option key={t.value} value={t.value}>{t.label}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* Title */}
-          <div style={styles.field}>
-            <label style={styles.label}>Title</label>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Enter post title"
-              style={styles.input}
-              maxLength={200}
-            />
-          </div>
-
-          {/* Content */}
-          <div style={styles.field}>
-            <label style={styles.label}>Content</label>
-            <RichTextEditor
-              value={content}
-              onChange={(editorContent) => setContent(editorContent.html)}
-              placeholder="Write your post content here"
-              minHeight="300px"
-              preset="compact"
-            />
-          </div>
-
-          {/* Actions */}
-          <div style={styles.actions}>
-            <button
-              type="button"
-              onClick={() => navigate(-1)}
-              style={styles.cancelBtn}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={submitting}
-              style={{
-                ...styles.submitBtn,
-                opacity: submitting ? 0.6 : 1,
-              }}
-            >
-              {submitting ? 'Posting...' : 'Post'}
-            </button>
-          </div>
-        </form>
+        <ForumWriteForm
+          showPostType
+          postTypeOptions={POST_TYPES}
+          postTypeLabel="Post Type"
+          titleLabel="Title"
+          titlePlaceholder="Enter post title"
+          contentLabel="Content"
+          contentPlaceholder="Write your post content here"
+          submitLabel="Post"
+          submittingLabel="Posting..."
+          cancelLabel="Cancel"
+          theme="pink"
+          minHeight="300px"
+          editorProps={{ preset: 'compact' }}
+          onSubmit={handleCreate}
+          onCancel={() => navigate(-1)}
+          onInvalid={(reason) =>
+            toast.error(reason === 'title' ? 'Please enter a title.' : 'Please enter content.')
+          }
+        />
       </div>
     </div>
   );

@@ -80,6 +80,16 @@ export type { ForumHubCategory, ForumHubPost, ForumHubConfig } from './ForumHubT
 export { ForumRequestForm } from './ForumRequestForm';
 export type { ForumRequestFormProps, ForumRequestFormPayload, ForumRequestFormTheme } from './ForumRequestForm';
 
+/* WO-O4O-FORUM-WRITE-FORM-COMMONIZATION-V1: 포럼 글쓰기 공통 폼 (create-only) */
+export { ForumWriteForm } from './ForumWriteForm';
+export type {
+  ForumWriteFormProps,
+  ForumWriteFormPayload,
+  ForumWriteFormTheme,
+  ForumWritePostType,
+  ForumWriteFormPostTypeOption,
+} from './ForumWriteForm';
+
 export { StoreHubTemplate } from './StoreHubTemplate';
 export type { StoreHubResourceCard, StoreHubFlowStep, StoreHubConfig, StoreHubTemplateProps } from './StoreHubTemplate';
 
