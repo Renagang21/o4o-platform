@@ -1,7 +1,10 @@
 import { NavLink } from 'react-router-dom';
 import { Activity, Mail } from 'lucide-react';
+import { PublicLegalFooterInfo } from '@o4o/shared-space-ui';
 // WO-O4O-GLYCOPHARM-REGISTER-MODAL-ENTRY-FIX-V1
 import { useRegisterModal } from '@/contexts/RegisterModalContext';
+// WO-O4O-CROSSSERVICE-DYNAMIC-LEGAL-FOOTER-V1
+import { loadFooterLegal } from '@/lib/footerLegal';
 
 export default function Footer() {
   const { openRegisterModal } = useRegisterModal();
@@ -51,6 +54,11 @@ export default function Footer() {
                   혈당관리 약국 사업
                 </NavLink>
               </li>
+              <li>
+                <NavLink to="/service-guide" className="text-sm hover:text-white transition-colors">
+                  서비스 안내
+                </NavLink>
+              </li>
             </ul>
           </div>
 
@@ -84,6 +92,16 @@ export default function Footer() {
                   문의하기
                 </NavLink>
               </li>
+              <li>
+                <NavLink to="/terms" className="text-sm hover:text-white transition-colors">
+                  이용약관
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="/privacy" className="text-sm hover:text-white transition-colors">
+                  개인정보처리방침
+                </NavLink>
+              </li>
             </ul>
             <div className="mt-4 pt-4 border-t border-slate-700">
               <p className="text-xs text-slate-500">
@@ -97,9 +115,11 @@ export default function Footer() {
       {/* Bottom Bar */}
       <div className="border-t border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex flex-col md:flex-row items-center gap-4 text-sm text-slate-500">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div className="text-sm text-slate-500">
               <p>&copy; 2025 GlycoPharm. All rights reserved.</p>
+              {/* WO-O4O-CROSSSERVICE-DYNAMIC-LEGAL-FOOTER-V1: 법정정보는 하드코딩 금지 — API 값 있을 때만 표시 */}
+              <PublicLegalFooterInfo serviceKey="glycopharm" loadProfile={loadFooterLegal} style={{ marginTop: 8 }} />
             </div>
           </div>
           {/* WO-O4O-GP-KCOS-FOOTER-PLACEHOLDER-LEGAL-INFO-SUPPRESSION-V1:

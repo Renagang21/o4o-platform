@@ -17,6 +17,10 @@ export { ContentHighlightSection } from './ContentHighlightSection';
 export { PolicyDocumentViewer } from './legal/PolicyDocumentViewer';
 export type { PolicyDocumentViewerProps, PolicyDocumentDto } from './legal/PolicyDocumentViewer';
 
+// WO-O4O-CROSSSERVICE-DYNAMIC-LEGAL-FOOTER-V1: 공개 푸터 동적 법정정보
+export { PublicLegalFooterInfo } from './legal/PublicLegalFooterInfo';
+export type { PublicLegalFooterInfoProps, PublicLegalProfileDto } from './legal/PublicLegalFooterInfo';
+
 /* HUB common components */
 export { HubPagination } from './HubPagination';
 export type { HubPaginationProps } from './HubPagination';

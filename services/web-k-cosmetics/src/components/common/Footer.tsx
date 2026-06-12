@@ -4,6 +4,9 @@
  */
 
 import { Link } from 'react-router-dom';
+import { PublicLegalFooterInfo } from '@o4o/shared-space-ui';
+// WO-O4O-CROSSSERVICE-DYNAMIC-LEGAL-FOOTER-V1
+import { loadFooterLegal } from '@/lib/footerLegal';
 
 export default function Footer() {
   return (
@@ -34,6 +37,9 @@ export default function Footer() {
                 <Link to="/" style={styles.link}>홈</Link>
               </li>
               <li>
+                <Link to="/service-guide" style={styles.link}>서비스 안내</Link>
+              </li>
+              <li>
                 <Link to="/contact" style={styles.link}>문의하기</Link>
               </li>
             </ul>
@@ -59,6 +65,12 @@ export default function Footer() {
               <li>
                 <Link to="/contact" style={styles.link}>문의하기</Link>
               </li>
+              <li>
+                <Link to="/terms" style={styles.link}>이용약관</Link>
+              </li>
+              <li>
+                <Link to="/privacy" style={styles.link}>개인정보처리방침</Link>
+              </li>
             </ul>
             <div style={styles.contact}>
               <p style={styles.hours}>평일 09:00 - 18:00</p>
@@ -73,9 +85,12 @@ export default function Footer() {
           <div style={styles.bottomContent}>
             <p style={styles.copyright}>&copy; 2025 K-Cosmetics. All rights reserved.</p>
           </div>
-          {/* WO-O4O-GP-KCOS-FOOTER-PLACEHOLDER-LEGAL-INFO-SUPPRESSION-V1:
-              미확인 법정정보(대표자/사업자등록번호/주소/전화 placeholder) 공개 노출 제거.
-              실값 임의작성 금지 — 실값 확정 후 ServiceLegalProfile 기반 동적 푸터로 재도입 (후속 WO). */}
+          {/* WO-O4O-CROSSSERVICE-DYNAMIC-LEGAL-FOOTER-V1:
+              WO-O4O-GP-KCOS-FOOTER-PLACEHOLDER-LEGAL-INFO-SUPPRESSION-V1 의 placeholder 제거를 잇는 동적 재도입.
+              법정정보는 하드코딩 금지 — ServiceLegalProfile public API 값이 있을 때만 표시(미설정/비활성→비표시). */}
+          <div style={styles.legal}>
+            <PublicLegalFooterInfo serviceKey="k-cosmetics" loadProfile={loadFooterLegal} />
+          </div>
         </div>
       </div>
     </footer>
@@ -188,6 +203,10 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '14px',
     color: '#64748b',
     margin: 0,
+  },
+  legal: {
+    color: '#64748b',
+    marginTop: '8px',
   },
   address: {
     fontSize: '12px',

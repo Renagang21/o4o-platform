@@ -8,7 +8,10 @@
  */
 
 import { Link, Outlet } from 'react-router-dom';
+import { PublicLegalFooterInfo } from '@o4o/shared-space-ui';
 import { NetureGlobalHeader } from '../NetureGlobalHeader';
+// WO-O4O-CROSSSERVICE-DYNAMIC-LEGAL-FOOTER-V1
+import { loadFooterLegal } from '../../lib/footerLegal';
 
 export default function NetureLayout() {
   return (
@@ -26,9 +29,10 @@ export default function NetureLayout() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
             <div className="text-center sm:text-left">
               <p>&copy; 2026 Neture. 공급자 &middot; 파트너 협업 플랫폼</p>
-              <p className="text-xs text-gray-400 mt-1">
-                ㈜쓰리라이프존 | 사업자등록번호 108-86-02873 | 고객센터 1577-2779
-              </p>
+              {/* WO-O4O-CROSSSERVICE-DYNAMIC-LEGAL-FOOTER-V1: 하드코딩 법정정보 제거 → API 값 있을 때만 표시 */}
+              <div className="text-xs text-gray-400 mt-1">
+                <PublicLegalFooterInfo serviceKey="neture" loadProfile={loadFooterLegal} />
+              </div>
             </div>
             <div className="flex items-center gap-4 text-xs text-gray-400">
               <Link to="/contact" className="hover:text-primary-600 transition-colors">

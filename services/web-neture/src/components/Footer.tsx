@@ -1,15 +1,15 @@
+// WO-O4O-CROSSSERVICE-DYNAMIC-LEGAL-FOOTER-V1: 하드코딩 법정정보 제거 → API(footer-legal) 값이 있을 때만 표시.
+import { PublicLegalFooterInfo } from '@o4o/shared-space-ui';
+import { loadFooterLegal } from '../lib/footerLegal';
+
 export function Footer() {
   return (
     <footer style={styles.footer}>
       <div style={styles.container}>
         <div style={styles.topRow}>
-          <div>
-            <p style={styles.company}>
-              © 2026 ㈜쓰리라이프존 | 사업자등록번호 108-86-02873
-            </p>
-            <p style={styles.contact}>
-              고객센터 1577-2779 | 운영 문의: support@neture.co.kr
-            </p>
+          <div style={{ color: '#666' }}>
+            <p style={styles.company}>© 2026 Neture. 공급자 · 파트너 협업 플랫폼</p>
+            <PublicLegalFooterInfo serviceKey="neture" loadProfile={loadFooterLegal} />
           </div>
         </div>
       </div>
