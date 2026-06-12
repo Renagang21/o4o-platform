@@ -113,7 +113,7 @@ export default function RequestCategoryPage() {
           새 포럼 신청
         </h1>
         <p className="text-slate-500 mt-2">
-          원하시는 포럼 카테고리가 없나요? 새 포럼을 신청해주세요.
+          원하시는 포럼이 없나요? 새 포럼을 신청해주세요.
           <br />
           관리자 검토 후 승인되면 포럼이 생성됩니다.
         </p>
