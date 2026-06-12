@@ -2,9 +2,10 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 
 /**
  * WO-O4O-PAYMENT-CORE-STABILIZATION-V1
+ * WO-O4O-PAYMENTCORE-O4O-PAYMENTS-MIGRATION-RELOCATE-V1
  *
- * P0-2: paymentKey UNIQUE 제약 추가 (partial — NULL 제외)
- * 보너스: status INDEX 추가 (성능)
+ * P0-2: o4o_payments.paymentKey UNIQUE 제약(partial — NULL 제외) + status INDEX.
+ * CreateO4oPaymentsTable 와 함께 orphaned 디렉터리에서 이전(IF NOT EXISTS — 재적용 안전).
  */
 export class AddPaymentKeyUniqueAndStatusIndex1771027200001 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {

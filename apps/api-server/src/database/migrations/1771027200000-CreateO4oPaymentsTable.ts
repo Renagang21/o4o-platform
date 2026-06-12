@@ -2,9 +2,14 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 
 /**
  * WO-O4O-PAYMENT-CORE-GLYCOPHARM-PILOT-V1
+ * WO-O4O-PAYMENTCORE-O4O-PAYMENTS-MIGRATION-RELOCATE-V1
  *
- * o4o_payments 테이블 생성
- * PaymentCoreService의 PaymentRepository 백킹 스토어
+ * o4o_payments 테이블 생성 — PaymentCoreService(PaymentRepository) 백킹 스토어(PlatformPayment entity).
+ *
+ * 본 migration 은 원래 apps/api-server/src/migrations/ (migration 러너 미스캔 디렉터리)에 있어
+ * production 에 적용되지 않았다(IR-O4O-PAYMENTCORE-O4O-PAYMENTS-SCHEMA-CONTRACT-AUDIT-V1).
+ * 스캔 디렉터리(src/database/migrations)로 이전하여 CI/CD migration job 이 적용하도록 한다.
+ * CREATE TABLE/INDEX IF NOT EXISTS — 재적용 안전.
  */
 export class CreateO4oPaymentsTable1771027200000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
