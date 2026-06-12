@@ -104,11 +104,21 @@
 
 ## 14. 검증 결과
 - **tsc api-server: 0 errors** ✅
-- migration: additive CREATE TABLE 정적 검토 ✅ (배포 시 CI/CD 자동 실행 — 실행 검증은 배포 후)
-- public API smoke(배포 후): `GET /api/v1/public/services/neture/legal-profile` → `{success:true, data:null}` 기대(미설정).
+- **배포**: `Deploy API Server (Cloud Run)` success (95ad3e237). migration CI/CD 자동 실행됨 ✅
+- **public API smoke (프로덕션 api.neture.co.kr)** ✅
+  | 요청 | 결과 |
+  |------|------|
+  | `GET /public/services/neture/legal-profile` | `200 {success:true, data:null}` (table 존재=migration 실행 + placeholder 없는 null fallback) |
+  | `GET /public/services/kpa-society/legal-profile` | `200 {success:true, data:null}` |
+  | `GET /public/services/foobar/legal-profile` | `404 UNKNOWN_SERVICE` (serviceKey 검증) |
+  | `GET /public/services/neture/policies/terms` | `404 NOT_FOUND` (published 없음 · draft 미노출) |
+- **admin 권한 가드 smoke (비인증)** ✅ — `GET/PUT legal-profile`, `POST policies` 모두 `401 AUTH_REQUIRED`.
+- **인증된 admin write happy-path**: 프로덕션에 실값 row 를 남기지 않기 위해(WO "실값 seed 금지/그릇만") 의도적 미수행.
+  타입체크 + 검증된 `kpa_legal_documents` 동일 패턴 + 가드 차단 확인으로 커버. 실제 입력은 후속 Admin UI WO 에서.
 
 ## 15. commit hash
-- (커밋 후 기재)
+- 구현 + CHECK: `95ad3e237`
+- CHECK smoke 반영: (본 커밋)
 
 ---
 
