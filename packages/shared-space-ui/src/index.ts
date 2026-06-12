@@ -32,6 +32,9 @@ export type { HubPaginationProps } from './HubPagination';
 /* WO-O4O-FORUM-LIST-SHARED-PRIMITIVES-V1: 포럼 목록 상대 시간 표시 유틸 (공통) */
 export { formatForumDate } from './formatForumDate';
 
+/* WO-O4O-FORUM-LIST-DATA-SHAPE-NORMALIZATION-V1: 포럼 목록 공통 표시 타입 */
+export type { ForumListItem, ForumListItemPostType } from './forumListItem';
+
 /* WO-O4O-GUIDE-UI-COMPONENT-V1: 화면 안 상황 안내 카드 (전 서비스 공통) */
 export { GuideBlock } from './GuideBlock';
 export type { GuideBlockProps, GuideBlockVariant } from './GuideBlock';

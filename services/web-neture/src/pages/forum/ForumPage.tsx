@@ -22,34 +22,26 @@ import {
   type ForumCategory,
 } from '../../services/forumApi';
 import type { ForumPostType } from '@o4o/types/forum';
+// WO-O4O-FORUM-LIST-DATA-SHAPE-NORMALIZATION-V1: 공통 표시 타입
+import type { ForumListItem } from '@o4o/shared-space-ui';
 
 type PostType = ForumPostType;
+type DisplayPost = ForumListItem;
 
-interface DisplayPost {
-  id: string;
-  title: string;
-  slug: string;
-  type: PostType;
-  authorName: string;
-  isPinned: boolean;
-  commentCount: number;
-  likeCount: number;
-  createdAt: string;
-}
-
-function toDisplayPost(post: ApiForumPost): DisplayPost {
+// routeTo 는 basePath(컴포넌트 prop) + slug 로 계산 → adapter 가 basePath 를 받는다.
+function toDisplayPost(post: ApiForumPost, basePath: string): DisplayPost {
   const valid: PostType[] = ['discussion', 'question', 'announcement', 'poll', 'guide'];
   const normalized = normalizePostType(post.type).toLowerCase() as PostType;
   return {
     id: post.id,
     title: post.title,
-    slug: post.slug,
-    type: valid.includes(normalized) ? normalized : 'discussion',
+    postType: valid.includes(normalized) ? normalized : 'discussion',
     authorName: getAuthorName(post),
     isPinned: post.isPinned,
     commentCount: post.commentCount || 0,
     likeCount: post.likeCount || 0,
     createdAt: post.createdAt,
+    routeTo: `${basePath}/post/${post.slug}`,
   };
 }
 
@@ -140,8 +132,8 @@ export function ForumPage({ boardSlug, title: customTitle, description: customDe
           if (cancelled) return;
 
           setPinnedPosts([]);
-          let results = res.data.map(toDisplayPost);
-          if (typeFilter) results = results.filter(p => p.type === typeFilter);
+          let results = res.data.map(p => toDisplayPost(p, basePath));
+          if (typeFilter) results = results.filter(p => p.postType === typeFilter);
 
           setPosts(results);
           setTotalCount(typeFilter ? results.length : res.totalCount);
@@ -153,15 +145,15 @@ export function ForumPage({ boardSlug, title: customTitle, description: customDe
           ]);
           if (cancelled) return;
 
-          const pinned = (pinnedRes as ApiForumPost[]).map(toDisplayPost);
+          const pinned = (pinnedRes as ApiForumPost[]).map(p => toDisplayPost(p, basePath));
           setPinnedPosts(currentPage === 1 ? pinned : []);
 
           const pinnedIds = new Set(pinned.map(p => p.id));
           let regular = postsRes.data
             .filter(p => !pinnedIds.has(p.id) && !p.isPinned)
-            .map(toDisplayPost);
+            .map(p => toDisplayPost(p, basePath));
 
-          if (typeFilter) regular = regular.filter(p => p.type === typeFilter);
+          if (typeFilter) regular = regular.filter(p => p.postType === typeFilter);
 
           setPosts(regular);
           setTotalCount(postsRes.totalCount);
@@ -178,7 +170,7 @@ export function ForumPage({ boardSlug, title: customTitle, description: customDe
     return () => { cancelled = true; };
   }, [filterKey]);
 
-  const handlePostClick = (post: DisplayPost) => navigate(`${basePath}/post/${post.slug}`);
+  const handlePostClick = (post: DisplayPost) => navigate(post.routeTo);
 
   const updateParam = (key: string, value: string) => {
     const next = new URLSearchParams(searchParams);
@@ -322,7 +314,7 @@ export function ForumPage({ boardSlug, title: customTitle, description: customDe
               <table style={s.table}>
                 <tbody>
                   {pinnedPosts.map(post => {
-                    const badge = TYPE_BADGES[post.type];
+                    const badge = TYPE_BADGES[post.postType ?? 'discussion'];
                     return (
                       <tr key={post.id} style={s.pinnedRow} onClick={() => handlePostClick(post)}>
                         <td style={{ ...s.td, width: '60px', textAlign: 'center' }}>
@@ -369,7 +361,7 @@ export function ForumPage({ boardSlug, title: customTitle, description: customDe
               </thead>
               <tbody>
                 {posts.length > 0 ? posts.map(post => {
-                  const badge = TYPE_BADGES[post.type];
+                  const badge = TYPE_BADGES[post.postType ?? 'discussion'];
                   return (
                     <tr key={post.id} style={s.row} onClick={() => handlePostClick(post)}>
                       <td style={{ ...s.td, width: '60px', textAlign: 'center' }}>

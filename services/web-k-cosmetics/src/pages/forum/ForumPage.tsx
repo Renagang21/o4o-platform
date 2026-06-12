@@ -21,20 +21,11 @@ import {
   type ForumPost as ApiForumPost,
 } from '../../services/forumApi';
 import type { ForumPostType } from '@o4o/types/forum';
+// WO-O4O-FORUM-LIST-DATA-SHAPE-NORMALIZATION-V1: 공통 표시 타입
+import type { ForumListItem } from '@o4o/shared-space-ui';
 
 type PostType = ForumPostType;
-
-interface DisplayPost {
-  id: string;
-  title: string;
-  slug: string;
-  type: PostType;
-  authorName: string;
-  isPinned: boolean;
-  commentCount: number;
-  likeCount: number;
-  createdAt: string;
-}
+type DisplayPost = ForumListItem;
 
 function toDisplayPost(post: ApiForumPost): DisplayPost {
   const valid: PostType[] = ['discussion', 'question', 'announcement', 'poll', 'guide'];
@@ -42,13 +33,13 @@ function toDisplayPost(post: ApiForumPost): DisplayPost {
   return {
     id: post.id,
     title: post.title,
-    slug: post.slug,
-    type: valid.includes(normalized) ? normalized : 'discussion',
+    postType: valid.includes(normalized) ? normalized : 'discussion',
     authorName: getAuthorName(post),
     isPinned: post.isPinned,
     commentCount: post.commentCount || 0,
     likeCount: post.likeCount || 0,
     createdAt: post.createdAt,
+    routeTo: `/forum/post/${post.id}`,
   };
 }
 
@@ -122,7 +113,7 @@ export default function ForumPage() {
               p.title.toLowerCase().includes(q) || p.authorName.toLowerCase().includes(q)
             );
           }
-          if (typeFilter) results = results.filter(p => p.type === typeFilter);
+          if (typeFilter) results = results.filter(p => p.postType === typeFilter);
 
           setPosts(results);
           setTotalCount(results.length);
@@ -142,7 +133,7 @@ export default function ForumPage() {
             .filter(p => !pinnedIds.has(p.id) && !p.isPinned)
             .map(toDisplayPost);
 
-          if (typeFilter) regular = regular.filter(p => p.type === typeFilter);
+          if (typeFilter) regular = regular.filter(p => p.postType === typeFilter);
 
           setPosts(regular);
           setTotalCount(postsRes.totalCount);
@@ -159,7 +150,7 @@ export default function ForumPage() {
     return () => { cancelled = true; };
   }, [filterKey]);
 
-  const handlePostClick = (post: DisplayPost) => navigate(`/forum/post/${post.id}`);
+  const handlePostClick = (post: DisplayPost) => navigate(post.routeTo);
 
   const updateParam = (key: string, value: string) => {
     const next = new URLSearchParams(searchParams);
@@ -285,7 +276,7 @@ export default function ForumPage() {
               <table className="w-full border-collapse table-fixed">
                 <tbody>
                   {pinnedPosts.map(post => {
-                    const badge = TYPE_BADGES[post.type];
+                    const badge = TYPE_BADGES[post.postType ?? 'discussion'];
                     return (
                       <tr key={post.id} className="cursor-pointer bg-amber-50 hover:bg-amber-100 transition-colors" onClick={() => handlePostClick(post)}>
                         <td className="px-3 py-3 text-center border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap" style={{ width: '60px' }}>
@@ -332,7 +323,7 @@ export default function ForumPage() {
               </thead>
               <tbody>
                 {posts.length > 0 ? posts.map(post => {
-                  const badge = TYPE_BADGES[post.type];
+                  const badge = TYPE_BADGES[post.postType ?? 'discussion'];
                   return (
                     <tr key={post.id} className="cursor-pointer hover:bg-slate-50 transition-colors" onClick={() => handlePostClick(post)}>
                       <td className="px-3 py-3 text-center border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap" style={{ width: '60px' }}>

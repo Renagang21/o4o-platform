@@ -16,30 +16,26 @@ import { PageSection, PageContainer } from '@o4o/ui';
 // WO-O4O-FORUM-LIST-SHARED-PRIMITIVES-V1 / WO-O4O-FORUM-LIST-PAGINATION-UNIFY-V1: 공통 유틸·페이지네이션
 import { formatForumDate as formatDate, HubPagination } from '@o4o/shared-space-ui';
 import { fetchForumPosts, type ForumPost as ApiForumPost } from '@/services/forumApi';
+// WO-O4O-FORUM-LIST-DATA-SHAPE-NORMALIZATION-V1: 공통 표시 타입
+import type { ForumListItem } from '@o4o/shared-space-ui';
 
-interface ForumPost {
-  id: string;
-  title: string;
-  author: string;
-  authorRole: string;
-  views: number;
-  likes: number;
-  comments: number;
-  createdAt: string;
-  isHot: boolean;
-}
+// GP 는 ForumListItem 기준 + isHot(GP 고유 파생) 로컬 확장.
+type ForumPost = ForumListItem & { isHot: boolean };
 
 function normalizePost(raw: ApiForumPost): ForumPost {
+  const viewCount = raw.viewCount || 0;
+  const commentCount = raw.commentCount || 0;
   return {
     id: raw.id,
     title: raw.title || '(제목 없음)',
-    author: raw.author?.nickname || raw.author?.name || '익명',
-    authorRole: '',
-    views: raw.viewCount || 0,
-    likes: raw.likeCount || 0,
-    comments: raw.commentCount || 0,
+    authorName: raw.author?.nickname || raw.author?.name || '익명',
+    viewCount,
+    likeCount: raw.likeCount || 0,
+    commentCount,
+    isPinned: raw.isPinned ?? false,
     createdAt: raw.createdAt,
-    isHot: (raw.viewCount || 0) >= 50 || (raw.commentCount || 0) >= 10,
+    routeTo: `/forum/posts/${raw.id}`,
+    isHot: viewCount >= 50 || commentCount >= 10,
   };
 }
 
@@ -87,11 +83,11 @@ export default function ForumPage() {
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       result = result.filter(p =>
-        p.title.toLowerCase().includes(q) || p.author.toLowerCase().includes(q)
+        p.title.toLowerCase().includes(q) || p.authorName.toLowerCase().includes(q)
       );
     }
 
-    if (sortBy === 'popular') result.sort((a, b) => b.views - a.views);
+    if (sortBy === 'popular') result.sort((a, b) => b.viewCount - a.viewCount);
     else if (sortBy === 'oldest') result.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
     else result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
@@ -218,16 +214,16 @@ export default function ForumPage() {
               <table className="w-full border-collapse" style={{ tableLayout: 'fixed' }}>
                 <tbody>
                   {hotPosts.map(post => (
-                    <tr key={post.id} className="bg-amber-50 cursor-pointer hover:bg-amber-100 transition-colors" onClick={() => navigate(`/forum/posts/${post.id}`)}>
+                    <tr key={post.id} className="bg-amber-50 cursor-pointer hover:bg-amber-100 transition-colors" onClick={() => navigate(post.routeTo)}>
                       <td className="px-3 py-3 border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap text-sm text-slate-800">
                         <span className="inline-block px-1.5 py-0.5 text-[11px] font-semibold rounded bg-red-50 text-red-600 mr-1.5">HOT</span>
                         <span className="font-medium">{post.title}</span>
-                        {post.comments > 0 && <span className="ml-1.5 text-xs text-primary-600 font-medium">[{post.comments}]</span>}
+                        {post.commentCount > 0 && <span className="ml-1.5 text-xs text-primary-600 font-medium">[{post.commentCount}]</span>}
                       </td>
-                      <td className="px-3 py-3 border-b border-slate-100 text-xs text-slate-500 overflow-hidden text-ellipsis whitespace-nowrap" style={{ width: '100px' }}>{post.author}</td>
+                      <td className="px-3 py-3 border-b border-slate-100 text-xs text-slate-500 overflow-hidden text-ellipsis whitespace-nowrap" style={{ width: '100px' }}>{post.authorName}</td>
                       <td className="px-3 py-3 border-b border-slate-100 text-xs text-slate-400 overflow-hidden text-ellipsis whitespace-nowrap" style={{ width: '100px' }}>{formatDate(post.createdAt)}</td>
-                      <td className="px-3 py-3 border-b border-slate-100 text-xs text-slate-500 text-center" style={{ width: '50px' }}>{post.likes > 0 ? post.likes : ''}</td>
-                      <td className="px-3 py-3 border-b border-slate-100 text-xs text-slate-500 text-center" style={{ width: '50px' }}>{post.comments}</td>
+                      <td className="px-3 py-3 border-b border-slate-100 text-xs text-slate-500 text-center" style={{ width: '50px' }}>{post.likeCount > 0 ? post.likeCount : ''}</td>
+                      <td className="px-3 py-3 border-b border-slate-100 text-xs text-slate-500 text-center" style={{ width: '50px' }}>{post.commentCount}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -259,16 +255,16 @@ export default function ForumPage() {
               </thead>
               <tbody>
                 {posts.length > 0 ? posts.map(post => (
-                  <tr key={post.id} className="cursor-pointer hover:bg-slate-50 transition-colors" onClick={() => navigate(`/forum/posts/${post.id}`)}>
+                  <tr key={post.id} className="cursor-pointer hover:bg-slate-50 transition-colors" onClick={() => navigate(post.routeTo)}>
                     <td className="px-3 py-3 border-b border-slate-50 overflow-hidden text-ellipsis whitespace-nowrap text-sm text-slate-800">
                       {post.isHot && <span className="inline-block px-1.5 py-0.5 text-[11px] font-semibold rounded bg-red-50 text-red-600 mr-1.5">HOT</span>}
                       <span className="font-medium">{post.title}</span>
-                      {post.comments > 0 && <span className="ml-1.5 text-xs text-primary-600 font-medium">[{post.comments}]</span>}
+                      {post.commentCount > 0 && <span className="ml-1.5 text-xs text-primary-600 font-medium">[{post.commentCount}]</span>}
                     </td>
-                    <td className="px-3 py-3 border-b border-slate-50 text-xs text-slate-500 overflow-hidden text-ellipsis whitespace-nowrap" style={{ width: '100px' }}>{post.author}</td>
+                    <td className="px-3 py-3 border-b border-slate-50 text-xs text-slate-500 overflow-hidden text-ellipsis whitespace-nowrap" style={{ width: '100px' }}>{post.authorName}</td>
                     <td className="px-3 py-3 border-b border-slate-50 text-xs text-slate-400 overflow-hidden text-ellipsis whitespace-nowrap" style={{ width: '100px' }}>{formatDate(post.createdAt)}</td>
-                    <td className="px-3 py-3 border-b border-slate-50 text-xs text-slate-500 text-center" style={{ width: '50px' }}>{post.likes > 0 ? post.likes : ''}</td>
-                    <td className="px-3 py-3 border-b border-slate-50 text-xs text-slate-500 text-center" style={{ width: '50px' }}>{post.comments}</td>
+                    <td className="px-3 py-3 border-b border-slate-50 text-xs text-slate-500 text-center" style={{ width: '50px' }}>{post.likeCount > 0 ? post.likeCount : ''}</td>
+                    <td className="px-3 py-3 border-b border-slate-50 text-xs text-slate-500 text-center" style={{ width: '50px' }}>{post.commentCount}</td>
                   </tr>
                 )) : (
                   <tr>
