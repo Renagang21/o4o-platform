@@ -90,7 +90,6 @@ const SECTION_ICONS: Record<string, typeof LayoutDashboard> = {
   billing: Receipt,
   // GlycoPharm 전용 섹션 키 (WO-O4O-GLYCOPHARM-NAVIGATION-AND-STORE-STRUCTURE-REFINE-V1)
   'b2b-order': Truck,
-  'market-trial': Tag,
   'funnel': TrendingUp,
   'management': Briefcase,
   'management-b2b': Package,

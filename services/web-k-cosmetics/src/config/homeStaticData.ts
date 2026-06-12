@@ -29,14 +29,6 @@ export const heroSlides: HeroSlide[] = [
     cta: { label: '시작하기', link: '/platform/stores', variant: 'primary' },
   },
   {
-    // WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1: Market Trial은 Neture 통합 허브로 진입
-    id: 'trial',
-    title: '유통참여형 펀딩\nNeture 허브에서 참여하세요',
-    subtitle: '브랜드의 신상품을 먼저 체험하고 피드백을 공유하세요',
-    bgGradient: '#334155',
-    cta: { label: 'Neture에서 보기', link: 'https://neture.co.kr/market-trial', variant: 'primary' },
-  },
-  {
     id: 'tourist',
     title: '지금 12개 매장\n관광객 연결 중',
     subtitle: 'Tourist Hub를 통해 실시간 연결됩니다',
@@ -89,18 +81,6 @@ export const quickActionCards: QuickActionCard[] = [
     link: '/b2b/supply',
     color: '#e2e8f0',
     status: { label: '공급', value: '사용 중' },
-  },
-  {
-    // WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1: Market Trial 진입은 Neture 허브로 (외부 링크)
-    // WO-KCOS-HOME-QUICK-ACTION-STATUS-TUNE-V1: 잘못된 /platform/stores 링크 → Neture 외부 URL 수정
-    id: 'trial',
-    title: '유통참여형 펀딩',
-    subtitle: '신상품 체험',
-    description: '브랜드의 신상품 유통참여형 펀딩에 참여하세요',
-    icon: '🎯',
-    link: 'https://neture.co.kr/market-trial',
-    color: '#e2e8f0',
-    status: { label: '진행 중', value: '-' },
   },
   {
     // WO-KCOS-HOME-QUICK-ACTION-STATUS-TUNE-V2: status.value는 fallback 전용

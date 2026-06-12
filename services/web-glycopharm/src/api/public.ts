@@ -70,21 +70,12 @@ export interface HomePreviewData {
 
 const fallbackNowRunning: NowRunningItem[] = [
   {
-    id: '1',
-    type: 'trial',
-    title: '당뇨인용 신규 영양제 Trial',
-    supplier: '글루코헬스',
-    deadline: '2026.01.31',
-    participants: 23,
-    link: '/store/market-trial',
-  },
-  {
     id: '2',
     type: 'event',
     title: '혈당관리 앱 연동 이벤트',
     supplier: 'GlucoseView',
     deadline: '2026.02.15',
-    link: '/store/market-trial',
+    link: '/forum',
   },
   {
     id: '3',
@@ -105,7 +96,7 @@ const fallbackNotices: Notice[] = [
   },
   {
     id: '2',
-    title: '[안내] 유통참여형 펀딩 참여 가이드',
+    title: '[안내] GlycoPharm 매장 운영 가이드',
     date: '2026.01.05',
     isPinned: true,
     link: '/forum',

@@ -16,7 +16,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Loader2, FlaskConical } from 'lucide-react';
+import { Loader2, BookOpen } from 'lucide-react';
 import { PageHero, Card, useTemplate } from '@o4o/ui';
 import {
   HeroBannerSection,
@@ -234,15 +234,13 @@ export function HomePage() {
         { title: '디지털 사이니지', description: '매장 디지털 사이니지 콘텐츠를 관리하세요', href: '/signage', icon: <span className={iconCls}><SignageIcon /></span> },
       ]}
       cta={{
-        title: '유통참여형 펀딩',
-        description: '서비스 참여자와 함께 제품을 다듬고, 좋은 조건의 유통 환경을 만들어가는 참여형 프로그램',
-        href: 'https://neture.co.kr',
-        linkLabel: 'Neture에서 보기 →',
-        // O4O-GLOBAL-ICON-SYSTEM-STANDARD-V1: Market Trial 표준 아이콘 (Neture 기준 정렬)
-        icon: <FlaskConical size={28} className="text-primary" />,
+        title: 'K-Cosmetics 활용이 처음이신가요?',
+        description: '서비스 구조와 기능별 이용 방법을 가이드에서 확인하세요',
+        href: '/guide/usage',
+        linkLabel: '이용 가이드 보기 →',
+        icon: <BookOpen size={28} className="text-primary" />,
         accentColor: 'var(--color-primary)',
         accentBg: 'var(--color-primary-light, #fdf2f8)',
-        external: true,
       }}
       help={{
         currentServiceKey: 'k-cosmetics',

@@ -35,9 +35,6 @@ const ForumWritePage = lazy(() => import('./pages/forum/ForumWritePage').then(m 
 // WO-O4O-FORUM-MULTI-STRUCTURE-RECONSTRUCTION-V1
 const ForumFeedPage = lazy(() => import('./pages/forum/ForumFeedPage').then(m => ({ default: m.ForumFeedPage })));
 
-// Market Trial — WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1
-// 실행은 Neture 단독. KPA는 entry → Neture redirect 만 유지.
-import { MarketTrialNetureRedirect } from './components/MarketTrialNetureRedirect';
 
 // LMS pages — WO-KPA-SOCIETY-APP-ROUTE-CODE-SPLITTING-V1: lazy (barrel unwound)
 const LmsCoursesPage = lazy(() => import('./pages/lms/LmsCoursesPage').then(m => ({ default: m.LmsCoursesPage })));
@@ -593,11 +590,6 @@ function App() {
           {/* WO-O4O-FORUM-MULTI-STRUCTURE-RECONSTRUCTION-V1: 포럼 피드 (slug). 모든 literal 라우트 뒤에 위치 */}
           <Route path="/forum/:slug" element={<Layout serviceName={SERVICE_NAME}><ForumFeedPage /></Layout>} />
 
-          {/* Market Trial — WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1
-              실행은 Neture 단독. 기존 URL은 backward-compat을 위해 redirect 유지. */}
-          <Route path="/market-trial" element={<Layout serviceName={SERVICE_NAME}><MarketTrialNetureRedirect /></Layout>} />
-          <Route path="/market-trial/my" element={<Layout serviceName={SERVICE_NAME}><MarketTrialNetureRedirect /></Layout>} />
-          <Route path="/market-trial/:id" element={<Layout serviceName={SERVICE_NAME}><MarketTrialNetureRedirect /></Layout>} />
 
 
 

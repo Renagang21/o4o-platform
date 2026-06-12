@@ -9,7 +9,7 @@
 
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { Store, GraduationCap, CalendarDays, FlaskConical } from 'lucide-react';
+import { Store, GraduationCap, CalendarDays } from 'lucide-react';
 import { colors, borderRadius } from '../styles/theme';
 import { kpaConfig } from '@o4o/operator-ux-core';
 
@@ -132,18 +132,6 @@ export function ExternalServiceSection() {
           variant="secondary"
           showDisclaimer={false}
           isInternal={true}
-        />
-        {/* WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1
-            Market Trial 실행은 Neture로 통합. KPA에서는 외부 진입점만 유지. */}
-        <ServiceBanner
-          icon={<FlaskConical size={22} />}
-          title="유통참여형 펀딩 참여"
-          description="공급자의 신제품을 먼저 체험하고 의견을 공유하세요. (Neture 통합 허브)"
-          linkUrl="https://neture.co.kr/market-trial"
-          linkText="Neture에서 보기"
-          variant="secondary"
-          showDisclaimer={false}
-          isInternal={false}
         />
       </div>
     </section>

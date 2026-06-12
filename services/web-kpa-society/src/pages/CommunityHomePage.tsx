@@ -21,7 +21,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Loader2, Store, Network, Users, FlaskConical } from 'lucide-react';
+import { Loader2, Store, Network, Users, BookOpen } from 'lucide-react';
 import { PageHero, Card, useTemplate } from '@o4o/ui';
 import {
   HeroBannerSection,
@@ -311,15 +311,13 @@ export function CommunityHomePage() {
       ]}
       appEntryOnCardClick={handleCardClick}
       cta={{
-        title: '유통참여형 펀딩',
-        description: '서비스 참여자와 함께 제품을 다듬고, 좋은 조건의 유통 환경을 만들어가는 참여형 프로그램',
-        href: 'https://neture.co.kr',
-        linkLabel: 'Neture에서 보기 →',
-        // O4O-GLOBAL-ICON-SYSTEM-STANDARD-V1: Market Trial 표준 아이콘 (Neture 기준 정렬)
-        icon: <FlaskConical size={28} className="text-primary" />,
+        title: 'KPA-Society 활용이 처음이신가요?',
+        description: '서비스 구조와 기능별 이용 방법을 가이드에서 확인하세요',
+        href: '/guide/usage',
+        linkLabel: '이용 가이드 보기 →',
+        icon: <BookOpen size={28} className="text-primary" />,
         accentColor: 'var(--color-primary)',
         accentBg: 'var(--color-primary-light, #eff6ff)',
-        external: true,
       }}
       help={{
         currentServiceKey: 'kpa-society',
