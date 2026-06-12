@@ -99,6 +99,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   system: [
     { label: '서비스 설정', path: '/operator/settings', adminOnly: true },
     { label: '회원 관리 (Admin)', path: '/admin/members', adminOnly: true },
+    // WO-O4O-GP-KCOS-SERVICE-LEGAL-POLICY-SETTINGS-UI-ROLLOUT-V1
+    { label: '법정정보·약관 설정', path: '/admin/settings/legal-terms', adminOnly: true },
   ],
 };
 

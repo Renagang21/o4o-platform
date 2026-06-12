@@ -184,6 +184,8 @@ const OperatorUserDetailPage = lazy(() => import('@/pages/operator/UserDetailPag
 // WO-O4O-KCOSMETICS-ADMIN-MEMBER-HARD-DELETE-V1
 const KCosmeticsAdminMembersPage = lazy(() => import('@/pages/admin/KCosmeticsAdminMembersPage'));
 const OperatorSettingsPage = lazy(() => import('@/pages/operator/SettingsPage'));
+// WO-O4O-GP-KCOS-SERVICE-LEGAL-POLICY-SETTINGS-UI-ROLLOUT-V1
+const ServiceLegalSettingsPage = lazy(() => import('@/pages/admin/ServiceLegalSettingsPage'));
 const OperatorRoleManagementPage = lazy(() => import('@/pages/operator/RoleManagementPage'));
 const OperatorAiReportPage = lazy(() => import('@/pages/operator/AiReportPage'));
 const StoreCockpitPage = lazy(() => import('@/pages/operator/StoreCockpitPage'));
@@ -606,6 +608,8 @@ function AppRoutes() {
         <Route path="users" element={<Navigate to="/admin/members" replace />} />
         <Route path="users/:id" element={<Navigate to="/admin/members" replace />} />
         <Route path="settings" element={<OperatorSettingsPage />} />
+        {/* WO-O4O-GP-KCOS-SERVICE-LEGAL-POLICY-SETTINGS-UI-ROLLOUT-V1 */}
+        <Route path="settings/legal-terms" element={<ServiceLegalSettingsPage />} />
         {/* 역할 관리 (WO-O4O-ROLE-MANAGEMENT-UI-V1) */}
         <Route path="roles" element={<OperatorRoleManagementPage />} />
       </Route>
