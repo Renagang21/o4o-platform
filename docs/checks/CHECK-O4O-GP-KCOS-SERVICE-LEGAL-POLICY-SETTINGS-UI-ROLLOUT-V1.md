@@ -56,12 +56,25 @@
 ## 13. 검증 결과
 - tsc: web-glycopharm 0 / web-k-cosmetics 0 ✅
 - build: web-glycopharm 0 / web-k-cosmetics 0 ✅
+- 배포: Deploy Web Services (Cloud Run) success (47e913959 + GP 메뉴 fix f95d90bdb)
 
-## 14. 브라우저 smoke 결과
-- (배포 후 갱신)
+## 14. 브라우저 smoke 결과 (프로덕션, 각 서비스 admin 로그인)
+**GlycoPharm** (glycopharm.co.kr):
+- `/admin/settings/legal-terms` 진입 → 페이지 렌더, **대상 서비스 'glycopharm'**, 3탭, 법정정보 16필드 빈값(data:null read) ✅
+- **메뉴 위치 정정**: GP admin 사이드바는 operatorMenuGroups 가 아니라 `DashboardLayout` roleConfig 기반 →
+  최초 operatorMenuGroups.system 에만 넣어 admin 사이드바에 미노출되던 것을 `DashboardLayout` admin System 그룹에
+  추가(commit f95d90bdb)하여 admin 사이드바 노출 정정.
+
+**K-Cosmetics** (k-cosmetics.site):
+- admin 사이드바 System 그룹에 "법정정보·약관 설정" 노출 → 클릭 진입 ✅
+- 페이지 렌더, **대상 서비스 'k-cosmetics'**(canonical), 3탭, 법정정보 16필드 빈값(read), 정책 문서 빈 목록 + "새 문서" ✅
+
+- 두 서비스 모두 실값/테스트 데이터 미입력(프로덕션 오염 없음). 권한: 세션 만료 시 로그인 redirect.
 
 ## 15. commit hash
-- (커밋 후 기재)
+- 롤아웃 + CHECK: `47e913959`
+- GP admin 사이드바 메뉴 정정: `f95d90bdb`
+- CHECK smoke 반영: (본 커밋)
 
 ---
 
