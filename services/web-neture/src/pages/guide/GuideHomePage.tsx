@@ -68,9 +68,9 @@ const homeProps: GuideFeaturesPageProps = {
   //   "사업 적용 예시"(앞으로 어떻게 적용하나) 위에, 실제 운영 중인 O4O 서비스를 먼저 보여준다.
   //   각 카드는 /guide/services/* 소개 페이지로 연결.
   serviceShowcase: {
-    title: '현재 운영 중인 O4O 서비스',
+    title: '준비 중인 O4O 서비스',
     lead: [
-      'O4O는 하나의 서비스가 아니라 여러 업종과 운영 목적에 맞게 적용되는 플랫폼입니다. 현재 다음 서비스가 O4O 기반으로 운영되고 있습니다.',
+      'O4O는 하나의 서비스가 아니라 여러 업종과 운영 목적에 맞게 적용되는 플랫폼입니다. 현재 다음 서비스들이 O4O 기반 서비스로 준비되고 있습니다.',
     ],
     cards: [
       { title: 'KPA Society', audience: '약국 · 약사', summary: '약국과 약사 커뮤니티를 기반으로 콘텐츠 · 교육 · 매장 활용 자료를 운영하는 O4O 서비스입니다.', to: '/guide/services/kpa-society' },

@@ -4001,7 +4001,7 @@ export const netureGuideBusinessHubProps: GuideFeatureManualPageProps = {
 
 export const netureGuideServiceKpaSocietyProps: GuideFeatureManualPageProps = {
   hero: {
-    eyebrow: '현재 운영 중인 O4O 서비스',
+    eyebrow: '준비 중인 O4O 서비스',
     title: 'KPA Society',
     description: '약국과 약사 커뮤니티를 기반으로 콘텐츠 · 교육 · 매장 활용 자료를 운영하는 O4O 서비스입니다.',
     primaryAction: { label: '상담하기 →', to: '/contact' },
@@ -4071,7 +4071,7 @@ export const netureGuideServiceKpaSocietyProps: GuideFeatureManualPageProps = {
 
 export const netureGuideServiceGlycopharmProps: GuideFeatureManualPageProps = {
   hero: {
-    eyebrow: '현재 운영 중인 O4O 서비스',
+    eyebrow: '준비 중인 O4O 서비스',
     title: 'GlycoPharm',
     description:
       'O4O 기반 혈당관리약국을 중심으로 상품 · 콘텐츠 · 고객 안내 자료를 연결하는 약국 O4O 서비스입니다. 한국당뇨협회 무료혈당기 사업과 연계하여, 약국이 지역 내 혈당관리 상담 거점으로 자리 잡고 당뇨 제품 · 콘텐츠 · 환자관리 기회를 확장하도록 지원합니다.',
@@ -4187,7 +4187,7 @@ export const netureGuideServiceGlycopharmProps: GuideFeatureManualPageProps = {
 
 export const netureGuideServiceKcosmeticsProps: GuideFeatureManualPageProps = {
   hero: {
-    eyebrow: '현재 운영 중인 O4O 서비스',
+    eyebrow: '준비 중인 O4O 서비스',
     title: 'K-Cosmetics',
     description: '화장품 매장에서 상품 설명 · 콘텐츠 · QR · POP · 사이니지 · 타블렛을 활용하도록 돕는 O4O 서비스입니다.',
     primaryAction: { label: '상담하기 →', to: '/contact' },
