@@ -154,6 +154,40 @@ export interface PharmacyOrderItem {
   totalPrice: number;
 }
 
+// IR-O4O-STORE-ORDER-DIRECTION-SEMANTICS-CROSSSERVICE-V1:
+//   "내 매장 주문 내역" canonical = buyer(구매/발주 내역). checkout_orders 를 buyerId 기준 조회.
+//   (기존 PharmacyOrder/getOrders 는 deprecated stub·seller 풀필먼트 모델 — buyer 화면에서 미사용.)
+export interface CheckoutOrderSummary {
+  id: string;
+  orderNumber: string;
+  status: string;
+  paymentStatus: string;
+  totalAmount: number;
+  pharmacy?: { id?: string; name?: string };
+  itemCount: number;
+  createdAt: string;
+}
+
+export interface CheckoutOrderListResponse {
+  success: boolean;
+  data: CheckoutOrderSummary[];
+  pagination: { page: number; limit: number; total: number; totalPages: number };
+}
+
+export interface CheckoutOrderItemDetail {
+  productName: string;
+  quantity: number;
+  unitPrice: number;
+  subtotal: number;
+}
+
+export interface CheckoutOrderDetail extends CheckoutOrderSummary {
+  subtotal: number;
+  shippingFee: number;
+  discount: number;
+  items: CheckoutOrderItemDetail[];
+}
+
 // WO-O4O-GLYCO-CARE-CLEANUP-V1: PharmacyCustomer 타입 제거 (환자/Care 잔재 — PharmacyPatients
 // 페이지 단독 사용처였음. canonical 구조에서는 환자 직접 관리 시스템 미포함).
 
@@ -499,6 +533,26 @@ class PharmacyApiClient {
     return this.request(`/glycopharm/pharmacy/orders/${orderId}/receive`, {
       method: 'PATCH',
     });
+  }
+
+  // ── Buyer 구매/발주 내역 (checkout_orders, buyerId 기준) ──────────────────
+  // IR-O4O-STORE-ORDER-DIRECTION-SEMANTICS-CROSSSERVICE-V1: "내 매장 주문 내역" = 구매 내역.
+
+  /**
+   * 내 매장 구매/발주 내역 — checkout_orders(buyerId + serviceKey='glycopharm')
+   */
+  async getCheckoutOrders(params?: { page?: number; limit?: number }): Promise<CheckoutOrderListResponse> {
+    const qs = new URLSearchParams();
+    if (params?.page) qs.set('page', String(params.page));
+    qs.set('limit', String(params?.limit ?? 100));
+    return this.request(`/glycopharm/checkout/orders?${qs.toString()}`);
+  }
+
+  /**
+   * 구매/발주 주문 상세 — checkout_orders(buyerId 기준), 상품·금액 분해 포함
+   */
+  async getCheckoutOrderDetail(orderId: string): Promise<StoreApiResponse<CheckoutOrderDetail>> {
+    return this.request(`/glycopharm/checkout/orders/${orderId}`);
   }
 
   // ============================================================================
