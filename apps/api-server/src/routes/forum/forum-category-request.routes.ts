@@ -19,6 +19,8 @@ import { forumRequestService } from '../../services/forum/ForumRequestService.js
 import type { AuthRequest } from '../../types/auth.js';
 import { isServiceAdmin } from '../../utils/role.utils.js';
 import type { ServiceKey } from '../../types/roles.js';
+// WO-O4O-FORUM-SERVICEKEY-EXTRACTION-AUDIT-V1: serviceCode whitelist (catalog SSOT) for create
+import { getService } from '../../config/service-catalog.js';
 
 const router: Router = Router();
 
@@ -34,6 +36,15 @@ router.post('/', authenticate, async (req: Request, res: Response): Promise<void
 
     if (!serviceCode) {
       res.status(400).json({ success: false, error: 'serviceCode is required' });
+      return;
+    }
+    // WO-O4O-FORUM-SERVICEKEY-EXTRACTION-AUDIT-V1: fail-closed on unknown serviceCode.
+    // Only the platform's known service keys may receive a forum creation request;
+    // this blocks arbitrary/typo serviceCode injection from the request body.
+    // (Membership binding — restricting to services the user belongs to — is out of scope;
+    //  deferred to a forum tag/membership policy WO.)
+    if (!getService(serviceCode)) {
+      res.status(400).json({ success: false, error: 'Invalid serviceCode', code: 'INVALID_SERVICE_CODE' });
       return;
     }
 
