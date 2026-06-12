@@ -67,6 +67,8 @@ const roleConfig: Record<string, RoleConfig> = {
       ]},
       { label: 'System', icon: Settings, items: [
         { label: '설정', path: '/admin/settings' },
+        // WO-O4O-GP-KCOS-SERVICE-LEGAL-POLICY-SETTINGS-UI-ROLLOUT-V1
+        { label: '법정정보·약관 설정', path: '/admin/settings/legal-terms' },
       ]},
     ],
   },
