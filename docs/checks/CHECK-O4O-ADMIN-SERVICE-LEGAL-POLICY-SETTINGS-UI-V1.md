@@ -67,10 +67,24 @@ Neture wrapper 가 `@o4o/auth-client` 의 `api`(axios)로 구현. publish 는 `P
 ## 14. 검증 결과
 - **tsc web-neture: 0** (공유 컴포넌트 소스 포함) ✅
 - **web-neture build: 0** (lazy import + 공유 모듈 번들 정상) ✅
-- 브라우저 smoke(배포 후): (갱신 예정)
+- **배포**: Deploy Web Services (Cloud Run) success (202084646) ✅
+- **브라우저 smoke (프로덕션 neture.co.kr, Neture admin 로그인)** ✅
+  | 항목 | 결과 |
+  |------|------|
+  | admin 메뉴 System 그룹에 "법정정보·약관 설정" 노출 | ✅ |
+  | `/admin/settings/legal-terms` 진입 → 3탭 렌더(법정정보/정책 문서/공개 상태 확인) | ✅ |
+  | 법정정보 탭: 6그룹·16필드 + isActive, 빈 값(데이터 null read) | ✅ |
+  | 정책 문서 탭: 빈 목록 "등록된 정책 문서가 없습니다" + "새 문서" 편집폼(유형 10종 select/제목/본문/버전/시행일/변경사유) | ✅ |
+  | **쓰기 경로**: 법정정보 저장(PUT) → "법정정보가 저장되었습니다" 성공 배너 | ✅ |
+  | **공개 fallback**: 저장 후 `GET /public/services/neture/legal-profile` → 여전히 `data:null` (isActive 해제로 미노출) | ✅ |
+  | 공개 상태 확인 탭: "비활성/미설정"·"확인 필요" 표시(법적 준수 판정 문구 없음) | ✅ |
+  | 권한: 세션 만료 시 로그인으로 redirect, admin API 비인증 401(선행 backend WO 검증) | ✅ |
+- smoke 노트: 쓰기 검증으로 **빈 값·isActive=false 법정정보 row 1건**이 남음 — 실값/placeholder 없음(=미설정 상태),
+  public 은 `null` 유지. policy 문서는 stray draft 미생성(편집폼 UI 만 확인). 실값 입력은 운영자 몫.
 
 ## 15. commit hash
-- (커밋 후 기재)
+- 구현 + CHECK: `202084646`
+- CHECK smoke 반영: (본 커밋)
 
 ---
 
