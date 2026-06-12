@@ -5,9 +5,6 @@
  * In-memory Map → TypeORM Repository 전환.
  * API 계약(엔드포인트, 요청/응답 형식) 유지.
  *
- * WO-MARKET-TRIAL-SERVICE-ENTRY-BANNER-AND-GATEWAY-V1:
- * gateway() — 접근 상태 + 오픈 trial 정보 반환 (서비스별 유입 창구용)
- *
  * WO-MARKET-TRIAL-KPA-DETAIL-AND-FORUM-DEEP-LINK-V1:
  * getTrials/getTrialById에 forumPostId 포함하여 개별 포럼 deep link 지원
  *
@@ -71,60 +68,6 @@ export class MarketTrialController {
     this.participantRepo = ds.getRepository(MarketTrialParticipant);
     this.forumRepo = ds.getRepository(MarketTrialForum);
     this.trialService = new MarketTrialService(ds);
-  }
-
-  /**
-   * GET /api/market-trial/gateway
-   * 접근 상태 + 오픈 trial 요약 반환 (서비스별 유입 창구용)
-   * WO-MARKET-TRIAL-SERVICE-ENTRY-BANNER-AND-GATEWAY-V1
-   */
-  static async gateway(req: AuthRequest, res: Response) {
-    try {
-      const userId = (req as any).user?.id;
-
-      const emptyResponse = (accessStatus: string) =>
-        res.json({ success: true, data: { accessStatus, openTrialCount: 0, trials: [] } });
-
-      // 1. 로그인 체크
-      if (!userId) return emptyResponse('not_logged_in');
-
-      // 2. KPA membership 체크 (service_key 'kpa'/'kpa-society' 혼재 대응)
-      const membership = await MarketTrialController.dataSource!.query(
-        `SELECT status FROM service_memberships WHERE user_id = $1 AND service_key IN ('kpa', 'kpa-society')`,
-        [userId],
-      );
-      if (!membership.length) return emptyResponse('no_kpa_membership');
-
-      // 3. 약국 회원 체크 (organization_members + organizations)
-      const orgMember = await MarketTrialController.dataSource!.query(
-        `SELECT om.id FROM organization_members om
-         JOIN organizations o ON o.id = om.organization_id
-         WHERE om.user_id = $1 AND o."isActive" = true AND om.left_at IS NULL`,
-        [userId],
-      );
-      if (!orgMember.length) return emptyResponse('not_pharmacy_member');
-
-      // 4. 해당 서비스의 오픈 trial 조회
-      const qb = MarketTrialController.trialRepo.createQueryBuilder('trial')
-        .where('trial.status = :status', { status: TrialStatus.RECRUITING });
-
-      qb.orderBy('trial.createdAt', 'DESC');
-      const trials = await qb.getMany();
-
-      if (!trials.length) return emptyResponse('no_trials');
-
-      return res.json({
-        success: true,
-        data: {
-          accessStatus: 'accessible',
-          openTrialCount: trials.length,
-          trials: trials.map(toGatewayDTO),
-        },
-      });
-    } catch (error) {
-      console.error('Gateway error:', error);
-      res.status(500).json({ success: false, message: 'Failed to get gateway info' });
-    }
   }
 
   /**
@@ -916,22 +859,6 @@ async function buildProductRefMap(
     console.error('buildProductRefMap error (product display degraded):', error);
     return new Map();
   }
-}
-
-/**
- * Convert trial entity to lightweight gateway DTO
- * WO-MARKET-TRIAL-SERVICE-ENTRY-BANNER-AND-GATEWAY-V1
- */
-function toGatewayDTO(trial: MarketTrial): any {
-  return {
-    id: trial.id,
-    title: trial.title,
-    status: trial.status,
-    supplierName: trial.supplierName || undefined,
-    currentParticipants: trial.currentParticipants,
-    maxParticipants: trial.maxParticipants || undefined,
-    fundingEndAt: trial.fundingEndAt ? new Date(trial.fundingEndAt).toISOString() : undefined,
-  };
 }
 
 /**

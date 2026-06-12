@@ -20,9 +20,6 @@ router.get('/my', authenticate, MarketTrialController.getMyTrials);
 // User participations (WO-MARKET-TRIAL-MY-PARTICIPATION-STATUS-V1)
 router.get('/my-participations', authenticate, MarketTrialController.getMyParticipations);
 
-// Gateway: access status + open trial summary (WO-MARKET-TRIAL-SERVICE-ENTRY-BANNER-AND-GATEWAY-V1)
-router.get('/gateway', optionalAuth, MarketTrialController.gateway);
-
 // Public routes (list and detail)
 router.get('/', optionalAuth, MarketTrialController.getTrials);
 router.get('/:id', optionalAuth, MarketTrialController.getTrialById);
