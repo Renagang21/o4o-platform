@@ -10,8 +10,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { PageSection, PageContainer } from '@o4o/ui';
-// WO-O4O-FORUM-LIST-SHARED-PRIMITIVES-V1 / WO-O4O-FORUM-LIST-PAGINATION-UNIFY-V1: 공통 유틸·페이지네이션
-import { formatForumDate as formatDate, HubPagination } from '@o4o/shared-space-ui';
+// WO-O4O-FORUM-LIST-PAGE-TEMPLATE-V1: 공통 목록 컴포넌트
+import { ForumListTemplate } from '@o4o/shared-space-ui';
 import {
   fetchForumPosts,
   fetchPinnedPosts,
@@ -274,145 +274,47 @@ export function ForumPage({ boardSlug, title: customTitle, description: customDe
         )}
       </div>
 
-      {/* Loading */}
-      {isLoading && (
-        <div style={s.tableWrapper}>
-          <table style={s.table}>
-            <thead><tr>
-              <th style={{ ...s.th, width: '60px' }}>유형</th>
-              <th style={s.th}>제목</th>
-              <th style={{ ...s.th, width: '100px' }}>작성자</th>
-              <th style={{ ...s.th, width: '100px' }}>작성일</th>
-              <th style={{ ...s.th, width: '50px' }}>좋아요</th>
-              <th style={{ ...s.th, width: '50px' }}>댓글</th>
-            </tr></thead>
-            <tbody>
-              {[1,2,3,4,5].map(i => (
-                <tr key={i}><td colSpan={6} style={s.td}>
-                  <div style={{ ...s.skeleton, width: `${50 + i * 8}%` }} />
-                </td></tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {/* Error */}
-      {error && (
-        <div style={s.errorBox}>
-          <p style={s.errorText}>{error}</p>
-          <button onClick={() => window.location.reload()} style={s.retryBtn}>다시 시도</button>
-        </div>
-      )}
-
-      {/* Table */}
+      {/* Info bar */}
       {!isLoading && !error && (
-        <>
-          {/* Pinned rows (page 1 only) */}
-          {!hasFilters && pinnedPosts.length > 0 && (
-            <div style={s.tableWrapper}>
-              <table style={s.table}>
-                <tbody>
-                  {pinnedPosts.map(post => {
-                    const badge = TYPE_BADGES[post.postType ?? 'discussion'];
-                    return (
-                      <tr key={post.id} style={s.pinnedRow} onClick={() => handlePostClick(post)}>
-                        <td style={{ ...s.td, width: '60px', textAlign: 'center' }}>
-                          <span style={{ ...s.badge, backgroundColor: badge.bg, color: badge.color }}>{badge.label}</span>
-                        </td>
-                        <td style={s.td}>
-                          <span style={s.pinnedTag}>고정</span>
-                          <span style={s.titleText}>{post.title}</span>
-                          {post.commentCount > 0 && <span style={s.commentBadge}>[{post.commentCount}]</span>}
-                        </td>
-                        <td style={{ ...s.td, width: '100px', color: '#64748b' }}>{post.authorName}</td>
-                        <td style={{ ...s.td, width: '100px', color: '#94a3b8' }}>{formatDate(post.createdAt)}</td>
-                        <td style={{ ...s.td, width: '50px', textAlign: 'center', color: '#64748b' }}>{post.likeCount > 0 ? post.likeCount : ''}</td>
-                        <td style={{ ...s.td, width: '50px', textAlign: 'center', color: '#64748b' }}>{post.commentCount}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+        <div style={s.infoBar}>
+          <span style={s.totalCount}>
+            {hasFilters ? `검색 결과 ${totalCount}건` : `총 ${totalCount}개의 게시글`}
+          </span>
+          {totalPages > 1 && (
+            <span style={s.pageInfo}>{currentPage} / {totalPages} 페이지</span>
           )}
-
-          {/* Info bar */}
-          <div style={s.infoBar}>
-            <span style={s.totalCount}>
-              {hasFilters ? `검색 결과 ${totalCount}건` : `총 ${totalCount}개의 게시글`}
-            </span>
-            {totalPages > 1 && (
-              <span style={s.pageInfo}>{currentPage} / {totalPages} 페이지</span>
-            )}
-          </div>
-
-          {/* Posts table */}
-          <div style={s.tableWrapper}>
-            <table style={s.table}>
-              <thead>
-                <tr>
-                  <th style={{ ...s.th, width: '60px' }}>유형</th>
-                  <th style={s.th}>제목</th>
-                  <th style={{ ...s.th, width: '100px' }}>작성자</th>
-                  <th style={{ ...s.th, width: '100px' }}>작성일</th>
-                  <th style={{ ...s.th, width: '60px' }}>댓글</th>
-                </tr>
-              </thead>
-              <tbody>
-                {posts.length > 0 ? posts.map(post => {
-                  const badge = TYPE_BADGES[post.postType ?? 'discussion'];
-                  return (
-                    <tr key={post.id} style={s.row} onClick={() => handlePostClick(post)}>
-                      <td style={{ ...s.td, width: '60px', textAlign: 'center' }}>
-                        <span style={{ ...s.badge, backgroundColor: badge.bg, color: badge.color }}>{badge.label}</span>
-                      </td>
-                      <td style={s.td}>
-                        <span style={s.titleText}>{post.title}</span>
-                        {post.commentCount > 0 && <span style={s.commentBadge}>[{post.commentCount}]</span>}
-                      </td>
-                      <td style={{ ...s.td, width: '100px', color: '#64748b', fontSize: '13px' }}>{post.authorName}</td>
-                      <td style={{ ...s.td, width: '100px', color: '#94a3b8', fontSize: '13px' }}>{formatDate(post.createdAt)}</td>
-                      <td style={{ ...s.td, width: '50px', textAlign: 'center', color: '#64748b', fontSize: '13px' }}>{post.likeCount > 0 ? post.likeCount : ''}</td>
-                      <td style={{ ...s.td, width: '50px', textAlign: 'center', color: '#64748b', fontSize: '13px' }}>{post.commentCount}</td>
-                    </tr>
-                  );
-                }) : (
-                  <tr>
-                    <td colSpan={6} style={s.emptyCell}>
-                      {hasFilters ? (
-                        <>
-                          <p style={s.emptyTitle}>검색 결과가 없습니다</p>
-                          <button onClick={handleClearAll} style={s.emptyBtn}>전체 목록 보기</button>
-                        </>
-                      ) : (
-                        <>
-                          <p style={s.emptyTitle}>아직 등록된 글이 없습니다</p>
-                          <Link to={`${basePath}/write`} style={s.emptyBtn}>글쓰기</Link>
-                        </>
-                      )}
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Pagination — WO-O4O-FORUM-LIST-PAGINATION-UNIFY-V1: 공통 HubPagination */}
-          <div style={s.pagination}>
-            <HubPagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={goToPage}
-              showFirstLast
-              showPageInfo={false}
-              align="center"
-              bordered={false}
-              accentColor={PRIMARY}
-            />
-          </div>
-        </>
+        </div>
       )}
+
+      {/* WO-O4O-FORUM-LIST-PAGE-TEMPLATE-V1: 공통 목록 컴포넌트 */}
+      <ForumListTemplate
+        posts={posts}
+        pinnedPosts={!hasFilters ? pinnedPosts : undefined}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={goToPage}
+        onPostClick={handlePostClick}
+        loading={isLoading}
+        error={error}
+        onRetry={() => window.location.reload()}
+        showPostType
+        accentColor={PRIMARY}
+        renderTypeBadge={(post) => {
+          const badge = TYPE_BADGES[post.postType ?? 'discussion'];
+          return <span style={{ ...s.badge, backgroundColor: badge.bg, color: badge.color }}>{badge.label}</span>;
+        }}
+        renderEmpty={() => (hasFilters ? (
+          <>
+            <p style={s.emptyTitle}>검색 결과가 없습니다</p>
+            <button onClick={handleClearAll} style={s.emptyBtn}>전체 목록 보기</button>
+          </>
+        ) : (
+          <>
+            <p style={s.emptyTitle}>아직 등록된 글이 없습니다</p>
+            <Link to={`${basePath}/write`} style={s.emptyBtn}>글쓰기</Link>
+          </>
+        ))}
+      />
 
       {/* Footer */}
       <div style={s.footer}>

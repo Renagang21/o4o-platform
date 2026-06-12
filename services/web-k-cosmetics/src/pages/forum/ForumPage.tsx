@@ -11,8 +11,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { PageSection, PageContainer } from '@o4o/ui';
-// WO-O4O-FORUM-LIST-SHARED-PRIMITIVES-V1 / WO-O4O-FORUM-LIST-PAGINATION-UNIFY-V1: 공통 유틸·페이지네이션
-import { formatForumDate as formatDate, HubPagination } from '@o4o/shared-space-ui';
+// WO-O4O-FORUM-LIST-PAGE-TEMPLATE-V1: 공통 목록 컴포넌트
+import { ForumListTemplate } from '@o4o/shared-space-ui';
 import {
   fetchForumPosts,
   fetchPinnedPosts,
@@ -236,145 +236,47 @@ export default function ForumPage() {
         )}
       </div>
 
-      {/* Loading */}
-      {isLoading && (
-        <div className="bg-white rounded-lg border border-slate-200 overflow-hidden mb-2">
-          <table className="w-full border-collapse table-fixed">
-            <thead><tr>
-              <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left" style={{ width: '60px' }}>유형</th>
-              <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left">제목</th>
-              <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left" style={{ width: '100px' }}>작성자</th>
-              <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left" style={{ width: '100px' }}>작성일</th>
-              <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-center" style={{ width: '50px' }}>좋아요</th>
-              <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-center" style={{ width: '50px' }}>댓글</th>
-            </tr></thead>
-            <tbody>
-              {[1,2,3,4,5].map(i => (
-                <tr key={i}><td colSpan={6} className="px-3 py-3 border-b border-slate-100">
-                  <div className="h-3.5 bg-slate-200 rounded" style={{ width: `${50 + i * 8}%` }} />
-                </td></tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {/* Error */}
-      {error && (
-        <div className="py-10 px-5 text-center bg-red-50 rounded-lg mb-4">
-          <p className="text-red-600 text-sm mb-3 mt-0">{error}</p>
-          <button onClick={() => window.location.reload()} className="px-4 py-2 text-xs font-medium text-red-600 bg-white border border-red-200 rounded-md cursor-pointer">다시 시도</button>
-        </div>
-      )}
-
-      {/* Table */}
+      {/* Info bar */}
       {!isLoading && !error && (
-        <>
-          {/* Pinned rows (page 1 only) */}
-          {!hasFilters && pinnedPosts.length > 0 && (
-            <div className="bg-white rounded-lg border border-slate-200 overflow-hidden mb-2">
-              <table className="w-full border-collapse table-fixed">
-                <tbody>
-                  {pinnedPosts.map(post => {
-                    const badge = TYPE_BADGES[post.postType ?? 'discussion'];
-                    return (
-                      <tr key={post.id} className="cursor-pointer bg-amber-50 hover:bg-amber-100 transition-colors" onClick={() => handlePostClick(post)}>
-                        <td className="px-3 py-3 text-center border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap" style={{ width: '60px' }}>
-                          <span className={`inline-block px-2 py-0.5 text-[11px] font-medium rounded ${badge.className}`}>{badge.label}</span>
-                        </td>
-                        <td className="px-3 py-3 text-sm text-slate-800 border-b border-slate-100">
-                          <span className="inline-block px-1.5 py-0.5 text-[11px] font-semibold rounded bg-red-50 text-red-600 mr-1.5">고정</span>
-                          <span className="font-medium">{post.title}</span>
-                          {post.commentCount > 0 && <span className="ml-1.5 text-xs text-primary font-medium">[{post.commentCount}]</span>}
-                        </td>
-                        <td className="px-3 py-3 text-xs text-slate-500 border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap" style={{ width: '100px' }}>{post.authorName}</td>
-                        <td className="px-3 py-3 text-xs text-slate-400 border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap" style={{ width: '100px' }}>{formatDate(post.createdAt)}</td>
-                        <td className="px-3 py-3 text-xs text-slate-500 border-b border-slate-100 text-center" style={{ width: '50px' }}>{post.likeCount > 0 ? post.likeCount : ''}</td>
-                        <td className="px-3 py-3 text-xs text-slate-500 border-b border-slate-100 text-center" style={{ width: '50px' }}>{post.commentCount}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+        <div className="flex justify-between items-center py-2 mb-1">
+          <span className="text-xs text-slate-500">
+            {hasFilters ? `검색 결과 ${totalCount}건` : `총 ${totalCount}개의 게시글`}
+          </span>
+          {totalPages > 1 && (
+            <span className="text-xs text-slate-400">{currentPage} / {totalPages} 페이지</span>
           )}
-
-          {/* Info bar */}
-          <div className="flex justify-between items-center py-2 mb-1">
-            <span className="text-xs text-slate-500">
-              {hasFilters ? `검색 결과 ${totalCount}건` : `총 ${totalCount}개의 게시글`}
-            </span>
-            {totalPages > 1 && (
-              <span className="text-xs text-slate-400">{currentPage} / {totalPages} 페이지</span>
-            )}
-          </div>
-
-          {/* Posts table */}
-          <div className="bg-white rounded-lg border border-slate-200 overflow-hidden mb-2">
-            <table className="w-full border-collapse table-fixed">
-              <thead>
-                <tr>
-                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left" style={{ width: '60px' }}>유형</th>
-                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left">제목</th>
-                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left" style={{ width: '100px' }}>작성자</th>
-                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-left" style={{ width: '100px' }}>작성일</th>
-                  <th className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 text-center" style={{ width: '60px' }}>댓글</th>
-                </tr>
-              </thead>
-              <tbody>
-                {posts.length > 0 ? posts.map(post => {
-                  const badge = TYPE_BADGES[post.postType ?? 'discussion'];
-                  return (
-                    <tr key={post.id} className="cursor-pointer hover:bg-slate-50 transition-colors" onClick={() => handlePostClick(post)}>
-                      <td className="px-3 py-3 text-center border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap" style={{ width: '60px' }}>
-                        <span className={`inline-block px-2 py-0.5 text-[11px] font-medium rounded ${badge.className}`}>{badge.label}</span>
-                      </td>
-                      <td className="px-3 py-3 text-sm text-slate-800 border-b border-slate-100">
-                        <span className="font-medium">{post.title}</span>
-                        {post.commentCount > 0 && <span className="ml-1.5 text-xs text-primary font-medium">[{post.commentCount}]</span>}
-                      </td>
-                      <td className="px-3 py-3 text-xs text-slate-500 border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap" style={{ width: '100px' }}>{post.authorName}</td>
-                      <td className="px-3 py-3 text-xs text-slate-400 border-b border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap" style={{ width: '100px' }}>{formatDate(post.createdAt)}</td>
-                      <td className="px-3 py-3 text-xs text-slate-500 border-b border-slate-100 text-center" style={{ width: '50px' }}>{post.likeCount > 0 ? post.likeCount : ''}</td>
-                      <td className="px-3 py-3 text-xs text-slate-500 border-b border-slate-100 text-center" style={{ width: '50px' }}>{post.commentCount}</td>
-                    </tr>
-                  );
-                }) : (
-                  <tr>
-                    <td colSpan={6} className="py-16 px-5 text-center">
-                      {hasFilters ? (
-                        <>
-                          <p className="text-sm text-slate-500 mb-3 mt-0">검색 결과가 없습니다</p>
-                          <button onClick={handleClearAll} className="inline-flex items-center px-4 py-2 text-xs font-semibold text-white bg-primary rounded-md border-none cursor-pointer">전체 목록 보기</button>
-                        </>
-                      ) : (
-                        <>
-                          <p className="text-sm text-slate-500 mb-3 mt-0">아직 등록된 글이 없습니다</p>
-                          <Link to="/forum" className="inline-flex items-center px-4 py-2 text-xs font-semibold text-white bg-primary rounded-md no-underline border-none">글쓰기</Link>
-                        </>
-                      )}
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Pagination — WO-O4O-FORUM-LIST-PAGINATION-UNIFY-V1: 공통 HubPagination */}
-          <div className="py-6">
-            <HubPagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={goToPage}
-              showFirstLast
-              showPageInfo={false}
-              align="center"
-              bordered={false}
-              accentColor="var(--color-primary)"
-            />
-          </div>
-        </>
+        </div>
       )}
+
+      {/* WO-O4O-FORUM-LIST-PAGE-TEMPLATE-V1: 공통 목록 컴포넌트 */}
+      <ForumListTemplate
+        posts={posts}
+        pinnedPosts={!hasFilters ? pinnedPosts : undefined}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={goToPage}
+        onPostClick={handlePostClick}
+        loading={isLoading}
+        error={error}
+        onRetry={() => window.location.reload()}
+        showPostType
+        accentColor="var(--color-primary)"
+        renderTypeBadge={(post) => {
+          const badge = TYPE_BADGES[post.postType ?? 'discussion'];
+          return <span className={`inline-block px-2 py-0.5 text-[11px] font-medium rounded ${badge.className}`}>{badge.label}</span>;
+        }}
+        renderEmpty={() => (hasFilters ? (
+          <>
+            <p className="text-sm text-slate-500 mb-3 mt-0">검색 결과가 없습니다</p>
+            <button onClick={handleClearAll} className="inline-flex items-center px-4 py-2 text-xs font-semibold text-white bg-primary rounded-md border-none cursor-pointer">전체 목록 보기</button>
+          </>
+        ) : (
+          <>
+            <p className="text-sm text-slate-500 mb-3 mt-0">아직 등록된 글이 없습니다</p>
+            <Link to="/forum" className="inline-flex items-center px-4 py-2 text-xs font-semibold text-white bg-primary rounded-md no-underline border-none">글쓰기</Link>
+          </>
+        ))}
+      />
 
       {/* Footer */}
       <div className="mt-6 text-center">
