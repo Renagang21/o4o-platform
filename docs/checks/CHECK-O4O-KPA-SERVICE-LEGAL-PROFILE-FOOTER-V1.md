@@ -73,11 +73,17 @@ KPA 푸터의 더미/하드코딩 법정정보를 제거하고 serviceKey 기반
 ## 15. 검증 결과
 - tsc web-kpa-society **0** ✅ / build **0** ✅
 
-## 16. 브라우저 smoke 결과
-- (배포 후 갱신)
+## 16. 브라우저 smoke 결과 (프로덕션 kpa-society.co.kr/, 로그아웃)
+- footer nav: 약사회 소개(/about) · 이용 가이드(/guide/intro) · **서비스 안내(/service-guide 추가)** · 협업 문의(/contact)
+  · **이용약관(/policy — dead /terms 교체)** · 개인정보처리방침(/privacy). **/sitemap 제거 확인** ✅
+- Copyright "© 2026 약사회. All Rights Reserved." 만 — **더미 주소(서울특별시 OO구)·전화 02-1234-5678·팩스·
+  info@kpa-society.kr·㈜쓰리라이프존·사업자등록번호 108-86-02873 전부 미노출** ✅
+- 동적 법정정보 영역: profile 비어있어 **비표시(placeholder 0)** ✅. footer 레이아웃 정상 ✅
+- dead link 0: footer 의 모든 링크가 실재 route(/about·/guide/intro·/service-guide·/contact·/policy·/privacy) ✅
 
 ## 17. commit hash
-- (커밋 후 기재)
+- 구현 + CHECK: `8831279bf` (web deploy success)
+- CHECK smoke 반영: (본 커밋)
 
 ---
 
