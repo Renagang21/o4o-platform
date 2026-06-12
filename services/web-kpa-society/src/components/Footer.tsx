@@ -4,7 +4,10 @@
  */
 
 import { Link } from 'react-router-dom';
+import { PublicLegalFooterInfo } from '@o4o/shared-space-ui';
 import { colors } from '../styles/theme';
+// WO-O4O-KPA-SERVICE-LEGAL-PROFILE-FOOTER-V1
+import { loadFooterLegal } from '../lib/footerLegal';
 
 export function Footer() {
   return (
@@ -16,50 +19,38 @@ export function Footer() {
             <span style={styles.logoIcon}>💊</span>
             <span style={styles.logoText}>약사회</span>
           </div>
+          {/* WO-O4O-KPA-SERVICE-LEGAL-PROFILE-FOOTER-V1: dead link 정리 — /terms→/policy(약관), /sitemap 제거, /service-guide 추가 */}
           <nav style={styles.footerNav}>
             <Link to="/about" style={styles.navLink}>약사회 소개</Link>
             <span style={styles.divider}>|</span>
             {/* WO-O4O-KPA-MAIN-NAV-GUIDE-ENTRY-V1: 가치·역할별 활용 가이드 발견성 */}
             <Link to="/guide/intro" style={styles.navLink}>이용 가이드</Link>
             <span style={styles.divider}>|</span>
+            <Link to="/service-guide" style={styles.navLink}>서비스 안내</Link>
+            <span style={styles.divider}>|</span>
             <Link to="/contact" style={styles.navLink}>협업 문의</Link>
             <span style={styles.divider}>|</span>
-            <Link to="/terms" style={styles.navLink}>이용약관</Link>
+            <Link to="/policy" style={styles.navLink}>이용약관</Link>
             <span style={styles.divider}>|</span>
             <Link to="/privacy" style={styles.navLink}>개인정보처리방침</Link>
-            <span style={styles.divider}>|</span>
-            <Link to="/sitemap" style={styles.navLink}>사이트맵</Link>
           </nav>
         </div>
 
-        {/* Contact Info */}
-        <div style={styles.contactSection}>
-          <div style={styles.contactRow}>
-            <span style={styles.contactLabel}>주소</span>
-            <span style={styles.contactValue}>서울특별시 OO구 OO로 123 약사회관</span>
-          </div>
-          <div style={styles.contactRow}>
-            <span style={styles.contactLabel}>전화</span>
-            <span style={styles.contactValue}>02-1234-5678</span>
-            <span style={styles.contactLabel}>팩스</span>
-            <span style={styles.contactValue}>02-1234-5679</span>
-          </div>
-          <div style={styles.contactRow}>
-            <span style={styles.contactLabel}>이메일</span>
-            <span style={styles.contactValue}>info@kpa-society.kr</span>
-          </div>
-        </div>
+        {/* WO-O4O-KPA-SERVICE-LEGAL-PROFILE-FOOTER-V1:
+            더미 주소/전화/팩스/이메일 + 하드코딩 사업자번호 제거 → service_legal_profiles 동적 표시.
+            법정정보는 코드 하드코딩 금지 — API 값이 있을 때만 표시(미설정/비활성→비표시, placeholder 0).
+            법정정보 입력은 Admin 설정 영역(`/admin/settings/legal-terms`) 소관(후속 통합 WO). */}
 
         {/* Copyright */}
         <div style={styles.copyright}>
           <div style={styles.copyrightRow}>
             <div>
               <p style={styles.copyrightText}>
-                Copyright © 2024 약사회. All Rights Reserved.
+                Copyright © 2026 약사회. All Rights Reserved.
               </p>
-              <p style={styles.operatorText}>
-                운영: ㈜쓰리라이프존 | 사업자등록번호 108-86-02873
-              </p>
+              <div style={styles.operatorText}>
+                <PublicLegalFooterInfo serviceKey="kpa-society" loadProfile={loadFooterLegal} />
+              </div>
             </div>
           </div>
         </div>
