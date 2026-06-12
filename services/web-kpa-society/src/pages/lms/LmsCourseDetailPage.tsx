@@ -281,7 +281,7 @@ export function LmsCourseDetailPage() {
             {!enrollment && !isArchived && course.visibility !== 'public' && (
               <div style={accessPolicyNoteStyle}>
                 {course.isPaid
-                  ? '결제 완료 후 이용 가능합니다.'
+                  ? '수강료가 있을 수 있으며, 납부·확인은 강사 또는 운영자가 별도로 안내합니다. O4O에서는 강의 결제를 제공하지 않습니다.'
                   : course.requiresApproval
                     ? '강사 승인 후 이용 가능합니다.'
                     : '수강 신청 후 이용 가능합니다.'}

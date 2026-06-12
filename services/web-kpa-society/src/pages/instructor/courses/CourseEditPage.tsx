@@ -170,7 +170,7 @@ interface LessonModalProps {
   lesson: Lesson | null; // null = new
   nextOrder: number;
   onClose: () => void;
-  /** keepOpen=true: 리스트 reload만 하고 modal은 닫지 않음 (quiz/assignment/live 신규 생성 후 editor 유지) */
+  /** keepOpen=true: 리스트 reload만 하고 modal은 닫지 않음 (quiz/assignment 신규 생성 후 editor 유지) */
   onSaved: (keepOpen?: boolean) => void;
 }
 
@@ -190,7 +190,7 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
   // WO-O4O-LMS-LESSON-AI-ASSIST-V1: AI로 레슨 초안 만들기
   const [aiOpen, setAiOpen] = useState(false);
   // WO-KPA-LMS-LESSON-EDITOR-UX-FLOW-V1:
-  // 신규 생성 후 quiz/assignment/live editor를 즉시 표시하기 위해
+  // 신규 생성 후 quiz/assignment editor를 즉시 표시하기 위해
   // createLesson API가 반환한 lesson을 보관한다.
   const [savedLesson, setSavedLesson] = useState<Lesson | null>(null);
 

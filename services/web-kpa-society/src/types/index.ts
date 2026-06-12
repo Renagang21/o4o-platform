@@ -209,7 +209,7 @@ export interface Lesson {
   content?: string;
   isPreview: boolean;
   isFree?: boolean;
-  type?: 'video' | 'article' | 'quiz' | 'assignment' | 'live';
+  type?: 'video' | 'article' | 'quiz' | 'assignment';
 }
 
 export interface Enrollment {

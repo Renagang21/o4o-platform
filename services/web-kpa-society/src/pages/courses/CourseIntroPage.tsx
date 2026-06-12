@@ -25,7 +25,6 @@ const LESSON_TYPE_ICONS: Record<string, string> = {
   article: '📄',
   quiz: '❓',
   assignment: '📝',
-  live: '🔴',
 };
 
 export function CourseIntroPage() {
