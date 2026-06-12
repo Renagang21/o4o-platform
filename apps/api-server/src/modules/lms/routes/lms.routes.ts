@@ -287,8 +287,6 @@ router.post('/instructor/submissions/:submissionId/grade', requireAuth, requireI
 // TEMPLATE ROUTES (WO-O4O-TEMPLATE-SYSTEM-FOUNDATION)
 // ========================================
 import { TemplateController } from '../controllers/TemplateController.js';
-// WO-O4O-STORE-CONTENT-COPY
-import { StoreContentController } from '../controllers/StoreContentController.js';
 
 // Library sub-paths (must be before /:id to avoid parameter capture)
 
@@ -376,64 +374,6 @@ router.post('/templates/:id/categories', requireAuth, requireInstructor, asyncHa
 
 // DELETE /api/v1/lms/templates/:id/categories/:categoryId - Remove Category from Template
 router.delete('/templates/:id/categories/:categoryId', requireAuth, requireInstructor, asyncHandler(TemplateController.removeCategoryFromTemplate));
-
-// ========================================
-// PUBLIC CONTENT (WO-O4O-STORE-CONTENT-USAGE) — NO AUTH
-// ========================================
-
-// GET /api/v1/lms/content/:slug - Public Content by slug (no auth)
-router.get('/content/:slug', asyncHandler(StoreContentController.getPublicContent));
-
-// ========================================
-// STORE CONTENT ROUTES (WO-O4O-STORE-CONTENT-COPY)
-// ========================================
-
-// POST /api/v1/lms/store-contents/copy - Copy Template to Store (before /:id)
-router.post('/store-contents/copy', requireAuth, asyncHandler(StoreContentController.copyTemplate));
-
-// GET /api/v1/lms/store-contents - List Store Contents
-router.get('/store-contents', requireAuth, asyncHandler(StoreContentController.listStoreContents));
-
-// GET /api/v1/lms/store-contents/:id - Get Store Content
-router.get('/store-contents/:id', requireAuth, asyncHandler(StoreContentController.getStoreContent));
-
-// PATCH /api/v1/lms/store-contents/:id - Update Store Content
-router.patch('/store-contents/:id', requireAuth, asyncHandler(StoreContentController.updateStoreContent));
-
-// DELETE /api/v1/lms/store-contents/:id - Delete Store Content
-router.delete('/store-contents/:id', requireAuth, asyncHandler(StoreContentController.deleteStoreContent));
-
-// GET /api/v1/lms/store-contents/:id/blocks - Get Store Content Blocks
-router.get('/store-contents/:id/blocks', requireAuth, asyncHandler(StoreContentController.getBlocks));
-
-// PATCH /api/v1/lms/store-content-blocks/:blockId - Update Store Content Block
-router.patch('/store-content-blocks/:blockId', requireAuth, asyncHandler(StoreContentController.updateBlock));
-
-// ========================================
-// STORE CONTENT USAGE (WO-O4O-STORE-CONTENT-USAGE)
-// ========================================
-
-// GET /api/v1/lms/store-contents/:id/sns - SNS Share Payload
-router.get('/store-contents/:id/sns', requireAuth, asyncHandler(StoreContentController.getSNSContent));
-
-// GET /api/v1/lms/store-contents/:id/pop - POP Display Payload
-router.get('/store-contents/:id/pop', requireAuth, asyncHandler(StoreContentController.getPOPContent));
-
-// GET /api/v1/lms/store-contents/:id/qr - QR Code Generation
-router.get('/store-contents/:id/qr', requireAuth, asyncHandler(StoreContentController.getQRCode));
-
-// ========================================
-// CONTENT ANALYTICS (WO-O4O-CONTENT-ANALYTICS)
-// ========================================
-
-// POST /api/v1/lms/content-analytics/track - Track Analytics Event
-router.post('/content-analytics/track', requireAuth, asyncHandler(StoreContentController.trackAnalyticsEvent));
-
-// GET /api/v1/lms/content-analytics/content/:storeContentId - Get Content Analytics
-router.get('/content-analytics/content/:storeContentId', requireAuth, asyncHandler(StoreContentController.getContentAnalytics));
-
-// GET /api/v1/lms/content-analytics/store/:storeId - Get Store Analytics
-router.get('/content-analytics/store/:storeId', requireAuth, asyncHandler(StoreContentController.getStoreAnalytics));
 
 // ========================================
 // OPERATOR COURSE ACTION ROUTES (WO-O4O-LMS-GLOBAL-OPERATOR-ROUTES-V1)
