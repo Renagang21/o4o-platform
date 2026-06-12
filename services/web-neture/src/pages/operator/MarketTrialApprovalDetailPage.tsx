@@ -131,7 +131,7 @@ export default function MarketTrialApprovalDetailPage() {
       getOperatorTrialKpi(id).then(setTrialKpi).catch(() => null);
       await loadParticipants(id, filter);
     } catch (err: any) {
-      setError(err.message || 'Trial을 불러오는데 실패했습니다.');
+      setError(err.message || '유통참여형 펀딩을 불러오는데 실패했습니다.');
     } finally {
       setLoading(false);
     }
@@ -348,7 +348,7 @@ export default function MarketTrialApprovalDetailPage() {
   if (!trial) {
     return (
       <div className="p-6 text-center text-gray-500">
-        {error || 'Trial을 찾을 수 없습니다.'}
+        {error || '유통참여형 펀딩을 찾을 수 없습니다.'}
       </div>
     );
   }
@@ -673,7 +673,7 @@ export default function MarketTrialApprovalDetailPage() {
           <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">{nextTransition.label}</h3>
             <p className="text-sm text-gray-600 mb-4">
-              Trial 상태를 <strong>{STATUS_LABELS[trial.status]}</strong>에서{' '}
+              유통참여형 펀딩 상태를 <strong>{STATUS_LABELS[trial.status]}</strong>에서{' '}
               <strong>{STATUS_LABELS[nextTransition.status]}</strong>으로 전환합니다.
               <br />이 작업은 되돌릴 수 없습니다.
             </p>

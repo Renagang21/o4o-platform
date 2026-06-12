@@ -126,7 +126,7 @@ function TrialsPanel() {
       const data = await getOperatorTrials(filter || undefined);
       setTrials(data);
     } catch (err: any) {
-      setError(err.message || 'Trial 목록을 불러오는데 실패했습니다.');
+      setError(err.message || '유통참여형 펀딩 목록을 불러오는데 실패했습니다.');
     } finally {
       setLoading(false);
     }
