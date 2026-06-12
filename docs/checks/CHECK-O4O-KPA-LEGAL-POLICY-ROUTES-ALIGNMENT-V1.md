@@ -55,11 +55,17 @@
 - tsc web-kpa-society **0** ✅ / build **0** ✅
 - 변경 파일: `lib/legalDocument.ts`(신규) · `pages/legal/LegalDocumentView.tsx`(신규) · `PolicyPage.tsx`/`PrivacyPage.tsx`(wrapper 전환).
 
-## 16. 브라우저 smoke 결과
-- (배포 후 갱신)
+## 16. 브라우저 smoke 결과 (프로덕션, 로그아웃)
+| URL | 결과 |
+|-----|------|
+| kpa-society.co.kr/policy | 제목 "이용약관" + **"현재 공개된 문서가 없습니다."** — static 약관 본문(제1조 목적 등) 사라짐, localStorage 미사용. `GET /api/v1/kpa/legal/documents/published/terms` 404→empty 처리 ✅ |
+| kpa-society.co.kr/privacy | 제목 "개인정보처리방침" + empty state — static 방침 본문 사라짐. `.../published/privacy` 404→empty ✅ |
+- seed terms/privacy 가 draft 라 미게시 → 공개는 empty(가짜 약관 0). 운영자가 `/operator/legal` 에서 게시하면 동일 페이지에
+  DB 본문이 자동 표시(단절 해소 확인). footer 링크(/policy·/privacy) 정상.
 
 ## 17. commit hash
-- (커밋 후 기재)
+- 구현 + CHECK: `7ca4fc3b0` (web deploy success)
+- CHECK smoke 반영: (본 커밋)
 
 ---
 
