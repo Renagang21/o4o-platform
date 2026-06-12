@@ -8,6 +8,7 @@
  */
 
 import type { DataSource, SelectQueryBuilder } from 'typeorm';
+import { Brackets } from 'typeorm';
 import { ForumPost, PostStatus, PostType } from '../entities/ForumPost.js';
 import { buildTsQuery, getSearchConfig } from '../utils/searchUtils.js';
 
@@ -46,6 +47,14 @@ export interface ForumSearchQuery {
   // Pagination
   page?: number;
   limit?: number;
+
+  /**
+   * WO-O4O-FORUM-SEARCH-CLOSED-FORUM-VISIBILITY-GATE-V1
+   * Authenticated viewer's user id (undefined for anonymous). Used to gate
+   * closed-forum posts: anonymous viewers only see open forums; authenticated
+   * viewers additionally see closed forums they are a member or owner of.
+   */
+  viewerId?: string;
 }
 
 /**
@@ -135,6 +144,7 @@ export class ForumSearchService {
       sort = 'relevance',
       page = 1,
       limit = 20,
+      viewerId,
     } = options;
 
     // Build tsquery from search string
@@ -188,6 +198,32 @@ export class ForumSearchService {
 
     // Status filter (default: published)
     qb.andWhere('post.status = :status', { status });
+
+    // WO-O4O-FORUM-SEARCH-CLOSED-FORUM-VISIBILITY-GATE-V1
+    // Closed-forum visibility gate: a post in a closed forum (forum_category_requests.forum_type
+    // = 'closed') must NOT surface in search results to non-members. Open forums (forum_type !=
+    // 'closed' or null) are always visible. Authenticated viewers additionally see closed forums
+    // they belong to (member) or own (requester). Anonymous viewers (no viewerId) see open only.
+    // Applied to the shared query builder → covers both getCount() and getRawAndEntities().
+    // (The live forum listing/search path — ForumPostController.listPosts — already enforces this;
+    //  this hardens the full-text search surface defense-in-depth.)
+    qb.andWhere(
+      new Brackets((vb) => {
+        vb.where(
+          `NOT EXISTS (SELECT 1 FROM forum_category_requests _vfcr WHERE _vfcr.id = post.forum_id AND _vfcr.forum_type = 'closed')`
+        );
+        if (viewerId) {
+          vb.orWhere(
+            `EXISTS (SELECT 1 FROM forum_category_members _vfcm WHERE _vfcm.forum_category_id = post.forum_id AND _vfcm.user_id = :viewerId)`,
+            { viewerId }
+          );
+          vb.orWhere(
+            `EXISTS (SELECT 1 FROM forum_category_requests _vfco WHERE _vfco.id = post.forum_id AND _vfco.requester_id = :viewerId)`,
+            { viewerId }
+          );
+        }
+      })
+    );
 
     // Extension key filter (generic)
     if (extensionKey) {

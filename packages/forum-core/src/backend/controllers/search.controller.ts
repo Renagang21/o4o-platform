@@ -65,6 +65,10 @@ export class SearchController {
       const pageNum = Math.max(1, parseInt(page as string, 10) || 1);
       const limitNum = Math.min(100, Math.max(1, parseInt(limit as string, 10) || 20));
 
+      // WO-O4O-FORUM-SEARCH-CLOSED-FORUM-VISIBILITY-GATE-V1: viewer context for closed-forum gate.
+      // Undefined when the request is anonymous (route has optional/no auth) → open forums only.
+      const viewerId = (req as any).user?.id as string | undefined;
+
       // Build search query
       const searchQuery: ForumSearchQuery = {
         query: q as string,
@@ -76,6 +80,7 @@ export class SearchController {
         sort: sort as 'relevance' | 'latest' | 'popular' | 'oldest',
         page: pageNum,
         limit: limitNum,
+        viewerId,
       };
 
       const results = await this.searchService.searchPosts(searchQuery);
