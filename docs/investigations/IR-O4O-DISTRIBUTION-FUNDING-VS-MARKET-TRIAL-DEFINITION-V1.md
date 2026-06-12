@@ -9,6 +9,32 @@
 
 ---
 
+> ## ⚠️ Supersede Note — 2026-06-12
+>
+> 본 IR 의 **기능 정의** 중 다음은 **유지**한다:
+> - 유통참여형 펀딩 = Market Trial 의 외부(사업)명, 내부 코드/엔티티/route 명 = `market_trial`.
+> - 참여 = 주문이 아니라 **사전 참여/약정**(크라우드펀딩형 사전 모집, 주문 전 단계).
+> - 결제 = online checkout(o4o_payments)이 아니라 **오프라인 정산 ledger**.
+> - Market Trial 은 별도 `market_trial` 도메인. `distribution_type` 에 `FUNDING` 값 없음.
+>
+> 다만 본 IR 작성 당시의 다음 **Store 연결 기준은 폐기**한다(이후 정책 정정):
+> - "Store 서비스(KPA/GlycoPharm/K-Cosmetics)는 Neture 리다이렉트 유지"
+> - "매장 허브 카드 / 내 매장 참여 이력·펀딩 상태 표시"
+> - "전환 후 OrganizationProductListing 이 Store 서비스의 O4O 주문 가능 상품으로 합류"
+> - Store 서비스에서 유통참여형 펀딩을 관련 기능처럼 취급
+>
+> **최신 확정 기준** (아래 후속 문서를 따른다):
+> `IR-O4O-MARKET-TRIAL-NETURE-ONLY-BOUNDARY-CORRECTION-V1` · `WO-O4O-MARKET-TRIAL-STORE-REDIRECT-AND-CARD-REMOVAL-V1` · `WO-O4O-MARKET-TRIAL-KPA-MEMBERSHIP-GATE-REMOVAL-V1` · `IR-O4O-MARKET-TRIAL-BACKEND-NETURE-BOUNDARY-V1` · `IR-O4O-MARKET-TRIAL-SPO-OPL-CONVERSION-USAGE-AUDIT-V1` · `WO-O4O-MARKET-TRIAL-CONVERSION-DISABLE-V1` · `CHECK-O4O-MARKET-TRIAL-CONVERTED-LISTING-DATA-AUDIT-V1`
+>
+> **최신 정책:**
+> - 유통참여형 펀딩은 **Neture 전용** 기능이다.
+> - KPA/GlycoPharm/K-Cosmetics 의 운영자·매장 허브·내 매장·O4O 주문 가능 상품·참여 이력과 **연결하지 않는다.**
+> - Store frontend 연결 흔적(route/card/banner/menu/redirect)은 **제거**되었다.
+> - Market Trial → SPO → OPL **신규 전환은 비활성화**되었고, checkout 의 trial 역연결(first_order 승격)도 중단되었다.
+> - production DB 실측 결과 `source_type='market_trial'` OPL 은 **0 건**으로, 기존 데이터 cleanup 은 **불필요**하다.
+
+---
+
 ## 1. 목적
 다음 개념의 관계를 코드 근거로 확정하고 canonical 정의를 제안한다: 유통참여형 펀딩 / Market Trial / 판매자 모집(SupplierProductOffer) / 공급 승인(ProductApproval) / O4O 주문 가능 상품(OrganizationProductListing) / 이벤트형(EventOffer).
 
