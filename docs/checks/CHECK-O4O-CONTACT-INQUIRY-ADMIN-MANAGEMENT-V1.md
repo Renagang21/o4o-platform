@@ -4,7 +4,7 @@
 > GP/KCos 접수 문의(`ContactInquiry`)를 Admin 운영자가 **조회·상태 처리**할 수 있는 화면을 추가.
 > 공통 `ContactInquiryAdminPage`(operator-core-ui) + GP/KCos admin route/menu. 알림 targetUrl 연결. **migration 없음.**
 > Neture/KPA·공개 Contact form 무변경.
-> **결과: CODE PASS** (tsc api-server/GP/contact파일 0 + GP build 0). 배포 후 smoke + 테스트 문의 정리 예정. — 2026-06-12
+> **결과: PASS** (tsc 0 + GP build 0 + 배포 success + GP/KCos 브라우저 smoke PASS + [SMOKE] 문의 2건 spam 정리). — 2026-06-12
 
 ---
 
@@ -48,7 +48,9 @@
   (NotificationBell 의 기존 targetUrl 라우팅 재사용). 상세 deep-link 는 후속(목록까지 연결).
 
 ## 10. 테스트 문의 처리 결과
-- (배포 후 smoke 시: 선행 WO 의 [SMOKE] GP/KCos 문의를 `spam` 상태로 변경 — hard delete 미생성, WO §6.4)
+- 선행 WO 의 [SMOKE] GP/KCos 문의 2건을 admin UI 에서 `spam` 상태로 변경 + 내부 메모 기록(2026-06-12 오후 02:32) — **hard delete 미생성**(WO §6.4).
+  - GP `[SMOKE] GP 문의 접수+알림 검증` → 스팸 / 처리일 기록 ✅
+  - KCos `[SMOKE] KCos 문의 접수+알림 검증` → 스팸 / 처리일 기록 ✅
 
 ## 11. 개인정보/XSS 처리 기준
 - 목록 본문 미노출 / 상세는 admin 권한만 / 본문 plain text(dangerouslySetInnerHTML 미사용) / 오류 메시지 내부 stack 미노출.
@@ -62,11 +64,14 @@
 - KCos full local build 는 **타 세션 미커밋 ForumPage WIP**(`pageNumbers` 미사용)로 차단 — 본 WO 파일과 무관, path-specific 커밋에 미포함 → main 무영향(CI 는 clean main 빌드).
 - migration 없음.
 
-## 15. 브라우저 smoke 결과
-- (배포 후 갱신)
+## 15. 브라우저 smoke 결과 (2026-06-12, 배포 6368c6da5 · api/web/admin deploy success)
+- **GP** `glycopharm.co.kr/admin/contact-inquiries`: admin 로그인 → System 그룹 "문의 관리" 메뉴 노출 → 목록에 [SMOKE] GP 문의 표시 → 상세 drawer(유형/이름/이메일/본문/알림상태 sent/경로 /contact) → 상태 스팸 변경 + 메모 저장 "저장되었습니다." → 목록 상태 '스팸' + 처리일 반영 ✅
+- **KCos** `www.k-cosmetics.site/admin/contact-inquiries`: admin 로그인 → "문의 관리" 메뉴 + 직접 진입 → 목록에 [SMOKE] KCos 문의 표시 → 상세 → 상태 스팸 변경 + 메모 저장 ✅
+- 결과: **PASS** (목록/상세/상태변경/메모/처리일 모두 정상, 서비스별 자기 문의만 노출).
 
 ## 16. commit hash
-- (커밋 후 기재)
+- 구현/문서: `6368c6da5` (feat(contact): GP/KCos admin contact-inquiry management)
+- smoke 반영: 본 갱신 커밋(아래)
 
 ---
 
