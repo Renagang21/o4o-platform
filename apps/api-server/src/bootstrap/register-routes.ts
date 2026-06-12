@@ -272,6 +272,12 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     app.use('/api/v1/admin/services', createAdminServiceLegalController(dataSource));
     logger.info('✅ Service Legal routes registered at /api/v1/public/services and /api/v1/admin/services');
 
+    // 8.2. Public Contact Inquiry (WO-O4O-CONTACT-DELIVERY-AND-NOTIFICATION-V1)
+    //   GP/KCos 공개 문의 접수 + 운영자 in-app 알림. Neture/KPA 는 자체 경로 유지(미사용).
+    const { createPublicContactInquiryController } = await import('../modules/contact-inquiry/public-contact-inquiry.controller.js');
+    app.use('/api/v1/public/services', createPublicContactInquiryController(dataSource));
+    logger.info('✅ Contact Inquiry public route registered at /api/v1/public/services/:serviceKey/contact-inquiries');
+
     // 8.5. Register SiteGuide routes (independent service - siteguide.co.kr, no auth)
     const siteguideRoutes = createSiteGuideRoutes(dataSource);
     app.use('/api/siteguide', siteguideRoutes);

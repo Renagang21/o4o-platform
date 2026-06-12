@@ -21,6 +21,10 @@ export type { PolicyDocumentViewerProps, PolicyDocumentDto } from './legal/Polic
 export { PublicLegalFooterInfo } from './legal/PublicLegalFooterInfo';
 export type { PublicLegalFooterInfoProps, PublicLegalProfileDto } from './legal/PublicLegalFooterInfo';
 
+// WO-O4O-CONTACT-DELIVERY-AND-NOTIFICATION-V1: 공개 문의 폼
+export { PublicContactForm } from './legal/PublicContactForm';
+export type { PublicContactFormProps, ContactInquiryPayload, PublicContactFormTheme } from './legal/PublicContactForm';
+
 /* HUB common components */
 export { HubPagination } from './HubPagination';
 export type { HubPaginationProps } from './HubPagination';

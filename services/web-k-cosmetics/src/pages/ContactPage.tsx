@@ -5,6 +5,26 @@
  */
 
 import { PageSection, PageContainer, Card } from '@o4o/ui';
+// WO-O4O-CONTACT-DELIVERY-AND-NOTIFICATION-V1
+import { PublicContactForm, type ContactInquiryPayload } from '@o4o/shared-space-ui';
+import { api } from '@/lib/apiClient';
+
+const KCOS_INQUIRY_TYPES = [
+  { value: 'service_usage', label: '서비스 이용 문의' },
+  { value: 'account_permission', label: '매장 가입/권한 문의' },
+  { value: 'partnership', label: '공급·제휴 문의' },
+  { value: 'technical_issue', label: '오류 신고' },
+  { value: 'other', label: '기타 문의' },
+];
+
+async function submitInquiry(payload: ContactInquiryPayload): Promise<void> {
+  try {
+    await api.post('/public/services/k-cosmetics/contact-inquiries', payload);
+  } catch (err: any) {
+    const msg = err?.response?.data?.error?.message;
+    throw new Error(typeof msg === 'string' ? msg : '문의 접수 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+  }
+}
 
 export function ContactPage() {
   return (
@@ -17,8 +37,25 @@ export function ContactPage() {
         </p>
       </section>
 
+      {/* WO-O4O-CONTACT-DELIVERY-AND-NOTIFICATION-V1: 문의 폼 (접수 + 운영자 in-app 알림) */}
+      <PageSection>
+        <PageContainer>
+          <PublicContactForm
+            serviceKey="k-cosmetics"
+            submitInquiry={submitInquiry}
+            inquiryTypes={KCOS_INQUIRY_TYPES}
+            organizationLabel="매장명"
+            privacyHref="/privacy"
+            theme={{ accent: '#db2777' }}
+            introText="매장 가입·상품/콘텐츠 활용·공급 제휴에 관한 문의를 남겨 주세요. 접수 후 운영자가 확인합니다."
+          />
+        </PageContainer>
+      </PageSection>
+
       <PageSection last>
         <PageContainer>
+          {/* 직접 연락 (보조) */}
+          <h2 className="text-center font-semibold text-slate-700 mb-6 mt-0">직접 연락</h2>
           {/* Contact Cards */}
           <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-6 mb-12">
             <Card className="p-7">
@@ -66,15 +103,8 @@ export function ContactPage() {
             </p>
           </div>
 
-          {/* Company Info */}
-          <Card className="p-6 text-center">
-            <h3 className="text-sm font-semibold text-slate-500 mb-3 mt-0">운영 회사 정보</h3>
-            <div className="text-xs text-slate-400 leading-loose">
-              <p className="m-0">㈜쓰리라이프존</p>
-              <p className="m-0">사업자등록번호: 108-86-02873</p>
-              <p className="m-0">서울시 강남구</p>
-            </div>
-          </Card>
+          {/* WO-O4O-CONTACT-DELIVERY-AND-NOTIFICATION-V1: 하드코딩 법정정보(운영 회사 정보) 카드 제거 —
+              법정정보는 service_legal_profiles 동적 표시 원칙(footer)과 일관. 코드 하드코딩 금지. */}
         </PageContainer>
       </PageSection>
     </div>

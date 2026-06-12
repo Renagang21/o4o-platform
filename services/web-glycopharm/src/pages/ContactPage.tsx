@@ -1,4 +1,24 @@
 import { Mail, Clock, Building2, FileText } from 'lucide-react';
+// WO-O4O-CONTACT-DELIVERY-AND-NOTIFICATION-V1
+import { PublicContactForm, type ContactInquiryPayload } from '@o4o/shared-space-ui';
+import { api } from '@/lib/apiClient';
+
+const GP_INQUIRY_TYPES = [
+  { value: 'service_usage', label: '서비스 이용 문의' },
+  { value: 'account_permission', label: '약국 가입/권한 문의' },
+  { value: 'partnership', label: '공급·제휴 문의' },
+  { value: 'technical_issue', label: '오류 신고' },
+  { value: 'other', label: '기타 문의' },
+];
+
+async function submitInquiry(payload: ContactInquiryPayload): Promise<void> {
+  try {
+    await api.post('/public/services/glycopharm/contact-inquiries', payload);
+  } catch (err: any) {
+    const msg = err?.response?.data?.error?.message;
+    throw new Error(typeof msg === 'string' ? msg : '문의 접수 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+  }
+}
 
 export default function ContactPage() {
   return (
@@ -13,9 +33,25 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* Contact Cards */}
-      <section className="py-16">
+      {/* WO-O4O-CONTACT-DELIVERY-AND-NOTIFICATION-V1: 문의 폼 (접수 + 운영자 in-app 알림) */}
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
+          <PublicContactForm
+            serviceKey="glycopharm"
+            submitInquiry={submitInquiry}
+            inquiryTypes={GP_INQUIRY_TYPES}
+            organizationLabel="약국명"
+            privacyHref="/privacy"
+            theme={{ accent: '#0d9488' }}
+            introText="약국 운영·서비스 이용·공급 제휴에 관한 문의를 남겨 주세요. 접수 후 운영자가 확인합니다."
+          />
+        </div>
+      </section>
+
+      {/* 직접 연락 (보조) */}
+      <section className="pb-16">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+          <h2 className="text-center font-semibold text-slate-700 mb-6">직접 연락</h2>
           <div className="grid md:grid-cols-3 gap-6 mb-12">
             {/* 일반 문의 */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100">

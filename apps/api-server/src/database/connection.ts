@@ -204,6 +204,9 @@ import { ActionLog } from '@o4o/action-log-core';
 import { ServiceLegalProfile } from '../modules/service-legal/entities/ServiceLegalProfile.entity.js';
 import { ServicePolicyDocument } from '../modules/service-legal/entities/ServicePolicyDocument.entity.js';
 
+// CONTACT INQUIRY ENTITY (WO-O4O-CONTACT-DELIVERY-AND-NOTIFICATION-V1)
+import { ContactInquiry } from '../modules/contact-inquiry/entities/ContactInquiry.entity.js';
+
 // ============================================================================
 // PLATFORM STORE IDENTITY ENTITIES (WO-CORE-STORE-SLUG-SYSTEM-V1)
 // ============================================================================
@@ -748,6 +751,8 @@ export const AppDataSource = new DataSource({
     // ============================================================================
     ServiceLegalProfile,
     ServicePolicyDocument,
+    // CONTACT INQUIRY (WO-O4O-CONTACT-DELIVERY-AND-NOTIFICATION-V1)
+    ContactInquiry,
     // ============================================================================
     // PLATFORM STORE IDENTITY ENTITIES (WO-CORE-STORE-SLUG-SYSTEM-V1)
     // ============================================================================
