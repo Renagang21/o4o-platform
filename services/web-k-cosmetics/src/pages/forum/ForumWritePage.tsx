@@ -14,6 +14,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { createForumPost } from '../../services/forumApi';
 import { toast } from '@o4o/error-handling';
+// WO-O4O-FORUM-WRITE-EDITOR-CONTENT-PARITY-V1: RichTextEditor + blocks 정렬(KPA/Neture 와 동일)
+import { RichTextEditor } from '@o4o/content-editor';
+import { htmlToBlocks } from '@o4o/forum-core/utils';
 
 type PostType = 'discussion' | 'question' | 'guide' | 'poll' | 'announcement';
 
@@ -24,15 +27,6 @@ const POST_TYPES: { value: PostType; label: string }[] = [
   { value: 'poll', label: 'Poll' },
   { value: 'announcement', label: 'Announcement' },
 ];
-
-
-/** Convert plain text to Block[] format */
-function textToBlocks(text: string): Array<{ type: string; content: string }> {
-  return text
-    .split('\n\n')
-    .filter((p) => p.trim())
-    .map((p) => ({ type: 'paragraph', content: p.trim() }));
-}
 
 export default function ForumWritePage() {
   const navigate = useNavigate();
@@ -50,14 +44,15 @@ export default function ForumWritePage() {
       toast.error('Please enter a title.');
       return;
     }
-    if (!content.trim()) {
+    const isEmpty = !content || content === '<p></p>' || content.replace(/<[^>]*>/g, '').trim() === '';
+    if (isEmpty) {
       toast.error('Please enter content.');
       return;
     }
 
     try {
       setSubmitting(true);
-      const blocks = textToBlocks(content);
+      const blocks = htmlToBlocks(content);
       const data = await createForumPost({
         title: title.trim(),
         type: postType,
@@ -133,12 +128,12 @@ export default function ForumWritePage() {
           {/* Content */}
           <div style={styles.field}>
             <label style={styles.label}>Content</label>
-            <textarea
+            <RichTextEditor
               value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="Write your post content here. Use double line breaks for paragraphs."
-              style={styles.textarea}
-              rows={12}
+              onChange={(editorContent) => setContent(editorContent.html)}
+              placeholder="Write your post content here"
+              minHeight="300px"
+              preset="compact"
             />
           </div>
 

@@ -18,6 +18,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { createForumPost } from '@/services/forumApi';
 import { toast } from '@o4o/error-handling';
 import { RichTextEditor } from '@o4o/content-editor';
+// WO-O4O-FORUM-WRITE-EDITOR-CONTENT-PARITY-V1: content 를 blocks 로 정렬(KPA/Neture 와 동일)
+import { htmlToBlocks } from '@o4o/forum-core/utils';
 
 type PostType = 'discussion' | 'question' | 'guide' | 'poll' | 'announcement';
 
@@ -56,7 +58,7 @@ export default function ForumWritePage() {
       const data = await createForumPost({
         title: title.trim(),
         type: postType,
-        content,
+        content: htmlToBlocks(content),
       });
 
       if (data.success && data.data?.id) {

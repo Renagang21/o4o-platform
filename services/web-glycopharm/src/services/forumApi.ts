@@ -105,7 +105,8 @@ export async function fetchPostComments(postId: string): Promise<{ success: bool
 export async function createForumPost(payload: {
   title: string;
   type: string;
-  content: string;
+  // WO-O4O-FORUM-WRITE-EDITOR-CONTENT-PARITY-V1: blocks(Block[]) 정렬 — string 호환 유지
+  content: unknown[] | string;
 }): Promise<{ success: boolean; data?: { id: string }; id?: string; error?: string }> {
   const response = await api.post('/forum/posts', payload);
   return response.data;

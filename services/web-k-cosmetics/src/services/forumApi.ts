@@ -207,7 +207,8 @@ export function extractTextContent(content: string | object[] | undefined): stri
 export async function createForumPost(payload: {
   title: string;
   type: ForumPostType;
-  content: Array<{ type: string; content: string }> | string;
+  // WO-O4O-FORUM-WRITE-EDITOR-CONTENT-PARITY-V1: htmlToBlocks Block[] 수용 — string 호환 유지
+  content: unknown[] | string;
 }): Promise<{ success: boolean; data?: { id: string }; error?: string }> {
   const response = await api.post('/forum/posts', payload);
   return response.data;
