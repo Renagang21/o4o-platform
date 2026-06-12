@@ -171,7 +171,8 @@ export function createPublicContactInquiryController(dataSource: DataSource): Ro
                 title: '새 문의가 접수되었습니다',
                 message: `[${typeLabel}] ${cleanSubject}`,
                 serviceKey,
-                metadata: { contactInquiryId: entity.id, inquiryType: type },
+                // WO-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1: 알림 클릭 → Admin 문의 관리
+                metadata: { contactInquiryId: entity.id, inquiryType: type, targetUrl: '/admin/contact-inquiries' },
               }),
             ),
           );

@@ -278,6 +278,11 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     app.use('/api/v1/public/services', createPublicContactInquiryController(dataSource));
     logger.info('✅ Contact Inquiry public route registered at /api/v1/public/services/:serviceKey/contact-inquiries');
 
+    // 8.3. Admin Contact Inquiry (WO-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1) — GP/KCos 문의 조회·처리
+    const { createAdminContactInquiryController } = await import('../modules/contact-inquiry/admin-contact-inquiry.controller.js');
+    app.use('/api/v1/admin/services', createAdminContactInquiryController(dataSource));
+    logger.info('✅ Contact Inquiry admin route registered at /api/v1/admin/services/:serviceKey/contact-inquiries');
+
     // 8.5. Register SiteGuide routes (independent service - siteguide.co.kr, no auth)
     const siteguideRoutes = createSiteGuideRoutes(dataSource);
     app.use('/api/siteguide', siteguideRoutes);

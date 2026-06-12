@@ -129,6 +129,8 @@ const GlycoPharmAdminDashboard = lazy(() => import('@/pages/admin/GlycoPharmAdmi
 const GlycoPharmAdminMembersPage = lazy(() => import('@/pages/admin/GlycoPharmAdminMembersPage'));
 // WO-O4O-GP-KCOS-SERVICE-LEGAL-POLICY-SETTINGS-UI-ROLLOUT-V1
 const ServiceLegalSettingsPage = lazy(() => import('@/pages/admin/ServiceLegalSettingsPage'));
+// WO-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1
+const ContactInquiriesPage = lazy(() => import('@/pages/admin/ContactInquiriesPage'));
 
 // Operator Dashboard
 const GlycoPharmOperatorDashboard = lazy(() => import('@/pages/operator/GlycoPharmOperatorDashboard'));
@@ -760,6 +762,8 @@ function AppRoutes() {
         <Route path="roles" element={<RoleManagementPage />} />
         {/* WO-O4O-GP-KCOS-SERVICE-LEGAL-POLICY-SETTINGS-UI-ROLLOUT-V1 */}
         <Route path="settings/legal-terms" element={<ServiceLegalSettingsPage />} />
+        {/* WO-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1 */}
+        <Route path="contact-inquiries" element={<ContactInquiriesPage />} />
       </Route>
 
       {/* Operator Dashboard — operator + admin 접근 가능 (WO-O4O-DASHBOARD-ROUTING-NORMALIZE-V1) */}
