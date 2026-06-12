@@ -200,6 +200,10 @@ import { AssetSnapshot } from '../modules/asset-snapshot/entities/asset-snapshot
 // ACTION LOG ENTITY (WO-PLATFORM-ACTION-LOG-CORE-V1)
 import { ActionLog } from '@o4o/action-log-core';
 
+// SERVICE LEGAL / POLICY ENTITIES (WO-O4O-SERVICE-LEGAL-POLICY-SETTINGS-BACKEND-V1)
+import { ServiceLegalProfile } from '../modules/service-legal/entities/ServiceLegalProfile.entity.js';
+import { ServicePolicyDocument } from '../modules/service-legal/entities/ServicePolicyDocument.entity.js';
+
 // ============================================================================
 // PLATFORM STORE IDENTITY ENTITIES (WO-CORE-STORE-SLUG-SYSTEM-V1)
 // ============================================================================
@@ -753,6 +757,11 @@ export const AppDataSource = new DataSource({
     // ACTION LOG ENTITY (WO-PLATFORM-ACTION-LOG-CORE-V1)
     // ============================================================================
     ActionLog,
+    // ============================================================================
+    // SERVICE LEGAL / POLICY ENTITIES (WO-O4O-SERVICE-LEGAL-POLICY-SETTINGS-BACKEND-V1)
+    // ============================================================================
+    ServiceLegalProfile,
+    ServicePolicyDocument,
     // ============================================================================
     // PLATFORM STORE IDENTITY ENTITIES (WO-CORE-STORE-SLUG-SYSTEM-V1)
     // ============================================================================

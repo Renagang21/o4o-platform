@@ -264,6 +264,14 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     app.use('/api/v1/public', publicRoutes);
     logger.info('✅ Public routes registered at /api/v1/public');
 
+    // 8.1. Service Legal / Policy settings (WO-O4O-SERVICE-LEGAL-POLICY-SETTINGS-BACKEND-V1)
+    //   public read (no auth) + admin write (serviceKey-scoped). frontend 미수정 — backend 기반만.
+    const { createPublicServiceLegalController } = await import('../modules/service-legal/public-service-legal.controller.js');
+    const { createAdminServiceLegalController } = await import('../modules/service-legal/admin-service-legal.controller.js');
+    app.use('/api/v1/public/services', createPublicServiceLegalController(dataSource));
+    app.use('/api/v1/admin/services', createAdminServiceLegalController(dataSource));
+    logger.info('✅ Service Legal routes registered at /api/v1/public/services and /api/v1/admin/services');
+
     // 8.5. Register SiteGuide routes (independent service - siteguide.co.kr, no auth)
     const siteguideRoutes = createSiteGuideRoutes(dataSource);
     app.use('/api/siteguide', siteguideRoutes);
