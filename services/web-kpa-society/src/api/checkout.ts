@@ -177,3 +177,30 @@ export async function updateStoreOrderStatus(
 ): Promise<{ success: boolean; data: any }> {
   return apiClient.patch(`/checkout/store-orders/${orderId}/status`, body);
 }
+
+// ── Buyer 구매/발주 내역 (checkout_orders, buyerId 기준) ──
+// IR-O4O-STORE-ORDER-DIRECTION-SEMANTICS-CROSSSERVICE-V1: "내 매장 주문 내역" canonical = buyer.
+// (위 store-orders* 는 sellerOrganizationId 기준 "판매자 관점" — 별도 seller 화면 후보로 보존.)
+
+export interface BuyerOrder {
+  id: string;
+  orderNumber: string;
+  status: string;
+  paymentStatus: string;
+  totalAmount: number;
+  organization?: { id?: string; name?: string };
+  itemCount: number;
+  createdAt: string;
+}
+
+/** 내 매장 구매/발주 내역 — checkout_orders(buyerId + serviceKey) */
+export async function getBuyerOrders(params?: {
+  page?: number;
+  limit?: number;
+}): Promise<{
+  success: boolean;
+  data: BuyerOrder[];
+  pagination: { page: number; limit: number; total: number; totalPages: number };
+}> {
+  return apiClient.get('/checkout/orders', params);
+}
