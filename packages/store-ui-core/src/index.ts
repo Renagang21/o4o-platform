@@ -83,6 +83,10 @@ export type {
   StoreLocalProductInput,
 } from './components/local-products/StoreLocalProductsManager';
 
+// Store Hub 이벤트 오퍼 단순 목록 공통 (WO-O4O-STORE-HUB-EVENT-OFFER-GP-KCOS-COMMON-COMPONENT-EXTRACTION-V1)
+export { EventOffersHubList } from './components/event-offers/EventOffersHubList';
+export type { EventOffersHubListProps, EventOfferHubItem, EventOffersHubAccent } from './components/event-offers/EventOffersHubList';
+
 // Shared Production Modal (WO-O4O-START-PRODUCTION-MODAL-SHARED-COMPONENT-PHASE2-H-V1)
 export { StartProductionModal } from './components/StartProductionModal';
 export type { StartProductionModalProps, StartProductionTargetConfig, StartProductionTemplateItem } from './components/StartProductionModal';
