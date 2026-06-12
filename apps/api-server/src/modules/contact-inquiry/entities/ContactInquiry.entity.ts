@@ -73,8 +73,8 @@ export class ContactInquiry {
   @Column({ type: 'varchar', length: 64, nullable: true })
   ip_hash!: string | null;
 
-  /** sent | skipped_no_recipient | failed (in-app 알림 결과) */
-  @Column({ type: 'varchar', length: 40, nullable: true })
+  /** 복합 알림 결과 — inapp:<x>;email:<y>;autoreply:<z> (WO-O4O-CONTACT-AUTO-REPLY-V1 로 확장) */
+  @Column({ type: 'varchar', length: 100, nullable: true })
   notification_status!: string | null;
 
   // ── 운영 처리(후속 Admin) — V1 미사용, nullable ──

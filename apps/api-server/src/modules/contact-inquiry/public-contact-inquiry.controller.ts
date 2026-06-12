@@ -245,8 +245,51 @@ export function createPublicContactInquiryController(dataSource: DataSource): Ro
         }
       }
 
-      // 복합 알림 결과 기록(접수 자체는 이미 성공). varchar(40) 이내.
-      const notificationStatus = `inapp:${inappStatus};email:${emailStatus}`;
+      // 자동 회신: 문의자에게 접수 확인 메일 (WO-O4O-CONTACT-AUTO-REPLY-V1, best-effort)
+      // "답변"이 아니라 "접수 확인". 운영자 수신자(recipientEmails)와 구분 — 문의자(cleanEmail)에게만 발송.
+      let autoReplyStatus = 'off';
+      if (settings.autoReplyEnabled) {
+        if (!settings.autoReplySubject || !settings.autoReplyMessage) {
+          autoReplyStatus = 'off'; // 제목/본문 미설정 — 발송 안 함
+        } else if (!EMAIL_RE.test(cleanEmail)) {
+          autoReplyStatus = 'noemail';
+        } else {
+          try {
+            const serviceName = SERVICE_DISPLAY_NAME[serviceKey] || serviceKey;
+            const parts = [
+              `<div style="white-space:pre-wrap;font-family:inherit">${esc(settings.autoReplyMessage)}</div>`,
+              `<hr/>`,
+              `<p style="color:#64748b;font-size:13px">`,
+              `서비스: ${esc(serviceName)}<br/>`,
+              `문의 유형: ${esc(typeLabel)}<br/>`,
+              `제목: ${esc(cleanSubject)}<br/>`,
+              `접수 시각: ${esc(entity.created_at?.toISOString?.() || '')}`,
+              `</p>`,
+            ];
+            if (settings.autoReplyIncludeOriginal) {
+              parts.push(`<p style="color:#64748b;font-size:13px"><strong>문의 내용</strong></p>`);
+              parts.push(`<pre style="white-space:pre-wrap;font-family:inherit;color:#475569">${esc(cleanMessage)}</pre>`);
+            }
+            const result = await emailService.sendEmail({
+              to: cleanEmail,
+              subject: (settings.autoReplySubject || `[${serviceName}] 문의가 접수되었습니다`).slice(0, 200),
+              html: parts.join('\n'),
+            });
+            if (result.success) {
+              autoReplyStatus = 'sent';
+            } else {
+              autoReplyStatus = /disabled/i.test(result.error || '') ? 'noprovider' : 'fail';
+              logger.warn(`[ContactInquiry] auto-reply not sent (${autoReplyStatus}): ${result.error || ''}`);
+            }
+          } catch (autoReplyError) {
+            autoReplyStatus = 'fail';
+            logger.warn('[ContactInquiry] auto-reply error (best-effort):', autoReplyError);
+          }
+        }
+      }
+
+      // 복합 알림 결과 기록(접수 자체는 이미 성공). varchar(100) 이내.
+      const notificationStatus = `inapp:${inappStatus};email:${emailStatus};autoreply:${autoReplyStatus}`;
       try {
         entity.notification_status = notificationStatus;
         await repo.save(entity);

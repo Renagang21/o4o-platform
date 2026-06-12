@@ -71,6 +71,10 @@ export function ServiceContactSettingsPage({ serviceKey, api, title }: ServiceCo
   const [types, setTypes] = useState<ContactInquiryTypeConfig[]>([]);
   const [privacyNotice, setPrivacyNotice] = useState('');
   const [completionNotice, setCompletionNotice] = useState('');
+  const [autoReplyEnabled, setAutoReplyEnabled] = useState(false);
+  const [autoReplySubject, setAutoReplySubject] = useState('');
+  const [autoReplyMessage, setAutoReplyMessage] = useState('');
+  const [autoReplyIncludeOriginal, setAutoReplyIncludeOriginal] = useState(false);
 
   function applyDto(d: ContactSettingsDto) {
     setInApp(d.inAppNotificationEnabled);
@@ -79,6 +83,10 @@ export function ServiceContactSettingsPage({ serviceKey, api, title }: ServiceCo
     setTypes(Array.isArray(d.inquiryTypes) ? d.inquiryTypes : []);
     setPrivacyNotice(d.privacyNotice || '');
     setCompletionNotice(d.completionNotice || '');
+    setAutoReplyEnabled(!!d.autoReplyEnabled);
+    setAutoReplySubject(d.autoReplySubject || '');
+    setAutoReplyMessage(d.autoReplyMessage || '');
+    setAutoReplyIncludeOriginal(!!d.autoReplyIncludeOriginal);
   }
 
   useEffect(() => {
@@ -116,6 +124,10 @@ export function ServiceContactSettingsPage({ serviceKey, api, title }: ServiceCo
       setError('이메일 알림을 사용하려면 수신 이메일을 1개 이상 입력하세요.');
       return;
     }
+    if (autoReplyEnabled && (!autoReplySubject.trim() || !autoReplyMessage.trim())) {
+      setError('자동 회신을 사용하려면 제목과 본문을 입력하세요.');
+      return;
+    }
     setSaving(true);
     try {
       const d = await api.updateSettings(serviceKey, {
@@ -125,6 +137,10 @@ export function ServiceContactSettingsPage({ serviceKey, api, title }: ServiceCo
         inquiryTypes: types.length > 0 ? types : null,
         privacyNotice: privacyNotice.trim() || null,
         completionNotice: completionNotice.trim() || null,
+        autoReplyEnabled,
+        autoReplySubject: autoReplySubject.trim() || null,
+        autoReplyMessage: autoReplyMessage.trim() || null,
+        autoReplyIncludeOriginal,
       });
       applyDto(d);
       setNotice('저장되었습니다.');
@@ -210,6 +226,26 @@ export function ServiceContactSettingsPage({ serviceKey, api, title }: ServiceCo
           <label style={S.label}>접수 완료 안내</label>
           <textarea style={S.textarea} value={completionNotice} onChange={(e) => setCompletionNotice(e.target.value)} placeholder="예: 문의가 정상 접수되었습니다. 영업일 기준 1~2일 내 회신드립니다." />
         </div>
+      </div>
+
+      {/* 자동 회신 설정 */}
+      <div style={S.card}>
+        <h2 style={S.cardH}>자동 회신 설정</h2>
+        <p style={S.cardSub}>문의 접수 시 문의자에게 접수 확인 메일을 자동 발송합니다.</p>
+        <div style={S.noticeBox}>
+          자동 회신은 문의자에게 접수 사실을 알려주는 메일입니다. 실제 답변이나 처리 완료를 의미하지 않습니다.
+          자동 회신을 사용하려면 운영 메일 발송 설정이 정상이어야 하며, 발송 실패가 발생해도 문의 접수는 유지됩니다.
+        </div>
+        <Toggle checked={autoReplyEnabled} onChange={setAutoReplyEnabled} label="자동 회신 사용" hint="문의자 이메일로 접수 확인 발송" />
+        <div style={S.field}>
+          <label style={S.label}>자동 회신 제목</label>
+          <input style={S.input} value={autoReplySubject} onChange={(e) => setAutoReplySubject(e.target.value)} placeholder="예: 문의가 접수되었습니다" />
+        </div>
+        <div style={S.field}>
+          <label style={S.label}>자동 회신 본문</label>
+          <textarea style={S.textarea} value={autoReplyMessage} onChange={(e) => setAutoReplyMessage(e.target.value)} placeholder={'예: 문의가 접수되었습니다.\n운영자가 내용을 확인한 후 필요한 경우 입력하신 이메일로 회신드립니다.'} />
+        </div>
+        <Toggle checked={autoReplyIncludeOriginal} onChange={setAutoReplyIncludeOriginal} label="문의 내용 요약 포함" hint="회신 메일에 문의 본문 포함" />
       </div>
 
       <div style={S.bar}>

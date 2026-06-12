@@ -45,6 +45,10 @@ function toDto(eff: ReturnType<typeof toEffective>) {
     inquiryTypes: eff.inquiryTypes,
     privacyNotice: eff.privacyNotice,
     completionNotice: eff.completionNotice,
+    autoReplyEnabled: eff.autoReplyEnabled,
+    autoReplySubject: eff.autoReplySubject,
+    autoReplyMessage: eff.autoReplyMessage,
+    autoReplyIncludeOriginal: eff.autoReplyIncludeOriginal,
     isActive: eff.isActive,
     configured: eff.configured,
   };
@@ -103,6 +107,24 @@ function sanitizeInput(
   if (body?.completionNotice !== undefined) {
     out.completion_notice = typeof body.completionNotice === 'string' && body.completionNotice.trim()
       ? body.completionNotice.trim().slice(0, 2000) : null;
+  }
+
+  // 자동 회신 (WO-O4O-CONTACT-AUTO-REPLY-V1)
+  if (typeof body?.autoReplyEnabled === 'boolean') out.auto_reply_enabled = body.autoReplyEnabled;
+  if (typeof body?.autoReplyIncludeOriginal === 'boolean') out.auto_reply_include_original = body.autoReplyIncludeOriginal;
+  if (body?.autoReplySubject !== undefined) {
+    out.auto_reply_subject = typeof body.autoReplySubject === 'string' && body.autoReplySubject.trim()
+      ? body.autoReplySubject.trim().slice(0, 300) : null;
+  }
+  if (body?.autoReplyMessage !== undefined) {
+    out.auto_reply_message = typeof body.autoReplyMessage === 'string' && body.autoReplyMessage.trim()
+      ? body.autoReplyMessage.trim().slice(0, 5000) : null;
+  }
+  // 자동 회신 ON 이면 제목·본문 필수(빈값이면 의미 없는 메일 방지)
+  if (out.auto_reply_enabled === true) {
+    if (out.auto_reply_subject === null || out.auto_reply_message === null) {
+      return { error: '자동 회신을 사용하려면 제목과 본문을 입력하세요.' };
+    }
   }
 
   // email 알림 켰는데 수신자가 없으면 경고성 거부(접수는 안전하지만 설정 자체는 모순)

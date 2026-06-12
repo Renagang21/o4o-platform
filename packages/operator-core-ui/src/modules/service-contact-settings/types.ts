@@ -26,6 +26,11 @@ export interface ContactSettingsDto {
   inquiryTypes: ContactInquiryTypeConfig[];
   privacyNotice: string | null;
   completionNotice: string | null;
+  /** 자동 회신(문의자 접수 확인) — WO-O4O-CONTACT-AUTO-REPLY-V1 */
+  autoReplyEnabled: boolean;
+  autoReplySubject: string | null;
+  autoReplyMessage: string | null;
+  autoReplyIncludeOriginal: boolean;
   isActive: boolean;
   /** 설정 row 실제 존재 여부(기본값 표시 구분용). */
   configured: boolean;
@@ -39,6 +44,10 @@ export interface ContactSettingsInput {
   inquiryTypes?: ContactInquiryTypeConfig[] | null;
   privacyNotice?: string | null;
   completionNotice?: string | null;
+  autoReplyEnabled?: boolean;
+  autoReplySubject?: string | null;
+  autoReplyMessage?: string | null;
+  autoReplyIncludeOriginal?: boolean;
   isActive?: boolean;
 }
 

@@ -72,6 +72,24 @@ export class ServiceContactSettings {
   @Column({ type: 'text', nullable: true })
   completion_notice!: string | null;
 
+  // ── 자동 회신 (WO-O4O-CONTACT-AUTO-REPLY-V1) — 문의자에게 접수 확인 메일 ──
+
+  /** 자동 회신 사용 여부 (기본 비활성). */
+  @Column({ type: 'boolean', default: false })
+  auto_reply_enabled!: boolean;
+
+  /** 자동 회신 제목 (plain text). null 이면 코드 기본 제목 사용. */
+  @Column({ type: 'text', nullable: true })
+  auto_reply_subject!: string | null;
+
+  /** 자동 회신 본문 (plain text). null 이면 코드 기본 본문 사용. */
+  @Column({ type: 'text', nullable: true })
+  auto_reply_message!: string | null;
+
+  /** 자동 회신에 문의 내용 요약(제목/시각 외 전문) 포함 여부. */
+  @Column({ type: 'boolean', default: false })
+  auto_reply_include_original!: boolean;
+
   // ── 운영 메타 ──
 
   /** 설정 활성 여부. */

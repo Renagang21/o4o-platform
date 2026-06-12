@@ -28,6 +28,11 @@ export interface EffectiveContactSettings {
   inquiryTypes: ContactInquiryTypeConfig[];
   privacyNotice: string | null;
   completionNotice: string | null;
+  /** 자동 회신(문의자 접수 확인) — WO-O4O-CONTACT-AUTO-REPLY-V1 */
+  autoReplyEnabled: boolean;
+  autoReplySubject: string | null;
+  autoReplyMessage: string | null;
+  autoReplyIncludeOriginal: boolean;
   isActive: boolean;
   /** row 가 실제 존재하는지(미설정 구분용). */
   configured: boolean;
@@ -45,6 +50,10 @@ export function toEffective(serviceKey: string, row: ServiceContactSettings | nu
       : DEFAULT_INQUIRY_TYPES,
     privacyNotice: row ? row.privacy_notice : null,
     completionNotice: row ? row.completion_notice : null,
+    autoReplyEnabled: row ? row.auto_reply_enabled : false,
+    autoReplySubject: row ? row.auto_reply_subject : null,
+    autoReplyMessage: row ? row.auto_reply_message : null,
+    autoReplyIncludeOriginal: row ? row.auto_reply_include_original : false,
     isActive: row ? row.is_active : true,
     configured: !!row,
   };
