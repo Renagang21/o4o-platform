@@ -62,6 +62,10 @@ export type { LmsHubCourse, LmsHubFetchParams, LmsHubConfig } from './LmsHubTemp
 export { ForumHubTemplate } from './ForumHubTemplate';
 export type { ForumHubCategory, ForumHubPost, ForumHubConfig } from './ForumHubTemplate';
 
+/* WO-O4O-FORUM-USER-REQUEST-FORM-COMMONIZATION-V1: 포럼 개설 신청 공통 폼 */
+export { ForumRequestForm } from './ForumRequestForm';
+export type { ForumRequestFormProps, ForumRequestFormPayload, ForumRequestFormTheme } from './ForumRequestForm';
+
 export { StoreHubTemplate } from './StoreHubTemplate';
 export type { StoreHubResourceCard, StoreHubFlowStep, StoreHubConfig, StoreHubTemplateProps } from './StoreHubTemplate';
 
