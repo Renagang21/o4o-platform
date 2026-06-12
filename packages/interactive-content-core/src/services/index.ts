@@ -20,16 +20,5 @@ export {
   initSurveyService,
 } from './SurveyService.js';
 
-// WO-O4O-TEMPLATE-SYSTEM-FOUNDATION
-export {
-  TemplateService,
-  getTemplateService,
-  initTemplateService,
-} from './TemplateService.js';
-
-// WO-O4O-STORE-CONTENT-COPY
-export {
-  StoreContentService,
-  getStoreContentService,
-  initStoreContentService,
-} from './StoreContentService.js';
+// NOTE: TemplateService / StoreContentService 제거
+// (WO-O4O-LMS-TEMPLATE-AND-CONTENT-CORE-DEAD-CODE-CLEANUP-V1 — 미사용 scaffold)

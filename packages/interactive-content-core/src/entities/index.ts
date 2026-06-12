@@ -27,31 +27,5 @@ export type { AssignmentSubmissionType } from './Assignment.js';
 export { Submission } from './Submission.js';
 export type { SubmissionStatus, GradingStatus } from './Submission.js';
 
-// Templates (WO-O4O-TEMPLATE-SYSTEM-FOUNDATION)
-export {
-  Template,
-  TemplateType,
-  TemplateVisibility,
-  TemplateStatus,
-} from './templates/index.js';
-export {
-  TemplateVersion,
-  TemplateVersionStatus,
-} from './templates/index.js';
-export {
-  TemplateBlock,
-  TemplateBlockType,
-} from './templates/index.js';
-
-// Template Library (WO-O4O-TEMPLATE-LIBRARY)
-export { TemplateTag } from './templates/index.js';
-export { TemplateTagMap } from './templates/index.js';
-export { TemplateCategory } from './templates/index.js';
-export { TemplateCategoryMap } from './templates/index.js';
-
-// Store Content (WO-O4O-STORE-CONTENT-COPY)
-export { StoreContent, StoreContentStatus } from './store/index.js';
-export { StoreContentBlock, StoreContentBlockType } from './store/index.js';
-
-// Content Analytics (WO-O4O-CONTENT-ANALYTICS)
-export { ContentAnalytics, ContentAnalyticsEventType } from './analytics/index.js';
+// NOTE: Template Library / Store Content / Content Analytics 라인 제거
+// (WO-O4O-LMS-TEMPLATE-AND-CONTENT-CORE-DEAD-CODE-CLEANUP-V1 — 미사용 scaffold)

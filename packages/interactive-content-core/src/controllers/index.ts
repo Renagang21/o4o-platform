@@ -14,8 +14,5 @@ export {
   createSurveyRoutes,
 } from './SurveyController.js';
 
-// WO-O4O-TEMPLATE-SYSTEM-FOUNDATION
-export {
-  TemplateController,
-  createTemplateRoutes,
-} from './TemplateController.js';
+// NOTE: TemplateController 제거
+// (WO-O4O-LMS-TEMPLATE-AND-CONTENT-CORE-DEAD-CODE-CLEANUP-V1 — 미사용 scaffold)

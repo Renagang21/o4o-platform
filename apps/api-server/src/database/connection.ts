@@ -485,20 +485,6 @@ import {
   // WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1
   Assignment,
   Submission,
-  // WO-O4O-TEMPLATE-SYSTEM-FOUNDATION
-  Template,
-  TemplateVersion,
-  TemplateBlock,
-  // WO-O4O-TEMPLATE-LIBRARY
-  TemplateTag,
-  TemplateTagMap,
-  TemplateCategory,
-  TemplateCategoryMap,
-  // WO-O4O-STORE-CONTENT-COPY
-  StoreContent,
-  StoreContentBlock,
-  // WO-O4O-CONTENT-ANALYTICS
-  ContentAnalytics,
 } from '@o4o/interactive-content-core/entities';
 
 // ============================================================================
@@ -941,20 +927,6 @@ export const AppDataSource = new DataSource({
     // WO-O4O-LMS-ASSIGNMENT-MINIMAL-V1
     Assignment,
     Submission,
-    // WO-O4O-TEMPLATE-SYSTEM-FOUNDATION
-    Template,
-    TemplateVersion,
-    TemplateBlock,
-    // WO-O4O-TEMPLATE-LIBRARY
-    TemplateTag,
-    TemplateTagMap,
-    TemplateCategory,
-    TemplateCategoryMap,
-    // WO-O4O-STORE-CONTENT-COPY
-    StoreContent,
-    StoreContentBlock,
-    // WO-O4O-CONTENT-ANALYTICS
-    ContentAnalytics,
     // ============================================================================
     // EDUCATION-EXTENSION ENTITIES
     // ============================================================================
