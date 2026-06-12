@@ -35,6 +35,8 @@ COPY packages/store-asset-policy-core/package.json ./packages/store-asset-policy
 COPY packages/o4o-ai-components/package.json ./packages/o4o-ai-components/
 COPY packages/error-handling/package.json ./packages/error-handling/
 COPY packages/content-editor/package.json ./packages/content-editor/
+COPY packages/organization-core/package.json ./packages/organization-core/
+COPY packages/forum-core/package.json ./packages/forum-core/
 COPY packages/account-ui/package.json ./packages/account-ui/
 COPY packages/lms-client/package.json ./packages/lms-client/
 COPY packages/store-products-ui/package.json ./packages/store-products-ui/
@@ -66,6 +68,8 @@ COPY packages/store-asset-policy-core/ ./packages/store-asset-policy-core/
 COPY packages/o4o-ai-components/ ./packages/o4o-ai-components/
 COPY packages/error-handling/ ./packages/error-handling/
 COPY packages/content-editor/ ./packages/content-editor/
+COPY packages/organization-core/ ./packages/organization-core/
+COPY packages/forum-core/ ./packages/forum-core/
 COPY packages/account-ui/ ./packages/account-ui/
 COPY packages/lms-client/ ./packages/lms-client/
 COPY packages/store-products-ui/ ./packages/store-products-ui/
@@ -76,6 +80,8 @@ COPY services/web-glycopharm/ ./services/web-glycopharm/
 
 # Build workspace dependencies first
 RUN pnpm --filter @o4o/types build
+RUN pnpm --filter @o4o/organization-core build
+RUN pnpm --filter @o4o/forum-core build
 RUN pnpm --filter @o4o/auth-utils build
 RUN pnpm --filter @o4o/auth-client build
 RUN pnpm --filter @o4o/ui build
