@@ -68,21 +68,16 @@ export default function MyCreditsPage() {
       <div className="bg-white rounded-2xl shadow-sm p-8 mb-4 text-center">
         <p className="text-sm text-gray-400 mb-2">보유 크레딧</p>
         <p className="text-5xl font-bold text-primary-600 mb-2">{balance.toLocaleString()} C</p>
-        <p className="text-xs text-gray-400">학습 활동을 완료하면 크레딧이 적립됩니다</p>
+        <p className="text-xs text-gray-400">리워드가 설정된 강의에서 조건을 충족하면 크레딧이 적립됩니다</p>
       </div>
 
-      {/* Reward Guide */}
-      <div className="grid grid-cols-3 gap-3 mb-6">
-        {[
-          { label: '레슨 완료', value: '+10 C' },
-          { label: '퀴즈 통과', value: '+20 C' },
-          { label: '코스 완료', value: '+50 C' },
-        ].map((item) => (
-          <div key={item.label} className="bg-gray-50 rounded-xl p-4 text-center">
-            <p className="text-xs text-gray-500 mb-1">{item.label}</p>
-            <p className="text-sm font-semibold text-primary-600">{item.value}</p>
-          </div>
-        ))}
+      {/* Reward policy notice — WO-O4O-LMS-GPKCOS-POLICY-DRIFT-ALIGNMENT-V1:
+          리워드는 강의별 정책(rewardPolicy)이 설정된 경우에만 지급된다. 고정 스케줄(+10/+20/+50) 노출 금지. */}
+      <div className="bg-gray-50 rounded-xl p-4 mb-6">
+        <p className="text-xs text-gray-500 leading-relaxed">
+          일부 강의는 레슨 완료, 퀴즈 통과, 강의 수료 등에 따라 리워드를 제공할 수 있습니다.
+          지급 여부와 금액은 강의별 리워드 정책에 따라 달라집니다.
+        </p>
       </div>
 
       {/* History */}

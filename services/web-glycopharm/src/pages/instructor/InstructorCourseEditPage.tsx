@@ -119,14 +119,6 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
 
   const isYouTubeUrl = (url: string) => /^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\//i.test(url);
 
-  const toYouTubeEmbedUrl = (url: string): string | null => {
-    const shortMatch = url.match(/youtu\.be\/([^?&#]+)/i);
-    if (shortMatch) return `https://www.youtube.com/embed/${shortMatch[1]}`;
-    const longMatch = url.match(/[?&]v=([^&#]+)/);
-    if (longMatch) return `https://www.youtube.com/embed/${longMatch[1]}`;
-    return null;
-  };
-
   const extractTitleFromHtml = (html: string): string => {
     const match = html.match(/<h[1-3][^>]*>([\s\S]*?)<\/h[1-3]>/i);
     if (!match) return '';
@@ -136,15 +128,13 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
   const handleAiInsert = ({ html, title, sourceUrl }: { html: string; title: string; sourceUrl?: string }) => {
     const finalTitle = (title || '').trim() || extractTitleFromHtml(html);
     if (finalTitle && !form.title.trim()) setForm((f) => ({ ...f, title: finalTitle }));
-    let finalContent = html;
-    if (sourceUrl && isYouTubeUrl(sourceUrl)) {
-      if (!form.videoUrl.trim()) setForm((f) => ({ ...f, videoUrl: sourceUrl }));
-      if (!/<iframe[\s>]/i.test(html)) {
-        const embed = toYouTubeEmbedUrl(sourceUrl);
-        if (embed) finalContent = `<iframe src="${embed}" frameborder="0" allowfullscreen style="width:100%;aspect-ratio:16/9;"></iframe>\n${html}`;
-      }
+    // WO-O4O-LMS-GPKCOS-POLICY-DRIFT-ALIGNMENT-V1:
+    // YouTube sourceUrl 은 videoUrl 로만 기록하고, 콘텐츠에 iframe 을 자동 주입하지 않는다
+    // (LMS 레슨플레이어는 self video 만 재생 — LIVE/YouTube iframe 재도입 금지).
+    if (sourceUrl && isYouTubeUrl(sourceUrl) && !form.videoUrl.trim()) {
+      setForm((f) => ({ ...f, videoUrl: sourceUrl }));
     }
-    setContent(finalContent);
+    setContent(html);
   };
 
   const handleSave = async () => {

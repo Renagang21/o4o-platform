@@ -32,26 +32,30 @@ import { appreciationPanelApi } from '@/api/appreciation';
 // ── 레슨 콘텐츠 렌더러 ───────────────────────────────────────────────────────
 function LessonContent({ lesson }: { lesson: LmsLesson }) {
   if (lesson.videoUrl) {
+    // WO-O4O-LMS-GPKCOS-POLICY-DRIFT-ALIGNMENT-V1:
+    // KPA 기준선 정렬 — LMS 레슨플레이어는 self video source 만 재생한다.
+    // YouTube/streaming URL 은 iframe 으로 자동 임베드하지 않는다(LIVE/YouTube 재도입 금지).
     const isYoutube = lesson.videoUrl.includes('youtube') || lesson.videoUrl.includes('youtu.be');
-    const embedUrl = isYoutube
-      ? lesson.videoUrl.replace('watch?v=', 'embed/').replace('youtu.be/', 'www.youtube.com/embed/')
-      : lesson.videoUrl;
 
     return (
       <div className="space-y-4">
-        <div className="aspect-video bg-black rounded-xl overflow-hidden">
-          {isYoutube ? (
-            <iframe
-              src={embedUrl}
-              title={lesson.title}
-              className="w-full h-full"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
-          ) : (
+        {isYoutube ? (
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-600 space-y-2">
+            <p>이 동영상 형식은 현재 강의 플레이어에서 바로 재생할 수 없습니다.</p>
+            <a
+              href={lesson.videoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-primary-600 hover:underline"
+            >
+              <ExternalLink className="w-4 h-4" /> 외부 링크에서 보기
+            </a>
+          </div>
+        ) : (
+          <div className="aspect-video bg-black rounded-xl overflow-hidden">
             <video src={lesson.videoUrl} controls className="w-full h-full" />
-          )}
-        </div>
+          </div>
+        )}
         {lesson.description && (
           <p className="text-slate-600 text-sm leading-relaxed">{lesson.description}</p>
         )}
