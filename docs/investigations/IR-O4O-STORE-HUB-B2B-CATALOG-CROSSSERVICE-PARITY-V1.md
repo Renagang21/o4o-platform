@@ -8,6 +8,16 @@
 
 ---
 
+## Naming Note — Supply Catalog canonical naming (2026-06-13)
+
+이 문서의 `B2B Catalog` 표현은 historical workstream 명칭이다.
+현재 canonical 표현은 `Store Hub Supply Catalog` / `공급 상품 카탈로그`이며, 공통 컴포넌트명은 `SupplyCatalogHub`(구 `B2BCatalogHub`)다.
+매장 허브는 B2C 판매 영역이 아니며, 이 화면은 공급자→매장 공급 상품 신청 카탈로그를 의미한다.
+내부 route(`/store-hub/b2b`)와 distributionType 값(`SERVICE`/`PRIVATE` 등)은 변경하지 않는다(legacy 식별자 유지).
+근거: `WO-O4O-STORE-HUB-SUPPLY-CATALOG-NAMING-ALIGNMENT-V1`.
+
+---
+
 ## 1. 목적
 KPA/GP/KCos B2B 카탈로그(공급 상품 신청) 화면의 구조·distributionType·신청/승인 흐름을 비교해 공통화 가능성을 판정한다.
 

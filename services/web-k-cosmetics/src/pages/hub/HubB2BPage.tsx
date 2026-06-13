@@ -2,7 +2,7 @@
  * HubB2BPage — K-Cosmetics Store HUB 상품 카탈로그 (thin wrapper)
  *
  * WO-O4O-STORE-HUB-B2B-CATALOG-GP-KCOS-COMMON-COMPONENT-EXTRACTION-V1:
- *   GlycoPharm/K-Cosmetics near-identical B2B 카탈로그를 @o4o/store-ui-core `B2BCatalogHub` 로 통합.
+ *   GlycoPharm/K-Cosmetics near-identical B2B 카탈로그를 @o4o/store-ui-core `SupplyCatalogHub` 로 통합.
  *   본 파일은 K-Cosmetics api client + accent(pink) + tableId + 라벨만 주입하는 wrapper.
  *
  * 선행:
@@ -13,7 +13,7 @@
  *   "내 매장에 추가" = 공급 상품 신청(ProductApproval PENDING). 신청 ≠ 주문.
  */
 
-import { B2BCatalogHub } from '@o4o/store-ui-core';
+import { SupplyCatalogHub } from '@o4o/store-ui-core';
 import {
   getCatalog,
   applyBySupplyProductId,
@@ -23,7 +23,7 @@ import {
 
 export function HubB2BPage() {
   return (
-    <B2BCatalogHub<CatalogProduct>
+    <SupplyCatalogHub<CatalogProduct>
       accent="pink"
       tableId="kcos-store-hub-b2b-products"
       labels={{ supplierLabel: '공급사' }}

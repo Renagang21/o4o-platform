@@ -8,6 +8,16 @@
 
 ---
 
+## Naming Note — Supply Catalog canonical naming (2026-06-13)
+
+이 문서의 `B2BCatalogHub` / `B2B 카탈로그` 표현은 historical workstream 명칭이다.
+현재 canonical 컴포넌트명은 `SupplyCatalogHub`(@o4o/store-ui-core `components/supply-catalog/`), 표현은 `공급 상품 카탈로그`다.
+매장 허브는 B2C 판매 영역이 아니며, 이 화면은 공급자→매장 공급 상품 신청 카탈로그를 의미한다.
+내부 route(`/store-hub/b2b`)·distributionType 값은 변경하지 않는다(legacy 식별자 유지).
+근거: `WO-O4O-STORE-HUB-SUPPLY-CATALOG-NAMING-ALIGNMENT-V1`.
+
+---
+
 ## 1. 목적
 GP/KCos 공급 상품 신청 화면(370/371 near-identical)을 공통 컴포넌트로 통합. service api + accent + tableId + 문맥 라벨 주입. 신청=ProductApproval(PENDING), 신청≠주문 의미 유지.
 

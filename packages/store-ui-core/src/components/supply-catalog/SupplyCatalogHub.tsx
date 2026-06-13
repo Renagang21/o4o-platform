@@ -1,7 +1,12 @@
 /**
- * B2BCatalogHub — Store HUB 상품 카탈로그 공통 컴포넌트
+ * SupplyCatalogHub — Store HUB 공급 상품 카탈로그 공통 컴포넌트
  *
- * WO-O4O-STORE-HUB-B2B-CATALOG-GP-KCOS-COMMON-COMPONENT-EXTRACTION-V1
+ * Naming (WO-O4O-STORE-HUB-SUPPLY-CATALOG-NAMING-ALIGNMENT-V1):
+ *   구 `B2BCatalogHub` → `SupplyCatalogHub` 로 정렬. 매장 허브는 B2C 판매 영역이 아니며,
+ *   이 화면은 공급자→매장 공급 상품 신청 카탈로그를 의미한다. 내부 distributionType('SERVICE' 등)
+ *   값과 route(`/store-hub/b2b`)는 변경하지 않는다(legacy 식별자 유지).
+ *
+ * WO-O4O-STORE-HUB-B2B-CATALOG-GP-KCOS-COMMON-COMPONENT-EXTRACTION-V1 (extraction origin)
  *   GlycoPharm `HubB2BCatalogPage` / K-Cosmetics `HubB2BPage` (near-identical 370/371줄)을 통합.
  *   서비스 차이(api client · accent 색 · tableId · supplier 라벨 · 채널 관리 링크 유무)만 props 로 주입,
  *   나머지 구조(유통유형 탭 · DataTable · checkbox multi-select · ActionBar bulk 추가 · 단건 추가/제외
@@ -23,7 +28,7 @@ import { DataTable } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 
 // ─── 공통 타입 ────────────────────────────────────────────────────────────────
-export interface B2BCatalogProduct {
+export interface SupplyCatalogProduct {
   id: string;
   name: string;
   description?: string | null;
@@ -33,12 +38,12 @@ export interface B2BCatalogProduct {
   isAdded?: boolean;
 }
 
-export interface B2BCatalogListResponse<T extends B2BCatalogProduct> {
+export interface SupplyCatalogListResponse<T extends SupplyCatalogProduct> {
   data: T[];
   pagination: { total: number; limit: number; offset: number };
 }
 
-export interface B2BCatalogGetParams {
+export interface SupplyCatalogGetParams {
   distributionType?: string;
   operatorView?: boolean;
   limit: number;
@@ -46,26 +51,26 @@ export interface B2BCatalogGetParams {
 }
 
 /** 서비스별 api client 가 구조적으로 만족해야 하는 계약. */
-export interface B2BCatalogApi<T extends B2BCatalogProduct> {
-  getCatalog(params: B2BCatalogGetParams): Promise<B2BCatalogListResponse<T>>;
+export interface SupplyCatalogApi<T extends SupplyCatalogProduct> {
+  getCatalog(params: SupplyCatalogGetParams): Promise<SupplyCatalogListResponse<T>>;
   applyBySupplyProductId(productId: string): Promise<unknown>;
   cancelProductByOfferId(productId: string): Promise<unknown>;
 }
 
-export type B2BCatalogAccent = 'teal' | 'pink';
+export type SupplyCatalogAccent = 'teal' | 'pink';
 
-export interface B2BCatalogHubLabels {
+export interface SupplyCatalogHubLabels {
   /** 공급자 컬럼 헤더. GP '공급자' · KCos '공급사'. 기본 '공급자'. */
   supplierLabel?: string;
   /** 채널 관리 링크 href. 있으면 안내문에 링크 렌더, 없으면 plain text. GP '/store/channels' · KCos 미지정. */
   channelManageHref?: string;
 }
 
-export interface B2BCatalogHubProps<T extends B2BCatalogProduct> {
-  api: B2BCatalogApi<T>;
-  accent: B2BCatalogAccent;
+export interface SupplyCatalogHubProps<T extends SupplyCatalogProduct> {
+  api: SupplyCatalogApi<T>;
+  accent: SupplyCatalogAccent;
   tableId: string;
-  labels?: B2BCatalogHubLabels;
+  labels?: SupplyCatalogHubLabels;
 }
 
 // ─── 탭 (유통유형 — KPA canonical 정합) ───────────────────────────────────────
@@ -81,7 +86,7 @@ const DISTRIBUTION_TABS: { key: string; label: string }[] = [
 const PAGE_LIMIT = 20;
 
 // accent 별 정적 Tailwind class 맵 (동적 class 구성 금지).
-const ACCENT_CLASSES: Record<B2BCatalogAccent, {
+const ACCENT_CLASSES: Record<SupplyCatalogAccent, {
   tabActive: string;
   badge: string;
   checkBox: string;
@@ -113,18 +118,18 @@ const ACCENT_CLASSES: Record<B2BCatalogAccent, {
   },
 };
 
-function formatPrice(item: B2BCatalogProduct): string {
+function formatPrice(item: SupplyCatalogProduct): string {
   const price = item.priceGold ?? item.priceGeneral;
   if (price == null) return '-';
   return price.toLocaleString('ko-KR') + '원';
 }
 
-export function B2BCatalogHub<T extends B2BCatalogProduct>({
+export function SupplyCatalogHub<T extends SupplyCatalogProduct>({
   api,
   accent,
   tableId,
   labels,
-}: B2BCatalogHubProps<T>) {
+}: SupplyCatalogHubProps<T>) {
   const ac = ACCENT_CLASSES[accent];
   const supplierLabel = labels?.supplierLabel ?? '공급자';
   const channelHref = labels?.channelManageHref;
@@ -467,4 +472,4 @@ export function B2BCatalogHub<T extends B2BCatalogProduct>({
   );
 }
 
-export default B2BCatalogHub;
+export default SupplyCatalogHub;
