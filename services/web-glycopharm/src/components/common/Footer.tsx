@@ -44,7 +44,8 @@ export default function Footer() {
                 </NavLink>
               </li>
               <li>
-                <NavLink to="/education" className="text-sm hover:text-white transition-colors">
+                {/* WO-O4O-PUBLIC-FOOTER-LINK-GUARD-V1: dead link /education → 실제 route /lms */}
+                <NavLink to="/lms" className="text-sm hover:text-white transition-colors">
                   교육/자료
                 </NavLink>
               </li>

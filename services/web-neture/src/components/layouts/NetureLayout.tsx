@@ -35,11 +35,9 @@ export default function NetureLayout() {
               </div>
             </div>
             <div className="flex items-center gap-4 text-xs text-gray-400">
+              {/* WO-O4O-PUBLIC-FOOTER-LINK-GUARD-V1: dead link /about 제거 (route 없음, About 페이지 부재) */}
               <Link to="/contact" className="hover:text-primary-600 transition-colors">
                 Contact Us
-              </Link>
-              <Link to="/about" className="hover:text-primary-600 transition-colors">
-                About
               </Link>
             </div>
           </div>
