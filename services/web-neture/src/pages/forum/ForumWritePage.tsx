@@ -18,9 +18,9 @@
 
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { RichTextEditor } from '@o4o/content-editor';
 import { htmlToBlocks } from '@o4o/forum-core/utils';
-// WO-O4O-FORUM-WRITE-NETURE-FORM-COMMONIZATION-V1: create 경로 공통 폼 적용 (edit 경로는 기존 inline 유지)
+// WO-O4O-FORUM-WRITE-NETURE-FORM-COMMONIZATION-V1: create 공통 폼 적용
+// WO-O4O-FORUM-WRITE-EDIT-FORM-COMMONIZATION-V1: edit 도 동일 공통 폼으로 통합 (inline form 제거)
 import { ForumWriteForm, type ForumWriteFormPayload } from '@o4o/shared-space-ui';
 import { useAuth, useLoginModal } from '../../contexts';
 import {
@@ -63,7 +63,6 @@ export function ForumWritePage({
 
   const [title, setTitle] = useState('');
   const [editorHtml, setEditorHtml] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingPost, setIsLoadingPost] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [editSlug, setEditSlug] = useState<string | null>(null);
@@ -141,57 +140,33 @@ export function ForumWritePage({
   const hasContactInfo = contactSettings?.contactEnabled &&
     (contactSettings?.kakaoOpenChatUrl || contactSettings?.kakaoChannelUrl);
 
-  const isFormValid = title.trim().length > 0 && editorHtml.trim().length >= MIN_CONTENT_LENGTH;
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-
-    if (!isFormValid) {
+  // WO-O4O-FORUM-WRITE-EDIT-FORM-COMMONIZATION-V1: ForumWriteForm edit 제출 핸들러.
+  // 기존 update 흐름(htmlToBlocks → updateForumPost → basePath redirect)을 그대로 보존한다.
+  // update payload 는 기존과 동일(showContactOnPost 미포함 — contact edit 영속화는 별도 WO 범위).
+  async function handleUpdateSubmit(payload: ForumWriteFormPayload) {
+    if (!editPostId) return;
+    const textLength = payload.editorHtml.replace(/<[^>]*>/g, '').trim().length;
+    if (!payload.title.trim() || textLength < MIN_CONTENT_LENGTH) {
       setError('제목과 내용을 모두 입력해주세요. (내용은 최소 20자 이상)');
       return;
     }
-
-    setIsSubmitting(true);
     setError(null);
-
     try {
-      // Convert HTML to Block[]
-      const blocks = htmlToBlocks(editorHtml);
-
+      const blocks = htmlToBlocks(payload.editorHtml);
       const base = (backPath || '/forum').replace(/\/$/, '');
-      const postDetailPath = (slug: string) => `${base}/${postSegment}/${slug}`;
-
-      if (isEditMode && editPostId) {
-        const response = await updateForumPost(editPostId, {
-          title: title.trim(),
-          content: blocks,
-          categorySlug: categorySlug,
-        });
-
-        if (response.success && response.data) {
-          navigate(postDetailPath(response.data.slug));
-        } else {
-          setError(response.error || '게시글 수정에 실패했습니다.');
-        }
+      const response = await updateForumPost(editPostId, {
+        title: payload.title,
+        content: blocks,
+        categorySlug: categorySlug,
+      });
+      if (response.success && response.data) {
+        navigate(`${base}/${postSegment}/${response.data.slug}`);
       } else {
-        const response = await createForumPost({
-            title: title.trim(),
-            content: blocks,
-            categorySlug: categorySlug,
-            showContactOnPost: hasContactInfo ? showContactOnPost : false,
-          });
-
-        if (response.success && response.data) {
-          navigate(postDetailPath(response.data.slug));
-        } else {
-          setError(response.error || '게시글 작성에 실패했습니다.');
-        }
+        setError(response.error || '게시글 수정에 실패했습니다.');
       }
     } catch (err) {
-      console.error('Error submitting post:', err);
+      console.error('Error updating post:', err);
       setError('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
-    } finally {
-      setIsSubmitting(false);
     }
   }
 
@@ -281,112 +256,21 @@ export function ForumWritePage({
         </div>
       )}
 
-      {/* Form: create → 공통 ForumWriteForm / edit → 기존 inline form 유지 (WO-O4O-FORUM-WRITE-NETURE-FORM-COMMONIZATION-V1) */}
-      {isEditMode ? (
-      <form onSubmit={handleSubmit} style={styles.form}>
-        {/* Title Input */}
-        <div style={styles.formGroup}>
-          <label htmlFor="title" style={styles.label}>
-            제목 <span style={styles.required}>*</span>
-          </label>
-          <input
-            id="title"
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="제목을 입력하세요"
-            style={styles.input}
-            disabled={isSubmitting}
-            maxLength={200}
-          />
-        </div>
-
-        {/* Content Input */}
-        <div style={styles.formGroup}>
-          <label htmlFor="content" style={styles.label}>
-            내용 <span style={styles.required}>*</span>
-            <span style={styles.hint}> (최소 {MIN_CONTENT_LENGTH}자)</span>
-          </label>
-          <RichTextEditor
-            value={editorHtml}
-            onChange={(content) => setEditorHtml(content.html)}
-            placeholder="의견을 작성해주세요..."
-            minHeight="300px"
-            editable={!isSubmitting}
-          />
-          <div style={styles.charCount}>
-            {editorHtml.length}자
-            {editorHtml.length < MIN_CONTENT_LENGTH && editorHtml.length > 0 && (
-              <span style={styles.charCountWarning}>
-                {' '}(최소 {MIN_CONTENT_LENGTH - editorHtml.length}자 더 필요)
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* WO-NETURE-EXTERNAL-CONTACT-V1: Contact Option */}
-        {hasContactInfo ? (
-          <div style={styles.contactOption}>
-            <label style={styles.contactLabel}>
-              <input
-                type="checkbox"
-                checked={showContactOnPost}
-                onChange={(e) => setShowContactOnPost(e.target.checked)}
-                style={styles.checkbox}
-                disabled={isSubmitting}
-              />
-              <span style={styles.contactText}>연락 정보 표시</span>
-            </label>
-            <p style={styles.contactHint}>
-              이 글에 카카오톡 연락 링크를 표시합니다.
-            </p>
-          </div>
-        ) : (
-          <div style={styles.contactPrompt}>
-            <p style={styles.contactPromptText}>
-              연락 정보를 등록하면 글에 연락처를 표시할 수 있습니다.
-            </p>
-            <Link to="/mypage" style={styles.contactPromptLink}>
-              연락 설정하기 →
-            </Link>
-          </div>
-        )}
-
-        {/* Actions */}
-        <div style={styles.actions}>
-          <button
-            type="button"
-            onClick={handleCancel}
-            style={styles.cancelButton}
-            disabled={isSubmitting}
-          >
-            취소
-          </button>
-          <button
-            type="submit"
-            style={{
-              ...styles.submitButton,
-              ...((!isFormValid || isSubmitting) ? styles.submitButtonDisabled : {}),
-            }}
-            disabled={!isFormValid || isSubmitting}
-          >
-            {isSubmitting ? (isEditMode ? '수정 중...' : '등록 중...') : (isEditMode ? '수정하기' : '등록하기')}
-          </button>
-        </div>
-      </form>
-      ) : (
+      {/* Form: create/edit 공통 ForumWriteForm (WO-O4O-FORUM-WRITE-EDIT-FORM-COMMONIZATION-V1) */}
         <ForumWriteForm
+          initialTitle={title}
+          initialContentHtml={editorHtml}
           titleLabel="제목"
           titlePlaceholder="제목을 입력하세요"
           titleMaxLength={200}
           contentLabel={`내용 (최소 ${MIN_CONTENT_LENGTH}자)`}
           contentPlaceholder="의견을 작성해주세요..."
-          submitLabel="등록하기"
-          submittingLabel="등록 중..."
+          submitLabel={isEditMode ? '수정하기' : '등록하기'}
+          submittingLabel={isEditMode ? '수정 중...' : '등록 중...'}
           cancelLabel="취소"
           theme="blue"
           onCancel={handleCancel}
-          onSubmit={handleCreateSubmit}
+          onSubmit={isEditMode ? handleUpdateSubmit : handleCreateSubmit}
           onInvalid={() => setError('제목과 내용을 모두 입력해주세요. (내용은 최소 20자 이상)')}
           renderContentMeta={({ textLength }) => (
             <div style={styles.charCount}>
@@ -426,7 +310,6 @@ export function ForumWritePage({
             )
           }
         />
-      )}
     </div>
   );
 }
