@@ -14,7 +14,7 @@ import { lmsApi, normalizeEnrollment } from '@/api/lms';
 import type { LmsCourse, LmsLesson, LmsEnrollment, LmsQuiz, LmsQuizResult, LmsAssignment, LmsAssignmentSubmission } from '@/api/lms';
 import { aiApi, type AiAnalyzeResult } from '@/api/ai';
 // WO-O4O-LMS-GLYCOPHARM-ADOPTION-V1: 공통 presentational UI 소비 (accent = GP green)
-import { CourseProgressBar } from '@o4o/lms-ui';
+import { CourseProgressBar, LessonList, type LessonItemView } from '@o4o/lms-ui';
 
 const C = {
   primary: '#16a34a',
@@ -381,23 +381,19 @@ export default function LmsLessonPage() {
           <h2 style={S.courseTitle}>{course.title}</h2>
         </div>
 
-        <div style={S.lessonList}>
-          {lessons.map((lesson, index) => {
-            const isActive = lesson.id === lessonId;
-            const isLessonCompleted = completedLessonIds.includes(lesson.id);
-            return (
-              <Link
-                key={lesson.id}
-                to={`/lms/course/${courseId}/lesson/${lesson.id}`}
-                style={{ ...S.lessonItem, ...(isActive ? S.lessonItemActive : {}) }}
-              >
-                <span style={S.lessonNumber}>{isLessonCompleted ? '✓' : index + 1}</span>
-                <span style={S.lessonTypeIcon} aria-hidden>{LESSON_TYPE_ICON[lesson.type as string] || '📄'}</span>
-                <span style={S.lessonTitle}>{lesson.title}</span>
-              </Link>
-            );
-          })}
-        </div>
+        <LessonList
+          style={S.lessonList}
+          rowClickMode="row"
+          accent={C.primary}
+          hrefFor={(l) => `/lms/course/${courseId}/lesson/${l.id}`}
+          lessons={lessons.map((lesson) => ({
+            id: lesson.id,
+            title: lesson.title,
+            kind: lesson.type as unknown as LessonItemView['kind'],
+            completed: completedLessonIds.includes(lesson.id),
+            current: lesson.id === lessonId,
+          }))}
+        />
 
         {enrollment && (
           <div style={S.progressInfo}>
