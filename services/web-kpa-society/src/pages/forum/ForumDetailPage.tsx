@@ -5,9 +5,15 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
-import { PageHeader, LoadingSpinner, Card } from '../../components/common';
+import { PageHeader, Card } from '../../components/common';
 import { PageSection, PageContainer } from '@o4o/ui';
-import { AppreciationPanel, ForumPostContent } from '@o4o/shared-space-ui';
+import {
+  AppreciationPanel,
+  ForumPostContent,
+  ForumPostHeader,
+  ForumDetailLoadingState,
+  ForumDetailNotFoundState,
+} from '@o4o/shared-space-ui';
 import { ClosedForumAccessBlocker } from '../../components/forum/ClosedForumAccessBlocker';
 import { forumApi } from '../../api';
 import { appreciationPanelApi } from '../../api/appreciation';
@@ -158,7 +164,7 @@ export function ForumDetailPage() {
   };
 
   if (loading) {
-    return <LoadingSpinner message="게시글을 불러오는 중..." />;
+    return <ForumDetailLoadingState message="게시글을 불러오는 중..." />;
   }
 
   if (error || !post) {
@@ -180,16 +186,10 @@ export function ForumDetailPage() {
     return (
       <PageSection last>
         <PageContainer width="form">
-          <div style={styles.accessDenied}>
-            <span style={styles.accessDeniedIcon}>⚠️</span>
-            <h2 style={styles.accessDeniedTitle}>게시글을 찾을 수 없습니다</h2>
-            <p style={styles.accessDeniedDesc}>
-              {error || '삭제되었거나 존재하지 않는 게시글입니다.'}
-            </p>
-            <button style={styles.accessDeniedBack} onClick={() => navigate('/forum')}>
-              목록으로
-            </button>
-          </div>
+          <ForumDetailNotFoundState
+            message={error || '삭제되었거나 존재하지 않는 게시글입니다.'}
+            onBack={() => navigate('/forum')}
+          />
         </PageContainer>
       </PageSection>
     );
@@ -211,22 +211,25 @@ export function ForumDetailPage() {
       />
 
       <Card padding="large">
-        <div style={styles.postHeader}>
-          <span style={styles.categoryBadge}>{post.categoryName}</span>
-          {post.isPinned && <span style={styles.pinnedBadge}>공지</span>}
-        </div>
-
-        <h1 style={styles.title}>{post.title}</h1>
-
-        <div style={styles.meta}>
-          <span style={styles.author}>작성자: {post.authorName}</span>
-          <span style={styles.separator}>·</span>
-          <span>등록일: {new Date(post.createdAt).toLocaleDateString('ko-KR')}</span>
-          <span style={styles.separator}>·</span>
-          <span>조회 {post.viewCount}</span>
-          <span style={styles.separator}>·</span>
-          <span>댓글 {post.commentCount ?? 0}</span>
-        </div>
+        <ForumPostHeader
+          title={post.title}
+          authorName={`작성자: ${post.authorName}`}
+          createdAt={`등록일: ${new Date(post.createdAt).toLocaleDateString('ko-KR')}`}
+          badgeSlot={
+            <>
+              <span style={styles.categoryBadge}>{post.categoryName}</span>
+              {post.isPinned && <span style={styles.pinnedBadge}>공지</span>}
+            </>
+          }
+          metaSlot={
+            <>
+              <span style={styles.separator}>·</span>
+              <span>조회 {post.viewCount}</span>
+              <span style={styles.separator}>·</span>
+              <span>댓글 {post.commentCount ?? 0}</span>
+            </>
+          }
+        />
 
         {post.tags && post.tags.length > 0 && (
           <div style={styles.tagRow}>

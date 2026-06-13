@@ -10,11 +10,18 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, MessageSquare, Eye, Heart, Calendar, User, Loader2, AlertCircle } from 'lucide-react';
+import { ArrowLeft, MessageSquare, Eye, Heart } from 'lucide-react';
 import { fetchForumPost, fetchPostComments, extractTextContent, type ForumPostDetail, type ForumComment } from '@/services/forumApi';
 import { toast } from '@o4o/error-handling';
 import { useAuth } from '@/contexts/AuthContext';
-import { AppreciationPanel, ForumPostContent } from '@o4o/shared-space-ui';
+import {
+  AppreciationPanel,
+  ForumPostContent,
+  ForumPostHeader,
+  ForumDetailLoadingState,
+  ForumDetailErrorState,
+  ForumDetailNotFoundState,
+} from '@o4o/shared-space-ui';
 import { appreciationPanelApi } from '@/api/appreciation';
 
 // ─── Local aliases ───────────────────────────────────────────
@@ -68,24 +75,20 @@ export default function ForumPostDetailPage() {
 
   if (loading) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-16 flex justify-center">
-        <Loader2 className="w-7 h-7 text-primary-600 animate-spin" />
+      <div className="max-w-3xl mx-auto px-4 py-16">
+        <ForumDetailLoadingState />
       </div>
     );
   }
 
   if (error || !post) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-16 text-center">
-        <AlertCircle className="w-10 h-10 text-red-300 mx-auto mb-3" />
-        <p className="text-sm text-slate-500 mb-4">{error || '게시글을 찾을 수 없습니다.'}</p>
-        <button
-          onClick={() => navigate(-1)}
-          className="inline-flex items-center gap-1 text-sm text-primary-600 hover:text-primary-700"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          돌아가기
-        </button>
+      <div className="max-w-3xl mx-auto px-4 py-16">
+        {error ? (
+          <ForumDetailErrorState message={error} backLabel="돌아가기" onBack={() => navigate(-1)} />
+        ) : (
+          <ForumDetailNotFoundState backLabel="돌아가기" onBack={() => navigate(-1)} />
+        )}
       </div>
     );
   }
@@ -110,32 +113,30 @@ export default function ForumPostDetailPage() {
       <article className="bg-white border border-slate-200 rounded-xl overflow-hidden mb-6">
         {/* 헤더 */}
         <div className="px-6 py-5 border-b border-slate-100">
-          {post.category?.name && (
-            <span className="inline-block px-2 py-0.5 text-[11px] font-medium bg-primary-50 text-primary-600 rounded mb-2">
-              {post.category.name}
-            </span>
-          )}
-          <h1 className="text-xl font-bold text-slate-900 leading-snug">{post.title}</h1>
-          <div className="flex items-center gap-4 mt-3 text-xs text-slate-400">
-            <span className="flex items-center gap-1">
-              <User className="w-3.5 h-3.5" />
-              {authorName}
-            </span>
-            <span className="flex items-center gap-1">
-              <Calendar className="w-3.5 h-3.5" />
-              {formatDate(post.createdAt)}
-            </span>
-            <span className="flex items-center gap-1">
-              <Eye className="w-3.5 h-3.5" />
-              {post.viewCount}
-            </span>
-            {(post.likeCount ?? 0) > 0 && (
-              <span className="flex items-center gap-1">
-                <Heart className="w-3.5 h-3.5" />
-                {post.likeCount}
+          <ForumPostHeader
+            title={post.title}
+            authorName={authorName}
+            createdAt={formatDate(post.createdAt)}
+            badgeSlot={post.category?.name ? (
+              <span className="inline-block px-2 py-0.5 text-[11px] font-medium bg-primary-50 text-primary-600 rounded">
+                {post.category.name}
               </span>
-            )}
-          </div>
+            ) : null}
+            metaSlot={
+              <>
+                <span className="flex items-center gap-1 text-xs text-slate-400">
+                  <Eye className="w-3.5 h-3.5" />
+                  {post.viewCount}
+                </span>
+                {(post.likeCount ?? 0) > 0 && (
+                  <span className="flex items-center gap-1 text-xs text-slate-400">
+                    <Heart className="w-3.5 h-3.5" />
+                    {post.likeCount}
+                  </span>
+                )}
+              </>
+            }
+          />
         </div>
 
         {/* 본문 */}

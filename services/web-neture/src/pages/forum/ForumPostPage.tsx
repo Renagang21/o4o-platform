@@ -49,7 +49,8 @@ import {
 } from '../../services/forumApi';
 import { blocksToHtml } from '@o4o/forum-core/utils';
 // WO-O4O-FORUM-DETAIL-PRIMITIVES-EXTRACTION-V1: 본문 공통 부품(Neture 고유 contentToHtml 변환은 html prop 으로 보존)
-import { ForumPostContent } from '@o4o/shared-space-ui';
+// WO-O4O-FORUM-DETAIL-STATES-HEADER-EXTRACTION-V1: not-found state 공통화(header/skeleton 은 반응형·액션 복잡으로 보류)
+import { ForumPostContent, ForumDetailNotFoundState } from '@o4o/shared-space-ui';
 
 /** Convert post content (Block[] or string) to safe HTML */
 function contentToHtml(content: string | object[] | undefined): string {
@@ -382,13 +383,11 @@ export function ForumPostPage({ basePath = '/forum' }: { basePath?: string } = {
           <span style={styles.breadcrumbDivider}>/</span>
           <Link to="/forum" style={styles.breadcrumbLink}>포럼</Link>
         </nav>
-        <div style={styles.notFound}>
-          <h2 style={styles.notFoundTitle}>게시글을 찾을 수 없습니다</h2>
-          <p style={styles.notFoundText}>{error || '요청하신 게시글이 존재하지 않거나 삭제되었습니다.'}</p>
-          <Link to="/forum" style={styles.notFoundButton}>
-            목록으로 돌아가기
-          </Link>
-        </div>
+        <ForumDetailNotFoundState
+          message={error || '요청하신 게시글이 존재하지 않거나 삭제되었습니다.'}
+          backLabel="목록으로 돌아가기"
+          onBack={() => navigate(basePath || '/forum')}
+        />
       </div>
     );
   }

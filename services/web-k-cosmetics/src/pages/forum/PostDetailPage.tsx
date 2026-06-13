@@ -3,7 +3,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ContentRenderer } from '@o4o/content-editor';
 import {
   fetchForumPostById,
@@ -14,7 +14,14 @@ import {
 } from '../../services/forumApi';
 import { toast } from '@o4o/error-handling';
 import { useAuth } from '@/contexts/AuthContext';
-import { AppreciationPanel, ForumPostContent } from '@o4o/shared-space-ui';
+import {
+  AppreciationPanel,
+  ForumPostContent,
+  ForumPostHeader,
+  ForumDetailLoadingState,
+  ForumDetailErrorState,
+  ForumDetailNotFoundState,
+} from '@o4o/shared-space-ui';
 import { appreciationPanelApi } from '@/api/appreciation';
 
 // Convert Block[] to HTML for rendering (WO-FORUM-CONTENT-RENDER-UNIFICATION-V1)
@@ -44,6 +51,7 @@ function formatDate(dateString: string): string {
 
 export default function PostDetailPage() {
   const { postId } = useParams<{ postId: string }>();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [post, setPost] = useState<ForumPost | null>(null);
   const [comments, setComments] = useState<ForumComment[]>([]);
@@ -92,9 +100,7 @@ export default function PostDetailPage() {
   if (isLoading) {
     return (
       <div style={styles.container}>
-        <div style={styles.loadingState}>
-          <p>게시글을 불러오는 중...</p>
-        </div>
+        <ForumDetailLoadingState message="게시글을 불러오는 중..." />
       </div>
     );
   }
@@ -102,14 +108,11 @@ export default function PostDetailPage() {
   if (error || !post) {
     return (
       <div style={styles.container}>
-        <div style={styles.errorState}>
-          <p>{error || '게시글을 찾을 수 없습니다.'}</p>
-        </div>
-        <div style={styles.footer}>
-          <Link to="/forum" style={styles.backLink}>
-            ← 목록으로 돌아가기
-          </Link>
-        </div>
+        {error ? (
+          <ForumDetailErrorState message={error} backLabel="목록으로 돌아가기" onBack={() => navigate('/forum')} />
+        ) : (
+          <ForumDetailNotFoundState backLabel="목록으로 돌아가기" onBack={() => navigate('/forum')} />
+        )}
       </div>
     );
   }
@@ -117,20 +120,18 @@ export default function PostDetailPage() {
   return (
     <div style={styles.container}>
       <article style={styles.article}>
-        <header style={styles.articleHeader}>
-          <h1 style={styles.title}>{post.title}</h1>
-          <div style={styles.meta}>
-            <span>{getAuthorName(post)}</span>
-            <span style={styles.metaDivider}>·</span>
-            <span>{formatDate(post.createdAt)}</span>
-            {post.commentCount > 0 && (
-              <>
-                <span style={styles.metaDivider}>·</span>
-                <span>댓글 {post.commentCount}</span>
-              </>
-            )}
-          </div>
-        </header>
+        <ForumPostHeader
+          title={post.title}
+          authorName={getAuthorName(post)}
+          createdAt={formatDate(post.createdAt)}
+          style={styles.articleHeader}
+          metaSlot={post.commentCount > 0 ? (
+            <>
+              <span style={styles.metaDivider}>·</span>
+              <span>댓글 {post.commentCount}</span>
+            </>
+          ) : null}
+        />
 
         <div style={styles.content}>
           {/* WO-O4O-FORUM-DETAIL-PRIMITIVES-EXTRACTION-V1: 본문 공통 부품(댓글 렌더는 기존 유지) */}

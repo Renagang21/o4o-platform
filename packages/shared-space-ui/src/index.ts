@@ -95,6 +95,20 @@ export { ForumPostContent } from './ForumPostContent';
 export type { ForumPostContentProps } from './ForumPostContent';
 export { forumContentToHtml } from './forumContentToHtml';
 
+/* WO-O4O-FORUM-DETAIL-STATES-HEADER-EXTRACTION-V1: forum detail header + loading/error/not-found 공통 부품 */
+export { ForumPostHeader } from './ForumPostHeader';
+export type { ForumPostHeaderProps } from './ForumPostHeader';
+export {
+  ForumDetailLoadingState,
+  ForumDetailErrorState,
+  ForumDetailNotFoundState,
+} from './ForumDetailStates';
+export type {
+  ForumDetailLoadingStateProps,
+  ForumDetailErrorStateProps,
+  ForumDetailNotFoundStateProps,
+} from './ForumDetailStates';
+
 export { StoreHubTemplate } from './StoreHubTemplate';
 export type { StoreHubResourceCard, StoreHubFlowStep, StoreHubConfig, StoreHubTemplateProps } from './StoreHubTemplate';
 
