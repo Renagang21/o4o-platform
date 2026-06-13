@@ -178,7 +178,7 @@ export function WorkPage() {
         <div style={styles.card}>
           <div style={styles.cardHeader}>
             <span style={styles.cardIcon}>🖥️</span>
-            <h2 style={styles.cardTitle}>디지털 사이니지</h2>
+            <h2 style={styles.cardTitle}>디지털사이니지</h2>
           </div>
           <div style={styles.cardBody}>
             <p style={styles.signageDesc}>

@@ -350,9 +350,9 @@ export function HubSignageLibraryPage() {
           플랫폼 자료 "가져오기"(행별 내 매장에 추가)와 "내 약국용 직접 만들기"를 분리 노출 */}
       <header className="mb-6 pb-5 border-b-2 border-slate-200 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">플랫폼 사이니지</h1>
+          <h1 className="text-2xl font-bold text-slate-900">플랫폼 디지털사이니지</h1>
           <p className="mt-1.5 text-sm text-slate-500">
-            플랫폼 사이니지 미디어·플레이리스트를 탐색해 내 매장에 추가하거나,
+            플랫폼이 제공하는 매장 화면 콘텐츠·플레이리스트를 탐색해 내 매장에 추가하거나,
             내 약국 전용 플레이리스트를 직접 구성하세요.
           </p>
         </div>
@@ -509,9 +509,9 @@ export function HubSignageLibraryPage() {
       <div className="flex items-start gap-3 mt-8 p-5 bg-blue-50/60 border border-blue-100 rounded-xl text-sm text-slate-600 leading-relaxed">
         <span className="text-lg shrink-0">💡</span>
         <span>
-          추가한 사이니지는{' '}
+          추가한 콘텐츠는{' '}
           <Link to="/store/marketing/signage" className="text-blue-600 underline underline-offset-2">
-            사이니지 운영 화면
+            디지털사이니지 운영 화면
           </Link>
           에서 플레이리스트 구성과 스케줄 적용을 할 수 있습니다.
         </span>

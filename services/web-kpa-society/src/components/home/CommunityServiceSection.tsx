@@ -80,8 +80,8 @@ const services: ServiceCardData[] = [
     icon: <EducationIcon />,
   },
   {
-    title: '디지털 사이니지',
-    description: '약국 디지털 미디어를 관리하세요',
+    title: '디지털사이니지',
+    description: '매장 화면에 송출할 콘텐츠를 관리하세요',
     href: '/signage',
     icon: <SignageIcon />,
   },

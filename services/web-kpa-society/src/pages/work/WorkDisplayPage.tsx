@@ -64,7 +64,7 @@ export function WorkDisplayPage() {
         <Link to="/work" style={styles.backLink}>← 내 업무</Link>
         <div style={styles.headerMain}>
           <div>
-            <h1 style={styles.pageTitle}>디지털 사이니지</h1>
+            <h1 style={styles.pageTitle}>디지털사이니지</h1>
             <p style={styles.subTitle}>{userName}님이 관여 중인 디스플레이</p>
           </div>
         </div>

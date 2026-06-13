@@ -306,7 +306,7 @@ export function CommunityHomePage() {
         { title: '포럼', description: '동료 약사와 질문·토론으로 전문성을 높이세요', href: '/forum', icon: <span className={iconCls}><ForumIcon /></span> },
         { title: '강의', description: '보수교육·세미나를 온라인으로 수강하세요', href: '/lms', icon: <span className={iconCls}><EducationIcon /></span> },
         { title: '콘텐츠', description: '플랫폼 콘텐츠를 검색하고 활용하세요', href: '/content', icon: <span className={iconCls}><ContentIcon /></span> },
-        { title: '디지털 사이니지', description: '약국 디지털 미디어를 관리하세요', href: '/signage', icon: <span className={iconCls}><SignageIcon size={24} /></span> },
+        { title: '디지털사이니지', description: '매장 화면에 송출할 콘텐츠를 관리하세요', href: '/signage', icon: <span className={iconCls}><SignageIcon size={24} /></span> },
         { title: '자료실', description: '자료를 저장하고 AI 작업에 활용하세요', href: '/resources', icon: <span className={iconCls}><ResourcesIcon /></span> },
       ]}
       appEntryOnCardClick={handleCardClick}

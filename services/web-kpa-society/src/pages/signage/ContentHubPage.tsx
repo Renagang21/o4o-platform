@@ -383,8 +383,8 @@ export default function ContentHubPage() {
   return (
     <>
       <SignageManagerTemplate config={{
-        title: '디지털 사이니지',
-        description: '동영상과 플레이리스트를 관리하세요',
+        title: '디지털사이니지',
+        description: '매장 화면에 송출할 동영상과 플레이리스트를 관리하세요',
 
         // ── 동영상 탭 ──
         videos,

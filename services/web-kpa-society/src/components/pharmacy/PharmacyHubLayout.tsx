@@ -42,7 +42,7 @@ interface HubMenuItem {
 const HUB_MENU_ITEMS: HubMenuItem[] = [
   { label: '홈', path: '/store-hub', icon: Home, description: '자원 탐색 허브 · 운영 흐름 안내' },
   { label: '상품 카탈로그', path: '/store-hub/b2b', icon: PackageSearch, description: '공급 가능 상품 탐색 · 내 매장에 추가' },
-  { label: '디지털 사이니지', path: '/store-hub/signage', icon: MonitorPlay, description: '사이니지 미디어 · 플레이리스트' },
+  { label: '디지털사이니지', path: '/store-hub/signage', icon: MonitorPlay, description: '매장 화면 콘텐츠 · 플레이리스트' },
   { label: '이벤트/특가', path: '/store-hub/event-offers', icon: BadgePercent, description: 'KPA-Society 이벤트 상품' },
   // WO-O4O-EVENT-OFFER-TO-CART-PHASE1A-FOLLOWUP-V1: 이벤트오퍼 담기 → 장바구니 확인
   { label: '내 장바구니', path: '/store-hub/cart', icon: ShoppingCart, description: '장바구니에 담은 상품 확인 · 수량 조정' },

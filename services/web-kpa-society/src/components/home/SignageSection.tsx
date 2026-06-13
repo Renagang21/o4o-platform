@@ -78,8 +78,8 @@ export function SignageSection({ prefetchedMedia, prefetchedPlaylists, loading: 
   return (
     <section style={styles.container}>
       <div style={styles.header}>
-        <h2 style={styles.sectionTitle}>디지털 사이니지</h2>
-        <Link to="/signage" style={styles.moreLink}>사이니지 콘텐츠 보기 →</Link>
+        <h2 style={styles.sectionTitle}>디지털사이니지</h2>
+        <Link to="/signage" style={styles.moreLink}>디지털사이니지 콘텐츠 보기 →</Link>
       </div>
 
       {isLoading ? (
@@ -89,8 +89,8 @@ export function SignageSection({ prefetchedMedia, prefetchedPlaylists, loading: 
       ) : !hasContent ? (
         <div style={styles.card}>
           <div style={styles.emptyWrap}>
-            <p style={styles.empty}>사이니지 콘텐츠가 준비 중입니다.</p>
-            <p style={styles.emptyHint}>디지털 사이니지로 약국을 꾸며보세요.</p>
+            <p style={styles.empty}>디지털사이니지 콘텐츠가 준비 중입니다.</p>
+            <p style={styles.emptyHint}>디지털사이니지로 약국을 꾸며보세요.</p>
           </div>
         </div>
       ) : (
