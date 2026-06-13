@@ -14,6 +14,8 @@ import type { AssignmentLearner, AssignmentSubmission } from '../../api/lms';
 import { colors, typography } from '../../styles/theme';
 import type { Course, Lesson, Enrollment, Quiz, QuizResult } from '../../types';
 import { ContentRenderer } from '@o4o/content-editor';
+// WO-O4O-LMS-KPA-FULLER-ADOPTION-V1: 레슨 사이드바를 공통 LessonList(row-click)로 수렴
+import { LessonList, CourseProgressBar } from '@o4o/lms-ui';
 
 // WO-O4O-LMS-UX-REFINEMENT-V1: lesson type 라벨/아이콘 단일 출처
 const LESSON_TYPE_LABEL: Record<string, string> = {
@@ -478,45 +480,29 @@ export function LmsLessonPage() {
           <h2 style={styles.courseTitle}>{course.title}</h2>
         </div>
 
-        <div style={styles.lessonList}>
-          {lessons.map((lesson, index) => {
-            const isActive = lesson.id === lessonId;
-            const isLessonCompleted = completedLessonIds.includes(lesson.id);
-
-            return (
-              <Link
-                key={lesson.id}
-                to={`/lms/course/${courseId}/lesson/${lesson.id}`}
-                style={{
-                  ...styles.lessonItem,
-                  ...(isActive ? styles.lessonItemActive : {}),
-                }}
-              >
-                <span style={styles.lessonNumber}>
-                  {isLessonCompleted ? '✓' : index + 1}
-                </span>
-                <span style={styles.lessonTypeIcon} aria-hidden>
-                  {LESSON_TYPE_ICON[lesson.type ?? ''] || '📄'}
-                </span>
-                <span style={styles.lessonTitle}>{lesson.title}</span>
-              </Link>
-            );
-          })}
-        </div>
+        <LessonList
+          style={styles.lessonList}
+          rowClickMode="row"
+          accent={colors.primary}
+          hrefFor={(l) => `/lms/course/${courseId}/lesson/${l.id}`}
+          lessons={lessons.map((lesson) => ({
+            id: lesson.id,
+            title: lesson.title,
+            kind: lesson.type,
+            completed: completedLessonIds.includes(lesson.id),
+            current: lesson.id === lessonId,
+          }))}
+        />
 
         {enrollment && (
           <div style={styles.progressInfo}>
-            <div style={styles.progressBar}>
-              <div
-                style={{
-                  ...styles.progressFill,
-                  width: `${enrollment.progress}%`,
-                }}
-              />
-            </div>
-            <span style={styles.progressText}>
-              진도율: {enrollment.progress}% ({completedLessonIds.length} / {lessons.length})
-            </span>
+            <CourseProgressBar
+              percent={enrollment.progress}
+              completedCount={completedLessonIds.length}
+              totalCount={lessons.length}
+              accent={colors.primary}
+              compact
+            />
           </div>
         )}
       </aside>

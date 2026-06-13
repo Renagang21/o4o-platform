@@ -10,8 +10,8 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { AppreciationPanel } from '@o4o/shared-space-ui';
-// WO-O4O-LMS-COMMON-UI-EXTRACTION-V1: KPA = reference impl, 공통 presentational UI 소비 시작
-import { CourseVisibilityBadge, NoPaymentNotice } from '@o4o/lms-ui';
+// WO-O4O-LMS-COMMON-UI-EXTRACTION-V1 / WO-O4O-LMS-KPA-FULLER-ADOPTION-V1: KPA = reference impl, 공통 presentational UI 소비
+import { CourseVisibilityBadge, NoPaymentNotice, LessonList, CourseProgressBar } from '@o4o/lms-ui';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { lmsApi, normalizeEnrollment } from '../../api/lms';
 import { appreciationPanelApi } from '../../api/appreciation';
@@ -231,38 +231,21 @@ export function LmsCourseDetailPage() {
           {/* 순서 목록 */}
           <Card padding="large" style={{ marginTop: '24px' }}>
             <h2 style={styles.sectionTitle}>순서 목록</h2>
-            <div style={styles.lessonList}>
-              {lessons.map((lesson, index) => {
-                const completedLessonIds = enrollment?.metadata?.completedLessonIds ?? [];
-                const isCompleted = completedLessonIds.includes(lesson.id);
-                const canAccess = enrollment || lesson.isPreview;
-
-                return (
-                  <div key={lesson.id} style={styles.lessonItem}>
-                    <div style={styles.lessonNumber}>
-                      {isCompleted ? '✓' : index + 1}
-                    </div>
-                    <div style={styles.lessonInfo}>
-                      <div style={styles.lessonHeader}>
-                        <span style={styles.lessonTitle}>{lesson.title}</span>
-                        {lesson.isPreview && (
-                          <span style={styles.previewBadge}>미리보기</span>
-                        )}
-                      </div>
-                      <span style={styles.lessonDuration}>{lesson.duration}분</span>
-                    </div>
-                    {canAccess && (
-                      <Link
-                        to={`/lms/course/${course.id}/lesson/${lesson.id}`}
-                        style={styles.lessonLink}
-                      >
-                        보기
-                      </Link>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+            <LessonList
+              style={styles.lessonList}
+              rowClickMode="row"
+              accent={colors.primary}
+              hrefFor={(l) => `/lms/course/${course.id}/lesson/${l.id}`}
+              lessons={lessons.map((lesson) => ({
+                id: lesson.id,
+                title: lesson.title,
+                kind: lesson.type,
+                durationMinutes: lesson.duration,
+                completed: (enrollment?.metadata?.completedLessonIds ?? []).includes(lesson.id),
+                isPreview: lesson.isPreview,
+                locked: !(enrollment || lesson.isPreview),
+              }))}
+            />
           </Card>
         </div>
 
@@ -340,19 +323,13 @@ export function LmsCourseDetailPage() {
                 </div>
               ) : (
                 <div style={styles.enrolledInfo}>
-                  <div style={styles.progressBar}>
-                    <div
-                      style={{
-                        ...styles.progressFill,
-                        width: `${enrollment.progress}%`,
-                      }}
-                    />
-                  </div>
-                  <p style={styles.progressText}>진도율: {enrollment.progress}%</p>
-                  {/* WO-KPA-LMS-UX-QUICK-WINS-V1: 완료 레슨 수 표시 */}
-                  <p style={{ fontSize: '12px', color: '#94a3b8', textAlign: 'center' as const, marginBottom: '16px' }}>
-                    {enrollment.completedLessons} / {lessons.length} 레슨 완료
-                  </p>
+                  <CourseProgressBar
+                    percent={enrollment.progress}
+                    completedCount={enrollment.completedLessons}
+                    totalCount={lessons.length}
+                    accent={colors.primary}
+                    style={{ marginBottom: '16px' }}
+                  />
                   <Link
                     to={`/lms/course/${course.id}/lesson/${lessons[0]?.id || ''}`}
                     style={styles.continueButton}
