@@ -21,6 +21,9 @@ export type { PolicyDocumentViewerProps, PolicyDocumentDto } from './legal/Polic
 export { PublicLegalFooterInfo } from './legal/PublicLegalFooterInfo';
 export type { PublicLegalFooterInfoProps, PublicLegalProfileDto } from './legal/PublicLegalFooterInfo';
 
+// WO-O4O-PUBLIC-FOOTER-LEGAL-LOADER-CONSOLIDATION-V1: 공통 푸터 법정정보 loader factory
+export { createFooterLegalLoader } from './legal/footerLegalLoader';
+
 // WO-O4O-CONTACT-DELIVERY-AND-NOTIFICATION-V1: 공개 문의 폼
 export { PublicContactForm } from './legal/PublicContactForm';
 export type { PublicContactFormProps, ContactInquiryPayload, PublicContactFormTheme } from './legal/PublicContactForm';
