@@ -12,7 +12,7 @@
  * - InstructorHeaderAction, 강사 본인 강의 수정/종료 액션 포함
  */
 
-import { useState, useEffect, type MouseEvent } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { PageSection, PageContainer } from '@o4o/ui';
@@ -26,16 +26,8 @@ import {
 import { lmsApi } from '../../api';
 import { lmsInstructorApi } from '../../api/lms-instructor';
 import { qualificationApi, type MemberQualification } from '../../api/qualification';
-import { assetSnapshotApi } from '../../api/assetSnapshot';
 import { useAuth } from '../../contexts';
 import type { Course } from '../../types';
-
-// ─── Types ───────────────────────────────────────────────────────────────────
-
-interface BulkResult {
-  succeeded: string[];
-  failed: Array<{ courseId: string; message: string }>;
-}
 
 // ─── Instructor CTA (WO-O4O-LMS-CANONICAL-ROUTE-ALIGN-V1) ───────────────────
 
@@ -76,21 +68,12 @@ function InstructorHeaderAction({ isInstructor, qualStatus, navigate }: {
 export function LmsCoursesPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { user, isKpaContextLoaded } = useAuth();
+  const { user } = useAuth();
 
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
   const [searchInput, setSearchInput] = useState(searchParams.get('search') || '');
-
-  // WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1
-  // WO-O4O-STORE-LIBRARY-COPY-INDEPENDENCE-ALIGN-V1: 같은 원본 중복 추가 허용 — dedupe state 제거
-  const [addingCourseId, setAddingCourseId] = useState<string | null>(null);
-
-  // WO-O4O-LMS-LIST-BULK-LIBRARY-ACTION-V1
-  const [selectedCourseIds, setSelectedCourseIds] = useState<Set<string>>(new Set());
-  const [bulkResult, setBulkResult] = useState<BulkResult | null>(null);
-  const [isBulkAdding, setIsBulkAdding] = useState(false);
 
   // WO-O4O-LMS-CANONICAL-ROUTE-ALIGN-V1: 강사 자격 심사 상태
   const [qualStatus, setQualStatus] = useState<'idle' | 'pending' | 'approved' | 'rejected'>('idle');
@@ -100,20 +83,11 @@ export function LmsCoursesPage() {
   const isAuthenticated = !!user;
   const isInstructor = user?.roles?.includes('lms:instructor') ?? false;
 
-  // WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1
-  const isStoreOwner = !!user?.isStoreOwner && !!user?.kpaMembership?.organizationId;
-  // WO-O4O-KPA-ME-CONTEXT-HYDRATION-UX-FIX-V1
-  const mightBeStoreOwner = !!user && (user.roles ?? []).includes('kpa:store_owner');
-
   // ─── Effects ───────────────────────────────────────────────────────────────
 
   useEffect(() => {
     loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, currentSearch]);
-
-  useEffect(() => {
-    setSelectedCourseIds(new Set());
   }, [currentPage, currentSearch]);
 
   // WO-O4O-LMS-CANONICAL-ROUTE-ALIGN-V1: 강사 신청 자격 조회
@@ -161,60 +135,6 @@ export function LmsCoursesPage() {
     });
   };
 
-  // WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1: 개별 추가
-  // WO-O4O-STORE-LIBRARY-COPY-INDEPENDENCE-ALIGN-V1: 중복 허용 — 매번 새 library item 생성
-  const handleAddToLibrary = async (course: Course, e: MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!isStoreOwner) return;
-    setAddingCourseId(course.id);
-    try {
-      await assetSnapshotApi.copy({ sourceService: 'kpa', sourceAssetId: course.id, assetType: 'lesson' });
-      toast.success('내 자료함에 추가되었습니다');
-    } catch (err: any) {
-      const code = err?.response?.data?.error?.code ?? err?.code;
-      if (code === 'SOURCE_NOT_FOUND') {
-        toast.error('현재 자료함에 추가할 수 없는 강의입니다');
-      } else {
-        toast.error(err?.response?.data?.error?.message || err?.message || '자료함 추가에 실패했습니다');
-      }
-    } finally {
-      setAddingCourseId(null);
-    }
-  };
-
-  const toggleSelect = (courseId: string) => {
-    setSelectedCourseIds(prev => {
-      const next = new Set(prev);
-      if (next.has(courseId)) next.delete(courseId);
-      else next.add(courseId);
-      return next;
-    });
-  };
-
-  // WO-O4O-LMS-LIST-BULK-LIBRARY-ACTION-V1: bulk 추가
-  // WO-O4O-STORE-LIBRARY-COPY-INDEPENDENCE-ALIGN-V1: 중복 허용 — 각 선택은 새 library item 생성
-  const handleBulkAddToLibrary = async () => {
-    if (!isStoreOwner || selectedCourseIds.size === 0 || isBulkAdding) return;
-    setIsBulkAdding(true);
-    const result: BulkResult = { succeeded: [], failed: [] };
-
-    await Promise.all(
-      [...selectedCourseIds].map(async (courseId) => {
-        try {
-          await assetSnapshotApi.copy({ sourceService: 'kpa', sourceAssetId: courseId, assetType: 'lesson' });
-          result.succeeded.push(courseId);
-        } catch (err: any) {
-          result.failed.push({ courseId, message: err?.response?.data?.error?.message || err?.message || '추가 실패' });
-        }
-      }),
-    );
-
-    setSelectedCourseIds(new Set());
-    setIsBulkAdding(false);
-    setBulkResult(result);
-  };
-
   const handlePageChange = (page: number) => {
     setSearchParams(prev => { prev.set('page', String(page)); return prev; });
   };
@@ -222,22 +142,6 @@ export function LmsCoursesPage() {
   // ─── Render ────────────────────────────────────────────────────────────────
 
   if (loading) return <LoadingSpinner message="강의를 불러오는 중..." />;
-
-  // Selectable = can add to library and not already added
-  const selectableIds = new Set(
-    courses
-      .filter(c => isStoreOwner && c.status === 'published' && !!c.reusablePolicy && c.reusablePolicy !== 'restricted')
-      .map(c => c.id),
-  );
-  const allSelectableSelected = selectableIds.size > 0 && [...selectableIds].every(id => selectedCourseIds.has(id));
-
-  const toggleSelectAll = () => {
-    if (allSelectableSelected) {
-      setSelectedCourseIds(prev => { const next = new Set(prev); selectableIds.forEach(id => next.delete(id)); return next; });
-    } else {
-      setSelectedCourseIds(prev => { const next = new Set(prev); selectableIds.forEach(id => next.add(id)); return next; });
-    }
-  };
 
   return (
     <PageSection last>
@@ -291,20 +195,6 @@ export function LmsCoursesPage() {
               <table style={styles.table}>
                 <thead>
                   <tr style={styles.thead}>
-                    {/* 선택 헤더 — store owner + hydrated 상태에서만 열 표시 */}
-                    {(isStoreOwner || (mightBeStoreOwner && !isKpaContextLoaded)) && (
-                      <th style={{ ...styles.th, width: 40, textAlign: 'center' }}>
-                        {isStoreOwner && selectableIds.size > 0 && (
-                          <input
-                            type="checkbox"
-                            checked={allSelectableSelected}
-                            onChange={toggleSelectAll}
-                            title="전체 선택"
-                            style={{ cursor: 'pointer' }}
-                          />
-                        )}
-                      </th>
-                    )}
                     <th style={{ ...styles.th, minWidth: 260 }}>강의명</th>
                     <th style={{ ...styles.th, width: 120 }}>강사</th>
                     <th style={{ ...styles.th, width: 80, textAlign: 'center' }}>유형</th>
@@ -318,15 +208,6 @@ export function LmsCoursesPage() {
                     const isPublic = course.visibility === 'public';
                     const instructorName = (course as any).instructor?.name || course.instructorName || '-';
                     const detailPath = `/lms/course/${course.id}`;
-
-                    const canAddToLibrary =
-                      isStoreOwner &&
-                      course.status === 'published' &&
-                      !!course.reusablePolicy &&
-                      course.reusablePolicy !== 'restricted';
-                    const isAdding = addingCourseId === course.id;
-                    const isSelectable = selectableIds.has(course.id);
-                    const isSelected = selectedCourseIds.has(course.id);
 
                     // Instructor own-course check
                     const isOwnCourse = isInstructor && !!user?.id && (course as any).instructor?.id === user.id;
@@ -344,23 +225,6 @@ export function LmsCoursesPage() {
                           backgroundColor: idx % 2 === 0 ? '#ffffff' : '#fafafa',
                         }}
                       >
-                        {/* 체크박스 열 */}
-                        {(isStoreOwner || (mightBeStoreOwner && !isKpaContextLoaded)) && (
-                          <td style={{ ...styles.td, textAlign: 'center' }}>
-                            {!isKpaContextLoaded && mightBeStoreOwner ? (
-                              <div style={skeletonCheckStyle} />
-                            ) : isSelectable ? (
-                              <input
-                                type="checkbox"
-                                checked={isSelected}
-                                onChange={() => toggleSelect(course.id)}
-                                style={{ cursor: 'pointer' }}
-                                aria-label={`${course.title} 선택`}
-                              />
-                            ) : null}
-                          </td>
-                        )}
-
                         {/* 강의명 */}
                         <td style={styles.td}>
                           <Link to={detailPath} style={styles.titleLink}>
@@ -418,21 +282,6 @@ export function LmsCoursesPage() {
                               {ctaLabel}
                             </Link>
 
-                            {/* 자료함 추가 — hydration unknown: skeleton, hydrated: button */}
-                            {/* WO-O4O-STORE-LIBRARY-COPY-INDEPENDENCE-ALIGN-V1: 중복 허용 — 항상 활성 */}
-                            {mightBeStoreOwner && !isKpaContextLoaded ? (
-                              <div style={skeletonActionStyle} />
-                            ) : canAddToLibrary ? (
-                              <button
-                                type="button"
-                                onClick={(e) => handleAddToLibrary(course, e)}
-                                disabled={isAdding}
-                                style={libraryBtnStyle(false, isAdding)}
-                              >
-                                {isAdding ? '추가 중...' : '자료함 추가'}
-                              </button>
-                            ) : null}
-
                             {/* 강사 본인 강의 수정/종료 */}
                             {isOwnCourse && (
                               <RowActionMenu
@@ -469,48 +318,6 @@ export function LmsCoursesPage() {
           </>
         )}
       </PageContainer>
-
-      {/* WO-O4O-LMS-LIST-BULK-LIBRARY-ACTION-V1: ActionBar */}
-      {isStoreOwner && selectedCourseIds.size > 0 && (
-        <div style={actionBarStyle}>
-          <span style={{ color: '#fff', fontSize: 14, fontWeight: 500 }}>
-            {selectedCourseIds.size}개 선택됨
-          </span>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button type="button" onClick={() => setSelectedCourseIds(new Set())} style={actionBarSecondaryBtnStyle}>
-              선택 해제
-            </button>
-            <button type="button" onClick={handleBulkAddToLibrary} disabled={isBulkAdding} style={actionBarPrimaryBtnStyle(isBulkAdding)}>
-              {isBulkAdding ? '추가 중...' : '내 자료함에 추가'}
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* WO-O4O-LMS-LIST-BULK-LIBRARY-ACTION-V1: BulkResultModal */}
-      {bulkResult && (
-        <div style={modalOverlayStyle} onClick={() => setBulkResult(null)}>
-          <div style={modalStyle} onClick={e => e.stopPropagation()}>
-            <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 700, color: '#111827' }}>
-              자료함 추가 결과
-            </h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {bulkResult.succeeded.length > 0 && (
-                <div style={resultRowStyle('#dcfce7', '#15803d')}>✓ 성공: {bulkResult.succeeded.length}개</div>
-              )}
-              {bulkResult.failed.length > 0 && (
-                <div style={resultRowStyle('#fee2e2', '#991b1b')}>
-                  ✗ 실패: {bulkResult.failed.length}개
-                  {bulkResult.failed.map((f, i) => (
-                    <div key={i} style={{ fontSize: 12, marginTop: 4, opacity: 0.85 }}>{f.message}</div>
-                  ))}
-                </div>
-              )}
-            </div>
-            <button type="button" onClick={() => setBulkResult(null)} style={modalCloseBtnStyle}>닫기</button>
-          </div>
-        </div>
-      )}
     </PageSection>
   );
 }
@@ -677,30 +484,6 @@ const ctaLinkStyle: React.CSSProperties = {
   whiteSpace: 'nowrap',
 };
 
-function libraryBtnStyle(isAdded: boolean, isAdding: boolean): React.CSSProperties {
-  return {
-    display: 'inline-flex',
-    alignItems: 'center',
-    padding: '5px 10px',
-    backgroundColor: isAdded ? '#f3f4f6' : '#fff',
-    color: isAdded ? '#9ca3af' : '#5b21b6',
-    border: `1px solid ${isAdded ? '#e5e7eb' : '#ddd6fe'}`,
-    borderRadius: 6,
-    fontSize: 12,
-    fontWeight: 500,
-    cursor: isAdded || isAdding ? 'default' : 'pointer',
-    whiteSpace: 'nowrap',
-  };
-}
-
-// WO-O4O-KPA-ME-CONTEXT-HYDRATION-UX-FIX-V1: skeleton placeholders
-const skeletonCheckStyle: React.CSSProperties = {
-  width: 16, height: 16, borderRadius: 3, backgroundColor: '#e5e7eb',
-};
-const skeletonActionStyle: React.CSSProperties = {
-  height: 26, width: 72, borderRadius: 6, backgroundColor: '#f3f4f6',
-};
-
 // WO-O4O-LMS-CANONICAL-ROUTE-ALIGN-V1: 강사 CTA 스타일
 const instructorCtaStyles: Record<string, React.CSSProperties> = {
   primaryBtn: {
@@ -726,43 +509,4 @@ const instructorCtaStyles: Record<string, React.CSSProperties> = {
   },
   applyWrap: { display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' },
   hint: { margin: 0, fontSize: '11px', color: '#94a3b8' },
-};
-
-// WO-O4O-LMS-LIST-BULK-LIBRARY-ACTION-V1
-const actionBarStyle: React.CSSProperties = {
-  position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)',
-  display: 'flex', alignItems: 'center', gap: 16, padding: '12px 20px',
-  backgroundColor: '#1e1b4b', borderRadius: 12,
-  boxShadow: '0 4px 24px rgba(0,0,0,0.24)', zIndex: 100, whiteSpace: 'nowrap',
-};
-const actionBarSecondaryBtnStyle: React.CSSProperties = {
-  padding: '8px 14px', backgroundColor: 'transparent', color: '#c4b5fd',
-  border: '1px solid #6d28d9', borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: 'pointer',
-};
-function actionBarPrimaryBtnStyle(disabled: boolean): React.CSSProperties {
-  return {
-    padding: '8px 16px', backgroundColor: disabled ? '#6d28d9' : '#7c3aed',
-    color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600,
-    cursor: disabled ? 'default' : 'pointer', opacity: disabled ? 0.7 : 1,
-  };
-}
-const modalOverlayStyle: React.CSSProperties = {
-  position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.45)',
-  display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200,
-};
-const modalStyle: React.CSSProperties = {
-  backgroundColor: '#fff', borderRadius: 12, padding: '24px 28px',
-  minWidth: 280, maxWidth: 380, width: '90vw',
-  boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
-};
-function resultRowStyle(bg: string, fg: string): React.CSSProperties {
-  return {
-    display: 'flex', flexDirection: 'column', padding: '10px 14px',
-    backgroundColor: bg, color: fg, borderRadius: 8, fontSize: 14, fontWeight: 600,
-  };
-}
-const modalCloseBtnStyle: React.CSSProperties = {
-  marginTop: 20, width: '100%', padding: '10px 0',
-  backgroundColor: '#f3f4f6', color: '#374151',
-  border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer',
 };
