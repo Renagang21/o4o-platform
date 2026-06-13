@@ -13,6 +13,7 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
+import { createHash } from 'crypto';
 import { NetureContactMessage } from '../entities/NetureContactMessage.entity.js';
 import { requireAuth } from '../../../middleware/auth.middleware.js';
 import { requireNetureScope } from '../../../middleware/neture-scope.middleware.js';
@@ -32,6 +33,12 @@ const CONTACT_TYPE_LABELS: Record<string, string> = {
   other: '기타',
 };
 
+/** IP → SHA256 hash (개인정보 최소수집 — 원문 미저장). WO-O4O-CONTACT-NETURE-KPA-PRIVACY-CONSENT-V1 */
+function ipHash(ip: string | undefined): string | null {
+  if (!ip) return null;
+  try { return createHash('sha256').update(ip).digest('hex'); } catch { return null; }
+}
+
 export function createContactController(dataSource: DataSource): Router {
   const router = Router();
   const repo = dataSource.getRepository(NetureContactMessage);
@@ -39,7 +46,7 @@ export function createContactController(dataSource: DataSource): Router {
   // ── PUBLIC: POST /contact ──
   router.post('/contact', async (req: Request, res: Response) => {
     try {
-      const { contactType = 'other', name, email, phone, subject, message } = req.body;
+      const { contactType = 'other', name, email, phone, subject, message, privacyConsent } = req.body;
 
       // Validation
       if (!name || !email || !subject || !message) {
@@ -64,6 +71,15 @@ export function createContactController(dataSource: DataSource): Router {
         });
       }
 
+      // 개인정보 수집·이용 동의 필수 (WO-O4O-CONTACT-NETURE-KPA-PRIVACY-CONSENT-V1).
+      // 미동의 시 저장·알림 없이 400.
+      if (privacyConsent !== true) {
+        return res.status(400).json({
+          success: false,
+          error: { code: 'PRIVACY_CONSENT_REQUIRED', message: '개인정보 수집·이용 동의가 필요합니다.' },
+        });
+      }
+
       const entity = repo.create({
         contactType,
         name: name.trim(),
@@ -72,7 +88,10 @@ export function createContactController(dataSource: DataSource): Router {
         subject: subject.trim(),
         message: message.trim(),
         status: 'new',
-        ipAddress: req.ip || req.socket?.remoteAddress || null,
+        // 개인정보 최소수집: 신규 저장은 IP 원문 미저장 → hash 만 기록 (legacy ipAddress 는 null).
+        ipAddress: null,
+        ipHash: ipHash(req.ip || req.socket?.remoteAddress || undefined),
+        privacyConsent: true,
         userAgent: req.headers['user-agent'] || null,
       });
       await repo.save(entity);

@@ -13,6 +13,8 @@ export interface ContactFormData {
   phone?: string;
   subject: string;
   message: string;
+  /** 개인정보 수집·이용 동의 (WO-O4O-CONTACT-NETURE-KPA-PRIVACY-CONSENT-V1) — 미동의 시 backend 400. */
+  privacyConsent: boolean;
 }
 
 export interface ContactSubmitResult {

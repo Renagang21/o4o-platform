@@ -70,6 +70,7 @@ export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [agree, setAgree] = useState(false);
   const formRef = useRef<HTMLDivElement>(null);
 
   const handleTypeSelect = (type: ContactType) => {
@@ -97,6 +98,11 @@ export default function ContactPage() {
       return;
     }
 
+    if (!agree) {
+      setError('개인정보 수집·이용에 동의해 주세요.');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const result = await contactApi.submitContactMessage({
@@ -106,11 +112,13 @@ export default function ContactPage() {
         phone: formData.phone.trim() || undefined,
         subject: formData.subject.trim(),
         message: formData.message.trim(),
+        privacyConsent: agree,
       });
 
       if (result.success) {
         setSubmitted(true);
         setFormData(initialFormData);
+        setAgree(false);
       } else {
         setError(result.error?.message || '문의 접수 중 오류가 발생했습니다.');
       }
@@ -278,10 +286,28 @@ export default function ContactPage() {
                   />
                 </div>
 
+                {/* 개인정보 수집·이용 동의 (WO-O4O-CONTACT-NETURE-KPA-PRIVACY-CONSENT-V1) */}
+                <label className="flex items-start gap-2 text-sm text-gray-600">
+                  <input
+                    type="checkbox"
+                    name="privacyConsent"
+                    checked={agree}
+                    onChange={(e) => setAgree(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                  />
+                  <span>
+                    문의 접수와 회신을 위해 입력한 개인정보를 수집·이용하는 데 동의합니다.{' '}
+                    <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-primary-600 underline hover:text-primary-700">
+                      개인정보처리방침
+                    </a>
+                    <span className="text-red-500"> *</span>
+                  </span>
+                </label>
+
                 {/* 제출 버튼 */}
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !agree}
                   className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   <Send className="w-4 h-4" />

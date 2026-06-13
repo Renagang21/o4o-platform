@@ -40,6 +40,7 @@ export function ContactModal({ type, onClose }: ContactModalProps) {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [agree, setAgree] = useState(false);
 
   const isPartner = type === 'partner';
   const title = isPartner ? '운영자 / 단체 협력 문의' : '강의 개설 / 협업 문의';
@@ -52,6 +53,10 @@ export function ContactModal({ type, onClose }: ContactModalProps) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    if (!agree) {
+      setError('개인정보 수집·이용에 동의해 주세요.');
+      return;
+    }
     setLoading(true);
     try {
       await contactRequestApi.submit({
@@ -62,6 +67,7 @@ export function ContactModal({ type, onClose }: ContactModalProps) {
         phone: form.phone || undefined,
         subject: isPartner ? undefined : form.subject || undefined,
         message: form.message,
+        privacyConsent: agree,
       });
       setSuccess(true);
     } catch (err: any) {
@@ -170,13 +176,30 @@ export function ContactModal({ type, onClose }: ContactModalProps) {
               />
             </label>
 
+            {/* 개인정보 수집·이용 동의 (WO-O4O-CONTACT-NETURE-KPA-PRIVACY-CONSENT-V1) */}
+            <label style={s.consent}>
+              <input
+                type="checkbox"
+                checked={agree}
+                onChange={(e) => setAgree(e.target.checked)}
+                style={{ marginTop: 2 }}
+              />
+              <span>
+                문의 접수와 회신을 위해 입력한 개인정보를 수집·이용하는 데 동의합니다.{' '}
+                <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-primary, #2563eb)', textDecoration: 'underline' }}>
+                  개인정보처리방침
+                </a>
+                <span style={s.required}>*</span>
+              </span>
+            </label>
+
             {error && <p style={s.errorText}>{error}</p>}
 
             <div style={s.actions}>
               <button type="button" style={s.btnSecondary} onClick={onClose} disabled={loading}>
                 취소
               </button>
-              <button type="submit" style={s.btnPrimary} disabled={loading}>
+              <button type="submit" style={s.btnPrimary} disabled={loading || !agree}>
                 {loading ? '등록 중…' : '문의 보내기'}
               </button>
             </div>
@@ -274,6 +297,15 @@ const s: Record<string, React.CSSProperties> = {
     fontSize: '0.875rem',
     color: '#ef4444',
     margin: '0 0 4px',
+  },
+  consent: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: 8,
+    fontSize: '0.8125rem',
+    fontWeight: 400,
+    color: '#475569',
+    lineHeight: 1.5,
   },
   actions: {
     display: 'flex',

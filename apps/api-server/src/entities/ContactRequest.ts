@@ -65,6 +65,13 @@ export class ContactRequest {
   created_by: string | null;
 
   /**
+   * 개인정보 수집·이용 동의 (WO-O4O-CONTACT-NETURE-KPA-PRIVACY-CONSENT-V1).
+   * 공개 submit 시 true 필수 — 신규 저장은 항상 true(미동의는 400 으로 차단).
+   */
+  @Column({ type: 'boolean', default: false })
+  privacy_consent: boolean;
+
+  /**
    * 알림 발송 결과 (WO-O4O-CONTACT-NETURE-KPA-SETTINGS-ADAPTER-V1).
    * 형식: `inapp:<status>;email:<status>;autoreply:<status>` (예: inapp:sent;email:off;autoreply:off).
    * 접수 자체와 무관한 best-effort 기록.

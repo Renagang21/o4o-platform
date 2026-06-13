@@ -33,6 +33,13 @@ export function createContactRequestHandler(dataSource: DataSource): RequestHand
       subject,
       message,
     } = req.body as Record<string, string | undefined>;
+    const privacyConsent = (req.body as any)?.privacyConsent;
+
+    // 개인정보 수집·이용 동의 필수 (WO-O4O-CONTACT-NETURE-KPA-PRIVACY-CONSENT-V1).
+    // 미동의 시 저장·알림 없이 400.
+    if (privacyConsent !== true) {
+      return res.status(400).json({ success: false, error: '개인정보 수집·이용 동의가 필요합니다.', code: 'PRIVACY_CONSENT_REQUIRED' });
+    }
 
     // ── Validation ──────────────────────────────────────────────────────────
     const errors: string[] = [];
@@ -68,6 +75,7 @@ export function createContactRequestHandler(dataSource: DataSource): RequestHand
       message: message!.trim(),
       status: 'pending',
       created_by: user?.id ?? null,
+      privacy_consent: true,
     });
     const saved = await repo().save(entity);
 

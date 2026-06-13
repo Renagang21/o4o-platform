@@ -49,8 +49,26 @@ export class NetureContactMessage {
   @Column({ type: 'varchar', length: 20, default: 'new' })
   status!: ContactMessageStatus;
 
+  /**
+   * Legacy IP 원문 (WO-O4O-NETURE-CONTACT-PAGE-V1). 신규 저장은 원문을 넣지 않고 null.
+   * 컬럼은 후속 cleanup WO 전까지 보존 — 여기서 drop 하지 않는다.
+   */
   @Column({ type: 'varchar', length: 50, nullable: true })
   ipAddress!: string | null;
+
+  /**
+   * IP SHA256 hash (WO-O4O-CONTACT-NETURE-KPA-PRIVACY-CONSENT-V1).
+   * 개인정보 최소수집 — 신규 저장부터 원문 대신 일방향 hash 만 기록.
+   */
+  @Column({ type: 'varchar', length: 64, nullable: true })
+  ipHash!: string | null;
+
+  /**
+   * 개인정보 수집·이용 동의 (WO-O4O-CONTACT-NETURE-KPA-PRIVACY-CONSENT-V1).
+   * 공개 submit 시 true 필수 — 신규 저장은 항상 true(미동의는 400 으로 저장 자체 차단).
+   */
+  @Column({ type: 'boolean', default: false })
+  privacyConsent!: boolean;
 
   @Column({ type: 'text', nullable: true })
   userAgent!: string | null;
