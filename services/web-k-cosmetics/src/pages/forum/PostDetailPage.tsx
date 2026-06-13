@@ -14,7 +14,7 @@ import {
 } from '../../services/forumApi';
 import { toast } from '@o4o/error-handling';
 import { useAuth } from '@/contexts/AuthContext';
-import { AppreciationPanel } from '@o4o/shared-space-ui';
+import { AppreciationPanel, ForumPostContent } from '@o4o/shared-space-ui';
 import { appreciationPanelApi } from '@/api/appreciation';
 
 // Convert Block[] to HTML for rendering (WO-FORUM-CONTENT-RENDER-UNIFICATION-V1)
@@ -114,11 +114,6 @@ export default function PostDetailPage() {
     );
   }
 
-  // Resolve content to HTML string (WO-FORUM-CONTENT-RENDER-UNIFICATION-V1)
-  const contentHtml = Array.isArray(post.content)
-    ? blocksToHtmlInline(post.content)
-    : (post.content || '');
-
   return (
     <div style={styles.container}>
       <article style={styles.article}>
@@ -138,7 +133,8 @@ export default function PostDetailPage() {
         </header>
 
         <div style={styles.content}>
-          <ContentRenderer html={contentHtml} />
+          {/* WO-O4O-FORUM-DETAIL-PRIMITIVES-EXTRACTION-V1: 본문 공통 부품(댓글 렌더는 기존 유지) */}
+          <ForumPostContent content={post.content} />
         </div>
       </article>
 

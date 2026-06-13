@@ -90,6 +90,11 @@ export type {
   ForumWriteFormPostTypeOption,
 } from './ForumWriteForm';
 
+/* WO-O4O-FORUM-DETAIL-PRIMITIVES-EXTRACTION-V1: forum detail 본문 렌더 공통 부품 + content 변환기 */
+export { ForumPostContent } from './ForumPostContent';
+export type { ForumPostContentProps } from './ForumPostContent';
+export { forumContentToHtml } from './forumContentToHtml';
+
 export { StoreHubTemplate } from './StoreHubTemplate';
 export type { StoreHubResourceCard, StoreHubFlowStep, StoreHubConfig, StoreHubTemplateProps } from './StoreHubTemplate';
 

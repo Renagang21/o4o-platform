@@ -48,7 +48,8 @@ import {
   type PostType,
 } from '../../services/forumApi';
 import { blocksToHtml } from '@o4o/forum-core/utils';
-import { ContentRenderer } from '@o4o/content-editor';
+// WO-O4O-FORUM-DETAIL-PRIMITIVES-EXTRACTION-V1: 본문 공통 부품(Neture 고유 contentToHtml 변환은 html prop 으로 보존)
+import { ForumPostContent } from '@o4o/shared-space-ui';
 
 /** Convert post content (Block[] or string) to safe HTML */
 function contentToHtml(content: string | object[] | undefined): string {
@@ -464,7 +465,7 @@ export function ForumPostPage({ basePath = '/forum' }: { basePath?: string } = {
       </header>
 
       {/* Post Content */}
-      <ContentRenderer html={contentToHtml(post.content)} style={styles.postContent} />
+      <ForumPostContent html={contentToHtml(post.content)} style={styles.postContent} />
 
       {/* WO-NETURE-EXTERNAL-CONTACT-V1: Author Contact Section */}
       {shouldShowAuthorContact(post) && (

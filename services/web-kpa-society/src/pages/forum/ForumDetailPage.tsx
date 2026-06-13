@@ -5,10 +5,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
-import { blocksToHtml } from '@o4o/forum-core/utils';
 import { PageHeader, LoadingSpinner, Card } from '../../components/common';
 import { PageSection, PageContainer } from '@o4o/ui';
-import { AppreciationPanel } from '@o4o/shared-space-ui';
+import { AppreciationPanel, ForumPostContent } from '@o4o/shared-space-ui';
 import { ClosedForumAccessBlocker } from '../../components/forum/ClosedForumAccessBlocker';
 import { forumApi } from '../../api';
 import { appreciationPanelApi } from '../../api/appreciation';
@@ -16,7 +15,6 @@ import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 import type { ForumPost, ForumComment } from '../../types';
 import { PLATFORM_ROLES, ROLES, hasAnyRole } from '../../lib/role-constants';
-import { ContentRenderer } from '@o4o/content-editor';
 
 export function ForumDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -239,9 +237,7 @@ export function ForumDetailPage() {
         )}
 
         <div style={styles.content}>
-          <ContentRenderer
-            html={Array.isArray(post.content) ? blocksToHtml(post.content) : post.content}
-          />
+          <ForumPostContent content={post.content} />
         </div>
 
         <div style={styles.actions}>

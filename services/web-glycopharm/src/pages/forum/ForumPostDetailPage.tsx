@@ -12,10 +12,9 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, MessageSquare, Eye, Heart, Calendar, User, Loader2, AlertCircle } from 'lucide-react';
 import { fetchForumPost, fetchPostComments, extractTextContent, type ForumPostDetail, type ForumComment } from '@/services/forumApi';
-import { ContentRenderer } from '@o4o/content-editor';
 import { toast } from '@o4o/error-handling';
 import { useAuth } from '@/contexts/AuthContext';
-import { AppreciationPanel } from '@o4o/shared-space-ui';
+import { AppreciationPanel, ForumPostContent } from '@o4o/shared-space-ui';
 import { appreciationPanelApi } from '@/api/appreciation';
 
 // ─── Local aliases ───────────────────────────────────────────
@@ -142,7 +141,7 @@ export default function ForumPostDetailPage() {
         {/* 본문 */}
         <div className="px-6 py-6 min-h-[120px]">
           {bodyText ? (
-            <ContentRenderer
+            <ForumPostContent
               html={bodyText}
               className="text-sm text-slate-700 leading-relaxed"
             />
