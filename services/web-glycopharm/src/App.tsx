@@ -904,6 +904,13 @@ function AppRoutes() {
           membership 기반 약국 회원 (service_memberships.glycopharm.role='pharmacy' status active|approved)
           도 진입 허용 — 헤더 isPharmacy 정책과 정렬. allowedRoles 만 검사하던 ProtectedRoute 는
           unprefixed 'pharmacy' role / membership 사용자를 거부 → '내 약국' 클릭 시 / 리다이렉트 (화면 변화 없음 증상). */}
+      {/* WO-O4O-DIGITAL-SIGNAGE-CROSSSERVICE-APPLY-V1: 실제 송출(매장 화면) 보기 — layout chrome 격리.
+          PharmacyStoreGuard(인증)만 적용, StoreLayoutWrapper(header/sidebar/footer) 미적용 →
+          송출 화면에 app chrome 미마운트 (KPA 패턴, CSS 덮기 의존 제거). path 문자열 불변. */}
+      <Route
+        path="/store/marketing/signage/play/:playlistId"
+        element={<PharmacyStoreGuard><SignagePlaybackPage /></PharmacyStoreGuard>}
+      />
       <Route
         path="store"
         element={
@@ -967,7 +974,8 @@ function AppRoutes() {
         <Route path="marketing/signage/videos" element={<StoreSignageMainPage />} />
         <Route path="marketing/signage/schedules" element={<StoreSignageMainPage />} />
         <Route path="marketing/signage/player" element={<SignagePlayerSelectPage />} />
-        <Route path="marketing/signage/play/:playlistId" element={<SignagePlaybackPage />} />
+        {/* WO-O4O-DIGITAL-SIGNAGE-CROSSSERVICE-APPLY-V1: 실제 송출(play)은 layout chrome 제거를 위해
+            store layout wrapper 밖 top-level route 로 격리 (KPA 패턴). 아래 /store/marketing/signage/play/:playlistId 참조. */}
         {/* Legacy signage routes (maintained for backward compat) */}
         <Route path="marketing/signage/library" element={<ContentLibraryPage />} />
         <Route path="marketing/signage/playlist/:id" element={<SignagePlaylistDetailPage />} />

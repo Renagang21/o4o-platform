@@ -704,6 +704,13 @@ function AppRoutes() {
       {/* Store Owner Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
           WO-O4O-MY-STORE-CROSSSERVICE-CANONICAL-GUARD-ALIGNMENT-V1:
             inline ProtectedRoute(allowedRoles=[...role-only]) → 공통 StoreOwnerGuard wrapper. */}
+      {/* WO-O4O-DIGITAL-SIGNAGE-CROSSSERVICE-APPLY-V1: 실제 송출(매장 화면) 보기 — layout chrome 격리.
+          StoreOwnerRoute(인증)만 적용, StoreLayoutWrapper(header/sidebar/footer) 미적용 →
+          송출 화면에 app chrome 미마운트 (KPA 패턴, CSS 덮기 의존 제거). path 문자열 불변. */}
+      <Route
+        path="/store/marketing/signage/play/:playlistId"
+        element={<StoreOwnerRoute><SignagePlaybackPage /></StoreOwnerRoute>}
+      />
       <Route
         path="store"
         element={
@@ -734,7 +741,8 @@ function AppRoutes() {
         <Route path="marketing/signage/schedules" element={<StoreSignagePage />} />
         {/* WO-O4O-KCOSMETICS-SIGNAGE-PLAYER-V1: TV 재생 (player select + fullscreen playback) */}
         <Route path="marketing/signage/player" element={<SignagePlayerSelectPage />} />
-        <Route path="marketing/signage/play/:playlistId" element={<SignagePlaybackPage />} />
+        {/* WO-O4O-DIGITAL-SIGNAGE-CROSSSERVICE-APPLY-V1: 실제 송출(play)은 layout chrome 제거를 위해
+            store layout wrapper 밖 top-level route 로 격리 (KPA 패턴). 아래 /store/marketing/signage/play/:playlistId 참조. */}
         {/* WO-O4O-STORE-HUB-CROSS-SERVICE-COMMONIZATION-PHASE1-V1: placeholder → StoreAssetsPanel */}
         <Route path="content" element={<StoreAssetsPage />} />
         {/* Interest 관리 (WO-O4O-TABLET-INTEREST-UX-REFACTOR-V1) */}

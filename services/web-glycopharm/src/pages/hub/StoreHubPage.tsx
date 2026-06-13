@@ -54,10 +54,10 @@ const glycoStoreHubConfig: StoreHubConfig = {
     },
     {
       icon: <MonitorPlay size={CARD_ICON_SIZE} color={ICON_COLOR} />,
-      title: '디지털 사이니지',
-      desc: '혈당관리 관련 사이니지 미디어를 탐색해 매장에 추가합니다',
+      title: '디지털사이니지',
+      desc: '매장 화면에 송출할 콘텐츠와 플레이리스트를 탐색해 내 약국에 추가합니다',
       href: '/store-hub/signage',
-      actionLabel: '사이니지 탐색',
+      actionLabel: '디지털사이니지 탐색',
     },
     {
       icon: <Files size={CARD_ICON_SIZE} color={ICON_COLOR} />,

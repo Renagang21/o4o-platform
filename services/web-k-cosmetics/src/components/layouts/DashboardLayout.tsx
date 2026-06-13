@@ -201,7 +201,6 @@ const roleConfig: Record<string, RoleConfig> = {
       { path: '/partner/overview', label: '개요', icon: icons.BarChart3 },
       { path: '/partner/targets', label: '타겟 설정', icon: icons.Users },
       { path: '/partner/content', label: '콘텐츠', icon: icons.Package },
-      { path: '/partner/signage/content', label: '사이니지 콘텐츠', icon: icons.Monitor },
       { path: '/partner/events', label: '이벤트', icon: icons.Megaphone },
       { path: '/partner/status', label: '현황', icon: icons.FileCheck },
     ],

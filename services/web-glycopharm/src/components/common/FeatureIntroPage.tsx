@@ -28,7 +28,7 @@ const FEATURE_CONFIG: Record<FeatureType, {
     icon: Store,
     title: '약국 운영 관리',
     description: '상품 관리, 주문 처리, 매출 분석 등\n약국 운영에 필요한 기능을 제공합니다.',
-    details: ['상품·재고 관리', '주문 처리', '매출 분석', '디지털 사이니지'],
+    details: ['상품·재고 관리', '주문 처리', '매출 분석', '디지털사이니지'],
   },
   mypage: {
     icon: UserCircle,

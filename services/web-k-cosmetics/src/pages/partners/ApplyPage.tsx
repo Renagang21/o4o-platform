@@ -27,7 +27,7 @@ interface ApplicationForm {
 const SERVICE_OPTIONS: { value: ServiceInterest; label: string; description: string }[] = [
   {
     value: 'DIGITAL_SIGNAGE',
-    label: '디지털 사이니지',
+    label: '디지털사이니지',
     description: '매장 내 디지털 디스플레이 광고',
   },
   {

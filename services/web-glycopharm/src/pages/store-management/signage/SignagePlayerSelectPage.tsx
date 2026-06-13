@@ -109,9 +109,9 @@ export function SignagePlayerSelectPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-bold text-slate-900">사이니지 재생</h2>
+          <h2 className="text-lg font-bold text-slate-900">디지털사이니지 송출</h2>
           <p className="text-sm text-slate-500 mt-0.5">
-            게시된 플레이리스트를 선택하여 전체 화면으로 재생합니다.
+            게시된 플레이리스트를 선택해 매장 화면으로 전체화면 송출합니다.
           </p>
         </div>
       </div>

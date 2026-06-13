@@ -21,7 +21,7 @@ import PageHeader from '../../components/common/PageHeader';
 const SERVICE_LABELS: Record<ServiceType, { label: string; icon: typeof Building2 }> = {
   dropshipping: { label: '무재고 판매', icon: Truck },
   sample_sales: { label: '샘플 판매', icon: Building2 },
-  digital_signage: { label: '디지털 사이니지', icon: Monitor },
+  digital_signage: { label: '디지털사이니지', icon: Monitor },
 };
 
 export default function ApplicationsPage() {
@@ -132,7 +132,7 @@ export default function ApplicationsPage() {
               <option value="">전체</option>
               <option value="dropshipping">무재고 판매</option>
               <option value="sample_sales">샘플 판매</option>
-              <option value="digital_signage">디지털 사이니지</option>
+              <option value="digital_signage">디지털사이니지</option>
             </select>
           </div>
           <div>

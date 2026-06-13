@@ -31,7 +31,7 @@ import type { AdminApplication, ServiceType, ApplicationStatus } from '@/api/gly
 const SERVICE_LABELS: Record<ServiceType, { label: string; icon: typeof Building2 }> = {
   dropshipping: { label: '무재고 판매', icon: Truck },
   sample_sales: { label: '샘플 판매', icon: Building2 },
-  digital_signage: { label: '디지털 사이니지', icon: Monitor },
+  digital_signage: { label: '디지털사이니지', icon: Monitor },
 };
 
 const STATUS_CONFIG: Record<ApplicationStatus, { label: string; icon: typeof Clock; bgColor: string; textColor: string }> = {

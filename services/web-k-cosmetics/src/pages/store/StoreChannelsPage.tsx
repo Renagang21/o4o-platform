@@ -246,7 +246,7 @@ const CHANNEL_DESC: Record<string, string> = {
   B2C: '고객이 온라인으로 상품을 확인하고 구매합니다',
   KIOSK: '매장 내 키오스크에서 고객이 직접 상품을 조회합니다',
   TABLET: '매장 내 태블릿에서 상품 안내 및 상담 요청을 처리합니다',
-  SIGNAGE: '매장 내 디지털 사이니지에 콘텐츠를 표시합니다',
+  SIGNAGE: '매장 내 디지털사이니지에 콘텐츠를 표시합니다',
 };
 
 /* ─── ChannelPublicUrlCard ───────────────────── */

@@ -47,8 +47,8 @@ export default function ContentLibraryPage() {
 
   const config: SignageHubConfig = {
     serviceKey: 'glycopharm',
-    heroTitle: '디지털 사이니지',
-    heroDesc: '사이니지에 표시할 동영상 콘텐츠를 선택하세요',
+    heroTitle: '디지털사이니지',
+    heroDesc: '매장 화면에 송출할 동영상 콘텐츠를 선택하세요',
     headerAction: (
       <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
         <button

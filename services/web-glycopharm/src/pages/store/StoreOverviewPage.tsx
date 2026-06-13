@@ -88,8 +88,8 @@ const HUB_SECTIONS: HubSectionDefinition[] = [
       },
       {
         id: 'signage',
-        title: '사이니지',
-        description: '디지털 사이니지 편성 관리',
+        title: '디지털사이니지',
+        description: '매장 화면 콘텐츠 편성·송출 관리',
         href: '/store/marketing/signage/playlist',
         icon: <LucideIcon Icon={Monitor} color="#6D28D9" />,
         iconBg: '#F5F3FF',

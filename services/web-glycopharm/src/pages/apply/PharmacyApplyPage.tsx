@@ -26,7 +26,7 @@ const SERVICE_OPTIONS: { value: ServiceType; label: string; description: string;
   },
   {
     value: 'digital_signage',
-    label: '디지털 사이니지',
+    label: '디지털사이니지',
     description: '약국 내 디스플레이로 혈당관리 콘텐츠를 노출하세요',
     icon: Monitor,
   },

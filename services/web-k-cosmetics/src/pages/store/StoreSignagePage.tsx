@@ -189,13 +189,13 @@ export default function StoreSignagePage() {
           <div className="text-sm text-slate-500 mb-1">
             <Link to="/store" className="text-blue-600 hover:underline">&larr; 대시보드</Link>
           </div>
-          <h1 className="text-2xl font-bold text-slate-900">사이니지 플레이리스트</h1>
-          <p className="text-sm text-slate-500 mt-1">매장 사이니지 플레이리스트를 관리합니다</p>
-          <div className="mt-2"><GuideBackLink to="/guide/features/signage" label="사이니지 운영 방법" /></div>
+          <h1 className="text-2xl font-bold text-slate-900">디지털사이니지 운영</h1>
+          <p className="text-sm text-slate-500 mt-1">매장 화면에 송출할 콘텐츠를 플레이리스트로 구성합니다</p>
+          <div className="mt-2"><GuideBackLink to="/guide/features/signage" label="디지털사이니지 운영 방법" /></div>
         </div>
         <div className="flex gap-2">
           <button
-            onClick={() => navigate('/partner/signage/content')}
+            onClick={() => navigate('/store-hub/signage')}
             className="flex items-center gap-2 px-3 py-2 text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50"
           >
             <Monitor className="w-4 h-4" />

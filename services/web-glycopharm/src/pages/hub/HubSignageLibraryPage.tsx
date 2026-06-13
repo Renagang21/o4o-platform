@@ -328,10 +328,10 @@ export function HubSignageLibraryPage() {
     <div className="max-w-7xl mx-auto px-6 py-8">
       {/* Hero */}
       <header className="mb-6 pb-5 border-b-2 border-slate-200">
-        <h1 className="text-2xl font-bold text-slate-900">플랫폼 사이니지</h1>
+        <h1 className="text-2xl font-bold text-slate-900">플랫폼 디지털사이니지</h1>
         <p className="mt-1.5 text-sm text-slate-500">
-          디지털 사이니지 미디어와 플레이리스트를 탐색하고 내 약국에 추가합니다.
-          추가 후 사이니지 운영 화면에서 재생 스케줄을 설정하세요.
+          매장 화면에 송출할 콘텐츠와 플레이리스트를 탐색하고 내 약국에 추가합니다.
+          추가 후 디지털사이니지 운영 화면에서 재생 스케줄을 설정하세요.
         </p>
       </header>
 
@@ -476,9 +476,9 @@ export function HubSignageLibraryPage() {
       <div className="flex items-start gap-3 mt-8 p-5 bg-blue-50/60 border border-blue-100 rounded-xl text-sm text-slate-600 leading-relaxed">
         <span className="text-lg shrink-0">💡</span>
         <span>
-          추가한 사이니지는{' '}
+          추가한 콘텐츠는{' '}
           <Link to="/store/marketing/signage" className="text-blue-600 underline underline-offset-2">
-            사이니지 운영 화면
+            디지털사이니지 운영 화면
           </Link>
           에서 플레이리스트 구성과 스케줄 적용을 할 수 있습니다.
         </span>
