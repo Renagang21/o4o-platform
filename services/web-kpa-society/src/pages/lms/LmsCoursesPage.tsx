@@ -1,39 +1,35 @@
 /**
- * LmsCoursesPage - 강의 Hub (/lms) 목록 페이지 (테이블형)
+ * LmsCoursesPage - 강의 Hub (/lms)
  *
- * WO-O4O-LMS-LIST-TABLE-CANONICAL-ALIGN-V1:
- * - 카드형 → 테이블형 전환 (강의 수 증가 대응)
- * - 검색, 선택, bulk action, 페이지네이션 구조로 정리
- *
- * WO-O4O-KPA-ME-CONTEXT-HYDRATION-UX-FIX-V1:
- * - isKpaContextLoaded 사용하여 unknown ≠ false 구분
- *
- * WO-O4O-LMS-CANONICAL-ROUTE-ALIGN-V1:
- * - InstructorHeaderAction, 강사 본인 강의 수정/종료 액션 포함
+ * WO-O4O-LMS-KPA-COURSESPAGE-HUBTEMPLATE-ALIGNMENT-V1:
+ * - 자체 raw <table> → 공통 LmsHubTemplate(@o4o/shared-space-ui)로 수렴.
+ *   3서비스(KPA/GP/KCos) /lms 목록 hub 를 단일 테이블 템플릿으로 정렬.
+ * - KPA 고유 요소는 config 로 주입:
+ *     headerAction       → InstructorHeaderAction(강사 등록/신청 CTA)
+ *     renderCta          → 동적 수강 CTA(공개=바로 보기 / 비로그인=로그인 후 수강)
+ *     renderRowActions   → 강사 본인 강의 수정/종료(RowActionMenu)
+ *     LmsHubCourse.visibility/requiresApproval/isPaid → 공개·회원제 배지
+ * - store library takeaway(자료함 가져가기)는 WO-...-TAKEAWAY-REMOVAL-V1 에서 삭제됨 — 재도입 금지.
  */
 
-import { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect, useMemo } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
-import { PageSection, PageContainer } from '@o4o/ui';
 import { RowActionMenu } from '@o4o/ui';
-import {
-  PageHeader,
-  LoadingSpinner,
-  EmptyState,
-  Pagination,
-} from '../../components/common';
+import { LmsHubTemplate, type LmsHubConfig, type LmsHubCourse } from '@o4o/shared-space-ui';
 import { lmsApi } from '../../api';
 import { lmsInstructorApi } from '../../api/lms-instructor';
 import { qualificationApi, type MemberQualification } from '../../api/qualification';
 import { useAuth } from '../../contexts';
 import type { Course } from '../../types';
 
+type QualStatus = 'idle' | 'pending' | 'approved' | 'rejected';
+
 // ─── Instructor CTA (WO-O4O-LMS-CANONICAL-ROUTE-ALIGN-V1) ───────────────────
 
 function InstructorHeaderAction({ isInstructor, qualStatus, navigate }: {
   isInstructor: boolean;
-  qualStatus: 'idle' | 'pending' | 'approved' | 'rejected';
+  qualStatus: QualStatus;
   navigate: ReturnType<typeof useNavigate>;
 }) {
   if (isInstructor) {
@@ -63,32 +59,38 @@ function InstructorHeaderAction({ isInstructor, qualStatus, navigate }: {
   );
 }
 
+// ─── Course → LmsHubCourse adapter ──────────────────────────────────────────
+
+function mapCourse(c: Course): LmsHubCourse {
+  return {
+    id: c.id,
+    title: c.title,
+    description: c.description,
+    thumbnail: c.thumbnail,
+    status: c.status,
+    lessonCount: c.lessonCount,
+    category: c.category,
+    instructorName: c.instructor?.name || c.instructorName || undefined,
+    instructorId: c.instructor?.id || undefined,
+    tags: c.tags,
+    // WO-...-HUBTEMPLATE-ALIGNMENT-V1: 공개/회원제 배지 (visibility 지정 시 유형 컬럼 렌더)
+    visibility: c.visibility === 'public' ? 'public' : 'members',
+    requiresApproval: c.requiresApproval,
+    isPaid: c.isPaid,
+  };
+}
+
 // ─── Page Component ──────────────────────────────────────────────────────────
 
 export function LmsCoursesPage() {
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
 
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [totalPages, setTotalPages] = useState(1);
-  const [searchInput, setSearchInput] = useState(searchParams.get('search') || '');
+  const [qualStatus, setQualStatus] = useState<QualStatus>('idle');
 
-  // WO-O4O-LMS-CANONICAL-ROUTE-ALIGN-V1: 강사 자격 심사 상태
-  const [qualStatus, setQualStatus] = useState<'idle' | 'pending' | 'approved' | 'rejected'>('idle');
-
-  const currentPage = parseInt(searchParams.get('page') || '1');
-  const currentSearch = searchParams.get('search') || '';
   const isAuthenticated = !!user;
   const isInstructor = user?.roles?.includes('lms:instructor') ?? false;
-
-  // ─── Effects ───────────────────────────────────────────────────────────────
-
-  useEffect(() => {
-    loadData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, currentSearch]);
+  const userId = user?.id;
 
   // WO-O4O-LMS-CANONICAL-ROUTE-ALIGN-V1: 강사 신청 자격 조회
   useEffect(() => {
@@ -102,374 +104,70 @@ export function LmsCoursesPage() {
     })();
   }, [isAuthenticated, isInstructor]);
 
-  // ─── Handlers ──────────────────────────────────────────────────────────────
+  // config 는 안정적 참조여야 한다(LmsHubTemplate loadCourses useCallback 의존 → 무한 리로드 방지).
+  const config = useMemo<LmsHubConfig>(() => ({
+    serviceKey: 'kpa-society',
+    heroTitle: '강의',
+    heroDesc: '공개 강의와 회원 전용 강의를 탐색하세요',
+    courseDetailPath: (id) => `/lms/course/${id}`,
 
-  const loadData = async () => {
-    try {
-      setLoading(true);
+    headerAction: isAuthenticated
+      ? <InstructorHeaderAction isInstructor={isInstructor} qualStatus={qualStatus} navigate={navigate} />
+      : undefined,
+
+    fetchCourses: async (params) => {
       const res = await lmsApi.getCourses({
         status: 'published',
-        search: currentSearch || undefined,
-        page: currentPage,
-        limit: 20,
+        search: params.search,
+        page: params.page,
+        limit: params.limit,
       });
-      setCourses(res.data || []);
       const pag = (res as any).pagination;
-      setTotalPages(pag?.totalPages || (res as any).totalPages || 1);
-    } catch (err) {
-      console.warn('LMS API not available:', err);
-      setCourses([]);
-      setTotalPages(1);
-    } finally {
-      setLoading(false);
-    }
-  };
+      return {
+        data: (res.data || []).map(mapCourse),
+        totalPages: pag?.totalPages || (res as any).totalPages || 1,
+      };
+    },
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSearchParams(prev => {
-      if (searchInput) prev.set('search', searchInput);
-      else prev.delete('search');
-      prev.set('page', '1');
-      return prev;
-    });
-  };
+    // 동적 수강 CTA: 공개=바로 보기 / 로그인=수강하기 / 비로그인 회원제=로그인 후 수강
+    renderCta: (course) => {
+      const isPublic = course.visibility === 'public';
+      const detailPath = `/lms/course/${course.id}`;
+      const label = isPublic ? '바로 보기' : isAuthenticated ? '수강하기' : '로그인 후 수강';
+      const to = isAuthenticated || isPublic ? detailPath : '/login';
+      const state = (!isAuthenticated && !isPublic) ? { from: detailPath } : undefined;
+      return <Link to={to} state={state} style={ctaLinkStyle}>{label}</Link>;
+    },
 
-  const handlePageChange = (page: number) => {
-    setSearchParams(prev => { prev.set('page', String(page)); return prev; });
-  };
+    // 강사 본인 강의 수정/종료 (store library takeaway 아님 — 유지)
+    renderRowActions: (course, reload) => {
+      const isOwnCourse = isInstructor && !!userId && course.instructorId === userId;
+      if (!isOwnCourse) return null;
+      return (
+        <RowActionMenu
+          actions={[
+            { key: 'edit', label: '수정', onClick: () => navigate(`/instructor/courses/${course.id}/edit`) },
+            {
+              key: 'delete', label: '강의 종료', variant: 'danger',
+              onClick: async () => {
+                try {
+                  await lmsInstructorApi.deleteCourse(course.id);
+                  toast.success('강의가 종료 처리되었습니다');
+                  reload();
+                } catch { toast.error('처리에 실패했습니다'); }
+              },
+              confirm: { title: '강의 종료', message: '이 강의를 종료(보관) 처리하시겠습니까?', variant: 'danger' },
+            },
+          ]}
+        />
+      );
+    },
+  }), [isAuthenticated, isInstructor, qualStatus, userId, navigate]);
 
-  // ─── Render ────────────────────────────────────────────────────────────────
-
-  if (loading) return <LoadingSpinner message="강의를 불러오는 중..." />;
-
-  return (
-    <PageSection last>
-      <PageContainer>
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 20 }}>
-          <PageHeader
-            title="강의"
-            description="공개 강의와 회원 전용 강의를 탐색하세요"
-            breadcrumb={[{ label: '홈', href: '/' }, { label: '강의' }]}
-          />
-          {isAuthenticated && (
-            <div style={{ paddingTop: 4 }}>
-              <InstructorHeaderAction isInstructor={isInstructor} qualStatus={qualStatus} navigate={navigate} />
-            </div>
-          )}
-        </div>
-
-        {/* Search */}
-        <form onSubmit={handleSearch} style={styles.searchBar}>
-          <input
-            type="text"
-            value={searchInput}
-            onChange={e => setSearchInput(e.target.value)}
-            placeholder="강의 검색..."
-            style={styles.searchInput}
-          />
-          <button type="submit" style={styles.searchBtn}>검색</button>
-          {currentSearch && (
-            <button
-              type="button"
-              style={styles.searchClearBtn}
-              onClick={() => {
-                setSearchInput('');
-                setSearchParams(prev => { prev.delete('search'); prev.set('page', '1'); return prev; });
-              }}
-            >
-              초기화
-            </button>
-          )}
-        </form>
-
-        {courses.length === 0 ? (
-          <EmptyState
-            icon="📋"
-            title={currentSearch ? `"${currentSearch}" 검색 결과가 없습니다` : '등록된 강의가 없습니다'}
-            description={currentSearch ? '다른 검색어를 사용해 보세요.' : '곧 새로운 강의가 등록될 예정입니다.'}
-          />
-        ) : (
-          <>
-            <div style={styles.tableWrap}>
-              <table style={styles.table}>
-                <thead>
-                  <tr style={styles.thead}>
-                    <th style={{ ...styles.th, minWidth: 260 }}>강의명</th>
-                    <th style={{ ...styles.th, width: 120 }}>강사</th>
-                    <th style={{ ...styles.th, width: 80, textAlign: 'center' }}>유형</th>
-                    <th style={{ ...styles.th, width: 80, textAlign: 'center' }}>강의수</th>
-                    <th style={{ ...styles.th, width: 80, textAlign: 'center' }}>상태</th>
-                    <th style={{ ...styles.th, width: 200 }}>액션</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {courses.map((course, idx) => {
-                    const isPublic = course.visibility === 'public';
-                    const instructorName = (course as any).instructor?.name || course.instructorName || '-';
-                    const detailPath = `/lms/course/${course.id}`;
-
-                    // Instructor own-course check
-                    const isOwnCourse = isInstructor && !!user?.id && (course as any).instructor?.id === user.id;
-
-                    // CTA: public → 바로 보기, loggedIn → 수강하기, else → 로그인 후 수강
-                    const ctaLabel = isPublic ? '바로 보기' : isAuthenticated ? '수강하기' : '로그인 후 수강';
-                    const ctaTo = isAuthenticated || isPublic ? detailPath : '/login';
-                    const ctaState = (!isAuthenticated && !isPublic) ? { from: detailPath } : undefined;
-
-                    return (
-                      <tr
-                        key={course.id}
-                        style={{
-                          ...styles.tr,
-                          backgroundColor: idx % 2 === 0 ? '#ffffff' : '#fafafa',
-                        }}
-                      >
-                        {/* 강의명 */}
-                        <td style={styles.td}>
-                          <Link to={detailPath} style={styles.titleLink}>
-                            {course.title}
-                          </Link>
-                          {course.description && (
-                            <p style={styles.description}>{course.description}</p>
-                          )}
-                          {course.tags && course.tags.length > 0 && (
-                            <div style={styles.tagRow}>
-                              {course.tags.slice(0, 4).map(tag => (
-                                <span key={tag} style={styles.tag}>{tag}</span>
-                              ))}
-                            </div>
-                          )}
-                        </td>
-
-                        {/* 강사 */}
-                        <td style={{ ...styles.td, color: '#6b7280', fontSize: 13 }}>
-                          {instructorName}
-                        </td>
-
-                        {/* 유형 — WO-O4O-LMS-COURSE-VISIBILITY-BADGE-UX-V1 */}
-                        <td style={{ ...styles.td, textAlign: 'center' }}>
-                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
-                            <span style={visibilityBadge(isPublic)}>
-                              {isPublic ? '공개' : '회원제'}
-                            </span>
-                            {!isPublic && course.requiresApproval && (
-                              <span style={approvalBadgeStyle}>승인 필요</span>
-                            )}
-                            {course.isPaid && (
-                              <span style={paidBadgeStyle}>유료</span>
-                            )}
-                          </div>
-                        </td>
-
-                        {/* 강의수 */}
-                        <td style={{ ...styles.td, textAlign: 'center', color: '#6b7280', fontSize: 13 }}>
-                          {course.lessonCount ?? '-'}
-                        </td>
-
-                        {/* 상태 */}
-                        <td style={{ ...styles.td, textAlign: 'center' }}>
-                          <span style={statusBadge(course.status)}>
-                            {course.status === 'published' ? '공개' : course.status}
-                          </span>
-                        </td>
-
-                        {/* 액션 */}
-                        <td style={{ ...styles.td }}>
-                          <div style={styles.actionCell}>
-                            {/* 수강하기 / 바로 보기 */}
-                            <Link to={ctaTo} state={ctaState} style={ctaLinkStyle}>
-                              {ctaLabel}
-                            </Link>
-
-                            {/* 강사 본인 강의 수정/종료 */}
-                            {isOwnCourse && (
-                              <RowActionMenu
-                                actions={[
-                                  { key: 'edit', label: '수정', onClick: () => navigate(`/instructor/courses/${course.id}/edit`) },
-                                  {
-                                    key: 'delete', label: '강의 종료', variant: 'danger',
-                                    onClick: async () => {
-                                      try {
-                                        await lmsInstructorApi.deleteCourse(course.id);
-                                        toast.success('강의가 종료 처리되었습니다');
-                                        void loadData();
-                                      } catch { toast.error('처리에 실패했습니다'); }
-                                    },
-                                    confirm: { title: '강의 종료', message: '이 강의를 종료(보관) 처리하시겠습니까?', variant: 'danger' },
-                                  },
-                                ]}
-                              />
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
-          </>
-        )}
-      </PageContainer>
-    </PageSection>
-  );
+  return <LmsHubTemplate config={config} />;
 }
 
 // ─── Styles ──────────────────────────────────────────────────────────────────
-
-const styles: Record<string, React.CSSProperties> = {
-  searchBar: {
-    display: 'flex',
-    gap: 8,
-    marginBottom: 16,
-    alignItems: 'center',
-  },
-  searchInput: {
-    flex: 1,
-    maxWidth: 360,
-    padding: '8px 12px',
-    border: '1px solid #e5e7eb',
-    borderRadius: 8,
-    fontSize: 14,
-    outline: 'none',
-  },
-  searchBtn: {
-    padding: '8px 16px',
-    backgroundColor: '#5b21b6',
-    color: '#fff',
-    border: 'none',
-    borderRadius: 8,
-    fontSize: 14,
-    fontWeight: 600,
-    cursor: 'pointer',
-  },
-  searchClearBtn: {
-    padding: '8px 12px',
-    backgroundColor: '#f3f4f6',
-    color: '#6b7280',
-    border: '1px solid #e5e7eb',
-    borderRadius: 8,
-    fontSize: 13,
-    cursor: 'pointer',
-  },
-  tableWrap: {
-    overflowX: 'auto',
-    border: '1px solid #e5e7eb',
-    borderRadius: 12,
-    marginBottom: 20,
-  },
-  table: {
-    width: '100%',
-    borderCollapse: 'collapse',
-    fontSize: 14,
-  },
-  thead: {
-    backgroundColor: '#f8fafc',
-    borderBottom: '1px solid #e5e7eb',
-  },
-  th: {
-    padding: '10px 14px',
-    fontWeight: 600,
-    color: '#374151',
-    textAlign: 'left',
-    whiteSpace: 'nowrap',
-  },
-  tr: {
-    borderBottom: '1px solid #f1f5f9',
-  },
-  td: {
-    padding: '12px 14px',
-    verticalAlign: 'top',
-  },
-  titleLink: {
-    display: 'block',
-    fontWeight: 600,
-    color: '#111827',
-    textDecoration: 'none',
-    fontSize: 14,
-    lineHeight: 1.4,
-  },
-  description: {
-    margin: '3px 0 0',
-    fontSize: 12,
-    color: '#9ca3af',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
-    maxWidth: 320,
-  },
-  tagRow: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: 4,
-    marginTop: 5,
-  },
-  tag: {
-    padding: '2px 6px',
-    backgroundColor: '#f3f4f6',
-    color: '#6b7280',
-    borderRadius: 4,
-    fontSize: 11,
-  },
-  actionCell: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-    gap: 6,
-  },
-};
-
-function visibilityBadge(isPublic: boolean): React.CSSProperties {
-  return {
-    display: 'inline-block',
-    padding: '2px 8px',
-    borderRadius: 20,
-    fontSize: 11,
-    fontWeight: 600,
-    backgroundColor: isPublic ? '#dcfce7' : '#ede9fe',
-    color: isPublic ? '#15803d' : '#6d28d9',
-  };
-}
-
-// WO-O4O-LMS-COURSE-VISIBILITY-BADGE-UX-V1
-const approvalBadgeStyle: React.CSSProperties = {
-  display: 'inline-block',
-  padding: '2px 8px',
-  borderRadius: 20,
-  fontSize: 11,
-  fontWeight: 600,
-  backgroundColor: '#fef3c7',
-  color: '#92400e',
-};
-
-const paidBadgeStyle: React.CSSProperties = {
-  display: 'inline-block',
-  padding: '2px 8px',
-  borderRadius: 20,
-  fontSize: 11,
-  fontWeight: 600,
-  backgroundColor: '#fee2e2',
-  color: '#991b1b',
-};
-
-function statusBadge(status: string): React.CSSProperties {
-  return {
-    display: 'inline-block',
-    padding: '2px 8px',
-    borderRadius: 20,
-    fontSize: 11,
-    fontWeight: 600,
-    backgroundColor: status === 'published' ? '#dcfce7' : '#f3f4f6',
-    color: status === 'published' ? '#15803d' : '#6b7280',
-  };
-}
 
 const ctaLinkStyle: React.CSSProperties = {
   display: 'inline-flex',

@@ -45,6 +45,15 @@ export interface LmsHubCourse {
   /** 태그 (O4O Tag Policy V1) */
   tags?: string[];
   createdAt?: string;
+  /**
+   * 공개/회원제 (optional) — 지정 시 "유형" 컬럼이 visibility 배지를 렌더한다.
+   * 미지정 시 category 배지로 fallback(기존 동작 — GP/KCos backward-compatible).
+   */
+  visibility?: 'public' | 'members';
+  /** 회원제 + 강사 승인 필요 (visibility 배지 보조). */
+  requiresApproval?: boolean;
+  /** 유료 표시(결제 기능 아님 — 표시 전용). */
+  isPaid?: boolean;
 }
 
 export interface LmsHubFetchParams {
@@ -73,6 +82,12 @@ export interface LmsHubConfig {
    * KPA instructor 소유 강의 수정/종료 버튼 등 서비스 고유 기능에 사용.
    */
   renderRowActions?: (course: LmsHubCourse, reload: () => void) => React.ReactNode;
+  /**
+   * 수강 CTA 렌더러 (optional) — 지정 시 기본 "수강하기" 링크 대신 사용.
+   * 공개=바로 보기 / 비로그인=로그인 후 수강 등 서비스별 동적 CTA 에 사용.
+   * 미지정 시 기본 "수강하기"(courseDetailPath) — 기존 동작(GP/KCos backward-compatible).
+   */
+  renderCta?: (course: LmsHubCourse) => React.ReactNode;
 }
 
 // ─── Status label/color helpers ───────────────────────────────────────────────
@@ -238,10 +253,22 @@ export function LmsHubTemplate({ config }: { config: LmsHubConfig }) {
       header: '유형',
       width: '12%',
       render: (_v, row) => {
-        const label = row.category || '-';
-        return (
-          <span style={colStyles.badge}>{label}</span>
-        );
+        // visibility 지정 시 공개/회원제 배지(+승인 필요/유료). 미지정 시 category fallback.
+        if (row.visibility) {
+          const isPublic = row.visibility === 'public';
+          return (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+              <span style={isPublic ? colStyles.visPublic : colStyles.visMembers}>
+                {isPublic ? '공개' : '회원제'}
+              </span>
+              {!isPublic && row.requiresApproval && (
+                <span style={colStyles.visApproval}>승인 필요</span>
+              )}
+              {row.isPaid && <span style={colStyles.visPaid}>유료</span>}
+            </div>
+          );
+        }
+        return <span style={colStyles.badge}>{row.category || '-'}</span>;
       },
     },
     {
@@ -280,9 +307,13 @@ export function LmsHubTemplate({ config }: { config: LmsHubConfig }) {
       system: true,
       render: (_v, row) => (
         <div style={colStyles.actionsCell}>
-          <Link to={config.courseDetailPath(row.id)} style={colStyles.enrollBtn}>
-            수강하기
-          </Link>
+          {config.renderCta ? (
+            config.renderCta(row)
+          ) : (
+            <Link to={config.courseDetailPath(row.id)} style={colStyles.enrollBtn}>
+              수강하기
+            </Link>
+          )}
           {config.renderRowActions?.(row, loadCourses)}
         </div>
       ),
@@ -430,6 +461,23 @@ const colStyles: Record<string, React.CSSProperties> = {
     textDecoration: 'none',
     borderRadius: '6px',
     whiteSpace: 'nowrap' as const,
+  },
+  // visibility 배지 (LmsHubCourse.visibility 지정 시)
+  visPublic: {
+    padding: '2px 8px', borderRadius: 20, fontSize: 11, fontWeight: 600,
+    backgroundColor: '#dcfce7', color: '#15803d',
+  },
+  visMembers: {
+    padding: '2px 8px', borderRadius: 20, fontSize: 11, fontWeight: 600,
+    backgroundColor: '#ede9fe', color: '#6d28d9',
+  },
+  visApproval: {
+    padding: '2px 8px', borderRadius: 20, fontSize: 11, fontWeight: 600,
+    backgroundColor: '#fef3c7', color: '#92400e',
+  },
+  visPaid: {
+    padding: '2px 8px', borderRadius: 20, fontSize: 11, fontWeight: 600,
+    backgroundColor: '#fee2e2', color: '#991b1b',
   },
 };
 
