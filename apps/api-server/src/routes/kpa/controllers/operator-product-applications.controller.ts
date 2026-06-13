@@ -131,74 +131,15 @@ export function createOperatorProductApplicationsController(
   }));
 
   // ─── PATCH /:id/approve — SERVICE 승인 처리 (KPA 2차 심사) ──────────────
-  // WO-KPA-SOCIETY-SECOND-REVIEW-BRIDGE-FOUNDATION-V1
-  // WO-KPA-PRODUCT-APPROVAL-LISTING-UPSERT-FIX-V1:
-  //   승인 대상 org의 listing이 없는 경우에도 반드시 생성+활성화 (UPSERT).
-  //   auto-expansion이 선행되지 않은 약국(pending enrollment 등)에서도 정상 동작 보장.
+  // WO-O4O-PRODUCT-APPROVAL-APPROVE-IMPL-UNIFY-V1:
+  //   direct SQL approve 제거 → ProductApprovalV2Service.approveServiceProduct() 흡수.
+  //   activateListing=true → 승인 대상 org 단건 OPL 활성(Option A, per-store). SAVEPOINT FK 가드는 service 내부.
+  //   (이전: offer+serviceKey OPL 일괄 활성 = Option B → 단건으로 축소. 각 org 는 각자 approval 승인 시 활성.)
   router.patch('/:id/approve', asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
     const approvedBy = (req as any).user?.id || 'unknown';
 
-    const result = await dataSource.transaction(async (manager) => {
-      // 1. product_approvals PENDING 확인 (organization_id 포함 조회)
-      const [approval] = await manager.query(
-        `SELECT id, offer_id, organization_id, service_key, approval_status
-         FROM product_approvals WHERE id = $1`,
-        [id],
-      );
-      if (!approval || approval.approval_status !== 'pending') {
-        return { success: false, error: 'APPROVAL_NOT_FOUND_OR_NOT_PENDING' };
-      }
-
-      // 2. product_approvals 상태 업데이트
-      await manager.query(
-        `UPDATE product_approvals SET approval_status = 'approved', decided_by = $2::uuid, decided_at = NOW(), updated_at = NOW()
-         WHERE id = $1 AND approval_status = 'pending'`,
-        [id, approvedBy],
-      );
-
-      // 3. 승인 대상 org의 listing UPSERT (없으면 생성, 있으면 활성화)
-      //    SAVEPOINT 사용: bridge 승인(대한약사회 등)의 경우 organization FK 제약 위반 가능 → 안전 처리
-      const serviceKey = approval.service_key || 'kpa-society';
-      let listingUpserted = false;
-      await manager.query('SAVEPOINT upsert_listing');
-      try {
-        await manager.query(
-          `INSERT INTO organization_product_listings
-             (id, organization_id, service_key, master_id, offer_id, is_active, created_at, updated_at)
-           SELECT gen_random_uuid(), $2, $3, spo.master_id, spo.id, true, NOW(), NOW()
-           FROM supplier_product_offers spo
-           WHERE spo.id = $1
-           ON CONFLICT (organization_id, service_key, offer_id)
-           DO UPDATE SET is_active = true, updated_at = NOW()`,
-          [approval.offer_id, approval.organization_id, serviceKey],
-        );
-        await manager.query('RELEASE SAVEPOINT upsert_listing');
-        listingUpserted = true;
-      } catch (upsertErr: any) {
-        await manager.query('ROLLBACK TO SAVEPOINT upsert_listing');
-        logger.warn(`[OperatorProductApplications] listing upsert failed for org=${approval.organization_id}, offer=${approval.offer_id}: ${upsertErr?.message || upsertErr}`);
-      }
-
-      // 4. 해당 offer의 kpa-society listings 전체 활성화 (auto-expansion으로 미리 생성된 다른 org listing 포함)
-      const listingResult = await manager.query(
-        `UPDATE organization_product_listings SET is_active = true, updated_at = NOW()
-         WHERE offer_id = $1 AND service_key = $2`,
-        [approval.offer_id, serviceKey],
-      );
-
-      return {
-        success: true,
-        data: {
-          approvalId: id,
-          offerId: approval.offer_id,
-          organizationId: approval.organization_id,
-          activatedListings: listingResult[1] || 0,
-          listingUpserted,
-        },
-      };
-    });
-
+    const result = await approvalV2Service.approveServiceProduct(id, approvedBy, { activateListing: true });
     if (!result.success) {
       const status = result.error === 'APPROVAL_NOT_FOUND_OR_NOT_PENDING' ? 404 : 400;
       return res.status(status).json({
@@ -207,11 +148,20 @@ export function createOperatorProductApplicationsController(
       });
     }
 
-    logger.info(`[OperatorProductApplications] KPA 2차 심사 승인: ${id} by ${approvedBy}, org=${(result.data as any)?.organizationId}, activated=${(result.data as any)?.activatedListings}, upserted=${(result.data as any)?.listingUpserted}`);
+    const { approval, listing } = result.data!;
+    logger.info(`[OperatorProductApplications] KPA 2차 심사 승인: ${id} by ${approvedBy}, org=${approval.organization_id}, listingActive=${listing?.is_active === true}`);
     actionLogService?.logSuccess('kpa-society', approvedBy, 'kpa.operator.product_approve', {
       meta: { targetId: id, statusBefore: 'pending', statusAfter: 'approved' },
     }).catch(() => {});
-    res.json({ success: true, data: result.data });
+    res.json({
+      success: true,
+      data: {
+        approvalId: id,
+        offerId: approval.offer_id,
+        organizationId: approval.organization_id,
+        listingActivated: listing?.is_active === true,
+      },
+    });
   }));
 
   // ─── PATCH /:id/reject — SERVICE 거절 처리 (v2 service) ───────────────
@@ -253,53 +203,12 @@ export function createOperatorProductApplicationsController(
     const approvedBy = (req as any).user?.id || 'unknown';
     const results: Array<{ id: string; status: 'success' | 'skipped' | 'failed'; error?: string }> = [];
 
+    // WO-O4O-PRODUCT-APPROVAL-APPROVE-IMPL-UNIFY-V1: direct SQL → V2 service (activateListing, Option A 단건).
     for (const id of ids) {
       try {
-        const result = await dataSource.transaction(async (manager) => {
-          const [approval] = await manager.query(
-            `SELECT id, offer_id, organization_id, service_key, approval_status
-             FROM product_approvals WHERE id = $1`,
-            [id],
-          );
-          if (!approval || approval.approval_status !== 'pending') {
-            return { skip: true, error: !approval ? 'Not found' : 'Already processed' };
-          }
-
-          await manager.query(
-            `UPDATE product_approvals SET approval_status = 'approved', decided_by = $2::uuid, decided_at = NOW(), updated_at = NOW()
-             WHERE id = $1 AND approval_status = 'pending'`,
-            [id, approvedBy],
-          );
-
-          const serviceKey = approval.service_key || 'kpa-society';
-          await manager.query('SAVEPOINT upsert_listing');
-          try {
-            await manager.query(
-              `INSERT INTO organization_product_listings
-                 (id, organization_id, service_key, master_id, offer_id, is_active, created_at, updated_at)
-               SELECT gen_random_uuid(), $2, $3, spo.master_id, spo.id, true, NOW(), NOW()
-               FROM supplier_product_offers spo
-               WHERE spo.id = $1
-               ON CONFLICT (organization_id, service_key, offer_id)
-               DO UPDATE SET is_active = true, updated_at = NOW()`,
-              [approval.offer_id, approval.organization_id, serviceKey],
-            );
-            await manager.query('RELEASE SAVEPOINT upsert_listing');
-          } catch {
-            await manager.query('ROLLBACK TO SAVEPOINT upsert_listing');
-          }
-
-          await manager.query(
-            `UPDATE organization_product_listings SET is_active = true, updated_at = NOW()
-             WHERE offer_id = $1 AND service_key = $2`,
-            [approval.offer_id, serviceKey],
-          );
-
-          return { skip: false };
-        });
-
-        if (result.skip) {
-          results.push({ id, status: 'skipped', error: result.error });
+        const result = await approvalV2Service.approveServiceProduct(id, approvedBy, { activateListing: true });
+        if (!result.success) {
+          results.push({ id, status: 'skipped', error: result.error || 'Not found or not pending' });
         } else {
           actionLogService?.logSuccess('kpa-society', approvedBy, 'kpa.operator.product_batch_approve', {
             meta: { targetId: id, statusBefore: 'pending', statusAfter: 'approved' },

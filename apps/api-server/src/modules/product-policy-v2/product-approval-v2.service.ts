@@ -19,6 +19,20 @@ import {
   OfferDistributionType,
 } from '../neture/entities/SupplierProductOffer.entity.js';
 
+/**
+ * approveServiceProduct 옵션 (WO-O4O-PRODUCT-APPROVAL-APPROVE-IMPL-UNIFY-V1).
+ * 기본값 둘 다 false → 기존 internal/V2 호출부 동작(listing is_active=false) 보존.
+ */
+export interface ApproveServiceProductOptions {
+  /** 승인 대상 organization 의 단건 OPL 을 활성화(is_active=true). operator 승인 경로 = true. */
+  activateListing?: boolean;
+  /**
+   * 동일 offer+serviceKey 의 모든 OPL 을 일괄 활성화(legacy KPA auto-expansion parity).
+   * 기본 false(Option A — 단건만). operator 경로는 미사용 — per-store 승인 의미 보존.
+   */
+  activateOfferListings?: boolean;
+}
+
 export class ProductApprovalV2Service {
   constructor(private dataSource: DataSource) {}
 
@@ -105,11 +119,13 @@ export class ProductApprovalV2Service {
   async approveServiceProduct(
     approvalId: string,
     approvedBy: string,
+    options: ApproveServiceProductOptions = {},
   ): Promise<{
     success: boolean;
     data?: { approval: ProductApproval; listing: OrganizationProductListing };
     error?: string;
   }> {
+    const { activateListing = false, activateOfferListings = false } = options;
     return this.dataSource.transaction(async (manager) => {
       const txApprovalRepo = manager.getRepository(ProductApproval);
       const txListingRepo = manager.getRepository(OrganizationProductListing);
@@ -153,39 +169,67 @@ export class ProductApprovalV2Service {
       approval.decided_at = new Date();
       await txApprovalRepo.save(approval);
 
-      // 5. Listing 생성 (중복 방지)
-      const existingListing = await txListingRepo.findOne({
-        where: {
-          organization_id: approval.organization_id,
-          offer_id: approval.offer_id!,
-          service_key: approval.service_key,
-        },
-      });
+      // 5. Listing 생성/활성 (중복 방지)
+      const listingWhere = {
+        organization_id: approval.organization_id,
+        offer_id: approval.offer_id!,
+        service_key: approval.service_key,
+      };
+      let listing: OrganizationProductListing | null;
 
-      let listing = existingListing;
-      if (!existingListing) {
+      if (activateListing) {
+        // operator 승인 경로: 단건 OPL UPSERT(is_active=true).
+        // bridge 승인(대한약사회 등) organization FK 위반에도 approval 커밋을 보존하기 위해 SAVEPOINT 가드.
+        // (KPA direct SQL approve 흡수 — WO-O4O-PRODUCT-APPROVAL-APPROVE-IMPL-UNIFY-V1)
+        await manager.query('SAVEPOINT upsert_listing');
         try {
-          listing = txListingRepo.create({
-            organization_id: approval.organization_id,
-            service_key: approval.service_key,
-            master_id: offer.masterId,
-            offer_id: offer.id,
-            is_active: false,
-          });
-          listing = await txListingRepo.save(listing);
-        } catch (err: any) {
-          if (err.code === '23505' || err.driverError?.code === '23505') {
-            listing = await txListingRepo.findOne({
-              where: {
-                organization_id: approval.organization_id,
-                offer_id: approval.offer_id!,
-                service_key: approval.service_key,
-              },
+          await manager.query(
+            `INSERT INTO organization_product_listings
+               (id, organization_id, service_key, master_id, offer_id, is_active, created_at, updated_at)
+             SELECT gen_random_uuid(), $2, $3, spo.master_id, spo.id, true, NOW(), NOW()
+             FROM supplier_product_offers spo
+             WHERE spo.id = $1
+             ON CONFLICT (organization_id, service_key, offer_id)
+             DO UPDATE SET is_active = true, updated_at = NOW()`,
+            [approval.offer_id, approval.organization_id, approval.service_key],
+          );
+          await manager.query('RELEASE SAVEPOINT upsert_listing');
+        } catch {
+          await manager.query('ROLLBACK TO SAVEPOINT upsert_listing');
+          // listing 생성/활성 실패해도 approval 승인은 유지(best-effort).
+        }
+        listing = await txListingRepo.findOne({ where: listingWhere });
+      } else {
+        // internal/V2 기본 경로: is_active=false 로 생성(기존 동작 보존).
+        const existingListing = await txListingRepo.findOne({ where: listingWhere });
+        listing = existingListing;
+        if (!existingListing) {
+          try {
+            const created = txListingRepo.create({
+              organization_id: approval.organization_id,
+              service_key: approval.service_key,
+              master_id: offer.masterId,
+              offer_id: offer.id,
+              is_active: false,
             });
-          } else {
-            throw err;
+            listing = await txListingRepo.save(created);
+          } catch (err: any) {
+            if (err.code === '23505' || err.driverError?.code === '23505') {
+              listing = await txListingRepo.findOne({ where: listingWhere });
+            } else {
+              throw err;
+            }
           }
         }
+      }
+
+      // 6. (옵션) 동일 offer+serviceKey OPL 일괄 활성 — legacy KPA parity. 기본 미사용(Option A: 단건만).
+      if (activateOfferListings) {
+        await manager.query(
+          `UPDATE organization_product_listings SET is_active = true, updated_at = NOW()
+           WHERE offer_id = $1 AND service_key = $2`,
+          [approval.offer_id, approval.service_key],
+        );
       }
 
       return { success: true, data: { approval, listing: listing! } };
