@@ -30,17 +30,49 @@ import logger from '../../../utils/logger.js';
 type AuthMiddleware = RequestHandler;
 type ScopeMiddleware = (scope: string) => RequestHandler;
 
+/**
+ * WO-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-ENABLE-GP-KCOS-V1:
+ *   KPA 전용이던 본 컨트롤러를 serviceKey/scope 파라미터화하여 GlycoPharm/K-Cosmetics 에서도 재사용.
+ *   - scope 미지정 시 'kpa:operator' (KPA 호출부 무변경).
+ *   - serviceKey 지정 시(GP/KCos) list/stats/delete/approve/reject 가 해당 serviceKey 의 product_approvals 로
+ *     격리(cross-service 누수/변조 차단, CLAUDE.md §7 Boundary). 미지정(KPA)이면 기존대로 전체(현행 동작 보존).
+ */
+export interface OperatorProductApplicationsOptions {
+  /** require 할 operator scope. 기본 'kpa:operator'. (GP='glycopharm:operator', KCos='cosmetics:operator') */
+  scope?: string;
+  /** product_approvals.service_key 격리 필터. 지정 시 해당 serviceKey 만 조회/변경. 미지정(KPA)=전체. */
+  serviceKey?: string;
+}
+
 export function createOperatorProductApplicationsController(
   dataSource: DataSource,
   requireAuth: AuthMiddleware,
   requireScope: ScopeMiddleware,
   actionLogService?: ActionLogService,
+  options?: OperatorProductApplicationsOptions,
 ): Router {
   const router = Router();
   const approvalV2Service = new ProductApprovalV2Service(dataSource);
 
-  // All routes require kpa:operator scope
-  router.use(requireAuth, requireScope('kpa:operator'));
+  const scope = options?.scope ?? 'kpa:operator';
+  const serviceKey = options?.serviceKey; // undefined = KPA 전체(현행), 지정 = serviceKey 격리
+  const logServiceKey = serviceKey ?? 'kpa-society';
+
+  // operator scope guard (서비스별)
+  router.use(requireAuth, requireScope(scope));
+
+  /**
+   * serviceKey 격리 가드: serviceKey 지정 시 대상 approval 이 동일 serviceKey 인지 검증.
+   * cross-service id 변조(IDOR) 차단. serviceKey 미지정(KPA)이면 항상 통과(현행 보존).
+   */
+  const inServiceScope = async (id: string): Promise<boolean> => {
+    if (!serviceKey) return true;
+    const [row] = await dataSource.query(
+      `SELECT service_key FROM product_approvals WHERE id = $1`,
+      [id],
+    );
+    return !!row && row.service_key === serviceKey;
+  };
 
   // ─── GET / — 전체 승인 목록 (v2: product_approvals) ─────────────────
   router.get('/', asyncHandler(async (req: Request, res: Response) => {
@@ -49,8 +81,12 @@ export function createOperatorProductApplicationsController(
     const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
 
     const hasStatus = status && ['pending', 'approved', 'rejected'].includes(status);
-    const statusFilter = hasStatus ? `WHERE pa.approval_status = $1` : '';
-    const baseParams: any[] = hasStatus ? [status] : [];
+    // WO-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-ENABLE-GP-KCOS-V1: serviceKey 격리(지정 시) + status 결합.
+    const conds: string[] = [];
+    const baseParams: any[] = [];
+    if (serviceKey) { baseParams.push(serviceKey); conds.push(`pa.service_key = $${baseParams.length}`); }
+    if (hasStatus) { baseParams.push(status); conds.push(`pa.approval_status = $${baseParams.length}`); }
+    const statusFilter = conds.length ? `WHERE ${conds.join(' AND ')}` : '';
 
     const countResult = await dataSource.query(
       `SELECT COUNT(*)::int AS total FROM product_approvals pa ${statusFilter}`,
@@ -116,10 +152,14 @@ export function createOperatorProductApplicationsController(
 
   // ─── GET /stats — 상태별 통계 (v2: product_approvals) ────────────────
   router.get('/stats', asyncHandler(async (_req: Request, res: Response) => {
+    // WO-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-ENABLE-GP-KCOS-V1: serviceKey 격리(지정 시).
     const rows = await dataSource.query(
-      `SELECT approval_status AS status, COUNT(*)::int AS count
-       FROM product_approvals
-       GROUP BY approval_status`,
+      serviceKey
+        ? `SELECT approval_status AS status, COUNT(*)::int AS count
+           FROM product_approvals WHERE service_key = $1 GROUP BY approval_status`
+        : `SELECT approval_status AS status, COUNT(*)::int AS count
+           FROM product_approvals GROUP BY approval_status`,
+      serviceKey ? [serviceKey] : [],
     );
 
     const stats: Record<string, number> = { pending: 0, approved: 0, rejected: 0 };
@@ -139,6 +179,9 @@ export function createOperatorProductApplicationsController(
     const { id } = req.params;
     const approvedBy = (req as any).user?.id || 'unknown';
 
+    if (!(await inServiceScope(id))) {
+      return res.status(404).json({ success: false, error: { code: 'APPROVAL_NOT_FOUND_OR_NOT_PENDING', message: 'APPROVAL_NOT_FOUND_OR_NOT_PENDING' } });
+    }
     const result = await approvalV2Service.approveServiceProduct(id, approvedBy, { activateListing: true });
     if (!result.success) {
       const status = result.error === 'APPROVAL_NOT_FOUND_OR_NOT_PENDING' ? 404 : 400;
@@ -150,7 +193,7 @@ export function createOperatorProductApplicationsController(
 
     const { approval, listing } = result.data!;
     logger.info(`[OperatorProductApplications] KPA 2차 심사 승인: ${id} by ${approvedBy}, org=${approval.organization_id}, listingActive=${listing?.is_active === true}`);
-    actionLogService?.logSuccess('kpa-society', approvedBy, 'kpa.operator.product_approve', {
+    actionLogService?.logSuccess(logServiceKey,approvedBy, 'kpa.operator.product_approve', {
       meta: { targetId: id, statusBefore: 'pending', statusAfter: 'approved' },
     }).catch(() => {});
     res.json({
@@ -170,6 +213,9 @@ export function createOperatorProductApplicationsController(
     const rejectedBy = (req as any).user?.id || 'unknown';
     const { reason } = req.body || {};
 
+    if (!(await inServiceScope(id))) {
+      return res.status(404).json({ success: false, error: { code: 'APPROVAL_NOT_FOUND_OR_NOT_PENDING', message: 'APPROVAL_NOT_FOUND_OR_NOT_PENDING' } });
+    }
     const result = await approvalV2Service.rejectServiceApproval(id, rejectedBy, reason);
     if (!result.success) {
       const status = result.error === 'APPROVAL_NOT_FOUND_OR_NOT_PENDING' ? 404 : 400;
@@ -180,7 +226,7 @@ export function createOperatorProductApplicationsController(
     }
 
     logger.info(`[OperatorProductApplications] SERVICE approval rejected: ${id} by ${rejectedBy}`);
-    actionLogService?.logSuccess('kpa-society', rejectedBy, 'kpa.operator.product_reject', {
+    actionLogService?.logSuccess(logServiceKey,rejectedBy, 'kpa.operator.product_reject', {
       meta: { targetId: id, reason, statusBefore: 'pending', statusAfter: 'rejected' },
     }).catch(() => {});
     res.json({ success: true, data: result.data });
@@ -206,11 +252,12 @@ export function createOperatorProductApplicationsController(
     // WO-O4O-PRODUCT-APPROVAL-APPROVE-IMPL-UNIFY-V1: direct SQL → V2 service (activateListing, Option A 단건).
     for (const id of ids) {
       try {
+        if (!(await inServiceScope(id))) { results.push({ id, status: 'skipped', error: 'Not in service scope' }); continue; }
         const result = await approvalV2Service.approveServiceProduct(id, approvedBy, { activateListing: true });
         if (!result.success) {
           results.push({ id, status: 'skipped', error: result.error || 'Not found or not pending' });
         } else {
-          actionLogService?.logSuccess('kpa-society', approvedBy, 'kpa.operator.product_batch_approve', {
+          actionLogService?.logSuccess(logServiceKey,approvedBy, 'kpa.operator.product_batch_approve', {
             meta: { targetId: id, statusBefore: 'pending', statusAfter: 'approved' },
           }).catch(() => {});
           results.push({ id, status: 'success' });
@@ -230,6 +277,9 @@ export function createOperatorProductApplicationsController(
     const { id } = req.params;
     const deletedBy = (req as any).user?.id || 'unknown';
 
+    if (!(await inServiceScope(id))) {
+      return res.status(404).json({ success: false, error: '신청 이력을 찾을 수 없습니다.', code: 'NOT_FOUND' });
+    }
     const [existing] = await dataSource.query(
       `SELECT id, approval_status FROM product_approvals WHERE id = $1`,
       [id],
@@ -243,7 +293,7 @@ export function createOperatorProductApplicationsController(
       [id],
     );
 
-    actionLogService?.logSuccess('kpa-society', deletedBy, 'kpa.operator.product_application_delete', {
+    actionLogService?.logSuccess(logServiceKey,deletedBy, 'kpa.operator.product_application_delete', {
       meta: { targetId: id, statusDeleted: existing.approval_status },
     }).catch(() => {});
 
@@ -266,6 +316,7 @@ export function createOperatorProductApplicationsController(
 
     for (const id of ids) {
       try {
+        if (!(await inServiceScope(id))) { results.push({ id, status: 'skipped', error: 'Not in service scope' }); continue; }
         const [existing] = await dataSource.query(
           `SELECT id FROM product_approvals WHERE id = $1`,
           [id],
@@ -275,7 +326,7 @@ export function createOperatorProductApplicationsController(
           continue;
         }
         await dataSource.query(`DELETE FROM product_approvals WHERE id = $1`, [id]);
-        actionLogService?.logSuccess('kpa-society', deletedBy, 'kpa.operator.product_application_batch_delete', {
+        actionLogService?.logSuccess(logServiceKey,deletedBy, 'kpa.operator.product_application_batch_delete', {
           meta: { targetId: id },
         }).catch(() => {});
         results.push({ id, status: 'success' });
@@ -304,11 +355,12 @@ export function createOperatorProductApplicationsController(
 
     for (const id of ids) {
       try {
+        if (!(await inServiceScope(id))) { results.push({ id, status: 'skipped', error: 'Not in service scope' }); continue; }
         const result = await approvalV2Service.rejectServiceApproval(id, rejectedBy, reason);
         if (!result.success) {
           results.push({ id, status: 'skipped', error: result.error || 'Not found or not pending' });
         } else {
-          actionLogService?.logSuccess('kpa-society', rejectedBy, 'kpa.operator.product_batch_reject', {
+          actionLogService?.logSuccess(logServiceKey,rejectedBy, 'kpa.operator.product_batch_reject', {
             meta: { targetId: id, reason, statusBefore: 'pending', statusAfter: 'rejected' },
           }).catch(() => {});
           results.push({ id, status: 'success' });
