@@ -897,6 +897,13 @@ function App() {
            * StoreDashboardLayout (store-ui-core) 기반 section sidebar
            * PharmacyGuard로 인증/승인 보호
            * ======================================== */}
+          {/* WO-O4O-KPA-STORE-SIGNAGE-PLAYLIST-TWO-VIEW-V1: 실제 송출(매장 화면) 보기 — layout chrome 격리.
+              PharmacyGuard(인증)만 적용하고 KpaStoreLayoutWrapper(header/sidebar/footer)는 미적용 →
+              header/sidebar/footer/탭/관리버튼이 송출 화면에 mount 되지 않음 (CSS 덮기 의존 제거). */}
+          <Route
+            path="/store/marketing/signage/play/:playlistId"
+            element={<PharmacyGuard><SignagePlaybackPage /></PharmacyGuard>}
+          />
           <Route path="/store" element={<PharmacyGuard><KpaStoreLayoutWrapper /></PharmacyGuard>}>
             {/* Home (WO-KPA-A-STORE-HOME-AND-SIDEBAR-RESTRUCTURE-V1) */}
             <Route index element={<StoreHomePage />} />
@@ -914,7 +921,8 @@ function App() {
             <Route path="marketing/signage/videos" element={<StoreSignagePage />} />
             <Route path="marketing/signage/schedules" element={<StoreSignagePage />} />
             <Route path="marketing/signage/player" element={<SignagePlayerSelectPage />} />
-            <Route path="marketing/signage/play/:playlistId" element={<SignagePlaybackPage />} />
+            {/* WO-O4O-KPA-STORE-SIGNAGE-PLAYLIST-TWO-VIEW-V1: 실제 송출 보기(play)는 layout chrome 제거를 위해
+                store layout wrapper 밖 top-level route 로 격리 (아래 /store/marketing/signage/play/:playlistId). */}
 
             {/* Commerce — WO-KPA-PHARMACY-HUB-NAVIGATION-RESTRUCTURE-V1: orderable → /hub/b2b canonical */}
             <Route path="commerce/orderable" element={<Navigate to="/store-hub/b2b" replace />} />
