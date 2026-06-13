@@ -157,7 +157,7 @@ const homeProps: GuideFeaturesPageProps = {
         { label: 'QR 가이드', route: '/seller/qr-guide' },
         { label: 'POP 활용', route: '/guide/for-seller#pop' },
         { label: '블로그 활용', route: '/guide/for-seller#blog' },
-        { label: '디지털사이니지', route: '/supplier/signage/manage' },
+        // WO-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1: '디지털사이니지' 진입 링크 제거 (route 삭제됨, Neture signage 미대상)
         { label: '타블렛 활용', route: '/guide/for-seller#tablet' },
         { label: '주문 · 배송', route: '/store/orders' },
       ],

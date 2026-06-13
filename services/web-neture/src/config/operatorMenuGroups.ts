@@ -77,9 +77,7 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '안내 문구 관리', path: '/operator/guide-contents' },
     { label: '커뮤니티 광고', path: '/admin/community-admin', adminOnly: true },
   ],
-  signage: [
-    { label: '사이니지', path: '/operator/signage/hq-media' },
-  ],
+  // WO-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1: signage 그룹 제거 (Neture signage 미대상)
   forum: [
     { label: '포럼 신청', path: '/operator/community' },
     { label: '삭제 요청', path: '/operator/forum-delete-requests' },
@@ -209,7 +207,7 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
   stores: [{ label: '매장 관리', path: '/operator/stores' }],
   orders: [{ label: '주문 관리', path: '/operator/orders' }],
   content: [{ label: '홈페이지 CMS', path: '/operator/homepage-cms' }],
-  signage: [{ label: '사이니지', path: '/operator/signage/hq-media' }],
+  // WO-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1: signage 그룹 제거
   forum: [
     { label: '포럼 신청', path: '/operator/community' },
     { label: '삭제 요청', path: '/operator/forum-delete-requests' },
@@ -262,7 +260,7 @@ export const NETURE_GROUP_TO_DOMAIN: Record<OperatorGroupKey, NetureOperatorDoma
   users: 'community_content',
   forum: 'community_content',
   content: 'community_content',
-  signage: 'community_content',
+  signage: 'community_content', // WO-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1: 미사용 — OperatorGroupKey 완전성 위한 안전 default
   resources: 'community_content', // 미사용 — 안전 default
   lms: 'community_content', // 미사용 — 안전 default
   analytics: 'common',
@@ -272,13 +270,14 @@ export const NETURE_GROUP_TO_DOMAIN: Record<OperatorGroupKey, NetureOperatorDoma
 /** 도메인 별 그룹 표시 순서.
  *  - 공급·유통: 승인(가입/유통펀딩/공급자활성화) → 상품
  *  - 커머스·정산: 주문 → 매장
- *  - 커뮤니티·콘텐츠: 회원 → 포럼 → 콘텐츠 → 사이니지
+ *  - 커뮤니티·콘텐츠: 회원 → 포럼 → 콘텐츠
  *  - 운영 공통: 분석/AI → 시스템 (대시보드는 TOP_PINNED 별도)
  */
 export const NETURE_DOMAIN_GROUP_ORDER: Record<NetureOperatorDomainKey, OperatorGroupKey[]> = {
   supply_distribution: ['approvals', 'products'],
   commerce_settlement: ['orders', 'stores'],
-  community_content: ['users', 'forum', 'content', 'signage'],
+  // WO-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1: 'signage' 제거 (Neture signage 미대상)
+  community_content: ['users', 'forum', 'content'],
   common: ['analytics', 'system'],
 };
 

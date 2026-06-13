@@ -41,13 +41,13 @@ const NETURE_AXES: OperatorAxisGroup[] = [
   {
     key: 'content',
     title: '콘텐츠·커뮤니티 운영',
-    description: '콘텐츠 · 커뮤니티 · 사이니지 · 회원',
+    // WO-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1: '사이니지' 제거 (Neture signage 미대상)
+    description: '콘텐츠 · 커뮤니티 · 회원',
     icon: '📋',
     tone: 'blue',
     links: [
       { key: 'guide-contents', label: '콘텐츠 관리', href: '/operator/guide-contents' },
       { key: 'community', label: '커뮤니티', href: '/operator/community' },
-      { key: 'signage', label: '사이니지', href: '/operator/signage/hq-media' },
       { key: 'members', label: '회원 관리', href: '/operator/members' },
     ],
   },

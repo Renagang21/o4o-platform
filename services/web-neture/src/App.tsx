@@ -446,15 +446,8 @@ const BrandManagementPage = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.BrandManagementPage }))
 );
 
-// Signage Operator Console (WO-O4O-SIGNAGE-CONSOLE-V1)
-// Store Signage (WO-O4O-SIGNAGE-STORE-ACTION-EXPANSION-V1)
-const StoreSignagePage = lazy(() => import('./pages/supplier/StoreSignagePage'));
-const SignageHqMediaPage = lazy(() => import('./pages/operator/signage/HqMediaPage'));
-const SignageHqMediaDetailPage = lazy(() => import('./pages/operator/signage/HqMediaDetailPage'));
-const SignageHqPlaylistsPage = lazy(() => import('./pages/operator/signage/HqPlaylistsPage'));
-const SignageHqPlaylistDetailPage = lazy(() => import('./pages/operator/signage/HqPlaylistDetailPage'));
-const SignageTemplatesPage = lazy(() => import('./pages/operator/signage/TemplatesPage'));
-const SignageTemplateDetailPage = lazy(() => import('./pages/operator/signage/TemplateDetailPage'));
+// WO-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1: Neture 디지털사이니지 surface 제거
+// (signage operator console / store signage lazy imports + routes 제거). KPA/GP/KCos signage 는 유지.
 
 // Homepage CMS (WO-O4O-NETURE-HOMEPAGE-CMS-V1)
 const HomepageCmsPage = lazy(() => import('./pages/operator/HomepageCmsPage'));
@@ -783,10 +776,7 @@ function App() {
               <Route path="/supplier/market-trial/new" element={<SupplierTrialCreatePage />} />
               <Route path="/supplier/market-trial/:id" element={<SupplierTrialDetailPage />} />
               <Route path="/supplier/market-trial/:id/edit" element={<SupplierTrialEditPage />} />
-              {/* WO-O4O-SUPPLIER-CONTENT-PRODUCER-UI-CLEANUP-V1 (2026-05-23):
-                  공급자가 Signage Hub 콘텐츠를 직접 탐색·복사하는 진입점 제거.
-                  Canonical 흐름은 Operator 가 HUB 콘텐츠를 큐레이션하고 매장에 배포. */}
-              <Route path="/supplier/signage/manage" element={<StoreSignagePage />} />
+              {/* WO-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1: /supplier/signage/manage 제거 (Neture signage 미대상) */}
               <Route path="/supplier/forum" element={<ForumPage title="공급자 포럼" description="공급자 간 소통 공간" basePath="/supplier/forum" />} />
               <Route path="/supplier/forum/write" element={<ForumWritePage backPath="/supplier/forum" />} />
               <Route path="/supplier/forum/post/:slug" element={<ForumPostPage basePath="/supplier/forum" />} />
@@ -959,12 +949,7 @@ function App() {
               <Route path="/admin/ai-card-report" element={<AiCardReportPage />} />
               <Route path="/admin/ai-operations" element={<AiOperationsPage />} />
               <Route path="/admin/ai/asset-quality" element={<AssetQualityPage />} />
-              <Route path="/admin/signage/hq-media" element={<SignageHqMediaPage />} />
-              <Route path="/admin/signage/hq-media/:mediaId" element={<SignageHqMediaDetailPage />} />
-              <Route path="/admin/signage/hq-playlists" element={<SignageHqPlaylistsPage />} />
-              <Route path="/admin/signage/hq-playlists/:playlistId" element={<SignageHqPlaylistDetailPage />} />
-              <Route path="/admin/signage/templates" element={<SignageTemplatesPage />} />
-              <Route path="/admin/signage/templates/:templateId" element={<SignageTemplateDetailPage />} />
+              {/* WO-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1: /admin/signage/* 제거 (Neture signage 미대상) */}
               <Route path="/admin/homepage-cms" element={<HomepageCmsPage />} />
               <Route path="/admin/analytics" element={<OperatorAnalyticsPage />} />
               <Route path="/admin/supplier-quality" element={<SupplierQualityPage />} />
@@ -1046,12 +1031,7 @@ function App() {
               <Route path="/operator/ai-card-report" element={<AiCardReportPage />} />
               <Route path="/operator/ai-operations" element={<AiOperationsPage />} />
               <Route path="/operator/ai/asset-quality" element={<AssetQualityPage />} />
-              <Route path="/operator/signage/hq-media" element={<SignageHqMediaPage />} />
-              <Route path="/operator/signage/hq-media/:mediaId" element={<SignageHqMediaDetailPage />} />
-              <Route path="/operator/signage/hq-playlists" element={<SignageHqPlaylistsPage />} />
-              <Route path="/operator/signage/hq-playlists/:playlistId" element={<SignageHqPlaylistDetailPage />} />
-              <Route path="/operator/signage/templates" element={<SignageTemplatesPage />} />
-              <Route path="/operator/signage/templates/:templateId" element={<SignageTemplateDetailPage />} />
+              {/* WO-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1: /operator/signage/* 제거 (Neture signage 미대상) */}
               <Route path="/operator/homepage-cms" element={<HomepageCmsPage />} />
               {/* Guide Contents (WO-O4O-OPERATOR-GUIDE-CONTENTS-CORE-EXTRACTION-V1) */}
               <Route path="/operator/guide-contents" element={<OperatorGuideContentsPage />} />
