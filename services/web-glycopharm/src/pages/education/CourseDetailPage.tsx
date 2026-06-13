@@ -28,6 +28,8 @@ import { useLoginModal } from '@/contexts/LoginModalContext';
 import { toast } from '@o4o/error-handling';
 import { AppreciationPanel } from '@o4o/shared-space-ui';
 import { appreciationPanelApi } from '@/api/appreciation';
+// WO-O4O-LMS-GLYCOPHARM-ADOPTION-V1: 공통 presentational UI 소비 (accent = GP green)
+import { CourseProgressBar } from '@o4o/lms-ui';
 
 // ── 레슨 콘텐츠 렌더러 ───────────────────────────────────────────────────────
 function LessonContent({ lesson }: { lesson: LmsLesson }) {
@@ -478,18 +480,12 @@ export default function CourseDetailPage() {
                   <span className="text-green-500 text-xs">· 전체 {lessons.length}개 레슨</span>
                 </div>
               ) : (
-                <>
-                  <div className="flex justify-between text-xs text-slate-500 mb-1">
-                    <span>진행률</span>
-                    <span>{completedLessonIds.size} / {lessons.length} 레슨 완료 ({progress}%)</span>
-                  </div>
-                  <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-primary-500 rounded-full transition-all duration-500"
-                      style={{ width: `${progress}%` }}
-                    />
-                  </div>
-                </>
+                <CourseProgressBar
+                  percent={progress}
+                  completedCount={completedLessonIds.size}
+                  totalCount={lessons.length}
+                  accent="#16a34a"
+                />
               )}
             </div>
           )}

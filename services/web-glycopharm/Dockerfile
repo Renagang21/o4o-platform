@@ -39,6 +39,7 @@ COPY packages/organization-core/package.json ./packages/organization-core/
 COPY packages/forum-core/package.json ./packages/forum-core/
 COPY packages/account-ui/package.json ./packages/account-ui/
 COPY packages/lms-client/package.json ./packages/lms-client/
+COPY packages/lms-ui/package.json ./packages/lms-ui/
 COPY packages/store-products-ui/package.json ./packages/store-products-ui/
 COPY packages/tablet-kiosk-core/package.json ./packages/tablet-kiosk-core/
 
@@ -72,6 +73,7 @@ COPY packages/organization-core/ ./packages/organization-core/
 COPY packages/forum-core/ ./packages/forum-core/
 COPY packages/account-ui/ ./packages/account-ui/
 COPY packages/lms-client/ ./packages/lms-client/
+COPY packages/lms-ui/ ./packages/lms-ui/
 COPY packages/store-products-ui/ ./packages/store-products-ui/
 COPY packages/tablet-kiosk-core/ ./packages/tablet-kiosk-core/
 

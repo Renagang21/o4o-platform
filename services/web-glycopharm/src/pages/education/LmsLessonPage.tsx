@@ -13,6 +13,8 @@ import { ContentRenderer } from '@o4o/content-editor';
 import { lmsApi, normalizeEnrollment } from '@/api/lms';
 import type { LmsCourse, LmsLesson, LmsEnrollment, LmsQuiz, LmsQuizResult, LmsAssignment, LmsAssignmentSubmission } from '@/api/lms';
 import { aiApi, type AiAnalyzeResult } from '@/api/ai';
+// WO-O4O-LMS-GLYCOPHARM-ADOPTION-V1: 공통 presentational UI 소비 (accent = GP green)
+import { CourseProgressBar } from '@o4o/lms-ui';
 
 const C = {
   primary: '#16a34a',
@@ -399,12 +401,13 @@ export default function LmsLessonPage() {
 
         {enrollment && (
           <div style={S.progressInfo}>
-            <div style={S.progressBar}>
-              <div style={{ ...S.progressFill, width: `${enrollment.progress}%` }} />
-            </div>
-            <span style={S.progressText}>
-              진도율: {enrollment.progress}% ({completedLessonIds.length} / {lessons.length})
-            </span>
+            <CourseProgressBar
+              percent={enrollment.progress ?? 0}
+              completedCount={completedLessonIds.length}
+              totalCount={lessons.length}
+              accent={C.primary}
+              compact
+            />
           </div>
         )}
       </aside>
