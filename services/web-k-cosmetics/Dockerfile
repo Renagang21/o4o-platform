@@ -37,6 +37,7 @@ COPY packages/content-editor/package.json ./packages/content-editor/
 COPY packages/organization-core/package.json ./packages/organization-core/
 COPY packages/forum-core/package.json ./packages/forum-core/
 COPY packages/lms-client/package.json ./packages/lms-client/
+COPY packages/lms-ui/package.json ./packages/lms-ui/
 COPY packages/store-products-ui/package.json ./packages/store-products-ui/
 COPY packages/admin-ux-core/package.json ./packages/admin-ux-core/
 
@@ -68,6 +69,7 @@ COPY packages/content-editor/ ./packages/content-editor/
 COPY packages/organization-core/ ./packages/organization-core/
 COPY packages/forum-core/ ./packages/forum-core/
 COPY packages/lms-client/ ./packages/lms-client/
+COPY packages/lms-ui/ ./packages/lms-ui/
 COPY packages/store-products-ui/ ./packages/store-products-ui/
 COPY packages/admin-ux-core/ ./packages/admin-ux-core/
 

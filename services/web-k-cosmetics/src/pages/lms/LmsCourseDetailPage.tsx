@@ -15,6 +15,8 @@ import { useAuth } from '../../contexts/AuthContext';
 import type { LmsCourse, LmsLesson, LmsEnrollment } from '../../api/lms';
 import { AppreciationPanel } from '@o4o/shared-space-ui';
 import { appreciationPanelApi } from '@/api/appreciation';
+// WO-O4O-LMS-KCOSMETICS-ADOPTION-V1: 공통 presentational UI 소비 (accent = KCos pink)
+import { CourseProgressBar } from '@o4o/lms-ui';
 
 // ─── 색상/타이포 (KPA colors/typography 대응) ────────────────────────────────
 
@@ -260,10 +262,13 @@ export default function LmsCourseDetailPage() {
                 </div>
               ) : (
                 <div>
-                  <div style={S.progressBar}>
-                    <div style={{ ...S.progressFill, width: `${enrollment.progress}%` }} />
-                  </div>
-                  <p style={S.progressText}>진도율: {enrollment.progress}%</p>
+                  <CourseProgressBar
+                    percent={enrollment.progress}
+                    completedCount={enrollment.metadata?.completedLessonIds?.length}
+                    totalCount={lessons.length}
+                    accent={C.primary}
+                    style={{ marginBottom: '16px' }}
+                  />
                   <Link to={`/lms/course/${course.id}/lesson/${lessons[0]?.id || ''}`} style={S.continueButton}>
                     계속 보기
                   </Link>
