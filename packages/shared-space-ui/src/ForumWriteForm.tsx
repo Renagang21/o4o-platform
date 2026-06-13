@@ -68,6 +68,12 @@ export interface ForumWriteFormProps {
 
   /** 액션 버튼 위 확장 슬롯 (예: Neture contact 옵션) */
   renderExtra?: ReactNode;
+  /**
+   * 에디터 하단 메타 슬롯 (예: Neture live charCount / 최소 길이 안내).
+   * 폼 내부 editorHtml 을 인자로 받아 라이브 렌더한다. 미지정 시 미노출 — 기존 소비처(KPA/GP/KCos) 무영향.
+   * WO-O4O-FORUM-WRITE-NETURE-FORM-COMMONIZATION-V1
+   */
+  renderContentMeta?: (state: { html: string; textLength: number }) => ReactNode;
 
   onSubmit: (payload: ForumWriteFormPayload) => Promise<void> | void;
   onCancel?: () => void;
@@ -114,6 +120,7 @@ export function ForumWriteForm({
   minHeight = '300px',
   editorProps,
   renderExtra,
+  renderContentMeta,
   onSubmit,
   onCancel,
   onInvalid,
@@ -189,6 +196,10 @@ export function ForumWriteForm({
           minHeight={minHeight}
           editable={!submitting}
         />
+        {renderContentMeta?.({
+          html: editorHtml,
+          textLength: editorHtml.replace(/<[^>]*>/g, '').trim().length,
+        })}
       </div>
 
       {renderExtra}

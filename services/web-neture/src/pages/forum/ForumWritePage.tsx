@@ -20,6 +20,8 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { RichTextEditor } from '@o4o/content-editor';
 import { htmlToBlocks } from '@o4o/forum-core/utils';
+// WO-O4O-FORUM-WRITE-NETURE-FORM-COMMONIZATION-V1: create 경로 공통 폼 적용 (edit 경로는 기존 inline 유지)
+import { ForumWriteForm, type ForumWriteFormPayload } from '@o4o/shared-space-ui';
 import { useAuth, useLoginModal } from '../../contexts';
 import {
   createForumPost,
@@ -193,6 +195,35 @@ export function ForumWritePage({
     }
   }
 
+  // WO-O4O-FORUM-WRITE-NETURE-FORM-COMMONIZATION-V1: ForumWriteForm create 제출 핸들러.
+  // 기존 create 흐름(htmlToBlocks → createForumPost → basePath redirect, contact payload)을 그대로 보존한다.
+  async function handleCreateSubmit(payload: ForumWriteFormPayload) {
+    const textLength = payload.editorHtml.replace(/<[^>]*>/g, '').trim().length;
+    if (!payload.title.trim() || textLength < MIN_CONTENT_LENGTH) {
+      setError('제목과 내용을 모두 입력해주세요. (내용은 최소 20자 이상)');
+      return;
+    }
+    setError(null);
+    try {
+      const blocks = htmlToBlocks(payload.editorHtml);
+      const base = (backPath || '/forum').replace(/\/$/, '');
+      const response = await createForumPost({
+        title: payload.title,
+        content: blocks,
+        categorySlug: categorySlug,
+        showContactOnPost: hasContactInfo ? showContactOnPost : false,
+      });
+      if (response.success && response.data) {
+        navigate(`${base}/${postSegment}/${response.data.slug}`);
+      } else {
+        setError(response.error || '게시글 작성에 실패했습니다.');
+      }
+    } catch (err) {
+      console.error('Error submitting post:', err);
+      setError('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+    }
+  }
+
   function handleCancel() {
     if (isEditMode && editSlug) {
       const base = (backPath || '/forum').replace(/\/$/, '');
@@ -250,7 +281,8 @@ export function ForumWritePage({
         </div>
       )}
 
-      {/* Form */}
+      {/* Form: create → 공통 ForumWriteForm / edit → 기존 inline form 유지 (WO-O4O-FORUM-WRITE-NETURE-FORM-COMMONIZATION-V1) */}
+      {isEditMode ? (
       <form onSubmit={handleSubmit} style={styles.form}>
         {/* Title Input */}
         <div style={styles.formGroup}>
@@ -342,6 +374,59 @@ export function ForumWritePage({
           </button>
         </div>
       </form>
+      ) : (
+        <ForumWriteForm
+          titleLabel="제목"
+          titlePlaceholder="제목을 입력하세요"
+          titleMaxLength={200}
+          contentLabel={`내용 (최소 ${MIN_CONTENT_LENGTH}자)`}
+          contentPlaceholder="의견을 작성해주세요..."
+          submitLabel="등록하기"
+          submittingLabel="등록 중..."
+          cancelLabel="취소"
+          theme="blue"
+          onCancel={handleCancel}
+          onSubmit={handleCreateSubmit}
+          onInvalid={() => setError('제목과 내용을 모두 입력해주세요. (내용은 최소 20자 이상)')}
+          renderContentMeta={({ textLength }) => (
+            <div style={styles.charCount}>
+              {textLength}자
+              {textLength < MIN_CONTENT_LENGTH && textLength > 0 && (
+                <span style={styles.charCountWarning}>
+                  {' '}(최소 {MIN_CONTENT_LENGTH - textLength}자 더 필요)
+                </span>
+              )}
+            </div>
+          )}
+          renderExtra={
+            hasContactInfo ? (
+              <div style={styles.contactOption}>
+                <label style={styles.contactLabel}>
+                  <input
+                    type="checkbox"
+                    checked={showContactOnPost}
+                    onChange={(e) => setShowContactOnPost(e.target.checked)}
+                    style={styles.checkbox}
+                  />
+                  <span style={styles.contactText}>연락 정보 표시</span>
+                </label>
+                <p style={styles.contactHint}>
+                  이 글에 카카오톡 연락 링크를 표시합니다.
+                </p>
+              </div>
+            ) : (
+              <div style={styles.contactPrompt}>
+                <p style={styles.contactPromptText}>
+                  연락 정보를 등록하면 글에 연락처를 표시할 수 있습니다.
+                </p>
+                <Link to="/mypage" style={styles.contactPromptLink}>
+                  연락 설정하기 →
+                </Link>
+              </div>
+            )
+          }
+        />
+      )}
     </div>
   );
 }
