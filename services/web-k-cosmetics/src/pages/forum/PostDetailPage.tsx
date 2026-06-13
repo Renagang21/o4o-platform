@@ -21,6 +21,7 @@ import {
   ForumDetailLoadingState,
   ForumDetailErrorState,
   ForumDetailNotFoundState,
+  ForumCommentList,
 } from '@o4o/shared-space-ui';
 import { appreciationPanelApi } from '@/api/appreciation';
 
@@ -157,30 +158,20 @@ export default function PostDetailPage() {
         <h2 style={styles.commentsTitle}>
           댓글 {comments.length}개
         </h2>
-        {comments.length > 0 ? (
-          <div style={styles.commentsList}>
-            {comments.map((comment) => (
-              <div key={comment.id} style={styles.comment}>
-                <div style={styles.commentMeta}>
-                  <span style={styles.commentAuthor}>
-                    {comment.author?.nickname || comment.author?.name || '익명'}
-                  </span>
-                  <span style={styles.commentDate}>
-                    {formatDate(comment.createdAt)}
-                  </span>
-                </div>
-                <ContentRenderer
-                  html={Array.isArray(comment.content)
-                    ? blocksToHtmlInline(comment.content)
-                    : (comment.content || '')}
-                  style={styles.commentContent}
-                />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p style={styles.noComments}>아직 댓글이 없습니다.</p>
-        )}
+        <ForumCommentList
+          comments={comments.map((comment) => ({
+            id: comment.id,
+            authorName: comment.author?.nickname || comment.author?.name || '익명',
+            content: Array.isArray(comment.content)
+              ? blocksToHtmlInline(comment.content)
+              : (comment.content || ''),
+            createdAt: formatDate(comment.createdAt),
+          }))}
+          emptyMessage="아직 댓글이 없습니다."
+          renderContent={(comment) => (
+            <ContentRenderer html={comment.content} style={styles.commentContent} />
+          )}
+        />
       </section>
 
       <div style={styles.footer}>

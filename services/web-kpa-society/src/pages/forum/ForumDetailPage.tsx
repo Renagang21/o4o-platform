@@ -13,6 +13,7 @@ import {
   ForumPostHeader,
   ForumDetailLoadingState,
   ForumDetailNotFoundState,
+  ForumCommentList,
 } from '@o4o/shared-space-ui';
 import { ClosedForumAccessBlocker } from '../../components/forum/ClosedForumAccessBlocker';
 import { forumApi } from '../../api';
@@ -329,32 +330,25 @@ export function ForumDetailPage() {
           </div>
         )}
 
-        <div style={styles.commentList}>
-          {comments.map(comment => {
-            const isCommentAuthor = user?.id === comment.authorId || isAdmin;
-            return (
-              <div key={comment.id} style={styles.commentItem}>
-                <div style={styles.commentHeader}>
-                  <div style={styles.commentHeaderLeft}>
-                    <span style={styles.commentAuthor}>{comment.authorName}</span>
-                    <span style={styles.commentDate}>
-                      {new Date(comment.createdAt).toLocaleDateString('ko-KR')}
-                    </span>
-                  </div>
-                  {isCommentAuthor && (
-                    <button
-                      style={styles.commentDeleteButton}
-                      onClick={() => handleDeleteComment(comment.id)}
-                    >
-                      삭제
-                    </button>
-                  )}
-                </div>
-                <p style={styles.commentContent}>{comment.content}</p>
-              </div>
-            );
-          })}
-        </div>
+        <ForumCommentList
+          comments={comments.map((comment) => ({
+            id: comment.id,
+            authorName: comment.authorName,
+            content: comment.content,
+            createdAt: new Date(comment.createdAt).toLocaleDateString('ko-KR'),
+            isAuthor: user?.id === comment.authorId || isAdmin,
+          }))}
+          renderCommentActions={(comment) =>
+            comment.isAuthor ? (
+              <button
+                style={styles.commentDeleteButton}
+                onClick={() => handleDeleteComment(comment.id)}
+              >
+                삭제
+              </button>
+            ) : null
+          }
+        />
       </div>
 
       <div style={styles.footer}>

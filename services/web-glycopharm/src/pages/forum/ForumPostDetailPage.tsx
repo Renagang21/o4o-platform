@@ -21,6 +21,7 @@ import {
   ForumDetailLoadingState,
   ForumDetailErrorState,
   ForumDetailNotFoundState,
+  ForumCommentList,
 } from '@o4o/shared-space-ui';
 import { appreciationPanelApi } from '@/api/appreciation';
 
@@ -174,27 +175,15 @@ export default function ForumPostDetailPage() {
           </h2>
         </div>
 
-        {comments.length === 0 ? (
-          <div className="bg-white border border-slate-200 rounded-xl px-6 py-8 text-center">
-            <p className="text-sm text-slate-400">아직 댓글이 없습니다.</p>
-          </div>
-        ) : (
-          <div className="bg-white border border-slate-200 rounded-xl divide-y divide-slate-100">
-            {comments.map((comment) => {
-              const cAuthor = comment.author?.nickname || comment.author?.name || '익명';
-              const cBody = comment.content || comment.body || '';
-              return (
-                <div key={comment.id} className="px-6 py-4">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-xs font-medium text-slate-700">{cAuthor}</span>
-                    <span className="text-[11px] text-slate-400">{new Date(comment.createdAt).toLocaleDateString('ko-KR')}</span>
-                  </div>
-                  <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap">{cBody}</p>
-                </div>
-              );
-            })}
-          </div>
-        )}
+        <ForumCommentList
+          comments={comments.map((comment) => ({
+            id: comment.id,
+            authorName: comment.author?.nickname || comment.author?.name || '익명',
+            content: comment.content || comment.body || '',
+            createdAt: new Date(comment.createdAt).toLocaleDateString('ko-KR'),
+          }))}
+          emptyMessage="아직 댓글이 없습니다."
+        />
       </section>
 
       {/* 하단 네비게이션 */}

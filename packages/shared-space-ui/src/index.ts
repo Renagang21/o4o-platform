@@ -109,6 +109,10 @@ export type {
   ForumDetailNotFoundStateProps,
 } from './ForumDetailStates';
 
+/* WO-O4O-FORUM-DETAIL-COMMENT-LIST-COMMONIZATION-V1: forum 댓글 목록 표시 공통 부품 */
+export { ForumCommentList } from './ForumCommentList';
+export type { ForumCommentListItem, ForumCommentListProps } from './ForumCommentList';
+
 export { StoreHubTemplate } from './StoreHubTemplate';
 export type { StoreHubResourceCard, StoreHubFlowStep, StoreHubConfig, StoreHubTemplateProps } from './StoreHubTemplate';
 
