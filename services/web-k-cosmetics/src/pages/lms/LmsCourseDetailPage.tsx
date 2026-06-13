@@ -15,8 +15,8 @@ import { useAuth } from '../../contexts/AuthContext';
 import type { LmsCourse, LmsLesson, LmsEnrollment } from '../../api/lms';
 import { AppreciationPanel } from '@o4o/shared-space-ui';
 import { appreciationPanelApi } from '@/api/appreciation';
-// WO-O4O-LMS-KCOSMETICS-ADOPTION-V1: 공통 presentational UI 소비 (accent = KCos pink)
-import { CourseProgressBar } from '@o4o/lms-ui';
+// WO-O4O-LMS-KCOSMETICS-ADOPTION-V1 / WO-O4O-LMS-KCOSMETICS-FULLER-ADOPTION-V1: 공통 presentational UI 소비 (accent = KCos pink)
+import { CourseProgressBar, LessonList } from '@o4o/lms-ui';
 
 // ─── 색상/타이포 (KPA colors/typography 대응) ────────────────────────────────
 
@@ -202,28 +202,20 @@ export default function LmsCourseDetailPage() {
           {/* 레슨 목록 */}
           <div style={{ ...S.card, marginTop: '24px' }}>
             <h2 style={S.sectionTitle}>레슨 목록</h2>
-            <div style={{ display: 'flex', flexDirection: 'column' as const }}>
-              {lessons.map((lesson, index) => {
-                const isCompleted = enrollment?.metadata?.completedLessonIds?.includes(lesson.id);
-                const canAccess = enrollment || lesson.isPreview;
-
-                return (
-                  <div key={lesson.id} style={S.lessonItem}>
-                    <div style={S.lessonNumber}>{isCompleted ? '✓' : index + 1}</div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontSize: '14px', fontWeight: 500, color: C.neutral800 }}>{lesson.title}</span>
-                        {lesson.isPreview && <span style={S.previewBadge}>미리보기</span>}
-                      </div>
-                      <span style={{ fontSize: '13px', color: C.neutral500 }}>{lesson.duration}분</span>
-                    </div>
-                    {canAccess && (
-                      <Link to={`/lms/course/${course.id}/lesson/${lesson.id}`} style={S.lessonLink}>보기</Link>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+            <LessonList
+              rowClickMode="row"
+              accent={C.primary}
+              hrefFor={(l) => `/lms/course/${course.id}/lesson/${l.id}`}
+              lessons={lessons.map((lesson) => ({
+                id: lesson.id,
+                title: lesson.title,
+                kind: lesson.type,
+                durationMinutes: lesson.duration,
+                completed: enrollment?.metadata?.completedLessonIds?.includes(lesson.id) ?? false,
+                isPreview: lesson.isPreview,
+                locked: !(enrollment || lesson.isPreview),
+              }))}
+            />
           </div>
         </div>
 
