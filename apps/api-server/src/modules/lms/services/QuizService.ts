@@ -482,7 +482,18 @@ export class QuizService {
       throw new Error('Quiz not found');
     }
 
+    // WO-O4O-LMS-REWARD-POLICY-CONTRACT-STABILIZE-V1:
+    // updateQuiz 시그니처에 metadata 는 없으나 controller 가 req.body 를 raw 로 전달하므로
+    // Object.assign 이 quiz.metadata 를 통째로 덮어쓸 수 있다. 기존 키(rewardPolicy 등) 유실 방지 — shallow merge.
+    const incomingMetadata = (data as { metadata?: Record<string, any> }).metadata;
+    const mergedMetadata =
+      incomingMetadata !== undefined ? { ...(quiz.metadata ?? {}), ...incomingMetadata } : undefined;
+
     Object.assign(quiz, data);
+
+    if (mergedMetadata !== undefined) {
+      quiz.metadata = mergedMetadata;
+    }
     if (data.isPublished && !quiz.publishedAt) {
       quiz.publishedAt = new Date();
     }

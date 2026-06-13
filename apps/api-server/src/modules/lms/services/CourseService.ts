@@ -257,8 +257,17 @@ export class CourseService extends BaseService<Course> {
     // data.status가 명시적으로 지정된 경우(예: 운영자/admin이 archive 등 다른 전이 수행)는 그대로 존중.
     const wasPublished = course.status === CourseStatus.PUBLISHED;
 
+    // WO-O4O-LMS-REWARD-POLICY-CONTRACT-STABILIZE-V1:
+    // metadata 부분 업데이트 시 기존 키(rewardPolicy 등) 유실 방지 — 통째 덮어쓰기 대신 shallow merge.
+    const mergedMetadata =
+      data.metadata !== undefined ? { ...(course.metadata ?? {}), ...data.metadata } : undefined;
+
     // Update fields
     Object.assign(course, data);
+
+    if (mergedMetadata !== undefined) {
+      course.metadata = mergedMetadata;
+    }
 
     if (wasPublished && !data.status) {
       course.status = CourseStatus.PENDING_REVIEW;

@@ -146,8 +146,17 @@ export class LessonService extends BaseService<Lesson> {
       data.type = (data.type as unknown as string).toLowerCase() as LessonType;
     }
 
+    // WO-O4O-LMS-REWARD-POLICY-CONTRACT-STABILIZE-V1:
+    // metadata 부분 업데이트 시 기존 키(rewardPolicy 등) 유실 방지 — 통째 덮어쓰기 대신 shallow merge.
+    const mergedMetadata =
+      data.metadata !== undefined ? { ...(lesson.metadata ?? {}), ...data.metadata } : undefined;
+
     // Update fields
     Object.assign(lesson, data);
+
+    if (mergedMetadata !== undefined) {
+      lesson.metadata = mergedMetadata;
+    }
 
     const updated = await this.lessonRepository.save(lesson);
 
