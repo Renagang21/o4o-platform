@@ -303,6 +303,8 @@ const EmailSettingsPage = lazy(() =>
 );
 // WO-O4O-ADMIN-SERVICE-LEGAL-POLICY-SETTINGS-UI-V1
 const ServiceLegalSettingsPage = lazy(() => import('./pages/admin/ServiceLegalSettingsPage'));
+// WO-O4O-CONTACT-NETURE-KPA-SETTINGS-ADAPTER-V1
+const ServiceContactSettingsPage = lazy(() => import('./pages/admin/ServiceContactSettingsPage'));
 
 // Admin Operators
 const OperatorsPage = lazy(() => import('./pages/admin/OperatorsPage'));
@@ -1006,6 +1008,8 @@ function App() {
               <Route path="/admin/ai-business-pack" element={<AiBusinessPackPage />} />
               <Route path="/admin/settings/email" element={<EmailSettingsPage />} />
               <Route path="/admin/settings/legal-terms" element={<ServiceLegalSettingsPage />} />
+              {/* WO-O4O-CONTACT-NETURE-KPA-SETTINGS-ADAPTER-V1 */}
+              <Route path="/admin/settings/contact" element={<ServiceContactSettingsPage />} />
             </Route>
 
             {/* ================================================================

@@ -17,6 +17,8 @@ import { NetureContactMessage } from '../entities/NetureContactMessage.entity.js
 import { requireAuth } from '../../../middleware/auth.middleware.js';
 import { requireNetureScope } from '../../../middleware/neture-scope.middleware.js';
 import { notificationService } from '../../../services/NotificationService.js';
+import { loadContactSettings } from '../../contact-inquiry/contact-settings.helper.js';
+import { sendContactEmails } from '../../contact-inquiry/contact-notification.helper.js';
 import logger from '../../../utils/logger.js';
 
 const VALID_CONTACT_TYPES = ['supplier', 'partner', 'service', 'other'] as const;
@@ -77,10 +79,14 @@ export function createContactController(dataSource: DataSource): Router {
 
       logger.info(`[Neture Contact] New message: ${entity.id} (${contactType})`);
 
-      // ── Operator notification (best-effort) ──
-      // WO-O4O-NETURE-CONTACT-INQUIRY-OPERATOR-NOTIFICATION-V1:
-      //   Contact us 는 공개 문의 창구 — 모든 contactType 을 neture:operator + neture:admin 에게 알린다.
-      //   알림 실패가 문의 접수(저장)를 실패시키지 않도록 try/catch 로 격리.
+      // ── 알림: 기존 in-app 유지 + ServiceContactSettings 기반 이메일/자동 회신 추가 ──
+      // WO-O4O-CONTACT-NETURE-KPA-SETTINGS-ADAPTER-V1 (기존 저장소/route/UI 불변, 알림만 보강).
+      const typeLabel = CONTACT_TYPE_LABELS[entity.contactType] || entity.contactType;
+
+      // (1) in-app: 기존 동작 유지 — 설정과 무관하게 neture:operator + neture:admin 에게 알림.
+      //   WO-O4O-NETURE-CONTACT-INQUIRY-OPERATOR-NOTIFICATION-V1: 모든 contactType 알림.
+      //   실패가 문의 접수(저장)를 실패시키지 않도록 try/catch 로 격리.
+      let inappStatus = 'none';
       try {
         const operators: { userId: string }[] = await dataSource.query(
           `SELECT DISTINCT user_id AS "userId"
@@ -89,26 +95,58 @@ export function createContactController(dataSource: DataSource): Router {
               AND is_active = true
             LIMIT 50`,
         );
-        const typeLabel = CONTACT_TYPE_LABELS[entity.contactType] || entity.contactType;
-        await Promise.allSettled(
-          operators.map((op) =>
-            notificationService.createNotification({
-              userId: op.userId,
-              type: 'contact.new',
-              title: '새 문의가 접수되었습니다',
-              message: `[${typeLabel}] ${entity.subject}`,
-              serviceKey: 'neture',
-              metadata: {
-                contactMessageId: entity.id,
-                contactType: entity.contactType,
-                targetUrl: '/operator/contact-messages?status=new',
-              },
-            }),
-          ),
-        );
+        if (operators.length > 0) {
+          await Promise.allSettled(
+            operators.map((op) =>
+              notificationService.createNotification({
+                userId: op.userId,
+                type: 'contact.new',
+                title: '새 문의가 접수되었습니다',
+                message: `[${typeLabel}] ${entity.subject}`,
+                serviceKey: 'neture',
+                metadata: {
+                  contactMessageId: entity.id,
+                  contactType: entity.contactType,
+                  targetUrl: '/operator/contact-messages?status=new',
+                },
+              }),
+            ),
+          );
+          inappStatus = 'sent';
+        }
       } catch (notifyError) {
+        inappStatus = 'fail';
         logger.warn('[Neture Contact] operator notification failed (best-effort):', notifyError);
       }
+
+      // (2) 이메일 알림 + 문의자 자동 회신: ServiceContactSettings(neture) 기반, best-effort.
+      let emailStatus = 'off';
+      let autoReplyStatus = 'off';
+      try {
+        const settings = await loadContactSettings(dataSource, 'neture');
+        const r = await sendContactEmails(settings, {
+          serviceName: 'Neture',
+          typeLabel,
+          subject: entity.subject,
+          name: entity.name,
+          email: entity.email,
+          organizationName: null,
+          phone: entity.phone,
+          message: entity.message,
+          createdAt: entity.createdAt,
+          adminManageUrl: '/admin/contact-messages',
+        });
+        emailStatus = r.emailStatus;
+        autoReplyStatus = r.autoReplyStatus;
+      } catch (notifyErr) {
+        logger.warn('[Neture Contact] email/auto-reply dispatch failed (best-effort):', notifyErr);
+      }
+
+      // (3) 알림 결과 기록 (접수 자체는 이미 성공 — 기록 실패가 성공을 바꾸지 않음).
+      try {
+        entity.notificationStatus = `inapp:${inappStatus};email:${emailStatus};autoreply:${autoReplyStatus}`;
+        await repo.save(entity);
+      } catch { /* 무시 */ }
 
       return res.status(201).json({
         success: true,

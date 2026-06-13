@@ -12,6 +12,8 @@ import { Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { ContactRequest } from '../../../entities/ContactRequest.js';
 import { notificationService } from '../../../services/NotificationService.js';
+import { loadContactSettings } from '../../../modules/contact-inquiry/contact-settings.helper.js';
+import { sendContactEmails } from '../../../modules/contact-inquiry/contact-notification.helper.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 import logger from '../../../utils/logger.js';
 
@@ -69,7 +71,12 @@ export function createContactRequestHandler(dataSource: DataSource): RequestHand
     });
     const saved = await repo().save(entity);
 
-    // ── Operator notification (best-effort) ──────────────────────────────────
+    const typeLabel = type === 'partner' ? '협력 문의' : '강의 개설 문의';
+
+    // ── 알림: 기존 in-app 유지 + ServiceContactSettings 기반 이메일/자동 회신 추가 ──
+    // WO-O4O-CONTACT-NETURE-KPA-SETTINGS-ADAPTER-V1 (기존 저장소/route/UI 불변, 알림만 보강).
+    // (1) in-app: 기존 동작 유지 — kpa:operator + kpa:admin 에게 알림. best-effort.
+    let inappStatus = 'none';
     try {
       const operators: { userId: string }[] = await dataSource.query(
         `SELECT DISTINCT user_id AS "userId"
@@ -78,22 +85,54 @@ export function createContactRequestHandler(dataSource: DataSource): RequestHand
             AND is_active = true
           LIMIT 20`,
       );
-      const typeLabel = type === 'partner' ? '협력 문의' : '강의 개설 문의';
-      await Promise.allSettled(
-        operators.map((op) =>
-          notificationService.createNotification({
-            userId: op.userId,
-            type: 'contact.new',
-            title: `새 문의: ${typeLabel}`,
-            message: `${name!.trim()} 님이 문의를 남겼습니다.`,
-            serviceKey: 'kpa-society',
-            metadata: { contactRequestId: saved.id, contactType: type },
-          }),
-        ),
-      );
+      if (operators.length > 0) {
+        await Promise.allSettled(
+          operators.map((op) =>
+            notificationService.createNotification({
+              userId: op.userId,
+              type: 'contact.new',
+              title: `새 문의: ${typeLabel}`,
+              message: `${name!.trim()} 님이 문의를 남겼습니다.`,
+              serviceKey: 'kpa-society',
+              metadata: { contactRequestId: saved.id, contactType: type },
+            }),
+          ),
+        );
+        inappStatus = 'sent';
+      }
     } catch (err) {
+      inappStatus = 'fail';
       logger.warn('[ContactRequest] operator notification failed (best-effort)', err);
     }
+
+    // (2) 이메일 알림 + 문의자 자동 회신: ServiceContactSettings(kpa-society) 기반, best-effort.
+    let emailStatus = 'off';
+    let autoReplyStatus = 'off';
+    try {
+      const settings = await loadContactSettings(dataSource, 'kpa-society');
+      const r = await sendContactEmails(settings, {
+        serviceName: 'KPA Society',
+        typeLabel,
+        subject: saved.subject || typeLabel,
+        name: saved.name,
+        email: saved.email,
+        organizationName: saved.organization_name,
+        phone: saved.phone,
+        message: saved.message,
+        createdAt: saved.createdAt,
+        adminManageUrl: '/operator/collaboration-requests',
+      });
+      emailStatus = r.emailStatus;
+      autoReplyStatus = r.autoReplyStatus;
+    } catch (notifyErr) {
+      logger.warn('[ContactRequest] email/auto-reply dispatch failed (best-effort)', notifyErr);
+    }
+
+    // (3) 알림 결과 기록 (접수 자체는 이미 성공 — 기록 실패가 성공을 바꾸지 않음).
+    try {
+      saved.notification_status = `inapp:${inappStatus};email:${emailStatus};autoreply:${autoReplyStatus}`;
+      await repo().save(saved);
+    } catch { /* 무시 */ }
 
     return res.status(201).json({
       success: true,

@@ -64,6 +64,14 @@ export class ContactRequest {
   @Column({ type: 'uuid', nullable: true })
   created_by: string | null;
 
+  /**
+   * 알림 발송 결과 (WO-O4O-CONTACT-NETURE-KPA-SETTINGS-ADAPTER-V1).
+   * 형식: `inapp:<status>;email:<status>;autoreply:<status>` (예: inapp:sent;email:off;autoreply:off).
+   * 접수 자체와 무관한 best-effort 기록.
+   */
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  notification_status: string | null;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

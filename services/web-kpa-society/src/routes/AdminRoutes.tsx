@@ -12,6 +12,8 @@ import { AdminLayout, AdminAuthGuard } from '../components/admin';
 import { KpaAdminDashboardPage } from '../pages/admin/KpaAdminDashboardPage';
 // WO-O4O-KPA-ADMIN-MEMBER-MANAGEMENT-SEPARATION-V1
 import AdminMemberManagementPage from '../pages/admin/AdminMemberManagementPage';
+// WO-O4O-CONTACT-NETURE-KPA-SETTINGS-ADAPTER-V1
+import ServiceContactSettingsPage from '../pages/admin/ServiceContactSettingsPage';
 
 export function AdminRoutes() {
   return (
@@ -29,6 +31,9 @@ export function AdminRoutes() {
 
           {/* WO-O4O-KPA-ADMIN-MEMBER-MANAGEMENT-SEPARATION-V1: admin 회원관리 (완전삭제) */}
           <Route path="members" element={<AdminMemberManagementPage />} />
+
+          {/* WO-O4O-CONTACT-NETURE-KPA-SETTINGS-ADAPTER-V1: 문의 수신자·자동 회신 설정 */}
+          <Route path="settings/contact" element={<ServiceContactSettingsPage />} />
 
           {/* 알 수 없는 경로 → 관리자 홈 */}
           <Route path="*" element={<Navigate to="kpa-dashboard" replace />} />

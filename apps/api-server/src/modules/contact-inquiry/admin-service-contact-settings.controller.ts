@@ -8,7 +8,10 @@
  *   PUT /:serviceKey/contact-settings — upsert(이메일 형식 검증)
  *
  * 권한: requireServiceLegalScope('admin') 재사용(serviceKey 별 `{prefix}:admin`).
- *   + serviceKey 화이트리스트 = glycopharm / k-cosmetics (Neture/KPA 제외). operator 기본 접근 없음.
+ *   + serviceKey 화이트리스트 = glycopharm / k-cosmetics / neture / kpa-society.
+ *     (WO-O4O-CONTACT-NETURE-KPA-SETTINGS-ADAPTER-V1: Neture/KPA 는 기존 저장소를 유지하되
+ *      ServiceContactSettings 기반 이메일 알림·자동 회신 설정만 공통 Admin 으로 추가.)
+ *     operator 기본 접근 없음.
  *
  * 보안: 수신 이메일은 admin 응답에만 포함(공개 API 미노출). 로그에 이메일 목록/문의 전문 미기록.
  */
@@ -22,7 +25,7 @@ import { requireServiceLegalScope } from '../service-legal/service-legal-scope.j
 import { authenticate } from '../../middleware/auth.middleware.js';
 import logger from '../../utils/logger.js';
 
-const CONTACT_SETTINGS_SERVICE_KEYS = ['glycopharm', 'k-cosmetics'] as const;
+const CONTACT_SETTINGS_SERVICE_KEYS = ['glycopharm', 'k-cosmetics', 'neture', 'kpa-society'] as const;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_RECIPIENTS = 20;
 

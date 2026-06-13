@@ -18,6 +18,7 @@ import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   Users,
+  Settings,
   ChevronRight,
   ChevronDown,
 } from 'lucide-react';
@@ -50,6 +51,14 @@ const ADMIN_SIDEBAR_GROUPS: SidebarGroup[] = [
       //   admin sidebar → /admin/members (완전삭제 워크플로우 전용).
       //   /operator/members 는 운영자 회원관리(승인/반려/정지/복원/탈퇴) 로 잔존.
       { label: '회원 관리', path: '/admin/members' },
+    ],
+  },
+  {
+    // WO-O4O-CONTACT-NETURE-KPA-SETTINGS-ADAPTER-V1: 문의 수신자·자동 회신 설정 (Admin 전용)
+    label: '설정',
+    icon: Settings,
+    items: [
+      { label: '문의 설정', path: '/admin/settings/contact' },
     ],
   },
 ];

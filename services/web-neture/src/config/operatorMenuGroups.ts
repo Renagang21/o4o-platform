@@ -181,6 +181,8 @@ export function getAdminMenu(): Partial<Record<OperatorGroupKey, OperatorMenuIte
       { label: '이메일 설정', path: '/admin/settings/email' },
       // WO-O4O-ADMIN-SERVICE-LEGAL-POLICY-SETTINGS-UI-V1
       { label: '법정정보·약관 설정', path: '/admin/settings/legal-terms' },
+      // WO-O4O-CONTACT-NETURE-KPA-SETTINGS-ADAPTER-V1: 문의 수신자·자동 회신 설정 (Admin 전용)
+      { label: '문의 설정', path: '/admin/settings/contact' },
       // admin 계정이 operator 영역으로 진입하는 단일 게이트 (관리자 sidebar 에는 operator 업무를 직접 두지 않는다)
       { label: '운영자 업무 →', path: '/operator' },
     ],
