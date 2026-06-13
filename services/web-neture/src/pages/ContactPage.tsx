@@ -347,14 +347,8 @@ export default function ContactPage() {
               </div>
             </div>
           </div>
-
-          <div className="mt-8 p-6 bg-white rounded-xl border border-gray-200">
-            <h3 className="text-sm font-semibold text-gray-900 mb-3">회사 정보</h3>
-            <div className="text-sm text-gray-600 space-y-1">
-              <p>㈜쓰리라이프존</p>
-              <p>사업자등록번호: 108-86-02873</p>
-            </div>
-          </div>
+          {/* WO-O4O-PUBLIC-FOOTER-LEGAL-GUARD-V1: 하드코딩 사업자 법정정보(㈜쓰리라이프존/사업자등록번호) 제거.
+              공개 화면 법정정보 표기는 Footer 의 PublicLegalFooterInfo(service_legal_profiles 동적)만 담당. */}
         </div>
       </section>
     </div>
