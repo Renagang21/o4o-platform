@@ -1,0 +1,23 @@
+{
+  "name": "@o4o/lms-ui",
+  "version": "1.0.0",
+  "description": "Shared presentational LMS UI primitives for O4O Platform (KPA / GlycoPharm / K-Cosmetics). Pure UI: no API client, no serviceKey, no route hardcoding. WO-O4O-LMS-COMMON-UI-EXTRACTION-V1.",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "type-check": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "typescript": "5.4.5"
+  }
+}
