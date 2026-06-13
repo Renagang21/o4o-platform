@@ -63,6 +63,9 @@ export async function getCatalog(params?: {
   offset?: number;
 }): Promise<CatalogResponse> {
   const searchParams = new URLSearchParams();
+  // WO-O4O-GLYCOPHARM-SUPPLY-CATALOG-SERVICEKEY-FRONTEND-FIX-V1:
+  //   canonical service_key 명시 — K-Cosmetics getCatalog 패턴과 대칭(backend 기본값 비의존).
+  searchParams.set('service_key', 'glycopharm');
   if (params?.distributionType) searchParams.set('distributionType', params.distributionType);
   if (params?.recommended) searchParams.set('recommended', 'true');
   if (params?.operatorView) searchParams.set('operatorView', 'true');
@@ -80,7 +83,13 @@ export async function getCatalog(params?: {
 export async function applyBySupplyProductId(
   supplyProductId: string,
 ): Promise<{ success: boolean; data: ProductApplication }> {
-  const res = await api.post('/glycopharm/pharmacy/products/apply', { supplyProductId });
+  // WO-O4O-GLYCOPHARM-SUPPLY-CATALOG-SERVICEKEY-FRONTEND-FIX-V1:
+  //   canonical service_key 'glycopharm' 명시 전송 — backend 기본값('kpa-society') 의존 제거.
+  //   K-Cosmetics(service_key:'k-cosmetics')와 대칭. backend 는 body.service_key 사용.
+  const res = await api.post('/glycopharm/pharmacy/products/apply', {
+    supplyProductId,
+    service_key: 'glycopharm',
+  });
   return res.data;
 }
 
