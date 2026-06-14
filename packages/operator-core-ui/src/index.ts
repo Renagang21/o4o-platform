@@ -43,6 +43,16 @@ export type {
 export { CmsContentManager } from './modules/cms-content';
 export type { CmsContentManagerProps } from './modules/cms-content';
 
+// LMS Operator Courses Module (WO-O4O-LMS-OPERATOR-COURSES-MANAGER-EXTRACTION-V1)
+export { OperatorLmsCoursesManager } from './modules/lms-courses';
+export type {
+  OperatorLmsCourse,
+  OperatorLmsCoursesApi,
+  OperatorLmsCoursesListParams,
+  OperatorLmsCoursesConfig,
+  OperatorLmsCoursesManagerProps,
+} from './modules/lms-courses';
+
 // Common EditUserModal (WO-O4O-OPERATOR-EDITUSER-MODAL-PHASE1-NETURE-GP-KCOS-V1)
 export { CommonEditUserModal } from './modules/members';
 export type {
