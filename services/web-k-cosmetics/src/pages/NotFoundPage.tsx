@@ -4,12 +4,13 @@
  */
 
 import { Link } from 'react-router-dom';
+import { SearchX } from 'lucide-react';
 
 export function NotFoundPage() {
   return (
     <div style={styles.container}>
       <div style={styles.content}>
-        <div style={styles.icon}>🔍</div>
+        <div style={styles.icon}><SearchX size={64} color="#cbd5e1" aria-hidden="true" /></div>
         <h1 style={styles.title}>페이지를 찾을 수 없습니다</h1>
         <p style={styles.description}>
           요청하신 페이지가 존재하지 않거나 이동되었습니다.

@@ -9,6 +9,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { AlertCircle, Lock, User, BookOpen, Clock } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { lmsApi, normalizeEnrollment } from '../../api/lms';
 import { useAuth } from '../../contexts/AuthContext';
@@ -122,7 +123,7 @@ export default function LmsCourseDetailPage() {
   if (error || !course) {
     return (
       <div style={{ textAlign: 'center', padding: '80px 20px', color: C.neutral500 }}>
-        <div style={{ fontSize: '48px', marginBottom: '16px' }}>⚠️</div>
+        <div style={{ marginBottom: '16px' }}><AlertCircle size={48} aria-hidden="true" /></div>
         <h2 style={{ fontSize: '18px', color: C.neutral900, marginBottom: '8px' }}>강의를 찾을 수 없습니다</h2>
         <p style={{ marginBottom: '24px' }}>{error || '삭제되었거나 존재하지 않는 강의입니다.'}</p>
         <button onClick={() => navigate('/lms')} style={{ ...S.enrollButton, width: 'auto', padding: '10px 24px' }}>
@@ -148,7 +149,7 @@ export default function LmsCourseDetailPage() {
       {/* 종료 배너 */}
       {isArchived && (
         <div style={S.archivedBanner}>
-          <span style={{ fontSize: '18px' }}>🔒</span>
+          <Lock size={18} aria-hidden="true" style={{ flexShrink: 0 }} />
           <div>
             <strong style={{ fontSize: '15px' }}>이 강의는 종료된 강의입니다.</strong>
             <p style={{ margin: '4px 0 0', fontSize: '13px', opacity: 0.85 }}>
@@ -170,10 +171,10 @@ export default function LmsCourseDetailPage() {
             <h1 style={S.title}>{course.title}</h1>
 
             <div style={S.meta}>
-              {course.instructorName && <><span>👤 {course.instructorName}</span><span>·</span></>}
-              <span>📖 {course.lessonCount}개 레슨</span>
+              {course.instructorName && <><span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><User size={14} aria-hidden="true" />{course.instructorName}</span><span>·</span></>}
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><BookOpen size={14} aria-hidden="true" />{course.lessonCount}개 레슨</span>
               <span>·</span>
-              <span>⏱ {Math.floor((course.duration || 0) / 60)}시간 {(course.duration || 0) % 60}분</span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><Clock size={14} aria-hidden="true" />{Math.floor((course.duration || 0) / 60)}시간 {(course.duration || 0) % 60}분</span>
               {course.enrollmentCount != null && <><span>·</span><span>{course.enrollmentCount}명 수강중</span></>}
             </div>
 

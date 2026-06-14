@@ -105,10 +105,10 @@ function buildAdminPolicies(data: OperatorDashboardConfig): PolicyItem[] {
 // ─── Admin Quick Actions ─────────────────────────────────────
 
 const ADMIN_QUICK_ACTIONS: StructureAction[] = [
-  { id: 'users', label: '회원 관리', link: '/admin/users', icon: '👤', description: '회원 조회·관리' },
-  { id: 'stores', label: '매장 관리', link: '/admin/stores', icon: '🏪', description: '매장 승인·구조 관리' },
-  { id: 'roles', label: '역할 관리', link: '/admin/roles', icon: '🛡️', description: '역할·권한 구조 관리' },
-  { id: 'settings', label: '설정', link: '/admin/settings', icon: '⚙️', description: '서비스 정책·설정' },
+  { id: 'users', label: '회원 관리', link: '/admin/users', icon: 'users', description: '회원 조회·관리' },
+  { id: 'stores', label: '매장 관리', link: '/admin/stores', icon: 'store', description: '매장 승인·구조 관리' },
+  { id: 'roles', label: '역할 관리', link: '/admin/roles', icon: 'shield', description: '역할·권한 구조 관리' },
+  { id: 'settings', label: '설정', link: '/admin/settings', icon: 'settings', description: '서비스 정책·설정' },
 ];
 
 // ─── Admin Block 정의 ─────────────────────────────────────────

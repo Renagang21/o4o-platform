@@ -11,6 +11,7 @@
  */
 
 import { useNavigate } from 'react-router-dom';
+import { Clock, FileText, Ban } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import {
   SERVICE_KEY,
@@ -68,12 +69,12 @@ function MembershipStatusScreen({ status, serviceKey }: { status: Exclude<Member
   const info = STATUS_MESSAGES[status];
   const applyPath = APPLY_PATH[serviceKey] ?? null;
   const canApply = status === 'none';
-  const icon = status === 'pending' ? '⏳' : status === 'none' ? '📝' : '🚫';
+  const StatusIcon = status === 'pending' ? Clock : status === 'none' ? FileText : Ban;
 
   return (
     <div className="min-h-[60vh] flex items-center justify-center p-5">
       <div className="bg-white rounded-2xl p-10 text-center max-w-md w-full shadow-sm border border-slate-200">
-        <div className="text-5xl mb-4">{icon}</div>
+        <StatusIcon className="w-12 h-12 mx-auto mb-4 text-slate-400" aria-hidden="true" />
         <h2 className="text-lg font-semibold text-slate-900 mb-2.5">{info.title}</h2>
         <p className="text-sm text-slate-600 leading-relaxed mb-6">{info.message}</p>
         <div className="flex justify-center gap-2 flex-wrap">

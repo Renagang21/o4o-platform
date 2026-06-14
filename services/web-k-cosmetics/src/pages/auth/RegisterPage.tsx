@@ -5,23 +5,24 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Sparkles, Eye, EyeOff, ShoppingBag, Store, type LucideIcon } from 'lucide-react';
 import { BusinessRegistrationFields } from '@o4o/account-ui';
 import { api } from '../../lib/apiClient';
 
 type UserRole = 'consumer' | 'seller';
 
-const roleOptions: Array<{ role: UserRole; label: string; description: string; emoji: string }> = [
+const roleOptions: Array<{ role: UserRole; label: string; description: string; Icon: LucideIcon }> = [
   {
     role: 'consumer',
     label: '소비자',
     description: 'K-뷰티 제품을 구매하는 고객입니다',
-    emoji: '🛍️',
+    Icon: ShoppingBag,
   },
   {
     role: 'seller',
     label: '판매자',
     description: 'K-뷰티 제품을 판매하는 사업자입니다',
-    emoji: '🏪',
+    Icon: Store,
   },
 ];
 
@@ -156,7 +157,7 @@ export default function RegisterPage() {
     return (
       <div style={styles.container}>
         <div style={styles.card}>
-          <div style={styles.logo}>💄</div>
+          <div style={styles.logo}><Sparkles size={48} color="#e91e63" aria-hidden="true" /></div>
           <h1 style={styles.title}>가입 신청 완료</h1>
           <p style={{ fontSize: '14px', color: '#475569', lineHeight: '1.6', margin: '16px 0 24px' }}>
             운영자 확인 후 서비스 이용이 가능합니다.<br />
@@ -173,7 +174,7 @@ export default function RegisterPage() {
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <div style={styles.logo}>💄</div>
+        <div style={styles.logo}><Sparkles size={48} color="#e91e63" aria-hidden="true" /></div>
         <h1 style={styles.title}>회원가입</h1>
         <p style={styles.subtitle}>K-Cosmetics와 함께 시작하세요</p>
 
@@ -201,7 +202,7 @@ export default function RegisterPage() {
                   onClick={() => handleRoleSelect(option.role)}
                   style={styles.roleButton}
                 >
-                  <span style={styles.roleEmoji}>{option.emoji}</span>
+                  <option.Icon size={32} color="#e91e63" style={styles.roleEmoji} aria-hidden="true" />
                   <h3 style={styles.roleLabel}>{option.label}</h3>
                   <p style={styles.roleDesc}>{option.description}</p>
                 </button>
@@ -226,9 +227,10 @@ export default function RegisterPage() {
             </button>
 
             <div style={styles.selectedRole}>
-              <span style={styles.roleEmoji}>
-                {roleOptions.find(r => r.role === selectedRole)?.emoji}
-              </span>
+              {(() => {
+                const Icon = roleOptions.find(r => r.role === selectedRole)?.Icon;
+                return Icon ? <Icon size={18} color="#880e4f" aria-hidden="true" /> : null;
+              })()}
               <span>{roleOptions.find(r => r.role === selectedRole)?.label}로 가입합니다</span>
             </div>
 
@@ -264,8 +266,13 @@ export default function RegisterPage() {
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     style={styles.eyeButton}
+                    aria-label={showPassword ? '비밀번호 숨기기' : '비밀번호 보기'}
                   >
-                    {showPassword ? '🙈' : '👁️'}
+                    {showPassword ? (
+                      <EyeOff size={18} color="#94a3b8" aria-hidden="true" />
+                    ) : (
+                      <Eye size={18} color="#94a3b8" aria-hidden="true" />
+                    )}
                   </button>
                 </div>
                 {formData.password && (

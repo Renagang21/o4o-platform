@@ -13,7 +13,7 @@
 
 import { useNavigate } from 'react-router-dom';
 import { useCallback } from 'react';
-import { LayoutDashboard, UserCircle, Settings, GraduationCap, Shield } from 'lucide-react';
+import { LayoutDashboard, UserCircle, Settings, GraduationCap, Shield, Sparkles } from 'lucide-react';
 import { GlobalHeader, GlobalHeaderMenuItem } from '@o4o/ui';
 import { NotificationBell, useNotifications } from '@o4o/account-ui';
 import type { NotificationItem } from '@o4o/account-ui';
@@ -117,7 +117,7 @@ export function KCosGlobalHeader() {
   return (
     <GlobalHeader
       brand={{
-        icon: '💄',
+        icon: <Sparkles className="w-5 h-5 text-white" aria-hidden="true" />,
         name: 'K-Cosmetics',
         subtitle: 'K-Beauty 전문 플랫폼',
         primaryColor: '#db2777',

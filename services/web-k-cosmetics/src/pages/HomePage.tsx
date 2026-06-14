@@ -16,7 +16,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Loader2, BookOpen } from 'lucide-react';
+import { Loader2, BookOpen, FlaskConical } from 'lucide-react';
 import { PageHero, Card, useTemplate } from '@o4o/ui';
 import {
   HeroBannerSection,
@@ -192,7 +192,7 @@ export function HomePage() {
           {/* WO-O4O-HOME-TEMP-EXPERIENCE-ACCOUNT-NOTICE-V1: 임시 공용 체험 계정 안내 (추후 제거 예정) */}
           <div style={{ background: '#ffffff', border: '1px solid #a7f3d0', borderRadius: 12, padding: '12px 16px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', justifyContent: 'space-between' }}>
             <div style={{ minWidth: 0 }}>
-              <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#065f46' }}>🧪 체험용 계정 제공</p>
+              <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#065f46', display: 'flex', alignItems: 'center', gap: 6 }}><FlaskConical size={15} aria-hidden="true" />체험용 계정 제공</p>
               <p style={{ margin: '2px 0 0', fontSize: 12.5, color: '#047857', lineHeight: 1.5 }}>
                 주요 기능을 확인할 수 있는 공용 계정입니다. 입력한 데이터는 예고 없이 초기화될 수 있습니다.
               </p>

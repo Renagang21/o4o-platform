@@ -14,10 +14,11 @@
  */
 
 import { Link } from 'react-router-dom';
+import { Package, Handshake, Globe, type LucideIcon } from 'lucide-react';
 
 interface RoleCard {
   id: string;
-  icon: string;
+  Icon: LucideIcon;
   title: string;
   description: string;
 }
@@ -25,19 +26,19 @@ interface RoleCard {
 const ROLE_CARDS: RoleCard[] = [
   {
     id: 'supplier',
-    icon: '📦',
+    Icon: Package,
     title: '공급자',
     description: '상품을 공급하고 K-Cosmetics 유통망에 참여합니다. 공급 등록 및 관리는 네뚜레에서 진행됩니다.',
   },
   {
     id: 'partner',
-    icon: '🤝',
+    Icon: Handshake,
     title: '파트너',
     description: '판매 및 유통 파트너로 참여합니다. 파트너 등록 및 정산은 네뚜레에서 통합 관리됩니다.',
   },
   {
     id: 'collaborator',
-    icon: '🌐',
+    Icon: Globe,
     title: '협력사',
     description: '마케팅, 물류, 기술 등 다양한 형태로 협력합니다. 협력 제안은 네뚜레를 통해 접수됩니다.',
   },
@@ -66,7 +67,7 @@ export function PartnerInfoPage() {
       <section style={styles.cardsSection}>
         {ROLE_CARDS.map((card) => (
           <div key={card.id} style={styles.card}>
-            <div style={styles.cardIcon}>{card.icon}</div>
+            <div style={styles.cardIcon}><card.Icon size={48} color="#e91e63" aria-hidden="true" /></div>
             <h2 style={styles.cardTitle}>{card.title}</h2>
             <p style={styles.cardDescription}>{card.description}</p>
           </div>

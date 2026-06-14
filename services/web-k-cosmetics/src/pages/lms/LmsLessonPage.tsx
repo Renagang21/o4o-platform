@@ -9,6 +9,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { FileText, Video, HelpCircle, PencilLine, AlertCircle, Film, type LucideIcon } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { ContentRenderer } from '@o4o/content-editor';
 import { lmsApi, normalizeEnrollment } from '../../api/lms';
@@ -36,11 +37,11 @@ const LESSON_TYPE_LABEL: Record<string, string> = {
   quiz: '퀴즈',
   assignment: '과제',
 };
-const LESSON_TYPE_ICON: Record<string, string> = {
-  article: '📄',
-  video: '🎬',
-  quiz: '❓',
-  assignment: '📝',
+const LESSON_TYPE_ICON: Record<string, LucideIcon> = {
+  article: FileText,
+  video: Video,
+  quiz: HelpCircle,
+  assignment: PencilLine,
 };
 
 // ─── Page Component ──────────────────────────────────────────────────────────
@@ -349,7 +350,7 @@ export default function LmsLessonPage() {
   if (error || !course || !currentLesson) {
     return (
       <div style={{ textAlign: 'center', padding: '80px 20px', color: C.neutral500 }}>
-        <div style={{ fontSize: '48px', marginBottom: '16px' }}>⚠️</div>
+        <div style={{ marginBottom: '16px' }}><AlertCircle size={48} aria-hidden="true" /></div>
         <h2 style={{ fontSize: '18px', color: C.neutral900, marginBottom: '8px' }}>레슨을 찾을 수 없습니다</h2>
         <p style={{ marginBottom: '24px' }}>{error || '삭제되었거나 존재하지 않는 레슨입니다.'}</p>
         <button
@@ -449,8 +450,9 @@ export default function LmsLessonPage() {
         <div style={S.lessonHeader}>
           <div style={S.headerMeta}>
             <span style={S.lessonOrder}>{currentIndex + 1} / {lessons.length}</span>
-            <span style={S.typeBadge}>
-              {LESSON_TYPE_ICON[currentLesson.type as string] || '📄'} {LESSON_TYPE_LABEL[currentLesson.type as string] || currentLesson.type}
+            <span style={{ ...S.typeBadge, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              {(() => { const TypeIcon = LESSON_TYPE_ICON[currentLesson.type as string] || FileText; return <TypeIcon size={13} aria-hidden="true" />; })()}
+              {LESSON_TYPE_LABEL[currentLesson.type as string] || currentLesson.type}
             </span>
             {isCompleted && <span style={S.statusBadgeCompleted}>✓ 완료</span>}
           </div>
@@ -617,7 +619,7 @@ export default function LmsLessonPage() {
                 <video style={S.video} src={currentLesson.videoUrl} controls autoPlay />
               ) : (
                 <div style={S.videoPlaceholder}>
-                  <span>🎬</span>
+                  <Film size={48} aria-hidden="true" />
                   <p>동영상이 준비 중입니다</p>
                 </div>
               )}

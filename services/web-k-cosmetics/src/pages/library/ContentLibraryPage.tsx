@@ -10,6 +10,7 @@
 
 import { useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { FileText } from 'lucide-react';
 import {
   ContentHubTemplate,
   type ContentHubConfig,
@@ -69,7 +70,7 @@ function CardGrid({ items, ctx }: { items: ContentHubItem[]; ctx: ContentHubItem
               </div>
             ) : (
               <div className="w-full h-[140px] bg-slate-50 flex items-center justify-center">
-                <span className="text-[32px] text-slate-200">📄</span>
+                <FileText className="w-8 h-8 text-slate-200" aria-hidden="true" />
               </div>
             )}
             <div className="px-3.5 pt-2.5 pb-3">

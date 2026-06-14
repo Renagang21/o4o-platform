@@ -6,6 +6,7 @@
 
 import { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { Sparkles } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, Button } from '@o4o/ui';
 
@@ -54,7 +55,9 @@ export default function LoginPage() {
   return (
     <div className="min-h-[80vh] flex items-center justify-center py-12 px-6">
       <Card className="w-full max-w-[400px] p-12 text-center">
-        <div className="text-5xl mb-4">💄</div>
+        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-pink-500 to-pink-600 flex items-center justify-center mx-auto mb-4">
+          <Sparkles className="w-7 h-7 text-white" aria-hidden="true" />
+        </div>
         <h1 className="text-2xl font-bold text-slate-800 mb-2 mt-0">로그인</h1>
         <p className="text-sm text-slate-500 mb-8 mt-0">K-Cosmetics에 오신 것을 환영합니다</p>
 

@@ -18,6 +18,7 @@
 
 import { useState, useEffect, FormEvent } from 'react';
 import { Link } from 'react-router-dom';
+import { Sparkles, X, AlertCircle, Mail, Lock, Eye, EyeOff, Store } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLoginModal } from '@/contexts/LoginModalContext';
 
@@ -92,14 +93,16 @@ export default function LoginModal() {
         {/* Header */}
         <div style={styles.header}>
           <div style={styles.headerContent}>
-            <div style={styles.logoIcon}>💄</div>
+            <div style={styles.logoIcon}>
+              <Sparkles size={20} color="#fff" aria-hidden="true" />
+            </div>
             <div>
               <h2 style={styles.title}>로그인</h2>
               <p style={styles.subtitle}>K-Cosmetics</p>
             </div>
           </div>
           <button onClick={handleClose} style={styles.closeButton} aria-label="닫기">
-            ✕
+            <X size={18} color="#64748b" aria-hidden="true" />
           </button>
         </div>
 
@@ -107,7 +110,7 @@ export default function LoginModal() {
         <form onSubmit={handleSubmit} style={styles.form}>
           {error && (
             <div style={styles.error}>
-              <span style={{ marginRight: '8px' }}>⚠️</span>
+              <AlertCircle size={16} style={{ marginRight: '8px', flexShrink: 0 }} aria-hidden="true" />
               {error}
             </div>
           )}
@@ -115,7 +118,7 @@ export default function LoginModal() {
           <div style={styles.formGroup}>
             <label style={styles.label}>이메일</label>
             <div style={styles.inputWrapper}>
-              <span style={styles.inputIcon}>📧</span>
+              <Mail size={18} style={styles.inputIcon} aria-hidden="true" />
               <input
                 type="email"
                 value={email}
@@ -132,7 +135,7 @@ export default function LoginModal() {
           <div style={styles.formGroup}>
             <label style={styles.label}>비밀번호</label>
             <div style={styles.inputWrapper}>
-              <span style={styles.inputIcon}>🔒</span>
+              <Lock size={18} style={styles.inputIcon} aria-hidden="true" />
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={password}
@@ -146,8 +149,13 @@ export default function LoginModal() {
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 style={styles.togglePassword}
+                aria-label={showPassword ? '비밀번호 숨기기' : '비밀번호 보기'}
               >
-                {showPassword ? '🙈' : '👁️'}
+                {showPassword ? (
+                  <EyeOff size={18} color="#94a3b8" aria-hidden="true" />
+                ) : (
+                  <Eye size={18} color="#94a3b8" aria-hidden="true" />
+                )}
               </button>
             </div>
           </div>
@@ -189,9 +197,10 @@ export default function LoginModal() {
         <button
           type="button"
           onClick={() => { setEmail('renagang21@gmail.com'); setPassword('3Lz157727791!'); setError(''); }}
-          style={{ width: '100%', marginTop: 12, padding: '10px', fontSize: 13, fontWeight: 600, color: '#047857', background: '#ecfdf5', border: '1px solid #a7f3d0', borderRadius: 10, cursor: 'pointer' }}
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, width: '100%', marginTop: 12, padding: '10px', fontSize: 13, fontWeight: 600, color: '#047857', background: '#ecfdf5', border: '1px solid #a7f3d0', borderRadius: 10, cursor: 'pointer' }}
         >
-          🧪 체험용 매장 경영자 계정
+          <Store size={16} aria-hidden="true" />
+          체험용 매장 경영자 계정
         </button>
 
         {/* Footer Links */}
@@ -317,7 +326,9 @@ const styles: Record<string, React.CSSProperties> = {
   inputIcon: {
     position: 'absolute',
     left: '12px',
-    fontSize: '16px',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    color: '#94a3b8',
   },
   input: {
     width: '100%',
@@ -331,10 +342,13 @@ const styles: Record<string, React.CSSProperties> = {
   togglePassword: {
     position: 'absolute',
     right: '12px',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    display: 'flex',
+    alignItems: 'center',
     background: 'none',
     border: 'none',
     cursor: 'pointer',
-    fontSize: '16px',
     padding: '4px',
   },
   submitButton: {

@@ -8,7 +8,7 @@
  */
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Loader2, ShoppingCart, Trash2 } from 'lucide-react';
+import { Loader2, ShoppingCart, Trash2, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { storeCartApi, type SupplierGroup, type CheckoutConfirmResult } from '@/api/storeCart';
 import { CART_SERVICE_KEY } from '@/utils/eventOfferCart';
@@ -114,7 +114,7 @@ export function StoreCartPage() {
         <div className="bg-white rounded-xl border border-slate-100 p-5 space-y-3">
           {result.createdOrders.length > 0 && (
             <div>
-              <p className="text-sm font-bold text-green-700 mb-2">✅ 생성된 주문 (공급자별)</p>
+              <p className="text-sm font-bold text-green-700 mb-2 flex items-center gap-1.5"><CheckCircle2 size={16} aria-hidden="true" />생성된 주문 (공급자별)</p>
               {result.createdOrders.map((o) => (
                 <div
                   key={o.orderId}
@@ -131,7 +131,7 @@ export function StoreCartPage() {
           )}
           {result.failedItems.length > 0 && (
             <div>
-              <p className="text-sm font-bold text-red-700 mb-1">⚠️ 주문하지 못한 항목</p>
+              <p className="text-sm font-bold text-red-700 mb-1 flex items-center gap-1.5"><AlertTriangle size={16} aria-hidden="true" />주문하지 못한 항목</p>
               {result.failedItems.map((f) => (
                 <p key={f.itemId} className="text-sm text-red-600">· {f.message}</p>
               ))}

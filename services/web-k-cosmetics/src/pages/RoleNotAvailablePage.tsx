@@ -4,30 +4,31 @@
  */
 
 import { Link } from 'react-router-dom';
+import { Package, Handshake, Wrench, ShoppingCart, Info, type LucideIcon } from 'lucide-react';
 
 interface RoleNotAvailablePageProps {
   role: 'supplier' | 'partner' | 'admin' | 'seller';
 }
 
-const ROLE_INFO = {
+const ROLE_INFO: Record<RoleNotAvailablePageProps['role'], { label: string; Icon: LucideIcon; description: string }> = {
   supplier: {
     label: '공급자',
-    icon: '📦',
+    Icon: Package,
     description: '상품 공급 및 재고 관리',
   },
   partner: {
     label: '파트너',
-    icon: '🤝',
+    Icon: Handshake,
     description: '파트너십 및 연계 서비스 관리',
   },
   admin: {
     label: '관리자',
-    icon: '🔧',
+    Icon: Wrench,
     description: '플랫폼 운영 및 관리',
   },
   seller: {
     label: '판매자',
-    icon: '🛒',
+    Icon: ShoppingCart,
     description: '상품 판매 및 매장 관리',
   },
 };
@@ -38,12 +39,12 @@ export function RoleNotAvailablePage({ role }: RoleNotAvailablePageProps) {
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <div style={styles.icon}>{info.icon}</div>
+        <div style={styles.icon}><info.Icon size={64} color={PRIMARY_COLOR} aria-hidden="true" /></div>
         <h1 style={styles.title}>{info.label} 대시보드</h1>
         <p style={styles.description}>{info.description}</p>
 
         <div style={styles.notice}>
-          <div style={styles.noticeIcon}>ℹ️</div>
+          <div style={styles.noticeIcon}><Info size={20} color={PRIMARY_COLOR} aria-hidden="true" /></div>
           <div>
             <p style={styles.noticeTitle}>안내</p>
             <p style={styles.noticeText}>

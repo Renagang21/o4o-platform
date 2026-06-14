@@ -4,6 +4,7 @@
  */
 
 import { Link } from 'react-router-dom';
+import { Sparkles, Mail } from 'lucide-react';
 import { PublicLegalFooterInfo } from '@o4o/shared-space-ui';
 // WO-O4O-CROSSSERVICE-DYNAMIC-LEGAL-FOOTER-V1
 import { loadFooterLegal } from '@/lib/footerLegal';
@@ -17,7 +18,7 @@ export default function Footer() {
           {/* Brand */}
           <div style={styles.brand}>
             <Link to="/" style={styles.logoLink}>
-              <div style={styles.logoIcon}>💄</div>
+              <div style={styles.logoIcon}><Sparkles size={20} color="#fff" aria-hidden="true" /></div>
               <span style={styles.logoText}>K-Cosmetics</span>
             </Link>
             <p style={styles.description}>
@@ -25,7 +26,8 @@ export default function Footer() {
               검증된 화장품 매장과 브랜드를 연결합니다.
             </p>
             <a href="mailto:support@k-cosmetics.site" style={styles.email}>
-              📧 support@k-cosmetics.site
+              <Mail size={14} aria-hidden="true" />
+              support@k-cosmetics.site
             </a>
           </div>
 
