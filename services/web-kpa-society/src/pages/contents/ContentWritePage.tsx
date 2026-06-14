@@ -1,32 +1,23 @@
 /**
- * ContentWritePage — 콘텐츠 생성/수정
+ * ContentWritePage — 콘텐츠 생성/수정 (KPA wrapper)
  *
  * WO-KPA-CONTENT-HUB-FOUNDATION-V1
+ * WO-O4O-CONTENT-STANDARD-MODULE-EXTRACT-V1:
+ *   form UI 를 공통 `CommunityContentWriteShell`(@o4o/shared-space-ui)로 위임.
+ *   본 wrapper 는 KPA 고유 책임만 유지: contentApi 저장·라우팅·소유권·인증·GuideBlock.
  *
- * - /content/new → 생성 모드
+ * - /content/documents/new → 생성 모드
  * - /content/:id/edit → 수정 모드
- * - RichTextEditor 본문 편집
- * - 제작 흐름: 생성 → 수정 → 공개 (LMS 패턴)
  */
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { RichTextEditor, AiContentModal } from '@o4o/content-editor';
+import { CommunityContentWriteShell, GuideBlock } from '@o4o/shared-space-ui';
+import type { CommunityContentWriteValues } from '@o4o/shared-space-ui';
 import { contentApi } from '../../api/content';
 import { useAuth, getAccessToken } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
-// WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1
-import { GuideBlock } from '@o4o/shared-space-ui';
 import { fetchGuidePageContent } from '../../api/guideContent';
-
-// WO-O4O-CONTENT-AI-ENTRY-V1: HTML 첫 heading 추출 (AI title fallback)
-function extractTitleFromHtml(html: string): string {
-  const match = html.match(/<h[1-3][^>]*>([\s\S]*?)<\/h[1-3]>/i);
-  if (!match) return '';
-  return match[1].replace(/<[^>]+>/g, '').trim();
-}
-
-// ─── Component ───────────────────────────────────────────────────────────────
 
 export function ContentWritePage() {
   const { id } = useParams<{ id: string }>();
@@ -34,24 +25,14 @@ export function ContentWritePage() {
   const { user, isAuthenticated } = useAuth();
   const isEditMode = Boolean(id);
 
-  const [title, setTitle] = useState('');
-  const [body, setBody] = useState('');
-  const [summary, setSummary] = useState('');
-  // WO-O4O-CONTENT-DOCUMENT-TAG-INPUT-CHIP-FIX-V1: chip 기반 입력. tags=확정된 태그, tagInput=현재 입력 중 텍스트
-  const [tags, setTags] = useState<string[]>([]);
-  const [tagInput, setTagInput] = useState('');
-  const [saving, setSaving] = useState(false);
-  const [loading, setLoading] = useState(false);
-  // WO-O4O-CMS-CONTENT-REUSABLE-POLICY-ALIGN-V1:
-  //   매장이 자기 자료함에 가져갈 수 있는지 제작자가 결정. default 'platform' (가져가기 허용).
-  const [reusablePolicy, setReusablePolicy] = useState<'platform' | 'restricted'>('platform');
-  // WO-O4O-CONTENT-AI-ENTRY-V1: AI로 만들기 모달
-  const [aiOpen, setAiOpen] = useState(false);
+  const [initialValues, setInitialValues] = useState<Partial<CommunityContentWriteValues> | undefined>(undefined);
+  // 수정 모드는 detail 로드 완료 후 shell 을 mount(=초기값 1회 적용) — 로드 전 빈 폼 mount 방지
+  const [loading, setLoading] = useState(isEditMode);
 
-  // WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1: content.document.editor guide
+  // WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1: content.document.editor guide (KPA 고유)
   const [guideTitle, setGuideTitle] = useState('콘텐츠를 작성합니다.');
   const [guideDesc, setGuideDesc] = useState('제목과 본문을 입력한 뒤 초안 저장 또는 공개 저장을 선택하세요.');
-  const [guideSteps, setGuideSteps] = useState([
+  const [guideSteps, setGuideSteps] = useState<string[]>([
     '콘텐츠 제목을 입력합니다',
     '본문을 작성합니다 (리치 텍스트 편집)',
     '요약(선택)과 태그(필수, 최소 1개)를 입력합니다',
@@ -81,21 +62,18 @@ export function ContentWritePage() {
       .then((res) => {
         if (res.success) {
           const c = res.data;
-          // Check ownership
           if (c.created_by !== user?.id) {
             toast.error('수정 권한이 없습니다');
             navigate('/content', { replace: true });
             return;
           }
-          setTitle(c.title);
-          setBody(c.body || '');
-          setSummary(c.summary || '');
-          setTags(c.tags || []);
-          setTagInput('');
-          // WO-O4O-CMS-CONTENT-REUSABLE-POLICY-ALIGN-V1
-          if (c.reusable_policy === 'restricted' || c.reusable_policy === 'platform') {
-            setReusablePolicy(c.reusable_policy);
-          }
+          setInitialValues({
+            title: c.title,
+            body: c.body || '',
+            summary: c.summary || '',
+            tags: c.tags || [],
+            reusablePolicy: c.reusable_policy === 'restricted' ? 'restricted' : 'platform',
+          });
         }
       })
       .catch((e) => {
@@ -113,64 +91,35 @@ export function ContentWritePage() {
     }
   }, [isAuthenticated, navigate]);
 
-  // WO-O4O-CONTENT-AI-ENTRY-V1: AI 결과를 form state 로 주입
-  // - LessonModal 의 onInsert 패턴 재사용 (사용자가 비워둔 필드만 자동 채움)
-  // - 본문은 항상 덮어씀 — 사용자가 이후 RichTextEditor 에서 편집 가능
-  const handleAiInsert = ({ html, title: aiTitle }: { html: string; title: string; sourceUrl?: string }) => {
-    const finalTitle = (aiTitle || '').trim() || extractTitleFromHtml(html);
-    if (finalTitle && !title.trim()) {
-      setTitle(finalTitle);
-    }
-    setBody(html);
-  };
+  const aiRequestHeaders = (() => {
+    const token = getAccessToken();
+    return token ? { Authorization: `Bearer ${token}` } : undefined;
+  })();
 
-  const handleSave = async (saveStatus: 'draft' | 'published') => {
-    if (!title.trim()) {
-      toast.error('제목을 입력해주세요');
-      return;
-    }
+  const handleSubmit = async (values: CommunityContentWriteValues, status: 'draft' | 'published') => {
+    const payload = {
+      title: values.title,
+      body: values.body || undefined,
+      summary: values.summary || undefined,
+      content_type: 'information' as const, // WO-KPA-CONTENT-WRITE-SIMPLIFY-V2: 분류 UI 제거, 기본값 고정
+      sub_type: 'content', // WO-KPA-CONTENT-RESOURCE-SUBTYPE-SEPARATION-V1: 콘텐츠 허브 항목 고정
+      tags: values.tags,
+      status,
+      reusable_policy: values.reusablePolicy, // WO-O4O-CMS-CONTENT-REUSABLE-POLICY-ALIGN-V1
+    };
 
-    // WO-O4O-CONTENT-FORM-TAG-LABEL-VALIDATION-ALIGN-V1:
-    //   백엔드 O4O Tag Policy V1 (kpa.routes.ts: 최소 1개 필수)을 라벨/검증 양쪽에서 반영.
-    //   확정 칩 + 미확정 input 텍스트를 합쳐 검증.
-    const pendingFromInput = tagInput.split(',').map((t) => t.trim()).filter(Boolean);
-    const tagArr = Array.from(new Set([...tags, ...pendingFromInput]));
-    if (tagArr.length === 0) {
-      toast.error('태그를 1개 이상 입력해주세요');
-      return;
-    }
-
-    setSaving(true);
-    try {
-      const payload = {
-        title: title.trim(),
-        body: body || undefined,
-        summary: summary || undefined,
-        content_type: 'information' as const, // WO-KPA-CONTENT-WRITE-SIMPLIFY-V2: 분류 UI 제거, 기본값 고정
-        sub_type: 'content', // WO-KPA-CONTENT-RESOURCE-SUBTYPE-SEPARATION-V1: 콘텐츠 허브 항목 고정
-        tags: tagArr,
-        status: saveStatus,
-        // WO-O4O-CMS-CONTENT-REUSABLE-POLICY-ALIGN-V1
-        reusable_policy: reusablePolicy,
-      };
-
-      if (isEditMode && id) {
-        const res = await contentApi.update(id, payload);
-        if (res.success) {
-          toast.success('수정되었습니다');
-          navigate(`/content/${id}`);
-        }
-      } else {
-        const res = await contentApi.create(payload);
-        if (res.success) {
-          toast.success('등록되었습니다');
-          navigate(`/content/${res.data.id}`);
-        }
+    if (isEditMode && id) {
+      const res = await contentApi.update(id, payload);
+      if (res.success) {
+        toast.success('수정되었습니다');
+        navigate(`/content/${id}`);
       }
-    } catch (e: any) {
-      toast.error(e?.message || '저장에 실패했습니다');
-    } finally {
-      setSaving(false);
+    } else {
+      const res = await contentApi.create(payload);
+      if (res.success) {
+        toast.success('등록되었습니다');
+        navigate(`/content/${res.data.id}`);
+      }
     }
   };
 
@@ -184,396 +133,26 @@ export function ContentWritePage() {
 
   return (
     <div style={styles.page}>
-      <h1 style={styles.pageTitle}>
-        {isEditMode ? '콘텐츠 수정' : '콘텐츠 작성'}
-      </h1>
+      <h1 style={styles.pageTitle}>{isEditMode ? '콘텐츠 수정' : '콘텐츠 작성'}</h1>
 
-      {/* WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1: content.document.editor */}
-      <GuideBlock
-        variant="info"
-        title={guideTitle}
-        description={guideDesc}
-        steps={guideSteps}
-      />
-
-      <div style={styles.card}>
-        {/* Title */}
-        <div style={styles.field}>
-          <label style={styles.label}>제목 <span style={styles.required}>*</span></label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="콘텐츠 제목을 입력하세요"
-            style={styles.input}
-          />
-        </div>
-
-        {/* WO-O4O-CONTENT-AI-ENTRY-V1: AI 보조 배너 — 페이지 상단 진입 */}
-        <div style={styles.aiBanner}>
-          <div style={styles.aiBannerText}>
-            <div style={styles.aiBannerTitle}>✨ AI 보조</div>
-            <div style={styles.aiBannerDesc}>
-              유튜브 URL 또는 콘텐츠 URL로 제목과 본문을 한 번에 생성합니다.
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={() => setAiOpen(true)}
-            style={styles.aiBannerBtn}
-          >
-            AI로 만들기
-          </button>
-        </div>
-
-        {/* Body — RichTextEditor */}
-        <div style={styles.field}>
-          <label style={styles.label}>본문</label>
-          <RichTextEditor
-            value={body}
-            onChange={(content) => setBody(content.html)}
-            placeholder="내용을 입력하세요"
-            minHeight="300px"
-            aiRequestHeaders={(() => {
-              const token = getAccessToken();
-              return token ? { Authorization: `Bearer ${token}` } : undefined;
-            })()}
-            showCommunitySave={true}
-            showStoreSave={true}
-          />
-        </div>
-
-        {/* Summary */}
-        <div style={styles.field}>
-          <label style={styles.label}>요약 <span style={styles.hint}>(선택)</span></label>
-          <textarea
-            value={summary}
-            onChange={(e) => setSummary(e.target.value)}
-            placeholder="콘텐츠 요약을 입력하세요 (목록에서 미리보기로 표시됩니다)"
-            rows={3}
-            style={styles.textarea}
-          />
-        </div>
-
-        {/* Tags — WO-O4O-CONTENT-DOCUMENT-TAG-INPUT-CHIP-FIX-V1: Enter/쉼표 확정, Backspace 마지막 칩 삭제 */}
-        <div style={styles.field}>
-          <label style={styles.label}>태그 <span style={styles.required}>*</span> <span style={styles.hint}>(Enter 또는 쉼표로 추가, 최소 1개)</span></label>
-          <div style={styles.tagInputWrap}>
-            {tags.map((tag) => (
-              <span key={tag} style={styles.tagChip}>
-                {tag}
-                <button
-                  type="button"
-                  onClick={() => setTags((prev) => prev.filter((t) => t !== tag))}
-                  style={styles.tagChipRemove}
-                  aria-label={`${tag} 삭제`}
-                >
-                  ×
-                </button>
-              </span>
-            ))}
-            <input
-              type="text"
-              value={tagInput}
-              onChange={(e) => {
-                const v = e.target.value;
-                if (v.includes(',')) {
-                  const parts = v.split(',');
-                  const last = parts.pop() || '';
-                  setTags((prev) => {
-                    const next = [...prev];
-                    parts.forEach((p) => {
-                      const t = p.trim();
-                      if (t && !next.includes(t)) next.push(t);
-                    });
-                    return next;
-                  });
-                  setTagInput(last);
-                } else {
-                  setTagInput(v);
-                }
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ',') {
-                  e.preventDefault();
-                  const t = tagInput.trim();
-                  if (!t) return;
-                  setTags((prev) => (prev.includes(t) ? prev : [...prev, t]));
-                  setTagInput('');
-                } else if (e.key === 'Backspace' && tagInput === '' && tags.length > 0) {
-                  e.preventDefault();
-                  setTags((prev) => prev.slice(0, -1));
-                }
-              }}
-              placeholder={tags.length === 0 ? '예: 약국경영, 복약지도, 건강관리' : ''}
-              style={styles.tagInput}
-            />
-          </div>
-        </div>
-
-        {/* Reusable Policy (WO-O4O-CMS-CONTENT-REUSABLE-POLICY-ALIGN-V1) */}
-        <div style={styles.field}>
-          <label style={styles.label}>매장 가져가기 허용</label>
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '14px' }}>
-              <input
-                type="radio"
-                name="reusable_policy"
-                value="platform"
-                checked={reusablePolicy === 'platform'}
-                onChange={() => setReusablePolicy('platform')}
-              />
-              매장에서 내 자료함으로 가져가기 허용
-            </label>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '14px' }}>
-              <input
-                type="radio"
-                name="reusable_policy"
-                value="restricted"
-                checked={reusablePolicy === 'restricted'}
-                onChange={() => setReusablePolicy('restricted')}
-              />
-              가져가기 불가
-            </label>
-          </div>
-          <span style={{ ...styles.hint, marginTop: '4px', display: 'block' }}>
-            가져가기 불가로 설정해도 커뮤니티에서 일반 열람은 그대로 가능합니다.
-          </span>
-        </div>
-
-        {/* Action Buttons */}
-        <div style={styles.actions}>
-          <button
-            onClick={() => navigate(-1)}
-            style={styles.cancelBtn}
-            disabled={saving}
-          >
-            취소
-          </button>
-          <button
-            onClick={() => handleSave('draft')}
-            disabled={saving}
-            style={styles.draftBtn}
-          >
-            {saving ? '저장 중...' : '임시 저장'}
-          </button>
-          <button
-            onClick={() => handleSave('published')}
-            disabled={saving}
-            style={styles.publishBtn}
-          >
-            {saving ? '저장 중...' : '공개'}
-          </button>
-        </div>
-      </div>
-
-      {/* WO-O4O-CONTENT-AI-ENTRY-V1: AI 콘텐츠 생성 모달
-          - editor=null + onInsert 패턴 (LessonModal 과 동일)
-          - 결과 HTML 은 setBody → RichTextEditor value prop sync
-          - showCommunitySave / showStoreSave 는 페이지 진입 시 비활성 (RichTextEditor 툴바에 이미 존재) */}
-      <AiContentModal
-        open={aiOpen}
-        onClose={() => setAiOpen(false)}
-        editor={null}
-        onInsert={handleAiInsert}
-        aiRequestHeaders={(() => {
-          const token = getAccessToken();
-          return token ? { Authorization: `Bearer ${token}` } : undefined;
-        })()}
+      <CommunityContentWriteShell
+        config={{ mode: isEditMode ? 'edit' : 'create' }}
+        initialValues={initialValues}
+        aiRequestHeaders={aiRequestHeaders}
+        guideSlot={
+          <GuideBlock variant="info" title={guideTitle} description={guideDesc} steps={guideSteps} />
+        }
+        onSubmit={handleSubmit}
+        onCancel={() => navigate(-1)}
       />
     </div>
   );
 }
 
-// ─── Styles ──────────────────────────────────────────────────────────────────
-
 const styles: Record<string, React.CSSProperties> = {
-  page: {
-    maxWidth: 780,
-    margin: '0 auto',
-    padding: '24px 16px 60px',
-  },
-  center: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: '40vh',
-  },
-  pageTitle: {
-    fontSize: '1.375rem',
-    fontWeight: 700,
-    color: '#0f172a',
-    margin: '0 0 20px',
-  },
-  card: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    border: '1px solid #e2e8f0',
-    padding: '28px',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-  },
-  field: {
-    marginBottom: 20,
-  },
-  label: {
-    display: 'block',
-    fontSize: '0.875rem',
-    fontWeight: 600,
-    color: '#334155',
-    marginBottom: 6,
-  },
-  required: {
-    color: '#ef4444',
-  },
-  hint: {
-    fontSize: '0.75rem',
-    fontWeight: 400,
-    color: '#94a3b8',
-  },
-  input: {
-    width: '100%',
-    padding: '10px 14px',
-    fontSize: '0.875rem',
-    border: '1px solid #e2e8f0',
-    borderRadius: 8,
-    outline: 'none',
-    boxSizing: 'border-box',
-  },
-  textarea: {
-    width: '100%',
-    padding: '10px 14px',
-    fontSize: '0.875rem',
-    border: '1px solid #e2e8f0',
-    borderRadius: 8,
-    outline: 'none',
-    resize: 'vertical' as const,
-    boxSizing: 'border-box' as const,
-  },
-  // WO-O4O-CONTENT-DOCUMENT-TAG-INPUT-CHIP-FIX-V1
-  tagInputWrap: {
-    display: 'flex',
-    flexWrap: 'wrap' as const,
-    alignItems: 'center',
-    gap: 6,
-    width: '100%',
-    minHeight: 44,
-    padding: '7px 10px',
-    border: '1.5px solid #e2e8f0',
-    borderRadius: 8,
-    background: '#fff',
-    boxSizing: 'border-box' as const,
-  },
-  tagChip: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: 4,
-    padding: '4px 10px',
-    fontSize: '0.8125rem',
-    fontWeight: 500,
-    background: '#eff6ff',
-    color: '#1d4ed8',
-    border: '1px solid #bfdbfe',
-    borderRadius: 9999,
-    lineHeight: 1.2,
-  },
-  tagChipRemove: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 16,
-    height: 16,
-    padding: 0,
-    border: 'none',
-    background: 'rgba(29, 78, 216, 0.12)',
-    color: '#1d4ed8',
-    fontSize: '0.875rem',
-    cursor: 'pointer',
-    lineHeight: 1,
-    borderRadius: '50%',
-  },
-  tagInput: {
-    flex: 1,
-    minWidth: 120,
-    padding: '4px 4px',
-    fontSize: '0.875rem',
-    border: 'none',
-    outline: 'none',
-    background: 'transparent',
-  },
-  actions: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    gap: 8,
-    paddingTop: 16,
-    borderTop: '1px solid #f1f5f9',
-  },
-  cancelBtn: {
-    padding: '10px 20px',
-    fontSize: '0.875rem',
-    fontWeight: 500,
-    color: '#64748b',
-    backgroundColor: '#ffffff',
-    border: '1px solid #e2e8f0',
-    borderRadius: 8,
-    cursor: 'pointer',
-  },
-  draftBtn: {
-    padding: '10px 20px',
-    fontSize: '0.875rem',
-    fontWeight: 600,
-    color: '#334155',
-    backgroundColor: '#f1f5f9',
-    border: '1px solid #e2e8f0',
-    borderRadius: 8,
-    cursor: 'pointer',
-  },
-  publishBtn: {
-    padding: '10px 20px',
-    fontSize: '0.875rem',
-    fontWeight: 600,
-    color: '#ffffff',
-    backgroundColor: '#2563eb',
-    border: '1px solid #2563eb',
-    borderRadius: 8,
-    cursor: 'pointer',
-  },
-  // WO-O4O-CONTENT-AI-ENTRY-V1
-  aiBanner: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 12,
-    padding: '12px 14px',
-    marginBottom: 20,
-    background: '#eef2ff',
-    border: '1px solid #c7d2fe',
-    borderRadius: 8,
-  },
-  aiBannerText: {
-    flex: 1,
-    minWidth: 0,
-  },
-  aiBannerTitle: {
-    fontSize: 13,
-    fontWeight: 600,
-    color: '#4338ca',
-    marginBottom: 2,
-  },
-  aiBannerDesc: {
-    fontSize: 12,
-    color: '#6366f1',
-  },
-  aiBannerBtn: {
-    padding: '8px 16px',
-    background: '#4f46e5',
-    color: '#fff',
-    border: 'none',
-    borderRadius: 7,
-    fontSize: 13,
-    fontWeight: 600,
-    cursor: 'pointer',
-    whiteSpace: 'nowrap',
-  },
+  page: { maxWidth: 780, margin: '0 auto', padding: '24px 16px 60px' },
+  center: { display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '40vh' },
+  pageTitle: { fontSize: '1.375rem', fontWeight: 700, color: '#0f172a', margin: '0 0 20px' },
 };
 
 export default ContentWritePage;

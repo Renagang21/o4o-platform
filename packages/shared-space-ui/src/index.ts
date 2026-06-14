@@ -120,6 +120,15 @@ export type {
 export { ForumCommentList } from './ForumCommentList';
 export type { ForumCommentListItem, ForumCommentListProps } from './ForumCommentList';
 
+/* WO-O4O-CONTENT-STANDARD-MODULE-EXTRACT-V1: O4O 표준 커뮤니티 콘텐츠 작성 form shell (KPA canonical 추출) */
+export { CommunityContentWriteShell } from './community/CommunityContentWriteShell';
+export type {
+  CommunityContentWriteShellProps,
+  CommunityContentWriteValues,
+  CommunityContentWriteConfig,
+  CommunityContentReusablePolicy,
+} from './community/CommunityContentWriteShell';
+
 export { StoreHubTemplate } from './StoreHubTemplate';
 export type { StoreHubResourceCard, StoreHubFlowStep, StoreHubConfig, StoreHubTemplateProps } from './StoreHubTemplate';
 
