@@ -10,7 +10,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { CheckCircle, XCircle, Sparkles, Trash2 } from 'lucide-react';
+import { CheckCircle, XCircle, Sparkles, Trash2, HelpCircle } from 'lucide-react';
 import { OperatorConfirmModal, useOperatorAction, ActionBar, BulkResultModal, RowActionMenu, BaseDetailDrawer } from '@o4o/ui';
 import type { RowActionItem } from '@o4o/ui';
 import { OperatorActionType } from '@o4o/types';
@@ -87,6 +87,8 @@ export function ProductApplicationManagementConsole({ api, config }: ProductAppl
 
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [selectedApp, setSelectedApp] = useState<ProductApplication | null>(null);
+  // WO-O4O-SUPPLY-CATALOG-APPROVAL-FLOW-DOCUMENTATION-V1: 운영자 승인 흐름 안내(승인≠소비자 노출)
+  const [guideOpen, setGuideOpen] = useState(false);
 
   // AI summary state
   const [aiLoading, setAiLoading] = useState(false);
@@ -397,7 +399,17 @@ export function ProductApplicationManagementConsole({ api, config }: ProductAppl
 
   return (
     <div className="max-w-[1100px] mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-2">{title}</h1>
+      <div className="flex items-start justify-between gap-3 mb-2">
+        <h1 className="text-2xl font-bold">{title}</h1>
+        {/* WO-O4O-SUPPLY-CATALOG-APPROVAL-FLOW-DOCUMENTATION-V1: 승인 흐름 안내 */}
+        <button
+          type="button"
+          onClick={() => setGuideOpen(true)}
+          className="shrink-0 inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-[13px] text-slate-600 hover:bg-slate-50"
+        >
+          <HelpCircle size={14} /> 승인 흐름 안내
+        </button>
+      </div>
       <p className="text-sm text-slate-500 mb-6">{description}</p>
 
       {/* Toast */}
@@ -663,6 +675,54 @@ export function ProductApplicationManagementConsole({ api, config }: ProductAppl
             )}
           </div>
         )}
+      </BaseDetailDrawer>
+
+      {/* WO-O4O-SUPPLY-CATALOG-APPROVAL-FLOW-DOCUMENTATION-V1: 승인 흐름 안내 Drawer */}
+      <BaseDetailDrawer
+        open={guideOpen}
+        onClose={() => setGuideOpen(false)}
+        title="공급 상품 신청 승인 — 운영자 안내"
+        width={520}
+      >
+        <div style={{ fontSize: 14, color: '#374151', lineHeight: 1.7 }}>
+          <p style={{ marginBottom: 12 }}>
+            매장이 공급 상품 카탈로그에서 신청한 상품을 검토·승인하는 화면입니다.
+            <strong> 승인은 “내 매장 주문 가능 상품 편입 자격”을 부여</strong>하는 것이며,
+            <strong> 소비자에게 즉시 노출(판매)되는 것은 아닙니다.</strong>
+          </p>
+
+          <div style={{ marginBottom: 14 }}>
+            <div style={{ fontWeight: 600, marginBottom: 6 }}>전체 흐름</div>
+            <ol style={{ paddingLeft: 18, margin: 0 }}>
+              <li>매장이 공급 상품을 신청 (승인 대기)</li>
+              <li>운영자가 이 화면에서 승인 / 거절</li>
+              <li>승인 시 그 매장의 상품이 <strong>O4O 주문 가능 상품</strong>으로 편입(OPL 활성)</li>
+              <li>소비자 노출은 채널 진열 + 채널 승인 등 <strong>별도 단계</strong> 필요</li>
+            </ol>
+          </div>
+
+          <div style={{ marginBottom: 14 }}>
+            <div style={{ fontWeight: 600, marginBottom: 6 }}>꼭 기억할 점</div>
+            <ul style={{ paddingLeft: 18, margin: 0 }}>
+              <li>승인 = 편입 자격 부여, 소비자 즉시 노출 아님</li>
+              <li>승인은 <strong>신청한 그 매장</strong>에만 적용(per-store 단건)</li>
+              <li>거절 사유는 매장이 확인하니 명확히 남기기</li>
+              <li>신청 이력 삭제는 기록만 제거 — 승인된 진열 상품은 유지</li>
+            </ul>
+          </div>
+
+          <div
+            style={{
+              marginTop: 16,
+              paddingTop: 12,
+              borderTop: '1px solid #f1f5f9',
+              fontSize: 12,
+              color: '#64748b',
+            }}
+          >
+            상세 가이드: <code>docs/guides/O4O-SUPPLY-CATALOG-APPROVAL-FLOW-GUIDE-V1.md</code>
+          </div>
+        </div>
       </BaseDetailDrawer>
     </div>
   );
