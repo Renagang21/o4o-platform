@@ -52,7 +52,7 @@ const LATEST_TABS = [
   { key: 'all',      label: '전체',     shortcutHref: null,                       shortcutLabel: null },
   { key: 'forum',    label: '포럼',     shortcutHref: '/forum',                   shortcutLabel: '포럼 바로가기' },
   { key: 'course',   label: '강의',     shortcutHref: '/lms',                     shortcutLabel: '강의 바로가기' },
-  { key: 'content',  label: '콘텐츠',   shortcutHref: '/library/content',         shortcutLabel: '콘텐츠 바로가기' },
+  { key: 'content',  label: '콘텐츠',   shortcutHref: '/store-hub/content',        shortcutLabel: '콘텐츠 바로가기' },
   { key: 'signage',  label: '사이니지', shortcutHref: '/store/marketing/signage/playlist',  shortcutLabel: '사이니지 바로가기' },
   { key: 'resource', label: '자료실',   shortcutHref: '/resources',               shortcutLabel: '자료실 바로가기' },
 ] as const;
@@ -244,7 +244,7 @@ export function HomePage() {
       appEntryCards={[
         { title: '포럼', description: 'K-Beauty 전문가와 토론하고 소통하세요', href: '/forum', icon: <span className={iconCls}><ForumIcon /></span> },
         { title: '강의', description: 'K-Beauty 교육 콘텐츠를 온라인으로 수강하세요', href: '/lms', icon: <span className={iconCls}><EducationIcon /></span> },
-        { title: '콘텐츠', description: '플랫폼 콘텐츠를 검색하고 활용하세요', href: '/library/content', icon: <span className={iconCls}><ContentIcon /></span> },
+        { title: '콘텐츠', description: '플랫폼 콘텐츠를 검색하고 활용하세요', href: '/store-hub/content', icon: <span className={iconCls}><ContentIcon /></span> },
         { title: '자료실', description: 'K-Beauty 관련 자료를 검색하고 활용하세요', href: '/resources', icon: <span className={iconCls}><ResourcesIcon /></span> },
         { title: '디지털사이니지', description: '매장 화면에 송출할 콘텐츠를 관리하세요', href: '/signage', icon: <span className={iconCls}><SignageIcon /></span> },
       ]}

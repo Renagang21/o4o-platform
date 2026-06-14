@@ -588,7 +588,9 @@ function AppRoutes() {
         <Route path="lms/course/:courseId/lesson/:lessonId" element={<LmsLessonPage />} />
         <Route path="lms/:id" element={<LmsCourseRedirect />} />
         {/* WO-O4O-GLYCOPHARM-CONTENT-RESOURCES-ROUTE-ALIGNMENT-V1: top-level canonical paths */}
-        <Route path="content" element={<HubContentListPage />} />
+        {/* WO-O4O-CONTENT-BROWSE-ROUTE-CLEANUP-V1: 운영자 발행 browse 는 /store-hub/content 로 수렴.
+            /content 는 표준 회원 작성형 모듈 자리로 비워둠(현재는 browse 로 redirect). */}
+        <Route path="content" element={<Navigate to="/store-hub/content" replace />} />
         <Route path="hub/content/:id" element={<HubContentDetailPage />} />
         <Route path="resources" element={<ResourcesPage />} />
         {/* Instructor — WO-GLYCOPHARM-INSTRUCTOR-OPERATOR-V1 + WO-O4O-GLYCOPHARM-LMS-PHASE3-INSTRUCTOR-PARITY-V1 */}
@@ -679,7 +681,8 @@ function AppRoutes() {
           <Route path="cart" element={<StoreCartPage />} />
         </Route>
         {/* WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1 */}
-        <Route path="library/content" element={<HubContentListPage />} />
+        {/* WO-O4O-CONTENT-BROWSE-ROUTE-CLEANUP-V1: legacy alias → /store-hub/content 수렴 */}
+        <Route path="library/content" element={<Navigate to="/store-hub/content" replace />} />
         {/* MyPage 3-split (WO-O4O-GLYCOPHARM-MYPAGE-SPLIT-V1) */}
         <Route path="mypage" element={
           <SoftGuard feature="mypage">

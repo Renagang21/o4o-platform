@@ -114,7 +114,7 @@ const ResourcesPage = lazy(() => import('@/pages/resources/ResourcesPage').then(
 
 
 // Content Library (WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1)
-const ContentLibraryPage = lazy(() => import('@/pages/library/ContentLibraryPage'));
+// WO-O4O-CONTENT-BROWSE-ROUTE-CLEANUP-V1: /library/content 리스트 → /store-hub/content redirect 로 ContentLibraryPage 미사용(상세만 유지)
 const ContentLibraryDetailPage = lazy(() => import('@/pages/library/ContentDetailPage'));
 
 // Signage Content Hub (WO-SIGNAGE-CONTENT-HUB-V1)
@@ -428,7 +428,9 @@ function AppRoutes() {
         <Route path="resources" element={<ResourcesPage />} />
 
         {/* WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1 */}
-        <Route path="library/content" element={<ContentLibraryPage />} />
+        {/* WO-O4O-CONTENT-BROWSE-ROUTE-CLEANUP-V1: 운영자 발행 browse 는 /store-hub/content 로 수렴.
+            상세(/:id)는 북마크 호환 위해 유지. */}
+        <Route path="library/content" element={<Navigate to="/store-hub/content" replace />} />
         <Route path="library/content/:id" element={<ContentLibraryDetailPage />} />
 
         {/* Forum */}
