@@ -1,16 +1,19 @@
 import { FC } from 'react';
 import { Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
-import { Key, Package, Bot, Mail } from 'lucide-react'
+import { Key, Package, Bot, Mail, Users } from 'lucide-react'
 import OAuthSettings from './OAuthSettings'
 import AppServices from './AppServices'
 import AiQuerySettings from './AiQuerySettings'
 import EmailSettings from './EmailSettings'
+// WO-O4O-ADMIN-PLATFORM-SETTINGS-SUPER-ADMIN-ACCOUNT-MANAGEMENT-V1
+import AdminAccountsSettings from './AdminAccountsSettings'
 
 const settingsTabs = [
   { id: 'oauth', label: 'OAuth', icon: <Key className="w-4 h-4" />, path: '/settings' },
   { id: 'app-services', label: 'AI Services', icon: <Package className="w-4 h-4" />, path: '/settings/app-services' },
   { id: 'ai-query', label: 'AI Query', icon: <Bot className="w-4 h-4" />, path: '/settings/ai-query' },
-  { id: 'email', label: 'Email', icon: <Mail className="w-4 h-4" />, path: '/settings/email' }
+  { id: 'email', label: 'Email', icon: <Mail className="w-4 h-4" />, path: '/settings/email' },
+  { id: 'admin-accounts', label: '관리자 계정', icon: <Users className="w-4 h-4" />, path: '/settings/admin-accounts' }
 ]
 
 const Settings: FC = () => {
@@ -54,6 +57,7 @@ const Settings: FC = () => {
         <Route path="app-services" element={<AppServices />} />
         <Route path="ai-query" element={<AiQuerySettings />} />
         <Route path="email" element={<EmailSettings />} />
+        <Route path="admin-accounts" element={<AdminAccountsSettings />} />
         <Route path="*" element={<Navigate to="" replace />} />
       </Routes>
     </div>

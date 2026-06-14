@@ -40,6 +40,8 @@ import appreciationRoutes from '../modules/appreciation/routes/appreciation.rout
 import settingsRoutes from '../routes/settingsRoutes.js';
 import adminAppsRoutes from '../routes/admin/apps.routes.js';
 import adminUsersRoutes from '../routes/admin/users.routes.js';
+// WO-O4O-ADMIN-PLATFORM-SETTINGS-SUPER-ADMIN-ACCOUNT-MANAGEMENT-V1: 관리자 계정 안전 유지관리(additive)
+import adminPlatformAccountsRoutes from '../routes/admin/platform-accounts.routes.js';
 import serviceMonitorRoutes from '../routes/service-monitor.routes.js';
 
 // ============================================================================
@@ -169,6 +171,7 @@ export async function registerCoreRoutes(app: Application): Promise<void> {
   app.use('/api/v1/settings', settingsRoutes);
   app.use('/api/v1/admin/apps', adminAppsRoutes);
   app.use('/api/v1/admin/users', adminUsersRoutes);
+  app.use('/api/v1/admin/platform-accounts', adminPlatformAccountsRoutes);
   app.use('/api/v1/service/monitor', serviceMonitorRoutes);
 
   logger.info('✅ Core API routes registered');
