@@ -66,8 +66,9 @@ admin/operator/supplier workspace/auth/fullscreen layout 무수정. `StoreDashbo
 - **404 = 'Type C(권장)'** → **선행 WO에서 minimal-nav로 이미 표준화**(footer 제외 의도). 본 WO에서 GP만 정합.
 - **Neture catch-all 404 부재** → 신규 발견. footer 무관(라우트 자체 없음). 필요 시 별도 WO.
 
-## 10. Commit
-- GP 404(+CHECK): path-specific commit (hash 본 커밋 이후 기록).
+## 10. Commit / 배포
+- GP 404 + CHECK: path-specific 단일 commit `f1a82803e`(docs-only tip skip 회피 — store-facing WO에서 겪은 HEAD~1 skip 방지).
+- 배포: push run `27490390015` → **deploy-glycopharm success**, KCos/KPA/Neture **정상 skip**(무변경). GP liveness 200.
 
 ## 11. 후속
 1. (선택) `WO-O4O-NETURE-CATCHALL-404-V1` — Neture unmatched route 404 페이지 도입(footer 무관, UX).
