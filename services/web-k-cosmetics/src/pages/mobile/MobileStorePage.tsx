@@ -40,7 +40,7 @@ const TABS: TabDef[] = [
     label: '매장 HUB',
     route: '/store-hub',
     icon: <Building2 size={32} strokeWidth={1.5} />,
-    description: '공급사 B2B 카탈로그, 콘텐츠 라이브러리, K-Beauty 운영 자료를 한곳에서 확인하세요.',
+    description: '공급사 B2B 카탈로그, 콘텐츠 자료실, K-Beauty 운영 자료를 한곳에서 확인하세요.',
     actionLabel: '매장 HUB 입장',
   },
 ];

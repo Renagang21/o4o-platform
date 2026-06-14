@@ -129,7 +129,7 @@ function useKCosContentHubConfig(userId?: string): ContentHubConfig {
     serviceKey: 'k-cosmetics',
 
     heroTitle: '매장에서 바로 쓰는 콘텐츠',
-    heroDesc: 'K-Cosmetics 매장을 위한 콘텐츠 라이브러리',
+    heroDesc: 'K-Cosmetics 매장을 위한 콘텐츠 자료실',
     searchPlaceholder: '콘텐츠 검색',
 
     filters: [

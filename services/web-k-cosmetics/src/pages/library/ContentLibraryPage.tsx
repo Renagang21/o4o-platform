@@ -109,7 +109,7 @@ export default function ContentLibraryPage() {
 
   const config: ContentHubConfig = useMemo(() => ({
     serviceKey: 'k-cosmetics',
-    heroTitle: '콘텐츠 라이브러리',
+    heroTitle: '콘텐츠 자료실',
     heroDesc: 'K-Cosmetics 콘텐츠를 한눈에 확인하세요',
     headerAction: (
       <Link to="/community" className="text-[13px] text-slate-500 no-underline hover:underline">
