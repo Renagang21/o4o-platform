@@ -1,3 +1,13 @@
+/**
+ * CourseCard — 카드형 강의 primitive.
+ *
+ * WO-O4O-LMS-COURSECARD-RETIRE-OR-SPECIALIZE-V1 (specialize / dormant)
+ *
+ * 역할: 향후 featured / 추천 / 관련(related) 강의 등 **카드형 노출면**용 presentational primitive.
+ * `/lms` 목록 hub 의 canonical 표현이 아니다 — canonical hub 목록은
+ * `LmsHubTemplate`(@o4o/shared-space-ui, 테이블)이다.
+ * 현재 실서비스 소비처 없음(dormant). LmsHubTemplate 과 결합하지 않는다(표현 상이).
+ */
 import type { CSSProperties, ReactNode } from 'react';
 import type { CourseCardView } from '../types';
 import { DEFAULT_ACCENT } from '../types';

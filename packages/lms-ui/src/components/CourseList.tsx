@@ -1,3 +1,12 @@
+/**
+ * CourseList — 카드형 강의 grid shell primitive.
+ *
+ * WO-O4O-LMS-COURSECARD-RETIRE-OR-SPECIALIZE-V1 (specialize / dormant)
+ *
+ * 역할: CourseCard 카드들의 grid + loading/error/empty shell. featured / 추천 / 관련 강의 등
+ * **카드형 노출면**용. `/lms` 목록 hub 의 canonical 표현 아님 — canonical hub 목록은
+ * `LmsHubTemplate`(@o4o/shared-space-ui, 테이블). 현재 실서비스 소비처 없음(dormant).
+ */
 import type { CSSProperties, ReactNode } from 'react';
 import type { CourseCardView } from '../types';
 import { DEFAULT_ACCENT } from '../types';
