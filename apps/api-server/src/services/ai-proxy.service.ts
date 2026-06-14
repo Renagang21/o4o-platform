@@ -666,15 +666,124 @@ class AIProxyService {
     opts: { surface?: EditingSurface } = {},
   ): Promise<AIRawContentResponse> {
     const { provider, model } = await resolveEditingProvider({ surface: opts.surface });
-    if (provider !== 'gemini') {
-      logger.warn('generateEditingRawContent: non-gemini provider gated — transport not wired, falling back to gemini', {
-        provider,
-        surface: opts.surface,
-        requestId,
-      });
-      return this.generateRawContent({ ...request, provider: 'gemini', model: EDITING_MODEL_FALLBACK }, userId, requestId);
+    if (provider === 'gemini') {
+      return this.generateRawContent({ ...request, provider: 'gemini', model }, userId, requestId);
     }
-    return this.generateRawContent({ ...request, provider: 'gemini', model }, userId, requestId);
+    // 비-gemini: 현재 Qwen(Singapore International)만 transport 배선(저위험 surface 실험).
+    // key 미설정 / 호출 실패 시 운영 안정성 위해 Gemini fallback (UX 깨지지 않음).
+    if (provider === 'qwen') {
+      const apiKey = process.env.QWEN_API_KEY?.trim();
+      const baseUrl = (process.env.QWEN_BASE_URL?.trim() || 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1').replace(/\/+$/, '');
+      if (apiKey) {
+        try {
+          logger.info('generateEditingRawContent: routing to qwen (Singapore)', { surface: opts.surface, model, requestId });
+          return await this.fetchQwenRawContent({ ...request, model }, requestId, apiKey, baseUrl);
+        } catch (err: any) {
+          logger.warn('generateEditingRawContent: qwen transport failed — gemini fallback', {
+            surface: opts.surface, model, requestId, error: err?.message,
+          });
+        }
+      } else {
+        logger.warn('generateEditingRawContent: qwen selected but QWEN_API_KEY missing — gemini fallback', {
+          surface: opts.surface, requestId,
+        });
+      }
+    } else {
+      logger.warn('generateEditingRawContent: non-gemini provider not wired — gemini fallback', {
+        provider, surface: opts.surface, requestId,
+      });
+    }
+    return this.generateRawContent({ ...request, provider: 'gemini', model: EDITING_MODEL_FALLBACK }, userId, requestId);
+  }
+
+  /**
+   * Qwen (Alibaba Model Studio International/Singapore) OpenAI-compatible raw content.
+   * WO-O4O-AI-QWEN-SINGAPORE-LOW-RISK-SURFACE-EXPERIMENT-V1
+   *
+   * - guardrail 통과 surface(pop/qr/blog) + admin 이 qwen 모델 선택 + QWEN_API_KEY 존재 시에만 도달.
+   * - 실패는 호출부(generateEditingRawContent)가 catch → Gemini fallback.
+   * - AIUsageLog provider enum(OPENAI/GEMINI/CLAUDE)에 qwen 미포함 → 본 실험은 logger 기록만
+   *   (DB usage log qwen 지원은 enum migration 동반 후속).
+   */
+  private async fetchQwenRawContent(
+    req: { systemPrompt: string; userPrompt: string; temperature?: number; maxTokens?: number; model: string },
+    requestId: string,
+    apiKey: string,
+    baseUrl: string,
+  ): Promise<AIRawContentResponse> {
+    const { systemPrompt, userPrompt, temperature = 0.5, maxTokens = 4096, model } = req;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), this.DEFAULT_TIMEOUT);
+    try {
+      const response = await fetch(`${baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt },
+          ],
+          temperature,
+          max_tokens: maxTokens,
+          response_format: { type: 'json_object' },
+        }),
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+
+      if (response.status === 429) {
+        throw this.createError('RATE_LIMIT_ERROR', 'Qwen rate limit exceeded', true);
+      }
+      if (!response.ok) {
+        let upstream = '';
+        try { upstream = (await response.text()).slice(0, 200); } catch { /* ignore */ }
+        throw this.createError('PROVIDER_ERROR', `Qwen API error (${response.status}): ${upstream}`, false);
+      }
+
+      const data: any = await response.json();
+      const content: string | undefined = data?.choices?.[0]?.message?.content;
+      if (!content) {
+        throw this.createError('PROVIDER_ERROR', 'No response from Qwen', false);
+      }
+
+      let parsed: any;
+      try {
+        parsed = JSON.parse(content);
+      } catch {
+        const m = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/\{[\s\S]*\}/);
+        parsed = JSON.parse(m ? (m[1] || m[0]) : content);
+      }
+
+      const usage = data?.usage || {};
+      logger.info('Qwen raw content generated', {
+        requestId,
+        model,
+        promptTokens: usage.prompt_tokens,
+        completionTokens: usage.completion_tokens,
+      });
+
+      return {
+        success: true,
+        // qwen 은 편집 AI provider(blocks transport enum 밖) — 정보용 표기.
+        provider: 'qwen' as unknown as AIProvider,
+        model,
+        usage: {
+          promptTokens: usage.prompt_tokens,
+          completionTokens: usage.completion_tokens,
+          totalTokens: usage.total_tokens,
+        },
+        parsed: parsed as Record<string, any>,
+        rawText: content,
+        requestId,
+      };
+    } catch (error: any) {
+      clearTimeout(timeoutId);
+      if (error.name === 'AbortError') {
+        throw this.createError('TIMEOUT_ERROR', 'Qwen request timeout (120s)', true);
+      }
+      throw error;
+    }
   }
 
   /**
