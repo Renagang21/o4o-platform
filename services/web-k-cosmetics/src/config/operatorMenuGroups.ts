@@ -28,6 +28,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '신청 관리', path: '/operator/applications' },
     // WO-O4O-EVENT-OFFER-KCOS-OPERATOR-APPROVAL-V1
     { label: '이벤트 오퍼 승인', path: '/operator/event-offers' },
+    // WO-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-ENABLE-GP-KCOS-V1
+    { label: '공급 상품 신청 승인', path: '/operator/product-applications' },
   ],
   products: [{ label: '상품 관리', path: '/operator/products' }],
   stores: [

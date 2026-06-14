@@ -143,6 +143,8 @@ const ForumAnalyticsPage = lazy(() => import('@/pages/operator/ForumAnalyticsPag
 const ApplicationsPage = lazy(() => import('@/pages/operator/ApplicationsPage'));
 const ApplicationDetailPage = lazy(() => import('@/pages/operator/ApplicationDetailPage'));
 const StoreApprovalsPage = lazy(() => import('@/pages/operator/StoreApprovalsPage'));
+// WO-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-ENABLE-GP-KCOS-V1: 공급 상품 신청 승인
+const ProductApplicationManagementPage = lazy(() => import('@/pages/operator/ProductApplicationManagementPage'));
 const StoreApprovalDetailPage = lazy(() => import('@/pages/operator/StoreApprovalDetailPage'));
 // StoreTemplateManagerPage 제거 — pharmacySlug="demo" 하드코딩으로 미완성 (글로벌 템플릿 저장소 미구현)
 const UsersPage = lazy(() => import('@/pages/operator/UsersPage'));
@@ -798,6 +800,8 @@ function AppRoutes() {
         <Route path="store-approvals/:id" element={<StoreApprovalDetailPage />} />
         <Route path="applications" element={<ApplicationsPage />} />
         <Route path="applications/:id" element={<ApplicationDetailPage />} />
+        {/* WO-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-ENABLE-GP-KCOS-V1: 공급 상품 신청 승인 */}
+        <Route path="product-applications" element={<ProductApplicationManagementPage />} />
         {/* legacy redirect: /operator/glycopharm-members → /operator/members */}
         <Route path="glycopharm-members" element={<Navigate to="/operator/members" replace />} />
         {/* WO-O4O-GLYCOPHARM-OPERATOR-ROUTE-CANONICALIZATION-V1: canonical route */}

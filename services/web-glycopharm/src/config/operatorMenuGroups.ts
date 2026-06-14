@@ -37,6 +37,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '약사 회원 관리', path: '/operator/members' },
     // WO-O4O-GLYCOPHARM-OPERATOR-EVENT-OFFER-APPROVAL-V1
     { label: '이벤트 오퍼 승인', path: '/operator/event-offers' },
+    // WO-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-ENABLE-GP-KCOS-V1
+    { label: '공급 상품 신청 승인', path: '/operator/product-applications' },
     /* WO-O4O-GLYCOPHARM-ADMIN-OPERATOR-CLEANUP-V1:
        Market Trial operator 콘솔은 미구현 → 메뉴/라우트에서 제거. 후속 별도 WO 예정. */
   ],

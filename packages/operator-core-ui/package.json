@@ -17,13 +17,15 @@
     "./modules/forum-requests": "./src/modules/forum-requests/index.ts",
     "./modules/service-legal": "./src/modules/service-legal/index.ts",
     "./modules/contact-inquiry": "./src/modules/contact-inquiry/index.ts",
-    "./modules/service-contact-settings": "./src/modules/service-contact-settings/index.ts"
+    "./modules/service-contact-settings": "./src/modules/service-contact-settings/index.ts",
+    "./modules/product-applications": "./src/modules/product-applications/index.ts"
   },
   "dependencies": {
     "@o4o/content-editor": "workspace:*",
     "@o4o/error-handling": "workspace:*",
     "@o4o/operator-ux-core": "workspace:*",
     "@o4o/shared-space-ui": "workspace:*",
+    "@o4o/types": "workspace:*",
     "@o4o/ui": "workspace:*"
   },
   "peerDependencies": {

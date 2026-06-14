@@ -182,6 +182,8 @@ const OperatorProductDetailPage = lazy(() => import('@/pages/operator/ProductDet
 const OperatorOrdersPage = lazy(() => import('@/pages/operator/OrdersPage'));
 // WO-O4O-EVENT-OFFER-KCOS-OPERATOR-APPROVAL-V1
 const OperatorEventOfferApprovalsPage = lazy(() => import('@/pages/operator/EventOfferApprovalsPage'));
+// WO-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-ENABLE-GP-KCOS-V1: 공급 상품 신청 승인
+const OperatorProductApplicationManagementPage = lazy(() => import('@/pages/operator/ProductApplicationManagementPage'));
 const OperatorUsersPage = lazy(() => import('@/pages/operator/UsersPage'));
 const OperatorUserDetailPage = lazy(() => import('@/pages/operator/UserDetailPage'));
 // WO-O4O-KCOSMETICS-ADMIN-MEMBER-HARD-DELETE-V1
@@ -640,6 +642,8 @@ function AppRoutes() {
         {/* Signal 기반 대시보드 (WO-K-COSMETICS-OPERATOR-DASHBOARD-UX-V1) */}
         <Route index element={<KCosmeticsOperatorDashboard />} />
         <Route path="applications" element={<OperatorApplicationsPage />} />
+        {/* WO-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-ENABLE-GP-KCOS-V1: 공급 상품 신청 승인 */}
+        <Route path="product-applications" element={<OperatorProductApplicationManagementPage />} />
         <Route path="products" element={<OperatorProductsPage />} />
         <Route path="products/:productId" element={<OperatorProductDetailPage />} />
         {/* 매장 관리 (WO-O4O-STORE-CONSOLE-V1) */}

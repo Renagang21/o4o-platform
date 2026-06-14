@@ -70,3 +70,18 @@ export type {
   OperatorAxisGroup,
   AxisNavigationSectionProps,
 } from './dashboard/AxisNavigationSection';
+
+// Product Applications Module (WO-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-ENABLE-GP-KCOS-V1)
+export { ProductApplicationManagementConsole } from './modules/product-applications';
+export type {
+  ProductApplication,
+  ProductApplicationStats,
+  ProductApplicationStatusFilter,
+  ProductApplicationListParams,
+  ProductApplicationListResult,
+  ProductApplicationAiSummary,
+  ProductApplicationsApi,
+  ProductApplicationsAccent,
+  ProductApplicationsConfig,
+  ProductApplicationManagementConsoleProps,
+} from './modules/product-applications';
