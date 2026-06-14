@@ -291,10 +291,10 @@ export default function LoginModal() {
             </button>
           </form>
 
-          {/* 테스트 계정 자동입력 — 약국 개설자만 노출 */}
+          {/* 체험용 공용 계정 자동입력 (WO-O4O-HOME-TEMP-EXPERIENCE-ACCOUNT-NOTICE-V1) — 약국 경영자만 노출 */}
           <div className="mt-4 flex justify-center">
             {[
-              { label: '약국 경영자', email: 'renagang21@gmail.com', password: 'seochuran1!' },
+              { label: '🧪 체험용 약국 경영자 계정', email: 'renagang21@gmail.com', password: '3Lz157727791!' },
             ].map((acct) => (
               <button
                 key={acct.email}

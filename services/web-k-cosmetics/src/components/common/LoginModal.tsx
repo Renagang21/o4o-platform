@@ -185,6 +185,15 @@ export default function LoginModal() {
           </button>
         </form>
 
+        {/* 체험용 공용 계정 자동입력 (WO-O4O-HOME-TEMP-EXPERIENCE-ACCOUNT-NOTICE-V1) — 추후 제거 예정 */}
+        <button
+          type="button"
+          onClick={() => { setEmail('renagang21@gmail.com'); setPassword('3Lz157727791!'); setError(''); }}
+          style={{ width: '100%', marginTop: 12, padding: '10px', fontSize: 13, fontWeight: 600, color: '#047857', background: '#ecfdf5', border: '1px solid #a7f3d0', borderRadius: 10, cursor: 'pointer' }}
+        >
+          🧪 체험용 매장 경영자 계정
+        </button>
+
         {/* Footer Links */}
         <div style={styles.footer}>
           <Link

@@ -204,13 +204,13 @@ export default function LoginModal() {
             </label>
           </div>
 
-          {/* 데모 계정 빠른 입력 */}
+          {/* 체험용 공용 계정 빠른 입력 (WO-O4O-HOME-TEMP-EXPERIENCE-ACCOUNT-NOTICE-V1) */}
           <button
             type="button"
             onClick={() => { setEmail('renagang21@gmail.com'); setPassword('3Lz157727791!'); setError(''); }}
             className="w-full py-2.5 text-sm font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl hover:bg-emerald-100 transition-colors"
           >
-            🧪 테스트 약국
+            🧪 체험용 약국 경영자 계정
           </button>
 
           <button
