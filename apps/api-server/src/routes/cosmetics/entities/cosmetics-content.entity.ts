@@ -40,6 +40,10 @@ export class CosmeticsContent {
   @Column({ type: 'jsonb', default: '[]' })
   blocks: object[];
 
+  /** 회원 작성 콘텐츠 본문 (rich text) — WO-O4O-GP-KCOS-CONTENT-STANDARD-ROUTE-ALIGNMENT-V1 */
+  @Column({ type: 'text', nullable: true })
+  body: string | null;
+
   @Column({ type: 'jsonb', default: '[]' })
   tags: string[];
 

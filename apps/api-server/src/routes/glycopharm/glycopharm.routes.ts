@@ -555,7 +555,7 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   //   PATCH  /api/v1/glycopharm/operator/resources/:id/status
   //   DELETE /api/v1/glycopharm/operator/resources/:id
   // ============================================================================
-  router.use('/contents', createGlycopharmContentsRouter(dataSource, optionalAuth as any));
+  router.use('/contents', createGlycopharmContentsRouter(dataSource, optionalAuth as any, authenticate as any));
   router.use(
     '/operator/resources',
     createGlycopharmOperatorResourcesRouter(dataSource, authenticate as any, requireGlycopharmScope),

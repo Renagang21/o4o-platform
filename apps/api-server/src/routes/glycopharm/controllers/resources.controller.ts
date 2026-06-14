@@ -31,15 +31,36 @@ function deriveUsageType(reqUsageType: string | undefined, sourceType: string): 
   return 'READ';
 }
 
-// ─── Public / Member 조회 라우터 ──────────────────────────────────────────────
+// ─── Public / Member 조회 + 회원 작성 라우터 ──────────────────────────────────
+//
+// WO-O4O-GP-KCOS-CONTENT-STANDARD-ROUTE-ALIGNMENT-V1 (Phase A):
+//   KPA 회원 콘텐츠(`sub_type='content'`) 풀세트를 미러링.
+//   - resource browse(`?sub_type=resource`) 기존 동작 유지(하위 호환)
+//   - 회원 본문은 `body`(rich text) 에 저장. content_type 은 저장하지 않음.
+//   - recommend / AI / copy-to-store 는 범위 외(제외).
+
+function sanitizeContentTags(t: unknown): string[] {
+  if (!Array.isArray(t)) return [];
+  return [...new Set<string>(
+    t.map((v: any) => String(v).trim().replace(/^#/, ''))
+      .filter(Boolean).filter((v: string) => v.length <= 30),
+  )];
+}
 
 export function createGlycopharmContentsRouter(
   dataSource: DataSource,
   optionalAuth: AuthMiddleware,
+  authenticate: AuthMiddleware,
 ): Router {
   const router = Router();
 
-  // GET /contents?sub_type=resource — 자료실 목록 (optionalAuth)
+  // operator/admin 판정 — 작성자 본인이 아니어도 수정/삭제 허용
+  const isOperatorOrAdmin = (user: any): boolean =>
+    Array.isArray(user?.roles) &&
+    user.roles.some((r: string) =>
+      r === 'glycopharm:operator' || r === 'glycopharm:admin' || r === 'platform:super_admin');
+
+  // GET /contents — 목록 (optionalAuth). ?sub_type=resource(자료실) / ?sub_type=content(회원) / ?my=true
   router.get('/', optionalAuth, async (req: Request, res: Response) => {
     try {
       const {
@@ -50,6 +71,9 @@ export function createGlycopharmContentsRouter(
         usage_type: usageTypeFilter,
         source_type: sourceTypeFilter,
         status: statusFilter,
+        category,
+        tag,
+        my,
         sort = 'latest',
       } = req.query;
 
@@ -62,8 +86,10 @@ export function createGlycopharmContentsRouter(
       const params: any[] = [];
       let idx = 1;
 
-      // 비로그인: published만, 로그인: 본인 draft/private 포함
-      if (!userId) {
+      // my=true: 내 콘텐츠만(로그인 필수) / 비로그인: published만 / 로그인: 본인 draft·private 포함
+      if (my === 'true' && userId) {
+        conditions.push(`c.created_by = $${idx++}`); params.push(userId);
+      } else if (!userId) {
         conditions.push(`c.status = 'published'`);
       } else if (!statusFilter) {
         conditions.push(`(c.status = 'published' OR c.created_by = $${idx++})`);
@@ -74,9 +100,11 @@ export function createGlycopharmContentsRouter(
       if (statusFilter) { conditions.push(`c.status = $${idx++}`); params.push(statusFilter); }
       if (usageTypeFilter) { conditions.push(`c.usage_type = $${idx++}`); params.push(usageTypeFilter); }
       if (sourceTypeFilter) { conditions.push(`c.source_type = $${idx++}`); params.push(sourceTypeFilter); }
+      if (category) { conditions.push(`c.category = $${idx++}`); params.push(category); }
+      if (tag) { conditions.push(`c.tags @> $${idx++}::jsonb`); params.push(JSON.stringify([tag])); }
       if (search) {
         conditions.push(
-          `(c.title ILIKE $${idx} OR c.summary ILIKE $${idx} OR c.author_name ILIKE $${idx} OR c.tags::text ILIKE $${idx})`,
+          `(c.title ILIKE $${idx} OR c.summary ILIKE $${idx} OR c.body ILIKE $${idx} OR c.author_name ILIKE $${idx} OR c.tags::text ILIKE $${idx})`,
         );
         params.push(`%${search}%`);
         idx++;
@@ -117,6 +145,200 @@ export function createGlycopharmContentsRouter(
     } catch (err) {
       console.error('[GlycoPharm] GET /contents error:', err);
       res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: '목록 조회 중 오류가 발생했습니다' } });
+    }
+  });
+
+  // POST /contents — 회원 작성 (authenticate)
+  router.post('/', authenticate, async (req: Request, res: Response) => {
+    try {
+      const user = (req as any).user;
+      const {
+        title, summary, body, tags, category, thumbnail_url,
+        source_type = 'manual', source_url, source_file_name,
+        sub_type: subType, usage_type: reqUsageType,
+        status: reqStatus, reusable_policy: reqReusablePolicy,
+      } = req.body;
+
+      if (!title?.trim()) {
+        res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'title은 필수입니다' } });
+        return;
+      }
+
+      const sanitizedTags = sanitizeContentTags(tags);
+      if (sanitizedTags.length === 0) {
+        res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: '태그를 1개 이상 입력해주세요' } });
+        return;
+      }
+
+      const status = (VALID_STATUSES as readonly string[]).includes(reqStatus) ? reqStatus : 'draft';
+      const usageType = deriveUsageType(reqUsageType, source_type);
+      if (usageType === 'COPY' && !(typeof body === 'string' && body.trim().length > 0)) {
+        res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'COPY 타입은 본문(body)이 필요합니다' } });
+        return;
+      }
+      const reusablePolicy = ['restricted', 'platform'].includes(reqReusablePolicy) ? reqReusablePolicy : 'platform';
+      const authorName = user?.name || user?.email || null;
+
+      const [inserted] = await dataSource.query(
+        `INSERT INTO glycopharm_contents
+           (title, summary, body, tags, category, thumbnail_url, sub_type,
+            source_type, source_url, source_file_name, usage_type, status,
+            created_by, updated_by, author_name, reusable_policy)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$13,$14,$15)
+         RETURNING *`,
+        [
+          title.trim(),
+          summary || null,
+          body || null,
+          JSON.stringify(sanitizedTags),
+          category || null,
+          thumbnail_url || null,
+          subType || null,
+          source_type,
+          source_url || null,
+          source_file_name || null,
+          usageType,
+          status,
+          user?.id || null,
+          authorName,
+          reusablePolicy,
+        ],
+      );
+
+      res.status(201).json({ success: true, data: inserted });
+    } catch (err) {
+      console.error('[GlycoPharm] POST /contents error:', err);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: '등록 중 오류가 발생했습니다' } });
+    }
+  });
+
+  // GET /contents/:id — 상세 (optionalAuth)
+  router.get('/:id', optionalAuth, async (req: Request, res: Response) => {
+    try {
+      const [content] = await dataSource.query(
+        `SELECT * FROM glycopharm_contents WHERE id = $1 AND is_deleted = false LIMIT 1`,
+        [req.params.id],
+      );
+      if (!content) {
+        res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '콘텐츠를 찾을 수 없습니다' } });
+        return;
+      }
+      res.json({ success: true, data: content });
+    } catch (err) {
+      console.error('[GlycoPharm] GET /contents/:id error:', err);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: '상세 조회 중 오류가 발생했습니다' } });
+    }
+  });
+
+  // PATCH /contents/:id — 수정 (본인 또는 operator/admin)
+  router.patch('/:id', authenticate, async (req: Request, res: Response) => {
+    try {
+      const user = (req as any).user;
+      const [existing] = await dataSource.query(
+        `SELECT * FROM glycopharm_contents WHERE id = $1 AND is_deleted = false LIMIT 1`,
+        [req.params.id],
+      );
+      if (!existing) {
+        res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '콘텐츠를 찾을 수 없습니다' } });
+        return;
+      }
+      if (existing.created_by !== user?.id && !isOperatorOrAdmin(user)) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: '수정 권한이 없습니다' } });
+        return;
+      }
+
+      const {
+        title, summary, body, tags, category, thumbnail_url,
+        source_type, source_url, source_file_name,
+        sub_type: subType, usage_type: reqUsageType,
+        status: reqStatus, reusable_policy: reqReusablePolicy,
+      } = req.body;
+
+      const sets: string[] = ['updated_at = NOW()'];
+      const params: any[] = [];
+      let idx = 1;
+
+      if (title !== undefined) { sets.push(`title = $${idx++}`); params.push(title.trim()); }
+      if (summary !== undefined) { sets.push(`summary = $${idx++}`); params.push(summary || null); }
+      if (body !== undefined) { sets.push(`body = $${idx++}`); params.push(body || null); }
+      if (tags !== undefined) {
+        const sanitized = sanitizeContentTags(tags);
+        if (sanitized.length === 0) {
+          res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: '태그를 1개 이상 입력해주세요' } });
+          return;
+        }
+        sets.push(`tags = $${idx++}`); params.push(JSON.stringify(sanitized));
+      }
+      if (category !== undefined) { sets.push(`category = $${idx++}`); params.push(category || null); }
+      if (thumbnail_url !== undefined) { sets.push(`thumbnail_url = $${idx++}`); params.push(thumbnail_url || null); }
+      if (source_type !== undefined) { sets.push(`source_type = $${idx++}`); params.push(source_type); }
+      if (source_url !== undefined) { sets.push(`source_url = $${idx++}`); params.push(source_url || null); }
+      if (source_file_name !== undefined) { sets.push(`source_file_name = $${idx++}`); params.push(source_file_name || null); }
+      if (subType !== undefined) { sets.push(`sub_type = $${idx++}`); params.push(subType || null); }
+      if (reqUsageType !== undefined) {
+        sets.push(`usage_type = $${idx++}`);
+        params.push((VALID_USAGE_TYPES as readonly string[]).includes(reqUsageType) ? reqUsageType : existing.usage_type);
+      }
+      if (reqStatus !== undefined) {
+        sets.push(`status = $${idx++}`);
+        params.push((VALID_STATUSES as readonly string[]).includes(reqStatus) ? reqStatus : existing.status);
+      }
+      if (reqReusablePolicy !== undefined) {
+        sets.push(`reusable_policy = $${idx++}`);
+        params.push(['restricted', 'platform'].includes(reqReusablePolicy) ? reqReusablePolicy : existing.reusable_policy);
+      }
+      sets.push(`updated_by = $${idx++}`); params.push(user?.id || null);
+
+      params.push(existing.id);
+      const [updated] = await dataSource.query(
+        `UPDATE glycopharm_contents SET ${sets.join(', ')} WHERE id = $${idx} RETURNING *`,
+        params,
+      );
+      res.json({ success: true, data: updated });
+    } catch (err) {
+      console.error('[GlycoPharm] PATCH /contents/:id error:', err);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: '수정 중 오류가 발생했습니다' } });
+    }
+  });
+
+  // DELETE /contents/:id — soft delete (본인 또는 operator/admin)
+  router.delete('/:id', authenticate, async (req: Request, res: Response) => {
+    try {
+      const user = (req as any).user;
+      const [existing] = await dataSource.query(
+        `SELECT id, created_by FROM glycopharm_contents WHERE id = $1 AND is_deleted = false LIMIT 1`,
+        [req.params.id],
+      );
+      if (!existing) {
+        res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '콘텐츠를 찾을 수 없습니다' } });
+        return;
+      }
+      if (existing.created_by !== user?.id && !isOperatorOrAdmin(user)) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: '삭제 권한이 없습니다' } });
+        return;
+      }
+      await dataSource.query(
+        `UPDATE glycopharm_contents SET is_deleted = true, updated_at = NOW() WHERE id = $1`,
+        [existing.id],
+      );
+      res.json({ success: true, data: { deleted: true, id: existing.id } });
+    } catch (err) {
+      console.error('[GlycoPharm] DELETE /contents/:id error:', err);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: '삭제 중 오류가 발생했습니다' } });
+    }
+  });
+
+  // POST /contents/:id/view — 조회수 증가 (optionalAuth)
+  router.post('/:id/view', optionalAuth, async (req: Request, res: Response) => {
+    try {
+      await dataSource.query(
+        `UPDATE glycopharm_contents SET view_count = view_count + 1 WHERE id = $1 AND is_deleted = false`,
+        [req.params.id],
+      );
+      res.json({ success: true });
+    } catch (err) {
+      console.error('[GlycoPharm] POST /contents/:id/view error:', err);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: '조회수 갱신 중 오류가 발생했습니다' } });
     }
   });
 

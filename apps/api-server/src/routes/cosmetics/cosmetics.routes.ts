@@ -244,7 +244,7 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
   //   PATCH  /api/v1/cosmetics/operator/resources/:id/status
   //   DELETE /api/v1/cosmetics/operator/resources/:id
   // ============================================================================
-  router.use('/contents', createCosmeticsContentsRouter(dataSource, optionalAuth as any));
+  router.use('/contents', createCosmeticsContentsRouter(dataSource, optionalAuth as any, authenticate as any));
   router.use(
     '/operator/resources',
     createCosmeticsOperatorResourcesRouter(dataSource, authenticate as any, requireCosmeticsScope),
