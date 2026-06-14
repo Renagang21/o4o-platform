@@ -129,6 +129,17 @@ export type {
   CommunityContentReusablePolicy,
 } from './community/CommunityContentWriteShell';
 
+/* WO-O4O-CONTENT-STANDARD-MODULE-EXTRACT-PHASE2-V1: 콘텐츠 상세 표시 + 검색 primitive */
+export { CommunityContentDetailView } from './community/CommunityContentDetailView';
+export type {
+  CommunityContentDetailViewProps,
+  CommunityContentDetailData,
+  CommunityContentBadge,
+  CommunityContentBadgeTone,
+} from './community/CommunityContentDetailView';
+export { CommunityContentSearchBar } from './community/CommunityContentSearchBar';
+export type { CommunityContentSearchBarProps } from './community/CommunityContentSearchBar';
+
 export { StoreHubTemplate } from './StoreHubTemplate';
 export type { StoreHubResourceCard, StoreHubFlowStep, StoreHubConfig, StoreHubTemplateProps } from './StoreHubTemplate';
 

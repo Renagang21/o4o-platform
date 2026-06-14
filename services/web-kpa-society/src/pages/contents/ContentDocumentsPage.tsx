@@ -24,7 +24,7 @@
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Search, X } from 'lucide-react';
+import { CommunityContentSearchBar } from '@o4o/shared-space-ui';
 import { contentApi, type ContentItem } from '../../api/content';
 import { assetSnapshotApi } from '../../api/assetSnapshot';
 import { useAuth } from '../../contexts/AuthContext';
@@ -411,29 +411,15 @@ export function ContentDocumentsPage({ subType = 'content' }: ContentDocumentsPa
         )}
       </header>
 
-      {/* WO-O4O-KPA-COMMUNITY-CONTENT-SEARCH-SURFACE-V1: 제목·내용·태그 검색 (제품 필터 없음) */}
+      {/* WO-O4O-KPA-COMMUNITY-CONTENT-SEARCH-SURFACE-V1 / WO-O4O-CONTENT-STANDARD-MODULE-EXTRACT-PHASE2-V1:
+          제목·내용·태그 검색 — 공통 CommunityContentSearchBar (제품 필터 없음) */}
       <div className="mb-4">
-        <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-          <input
-            type="text"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            placeholder="제목, 내용, 태그로 검색"
-            className="w-full pl-9 pr-9 py-2.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
-            aria-label="콘텐츠 검색"
-          />
-          {searchInput && (
-            <button
-              type="button"
-              onClick={() => setSearchInput('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-              aria-label="검색 초기화"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          )}
-        </div>
+        <CommunityContentSearchBar
+          value={searchInput}
+          onChange={setSearchInput}
+          onClear={() => setSearchInput('')}
+          placeholder="제목, 내용, 태그로 검색"
+        />
       </div>
 
       {/* Bulk ActionBar */}
