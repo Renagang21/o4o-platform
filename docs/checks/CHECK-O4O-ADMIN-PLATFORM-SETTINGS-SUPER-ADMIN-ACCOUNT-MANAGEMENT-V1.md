@@ -61,7 +61,10 @@ admin.neture.co.kr `/settings` 에 최고/플랫폼 관리자 계정의 **로그
 | 브라우저 smoke | ⏭️ 배포 후 — `/settings` "관리자 계정" 탭 진입 → 목록 표시 / 비번 재설정 모달 open·저장 / 본인 비활성 차단(403) / 마지막 super_admin 차단(403) 1회 확인 |
 
 ## 8. Commit / 배포
-- backend(2) + frontend(2) + CHECK: 단일 path-specific commit. push 시 **Deploy API Server** + **Deploy Admin Dashboard** 트리거(각 워크플로 path filter). 배포 후 §7 smoke.
+- backend(2) + frontend(2) + CHECK: 단일 path-specific commit `ee3ff4852` (push `7cce5ac4a..ee3ff4852`, divergence 0 0).
+- 배포: **Deploy API Server** run `27492717295` ✅ success · **Deploy Admin Dashboard** run `27492717338` ✅ success · admin.neture.co.kr 200.
+- **엔드포인트 sanity:** `GET /api/v1/admin/platform-accounts` (no auth) → **HTTP 401**(라우트 마운트 + 가드 작동 확인, 404 아님).
+- 잔여: 인증 후 브라우저 smoke(§7) — Playwright 점유로 보류. 가용 시 super_admin 로그인 → `/settings` "관리자 계정" 탭 1회 확인 권장.
 
 ## 9. 후속 (선택)
 1. 접근을 super_admin 전용으로 더 좁힐지 정책 결정(현재 super_admin+admin, super_admin 대상은 super_admin 만).
