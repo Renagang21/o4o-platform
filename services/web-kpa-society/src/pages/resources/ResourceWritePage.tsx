@@ -14,6 +14,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { RichTextEditor, AiContentModal } from '@o4o/content-editor';
+// WO-O4O-AI-PRODUCTION-TEMPLATE-SURFACE-PRESET-EXTEND-V1: store 바깥 surface(resource) preset
+import { findEditingPreset } from '@o4o/types';
 import { resourcesApi } from '../../api/resources';
 import { mediaApi } from '../../api/media';
 import { useAuth, getAccessToken } from '../../contexts/AuthContext';
@@ -572,6 +574,8 @@ export function ResourceWritePage() {
         onClose={() => setAiOpen(false)}
         editor={null}
         onInsert={handleAiInsert}
+        templateSystemPrompt={findEditingPreset('resource')?.systemPromptOverride}
+        templateForcedOptions={findEditingPreset('resource')?.forcedOptions}
         aiRequestHeaders={(() => {
           const token = getAccessToken();
           return token ? { Authorization: `Bearer ${token}` } : undefined;

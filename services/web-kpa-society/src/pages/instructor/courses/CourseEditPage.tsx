@@ -8,6 +8,8 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { RichTextEditor, AiContentModal } from '@o4o/content-editor';
+// WO-O4O-AI-PRODUCTION-TEMPLATE-SURFACE-PRESET-EXTEND-V1: store 바깥 surface(lms-lesson) preset
+import { findEditingPreset } from '@o4o/types';
 // WO-O4O-GUIDE-UI-COMPONENT-V1
 import { GuideBlock } from '@o4o/shared-space-ui';
 // WO-O4O-LMS-INSTRUCTOR-LESSON-LIST-MANAGER-V1: 레슨 목록/순서 공통 shell
@@ -475,6 +477,8 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
         editor={null}
         onInsert={handleAiInsert}
         showCommunitySave={true}
+        templateSystemPrompt={findEditingPreset('lms-lesson')?.systemPromptOverride}
+        templateForcedOptions={findEditingPreset('lms-lesson')?.forcedOptions}
         aiRequestHeaders={(() => {
           const token = getAccessToken();
           return token ? { Authorization: `Bearer ${token}` } : undefined;

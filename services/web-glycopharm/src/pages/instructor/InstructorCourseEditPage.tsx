@@ -13,6 +13,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { RichTextEditor, AiContentModal } from '@o4o/content-editor';
+// WO-O4O-AI-PRODUCTION-TEMPLATE-SURFACE-PRESET-EXTEND-V1: store 바깥 surface(lms-lesson) preset
+import { findEditingPreset } from '@o4o/types';
 import {
   InstructorCourseFormShell,
   type InstructorCourseFormValues,
@@ -292,6 +294,8 @@ function LessonModal({ courseId, lesson, nextOrder, onClose, onSaved }: LessonMo
         editor={null}
         onInsert={handleAiInsert}
         showCommunitySave={false}
+        templateSystemPrompt={findEditingPreset('lms-lesson')?.systemPromptOverride}
+        templateForcedOptions={findEditingPreset('lms-lesson')?.forcedOptions}
         aiRequestHeaders={(() => {
           const token = getAccessToken();
           return token ? { Authorization: `Bearer ${token}` } : undefined;

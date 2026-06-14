@@ -127,6 +127,10 @@ export * from './production.js';
 // canonical 출처 — KPA / GlycoPharm / K-Cosmetics 서비스별 template registry 타입 기반
 export * from './production-template.js';
 
+// Export surface-agnostic editing AI preset standard (WO-O4O-AI-PRODUCTION-TEMPLATE-SURFACE-PRESET-EXTEND-V1)
+// store ProductionTemplate 를 오염시키지 않는 상위 계층 — store 바깥 surface(LMS/resources 등) preset
+export * from './editing-preset.js';
+
 // Export business registration canonical types (WO-O4O-BUSINESS-INFO-CANONICAL-TYPE-PACKAGE-V1)
 // canonical 출처 — 4 service 사업자성 회원 (약국 경영자 / 매장 경영자 / 공급자 / 파트너)
 // 의 공통 사업자 등록 정보 type. 계좌 정보 제외 / 세금계산서 정보 별도.
