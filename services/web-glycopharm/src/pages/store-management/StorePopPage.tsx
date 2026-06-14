@@ -2,13 +2,15 @@
  * StorePopPage — GlycoPharm POP 생성
  *
  * WO-O4O-GLYCOPHARM-POP-STORE-EXECUTION-V1
+ * WO-O4O-AI-EDITING-MODAL-ADOPTION-ALIGNMENT-V1: POP AI 진입을 인라인 fetch →
+ *   공통 AiContentModal(@o4o/content-editor)로 정렬(KPA 패턴). 모델 resolver/preset 적용 가능.
  *
  * Community Canonical Store Execution 첫 축.
  * Resource → AI Content → POP 흐름 완성.
  *
  * 흐름:
  *   1. 공급자 자료 선택 (GET /glycopharm/pharmacy/pop/source/supplier-items)
- *   2. AI 문구 생성 (POST /api/ai/content-to-store-use, useCase='pop') — 선택
+ *   2. AI 문구 생성 (AiContentModal initialMode='pop' → POST /api/ai/content) — 선택
  *   3. 레이아웃/템플릿 선택
  *   4. POP PDF 생성 (POST /glycopharm/pharmacy/pop/generate, aiContent 포함)
  *
@@ -35,6 +37,8 @@ import { getAccessToken } from '@o4o/auth-client';
 import { toast } from '@o4o/error-handling';
 import type { ProductionTemplate } from '@o4o/types/production-template';
 import { findTemplate } from '@/config/productionTemplates';
+// WO-O4O-AI-EDITING-MODAL-ADOPTION-ALIGNMENT-V1: POP AI 진입을 KPA 와 동일한 공통 모달로 정렬
+import { AiContentModal } from '@o4o/content-editor';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -88,7 +92,7 @@ export default function StorePopPage() {
     }
     return '';
   });
-  const [aiGenerating, setAiGenerating] = useState(false);
+  const [aiOpen, setAiOpen] = useState(false);
   const [popAiContent, setPopAiContent] = useState<PopAiContent | null>(null);
 
   // Step 3: layout + template
@@ -132,8 +136,11 @@ export default function StorePopPage() {
 
   // ─── AI content generation ────────────────────────────────────────────────
 
-  const handleAiGenerate = async () => {
-    const sourceText = aiPrompt.trim() || selectedIds
+  // AiContentModal 진입 시 seed 할 입력 텍스트(주제 직접입력 우선, 없으면 선택 자료 원문).
+  const buildAiInputText = (): string => {
+    const fromPrompt = aiPrompt.trim();
+    if (fromPrompt) return fromPrompt;
+    return selectedIds
       .map((id) => {
         const item = items.find((it) => it.id === id);
         return item ? `${item.title}\n${item.description ?? ''}` : '';
@@ -141,48 +148,22 @@ export default function StorePopPage() {
       .filter(Boolean)
       .join('\n\n')
       .slice(0, 3000);
+  };
 
-    if (!sourceText) {
-      toast.error('AI 문구 생성에 사용할 내용이 없습니다. 자료를 선택하거나 주제를 입력하세요.');
-      return;
-    }
-
-    setAiGenerating(true);
-    try {
-      const token = getAccessToken();
-      const res = await fetch(`${API_BASE_URL}/api/ai/content-to-store-use`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({
-          sourceHtml: `<p>${sourceText.replace(/\n/g, '</p><p>')}</p>`,
-          useCase: 'pop',
-          audience: 'customer',
-          tone: selectedTemplate?.forcedOptions?.tone ?? 'easy',
-          length: selectedTemplate?.forcedOptions?.length ?? 'short',
-        }),
-      });
-
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error((errData as any)?.error?.message || 'AI 생성 실패');
-      }
-
-      const data = await res.json();
-      setPopAiContent({
-        title: data.title || '',
-        bullets: Array.isArray(data.bullets) ? data.bullets.slice(0, 3) : [],
-        shortText: data.shortText || data.plainText?.slice(0, 100) || '',
-        longText: data.longText || data.plainText || '',
-      });
-      toast.success('AI 문구가 생성되었습니다');
-    } catch (err: any) {
-      toast.error(err?.message || 'AI 문구 생성에 실패했습니다');
-    } finally {
-      setAiGenerating(false);
-    }
+  // AiContentModal onInsert — KPA POP 패턴과 동일: html 을 파싱해 popAiContent 로 변환.
+  const handleAiInsert = (data: { html: string; title: string }) => {
+    setAiOpen(false);
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(data.html, 'text/html');
+    const bullets = Array.from(doc.querySelectorAll('li')).map((li) => li.textContent?.trim() || '').filter(Boolean);
+    const paragraphs = Array.from(doc.querySelectorAll('p')).map((p) => p.textContent?.trim() || '').filter(Boolean);
+    setPopAiContent({
+      title: data.title || paragraphs[0] || '',
+      bullets: bullets.slice(0, 3),
+      shortText: paragraphs[0] || '',
+      longText: paragraphs.slice(0, 3).join(' '),
+    });
+    toast.success('AI 문구가 생성되었습니다');
   };
 
   // ─── POP PDF generation ───────────────────────────────────────────────────
@@ -350,12 +331,11 @@ export default function StorePopPage() {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 10 }}>
           <button
-            onClick={handleAiGenerate}
-            disabled={aiGenerating}
-            style={{ ...aiGenBtnStyle, opacity: aiGenerating ? 0.7 : 1 }}
+            onClick={() => setAiOpen(true)}
+            style={aiGenBtnStyle}
           >
-            {aiGenerating ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
-            {aiGenerating ? 'AI 생성 중...' : 'AI 문구 생성'}
+            <Sparkles size={14} />
+            AI 문구 생성
           </button>
           {popAiContent && (
             <button
@@ -471,6 +451,24 @@ export default function StorePopPage() {
           자료를 1개 이상 선택하면 POP를 생성할 수 있습니다
         </p>
       )}
+
+      {/* WO-O4O-AI-EDITING-MODAL-ADOPTION-ALIGNMENT-V1: POP 문구 AI 공통 모달(KPA 패턴) */}
+      <AiContentModal
+        open={aiOpen}
+        onClose={() => setAiOpen(false)}
+        editor={null}
+        onInsert={handleAiInsert}
+        initialMode="pop"
+        initialText={buildAiInputText()}
+        templateId={selectedTemplate?.id}
+        templateSystemPrompt={selectedTemplate?.systemPromptOverride}
+        templateForcedOptions={selectedTemplate?.forcedOptions}
+        headerLabel="POP 문구 AI 생성"
+        aiRequestHeaders={(() => {
+          const token = getAccessToken();
+          return token ? { Authorization: `Bearer ${token}` } : undefined;
+        })()}
+      />
     </div>
   );
 }
