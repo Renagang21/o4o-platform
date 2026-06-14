@@ -41,6 +41,10 @@ export interface LmsCourse {
   category?: string;
   lessonCount?: number;
   createdAt: string;
+  // WO-O4O-LMS-GPKCOS-HUB-VISIBILITY-MAPPING-V1: /lms 응답에 이미 포함(service-neutral) — hub 배지용
+  visibility?: 'public' | 'members';
+  requiresApproval?: boolean;
+  isPaid?: boolean;
 }
 
 export interface LmsEnrollment {

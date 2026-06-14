@@ -17,6 +17,10 @@ import { lmsApi, type LmsCourse } from '../../api/lms';
 
 // ─── Course type adapter (KPA mapCourse 동일 구조) ──────────────────────────
 
+// WO-O4O-LMS-GPKCOS-HUB-VISIBILITY-MAPPING-V1: 공개/회원제 배지용 — 유효값만 매핑, 그 외 undefined(=category fallback)
+const normalizeVisibility = (v: unknown): 'public' | 'members' | undefined =>
+  v === 'public' || v === 'members' ? v : undefined;
+
 function mapCourse(c: LmsCourse): LmsHubCourse {
   return {
     id: c.id,
@@ -27,6 +31,9 @@ function mapCourse(c: LmsCourse): LmsHubCourse {
     instructorName: c.instructor?.name || c.instructorName || undefined,
     instructorId: c.instructor?.id || undefined,
     createdAt: c.createdAt,
+    visibility: normalizeVisibility(c.visibility),
+    requiresApproval: c.requiresApproval,
+    isPaid: c.isPaid,
   };
 }
 
