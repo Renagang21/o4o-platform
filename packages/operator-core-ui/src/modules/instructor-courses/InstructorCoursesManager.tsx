@@ -22,6 +22,8 @@ export interface InstructorCourse {
   status: string;
   thumbnail?: string | null;
   description?: string | null;
+  category?: string | null;
+  lessonCount?: number;
   /** 수강생 수(서비스별 currentEnrollments/enrolledCount → wrapper 에서 매핑). */
   enrollmentCount?: number;
   /** 완료율(%) — 일부 서비스만. */
@@ -34,15 +36,18 @@ export type InstructorCourseRowAction = 'edit' | 'participants' | 'delete';
 export interface InstructorCoursesApi {
   /** 강사 본인 강의 목록(envelope/필드 매핑은 wrapper 책임 → InstructorCourse[] 반환). */
   list: () => Promise<InstructorCourse[]>;
-  delete: (id: string) => Promise<unknown>;
+  /** 삭제 — 'delete' action 또는 bulkDelete 사용 시 필수. read-only 서비스는 생략. */
+  delete?: (id: string) => Promise<unknown>;
 }
 
 export interface InstructorCoursesRoutes {
   dashboard: string;
-  create: string;
-  edit: (id: string) => string;
-  /** row click 이동(강의 관리/상세). */
-  manage: (id: string) => string;
+  /** 새 강의 작성 경로 — 있을 때만 생성 CTA 노출(read-only 서비스는 생략). */
+  create?: string;
+  /** 'edit' action 경로 — 있을 때만 수정 action 노출. */
+  edit?: (id: string) => string;
+  /** row click 이동(강의 관리/상세) — 있을 때만 row click 활성. */
+  manage?: (id: string) => string;
   /** 수강자 관리(있는 서비스만 — 'participants' action 사용 시 필수). */
   participants?: (id: string) => string;
 }
@@ -60,7 +65,11 @@ export interface InstructorCoursesConfig {
   rowActions?: InstructorCourseRowAction[];
   /** 컬럼 토글. */
   columns?: {
+    /** 썸네일 컬럼(기본 true). 썸네일 데이터 없는 서비스는 false 권장. */
+    thumbnail?: boolean;
     description?: boolean;
+    category?: boolean;
+    lessonCount?: boolean;
     createdAt?: boolean;
     completionRate?: boolean;
   };
@@ -102,8 +111,11 @@ export function InstructorCoursesManager({ config }: InstructorCoursesManagerPro
   const accent = config.accent ?? '#4f46e5';
   const rowActions = config.rowActions ?? ['edit', 'delete'];
   const showSearch = config.search ?? false;
-  const showBulk = config.bulkDelete ?? false;
+  const showBulk = (config.bulkDelete ?? false) && !!api.delete;
+  const showThumbnail = config.columns?.thumbnail ?? true;
   const showDescription = config.columns?.description ?? false;
+  const showCategory = config.columns?.category ?? false;
+  const showLessonCount = config.columns?.lessonCount ?? false;
   const showCreatedAt = config.columns?.createdAt ?? false;
   const showCompletion = config.columns?.completionRate ?? false;
 
@@ -126,6 +138,7 @@ export function InstructorCoursesManager({ config }: InstructorCoursesManagerPro
   useEffect(() => { fetchCourses(); }, [fetchCourses]);
 
   const handleDelete = useCallback(async (id: string) => {
+    if (!api.delete) return;
     setDeletingId(id);
     try {
       await api.delete(id);
@@ -139,11 +152,13 @@ export function InstructorCoursesManager({ config }: InstructorCoursesManagerPro
   }, [api]);
 
   const handleBulkDelete = useCallback(async () => {
+    if (!api.delete) return;
+    const del = api.delete;
     const ids = Array.from(selectedKeys);
     if (!ids.length) return;
     setBulkBusy(true);
     try {
-      await Promise.all(ids.map((id) => api.delete(id)));
+      await Promise.all(ids.map((id) => del(id)));
       setCourses((prev) => prev.filter((c) => !ids.includes(c.id)));
       setSelectedKeys(new Set());
     } catch {
@@ -189,17 +204,19 @@ export function InstructorCoursesManager({ config }: InstructorCoursesManagerPro
       });
     }
 
-    cols.push({
-      key: 'thumbnail',
-      header: '썸네일',
-      width: '80px',
-      render: (_v, row) =>
-        row.thumbnail ? (
-          <img src={row.thumbnail} alt={row.title} style={{ width: 60, height: 44, objectFit: 'cover', borderRadius: 6 }} />
-        ) : (
-          <div style={{ width: 60, height: 44, borderRadius: 6, background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>📚</div>
-        ),
-    });
+    if (showThumbnail) {
+      cols.push({
+        key: 'thumbnail',
+        header: '썸네일',
+        width: '80px',
+        render: (_v, row) =>
+          row.thumbnail ? (
+            <img src={row.thumbnail} alt={row.title} style={{ width: 60, height: 44, objectFit: 'cover', borderRadius: 6 }} />
+          ) : (
+            <div style={{ width: 60, height: 44, borderRadius: 6, background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>📚</div>
+          ),
+      });
+    }
 
     cols.push({
       key: 'title',
@@ -231,6 +248,15 @@ export function InstructorCoursesManager({ config }: InstructorCoursesManagerPro
       },
     });
 
+    if (showCategory) {
+      cols.push({
+        key: 'category',
+        header: '카테고리',
+        width: '120px',
+        render: (_v, row) => <span style={{ fontSize: 13, color: '#374151' }}>{row.category || '-'}</span>,
+      });
+    }
+
     cols.push({
       key: 'enrollmentCount',
       header: '수강생',
@@ -238,6 +264,16 @@ export function InstructorCoursesManager({ config }: InstructorCoursesManagerPro
       align: 'center',
       render: (_v, row) => <span style={{ fontSize: 13, color: '#374151' }}>{row.enrollmentCount ?? 0}명</span>,
     });
+
+    if (showLessonCount) {
+      cols.push({
+        key: 'lessonCount',
+        header: '레슨',
+        width: '70px',
+        align: 'center',
+        render: (_v, row) => <span style={{ fontSize: 13, color: '#374151' }}>{row.lessonCount ?? 0}</span>,
+      });
+    }
 
     if (showCompletion) {
       cols.push({
@@ -263,40 +299,42 @@ export function InstructorCoursesManager({ config }: InstructorCoursesManagerPro
       });
     }
 
-    cols.push({
-      key: '_actions',
-      header: '',
-      width: '52px',
-      align: 'center',
-      system: 'last' as any,
-      render: (_v, row) => {
-        const actions: RowActionItem[] = [];
-        if (rowActions.includes('edit')) {
-          actions.push({ key: 'edit', label: '수정', onClick: () => navigate(routes.edit(row.id)) });
-        }
-        if (rowActions.includes('participants') && routes.participants) {
-          actions.push({ key: 'participants', label: '수강자', onClick: () => navigate(routes.participants!(row.id)) });
-        }
-        if (rowActions.includes('delete')) {
-          actions.push({
-            key: 'delete',
-            label: '삭제',
-            variant: 'danger',
-            loading: deletingId === row.id,
-            confirm: {
-              title: '강의 삭제',
-              message: `"${row.title}" 강의를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`,
+    if (rowActions.length > 0) {
+      cols.push({
+        key: '_actions',
+        header: '',
+        width: '52px',
+        align: 'center',
+        system: 'last' as any,
+        render: (_v, row) => {
+          const actions: RowActionItem[] = [];
+          if (rowActions.includes('edit') && routes.edit) {
+            actions.push({ key: 'edit', label: '수정', onClick: () => navigate(routes.edit!(row.id)) });
+          }
+          if (rowActions.includes('participants') && routes.participants) {
+            actions.push({ key: 'participants', label: '수강자', onClick: () => navigate(routes.participants!(row.id)) });
+          }
+          if (rowActions.includes('delete') && api.delete) {
+            actions.push({
+              key: 'delete',
+              label: '삭제',
               variant: 'danger',
-            },
-            onClick: () => handleDelete(row.id),
-          });
-        }
-        return <RowActionMenu actions={actions} />;
-      },
-    });
+              loading: deletingId === row.id,
+              confirm: {
+                title: '강의 삭제',
+                message: `"${row.title}" 강의를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`,
+                variant: 'danger',
+              },
+              onClick: () => handleDelete(row.id),
+            });
+          }
+          return <RowActionMenu actions={actions} />;
+        },
+      });
+    }
 
     return cols;
-  }, [showBulk, showDescription, showCompletion, showCreatedAt, rowActions, routes, navigate, deletingId, handleDelete, selectedKeys, accent]);
+  }, [showBulk, showThumbnail, showDescription, showCategory, showLessonCount, showCompletion, showCreatedAt, rowActions, routes, navigate, deletingId, handleDelete, selectedKeys, accent, api]);
 
   const bulkActions: ActionBarAction[] = [
     {
@@ -318,7 +356,7 @@ export function InstructorCoursesManager({ config }: InstructorCoursesManagerPro
       <p style={{ margin: '0 0 12px', fontSize: 15 }}>
         {showSearch && search ? '검색 결과가 없습니다.' : '등록된 강의가 없습니다.'}
       </p>
-      {!(showSearch && search) && (
+      {routes.create && !(showSearch && search) && (
         <Link
           to={routes.create}
           style={{ display: 'inline-block', padding: '10px 20px', background: accent, color: '#fff', borderRadius: 8, fontSize: 14, fontWeight: 600, textDecoration: 'none' }}
@@ -340,12 +378,14 @@ export function InstructorCoursesManager({ config }: InstructorCoursesManagerPro
       </span>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
         <h1 style={{ fontSize: 22, fontWeight: 700, color: '#111827', margin: 0 }}>내 강의 목록</h1>
-        <button
-          style={{ padding: '10px 20px', background: accent, color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
-          onClick={() => navigate(routes.create)}
-        >
-          + 새 강의 만들기
-        </button>
+        {routes.create && (
+          <button
+            style={{ padding: '10px 20px', background: accent, color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
+            onClick={() => navigate(routes.create!)}
+          >
+            + 새 강의 만들기
+          </button>
+        )}
       </div>
 
       {showSearch && (
@@ -389,7 +429,7 @@ export function InstructorCoursesManager({ config }: InstructorCoursesManagerPro
             selectable={showBulk}
             selectedKeys={selectedKeys}
             onSelectionChange={setSelectedKeys}
-            onRowClick={(row) => navigate(routes.manage(row.id))}
+            onRowClick={routes.manage ? (row) => navigate(routes.manage!(row.id)) : undefined}
           />
         </div>
       )}
