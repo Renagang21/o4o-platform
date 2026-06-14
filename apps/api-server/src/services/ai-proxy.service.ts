@@ -43,6 +43,9 @@ interface GeminiHttpResult {
 import { AppDataSource } from '../database/connection.js';
 import { AIUsageLog, AIProvider as UsageProvider, AIUsageStatus } from '../entities/AIUsageLog.js';
 import { resolveAiApiKey } from '../utils/ai-key.util.js';
+// WO-O4O-AI-PROVIDER-ABSTRACTION-CALLPROVIDER-ALIGNMENT-V1: provider×surface guardrail gate
+import { resolveEditingProvider, EDITING_MODEL_FALLBACK } from '../utils/ai-editing-model-resolver.js';
+import type { EditingSurface } from '@o4o/types';
 
 class AIProxyService {
   private static instance: AIProxyService;
@@ -644,6 +647,34 @@ class AIProxyService {
       result: normalizedResult,
       requestId,
     };
+  }
+
+  /**
+   * 편집 AI 생성의 provider×surface guardrail gate.
+   * WO-O4O-AI-PROVIDER-ABSTRACTION-CALLPROVIDER-ALIGNMENT-V1
+   *
+   * - provider/model 을 `resolveEditingProvider(surface)` 로 결정(guardrail 강제).
+   * - **gemini → 기존 generateRawContent(검증된 Gemini transport, 불변).**
+   * - **비-gemini → guardrail 은 통과했으나 transport 미배선(후속 WO) → 안전하게 Gemini fallback.**
+   *   (Qwen/DeepSeek 실제 호출은 `WO-...-QWEN-SINGAPORE-LOW-RISK-SURFACE-EXPERIMENT-V1` 에서 key+transport 동반 배선.)
+   * - 편집 endpoint 는 provider/model 을 하드코딩하지 않고 surface 만 전달한다.
+   */
+  async generateEditingRawContent(
+    request: Omit<AIGenerateRequest, 'provider' | 'model'>,
+    userId: string,
+    requestId: string,
+    opts: { surface?: EditingSurface } = {},
+  ): Promise<AIRawContentResponse> {
+    const { provider, model } = await resolveEditingProvider({ surface: opts.surface });
+    if (provider !== 'gemini') {
+      logger.warn('generateEditingRawContent: non-gemini provider gated — transport not wired, falling back to gemini', {
+        provider,
+        surface: opts.surface,
+        requestId,
+      });
+      return this.generateRawContent({ ...request, provider: 'gemini', model: EDITING_MODEL_FALLBACK }, userId, requestId);
+    }
+    return this.generateRawContent({ ...request, provider: 'gemini', model }, userId, requestId);
   }
 
   /**

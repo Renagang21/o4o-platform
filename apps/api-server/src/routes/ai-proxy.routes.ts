@@ -14,7 +14,8 @@ import { Router, Response } from 'express';
 import { authenticate } from '../middleware/auth.middleware.js';
 import { aiProxyService } from '../services/ai-proxy.service.js';
 // WO-O4O-AI-MODEL-SELECTION-RUNTIME-RESOLVER-V1: 편집 모델을 admin 정책(AiQueryPolicy.defaultModel)에서 결정
-import { resolveEditingModel } from '../utils/ai-editing-model-resolver.js';
+// WO-O4O-AI-PROVIDER-ABSTRACTION-CALLPROVIDER-ALIGNMENT-V1: surface→provider guardrail gate
+import { resolveEditingModel, editingSurfaceForOutputType } from '../utils/ai-editing-model-resolver.js';
 import { AppDataSource } from '../database/connection.js';
 import type { AuthRequest } from '../types/auth.js';
 import logger from '../utils/logger.js';
@@ -232,10 +233,8 @@ router.post('/content', authenticate, async (req, res: Response) => {
   const requestId = crypto.randomUUID();
 
   try {
-    const rawResponse = await aiProxyService.generateRawContent(
+    const rawResponse = await aiProxyService.generateEditingRawContent(
       {
-        provider: 'gemini',
-        model: await resolveEditingModel(),
         systemPrompt,
         userPrompt,
         temperature: 0.5,
@@ -243,6 +242,7 @@ router.post('/content', authenticate, async (req, res: Response) => {
       },
       userId,
       requestId,
+      { surface: editingSurfaceForOutputType(outputType) },
     );
 
     const normalized = parseResponse(outputType, rawResponse.parsed, rawResponse.rawText);
@@ -1066,10 +1066,9 @@ router.post('/url-to-blocks', authenticate, async (req, res: Response) => {
     //   maxTokens 는 length 별로 동적 조정 (long 은 16384 까지 확보).
     let aiResponse: Awaited<ReturnType<typeof aiProxyService.generateRawContent>>;
     try {
-      aiResponse = await aiProxyService.generateRawContent(
+      // surface 불명확(블록 변환 범용) → gemini 유지
+      aiResponse = await aiProxyService.generateEditingRawContent(
         {
-          provider: 'gemini',
-          model: await resolveEditingModel(),
           systemPrompt,
           userPrompt,
           temperature: 0.5,
@@ -1323,10 +1322,8 @@ router.post('/content-to-store-use', authenticate, async (req, res: Response) =>
   const requestId = crypto.randomUUID();
 
   try {
-    const rawResponse = await aiProxyService.generateRawContent(
+    const rawResponse = await aiProxyService.generateEditingRawContent(
       {
-        provider: 'gemini',
-        model: await resolveEditingModel(),
         systemPrompt,
         userPrompt,
         temperature: 0.5,
@@ -1334,6 +1331,7 @@ router.post('/content-to-store-use', authenticate, async (req, res: Response) =>
       },
       userId,
       requestId,
+      { surface: editingSurfaceForOutputType(outputType) },
     );
 
     const normalized = parseResponse(outputType, rawResponse.parsed, rawResponse.rawText);
@@ -1465,10 +1463,9 @@ router.post('/course-structure', authenticate, async (req, res: Response) => {
 
     // 2. AI 호출
     logger.info('[course-structure] 시작', { requestId, userId, type });
-    const aiResponse = await aiProxyService.generateRawContent(
+    // course-structure 는 EditingSurface 밖(2단계 구조 생성) → gemini 유지
+    const aiResponse = await aiProxyService.generateEditingRawContent(
       {
-        provider: 'gemini',
-        model: await resolveEditingModel(),
         systemPrompt: buildCourseStructureSystemPrompt(),
         userPrompt,
         temperature: 0.6,
@@ -1618,10 +1615,8 @@ router.post('/lesson-body', authenticate, async (req, res: Response) => {
 
     logger.info('[lesson-body] 시작', { requestId, userId, lessonTitle: lessonTitle.slice(0, 60) });
 
-    const aiResponse = await aiProxyService.generateRawContent(
+    const aiResponse = await aiProxyService.generateEditingRawContent(
       {
-        provider: 'gemini',
-        model: await resolveEditingModel(),
         systemPrompt: buildLessonBodySystemPrompt(tone, audience),
         userPrompt,
         temperature: 0.6,
@@ -1629,6 +1624,7 @@ router.post('/lesson-body', authenticate, async (req, res: Response) => {
       },
       userId,
       requestId,
+      { surface: 'lms-lesson' },
     );
 
     let rawText: string = (aiResponse.rawText || '').trim();
