@@ -22,6 +22,9 @@ import { createCosmeticsStoreController } from './controllers/cosmetics-store.co
 import { requireAuth as coreRequireAuth } from '../../middleware/auth.middleware.js';
 // WO-O4O-OPERATOR-API-ARCHITECTURE-UNIFICATION-V1: Centralized scope middleware
 import { requireCosmeticsScope } from '../../middleware/cosmetics-scope.middleware.js';
+// WO-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-ENABLE-GP-KCOS-V1: 공유 operator 공급 상품 신청 승인 컨트롤러(serviceKey 격리)
+import { createOperatorProductApplicationsController } from '../kpa/controllers/operator-product-applications.controller.js';
+import { ActionLogService } from '@o4o/action-log-core';
 // WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1: Store HUB controllers
 import { createStoreHubController } from '../o4o-store/controllers/store-hub.controller.js';
 import { createStoreChannelProductsController } from '../o4o-store/controllers/store-channel-products.controller.js';
@@ -128,6 +131,18 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
   // B2B Supply Catalog — 공급자 상품 카탈로그 + 신청 (WO-O4O-HUB-TO-STORE-UX-BRIDGE-V1)
   // WO-GLYCOPHARM-STORE-GUARD-SERVICE-AWARE-FIX-V1: serviceKey='cosmetics' 전달 → cosmetics:store_owner 만 통과.
   router.use('/pharmacy/products', createPharmacyProductsController(dataSource, coreRequireAuth as any, 'cosmetics'));
+
+  // WO-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-ENABLE-GP-KCOS-V1
+  // /api/v1/cosmetics/operator/product-applications — 운영자 공급 상품 신청 승인/거절
+  // 권한: cosmetics:operator. serviceKey='k-cosmetics' 격리(KPA 공유 컨트롤러 재사용).
+  // approve = ProductApprovalV2Service.approveServiceProduct(activateListing:true) — per-store 단건 OPL active.
+  router.use('/operator/product-applications', createOperatorProductApplicationsController(
+    dataSource,
+    coreRequireAuth as any,
+    requireCosmeticsScope,
+    new ActionLogService(dataSource),
+    { scope: 'cosmetics:operator', serviceKey: 'k-cosmetics' },
+  ));
 
   // Asset Snapshot
   router.use('/assets', createAssetSnapshotController(dataSource, coreRequireAuth as any));

@@ -68,6 +68,8 @@ import { createGlycopharmEventOfferOperatorController } from './controllers/even
 import { createNewsController } from '../o4o-store/controllers/news.controller.js'; // WO-O4O-CONTENT-CANONICAL-CROSS-SERVICE-ALIGNMENT-V1
 import { createGlycopharmMemberController } from './controllers/glycopharm-member.controller.js'; // WO-GLYCOPHARM-MEMBER-REGISTER-FLOW-V1
 import { createGlycopharmMypageController } from './controllers/mypage.controller.js'; // WO-O4O-MYPAGE-MY-REQUESTS-INBOX-GLYCO-KCOS-ROUTE-V1
+// WO-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-ENABLE-GP-KCOS-V1: 공유 operator 공급 상품 신청 승인 컨트롤러(serviceKey 격리)
+import { createOperatorProductApplicationsController } from '../kpa/controllers/operator-product-applications.controller.js';
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 import { hasAnyServiceRole, logLegacyRoleUsage } from '../../utils/role.utils.js';
 import { GLYCOPHARM_SCOPE_CONFIG } from '@o4o/security-core';
@@ -526,6 +528,18 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
     dataSource,
     coreRequireAuth as any,
     requireGlycopharmScope,
+  ));
+
+  // WO-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-ENABLE-GP-KCOS-V1
+  // /api/v1/glycopharm/operator/product-applications — 운영자 공급 상품 신청 승인/거절
+  // 권한: glycopharm:operator. serviceKey='glycopharm' 격리(KPA 공유 컨트롤러 재사용).
+  // approve = ProductApprovalV2Service.approveServiceProduct(activateListing:true) — per-store 단건 OPL active.
+  router.use('/operator/product-applications', createOperatorProductApplicationsController(
+    dataSource,
+    coreRequireAuth as any,
+    requireGlycopharmScope,
+    actionLogService,
+    { scope: 'glycopharm:operator', serviceKey: 'glycopharm' },
   ));
 
   // ============================================================================
