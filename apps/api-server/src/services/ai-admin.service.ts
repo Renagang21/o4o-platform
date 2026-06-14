@@ -125,6 +125,16 @@ class AiAdminService {
           isAvailable: true,
           sortOrder: 2,
         },
+        {
+          // WO-O4O-AI-ENGINE-REGISTRY-CANDIDATE-SEED-V1: 저비용/짧은 문구(POP/QR) 후보
+          slug: 'gemini-2.5-flash-lite',
+          name: 'Gemini 2.5 Flash-Lite',
+          description: '최저가·저지연 모델. POP/QR 등 짧은 문구 생성에 적합합니다.',
+          provider: 'google',
+          isActive: false,
+          isAvailable: true,
+          sortOrder: 3,
+        },
       ];
 
       for (const engine of defaultEngines) {
