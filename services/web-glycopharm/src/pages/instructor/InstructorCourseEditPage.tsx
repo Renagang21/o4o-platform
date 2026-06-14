@@ -13,14 +13,13 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { RichTextEditor, AiContentModal } from '@o4o/content-editor';
+import { InstructorCourseFormShell, type InstructorCourseFormValues } from '@o4o/operator-core-ui';
 import { getAccessToken } from '@/contexts/AuthContext';
 import {
   lmsApi,
   type InstructorCourseDetail,
   type InstructorLesson,
   type LessonType,
-  type CourseVisibility,
-  type CourseReusablePolicy,
 } from '@/api/lms';
 
 const LESSON_TYPE_LABEL: Record<LessonType, string> = {
@@ -310,14 +309,9 @@ export default function InstructorCourseEditPage() {
   const [lessons, setLessons] = useState<InstructorLesson[]>([]);
   const [loading, setLoading] = useState(!isNew);
   const [error, setError] = useState<string | null>(null);
-  const [form, setForm] = useState({ title: '', description: '' });
-  const [tags, setTags] = useState<string[]>([]);
-  const [tagInput, setTagInput] = useState('');
-  const [visibility, setVisibility] = useState<CourseVisibility>('members');
-  const [requiresApproval, setRequiresApproval] = useState(false);
-  const [reusablePolicy, setReusablePolicy] = useState<CourseReusablePolicy>('restricted');
-  const [saving, setSaving] = useState(false);
-  const [saveMsg, setSaveMsg] = useState<string | null>(null);
+  // 기본정보 form(title/description/visibility/requiresApproval/reusablePolicy/tags)의
+  // 상태·저장 UI 는 공통 `InstructorCourseFormShell` 이 소유. 본 페이지는 course 로부터
+  // initialValues 를 주입하고 onSubmit(values) 에서 instructorUpdateCourse 만 호출한다.
   const [lessonModal, setLessonModal] = useState<{ open: boolean; lesson: InstructorLesson | null }>({ open: false, lesson: null });
   const [showCreatedBanner, setShowCreatedBanner] = useState(() => !!(location.state as any)?.justCreated);
   const dragIndexRef = useRef<number | null>(null);
@@ -336,11 +330,6 @@ export default function InstructorCourseEditPage() {
         lmsApi.instructorGetLessons(courseId),
       ]);
       setCourse(c);
-      setForm({ title: c.title, description: c.description || '' });
-      setTags(c.tags || []);
-      setVisibility(c.visibility ?? 'members');
-      setRequiresApproval(c.requiresApproval ?? false);
-      setReusablePolicy(c.reusablePolicy ?? 'restricted');
       setLessons([...ls].sort((a, b) => a.order - b.order));
     } catch (e: any) {
       setError('강의 정보를 불러오지 못했습니다.');
@@ -365,26 +354,17 @@ export default function InstructorCourseEditPage() {
     }
   };
 
-  const handleSaveCourse = async () => {
-    if (!courseId || !form.title.trim()) return;
-    setSaving(true);
-    setSaveMsg(null);
-    try {
-      await lmsApi.instructorUpdateCourse(courseId, {
-        title: form.title.trim(),
-        description: form.description.trim(),
-        tags: tags.length > 0 ? tags : [],
-        visibility,
-        reusablePolicy,
-        requiresApproval,
-      });
-      setSaveMsg('저장되었습니다.');
-      setTimeout(() => setSaveMsg(null), 2000);
-    } catch {
-      setSaveMsg('저장 실패');
-    } finally {
-      setSaving(false);
-    }
+  // 공통 shell 이 submitting/성공·실패 표시를 소유 → 여기서는 저장만 수행하고 실패 시 throw.
+  const handleSaveCourse = async (values: InstructorCourseFormValues) => {
+    if (!courseId) return;
+    await lmsApi.instructorUpdateCourse(courseId, {
+      title: values.title,
+      description: values.description,
+      tags: values.tags.length > 0 ? values.tags : [],
+      visibility: values.visibility,
+      reusablePolicy: values.reusablePolicy,
+      requiresApproval: values.requiresApproval,
+    });
   };
 
   const handleSubmitForReview = async () => {
@@ -440,13 +420,6 @@ export default function InstructorCourseEditPage() {
     }
   };
   const handleDragEnd = () => { dragIndexRef.current = null; setDragOverIndex(null); };
-
-  const addTag = () => {
-    const t = tagInput.trim().replace(/^#/, '');
-    if (!t || t.length > 30 || tags.includes(t)) { setTagInput(''); return; }
-    setTags((p) => [...p, t]);
-    setTagInput('');
-  };
 
   const nextOrder = lessons.length > 0 ? Math.max(...lessons.map((l) => l.order)) + 1 : 1;
 
@@ -516,85 +489,38 @@ export default function InstructorCourseEditPage() {
         )}
 
         <div style={s.card}>
-          <div style={s.field}>
-            <label style={s.label}>제목</label>
-            <input style={s.input} value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} />
-          </div>
-          <div style={s.field}>
-            <label style={s.label}>설명</label>
-            <textarea style={s.textarea} value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} />
-          </div>
-          <div style={s.field}>
-            <label style={s.label}>공개 범위</label>
-            <div style={{ display: 'flex', gap: 16 }}>
-              {(['members', 'public'] as CourseVisibility[]).map((v) => (
-                <label key={v} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#374151', cursor: 'pointer' }}>
-                  <input type="radio" name="visibility" value={v} checked={visibility === v} onChange={() => setVisibility(v)} />
-                  {v === 'members' ? '회원제 강의' : '공개 강의'}
-                </label>
-              ))}
-            </div>
-          </div>
-          {visibility === 'members' && (
-            <div style={s.field}>
-              <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, cursor: 'pointer' }}>
-                <input type="checkbox" checked={requiresApproval} onChange={(e) => setRequiresApproval(e.target.checked)} style={{ marginTop: 2 }} />
-                <span>
-                  <span style={{ ...s.label, display: 'block' }}>강사 승인 필요</span>
-                  <span style={{ fontSize: 11, color: '#9ca3af' }}>수강 신청 후 강사가 직접 승인해야 수강이 가능합니다.</span>
-                </span>
-              </label>
-            </div>
-          )}
-          <div style={s.field}>
-            <label style={s.label}>매장 자료함 활용 허용</label>
-            <div style={{ display: 'flex', gap: 16 }}>
-              {(['restricted', 'platform'] as CourseReusablePolicy[]).map((v) => (
-                <label key={v} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#374151', cursor: 'pointer' }}>
-                  <input type="radio" name="reusablePolicy" value={v} checked={reusablePolicy === v} onChange={() => setReusablePolicy(v)} />
-                  {v === 'restricted' ? '차단(기본)' : '모든 매장 허용'}
-                </label>
-              ))}
-            </div>
-          </div>
-          <div style={s.field}>
-            <label style={s.label}>태그</label>
-            <div style={s.tagContainer}>
-              {tags.map((tag) => (
-                <span key={tag} style={s.tag}>
-                  {tag}
-                  <span style={s.tagRemove} onClick={() => setTags((p) => p.filter((t) => t !== tag))}>×</span>
-                </span>
-              ))}
-              <input
-                style={s.tagInput}
-                type="text"
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addTag(); } }}
-                placeholder="태그 입력 후 Enter"
-              />
-            </div>
-          </div>
-          <div style={s.row}>
-            <button style={saveBtnStyle(saving || !form.title.trim())} disabled={saving || !form.title.trim()} onClick={handleSaveCourse}>
-              {saving ? '저장 중...' : '저장'}
-            </button>
-            {(course.status === 'draft' || course.status === 'rejected') && (
-              <button style={publishBtnStyle(false)} onClick={handleSubmitForReview}>
-                {course.status === 'rejected' ? '수정 후 재요청' : '승인 요청'}
-              </button>
-            )}
-            {course.status === 'pending_review' && (
-              <button style={{ ...publishBtnStyle(true), opacity: 0.6, cursor: 'not-allowed' }} disabled>검토 중</button>
-            )}
-            {course.status !== 'archived' && (
-              <button style={s.archiveBtn} onClick={handleArchive}>강의 종료</button>
-            )}
-            {saveMsg && (
-              <span style={{ fontSize: 13, color: saveMsg === '저장되었습니다.' ? '#16a34a' : '#ef4444' }}>{saveMsg}</span>
-            )}
-          </div>
+          <InstructorCourseFormShell
+            config={{
+              accent: C.primary,
+              submitLabel: '저장',
+              submittingLabel: '저장 중...',
+              successMessage: '저장되었습니다.',
+            }}
+            initialValues={{
+              title: course.title,
+              description: course.description || '',
+              visibility: course.visibility ?? 'members',
+              requiresApproval: course.requiresApproval ?? false,
+              reusablePolicy: course.reusablePolicy ?? 'restricted',
+              tags: course.tags || [],
+            }}
+            onSubmit={handleSaveCourse}
+            extraActions={
+              <>
+                {(course.status === 'draft' || course.status === 'rejected') && (
+                  <button type="button" style={publishBtnStyle(false)} onClick={handleSubmitForReview}>
+                    {course.status === 'rejected' ? '수정 후 재요청' : '승인 요청'}
+                  </button>
+                )}
+                {course.status === 'pending_review' && (
+                  <button type="button" style={{ ...publishBtnStyle(true), opacity: 0.6, cursor: 'not-allowed' }} disabled>검토 중</button>
+                )}
+                {course.status !== 'archived' && (
+                  <button type="button" style={s.archiveBtn} onClick={handleArchive}>강의 종료</button>
+                )}
+              </>
+            }
+          />
         </div>
       </div>
 

@@ -1,51 +1,20 @@
 /**
  * CourseNewPage — /instructor/courses/new
  * WO-O4O-LMS-FOUNDATION-V1
+ * WO-O4O-LMS-INSTRUCTOR-COURSE-FORM-SHELL-V1: 기본정보 form 을 공통 `InstructorCourseFormShell`
+ *   (@o4o/operator-core-ui) 로 위임. 저장(createCourse)·라우팅은 본 wrapper 가 담당.
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { lmsInstructorApi, type ContentKind, type CourseVisibility, type CourseReusablePolicy } from '../../../api/lms-instructor';
+import { InstructorCourseFormShell, type InstructorCourseFormValues } from '@o4o/operator-core-ui';
+import { lmsInstructorApi, type ContentKind } from '../../../api/lms-instructor';
 
 const styles: Record<string, React.CSSProperties> = {
   page: { maxWidth: 680, margin: '0 auto', padding: '32px 20px' },
   backLink: { fontSize: 13, color: '#6b7280', cursor: 'pointer', marginBottom: 20, display: 'inline-block' },
   title: { fontSize: 22, fontWeight: 700, color: '#111827', margin: '0 0 28px' },
-  form: { display: 'flex', flexDirection: 'column', gap: 20 },
-  field: { display: 'flex', flexDirection: 'column', gap: 6 },
-  label: { fontSize: 13, fontWeight: 600, color: '#374151' },
-  input: {
-    padding: '10px 14px', border: '1px solid #d1d5db', borderRadius: 8,
-    fontSize: 14, color: '#111827', outline: 'none',
-  },
-  textarea: {
-    padding: '10px 14px', border: '1px solid #d1d5db', borderRadius: 8,
-    fontSize: 14, color: '#111827', outline: 'none', resize: 'vertical', minHeight: 100,
-  },
-  tagContainer: {
-    display: 'flex', flexWrap: 'wrap', gap: 6, padding: '8px 10px',
-    border: '1px solid #d1d5db', borderRadius: 8, minHeight: 44, alignItems: 'center',
-  },
-  tag: {
-    display: 'inline-flex', alignItems: 'center', gap: 4, padding: '2px 10px',
-    background: '#ede9fe', color: '#5b21b6', borderRadius: 999, fontSize: 12, fontWeight: 500,
-  },
-  tagRemove: { cursor: 'pointer', fontSize: 14, color: '#7c3aed', lineHeight: 1 },
-  tagInput: { border: 'none', outline: 'none', fontSize: 13, flex: 1, minWidth: 80, color: '#111827' },
-  hint: { fontSize: 11, color: '#9ca3af' },
-  actions: { display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 8 },
-  cancelBtn: {
-    padding: '10px 20px', background: '#f3f4f6', color: '#374151',
-    border: 'none', borderRadius: 8, fontSize: 14, cursor: 'pointer',
-  },
-  error: { color: '#ef4444', fontSize: 13 },
 };
-
-const submitBtnStyle = (disabled: boolean): React.CSSProperties => ({
-  padding: '10px 24px', background: disabled ? '#c4b5fd' : '#4f46e5', color: '#fff',
-  border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600,
-  cursor: disabled ? 'not-allowed' : 'pointer',
-});
 
 interface CourseNewPageProps {
   /** Override page title (default: "새 강의 만들기") */
@@ -80,193 +49,44 @@ export default function CourseNewPage({
   contentKind,
 }: CourseNewPageProps = {}) {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ title: '', description: '' });
-  const [tags, setTags] = useState<string[]>([]);
-  const [tagInput, setTagInput] = useState('');
-  // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1: 기본값 회원제
-  const [visibility, setVisibility] = useState<CourseVisibility>('members');
-  // WO-O4O-LMS-VISIBILITY-ENROLLMENT-INTEGRATION-V1: 강사 승인 필요 여부 (기본값 false)
-  const [requiresApproval, setRequiresApproval] = useState(false);
-  // WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1: 매장 자료함 가져가기 허용 여부 (기본값 차단)
-  const [reusablePolicy, setReusablePolicy] = useState<CourseReusablePolicy>('restricted');
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const back = () => navigate(returnTo ?? '/instructor/courses');
 
-  const addTag = () => {
-    const t = tagInput.trim().replace(/^#/, '');
-    if (!t || t.length > 30 || tags.includes(t)) { setTagInput(''); return; }
-    setTags((prev) => [...prev, t]);
-    setTagInput('');
-  };
-
-  const removeTag = (tag: string) => setTags((prev) => prev.filter((t) => t !== tag));
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!form.title.trim() || !form.description.trim()) return;
-    if (tags.length === 0) { setError('태그를 1개 이상 입력해주세요'); return; }
-    setSubmitting(true);
-    setError(null);
-    try {
-      const res: any = await lmsInstructorApi.createCourse({
-        title: form.title.trim(),
-        description: form.description.trim(),
-        tags: tags.length > 0 ? tags : undefined,
-        contentKind, // 미지정 시 백엔드에서 'lecture' 기본
-        visibility,  // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1
-        reusablePolicy, // WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1
-        requiresApproval, // WO-O4O-LMS-VISIBILITY-ENROLLMENT-INTEGRATION-V1
-      });
-      // API returns { success, data: Course }
-      const courseId = res.data?.data?.id;
-      if (courseId) {
-        const target = redirectAfterCreate ? redirectAfterCreate(courseId) : `/instructor/courses/${courseId}`;
-        navigate(target, { state: { justCreated: true } });
-      } else {
-        navigate(redirectAfterCreateFallback ?? returnTo ?? '/instructor/courses');
-      }
-    } catch (err: any) {
-      setError(err?.response?.data?.error || '강의 생성에 실패했습니다.');
-      setSubmitting(false);
+  const handleSubmit = async (values: InstructorCourseFormValues) => {
+    const res: any = await lmsInstructorApi.createCourse({
+      title: values.title,
+      description: values.description,
+      tags: values.tags.length > 0 ? values.tags : undefined,
+      contentKind, // 미지정 시 백엔드에서 'lecture' 기본
+      visibility: values.visibility,            // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1
+      reusablePolicy: values.reusablePolicy,     // WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1
+      requiresApproval: values.requiresApproval, // WO-O4O-LMS-VISIBILITY-ENROLLMENT-INTEGRATION-V1
+    });
+    // API returns { success, data: Course }
+    const courseId = res.data?.data?.id;
+    if (courseId) {
+      const target = redirectAfterCreate ? redirectAfterCreate(courseId) : `/instructor/courses/${courseId}`;
+      navigate(target, { state: { justCreated: true } });
+    } else {
+      navigate(redirectAfterCreateFallback ?? returnTo ?? '/instructor/courses');
     }
   };
 
-  const isValid = form.title.trim().length > 0 && form.description.trim().length > 0;
-
   return (
     <div style={styles.page}>
-      <span style={styles.backLink} onClick={() => navigate(returnTo ?? '/instructor/courses')}>{backLinkText ?? '← 강의 목록'}</span>
+      <span style={styles.backLink} onClick={back}>{backLinkText ?? '← 강의 목록'}</span>
       <h1 style={styles.title}>{pageTitle ?? '새 강의 만들기'}</h1>
 
-      <form style={styles.form} onSubmit={handleSubmit}>
-        <div style={styles.field}>
-          <label style={styles.label}>강의 제목 *</label>
-          <input
-            style={styles.input}
-            type="text"
-            value={form.title}
-            onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-            placeholder="강의 제목을 입력하세요"
-            maxLength={255}
-          />
-        </div>
-
-        <div style={styles.field}>
-          <label style={styles.label}>강의 설명 *</label>
-          <textarea
-            style={styles.textarea}
-            value={form.description}
-            onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-            placeholder="강의 내용과 목표를 설명해 주세요"
-          />
-        </div>
-
-        {/* WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1: 공개 범위 */}
-        <div style={styles.field}>
-          <label style={styles.label}>공개 범위 *</label>
-          <div style={{ display: 'flex', gap: 16 }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#374151', cursor: 'pointer' }}>
-              <input
-                type="radio"
-                name="visibility"
-                value="members"
-                checked={visibility === 'members'}
-                onChange={() => setVisibility('members')}
-              />
-              회원제 강의
-            </label>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#374151', cursor: 'pointer' }}>
-              <input
-                type="radio"
-                name="visibility"
-                value="public"
-                checked={visibility === 'public'}
-                onChange={() => setVisibility('public')}
-              />
-              공개 강의
-            </label>
-          </div>
-          <span style={styles.hint}>회원제는 로그인 회원만, 공개는 모두에게 노출됩니다.</span>
-        </div>
-
-        {/* WO-O4O-LMS-VISIBILITY-ENROLLMENT-INTEGRATION-V1: 강사 승인 필요 — MEMBERS 강의에서만 표시 */}
-        {visibility === 'members' && (
-          <div style={styles.field}>
-            <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, cursor: 'pointer' }}>
-              <input
-                type="checkbox"
-                checked={requiresApproval}
-                onChange={(e) => setRequiresApproval(e.target.checked)}
-                style={{ marginTop: 2 }}
-              />
-              <span>
-                <span style={{ ...styles.label, display: 'block' }}>강사 승인 필요</span>
-                <span style={styles.hint}>수강 신청 후 강사가 직접 승인해야 수강이 가능합니다.</span>
-              </span>
-            </label>
-          </div>
-        )}
-
-        {/* WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1: 매장 자료함 가져가기 허용 — visibility와 독립 축 */}
-        <div style={styles.field}>
-          <label style={styles.label}>매장 자료함 활용 허용</label>
-          <div style={{ display: 'flex', gap: 16 }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#374151', cursor: 'pointer' }}>
-              <input
-                type="radio"
-                name="reusablePolicy"
-                value="restricted"
-                checked={reusablePolicy === 'restricted'}
-                onChange={() => setReusablePolicy('restricted')}
-              />
-              차단(기본)
-            </label>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#374151', cursor: 'pointer' }}>
-              <input
-                type="radio"
-                name="reusablePolicy"
-                value="platform"
-                checked={reusablePolicy === 'platform'}
-                onChange={() => setReusablePolicy('platform')}
-              />
-              모든 매장 허용
-            </label>
-          </div>
-          <span style={styles.hint}>허용 시 매장 운영자가 이 강의를 자료함에 추가하여 매장 콘텐츠로 활용할 수 있습니다(공개 메타데이터만 노출, 강의 본문/영상은 복사되지 않음).</span>
-        </div>
-
-        <div style={styles.field}>
-          <label style={styles.label}>태그</label>
-          <div style={styles.tagContainer}>
-            {tags.map((tag) => (
-              <span key={tag} style={styles.tag}>
-                {tag}
-                <span style={styles.tagRemove} onClick={() => removeTag(tag)}>×</span>
-              </span>
-            ))}
-            <input
-              style={styles.tagInput}
-              type="text"
-              value={tagInput}
-              onChange={(e) => setTagInput(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addTag(); } }}
-              placeholder="태그 입력 후 Enter"
-            />
-          </div>
-          <span style={styles.hint}>Enter 키로 태그를 추가하세요</span>
-        </div>
-
-        {error && <p style={styles.error}>{error}</p>}
-
-        <div style={styles.actions}>
-          <button type="button" style={styles.cancelBtn} onClick={() => navigate(returnTo ?? '/instructor/courses')}>
-            취소
-          </button>
-          <button type="submit" style={submitBtnStyle(!isValid || submitting)} disabled={!isValid || submitting}>
-            {submitting ? '생성 중...' : '강의 생성'}
-          </button>
-        </div>
-      </form>
+      <InstructorCourseFormShell
+        config={{
+          accent: '#4f46e5',
+          submitLabel: '강의 생성',
+          submittingLabel: '생성 중...',
+          requireDescription: true,
+          requireTags: true,
+        }}
+        onSubmit={handleSubmit}
+        onCancel={back}
+      />
     </div>
   );
 }
