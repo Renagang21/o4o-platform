@@ -24,6 +24,7 @@
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { Search, X } from 'lucide-react';
 import { contentApi, type ContentItem } from '../../api/content';
 import { assetSnapshotApi } from '../../api/assetSnapshot';
 import { useAuth } from '../../contexts/AuthContext';
@@ -76,6 +77,10 @@ export function ContentDocumentsPage({ subType = 'content' }: ContentDocumentsPa
   const [loading, setLoading] = useState(true);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
 
+  // WO-O4O-KPA-COMMUNITY-CONTENT-SEARCH-SURFACE-V1: 제목·본문·태그 검색 (기존 contentApi.list search 활용)
+  const [searchInput, setSearchInput] = useState('');
+  const [search, setSearch] = useState('');
+
   // Drawer state
   const [drawerItem, setDrawerItem] = useState<ContentItem | null>(null);
   const [drawerDetail, setDrawerDetail] = useState<ContentItem | null>(null);
@@ -93,6 +98,7 @@ export function ContentDocumentsPage({ subType = 'content' }: ContentDocumentsPa
       sort: 'latest',
       content_type: 'information',
       sub_type: subType,
+      search: search || undefined,
     })
       .then((res) => {
         setItems(res.data?.items ?? []);
@@ -103,12 +109,21 @@ export function ContentDocumentsPage({ subType = 'content' }: ContentDocumentsPa
         setTotal(0);
       })
       .finally(() => setLoading(false));
-  }, [subType]);
+  }, [subType, search]);
 
   useEffect(() => {
     load(page);
     setSelectedKeys(new Set());
   }, [load, page]);
+
+  // WO-O4O-KPA-COMMUNITY-CONTENT-SEARCH-SURFACE-V1: 입력 디바운스 → search 확정 + 1페이지로
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setSearch(searchInput.trim());
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(t);
+  }, [searchInput]);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
 
@@ -370,9 +385,9 @@ export function ContentDocumentsPage({ subType = 'content' }: ContentDocumentsPa
 
   const emptyMessage = (
     <div className="py-12 px-4 text-sm text-slate-400 text-center">
-      <p className="m-0 mb-2">{emptyText}</p>
+      <p className="m-0 mb-2">{search ? '검색 결과가 없습니다.' : emptyText}</p>
       {/* WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: 자료실(resource) 은 사용자 직접 등록 진입점 미제공 */}
-      {isAuthenticated && !isResource && (
+      {isAuthenticated && !isResource && !search && (
         <Link to={newItemHref} className="text-sm font-semibold text-primary no-underline">
           {emptyCtaText}
         </Link>
@@ -395,6 +410,31 @@ export function ContentDocumentsPage({ subType = 'content' }: ContentDocumentsPa
           </Link>
         )}
       </header>
+
+      {/* WO-O4O-KPA-COMMUNITY-CONTENT-SEARCH-SURFACE-V1: 제목·내용·태그 검색 (제품 필터 없음) */}
+      <div className="mb-4">
+        <div className="relative max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+          <input
+            type="text"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            placeholder="제목, 내용, 태그로 검색"
+            className="w-full pl-9 pr-9 py-2.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+            aria-label="콘텐츠 검색"
+          />
+          {searchInput && (
+            <button
+              type="button"
+              onClick={() => setSearchInput('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              aria-label="검색 초기화"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+      </div>
 
       {/* Bulk ActionBar */}
       {selectedKeys.size > 0 && (
