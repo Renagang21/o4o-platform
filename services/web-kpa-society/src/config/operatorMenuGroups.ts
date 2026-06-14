@@ -34,7 +34,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   ],
   approvals: [
     // WO-KPA-LMS-INSTRUCTOR-APPROVAL-RELOCATE-V1: 자격 신청 관리 → lms 그룹으로 이동
-    { label: '상품 신청 관리', path: '/operator/product-applications' },
+    // WO-O4O-KPA-PRODUCT-APPLICATIONS-MENU-EXPOSURE-V1: GP/KCos 와 메뉴명 정렬
+    { label: '공급 상품 신청 승인', path: '/operator/product-applications' },
     // WO-O4O-EVENT-OFFER-OPERATOR-APPROVAL-KPA-V1: 이벤트 오퍼 승인 관리
     { label: '이벤트 오퍼 승인', path: '/operator/event-offers' },
     // WO-O4O-KPA-OPERATOR-COLLABORATION-INBOX-V1
@@ -134,7 +135,8 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
   ],
   approvals: [
     // WO-KPA-LMS-INSTRUCTOR-APPROVAL-RELOCATE-V1: 자격 신청 관리 → lms 그룹으로 이동
-    { label: '상품 신청 관리', path: '/operator/product-applications' },
+    // WO-O4O-KPA-PRODUCT-APPLICATIONS-MENU-EXPOSURE-V1: GP/KCos 와 메뉴명 정렬
+    { label: '공급 상품 신청 승인', path: '/operator/product-applications' },
     // WO-O4O-EVENT-OFFER-OPERATOR-APPROVAL-KPA-V1
     { label: '이벤트 오퍼 승인', path: '/operator/event-offers' },
     // WO-O4O-KPA-OPERATOR-COLLABORATION-INBOX-V1
