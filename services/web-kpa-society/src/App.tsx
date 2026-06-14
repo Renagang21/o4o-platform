@@ -11,7 +11,7 @@ import { LoadingSpinner } from './components/common/LoadingSpinner';
 import { AuthProvider, OrganizationProvider } from './contexts';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
 import { TemplateProvider } from '@o4o/ui';
-import { templates, usePageSeo } from '@o4o/shared-space-ui';
+import { templates, usePageSeo, StoreFacingFooter } from '@o4o/shared-space-ui';
 import { kpaConfig } from '@o4o/operator-ux-core';
 import { kpaSeoRegistry, KPA_SEO_DEFAULTS } from './config/seoRegistry';
 import { ServiceProvider } from './contexts/ServiceContext';
@@ -237,6 +237,8 @@ import { PharmacyHubLayout } from './components/pharmacy/PharmacyHubLayout';
 // WO-PHARMACY-MANAGEMENT-CONSOLIDATION-V1 Phase 2: Store Core v1.0 통합
 import { StoreDashboardLayout, KPA_SOCIETY_STORE_CONFIG, resolveStoreMenu } from '@o4o/store-ui-core';
 import { useStoreCapabilities } from './hooks/useStoreCapabilities';
+// WO-O4O-STORE-FACING-FOOTER-COVERAGE-V1: 공통 footer 법정정보 loader
+import { loadFooterLegal } from './lib/footerLegal';
 import { KpaGlobalHeader } from './components/KpaGlobalHeader';
 // WO-O4O-STORE-HUB-LEGACY-LIST-CLEANUP-V1: SupplierList/DetailPage 제거
 //   - 사이드바 미노출, mock-only, /store-hub/b2b 와 redundant
@@ -491,6 +493,14 @@ function KpaStoreLayoutWrapper() {
         orgName={pharmacyName}
         onLogout={() => { logout(); navigate('/'); }}
         hideTopBar
+        footer={
+          <StoreFacingFooter
+            serviceKey="kpa-society"
+            serviceName="약사회"
+            loadProfile={loadFooterLegal}
+            links={{ terms: '/policy', privacy: '/privacy', contact: '/contact' }}
+          />
+        }
       />
     </div>
   );

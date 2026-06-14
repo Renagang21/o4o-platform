@@ -24,6 +24,10 @@ export type { PublicLegalFooterInfoProps, PublicLegalProfileDto } from './legal/
 // WO-O4O-PUBLIC-FOOTER-LEGAL-LOADER-CONSOLIDATION-V1: 공통 푸터 법정정보 loader factory
 export { createFooterLegalLoader } from './legal/footerLegalLoader';
 
+// WO-O4O-STORE-FACING-FOOTER-COVERAGE-V1: store-facing 화면 공통 compact 푸터
+export { StoreFacingFooter } from './legal/StoreFacingFooter';
+export type { StoreFacingFooterProps, StoreFacingFooterLinks } from './legal/StoreFacingFooter';
+
 // WO-O4O-CONTACT-DELIVERY-AND-NOTIFICATION-V1: 공개 문의 폼
 export { PublicContactForm } from './legal/PublicContactForm';
 export type { PublicContactFormProps, ContactInquiryPayload, PublicContactFormTheme } from './legal/PublicContactForm';

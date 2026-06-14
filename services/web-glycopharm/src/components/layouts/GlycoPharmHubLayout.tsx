@@ -11,6 +11,9 @@
 
 import { NavLink, Outlet } from 'react-router-dom';
 import { Home, ShoppingCart, Monitor, FileText, Tag, BookOpen, Megaphone, QrCode } from 'lucide-react';
+// WO-O4O-STORE-FACING-FOOTER-COVERAGE-V1: store-facing compact 푸터
+import { StoreFacingFooter } from '@o4o/shared-space-ui';
+import { loadFooterLegal } from '../../lib/footerLegal';
 
 type HubMenuItem =
   | { key: string; label: string; desc: string; icon: React.ComponentType<{ className?: string }>; to: string; end: boolean; badge?: undefined }
@@ -96,8 +99,8 @@ const HUB_MENU: HubMenuItem[] = [
 
 export function GlycoPharmHubLayout() {
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="max-w-5xl mx-auto px-4 py-8">
+    <div className="min-h-screen bg-slate-50 flex flex-col">
+      <div className="max-w-5xl mx-auto px-4 py-8 w-full flex-1">
         <div className="flex gap-6 items-start">
           {/* ── 좌측 사이드바 ── */}
           <aside className="w-52 shrink-0 bg-white border border-slate-200 rounded-xl overflow-hidden sticky top-20">
@@ -176,6 +179,14 @@ export function GlycoPharmHubLayout() {
           </main>
         </div>
       </div>
+
+      {/* WO-O4O-STORE-FACING-FOOTER-COVERAGE-V1: 매장 HUB compact 푸터 */}
+      <StoreFacingFooter
+        serviceKey="glycopharm"
+        serviceName="GlycoPharm"
+        loadProfile={loadFooterLegal}
+        links={{ terms: '/terms', privacy: '/privacy', contact: '/contact' }}
+      />
     </div>
   );
 }

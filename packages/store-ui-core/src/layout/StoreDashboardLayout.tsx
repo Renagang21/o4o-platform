@@ -36,6 +36,12 @@ interface StoreDashboardLayoutProps {
   topBarRight?: React.ReactNode;
   /** true이면 StoreTopBar를 숨김 (외부 GlobalHeader 사용 시) */
   hideTopBar?: boolean;
+  /**
+   * 하단 푸터 (WO-O4O-STORE-FACING-FOOTER-COVERAGE-V1)
+   * store-facing 사용자 화면 footer coverage. 서비스 wrapper 가 주입한다(공통 StoreFacingFooter 권장).
+   * 미주입 시 렌더하지 않음 — 기존 소비처 동작 불변(additive).
+   */
+  footer?: React.ReactNode;
 }
 
 export function StoreDashboardLayout({
@@ -51,6 +57,7 @@ export function StoreDashboardLayout({
   orgName,
   topBarRight,
   hideTopBar = false,
+  footer,
 }: StoreDashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -113,6 +120,10 @@ export function StoreDashboardLayout({
           </main>
         </div>
       </div>
+
+      {/* ──── Footer (store-facing coverage) — WO-O4O-STORE-FACING-FOOTER-COVERAGE-V1 ──── */}
+      {/* body 가 flex-1 이므로 짧은 페이지에서도 하단 고정. 미주입 시 비표시(동작 불변). */}
+      {footer}
     </div>
   );
 }

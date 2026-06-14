@@ -134,6 +134,8 @@ const ForcedContentPage = lazy(() => import('@/pages/operator/signage/ForcedCont
 // Store Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
 import { StoreDashboardLayout, COSMETICS_STORE_CONFIG, resolveStoreMenu, StoreOwnerGuard } from '@o4o/store-ui-core';
 import { useStoreCapabilities } from './hooks/useStoreCapabilities';
+// WO-O4O-STORE-FACING-FOOTER-COVERAGE-V1: 공통 footer 법정정보 loader
+import { loadFooterLegal } from './lib/footerLegal';
 
 // Store Settings (WO-STORE-COMMON-SETTINGS-KCOS-UI-V1)
 const StoreSettingsPage = lazy(() => import('@/pages/store/StoreSettingsPage'));
@@ -244,6 +246,8 @@ import {
   kCosmeticsGuideFeaturePopProps,
   kCosmeticsGuideFeatureBlogProps,
   kCosmeticsGuideFeatureProductionMaterialsProps,
+  // WO-O4O-STORE-FACING-FOOTER-COVERAGE-V1: store-facing compact 푸터
+  StoreFacingFooter,
 } from '@o4o/shared-space-ui';
 
 // WO-O4O-FORUM-OPERATOR-UNIFICATION-V1
@@ -337,6 +341,14 @@ function StoreLayoutWrapper() {
         homeLink="/"
         onLogout={() => { logout(); navigate('/'); }}
         hideTopBar
+        footer={
+          <StoreFacingFooter
+            serviceKey="k-cosmetics"
+            serviceName="K-Cosmetics"
+            loadProfile={loadFooterLegal}
+            links={{ terms: '/terms', privacy: '/privacy', contact: '/contact' }}
+          />
+        }
       />
     </div>
   );

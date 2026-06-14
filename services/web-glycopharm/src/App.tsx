@@ -218,12 +218,16 @@ import {
   glycopharmGuideFeaturePopProps,
   glycopharmGuideFeatureBlogProps,
   glycopharmGuideFeatureProductionMaterialsProps,
+  // WO-O4O-STORE-FACING-FOOTER-COVERAGE-V1: store-facing compact 푸터
+  StoreFacingFooter,
 } from '@o4o/shared-space-ui';
 
 // Store Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
 import { StoreDashboardLayout, GLYCOPHARM_STORE_CONFIG, resolveStoreMenu } from '@o4o/store-ui-core';
 import { GlycoGlobalHeader } from './components/GlycoGlobalHeader';
 import { useStoreCapabilities } from './hooks/useStoreCapabilities';
+// WO-O4O-STORE-FACING-FOOTER-COVERAGE-V1: 공통 footer 법정정보 loader
+import { loadFooterLegal } from './lib/footerLegal';
 const StoreOverviewPage = lazy(() => import('@/pages/store/StoreOverviewPage'));
 // WO-O4O-GLYCO-STORE-CANONICAL-ENTRY-ALIGN-V1: StoreEntryPage 라우트 제거됨.
 // 페이지 파일은 보존(별도 cleanup WO에서 판단). 라우트 사용 제거에 따른 import만 정리.
@@ -433,6 +437,14 @@ function StoreLayoutWrapper() {
         onLogout={() => { logout(); navigate('/'); }}
         banner={<RedirectNoticeBanner />}
         hideTopBar
+        footer={
+          <StoreFacingFooter
+            serviceKey="glycopharm"
+            serviceName="GlycoPharm"
+            loadProfile={loadFooterLegal}
+            links={{ terms: '/terms', privacy: '/privacy', contact: '/contact' }}
+          />
+        }
       />
     </div>
   );
