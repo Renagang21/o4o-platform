@@ -27,6 +27,7 @@ function mapCourse(c: LmsCourse): LmsHubCourse {
 
 const glycoConfig: LmsHubConfig = {
   serviceKey: 'glycopharm',
+  accent: '#16a34a',
   heroTitle: '강의',
   heroDesc: '혈당관리 전문성을 높이는 다양한 교육 자료',
   courseDetailPath: (id) => `/lms/course/${id}`,

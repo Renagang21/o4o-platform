@@ -88,6 +88,12 @@ export interface LmsHubConfig {
    * 미지정 시 기본 "수강하기"(courseDetailPath) — 기존 동작(GP/KCos backward-compatible).
    */
   renderCta?: (course: LmsHubCourse) => React.ReactNode;
+  /**
+   * 서비스 accent(테마) 색 — 강의명 링크 / 기본 수강 CTA / 선택 체크박스에 적용.
+   * 미지정 시 기본 blue(#2563eb) — 기존 동작 backward-compatible.
+   * (KPA #2563EB / GlycoPharm #16a34a / K-Cosmetics #db2777)
+   */
+  accent?: string;
 }
 
 // ─── Status label/color helpers ───────────────────────────────────────────────
@@ -108,6 +114,7 @@ const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
 
 export function LmsHubTemplate({ config }: { config: LmsHubConfig }) {
   const [searchParams, setSearchParams] = useSearchParams();
+  const accent = config.accent ?? '#2563eb';
 
   const [courses, setCourses] = useState<LmsHubCourse[]>([]);
   const [totalPages, setTotalPages] = useState(1);
@@ -211,7 +218,8 @@ export function LmsHubTemplate({ config }: { config: LmsHubConfig }) {
             });
           }}
           onClick={(e) => e.stopPropagation()}
-          className="w-4 h-4 accent-blue-600 cursor-pointer"
+          className="w-4 h-4 cursor-pointer"
+          style={{ accentColor: accent }}
         />
       ),
     },
@@ -225,7 +233,7 @@ export function LmsHubTemplate({ config }: { config: LmsHubConfig }) {
         <div>
           <Link
             to={config.courseDetailPath(row.id)}
-            style={colStyles.titleLink}
+            style={{ ...colStyles.titleLink, color: accent }}
           >
             {row.title}
           </Link>
@@ -310,7 +318,7 @@ export function LmsHubTemplate({ config }: { config: LmsHubConfig }) {
           {config.renderCta ? (
             config.renderCta(row)
           ) : (
-            <Link to={config.courseDetailPath(row.id)} style={colStyles.enrollBtn}>
+            <Link to={config.courseDetailPath(row.id)} style={{ ...colStyles.enrollBtn, backgroundColor: accent }}>
               수강하기
             </Link>
           )}
@@ -318,7 +326,7 @@ export function LmsHubTemplate({ config }: { config: LmsHubConfig }) {
         </div>
       ),
     },
-  ], [config, loadCourses]);
+  ], [config, loadCourses, accent]);
 
   // ── Bulk Actions ──
 

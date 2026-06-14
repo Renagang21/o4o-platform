@@ -107,6 +107,7 @@ export function LmsCoursesPage() {
   // config 는 안정적 참조여야 한다(LmsHubTemplate loadCourses useCallback 의존 → 무한 리로드 방지).
   const config = useMemo<LmsHubConfig>(() => ({
     serviceKey: 'kpa-society',
+    accent: '#2563EB',
     heroTitle: '강의',
     heroDesc: '공개 강의와 회원 전용 강의를 탐색하세요',
     courseDetailPath: (id) => `/lms/course/${id}`,

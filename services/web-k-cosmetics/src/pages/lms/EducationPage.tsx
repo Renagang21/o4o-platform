@@ -35,6 +35,7 @@ function mapCourse(c: LmsCourse): LmsHubCourse {
 export function EducationPage() {
   const config: LmsHubConfig = {
     serviceKey: 'k-cosmetics',
+    accent: '#db2777',
     heroTitle: '강의',
     heroDesc: 'K-Beauty, 매장 운영, 고객 응대, 상품 이해를 위한 교육 콘텐츠',
     courseDetailPath: (id) => `/lms/course/${id}`,
