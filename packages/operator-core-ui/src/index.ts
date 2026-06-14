@@ -74,6 +74,14 @@ export type {
   InstructorCourseFormShellProps,
 } from './modules/instructor-course-form';
 
+// LMS Instructor Lesson List Module (WO-O4O-LMS-INSTRUCTOR-LESSON-LIST-MANAGER-V1)
+export { InstructorLessonListManager } from './modules/instructor-lesson-list';
+export type {
+  InstructorLessonListItem,
+  InstructorLessonListHandle,
+  InstructorLessonListManagerProps,
+} from './modules/instructor-lesson-list';
+
 // Common EditUserModal (WO-O4O-OPERATOR-EDITUSER-MODAL-PHASE1-NETURE-GP-KCOS-V1)
 export { CommonEditUserModal } from './modules/members';
 export type {

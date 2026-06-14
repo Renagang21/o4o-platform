@@ -10,6 +10,12 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { RichTextEditor, AiContentModal } from '@o4o/content-editor';
 // WO-O4O-GUIDE-UI-COMPONENT-V1
 import { GuideBlock } from '@o4o/shared-space-ui';
+// WO-O4O-LMS-INSTRUCTOR-LESSON-LIST-MANAGER-V1: 레슨 목록/순서 공통 shell
+import {
+  InstructorLessonListManager,
+  type InstructorLessonListItem,
+  type InstructorLessonListHandle,
+} from '@o4o/operator-core-ui';
 // WO-O4O-GUIDE-CONTENT-MANAGEMENT-V1-SCOPED
 import { fetchGuidePageContent } from '../../../api/guideContent';
 import { lmsInstructorApi, Course, Lesson, LessonType, type CourseVisibility, type CourseReusablePolicy } from '../../../api/lms-instructor';
@@ -520,18 +526,16 @@ export default function CourseEditPage() {
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState<string | null>(null);
 
-  // lesson modal
-  const [lessonModal, setLessonModal] = useState<{ open: boolean; lesson: Lesson | null }>({ open: false, lesson: null });
+  // WO-O4O-LMS-INSTRUCTOR-LESSON-LIST-MANAGER-V1:
+  //   레슨 목록/순서/추가·편집 modal open 상태는 공통 `InstructorLessonListManager` 가 소유.
+  //   wrapper 는 삭제/순서변경 API + LessonModal(renderEditor) + AI 버튼(headerExtra)만 주입.
+  const lessonListRef = useRef<InstructorLessonListHandle>(null);
 
-  // WO-O4O-LMS-COURSE-STRUCTURE-AI-V2: 강의 구조 AI 모달
+  // WO-O4O-LMS-COURSE-STRUCTURE-AI-V2: 강의 구조 AI 모달 (KPA 전용 — manager 밖)
   const [structureModalOpen, setStructureModalOpen] = useState(false);
 
   // WO-KPA-LMS-UX-QUICK-WINS-V1: 생성 안내 배너
   const [showCreatedBanner, setShowCreatedBanner] = useState(() => !!(location.state as any)?.justCreated);
-
-  // WO-KPA-LMS-UX-QUICK-WINS-V1: 드래그 정렬
-  const dragIndexRef = useRef<number | null>(null);
-  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
   const loadData = useCallback(async () => {
     if (!id) return;
@@ -652,47 +656,19 @@ export default function CourseEditPage() {
   // WO-O4O-KPA-LMS-LESSON-AUTONOMY-V1:
   //   레슨 단위 발행/비공개 토글 제거. 수강생 노출은 강의 승인 상태로만 결정한다.
 
-  // WO-KPA-LMS-UX-QUICK-WINS-V1: 드래그 정렬
-  const handleDragStart = (index: number) => {
-    dragIndexRef.current = index;
-  };
-
-  const handleDragOver = (e: React.DragEvent, index: number) => {
-    e.preventDefault();
-    setDragOverIndex(index);
-  };
-
-  const handleDragLeave = () => {
-    setDragOverIndex(null);
-  };
-
-  const handleDrop = async (e: React.DragEvent, dropIndex: number) => {
-    e.preventDefault();
-    setDragOverIndex(null);
-    const dragIndex = dragIndexRef.current;
-    if (dragIndex === null || dragIndex === dropIndex || !id) return;
-    dragIndexRef.current = null;
-
-    // 로컬 재정렬 (즉시 UI 반영)
-    const reordered = [...lessons];
-    const [moved] = reordered.splice(dragIndex, 1);
-    reordered.splice(dropIndex, 0, moved);
-    setLessons(reordered);
-
-    // API 호출
+  // WO-O4O-LMS-INSTRUCTOR-LESSON-LIST-MANAGER-V1: 순서 변경 —
+  //   manager 가 재배열한 목록(id 기준)을 받아 낙관적 갱신 + API + 재조회.
+  const handleReorderLessons = async (reordered: InstructorLessonListItem[]) => {
+    if (!id) return;
+    const byId = new Map(lessons.map((l) => [l.id, l]));
+    setLessons(reordered.map((r) => byId.get(r.id)!).filter(Boolean));
     try {
-      await lmsInstructorApi.reorderLessons(id, reordered.map(l => l.id));
+      await lmsInstructorApi.reorderLessons(id, reordered.map((l) => l.id));
       await loadData();
     } catch {
-      // 실패 시 원래 순서로 롤백
       await loadData();
       alert('순서 변경에 실패했습니다.');
     }
-  };
-
-  const handleDragEnd = () => {
-    dragIndexRef.current = null;
-    setDragOverIndex(null);
   };
 
   const addTag = () => {
@@ -897,18 +873,23 @@ export default function CourseEditPage() {
           <span>강의가 생성되었습니다. 이제 레슨을 추가하여 강의를 구성하세요.</span>
           <button
             style={s.createdBannerBtn}
-            onClick={() => { setShowCreatedBanner(false); setLessonModal({ open: true, lesson: null }); }}
+            onClick={() => { setShowCreatedBanner(false); lessonListRef.current?.openAdd(); }}
           >
             + 레슨 추가
           </button>
         </div>
       )}
 
-      {/* Lessons */}
-      <div style={s.section}>
-        <div style={{ ...s.sectionTitle, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <span>레슨 목록 ({lessons.length})</span>
-          {/* WO-O4O-LMS-COURSE-STRUCTURE-AI-V2: 강의 구조 AI 생성 진입 */}
+      {/* Lessons — 공통 목록/순서 shell. LessonModal(video/article/quiz/assignment editor)은
+          renderEditor 슬롯으로 주입. AI 강의 구조 생성(KPA 전용)은 headerExtra 슬롯 + 아래 모달. */}
+      <InstructorLessonListManager
+        ref={lessonListRef}
+        lessons={lessons}
+        lessonTypeLabel={LESSON_TYPE_LABEL}
+        onReorder={handleReorderLessons}
+        onDelete={(l) => handleDeleteLesson(l.id)}
+        headerExtra={
+          /* WO-O4O-LMS-COURSE-STRUCTURE-AI-V2: 강의 구조 AI 생성 진입 (KPA 전용) */
           <button
             type="button"
             onClick={() => setStructureModalOpen(true)}
@@ -927,64 +908,17 @@ export default function CourseEditPage() {
           >
             🧱 AI로 강의 구조 만들기
           </button>
-        </div>
-
-        {lessons.length === 0 ? (
-          /* WO-KPA-LMS-UX-QUICK-WINS-V1: Empty 상태 */
-          <div style={s.emptyState}>
-            <div style={s.emptyIcon}>📝</div>
-            <div style={s.emptyTitle}>아직 강의 내용이 없습니다</div>
-            <div style={s.emptyDesc}>첫 번째 레슨을 추가하여 강의를 구성하세요</div>
-            <button style={s.addLessonBtn} onClick={() => setLessonModal({ open: true, lesson: null })}>
-              + 레슨 추가
-            </button>
-          </div>
-        ) : (
-          <>
-            {lessons.map((lesson, index) => (
-              <div
-                key={lesson.id}
-                style={{ ...s.lessonCard, ...(dragOverIndex === index ? s.dragOver : {}) }}
-                draggable
-                onDragStart={() => handleDragStart(index)}
-                onDragOver={(e) => handleDragOver(e, index)}
-                onDragLeave={handleDragLeave}
-                onDrop={(e) => handleDrop(e, index)}
-                onDragEnd={handleDragEnd}
-              >
-                <span style={s.dragHandle} title="드래그하여 순서 변경">⠿</span>
-                <div style={s.lessonOrder}>{index + 1}</div>
-                <div style={s.lessonBody}>
-                  <div style={s.lessonTitle}>{lesson.title}</div>
-                  <div style={s.lessonMeta}>
-                    {LESSON_TYPE_LABEL[lesson.type] || lesson.type} · {lesson.duration > 0 ? `${lesson.duration}분` : '시간 미설정'}
-                  </div>
-                </div>
-                {/* WO-O4O-KPA-LMS-LESSON-AUTONOMY-V1:
-                    레슨 단위 발행/비공개 토글 제거. 수강생 노출은 강의 승인 상태로만 결정. */}
-                <div style={s.lessonActions}>
-                  <button style={s.editSmBtn} onClick={() => setLessonModal({ open: true, lesson })}>편집</button>
-                  <button style={s.delSmBtn} onClick={() => handleDeleteLesson(lesson.id)}>삭제</button>
-                </div>
-              </div>
-            ))}
-
-            <button style={s.addLessonBtn} onClick={() => setLessonModal({ open: true, lesson: null })}>
-              + 새 레슨 추가
-            </button>
-          </>
+        }
+        renderEditor={({ lesson, close }) => (
+          <LessonModal
+            courseId={course.id}
+            lesson={lesson ? (lessons.find((x) => x.id === lesson.id) ?? null) : null}
+            nextOrder={nextOrder}
+            onClose={close}
+            onSaved={(keepOpen) => { if (!keepOpen) close(); loadData(); }}
+          />
         )}
-      </div>
-
-      {lessonModal.open && (
-        <LessonModal
-          courseId={course.id}
-          lesson={lessonModal.lesson}
-          nextOrder={nextOrder}
-          onClose={() => setLessonModal({ open: false, lesson: null })}
-          onSaved={(keepOpen) => { if (!keepOpen) setLessonModal({ open: false, lesson: null }); loadData(); }}
-        />
-      )}
+      />
 
       {/* WO-O4O-LMS-COURSE-STRUCTURE-AI-V2 + WO-O4O-LMS-LESSON-BODY-AI-GENERATION-V3:
           강의 구조(레슨 후보) AI 생성 + 본문 HTML 초안 생성 */}
