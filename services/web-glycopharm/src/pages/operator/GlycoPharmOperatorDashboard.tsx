@@ -42,7 +42,7 @@ const GP_AXES: OperatorAxisGroup[] = [
     key: 'community',
     title: '커뮤니티 운영',
     description: '포럼 · 회원 · 콘텐츠 · LMS',
-    icon: '💬',
+    icon: 'message-square',
     tone: 'blue',
     links: [
       { key: 'forum', label: '포럼 신청 관리', href: '/operator/forum-requests' },
@@ -54,7 +54,7 @@ const GP_AXES: OperatorAxisGroup[] = [
     key: 'pharmacy-hub',
     title: '약국 HUB 운영',
     description: '매장 · 채널 · 설문',
-    icon: '🏥',
+    icon: 'building-2',
     tone: 'emerald',
     links: [
       { key: 'stores', label: '매장 관리', href: '/operator/stores' },

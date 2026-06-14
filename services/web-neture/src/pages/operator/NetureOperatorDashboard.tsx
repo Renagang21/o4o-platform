@@ -29,7 +29,7 @@ const NETURE_AXES: OperatorAxisGroup[] = [
     key: 'supply',
     title: '공급·유통 운영',
     description: '공급자 · 상품 · 승인 · 주문',
-    icon: '📦',
+    icon: 'package',
     tone: 'emerald',
     links: [
       { key: 'suppliers', label: '공급자 관리', href: '/operator/suppliers' },
@@ -43,7 +43,7 @@ const NETURE_AXES: OperatorAxisGroup[] = [
     title: '콘텐츠·커뮤니티 운영',
     // WO-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1: '사이니지' 제거 (Neture signage 미대상)
     description: '콘텐츠 · 커뮤니티 · 회원',
-    icon: '📋',
+    icon: 'clipboard-list',
     tone: 'blue',
     links: [
       { key: 'guide-contents', label: '콘텐츠 관리', href: '/operator/guide-contents' },

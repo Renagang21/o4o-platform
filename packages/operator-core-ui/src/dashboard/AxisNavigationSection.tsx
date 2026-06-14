@@ -10,6 +10,47 @@
  */
 
 import { Link } from 'react-router-dom';
+import {
+  Store,
+  ClipboardList,
+  Package,
+  MessageSquare,
+  Building2,
+  Users,
+  FileText,
+  Settings,
+  Home,
+  ShoppingCart,
+  type LucideIcon,
+} from 'lucide-react';
+
+/**
+ * Axis 아이콘 렌더 — operator-ux-core/ActionIcon 과 동일 정책:
+ *  - lucide-name(kebab) → lucide 컴포넌트
+ *  - 매핑에 없는 ASCII name-like → 생략(텍스트 노출 방지)
+ *  - emoji 등 비-ASCII → 그대로 통과(미전환 config 하위호환)
+ * WO-O4O-OPERATOR-DASHBOARD-AXIS-ICON-CONTRACT-LUCIDE-V1
+ */
+const AXIS_ICON_MAP: Record<string, LucideIcon> = {
+  store: Store,
+  'clipboard-list': ClipboardList,
+  package: Package,
+  'message-square': MessageSquare,
+  'building-2': Building2,
+  users: Users,
+  'file-text': FileText,
+  settings: Settings,
+  home: Home,
+  'shopping-cart': ShoppingCart,
+};
+const AXIS_ICON_NAME_LIKE = /^[a-z0-9-]+$/i;
+
+function AxisIcon({ icon }: { icon: string }) {
+  const Mapped = AXIS_ICON_MAP[icon];
+  if (Mapped) return <Mapped size={16} className="text-slate-500 shrink-0" aria-hidden="true" />;
+  if (AXIS_ICON_NAME_LIKE.test(icon)) return null;
+  return <span>{icon}</span>;
+}
 
 export interface AxisMetric {
   label: string;
@@ -54,7 +95,7 @@ export function AxisNavigationSection({ axes }: AxisNavigationSectionProps) {
         return (
           <div key={axis.key} className={`bg-white rounded-xl border ${t.border} p-5`}>
             <div className="flex items-center gap-2 mb-1">
-              {axis.icon && <span>{axis.icon}</span>}
+              {axis.icon && <AxisIcon icon={axis.icon} />}
               <span className="text-sm font-semibold text-slate-800">{axis.title}</span>
             </div>
             {axis.description && (

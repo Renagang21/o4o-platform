@@ -18,7 +18,7 @@ const KCOS_AXES: OperatorAxisGroup[] = [
     key: 'store-hub',
     title: '매장 HUB 운영',
     description: '매장 · 상품 · 주문 · 이벤트',
-    icon: '🏪',
+    icon: 'store',
     tone: 'emerald',
     links: [
       { key: 'stores', label: '매장 관리', href: '/operator/stores' },
@@ -31,7 +31,7 @@ const KCOS_AXES: OperatorAxisGroup[] = [
     key: 'content',
     title: '콘텐츠 운영',
     description: '콘텐츠 · LMS · 자료실 · 사이니지',
-    icon: '📋',
+    icon: 'clipboard-list',
     tone: 'blue',
     links: [
       { key: 'content-management', label: '콘텐츠 관리', href: '/operator/content-management' },

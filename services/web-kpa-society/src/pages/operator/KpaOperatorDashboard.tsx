@@ -172,7 +172,7 @@ function buildKpaAxesFromConfig(
       key: 'community',
       title: '커뮤니티 운영',
       description: '포럼 · 회원 · 콘텐츠 · LMS · 자료실',
-      icon: '💬',
+      icon: 'message-square',
       tone: 'blue',
       metrics: [
         { label: '회원 승인', value: pendingMembers, href: '/operator/members', warn: pendingMembers > 0 },
@@ -189,7 +189,7 @@ function buildKpaAxesFromConfig(
       key: 'store-hub',
       title: '매장 HUB 운영',
       description: '매장 · 이벤트 오퍼 · 사이니지 · 상품 신청',
-      icon: '🏪',
+      icon: 'store',
       tone: 'emerald',
       metrics: [
         { label: '상품 신청', value: productApplicationPending, href: '/operator/product-applications', warn: productApplicationPending > 0 },
