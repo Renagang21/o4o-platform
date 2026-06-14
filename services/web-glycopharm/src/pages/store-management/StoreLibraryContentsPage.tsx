@@ -18,6 +18,8 @@ import { useEffect, useState, useCallback, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, RefreshCw, Megaphone, QrCode } from 'lucide-react';
 import { AiContentModal } from '@o4o/content-editor';
+// WO-O4O-AI-EDITING-PRESET-ADOPTION-LMS-RESOURCES-V1: 라이브러리 진입(타깃 미선택) 범용 preset
+import { findEditingPreset } from '@o4o/types';
 import { getAccessToken } from '@o4o/auth-client';
 import { assetSnapshotApi, type AssetSnapshotItem } from '@/api/assetSnapshot';
 import {
@@ -177,6 +179,8 @@ export default function StoreLibraryContentsPage() {
         onInsert={handleAiInsert}
         initialText={aiInitialText}
         headerLabel="AI 매장 제작 자료 초안"
+        templateSystemPrompt={findEditingPreset('library-entry')?.systemPromptOverride}
+        templateForcedOptions={findEditingPreset('library-entry')?.forcedOptions}
         aiRequestHeaders={(() => {
           const token = getAccessToken();
           return token ? { Authorization: `Bearer ${token}` } : undefined;
