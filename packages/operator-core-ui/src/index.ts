@@ -53,6 +53,17 @@ export type {
   OperatorLmsCoursesManagerProps,
 } from './modules/lms-courses';
 
+// LMS Instructor Courses Module (WO-O4O-LMS-INSTRUCTOR-COURSE-LIST-MANAGER-EXTRACTION-V1)
+export { InstructorCoursesManager } from './modules/instructor-courses';
+export type {
+  InstructorCourse,
+  InstructorCourseRowAction,
+  InstructorCoursesApi,
+  InstructorCoursesRoutes,
+  InstructorCoursesConfig,
+  InstructorCoursesManagerProps,
+} from './modules/instructor-courses';
+
 // Common EditUserModal (WO-O4O-OPERATOR-EDITUSER-MODAL-PHASE1-NETURE-GP-KCOS-V1)
 export { CommonEditUserModal } from './modules/members';
 export type {
