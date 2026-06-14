@@ -71,24 +71,23 @@ export interface ContentPayload {
   reusable_policy?: 'platform' | 'restricted';
 }
 
+// authClient.api 는 axios 인스턴스 → 응답 envelope 은 res.data 에 위치. 여기서 unwrap 해 반환.
 export const contentApi = {
-  list: (params?: ContentListParams) =>
-    api.get<ContentListResponse>('/glycopharm/contents', {
-      params: { ...params, sub_type: 'content' },
-    }),
+  list: (params?: ContentListParams): Promise<ContentListResponse> =>
+    api.get('/glycopharm/contents', { params: { ...params, sub_type: 'content' } }).then((r: any) => r.data),
 
-  detail: (id: string) =>
-    api.get<ContentDetailResponse>(`/glycopharm/contents/${id}`),
+  detail: (id: string): Promise<ContentDetailResponse> =>
+    api.get(`/glycopharm/contents/${id}`).then((r: any) => r.data),
 
-  create: (data: ContentPayload) =>
-    api.post<ContentDetailResponse>('/glycopharm/contents', data),
+  create: (data: ContentPayload): Promise<ContentDetailResponse> =>
+    api.post('/glycopharm/contents', data).then((r: any) => r.data),
 
-  update: (id: string, data: Partial<ContentPayload>) =>
-    api.patch<ContentDetailResponse>(`/glycopharm/contents/${id}`, data),
+  update: (id: string, data: Partial<ContentPayload>): Promise<ContentDetailResponse> =>
+    api.patch(`/glycopharm/contents/${id}`, data).then((r: any) => r.data),
 
-  remove: (id: string) =>
-    api.delete<{ success: boolean }>(`/glycopharm/contents/${id}`),
+  remove: (id: string): Promise<{ success: boolean }> =>
+    api.delete(`/glycopharm/contents/${id}`).then((r: any) => r.data),
 
-  trackView: (id: string) =>
-    api.post<{ success: boolean }>(`/glycopharm/contents/${id}/view`),
+  trackView: (id: string): Promise<{ success: boolean }> =>
+    api.post(`/glycopharm/contents/${id}/view`).then((r: any) => r.data),
 };
