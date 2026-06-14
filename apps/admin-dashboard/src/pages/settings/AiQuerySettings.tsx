@@ -203,6 +203,7 @@ const AiQuerySettings: React.FC = () => {
             className="w-full max-w-md px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="gemini-2.5-flash">Gemini 2.5 Flash (권장, 빠름)</option>
+            <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite (최저가, 짧은 문구)</option>
             <option value="gemini-2.5-pro">Gemini 2.5 Pro (정확도 높음)</option>
             <option value="gemini-2.0-flash">Gemini 2.0 Flash (안정)</option>
             <option value="gemini-1.5-flash">Gemini 1.5 Flash (레거시)</option>

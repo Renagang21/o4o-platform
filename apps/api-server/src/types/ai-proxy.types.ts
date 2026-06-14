@@ -21,6 +21,9 @@ export const MODEL_WHITELIST = {
   gemini: [
     'gemini-2.5-flash',
     'gemini-2.5-pro',
+    // WO-O4O-AI-GEMINI-MODEL-UPGRADE-V1: 저비용/짧은 문구(POP/QR) 후보. 공식 id 확인됨
+    // (ai.google.dev/gemini-api/docs/models/gemini-2.5-flash-lite, 1M ctx / 65K out).
+    'gemini-2.5-flash-lite',
     'gemini-2.0-flash',
     'gemini-2.0-flash-lite',
     'gemini-1.5-flash',
