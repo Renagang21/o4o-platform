@@ -87,7 +87,7 @@ export default function ForumPage() {
       );
     }
 
-    if (sortBy === 'popular') result.sort((a, b) => b.viewCount - a.viewCount);
+    if (sortBy === 'popular') result.sort((a, b) => (b.viewCount ?? 0) - (a.viewCount ?? 0));
     else if (sortBy === 'oldest') result.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
     else result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
