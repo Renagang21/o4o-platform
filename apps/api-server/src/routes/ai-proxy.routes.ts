@@ -13,6 +13,8 @@
 import { Router, Response } from 'express';
 import { authenticate } from '../middleware/auth.middleware.js';
 import { aiProxyService } from '../services/ai-proxy.service.js';
+// WO-O4O-AI-MODEL-SELECTION-RUNTIME-RESOLVER-V1: 편집 모델을 admin 정책(AiQueryPolicy.defaultModel)에서 결정
+import { resolveEditingModel } from '../utils/ai-editing-model-resolver.js';
 import { AppDataSource } from '../database/connection.js';
 import type { AuthRequest } from '../types/auth.js';
 import logger from '../utils/logger.js';
@@ -119,8 +121,9 @@ router.post('/vision/analyze', authenticate, async (req, res: Response) => {
   "context": "추가 맥락 정보"
 }`;
 
-    // WO-O4O-AI-MODEL-SETTINGS-CLEANUP-V1: gemini-3.0-flash → gemini-2.5-flash (canonical valid model).
-    const model = 'gemini-2.5-flash';
+    // WO-O4O-AI-MODEL-SELECTION-RUNTIME-RESOLVER-V1: 모델을 admin 정책에서 결정(fallback=gemini-2.5-flash).
+    // vision 은 gemini-only 인라인 경로 → resolver 가 gemini whitelist 로 검증한 모델만 반환.
+    const model = await resolveEditingModel();
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
     const controller = new AbortController();
@@ -232,7 +235,7 @@ router.post('/content', authenticate, async (req, res: Response) => {
     const rawResponse = await aiProxyService.generateRawContent(
       {
         provider: 'gemini',
-        model: 'gemini-2.5-flash',
+        model: await resolveEditingModel(),
         systemPrompt,
         userPrompt,
         temperature: 0.5,
@@ -1066,7 +1069,7 @@ router.post('/url-to-blocks', authenticate, async (req, res: Response) => {
       aiResponse = await aiProxyService.generateRawContent(
         {
           provider: 'gemini',
-          model: 'gemini-2.5-flash',
+          model: await resolveEditingModel(),
           systemPrompt,
           userPrompt,
           temperature: 0.5,
@@ -1323,7 +1326,7 @@ router.post('/content-to-store-use', authenticate, async (req, res: Response) =>
     const rawResponse = await aiProxyService.generateRawContent(
       {
         provider: 'gemini',
-        model: 'gemini-2.5-flash',
+        model: await resolveEditingModel(),
         systemPrompt,
         userPrompt,
         temperature: 0.5,
@@ -1465,7 +1468,7 @@ router.post('/course-structure', authenticate, async (req, res: Response) => {
     const aiResponse = await aiProxyService.generateRawContent(
       {
         provider: 'gemini',
-        model: 'gemini-2.5-flash',
+        model: await resolveEditingModel(),
         systemPrompt: buildCourseStructureSystemPrompt(),
         userPrompt,
         temperature: 0.6,
@@ -1618,7 +1621,7 @@ router.post('/lesson-body', authenticate, async (req, res: Response) => {
     const aiResponse = await aiProxyService.generateRawContent(
       {
         provider: 'gemini',
-        model: 'gemini-2.5-flash',
+        model: await resolveEditingModel(),
         systemPrompt: buildLessonBodySystemPrompt(tone, audience),
         userPrompt,
         temperature: 0.6,
