@@ -96,4 +96,4 @@ KPA wrapper 미러링 (`CommunityContentWriteShell` / DetailView / SearchBar):
 
 ---
 
-*Created: 2026-06-14 · Status: Phase A in progress*
+*Created: 2026-06-14 · Status: Phase A 완료(배포·마이그레이션·smoke PASS) · Phase B GP/KCos 구현 완료(documents-only)*

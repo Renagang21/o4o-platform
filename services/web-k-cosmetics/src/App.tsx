@@ -80,6 +80,10 @@ const KCosmeticsHubPage = lazy(() => import('@/pages/hub/KCosmeticsHubPage'));
 const HubB2BPage = lazy(() => import('@/pages/hub/HubB2BPage').then(m => ({ default: m.HubB2BPage })));
 const HubContentPage = lazy(() => import('@/pages/hub/HubContentPage').then(m => ({ default: m.HubContentPage })));
 const HubSignagePage = lazy(() => import('@/pages/hub/HubSignagePage').then(m => ({ default: m.HubSignagePage })));
+// WO-O4O-GP-KCOS-CONTENT-STANDARD-ROUTE-ALIGNMENT-V1 (Phase B): 회원 작성 콘텐츠
+const ContentListPage = lazy(() => import('@/pages/contents').then(m => ({ default: m.ContentListPage })));
+const ContentWritePage = lazy(() => import('@/pages/contents').then(m => ({ default: m.ContentWritePage })));
+const ContentDetailPage = lazy(() => import('@/pages/contents').then(m => ({ default: m.ContentDetailPage })));
 const HubEventOffersPage = lazy(() => import('@/pages/hub/HubEventOffersPage').then(m => ({ default: m.HubEventOffersPage })));
 // WO-O4O-EVENT-OFFER-TO-CART-CROSSSERVICE-V2: canonical store cart
 const StoreCartPage = lazy(() => import('@/pages/store-cart/StoreCartPage').then(m => ({ default: m.StoreCartPage })));
@@ -432,6 +436,14 @@ function AppRoutes() {
             상세(/:id)는 북마크 호환 위해 유지. */}
         <Route path="library/content" element={<Navigate to="/store-hub/content" replace />} />
         <Route path="library/content/:id" element={<ContentLibraryDetailPage />} />
+
+        {/* WO-O4O-GP-KCOS-CONTENT-STANDARD-ROUTE-ALIGNMENT-V1 (Phase B):
+            /content 회원 작성형 콘텐츠 모듈(KPA 표준 미러, documents-only). */}
+        <Route path="content" element={<ContentListPage />} />
+        <Route path="content/documents" element={<ContentListPage />} />
+        <Route path="content/documents/new" element={<ContentWritePage />} />
+        <Route path="content/:id/edit" element={<ContentWritePage />} />
+        <Route path="content/:id" element={<ContentDetailPage />} />
 
         {/* Forum */}
         <Route path="forum" element={<ForumHubPage />} />

@@ -180,6 +180,10 @@ const GlycoStoreHubPage = lazy(() => import('@/pages/hub/StoreHubPage').then(m =
 const HubB2BCatalogPage = lazy(() => import('@/pages/hub/HubB2BCatalogPage').then(m => ({ default: m.HubB2BCatalogPage })));
 const HubContentListPage = lazy(() => import('@/pages/hub/HubContentListPage').then(m => ({ default: m.HubContentListPage })));
 const HubContentDetailPage = lazy(() => import('@/pages/hub/HubContentDetailPage'));
+// WO-O4O-GP-KCOS-CONTENT-STANDARD-ROUTE-ALIGNMENT-V1 (Phase B): 회원 작성 콘텐츠
+const ContentListPage = lazy(() => import('@/pages/contents').then(m => ({ default: m.ContentListPage })));
+const ContentWritePage = lazy(() => import('@/pages/contents').then(m => ({ default: m.ContentWritePage })));
+const ContentDetailPage = lazy(() => import('@/pages/contents').then(m => ({ default: m.ContentDetailPage })));
 // WO-O4O-GLYCOPHARM-EVENT-OFFERS-HUB-CANONICAL-ALIGNMENT-V1
 const HubEventOffersPage = lazy(() => import('@/pages/hub/HubEventOffersPage').then(m => ({ default: m.HubEventOffersPage })));
 // WO-O4O-EVENT-OFFER-TO-CART-CROSSSERVICE-V2: canonical store cart
@@ -589,8 +593,13 @@ function AppRoutes() {
         <Route path="lms/:id" element={<LmsCourseRedirect />} />
         {/* WO-O4O-GLYCOPHARM-CONTENT-RESOURCES-ROUTE-ALIGNMENT-V1: top-level canonical paths */}
         {/* WO-O4O-CONTENT-BROWSE-ROUTE-CLEANUP-V1: 운영자 발행 browse 는 /store-hub/content 로 수렴.
-            /content 는 표준 회원 작성형 모듈 자리로 비워둠(현재는 browse 로 redirect). */}
-        <Route path="content" element={<Navigate to="/store-hub/content" replace />} />
+            WO-O4O-GP-KCOS-CONTENT-STANDARD-ROUTE-ALIGNMENT-V1 (Phase B):
+            /content 는 회원 작성형 콘텐츠 모듈(KPA 표준 미러, documents-only). */}
+        <Route path="content" element={<ContentListPage />} />
+        <Route path="content/documents" element={<ContentListPage />} />
+        <Route path="content/documents/new" element={<ContentWritePage />} />
+        <Route path="content/:id/edit" element={<ContentWritePage />} />
+        <Route path="content/:id" element={<ContentDetailPage />} />
         <Route path="hub/content/:id" element={<HubContentDetailPage />} />
         <Route path="resources" element={<ResourcesPage />} />
         {/* Instructor — WO-GLYCOPHARM-INSTRUCTOR-OPERATOR-V1 + WO-O4O-GLYCOPHARM-LMS-PHASE3-INSTRUCTOR-PARITY-V1 */}
