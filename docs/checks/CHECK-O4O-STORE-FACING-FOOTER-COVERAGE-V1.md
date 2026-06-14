@@ -4,7 +4,7 @@
 > **선행 IR:** [IR-O4O-FOOTER-COVERAGE-AUDIT-V1](../investigations/IR-O4O-FOOTER-COVERAGE-AUDIT-V1.md)
 > **선행:** [CHECK-STANDARDIZATION-MILESTONE](CHECK-O4O-PUBLIC-FOOTER-STANDARDIZATION-MILESTONE-V1.md) · LINK/LEGAL/LOADER GUARD
 > **작성일:** 2026-06-14
-> **상태:** ✅ **구현 완료** — 4서비스 tsc 0 + Shared Module Change Protocol 검증. 배포/브라우저 smoke는 §14·§15 참조(보류).
+> **상태:** ✅ **완료** — 4서비스 tsc 0 + Shared Module Change Protocol 검증 + **4서비스 prod 재배포 success**. 브라우저 시각 smoke만 보류(§14).
 
 ## 1. 목적
 GP·KCos·KPA의 store-facing 사용자 화면(매장 HUB / 내 매장·내 약국 owner dashboard)에 Footer coverage 보장. **layout 단위 주입**(page별 `<Footer/>` 패치 금지). 공개 footer 표준(법정정보·링크·loader)은 기존 유지.
@@ -87,8 +87,15 @@ IR 권고대로 **compact footer + layout 단위 + admin/operator 제외 + Netur
 - KPA `/store`(내 약국) footer 노출 + **`/store-hub` 기존 상속 footer 회귀 없음**, `/policy` 링크 정상
 
 ## 15. 배포
-⏳ **push 대기** — main 직접 commit 완료(코드 `189fbc5ed`). 공통 package(store-ui-core/shared-space-ui) 변경 → push 시 GP/KCos/KPA 재배포 필요. **prod 3서비스 배포는 outward-facing이라 사용자 확인 후 push.** Neture는 코드 무변경이나 shared-space-ui 변경으로 build 영향 가능 → 재배포 시 tsc만 확인(UI 수정 없음).
-> 주의: detect-changes가 push tip 기준 skip 가능 — 공통 package 변경 시 GP/KCos/KPA 실제 재배포 여부 확인, 필요 시 workflow_dispatch 명시 재배포.
+✅ **완료** — main push(`a737c1cd6..1b5cd3d72`) 후 명시 재배포.
+
+| 단계 | run | 결과 |
+|------|-----|------|
+| push 자동 Deploy Web Services | `27489758704` | success이나 **4서비스 skipped** |
+| workflow_dispatch service=all | `27489802289` | ✅ deploy-glycopharm / -k-cosmetics / -kpa-society / -neture **전부 success** |
+| liveness (4 root) | — | glycopharm.co.kr / k-cosmetics.site / kpa-society.co.kr / neture.co.kr **전부 200** |
+
+> **skip 원인(확정):** `deploy-web-services.yml` detect-changes는 `git diff HEAD~1 HEAD`(직전 1커밋)만 검사. push tip(`1b5cd3d72`)이 docs-only CHECK 커밋이라 그 diff에 packages/services 변경이 없어 전 서비스 skip(코드는 HEAD~2 `189fbc5ed`). → `workflow_dispatch service=all`로 4서비스 명시 재배포. 공통 package 변경 + 코드/문서 2커밋 분리 push 시 재발 가능 — 명시 재배포가 정석.
 
 ## 16. Commit
 - 코드(8파일): `189fbc5ed`.
