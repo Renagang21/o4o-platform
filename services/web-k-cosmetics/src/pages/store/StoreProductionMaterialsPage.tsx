@@ -14,42 +14,19 @@ import { useEffect, useState, useCallback, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FileEdit, RefreshCw, Link2, Megaphone, QrCode, PenLine, MonitorPlay } from 'lucide-react';
 import { StoreAssetDerivationViewer, resultKindToDerivedKind, GuideBackLink } from '@o4o/store-ui-core';
+// WO-O4O-STORE-PRODUCTION-MATERIAL-LIST-QUERY-CLEANUP-V1: 정규화/병합 공통 helper
+import {
+  mergeProductionMaterials,
+  PRODUCTION_USAGE_LABELS,
+  PRODUCTION_ASSET_TYPE_LABELS,
+  PRODUCTION_KIND_BADGE,
+  PRODUCTION_BLOG_STATUS_LABELS,
+  type ProductionMaterialItem,
+} from '@o4o/store-ui-core';
 import { getStoreExecutionAssets } from '@/api/storeExecutionAssets';
 import { fetchStaffBlogPosts } from '@/api/blogStaff';
 import { getStoreSlug } from '@/api/storeHub';
 import { api } from '@/lib/apiClient';
-
-// ─── 타입 ──────────────────────────────────────────────────────────────────
-type ResultKind = 'material' | 'blog';
-
-interface ProductionMaterialItem {
-  id: string;
-  title: string;
-  updatedAt: string;
-  kind: ResultKind;
-  /** material 전용 — 사용 유형(pop/qr/signage 등) */
-  usageType?: string | null;
-  /** material 전용 — 자료 형태(file/content/external-link) */
-  assetType?: string;
-  /** blog status */
-  status?: string;
-  /** 원본 보기(derivation viewer)에 쓸 결과물 kind */
-  derivedResultKind: 'pop' | 'blog';
-}
-
-const USAGE_LABELS: Record<string, string> = {
-  pop: 'POP', qr: 'QR 코드', signage: '사이니지', banner: '배너', notice: '공지',
-};
-const ASSET_TYPE_LABELS: Record<string, string> = {
-  file: '파일', content: '콘텐츠', 'external-link': '외부 링크',
-};
-const KIND_BADGE: Record<ResultKind, { label: string; bg: string; fg: string }> = {
-  material: { label: '제작 자료', bg: '#eef2ff', fg: '#4338ca' },
-  blog: { label: '블로그', bg: '#ecfdf5', fg: '#047857' },
-};
-const BLOG_STATUS_LABELS: Record<string, string> = {
-  draft: '초안', published: '발행', archived: '보관',
-};
 
 // 제작 자료 기반 교차 진입(기존 제작 화면 route 재사용 — 신규 API/DB 없음)
 const CROSS_CREATE: { key: string; label: string; icon: typeof Megaphone; to: string }[] = [
@@ -87,32 +64,11 @@ export default function StoreProductionMaterialsPage() {
         slug ? fetchStaffBlogPosts(slug, { limit: 50 }).catch(() => null) : Promise.resolve(null),
       ]);
 
-      const executionItems: ProductionMaterialItem[] = ((assetsRes?.data?.items ?? []) as any[]).map(
-        (it: any): ProductionMaterialItem => ({
-          id: it.id,
-          title: it.title,
-          updatedAt: it.updatedAt,
-          kind: 'material',
-          usageType: it.usageType,
-          assetType: it.assetType,
-          derivedResultKind: 'pop',
-        }),
-      );
-
-      const blogItems: ProductionMaterialItem[] = ((blogRes?.data ?? []) as any[]).map(
-        (it: any): ProductionMaterialItem => ({
-          id: it.id,
-          title: it.title,
-          updatedAt: it.updatedAt ?? it.createdAt,
-          kind: 'blog',
-          status: it.status,
-          derivedResultKind: 'blog',
-        }),
-      );
-
-      const merged = [...executionItems, ...blogItems].sort(
-        (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
-      );
+      // multi-source 정규화/병합 공통 helper (execution + blog). QR/direct 는 KCos ready client 부재 → 미주입.
+      const merged = mergeProductionMaterials({
+        executionAssets: (assetsRes?.data?.items ?? []) as any[],
+        blogPosts: (blogRes?.data ?? []) as any[],
+      });
       setItems(merged);
     } catch (e: any) {
       setError(e?.message || '불러오는 데 실패했습니다.');
@@ -219,10 +175,10 @@ function AssetRow({
   item: ProductionMaterialItem;
   onViewSource: (item: ProductionMaterialItem) => void;
 }) {
-  const kindBadge = KIND_BADGE[item.kind];
-  const usageLabel = item.usageType ? (USAGE_LABELS[item.usageType] ?? item.usageType) : null;
-  const typeLabel = item.assetType ? (ASSET_TYPE_LABELS[item.assetType] ?? item.assetType) : null;
-  const statusLabel = item.status ? (BLOG_STATUS_LABELS[item.status] ?? item.status) : null;
+  const kindBadge = PRODUCTION_KIND_BADGE[item.kind];
+  const usageLabel = item.usageType ? (PRODUCTION_USAGE_LABELS[item.usageType] ?? item.usageType) : null;
+  const typeLabel = item.assetType ? (PRODUCTION_ASSET_TYPE_LABELS[item.assetType] ?? item.assetType) : null;
+  const statusLabel = item.status ? (PRODUCTION_BLOG_STATUS_LABELS[item.status] ?? item.status) : null;
   const date = item.updatedAt ? new Date(item.updatedAt).toLocaleDateString('ko-KR') : '—';
   // 원본 보기: POP 결과물(material+usageType=pop) 또는 블로그 결과물
   const canViewSource = (item.kind === 'material' && item.usageType === 'pop') || item.kind === 'blog';

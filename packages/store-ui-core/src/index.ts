@@ -45,6 +45,20 @@ export type {
   StoreResultKind,
 } from './components/StoreAssetDerivationViewer';
 
+// Production Materials 목록 정규화/병합 (WO-O4O-STORE-PRODUCTION-MATERIAL-LIST-QUERY-CLEANUP-V1)
+export {
+  mergeProductionMaterials,
+  PRODUCTION_USAGE_LABELS,
+  PRODUCTION_ASSET_TYPE_LABELS,
+  PRODUCTION_KIND_BADGE,
+  PRODUCTION_BLOG_STATUS_LABELS,
+} from './utils/productionMaterials';
+export type {
+  ProductionMaterialItem,
+  ProductionMaterialKind,
+  MergeProductionMaterialsInput,
+} from './utils/productionMaterials';
+
 // Capability Menu Integration (WO-O4O-CAPABILITY-MENU-INTEGRATION-V1)
 export { MENU_CAPABILITY_MAP, resolveStoreMenu } from './config/menuCapabilityMap';
 
