@@ -125,6 +125,60 @@ export function createStorePopStaffController(
   // 사본 excerpt 앞에 "[운영자 자료 가져옴] " 접두어로 출처 표시 (schema 변경 없는 MVP).
   // 향후 별도 origin/source_metadata 컬럼 도입 시 그쪽으로 이관.
   // ============================================================================
+  // ============================================================================
+  // STAFF — 매장 직접 POP 콘텐츠 저장 (author_role='store' INSERT)
+  // POST /stores/:slug/pop/staff
+  //   WO-O4O-POP-SAVE-AS-CONTENT-V1: POP 제작 결과(title/content/excerpt)를 재편집 가능한
+  //   매장 POP 콘텐츠로 저장. status='draft'. DB schema 변경 없음(기존 컬럼만 사용).
+  //   author_role='store' + storeId NOT NULL 강제(DB CHECK + 본 controller).
+  // ============================================================================
+  router.post('/:slug/pop/staff', requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { slug } = req.params;
+      const authReq = req as unknown as AuthRequest;
+      const userId = authReq.user?.id || authReq.authUser?.id;
+      const { title, content, excerpt } = (req.body ?? {}) as { title?: string; content?: string; excerpt?: string };
+
+      if (typeof title !== 'string' || title.trim().length === 0) {
+        res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'title is required' } });
+        return;
+      }
+
+      const pharmacy = await resolvePharmacy(slug);
+      if (!pharmacy) {
+        res.status(404).json({ success: false, error: { code: 'STORE_NOT_FOUND', message: 'Store not found' } });
+        return;
+      }
+      if (!userId || !verifyOwner(pharmacy, userId)) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Not the store owner' } });
+        return;
+      }
+
+      // slug 생성 (title slugify + 매장 내 충돌 시 timestamp)
+      const baseSlug =
+        title.trim().toLowerCase().replace(/[^a-z0-9가-힣]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 120) ||
+        `pop-${Date.now().toString(36)}`;
+      let finalSlug = baseSlug;
+      const existing = await popRepo.findOne({ where: { storeId: pharmacy.id, slug: baseSlug } });
+      if (existing) finalSlug = `${baseSlug}-${Date.now().toString(36)}`;
+
+      const created = popRepo.create({
+        storeId: pharmacy.id,
+        serviceKey,
+        authorRole: 'store' as StorePopAuthorRole,
+        title: title.trim(),
+        slug: finalSlug,
+        excerpt: (excerpt ?? '').trim() || undefined,
+        content: content ?? '',
+        status: 'draft' as StorePopStatus,
+      });
+      const saved = await popRepo.save(created);
+      res.status(201).json({ success: true, data: saved });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: err.message } });
+    }
+  });
+
   router.post('/:slug/pop/staff/import', requireAuth, async (req: Request, res: Response) => {
     try {
       const { slug } = req.params;

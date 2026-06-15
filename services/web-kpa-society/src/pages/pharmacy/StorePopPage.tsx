@@ -29,7 +29,7 @@
 import { useState, useEffect, useCallback, type CSSProperties } from 'react';
 import {
   Megaphone, Trash2, ExternalLink, FileDown, QrCode, FolderOpen,
-  Sparkles, ChevronDown, ChevronUp, CheckCircle2, LayoutTemplate,
+  Sparkles, ChevronDown, ChevronUp, CheckCircle2, LayoutTemplate, Save,
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
@@ -38,6 +38,9 @@ import { colors } from '../../styles/theme';
 import { getStoreExecutionAsset } from '../../api/storeExecutionAssets';
 import { getStoreQrCodes } from '../../api/storeQr';
 import type { StoreQrCode } from '../../api/storeQr';
+// WO-O4O-POP-SAVE-AS-CONTENT-V1: 제작 결과를 재편집 가능한 POP 콘텐츠(store_pops)로 저장
+import { createStaffPopPost } from '../../api/popStaff';
+import { getStoreSlug } from '../../api/pharmacyInfo';
 import { getAccessToken } from '../../contexts/AuthContext';
 import { findTemplate } from './productionTemplates';
 import type { ProductionTemplate } from './productionTemplates';
@@ -110,6 +113,38 @@ export function StorePopPage() {
   // Layout + generate
   const [layout, setLayout] = useState<'A4' | 'A5'>('A4');
   const [generating, setGenerating] = useState(false);
+
+  // WO-O4O-POP-SAVE-AS-CONTENT-V1: POP 콘텐츠로 저장
+  const [savingContent, setSavingContent] = useState(false);
+  const handleSaveAsContent = useCallback(async () => {
+    if (!popAiContent) {
+      toast.error('저장할 POP 문구가 없습니다. 먼저 AI 문구를 만들거나 가져온 POP으로 시작하세요.');
+      return;
+    }
+    const slug = await getStoreSlug().catch(() => null);
+    if (!slug) {
+      toast.error('매장 정보를 확인할 수 없습니다');
+      return;
+    }
+    setSavingContent(true);
+    try {
+      const contentHtml = [
+        popAiContent.shortText ? `<p>${popAiContent.shortText}</p>` : '',
+        popAiContent.bullets.length ? `<ul>${popAiContent.bullets.map((b) => `<li>${b}</li>`).join('')}</ul>` : '',
+        popAiContent.longText ? `<p>${popAiContent.longText}</p>` : '',
+      ].filter(Boolean).join('');
+      await createStaffPopPost(slug, {
+        title: popAiContent.title || 'POP',
+        content: contentHtml,
+        excerpt: popAiContent.shortText || undefined,
+      });
+      toast.success('POP 콘텐츠로 저장되었습니다. 내 매장 POP에서 다시 수정·제작할 수 있습니다.');
+    } catch (e: any) {
+      toast.error(e?.message || 'POP 콘텐츠 저장에 실패했습니다');
+    } finally {
+      setSavingContent(false);
+    }
+  }, [popAiContent]);
 
   const fetchQrCodes = useCallback(async () => {
     try {
@@ -431,6 +466,18 @@ export function StorePopPage() {
                     <Sparkles size={13} />
                     {popAiContent ? '재생성' : 'AI 문구 만들기'}
                   </button>
+                  {popAiContent && (
+                    <button
+                      type="button"
+                      onClick={handleSaveAsContent}
+                      disabled={savingContent}
+                      style={styles.aiGenerateBtn}
+                      title="POP 콘텐츠로 저장 (내 매장 POP 에서 재편집·재제작)"
+                    >
+                      <Save size={13} />
+                      {savingContent ? '저장 중...' : 'POP 콘텐츠로 저장'}
+                    </button>
+                  )}
                   {popAiContent && (
                     <button
                       type="button"

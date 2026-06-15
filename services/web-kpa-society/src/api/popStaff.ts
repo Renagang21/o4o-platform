@@ -91,6 +91,20 @@ export async function deleteStaffPopPost(slug: string, postId: string, service?:
   await authFetch(url, { method: 'DELETE' });
 }
 
+/**
+ * 매장 직접 POP 콘텐츠 저장 (author_role='store' INSERT).
+ * WO-O4O-POP-SAVE-AS-CONTENT-V1: POP 제작 결과를 재편집 가능한 매장 POP 콘텐츠로 저장.
+ */
+export async function createStaffPopPost(
+  slug: string,
+  body: { title: string; content?: string; excerpt?: string },
+  service?: string,
+): Promise<StaffPopPost> {
+  const url = `${getApiBase(service)}/stores/${encodeURIComponent(slug)}/pop/staff`;
+  const json = await authFetch(url, { method: 'POST', body: JSON.stringify(body) });
+  return json.data;
+}
+
 // ─────────────────────────────────────────────────────
 // Operator HUB POP Import (WO-O4O-KPA-STORE-HUB-POP-CONTENT-IMPORT-V1)
 // ─────────────────────────────────────────────────────

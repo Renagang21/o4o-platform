@@ -31,10 +31,14 @@ import {
   Square,
   RefreshCw,
   FileDown,
+  Save,
 } from 'lucide-react';
 import { api, API_BASE_URL } from '@/lib/apiClient';
 import { getAccessToken } from '@o4o/auth-client';
 import { toast } from '@o4o/error-handling';
+// WO-O4O-POP-SAVE-AS-CONTENT-V1: 제작 결과를 재편집 가능한 POP 콘텐츠(store_pops)로 저장
+import { createStaffPopPost } from '@/api/popStaff';
+import { getStoreSlug } from '@/api/storeHub';
 import type { ProductionTemplate } from '@o4o/types/production-template';
 import { findTemplate } from '@/config/productionTemplates';
 // WO-O4O-AI-EDITING-MODAL-ADOPTION-ALIGNMENT-V1: POP AI 진입을 KPA 와 동일한 공통 모달로 정렬
@@ -103,6 +107,38 @@ export default function StorePopPage() {
     setPopAiContent({ title: pf.title || '', bullets: [], shortText: (pf.excerpt || '').trim(), longText: bodyText });
     window.history.replaceState({}, document.title);
   }, [location.state]);
+
+  // WO-O4O-POP-SAVE-AS-CONTENT-V1: POP 콘텐츠로 저장
+  const [savingContent, setSavingContent] = useState(false);
+  const handleSaveAsContent = async () => {
+    if (!popAiContent) {
+      toast.error('저장할 POP 문구가 없습니다. 먼저 AI 문구를 만들거나 가져온 POP으로 시작하세요.');
+      return;
+    }
+    const slug = await getStoreSlug().catch(() => null);
+    if (!slug) {
+      toast.error('약국 정보를 확인할 수 없습니다');
+      return;
+    }
+    setSavingContent(true);
+    try {
+      const contentHtml = [
+        popAiContent.shortText ? `<p>${popAiContent.shortText}</p>` : '',
+        popAiContent.bullets.length ? `<ul>${popAiContent.bullets.map((b) => `<li>${b}</li>`).join('')}</ul>` : '',
+        popAiContent.longText ? `<p>${popAiContent.longText}</p>` : '',
+      ].filter(Boolean).join('');
+      await createStaffPopPost(slug, {
+        title: popAiContent.title || 'POP',
+        content: contentHtml,
+        excerpt: popAiContent.shortText || undefined,
+      });
+      toast.success('POP 콘텐츠로 저장되었습니다. 내 약국 POP에서 다시 수정·제작할 수 있습니다.');
+    } catch (e: any) {
+      toast.error(e?.message || 'POP 콘텐츠 저장에 실패했습니다');
+    } finally {
+      setSavingContent(false);
+    }
+  };
 
   // Step 3: layout + template
   const [layout, setLayout] = useState<'A4' | 'A5'>('A4');
@@ -346,6 +382,18 @@ export default function StorePopPage() {
             <Sparkles size={14} />
             AI 문구 생성
           </button>
+          {/* WO-O4O-POP-SAVE-AS-CONTENT-V1: POP 콘텐츠로 저장 (내 약국 POP 재편집·재제작) */}
+          {popAiContent && (
+            <button
+              onClick={handleSaveAsContent}
+              disabled={savingContent}
+              style={aiGenBtnStyle}
+              title="POP 콘텐츠로 저장 (내 약국 POP 에서 재편집·재제작)"
+            >
+              <Save size={14} />
+              {savingContent ? '저장 중...' : 'POP 콘텐츠로 저장'}
+            </button>
+          )}
           {popAiContent && (
             <button
               onClick={() => setPopAiContent(null)}
