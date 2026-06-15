@@ -57,7 +57,6 @@ import routesRoutes from '../routes/routes.routes.js';
 import serviceProvisioningRoutes from '../routes/service-provisioning.routes.js';
 import serviceAdminRoutes from '../routes/service-admin.routes.js';
 import publicRoutes from '../routes/public.routes.js';
-import { createSiteGuideRoutes } from '../routes/siteguide/index.js';
 import platformInquiryRoutes, { adminRouter as platformInquiryAdminRoutes } from '../routes/v1/platformInquiry.routes.js';
 import { createPlatformServicesRoutes } from '../routes/platform-services/platform-services.routes.js';
 import { createAdminPlatformServicesRoutes } from '../routes/platform-services/admin-platform-services.routes.js';
@@ -117,14 +116,6 @@ import { createAdminPlaybackLogRoutes } from '../routes/admin/channel-playback-l
 import { createAdminHeartbeatRoutes } from '../routes/admin/channel-heartbeat.routes.js';
 import { createAdminChannelOpsRoutes } from '../routes/admin/channel-ops.routes.js';
 import { createAdminOpsMetricsRoutes } from '../routes/admin/ops-metrics.routes.js';
-
-// SiteGuide Entities (for DataSource registration)
-import {
-  SiteGuideBusiness,
-  SiteGuideApiKey,
-  SiteGuideUsageSummary,
-  SiteGuideExecutionLog,
-} from '../routes/siteguide/entities/index.js';
 
 // ============================================================================
 // PHASE 1: Core routes — registered BEFORE server listen
@@ -290,11 +281,6 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     const { createAdminServiceContactSettingsController } = await import('../modules/contact-inquiry/admin-service-contact-settings.controller.js');
     app.use('/api/v1/admin/services', createAdminServiceContactSettingsController(dataSource));
     logger.info('✅ Contact Settings admin route registered at /api/v1/admin/services/:serviceKey/contact-settings');
-
-    // 8.5. Register SiteGuide routes (independent service - siteguide.co.kr, no auth)
-    const siteguideRoutes = createSiteGuideRoutes(dataSource);
-    app.use('/api/siteguide', siteguideRoutes);
-    logger.info('✅ SiteGuide routes registered at /api/siteguide (independent service)');
 
     // 8.6. Register Platform Inquiry routes (contact forms for SaaS operator)
     app.use('/api/v1/platform', platformInquiryRoutes);

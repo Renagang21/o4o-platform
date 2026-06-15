@@ -329,15 +329,6 @@ import {
 } from '../modules/partner/entities/index.js';
 
 // ============================================================================
-// SITEGUIDE ENTITIES (WO-SITEGUIDE-CORE-EXECUTION-V1)
-// ============================================================================
-import {
-  SiteGuideBusiness,
-  SiteGuideApiKey,
-  SiteGuideUsageSummary,
-  SiteGuideExecutionLog,
-} from '../routes/siteguide/entities/index.js';
-// ============================================================================
 // MARKET-TRIAL CORE ENTITIES (WO-MARKET-TRIAL-DB-PERSISTENCE-INTEGRATION-V1)
 // ============================================================================
 import {
@@ -859,13 +850,6 @@ export const AppDataSource = new DataSource({
     PartnerContent,
     PartnerEvent,
     PartnerTarget,
-    // ============================================================================
-    // SITEGUIDE ENTITIES (WO-SITEGUIDE-CORE-EXECUTION-V1)
-    // ============================================================================
-    SiteGuideBusiness,
-    SiteGuideApiKey,
-    SiteGuideUsageSummary,
-    SiteGuideExecutionLog,
     // ============================================================================
     // CONTENT TEMPLATE ENTITY (WO-O4O-CONTENT-TEMPLATE-SYSTEM-V1)
     // ============================================================================

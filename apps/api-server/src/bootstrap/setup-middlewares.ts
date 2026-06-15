@@ -58,7 +58,6 @@ export const getAllowedOrigins = (): string[] => {
     "https://glycopharm.co.kr", "https://www.glycopharm.co.kr",
     "https://kpa-society.co.kr", "https://www.kpa-society.co.kr",
     "https://k-cosmetics.site", "https://www.k-cosmetics.site",
-    "https://siteguide.co.kr", "https://www.siteguide.co.kr",
     // Cloud Run service URLs (GCP asia-northeast3)
     "https://glycopharm-web-3e3aws7zqa-du.a.run.app",
     "https://neture-web-3e3aws7zqa-du.a.run.app",
