@@ -83,13 +83,9 @@ ai-logs/
 
 ### 4.1 AI를 사용하는 독립 서비스
 
-다음 서비스들은 AI Core의 정책/계약을 준수하지만, **AI Core나 AI Extension이 아닌 독립 Service Layer**입니다:
+AI Core의 정책/계약을 준수하지만 **AI Core나 AI Extension이 아닌 독립 Service Layer**로 동작하는 서비스를 여기에 등재한다. 현재 해당 서비스는 없다.
 
-| 서비스 | 도메인 | 설명 | 문서 |
-|--------|--------|------|------|
-| SiteGuide | siteguide.co.kr | 외부 사업자용 AI 사이트 안내 | [docs/services/siteguide/](../../docs/services/siteguide/) |
-
-> **참고**: SiteGuide는 Neture 종속이 아닌 독립 서비스입니다. AI Core의 계약을 사용하지만, AI Core나 AI Extension에 포함되지 않습니다.
+> **참고**: SiteGuide(`siteguide.co.kr`)는 과거 이 항목의 예시였으나, **O4O 에서 legacy 코드·인프라가 모두 제거**되었으며 현재 운영 서비스가 아니다(WO-O4O-SITEGUIDE-LEGACY-CODE-REMOVAL-V1). 향후 필요 시 **별도 저장소에서 신규 개발**할 독립 서비스 후보로만 보류한다.
 
 ---
 

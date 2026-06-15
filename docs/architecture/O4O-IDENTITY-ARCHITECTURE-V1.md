@@ -355,8 +355,8 @@ glycopharm.co.kr (www)
 glucoseview.co.kr (www)
 kpa-society.co.kr (www)
 k-cosmetics.site (www)
-siteguide.co.kr (www)
 ```
+<!-- siteguide.co.kr: O4O legacy 제거됨(WO-O4O-SITEGUIDE-LEGACY-CODE-REMOVAL-V1). 현재 미운영 — 향후 별도 저장소 신규 서비스 후보. -->
 
 **Development:**
 ```
