@@ -13,6 +13,8 @@ import {
 import { NeturePartner } from '../../../routes/neture/entities/neture-partner.entity.js';
 import { ServiceMembership } from '../../auth/entities/ServiceMembership.js';
 import { roleAssignmentService } from '../../auth/services/role-assignment.service.js';
+// WO-O4O-SELLER-RECRUITMENT-C-BRIDGE-BACKEND-V1: 약국 대상 서비스 정책(의약품 gate 재확인)
+import { ServiceAudienceService } from './service-audience.service.js';
 import logger from '../../../utils/logger.js';
 
 /**
@@ -253,11 +255,97 @@ export class NeturePartnerContractService {
         logger.info(`[NeturePartnerContractService] Role partner assigned to user ${application.partnerId}`);
       }
 
+      // WO-O4O-SELLER-RECRUITMENT-C-BRIDGE-BACKEND-V1:
+      // 모집 승인 → 판매자 주문 가능화. 계약/RBAC 와 독립한 best-effort(실패해도 승인은 유지, idempotent).
+      //  ① master_id + 공급자 user_id 로 offer 해소
+      //  ② 의약품 gate 재확인 (모집은 createSupplierOffer 미경유 → 여기서 보강)
+      //  ③ allowedSellerIds(USER id) 에 판매자 추가 = 조달 주문 가능화 (조달 쿼리는 OPL 미참조)
+      //  ④ 판매자 organization OPL 생성 (매장 listing, price=NULL 옵션 A 유지)
+      try {
+        await this.bridgeRecruitmentToOrderable(recruitment, application.partnerId);
+      } catch (bridgeError) {
+        logger.error(`[NeturePartnerContractService] C-bridge failed (approval kept): application=${application.id}`, bridgeError);
+      }
+
       return { id: application.id, status: application.status };
     } catch (error) {
       logger.error('[NeturePartnerContractService] Error approving partner application:', error);
       throw error;
     }
+  }
+
+  /**
+   * WO-O4O-SELLER-RECRUITMENT-C-BRIDGE-BACKEND-V1
+   *
+   * 모집 승인된 제품을 판매자가 주문 가능한 상태로 완성한다 (best-effort, idempotent).
+   *  - offer 해소: recruitment.productId(=master_id) + recruitment.sellerId(=공급자 user_id)
+   *  - 의약품 gate: 규제 상품은 약국 대상 서비스에서만 (service_audience_policies)
+   *  - allowedSellerIds(USER id) += 판매자 → 조달(B2B supply) 주문 가능화
+   *  - 판매자 organization OPL 생성 (매장 listing, price=NULL = 가격 정책 옵션 A 유지)
+   */
+  private async bridgeRecruitmentToOrderable(
+    recruitment: NeturePartnerRecruitment,
+    partnerUserId: string,
+  ): Promise<void> {
+    const serviceKey = recruitment.serviceId || 'neture';
+
+    // ① offer 해소 (master_id + 공급자 user_id). PRIVATE·APPROVED 우선.
+    const offerRows: Array<{ id: string; master_id: string; allowed_seller_ids: string[] | null; is_regulated: boolean | null }> =
+      await AppDataSource.query(
+        `SELECT spo.id, spo.master_id, spo.allowed_seller_ids, c.is_regulated
+         FROM supplier_product_offers spo
+         JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+         JOIN product_masters pm ON pm.id = spo.master_id
+         LEFT JOIN product_categories c ON c.id = pm.category_id
+         WHERE spo.master_id = $1 AND ns.user_id = $2 AND spo.deleted_at IS NULL
+         ORDER BY (spo.distribution_type = 'PRIVATE') DESC, (spo.approval_status = 'APPROVED') DESC, spo.created_at DESC
+         LIMIT 1`,
+        [recruitment.productId, recruitment.sellerId],
+      );
+    if (!offerRows.length) {
+      logger.warn(`[C-Bridge] offer not found (master=${recruitment.productId}, sellerUser=${recruitment.sellerId}) — bridge skipped`);
+      return;
+    }
+    const offer = offerRows[0];
+
+    // ② 의약품 gate 재확인 — 규제 상품은 약국 대상 서비스에만 연결
+    if (offer.is_regulated) {
+      const isPharmacyAudience = await new ServiceAudienceService(AppDataSource).getPharmacyAudienceResolver();
+      if (!isPharmacyAudience(serviceKey)) {
+        logger.warn(`[C-Bridge] regulated product → non-pharmacy service(${serviceKey}) — bridge skipped (offer=${offer.id})`);
+        return;
+      }
+    }
+
+    // ③ allowedSellerIds(USER id) += 판매자 (idempotent)
+    const current = offer.allowed_seller_ids || [];
+    if (!current.includes(partnerUserId)) {
+      await AppDataSource.query(
+        `UPDATE supplier_product_offers
+         SET allowed_seller_ids = array_append(coalesce(allowed_seller_ids, '{}'), $1), updated_at = NOW()
+         WHERE id = $2`,
+        [partnerUserId, offer.id],
+      );
+      logger.info(`[C-Bridge] allowedSellerIds += partner ${partnerUserId} (offer=${offer.id})`);
+    }
+
+    // ④ 판매자 organization OPL 생성 (org 없으면 skip — allowedSellerIds 는 이미 적용)
+    const orgRows: Array<{ organization_id: string }> = await AppDataSource.query(
+      `SELECT organization_id FROM organization_members WHERE user_id = $1 AND left_at IS NULL LIMIT 1`,
+      [partnerUserId],
+    );
+    if (!orgRows.length) {
+      logger.warn(`[C-Bridge] partner ${partnerUserId} has no organization — OPL skipped (allowedSellerIds applied)`);
+      return;
+    }
+    await AppDataSource.query(
+      `INSERT INTO organization_product_listings
+        (id, organization_id, service_key, master_id, offer_id, is_active, price, source_type, source_id, created_at, updated_at)
+       VALUES (gen_random_uuid(), $1, $2, $3, $4, true, NULL, 'seller_recruitment', $5, NOW(), NOW())
+       ON CONFLICT (organization_id, service_key, offer_id) DO NOTHING`,
+      [orgRows[0].organization_id, serviceKey, offer.master_id, offer.id, recruitment.id],
+    );
+    logger.info(`[C-Bridge] OPL ensured (org=${orgRows[0].organization_id}, offer=${offer.id}, service=${serviceKey})`);
   }
 
   /**
