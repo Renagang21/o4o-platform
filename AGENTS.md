@@ -30,8 +30,15 @@
 - Commits: `type(scope): summary` (e.g., `feat(admin-dashboard): add stock widget`). Keep changes atomic; don’t mix client/server/ops.
 - PRs: link the tracking issue, summarize impact, flag breaking changes, and include screenshots or API samples for UI or contract changes.
 
+## Multi-Workspace Agent Operations
+- This repository is operated by one user across multiple PCs and workspaces, with GitHub as the synchronization source of truth.
+- Before starting work in any workspace, check `git status --short`, `git branch --show-current`, `git fetch origin`, and `git status -sb`.
+- Before leaving a workspace, commit and push completed work. After moving to another workspace, run `git fetch origin`, `git pull --ff-only`, and `git status --short`.
+- Codex and Claude Code may each perform independent WO tasks from separate workspaces. Each WO must define allowed files, forbidden files, validation commands, and whether commit or push is allowed.
+- Keep commits path-specific to the assigned WO. Stage only the allowed files, then verify with `git diff --cached --name-only` before committing.
+- Do not mix unrelated client, server, docs, dependency, or lockfile changes in one commit. Treat unexpected dirty files as existing workspace state unless the user explicitly assigns them.
+
 ## Environment & Configuration Tips
 - Use Node `22.18.0` and pnpm `9.x` (Volta or `.nvmrc` recommended).
 - Copy `.env.example` to `.env.local` for development; follow `config/env-templates` for new envs.
 - Never commit secrets. PM2 reads server-managed `.env`; document rotations in `docs/` or `config/systemd`.
-
