@@ -33,6 +33,17 @@ const statusColors: Record<string, string> = {
   INACTIVE: 'bg-slate-100 text-slate-500',
 };
 
+function getMissingOnboardingItems(supplier: AdminSupplier): string[] {
+  const missing: string[] = [];
+  if (!supplier.businessRegistrationDocumentId) missing.push('사업자등록증');
+  if (!supplier.taxInvoiceEmail) missing.push('세금계산서 이메일');
+  if (!supplier.settlementBankName) missing.push('은행명');
+  if (!supplier.settlementAccountNumberMasked) missing.push('계좌번호');
+  if (!supplier.settlementAccountHolder) missing.push('예금주');
+  if (!supplier.settlementBankbookDocumentId) missing.push('통장 사본');
+  return missing;
+}
+
 export default function OperatorSupplierApprovalPage() {
   const [suppliers, setSuppliers] = useState<AdminSupplier[]>([]);
   const [loading, setLoading] = useState(true);
@@ -72,6 +83,17 @@ export default function OperatorSupplierApprovalPage() {
     setRejectModal(null);
     setRejectReason('');
     if (ok) await loadSuppliers();
+  };
+
+  const handleDownloadDocument = async (
+    supplierId: string,
+    documentType: 'business_registration' | 'bank_statement',
+  ) => {
+    const blob = await operatorSupplierApi.downloadDocument(supplierId, documentType);
+    if (!blob) return;
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank', 'noopener,noreferrer');
+    setTimeout(() => URL.revokeObjectURL(url), 30_000);
   };
 
   const statuses = ['all', 'PENDING', 'ACTIVE', 'REJECTED', 'INACTIVE'];
@@ -159,13 +181,17 @@ export default function OperatorSupplierApprovalPage() {
                 <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">대표자</th>
                 <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">사업자번호</th>
                 <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">이메일</th>
+                <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">서류/정산</th>
                 <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">상태</th>
                 <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">등록일</th>
                 <th className="text-center px-6 py-4 text-sm font-medium text-slate-500">관리</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {filtered.map((s) => (
+              {filtered.map((s) => {
+                const missing = getMissingOnboardingItems(s);
+                const onboardingComplete = missing.length === 0;
+                return (
                 <tr key={s.id} className="hover:bg-slate-50 transition-colors">
                   <td className="px-6 py-4">
                     <p className="font-medium text-slate-800">{s.name}</p>
@@ -178,6 +204,38 @@ export default function OperatorSupplierApprovalPage() {
                     {s.taxInvoiceEmail && s.taxInvoiceEmail !== s.email && (
                       <div className="text-xs text-slate-400 mt-0.5">세금: {s.taxInvoiceEmail}</div>
                     )}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-slate-600">
+                    <div className="space-y-1">
+                      <div className={onboardingComplete ? 'text-emerald-700' : 'text-amber-700'}>
+                        {onboardingComplete ? '필수 완료' : `미완료: ${missing.join(', ')}`}
+                      </div>
+                      <div className="text-xs text-slate-500">
+                        {s.settlementBankName && s.settlementAccountHolder
+                          ? `${s.settlementBankName} / ${s.settlementAccountHolder} / ${s.settlementAccountNumberMasked || '-'}`
+                          : '정산 정보 없음'}
+                      </div>
+                      <div className="flex gap-2 text-xs">
+                        {s.businessRegistrationDocumentId && (
+                          <button
+                            type="button"
+                            onClick={() => handleDownloadDocument(s.id, 'business_registration')}
+                            className="text-emerald-700 hover:text-emerald-900"
+                          >
+                            사업자등록증
+                          </button>
+                        )}
+                        {s.settlementBankbookDocumentId && (
+                          <button
+                            type="button"
+                            onClick={() => handleDownloadDocument(s.id, 'bank_statement')}
+                            className="text-emerald-700 hover:text-emerald-900"
+                          >
+                            통장 사본
+                          </button>
+                        )}
+                      </div>
+                    </div>
                   </td>
                   <td className="px-6 py-4">
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[s.status] || 'bg-gray-100 text-gray-700'}`}>
@@ -192,7 +250,8 @@ export default function OperatorSupplierApprovalPage() {
                       <>
                         <button
                           onClick={() => setApproveConfirmId(s.id)}
-                          disabled={actionLoading === s.id}
+                          disabled={actionLoading === s.id || !onboardingComplete}
+                          title={!onboardingComplete ? `필수 항목 미완료: ${missing.join(', ')}` : undefined}
                           className="text-emerald-600 hover:text-emerald-800 font-medium text-sm disabled:opacity-50"
                         >
                           {actionLoading === s.id ? '처리중...' : '활성화'}
@@ -211,7 +270,8 @@ export default function OperatorSupplierApprovalPage() {
                     )}
                   </td>
                 </tr>
-              ))}
+              );
+              })}
             </tbody>
           </table>
         )}

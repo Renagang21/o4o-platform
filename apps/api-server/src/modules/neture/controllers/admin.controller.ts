@@ -25,6 +25,10 @@ import { AdminService } from '../services/admin.service.js';
 import { ActionLogService } from '@o4o/action-log-core';
 import { ProductApprovalV2Service } from '../../product-policy-v2/product-approval-v2.service.js';
 import { SupplierStatus, OfferDistributionType, OfferApprovalStatus } from '../entities/index.js';
+import {
+  SupplierOnboardingService,
+  type SupplierOnboardingDocumentType,
+} from '../services/supplier-onboarding.service.js';
 import sharp from 'sharp';
 import logger from '../../../utils/logger.js';
 
@@ -56,6 +60,7 @@ export function createAdminController(dataSource: DataSource): Router {
   const adminService = new AdminService(dataSource);
   const netureActionLogService = new ActionLogService(dataSource);
   const approvalV2Service = new ProductApprovalV2Service(dataSource);
+  const onboardingService = new SupplierOnboardingService(dataSource);
 
   // ==================== Admin: Supplier Management ====================
 
@@ -159,6 +164,50 @@ export function createAdminController(dataSource: DataSource): Router {
     } catch (error) {
       logger.error('[Neture API] Error deactivating supplier:', error);
       res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to deactivate supplier' } });
+    }
+  });
+
+  /**
+   * GET /admin/suppliers/:id/onboarding
+   * 공급자 기본 서류/정산 정보 상세
+   */
+  router.get('/suppliers/:id/onboarding', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const data = await onboardingService.getOnboarding(req.params.id);
+      if (!data) {
+        return res.status(404).json({ success: false, error: { code: 'SUPPLIER_NOT_FOUND' } });
+      }
+      res.json({ success: true, data });
+    } catch (error) {
+      logger.error('[Neture API] Error fetching supplier onboarding:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR' } });
+    }
+  });
+
+  /**
+   * GET /admin/suppliers/:id/documents/:documentType/download
+   */
+  router.get('/suppliers/:id/documents/:documentType/download', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const documentType = req.params.documentType as SupplierOnboardingDocumentType;
+      const document = await onboardingService.getDocumentForSupplier(req.params.id, documentType);
+      if (!document) {
+        return res.status(404).json({ success: false, error: { code: 'DOCUMENT_NOT_FOUND' } });
+      }
+      res.setHeader('Content-Type', document.mimeType || 'application/pdf');
+      res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(document.fileName)}"`);
+      const stream = await onboardingService.createReadStream(document);
+      stream.on('error', (err) => {
+        logger.error('[Neture API] Supplier document stream error:', err);
+        if (!res.headersSent) res.status(500).end();
+        else res.end();
+      });
+      stream.pipe(res);
+    } catch (error) {
+      logger.error('[Neture API] Error downloading supplier document:', error);
+      if (!res.headersSent) {
+        res.status(500).json({ success: false, error: { code: 'DOWNLOAD_FAILED' } });
+      }
     }
   });
 

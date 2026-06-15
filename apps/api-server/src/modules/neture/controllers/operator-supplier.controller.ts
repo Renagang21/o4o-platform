@@ -34,6 +34,10 @@ import { requireNetureScope } from '../../../middleware/neture-scope.middleware.
 import { NetureService } from '../neture.service.js';
 import { ActionLogService } from '@o4o/action-log-core';
 import { SupplierStatus } from '../entities/index.js';
+import {
+  SupplierOnboardingService,
+  type SupplierOnboardingDocumentType,
+} from '../services/supplier-onboarding.service.js';
 import logger from '../../../utils/logger.js';
 
 type AuthenticatedRequest = Request & {
@@ -43,6 +47,7 @@ type AuthenticatedRequest = Request & {
 export function createOperatorSupplierController(dataSource: DataSource): Router {
   const router = Router();
   const netureService = new NetureService();
+  const onboardingService = new SupplierOnboardingService(dataSource);
   const actionLogService = new ActionLogService(dataSource);
 
   // Router-level guard: operator scope (admin 도 scopeRoleMapping 으로 통과)
@@ -80,6 +85,50 @@ export function createOperatorSupplierController(dataSource: DataSource): Router
     } catch (error) {
       logger.error('[Neture Operator API] Error fetching pending suppliers:', error);
       res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch pending suppliers' } });
+    }
+  });
+
+  /**
+   * GET /operator/suppliers/:id/onboarding
+   * 공급자 기본 서류/정산 정보 상세
+   */
+  router.get('/suppliers/:id/onboarding', async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const data = await onboardingService.getOnboarding(req.params.id);
+      if (!data) {
+        return res.status(404).json({ success: false, error: { code: 'SUPPLIER_NOT_FOUND' } });
+      }
+      res.json({ success: true, data });
+    } catch (error) {
+      logger.error('[Neture Operator API] Error fetching supplier onboarding:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR' } });
+    }
+  });
+
+  /**
+   * GET /operator/suppliers/:id/documents/:documentType/download
+   */
+  router.get('/suppliers/:id/documents/:documentType/download', async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const documentType = req.params.documentType as SupplierOnboardingDocumentType;
+      const document = await onboardingService.getDocumentForSupplier(req.params.id, documentType);
+      if (!document) {
+        return res.status(404).json({ success: false, error: { code: 'DOCUMENT_NOT_FOUND' } });
+      }
+      res.setHeader('Content-Type', document.mimeType || 'application/pdf');
+      res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(document.fileName)}"`);
+      const stream = await onboardingService.createReadStream(document);
+      stream.on('error', (err) => {
+        logger.error('[Neture Operator API] Supplier document stream error:', err);
+        if (!res.headersSent) res.status(500).end();
+        else res.end();
+      });
+      stream.pipe(res);
+    } catch (error) {
+      logger.error('[Neture Operator API] Error downloading supplier document:', error);
+      if (!res.headersSent) {
+        res.status(500).json({ success: false, error: { code: 'DOWNLOAD_FAILED' } });
+      }
     }
   });
 

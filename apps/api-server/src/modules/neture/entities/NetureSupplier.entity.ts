@@ -103,6 +103,27 @@ export class NetureSupplier {
   @Column({ name: 'tax_invoice_email', type: 'varchar', length: 255, nullable: true })
   taxInvoiceEmail: string | null;
 
+  @Column({ name: 'business_registration_document_id', type: 'uuid', nullable: true })
+  businessRegistrationDocumentId: string | null;
+
+  @Column({ name: 'settlement_bank_name', type: 'varchar', length: 100, nullable: true })
+  settlementBankName: string | null;
+
+  @Column({ name: 'settlement_account_number', type: 'varchar', length: 100, nullable: true })
+  settlementAccountNumber: string | null;
+
+  @Column({ name: 'settlement_account_holder', type: 'varchar', length: 100, nullable: true })
+  settlementAccountHolder: string | null;
+
+  @Column({ name: 'settlement_bankbook_document_id', type: 'uuid', nullable: true })
+  settlementBankbookDocumentId: string | null;
+
+  @Column({ name: 'settlement_contact_name', type: 'varchar', length: 100, nullable: true })
+  settlementContactName: string | null;
+
+  @Column({ name: 'settlement_contact_email', type: 'varchar', length: 255, nullable: true })
+  settlementContactEmail: string | null;
+
   @Column({ name: 'business_item', type: 'varchar', length: 100, nullable: true })
   businessItem: string | null;
 

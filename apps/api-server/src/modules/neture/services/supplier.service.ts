@@ -117,6 +117,14 @@ export class NetureSupplierService {
       if (!supplier) return { success: false, error: 'SUPPLIER_NOT_FOUND' };
       if (supplier.status !== SupplierStatus.PENDING) return { success: false, error: 'INVALID_STATUS' };
 
+      const missingOnboardingFields = this.getMissingBasicOnboardingFields(supplier);
+      if (missingOnboardingFields.length > 0) {
+        return {
+          success: false,
+          error: `ONBOARDING_INCOMPLETE:${missingOnboardingFields.join(',')}`,
+        };
+      }
+
       supplier.status = SupplierStatus.ACTIVE;
       supplier.approvedBy = approvedByUserId;
       supplier.approvedAt = new Date();
@@ -303,7 +311,28 @@ export class NetureSupplierService {
 
   async getAllSuppliers(
     filters?: { status?: SupplierStatus },
-  ): Promise<Array<{ id: string; name: string; slug: string; status: SupplierStatus; contactEmail: string; userId: string; identityStatus: string | null; userEmail: string | null; representativeName: string | null; businessNumber: string | null; taxInvoiceEmail: string | null; createdAt: Date; updatedAt: Date }>> {
+  ): Promise<Array<{
+    id: string;
+    name: string;
+    slug: string;
+    status: SupplierStatus;
+    contactEmail: string;
+    userId: string;
+    identityStatus: string | null;
+    userEmail: string | null;
+    representativeName: string | null;
+    businessNumber: string | null;
+    taxInvoiceEmail: string | null;
+    businessRegistrationDocumentId: string | null;
+    settlementBankName: string | null;
+    settlementAccountNumberMasked: string | null;
+    settlementAccountHolder: string | null;
+    settlementBankbookDocumentId: string | null;
+    settlementContactName: string | null;
+    settlementContactEmail: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+  }>> {
     try {
       const where: { status?: SupplierStatus } = {};
       if (filters?.status) where.status = filters.status;
@@ -340,6 +369,13 @@ export class NetureSupplierService {
           representativeName: s.representativeName || null,
           businessNumber: org?.business_number ?? null,
           taxInvoiceEmail: s.taxInvoiceEmail || null,
+          businessRegistrationDocumentId: s.businessRegistrationDocumentId || null,
+          settlementBankName: s.settlementBankName || null,
+          settlementAccountNumberMasked: this.maskAccountNumber(s.settlementAccountNumber || null),
+          settlementAccountHolder: s.settlementAccountHolder || null,
+          settlementBankbookDocumentId: s.settlementBankbookDocumentId || null,
+          settlementContactName: s.settlementContactName || null,
+          settlementContactEmail: s.settlementContactEmail || null,
           createdAt: s.createdAt,
           updatedAt: s.updatedAt,
         };
@@ -1125,5 +1161,28 @@ export class NetureSupplierService {
       website: getHint(supplier.contactWebsite, supplier.contactWebsiteVisibility),
       kakao: getHint(supplier.contactKakao, supplier.contactKakaoVisibility),
     };
+  }
+
+  private maskAccountNumber(value: string | null): string | null {
+    if (!value) return null;
+    const digits = value.replace(/\D/g, '');
+    if (digits.length <= 4) return value;
+    const suffix = digits.slice(-4);
+    return `${value.slice(0, Math.max(0, value.length - suffix.length)).replace(/\d/g, '*')}${suffix}`;
+  }
+
+  private getMissingBasicOnboardingFields(supplier: NetureSupplier): string[] {
+    const missing: string[] = [];
+    if (!supplier.businessRegistrationDocumentId) missing.push('businessRegistrationDocument');
+    if (!supplier.settlementBankName?.trim()) missing.push('settlementBankName');
+    if (!supplier.settlementAccountNumber?.trim()) missing.push('settlementAccountNumber');
+    if (!supplier.settlementAccountHolder?.trim()) missing.push('settlementAccountHolder');
+    if (!supplier.settlementBankbookDocumentId) missing.push('settlementBankbookDocument');
+    if (!supplier.taxInvoiceEmail?.trim()) {
+      missing.push('taxInvoiceEmail');
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(supplier.taxInvoiceEmail)) {
+      missing.push('validTaxInvoiceEmail');
+    }
+    return missing;
   }
 }

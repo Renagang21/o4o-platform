@@ -25,10 +25,18 @@ import {
   Info,
   ShoppingCart,
   BadgeCheck,
+  Upload,
+  Download,
 } from 'lucide-react';
 
 import { BusinessRegistrationFields } from '@o4o/account-ui';
-import { supplierProfileApi, type SupplierProfile, type ContactVisibility } from '../../lib/api';
+import {
+  supplierProfileApi,
+  supplierOnboardingApi,
+  type SupplierProfile,
+  type SupplierOnboarding,
+  type ContactVisibility,
+} from '../../lib/api';
 
 const SUPPLIER_STATUS_CONFIG: Record<string, { label: string; cls: string }> = {
   pending:   { label: '승인 대기 중', cls: 'bg-amber-100 text-amber-700 border-amber-200' },
@@ -69,6 +77,7 @@ function VisibilitySelector({ value, onChange }: { value: ContactVisibility; onC
 
 const inputClass = 'w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent';
 const disabledInputClass = 'w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 text-gray-500 cursor-not-allowed';
+const fileInputClass = 'block w-full text-sm text-gray-600 file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-2 file:text-sm file:font-medium file:text-gray-700 hover:file:bg-gray-200';
 
 export default function SupplierProfilePage() {
   const [profile, setProfile] = useState<SupplierProfile | null>(null);
@@ -76,6 +85,13 @@ export default function SupplierProfilePage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [onboarding, setOnboarding] = useState<SupplierOnboarding | null>(null);
+  const [onboardingSaving, setOnboardingSaving] = useState(false);
+  const [onboardingSaved, setOnboardingSaved] = useState(false);
+  const [onboardingError, setOnboardingError] = useState<string | null>(null);
+  const [businessRegistrationFile, setBusinessRegistrationFile] = useState<File | null>(null);
+  const [bankbookFile, setBankbookFile] = useState<File | null>(null);
+  const [uploadingDocument, setUploadingDocument] = useState<'business_registration' | 'bank_statement' | null>(null);
 
   // Section A: 사업자 기본정보
   const [representativeName, setRepresentativeName] = useState('');
@@ -89,6 +105,11 @@ export default function SupplierProfilePage() {
   const [businessAddress, setBusinessAddress] = useState('');
   const [businessAddressDetail, setBusinessAddressDetail] = useState('');
   const [taxInvoiceEmail, setTaxInvoiceEmail] = useState('');
+  const [settlementBankName, setSettlementBankName] = useState('');
+  const [settlementAccountNumber, setSettlementAccountNumber] = useState('');
+  const [settlementAccountHolder, setSettlementAccountHolder] = useState('');
+  const [settlementContactName, setSettlementContactName] = useState('');
+  const [settlementContactEmail, setSettlementContactEmail] = useState('');
 
   // Section B: 담당자 정보
   const [managerName, setManagerName] = useState('');
@@ -124,7 +145,10 @@ export default function SupplierProfilePage() {
   useEffect(() => {
     const fetchProfile = async () => {
       setLoading(true);
-      const data = await supplierProfileApi.getProfile();
+      const [data, onboardingData] = await Promise.all([
+        supplierProfileApi.getProfile(),
+        supplierOnboardingApi.getOnboarding(),
+      ]);
       if (data) {
         setProfile(data);
         // Section A
@@ -165,6 +189,15 @@ export default function SupplierProfilePage() {
         setShippingMountain(data.shippingMountain || '');
         // Pre-fill
         setPrefilled(!!data._prefilled);
+      }
+      if (onboardingData) {
+        setOnboarding(onboardingData);
+        setTaxInvoiceEmail(onboardingData.taxInvoiceEmail || data?.taxInvoiceEmail || '');
+        setSettlementBankName(onboardingData.settlementBankName || '');
+        setSettlementAccountNumber(onboardingData.settlementAccountNumber || '');
+        setSettlementAccountHolder(onboardingData.settlementAccountHolder || '');
+        setSettlementContactName(onboardingData.settlementContactName || '');
+        setSettlementContactEmail(onboardingData.settlementContactEmail || '');
       }
       setLoading(false);
     };
@@ -224,6 +257,79 @@ export default function SupplierProfilePage() {
     } else {
       setError(result.error || '저장에 실패했습니다.');
     }
+  };
+
+  const refreshOnboarding = async () => {
+    const data = await supplierOnboardingApi.getOnboarding();
+    if (data) {
+      setOnboarding(data);
+      setTaxInvoiceEmail(data.taxInvoiceEmail || '');
+      setSettlementBankName(data.settlementBankName || '');
+      setSettlementAccountNumber(data.settlementAccountNumber || '');
+      setSettlementAccountHolder(data.settlementAccountHolder || '');
+      setSettlementContactName(data.settlementContactName || '');
+      setSettlementContactEmail(data.settlementContactEmail || '');
+    }
+  };
+
+  const handleSaveOnboarding = async () => {
+    setOnboardingSaving(true);
+    setOnboardingSaved(false);
+    setOnboardingError(null);
+
+    const result = await supplierOnboardingApi.updateOnboarding({
+      taxInvoiceEmail,
+      settlementBankName,
+      settlementAccountNumber,
+      settlementAccountHolder,
+      settlementContactName,
+      settlementContactEmail,
+    });
+
+    setOnboardingSaving(false);
+    if (result.success) {
+      if (result.data) setOnboarding(result.data);
+      setOnboardingSaved(true);
+      setTimeout(() => setOnboardingSaved(false), 3000);
+    } else {
+      setOnboardingError(result.error || '온보딩 정보 저장에 실패했습니다.');
+    }
+  };
+
+  const handleUploadDocument = async (documentType: 'business_registration' | 'bank_statement') => {
+    const file = documentType === 'business_registration' ? businessRegistrationFile : bankbookFile;
+    if (!file) {
+      setOnboardingError('PDF 파일을 선택해 주세요.');
+      return;
+    }
+    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+      setOnboardingError('PDF 파일만 업로드할 수 있습니다.');
+      return;
+    }
+
+    setUploadingDocument(documentType);
+    setOnboardingError(null);
+    const result = await supplierOnboardingApi.uploadDocument(documentType, file);
+    setUploadingDocument(null);
+
+    if (result.success) {
+      if (documentType === 'business_registration') setBusinessRegistrationFile(null);
+      else setBankbookFile(null);
+      await refreshOnboarding();
+    } else {
+      setOnboardingError(result.error || '문서 업로드에 실패했습니다.');
+    }
+  };
+
+  const handleDownloadDocument = async (documentType: 'business_registration' | 'bank_statement') => {
+    const blob = await supplierOnboardingApi.downloadDocument(documentType);
+    if (!blob) {
+      setOnboardingError('문서를 열 수 없습니다.');
+      return;
+    }
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank', 'noopener,noreferrer');
+    setTimeout(() => URL.revokeObjectURL(url), 30_000);
   };
 
   if (loading) {
@@ -361,7 +467,7 @@ export default function SupplierProfilePage() {
           <div>
             <label className="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-1.5">
               <Mail className="w-3.5 h-3.5 text-gray-400" />
-              세금계산서 이메일
+              세금계산서 이메일 <span className="text-red-500">*</span>
             </label>
             <input
               type="email"
@@ -370,6 +476,152 @@ export default function SupplierProfilePage() {
               placeholder="tax@company.com"
               className={inputClass}
             />
+          </div>
+        </div>
+      </div>
+
+      {/* Section A-2: 공급자 온보딩 서류/정산 정보 */}
+      <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4">
+        <h2 className="flex items-center gap-2 text-base font-semibold text-gray-800 mb-2">
+          <FileText className="w-5 h-5 text-gray-500" />
+          공급자 서류 및 정산 정보
+        </h2>
+        <p className="text-xs text-gray-500 mb-5">
+          공급자 활성화 전에 운영자가 확인하는 기본 서류와 정산 정보입니다. 사업자등록증과 통장 사본은 PDF로 제출해 주세요.
+        </p>
+
+        <div className="space-y-5">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">은행명 <span className="text-red-500">*</span></label>
+              <input
+                type="text"
+                value={settlementBankName}
+                onChange={(e) => setSettlementBankName(e.target.value)}
+                placeholder="예: 국민은행"
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">계좌번호 <span className="text-red-500">*</span></label>
+              <input
+                type="text"
+                value={settlementAccountNumber}
+                onChange={(e) => setSettlementAccountNumber(e.target.value)}
+                placeholder="숫자와 하이픈 입력"
+                className={inputClass}
+              />
+              {onboarding?.settlementAccountNumberMasked && (
+                <p className="mt-1 text-xs text-gray-400">저장된 계좌: {onboarding.settlementAccountNumberMasked}</p>
+              )}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">예금주 <span className="text-red-500">*</span></label>
+              <input
+                type="text"
+                value={settlementAccountHolder}
+                onChange={(e) => setSettlementAccountHolder(e.target.value)}
+                placeholder="예: 주식회사 O4O"
+                className={inputClass}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">정산 담당자명</label>
+              <input
+                type="text"
+                value={settlementContactName}
+                onChange={(e) => setSettlementContactName(e.target.value)}
+                placeholder="선택"
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">정산 담당자 이메일</label>
+              <input
+                type="email"
+                value={settlementContactEmail}
+                onChange={(e) => setSettlementContactEmail(e.target.value)}
+                placeholder="settlement@company.com"
+                className={inputClass}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="rounded-lg border border-gray-200 p-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">사업자등록증 PDF <span className="text-red-500">*</span></label>
+              {onboarding?.businessRegistrationDocument && (
+                <button
+                  type="button"
+                  onClick={() => handleDownloadDocument('business_registration')}
+                  className="inline-flex items-center gap-1 text-xs font-medium text-primary-700 hover:text-primary-800 mb-3"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  제출 파일 열람
+                </button>
+              )}
+              <input
+                type="file"
+                accept="application/pdf,.pdf"
+                onChange={(e) => setBusinessRegistrationFile(e.target.files?.[0] || null)}
+                className={fileInputClass}
+              />
+              <button
+                type="button"
+                onClick={() => handleUploadDocument('business_registration')}
+                disabled={uploadingDocument !== null || !businessRegistrationFile}
+                className="mt-3 inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium disabled:opacity-50"
+              >
+                {uploadingDocument === 'business_registration' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                업로드
+              </button>
+            </div>
+
+            <div className="rounded-lg border border-gray-200 p-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">통장 사본 PDF <span className="text-red-500">*</span></label>
+              {onboarding?.settlementBankbookDocument && (
+                <button
+                  type="button"
+                  onClick={() => handleDownloadDocument('bank_statement')}
+                  className="inline-flex items-center gap-1 text-xs font-medium text-primary-700 hover:text-primary-800 mb-3"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  제출 파일 열람
+                </button>
+              )}
+              <input
+                type="file"
+                accept="application/pdf,.pdf"
+                onChange={(e) => setBankbookFile(e.target.files?.[0] || null)}
+                className={fileInputClass}
+              />
+              <button
+                type="button"
+                onClick={() => handleUploadDocument('bank_statement')}
+                disabled={uploadingDocument !== null || !bankbookFile}
+                className="mt-3 inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium disabled:opacity-50"
+              >
+                {uploadingDocument === 'bank_statement' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                업로드
+              </button>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={handleSaveOnboarding}
+              disabled={onboardingSaving}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 text-sm font-medium disabled:opacity-50"
+            >
+              {onboardingSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : onboardingSaved ? <CheckCircle className="w-4 h-4" /> : <Save className="w-4 h-4" />}
+              {onboardingSaving ? '저장 중...' : onboardingSaved ? '저장됨' : '정산 정보 저장'}
+            </button>
+            {onboardingError && <p className="text-sm text-red-500">{onboardingError}</p>}
+            {onboardingSaved && <p className="text-sm text-green-600">온보딩 정보가 저장되었습니다.</p>}
           </div>
         </div>
       </div>

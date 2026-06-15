@@ -374,6 +374,30 @@ export interface SupplierProfile {
   shippingMountain?: string | null;
 }
 
+export interface SupplierOnboardingDocument {
+  id: string;
+  documentType: 'business_registration' | 'bank_statement';
+  fileName: string;
+  fileSize: number | null;
+  mimeType: string | null;
+  verificationStatus: string;
+  createdAt: string;
+  verifiedAt: string | null;
+}
+
+export interface SupplierOnboarding {
+  supplierId: string;
+  taxInvoiceEmail: string | null;
+  settlementBankName: string | null;
+  settlementAccountNumber: string | null;
+  settlementAccountNumberMasked: string | null;
+  settlementAccountHolder: string | null;
+  settlementContactName: string | null;
+  settlementContactEmail: string | null;
+  businessRegistrationDocument: SupplierOnboardingDocument | null;
+  settlementBankbookDocument: SupplierOnboardingDocument | null;
+}
+
 // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
 export interface SupplierOrderCondition {
   supplierId: string;
@@ -1018,6 +1042,64 @@ export const supplierProfileApi = {
       return response.data?.data ?? null;
     } catch (error) {
       console.warn('[Supplier API] Failed to fetch order condition:', error);
+      return null;
+    }
+  },
+};
+
+// ==================== Supplier Onboarding API ====================
+
+export const supplierOnboardingApi = {
+  async getOnboarding(): Promise<SupplierOnboarding | null> {
+    try {
+      const response = await api.get('/neture/supplier/onboarding');
+      return response.data?.data ?? null;
+    } catch (error) {
+      console.warn('[Supplier Onboarding API] Failed to fetch onboarding:', error);
+      return null;
+    }
+  },
+
+  async updateOnboarding(data: {
+    taxInvoiceEmail?: string;
+    settlementBankName?: string;
+    settlementAccountNumber?: string;
+    settlementAccountHolder?: string;
+    settlementContactName?: string;
+    settlementContactEmail?: string;
+  }): Promise<{ success: boolean; error?: string; data?: SupplierOnboarding }> {
+    try {
+      const response = await api.patch('/neture/supplier/onboarding', data);
+      return response.data;
+    } catch (error) {
+      return { success: false, error: extractApiError(error) };
+    }
+  },
+
+  async uploadDocument(
+    documentType: 'business_registration' | 'bank_statement',
+    file: File,
+  ): Promise<{ success: boolean; error?: string; data?: SupplierOnboardingDocument }> {
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      const response = await api.post(`/neture/supplier/documents/${documentType}`, form, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      return response.data;
+    } catch (error) {
+      return { success: false, error: extractApiError(error) };
+    }
+  },
+
+  async downloadDocument(documentType: 'business_registration' | 'bank_statement'): Promise<Blob | null> {
+    try {
+      const response = await api.get(`/neture/supplier/documents/${documentType}/download`, {
+        responseType: 'blob',
+      });
+      return response.data as Blob;
+    } catch (error) {
+      console.warn('[Supplier Onboarding API] Failed to download document:', error);
       return null;
     }
   },

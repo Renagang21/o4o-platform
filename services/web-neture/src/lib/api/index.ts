@@ -61,6 +61,7 @@ export {
 export {
   supplierApi,
   supplierProfileApi,
+  supplierOnboardingApi,
   supplierCommissionApi,
   type SupplierProductPurpose,
   type DistributionType,
@@ -70,6 +71,8 @@ export {
   type OrderSummaryResponse,
   type OrderSummary,
   type SupplierProfile,
+  type SupplierOnboarding,
+  type SupplierOnboardingDocument,
   type SupplierOrderCondition,
   type ProfileCompleteness,
   type SupplierPartnerCommission,

@@ -12,10 +12,16 @@ import { createRequireActiveSupplier, createRequireLinkedSupplier } from '../mid
 import type { SupplierRequest, AuthenticatedRequest } from '../middleware/neture-identity.middleware.js';
 import { NetureService } from '../neture.service.js';
 import logger from '../../../utils/logger.js';
+import { uploadSingleMiddleware } from '../../../middleware/upload.middleware.js';
+import {
+  SupplierOnboardingService,
+  type SupplierOnboardingDocumentType,
+} from '../services/supplier-onboarding.service.js';
 
 export function createSupplierManagementController(dataSource: DataSource): Router {
   const router = Router();
   const netureService = new NetureService();
+  const onboardingService = new SupplierOnboardingService(dataSource);
   const requireActiveSupplier = createRequireActiveSupplier(dataSource);
   const requireLinkedSupplier = createRequireLinkedSupplier(dataSource);
 
@@ -169,6 +175,94 @@ export function createSupplierManagementController(dataSource: DataSource): Rout
     } catch (error) {
       logger.error('[Neture API] Error fetching profile completeness:', error);
       res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+    }
+  });
+
+  // GET /supplier/onboarding
+  // WO-O4O-SUPPLIER-ONBOARDING-BASIC-DOCUMENTS-AND-SETTLEMENT-V1
+  router.get('/onboarding', requireAuth, requireLinkedSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const supplierId = (req as SupplierRequest).supplierId;
+      const data = await onboardingService.getOnboarding(supplierId);
+      if (!data) {
+        return res.status(404).json({ success: false, error: { code: 'SUPPLIER_NOT_FOUND' } });
+      }
+      res.json({ success: true, data });
+    } catch (error) {
+      logger.error('[Neture API] Error fetching supplier onboarding:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR' } });
+    }
+  });
+
+  // PATCH /supplier/onboarding
+  router.patch('/onboarding', requireAuth, requireLinkedSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const supplierId = (req as SupplierRequest).supplierId;
+      const result = await onboardingService.updateOnboarding(supplierId, req.body || {});
+      if (!result) {
+        return res.status(404).json({ success: false, error: { code: 'SUPPLIER_NOT_FOUND' } });
+      }
+      if (!result.success) {
+        return res.status(400).json({ success: false, error: { code: result.error } });
+      }
+      res.json({ success: true, data: result.data });
+    } catch (error) {
+      logger.error('[Neture API] Error updating supplier onboarding:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR' } });
+    }
+  });
+
+  // POST /supplier/documents/:documentType
+  router.post(
+    '/documents/:documentType',
+    requireAuth,
+    requireLinkedSupplier as RequestHandler,
+    uploadSingleMiddleware('file'),
+    async (req: AuthenticatedRequest, res: Response) => {
+      try {
+        const supplierId = (req as SupplierRequest).supplierId;
+        const documentType = req.params.documentType as SupplierOnboardingDocumentType;
+        const file = req.file as Express.Multer.File | undefined;
+        if (!file) {
+          return res.status(400).json({ success: false, error: { code: 'FILE_REQUIRED' } });
+        }
+        const result = await onboardingService.uploadDocument(supplierId, documentType, file);
+        if (!result.success) {
+          const status = result.error === 'SUPPLIER_NOT_FOUND' ? 404 : 400;
+          return res.status(status).json({ success: false, error: { code: result.error } });
+        }
+        res.status(201).json({ success: true, data: result.data });
+      } catch (error) {
+        logger.error('[Neture API] Error uploading supplier onboarding document:', error);
+        res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR' } });
+      }
+    },
+  );
+
+  // GET /supplier/documents/:documentType/download
+  router.get('/documents/:documentType/download', requireAuth, requireLinkedSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const supplierId = (req as SupplierRequest).supplierId;
+      const documentType = req.params.documentType as SupplierOnboardingDocumentType;
+      const document = await onboardingService.getDocumentForSupplier(supplierId, documentType);
+      if (!document) {
+        return res.status(404).json({ success: false, error: { code: 'DOCUMENT_NOT_FOUND' } });
+      }
+
+      res.setHeader('Content-Type', document.mimeType || 'application/pdf');
+      res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(document.fileName)}"`);
+      const stream = await onboardingService.createReadStream(document);
+      stream.on('error', (err) => {
+        logger.error('[Neture API] Supplier document stream error:', err);
+        if (!res.headersSent) res.status(500).end();
+        else res.end();
+      });
+      stream.pipe(res);
+    } catch (error) {
+      logger.error('[Neture API] Error downloading supplier onboarding document:', error);
+      if (!res.headersSent) {
+        res.status(500).json({ success: false, error: { code: 'DOWNLOAD_FAILED' } });
+      }
     }
   });
 
