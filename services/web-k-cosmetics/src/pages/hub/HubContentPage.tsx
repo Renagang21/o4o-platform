@@ -13,9 +13,9 @@
  */
 
 import { useMemo } from 'react';
-import { FileText, Image as ImageIcon, Check, Loader2, Copy, ExternalLink } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
-import { ContentHubTemplate, type ContentHubConfig, type ContentHubItem, type ContentHubItemContext } from '@o4o/shared-space-ui';
+// WO-O4O-STORE-HUB-CONTENT-BROWSE-COMPONENT-EXTRACTION-V1: 카드 그리드 공통화(@o4o/shared-space-ui)
+import { ContentHubTemplate, contentHubCardGrid, type ContentHubConfig, type ContentHubItem } from '@o4o/shared-space-ui';
 import { hubContentApi, type HubContentItemResponse } from '@/lib/api/hubContent';
 import { assetSnapshotApi } from '@/api/assetSnapshot';
 import { useAuth } from '@/contexts/AuthContext';
@@ -37,89 +37,6 @@ function apiItemToContentHubItem(item: HubContentItemResponse): ContentHubItem {
       : null,
     createdBy: item.authorId ?? null,
   };
-}
-
-// ─── Content Card (K-Cosmetics layout) ───────────────────────────────────────
-
-function KCosContentCard({ item, ctx }: { item: ContentHubItem; ctx: ContentHubItemContext }) {
-  const isCopying = ctx.copyingId === item.id;
-  const alreadyCopied = ctx.copiedIds.has(item.id);
-
-  return (
-    <div className="bg-white rounded-lg border border-slate-200 overflow-hidden transition-all hover:shadow-md hover:border-pink-200">
-      {item.thumbnail ? (
-        <div className="aspect-[16/9] bg-slate-100 overflow-hidden">
-          <img
-            src={item.thumbnail}
-            alt={item.title}
-            className="w-full h-full object-cover"
-            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-          />
-        </div>
-      ) : (
-        <div className="aspect-[16/9] bg-slate-50 flex items-center justify-center">
-          <ImageIcon className="w-8 h-8 text-slate-200" />
-        </div>
-      )}
-      <div className="p-4">
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0 flex-1">
-            {item.type && (
-              <span className="inline-block px-2 py-0.5 text-[10px] font-medium bg-slate-100 text-slate-500 rounded mb-1.5">
-                {item.type}
-              </span>
-            )}
-            <h3 className="text-sm font-semibold text-slate-800 line-clamp-2">{item.title}</h3>
-            {item.summary && (
-              <p className="text-xs text-slate-500 mt-1 line-clamp-2">{item.summary}</p>
-            )}
-          </div>
-          {item.href && <ExternalLink className="w-3.5 h-3.5 text-slate-300 shrink-0 mt-0.5" />}
-        </div>
-
-        <div className="flex items-center justify-between mt-2">
-          <p className="text-[10px] text-slate-400">{item.date}</p>
-          {ctx.onCopy && (
-            <button
-              onClick={(e) => { e.stopPropagation(); ctx.onCopy!(item); }}
-              disabled={alreadyCopied || isCopying}
-              className={`inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded transition-colors ${
-                alreadyCopied
-                  ? 'bg-slate-100 text-slate-400 cursor-default'
-                  : isCopying
-                    ? 'bg-slate-100 text-slate-400 cursor-wait'
-                    : 'bg-pink-50 text-pink-600 hover:bg-pink-100'
-              }`}
-            >
-              {alreadyCopied ? (
-                <><Check className="w-3 h-3" /> {ctx.copiedLabel}</>
-              ) : isCopying ? (
-                <><Loader2 className="w-3 h-3 animate-spin" /> {ctx.copyingLabel}</>
-              ) : (
-                <><Copy className="w-3 h-3" /> {ctx.copyLabel}</>
-              )}
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function KCosCardGrid(items: ContentHubItem[], ctx: ContentHubItemContext) {
-  if (items.length === 0) {
-    return (
-      <div className="text-center py-20">
-        <FileText className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-        <p className="text-sm text-slate-400">등록된 콘텐츠가 없습니다.</p>
-      </div>
-    );
-  }
-  return (
-    <div className="grid gap-4 sm:grid-cols-2">
-      {items.map(item => <KCosContentCard key={item.id} item={item} ctx={ctx} />)}
-    </div>
-  );
 }
 
 // ─── K-Cosmetics Content Hub Config ──────────────────────────────────────────
@@ -182,7 +99,7 @@ function useKCosContentHubConfig(userId?: string): ContentHubConfig {
     copyingLabel: '복사 중...',
     afterCopyAction: { label: '작업하러 가기 →', href: '/store/library/contents' },
 
-    renderItems: KCosCardGrid,
+    renderItems: contentHubCardGrid('pink'),
 
     infoText: '복사된 콘텐츠는 ',
     infoLinks: [{ label: '내 매장 > 자산 관리', href: '/store/library/contents' }],

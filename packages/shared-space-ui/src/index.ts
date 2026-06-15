@@ -145,6 +145,9 @@ export type { StoreHubResourceCard, StoreHubFlowStep, StoreHubConfig, StoreHubTe
 
 export { ContentHubTemplate } from './ContentHubTemplate';
 export type { ContentHubItem, ContentHubFilter, ContentHubFetchParams, ContentHubFetchResult, ContentHubItemContext, ContentHubConfig } from './ContentHubTemplate';
+/* WO-O4O-STORE-HUB-CONTENT-BROWSE-COMPONENT-EXTRACTION-V1: GP/KCos 공통 카드 그리드 */
+export { contentHubCardGrid } from './ContentHubCardGrid';
+export type { ContentHubCardAccent } from './ContentHubCardGrid';
 
 export { ResourcesHubTemplate } from './ResourcesHubTemplate';
 export type { ResourcesHubItem, ResourcesHubFetchParams, ResourcesHubFetchResult, ResourcesHubConfig } from './ResourcesHubTemplate';
