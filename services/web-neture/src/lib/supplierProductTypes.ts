@@ -109,11 +109,12 @@ export function buildBulkTemplateCsv(key: string): string {
 export type SupplierOfferAction = 'supply' | 'recruit' | 'event' | 'funding';
 
 /** 후속 액션 메타 (라벨/이동경로/구현여부). ready=false 는 준비 중(비활성). */
+// WO-O4O-SUPPLIER-PRODUCT-LIST-NEXT-ACTIONS-CLARITY-V1: 라벨 어휘 정비(연결/관리/준비중 — '자동 등록/즉시 판매' 금지)
 export const SUPPLIER_OFFER_ACTION_META: Record<SupplierOfferAction, { label: string; path?: string; ready: boolean }> = {
-  supply: { label: '일반 공급 오퍼', path: '/supplier/supply-offers', ready: true },
-  recruit: { label: '판매자 모집 (준비 중)', ready: false },
-  event: { label: '이벤트 오퍼', path: '/supplier/event-offers', ready: true },
-  funding: { label: '유통참여형 펀딩 후보', path: '/supplier/market-trial/new', ready: true },
+  supply: { label: '일반 공급 오퍼 연결', path: '/supplier/supply-offers', ready: true },
+  recruit: { label: '판매자 모집 연결 (준비 중)', ready: false },
+  event: { label: '이벤트 오퍼 연결', path: '/supplier/event-offers', ready: true },
+  funding: { label: '유통참여형 펀딩 연결', path: '/supplier/market-trial/new', ready: true },
 };
 
 /**

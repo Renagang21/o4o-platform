@@ -897,7 +897,7 @@ export default function SupplierProductsPage() {
             }}
             className="w-full text-xs border border-slate-200 rounded px-2 py-1 bg-white text-slate-600 focus:outline-none focus:ring-1 focus:ring-blue-400"
           >
-            <option value="">활용 선택…</option>
+            <option value="">후속 작업 연결…</option>
             {gate.actions.map((a) => {
               const meta = SUPPLIER_OFFER_ACTION_META[a];
               return (
@@ -1131,6 +1131,37 @@ export default function SupplierProductsPage() {
         <Info size={14} className="shrink-0 mt-0.5" />
         <p>운영자 화면에는 <strong>공개(PUBLIC/SERVICE)</strong> 및 <strong>활성</strong> 상태의 상품만 노출됩니다. 등록 후 운영자에게 보이려면 상품을 활성화하고 유통 타입을 공개로 설정해 주세요.</p>
       </div>
+
+      {/* WO-O4O-SUPPLIER-PRODUCT-LIST-NEXT-ACTIONS-CLARITY-V1: 제품 등록 후 다음 단계 안내 */}
+      <details className="mb-4 rounded-lg border border-slate-200 bg-slate-50">
+        <summary className="cursor-pointer select-none px-3 py-2.5 text-sm font-medium text-slate-700">
+          제품 등록 후 다음 단계 안내
+        </summary>
+        <div className="px-4 pb-3 pt-1 text-xs text-slate-600 space-y-2">
+          <p className="text-slate-500">
+            제품을 등록한 뒤, 제품별로 필요한 후속 작업을 연결할 수 있습니다. 실제 노출·판매는 <strong>운영자 확인 후</strong> 진행됩니다.
+          </p>
+          <ul className="space-y-1.5">
+            <li>
+              <strong>승인요청</strong> — 상품을 선택하고 위 <span className="font-medium">[승인 요청]</span> 버튼으로 운영자 검토를 요청합니다.
+            </li>
+            <li>
+              <strong>서비스 등록 신청</strong> — 상품 편집에서 공급할 서비스를 선택한 뒤 승인 요청합니다.
+              <span className="text-amber-600"> 의약품은 약국 대상 서비스에만 연결할 수 있습니다.</span>
+            </li>
+            <li>
+              <strong>B2B 콘텐츠 관리</strong> — 사업자용 설명을 보강합니다. B2B 설명이 없으면 B2C 설명을 기본으로 사용합니다.
+              <button type="button" onClick={() => navigate('/supplier/b2b-content')} className="ml-1 text-blue-600 hover:text-blue-800 underline">B2B 콘텐츠로 이동</button>
+            </li>
+            <li>
+              <strong>이벤트 오퍼 연결 / 유통참여형 펀딩 연결</strong> — 각 제품 행의 <span className="font-medium">[후속 작업]</span> 에서 연결합니다.
+            </li>
+            <li>
+              <strong>판매자 모집 연결</strong> — <span className="text-slate-400">준비 중</span> (제품을 취급할 약국/매장 판매자를 모집하는 기능)
+            </li>
+          </ul>
+        </div>
+      </details>
 
       {/* Search */}
       <div className="mb-3">
