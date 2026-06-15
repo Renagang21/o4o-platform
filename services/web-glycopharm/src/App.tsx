@@ -331,6 +331,8 @@ const FunnelPage = lazy(() => import('@/pages/store-management/FunnelPage'));
 
 // WO-O4O-GLYCOPHARM-POP-STORE-EXECUTION-V1
 const StorePopPage = lazy(() => import('@/pages/store-management/StorePopPage'));
+// WO-O4O-POP-STAFF-PAGE-GP-KCOS-PARITY-V1: 내 약국 POP 사본 관리
+const StorePopStaffPage = lazy(() => import('@/pages/store-management/StorePopStaffPage'));
 
 // WO-O4O-GLYCOPHARM-QR-STORE-EXECUTION-V1
 const StoreQrPage = lazy(() => import('@/pages/store/StoreQrPage'));
@@ -1015,6 +1017,7 @@ function AppRoutes() {
         <Route path="funnel" element={<FunnelPage />} />
         {/* POP 생성 (WO-O4O-GLYCOPHARM-POP-STORE-EXECUTION-V1) */}
         <Route path="marketing/pop" element={<StorePopPage />} />
+        <Route path="marketing/pop/library" element={<StorePopStaffPage />} />
         {/* QR 관리 (WO-O4O-GLYCOPHARM-QR-STORE-EXECUTION-V1) */}
         <Route path="marketing/qr" element={<StoreQrPage />} />
         {/* 마케팅 분석 (WO-O4O-STORE-MARKETING-ANALYTICS-CROSSSERVICE-V1) */}

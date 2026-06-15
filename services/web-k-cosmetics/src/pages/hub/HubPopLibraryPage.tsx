@@ -166,6 +166,13 @@ export function HubPopLibraryPage() {
           K-Cosmetics 운영자가 발행한 POP 콘텐츠입니다. 선택해 일괄 가져가기 또는 행 클릭으로 단건 가져가기를 할 수 있습니다.
           가져온 POP 은 매장 소유이며, 초안 상태로 복사되어 자유롭게 수정·발행할 수 있습니다.
         </p>
+        {/* WO-O4O-POP-STAFF-PAGE-GP-KCOS-PARITY-V1: 가져온 POP 사본 관리 진입 */}
+        <button
+          onClick={() => navigate('/store/marketing/pop/library')}
+          className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-pink-600 hover:underline"
+        >
+          내 매장 POP 사본 관리 →
+        </button>
       </header>
 
       {slugResolved && !slug && (
