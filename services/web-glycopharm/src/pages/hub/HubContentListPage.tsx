@@ -12,7 +12,7 @@
  */
 
 import { useMemo } from 'react';
-import { Check, Loader2, Download, FileText, ExternalLink, Image as ImageIcon } from 'lucide-react';
+import { Check, Loader2, Copy, FileText, ExternalLink, Image as ImageIcon } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { ContentHubTemplate, type ContentHubConfig, type ContentHubItem, type ContentHubItemContext } from '@o4o/shared-space-ui';
 import { hubContentApi, type HubContentItemResponse } from '@/api/hubContent';
@@ -99,7 +99,7 @@ function GlycoContentCard({ item, ctx }: { item: ContentHubItem; ctx: ContentHub
               ) : isCopying ? (
                 <><Loader2 className="w-3 h-3 animate-spin" /> {ctx.copyingLabel}</>
               ) : (
-                <><Download className="w-3 h-3" /> {ctx.copyLabel}</>
+                <><Copy className="w-3 h-3" /> {ctx.copyLabel}</>
               )}
             </button>
           )}
@@ -191,6 +191,8 @@ function useGlycoContentHubConfig(userId?: string): ContentHubConfig {
 
     infoText: '복사된 콘텐츠는 ',
     infoLinks: [{ label: '내 약국 > 자산 관리', href: '/store/library/contents' }],
+    // WO-O4O-STORE-CONTENT-TERMINOLOGY-AND-GUIDE-COPY-V1: 가져오기=복사·원본 단절 안내 (약국 용어 유지)
+    infoTextAfter: '에 별도 사본으로 저장됩니다. 원본이 수정·삭제되어도 내 약국 사본은 영향받지 않습니다.',
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }), [userId]);
 }

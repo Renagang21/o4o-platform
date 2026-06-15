@@ -15,7 +15,7 @@
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Download, X, ExternalLink, Megaphone } from 'lucide-react';
+import { Copy, X, ExternalLink, Megaphone } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { ActionBar, BaseDetailDrawer, BulkResultModal } from '@o4o/ui';
 import { DataTable, useBatchAction } from '@o4o/operator-ux-core';
@@ -202,7 +202,7 @@ export function HubPopLibraryPage() {
                   label: `내 매장에 가져가기 (${selectedIds.size})`,
                   onClick: handleBulkImport,
                   variant: 'primary' as const,
-                  icon: <Download className="w-3.5 h-3.5" />,
+                  icon: <Copy className="w-3.5 h-3.5" />,
                   loading: batch.loading,
                   group: 'actions',
                   tooltip: '선택한 POP 을 내 매장 POP(초안)으로 일괄 가져갑니다',

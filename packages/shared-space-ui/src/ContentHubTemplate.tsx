@@ -122,6 +122,8 @@ export interface ContentHubConfig {
   showInfoBlock?: boolean;
   infoText?: string;
   infoLinks?: { label: string; href: string }[];
+  /** infoLinks 뒤에 이어지는 보조 문구 (예: "에 별도 사본으로 저장됩니다. 원본 변경에 영향받지 않습니다.") */
+  infoTextAfter?: string;
 
   /** Empty state messages */
   emptyMessage?: string;
@@ -371,6 +373,7 @@ export function ContentHubTemplate({ config }: { config: ContentHubConfig }) {
                 {' '}<Link to={link.href} style={st.infoLink}>{link.label}</Link>
               </span>
             ))}
+            {config.infoTextAfter}
           </span>
         </div>
       )}
