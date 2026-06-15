@@ -26,7 +26,10 @@
 
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
-import { StoreLibraryItem } from '../../platform/entities/store-library-item.entity.js';
+// WO-O4O-STORE-LIBRARY-CONTROLLER-REPOINT-TO-EXECUTION-ASSETS-V1:
+//   store_library_items → store_execution_assets (migration 20260421010000) 정합.
+//   레거시 StoreLibraryItem(부재 테이블) → StoreExecutionAsset(동일 물리 테이블) repoint.
+import { StoreExecutionAsset } from '../../platform/entities/store-execution-asset.entity.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
 
@@ -43,7 +46,7 @@ export function createStoreLibraryController(
   serviceKey?: StoreOwnerServiceKey,
 ): Router {
   const router = Router();
-  const libraryRepo = dataSource.getRepository(StoreLibraryItem);
+  const libraryRepo = dataSource.getRepository(StoreExecutionAsset);
 
   const requirePharmacyOwner = createRequireStoreOwner(dataSource, serviceKey);
 

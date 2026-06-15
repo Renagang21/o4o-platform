@@ -220,8 +220,8 @@ import { PlatformStoreSlugHistory } from '@o4o/platform-core/store-identity';
 // ============================================================================
 import { CatalogProduct } from '../modules/catalog/entities/catalog-product.entity.js';
 import { StoreProduct } from '../modules/store/entities/store-product.entity.js';
-// STORE LIBRARY ENTITY (WO-O4O-STORE-LIBRARY-FOUNDATION-V1)
-import { StoreLibraryItem } from '../routes/platform/entities/store-library-item.entity.js';
+// STORE LIBRARY ENTITY — store_library_items 는 store_execution_assets 로 rename됨(migration 20260421010000).
+// StoreLibraryItem(부재 테이블) 제거 — StoreExecutionAsset 사용. (WO-O4O-STORE-LIBRARY-CONTROLLER-REPOINT-TO-EXECUTION-ASSETS-V1)
 
 // ============================================================================
 // NETURE ENTITIES (Phase P1: Read-Only Information Platform)
@@ -1010,9 +1010,9 @@ export const AppDataSource = new DataSource({
     MarketTrialFulfillment,
     MarketTrialForumSyncFailure,
     // ============================================================================
-    // STORE LIBRARY (WO-O4O-STORE-LIBRARY-FOUNDATION-V1)
-    // ============================================================================
-    StoreLibraryItem,
+    // STORE LIBRARY — store_library_items → store_execution_assets rename(20260421010000).
+    //   StoreLibraryItem 제거(부재 테이블), StoreExecutionAsset 사용.
+    //   (WO-O4O-STORE-LIBRARY-CONTROLLER-REPOINT-TO-EXECUTION-ASSETS-V1)
     // ============================================================================
     // STORE AI ENTITIES (WO-O4O-STORE-HUB-AI-SUMMARY-V1)
     // ============================================================================

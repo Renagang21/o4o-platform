@@ -9,7 +9,7 @@
  *   - aiContent 제공 시: 각 popItem의 title/description 오버라이드
  *
  * Library 콘텐츠 + QR 코드를 조합하여 POP PDF 자동 생성.
- * 공급자 공개 자료(supplierItemIds)를 StoreLibraryItem 복사 없이 직접 참조 지원.
+ * 공급자 공개 자료(supplierItemIds)를 store execution asset 복사 없이 직접 참조 지원.
  *
  * AUTHENTICATED (requireAuth + requirePharmacyOwner):
  *   POST /pharmacy/pop/generate       — POP PDF 생성
