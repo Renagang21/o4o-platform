@@ -50,6 +50,61 @@ function isRegulatedCategoryStatus(value: string): value is RegulatedCategorySta
   return (REGULATED_CATEGORY_STATUSES as readonly string[]).includes(value);
 }
 
+// ==================== 제품 등록 gate (WO-O4O-SUPPLIER-PRODUCT-REGISTER-BY-CATEGORY-STATUS-V1) ====================
+
+export type ProductCategoryGateReason =
+  | 'SUPPLIER_CATEGORY_NOT_SELECTED'
+  | 'SUPPLIER_CATEGORY_NOT_APPROVED'
+  | 'SUPPLIER_CATEGORY_NEEDS_UPDATE'
+  | 'SUPPLIER_CATEGORY_REJECTED'
+  | 'SUPPLIER_CATEGORY_SUSPENDED'
+  | 'SUPPLIER_CATEGORY_UNRESOLVED';
+
+export interface ProductCategoryGateResult {
+  allowed: boolean;
+  category: RegulatedCategory | null;
+  status: RegulatedCategoryStatus | null;
+  reasonCode: ProductCategoryGateReason | null;
+}
+
+export interface ProductRegulatedCategoryInput {
+  regulatoryType?: string | null;
+  categoryName?: string | null;
+  categorySlug?: string | null;
+}
+
+/**
+ * 제품 분류값(regulatoryType + ProductCategory name/slug)을 공급자 품목군으로 최소 매핑.
+ * 기존 제품 분류 개편 없이 현행 값만 사용한다. 의약품/OTC/Rx 상세 흐름은 건드리지 않음.
+ */
+export function resolveRegulatedCategoryFromProduct(input: ProductRegulatedCategoryInput): RegulatedCategory | null {
+  const rt = (input.regulatoryType || '').trim().toUpperCase();
+  const name = input.categoryName || '';
+  const slug = (input.categorySlug || '').toLowerCase();
+  const looksMedicalDevice = /의료\s*기기/.test(name) || /medical|device/.test(slug);
+  const looksFood = (/식품/.test(name) && !/건강\s*기능/.test(name)) || /(^|[-_])food/.test(slug);
+
+  switch (rt) {
+    case 'DRUG':
+      return 'pharmaceutical';
+    case 'QUASI_DRUG':
+      return 'quasi_drug';
+    case 'HEALTH_FUNCTIONAL':
+      return 'health_functional_food';
+    case 'COSMETIC':
+      return 'cosmetics';
+    case 'GENERAL':
+      if (looksMedicalDevice) return 'medical_device';
+      if (looksFood) return 'food';
+      return 'general';
+    default:
+      // regulatoryType 미상 — category hint 로만 최소 판정, 그 외엔 확인 불가
+      if (looksMedicalDevice) return 'medical_device';
+      if (looksFood) return 'food';
+      return null;
+  }
+}
+
 export class SupplierRegulatedCategoryService {
   private storage = new Storage();
   private bucketName = process.env.GCS_PRIVATE_DOCUMENT_BUCKET || 'o4o-private-documents';
@@ -76,6 +131,39 @@ export class SupplierRegulatedCategoryService {
       for (const d of docs) docMap.set(d.id, d);
     }
     return rows.map((r) => this.mapCategory(r, r.evidenceDocumentId ? docMap.get(r.evidenceDocumentId) ?? null : null));
+  }
+
+  /** 공급자 품목군 → 현재 상태 맵 (제품 등록 gate 용 batch 조회) */
+  async getStatusMap(supplierId: string): Promise<Map<string, RegulatedCategoryStatus>> {
+    const rows = await this.categoryRepo.find({ where: { supplierId } });
+    return new Map(rows.map((r) => [r.category, r.status as RegulatedCategoryStatus]));
+  }
+
+  /**
+   * 제품 등록 gate 판정 — 해당 품목군이 approved 일 때만 allowed.
+   * statusMap 은 getStatusMap() 결과를 재사용(여러 offer 일괄 처리 시 1회 조회).
+   */
+  evaluateGate(
+    category: RegulatedCategory | null,
+    statusMap: Map<string, RegulatedCategoryStatus>,
+  ): ProductCategoryGateResult {
+    if (!category) {
+      return { allowed: false, category: null, status: null, reasonCode: 'SUPPLIER_CATEGORY_UNRESOLVED' };
+    }
+    const status = statusMap.get(category) ?? null;
+    if (!status || status === 'not_requested') {
+      return { allowed: false, category, status, reasonCode: 'SUPPLIER_CATEGORY_NOT_SELECTED' };
+    }
+    if (status === 'approved') {
+      return { allowed: true, category, status, reasonCode: null };
+    }
+    const reasonByStatus: Record<string, ProductCategoryGateReason> = {
+      submitted: 'SUPPLIER_CATEGORY_NOT_APPROVED',
+      needs_update: 'SUPPLIER_CATEGORY_NEEDS_UPDATE',
+      rejected: 'SUPPLIER_CATEGORY_REJECTED',
+      suspended: 'SUPPLIER_CATEGORY_SUSPENDED',
+    };
+    return { allowed: false, category, status, reasonCode: reasonByStatus[status] ?? 'SUPPLIER_CATEGORY_NOT_APPROVED' };
   }
 
   /** 공급자가 품목군 선택(행 생성). 이미 있으면 기존 행 반환. */

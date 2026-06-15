@@ -15,6 +15,11 @@ import { OfferServiceApprovalService } from './offer-service-approval.service.js
 import type { NetureCatalogService } from './catalog.service.js';
 import { OfferErrorCode } from '../constants/offer-error-code.js';
 import { filterApprovalEligibleServiceKeys } from '../constants/approval-service-keys.js';
+// WO-O4O-SUPPLIER-PRODUCT-REGISTER-BY-CATEGORY-STATUS-V1: 품목군 등록 가능 상태 gate
+import {
+  SupplierRegulatedCategoryService,
+  resolveRegulatedCategoryFromProduct,
+} from './supplier-regulated-category.service.js';
 
 /**
  * WO-NETURE-DISTRIBUTION-MODEL-SPLIT-PUBLIC-AND-SERVICE-SUPPLY-V1
@@ -416,22 +421,50 @@ export class NetureOfferService {
       errors: [] as Array<{ id: string; error: string }>,
     };
 
-    // 소유권 + 저장된 정책 일괄 조회
-    const ownedRows: Array<{ id: string; service_keys: string[] }> = await AppDataSource.query(
-      `SELECT id, service_keys FROM supplier_product_offers WHERE id = ANY($1) AND supplier_id = $2 AND deleted_at IS NULL`,
+    // 소유권 + 저장된 정책 + 제품 분류값(품목군 gate) 일괄 조회
+    const ownedRows: Array<{
+      id: string;
+      service_keys: string[];
+      regulatory_type: string | null;
+      category_name: string | null;
+      category_slug: string | null;
+    }> = await AppDataSource.query(
+      `SELECT o.id, o.service_keys, m.regulatory_type, c.name AS category_name, c.slug AS category_slug
+       FROM supplier_product_offers o
+       JOIN product_masters m ON m.id = o.master_id
+       LEFT JOIN product_categories c ON c.id = m.category_id
+       WHERE o.id = ANY($1) AND o.supplier_id = $2 AND o.deleted_at IS NULL`,
       [offerIds, supplierId],
     );
-    const ownedMap = new Map(ownedRows.map((r) => [r.id, r.service_keys || []]));
+    const ownedMap = new Map(ownedRows.map((r) => [r.id, r]));
+
+    // WO-O4O-SUPPLIER-PRODUCT-REGISTER-BY-CATEGORY-STATUS-V1:
+    // 승인요청 시점에 공급자 품목군이 approved 인지 확인 (생성/draft 는 허용, 승인요청만 gate).
+    const regulatedCategoryService = new SupplierRegulatedCategoryService(AppDataSource);
+    const categoryStatusMap = await regulatedCategoryService.getStatusMap(supplierId);
 
     for (const offerId of offerIds) {
-      if (!ownedMap.has(offerId)) {
+      const ownedRow = ownedMap.get(offerId);
+      if (!ownedRow) {
         result.errors.push({ id: offerId, error: 'NOT_OWNED' });
         continue;
       }
 
       try {
+        // 품목군 등록 가능 상태 gate
+        const resolvedCategory = resolveRegulatedCategoryFromProduct({
+          regulatoryType: ownedRow.regulatory_type,
+          categoryName: ownedRow.category_name,
+          categorySlug: ownedRow.category_slug,
+        });
+        const gate = regulatedCategoryService.evaluateGate(resolvedCategory, categoryStatusMap);
+        if (!gate.allowed) {
+          result.skipped.push({ id: offerId, reason: gate.reasonCode || 'SUPPLIER_CATEGORY_NOT_APPROVED' });
+          continue;
+        }
+
         // 정책 필터: 승인 대상 서비스 키만 추출 (SSOT)
-        const eligibleKeys = filterApprovalEligibleServiceKeys(ownedMap.get(offerId));
+        const eligibleKeys = filterApprovalEligibleServiceKeys(ownedRow.service_keys || []);
 
         if (eligibleKeys.length === 0) {
           // offer의 service_keys가 비어 있거나, 모두 정책상 승인 대상 아님 (예: neture/glucoseview only)

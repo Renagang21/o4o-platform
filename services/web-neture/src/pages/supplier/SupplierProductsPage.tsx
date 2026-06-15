@@ -1212,18 +1212,24 @@ export default function SupplierProductsPage() {
                 // reason별 집계
                 const noEligible = (d.skipped || []).filter((s) => s.reason === 'NO_ELIGIBLE_SERVICE_KEYS').length;
                 const alreadyDone = (d.skipped || []).filter((s) => s.reason === 'ALREADY_REQUESTED_OR_DECIDED').length;
+                // WO-O4O-SUPPLIER-PRODUCT-REGISTER-BY-CATEGORY-STATUS-V1: 품목군 gate 차단
+                const categoryBlocked = (d.skipped || []).filter((s) => s.reason.startsWith('SUPPLIER_CATEGORY_')).length;
 
                 if (d.submitted === 0 && errorCount === 0) {
                   // 전원 skipped: 사용자에게 원인 안내
                   const parts: string[] = [];
+                  if (categoryBlocked > 0) parts.push(`${categoryBlocked}건은 해당 품목군이 O4O 내부 등록 가능 상태가 아닙니다`);
                   if (noEligible > 0) parts.push(`${noEligible}건은 공급 정책(서비스 키)이 설정되지 않았습니다`);
                   if (alreadyDone > 0) parts.push(`${alreadyDone}건은 이미 승인 요청이 진행 중이거나 완료되었습니다`);
                   const reason = parts.length > 0 ? parts.join('. ') : '변경사항이 없습니다';
-                  const guide = noEligible > 0 ? ' 상품 편집에서 서비스별 공급을 선택한 뒤 다시 승인요청해 주세요.' : '';
+                  const guide = categoryBlocked > 0
+                    ? ' 공급자 프로필 > 공급 예정 품목군에서 증빙을 제출하고 운영자 확인을 받아 주세요.'
+                    : noEligible > 0 ? ' 상품 편집에서 서비스별 공급을 선택한 뒤 다시 승인요청해 주세요.' : '';
                   showToast(`승인 요청된 상품이 없습니다. ${reason}.${guide}`);
                 } else if (d.submitted > 0) {
                   const tail: string[] = [];
-                  if (skippedCount > 0) tail.push(`${skippedCount}건 건너뜀`);
+                  if (categoryBlocked > 0) tail.push(`${categoryBlocked}건 품목군 미승인`);
+                  if (skippedCount - categoryBlocked > 0) tail.push(`${skippedCount - categoryBlocked}건 건너뜀`);
                   if (errorCount > 0) tail.push(`${errorCount}건 실패`);
                   const tailStr = tail.length > 0 ? ` (${tail.join(', ')})` : '';
                   showToast(`${d.submitted}/${total}건 승인 요청 완료${tailStr}`);
