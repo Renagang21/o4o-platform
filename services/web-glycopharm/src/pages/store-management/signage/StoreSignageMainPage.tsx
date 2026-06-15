@@ -12,7 +12,8 @@
  *
  * 콘텐츠 탐색은 /store/marketing/signage/library (ContentLibraryPage) 에서 수행
  *
- * organizationId: user.pharmacyId (GlycoPharm pharmacy = organization)
+ * organizationId: 토큰 기반 store-hub overview 에서 해석 (user.pharmacyId 미사용 — auth 파이프라인 미주입)
+ *   WO-O4O-GLYCOPHARM-SIGNAGE-SCHEDULE-PHARMACY-CONTEXT-FIX-V1
  * API: /api/signage/glycopharm/... (shared serviceKey route)
  */
 
@@ -47,7 +48,6 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { DataTable, type Column } from '@o4o/ui';
-import { useAuth } from '@/contexts/AuthContext';
 import {
   storeAssetControlApi,
   type StoreAssetItem,
@@ -79,6 +79,7 @@ import {
 } from '@/api/signageSchedule';
 import { StoreLibrarySelectorModal } from '@/components/store/StoreLibrarySelectorModal';
 import type { LibrarySelectorResult } from '@/components/store/StoreLibrarySelectorModal';
+import { fetchStoreHubOverview } from '@/api/storeHub';
 
 /* ─── Constants ──────────────────────────────── */
 
@@ -224,9 +225,27 @@ const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'] as const;
 export default function StoreSignageMainPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuth();
-  // organizationId: user.pharmacyId (GlycoPharm pharmacy = organization)
-  const organizationId = (user as { pharmacyId?: string } | null)?.pharmacyId || '';
+  // organizationId: 토큰 기반 store-hub overview 에서 해석 (GlycoPharm pharmacy = organization).
+  // user.pharmacyId 는 auth 파이프라인에서 채워지지 않으므로 사용하지 않는다.
+  // 내 동영상/플레이리스트 탭은 backend 가 토큰에서 매장 컨텍스트를 해석하나,
+  // 스케줄 API(/api/signage/glycopharm/schedules)는 organizationId(X-Organization-Id)를 요구한다.
+  const [organizationId, setOrganizationId] = useState('');
+  const [orgResolving, setOrgResolving] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const overview = await fetchStoreHubOverview();
+        if (!cancelled) setOrganizationId(overview?.organizationId || '');
+      } catch {
+        if (!cancelled) setOrganizationId('');
+      } finally {
+        if (!cancelled) setOrgResolving(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   // URL-based tab derivation (IA restructure)
   const activeTab = useMemo((): ActiveTab => {
@@ -977,7 +996,12 @@ export default function StoreSignageMainPage() {
       {/* ═══ Schedule Tab ═══════════════════════════════════════════ */}
       {activeTab === 'schedules' && (
         <div>
-          {!organizationId ? (
+          {orgResolving ? (
+            <div className="flex items-center justify-center gap-2 p-12 text-slate-500">
+              <Loader2 className="w-5 h-5 animate-spin" />
+              <span className="text-sm">약국 정보를 불러오는 중…</span>
+            </div>
+          ) : !organizationId ? (
             <div className="flex items-center gap-3 p-6 bg-amber-50 border border-amber-200 rounded-xl">
               <AlertCircle className="w-6 h-6 text-amber-500 flex-shrink-0" />
               <div>
