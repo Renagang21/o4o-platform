@@ -64,6 +64,36 @@ path-matcher-siteguide-web  <= ['siteguide.co.kr','www.siteguide.co.kr'] → bac
 3. **리소스 삭제(서빙 분리 후)**: `path-matcher-siteguide-web` host 규칙 제거 → backend-siteguide-web/-core → NEG → Cloud Run `siteguide-web`/`siteguide-core` 순으로 정리.
    - `siteguide.co.kr` 도메인은 향후 별도 저장소 신규 서비스로 재개 시 다시 매핑.
 
+## 4-A. 실행 결과 (2026-06-15, 승인 후 적용)
+
+> 사용자 승인(1번: `*` catch-all 규칙 제거). 코드/DB 무변경, **인프라(LB + Cloud Run)만 변경**.
+
+**Phase 2 — www 정상화 (url-map import):**
+- `www.glycopharm.co.kr` → `path-matcher-glycopharm`
+- `www.kpa-society.co.kr` → `path-matcher-kpa-society`
+- `www.glucoseview.co.kr` → `path-matcher-glucoseview`
+- `path-matcher-siteguide-web` host 규칙(`*`, `siteguide.co.kr`, `www.siteguide.co.kr`) + path matcher 제거
+- url-map defaultService(`backend-neture-web-http`)는 그대로 — 미매칭 호스트는 여기로 fallback (신규 catch-all 미생성)
+
+**Phase 3 — siteguide 리소스 삭제 (참조 역순):**
+- backend-services: `backend-siteguide-web`, `backend-siteguide-core` ✅ 삭제
+- serverless NEG: `siteguide-web-neg`, `siteguide-core` ✅ 삭제
+- Cloud Run: `siteguide-web`, `siteguide-core` ✅ 삭제
+
+**검증 (전 도메인 HTTP 200, 올바른 서비스):**
+
+| 도메인 | 결과 |
+|--------|------|
+| glycopharm.co.kr / www.glycopharm.co.kr | GlycoPharm ✅ |
+| kpa-society.co.kr / www.kpa-society.co.kr | KPA Society ✅ |
+| glucoseview.co.kr / www.glucoseview.co.kr | GlucoseView ✅ |
+| neture.co.kr / www.neture.co.kr | Neture ✅ |
+| k-cosmetics.site | K-Cosmetics ✅ |
+| siteguide.co.kr | Neture (url-map default — catch-all 제거 결과) |
+
+- siteguide Cloud Run / backend / NEG 잔존 **0** (전수 확인).
+- `siteguide.co.kr` 도메인은 향후 별도 저장소 신규 서비스 재개 시 다시 매핑.
+
 ## 5. 판정
 
 ```
