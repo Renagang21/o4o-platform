@@ -440,6 +440,19 @@ export function PharmacyPopPage() {
                 align: 'right',
                 render: (_v, item) => (
                   <div className="flex items-center justify-end gap-1">
+                    {/* WO-O4O-POP-IMPORT-TO-BUILDER-LINK-V1: 이 POP으로 제작 → builder prefill */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate('/store/marketing/pop', {
+                          state: { prefillPop: { title: item.title, content: item.content, excerpt: item.excerpt } },
+                        });
+                      }}
+                      className="p-1.5 rounded hover:bg-blue-50 text-slate-400 hover:text-blue-600"
+                      title="이 POP으로 제작"
+                    >
+                      <Printer className="w-4 h-4" />
+                    </button>
                     <button
                       onClick={(e) => { e.stopPropagation(); openEditor(item); }}
                       className="p-1.5 rounded hover:bg-slate-100 text-slate-500"

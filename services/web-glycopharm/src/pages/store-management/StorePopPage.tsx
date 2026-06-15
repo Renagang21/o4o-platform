@@ -95,6 +95,15 @@ export default function StorePopPage() {
   const [aiOpen, setAiOpen] = useState(false);
   const [popAiContent, setPopAiContent] = useState<PopAiContent | null>(null);
 
+  // WO-O4O-POP-IMPORT-TO-BUILDER-LINK-V1: 가져온 POP 사본 prefill (router state)
+  useEffect(() => {
+    const pf = (location.state as { prefillPop?: { title?: string; content?: string; excerpt?: string } } | null)?.prefillPop;
+    if (!pf) return;
+    const bodyText = (pf.content || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+    setPopAiContent({ title: pf.title || '', bullets: [], shortText: (pf.excerpt || '').trim(), longText: bodyText });
+    window.history.replaceState({}, document.title);
+  }, [location.state]);
+
   // Step 3: layout + template
   const [layout, setLayout] = useState<'A4' | 'A5'>('A4');
   const [templateId, setTemplateId] = useState('pop-modern');

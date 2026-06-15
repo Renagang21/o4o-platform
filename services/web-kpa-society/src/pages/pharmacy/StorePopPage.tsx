@@ -93,6 +93,16 @@ export function StorePopPage() {
   const [popAiContent, setPopAiContent] = useState<PopAiContent | null>(null);
   const [aiPanelExpanded, setAiPanelExpanded] = useState(false);
 
+  // WO-O4O-POP-IMPORT-TO-BUILDER-LINK-V1: 가져온 POP 사본 prefill (router state)
+  useEffect(() => {
+    const pf = (location.state as { prefillPop?: { title?: string; content?: string; excerpt?: string } } | null)?.prefillPop;
+    if (!pf) return;
+    const bodyText = (pf.content || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+    setPopAiContent({ title: pf.title || '', bullets: [], shortText: (pf.excerpt || '').trim(), longText: bodyText });
+    setAiPanelExpanded(true);
+    window.history.replaceState({}, document.title);
+  }, [location.state]);
+
   // QR selection
   const [qrCodes, setQrCodes] = useState<StoreQrCode[]>([]);
   const [selectedQrId, setSelectedQrId] = useState<string>('');
