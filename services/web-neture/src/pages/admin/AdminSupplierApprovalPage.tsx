@@ -7,6 +7,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { adminSupplierApi, type AdminSupplier } from '../../lib/api';
+import SupplierRegulatedCategoriesModal from '../../components/supplier/SupplierRegulatedCategoriesModal';
 
 const statusLabels: Record<string, string> = {
   PENDING: '승인대기',
@@ -43,6 +44,7 @@ function getMissingOnboardingItems(supplier: AdminSupplier): string[] {
 
 export default function AdminSupplierApprovalPage() {
   const [suppliers, setSuppliers] = useState<AdminSupplier[]>([]);
+  const [categoryModal, setCategoryModal] = useState<{ id: string; name: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
@@ -265,7 +267,13 @@ export default function AdminSupplierApprovalPage() {
                   <td className="px-6 py-4 text-sm text-slate-500">
                     {new Date(s.createdAt).toLocaleDateString('ko-KR')}
                   </td>
-                  <td className="px-6 py-4 text-center space-x-2">
+                  <td className="px-6 py-4 text-center space-x-2 whitespace-nowrap">
+                    <button
+                      onClick={() => setCategoryModal({ id: s.id, name: s.name })}
+                      className="text-slate-600 hover:text-slate-900 font-medium text-sm"
+                    >
+                      품목군
+                    </button>
                     {s.status === 'PENDING' && (
                       <>
                         <button
@@ -302,6 +310,15 @@ export default function AdminSupplierApprovalPage() {
           </table>
         )}
       </div>
+
+      {categoryModal && (
+        <SupplierRegulatedCategoriesModal
+          supplierId={categoryModal.id}
+          supplierName={categoryModal.name}
+          api={adminSupplierApi}
+          onClose={() => setCategoryModal(null)}
+        />
+      )}
 
       {approveConfirmId && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">

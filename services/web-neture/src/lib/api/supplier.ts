@@ -1114,6 +1114,146 @@ export const supplierOnboardingApi = {
   },
 };
 
+// ==================== Supplier Regulated Category API ====================
+// WO-O4O-SUPPLIER-REGULATED-CATEGORY-DOCUMENTS-V1
+
+export type RegulatedCategory =
+  | 'general'
+  | 'pharmaceutical'
+  | 'quasi_drug'
+  | 'medical_device'
+  | 'health_functional_food'
+  | 'food'
+  | 'cosmetics'
+  | 'other_regulated';
+
+export type RegulatedCategoryStatus =
+  | 'not_requested'
+  | 'submitted'
+  | 'approved'
+  | 'rejected'
+  | 'needs_update'
+  | 'suspended';
+
+export const REGULATED_CATEGORY_LABELS: Record<RegulatedCategory, string> = {
+  general: '일반 상품',
+  pharmaceutical: '의약품',
+  quasi_drug: '의약외품',
+  medical_device: '의료기기',
+  health_functional_food: '건강기능식품',
+  food: '식품',
+  cosmetics: '화장품',
+  other_regulated: '기타 법정 관리 품목',
+};
+
+export const REGULATED_CATEGORY_ORDER: RegulatedCategory[] = [
+  'general',
+  'pharmaceutical',
+  'quasi_drug',
+  'medical_device',
+  'health_functional_food',
+  'food',
+  'cosmetics',
+  'other_regulated',
+];
+
+export const REGULATED_CATEGORY_STATUS_LABELS: Record<RegulatedCategoryStatus, string> = {
+  not_requested: '미신청',
+  submitted: '서류 제출',
+  approved: '등록 가능',
+  rejected: '반려',
+  needs_update: '보완 필요',
+  suspended: '사용 제한',
+};
+
+export interface SupplierRegulatedCategory {
+  id: string;
+  category: RegulatedCategory;
+  status: RegulatedCategoryStatus;
+  registrationNumber: string | null;
+  reviewNote: string | null;
+  reviewedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  evidenceDocument: {
+    id: string;
+    fileName: string;
+    fileSize: number | null;
+    mimeType: string | null;
+    createdAt: string;
+  } | null;
+}
+
+export const supplierRegulatedCategoryApi = {
+  async list(): Promise<SupplierRegulatedCategory[]> {
+    try {
+      const response = await api.get('/neture/supplier/regulated-categories');
+      return response.data?.data ?? [];
+    } catch (error) {
+      console.warn('[Supplier Regulated Category API] Failed to list:', error);
+      return [];
+    }
+  },
+
+  async select(category: RegulatedCategory): Promise<{ success: boolean; error?: string; data?: SupplierRegulatedCategory }> {
+    try {
+      const response = await api.post('/neture/supplier/regulated-categories', { category });
+      return response.data;
+    } catch (error) {
+      return { success: false, error: extractApiError(error) };
+    }
+  },
+
+  async remove(category: RegulatedCategory): Promise<{ success: boolean; error?: string }> {
+    try {
+      const response = await api.delete(`/neture/supplier/regulated-categories/${category}`);
+      return response.data;
+    } catch (error) {
+      return { success: false, error: extractApiError(error) };
+    }
+  },
+
+  async updateRegistrationNumber(
+    category: RegulatedCategory,
+    registrationNumber: string,
+  ): Promise<{ success: boolean; error?: string; data?: SupplierRegulatedCategory }> {
+    try {
+      const response = await api.patch(`/neture/supplier/regulated-categories/${category}`, { registrationNumber });
+      return response.data;
+    } catch (error) {
+      return { success: false, error: extractApiError(error) };
+    }
+  },
+
+  async uploadEvidence(
+    category: RegulatedCategory,
+    file: File,
+  ): Promise<{ success: boolean; error?: string; data?: SupplierRegulatedCategory }> {
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      const response = await api.post(`/neture/supplier/regulated-categories/${category}/document`, form, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      return response.data;
+    } catch (error) {
+      return { success: false, error: extractApiError(error) };
+    }
+  },
+
+  async downloadEvidence(category: RegulatedCategory): Promise<Blob | null> {
+    try {
+      const response = await api.get(`/neture/supplier/regulated-categories/${category}/document/download`, {
+        responseType: 'blob',
+      });
+      return response.data as Blob;
+    } catch (error) {
+      console.warn('[Supplier Regulated Category API] Failed to download evidence:', error);
+      return null;
+    }
+  },
+};
+
 // ==================== KPA Event Offer Stats ====================
 // WO-EVENT-OFFER-SUPPLIER-DASHBOARD-STATS-INTEGRATION-V1
 

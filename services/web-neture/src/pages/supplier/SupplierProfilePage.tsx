@@ -33,10 +33,25 @@ import { BusinessRegistrationFields } from '@o4o/account-ui';
 import {
   supplierProfileApi,
   supplierOnboardingApi,
+  supplierRegulatedCategoryApi,
+  REGULATED_CATEGORY_LABELS,
+  REGULATED_CATEGORY_ORDER,
+  REGULATED_CATEGORY_STATUS_LABELS,
   type SupplierProfile,
   type SupplierOnboarding,
+  type SupplierRegulatedCategory,
+  type RegulatedCategory,
   type ContactVisibility,
 } from '../../lib/api';
+
+const REGULATED_STATUS_BADGE: Record<string, string> = {
+  not_requested: 'bg-slate-100 text-slate-600',
+  submitted: 'bg-blue-100 text-blue-700',
+  approved: 'bg-emerald-100 text-emerald-700',
+  rejected: 'bg-red-100 text-red-700',
+  needs_update: 'bg-amber-100 text-amber-700',
+  suspended: 'bg-gray-200 text-gray-600',
+};
 
 const SUPPLIER_STATUS_CONFIG: Record<string, { label: string; cls: string }> = {
   pending:   { label: '승인 대기 중', cls: 'bg-amber-100 text-amber-700 border-amber-200' },
@@ -93,6 +108,10 @@ export default function SupplierProfilePage() {
   const [bankbookFile, setBankbookFile] = useState<File | null>(null);
   const [mailOrderReportFile, setMailOrderReportFile] = useState<File | null>(null);
   const [uploadingDocument, setUploadingDocument] = useState<'business_registration' | 'bank_statement' | 'mail_order_report' | null>(null);
+  // 공급 예정 품목군 (WO-O4O-SUPPLIER-REGULATED-CATEGORY-DOCUMENTS-V1)
+  const [regulatedCategories, setRegulatedCategories] = useState<SupplierRegulatedCategory[]>([]);
+  const [categoryBusy, setCategoryBusy] = useState<RegulatedCategory | null>(null);
+  const [categoryError, setCategoryError] = useState<string | null>(null);
 
   // Section A: 사업자 기본정보
   const [representativeName, setRepresentativeName] = useState('');
@@ -149,10 +168,12 @@ export default function SupplierProfilePage() {
   useEffect(() => {
     const fetchProfile = async () => {
       setLoading(true);
-      const [data, onboardingData] = await Promise.all([
+      const [data, onboardingData, categoriesData] = await Promise.all([
         supplierProfileApi.getProfile(),
         supplierOnboardingApi.getOnboarding(),
+        supplierRegulatedCategoryApi.list(),
       ]);
+      setRegulatedCategories(categoriesData);
       if (data) {
         setProfile(data);
         // Section A
@@ -340,6 +361,63 @@ export default function SupplierProfilePage() {
     const blob = await supplierOnboardingApi.downloadDocument(documentType);
     if (!blob) {
       setOnboardingError('문서를 열 수 없습니다.');
+      return;
+    }
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank', 'noopener,noreferrer');
+    setTimeout(() => URL.revokeObjectURL(url), 30_000);
+  };
+
+  // === 공급 예정 품목군 핸들러 ===
+  const refreshCategories = async () => {
+    setRegulatedCategories(await supplierRegulatedCategoryApi.list());
+  };
+
+  const handleToggleCategory = async (category: RegulatedCategory, selected: boolean, removable: boolean) => {
+    setCategoryError(null);
+    setCategoryBusy(category);
+    if (selected) {
+      const result = await supplierRegulatedCategoryApi.select(category);
+      if (!result.success) setCategoryError(result.error || '품목군 선택에 실패했습니다.');
+    } else {
+      if (!removable) {
+        setCategoryError('검토 중이거나 승인/제한된 품목군은 선택 해제할 수 없습니다.');
+        setCategoryBusy(null);
+        return;
+      }
+      const result = await supplierRegulatedCategoryApi.remove(category);
+      if (!result.success) setCategoryError(result.error || '품목군 해제에 실패했습니다.');
+    }
+    await refreshCategories();
+    setCategoryBusy(null);
+  };
+
+  const handleSaveCategoryRegistration = async (category: RegulatedCategory, registrationNumber: string) => {
+    setCategoryError(null);
+    setCategoryBusy(category);
+    const result = await supplierRegulatedCategoryApi.updateRegistrationNumber(category, registrationNumber);
+    if (!result.success) setCategoryError(result.error || '저장에 실패했습니다.');
+    await refreshCategories();
+    setCategoryBusy(null);
+  };
+
+  const handleUploadCategoryEvidence = async (category: RegulatedCategory, file: File) => {
+    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+      setCategoryError('PDF 파일만 업로드할 수 있습니다.');
+      return;
+    }
+    setCategoryError(null);
+    setCategoryBusy(category);
+    const result = await supplierRegulatedCategoryApi.uploadEvidence(category, file);
+    if (!result.success) setCategoryError(result.error || '증빙 업로드에 실패했습니다.');
+    await refreshCategories();
+    setCategoryBusy(null);
+  };
+
+  const handleDownloadCategoryEvidence = async (category: RegulatedCategory) => {
+    const blob = await supplierRegulatedCategoryApi.downloadEvidence(category);
+    if (!blob) {
+      setCategoryError('증빙 문서를 열 수 없습니다.');
       return;
     }
     const url = URL.createObjectURL(blob);
@@ -728,6 +806,102 @@ export default function SupplierProfilePage() {
             </button>
             {onboardingError && <p className="text-sm text-red-500">{onboardingError}</p>}
           </div>
+        </div>
+      </div>
+
+      {/* Section A-4: 공급 예정 품목군 (WO-O4O-SUPPLIER-REGULATED-CATEGORY-DOCUMENTS-V1) */}
+      <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4">
+        <h2 className="flex items-center gap-2 text-base font-semibold text-gray-800 mb-2">
+          <FileText className="w-5 h-5 text-gray-500" />
+          공급 예정 품목군
+        </h2>
+        <p className="text-xs text-gray-500 mb-5">
+          O4O 에 공급하려는 품목군을 선택하고, 품목군별로 필요한 증빙 PDF 를 제출해 주세요.
+          운영자가 확인 후 O4O 내부 등록 가능 상태를 설정합니다.
+          O4O 는 법적 허가 여부를 인증하지 않으며, 제출 서류는 운영자 검토용 참고 정보로만 사용됩니다.
+        </p>
+
+        <div className="space-y-3">
+          {REGULATED_CATEGORY_ORDER.map((category) => {
+            const row = regulatedCategories.find((c) => c.category === category);
+            const selected = !!row;
+            const removable = !row || ['not_requested', 'rejected', 'needs_update'].includes(row.status);
+            const busy = categoryBusy === category;
+            return (
+              <div key={category} className="rounded-lg border border-gray-200 p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-800">
+                    <input
+                      type="checkbox"
+                      checked={selected}
+                      disabled={busy || (selected && !removable)}
+                      onChange={(e) => handleToggleCategory(category, e.target.checked, removable)}
+                      className="w-4 h-4"
+                    />
+                    {REGULATED_CATEGORY_LABELS[category]}
+                  </label>
+                  {row && (
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${REGULATED_STATUS_BADGE[row.status] || 'bg-gray-100 text-gray-600'}`}>
+                      {REGULATED_CATEGORY_STATUS_LABELS[row.status] || row.status}
+                    </span>
+                  )}
+                </div>
+
+                {row && (
+                  <div className="mt-3 space-y-3 pl-6">
+                    {row.reviewNote && (row.status === 'rejected' || row.status === 'needs_update' || row.status === 'suspended') && (
+                      <p className="text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded px-2 py-1.5">
+                        운영자 메모: {row.reviewNote}
+                      </p>
+                    )}
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-end">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">허가/신고 번호 (선택)</label>
+                        <input
+                          type="text"
+                          defaultValue={row.registrationNumber || ''}
+                          onBlur={(e) => {
+                            const v = e.target.value.trim();
+                            if (v !== (row.registrationNumber || '')) handleSaveCategoryRegistration(category, v);
+                          }}
+                          placeholder="입력 후 포커스 이동 시 저장"
+                          className={inputClass}
+                        />
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="file"
+                          accept="application/pdf,.pdf"
+                          disabled={busy}
+                          onChange={(e) => {
+                            const f = e.target.files?.[0];
+                            if (f) handleUploadCategoryEvidence(category, f);
+                            e.target.value = '';
+                          }}
+                          className={fileInputClass}
+                        />
+                        {row.evidenceDocument && (
+                          <button
+                            type="button"
+                            onClick={() => handleDownloadCategoryEvidence(category)}
+                            className="inline-flex items-center gap-1 text-xs font-medium text-primary-700 hover:text-primary-800 whitespace-nowrap"
+                          >
+                            <Download className="w-3.5 h-3.5" />
+                            증빙 열람
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    {row.evidenceDocument && (
+                      <p className="text-xs text-gray-400">제출 파일: {row.evidenceDocument.fileName}</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+          {categoryError && <p className="text-sm text-red-500">{categoryError}</p>}
         </div>
       </div>
 

@@ -38,6 +38,7 @@ import {
   SupplierOnboardingService,
   type SupplierOnboardingDocumentType,
 } from '../services/supplier-onboarding.service.js';
+import { SupplierRegulatedCategoryService } from '../services/supplier-regulated-category.service.js';
 import logger from '../../../utils/logger.js';
 
 type AuthenticatedRequest = Request & {
@@ -48,6 +49,7 @@ export function createOperatorSupplierController(dataSource: DataSource): Router
   const router = Router();
   const netureService = new NetureService();
   const onboardingService = new SupplierOnboardingService(dataSource);
+  const regulatedCategoryService = new SupplierRegulatedCategoryService(dataSource);
   const actionLogService = new ActionLogService(dataSource);
 
   // Router-level guard: operator scope (admin 도 scopeRoleMapping 으로 통과)
@@ -126,6 +128,65 @@ export function createOperatorSupplierController(dataSource: DataSource): Router
       stream.pipe(res);
     } catch (error) {
       logger.error('[Neture Operator API] Error downloading supplier document:', error);
+      if (!res.headersSent) {
+        res.status(500).json({ success: false, error: { code: 'DOWNLOAD_FAILED' } });
+      }
+    }
+  });
+
+  // ==================== 공급자 품목군 검토 (WO-O4O-SUPPLIER-REGULATED-CATEGORY-DOCUMENTS-V1) ====================
+
+  // GET /operator/suppliers/:id/regulated-categories
+  router.get('/suppliers/:id/regulated-categories', async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const data = await regulatedCategoryService.listForSupplier(req.params.id);
+      res.json({ success: true, data });
+    } catch (error) {
+      logger.error('[Neture Operator API] Error listing regulated categories:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR' } });
+    }
+  });
+
+  // PATCH /operator/suppliers/:id/regulated-categories/:category — 상태 변경 + 검토 메모
+  router.patch('/suppliers/:id/regulated-categories/:category', async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const reviewerId = req.user?.id;
+      if (!reviewerId) return res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED' } });
+      const result = await regulatedCategoryService.review(
+        req.params.id,
+        req.params.category,
+        { status: String(req.body?.status || ''), reviewNote: req.body?.reviewNote },
+        reviewerId,
+      );
+      if (!result.success) {
+        const status = result.error === 'CATEGORY_NOT_FOUND' ? 404 : 400;
+        return res.status(status).json({ success: false, error: { code: result.error } });
+      }
+      res.json({ success: true, data: result.data });
+    } catch (error) {
+      logger.error('[Neture Operator API] Error reviewing regulated category:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR' } });
+    }
+  });
+
+  // GET /operator/suppliers/:id/regulated-categories/:category/document/download
+  router.get('/suppliers/:id/regulated-categories/:category/document/download', async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const document = await regulatedCategoryService.getEvidenceDocument(req.params.id, req.params.category);
+      if (!document) {
+        return res.status(404).json({ success: false, error: { code: 'DOCUMENT_NOT_FOUND' } });
+      }
+      res.setHeader('Content-Type', document.mimeType || 'application/pdf');
+      res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(document.fileName)}"`);
+      const stream = await regulatedCategoryService.createReadStream(document);
+      stream.on('error', (err) => {
+        logger.error('[Neture Operator API] Regulated category document stream error:', err);
+        if (!res.headersSent) res.status(500).end();
+        else res.end();
+      });
+      stream.pipe(res);
+    } catch (error) {
+      logger.error('[Neture Operator API] Error downloading regulated category evidence:', error);
       if (!res.headersSent) {
         res.status(500).json({ success: false, error: { code: 'DOWNLOAD_FAILED' } });
       }

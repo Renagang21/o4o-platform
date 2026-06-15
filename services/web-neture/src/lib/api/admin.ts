@@ -15,6 +15,11 @@ import type {
   CommissionsResponse,
   CommissionDetail,
 } from './partner.js';
+import type {
+  SupplierRegulatedCategory,
+  RegulatedCategory,
+  RegulatedCategoryStatus,
+} from './supplier.js';
 
 // ==================== Admin Operator ====================
 
@@ -163,6 +168,40 @@ export const adminSupplierApi = {
       return null;
     }
   },
+
+  // WO-O4O-SUPPLIER-REGULATED-CATEGORY-DOCUMENTS-V1
+  async listRegulatedCategories(id: string): Promise<SupplierRegulatedCategory[]> {
+    try {
+      const response = await api.get(`/neture/admin/suppliers/${id}/regulated-categories`);
+      return response.data?.data ?? [];
+    } catch {
+      return [];
+    }
+  },
+
+  async reviewRegulatedCategory(
+    id: string,
+    category: RegulatedCategory,
+    body: { status: RegulatedCategoryStatus; reviewNote?: string },
+  ): Promise<{ success: boolean; error?: string }> {
+    try {
+      const response = await api.patch(`/neture/admin/suppliers/${id}/regulated-categories/${category}`, body);
+      return response.data;
+    } catch (error: any) {
+      return { success: false, error: error?.response?.data?.error?.code || 'REVIEW_FAILED' };
+    }
+  },
+
+  async downloadRegulatedEvidence(id: string, category: RegulatedCategory): Promise<Blob | null> {
+    try {
+      const response = await api.get(`/neture/admin/suppliers/${id}/regulated-categories/${category}/document/download`, {
+        responseType: 'blob',
+      });
+      return response.data as Blob;
+    } catch {
+      return null;
+    }
+  },
 };
 
 // ==================== Operator Supplier ====================
@@ -212,6 +251,40 @@ export const operatorSupplierApi = {
   async downloadDocument(id: string, documentType: 'business_registration' | 'bank_statement' | 'mail_order_report'): Promise<Blob | null> {
     try {
       const response = await api.get(`/neture/operator/suppliers/${id}/documents/${documentType}/download`, {
+        responseType: 'blob',
+      });
+      return response.data as Blob;
+    } catch {
+      return null;
+    }
+  },
+
+  // WO-O4O-SUPPLIER-REGULATED-CATEGORY-DOCUMENTS-V1
+  async listRegulatedCategories(id: string): Promise<SupplierRegulatedCategory[]> {
+    try {
+      const response = await api.get(`/neture/operator/suppliers/${id}/regulated-categories`);
+      return response.data?.data ?? [];
+    } catch {
+      return [];
+    }
+  },
+
+  async reviewRegulatedCategory(
+    id: string,
+    category: RegulatedCategory,
+    body: { status: RegulatedCategoryStatus; reviewNote?: string },
+  ): Promise<{ success: boolean; error?: string }> {
+    try {
+      const response = await api.patch(`/neture/operator/suppliers/${id}/regulated-categories/${category}`, body);
+      return response.data;
+    } catch (error: any) {
+      return { success: false, error: error?.response?.data?.error?.code || 'REVIEW_FAILED' };
+    }
+  },
+
+  async downloadRegulatedEvidence(id: string, category: RegulatedCategory): Promise<Blob | null> {
+    try {
+      const response = await api.get(`/neture/operator/suppliers/${id}/regulated-categories/${category}/document/download`, {
         responseType: 'blob',
       });
       return response.data as Blob;

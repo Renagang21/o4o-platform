@@ -1,4 +1,12 @@
 export { NetureSupplier, SupplierStatus, ContactVisibility } from './NetureSupplier.entity.js';
+// WO-O4O-SUPPLIER-REGULATED-CATEGORY-DOCUMENTS-V1
+export {
+  NetureSupplierRegulatedCategory,
+  REGULATED_CATEGORIES,
+  REGULATED_CATEGORY_STATUSES,
+  type RegulatedCategory,
+  type RegulatedCategoryStatus,
+} from './NetureSupplierRegulatedCategory.entity.js';
 export { ProductMaster } from './ProductMaster.entity.js';
 // WO-O4O-PRODUCT-IDENTIFIER-CORE-V1: Identifier Core (Phase 2)
 export {

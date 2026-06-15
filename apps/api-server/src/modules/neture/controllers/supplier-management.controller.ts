@@ -17,11 +17,13 @@ import {
   SupplierOnboardingService,
   type SupplierOnboardingDocumentType,
 } from '../services/supplier-onboarding.service.js';
+import { SupplierRegulatedCategoryService } from '../services/supplier-regulated-category.service.js';
 
 export function createSupplierManagementController(dataSource: DataSource): Router {
   const router = Router();
   const netureService = new NetureService();
   const onboardingService = new SupplierOnboardingService(dataSource);
+  const regulatedCategoryService = new SupplierRegulatedCategoryService(dataSource);
   const requireActiveSupplier = createRequireActiveSupplier(dataSource);
   const requireLinkedSupplier = createRequireLinkedSupplier(dataSource);
 
@@ -260,6 +262,121 @@ export function createSupplierManagementController(dataSource: DataSource): Rout
       stream.pipe(res);
     } catch (error) {
       logger.error('[Neture API] Error downloading supplier onboarding document:', error);
+      if (!res.headersSent) {
+        res.status(500).json({ success: false, error: { code: 'DOWNLOAD_FAILED' } });
+      }
+    }
+  });
+
+  // ==================== 공급 예정 품목군 (WO-O4O-SUPPLIER-REGULATED-CATEGORY-DOCUMENTS-V1) ====================
+
+  // GET /supplier/regulated-categories — 공급자 본인 품목군 목록
+  router.get('/regulated-categories', requireAuth, requireLinkedSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const supplierId = (req as SupplierRequest).supplierId;
+      const data = await regulatedCategoryService.listForSupplier(supplierId);
+      res.json({ success: true, data });
+    } catch (error) {
+      logger.error('[Neture API] Error listing regulated categories:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR' } });
+    }
+  });
+
+  // POST /supplier/regulated-categories — 품목군 선택(행 생성) body: { category }
+  router.post('/regulated-categories', requireAuth, requireLinkedSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const supplierId = (req as SupplierRequest).supplierId;
+      const result = await regulatedCategoryService.selectCategory(supplierId, String(req.body?.category || ''));
+      if (!result.success) {
+        const status = result.error === 'SUPPLIER_NOT_FOUND' ? 404 : 400;
+        return res.status(status).json({ success: false, error: { code: result.error } });
+      }
+      res.status(201).json({ success: true, data: result.data });
+    } catch (error) {
+      logger.error('[Neture API] Error selecting regulated category:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR' } });
+    }
+  });
+
+  // PATCH /supplier/regulated-categories/:category — 신고/허가 번호 입력
+  router.patch('/regulated-categories/:category', requireAuth, requireLinkedSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const supplierId = (req as SupplierRequest).supplierId;
+      const result = await regulatedCategoryService.updateCategory(supplierId, req.params.category, {
+        registrationNumber: req.body?.registrationNumber,
+      });
+      if (!result.success) {
+        const status = result.error === 'CATEGORY_NOT_FOUND' ? 404 : 400;
+        return res.status(status).json({ success: false, error: { code: result.error } });
+      }
+      res.json({ success: true, data: result.data });
+    } catch (error) {
+      logger.error('[Neture API] Error updating regulated category:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR' } });
+    }
+  });
+
+  // DELETE /supplier/regulated-categories/:category — 선택 해제(검토중/승인/제한은 잠금)
+  router.delete('/regulated-categories/:category', requireAuth, requireLinkedSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const supplierId = (req as SupplierRequest).supplierId;
+      const result = await regulatedCategoryService.removeCategory(supplierId, req.params.category);
+      if (!result.success) {
+        const status = result.error === 'CATEGORY_NOT_FOUND' ? 404 : 400;
+        return res.status(status).json({ success: false, error: { code: result.error } });
+      }
+      res.json({ success: true });
+    } catch (error) {
+      logger.error('[Neture API] Error removing regulated category:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR' } });
+    }
+  });
+
+  // POST /supplier/regulated-categories/:category/document — 증빙 PDF 업로드
+  router.post(
+    '/regulated-categories/:category/document',
+    requireAuth,
+    requireLinkedSupplier as RequestHandler,
+    uploadSingleMiddleware('file'),
+    async (req: AuthenticatedRequest, res: Response) => {
+      try {
+        const supplierId = (req as SupplierRequest).supplierId;
+        const file = req.file as Express.Multer.File | undefined;
+        if (!file) {
+          return res.status(400).json({ success: false, error: { code: 'FILE_REQUIRED' } });
+        }
+        const result = await regulatedCategoryService.uploadEvidence(supplierId, req.params.category, file);
+        if (!result.success) {
+          const status = result.error === 'SUPPLIER_NOT_FOUND' ? 404 : 400;
+          return res.status(status).json({ success: false, error: { code: result.error } });
+        }
+        res.status(201).json({ success: true, data: result.data });
+      } catch (error) {
+        logger.error('[Neture API] Error uploading regulated category evidence:', error);
+        res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR' } });
+      }
+    },
+  );
+
+  // GET /supplier/regulated-categories/:category/document/download — 증빙 열람
+  router.get('/regulated-categories/:category/document/download', requireAuth, requireLinkedSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const supplierId = (req as SupplierRequest).supplierId;
+      const document = await regulatedCategoryService.getEvidenceDocument(supplierId, req.params.category);
+      if (!document) {
+        return res.status(404).json({ success: false, error: { code: 'DOCUMENT_NOT_FOUND' } });
+      }
+      res.setHeader('Content-Type', document.mimeType || 'application/pdf');
+      res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(document.fileName)}"`);
+      const stream = await regulatedCategoryService.createReadStream(document);
+      stream.on('error', (err) => {
+        logger.error('[Neture API] Regulated category document stream error:', err);
+        if (!res.headersSent) res.status(500).end();
+        else res.end();
+      });
+      stream.pipe(res);
+    } catch (error) {
+      logger.error('[Neture API] Error downloading regulated category evidence:', error);
       if (!res.headersSent) {
         res.status(500).json({ success: false, error: { code: 'DOWNLOAD_FAILED' } });
       }

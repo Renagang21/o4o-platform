@@ -29,6 +29,7 @@ import {
   SupplierOnboardingService,
   type SupplierOnboardingDocumentType,
 } from '../services/supplier-onboarding.service.js';
+import { SupplierRegulatedCategoryService } from '../services/supplier-regulated-category.service.js';
 import sharp from 'sharp';
 import logger from '../../../utils/logger.js';
 
@@ -61,6 +62,7 @@ export function createAdminController(dataSource: DataSource): Router {
   const netureActionLogService = new ActionLogService(dataSource);
   const approvalV2Service = new ProductApprovalV2Service(dataSource);
   const onboardingService = new SupplierOnboardingService(dataSource);
+  const regulatedCategoryService = new SupplierRegulatedCategoryService(dataSource);
 
   // ==================== Admin: Supplier Management ====================
 
@@ -205,6 +207,65 @@ export function createAdminController(dataSource: DataSource): Router {
       stream.pipe(res);
     } catch (error) {
       logger.error('[Neture API] Error downloading supplier document:', error);
+      if (!res.headersSent) {
+        res.status(500).json({ success: false, error: { code: 'DOWNLOAD_FAILED' } });
+      }
+    }
+  });
+
+  // ==================== 공급자 품목군 검토 (WO-O4O-SUPPLIER-REGULATED-CATEGORY-DOCUMENTS-V1) ====================
+
+  // GET /admin/suppliers/:id/regulated-categories
+  router.get('/suppliers/:id/regulated-categories', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const data = await regulatedCategoryService.listForSupplier(req.params.id);
+      res.json({ success: true, data });
+    } catch (error) {
+      logger.error('[Neture API] Error listing regulated categories:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR' } });
+    }
+  });
+
+  // PATCH /admin/suppliers/:id/regulated-categories/:category — 상태 변경 + 검토 메모
+  router.patch('/suppliers/:id/regulated-categories/:category', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const reviewerId = req.user?.id;
+      if (!reviewerId) return res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED' } });
+      const result = await regulatedCategoryService.review(
+        req.params.id,
+        req.params.category,
+        { status: String(req.body?.status || ''), reviewNote: req.body?.reviewNote },
+        reviewerId,
+      );
+      if (!result.success) {
+        const status = result.error === 'CATEGORY_NOT_FOUND' ? 404 : 400;
+        return res.status(status).json({ success: false, error: { code: result.error } });
+      }
+      res.json({ success: true, data: result.data });
+    } catch (error) {
+      logger.error('[Neture API] Error reviewing regulated category:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR' } });
+    }
+  });
+
+  // GET /admin/suppliers/:id/regulated-categories/:category/document/download
+  router.get('/suppliers/:id/regulated-categories/:category/document/download', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const document = await regulatedCategoryService.getEvidenceDocument(req.params.id, req.params.category);
+      if (!document) {
+        return res.status(404).json({ success: false, error: { code: 'DOCUMENT_NOT_FOUND' } });
+      }
+      res.setHeader('Content-Type', document.mimeType || 'application/pdf');
+      res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(document.fileName)}"`);
+      const stream = await regulatedCategoryService.createReadStream(document);
+      stream.on('error', (err) => {
+        logger.error('[Neture API] Regulated category document stream error:', err);
+        if (!res.headersSent) res.status(500).end();
+        else res.end();
+      });
+      stream.pipe(res);
+    } catch (error) {
+      logger.error('[Neture API] Error downloading regulated category evidence:', error);
       if (!res.headersSent) {
         res.status(500).json({ success: false, error: { code: 'DOWNLOAD_FAILED' } });
       }
