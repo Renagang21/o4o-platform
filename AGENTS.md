@@ -38,6 +38,52 @@
 - Keep commits path-specific to the assigned WO. Stage only the allowed files, then verify with `git diff --cached --name-only` before committing.
 - Do not mix unrelated client, server, docs, dependency, or lockfile changes in one commit. Treat unexpected dirty files as existing workspace state unless the user explicitly assigns them.
 
+## Progress Approval and Reporting Guidelines
+- Agents should not ask the user after every small file edit or routine step. Within the approved Work Order scope, continue without additional confirmation for simple, local, and expected actions.
+- Agents should also avoid showing full modified file contents, long diffs, or verbose patch details after each file edit. Do not paste large file contents into the conversation just to show what changed. Instead, keep implementation moving and summarize the completed work at the end.
+- Proceed without asking for confirmation when the action is clearly inside the current WO scope, such as:
+  - Editing files explicitly allowed by the WO
+  - Applying straightforward UI text changes
+  - Adjusting layout or minor styling within the target component
+  - Fixing imports caused by the current edit
+  - Fixing TypeScript errors directly caused by the current edit
+  - Updating CHECK/IR documentation required by the WO
+  - Running requested read-only or validation commands
+  - Continuing sequential implementation steps already described in the WO
+- Do not interrupt the user with full file dumps or long diffs for routine edits. Use concise progress notes only when useful.
+- At completion, report the work through a CHECK/IR document and a concise completion summary, including:
+  - What was changed
+  - Which files were modified
+  - Which areas were not touched
+  - Validation results
+  - Known exclusions or follow-up work
+  - Git status, commit, and push state when applicable
+- Stop and ask the user before proceeding in any of the following cases:
+  - A file outside the WO scope must be modified
+  - Existing dirty or untracked files would need to be touched
+  - DB schema or migration changes are required
+  - `package.json`, lockfiles, dependencies, Docker, or build infrastructure must change
+  - Core, frozen, or shared modules must be changed without explicit WO permission
+  - Auth, role, permission, route, or API contract changes are required
+  - Data deletion, seed changes, bulk updates, or destructive actions are required
+  - The implementation would cross into an explicitly excluded scope
+  - The validation failure appears unrelated to the current WO
+  - Product, legal, compliance, settlement, or business-policy judgment is needed
+  - File access or private document security is unclear
+  - The agent is unsure whether the change is safe
+  - Staging, commit, or push is about to be performed
+- For git operations:
+  - Never use `git add .`
+  - Never use `git commit -am`
+  - Use path-specific staging only
+  - Ask before staging, committing, or pushing unless the WO explicitly grants that permission
+- Default behavior:
+  - Continue through routine implementation steps without interrupting the user
+  - Do not show full modified file contents after every edit
+  - Stop only at meaningful decision points
+  - Report what was done, what was not touched, and what remains
+- O4O 운영 맥락: 사용자가 전체 조율자이며, 여러 작업공간과 여러 에이전트가 GitHub를 기준으로 동기화한다. 따라서 단순 작업마다 확인을 요구하지 말고 WO 범위 안에서는 계속 진행한다. 또한 파일을 수정할 때마다 전체 파일 내용이나 긴 diff를 사용자에게 보여주지 않으며, 작업 결과는 완료 후 CHECK/IR 문서와 완료 보고로 정리한다. 단, 경계 변경·위험 변경·기존 dirty 파일 접촉·DB/migration/package/core/API/permission 변경·정책 판단이 필요한 경우에는 반드시 중단하고 사용자에게 판단을 요청한다.
+
 ## Environment & Configuration Tips
 - Use Node `22.18.0` and pnpm `9.x` (Volta or `.nvmrc` recommended).
 - Copy `.env.example` to `.env.local` for development; follow `config/env-templates` for new envs.
