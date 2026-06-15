@@ -229,6 +229,7 @@ import { StoreProduct } from '../modules/store/entities/store-product.entity.js'
 import {
   NetureSupplier,
   NetureSupplierRegulatedCategory, // WO-O4O-SUPPLIER-REGULATED-CATEGORY-DOCUMENTS-V1
+  ServiceAudiencePolicy, // WO-O4O-SERVICE-PHARMACY-AUDIENCE-POLICY-SETTINGS-V1
   ProductMaster,
   ProductIdentifier, // WO-O4O-PRODUCT-IDENTIFIER-CORE-V1
   ProductCandidate, // WO-O4O-PRODUCT-CANDIDATE-REVIEW-QUEUE-V1
@@ -764,6 +765,7 @@ export const AppDataSource = new DataSource({
     // ============================================================================
     NetureSupplier,
     NetureSupplierRegulatedCategory, // WO-O4O-SUPPLIER-REGULATED-CATEGORY-DOCUMENTS-V1
+    ServiceAudiencePolicy, // WO-O4O-SERVICE-PHARMACY-AUDIENCE-POLICY-SETTINGS-V1
     ProductMaster,
     ProductIdentifier, // WO-O4O-PRODUCT-IDENTIFIER-CORE-V1
     ProductCandidate, // WO-O4O-PRODUCT-CANDIDATE-REVIEW-QUEUE-V1

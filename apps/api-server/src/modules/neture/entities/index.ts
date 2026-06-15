@@ -7,6 +7,8 @@ export {
   type RegulatedCategory,
   type RegulatedCategoryStatus,
 } from './NetureSupplierRegulatedCategory.entity.js';
+// WO-O4O-SERVICE-PHARMACY-AUDIENCE-POLICY-SETTINGS-V1
+export { ServiceAudiencePolicy } from './ServiceAudiencePolicy.entity.js';
 export { ProductMaster } from './ProductMaster.entity.js';
 // WO-O4O-PRODUCT-IDENTIFIER-CORE-V1: Identifier Core (Phase 2)
 export {

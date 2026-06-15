@@ -25,6 +25,7 @@ import { createShipmentController } from './controllers/shipment.controller.js';
 import { createInventoryController } from './controllers/inventory.controller.js';
 import { createSupplierSettlementController } from './controllers/supplier-settlement.controller.js';
 import { createAdminController, createProductImageController } from './controllers/admin.controller.js';
+import { createAdminServiceAudienceController } from './controllers/admin-service-audience.controller.js';
 import { createAdminSettlementController } from './controllers/admin-settlement.controller.js';
 import { createPartnerController } from './controllers/partner.controller.js';
 import { createSellerController, createPartnerContractController } from './controllers/seller.controller.js';
@@ -84,6 +85,8 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
   // Admin domain
   router.use('/admin', createAdminController(dataSource));
   router.use('/admin', createAdminSettlementController(dataSource));
+  // WO-O4O-SERVICE-PHARMACY-AUDIENCE-POLICY-SETTINGS-V1: 약국 대상 서비스 정책 (admin)
+  router.use('/admin/service-audience-policies', createAdminServiceAudienceController(dataSource));
   // WO-O4O-ADMIN-OPERATOR-DASHBOARD-SEPARATION-V1
   router.use('/admin', createAdminDashboardController(dataSource));
 

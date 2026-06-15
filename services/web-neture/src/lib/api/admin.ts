@@ -950,3 +950,41 @@ export const operatorContactApi = {
     }
   },
 };
+
+// ==================== Service Audience Policy ====================
+// WO-O4O-SERVICE-PHARMACY-AUDIENCE-POLICY-SETTINGS-V1
+// admin.neture.co.kr 전용 — 서비스별 약국 대상 여부 정책. 후속 의약품 service gate 기준값.
+
+export interface ServiceAudiencePolicy {
+  serviceKey: string;
+  serviceName: string;
+  isPharmacyTargetService: boolean;
+  note: string | null;
+  updatedAt: string | null;
+  persisted: boolean;
+}
+
+export const serviceAudiencePolicyApi = {
+  async list(): Promise<ServiceAudiencePolicy[]> {
+    try {
+      const response = await api.get('/neture/admin/service-audience-policies');
+      return response.data?.data ?? [];
+    } catch (error: any) {
+      if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
+      console.warn('[Service Audience API] Failed to list:', error);
+      return [];
+    }
+  },
+
+  async update(
+    serviceKey: string,
+    payload: { isPharmacyTargetService?: boolean; note?: string | null },
+  ): Promise<{ success: boolean; error?: string; data?: ServiceAudiencePolicy }> {
+    try {
+      const response = await api.put(`/neture/admin/service-audience-policies/${serviceKey}`, payload);
+      return response.data;
+    } catch (error: any) {
+      return { success: false, error: error?.response?.data?.error?.code || 'UPDATE_FAILED' };
+    }
+  },
+};

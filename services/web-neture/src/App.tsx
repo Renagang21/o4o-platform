@@ -305,6 +305,8 @@ const EmailSettingsPage = lazy(() =>
 const ServiceLegalSettingsPage = lazy(() => import('./pages/admin/ServiceLegalSettingsPage'));
 // WO-O4O-CONTACT-NETURE-KPA-SETTINGS-ADAPTER-V1
 const ServiceContactSettingsPage = lazy(() => import('./pages/admin/ServiceContactSettingsPage'));
+// WO-O4O-SERVICE-PHARMACY-AUDIENCE-POLICY-SETTINGS-V1
+const ServiceAudiencePolicyPage = lazy(() => import('./pages/admin/ServiceAudiencePolicyPage'));
 
 // Admin Operators
 const OperatorsPage = lazy(() => import('./pages/admin/OperatorsPage'));
@@ -995,6 +997,8 @@ function App() {
               <Route path="/admin/settings/legal-terms" element={<ServiceLegalSettingsPage />} />
               {/* WO-O4O-CONTACT-NETURE-KPA-SETTINGS-ADAPTER-V1 */}
               <Route path="/admin/settings/contact" element={<ServiceContactSettingsPage />} />
+              {/* WO-O4O-SERVICE-PHARMACY-AUDIENCE-POLICY-SETTINGS-V1 */}
+              <Route path="/admin/settings/service-audience" element={<ServiceAudiencePolicyPage />} />
             </Route>
 
             {/* ================================================================
