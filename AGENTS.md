@@ -56,6 +56,8 @@
   - Which files were modified
   - Which areas were not touched
   - Validation results
+  - Existing dirty/untracked files preservation
+  - Staged file status
   - Known exclusions or follow-up work
   - Git status, commit, and push state when applicable
 - Stop and ask the user before proceeding in any of the following cases:
@@ -77,6 +79,8 @@
   - Never use `git commit -am`
   - Use path-specific staging only
   - Ask before staging, committing, or pushing unless the WO explicitly grants that permission
+  - Even when a WO grants commit or push permission, verify the staged file list first with `git diff --cached --name-only`
+  - Do not include existing dirty or untracked files in a commit unless the user explicitly assigns them to the current WO
 - Default behavior:
   - Continue through routine implementation steps without interrupting the user
   - Do not show full modified file contents after every edit
