@@ -66,10 +66,25 @@ status:                   legacy physical table name
 
 | 분류 | 예시 | 이유 |
 |------|------|-----|
-| 외부 입력 raw asset | 자료함 파일 (`store_library_items`), 가져온 snapshot 원본 (`o4o_asset_snapshots`) | 가공되지 않은 *원천 자료* — Material 의 *입력* 일 뿐 |
-| 결과물 | 발행된 POP, QR 코드, 블로그 글, 상품 상세 페이지 | 결과물(`store_execution_assets` 류)이며 Material 이 *출처* 가 됨 |
+| 외부 입력 raw asset | 자료함 파일 (`store_execution_assets`, `source_type=uploaded`/`library` — 구 `store_library_items` rename, §2.4 참조), 가져온 snapshot 원본 (`o4o_asset_snapshots`) | 가공되지 않은 *원천 자료* — Material 의 *입력* 일 뿐 |
+| 결과물 | 발행된 POP, QR 코드, 블로그 글, 상품 상세 페이지 | 결과물(`store_execution_assets` `source_type=generated` · `store_blog_posts` · `store_pops` · `store_qr_codes`)이며 Material 이 *출처* 가 됨 |
 | 커뮤니티 콘텐츠 | `forum_post`, `kpa_contents` | 별도 도메인 (커뮤니티 / Hub) — 매장 귀속이 아님 |
 | LMS Template-copy | `packages/interactive-content-core` 의 `StoreContent` (table `store_contents`) | LMS Template → Store 복제 흐름의 별도 도메인 — 본 canonical 과 무관 |
+
+### 2.4 `store_execution_assets` 의 이중 역할 (INPUT + OUTPUT)
+
+> 보강: `WO-O4O-STORE-PRODUCTION-MATERIAL-BOUNDARY-DOCUMENTATION-V1` (2026-06-15) — 코드 기준 정정.
+
+`store_execution_assets` 는 **단일 OUTPUT 전용 테이블이 아니다.** `source_type` 값에 따라 두 역할을 겸한다.
+
+| `source_type` | 역할 | 본 canonical 관점 |
+|---------------|------|------------------|
+| `uploaded` / `library` | 매장 자료함 자료 (file / external link) | **INPUT** (가공 전 원천) — Material 의 입력 |
+| `generated` | AI/제작 결과물(실행 자산) | **OUTPUT** (결과물) — Material 을 source 로 참조 |
+
+- 물리 테이블: 구 `store_library_items` 가 `store_execution_assets` 로 **rename** 됨 (migration `20260421010000-RenameStoreLibraryToExecutionAssets`). 본 문서 §2.3/§3 의 구 표기는 이에 맞춰 갱신됨.
+- 따라서 같은 테이블 row 라도 `source_type` 으로 INPUT/OUTPUT 이 갈리며, **row 중복이 아니다**(역할 구분). 조회 화면(`StoreLibraryResourcesPage`=library, `StoreProductionMaterialsPage`=generated)이 `source_type` 으로 필터한다.
+- **잔존 코드 점검(후속):** `StoreLibraryItem`(`@Entity('store_library_items')`, `connection.ts` 등록)이 rename 된 테이블명을 가리키는 stale entity 로 잔존 가능. 본 문서 범위(문서 only) 밖이며 코드 점검 후속 — `WO-O4O-STORE-LIBRARY-ITEM-ENTITY-RESIDUAL-CHECK-V1`(후보).
 
 ---
 
@@ -79,7 +94,7 @@ status:                   legacy physical table name
 [입력 — 가공되지 않은 원천]
  ├─ 가져온 콘텐츠 (snapshot)              ← o4o_asset_snapshots
  ├─ 가져온 강의 (lesson reference)
- ├─ 매장 자료 (file / external link)      ← store_library_items
+ ├─ 매장 자료 (file / external link)      ← store_execution_assets (source_type=uploaded/library)
  └─ 직접 입력 (direct content)
         │
         ▼
@@ -124,6 +139,23 @@ status:                   legacy physical table name
 > **logical 과 physical 을 혼동하지 말 것.**
 > 이 분리가 깨지면 (1) 운영자/신규 개발자가 KPA 전용 구조로 오해하거나,
 > (2) 단순 prefix 제거를 시도하다가 LMS 도메인의 별도 `store_contents` table 과 이름 충돌하는 사고가 발생한다.
+
+### 4.1 `kpa_store_contents` 주요 컬럼 의미
+
+> 보강: `WO-O4O-STORE-PRODUCTION-MATERIAL-BOUNDARY-DOCUMENTATION-V1` (2026-06-15) — 엔티티 `apps/api-server/src/routes/kpa/entities/kpa-store-content.entity.ts` 기준.
+
+| 컬럼 | 의미 |
+|------|------|
+| `snapshot_id` | 편집 대상 snapshot 의 id. **plain uuid — FK 아님**(cascade 없음). `source_type='snapshot_edit'` 일 때만 채워짐. **원본 `o4o_asset_snapshots` 로 write-back 하지 않는다.** |
+| `source_type` | `'snapshot_edit'`(허브/커뮤니티 snapshot 을 가져와 편집) / `'direct'`(매장 직접 작성, snapshot_id NULL) |
+| `content_json` | 편집 본문(jsonb). 렌더 시 store override(본 row) 우선 → 없으면 snapshot seed fallback(COALESCE). |
+| `source_metadata` | Operator Workspace A 수신 원천 메타(공급사/채널/일자 등, jsonb) |
+| `author_role` | 자료 귀속 주체(`operator`/`store` 등). Operator 수신 자료와 매장 자료 구분 |
+| `visibility_scope` | 가시성 범위(기본 `organization`) — 매장 단위 격리 |
+| `workspace_status` | Operator Workspace A 처리 단계(`draft` 등) |
+
+- 본 테이블 = **CORE(편집 레이어)**. snapshot(INPUT, 불변) 과 결과물(OUTPUT) 사이의 *가공 직후·결과물 직전* 단계.
+- `author_role`/`visibility_scope`/`workspace_status` 는 Operator Workspace A 의 "운영자 수신 원천 자료" 도 본 테이블이 겸해 담기 때문에 존재한다(`O4O-OPERATOR-NON-APPROVAL-UX-BASELINE-V1` Workspace A).
 
 ---
 
@@ -228,6 +260,7 @@ store_production_materials
 4. **logical canonical 과 physical table 을 혼동하지 말 것** — 코드 / 주석 / 신규 entity 작성 시 둘을 명확히 구분.
 5. **본 entity 와 LMS Template-copy `store_contents` 는 별개** — `packages/interactive-content-core` 의 `StoreContent` / `/api/v1/lms/store-contents` 는 본 canonical 과 무관한 도메인.
 6. **별도 KPA 전용 table 신설 금지** — 공통 Store Production Material capability 는 본 entity 가 담당. 새로운 매장 제작 자료 유형은 `content_json` jsonb 흡수 또는 `source_type` 확장으로 처리.
+7. **INPUT / CORE / OUTPUT 테이블 통합 금지** — `o4o_asset_snapshots`(INPUT·불변 복사) / `kpa_store_contents`(CORE·가변 편집) / `store_execution_assets`·`store_blog_posts`·`store_pops`·`store_qr_codes`(OUTPUT)는 역할이 다른 계층이다. 통합 시 불변성·원본-사본 단절·`author_role` 분리가 깨진다. snapshot 으로의 **FK/cascade 도입 금지**. snapshot↔편집 분리(중복처럼 보이는 구조)를 합치지 말 것. 근거: [`IR-O4O-STORE-PRODUCTION-MATERIAL-TABLE-CONSOLIDATION-AUDIT-V1`](../investigations/IR-O4O-STORE-PRODUCTION-MATERIAL-TABLE-CONSOLIDATION-AUDIT-V1.md) — 역방향 FK 0·부당 중복 0·통합 불제안.
 
 ---
 
@@ -257,9 +290,10 @@ store_production_materials
 | Execution Content Asset Policy | [`docs/archive/investigations/IR-O4O-STORE-EXECUTION-CONTENT-ASSET-POLICY-V1.md`](../archive/investigations/IR-O4O-STORE-EXECUTION-CONTENT-ASSET-POLICY-V1.md) |
 | Store Library canonical | [`docs/archive/investigations/IR-O4O-STORE-LIBRARY-CANONICAL-ASSET-FLOW-V1.md`](../archive/investigations/IR-O4O-STORE-LIBRARY-CANONICAL-ASSET-FLOW-V1.md) |
 | Community → Store copy flow | [`docs/archive/investigations/IR-O4O-COMMUNITY-TO-STORE-COPY-FLOW-AUDIT-V1.md`](../archive/investigations/IR-O4O-COMMUNITY-TO-STORE-COPY-FLOW-AUDIT-V1.md) |
+| 다중 테이블 경계 감사 | [`docs/investigations/IR-O4O-STORE-PRODUCTION-MATERIAL-TABLE-CONSOLIDATION-AUDIT-V1.md`](../investigations/IR-O4O-STORE-PRODUCTION-MATERIAL-TABLE-CONSOLIDATION-AUDIT-V1.md) |
 
 ---
 
-*Updated: 2026-05-09*
-*Version: 1.0*
+*Updated: 2026-06-15*
+*Version: 1.1 (boundary 문서 보강 — store_execution_assets 이중역할 §2.4 · kpa_store_contents 컬럼 §4.1 · 통합 금지 §8.7. WO-O4O-STORE-PRODUCTION-MATERIAL-BOUNDARY-DOCUMENTATION-V1)*
 *Status: Active (logical canonical only)*
