@@ -20,6 +20,8 @@ import {
   SupplierRegulatedCategoryService,
   resolveRegulatedCategoryFromProduct,
 } from './supplier-regulated-category.service.js';
+// WO-O4O-DRUG-SERVICE-CONNECTION-GATE-V1: 약국 대상 서비스 정책(DB) 참조
+import { ServiceAudienceService } from './service-audience.service.js';
 
 /**
  * WO-NETURE-DISTRIBUTION-MODEL-SPLIT-PUBLIC-AND-SERVICE-SUPPLY-V1
@@ -58,13 +60,12 @@ function resolveRegulatoryType(raw?: string): RegulatoryType | null {
  *
  * 규제 상품(의약품/건강기능식품/의약외품 등)은 약국 전용 서비스에만 연결될 수 있다.
  *
- * ⚠️ 임시 fallback 상수.
- *  - admin 운영자가 약국 전용 서비스를 지정하는 설정 소스가 아직 없음
- *    (참고: services/web-neture/.../appsCatalog.ts:500의 'yaksa' serviceGroup 결정 보류 상태)
- *  - 추후 admin 설정 소스가 도입되면 이 상수 대신 그것을 우선 사용해야 함 (별도 후속 WO)
- *  - 본 WO에서는 카테고리 정의 / 규제 판정 기준 자체는 변경하지 않는다.
+ * 약국 대상 서비스 판정은 DB 정책(service_audience_policies)을 SSOT 로 사용한다.
+ *  - WO-O4O-SERVICE-PHARMACY-AUDIENCE-POLICY-SETTINGS-V1 에서 admin 설정 소스 도입.
+ *  - WO-O4O-DRUG-SERVICE-CONNECTION-GATE-V1 에서 본 함수가 ServiceAudienceService 를 참조하도록 전환
+ *    (기존 하드코딩 ['glycopharm','kpa-society'] 는 ServiceAudienceService 의 fallback 으로 이전됨).
+ *  - 카테고리 정의 / 규제 판정 기준(isRegulated) 자체는 변경하지 않는다.
  */
-const PHARMACY_ALLOWED_SERVICE_KEYS: readonly string[] = ['glycopharm', 'kpa-society'];
 
 /**
  * WO-O4O-REGULATED-PRODUCT-GATE-CONSOLIDATION-V1
@@ -103,12 +104,13 @@ function assertRegulatedPermit(args: {
  * - service_keys에 비-약국 서비스 1개라도 포함 → 거부
  */
 function assertPharmacyOnlyServiceKeys(
+  isPharmacyAudienceService: (serviceKey: string) => boolean,
   isRegulated: boolean,
   serviceKeys: string[] | null | undefined,
 ): OfferErrorCode | null {
   if (!isRegulated) return null;
   if (!serviceKeys || serviceKeys.length === 0) return null;
-  const violating = serviceKeys.filter((k) => !PHARMACY_ALLOWED_SERVICE_KEYS.includes(k));
+  const violating = serviceKeys.filter((k) => !isPharmacyAudienceService(k));
   if (violating.length > 0) {
     return OfferErrorCode.REGULATED_PRODUCT_NON_PHARMACY_SERVICE;
   }
@@ -426,10 +428,11 @@ export class NetureOfferService {
       id: string;
       service_keys: string[];
       regulatory_type: string | null;
+      is_regulated: boolean | null;
       category_name: string | null;
       category_slug: string | null;
     }> = await AppDataSource.query(
-      `SELECT o.id, o.service_keys, m.regulatory_type, c.name AS category_name, c.slug AS category_slug
+      `SELECT o.id, o.service_keys, m.regulatory_type, c.is_regulated, c.name AS category_name, c.slug AS category_slug
        FROM supplier_product_offers o
        JOIN product_masters m ON m.id = o.master_id
        LEFT JOIN product_categories c ON c.id = m.category_id
@@ -442,6 +445,10 @@ export class NetureOfferService {
     // 승인요청 시점에 공급자 품목군이 approved 인지 확인 (생성/draft 는 허용, 승인요청만 gate).
     const regulatedCategoryService = new SupplierRegulatedCategoryService(AppDataSource);
     const categoryStatusMap = await regulatedCategoryService.getStatusMap(supplierId);
+
+    // WO-O4O-DRUG-SERVICE-CONNECTION-GATE-V1:
+    // 규제 상품은 약국 대상 서비스에만 연결 가능 — 방어적 재확인(생성 시 차단되나 수동 변경 대비).
+    const isPharmacyAudience = await new ServiceAudienceService(AppDataSource).getPharmacyAudienceResolver();
 
     for (const offerId of offerIds) {
       const ownedRow = ownedMap.get(offerId);
@@ -469,6 +476,12 @@ export class NetureOfferService {
         if (eligibleKeys.length === 0) {
           // offer의 service_keys가 비어 있거나, 모두 정책상 승인 대상 아님 (예: neture/glucoseview only)
           result.skipped.push({ id: offerId, reason: 'NO_ELIGIBLE_SERVICE_KEYS' });
+          continue;
+        }
+
+        // 규제 상품(의약품 등) → 약국 대상 서비스에만 연결 가능
+        if (ownedRow.is_regulated && eligibleKeys.some((k) => !isPharmacyAudience(k))) {
+          result.skipped.push({ id: offerId, reason: 'DRUG_SERVICE_NOT_PHARMACY_AUDIENCE' });
           continue;
         }
 
@@ -812,8 +825,10 @@ export class NetureOfferService {
       // WO-NETURE-DISTRIBUTION-MODEL-SPLIT-PUBLIC-AND-SERVICE-SUPPLY-V1: 두 축 분리
       const filteredServiceKeys = (data.serviceKeys || []).filter((k) => k !== 'neture' && k !== 'glucoseview');
 
-      // WO-O4O-REGULATED-PRODUCT-GATE-CONSOLIDATION-V1: 규제 상품은 약국 전용 서비스에만 연결 가능
-      const pharmacyServiceError = assertPharmacyOnlyServiceKeys(isRegulated, filteredServiceKeys);
+      // WO-O4O-REGULATED-PRODUCT-GATE-CONSOLIDATION-V1 / WO-O4O-DRUG-SERVICE-CONNECTION-GATE-V1:
+      // 규제 상품은 약국 대상 서비스(service_audience_policies)에만 연결 가능
+      const isPharmacyAudience = await new ServiceAudienceService(AppDataSource).getPharmacyAudienceResolver();
+      const pharmacyServiceError = assertPharmacyOnlyServiceKeys(isPharmacyAudience, isRegulated, filteredServiceKeys);
       if (pharmacyServiceError) {
         return {
           success: false,

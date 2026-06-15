@@ -106,4 +106,16 @@ export class ServiceAudienceService {
     if (row) return row.isPharmacyTargetService;
     return DEFAULT_PHARMACY_SERVICE_KEYS.includes(serviceKey);
   }
+
+  /**
+   * 전 정책을 1회 조회해 동기 resolver 반환 (여러 serviceKey/offer 일괄 gate 용).
+   * row 부재 serviceKey 는 레거시 기본값으로 fallback.
+   * WO-O4O-DRUG-SERVICE-CONNECTION-GATE-V1
+   */
+  async getPharmacyAudienceResolver(): Promise<(serviceKey: string) => boolean> {
+    const rows = await this.repo.find();
+    const map = new Map(rows.map((r) => [r.serviceKey, r.isPharmacyTargetService]));
+    return (serviceKey: string) =>
+      map.has(serviceKey) ? !!map.get(serviceKey) : DEFAULT_PHARMACY_SERVICE_KEYS.includes(serviceKey);
+  }
 }
