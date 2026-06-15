@@ -22,6 +22,7 @@ import {
   AlertCircle,
   RefreshCw,
   X,
+  Edit3,
 } from 'lucide-react';
 import { API_BASE_URL } from '@/lib/apiClient';
 import { getAccessToken } from '@o4o/auth-client';
@@ -129,6 +130,8 @@ export default function StoreQrPage() {
   });
   const [form, setForm] = useState<CreateQrForm>(initFormFromState);
   const [creating, setCreating] = useState(false);
+  // WO-O4O-QR-EDITOR-GP-KCOS-PARITY-V1: 편집 모드(null=생성)
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const loadItems = useCallback(async () => {
     setLoading(true);
@@ -146,7 +149,21 @@ export default function StoreQrPage() {
   useEffect(() => { loadItems(); }, [loadItems]);
 
   const openCreate = () => {
+    setEditingId(null);
     setForm({ title: '', description: '', landingType: 'link', landingTargetId: '', slug: '' });
+    setShowCreate(true);
+  };
+
+  // WO-O4O-QR-EDITOR-GP-KCOS-PARITY-V1: 기존 QR 편집
+  const openEdit = (qr: QrItem) => {
+    setEditingId(qr.id);
+    setForm({
+      title: qr.title,
+      description: qr.description ?? '',
+      landingType: qr.landingType,
+      landingTargetId: qr.landingTargetId ?? '',
+      slug: qr.slug,
+    });
     setShowCreate(true);
   };
 
@@ -166,21 +183,26 @@ export default function StoreQrPage() {
 
     setCreating(true);
     try {
-      await qrFetch('/pharmacy/qr', {
-        method: 'POST',
-        body: JSON.stringify({
-          title: form.title.trim(),
-          description: form.description.trim() || undefined,
-          landingType: form.landingType,
-          landingTargetId: form.landingTargetId.trim() || undefined,
-          slug,
-        }),
+      const body = JSON.stringify({
+        title: form.title.trim(),
+        description: form.description.trim() || undefined,
+        landingType: form.landingType,
+        landingTargetId: form.landingTargetId.trim() || undefined,
+        slug,
       });
-      toast.success('QR 코드가 생성되었습니다');
+      // WO-O4O-QR-EDITOR-GP-KCOS-PARITY-V1: editingId 있으면 PUT(수정), 없으면 POST(생성)
+      if (editingId) {
+        await qrFetch(`/pharmacy/qr/${editingId}`, { method: 'PUT', body });
+        toast.success('QR 코드가 수정되었습니다');
+      } else {
+        await qrFetch('/pharmacy/qr', { method: 'POST', body });
+        toast.success('QR 코드가 생성되었습니다');
+      }
       setShowCreate(false);
+      setEditingId(null);
       loadItems();
     } catch (err: any) {
-      toast.error(err?.message || 'QR 생성에 실패했습니다');
+      toast.error(err?.message || (editingId ? 'QR 수정에 실패했습니다' : 'QR 생성에 실패했습니다'));
     } finally {
       setCreating(false);
     }
@@ -321,6 +343,10 @@ export default function StoreQrPage() {
                   <button onClick={() => handleDownload(qr)} disabled={downloadingId === qr.id} title="QR 이미지 다운로드" style={iconBtnStyle}>
                     {downloadingId === qr.id ? <Loader2 size={15} className="animate-spin" /> : <Download size={15} />}
                   </button>
+                  {/* WO-O4O-QR-EDITOR-GP-KCOS-PARITY-V1: 편집 */}
+                  <button onClick={() => openEdit(qr)} title="QR 수정" style={iconBtnStyle}>
+                    <Edit3 size={15} />
+                  </button>
                   <button onClick={() => handleDelete(qr)} disabled={deletingId === qr.id} title="QR 삭제" style={{ ...iconBtnStyle, color: '#ef4444' }}>
                     {deletingId === qr.id ? <Loader2 size={15} className="animate-spin" /> : <Trash2 size={15} />}
                   </button>
@@ -336,7 +362,7 @@ export default function StoreQrPage() {
           <div style={modalStyle}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
               <div>
-                <h2 style={{ fontSize: 17, fontWeight: 700, color: '#1e293b', margin: 0 }}>새 QR 코드 만들기</h2>
+                <h2 style={{ fontSize: 17, fontWeight: 700, color: '#1e293b', margin: 0 }}>{editingId ? 'QR 코드 수정' : '새 QR 코드 만들기'}</h2>
                 {selectedTemplate && (
                   <p style={{ fontSize: 12, color: '#db2777', margin: '2px 0 0' }}>{selectedTemplate.name}</p>
                 )}
@@ -441,8 +467,8 @@ export default function StoreQrPage() {
                   disabled={creating || !form.title.trim()}
                   style={{ ...createBtnStyle, opacity: creating || !form.title.trim() ? 0.6 : 1, cursor: creating || !form.title.trim() ? 'not-allowed' : 'pointer' }}
                 >
-                  {creating ? <Loader2 size={13} className="animate-spin" /> : <Plus size={13} />}
-                  {creating ? '생성 중...' : 'QR 생성'}
+                  {creating ? <Loader2 size={13} className="animate-spin" /> : editingId ? <Edit3 size={13} /> : <Plus size={13} />}
+                  {creating ? '저장 중...' : editingId ? 'QR 수정' : 'QR 생성'}
                 </button>
               </div>
             </form>
