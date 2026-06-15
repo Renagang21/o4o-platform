@@ -76,6 +76,8 @@ export interface ContentHubItemContext {
   copyLabel: string;
   copiedLabel: string;
   copyingLabel: string;
+  /** 이미 복사한 항목 재복사 안내(툴팁) — '복사 완료'는 차단이 아닌 이력 표시 */
+  recopyLabel: string;
   afterCopyAction?: { label: string; href: string };
 }
 
@@ -107,6 +109,8 @@ export interface ContentHubConfig {
   copyLabel?: string;
   copiedLabel?: string;
   copyingLabel?: string;
+  /** 재복사 안내(툴팁, 기본 '다시 복사') — WO-O4O-STORE-LIBRARY-DUPLICATE-COPY-UX-POLICY-V1: 중복 복사 허용, '복사 완료'는 이력 표시일 뿐 차단 아님 */
+  recopyLabel?: string;
   /** 복사 직후 action 버튼 (e.g. "작업하러 가기") */
   afterCopyAction?: { label: string; href: string };
 
@@ -246,8 +250,9 @@ export function ContentHubTemplate({ config }: { config: ContentHubConfig }) {
     copyLabel: config.copyLabel ?? '내 매장에 복사',
     copiedLabel: config.copiedLabel ?? '복사 완료',
     copyingLabel: config.copyingLabel ?? '복사 중...',
+    recopyLabel: config.recopyLabel ?? '다시 복사',
     afterCopyAction: config.afterCopyAction,
-  }), [copiedIds, copyingId, justCopiedId, handleCopy, config.copyLabel, config.copiedLabel, config.copyingLabel, config.afterCopyAction]);
+  }), [copiedIds, copyingId, justCopiedId, handleCopy, config.copyLabel, config.copiedLabel, config.copyingLabel, config.recopyLabel, config.afterCopyAction]);
 
   return (
     <div style={st.container}>
@@ -478,27 +483,29 @@ function getContentHubColumns({
         const alreadyCopied = ctx.copiedIds.has(item.id);
         const wasJustCopied = ctx.justCopiedId === item.id;
 
-        if (alreadyCopied) {
-          return wasJustCopied && ctx.afterCopyAction ? (
+        // 복사 직후 한정: "작업하러 가기" 안내
+        if (wasJustCopied && ctx.afterCopyAction) {
+          return (
             <Link to={ctx.afterCopyAction.href} style={st.afterCopyBtn}>
               {ctx.afterCopyAction.label}
             </Link>
-          ) : (
-            <span style={st.copiedLabel}>{ctx.copiedLabel}</span>
           );
         }
 
+        // WO-O4O-STORE-LIBRARY-DUPLICATE-COPY-UX-POLICY-V1:
+        // 이미 복사한 항목도 재복사 가능(영구 차단 금지). '복사 완료'는 이력 표시이며 클릭 시 새 사본 생성.
         return (
           <button
             onClick={() => ctx.onCopy(item)}
             disabled={isCopying}
+            title={alreadyCopied ? ctx.recopyLabel : undefined}
             style={{
               ...st.copyBtn,
               opacity: isCopying ? 0.6 : 1,
               cursor: isCopying ? 'not-allowed' : 'pointer',
             }}
           >
-            {isCopying ? ctx.copyingLabel : ctx.copyLabel}
+            {isCopying ? ctx.copyingLabel : alreadyCopied ? ctx.copiedLabel : ctx.copyLabel}
           </button>
         );
       },

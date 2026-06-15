@@ -76,15 +76,14 @@ function ContentHubCard({
         <div className="flex items-center justify-between mt-2">
           <p className="text-[10px] text-slate-400">{item.date}</p>
           {ctx.onCopy && (
+            // WO-O4O-STORE-LIBRARY-DUPLICATE-COPY-UX-POLICY-V1:
+            // 이미 복사한 항목도 재복사 가능(영구 차단 금지). '복사 완료'는 이력 표시이며 클릭 시 새 사본 생성.
             <button
               onClick={(e) => { e.stopPropagation(); ctx.onCopy!(item); }}
-              disabled={alreadyCopied || isCopying}
+              disabled={isCopying}
+              title={alreadyCopied ? ctx.recopyLabel : undefined}
               className={`inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded transition-colors ${
-                alreadyCopied
-                  ? 'bg-slate-100 text-slate-400 cursor-default'
-                  : isCopying
-                    ? 'bg-slate-100 text-slate-400 cursor-wait'
-                    : a.copyIdle
+                isCopying ? 'bg-slate-100 text-slate-400 cursor-wait' : a.copyIdle
               }`}
             >
               {alreadyCopied ? (

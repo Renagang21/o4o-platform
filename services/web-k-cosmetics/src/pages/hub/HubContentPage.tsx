@@ -104,7 +104,8 @@ function useKCosContentHubConfig(userId?: string): ContentHubConfig {
     infoText: '복사된 콘텐츠는 ',
     infoLinks: [{ label: '내 매장 > 자산 관리', href: '/store/library/contents' }],
     // WO-O4O-STORE-CONTENT-TERMINOLOGY-AND-GUIDE-COPY-V1: 가져오기=복사·원본 단절 안내
-    infoTextAfter: '에 별도 사본으로 저장됩니다. 원본이 수정·삭제되어도 내 매장 사본은 영향받지 않습니다.',
+    // WO-O4O-STORE-LIBRARY-DUPLICATE-COPY-UX-POLICY-V1: 재복사 허용 안내
+    infoTextAfter: '에 별도 사본으로 저장됩니다. 원본이 수정·삭제되어도 내 매장 사본은 영향받지 않습니다. 다시 복사하면 새 사본으로 저장되며, 필요 없는 사본은 내 매장에서 삭제할 수 있습니다.',
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }), [userId]);
 }
