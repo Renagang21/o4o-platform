@@ -39,6 +39,8 @@ import { toast } from '@o4o/error-handling';
 // WO-O4O-POP-SAVE-AS-CONTENT-V1: 제작 결과를 재편집 가능한 POP 콘텐츠(store_pops)로 저장
 import { createStaffPopPost } from '@/api/popStaff';
 import { getStoreSlug } from '@/api/storeHub';
+// WO-O4O-POP-QR-SELECTOR-GP-KCOS-PARITY-V1: POP 에 QR 연결
+import { getStoreQrCodes } from '@/api/storeProductionSources';
 import type { ProductionTemplate } from '@o4o/types/production-template';
 import { findTemplate } from '@/config/productionTemplates';
 // WO-O4O-AI-EDITING-MODAL-ADOPTION-ALIGNMENT-V1: POP AI 진입을 KPA 와 동일한 공통 모달로 정렬
@@ -144,6 +146,15 @@ export default function StorePopPage() {
   const [layout, setLayout] = useState<'A4' | 'A5'>('A4');
   const [templateId, setTemplateId] = useState('pop-modern');
 
+  // WO-O4O-POP-QR-SELECTOR-GP-KCOS-PARITY-V1: QR 선택(POP PDF 에 삽입)
+  const [qrCodes, setQrCodes] = useState<Array<{ id: string; title: string; landingType?: string; slug?: string }>>([]);
+  const [selectedQrId, setSelectedQrId] = useState('');
+  useEffect(() => {
+    getStoreQrCodes({ limit: 100 })
+      .then((items) => setQrCodes(Array.isArray(items) ? items : []))
+      .catch(() => setQrCodes([]));
+  }, []);
+
   // Generate
   const [generating, setGenerating] = useState(false);
 
@@ -234,6 +245,7 @@ export default function StorePopPage() {
           layout,
           templateId,
           ...(popAiContent ? { aiContent: popAiContent } : {}),
+          ...(selectedQrId ? { qrId: selectedQrId } : {}),
         }),
       });
 
@@ -484,6 +496,30 @@ export default function StorePopPage() {
           </div>
         </div>
       </section>
+
+      {/* WO-O4O-POP-QR-SELECTOR-GP-KCOS-PARITY-V1: QR 연결(선택) */}
+      {qrCodes.length > 0 && (
+        <section style={{ marginTop: 16, background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+            <span style={{ fontWeight: 600, color: '#1e293b' }}>QR 연결 (선택)</span>
+          </div>
+          <p style={{ fontSize: 13, color: '#64748b', marginBottom: 8 }}>
+            POP 에 삽입할 내 QR 코드를 선택하면 생성된 POP PDF 에 함께 표시됩니다.
+          </p>
+          <select
+            value={selectedQrId}
+            onChange={(e) => setSelectedQrId(e.target.value)}
+            style={{ width: '100%', maxWidth: 480, padding: '8px 12px', fontSize: 14, border: '1px solid #e2e8f0', borderRadius: 8, background: '#fff' }}
+          >
+            <option value="">QR 연결 안 함</option>
+            {qrCodes.map((qr) => (
+              <option key={qr.id} value={qr.id}>
+                {qr.title}{qr.landingType ? ` (${qr.landingType})` : ''}
+              </option>
+            ))}
+          </select>
+        </section>
+      )}
 
       {/* Generate Button */}
       <div style={{ marginTop: 24, display: 'flex', justifyContent: 'flex-end' }}>
