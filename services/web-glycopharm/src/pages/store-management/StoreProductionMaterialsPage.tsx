@@ -26,6 +26,8 @@ import {
 import { getStoreExecutionAssets } from '@/api/storeExecutionAssets';
 import { fetchStaffBlogPosts } from '@/api/blogStaff';
 import { getStoreSlug } from '@/api/storeHub';
+// WO-O4O-STORE-PRODUCTION-MATERIAL-GP-KCOS-SOURCE-COMPLETION-V1: QR/direct 소스 연결
+import { getStoreQrCodes, getStoreDirectContents } from '@/api/storeProductionSources';
 import { api } from '@/lib/apiClient';
 
 // 제작 자료 기반 교차 진입(기존 제작 화면 route 재사용 — 신규 API/DB 없음)
@@ -59,15 +61,19 @@ export default function StoreProductionMaterialsPage() {
     try {
       // multi-source 병합. 각 소스 독립 .catch→null(한쪽 실패해도 나머지 표시). 블로그는 slug 필요.
       const slug = await getStoreSlug().catch(() => null);
-      const [assetsRes, blogRes] = await Promise.all([
+      const [assetsRes, blogRes, qrItems, directItems] = await Promise.all([
         getStoreExecutionAssets({ limit: 100 }).catch(() => null),
         slug ? fetchStaffBlogPosts(slug, { limit: 50 }).catch(() => null) : Promise.resolve(null),
+        getStoreQrCodes({ limit: 50 }).catch(() => []),
+        getStoreDirectContents().catch(() => []),
       ]);
 
-      // multi-source 정규화/병합 공통 helper (execution + blog). QR/direct 는 GP ready client 부재 → 미주입.
+      // multi-source 정규화/병합 공통 helper (execution + blog + qr + direct). 각 소스 독립 .catch.
       const merged = mergeProductionMaterials({
         executionAssets: (assetsRes?.data?.items ?? []) as any[],
         blogPosts: (blogRes?.data ?? []) as any[],
+        qrCodes: qrItems,
+        directContents: directItems,
       });
       setItems(merged);
     } catch (e: any) {
