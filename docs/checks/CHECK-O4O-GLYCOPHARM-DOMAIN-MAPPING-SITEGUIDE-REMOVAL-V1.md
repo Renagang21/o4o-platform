@@ -32,7 +32,16 @@ path-matcher-siteguide-web  <= ['siteguide.co.kr','www.siteguide.co.kr'] → bac
 ```
 
 - **`www.glycopharm.co.kr` 명시 규칙 부재** → 와일드카드 `['*']` 로 fallback → `backend-siteguide-web`.
-- 부수 위험: `www.kpa-society.co.kr`, `www.glucoseview.co.kr` 등 **명시되지 않은 모든 www/서브도메인이 동일하게 SiteGuide 로** 떨어진다(같은 `*` 규칙).
+- **확정 영향(실측, 2026-06-15)**: catch-all 로 떨어지는 **3개 www 도메인이 전부 SiteGuide 서빙 중**:
+
+| 도메인 | 현재 title | 올바른 백엔드 |
+|--------|-----------|--------------|
+| `www.glycopharm.co.kr` | SiteGuide ❌ | backend-glycopharm-web |
+| `www.kpa-society.co.kr` | SiteGuide ❌ | backend-kpa-society-web |
+| `www.glucoseview.co.kr` | SiteGuide ❌ | backend-glucoseview-web-advanced |
+
+> 명시 규칙 있는 `www.neture.co.kr`·`www.k-cosmetics.site` 는 정상. 즉 **www 누락 3건 + catch-all 대상이 SiteGuide** 인 것이 복합 원인.
+> `backend-siteguide-core` 는 url-map 의 어떤 path rule 에서도 참조되지 않음(완전 orphan).
 
 ## 3. siteguide 잔존 인프라 (코드 제거됐으나 GCP 에 남음)
 
