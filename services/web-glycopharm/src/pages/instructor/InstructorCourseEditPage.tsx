@@ -28,7 +28,15 @@ import {
   type InstructorCourseDetail,
   type InstructorLesson,
   type LessonType,
+  type CourseReusablePolicy,
 } from '@/api/lms';
+
+// 공통 shell 의 CourseFormReusablePolicy(Phase 2 값 'organization' 포함)를 GlycoPharm domain
+// (CourseReusablePolicy: 'restricted' | 'platform')로 정합한다.
+// - GP 는 'organization'(조직 범위 재사용) tier 를 미지원하며, 공통 shell 의 폼 UI 도 restricted/platform 만 노출한다.
+// - 만에 하나 'organization' 이 들어와도 재사용 범위를 넓히지 않도록 보수적으로 'restricted'(가장 좁은 재사용)로 대응한다.
+const toGpReusablePolicy = (p: InstructorCourseFormValues['reusablePolicy']): CourseReusablePolicy =>
+  p === 'platform' ? 'platform' : 'restricted';
 
 const LESSON_TYPE_LABEL: Record<LessonType, string> = {
   video: '동영상', article: '문서', quiz: '퀴즈', assignment: '과제',
@@ -372,7 +380,7 @@ export default function InstructorCourseEditPage() {
       description: values.description,
       tags: values.tags.length > 0 ? values.tags : [],
       visibility: values.visibility,
-      reusablePolicy: values.reusablePolicy,
+      reusablePolicy: toGpReusablePolicy(values.reusablePolicy),
       requiresApproval: values.requiresApproval,
     });
   };
