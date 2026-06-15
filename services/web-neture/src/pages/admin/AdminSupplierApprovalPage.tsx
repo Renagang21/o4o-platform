@@ -22,6 +22,13 @@ const statusColors: Record<string, string> = {
   INACTIVE: 'bg-slate-100 text-slate-500',
 };
 
+// 통신판매업 신고 상태 — 운영자/admin 확인 항목 (ACTIVE 전환 차단 조건 아님)
+const mailOrderStatusLabels: Record<string, string> = {
+  not_applicable: '해당 없음',
+  reported: '신고 완료',
+  pending: '확인 필요',
+};
+
 function getMissingOnboardingItems(supplier: AdminSupplier): string[] {
   const missing: string[] = [];
   if (!supplier.businessRegistrationDocumentId) missing.push('사업자등록증');
@@ -30,6 +37,7 @@ function getMissingOnboardingItems(supplier: AdminSupplier): string[] {
   if (!supplier.settlementAccountNumberMasked) missing.push('계좌번호');
   if (!supplier.settlementAccountHolder) missing.push('예금주');
   if (!supplier.settlementBankbookDocumentId) missing.push('통장 사본');
+  // 통신판매업 신고 정보는 의도적으로 미포함 — 운영자/admin 확인 항목일 뿐 활성화 차단 조건 아님.
   return missing;
 }
 
@@ -87,7 +95,7 @@ export default function AdminSupplierApprovalPage() {
 
   const handleDownloadDocument = async (
     supplierId: string,
-    documentType: 'business_registration' | 'bank_statement',
+    documentType: 'business_registration' | 'bank_statement' | 'mail_order_report',
   ) => {
     const blob = await adminSupplierApi.downloadDocument(supplierId, documentType);
     if (!blob) return;
@@ -213,6 +221,11 @@ export default function AdminSupplierApprovalPage() {
                           ? `${s.settlementBankName} / ${s.settlementAccountHolder} / ${s.settlementAccountNumberMasked || '-'}`
                           : '정산 정보 없음'}
                       </div>
+                      <div className="text-xs text-slate-500">
+                        통신판매업: {s.mailOrderSalesStatus
+                          ? `${mailOrderStatusLabels[s.mailOrderSalesStatus] || s.mailOrderSalesStatus}${s.mailOrderSalesRegistrationNumber ? ` (${s.mailOrderSalesRegistrationNumber})` : ''}`
+                          : '미입력'}
+                      </div>
                       <div className="flex gap-2 text-xs">
                         {s.businessRegistrationDocumentId && (
                           <button
@@ -230,6 +243,15 @@ export default function AdminSupplierApprovalPage() {
                             className="text-emerald-700 hover:text-emerald-900"
                           >
                             통장 사본
+                          </button>
+                        )}
+                        {s.mailOrderSalesDocumentId && (
+                          <button
+                            type="button"
+                            onClick={() => handleDownloadDocument(s.id, 'mail_order_report')}
+                            className="text-emerald-700 hover:text-emerald-900"
+                          >
+                            통신판매업 신고증
                           </button>
                         )}
                       </div>

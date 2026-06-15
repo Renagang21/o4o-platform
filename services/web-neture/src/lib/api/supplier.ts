@@ -374,9 +374,13 @@ export interface SupplierProfile {
   shippingMountain?: string | null;
 }
 
+export type SupplierOnboardingDocumentType = 'business_registration' | 'bank_statement' | 'mail_order_report';
+
+export type MailOrderSalesStatus = 'not_applicable' | 'reported' | 'pending';
+
 export interface SupplierOnboardingDocument {
   id: string;
-  documentType: 'business_registration' | 'bank_statement';
+  documentType: SupplierOnboardingDocumentType;
   fileName: string;
   fileSize: number | null;
   mimeType: string | null;
@@ -394,8 +398,11 @@ export interface SupplierOnboarding {
   settlementAccountHolder: string | null;
   settlementContactName: string | null;
   settlementContactEmail: string | null;
+  mailOrderSalesStatus: MailOrderSalesStatus | null;
+  mailOrderSalesRegistrationNumber: string | null;
   businessRegistrationDocument: SupplierOnboardingDocument | null;
   settlementBankbookDocument: SupplierOnboardingDocument | null;
+  mailOrderSalesDocument: SupplierOnboardingDocument | null;
 }
 
 // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
@@ -1067,6 +1074,8 @@ export const supplierOnboardingApi = {
     settlementAccountHolder?: string;
     settlementContactName?: string;
     settlementContactEmail?: string;
+    mailOrderSalesStatus?: string;
+    mailOrderSalesRegistrationNumber?: string;
   }): Promise<{ success: boolean; error?: string; data?: SupplierOnboarding }> {
     try {
       const response = await api.patch('/neture/supplier/onboarding', data);
@@ -1077,7 +1086,7 @@ export const supplierOnboardingApi = {
   },
 
   async uploadDocument(
-    documentType: 'business_registration' | 'bank_statement',
+    documentType: SupplierOnboardingDocumentType,
     file: File,
   ): Promise<{ success: boolean; error?: string; data?: SupplierOnboardingDocument }> {
     try {
@@ -1092,7 +1101,7 @@ export const supplierOnboardingApi = {
     }
   },
 
-  async downloadDocument(documentType: 'business_registration' | 'bank_statement'): Promise<Blob | null> {
+  async downloadDocument(documentType: SupplierOnboardingDocumentType): Promise<Blob | null> {
     try {
       const response = await api.get(`/neture/supplier/documents/${documentType}/download`, {
         responseType: 'blob',

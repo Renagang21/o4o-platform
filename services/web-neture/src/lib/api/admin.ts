@@ -99,6 +99,9 @@ export interface AdminSupplier {
   settlementBankbookDocumentId?: string | null;
   settlementContactName?: string | null;
   settlementContactEmail?: string | null;
+  mailOrderSalesStatus?: string | null;
+  mailOrderSalesRegistrationNumber?: string | null;
+  mailOrderSalesDocumentId?: string | null;
   createdAt: string;
   // WO-O4O-NETURE-OPERATOR-MEMBER-SUPPLIER-STATUS-VISIBILITY-V1:
   // backend(getAllSuppliers)는 userId 를 내려주나 타입에 누락돼 있던 것을 명시 (회원 목록 매핑용).
@@ -150,7 +153,7 @@ export const adminSupplierApi = {
     } catch { return false; }
   },
 
-  async downloadDocument(id: string, documentType: 'business_registration' | 'bank_statement'): Promise<Blob | null> {
+  async downloadDocument(id: string, documentType: 'business_registration' | 'bank_statement' | 'mail_order_report'): Promise<Blob | null> {
     try {
       const response = await api.get(`/neture/admin/suppliers/${id}/documents/${documentType}/download`, {
         responseType: 'blob',
@@ -206,7 +209,7 @@ export const operatorSupplierApi = {
     } catch { return false; }
   },
 
-  async downloadDocument(id: string, documentType: 'business_registration' | 'bank_statement'): Promise<Blob | null> {
+  async downloadDocument(id: string, documentType: 'business_registration' | 'bank_statement' | 'mail_order_report'): Promise<Blob | null> {
     try {
       const response = await api.get(`/neture/operator/suppliers/${id}/documents/${documentType}/download`, {
         responseType: 'blob',

@@ -124,6 +124,18 @@ export class NetureSupplier {
   @Column({ name: 'settlement_contact_email', type: 'varchar', length: 255, nullable: true })
   settlementContactEmail: string | null;
 
+  // === 통신판매업 신고 정보 (WO-O4O-SUPPLIER-MAIL-ORDER-REPORTING-FIELDS-V1) ===
+  // 운영자 확인 항목 — ACTIVE 전환 필수 차단 조건 아님. O4O 는 신고 유효성을 보증하지 않음.
+
+  @Column({ name: 'mail_order_sales_status', type: 'varchar', length: 20, nullable: true })
+  mailOrderSalesStatus: string | null;
+
+  @Column({ name: 'mail_order_sales_registration_number', type: 'varchar', length: 100, nullable: true })
+  mailOrderSalesRegistrationNumber: string | null;
+
+  @Column({ name: 'mail_order_sales_document_id', type: 'uuid', nullable: true })
+  mailOrderSalesDocumentId: string | null;
+
   @Column({ name: 'business_item', type: 'varchar', length: 100, nullable: true })
   businessItem: string | null;
 

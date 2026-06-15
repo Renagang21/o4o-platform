@@ -6,7 +6,10 @@ import { KycDocument } from '../../../entities/KycDocument.js';
 import { NetureSupplier } from '../entities/index.js';
 import logger from '../../../utils/logger.js';
 
-export type SupplierOnboardingDocumentType = 'business_registration' | 'bank_statement';
+export type SupplierOnboardingDocumentType = 'business_registration' | 'bank_statement' | 'mail_order_report';
+
+export const MAIL_ORDER_SALES_STATUSES = ['not_applicable', 'reported', 'pending'] as const;
+export type MailOrderSalesStatus = typeof MAIL_ORDER_SALES_STATUSES[number];
 
 export interface SupplierOnboardingInput {
   taxInvoiceEmail?: string | null;
@@ -15,6 +18,12 @@ export interface SupplierOnboardingInput {
   settlementAccountHolder?: string | null;
   settlementContactName?: string | null;
   settlementContactEmail?: string | null;
+  mailOrderSalesStatus?: string | null;
+  mailOrderSalesRegistrationNumber?: string | null;
+}
+
+function isMailOrderSalesStatus(value: string): value is MailOrderSalesStatus {
+  return (MAIL_ORDER_SALES_STATUSES as readonly string[]).includes(value);
 }
 
 function decodeOriginalName(name: string): string {
@@ -86,12 +95,38 @@ export class SupplierOnboardingService {
       return { success: false as const, error: 'INVALID_SETTLEMENT_CONTACT_EMAIL' };
     }
 
+    // 통신판매업 신고 정보 검증 (운영자 확인 항목 — ACTIVE 전환 차단 아님)
+    let mailOrderSalesStatus: MailOrderSalesStatus | null | undefined = undefined;
+    if (input.mailOrderSalesStatus !== undefined) {
+      const normalized = normalizeOptionalText(input.mailOrderSalesStatus);
+      if (normalized !== null && !isMailOrderSalesStatus(normalized)) {
+        return { success: false as const, error: 'INVALID_MAIL_ORDER_SALES_STATUS' };
+      }
+      mailOrderSalesStatus = normalized as MailOrderSalesStatus | null;
+    }
+    const mailOrderSalesRegistrationNumber = input.mailOrderSalesRegistrationNumber !== undefined
+      ? normalizeOptionalText(input.mailOrderSalesRegistrationNumber)
+      : undefined;
+
+    // reported 선택 시 신고번호 필수 (그 외 상태는 신고번호 없이 저장 가능)
+    const effectiveStatus = mailOrderSalesStatus !== undefined
+      ? mailOrderSalesStatus
+      : (supplier.mailOrderSalesStatus as MailOrderSalesStatus | null);
+    const effectiveRegistrationNumber = mailOrderSalesRegistrationNumber !== undefined
+      ? mailOrderSalesRegistrationNumber
+      : supplier.mailOrderSalesRegistrationNumber;
+    if (effectiveStatus === 'reported' && !effectiveRegistrationNumber) {
+      return { success: false as const, error: 'MAIL_ORDER_REGISTRATION_NUMBER_REQUIRED' };
+    }
+
     if (taxInvoiceEmail !== undefined) supplier.taxInvoiceEmail = taxInvoiceEmail;
     if (input.settlementBankName !== undefined) supplier.settlementBankName = normalizeOptionalText(input.settlementBankName);
     if (input.settlementAccountNumber !== undefined) supplier.settlementAccountNumber = normalizeAccountNumber(input.settlementAccountNumber);
     if (input.settlementAccountHolder !== undefined) supplier.settlementAccountHolder = normalizeOptionalText(input.settlementAccountHolder);
     if (input.settlementContactName !== undefined) supplier.settlementContactName = normalizeOptionalText(input.settlementContactName);
     if (settlementContactEmail !== undefined) supplier.settlementContactEmail = settlementContactEmail;
+    if (mailOrderSalesStatus !== undefined) supplier.mailOrderSalesStatus = mailOrderSalesStatus;
+    if (mailOrderSalesRegistrationNumber !== undefined) supplier.mailOrderSalesRegistrationNumber = mailOrderSalesRegistrationNumber;
 
     await this.supplierRepo.save(supplier);
     return { success: true as const, data: await this.mapSupplierOnboarding(supplier) };
@@ -136,6 +171,8 @@ export class SupplierOnboardingService {
 
     if (documentType === 'business_registration') {
       supplier.businessRegistrationDocumentId = saved.id;
+    } else if (documentType === 'mail_order_report') {
+      supplier.mailOrderSalesDocumentId = saved.id;
     } else {
       supplier.settlementBankbookDocumentId = saved.id;
     }
@@ -150,7 +187,9 @@ export class SupplierOnboardingService {
     if (!supplier || !this.isAllowedDocumentType(documentType)) return null;
     const id = documentType === 'business_registration'
       ? supplier.businessRegistrationDocumentId
-      : supplier.settlementBankbookDocumentId;
+      : documentType === 'mail_order_report'
+        ? supplier.mailOrderSalesDocumentId
+        : supplier.settlementBankbookDocumentId;
     if (!id) return null;
     return this.documentRepo.findOne({ where: { id } });
   }
@@ -162,12 +201,15 @@ export class SupplierOnboardingService {
   }
 
   private async mapSupplierOnboarding(supplier: NetureSupplier) {
-    const [businessRegistrationDocument, settlementBankbookDocument] = await Promise.all([
+    const [businessRegistrationDocument, settlementBankbookDocument, mailOrderSalesDocument] = await Promise.all([
       supplier.businessRegistrationDocumentId
         ? this.documentRepo.findOne({ where: { id: supplier.businessRegistrationDocumentId } })
         : Promise.resolve(null),
       supplier.settlementBankbookDocumentId
         ? this.documentRepo.findOne({ where: { id: supplier.settlementBankbookDocumentId } })
+        : Promise.resolve(null),
+      supplier.mailOrderSalesDocumentId
+        ? this.documentRepo.findOne({ where: { id: supplier.mailOrderSalesDocumentId } })
         : Promise.resolve(null),
     ]);
 
@@ -180,8 +222,11 @@ export class SupplierOnboardingService {
       settlementAccountHolder: supplier.settlementAccountHolder || null,
       settlementContactName: supplier.settlementContactName || null,
       settlementContactEmail: supplier.settlementContactEmail || null,
+      mailOrderSalesStatus: supplier.mailOrderSalesStatus || null,
+      mailOrderSalesRegistrationNumber: supplier.mailOrderSalesRegistrationNumber || null,
       businessRegistrationDocument: businessRegistrationDocument ? this.mapDocument(businessRegistrationDocument) : null,
       settlementBankbookDocument: settlementBankbookDocument ? this.mapDocument(settlementBankbookDocument) : null,
+      mailOrderSalesDocument: mailOrderSalesDocument ? this.mapDocument(mailOrderSalesDocument) : null,
     };
   }
 
@@ -210,6 +255,6 @@ export class SupplierOnboardingService {
   }
 
   private isAllowedDocumentType(type: string): type is SupplierOnboardingDocumentType {
-    return type === 'business_registration' || type === 'bank_statement';
+    return type === 'business_registration' || type === 'bank_statement' || type === 'mail_order_report';
   }
 }

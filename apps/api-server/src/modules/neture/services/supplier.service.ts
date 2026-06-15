@@ -330,6 +330,9 @@ export class NetureSupplierService {
     settlementBankbookDocumentId: string | null;
     settlementContactName: string | null;
     settlementContactEmail: string | null;
+    mailOrderSalesStatus: string | null;
+    mailOrderSalesRegistrationNumber: string | null;
+    mailOrderSalesDocumentId: string | null;
     createdAt: Date;
     updatedAt: Date;
   }>> {
@@ -376,6 +379,9 @@ export class NetureSupplierService {
           settlementBankbookDocumentId: s.settlementBankbookDocumentId || null,
           settlementContactName: s.settlementContactName || null,
           settlementContactEmail: s.settlementContactEmail || null,
+          mailOrderSalesStatus: s.mailOrderSalesStatus || null,
+          mailOrderSalesRegistrationNumber: s.mailOrderSalesRegistrationNumber || null,
+          mailOrderSalesDocumentId: s.mailOrderSalesDocumentId || null,
           createdAt: s.createdAt,
           updatedAt: s.updatedAt,
         };
