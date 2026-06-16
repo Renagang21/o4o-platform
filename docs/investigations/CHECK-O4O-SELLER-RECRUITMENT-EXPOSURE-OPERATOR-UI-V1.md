@@ -75,7 +75,7 @@ backend entity/migration/ExposureStatus/RecruitmentStatus/browse·apply gate/판
 
 **PASS.** 3서비스 운영자가 자기 서비스 모집 노출 승인/반려. per-service proxy(권한 경계 보강) + 공통 console. backend 모델/정책 불변.
 
-**커밋:** path-specific 12파일(backend 6 + frontend 5 + CHECK) · `<commit>`.
+**커밋:** path-specific 12파일(backend 6 + frontend 5 + CHECK) · `8996a97f2`. (※ pre-commit hook 이 다른 세션 tablet-kiosk-core WIP 기준으로 `pnpm-lock.yaml` 1줄 그룹 제거를 자동 staging — 본 WO 변경 아님, worktree package.json 과 일치.)
 **후속:** ③ EXPOSURE-SUPPLIER-STATUS-V1(공급자 모집 현황에 노출 상태·반려 사유 표시). KCos cosmetics/k-cosmetics alias(현재 k-cosmetics 고정) 데이터 정합 모니터링.
 
 ---
