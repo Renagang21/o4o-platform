@@ -72,7 +72,7 @@ approved/rejected/terminated 취소 불가 · 참여해지/계약/RBAC/allowedSe
 
 **PASS.** 판매자/매장 본인 pending 신청 철회 end-to-end(enum+API+4서비스 화면). 공급자는 상태만 표시. 정책(C bridge/계약/RBAC/OPL/가격) 무변경, 알림 미추가.
 
-**커밋:** path-specific 13파일(backend 5 + frontend 7 + CHECK) · `<commit>`.
+**커밋:** path-specific 13파일(backend 5 + frontend 7 + CHECK) · `e15f66968`.
 **후속(선택):** 공급자 취소 알림(in-app) / 취소 후 재신청 허용(중복 정책 개정) / pending/approved/cancelled 카운트 분리.
 
 ---
