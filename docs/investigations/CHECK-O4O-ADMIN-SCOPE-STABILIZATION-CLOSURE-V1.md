@@ -182,6 +182,6 @@
 | 보류 | Finance · platform-admin surface · KPA legacy cleanup |
 | 다른 세션 WIP | 미접촉(본 문서만 staged) |
 | browser smoke | 배포 후 §8 묶음 수행(보류) |
-| commit hash | (commit 후 기재) |
+| commit hash | `5f2f54ff9` |
 
 > **상태**: O4O 4개 서비스 admin scope 정비 **1차 사이클 종료 고정**. 다음은 신규 구현보다 배포 후 smoke 묶음 + platform-admin surface 설계 IR(정책 결정 선행).
