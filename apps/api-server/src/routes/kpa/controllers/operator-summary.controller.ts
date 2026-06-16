@@ -23,6 +23,8 @@ import { KpaApplication } from '../entities/kpa-application.entity.js';
 //   IR-O4O-KPA-OPERATOR-DASHBOARD-API-5BLOCK-UNIFICATION-V1 (Option B) Foundation.
 //   /operator/dashboard 재도입 — 기존 /operator/summary 와 병행 운영, frontend Adapter WO 단계에서 전환.
 import { buildKpaOperatorDashboardConfig } from '../services/operator-dashboard.service.js';
+// WO-O4O-KPA-OPERATOR-ORDER-VIEW-BACKEND-ENABLE-V1: 공통 view-only 주문 조회 헬퍼
+import { queryOperatorOrders } from '../../common/order/operatorOrderQuery.js';
 
 interface OperatorSummaryServices {
   contentService: ContentQueryService;
@@ -42,6 +44,25 @@ export function createOperatorSummaryController(
   // WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: Operator scope enforced at router level
   router.use(authenticate);
   router.use(requireKpaScope('kpa:operator'));
+
+  /**
+   * GET /operator/orders
+   * WO-O4O-KPA-OPERATOR-ORDER-VIEW-BACKEND-ENABLE-V1 — view-only 주문 목록.
+   * canonical 원장 checkout_orders + metadata.serviceKey IN ('kpa-society','kpa') (서버 고정).
+   * 상태변경/배송/취소/환불/정산 없음. PII 미노출. empty(row 0)에서도 200 + 빈 목록.
+   */
+  router.get('/orders', asyncHandler(async (req: Request, res: Response) => {
+    const result = await queryOperatorOrders(dataSource, ['kpa-society', 'kpa'], {
+      page: req.query.page as string,
+      limit: req.query.limit as string,
+      status: (req.query.status as string) || null,
+      paymentStatus: (req.query.paymentStatus as string) || null,
+      search: (req.query.search as string) || null,
+      dateFrom: (req.query.dateFrom as string) || null,
+      dateTo: (req.query.dateTo as string) || null,
+    });
+    res.json({ success: true, data: result });
+  }));
 
   /**
    * GET /operator/summary

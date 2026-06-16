@@ -73,11 +73,13 @@ const EMPTY_STATS: OperatorOrderStats = {
  *
  * @param dataSource  api-server DataSource
  * @param serviceKey  서버 고정 serviceKey ('glycopharm' | 'cosmetics' 등). client 값 신뢰 금지.
+ *                    복수 허용 (예: KPA = ['kpa-society','kpa']) — 동일 서비스의 legacy/canonical
+ *                    serviceKey 가 공존할 때 배열로 전달하면 ANY 로 매칭한다.
  * @param params      pagination / filter
  */
 export async function queryOperatorOrders(
   dataSource: DataSource,
-  serviceKey: string,
+  serviceKey: string | string[],
   params: OperatorOrderQueryParams = {},
 ): Promise<OperatorOrderListResult> {
   const page = Math.max(1, Number(params.page) || 1);
@@ -90,9 +92,10 @@ export async function queryOperatorOrders(
   const dateFrom = params.dateFrom ? String(params.dateFrom) : null;
   const dateTo = params.dateTo ? String(params.dateTo) : null;
 
-  // serviceKey 서버 고정 — $1. 이하 filter 는 parameter binding 으로만 추가.
-  const where: string[] = [`co.metadata->>'serviceKey' = $1`];
-  const p: unknown[] = [serviceKey];
+  // serviceKey 서버 고정 — $1 (단일/복수 모두 ANY 로 매칭). 이하 filter 는 parameter binding 으로만 추가.
+  const serviceKeys = Array.isArray(serviceKey) ? serviceKey : [serviceKey];
+  const where: string[] = [`co.metadata->>'serviceKey' = ANY($1::text[])`];
+  const p: unknown[] = [serviceKeys];
 
   if (status) {
     p.push(status);
