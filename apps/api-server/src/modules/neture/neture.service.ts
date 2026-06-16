@@ -573,6 +573,11 @@ export class NetureService {
     return this.partnerContractService.closeRecruitment(recruitmentId, sellerUserId);
   }
 
+  // WO-O4O-SELLER-RECRUITMENT-REOPEN-ACTION-V1: 모집 재개(다시 신규 신청 가능)
+  async reopenPartnerRecruitment(recruitmentId: string, sellerUserId: string) {
+    return this.partnerContractService.reopenRecruitment(recruitmentId, sellerUserId);
+  }
+
   async approvePartnerApplication(applicationId: string, sellerId: string) {
     return this.partnerContractService.approvePartnerApplication(applicationId, sellerId);
   }

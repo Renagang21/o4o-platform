@@ -45,6 +45,15 @@ export default function SupplierRecruitmentsPage() {
     await load();
   };
 
+  // WO-O4O-SELLER-RECRUITMENT-REOPEN-ACTION-V1
+  const handleReopen = async (id: string) => {
+    if (!window.confirm('이 모집을 다시 재개하면 신규 신청을 받을 수 있습니다.\n재개하시겠습니까?')) return;
+    setClosingId(id);
+    await supplierRecruitmentApi.reopen(id);
+    setClosingId(null);
+    await load();
+  };
+
   return (
     <div className="max-w-5xl">
       <div className="mb-6">
@@ -117,7 +126,7 @@ export default function SupplierRecruitmentsPage() {
                       >
                         신청자 보기
                       </button>
-                      {r.status === 'recruiting' && (
+                      {r.status === 'recruiting' ? (
                         <button
                           type="button"
                           disabled={closingId === r.id}
@@ -125,6 +134,15 @@ export default function SupplierRecruitmentsPage() {
                           className="text-slate-500 hover:text-red-600 text-sm font-medium disabled:opacity-50"
                         >
                           마감
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          disabled={closingId === r.id}
+                          onClick={() => handleReopen(r.id)}
+                          className="text-slate-500 hover:text-emerald-600 text-sm font-medium disabled:opacity-50"
+                        >
+                          재개
                         </button>
                       )}
                     </td>

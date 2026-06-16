@@ -130,6 +130,27 @@ export function createPartnerRecruitmentController(deps: {
   });
 
   /**
+   * PATCH /partner/recruitments/:recruitmentId/reopen
+   * 공급자 본인 모집 재개 — 다시 신규 신청 가능 (WO-O4O-SELLER-RECRUITMENT-REOPEN-ACTION-V1)
+   */
+  router.patch('/partner/recruitments/:recruitmentId/reopen', requireAuth, requireActiveSupplier, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
+      }
+      const result = await netureService.reopenPartnerRecruitment(req.params.recruitmentId, userId);
+      if (!result.success) {
+        return res.status(404).json({ success: false, error: 'NOT_FOUND', message: '모집을 찾을 수 없습니다.' });
+      }
+      res.json({ success: true, data: result.data });
+    } catch (error) {
+      logger.error('[Neture API] Error reopening recruitment:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to reopen recruitment' });
+    }
+  });
+
+  /**
    * GET /partner/recruitments/:recruitmentId/applications
    * 공급자 본인 모집 신청자 목록 + 요약 (WO-O4O-SELLER-RECRUITMENT-SUPPLIER-APPLICATION-REVIEW-V1)
    */

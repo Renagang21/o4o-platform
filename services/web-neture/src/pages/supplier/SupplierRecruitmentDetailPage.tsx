@@ -73,6 +73,16 @@ export default function SupplierRecruitmentDetailPage() {
     await load();
   };
 
+  // WO-O4O-SELLER-RECRUITMENT-REOPEN-ACTION-V1
+  const handleReopenRecruitment = async () => {
+    if (!recruitmentId) return;
+    if (!window.confirm('재개하면 이 모집은 다시 신규 신청을 받을 수 있습니다.\n기존 신청 및 승인 이력은 그대로 유지됩니다.\n재개하시겠습니까?')) return;
+    setError(null);
+    const result = await supplierRecruitmentApi.reopen(recruitmentId);
+    if (!result.success) setError(result.message || '재개에 실패했습니다.');
+    await load();
+  };
+
   if (loading) {
     return <div className="max-w-4xl py-16 text-center text-slate-400 text-sm">불러오는 중...</div>;
   }
@@ -97,13 +107,21 @@ export default function SupplierRecruitmentDetailPage() {
       <div className="rounded-xl border border-slate-200 bg-white p-5 mb-5">
         <div className="flex items-start justify-between gap-3">
           <h1 className="text-xl font-bold text-slate-900">{r.productName}</h1>
-          {r.status === 'recruiting' && (
+          {r.status === 'recruiting' ? (
             <button
               type="button"
               onClick={handleCloseRecruitment}
               className="shrink-0 px-3 py-1.5 text-sm font-medium text-slate-600 border border-slate-200 rounded-lg hover:border-red-300 hover:text-red-600"
             >
               모집 마감
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleReopenRecruitment}
+              className="shrink-0 px-3 py-1.5 text-sm font-medium text-slate-600 border border-slate-200 rounded-lg hover:border-emerald-300 hover:text-emerald-600"
+            >
+              모집 재개
             </button>
           )}
         </div>

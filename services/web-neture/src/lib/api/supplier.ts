@@ -1353,6 +1353,17 @@ export const supplierRecruitmentApi = {
     }
   },
 
+  // WO-O4O-SELLER-RECRUITMENT-REOPEN-ACTION-V1: 모집 재개(다시 신규 신청 가능)
+  async reopen(recruitmentId: string): Promise<{ success: boolean; error?: string; message?: string }> {
+    try {
+      const response = await api.patch(`/neture/partner/recruitments/${recruitmentId}/reopen`);
+      return response.data;
+    } catch (error: any) {
+      const d = error?.response?.data;
+      return { success: false, error: d?.error || 'REOPEN_FAILED', message: d?.message };
+    }
+  },
+
   async create(input: {
     masterId: string;
     serviceKey: string;
