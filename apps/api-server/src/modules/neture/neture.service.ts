@@ -588,6 +588,11 @@ export class NetureService {
     return this.partnerContractService.getApplicationsForPartner(partnerUserId);
   }
 
+  // WO-O4O-SELLER-RECRUITMENT-APPLICATION-CANCEL-V1: 신청자 본인 pending 신청 철회
+  async cancelPartnerApplication(applicationId: string, partnerUserId: string) {
+    return this.partnerContractService.cancelApplication(applicationId, partnerUserId);
+  }
+
   async approvePartnerApplication(applicationId: string, sellerId: string) {
     return this.partnerContractService.approvePartnerApplication(applicationId, sellerId);
   }

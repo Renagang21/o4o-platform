@@ -14,7 +14,7 @@ export interface StoreRecruitmentApplicationRow {
   productName: string;
   supplierName: string;
   serviceId: string;
-  status: string; // pending | approved | rejected
+  status: string; // pending | approved | rejected | cancelled
   participationTerminated: boolean;
   appliedAt: string;
   decidedAt: string | null;
@@ -26,6 +26,14 @@ export interface StoreRecruitmentApplicationsViewProps {
   loading: boolean;
   /** 화면 설명(서비스별 문구 미세 차이 허용). 기본 제공. */
   description?: string;
+  /**
+   * WO-O4O-SELLER-RECRUITMENT-APPLICATION-CANCEL-V1
+   * 제공되면 pending 신청에 "신청 취소" 버튼을 노출하고 클릭 시 호출한다.
+   * 미제공이면 취소 버튼 미노출(조회 전용).
+   */
+  onCancelApplication?: (applicationId: string) => void;
+  /** 취소 처리 중인 applicationId (버튼 비활성/문구용). */
+  cancellingId?: string | null;
 }
 
 const SERVICE_LABELS: Record<string, string> = {
@@ -57,10 +65,17 @@ function resolveState(a: StoreRecruitmentApplicationRow): { label: string; cls: 
       note: a.reason ? `반려 사유: ${a.reason}` : '신청이 반려되었습니다. 필요한 경우 공급자 안내를 확인해 주세요.',
     };
   }
+  if (a.status === 'cancelled') {
+    return {
+      label: '신청 취소',
+      cls: 'bg-slate-200 text-slate-600',
+      note: '신청을 취소했습니다. 공급자는 더 이상 이 신청을 심사하지 않습니다.',
+    };
+  }
   return { label: '심사 대기', cls: 'bg-amber-100 text-amber-700', note: '공급자가 신청 내용을 검토 중입니다.' };
 }
 
-export function StoreRecruitmentApplicationsView({ applications, loading, description }: StoreRecruitmentApplicationsViewProps) {
+export function StoreRecruitmentApplicationsView({ applications, loading, description, onCancelApplication, cancellingId }: StoreRecruitmentApplicationsViewProps) {
   return (
     <div className="max-w-4xl">
       <div className="mb-6">
@@ -93,6 +108,18 @@ export function StoreRecruitmentApplicationsView({ applications, loading, descri
                   <span className={`shrink-0 px-2 py-0.5 rounded-full text-xs font-medium ${st.cls}`}>{st.label}</span>
                 </div>
                 <p className="mt-2 text-xs text-slate-500">{st.note}</p>
+                {onCancelApplication && a.status === 'pending' && (
+                  <div className="mt-3 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => onCancelApplication(a.applicationId)}
+                      disabled={cancellingId === a.applicationId}
+                      className="px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                    >
+                      {cancellingId === a.applicationId ? '취소 중...' : '신청 취소'}
+                    </button>
+                  </div>
+                )}
               </div>
             );
           })}

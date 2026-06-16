@@ -344,12 +344,39 @@ export class NeturePartnerContractService {
       productName: a.product_name,
       supplierName: a.seller_name || '',
       serviceId: a.service_id || '',
-      status: a.status, // pending | approved | rejected
+      status: a.status, // pending | approved | rejected | cancelled
       participationTerminated: a.contract_status === 'terminated',
       appliedAt: a.applied_at,
       decidedAt: a.decided_at,
       reason: a.reason || '',
     }));
+  }
+
+  /**
+   * WO-O4O-SELLER-RECRUITMENT-APPLICATION-CANCEL-V1
+   *
+   * 판매자/매장 신청자 본인이 pending 신청을 직접 철회한다.
+   *  - 소유권: application.partnerId === partnerUserId
+   *  - pending 만 취소 가능(approved/rejected/cancelled 불가)
+   *  - 이미 cancelled 이면 idempotent 성공
+   *  - C bridge / contract / allowedSellerIds / OPL / RBAC 무변경(pending 단계)
+   *  - 공급자 알림 미발송(이번 WO 범위 외 — 공급자는 화면에서 취소 상태 확인)
+   */
+  async cancelApplication(applicationId: string, partnerUserId: string) {
+    const application = await this.applicationRepo.findOne({ where: { id: applicationId } });
+    if (!application) return { success: false as const, error: 'APPLICATION_NOT_FOUND' };
+    if (application.partnerId !== partnerUserId) return { success: false as const, error: 'NOT_OWNER' };
+    if (application.status === ApplicationStatus.CANCELLED) {
+      return { success: true as const, data: { applicationId, alreadyCancelled: true } };
+    }
+    if (application.status !== ApplicationStatus.PENDING) return { success: false as const, error: 'NOT_PENDING' };
+
+    application.status = ApplicationStatus.CANCELLED;
+    application.decidedAt = new Date();
+    application.decidedBy = partnerUserId; // 신청자 본인 철회
+    await this.applicationRepo.save(application);
+    logger.info(`[NeturePartnerContractService] application cancelled by applicant: app=${applicationId} partner=${partnerUserId}`);
+    return { success: true as const, data: { applicationId } };
   }
 
   /**

@@ -196,6 +196,16 @@ export const partnerRecruitmentApi = {
       return [];
     }
   },
+
+  // WO-O4O-SELLER-RECRUITMENT-APPLICATION-CANCEL-V1: pending 신청 본인 취소
+  async cancelMine(applicationId: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      await api.post(`/neture/partner/applications/${applicationId}/cancel`);
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error?.response?.data?.error || 'UNKNOWN_ERROR' };
+    }
+  },
 };
 
 export interface PartnerApplication {
@@ -205,7 +215,7 @@ export interface PartnerApplication {
   productName: string;
   supplierName: string;
   serviceId: string;
-  status: string; // pending | approved | rejected
+  status: string; // pending | approved | rejected | cancelled
   participationTerminated: boolean;
   appliedAt: string;
   decidedAt: string | null;

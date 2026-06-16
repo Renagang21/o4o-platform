@@ -22,6 +22,8 @@ const APP_STATUS: Record<string, { label: string; cls: string }> = {
   pending: { label: '대기', cls: 'bg-amber-100 text-amber-700' },
   approved: { label: '승인', cls: 'bg-emerald-100 text-emerald-700' },
   rejected: { label: '반려', cls: 'bg-red-100 text-red-700' },
+  // WO-O4O-SELLER-RECRUITMENT-APPLICATION-CANCEL-V1: 신청자 본인 철회 (공급자는 상태만 확인, 승인/반려 액션 없음)
+  cancelled: { label: '신청 취소', cls: 'bg-slate-200 text-slate-600' },
 };
 
 export default function SupplierRecruitmentDetailPage() {

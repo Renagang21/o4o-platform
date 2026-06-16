@@ -6,7 +6,7 @@
  * 판매자(매장)가 공급자 판매자 모집에 신청한 내역과 승인/참여 상태를 확인한다.
  * My Page 이력이 아니라 내 매장의 조달 참여 신청 상태(조회 전용).
  */
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ClipboardList } from 'lucide-react';
 import { partnerRecruitmentApi, type PartnerApplication } from '../../lib/api/partner';
 
@@ -40,20 +40,46 @@ function resolveState(a: PartnerApplication): { label: string; cls: string; note
       note: a.reason ? `반려 사유: ${a.reason}` : '신청이 반려되었습니다. 필요한 경우 공급자 안내를 확인해 주세요.',
     };
   }
+  if (a.status === 'cancelled') {
+    return {
+      label: '신청 취소',
+      cls: 'bg-slate-200 text-slate-600',
+      note: '신청을 취소했습니다. 공급자는 더 이상 이 신청을 심사하지 않습니다.',
+    };
+  }
   return { label: '심사 대기', cls: 'bg-amber-100 text-amber-700', note: '공급자가 신청 내용을 검토 중입니다.' };
 }
 
 export default function PartnerRecruitmentApplicationsPage() {
   const [rows, setRows] = useState<PartnerApplication[]>([]);
   const [loading, setLoading] = useState(true);
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setRows(await partnerRecruitmentApi.listMine());
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
-    (async () => {
-      setLoading(true);
-      setRows(await partnerRecruitmentApi.listMine());
-      setLoading(false);
-    })();
-  }, []);
+    void load();
+  }, [load]);
+
+  // WO-O4O-SELLER-RECRUITMENT-APPLICATION-CANCEL-V1: pending 신청 본인 취소
+  const handleCancel = useCallback(
+    async (applicationId: string) => {
+      if (!window.confirm('이 신청을 취소하면 공급자가 더 이상 해당 신청을 심사하지 않습니다.\n취소하시겠습니까?')) return;
+      setCancellingId(applicationId);
+      const res = await partnerRecruitmentApi.cancelMine(applicationId);
+      if (!res.success) {
+        window.alert('신청 취소에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+      } else {
+        await load();
+      }
+      setCancellingId(null);
+    },
+    [load],
+  );
 
   return (
     <div className="max-w-4xl">
@@ -90,6 +116,18 @@ export default function PartnerRecruitmentApplicationsPage() {
                   <span className={`shrink-0 px-2 py-0.5 rounded-full text-xs font-medium ${st.cls}`}>{st.label}</span>
                 </div>
                 <p className="mt-2 text-xs text-slate-500">{st.note}</p>
+                {a.status === 'pending' && (
+                  <div className="mt-3 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => handleCancel(a.applicationId)}
+                      disabled={cancellingId === a.applicationId}
+                      className="px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                    >
+                      {cancellingId === a.applicationId ? '취소 중...' : '신청 취소'}
+                    </button>
+                  </div>
+                )}
               </div>
             );
           })}

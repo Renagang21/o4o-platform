@@ -259,6 +259,34 @@ export function createPartnerRecruitmentController(deps: {
   });
 
   /**
+   * POST /partner/applications/:id/cancel
+   * 신청자(판매자/매장) 본인 pending 신청 철회 (WO-O4O-SELLER-RECRUITMENT-APPLICATION-CANCEL-V1)
+   * requireAuth 만 — 공급자 guard 미적용(취소 주체 = 신청자 본인).
+   */
+  router.post('/partner/applications/:id/cancel', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
+      }
+      const result = await netureService.cancelPartnerApplication(req.params.id, userId);
+      if (!result.success) {
+        const map: Record<string, [number, string]> = {
+          APPLICATION_NOT_FOUND: [404, '신청을 찾을 수 없습니다.'],
+          NOT_OWNER: [403, '본인 신청만 취소할 수 있습니다.'],
+          NOT_PENDING: [400, '심사 대기 중인 신청만 취소할 수 있습니다.'],
+        };
+        const [status, message] = map[result.error] || [400, '신청 취소에 실패했습니다.'];
+        return res.status(status).json({ success: false, error: result.error, message });
+      }
+      res.json({ success: true, data: result.data });
+    } catch (error) {
+      logger.error('[Neture API] Error cancelling partner application:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to cancel application' });
+    }
+  });
+
+  /**
    * POST /partner/applications/:id/terminate
    * 승인 판매자 참여 해지 (WO-O4O-SELLER-RECRUITMENT-PARTICIPATION-TERMINATION-V1)
    */
