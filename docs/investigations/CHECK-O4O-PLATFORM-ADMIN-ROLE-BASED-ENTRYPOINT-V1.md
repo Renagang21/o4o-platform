@@ -86,4 +86,4 @@
 
 ## 13. commit hash
 
-- (commit 후 기재)
+- `66132b54c` — feat(neture): role-based platform-admin entrypoint on admin dashboard (WO-O4O-PLATFORM-ADMIN-ROLE-BASED-ENTRYPOINT-V1)
