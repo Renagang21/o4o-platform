@@ -19,9 +19,7 @@ import {
   Truck,
   Shield,
   Search,
-  Store,
   DollarSign,
-  ShieldCheck,
 } from 'lucide-react';
 
 interface DashboardLayoutProps {
@@ -44,17 +42,19 @@ const roleConfig: Record<string, RoleConfig> = {
     title: '관리자',
     icon: Shield,
     color: 'red',
-    /* WO-O4O-ADMIN-DASHBOARD-REFINE-V1: 표준 Admin Capability 그룹 */
+    /* WO-O4O-ADMIN-DASHBOARD-REFINE-V1: 표준 Admin Capability 그룹
+     * WO-O4O-GLYCOPHARM-ADMIN-SCOPE-CLEANUP-V1: 서비스 admin = 서비스 설정 관리자 역할로 축소.
+     *   제거: Approvals(약국 네트워크 → /operator/stores 일원화) / Governance(역할 관리 → O4O 전체 관리자) /
+     *         System '문의 관리'(→ operator /operator/contacts 이관).
+     *   유지: Finance(현상 유지) / 법정정보·약관 / 문의 설정 / 서비스 설정.
+     *   라벨: '회원 관리' → '회원 데이터 관리'(조회·삭제·파기 관점, 일상 운영은 operator). */
     menuGroups: [
       { label: 'Overview', icon: LayoutDashboard, items: [
         { label: '대시보드', path: '/admin', exact: true },
       ]},
       { label: 'Users', icon: Users, items: [
         // WO-O4O-GLYCOPHARM-OPERATOR-ADMIN-CONSOLE-KPA-ALIGNMENT-V1: /admin/members (soft+hard delete)
-        { label: '회원 관리', path: '/admin/members' },
-      ]},
-      { label: 'Approvals', icon: Store, items: [
-        { label: '약국 네트워크', path: '/admin/pharmacies' },
+        { label: '회원 데이터 관리', path: '/admin/members' },
       ]},
       { label: 'Finance', icon: DollarSign, items: [
         { label: '정산 관리', path: '/admin/settlements' },
@@ -62,16 +62,11 @@ const roleConfig: Record<string, RoleConfig> = {
         { label: '청구 미리보기', path: '/admin/billing-preview' },
         { label: '인보이스', path: '/admin/invoices' },
       ]},
-      { label: 'Governance', icon: ShieldCheck, items: [
-        { label: '역할 관리', path: '/admin/roles' },
-      ]},
       { label: 'System', icon: Settings, items: [
         { label: '설정', path: '/admin/settings' },
         // WO-O4O-GP-KCOS-SERVICE-LEGAL-POLICY-SETTINGS-UI-ROLLOUT-V1
         { label: '법정정보·약관 설정', path: '/admin/settings/legal-terms' },
-        // WO-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1
-        { label: '문의 관리', path: '/admin/contact-inquiries' },
-        // WO-O4O-SERVICE-CONTACT-SETTINGS-ADMIN-V1
+        // WO-O4O-SERVICE-CONTACT-SETTINGS-ADMIN-V1: 문의 '설정'은 admin 유지 (문의 '관리'는 operator 이관)
         { label: '문의 설정', path: '/admin/settings/contact' },
       ]},
     ],

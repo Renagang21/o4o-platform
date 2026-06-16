@@ -33,8 +33,6 @@ import {
   FileText,
   Receipt,
   FileBarChart,
-  ShieldCheck,
-  Building2,
   Users,
 } from 'lucide-react';
 import {
@@ -78,17 +76,10 @@ function buildStructureMetrics(kpis: KpiItem[]): StructureMetric[] {
 
 // ─── Admin Action Queue (점검·처리 항목) ─────────────────────
 
-function buildAdminPolicies(data: OperatorDashboardConfig): PolicyItem[] {
-  const pendingCount =
-    data.actionQueue.find((a) => a.id === 'pending-applications')?.count ?? 0;
-
+// WO-O4O-GLYCOPHARM-ADMIN-SCOPE-CLEANUP-V1: 약국 네트워크 승인 / 역할·권한 관리 정책 항목 제거
+//   (약국 네트워크 → operator, 역할 관리 → O4O 전체 관리자). Finance 항목은 현상 유지.
+function buildAdminPolicies(_data: OperatorDashboardConfig): PolicyItem[] {
   return [
-    {
-      key: 'pharmacy-network',
-      label: '약국 네트워크 승인',
-      status: pendingCount > 0 ? ('partial' as const) : ('configured' as const),
-      link: '/admin/pharmacies',
-    },
     {
       key: 'settlement-management',
       label: '정산 관리',
@@ -107,12 +98,6 @@ function buildAdminPolicies(data: OperatorDashboardConfig): PolicyItem[] {
       status: 'configured' as const,
       link: '/admin/invoices',
     },
-    {
-      key: 'role-management',
-      label: '역할·권한 관리',
-      status: 'configured' as const,
-      link: '/admin/roles',
-    },
   ];
 }
 
@@ -120,12 +105,12 @@ function buildAdminPolicies(data: OperatorDashboardConfig): PolicyItem[] {
 
 // WO-O4O-ADMIN-QUICKACTION-FRONTEND-CONVERGE-V1 (Phase C):
 //   admin Structure Actions emoji → lucide-name 정렬. ActionIcon vocabulary 19종 안.
+// WO-O4O-GLYCOPHARM-ADMIN-SCOPE-CLEANUP-V1: 약국 네트워크 / 역할 관리 quick action 제거.
+//   회원 관리 → '회원 데이터 관리'(조회·삭제·파기 관점).
 const ADMIN_QUICK_ACTIONS: StructureAction[] = [
-  { id: 'users', label: '회원 관리', link: '/admin/members', icon: 'users', description: '회원 조회·탈퇴·완전삭제 관리' },
-  { id: 'pharmacies', label: '약국 네트워크', link: '/admin/pharmacies', icon: 'building-2', description: '약국 승인·네트워크 관리' },
+  { id: 'users', label: '회원 데이터 관리', link: '/admin/members', icon: 'users', description: '회원 조회·완전삭제·개인정보 파기 관리' },
   { id: 'settlements', label: '정산 관리', link: '/admin/settlements', icon: 'dollar-sign', description: '정산 처리·내역 조회' },
   { id: 'invoices', label: '인보이스', link: '/admin/invoices', icon: 'file-text', description: '인보이스 발행·관리' },
-  { id: 'roles', label: '역할 관리', link: '/admin/roles', icon: 'shield', description: '역할·권한 구조 관리' },
   { id: 'settings', label: '설정', link: '/admin/settings', icon: 'settings', description: '시스템 설정' },
 ];
 
@@ -142,13 +127,10 @@ const FINANCE_LINKS: AdminBlockLink[] = [
   { label: '인보이스', path: '/admin/invoices', icon: <Receipt className={ICON_CLS} />, description: '인보이스 발행·관리' },
 ];
 
-const GOVERNANCE_LINKS: AdminBlockLink[] = [
-  { label: '역할 관리', path: '/admin/roles', icon: <ShieldCheck className={ICON_CLS} />, description: '역할·권한 구조 정의·관리' },
-];
-
-const NETWORK_LINKS: AdminBlockLink[] = [
-  { label: '약국 네트워크', path: '/admin/pharmacies', icon: <Building2 className={ICON_CLS} />, description: '약국 승인·네트워크 구조 관리' },
-  { label: '회원 관리', path: '/admin/members', icon: <Users className={ICON_CLS} />, description: '회원 조회·탈퇴·완전삭제 관리' },
+// WO-O4O-GLYCOPHARM-ADMIN-SCOPE-CLEANUP-V1: Governance(역할 관리) 블록 제거 → O4O 전체 관리자 영역.
+//   Network 블록에서 약국 네트워크 제거(→ operator /operator/stores), 회원 데이터 관리만 유지.
+const MEMBER_LINKS: AdminBlockLink[] = [
+  { label: '회원 데이터 관리', path: '/admin/members', icon: <Users className={ICON_CLS} />, description: '회원 조회·완전삭제·개인정보 파기 관리' },
 ];
 
 // ─── Helper ──────────────────────────────────────────────────
@@ -210,18 +192,10 @@ export default function GlycoPharmAdminDashboard() {
     structureActions: ADMIN_QUICK_ACTIONS,
   };
 
-  // Phase 2: Network 블록 요약 수치 (기존 KPI에서 추출)
-  const activePharmacies = getKpiValue(data.kpis, 'active-pharmacies');
-  const totalPatients = getKpiValue(data.kpis, 'total-patients');
-  const pendingApplications = getKpiValue(data.kpis, 'pending-applications');
-
-  const networkStats = [
-    ...(activePharmacies != null ? [{ label: '약국 수', value: activePharmacies }] : []),
-    ...(totalPatients != null ? [{ label: '회원 수', value: totalPatients }] : []),
-    ...(pendingApplications != null && pendingApplications !== 0
-      ? [{ label: '입점 대기', value: pendingApplications }]
-      : []),
-  ];
+  // Phase 2: 회원 구조 블록 요약 수치 (기존 KPI에서 추출)
+  // WO-O4O-GLYCOPHARM-ADMIN-SCOPE-CLEANUP-V1: 약국 수/입점 대기(약국 네트워크 지표) 제거 → 회원 수만 유지.
+  const totalMembers = getKpiValue(data.kpis, 'total-patients');
+  const memberStats = totalMembers != null ? [{ label: '회원 수', value: totalMembers }] : [];
 
   return (
     <div className="space-y-6">
@@ -246,7 +220,9 @@ export default function GlycoPharmAdminDashboard() {
       {/* 4-Block 표준 레이아웃: A Snapshot → B Policy → C GovernanceAlerts → D Actions */}
       <AdminDashboardLayout config={adminConfig} />
 
-      {/* Phase 2: Finance + Governance — 2열 그리드 (레이아웃 외부, 공통 AdminLinkBlock) */}
+      {/* Phase 2: Finance + 회원 구조 — 2열 그리드 (레이아웃 외부, 공통 AdminLinkBlock)
+       * WO-O4O-GLYCOPHARM-ADMIN-SCOPE-CLEANUP-V1: Governance 블록 제거(역할 관리 → O4O 전체 관리자),
+       *   Network → '회원 구조'로 축소(약국 네트워크 제거 → operator /operator/stores). Finance 현상 유지. */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Block 4: Finance */}
         <AdminLinkBlock
@@ -255,21 +231,14 @@ export default function GlycoPharmAdminDashboard() {
           links={FINANCE_LINKS}
         />
 
-        {/* Block 5: Governance */}
+        {/* Block 5: 회원 구조 (회원 데이터 관리) */}
         <AdminLinkBlock
-          title="거버넌스 · 권한 관리"
-          description="역할과 권한 구조를 관리합니다."
-          links={GOVERNANCE_LINKS}
+          title="회원 구조"
+          description="회원 데이터의 보존·삭제·파기 관점에서 관리합니다. 이용중지 등 일상 운영은 operator에서 처리합니다."
+          links={MEMBER_LINKS}
+          stats={memberStats}
         />
       </div>
-
-      {/* Block 6: Network (Phase 2) */}
-      <AdminLinkBlock
-        title="약국 네트워크 · 회원 구조"
-        description="서비스 구조의 핵심 네트워크 대상을 관리합니다."
-        links={NETWORK_LINKS}
-        stats={networkStats}
-      />
     </div>
   );
 }
