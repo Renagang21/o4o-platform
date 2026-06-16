@@ -8,14 +8,16 @@
  *   PATCH /cosmetics/mypage/business-info — 매장 경영자 매장/사업자 정보 수정
  *
  * 저장 SSOT: users.businessInfo JSONB (canonical signup source).
- * 권한 가드: cosmetics_members.subRole === 'store_owner' (그 외 403).
+ * 권한 가드: canonical role_assignments(cosmetics:store_owner) — 라우트 가드와 동일 소스 (그 외 403).
+ *   WO-O4O-STORE-INFO-OWNER-GATE-CANONICAL-ROLE-ALIGN-BACKEND-V1 (legacy cosmetics_members.subRole 제거).
  *
  * 패턴 동일: apps/api-server/src/routes/glycopharm/controllers/mypage.controller.ts
  */
 
 import { Router, Request, Response, RequestHandler } from 'express';
 import type { DataSource } from 'typeorm';
-import { CosmeticsMember } from '../entities/cosmetics-member.entity.js';
+// WO-O4O-STORE-INFO-OWNER-GATE-CANONICAL-ROLE-ALIGN-BACKEND-V1: canonical role(role_assignments) 기반 인가
+import { isStoreOwner as isCanonicalStoreOwner } from '../../../utils/store-owner.utils.js';
 
 interface AuthRequest extends Request {
   user?: { userId?: string; id?: string };
@@ -72,11 +74,13 @@ export function createCosmeticsMypageController(
   requireAuth: RequestHandler,
 ): Router {
   const router = Router();
-  const memberRepo = dataSource.getRepository(CosmeticsMember);
 
+  // WO-O4O-STORE-INFO-OWNER-GATE-CANONICAL-ROLE-ALIGN-BACKEND-V1:
+  // canonical role_assignments(cosmetics:store_owner) 기반 — legacy cosmetics_members.subRole 의존 제거.
+  // 권한 없는 사용자는 계속 403.
   async function isStoreOwner(userId: string): Promise<boolean> {
-    const member = await memberRepo.findOne({ where: { userId } });
-    return !!member && member.subRole === 'store_owner';
+    const { isOwner } = await isCanonicalStoreOwner(dataSource, userId, 'cosmetics');
+    return isOwner;
   }
 
   /**

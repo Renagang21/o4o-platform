@@ -9,7 +9,8 @@
  *   GET   /mypage/business-info — 약국 경영자 사업자 정보 조회 (users.businessInfo)
  *   PATCH /mypage/business-info — 약국 경영자 사업자 정보 수정 (users.businessInfo JSONB merge)
  *
- * Read-only / write 모두 약국 경영자 (pharmacy_owner subRole) 만 접근.
+ * Read-only / write 모두 canonical role_assignments(glycopharm:store_owner) 기준 접근 — 라우트 가드와 동일 소스.
+ *   WO-O4O-STORE-INFO-OWNER-GATE-CANONICAL-ROLE-ALIGN-BACKEND-V1 (legacy glycopharm_members.subRole 제거).
  */
 
 import { Router, Request, Response, RequestHandler } from 'express';
@@ -20,6 +21,8 @@ import {
   glycopharmMemberToCanonical,
   glycopharmApplicationToCanonical,
 } from '../utils/canonical-status.js';
+// WO-O4O-STORE-INFO-OWNER-GATE-CANONICAL-ROLE-ALIGN-BACKEND-V1: canonical role(role_assignments) 기반 인가
+import { isStoreOwner } from '../../../utils/store-owner.utils.js';
 
 interface AuthRequest extends Request {
   user?: { userId?: string; id?: string };
@@ -159,8 +162,11 @@ export function createGlycopharmMypageController(
     }
 
     try {
-      const member = await memberService.getMyMembership(userId);
-      if (!member || member.subRole !== 'pharmacy_owner') {
+      // WO-O4O-STORE-INFO-OWNER-GATE-CANONICAL-ROLE-ALIGN-BACKEND-V1:
+      // 인가 소스를 canonical role_assignments(glycopharm:store_owner)로 정렬 — 라우트 가드와 동일 기준.
+      // legacy glycopharm_members.subRole 의존 제거(권한 없는 사용자는 계속 403).
+      const { isOwner } = await isStoreOwner(dataSource, userId, 'glycopharm');
+      if (!isOwner) {
         res.status(403).json({ success: false, error: '약국 경영자만 접근 가능합니다.' });
         return;
       }
@@ -216,8 +222,9 @@ export function createGlycopharmMypageController(
     }
 
     try {
-      const member = await memberService.getMyMembership(userId);
-      if (!member || member.subRole !== 'pharmacy_owner') {
+      // WO-O4O-STORE-INFO-OWNER-GATE-CANONICAL-ROLE-ALIGN-BACKEND-V1: canonical role 기반 인가 (legacy subRole 제거)
+      const { isOwner } = await isStoreOwner(dataSource, userId, 'glycopharm');
+      if (!isOwner) {
         res.status(403).json({ success: false, error: '약국 경영자만 접근 가능합니다.' });
         return;
       }
