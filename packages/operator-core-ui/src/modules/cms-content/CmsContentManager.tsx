@@ -88,7 +88,11 @@ function makeApiFetch(getToken: () => string | null) {
   return async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
     const token = getToken();
     const envBase = getEnvApiBase();
-    const res = await fetch(`${envBase}${path}`, {
+    // `path` may already be absolute when consumers pass `${VITE_API_BASE_URL}/api/v1/...`
+    // as apiBase. Only prepend envBase for relative paths, otherwise the origin is doubled
+    // (e.g. https://api...https://api.../news/admin/list) and fetch fails with "Failed to fetch".
+    const url = /^https?:\/\//i.test(path) ? path : `${envBase}${path}`;
+    const res = await fetch(url, {
       ...options,
       headers: {
         'Content-Type': 'application/json',
