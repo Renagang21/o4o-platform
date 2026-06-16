@@ -2,7 +2,7 @@
 
 > **작업명:** WO-O4O-KPA-OPERATOR-ORDER-VIEW-FRONTEND-WIRING-V1
 > **유형:** KPA operator '주문 현황' frontend wiring (route/menu/page). backend/operator-core-ui 무변경.
-> **판정: PASS** — KPA '주문 현황' 도입 완료. **KPA parity(상품 현황 + 주문 현황) 완성.**
+> **판정: PASS (배포 후 운영 smoke 포함)** — KPA '주문 현황' 도입 완료. **KPA parity(상품 현황 + 주문 현황) 완성.** 프로덕션 배포 후 KPA/GP/KCos 3서비스 브라우저 smoke PASS(§12).
 > 선행: `WO-O4O-OPERATOR-PRODUCT-ORDER-VIEW-COMMONIZE-V1`, `WO-O4O-KPA-OPERATOR-PRODUCT-ORDER-VIEW-INTRODUCE-V1`, `WO-O4O-KPA-OPERATOR-ORDER-VIEW-BACKEND-ENABLE-V1`
 > 작성일: 2026-06-16
 
@@ -81,16 +81,52 @@
 
 > GP/KCos 는 미변경 → 재빌드 불요(무영향). operator-core-ui 소스 소비.
 
-## 12. smoke 결과 / 보류 사유
+## 12. smoke 결과 (배포 후 프로덕션 검증 — PASS)
 
-- 브라우저 smoke(KPA `/operator/orders` 렌더·"주문 현황" 메뉴·목록/empty·검색·상태/결제 필터·새로고침·처리 버튼 부재·console error 0)는 **프로덕션 배포 후** 권장(로컬 prod DB/Cloud Run 의존). typecheck + production build 통과로 정적 정합성 확보. 요청 시 배포 후 Playwright 검증.
+**검증일:** 2026-06-16 (main 배포 후) · **환경:** 프로덕션(kpa-society.co.kr / glycopharm.co.kr / k-cosmetics.site) · **계정:** operator(Bearer) 로그인 · Playwright, read-only 탐색.
+
+### KPA-Society — PASS
+| 항목 | 결과 |
+|---|---|
+| `/operator/products` 렌더 | ✅ "상품 현황" 화면 정상 |
+| `/operator/orders` 렌더 | ✅ "주문 현황" + "주문 조회 전용" 배너 |
+| 사이드바(매장 HUB 운영) | ✅ **상품 현황 / 주문 현황** 둘 다 표시 |
+| 상품 empty state | ✅ "상품 데이터가 없습니다" |
+| 주문 empty state | ✅ "표시할 주문이 없습니다" |
+| 검색/필터/새로고침 UI | ✅ 존재(검색창·상태/결제 필터·새로고침) |
+| 처리 버튼 | ✅ **없음**(생성/수정/삭제/상태변경 0) |
+| `GET /operator/products?serviceKey=kpa-society` | ✅ **200** |
+| `GET /kpa/operator/orders?page=1&limit=20` | ✅ **200** (신규 backend 라이브 동작) |
+| console error / pageerror / 4xx | ✅ **0** |
+
+### GlycoPharm — 회귀 PASS
+| 항목 | 결과 |
+|---|---|
+| `/operator/products` (상품 현황) | ✅ 정상(공통 컴포넌트, 라벨 "상품 현황") |
+| `/operator/orders` (주문 현황) | ✅ 정상 + "주문 조회 전용" 배너 |
+| `GET /glycopharm/operator/orders` | ✅ **200** (헬퍼 serviceKey 배열 변경 무영향) |
+| console error | ✅ **0** |
+
+### K-Cosmetics — 회귀 PASS
+| 항목 | 결과 |
+|---|---|
+| `/operator/products` (상품 현황) | ✅ 정상 |
+| `/operator/orders` (주문 현황) | ✅ 정상 + "주문 조회 전용" 배너 |
+| `GET /operator/products?serviceKey=k-cosmetics` | ✅ **200** |
+| `GET /cosmetics/operator/orders` | ✅ **200** |
+| console error | ✅ **0** |
+
+### 데이터 0건(empty state) — 정상으로 기록
+- 검증 시점 해당 serviceKey 에 표시할 `product_masters` / `checkout_orders` 데이터가 없는 상태 → 목록은 빈 상태로 표시.
+- **API 는 200 으로 정상 응답** — endpoint / wiring / 권한(operator scope) / view-only 정책은 모두 입증됨. (실제 행 표시는 데이터가 존재하는 serviceKey 환경에서 확인 가능, 동작 경로는 동일.)
 
 ## 13. KPA 상품 현황 + 주문 현황 parity 완료 여부
 
-- ✅ **완성.** KPA operator 도 GP/KCos 와 동일하게:
+- ✅ **완성 (배포 후 운영 smoke 확정).** KPA operator 도 GP/KCos 와 동일하게:
   - **상품 현황** (`/operator/products`, view-only) — INTRODUCE WO
   - **주문 현황** (`/operator/orders`, view-only) — 본 WO
   - 승인 업무는 Approvals 에서 처리(불변).
+- **최종 판정:** KPA / GlycoPharm / K-Cosmetics operator 상품·주문 **현황** 축 — 배포 전 정적 검증(typecheck/build) + 배포 후 운영 smoke(§12) **모두 PASS**. operator 는 주문 처리자가 아니라 **서비스 전역 현황 모니터링 주체**로 유지(view-only 불변). **상품 현황 / 주문 현황 parity 완료 고정.**
 
 ---
 
