@@ -13,6 +13,7 @@
 
 import { useState } from 'react';
 import type { Editor } from '@tiptap/react';
+import { sanitizeHtml } from '../sanitize';
 
 const API_BASE_URL =
   (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_API_BASE_URL) ||
@@ -379,7 +380,7 @@ export function StoreUseModal({ open, onClose, editor }: StoreUseModalProps) {
               color: '#111827',
             }}>
               {resultView === 'preview' ? (
-                <div dangerouslySetInnerHTML={{ __html: result.html }} />
+                <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(result.html || '') }} />
               ) : (
                 <pre style={{ whiteSpace: 'pre-wrap', margin: 0, fontFamily: 'inherit' }}>
                   {result.plainText}

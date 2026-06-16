@@ -30,6 +30,7 @@
 
 import { useEffect, useState } from 'react';
 import type { Editor } from '@tiptap/react';
+import { sanitizeHtml } from '../sanitize';
 
 const API_BASE_URL =
   (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_API_BASE_URL) ||
@@ -1358,7 +1359,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
                     maxHeight: '240px',
                     overflowY: 'auto',
                   }}
-                  dangerouslySetInnerHTML={{ __html: result.html }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(result.html || '') }}
                 />
               ) : (
                 <pre
