@@ -41,6 +41,15 @@ export const ADMIN_ROLES: string[] = [NETURE_ROLES.ADMIN, NETURE_ROLES.PLATFORM_
  */
 export const PLATFORM_ROLES: string[] = ['platform:admin', NETURE_ROLES.PLATFORM_SUPER_ADMIN];
 
+/**
+ * platform-admin 진입점 노출 판정 — WO-O4O-PLATFORM-ADMIN-ROLE-BASED-ENTRYPOINT-V1.
+ * neture:admin 단독은 false(platform role 아님). PLATFORM_ROLES 재사용.
+ */
+export function hasPlatformAdminRole(roles: string[] | undefined | null): boolean {
+  if (!roles || roles.length === 0) return false;
+  return roles.some((r) => PLATFORM_ROLES.includes(r));
+}
+
 /** Operator route guard 역할 집합 */
 export const OPERATOR_ROLES: string[] = [NETURE_ROLES.OPERATOR];
 
