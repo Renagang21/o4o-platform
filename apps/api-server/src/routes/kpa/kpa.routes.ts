@@ -59,6 +59,9 @@ import { createOperatorSummaryController } from './controllers/operator-summary.
 import { createEventOfferOperatorController } from './controllers/event-offer-operator.controller.js';
 // WO-O4O-SELLER-RECRUITMENT-EXPOSURE-OPERATOR-UI-V1: 판매자 모집 노출 승인 (kpa-society 고정 proxy)
 import { createServiceRecruitmentExposureProxyController } from '../../modules/neture/controllers/service-recruitment-exposure-proxy.controller.js';
+// WO-O4O-KPA-CONTENT-BODY-SANITIZE-ON-WRITE-V1: content body 저장 전 backend sanitize (jsdom+DOMPurify).
+// 기존 backend-safe sanitizer 재사용 (위치/명명 공통화는 후속 WO-O4O-BACKEND-SAFE-HTML-SANITIZER-COMMONIZATION-V1).
+import { sanitizeDescriptionHtml } from '../../modules/neture/utils/sanitize-description-html.util.js';
 import { createSupplierOffersController } from './controllers/supplier-offers.controller.js';
 import { createJoinInquiryAdminRoutes, createJoinInquiryPublicRoutes } from './controllers/join-inquiry.controller.js';
 // WO-O4O-KPA-CONTACT-FORM-WORKFLOW-V1
@@ -1560,7 +1563,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
           source_file_name || null,
           status,
           userId,
-          body || null,
+          sanitizeDescriptionHtml(body) || null,
           cType,
           sub_type || null,
           user?.name || null,
@@ -1678,7 +1681,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         sets.push(`status = $${idx++}`);
         params.push(validStatuses.includes(reqStatus) ? reqStatus : existing.status);
       }
-      if (body !== undefined) { sets.push(`body = $${idx++}`); params.push(body || null); }
+      if (body !== undefined) { sets.push(`body = $${idx++}`); params.push(sanitizeDescriptionHtml(body) || null); }
       if (content_type !== undefined) {
         const validTypes = ['participation', 'information'];
         sets.push(`content_type = $${idx++}`);
