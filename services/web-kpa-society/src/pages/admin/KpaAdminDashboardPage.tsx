@@ -28,6 +28,8 @@ import {
   type StructureAction,
 } from '@o4o/admin-ux-core';
 import { operatorApi, type DistrictOperatorSummary } from '../../api/operator';
+// WO-O4O-KPA-ADMIN-PUBLIC-READINESS-CHECK-V1: 공개 상태 점검 카드
+import { AdminPublicReadinessCard } from './components/AdminPublicReadinessCard';
 
 // ─── Structure Actions (빠른 이동 — Block D) ───────────────────────────────
 
@@ -119,6 +121,9 @@ export function KpaAdminDashboardPage() {
       ) : (
         <AdminDashboardLayout config={adminConfig} />
       )}
+
+      {/* ── 공개 상태 점검 (WO-O4O-KPA-ADMIN-PUBLIC-READINESS-CHECK-V1) ── */}
+      <AdminPublicReadinessCard />
 
       {/* ── 최근 가입 신청 목록 (KPA 특수 섹션 — 분회 신청 detail, 레이아웃 외부 유지) ── */}
       <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
