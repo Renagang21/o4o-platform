@@ -202,6 +202,23 @@ export default function StoreProductDescriptionsPage() {
         </button>
       </div>
 
+      {/* WO-O4O-PRODUCT-DESCRIPTION-GUIDE-NOTICE-V1: 공용 상품 DB 정책 안내 */}
+      <div
+        style={{
+          margin: '0 0 16px',
+          padding: '12px 16px',
+          background: '#F8FAFC',
+          border: '1px solid #E2E8F0',
+          borderRadius: '8px',
+          fontSize: '13px',
+          color: '#334155',
+          lineHeight: 1.6,
+        }}
+      >
+        상품설명은 <strong>O4O 공용 상품 DB 기준</strong>으로 관리됩니다. 공급자 설명·AI 초안·의약품 정보 등을 바탕으로 O4O 관리자가 대표 설명을 정비합니다.
+        매장 특화 홍보문·이벤트 문구·POP/블로그용 문구가 필요하면 <strong>콘텐츠 만들기</strong>에서 별도 콘텐츠로 제작하세요.
+      </div>
+
       <div style={styles.layout}>
         {/* 상품 목록 */}
         <aside style={styles.sidebar}>

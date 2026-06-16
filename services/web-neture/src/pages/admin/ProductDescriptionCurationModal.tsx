@@ -169,6 +169,12 @@ export default function ProductDescriptionCurationModal({ master, onClose }: Pro
           </div>
         </div>
 
+        {/* WO-O4O-PRODUCT-DESCRIPTION-GUIDE-NOTICE-V1: 정비 화면 정책 안내 */}
+        <div className="px-6 py-2 text-xs text-slate-500 bg-slate-50 border-b leading-relaxed">
+          ProductMaster 기준 <strong>공용 상품설명 후보</strong>를 정비하는 화면입니다. 대표로 지정된 설명은 상품 상세에 노출됩니다.
+          후보는 공급자 설명·AI 초안·의약품 정보 등에서 가져올 수 있으며, 매장별 override나 매장별 선택값은 사용하지 않습니다.
+        </div>
+
         {notice && <div className="px-6 py-2 text-sm text-slate-600 bg-slate-50 border-b">{notice}</div>}
 
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3">
