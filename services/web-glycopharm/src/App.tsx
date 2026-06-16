@@ -1029,11 +1029,14 @@ function AppRoutes() {
         <Route path="library/production-materials/new" element={<ProductionMaterialEditorPage />} />
         {/* WO-O4O-MY-STORE-PRODUCT-DESCRIPTION-CROSSSERVICE-ALIGNMENT-V1: 약국 상품 설명 */}
         <Route path="library/product-descriptions" element={<StoreProductDescriptionsPage />} />
+        {/* WO-O4O-STORE-COMMERCE-PRODUCT-PAGE-CROSSSERVICE-PARITY-V1: canonical 상품 route (KPA/KC 동형) */}
+        <Route path="commerce/products" element={<PharmacyB2BProducts />} />
         {/* WO-O4O-PRODUCT-MARKETING-POP-BUILDER-EXTRACTION-V1: 상품별 마케팅 자산 + POP 빌더 */}
         <Route path="commerce/products/:productId/marketing" element={<ProductMarketingPage />} />
         <Route path="commerce/products/:productId/pop" element={<ProductPopBuilderPage />} />
         <Route path="management" element={<PharmacyManagement />} />
-        <Route path="management/b2b" element={<PharmacyB2BProducts />} />
+        {/* WO-O4O-STORE-COMMERCE-PRODUCT-PAGE-CROSSSERVICE-PARITY-V1: legacy path → canonical redirect (deep-link 보존) */}
+        <Route path="management/b2b" element={<Navigate to="/store/commerce/products" replace />} />
 
         {/* WO-O4O-GLYCOPHARM-STORE-PATH-NESTED-MIGRATION-V1:
               기존 flat path → nested canonical redirect alias.

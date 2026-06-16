@@ -8,7 +8,7 @@
  *   (선행: IR-O4O-GLYCOPHARM-STORE-COMMERCE-PRODUCT-DATA-SOURCE-ALIGNMENT-V1 판정 A. READY)
  *
  * IA 구분:
- *   - 이 화면(/store/management/b2b) = 내 약국 상품·거래 안에서 거래할 공급자 상품을 확인하는 업무 화면.
+ *   - 이 화면(/store/commerce/products, legacy /store/management/b2b redirect) = 내 약국 상품·거래 안에서 거래할 공급자 상품을 확인하는 업무 화면.
  *   - /store-hub/b2b(HubB2BCatalogPage) = Store HUB 에서 공급 상품을 탐색하는 허브 화면(유지, 무변경).
  *   동일 API/컴포넌트를 재사용하되 헤더 문구와 tableId 만 내 약국 맥락으로 분리한다.
  *

@@ -312,7 +312,7 @@ export function PharmacyB2BPage() {
         <div style={styles.headerMain}>
           <div>
             <h1 style={styles.pageTitle}>상품 관리</h1>
-            <p style={styles.pageDesc}>매장에서 취급하는 상품을 서비스별로 탐색합니다</p>
+            <p style={styles.pageDesc}>약국에서 거래할 상품을 확인하고 주문 작업대에 담을 수 있습니다</p>
           </div>
         </div>
       </header>

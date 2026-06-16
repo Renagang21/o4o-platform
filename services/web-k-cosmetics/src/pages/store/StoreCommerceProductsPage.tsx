@@ -30,7 +30,7 @@ export function StoreCommerceProductsPage() {
       labels={{ supplierLabel: '공급사' }}
       heading={{
         title: '상품 관리',
-        description: '매장에서 거래할 상품을 확인하고 내 매장에 추가할 수 있습니다.',
+        description: '매장에서 거래할 공급자 상품을 확인하고 내 매장에 추가할 수 있습니다.',
       }}
       api={{ getCatalog, applyBySupplyProductId, cancelProductByOfferId }}
     />

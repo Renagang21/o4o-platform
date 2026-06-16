@@ -159,7 +159,7 @@ export const COSMETICS_STORE_CONFIG: StoreDashboardConfig = {
  * WO-O4O-MY-STORE-PRODUCT-CENTERED-ACTIVATION-V1: 운영/활성화 축 1차 정렬
  * WO-O4O-STORE-MENU-CANONICAL-TREE-ALIGNMENT-V2 (2026-06-05):
  *   "약국 상품·거래"(거래·주문 대상)를 최상단으로, 활성화 앵커는 "내 약국 제품"(제품=제작 기준 데이터).
- *   상품 = 공급자 거래 상품(B2B). GlycoPharm 의 owner 상품 화면은 /management/b2b(PharmacyB2BProducts),
+ *   상품 = 공급자 거래 상품(B2B). GlycoPharm 의 owner 상품 화면은 /commerce/products(PharmacyB2BProducts, legacy /management/b2b redirect 보존),
  *   거래 신청은 /b2b-order. 기존 데드링크 정리: /products(미마운트), /market-trial(미마운트) 제거.
  *   퍼널/콘텐츠 가져오기/채널은 마케팅·채널, 약국 경영/정산은 경영 그룹에 보존(실기능 — 은폐 금지).
  */
@@ -174,8 +174,10 @@ export const GLYCOPHARM_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'dashboard', label: '대시보드', subPath: '' },
     ]},
     { label: '약국 상품·거래', items: [
-      // 상품 = 공급자 거래 상품(B2B). owner 화면 = PharmacyB2BProducts(/management/b2b).
-      { key: 'products',  label: '상품',     subPath: '/management/b2b' },
+      // WO-O4O-STORE-COMMERCE-PRODUCT-PAGE-CROSSSERVICE-PARITY-V1: canonical route 정렬.
+      // 상품 = 공급자 거래 상품(B2B). owner 화면 = PharmacyB2BProducts(/commerce/products, KPA/KC 동형).
+      // legacy /management/b2b 는 App.tsx 에서 redirect 보존(데드링크 0).
+      { key: 'products',  label: '상품',     subPath: '/commerce/products' },
       // 거래 신청 = B2BOrderPage(/b2b-order)
       { key: 'b2b-order', label: '거래 신청', subPath: '/b2b-order' },
       { key: 'orders',    label: '주문 관리', subPath: '/commerce/orders' },
