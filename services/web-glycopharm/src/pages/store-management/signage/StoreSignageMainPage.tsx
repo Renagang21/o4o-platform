@@ -622,14 +622,9 @@ export default function StoreSignageMainPage() {
           <p className="text-sm text-slate-500 mt-1">매장 화면에 송출할 콘텐츠를 확보하고, 플레이리스트로 구성하고, 스케줄을 적용합니다</p>
           <div className="mt-2"><GuideBackLink to="/guide/features/signage" label="디지털사이니지 운영 방법" /></div>
         </div>
+        {/* WO-O4O-GLYCOPHARM-STORE-SIGNAGE-SCHEDULE-KPA-PARITY-FIX-V1:
+            KPA 정렬 — 상단 헤더는 '새로고침'만. '콘텐츠 추가'는 '내 동영상' 탭 헤더로 이동(KPA '동영상 등록' 위치). */}
         <div className="flex gap-2">
-          <button
-            onClick={() => navigate('/store/marketing/signage/library')}
-            className="flex items-center gap-2 px-3 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <ExternalLink className="w-4 h-4" />
-            콘텐츠 추가
-          </button>
           <button
             onClick={() => {
               fetchItems(); loadPlaylists();
@@ -996,18 +991,13 @@ export default function StoreSignageMainPage() {
       {/* ═══ Schedule Tab ═══════════════════════════════════════════ */}
       {activeTab === 'schedules' && (
         <div>
+          {/* WO-O4O-GLYCOPHARM-STORE-SIGNAGE-SCHEDULE-KPA-PARITY-FIX-V1:
+              KPA 정렬 — 약국 context 미해석 시 차단 배너 제거. 스케줄 UI/'새 스케줄'을 항상 렌더(KPA와 동일).
+              organizationId 는 store-hub overview 에서 해석되어 API 호출에 사용되며, 미해석 시 목록은 빈 상태로 표시. */}
           {orgResolving ? (
             <div className="flex items-center justify-center gap-2 p-12 text-slate-500">
               <Loader2 className="w-5 h-5 animate-spin" />
-              <span className="text-sm">약국 정보를 불러오는 중…</span>
-            </div>
-          ) : !organizationId ? (
-            <div className="flex items-center gap-3 p-6 bg-amber-50 border border-amber-200 rounded-xl">
-              <AlertCircle className="w-6 h-6 text-amber-500 flex-shrink-0" />
-              <div>
-                <p className="font-semibold text-amber-700">약국 정보를 불러올 수 없습니다</p>
-                <p className="text-sm text-amber-600 mt-0.5">스케줄 기능을 사용하려면 약국 계정으로 로그인해야 합니다.</p>
-              </div>
+              <span className="text-sm">불러오는 중…</span>
             </div>
           ) : (
             <>
@@ -1296,9 +1286,17 @@ export default function StoreSignageMainPage() {
       {/* ═══ Assets Tab ════════════════════════════ */}
       {activeTab === 'assets' && <>
 
+      {/* WO-O4O-GLYCOPHARM-STORE-SIGNAGE-SCHEDULE-KPA-PARITY-FIX-V1:
+          KPA '동영상 등록' 위치(탭 헤더 우측)에 맞춰 '콘텐츠 추가' 배치. GlycoPharm 자산은 허브에서 가져오므로 라이브러리로 이동. */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-slate-800">내 동영상</h2>
-        <p className="text-xs text-slate-400">허브에서 가져온 사이니지 자산 목록입니다</p>
+        <button
+          onClick={() => navigate('/store/marketing/signage/library')}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50"
+        >
+          <Plus className="w-4 h-4" />
+          콘텐츠 추가
+        </button>
       </div>
 
       {!loading && !error && (
