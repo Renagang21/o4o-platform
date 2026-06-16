@@ -184,8 +184,11 @@ export async function queryVisibleProducts(
          CASE WHEN spo.is_active THEN 'active' ELSE 'inactive' END AS status,
          false AS is_featured,
          s.slug AS manufacturer,
-         COALESCE(sp.description, spo.consumer_detail_description, '') AS description,
-         COALESCE(spo.consumer_short_description, '') AS short_description,
+         -- WO-O4O-KPA-STOREFRONT-DESCRIPTION-LINK-V1: O4O 공용 대표(canonical) 설명을 fallback 에 연결.
+         -- 기존 store_product_profiles override(sp.description, 편집 UI 존재)는 보존(비회귀) → 그 아래·supplier 위.
+         -- KPA storefront 는 ContentRenderer(HTML) 렌더 → 태그 보존(GP plain-text 와 달리 strip 안 함).
+         COALESCE(sp.description, spd.content, spo.consumer_detail_description, '') AS description,
+         COALESCE(spd.summary, spo.consumer_short_description, '') AS short_description,
          opl.created_at AS sort_order,
          spo.created_at, spo.updated_at,
          opl.organization_id AS pharmacy_id,
@@ -209,6 +212,11 @@ export async function queryVisibleProducts(
          ON sp.master_id = pm.id
          AND sp.organization_id = opl.organization_id
          AND sp.is_active = true
+       -- canonical 1개/master (partial unique index) → DISTINCT ON 행 증식 없음
+       LEFT JOIN shared_product_descriptions spd
+         ON spd.master_id = pm.id
+         AND spd.status = 'canonical'
+         AND spd.deleted_at IS NULL
        WHERE spo.is_active = true
          AND s.status = 'ACTIVE'
          ${whereExtra}
