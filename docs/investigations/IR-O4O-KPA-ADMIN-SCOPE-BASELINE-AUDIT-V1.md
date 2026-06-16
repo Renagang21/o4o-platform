@@ -149,8 +149,8 @@
 | 결정 선결 | 정책문서 트랙(kpa_legal_documents vs service_policy_documents) |
 | 경계 정상 | 회원(hard/soft) · 문의(설정/처리) 분리 |
 | 정책 검토 | /operator/roles 소속 |
-| git status | working tree clean |
-| commit hash | (commit 후 기재) |
+| git status | working tree clean (외부 세션 WIP 미접촉) |
+| commit hash | `ffc22c6a3` |
 
 **핵심 참조 파일**:
 `services/web-kpa-society/src/routes/AdminRoutes.tsx` · `routes/OperatorRoutes.tsx` · `config/operatorMenuGroups.ts` ·
