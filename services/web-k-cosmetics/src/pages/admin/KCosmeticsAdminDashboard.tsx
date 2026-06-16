@@ -22,8 +22,6 @@ import { useState, useEffect, useCallback } from 'react';
 import {
   RefreshCw,
   Loader2,
-  ShieldCheck,
-  Store,
   Users,
 } from 'lucide-react';
 import {
@@ -68,16 +66,11 @@ function buildAdminPolicies(data: OperatorDashboardConfig): PolicyItem[] {
   const pendingProducts =
     data.actionQueue.find((a) => a.id === 'pending-products')?.count ?? 0;
 
+  // WO-O4O-KCOS-ADMIN-SCOPE-CLEANUP-V1: 매장 관리(→ operator) / 역할·권한 관리(→ O4O 전체 관리자) 정책 항목 제거.
   return [
     {
-      key: 'store-management',
-      label: '매장 관리',
-      status: 'configured' as const,
-      link: '/admin/stores',
-    },
-    {
       key: 'user-management',
-      label: '회원 관리',
+      label: '회원 데이터 관리',
       status: 'configured' as const,
       link: '/admin/users',
     },
@@ -86,12 +79,6 @@ function buildAdminPolicies(data: OperatorDashboardConfig): PolicyItem[] {
       label: '상품 승인 관리',
       status: pendingProducts > 0 ? ('partial' as const) : ('configured' as const),
       link: '/operator/products?status=PENDING',
-    },
-    {
-      key: 'role-management',
-      label: '역할·권한 관리',
-      status: 'configured' as const,
-      link: '/admin/roles',
     },
     {
       key: 'settings',
@@ -104,10 +91,10 @@ function buildAdminPolicies(data: OperatorDashboardConfig): PolicyItem[] {
 
 // ─── Admin Quick Actions ─────────────────────────────────────
 
+// WO-O4O-KCOS-ADMIN-SCOPE-CLEANUP-V1: 매장 관리 / 역할 관리 quick action 제거.
+//   회원 관리 → '회원 데이터 관리'(조회·삭제·파기 관점).
 const ADMIN_QUICK_ACTIONS: StructureAction[] = [
-  { id: 'users', label: '회원 관리', link: '/admin/users', icon: 'users', description: '회원 조회·관리' },
-  { id: 'stores', label: '매장 관리', link: '/admin/stores', icon: 'store', description: '매장 승인·구조 관리' },
-  { id: 'roles', label: '역할 관리', link: '/admin/roles', icon: 'shield', description: '역할·권한 구조 관리' },
+  { id: 'users', label: '회원 데이터 관리', link: '/admin/users', icon: 'users', description: '회원 조회·완전삭제·개인정보 파기 관리' },
   { id: 'settings', label: '설정', link: '/admin/settings', icon: 'settings', description: '서비스 정책·설정' },
 ];
 
@@ -117,13 +104,10 @@ const ADMIN_QUICK_ACTIONS: StructureAction[] = [
 
 const ICON_CLS = 'w-4 h-4 text-slate-500';
 
-const GOVERNANCE_LINKS: AdminBlockLink[] = [
-  { label: '역할 관리', path: '/admin/roles', icon: <ShieldCheck className={ICON_CLS} />, description: '역할·권한 구조 정의·관리' },
-];
-
-const NETWORK_LINKS: AdminBlockLink[] = [
-  { label: '매장 관리', path: '/admin/stores', icon: <Store className={ICON_CLS} />, description: '매장 승인·구조 관리' },
-  { label: '회원 관리', path: '/admin/users', icon: <Users className={ICON_CLS} />, description: '회원 조회·구조 관리' },
+// WO-O4O-KCOS-ADMIN-SCOPE-CLEANUP-V1: Governance(역할 관리) 블록 제거 → O4O 전체 관리자 영역.
+//   Network 블록에서 매장 관리 제거(→ operator /operator/stores), 회원 데이터 관리만 유지.
+const MEMBER_LINKS: AdminBlockLink[] = [
+  { label: '회원 데이터 관리', path: '/admin/users', icon: <Users className={ICON_CLS} />, description: '회원 조회·완전삭제·개인정보 파기 관리' },
 ];
 
 // ─── Main Component ──────────────────────────────────────────
@@ -205,19 +189,14 @@ export default function KCosmeticsAdminDashboard() {
       {/* 4-Block 표준 레이아웃: A Snapshot → B Policy → C GovernanceAlerts → D Actions */}
       <AdminDashboardLayout config={adminConfig} />
 
-      {/* Governance + Network — 2열 그리드 (레이아웃 외부, 공통 AdminLinkBlock) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <AdminLinkBlock
-          title="거버넌스 · 권한 관리"
-          description="역할과 권한 구조를 관리합니다."
-          links={GOVERNANCE_LINKS}
-        />
-        <AdminLinkBlock
-          title="회원 · 매장 구조"
-          description="서비스 구조의 핵심 대상을 관리합니다."
-          links={NETWORK_LINKS}
-        />
-      </div>
+      {/* 회원 구조 (회원 데이터 관리) — 공통 AdminLinkBlock
+       * WO-O4O-KCOS-ADMIN-SCOPE-CLEANUP-V1: Governance(역할 관리) 블록 제거(→ O4O 전체 관리자),
+       *   매장 관리 제거(→ operator /operator/stores). 회원 데이터 보존·삭제·파기 관점만 유지. */}
+      <AdminLinkBlock
+        title="회원 구조"
+        description="회원 데이터의 보존·삭제·파기 관점에서 관리합니다. 이용중지 등 일상 운영은 operator에서 처리합니다."
+        links={MEMBER_LINKS}
+      />
     </div>
   );
 }

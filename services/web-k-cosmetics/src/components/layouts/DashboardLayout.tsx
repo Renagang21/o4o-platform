@@ -169,26 +169,25 @@ const roleConfig: Record<string, RoleConfig> = {
     title: '관리자',
     icon: icons.Shield,
     color: 'red',
-    /* WO-O4O-ADMIN-DASHBOARD-REFINE-V1: 표준 Admin Capability 그룹 */
+    /* WO-O4O-ADMIN-DASHBOARD-REFINE-V1: 표준 Admin Capability 그룹
+     * WO-O4O-KCOS-ADMIN-SCOPE-CLEANUP-V1: 서비스 admin = 서비스 설정 관리자 역할로 축소 (GlycoPharm 기준 모델 적용).
+     *   제거: Approvals(매장 네트워크 → operator /operator/stores 대응) / System '문의 관리'(→ operator /operator/contacts) /
+     *         System '역할 관리'(→ O4O 전체 관리자).
+     *   유지: 법정정보·약관 / 문의 설정 / 서비스 설정.
+     *   라벨: '회원 관리' → '회원 데이터 관리'(조회·삭제·파기 관점, 일상 운영은 operator). */
     menuGroups: [
       { label: 'Overview', icon: icons.LayoutDashboard, items: [
         { label: '대시보드', path: '/admin', exact: true },
       ]},
       { label: 'Users', icon: icons.Users, items: [
-        { label: '회원 관리', path: '/admin/users' },
-      ]},
-      { label: 'Approvals', icon: icons.Store, items: [
-        { label: '매장 네트워크', path: '/admin/stores' },
+        { label: '회원 데이터 관리', path: '/admin/users' },
       ]},
       { label: 'System', icon: icons.Settings, items: [
         { label: '설정', path: '/admin/settings' },
         // WO-O4O-GP-KCOS-SERVICE-LEGAL-POLICY-SETTINGS-UI-ROLLOUT-V1
         { label: '법정정보·약관 설정', path: '/admin/settings/legal-terms' },
-        // WO-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1
-        { label: '문의 관리', path: '/admin/contact-inquiries' },
-        // WO-O4O-SERVICE-CONTACT-SETTINGS-ADMIN-V1
+        // WO-O4O-SERVICE-CONTACT-SETTINGS-ADMIN-V1: 문의 '설정'은 admin 유지 (문의 '관리'는 operator 이관)
         { label: '문의 설정', path: '/admin/settings/contact' },
-        { label: '역할 관리', path: '/admin/roles' },
       ]},
     ],
   },
