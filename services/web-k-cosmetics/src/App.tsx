@@ -192,6 +192,8 @@ const OperatorProductDetailPage = lazy(() => import('@/pages/operator/ProductDet
 const OperatorOrdersPage = lazy(() => import('@/pages/operator/OrdersPage'));
 // WO-O4O-EVENT-OFFER-KCOS-OPERATOR-APPROVAL-V1
 const OperatorEventOfferApprovalsPage = lazy(() => import('@/pages/operator/EventOfferApprovalsPage'));
+// WO-O4O-OPERATOR-APPROVALS-SELLER-RECRUITMENT-EXPOSURE-MENU-REMODEL-V1
+const RecruitmentExposureApprovalPage = lazy(() => import('@/pages/operator/RecruitmentExposureApprovalPage'));
 // WO-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-ENABLE-GP-KCOS-V1: 공급 상품 신청 승인
 const OperatorProductApplicationManagementPage = lazy(() => import('@/pages/operator/ProductApplicationManagementPage'));
 const OperatorUsersPage = lazy(() => import('@/pages/operator/UsersPage'));
@@ -687,6 +689,8 @@ function AppRoutes() {
         <Route path="orders" element={<OperatorOrdersPage />} />
         {/* WO-O4O-EVENT-OFFER-KCOS-OPERATOR-APPROVAL-V1: 이벤트 오퍼 승인 */}
         <Route path="event-offers" element={<OperatorEventOfferApprovalsPage />} />
+        {/* 판매자 모집 노출 승인 (WO-O4O-OPERATOR-APPROVALS-SELLER-RECRUITMENT-EXPOSURE-MENU-REMODEL-V1) — B안 준비중 안내 */}
+        <Route path="recruitment-exposure" element={<RecruitmentExposureApprovalPage />} />
         {/* WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: Deprecated routes removed (inventory, settlements, analytics, marketing) */}
         <Route path="signage/content" element={<SignageContentHubPage />} />
               <Route path="signage/playlist/:id" element={<SignagePlaylistDetailPage />} />

@@ -48,6 +48,8 @@ import OperatorAnalyticsPage from '../pages/operator/AnalyticsPage';
 import OperatorGuideContentsPage from '../pages/operator/OperatorGuideContentsPage';
 // WO-O4O-KPA-OPERATOR-COLLABORATION-INBOX-V1
 import CollaborationRequestsPage from '../pages/operator/CollaborationRequestsPage';
+// WO-O4O-OPERATOR-APPROVALS-SELLER-RECRUITMENT-EXPOSURE-MENU-REMODEL-V1
+import RecruitmentExposureApprovalPage from '../pages/operator/RecruitmentExposureApprovalPage';
 // WO-O4O-SURVEY-POINT-REWARD-PHASE1-V1
 import OperatorSurveyListPage from '../pages/operator/survey/OperatorSurveyListPage';
 import OperatorSurveyCreatePage from '../pages/operator/survey/OperatorSurveyCreatePage';
@@ -147,6 +149,9 @@ export function OperatorRoutes() {
 
           {/* 이벤트 오퍼 승인 관리 (WO-O4O-EVENT-OFFER-OPERATOR-APPROVAL-KPA-V1) */}
           <Route path="event-offers" element={<EventOfferManagePage />} />
+
+          {/* 판매자 모집 노출 승인 (WO-O4O-OPERATOR-APPROVALS-SELLER-RECRUITMENT-EXPOSURE-MENU-REMODEL-V1) — B안 준비중 안내 */}
+          <Route path="recruitment-exposure" element={<RecruitmentExposureApprovalPage />} />
 
           {/* 상품 현황 (view-only) — WO-O4O-KPA-OPERATOR-PRODUCT-ORDER-VIEW-INTRODUCE-V1 */}
           <Route path="products" element={<OperatorProductsPage />} />

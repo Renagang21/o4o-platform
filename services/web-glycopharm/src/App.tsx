@@ -300,6 +300,8 @@ const OperatorQrListPage = lazy(() => import('@/pages/operator/qr/OperatorQrList
 const OperatorQrWritePage = lazy(() => import('@/pages/operator/qr/OperatorQrWritePage'));
 const QualificationRequestsPage = lazy(() => import('@/pages/operator/QualificationRequestsPage'));
 const EventOfferManagePage = lazy(() => import('@/pages/operator/event-offer/EventOfferManagePage'));
+// WO-O4O-OPERATOR-APPROVALS-SELLER-RECRUITMENT-EXPOSURE-MENU-REMODEL-V1
+const RecruitmentExposureApprovalPage = lazy(() => import('@/pages/operator/RecruitmentExposureApprovalPage'));
 const OperatorStoreChannelsPage = lazy(() => import('@/pages/operator/store-channels/OperatorStoreChannelsPage'));
 const OperatorSurveyListPage = lazy(() => import('@/pages/operator/survey/OperatorSurveyListPage'));
 const OperatorSurveyCreatePage = lazy(() => import('@/pages/operator/survey/OperatorSurveyCreatePage'));
@@ -893,6 +895,8 @@ function AppRoutes() {
         <Route path="qualification-requests" element={<QualificationRequestsPage />} />
         {/* Event Offer Approval (WO-O4O-GLYCOPHARM-OPERATOR-EVENT-OFFER-APPROVAL-V1) */}
         <Route path="event-offers" element={<EventOfferManagePage />} />
+        {/* 판매자 모집 노출 승인 (WO-O4O-OPERATOR-APPROVALS-SELLER-RECRUITMENT-EXPOSURE-MENU-REMODEL-V1) — B안 준비중 안내 */}
+        <Route path="recruitment-exposure" element={<RecruitmentExposureApprovalPage />} />
         {/* Store Channels (WO-O4O-GLYCOPHARM-OPERATOR-STORE-CHANNELS-V1) */}
         <Route path="store-channels" element={<OperatorStoreChannelsPage />} />
         {/* Surveys (WO-O4O-GLYCOPHARM-OPERATOR-SURVEYS-V1) */}

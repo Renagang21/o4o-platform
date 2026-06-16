@@ -38,8 +38,10 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '공급 상품 신청 승인', path: '/operator/product-applications' },
     // WO-O4O-EVENT-OFFER-OPERATOR-APPROVAL-KPA-V1: 이벤트 오퍼 승인 관리
     { label: '이벤트 오퍼 승인', path: '/operator/event-offers' },
-    // WO-O4O-KPA-OPERATOR-COLLABORATION-INBOX-V1
-    { label: '협업 문의', path: '/operator/collaboration-requests' },
+    // WO-O4O-OPERATOR-APPROVALS-SELLER-RECRUITMENT-EXPOSURE-MENU-REMODEL-V1:
+    //   운영자 승인 = 판매자(개별) 승인 아님 = 모집 제품의 자기 서비스 노출 승인.
+    //   '협업 문의' 메뉴 제거(route/page 보존). 노출 승인 backend 부재 → 준비중 안내(B안).
+    { label: '판매자 모집 노출 승인', path: '/operator/recruitment-exposure' },
   ],
   // WO-O4O-KPA-OPERATOR-PRODUCT-ORDER-VIEW-INTRODUCE-V1: 상품 현황 (view-only, 서비스 전역 조회).
   //   GP/KCos 와 동일한 products/orders 그룹/라벨.
@@ -148,8 +150,8 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     { label: '공급 상품 신청 승인', path: '/operator/product-applications' },
     // WO-O4O-EVENT-OFFER-OPERATOR-APPROVAL-KPA-V1
     { label: '이벤트 오퍼 승인', path: '/operator/event-offers' },
-    // WO-O4O-KPA-OPERATOR-COLLABORATION-INBOX-V1
-    { label: '협업 문의', path: '/operator/collaboration-requests' },
+    // WO-O4O-OPERATOR-APPROVALS-SELLER-RECRUITMENT-EXPOSURE-MENU-REMODEL-V1: '협업 문의' 제거 + 노출 승인
+    { label: '판매자 모집 노출 승인', path: '/operator/recruitment-exposure' },
   ],
   // WO-KPA-OPERATOR-STORES-MENU-HIDE-V1: stores 메뉴 노출 제거
   // WO-KPA-LMS-INSTRUCTOR-APPROVAL-RELOCATE-V1: 자료실/강의 독립 그룹 분리

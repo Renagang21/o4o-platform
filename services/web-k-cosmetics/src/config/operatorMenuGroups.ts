@@ -33,6 +33,10 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '공급 상품 신청 승인', path: '/operator/product-applications' },
     // WO-O4O-EVENT-OFFER-KCOS-OPERATOR-APPROVAL-V1
     { label: '이벤트 오퍼 승인', path: '/operator/event-offers' },
+    // WO-O4O-OPERATOR-APPROVALS-SELLER-RECRUITMENT-EXPOSURE-MENU-REMODEL-V1:
+    //   운영자 승인 = 모집 제품의 자기 서비스 노출 승인(판매자 개별 승인 아님). 노출 승인 backend 부재 → 준비중 안내(B안).
+    //   '매장 가입 신청 관리'(매장 온보딩)는 본 WO 제거 대상 아님 → 유지.
+    { label: '판매자 모집 노출 승인', path: '/operator/recruitment-exposure' },
   ],
   // WO-O4O-OPERATOR-PRODUCT-ORDER-VIEW-LABEL-CLARIFY-GP-KCOS-V1: view-only 콘솔 → '상품 현황'
   products: [{ label: '상품 현황', path: '/operator/products' }],

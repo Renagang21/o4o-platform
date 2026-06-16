@@ -33,17 +33,15 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   dashboard: [{ label: '대시보드', path: '/operator', exact: true }],
   users: [{ label: '회원 관리', path: '/operator/members' }],
   approvals: [
-    // WO-O4O-CROSSSERVICE-OPERATOR-APPROVAL-GROUP-LABEL-ALIGN-V1:
-    //   '매장 승인' → '매장 판매 참여 승인' (StoreApprovalsPage = 스토어 판매 참여 신청 의미 명확화).
-    //   공통 항목(공급 상품 신청 승인 → 이벤트 오퍼 승인) 순서를 KPA/KCos 와 정합.
-    { label: '매장 판매 참여 승인', path: '/operator/store-approvals' },
-    { label: '약사 회원 관리', path: '/operator/members' },
+    // WO-O4O-OPERATOR-APPROVALS-SELLER-RECRUITMENT-EXPOSURE-MENU-REMODEL-V1:
+    //   운영자 승인 = 판매자(개별) 승인 아님 = 모집 제품의 자기 서비스 노출 승인.
+    //   '매장 판매 참여 승인'(StoreApprovalsPage=매장 온보딩) / '약사 회원 관리'(users 그룹 중복) 메뉴 제거.
+    //   route/page 는 보존(미삭제). 노출 승인 backend 부재 → 준비중 안내(B안).
     // WO-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-ENABLE-GP-KCOS-V1
     { label: '공급 상품 신청 승인', path: '/operator/product-applications' },
     // WO-O4O-GLYCOPHARM-OPERATOR-EVENT-OFFER-APPROVAL-V1
     { label: '이벤트 오퍼 승인', path: '/operator/event-offers' },
-    /* WO-O4O-GLYCOPHARM-ADMIN-OPERATOR-CLEANUP-V1:
-       Market Trial operator 콘솔은 미구현 → 메뉴/라우트에서 제거. 후속 별도 WO 예정. */
+    { label: '판매자 모집 노출 승인', path: '/operator/recruitment-exposure' },
   ],
   // WO-O4O-OPERATOR-PRODUCT-ORDER-VIEW-LABEL-CLARIFY-GP-KCOS-V1: view-only 콘솔 → '상품 현황'
   products: [{ label: '상품 현황', path: '/operator/products' }],
@@ -142,9 +140,11 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
   dashboard: [{ label: '대시보드', path: '/operator', exact: true }],
   users: [{ label: '회원 관리', path: '/operator/members' }],
   approvals: [
-    { label: '매장 승인', path: '/operator/store-approvals' },
-    { label: '약사 회원 관리', path: '/operator/members' },
+    // WO-O4O-OPERATOR-APPROVALS-SELLER-RECRUITMENT-EXPOSURE-MENU-REMODEL-V1:
+    //   '매장 승인'(매장 온보딩) / '약사 회원 관리' 메뉴 제거(route/page 보존) + 노출 승인 추가.
+    { label: '공급 상품 신청 승인', path: '/operator/product-applications' },
     { label: '이벤트 오퍼 승인', path: '/operator/event-offers' },
+    { label: '판매자 모집 노출 승인', path: '/operator/recruitment-exposure' },
   ],
   // WO-O4O-OPERATOR-PRODUCT-ORDER-VIEW-LABEL-CLARIFY-GP-KCOS-V1: view-only 콘솔 → '상품 현황'
   products: [{ label: '상품 현황', path: '/operator/products' }],
