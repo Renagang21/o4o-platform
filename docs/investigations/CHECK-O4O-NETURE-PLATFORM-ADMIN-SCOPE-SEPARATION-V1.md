@@ -97,4 +97,4 @@ Neture admin 안에 섞여 있는 **Neture 서비스 admin** 기능과 **O4O pla
 
 ## 13. commit hash
 
-- (commit 후 기재)
+- `d25378ce4` — feat(neture): surface-separate platform-admin from service-admin (WO-O4O-NETURE-PLATFORM-ADMIN-SCOPE-SEPARATION-V1)
