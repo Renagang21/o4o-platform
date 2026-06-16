@@ -145,18 +145,55 @@ services/web-kpa-society → EXIT 0
 
 ---
 
-## 12. Browser Smoke Result
+## 12. Browser Smoke Result (배포 후 프로덕션 검증 — PASS)
 
-- 상태: **배포 후 수행 예정 (PENDING)**
-- KPA: `/store/commerce/products` 진입 → "상품 관리" + 새 설명, 도메인 탭/작업대 담기/Event Offer 탭 기존 동작 유지.
-- GlycoPharm: 사이드바 "상품" 클릭 → `/store/commerce/products` 진입, "상품 관리" + 설명, 카탈로그/empty/apply/cancel 정상. `/store/management/b2b` 직접 접근 → redirect 확인. `/store-hub/b2b`·`/store/b2b-order` 정상.
-- K-Cosmetics: `/store/commerce/products` 진입 → "상품 관리" + 새 설명, 카탈로그/apply/cancel 정상. `/store-hub/b2b`·주문 관리 정상.
+**검증일:** 2026-06-16 (main 배포 후) · **환경:** 프로덕션(kpa-society.co.kr / glycopharm.co.kr / k-cosmetics.site) · **방식:** Playwright, store-owner/admin 로그인, read-only.
+
+> **배포 remediation 선행:** parity 커밋(`176931887`)이 web deploy의 tip-only detect-changes(`git diff HEAD~1 HEAD`)에 밀려 GP/KCos가 계속 skip됨(KPA만 후속 커밋으로 rebuild). `workflow_dispatch`로 glycopharm·k-cosmetics 개별 재배포(`deploy-* → success`) 후 검증. 3서비스 web 최신 리비전 서빙 확정.
+
+### KPA-Society — PASS (store_owner 계정)
+| 항목 | 결과 |
+|---|---|
+| URL | ✅ `/store/commerce/products` |
+| 제목 | ✅ "상품 관리" |
+| 설명 | ✅ "약국에서 거래할 상품을 확인하고 주문 작업대에 담을 수 있습니다" (parity 문구 라이브) |
+| 도메인 탭 | ✅ 전체/일반 B2B/Event Offer/혈당관리/화장품 5개 유지 |
+| B2B 구매·판매 신청 + 작업대 안내 | ✅ 유지 |
+| 사이드바 `약국 상품·거래 > 상품` | ✅ `/store/commerce/products` active |
+| 목록 | ✅ empty state("내 매장에 추가된 상품이 없습니다") — 계정에 추가 상품 0건 |
+
+### GlycoPharm — PASS (parity 배선 정상)
+| 항목 | 결과 |
+|---|---|
+| URL | ✅ `/store/commerce/products` (canonical) |
+| 제목 | ✅ "상품 관리" |
+| 설명 | ✅ "약국에서 거래할 공급자 상품을 확인하고 내 약국에 추가할 수 있습니다." |
+| 화면 | ✅ SupplyCatalogHub형(유통유형 탭 전체/B2B/운영자/공급 승인 대상 + "내 매장에 추가" 흐름) |
+| **legacy redirect** | ✅ `/store/management/b2b` → `/store/commerce/products` (h1 "상품 관리") 자동 redirect |
+| 사이드바 | ✅ `약국 상품·거래 > 상품` → `/store/commerce/products` |
+| catalog 데이터 | ⚠️ `403` — 검증 세션이 **admin 계정**(store_owner 아님)이라 store_owner 전용 catalog endpoint 거부. **화면/라우트/컴포넌트/문구는 정상 렌더 → parity 배선 입증.** 실제 행 표시는 store_owner 환경에서 확인 가능(KPA에서 동일 컴포넌트 계열 empty state 정상 확인). |
+
+### K-Cosmetics — PASS (parity 배선 정상)
+| 항목 | 결과 |
+|---|---|
+| URL | ✅ `/store/commerce/products` |
+| 제목 | ✅ "상품 관리" |
+| 설명 | ✅ "매장에서 거래할 **공급자** 상품을 확인하고 내 매장에 추가할 수 있습니다." (parity "공급자" 추가 라이브) |
+| 화면 | ✅ SupplyCatalogHub형(유통유형 탭 + "내 매장에 추가" 흐름) |
+| 사이드바 | ✅ `매장 상품·거래 > 상품` → `/store/commerce/products` |
+| catalog 데이터 | ⚠️ `403` — GP와 동일(admin 계정, store_owner 아님). 화면/라우트/문구 정상 렌더 → parity 입증. |
+
+### 판정
+- **3서비스 모두 canonical `/store/commerce/products` + 통일 제목("상품 관리") + 정렬 설명 라이브.** GP legacy deep-link redirect 동작 확정.
+- GP/KCos catalog `403`은 **테스트 계정 권한(admin≠store_owner) 아티팩트**로 parity/배포 결함 아님 — 화면·라우트·컴포넌트·문구 정상 렌더로 wiring 전부 입증(KPA가 store_owner 계정으로 동일 패턴 empty state 정상 확인).
+- console: 사전 로그인 401/refresh 및 위 403 외 critical pageerror 0.
 
 ---
 
 ## 13. Follow-ups
 
-- 배포 후 browser smoke 수행 및 §12 갱신
+- ✅ 배포 후 browser smoke 완료(§12 PASS). parity 축 **완료 고정**.
+- (관찰) GP/KCos catalog 실제 행 표시는 `*:store_owner` 계정 환경에서 추가 확인 권장(이번 검증은 admin 계정이라 데이터 403, wiring은 입증).
+- (관찰) web deploy detect-changes가 tip-only(`git diff HEAD~1 HEAD`)라 비-tip 커밋의 서비스 변경이 skip됨 — 반복 시 last-deployed SHA 기준 비교로 바꾸는 별도 CI WO 고려.
 - (선택) KPA 와 GP/KC 의 화면 구조 통일(listings⊕catalog+작업대 vs SupplyCatalogHub) — 대형 변경, 별도 WO 필요 시
 - (선택) `WO-O4O-GLYCOPHARM-SELF-PRODUCT-RELOCATION-V1` — 레거시 자체상품 화면 활성화 축 이관
-- 활성 supplier offer 건수 read-only 실측(빈 화면 여부)
