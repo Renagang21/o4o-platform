@@ -124,3 +124,27 @@ export type {
   ProductApplicationsConfig,
   ProductApplicationManagementConsoleProps,
 } from './modules/product-applications';
+
+// Product/Order View Module (WO-O4O-OPERATOR-PRODUCT-ORDER-VIEW-COMMONIZE-V1)
+export {
+  OperatorProductStatusPage,
+  OperatorOrderStatusPage,
+} from './modules/product-order-view';
+export type {
+  OperatorViewAccent,
+  ProductStatusRow,
+  ProductStatusStats,
+  ProductStatusPagination,
+  ProductStatusFetchParams,
+  ProductStatusListResult,
+  ProductStatusFetcher,
+  OperatorProductStatusConfig,
+  OperatorProductStatusPageProps,
+  OrderStatusRow,
+  OrderStatusStats,
+  OrderStatusFetchParams,
+  OrderStatusListResult,
+  OrderStatusFetcher,
+  OperatorOrderStatusConfig,
+  OperatorOrderStatusPageProps,
+} from './modules/product-order-view';
