@@ -8,6 +8,7 @@ import {
   ContractStatus,
   ContractTerminatedBy,
   RecruitmentStatus,
+  ExposureStatus,
   ApplicationStatus,
 } from '../entities/index.js';
 import { NeturePartner } from '../../../routes/neture/entities/neture-partner.entity.js';
@@ -119,12 +120,22 @@ export class NeturePartnerContractService {
   /**
    * 파트너 모집 목록 조회
    */
-  async getPartnerRecruitments(filters?: { status?: RecruitmentStatus }) {
+  /**
+   * 모집 목록 조회.
+   * WO-O4O-SELLER-RECRUITMENT-EXPOSURE-BACKEND-V1:
+   *  - exposureStatus 필터(public browse 는 컨트롤러에서 APPROVED 강제 → 미승인/반려 모집 미노출)
+   *  - serviceKey scope(serviceId 일치) — 누락 시 노출은 exposureStatus 게이트로만 제한
+   */
+  async getPartnerRecruitments(filters?: {
+    status?: RecruitmentStatus;
+    serviceKey?: string;
+    exposureStatus?: ExposureStatus;
+  }) {
     try {
       const where: Record<string, unknown> = {};
-      if (filters?.status) {
-        where.status = filters.status;
-      }
+      if (filters?.status) where.status = filters.status;
+      if (filters?.serviceKey) where.serviceId = filters.serviceKey;
+      if (filters?.exposureStatus) where.exposureStatus = filters.exposureStatus;
 
       const recruitments = await this.recruitmentRepo.find({
         where,
@@ -145,12 +156,76 @@ export class NeturePartnerContractService {
         serviceId: r.serviceId || '',
         imageUrl: r.imageUrl || '',
         status: r.status,
+        exposureStatus: r.exposureStatus,
         createdAt: r.createdAt,
       }));
     } catch (error) {
       logger.error('[NeturePartnerContractService] Error fetching partner recruitments:', error);
       throw error;
     }
+  }
+
+  /**
+   * WO-O4O-SELLER-RECRUITMENT-EXPOSURE-BACKEND-V1
+   * 운영자 노출 승인 큐 — serviceKey/exposureStatus/status 필터. 감사 필드 포함.
+   * (serviceKey 별 권한 enforcement 는 operator-UI WO 에서 결정 — 현재 neture:operator 큐.)
+   */
+  async getRecruitmentsForExposureReview(filters?: {
+    serviceKey?: string;
+    exposureStatus?: ExposureStatus;
+    status?: RecruitmentStatus;
+  }) {
+    const where: Record<string, unknown> = {};
+    if (filters?.serviceKey) where.serviceId = filters.serviceKey;
+    if (filters?.exposureStatus) where.exposureStatus = filters.exposureStatus;
+    if (filters?.status) where.status = filters.status;
+
+    const rows = await this.recruitmentRepo.find({ where, order: { createdAt: 'DESC' } });
+    return rows.map((r) => ({
+      id: r.id,
+      productId: r.productId,
+      productName: r.productName,
+      manufacturer: r.manufacturer || '',
+      sellerId: r.sellerId,
+      sellerName: r.sellerName,
+      serviceId: r.serviceId || '',
+      serviceName: r.serviceName || '',
+      consumerPrice: Number(r.consumerPrice),
+      commissionRate: Number(r.commissionRate),
+      status: r.status,
+      exposureStatus: r.exposureStatus,
+      exposureReviewedAt: r.exposureReviewedAt,
+      exposureReviewedBy: r.exposureReviewedBy,
+      exposureReviewNote: r.exposureReviewNote || '',
+      createdAt: r.createdAt,
+    }));
+  }
+
+  /**
+   * WO-O4O-SELLER-RECRUITMENT-EXPOSURE-BACKEND-V1
+   * 운영자 노출 승인/반려. RecruitmentStatus(운영 상태) 는 건드리지 않는다.
+   * 이미 같은 상태면 idempotent 성공.
+   */
+  async setRecruitmentExposure(
+    recruitmentId: string,
+    operatorUserId: string,
+    decision: ExposureStatus.APPROVED | ExposureStatus.REJECTED,
+    note?: string,
+  ) {
+    const recruitment = await this.recruitmentRepo.findOne({ where: { id: recruitmentId } });
+    if (!recruitment) return { success: false as const, error: 'RECRUITMENT_NOT_FOUND' };
+
+    if (recruitment.exposureStatus === decision) {
+      return { success: true as const, data: { id: recruitmentId, exposureStatus: decision, idempotent: true } };
+    }
+
+    recruitment.exposureStatus = decision;
+    recruitment.exposureReviewedAt = new Date();
+    recruitment.exposureReviewedBy = operatorUserId;
+    recruitment.exposureReviewNote = note?.trim() || null;
+    await this.recruitmentRepo.save(recruitment);
+    logger.info(`[NeturePartnerContractService] recruitment exposure ${decision}: ${recruitmentId} by ${operatorUserId}`);
+    return { success: true as const, data: { id: recruitment.id, exposureStatus: decision } };
   }
 
   /**
@@ -509,6 +584,8 @@ export class NeturePartnerContractService {
       shopUrl: input.shopUrl?.trim() || undefined,
       imageUrl: input.imageUrl?.trim() || undefined,
       status: RecruitmentStatus.RECRUITING,
+      // WO-O4O-SELLER-RECRUITMENT-EXPOSURE-BACKEND-V1: 신규 모집은 운영자 노출 승인 대기
+      exposureStatus: ExposureStatus.PENDING,
     });
     const saved = await this.recruitmentRepo.save(recruitment);
     logger.info(`[NeturePartnerContractService] Recruitment created: ${saved.id} (master=${masterId}, sellerUser=${sellerUserId}, service=${serviceKey})`);
@@ -527,6 +604,10 @@ export class NeturePartnerContractService {
       }
       if (recruitment.status !== RecruitmentStatus.RECRUITING) {
         throw new Error('RECRUITMENT_CLOSED');
+      }
+      // WO-O4O-SELLER-RECRUITMENT-EXPOSURE-BACKEND-V1: 노출 승인되지 않은 모집은 신청 방어 차단
+      if (recruitment.exposureStatus !== ExposureStatus.APPROVED) {
+        throw new Error('RECRUITMENT_NOT_EXPOSED');
       }
 
       // 중복 신청 확인

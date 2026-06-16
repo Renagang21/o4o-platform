@@ -16,7 +16,7 @@ import { requireAuth } from '../../../middleware/auth.middleware.js';
 import type { AuthenticatedRequest } from '../middleware/neture-identity.middleware.js';
 import type { NetureService } from '../neture.service.js';
 import { GlycopharmRepository } from '../../../routes/glycopharm/repositories/glycopharm.repository.js';
-import { RecruitmentStatus } from '../entities/index.js';
+import { RecruitmentStatus, ExposureStatus } from '../entities/index.js';
 import logger from '../../../utils/logger.js';
 
 export function createPartnerRecruitmentController(deps: {
@@ -72,14 +72,23 @@ export function createPartnerRecruitmentController(deps: {
 
   /**
    * GET /partner/recruitments
-   * 파트너 모집 목록 조회 (public)
+   * 파트너 모집 목록 조회 (public browse)
+   * WO-O4O-SELLER-RECRUITMENT-EXPOSURE-BACKEND-V1:
+   *  - exposureStatus = APPROVED 강제 (미승인/반려 모집 미노출)
+   *  - serviceKey scope(query) — 전달 시 해당 서비스 모집만
    */
   router.get('/partner/recruitments', async (req: Request, res: Response) => {
     try {
-      const { status } = req.query;
-      const filters: { status?: RecruitmentStatus } = {};
+      const { status, serviceKey } = req.query;
+      const filters: { status?: RecruitmentStatus; serviceKey?: string; exposureStatus?: ExposureStatus } = {
+        // public browse 는 노출 승인된 모집만 — serviceKey 누락 시에도 미승인 모집은 절대 노출 금지
+        exposureStatus: ExposureStatus.APPROVED,
+      };
       if (status && typeof status === 'string') {
         filters.status = status as RecruitmentStatus;
+      }
+      if (serviceKey && typeof serviceKey === 'string') {
+        filters.serviceKey = serviceKey;
       }
 
       const data = await netureService.getPartnerRecruitments(filters);
@@ -249,6 +258,10 @@ export function createPartnerRecruitmentController(deps: {
       }
       if (msg === 'RECRUITMENT_CLOSED') {
         return res.status(400).json({ success: false, error: 'RECRUITMENT_CLOSED', message: '마감된 모집입니다.' });
+      }
+      // WO-O4O-SELLER-RECRUITMENT-EXPOSURE-BACKEND-V1: 노출 승인 전 모집 신청 차단
+      if (msg === 'RECRUITMENT_NOT_EXPOSED') {
+        return res.status(400).json({ success: false, error: 'RECRUITMENT_NOT_EXPOSED', message: '아직 서비스 노출 승인이 완료되지 않은 모집입니다.' });
       }
       if (msg === 'DUPLICATE_APPLICATION') {
         return res.status(409).json({ success: false, error: 'DUPLICATE_APPLICATION', message: '이미 신청한 모집입니다.' });

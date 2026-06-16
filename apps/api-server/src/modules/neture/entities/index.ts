@@ -61,7 +61,7 @@ export { NeturePartnershipRequest, PartnershipStatus } from './NeturePartnership
 export { NeturePartnershipProduct } from './NeturePartnershipProduct.entity.js';
 export { NeturePartnerDashboardItem, type PartnerDashboardItemStatus } from './NeturePartnerDashboardItem.entity.js';
 export { NeturePartnerDashboardItemContent, type ContentSource } from './NeturePartnerDashboardItemContent.entity.js';
-export { NeturePartnerRecruitment, RecruitmentStatus } from './NeturePartnerRecruitment.entity.js';
+export { NeturePartnerRecruitment, RecruitmentStatus, ExposureStatus } from './NeturePartnerRecruitment.entity.js';
 export { NeturePartnerApplication, ApplicationStatus } from './NeturePartnerApplication.entity.js';
 export { NetureSellerPartnerContract, ContractStatus, ContractTerminatedBy } from './NetureSellerPartnerContract.entity.js';
 export { SupplierCsvImportBatch, CsvImportBatchStatus } from './SupplierCsvImportBatch.entity.js';

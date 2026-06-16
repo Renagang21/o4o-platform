@@ -47,6 +47,7 @@ import { createAdminDashboardController } from './controllers/admin-dashboard.co
 import { createOperatorSupplierQualityController } from './controllers/operator-supplier-quality.controller.js';
 import { createOperatorCategoryMappingController } from './controllers/operator-category-mapping.controller.js';
 import { createOperatorRecruitingController } from './controllers/operator-recruiting.controller.js';
+import { createOperatorRecruitmentExposureController } from './controllers/operator-recruitment-exposure.controller.js';
 import { createOperatorSupplierController } from './controllers/operator-supplier.controller.js';
 import { createOperatorContactController } from './controllers/operator-contact.controller.js';
 import { CategoryMappingService } from './services/category-mapping.service.js';
@@ -173,6 +174,8 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
   router.use('/operator', createOperatorCategoryMappingController());
   // WO-NETURE-RECRUITING-PRODUCTS-OPERATOR-MUTATION-API-V1
   router.use('/operator', createOperatorRecruitingController(dataSource));
+  // WO-O4O-SELLER-RECRUITMENT-EXPOSURE-BACKEND-V1: 판매자 모집 노출 승인 큐 (neture:operator)
+  router.use('/operator', createOperatorRecruitmentExposureController(dataSource));
   // WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1
   // operator scope supplier activation (admin scope endpoints 와 별도 — 권한 확장 아님)
   router.use('/operator', createOperatorSupplierController(dataSource));

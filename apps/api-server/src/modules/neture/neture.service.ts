@@ -26,6 +26,7 @@ import { NeturePartnershipService } from './services/partnership.service.js';
 import type { NetureSupplier, SupplierStatus, OfferDistributionType, OfferApprovalStatus, ContactVisibility, ProductMaster, ProductCategory, Brand, ProductImage } from './entities/index.js';
 import type { NeturePartner } from '../../routes/neture/entities/neture-partner.entity.js';
 import type { PartnershipStatus, RecruitmentStatus } from './entities/index.js';
+import { ExposureStatus } from './entities/index.js';
 
 export class NetureService {
   // ==================== Sub-service Lazy Getters ====================
@@ -542,8 +543,17 @@ export class NetureService {
 
   // ==================== Partner Recruitment & Application ====================
 
-  async getPartnerRecruitments(filters?: { status?: RecruitmentStatus }) {
+  async getPartnerRecruitments(filters?: { status?: RecruitmentStatus; serviceKey?: string; exposureStatus?: ExposureStatus }) {
     return this.partnerContractService.getPartnerRecruitments(filters);
+  }
+
+  // WO-O4O-SELLER-RECRUITMENT-EXPOSURE-BACKEND-V1: 운영자 노출 승인 큐 + approve/reject
+  async getRecruitmentsForExposureReview(filters?: { serviceKey?: string; exposureStatus?: ExposureStatus; status?: RecruitmentStatus }) {
+    return this.partnerContractService.getRecruitmentsForExposureReview(filters);
+  }
+
+  async setRecruitmentExposure(recruitmentId: string, operatorUserId: string, decision: ExposureStatus.APPROVED | ExposureStatus.REJECTED, note?: string) {
+    return this.partnerContractService.setRecruitmentExposure(recruitmentId, operatorUserId, decision, note);
   }
 
   async createPartnerApplication(recruitmentId: string, partnerId: string, partnerName: string) {
