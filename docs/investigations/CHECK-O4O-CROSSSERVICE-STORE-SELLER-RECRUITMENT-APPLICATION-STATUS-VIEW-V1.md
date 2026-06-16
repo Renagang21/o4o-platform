@@ -64,7 +64,7 @@
 
 **PASS.** KPA/GP/KCos 매장 앱에 판매자 모집 신청 현황 노출(기존 API 재사용, 공통 view). My Page 미생성, 정책·backend·migration 무변경.
 
-**커밋:** path-specific 10파일 · `<commit>`.
+**커밋:** path-specific 10파일 · `df093f902`.
 **후속(선택):** 알림 targetUrl 서비스별 분기(알림센터 도메인 route 정책) / 신청 취소(판매자) / 이메일 알림.
 
 ---
