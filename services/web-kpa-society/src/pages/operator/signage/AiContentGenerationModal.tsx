@@ -15,6 +15,7 @@ import { generateAiContent, saveAsHqMedia } from '../../../api/signageAi';
 import type { AiGenerateRequest, AiGenerateResponse } from '../../../api/signageAi';
 import { fetchTemplates } from '../../../api/signageTemplate';
 import type { SignageTemplateItem } from '../../../api/signageTemplate';
+import { ContentRenderer } from '@o4o/content-editor';
 
 interface Props {
   open: boolean;
@@ -315,9 +316,9 @@ export default function AiContentGenerationModal({ open, onClose, onSaved }: Pro
                       <Eye className="w-4 h-4 text-slate-500" />
                       <span className="text-sm font-medium text-slate-700">미리보기</span>
                     </div>
-                    <div
+                    <ContentRenderer
+                      html={genResult.generatedContent}
                       className="border border-purple-200 rounded-lg p-4 bg-slate-50 max-h-80 overflow-auto"
-                      dangerouslySetInnerHTML={{ __html: genResult.generatedContent }}
                     />
                   </div>
 
@@ -376,9 +377,9 @@ export default function AiContentGenerationModal({ open, onClose, onSaved }: Pro
               {genResult && (
                 <div>
                   <p className="text-xs font-medium text-slate-500 mb-1">콘텐츠 미리보기</p>
-                  <div
+                  <ContentRenderer
+                    html={genResult.generatedContent}
                     className="border border-slate-200 rounded-lg p-3 bg-slate-50 max-h-32 overflow-auto text-sm"
-                    dangerouslySetInnerHTML={{ __html: genResult.generatedContent }}
                   />
                 </div>
               )}

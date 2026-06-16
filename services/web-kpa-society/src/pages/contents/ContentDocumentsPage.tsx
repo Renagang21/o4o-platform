@@ -25,6 +25,7 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { CommunityContentSearchBar } from '@o4o/shared-space-ui';
+import { ContentRenderer } from '@o4o/content-editor';
 import { contentApi, type ContentItem } from '../../api/content';
 import { assetSnapshotApi } from '../../api/assetSnapshot';
 import { useAuth } from '../../contexts/AuthContext';
@@ -542,7 +543,7 @@ export function ContentDocumentsPage({ subType = 'content' }: ContentDocumentsPa
               </div>
             )}
             {drawerDetail.body ? (
-              <div className="text-sm text-slate-800 leading-relaxed" dangerouslySetInnerHTML={{ __html: drawerDetail.body }} />
+              <ContentRenderer html={drawerDetail.body || ''} className="text-sm text-slate-800 leading-relaxed" />
             ) : (
               <p className="text-sm text-slate-400 m-0">본문이 없습니다.</p>
             )}
