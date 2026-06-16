@@ -5,6 +5,8 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, NavLink } from 'react-router-dom';
+// WO-O4O-GLYCOPHARM-PRODUCT-DESCRIPTION-RICH-RENDER-V1: 공용 상품설명 sanitized rich render
+import { ContentRenderer } from '@o4o/content-editor';
 import {
   ArrowLeft,
   Star,
@@ -309,11 +311,12 @@ export default function StoreProductDetail() {
         <div className="p-6">
           {activeTab === 'description' && (
             <div className="prose max-w-none">
-              <div className="whitespace-pre-wrap font-sans text-slate-700">
-                {product.description}
-              </div>
+              {/* WO-O4O-GLYCOPHARM-PRODUCT-DESCRIPTION-RICH-RENDER-V1: canonical 상품설명 sanitized rich render */}
+              {product.description && (
+                <ContentRenderer html={product.description} className="text-slate-700" />
+              )}
               {product.shortDescription && (
-                <p className="text-slate-500 mt-4">{product.shortDescription}</p>
+                <ContentRenderer html={product.shortDescription} className="text-slate-500 mt-4" />
               )}
             </div>
           )}

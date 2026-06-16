@@ -145,16 +145,10 @@ async function queryVisibleProducts(
        CASE WHEN spo.is_active THEN 'active' ELSE 'inactive' END AS status,
        false AS is_featured,
        s.name AS manufacturer,
-       -- WO-O4O-PRODUCT-DESCRIPTION-CANONICAL-OUTPUT-LINK-V1: canonical 공용 설명 우선 fallback.
-       -- GP storefront 는 plain text 렌더 → content(HTML)는 태그 제거하여 안전 노출.
-       regexp_replace(
-         COALESCE(spd.content, spo.consumer_detail_description, spo.consumer_short_description, ''),
-         '<[^>]+>', '', 'g'
-       ) AS description,
-       regexp_replace(
-         COALESCE(spd.summary, spo.consumer_short_description, ''),
-         '<[^>]+>', '', 'g'
-       ) AS short_description,
+       -- WO-O4O-PRODUCT-DESCRIPTION-CANONICAL-OUTPUT-LINK-V1 / -GLYCOPHARM-RICH-RENDER-V1:
+       -- canonical 공용 설명 우선 fallback. HTML 보존(strip 제거) → frontend ContentRenderer(DOMPurify)가 sanitize 렌더.
+       COALESCE(spd.content, spo.consumer_detail_description, spo.consumer_short_description, '') AS description,
+       COALESCE(spd.summary, spo.consumer_short_description, '') AS short_description,
        opl.created_at AS sort_order,
        spo.created_at, spo.updated_at,
        opl.organization_id AS pharmacy_id,
