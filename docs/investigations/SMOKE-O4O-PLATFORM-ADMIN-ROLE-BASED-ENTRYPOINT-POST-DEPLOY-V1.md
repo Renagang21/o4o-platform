@@ -101,4 +101,4 @@
 | 배포 commit | `66132b54c` (Cloud Run deploy success) |
 | 자격증명 | SSOT env 주입, 보고서 미기재 |
 | 운영 데이터 변경 | **없음** (read-only) |
-| commit hash | (commit 후 기재) |
+| commit hash | `a2f926057` |
