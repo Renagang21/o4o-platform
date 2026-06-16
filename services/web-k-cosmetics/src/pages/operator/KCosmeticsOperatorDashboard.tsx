@@ -8,7 +8,11 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { OperatorDashboardLayout, type OperatorDashboardConfig } from '@o4o/operator-ux-core';
-import { AxisNavigationSection, type OperatorAxisGroup } from '@o4o/operator-core-ui';
+import {
+  AxisNavigationSection,
+  OperatorRoleGuideCard,
+  type OperatorAxisGroup,
+} from '@o4o/operator-core-ui';
 import { operatorApi } from '@/services/operatorApi';
 import { buildKCosmeticsOperatorConfig } from './operatorConfig';
 
@@ -123,6 +127,8 @@ export default function KCosmeticsOperatorDashboard() {
         ...config,
         aboveBlocks: (
           <>
+            {/* WO-O4O-CROSSSERVICE-OPERATOR-DASHBOARD-UI-PARITY-V1: 운영 철학 안내 카드 (공통, 세 서비스 동일 구조) */}
+            <OperatorRoleGuideCard guideHref="/guide/usage" />
             {/* 부가 섹션: [Alert/Notice] → [Axis] → [5-block] */}
             {orderMetricsNotice}
             {/* WO-O4O-OPERATOR-DASHBOARD-AXIS-NAVIGATION-COMMONIZATION-V1: 2축 운영 네비게이션 */}

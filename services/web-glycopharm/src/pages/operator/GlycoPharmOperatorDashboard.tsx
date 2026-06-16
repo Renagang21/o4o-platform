@@ -19,7 +19,11 @@ import {
   OperatorDashboardLayout,
   type OperatorDashboardConfig,
 } from '@o4o/operator-ux-core';
-import { AxisNavigationSection, type OperatorAxisGroup } from '@o4o/operator-core-ui';
+import {
+  AxisNavigationSection,
+  OperatorRoleGuideCard,
+  type OperatorAxisGroup,
+} from '@o4o/operator-core-ui';
 import { fetchOperatorDashboard } from '../../api/operatorDashboard';
 import { buildGlycoPharmOperatorConfig } from './operatorConfig';
 import OperatorAlerts from '../../components/OperatorAlerts';
@@ -126,6 +130,8 @@ export default function GlycoPharmOperatorDashboard() {
         ...config,
         aboveBlocks: (
           <>
+            {/* WO-O4O-CROSSSERVICE-OPERATOR-DASHBOARD-UI-PARITY-V1: 운영 철학 안내 카드 (공통, 세 서비스 동일 구조) */}
+            <OperatorRoleGuideCard guideHref="/guide/usage" />
             {/* Operator Alerts (rule-based) */}
             <OperatorAlerts alerts={alerts} />
             {/* WO-O4O-OPERATOR-DASHBOARD-AXIS-NAVIGATION-COMMONIZATION-V1: 2축 운영 네비게이션 */}

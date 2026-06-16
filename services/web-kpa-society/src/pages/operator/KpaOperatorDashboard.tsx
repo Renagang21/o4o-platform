@@ -27,13 +27,16 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
 import {
   OperatorDashboardLayout,
   type OperatorDashboardConfig,
   type KpiItem,
 } from '@o4o/operator-ux-core';
-import { AxisNavigationSection, type OperatorAxisGroup } from '@o4o/operator-core-ui';
+import {
+  AxisNavigationSection,
+  OperatorRoleGuideCard,
+  type OperatorAxisGroup,
+} from '@o4o/operator-core-ui';
 import { operatorApi } from '../../api/operator';
 import { getAccessToken } from '../../contexts/AuthContext';
 
@@ -130,8 +133,8 @@ export default function KpaOperatorDashboard() {
         ...config,
         aboveBlocks: (
           <>
-            {/* WO-O4O-KPA-OPERATOR-DASHBOARD-GUIDE-CARD-V1: 운영 철학 카드 (KPA only, frontend static) */}
-            <OperatorRoleGuideCard />
+            {/* WO-O4O-CROSSSERVICE-OPERATOR-DASHBOARD-UI-PARITY-V1: 운영 철학 카드 (공통 컴포넌트, 가이드 링크는 KPA route 주입) */}
+            <OperatorRoleGuideCard guideHref="/guide/for/operator" />
             {/* WO-O4O-OPERATOR-DASHBOARD-COMMUNITY-STORE-HUB-SPLIT-V1: 2축 운영 네비게이션 (frontend 유지 — I3 정합) */}
             {axes.length > 0 && <AxisNavigationSection axes={axes} />}
           </>
@@ -203,36 +206,4 @@ function buildKpaAxesFromConfig(
       ],
     },
   ];
-}
-
-// ─── 운영 철학 가이드 카드 ─────────────────────────────────────────────────────
-// WO-O4O-KPA-OPERATOR-DASHBOARD-GUIDE-CARD-V1: KPA only static. frontend 유지 (I1 정합).
-
-function OperatorRoleGuideCard() {
-  return (
-    <section className="bg-white rounded-xl border border-indigo-100 p-5">
-      <div className="flex items-start gap-3">
-        <span className="text-2xl shrink-0" aria-hidden="true">🤝</span>
-        <div className="flex-1 min-w-0">
-          <h2 className="text-base font-semibold text-slate-900 mb-1">
-            운영자는 관리자가 아닙니다
-          </h2>
-          <p className="text-xs text-slate-500 mb-3">
-            공급자 협력 · 자료 구성 · AI 보조 · 매장 지원 · 운영 생태계 구축
-          </p>
-          <p className="text-sm text-slate-600 leading-relaxed mb-4">
-            운영자는 공급자와 협력하고 자료를 정리하며 AI 도움을 활용하여
-            매장이 실제 활용할 수 있는 환경을 지원합니다.
-          </p>
-          <Link
-            to="/guide/for/operator"
-            className="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors"
-          >
-            운영자 활용 가이드 보기
-            <span className="ml-1" aria-hidden="true">→</span>
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
 }

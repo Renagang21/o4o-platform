@@ -110,6 +110,10 @@ export type {
   AxisNavigationSectionProps,
 } from './dashboard/AxisNavigationSection';
 
+// Operator Role Guide Card (WO-O4O-CROSSSERVICE-OPERATOR-DASHBOARD-UI-PARITY-V1)
+export { OperatorRoleGuideCard } from './dashboard/OperatorRoleGuideCard';
+export type { OperatorRoleGuideCardProps } from './dashboard/OperatorRoleGuideCard';
+
 // Product Applications Module (WO-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-ENABLE-GP-KCOS-V1)
 export { ProductApplicationManagementConsole } from './modules/product-applications';
 export type {
