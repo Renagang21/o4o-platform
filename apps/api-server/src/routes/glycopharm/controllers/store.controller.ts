@@ -144,8 +144,17 @@ async function queryVisibleProducts(
        0 AS stock_quantity, '[]'::jsonb AS images,
        CASE WHEN spo.is_active THEN 'active' ELSE 'inactive' END AS status,
        false AS is_featured,
-       s.name AS manufacturer, '' AS description,
-       '' AS short_description,
+       s.name AS manufacturer,
+       -- WO-O4O-PRODUCT-DESCRIPTION-CANONICAL-OUTPUT-LINK-V1: canonical 공용 설명 우선 fallback.
+       -- GP storefront 는 plain text 렌더 → content(HTML)는 태그 제거하여 안전 노출.
+       regexp_replace(
+         COALESCE(spd.content, spo.consumer_detail_description, spo.consumer_short_description, ''),
+         '<[^>]+>', '', 'g'
+       ) AS description,
+       regexp_replace(
+         COALESCE(spd.summary, spo.consumer_short_description, ''),
+         '<[^>]+>', '', 'g'
+       ) AS short_description,
        opl.created_at AS sort_order,
        spo.created_at, spo.updated_at,
        opl.organization_id AS pharmacy_id,
@@ -153,6 +162,11 @@ async function queryVisibleProducts(
      FROM supplier_product_offers spo
      JOIN product_masters pm ON pm.id = spo.master_id
      JOIN neture_suppliers s ON s.id = spo.supplier_id
+     -- canonical 1개/master (partial unique index) → DISTINCT ON 행 증식 없음
+     LEFT JOIN shared_product_descriptions spd
+       ON spd.master_id = pm.id
+       AND spd.status = 'canonical'
+       AND spd.deleted_at IS NULL
      INNER JOIN organization_product_listings opl
        ON opl.offer_id = spo.id
        AND opl.organization_id = $1
