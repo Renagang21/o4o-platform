@@ -63,6 +63,16 @@ export default function SupplierRecruitmentDetailPage() {
     await load();
   };
 
+  // WO-O4O-SELLER-RECRUITMENT-CLOSE-ACTION-V1
+  const handleCloseRecruitment = async () => {
+    if (!recruitmentId) return;
+    if (!window.confirm('이 모집을 마감하면 신규 신청을 받을 수 없습니다.\n기존 신청자에 대한 승인/반려는 계속 처리할 수 있습니다.\n마감하시겠습니까?')) return;
+    setError(null);
+    const result = await supplierRecruitmentApi.close(recruitmentId);
+    if (!result.success) setError(result.message || '마감에 실패했습니다.');
+    await load();
+  };
+
   if (loading) {
     return <div className="max-w-4xl py-16 text-center text-slate-400 text-sm">불러오는 중...</div>;
   }
@@ -85,13 +95,29 @@ export default function SupplierRecruitmentDetailPage() {
 
       {/* 모집 요약 */}
       <div className="rounded-xl border border-slate-200 bg-white p-5 mb-5">
-        <h1 className="text-xl font-bold text-slate-900">{r.productName}</h1>
+        <div className="flex items-start justify-between gap-3">
+          <h1 className="text-xl font-bold text-slate-900">{r.productName}</h1>
+          {r.status === 'recruiting' && (
+            <button
+              type="button"
+              onClick={handleCloseRecruitment}
+              className="shrink-0 px-3 py-1.5 text-sm font-medium text-slate-600 border border-slate-200 rounded-lg hover:border-red-300 hover:text-red-600"
+            >
+              모집 마감
+            </button>
+          )}
+        </div>
         <div className="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
           <div><div className="text-xs text-slate-400">대상 서비스</div><div className="text-slate-700">{SERVICE_LABELS[r.serviceId] || r.serviceId || '-'}</div></div>
           <div><div className="text-xs text-slate-400">수수료율</div><div className="text-slate-700">{r.commissionRate ? `${r.commissionRate}%` : '-'}</div></div>
           <div><div className="text-xs text-slate-400">상태</div><div className="text-slate-700">{r.status === 'recruiting' ? '모집중' : '마감'}</div></div>
           <div><div className="text-xs text-slate-400">생성일</div><div className="text-slate-700">{new Date(r.createdAt).toLocaleDateString('ko-KR')}</div></div>
         </div>
+        {r.status === 'closed' && (
+          <p className="mt-3 text-xs text-slate-500 bg-slate-50 border border-slate-100 rounded px-2 py-1.5">
+            이 모집은 마감되어 신규 신청을 받지 않습니다. 기존 신청자에 대한 승인/반려는 계속 처리할 수 있습니다.
+          </p>
+        )}
       </div>
 
       <h2 className="text-base font-semibold text-slate-800 mb-2">신청자 ({detail.applications.length})</h2>

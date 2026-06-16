@@ -26,14 +26,24 @@ export default function SupplierRecruitmentsPage() {
   const navigate = useNavigate();
   const [rows, setRows] = useState<SupplierRecruitment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [closingId, setClosingId] = useState<string | null>(null);
 
-  useEffect(() => {
-    (async () => {
-      setLoading(true);
-      setRows(await supplierRecruitmentApi.listMine());
-      setLoading(false);
-    })();
-  }, []);
+  const load = async () => {
+    setLoading(true);
+    setRows(await supplierRecruitmentApi.listMine());
+    setLoading(false);
+  };
+
+  useEffect(() => { load(); }, []);
+
+  // WO-O4O-SELLER-RECRUITMENT-CLOSE-ACTION-V1
+  const handleClose = async (id: string) => {
+    if (!window.confirm('이 모집을 마감하면 신규 신청을 받을 수 없습니다.\n기존 신청 및 승인된 판매자의 주문 가능 상태는 유지됩니다.\n마감하시겠습니까?')) return;
+    setClosingId(id);
+    await supplierRecruitmentApi.close(id);
+    setClosingId(null);
+    await load();
+  };
 
   return (
     <div className="max-w-5xl">
@@ -99,7 +109,7 @@ export default function SupplierRecruitmentsPage() {
                         : <span className="text-slate-400">0</span>}
                     </td>
                     <td className="px-4 py-3 text-slate-400 text-xs">{new Date(r.createdAt).toLocaleDateString('ko-KR')}</td>
-                    <td className="px-4 py-3 text-center">
+                    <td className="px-4 py-3 text-center whitespace-nowrap space-x-3">
                       <button
                         type="button"
                         onClick={() => navigate(`/supplier/recruitments/${r.id}`)}
@@ -107,6 +117,16 @@ export default function SupplierRecruitmentsPage() {
                       >
                         신청자 보기
                       </button>
+                      {r.status === 'recruiting' && (
+                        <button
+                          type="button"
+                          disabled={closingId === r.id}
+                          onClick={() => handleClose(r.id)}
+                          className="text-slate-500 hover:text-red-600 text-sm font-medium disabled:opacity-50"
+                        >
+                          마감
+                        </button>
+                      )}
                     </td>
                   </tr>
                 );

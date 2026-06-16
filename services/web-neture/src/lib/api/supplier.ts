@@ -1342,6 +1342,17 @@ export const supplierRecruitmentApi = {
     }
   },
 
+  // WO-O4O-SELLER-RECRUITMENT-CLOSE-ACTION-V1: 모집 마감(신규 신청 차단)
+  async close(recruitmentId: string): Promise<{ success: boolean; error?: string; message?: string }> {
+    try {
+      const response = await api.patch(`/neture/partner/recruitments/${recruitmentId}/close`);
+      return response.data;
+    } catch (error: any) {
+      const d = error?.response?.data;
+      return { success: false, error: d?.error || 'CLOSE_FAILED', message: d?.message };
+    }
+  },
+
   async create(input: {
     masterId: string;
     serviceKey: string;

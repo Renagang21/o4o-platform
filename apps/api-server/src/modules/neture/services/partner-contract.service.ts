@@ -172,6 +172,26 @@ export class NeturePartnerContractService {
   }
 
   /**
+   * WO-O4O-SELLER-RECRUITMENT-CLOSE-ACTION-V1
+   *
+   * 공급자가 본인 모집을 마감한다(신규 신청 차단). 기존 신청/승인/계약/C bridge 결과는 유지.
+   * 소유권: recruitment.sellerId === sellerUserId. 이미 closed 면 idempotent 성공.
+   * (신규 신청 차단은 createPartnerApplication 의 status 검증으로 이미 동작 — 본 메서드는 status 전환만.)
+   */
+  async closeRecruitment(recruitmentId: string, sellerUserId: string) {
+    const recruitment = await this.recruitmentRepo.findOne({ where: { id: recruitmentId } });
+    if (!recruitment || recruitment.sellerId !== sellerUserId) {
+      return { success: false as const, error: 'NOT_FOUND' };
+    }
+    if (recruitment.status !== RecruitmentStatus.CLOSED) {
+      recruitment.status = RecruitmentStatus.CLOSED;
+      await this.recruitmentRepo.save(recruitment);
+      logger.info(`[NeturePartnerContractService] Recruitment closed: ${recruitment.id}`);
+    }
+    return { success: true as const, data: { id: recruitment.id, status: recruitment.status } };
+  }
+
+  /**
    * WO-O4O-SELLER-RECRUITMENT-SUPPLIER-APPLICATION-REVIEW-V1
    *
    * 공급자 본인 모집의 신청자 목록 + 모집 요약 (소유권: recruitment.sellerId === sellerUserId).

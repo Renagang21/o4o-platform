@@ -568,6 +568,11 @@ export class NetureService {
     return this.partnerContractService.getRecruitmentApplications(recruitmentId, sellerUserId);
   }
 
+  // WO-O4O-SELLER-RECRUITMENT-CLOSE-ACTION-V1: 모집 마감(신규 신청 차단)
+  async closePartnerRecruitment(recruitmentId: string, sellerUserId: string) {
+    return this.partnerContractService.closeRecruitment(recruitmentId, sellerUserId);
+  }
+
   async approvePartnerApplication(applicationId: string, sellerId: string) {
     return this.partnerContractService.approvePartnerApplication(applicationId, sellerId);
   }
