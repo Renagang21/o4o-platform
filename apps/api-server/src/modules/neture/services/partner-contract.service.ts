@@ -276,6 +276,11 @@ export class NeturePartnerContractService {
       commissionRate: Number(r.commissionRate),
       consumerPrice: Number(r.consumerPrice),
       status: r.status,
+      // WO-O4O-SELLER-RECRUITMENT-EXPOSURE-SUPPLIER-STATUS-V1: 서비스 노출 승인 상태(읽기 표시용, 변경 API 아님)
+      exposureStatus: r.exposureStatus,
+      exposureReviewedAt: r.exposureReviewedAt,
+      exposureReviewedBy: r.exposureReviewedBy,
+      exposureReviewNote: r.exposureReviewNote,
       createdAt: r.createdAt,
       applications: countMap.get(r.id) || { total: 0, pending: 0, approved: 0, rejected: 0 },
     }));
@@ -500,6 +505,11 @@ export class NeturePartnerContractService {
         commissionRate: Number(recruitment.commissionRate),
         consumerPrice: Number(recruitment.consumerPrice),
         status: recruitment.status,
+        // WO-O4O-SELLER-RECRUITMENT-EXPOSURE-SUPPLIER-STATUS-V1: 서비스 노출 승인 상태(읽기 표시용)
+        exposureStatus: recruitment.exposureStatus,
+        exposureReviewedAt: recruitment.exposureReviewedAt,
+        exposureReviewedBy: recruitment.exposureReviewedBy,
+        exposureReviewNote: recruitment.exposureReviewNote,
         createdAt: recruitment.createdAt,
       },
       applications: rows.map((a) => ({

@@ -116,6 +116,12 @@ export function createSharedProductDescriptionController(dataSource: DataSource)
       });
       res.status(201).json({ success: true, data: created });
     } catch (error) {
+      // WO-O4O-...-SANITIZE-ON-WRITE-V2: sanitize 후 content 가 비면 검증 실패(400)로 응답.
+      const msg = error instanceof Error ? error.message : '';
+      if (msg.includes('empty after sanitization')) {
+        res.status(400).json({ success: false, error: 'content is empty after sanitization' });
+        return;
+      }
       logger.error('[SharedProductDescription] create error:', error);
       res.status(500).json({ success: false, error: 'Failed to create candidate' });
     }

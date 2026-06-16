@@ -26,6 +26,29 @@ const APP_STATUS: Record<string, { label: string; cls: string }> = {
   cancelled: { label: '신청 취소', cls: 'bg-slate-200 text-slate-600' },
 };
 
+// WO-O4O-SELLER-RECRUITMENT-EXPOSURE-SUPPLIER-STATUS-V1: 서비스 노출 승인 상태 (운영자 콘솔과 동일 라벨)
+const EXPOSURE_BADGE: Record<string, { label: string; cls: string }> = {
+  pending: { label: '노출 대기', cls: 'bg-amber-100 text-amber-700' },
+  approved: { label: '노출 승인', cls: 'bg-emerald-100 text-emerald-700' },
+  rejected: { label: '노출 반려', cls: 'bg-red-100 text-red-700' },
+};
+
+// 노출 상태별 안내 배너 (공급자는 조회만 — 변경 액션 없음)
+const EXPOSURE_NOTICE: Record<string, { cls: string; text: string }> = {
+  pending: {
+    cls: 'bg-amber-50 border-amber-100 text-amber-800',
+    text: '서비스 운영자가 모집 제품의 노출을 검토 중입니다. 승인 전에는 매장/약국 사용자에게 보이지 않습니다.',
+  },
+  approved: {
+    cls: 'bg-emerald-50 border-emerald-100 text-emerald-800',
+    text: '이 모집은 서비스에 노출 중입니다. 매장/약국 사용자가 신청할 수 있습니다.',
+  },
+  rejected: {
+    cls: 'bg-red-50 border-red-100 text-red-800',
+    text: '서비스 운영자가 이 모집의 노출을 반려했습니다. 매장/약국 사용자에게 보이지 않습니다.',
+  },
+};
+
 export default function SupplierRecruitmentDetailPage() {
   const { recruitmentId } = useParams<{ recruitmentId: string }>();
   const navigate = useNavigate();
@@ -142,8 +165,33 @@ export default function SupplierRecruitmentDetailPage() {
           <div><div className="text-xs text-slate-400">대상 서비스</div><div className="text-slate-700">{SERVICE_LABELS[r.serviceId] || r.serviceId || '-'}</div></div>
           <div><div className="text-xs text-slate-400">수수료율</div><div className="text-slate-700">{r.commissionRate ? `${r.commissionRate}%` : '-'}</div></div>
           <div><div className="text-xs text-slate-400">상태</div><div className="text-slate-700">{r.status === 'recruiting' ? '모집중' : '마감'}</div></div>
+          {/* WO-O4O-SELLER-RECRUITMENT-EXPOSURE-SUPPLIER-STATUS-V1 */}
+          <div>
+            <div className="text-xs text-slate-400">노출 승인</div>
+            <div className="mt-0.5">
+              <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${(EXPOSURE_BADGE[r.exposureStatus] || { cls: 'bg-gray-100 text-gray-600' }).cls}`}>
+                {(EXPOSURE_BADGE[r.exposureStatus] || { label: r.exposureStatus }).label}
+              </span>
+            </div>
+          </div>
           <div><div className="text-xs text-slate-400">생성일</div><div className="text-slate-700">{new Date(r.createdAt).toLocaleDateString('ko-KR')}</div></div>
         </div>
+
+        {/* WO-O4O-SELLER-RECRUITMENT-EXPOSURE-SUPPLIER-STATUS-V1: 노출 상태별 안내 (공급자 조회 전용 — 변경 불가) */}
+        {EXPOSURE_NOTICE[r.exposureStatus] && (
+          <div className={`mt-3 text-xs rounded border px-2.5 py-2 ${EXPOSURE_NOTICE[r.exposureStatus].cls}`}>
+            {EXPOSURE_NOTICE[r.exposureStatus].text}
+            {r.exposureStatus === 'rejected' && (
+              <div className="mt-1.5 text-slate-600">
+                <span className="font-medium text-slate-500">반려 메모: </span>
+                {r.exposureReviewNote && r.exposureReviewNote.trim()
+                  ? r.exposureReviewNote
+                  : <span className="text-slate-400">반려 사유가 입력되지 않았습니다.</span>}
+              </div>
+            )}
+          </div>
+        )}
+
         {r.status === 'closed' && (
           <p className="mt-3 text-xs text-slate-500 bg-slate-50 border border-slate-100 rounded px-2 py-1.5">
             이 모집은 마감되어 신규 신청을 받지 않습니다. 기존 신청자에 대한 승인/반려는 계속 처리할 수 있습니다.

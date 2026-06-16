@@ -22,6 +22,13 @@ const STATUS_BADGE: Record<string, { label: string; cls: string }> = {
   closed: { label: '마감', cls: 'bg-slate-100 text-slate-500' },
 };
 
+// WO-O4O-SELLER-RECRUITMENT-EXPOSURE-SUPPLIER-STATUS-V1: 서비스 노출 승인 상태 (운영자 콘솔과 동일 라벨)
+const EXPOSURE_BADGE: Record<string, { label: string; cls: string }> = {
+  pending: { label: '노출 대기', cls: 'bg-amber-100 text-amber-700' },
+  approved: { label: '노출 승인', cls: 'bg-emerald-100 text-emerald-700' },
+  rejected: { label: '노출 반려', cls: 'bg-red-100 text-red-700' },
+};
+
 export default function SupplierRecruitmentsPage() {
   const navigate = useNavigate();
   const [rows, setRows] = useState<SupplierRecruitment[]>([]);
@@ -66,6 +73,13 @@ export default function SupplierRecruitmentsPage() {
         </p>
       </div>
 
+      {/* WO-O4O-SELLER-RECRUITMENT-EXPOSURE-SUPPLIER-STATUS-V1: 노출 승인 개념 안내 */}
+      <div className="mb-4 rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-xs text-blue-800">
+        모집은 <strong>서비스 운영자의 노출 승인</strong>을 받은 뒤에야 매장/약국 사용자에게 보입니다.
+        <span className="text-blue-700"> 노출 대기·노출 반려</span> 상태의 모집은 아직(또는 더 이상) 매장/약국 사용자에게 노출되지 않습니다.
+        노출 승인은 서비스 운영자가 결정하며, 공급자가 직접 변경할 수 없습니다.
+      </div>
+
       {loading ? (
         <div className="py-16 text-center text-slate-400 text-sm">불러오는 중...</div>
       ) : rows.length === 0 ? (
@@ -88,6 +102,7 @@ export default function SupplierRecruitmentsPage() {
                 <th className="px-4 py-3">대상 서비스</th>
                 <th className="px-4 py-3">수수료율</th>
                 <th className="px-4 py-3">상태</th>
+                <th className="px-4 py-3">노출 승인</th>
                 <th className="px-4 py-3 text-center">신청</th>
                 <th className="px-4 py-3 text-center">대기</th>
                 <th className="px-4 py-3 text-center">승인</th>
@@ -98,6 +113,7 @@ export default function SupplierRecruitmentsPage() {
             <tbody className="divide-y divide-slate-100">
               {rows.map((r) => {
                 const badge = STATUS_BADGE[r.status] || { label: r.status, cls: 'bg-gray-100 text-gray-600' };
+                const exposure = EXPOSURE_BADGE[r.exposureStatus] || { label: r.exposureStatus, cls: 'bg-gray-100 text-gray-600' };
                 return (
                   <tr key={r.id} className="hover:bg-slate-50">
                     <td className="px-4 py-3 font-medium text-slate-800">{r.productName}</td>
@@ -105,6 +121,12 @@ export default function SupplierRecruitmentsPage() {
                     <td className="px-4 py-3 text-slate-600">{r.commissionRate ? `${r.commissionRate}%` : '-'}</td>
                     <td className="px-4 py-3">
                       <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${badge.cls}`}>{badge.label}</span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${exposure.cls}`}>{exposure.label}</span>
+                      {r.exposureStatus === 'rejected' && r.exposureReviewNote && (
+                        <div className="text-xs text-slate-400 mt-0.5 max-w-[180px] truncate" title={r.exposureReviewNote}>{r.exposureReviewNote}</div>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-center text-slate-700">{r.applications.total}</td>
                     <td className="px-4 py-3 text-center">

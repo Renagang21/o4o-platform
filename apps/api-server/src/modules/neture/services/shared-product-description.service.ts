@@ -15,6 +15,7 @@ import type {
   SharedProductDescriptionSourceType,
   SharedProductDescriptionStatus,
 } from '../entities/SharedProductDescription.entity.js';
+import { sanitizeDescriptionHtml } from '../utils/sanitize-description-html.util.js';
 
 export interface CreateCandidateInput {
   masterId: string;
@@ -78,12 +79,27 @@ export class SharedProductDescriptionService {
     return this.repo.findOne({ where: { id } });
   }
 
-  /** 후보 생성 (기본 status='candidate') */
+  /**
+   * 후보 생성 (기본 status='candidate')
+   *
+   * WO-O4O-PRODUCT-DESCRIPTION-SANITIZE-ON-WRITE-V2:
+   * content/summary 는 저장 전 backend sanitizer(jsdom+DOMPurify)로 정화한다 (1차 방어선).
+   * sanitize 후 content 가 비면 빈 candidate 를 만들지 않고 에러를 던진다.
+   * (seed 경로는 sanitize 결과가 빈 경우 createCandidate 호출 전에 skip 하므로 여기 도달하지 않는다.)
+   */
   async createCandidate(input: CreateCandidateInput): Promise<SharedProductDescription> {
+    const content = sanitizeDescriptionHtml(input.content);
+    if (!content) {
+      throw new Error('content is empty after sanitization');
+    }
+    const summary =
+      input.summary === undefined || input.summary === null
+        ? null
+        : sanitizeDescriptionHtml(input.summary) || null;
     const entity = this.repo.create({
       masterId: input.masterId,
-      content: input.content,
-      summary: input.summary ?? null,
+      content,
+      summary,
       sourceType: input.sourceType,
       sourceRefId: input.sourceRefId ?? null,
       language: input.language ?? 'ko',
@@ -214,8 +230,9 @@ export class SharedProductDescriptionService {
     let created = 0;
     let skipped = 0;
     for (const row of rows) {
-      const content = (row.consumer_detail_description ?? '').trim();
-      const summary = (row.consumer_short_description ?? '').trim();
+      // WO-O4O-...-SANITIZE-ON-WRITE-V2: source 원본은 수정하지 않고, candidate 저장값만 sanitize.
+      const content = sanitizeDescriptionHtml(row.consumer_detail_description);
+      const summary = sanitizeDescriptionHtml(row.consumer_short_description);
       if (!content && !summary) {
         skipped++;
         continue;
@@ -250,7 +267,8 @@ export class SharedProductDescriptionService {
     let created = 0;
     let skipped = 0;
     for (const row of rows) {
-      const content = (row.content ?? '').trim();
+      // WO-O4O-...-SANITIZE-ON-WRITE-V2: product_ai_contents 원본은 수정하지 않고, candidate 저장값만 sanitize.
+      const content = sanitizeDescriptionHtml(row.content);
       if (!content) {
         skipped++;
         continue;
@@ -301,10 +319,12 @@ export class SharedProductDescriptionService {
         ['금기', row.contraindication_text],
         ['저장방법', row.storage_text],
       ];
-      const content = sections
+      const builtContent = sections
         .filter(([, v]) => v && v.trim())
         .map(([label, v]) => `<p><strong>${label}</strong><br/>${(v as string).trim()}</p>`)
         .join('\n');
+      // WO-O4O-...-SANITIZE-ON-WRITE-V2: drug_extension 원본은 수정하지 않고, 조합한 candidate 저장값만 sanitize.
+      const content = sanitizeDescriptionHtml(builtContent);
 
       if (!content) {
         skipped++;
