@@ -64,10 +64,13 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   ],
   // WO-KPA-OPERATOR-CONTENT-NOTICE-NEWS-MENU-NORMALIZATION-V1: "공지사항" + "콘텐츠 관리" → "공지사항/뉴스" 통합
   // WO-KPA-LMS-INSTRUCTOR-APPROVAL-RELOCATE-V1: 자료실 관리 → resources 그룹으로, 강의 관리 → lms 그룹으로 이동
+  // WO-O4O-CROSSSERVICE-OPERATOR-CONTENT-MENU-PARITY-V1: 설문조사 관리 추가 (route /operator/surveys 기존 존재).
+  //   canonical Content 4항목(공지사항/뉴스 · Home 편집 · 콘텐츠 허브 · 설문조사 관리) 정합.
   content: [
     { label: '공지사항/뉴스', path: '/operator/content' },
     { label: 'Home 편집', path: '/operator/community' },
     { label: '콘텐츠 허브', path: '/operator/docs' },
+    { label: '설문조사 관리', path: '/operator/surveys' },
   ],
   // WO-KPA-LMS-INSTRUCTOR-APPROVAL-RELOCATE-V1: 자료실 독립 최상위 그룹
   resources: [
@@ -154,6 +157,8 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     { label: '공지사항/뉴스', path: '/operator/content' },
     { label: 'Home 편집', path: '/operator/community' },
     { label: '콘텐츠 허브', path: '/operator/docs' },
+    // WO-O4O-CROSSSERVICE-OPERATOR-CONTENT-MENU-PARITY-V1
+    { label: '설문조사 관리', path: '/operator/surveys' },
   ],
   resources: [
     { label: '자료실 관리', path: '/operator/resources' },

@@ -50,9 +50,12 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   orders: [{ label: '주문 현황', path: '/operator/orders' }],
   // WO-O4O-KCOS-OPERATOR-MENU-ALIGN-WITH-KPA-V1:
   //   content 그룹에서 안내 문구 관리 → lms, 자료실 관리 → resources 로 분리.
+  // WO-O4O-CROSSSERVICE-OPERATOR-CONTENT-MENU-PARITY-V1:
+  //   canonical Content 라벨 정합 — '공지/뉴스 관리' → '공지사항/뉴스' (KPA/GP 와 동일 라벨).
+  //   Home 편집(/operator/community) · 콘텐츠 허브(/operator/docs) 는 K-Cosmetics 에 route 부재 →
+  //   dead link 방지 위해 메뉴 미추가 (후속 별도 WO: page/route 신설 필요).
   content: [
-    // WO-O4O-CONTENT-CANONICAL-CROSS-SERVICE-ALIGNMENT-V1
-    { label: '공지/뉴스 관리', path: '/operator/content-management' },
+    { label: '공지사항/뉴스', path: '/operator/content-management' },
     // WO-O4O-KCOSMETICS-OPERATOR-SURVEYS-V1
     { label: '설문조사 관리', path: '/operator/surveys' },
   ],
