@@ -810,7 +810,9 @@ function AppRoutes() {
         }
       >
         <Route index element={<GlycoPharmOperatorDashboard />} />
-        <Route path="pharmacies" element={<PharmaciesPage />} />
+        {/* WO-O4O-GLYCOPHARM-OPERATOR-PHARMACIES-LEGACY-REMOVAL-V1:
+            legacy /operator/pharmacies 축 제거 — canonical 은 /operator/stores.
+            (admin 약국 네트워크 /admin/pharmacies 는 별개 기능으로 유지) */}
         <Route path="products" element={<ProductsPage />} />
         <Route path="products/:productId" element={<ProductDetailPage />} />
         <Route path="stores" element={<OperatorStoresPage />} />

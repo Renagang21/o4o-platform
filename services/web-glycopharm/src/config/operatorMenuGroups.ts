@@ -51,7 +51,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   //   약국 HUB 블로그/POP/QR 을 stores 그룹으로 이동 (KPA-aligned).
   //   Store Menu Canonical Tree V1 의 매장 HUB 운영 축에 정합.
   stores: [
-    { label: '약국 관리', path: '/operator/pharmacies' },
+    // WO-O4O-GLYCOPHARM-OPERATOR-PHARMACIES-LEGACY-REMOVAL-V1:
+    //   legacy '약국 관리'(/operator/pharmacies) 제거 — canonical 은 '매장 관리'(/operator/stores).
     { label: '매장 관리', path: '/operator/stores' },
     // WO-O4O-GLYCOPHARM-OPERATOR-STORE-CHANNELS-V1
     { label: '채널 관리', path: '/operator/store-channels' },
@@ -149,7 +150,7 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
   // WO-O4O-OPERATOR-PRODUCT-ORDER-VIEW-LABEL-CLARIFY-GP-KCOS-V1: view-only 콘솔 → '상품 현황'
   products: [{ label: '상품 현황', path: '/operator/products' }],
   stores: [
-    { label: '약국 관리', path: '/operator/pharmacies' },
+    // WO-O4O-GLYCOPHARM-OPERATOR-PHARMACIES-LEGACY-REMOVAL-V1: legacy '약국 관리' 제거
     { label: '매장 관리', path: '/operator/stores' },
     { label: '채널 관리', path: '/operator/store-channels' },
     { label: '약국 HUB 블로그', path: '/operator/blog' },
