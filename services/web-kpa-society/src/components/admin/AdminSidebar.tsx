@@ -59,6 +59,8 @@ const ADMIN_SIDEBAR_GROUPS: SidebarGroup[] = [
     icon: Settings,
     items: [
       { label: '문의 설정', path: '/admin/settings/contact' },
+      // WO-O4O-KPA-ADMIN-SERVICE-LEGAL-SETTINGS-WIRING-V1: footer 법정정보 편집 (정책문서는 운영자 법률 관리 유지)
+      { label: '법정정보 설정', path: '/admin/settings/legal' },
     ],
   },
 ];

@@ -121,6 +121,9 @@ export const POLICY_DOCUMENT_TYPES: { value: string; label: string }[] = [
   { value: 'custom', label: '기타' },
 ];
 
+/** 노출 가능한 탭 키. */
+export type ServiceLegalTabKey = 'profile' | 'policies' | 'status';
+
 export interface ServiceLegalSettingsPageProps {
   /** 대상 service canonical key (예: 'neture'). */
   serviceKey: string;
@@ -128,4 +131,10 @@ export interface ServiceLegalSettingsPageProps {
   api: ServiceLegalApi;
   /** 화면 상단 제목(선택). 기본 '서비스 설정 — 법정정보·약관'. */
   title?: string;
+  /**
+   * 노출할 탭(선택). 기본: 전체 `['profile', 'policies', 'status']`.
+   * 정책문서 트랙을 별도(legacy)로 운영하는 서비스는 `['profile']` 등 부분 노출로
+   * service_policy_documents 편집 탭을 숨길 수 있다. (WO-O4O-KPA-ADMIN-SERVICE-LEGAL-SETTINGS-WIRING-V1)
+   */
+  enabledTabs?: ServiceLegalTabKey[];
 }

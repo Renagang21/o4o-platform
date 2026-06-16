@@ -22,6 +22,7 @@ import {
   type ServicePolicyDocumentDto,
   type ServicePolicyDocumentInput,
   type ServiceLegalSettingsPageProps,
+  type ServiceLegalTabKey,
 } from './types';
 
 // ── styles ──
@@ -59,7 +60,8 @@ const S = {
   statusRow: { display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #f1f5f9', fontSize: 14, color: '#334155' } as CSSProperties,
 };
 
-type TabKey = 'profile' | 'policies' | 'status';
+type TabKey = ServiceLegalTabKey;
+const ALL_TABS: TabKey[] = ['profile', 'policies', 'status'];
 
 interface ProfileFieldDef { key: keyof ServiceLegalProfileInput; label: string; multiline?: boolean }
 const PROFILE_GROUPS: { title: string; fields: ProfileFieldDef[] }[] = [
@@ -108,8 +110,14 @@ function fmtDate(iso: string | null | undefined): string {
   try { return new Date(iso).toLocaleDateString('ko-KR'); } catch { return '-'; }
 }
 
-export function ServiceLegalSettingsPage({ serviceKey, api, title }: ServiceLegalSettingsPageProps) {
-  const [tab, setTab] = useState<TabKey>('profile');
+export function ServiceLegalSettingsPage({ serviceKey, api, title, enabledTabs }: ServiceLegalSettingsPageProps) {
+  // WO-O4O-KPA-ADMIN-SERVICE-LEGAL-SETTINGS-WIRING-V1: 일부 서비스는 정책문서 탭을 숨긴다(법정정보만).
+  const allowedTabs: TabKey[] = enabledTabs && enabledTabs.length > 0 ? enabledTabs : ALL_TABS;
+  const showProfile = allowedTabs.includes('profile');
+  const showPolicies = allowedTabs.includes('policies');
+  const showStatus = allowedTabs.includes('status');
+
+  const [tab, setTab] = useState<TabKey>(allowedTabs[0]);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   // ── profile state ──
@@ -158,7 +166,11 @@ export function ServiceLegalSettingsPage({ serviceKey, api, title }: ServiceLega
     }
   }, [api, serviceKey]);
 
-  useEffect(() => { loadProfile(); loadPolicies(); }, [loadProfile, loadPolicies]);
+  useEffect(() => {
+    if (showProfile) loadProfile();
+    // 정책문서 탭/공개상태 탭이 숨겨진 서비스는 service_policy_documents 를 조회하지 않는다.
+    if (showPolicies || showStatus) loadPolicies();
+  }, [loadProfile, loadPolicies, showProfile, showPolicies, showStatus]);
 
   const handleSaveProfile = async () => {
     setSaving(true);
@@ -242,9 +254,9 @@ export function ServiceLegalSettingsPage({ serviceKey, api, title }: ServiceLega
       </p>
 
       <div style={S.tabs}>
-        <button style={S.tab(tab === 'profile')} onClick={() => setTab('profile')}>법정정보</button>
-        <button style={S.tab(tab === 'policies')} onClick={() => setTab('policies')}>정책 문서</button>
-        <button style={S.tab(tab === 'status')} onClick={() => setTab('status')}>공개 상태 확인</button>
+        {showProfile && <button style={S.tab(tab === 'profile')} onClick={() => setTab('profile')}>법정정보</button>}
+        {showPolicies && <button style={S.tab(tab === 'policies')} onClick={() => setTab('policies')}>정책 문서</button>}
+        {showStatus && <button style={S.tab(tab === 'status')} onClick={() => setTab('status')}>공개 상태 확인</button>}
       </div>
 
       {message && <div style={S.banner(message.type)}>{message.text}</div>}

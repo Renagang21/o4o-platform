@@ -14,6 +14,8 @@ import { KpaAdminDashboardPage } from '../pages/admin/KpaAdminDashboardPage';
 import AdminMemberManagementPage from '../pages/admin/AdminMemberManagementPage';
 // WO-O4O-CONTACT-NETURE-KPA-SETTINGS-ADAPTER-V1
 import ServiceContactSettingsPage from '../pages/admin/ServiceContactSettingsPage';
+// WO-O4O-KPA-ADMIN-SERVICE-LEGAL-SETTINGS-WIRING-V1: footer 법정정보 편집(service_legal_profiles)
+import ServiceLegalSettingsPage from '../pages/admin/ServiceLegalSettingsPage';
 
 export function AdminRoutes() {
   return (
@@ -34,6 +36,10 @@ export function AdminRoutes() {
 
           {/* WO-O4O-CONTACT-NETURE-KPA-SETTINGS-ADAPTER-V1: 문의 수신자·자동 회신 설정 */}
           <Route path="settings/contact" element={<ServiceContactSettingsPage />} />
+
+          {/* WO-O4O-KPA-ADMIN-SERVICE-LEGAL-SETTINGS-WIRING-V1: footer 법정정보(service_legal_profiles) 편집.
+              정책문서(약관/개인정보)는 기존 /operator/legal(kpa_legal_documents) 유지 — 본 화면 범위 외. */}
+          <Route path="settings/legal" element={<ServiceLegalSettingsPage />} />
 
           {/* 알 수 없는 경로 → 관리자 홈 */}
           <Route path="*" element={<Navigate to="kpa-dashboard" replace />} />
