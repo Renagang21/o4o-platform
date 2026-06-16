@@ -1,20 +1,57 @@
 /**
- * RecruitmentExposureApprovalPage — 판매자 모집 노출 승인 (준비중 안내)
+ * RecruitmentExposureApprovalPage (GlycoPharm) — 판매자 모집 노출 승인
  *
- * WO-O4O-OPERATOR-APPROVALS-SELLER-RECRUITMENT-EXPOSURE-MENU-REMODEL-V1
+ * WO-O4O-SELLER-RECRUITMENT-EXPOSURE-OPERATOR-UI-V1
  *
- * 운영자 승인의 의미: 개별 판매자 승인이 아니라 "판매자 모집 제품을 우리 서비스에 노출할지" 결정.
- * 현재 노출 승인 backend(상태/API)가 없어 안내 화면만 제공(B안). 기능은 후속 작업에서 연결.
+ * glycopharm serviceKey 로 고정된 per-service proxy(/api/v1/glycopharm/operator/recruitment-exposure)를
+ * 자기 서비스 operator scope(glycopharm:operator)로 호출. 공통 RecruitmentExposureConsole 렌더.
  */
+import { useCallback, useEffect, useState } from 'react';
+import { RecruitmentExposureConsole, type RecruitmentExposureItem } from '@o4o/operator-ux-core';
+import { api } from '../../lib/apiClient';
+
+const BASE = '/glycopharm/operator/recruitment-exposure';
+
 export default function RecruitmentExposureApprovalPage() {
+  const [items, setItems] = useState<RecruitmentExposureItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [busyId, setBusyId] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await api.get(BASE);
+      setItems(res.data?.data ?? []);
+    } catch {
+      setItems([]);
+    }
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { void load(); }, [load]);
+
+  const decide = useCallback(
+    async (id: string, action: 'approve' | 'reject', note?: string) => {
+      setBusyId(id);
+      try {
+        await api.patch(`${BASE}/${id}/${action}`, { note });
+        await load();
+      } catch {
+        window.alert('처리에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+      }
+      setBusyId(null);
+    },
+    [load],
+  );
+
   return (
-    <div className="max-w-3xl p-6">
-      <h1 className="text-2xl font-bold text-slate-900">판매자 모집 노출 승인</h1>
-      <div className="mt-4 rounded-xl border border-slate-200 bg-white p-6 text-sm leading-relaxed text-slate-600">
-        <p>판매자 모집 제품을 우리 서비스에 노출할지 검토하는 화면입니다.</p>
-        <p className="mt-2">개별 판매자 승인/반려는 공급자가 모집 상세에서 처리합니다.</p>
-        <p className="mt-2 text-slate-400">노출 승인 기능은 후속 작업에서 연결됩니다.</p>
-      </div>
-    </div>
+    <RecruitmentExposureConsole
+      items={items}
+      loading={loading}
+      busyId={busyId}
+      audienceLabel="매장/약국 사용자"
+      onApprove={(id, note) => decide(id, 'approve', note)}
+      onReject={(id, note) => decide(id, 'reject', note)}
+    />
   );
 }

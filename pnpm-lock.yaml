@@ -3043,9 +3043,6 @@ importers:
 
   packages/tablet-kiosk-core:
     dependencies:
-      '@o4o/content-editor':
-        specifier: workspace:*
-        version: link:../content-editor
       react:
         specifier: 19.2.0
         version: 19.2.0

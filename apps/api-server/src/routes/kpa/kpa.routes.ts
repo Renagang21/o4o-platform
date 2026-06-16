@@ -57,6 +57,8 @@ import { createMemberController } from './controllers/member.controller.js';
 import { createApplicationController } from './controllers/application.controller.js';
 import { createOperatorSummaryController } from './controllers/operator-summary.controller.js';
 import { createEventOfferOperatorController } from './controllers/event-offer-operator.controller.js';
+// WO-O4O-SELLER-RECRUITMENT-EXPOSURE-OPERATOR-UI-V1: 판매자 모집 노출 승인 (kpa-society 고정 proxy)
+import { createServiceRecruitmentExposureProxyController } from '../../modules/neture/controllers/service-recruitment-exposure-proxy.controller.js';
 import { createSupplierOffersController } from './controllers/supplier-offers.controller.js';
 import { createJoinInquiryAdminRoutes, createJoinInquiryPublicRoutes } from './controllers/join-inquiry.controller.js';
 // WO-O4O-KPA-CONTACT-FORM-WORKFLOW-V1
@@ -244,6 +246,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Product Application Management (WO-O4O-PRODUCT-APPROVAL-WORKFLOW-V1)
   router.use('/operator/product-applications', createOperatorProductApplicationsController(dataSource, coreRequireAuth as any, requireKpaScope, kpaActionLogService));
+
+  // 판매자 모집 노출 승인 (WO-O4O-SELLER-RECRUITMENT-EXPOSURE-OPERATOR-UI-V1) — serviceKey 'kpa-society' 고정
+  router.use(createServiceRecruitmentExposureProxyController(coreRequireAuth as any, requireKpaScope('kpa:operator'), 'kpa-society'));
 
   // Groupbuy Operator routes (WO-KPA-GROUPBUY-OPERATOR-UI-V1)
   router.use('/groupbuy-admin', createEventOfferOperatorController(dataSource, coreRequireAuth as any));

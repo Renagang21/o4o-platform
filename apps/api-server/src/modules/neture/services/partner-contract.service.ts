@@ -211,9 +211,15 @@ export class NeturePartnerContractService {
     operatorUserId: string,
     decision: ExposureStatus.APPROVED | ExposureStatus.REJECTED,
     note?: string,
+    // WO-O4O-SELLER-RECRUITMENT-EXPOSURE-OPERATOR-UI-V1: per-service proxy 가 자기 serviceKey 로 고정.
+    // 전달 시 recruitment.serviceId 와 불일치하면 차단(서비스 운영자 권한 경계). neture 큐는 미전달(제한 없음).
+    serviceKey?: string,
   ) {
     const recruitment = await this.recruitmentRepo.findOne({ where: { id: recruitmentId } });
     if (!recruitment) return { success: false as const, error: 'RECRUITMENT_NOT_FOUND' };
+    if (serviceKey && recruitment.serviceId !== serviceKey) {
+      return { success: false as const, error: 'SERVICE_MISMATCH' };
+    }
 
     if (recruitment.exposureStatus === decision) {
       return { success: true as const, data: { id: recruitmentId, exposureStatus: decision, idempotent: true } };

@@ -70,6 +70,8 @@ import { createGlycopharmMemberController } from './controllers/glycopharm-membe
 import { createGlycopharmMypageController } from './controllers/mypage.controller.js'; // WO-O4O-MYPAGE-MY-REQUESTS-INBOX-GLYCO-KCOS-ROUTE-V1
 // WO-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-ENABLE-GP-KCOS-V1: 공유 operator 공급 상품 신청 승인 컨트롤러(serviceKey 격리)
 import { createOperatorProductApplicationsController } from '../kpa/controllers/operator-product-applications.controller.js';
+// WO-O4O-SELLER-RECRUITMENT-EXPOSURE-OPERATOR-UI-V1: 판매자 모집 노출 승인 (glycopharm 고정 proxy)
+import { createServiceRecruitmentExposureProxyController } from '../../modules/neture/controllers/service-recruitment-exposure-proxy.controller.js';
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 import { hasAnyServiceRole, logLegacyRoleUsage } from '../../utils/role.utils.js';
 import { GLYCOPHARM_SCOPE_CONFIG } from '@o4o/security-core';
@@ -541,6 +543,9 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
     actionLogService,
     { scope: 'glycopharm:operator', serviceKey: 'glycopharm' },
   ));
+
+  // 판매자 모집 노출 승인 (WO-O4O-SELLER-RECRUITMENT-EXPOSURE-OPERATOR-UI-V1) — serviceKey 'glycopharm' 고정
+  router.use(createServiceRecruitmentExposureProxyController(coreRequireAuth as any, requireGlycopharmScope('glycopharm:operator'), 'glycopharm'));
 
   // ============================================================================
   // Contents / Resources Routes

@@ -24,6 +24,8 @@ import { requireAuth as coreRequireAuth } from '../../middleware/auth.middleware
 import { requireCosmeticsScope } from '../../middleware/cosmetics-scope.middleware.js';
 // WO-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-ENABLE-GP-KCOS-V1: 공유 operator 공급 상품 신청 승인 컨트롤러(serviceKey 격리)
 import { createOperatorProductApplicationsController } from '../kpa/controllers/operator-product-applications.controller.js';
+// WO-O4O-SELLER-RECRUITMENT-EXPOSURE-OPERATOR-UI-V1: 판매자 모집 노출 승인 (k-cosmetics 고정 proxy)
+import { createServiceRecruitmentExposureProxyController } from '../../modules/neture/controllers/service-recruitment-exposure-proxy.controller.js';
 import { ActionLogService } from '@o4o/action-log-core';
 // WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1: Store HUB controllers
 import { createStoreHubController } from '../o4o-store/controllers/store-hub.controller.js';
@@ -143,6 +145,9 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
     new ActionLogService(dataSource),
     { scope: 'cosmetics:operator', serviceKey: 'k-cosmetics' },
   ));
+
+  // 판매자 모집 노출 승인 (WO-O4O-SELLER-RECRUITMENT-EXPOSURE-OPERATOR-UI-V1) — serviceKey 'k-cosmetics' 고정
+  router.use(createServiceRecruitmentExposureProxyController(coreRequireAuth as any, requireCosmeticsScope('cosmetics:operator'), 'k-cosmetics'));
 
   // Asset Snapshot
   router.use('/assets', createAssetSnapshotController(dataSource, coreRequireAuth as any));

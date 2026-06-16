@@ -552,8 +552,8 @@ export class NetureService {
     return this.partnerContractService.getRecruitmentsForExposureReview(filters);
   }
 
-  async setRecruitmentExposure(recruitmentId: string, operatorUserId: string, decision: ExposureStatus.APPROVED | ExposureStatus.REJECTED, note?: string) {
-    return this.partnerContractService.setRecruitmentExposure(recruitmentId, operatorUserId, decision, note);
+  async setRecruitmentExposure(recruitmentId: string, operatorUserId: string, decision: ExposureStatus.APPROVED | ExposureStatus.REJECTED, note?: string, serviceKey?: string) {
+    return this.partnerContractService.setRecruitmentExposure(recruitmentId, operatorUserId, decision, note, serviceKey);
   }
 
   async createPartnerApplication(recruitmentId: string, partnerId: string, partnerName: string) {
