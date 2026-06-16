@@ -94,4 +94,4 @@ Neture 서비스 admin(`/admin`)과 분리된 platform-admin section `/admin/pla
 
 ## 12. commit hash
 
-- (commit 후 기재)
+- `11d14a050` — feat(neture): introduce /admin/platform section skeleton (WO-O4O-ADMIN-PLATFORM-SECTION-ROUTING-V1)
