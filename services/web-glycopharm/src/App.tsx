@@ -133,6 +133,8 @@ const GlycoPharmAdminMembersPage = lazy(() => import('@/pages/admin/GlycoPharmAd
 const ServiceLegalSettingsPage = lazy(() => import('@/pages/admin/ServiceLegalSettingsPage'));
 // WO-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1
 const ContactInquiriesPage = lazy(() => import('@/pages/admin/ContactInquiriesPage'));
+// WO-O4O-GLYCOPHARM-OPERATOR-CONTACT-MANAGEMENT-MIGRATION-V1: 문의 처리 operator 이관
+const OperatorContactInquiriesPage = lazy(() => import('@/pages/operator/OperatorContactInquiriesPage'));
 // WO-O4O-SERVICE-CONTACT-SETTINGS-ADMIN-V1
 const ServiceContactSettingsPage = lazy(() => import('@/pages/admin/ServiceContactSettingsPage'));
 
@@ -873,6 +875,8 @@ function AppRoutes() {
         {/* Content Management 공지사항/뉴스 (WO-O4O-CONTENT-CANONICAL-CROSS-SERVICE-ALIGNMENT-V1) */}
         <Route path="content" element={<OperatorContentPage />} />
         <Route path="content-management" element={<Navigate to="/operator/content" replace />} />
+        {/* 문의 관리 — operator 이관 (WO-O4O-GLYCOPHARM-OPERATOR-CONTACT-MANAGEMENT-MIGRATION-V1) */}
+        <Route path="contacts" element={<OperatorContactInquiriesPage />} />
         {/* LMS Management (WO-O4O-GLYCOPHARM-LMS-PHASE1-OPERATOR-PARITY-V1) */}
         {/* canonical: /operator/lms — legacy /operator/lms/courses redirect 유지 */}
         <Route path="lms" element={<OperatorLmsCoursesPage />} />

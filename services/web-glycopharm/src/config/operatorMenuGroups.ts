@@ -67,6 +67,10 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   content: [
     { label: '공지사항/뉴스', path: '/operator/content' },
     { label: 'Home 편집', path: '/operator/community' },
+    // WO-O4O-GLYCOPHARM-OPERATOR-CONTACT-MANAGEMENT-MIGRATION-V1:
+    //   문의 처리(목록·상세·답변·상태/메모)는 operator 업무 → operator 로 이관 신설.
+    //   문의 '설정'은 admin 유지(/admin/settings/contact). backend 변경 없음(operator 가드 통과).
+    { label: '문의 관리', path: '/operator/contacts' },
   ],
   // WO-O4O-GLYCOPHARM-OPERATOR-MENU-ALIGN-WITH-KPA-V1:
   //   content 그룹에서 LMS 항목 분리 — KPA 와 동일한 별도 lms 그룹.
