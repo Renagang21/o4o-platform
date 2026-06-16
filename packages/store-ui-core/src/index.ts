@@ -125,6 +125,10 @@ export type {
 export { StartProductionModal } from './components/StartProductionModal';
 export type { StartProductionModalProps, StartProductionTargetConfig, StartProductionTemplateItem } from './components/StartProductionModal';
 
+// Shared Production Material Editor Shell (WO-O4O-PRODUCTION-MATERIAL-EDITOR-SHELL-COMMONIZATION-V1)
+export { ProductionMaterialEditorShell } from './components/ProductionMaterialEditorShell';
+export type { ProductionMaterialEditorShellProps, ProductionMaterialCreateInput } from './components/ProductionMaterialEditorShell';
+
 // Auth Guard (WO-O4O-MY-STORE-CROSSSERVICE-CANONICAL-GUARD-ALIGNMENT-V1)
 export { StoreOwnerGuard } from './auth/StoreOwnerGuard';
 export type {
