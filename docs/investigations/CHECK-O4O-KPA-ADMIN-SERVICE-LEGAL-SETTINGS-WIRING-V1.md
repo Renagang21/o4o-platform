@@ -81,4 +81,4 @@ KPA-Society admin 에서 footer 법정정보(`service_legal_profiles`, serviceKe
 
 ## 13. commit hash
 
-- (commit 후 기재)
+- `e3f9766f9` — feat(kpa): wire footer legal-info admin editor (WO-O4O-KPA-ADMIN-SERVICE-LEGAL-SETTINGS-WIRING-V1)
