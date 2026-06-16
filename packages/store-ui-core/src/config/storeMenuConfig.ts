@@ -104,8 +104,10 @@ export const COSMETICS_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'home', label: '홈', subPath: '' },
     ]},
     { label: '매장 상품·거래', items: [
+      // WO-O4O-KCOSMETICS-STORE-COMMERCE-PRODUCT-PAGE-INTRODUCE-V1: 상품 화면 1차 도입.
+      // 공통 카탈로그(SupplyCatalogHub) + 기존 cosmetics 상품 API 재사용, route /commerce/products mount 동반(데드링크 0).
+      { key: 'products', label: '상품', subPath: '/commerce/products' },
       // WO-O4O-KCOSMETICS-STORE-ORDERS-FRONTEND-ALIGNMENT-V1: 매장 주문 관리
-      // (KC는 공급자 상품 카탈로그/거래 신청 전용 라우트가 없어 주문 관리만 — 데드링크 방지)
       { key: 'orders', label: '주문 관리', subPath: '/commerce/orders' },
     ]},
     { label: '매장 활성화', items: [

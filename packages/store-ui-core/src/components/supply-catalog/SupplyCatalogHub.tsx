@@ -71,6 +71,11 @@ export interface SupplyCatalogHubProps<T extends SupplyCatalogProduct> {
   accent: SupplyCatalogAccent;
   tableId: string;
   labels?: SupplyCatalogHubLabels;
+  /**
+   * 페이지 헤더 override (선택). 미지정 시 Store HUB 기본 문구("상품 카탈로그" …)를 유지한다.
+   * 동일 카탈로그를 다른 IA 위치(예: 내 매장 상품·거래)에서 재사용할 때 제목/설명만 맥락에 맞게 주입.
+   */
+  heading?: { title?: string; description?: string };
 }
 
 // ─── 탭 (유통유형 — KPA canonical 정합) ───────────────────────────────────────
@@ -129,10 +134,14 @@ export function SupplyCatalogHub<T extends SupplyCatalogProduct>({
   accent,
   tableId,
   labels,
+  heading,
 }: SupplyCatalogHubProps<T>) {
   const ac = ACCENT_CLASSES[accent];
   const supplierLabel = labels?.supplierLabel ?? '공급자';
   const channelHref = labels?.channelManageHref;
+  const headingTitle = heading?.title ?? '상품 카탈로그';
+  const headingDescription =
+    heading?.description ?? '현재 활성 공급자가 제공 중인 상품을 탐색하고 내 매장에 추가할 수 있습니다.';
 
   const [products, setProducts] = useState<T[]>([]);
   const [loading, setLoading] = useState(true);
@@ -330,10 +339,8 @@ export function SupplyCatalogHub<T extends SupplyCatalogProduct>({
     <div className="px-1 py-2">
       {/* 페이지 헤더 */}
       <div className="mb-5 pb-4 border-b border-slate-200">
-        <h1 className="text-xl font-bold text-slate-900">상품 카탈로그</h1>
-        <p className="text-sm text-slate-500 mt-1">
-          현재 활성 공급자가 제공 중인 상품을 탐색하고 내 매장에 추가할 수 있습니다.
-        </p>
+        <h1 className="text-xl font-bold text-slate-900">{headingTitle}</h1>
+        <p className="text-sm text-slate-500 mt-1">{headingDescription}</p>
       </div>
 
       {/* 유통유형 탭 */}

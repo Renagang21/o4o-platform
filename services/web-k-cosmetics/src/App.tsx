@@ -270,6 +270,9 @@ const StoreSignagePage = lazy(() => import('@/pages/store/StoreSignagePage'));
 const SignagePlayerSelectPage = lazy(() => import('@/pages/store/signage/SignagePlayerSelectPage').then(m => ({ default: m.SignagePlayerSelectPage })));
 const SignagePlaybackPage = lazy(() => import('@/pages/store/signage/SignagePlaybackPage'));
 
+// WO-O4O-KCOSMETICS-STORE-COMMERCE-PRODUCT-PAGE-INTRODUCE-V1: 내 매장 상품·거래 > 상품 (공통 카탈로그 재사용)
+const StoreCommerceProductsPage = lazy(() => import('@/pages/store/StoreCommerceProductsPage'));
+
 // WO-O4O-STORE-LOCAL-PRODUCT-UI-V1: 자체 상품 CRUD + 태블릿 진열 관리
 const StoreLocalProductsPage = lazy(() => import('@/pages/store/StoreLocalProductsPage'));
 const StoreTabletDisplaysPage = lazy(() => import('@/pages/store/StoreTabletDisplaysPage'));
@@ -763,6 +766,8 @@ function AppRoutes() {
               KPA canonical 정합 — nested canonical routes (commerce/* · marketing/*) 가 실제 page 를 렌더한다.
               flat path 는 본 블록 하단의 redirect alias 그룹에서 nested canonical 으로 redirect.
             WO-O4O-MY-STORE-SIGNAGE-SUBMENU-ALIGNMENT-V1: KPA/GP 기준 서브메뉴 정렬 (player 미구현 제외) */}
+        {/* WO-O4O-KCOSMETICS-STORE-COMMERCE-PRODUCT-PAGE-INTRODUCE-V1: 내 매장 상품·거래 > 상품 */}
+        <Route path="commerce/products" element={<StoreCommerceProductsPage />} />
         <Route path="commerce/local-products" element={<StoreLocalProductsPage />} />
         <Route path="commerce/tablet-displays" element={<StoreTabletDisplaysPage />} />
         <Route path="commerce/orders" element={<StoreOrdersPage />} />
