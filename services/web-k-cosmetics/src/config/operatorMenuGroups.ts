@@ -34,7 +34,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     // WO-O4O-EVENT-OFFER-KCOS-OPERATOR-APPROVAL-V1
     { label: '이벤트 오퍼 승인', path: '/operator/event-offers' },
   ],
-  products: [{ label: '상품 관리', path: '/operator/products' }],
+  // WO-O4O-OPERATOR-PRODUCT-ORDER-VIEW-LABEL-CLARIFY-GP-KCOS-V1: view-only 콘솔 → '상품 현황'
+  products: [{ label: '상품 현황', path: '/operator/products' }],
   stores: [
     { label: '내 매장', path: '/operator/store-cockpit' },
     { label: '매장 관리', path: '/operator/stores' },
@@ -45,7 +46,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '매장 HUB POP', path: '/operator/pop' },
     { label: '매장 HUB QR', path: '/operator/qr' },
   ],
-  orders: [{ label: '주문 관리', path: '/operator/orders' }],
+  // WO-O4O-OPERATOR-PRODUCT-ORDER-VIEW-LABEL-CLARIFY-GP-KCOS-V1: view-only(조회 전용) → '주문 현황'
+  orders: [{ label: '주문 현황', path: '/operator/orders' }],
   // WO-O4O-KCOS-OPERATOR-MENU-ALIGN-WITH-KPA-V1:
   //   content 그룹에서 안내 문구 관리 → lms, 자료실 관리 → resources 로 분리.
   content: [

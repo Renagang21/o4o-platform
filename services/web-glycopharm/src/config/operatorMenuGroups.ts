@@ -45,7 +45,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     /* WO-O4O-GLYCOPHARM-ADMIN-OPERATOR-CLEANUP-V1:
        Market Trial operator 콘솔은 미구현 → 메뉴/라우트에서 제거. 후속 별도 WO 예정. */
   ],
-  products: [{ label: '상품 관리', path: '/operator/products' }],
+  // WO-O4O-OPERATOR-PRODUCT-ORDER-VIEW-LABEL-CLARIFY-GP-KCOS-V1: view-only 콘솔 → '상품 현황'
+  products: [{ label: '상품 현황', path: '/operator/products' }],
   // WO-O4O-GLYCOPHARM-OPERATOR-MENU-ALIGN-WITH-KPA-V1:
   //   약국 HUB 블로그/POP/QR 을 stores 그룹으로 이동 (KPA-aligned).
   //   Store Menu Canonical Tree V1 의 매장 HUB 운영 축에 정합.
@@ -59,7 +60,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '약국 HUB POP', path: '/operator/pop' },
     { label: '약국 HUB QR', path: '/operator/qr' },
   ],
-  orders: [{ label: '주문 관리', path: '/operator/orders' }],
+  // WO-O4O-OPERATOR-PRODUCT-ORDER-VIEW-LABEL-CLARIFY-GP-KCOS-V1: view-only(조회 전용) → '주문 현황'
+  orders: [{ label: '주문 현황', path: '/operator/orders' }],
   // WO-O4O-GLYCOPHARM-OPERATOR-MENU-ALIGN-WITH-KPA-V1:
   //   LMS / HUB 항목 분리 후 community 도메인 콘텐츠 축만 잔존.
   content: [
@@ -144,7 +146,8 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     { label: '약사 회원 관리', path: '/operator/members' },
     { label: '이벤트 오퍼 승인', path: '/operator/event-offers' },
   ],
-  products: [{ label: '상품 관리', path: '/operator/products' }],
+  // WO-O4O-OPERATOR-PRODUCT-ORDER-VIEW-LABEL-CLARIFY-GP-KCOS-V1: view-only 콘솔 → '상품 현황'
+  products: [{ label: '상품 현황', path: '/operator/products' }],
   stores: [
     { label: '약국 관리', path: '/operator/pharmacies' },
     { label: '매장 관리', path: '/operator/stores' },
@@ -153,7 +156,8 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     { label: '약국 HUB POP', path: '/operator/pop' },
     { label: '약국 HUB QR', path: '/operator/qr' },
   ],
-  orders: [{ label: '주문 관리', path: '/operator/orders' }],
+  // WO-O4O-OPERATOR-PRODUCT-ORDER-VIEW-LABEL-CLARIFY-GP-KCOS-V1: view-only(조회 전용) → '주문 현황'
+  orders: [{ label: '주문 현황', path: '/operator/orders' }],
   content: [
     { label: '가이드라인 관리', path: '/operator/guidelines' },
     { label: '공지/뉴스 관리', path: '/operator/content-management' },
