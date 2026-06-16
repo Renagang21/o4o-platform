@@ -36,6 +36,9 @@ export { StoreTopBar } from './components/StoreTopBar';
 export type { StoreTopBarProps, StoreNavItem } from './components/StoreTopBar';
 export { StoreSidebar } from './components/StoreSidebar';
 export type { StoreSidebarProps } from './components/StoreSidebar';
+// WO-O4O-CROSSSERVICE-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1
+export { StoreRecruitmentApplicationsView } from './components/StoreRecruitmentApplicationsView';
+export type { StoreRecruitmentApplicationsViewProps, StoreRecruitmentApplicationRow } from './components/StoreRecruitmentApplicationsView';
 
 // 원본 보기 (Store Asset Derivation) 공통 뷰어 — WO-O4O-STORE-ASSET-DERIVATION-VIEWER-COMPONENT-EXTRACT-V1
 export { StoreAssetDerivationViewer, resultKindToDerivedKind } from './components/StoreAssetDerivationViewer';

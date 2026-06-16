@@ -109,6 +109,8 @@ export const COSMETICS_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'products', label: '상품', subPath: '/commerce/products' },
       // WO-O4O-KCOSMETICS-STORE-ORDERS-FRONTEND-ALIGNMENT-V1: 매장 주문 관리
       { key: 'orders', label: '주문 관리', subPath: '/commerce/orders' },
+      // WO-O4O-CROSSSERVICE-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1: 판매자 모집 신청 현황(조회)
+      { key: 'recruitment-applications', label: '신청·승인 현황', subPath: '/commerce/recruitment-applications' },
     ]},
     { label: '매장 활성화', items: [
       // WO-O4O-STORE-PRODUCTS-SERVICE-ROUTING-V1: 활성화 앵커 — 제품(제작 기준 데이터)
@@ -181,6 +183,8 @@ export const GLYCOPHARM_STORE_CONFIG: StoreDashboardConfig = {
       // 거래 신청 = B2BOrderPage(/b2b-order)
       { key: 'b2b-order', label: '거래 신청', subPath: '/b2b-order' },
       { key: 'orders',    label: '주문 관리', subPath: '/commerce/orders' },
+      // WO-O4O-CROSSSERVICE-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1: 판매자 모집 신청 현황(조회)
+      { key: 'recruitment-applications', label: '신청·승인 현황', subPath: '/commerce/recruitment-applications' },
     ]},
     { label: '약국 활성화', items: [
       // WO-O4O-STORE-PRODUCTS-SERVICE-ROUTING-V1: 활성화 앵커 — 제품(제작 기준 데이터)
@@ -251,6 +255,8 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       // 거래 신청 전용 라우트는 KPA에 없음 → 별도 항목 미추가(데드링크 방지).
       { key: 'products', label: '상품',     subPath: '/commerce/products' },
       { key: 'orders',   label: '주문 관리', subPath: '/commerce/orders' },
+      // WO-O4O-CROSSSERVICE-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1: 판매자 모집 신청 현황(조회)
+      { key: 'recruitment-applications', label: '신청·승인 현황', subPath: '/commerce/recruitment-applications' },
     ]},
     // 약국 활성화 — 내 약국 제품을 앵커로, 제품 파생 콘텐츠(상품 설명/블로그/POP/QR)를 함께 배치.
     // WO-O4O-KPA-STORE-MENU-BLOG-POP-QR-ALIGNMENT-V1 의 라우트/페이지/API 그대로 사용.

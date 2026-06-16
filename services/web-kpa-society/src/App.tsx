@@ -199,6 +199,8 @@ const PharmacyBlogPage = lazy(() => import('./pages/pharmacy/PharmacyBlogPage').
 const PharmacyTemplatePage = lazy(() => import('./pages/pharmacy/PharmacyTemplatePage').then(m => ({ default: m.PharmacyTemplatePage })));
 const StoreChannelsPage = lazy(() => import('./pages/pharmacy/StoreChannelsPage').then(m => ({ default: m.StoreChannelsPage })));
 const StoreOrdersPage = lazy(() => import('./pages/pharmacy/StoreOrdersPage').then(m => ({ default: m.StoreOrdersPage })));
+// WO-O4O-CROSSSERVICE-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1
+const StoreRecruitmentApplicationsPage = lazy(() => import('./pages/pharmacy/StoreRecruitmentApplicationsPage'));
 // WO-O4O-STORE-HUB-LEGACY-LIST-CLEANUP-V1: StoreBillingPage 제거 (KPA 사이드바 미노출, API 미연결 placeholder)
 const StoreSignagePage = lazy(() => import('./pages/pharmacy/StoreSignagePage').then(m => ({ default: m.StoreSignagePage })));
 const StoreQRPage = lazy(() => import('./pages/pharmacy/StoreQRPage').then(m => ({ default: m.StoreQRPage })));
@@ -961,6 +963,8 @@ function App() {
             <Route path="commerce/tablet-displays" element={<StoreTabletDisplaysPage />} />
             <Route path="commerce/order-worktable" element={<StoreOrderWorktablePage />} />
             <Route path="commerce/orders" element={<StoreOrdersPage />} />
+            {/* WO-O4O-CROSSSERVICE-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1 */}
+            <Route path="commerce/recruitment-applications" element={<StoreRecruitmentApplicationsPage />} />
 
             {/* Analytics */}
             <Route path="analytics/marketing" element={<MarketingAnalyticsPage />} />

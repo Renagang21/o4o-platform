@@ -170,6 +170,8 @@ const ProductPopBuilderPage = lazy(() => import('@/pages/store/ProductPopBuilder
 const StoreMarketingAnalyticsPage = lazy(() => import('@/pages/store/StoreMarketingAnalyticsPage').then(m => ({ default: m.StoreMarketingAnalyticsPage })));
 // WO-O4O-KCOSMETICS-STORE-ORDERS-FRONTEND-ALIGNMENT-V1: 매장 주문 관리
 const StoreOrdersPage = lazy(() => import('@/pages/store/StoreOrdersPage'));
+// WO-O4O-CROSSSERVICE-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1
+const StoreRecruitmentApplicationsPage = lazy(() => import('@/pages/store/StoreRecruitmentApplicationsPage'));
 // WO-O4O-KCOSMETICS-STORE-REVENUE-SUMMARY-FRONTEND-V1: 매출 요약 (참고용)
 const StoreRevenueSummaryPage = lazy(() => import('@/pages/store/StoreRevenueSummaryPage'));
 // WO-O4O-STORE-HUB-CROSS-SERVICE-COMMONIZATION-PHASE1-V1
@@ -771,6 +773,8 @@ function AppRoutes() {
         <Route path="commerce/local-products" element={<StoreLocalProductsPage />} />
         <Route path="commerce/tablet-displays" element={<StoreTabletDisplaysPage />} />
         <Route path="commerce/orders" element={<StoreOrdersPage />} />
+        {/* WO-O4O-CROSSSERVICE-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1 */}
+        <Route path="commerce/recruitment-applications" element={<StoreRecruitmentApplicationsPage />} />
         <Route path="commerce/billing" element={<StoreRevenueSummaryPage />} />
         <Route path="marketing/signage" element={<Navigate to="playlist" replace />} />
         <Route path="marketing/signage/playlist" element={<StoreSignagePage />} />

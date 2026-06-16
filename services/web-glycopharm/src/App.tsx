@@ -79,6 +79,8 @@ const RoleSelectPage = lazy(() => import('@/pages/auth/RoleSelectPage'));
 //   pages/pharmacy/ → pages/store-management/ 이동, /store/* 라우트 담당)
 const StoreMainPage = lazy(() => import('@/pages/store-management/StoreMainPage'));
 const PharmacyOrders = lazy(() => import('@/pages/store-management/PharmacyOrders'));
+// WO-O4O-CROSSSERVICE-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1
+const StoreRecruitmentApplicationsPage = lazy(() => import('@/pages/store-management/StoreRecruitmentApplicationsPage'));
 // WO-O4O-GLYCO-CARE-CLEANUP-V1: PharmacyPatients (환자/Care 잔재) 제거.
 // 현재 GlycoPharm canonical = 전문 매장 운영 + Blog + Content + Store. /store/services 라우트도 함께 제거됨.
 const PharmacySettings = lazy(() => import('@/pages/store-management/PharmacySettings'));
@@ -967,6 +969,8 @@ function AppRoutes() {
         <Route path="commerce/local-products" element={<StoreLocalProductsPage />} />
         <Route path="commerce/tablet-displays" element={<StoreTabletDisplaysPage />} />
         <Route path="commerce/orders" element={<PharmacyOrders />} />
+        {/* WO-O4O-CROSSSERVICE-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1 */}
+        <Route path="commerce/recruitment-applications" element={<StoreRecruitmentApplicationsPage />} />
         {/* channels: 채널 관리 (WO-O4O-GLYCOPHARM-STORE-HUB-ADOPTION-V1) */}
         <Route path="channels" element={<StoreChannelsPage />} />
         <Route path="content" element={<StoreAssetsPage />} />
