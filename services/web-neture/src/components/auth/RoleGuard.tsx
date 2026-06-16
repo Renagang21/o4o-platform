@@ -15,13 +15,14 @@ import { isPlatformSuperAdmin } from '../../lib/membershipGate';
 import {
   NETURE_ROLES,
   ADMIN_ROLES,
+  PLATFORM_ROLES,
   OPERATOR_ROLES,
   OPERATOR_OR_ABOVE_ROLES,
   SUPPLIER_ROLES,
 } from '../../lib/role-constants';
 
 // re-export for backward compat — 기존 import 유지
-export { NETURE_ROLES, ADMIN_ROLES, OPERATOR_ROLES, OPERATOR_OR_ABOVE_ROLES, SUPPLIER_ROLES };
+export { NETURE_ROLES, ADMIN_ROLES, PLATFORM_ROLES, OPERATOR_ROLES, OPERATOR_OR_ABOVE_ROLES, SUPPLIER_ROLES };
 
 // ─── RouteGuard (통합 컴포넌트) ───
 
@@ -156,6 +157,24 @@ export function AdminRoute({ children, fallback = '/login' }: Omit<LegacyGuardPr
     <RouteGuard
       allowedRoles={ADMIN_ROLES}
       requireMembership="neture"
+      fallback={fallback}
+    >
+      {children}
+    </RouteGuard>
+  );
+}
+
+/**
+ * PlatformRoute — O4O platform-admin 전용 guard
+ *
+ * WO-O4O-ADMIN-PLATFORM-SECTION-ROUTING-V1 (Phased B):
+ *   platform:admin / platform:super_admin 만 통과. neture:admin 단독은 차단(→ '/').
+ *   cross-service surface 이므로 'neture' membership 을 요구하지 않는다(서비스 멤버십과 무관).
+ */
+export function PlatformRoute({ children, fallback = '/login' }: Omit<LegacyGuardProps, 'allowedRoles'>) {
+  return (
+    <RouteGuard
+      allowedRoles={PLATFORM_ROLES}
       fallback={fallback}
     >
       {children}

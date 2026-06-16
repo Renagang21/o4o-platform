@@ -34,6 +34,13 @@ export const LEGACY_ROLES = {
 /** Admin 역할 집합 (admin + platform:super_admin) */
 export const ADMIN_ROLES: string[] = [NETURE_ROLES.ADMIN, NETURE_ROLES.PLATFORM_SUPER_ADMIN];
 
+/**
+ * Platform-level 역할 집합 (cross-service) — neture:admin 과 구분.
+ * WO-O4O-ADMIN-PLATFORM-SECTION-ROUTING-V1: /admin/platform section 전용.
+ * neture:admin 단독으로는 platform surface 에 접근하지 못한다(platform guard).
+ */
+export const PLATFORM_ROLES: string[] = ['platform:admin', NETURE_ROLES.PLATFORM_SUPER_ADMIN];
+
 /** Operator route guard 역할 집합 */
 export const OPERATOR_ROLES: string[] = [NETURE_ROLES.OPERATOR];
 

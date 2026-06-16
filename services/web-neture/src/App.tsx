@@ -40,7 +40,7 @@ import AdminLayoutWrapper from './components/layouts/AdminLayoutWrapper';
 import SupplierAccountLayout from './components/layouts/SupplierAccountLayout';
 import PartnerAccountLayout from './components/layouts/PartnerAccountLayout';
 import AdminVaultLayout from './components/layouts/AdminVaultLayout';
-import { RoleGuard, OperatorRoute, AdminRoute, SupplierRoute } from './components/auth/RoleGuard';
+import { RoleGuard, OperatorRoute, AdminRoute, PlatformRoute, SupplierRoute } from './components/auth/RoleGuard';
 import { ADMIN_ROLES } from './lib/role-constants';
 
 // ============================================================================
@@ -313,6 +313,8 @@ const ServiceLegalSettingsPage = lazy(() => import('./pages/admin/ServiceLegalSe
 const ServiceContactSettingsPage = lazy(() => import('./pages/admin/ServiceContactSettingsPage'));
 // WO-O4O-SERVICE-PHARMACY-AUDIENCE-POLICY-SETTINGS-V1
 const ServiceAudiencePolicyPage = lazy(() => import('./pages/admin/ServiceAudiencePolicyPage'));
+// WO-O4O-ADMIN-PLATFORM-SECTION-ROUTING-V1: platform-admin section landing
+const PlatformAdminLandingPage = lazy(() => import('./pages/admin/platform/PlatformAdminLandingPage'));
 
 // Admin Operators
 const OperatorsPage = lazy(() => import('./pages/admin/OperatorsPage'));
@@ -1012,6 +1014,22 @@ function App() {
               {/* WO-O4O-SERVICE-PHARMACY-AUDIENCE-POLICY-SETTINGS-V1 */}
               <Route path="/admin/settings/service-audience" element={<ServiceAudiencePolicyPage />} />
             </Route>
+
+            {/* ================================================================
+                Platform Admin Section (/admin/platform/*)
+                WO-O4O-ADMIN-PLATFORM-SECTION-ROUTING-V1 (Phased B)
+                guard = platform:admin / super_admin (PlatformRoute) — neture:admin 단독 차단.
+                Neture 서비스 admin(/admin) sidebar/layout 과 분리된 platform surface.
+                Tier 1(운영자/역할/서비스 대상 정책)은 이동하지 않음(landing 안내만).
+            ================================================================ */}
+            <Route
+              path="/admin/platform"
+              element={
+                <PlatformRoute>
+                  <PlatformAdminLandingPage />
+                </PlatformRoute>
+              }
+            />
 
             {/* ================================================================
                 Operator Dashboard (/operator/*)
