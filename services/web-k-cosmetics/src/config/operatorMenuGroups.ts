@@ -25,11 +25,14 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   // WO-O4O-K-COSMETICS-OPERATOR-ROUTE-CANONICALIZATION-V1: /operator/members (KPA/GlycoPharm canonical)
   users: [{ label: '회원 관리', path: '/operator/members' }],
   approvals: [
-    { label: '신청 관리', path: '/operator/applications' },
-    // WO-O4O-EVENT-OFFER-KCOS-OPERATOR-APPROVAL-V1
-    { label: '이벤트 오퍼 승인', path: '/operator/event-offers' },
+    // WO-O4O-CROSSSERVICE-OPERATOR-APPROVAL-GROUP-LABEL-ALIGN-V1:
+    //   '신청 관리' → '매장 가입 신청 관리' (ApplicationsPage = 매장 가입신청 관리 의미 명확화).
+    //   공통 항목(공급 상품 신청 승인 → 이벤트 오퍼 승인) 순서를 KPA/GP 와 정합.
+    { label: '매장 가입 신청 관리', path: '/operator/applications' },
     // WO-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-ENABLE-GP-KCOS-V1
     { label: '공급 상품 신청 승인', path: '/operator/product-applications' },
+    // WO-O4O-EVENT-OFFER-KCOS-OPERATOR-APPROVAL-V1
+    { label: '이벤트 오퍼 승인', path: '/operator/event-offers' },
   ],
   products: [{ label: '상품 관리', path: '/operator/products' }],
   stores: [

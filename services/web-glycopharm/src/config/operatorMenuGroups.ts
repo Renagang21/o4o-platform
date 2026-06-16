@@ -33,12 +33,15 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   dashboard: [{ label: '대시보드', path: '/operator', exact: true }],
   users: [{ label: '회원 관리', path: '/operator/members' }],
   approvals: [
-    { label: '매장 승인', path: '/operator/store-approvals' },
+    // WO-O4O-CROSSSERVICE-OPERATOR-APPROVAL-GROUP-LABEL-ALIGN-V1:
+    //   '매장 승인' → '매장 판매 참여 승인' (StoreApprovalsPage = 스토어 판매 참여 신청 의미 명확화).
+    //   공통 항목(공급 상품 신청 승인 → 이벤트 오퍼 승인) 순서를 KPA/KCos 와 정합.
+    { label: '매장 판매 참여 승인', path: '/operator/store-approvals' },
     { label: '약사 회원 관리', path: '/operator/members' },
-    // WO-O4O-GLYCOPHARM-OPERATOR-EVENT-OFFER-APPROVAL-V1
-    { label: '이벤트 오퍼 승인', path: '/operator/event-offers' },
     // WO-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-ENABLE-GP-KCOS-V1
     { label: '공급 상품 신청 승인', path: '/operator/product-applications' },
+    // WO-O4O-GLYCOPHARM-OPERATOR-EVENT-OFFER-APPROVAL-V1
+    { label: '이벤트 오퍼 승인', path: '/operator/event-offers' },
     /* WO-O4O-GLYCOPHARM-ADMIN-OPERATOR-CLEANUP-V1:
        Market Trial operator 콘솔은 미구현 → 메뉴/라우트에서 제거. 후속 별도 WO 예정. */
   ],
