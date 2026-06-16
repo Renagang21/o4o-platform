@@ -184,10 +184,12 @@ export async function queryVisibleProducts(
          CASE WHEN spo.is_active THEN 'active' ELSE 'inactive' END AS status,
          false AS is_featured,
          s.slug AS manufacturer,
-         -- WO-O4O-KPA-STOREFRONT-DESCRIPTION-LINK-V1: O4O 공용 대표(canonical) 설명을 fallback 에 연결.
-         -- 기존 store_product_profiles override(sp.description, 편집 UI 존재)는 보존(비회귀) → 그 아래·supplier 위.
+         -- WO-O4O-KPA-STOREFRONT-DESCRIPTION-LINK-V1 / -STORE-PROFILE-OVERRIDE-POLICY-ALIGNMENT-V1:
+         -- O4O 공용 대표(canonical) 설명을 우선 노출. 기존 store_product_profiles override(sp.description,
+         -- 편집 UI = PATCH /api/v1/store/products/:id/description)는 삭제하지 않고 canonical 아래
+         -- legacy fallback 으로 격하(데이터 보존, 비회귀, 매장 override 정책 격하).
          -- KPA storefront 는 ContentRenderer(HTML) 렌더 → 태그 보존(GP plain-text 와 달리 strip 안 함).
-         COALESCE(sp.description, spd.content, spo.consumer_detail_description, '') AS description,
+         COALESCE(spd.content, sp.description, spo.consumer_detail_description, '') AS description,
          COALESCE(spd.summary, spo.consumer_short_description, '') AS short_description,
          opl.created_at AS sort_order,
          spo.created_at, spo.updated_at,
