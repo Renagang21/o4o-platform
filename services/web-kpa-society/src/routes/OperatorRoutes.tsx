@@ -16,7 +16,7 @@
  */
 
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { OperatorAiReportPage, ForumRequestsManagementPage, ForumCategoriesManagementPage, ForumDeleteRequestsPage, LegalManagementPage, ForumAnalyticsDashboard, ContentManagementPage, AuditLogPage, MemberManagementPage, PharmacyRequestManagementPage, ProductApplicationManagementPage, CommunityManagementPage, QualificationRequestsPage, OperatorLmsCoursesPage, OperatorResourcesPage, OperatorProductsPage } from '../pages/operator';
+import { OperatorAiReportPage, ForumRequestsManagementPage, ForumCategoriesManagementPage, ForumDeleteRequestsPage, LegalManagementPage, ForumAnalyticsDashboard, ContentManagementPage, AuditLogPage, MemberManagementPage, PharmacyRequestManagementPage, ProductApplicationManagementPage, CommunityManagementPage, QualificationRequestsPage, OperatorLmsCoursesPage, OperatorResourcesPage, OperatorProductsPage, OperatorOrdersPage } from '../pages/operator';
 // WO-KPA-A-OPERATOR-DASHBOARD-FIRST-STABILIZATION-V1: UsersPage → /operator/members redirect
 import UserDetailPage from '../pages/operator/UserDetailPage';
 import RoleManagementPage from '../pages/operator/RoleManagementPage';
@@ -150,6 +150,9 @@ export function OperatorRoutes() {
 
           {/* 상품 현황 (view-only) — WO-O4O-KPA-OPERATOR-PRODUCT-ORDER-VIEW-INTRODUCE-V1 */}
           <Route path="products" element={<OperatorProductsPage />} />
+
+          {/* 주문 현황 (view-only) — WO-O4O-KPA-OPERATOR-ORDER-VIEW-FRONTEND-WIRING-V1 */}
+          <Route path="orders" element={<OperatorOrdersPage />} />
 
           {/* 자격 신청 관리 (WO-O4O-QUALIFICATION-SYSTEM-V1) */}
           <Route path="qualification-requests" element={<QualificationRequestsPage />} />

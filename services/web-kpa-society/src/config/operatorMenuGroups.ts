@@ -42,9 +42,11 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '협업 문의', path: '/operator/collaboration-requests' },
   ],
   // WO-O4O-KPA-OPERATOR-PRODUCT-ORDER-VIEW-INTRODUCE-V1: 상품 현황 (view-only, 서비스 전역 조회).
-  //   GP/KCos 와 동일한 products 그룹/라벨. 주문 현황은 KPA backend(/kpa/operator/orders) 부재로
-  //   이번 WO 에서 보류 — 별도 backend WO 후 추가.
+  //   GP/KCos 와 동일한 products/orders 그룹/라벨.
   products: [{ label: '상품 현황', path: '/operator/products' }],
+  // WO-O4O-KPA-OPERATOR-ORDER-VIEW-FRONTEND-WIRING-V1: 주문 현황 (view-only).
+  //   backend GET /api/v1/kpa/operator/orders (kpa:operator) 연결.
+  orders: [{ label: '주문 현황', path: '/operator/orders' }],
   // WO-O4O-OPERATOR-DASHBOARD-COMMUNITY-STORE-HUB-SPLIT-V1: stores 메뉴 복원 (매장 HUB 운영 축)
   // WO-O4O-OPERATOR-BLOG-WRITE-PAGE-KPA-V1: 매장 HUB 블로그 (운영자 게시 → 매장 가져가기)
   // WO-O4O-KPA-OPERATOR-POP-WRITE-PAGE-V1: 매장 HUB POP (운영자 게시 → 매장 가져가기)

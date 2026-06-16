@@ -25,3 +25,5 @@ export { default as OperatorLmsCoursesPage } from './OperatorLmsCoursesPage';
 export { default as OperatorResourcesPage } from './OperatorResourcesPage';
 // WO-O4O-KPA-OPERATOR-PRODUCT-ORDER-VIEW-INTRODUCE-V1: 상품 현황 (view-only)
 export { default as OperatorProductsPage } from './ProductsPage';
+// WO-O4O-KPA-OPERATOR-ORDER-VIEW-FRONTEND-WIRING-V1: 주문 현황 (view-only)
+export { default as OperatorOrdersPage } from './OrdersPage';
