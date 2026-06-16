@@ -55,6 +55,8 @@ export interface ForumHubAccent {
 export interface ForumHubNav {
   /** 포럼 관리 / 개설 요청 — KPA: /operator/forum-management, GP/KCos: /operator/forum-requests */
   requests: string;
+  /** 포럼 목록 관리 (forum-categories) — route 가 있는 서비스에서만 주입 (미주입 시 shortcut 미렌더) */
+  categories?: string;
   /** 삭제 요청 — /operator/forum-delete-requests */
   deleteRequests: string;
   /** 포럼 분석 — /operator/forum-analytics */

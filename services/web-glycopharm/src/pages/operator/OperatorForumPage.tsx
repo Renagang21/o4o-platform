@@ -26,6 +26,7 @@ export default function OperatorForumPage() {
       accent={{ iconColor: '#0d9488', iconBgColor: '#ccfbf1' }}
       nav={{
         requests: '/operator/forum-requests',
+        categories: '/operator/forum-categories',
         deleteRequests: '/operator/forum-delete-requests',
         analytics: '/operator/forum-analytics',
         community: '/operator/community',

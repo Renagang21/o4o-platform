@@ -269,6 +269,8 @@ const ForumDeleteRequestsPage = lazy(() => import('@/pages/operator/ForumDeleteR
 const ForumAnalyticsPage = lazy(() => import('@/pages/operator/ForumAnalyticsPage'));
 // WO-O4O-CROSSSERVICE-OPERATOR-FORUM-HUB-READONLY-INTRODUCE-V1
 const OperatorForumPage = lazy(() => import('@/pages/operator/OperatorForumPage'));
+// WO-O4O-CROSSSERVICE-OPERATOR-FORUM-CATEGORIES-GP-KCOS-INTRODUCE-V1
+const ForumCategoriesManagementPage = lazy(() => import('@/pages/operator/ForumCategoriesManagementPage'));
 
 // Store Channel Management (WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1)
 const StoreChannelsPage = lazy(() => import('@/pages/store/StoreChannelsPage'));
@@ -723,6 +725,8 @@ function AppRoutes() {
         <Route path="forum" element={<OperatorForumPage />} />
         {/* WO-O4O-FORUM-OPERATOR-UNIFICATION-V1 */}
         <Route path="forum-requests" element={<ForumRequestsPage />} />
+        {/* WO-O4O-CROSSSERVICE-OPERATOR-FORUM-CATEGORIES-GP-KCOS-INTRODUCE-V1 */}
+        <Route path="forum-categories" element={<ForumCategoriesManagementPage />} />
         <Route path="forum-delete-requests" element={<ForumDeleteRequestsPage />} />
         {/* WO-O4O-FORUM-ANALYTICS-UNIFICATION-V1 */}
         <Route path="forum-analytics" element={<ForumAnalyticsPage />} />

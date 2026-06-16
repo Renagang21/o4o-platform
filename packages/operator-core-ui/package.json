@@ -17,6 +17,7 @@
     "./modules/forum-requests": "./src/modules/forum-requests/index.ts",
     "./modules/forum-analytics": "./src/modules/forum-analytics/index.ts",
     "./modules/forum-hub": "./src/modules/forum-hub/index.ts",
+    "./modules/forum-categories": "./src/modules/forum-categories/index.ts",
     "./modules/service-legal": "./src/modules/service-legal/index.ts",
     "./modules/contact-inquiry": "./src/modules/contact-inquiry/index.ts",
     "./modules/service-contact-settings": "./src/modules/service-contact-settings/index.ts",

@@ -23,6 +23,7 @@ import {
   RefreshCw,
   ArrowRight,
   LayoutGrid,
+  List,
   Trash2,
   BarChart3,
   Eye,
@@ -360,6 +361,15 @@ export function OperatorForumHubPage({
           count={stats?.pendingRequests}
           onClick={() => navigate(nav.requests)}
         />
+        {nav.categories && (
+          <ShortcutCard
+            icon={<List size={16} />}
+            accentColor={accent.iconColor}
+            label="포럼 목록 관리"
+            desc="활성/비활성 · 태그 · 삭제"
+            onClick={() => navigate(nav.categories!)}
+          />
+        )}
         <ShortcutCard
           icon={<Trash2 size={16} />}
           accentColor={accent.iconColor}

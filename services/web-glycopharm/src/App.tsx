@@ -146,6 +146,8 @@ const ForumDeleteRequestsPage = lazy(() => import('@/pages/operator/ForumDeleteR
 const ForumAnalyticsPage = lazy(() => import('@/pages/operator/ForumAnalyticsPage'));
 // WO-O4O-CROSSSERVICE-OPERATOR-FORUM-HUB-READONLY-INTRODUCE-V1
 const OperatorForumPage = lazy(() => import('@/pages/operator/OperatorForumPage'));
+// WO-O4O-CROSSSERVICE-OPERATOR-FORUM-CATEGORIES-GP-KCOS-INTRODUCE-V1
+const ForumCategoriesManagementPage = lazy(() => import('@/pages/operator/ForumCategoriesManagementPage'));
 const ApplicationsPage = lazy(() => import('@/pages/operator/ApplicationsPage'));
 const ApplicationDetailPage = lazy(() => import('@/pages/operator/ApplicationDetailPage'));
 const StoreApprovalsPage = lazy(() => import('@/pages/operator/StoreApprovalsPage'));
@@ -828,6 +830,8 @@ function AppRoutes() {
             /operator/forum 을 redirect 에서 read-only 운영 허브(OperatorForumPage)로 승격. */}
         <Route path="forum" element={<OperatorForumPage />} />
         <Route path="forum-requests" element={<ForumRequestsPage />} />
+        {/* WO-O4O-CROSSSERVICE-OPERATOR-FORUM-CATEGORIES-GP-KCOS-INTRODUCE-V1 */}
+        <Route path="forum-categories" element={<ForumCategoriesManagementPage />} />
         <Route path="forum-delete-requests" element={<ForumDeleteRequestsPage />} />
         {/* WO-O4O-FORUM-ANALYTICS-UNIFICATION-V1 */}
         <Route path="forum-analytics" element={<ForumAnalyticsPage />} />

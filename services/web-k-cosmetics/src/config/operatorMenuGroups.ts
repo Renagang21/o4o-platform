@@ -96,6 +96,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     // WO-O4O-CROSSSERVICE-OPERATOR-FORUM-HUB-READONLY-INTRODUCE-V1: read-only 운영 허브 도입
     { label: '포럼 운영', path: '/operator/forum' },
     { label: '포럼 신청 관리', path: '/operator/forum-requests' },
+    // WO-O4O-CROSSSERVICE-OPERATOR-FORUM-CATEGORIES-GP-KCOS-INTRODUCE-V1
+    { label: '포럼 목록 관리', path: '/operator/forum-categories' },
     { label: '삭제 요청', path: '/operator/forum-delete-requests' },
     { label: '포럼 분석', path: '/operator/forum-analytics' },
   ],
