@@ -315,6 +315,10 @@ const ServiceContactSettingsPage = lazy(() => import('./pages/admin/ServiceConta
 const ServiceAudiencePolicyPage = lazy(() => import('./pages/admin/ServiceAudiencePolicyPage'));
 // WO-O4O-ADMIN-PLATFORM-SECTION-ROUTING-V1: platform-admin section landing
 const PlatformAdminLandingPage = lazy(() => import('./pages/admin/platform/PlatformAdminLandingPage'));
+// WO-O4O-PLATFORM-ACCOUNTS-SERVICES-UI-V1: platform section layout + 계정/서비스 페이지
+const PlatformSectionLayout = lazy(() => import('./pages/admin/platform/PlatformSectionLayout'));
+const PlatformAccountsPage = lazy(() => import('./pages/admin/platform/PlatformAccountsPage'));
+const PlatformServicesPage = lazy(() => import('./pages/admin/platform/PlatformServicesPage'));
 
 // Admin Operators
 const OperatorsPage = lazy(() => import('./pages/admin/OperatorsPage'));
@@ -1026,10 +1030,15 @@ function App() {
               path="/admin/platform"
               element={
                 <PlatformRoute>
-                  <PlatformAdminLandingPage />
+                  <PlatformSectionLayout />
                 </PlatformRoute>
               }
-            />
+            >
+              <Route index element={<PlatformAdminLandingPage />} />
+              {/* WO-O4O-PLATFORM-ACCOUNTS-SERVICES-UI-V1 */}
+              <Route path="accounts" element={<PlatformAccountsPage />} />
+              <Route path="services" element={<PlatformServicesPage />} />
+            </Route>
 
             {/* ================================================================
                 Operator Dashboard (/operator/*)
