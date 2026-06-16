@@ -22,6 +22,8 @@ import type { Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
 import { authenticate, requireRole } from '../../../middleware/auth.middleware.js';
 import { SharedProductDescriptionService } from '../services/shared-product-description.service.js';
+import { SHARED_PRODUCT_DESCRIPTION_SEED_SOURCES } from '../services/shared-product-description.service.js';
+import type { SharedProductDescriptionSeedSource } from '../services/shared-product-description.service.js';
 import {
   SHARED_PRODUCT_DESCRIPTION_SOURCE_TYPES,
   SHARED_PRODUCT_DESCRIPTION_STATUSES,
@@ -116,6 +118,36 @@ export function createSharedProductDescriptionController(dataSource: DataSource)
     } catch (error) {
       logger.error('[SharedProductDescription] create error:', error);
       res.status(500).json({ success: false, error: 'Failed to create candidate' });
+    }
+  });
+
+  // POST /by-master/:masterId/seed — 기존 소스(supplier/ai/drug_extension)를 후보로 흡수
+  // 후보 생성까지만 (canonical 자동 승격 없음). 중복은 (master,source,ref) 기준 skip.
+  router.post('/by-master/:masterId/seed', async (req: Request, res: Response) => {
+    try {
+      const { sources } = req.body as { sources?: string[]; autoCanonical?: boolean };
+
+      // autoCanonical 은 본 WO 에서 미지원 (항상 후보까지만 — ADMIN-CURATION 후속). 수신만.
+      let seedSources: SharedProductDescriptionSeedSource[] = SHARED_PRODUCT_DESCRIPTION_SEED_SOURCES;
+      if (Array.isArray(sources) && sources.length > 0) {
+        const invalid = sources.filter(
+          (s) => !SHARED_PRODUCT_DESCRIPTION_SEED_SOURCES.includes(s as SharedProductDescriptionSeedSource),
+        );
+        if (invalid.length > 0) {
+          res.status(400).json({
+            success: false,
+            error: `Invalid sources: ${invalid.join(', ')}. Valid: ${SHARED_PRODUCT_DESCRIPTION_SEED_SOURCES.join(', ')}`,
+          });
+          return;
+        }
+        seedSources = sources as SharedProductDescriptionSeedSource[];
+      }
+
+      const result = await service.seedFromExistingSources(req.params.masterId, actorId(req), seedSources);
+      res.json({ success: true, data: result });
+    } catch (error) {
+      logger.error('[SharedProductDescription] seed error:', error);
+      res.status(500).json({ success: false, error: 'Failed to seed candidates' });
     }
   });
 
