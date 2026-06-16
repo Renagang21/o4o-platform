@@ -21,6 +21,32 @@ import type { NotificationType } from '../../../entities/Notification.js';
 import logger from '../../../utils/logger.js';
 
 /**
+ * WO-O4O-CROSSSERVICE-SELLER-RECRUITMENT-NOTIFICATION-TARGETURL-V1
+ *
+ * 판매자 모집 신청·승인 현황 알림의 클릭 이동 경로(targetUrl)를 serviceKey 로 해소한다.
+ * 알림은 `serviceKey` 로 필터되어 해당 서비스 앱 GlobalHeader 에서만 노출되며,
+ * 헤더는 metadata.targetUrl 로 자기 도메인 내에서 react-router `navigate(target)` 한다.
+ * → 상대 경로만 필요(cross-domain 절대 URL 불필요). 매장 3서비스는 동일하게
+ *   `/store/commerce/recruitment-applications`(basePath '/store' + subPath), Neture 는
+ *   partner 영역 `/partner/recruitment-applications`. unknown/empty 는 Neture 로 fallback.
+ */
+const STORE_RECRUITMENT_APPLICATIONS_ROUTE = '/store/commerce/recruitment-applications';
+const NETURE_RECRUITMENT_APPLICATIONS_ROUTE = '/partner/recruitment-applications';
+
+export function resolveRecruitmentApplicationTargetUrl(serviceKey?: string): string {
+  switch (serviceKey) {
+    case 'kpa-society':
+    case 'glycopharm':
+    case 'k-cosmetics':
+    case 'cosmetics': // service-catalog canonical 은 'k-cosmetics' 이나 일부 경로가 'cosmetics' 사용
+      return STORE_RECRUITMENT_APPLICATIONS_ROUTE;
+    default:
+      // 'neture' / undefined / 알 수 없는 serviceKey → Neture partner 신청·승인 현황(안전 fallback)
+      return NETURE_RECRUITMENT_APPLICATIONS_ROUTE;
+  }
+}
+
+/**
  * NeturePartnerContractService
  *
  * Partner recruitment, application (approve/reject), contract CRUD.
@@ -712,19 +738,23 @@ export class NeturePartnerContractService {
     applicationId: string,
   ): Promise<void> {
     try {
+      const serviceKey = recruitment.serviceId || undefined;
       await notificationService.createNotification({
         userId: partnerUserId,
         type,
         title,
         message,
-        serviceKey: recruitment.serviceId || undefined,
+        serviceKey,
         metadata: {
           recruitmentId: recruitment.id,
           applicationId,
           productId: recruitment.productId,
           eventType: type,
-          // WO-O4O-MY-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1: 신청 현황 화면 link
-          targetUrl: '/partner/recruitment-applications',
+          // WO-O4O-CROSSSERVICE-SELLER-RECRUITMENT-NOTIFICATION-TARGETURL-V1:
+          // 알림은 serviceKey 로 필터되어 해당 서비스 앱 헤더에서만 노출되고, 헤더는
+          // metadata.targetUrl 로 자기 도메인 내 상대 이동(navigate)한다. 따라서
+          // serviceKey 별로 해당 앱의 신청·승인 현황 route 를 지정한다(dead link 0).
+          targetUrl: resolveRecruitmentApplicationTargetUrl(serviceKey),
         },
       });
     } catch (e) {
