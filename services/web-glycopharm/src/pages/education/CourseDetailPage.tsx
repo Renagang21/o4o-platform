@@ -30,6 +30,8 @@ import { AppreciationPanel } from '@o4o/shared-space-ui';
 import { appreciationPanelApi } from '@/api/appreciation';
 // WO-O4O-LMS-GLYCOPHARM-ADOPTION-V1: 공통 presentational UI 소비 (accent = GP green)
 import { CourseProgressBar } from '@o4o/lms-ui';
+// WO-O4O-LMS-COURSE-DETAIL-XSS-FIX-V1: lesson content raw HTML 주입 sanitize (DOMPurify)
+import { sanitizeHtml } from '@o4o/content-editor';
 
 // ── 레슨 콘텐츠 렌더러 ───────────────────────────────────────────────────────
 function LessonContent({ lesson }: { lesson: LmsLesson }) {
@@ -85,7 +87,7 @@ function LessonContent({ lesson }: { lesson: LmsLesson }) {
       return (
         <div
           className="prose prose-sm max-w-none text-slate-700 leading-relaxed"
-          dangerouslySetInnerHTML={{ __html: raw }}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(raw || '') }}
         />
       );
     }
