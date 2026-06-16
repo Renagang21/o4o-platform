@@ -109,4 +109,4 @@
 
 ## 15. commit hash
 
-- (commit 후 기재)
+- `a4e93fc1e` — feat(neture): platform-admin accounts + services UI (WO-O4O-PLATFORM-ACCOUNTS-SERVICES-UI-V1)
