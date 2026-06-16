@@ -23,3 +23,5 @@ export { default as QualificationRequestsPage } from './QualificationRequestsPag
 export { default as OperatorLmsCoursesPage } from './OperatorLmsCoursesPage';
 // WO-KPA-OPERATOR-RESOURCES-MANAGEMENT-MENU-V1
 export { default as OperatorResourcesPage } from './OperatorResourcesPage';
+// WO-O4O-KPA-OPERATOR-PRODUCT-ORDER-VIEW-INTRODUCE-V1: 상품 현황 (view-only)
+export { default as OperatorProductsPage } from './ProductsPage';

@@ -89,8 +89,11 @@ export interface OperatorProductStatusConfig {
   errorFallback?: string;
   /** DataTable 식별자 (서비스별 컬럼 폭 저장 분리) */
   tableId: string;
-  /** 행 클릭 시 상세 경로 base (기본: '/operator/products') */
-  detailPathBase?: string;
+  /**
+   * 행 클릭 시 상세 경로 base (기본: '/operator/products').
+   * `null` 이면 행 클릭 네비게이션을 비활성화한다 (상세 화면이 없는 서비스용 — 데드링크 방지).
+   */
+  detailPathBase?: string | null;
   accent: OperatorViewAccent;
 }
 

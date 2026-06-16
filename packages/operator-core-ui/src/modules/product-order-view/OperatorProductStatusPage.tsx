@@ -254,7 +254,7 @@ export function OperatorProductStatusPage({ fetchProducts, config }: OperatorPro
           rowKey="id"
           loading={isLoading}
           emptyMessage={emptyMessage}
-          onRowClick={(p) => navigate(`${detailPathBase}/${p.id}`)}
+          onRowClick={detailPathBase ? (p) => navigate(`${detailPathBase}/${p.id}`) : undefined}
           tableId={tableId}
         />
         {pagination.totalPages > 1 && (
