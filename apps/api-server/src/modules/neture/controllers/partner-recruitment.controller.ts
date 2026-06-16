@@ -241,6 +241,33 @@ export function createPartnerRecruitmentController(deps: {
   });
 
   /**
+   * POST /partner/applications/:id/terminate
+   * 승인 판매자 참여 해지 (WO-O4O-SELLER-RECRUITMENT-PARTICIPATION-TERMINATION-V1)
+   */
+  router.post('/partner/applications/:id/terminate', requireAuth, requireActiveSupplier, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
+      }
+      const result = await netureService.terminateRecruitmentParticipation(req.params.id, userId);
+      if (!result.success) {
+        const map: Record<string, [number, string]> = {
+          APPLICATION_NOT_FOUND: [404, '신청을 찾을 수 없습니다.'],
+          NOT_OWNER: [403, '모집 주체만 참여를 해지할 수 있습니다.'],
+          NOT_APPROVED: [400, '승인된 신청만 참여 해지할 수 있습니다.'],
+        };
+        const [status, message] = map[result.error] || [400, '참여 해지에 실패했습니다.'];
+        return res.status(status).json({ success: false, error: result.error, message });
+      }
+      res.json({ success: true, data: result.data });
+    } catch (error) {
+      logger.error('[Neture API] Error terminating participation:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to terminate participation' });
+    }
+  });
+
+  /**
    * POST /partner/applications/:id/approve
    * 파트너 신청 승인 (모집 주체 판매자)
    */

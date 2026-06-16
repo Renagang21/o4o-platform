@@ -1281,6 +1281,8 @@ export interface RecruitmentApplication {
   appliedAt: string;
   decidedAt: string | null;
   reason: string;
+  // WO-O4O-SELLER-RECRUITMENT-PARTICIPATION-TERMINATION-V1: 참여 해지 파생 상태
+  participationTerminated?: boolean;
 }
 
 export interface RecruitmentDetail {
@@ -1339,6 +1341,17 @@ export const supplierRecruitmentApi = {
     } catch (error: any) {
       const d = error?.response?.data;
       return { success: false, error: d?.error || 'REJECT_FAILED', message: d?.message };
+    }
+  },
+
+  // WO-O4O-SELLER-RECRUITMENT-PARTICIPATION-TERMINATION-V1: 승인 판매자 참여 해지
+  async terminateApplication(applicationId: string): Promise<{ success: boolean; error?: string; message?: string }> {
+    try {
+      const response = await api.post(`/neture/partner/applications/${applicationId}/terminate`);
+      return response.data;
+    } catch (error: any) {
+      const d = error?.response?.data;
+      return { success: false, error: d?.error || 'TERMINATE_FAILED', message: d?.message };
     }
   },
 

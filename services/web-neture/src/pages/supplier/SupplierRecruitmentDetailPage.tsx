@@ -63,6 +63,17 @@ export default function SupplierRecruitmentDetailPage() {
     await load();
   };
 
+  // WO-O4O-SELLER-RECRUITMENT-PARTICIPATION-TERMINATION-V1
+  const handleTerminate = async (applicationId: string) => {
+    if (!window.confirm('이 판매자의 모집 참여를 해지하면 신규 조달 상품 노출이 중단됩니다.\n기존 주문 이력과 정산 이력은 유지됩니다.\n해지하시겠습니까?')) return;
+    setBusyId(applicationId);
+    setError(null);
+    const result = await supplierRecruitmentApi.terminateApplication(applicationId);
+    setBusyId(null);
+    if (!result.success) setError(result.message || '참여 해지에 실패했습니다.');
+    await load();
+  };
+
   // WO-O4O-SELLER-RECRUITMENT-CLOSE-ACTION-V1
   const handleCloseRecruitment = async () => {
     if (!recruitmentId) return;
@@ -169,6 +180,9 @@ export default function SupplierRecruitmentDetailPage() {
                     <td className="px-4 py-3 text-slate-600">{a.organizationName || <span className="text-slate-300">-</span>}</td>
                     <td className="px-4 py-3">
                       <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${badge.cls}`}>{badge.label}</span>
+                      {a.participationTerminated && (
+                        <span className="ml-1 px-2 py-0.5 rounded-full text-xs font-medium bg-slate-200 text-slate-600">참여 해지됨</span>
+                      )}
                       {a.status === 'rejected' && a.reason && <div className="text-xs text-slate-400 mt-0.5">{a.reason}</div>}
                     </td>
                     <td className="px-4 py-3 text-slate-400 text-xs">{new Date(a.appliedAt).toLocaleDateString('ko-KR')}</td>
@@ -178,6 +192,11 @@ export default function SupplierRecruitmentDetailPage() {
                           {busy && <Loader2 className="w-4 h-4 animate-spin text-slate-400" />}
                           <button type="button" disabled={busy} onClick={() => handleApprove(a.id)} className="text-emerald-600 hover:text-emerald-800 font-medium text-sm disabled:opacity-50">승인</button>
                           <button type="button" disabled={busy} onClick={() => handleReject(a.id)} className="text-red-500 hover:text-red-700 font-medium text-sm disabled:opacity-50">반려</button>
+                        </span>
+                      ) : a.status === 'approved' && !a.participationTerminated ? (
+                        <span className="inline-flex items-center gap-2">
+                          {busy && <Loader2 className="w-4 h-4 animate-spin text-slate-400" />}
+                          <button type="button" disabled={busy} onClick={() => handleTerminate(a.id)} className="text-slate-500 hover:text-red-600 font-medium text-sm disabled:opacity-50">참여 해지</button>
                         </span>
                       ) : (
                         <span className="text-xs text-slate-400">완료</span>

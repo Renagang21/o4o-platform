@@ -578,6 +578,11 @@ export class NetureService {
     return this.partnerContractService.reopenRecruitment(recruitmentId, sellerUserId);
   }
 
+  // WO-O4O-SELLER-RECRUITMENT-PARTICIPATION-TERMINATION-V1: 승인 판매자 참여 해지
+  async terminateRecruitmentParticipation(applicationId: string, sellerUserId: string) {
+    return this.partnerContractService.terminateParticipation(applicationId, sellerUserId);
+  }
+
   async approvePartnerApplication(applicationId: string, sellerId: string) {
     return this.partnerContractService.approvePartnerApplication(applicationId, sellerId);
   }

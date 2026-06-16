@@ -212,6 +212,71 @@ export class NeturePartnerContractService {
   }
 
   /**
+   * WO-O4O-SELLER-RECRUITMENT-PARTICIPATION-TERMINATION-V1
+   *
+   * 승인된 판매자의 모집 참여를 해지한다(= 신규 조달 노출 중단). "계약 해지 전체"가 아니라 "모집 참여 해지".
+   * 정책: application 은 approved 유지(rejected 로 되돌리지 않음). RBAC 회수·주문 취소·정산 제외. 기존 주문 이력 유지.
+   *  ① 소유권: recruitment.sellerId === sellerUserId, application=approved
+   *  ② contract(by applicationId) ACTIVE → TERMINATED
+   *  ③ offer.allowed_seller_ids 에서 partner userId 제거 (array_remove — 조달 노출/신규 주문 차단)
+   *  ④ source_type='seller_recruitment' OPL is_active=false (삭제 아님, 매장 listing 노출 차단)
+   * idempotent, 소유권 외 best-effort.
+   */
+  async terminateParticipation(applicationId: string, sellerUserId: string) {
+    const application = await this.applicationRepo.findOne({ where: { id: applicationId } });
+    if (!application) return { success: false as const, error: 'APPLICATION_NOT_FOUND' };
+    const recruitment = await this.recruitmentRepo.findOne({ where: { id: application.recruitmentId } });
+    if (!recruitment || recruitment.sellerId !== sellerUserId) return { success: false as const, error: 'NOT_OWNER' };
+    if (application.status !== ApplicationStatus.APPROVED) return { success: false as const, error: 'NOT_APPROVED' };
+
+    // ② contract TERMINATED (있을 때만, idempotent)
+    const contract = await this.contractRepo.findOne({ where: { applicationId, contractStatus: ContractStatus.ACTIVE } });
+    if (contract) {
+      contract.contractStatus = ContractStatus.TERMINATED;
+      contract.terminatedBy = ContractTerminatedBy.SELLER;
+      contract.endedAt = new Date();
+      await this.contractRepo.save(contract);
+    }
+
+    // ③④ offer 해소 → allowedSellerIds 제거 + seller_recruitment OPL 비활성화
+    const offerRows: Array<{ id: string }> = await AppDataSource.query(
+      `SELECT spo.id
+       FROM supplier_product_offers spo
+       JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+       WHERE spo.master_id = $1 AND ns.user_id = $2 AND spo.deleted_at IS NULL
+       ORDER BY (spo.distribution_type = 'PRIVATE') DESC, (spo.approval_status = 'APPROVED') DESC, spo.created_at DESC
+       LIMIT 1`,
+      [recruitment.productId, sellerUserId],
+    );
+    if (offerRows.length) {
+      const offerId = offerRows[0].id;
+      await AppDataSource.query(
+        `UPDATE supplier_product_offers
+         SET allowed_seller_ids = array_remove(coalesce(allowed_seller_ids, '{}'), $1), updated_at = NOW()
+         WHERE id = $2`,
+        [application.partnerId, offerId],
+      );
+      const orgRows: Array<{ organization_id: string }> = await AppDataSource.query(
+        `SELECT organization_id FROM organization_members WHERE user_id = $1 AND left_at IS NULL LIMIT 1`,
+        [application.partnerId],
+      );
+      if (orgRows.length) {
+        await AppDataSource.query(
+          `UPDATE organization_product_listings
+           SET is_active = false, updated_at = NOW()
+           WHERE offer_id = $1 AND organization_id = $2 AND source_type = 'seller_recruitment'`,
+          [offerId, orgRows[0].organization_id],
+        );
+      }
+      logger.info(`[Participation] terminated app=${applicationId} partner=${application.partnerId} offer=${offerId}`);
+    } else {
+      logger.warn(`[Participation] offer not found — allowedSellerIds/OPL cleanup skipped (app=${applicationId})`);
+    }
+
+    return { success: true as const, data: { applicationId, contractTerminated: !!contract } };
+  }
+
+  /**
    * WO-O4O-SELLER-RECRUITMENT-SUPPLIER-APPLICATION-REVIEW-V1
    *
    * 공급자 본인 모집의 신청자 목록 + 모집 요약 (소유권: recruitment.sellerId === sellerUserId).
@@ -225,12 +290,15 @@ export class NeturePartnerContractService {
       id: string; partner_id: string; partner_name: string | null; status: string;
       applied_at: Date; decided_at: Date | null; reason: string | null;
       partner_user_name: string | null; partner_email: string | null; organization_name: string | null;
+      contract_status: string | null;
     }> = await AppDataSource.query(
       `SELECT a.id, a.partner_id, a.partner_name, a.status, a.applied_at, a.decided_at, a.reason,
               u.name AS partner_user_name, u.email AS partner_email,
               (SELECT o.name FROM organization_members om
                  JOIN organizations o ON o.id = om.organization_id
-               WHERE om.user_id = a.partner_id AND om.left_at IS NULL LIMIT 1) AS organization_name
+               WHERE om.user_id = a.partner_id AND om.left_at IS NULL LIMIT 1) AS organization_name,
+              (SELECT c.contract_status FROM neture_seller_partner_contracts c
+               WHERE c.application_id = a.id ORDER BY c.created_at DESC LIMIT 1) AS contract_status
        FROM neture_partner_applications a
        LEFT JOIN users u ON u.id = a.partner_id
        WHERE a.recruitment_id = $1
@@ -260,6 +328,8 @@ export class NeturePartnerContractService {
         appliedAt: a.applied_at,
         decidedAt: a.decided_at,
         reason: a.reason || '',
+        // WO-O4O-SELLER-RECRUITMENT-PARTICIPATION-TERMINATION-V1: 참여 해지 파생 상태(contract=terminated)
+        participationTerminated: a.contract_status === 'terminated',
       })),
     };
   }
