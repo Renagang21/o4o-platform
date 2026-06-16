@@ -62,11 +62,19 @@ import {
   fetchPlaylistItems,
   addPlaylistItem,
   addPlaylistItemFromLibrary,
+  addPlaylistItemFromSignage,
   deletePlaylistItem,
   reorderPlaylistItems,
   type StorePlaylist,
   type StorePlaylistItem,
 } from '@/api/storePlaylist';
+// WO-O4O-GLYCOPHARM-STORE-SIGNAGE-MEDIA-REGISTRATION-FRONTEND-PARITY-V1: 직접 동영상 등록(SignageMedia)
+import {
+  fetchSignageMedia,
+  createSignageMedia,
+  deleteSignageMedia,
+  type SignageMediaItem,
+} from '@/api/signageMedia';
 import {
   fetchSchedules,
   createSchedule,
@@ -110,6 +118,14 @@ function daysUntil(dateStr: string): number {
   const target = new Date(dateStr);
   const now = new Date();
   return Math.ceil((target.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+}
+
+// WO-O4O-GLYCOPHARM-STORE-SIGNAGE-MEDIA-REGISTRATION-FRONTEND-PARITY-V1
+function detectVideoSource(url: string): 'youtube' | 'vimeo' | null {
+  const u = url.toLowerCase();
+  if (u.includes('youtube.com') || u.includes('youtu.be')) return 'youtube';
+  if (u.includes('vimeo.com')) return 'vimeo';
+  return null;
 }
 
 function isForcedActive(item: StoreAssetItem): boolean {
@@ -282,6 +298,17 @@ export default function StoreSignageMainPage() {
   const [schIsActive, setSchIsActive] = useState(true);
   const [schSaving, setSchSaving] = useState(false);
 
+  // ── 동영상 등록 state (WO-O4O-GLYCOPHARM-STORE-SIGNAGE-MEDIA-REGISTRATION-FRONTEND-PARITY-V1) ──
+  const [registeredMedia, setRegisteredMedia] = useState<SignageMediaItem[]>([]);
+  const [showVideoRegForm, setShowVideoRegForm] = useState(false);
+  const [regVideoTitle, setRegVideoTitle] = useState('');
+  const [regVideoUrl, setRegVideoUrl] = useState('');
+  const [regVideoDescription, setRegVideoDescription] = useState('');
+  const [regVideoTags, setRegVideoTags] = useState('');
+  const [regVideoStatus, setRegVideoStatus] = useState<'draft' | 'active'>('active');
+  const [regVideoSaving, setRegVideoSaving] = useState(false);
+  const [regVideoError, setRegVideoError] = useState('');
+
   // ── Legacy asset state ──
   const [items, setItems] = useState<StoreAssetItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -375,12 +402,23 @@ export default function StoreSignageMainPage() {
     }
   }, [organizationId]);
 
+  // ── 직접 등록한 동영상(SignageMedia) 로더 ──
+  const loadSignageMedia = useCallback(async () => {
+    if (!organizationId) return;
+    try {
+      setRegisteredMedia(await fetchSignageMedia(organizationId));
+    } catch {
+      setRegisteredMedia([]);
+    }
+  }, [organizationId]);
+
   useEffect(() => {
     fetchItems();
     loadPlaylists();
     loadSchedules();
     loadSignagePlaylists();
-  }, [fetchItems, loadPlaylists, loadSchedules, loadSignagePlaylists]);
+    loadSignageMedia();
+  }, [fetchItems, loadPlaylists, loadSchedules, loadSignagePlaylists, loadSignageMedia]);
 
   useEffect(() => {
     if (selectedPlaylistId) loadPlaylistItems(selectedPlaylistId);
@@ -536,6 +574,62 @@ export default function StoreSignageMainPage() {
 
   const toggleSchDay = (day: number) => {
     setSchDays(prev => prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day].sort());
+  };
+
+  // ── 동영상 등록 handlers (WO-O4O-GLYCOPHARM-STORE-SIGNAGE-MEDIA-REGISTRATION-FRONTEND-PARITY-V1) ──
+  const resetVideoRegForm = () => {
+    setRegVideoTitle('');
+    setRegVideoUrl('');
+    setRegVideoDescription('');
+    setRegVideoTags('');
+    setRegVideoStatus('active');
+    setRegVideoError('');
+    setShowVideoRegForm(false);
+  };
+
+  const handleRegisterVideo = async () => {
+    setRegVideoError('');
+    if (!regVideoTitle.trim() || !regVideoUrl.trim()) return;
+    if (!organizationId) { setRegVideoError('매장 정보를 불러오는 중입니다. 잠시 후 다시 시도해 주세요.'); return; }
+    const sourceType = detectVideoSource(regVideoUrl.trim());
+    if (!sourceType) { setRegVideoError('올바른 YouTube 또는 Vimeo URL을 입력해 주세요.'); return; }
+    const tags = regVideoTags.split(',').map(t => t.trim()).filter(Boolean);
+    setRegVideoSaving(true);
+    try {
+      await createSignageMedia(organizationId, {
+        name: regVideoTitle.trim(),
+        mediaType: 'video',
+        sourceType,
+        sourceUrl: regVideoUrl.trim(),
+        description: regVideoDescription.trim() || undefined,
+        tags: tags.length > 0 ? tags : undefined,
+        status: regVideoStatus,
+      });
+      resetVideoRegForm();
+      loadSignageMedia();
+    } catch (err: unknown) {
+      setRegVideoError(err instanceof Error ? err.message : '동영상 등록에 실패했습니다.');
+    } finally {
+      setRegVideoSaving(false);
+    }
+  };
+
+  const handleDeleteMedia = async (mediaId: string) => {
+    if (!organizationId) return;
+    if (!confirm('이 동영상을 삭제하시겠습니까?')) return;
+    try {
+      await deleteSignageMedia(organizationId, mediaId);
+      loadSignageMedia();
+    } catch { /* user can retry */ }
+  };
+
+  const handleAddSignageToPlaylist = async (mediaId: string) => {
+    if (!selectedPlaylistId || !organizationId) return;
+    try {
+      await addPlaylistItemFromSignage(selectedPlaylistId, mediaId, organizationId);
+      setShowAddPicker(false);
+      loadPlaylistItems(selectedPlaylistId);
+    } catch { /* user can retry */ }
   };
 
   // KPI
@@ -926,10 +1020,22 @@ export default function StoreSignageMainPage() {
                       Library에서 선택
                     </button>
                   </div>
-                  {signageSnapshots.length === 0 ? (
-                    <p className="text-xs text-slate-400">사이니지 자산이 없습니다. Hub에서 가져오거나 Library에서 선택하세요.</p>
+                  {signageSnapshots.length === 0 && registeredMedia.length === 0 ? (
+                    <p className="text-xs text-slate-400">사이니지 자산이 없습니다. '동영상 등록'으로 직접 추가하거나 Hub/Library에서 선택하세요.</p>
                   ) : (
                     <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
+                      {/* WO-O4O-GLYCOPHARM-STORE-SIGNAGE-MEDIA-REGISTRATION-FRONTEND-PARITY-V1: 직접 등록 동영상 */}
+                      {registeredMedia.map(m => (
+                        <button
+                          key={`media-${m.id}`}
+                          onClick={() => handleAddSignageToPlaylist(m.id)}
+                          className="flex items-center gap-1 px-3 py-1.5 text-xs bg-white border border-blue-200 rounded-md hover:bg-blue-50 hover:border-blue-300 truncate max-w-[200px]"
+                          title="등록한 동영상"
+                        >
+                          <Monitor className="w-3 h-3 text-blue-500 flex-shrink-0" />
+                          {m.name}
+                        </button>
+                      ))}
                       {signageSnapshots.map(snap => (
                         <button
                           key={snap.id}
@@ -1286,18 +1392,142 @@ export default function StoreSignageMainPage() {
       {/* ═══ Assets Tab ════════════════════════════ */}
       {activeTab === 'assets' && <>
 
-      {/* WO-O4O-GLYCOPHARM-STORE-SIGNAGE-SCHEDULE-KPA-PARITY-FIX-V1:
-          KPA '동영상 등록' 위치(탭 헤더 우측)에 맞춰 '콘텐츠 추가' 배치. GlycoPharm 자산은 허브에서 가져오므로 라이브러리로 이동. */}
+      {/* WO-O4O-GLYCOPHARM-STORE-SIGNAGE-MEDIA-REGISTRATION-FRONTEND-PARITY-V1:
+          KPA 정렬 — '동영상 등록'(직접 URL 등록 모달)을 탭 헤더 우측 1순위로. 허브 가져오기는 '콘텐츠 허브'로 보존. */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-slate-800">내 동영상</h2>
-        <button
-          onClick={() => navigate('/store/marketing/signage/library')}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50"
-        >
-          <Plus className="w-4 h-4" />
-          콘텐츠 추가
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => navigate('/store/marketing/signage/library')}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-slate-500 border border-slate-200 rounded-lg hover:bg-slate-50"
+          >
+            <ExternalLink className="w-4 h-4" />
+            콘텐츠 허브
+          </button>
+          <button
+            onClick={() => setShowVideoRegForm(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50"
+          >
+            <Plus className="w-4 h-4" />
+            동영상 등록
+          </button>
+        </div>
       </div>
+
+      {/* ── 동영상 등록 모달 ── */}
+      {showVideoRegForm && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          onClick={e => { if (e.target === e.currentTarget) resetVideoRegForm(); }}
+          onKeyDown={e => { if (e.key === 'Escape') resetVideoRegForm(); }}
+          role="dialog"
+          aria-modal="true"
+          tabIndex={-1}
+        >
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg p-6">
+            <h3 className="text-base font-semibold text-slate-800 mb-4">동영상 등록</h3>
+            {regVideoError && (
+              <p className="text-xs text-red-600 mb-3 px-2 py-1.5 bg-red-50 border border-red-200 rounded">{regVideoError}</p>
+            )}
+            <div className="mb-3">
+              <label className="block text-xs font-medium text-slate-600 mb-1">제목 <span className="text-red-500">*</span></label>
+              <input
+                type="text"
+                value={regVideoTitle}
+                onChange={e => { setRegVideoTitle(e.target.value); setRegVideoError(''); }}
+                placeholder="동영상 제목을 입력하세요"
+                className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                autoFocus
+              />
+            </div>
+            <div className="mb-3">
+              <label className="block text-xs font-medium text-slate-600 mb-1">YouTube / Vimeo URL <span className="text-red-500">*</span></label>
+              <input
+                type="url"
+                value={regVideoUrl}
+                onChange={e => { setRegVideoUrl(e.target.value); setRegVideoError(''); }}
+                placeholder="https://www.youtube.com/watch?v=..."
+                className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+            <div className="mb-3">
+              <label className="block text-xs font-medium text-slate-600 mb-1">설명 / 용도 메모</label>
+              <textarea
+                value={regVideoDescription}
+                onChange={e => setRegVideoDescription(e.target.value)}
+                placeholder="이 동영상의 활용 위치나 용도를 간략히 기록하세요"
+                rows={2}
+                className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3 mb-5">
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1">태그 <span className="text-slate-400 font-normal">(쉼표로 구분)</span></label>
+                <input
+                  type="text"
+                  value={regVideoTags}
+                  onChange={e => setRegVideoTags(e.target.value)}
+                  placeholder="예: 약국, 건강, 홍보"
+                  className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1">공개 상태</label>
+                <select
+                  value={regVideoStatus}
+                  onChange={e => setRegVideoStatus(e.target.value as 'draft' | 'active')}
+                  className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+                >
+                  <option value="active">공개</option>
+                  <option value="draft">초안 (숨김)</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={resetVideoRegForm}
+                className="px-4 py-2 text-sm text-slate-600 border border-slate-300 rounded-md hover:bg-slate-50"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleRegisterVideo}
+                disabled={regVideoSaving || !regVideoTitle.trim() || !regVideoUrl.trim()}
+                className="flex items-center gap-1.5 px-4 py-2 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {regVideoSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                {regVideoSaving ? '등록 중...' : '등록'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── 등록한 동영상 목록 (직접 등록 SignageMedia) ── */}
+      {registeredMedia.length > 0 && (
+        <div className="mb-6 rounded-lg border border-slate-200 bg-white">
+          <div className="px-4 py-2.5 border-b border-slate-100 text-sm font-medium text-slate-700">
+            등록한 동영상 <span className="text-slate-400 font-normal">({registeredMedia.length})</span>
+          </div>
+          <ul className="divide-y divide-slate-50">
+            {registeredMedia.map(m => (
+              <li key={m.id} className="flex items-center gap-3 px-4 py-2.5">
+                <Monitor className="w-4 h-4 text-slate-400 flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-medium text-slate-800 truncate">{m.name}</div>
+                  <div className="text-xs text-slate-400 truncate">{m.sourceType} · {m.sourceUrl}</div>
+                </div>
+                <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${m.status === 'active' ? 'bg-green-50 text-green-700' : 'bg-slate-100 text-slate-500'}`}>
+                  {m.status === 'active' ? '공개' : '초안'}
+                </span>
+                <button onClick={() => handleDeleteMedia(m.id)} className="p-1 text-slate-300 hover:text-red-500 rounded" title="삭제">
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {!loading && !error && (
         <div className="grid grid-cols-5 gap-4 mb-6">

@@ -95,6 +95,17 @@ export async function addPlaylistItemFromLibrary(
   return (res.data as { success: boolean; data: StorePlaylistItem }).data;
 }
 
+// WO-O4O-GLYCOPHARM-STORE-SIGNAGE-MEDIA-REGISTRATION-FRONTEND-PARITY-V1:
+// 직접 등록한 SignageMedia 를 플레이리스트 항목으로 추가 (backend: signage_media → auto-snapshot → item).
+export async function addPlaylistItemFromSignage(
+  playlistId: string,
+  mediaId: string,
+  organizationId: string,
+): Promise<StorePlaylistItem> {
+  const res = await api.post(`/glycopharm/store-playlists/${playlistId}/items/from-signage`, { mediaId, organizationId });
+  return (res.data as { success: boolean; data: StorePlaylistItem }).data;
+}
+
 export async function reorderPlaylistItems(
   playlistId: string,
   order: string[],
