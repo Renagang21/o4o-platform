@@ -70,7 +70,7 @@
 
 **PASS.** 운영자 Approvals 의미를 "판매자 승인"→"모집 제품 서비스 노출 승인"으로 재정의. 메뉴 정리 + B안 준비중 안내. 공급자 흐름·정책 무변경.
 
-**커밋:** path-specific 9파일(menu config 3 + page 3 + route 3[OperatorRoutes/App.tsx ×2] + CHECK) · `<commit>`.
+**커밋:** path-specific 10파일(menu config 3 + page 3 + route 3[OperatorRoutes/App.tsx ×2] + CHECK) · `4d6e4571b`.
 **후속(선택):** 노출 승인 backend 모델(RecruitmentExposure status/API) WO / delist 메뉴 route·page 완전 제거 여부 / KCos "매장 가입 신청 관리" 정렬(D4).
 
 ---
