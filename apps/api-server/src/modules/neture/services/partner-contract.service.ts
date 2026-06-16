@@ -125,6 +125,53 @@ export class NeturePartnerContractService {
   }
 
   /**
+   * WO-O4O-SELLER-RECRUITMENT-SUPPLIER-STATUS-VIEW-V1
+   *
+   * 공급자(모집 주체) 본인이 생성한 모집 목록 + 신청 카운트(전체/대기/승인/반려).
+   * sellerId = 공급자 user id (생성 시 저장값과 동일).
+   */
+  async getSellerRecruitments(sellerUserId: string) {
+    const recruitments = await this.recruitmentRepo.find({
+      where: { sellerId: sellerUserId },
+      order: { createdAt: 'DESC' },
+    });
+    if (!recruitments.length) return [];
+
+    const ids = recruitments.map((r) => r.id);
+    const countRows: Array<{ recruitment_id: string; status: string; cnt: number }> = await AppDataSource.query(
+      `SELECT recruitment_id, status, COUNT(*)::int AS cnt
+       FROM neture_partner_applications
+       WHERE recruitment_id = ANY($1)
+       GROUP BY recruitment_id, status`,
+      [ids],
+    );
+    const countMap = new Map<string, { total: number; pending: number; approved: number; rejected: number }>();
+    for (const r of recruitments) countMap.set(r.id, { total: 0, pending: 0, approved: 0, rejected: 0 });
+    for (const c of countRows) {
+      const m = countMap.get(c.recruitment_id);
+      if (!m) continue;
+      const n = Number(c.cnt);
+      m.total += n;
+      if (c.status === ApplicationStatus.PENDING) m.pending = n;
+      else if (c.status === ApplicationStatus.APPROVED) m.approved = n;
+      else if (c.status === ApplicationStatus.REJECTED) m.rejected = n;
+    }
+
+    return recruitments.map((r) => ({
+      id: r.id,
+      productId: r.productId,
+      productName: r.productName,
+      serviceId: r.serviceId || '',
+      serviceName: r.serviceName || '',
+      commissionRate: Number(r.commissionRate),
+      consumerPrice: Number(r.consumerPrice),
+      status: r.status,
+      createdAt: r.createdAt,
+      applications: countMap.get(r.id) || { total: 0, pending: 0, approved: 0, rejected: 0 },
+    }));
+  }
+
+  /**
    * WO-O4O-SELLER-RECRUITMENT-CREATION-FLOW-V1
    *
    * 공급자가 등록된 PRIVATE 제품으로 판매자 모집을 생성한다.

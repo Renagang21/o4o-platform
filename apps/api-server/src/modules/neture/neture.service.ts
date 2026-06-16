@@ -558,6 +558,11 @@ export class NetureService {
     return this.partnerContractService.createRecruitment(sellerUserId, input);
   }
 
+  // WO-O4O-SELLER-RECRUITMENT-SUPPLIER-STATUS-VIEW-V1: 공급자 본인 모집 현황
+  async getSellerRecruitments(sellerUserId: string) {
+    return this.partnerContractService.getSellerRecruitments(sellerUserId);
+  }
+
   async approvePartnerApplication(applicationId: string, sellerId: string) {
     return this.partnerContractService.approvePartnerApplication(applicationId, sellerId);
   }

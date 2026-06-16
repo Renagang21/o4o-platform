@@ -21,6 +21,7 @@ import {
   MessageSquare,
   Boxes,
   Tag,
+  Megaphone,
   Settings,
   ChevronRight,
   ChevronDown,
@@ -73,6 +74,12 @@ const SUPPLIER_SIDEBAR_GROUPS: SidebarGroup[] = [
     label: '공급 오퍼',
     icon: Boxes,
     items: [{ label: '공급 오퍼', path: '/supplier/supply-offers' }],
+  },
+  {
+    // WO-O4O-SELLER-RECRUITMENT-SUPPLIER-STATUS-VIEW-V1
+    label: '판매자 모집',
+    icon: Megaphone,
+    items: [{ label: '모집 현황', path: '/supplier/recruitments' }],
   },
   {
     label: '유통참여형 펀딩',

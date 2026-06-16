@@ -91,6 +91,24 @@ export function createPartnerRecruitmentController(deps: {
   });
 
   /**
+   * GET /partner/recruitments/mine
+   * 공급자 본인 모집 현황 + 신청 카운트 (WO-O4O-SELLER-RECRUITMENT-SUPPLIER-STATUS-VIEW-V1)
+   */
+  router.get('/partner/recruitments/mine', requireAuth, requireActiveSupplier, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
+      }
+      const data = await netureService.getSellerRecruitments(userId);
+      res.json({ success: true, data });
+    } catch (error) {
+      logger.error('[Neture API] Error fetching seller recruitments:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch recruitments' });
+    }
+  });
+
+  /**
    * POST /partner/recruitments
    * 공급자 판매자 모집 생성 (WO-O4O-SELLER-RECRUITMENT-CREATION-FLOW-V1)
    */

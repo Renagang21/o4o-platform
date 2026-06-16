@@ -1257,7 +1257,31 @@ export const supplierRegulatedCategoryApi = {
 // ==================== Supplier Recruitment Creation API ====================
 // WO-O4O-SELLER-RECRUITMENT-CREATION-FLOW-V1
 
+export interface SupplierRecruitment {
+  id: string;
+  productId: string;
+  productName: string;
+  serviceId: string;
+  serviceName: string;
+  commissionRate: number;
+  consumerPrice: number;
+  status: string;
+  createdAt: string;
+  applications: { total: number; pending: number; approved: number; rejected: number };
+}
+
 export const supplierRecruitmentApi = {
+  // WO-O4O-SELLER-RECRUITMENT-SUPPLIER-STATUS-VIEW-V1
+  async listMine(): Promise<SupplierRecruitment[]> {
+    try {
+      const response = await api.get('/neture/partner/recruitments/mine');
+      return response.data?.data ?? [];
+    } catch (error) {
+      console.warn('[Supplier Recruitment API] Failed to list:', error);
+      return [];
+    }
+  },
+
   async create(input: {
     masterId: string;
     serviceKey: string;
