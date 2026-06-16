@@ -62,6 +62,10 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '공지사항/뉴스', path: '/operator/content-management' },
     // WO-O4O-KCOSMETICS-OPERATOR-SURVEYS-V1
     { label: '설문조사 관리', path: '/operator/surveys' },
+    // WO-O4O-KCOS-OPERATOR-CONTACT-MANAGEMENT-MIGRATION-V1:
+    //   문의 처리(목록·상세·답변·상태/메모)는 operator 업무 → operator 로 이관 신설.
+    //   문의 '설정'은 admin 유지(/admin/settings/contact). backend 가드 operator 레벨로 조정(scopeRoleMapping 엄격 대응).
+    { label: '문의 관리', path: '/operator/contacts' },
   ],
   // WO-O4O-KCOS-OPERATOR-MENU-ALIGN-WITH-KPA-V1: 자료실 독립 그룹 (KPA 정합)
   resources: [

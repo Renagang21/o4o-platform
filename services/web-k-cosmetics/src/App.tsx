@@ -205,6 +205,8 @@ const OperatorSettingsPage = lazy(() => import('@/pages/operator/SettingsPage'))
 const ServiceLegalSettingsPage = lazy(() => import('@/pages/admin/ServiceLegalSettingsPage'));
 // WO-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1
 const ContactInquiriesPage = lazy(() => import('@/pages/admin/ContactInquiriesPage'));
+// WO-O4O-KCOS-OPERATOR-CONTACT-MANAGEMENT-MIGRATION-V1: 문의 처리 operator 이관
+const OperatorContactInquiriesPage = lazy(() => import('@/pages/operator/OperatorContactInquiriesPage'));
 // WO-O4O-SERVICE-CONTACT-SETTINGS-ADMIN-V1
 const ServiceContactSettingsPage = lazy(() => import('@/pages/admin/ServiceContactSettingsPage'));
 const OperatorRoleManagementPage = lazy(() => import('@/pages/operator/RoleManagementPage'));
@@ -729,6 +731,8 @@ function AppRoutes() {
         <Route path="resources" element={<OperatorResourcesPage />} />
         {/* Content Management 공지/뉴스 (WO-O4O-CONTENT-CANONICAL-CROSS-SERVICE-ALIGNMENT-V1) */}
         <Route path="content-management" element={<OperatorContentPage />} />
+        {/* 문의 관리 — operator 이관 (WO-O4O-KCOS-OPERATOR-CONTACT-MANAGEMENT-MIGRATION-V1) */}
+        <Route path="contacts" element={<OperatorContactInquiriesPage />} />
         {/* LMS 강의 관리 (WO-KCOS-OPERATOR-LMS-BOOTSTRAP-V1) */}
         <Route path="lms" element={<OperatorLmsCoursesPage />} />
         {/* 설문조사 관리 (WO-O4O-KCOSMETICS-OPERATOR-SURVEYS-V1) */}

@@ -3,15 +3,19 @@
  *
  * WO-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1
  *
- * GP/KCos 운영자(admin)가 접수된 문의를 조회·상태 처리한다. Mount: /api/v1/admin/services
+ * GP/KCos operator(및 admin)가 접수된 문의를 조회·상태 처리한다. Mount: /api/v1/admin/services
  *   GET   /:serviceKey/contact-inquiries          — 목록(status/page/limit). 본문 미노출(미리보기만).
  *   GET   /:serviceKey/contact-inquiries/:id       — 상세(본문 포함)
  *   PATCH /:serviceKey/contact-inquiries/:id/status — 상태 변경(+handled_at/handled_by)
  *   PATCH /:serviceKey/contact-inquiries/:id/note   — 내부 메모
  *
- * 권한: requireServiceLegalScope('admin') 재사용(serviceKey 별 `{prefix}:admin`, KPA platformBypass=false 자동 준수).
+ * 권한: requireServiceLegalScope('operator') — 문의 '처리'는 operator 업무다 (WO-O4O-KCOS-OPERATOR-CONTACT-MANAGEMENT-MIGRATION-V1).
+ *   scopeRoleMapping 상 admin ⊃ operator 이므로 admin 도 그대로 통과한다.
+ *   - GlycoPharm: scopeRoleMapping 부재 → operator/admin 모두 allowedRoles fallback 통과 (기존 동작 동일).
+ *   - K-Cosmetics: 'cosmetics:operator' → ['cosmetics:operator','cosmetics:admin'] 통과 (기존 admin-only 403 해소).
+ *   문의 '설정'(admin-service-contact-settings.controller)은 그대로 admin 전용 유지.
  *   + serviceKey 화이트리스트 = glycopharm / k-cosmetics (Neture/KPA 는 자체 contact 시스템 → 거부).
- *   operator 기본 접근 없음(admin only). 개인정보(본문/연락처)는 상세에서만.
+ *   개인정보(본문/연락처)는 상세에서만.
  */
 
 import { Router } from 'express';
@@ -79,10 +83,12 @@ function toDetail(i: ContactInquiry) {
 export function createAdminContactInquiryController(dataSource: DataSource): Router {
   const router = Router();
   const repo = dataSource.getRepository(ContactInquiry);
-  const adminGuard = requireServiceLegalScope('admin');
+  // WO-O4O-KCOS-OPERATOR-CONTACT-MANAGEMENT-MIGRATION-V1: 문의 처리 = operator 업무.
+  //   operator 레벨 가드(admin ⊃ operator)로 GP/KCos operator 의 문의 관리 접근 허용. 설정은 별도 컨트롤러에서 admin 유지.
+  const manageGuard = requireServiceLegalScope('operator');
 
   // ── 목록 ──
-  router.get('/:serviceKey/contact-inquiries', authenticate, adminGuard, async (req: Request, res: Response) => {
+  router.get('/:serviceKey/contact-inquiries', authenticate, manageGuard, async (req: Request, res: Response) => {
     const serviceKey = guardServiceKey(req, res);
     if (!serviceKey) return;
     try {
@@ -107,7 +113,7 @@ export function createAdminContactInquiryController(dataSource: DataSource): Rou
   });
 
   // ── 상세 ──
-  router.get('/:serviceKey/contact-inquiries/:id', authenticate, adminGuard, async (req: Request, res: Response) => {
+  router.get('/:serviceKey/contact-inquiries/:id', authenticate, manageGuard, async (req: Request, res: Response) => {
     const serviceKey = guardServiceKey(req, res);
     if (!serviceKey) return;
     try {
@@ -121,7 +127,7 @@ export function createAdminContactInquiryController(dataSource: DataSource): Rou
   });
 
   // ── 상태 변경 ──
-  router.patch('/:serviceKey/contact-inquiries/:id/status', authenticate, adminGuard, async (req: Request, res: Response) => {
+  router.patch('/:serviceKey/contact-inquiries/:id/status', authenticate, manageGuard, async (req: Request, res: Response) => {
     const serviceKey = guardServiceKey(req, res);
     if (!serviceKey) return;
     const { status } = req.body ?? {};
@@ -143,7 +149,7 @@ export function createAdminContactInquiryController(dataSource: DataSource): Rou
   });
 
   // ── 내부 메모 ──
-  router.patch('/:serviceKey/contact-inquiries/:id/note', authenticate, adminGuard, async (req: Request, res: Response) => {
+  router.patch('/:serviceKey/contact-inquiries/:id/note', authenticate, manageGuard, async (req: Request, res: Response) => {
     const serviceKey = guardServiceKey(req, res);
     if (!serviceKey) return;
     const { internalNote } = req.body ?? {};
