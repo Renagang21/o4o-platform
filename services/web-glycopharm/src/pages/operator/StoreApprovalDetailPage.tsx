@@ -23,11 +23,8 @@ import {
   Mail,
   MapPin,
   FileText,
-  CreditCard,
   AlertCircle,
   Loader2,
-  Check,
-  X,
 } from 'lucide-react';
 import { storeApi } from '@/api/store';
 import type { StoreApplication, StoreApplicationStatus, ReviewCheckpoint } from '@/types/store';
@@ -78,6 +75,27 @@ const STATUS_CONFIG: Record<
     bgColor: 'bg-red-100',
     textColor: 'text-red-700',
   },
+};
+
+// 알 수 없는 상태값에 대한 안전 fallback
+const FALLBACK_STATUS_CONFIG = {
+  label: '알 수 없음',
+  icon: AlertCircle,
+  bgColor: 'bg-slate-100',
+  textColor: 'text-slate-600',
+} as const;
+
+// 조직 유형 표시 라벨
+const ORG_TYPE_LABEL: Record<string, string> = {
+  pharmacy: '약국',
+  pharmacy_chain: '약국 체인',
+};
+
+// 신청 서비스 유형 표시 라벨
+const SERVICE_TYPE_LABEL: Record<string, string> = {
+  dropshipping: '무재고 판매',
+  sample_sales: '샘플 판매',
+  digital_signage: '디지털 사이니지',
 };
 
 // 기본 심사 체크포인트
@@ -167,8 +185,10 @@ export default function StoreApprovalDetailPage() {
   };
 
   useEffect(() => {
-    if (application?.form.pharmacyName && !storeSlug) {
-      setStoreSlug(generateSlugFromName(application.form.pharmacyName));
+    if (application?.requestedSlug && !storeSlug) {
+      setStoreSlug(application.requestedSlug);
+    } else if (application?.organizationName && !storeSlug) {
+      setStoreSlug(generateSlugFromName(application.organizationName));
     }
   }, [application]);
 
@@ -265,10 +285,16 @@ export default function StoreApprovalDetailPage() {
 
   if (!application) return null;
 
-  const { form } = application;
-  const statusConfig = STATUS_CONFIG[application.status];
+  const statusConfig = STATUS_CONFIG[application.status] ?? FALLBACK_STATUS_CONFIG;
   const StatusIcon = statusConfig.icon;
   const canProcess = ['submitted', 'reviewing', 'supplementing'].includes(application.status);
+  const serviceTypeLabels = (application.serviceTypes || []).map(
+    (s) => SERVICE_TYPE_LABEL[s] || s,
+  );
+  // 보완 요청 메시지는 metadata.supplementRequests 마지막 항목에서 도출
+  const supplementMessages: Array<{ message?: string; requestedAt?: string }> =
+    application.metadata?.supplementRequests || [];
+  const latestSupplement = supplementMessages[supplementMessages.length - 1];
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -288,8 +314,12 @@ export default function StoreApprovalDetailPage() {
             <Store className="w-7 h-7 text-primary-600" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-slate-800">{form.pharmacyName}</h1>
-            <p className="text-slate-500">{form.businessName}</p>
+            <h1 className="text-2xl font-bold text-slate-800">
+              {application.organizationName || '약국명 미확인'}
+            </h1>
+            <p className="text-slate-500">
+              {ORG_TYPE_LABEL[application.organizationType] || application.organizationType || '-'}
+            </p>
           </div>
         </div>
         <span
@@ -303,82 +333,76 @@ export default function StoreApprovalDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Info */}
         <div className="lg:col-span-2 space-y-6">
-          {/* 사업자 정보 */}
+          {/* 신청 정보 */}
           <div className="bg-white rounded-xl shadow-sm p-6">
             <h2 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
               <Building2 className="w-5 h-5 text-slate-400" />
-              사업자 정보
+              신청 정보
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <InfoItem icon={Building2} label="상호명" value={form.businessName} />
-              <InfoItem icon={FileText} label="사업자등록번호" value={form.businessNumber} />
-              <InfoItem icon={User} label="대표자명" value={form.representativeName} />
-              <InfoItem icon={MapPin} label="사업장 주소" value={form.businessAddress} />
-              <InfoItem icon={Phone} label="사업장 연락처" value={form.businessPhone} />
-              <InfoItem icon={Mail} label="사업장 이메일" value={form.businessEmail} />
+              <InfoItem icon={Building2} label="조직명" value={application.organizationName} />
+              <InfoItem
+                icon={Store}
+                label="조직 유형"
+                value={ORG_TYPE_LABEL[application.organizationType] || application.organizationType}
+              />
+              <InfoItem icon={FileText} label="사업자등록번호" value={application.businessNumber} />
+              <InfoItem icon={FileText} label="희망 스토어 slug" value={application.requestedSlug} />
             </div>
           </div>
 
-          {/* 통신판매업 정보 */}
+          {/* 신청 서비스 */}
           <div className="bg-white rounded-xl shadow-sm p-6">
             <h2 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
               <FileText className="w-5 h-5 text-slate-400" />
-              통신판매업 정보
+              신청 서비스
+            </h2>
+            {serviceTypeLabels.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {serviceTypeLabels.map((label) => (
+                  <span
+                    key={label}
+                    className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-primary-50 text-primary-700"
+                  >
+                    {label}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-slate-500">신청한 서비스가 없습니다.</p>
+            )}
+          </div>
+
+          {/* 신청자 정보 */}
+          <div className="bg-white rounded-xl shadow-sm p-6">
+            <h2 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+              <User className="w-5 h-5 text-slate-400" />
+              신청자 정보
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <InfoItem
-                icon={FileText}
-                label="통신판매업 신고번호"
-                value={form.onlineSalesNumber}
-              />
-              <InfoItem
-                icon={Clock}
-                label="신고일자"
-                value={form.onlineSalesRegisteredAt || '-'}
-              />
+              <InfoItem icon={User} label="신청자" value={application.userName} />
+              <InfoItem icon={Mail} label="이메일" value={application.userEmail} />
+              <InfoItem icon={Phone} label="연락처" value={application.userPhone} />
             </div>
           </div>
 
-          {/* 약국/약사 정보 */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
-              <Store className="w-5 h-5 text-slate-400" />
-              약국/약사 정보
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <InfoItem icon={Store} label="약국명" value={form.pharmacyName} />
-              <InfoItem icon={User} label="관리약사" value={form.pharmacistName} />
-              <InfoItem icon={FileText} label="약사면허번호" value={form.pharmacistLicense} />
-              <InfoItem icon={Phone} label="약국 연락처" value={form.pharmacyPhone} />
-              <InfoItem icon={MapPin} label="약국 주소" value={form.pharmacyAddress} />
+          {/* 생성된 약국 정보 (승인 시) */}
+          {application.pharmacy && (
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h2 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                <Store className="w-5 h-5 text-slate-400" />
+                약국 정보
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <InfoItem icon={Store} label="약국명" value={application.pharmacy.name} />
+                <InfoItem icon={FileText} label="약국 코드" value={application.pharmacy.code} />
+                <InfoItem icon={User} label="대표자명" value={application.pharmacy.ownerName} />
+                <InfoItem icon={FileText} label="사업자등록번호" value={application.pharmacy.businessNumber} />
+                <InfoItem icon={Phone} label="연락처" value={application.pharmacy.phone} />
+                <InfoItem icon={MapPin} label="주소" value={application.pharmacy.address} />
+              </div>
             </div>
-          </div>
-
-          {/* 정산 정보 */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
-              <CreditCard className="w-5 h-5 text-slate-400" />
-              정산 계좌 정보
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <InfoItem icon={CreditCard} label="은행" value={form.bankName} />
-              <InfoItem icon={CreditCard} label="계좌번호" value={form.bankAccountNumber} />
-              <InfoItem icon={User} label="예금주" value={form.bankAccountHolder} />
-            </div>
-          </div>
-
-          {/* 동의 항목 */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-slate-400" />
-              동의 항목
-            </h2>
-            <div className="space-y-2">
-              <AgreementItem label="이용약관 동의" agreed={form.agreedTerms} />
-              <AgreementItem label="개인정보 처리방침 동의" agreed={form.agreedPrivacy} />
-              <AgreementItem label="마케팅 정보 수신 동의 (선택)" agreed={form.agreedMarketing} />
-            </div>
-          </div>
+          )}
 
           {/* 반려 사유 */}
           {application.status === 'rejected' && application.rejectionReason && (
@@ -392,21 +416,21 @@ export default function StoreApprovalDetailPage() {
           )}
 
           {/* 보완 요청 */}
-          {application.status === 'supplementing' && application.supplementRequest && (
+          {application.status === 'supplementing' && latestSupplement?.message && (
             <div className="bg-orange-50 border border-orange-200 rounded-xl p-6">
               <h2 className="text-lg font-semibold text-orange-800 mb-2 flex items-center gap-2">
                 <AlertTriangle className="w-5 h-5" />
                 보완 요청 사항
               </h2>
-              <p className="text-orange-700 whitespace-pre-wrap">{application.supplementRequest}</p>
+              <p className="text-orange-700 whitespace-pre-wrap">{latestSupplement.message}</p>
             </div>
           )}
 
           {/* 추가 메모 */}
-          {form.note && (
+          {application.note && (
             <div className="bg-white rounded-xl shadow-sm p-6">
               <h2 className="text-lg font-semibold text-slate-800 mb-4">신청자 메모</h2>
-              <p className="text-slate-600 whitespace-pre-wrap">{form.note}</p>
+              <p className="text-slate-600 whitespace-pre-wrap">{application.note}</p>
             </div>
           )}
         </div>
@@ -423,7 +447,7 @@ export default function StoreApprovalDetailPage() {
                 label="신청 접수"
                 date={application.submittedAt || application.createdAt}
               />
-              {application.reviewedAt && (
+              {application.decidedAt && (
                 <TimelineItem
                   icon={
                     application.status === 'approved' ? (
@@ -448,7 +472,7 @@ export default function StoreApprovalDetailPage() {
                         ? '반려 처리'
                         : '보완 요청'
                   }
-                  date={application.reviewedAt}
+                  date={application.decidedAt}
                 />
               )}
             </div>
@@ -753,7 +777,7 @@ function InfoItem({
 }: {
   icon: typeof Building2;
   label: string;
-  value: string;
+  value?: string | null;
 }) {
   return (
     <div className="flex items-start gap-3">
@@ -768,18 +792,6 @@ function InfoItem({
   );
 }
 
-function AgreementItem({ label, agreed }: { label: string; agreed?: boolean }) {
-  return (
-    <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
-      {agreed ? (
-        <Check className="w-5 h-5 text-green-600" />
-      ) : (
-        <X className="w-5 h-5 text-slate-400" />
-      )}
-      <span className={`text-sm ${agreed ? 'text-slate-800' : 'text-slate-500'}`}>{label}</span>
-    </div>
-  );
-}
 
 function TimelineItem({
   icon,

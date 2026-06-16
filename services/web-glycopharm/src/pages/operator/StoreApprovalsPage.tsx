@@ -84,6 +84,28 @@ const STATUS_CONFIG: Record<
   },
 };
 
+// 알 수 없는 상태값에 대한 안전 fallback (데이터 정합성 방어)
+const FALLBACK_STATUS_CONFIG = {
+  label: '알 수 없음',
+  icon: AlertCircle,
+  bgColor: 'bg-slate-100',
+  textColor: 'text-slate-600',
+  borderColor: 'border-slate-300',
+} as const;
+
+// 조직 유형 표시 라벨
+const ORG_TYPE_LABEL: Record<string, string> = {
+  pharmacy: '약국',
+  pharmacy_chain: '약국 체인',
+};
+
+// 신청 서비스 유형 표시 라벨
+const SERVICE_TYPE_LABEL: Record<string, string> = {
+  dropshipping: '무재고 판매',
+  sample_sales: '샘플 판매',
+  digital_signage: '디지털 사이니지',
+};
+
 // 필터용 상태 옵션
 const STATUS_OPTIONS: Array<{ value: StoreApplicationStatus | ''; label: string }> = [
   { value: '', label: '전체' },
@@ -284,32 +306,38 @@ export default function StoreApprovalsPage() {
       {!error && (() => {
         const columns: ListColumnDef<StoreApplication>[] = [
           {
-            key: 'pharmacyName',
-            header: '약국명',
+            key: 'organizationName',
+            header: '조직명',
             render: (_v, app) => (
               <div>
-                <p className="font-medium text-slate-800">{app.form.pharmacyName}</p>
-                <p className="text-xs text-slate-500">{app.form.pharmacyAddress}</p>
+                <p className="font-medium text-slate-800">{app.organizationName || '-'}</p>
+                <p className="text-xs text-slate-500">
+                  {ORG_TYPE_LABEL[app.organizationType] || app.organizationType || '-'}
+                </p>
               </div>
             ),
           },
           {
-            key: 'businessName',
-            header: '사업자 정보',
+            key: 'businessNumber',
+            header: '사업자등록번호',
             render: (_v, app) => (
               <div>
-                <p className="text-sm text-slate-700">{app.form.businessName}</p>
-                <p className="text-xs text-slate-500">{app.form.businessNumber}</p>
+                <p className="text-sm text-slate-700">{app.businessNumber || '-'}</p>
+                <p className="text-xs text-slate-500">
+                  {(app.serviceTypes || [])
+                    .map((s) => SERVICE_TYPE_LABEL[s] || s)
+                    .join(', ') || '-'}
+                </p>
               </div>
             ),
           },
           {
-            key: 'pharmacistName',
-            header: '관리약사',
+            key: 'applicant',
+            header: '신청자',
             render: (_v, app) => (
               <div>
-                <p className="text-sm text-slate-700">{app.form.pharmacistName}</p>
-                <p className="text-xs text-slate-500">면허 #{app.form.pharmacistLicense}</p>
+                <p className="text-sm text-slate-700">{app.userName || '-'}</p>
+                <p className="text-xs text-slate-500">{app.userEmail || '-'}</p>
               </div>
             ),
           },
@@ -318,7 +346,7 @@ export default function StoreApprovalsPage() {
             header: '상태',
             width: '120px',
             render: (_v, app) => {
-              const cfg = STATUS_CONFIG[app.status];
+              const cfg = STATUS_CONFIG[app.status] ?? FALLBACK_STATUS_CONFIG;
               const Icon = cfg.icon;
               return (
                 <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${cfg.bgColor} ${cfg.textColor}`}>

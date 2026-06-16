@@ -572,21 +572,56 @@ export type StoreApplicationStatus =
   | 'approved'       // 승인
   | 'rejected';      // 반려
 
+// 신청 조직 유형 (백엔드 GlycopharmApplication 기준)
+export type StoreOrganizationType = 'pharmacy' | 'pharmacy_chain';
+
+// 신청 서비스 유형 (백엔드 GlycopharmApplication 기준)
+export type StoreServiceType = 'dropshipping' | 'sample_sales' | 'digital_signage';
+
+// 승인 시 생성된 약국(조직) 요약 — 상세 응답에만 포함
+export interface StoreApplicationPharmacy {
+  id: string;
+  name: string;
+  code: string;
+  address?: string | null;
+  phone?: string | null;
+  ownerName?: string | null;
+  businessNumber?: string | null;
+  status?: string;
+  createdAt?: string;
+}
+
 // 판매 참여 신청
+//
+// ⚠️ 백엔드(GlycopharmApplication, /glycopharm/store-applications)는 flat 구조를
+// 내려준다. 과거의 리치 `form: StoreApplicationForm` 구조(약국주소/약사면허/정산계좌
+// 등)는 백엔드에 존재하지 않으며, 소비자 apply 플로우가 dead code 로 제거되면서
+// 사용되지 않는다. 운영자 화면은 아래 실제 필드만 소비한다.
 export interface StoreApplication {
   id: string;
   userId: string;
-  pharmacyId?: string;
-  form: StoreApplicationForm;
+  // 신청자(가입 사용자) 정보 — 목록/상세 응답에서 매핑
+  userName?: string | null;
+  userEmail?: string | null;
+  userPhone?: string | null;
+  // 신청 본문
+  organizationType: StoreOrganizationType;
+  organizationName: string;
+  businessNumber?: string | null;
+  serviceTypes: StoreServiceType[];
+  note?: string | null;
+  requestedSlug?: string | null;
   status: StoreApplicationStatus;
+  rejectionReason?: string | null;
+  metadata?: Record<string, any> | null;
+  // 승인 시 생성된 약국(상세 응답에만 포함)
+  pharmacy?: StoreApplicationPharmacy | null;
   reviewCheckpoints?: ReviewCheckpoint[];
-  rejectionReason?: string;
-  supplementRequest?: string;
   submittedAt?: string;
-  reviewedAt?: string;
-  reviewedBy?: string;
+  decidedAt?: string | null;
+  decidedBy?: string | null;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
 }
 
 // 심사 체크포인트
