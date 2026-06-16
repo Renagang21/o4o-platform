@@ -150,7 +150,15 @@ controller(`shared-product-description.controller.ts`) create catch: `empty afte
 ## 14. 작업 규칙 준수 / 다른 세션 WIP
 
 - path-specific stage(본 WO 파일만). `git add .` **미사용**.
-- 작업 중 working tree 에 **다른 세션 WIP** 감지(`partner-contract.service.ts`, `web-glycopharm/web-k-cosmetics operatorMenuGroups.ts`, `web-neture supplier*` — `wip-not-mine-cross-session` stash). **미접촉** — 스테이지/커밋 제외.
+- 작업 중 working tree 에 **다른 세션 WIP** 감지(`partner-contract.service.ts`, `web-glycopharm/web-k-cosmetics operatorMenuGroups.ts`, `web-neture supplier*` — `wip-not-mine-cross-session` stash). 스테이지에서 제외 의도.
+
+### 14-A. Mixed commit 발생 (커밋 위생 이슈 — 기능/빌드 영향 없음)
+
+- 커밋 `c3b790851` 에 **다른 세션 WIP 가 함께 포함됨**: `partner-contract.service.ts`, `web-neture/src/lib/api/supplier.ts`, `SupplierRecruitmentDetailPage.tsx`, `SupplierRecruitmentsPage.tsx`, `CHECK-O4O-SELLER-RECRUITMENT-EXPOSURE-SUPPLIER-STATUS-V1.md`.
+- **원인**: `git add`(path-specific) 와 `git commit` 을 **별도 shell call** 로 분리 실행 → 그 사이 병렬 세션이 index 에 추가 stage → 본 커밋에 혼입(memory `feedback_git_commit_workflow` 위반).
+- **영향 평가**: 작업/데이터 손실 **없음**(혼입 파일은 self-consistent, 자체 CHECK 동반). 빌드 green — api-server typecheck 신규 에러 0(pre-existing market-trial 1건만), web-neture `tsc --noEmit` EXIT 0.
+- **처리 방침(사용자 합의)**: force-push 로 쪼개지 **않음**(이미 origin/main 반영 + 혼입 self-consistent + typecheck green + 병렬 세션 작업 중 → force-push 가 손실/충돌 위험을 더 키움). `c3b790851` 을 mixed commit 으로 인정, main 유지.
+- **재발 방지**: 이후 `git add`(path-specific) → `git diff --cached` → `git commit` 을 **반드시 단일 shell call 로 체인**.
 
 ## 15. 완료 판정
 
