@@ -112,7 +112,8 @@ export type SupplierOfferAction = 'supply' | 'recruit' | 'event' | 'funding';
 // WO-O4O-SUPPLIER-PRODUCT-LIST-NEXT-ACTIONS-CLARITY-V1: 라벨 어휘 정비(연결/관리/준비중 — '자동 등록/즉시 판매' 금지)
 export const SUPPLIER_OFFER_ACTION_META: Record<SupplierOfferAction, { label: string; path?: string; ready: boolean }> = {
   supply: { label: '일반 공급 오퍼 연결', path: '/supplier/supply-offers', ready: true },
-  recruit: { label: '판매자 모집 연결 (준비 중)', ready: false },
+  // WO-O4O-SELLER-RECRUITMENT-CREATION-FLOW-V1: 제품 행에서 모집 생성 modal (path 없이 ready, 모달로 처리)
+  recruit: { label: '판매자 모집 연결', ready: true },
   event: { label: '이벤트 오퍼 연결', path: '/supplier/event-offers', ready: true },
   funding: { label: '유통참여형 펀딩 연결', path: '/supplier/market-trial/new', ready: true },
 };

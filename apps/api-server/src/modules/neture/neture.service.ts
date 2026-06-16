@@ -550,6 +550,14 @@ export class NetureService {
     return this.partnerContractService.createPartnerApplication(recruitmentId, partnerId, partnerName);
   }
 
+  // WO-O4O-SELLER-RECRUITMENT-CREATION-FLOW-V1: 공급자 모집 생성
+  async createPartnerRecruitment(
+    sellerUserId: string,
+    input: { masterId?: string; serviceKey?: string; commissionRate?: number; consumerPrice?: number; shopUrl?: string; imageUrl?: string },
+  ) {
+    return this.partnerContractService.createRecruitment(sellerUserId, input);
+  }
+
   async approvePartnerApplication(applicationId: string, sellerId: string) {
     return this.partnerContractService.approvePartnerApplication(applicationId, sellerId);
   }

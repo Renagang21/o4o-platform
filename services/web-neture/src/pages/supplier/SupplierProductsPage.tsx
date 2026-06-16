@@ -29,6 +29,8 @@ import ProductDetailDrawer from './ProductDetailDrawer';
 // WO-O4O-NETURE-SUPPLIER-OFFER-MODE-SELECTION-V1
 import { getAllowedOfferActions, getDrugSupplyGate, getSupplierProductTypeLabel, SUPPLIER_OFFER_ACTION_META, buildOfferActionUrl, type SupplierOfferAction } from '../../lib/supplierProductTypes';
 import MediaPickerModal from '../../components/common/MediaPickerModal';
+// WO-O4O-SELLER-RECRUITMENT-CREATION-FLOW-V1
+import RecruitmentCreateModal from '../../components/supplier/RecruitmentCreateModal';
 import {
   APPROVAL_STATUS_BADGE,
   REGULATORY_TYPE_LABELS,
@@ -526,8 +528,12 @@ const baseColumns: ListColumnDef<SupplierProduct>[] = [
 
 // ─── Page Component ───
 
+type RecruitModalProduct = { masterId: string; name: string; regulatoryType?: string; distributionType?: string };
+
 export default function SupplierProductsPage() {
   const navigate = useNavigate();
+  // WO-O4O-SELLER-RECRUITMENT-CREATION-FLOW-V1
+  const [recruitModalProduct, setRecruitModalProduct] = useState<RecruitModalProduct | null>(null);
 
   // WO-NETURE-SUPPLIER-PRODUCT-LIST-WIDE-TABLE-VIEW-APPLY-V1
   // 21개 컬럼 wide table — 부모 레이아웃(SupplierSpaceLayout)의 max-w 제약 해제
@@ -882,6 +888,16 @@ export default function SupplierProductsPage() {
               const action = e.target.value as SupplierOfferAction | '';
               e.currentTarget.value = '';
               if (!action) return;
+              // WO-O4O-SELLER-RECRUITMENT-CREATION-FLOW-V1: 모집은 modal 로 생성(path 없음)
+              if (action === 'recruit') {
+                setRecruitModalProduct({
+                  masterId: row.masterId,
+                  name: row.name,
+                  regulatoryType: row.regulatoryType,
+                  distributionType: row.distributionType,
+                });
+                return;
+              }
               const meta = SUPPLIER_OFFER_ACTION_META[action];
               if (!meta?.ready || !meta.path) return; // 준비 중 → no-op
               // 선택 상품 context 를 query 로 전달 (이벤트/펀딩 생성 화면 prefill)
@@ -1464,6 +1480,15 @@ export default function SupplierProductsPage() {
         onClose={() => setDrawerProduct(null)}
         onSaved={() => fetchProducts(pagination.page)}
       />
+
+      {/* WO-O4O-SELLER-RECRUITMENT-CREATION-FLOW-V1 */}
+      {recruitModalProduct && (
+        <RecruitmentCreateModal
+          product={recruitModalProduct}
+          onClose={() => setRecruitModalProduct(null)}
+          onCreated={() => showToast('판매자 모집이 생성되었습니다.')}
+        />
+      )}
     </div>
   );
 }

@@ -91,6 +91,39 @@ export function createPartnerRecruitmentController(deps: {
   });
 
   /**
+   * POST /partner/recruitments
+   * 공급자 판매자 모집 생성 (WO-O4O-SELLER-RECRUITMENT-CREATION-FLOW-V1)
+   */
+  router.post('/partner/recruitments', requireAuth, requireActiveSupplier, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
+      }
+      const { masterId, serviceKey, commissionRate, consumerPrice, shopUrl, imageUrl } = req.body || {};
+      const result = await netureService.createPartnerRecruitment(userId, {
+        masterId, serviceKey, commissionRate, consumerPrice, shopUrl, imageUrl,
+      });
+      if (!result.success) {
+        const map: Record<string, [number, string]> = {
+          MASTER_ID_REQUIRED: [400, '제품 정보가 필요합니다.'],
+          SERVICE_KEY_REQUIRED: [400, '모집 대상 서비스를 선택해 주세요.'],
+          OFFER_NOT_FOUND: [404, '등록된 제품(공급 오퍼)을 찾을 수 없습니다.'],
+          OFFER_NOT_PRIVATE: [400, '판매자 모집은 PRIVATE(판매자 제한) 유통 제품만 가능합니다. 제품을 PRIVATE 유통으로 설정한 뒤 다시 시도해 주세요.'],
+          DRUG_SERVICE_NOT_PHARMACY_AUDIENCE: [400, '의약품·규제 상품은 약국 대상 서비스에만 모집할 수 있습니다.'],
+          RECRUITMENT_ALREADY_EXISTS: [409, '이미 이 제품의 판매자 모집이 존재합니다.'],
+        };
+        const [status, message] = map[result.error] || [400, '모집 생성에 실패했습니다.'];
+        return res.status(status).json({ success: false, error: result.error, message });
+      }
+      res.status(201).json({ success: true, data: result.data });
+    } catch (error) {
+      logger.error('[Neture API] Error creating partner recruitment:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to create recruitment' });
+    }
+  });
+
+  /**
    * POST /partner/applications
    * 파트너 신청 (requires auth)
    */

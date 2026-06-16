@@ -1254,6 +1254,28 @@ export const supplierRegulatedCategoryApi = {
   },
 };
 
+// ==================== Supplier Recruitment Creation API ====================
+// WO-O4O-SELLER-RECRUITMENT-CREATION-FLOW-V1
+
+export const supplierRecruitmentApi = {
+  async create(input: {
+    masterId: string;
+    serviceKey: string;
+    commissionRate?: number;
+    consumerPrice?: number;
+    shopUrl?: string;
+    imageUrl?: string;
+  }): Promise<{ success: boolean; error?: string; message?: string; data?: { id: string } }> {
+    try {
+      const response = await api.post('/neture/partner/recruitments', input);
+      return response.data;
+    } catch (error: any) {
+      const d = error?.response?.data;
+      return { success: false, error: d?.error || 'CREATE_FAILED', message: d?.message || extractApiError(error) };
+    }
+  },
+};
+
 // ==================== KPA Event Offer Stats ====================
 // WO-EVENT-OFFER-SUPPLIER-DASHBOARD-STATS-INTEGRATION-V1
 

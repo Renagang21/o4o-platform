@@ -125,6 +125,84 @@ export class NeturePartnerContractService {
   }
 
   /**
+   * WO-O4O-SELLER-RECRUITMENT-CREATION-FLOW-V1
+   *
+   * 공급자가 등록된 PRIVATE 제품으로 판매자 모집을 생성한다.
+   *  - offer 해소: master_id + 공급자 user_id → PRIVATE offer (없으면 차단)
+   *  - 의약품 gate: 규제 상품은 약국 대상 서비스에서만
+   *  - sellerId = 공급자 user id (C bridge offer 해소 전제), productId = master_id
+   *  - 가격 구조 변경 없음 (commissionRate/consumerPrice 는 모집 commission/참조값)
+   */
+  async createRecruitment(
+    sellerUserId: string,
+    input: { masterId?: string; serviceKey?: string; commissionRate?: number; consumerPrice?: number; shopUrl?: string; imageUrl?: string },
+  ) {
+    const masterId = (input.masterId || '').trim();
+    const serviceKey = (input.serviceKey || '').trim();
+    if (!masterId) return { success: false as const, error: 'MASTER_ID_REQUIRED' };
+    if (!serviceKey) return { success: false as const, error: 'SERVICE_KEY_REQUIRED' };
+
+    // offer 해소 (master_id + 공급자 user_id). PRIVATE·APPROVED 우선.
+    const rows: Array<{
+      offer_id: string; distribution_type: string; product_name: string;
+      manufacturer: string | null; is_regulated: boolean | null; seller_name: string | null;
+    }> = await AppDataSource.query(
+      `SELECT spo.id AS offer_id, spo.distribution_type, pm.name AS product_name,
+              pm.manufacturer_name AS manufacturer, c.is_regulated, org.name AS seller_name
+       FROM supplier_product_offers spo
+       JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+       JOIN product_masters pm ON pm.id = spo.master_id
+       LEFT JOIN product_categories c ON c.id = pm.category_id
+       LEFT JOIN organizations org ON org.id = ns.organization_id
+       WHERE spo.master_id = $1 AND ns.user_id = $2 AND spo.deleted_at IS NULL
+       ORDER BY (spo.distribution_type = 'PRIVATE') DESC, (spo.approval_status = 'APPROVED') DESC, spo.created_at DESC
+       LIMIT 1`,
+      [masterId, sellerUserId],
+    );
+    if (!rows.length) return { success: false as const, error: 'OFFER_NOT_FOUND' };
+    const offer = rows[0];
+
+    // [결정 1·2] 판매자 모집은 PRIVATE 유통 제품만 (없으면 차단 — PRIVATE offer 자동생성은 후속)
+    if (offer.distribution_type !== 'PRIVATE') {
+      return { success: false as const, error: 'OFFER_NOT_PRIVATE' };
+    }
+
+    // [결정 3] 의약품/규제 상품 → 약국 대상 서비스에만
+    if (offer.is_regulated) {
+      const isPharmacyAudience = await new ServiceAudienceService(AppDataSource).getPharmacyAudienceResolver();
+      if (!isPharmacyAudience(serviceKey)) {
+        return { success: false as const, error: 'DRUG_SERVICE_NOT_PHARMACY_AUDIENCE' };
+      }
+    }
+
+    // UNIQUE(productId, sellerId) — 제품당 1 모집
+    const existing = await this.recruitmentRepo.findOne({ where: { productId: masterId, sellerId: sellerUserId } });
+    if (existing) return { success: false as const, error: 'RECRUITMENT_ALREADY_EXISTS' };
+
+    const commissionRate = Number.isFinite(Number(input.commissionRate))
+      ? Math.max(0, Math.min(100, Number(input.commissionRate)))
+      : 0;
+    const consumerPrice = Number.isFinite(Number(input.consumerPrice)) ? Math.max(0, Number(input.consumerPrice)) : 0;
+
+    const recruitment = this.recruitmentRepo.create({
+      productId: masterId,
+      productName: offer.product_name,
+      manufacturer: offer.manufacturer ?? undefined,
+      sellerId: sellerUserId, // 공급자 user id — C bridge offer 해소 전제
+      sellerName: offer.seller_name || '공급자',
+      serviceId: serviceKey,
+      consumerPrice,
+      commissionRate,
+      shopUrl: input.shopUrl?.trim() || undefined,
+      imageUrl: input.imageUrl?.trim() || undefined,
+      status: RecruitmentStatus.RECRUITING,
+    });
+    const saved = await this.recruitmentRepo.save(recruitment);
+    logger.info(`[NeturePartnerContractService] Recruitment created: ${saved.id} (master=${masterId}, sellerUser=${sellerUserId}, service=${serviceKey})`);
+    return { success: true as const, data: { id: saved.id, productId: saved.productId, serviceId: saved.serviceId, status: saved.status } };
+  }
+
+  /**
    * 파트너 신청
    */
   async createPartnerApplication(recruitmentId: string, partnerId: string, partnerName: string) {
