@@ -63,13 +63,12 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   ],
   // WO-O4O-OPERATOR-PRODUCT-ORDER-VIEW-LABEL-CLARIFY-GP-KCOS-V1: view-only(조회 전용) → '주문 현황'
   orders: [{ label: '주문 현황', path: '/operator/orders' }],
-  // WO-O4O-GLYCOPHARM-OPERATOR-MENU-ALIGN-WITH-KPA-V1:
-  //   LMS / HUB 항목 분리 후 community 도메인 콘텐츠 축만 잔존.
+  // WO-O4O-GLYCOPHARM-OPERATOR-CONTENT-KPA-PARITY-P1-V1:
+  //   guidelines/care legacy 메뉴 제거. KPA Content canonical 기준으로 공지사항/뉴스 + Home 편집만 노출.
+  //   콘텐츠 허브는 backend/API/DB 포함 후속 필수 WO에서 추가.
   content: [
-    { label: '가이드라인 관리', path: '/operator/guidelines' },
-    { label: '공지/뉴스 관리', path: '/operator/content-management' },
-    // WO-O4O-GLYCOPHARM-OPERATOR-SURVEYS-V1
-    { label: '설문조사 관리', path: '/operator/surveys' },
+    { label: '공지사항/뉴스', path: '/operator/content' },
+    { label: 'Home 편집', path: '/operator/community' },
   ],
   // WO-O4O-GLYCOPHARM-OPERATOR-MENU-ALIGN-WITH-KPA-V1:
   //   content 그룹에서 LMS 항목 분리 — KPA 와 동일한 별도 lms 그룹.
@@ -91,7 +90,6 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     // WO-O4O-GLYCOPHARM-FORUM-MANAGEMENT-ORPHAN-REMOVAL-V1: mock-only '포럼 관리'(forum-management) 제거 — canonical 신청/삭제요청/분석만 유지
     { label: '포럼 신청', path: '/operator/forum-requests' },
     { label: '포럼 삭제 요청', path: '/operator/forum-delete-requests' },
-    { label: '커뮤니티 관리', path: '/operator/community' },
     { label: '포럼 분석', path: '/operator/forum-analytics' },
   ],
   analytics: [
@@ -160,9 +158,8 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
   // WO-O4O-OPERATOR-PRODUCT-ORDER-VIEW-LABEL-CLARIFY-GP-KCOS-V1: view-only(조회 전용) → '주문 현황'
   orders: [{ label: '주문 현황', path: '/operator/orders' }],
   content: [
-    { label: '가이드라인 관리', path: '/operator/guidelines' },
-    { label: '공지/뉴스 관리', path: '/operator/content-management' },
-    { label: '설문조사 관리', path: '/operator/surveys' },
+    { label: '공지사항/뉴스', path: '/operator/content' },
+    { label: 'Home 편집', path: '/operator/community' },
   ],
   lms: [
     { label: '강의 관리', path: '/operator/lms' },
@@ -181,7 +178,6 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     // WO-O4O-GLYCOPHARM-FORUM-MANAGEMENT-ORPHAN-REMOVAL-V1: mock-only '포럼 관리'(forum-management) 제거 — canonical 신청/삭제요청/분석만 유지
     { label: '포럼 신청', path: '/operator/forum-requests' },
     { label: '포럼 삭제 요청', path: '/operator/forum-delete-requests' },
-    { label: '커뮤니티 관리', path: '/operator/community' },
     { label: '포럼 분석', path: '/operator/forum-analytics' },
   ],
   analytics: [

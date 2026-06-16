@@ -1,5 +1,5 @@
 /**
- * OperatorContentPage — GlycoPharm 공지/뉴스 관리 (공통 모듈)
+ * OperatorContentPage — GlycoPharm 공지사항/뉴스 (공통 모듈)
  *
  * WO-O4O-CONTENT-CANONICAL-CROSS-SERVICE-ALIGNMENT-V1
  *

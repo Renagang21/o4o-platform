@@ -1,5 +1,5 @@
 /**
- * CommunityManagementPage — Operator Community Ads/Sponsors 관리
+ * CommunityManagementPage — Operator Home 편집
  *
  * WO-GLYCOPHARM-COMMUNITY-HUB-IMPLEMENTATION-V1
  *
@@ -96,8 +96,8 @@ export default function CommunityManagementPage() {
           <Monitor size={20} color="#059669" />
         </div>
         <div>
-          <h1 style={{ fontSize: 20, fontWeight: 600, color: '#1e293b', margin: 0 }}>커뮤니티 관리</h1>
-          <p style={{ fontSize: 13, color: '#64748b', margin: 0 }}>Community Hub 광고 및 스폰서 관리</p>
+          <h1 style={{ fontSize: 20, fontWeight: 600, color: '#1e293b', margin: 0 }}>Home 편집</h1>
+          <p style={{ fontSize: 13, color: '#64748b', margin: 0 }}>Home 화면의 Hero 배너, 광고, 스폰서를 관리합니다</p>
         </div>
       </div>
 
@@ -109,9 +109,9 @@ export default function CommunityManagementPage() {
       }}>
         <AlertCircle size={18} style={{ flexShrink: 0, marginTop: 1 }} />
         <div>
-          <div style={{ fontWeight: 600 }}>커뮤니티 관리 준비 중</div>
+          <div style={{ fontWeight: 600 }}>Home 편집 일부 기능 준비 중</div>
           <div style={{ marginTop: 4, color: '#b45309' }}>
-            현재는 광고/스폰서 기본 등록만 가능하며, 콘텐츠 모더레이션·신고 처리·자동 필터 등 운영 기능은 후속 단계에서 제공됩니다.
+            현재는 광고/스폰서 기본 등록만 가능하며, 추가 Home 편집 항목은 후속 단계에서 제공됩니다.
           </div>
         </div>
       </div>

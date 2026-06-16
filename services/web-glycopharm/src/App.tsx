@@ -158,8 +158,6 @@ const AiUsageDashboardPage = lazy(() => import('@/pages/operator/AiUsageDashboar
 const AiBillingPage = lazy(() => import('@/pages/operator/AiBillingPage'));
 const OperatorAnalyticsPage = lazy(() => import('@/pages/operator/AnalyticsPage'));
 
-// Operator Guideline Management (WO-GLYCOPHARM-GUIDELINE-CMS-MIGRATION-V1)
-const GuidelineManagementPage = lazy(() => import('@/pages/operator/GuidelineManagementPage'));
 // Operator Guide Contents (WO-O4O-OPERATOR-GUIDE-CONTENTS-CORE-EXTRACTION-V1)
 const OperatorGuideContentsPage = lazy(() => import('@/pages/operator/OperatorGuideContentsPage'));
 // Operator Content Management (WO-O4O-CONTENT-CANONICAL-CROSS-SERVICE-ALIGNMENT-V1)
@@ -861,12 +859,14 @@ function AppRoutes() {
         <Route path="analytics" element={<OperatorAnalyticsPage />} />
         {/* WO-O4O-GLYCOPHARM-ADMIN-OPERATOR-CLEANUP-V1:
             역할 관리는 /admin/roles 에서만 접근. /operator/roles 라우트 제거. */}
-        {/* Guideline Management (WO-GLYCOPHARM-GUIDELINE-CMS-MIGRATION-V1) */}
-        <Route path="guidelines" element={<GuidelineManagementPage />} />
+        {/* WO-O4O-GLYCOPHARM-OPERATOR-CONTENT-KPA-PARITY-P1-V1:
+            guidelines/care legacy 화면 제거. Content canonical route로 redirect. */}
+        <Route path="guidelines" element={<Navigate to="/operator/content" replace />} />
         {/* Guide Contents (WO-O4O-OPERATOR-GUIDE-CONTENTS-CORE-EXTRACTION-V1) */}
         <Route path="guide-contents" element={<OperatorGuideContentsPage />} />
-        {/* Content Management 공지/뉴스 (WO-O4O-CONTENT-CANONICAL-CROSS-SERVICE-ALIGNMENT-V1) */}
-        <Route path="content-management" element={<OperatorContentPage />} />
+        {/* Content Management 공지사항/뉴스 (WO-O4O-CONTENT-CANONICAL-CROSS-SERVICE-ALIGNMENT-V1) */}
+        <Route path="content" element={<OperatorContentPage />} />
+        <Route path="content-management" element={<Navigate to="/operator/content" replace />} />
         {/* LMS Management (WO-O4O-GLYCOPHARM-LMS-PHASE1-OPERATOR-PARITY-V1) */}
         {/* canonical: /operator/lms — legacy /operator/lms/courses redirect 유지 */}
         <Route path="lms" element={<OperatorLmsCoursesPage />} />
