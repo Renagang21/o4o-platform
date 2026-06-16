@@ -44,6 +44,14 @@ export {
   type PublicDisplayPolicy,
 } from './ProductDrugExtension.entity.js';
 export { ProductAlias, AliasSource } from './ProductAlias.entity.js';
+// WO-O4O-PRODUCT-DESCRIPTION-SHARED-CANDIDATE-STORAGE-V1: 공용 상품설명 후보 풀
+export {
+  SharedProductDescription,
+  SHARED_PRODUCT_DESCRIPTION_SOURCE_TYPES,
+  SHARED_PRODUCT_DESCRIPTION_STATUSES,
+  type SharedProductDescriptionSourceType,
+  type SharedProductDescriptionStatus,
+} from './SharedProductDescription.entity.js';
 export { ProductCategory } from './ProductCategory.entity.js';
 export { Brand } from './Brand.entity.js';
 export { SupplierProductOffer, OfferDistributionType, OfferApprovalStatus } from './SupplierProductOffer.entity.js';

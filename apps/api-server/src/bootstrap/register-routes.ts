@@ -437,6 +437,15 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Product Candidate Review Queue routes:', productCandidateError);
     }
 
+    // 24-e2b. Register Shared Product Description routes (WO-O4O-PRODUCT-DESCRIPTION-SHARED-CANDIDATE-STORAGE-V1)
+    try {
+      const { createSharedProductDescriptionController } = await import('../modules/neture/controllers/shared-product-description.controller.js');
+      app.use('/api/v1/admin/shared-product-descriptions', createSharedProductDescriptionController(dataSource));
+      logger.info('✅ Shared Product Description routes registered at /api/v1/admin/shared-product-descriptions');
+    } catch (sharedDescError) {
+      logger.error('Failed to register Shared Product Description routes:', sharedDescError);
+    }
+
     // 24-e3. Register Mobile Product Draft routes (WO-O4O-MOBILE-PRODUCT-DRAFT-TO-CANDIDATE-V1, Phase 4)
     try {
       const { createMobileProductDraftController } = await import('../modules/neture/controllers/mobile-product-draft.controller.js');
