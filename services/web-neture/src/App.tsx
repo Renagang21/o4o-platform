@@ -205,6 +205,8 @@ const SupplierBulkRegisterPage = lazy(() => import('./pages/supplier/SupplierBul
 const SupplierSupplyOffersPage = lazy(() => import('./pages/supplier/SupplierSupplyOffersPage'));
 // WO-O4O-SELLER-RECRUITMENT-SUPPLIER-STATUS-VIEW-V1
 const SupplierRecruitmentsPage = lazy(() => import('./pages/supplier/SupplierRecruitmentsPage'));
+// WO-O4O-SELLER-RECRUITMENT-SUPPLIER-APPLICATION-REVIEW-V1
+const SupplierRecruitmentDetailPage = lazy(() => import('./pages/supplier/SupplierRecruitmentDetailPage'));
 
 // WO-O4O-PRODUCT-IMPORT-ASSISTANT-V1: Import Assistant
 const SupplierProductImportPage = lazy(() => import('./pages/supplier/SupplierProductImportPage'));
@@ -764,6 +766,8 @@ function App() {
               <Route path="/supplier/supply-offers" element={<SupplierSupplyOffersPage />} />
               {/* WO-O4O-SELLER-RECRUITMENT-SUPPLIER-STATUS-VIEW-V1 */}
               <Route path="/supplier/recruitments" element={<SupplierRecruitmentsPage />} />
+              {/* WO-O4O-SELLER-RECRUITMENT-SUPPLIER-APPLICATION-REVIEW-V1 */}
+              <Route path="/supplier/recruitments/:recruitmentId" element={<SupplierRecruitmentDetailPage />} />
               <Route path="/supplier/orders" element={<SupplierOrdersPage />} />
               <Route path="/supplier/library" element={<SupplierLibraryPage />} />
               <Route path="/supplier/library/new" element={<SupplierLibraryFormPage />} />

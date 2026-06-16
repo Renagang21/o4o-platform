@@ -109,6 +109,27 @@ export function createPartnerRecruitmentController(deps: {
   });
 
   /**
+   * GET /partner/recruitments/:recruitmentId/applications
+   * 공급자 본인 모집 신청자 목록 + 요약 (WO-O4O-SELLER-RECRUITMENT-SUPPLIER-APPLICATION-REVIEW-V1)
+   */
+  router.get('/partner/recruitments/:recruitmentId/applications', requireAuth, requireActiveSupplier, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
+      }
+      const data = await netureService.getRecruitmentApplications(req.params.recruitmentId, userId);
+      if (!data) {
+        return res.status(404).json({ success: false, error: 'NOT_FOUND', message: '모집을 찾을 수 없습니다.' });
+      }
+      res.json({ success: true, data });
+    } catch (error) {
+      logger.error('[Neture API] Error fetching recruitment applications:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch applications' });
+    }
+  });
+
+  /**
    * POST /partner/recruitments
    * 공급자 판매자 모집 생성 (WO-O4O-SELLER-RECRUITMENT-CREATION-FLOW-V1)
    */

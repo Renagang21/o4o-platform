@@ -172,6 +172,59 @@ export class NeturePartnerContractService {
   }
 
   /**
+   * WO-O4O-SELLER-RECRUITMENT-SUPPLIER-APPLICATION-REVIEW-V1
+   *
+   * 공급자 본인 모집의 신청자 목록 + 모집 요약 (소유권: recruitment.sellerId === sellerUserId).
+   * 미존재/타 공급자 모집 → null (controller 404).
+   */
+  async getRecruitmentApplications(recruitmentId: string, sellerUserId: string) {
+    const recruitment = await this.recruitmentRepo.findOne({ where: { id: recruitmentId } });
+    if (!recruitment || recruitment.sellerId !== sellerUserId) return null;
+
+    const rows: Array<{
+      id: string; partner_id: string; partner_name: string | null; status: string;
+      applied_at: Date; decided_at: Date | null; reason: string | null;
+      partner_user_name: string | null; partner_email: string | null; organization_name: string | null;
+    }> = await AppDataSource.query(
+      `SELECT a.id, a.partner_id, a.partner_name, a.status, a.applied_at, a.decided_at, a.reason,
+              u.name AS partner_user_name, u.email AS partner_email,
+              (SELECT o.name FROM organization_members om
+                 JOIN organizations o ON o.id = om.organization_id
+               WHERE om.user_id = a.partner_id AND om.left_at IS NULL LIMIT 1) AS organization_name
+       FROM neture_partner_applications a
+       LEFT JOIN users u ON u.id = a.partner_id
+       WHERE a.recruitment_id = $1
+       ORDER BY a.applied_at DESC`,
+      [recruitmentId],
+    );
+
+    return {
+      recruitment: {
+        id: recruitment.id,
+        productId: recruitment.productId,
+        productName: recruitment.productName,
+        serviceId: recruitment.serviceId || '',
+        serviceName: recruitment.serviceName || '',
+        commissionRate: Number(recruitment.commissionRate),
+        consumerPrice: Number(recruitment.consumerPrice),
+        status: recruitment.status,
+        createdAt: recruitment.createdAt,
+      },
+      applications: rows.map((a) => ({
+        id: a.id,
+        partnerId: a.partner_id,
+        partnerName: a.partner_name || a.partner_user_name || '신청자',
+        partnerEmail: a.partner_email || '',
+        organizationName: a.organization_name || '',
+        status: a.status,
+        appliedAt: a.applied_at,
+        decidedAt: a.decided_at,
+        reason: a.reason || '',
+      })),
+    };
+  }
+
+  /**
    * WO-O4O-SELLER-RECRUITMENT-CREATION-FLOW-V1
    *
    * 공급자가 등록된 PRIVATE 제품으로 판매자 모집을 생성한다.

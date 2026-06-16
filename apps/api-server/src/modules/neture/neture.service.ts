@@ -563,6 +563,11 @@ export class NetureService {
     return this.partnerContractService.getSellerRecruitments(sellerUserId);
   }
 
+  // WO-O4O-SELLER-RECRUITMENT-SUPPLIER-APPLICATION-REVIEW-V1: 모집 신청자 목록(소유권 필터)
+  async getRecruitmentApplications(recruitmentId: string, sellerUserId: string) {
+    return this.partnerContractService.getRecruitmentApplications(recruitmentId, sellerUserId);
+  }
+
   async approvePartnerApplication(applicationId: string, sellerId: string) {
     return this.partnerContractService.approvePartnerApplication(applicationId, sellerId);
   }

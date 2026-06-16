@@ -1270,6 +1270,34 @@ export interface SupplierRecruitment {
   applications: { total: number; pending: number; approved: number; rejected: number };
 }
 
+// WO-O4O-SELLER-RECRUITMENT-SUPPLIER-APPLICATION-REVIEW-V1
+export interface RecruitmentApplication {
+  id: string;
+  partnerId: string;
+  partnerName: string;
+  partnerEmail: string;
+  organizationName: string;
+  status: string;
+  appliedAt: string;
+  decidedAt: string | null;
+  reason: string;
+}
+
+export interface RecruitmentDetail {
+  recruitment: {
+    id: string;
+    productId: string;
+    productName: string;
+    serviceId: string;
+    serviceName: string;
+    commissionRate: number;
+    consumerPrice: number;
+    status: string;
+    createdAt: string;
+  };
+  applications: RecruitmentApplication[];
+}
+
 export const supplierRecruitmentApi = {
   // WO-O4O-SELLER-RECRUITMENT-SUPPLIER-STATUS-VIEW-V1
   async listMine(): Promise<SupplierRecruitment[]> {
@@ -1279,6 +1307,38 @@ export const supplierRecruitmentApi = {
     } catch (error) {
       console.warn('[Supplier Recruitment API] Failed to list:', error);
       return [];
+    }
+  },
+
+  // WO-O4O-SELLER-RECRUITMENT-SUPPLIER-APPLICATION-REVIEW-V1
+  async getApplications(recruitmentId: string): Promise<RecruitmentDetail | null> {
+    try {
+      const response = await api.get(`/neture/partner/recruitments/${recruitmentId}/applications`);
+      return response.data?.data ?? null;
+    } catch (error) {
+      console.warn('[Supplier Recruitment API] Failed to fetch applications:', error);
+      return null;
+    }
+  },
+
+  // 기존 승인/반려 엔드포인트 재사용 (ownership + C bridge backend 처리)
+  async approveApplication(applicationId: string): Promise<{ success: boolean; error?: string; message?: string }> {
+    try {
+      const response = await api.post(`/neture/partner/applications/${applicationId}/approve`);
+      return response.data;
+    } catch (error: any) {
+      const d = error?.response?.data;
+      return { success: false, error: d?.error || 'APPROVE_FAILED', message: d?.message };
+    }
+  },
+
+  async rejectApplication(applicationId: string, reason?: string): Promise<{ success: boolean; error?: string; message?: string }> {
+    try {
+      const response = await api.post(`/neture/partner/applications/${applicationId}/reject`, { reason });
+      return response.data;
+    } catch (error: any) {
+      const d = error?.response?.data;
+      return { success: false, error: d?.error || 'REJECT_FAILED', message: d?.message };
     }
   },
 

@@ -73,6 +73,7 @@ export default function SupplierRecruitmentsPage() {
                 <th className="px-4 py-3 text-center">대기</th>
                 <th className="px-4 py-3 text-center">승인</th>
                 <th className="px-4 py-3">생성일</th>
+                <th className="px-4 py-3 text-center">상세</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -98,6 +99,15 @@ export default function SupplierRecruitmentsPage() {
                         : <span className="text-slate-400">0</span>}
                     </td>
                     <td className="px-4 py-3 text-slate-400 text-xs">{new Date(r.createdAt).toLocaleDateString('ko-KR')}</td>
+                    <td className="px-4 py-3 text-center">
+                      <button
+                        type="button"
+                        onClick={() => navigate(`/supplier/recruitments/${r.id}`)}
+                        className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                      >
+                        신청자 보기
+                      </button>
+                    </td>
                   </tr>
                 );
               })}
