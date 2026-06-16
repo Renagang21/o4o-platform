@@ -71,7 +71,7 @@
 
 **PASS.** serviceKey별 안전한 targetUrl 정책 확정·반영. dead link 0, cross-domain 절대 URL 불필요(상대 route + Neture fallback). 새 알림 시스템·migration·정책 무변경.
 
-**커밋:** path-specific 2파일(service + CHECK) · `<commit>`.
+**커밋:** path-specific 2파일(service + CHECK) · `8ebd85853`.
 **후속(선택):** 통합 알림센터(타 서비스 알림 혼재) 도입 시 serviceKey→절대 URL 매핑 재검토 / 신청 취소·참여 재개 알림 / 이메일 알림.
 
 ---
