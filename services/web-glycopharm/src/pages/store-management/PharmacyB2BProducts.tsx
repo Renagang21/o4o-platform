@@ -1,8 +1,9 @@
 /**
- * PharmacyB2BProducts - B2B 상품 리스트 (WordPress 스타일 UI 검증용)
+ * PharmacyB2BProducts - 약국 상품·거래 > 상품 화면
  *
- * ※ 본 화면은 B2B 주문 UI 검증용입니다.
- * 실제 B2B 전용 상품 API는 백엔드 구현 대기 중입니다.
+ * 약국에서 취급할 상품 목록을 조회한다.
+ * 데이터 소스는 GlycoPharm 상품 API(pharmacyApi.getProducts)이며,
+ * KPA/K-Cosmetics 와의 SupplierProductOffer 기반 공통 정렬은 후속 작업이다.
  */
 
 import { useState, useEffect } from 'react';
@@ -137,27 +138,14 @@ export default function PharmacyB2BProducts() {
 
   return (
     <div className="space-y-6">
-      {/* 검증용 안내 배너 */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-          <div className="text-sm text-blue-800">
-            <p className="font-medium mb-1">B2B UI 검증용 화면</p>
-            <p className="text-blue-700">
-              본 화면은 WordPress 스타일 테이블 UI 검증을 위한 페이지입니다.
-              실제 B2B 전용 상품 API는 백엔드 구현 대기 중이며,
-              현재는 일반 상품 API를 사용하여 UI/UX를 테스트합니다.
-            </p>
-          </div>
-        </div>
-      </div>
-
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">B2B 상품 관리</h1>
+          <h1 className="text-2xl font-bold text-slate-800">상품 관리</h1>
           <p className="text-slate-500 text-sm">
-            {loading ? '불러오는 중...' : `총 ${totalCount}개의 상품`}
+            {loading
+              ? '불러오는 중...'
+              : `약국에서 취급할 상품을 확인합니다 · 총 ${totalCount}개`}
           </p>
         </div>
       </div>
@@ -181,7 +169,7 @@ export default function PharmacyB2BProducts() {
         </div>
       </div>
 
-      {/* WordPress Style Table */}
+      {/* 상품 테이블 */}
       {error ? (
         <div className="bg-white rounded-lg shadow-sm p-12 text-center">
           <AlertCircle className="w-12 h-12 text-red-300 mx-auto mb-4" />
