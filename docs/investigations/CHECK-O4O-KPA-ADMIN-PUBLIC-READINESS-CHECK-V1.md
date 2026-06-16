@@ -87,4 +87,4 @@ KPA 운영자가 법정정보 입력 후 **공개 준비 상태를 한눈에 점
 
 ## 12. commit hash
 
-- (commit 후 기재)
+- `4f4ca4b5b` — feat(kpa): add admin public-readiness check card (WO-O4O-KPA-ADMIN-PUBLIC-READINESS-CHECK-V1)
