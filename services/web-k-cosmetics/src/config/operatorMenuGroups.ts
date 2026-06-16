@@ -79,8 +79,11 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     // WO-O4O-OPERATOR-GUIDE-CONTENTS-CORE-EXTRACTION-V1
     { label: '안내 문구 관리', path: '/operator/guide-contents' },
   ],
+  // WO-O4O-CROSSSERVICE-OPERATOR-SIGNAGE-MENU-PARITY-V1:
+  //   Content 성격 메뉴('사이니지 콘텐츠' /signage/content)를 Signage 하위에서 제거 —
+  //   GlycoPharm 과 동일한 canonical 4-항목 구조 정합. route/page 는 보존(orphan 허용,
+  //   StoreCockpitPage 내부 링크로 도달 가능). Signage 는 디지털 사이니지 운영 메뉴.
   signage: [
-    { label: '사이니지 콘텐츠', path: '/operator/signage/content' },
     { label: 'HQ 미디어', path: '/operator/signage/hq-media' },
     { label: 'HQ 플레이리스트', path: '/operator/signage/hq-playlists' },
     { label: '템플릿', path: '/operator/signage/templates' },

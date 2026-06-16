@@ -80,12 +80,14 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '강사 승인', path: '/operator/qualification-requests' },
     { label: '안내 문구 관리', path: '/operator/guide-contents' },
   ],
+  // WO-O4O-CROSSSERVICE-OPERATOR-SIGNAGE-MENU-PARITY-V1:
+  //   Content 성격 메뉴(콘텐츠 허브 /signage/content, 콘텐츠 라이브러리 /signage/library)를
+  //   Signage 하위에서 제거 — Signage 는 디지털 사이니지 운영 메뉴이며 Content 와 섞지 않음.
+  //   K-Cosmetics 와 동일한 canonical 4-항목 구조 정합. route/page 는 보존(orphan 허용).
   signage: [
     { label: 'HQ 미디어', path: '/operator/signage/hq-media' },
     { label: 'HQ 플레이리스트', path: '/operator/signage/hq-playlists' },
     { label: '템플릿', path: '/operator/signage/templates' },
-    { label: '콘텐츠 허브', path: '/operator/signage/content' },
-    { label: '콘텐츠 라이브러리', path: '/operator/signage/library' },
     { label: '강제 콘텐츠', path: '/operator/signage/forced-content' },
   ],
   forum: [
@@ -171,12 +173,11 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     { label: '강사 승인', path: '/operator/qualification-requests' },
     { label: '안내 문구 관리', path: '/operator/guide-contents' },
   ],
+  // WO-O4O-CROSSSERVICE-OPERATOR-SIGNAGE-MENU-PARITY-V1: 콘텐츠 허브/라이브러리 제거 (UNIFIED_MENU 와 동일)
   signage: [
     { label: 'HQ 미디어', path: '/operator/signage/hq-media' },
     { label: 'HQ 플레이리스트', path: '/operator/signage/hq-playlists' },
     { label: '템플릿', path: '/operator/signage/templates' },
-    { label: '콘텐츠 허브', path: '/operator/signage/content' },
-    { label: '콘텐츠 라이브러리', path: '/operator/signage/library' },
     { label: '강제 콘텐츠', path: '/operator/signage/forced-content' },
   ],
   forum: [
