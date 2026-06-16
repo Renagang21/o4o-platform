@@ -237,3 +237,13 @@ export { mediaApi, type MediaAssetItem } from './media.js';
 
 // Neture Event Offer API (WO-O4O-EVENT-OFFER-NETURE-ADOPTION-V1)
 export { netureEventOfferApi } from './eventOffer.js';
+
+// Shared Product Description curation (WO-O4O-PRODUCT-DESCRIPTION-ADMIN-CURATION-V1)
+export {
+  sharedProductDescriptionApi,
+  type SharedProductDescription,
+  type SharedDescriptionStatus,
+  type SharedDescriptionSourceType,
+  type SharedDescriptionSeedSource,
+  type SharedDescriptionSeedResult,
+} from './sharedProductDescription.js';

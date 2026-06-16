@@ -7,6 +7,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { adminMasterApi, type AdminMaster } from '../../lib/api';
+import ProductDescriptionCurationModal from './ProductDescriptionCurationModal';
 
 export default function AdminMasterManagementPage() {
   const [masters, setMasters] = useState<AdminMaster[]>([]);
@@ -15,6 +16,9 @@ export default function AdminMasterManagementPage() {
   const [barcodeSearch, setBarcodeSearch] = useState('');
   const [barcodeResult, setBarcodeResult] = useState<AdminMaster | null | undefined>(undefined);
   const [barcodeSearching, setBarcodeSearching] = useState(false);
+
+  // 상품설명 정비 모달 (WO-O4O-PRODUCT-DESCRIPTION-ADMIN-CURATION-V1)
+  const [curationMaster, setCurationMaster] = useState<{ id: string; name: string } | null>(null);
 
   // Edit modal
   const [editModal, setEditModal] = useState<AdminMaster | null>(null);
@@ -196,12 +200,18 @@ export default function AdminMasterManagementPage() {
                   <td className="px-6 py-4 text-sm text-slate-500">
                     {new Date(m.createdAt).toLocaleDateString('ko-KR')}
                   </td>
-                  <td className="px-6 py-4 text-center">
+                  <td className="px-6 py-4 text-center whitespace-nowrap">
                     <button
                       onClick={() => handleEdit(m)}
                       className="text-blue-500 hover:text-blue-700 font-medium text-sm"
                     >
                       수정
+                    </button>
+                    <button
+                      onClick={() => setCurationMaster({ id: m.id, name: m.name })}
+                      className="ml-3 text-emerald-600 hover:text-emerald-700 font-medium text-sm"
+                    >
+                      설명 정비
                     </button>
                   </td>
                 </tr>
@@ -287,6 +297,9 @@ export default function AdminMasterManagementPage() {
           </div>
         </div>
       )}
+
+      {/* 상품설명 정비 모달 (WO-O4O-PRODUCT-DESCRIPTION-ADMIN-CURATION-V1) */}
+      <ProductDescriptionCurationModal master={curationMaster} onClose={() => setCurationMaster(null)} />
     </div>
   );
 }
