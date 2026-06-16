@@ -130,7 +130,7 @@
 | 공유 enum 변경 | B/C 불필요, A(정식 그룹) 시 필요(×4) |
 | Finance | 제외(별도 IR) |
 | git status | working tree clean (외부 세션 WIP 미접촉) |
-| commit hash | (commit 후 기재) |
+| commit hash | `01f7987a1` |
 
 **핵심 참조 파일**:
 `apps/api-server/src/routes/admin/{platform-accounts,users}.routes.ts` · `apps/api-server/src/routes/platform-services/admin-platform-services.routes.ts` ·
