@@ -2,8 +2,9 @@
 
 > **작업명:** WO-O4O-PRODUCT-DESCRIPTION-TARGET-ID-STANDARDIZATION-V1
 > **유형:** read-only 조사 — 코드/DB/UI **무변경**. 노출 연결(OUTPUT-LINK) 선행 — 상품설명 귀속 단위 확정.
-> **판정: D (ID 혼용 위험) — 노출 연결 전 scope 결정 + bridge 정리 필수.**
+> **판정: D (ID 혼용 위험) — 노출 연결 전 bridge 정리 필수.**
 > 편집기는 `store_local_products.id` 를 `productId` 로 전송하나, AI 콘텐츠 백엔드(guard + generate)는 `productId` 를 **`product_masters.id`** 로 취급 → **두 상품 우주가 불일치**. 게다가 `store_local_products` 는 이미 자체 `detail_html` description 경로를 보유. **A안(현행 master 유지) 불가 — 현 ID 흐름이 정합하지 않음.**
+> **🔵 Canonical Target 결정(사용자, 2026-06-16):** ①(local 단독)도 ②(catalog 단독)도 아닌 **통합 "매장 내 상품 설명" scope** — StoreLocalProduct + OrganizationProductListing(그 뒤 ProductMaster/SupplierProductOffer 정보) 를 **모두 포괄**. 저장 기준 = **store/organization scope + product identity**. 상품설명은 공용 ProductMaster 설명이 아니라 **매장별 재사용·수정 가능한 설명 콘텐츠**. → §5.
 > 선행: [`IR-O4O-PRODUCT-DESCRIPTION-PRODUCTION-FLOW-AUDIT-V1`](IR-O4O-PRODUCT-DESCRIPTION-PRODUCTION-FLOW-AUDIT-V1.md) — 2026-06-16
 
 ---
@@ -85,51 +86,79 @@ WHERE spo.master_id = $1  -- productId
 
 ---
 
-## 5. Canonical Target 결정 — scope 선택 필요 (사용자 판단)
+## 5. Canonical Target 결정 (사용자 확정, 2026-06-16)
 
-노출 연결 전, 상품설명 편집기가 **어느 상품 우주를 위한 기능인지** 먼저 확정해야 한다. 두 정합 종착지:
+> **결정:** 상품설명 편집기는 **자체 상품/O4O 상품을 구분하지 않고, 매장 안에서 활용되는 모든 상품을 대상으로 한다.** 상품설명은 공용 ProductMaster 설명이 아니라, **매장별로 재사용·수정 가능한 상품설명 콘텐츠**로 본다.
 
-### 선택지 ① 매장 자체 진열상품용 (store_local_products native)
-- 편집기 대상 = `store_local_products`(현 목록 유지). 설명을 `product_ai_contents` 가 아니라 **native `detail_html`** 에 저장.
-- 노출: 이미 tablet/storefront 상세에서 detail_html 렌더 → **⑥ 즉시 충족**.
-- AI 생성: ProductMaster 입력(regulatory/OCR) 부적합 → local product 자유 입력 기반 AI 로 재정의 필요.
-- 성격: 가장 적은 데이터 이전, 사용자 가설("매장이 자기 판매 맥락에서 쓰는 설명")에 부합.
+### 5.1 통합 scope 정의 (선택지 ③)
+앞서 검토한 ①(local 단독)·②(catalog 단독)은 **모두 부분 해이며 채택하지 않는다.** Canonical target 은 둘을 포괄한다.
 
-### 선택지 ② 공급 카탈로그 상품용 (Listing/Master)
-- 편집기 대상 = `organization_product_listings`(주문 가능 상품)로 교체. productId = master.id(또는 listing.id)로 정합.
-- 노출: 소비자 상품 상세(`store.controller` `'' AS description`)에 listing→offer→master→`product_ai_contents` join 으로 연결 → `WO-O4O-PRODUCT-DESCRIPTION-OUTPUT-LINK-V1` 가능.
-- AI 생성: 현행 ProductMaster 입력과 정합.
-- 성격: `product_ai_contents` 설계 의도와 일치하나, **편집기 product source 교체**(fetchLocalProducts → listing) 필요.
+```text
+매장 상품 설명 scope
+= organization/store  +  product identity (어떤 상품인가)
 
-> 두 선택지는 배타가 아니다 — local product 설명(①)과 카탈로그 상품 설명(②)은 **다른 대상**이므로 각각 native 경로로 둘 수 있다. 다만 **현재처럼 local product 목록 → master 키 product_ai_contents 저장**은 어느 쪽으로도 정합하지 않으므로 정리 대상.
+대상 상품 우주:
+- StoreLocalProduct          (매장 자체 진열상품)
+- OrganizationProductListing (O4O 주문 가능 상품)
+- 그 뒤 ProductMaster / SupplierProductOffer 정보 (표시·AI 입력용)
+→ 모두 하나의 "매장 상품 설명" 편집 목록으로 통합
+```
+
+### 5.2 저장 기준
+- 상품설명은 **매장별(store/organization scope) 콘텐츠**다 — 같은 ProductMaster 라도 **매장마다 설명이 다를 수 있다.**
+- 따라서 canonical key 는 `ProductMaster.id` 단독이 **아니라** `(organization/store, product identity)` 복합이다.
+- 공용 ProductMaster.description 을 덮어쓰지 않는다(공급자 원천 자료 보존, 3-Role Flow §4 원천 자료 vs 실행 자산).
+
+### 5.3 후속 작업 지시 원칙
+```text
+A안 / ProductMaster 단독 기준으로 고정하지 말 것.
+B안 / OrganizationProductListing 만으로 제한하지 말 것.
+StoreLocalProduct 와 O4O Listing 을 모두 포괄하는
+"매장 내 상품 설명" 기준으로 정리할 것.
+```
+
+### 5.4 현 구현과의 격차 (bridge 가 메워야 할 것)
+- 편집기 product source: 현재 `store_local_products` 만 → **local + listing 통합 목록**으로 확장 필요.
+- 저장 key: 현재 `product_ai_contents.productId`(master 가정, store scope 없음) → **store/organization scope 보장** 필요(매장별 설명 분리).
+- AI 입력: ProductMaster 정보(regulatory/OCR)는 listing 계열엔 적합, local product 엔 자유 입력 기반 보강 필요.
+- 노출(⑥): local → native `detail_html` 경로 / listing → 소비자 상세(`'' AS description`) 연결 — **두 노출 경로 모두** 통합 콘텐츠를 소비하도록 정렬.
 
 ---
 
-## 6. DB 실측 한계 (정적 확정 / DB 미수행)
+## 6. DB 실측 (정적 확정 / DB row 매칭 미수행 — bridge WO 선행 권장)
 
-- 본 조사는 정적 근거로 D 를 확정. **row-level 매칭**(아래)은 prod DB 방화벽 + 비대화형 환경(psql 대화형 only)으로 이번에 미수행.
-- 후속 bridge WO 시 1회성 read-only SELECT 권장:
-  ```sql
-  -- product_ai_contents.product_id 가 master 와 매칭되나
-  SELECT COUNT(*) FROM product_ai_contents p
-    LEFT JOIN product_masters m ON m.id = p.product_id WHERE m.id IS NULL;  -- orphan(master 기준)
-  -- local product 와 매칭되나
-  SELECT COUNT(*) FROM product_ai_contents p
-    JOIN store_local_products s ON s.id = p.product_id;  -- local 매칭 수
-  ```
-  결과로 ① 우세(local 매칭 다수) / ② 우세(master 매칭 다수) / orphan 규모를 정량 확정.
+본 조사는 정적 근거로 D 를 확정. **row-level 매칭**은 prod DB 방화벽 + 비대화형 환경(psql 대화형 only)으로 이번에 미수행. bridge WO 착수 시 아래 5개를 read-only 로 확인한다(사용자 지정 질문):
+
+```text
+1. StoreLocalProduct 와 ProductMaster 의 관계 (FK/공유 id 여부 — 엔티티상 부재, DB 실측)
+2. OrganizationProductListing 과 ProductMaster 의 관계 (opl.offer_id → spo.master_id, 정상 경로)
+3. product_ai_contents.productId 가 현재 어느 쪽과 매칭되는지 (master / local / orphan 분포)
+4. 모든 매장 상품(local + listing)을 하나의 편집 목록으로 보여줄 수 있는지 (통합 쿼리 가능성)
+5. 저장 시 store/organization scope 가 보장되는지 (현 product_ai_contents 에 org/store 컬럼 부재 확인)
+```
+
+참고 read-only SELECT:
+```sql
+SELECT COUNT(*) FROM product_ai_contents p
+  LEFT JOIN product_masters m ON m.id = p.product_id WHERE m.id IS NULL;     -- master 기준 orphan
+SELECT COUNT(*) FROM product_ai_contents p
+  JOIN store_local_products s ON s.id = p.product_id;                        -- local 매칭 수
+```
+→ master 매칭 / local 매칭 / orphan 분포로 현 데이터가 어느 우주에 쏠려 있는지 정량 확정 후 bridge 이전 전략 결정.
 
 ---
 
 ## 7. 후속 WO
 
+> scope 는 §5 에서 **통합 "매장 내 상품 설명"으로 확정**됨. 후속은 그 기준으로 bridge → 노출 순.
+
 | 순위 | WO | 목적 | 선행 |
 |:--:|------|------|------|
-| **1** | **scope 결정**(사용자) | §5 선택지 ①(local native) / ②(catalog) 확정 + DB 실측(§6) | 본 CHECK |
-| 2 | `WO-O4O-PRODUCT-DESCRIPTION-ID-BRIDGE-CLEANUP-V1` | 확정 scope 로 편집기 product source / 저장처 정렬(ID 혼용 제거). orphan 데이터 처리 | scope 결정 |
-| 3 | `WO-O4O-PRODUCT-DESCRIPTION-OUTPUT-LINK-V1` | (②선택 시) 상품 상세 응답에 description fallback 연결, `'' AS description` 제거 | bridge |
+| **1** | `WO-O4O-PRODUCT-DESCRIPTION-STORE-SCOPE-BRIDGE-V1` | §5 통합 scope 구현: ① 편집기 product source = **local + listing 통합 목록**, ② 저장 key = `(store/organization, product identity)` 로 정렬(매장별 설명 분리), ③ DB 실측(§6) 후 orphan/기존 데이터 이전 | 본 CHECK + DB 실측 |
+| 2 | `WO-O4O-PRODUCT-DESCRIPTION-OUTPUT-LINK-V1` | 통합 콘텐츠를 **두 노출 경로 모두** 연결 — local → native `detail_html`, listing → 소비자 상세(`'' AS description` 제거, store-scope 설명 우선 fallback) | bridge |
+| 3 | `WO-O4O-PRODUCT-DESCRIPTION-AI-INPUT-UNIFY-V1`(선택) | AI 생성 입력을 local(자유 입력)·listing(ProductMaster/OCR) 양쪽 지원하도록 통합 | bridge |
 
-→ **A안 전제(현행 유지로 바로 OUTPUT-LINK) 불가.** 반드시 scope 결정 → bridge → 노출 연결 순.
+→ **A안(ProductMaster 단독)·B안(Listing 단독) 모두 채택 금지.** 반드시 통합 scope(§5.3 지시 원칙) 기준 bridge → 노출 순.
 
 ---
 
@@ -141,9 +170,9 @@ WHERE spo.master_id = $1  -- productId
 - [x] 상품 상세 API 기준 id 확인 (supplier offer 기반, description `''`)
 - [x] StoreLocalProduct ↔ ProductMaster 관계 부재 확인 (엔티티 FK 없음)
 - [x] store_local_products native description 경로 확인 (detail_html 렌더)
-- [ ] DB row 매칭 — **미수행**(방화벽/비대화형), 후속 권장(§6)
-- 판정: **D**, canonical target = scope 결정 대기.
+- [ ] DB row 매칭 — **미수행**(방화벽/비대화형), bridge WO 선행 권장(§6)
+- 판정: **D**, canonical target = **통합 "매장 내 상품 설명" scope 확정**(§5).
 
 ---
 
-*Date: 2026-06-16 · 상품설명 target ID 표준화 조사 · 판정 D(ID 혼용) · 편집기=store_local_products.id ↔ 백엔드=product_masters.id 불일치, local product 는 native detail_html 보유 · A안(현행 유지) 불가 · 후속: scope 결정(local native vs catalog)→bridge cleanup→output-link · 코드/DB/UI 무변경.*
+*Date: 2026-06-16 · 상품설명 target ID 표준화 조사 · 판정 D(ID 혼용) · 편집기=store_local_products.id ↔ 백엔드=product_masters.id 불일치, local product 는 native detail_html 보유 · **Canonical target=통합 "매장 내 상품 설명"(local+listing, store/org scope, 매장별 콘텐츠) 사용자 확정** · A안/B안 단독 금지 · 후속: store-scope bridge→output-link · 코드/DB/UI 무변경.*
