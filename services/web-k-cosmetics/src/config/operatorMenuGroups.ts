@@ -93,6 +93,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   forum: [
     // WO-O4O-KCOSMETICS-OPERATOR-STORE-CHANNELS-V1: /operator/community dead link 제거 (route 없음)
     // WO-O4O-CROSSSERVICE-OPERATOR-FORUM-MENU-LABEL-ORDER-PARITY-V1: KPA canonical 라벨 정합 (신청 관리)
+    // WO-O4O-CROSSSERVICE-OPERATOR-FORUM-HUB-READONLY-INTRODUCE-V1: read-only 운영 허브 도입
+    { label: '포럼 운영', path: '/operator/forum' },
     { label: '포럼 신청 관리', path: '/operator/forum-requests' },
     { label: '삭제 요청', path: '/operator/forum-delete-requests' },
     { label: '포럼 분석', path: '/operator/forum-analytics' },

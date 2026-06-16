@@ -267,6 +267,8 @@ const ForumRequestsPage = lazy(() => import('@/pages/operator/ForumRequestsPage'
 const ForumDeleteRequestsPage = lazy(() => import('@/pages/operator/ForumDeleteRequestsPage'));
 // WO-O4O-FORUM-ANALYTICS-UNIFICATION-V1
 const ForumAnalyticsPage = lazy(() => import('@/pages/operator/ForumAnalyticsPage'));
+// WO-O4O-CROSSSERVICE-OPERATOR-FORUM-HUB-READONLY-INTRODUCE-V1
+const OperatorForumPage = lazy(() => import('@/pages/operator/OperatorForumPage'));
 
 // Store Channel Management (WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1)
 const StoreChannelsPage = lazy(() => import('@/pages/store/StoreChannelsPage'));
@@ -716,10 +718,9 @@ function AppRoutes() {
         <Route path="ai-report" element={<OperatorAiReportPage />} />
         {/* Store Cockpit (WO-KCOS-STORES-PHASE3-STORE-COCKPIT-V1) */}
         <Route path="store-cockpit" element={<StoreCockpitPage />} />
-        {/* WO-O4O-CROSSSERVICE-OPERATOR-FORUM-ROUTE-ALIAS-PARITY-V1:
-            /operator/forum base 진입 통일 — 운영 허브(OperatorForumPage)는 KCos 미이식 상태이므로
-            첫 actionable 화면(forum-requests)로 redirect. 운영 허브 이식은 후속 WO. */}
-        <Route path="forum" element={<Navigate to="/operator/forum-requests" replace />} />
+        {/* WO-O4O-CROSSSERVICE-OPERATOR-FORUM-HUB-READONLY-INTRODUCE-V1:
+            /operator/forum 을 redirect 에서 read-only 운영 허브(OperatorForumPage)로 승격. */}
+        <Route path="forum" element={<OperatorForumPage />} />
         {/* WO-O4O-FORUM-OPERATOR-UNIFICATION-V1 */}
         <Route path="forum-requests" element={<ForumRequestsPage />} />
         <Route path="forum-delete-requests" element={<ForumDeleteRequestsPage />} />

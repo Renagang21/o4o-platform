@@ -93,6 +93,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   forum: [
     // WO-O4O-GLYCOPHARM-FORUM-MANAGEMENT-ORPHAN-REMOVAL-V1: mock-only '포럼 관리'(forum-management) 제거 — canonical 신청/삭제요청/분석만 유지
     // WO-O4O-CROSSSERVICE-OPERATOR-FORUM-MENU-LABEL-ORDER-PARITY-V1: KPA canonical 라벨 정합 (신청 관리 / 삭제 요청)
+    // WO-O4O-CROSSSERVICE-OPERATOR-FORUM-HUB-READONLY-INTRODUCE-V1: read-only 운영 허브 도입
+    { label: '포럼 운영', path: '/operator/forum' },
     { label: '포럼 신청 관리', path: '/operator/forum-requests' },
     { label: '삭제 요청', path: '/operator/forum-delete-requests' },
     { label: '포럼 분석', path: '/operator/forum-analytics' },
@@ -183,6 +185,8 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
   forum: [
     // WO-O4O-GLYCOPHARM-FORUM-MANAGEMENT-ORPHAN-REMOVAL-V1: mock-only '포럼 관리'(forum-management) 제거 — canonical 신청/삭제요청/분석만 유지
     // WO-O4O-CROSSSERVICE-OPERATOR-FORUM-MENU-LABEL-ORDER-PARITY-V1: KPA canonical 라벨 정합 (신청 관리 / 삭제 요청)
+    // WO-O4O-CROSSSERVICE-OPERATOR-FORUM-HUB-READONLY-INTRODUCE-V1: read-only 운영 허브 도입
+    { label: '포럼 운영', path: '/operator/forum' },
     { label: '포럼 신청 관리', path: '/operator/forum-requests' },
     { label: '삭제 요청', path: '/operator/forum-delete-requests' },
     { label: '포럼 분석', path: '/operator/forum-analytics' },
