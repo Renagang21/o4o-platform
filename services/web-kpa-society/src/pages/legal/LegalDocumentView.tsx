@@ -2,8 +2,10 @@
  * LegalDocumentView - KPA 공개 정책 문서 뷰 (이용약관 / 개인정보처리방침 공통)
  *
  * WO-O4O-KPA-LEGAL-POLICY-ROUTES-ALIGNMENT-V1
+ * WO-O4O-KPA-POLICY-DOCUMENTS-SERVICE-POLICY-MIGRATION-V1:
+ *   표준 소스를 service_policy_documents(cross-service) 로 전환. 미게시 시 legacy
+ *   kpa_legal_documents 로 fallback(전환 안전망 — 빈 문서 노출 방지).
  *
- * 운영자가 /operator/legal 에서 입력·게시한 kpa_legal_documents(published) 를 표시한다.
  * - localStorage / static fallback 제거 → DB published 문서만 표시.
  * - 게시 문서 없으면 중립 empty state(가짜 약관 금지). draft 미노출(API 가 published 만 반환).
  * - 본문은 안전한 line 기반 markdown 렌더(React element 생성) — dangerouslySetInnerHTML 미사용.
@@ -12,10 +14,10 @@
 
 import { useEffect, useState } from 'react';
 import { colors, spacing, typography } from '../../styles/theme';
-import { loadPublishedLegalDocument, type KpaLegalDocument } from '../../lib/legalDocument';
+import { loadPublishedPolicyDocument, type PublicPolicyDocument } from '../../lib/legalDocument';
 
 interface LegalDocumentViewProps {
-  /** kpa_legal_documents.document_type — 이용약관='terms', 개인정보처리방침='privacy'. */
+  /** 정책문서 유형 — 이용약관='terms', 개인정보처리방침='privacy'. */
   documentType: string;
   /** 문서 미게시 시에도 표시할 페이지 제목. */
   heading: string;
@@ -41,12 +43,12 @@ function renderMarkdown(content: string) {
 
 export function LegalDocumentView({ documentType, heading }: LegalDocumentViewProps) {
   const [state, setState] = useState<'loading' | 'ok' | 'empty' | 'error'>('loading');
-  const [doc, setDoc] = useState<KpaLegalDocument | null>(null);
+  const [doc, setDoc] = useState<PublicPolicyDocument | null>(null);
 
   useEffect(() => {
     let alive = true;
     setState('loading');
-    loadPublishedLegalDocument(documentType).then((r) => {
+    loadPublishedPolicyDocument(documentType).then((r) => {
       if (!alive) return;
       if (r.status === 'ok') { setDoc(r.doc); setState('ok'); }
       else setState(r.status);

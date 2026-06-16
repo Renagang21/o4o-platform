@@ -10,6 +10,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { Save, FileText, Shield, AlertCircle, CheckCircle, Globe, FileEdit } from 'lucide-react';
 import { getAccessToken } from '../../contexts/AuthContext';
 
@@ -168,6 +169,15 @@ export function LegalManagementPage() {
           서비스 이용약관과 개인정보처리방침을 편집합니다.
           회원가입 시 사용자가 동의해야 하는 내용입니다.
         </p>
+      </div>
+
+      {/* WO-O4O-KPA-POLICY-DOCUMENTS-SERVICE-POLICY-MIGRATION-V1: legacy 안내 (deprecated) */}
+      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 text-sm text-amber-800">
+        KPA 정책문서는 이제 <strong>관리자 → 법정정보·약관 설정</strong>의 “정책 문서” 탭에서 관리합니다
+        (공개 <strong>/policy · /privacy</strong> 에 반영). 이 화면은 legacy 관리 화면이며 추후 제거될 수 있습니다.
+        <Link to="/admin/settings/legal" className="ml-1 font-medium text-amber-900 underline">
+          법정정보·약관 설정으로 이동
+        </Link>
       </div>
 
       {/* 안내 메시지 */}

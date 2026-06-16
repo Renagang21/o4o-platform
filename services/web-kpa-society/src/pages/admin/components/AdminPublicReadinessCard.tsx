@@ -17,7 +17,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ClipboardCheck, ArrowRight, CircleCheck, CircleAlert, CircleHelp, Circle } from 'lucide-react';
 import { coreApiClient } from '../../../api/client';
-import { loadPublishedLegalDocument } from '../../../lib/legalDocument';
+import { loadPublishedPolicyDocument } from '../../../lib/legalDocument';
 
 const SERVICE_KEY = 'kpa-society';
 
@@ -86,11 +86,15 @@ export function AdminPublicReadinessCard() {
               : '법정정보 미입력/비활성 항목은 footer에 표시되지 않습니다.',
       };
 
-      // ── 이용약관 / 개인정보처리방침 (legacy kpa_legal_documents, public read) ──
+      // ── 이용약관 / 개인정보처리방침 (표준 service_policy_documents + legacy fallback) ──
       async function policyRow(type: 'terms' | 'privacy', label: string): Promise<CheckRow> {
-        const r = await loadPublishedLegalDocument(type);
-        if (r.status === 'ok') return { key: type, label, status: 'ok', detail: '게시됨.' };
-        if (r.status === 'empty') return { key: type, label, status: 'missing', detail: '미게시 — 운영자 법률 관리에서 게시하세요.' };
+        const r = await loadPublishedPolicyDocument(type);
+        if (r.status === 'ok') {
+          return r.doc.source === 'service'
+            ? { key: type, label, status: 'ok', detail: '게시됨(표준).' }
+            : { key: type, label, status: 'warn', detail: '게시됨(legacy) — 법정정보·약관 설정에서 표준 위치로 재게시 권장.' };
+        }
+        if (r.status === 'empty') return { key: type, label, status: 'missing', detail: '미게시 — 법정정보·약관 설정의 정책 문서 탭에서 게시하세요.' };
         return { key: type, label, status: 'unknown', detail: '조회하지 못했습니다.' };
       }
       const termsRow = await policyRow('terms', '이용약관 게시');
@@ -156,18 +160,15 @@ export function AdminPublicReadinessCard() {
       {/* 편집 위치 안내 */}
       <div className="px-5 py-4 border-t border-slate-100 bg-slate-50/60 space-y-2">
         <p className="text-xs text-slate-500 leading-relaxed">
-          법정정보는 공개 footer에 표시되는 서비스 운영 주체 정보입니다. KPA의 이용약관·개인정보처리방침 문서는
-          현재 운영자 <strong>법률 관리</strong> 화면에서 관리됩니다.
+          법정정보(공개 footer)와 이용약관·개인정보처리방침 문서는 모두 <strong>법정정보·약관 설정</strong>
+          (관리자)에서 관리합니다. 게시된 정책 문서는 공개 <strong>/policy · /privacy</strong> 에 반영됩니다.
         </p>
         <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
           <Link to="/admin/settings/legal" className="text-indigo-600 hover:underline inline-flex items-center gap-1">
-            법정정보 설정 <ArrowRight className="w-3 h-3" />
+            법정정보·약관 설정 <ArrowRight className="w-3 h-3" />
           </Link>
           <Link to="/admin/settings/contact" className="text-indigo-600 hover:underline inline-flex items-center gap-1">
             문의 설정 <ArrowRight className="w-3 h-3" />
-          </Link>
-          <Link to="/operator/legal" className="text-indigo-600 hover:underline inline-flex items-center gap-1">
-            법률 문서 관리(운영자) <ArrowRight className="w-3 h-3" />
           </Link>
         </div>
       </div>

@@ -7,10 +7,10 @@
  * + coreApiClient 어댑터를 주입한다. backend: /api/v1/admin/services/kpa-society/legal-profile.
  *
  * 범위(중요):
- *   - 이 화면은 **footer 법정정보(service_legal_profiles)** 만 편집한다 → enabledTabs={['profile']}.
- *   - KPA 의 이용약관/개인정보처리방침 문서는 **기존 legacy 트랙(kpa_legal_documents)** 으로
- *     `/operator/legal` 에서 관리한다. 본 WO 는 정책문서 트랙을 변경하지 않으므로
- *     공유 컴포넌트의 "정책 문서"(service_policy_documents) 탭은 숨긴다.
+ *   - 법정정보(service_legal_profiles) + 정책문서(service_policy_documents) + 공개 상태 확인 전체 탭 사용.
+ *   - WO-O4O-KPA-POLICY-DOCUMENTS-SERVICE-POLICY-MIGRATION-V1: KPA 정책문서 표준 소스를
+ *     service_policy_documents 로 전환 → 정책 문서 탭에서 편집/게시하면 공개 /policy·/privacy 에 반영.
+ *   - legacy `kpa_legal_documents`/`/operator/legal` 은 보존(전환 안전망)하되 canonical 아님.
  *
  * api: KPA 기본 apiClient 는 /api/v1/kpa prefix 라 공통 admin 엔드포인트에 닿지 못하므로,
  *   prefix 없는 coreApiClient(/api/v1)를 사용한다. (ServiceContactSettingsPage 와 동일 관례)
@@ -87,15 +87,14 @@ export default function ServiceLegalSettingsPage() {
           lineHeight: 1.6,
         }}
       >
-        이 화면은 공개 푸터에 표시되는 <strong>법정정보</strong>를 관리합니다.
-        KPA의 이용약관·개인정보처리방침 문서는 기존 운영자 법정문서 관리 화면
-        (운영자 → 법률 관리)에서 관리됩니다.
+        법정정보와 정책문서(이용약관·개인정보처리방침)는 KPA 공개 푸터 및 <strong>/policy · /privacy</strong> 에
+        반영됩니다. 정책 문서는 <strong>정책 문서</strong> 탭에서 작성·게시하세요.
+        (기존 운영자 “법률 관리” 화면은 legacy 이며 추후 제거될 수 있습니다.)
       </div>
       <SharedServiceLegalSettingsPage
         serviceKey={SERVICE_KEY}
         api={legalApi}
-        title="서비스 설정 — 법정정보"
-        enabledTabs={['profile']}
+        title="서비스 설정 — 법정정보·약관"
       />
     </div>
   );

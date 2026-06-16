@@ -105,7 +105,10 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '운영 분석', path: '/operator/analytics' },
   ],
   system: [
-    { label: '법률 관리', path: '/operator/legal', adminOnly: true },
+    // WO-O4O-KPA-POLICY-DOCUMENTS-SERVICE-POLICY-MIGRATION-V1:
+    //   '법률 관리'(/operator/legal, legacy kpa_legal_documents) 메뉴 제거.
+    //   정책문서 canonical 편집은 관리자 → 법정정보·약관 설정(service_policy_documents).
+    //   route/page 는 보존(legacy 안내) — 후속 cleanup WO 에서 제거 판단.
     { label: '감사 로그', path: '/operator/audit-logs', adminOnly: true },
     { label: '역할 관리', path: '/operator/roles', adminOnly: true },
   ],
