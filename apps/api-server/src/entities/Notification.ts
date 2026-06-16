@@ -61,6 +61,10 @@ export type NotificationType =
   | 'pharmacy.request_submitted'     // 운영자: 약국 개설 신청 접수
   | 'pharmacy.request_approved'      // 신청자: 약국 개설 신청 승인
   | 'pharmacy.request_rejected'      // 신청자: 약국 개설 신청 반려
+  // WO-O4O-SELLER-RECRUITMENT-SELLER-NOTIFICATION-V1: 판매자 모집 신청자 알림
+  | 'recruitment.application_approved'     // 판매자: 모집 신청 승인
+  | 'recruitment.application_rejected'     // 판매자: 모집 신청 반려
+  | 'recruitment.participation_terminated' // 판매자: 모집 참여 해지
   | 'custom';
 
 // Legacy interface for backward compatibility

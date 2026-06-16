@@ -15,6 +15,9 @@ import { ServiceMembership } from '../../auth/entities/ServiceMembership.js';
 import { roleAssignmentService } from '../../auth/services/role-assignment.service.js';
 // WO-O4O-SELLER-RECRUITMENT-C-BRIDGE-BACKEND-V1: 약국 대상 서비스 정책(의약품 gate 재확인)
 import { ServiceAudienceService } from './service-audience.service.js';
+// WO-O4O-SELLER-RECRUITMENT-SELLER-NOTIFICATION-V1: 판매자 in-app 알림
+import { notificationService } from '../../../services/NotificationService.js';
+import type { NotificationType } from '../../../entities/Notification.js';
 import logger from '../../../utils/logger.js';
 
 /**
@@ -272,6 +275,16 @@ export class NeturePartnerContractService {
     } else {
       logger.warn(`[Participation] offer not found — allowedSellerIds/OPL cleanup skipped (app=${applicationId})`);
     }
+
+    // WO-O4O-SELLER-RECRUITMENT-SELLER-NOTIFICATION-V1
+    await this.notifyApplicant(
+      application.partnerId,
+      'recruitment.participation_terminated',
+      '판매자 모집 참여가 해지되었습니다.',
+      `${recruitment.productName} 모집 제품의 조달 가능 상태가 종료되었습니다. 기존 주문 이력은 유지됩니다.`,
+      recruitment,
+      application.id,
+    );
 
     return { success: true as const, data: { applicationId, contractTerminated: !!contract } };
   }
@@ -555,6 +568,16 @@ export class NeturePartnerContractService {
         logger.error(`[NeturePartnerContractService] C-bridge failed (approval kept): application=${application.id}`, bridgeError);
       }
 
+      // WO-O4O-SELLER-RECRUITMENT-SELLER-NOTIFICATION-V1
+      await this.notifyApplicant(
+        application.partnerId,
+        'recruitment.application_approved',
+        '판매자 모집 신청이 승인되었습니다.',
+        `${recruitment.productName} 판매자 모집 신청이 승인되었습니다. 해당 모집 제품을 조달 가능한 상품으로 확인할 수 있습니다.`,
+        recruitment,
+        application.id,
+      );
+
       return { id: application.id, status: application.status };
     } catch (error) {
       logger.error('[NeturePartnerContractService] Error approving partner application:', error);
@@ -639,6 +662,37 @@ export class NeturePartnerContractService {
   /**
    * 파트너 신청 거절
    */
+  /**
+   * WO-O4O-SELLER-RECRUITMENT-SELLER-NOTIFICATION-V1
+   * 판매자(신청자)에게 in-app 알림 — best-effort(실패해도 원 처리 성공 유지).
+   */
+  private async notifyApplicant(
+    partnerUserId: string,
+    type: NotificationType,
+    title: string,
+    message: string,
+    recruitment: NeturePartnerRecruitment,
+    applicationId: string,
+  ): Promise<void> {
+    try {
+      await notificationService.createNotification({
+        userId: partnerUserId,
+        type,
+        title,
+        message,
+        serviceKey: recruitment.serviceId || undefined,
+        metadata: {
+          recruitmentId: recruitment.id,
+          applicationId,
+          productId: recruitment.productId,
+          eventType: type,
+        },
+      });
+    } catch (e) {
+      logger.warn(`[NeturePartnerContractService] applicant notification failed (best-effort): ${type} app=${applicationId}`, e);
+    }
+  }
+
   async rejectPartnerApplication(applicationId: string, sellerId: string, reason?: string) {
     try {
       const application = await this.applicationRepo.findOne({ where: { id: applicationId } });
@@ -663,6 +717,16 @@ export class NeturePartnerContractService {
       application.decidedBy = sellerId;
       application.reason = reason || '';
       await this.applicationRepo.save(application);
+
+      // WO-O4O-SELLER-RECRUITMENT-SELLER-NOTIFICATION-V1
+      await this.notifyApplicant(
+        application.partnerId,
+        'recruitment.application_rejected',
+        '판매자 모집 신청이 반려되었습니다.',
+        `${recruitment.productName} 판매자 모집 신청이 반려되었습니다. 자세한 사유는 모집 신청 내역을 확인해 주세요.`,
+        recruitment,
+        application.id,
+      );
 
       return { id: application.id, status: application.status };
     } catch (error) {
