@@ -124,4 +124,4 @@
 | 검증 도구 | Playwright headless chromium (login modal → Enter submit, hard-nav 후 finalUrl/console/network/keyword 수집) |
 | 자격증명 | SSOT env 주입, 보고서 미기재(정책 준수) |
 | 운영 데이터 변경 | 없음(읽기 전용 검증, 저장/mutation 미수행) |
-| commit hash | (commit 후 기재) |
+| commit hash | `41964540c` |
