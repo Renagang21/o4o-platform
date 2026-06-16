@@ -326,8 +326,11 @@ export async function queryTabletVisibleProducts(
          CASE WHEN spo.is_active THEN 'active' ELSE 'inactive' END AS status,
          false AS is_featured,
          s.slug AS manufacturer,
-         COALESCE(sp.description, spo.consumer_detail_description, '') AS description,
-         COALESCE(spo.consumer_short_description, '') AS short_description,
+         -- WO-O4O-KPA-TABLET-DESCRIPTION-CANONICAL-LINK-V1: storefront 와 동일 정책 — canonical 우선,
+         -- store_product_profiles override(sp.description)는 legacy fallback 으로 보존(데이터 무삭제).
+         -- 기존 tablet 도 description 을 strip 없이 반환 → HTML 보존(기존 처리 방식 유지).
+         COALESCE(spd.content, sp.description, spo.consumer_detail_description, '') AS description,
+         COALESCE(spd.summary, spo.consumer_short_description, '') AS short_description,
          opl.created_at AS sort_order,
          spo.created_at, spo.updated_at,
          opl.organization_id AS pharmacy_id
@@ -350,6 +353,11 @@ export async function queryTabletVisibleProducts(
          ON sp.master_id = pm.id
          AND sp.organization_id = opl.organization_id
          AND sp.is_active = true
+       -- canonical 1개/master (partial unique index) → DISTINCT ON 행 증식 없음
+       LEFT JOIN shared_product_descriptions spd
+         ON spd.master_id = pm.id
+         AND spd.status = 'canonical'
+         AND spd.deleted_at IS NULL
        WHERE spo.is_active = true
          AND s.status = 'ACTIVE'
          ${whereExtra}
