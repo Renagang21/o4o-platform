@@ -63,11 +63,20 @@ export default function ServiceAudiencePolicyPage() {
   return (
     <div className="max-w-3xl">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-900">약국 대상 서비스 설정</h1>
+        <h1 className="text-2xl font-bold text-slate-900">서비스 대상 정책 (플랫폼 관리)</h1>
         <p className="text-sm text-slate-500 mt-1">
           서비스 이용자가 <strong>약국</strong>인 서비스를 관리합니다. 의약품 제품은 약국 대상 서비스에만 연결할 수 있도록
           후속 단계에서 이 설정을 기준으로 검증합니다.
         </p>
+      </div>
+
+      {/* WO-O4O-NETURE-PLATFORM-ADMIN-SCOPE-SEPARATION-V1: 플랫폼 관리(cross-service) 성격 명시 */}
+      <div className="mb-4 flex items-start gap-2 rounded-lg bg-indigo-50 border border-indigo-100 p-3 text-xs text-indigo-800">
+        <Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
+        <div>
+          이 설정은 Neture 자체 서비스 설정이 아니라, <strong>O4O 내 여러 서비스의 대상 정책</strong>을 관리하는
+          플랫폼 관리 항목입니다. 향후 platform-admin 표면이 분리되면 이 화면의 소속이 조정될 수 있습니다.
+        </div>
       </div>
 
       <div className="mb-4 flex items-start gap-2 rounded-lg bg-blue-50 border border-blue-100 p-3 text-xs text-blue-800">

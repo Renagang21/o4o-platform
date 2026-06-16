@@ -252,6 +252,12 @@ export default function OperatorsPage() {
         </button>
       </div>
 
+      {/* WO-O4O-NETURE-PLATFORM-ADMIN-SCOPE-SEPARATION-V1: 운영자 지정 = 플랫폼 관리 성격 명시 */}
+      <div className="rounded-lg bg-indigo-50 border border-indigo-100 p-3 text-xs text-indigo-800">
+        운영자 지정은 플랫폼 관리 성격의 기능입니다. 현재는 Neture 서비스 운영자(neture:operator / neture:admin)를
+        관리하며, 서비스별 운영자 지정 정책은 후속 platform-admin 정책 결정에 따라 조정될 수 있습니다.
+      </div>
+
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
