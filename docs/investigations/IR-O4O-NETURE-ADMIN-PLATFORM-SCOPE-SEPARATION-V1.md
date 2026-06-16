@@ -152,7 +152,7 @@
 | D(보류) | finance(정산·커미션) |
 | 경계 정상 | 회원 soft/hard · 문의 설정/처리 · operator 실무 |
 | git status | working tree clean (외부 세션 WIP 미접촉) |
-| commit hash | (commit 후 기재) |
+| commit hash | `52804e82b` |
 
 **핵심 참조 파일**:
 `services/web-neture/src/App.tsx`(admin/operator routes) · `src/config/operatorMenuGroups.ts`(getAdminMenu/filterMenuByRole) ·
