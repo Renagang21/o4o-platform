@@ -710,6 +710,10 @@ function AppRoutes() {
         <Route path="ai-report" element={<OperatorAiReportPage />} />
         {/* Store Cockpit (WO-KCOS-STORES-PHASE3-STORE-COCKPIT-V1) */}
         <Route path="store-cockpit" element={<StoreCockpitPage />} />
+        {/* WO-O4O-CROSSSERVICE-OPERATOR-FORUM-ROUTE-ALIAS-PARITY-V1:
+            /operator/forum base 진입 통일 — 운영 허브(OperatorForumPage)는 KCos 미이식 상태이므로
+            첫 actionable 화면(forum-requests)로 redirect. 운영 허브 이식은 후속 WO. */}
+        <Route path="forum" element={<Navigate to="/operator/forum-requests" replace />} />
         {/* WO-O4O-FORUM-OPERATOR-UNIFICATION-V1 */}
         <Route path="forum-requests" element={<ForumRequestsPage />} />
         <Route path="forum-delete-requests" element={<ForumDeleteRequestsPage />} />

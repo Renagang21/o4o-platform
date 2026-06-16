@@ -818,6 +818,10 @@ function AppRoutes() {
         <Route path="orders" element={<OrdersPage />} />
         {/* WO-O4O-GLYCOPHARM-ADMIN-OPERATOR-CLEANUP-V1: Finance/Governance routes moved to /admin/* only.
             Removed from /operator/*: settlements, reports, billing-preview, invoices, roles. */}
+        {/* WO-O4O-CROSSSERVICE-OPERATOR-FORUM-ROUTE-ALIAS-PARITY-V1:
+            /operator/forum base 진입 통일 — 운영 허브(OperatorForumPage)는 GP 미이식 상태이므로
+            첫 actionable 화면(forum-requests)로 redirect. 운영 허브 이식은 후속 WO. */}
+        <Route path="forum" element={<Navigate to="/operator/forum-requests" replace />} />
         <Route path="forum-requests" element={<ForumRequestsPage />} />
         <Route path="forum-delete-requests" element={<ForumDeleteRequestsPage />} />
         {/* WO-O4O-FORUM-ANALYTICS-UNIFICATION-V1 */}
