@@ -46,6 +46,8 @@
 
 import { useEffect, useReducer, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
+// WO-O4O-KPA-TABLET-PRODUCT-DESCRIPTION-RICH-RENDER-V1: canonical 상품설명 HTML 안전 렌더(DOMPurify)
+import { ContentRenderer } from '@o4o/content-editor';
 import type {
   TabletProduct,
   InterestStatusDetail,
@@ -484,10 +486,16 @@ export function TabletKioskPage({
               {selectedProduct.price ? formatPrice(selectedProduct.price) : selectedProduct.priceDisplay || '가격 문의'}
             </p>
             {selectedProduct.description && (
-              <p style={{ fontSize: '15px', color: '#475569', lineHeight: 1.6, margin: '0 0 8px' }}>{selectedProduct.description}</p>
+              <ContentRenderer
+                html={selectedProduct.description}
+                style={{ fontSize: '15px', color: '#475569', lineHeight: 1.6, margin: '0 0 8px' }}
+              />
             )}
             {selectedProduct.summary && (
-              <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.5, margin: '0 0 16px' }}>{selectedProduct.summary}</p>
+              <ContentRenderer
+                html={selectedProduct.summary}
+                style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.5, margin: '0 0 16px' }}
+              />
             )}
 
             {/* Customer Info (optional) */}

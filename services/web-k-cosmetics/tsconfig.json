@@ -17,7 +17,8 @@
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@o4o/content-editor": ["../../packages/content-editor/dist"]
     }
   },
   "include": ["src"],
