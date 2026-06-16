@@ -185,7 +185,32 @@ export const partnerRecruitmentApi = {
       return { success: false, error: result?.error || 'UNKNOWN_ERROR' };
     }
   },
+
+  // WO-O4O-MY-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1: 본인 신청 현황
+  async listMine(): Promise<PartnerApplication[]> {
+    try {
+      const response = await api.get('/neture/partner/applications/mine');
+      return response.data?.data ?? [];
+    } catch (error) {
+      console.warn('[Partner Recruitment API] Failed to list applications:', error);
+      return [];
+    }
+  },
 };
+
+export interface PartnerApplication {
+  applicationId: string;
+  recruitmentId: string;
+  productId: string;
+  productName: string;
+  supplierName: string;
+  serviceId: string;
+  status: string; // pending | approved | rejected
+  participationTerminated: boolean;
+  appliedAt: string;
+  decidedAt: string | null;
+  reason: string;
+}
 
 // ==================== Partner Commission (WO-O4O-PARTNER-COMMISSION-ENGINE-V1) ====================
 

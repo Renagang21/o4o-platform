@@ -290,6 +290,43 @@ export class NeturePartnerContractService {
   }
 
   /**
+   * WO-O4O-MY-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1
+   *
+   * 판매자(신청자) 본인이 신청한 모집 목록 + 상태(심사대기/승인/반려/참여해지).
+   * partnerId = req.user.id. 참여 해지는 contract.contractStatus 로 파생(공급자 측과 동일).
+   */
+  async getApplicationsForPartner(partnerUserId: string) {
+    const rows: Array<{
+      id: string; recruitment_id: string; status: string; applied_at: Date; decided_at: Date | null; reason: string | null;
+      product_id: string; product_name: string; seller_name: string | null; service_id: string | null;
+      contract_status: string | null;
+    }> = await AppDataSource.query(
+      `SELECT a.id, a.recruitment_id, a.status, a.applied_at, a.decided_at, a.reason,
+              r.product_id, r.product_name, r.seller_name, r.service_id,
+              (SELECT c.contract_status FROM neture_seller_partner_contracts c
+               WHERE c.application_id = a.id ORDER BY c.created_at DESC LIMIT 1) AS contract_status
+       FROM neture_partner_applications a
+       JOIN neture_partner_recruitments r ON r.id = a.recruitment_id
+       WHERE a.partner_id = $1
+       ORDER BY a.applied_at DESC`,
+      [partnerUserId],
+    );
+    return rows.map((a) => ({
+      applicationId: a.id,
+      recruitmentId: a.recruitment_id,
+      productId: a.product_id,
+      productName: a.product_name,
+      supplierName: a.seller_name || '',
+      serviceId: a.service_id || '',
+      status: a.status, // pending | approved | rejected
+      participationTerminated: a.contract_status === 'terminated',
+      appliedAt: a.applied_at,
+      decidedAt: a.decided_at,
+      reason: a.reason || '',
+    }));
+  }
+
+  /**
    * WO-O4O-SELLER-RECRUITMENT-SUPPLIER-APPLICATION-REVIEW-V1
    *
    * 공급자 본인 모집의 신청자 목록 + 모집 요약 (소유권: recruitment.sellerId === sellerUserId).
@@ -686,6 +723,8 @@ export class NeturePartnerContractService {
           applicationId,
           productId: recruitment.productId,
           eventType: type,
+          // WO-O4O-MY-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1: 신청 현황 화면 link
+          targetUrl: '/partner/recruitment-applications',
         },
       });
     } catch (e) {

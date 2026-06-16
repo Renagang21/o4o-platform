@@ -259,6 +259,8 @@ const PartnerStoresPage = lazy(() =>
 
 // Partner Dashboard
 const RecruitingProductsPage = lazy(() => import('./pages/partner/RecruitingProductsPage'));
+// WO-O4O-MY-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1
+const PartnerRecruitmentApplicationsPage = lazy(() => import('./pages/partner/PartnerRecruitmentApplicationsPage'));
 const PartnerOverviewPage = lazy(() =>
   import('./pages/partner/PartnerOverviewPage').then((m) => ({ default: m.PartnerOverviewPage }))
 );
@@ -831,6 +833,8 @@ function App() {
             <Route element={<PartnerSpaceLayout />}>
               <Route path="/partner/dashboard" element={<PartnerHubDashboardPage />} />
               <Route path="/partner/products" element={<ProductPoolPage />} />
+              {/* WO-O4O-MY-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1 */}
+              <Route path="/partner/recruitment-applications" element={<PartnerRecruitmentApplicationsPage />} />
               <Route path="/partner/links" element={<ReferralLinksPage />} />
               <Route path="/partner/settlements" element={<PartnerSettlementBatchPage />} />
               {/* Legacy routes kept for compatibility */}

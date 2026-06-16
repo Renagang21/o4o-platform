@@ -208,6 +208,24 @@ export function createPartnerRecruitmentController(deps: {
    * POST /partner/applications
    * 파트너 신청 (requires auth)
    */
+  /**
+   * GET /partner/applications/mine
+   * 판매자(신청자) 본인 모집 신청 현황 (WO-O4O-MY-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1)
+   */
+  router.get('/partner/applications/mine', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
+      }
+      const data = await netureService.getPartnerApplications(userId);
+      res.json({ success: true, data });
+    } catch (error) {
+      logger.error('[Neture API] Error fetching partner applications:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch applications' });
+    }
+  });
+
   router.post('/partner/applications', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user?.id;

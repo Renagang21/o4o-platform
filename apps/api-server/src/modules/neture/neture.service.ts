@@ -583,6 +583,11 @@ export class NetureService {
     return this.partnerContractService.terminateParticipation(applicationId, sellerUserId);
   }
 
+  // WO-O4O-MY-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1: 판매자 본인 신청 현황
+  async getPartnerApplications(partnerUserId: string) {
+    return this.partnerContractService.getApplicationsForPartner(partnerUserId);
+  }
+
   async approvePartnerApplication(applicationId: string, sellerId: string) {
     return this.partnerContractService.approvePartnerApplication(applicationId, sellerId);
   }

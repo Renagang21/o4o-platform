@@ -17,6 +17,7 @@ import {
   Package,
   Link2,
   CreditCard,
+  ClipboardList,
   ChevronRight,
   ChevronDown,
 } from 'lucide-react';
@@ -42,6 +43,12 @@ const PARTNER_SIDEBAR_GROUPS: SidebarGroup[] = [
     label: 'Products',
     icon: Package,
     items: [{ label: '상품 관리', path: '/partner/products' }],
+  },
+  {
+    // WO-O4O-MY-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1
+    label: '신청·승인',
+    icon: ClipboardList,
+    items: [{ label: '신청·승인 현황', path: '/partner/recruitment-applications' }],
   },
   {
     label: 'Marketing',
