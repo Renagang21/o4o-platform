@@ -22,8 +22,10 @@ import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { HubLayout } from '@o4o/hub-core';
 import type { HubSectionDefinition } from '@o4o/hub-core';
-import { computeStoreInsights } from '@o4o/store-ui-core';
-import type { StoreInsight } from '@o4o/store-ui-core';
+// WO-O4O-STORE-HOME-CANONICAL-SHELL-V1:
+// canonical pre-sections 영역(새로고침/배너/AI요약/인사이트/온보딩)을 공통 셸로 위임.
+// HubLayout 의 beforeSections 로 주입한다. 카드 섹션 렌더는 HubLayout 이 계속 담당.
+import { computeStoreInsights, StoreHomeShell } from '@o4o/store-ui-core';
 import { Card } from '@o4o/ui';
 // WO-O4O-GLYCOPHARM-MY-STORE-DASHBOARD-LABEL-ALIGN-WITH-KPA-V1:
 // 사용자-facing 문구는 operator-ux-core 의 glycopharmConfig.uiText 단일 SSOT 를 사용한다.
@@ -40,7 +42,6 @@ import {
   Settings,
   Loader2,
   AlertCircle,
-  RefreshCw,
 } from 'lucide-react';
 import { useStoreHub } from './hooks/useStoreHub';
 import type { AiSummaryData } from './hooks/useStoreHub';
@@ -164,42 +165,9 @@ function AiSummaryCard({ data }: { data: AiSummaryData }) {
   );
 }
 
-// ─── Insight Block (WO-STORE-AI-INSIGHT-LAYER-V1) ───
-
-function InsightBlock({ insights, onNavigate }: { insights: StoreInsight[]; onNavigate: (path: string) => void }) {
-  if (insights.length === 0) return null;
-  const levelIcon = (l: StoreInsight['level']) =>
-    l === 'critical' ? '🔴' : l === 'warning' ? '🟡' : '🔵';
-
-  return (
-    <section className="mb-8">
-      <h2 className="text-lg font-semibold text-slate-800 mb-4 mt-0">경영 인사이트</h2>
-      <Card className="px-5 py-4">
-        <div className="flex flex-col gap-2.5">
-          {insights.map((ins) => (
-            <div key={ins.code} className="flex items-start gap-2.5">
-              <span className="text-base leading-[22px] flex-shrink-0">{levelIcon(ins.level)}</span>
-              <div className="flex-1">
-                <span className="text-sm font-semibold text-slate-800">{ins.message}</span>
-                {ins.recommendation && (
-                  <span className="text-[13px] text-slate-500"> — {ins.recommendation}</span>
-                )}
-              </div>
-              {ins.action && (
-                <button
-                  onClick={() => onNavigate(ins.action!.target)}
-                  className="flex-shrink-0 self-center px-3 py-1 text-xs font-semibold text-primary bg-transparent border border-primary-200 rounded-md cursor-pointer whitespace-nowrap hover:bg-primary-50"
-                >
-                  {ins.action.label} →
-                </button>
-              )}
-            </div>
-          ))}
-        </div>
-      </Card>
-    </section>
-  );
-}
+// ─── Insight Block ───
+// WO-O4O-STORE-HOME-CANONICAL-SHELL-V1: 로컬 InsightBlock 제거 →
+// @o4o/store-ui-core StoreHomeShell 의 공통 인사이트 렌더로 위임 (insights prop 주입).
 
 // ─── Component ───
 
@@ -224,6 +192,52 @@ export default function StoreOverviewPage() {
     });
   }, [cockpitData]);
 
+  // WO-O4O-STORE-DASHBOARD-ORDER-METRICS-SAFE-FALLBACK-V1:
+  // 주문/매출 데이터가 미준비 상태인 경우 silent 0 거짓 신호 대신 명시 안내.
+  // backend cockpit/today-actions 가 meta.featureStatus='not_ready' 응답 시 노출.
+  const orderMetricsBanner =
+    !loading && !cockpitData.orderMetricsReady ? (
+      <section className="mb-6">
+        <Card className="p-4 bg-amber-50 border border-amber-200">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-amber-900 m-0 mb-1">
+                주문/매출 지표를 준비 중입니다.
+              </p>
+              <p className="text-[13px] text-amber-700 m-0">
+                현재 이 지표는 준비 중입니다. 다른 내 약국 기능은 계속 이용할 수 있습니다.
+              </p>
+            </div>
+          </div>
+        </Card>
+      </section>
+    ) : null;
+
+  // AI Summary 카드 (서비스별 데이터/로딩/에러 — aiSummarySlot 으로 주입)
+  const aiSummarySection = (
+    <section className="mb-8">
+      <h2 className="text-lg font-semibold text-slate-800 mb-4 mt-0">AI 운영 요약</h2>
+      {loading ? (
+        <div className="flex items-center justify-center gap-2.5 py-8">
+          <Loader2 className="w-6 h-6 text-primary animate-spin" />
+          <span className="text-sm text-slate-500">분석 중...</span>
+        </div>
+      ) : error ? (
+        <div className="flex items-center gap-2 p-4 bg-red-50 rounded-lg">
+          <AlertCircle className="w-5 h-5 text-red-600" />
+          <span className="text-sm text-red-600">{error}</span>
+        </div>
+      ) : cockpitData.aiSummary ? (
+        <AiSummaryCard data={cockpitData.aiSummary} />
+      ) : (
+        <Card className="p-6 text-center">
+          <span className="text-sm text-slate-400">AI 요약 데이터가 없습니다.</span>
+        </Card>
+      )}
+    </section>
+  );
+
   return (
     <HubLayout
       title={glycopharmConfig.uiText.storeHomeTitle}
@@ -234,65 +248,14 @@ export default function StoreOverviewPage() {
       onCardClick={(href) => navigate(href)}
       onActionTrigger={handleActionTrigger}
       beforeSections={
-        <>
-          {/* 새로고침 버튼 */}
-          <div className="flex justify-end mb-4 -mt-4">
-            <button
-              className="flex items-center gap-1.5 px-4 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-600 cursor-pointer"
-              onClick={fetchData}
-              disabled={loading}
-            >
-              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-              새로고침
-            </button>
-          </div>
-
-          {/* WO-O4O-STORE-DASHBOARD-ORDER-METRICS-SAFE-FALLBACK-V1:
-              주문/매출 데이터가 미준비 상태인 경우 silent 0 거짓 신호 대신 명시 안내.
-              backend cockpit/today-actions 가 meta.featureStatus='not_ready' 응답 시 노출. */}
-          {!loading && !cockpitData.orderMetricsReady && (
-            <section className="mb-6">
-              <Card className="p-4 bg-amber-50 border border-amber-200">
-                <div className="flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold text-amber-900 m-0 mb-1">
-                      주문/매출 지표를 준비 중입니다.
-                    </p>
-                    <p className="text-[13px] text-amber-700 m-0">
-                      현재 이 지표는 준비 중입니다. 다른 내 약국 기능은 계속 이용할 수 있습니다.
-                    </p>
-                  </div>
-                </div>
-              </Card>
-            </section>
-          )}
-
-          {/* AI Summary 카드 */}
-          <section className="mb-8">
-            <h2 className="text-lg font-semibold text-slate-800 mb-4 mt-0">AI 운영 요약</h2>
-            {loading ? (
-              <div className="flex items-center justify-center gap-2.5 py-8">
-                <Loader2 className="w-6 h-6 text-primary animate-spin" />
-                <span className="text-sm text-slate-500">분석 중...</span>
-              </div>
-            ) : error ? (
-              <div className="flex items-center gap-2 p-4 bg-red-50 rounded-lg">
-                <AlertCircle className="w-5 h-5 text-red-600" />
-                <span className="text-sm text-red-600">{error}</span>
-              </div>
-            ) : cockpitData.aiSummary ? (
-              <AiSummaryCard data={cockpitData.aiSummary} />
-            ) : (
-              <Card className="p-6 text-center">
-                <span className="text-sm text-slate-400">AI 요약 데이터가 없습니다.</span>
-              </Card>
-            )}
-          </section>
-
-          {/* WO-STORE-AI-INSIGHT-LAYER-V1 + WO-STORE-INSIGHT-ACTION-BRIDGE-V1 */}
-          {!loading && <InsightBlock insights={insights} onNavigate={navigate} />}
-        </>
+        <StoreHomeShell
+          loading={loading}
+          onRefresh={fetchData}
+          bannerSlot={orderMetricsBanner}
+          aiSummarySlot={aiSummarySection}
+          insights={insights}
+          onInsightAction={navigate}
+        />
       }
       footerNote="각 카드는 해당 기능의 진입점입니다. QuickAction 버튼으로 즉시 실행하거나, 카드를 클릭하여 상세 페이지로 이동하세요."
     />

@@ -73,6 +73,11 @@ export { MENU_CAPABILITY_MAP, resolveStoreMenu } from './config/menuCapabilityMa
 export type { StoreInsight, StoreInsightAction, StoreInsightInput, InsightLevel } from './engine/storeInsightEngine';
 export { computeStoreInsights } from './engine/storeInsightEngine';
 
+// Store Home canonical shell (WO-O4O-STORE-HOME-CANONICAL-SHELL-V1)
+// HubLayout 의 beforeSections 로 주입하는 canonical pre-sections 영역(새로고침/매장선택/배너/AI요약/인사이트/온보딩).
+export { StoreHomeShell } from './components/StoreHomeShell';
+export type { StoreHomeShellProps } from './components/StoreHomeShell';
+
 // Production Router Utils (WO-O4O-STORE-PRODUCTION-ROUTER-UTILS-COMMONIZATION-PHASE2-G-V1)
 export type { ProductionTarget, ProductionSourceItem, ProductionSource, ProductionRouterState } from './utils/productionUtils';
 export { buildProductionState, composeSourceTextFromItems, parseProductionRouterState, useProductionRouterState } from './utils/productionUtils';
