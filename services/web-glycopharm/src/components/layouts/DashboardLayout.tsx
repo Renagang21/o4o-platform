@@ -144,9 +144,13 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
         />
       )}
 
+      {/* WO-O4O-GP-KCOS-ADMIN-DASHBOARD-LAYOUT-RESPONSIVE-CLEANUP-V1:
+          fixed sidebar + lg:ml-64 본문 margin 의존 제거 → flex sibling 구조.
+          mobile=fixed drawer / desktop(>=lg)=in-flow sticky sidebar + 본문 flex-1 min-w-0(겹침/가로스크롤 없음). */}
+      <div className="flex flex-1 min-h-0">
       {/* Sidebar */}
       <aside
-        className={`fixed top-16 left-0 z-40 h-[calc(100vh-4rem)] w-64 bg-white shadow-xl transform transition-transform duration-300 lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`fixed top-16 left-0 z-40 h-[calc(100vh-4rem)] w-64 bg-white shadow-xl transform transition-transform duration-300 lg:sticky lg:top-16 lg:z-auto lg:shrink-0 lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
       >
         <div className="flex flex-col h-full">
@@ -274,8 +278,8 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
         </div>
       </aside>
 
-      {/* Main Content */}
-      <div className="lg:ml-64 pt-16">
+      {/* Main Content — flex sibling (고정 margin/pt 제거) */}
+      <div className="flex-1 min-w-0">
         {/* Dashboard Header — Layer B Context */}
         <header className="sticky top-16 z-30 bg-white border-b">
           <div className="flex items-center justify-between px-4 py-3">
@@ -309,6 +313,7 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
         <main className="p-4 md:p-6">
           <Outlet />
         </main>
+      </div>
       </div>
     </div>
   );
