@@ -4,14 +4,22 @@
  * WO-O4O-COSMETICS-ORG-REUSE-AND-ENROLLMENT-V1:
  * 모의 데이터 → 실제 API 연결
  * GET /api/v1/cosmetics/stores/admin/applications (cosmetics:admin scope)
+ *
+ * WO-O4O-KCOS-OPERATOR-APPLICATIONS-URL-SYNC-MINIMAL-V1:
+ *   GP 와 달리 backend array-only + client filter 구조 → STANDARD-LIST full adoption 비대상.
+ *   기존 client filter/카드/drawer 유지하고 statusFilter 만 URL query(applications_status)와 동기화.
  */
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { BaseDetailDrawer } from '@o4o/ui';
 import { DataTable } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { getBusinessEntityTypeLabel } from '@o4o/types';
 import { api } from '../../lib/apiClient';
+
+const URL_KEY = 'applications_status';
+const DEFAULT_STATUS = 'all';
 
 interface Application {
   id: string;
@@ -49,11 +57,26 @@ const statusColors: Record<string, string> = {
 };
 
 export default function ApplicationsPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
-  const [statusFilter, setStatusFilter] = useState('all');
+  // WO-O4O-KCOS-OPERATOR-APPLICATIONS-URL-SYNC-MINIMAL-V1: statusFilter 를 URL 에서 복원
+  const [statusFilter, setStatusFilter] = useState<string>(() => searchParams.get(URL_KEY) || DEFAULT_STATUS);
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
+
+  // URL query sync (기본 'all' 은 param 생략)
+  useEffect(() => {
+    setSearchParams(
+      (prev) => {
+        const sp = new URLSearchParams(prev);
+        if (statusFilter === DEFAULT_STATUS) sp.delete(URL_KEY);
+        else sp.set(URL_KEY, statusFilter);
+        return sp;
+      },
+      { replace: true },
+    );
+  }, [statusFilter, setSearchParams]);
 
   useEffect(() => {
     const fetchApplications = async () => {
