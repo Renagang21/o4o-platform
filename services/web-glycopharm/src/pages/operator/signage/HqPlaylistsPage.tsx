@@ -25,11 +25,7 @@ import {
 
 const SERVICE_KEY = 'glycopharm';
 const BASE = `${API_BASE_URL}/api/signage/${SERVICE_KEY}`;
-
-const DEFAULT_TAG_SUGGESTIONS = [
-  '복약지도', '당뇨', '혈압', '면역', '건강기능식품',
-  '의약외품', '이벤트', '프로모션', '신제품', '추천상품',
-];
+const NEW_PATH = '/operator/signage/hq-playlists/new';
 
 interface PlaylistItem {
   id: string;
@@ -70,7 +66,6 @@ export default function HqPlaylistsPage() {
   const [playlists, setPlaylists] = useState<PlaylistItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showForm, setShowForm] = useState(false);
 
   // Store 복사 횟수 맵 (hqPlaylistId → count)
   const [storeCopyMap, setStoreCopyMap] = useState<Record<string, number>>({});
@@ -79,16 +74,6 @@ export default function HqPlaylistsPage() {
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // 생성 폼
-  const [formName, setFormName] = useState('');
-  const [formDesc, setFormDesc] = useState('');
-  const [formLoop, setFormLoop] = useState(true);
-  const [formDuration, setFormDuration] = useState(10);
-  const [formTransition, setFormTransition] = useState('fade');
-  const [isCreating, setIsCreating] = useState(false);
-  const [formTags, setFormTags] = useState<string[]>([]);
-  const [formTagInput, setFormTagInput] = useState('');
 
   const apiFetch = useCallback(async (path: string, options?: RequestInit) => {
     const method = (options?.method || 'GET').toUpperCase();
@@ -147,47 +132,6 @@ export default function HqPlaylistsPage() {
     return playlists.filter((p) => p.name.toLowerCase().includes(q));
   }, [playlists, debouncedSearch]);
 
-  const addTag = (value: string) => {
-    const tag = value.trim().replace(/^#/, '');
-    if (!tag || formTags.includes(tag)) return;
-    setFormTags(prev => [...prev, tag]);
-  };
-
-  const removeTag = (tag: string) => {
-    setFormTags(prev => prev.filter(t => t !== tag));
-  };
-
-  const handleCreate = async () => {
-    if (!formName.trim()) return;
-    if (formTags.length === 0) {
-      setError('태그를 최소 1개 이상 입력해주세요');
-      return;
-    }
-    setIsCreating(true);
-    setError(null);
-    try {
-      await apiFetch(`${BASE}/hq/playlists`, {
-        method: 'POST',
-        body: JSON.stringify({
-          name: formName.trim(),
-          description: formDesc.trim() || undefined,
-          loopEnabled: formLoop,
-          defaultItemDuration: formDuration,
-          transitionType: formTransition,
-          tags: formTags,
-        }),
-      });
-      setFormName(''); setFormDesc(''); setShowForm(false);
-      setFormTags([]);
-      setFormTagInput('');
-      fetchPlaylists();
-    } catch {
-      setError('플레이리스트 생성에 실패했습니다.');
-    } finally {
-      setIsCreating(false);
-    }
-  };
-
   const stats = useMemo(() => ({
     total: playlists.length,
     active: playlists.filter((p) => p.status === 'active').length,
@@ -207,7 +151,7 @@ export default function HqPlaylistsPage() {
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setShowForm(!showForm)}
+            onClick={() => navigate(NEW_PATH)}
             className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 text-sm font-medium transition-colors"
           >
             <Plus className="w-4 h-4" /> 새 플레이리스트
@@ -242,119 +186,6 @@ export default function HqPlaylistsPage() {
           </div>
         ))}
       </div>
-
-      {/* 생성 폼 */}
-      {showForm && (
-        <div className="bg-white rounded-xl border border-slate-200 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-semibold text-slate-800">새 HQ 플레이리스트</h2>
-            <button onClick={() => setShowForm(false)} className="p-1 text-slate-400 hover:text-slate-600">
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">이름 *</label>
-              <input
-                type="text"
-                value={formName}
-                onChange={(e) => setFormName(e.target.value)}
-                placeholder="플레이리스트 이름"
-                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">기본 항목 시간 (초)</label>
-              <input
-                type="number"
-                value={formDuration}
-                onChange={(e) => setFormDuration(Number(e.target.value))}
-                min={1} max={300}
-                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">설명</label>
-              <input
-                type="text"
-                value={formDesc}
-                onChange={(e) => setFormDesc(e.target.value)}
-                placeholder="선택 사항"
-                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">전환 효과</label>
-              <select
-                value={formTransition}
-                onChange={(e) => setFormTransition(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-              >
-                <option value="none">없음</option>
-                <option value="fade">페이드</option>
-                <option value="slide">슬라이드</option>
-              </select>
-            </div>
-            <div className="flex items-center gap-2 pt-1">
-              <input
-                type="checkbox"
-                id="loop"
-                checked={formLoop}
-                onChange={(e) => setFormLoop(e.target.checked)}
-                className="rounded text-primary-600"
-              />
-              <label htmlFor="loop" className="text-sm text-slate-700">반복 재생</label>
-            </div>
-            <div className="md:col-span-2">
-              <label className="block text-xs font-medium text-slate-500 mb-1">태그 * (최소 1개)</label>
-              <div className="flex flex-wrap gap-1 mb-2 min-h-[28px]">
-                {formTags.map(tag => (
-                  <span key={tag} className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">
-                    #{tag}
-                    <button type="button" onClick={() => removeTag(tag)} className="ml-0.5 hover:text-blue-900">×</button>
-                  </span>
-                ))}
-              </div>
-              <input
-                type="text"
-                value={formTagInput}
-                onChange={(e) => setFormTagInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ',') {
-                    e.preventDefault();
-                    addTag(formTagInput);
-                    setFormTagInput('');
-                  }
-                }}
-                placeholder="태그 입력 후 Enter 또는 쉼표"
-                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-              />
-              <div className="flex flex-wrap gap-1 mt-2">
-                {DEFAULT_TAG_SUGGESTIONS.filter(t => !formTags.includes(t)).map(t => (
-                  <button
-                    key={t}
-                    type="button"
-                    onClick={() => addTag(t)}
-                    className="px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded-full hover:bg-blue-100 hover:text-blue-700 transition-colors"
-                  >
-                    #{t}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-          <div className="flex justify-end gap-2 mt-5">
-            <button onClick={() => setShowForm(false)} className="px-4 py-2 border border-slate-200 rounded-lg text-sm hover:bg-slate-50 transition-colors">취소</button>
-            <button
-              onClick={handleCreate}
-              disabled={isCreating || !formName.trim() || formTags.length === 0}
-              className="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm hover:bg-primary-700 disabled:opacity-50 transition-colors"
-            >
-              {isCreating ? '생성 중...' : '생성'}
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* 검색 */}
       <div className="bg-white rounded-xl border border-slate-100 p-4 flex items-center gap-3">
@@ -415,7 +246,7 @@ export default function HqPlaylistsPage() {
                     </p>
                     {!search && (
                       <button
-                        onClick={() => setShowForm(true)}
+                        onClick={() => navigate(NEW_PATH)}
                         className="mt-3 px-4 py-2 bg-primary-600 text-white rounded-lg text-sm hover:bg-primary-700 inline-flex items-center gap-1.5"
                       >
                         <Plus className="w-3.5 h-3.5" /> 첫 플레이리스트 생성

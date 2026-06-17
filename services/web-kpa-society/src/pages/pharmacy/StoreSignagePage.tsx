@@ -63,7 +63,6 @@ import {
 } from '../../api/assetSnapshot';
 import {
   fetchStorePlaylists,
-  createStorePlaylist,
   updateStorePlaylist,
   deleteStorePlaylist,
   fetchPlaylistItems,
@@ -310,10 +309,6 @@ export function StoreSignagePage() {
   const [selectedPlaylistId, setSelectedPlaylistId] = useState<string | null>(null);
   const [playlistItems, setPlaylistItems] = useState<StorePlaylistItem[]>([]);
   const [playlistItemsLoading, setPlaylistItemsLoading] = useState(false);
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [newPlaylistName, setNewPlaylistName] = useState('');
-  const [newPlaylistDescription, setNewPlaylistDescription] = useState('');
-  const [newPlaylistTags, setNewPlaylistTags] = useState('');
   const [playlistKeyword, setPlaylistKeyword] = useState('');
   const [selectedPlaylistKeys, setSelectedPlaylistKeys] = useState<string[]>([]);
 
@@ -439,23 +434,6 @@ export function StoreSignagePage() {
   }, [selectedPlaylistId, loadPlaylistItems]);
 
   // ── Playlist handlers ──
-  const handleCreatePlaylist = async () => {
-    if (!newPlaylistName.trim()) return;
-    const tags = newPlaylistTags.split(',').map(t => t.trim()).filter(Boolean);
-    try {
-      await createStorePlaylist({
-        name: newPlaylistName.trim(),
-        description: newPlaylistDescription.trim() || undefined,
-        tags: tags.length > 0 ? tags : undefined,
-      });
-      setNewPlaylistName('');
-      setNewPlaylistDescription('');
-      setNewPlaylistTags('');
-      setShowCreateForm(false);
-      loadPlaylists();
-    } catch { /* user can retry */ }
-  };
-
   const handleTogglePublish = async (pl: StorePlaylist) => {
     const next = pl.publishStatus === 'draft' ? 'published' : 'draft';
     try {
@@ -991,81 +969,15 @@ export function StoreSignagePage() {
           {/* Create + list */}
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-slate-800">내 플레이리스트</h2>
+            {/* WO-O4O-SIGNAGE-PLAYLIST-CREATE-STANDARD-ALL-SURFACES-V1: 모달 → 표준 /new 등록 페이지 */}
             <button
-              onClick={() => setShowCreateForm(true)}
+              onClick={() => navigate('/store/marketing/signage/playlist/new')}
               className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50"
             >
               <Plus className="w-4 h-4" />
               새 플레이리스트
             </button>
           </div>
-
-          {/* Create form — modal */}
-          {showCreateForm && (
-            <div
-              className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
-              onClick={e => { if (e.target === e.currentTarget) { setShowCreateForm(false); setNewPlaylistName(''); setNewPlaylistDescription(''); setNewPlaylistTags(''); } }}
-              onKeyDown={e => { if (e.key === 'Escape') { setShowCreateForm(false); setNewPlaylistName(''); setNewPlaylistDescription(''); setNewPlaylistTags(''); } }}
-              role="dialog"
-              aria-modal="true"
-              tabIndex={-1}
-            >
-              <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
-                <h3 className="text-base font-semibold text-slate-800 mb-4">새 플레이리스트</h3>
-                <div className="mb-3">
-                  <label className="block text-xs font-medium text-slate-600 mb-1">플레이리스트 이름 <span className="text-red-500">*</span></label>
-                  <input
-                    type="text"
-                    value={newPlaylistName}
-                    onChange={e => setNewPlaylistName(e.target.value)}
-                    placeholder="플레이리스트 이름을 입력하세요"
-                    className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    autoFocus
-                  />
-                </div>
-                <div className="mb-3">
-                  <label className="block text-xs font-medium text-slate-600 mb-1">설명 / 사용 목적</label>
-                  <textarea
-                    value={newPlaylistDescription}
-                    onChange={e => setNewPlaylistDescription(e.target.value)}
-                    placeholder="이 플레이리스트의 사용 목적이나 적용 위치를 간략히 기록하세요"
-                    rows={2}
-                    className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
-                  />
-                </div>
-                <div className="mb-5">
-                  <label className="block text-xs font-medium text-slate-600 mb-1">태그 <span className="text-slate-400 font-normal">(쉼표로 구분)</span></label>
-                  <input
-                    type="text"
-                    value={newPlaylistTags}
-                    onChange={e => setNewPlaylistTags(e.target.value)}
-                    placeholder="예: 대기실, 약국, 홍보"
-                    className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  />
-                </div>
-                <div className="flex justify-end gap-2">
-                  <button
-                    onClick={() => {
-                      setShowCreateForm(false);
-                      setNewPlaylistName('');
-                      setNewPlaylistDescription('');
-                      setNewPlaylistTags('');
-                    }}
-                    className="px-4 py-2 text-sm text-slate-600 border border-slate-300 rounded-md hover:bg-slate-50"
-                  >
-                    취소
-                  </button>
-                  <button
-                    onClick={handleCreatePlaylist}
-                    disabled={!newPlaylistName.trim()}
-                    className="px-4 py-2 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    생성
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* Playlist search */}
           {!playlistLoading && !playlistError && playlists.length > 0 && (

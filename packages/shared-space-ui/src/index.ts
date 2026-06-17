@@ -158,6 +158,16 @@ export type { SignageHubItem, SignageHubFilter, SignageHubFetchParams, SignageHu
 export { SignageManagerTemplate } from './SignageManagerTemplate';
 export type { SignageHubVideo, SignageHubPlaylist, SignageManagerConfig } from './SignageManagerTemplate';
 
+/* WO-O4O-SIGNAGE-PLAYLIST-CREATE-STANDARD-ALL-SURFACES-V1: 사이니지 플레이리스트 등록 공통 shell (community/operator/store) */
+export { SignagePlaylistCreateShell } from './signage/SignagePlaylistCreateShell';
+export type {
+  SignagePlaylistCreateShellProps,
+  SignagePlaylistCreateConfig,
+  SignagePlaylistCreateValues,
+  SignagePlaylistCreateItem,
+  SignagePlaylistSurface,
+} from './signage/SignagePlaylistCreateShell';
+
 /* Template Presets — WO-O4O-TEMPLATE-PRESET-DEFINITION-V1 */
 export { templates, templatePresets } from './templates';
 export type { TemplateKey, TemplateTokens, TemplatePreset, PresetCategory } from './templates';

@@ -26,7 +26,6 @@ import {
 import { assetSnapshotApi } from '@/api/assetSnapshot';
 import {
   fetchStorePlaylists,
-  createStorePlaylist,
   updateStorePlaylist,
   deleteStorePlaylist,
   fetchPlaylistItems,
@@ -51,8 +50,6 @@ export default function StoreSignagePage() {
   const [selectedPlaylistId, setSelectedPlaylistId] = useState<string | null>(null);
   const [playlistItems, setPlaylistItems] = useState<StorePlaylistItem[]>([]);
   const [playlistItemsLoading, setPlaylistItemsLoading] = useState(false);
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [newPlaylistName, setNewPlaylistName] = useState('');
 
   // ── Pending media from Community "매장에 적용" ──
   const [pendingBusy, setPendingBusy] = useState(false);
@@ -90,15 +87,6 @@ export default function StoreSignagePage() {
   }, [selectedPlaylistId, loadPlaylistItems]);
 
   // ── Playlist handlers ──
-  const handleCreatePlaylist = async () => {
-    if (!newPlaylistName.trim()) return;
-    try {
-      await createStorePlaylist(newPlaylistName.trim());
-      setNewPlaylistName('');
-      setShowCreateForm(false);
-      loadPlaylists();
-    } catch { /* user can retry */ }
-  };
 
   const handleTogglePublish = async (pl: StorePlaylist) => {
     const next = pl.publishStatus === 'draft' ? 'published' : 'draft';
@@ -236,8 +224,9 @@ export default function StoreSignagePage() {
       {/* Create + list */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-slate-800">내 플레이리스트</h2>
+        {/* WO-O4O-SIGNAGE-PLAYLIST-CREATE-STANDARD-ALL-SURFACES-V1: 인라인 폼 → 표준 /new 등록 페이지 */}
         <button
-          onClick={() => setShowCreateForm(true)}
+          onClick={() => navigate('/store/marketing/signage/playlist/new')}
           className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50"
         >
           <Plus className="w-4 h-4" />
@@ -245,22 +234,6 @@ export default function StoreSignagePage() {
         </button>
       </div>
 
-      {/* Create form */}
-      {showCreateForm && (
-        <div className="flex gap-2 mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-          <input
-            type="text"
-            value={newPlaylistName}
-            onChange={e => setNewPlaylistName(e.target.value)}
-            placeholder="플레이리스트 이름"
-            className="flex-1 px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-            onKeyDown={e => e.key === 'Enter' && handleCreatePlaylist()}
-            autoFocus
-          />
-          <button onClick={handleCreatePlaylist} className="px-3 py-1.5 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700">생성</button>
-          <button onClick={() => { setShowCreateForm(false); setNewPlaylistName(''); }} className="px-3 py-1.5 text-sm text-slate-600 border border-slate-300 rounded-md hover:bg-slate-50">취소</button>
-        </div>
-      )}
 
       {/* Playlist list */}
       {playlistLoading ? (

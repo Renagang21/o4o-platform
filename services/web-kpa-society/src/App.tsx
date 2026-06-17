@@ -203,6 +203,8 @@ const StoreOrdersPage = lazy(() => import('./pages/pharmacy/StoreOrdersPage').th
 const StoreRecruitmentApplicationsPage = lazy(() => import('./pages/pharmacy/StoreRecruitmentApplicationsPage'));
 // WO-O4O-STORE-HUB-LEGACY-LIST-CLEANUP-V1: StoreBillingPage 제거 (KPA 사이드바 미노출, API 미연결 placeholder)
 const StoreSignagePage = lazy(() => import('./pages/pharmacy/StoreSignagePage').then(m => ({ default: m.StoreSignagePage })));
+// WO-O4O-SIGNAGE-PLAYLIST-CREATE-STANDARD-ALL-SURFACES-V1: 매장 플레이리스트 표준 /new 등록
+const StorePlaylistCreatePage = lazy(() => import('./pages/pharmacy/StorePlaylistCreatePage').then(m => ({ default: m.StorePlaylistCreatePage })));
 const StoreQRPage = lazy(() => import('./pages/pharmacy/StoreQRPage').then(m => ({ default: m.StoreQRPage })));
 const StorePopPage = lazy(() => import('./pages/pharmacy/StorePopPage').then(m => ({ default: m.StorePopPage })));
 const MarketingAnalyticsPage = lazy(() => import('./pages/pharmacy/MarketingAnalyticsPage').then(m => ({ default: m.MarketingAnalyticsPage })));
@@ -930,6 +932,7 @@ function App() {
             <Route path="marketing/pop" element={<StorePopPage />} />
             <Route path="marketing/signage" element={<Navigate to="playlist" replace />} />
             <Route path="marketing/signage/playlist" element={<StoreSignagePage />} />
+            <Route path="marketing/signage/playlist/new" element={<StorePlaylistCreatePage />} />
             <Route path="marketing/signage/videos" element={<StoreSignagePage />} />
             <Route path="marketing/signage/schedules" element={<StoreSignagePage />} />
             <Route path="marketing/signage/player" element={<SignagePlayerSelectPage />} />

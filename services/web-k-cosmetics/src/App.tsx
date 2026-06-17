@@ -130,6 +130,8 @@ const SignageMediaDetailPage = lazy(() => import('@/pages/signage/MediaDetailPag
 const HqMediaPage = lazy(() => import('@/pages/operator/signage/HqMediaPage'));
 const HqMediaDetailPage = lazy(() => import('@/pages/operator/signage/HqMediaDetailPage'));
 const HqPlaylistsPage = lazy(() => import('@/pages/operator/signage/HqPlaylistsPage'));
+// WO-O4O-SIGNAGE-PLAYLIST-CREATE-STANDARD-ALL-SURFACES-V1: 표준 /new 등록
+const HqPlaylistCreatePage = lazy(() => import('@/pages/operator/signage/HqPlaylistCreatePage'));
 const HqPlaylistDetailPage = lazy(() => import('@/pages/operator/signage/HqPlaylistDetailPage'));
 const SignageTemplatesPage = lazy(() => import('@/pages/operator/signage/TemplatesPage'));
 const SignageTemplateDetailPage = lazy(() => import('@/pages/operator/signage/TemplateDetailPage'));
@@ -276,6 +278,8 @@ const ForumCategoriesManagementPage = lazy(() => import('@/pages/operator/ForumC
 const StoreChannelsPage = lazy(() => import('@/pages/store/StoreChannelsPage'));
 // WO-O4O-SIGNAGE-STORE-ACTION-EXPANSION-V1
 const StoreSignagePage = lazy(() => import('@/pages/store/StoreSignagePage'));
+// WO-O4O-SIGNAGE-PLAYLIST-CREATE-STANDARD-ALL-SURFACES-V1: 매장 플레이리스트 표준 /new 등록
+const StorePlaylistCreatePage = lazy(() => import('@/pages/store/StorePlaylistCreatePage'));
 // WO-O4O-KCOSMETICS-SIGNAGE-PLAYER-V1
 const SignagePlayerSelectPage = lazy(() => import('@/pages/store/signage/SignagePlayerSelectPage').then(m => ({ default: m.SignagePlayerSelectPage })));
 const SignagePlaybackPage = lazy(() => import('@/pages/store/signage/SignagePlaybackPage'));
@@ -705,6 +709,8 @@ function AppRoutes() {
         <Route path="signage/hq-media" element={<HqMediaPage />} />
         <Route path="signage/hq-media/:mediaId" element={<HqMediaDetailPage />} />
         <Route path="signage/hq-playlists" element={<HqPlaylistsPage />} />
+        {/* WO-O4O-SIGNAGE-PLAYLIST-CREATE-STANDARD-ALL-SURFACES-V1 */}
+        <Route path="signage/hq-playlists/new" element={<HqPlaylistCreatePage />} />
         <Route path="signage/hq-playlists/:playlistId" element={<HqPlaylistDetailPage />} />
         <Route path="signage/templates" element={<SignageTemplatesPage />} />
         <Route path="signage/templates/:templateId" element={<SignageTemplateDetailPage />} />
@@ -795,6 +801,7 @@ function AppRoutes() {
         <Route path="commerce/billing" element={<StoreRevenueSummaryPage />} />
         <Route path="marketing/signage" element={<Navigate to="playlist" replace />} />
         <Route path="marketing/signage/playlist" element={<StoreSignagePage />} />
+        <Route path="marketing/signage/playlist/new" element={<StorePlaylistCreatePage />} />
         <Route path="marketing/signage/videos" element={<StoreSignagePage />} />
         <Route path="marketing/signage/schedules" element={<StoreSignagePage />} />
         {/* WO-O4O-KCOSMETICS-SIGNAGE-PLAYER-V1: TV 재생 (player select + fullscreen playback) */}

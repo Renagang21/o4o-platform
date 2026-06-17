@@ -39,6 +39,7 @@ import WorkingContentEditPage from '../pages/operator/WorkingContentEditPage';
 import HqMediaPage from '../pages/operator/signage/HqMediaPage';
 import HqMediaDetailPage from '../pages/operator/signage/HqMediaDetailPage';
 import HqPlaylistsPage from '../pages/operator/signage/HqPlaylistsPage';
+import HqPlaylistCreatePage from '../pages/operator/signage/HqPlaylistCreatePage';
 import HqPlaylistDetailPage from '../pages/operator/signage/HqPlaylistDetailPage';
 import TemplatesPage from '../pages/operator/signage/TemplatesPage';
 import TemplateDetailPage from '../pages/operator/signage/TemplateDetailPage';
@@ -104,6 +105,8 @@ export function OperatorRoutes() {
           <Route path="signage/hq-media" element={<HqMediaPage />} />
           <Route path="signage/hq-media/:mediaId" element={<HqMediaDetailPage />} />
           <Route path="signage/hq-playlists" element={<HqPlaylistsPage />} />
+          {/* WO-O4O-SIGNAGE-PLAYLIST-CREATE-STANDARD-ALL-SURFACES-V1: 표준 /new 등록 */}
+          <Route path="signage/hq-playlists/new" element={<HqPlaylistCreatePage />} />
           <Route path="signage/hq-playlists/:playlistId" element={<HqPlaylistDetailPage />} />
           <Route path="signage/templates" element={<TemplatesPage />} />
           <Route path="signage/templates/:templateId" element={<TemplateDetailPage />} />

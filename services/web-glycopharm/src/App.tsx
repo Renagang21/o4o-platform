@@ -102,6 +102,8 @@ const SignagePlaylistDetailPage = lazy(() => import('@/pages/store-management/si
 const SignageMediaDetailPage = lazy(() => import('@/pages/store-management/signage').then(m => ({ default: m.MediaDetailPage })));
 // WO-O4O-GLYCOPHARM-SIGNAGE-PHASE1-V1
 const StoreSignageMainPage = lazy(() => import('@/pages/store-management/signage').then(m => ({ default: m.StoreSignageMainPage })));
+// WO-O4O-SIGNAGE-PLAYLIST-CREATE-STANDARD-ALL-SURFACES-V1: 매장 플레이리스트 표준 /new 등록
+const StorePlaylistCreatePage = lazy(() => import('@/pages/store-management/signage/StorePlaylistCreatePage'));
 const SignagePlaybackPage = lazy(() => import('@/pages/store-management/signage').then(m => ({ default: m.SignagePlaybackPage })));
 const SignagePlayerSelectPage = lazy(() => import('@/pages/store-management/signage/SignagePlayerSelectPage').then(m => ({ default: m.SignagePlayerSelectPage })));
 
@@ -109,6 +111,8 @@ const SignagePlayerSelectPage = lazy(() => import('@/pages/store-management/sign
 const HqMediaPage = lazy(() => import('@/pages/operator/signage/HqMediaPage'));
 const HqMediaDetailPage = lazy(() => import('@/pages/operator/signage/HqMediaDetailPage'));
 const HqPlaylistsPage = lazy(() => import('@/pages/operator/signage/HqPlaylistsPage'));
+// WO-O4O-SIGNAGE-PLAYLIST-CREATE-STANDARD-ALL-SURFACES-V1: 표준 /new 등록
+const HqPlaylistCreatePage = lazy(() => import('@/pages/operator/signage/HqPlaylistCreatePage'));
 const HqPlaylistDetailPage = lazy(() => import('@/pages/operator/signage/HqPlaylistDetailPage'));
 const SignageTemplatesPage = lazy(() => import('@/pages/operator/signage/TemplatesPage'));
 const SignageTemplateDetailPage = lazy(() => import('@/pages/operator/signage/TemplateDetailPage'));
@@ -865,6 +869,8 @@ function AppRoutes() {
         <Route path="signage/hq-media" element={<HqMediaPage />} />
         <Route path="signage/hq-media/:mediaId" element={<HqMediaDetailPage />} />
         <Route path="signage/hq-playlists" element={<HqPlaylistsPage />} />
+        {/* WO-O4O-SIGNAGE-PLAYLIST-CREATE-STANDARD-ALL-SURFACES-V1 */}
+        <Route path="signage/hq-playlists/new" element={<HqPlaylistCreatePage />} />
         <Route path="signage/hq-playlists/:playlistId" element={<HqPlaylistDetailPage />} />
         <Route path="signage/templates" element={<SignageTemplatesPage />} />
         <Route path="signage/templates/:templateId" element={<SignageTemplateDetailPage />} />
@@ -1028,6 +1034,7 @@ function AppRoutes() {
         {/* Signage — WO-O4O-GLYCOPHARM-SIGNAGE-PHASE1-V1 + IA-RESTRUCTURE-V2 */}
         <Route path="marketing/signage" element={<Navigate to="/store/marketing/signage/playlist" replace />} />
         <Route path="marketing/signage/playlist" element={<StoreSignageMainPage />} />
+        <Route path="marketing/signage/playlist/new" element={<StorePlaylistCreatePage />} />
         <Route path="marketing/signage/videos" element={<StoreSignageMainPage />} />
         <Route path="marketing/signage/schedules" element={<StoreSignageMainPage />} />
         <Route path="marketing/signage/player" element={<SignagePlayerSelectPage />} />
