@@ -15,6 +15,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Card, useTemplate } from '@o4o/ui';
+// WO-O4O-STORE-HOME-KCOSMETICS-ADOPT-V1:
+// canonical StoreHomeShell 2번째 소비처. 다중 매장 selector 를 storeSelectorSlot 으로 수렴.
+// 기존 5-block 운영 대시보드(KPI/상품/사이니지/AI인사이트/최근주문)는 의미·순서 그대로 유지.
+import { StoreHomeShell } from '@o4o/store-ui-core';
 import {
   storeApi,
   type StoreInfo,
@@ -253,6 +257,31 @@ export default function StoreCockpitPage() {
   return (
     <div className="space-y-6">
       {/* ================================================================== */}
+      {/* WO-O4O-STORE-HOME-KCOSMETICS-ADOPT-V1: canonical StoreHomeShell */}
+      {/* 다중 매장 선택을 storeSelectorSlot 으로 흡수 (canonical 최상단).      */}
+      {/* 단일 매장이면 slot=null → 미표시. 데이터 fetch/storeId 스코프는       */}
+      {/* service-local(handleStoreChange)에 유지 — 셸은 API 를 알지 않음.     */}
+      {/* ================================================================== */}
+      <StoreHomeShell
+        storeSelectorSlot={
+          stores.length > 1 ? (
+            <div className="flex justify-end">
+              <select
+                value={selectedStore?.id || ''}
+                onChange={(e) => handleStoreChange(e.target.value)}
+                className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary"
+                aria-label="매장 선택"
+              >
+                {stores.map(s => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </select>
+            </div>
+          ) : null
+        }
+      />
+
+      {/* ================================================================== */}
       {/* Block 1: Store Status Header */}
       {/* ================================================================== */}
       <Card className="p-6">
@@ -283,21 +312,9 @@ export default function StoreCockpitPage() {
             </div>
           </div>
 
-          {/* Store selector (if multiple stores) */}
+          {/* Quick action buttons */}
+          {/* 매장 선택 select 는 StoreHomeShell.storeSelectorSlot 로 이동 (WO-O4O-STORE-HOME-KCOSMETICS-ADOPT-V1) */}
           <div className="flex items-center gap-3">
-            {stores.length > 1 && (
-              <select
-                value={selectedStore?.id || ''}
-                onChange={(e) => handleStoreChange(e.target.value)}
-                className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary"
-              >
-                {stores.map(s => (
-                  <option key={s.id} value={s.id}>{s.name}</option>
-                ))}
-              </select>
-            )}
-
-            {/* Quick action buttons */}
             <NavLink
               to="/operator/products"
               className="px-3 py-2 text-sm bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition"
