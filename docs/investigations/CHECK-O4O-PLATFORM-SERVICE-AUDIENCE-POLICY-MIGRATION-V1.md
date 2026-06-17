@@ -88,4 +88,4 @@
 
 ## 12. commit hash
 
-- (commit 후 기재)
+- `f817f7e22` — feat(platform): migrate service-audience policy ownership to platform-admin (WO-O4O-PLATFORM-SERVICE-AUDIENCE-POLICY-MIGRATION-V1)
