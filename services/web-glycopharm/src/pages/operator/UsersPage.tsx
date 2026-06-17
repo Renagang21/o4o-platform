@@ -82,6 +82,9 @@ const gpMembersClient: MembersConsoleClient = {
     usp.set('serviceKey', 'glycopharm');
     if (params.status) usp.set('status', params.status);
     if (params.search) usp.set('search', params.search);
+    // WO-O4O-OPERATOR-MEMBERS-STANDARD-LIST-ADOPTION-V1: 서버 정렬 forward
+    if (params.sortBy) usp.set('sortBy', params.sortBy);
+    if (params.sortOrder) usp.set('sortOrder', params.sortOrder);
     const { data } = await api.get(`/operator/members?${usp}`);
     return { users: data.users || [], pagination: data.pagination };
   },
@@ -230,6 +233,8 @@ export default function UsersPage() {
     <OperatorMembersConsolePage
       serviceKey="glycopharm"
       client={gpMembersClient}
+      serverSort
+      syncUrl
       getPrimaryRole={getPrimaryRole}
       roleDisplayMap={GP_ROLE_DISPLAY}
       roleColumnHeader="회원 유형"

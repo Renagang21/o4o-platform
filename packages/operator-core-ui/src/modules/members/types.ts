@@ -53,6 +53,9 @@ export interface MembersConsoleListParams {
   limit: number;
   status?: string;
   search?: string;
+  // WO-O4O-OPERATOR-MEMBERS-STANDARD-LIST-ADOPTION-V1: 서버 정렬(opt-in). adapter 가 forward.
+  sortBy?: string;
+  sortOrder?: 'ASC' | 'DESC';
 }
 
 export interface MembersConsoleListResponse {
@@ -262,4 +265,10 @@ export interface OperatorMembersConsolePageProps {
 
   /** DataTable tableId (for column persistence). Default: `{serviceKey}-operator-members`. */
   tableId?: string;
+
+  // WO-O4O-OPERATOR-MEMBERS-STANDARD-LIST-ADOPTION-V1 (Targeted, opt-in — admin 화면 무변경)
+  /** true 면 컬럼 클릭이 서버 정렬(email/createdAt)로 연결되고 sortBy/sortOrder 를 client.list 에 전달. 기본 false=기존 클라이언트 정렬. */
+  serverSort?: boolean;
+  /** true 면 tab/search/page/sort 를 URL query(`members_*`)와 동기화하고 새로고침 시 복원. 기본 false. */
+  syncUrl?: boolean;
 }

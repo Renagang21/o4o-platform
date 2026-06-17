@@ -18,6 +18,8 @@
  */
 
 import { useState, useEffect, useCallback, useMemo, type ReactNode } from 'react';
+// WO-O4O-OPERATOR-MEMBERS-STANDARD-LIST-ADOPTION-V1: URL query sync(opt-in)
+import { useSearchParams } from 'react-router-dom';
 import {
   Users,
   CheckCircle,
@@ -51,6 +53,7 @@ import type { ListColumnDef, MemberTab, BuiltAction } from '@o4o/operator-ux-cor
 import { toast } from '@o4o/error-handling';
 import type {
   MembersConsoleClient,
+  MembersConsoleListParams,
   OperatorMembersConsolePageProps,
   PaginationData,
   UserData,
@@ -226,13 +229,31 @@ export function OperatorMembersConsolePage({
   renderDeleteFlow,
   searchPlaceholder,
   tableId,
+  // WO-O4O-OPERATOR-MEMBERS-STANDARD-LIST-ADOPTION-V1 (opt-in)
+  serverSort = false,
+  syncUrl = false,
 }: OperatorMembersConsolePageProps) {
   const getPrimaryRole = useMemo(
     () => getPrimaryRoleProp ?? defaultGetPrimaryRole(serviceKey),
     [getPrimaryRoleProp, serviceKey],
   );
 
-  const [activeTab, setActiveTab] = useState('all');
+  // ─── URL query sync (opt-in) ─────────────────────────────────
+  const [searchParams, setSearchParams] = useSearchParams();
+  const uk = (key: string) => `members_${key}`;
+  const initParam = (key: string) => (syncUrl ? searchParams.get(uk(key)) : null);
+  const initPage = (() => {
+    const p = parseInt(initParam('page') || '', 10);
+    return Number.isFinite(p) && p > 0 ? p : 1;
+  })();
+  const initOrder = initParam('sortOrder');
+
+  const [activeTab, setActiveTab] = useState(() => initParam('tab') || 'all');
+  const [page, setPage] = useState<number>(initPage);
+  const [sortBy, setSortBy] = useState<string>(() => initParam('sortBy') || 'createdAt');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(
+    initOrder === 'asc' || initOrder === 'desc' ? initOrder : 'desc',
+  );
   const [users, setUsers] = useState<UserData[]>([]);
   const [pagination, setPagination] = useState<PaginationData>({
     page: 1,
@@ -242,8 +263,8 @@ export function OperatorMembersConsolePage({
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [search, setSearch] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [search, setSearch] = useState(() => initParam('search') || '');
+  const [searchQuery, setSearchQuery] = useState(() => initParam('search') || '');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [passwordUser, setPasswordUser] = useState<UserData | null>(null);
   const [editUser, setEditUser] = useState<UserData | null>(null);
@@ -263,18 +284,20 @@ export function OperatorMembersConsolePage({
 
   // ─── Fetch ──────────────────────────────────────────────────
 
+  // page 는 state 기반(URL sync/복원 대응). 별도 인자 없이 현재 page 를 조회.
   const fetchUsers = useCallback(
-    async (page = 1) => {
+    async () => {
       setLoading(true);
       setError('');
       try {
         const activeStatusTab = (statusTabs ?? []).find((t) => t.key === activeTab);
-        const params = {
+        const params: MembersConsoleListParams = {
           page,
           limit: 20,
           ...(activeTab === 'pending' ? { status: 'pending' } : {}),
           ...(activeStatusTab ? { status: activeStatusTab.status } : {}),
           ...(searchQuery ? { search: searchQuery } : {}),
+          ...(serverSort ? { sortBy, sortOrder: sortOrder.toUpperCase() as 'ASC' | 'DESC' } : {}),
         };
         const data = await client.list(params);
         setUsers(data.users || []);
@@ -285,7 +308,7 @@ export function OperatorMembersConsolePage({
         setLoading(false);
       }
     },
-    [client, activeTab, searchQuery, statusTabs],
+    [client, page, activeTab, searchQuery, statusTabs, serverSort, sortBy, sortOrder],
   );
 
   const fetchStats = useCallback(async () => {
@@ -320,17 +343,46 @@ export function OperatorMembersConsolePage({
   }, [client, roleTabs, statusTabs, getPrimaryRole]);
 
   useEffect(() => {
-    fetchUsers(1);
+    void fetchUsers();
   }, [fetchUsers]);
   useEffect(() => {
     fetchStats();
   }, [fetchStats]);
 
-  // Reset selection on tab/search change
+  // WO-O4O-OPERATOR-MEMBERS-STANDARD-LIST-ADOPTION-V1: URL query sync (opt-in)
+  useEffect(() => {
+    if (!syncUrl) return;
+    setSearchParams(
+      (prev) => {
+        const sp = new URLSearchParams(prev);
+        const put = (key: string, v: string | undefined) => {
+          if (!v) sp.delete(uk(key));
+          else sp.set(uk(key), v);
+        };
+        put('tab', activeTab !== 'all' ? activeTab : undefined);
+        put('search', searchQuery || undefined);
+        put('page', page > 1 ? String(page) : undefined);
+        put('sortBy', serverSort && sortBy !== 'createdAt' ? sortBy : undefined);
+        put('sortOrder', serverSort && sortOrder !== 'desc' ? sortOrder : undefined);
+        return sp;
+      },
+      { replace: true },
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [syncUrl, serverSort, activeTab, searchQuery, page, sortBy, sortOrder]);
+
+  // Reset selection on tab/search/page/sort change
   useEffect(() => {
     setSelectedIds(new Set());
     setSelectedUser(null);
-  }, [activeTab, searchQuery]);
+  }, [activeTab, searchQuery, page, sortBy, sortOrder]);
+
+  // 서버 정렬 변경 — page=1 reset
+  const handleSort = useCallback((key: string, order: 'asc' | 'desc') => {
+    setSortBy(key);
+    setSortOrder(order);
+    setPage(1);
+  }, []);
 
   // ─── Status & Password Handlers ─────────────────────────────
 
@@ -344,7 +396,7 @@ export function OperatorMembersConsolePage({
     try {
       await client.updateStatus(userId, status, currentStatus, user);
       setSelectedUser(null);
-      fetchUsers(pagination.page);
+      fetchUsers();
       fetchStats();
     } catch (err: any) {
       toast.error(err?.message || '오류가 발생했습니다.');
@@ -382,7 +434,7 @@ export function OperatorMembersConsolePage({
     );
     if (result.successCount > 0) {
       setSelectedIds(new Set());
-      fetchUsers(pagination.page);
+      fetchUsers();
       fetchStats();
     }
   };
@@ -395,7 +447,7 @@ export function OperatorMembersConsolePage({
     );
     if (result.successCount > 0) {
       setSelectedIds(new Set());
-      fetchUsers(pagination.page);
+      fetchUsers();
       fetchStats();
     }
   };
@@ -443,7 +495,7 @@ export function OperatorMembersConsolePage({
         const result = await batch.executeBatch(action.executeBatch, targetIds);
         if (result.successCount > 0) {
           setSelectedIds(new Set());
-          fetchUsers(pagination.page);
+          fetchUsers();
           fetchStats();
         }
       },
@@ -506,7 +558,8 @@ export function OperatorMembersConsolePage({
     {
       key: 'name',
       header: '이름',
-      sortable: true,
+      // 서버 정렬(serverSort)에는 'name' 단일 키가 없음(firstName/lastName 분리) → client 정렬 모드에서만 sortable
+      sortable: !serverSort,
       width: '180px',
       sortAccessor: (u) => getUserName(u),
       render: (_v, user) => (
@@ -584,7 +637,7 @@ export function OperatorMembersConsolePage({
           confirm: a.confirm,
           onClick: async () => {
             await a.onClick(user);
-            fetchUsers(pagination.page);
+            fetchUsers();
             fetchStats();
           },
         }));
@@ -687,15 +740,21 @@ export function OperatorMembersConsolePage({
         description={description}
         tabs={tabs}
         activeTab={activeTab}
-        onTabChange={(key) => setActiveTab(key)}
+        onTabChange={(key) => {
+          setActiveTab(key);
+          setPage(1);
+        }}
         search={search}
         onSearchChange={setSearch}
-        onSearch={(q) => setSearchQuery(q)}
+        onSearch={(q) => {
+          setSearchQuery(q);
+          setPage(1);
+        }}
         {...(searchPlaceholder !== undefined && { searchPlaceholder })}
         headerActions={
           <button
             onClick={() => {
-              fetchUsers(pagination.page);
+              fetchUsers();
               fetchStats();
             }}
             className="flex items-center gap-2 px-4 py-2 text-sm border border-slate-300 rounded-lg hover:bg-slate-50"
@@ -726,7 +785,7 @@ export function OperatorMembersConsolePage({
           open={batch.showResult}
           onClose={() => {
             batch.clearResult();
-            fetchUsers(pagination.page);
+            fetchUsers();
             fetchStats();
           }}
           result={batch.result}
@@ -747,25 +806,28 @@ export function OperatorMembersConsolePage({
           selectable
           selectedKeys={selectedIds}
           onSelectionChange={setSelectedIds}
+          {...(serverSort
+            ? { manualSort: true, sortBy, sortOrder, onSort: handleSort }
+            : {})}
         />
 
         {/* Pagination */}
         {(activeTab === 'all' || activeTab === 'pending') && pagination.totalPages > 1 && (
           <div className="flex items-center justify-center gap-3 mt-4">
             <button
-              onClick={() => fetchUsers(Math.max(1, pagination.page - 1))}
-              disabled={pagination.page <= 1}
+              onClick={() => setPage(Math.max(1, page - 1))}
+              disabled={page <= 1}
               className="flex items-center gap-1 px-3 py-2 border rounded-lg disabled:opacity-50 hover:bg-slate-50"
             >
               <ChevronLeft className="w-4 h-4" />
               이전
             </button>
             <span className="text-sm text-slate-600">
-              {pagination.page} / {pagination.totalPages}
+              {page} / {pagination.totalPages}
             </span>
             <button
-              onClick={() => fetchUsers(Math.min(pagination.totalPages, pagination.page + 1))}
-              disabled={pagination.page >= pagination.totalPages}
+              onClick={() => setPage(Math.min(pagination.totalPages, page + 1))}
+              disabled={page >= pagination.totalPages}
               className="flex items-center gap-1 px-3 py-2 border rounded-lg disabled:opacity-50 hover:bg-slate-50"
             >
               다음
@@ -920,7 +982,7 @@ export function OperatorMembersConsolePage({
           client={client}
           onClose={() => setPasswordUser(null)}
           onSuccess={() => {
-            fetchUsers(pagination.page);
+            fetchUsers();
           }}
         />
       )}
@@ -931,7 +993,7 @@ export function OperatorMembersConsolePage({
           user: editUser,
           onClose: () => setEditUser(null),
           onSuccess: () => {
-            fetchUsers(pagination.page);
+            fetchUsers();
           },
         })}
 
@@ -942,7 +1004,7 @@ export function OperatorMembersConsolePage({
           user: deleteTarget,
           onClose: () => setDeleteTarget(null),
           onDeleted: () => {
-            fetchUsers(pagination.page);
+            fetchUsers();
             fetchStats();
             setDeleteTarget(null);
           },

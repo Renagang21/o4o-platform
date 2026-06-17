@@ -109,6 +109,9 @@ const netureMembersClient: MembersConsoleClient = {
     usp.set('serviceKey', 'neture');
     if (params.status) usp.set('status', params.status);
     if (params.search) usp.set('search', params.search);
+    // WO-O4O-OPERATOR-MEMBERS-STANDARD-LIST-ADOPTION-V1: 서버 정렬 forward
+    if (params.sortBy) usp.set('sortBy', params.sortBy);
+    if (params.sortOrder) usp.set('sortOrder', params.sortOrder);
     const { data } = await api.get(`/operator/members?${usp}`);
     return { users: data.users || [], pagination: data.pagination };
   },
@@ -256,6 +259,8 @@ export default function UsersManagementPage() {
     <OperatorMembersConsolePage
       serviceKey="neture"
       client={netureMembersClient}
+      serverSort
+      syncUrl
       roleTabs={[
         { key: 'supplier', label: '공급자', roleFilter: ['supplier', 'neture:supplier'] },
         { key: 'partner', label: '파트너', roleFilter: ['partner', 'neture:partner'] },
