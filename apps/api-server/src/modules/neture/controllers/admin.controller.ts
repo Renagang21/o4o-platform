@@ -310,6 +310,32 @@ export function createAdminController(dataSource: DataSource): Router {
   });
 
   /**
+   * GET /admin/products/summary
+   * 승인 상태별 전체 집계 (WO-O4O-ADMIN-PRODUCT-APPROVAL-BACKEND-PAGINATION-V1)
+   *
+   * pagination 도입 후 list 응답만으로는 전체 KPI(전체/대기/승인/반려)를 집계할 수 없으므로
+   * 전체 기준 집계를 별도 endpoint 로 제공한다. 공통 필터(supplierId/distributionType/isActive)만 수용.
+   */
+  router.get('/products/summary', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const { supplierId, distributionType, isActive } = req.query;
+      const filters: { supplierId?: string; distributionType?: OfferDistributionType; isActive?: boolean } = {};
+      if (supplierId && typeof supplierId === 'string') filters.supplierId = supplierId;
+      if (distributionType && typeof distributionType === 'string' && Object.values(OfferDistributionType).includes(distributionType as OfferDistributionType)) {
+        filters.distributionType = distributionType as OfferDistributionType;
+      }
+      if (isActive === 'true') filters.isActive = true;
+      if (isActive === 'false') filters.isActive = false;
+
+      const summary = await netureService.getProductsSummary(filters);
+      res.json({ success: true, data: summary });
+    } catch (error) {
+      logger.error('[Neture API] Error fetching products summary:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch products summary' } });
+    }
+  });
+
+  /**
    * POST /admin/products/:id/approve
    * 상품 승인 (isActive = true)
    */
@@ -489,24 +515,66 @@ export function createAdminController(dataSource: DataSource): Router {
   /**
    * GET /admin/products
    * 전체 상품 목록 (필터: supplierId, distributionType, isActive, approvalStatus)
+   *
+   * WO-O4O-ADMIN-PRODUCT-APPROVAL-BACKEND-PAGINATION-V1:
+   *   page/limit/search/sortBy/sortOrder 를 additive 로 수용하고 pagination meta 를 추가한다.
+   *   - page/limit 미전달 시: 기존처럼 전량 반환(legacy 호환). 응답 data 배열 위치 유지.
+   *   - page/limit 전달 시: server-side pagination (limit 상한 100).
+   *   - sortBy 는 service whitelist 로 제한, 미허용 값은 createdAt fallback.
    */
   router.get('/products', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
     try {
-      const { supplierId, distributionType, isActive, approvalStatus } = req.query;
-      const filters: { supplierId?: string; distributionType?: OfferDistributionType; isActive?: boolean; approvalStatus?: OfferApprovalStatus } = {};
+      const { supplierId, distributionType, isActive, approvalStatus, search, sortBy, sortOrder, page, limit } = req.query;
+      const options: {
+        supplierId?: string;
+        distributionType?: OfferDistributionType;
+        isActive?: boolean;
+        approvalStatus?: OfferApprovalStatus;
+        search?: string;
+        sortBy?: string;
+        sortOrder?: string;
+        page?: number;
+        limit?: number;
+      } = {};
 
-      if (supplierId && typeof supplierId === 'string') filters.supplierId = supplierId;
+      if (supplierId && typeof supplierId === 'string') options.supplierId = supplierId;
       if (distributionType && typeof distributionType === 'string' && Object.values(OfferDistributionType).includes(distributionType as OfferDistributionType)) {
-        filters.distributionType = distributionType as OfferDistributionType;
+        options.distributionType = distributionType as OfferDistributionType;
       }
-      if (isActive === 'true') filters.isActive = true;
-      if (isActive === 'false') filters.isActive = false;
+      if (isActive === 'true') options.isActive = true;
+      if (isActive === 'false') options.isActive = false;
       if (approvalStatus && typeof approvalStatus === 'string' && Object.values(OfferApprovalStatus).includes(approvalStatus as OfferApprovalStatus)) {
-        filters.approvalStatus = approvalStatus as OfferApprovalStatus;
+        options.approvalStatus = approvalStatus as OfferApprovalStatus;
       }
+      if (search && typeof search === 'string') options.search = search;
+      if (sortBy && typeof sortBy === 'string') options.sortBy = sortBy;
+      if (sortOrder && typeof sortOrder === 'string') options.sortOrder = sortOrder;
 
-      const products = await netureService.getAllProducts(filters);
-      res.json({ success: true, data: products });
+      const pageNum = page !== undefined ? parseInt(String(page), 10) : undefined;
+      const limitNum = limit !== undefined ? parseInt(String(limit), 10) : undefined;
+      const hasPaging = (pageNum !== undefined && !Number.isNaN(pageNum)) || (limitNum !== undefined && !Number.isNaN(limitNum));
+      if (pageNum !== undefined && !Number.isNaN(pageNum)) options.page = pageNum;
+      if (limitNum !== undefined && !Number.isNaN(limitNum)) options.limit = limitNum;
+
+      const { items, total } = await netureService.getAllProductsPaged(options);
+
+      // pagination meta — paging 미요청 시 전체를 단일 페이지로 표현 (additive, 하위호환)
+      const effLimit = hasPaging ? Math.min(100, Math.max(1, options.limit ?? 20)) : (total || 0);
+      const effPage = hasPaging ? Math.max(1, options.page ?? 1) : 1;
+      const totalPages = hasPaging ? Math.max(1, Math.ceil(total / effLimit)) : 1;
+
+      res.json({
+        success: true,
+        data: items,
+        pagination: {
+          page: effPage,
+          limit: effLimit,
+          total,
+          totalPages,
+          hasNextPage: hasPaging ? effPage < totalPages : false,
+          hasPreviousPage: hasPaging ? effPage > 1 : false,
+        },
+      });
     } catch (error) {
       logger.error('[Neture API] Error fetching all products:', error);
       res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch products' } });

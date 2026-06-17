@@ -376,8 +376,10 @@ export interface AdminProduct {
   id: string;
   masterId: string;
   marketingName: string;
+  // WO-O4O-ADMIN-PRODUCT-APPROVAL-BACKEND-PAGINATION-V1: backend 가 함께 반환(field contract 정합)
+  masterName?: string;
   supplierName: string;
-  category: string;
+  category: string | null;
   distributionType: string;
   approvalStatus: string;
   isActive: boolean;
@@ -387,6 +389,37 @@ export interface AdminProduct {
   businessShortDescription?: string | null;
   businessDetailDescription?: string | null;
 }
+
+// WO-O4O-ADMIN-PRODUCT-APPROVAL-BACKEND-PAGINATION-V1
+export interface AdminProductPagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
+export interface AdminProductListParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  sortBy?: 'createdAt' | 'approvalStatus' | 'distributionType' | 'priceGeneral' | 'isActive';
+  sortOrder?: 'asc' | 'desc';
+  approvalStatus?: 'PENDING' | 'APPROVED' | 'REJECTED';
+  distributionType?: 'PUBLIC' | 'SERVICE' | 'PRIVATE';
+  isActive?: boolean;
+  supplierId?: string;
+}
+
+export interface AdminProductSummary {
+  total: number;
+  pending: number;
+  approved: number;
+  rejected: number;
+}
+
+const ADMIN_PRODUCT_SUMMARY_DEFAULT: AdminProductSummary = { total: 0, pending: 0, approved: 0, rejected: 0 };
 
 export const adminProductApi = {
   async getProducts(status?: string): Promise<AdminProduct[]> {
@@ -398,6 +431,61 @@ export const adminProductApi = {
       if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
       console.warn('[Admin API] Failed to fetch products:', error);
       return [];
+    }
+  },
+
+  /**
+   * WO-O4O-ADMIN-PRODUCT-APPROVAL-BACKEND-PAGINATION-V1
+   * server-driven pagination/search/sort 목록. 후속 standard list adoption 화면용.
+   * (기존 getProducts 는 그대로 유지 — 현재 화면 하위호환)
+   */
+  async getProductsList(
+    params?: AdminProductListParams,
+  ): Promise<{ data: AdminProduct[]; pagination: AdminProductPagination }> {
+    const fallback: AdminProductPagination = {
+      page: 1, limit: 20, total: 0, totalPages: 1, hasNextPage: false, hasPreviousPage: false,
+    };
+    try {
+      const sp = new URLSearchParams();
+      if (params?.page) sp.append('page', String(params.page));
+      if (params?.limit) sp.append('limit', String(params.limit));
+      if (params?.search) sp.append('search', params.search);
+      if (params?.sortBy) sp.append('sortBy', params.sortBy);
+      if (params?.sortOrder) sp.append('sortOrder', params.sortOrder);
+      if (params?.approvalStatus) sp.append('approvalStatus', params.approvalStatus);
+      if (params?.distributionType) sp.append('distributionType', params.distributionType);
+      if (params?.isActive !== undefined) sp.append('isActive', String(params.isActive));
+      if (params?.supplierId) sp.append('supplierId', params.supplierId);
+      const qs = sp.toString() ? `?${sp}` : '';
+      const response = await api.get(`/neture/admin/products${qs}`);
+      const result = response.data;
+      return { data: result.data || [], pagination: result.pagination || fallback };
+    } catch (error: any) {
+      if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
+      console.warn('[Admin API] Failed to fetch product list:', error);
+      return { data: [], pagination: fallback };
+    }
+  },
+
+  /**
+   * WO-O4O-ADMIN-PRODUCT-APPROVAL-BACKEND-PAGINATION-V1
+   * 전체 기준 승인 상태 집계 (KPI 카드용). pagination 도입 후 client 전량 집계 대체.
+   */
+  async getSummary(
+    params?: { supplierId?: string; distributionType?: string; isActive?: boolean },
+  ): Promise<AdminProductSummary> {
+    try {
+      const sp = new URLSearchParams();
+      if (params?.supplierId) sp.append('supplierId', params.supplierId);
+      if (params?.distributionType) sp.append('distributionType', params.distributionType);
+      if (params?.isActive !== undefined) sp.append('isActive', String(params.isActive));
+      const qs = sp.toString() ? `?${sp}` : '';
+      const response = await api.get(`/neture/admin/products/summary${qs}`);
+      return response.data.data || ADMIN_PRODUCT_SUMMARY_DEFAULT;
+    } catch (error: any) {
+      if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
+      console.warn('[Admin API] Failed to fetch product summary:', error);
+      return ADMIN_PRODUCT_SUMMARY_DEFAULT;
     }
   },
 

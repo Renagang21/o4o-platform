@@ -156,6 +156,29 @@ export class NetureService {
     return this.offerService.getAllProducts(filters);
   }
 
+  // WO-O4O-ADMIN-PRODUCT-APPROVAL-BACKEND-PAGINATION-V1
+  async getAllProductsPaged(options?: {
+    supplierId?: string;
+    distributionType?: OfferDistributionType;
+    isActive?: boolean;
+    approvalStatus?: OfferApprovalStatus;
+    search?: string;
+    sortBy?: string;
+    sortOrder?: string;
+    page?: number;
+    limit?: number;
+  }) {
+    return this.offerService.getAllProductsPaged(options);
+  }
+
+  async getProductsSummary(filters?: {
+    supplierId?: string;
+    distributionType?: OfferDistributionType;
+    isActive?: boolean;
+  }) {
+    return this.offerService.getProductsSummary(filters);
+  }
+
   // ==================== Suppliers (Public) ====================
 
   async getSuppliers(filters?: { category?: string; status?: SupplierStatus }) {
