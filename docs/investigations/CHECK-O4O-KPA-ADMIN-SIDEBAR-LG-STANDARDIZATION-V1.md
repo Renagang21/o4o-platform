@@ -4,7 +4,7 @@
 > **선행**: IR responsive sidebar audit · P0 drawer · operator/admin 공통 lg · GP/KCos admin flex · 누적 smoke PASS
 > **목적**: KPA admin `AdminSidebar`/`AdminLayout` 의 반응형 breakpoint 를 O4O 표준 **md(768) → lg(1024)** 로 정렬. <1024 drawer / >=1024 고정 사이드바.
 > **작성일**: 2026-06-17
-> **상태**: 코드 완료 · KPA build PASS · browser smoke 배포 후
+> **상태**: 완료 · KPA build PASS · **browser smoke PASS (배포 후 실측 — §6)**
 > **분류**: frontend-only, KPA admin 한정(공통 컴포넌트 아님)
 
 ---
@@ -80,15 +80,22 @@ AdminLayout (min-h-screen flex flex-col)
 | 공통 DomainIASidebar/OperatorAreaShell, GP/KCos DashboardLayout, store/store-hub/supplier | ✅ 미변경 |
 | backend/DB/package/lock | ✅ 변경 0 |
 
-### browser smoke (배포 후)
-```
-KPA admin (sohae2100, kpa-society.co.kr/admin) · viewport 375/768/1023/1024/wide:
-- <1024: 햄버거 표시, 사이드바 off-canvas, drawer open/close(backdrop·메뉴선택), 본문 full-width(margin 잔재 0)
-- >=1024: 사이드바 고정(260px), 본문 lg:ml-[260px] 겹침 없음
-- horizontal scroll 0, active menu, console error 0, route broken 0
-- 1023↔1024 경계 전환 정상
-```
-> 동일 패턴(fixed+margin, lg)은 GP/KCos admin 에서 누적 smoke PASS 검증됨 → 회귀 위험 낮음.
+### browser smoke (배포 후 — **수행 완료, PASS**)
+운영 배포(web deploy success) 후 Playwright 실측 (`kpa-society.co.kr/admin`, sohae2100 admin):
+
+| viewport | #admin-sidebar | main | h-scroll | 판정 |
+|---------:|----------------|------|:--------:|:----:|
+| 1023 | **fixed, left -260 off-canvas** | left 0, **marginLeft 0px** | false | PASS |
+| drawer open(1023) | left 0, backdrop 표시 | — | false | PASS |
+| backdrop click | left -260 close, backdrop 제거 | — | — | PASS |
+| 1024 | **fixed, translateX(0), left 0, w 260 (표시)** | left **260, marginLeft 260px** (겹침 없음: aside.right 260 ≤ main.left 260) | false | PASS |
+| 햄버거(1024) | 숨김 | — | — | PASS |
+
+- md→lg 검증: 1023(<lg) 사이드바 off-canvas + 본문 margin 0 / 1024(>=lg) 사이드바 고정 + 본문 ml-260. 경계 전환 정상.
+- console error: 사이드바 무관한 법정문서 미게시 404(policies/legal `published/terms·privacy`)만 — **데이터 상태, 본 변경 무관**. 사이드바 관련 error 0.
+- route broken 0, active menu 정상.
+
+> 동일 패턴(fixed+margin, lg)은 GP/KCos admin 누적 smoke 와도 정합.
 
 ---
 
