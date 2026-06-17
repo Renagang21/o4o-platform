@@ -9,8 +9,9 @@
  * - NavLink 활성 상태 표시기
  */
 
+import { useState, useEffect } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { Home, ShoppingCart, Monitor, FileText, Tag, BookOpen, Megaphone, QrCode } from 'lucide-react';
+import { Home, ShoppingCart, Monitor, FileText, Tag, BookOpen, Megaphone, QrCode, Menu } from 'lucide-react';
 // WO-O4O-STORE-FACING-FOOTER-COVERAGE-V1: store-facing compact 푸터
 import { StoreFacingFooter } from '@o4o/shared-space-ui';
 import { loadFooterLegal } from '../../lib/footerLegal';
@@ -98,12 +99,52 @@ const HUB_MENU: HubMenuItem[] = [
 ];
 
 export function GlycoPharmHubLayout() {
+  // WO-O4O-RESPONSIVE-SIDEBAR-P0-BROKEN-MOBILE-DRAWER-FIX-V1:
+  //   <1024px(lg) 에서 sidebar 를 drawer 로 전환 (hamburger + overlay + 자동 close + ESC).
+  //   desktop(>=lg) 은 기존 sticky 사이드바 동작 유지. 메뉴/라우팅/권한 변경 없음.
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const closeMobile = () => setMobileOpen(false);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setMobileOpen(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [mobileOpen]);
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <div className="max-w-5xl mx-auto px-4 py-8 w-full flex-1">
+        {/* Mobile-only sidebar toggle — desktop(lg) 숨김 */}
+        <button
+          type="button"
+          onClick={() => setMobileOpen(true)}
+          aria-label="허브 메뉴 열기"
+          aria-expanded={mobileOpen}
+          aria-controls="glyco-hub-sidebar"
+          className="lg:hidden mb-4 flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+        >
+          <Menu className="w-5 h-5" />
+          허브 메뉴
+        </button>
+
+        {/* Mobile drawer backdrop */}
+        {mobileOpen && (
+          <div
+            className="lg:hidden fixed inset-x-0 top-16 bottom-0 bg-black/40 z-30"
+            onClick={closeMobile}
+            aria-hidden="true"
+          />
+        )}
+
         <div className="flex gap-6 items-start">
-          {/* ── 좌측 사이드바 ── */}
-          <aside className="w-52 shrink-0 bg-white border border-slate-200 rounded-xl overflow-hidden sticky top-20">
+          {/* ── 좌측 사이드바 (mobile drawer / desktop sticky) ── */}
+          <aside
+            id="glyco-hub-sidebar"
+            className={`bg-white border border-slate-200 overflow-y-auto z-40 w-72 max-w-[85%] fixed left-0 top-16 bottom-0 transition-transform duration-200 ease-out lg:static lg:top-20 lg:bottom-auto lg:left-auto lg:z-auto lg:w-52 lg:max-w-none lg:shrink-0 lg:self-start lg:rounded-xl lg:overflow-hidden lg:transition-none lg:translate-x-0 lg:sticky ${
+              mobileOpen ? 'translate-x-0' : '-translate-x-full'
+            }`}
+          >
             <div className="px-4 py-4 border-b border-slate-100">
               <h2 className="text-sm font-bold text-slate-800">매장 운영 허브</h2>
               <p className="text-xs text-slate-400 mt-0.5">플랫폼 자원을 탐색하고 내 매장에 가져갑니다</p>
@@ -137,6 +178,7 @@ export function GlycoPharmHubLayout() {
                     key={item.key}
                     to={item.to}
                     end={item.end}
+                    onClick={closeMobile}
                     className={({ isActive }) =>
                       `flex items-start gap-3 px-4 py-3 transition-colors relative ${
                         isActive

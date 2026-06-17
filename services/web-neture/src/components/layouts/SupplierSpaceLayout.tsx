@@ -10,7 +10,7 @@
  * - 스코프: /supplier/*
  */
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link, Outlet, useLocation, Navigate } from 'react-router-dom';
 import {
   Home,
@@ -25,6 +25,7 @@ import {
   Settings,
   ChevronRight,
   ChevronDown,
+  Menu,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
@@ -161,6 +162,91 @@ export default function SupplierSpaceLayout() {
     [wideMode],
   );
 
+  // WO-O4O-RESPONSIVE-SIDEBAR-P0-BROKEN-MOBILE-DRAWER-FIX-V1:
+  //   <1024px(lg) 에서 group-level 수평 탭(중첩 메뉴 도달 불가)을 전체 메뉴 drawer 로 교체.
+  //   hamburger + overlay + 자동 close + ESC. desktop(>=lg) 은 기존 사이드바 동작 유지.
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const closeMobile = () => setMobileOpen(false);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setMobileOpen(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [mobileOpen]);
+
+  // 사이드바 nav 렌더 — desktop 사이드바 / mobile drawer 양쪽 재사용.
+  //   onNavigate: 메뉴(Link) 선택 시 호출(mobile drawer 에서만 closeMobile 전달). 그룹 토글은 close 안 함.
+  const renderNav = (onNavigate?: () => void) => (
+    <>
+      {SUPPLIER_SIDEBAR_GROUPS.map((group) => {
+        const Icon = group.icon;
+        const active = isGroupActive(group);
+        const isOpen = openGroups.has(group.label);
+        const isSingle = group.items.length === 1;
+
+        if (isSingle) {
+          const item = group.items[0];
+          return (
+            <Link
+              key={group.label}
+              to={item.path}
+              onClick={onNavigate}
+              className={`flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors border-l-2 ${
+                isItemActive(item.path, item.exact)
+                  ? 'bg-primary-50 text-primary-600 border-primary-600'
+                  : 'text-gray-600 border-transparent hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <Icon size={18} />
+              {item.label}
+            </Link>
+          );
+        }
+
+        return (
+          <div key={group.label}>
+            <button
+              onClick={() => toggleGroup(group.label)}
+              className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors border-l-2 ${
+                active
+                  ? 'text-primary-600 border-primary-600'
+                  : 'text-gray-600 border-transparent hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <Icon size={18} />
+              <span className="flex-1 text-left">{group.label}</span>
+              {isOpen ? (
+                <ChevronDown className="w-4 h-4 text-gray-400" />
+              ) : (
+                <ChevronRight className="w-4 h-4 text-gray-400" />
+              )}
+            </button>
+
+            {isOpen && (
+              <div className="pb-1">
+                {group.items.map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={onNavigate}
+                    className={`block pl-11 pr-4 py-2 text-sm transition-colors ${
+                      isItemActive(item.path, item.exact)
+                        ? 'text-primary-600 bg-primary-50 font-medium'
+                        : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </>
+  );
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -199,100 +285,45 @@ export default function SupplierSpaceLayout() {
           wideMode ? 'max-w-none' : 'max-w-[1400px]'
         }`}
       >
+        {/* Mobile-only sidebar toggle — desktop(lg) 숨김 */}
+        <button
+          type="button"
+          onClick={() => setMobileOpen(true)}
+          aria-label="공급자 메뉴 열기"
+          aria-expanded={mobileOpen}
+          aria-controls="supplier-sidebar"
+          className="lg:hidden mb-4 flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+        >
+          <Menu className="w-5 h-5" />
+          공급자 메뉴
+        </button>
+
+        {/* Mobile drawer backdrop */}
+        {mobileOpen && (
+          <div
+            className="lg:hidden fixed inset-x-0 top-16 bottom-0 bg-black/40 z-30"
+            onClick={closeMobile}
+            aria-hidden="true"
+          />
+        )}
+
         <div className="flex gap-6">
-          {/* Desktop Sidebar */}
-          <aside className="w-60 flex-shrink-0 hidden md:block">
+          {/* Desktop Sidebar (>=lg) */}
+          <aside className="w-60 flex-shrink-0 hidden lg:block">
             <nav className="bg-white rounded-xl border border-gray-200 overflow-hidden sticky top-20">
-              {SUPPLIER_SIDEBAR_GROUPS.map((group) => {
-                const Icon = group.icon;
-                const active = isGroupActive(group);
-                const isOpen = openGroups.has(group.label);
-                const isSingle = group.items.length === 1;
-
-                if (isSingle) {
-                  const item = group.items[0];
-                  return (
-                    <Link
-                      key={group.label}
-                      to={item.path}
-                      className={`flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors border-l-2 ${
-                        isItemActive(item.path, item.exact)
-                          ? 'bg-primary-50 text-primary-600 border-primary-600'
-                          : 'text-gray-600 border-transparent hover:bg-gray-50 hover:text-gray-900'
-                      }`}
-                    >
-                      <Icon size={18} />
-                      {item.label}
-                    </Link>
-                  );
-                }
-
-                return (
-                  <div key={group.label}>
-                    <button
-                      onClick={() => toggleGroup(group.label)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors border-l-2 ${
-                        active
-                          ? 'text-primary-600 border-primary-600'
-                          : 'text-gray-600 border-transparent hover:bg-gray-50 hover:text-gray-900'
-                      }`}
-                    >
-                      <Icon size={18} />
-                      <span className="flex-1 text-left">{group.label}</span>
-                      {isOpen ? (
-                        <ChevronDown className="w-4 h-4 text-gray-400" />
-                      ) : (
-                        <ChevronRight className="w-4 h-4 text-gray-400" />
-                      )}
-                    </button>
-
-                    {isOpen && (
-                      <div className="pb-1">
-                        {group.items.map((item) => (
-                          <Link
-                            key={item.path}
-                            to={item.path}
-                            className={`block pl-11 pr-4 py-2 text-sm transition-colors ${
-                              isItemActive(item.path, item.exact)
-                                ? 'text-primary-600 bg-primary-50 font-medium'
-                                : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
-                            }`}
-                          >
-                            {item.label}
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+              {renderNav()}
             </nav>
           </aside>
 
-          {/* Mobile Navigation */}
-          <div className="md:hidden w-full mb-4">
-            <nav className="flex gap-1 overflow-x-auto bg-white rounded-xl border border-gray-200 p-1">
-              {SUPPLIER_SIDEBAR_GROUPS.map((group) => {
-                const Icon = group.icon;
-                const active = isGroupActive(group);
-                const firstPath = group.items[0].path;
-                return (
-                  <Link
-                    key={group.label}
-                    to={firstPath}
-                    className={`flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg whitespace-nowrap transition-colors ${
-                      active
-                        ? 'bg-primary-50 text-primary-600'
-                        : 'text-gray-500 hover:text-gray-700'
-                    }`}
-                  >
-                    <Icon size={14} />
-                    {group.label}
-                  </Link>
-                );
-              })}
-            </nav>
-          </div>
+          {/* Mobile drawer (<lg) — 전체 메뉴(중첩 포함) */}
+          <aside
+            id="supplier-sidebar"
+            className={`lg:hidden fixed left-0 top-16 bottom-0 z-40 w-72 max-w-[85%] bg-white border-r border-gray-200 overflow-y-auto transition-transform duration-200 ease-out ${
+              mobileOpen ? 'translate-x-0' : '-translate-x-full'
+            }`}
+          >
+            <nav>{renderNav(closeMobile)}</nav>
+          </aside>
 
           {/* Main Content */}
           <main className="flex-1 min-w-0">
