@@ -9,42 +9,33 @@
  * 표준에 따라 @o4o/operator-ux-core 의 DataTable 만 사용한다.
  */
 
-import { useState, useEffect, useMemo, type ReactNode } from 'react';
+import { useState, useEffect, useMemo, useCallback, type ReactNode } from 'react';
 import { ChevronRight } from 'lucide-react';
-import { DataTable, Pagination, type ListColumnDef } from '@o4o/operator-ux-core';
-import { useStoresQuery } from './useStoresQuery';
+// WO-O4O-OPERATOR-STORES-STANDARD-LIST-ADOPTION-V1: 표준 리스트 상태 계층(STANDARD-LIST-CORE) 적용.
+import {
+  DataTable,
+  Pagination,
+  StandardListToolbar,
+  useStandardListQuery,
+  type ListColumnDef,
+  type StandardListQueryState,
+  type StandardSortOrder,
+} from '@o4o/operator-ux-core';
 import type {
   OperatorStoreBase,
   OperatorStoresListProps,
   StoresConfig,
+  StoresListStats,
+  StoresListResponse,
 } from './types';
 
-// ─── Color scheme tokens ─────────────────────────────────────────────────────
+// ─── Defaults ────────────────────────────────────────────────────────────────
 
-const SCHEME_TOKENS: Record<NonNullable<StoresConfig['colorScheme']>, {
-  primary: string;
-  primaryHover: string;
-  primaryText: string;
-  searchRing: string;
-}> = {
-  slate: {
-    primary: 'bg-slate-700',
-    primaryHover: 'hover:bg-slate-800',
-    primaryText: 'text-slate-700',
-    searchRing: 'focus:ring-blue-500',
-  },
-  primary: {
-    primary: 'bg-primary-600',
-    primaryHover: 'hover:bg-primary-700',
-    primaryText: 'text-primary-700',
-    searchRing: 'focus:ring-primary-500',
-  },
-  pink: {
-    primary: 'bg-pink-600',
-    primaryHover: 'hover:bg-pink-700',
-    primaryText: 'text-pink-700',
-    searchRing: 'focus:ring-pink-500',
-  },
+const DEFAULT_STATS: StoresListStats = {
+  totalStores: 0,
+  activeStores: 0,
+  withChannel: 0,
+  withProducts: 0,
 };
 
 // ─── Default columns ─────────────────────────────────────────────────────────
@@ -206,35 +197,70 @@ export function OperatorStoresList<T extends OperatorStoreBase = OperatorStoreBa
     tableId,
   } = props;
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [searchInput, setSearchInput] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  // stats 는 동일 응답에서 추출 — fetcher side-channel 로 보관(useStandardListQuery 는 items/pagination 만 반환).
+  const [stats, setStats] = useState<StoresListStats>(DEFAULT_STATS);
 
-  const tokens = SCHEME_TOKENS[config.colorScheme ?? 'slate'];
+  // WO-O4O-OPERATOR-STORES-STANDARD-LIST-ADOPTION-V1:
+  // 기존 StoresApi.listStores 그대로 사용 — query state → 기존 query param 매핑(adapter).
+  const fetcher = useCallback(
+    async (q: StandardListQueryState): Promise<StoresListResponse<T>> => {
+      const res = await api.listStores({
+        page: q.page,
+        limit: q.limit,
+        ...(q.search ? { search: q.search } : {}),
+        sortBy: q.sortBy,
+        sortOrder: q.sortOrder ? (q.sortOrder.toUpperCase() as 'ASC' | 'DESC') : undefined,
+      });
+      if (res?.success) setStats(res.stats ?? DEFAULT_STATS);
+      return res;
+    },
+    [api],
+  );
 
-  const { stores, stats, pagination, loading, error, refetch } = useStoresQuery<T>({
-    api,
-    page: currentPage,
-    search: searchTerm,
-    pageSize,
-    sortBy: defaultSort.field,
-    sortOrder: defaultSort.order,
+  const {
+    items: stores,
+    pagination,
+    query,
+    loading,
+    error,
+    setPage,
+    setSearch,
+    refetch,
+  } = useStandardListQuery<T, StoresListResponse<T>>({
+    defaultLimit: pageSize,
+    defaultSortBy: defaultSort.field,
+    defaultSortOrder: defaultSort.order.toLowerCase() as StandardSortOrder,
+    syncUrl: true,
+    urlKeyPrefix: 'stores',
+    fetcher,
+    // 응답이 { success, stores, pagination } — domain key(stores) 명시 흡수.
+    normalize: (res) => {
+      const p = res?.pagination ?? { page: 1, limit: pageSize, total: 0, totalPages: 1 };
+      return {
+        data: res?.stores ?? [],
+        pagination: {
+          page: p.page,
+          limit: p.limit,
+          total: p.total,
+          totalPages: p.totalPages,
+          hasNextPage: p.page < p.totalPages,
+          hasPreviousPage: p.page > 1,
+        },
+      };
+    },
   });
 
-  // Reset selection on search/page change
+  const errorMessage = error
+    ? error instanceof Error
+      ? error.message
+      : '매장 데이터를 불러올 수 없습니다'
+    : null;
+
+  // 검색/페이지/정렬 변경 시 선택 초기화
   useEffect(() => {
     setSelectedIds(new Set());
-  }, [searchTerm, currentPage]);
-
-  const handleSearch = () => {
-    setSearchTerm(searchInput);
-    setCurrentPage(1);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') handleSearch();
-  };
+  }, [query]);
 
   // Default columns + optional rowActionsExtra column appended
   const effectiveColumns = useMemo<ListColumnDef<T>[]>(() => {
@@ -307,10 +333,10 @@ export function OperatorStoresList<T extends OperatorStoreBase = OperatorStoreBa
       </div>
 
       {/* Error */}
-      {error && (
+      {errorMessage && (
         <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-center gap-3">
           <svg className="w-5 h-5 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-          <p className="text-sm text-amber-800">{error}</p>
+          <p className="text-sm text-amber-800">{errorMessage}</p>
         </div>
       )}
 
@@ -342,27 +368,14 @@ export function OperatorStoresList<T extends OperatorStoreBase = OperatorStoreBa
 
       {/* Search + Table */}
       <div>
+        {/* WO-O4O-OPERATOR-STORES-STANDARD-LIST-ADOPTION-V1: 표준 도구막대(검색 디바운스 + page=1 reset) */}
         <div className="mb-4">
-          <div className="flex items-center gap-3">
-            <div className="relative flex-1">
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-              <input
-                type="text"
-                placeholder={resolvedSearchPlaceholder}
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                className={`w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 ${tokens.searchRing} focus:border-transparent text-sm`}
-              />
-            </div>
-            <button
-              type="button"
-              onClick={handleSearch}
-              className={`px-4 py-2 ${tokens.primary} text-white rounded-lg ${tokens.primaryHover} transition-colors text-sm font-medium`}
-            >
-              검색
-            </button>
-          </div>
+          <StandardListToolbar
+            searchValue={query.search}
+            searchPlaceholder={resolvedSearchPlaceholder}
+            onSearchChange={setSearch}
+            summary={pagination.total > 0 ? `총 ${pagination.total}건` : undefined}
+          />
         </div>
 
         {/* DataTable (Operator 표준 — operator-ux-core) */}
@@ -385,7 +398,7 @@ export function OperatorStoresList<T extends OperatorStoreBase = OperatorStoreBa
             page={pagination.page}
             totalPages={pagination.totalPages}
             total={pagination.total}
-            onPageChange={setCurrentPage}
+            onPageChange={setPage}
           />
         )}
       </div>
