@@ -38,6 +38,11 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Card, useTemplate } from '@o4o/ui';
+// WO-O4O-STORE-HOME-KPA-ADOPT-V1:
+// canonical StoreHomeShell 3번째 소비처. "실행 흐름 3단계"(기능 안내/온보딩 성격)를
+// onboardingSlot 으로 이동·하단 강등. 운영 블록(Live Signals/KPI/홍보성과/최근활동)은
+// 위치·의미 유지. KPA 전용 fetch/adapter 는 service-local 유지 — 셸은 API 를 알지 않음.
+import { StoreHomeShell } from '@o4o/store-ui-core';
 import { kpaConfig } from '@o4o/operator-ux-core';
 import { getMarketingAnalytics, getRecentScans } from '../../api/storeAnalytics';
 import type { MarketingAnalyticsData, RecentScanItem } from '../../api/storeAnalytics';
@@ -197,67 +202,6 @@ export function StoreHomePage() {
         </Card>
       </div>
 
-      {/* ── 실행 흐름 (WO-O4O-STORE-UX-STRUCTURE-ALIGNMENT-V1) ── */}
-      <Card className="p-5 mb-4">
-        <h2 className="text-[15px] font-semibold text-slate-800 m-0 mb-3">실행 흐름</h2>
-        <div className="flex flex-col">
-
-          {/* Step 1: 상품 선택 */}
-          <div className="py-3">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="inline-flex items-center justify-center w-[22px] h-[22px] rounded-full bg-primary text-[11px] font-bold text-white flex-shrink-0">1</span>
-              <span className="text-[13px] font-semibold text-primary tracking-wide">상품 선택</span>
-            </div>
-            <p className="text-[12px] text-slate-500 m-0 mb-2.5 pl-[30px]">매장에서 진열·판매할 상품을 선택합니다.</p>
-            <div className="flex flex-wrap gap-2 pl-[30px]">
-              <Link to="/store/commerce/products" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
-                <Package size={16} className="text-violet-600" />
-                <span>상품 관리</span>
-              </Link>
-            </div>
-          </div>
-
-          <div className="h-px bg-slate-100" />
-
-          {/* Step 2: 제작 자료 만들기 (WO-O4O-KPA-STORE-HOME-EXECUTION-FLOW-ALIGN-V1) */}
-          <div className="py-3">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="inline-flex items-center justify-center w-[22px] h-[22px] rounded-full bg-emerald-600 text-[11px] font-bold text-white flex-shrink-0">2</span>
-              <span className="text-[13px] font-semibold text-emerald-600 tracking-wide">제작 자료 만들기</span>
-            </div>
-            <p className="text-[12px] text-slate-500 m-0 mb-2.5 pl-[30px]">POP·QR·블로그·상품 상세설명은 모두 매장 제작 자료에서 만듭니다.</p>
-            <div className="flex flex-wrap gap-2 pl-[30px]">
-              <Link to="/store/library/production-materials" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
-                <FileEdit size={16} className="text-emerald-600" />
-                <span>매장 제작 자료</span>
-              </Link>
-            </div>
-          </div>
-
-          <div className="h-px bg-slate-100" />
-
-          {/* Step 3: 매장에 적용하기 (배포·운영) */}
-          <div className="py-3">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="inline-flex items-center justify-center w-[22px] h-[22px] rounded-full bg-violet-600 text-[11px] font-bold text-white flex-shrink-0">3</span>
-              <span className="text-[13px] font-semibold text-violet-600 tracking-wide">매장에 적용하기</span>
-            </div>
-            <p className="text-[12px] text-slate-500 m-0 mb-2.5 pl-[30px]">제작한 자료를 매장 채널·사이니지에 배포·운영합니다.</p>
-            <div className="flex flex-wrap gap-2 pl-[30px]">
-              <Link to="/store/marketing/signage" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
-                <Monitor size={16} className="text-primary" />
-                <span>사이니지</span>
-              </Link>
-              <Link to="/store/channels" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
-                <BarChart3 size={16} className="text-violet-600" />
-                <span>채널 관리</span>
-              </Link>
-            </div>
-          </div>
-
-        </div>
-      </Card>
-
       {/* ── 하단 2열: 홍보 성과 요약 + 최근 활동 ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         {/* 홍보 성과 요약 */}
@@ -328,6 +272,73 @@ export function StoreHomePage() {
           )}
         </Card>
       </div>
+
+      {/* ── 실행 흐름 → StoreHomeShell.onboardingSlot 으로 이동·하단 강등 ── */}
+      {/* WO-O4O-STORE-HOME-KPA-ADOPT-V1: 기능 안내/온보딩 성격이므로 운영 블록 */}
+      {/* (Live Signals / KPI / 홍보성과 / 최근활동) 아래로 내림. 내용 삭제 아님. */}
+      <StoreHomeShell
+        onboardingSlot={
+          <Card className="p-5 mb-4">
+            <h2 className="text-[15px] font-semibold text-slate-800 m-0 mb-3">실행 흐름</h2>
+            <div className="flex flex-col">
+
+              {/* Step 1: 상품 선택 */}
+              <div className="py-3">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="inline-flex items-center justify-center w-[22px] h-[22px] rounded-full bg-primary text-[11px] font-bold text-white flex-shrink-0">1</span>
+                  <span className="text-[13px] font-semibold text-primary tracking-wide">상품 선택</span>
+                </div>
+                <p className="text-[12px] text-slate-500 m-0 mb-2.5 pl-[30px]">매장에서 진열·판매할 상품을 선택합니다.</p>
+                <div className="flex flex-wrap gap-2 pl-[30px]">
+                  <Link to="/store/commerce/products" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
+                    <Package size={16} className="text-violet-600" />
+                    <span>상품 관리</span>
+                  </Link>
+                </div>
+              </div>
+
+              <div className="h-px bg-slate-100" />
+
+              {/* Step 2: 제작 자료 만들기 (WO-O4O-KPA-STORE-HOME-EXECUTION-FLOW-ALIGN-V1) */}
+              <div className="py-3">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="inline-flex items-center justify-center w-[22px] h-[22px] rounded-full bg-emerald-600 text-[11px] font-bold text-white flex-shrink-0">2</span>
+                  <span className="text-[13px] font-semibold text-emerald-600 tracking-wide">제작 자료 만들기</span>
+                </div>
+                <p className="text-[12px] text-slate-500 m-0 mb-2.5 pl-[30px]">POP·QR·블로그·상품 상세설명은 모두 매장 제작 자료에서 만듭니다.</p>
+                <div className="flex flex-wrap gap-2 pl-[30px]">
+                  <Link to="/store/library/production-materials" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
+                    <FileEdit size={16} className="text-emerald-600" />
+                    <span>매장 제작 자료</span>
+                  </Link>
+                </div>
+              </div>
+
+              <div className="h-px bg-slate-100" />
+
+              {/* Step 3: 매장에 적용하기 (배포·운영) */}
+              <div className="py-3">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="inline-flex items-center justify-center w-[22px] h-[22px] rounded-full bg-violet-600 text-[11px] font-bold text-white flex-shrink-0">3</span>
+                  <span className="text-[13px] font-semibold text-violet-600 tracking-wide">매장에 적용하기</span>
+                </div>
+                <p className="text-[12px] text-slate-500 m-0 mb-2.5 pl-[30px]">제작한 자료를 매장 채널·사이니지에 배포·운영합니다.</p>
+                <div className="flex flex-wrap gap-2 pl-[30px]">
+                  <Link to="/store/marketing/signage" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
+                    <Monitor size={16} className="text-primary" />
+                    <span>사이니지</span>
+                  </Link>
+                  <Link to="/store/channels" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
+                    <BarChart3 size={16} className="text-violet-600" />
+                    <span>채널 관리</span>
+                  </Link>
+                </div>
+              </div>
+
+            </div>
+          </Card>
+        }
+      />
     </div>
   );
 }
