@@ -95,7 +95,18 @@ Playwright headless, 프로덕션 도메인(kpa-society.co.kr / glycopharm.co.kr
 
 - 전 PASS: route 해결(redirect 0) · Shell 마운트(제목 input + 저장/생성 버튼) · **console error 0 · 관련 4xx/5xx 0**.
 - surface 구성 정확: operator=재생옵션+태그필수, store=KPA(설명/태그 노출)·GP/KCos(name-only).
-- **저장 round-trip 미수행** — 프로덕션 데이터 생성 회피. 저장 경로는 기존 미변경 store/canonical 엔드포인트를 adapter 가 호출(신규 로직 아님)이라 위험 낮음. 라이브 저장 검증 필요 시 통제된 생성→목록확인→삭제 round-trip 별도 수행.
+- **저장 round-trip**: KPA 내 매장 1건 통제 수행(GP/KCos 미확대, 프로덕션 데이터 최소화).
+
+#### KPA 내 매장 store-playlist round-trip (KEEP-LEGACY 핵심 검증)
+| 항목 | 결과 |
+|---|---|
+| 생성 데이터명 | `[SMOKE] keep-legacy <ts>` |
+| 생성 성공 | ✅ 201 `POST https://api.neture.co.kr/api/v1/kpa/store-playlists` |
+| 목록 반영 | ✅ YES — 생성 직후 내 매장 목록(`/store/marketing/signage/playlist`) 렌더에 표시 |
+| 삭제/정리 | ✅ DELETE 200, 잔존 `[SMOKE]` 0 (앱 토큰 인증으로 정리 완료) |
+| console / 4xx·5xx | 생성·목록 경로 정상(201/200). store 화면의 403 다수 = pharmacy 계정이 operator signage 엔드포인트(`/api/signage/kpa-society/{playlists,media,schedules}`) 호출 시 발생 — **pre-existing 권한 경계, 이번 변경 무관** |
+
+→ **KEEP-LEGACY 핵심 주장 라이브 확인**: 내 매장 저장이 `store_playlists` 로 가서 내 매장 목록에 반영됨(canonical 오저장 아님). GP/KCos store 는 동일 패턴(현행 미변경 endpoint)이라 KPA 1건으로 대표 검증.
 
 **배포 주의(재발 방지):** `deploy-web-services.yml` 의 detect-changes 가 `git diff HEAD~1 HEAD`(HEAD 단일 커밋)만 봄. 코드 커밋 뒤 docs-only 커밋이 HEAD 가 되면 web 배포가 전부 skip 됨(이번에 발생). → `gh workflow run deploy-web-services.yml --ref main -f service=all` 수동 트리거로 해결(run 27694104841).
 
