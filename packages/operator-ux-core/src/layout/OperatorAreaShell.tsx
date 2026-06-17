@@ -60,8 +60,10 @@ export function OperatorAreaShell({
     <div className="min-h-screen flex flex-col bg-gray-50">
       {header}
       <div className="flex-1 max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* WO-O4O-OPERATOR-MOBILE-NAV-DRAWER-V1: mobile column(토글 바 위 → 본문) / desktop row */}
-        <div className="flex flex-col md:flex-row md:gap-6">
+        {/* WO-O4O-OPERATOR-MOBILE-NAV-DRAWER-V1: mobile column(토글 바 위 → 본문) / desktop row
+         * WO-O4O-RESPONSIVE-SIDEBAR-OPERATOR-ADMIN-LG-STANDARDIZATION-V1: breakpoint md→lg
+         *   (tablet 구간도 drawer — DomainIASidebar 의 lg 기준과 정합) */}
+        <div className="flex flex-col lg:flex-row lg:gap-6">
           <DomainIASidebar
             menuItems={menuItems}
             capabilities={capabilities}

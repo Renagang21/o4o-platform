@@ -17,7 +17,7 @@
  * domain IA 메타데이터는 ./operatorDomainIA 에서 import.
  */
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   ChevronDown,
@@ -181,8 +181,16 @@ export function DomainIASidebar({
 
   // ── Mobile drawer open state ──
   // WO-O4O-OPERATOR-MOBILE-NAV-DRAWER-V1: 모바일 가로 스크롤 탭 → 햄버거 drawer.
+  // WO-O4O-RESPONSIVE-SIDEBAR-OPERATOR-ADMIN-LG-STANDARDIZATION-V1: breakpoint md→lg + ESC close.
   const [mobileOpen, setMobileOpen] = useState(false);
   const closeMobile = () => setMobileOpen(false);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setMobileOpen(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [mobileOpen]);
 
   // ── Shared nav content ──
   // 데스크톱 <aside> 와 모바일 drawer 가 동일 트리를 재사용 (도메인 헤딩 + 그룹 collapsible
@@ -221,7 +229,7 @@ export function DomainIASidebar({
             <button
               type="button"
               onClick={() => toggleGroup(group.key)}
-              className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors border-l-2 ${
+              className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold transition-colors border-l-2 ${
                 active
                   ? 'text-blue-600 border-blue-600'
                   : 'text-gray-600 border-transparent hover:bg-gray-50 hover:text-gray-900'
@@ -244,7 +252,7 @@ export function DomainIASidebar({
                       key={item.path}
                       to={item.path}
                       onClick={onNavigate}
-                      className={`block pl-11 pr-4 py-2 text-sm transition-colors ${
+                      className={`block pl-14 pr-4 py-2 text-[13px] transition-colors ${
                         itemActive
                           ? 'text-blue-600 bg-blue-50 font-medium'
                           : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
@@ -315,7 +323,7 @@ export function DomainIASidebar({
                 <button
                   type="button"
                   onClick={() => toggleGroup(group.key)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors border-l-2 ${
+                  className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold transition-colors border-l-2 ${
                     active
                       ? 'text-blue-600 border-blue-600'
                       : 'text-gray-600 border-transparent hover:bg-gray-50 hover:text-gray-900'
@@ -339,7 +347,7 @@ export function DomainIASidebar({
                           key={item.path}
                           to={item.path}
                           onClick={onNavigate}
-                          className={`block pl-11 pr-4 py-2 text-sm transition-colors ${
+                          className={`block pl-14 pr-4 py-2 text-[13px] transition-colors ${
                             itemActive
                               ? 'text-blue-600 bg-blue-50 font-medium'
                               : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
@@ -361,15 +369,15 @@ export function DomainIASidebar({
 
   return (
     <>
-      {/* ── Desktop Sidebar (md 이상) ── */}
-      <aside className="w-60 flex-shrink-0 hidden md:block">
+      {/* ── Desktop Sidebar (lg 이상) ── */}
+      <aside className="w-60 flex-shrink-0 hidden lg:block">
         <nav className={`bg-white rounded-xl border border-gray-200 overflow-hidden sticky ${sidebarTopOffset}`}>
           {renderNav()}
         </nav>
       </aside>
 
-      {/* ── Mobile: 햄버거 토글 바 (md 미만) ── */}
-      <div className="md:hidden mb-4">
+      {/* ── Mobile/Tablet: 햄버거 토글 바 (lg 미만) ── */}
+      <div className="lg:hidden mb-4">
         <button
           type="button"
           onClick={() => setMobileOpen(true)}
@@ -383,19 +391,19 @@ export function DomainIASidebar({
         </button>
       </div>
 
-      {/* ── Mobile: backdrop ── */}
+      {/* ── Mobile/Tablet: backdrop ── */}
       {mobileOpen && (
         <div
-          className="md:hidden fixed inset-0 z-40 bg-black/40"
+          className="lg:hidden fixed inset-0 z-40 bg-black/40"
           onClick={closeMobile}
           aria-hidden="true"
         />
       )}
 
-      {/* ── Mobile: slide-in drawer (데스크톱과 동일 IA 재사용) ── */}
+      {/* ── Mobile/Tablet: slide-in drawer (데스크톱과 동일 IA 재사용) ── */}
       <aside
         id="operator-mobile-drawer"
-        className={`md:hidden fixed left-0 top-0 bottom-0 z-50 w-72 max-w-[85%] bg-white shadow-xl flex flex-col transition-transform duration-200 ease-out ${
+        className={`lg:hidden fixed left-0 top-0 bottom-0 z-50 w-72 max-w-[85%] bg-white shadow-xl flex flex-col transition-transform duration-200 ease-out ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
         aria-hidden={!mobileOpen}
