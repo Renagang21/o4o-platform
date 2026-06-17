@@ -4,6 +4,7 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
     "../../packages/operator-core/src/**/*.{js,ts,jsx,tsx}",
+    "../../packages/operator-ux-core/src/**/*.{ts,tsx}",
     "../../packages/operator-core-ui/src/**/*.{ts,tsx}",
     "../../packages/store-ui-core/src/**/*.{ts,tsx}",
     "../../packages/ui/src/**/*.{ts,tsx}",
