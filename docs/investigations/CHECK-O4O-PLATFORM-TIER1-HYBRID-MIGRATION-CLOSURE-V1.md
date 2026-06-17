@@ -110,4 +110,4 @@
 | 생성 문서 | `docs/investigations/CHECK-O4O-PLATFORM-TIER1-HYBRID-MIGRATION-CLOSURE-V1.md` |
 | 코드/route/backend/DB/운영 데이터 변경 | 0 |
 | 다른 세션 WIP | 미접촉(working tree 의 signage store-playlist WIP 등) |
-| commit hash | (commit 후 기재) |
+| commit hash | `ba93d6fad` (closure + SMOKE hash 정정, `git commit <explicit paths>` 로 오염 회피) |
