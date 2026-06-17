@@ -97,6 +97,12 @@ export interface ContentHubConfig {
   searchPlaceholder?: string;
   /** 필터 배열 — 첫 번째 key가 "전체" 역할 */
   filters?: ContentHubFilter[];
+  /**
+   * CMS type 필터 탭 노출 여부 (기본 true). false 면 filters 배열은 보존하되 상단 탭 UI 만 숨김.
+   * 기본 fetch 는 첫 번째 key('all') 기준 전체 목록 유지 → 검색 중심 탐색.
+   * WO-O4O-STOREHUB-CONTENT-FILTER-TABS-DEFER-V1: 콘텐츠 수 적은 단계에서 탭 보류(재도입 여지 유지).
+   */
+  showTypeFilters?: boolean;
 
   /** Block 3: Content List */
   pageLimit?: number;
@@ -280,7 +286,7 @@ export function ContentHubTemplate({ config }: { config: ContentHubConfig }) {
         </div>
       )}
 
-      {config.filters && config.filters.length > 1 && (
+      {config.showTypeFilters !== false && config.filters && config.filters.length > 1 && (
         <div style={st.filterBar}>
           {config.filters.map(f => (
             <button

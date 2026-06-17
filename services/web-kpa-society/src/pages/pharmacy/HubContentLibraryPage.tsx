@@ -85,6 +85,8 @@ function useKpaContentHubConfig(userId?: string): ContentHubConfig {
     heroDesc: 'KPA-Society 약국을 위한 콘텐츠 자료실',
     searchPlaceholder: '콘텐츠 검색',
 
+    // WO-O4O-STOREHUB-CONTENT-FILTER-TABS-DEFER-V1: 콘텐츠 수 적은 단계에서 CMS type 탭 보류.
+    // filters 배열은 보존(재도입 시 showTypeFilters 만 true). 기본 fetch=전체('all') 유지.
     filters: [
       { key: 'all',       label: '전체' },
       { key: 'notice',    label: '공지' },
@@ -93,6 +95,7 @@ function useKpaContentHubConfig(userId?: string): ContentHubConfig {
       { key: 'promo',     label: '프로모션' },
       { key: 'news',      label: '뉴스' },
     ],
+    showTypeFilters: false,
 
     pageLimit: PAGE_LIMIT,
 
