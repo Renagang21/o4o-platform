@@ -40,8 +40,9 @@ router.get('/', requireRole(ADMIN_ACCESS_ROLES), async (req: Request, res: Respo
     const qb = userRepo.createQueryBuilder('user');
 
     if (search) {
+      // WO-O4O-PLATFORM-USERS-SEARCH-COMPANY-FIELD-FIX-V1: User 엔티티에 company 없음 → 제거(500 원인).
       qb.where(
-        '(user.firstName ILIKE :s OR user.lastName ILIKE :s OR user.email ILIKE :s OR user.company ILIKE :s)',
+        '(user.firstName ILIKE :s OR user.lastName ILIKE :s OR user.email ILIKE :s)',
         { s: `%${search}%` },
       );
     }
