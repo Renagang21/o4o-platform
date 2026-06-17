@@ -84,8 +84,20 @@ KPA store-playlists 는 description/tags 수용 → store 모드 기본(표시).
 
 `noUnusedLocals`/`noUnusedParameters` strict → 모달/인라인 폼 제거 시 잔여 state/handler/import 없음 확인됨(tsc 통과).
 
-### 브라우저 smoke
-- ⏳ 미실시 (배포 후). 배포 후 surface별 `/new` 진입 + 저장 + 목록 반영 + console/4xx-5xx 확인 필요.
+### 브라우저 smoke (2026-06-17, 배포 후 — 리비전 13:56Z)
+Playwright headless, 프로덕션 도메인(kpa-society.co.kr / glycopharm.co.kr / k-cosmetics.site). operator=sohae2100, store=renagang21 (자격증명 SSOT 직접 read, 미노출).
+
+| 서비스 | community `/signage/playlist/new` | operator `/operator/signage/hq-playlists/new` | store `/store/marketing/signage/playlist/new` |
+|---|---|---|---|
+| KPA | ✅ PASS (Shell) | ✅ PASS | ✅ PASS |
+| GlycoPharm | ⛔ 404 = 의도(소비 surface, /new 미추가) | ✅ PASS | ✅ PASS |
+| K-Cosmetics | ⛔ 404 = 의도(소비 surface, /new 미추가) | ✅ PASS | ✅ PASS |
+
+- 전 PASS: route 해결(redirect 0) · Shell 마운트(제목 input + 저장/생성 버튼) · **console error 0 · 관련 4xx/5xx 0**.
+- surface 구성 정확: operator=재생옵션+태그필수, store=KPA(설명/태그 노출)·GP/KCos(name-only).
+- **저장 round-trip 미수행** — 프로덕션 데이터 생성 회피. 저장 경로는 기존 미변경 store/canonical 엔드포인트를 adapter 가 호출(신규 로직 아님)이라 위험 낮음. 라이브 저장 검증 필요 시 통제된 생성→목록확인→삭제 round-trip 별도 수행.
+
+**배포 주의(재발 방지):** `deploy-web-services.yml` 의 detect-changes 가 `git diff HEAD~1 HEAD`(HEAD 단일 커밋)만 봄. 코드 커밋 뒤 docs-only 커밋이 HEAD 가 되면 web 배포가 전부 skip 됨(이번에 발생). → `gh workflow run deploy-web-services.yml --ref main -f service=all` 수동 트리거로 해결(run 27694104841).
 
 ---
 
