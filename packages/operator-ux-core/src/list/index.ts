@@ -33,3 +33,19 @@ export { EditableDataTable } from './EditableDataTable';
 
 // Hooks (V3)
 export { useBatchAction } from './useBatchAction';
+
+// ─── Standard List Core (WO-O4O-STANDARD-LIST-CORE-V1) ───
+// 기존 DataTable/Pagination/SearchBar(UI) 위의 상태·계약·정규화 계층(additive).
+export type {
+  StandardSortOrder,
+  StandardFilterValue,
+  StandardListQueryState,
+  StandardPaginationState,
+  StandardPaginatedResponse,
+  UseStandardListQueryOptions,
+  UseStandardListQueryResult,
+} from './standard/standard-types';
+export { normalizePaginatedResponse } from './standard/normalizePaginatedResponse';
+export { useStandardListQuery } from './standard/useStandardListQuery';
+export { StandardListToolbar } from './standard/StandardListToolbar';
+export type { StandardListToolbarProps } from './standard/StandardListToolbar';
