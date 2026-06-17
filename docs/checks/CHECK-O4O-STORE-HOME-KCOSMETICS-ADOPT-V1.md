@@ -2,7 +2,7 @@
 
 > **작업명:** WO-O4O-STORE-HOME-KCOSMETICS-ADOPT-V1
 > **유형:** K-Cosmetics `/store` 홈을 canonical `StoreHomeShell` 2번째 소비처로 adopt. 다중 매장 selector → `storeSelectorSlot` 수렴. 기존 5-block 운영 대시보드 의미·순서 유지.
-> **결과: PARTIAL — 코드 adopt + typecheck PASS. 다중 매장 selector 를 `storeSelectorSlot` 으로 이동, 5-block 의미·순서 보존, service-local fetch/storeId 스코프 유지. store-ui-core/hub-core/backend/API/DB/package/route·GlycoPharm·KPA 변경 0. web-k-cosmetics `tsc -b` exit 0. browser: `/store` 접근·레이아웃·빈 상태 무회귀 확인. 단 storeSelectorSlot 다중매장 런타임 동작은 사용 가능한 KCos 계정에 매장 0개라 미검증(계정 제약).**
+> **결과: PARTIAL (단일매장 런타임 PASS) — 코드 adopt + typecheck PASS + 배포 success. 다중 매장 selector 를 `storeSelectorSlot` 으로 이동, 5-block 의미·순서 보존, service-local fetch/storeId 스코프 유지. store-ui-core/hub-core/backend/API/DB/package/route·GlycoPharm·KPA 변경 0. web-k-cosmetics `tsc -b` exit 0. browser: 체험 매장 계정으로 main cockpit 런타임 렌더·5-block 순서·반응형·무회귀 실증. 단 storeSelectorSlot 다중매장(≥2) 동작은 ≥2 매장 계정 부재로 미검증(정적+typecheck 대체).**
 > 선행: WO-O4O-STORE-HOME-CANONICAL-SHELL-V1 · SMOKE-...-GLYCOPHARM-...(PASS)
 >
 > *Date: 2026-06-17*
@@ -92,16 +92,23 @@
 | 배포 | main `57d8af5dd` push → `Deploy Web Services` k-cosmetics **success**. 라이브 이미지 sha=`57d8af5dd`(= 본 커밋) 확인 |
 | browser: `/store` 접근 | ✅ 로그인(cosmetics:admin) → `/store` 진입, 레이아웃/사이드바(매장 용어: 매장 상품·거래/내 자료함 등) 정상 |
 | browser: 빈 상태 | ✅ "등록된 매장이 없습니다"+"매장 신청하기"(early-return, 무변경) 정상 — **회귀 없음** |
-| browser: console | 401 auth/me·refresh(로그인 前 흐름) + 403 store-hub/capabilities(레이아웃 호출, 무매장 계정 baseline) — **본 변경(main cockpit 경로) 무관** |
-| **browser: storeSelectorSlot 다중매장** | ⚠️ **미검증** — 사용 가능한 KCos 계정(sohae2100, cosmetics:admin)에 매장 0개 → main cockpit 미도달, 다중매장(≥2) 부재. **정적+typecheck 로 대체 검증** |
+| browser: 무매장 계정(sohae2100, admin) 빈 상태 | ✅ "등록된 매장이 없습니다"(early-return, 무변경) 정상 |
+| **browser: 매장 보유 계정 main cockpit** | ✅ **체험용 매장 경영자 계정(renagang21, 매장 "테스트 뷰티샵" 1개)으로 main cockpit 런타임 렌더 확인** — StoreHomeShell adopt 경로 도달 |
+| ↳ 5-block 순서·의미 | ✅ Block1(매장 헤더: 테스트 뷰티샵/운영중/코드/멤버/역할 + 상품·주문 quick action) → KPI(오늘주문/매출/채널/등록상품) → 상품 운영 현황 → 콘텐츠·사이니지 + AI 인사이트 — 순서·의미 보존 |
+| ↳ 단일 매장 storeSelectorSlot | ✅ `stores.length===1` → slot=null → 셸 미렌더(레이아웃 교란 0). 조건부 슬롯 단일매장 분기 정상 |
+| ↳ 반응형 390px | ✅ "메뉴 열기" 햄버거 + 사이드바 drawer + 5-block 본문 순서 유지 |
+| ↳ console | 403 store-hub/capabilities(레이아웃) + **500 ×4 (store summary/listings/insights/playlists)** — 모두 **변경 없는 `storeApi` Promise.all + 데모 매장 backend 데이터 조건**. 셸/본 변경 무관, 페이지는 graceful empty state 처리(§발견) |
+| **browser: storeSelectorSlot 다중매장(≥2)** | ⚠️ **미검증** — 체험 계정도 매장 1개. ≥2 매장 계정 부재 → 다중매장 selector·전환 런타임 불가. **정적+typecheck 로 대체 검증**(`stores.length>1 ? <select/> : null`, onChange=handleStoreChange) |
 | GlycoPharm 무회귀 | ✅ 공통 셸 무변경 → 영향 0(선행 smoke PASS) |
 | KPA 무변경 | ✅ 코드 미접촉 |
 
-**계정 제약 상세:** TEST-ACCOUNTS 의 KCos 계정은 admin/operator(sohae2100)뿐이며 store_owner+매장 보유 계정 부재. `/store` cockpit 은 매장 ≥1 필요, storeSelectorSlot 은 ≥2 필요 → 런타임 다중매장 검증 불가. 매장 데이터 생성은 backend 변경(범위 외)이라 미수행.
+**계정 제약 상세:** 무매장 admin 계정(sohae2100) + 단일매장 체험 계정(renagang21)만 가용. 단일매장으로 **main cockpit 런타임 PASS**(셸 adopt·순서·반응형·무회귀 실증). 단 storeSelectorSlot 은 ≥2 매장에서만 렌더 → 다중매장 분기는 정적+typecheck 만(≥2 계정 부재, 매장 데이터 생성은 backend 변경=범위 외).
+
+**발견(회귀 아님):** 체험 매장(`bac64424…`)의 store 데이터 endpoint 4종(`summary`/`listings`/`insights`/`playlists`)이 **backend 500**. 변경 없는 `storeApi` Promise.all 에서 발생(stack: `StoreCockpitPage` 기존 fetch). 페이지는 empty state 로 graceful 처리. **본 WO(프론트 selector 이동) 무관 — 데모 매장 데이터/backend 조건.** 후속 후보: `IR-O4O-KCOSMETICS-DEMO-STORE-DATA-500-V1`.
 
 ## 11. 완료 판정
 
-**PARTIAL.** StoreHomeShell adopt(다중 매장 selector → storeSelectorSlot) 코드 완료 + web-k-cosmetics typecheck PASS + 배포 success. 5-block 의미·순서 보존, service-local 스코프 유지, 공통 셸·backend·GlycoPharm·KPA 무변경. browser 로 `/store` 접근·레이아웃·빈 상태 무회귀 확인. **단 storeSelectorSlot 다중매장 런타임 동작은 계정 제약(무매장)으로 미검증** → WO PARTIAL 정의("계정 제약으로 일부 제한") 부합.
+**PARTIAL (단일매장 런타임 PASS).** StoreHomeShell adopt(다중 매장 selector → storeSelectorSlot) 코드 완료 + web-k-cosmetics typecheck PASS + 배포 success. 5-block 의미·순서 보존, service-local 스코프 유지, 공통 셸·backend·GlycoPharm·KPA 무변경. **체험 매장 계정으로 main cockpit 런타임 렌더·5-block 순서·반응형·무회귀 실증.** 단 **storeSelectorSlot 다중매장(≥2) 동작은 ≥2 매장 계정 부재로 미검증**(정적+typecheck 대체) → WO PARTIAL 정의("계정 제약으로 일부 제한") 부합.
 
 ## 12. 후속 KPA adopt 시 참고
 
@@ -114,7 +121,8 @@
 
 1. **`SMOKE-O4O-STORE-HOME-KCOSMETICS-MULTISTORE-V1`** — 매장 ≥2 보유 KCos 계정 확보 시 storeSelectorSlot 전환·스코프 갱신 런타임 검증.
 2. **`WO-O4O-STORE-HOME-KPA-ADOPT-V1`** — KPA adopt, 실행흐름 → onboardingSlot.
+3. (독립, 본 smoke 발견) **`IR-O4O-KCOSMETICS-DEMO-STORE-DATA-500-V1`** — 체험 매장 store 데이터 endpoint(summary/listings/insights/playlists) backend 500 점검(본 WO 무관).
 
 ---
 
-*Date: 2026-06-17 · K-Cosmetics store home StoreHomeShell adopt · PARTIAL · 다중매장 selector → storeSelectorSlot, 5-block 의미·순서 보존, service-local fetch/scope 유지 · 공통 셸/backend/GlycoPharm/KPA 무변경 · web-k-cosmetics tsc -b 0 · 배포 success(57d8af5dd) · browser /store 접근·빈 상태 무회귀 · storeSelectorSlot 다중매장 런타임은 무매장 계정 제약으로 미검증(정적+typecheck 대체) · 후속 multistore smoke + KPA adopt.*
+*Date: 2026-06-17 · K-Cosmetics store home StoreHomeShell adopt · PARTIAL(단일매장 런타임 PASS) · 다중매장 selector → storeSelectorSlot, 5-block 의미·순서 보존, service-local fetch/scope 유지 · 공통 셸/backend/GlycoPharm/KPA 무변경 · web-k-cosmetics tsc -b 0 · 배포 success(57d8af5dd) · 체험 매장 계정으로 main cockpit 런타임 렌더·순서·반응형·무회귀 실증 · storeSelectorSlot 다중매장(≥2)은 계정 부재로 정적+typecheck 대체 · 데모 매장 데이터 500(무관) 발견 · 후속 multistore smoke + KPA adopt.*
