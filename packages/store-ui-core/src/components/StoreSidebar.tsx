@@ -2,6 +2,11 @@
  * StoreSidebar - Store Dashboard 사이드바 내부 콘텐츠
  * WO-O4O-STORE-ADMIN-LAYOUT-STANDARDIZATION-V1
  * WO-O4O-STORE-HUB-STRUCTURE-REFACTOR-V1: section-based 렌더링 추가
+ * WO-O4O-STORE-SIDEBAR-HIERARCHY-TOKEN-ALIGNMENT-V1:
+ *   메뉴 계층 시각 토큰을 O4O responsive sidebar 표준(DomainIASidebar/KPA admin)에 정렬.
+ *   - active 배경 bg-teal-100 → bg-teal-50 (정렬된 사이드바 공통 active shade '-50') + active font-semibold(강조)
+ *   - section(group) 헤더 py-2 → py-2.5 (group height 42~44 정합)
+ *   breakpoint/drawer/구조/메뉴/route 무변경. brand color(teal) 유지.
  *
  * 사이드바 헤더 + 네비게이션 메뉴 + 로그아웃 버튼
  * 서비스 컨텍스트 표시는 TopBar에서만 처리 (사이드바에서는 제거)
@@ -215,7 +220,7 @@ export function StoreSidebar({
                       type="button"
                       onClick={() => toggleSection(sIdx)}
                       aria-expanded={isExpanded}
-                      className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                      className={`w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
                         sectionContainsActive
                           ? 'text-teal-700 bg-teal-50/60 hover:bg-teal-50'
                           : 'text-slate-700 hover:bg-slate-50'
@@ -246,7 +251,7 @@ export function StoreSidebar({
                             className={({ isActive }) =>
                               `flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
                                 isActive
-                                  ? 'bg-teal-100 text-teal-700'
+                                  ? 'bg-teal-50 text-teal-700 font-semibold'
                                   : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                               }`
                             }
@@ -280,7 +285,7 @@ export function StoreSidebar({
                   className={({ isActive }) =>
                     `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                       isActive
-                        ? 'bg-teal-100 text-teal-700'
+                        ? 'bg-teal-50 text-teal-700 font-semibold'
                         : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                     }`
                   }
