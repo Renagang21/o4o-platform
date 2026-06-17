@@ -5,6 +5,11 @@
  *   - 공통 SignagePlaylistCreateShell 채택(store 모드: 제목/설명/태그).
  *   - 저장 endpoint(store-playlists)는 현행 유지 — 매장 목록 조회와 동일 테이블(데이터 정합성).
  *   - 항목(미디어)은 생성 후 목록/상세에서 HUB 복사로 추가한다.
+ *
+ * ⚠️ KEEP-LEGACY (docs/baseline/O4O-SIGNAGE-STORE-PLAYLIST-MODEL-BOUNDARY-V1.md):
+ *   내 매장 저장을 canonical POST /api/signage/:serviceKey/playlists 로 바꾸지 말 것.
+ *   store_playlist_items(snapshot_id) ≠ signage_playlist_items(mediaId) — 항목 모델 비호환.
+ *   항목 reconciliation 전 전환 시 목록 불일치/항목 손실. 근거: IR-...-CANONICAL-DATA-MODEL-V1.
  */
 
 import { useCallback } from 'react';

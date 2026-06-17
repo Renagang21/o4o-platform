@@ -6,6 +6,10 @@
  *   - 저장 endpoint(/cosmetics/store-playlists)는 현행 유지 — 매장 목록 조회와 동일 테이블.
  *     store-playlists 는 이름만 받으므로 태그/설명 필드는 비노출.
  *   - 항목(미디어)은 생성 후 목록/상세에서 HUB 복사로 추가한다.
+ *
+ * ⚠️ KEEP-LEGACY (docs/baseline/O4O-SIGNAGE-STORE-PLAYLIST-MODEL-BOUNDARY-V1.md):
+ *   K-Cosmetics 내 매장은 cosmetics_store_playlists 격리 스키마. canonical signage_playlists 로 바꾸지 말 것.
+ *   항목 모델(snapshot vs mediaId) 비호환 — reconciliation 전 전환 금지.
  */
 
 import { useCallback } from 'react';

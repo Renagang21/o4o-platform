@@ -422,6 +422,7 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | **Guide Content Reseed** | `docs/architecture/O4O-GUIDE-CONTENT-RESEED-GUIDEBLOCK-V1.md` |
 | **Guide pageKey Catalog V1** | `docs/architecture/O4O-GUIDE-PAGE-KEY-CATALOG-V1.md` |
 | **Store Local Product 경계 정책** | `docs/baseline/STORE-LOCAL-PRODUCT-BOUNDARY-POLICY-V1.md` |
+| **Signage Store Playlist 모델 경계 (KEEP-LEGACY)** | `docs/baseline/O4O-SIGNAGE-STORE-PLAYLIST-MODEL-BOUNDARY-V1.md` |
 | **User Domain SSOT** | `docs/baseline/USER-DOMAIN-SSOT-V1.md` |
 | **Role Policy & Guard Baseline** | `docs/baseline/ROLE-POLICY-AND-GUARD-V1.md` |
 | **Global Header Standard** | `docs/architecture/ui/GLOBAL-HEADER-STANDARD-V1.md` |
