@@ -20,6 +20,7 @@ interface PlatformCard {
   desc: string;
   to: string | null;
   api: string;
+  badge?: string;
 }
 
 const PLATFORM_CARDS: PlatformCard[] = [
@@ -39,10 +40,11 @@ const PLATFORM_CARDS: PlatformCard[] = [
   },
   {
     icon: Users,
-    title: 'Global 사용자 관리',
-    desc: '전체 사용자/관리자 조회 및 역할 관리. (노출 범위 후속 정책 결정)',
-    to: null,
-    api: 'GET /api/v1/admin/users',
+    title: '전체 사용자 조회',
+    desc: 'O4O 전체 사용자 현황 read-only 조회(안전 필드만). 이용중지·삭제·권한 변경은 각 전용 화면 소관.',
+    to: '/admin/platform/users',
+    api: 'GET /api/v1/admin/platform-users',
+    badge: '조회 전용',
   },
 ];
 
@@ -69,9 +71,11 @@ export default function PlatformAdminLandingPage() {
                   <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
                     <Icon className="w-5 h-5 text-slate-600" />
                   </div>
-                  {card.to
-                    ? <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-slate-600 transition-colors" />
-                    : <span className="text-[11px] font-semibold rounded-full bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5">연결 예정</span>}
+                  {card.badge
+                    ? <span className="text-[11px] font-semibold rounded-full bg-slate-100 text-slate-600 border border-slate-200 px-2 py-0.5">{card.badge}</span>
+                    : card.to
+                      ? <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-slate-600 transition-colors" />
+                      : <span className="text-[11px] font-semibold rounded-full bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5">연결 예정</span>}
                 </div>
                 <h3 className="font-semibold text-slate-800 mb-1">{card.title}</h3>
                 <p className="text-xs text-slate-500 leading-relaxed mb-2">{card.desc}</p>

@@ -319,6 +319,7 @@ const PlatformAdminLandingPage = lazy(() => import('./pages/admin/platform/Platf
 const PlatformSectionLayout = lazy(() => import('./pages/admin/platform/PlatformSectionLayout'));
 const PlatformAccountsPage = lazy(() => import('./pages/admin/platform/PlatformAccountsPage'));
 const PlatformServicesPage = lazy(() => import('./pages/admin/platform/PlatformServicesPage'));
+const PlatformUsersPage = lazy(() => import('./pages/admin/platform/PlatformUsersPage'));
 
 // Admin Operators
 const OperatorsPage = lazy(() => import('./pages/admin/OperatorsPage'));
@@ -1038,6 +1039,8 @@ function App() {
               {/* WO-O4O-PLATFORM-ACCOUNTS-SERVICES-UI-V1 */}
               <Route path="accounts" element={<PlatformAccountsPage />} />
               <Route path="services" element={<PlatformServicesPage />} />
+              {/* WO-O4O-PLATFORM-GLOBAL-USERS-READONLY-LIST-V1 */}
+              <Route path="users" element={<PlatformUsersPage />} />
             </Route>
 
             {/* ================================================================

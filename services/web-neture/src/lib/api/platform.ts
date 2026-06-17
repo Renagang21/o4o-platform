@@ -22,6 +22,31 @@ export interface PlatformAccount {
   lastLoginAt: string | null;
 }
 
+/** 전체 사용자 read-only 행 (WO-O4O-PLATFORM-GLOBAL-USERS-READONLY-LIST-V1, 안전 투영) */
+export interface PlatformUser {
+  id: string;
+  email: string;
+  name: string | null;
+  roles: string[];
+  status: string;
+  isActive: boolean;
+  createdAt: string;
+  lastLoginAt: string | null;
+}
+
+export interface PlatformUsersResult {
+  data: PlatformUser[];
+  pagination: { page: number; limit: number; total: number; totalPages: number };
+}
+
+export interface PlatformUsersParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  role?: string;
+  status?: string;
+}
+
 export interface PlatformService {
   id: string;
   code: string;
@@ -68,6 +93,16 @@ export const platformAdminApi = {
     try {
       const res = await api.get('/admin/platform-services');
       return res.data?.data ?? [];
+    } catch (err) { throw toError(err); }
+  },
+  // WO-O4O-PLATFORM-GLOBAL-USERS-READONLY-LIST-V1: 전체 사용자 read-only 조회(투영)
+  async getUsers(params: PlatformUsersParams = {}): Promise<PlatformUsersResult> {
+    try {
+      const res = await api.get('/admin/platform-users', { params });
+      return {
+        data: res.data?.data ?? [],
+        pagination: res.data?.pagination ?? { page: 1, limit: 20, total: 0, totalPages: 0 },
+      };
     } catch (err) { throw toError(err); }
   },
 };
