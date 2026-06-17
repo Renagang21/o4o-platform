@@ -61,16 +61,14 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   ],
   // WO-O4O-OPERATOR-PRODUCT-ORDER-VIEW-LABEL-CLARIFY-GP-KCOS-V1: view-only(조회 전용) → '주문 현황'
   orders: [{ label: '주문 현황', path: '/operator/orders' }],
-  // WO-O4O-GLYCOPHARM-OPERATOR-CONTENT-KPA-PARITY-P1-V1:
-  //   guidelines/care legacy 메뉴 제거. KPA Content canonical 기준으로 공지사항/뉴스 + Home 편집만 노출.
-  //   콘텐츠 허브는 backend/API/DB 포함 후속 필수 WO에서 추가.
+  // WO-O4O-GLYCOPHARM-OPERATOR-CONTENT-SUBMENU-ALIGNMENT-V1:
+  //   KPA Content canonical 4-항목 정합 — 콘텐츠 허브(/operator/docs) + 설문조사 관리(/operator/surveys) 추가.
+  //   '문의 관리'(/operator/contacts) 는 본 메뉴에서 제거(노출만 제거 — contact route/page/backend 무변경).
   content: [
     { label: '공지사항/뉴스', path: '/operator/content' },
     { label: 'Home 편집', path: '/operator/community' },
-    // WO-O4O-GLYCOPHARM-OPERATOR-CONTACT-MANAGEMENT-MIGRATION-V1:
-    //   문의 처리(목록·상세·답변·상태/메모)는 operator 업무 → operator 로 이관 신설.
-    //   문의 '설정'은 admin 유지(/admin/settings/contact). backend 변경 없음(operator 가드 통과).
-    { label: '문의 관리', path: '/operator/contacts' },
+    { label: '콘텐츠 허브', path: '/operator/docs' },
+    { label: '설문조사 관리', path: '/operator/surveys' },
   ],
   // WO-O4O-GLYCOPHARM-OPERATOR-MENU-ALIGN-WITH-KPA-V1:
   //   content 그룹에서 LMS 항목 분리 — KPA 와 동일한 별도 lms 그룹.

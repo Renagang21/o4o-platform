@@ -168,6 +168,8 @@ const OperatorAnalyticsPage = lazy(() => import('@/pages/operator/AnalyticsPage'
 const OperatorGuideContentsPage = lazy(() => import('@/pages/operator/OperatorGuideContentsPage'));
 // Operator Content Management (WO-O4O-CONTENT-CANONICAL-CROSS-SERVICE-ALIGNMENT-V1)
 const OperatorContentPage = lazy(() => import('@/pages/operator/OperatorContentPage'));
+// Operator Content Hub (WO-O4O-GLYCOPHARM-OPERATOR-CONTENT-SUBMENU-ALIGNMENT-V1)
+const OperatorContentHubPage = lazy(() => import('@/pages/operator/OperatorContentHubPage'));
 
 // Operator Semi-Franchise Pages
 const PharmaciesPage = lazy(() => import('@/pages/operator/PharmaciesPage'));
@@ -880,6 +882,8 @@ function AppRoutes() {
         {/* Content Management 공지사항/뉴스 (WO-O4O-CONTENT-CANONICAL-CROSS-SERVICE-ALIGNMENT-V1) */}
         <Route path="content" element={<OperatorContentPage />} />
         <Route path="content-management" element={<Navigate to="/operator/content" replace />} />
+        {/* 콘텐츠 허브 — KPA 정합 포팅 (WO-O4O-GLYCOPHARM-OPERATOR-CONTENT-SUBMENU-ALIGNMENT-V1) */}
+        <Route path="docs" element={<OperatorContentHubPage />} />
         {/* 문의 관리 — operator 이관 (WO-O4O-GLYCOPHARM-OPERATOR-CONTACT-MANAGEMENT-MIGRATION-V1) */}
         <Route path="contacts" element={<OperatorContactInquiriesPage />} />
         {/* LMS Management (WO-O4O-GLYCOPHARM-LMS-PHASE1-OPERATOR-PARITY-V1) */}
