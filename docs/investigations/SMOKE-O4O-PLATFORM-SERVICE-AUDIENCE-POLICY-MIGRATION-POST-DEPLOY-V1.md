@@ -104,4 +104,4 @@
 | 배포 commit | `f817f7e22` (API + Web deploy success) |
 | 자격증명 | SSOT env 주입, 보고서 미기재 |
 | 운영 데이터 변경 | **없음** (read-only) |
-| commit hash | (commit 후 기재) |
+| commit hash | `5c1b79c08` (병렬 세션 staging 오염으로 그 세션 commit 에 함께 포함되어 origin/main 에 푸시됨 — 문서 존재·검증 결과 유효, attribution 만 오염) |
