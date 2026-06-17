@@ -135,6 +135,10 @@ export {
   type NetureOperatorInfo,
   type AdminSupplier,
   type AdminProduct,
+  // WO-O4O-ADMIN-PRODUCT-APPROVAL-STANDARD-LIST-ADOPTION-V1
+  type AdminProductSummary,
+  type AdminProductListParams,
+  type AdminProductPagination,
   type AdminMaster,
   type ServiceApproval,
   type AdminCommissionKpi,
