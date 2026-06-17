@@ -119,6 +119,11 @@ export function BaseTable<T extends Record<string, any>>({
   selectable,
   selectedKeys,
   onSelectionChange,
+  // WO-O4O-DATATABLE-ONSORT-CONTROLLED-SORT-V1
+  manualSort = false,
+  sortKey,
+  sortDirection,
+  onSortChange,
 }: BaseTableProps<T>) {
   const thBase = thClassName ?? DEFAULT_TH;
   const tdBase = tdClassName ?? DEFAULT_TD;
@@ -179,23 +184,37 @@ export function BaseTable<T extends Record<string, any>>({
 
   const [sortState, setSortState] = useState<SortState>(SORT_NONE);
 
-  // 정렬 컬럼이 visibility로 숨겨지면 정렬 해제 (UI 혼란 방지)
+  // WO-O4O-DATATABLE-ONSORT-CONTROLLED-SORT-V1:
+  // manualSort 면 외부 sortKey/sortDirection 을 표시에 사용(controlled), 아니면 내부 sortState.
+  const effectiveSort: SortState = manualSort
+    ? { key: sortKey ?? null, direction: sortDirection ?? null }
+    : sortState;
+
+  // 정렬 컬럼이 visibility로 숨겨지면 정렬 해제 (UI 혼란 방지) — 내부 정렬 모드만.
   useEffect(() => {
-    if (sortState.key && hiddenKeys.has(sortState.key)) {
+    if (!manualSort && sortState.key && hiddenKeys.has(sortState.key)) {
       setSortState(SORT_NONE);
     }
-  }, [hiddenKeys, sortState.key]);
+  }, [hiddenKeys, sortState.key, manualSort]);
 
   const handleHeaderSort = useCallback((col: O4OColumn<T>) => {
     if (col.system || !col.sortable) return;
+    if (manualSort) {
+      // controlled — 같은 컬럼이면 asc↔desc 토글, 다른 컬럼이면 asc. (서버 정렬은 항상 정렬됨)
+      const next: 'asc' | 'desc' = sortKey === col.key && sortDirection === 'asc' ? 'desc' : 'asc';
+      onSortChange?.(col.key, next);
+      return;
+    }
     setSortState((prev) => {
       if (prev.key !== col.key) return { key: col.key, direction: 'asc' };
       if (prev.direction === 'asc') return { key: col.key, direction: 'desc' };
       return SORT_NONE; // desc → none
     });
-  }, []);
+  }, [manualSort, sortKey, sortDirection, onSortChange]);
 
   const sortedData = useMemo(() => {
+    // manualSort: data 는 서버 정렬된 것으로 간주 — 클라이언트 재정렬 안 함.
+    if (manualSort) return data;
     if (!sortState.key || !sortState.direction) return data;
     const col = effectiveColumns.find((c) => c.key === sortState.key);
     if (!col) return data;
@@ -209,7 +228,7 @@ export function BaseTable<T extends Record<string, any>>({
       return a.i - b.i; // tie-breaker: 원본 순서 유지
     });
     return indexed.map((x) => x.row);
-  }, [data, sortState, effectiveColumns]);
+  }, [data, sortState, effectiveColumns, manualSort]);
 
   // ─── Selection (select-all / indeterminate) ───
 
@@ -489,8 +508,8 @@ export function BaseTable<T extends Record<string, any>>({
                 : col.header;
 
               const isSortable = !!col.sortable && !isSystem;
-              const isSorted = isSortable && sortState.key === col.key && sortState.direction !== null;
-              const sortDir: SortDirection = isSorted ? sortState.direction : null;
+              const isSorted = isSortable && effectiveSort.key === col.key && effectiveSort.direction !== null;
+              const sortDir: SortDirection = isSorted ? effectiveSort.direction : null;
 
               const onThClick = isSortable
                 ? (e: React.MouseEvent) => {

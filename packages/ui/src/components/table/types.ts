@@ -115,4 +115,19 @@ export interface BaseTableProps<T> {
   selectedKeys?: Set<string>;
   /** 선택 변경 콜백 */
   onSelectionChange?: (keys: Set<string>) => void;
+
+  // WO-O4O-DATATABLE-ONSORT-CONTROLLED-SORT-V1: 외부(서버) controlled 정렬 (additive, optional)
+  /**
+   * true 면 내부 클라이언트 정렬 대신 controlled 모드로 동작 —
+   * sortKey/sortDirection 을 헤더 표시에 사용하고, 헤더 클릭은 onSortChange 로 위임한다.
+   * data 는 서버 정렬된 것으로 간주하여 클라이언트 재정렬하지 않는다.
+   * 미지정(기본)이면 기존 클라이언트 정렬 동작 그대로.
+   */
+  manualSort?: boolean;
+  /** controlled 정렬 컬럼 key (manualSort 시 표시용). */
+  sortKey?: string | null;
+  /** controlled 정렬 방향 (manualSort 시 표시용). */
+  sortDirection?: SortDirection;
+  /** 헤더 클릭 시 호출 (manualSort). 같은 컬럼=asc↔desc 토글, 다른 컬럼=asc. */
+  onSortChange?: (key: string, direction: 'asc' | 'desc') => void;
 }

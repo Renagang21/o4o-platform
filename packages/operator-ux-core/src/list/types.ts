@@ -95,6 +95,16 @@ export interface DataTableProps<T extends Record<string, any>> {
   selectedKeys?: Set<string>;
   /** 선택 변경 콜백 */
   onSelectionChange?: (keys: Set<string>) => void;
+
+  // WO-O4O-DATATABLE-ONSORT-CONTROLLED-SORT-V1: 서버(controlled) 정렬 (additive, optional)
+  /** true 면 컬럼 클릭이 onSort 로 위임되고 data 는 서버 정렬로 간주(클라이언트 재정렬 X). 미지정 시 기존 동작. */
+  manualSort?: boolean;
+  /** controlled 정렬 컬럼 key. */
+  sortBy?: string;
+  /** controlled 정렬 방향. */
+  sortOrder?: 'asc' | 'desc';
+  /** 헤더 클릭 시 호출(manualSort). 같은 컬럼=asc↔desc 토글, 다른 컬럼=asc. */
+  onSort?: (sortBy: string, sortOrder: 'asc' | 'desc') => void;
 }
 
 // ─── Pagination Props ───

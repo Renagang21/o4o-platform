@@ -36,6 +36,11 @@ export function DataTable<T extends Record<string, any>>({
   selectable,
   selectedKeys,
   onSelectionChange,
+  // WO-O4O-DATATABLE-ONSORT-CONTROLLED-SORT-V1
+  manualSort,
+  sortBy,
+  sortOrder,
+  onSort,
 }: DataTableProps<T>) {
   // Loading skeleton
   if (loading) {
@@ -120,6 +125,10 @@ export function DataTable<T extends Record<string, any>>({
         selectable={selectable}
         selectedKeys={selectedKeys}
         onSelectionChange={onSelectionChange}
+        manualSort={manualSort}
+        sortKey={sortBy}
+        sortDirection={sortOrder}
+        onSortChange={onSort}
       />
     </div>
   );

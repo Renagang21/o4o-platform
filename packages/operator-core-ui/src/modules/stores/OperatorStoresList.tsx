@@ -226,6 +226,7 @@ export function OperatorStoresList<T extends OperatorStoreBase = OperatorStoreBa
     error,
     setPage,
     setSearch,
+    setSort,
     refetch,
   } = useStandardListQuery<T, StoresListResponse<T>>({
     defaultLimit: pageSize,
@@ -390,6 +391,11 @@ export function OperatorStoresList<T extends OperatorStoreBase = OperatorStoreBa
           selectable={selectable}
           selectedKeys={selectedIds}
           onSelectionChange={setSelectedIds}
+          // WO-O4O-DATATABLE-ONSORT-CONTROLLED-SORT-V1: 컬럼 클릭 → 서버 정렬(useStandardListQuery setSort)
+          manualSort
+          sortBy={query.sortBy}
+          sortOrder={query.sortOrder}
+          onSort={setSort}
         />
 
         {/* Pagination (operator-ux-core 외부 결합) */}
