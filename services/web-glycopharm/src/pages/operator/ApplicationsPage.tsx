@@ -1,8 +1,12 @@
-import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Building2, Truck, Monitor, ChevronRight, ChevronLeft, Filter } from 'lucide-react';
-import { DataTable } from '@o4o/operator-ux-core';
-import type { ListColumnDef } from '@o4o/operator-ux-core';
+import {
+  DataTable,
+  useStandardListQuery,
+  type ListColumnDef,
+  type StandardListQueryState,
+  type StandardPaginatedResponse,
+} from '@o4o/operator-ux-core';
 import { glycopharmApi } from '@/api/glycopharm';
 import type { AdminApplication, ApplicationStatus, ServiceType, OrganizationType } from '@/api/glycopharm';
 import StatusBadge from '../../components/common/StatusBadge';
@@ -13,9 +17,9 @@ import PageHeader from '../../components/common/PageHeader';
  * 운영자용 신청 목록 화면
  *
  * WO-O4O-OPERATOR-DATATABLE-SOURCE-ALIGN-V1: DataTable @o4o/ui → @o4o/operator-ux-core
- *   - Column → ListColumnDef
- *   - dataSource → data, emptyText → emptyMessage
- *   - 내장 pagination → 외부 JSX pagination
+ * WO-O4O-OPERATOR-APPLICATIONS-STANDARD-LIST-ADOPTION-V1:
+ *   useStandardListQuery + normalize({applications,pagination}) + URL sync(applications_*) + page=1 reset.
+ *   검색·정렬은 backend(getAdminApplications)가 미지원 → 보류(필터 status/serviceType/orgType만 서버).
  */
 
 const SERVICE_LABELS: Record<ServiceType, { label: string; icon: typeof Building2 }> = {
@@ -24,62 +28,63 @@ const SERVICE_LABELS: Record<ServiceType, { label: string; icon: typeof Building
   digital_signage: { label: '디지털사이니지', icon: Monitor },
 };
 
+interface AdminApplicationsResponse {
+  applications: AdminApplication[];
+  pagination: { page: number; limit: number; total: number; totalPages: number };
+}
+
 export default function ApplicationsPage() {
-  const [applications, setApplications] = useState<AdminApplication[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    items: applications,
+    pagination,
+    query,
+    loading,
+    error,
+    setPage,
+    setFilter,
+    resetFilters,
+    refetch,
+  } = useStandardListQuery<AdminApplication, AdminApplicationsResponse>({
+    defaultLimit: 20,
+    syncUrl: true,
+    urlKeyPrefix: 'applications',
+    fetcher: (q: StandardListQueryState) =>
+      glycopharmApi.getAdminApplications({
+        status: (q.filters.status as ApplicationStatus | undefined) || undefined,
+        serviceType: (q.filters.serviceType as ServiceType | undefined) || undefined,
+        organizationType: (q.filters.organizationType as OrganizationType | undefined) || undefined,
+        page: q.page,
+        limit: q.limit,
+      }),
+    normalize: (res): StandardPaginatedResponse<AdminApplication> => {
+      const p = res?.pagination ?? { page: 1, limit: 20, total: 0, totalPages: 1 };
+      return {
+        data: res?.applications ?? [],
+        pagination: {
+          page: p.page,
+          limit: p.limit,
+          total: p.total,
+          totalPages: p.totalPages,
+          hasNextPage: p.page < p.totalPages,
+          hasPreviousPage: p.page > 1,
+        },
+      };
+    },
+  });
 
-  // Filters
-  const [statusFilter, setStatusFilter] = useState<ApplicationStatus | ''>('');
-  const [serviceTypeFilter, setServiceTypeFilter] = useState<ServiceType | ''>('');
-  const [orgTypeFilter, setOrgTypeFilter] = useState<OrganizationType | ''>('');
+  const statusFilter = (query.filters.status as string) ?? '';
+  const serviceTypeFilter = (query.filters.serviceType as string) ?? '';
+  const orgTypeFilter = (query.filters.organizationType as string) ?? '';
+  const hasFilters = !!(statusFilter || serviceTypeFilter || orgTypeFilter);
 
-  // Pagination
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [total, setTotal] = useState(0);
-
-  useEffect(() => {
-    loadApplications();
-  }, [statusFilter, serviceTypeFilter, orgTypeFilter, page]);
-
-  const loadApplications = async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await glycopharmApi.getAdminApplications({
-        status: statusFilter || undefined,
-        serviceType: serviceTypeFilter || undefined,
-        organizationType: orgTypeFilter || undefined,
-        page,
-        limit: 20,
-      });
-
-      setApplications(response.applications);
-      setTotalPages(response.pagination.totalPages);
-      setTotal(response.pagination.total);
-    } catch (err: any) {
-      if (err.status === 403) {
-        setError('접근 권한이 없습니다. 운영자 또는 관리자 계정으로 로그인하세요.');
-      } else if (err.status === 401) {
-        setError('로그인이 필요합니다.');
-      } else {
-        setError(err.message || '신청 목록을 불러오는데 실패했습니다.');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const clearFilters = () => {
-    setStatusFilter('');
-    setServiceTypeFilter('');
-    setOrgTypeFilter('');
-    setPage(1);
-  };
-
-  const hasFilters = statusFilter || serviceTypeFilter || orgTypeFilter;
+  const err = error as { status?: number; message?: string } | null;
+  const errorMessage = err
+    ? err.status === 403
+      ? '접근 권한이 없습니다. 운영자 또는 관리자 계정으로 로그인하세요.'
+      : err.status === 401
+        ? '로그인이 필요합니다.'
+        : err.message || '신청 목록을 불러오는데 실패했습니다.'
+    : null;
 
   return (
     <div className="p-6">
@@ -95,7 +100,7 @@ export default function ApplicationsPage() {
           <span className="text-sm font-medium text-slate-700">필터</span>
           {hasFilters && (
             <button
-              onClick={clearFilters}
+              onClick={() => resetFilters()}
               className="ml-auto text-sm text-primary-600 hover:text-primary-700"
             >
               필터 초기화
@@ -107,10 +112,7 @@ export default function ApplicationsPage() {
             <label className="block text-xs text-slate-500 mb-1">상태</label>
             <select
               value={statusFilter}
-              onChange={(e) => {
-                setStatusFilter(e.target.value as ApplicationStatus | '');
-                setPage(1);
-              }}
+              onChange={(e) => setFilter('status', e.target.value || undefined)}
               className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="">전체</option>
@@ -123,10 +125,7 @@ export default function ApplicationsPage() {
             <label className="block text-xs text-slate-500 mb-1">서비스 타입</label>
             <select
               value={serviceTypeFilter}
-              onChange={(e) => {
-                setServiceTypeFilter(e.target.value as ServiceType | '');
-                setPage(1);
-              }}
+              onChange={(e) => setFilter('serviceType', e.target.value || undefined)}
               className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="">전체</option>
@@ -139,10 +138,7 @@ export default function ApplicationsPage() {
             <label className="block text-xs text-slate-500 mb-1">조직 유형</label>
             <select
               value={orgTypeFilter}
-              onChange={(e) => {
-                setOrgTypeFilter(e.target.value as OrganizationType | '');
-                setPage(1);
-              }}
+              onChange={(e) => setFilter('organizationType', e.target.value || undefined)}
               className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="">전체</option>
@@ -156,7 +152,7 @@ export default function ApplicationsPage() {
       {/* Stats */}
       <div className="flex items-center gap-4 mb-4">
         <span className="text-sm text-slate-500">
-          총 <span className="font-medium text-slate-700">{total}</span>건
+          총 <span className="font-medium text-slate-700">{pagination.total}</span>건
         </span>
       </div>
 
@@ -169,11 +165,11 @@ export default function ApplicationsPage() {
       )}
 
       {/* Error */}
-      {error && (
+      {errorMessage && (
         <div className="bg-white rounded-xl shadow-sm p-8 text-center">
-          <p className="text-red-600 mb-4">{error}</p>
+          <p className="text-red-600 mb-4">{errorMessage}</p>
           <button
-            onClick={loadApplications}
+            onClick={() => refetch()}
             className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
           >
             다시 시도
@@ -182,7 +178,7 @@ export default function ApplicationsPage() {
       )}
 
       {/* Applications Table */}
-      {!error && (() => {
+      {!errorMessage && (() => {
         const columns: ListColumnDef<AdminApplication>[] = [
           {
             key: 'organizationName',
@@ -257,22 +253,22 @@ export default function ApplicationsPage() {
               emptyMessage={hasFilters ? '조건에 맞는 신청이 없습니다.' : '신청 내역이 없습니다.'}
               tableId="glycopharm-operator-applications"
             />
-            {totalPages > 1 && (
+            {pagination.totalPages > 1 && (
               <div className="flex items-center justify-center gap-3 mt-4">
                 <button
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={page <= 1}
+                  onClick={() => setPage(Math.max(1, pagination.page - 1))}
+                  disabled={pagination.page <= 1}
                   className="flex items-center gap-1 px-3 py-2 border rounded-lg disabled:opacity-50 hover:bg-slate-50"
                 >
                   <ChevronLeft className="w-4 h-4" />
                   이전
                 </button>
                 <span className="text-sm text-slate-600">
-                  {page} / {totalPages}
+                  {pagination.page} / {pagination.totalPages}
                 </span>
                 <button
-                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={page >= totalPages}
+                  onClick={() => setPage(Math.min(pagination.totalPages, pagination.page + 1))}
+                  disabled={pagination.page >= pagination.totalPages}
                   className="flex items-center gap-1 px-3 py-2 border rounded-lg disabled:opacity-50 hover:bg-slate-50"
                 >
                   다음
