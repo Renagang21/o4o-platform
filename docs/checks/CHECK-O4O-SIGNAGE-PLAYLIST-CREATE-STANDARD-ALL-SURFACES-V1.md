@@ -101,5 +101,14 @@ KPA store-playlists 는 description/tags 수용 → store 모드 기본(표시).
 
 ## 6. 남은 이슈 / 후속
 - **브라우저 smoke** (3 서비스 × 운영자/내매장, KPA 커뮤니티) — 배포 후.
-- **백엔드 canonical 통합 IR** — `store_playlists` → `signage_playlists` 정합(미러 write / dual-read / migration) 은 별도 백엔드 WO 로 분리(이번 WO §9 범위 외).
+- **백엔드 canonical 통합 IR** — `store_playlists` → `signage_playlists` 정합(미러 write / dual-read / migration) 은 별도 IR/WO 로 분리(이번 WO §9 범위 외). 제안 문서명: `IR-O4O-SIGNAGE-STORE-PLAYLISTS-CANONICAL-DATA-MODEL-V1` (조사 대상: 두 테이블 필드 차이 / store-playlists API 사용처 / 목록·상세·복사·미디어추가 흐름 / organizationId·serviceKey 스코핑 차이 / dual-read·mirror-write 가능성 / migration·데이터 보존 정책).
 - GP/KCos 운영자 등록이 단건→다단계로 바뀌며 "URL 최소 1개 필수"가 됨(KPA 정합). 의도된 정렬.
+
+---
+
+## 7. 범위 경계 (명시)
+
+본 WO 의 표준화 범위는 **등록 UI Shell · `/new` route · surface별 adapter 정렬**까지이며, **저장 데이터 모델 통합은 명시적으로 제외**한다. 특히 내 매장 축은 목록 정합성을 위해 현행 `store_playlists` endpoint 를 유지한다.
+
+**상태:** CODE PASS / 배포 후 browser smoke 대기
+**후속:** `store_playlists` → `signage_playlists` canonical 통합 IR 분리
