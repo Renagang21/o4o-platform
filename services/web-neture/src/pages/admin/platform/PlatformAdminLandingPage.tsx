@@ -44,10 +44,10 @@ const TIER1_CARDS: Tier1Card[] = [
   {
     icon: Target,
     title: '서비스 대상 정책',
-    desc: '여러 O4O 서비스의 대상 정책을 관리하는 cross-service 기능. 운영 책임·guard 정합 확정 후 이동을 검토합니다.',
-    to: '/admin/settings/service-audience',
-    badge: '소유권 결정 필요',
-    badgeTone: 'decide',
+    desc: '여러 O4O 서비스의 의약품 연결 가능 여부를 결정하는 cross-service governance. 플랫폼 관리 영역으로 이동되었습니다.',
+    to: '/admin/platform/service-audience',
+    badge: '이동 완료',
+    badgeTone: 'move',
   },
 ];
 

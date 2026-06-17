@@ -1044,6 +1044,8 @@ function App() {
               <Route path="users" element={<PlatformUsersPage />} />
               {/* WO-O4O-PLATFORM-ROLES-MENU-MIGRATION-V1 */}
               <Route path="roles" element={<PlatformRolesPage />} />
+              {/* WO-O4O-PLATFORM-SERVICE-AUDIENCE-POLICY-MIGRATION-V1: 서비스 대상 정책 platform 이동 */}
+              <Route path="service-audience" element={<ServiceAudiencePolicyPage />} />
             </Route>
 
             {/* ================================================================

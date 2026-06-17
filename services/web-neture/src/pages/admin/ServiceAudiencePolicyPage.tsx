@@ -8,10 +8,14 @@
  * 본 화면은 정책 저장/조회까지만 — gate 실제 적용은 후속 WO.
  */
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Building2, Loader2, CheckCircle, Info } from 'lucide-react';
 import { serviceAudiencePolicyApi, type ServiceAudiencePolicy } from '../../lib/api/admin';
 
 export default function ServiceAudiencePolicyPage() {
+  // WO-O4O-PLATFORM-SERVICE-AUDIENCE-POLICY-MIGRATION-V1: legacy 진입(/admin/settings/...) 시 이동 안내.
+  const { pathname } = useLocation();
+  const isLegacyRoute = pathname.startsWith('/admin/settings/service-audience');
   const [rows, setRows] = useState<ServiceAudiencePolicy[]>([]);
   const [loading, setLoading] = useState(true);
   const [savingKey, setSavingKey] = useState<string | null>(null);
@@ -62,6 +66,17 @@ export default function ServiceAudiencePolicyPage() {
 
   return (
     <div className="max-w-3xl">
+      {isLegacyRoute && (
+        <div className="mb-4 rounded-lg bg-amber-50 border border-amber-200 p-3 text-xs text-amber-800 flex items-center justify-between gap-3">
+          <span>
+            서비스 대상 정책은 <strong>O4O 플랫폼 관리</strong> 영역으로 이동되었습니다.
+            앞으로는 <code>/admin/platform/service-audience</code> 에서 관리해 주세요.
+          </span>
+          <a href="/admin/platform/service-audience" className="shrink-0 px-3 py-1.5 rounded-lg bg-amber-600 text-white font-medium hover:bg-amber-700 no-underline">
+            플랫폼으로 이동
+          </a>
+        </div>
+      )}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-slate-900">서비스 대상 정책 (플랫폼 관리)</h1>
         <p className="text-sm text-slate-500 mt-1">
@@ -75,7 +90,7 @@ export default function ServiceAudiencePolicyPage() {
         <Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
         <div>
           이 설정은 Neture 자체 서비스 설정이 아니라, <strong>O4O 내 여러 서비스의 대상 정책</strong>을 관리하는
-          플랫폼 관리 항목입니다. 향후 platform-admin 표면이 분리되면 이 화면의 소속이 조정될 수 있습니다.
+          플랫폼 관리 항목입니다. platform 권한(platform:admin / platform:super_admin)으로 관리합니다.
         </div>
       </div>
 

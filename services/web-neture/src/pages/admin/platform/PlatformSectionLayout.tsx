@@ -17,6 +17,8 @@ const NAV = [
   { to: '/admin/platform/services', label: '서비스 관리', end: false },
   { to: '/admin/platform/users', label: '사용자 조회', end: false },
   { to: '/admin/platform/roles', label: '역할 관리', end: false },
+  // WO-O4O-PLATFORM-SERVICE-AUDIENCE-POLICY-MIGRATION-V1
+  { to: '/admin/platform/service-audience', label: '서비스 대상 정책', end: false },
 ];
 
 export default function PlatformSectionLayout() {
