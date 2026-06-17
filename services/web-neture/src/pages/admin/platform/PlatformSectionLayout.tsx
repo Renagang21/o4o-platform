@@ -16,6 +16,7 @@ const NAV = [
   { to: '/admin/platform/accounts', label: '계정 관리', end: false },
   { to: '/admin/platform/services', label: '서비스 관리', end: false },
   { to: '/admin/platform/users', label: '사용자 조회', end: false },
+  { to: '/admin/platform/roles', label: '역할 관리', end: false },
 ];
 
 export default function PlatformSectionLayout() {

@@ -320,6 +320,7 @@ const PlatformSectionLayout = lazy(() => import('./pages/admin/platform/Platform
 const PlatformAccountsPage = lazy(() => import('./pages/admin/platform/PlatformAccountsPage'));
 const PlatformServicesPage = lazy(() => import('./pages/admin/platform/PlatformServicesPage'));
 const PlatformUsersPage = lazy(() => import('./pages/admin/platform/PlatformUsersPage'));
+const PlatformRolesPage = lazy(() => import('./pages/admin/platform/PlatformRolesPage'));
 
 // Admin Operators
 const OperatorsPage = lazy(() => import('./pages/admin/OperatorsPage'));
@@ -1041,6 +1042,8 @@ function App() {
               <Route path="services" element={<PlatformServicesPage />} />
               {/* WO-O4O-PLATFORM-GLOBAL-USERS-READONLY-LIST-V1 */}
               <Route path="users" element={<PlatformUsersPage />} />
+              {/* WO-O4O-PLATFORM-ROLES-MENU-MIGRATION-V1 */}
+              <Route path="roles" element={<PlatformRolesPage />} />
             </Route>
 
             {/* ================================================================

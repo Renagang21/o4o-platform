@@ -36,10 +36,10 @@ const TIER1_CARDS: Tier1Card[] = [
   {
     icon: ShieldCheck,
     title: '역할 관리',
-    desc: '여러 서비스의 role 카탈로그를 다루는 cross-service 기능. 향후 platform section 이동 후보입니다.',
-    to: '/admin/roles',
-    badge: '이동 후보',
-    badgeTone: 'move',
+    desc: '여러 서비스의 role 카탈로그를 다루는 cross-service 기능. platform 영역으로 이동되었습니다.',
+    to: '/admin/platform/roles',
+    badge: '이동 완료',
+    badgeTone: 'keep',
   },
   {
     icon: Target,
