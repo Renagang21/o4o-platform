@@ -6,7 +6,25 @@
  * 운영자 승인 = 판매자 모집 제품의 "자기 서비스 노출" 승인 (개별 판매자 승인 아님).
  * 데이터 fetch / approve / reject 는 각 서비스 wrapper 가 자기 apiClient 로 수행하고 props 로 주입.
  * semantic 색만 사용 — 서비스 accent 불필요.
+ *
+ * WO-O4O-OPERATOR-RECRUITMENT-EXPOSURE-STANDARD-LIST-ADOPTION-V1 (최소 개선):
+ *   카드 승인 큐 유지(DataTable/Pagination/검색/정렬 미적용 — 화면 성격상 N/A).
+ *   exposureStatus 필터(opt-in)만 도입. 필터 상태·URL sync 는 page 가 소유(controlled).
  */
+import { StandardListToolbar } from '../list';
+
+export interface RecruitmentExposureFilterOption {
+  value: string;
+  label: string;
+}
+
+const DEFAULT_EXPOSURE_FILTERS: RecruitmentExposureFilterOption[] = [
+  { value: 'pending', label: '노출 대기' },
+  { value: 'approved', label: '노출 승인' },
+  { value: 'rejected', label: '노출 반려' },
+  { value: 'all', label: '전체' },
+];
+
 export interface RecruitmentExposureItem {
   id: string;
   productName: string;
@@ -30,6 +48,13 @@ export interface RecruitmentExposureConsoleProps {
   audienceLabel?: string;
   onApprove: (id: string, note?: string) => void;
   onReject: (id: string, note?: string) => void;
+  // WO-O4O-OPERATOR-RECRUITMENT-EXPOSURE-STANDARD-LIST-ADOPTION-V1: exposureStatus 필터(opt-in, controlled by page)
+  /** 현재 필터 값(예: 'pending'|'approved'|'rejected'|'all'). onFilterChange 와 함께 제공 시 필터 노출. */
+  filterStatus?: string;
+  /** 필터 옵션(미지정 시 기본: 노출 대기/승인/반려/전체). */
+  filterOptions?: RecruitmentExposureFilterOption[];
+  /** 필터 변경 콜백 — 제공 시 필터 UI 노출. page 가 fetch/URL sync 수행. */
+  onFilterChange?: (value: string) => void;
 }
 
 const EXPOSURE_META: Record<string, { label: string; cls: string }> = {
@@ -50,11 +75,15 @@ export function RecruitmentExposureConsole({
   audienceLabel = '매장 사용자',
   onApprove,
   onReject,
+  filterStatus,
+  filterOptions,
+  onFilterChange,
 }: RecruitmentExposureConsoleProps) {
   const handleReject = (id: string) => {
     const note = window.prompt('노출 반려 사유 (선택)') ?? undefined;
     onReject(id, note);
   };
+  const options = filterOptions ?? DEFAULT_EXPOSURE_FILTERS;
 
   return (
     <div className="max-w-4xl p-6">
@@ -67,6 +96,28 @@ export function RecruitmentExposureConsole({
           개별 판매자 승인/반려는 공급자가 모집 상세에서 처리합니다.
         </p>
       </div>
+
+      {onFilterChange && (
+        <div className="mb-4">
+          <StandardListToolbar
+            filters={
+              <select
+                value={filterStatus ?? 'pending'}
+                onChange={(e) => onFilterChange(e.target.value)}
+                className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                aria-label="노출 승인 상태 필터"
+              >
+                {options.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+            }
+            summary={!loading ? `총 ${items.length}건` : undefined}
+          />
+        </div>
+      )}
 
       {loading ? (
         <div className="py-16 text-center text-slate-400 text-sm">불러오는 중...</div>
