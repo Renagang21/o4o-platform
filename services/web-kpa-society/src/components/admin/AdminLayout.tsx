@@ -9,6 +9,8 @@
  * WO-O4O-KPA-ADMIN-LAYOUT-MOBILE-FIX-V1:
  * - 데스크톱 고정 `ml-[260px]` → `md:ml-[260px]`로 한정 (mobile 본문 잘림 해소)
  * - mobile에서는 sidebar drawer 패턴 + 햄버거 토글 바 제공
+ * WO-O4O-KPA-ADMIN-SIDEBAR-LG-STANDARDIZATION-V1:
+ * - O4O 표준 breakpoint 정렬: md → lg(1024). <1024 drawer / >=1024 고정 sidebar.
  */
 
 import { useState } from 'react';
@@ -24,8 +26,8 @@ export function AdminLayout() {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <KpaGlobalHeader />
 
-      {/* Mobile-only sidebar toggle bar — desktop 숨김. 헤더 바로 아래에 sticky로 배치. */}
-      <div className="md:hidden sticky top-16 z-20 bg-white border-b border-gray-200 px-4 py-2 flex items-center">
+      {/* Mobile/Tablet sidebar toggle bar (<lg) — desktop(>=lg) 숨김. 헤더 바로 아래에 sticky로 배치. */}
+      <div className="lg:hidden sticky top-16 z-20 bg-white border-b border-gray-200 px-4 py-2 flex items-center">
         <button
           type="button"
           onClick={() => setMobileSidebarOpen(true)}
@@ -44,7 +46,7 @@ export function AdminLayout() {
           isMobileOpen={mobileSidebarOpen}
           onMobileClose={() => setMobileSidebarOpen(false)}
         />
-        <main className="flex-1 md:ml-[260px] min-h-screen">
+        <main className="flex-1 lg:ml-[260px] min-h-screen">
           <Outlet />
         </main>
       </div>

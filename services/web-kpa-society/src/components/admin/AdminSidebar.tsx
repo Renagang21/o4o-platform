@@ -11,6 +11,9 @@
  * WO-O4O-KPA-ADMIN-LAYOUT-MOBILE-FIX-V1:
  * - mobile drawer 패턴 (slide-in transform + backdrop)
  * - desktop 동작 유지 (md+에서는 항상 visible)
+ * WO-O4O-KPA-ADMIN-SIDEBAR-LG-STANDARDIZATION-V1:
+ * - breakpoint md → lg(1024) 정렬. >=lg 에서 항상 visible, <lg drawer.
+ * - 메뉴 계층 토큰 최소 정렬(group weight 600, child 13px/pl-14) — DomainIASidebar 표준 정합.
  */
 
 import { useState } from 'react';
@@ -110,10 +113,10 @@ export function AdminSidebar({ isMobileOpen = false, onMobileClose }: AdminSideb
 
   return (
     <>
-      {/* Mobile drawer backdrop — md+에서는 hidden, drawer 닫혔으면 hidden */}
+      {/* Mobile/Tablet drawer backdrop (<lg) — desktop(>=lg) hidden, drawer 닫혔으면 hidden */}
       {isMobileOpen && (
         <div
-          className="md:hidden fixed inset-x-0 top-16 bottom-0 bg-black/40 z-30"
+          className="lg:hidden fixed inset-x-0 top-16 bottom-0 bg-black/40 z-30"
           onClick={onMobileClose}
           aria-hidden="true"
         />
@@ -121,8 +124,8 @@ export function AdminSidebar({ isMobileOpen = false, onMobileClose }: AdminSideb
 
       <aside
         id="admin-sidebar"
-        className={`fixed left-0 top-16 h-[calc(100vh-4rem)] w-[260px] bg-white border-r border-gray-200 flex flex-col z-40 transition-transform duration-200 ease-out md:translate-x-0 ${
-          isMobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+        className={`fixed left-0 top-16 h-[calc(100vh-4rem)] w-[260px] bg-white border-r border-gray-200 flex flex-col z-40 transition-transform duration-200 ease-out lg:translate-x-0 ${
+          isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
         {/* WO-O4O-KPA-ADMIN-DASHBOARD-ORG-BRANDING-REMOVAL-V1:
@@ -163,7 +166,7 @@ export function AdminSidebar({ isMobileOpen = false, onMobileClose }: AdminSideb
               <div key={group.label}>
                 <button
                   onClick={() => toggleGroup(group.label)}
-                  className={`w-full flex items-center gap-3 px-5 py-3 text-sm font-medium transition-colors border-l-2 ${
+                  className={`w-full flex items-center gap-3 px-5 py-3 text-sm font-semibold transition-colors border-l-2 ${
                     active
                       ? 'text-indigo-600 border-indigo-600'
                       : 'text-gray-600 border-transparent hover:bg-gray-50 hover:text-gray-900'
@@ -185,7 +188,7 @@ export function AdminSidebar({ isMobileOpen = false, onMobileClose }: AdminSideb
                         key={item.path}
                         to={item.path}
                         onClick={handleNavigate}
-                        className={`block pl-12 pr-5 py-2 text-sm transition-colors ${
+                        className={`block pl-14 pr-5 py-2 text-[13px] transition-colors ${
                           isItemActive(item.path, item.exact)
                             ? 'text-indigo-600 bg-indigo-50 font-medium'
                             : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
