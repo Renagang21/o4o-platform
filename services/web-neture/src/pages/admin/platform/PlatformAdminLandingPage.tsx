@@ -12,7 +12,50 @@
  */
 
 import { Link } from 'react-router-dom';
-import { Users, LayoutGrid, UserCog, ArrowRight } from 'lucide-react';
+import { Users, LayoutGrid, UserCog, ArrowRight, ShieldCheck, Target } from 'lucide-react';
+
+// WO-O4O-PLATFORM-TIER1-CROSSLINK-CARDS-V1: Neture admin 에 남은 플랫폼 성격 Tier 1 기능 안내(이동/guard 변경 없음)
+interface Tier1Card {
+  icon: typeof Users;
+  title: string;
+  desc: string;
+  to: string;
+  badge: string;
+  badgeTone: 'keep' | 'move' | 'decide';
+}
+
+const TIER1_CARDS: Tier1Card[] = [
+  {
+    icon: UserCog,
+    title: '운영자 관리',
+    desc: 'Neture 서비스 운영자/관리자를 부여·회수하는 기능(neture 전용 범위). 현재 위치를 유지합니다.',
+    to: '/admin/operators',
+    badge: '현 위치 유지',
+    badgeTone: 'keep',
+  },
+  {
+    icon: ShieldCheck,
+    title: '역할 관리',
+    desc: '여러 서비스의 role 카탈로그를 다루는 cross-service 기능. 향후 platform section 이동 후보입니다.',
+    to: '/admin/roles',
+    badge: '이동 후보',
+    badgeTone: 'move',
+  },
+  {
+    icon: Target,
+    title: '서비스 대상 정책',
+    desc: '여러 O4O 서비스의 대상 정책을 관리하는 cross-service 기능. 운영 책임·guard 정합 확정 후 이동을 검토합니다.',
+    to: '/admin/settings/service-audience',
+    badge: '소유권 결정 필요',
+    badgeTone: 'decide',
+  },
+];
+
+const TIER1_BADGE_CLASS: Record<Tier1Card['badgeTone'], string> = {
+  keep: 'bg-slate-100 text-slate-600 border-slate-200',
+  move: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+  decide: 'bg-amber-50 text-amber-700 border-amber-200',
+};
 
 interface PlatformCard {
   icon: typeof Users;
@@ -95,15 +138,41 @@ export default function PlatformAdminLandingPage() {
         </div>
       </section>
 
-      {/* Tier 1 안내 (이동하지 않음) */}
-      <section className="rounded-xl bg-slate-50 border border-slate-200 p-5">
-        <h2 className="text-sm font-semibold text-slate-700 mb-2">현재 Neture admin 에서 운영 중인 플랫폼 성격 항목</h2>
-        <p className="text-xs text-slate-500 leading-relaxed">
-          <strong>운영자 관리 · 역할 관리 · 서비스 대상 정책</strong>은 현재 Neture admin 안에서
-          “플랫폼” 라벨로 운영 중입니다(guard: neture:admin). 이 항목들은 후속 정책 결정
-          (<code>IR-O4O-PLATFORM-TIER1-MENU-MIGRATION-DECISION-V1</code>)에 따라 본 platform section 으로
-          이동될 수 있습니다. 현재 단계에서는 이동하지 않으며, 기존 위치에서 그대로 동작합니다.
+      {/* Tier 1 crosslink (WO-O4O-PLATFORM-TIER1-CROSSLINK-CARDS-V1 — 안내·링크만, 이동/guard 변경 없음) */}
+      <section>
+        <h2 className="text-sm font-semibold text-slate-700 mb-1">Neture admin 에서 운영 중인 플랫폼 성격 기능</h2>
+        <p className="text-xs text-slate-500 mb-4 leading-relaxed">
+          아래 기능은 현재 Neture admin(guard: neture:admin) 안에서 운영 중이지만 플랫폼 성격을 가진 항목입니다.
+          실제 이동 여부는 후속 정책 결정(<code>IR-O4O-PLATFORM-TIER1-MENU-MIGRATION-DECISION-V1</code>)에 따라 정리되며,
+          현재 단계에서는 위치·권한을 변경하지 않습니다.
         </p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {TIER1_CARDS.map((card) => {
+            const Icon = card.icon;
+            return (
+              <Link
+                key={card.title}
+                to={card.to}
+                className="group block rounded-xl bg-white border border-slate-200 shadow-sm p-5 hover:border-slate-400 transition-colors no-underline"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
+                    <Icon className="w-5 h-5 text-slate-600" />
+                  </div>
+                  <span className={`text-[11px] font-semibold rounded-full border px-2 py-0.5 ${TIER1_BADGE_CLASS[card.badgeTone]}`}>
+                    {card.badge}
+                  </span>
+                </div>
+                <h3 className="font-semibold text-slate-800 mb-1 flex items-center gap-1">
+                  {card.title}
+                  <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-600 transition-colors" />
+                </h3>
+                <p className="text-xs text-slate-500 leading-relaxed mb-2">{card.desc}</p>
+                <p className="text-[11px] text-slate-400 font-mono break-all">{card.to}</p>
+              </Link>
+            );
+          })}
+        </div>
       </section>
     </div>
   );
