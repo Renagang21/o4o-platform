@@ -547,15 +547,28 @@ export class OfferServiceApprovalService {
 
       const { user_id: userId, product_name: productName } = rows[0];
       const isApproved = status === 'approved';
-      const title = isApproved ? '상품 승인 완료' : '상품 승인 거절';
-      const message = reason
-        ? `[${productName}] ${isApproved ? '승인' : '거절'}되었습니다. 사유: ${reason}`
-        : `[${productName}] ${isApproved ? '승인' : '거절'}되었습니다.`;
+
+      // WO-O4O-NETURE-PRODUCT-APPROVAL-REJECTION-COPY-AND-RESUBMIT-UX-V1:
+      // 반려는 "끝"이 아니라 보완 후 재요청 가능함을 알림 문구에 명시한다(상태 체계 불변).
+      const title = isApproved ? '상품 승인 완료' : '상품 승인 반려';
+      let message: string;
+      if (isApproved) {
+        message = reason
+          ? `[${productName}] 승인되었습니다. 사유: ${reason}`
+          : `[${productName}] 승인되었습니다.`;
+      } else {
+        message = reason
+          ? `[${productName}] 승인 요청이 반려되었습니다. 사유: ${reason} 제품 정보를 수정한 뒤 다시 승인 요청할 수 있습니다.`
+          : `[${productName}] 승인 요청이 반려되었습니다. 사유를 확인하고 제품 정보를 보완한 뒤 다시 승인 요청할 수 있습니다.`;
+      }
+
+      // targetUrl: schema 변경 없이 metadata에 포함(공급자 제품 목록). 라우트 설계 영향 없음.
+      const targetUrl = '/supplier/products';
 
       await this.dataSource.query(
         `INSERT INTO notifications (id, "userId", channel, type, title, message, metadata, "isRead", "createdAt")
          VALUES (gen_random_uuid(), $1, 'in_app', 'custom', $2, $3, $4, false, NOW())`,
-        [userId, title, message, JSON.stringify({ offerId, status, productName })],
+        [userId, title, message, JSON.stringify({ offerId, status, productName, targetUrl })],
       );
     } catch (err) {
       logger.warn('[ServiceApproval] Failed to send notification', err);

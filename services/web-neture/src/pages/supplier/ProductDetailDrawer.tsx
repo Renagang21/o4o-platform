@@ -670,6 +670,33 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto px-6 py-5">
 
+          {/* ── 반려 안내 배너 (WO-O4O-NETURE-PRODUCT-APPROVAL-REJECTION-COPY-AND-RESUBMIT-UX-V1) ──
+               반려 = 끝이 아니라 보완 후 재요청 가능함을 상단에 명확히 안내(상태 체계 불변). */}
+          {!isEditing && !approvalActions && (() => {
+            const rejectedApprovals = (product.serviceApprovals || []).filter(
+              (sa) => sa.serviceKey !== 'neture' && sa.status === 'rejected',
+            );
+            if (rejectedApprovals.length === 0) return null;
+            const reasons = rejectedApprovals.filter((sa) => sa.reason);
+            return (
+              <div className="mb-4 px-4 py-3 rounded-lg bg-red-50 border border-red-200">
+                <p className="text-sm font-bold text-red-700">이 제품은 반려되었습니다.</p>
+                {reasons.length > 0 ? (
+                  <ul className="mt-1.5 space-y-1">
+                    {reasons.map((sa, i) => (
+                      <li key={i} className="text-xs text-red-600">반려 사유: {sa.reason}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="mt-1.5 text-xs text-red-600">반려 사유가 입력되지 않았습니다.</p>
+                )}
+                <p className="mt-2 text-xs text-slate-600">
+                  아래 정보를 확인하고 제품을 보완한 뒤 다시 승인 요청할 수 있습니다.
+                </p>
+              </div>
+            );
+          })()}
+
           {/* ── 편집 모드 배너 (WO-NETURE-PRODUCT-DRAWER-DUAL-EDIT-ENTRY-V1) ── */}
           {isEditing && (
             <div className={`mb-4 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 ${

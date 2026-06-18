@@ -68,7 +68,9 @@ const productApprovalPolicy = defineActionPolicy<AdminProduct>('neture:product-a
         variant: 'danger',
         confirmText: '반려 확인',
         showReason: true,
-        reasonPlaceholder: '반려 사유를 입력하세요 (선택)',
+        // WO-O4O-NETURE-PRODUCT-APPROVAL-REJECTION-COPY-AND-RESUBMIT-UX-V1:
+        // 공급자는 반려 후 보완하여 다시 승인 요청할 수 있으므로, 보완할 내용을 구체적으로 안내한다.
+        reasonPlaceholder: '예: 제품명과 상세 설명이 일치하지 않습니다. 상세 설명을 수정한 뒤 다시 승인 요청해 주세요.',
       }),
     },
     {
@@ -501,11 +503,16 @@ export default function OperatorProductApprovalPage() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]">
           <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl">
             <h3 className="text-lg font-bold text-slate-900 mb-2">상품 반려</h3>
-            <p className="text-sm text-slate-500 mb-4">{rejectTarget.name}</p>
+            <p className="text-sm text-slate-500 mb-2">{rejectTarget.name}</p>
+            {/* WO-O4O-NETURE-PRODUCT-APPROVAL-REJECTION-COPY-AND-RESUBMIT-UX-V1 */}
+            <p className="text-xs text-slate-500 mb-3">
+              공급자가 확인할 반려/보완 사유를 입력해 주세요. 수정 후 다시 승인 요청할 수 있으므로,
+              보완할 내용을 구체적으로 작성하는 것이 좋습니다.
+            </p>
             <textarea
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
-              placeholder="반려 사유를 입력하세요 (선택)"
+              placeholder="예: 제품명과 상세 설명이 일치하지 않습니다. 상세 설명을 수정한 뒤 다시 승인 요청해 주세요."
               className="w-full border border-slate-200 rounded-lg p-3 text-sm resize-none h-24 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <div className="flex justify-end gap-2 mt-4">
