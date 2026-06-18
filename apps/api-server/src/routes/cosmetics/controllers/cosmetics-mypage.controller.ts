@@ -46,6 +46,9 @@ interface CosmeticsBusinessInfoResponse {
   representativeName: string | null;
   businessAddress: string | null;
   businessPhone: string | null;
+  // 회사이메일 / 담당자이메일 — WO-O4O-CROSSSERVICE-BUSINESS-CONTACT-FIELDS-BACKEND-SUPPORT-V1
+  businessEmail: string | null;
+  contactEmail: string | null;
   businessType: string | null;
   businessItem: string | null;
   businessEntityType: string | null;
@@ -61,6 +64,9 @@ function projectBusinessInfo(biz: Record<string, unknown>): CosmeticsBusinessInf
     representativeName: (biz.representativeName as string) ?? (biz.ceoName as string) ?? null,
     businessAddress: (biz.businessAddress as string) ?? (biz.address as string) ?? null,
     businessPhone: (biz.businessPhone as string) ?? (biz.phone as string) ?? null,
+    // 회사이메일 / 담당자이메일 — WO-O4O-CROSSSERVICE-BUSINESS-CONTACT-FIELDS-BACKEND-SUPPORT-V1
+    businessEmail: (biz.businessEmail as string) ?? null,
+    contactEmail: (biz.contactEmail as string) ?? null,
     businessType: (biz.businessType as string) ?? null,
     businessItem: (biz.businessItem as string) ?? null,
     businessEntityType: (biz.businessEntityType as string) ?? null,
@@ -169,6 +175,17 @@ export function createCosmeticsMypageController(
         const v = SAFE_STRING(body.taxInvoiceEmail, 255);
         if (v && !/^\S+@\S+\.\S+$/.test(v)) errors.push('taxInvoiceEmail: 올바른 이메일 형식이 아닙니다');
         patch.taxInvoiceEmail = v;
+      }
+      // 회사이메일 / 담당자이메일 — WO-O4O-CROSSSERVICE-BUSINESS-CONTACT-FIELDS-BACKEND-SUPPORT-V1
+      if ('businessEmail' in body) {
+        const v = SAFE_STRING(body.businessEmail, 255);
+        if (v && !/^\S+@\S+\.\S+$/.test(v)) errors.push('businessEmail: 올바른 이메일 형식이 아닙니다');
+        patch.businessEmail = v;
+      }
+      if ('contactEmail' in body) {
+        const v = SAFE_STRING(body.contactEmail, 255);
+        if (v && !/^\S+@\S+\.\S+$/.test(v)) errors.push('contactEmail: 올바른 이메일 형식이 아닙니다');
+        patch.contactEmail = v;
       }
 
       if (errors.length > 0) {

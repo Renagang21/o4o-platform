@@ -179,6 +179,10 @@ export class AuthAccountController extends BaseController {
             'businessItem', 'representativeName', 'taxInvoiceEmail', 'managerPhone', 'contactName',
             'businessAddress', 'businessAddressDetail', 'zipCode',
             'phone', 'storeAddress',
+            // 사업자 연락처 3종 (WO-O4O-CROSSSERVICE-BUSINESS-CONTACT-FIELDS-BACKEND-SUPPORT-V1)
+            // businessPhone(회사전화)/businessEmail(회사이메일)/contactEmail(담당자이메일).
+            // 기존 phone(개인)/managerPhone(담당자 전화)/taxInvoiceEmail(세금계산서)와 의미 분리.
+            'businessPhone', 'businessEmail', 'contactEmail',
             // 사업자 유형 / 개업일 (WO-O4O-CROSSSERVICE-BUSINESS-REGISTRATION-FORM-ALIGNMENT-V1)
             // canonical: packages/types/src/business-registration.ts BusinessRegistrationInfo
             'businessEntityType', 'businessStartDate',

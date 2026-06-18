@@ -186,6 +186,9 @@ export function createGlycopharmMypageController(
           representativeName: (biz.representativeName as string) ?? (biz.ceoName as string) ?? null,
           businessAddress: (biz.businessAddress as string) ?? (biz.address as string) ?? null,
           businessPhone: (biz.businessPhone as string) ?? (biz.phone as string) ?? null,
+          // 회사이메일 / 담당자이메일 — WO-O4O-CROSSSERVICE-BUSINESS-CONTACT-FIELDS-BACKEND-SUPPORT-V1
+          businessEmail: (biz.businessEmail as string) ?? null,
+          contactEmail: (biz.contactEmail as string) ?? null,
           businessType: (biz.businessType as string) ?? null,
           businessItem: (biz.businessItem as string) ?? null,
           businessEntityType: (biz.businessEntityType as string) ?? null,
@@ -259,6 +262,17 @@ export function createGlycopharmMypageController(
         if (v && !/^\S+@\S+\.\S+$/.test(v)) errors.push('taxInvoiceEmail: 올바른 이메일 형식이 아닙니다');
         patch.taxInvoiceEmail = v;
       }
+      // 회사이메일 / 담당자이메일 — WO-O4O-CROSSSERVICE-BUSINESS-CONTACT-FIELDS-BACKEND-SUPPORT-V1
+      if ('businessEmail' in body) {
+        const v = SAFE_STRING(body.businessEmail, 255);
+        if (v && !/^\S+@\S+\.\S+$/.test(v)) errors.push('businessEmail: 올바른 이메일 형식이 아닙니다');
+        patch.businessEmail = v;
+      }
+      if ('contactEmail' in body) {
+        const v = SAFE_STRING(body.contactEmail, 255);
+        if (v && !/^\S+@\S+\.\S+$/.test(v)) errors.push('contactEmail: 올바른 이메일 형식이 아닙니다');
+        patch.contactEmail = v;
+      }
 
       if (errors.length > 0) {
         res.status(400).json({ success: false, error: errors.join('; ') });
@@ -292,6 +306,9 @@ export function createGlycopharmMypageController(
           representativeName: (biz.representativeName as string) ?? (biz.ceoName as string) ?? null,
           businessAddress: (biz.businessAddress as string) ?? (biz.address as string) ?? null,
           businessPhone: (biz.businessPhone as string) ?? (biz.phone as string) ?? null,
+          // 회사이메일 / 담당자이메일 — WO-O4O-CROSSSERVICE-BUSINESS-CONTACT-FIELDS-BACKEND-SUPPORT-V1
+          businessEmail: (biz.businessEmail as string) ?? null,
+          contactEmail: (biz.contactEmail as string) ?? null,
           businessType: (biz.businessType as string) ?? null,
           businessItem: (biz.businessItem as string) ?? null,
           businessEntityType: (biz.businessEntityType as string) ?? null,

@@ -34,6 +34,12 @@ export interface BusinessInfo {
   managerPhone?: string;             // 담당자 전화번호
   contactName?: string;              // 담당자명
 
+  // 사업자 연락처 3종 (canonical) — WO-O4O-CROSSSERVICE-BUSINESS-CONTACT-FIELDS-BACKEND-SUPPORT-V1
+  // 위 phone/email 은 legacy read-fallback. 신규 write 는 아래 canonical 키 사용.
+  businessPhone?: string;            // 회사/사업장 전화 (canonical, GP/KCos mypage 기존 키 재사용)
+  businessEmail?: string;            // 회사/대표 업무 이메일 (canonical)
+  contactEmail?: string;             // 담당자 이메일 (canonical) — Neture supplier 의 외부 공개 contactEmail(neture_suppliers)과 의미 구분
+
   // Legacy (read-fallback 용 — 신규 write 금지)
   /** @deprecated use representativeName */
   ceoName?: string;

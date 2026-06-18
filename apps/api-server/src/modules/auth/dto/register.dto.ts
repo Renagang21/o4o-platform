@@ -193,6 +193,24 @@ export class RegisterRequestDto {
   @IsString()
   managerPhone?: string;
 
+  // WO-O4O-CROSSSERVICE-BUSINESS-CONTACT-FIELDS-BACKEND-SUPPORT-V1:
+  //   사업자 연락처 3종 공통 수용 (users.businessInfo JSONB). 기존 phone(개인)/managerPhone(담당자 전화)/
+  //   taxInvoiceEmail(세금계산서)와 의미 분리. companyPhone 신규 키 금지 — businessPhone 재사용.
+  /** 회사/사업장 전화 (canonical) — GlycoPharm/K-Cosmetics mypage 기존 키 재사용 */
+  @IsOptional()
+  @IsString()
+  businessPhone?: string;
+
+  /** 회사/대표 업무 이메일 (canonical) */
+  @IsOptional()
+  @IsEmail({}, { message: 'Valid business email is required' })
+  businessEmail?: string;
+
+  /** 담당자 이메일 (canonical) — contactName/managerPhone 와 짝. Neture supplier 의 외부 공개 contactEmail(neture_suppliers)과 의미 구분 */
+  @IsOptional()
+  @IsEmail({}, { message: 'Valid contact email is required' })
+  contactEmail?: string;
+
   /** 종목 (canonical, 사업자등록증 기준) — WO-O4O-BUSINESS-REGISTRATION-FIELD-NAMING-STANDARD-V1 */
   @IsOptional()
   @IsString()

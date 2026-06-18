@@ -207,6 +207,10 @@ export class AuthRegisterController extends BaseController {
           if (effectiveTaxInvoiceEmail) newBiz.taxInvoiceEmail = effectiveTaxInvoiceEmail;
           if (data.contactName) newBiz.contactName = data.contactName;
           if (data.managerPhone) newBiz.managerPhone = data.managerPhone;
+          // 사업자 연락처 3종 — WO-O4O-CROSSSERVICE-BUSINESS-CONTACT-FIELDS-BACKEND-SUPPORT-V1
+          if (data.businessPhone) newBiz.businessPhone = data.businessPhone;
+          if (data.businessEmail) newBiz.businessEmail = data.businessEmail;
+          if (data.contactEmail) newBiz.contactEmail = data.contactEmail;
           // 사업자 유형 / 개업일 — WO-O4O-CROSSSERVICE-BUSINESS-REGISTRATION-FORM-ALIGNMENT-V1
           if (data.businessEntityType) newBiz.businessEntityType = data.businessEntityType;
           if (data.businessStartDate) newBiz.businessStartDate = data.businessStartDate;
@@ -384,6 +388,16 @@ export class AuthRegisterController extends BaseController {
         }
         if (data.managerPhone) {
           businessInfo.managerPhone = data.managerPhone;
+        }
+        // 사업자 연락처 3종 — WO-O4O-CROSSSERVICE-BUSINESS-CONTACT-FIELDS-BACKEND-SUPPORT-V1
+        if (data.businessPhone) {
+          businessInfo.businessPhone = data.businessPhone;
+        }
+        if (data.businessEmail) {
+          businessInfo.businessEmail = data.businessEmail;
+        }
+        if (data.contactEmail) {
+          businessInfo.contactEmail = data.contactEmail;
         }
         // 사업자 유형 / 개업일 — WO-O4O-CROSSSERVICE-BUSINESS-REGISTRATION-FORM-ALIGNMENT-V1
         if (data.businessEntityType) {
