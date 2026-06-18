@@ -91,17 +91,17 @@ catalog 팩토리 serviceKey(role-prefix) → `offer_service_approvals.service_k
 - main: params `[org,limit,offset]`(고정 $1-$3) 뒤 category/dist/approval 순서대로 push, `$${params.length}` 사용. `LIMIT $2 OFFSET $3` 충돌 없음.
 - count: countParams(operatorView ? [org] : []) 뒤 category/dist/approval push, `$${countParams.length}` 사용. main/count 게이트 동기화.
 
-### 7.3 Catalog smoke — 배포 후 수행
-```text
-[PUBLIC 회귀] KPA/Glyco/KCos 약국 catalog → PUBLIC 상품 여전히 노출 (예: 미네락 600 PUBLIC)
-[SERVICE 게이트] SERVICE offer를 한 서비스만 approved →
-   - 승인 서비스 catalog: 노출
-   - 미승인 서비스 catalog: 미노출
-[SERVICE 미승인] approval row 없음/rejected → 전 서비스 미노출
-[PRIVATE] 현재 serviceKey approved 시에만 노출
-[count] 목록과 pagination.total 일치
-```
-> SERVICE/PRIVATE 교차 누출 차단은 게이트 EXISTS(`service_key=$N AND approved`)로 코드 보장. 실데이터 시나리오(SERVICE offer 단일 서비스 승인) 검증은 배포 후 전용 offer로 수행 가능.
+### 7.3 Catalog smoke — 부분 PASS (2026-06-18, 배포 후)
+
+**배포 확인:** o4o-core-api revision `o4o-core-api-02245-kbj` (commit `46cf5b516` Deploy API Server success).
+
+| 검증 | 결과 |
+|------|------|
+| **[PUBLIC 회귀]** KPA 약국 catalog (renagang21) | ✅ 미네락 600(PUBLIC) 여전히 노출, total 1, HTTP success → **PUBLIC 승인 예외 유지, 회귀 없음** |
+| **[게이트 활성]** distributionType=SERVICE 필터 | SERVICE 0건(현 환경 SERVICE offer 부재) — 쿼리 정상(에러 없음) |
+| **[SERVICE/PRIVATE 교차 누출 차단]** | ◻︎ 코드 보장(게이트 EXISTS `service_key=$N AND approved`). 현 환경에 SERVICE/PRIVATE offer 부재로 실데이터 실증 미수행 |
+
+> 핵심 사용자 요구(PUBLIC 예외 유지)는 라이브로 확인됨. SERVICE/PRIVATE 누출 차단은 SQL 게이트로 보장되나, 환경에 SERVICE/PRIVATE offer가 없어(유일 offer = PUBLIC) 실데이터 시나리오는 전용 테스트 offer 생성 시 검증 가능(요청 시).
 
 ---
 
@@ -140,13 +140,13 @@ catalog 팩토리 serviceKey(role-prefix) → `offer_service_approvals.service_k
 | SERVICE 현재 serviceKey approved 시만 노출 | ✅ (게이트) |
 | PRIVATE 현재 serviceKey approved 시만 노출 | ✅ (게이트, 기존 조건 무변경) |
 | 교차 서비스 누출 차단 | ✅ (service_key 격리) |
-| KPA/Glyco/KCos catalog 정상 | ⏳ 배포 후 smoke |
+| KPA/Glyco/KCos catalog 정상 | ✅ KPA catalog PUBLIC 회귀 PASS(§7.3) |
 | 운영자 승인 목록 / 공급자 목록 무영향 | ✅ (무접촉) |
 | DB/migration 없음 | ✅ |
 | backend typecheck 통과 | ✅ |
 | CHECK 문서 작성 | ✅ |
-| path-specific commit/push | ⏳ 직후 |
-| catalog smoke | ⏳ 배포 후(§7.3) |
+| path-specific commit/push | ✅ commit `46cf5b516` |
+| catalog smoke | ◻︎ 부분 PASS — PUBLIC 회귀 확인, SERVICE/PRIVATE 실증은 테스트 offer 필요(§7.3) |
 
 ---
 
