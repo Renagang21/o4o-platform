@@ -37,7 +37,10 @@ export function BulkResultModal({ open, onClose, result, onRetry, title = '일�
   const total = result.results.length;
   const failedItems = result.results.filter(r => r.status === 'failed');
   const skippedItems = result.results.filter(r => r.status === 'skipped');
-  const allSuccess = result.failedCount === 0 && result.skippedCount === 0;
+  // WO-O4O-NETURE-SUPPLIER-SIGNUP-REQUIRED-FIELDS-GATE-V1:
+  //   처리 대상이 0건(results 빈 배열)인 경우 "모든 항목 성공"으로 오표시하지 않는다.
+  const hasResults = total > 0;
+  const allSuccess = hasResults && result.failedCount === 0 && result.skippedCount === 0;
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
@@ -86,6 +89,12 @@ export function BulkResultModal({ open, onClose, result, onRetry, title = '일�
           {allSuccess && (
             <p className="text-sm text-green-700 bg-green-50 px-3 py-2 rounded-lg">
               모든 항목이 성공적으로 처리되었습니다.
+            </p>
+          )}
+
+          {!hasResults && (
+            <p className="text-sm text-slate-600 bg-slate-50 px-3 py-2 rounded-lg">
+              처리 대상이 없습니다. 선택한 항목 중 현재 처리 가능한 대상이 없습니다.
             </p>
           )}
 

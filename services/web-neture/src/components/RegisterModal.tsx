@@ -247,7 +247,7 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
       const axiosErr = err as {
         response?: {
           status?: number;
-          data?: { code?: string; error?: string; services?: Array<{ key: string; status: string }> };
+          data?: { code?: string; error?: string; missingFields?: string[]; services?: Array<{ key: string; status: string }> };
         };
       };
       const status = axiosErr.response?.status;
@@ -258,6 +258,22 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
         } else {
           setError('이미 가입된 이메일입니다. 기존 계정으로 로그인해 주세요.');
         }
+      } else if (status === 400 && data?.code === 'NETURE_SUPPLIER_REQUIRED_FIELDS_MISSING') {
+        // WO-O4O-NETURE-SUPPLIER-SIGNUP-REQUIRED-FIELDS-GATE-V1:
+        //   백엔드 게이트 거절 시 누락 항목을 프론트 라벨로 매핑해 안내.
+        const labelMap: Record<string, string> = {
+          companyName: '회사명',
+          representativeName: '대표자명',
+          contactName: '담당자명',
+          managerPhone: '담당자 연락처',
+          businessAddress: '사업장 주소',
+        };
+        const labels = (data?.missingFields || []).map((f) => labelMap[f] || f);
+        setError(
+          labels.length > 0
+            ? `공급자 가입신청에 필요한 필수 정보가 누락되었습니다. 미입력: ${labels.join(', ')}`
+            : '공급자 가입신청에 필요한 필수 정보가 누락되었습니다. 필수 항목을 모두 입력해주세요.',
+        );
       } else {
         // WO-AUTH-ERROR-MESSAGE-SANITIZATION-V1: raw error 노출 차단
         console.error('[RegisterModal] Registration error:', err);
@@ -298,6 +314,20 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
       );
     }
     return true;
+  };
+
+  // WO-O4O-NETURE-SUPPLIER-SIGNUP-REQUIRED-FIELDS-GATE-V1:
+  //   공급자 가입신청 필수 식별항목 누락 목록 (백엔드 게이트와 동일 기준).
+  //   버튼 비활성화만으로 끝내지 않고 사용자에게 무엇을 입력해야 하는지 안내한다.
+  const supplierMissingFields = (): string[] => {
+    if (selectedRole !== 'supplier') return [];
+    const missing: string[] = [];
+    if (!formData.companyName.trim()) missing.push('회사명');
+    if (!formData.representativeName.trim()) missing.push('대표자명');
+    if (!formData.contactName.trim()) missing.push('담당자명');
+    if (formData.contactPhone.length < 10) missing.push('담당자 연락처');
+    if (!formData.businessAddress.trim()) missing.push('사업장 주소');
+    return missing;
   };
 
   if (!isOpen) return null;
@@ -913,6 +943,18 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                   <span>마케팅 정보 수신에 동의합니다 (선택)</span>
                 </label>
               </div>
+
+              {/* WO-O4O-NETURE-SUPPLIER-SIGNUP-REQUIRED-FIELDS-GATE-V1: 공급자 필수 누락 안내 */}
+              {selectedRole === 'supplier' && supplierMissingFields().length > 0 && (
+                <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                  <p className="text-sm text-amber-700">
+                    공급자 가입신청을 위해 아래 필수 정보를 모두 입력해주세요.
+                  </p>
+                  <p className="text-sm text-amber-700 mt-1">
+                    미입력 항목: {supplierMissingFields().join(', ')}
+                  </p>
+                </div>
+              )}
             </form>
           )}
 

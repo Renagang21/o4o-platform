@@ -75,6 +75,34 @@ export class AuthRegisterController extends BaseController {
         }
       }
 
+      // WO-O4O-NETURE-SUPPLIER-SIGNUP-REQUIRED-FIELDS-GATE-V1:
+      //   Neture 공급자 가입신청 최소 식별항목 백엔드 방어 검증 (프론트 isStep2Valid 와 동일 기준).
+      //   회사명 / 대표자명 / 담당자명 / 담당자 연락처(숫자 10자리 이상) / 사업장 주소.
+      //   사업자등록번호·세금계산서·정산·증빙 서류는 가입신청 필수 아님 — 온보딩/ACTIVE 전환 게이트 유지
+      //   (IR-O4O-NETURE-SUPPLIER-SIGNUP-REQUIRED-FIELDS-AUDIT-V1 §6 정책 결정).
+      //   canonical + legacy fallback 모두 허용. KPA/GlycoPharm/K-Cosmetics 무관(serviceKey/role 한정).
+      if (serviceKey === 'neture' && data.role === 'supplier') {
+        const trimmed = (v: unknown) => String(v ?? '').trim();
+        const digitsLen = (v: unknown) => String(v ?? '').replace(/\D/g, '').length;
+        const supplierRequired: { field: string; ok: boolean }[] = [
+          { field: 'companyName', ok: trimmed(data.companyName || data.businessName) !== '' },
+          { field: 'representativeName', ok: trimmed(data.representativeName || data.ceoName) !== '' },
+          { field: 'contactName', ok: trimmed(data.contactName) !== '' },
+          { field: 'managerPhone', ok: digitsLen(data.managerPhone) >= 10 },
+          { field: 'businessAddress', ok: trimmed(data.businessAddress || data.address1) !== '' },
+        ];
+        const missingFields = supplierRequired.filter((c) => !c.ok).map((c) => c.field);
+        if (missingFields.length > 0) {
+          // BaseController.error 는 missingFields 확장 payload 미지원 → 표준 shape 유지하며 직접 응답.
+          return res.status(400).json({
+            success: false,
+            error: '공급자 가입신청에 필요한 필수 정보가 누락되었습니다. 모든 필수 항목을 입력해주세요.',
+            code: 'NETURE_SUPPLIER_REQUIRED_FIELDS_MISSING',
+            missingFields,
+          });
+        }
+      }
+
       const rawRole = data.membershipType === 'student'
         ? 'user'
         : (data.role || 'customer');
