@@ -210,3 +210,49 @@ KPA 개설약사 가입은 `약국명`, `사업자등록번호`, `대표자명`,
 - 공급자 온보딩 KYC 문서 정책 변경
 - 기존 승인 상태/역할/RBAC 변경
 - 사업자등록증 파일 업로드 강제화
+
+---
+
+## 11. FORM-ALIGNMENT-V1 실제 구현 범위 확인 (read-only 보강, 2026-06-18)
+
+> 본 섹션은 §8~§9 의 "후속 WO" 를 실제 코드/커밋 기준으로 재확인한 결과다. **기존 `WO-O4O-CROSSSERVICE-BUSINESS-REGISTRATION-FORM-ALIGNMENT-V1`(이미 main 반영) 이 어디까지 했고 무엇이 남았는지**를 고정한다. 코드 수정 0.
+
+### 11.1 FORM-ALIGNMENT-V1 이 한 것 (커밋 2개, 별도 문서 없음)
+
+| Step | 커밋 | 내용 |
+|------|------|------|
+| Step1 Backend | `1c64b2047` | `register.dto.ts` 에 `businessEntityType`/`businessStartDate` 추가 + `auth-register.controller`(신규·기존 양 flow) + `auth-account.controller` white-list 수용. **`businessType`(업태)/`businessItem`(종목) 은 이미 수용 중이라 추가 0.** DB/migration 0 (`users.businessInfo` JSONB). |
+| Step2 Frontend | `8dc5a135d` | 4서비스 가입폼(neture/glycopharm/k-cosmetics/kpa)에 공통 `BusinessRegistrationFields` 로 사업자등록증 cert 필드 렌더 추가. |
+
+→ **FORM-ALIGNMENT-V1 = "사업자등록증 4필드(업태/종목/사업자유형/개업일) 를 4서비스 폼 + 백엔드 DTO 에 도입"까지.** 다음 3가지는 **처리하지 않음**: ① 업종 select 제거 ② 연락처 필드 보강 ③ 사업자유형 가입단계 후순위화.
+
+### 11.2 AUDIT(§4) 대비 정정 — 실측 결과
+
+- **업종 select 는 전 서비스 공통 문제가 아니라 Neture 에만 존재한다.**
+  - Neture: supplier(700–714), store_owner(609–622) = `업종` select / partner(837–852) = `활동 분야` select. 값 `cosmetics/health/medical/food/other`.
+  - GlycoPharm / K-Cosmetics / KPA: 업종 select **없음** — 이미 `BusinessRegistrationFields` 로 `업태(businessType free-text)`/`종목`/`사업자유형`/`개업일` 4필드 노출 중.
+- **Neture supplier 만 `업태(businessType)` 가 빠져 있다.** `includeFields={['businessItem','businessEntityType','businessStartDate']}` 로 3필드만 렌더(업태 제외). 기존 카테고리형 `업종` select 가 업태 자리를 대체하고 있어 사업자등록증 원문과 불일치.
+- **연락처 3필드(`companyPhone`/`companyEmail`/`contactEmail`)는 4서비스 전부 부재** = 공통 delta.
+- 세금계산서 이메일: K-Cosmetics 만 부재(neture/glycopharm/kpa 보유).
+
+### 11.3 남은 Delta 매트릭스 (현재 코드 실측)
+
+| Delta | Neture | GlycoPharm | K-Cosmetics | KPA | FORM-ALIGN |
+|------|:--:|:--:|:--:|:--:|:--:|
+| 업종 select 제거 | ❗3곳 존재 | 없음 | 없음 | 없음 | ❌ |
+| 업태(businessType) 노출 | ❌Neture만 빠짐 | ✅ | ✅ | ✅ | ⚠️ |
+| 사업자유형 후순위화 | 노출 | 노출 | 노출 | 노출 | ❌(오히려 추가) |
+| 회사전화 | ❌ | ❌ | ❌ | ❌ | ❌ |
+| 회사이메일 | ❌ | ❌ | ❌ | ❌ | ❌ |
+| 담당자 이메일 | ❌ | ❌ | ❌ | ❌ | ❌ |
+| 세금계산서 이메일 | ✅ | ✅ | ❌ | ✅ | — |
+
+### 11.4 WO 시퀀싱 (확정)
+
+1. **(소·안전, 다음 작업) `WO-O4O-NETURE-SUPPLIER-BUSINESS-TYPE-SELECT-REMOVE-V1`** — Neture **공급자** 가입 화면 한정. 업종 select 제거 + `BusinessRegistrationFields` 에 `businessType`(업태) 포함 → 업태/종목/개업일 정렬. `businessEntityType` 유지(후순위화 보류). **store_owner 업종 / partner 활동분야는 건드리지 않음**(범위 흐림 방지, 후속 판단).
+2. **(중·횡단, 별도 WO) 4서비스 연락처 필드 보강** — 회사전화/회사이메일/담당자이메일. 공유 컴포넌트(`BusinessRegistrationFields`) 또는 §8 후보B(`BusinessIdentityFields` 신설) 결정 + DTO/저장/operator 승인상세 확인. **Shared Module 변경 → 4서비스 소비처 전수 확인 필수**(CLAUDE.md Shared Module Change Rule).
+3. (소·선택) 사업자유형 가입단계 격하 — 2번과 묶음 권장.
+
+---
+
+*보강: 2026-06-18 · read-only · FORM-ALIGNMENT-V1=4필드 도입까지 · 업종 select=Neture only(정정) · 연락처 3필드=전 서비스 공통 부재 · 다음 WO=WO-O4O-NETURE-SUPPLIER-BUSINESS-TYPE-SELECT-REMOVE-V1(공급자 한정).*
