@@ -69,6 +69,11 @@ export function RegisterFlowModal({ open, onClose }: Props) {
     representativeName: '',
     businessNumber: '',
     taxEmail: '',
+    // 사업자 연락처 3종 — WO-O4O-GLYCOPHARM-BUSINESS-CONTACT-FIELDS-UI-EXTEND-V1
+    //   회사/약국 전화 / 약국 대표 이메일 / 담당자 이메일 — users.businessInfo 저장(백엔드 기수용).
+    businessPhone: '',
+    businessEmail: '',
+    contactEmail: '',
     businessType: '',
     businessCategory: '',
     // 사업자등록증 표준 추가 필드 (WO-O4O-CROSSSERVICE-BUSINESS-REGISTRATION-FORM-ALIGNMENT-V1)
@@ -97,7 +102,8 @@ export function RegisterFlowModal({ open, onClose }: Props) {
         password: '', passwordConfirm: '',
         phone: '', licenseNumber: '',
         businessName: '', representativeName: '', businessNumber: '',
-        taxEmail: '', businessType: '', businessCategory: '',
+        taxEmail: '', businessPhone: '', businessEmail: '', contactEmail: '',
+        businessType: '', businessCategory: '',
         businessItem: '', businessEntityType: '', businessStartDate: '',
         zipCode: '', address1: '', address2: '',
         agreeTerms: false, agreePrivacy: false, agreeMarketing: false,
@@ -119,7 +125,7 @@ export function RegisterFlowModal({ open, onClose }: Props) {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
-    const numericFields = ['phone', 'businessNumber'];
+    const numericFields = ['phone', 'businessNumber', 'businessPhone'];
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : numericFields.includes(name) ? value.replace(/\D/g, '') : value,
@@ -240,6 +246,12 @@ export function RegisterFlowModal({ open, onClose }: Props) {
           representativeName: formData.representativeName,
           businessNumber: formData.businessNumber,
           taxEmail: formData.taxEmail,
+          // 사업자 연락처 3종 — WO-O4O-GLYCOPHARM-BUSINESS-CONTACT-FIELDS-UI-EXTEND-V1
+          //   DTO 가 businessEmail/contactEmail 에 @IsEmail 강제 → 빈 문자열 전송 금지(조건부).
+          //   businessPhone/businessEmail/contactEmail → users.businessInfo (백엔드 기수용).
+          ...(formData.businessPhone ? { businessPhone: formData.businessPhone } : {}),
+          ...(formData.businessEmail ? { businessEmail: formData.businessEmail } : {}),
+          ...(formData.contactEmail ? { contactEmail: formData.contactEmail } : {}),
           ...(formData.licenseNumber ? { licenseNumber: formData.licenseNumber } : {}),
           ...(formData.businessType ? { businessType: formData.businessType } : {}),
           ...(formData.businessCategory ? { businessCategory: formData.businessCategory } : {}),
@@ -590,6 +602,36 @@ export function RegisterFlowModal({ open, onClose }: Props) {
                       <input type="email" name="taxEmail" value={formData.taxEmail} onChange={handleInputChange}
                         className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                         placeholder="tax@pharmacy.com" required />
+                    </div>
+                  </div>
+                  {/* 사업자 연락처 3종 — WO-O4O-GLYCOPHARM-BUSINESS-CONTACT-FIELDS-UI-EXTEND-V1
+                      회사/약국 전화 · 약국 대표 이메일 · 담당자 이메일 (모두 선택).
+                      세금계산서 이메일(taxEmail)·휴대전화(phone)와 별개 의미. */}
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1.5">약국 전화 <span className="text-slate-400 text-xs">(선택)</span></label>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                      <input type="tel" name="businessPhone" inputMode="numeric" value={formData.businessPhone} onChange={handleInputChange}
+                        className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                        placeholder="숫자만 입력 (선택)" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1.5">약국 대표 이메일 <span className="text-slate-400 text-xs">(선택)</span></label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                      <input type="email" name="businessEmail" value={formData.businessEmail} onChange={handleInputChange}
+                        className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                        placeholder="info@pharmacy.com (선택)" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1.5">담당자 이메일 <span className="text-slate-400 text-xs">(선택)</span></label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                      <input type="email" name="contactEmail" value={formData.contactEmail} onChange={handleInputChange}
+                        className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                        placeholder="manager@pharmacy.com (선택)" />
                     </div>
                   </div>
                   {/* 사업자등록증 표준 4 필드 — WO-O4O-BUSINESS-REGISTRATION-COMMON-UI-COMPONENT-V1 (P3)
