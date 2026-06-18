@@ -83,6 +83,13 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
     contactName: '',
     contactPhone: '',
     taxInvoiceEmail: '',
+    // 사업자 연락처 3종 (WO-O4O-NETURE-SUPPLIER-CONTACT-FIELDS-EXTEND-V1)
+    //   회사전화 / 회사이메일 / 담당자이메일 — users.businessInfo 저장(백엔드 기수용).
+    //   contactEmail(담당자이메일) 은 SupplierProfilePage Section C 외부공개 contactEmail
+    //   (neture_suppliers)과 의미가 다름 — 가입 payload 는 users.businessInfo 경로.
+    businessPhone: '',         // 회사/사업장 전화
+    businessEmail: '',         // 회사/대표 업무 이메일
+    contactEmail: '',          // 담당자 이메일
     // 사업자등록증 표준 추가 필드 (WO-O4O-CROSSSERVICE-BUSINESS-REGISTRATION-FORM-ALIGNMENT-V1)
     businessItem: '',          // 종목
     businessEntityType: '',    // 사업자 유형
@@ -117,6 +124,9 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
         contactName: '',
         contactPhone: '',
         taxInvoiceEmail: '',
+        businessPhone: '',
+        businessEmail: '',
+        contactEmail: '',
         businessItem: '',
         businessEntityType: '',
         businessStartDate: '',
@@ -164,7 +174,7 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
     const checked = target instanceof HTMLInputElement ? target.checked : false;
     const type = target instanceof HTMLInputElement ? target.type : 'text';
 
-    if (name === 'phone' || name === 'businessNumber' || name === 'contactPhone') {
+    if (name === 'phone' || name === 'businessNumber' || name === 'contactPhone' || name === 'businessPhone') {
       value = value.replace(/\D/g, '');
     }
     if (name === 'email') {
@@ -227,6 +237,12 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
           taxInvoiceEmail: formData.taxInvoiceEmail,
           contactName: formData.contactName,
           managerPhone: formData.contactPhone,
+          // 사업자 연락처 3종 — WO-O4O-NETURE-SUPPLIER-CONTACT-FIELDS-EXTEND-V1
+          //   DTO 가 businessEmail/contactEmail 에 @IsEmail 강제 → 빈 문자열 전송 금지(조건부).
+          //   businessPhone/businessEmail/contactEmail → users.businessInfo (백엔드 기수용).
+          ...(formData.businessPhone ? { businessPhone: formData.businessPhone } : {}),
+          ...(formData.businessEmail ? { businessEmail: formData.businessEmail } : {}),
+          ...(formData.contactEmail ? { contactEmail: formData.contactEmail } : {}),
           // WO-O4O-NETURE-SUPPLIER-SIGNUP-ADDRESS-POSTCODE-SEARCH-V1: AddressSearch → zipCode/address1/address2
           zipCode: formData.zipCode,
           address1: formData.businessAddress,
@@ -614,6 +630,36 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                           className={INPUT_CLASS_BG}
                         />
                       </div>
+                      {/* 회사 연락처 — WO-O4O-NETURE-SUPPLIER-CONTACT-FIELDS-EXTEND-V1
+                          회사전화 / 회사이메일 (선택). 담당자 연락처(아래)·세금계산서 이메일과 별개. */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            회사 전화
+                          </label>
+                          <input
+                            type="tel"
+                            name="businessPhone"
+                            value={formData.businessPhone}
+                            onChange={handleInputChange}
+                            placeholder="숫자만 입력 (선택)"
+                            className={INPUT_CLASS_BG}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            회사 이메일
+                          </label>
+                          <input
+                            type="email"
+                            name="businessEmail"
+                            value={formData.businessEmail}
+                            onChange={handleInputChange}
+                            placeholder="info@company.com (선택)"
+                            className={INPUT_CLASS_BG}
+                          />
+                        </div>
+                      </div>
                       {/* WO-O4O-NETURE-SUPPLIER-SIGNUP-ADDRESS-POSTCODE-SEARCH-V1:
                           사업장 주소 free-text → 공통 AddressSearch(Daum Postcode) 교체.
                           SupplierProfilePage 와 동일 패턴(우편번호 검색 + 기본주소 자동입력 + 상세주소).
@@ -668,6 +714,22 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                               <p className="mt-1 text-xs text-red-500">10자리 이상 입력해주세요</p>
                             )}
                         </div>
+                      </div>
+                      {/* 담당자 이메일 — WO-O4O-NETURE-SUPPLIER-CONTACT-FIELDS-EXTEND-V1
+                          담당자명/담당자 연락처와 짝(선택). users.businessInfo.contactEmail 저장.
+                          ※ SupplierProfilePage Section C 외부공개 contactEmail(neture_suppliers)과 의미 상이. */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          담당자 이메일
+                        </label>
+                        <input
+                          type="email"
+                          name="contactEmail"
+                          value={formData.contactEmail}
+                          onChange={handleInputChange}
+                          placeholder="manager@company.com (선택)"
+                          className={INPUT_CLASS_BG}
+                        />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
