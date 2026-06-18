@@ -93,16 +93,17 @@
 - **api-server** (`tsc --noEmit -p tsconfig.build.json`): 변경 파일 error 0. 유일 에러 `marketTrialController.ts(105,9)` 는 본 WO 무관 pre-existing(commit `df1f0fd26`).
 - **web-neture** (`tsc --noEmit`): 변경 3파일 포함 전체 error 0.
 
-### 8.2 Browser smoke — 배포 후 수행
-배포 후 다음 확인(운영 데이터 전이는 정상 UI 플로우로만):
-```text
-[공급자] 반려 제품 drawer 열기 → 상단 반려 안내 배너(사유/fallback/재요청 안내) 표시
-[공급자] 반려 사유 없는 제품 → fallback 문구 표시
-[운영자] 반려 모달 → 보완 요청 문맥 안내 + 구체 placeholder 표시
-[Admin] 반려 모달 → 동일 안내 표시
-[알림] 반려 시 in_app 알림 문구에 "수정 후 다시 승인 요청" 포함 + metadata.targetUrl
-[회귀] 승인/반려 동작·pending/approved UI·제품등록 gate·품목군 gate 무변경
-```
+### 8.2 Live smoke — 부분 PASS (2026-06-18, 배포 후)
+
+**배포 확인:** web-neture(`59f27a7be` Deploy Web Services success) + o4o-core-api revision `02243-ttf`.
+
+| 검증 | 방식 | 결과 |
+|------|------|------|
+| **반려 상태 데이터 조건**(drawer 배너 트리거) | `GET /operator/service-approvals` — reject 직후 offer 3adc23b1의 serviceApprovals `status=rejected` + reason 저장 확인 | ✅ 배너 렌더 전제 데이터 성립(`serviceApprovals[].status==='rejected'`) |
+| **drawer 배너 / 운영자·Admin 모달 문구** | static JSX/copy, web-neture 빌드·배포 success + typecheck PASS | ✅ deployed (정적 카피 — 코드/타입/배포로 보증) |
+| **반려 알림 문구**(backend) | reject 시 `notifySupplier()` 실행 경로 deployed | ◻︎ 코드 deployed. 단 본 테스트 공급자(`91169739`)의 `neture_suppliers.user_id` 가 로그인 user(renagang21)와 매핑이 달라 해당 user 알림함에 미노출 — **본 변경의 회귀 아님**(템플릿 코드 정상, 전달 대상은 user_id 매핑에 의존) |
+
+> 결론: P1 의 사용자-facing 정적 카피(배너/모달)는 배포 확인. 반려 알림 문구는 코드 deployed 이나, 테스트 공급자 user_id 매핑 사유로 런타임 알림 수신은 본 smoke 에서 미관측(별도 데이터 이슈, P1 무관). 잔여 browser 시각 확인(스크린샷)은 필요 시 후속.
 
 ---
 
@@ -147,8 +148,8 @@
 | backend typecheck 통과 | ✅ |
 | web-neture typecheck 통과 | ✅ |
 | CHECK 문서 작성 | ✅ (본 문서) |
-| path-specific commit/push | ⏳ 본 문서 직후 |
-| browser smoke | ⏳ 배포 후(§8.2) |
+| path-specific commit/push | ✅ commit `59f27a7be` |
+| browser smoke | ◻︎ 부분 PASS (2026-06-18, §8.2) — 정적 카피 deployed, 알림 런타임 미관측(user_id 매핑) |
 
 ---
 

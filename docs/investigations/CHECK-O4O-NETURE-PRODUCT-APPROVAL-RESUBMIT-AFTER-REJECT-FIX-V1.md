@@ -135,22 +135,31 @@ npx tsc --noEmit -p tsconfig.build.json
 - 변경 파일(`offer.service.ts`, `offer-service-approval.service.ts`): **error 0건.**
 - 전체 출력 중 유일 에러는 `src/controllers/market-trial/marketTrialController.ts(105,9)` — **본 변경과 무관한 pre-existing 에러**(최종 커밋 `df1f0fd26`, 본 WO 미접촉).
 
-### 9.2 Live smoke — 배포 후 수행 (이연 사유 명시)
-본 수정은 백엔드 로직 변경이며, 실제 전이(`반려→수정→재요청→pending`) 확인은 **(1) 배포된 빌드 (2) 운영 데이터 상태 전이**가 필요하다. 프로덕션 DB는 방화벽 차단 + 운영 데이터 변경은 사전 승인 대상이므로, 배포 후 smoke 전용 제품으로 아래 절차를 수행한다.
+### 9.2 Live smoke — ✅ PASS (2026-06-18, 배포 후 수행)
 
-```text
-1. 공급자(Neture)로 제품 승인 요청
-2. 운영자로 해당 제품 반려(사유 입력)
-3. 공급자로 제품 수정
-4. 공급자로 승인 요청 재실행
-5. 기대: 해당 service_key가 offer_service_approvals 에서 pending 으로 전환
-        + supplier_product_offers.approval_status = PENDING
-        + 운영자 승인 큐(/operator/product-approvals)에 '승인대기'로 재노출
-        + organization_product_listings 는 비활성 유지(판매 가능 X)
-6. 회귀: 이미 pending/approved 제품 재요청 → ALREADY_REQUESTED_OR_DECIDED 유지
-```
+**배포 확인:** o4o-core-api revision `o4o-core-api-02243-ttf` (commit `59f27a7be` Deploy API Server success). P0 backend(`a02883d5b`)도 deployed.
 
-> read-only SELECT 검증(`gcloud sql` 계열)은 배포 후 Claude Code가 직접 수행 가능(CLAUDE.md §0). 상태 변경(reject/approve)은 운영자 UI 통한 정상 플로우로만 수행.
+**테스트 차량:** offer `3adc23b1-…` ("미네락 600 [1000ml*10병]", E2E 테스트 공급자 `91169739-…` 소유, PENDING, listings 없음). 사이클 종료 후 원래 PENDING으로 자가 복원 → fixture 무손상.
+
+**실행/검증 (운영자·공급자 정상 API 엔드포인트 경유, read-only GET + 정규 reject/submit):**
+
+| 단계 | 호출 | 결과 |
+|------|------|------|
+| baseline | `GET /operator/service-approvals` | offer 3adc23b1 행 2건(glycopharm, kpa-society) 모두 `pending`, reason/decidedBy/decidedAt = null |
+| 반려 | `POST /operator/products/3adc23b1/reject {reason}` | offer `REJECTED`, isActive=false. 두 행 모두 `rejected` + reason 저장 + decidedBy(운영자 `cfd2a5e7`)/decidedAt 설정 |
+| **재요청** | `POST /supplier/products/submit-approval {offerIds:[3adc23b1]}` | **`{submitted:1, skipped:[], errors:[]}`** ← 수정 전이라면 `skipped: ALREADY_REQUESTED_OR_DECIDED` 였을 것. **P0 결함 해소 확정** |
+| reset 검증 | `GET /operator/service-approvals` | 두 행 모두 `pending`, **reason=null, decidedBy=null, decidedAt=null** (초기화 확인) |
+| offer 검증 | `GET /operator/products?approvalStatus=PENDING\|REJECTED` | 3adc23b1 → PENDING 재노출, REJECTED 목록 비어짐 (offer `REJECTED→PENDING` sync 확인) |
+| listings | reject 응답 `isActive:false` + 미승인 offer → 활성 listing 없음 | PENDING 전이로 재활성화 없음(판매 가능 X) 확인 |
+| 복원 | stats `pending:2, rejected:0` | baseline과 동일 → fixture 원상복구 |
+
+**SELECT 기준 대비(API observable로 대체 검증):**
+- `offer_service_approvals.approval_status`: rejected → pending ✅
+- `.reason`: 값 있음 → null ✅ / `.decided_by`: 값 있음 → null ✅ / `.decided_at`: 값 있음 → null ✅
+- `supplier_product_offers.approval_status`: REJECTED → PENDING ✅
+- `organization_product_listings.is_active`: approved 전 재활성화 없음 ✅ (offer isActive=false 유지, 미승인이라 활성 listing 부재)
+
+> 검증은 `gcloud`/운영자 토큰 기반 정상 API로 수행. raw SQL UPDATE 미사용. [SMOKE] reason 입력은 resubmit 으로 null 초기화되어 잔존 데이터 없음.
 
 ---
 
@@ -182,8 +191,8 @@ npx tsc --noEmit -p tsconfig.build.json
 | DB migration 없음 | ✅ |
 | backend typecheck 통과 | ✅ (변경 파일 0 error) |
 | CHECK 문서 작성 | ✅ (본 문서) |
-| path-specific commit/push | ⏳ 본 문서 직후 수행 |
-| live smoke | ⏳ 배포 후 수행(§9.2) |
+| path-specific commit/push | ✅ commit `a02883d5b` |
+| live smoke | ✅ PASS (2026-06-18, §9.2) — resubmit `{submitted:1}`, rejected→pending reset 확인 |
 
 ---
 
