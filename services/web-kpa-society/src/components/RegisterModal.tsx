@@ -118,6 +118,10 @@ export default function RegisterModal() {
     contactName: '',           // WO-O4O-KPA-PHARMACY-CONTACT-NAME-FIELD-V1
     taxInvoiceEmail: '',       // canonical (legacy: taxEmail)
     managerPhone: '',          // canonical (신규)
+    // 사업자 연락처 이메일 2종 — WO-O4O-KPA-BUSINESS-CONTACT-EMAIL-FIELDS-UI-EXTEND-V1
+    //   약국 대표 업무 이메일 / 담당자 이메일. taxInvoiceEmail(세금계산서)와 의미 구분.
+    businessEmail: '',
+    contactEmail: '',
     // 사업자등록증 표준 4 필드 (WO-O4O-CROSSSERVICE-BUSINESS-REGISTRATION-FORM-ALIGNMENT-V1)
     businessType: '',          // 업태 (예: 도매 및 소매)
     businessItem: '',          // 종목 (예: 의약품 소매업)
@@ -159,6 +163,7 @@ export default function RegisterModal() {
         licenseNumber: '',
         activityType: '', pharmacyName: '', pharmacyAddress: '', pharmacyPhone: '',
         businessNumber: '', ceoName: '', contactName: '', taxInvoiceEmail: '', managerPhone: '',
+        businessEmail: '', contactEmail: '',
         businessType: '', businessItem: '', businessEntityType: '', businessStartDate: '',
         businessZipCode: '', businessAddress: '', businessAddressDetail: '',
         universityName: '', studentYear: '',
@@ -267,6 +272,10 @@ export default function RegisterModal() {
           if (formData.contactName) payload.contactName = formData.contactName;
           if (formData.taxInvoiceEmail) payload.taxInvoiceEmail = formData.taxInvoiceEmail;
           if (formData.managerPhone) payload.managerPhone = formData.managerPhone;
+          // 사업자 연락처 이메일 2종 — WO-O4O-KPA-BUSINESS-CONTACT-EMAIL-FIELDS-UI-EXTEND-V1
+          //   DTO @IsEmail → 빈 문자열 전송 금지(조건부). users.businessInfo 저장(공통 register 경로).
+          if (formData.businessEmail) payload.businessEmail = formData.businessEmail;
+          if (formData.contactEmail) payload.contactEmail = formData.contactEmail;
           // 사업자등록증 표준 4 필드 (WO-O4O-CROSSSERVICE-BUSINESS-REGISTRATION-FORM-ALIGNMENT-V1)
           if (formData.businessType) payload.businessType = formData.businessType;
           if (formData.businessItem) payload.businessItem = formData.businessItem;
@@ -664,6 +673,20 @@ export default function RegisterModal() {
                           <label className="block text-sm font-medium text-gray-700 mb-1">세금계산서 이메일</label>
                           <input type="email" name="taxInvoiceEmail" value={formData.taxInvoiceEmail} onChange={handleInputChange}
                             placeholder="세금계산서 수신 이메일 (선택)"
+                            className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                        </div>
+                        {/* 사업자 연락처 이메일 2종 — WO-O4O-KPA-BUSINESS-CONTACT-EMAIL-FIELDS-UI-EXTEND-V1
+                            약국 대표 업무 이메일 · 담당자 이메일 (선택). 세금계산서 이메일과 별개. */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">약국 대표 이메일</label>
+                          <input type="email" name="businessEmail" value={formData.businessEmail} onChange={handleInputChange}
+                            placeholder="info@pharmacy.com (선택)"
+                            className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">담당자 이메일</label>
+                          <input type="email" name="contactEmail" value={formData.contactEmail} onChange={handleInputChange}
+                            placeholder="manager@pharmacy.com (선택)"
                             className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                         </div>
                         {/* 사업자등록증 표준 4 필드 — WO-O4O-BUSINESS-REGISTRATION-COMMON-UI-COMPONENT-V1 (P3) */}

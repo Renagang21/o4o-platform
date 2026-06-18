@@ -29,6 +29,11 @@ interface PharmacyInfoResponse {
   address: string | null;
   addressDetail: StoreAddress | null;
   taxInvoiceEmail: string | null;
+  // 사업자 연락처 이메일 2종 — WO-O4O-KPA-BUSINESS-CONTACT-EMAIL-FIELDS-UI-EXTEND-V1
+  //   businessEmail(약국 대표 업무 이메일) / contactEmail(담당자 이메일). SSOT = org.metadata.
+  //   taxInvoiceEmail(세금계산서)와 의미 구분.
+  businessEmail: string | null;
+  contactEmail: string | null;
   ownerPhone: string | null;
   ceoName: string | null;
   contactName: string | null;
@@ -97,6 +102,9 @@ export function createPharmacyInfoController(
       address: org.address || null,
       addressDetail: (org.address_detail as StoreAddress) || null,
       taxInvoiceEmail: meta.taxInvoiceEmail || null,
+      // WO-O4O-KPA-BUSINESS-CONTACT-EMAIL-FIELDS-UI-EXTEND-V1: org.metadata SSOT
+      businessEmail: meta.businessEmail || null,
+      contactEmail: meta.contactEmail || null,
       ownerPhone: meta.ownerPhone || null,
       ceoName: meta.ceoName || null,
       contactName: meta.contactName || null,
@@ -232,6 +240,18 @@ export function createPharmacyInfoController(
       }
     }
 
+    // 사업자 연락처 이메일 2종 — WO-O4O-KPA-BUSINESS-CONTACT-EMAIL-FIELDS-UI-EXTEND-V1
+    if (body.businessEmail !== undefined && body.businessEmail !== null && body.businessEmail !== '') {
+      if (!/^\S+@\S+\.\S+$/.test(body.businessEmail)) {
+        errors.push('businessEmail: 올바른 이메일 형식이 아닙니다');
+      }
+    }
+    if (body.contactEmail !== undefined && body.contactEmail !== null && body.contactEmail !== '') {
+      if (!/^\S+@\S+\.\S+$/.test(body.contactEmail)) {
+        errors.push('contactEmail: 올바른 이메일 형식이 아닙니다');
+      }
+    }
+
     if (body.ownerPhone !== undefined && body.ownerPhone !== null && body.ownerPhone !== '') {
       const digits = sanitizePhone(body.ownerPhone);
       if (digits && digits.length > 20) errors.push('ownerPhone: 연락처는 20자 이내');
@@ -303,6 +323,10 @@ export function createPharmacyInfoController(
       ceoName: body.ceoName?.trim() || null,
       contactName: body.contactName?.trim() || null,
       managerPhone: sanitizePhone(body.managerPhone),
+      // 사업자 연락처 이메일 2종 — WO-O4O-KPA-BUSINESS-CONTACT-EMAIL-FIELDS-UI-EXTEND-V1
+      //   payload 포함 시에만 merge — 미포함이면 기존 metadata 값 보존(방어적).
+      ...('businessEmail' in body ? { businessEmail: (typeof body.businessEmail === 'string' ? body.businessEmail.trim() : '') || null } : {}),
+      ...('contactEmail' in body ? { contactEmail: (typeof body.contactEmail === 'string' ? body.contactEmail.trim() : '') || null } : {}),
     };
 
     await orgRepo.save(org);
@@ -366,6 +390,9 @@ export function createPharmacyInfoController(
         address: org.address,
         addressDetail: (org as any).address_detail || null,
         taxInvoiceEmail: meta?.taxInvoiceEmail || null,
+        // WO-O4O-KPA-BUSINESS-CONTACT-EMAIL-FIELDS-UI-EXTEND-V1
+        businessEmail: meta?.businessEmail || null,
+        contactEmail: meta?.contactEmail || null,
         ownerPhone: meta?.ownerPhone || null,
         ceoName: meta?.ceoName || null,
         contactName: meta?.contactName || null,

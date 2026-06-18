@@ -34,6 +34,9 @@ interface FormState {
   ceoName: string;
   contactName: string;
   taxInvoiceEmail: string;
+  // 사업자 연락처 이메일 2종 — WO-O4O-KPA-BUSINESS-CONTACT-EMAIL-FIELDS-UI-EXTEND-V1
+  businessEmail: string;
+  contactEmail: string;
   zipCode: string;
   baseAddress: string;
   detailAddress: string;
@@ -52,6 +55,8 @@ function dataToForm(data: PharmacyInfoData): FormState {
     ceoName: data.ceoName || '',
     contactName: data.contactName || '',
     taxInvoiceEmail: data.taxInvoiceEmail || '',
+    businessEmail: data.businessEmail || '',
+    contactEmail: data.contactEmail || '',
     zipCode: data.addressDetail?.zipCode || '',
     baseAddress: data.addressDetail?.baseAddress || '',
     detailAddress: data.addressDetail?.detailAddress || '',
@@ -70,7 +75,7 @@ export function PharmacyInfoPage() {
   const [data, setData] = useState<PharmacyInfoData | null>(null);
   const [loadState, setLoadState] = useState<LoadState>('loading');
   const [isEditMode, setIsEditMode] = useState(false);
-  const [form, setForm] = useState<FormState>({ name: '', phone: '', ownerPhone: '', ceoName: '', contactName: '', taxInvoiceEmail: '', zipCode: '', baseAddress: '', detailAddress: '', businessType: '', businessItem: '', businessEntityType: '', businessStartDate: '' });
+  const [form, setForm] = useState<FormState>({ name: '', phone: '', ownerPhone: '', ceoName: '', contactName: '', taxInvoiceEmail: '', businessEmail: '', contactEmail: '', zipCode: '', baseAddress: '', detailAddress: '', businessType: '', businessItem: '', businessEntityType: '', businessStartDate: '' });
   const [isSaving, setIsSaving] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const [successMsg, setSuccessMsg] = useState('');
@@ -114,6 +119,13 @@ export function PharmacyInfoPage() {
     if (form.taxInvoiceEmail && !/^\S+@\S+\.\S+$/.test(form.taxInvoiceEmail)) {
       errs.push('세금계산서 이메일 형식이 올바르지 않습니다.');
     }
+    // WO-O4O-KPA-BUSINESS-CONTACT-EMAIL-FIELDS-UI-EXTEND-V1
+    if (form.businessEmail && !/^\S+@\S+\.\S+$/.test(form.businessEmail)) {
+      errs.push('약국 대표 이메일 형식이 올바르지 않습니다.');
+    }
+    if (form.contactEmail && !/^\S+@\S+\.\S+$/.test(form.contactEmail)) {
+      errs.push('담당자 이메일 형식이 올바르지 않습니다.');
+    }
     if (form.baseAddress && form.baseAddress.trim().length === 0) {
       errs.push('기본주소를 입력해 주세요.');
     }
@@ -147,6 +159,9 @@ export function PharmacyInfoPage() {
         ceoName: form.ceoName.trim() || undefined,
         contactName: form.contactName.trim() || undefined,
         taxInvoiceEmail: form.taxInvoiceEmail.trim() || undefined,
+        // WO-O4O-KPA-BUSINESS-CONTACT-EMAIL-FIELDS-UI-EXTEND-V1
+        businessEmail: form.businessEmail.trim() || undefined,
+        contactEmail: form.contactEmail.trim() || undefined,
         addressDetail,
         businessType: form.businessType.trim() || undefined,
         businessItem: form.businessItem.trim() || undefined,
@@ -286,6 +301,28 @@ export function PharmacyInfoPage() {
               />
             </div>
 
+            {/* WO-O4O-KPA-BUSINESS-CONTACT-EMAIL-FIELDS-UI-EXTEND-V1: 약국 대표 이메일 / 담당자 이메일 */}
+            <div style={styles.formGroup}>
+              <label style={styles.formLabel}>약국 대표 이메일</label>
+              <input
+                style={styles.formInput}
+                value={form.businessEmail}
+                onChange={e => updateField('businessEmail', e.target.value)}
+                placeholder="info@pharmacy.com (선택)"
+                type="email"
+              />
+            </div>
+            <div style={styles.formGroup}>
+              <label style={styles.formLabel}>담당자 이메일</label>
+              <input
+                style={styles.formInput}
+                value={form.contactEmail}
+                onChange={e => updateField('contactEmail', e.target.value)}
+                placeholder="manager@pharmacy.com (선택)"
+                type="email"
+              />
+            </div>
+
             {/* WO-O4O-MYPAGE-BUSINESS-INFO-EDIT-P2-P4-ADD-V1:
                   사업자등록증 P2/P4 fields — 공통 BusinessRegistrationFields 재사용 */}
             <div style={styles.formGroup}>
@@ -381,6 +418,15 @@ export function PharmacyInfoPage() {
             <div style={styles.infoRow}>
               <span style={styles.infoLabel}>세금계산서 이메일</span>
               <span style={styles.infoValue}>{data.taxInvoiceEmail || '-'}</span>
+            </div>
+            {/* WO-O4O-KPA-BUSINESS-CONTACT-EMAIL-FIELDS-UI-EXTEND-V1 */}
+            <div style={styles.infoRow}>
+              <span style={styles.infoLabel}>약국 대표 이메일</span>
+              <span style={styles.infoValue}>{data.businessEmail || '-'}</span>
+            </div>
+            <div style={styles.infoRow}>
+              <span style={styles.infoLabel}>담당자 이메일</span>
+              <span style={styles.infoValue}>{data.contactEmail || '-'}</span>
             </div>
             {/* WO-O4O-MYPAGE-BUSINESS-INFO-EDIT-P2-P4-ADD-V1: 사업자등록증 P2/P4 fields */}
             <div style={styles.infoRow}>

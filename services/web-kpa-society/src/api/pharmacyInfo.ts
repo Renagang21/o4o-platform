@@ -24,6 +24,10 @@ export interface PharmacyInfoData {
   address: string | null;
   addressDetail: StoreAddress | null;
   taxInvoiceEmail: string | null;
+  // 사업자 연락처 이메일 2종 — WO-O4O-KPA-BUSINESS-CONTACT-EMAIL-FIELDS-UI-EXTEND-V1
+  //   org.metadata SSOT. taxInvoiceEmail(세금계산서)와 의미 구분.
+  businessEmail: string | null;
+  contactEmail: string | null;
   ownerPhone: string | null;
   ceoName: string | null;
   contactName: string | null;
@@ -41,6 +45,9 @@ export interface UpdatePharmacyInfoPayload {
   phone?: string;
   addressDetail?: StoreAddress;
   taxInvoiceEmail?: string;
+  // WO-O4O-KPA-BUSINESS-CONTACT-EMAIL-FIELDS-UI-EXTEND-V1
+  businessEmail?: string;
+  contactEmail?: string;
   ownerPhone?: string;
   ceoName?: string;
   contactName?: string;
