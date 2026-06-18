@@ -147,7 +147,21 @@ const netureMembersClient: MembersConsoleClient = {
       action: status === 'approved' ? 'approve' : 'reject',
       ...(status === 'rejected' ? { reason: '운영자 일괄 거부' } : {}),
     });
-    return r.data;
+    // WO-O4O-NETURE-SUPPLIER-APPROVAL-BATCH-RESULT-SHAPE-FIX-V1:
+    //   /registrations/batch 응답은 { succeeded: string[], failed: {id,error}[], total } shape 다.
+    //   useBatchAction.executeBatch 는 { data: { results: [{id,status,error}] } } 를 기대하므로
+    //   (res.data.results || res.data.data.results) 매칭이 실패해 항상 0건으로 오표시되던 문제를
+    //   adapter 에서 정규화한다. (정지/복원/탈퇴 extraBulkActions 와 동일 shape)
+    const payload = r.data?.data ?? r.data ?? {};
+    const succeeded: string[] = Array.isArray(payload.succeeded) ? payload.succeeded : [];
+    const failed: Array<{ id: string; error?: string }> = Array.isArray(payload.failed)
+      ? payload.failed
+      : [];
+    const results = [
+      ...succeeded.map((id) => ({ id, status: 'success' as const })),
+      ...failed.map((f) => ({ id: f.id, status: 'failed' as const, error: f.error })),
+    ];
+    return { data: { results } };
   },
   async updatePassword(userId, password) {
     await api.put(`/operator/members/${userId}`, { password });
