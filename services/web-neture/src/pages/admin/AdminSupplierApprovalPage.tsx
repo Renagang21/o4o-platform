@@ -30,16 +30,27 @@ const mailOrderStatusLabels: Record<string, string> = {
   pending: '확인 필요',
 };
 
-function getMissingOnboardingItems(supplier: AdminSupplier): string[] {
-  const missing: string[] = [];
-  if (!supplier.businessRegistrationDocumentId) missing.push('사업자등록증');
-  if (!supplier.taxInvoiceEmail) missing.push('세금계산서 이메일');
-  if (!supplier.settlementBankName) missing.push('은행명');
-  if (!supplier.settlementAccountNumberMasked) missing.push('계좌번호');
-  if (!supplier.settlementAccountHolder) missing.push('예금주');
-  if (!supplier.settlementBankbookDocumentId) missing.push('통장 사본');
-  // 통신판매업 신고 정보는 의도적으로 미포함 — 운영자/admin 확인 항목일 뿐 활성화 차단 조건 아님.
-  return missing;
+// WO-O4O-NETURE-SUPPLIER-ACTIVATION-DOCUMENT-GATE-RELAXATION-V1:
+// ACTIVE 승인은 기본 사업자 정보만 필수. 사업자등록증/정산정보/통장사본/세금계산서 이메일은
+// 판매 전·정산 전 필요 항목으로 분리(활성화 차단 아님). 통신판매업은 종전대로 비차단.
+function getDeferredItems(supplier: AdminSupplier): { label: string; stage: string }[] {
+  const items: { label: string; stage: string }[] = [];
+  if (!supplier.businessRegistrationDocumentId) items.push({ label: '사업자등록증', stage: '판매 전' });
+  if (!supplier.taxInvoiceEmail) items.push({ label: '세금계산서 이메일', stage: '정산 전' });
+  if (!supplier.settlementBankName) items.push({ label: '은행명', stage: '정산 전' });
+  if (!supplier.settlementAccountNumberMasked) items.push({ label: '계좌번호', stage: '정산 전' });
+  if (!supplier.settlementAccountHolder) items.push({ label: '예금주', stage: '정산 전' });
+  if (!supplier.settlementBankbookDocumentId) items.push({ label: '통장 사본', stage: '정산 전' });
+  return items;
+}
+function describeDeferred(items: { label: string; stage: string }[]): string {
+  return ['판매 전', '정산 전']
+    .map((stage) => {
+      const labels = items.filter((i) => i.stage === stage).map((i) => i.label);
+      return labels.length ? `${stage} 필요: ${labels.join(', ')}` : null;
+    })
+    .filter(Boolean)
+    .join(' · ');
 }
 
 export default function AdminSupplierApprovalPage() {
@@ -197,8 +208,8 @@ export default function AdminSupplierApprovalPage() {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {filtered.map((s) => {
-                const missing = getMissingOnboardingItems(s);
-                const onboardingComplete = missing.length === 0;
+                const deferred = getDeferredItems(s);
+                const activationReady = !!s.representativeName;
                 return (
                 <tr key={s.id} className="hover:bg-slate-50 transition-colors">
                   <td className="px-6 py-4">
@@ -215,9 +226,12 @@ export default function AdminSupplierApprovalPage() {
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-600">
                     <div className="space-y-1">
-                      <div className={onboardingComplete ? 'text-emerald-700' : 'text-amber-700'}>
-                        {onboardingComplete ? '필수 완료' : `미완료: ${missing.join(', ')}`}
+                      <div className={activationReady ? 'text-emerald-700' : 'text-amber-700'}>
+                        {activationReady ? '승인 가능 (기본 정보 완료)' : '기본 사업자 정보 미완료'}
                       </div>
+                      {deferred.length > 0 && (
+                        <div className="text-xs text-amber-600">{describeDeferred(deferred)}</div>
+                      )}
                       <div className="text-xs text-slate-500">
                         {s.settlementBankName && s.settlementAccountHolder
                           ? `${s.settlementBankName} / ${s.settlementAccountHolder} / ${s.settlementAccountNumberMasked || '-'}`
@@ -278,8 +292,8 @@ export default function AdminSupplierApprovalPage() {
                       <>
                         <button
                           onClick={() => setApproveConfirmId(s.id)}
-                          disabled={actionLoading === s.id || !onboardingComplete}
-                          title={!onboardingComplete ? `필수 항목 미완료: ${missing.join(', ')}` : undefined}
+                          disabled={actionLoading === s.id || !activationReady}
+                          title={!activationReady ? '기본 사업자 정보(대표자명 등) 미완료' : undefined}
                           className="text-emerald-600 hover:text-emerald-800 font-medium text-sm disabled:opacity-50"
                         >
                           {actionLoading === s.id ? '처리중...' : '승인'}

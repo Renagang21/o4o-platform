@@ -450,10 +450,24 @@ export class NetureOfferService {
     // 규제 상품은 약국 대상 서비스에만 연결 가능 — 방어적 재확인(생성 시 차단되나 수동 변경 대비).
     const isPharmacyAudience = await new ServiceAudienceService(AppDataSource).getPharmacyAudienceResolver();
 
+    // WO-O4O-NETURE-SUPPLIER-ACTIVATION-DOCUMENT-GATE-RELAXATION-V1:
+    // 판매 가능 전 게이트 — 사업자등록증 PDF 미제출 공급자는 승인요청(판매 진입) 차단.
+    // (ACTIVE 전환 게이트에서는 제거됨 — 이 지점이 판매 전 확인 시점.)
+    const [supplierDocRow] = await AppDataSource.query(
+      `SELECT business_registration_document_id FROM neture_suppliers WHERE id = $1 LIMIT 1`,
+      [supplierId],
+    );
+    const hasBusinessRegistration = !!supplierDocRow?.business_registration_document_id;
+
     for (const offerId of offerIds) {
       const ownedRow = ownedMap.get(offerId);
       if (!ownedRow) {
         result.errors.push({ id: offerId, error: 'NOT_OWNED' });
+        continue;
+      }
+
+      if (!hasBusinessRegistration) {
+        result.skipped.push({ id: offerId, reason: 'SUPPLIER_BUSINESS_REGISTRATION_REQUIRED' });
         continue;
       }
 

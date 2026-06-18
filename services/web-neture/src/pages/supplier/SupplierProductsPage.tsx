@@ -581,6 +581,12 @@ const APPROVAL_GATE_REASON_DISPLAY: Record<string, GateReasonDisplay> = {
     nextAction: '현재 승인 상태를 확인해 주세요.',
     cta: false,
   },
+  // WO-O4O-NETURE-SUPPLIER-ACTIVATION-DOCUMENT-GATE-RELAXATION-V1: 판매 전 게이트(사업자등록증)
+  SUPPLIER_BUSINESS_REGISTRATION_REQUIRED: {
+    status: '사업자등록증이 제출되지 않아 판매 승인 요청을 할 수 없습니다.',
+    nextAction: '공급자 프로필 > 사업자 정보에서 사업자등록증을 제출한 뒤 다시 요청해 주세요.',
+    cta: true,
+  },
 };
 const APPROVAL_GATE_FALLBACK: GateReasonDisplay = {
   status: '승인 요청 조건을 충족하지 못했습니다.',

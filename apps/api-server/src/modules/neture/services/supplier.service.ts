@@ -117,11 +117,13 @@ export class NetureSupplierService {
       if (!supplier) return { success: false, error: 'SUPPLIER_NOT_FOUND' };
       if (supplier.status !== SupplierStatus.PENDING) return { success: false, error: 'INVALID_STATUS' };
 
-      const missingOnboardingFields = this.getMissingBasicOnboardingFields(supplier);
-      if (missingOnboardingFields.length > 0) {
+      // WO-O4O-NETURE-SUPPLIER-ACTIVATION-DOCUMENT-GATE-RELAXATION-V1:
+      // ACTIVE 전환은 기본 사업자/담당자 정보만 요구. 사업자등록증·정산정보는 판매전/정산전 게이트로 이동.
+      const missingActivationFields = this.getMissingActivationFields(supplier);
+      if (missingActivationFields.length > 0) {
         return {
           success: false,
-          error: `ONBOARDING_INCOMPLETE:${missingOnboardingFields.join(',')}`,
+          error: `ONBOARDING_INCOMPLETE:${missingActivationFields.join(',')}`,
         };
       }
 
@@ -1177,9 +1179,30 @@ export class NetureSupplierService {
     return `${value.slice(0, Math.max(0, value.length - suffix.length)).replace(/\d/g, '*')}${suffix}`;
   }
 
-  private getMissingBasicOnboardingFields(supplier: NetureSupplier): string[] {
+  // WO-O4O-NETURE-SUPPLIER-ACTIVATION-DOCUMENT-GATE-RELAXATION-V1:
+  // 단일 무거운 onboarding 게이트 → 단계별 분리.
+  //   IR-O4O-NETURE-SUPPLIER-ACTIVATION-DOCUMENT-GATE-AUDIT-V1: 서류·정산 6항목은 정산/상품/주문
+  //   로직에서 미소비(컴플라이언스 보관용)이므로 ACTIVE 게이트에서 제거하고 판매전/정산전으로 이동.
+
+  /** 공급 승인(ACTIVE 전환) 필수 — 기본 사업자/담당자 정보만. 서류·정산은 후단계. */
+  private getMissingActivationFields(supplier: NetureSupplier): string[] {
+    const missing: string[] = [];
+    if (!supplier.representativeName?.trim()) missing.push('representativeName');
+    if (!supplier.managerName?.trim()) missing.push('managerName');
+    if (!supplier.managerPhone?.trim()) missing.push('managerPhone');
+    return missing;
+  }
+
+  /** 판매 가능 전(상품 승인요청) 필수 — 사업자등록증 PDF. */
+  getMissingSaleFields(supplier: NetureSupplier): string[] {
     const missing: string[] = [];
     if (!supplier.businessRegistrationDocumentId) missing.push('businessRegistrationDocument');
+    return missing;
+  }
+
+  /** 정산 전 필수 — 정산 계좌/통장사본 + 세금계산서 이메일. */
+  getMissingSettlementFields(supplier: NetureSupplier): string[] {
+    const missing: string[] = [];
     if (!supplier.settlementBankName?.trim()) missing.push('settlementBankName');
     if (!supplier.settlementAccountNumber?.trim()) missing.push('settlementAccountNumber');
     if (!supplier.settlementAccountHolder?.trim()) missing.push('settlementAccountHolder');

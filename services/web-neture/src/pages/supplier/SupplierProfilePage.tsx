@@ -596,9 +596,14 @@ export default function SupplierProfilePage() {
           <FileText className="w-5 h-5 text-gray-500" />
           공급자 서류 및 정산 정보
         </h2>
-        <p className="text-xs text-gray-500 mb-5">
-          공급자 활성화 전에 운영자가 확인하는 기본 서류와 정산 정보입니다. 사업자등록증과 통장 사본은 PDF로 제출해 주세요.
+        {/* WO-O4O-NETURE-SUPPLIER-ACTIVATION-DOCUMENT-GATE-RELAXATION-V1: 단계별 제출 안내 */}
+        <p className="text-xs text-gray-500 mb-3">
+          공급자 승인은 기본 사업자 정보만으로 진행할 수 있습니다. 아래 서류·정산 정보는 단계별로 제출하시면 됩니다.
         </p>
+        <ul className="text-xs text-gray-500 mb-5 space-y-0.5 list-disc list-inside">
+          <li><span className="font-medium text-gray-700">판매 가능 전</span> — 사업자등록증(PDF)</li>
+          <li><span className="font-medium text-gray-700">정산 전</span> — 정산은행/계좌/예금주, 통장 사본(PDF), 세금계산서 이메일</li>
+        </ul>
 
         <div className="space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
