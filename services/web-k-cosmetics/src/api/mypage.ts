@@ -25,6 +25,9 @@ export interface CosmeticsBusinessInfo {
   representativeName: string | null;
   businessAddress: string | null;
   businessPhone: string | null;
+  // 회사이메일(회사/대표 업무 이메일) / 담당자이메일 — WO-O4O-KCOSMETICS-BUSINESS-CONTACT-FIELDS-UI-EXTEND-V1
+  businessEmail: string | null;
+  contactEmail: string | null;
   businessType: string | null;
   businessItem: string | null;
   businessEntityType: string | null;
@@ -38,6 +41,9 @@ export interface UpdateCosmeticsBusinessInfoPayload {
   representativeName?: string;
   businessAddress?: string;
   businessPhone?: string;
+  // WO-O4O-KCOSMETICS-BUSINESS-CONTACT-FIELDS-UI-EXTEND-V1
+  businessEmail?: string;
+  contactEmail?: string;
   businessType?: string;
   businessItem?: string;
   businessEntityType?: string;

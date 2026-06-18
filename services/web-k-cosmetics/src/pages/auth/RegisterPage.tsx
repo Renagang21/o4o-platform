@@ -44,6 +44,11 @@ export default function RegisterPage() {
     phone: '',
     businessName: '',
     businessNumber: '',
+    // 사업자 연락처 3종 — WO-O4O-KCOSMETICS-BUSINESS-CONTACT-FIELDS-UI-EXTEND-V1
+    //   회사/매장 전화 / 회사 대표 이메일 / 담당자 이메일 — users.businessInfo 저장(백엔드 기수용).
+    businessPhone: '',
+    businessEmail: '',
+    contactEmail: '',
     // 사업자등록증 표준 추가 필드 (WO-O4O-CROSSSERVICE-BUSINESS-REGISTRATION-FORM-ALIGNMENT-V1)
     businessType: '',          // 업태
     businessItem: '',          // 종목
@@ -59,7 +64,7 @@ export default function RegisterPage() {
     const { name, value, type, checked } = target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : name === 'phone' ? value.replace(/\D/g, '') : value,
+      [name]: type === 'checkbox' ? checked : (name === 'phone' || name === 'businessPhone') ? value.replace(/\D/g, '') : value,
     }));
   };
 
@@ -107,6 +112,12 @@ export default function RegisterPage() {
         service: 'k-cosmetics',
         businessName: formData.businessName,
         businessNumber: formData.businessNumber,
+        // 사업자 연락처 3종 — WO-O4O-KCOSMETICS-BUSINESS-CONTACT-FIELDS-UI-EXTEND-V1
+        //   DTO 가 businessEmail/contactEmail 에 @IsEmail 강제 → 빈 문자열 전송 금지(조건부).
+        //   businessPhone/businessEmail/contactEmail → users.businessInfo (백엔드 기수용).
+        ...(formData.businessPhone ? { businessPhone: formData.businessPhone } : {}),
+        ...(formData.businessEmail ? { businessEmail: formData.businessEmail } : {}),
+        ...(formData.contactEmail ? { contactEmail: formData.contactEmail } : {}),
         // 사업자등록증 표준 추가 필드 (WO-O4O-CROSSSERVICE-BUSINESS-REGISTRATION-FORM-ALIGNMENT-V1)
         ...(formData.businessType ? { businessType: formData.businessType } : {}),
         ...(formData.businessItem ? { businessItem: formData.businessItem } : {}),
@@ -383,6 +394,41 @@ export default function RegisterPage() {
                     value={formData.businessNumber}
                     onChange={handleInputChange}
                     placeholder="000-00-00000"
+                    style={styles.input}
+                  />
+                </div>
+                {/* 사업자 연락처 3종 — WO-O4O-KCOSMETICS-BUSINESS-CONTACT-FIELDS-UI-EXTEND-V1
+                    회사/매장 전화 · 회사 대표 이메일 · 담당자 이메일 (모두 선택). */}
+                <div style={styles.inputGroup}>
+                  <label style={styles.label}>회사/매장 전화</label>
+                  <input
+                    type="tel"
+                    name="businessPhone"
+                    value={formData.businessPhone}
+                    onChange={handleInputChange}
+                    placeholder="숫자만 입력 (선택)"
+                    style={styles.input}
+                  />
+                </div>
+                <div style={styles.inputGroup}>
+                  <label style={styles.label}>회사 대표 이메일</label>
+                  <input
+                    type="email"
+                    name="businessEmail"
+                    value={formData.businessEmail}
+                    onChange={handleInputChange}
+                    placeholder="info@store.com (선택)"
+                    style={styles.input}
+                  />
+                </div>
+                <div style={styles.inputGroup}>
+                  <label style={styles.label}>담당자 이메일</label>
+                  <input
+                    type="email"
+                    name="contactEmail"
+                    value={formData.contactEmail}
+                    onChange={handleInputChange}
+                    placeholder="manager@store.com (선택)"
                     style={styles.input}
                   />
                 </div>

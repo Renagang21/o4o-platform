@@ -32,6 +32,9 @@ interface FormState {
   representativeName: string;
   businessAddress: string;
   businessPhone: string;
+  // WO-O4O-KCOSMETICS-BUSINESS-CONTACT-FIELDS-UI-EXTEND-V1: 회사이메일 / 담당자이메일
+  businessEmail: string;
+  contactEmail: string;
   businessType: string;
   businessItem: string;
   businessEntityType: string;
@@ -45,6 +48,8 @@ const EMPTY_FORM: FormState = {
   representativeName: '',
   businessAddress: '',
   businessPhone: '',
+  businessEmail: '',
+  contactEmail: '',
   businessType: '',
   businessItem: '',
   businessEntityType: '',
@@ -59,6 +64,8 @@ function dataToForm(data: CosmeticsBusinessInfo): FormState {
     representativeName: data.representativeName || '',
     businessAddress: data.businessAddress || '',
     businessPhone: data.businessPhone || '',
+    businessEmail: data.businessEmail || '',
+    contactEmail: data.contactEmail || '',
     businessType: data.businessType || '',
     businessItem: data.businessItem || '',
     businessEntityType: data.businessEntityType || '',
@@ -121,6 +128,13 @@ export default function StoreInfoPage() {
     if (form.taxInvoiceEmail && !/^\S+@\S+\.\S+$/.test(form.taxInvoiceEmail)) {
       errs.push('세금계산서 이메일 형식이 올바르지 않습니다.');
     }
+    // WO-O4O-KCOSMETICS-BUSINESS-CONTACT-FIELDS-UI-EXTEND-V1
+    if (form.businessEmail && !/^\S+@\S+\.\S+$/.test(form.businessEmail)) {
+      errs.push('회사 대표 이메일 형식이 올바르지 않습니다.');
+    }
+    if (form.contactEmail && !/^\S+@\S+\.\S+$/.test(form.contactEmail)) {
+      errs.push('담당자 이메일 형식이 올바르지 않습니다.');
+    }
     if (form.businessStartDate && !/^\d{4}-\d{2}-\d{2}$/.test(form.businessStartDate)) {
       errs.push('개업일은 YYYY-MM-DD 형식이어야 합니다.');
     }
@@ -143,6 +157,9 @@ export default function StoreInfoPage() {
         representativeName: form.representativeName.trim() || undefined,
         businessAddress: form.businessAddress.trim() || undefined,
         businessPhone: digitsOnly(form.businessPhone) || undefined,
+        // WO-O4O-KCOSMETICS-BUSINESS-CONTACT-FIELDS-UI-EXTEND-V1
+        businessEmail: form.businessEmail.trim() || undefined,
+        contactEmail: form.contactEmail.trim() || undefined,
         businessType: form.businessType.trim() || undefined,
         businessItem: form.businessItem.trim() || undefined,
         businessEntityType: form.businessEntityType || undefined,
@@ -297,6 +314,25 @@ export default function StoreInfoPage() {
                   placeholder="숫자만 입력"
                 />
               </Field>
+              {/* WO-O4O-KCOSMETICS-BUSINESS-CONTACT-FIELDS-UI-EXTEND-V1: 회사이메일 / 담당자이메일 */}
+              <Field label="회사 대표 이메일">
+                <input
+                  type="email"
+                  className={inputCls}
+                  value={form.businessEmail}
+                  onChange={(e) => updateField('businessEmail', e.target.value)}
+                  placeholder="info@store.com"
+                />
+              </Field>
+              <Field label="담당자 이메일">
+                <input
+                  type="email"
+                  className={inputCls}
+                  value={form.contactEmail}
+                  onChange={(e) => updateField('contactEmail', e.target.value)}
+                  placeholder="manager@store.com"
+                />
+              </Field>
 
               {/* P2/P4 — 공통 BusinessRegistrationFields */}
               <BusinessRegistrationFields
@@ -367,6 +403,17 @@ export default function StoreInfoPage() {
                 label="사업장 전화번호"
                 value={data.businessPhone}
                 icon={<Phone className="w-3.5 h-3.5 text-gray-400" />}
+              />
+              {/* WO-O4O-KCOSMETICS-BUSINESS-CONTACT-FIELDS-UI-EXTEND-V1 */}
+              <ViewRow
+                label="회사 대표 이메일"
+                value={data.businessEmail}
+                icon={<Mail className="w-3.5 h-3.5 text-gray-400" />}
+              />
+              <ViewRow
+                label="담당자 이메일"
+                value={data.contactEmail}
+                icon={<Mail className="w-3.5 h-3.5 text-gray-400" />}
               />
               <ViewRow label="업태" value={data.businessType} />
               <ViewRow label="종목" value={data.businessItem} />
