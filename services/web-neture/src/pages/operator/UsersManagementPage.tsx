@@ -18,7 +18,7 @@
 
 import { useMemo, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { UserCheck, UserMinus, UserX } from 'lucide-react';
+import { UserCheck, UserMinus, UserX, Info, ArrowRight } from 'lucide-react';
 import {
   OperatorMembersConsolePage,
   type MembersConsoleClient,
@@ -125,7 +125,22 @@ const netureMembersClient: MembersConsoleClient = {
   },
   async updateStatus(userId, status, currentStatus, user) {
     if (status === 'approved' && (currentStatus === 'pending' || currentStatus === 'rejected')) {
-      await api.post(`/neture/operator/registrations/${userId}/approve`);
+      // WO-O4O-NETURE-OPERATOR-MEMBERS-SUPPLIER-PENDING-UX-CLARIFY-V1:
+      //   이 액션은 1단계(회원 가입 승인)다. 이미 가입 승인된(active) 회원은 백엔드가
+      //   REGISTRATION_NOT_FOUND(404)로 응답하는데("already processed"), 운영자에게 원문 대신
+      //   2단계(공급자 프로필 승인) 안내 문구를 보여준다. handleStatusChange 가 err.message 를 toast 한다.
+      try {
+        await api.post(`/neture/operator/registrations/${userId}/approve`);
+      } catch (err: any) {
+        const code = err?.response?.status ?? err?.status;
+        const msg = String(err?.response?.data?.error || err?.response?.data?.message || err?.message || '');
+        if (code === 404 || /REGISTRATION_NOT_FOUND|already processed/i.test(msg)) {
+          throw new Error(
+            '이미 가입 승인된 회원입니다. 공급자 프로필 승인이 필요하면 "공급자 승인 관리(공급자 활성화)" 화면에서 처리해 주세요.',
+          );
+        }
+        throw err;
+      }
       return;
     }
     if (status === 'rejected') {
@@ -242,6 +257,41 @@ function NetureDeleteFlow({
   );
 }
 
+// ─── 2단계 승인 안내 + 공급 승인 대기 CTA ────────────────────
+// WO-O4O-NETURE-OPERATOR-MEMBERS-SUPPLIER-PENDING-UX-CLARIFY-V1:
+//   IR-O4O-NETURE-OPERATOR-MEMBERS-SUPPLIER-PENDING-STATE-AUDIT-V1 결론 반영.
+//   회원 가입 승인(1단계, 이 화면)과 공급자 프로필 승인(2단계, /operator/suppliers)은 별개 축이다.
+//   상단 "대기" 통계는 1단계(service_memberships.status) 기준이므로, 2단계(neture_suppliers PENDING)
+//   대기 작업이 "대기 0" 으로 가려 보이는 혼동을 안내 문구 + 이동 동선으로 해소한다.
+//   (집계/승인 API/로그인 정책은 변경하지 않음 — 표시·동선만 보강)
+function SupplierTwoStepGuide({ pendingSupplierCount }: { pendingSupplierCount: number }) {
+  return (
+    <div className="mb-4 rounded-lg border border-slate-200 bg-slate-50 p-3">
+      <div className="flex items-start gap-2">
+        <Info size={16} className="mt-0.5 shrink-0 text-slate-400" />
+        <p className="flex-1 text-xs leading-relaxed text-slate-600">
+          Neture 공급자는 <b>2단계</b>로 활성화됩니다. <b>1단계 회원 가입 승인</b>은 이 화면에서,{' '}
+          <b>2단계 공급자 프로필 승인</b>은 <b>공급자 승인 관리</b>에서 처리합니다. 상단 “대기” 통계는
+          1단계(회원 가입) 기준이며, 공급자 프로필 승인대기는 아래 별도 안내로 표시됩니다.
+        </p>
+      </div>
+      {pendingSupplierCount > 0 && (
+        <div className="mt-2 flex items-center justify-between gap-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2">
+          <span className="text-xs font-medium text-amber-800">
+            공급 승인 대기 {pendingSupplierCount}건 — 회원 가입은 완료되었고 공급자 프로필 승인(2단계)이 필요합니다.
+          </span>
+          <Link
+            to="/operator/suppliers"
+            className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-md bg-amber-600 px-3 py-1.5 text-xs font-semibold text-white no-underline hover:bg-amber-700"
+          >
+            공급자 승인 관리로 이동 <ArrowRight size={13} />
+          </Link>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Main Component ──────────────────────────────────────────
 
 export default function UsersManagementPage() {
@@ -269,7 +319,17 @@ export default function UsersManagementPage() {
     };
   }, []);
 
+  // WO-O4O-NETURE-OPERATOR-MEMBERS-SUPPLIER-PENDING-UX-CLARIFY-V1:
+  //   공급 승인 대기(neture_suppliers.status === 'PENDING') 건수 — 안내 배너 CTA 표시용.
+  //   supplierStatusMap 은 전체 공급자 기준 1회 로드(페이지네이션 무관)이라 총 대기 건수를 반영한다.
+  const pendingSupplierCount = useMemo(
+    () => Array.from(supplierStatusMap.values()).filter((s) => s === 'PENDING').length,
+    [supplierStatusMap],
+  );
+
   return (
+    <>
+    <SupplierTwoStepGuide pendingSupplierCount={pendingSupplierCount} />
     <OperatorMembersConsolePage
       serviceKey="neture"
       client={netureMembersClient}
@@ -330,13 +390,19 @@ export default function UsersManagementPage() {
               </span>
             );
             if (st === 'PENDING') {
+              // WO-O4O-NETURE-OPERATOR-MEMBERS-SUPPLIER-PENDING-UX-CLARIFY-V1:
+              //   PENDING 행에 "공급 승인 →" 명시 액션을 노출한다. 승인 처리는 이 화면이 아니라
+              //   /operator/suppliers(2단계 공급 승인)에서 수행 — 링크로 이동만 제공한다.
               return (
                 <Link
                   to="/operator/suppliers"
-                  title="회원 가입은 승인됨 · 공급자 프로필 승인이 필요합니다. 공급사 승인 화면에서 처리하세요."
-                  className="no-underline"
+                  title="회원 가입은 승인됨 · 공급자 프로필 승인(2단계)이 필요합니다. 공급자 승인 관리 화면에서 처리하세요."
+                  className="group inline-flex items-center gap-1 no-underline"
                 >
                   {badge}
+                  <span className="whitespace-nowrap text-[11px] font-medium text-amber-700 group-hover:underline">
+                    공급 승인 →
+                  </span>
                 </Link>
               );
             }
@@ -433,5 +499,6 @@ export default function UsersManagementPage() {
         },
       ]}
     />
+    </>
   );
 }
