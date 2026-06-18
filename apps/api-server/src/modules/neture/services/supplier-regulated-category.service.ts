@@ -204,6 +204,30 @@ export class SupplierRegulatedCategoryService {
     return { success: true as const, data: await this.withDocument(saved) };
   }
 
+  /**
+   * 공급자가 운영자 검토 요청 → status 'submitted'.
+   * WO-O4O-NETURE-SUPPLIER-REGULATED-CATEGORY-NUMBER-FIRST-V1:
+   * 파일 업로드를 검토 요청의 필수 트리거로 보지 않고, **허가/신고 번호만 입력해도** 검토 요청 가능.
+   * (번호 또는 증빙 중 최소 하나 필요. approved/suspended 는 잠금.)
+   */
+  async submitForReview(supplierId: string, category: string) {
+    if (!isRegulatedCategory(category)) return { success: false as const, error: 'INVALID_CATEGORY' };
+    const row = await this.categoryRepo.findOne({ where: { supplierId, category } });
+    if (!row) return { success: false as const, error: 'CATEGORY_NOT_FOUND' };
+    if (row.status === 'approved') return { success: false as const, error: 'ALREADY_APPROVED' };
+    if (row.status === 'suspended') return { success: false as const, error: 'CATEGORY_SUSPENDED' };
+    // 번호 우선: 허가/신고 번호 또는 증빙 PDF 중 최소 하나가 있어야 검토 요청 가능(파일 필수 아님)
+    if (!row.registrationNumber && !row.evidenceDocumentId) {
+      return { success: false as const, error: 'REVIEW_REQUIRES_NUMBER_OR_FILE' };
+    }
+    if (row.status !== 'submitted') {
+      row.status = 'submitted';
+      await this.categoryRepo.save(row);
+    }
+    logger.info(`[SupplierRegulatedCategory] submit-for-review supplier=${supplierId} category=${category}`);
+    return { success: true as const, data: await this.withDocument(row) };
+  }
+
   /** 공급자가 품목군 증빙 PDF 업로드 → status 'submitted'(suspended 는 유지) */
   async uploadEvidence(supplierId: string, category: string, file: Express.Multer.File) {
     if (!isRegulatedCategory(category)) return { success: false as const, error: 'INVALID_CATEGORY' };

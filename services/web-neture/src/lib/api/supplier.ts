@@ -1225,6 +1225,18 @@ export const supplierRegulatedCategoryApi = {
     }
   },
 
+  // WO-O4O-NETURE-SUPPLIER-REGULATED-CATEGORY-NUMBER-FIRST-V1: 번호만으로도 검토 요청(파일 선택)
+  async submitForReview(
+    category: RegulatedCategory,
+  ): Promise<{ success: boolean; error?: string; data?: SupplierRegulatedCategory }> {
+    try {
+      const response = await api.post(`/neture/supplier/regulated-categories/${category}/submit`);
+      return response.data;
+    } catch (error) {
+      return { success: false, error: extractApiError(error) };
+    }
+  },
+
   async uploadEvidence(
     category: RegulatedCategory,
     file: File,

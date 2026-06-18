@@ -401,6 +401,23 @@ export default function SupplierProfilePage() {
     setCategoryBusy(null);
   };
 
+  // WO-O4O-NETURE-SUPPLIER-REGULATED-CATEGORY-NUMBER-FIRST-V1:
+  // 번호(또는 선택 첨부)만으로 운영자 검토 요청 → submitted.
+  const handleSubmitCategoryReview = async (category: RegulatedCategory) => {
+    setCategoryError(null);
+    setCategoryBusy(category);
+    const result = await supplierRegulatedCategoryApi.submitForReview(category);
+    if (!result.success) {
+      const msg =
+        result.error === 'REVIEW_REQUIRES_NUMBER_OR_FILE'
+          ? '허가/신고 번호를 입력하거나 증빙 PDF를 첨부한 뒤 검토를 요청해 주세요.'
+          : result.error || '검토 요청에 실패했습니다.';
+      setCategoryError(msg);
+    }
+    await refreshCategories();
+    setCategoryBusy(null);
+  };
+
   const handleUploadCategoryEvidence = async (category: RegulatedCategory, file: File) => {
     if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
       setCategoryError('PDF 파일만 업로드할 수 있습니다.');
@@ -816,9 +833,9 @@ export default function SupplierProfilePage() {
           공급 예정 품목군
         </h2>
         <p className="text-xs text-gray-500 mb-5">
-          O4O 에 공급하려는 품목군을 선택하고, 품목군별로 필요한 증빙 PDF 를 제출해 주세요.
-          운영자가 확인 후 O4O 내부 등록 가능 상태를 설정합니다.
-          O4O 는 법적 허가 여부를 인증하지 않으며, 제출 서류는 운영자 검토용 참고 정보로만 사용됩니다.
+          O4O 에 공급하려는 품목군을 선택하고, 허가/신고 번호를 입력한 뒤 검토를 요청해 주세요.
+          증빙 PDF 첨부는 선택 사항이며, 운영자가 확인 후 O4O 내부 등록 가능 상태를 설정합니다.
+          O4O 는 법적 허가 여부를 인증하지 않으며, 입력 정보와 제출 서류는 운영자 검토용 참고 정보로만 사용됩니다.
         </p>
 
         <div className="space-y-3">
@@ -871,9 +888,15 @@ export default function SupplierProfilePage() {
                       </p>
                     )}
 
+                    {/* WO-O4O-NETURE-SUPPLIER-REGULATED-CATEGORY-NUMBER-FIRST-V1: 번호 우선 안내 */}
+                    <p className="text-xs text-gray-500 leading-relaxed">
+                      허가/신고 번호를 입력하면 운영자 검토를 요청할 수 있습니다. 증빙 PDF는 선택 사항이며,
+                      운영자가 필요하다고 판단하면 보완을 요청할 수 있습니다.
+                    </p>
+
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-end">
                       <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-1">허가/신고 번호 (선택)</label>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">허가/신고 번호</label>
                         <input
                           type="text"
                           defaultValue={row.registrationNumber || ''}
@@ -885,32 +908,47 @@ export default function SupplierProfilePage() {
                           className={inputClass}
                         />
                       </div>
-                      <div className="flex items-center gap-3">
-                        <input
-                          type="file"
-                          accept="application/pdf,.pdf"
-                          disabled={busy}
-                          onChange={(e) => {
-                            const f = e.target.files?.[0];
-                            if (f) handleUploadCategoryEvidence(category, f);
-                            e.target.value = '';
-                          }}
-                          className={fileInputClass}
-                        />
-                        {row.evidenceDocument && (
-                          <button
-                            type="button"
-                            onClick={() => handleDownloadCategoryEvidence(category)}
-                            className="inline-flex items-center gap-1 text-xs font-medium text-primary-700 hover:text-primary-800 whitespace-nowrap"
-                          >
-                            <Download className="w-3.5 h-3.5" />
-                            증빙 열람
-                          </button>
-                        )}
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">증빙 PDF 첨부 (선택)</label>
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="file"
+                            accept="application/pdf,.pdf"
+                            disabled={busy}
+                            onChange={(e) => {
+                              const f = e.target.files?.[0];
+                              if (f) handleUploadCategoryEvidence(category, f);
+                              e.target.value = '';
+                            }}
+                            className={fileInputClass}
+                          />
+                          {row.evidenceDocument && (
+                            <button
+                              type="button"
+                              onClick={() => handleDownloadCategoryEvidence(category)}
+                              className="inline-flex items-center gap-1 text-xs font-medium text-primary-700 hover:text-primary-800 whitespace-nowrap"
+                            >
+                              <Download className="w-3.5 h-3.5" />
+                              증빙 열람
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
                     {row.evidenceDocument && (
                       <p className="text-xs text-gray-400">제출 파일: {row.evidenceDocument.fileName}</p>
+                    )}
+
+                    {/* 검토 요청 — not_requested/needs_update/rejected 에서만 (submitted/approved/suspended 제외) */}
+                    {['not_requested', 'needs_update', 'rejected'].includes(row.status) && (
+                      <button
+                        type="button"
+                        onClick={() => handleSubmitCategoryReview(category)}
+                        disabled={busy}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary-600 text-white text-xs font-medium hover:bg-primary-700 disabled:opacity-50"
+                      >
+                        {row.status === 'not_requested' ? '검토 요청' : '재검토 요청'}
+                      </button>
                     )}
                   </div>
                 )}

@@ -316,6 +316,23 @@ export function createSupplierManagementController(dataSource: DataSource): Rout
     }
   });
 
+  // POST /supplier/regulated-categories/:category/submit — 검토 요청(번호 우선, 파일 선택)
+  // WO-O4O-NETURE-SUPPLIER-REGULATED-CATEGORY-NUMBER-FIRST-V1
+  router.post('/regulated-categories/:category/submit', requireAuth, requireLinkedSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const supplierId = (req as SupplierRequest).supplierId;
+      const result = await regulatedCategoryService.submitForReview(supplierId, req.params.category);
+      if (!result.success) {
+        const status = result.error === 'CATEGORY_NOT_FOUND' ? 404 : 400;
+        return res.status(status).json({ success: false, error: { code: result.error } });
+      }
+      res.json({ success: true, data: result.data });
+    } catch (error) {
+      logger.error('[Neture API] Error submitting regulated category for review:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR' } });
+    }
+  });
+
   // DELETE /supplier/regulated-categories/:category — 선택 해제(검토중/승인/제한은 잠금)
   router.delete('/regulated-categories/:category', requireAuth, requireLinkedSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
     try {
