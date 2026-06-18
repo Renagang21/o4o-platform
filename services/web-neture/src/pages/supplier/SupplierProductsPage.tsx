@@ -530,6 +530,66 @@ const baseColumns: ListColumnDef<SupplierProduct>[] = [
 
 type RecruitModalProduct = { masterId: string; name: string; regulatoryType?: string; distributionType?: string };
 
+// WO-O4O-SUPPLIER-PRODUCT-APPROVAL-GATE-UX-MESSAGE-IMPROVEMENT-V1:
+// submitForApproval 의 skipped[].reason(세분화된 reasonCode)을 상태/다음행동 문구로 변환.
+// backend(evaluateGate)가 이미 reasonCode 를 세분화하여 반환 — frontend 는 표시만 정확히 한다.
+const APPROVAL_GATE_PROFILE_URL = '/mypage/business-profile';
+type GateReasonDisplay = { status: string; nextAction: string; cta: boolean };
+const APPROVAL_GATE_REASON_DISPLAY: Record<string, GateReasonDisplay> = {
+  SUPPLIER_CATEGORY_NOT_SELECTED: {
+    status: '공급 예정 품목군에 아직 등록되지 않았습니다.',
+    nextAction: '공급자 프로필 > 공급 예정 품목군에서 해당 품목군을 추가하고 필요한 증빙을 제출해 주세요.',
+    cta: true,
+  },
+  SUPPLIER_CATEGORY_NOT_APPROVED: {
+    status: '해당 품목군이 운영자 확인 대기 중입니다.',
+    nextAction: '운영자 확인이 완료된 후 상품 승인 요청을 다시 진행해 주세요.',
+    cta: true,
+  },
+  SUPPLIER_CATEGORY_NEEDS_UPDATE: {
+    status: '해당 품목군 증빙에 보완이 필요합니다.',
+    nextAction: '공급자 프로필 > 공급 예정 품목군에서 보완 요청 내용을 확인하고 증빙을 다시 제출해 주세요.',
+    cta: true,
+  },
+  SUPPLIER_CATEGORY_REJECTED: {
+    status: '해당 품목군 신청이 반려되었습니다.',
+    nextAction: '반려 사유를 확인한 뒤 필요한 증빙을 보완하여 다시 제출해 주세요.',
+    cta: true,
+  },
+  SUPPLIER_CATEGORY_SUSPENDED: {
+    status: '해당 품목군이 정지 상태입니다.',
+    nextAction: '운영자 확인 또는 문의가 필요합니다.',
+    cta: true,
+  },
+  SUPPLIER_CATEGORY_UNRESOLVED: {
+    status: '해당 상품의 품목군 상태를 확인할 수 없습니다.',
+    nextAction: '상품의 규제/품목군 정보를 확인하거나 공급 예정 품목군 등록 상태를 확인해 주세요.',
+    cta: true,
+  },
+  NO_ELIGIBLE_SERVICE_KEYS: {
+    status: '이 상품을 노출할 수 있는 서비스 대상이 없습니다.',
+    nextAction: '상품 편집에서 서비스 대상 또는 유통 설정을 확인해 주세요.',
+    cta: false,
+  },
+  DRUG_SERVICE_NOT_PHARMACY_AUDIENCE: {
+    status: '의약품 상품은 약국 대상 서비스에만 승인 요청할 수 있습니다.',
+    nextAction: '상품 편집에서 서비스 대상 설정을 확인해 주세요.',
+    cta: false,
+  },
+  ALREADY_REQUESTED_OR_DECIDED: {
+    status: '이미 승인 요청 중이거나 승인/반려 처리된 상품입니다.',
+    nextAction: '현재 승인 상태를 확인해 주세요.',
+    cta: false,
+  },
+};
+const APPROVAL_GATE_FALLBACK: GateReasonDisplay = {
+  status: '승인 요청 조건을 충족하지 못했습니다.',
+  nextAction: '상품 정보와 공급자 품목군 등록 상태를 확인해 주세요.',
+  cta: false,
+};
+type ApprovalSkippedItem = { id: string; reason: string; name: string; category: string; display: GateReasonDisplay };
+type ApprovalResultView = { submitted: number; total: number; errorCount: number; skipped: ApprovalSkippedItem[] };
+
 export default function SupplierProductsPage() {
   const navigate = useNavigate();
   // WO-O4O-SELLER-RECRUITMENT-CREATION-FLOW-V1
@@ -556,6 +616,8 @@ export default function SupplierProductsPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   // showApprovalModal 제거됨 — WO-NETURE-SUPPLIER-APPROVAL-REQUEST-USE-SAVED-DISTRIBUTION-POLICY-V1
   const [toast, setToast] = useState<string | null>(null);
+  // WO-O4O-SUPPLIER-PRODUCT-APPROVAL-GATE-UX-MESSAGE-IMPROVEMENT-V1: 승인 요청 결과 banner
+  const [approvalResult, setApprovalResult] = useState<ApprovalResultView | null>(null);
 
   // Filter state
   const [filterHasImage, setFilterHasImage] = useState('');
@@ -1109,6 +1171,80 @@ export default function SupplierProductsPage() {
         </div>
       )}
 
+      {/* WO-O4O-SUPPLIER-PRODUCT-APPROVAL-GATE-UX-MESSAGE-IMPROVEMENT-V1: 승인 요청 결과 banner */}
+      {approvalResult && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          onClick={(e) => e.target === e.currentTarget && setApprovalResult(null)}
+        >
+          <div className="absolute inset-0 bg-black/40" />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[85vh] overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+              <h2 className="text-base font-bold text-slate-900">승인 요청 결과</h2>
+              <button
+                type="button"
+                onClick={() => setApprovalResult(null)}
+                className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg"
+                aria-label="닫기"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="px-5 py-4 overflow-y-auto">
+              {/* 요약 */}
+              <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm mb-4">
+                <span className="text-emerald-700 font-semibold">승인 요청 완료: {approvalResult.submitted}건</span>
+                <span className="text-amber-700 font-semibold">승인 요청 제외: {approvalResult.skipped.length}건</span>
+                {approvalResult.errorCount > 0 && (
+                  <span className="text-red-600 font-semibold">오류: {approvalResult.errorCount}건</span>
+                )}
+              </div>
+              {approvalResult.submitted === 0 && approvalResult.skipped.length > 0 && (
+                <p className="text-sm text-slate-500 mb-3">선택한 상품 중 승인 요청 가능한 상품이 없습니다.</p>
+              )}
+
+              {/* 제외 상품 목록 */}
+              {approvalResult.skipped.length > 0 && (
+                <div className="space-y-2.5">
+                  <p className="text-xs font-semibold text-slate-500">제외된 상품</p>
+                  {approvalResult.skipped.map((item) => (
+                    <div key={`${item.id}-${item.reason}`} className="p-3 bg-slate-50 border border-slate-200 rounded-lg">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-sm font-medium text-slate-900">{item.name}</span>
+                        <span className="text-xs px-2 py-0.5 bg-slate-200 text-slate-600 rounded">{item.category}</span>
+                      </div>
+                      <p className="text-sm text-amber-800 mt-1">{item.display.status}</p>
+                      <p className="text-xs text-slate-500 mt-0.5">다음 작업: {item.display.nextAction}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* 푸터: CTA + 확인 */}
+            <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-slate-100">
+              {approvalResult.skipped.some((s) => s.display.cta) && (
+                <button
+                  type="button"
+                  onClick={() => { setApprovalResult(null); navigate(APPROVAL_GATE_PROFILE_URL); }}
+                  className="px-4 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg"
+                >
+                  공급 예정 품목군 관리로 이동
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setApprovalResult(null)}
+                className="px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg"
+              >
+                확인
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-start justify-between mb-6">
         <div>
@@ -1256,38 +1392,22 @@ export default function SupplierProductsPage() {
                 const skippedCount = d.skipped?.length ?? 0;
                 const errorCount = d.errors?.length ?? 0;
 
-                // reason별 집계
-                const noEligible = (d.skipped || []).filter((s) => s.reason === 'NO_ELIGIBLE_SERVICE_KEYS').length;
-                const alreadyDone = (d.skipped || []).filter((s) => s.reason === 'ALREADY_REQUESTED_OR_DECIDED').length;
-                // WO-O4O-SUPPLIER-PRODUCT-REGISTER-BY-CATEGORY-STATUS-V1: 품목군 gate 차단
-                const categoryBlocked = (d.skipped || []).filter((s) => s.reason.startsWith('SUPPLIER_CATEGORY_')).length;
-                // WO-O4O-DRUG-SERVICE-CONNECTION-GATE-V1: 의약품 비약국 서비스 연결 차단
-                const drugServiceBlocked = (d.skipped || []).filter((s) => s.reason === 'DRUG_SERVICE_NOT_PHARMACY_AUDIENCE').length;
-
-                if (d.submitted === 0 && errorCount === 0) {
-                  // 전원 skipped: 사용자에게 원인 안내
-                  const parts: string[] = [];
-                  if (categoryBlocked > 0) parts.push(`${categoryBlocked}건은 해당 품목군이 O4O 내부 등록 가능 상태가 아닙니다`);
-                  if (drugServiceBlocked > 0) parts.push(`${drugServiceBlocked}건은 의약품이 약국 대상 서비스가 아닌 서비스에 연결되어 있습니다`);
-                  if (noEligible > 0) parts.push(`${noEligible}건은 공급 정책(서비스 키)이 설정되지 않았습니다`);
-                  if (alreadyDone > 0) parts.push(`${alreadyDone}건은 이미 승인 요청이 진행 중이거나 완료되었습니다`);
-                  const reason = parts.length > 0 ? parts.join('. ') : '변경사항이 없습니다';
-                  const guide = categoryBlocked > 0
-                    ? ' 공급자 프로필 > 공급 예정 품목군에서 증빙을 제출하고 운영자 확인을 받아 주세요.'
-                    : drugServiceBlocked > 0
-                    ? ' 의약품은 약국 대상 서비스에만 등록할 수 있습니다. 상품 편집에서 서비스 연결을 확인해 주세요.'
-                    : noEligible > 0 ? ' 상품 편집에서 서비스별 공급을 선택한 뒤 다시 승인요청해 주세요.' : '';
-                  showToast(`승인 요청된 상품이 없습니다. ${reason}.${guide}`);
-                } else if (d.submitted > 0) {
-                  const tail: string[] = [];
-                  if (categoryBlocked > 0) tail.push(`${categoryBlocked}건 품목군 미승인`);
-                  if (drugServiceBlocked > 0) tail.push(`${drugServiceBlocked}건 약국 대상 서비스 아님`);
-                  if (skippedCount - categoryBlocked - drugServiceBlocked > 0) tail.push(`${skippedCount - categoryBlocked - drugServiceBlocked}건 건너뜀`);
-                  if (errorCount > 0) tail.push(`${errorCount}건 실패`);
-                  const tailStr = tail.length > 0 ? ` (${tail.join(', ')})` : '';
-                  showToast(`${d.submitted}/${total}건 승인 요청 완료${tailStr}`);
+                if (skippedCount === 0 && errorCount === 0) {
+                  // 전원 성공: 간단 toast
+                  showToast(`${d.submitted}건 승인 요청 완료`);
                 } else {
-                  showToast(`승인 요청 실패: ${errorCount}건 오류`);
+                  // WO-O4O-SUPPLIER-PRODUCT-APPROVAL-GATE-UX-MESSAGE-IMPROVEMENT-V1:
+                  // skipped[].id(offerId) → 현재 목록 상품과 매핑(상품명/품목군) + reasonCode → 상태/다음행동.
+                  const skippedView: ApprovalSkippedItem[] = (d.skipped || []).map((s) => {
+                    const p = products.find((pr) => pr.id === s.id);
+                    const name = p?.name || p?.masterName || `상품 ID: ${s.id}`;
+                    const category = p?.regulatoryType
+                      ? (REGULATORY_TYPE_LABELS[p.regulatoryType] || p.regulatoryType)
+                      : (p?.categoryName || '-');
+                    const display = APPROVAL_GATE_REASON_DISPLAY[s.reason] || APPROVAL_GATE_FALLBACK;
+                    return { id: s.id, reason: s.reason, name, category, display };
+                  });
+                  setApprovalResult({ submitted: d.submitted, total, errorCount, skipped: skippedView });
                 }
 
                 // WO-NETURE-PRODUCT-TABLE-SELECTION-AND-APPROVAL-REFRESH-FIX-V1:
