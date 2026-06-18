@@ -43,6 +43,16 @@ function resolveServiceKeyFromBody(body: any): string {
   throw new ApiError(400, `Invalid service_key: ${requested}`, 'INVALID_SERVICE_KEY');
 }
 
+// WO-O4O-SERVICE-OFFER-HUB-EXPOSURE-APPROVAL-GATE-FIX-V1:
+//   catalog 팩토리 serviceKey(role-prefix: kpa/glycopharm/cosmetics) →
+//   offer_service_approvals.service_key(platform-level: kpa-society/glycopharm/k-cosmetics) 매핑.
+//   (store-owner.utils.ts 의 STORE_OWNER_SCOPE_TO_MEMBERSHIP_KEY 와 동일 의미 — 정책 SSOT 정합)
+const STORE_SERVICE_KEY_TO_APPROVAL_KEY: Record<string, string> = {
+  kpa: 'kpa-society',
+  glycopharm: 'glycopharm',
+  cosmetics: 'k-cosmetics',
+};
+
 export function createPharmacyProductsController(
   dataSource: DataSource,
   requireAuth: AuthMiddleware,
@@ -96,6 +106,27 @@ export function createPharmacyProductsController(
       params.push(distributionType);
       distributionFilter = `AND spo.distribution_type = $${params.length}`;
     }
+
+    // WO-O4O-SERVICE-OFFER-HUB-EXPOSURE-APPROVAL-GATE-FIX-V1:
+    //   서비스 운영자 승인 게이트. PUBLIC 은 승인 예외(전체 공개) → 통과.
+    //   SERVICE/PRIVATE 은 현재 서비스(serviceKey)의 offer_service_approvals 가 'approved' 일 때만 노출.
+    //   (전역 spo.is_active=true 만으로는 타 서비스 승인이 현재 서비스 HUB 로 누출됨 → per-service 게이트로 차단)
+    //   serviceKey 미지정(back-compat 마운트)이면 게이트 미적용(기존 동작 보존).
+    const approvalServiceKey = serviceKey ? STORE_SERVICE_KEY_TO_APPROVAL_KEY[serviceKey] : undefined;
+    let approvalFilter = '';
+    if (approvalServiceKey) {
+      params.push(approvalServiceKey);
+      approvalFilter = `AND (
+        spo.distribution_type = 'PUBLIC'
+        OR EXISTS (
+          SELECT 1 FROM offer_service_approvals osa
+          WHERE osa.offer_id = spo.id
+            AND osa.service_key = $${params.length}
+            AND osa.approval_status = 'approved'
+        )
+      )`;
+    }
+
     // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1:
     // recommended 탭은 공급자 강조 플래그(spo.is_featured) 우선 → created_at DESC fallback
     // 기존 offer_curations 의존 제거. 별도 WHERE 필터 없이 ORDER BY로 자연 fallback.
@@ -139,6 +170,7 @@ export function createPharmacyProductsController(
          ${categoryFilter}
          ${distributionFilter}
          ${operatorFilter}
+         ${approvalFilter}
        ORDER BY ${orderBy}
        LIMIT $2 OFFSET $3`,
       params,
@@ -163,6 +195,20 @@ export function createPharmacyProductsController(
       countParams.push(distributionType);
       countDistributionFilter = `AND spo.distribution_type = $${countParams.length}`;
     }
+    // WO-O4O-SERVICE-OFFER-HUB-EXPOSURE-APPROVAL-GATE-FIX-V1: count 쿼리도 동일 게이트 동기화.
+    let countApprovalFilter = '';
+    if (approvalServiceKey) {
+      countParams.push(approvalServiceKey);
+      countApprovalFilter = `AND (
+        spo.distribution_type = 'PUBLIC'
+        OR EXISTS (
+          SELECT 1 FROM offer_service_approvals osa
+          WHERE osa.offer_id = spo.id
+            AND osa.service_key = $${countParams.length}
+            AND osa.approval_status = 'approved'
+        )
+      )`;
+    }
 
     const countResult = await dataSource.query(
       `SELECT COUNT(*)::int AS total
@@ -174,7 +220,8 @@ export function createPharmacyProductsController(
          AND s.status = 'ACTIVE'
          ${countCategoryFilter}
          ${countDistributionFilter}
-         ${countOperatorFilter}`,
+         ${countOperatorFilter}
+         ${countApprovalFilter}`,
       countParams,
     );
 
