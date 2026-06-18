@@ -827,6 +827,9 @@ export default function SupplierProfilePage() {
             const selected = !!row;
             const removable = !row || ['not_requested', 'rejected', 'needs_update'].includes(row.status);
             const busy = categoryBusy === category;
+            // WO-O4O-NETURE-SUPPLIER-GENERAL-CATEGORY-NO-DOCUMENT-V1:
+            // 일반 상품은 backend 면제(번호/파일/심사 없음) → 증빙 입력 UI·심사 배지 미표시, 안내만.
+            const isGeneral = category === 'general';
             return (
               <div key={category} className="rounded-lg border border-gray-200 p-4">
                 <div className="flex items-center justify-between gap-3">
@@ -840,14 +843,27 @@ export default function SupplierProfilePage() {
                     />
                     {REGULATED_CATEGORY_LABELS[category]}
                   </label>
-                  {row && (
+                  {row && !isGeneral && (
                     <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${REGULATED_STATUS_BADGE[row.status] || 'bg-gray-100 text-gray-600'}`}>
                       {REGULATED_CATEGORY_STATUS_LABELS[row.status] || row.status}
                     </span>
                   )}
+                  {row && isGeneral && (
+                    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
+                      서류 불필요
+                    </span>
+                  )}
                 </div>
 
-                {row && (
+                {/* 일반 상품: backend 면제 → 증빙 입력 UI 대신 안내만 */}
+                {row && isGeneral && (
+                  <p className="mt-3 pl-6 text-xs text-gray-500 leading-relaxed">
+                    일반 상품은 별도 허가/신고 서류가 필요하지 않습니다. 바로 제품 등록을 진행할 수 있으며,
+                    법정 인증 대상 상품은 제품 등록 단계에서 별도로 확인됩니다.
+                  </p>
+                )}
+
+                {row && !isGeneral && (
                   <div className="mt-3 space-y-3 pl-6">
                     {row.reviewNote && (row.status === 'rejected' || row.status === 'needs_update' || row.status === 'suspended') && (
                       <p className="text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded px-2 py-1.5">
