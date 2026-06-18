@@ -278,11 +278,14 @@ export function DomainIASidebar({
                 : ''
             } bg-gray-50/60`}
           >
-            <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-gray-500">
+            {/* WO-O4O-OPERATOR-SIDEBAR-DOMAIN-HEADING-LEGIBILITY-V1:
+                도메인(큰 분류) 헤딩이 11px 라 가독성 부족 → 14px. uppercase 는 한국어 no-op 이라 제거,
+                자간 완화(wider→wide). 공통 DomainIASidebar — 4 서비스 operator/admin 동일 적용. */}
+            <div className="flex items-center gap-1.5 text-sm font-semibold tracking-wide text-gray-500">
               {(() => {
                 const DomainIcon = DOMAIN_HEADING_ICONS[domain.key];
                 return DomainIcon ? (
-                  <DomainIcon size={13} aria-hidden className="text-gray-500" />
+                  <DomainIcon size={15} aria-hidden className="text-gray-500" />
                 ) : (
                   <span aria-hidden>{domain.emoji}</span>
                 );
