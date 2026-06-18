@@ -61,14 +61,19 @@ export class AuthRegisterController extends BaseController {
 
       // WO-O4O-NETURE-REGISTRATION-ROLE-SMOKING-GUN-FIX-V1:
       // Neture 가입 신청은 신청 역할이 명시되어야 한다 — role 누락 시 'customer' 로 폴백하지 않는다.
-      // 허용 신청 role: supplier / partner / store_owner. (admin/operator 는 가입 신청 경로 미지원)
+      // WO-O4O-NETURE-STORE-OWNER-SIGNUP-CARD-REMOVE-V1:
+      //   허용 신청 role 에서 'store_owner' 제거 — Neture 는 매장 경영자 가입 유형을 신규로 받지 않는다.
+      //   (store_owner 는 inert: 전용 workspace 없음, 유통참여 펀딩은 가입 role 미의존.
+      //    Market Trial 의 ParticipantType.STORE_OWNER 는 별개 도메인 — 본 변경과 무관.)
+      //   기존 store_owner 회원 데이터는 그대로 잔존(legacy) — migration 없음.
+      // 허용 신청 role: supplier / partner. (admin/operator 는 가입 신청 경로 미지원)
       // 다른 서비스(KPA / GlycoPharm / K-Cosmetics)의 가입 흐름은 영향 없음 — 기존 fallback 유지.
-      const NETURE_ALLOWED_SIGNUP_ROLES = ['supplier', 'partner', 'store_owner'];
+      const NETURE_ALLOWED_SIGNUP_ROLES = ['supplier', 'partner'];
       if (serviceKey === 'neture') {
         if (!data.role || !NETURE_ALLOWED_SIGNUP_ROLES.includes(data.role)) {
           return BaseController.error(
             res,
-            'Neture 가입 신청 역할이 필요합니다. (supplier / partner / store_owner)',
+            'Neture 가입 신청 역할이 필요합니다. (supplier / partner)',
             400,
             'NETURE_SIGNUP_ROLE_REQUIRED',
           );

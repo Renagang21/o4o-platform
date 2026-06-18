@@ -12,20 +12,18 @@
  */
 
 import { useState, useEffect } from 'react';
-import { X, Eye, EyeOff, CheckCircle, ArrowLeft, Store, Factory, Handshake, type LucideIcon } from 'lucide-react';
+import { X, Eye, EyeOff, CheckCircle, ArrowLeft, Factory, Handshake, type LucideIcon } from 'lucide-react';
 import { BusinessRegistrationFields } from '@o4o/account-ui';
 import { AddressSearch } from '@o4o/ui';
 import { useLoginModal } from '../contexts';
 import { api } from '../lib/apiClient';
 
-// WO-O4O-NETURE-SELLER-LEGACY-CLEANUP-TO-STORE-OWNER-PARTICIPANT-V1:
-// 'seller' (legacy) → 'store_owner' (Neture 내부 participant type, 권한 role 아님).
-// neture:store_owner role 은 생성하지 않으며, 다른 서비스 store_owner 와 연결하지 않는다.
-//
-// WO-O4O-NETURE-REGISTRATION-ROLE-SMOKING-GUN-FIX-V1:
-// Neture 신청 역할에서 'user' (일반 이용자) 제거. Neture 는 공급자/파트너/매장 경영자 3개 유형만
-// 신청 받는다. 소비자/일반 이용자는 Neture 회원 유형으로 사용하지 않는다.
-type SignupRole = 'supplier' | 'partner' | 'store_owner';
+// WO-O4O-NETURE-STORE-OWNER-SIGNUP-CARD-REMOVE-V1:
+// Neture 가입 유형에서 'store_owner'(매장 경영자) 제거 — 전용 workspace 없음, 권한/guard inert,
+// 유통참여 펀딩은 가입 role 미의존. 신청 역할은 공급자/파트너 2개만.
+// (Market Trial 의 ParticipantType.STORE_OWNER 는 별개 도메인 — 본 변경과 무관, 미수정.)
+// WO-O4O-NETURE-REGISTRATION-ROLE-SMOKING-GUN-FIX-V1: 'user'(일반 이용자) 미사용.
+type SignupRole = 'supplier' | 'partner';
 
 function formatBusinessNumber(digits: string): string {
   if (digits.length <= 3) return digits;
@@ -33,16 +31,9 @@ function formatBusinessNumber(digits: string): string {
   return `${digits.slice(0, 3)}-${digits.slice(3, 5)}-${digits.slice(5, 10)}`;
 }
 
-// WO-O4O-NETURE-REGISTRATION-ROLE-SMOKING-GUN-FIX-V1:
-// 'user' (일반 이용자) 옵션 제거 — Neture 신청 역할은 공급자/파트너/매장 경영자만 노출.
+// WO-O4O-NETURE-STORE-OWNER-SIGNUP-CARD-REMOVE-V1: '매장 경영자' 카드 제거 — 공급자/파트너만 노출.
 // WO-O4O-NETURE-HOME-ROLE-MARKET-TRIAL-ICON-ALIGNMENT-V1: 역할 emoji → lucide
 const roleOptions: Array<{ role: SignupRole; label: string; description: string; Icon: LucideIcon }> = [
-  {
-    role: 'store_owner',
-    label: '매장 경영자',
-    description: '매장을 운영하는 경영자',
-    Icon: Store,
-  },
   {
     role: 'supplier',
     label: '공급자',
@@ -307,7 +298,7 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
 
   const isStep2Valid = () => {
     // WO-O4O-NETURE-REGISTRATION-ROLE-SMOKING-GUN-FIX-V1: 'user' 분기 제거.
-    // 모든 신청 역할(store_owner / supplier / partner)이 companyName 을 필수로 한다.
+    // 모든 신청 역할(supplier / partner)이 companyName 을 필수로 한다.
     if (!selectedRole || !formData.agreeTerms || !formData.agreePrivacy) return false;
     if (!formData.companyName.trim()) return false;
     if (selectedRole === 'supplier') {
@@ -586,90 +577,10 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
               {selectedRole && (
                 <div className="p-4 bg-gray-50 rounded-xl space-y-3">
                   <h4 className="text-sm font-semibold text-gray-700">
-                    {selectedRole === 'store_owner'
-                      ? '매장 정보'
-                      : selectedRole === 'supplier'
-                      ? '공급자 정보'
-                      : '파트너 정보'}
+                    {selectedRole === 'supplier' ? '공급자 정보' : '파트너 정보'}
                   </h4>
 
-                  {/* 매장 경영자 */}
-                  {selectedRole === 'store_owner' && (
-                    <>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          매장명 <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          name="companyName"
-                          value={formData.companyName}
-                          onChange={handleInputChange}
-                          placeholder="OO 매장"
-                          className={INPUT_CLASS_BG}
-                        />
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">업종</label>
-                          <select
-                            name="businessType"
-                            value={formData.businessType}
-                            onChange={handleInputChange}
-                            className={INPUT_CLASS_BG}
-                          >
-                            <option value="">선택</option>
-                            <option value="cosmetics">화장품</option>
-                            <option value="health">건강식품</option>
-                            <option value="medical">의료기기</option>
-                            <option value="food">식품</option>
-                            <option value="other">기타</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            매장 지역
-                          </label>
-                          <input
-                            type="text"
-                            name="businessAddress"
-                            value={formData.businessAddress}
-                            onChange={handleInputChange}
-                            placeholder="서울 강남구"
-                            className={INPUT_CLASS_BG}
-                          />
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            담당자명
-                          </label>
-                          <input
-                            type="text"
-                            name="contactName"
-                            value={formData.contactName}
-                            onChange={handleInputChange}
-                            placeholder="홍길동"
-                            className={INPUT_CLASS_BG}
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            담당자 연락처
-                          </label>
-                          <input
-                            type="tel"
-                            name="contactPhone"
-                            value={formData.contactPhone}
-                            onChange={handleInputChange}
-                            placeholder="숫자만 입력"
-                            className={INPUT_CLASS_BG}
-                          />
-                        </div>
-                      </div>
-                    </>
-                  )}
+                  {/* WO-O4O-NETURE-STORE-OWNER-SIGNUP-CARD-REMOVE-V1: '매장 경영자' 입력 분기 제거 */}
 
                   {/* 공급자 */}
                   {selectedRole === 'supplier' && (
