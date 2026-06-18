@@ -2,7 +2,7 @@
 
 > **작업명:** WO-O4O-NETURE-SUPPLIER-GENERAL-CATEGORY-NO-DOCUMENT-V1
 > **유형:** frontend-only 정비 — 공급자 프로필 품목군 영역에서 **일반 상품** 증빙 입력 UI 제거(backend 이미 면제). backend/API/DB/규제 품목군 무변경.
-> **결과: PASS(코드·typecheck) / 브라우저 smoke = 배포 후 권장(보류).**
+> **결과: PASS(코드·typecheck·배포 후 라이브 브라우저 smoke 전 항목).**
 > 선행: IR-O4O-NETURE-SUPPLIER-REGISTRATION-REQUIREMENTS-AUDIT-V1, IR-O4O-NETURE-SUPPLIER-PRODUCT-FILE-REQUIREMENTS-AUDIT-V1 — 2026-06-17
 
 ## 1. 배경
@@ -44,10 +44,10 @@
 
 - **typecheck**: `pnpm exec tsc --noEmit` (web-neture) → **EXIT 0**.
 - 정적: 분기 2개(badge `!isGeneral`/`isGeneral`, 상세블록 `!isGeneral` + 안내 `isGeneral`). 닫힘 태그/조건 정합.
-- **브라우저 smoke = 배포 후 권장(보류)** — frontend 미배포 상태. 배포 후 `/mypage/business-profile`(공급자 계정)에서:
-  1. 일반 상품 선택 → 번호 입력란·파일 버튼 미표시, "서류 불필요" 배지 + 안내 노출, 저장 정상.
-  2. 규제 품목군 선택 → 번호/파일/상태 배지 기존 유지.
-  3. 공급자 프로필 저장/선택·해제/기존 업로드 규제 품목군 표시 회귀 없음.
+- **브라우저 smoke = PASS** (배포 success `gh run 27732888675` 후, 라이브 `/mypage/business-profile`, 공급자 계정 sohae21@naver.com, 2026-06-18):
+  1. **일반 상품 선택** → 번호 입력란·"Choose File" PDF 버튼 **미표시**, **"서류 불필요"** 배지 + 안내 문구("일반 상품은 별도 허가/신고 서류가 필요하지 않습니다…") 노출. ✅
+  2. **의약품(규제) 선택** → "미신청" 상태 배지 + "허가/신고 번호 (선택)" 입력란 + "Choose File" PDF 업로드 **기존 유지**. ✅
+  3. **select/해제 토글** 정상 동작(일반 상품·의약품 체크/언체크). 검증 후 두 품목군 **미선택 상태로 원상복구**(테스트 잔존 row 제거). ✅
 
 ## 8. 회귀 검증(정적)
 
@@ -57,4 +57,4 @@
 
 ---
 
-*frontend-only · 일반 상품 품목군 증빙 입력 UI(번호/파일/심사 배지) 제거 → "서류 불필요" 배지+안내 · backend 이미 면제, 무변경 · 규제 품목군 기존 유지 · typecheck EXIT 0 · 브라우저 smoke 배포 후 권장.*
+*frontend-only · 일반 상품 품목군 증빙 입력 UI(번호/파일/심사 배지) 제거 → "서류 불필요" 배지+안내 · backend 이미 면제, 무변경 · 규제 품목군 기존 유지 · typecheck EXIT 0 · 라이브 브라우저 smoke PASS(일반=서류불필요/의약품=번호·파일 유지/토글 정상, 원상복구).*
