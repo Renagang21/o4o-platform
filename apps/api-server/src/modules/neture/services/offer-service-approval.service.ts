@@ -25,26 +25,44 @@ export class OfferServiceApprovalService {
    * WO-NETURE-APPROVAL-REQUEST-TRUTH-ALIGNMENT-V1:
    * 실제 INSERT된 service_key 목록을 반환 (ON CONFLICT로 skip된 것 제외).
    * submitForApproval이 이 값으로 "정말 새로 요청된 행"과 "이미 존재해서 skip된 행"을 구분한다.
+   *
+   * WO-O4O-NETURE-PRODUCT-APPROVAL-RESUBMIT-AFTER-REJECT-FIX-V1:
+   * 기존 (offer_id, service_key) UNIQUE 제약 + ON CONFLICT DO NOTHING 구조에서는
+   * 반려(rejected)된 행이 남아 있어 공급자가 제품을 보완한 뒤 재요청해도 신규 pending이
+   * 생성되지 않고 silent skip 되었다(ALREADY_REQUESTED_OR_DECIDED).
+   * → 충돌 행이 'rejected' 인 경우에만 pending 으로 되돌린다(reason/decided_* 초기화).
+   *   pending/approved 행은 WHERE 가드로 그대로 두어 중복 요청/승인 취소를 막는다.
+   *   판매 가능 상태는 운영자 approved 이후에만 가능하므로 listings 재활성화는 하지 않는다.
+   *   xmax = 0 → 신규 INSERT, 그 외 → rejected 에서 reset 된 재요청(resubmit) 행.
    */
   async createPendingApprovals(
     offerId: string,
     serviceKeys: string[],
-  ): Promise<{ insertedServiceKeys: string[] }> {
-    if (!serviceKeys.length) return { insertedServiceKeys: [] };
+  ): Promise<{ insertedServiceKeys: string[]; resubmittedServiceKeys: string[] }> {
+    if (!serviceKeys.length) return { insertedServiceKeys: [], resubmittedServiceKeys: [] };
 
     const values = serviceKeys
       .map((_, i) => `($1, $${i + 2}, 'pending', NOW(), NOW())`)
       .join(', ');
 
-    const rows: Array<{ service_key: string }> = await this.dataSource.query(
+    const rows: Array<{ service_key: string; inserted: boolean }> = await this.dataSource.query(
       `INSERT INTO offer_service_approvals (offer_id, service_key, approval_status, created_at, updated_at)
        VALUES ${values}
-       ON CONFLICT (offer_id, service_key) DO NOTHING
-       RETURNING service_key`,
+       ON CONFLICT (offer_id, service_key) DO UPDATE SET
+         approval_status = 'pending',
+         reason = NULL,
+         decided_by = NULL,
+         decided_at = NULL,
+         updated_at = NOW()
+       WHERE offer_service_approvals.approval_status = 'rejected'
+       RETURNING service_key, (xmax = 0) AS inserted`,
       [offerId, ...serviceKeys],
     );
 
-    return { insertedServiceKeys: rows.map((r) => r.service_key) };
+    return {
+      insertedServiceKeys: rows.filter((r) => r.inserted).map((r) => r.service_key),
+      resubmittedServiceKeys: rows.filter((r) => !r.inserted).map((r) => r.service_key),
+    };
   }
 
   /**

@@ -490,16 +490,25 @@ export class NetureOfferService {
           continue;
         }
 
-        const { insertedServiceKeys } = await approvalService.createPendingApprovals(
+        const { insertedServiceKeys, resubmittedServiceKeys } = await approvalService.createPendingApprovals(
           offerId,
           eligibleKeys,
         );
 
-        if (insertedServiceKeys.length > 0) {
-          // 하나라도 신규 INSERT가 발생했으면 submitted로 집계
+        if (insertedServiceKeys.length + resubmittedServiceKeys.length > 0) {
+          // WO-O4O-NETURE-PRODUCT-APPROVAL-RESUBMIT-AFTER-REJECT-FIX-V1:
+          // 반려(rejected) 행이 pending 으로 reset 된 경우, offer 파생 상태(REJECTED)도
+          // PENDING 으로 되돌려 운영자 승인 큐에 다시 노출되게 한다.
+          // sync 의 PENDING 분기는 offer.approval_status 만 갱신하며, listings 재활성화나
+          // 판매 가능 전환은 하지 않는다(판매 가능은 운영자 approved 이후에만).
+          // 이미 APPROVED 인 offer 는 derived 가 동일해 changed=false 로 early-return 된다.
+          if (resubmittedServiceKeys.length > 0) {
+            await approvalService.syncOfferFromServiceApprovals(offerId, supplierId, AppDataSource);
+          }
+          // 하나라도 신규 INSERT 또는 rejected→pending reset 이 발생했으면 submitted 로 집계
           result.submitted++;
         } else {
-          // 모든 eligible key에 대해 이미 승인 레코드가 존재 (ON CONFLICT DO NOTHING)
+          // 모든 eligible key 가 이미 pending/approved (WHERE 가드로 reset 제외)
           result.skipped.push({ id: offerId, reason: 'ALREADY_REQUESTED_OR_DECIDED' });
         }
       } catch (error) {
