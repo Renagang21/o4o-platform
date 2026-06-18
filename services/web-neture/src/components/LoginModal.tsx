@@ -219,6 +219,20 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
                   </label>
                 </div>
 
+                {/* 체험용 공용 계정 빠른 입력 (WO-O4O-HOME-TEMP-EXPERIENCE-ACCOUNT-NOTICE-V1) — GP/KCos/KPA 동일 패턴 */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail('renagang21@gmail.com');
+                    setPassword('3Lz157727791!');
+                    setError(null);
+                    setIsNotMember(false);
+                  }}
+                  className="w-full py-2.5 text-sm font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl hover:bg-emerald-100 transition-colors"
+                >
+                  🧪 체험용 공급자 계정
+                </button>
+
                 <button
                   type="submit"
                   disabled={loading}

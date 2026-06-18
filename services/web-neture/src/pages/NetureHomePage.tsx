@@ -20,7 +20,9 @@
 
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { FlaskConical } from 'lucide-react';
 import { PageHero, PageSection, PageContainer } from '@o4o/ui';
+import { useLoginModal } from '../contexts/LoginModalContext';
 import HeroSlider from '../components/home/HeroSlider';
 import { PlatformIntroSection } from '../components/home/PlatformIntroSection';
 import HomepageAds from '../components/home/HomepageAds';
@@ -165,10 +167,32 @@ const mts: Record<string, React.CSSProperties> = {
   supplierCtaLink: { fontSize: '0.8125rem', fontWeight: 600, color: '#7C3AED', textDecoration: 'none' },
 };
 
+/**
+ * WO-O4O-HOME-TEMP-EXPERIENCE-ACCOUNT-NOTICE-V1: 임시 공용 체험 계정 안내 (추후 제거 예정)
+ * GP/KCos/KPA 홈과 동일 패턴. "체험 계정 보기" → 로그인 모달(체험용 공급자 계정 빠른 입력).
+ */
+function ExperienceAccountNotice() {
+  const { openLoginModal } = useLoginModal();
+  return (
+    <div style={{ background: '#ffffff', border: '1px solid #a7f3d0', borderRadius: 12, padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', justifyContent: 'space-between' }}>
+      <div style={{ minWidth: 0 }}>
+        <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#065f46', display: 'flex', alignItems: 'center', gap: 6 }}><FlaskConical size={15} aria-hidden="true" />체험용 계정 제공</p>
+        <p style={{ margin: '2px 0 0', fontSize: 12.5, color: '#047857', lineHeight: 1.5 }}>
+          주요 기능을 확인할 수 있는 공용 계정입니다. 입력한 데이터는 예고 없이 초기화될 수 있습니다.
+        </p>
+      </div>
+      <button type="button" onClick={() => openLoginModal()} style={{ flexShrink: 0, fontSize: 13, fontWeight: 600, color: '#fff', background: '#059669', padding: '8px 16px', borderRadius: 8, border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+        체험 계정 보기
+      </button>
+    </div>
+  );
+}
+
 export default function NetureHomePage() {
   return (
     <div className="min-h-screen">
       <PageHero><HeroSlider /></PageHero>
+      <PageSection><PageContainer><ExperienceAccountNotice /></PageContainer></PageSection>
       <PageSection><PageContainer><PlatformIntroSection /></PageContainer></PageSection>
       <PageSection><PageContainer><HomepageAds /></PageContainer></PageSection>
       <PageSection><MarketTrialSection /></PageSection>
