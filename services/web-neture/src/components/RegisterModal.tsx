@@ -682,36 +682,21 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                           className={INPUT_CLASS_BG}
                         />
                       </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            대표자명 <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="text"
-                            name="representativeName"
-                            value={formData.representativeName}
-                            onChange={handleInputChange}
-                            placeholder="홍길동"
-                            className={INPUT_CLASS_BG}
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">업종</label>
-                          <select
-                            name="businessType"
-                            value={formData.businessType}
-                            onChange={handleInputChange}
-                            className={INPUT_CLASS_BG}
-                          >
-                            <option value="">선택</option>
-                            <option value="cosmetics">화장품</option>
-                            <option value="health">건강식품</option>
-                            <option value="medical">의료기기</option>
-                            <option value="food">식품</option>
-                            <option value="other">기타</option>
-                          </select>
-                        </div>
+                      {/* WO-O4O-NETURE-SUPPLIER-BUSINESS-TYPE-SELECT-REMOVE-V1:
+                          서비스 카테고리형 '업종' select 제거. 업태(businessType)는 아래
+                          BusinessRegistrationFields 의 사업자등록증 기준 free-text 로 정렬. */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          대표자명 <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="representativeName"
+                          value={formData.representativeName}
+                          onChange={handleInputChange}
+                          placeholder="홍길동"
+                          className={INPUT_CLASS_BG}
+                        />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -801,17 +786,19 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                           세금계산서 수신용 이메일 (로그인 이메일과 달라도 됩니다)
                         </p>
                       </div>
-                      {/* 사업자등록증 표준 추가 필드 — WO-O4O-BUSINESS-REGISTRATION-COMMON-UI-COMPONENT-V1 (P3)
-                          Neture supplier 의 기존 businessType select (카테고리 선택 — cosmetics/health 등)는 의미가
-                          canonical "업태" (free text) 와 다르므로 그대로 유지. includeFields 로 나머지 3 필드만 공통화. */}
+                      {/* 사업자등록증 표준 필드 — WO-O4O-BUSINESS-REGISTRATION-COMMON-UI-COMPONENT-V1 (P3)
+                          WO-O4O-NETURE-SUPPLIER-BUSINESS-TYPE-SELECT-REMOVE-V1: 카테고리형 업종 select 제거 후
+                          businessType 을 사업자등록증 기준 '업태'(free text) 로 본 컴포넌트에서 렌더.
+                          업태 / 종목 / 사업자유형 / 개업일 정렬. */}
                       <BusinessRegistrationFields
                         value={{
+                          businessType: formData.businessType,
                           businessItem: formData.businessItem,
                           businessEntityType: formData.businessEntityType,
                           businessStartDate: formData.businessStartDate,
                         }}
                         onChange={(patch) => setFormData((prev) => ({ ...prev, ...patch }))}
-                        includeFields={['businessItem', 'businessEntityType', 'businessStartDate']}
+                        includeFields={['businessType', 'businessItem', 'businessEntityType', 'businessStartDate']}
                       />
                     </>
                   )}
