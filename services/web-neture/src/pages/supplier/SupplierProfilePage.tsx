@@ -36,22 +36,12 @@ import {
   supplierRegulatedCategoryApi,
   REGULATED_CATEGORY_LABELS,
   REGULATED_CATEGORY_ORDER,
-  REGULATED_CATEGORY_STATUS_LABELS,
   type SupplierProfile,
   type SupplierOnboarding,
   type SupplierRegulatedCategory,
   type RegulatedCategory,
   type ContactVisibility,
 } from '../../lib/api';
-
-const REGULATED_STATUS_BADGE: Record<string, string> = {
-  not_requested: 'bg-slate-100 text-slate-600',
-  submitted: 'bg-blue-100 text-blue-700',
-  approved: 'bg-emerald-100 text-emerald-700',
-  rejected: 'bg-red-100 text-red-700',
-  needs_update: 'bg-amber-100 text-amber-700',
-  suspended: 'bg-gray-200 text-gray-600',
-};
 
 const SUPPLIER_STATUS_CONFIG: Record<string, { label: string; cls: string }> = {
   pending:   { label: '승인 대기 중', cls: 'bg-amber-100 text-amber-700 border-amber-200' },
@@ -392,45 +382,9 @@ export default function SupplierProfilePage() {
     setCategoryBusy(null);
   };
 
-  const handleSaveCategoryRegistration = async (category: RegulatedCategory, registrationNumber: string) => {
-    setCategoryError(null);
-    setCategoryBusy(category);
-    const result = await supplierRegulatedCategoryApi.updateRegistrationNumber(category, registrationNumber);
-    if (!result.success) setCategoryError(result.error || '저장에 실패했습니다.');
-    await refreshCategories();
-    setCategoryBusy(null);
-  };
-
-  // WO-O4O-NETURE-SUPPLIER-REGULATED-CATEGORY-NUMBER-FIRST-V1:
-  // 번호(또는 선택 첨부)만으로 운영자 검토 요청 → submitted.
-  const handleSubmitCategoryReview = async (category: RegulatedCategory) => {
-    setCategoryError(null);
-    setCategoryBusy(category);
-    const result = await supplierRegulatedCategoryApi.submitForReview(category);
-    if (!result.success) {
-      const msg =
-        result.error === 'REVIEW_REQUIRES_NUMBER_OR_FILE'
-          ? '허가/신고 번호를 입력하거나 증빙 PDF를 첨부한 뒤 검토를 요청해 주세요.'
-          : result.error || '검토 요청에 실패했습니다.';
-      setCategoryError(msg);
-    }
-    await refreshCategories();
-    setCategoryBusy(null);
-  };
-
-  const handleUploadCategoryEvidence = async (category: RegulatedCategory, file: File) => {
-    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
-      setCategoryError('PDF 파일만 업로드할 수 있습니다.');
-      return;
-    }
-    setCategoryError(null);
-    setCategoryBusy(category);
-    const result = await supplierRegulatedCategoryApi.uploadEvidence(category, file);
-    if (!result.success) setCategoryError(result.error || '증빙 업로드에 실패했습니다.');
-    await refreshCategories();
-    setCategoryBusy(null);
-  };
-
+  // WO-O4O-NETURE-SUPPLIER-PROFILE-CATEGORY-SELECTION-ONLY-AND-PRODUCT-LIGHTWEIGHT-GATE-V1:
+  // 프로필 단계 선택-only — 번호 저장/검토 요청/증빙 업로드 핸들러 제거(해당 액션은 상품/운영자 단계로 이동).
+  // 기존 제출 데이터 열람은 유지(보존).
   const handleDownloadCategoryEvidence = async (category: RegulatedCategory) => {
     const blob = await supplierRegulatedCategoryApi.downloadEvidence(category);
     if (!blob) {
@@ -837,10 +791,12 @@ export default function SupplierProfilePage() {
           <FileText className="w-5 h-5 text-gray-500" />
           공급 예정 품목군
         </h2>
+        {/* WO-O4O-NETURE-SUPPLIER-PROFILE-CATEGORY-SELECTION-ONLY-AND-PRODUCT-LIGHTWEIGHT-GATE-V1:
+            선택-only — 번호/PDF/검토요청은 프로필 단계에서 제거. 규제 적합성은 상품 등록·운영자 확인 단계. */}
         <p className="text-xs text-gray-500 mb-5">
-          O4O 에 공급하려는 품목군을 선택하고, 허가/신고 번호를 입력한 뒤 검토를 요청해 주세요.
-          증빙 PDF 첨부는 선택 사항이며, 운영자가 확인 후 O4O 내부 등록 가능 상태를 설정합니다.
-          O4O 는 법적 허가 여부를 인증하지 않으며, 입력 정보와 제출 서류는 운영자 검토용 참고 정보로만 사용됩니다.
+          공급 예정 품목군은 향후 상품 등록과 운영자 확인 기준을 정하기 위한 정보입니다.
+          일반 상품은 별도 서류가 필요하지 않습니다. 의약품·의료기기·건강기능식품 등 일부 품목은
+          실제 판매 노출 또는 주문 가능 전 운영자 확인이 필요할 수 있습니다. 우선 공급 예정 품목군만 선택해 주세요.
         </p>
 
         <div className="space-y-3">
@@ -865,9 +821,9 @@ export default function SupplierProfilePage() {
                     />
                     {REGULATED_CATEGORY_LABELS[category]}
                   </label>
-                  {row && !isGeneral && (
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${REGULATED_STATUS_BADGE[row.status] || 'bg-gray-100 text-gray-600'}`}>
-                      {REGULATED_CATEGORY_STATUS_LABELS[row.status] || row.status}
+                  {row && !isGeneral && row.status === 'suspended' && (
+                    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-600 border border-red-100">
+                      운영자 보류
                     </span>
                   )}
                   {row && isGeneral && (
@@ -886,74 +842,34 @@ export default function SupplierProfilePage() {
                 )}
 
                 {row && !isGeneral && (
-                  <div className="mt-3 space-y-3 pl-6">
-                    {row.reviewNote && (row.status === 'rejected' || row.status === 'needs_update' || row.status === 'suspended') && (
+                  <div className="mt-3 space-y-2 pl-6">
+                    {/* 선택-only 안내 — 규제 적합성은 상품 등록/운영자 확인 단계 */}
+                    <p className="text-xs text-gray-500 leading-relaxed">
+                      이 품목군은 상품 판매 노출 또는 주문 가능 전 운영자 확인이 필요할 수 있습니다.
+                      필요한 허가/신고 번호·증빙은 상품 등록 또는 운영자 확인 단계에서 안내됩니다.
+                    </p>
+                    {row.status === 'suspended' && row.reviewNote && (
                       <p className="text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded px-2 py-1.5">
                         운영자 메모: {row.reviewNote}
                       </p>
                     )}
-
-                    {/* WO-O4O-NETURE-SUPPLIER-REGULATED-CATEGORY-NUMBER-FIRST-V1: 번호 우선 안내 */}
-                    <p className="text-xs text-gray-500 leading-relaxed">
-                      허가/신고 번호를 입력하면 운영자 검토를 요청할 수 있습니다. 증빙 PDF는 선택 사항이며,
-                      운영자가 필요하다고 판단하면 보완을 요청할 수 있습니다.
-                    </p>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-end">
-                      <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-1">허가/신고 번호</label>
-                        <input
-                          type="text"
-                          defaultValue={row.registrationNumber || ''}
-                          onBlur={(e) => {
-                            const v = e.target.value.trim();
-                            if (v !== (row.registrationNumber || '')) handleSaveCategoryRegistration(category, v);
-                          }}
-                          placeholder="입력 후 포커스 이동 시 저장"
-                          className={inputClass}
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-1">증빙 PDF 첨부 (선택)</label>
-                        <div className="flex items-center gap-3">
-                          <input
-                            type="file"
-                            accept="application/pdf,.pdf"
-                            disabled={busy}
-                            onChange={(e) => {
-                              const f = e.target.files?.[0];
-                              if (f) handleUploadCategoryEvidence(category, f);
-                              e.target.value = '';
-                            }}
-                            className={fileInputClass}
-                          />
-                          {row.evidenceDocument && (
-                            <button
-                              type="button"
-                              onClick={() => handleDownloadCategoryEvidence(category)}
-                              className="inline-flex items-center gap-1 text-xs font-medium text-primary-700 hover:text-primary-800 whitespace-nowrap"
-                            >
-                              <Download className="w-3.5 h-3.5" />
-                              증빙 열람
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    {row.evidenceDocument && (
-                      <p className="text-xs text-gray-400">제출 파일: {row.evidenceDocument.fileName}</p>
-                    )}
-
-                    {/* 검토 요청 — not_requested/needs_update/rejected 에서만 (submitted/approved/suspended 제외) */}
-                    {['not_requested', 'needs_update', 'rejected'].includes(row.status) && (
-                      <button
-                        type="button"
-                        onClick={() => handleSubmitCategoryReview(category)}
-                        disabled={busy}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary-600 text-white text-xs font-medium hover:bg-primary-700 disabled:opacity-50"
-                      >
-                        {row.status === 'not_requested' ? '검토 요청' : '재검토 요청'}
-                      </button>
+                    {/* 기존 제출 자료 보존 표시(삭제하지 않음) */}
+                    {(row.registrationNumber || row.evidenceDocument) && (
+                      <p className="text-xs text-gray-400">
+                        제출 보관됨:
+                        {row.registrationNumber ? ` 번호 ${row.registrationNumber}` : ''}
+                        {row.registrationNumber && row.evidenceDocument ? ' ·' : ''}
+                        {row.evidenceDocument && (
+                          <button
+                            type="button"
+                            onClick={() => handleDownloadCategoryEvidence(category)}
+                            className="ml-1 inline-flex items-center gap-1 font-medium text-primary-700 hover:text-primary-800"
+                          >
+                            <Download className="w-3.5 h-3.5" />
+                            증빙 열람
+                          </button>
+                        )}
+                      </p>
                     )}
                   </div>
                 )}

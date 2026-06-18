@@ -147,23 +147,19 @@ export class SupplierRegulatedCategoryService {
     category: RegulatedCategory | null,
     statusMap: Map<string, RegulatedCategoryStatus>,
   ): ProductCategoryGateResult {
+    // WO-O4O-NETURE-SUPPLIER-PROFILE-CATEGORY-SELECTION-ONLY-AND-PRODUCT-LIGHTWEIGHT-GATE-V1:
+    // 품목군은 사전 허가 심사 → 선택 정보로 재정의. "선진입 후보완" 원칙으로 차단 최소화.
+    //   - 미상/미선택/선택됨/심사중/보완/반려 → 모두 통과(운영자 상품 승인 단계에서 확인·보완).
+    //   - suspended(운영자 명시 잠금)만 차단 — 유일한 hard guard.
+    //   기존 status/번호/증빙 데이터는 보존(재해석만, migration·enum 변경 0).
     if (!category) {
-      return { allowed: false, category: null, status: null, reasonCode: 'SUPPLIER_CATEGORY_UNRESOLVED' };
+      return { allowed: true, category: null, status: null, reasonCode: null };
     }
     const status = statusMap.get(category) ?? null;
-    if (!status || status === 'not_requested') {
-      return { allowed: false, category, status, reasonCode: 'SUPPLIER_CATEGORY_NOT_SELECTED' };
+    if (status === 'suspended') {
+      return { allowed: false, category, status, reasonCode: 'SUPPLIER_CATEGORY_SUSPENDED' };
     }
-    if (status === 'approved') {
-      return { allowed: true, category, status, reasonCode: null };
-    }
-    const reasonByStatus: Record<string, ProductCategoryGateReason> = {
-      submitted: 'SUPPLIER_CATEGORY_NOT_APPROVED',
-      needs_update: 'SUPPLIER_CATEGORY_NEEDS_UPDATE',
-      rejected: 'SUPPLIER_CATEGORY_REJECTED',
-      suspended: 'SUPPLIER_CATEGORY_SUSPENDED',
-    };
-    return { allowed: false, category, status, reasonCode: reasonByStatus[status] ?? 'SUPPLIER_CATEGORY_NOT_APPROVED' };
+    return { allowed: true, category, status, reasonCode: null };
   }
 
   /** 공급자가 품목군 선택(행 생성). 이미 있으면 기존 행 반환. */
