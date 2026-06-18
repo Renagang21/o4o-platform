@@ -56,7 +56,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
         with:
-          fetch-depth: 2
+          # WO-O4O-WEB-DEPLOY-DETECT-CHANGES-LAST-DEPLOYED-SHA-V1:
+          # full history needed to diff github.event.before..github.sha (multi-commit push batch)
+          fetch-depth: 0
 
       - name: Detect changed services
         id: changes
@@ -78,15 +80,38 @@ jobs:
             exit 0
           fi
 
-          # For push events, detect actual changes
-          CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || git diff --name-only HEAD)
+          # WO-O4O-WEB-DEPLOY-DETECT-CHANGES-LAST-DEPLOYED-SHA-V1:
+          # push events — compare the WHOLE pushed batch (event.before..github.sha) instead of
+          # tip-only (HEAD~1 HEAD). tip-only skipped web deploys when a docs-only/other commit
+          # became HEAD after the web-change commit in the same push.
+          HEAD_SHA="${{ github.sha }}"
+          BASE_SHA="${{ github.event.before }}"
 
+          # fallback when before is unusable: all-zeros (new branch / first push / force push)
+          # or not present locally → use HEAD~1; if even that is missing, force ALL (safe).
+          if [ -z "$BASE_SHA" ] || [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "${BASE_SHA}^{commit}" 2>/dev/null; then
+            echo "event.before unusable ('${BASE_SHA}') — fallback to HEAD~1"
+            BASE_SHA=$(git rev-parse HEAD~1 2>/dev/null || echo "")
+          fi
+
+          if [ -n "$BASE_SHA" ]; then
+            CHANGED_FILES=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")
+            FORCE_ALL=0
+          else
+            echo "no usable base SHA — forcing ALL web services (safe default)"
+            CHANGED_FILES=""
+            FORCE_ALL=1
+          fi
+
+          echo "event=push"
+          echo "base_sha=${BASE_SHA:-<none>}"
+          echo "head_sha=${HEAD_SHA}"
           echo "Changed files:"
           echo "$CHANGED_FILES"
 
-          # Shared packages changed → rebuild ALL web services
-          if echo "$CHANGED_FILES" | grep -q "^packages/"; then
-            echo "Shared packages changed — rebuilding all web services"
+          # Shared packages changed (or no base) → rebuild ALL web services
+          if [ "$FORCE_ALL" = "1" ] || echo "$CHANGED_FILES" | grep -q "^packages/"; then
+            echo "decision: shared packages changed or forced — rebuilding all web services"
             echo "neture=true" >> $GITHUB_OUTPUT
             echo "k-cosmetics=true" >> $GITHUB_OUTPUT
             echo "kpa-society=true" >> $GITHUB_OUTPUT
@@ -94,30 +119,21 @@ jobs:
             exit 0
           fi
 
-          # Check each service
-          if echo "$CHANGED_FILES" | grep -q "^services/web-neture/"; then
-            echo "neture=true" >> $GITHUB_OUTPUT
-          else
-            echo "neture=false" >> $GITHUB_OUTPUT
-          fi
-
-          if echo "$CHANGED_FILES" | grep -q "^services/web-k-cosmetics/"; then
-            echo "k-cosmetics=true" >> $GITHUB_OUTPUT
-          else
-            echo "k-cosmetics=false" >> $GITHUB_OUTPUT
-          fi
-
-          if echo "$CHANGED_FILES" | grep -q "^services/web-kpa-society/"; then
-            echo "kpa-society=true" >> $GITHUB_OUTPUT
-          else
-            echo "kpa-society=false" >> $GITHUB_OUTPUT
-          fi
-
-          if echo "$CHANGED_FILES" | grep -q "^services/web-glycopharm/"; then
-            echo "glycopharm=true" >> $GITHUB_OUTPUT
-          else
-            echo "glycopharm=false" >> $GITHUB_OUTPUT
-          fi
+          # Per-service detection (helper logs the decision)
+          decide() {
+            local svc="$1" path="$2"
+            if echo "$CHANGED_FILES" | grep -q "^${path}"; then
+              echo "${svc}=true" >> $GITHUB_OUTPUT
+              echo "decision: ${svc}=true (matched ${path})"
+            else
+              echo "${svc}=false" >> $GITHUB_OUTPUT
+              echo "decision: ${svc}=false"
+            fi
+          }
+          decide "neture" "services/web-neture/"
+          decide "k-cosmetics" "services/web-k-cosmetics/"
+          decide "kpa-society" "services/web-kpa-society/"
+          decide "glycopharm" "services/web-glycopharm/"
 
   deploy-neture:
     needs: detect-changes
