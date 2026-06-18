@@ -2,7 +2,7 @@
 
 > **작업명:** WO-O4O-NETURE-SUPPLIER-REGULATED-CATEGORY-NUMBER-FIRST-V1
 > **유형:** backend + frontend — 규제 품목군 검토 요청을 **파일 업로드 단독 트리거 → 번호 우선**으로. migration 없음.
-> **결과: PASS(코드·typecheck backend+frontend) / 브라우저 smoke = 배포 후 권장.**
+> **결과: PASS(코드·typecheck backend+frontend·배포 후 라이브 브라우저 smoke 전 항목).**
 > 선행: IR 2건 + WO-O4O-NETURE-SUPPLIER-GENERAL-CATEGORY-NO-DOCUMENT-V1 — 2026-06-17
 
 ## 1. 기존 구조 요약
@@ -66,12 +66,13 @@
 
 - **typecheck**: web-neture `tsc --noEmit` EXIT 0 / api-server `tsc --noEmit` EXIT 0.
 - 정적: submitForReview 잠금/필수 분기, FE 버튼 노출 조건(not_requested/needs_update/rejected), general 미노출 확인.
-- **브라우저 smoke = 배포 후 권장**(backend 포함 → api-server + web-neture 배포 필요). 배포 후 `/mypage/business-profile`(공급자):
-  1. 규제 품목군 선택 → 번호 입력란 + "증빙 PDF 첨부 (선택)" + "검토 요청" 버튼 노출.
-  2. 번호만 입력 → 검토 요청 → status `submitted` 배지.
-  3. 번호·파일 모두 없이 검토 요청 → 안내(REVIEW_REQUIRES_NUMBER_OR_FILE) 노출.
-  4. 일반 상품 → "서류 불필요" 유지(회귀 없음).
-  5. 운영자 화면 → 파일 없는 submitted row 검토(approve/reject/needs_update) 가능.
+- **브라우저 smoke = PASS** (api `gh run 27735774359` + web `27735774365` 배포 success 후, 라이브, 2026-06-18):
+  1. 규제 품목군(의약품) 선택 → "허가/신고 번호" 입력 + "증빙 PDF 첨부 (선택)" + "검토 요청" 버튼 노출(공급자 sohae21). ✅
+  2. **번호·파일 모두 없이 검토 요청** → "허가/신고 번호를 입력하거나 증빙 PDF를 첨부한 뒤…" 안내(REVIEW_REQUIRES_NUMBER_OR_FILE, 400), status 미신청 유지. **신규 endpoint 정상 라우팅(404 아님)**. ✅
+  3. **번호만 입력(SMOKE-TEST-2026-001) → 검토 요청** → status "서류 제출"(submitted), 체크박스 잠금, 버튼 사라짐. ✅ (파일 없이 번호만으로 submitted)
+  4. 일반 상품 → "서류 불필요" 배지+안내 유지(회귀 없음). ✅
+  5. 운영자 화면(공급사 승인 → 품목군) → 파일 없는 submitted row가 **"허가/신고 번호: SMOKE-TEST-2026-001 / 증빙: 미제출"** 로 노출, 등록가능/보완/반려/제한 액션 가능. ✅
+  6. (정리 겸) 운영자 "보완 필요"(needs_update) 설정 → 공급자에 "재검토 요청" 버튼 + 제거 가능 → **의약품 제거로 테스트 계정 원상복구**(전 품목군 미선택). ✅
 
 ## 10. 회귀(정적)
 
@@ -79,4 +80,4 @@
 
 ---
 
-*backend+frontend · 규제 품목군 검토 요청 트리거를 파일 단독 → 번호 우선(번호 또는 파일 최소 하나)으로 · submitForReview service+route+API+FE "검토 요청" 버튼 · migration 없음 · general/제품 gate/제품 승인 무변경 · typecheck backend+frontend EXIT 0 · 브라우저 smoke 배포 후 권장.*
+*backend+frontend · 규제 품목군 검토 요청 트리거를 파일 단독 → 번호 우선(번호 또는 파일 최소 하나)으로 · submitForReview service+route+API+FE "검토 요청" 버튼 · migration 없음 · general/제품 gate/제품 승인 무변경 · typecheck backend+frontend EXIT 0 · 라이브 브라우저 smoke PASS(번호만 submitted/빈 제출 차단/운영자 파일없는 submitted 노출/일반상품 회귀/원상복구).*
