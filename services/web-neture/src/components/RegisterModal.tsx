@@ -14,6 +14,7 @@
 import { useState, useEffect } from 'react';
 import { X, Eye, EyeOff, CheckCircle, ArrowLeft, Store, Factory, Handshake, type LucideIcon } from 'lucide-react';
 import { BusinessRegistrationFields } from '@o4o/account-ui';
+import { AddressSearch } from '@o4o/ui';
 import { useLoginModal } from '../contexts';
 import { api } from '../lib/apiClient';
 
@@ -87,6 +88,7 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
     representativeName: '',
     businessAddress: '',
     businessAddressDetail: '',
+    zipCode: '',
     contactName: '',
     contactPhone: '',
     taxInvoiceEmail: '',
@@ -120,6 +122,7 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
         representativeName: '',
         businessAddress: '',
         businessAddressDetail: '',
+        zipCode: '',
         contactName: '',
         contactPhone: '',
         taxInvoiceEmail: '',
@@ -233,6 +236,8 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
           taxInvoiceEmail: formData.taxInvoiceEmail,
           contactName: formData.contactName,
           managerPhone: formData.contactPhone,
+          // WO-O4O-NETURE-SUPPLIER-SIGNUP-ADDRESS-POSTCODE-SEARCH-V1: AddressSearch → zipCode/address1/address2
+          zipCode: formData.zipCode,
           address1: formData.businessAddress,
           address2: formData.businessAddressDetail,
           // 사업자등록증 표준 추가 필드 (WO-O4O-CROSSSERVICE-BUSINESS-REGISTRATION-FORM-ALIGNMENT-V1)
@@ -698,30 +703,27 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                           className={INPUT_CLASS_BG}
                         />
                       </div>
+                      {/* WO-O4O-NETURE-SUPPLIER-SIGNUP-ADDRESS-POSTCODE-SEARCH-V1:
+                          사업장 주소 free-text → 공통 AddressSearch(Daum Postcode) 교체.
+                          SupplierProfilePage 와 동일 패턴(우편번호 검색 + 기본주소 자동입력 + 상세주소).
+                          payload 는 zipCode/address1/address2 로 전송(백엔드 수용 — IR-...-POSTCODE-SEARCH-AUDIT-V1 §4). */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           사업장 주소 <span className="text-red-500">*</span>
                         </label>
-                        <input
-                          type="text"
-                          name="businessAddress"
-                          value={formData.businessAddress}
-                          onChange={handleInputChange}
-                          placeholder="서울시 강남구 테헤란로 123"
-                          className={INPUT_CLASS_BG}
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          상세주소
-                        </label>
-                        <input
-                          type="text"
-                          name="businessAddressDetail"
-                          value={formData.businessAddressDetail}
-                          onChange={handleInputChange}
-                          placeholder="5층 502호 (선택)"
-                          className={INPUT_CLASS_BG}
+                        <AddressSearch
+                          zipCode={formData.zipCode}
+                          address={formData.businessAddress}
+                          addressDetail={formData.businessAddressDetail}
+                          onChange={({ zipCode, address, addressDetail }) =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              zipCode,
+                              businessAddress: address,
+                              businessAddressDetail: addressDetail,
+                            }))
+                          }
+                          inputClassName={INPUT_CLASS_BG}
                         />
                       </div>
                       <div className="grid grid-cols-2 gap-3">
