@@ -170,6 +170,16 @@ export class OperatorRegistrationService {
           const businessAddress = bizInfo?.businessAddress || bizInfo?.address || null;
           // taxInvoiceEmail canonical → tax_invoice_email 컬럼
           const taxInvoiceEmail = bizInfo?.taxInvoiceEmail || null;
+          // WO-O4O-NETURE-SUPPLIER-ONBOARDING-BUSINESS-PROFILE-SYNC-AND-SIMPLIFICATION-V1 (D1):
+          // businessInfo seed 완성 — 담당자/업태/상세주소도 supplier seed 시 복사(프로필 비어 보임 해소).
+          const managerName = bizInfo?.contactName || null;
+          const managerPhone = bizInfo?.managerPhone || userRow?.phone || null;
+          const businessType = bizInfo?.businessType || null;
+          const zipCode = bizInfo?.zipCode || null;
+          const businessAddressDetail = bizInfo?.businessAddressDetail || bizInfo?.address2 || null;
+          const addressDetailJson = (zipCode || businessAddressDetail)
+            ? JSON.stringify({ zipCode, detailAddress: businessAddressDetail })
+            : null;
 
           // WO-NETURE-SUPPLIER-APPROVAL-TWO-STEP-ACTIVATION-V1:
           // 가입 승인 시 PENDING으로 생성 → 운영자가 별도 공급 승인 후 ACTIVE
@@ -177,11 +187,11 @@ export class OperatorRegistrationService {
           // business_number, business_address 컬럼은 migration 20260327000300으로 삭제됨.
           // 해당 값은 organizations 테이블(org SSOT)에 저장한다.
           const [insertedSupplier] = await queryRunner.query(
-            `INSERT INTO neture_suppliers (user_id, slug, contact_email, contact_phone, representative_name, tax_invoice_email, status, approved_by, approved_at, created_at, updated_at)
-             VALUES ($1, $2, $3, $4, $5, $6, 'PENDING', NULL, NULL, NOW(), NOW())
+            `INSERT INTO neture_suppliers (user_id, slug, contact_email, contact_phone, representative_name, manager_name, manager_phone, business_type, tax_invoice_email, status, approved_by, approved_at, created_at, updated_at)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'PENDING', NULL, NULL, NOW(), NOW())
              ON CONFLICT (user_id) DO NOTHING
              RETURNING id`,
-            [userId, slug, contactEmail, contactPhone, representativeName, taxInvoiceEmail],
+            [userId, slug, contactEmail, contactPhone, representativeName, managerName, managerPhone, businessType, taxInvoiceEmail],
           );
 
           // organization 연동 (businessName이 있는 경우) — business_number, address org SSOT에 저장
@@ -191,15 +201,16 @@ export class OperatorRegistrationService {
             // organizations 테이블은 camelCase 컬럼 (TypeORM SnakeNamingStrategy 미적용),
             // business_number / address 는 snake_case 컬럼 (organizations schema 기준)
             const [org] = await queryRunner.query(
-              `INSERT INTO organizations (name, code, type, "isActive", "createdAt", "updatedAt", level, path, "childrenCount", business_number, address)
-               VALUES ($1, $2, 'supplier', true, NOW(), NOW(), 0, $3, 0, $4, $5)
+              `INSERT INTO organizations (name, code, type, "isActive", "createdAt", "updatedAt", level, path, "childrenCount", business_number, address, address_detail)
+               VALUES ($1, $2, 'supplier', true, NOW(), NOW(), 0, $3, 0, $4, $5, $6::jsonb)
                ON CONFLICT (code) DO UPDATE SET
                  "isActive" = true,
                  "updatedAt" = NOW(),
                  business_number = COALESCE(EXCLUDED.business_number, organizations.business_number),
-                 address = COALESCE(EXCLUDED.address, organizations.address)
+                 address = COALESCE(EXCLUDED.address, organizations.address),
+                 address_detail = COALESCE(EXCLUDED.address_detail, organizations.address_detail)
                RETURNING id`,
-              [bizName, orgCode, orgPath, businessNumber, businessAddress],
+              [bizName, orgCode, orgPath, businessNumber, businessAddress, addressDetailJson],
             );
             if (org?.id) {
               await queryRunner.query(
