@@ -12,6 +12,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { X, Pencil, Trash2, ImagePlus, Loader2, Sparkles, Plus, ChevronDown, ChevronRight } from 'lucide-react';
 import { supplierApi, type SupplierProduct, productApi, type ProductImage, type CategoryTreeItem, type BrandItem, type SpotPricePolicy } from '../../lib/api';
 import { ProductForm, type ProductFormData, CategorySelect } from '../../components/product';
@@ -116,6 +117,8 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
   const [distSaving, setDistSaving] = useState(false);
   const [distForm, setDistForm] = useState<{ isPublic: boolean; serviceKeys: string[] }>({ isPublic: false, serviceKeys: [] });
   const [distConfirmRemove, setDistConfirmRemove] = useState<string[] | null>(null);
+  // WO-O4O-NETURE-SUPPLIER-PRODUCT-TO-EVENT-OFFER-ENTRY-V1
+  const navigate = useNavigate();
 
   // Template integration (WO-O4O-TEMPLATE-ADOPTION-NETURE-PRODUCT-V1)
   const { user } = useAuth();
@@ -1362,6 +1365,23 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                     </div>
                   )}
                 </div>
+
+                {/* WO-O4O-NETURE-SUPPLIER-PRODUCT-TO-EVENT-OFFER-ENTRY-V1: 이벤트 오퍼 진입 (공급 방식 변경 아님) */}
+                {!isEditing && (
+                  <div className="mt-3 pt-3 border-t border-slate-100">
+                    <p className="text-xs font-semibold text-slate-700 mb-0.5">이벤트 오퍼</p>
+                    <p className="text-[11px] text-slate-500 mb-2">
+                      이벤트 오퍼는 상품의 공급 방식을 바꾸지 않습니다. 기존 상품을 기준으로 대상 서비스·이벤트 가격·기간·수량 조건을 별도로 설정합니다.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => navigate(`/supplier/event-offers?supplierProductId=${product.id}&masterId=${product.masterId}&name=${encodeURIComponent(product.name || product.masterName || '')}&priceGeneral=${product.priceGeneral ?? ''}`)}
+                      className="w-full py-2 text-sm font-medium text-purple-700 bg-purple-50 hover:bg-purple-100 rounded-lg border border-purple-200"
+                    >
+                      이 상품으로 이벤트 오퍼 만들기
+                    </button>
+                  </div>
+                )}
               </Section>
             );
           })()}
