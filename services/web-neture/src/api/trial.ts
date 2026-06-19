@@ -7,6 +7,19 @@
 
 import { api, API_BASE_URL } from '../lib/apiClient';
 
+/**
+ * WO-O4O-MARKET-TRIAL-COMMERCE-WIRING-DISABLE-WITH-DATA-PRESERVATION-V1:
+ * 유통참여형 펀딩 = Neture 전용 content-only 모집. 제품 전환 / 매장 진열(OPL) /
+ * 정산 / 결제 / 배송 등 커머스 mutation 은 더 이상 제공하지 않는다.
+ * 클라이언트 단에서 즉시 차단하여 신규 커머스 데이터 생성을 막는다.
+ * (backend 도 동일 정책으로 409 차단. 기존 데이터는 건드리지 않음.)
+ */
+function marketTrialCommerceDisabled(message: string): never {
+  const err = new Error(message) as Error & { response?: { data?: { message?: string } } };
+  err.response = { data: { message } };
+  throw err;
+}
+
 // ============================================================================
 // Types
 // ============================================================================
@@ -352,6 +365,8 @@ export async function saveSettlementChoice(
   trialId: string,
   choice: 'product' | 'cash',
 ): Promise<ParticipationInfoDetail> {
+  marketTrialCommerceDisabled('유통참여형 펀딩은 O4O 정산 기능을 제공하지 않습니다.');
+  // eslint-disable-next-line no-unreachable -- 정책 비활성화. 기존 로직 보존.
   const { data } = await api.post(
     `${API_BASE_URL}/api/market-trial/${trialId}/settlement-choice`,
     { choice },
@@ -420,6 +435,8 @@ export async function convertTrialToProduct(
   trialId: string,
   payload: ConvertTrialPayload,
 ): Promise<TrialConversionResult> {
+  marketTrialCommerceDisabled('유통참여형 펀딩은 제품 전환 기능을 제공하지 않습니다.');
+  // eslint-disable-next-line no-unreachable -- 정책 비활성화. 기존 로직 보존.
   const { data } = await api.post(
     `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/convert`,
     payload,
@@ -581,6 +598,8 @@ export async function updateParticipantSettlementStatus(
   settlementStatus: SettlementStatus,
   settlementNote?: string,
 ): Promise<{ id: string; settlementStatus: SettlementStatus; settlementNote: string | null; updatedAt: string | null }> {
+  marketTrialCommerceDisabled('유통참여형 펀딩은 O4O 정산 기능을 제공하지 않습니다.');
+  // eslint-disable-next-line no-unreachable -- 정책 비활성화. 기존 로직 보존.
   const { data } = await api.patch(
     `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/participants/${participantId}/settlement-status`,
     { settlementStatus, ...(settlementNote !== undefined && { settlementNote }) },
@@ -627,6 +646,8 @@ export async function updateParticipantPaymentStatus(
   participantId: string,
   input: UpdateParticipantPaymentInput,
 ): Promise<UpdateParticipantPaymentResult> {
+  marketTrialCommerceDisabled('유통참여형 펀딩은 O4O 결제 기능을 제공하지 않습니다.');
+  // eslint-disable-next-line no-unreachable -- 정책 비활성화. 기존 로직 보존.
   const { data } = await api.patch(
     `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/participants/${participantId}/payment-status`,
     input,
@@ -643,6 +664,8 @@ export async function createListingFromTrialParticipant(
   participantId: string,
   price?: number,
 ): Promise<{ listingId: string; organizationId: string; offerId: string; masterId: string }> {
+  marketTrialCommerceDisabled('유통참여형 펀딩은 매장 상품 전환(매장 진열) 기능을 제공하지 않습니다.');
+  // eslint-disable-next-line no-unreachable -- 정책 비활성화. 기존 로직 보존.
   const { data } = await api.post(
     `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/participants/${participantId}/listing`,
     { price },
@@ -745,6 +768,8 @@ export async function submitShippingAddress(
   participationId: string,
   address: Omit<ShippingAddress, 'participationId' | 'createdAt'>
 ): Promise<ShippingAddress> {
+  marketTrialCommerceDisabled('유통참여형 펀딩은 O4O 배송/발송 기능을 제공하지 않습니다.');
+  // eslint-disable-next-line no-unreachable -- 정책 비활성화. 기존 로직 보존.
   const { data } = await api.post(`${API_BASE_URL}/api/trial-shipping/${participationId}`, address);
   return data.data || data;
 }

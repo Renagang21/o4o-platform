@@ -168,6 +168,17 @@ export class TrialFulfillmentController {
    */
   static async createOrder(req: Request, res: Response) {
     try {
+      // WO-O4O-MARKET-TRIAL-COMMERCE-WIRING-DISABLE-WITH-DATA-PRESERVATION-V1:
+      // 유통참여형 펀딩 = Neture 전용 content-only 모집. 신규 풀필먼트 주문 생성을 중단한다.
+      // (market_trial_fulfillments row=0, NetureService.createOrder 호출 차단 — 신규 생성만 차단.)
+      return res.status(409).json({
+        success: false,
+        error: 'Market Trial fulfillment is disabled by content-only boundary policy.',
+        message: '유통참여형 펀딩은 O4O 주문/발송 기능을 제공하지 않습니다.',
+        code: 'MARKET_TRIAL_FULFILLMENT_DISABLED',
+      });
+
+      // eslint-disable-next-line no-unreachable -- 정책 비활성화. 기존 로직 보존(정의 재확인 시 참조).
       const { participationId } = req.params;
 
       if (!TrialFulfillmentController.dataSource) {
@@ -265,6 +276,17 @@ export class TrialFulfillmentController {
    */
   static async syncStatus(req: Request, res: Response) {
     try {
+      // WO-O4O-MARKET-TRIAL-COMMERCE-WIRING-DISABLE-WITH-DATA-PRESERVATION-V1:
+      // 유통참여형 펀딩 = Neture 전용 content-only 모집. 신규 풀필먼트 상태 동기화를 중단한다.
+      // (주문→fulfillment 동기화 차단 — 신규 mutation 만 차단.)
+      return res.status(409).json({
+        success: false,
+        error: 'Market Trial fulfillment is disabled by content-only boundary policy.',
+        message: '유통참여형 펀딩은 O4O 주문/발송 기능을 제공하지 않습니다.',
+        code: 'MARKET_TRIAL_FULFILLMENT_DISABLED',
+      });
+
+      // eslint-disable-next-line no-unreachable -- 정책 비활성화. 기존 로직 보존(정의 재확인 시 참조).
       const { participationId } = req.params;
 
       if (!TrialFulfillmentController.dataSource) {

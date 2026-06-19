@@ -60,6 +60,17 @@ export class TrialShippingController {
    */
   static async setAddress(req: Request, res: Response) {
     try {
+      // WO-O4O-MARKET-TRIAL-COMMERCE-WIRING-DISABLE-WITH-DATA-PRESERVATION-V1:
+      // 유통참여형 펀딩 = Neture 전용 content-only 모집. 신규 배송지 수집/저장을 중단한다.
+      // (market_trial_shipping_addresses row=0, 개인정보 신규 수집 차단 — 신규 mutation 만 차단.)
+      return res.status(409).json({
+        success: false,
+        error: 'Market Trial shipping is disabled by content-only boundary policy.',
+        message: '유통참여형 펀딩은 O4O 배송/발송 기능을 제공하지 않습니다.',
+        code: 'MARKET_TRIAL_SHIPPING_DISABLED',
+      });
+
+      // eslint-disable-next-line no-unreachable -- 정책 비활성화. 기존 로직 보존(정의 재확인 시 참조).
       const { participationId } = req.params;
       const addressData = req.body;
 

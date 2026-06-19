@@ -655,6 +655,17 @@ export class MarketTrialController {
    */
   static async saveSettlementChoice(req: AuthRequest, res: Response) {
     try {
+      // WO-O4O-MARKET-TRIAL-COMMERCE-WIRING-DISABLE-WITH-DATA-PRESERVATION-V1:
+      // 유통참여형 펀딩 = Neture 전용 content-only 모집. 신규 정산 선택(제품/현금) 저장을 중단한다.
+      // (기존 settlementChoice/Status 데이터는 건드리지 않음 — 신규 mutation 만 차단.)
+      return res.status(409).json({
+        success: false,
+        error: 'Market Trial settlement is disabled by content-only boundary policy.',
+        message: '유통참여형 펀딩은 O4O 정산 기능을 제공하지 않습니다.',
+        code: 'MARKET_TRIAL_SETTLEMENT_DISABLED',
+      });
+
+      // eslint-disable-next-line no-unreachable -- 정책 비활성화. 기존 로직 보존(정의 재확인 시 참조).
       const { id } = req.params;
       const { choice } = req.body;
       const userId = (req as any).user?.id;

@@ -794,6 +794,17 @@ export class MarketTrialOperatorController {
    */
   static async updateParticipantSettlementStatus(req: AuthRequest, res: Response) {
     try {
+      // WO-O4O-MARKET-TRIAL-COMMERCE-WIRING-DISABLE-WITH-DATA-PRESERVATION-V1:
+      // 유통참여형 펀딩 = Neture 전용 content-only 모집. 신규 정산 상태 변경을 중단한다.
+      // (기존 settlementStatus 데이터는 건드리지 않음 — 신규 mutation 만 차단.)
+      return res.status(409).json({
+        success: false,
+        error: 'Market Trial settlement is disabled by content-only boundary policy.',
+        message: '유통참여형 펀딩은 O4O 정산 기능을 제공하지 않습니다.',
+        code: 'MARKET_TRIAL_SETTLEMENT_DISABLED',
+      });
+
+      // eslint-disable-next-line no-unreachable -- 정책 비활성화. 기존 로직 보존(정의 재확인 시 참조).
       const { id, participantId } = req.params;
       const { settlementStatus: newStatus, settlementNote } = req.body;
       const ds = MarketTrialOperatorController.dataSource;
@@ -903,6 +914,17 @@ export class MarketTrialOperatorController {
    */
   static async updateParticipantPaymentStatus(req: AuthRequest, res: Response) {
     try {
+      // WO-O4O-MARKET-TRIAL-COMMERCE-WIRING-DISABLE-WITH-DATA-PRESERVATION-V1:
+      // 유통참여형 펀딩 = Neture 전용 content-only 모집. 신규 결제 상태 변경을 중단한다.
+      // (기존 paymentStatus 데이터는 건드리지 않음 — 신규 mutation 만 차단.)
+      return res.status(409).json({
+        success: false,
+        error: 'Market Trial payment is disabled by content-only boundary policy.',
+        message: '유통참여형 펀딩은 O4O 결제 기능을 제공하지 않습니다.',
+        code: 'MARKET_TRIAL_PAYMENT_DISABLED',
+      });
+
+      // eslint-disable-next-line no-unreachable -- 정책 비활성화. 기존 로직 보존(정의 재확인 시 참조).
       const { id, participantId } = req.params;
       const {
         paymentStatus: newStatus,
@@ -1461,6 +1483,17 @@ export class MarketTrialOperatorController {
    */
   static async convertToProduct(req: AuthRequest, res: Response) {
     try {
+      // WO-O4O-MARKET-TRIAL-COMMERCE-WIRING-DISABLE-WITH-DATA-PRESERVATION-V1:
+      // 유통참여형 펀딩 = Neture 전용 content-only 모집. 신규 제품 전환(ProductMaster/SPO 연결)을 중단한다.
+      // (기존 convertedProductId 데이터는 건드리지 않음 — 신규 mutation 만 차단.)
+      return res.status(409).json({
+        success: false,
+        error: 'Market Trial product conversion is disabled by content-only boundary policy.',
+        message: '유통참여형 펀딩은 제품 전환 기능을 제공하지 않습니다.',
+        code: 'MARKET_TRIAL_PRODUCT_CONVERSION_DISABLED',
+      });
+
+      // eslint-disable-next-line no-unreachable -- 정책 비활성화. 기존 로직 보존(정의 재확인 시 참조).
       const { id } = req.params;
       const { productId, productName, conversionNote } = req.body;
 
