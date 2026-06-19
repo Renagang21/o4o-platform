@@ -63,12 +63,20 @@
 | DB migration은 보정용 1개(스키마 변경 0) | ✅ |
 | api-server tsc | ✅ |
 
-## 7. 배포 후 권장 스모크 (필수 — 신규 데이터 생성 경로)
+## 7. 배포 후 스모크 결과 (2026-06-19, 리비전 5c071fa1c)
 
-1. Neture 공급자 신규 가입 → `neture_suppliers` row(PENDING) 생성 확인(read-only SELECT 또는 operator 화면 "공급자 프로필: 검토대기").
-2. 해당 회원 step1 승인 → 중복 생성/에러 없이 membership active, neture_suppliers PENDING 유지 확인.
-3. step2 공급 승인 → ACTIVE 전환 확인.
-4. migration 실행 로그 확인(보정 건수). 현 prod 는 0건 가능성(기존 IR §4: 전원 active+row 보유).
+| # | 항목 | 결과 |
+|---|------|------|
+| migration | job `o4o-api-migrations-9nwlc` 실행 | ✅ SUCCESS — `[X] 555 BackfillNetureSupplierProfiles20260618000000` 기록됨. 에러/중복 없음. 보정 0건(prod 에 row 누락 supplier 없음 — 기존 IR §4 일치) |
+| 1 | 신규 공급자 가입 → 가입 시점 row 생성 | ✅ **PROVEN(라이브)** — disposable `smoke-regprofile-…@example.com`(userId `086f898f…`) `POST /auth/register`(neture/supplier) → 201 pending. 회원 **미승인** 상태에서 `GET /neture/operator/suppliers` 에 **status=PENDING 으로 등장**(공급자 5→6). 종전엔 step1 승인 후에만 생성 → 가입 시점 생성 결정적 증명 |
+| 2 | step1 승인 no-op 안전성 | ✅ **코드 보증** — step1(`operator-registration.service`)의 `if (!existingSupplier?.length)` 가드 + `INSERT ... ON CONFLICT (user_id) DO NOTHING` 로 가입분 발견 시 else 분기(updated_at touch), 중복/에러 0, status PENDING 유지. (가짜 공급자 활성화 회피 위해 라이브 승인 미실행 — 구조적 보증) |
+| 3 | step2 ACTIVE 전환 | 미변경 경로(라이브 미실행 — 가짜 ACTIVE 공급자 생성 회피). 기존 `/operator/suppliers` 승인 흐름 그대로 |
+
+**스모크 PASS.** 핵심(가입 시점 생성) 라이브 증명 + migration 정상 실행 + step1 무변경 구조 보증.
+
+### 7-1. 스모크 잔여 데이터 (정리 필요)
+- 프로덕션에 테스트 계정 생성됨: `smoke-regprofile-1781833640@example.com` (userId `086f898f-4177-474c-91f5-c867472a76c3`) — neture membership(pending) + neture_suppliers(PENDING) + org(`neture-supplier-086f898f`).
+- 정리 방법: operator 회원관리에서 거절/삭제 또는 admin hard-delete. (DB 직접 삭제는 방화벽/승인 필요 — 본 세션 미실행)
 
 ## 8. 비범위 / 후속
 
@@ -79,4 +87,4 @@
 
 ---
 
-*Date: 2026-06-18 · CHECK · PASS · Neture 공급자 가입 시점 neture_suppliers(PENDING) 즉시 생성 + 누락 보정 migration · step1 무변경(존재가드 자동 no-op) · 2단계 모델 불변 · 멱등 3중 · api-server tsc 통과 · 배포 후 가입→row 스모크 권장.*
+*Date: 2026-06-18 (스모크 2026-06-19) · CHECK · PASS · Neture 공급자 가입 시점 neture_suppliers(PENDING) 즉시 생성 + 누락 보정 migration · step1 무변경(존재가드 자동 no-op) · 2단계 모델 불변 · 멱등 3중 · api-server tsc 통과 · 배포 후 라이브 스모크 PASS(가입→PENDING row 결정적 증명, migration [X] 555 기록) · 스모크 테스트 계정 정리 필요(086f898f).*
