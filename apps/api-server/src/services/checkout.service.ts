@@ -188,11 +188,6 @@ class CheckoutService {
       totalAmount,
     });
 
-    // WO-MARKET-TRIAL-ORDER-CONNECTION-AUTOMATION-V1: fire-and-forget
-    void tryConnectOrderToTrial(savedOrder).catch((err) =>
-      logger.warn('[MarketTrial] tryConnectOrderToTrial failed:', err),
-    );
-
     return savedOrder;
   }
 
@@ -524,106 +519,5 @@ class CheckoutService {
 
 export const checkoutService = new CheckoutService();
 
-// ============================================================================
-// WO-MARKET-TRIAL-ORDER-CONNECTION-AUTOMATION-V1
-// ============================================================================
-
-/**
- * Fire-and-forget hook: detect first orders from trial listings and
- * auto-promote participant adopted → first_order.
- *
- * Match logic:
- *   - For each order item, check if organization_product_listings has a row
- *     where offer_id = item.productId AND source_type = 'market_trial'
- *     AND organization_id = order.sellerOrganizationId
- *   - If found, look up the trial participant via market_trial_participants.listingId
- *   - Atomically update customerConversionStatus 'adopted' → 'first_order'
- *     (WHERE customerConversionStatus = 'adopted' prevents double-promotion)
- *   - Notify the trial supplier
- */
-async function tryConnectOrderToTrial(order: CheckoutOrder): Promise<void> {
-  // WO-O4O-MARKET-TRIAL-CONVERSION-DISABLE-V1:
-  // 유통참여형 펀딩 = Neture 전용. Store 주문을 trial 로 역연결해 participant 를
-  // first_order 로 승격하는 흐름은 Store 통합 퍼널이므로 Neture-only 경계 정책에 따라 중단한다.
-  // (일반 checkout 주문 처리에는 영향 없음 — 본 hook 만 no-op.)
-  return;
-
-  // eslint-disable-next-line no-unreachable -- 정책 비활성화. 기존 역연결 로직 보존(정의 재확인 시 참조).
-  if (!order.sellerOrganizationId || !order.items?.length) return;
-
-  const ds = AppDataSource;
-  if (!ds.isInitialized) return;
-
-  for (const item of order.items) {
-    try {
-      // Find a trial listing matching this order item + seller org
-      const listingRows: Array<{
-        listingId: string;
-        trialId: string;
-        participantId: string;
-        participantUserId: string;
-        trialTitle: string;
-        supplierUserId: string | null;
-      }> = await ds.query(
-        `SELECT
-           opl.id                         AS "listingId",
-           opl.source_id                  AS "trialId",
-           mtp.id                         AS "participantId",
-           mtp."participantId"            AS "participantUserId",
-           mt.title                       AS "trialTitle",
-           ns_user.user_id                AS "supplierUserId"
-         FROM organization_product_listings opl
-         JOIN market_trial_participants mtp ON mtp."listingId" = opl.id
-         JOIN market_trials mt              ON mt.id = opl.source_id
-         LEFT JOIN neture_suppliers ns_user ON ns_user.id = mt."supplierId"
-         WHERE opl.source_type = 'market_trial'
-           AND opl.organization_id = $1
-           AND opl.offer_id = $2
-           AND mtp."customerConversionStatus" = 'adopted'
-         LIMIT 1`,
-        [order.sellerOrganizationId, item.productId],
-      );
-
-      if (!listingRows.length) continue;
-
-      const row = listingRows[0];
-
-      // Atomically promote adopted → first_order (CAS: WHERE = 'adopted')
-      const updated: Array<{ id: string }> = await ds.query(
-        `UPDATE market_trial_participants
-         SET "customerConversionStatus" = 'first_order',
-             "customerConversionAt"     = NOW()
-         WHERE id = $1
-           AND "customerConversionStatus" = 'adopted'
-         RETURNING id`,
-        [row.participantId],
-      );
-
-      if (!updated.length) continue; // Already promoted by another order
-
-      logger.info('[MarketTrial] First order detected, participant promoted to first_order', {
-        orderId: order.id,
-        trialId: row.trialId,
-        participantId: row.participantId,
-      });
-
-      // Notify supplier (fire-and-forget, skip if no userId)
-      if (row.supplierUserId) {
-        await ds.query(
-          `INSERT INTO notifications
-             (id, "userId", channel, type, title, message, metadata, "isRead", "createdAt")
-           VALUES
-             (gen_random_uuid(), $1, 'in_app', 'custom', $2, $3, $4::jsonb, false, NOW())`,
-          [
-            row.supplierUserId,
-            `시범판매 첫 주문 발생`,
-            `"${row.trialTitle}" 시범판매에서 첫 주문이 발생했습니다.`,
-            JSON.stringify({ trialId: row.trialId, participantId: row.participantId, orderId: order.id }),
-          ],
-        ).catch(() => {/* notifications 테이블 없어도 무시 */});
-      }
-    } catch (itemErr) {
-      logger.warn('[MarketTrial] tryConnectOrderToTrial item error:', itemErr);
-    }
-  }
-}
+// WO-O4O-MARKET-TRIAL-PRODUCT-ORDER-SHIPPING-SCHEMA-CLEANUP-V1 (P3-1):
+// 유통참여형 펀딩 = content-only. checkout → trial 역연결(first_order 승격) hook 제거됨.

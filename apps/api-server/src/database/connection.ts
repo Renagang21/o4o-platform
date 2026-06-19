@@ -342,8 +342,8 @@ import {
 } from '@o4o/market-trial';
 
 // MARKET-TRIAL EXTENSION ENTITIES
-import { MarketTrialShippingAddress } from '../extensions/trial-shipping/entities/MarketTrialShippingAddress.entity.js';
-import { MarketTrialFulfillment } from '../extensions/trial-fulfillment/entities/MarketTrialFulfillment.entity.js';
+// WO-O4O-MARKET-TRIAL-PRODUCT-ORDER-SHIPPING-SCHEMA-CLEANUP-V1 (P3-1):
+// MarketTrialShippingAddress / MarketTrialFulfillment (주문/발송 축) 제거됨.
 import { MarketTrialForumSyncFailure } from '../extensions/trial-forum-monitor/entities/MarketTrialForumSyncFailure.entity.js';
 
 // ============================================================================
@@ -1012,8 +1012,6 @@ export const AppDataSource = new DataSource({
     MarketTrialParticipant,
     MarketTrialForum,
     MarketTrialDecision,
-    MarketTrialShippingAddress,
-    MarketTrialFulfillment,
     MarketTrialForumSyncFailure,
     // ============================================================================
     // STORE LIBRARY — store_library_items → store_execution_assets rename(20260421010000).

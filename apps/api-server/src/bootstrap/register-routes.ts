@@ -82,12 +82,6 @@ import aiAdminRoutes from '../routes/ai-admin.routes.js';
 import { MarketTrialController } from '../controllers/market-trial/marketTrialController.js';
 import { MarketTrialOperatorController } from '../controllers/market-trial/marketTrialOperatorController.js';
 import { createNetureOperatorTrialRoutes } from '../routes/market-trial-operator.routes.js';
-import trialShippingRoutes from '../extensions/trial-shipping/index.js';
-import trialFulfillmentRoutes from '../extensions/trial-fulfillment/index.js';
-import { TrialFulfillmentController } from '../extensions/trial-fulfillment/trialFulfillment.controller.js';
-import { TrialShippingController } from '../extensions/trial-shipping/trialShipping.controller.js';
-import { setDataSource as setShippingStoreDataSource } from '../extensions/trial-shipping/trialShipping.store.js';
-import { setDataSource as setFulfillmentStoreDataSource } from '../extensions/trial-fulfillment/trialFulfillment.store.js';
 import partnerRoutes from '../routes/partner.routes.js';
 import { partnerDashboardRoutes, partnerApplicationRoutes } from '../modules/partner/index.js';
 import checkoutRoutes from '../routes/checkout.routes.js';
@@ -394,17 +388,8 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     app.use('/api/ai/admin', aiAdminRoutes);
     logger.info('✅ AI Admin routes registered at /api/ai/admin');
 
-    // 22-a. Register Trial Shipping Extension (H8-2)
-    setShippingStoreDataSource(dataSource);
-    TrialShippingController.setDataSource(dataSource);
-    app.use('/api/trial-shipping', trialShippingRoutes);
-    logger.info('✅ Trial Shipping Extension registered at /api/trial-shipping');
-
-    // 22-b. Register Trial Fulfillment Extension (H8-3)
-    setFulfillmentStoreDataSource(dataSource);
-    TrialFulfillmentController.setDataSource(dataSource);
-    app.use('/api/trial-fulfillment', trialFulfillmentRoutes);
-    logger.info('✅ Trial Fulfillment Extension registered at /api/trial-fulfillment');
+    // WO-O4O-MARKET-TRIAL-PRODUCT-ORDER-SHIPPING-SCHEMA-CLEANUP-V1 (P3-1):
+    // 유통참여형 펀딩 = content-only. Trial Shipping / Trial Fulfillment 확장(주문/발송 축) 제거됨.
 
     // 23. Register Checkout routes (Phase N-1)
     app.use('/api/checkout', checkoutRoutes);

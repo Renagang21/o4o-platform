@@ -290,25 +290,8 @@ export interface MyParticipationSummary extends ParticipationInfoDetail {
   };
 }
 
-export interface ShippingAddress {
-  participationId: string;
-  recipientName: string;
-  phone: string;
-  postalCode: string;
-  address: string;
-  addressDetail?: string;
-  deliveryNote?: string;
-  createdAt?: string;
-}
-
-export interface Fulfillment {
-  participationId: string;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'completed';
-  orderId?: string;
-  orderNumber?: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
+// WO-O4O-MARKET-TRIAL-PRODUCT-ORDER-SHIPPING-SCHEMA-CLEANUP-V1 (P3-1):
+// ShippingAddress / Fulfillment 타입 제거 (content-only — 주문/발송 축 제거).
 
 // ============================================================================
 // Public / Store API
@@ -739,27 +722,8 @@ export async function resolveForumSyncFailure(
 
 // WO-O4O-MARKET-TRIAL-CONTRACT-CLEANUP-V1: submitShippingAddress 제거 (content-only, 호출처 0).
 
-export async function getShippingAddress(participationId: string): Promise<ShippingAddress | null> {
-  try {
-    const { data } = await api.get(`${API_BASE_URL}/api/trial-shipping/${participationId}`);
-    return data.data || data;
-  } catch (err: unknown) {
-    const axiosErr = err as { response?: { status?: number } };
-    if (axiosErr.response?.status === 404) return null;
-    throw err;
-  }
-}
-
-export async function getFulfillment(participationId: string): Promise<Fulfillment | null> {
-  try {
-    const { data } = await api.get(`${API_BASE_URL}/api/trial-fulfillment/${participationId}`);
-    return data.data || data;
-  } catch (err: unknown) {
-    const axiosErr = err as { response?: { status?: number } };
-    if (axiosErr.response?.status === 404) return null;
-    throw err;
-  }
-}
+// WO-O4O-MARKET-TRIAL-PRODUCT-ORDER-SHIPPING-SCHEMA-CLEANUP-V1 (P3-1):
+// getShippingAddress / getFulfillment 제거 (content-only — 주문/발송 축 제거, route 삭제됨).
 
 // ============================================================================
 // Analytics / KPI (WO-NETURE-MARKET-TRIAL-ANALYTICS-AND-KPI-V1)
