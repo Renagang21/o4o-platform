@@ -458,7 +458,10 @@ const baseColumns: ListColumnDef<SupplierProduct>[] = [
     render: (_v: string, row: SupplierProduct) => {
       const cfg = deriveSubmissionStatus(row);
       const approvals = (row.serviceApprovals || []).filter((a) => a.serviceKey !== 'neture');
-      const reasonApproval = approvals.find((a) => a.reason);
+      // WO-O4O-NETURE-SUPPLIER-PRODUCT-CANCELLED-STATUS-LABEL-CONSISTENCY-V1:
+      // 반려(rejected) 사유만 '*'/tooltip 으로 표시. cancelled(공급자 철회)는 문제 표시가 아니므로 제외 —
+      // 승인 badge 에 철회 사유가 붙어 반려처럼 오인되지 않게 한다.
+      const reasonApproval = approvals.find((a) => a.reason && a.status === 'rejected');
       return (
         <span
           className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${cfg.bg} ${cfg.text}`}
