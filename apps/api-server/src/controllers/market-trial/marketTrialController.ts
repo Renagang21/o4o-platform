@@ -431,9 +431,11 @@ export class MarketTrialController {
       }
 
       // Aggregate participant stats (no individual info exposed)
+      // WO-O4O-MARKET-TRIAL-CONVERSION-READ-WIRING-CLEANUP-V1:
+      // content-only — 전환 분포(conversionDistribution)·매장 진열(listingCount) 집계 제거.
       const rows = await MarketTrialController.participantRepo.find({
         where: { marketTrialId: id },
-        select: ['rewardType', 'rewardStatus', 'customerConversionStatus'] as any,
+        select: ['rewardType', 'rewardStatus'] as any,
       });
 
       const totalCount = rows.length;
@@ -444,26 +446,6 @@ export class MarketTrialController {
       const recruitRate = trial.maxParticipants
         ? Math.round((totalCount / trial.maxParticipants) * 100)
         : null;
-
-      // WO-MARKET-TRIAL-PARTICIPANT-TO-CUSTOMER-FLOW-V1: conversion pipeline distribution
-      const conversionDistribution = {
-        none:        rows.filter((r: any) => !r.customerConversionStatus || r.customerConversionStatus === 'none').length,
-        interested:  rows.filter((r: any) => r.customerConversionStatus === 'interested').length,
-        considering: rows.filter((r: any) => r.customerConversionStatus === 'considering').length,
-        adopted:     rows.filter((r: any) => r.customerConversionStatus === 'adopted').length,
-        first_order: rows.filter((r: any) => r.customerConversionStatus === 'first_order').length,
-      };
-
-      // WO-MARKET-TRIAL-LISTING-AUTOLINK-V1: count store listings created from this trial
-      let listingCount = 0;
-      if (MarketTrialController.dataSource) {
-        const listingCountRows: Array<{ cnt: number }> = await MarketTrialController.dataSource.query(
-          `SELECT COUNT(*)::int AS cnt FROM organization_product_listings
-           WHERE source_type = 'market_trial' AND source_id = $1`,
-          [id],
-        );
-        listingCount = listingCountRows[0]?.cnt ?? 0;
-      }
 
       // Forum link
       const forumMapping = await MarketTrialController.forumRepo.findOne({
@@ -485,8 +467,6 @@ export class MarketTrialController {
             pendingCount: totalCount - fulfilledCount,
             fulfillmentRate,
             recruitRate,
-            conversionDistribution,
-            listingCount,
           },
           forumPostId: forumMapping?.forumId || null,
         },
@@ -787,10 +767,6 @@ function toTrialDTO(
     // productId 없는 기존 펀딩은 둘 다 null. 가격/원본 복제 없음.
     productId: trial.productId || null,
     product: productRef || null,
-    // WO-MARKET-TRIAL-TO-PRODUCT-CONVERSION-FLOW-V1
-    convertedProductId: trial.convertedProductId || null,
-    convertedProductName: trial.convertedProductName || null,
-    conversionNote: trial.conversionNote || null,
     // WO-MARKET-TRIAL-CROWDFUNDING-CORE-ALIGNMENT-V1
     targetAmount: targetAmount || null,
     currentAmount: currentAmount || 0,

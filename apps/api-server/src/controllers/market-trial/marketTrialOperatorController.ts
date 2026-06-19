@@ -455,26 +455,15 @@ export class MarketTrialOperatorController {
         return res.status(404).json({ success: false, message: 'Trial not found' });
       }
 
+      // WO-O4O-MARKET-TRIAL-CONVERSION-READ-WIRING-CLEANUP-V1:
+      // content-only — 전환 퍼널(conversionDistribution)·매장 진열(listingCount)·제품 전환 read 제거.
       const rows: Array<{
         participantCount: number;
         productRewardCount: number;
-        convNone: number;
-        convInterested: number;
-        convConsidering: number;
-        convAdopted: number;
-        convFirstOrder: number;
-        listingCount: number;
       }> = await ds.query(
         `SELECT
-           COUNT(p.id)::int                                                            AS "participantCount",
-           COUNT(p.id) FILTER (WHERE p."rewardType" = 'product')::int                 AS "productRewardCount",
-           COUNT(p.id) FILTER (WHERE COALESCE(p."customerConversionStatus",'none') = 'none')::int AS "convNone",
-           COUNT(p.id) FILTER (WHERE p."customerConversionStatus" = 'interested')::int  AS "convInterested",
-           COUNT(p.id) FILTER (WHERE p."customerConversionStatus" = 'considering')::int AS "convConsidering",
-           COUNT(p.id) FILTER (WHERE p."customerConversionStatus" = 'adopted')::int     AS "convAdopted",
-           COUNT(p.id) FILTER (WHERE p."customerConversionStatus" = 'first_order')::int AS "convFirstOrder",
-           (SELECT COUNT(*)::int FROM organization_product_listings opl
-            WHERE opl.source_type = 'market_trial' AND opl.source_id = $1)             AS "listingCount"
+           COUNT(p.id)::int                                            AS "participantCount",
+           COUNT(p.id) FILTER (WHERE p."rewardType" = 'product')::int AS "productRewardCount"
          FROM market_trial_participants p
          WHERE p."marketTrialId" = $1`,
         [id],
@@ -482,8 +471,6 @@ export class MarketTrialOperatorController {
 
       const r = rows[0] ?? {
         participantCount: 0, productRewardCount: 0,
-        convNone: 0, convInterested: 0, convConsidering: 0,
-        convAdopted: 0, convFirstOrder: 0, listingCount: 0,
       };
       res.json({
         success: true,
@@ -491,18 +478,6 @@ export class MarketTrialOperatorController {
           recruitCount: trial.maxParticipants ?? null,
           participantCount: r.participantCount ?? 0,
           productRewardCount: r.productRewardCount ?? 0,
-          convertedProduct: !!trial.convertedProductId,
-          convertedProductId: trial.convertedProductId || null,
-          convertedProductName: trial.convertedProductName || null,
-          conversionDistribution: {
-            none:        r.convNone        ?? 0,
-            interested:  r.convInterested  ?? 0,
-            considering: r.convConsidering ?? 0,
-            adopted:     r.convAdopted     ?? 0,
-            first_order: r.convFirstOrder  ?? 0,
-          },
-          listingCount:    r.listingCount     ?? 0,
-          firstOrderCount: r.convFirstOrder   ?? 0,
         },
       });
     } catch (error) {
@@ -523,7 +498,7 @@ export class MarketTrialOperatorController {
   static async listParticipants(req: AuthRequest, res: Response) {
     try {
       const { id } = req.params;
-      const { rewardType, rewardStatus, customerConversionStatus } = req.query;
+      const { rewardType, rewardStatus } = req.query;
       const ds = MarketTrialOperatorController.dataSource;
       if (!ds) {
         return res.status(500).json({ success: false, message: 'DataSource not initialized' });
@@ -545,11 +520,6 @@ export class MarketTrialOperatorController {
         params.push(rewardStatus);
         conditions.push(`p."rewardStatus" = $${params.length}`);
       }
-      if (customerConversionStatus && typeof customerConversionStatus === 'string'
-        && VALID_CUSTOMER_CONVERSION_STATUSES.includes(customerConversionStatus as CustomerConversionStatus)) {
-        params.push(customerConversionStatus);
-        conditions.push(`COALESCE(p."customerConversionStatus", 'none') = $${params.length}`);
-      }
 
       // WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1: settlement filter support
       if (req.query.settlementStatus && typeof req.query.settlementStatus === 'string') {
@@ -570,10 +540,6 @@ export class MarketTrialOperatorController {
         participantType: string;
         rewardType: string | null;
         rewardStatus: string;
-        customerConversionStatus: string;
-        customerConversionAt: Date | null;
-        customerConversionNote: string | null;
-        listingId: string | null;
         organizationId: string | null;
         createdAt: Date;
         // WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1
@@ -601,10 +567,6 @@ export class MarketTrialOperatorController {
            p."participantType",
            p."rewardType",
            p."rewardStatus",
-           COALESCE(p."customerConversionStatus", 'none') AS "customerConversionStatus",
-           p."customerConversionAt",
-           p."customerConversionNote",
-           p."listingId",
            (SELECT om.organization_id FROM organization_members om
             WHERE om.user_id = p."participantId"
               AND om.role IN ('owner', 'admin', 'manager')
@@ -691,10 +653,6 @@ export class MarketTrialOperatorController {
               type: r.participantType,
               rewardType: r.rewardType,
               rewardStatus: r.rewardStatus,
-              customerConversionStatus: r.customerConversionStatus,
-              customerConversionAt: r.customerConversionAt ? new Date(r.customerConversionAt).toISOString() : null,
-              customerConversionNote: r.customerConversionNote || null,
-              listingId: r.listingId || null,
               organizationId: r.organizationId || null,
               joinedAt: new Date(r.createdAt).toISOString(),
               // WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1
@@ -1362,8 +1320,6 @@ export class MarketTrialOperatorController {
         paymentReference: string | null;
         settlementChoice: string | null;
         settlementStatus: string | null;
-        customerConversionStatus: string | null;
-        listingId: string | null;
         createdAt: Date;
       }> = await ds.query(
         `SELECT
@@ -1378,8 +1334,6 @@ export class MarketTrialOperatorController {
            p."paymentReference",
            p."settlementChoice",
            p."settlementStatus",
-           p."customerConversionStatus",
-           p."listingId",
            p."createdAt"
          FROM market_trial_participants p
          LEFT JOIN users u ON u.id = p."participantId"
@@ -1424,12 +1378,10 @@ export class MarketTrialOperatorController {
       const settlementStatusLabel = (v: string | null) =>
         ({ pending: '대기', choice_pending: '선택 대기', choice_completed: '선택 완료', offline_review: '운영 확인 중', offline_settled: '정산 완료' } as Record<string, string>)[v || 'pending'] || v || '-';
       const settlementChoiceLabel = (v: string | null) => (v === 'product' ? '제품 수령' : v === 'cash' ? '금액 환급' : '-');
-      const conversionLabel = (v: string | null) =>
-        ({ none: '랜딩 전', interested: '관심 확인', considering: '취급 검토', adopted: '매장 도입', first_order: '첫 주문' } as Record<string, string>)[v || 'none'] || v || '-';
       const won = (n: string | number | null) => (n != null && n !== '' ? `${Number(n).toLocaleString()}원` : '-');
 
       // CSV header + rows
-      const header = ['참여자명', '참여자유형', '보상방식', '보상상태', '참여금', '입금상태', '입금확인금액', '입금확인일', '입금참조', '정산선택', '정산상태', '매장랜딩단계', '활용상품연결', '참여일', '유통참여형 펀딩 제목', '상태'];
+      const header = ['참여자명', '참여자유형', '보상방식', '보상상태', '참여금', '입금상태', '입금확인금액', '입금확인일', '입금참조', '정산선택', '정산상태', '참여일', '유통참여형 펀딩 제목', '상태'];
       const trialTitle = (trial.title || '').replace(/"/g, '""');
       const trialStatusLabel: Record<string, string> = {
         draft: '작성 중', submitted: '심사 대기',
@@ -1450,8 +1402,6 @@ export class MarketTrialOperatorController {
         `"${(r.paymentReference || '-').replace(/"/g, '""')}"`,
         `"${settlementChoiceLabel(r.settlementChoice)}"`,
         `"${settlementStatusLabel(r.settlementStatus)}"`,
-        `"${conversionLabel(r.customerConversionStatus)}"`,
-        `"${r.listingId ? '연결됨' : '-'}"`,
         `"${fmtDate(r.createdAt)}"`,
         `"${trialTitle}"`,
         `"${trialStatusText}"`,
@@ -1836,10 +1786,6 @@ function toOperatorTrialDTO(trial: MarketTrial, productRef?: OperatorTrialProduc
     // WO-O4O-NETURE-MARKET-TRIAL-PRODUCT-REFERENCE-DISPLAY-V2: 연결 제품 (표시 전용)
     productId: trial.productId || null,
     product: productRef || null,
-    // WO-MARKET-TRIAL-TO-PRODUCT-CONVERSION-FLOW-V1
-    convertedProductId: trial.convertedProductId || null,
-    convertedProductName: trial.convertedProductName || null,
-    conversionNote: trial.conversionNote || null,
     createdAt: new Date(trial.createdAt).toISOString(),
     updatedAt: new Date(trial.updatedAt).toISOString(),
   };
