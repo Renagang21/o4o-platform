@@ -234,6 +234,10 @@ export class AuthRegisterController extends BaseController {
           // WO-O4O-GLYCOPHARM-PHARMACY-OWNER-SIGNUP-AND-APPROVAL-FLOW-ALIGNMENT-V1:
           // GlycoPharm 약국 경영자 가입 시 glycopharm_applications 자동 생성
           await AuthRegisterController.createGlycopharmApplication(manager, existingUser.id, data, effectiveRole);
+
+          // WO-O4O-NETURE-SUPPLIER-REGISTRATION-PROFILE-CREATION-V1:
+          //   Neture 공급자 가입 시점에 neture_suppliers row(PENDING) 즉시 생성.
+          await AuthRegisterController.createNetureSupplier(manager, existingUser.id, data, effectiveRole, resolvedName);
         });
 
         logger.info('[AuthRegisterController.register] Service membership added to existing user', {
@@ -462,6 +466,10 @@ export class AuthRegisterController extends BaseController {
         // WO-O4O-GLYCOPHARM-PHARMACY-OWNER-SIGNUP-AND-APPROVAL-FLOW-ALIGNMENT-V1:
         // GlycoPharm 약국 경영자 가입 시 glycopharm_applications 자동 생성
         await AuthRegisterController.createGlycopharmApplication(manager, newUser.id, data, effectiveRole);
+
+        // WO-O4O-NETURE-SUPPLIER-REGISTRATION-PROFILE-CREATION-V1:
+        //   Neture 공급자 가입 시점에 neture_suppliers row(PENDING) 즉시 생성.
+        await AuthRegisterController.createNetureSupplier(manager, newUser.id, data, effectiveRole, resolvedName);
 
         // WO-O4O-AUTH-REGISTER-UX-IMPROVEMENT-V1: RoleAssignment는 서비스 승인 시에만 생성
 
@@ -883,5 +891,87 @@ export class AuthRegisterController extends BaseController {
         JSON.stringify(metadata),
       ],
     );
+  }
+
+  /**
+   * WO-O4O-NETURE-SUPPLIER-REGISTRATION-PROFILE-CREATION-V1
+   *
+   * Neture 공급자 가입 시점에 neture_suppliers row(PENDING) 즉시 생성한다.
+   * '공급자 role 회원이 존재하는데 neture_suppliers row 가 없는' 상태를 제거 —
+   * 운영자 회원관리에서 공급자 프로필 상태(검토대기)가 일관되게 표시되도록 한다.
+   *
+   * 2단계 모델 불변: status='PENDING' 으로 생성 → 공급 승인(step2, /operator/suppliers)에서 ACTIVE.
+   * 회원 승인(step1, operator-registration.service)의 동일 생성 로직은 존재 가드/ON CONFLICT 로
+   * 자동 no-op 되어 중복 생성/충돌이 없다.
+   *
+   * seed/org 로직은 operator-registration.service 의 step1 생성과 동일 형태(snapshot).
+   * 멱등: user_id 존재 시 skip + ON CONFLICT DO NOTHING.
+   */
+  private static async createNetureSupplier(
+    manager: import('typeorm').EntityManager,
+    userId: string,
+    data: RegisterRequestDto,
+    effectiveRole: string,
+    resolvedName: string,
+  ): Promise<void> {
+    if (data.service !== 'neture' || effectiveRole !== 'supplier') return;
+
+    const existing = await manager.query(
+      `SELECT id FROM neture_suppliers WHERE user_id = $1`,
+      [userId],
+    );
+    if (existing?.length) return; // 이미 존재 — 멱등 skip
+
+    const slug = `supplier-${userId.substring(0, 8)}`;
+    const contactEmail = data.email || null;
+    const contactPhone = data.phone ? String(data.phone).replace(/\D/g, '') : null;
+    // canonical fallback (WO-O4O-BUSINESS-REGISTRATION-FIELD-NAMING-STANDARD-V1)
+    const representativeName = data.representativeName ?? data.ceoName ?? resolvedName ?? null;
+    const managerName = data.contactName || null;
+    const managerPhone = data.managerPhone || contactPhone || null;
+    const businessType = data.businessType || null;
+    const taxInvoiceEmail = data.taxInvoiceEmail ?? data.taxEmail ?? null;
+
+    const [inserted] = await manager.query(
+      `INSERT INTO neture_suppliers (user_id, slug, contact_email, contact_phone, representative_name, manager_name, manager_phone, business_type, tax_invoice_email, status, approved_by, approved_at, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'PENDING', NULL, NULL, NOW(), NOW())
+       ON CONFLICT (user_id) DO NOTHING
+       RETURNING id`,
+      [userId, slug, contactEmail, contactPhone, representativeName, managerName, managerPhone, businessType, taxInvoiceEmail],
+    );
+
+    // organization 연동 (businessName 있는 경우) — business_number/address 는 org SSOT.
+    const bizName = data.businessName || data.companyName || resolvedName || '';
+    if (bizName && inserted?.id) {
+      const orgCode = `neture-${slug}`;
+      const orgPath = `/${orgCode}`;
+      const businessNumber = data.businessNumber || null;
+      const businessAddress = data.businessAddress || data.address1 || null;
+      const zipCode = data.zipCode || null;
+      const businessAddressDetail = data.businessAddressDetail || data.address2 || null;
+      const addressDetailJson = (zipCode || businessAddressDetail)
+        ? JSON.stringify({ zipCode, detailAddress: businessAddressDetail })
+        : null;
+      const [org] = await manager.query(
+        `INSERT INTO organizations (name, code, type, "isActive", "createdAt", "updatedAt", level, path, "childrenCount", business_number, address, address_detail)
+         VALUES ($1, $2, 'supplier', true, NOW(), NOW(), 0, $3, 0, $4, $5, $6::jsonb)
+         ON CONFLICT (code) DO UPDATE SET
+           "isActive" = true,
+           "updatedAt" = NOW(),
+           business_number = COALESCE(EXCLUDED.business_number, organizations.business_number),
+           address = COALESCE(EXCLUDED.address, organizations.address),
+           address_detail = COALESCE(EXCLUDED.address_detail, organizations.address_detail)
+         RETURNING id`,
+        [bizName, orgCode, orgPath, businessNumber, businessAddress, addressDetailJson],
+      );
+      if (org?.id) {
+        await manager.query(
+          `UPDATE neture_suppliers SET organization_id = $1 WHERE id = $2 AND organization_id IS NULL`,
+          [org.id, inserted.id],
+        );
+      }
+    }
+
+    logger.info(`[Register] Auto-created neture_suppliers for user ${userId} (PENDING) at signup — awaiting supplier approval`);
   }
 }
