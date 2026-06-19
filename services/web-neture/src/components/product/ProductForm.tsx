@@ -34,6 +34,9 @@ export interface ProductFormProps {
   initialData?: Partial<ProductFormData>;
   onChange: (data: ProductFormData, isDirty: boolean) => void;
   disabled?: boolean;
+  /** WO-O4O-NETURE-SUPPLIER-PRODUCT-DISTRIBUTION-MANAGEMENT-FLOW-V1:
+   *  공급 방식(전체 공개/서비스 공급) UI 숨김 — drawer 편집에서 상품 정보와 분리(공급 방식은 별도 모달). */
+  hideDistribution?: boolean;
 }
 
 // ─── Validation (exported) ───
@@ -141,7 +144,7 @@ const DEFAULT_DATA: ProductFormData = {
 
 // ─── Component ───
 
-export default function ProductForm({ mode, initialData, onChange, disabled = false }: ProductFormProps) {
+export default function ProductForm({ mode, initialData, onChange, disabled = false, hideDistribution = false }: ProductFormProps) {
   const [data, setData] = useState<ProductFormData>(() => ({
     ...DEFAULT_DATA,
     ...initialData,
@@ -301,6 +304,9 @@ export default function ProductForm({ mode, initialData, onChange, disabled = fa
         </div>
       )}
 
+      {/* WO-O4O-NETURE-SUPPLIER-PRODUCT-DISTRIBUTION-MANAGEMENT-FLOW-V1: hideDistribution 시 공급 방식 UI 숨김 */}
+      {!hideDistribution && (
+      <>
       {/* ── A. 기본 공개 설정 ── */}
       <div>
         <FieldLabel>기본 공개 설정</FieldLabel>
@@ -366,6 +372,8 @@ export default function ProductForm({ mode, initialData, onChange, disabled = fa
           </p>
         )}
       </div>
+      </>
+      )}
 
       {/* ── C. 추천 노출 희망 (WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1) ── */}
       <div>

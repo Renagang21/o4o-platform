@@ -645,6 +645,20 @@ export const supplierApi = {
     }
   },
 
+  // WO-O4O-NETURE-SUPPLIER-PRODUCT-DISTRIBUTION-MANAGEMENT-FLOW-V1:
+  // 공급 방식(전체 공개 + 서비스 대상) 정식 변경 — 추가=pending/재심사, 제거=cancelled+listing 비활성.
+  async updateDistribution(
+    id: string,
+    input: { isPublic?: boolean; serviceKeys?: string[] },
+  ): Promise<{ success: boolean; error?: string; data?: any }> {
+    try {
+      const response = await api.patch(`/neture/supplier/products/${id}/distribution`, input);
+      return response.data;
+    } catch (error) {
+      return { success: false, error: extractApiError(error) };
+    }
+  },
+
   // WO-NETURE-B2B-CONTENT-MANAGEMENT-V1
   async updateBusinessContent(
     offerId: string,

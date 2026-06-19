@@ -111,6 +111,11 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
   const [showDirtyConfirm, setShowDirtyConfirm] = useState(false);
   // WO-O4O-NETURE-SUPPLIER-PRODUCT-DISTRIBUTION-MANAGEMENT-ENTRY-V1: 공급 방식 정책 안내 토글
   const [showSupplyGuide, setShowSupplyGuide] = useState(false);
+  // WO-O4O-NETURE-SUPPLIER-PRODUCT-DISTRIBUTION-MANAGEMENT-FLOW-V1: 공급 방식 변경 모달
+  const [distMgmtOpen, setDistMgmtOpen] = useState(false);
+  const [distSaving, setDistSaving] = useState(false);
+  const [distForm, setDistForm] = useState<{ isPublic: boolean; serviceKeys: string[] }>({ isPublic: false, serviceKeys: [] });
+  const [distConfirmRemove, setDistConfirmRemove] = useState<string[] | null>(null);
 
   // Template integration (WO-O4O-TEMPLATE-ADOPTION-NETURE-PRODUCT-V1)
   const { user } = useAuth();
@@ -332,8 +337,8 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
         // WO-NETURE-PRODUCT-DRAWER-B2C-EDIT-RESTORE-V1: B2C 설명 저장 복구
         consumerShortDescription: editConsumerShort.trim() || null,
         consumerDetailDescription: editConsumerDetail.trim() || null,
-        // 서비스별 공급 설정
-        serviceKeys: form.serviceKeys,
+        // WO-O4O-NETURE-SUPPLIER-PRODUCT-DISTRIBUTION-MANAGEMENT-FLOW-V1:
+        // serviceKeys 는 상품 정보 저장에서 제외 — 공급 방식 변경은 [공급 방식 변경] 모달(distribution API)로만 처리.
       };
       console.log('[ProductDetailDrawer] save payload:', payload);
 
@@ -359,14 +364,8 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
         }
       }
 
-      // 3. 새로운 serviceKeys가 추가되었으면 승인 요청
-      if (form.serviceKeys?.length) {
-        const existingKeys = new Set(product.serviceKeys || []);
-        const newKeys = form.serviceKeys.filter(k => !existingKeys.has(k));
-        if (newKeys.length > 0) {
-          await supplierApi.submitForApproval([product.id]);
-        }
-      }
+      // WO-O4O-NETURE-SUPPLIER-PRODUCT-DISTRIBUTION-MANAGEMENT-FLOW-V1:
+      // serviceKeys 변경 시 auto submitForApproval 우회 제거 — 공급 방식 변경/승인요청은 distribution API 단일 경로.
 
       setEditMode(null);
       setShowSecondaryEdit(false);
@@ -620,6 +619,93 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
         </div>
       )}
 
+      {/* WO-O4O-NETURE-SUPPLIER-PRODUCT-DISTRIBUTION-MANAGEMENT-FLOW-V1: 공급 방식 변경 모달 */}
+      {distMgmtOpen && product && (() => {
+        const SERVICES = [
+          { key: 'kpa-society', label: 'KPA Society' },
+          { key: 'glycopharm', label: 'GlycoPharm' },
+          { key: 'k-cosmetics', label: 'K-Cosmetics' },
+        ];
+        const currentKeys = (product.serviceKeys || []).filter((k) => k !== 'neture');
+        const removed = currentKeys.filter((k) => !distForm.serviceKeys.includes(k));
+        const toggleSvc = (k: string) =>
+          setDistForm((f) => ({ ...f, serviceKeys: f.serviceKeys.includes(k) ? f.serviceKeys.filter((x) => x !== k) : [...f.serviceKeys, k] }));
+        const doSave = async () => {
+          setDistSaving(true);
+          try {
+            const r = await supplierApi.updateDistribution(product.id, { isPublic: distForm.isPublic, serviceKeys: distForm.serviceKeys });
+            if (!r.success) { toast.error(`공급 방식 변경 실패: ${r.error || '오류'}`); setDistSaving(false); return; }
+            toast.success('공급 방식이 변경되었습니다');
+            setDistMgmtOpen(false);
+            setDistConfirmRemove(null);
+            onSaved?.();
+          } catch {
+            toast.error('공급 방식 변경 중 오류가 발생했습니다');
+          } finally {
+            setDistSaving(false);
+          }
+        };
+        return (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4" onClick={(e) => { if (e.target === e.currentTarget && !distSaving) setDistMgmtOpen(false); }}>
+            <div className="bg-white rounded-xl shadow-xl p-5 w-full max-w-md max-h-[85vh] overflow-y-auto">
+              <h3 className="text-base font-bold text-slate-900 mb-3">공급 방식 변경</h3>
+              {!distConfirmRemove ? (
+                <>
+                  <label className="flex items-start gap-2 mb-2 cursor-pointer">
+                    <input type="checkbox" checked={distForm.isPublic} onChange={(e) => setDistForm((f) => ({ ...f, isPublic: e.target.checked }))} className="mt-0.5" />
+                    <span>
+                      <span className="text-sm font-medium text-slate-800">B2B 전체 공급</span>
+                      <span className="block text-xs text-slate-500">운영자 승인 없이 각 서비스 HUB에 노출될 수 있습니다.</span>
+                    </span>
+                  </label>
+                  {distForm.isPublic && (
+                    <p className="text-[11px] text-amber-700 bg-amber-50 border border-amber-100 rounded px-2 py-1.5 mb-3">
+                      B2B 전체 공급으로 설정하면 서비스 운영자 승인 없이 각 서비스 HUB에 노출될 수 있습니다.
+                    </p>
+                  )}
+                  <p className="text-xs font-semibold text-slate-600 mb-1 mt-3">서비스 공급 대상</p>
+                  <p className="text-[11px] text-slate-500 mb-2">선택한 서비스 운영자의 승인 후 해당 서비스 HUB에 노출됩니다.</p>
+                  <div className="space-y-1.5 mb-3">
+                    {SERVICES.map((s) => (
+                      <label key={s.key} className="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" checked={distForm.serviceKeys.includes(s.key)} onChange={() => toggleSvc(s.key)} />
+                        <span className="text-sm text-slate-700">{s.label}</span>
+                        {currentKeys.includes(s.key) && !distForm.serviceKeys.includes(s.key) && (
+                          <span className="text-[10px] text-red-600">철회 예정</span>
+                        )}
+                      </label>
+                    ))}
+                  </div>
+                  {!distForm.isPublic && distForm.serviceKeys.length === 0 && (
+                    <p className="text-[11px] text-slate-500 mb-3">아무것도 선택하지 않으면 내부 상품(미노출)으로 저장됩니다.</p>
+                  )}
+                  <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
+                    <button onClick={() => setDistMgmtOpen(false)} disabled={distSaving} className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg disabled:opacity-50">취소</button>
+                    <button
+                      onClick={() => { if (removed.length) setDistConfirmRemove(removed); else doSave(); }}
+                      disabled={distSaving}
+                      className="px-4 py-2 text-sm text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg disabled:opacity-50"
+                    >{distSaving ? '저장 중...' : '저장'}</button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm text-slate-700 mb-2">다음 서비스 공급을 철회합니다:</p>
+                  <ul className="text-sm font-medium text-slate-900 mb-3 list-disc list-inside">
+                    {distConfirmRemove.map((k) => <li key={k}>{SERVICES.find((s) => s.key === k)?.label || k}</li>)}
+                  </ul>
+                  <p className="text-[11px] text-slate-500 mb-4">해당 서비스 HUB 노출이 중단되고, 기존 승인 이력은 '철회됨'으로 보존됩니다. 다시 공급하려면 재신청(승인 대기)이 필요합니다.</p>
+                  <div className="flex justify-end gap-2">
+                    <button onClick={() => setDistConfirmRemove(null)} disabled={distSaving} className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg disabled:opacity-50">뒤로</button>
+                    <button onClick={doSave} disabled={distSaving} className="px-4 py-2 text-sm text-white bg-red-600 hover:bg-red-700 rounded-lg disabled:opacity-50">{distSaving ? '처리 중...' : '철회하고 저장'}</button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/30 z-40 transition-opacity"
@@ -828,6 +914,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                 initialData={toFormData(product)}
                 onChange={handleFormChange}
                 disabled={saving}
+                hideDistribution
               />
             </div>
           )}
@@ -1217,9 +1304,10 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                             st === 'approved' ? 'bg-green-50 text-green-700'
                               : st === 'pending' ? 'bg-amber-50 text-amber-700'
                               : st === 'rejected' ? 'bg-red-50 text-red-700'
+                              : st === 'cancelled' ? 'bg-slate-200 text-slate-600'
                               : 'bg-slate-100 text-slate-500'
                           }>
-                            {st === 'approved' ? '승인됨' : st === 'pending' ? '승인대기' : st === 'rejected' ? '반려됨' : '미신청'}
+                            {st === 'approved' ? '승인됨' : st === 'pending' ? '승인대기' : st === 'rejected' ? '반려됨' : st === 'cancelled' ? '철회됨' : '미신청'}
                           </Badge>
                         </div>
                       );
@@ -1228,8 +1316,23 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                 )}
                 <p className="text-[11px] text-slate-400 mt-2">이벤트 오퍼는 공급 방식 변경이 아니라 별도로 생성합니다.</p>
 
+                {/* WO-O4O-NETURE-SUPPLIER-PRODUCT-DISTRIBUTION-MANAGEMENT-FLOW-V1: 공급 방식 변경 진입 */}
+                {!isEditing && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDistForm({ isPublic: isPub, serviceKeys: [...supplyKeys] });
+                      setDistConfirmRemove(null);
+                      setDistMgmtOpen(true);
+                    }}
+                    className="mt-3 w-full py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg"
+                  >
+                    공급 방식 변경
+                  </button>
+                )}
+
                 {/* WO-O4O-NETURE-SUPPLIER-PRODUCT-DISTRIBUTION-MANAGEMENT-ENTRY-V1:
-                    공급 방식 관리 진입 + 정책 안내(읽기 전용). 실제 변경 플로우는 후속(D). */}
+                    공급 방식 관리 진입 + 정책 안내(읽기 전용). */}
                 <div className="mt-3 pt-3 border-t border-slate-100">
                   <button
                     type="button"

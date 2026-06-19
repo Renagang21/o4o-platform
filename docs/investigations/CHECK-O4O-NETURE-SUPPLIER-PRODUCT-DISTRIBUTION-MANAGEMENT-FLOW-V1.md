@@ -71,12 +71,22 @@
 
 > **발견·수정**: `cancelServiceApprovals` 의 응답 필드(`cancelledServiceKeys`/`deactivatedListings`)가 **queryRunner `UPDATE...RETURNING` 컬럼 null/형식 이슈**로 잘못 파싱(`[null,null]`/오카운트). **실제 DB 전이는 정상**(재추가 resubmit로 입증)이나 보고 필드가 틀려 → **SELECT→UPDATE 안전 패턴으로 수정**(RETURNING 의존 제거, 사전 COUNT). api-server tsc 0. ← 본 CHECK 커밋에 포함.
 
-## 6. Phase 2 (frontend) — 후속 (이번 커밋 미포함)
+## 6. Phase 2 (frontend) — 구현 완료 (PASS 코드/타입)
 
-- ProductDetailDrawer/SupplierProductsPage: **공급 방식 관리 모달**(B2B 전체 공급 토글 + 서비스 대상 체크 + 정책 안내 + 저장→distribution API).
-- PUBLIC 경고 / SERVICE 제거 확인(철회·재신청 안내) / cancelled='철회됨' 표시.
-- **drawer auto submitForApproval 우회 정리**(상품 정보 저장과 공급 방식 변경 분리). 기존 상품 정보/설명/가격 편집 회귀 금지.
-- 실브라우저 smoke(A 교훈) 후 CHECK 갱신.
+변경 파일(3): `lib/api/supplier.ts` · `pages/supplier/ProductDetailDrawer.tsx` · `components/product/ProductForm.tsx`.
+
+- **API 클라이언트**: `supplierApi.updateDistribution(id, {isPublic, serviceKeys})` → `PATCH .../distribution`.
+- **공급 방식 변경 모달**(drawer): [공급 방식 변경] 버튼 → 모달. **B2B 전체 공급 토글**(PUBLIC 경고) + **서비스 대상 체크박스**(KPA/GlycoPharm/K-Cosmetics, 철회 예정 표시) + 내부상품 안내 + 저장→`updateDistribution`. **SERVICE 제거 확인 다이얼로그**("HUB 노출 중단 + 이력 '철회됨' 보존 + 재신청 필요"). 저장 후 `onSaved()` 새로고침.
+- **cancelled='철회됨'** 배지 표시(공급 방식 섹션 서비스별 승인).
+- **drawer auto submitForApproval 우회 제거**: 상품 정보 저장(`handleSave`) payload 에서 `serviceKeys` 제거 + 신규 키 auto `submitForApproval` 블록 제거 → **상품 정보 저장과 공급 방식 변경 완전 분리**(D UX 핵심).
+- **편집 폼 distribution 숨김**: `ProductForm` 에 `hideDistribution` prop 추가, drawer 편집(mode=edit)에서 전체공개/서비스공급 UI 숨김(혼선 제거). **create 위저드는 무영향**(prop 미전달).
+- 기존 상품정보/B2C·B2B 설명/가격/재고 편집 경로 무변경. web-neture tsc 0.
+
+### Phase 2 배포 후 실브라우저 smoke (A 교훈) — 배포 후 수행
+1. drawer → [공급 방식 변경] 모달: 토글/체크박스/경고/확인 다이얼로그 동작.
+2. 비파괴 검증(k-cosmetics 추가→제거→원복) UI로 재현, cancelled='철회됨' 표시 확인.
+3. 상품 정보 편집(B2C 편집)에서 공급 방식 UI 미표시 + 저장 시 distribution 미변경 확인(분리).
+4. operator 공유 drawer 레이아웃 무붕괴.
 
 ## 7. 비범위 / 준수
 
