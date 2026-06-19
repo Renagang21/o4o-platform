@@ -1140,7 +1140,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
 
           {/* ── 기본 정보 (read-only) ── */}
           {!isEditing && (
-            <Section title="기본 정보">
+            <Section title="상품 정보">
               <InfoRow label="바코드"><span className="font-mono">{product.barcode}</span></InfoRow>
               <InfoRow label="상품명">{product.name || product.masterName || '-'}</InfoRow>
               {product.regulatoryName && product.regulatoryName !== product.name && (
@@ -1171,6 +1171,63 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
               )}
             </Section>
           )}
+
+          {/* ── 공급 방식 요약 (WO-O4O-NETURE-SUPPLIER-PRODUCT-INFO-DISTRIBUTION-SUMMARY-V1) ──
+               상품 정보와 분리하여 "이 상품을 어디에 어떤 상태로 공급하는가"를 평이한 라벨로 표시.
+               distributionType(내부 용어)은 노출하지 않고 isPublic+serviceKeys 파생 라벨 사용. 표시 전용. */}
+          {!isEditing && (() => {
+            const supplyKeys = (product.serviceKeys || []).filter((k) => k !== 'neture');
+            const isPub = (product as any).isPublic ?? (product.distributionType === 'PUBLIC');
+            let supplyLabel: string, supplyDesc: string, supplyCls: string;
+            if (isPub) {
+              supplyLabel = 'B2B 전체 공급';
+              supplyDesc = '서비스 운영자 승인 없이 HUB에 노출될 수 있습니다.';
+              supplyCls = 'bg-blue-50 text-blue-700';
+            } else if (supplyKeys.length > 0) {
+              supplyLabel = '서비스 공급';
+              supplyDesc = '선택한 서비스 운영자의 승인 후 해당 서비스 HUB에 노출됩니다.';
+              supplyCls = 'bg-purple-50 text-purple-700';
+            } else {
+              supplyLabel = '내부 상품';
+              supplyDesc = '아직 공급 방식이 설정되지 않아 HUB에 노출되지 않습니다.';
+              supplyCls = 'bg-slate-100 text-slate-600';
+            }
+            return (
+              <Section title="공급 방식">
+                <InfoRow label="현재 공급 방식"><Badge className={supplyCls}>{supplyLabel}</Badge></InfoRow>
+                <p className="text-[11px] text-slate-400 -mt-1 mb-1">{supplyDesc}</p>
+                <InfoRow label="기본 B2B 공급가">{formatPrice(product.priceGeneral)}</InfoRow>
+                <InfoRow label="노출 상태">
+                  <Badge className={product.isActive ? 'bg-green-50 text-green-700' : 'bg-slate-100 text-slate-600'}>
+                    {product.isActive ? '노출 활성' : '미노출'}
+                  </Badge>
+                </InfoRow>
+                {supplyKeys.length > 0 && (
+                  <div className="space-y-1 mt-1">
+                    <span className="text-xs text-slate-500">서비스별 승인</span>
+                    {supplyKeys.map((sk) => {
+                      const sa = (product.serviceApprovals || []).find((a) => a.serviceKey === sk);
+                      const st = sa?.status;
+                      return (
+                        <div key={sk} className="flex items-center justify-between pl-3">
+                          <span className="text-xs text-slate-600">{sk}</span>
+                          <Badge className={
+                            st === 'approved' ? 'bg-green-50 text-green-700'
+                              : st === 'pending' ? 'bg-amber-50 text-amber-700'
+                              : st === 'rejected' ? 'bg-red-50 text-red-700'
+                              : 'bg-slate-100 text-slate-500'
+                          }>
+                            {st === 'approved' ? '승인됨' : st === 'pending' ? '승인대기' : st === 'rejected' ? '반려됨' : '미신청'}
+                          </Badge>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+                <p className="text-[11px] text-slate-400 mt-2">이벤트 오퍼는 공급 방식 변경이 아니라 별도로 생성합니다.</p>
+              </Section>
+            );
+          })()}
 
           {/* ── 소비자 공개 설명 (B2C) ── */}
           {!isEditing && (
