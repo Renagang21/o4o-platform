@@ -109,6 +109,8 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
   const b2bEditRef = useRef<HTMLDivElement>(null);
   const [saving, setSaving] = useState(false);
   const [showDirtyConfirm, setShowDirtyConfirm] = useState(false);
+  // WO-O4O-NETURE-SUPPLIER-PRODUCT-DISTRIBUTION-MANAGEMENT-ENTRY-V1: 공급 방식 정책 안내 토글
+  const [showSupplyGuide, setShowSupplyGuide] = useState(false);
 
   // Template integration (WO-O4O-TEMPLATE-ADOPTION-NETURE-PRODUCT-V1)
   const { user } = useAuth();
@@ -1225,6 +1227,38 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                   </div>
                 )}
                 <p className="text-[11px] text-slate-400 mt-2">이벤트 오퍼는 공급 방식 변경이 아니라 별도로 생성합니다.</p>
+
+                {/* WO-O4O-NETURE-SUPPLIER-PRODUCT-DISTRIBUTION-MANAGEMENT-ENTRY-V1:
+                    공급 방식 관리 진입 + 정책 안내(읽기 전용). 실제 변경 플로우는 후속(D). */}
+                <div className="mt-3 pt-3 border-t border-slate-100">
+                  <button
+                    type="button"
+                    onClick={() => setShowSupplyGuide((v) => !v)}
+                    className="flex items-center gap-1 text-xs font-medium text-emerald-700 hover:text-emerald-800"
+                    aria-expanded={showSupplyGuide}
+                  >
+                    {showSupplyGuide ? '▾' : '▸'} 공급 방식 관리 · 정책 안내
+                  </button>
+                  {showSupplyGuide && (
+                    <div className="mt-2 space-y-2 rounded-lg bg-slate-50 border border-slate-100 p-3">
+                      <div>
+                        <p className="text-xs font-semibold text-slate-700">B2B 전체 공급</p>
+                        <p className="text-[11px] text-slate-500">서비스 운영자 승인 없이 HUB에 노출됩니다.</p>
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold text-slate-700">서비스 공급</p>
+                        <p className="text-[11px] text-slate-500">선택한 서비스 운영자의 승인 후 해당 서비스 HUB에 노출됩니다.</p>
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold text-slate-700">내부 상품</p>
+                        <p className="text-[11px] text-slate-500">공급 방식이 설정되지 않아 HUB에 노출되지 않습니다.</p>
+                      </div>
+                      <p className="text-[11px] text-slate-400 pt-1 border-t border-slate-100">
+                        공급 방식은 상품 편집에서 전체 공개 여부와 서비스 공급 대상을 조정할 수 있습니다. 전용 공급 방식 관리 화면은 준비 중입니다.
+                      </p>
+                    </div>
+                  )}
+                </div>
               </Section>
             );
           })()}
