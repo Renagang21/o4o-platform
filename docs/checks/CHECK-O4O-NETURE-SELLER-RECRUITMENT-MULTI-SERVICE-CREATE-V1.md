@@ -50,6 +50,13 @@
 - 노출 승인 정책·offer 2축·event-offer·allowedSellerIds 의미·알림 경로 무변경.
 - 하위호환: 기존 단일 `serviceKey` payload·기존 단일 모집 row 정상 동작.
 
+## 6-1. 배포 후 1차 시도 — migration FAIL → 수정 (2026-06-19)
+
+- **1차 배포 migration FAILED:** `operator does not exist: name[] = text[]`. 원인: DO 블록의 `array_agg(att.attname)`(타입 `name[]`)을 `ARRAY['product_id','seller_id']`(text[])와 비교 → Postgres 연산자 부재.
+- **영향:** 트랜잭션 롤백 → 제약 **미변경**(여전히 UNIQUE(product_id, seller_id)), migration `[ ]` pending 유지(typeorm_migrations 미기록). 데이터 손상 없음. 단 **복수 모집 생성은 DB 제약상 차단**(단일은 정상) — 부분 상태.
+- **수정:** `att.attname::text` + `ARRAY[...]::text[]` 캐스팅(up/down 양쪽). 동일 migration 명/타임스탬프 → 재배포 시 pending 재실행. api-server tsc PASS.
+- 판정: 사용자 기준대로 **FAIL→추가수정** 전환. 재배포 후 재검증.
+
 ## 7. 배포 후 스모크 (필수 — DB migration + 신규 생성 경로)
 
 1. migration `ExpandRecruitmentUniqueToService` 실행 로그 확인(제약 교체 성공, 에러 0).

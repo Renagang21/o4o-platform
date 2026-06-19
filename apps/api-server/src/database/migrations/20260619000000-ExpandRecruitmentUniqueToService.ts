@@ -31,10 +31,10 @@ export class ExpandRecruitmentUniqueToService20260619000000
         WHERE rel.relname = 'neture_partner_recruitments'
           AND con.contype = 'u'
           AND (
-            SELECT array_agg(att.attname ORDER BY att.attname)
+            SELECT array_agg(att.attname::text ORDER BY att.attname::text)
             FROM pg_attribute att
             WHERE att.attrelid = con.conrelid AND att.attnum = ANY(con.conkey)
-          ) = ARRAY['product_id','seller_id']
+          ) = ARRAY['product_id','seller_id']::text[]
         LIMIT 1;
         IF cname IS NOT NULL THEN
           EXECUTE format('ALTER TABLE neture_partner_recruitments DROP CONSTRAINT %I', cname);
@@ -72,10 +72,10 @@ export class ExpandRecruitmentUniqueToService20260619000000
           JOIN pg_class rel ON rel.oid = con.conrelid
           WHERE rel.relname = 'neture_partner_recruitments' AND con.contype = 'u'
             AND (
-              SELECT array_agg(att.attname ORDER BY att.attname)
+              SELECT array_agg(att.attname::text ORDER BY att.attname::text)
               FROM pg_attribute att
               WHERE att.attrelid = con.conrelid AND att.attnum = ANY(con.conkey)
-            ) = ARRAY['product_id','seller_id']
+            ) = ARRAY['product_id','seller_id']::text[]
         ) THEN
           ALTER TABLE neture_partner_recruitments
             ADD CONSTRAINT UQ_neture_partner_recruitments_product_seller
