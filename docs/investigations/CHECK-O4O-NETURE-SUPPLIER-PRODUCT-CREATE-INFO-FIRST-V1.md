@@ -36,12 +36,13 @@
 - **web-neture `tsc --noEmit`: EXIT 0.**
 - 정적: createProduct/handleSubmit/validateStep 로직 무변경(price 검증 유지). ProductForm hideDistribution 재사용. 완료 화면 reviewOnly 분기 보존.
 
-### 배포 후 실브라우저 smoke (A 교훈)
-1. `/supplier/products/register` → 비의약품 → 하나씩 → Step1 정보-우선 안내 배너 표시.
-2. Step2 = '기본 공급가', **전체공개/서비스공급 UI 미표시** + 내부/미노출 안내.
-3. 정보+공급가만으로 등록 → 완료 화면 내부/미노출 안내 + 공급 방식 설정 경로.
-4. 목록 반영 → 상품 = 내부/미노출(전체공개/서비스 미설정). drawer [공급 방식 변경]에서 설정 가능.
-5. 기존 등록/이미지/설명/import 회귀 없음.
+### 배포 후 실브라우저 smoke — 2026-06-19 **PASS** (renagang21, 비파괴·미제출)
+1. `/supplier/products/register` → 비의약품 → 하나씩 → Step 표시 **"2 기본 공급가"** + **Step1 정보-우선 안내 배너**("먼저 상품 정보 / 공급 방식은 저장 후 / 설정 전까지 HUB 미노출"). **PASS**
+2. Step2 = **"기본 공급가"** 헤딩 + 안내("공급 방식은 등록 후 [공급 방식 변경]에서 설정 / 지금 저장 시 내부 상품(미노출)") + **전체공개/서비스공급 UI 완전 미표시**(공급가/서비스가/소비자가/재고/추천만). **PASS**
+3. **완료 화면 내부/미노출 안내 + 데이터(is_public=false 등) 검증 = 미수행(운영 테스트 상품 생성 회피).** 완료 화면 안내는 정적 조건부(`!reviewOnly`)로 코드 확정. 생성 결과는 createProduct 로직(form 기본 PRIVATE/[] 유지)으로 보증.
+4. 기존 위저드 진입/Step1 필드/카테고리 정상, 회귀 없음.
+
+> 참고: 등록 진입 페이지 BlockGuide 의 "Step 2: 공급가, 유통 정책, 서비스 노출" 안내 문구는 **CMS guide block**(코드 STEPS 아님)이라 본 WO 미접촉 — 후속 guide 콘텐츠 정정 대상.
 
 ## 5. 비범위 / 준수
 
