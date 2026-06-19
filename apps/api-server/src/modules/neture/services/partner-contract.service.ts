@@ -539,12 +539,18 @@ export class NeturePartnerContractService {
    */
   async createRecruitment(
     sellerUserId: string,
-    input: { masterId?: string; serviceKey?: string; commissionRate?: number; consumerPrice?: number; shopUrl?: string; imageUrl?: string },
+    input: { masterId?: string; serviceKey?: string; serviceKeys?: string[]; commissionRate?: number; consumerPrice?: number; shopUrl?: string; imageUrl?: string },
   ) {
     const masterId = (input.masterId || '').trim();
-    const serviceKey = (input.serviceKey || '').trim();
+    // WO-O4O-NETURE-SELLER-RECRUITMENT-MULTI-SERVICE-CREATE-V1:
+    //   serviceKeys[](복수) 우선, 없으면 serviceKey(단수, 하위호환). dedupe + trim.
+    //   서비스당 row 1개 생성(원자적 — 하나라도 불가하면 전체 실패).
+    const rawKeys = (input.serviceKeys && input.serviceKeys.length > 0)
+      ? input.serviceKeys
+      : (input.serviceKey ? [input.serviceKey] : []);
+    const serviceKeys = [...new Set(rawKeys.map((k) => (k || '').trim()).filter(Boolean))];
     if (!masterId) return { success: false as const, error: 'MASTER_ID_REQUIRED' };
-    if (!serviceKey) return { success: false as const, error: 'SERVICE_KEY_REQUIRED' };
+    if (serviceKeys.length === 0) return { success: false as const, error: 'SERVICE_KEY_REQUIRED' };
 
     // offer 해소 (master_id + 공급자 user_id). PRIVATE·APPROVED 우선.
     const rows: Array<{
@@ -571,41 +577,63 @@ export class NeturePartnerContractService {
       return { success: false as const, error: 'OFFER_NOT_PRIVATE' };
     }
 
-    // [결정 3] 의약품/규제 상품 → 약국 대상 서비스에만
+    // [결정 3] 의약품/규제 상품 → 약국 대상 서비스에만 (원자적: 하나라도 불가하면 전체 실패)
     if (offer.is_regulated) {
       const isPharmacyAudience = await new ServiceAudienceService(AppDataSource).getPharmacyAudienceResolver();
-      if (!isPharmacyAudience(serviceKey)) {
+      const nonPharmacy = serviceKeys.filter((k) => !isPharmacyAudience(k));
+      if (nonPharmacy.length > 0) {
         return { success: false as const, error: 'DRUG_SERVICE_NOT_PHARMACY_AUDIENCE' };
       }
     }
 
-    // UNIQUE(productId, sellerId) — 제품당 1 모집
-    const existing = await this.recruitmentRepo.findOne({ where: { productId: masterId, sellerId: sellerUserId } });
-    if (existing) return { success: false as const, error: 'RECRUITMENT_ALREADY_EXISTS' };
+    // UNIQUE(productId, sellerId, serviceId) — 서비스당 1 모집. 선택 서비스 중 하나라도 이미 있으면 전체 실패(원자적).
+    const existing = await this.recruitmentRepo.find({
+      where: serviceKeys.map((k) => ({ productId: masterId, sellerId: sellerUserId, serviceId: k })),
+    });
+    if (existing.length > 0) return { success: false as const, error: 'RECRUITMENT_ALREADY_EXISTS' };
 
     const commissionRate = Number.isFinite(Number(input.commissionRate))
       ? Math.max(0, Math.min(100, Number(input.commissionRate)))
       : 0;
     const consumerPrice = Number.isFinite(Number(input.consumerPrice)) ? Math.max(0, Number(input.consumerPrice)) : 0;
 
-    const recruitment = this.recruitmentRepo.create({
-      productId: masterId,
-      productName: offer.product_name,
-      manufacturer: offer.manufacturer ?? undefined,
-      sellerId: sellerUserId, // 공급자 user id — C bridge offer 해소 전제
-      sellerName: offer.seller_name || '공급자',
-      serviceId: serviceKey,
-      consumerPrice,
-      commissionRate,
-      shopUrl: input.shopUrl?.trim() || undefined,
-      imageUrl: input.imageUrl?.trim() || undefined,
-      status: RecruitmentStatus.RECRUITING,
-      // WO-O4O-SELLER-RECRUITMENT-EXPOSURE-BACKEND-V1: 신규 모집은 운영자 노출 승인 대기
-      exposureStatus: ExposureStatus.PENDING,
+    // 서비스당 row 생성 — 트랜잭션으로 원자 처리(부분 성공 방지).
+    const created = await AppDataSource.transaction(async (manager) => {
+      const repo = manager.getRepository(NeturePartnerRecruitment);
+      const out: Array<{ id: string; serviceId: string; status: RecruitmentStatus }> = [];
+      for (const k of serviceKeys) {
+        const recruitment = repo.create({
+          productId: masterId,
+          productName: offer.product_name,
+          manufacturer: offer.manufacturer ?? undefined,
+          sellerId: sellerUserId, // 공급자 user id — C bridge offer 해소 전제
+          sellerName: offer.seller_name || '공급자',
+          serviceId: k,
+          consumerPrice,
+          commissionRate,
+          shopUrl: input.shopUrl?.trim() || undefined,
+          imageUrl: input.imageUrl?.trim() || undefined,
+          status: RecruitmentStatus.RECRUITING,
+          // WO-O4O-SELLER-RECRUITMENT-EXPOSURE-BACKEND-V1: 신규 모집은 운영자 노출 승인 대기(서비스별 독립)
+          exposureStatus: ExposureStatus.PENDING,
+        });
+        const saved = await repo.save(recruitment);
+        out.push({ id: saved.id, serviceId: saved.serviceId, status: saved.status });
+      }
+      return out;
     });
-    const saved = await this.recruitmentRepo.save(recruitment);
-    logger.info(`[NeturePartnerContractService] Recruitment created: ${saved.id} (master=${masterId}, sellerUser=${sellerUserId}, service=${serviceKey})`);
-    return { success: true as const, data: { id: saved.id, productId: saved.productId, serviceId: saved.serviceId, status: saved.status } };
+    logger.info(`[NeturePartnerContractService] Recruitment created: ${created.length} row(s) (master=${masterId}, sellerUser=${sellerUserId}, services=${serviceKeys.join(',')})`);
+    // 하위호환: 단일 생성 호출부 대비 id/serviceId(첫 row) 유지 + recruitments[] 추가.
+    return {
+      success: true as const,
+      data: {
+        id: created[0].id,
+        productId: masterId,
+        serviceId: created[0].serviceId,
+        status: created[0].status,
+        recruitments: created,
+      },
+    };
   }
 
   /**

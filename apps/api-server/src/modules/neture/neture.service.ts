@@ -596,7 +596,8 @@ export class NetureService {
   // WO-O4O-SELLER-RECRUITMENT-CREATION-FLOW-V1: 공급자 모집 생성
   async createPartnerRecruitment(
     sellerUserId: string,
-    input: { masterId?: string; serviceKey?: string; commissionRate?: number; consumerPrice?: number; shopUrl?: string; imageUrl?: string },
+    // WO-O4O-NETURE-SELLER-RECRUITMENT-MULTI-SERVICE-CREATE-V1: serviceKeys[](복수) 수용 + serviceKey 하위호환
+    input: { masterId?: string; serviceKey?: string; serviceKeys?: string[]; commissionRate?: number; consumerPrice?: number; shopUrl?: string; imageUrl?: string },
   ) {
     return this.partnerContractService.createRecruitment(sellerUserId, input);
   }

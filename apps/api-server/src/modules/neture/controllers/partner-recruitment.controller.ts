@@ -190,9 +190,10 @@ export function createPartnerRecruitmentController(deps: {
       if (!userId) {
         return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
       }
-      const { masterId, serviceKey, commissionRate, consumerPrice, shopUrl, imageUrl } = req.body || {};
+      // WO-O4O-NETURE-SELLER-RECRUITMENT-MULTI-SERVICE-CREATE-V1: serviceKeys[](복수) + serviceKey 하위호환
+      const { masterId, serviceKey, serviceKeys, commissionRate, consumerPrice, shopUrl, imageUrl } = req.body || {};
       const result = await netureService.createPartnerRecruitment(userId, {
-        masterId, serviceKey, commissionRate, consumerPrice, shopUrl, imageUrl,
+        masterId, serviceKey, serviceKeys, commissionRate, consumerPrice, shopUrl, imageUrl,
       });
       if (!result.success) {
         const map: Record<string, [number, string]> = {

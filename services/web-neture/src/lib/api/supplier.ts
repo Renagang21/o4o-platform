@@ -1418,12 +1418,15 @@ export const supplierRecruitmentApi = {
 
   async create(input: {
     masterId: string;
-    serviceKey: string;
+    // WO-O4O-NETURE-SELLER-RECRUITMENT-MULTI-SERVICE-CREATE-V1:
+    //   serviceKeys[](복수) 우선. serviceKey(단수)는 하위호환.
+    serviceKey?: string;
+    serviceKeys?: string[];
     commissionRate?: number;
     consumerPrice?: number;
     shopUrl?: string;
     imageUrl?: string;
-  }): Promise<{ success: boolean; error?: string; message?: string; data?: { id: string } }> {
+  }): Promise<{ success: boolean; error?: string; message?: string; data?: { id: string; recruitments?: Array<{ id: string; serviceId: string; status: string }> } }> {
     try {
       const response = await api.post('/neture/partner/recruitments', input);
       return response.data;

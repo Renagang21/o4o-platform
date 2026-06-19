@@ -39,7 +39,9 @@ export enum ExposureStatus {
 }
 
 @Entity('neture_partner_recruitments')
-@Unique(['productId', 'sellerId'])
+// WO-O4O-NETURE-SELLER-RECRUITMENT-MULTI-SERVICE-CREATE-V1:
+// 서비스당 1 row — 같은 상품×판매자라도 service 별 독립 모집(각자 exposure_status).
+@Unique(['productId', 'sellerId', 'serviceId'])
 @Index(['status'])
 export class NeturePartnerRecruitment {
   @PrimaryGeneratedColumn('uuid')

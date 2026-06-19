@@ -24,25 +24,36 @@ interface Props {
   onCreated?: () => void;
 }
 
+// WO-O4O-NETURE-SELLER-RECRUITMENT-MULTI-SERVICE-CREATE-V1:
+//   규제(의약품 계열) 상품은 약국 대상 서비스에만 모집 가능 — 프론트도 반영(백엔드 gate 가 최종 방어).
+const REGULATED_TYPES = ['DRUG', 'QUASI_DRUG', 'MEDICAL_DEVICE', 'HEALTH_FUNCTIONAL'];
+
 export default function RecruitmentCreateModal({ product, onClose, onCreated }: Props) {
-  const [serviceKey, setServiceKey] = useState('');
+  // WO-O4O-NETURE-SELLER-RECRUITMENT-MULTI-SERVICE-CREATE-V1: 복수 서비스 선택
+  const [serviceKeys, setServiceKeys] = useState<string[]>([]);
   const [commissionRate, setCommissionRate] = useState('');
   const [consumerPrice, setConsumerPrice] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const notPrivate = product.distributionType && product.distributionType !== 'PRIVATE';
+  const isRegulated = !!product.regulatoryType && REGULATED_TYPES.includes(product.regulatoryType);
+
+  const toggleService = (key: string) => {
+    setError(null);
+    setServiceKeys((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
+  };
 
   const handleSubmit = async () => {
     setError(null);
-    if (!serviceKey) {
-      setError('모집 대상 서비스를 선택해 주세요.');
+    if (serviceKeys.length === 0) {
+      setError('모집할 서비스를 한 개 이상 선택해 주세요.');
       return;
     }
     setSubmitting(true);
     const result = await supplierRecruitmentApi.create({
       masterId: product.masterId,
-      serviceKey,
+      serviceKeys,
       commissionRate: commissionRate ? Number(commissionRate) : undefined,
       consumerPrice: consumerPrice ? Number(consumerPrice) : undefined,
     });
@@ -78,18 +89,40 @@ export default function RecruitmentCreateModal({ product, onClose, onCreated }: 
           )}
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">모집 대상 서비스 <span className="text-red-500">*</span></label>
-            <select
-              value={serviceKey}
-              onChange={(e) => setServiceKey(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">선택…</option>
-              {SERVICE_OPTIONS.map((s) => (
-                <option key={s.key} value={s.key}>{s.label}</option>
-              ))}
-            </select>
-            <p className="mt-1 text-xs text-slate-400">의약품·규제 상품은 약국 대상 서비스에만 모집할 수 있습니다.</p>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">모집할 서비스 <span className="text-red-500">*</span> <span className="text-xs font-normal text-slate-400">(복수 선택 가능)</span></label>
+            <div className="space-y-1.5">
+              {SERVICE_OPTIONS.map((s) => {
+                const disabled = isRegulated && !s.pharmacy;
+                const checked = serviceKeys.includes(s.key);
+                return (
+                  <label
+                    key={s.key}
+                    className={`flex items-center gap-2 px-3 py-2 border rounded-lg text-sm ${
+                      disabled
+                        ? 'border-slate-100 bg-slate-50 text-slate-300 cursor-not-allowed'
+                        : checked
+                        ? 'border-blue-500 bg-blue-50 text-slate-800 cursor-pointer'
+                        : 'border-slate-200 text-slate-700 hover:border-blue-300 cursor-pointer'
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      disabled={disabled}
+                      onChange={() => toggleService(s.key)}
+                      className="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
+                    />
+                    <span>{s.label}</span>
+                    {disabled && <span className="ml-auto text-xs">약국 전용 상품 — 선택 불가</span>}
+                  </label>
+                );
+              })}
+            </div>
+            <p className="mt-1 text-xs text-slate-400">
+              {isRegulated
+                ? '의약품·규제 상품은 약국 대상 서비스(GlycoPharm / KPA)에만 모집할 수 있습니다.'
+                : '여러 서비스를 선택하면 서비스별로 모집이 생성되며, 운영자 노출 승인도 서비스별로 진행됩니다.'}
+            </p>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
