@@ -142,7 +142,6 @@ export default function SupplierDashboardPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <KpiCard label="등록 상품" value={kpi?.registeredProducts ?? 0} />
             <KpiCard label="판매 중" value={kpi?.activeProducts ?? 0} accent />
-            <KpiCard label="매장 진열" value={kpi?.storeListings ?? 0} />
             <KpiCard label="최근 7일 주문" value={kpi?.recentOrders ?? 0} accent />
           </div>
         )}
@@ -183,7 +182,7 @@ export default function SupplierDashboardPage() {
             <div>
               <h2 className="text-base font-semibold text-violet-900">유통참여형 펀딩</h2>
               <p className="text-sm text-violet-600 mt-0.5">
-                제품 개발 또는 유통 준비 단계에서 참여자를 모으고, Neture 운영자의 송금 확인과 제품 정산을 통해 초기 매장 랜딩을 만들어 보세요. 목표 금액보다 목표 매장 수와 제품 정산 구조를 먼저 설계하는 것이 핵심입니다.
+                신규 제품 또는 신규 유통안을 콘텐츠로 소개하고 참여 의향을 확인하는 Neture 전용 모집 기능입니다. O4O는 콘텐츠 게시·참여 신청·참여 현황 확인까지만 제공하며, 실제 거래·정산·발송은 공급자가 별도로 진행합니다.
               </p>
             </div>
           </div>

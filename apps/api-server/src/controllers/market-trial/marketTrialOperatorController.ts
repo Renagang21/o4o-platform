@@ -1051,6 +1051,17 @@ export class MarketTrialOperatorController {
    */
   static async updateParticipantConversionStatus(req: AuthRequest, res: Response) {
     try {
+      // WO-O4O-MARKET-TRIAL-UI-COMMERCE-LABEL-CLEANUP-V1:
+      // 유통참여형 펀딩 = Neture 전용 content-only 모집. 참여자 매장 도입/첫 주문(전환 퍼널)
+      // 상태 변경을 중단한다. (기존 customerConversionStatus 데이터는 건드리지 않음.)
+      return res.status(409).json({
+        success: false,
+        error: 'Market Trial conversion status is disabled by content-only boundary policy.',
+        message: '유통참여형 펀딩은 매장 도입 또는 첫 주문 전환 상태를 관리하지 않습니다.',
+        code: 'MARKET_TRIAL_CONVERSION_STATUS_DISABLED',
+      });
+
+      // eslint-disable-next-line no-unreachable -- 정책 비활성화. 기존 로직 보존(정의 재확인 시 참조).
       const { id, participantId } = req.params;
       const { status, note } = req.body;
       const ds = MarketTrialOperatorController.dataSource;

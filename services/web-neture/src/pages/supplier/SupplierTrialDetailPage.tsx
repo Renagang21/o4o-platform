@@ -148,6 +148,9 @@ export default function SupplierTrialDetailPage() {
   const { trial, summary, forumPostId } = results;
   const nextAction = NEXT_ACTION[trial.status];
   const statusColor = STATUS_COLOR[trial.status] ?? '#9CA3AF';
+  // WO-O4O-MARKET-TRIAL-UI-COMMERCE-LABEL-CLEANUP-V1:
+  // content-only 정책 — 매장 진열/거래선 전환/이행/상품 전환 등 커머스 퍼널 섹션은 노출하지 않는다.
+  const SHOW_MARKET_TRIAL_COMMERCE_UI = false;
   const conversionStatus = getConversionStatus(trial as any);
 
   const isResultPhase = ['outcome_confirming', 'fulfilled', 'closed'].includes(trial.status);
@@ -384,7 +387,7 @@ export default function SupplierTrialDetailPage() {
       </div>
 
       {/* 이행 결과 (결과 확인 이후 단계만 표시) */}
-      {isResultPhase && summary.totalCount > 0 && (
+      {SHOW_MARKET_TRIAL_COMMERCE_UI && isResultPhase && summary.totalCount > 0 && (
         <div style={s.section}>
           <h2 style={s.sectionTitle}>이행 현황</h2>
           <div style={s.statsGrid}>
@@ -407,7 +410,7 @@ export default function SupplierTrialDetailPage() {
       )}
 
       {/* 매장 진열 현황 (WO-MARKET-TRIAL-LISTING-AUTOLINK-V1) */}
-      {isResultPhase && (summary.listingCount ?? 0) > 0 && (
+      {SHOW_MARKET_TRIAL_COMMERCE_UI && isResultPhase && (summary.listingCount ?? 0) > 0 && (
         <div style={s.section}>
           <h2 style={s.sectionTitle}>활용 상품 연결 현황</h2>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -425,7 +428,7 @@ export default function SupplierTrialDetailPage() {
       )}
 
       {/* 거래선 전환 현황 (WO-MARKET-TRIAL-PARTICIPANT-TO-CUSTOMER-FLOW-V1) */}
-      {isResultPhase && summary.conversionDistribution && summary.totalCount > 0 && (() => {
+      {SHOW_MARKET_TRIAL_COMMERCE_UI && isResultPhase && summary.conversionDistribution && summary.totalCount > 0 && (() => {
         const dist = summary.conversionDistribution!;
         const total = summary.totalCount;
         const adoptedCount = (dist.adopted ?? 0) + (dist.first_order ?? 0);
@@ -499,7 +502,7 @@ export default function SupplierTrialDetailPage() {
       )}
 
       {/* 상품 전환 상태 */}
-      {conversionStatus !== 'not_eligible' && (
+      {SHOW_MARKET_TRIAL_COMMERCE_UI && conversionStatus !== 'not_eligible' && (
         <div style={s.section}>
           <h2 style={s.sectionTitle}>상품 전환 상태</h2>
           {conversionStatus === 'converted' ? (

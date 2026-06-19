@@ -564,6 +564,8 @@ export async function updateParticipantConversionStatus(
   status: CustomerConversionStatus,
   note?: string,
 ): Promise<{ id: string; customerConversionStatus: CustomerConversionStatus; customerConversionAt: string | null; customerConversionNote: string | null }> {
+  marketTrialCommerceDisabled('유통참여형 펀딩은 매장 도입/첫 주문 전환 상태를 관리하지 않습니다.');
+  // eslint-disable-next-line no-unreachable -- 정책 비활성화. 기존 로직 보존.
   const { data } = await api.patch(
     `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/participants/${participantId}/conversion`,
     { status, note },

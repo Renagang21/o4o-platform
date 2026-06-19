@@ -43,6 +43,11 @@ import { PAYMENT_STATUS_LABELS } from '../../api/trial';
 import { BaseTable } from '@o4o/ui';
 import type { O4OColumn } from '@o4o/ui';
 
+// WO-O4O-MARKET-TRIAL-UI-COMMERCE-LABEL-CLEANUP-V1:
+// content-only 정책 — 제품 전환 / 매장 진열 / 정산 / 결제(오프라인 입금) / 매장 랜딩 단계 등
+// 커머스 퍼널 UI 는 노출하지 않는다. (신규 mutation 은 backend + api client 에서 이미 차단됨.)
+const SHOW_MARKET_TRIAL_COMMERCE_UI = false;
+
 type ParticipantFilter =
   | 'all' | 'product' | 'cash' | 'pending' | 'fulfilled'
   | 'conv_interested' | 'conv_considering' | 'conv_adopted' | 'conv_first_order';
@@ -504,11 +509,13 @@ export default function MarketTrialApprovalDetailPage() {
       )}
 
       {/* Product Conversion Section — WO-MARKET-TRIAL-TO-PRODUCT-CONVERSION-FLOW-V1 */}
-      <ProductConversionSection
-        trial={trial}
-        productRewardCount={summary?.productCount ?? 0}
-        onConvertClick={openConvertModal}
-      />
+      {SHOW_MARKET_TRIAL_COMMERCE_UI && (
+        <ProductConversionSection
+          trial={trial}
+          productRewardCount={summary?.productCount ?? 0}
+          onConvertClick={openConvertModal}
+        />
+      )}
 
       {/* Approve/Reject buttons + 승인 전 확인사항 — WO-O4O-NETURE-DISTRIBUTION-FUNDING-OPERATOR-PREAPPROVAL-CHECKLIST-V1 */}
       {isSubmitted && (
@@ -582,7 +589,7 @@ export default function MarketTrialApprovalDetailPage() {
       )}
 
       {/* Product Conversion Modal — WO-MARKET-TRIAL-PRODUCT-LINK-SEARCH-UI-V1 */}
-      {showConvertModal && (
+      {SHOW_MARKET_TRIAL_COMMERCE_UI && showConvertModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg w-full max-w-3xl max-h-[90vh] flex flex-col">
             {/* Header */}
@@ -807,10 +814,7 @@ const FILTER_OPTIONS: { value: ParticipantFilter; label: string; group?: string 
   { value: 'cash',      label: '현금 보상' },
   { value: 'pending',   label: '이행 대기' },
   { value: 'fulfilled', label: '이행 완료' },
-  { value: 'conv_interested',  label: '관심 확인', group: 'conv' },
-  { value: 'conv_considering', label: '취급 검토', group: 'conv' },
-  { value: 'conv_adopted',     label: '매장 도입', group: 'conv' },
-  { value: 'conv_first_order', label: '첫 주문', group: 'conv' },
+  // WO-O4O-MARKET-TRIAL-UI-COMMERCE-LABEL-CLEANUP-V1: content-only — 전환 퍼널(관심/취급/매장 도입/첫 주문) 필터 제거.
 ];
 
 // WO-O4O-NETURE-DISTRIBUTION-FUNDING-STORE-LANDING-TRACKING-V1: 매장 랜딩 단계 라벨
@@ -975,7 +979,7 @@ function ParticipantSection({
       )}
 
       {/* WO-O4O-NETURE-DISTRIBUTION-FUNDING-STORE-LANDING-TRACKING-V1: 매장 랜딩 파이프라인 요약 + 안내 */}
-      {totalCount > 0 && filter === 'all' && (
+      {SHOW_MARKET_TRIAL_COMMERCE_UI && totalCount > 0 && filter === 'all' && (
         <div className="flex flex-wrap items-center gap-1.5 mb-2">
           <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
             입금 확인 완료 {participants.filter((p) => (p.paymentStatus ?? 'unpaid') === 'paid').length}명
@@ -991,7 +995,7 @@ function ParticipantSection({
           </span>
         </div>
       )}
-      {totalCount > 0 && (
+      {SHOW_MARKET_TRIAL_COMMERCE_UI && totalCount > 0 && (
         <p className="text-xs text-gray-500 mb-3">
           입금 확인 완료자는 정산 방식(제품/수익)을 선택합니다. <strong>제품 정산을 선택한 참여자만 제품 제공·매장 랜딩 추적 대상</strong>이며, 수익·현금성 정산 선택자는 랜딩 대상으로 분류하지 않습니다. <strong>매장 랜딩은 자동 확정되지 않으며</strong> 운영자가 정산·활용 상품 연결 상태를 참고해 확인하고, 필요하면 제품 개발자와 함께 확정합니다.
         </p>
@@ -1014,8 +1018,10 @@ function ParticipantSection({
                 <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">유형</th>
                 <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">보상</th>
                 <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">이행</th>
-                <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">매장 랜딩 단계</th>
-                {trialConverted && (
+                {SHOW_MARKET_TRIAL_COMMERCE_UI && (
+                  <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">매장 랜딩 단계</th>
+                )}
+                {SHOW_MARKET_TRIAL_COMMERCE_UI && trialConverted && (
                   <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">활용 상품 연결</th>
                 )}
                 <th className="text-left py-2 px-4 text-xs font-medium text-gray-500">참여일</th>
@@ -1052,6 +1058,7 @@ function ParticipantSection({
                         {isFulfilled ? '완료' : '대기'}
                       </span>
                     </td>
+                    {SHOW_MARKET_TRIAL_COMMERCE_UI && (
                     <td className="py-2.5 px-2">
                       {isUpdatingConv ? (
                         <span className="text-xs text-gray-400">...</span>
@@ -1067,7 +1074,8 @@ function ParticipantSection({
                         </select>
                       )}
                     </td>
-                    {trialConverted && (
+                    )}
+                    {SHOW_MARKET_TRIAL_COMMERCE_UI && trialConverted && (
                       <td className="py-2.5 px-2">
                         {p.listingId ? (
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
@@ -1113,7 +1121,7 @@ function ParticipantSection({
       )}
 
       {/* WO-NETURE-MARKET-TRIAL-PAYMENT-READINESS-V1: 결제(수기 송금/PG-ready) 상태 관리 섹션 */}
-      {PAYMENT_VISIBLE_STATUSES.includes(trialStatus) && totalCount > 0 && (
+      {SHOW_MARKET_TRIAL_COMMERCE_UI && PAYMENT_VISIBLE_STATUSES.includes(trialStatus) && totalCount > 0 && (
         <div className="mt-4 border-t border-gray-100 pt-4">
           <div className="flex items-center flex-wrap gap-2 mb-3">
             <h3 className="text-sm font-semibold text-gray-700">오프라인 입금 관리</h3>
@@ -1224,7 +1232,7 @@ function ParticipantSection({
       )}
 
       {/* WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1: 정산 상태 관리 섹션 */}
-      {SETTLEMENT_VISIBLE_STATUSES.includes(trialStatus) && totalCount > 0 && (
+      {SHOW_MARKET_TRIAL_COMMERCE_UI && SETTLEMENT_VISIBLE_STATUSES.includes(trialStatus) && totalCount > 0 && (
         <div className="mt-4 border-t border-gray-100 pt-4">
           <h3 className="text-sm font-semibold text-gray-700 mb-3">정산 상태 관리</h3>
           <div className="overflow-x-auto -mx-4 sm:-mx-5">

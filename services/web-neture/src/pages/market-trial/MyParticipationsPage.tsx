@@ -102,6 +102,9 @@ function DetailDrawer({ trialId, onClose, onChoiceSaved }: DetailDrawerProps) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ kind: 'ok' | 'err'; text: string } | null>(null);
+  // WO-O4O-MARKET-TRIAL-UI-COMMERCE-LABEL-CLEANUP-V1:
+  // content-only 정책 — 정산 선택(제품/현금) 등 커머스 액션 UI 는 노출하지 않는다.
+  const SHOW_MARKET_TRIAL_COMMERCE_UI = false;
 
   useEffect(() => {
     let active = true;
@@ -241,7 +244,7 @@ function DetailDrawer({ trialId, onClose, onChoiceSaved }: DetailDrawerProps) {
               )}
             </div>
 
-            {canChoose && (
+            {SHOW_MARKET_TRIAL_COMMERCE_UI && canChoose && (
               <div
                 style={{
                   background: '#FFF7ED',
