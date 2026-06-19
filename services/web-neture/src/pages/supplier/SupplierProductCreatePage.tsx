@@ -487,11 +487,11 @@ export default function SupplierProductCreatePage() {
       {/* GuideBlock */}
       <GuideBlock
         variant="info"
-        title={guideTitle ?? '상품 등록 절차를 안내합니다.'}
-        description={guideDesc ?? '3단계 마법사로 상품 기본 정보, 가격/유통 설정, 이미지/설명을 순서대로 입력합니다.'}
+        title={guideTitle ?? '상품 정보를 먼저 등록합니다.'}
+        description={guideDesc ?? '상품 기본 정보와 기본 공급가를 저장합니다. 공급 방식(전체 공개 / 서비스 공급)은 저장 후 상품 상세의 [공급 방식 변경]에서 설정하며, 설정 전까지 HUB에 노출되지 않습니다.'}
         steps={guideSteps ?? [
           'Step 1: 상품명, 카테고리, 브랜드, 규제 정보를 입력합니다',
-          'Step 2: 공급가, 유통 정책, 서비스 노출을 설정합니다',
+          'Step 2: 기본 공급가를 입력합니다 (공급 방식은 저장 후 별도 설정)',
           'Step 3: 대표 이미지와 상세 설명을 작성하고 등록합니다',
         ]}
         compact
