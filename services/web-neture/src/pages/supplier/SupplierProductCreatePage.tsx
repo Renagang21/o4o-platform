@@ -35,7 +35,8 @@ import { fetchGuidePageContent } from '../../api/guideContent';
 const GUIDE_PAGE_KEY = 'supplier.product.editor';
 const SERVICE_KEY = 'neture';
 
-const STEPS = ['기본 정보', '가격 / 유통', '이미지 / 설명'];
+// WO-O4O-NETURE-SUPPLIER-PRODUCT-CREATE-INFO-FIRST-V1: 정보-우선 — 공급 방식은 등록 후 별도 설정
+const STEPS = ['기본 정보', '기본 공급가', '이미지 / 설명'];
 
 interface FormData {
   barcode: string;
@@ -433,6 +434,14 @@ export default function SupplierProductCreatePage() {
           )}
         </div>
 
+        {/* WO-O4O-NETURE-SUPPLIER-PRODUCT-CREATE-INFO-FIRST-V1: 정보-우선 — 등록 직후 내부/미노출 안내 + 공급 방식 설정 경로 */}
+        {!reviewOnly && (
+          <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-600">
+            현재 이 상품은 <strong>내부 상품(공급 방식 미설정)</strong> 상태로 HUB에 노출되지 않습니다.
+            B2B 전체 공급이나 서비스 공급을 시작하려면 <strong>제품 목록 → 상품 상세의 [공급 방식 변경]</strong>에서 공급 방식을 설정하세요.
+          </div>
+        )}
+
         <div>
           <div className="text-xs font-semibold text-slate-500 mb-2">다음 작업</div>
           <div className="grid sm:grid-cols-2 gap-2">
@@ -549,6 +558,11 @@ export default function SupplierProductCreatePage() {
       {/* ==================== Step 1: 기본 정보 ==================== */}
       {currentStep === 1 && (
         <>
+          {/* WO-O4O-NETURE-SUPPLIER-PRODUCT-CREATE-INFO-FIRST-V1: 정보-우선 안내 */}
+          <div className="rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-xs text-blue-800">
+            먼저 <strong>상품 정보</strong>를 등록합니다. 공급 방식(전체 공개 / 서비스 공급)은 저장 후 상품 상세에서 별도로 설정할 수 있으며,
+            공급 방식이 설정되기 전까지 이 상품은 <strong>HUB에 노출되지 않습니다</strong>.
+          </div>
           <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-6 space-y-5">
             <h3 className="text-lg font-semibold text-slate-800">기본 정보</h3>
 
@@ -746,14 +760,20 @@ export default function SupplierProductCreatePage() {
         </>
       )}
 
-      {/* ==================== Step 2: 가격 / 유통 / 서비스 (WO-O4O-NETURE-PRODUCT-FORM-UNIFICATION-V1) ==================== */}
+      {/* ==================== Step 2: 기본 공급가 (WO-O4O-NETURE-SUPPLIER-PRODUCT-CREATE-INFO-FIRST-V1) ====================
+           정보-우선: 등록 단계에서는 기본 공급가만 입력하고, 공급 방식(전체 공개/서비스 공급)은 등록 후 별도 설정한다. */}
       {currentStep === 2 && (
         <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-slate-800 mb-5">가격 / 유통 / 서비스</h3>
+          <h3 className="text-lg font-semibold text-slate-800 mb-2">기본 공급가</h3>
+          <p className="text-xs text-slate-500 mb-5">
+            공급 방식(전체 공개 / 서비스 공급)은 등록 후 상품 상세의 <strong>[공급 방식 변경]</strong>에서 설정합니다.
+            지금 저장하면 <strong>내부 상품(미노출)</strong>으로 등록됩니다.
+          </p>
           <ProductForm
             mode="create"
             initialData={productFormInitialData}
             onChange={handleProductFormChange}
+            hideDistribution
           />
         </div>
       )}
