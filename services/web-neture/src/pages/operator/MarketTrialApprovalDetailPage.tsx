@@ -8,7 +8,7 @@
  * 운영자 상세 — Trial 정보 확인 + 승인/반려 + 참여자 이행 상태 관리
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   getOperatorTrialDetail,
@@ -23,8 +23,6 @@ import {
   updateParticipantPaymentStatus,
   createListingFromTrialParticipant,
   updateTrialStatus,
-  convertTrialToProduct,
-  searchProductsForConversion,
   getOperatorTrialKpi,
 } from '../../api/trial';
 import type {
@@ -33,15 +31,12 @@ import type {
   TrialFunnel,
   ParticipantListResponse,
   TrialStatus,
-  ProductSearchItem,
   CustomerConversionStatus,
   SettlementStatus,
   PaymentStatus,
   MarketTrialDetailKpi,
 } from '../../api/trial';
 import { PAYMENT_STATUS_LABELS } from '../../api/trial';
-import { BaseTable } from '@o4o/ui';
-import type { O4OColumn } from '@o4o/ui';
 
 // WO-O4O-MARKET-TRIAL-UI-COMMERCE-LABEL-CLEANUP-V1:
 // content-only 정책 — 제품 전환 / 매장 진열 / 정산 / 결제(오프라인 입금) / 매장 랜딩 단계 등
@@ -92,15 +87,6 @@ export default function MarketTrialApprovalDetailPage() {
   // WO-NETURE-MARKET-TRIAL-PAYMENT-READINESS-V1
   const [updatingPaymentId, setUpdatingPaymentId] = useState<string | null>(null);
   const [showStatusModal, setShowStatusModal] = useState(false);
-  // WO-MARKET-TRIAL-PRODUCT-LINK-SEARCH-UI-V1
-  const [showConvertModal, setShowConvertModal] = useState(false);
-  const [convertNote, setConvertNote] = useState('');
-  const [convertLoading, setConvertLoading] = useState(false);
-  const [productSearchKeyword, setProductSearchKeyword] = useState('');
-  const [productSearchResults, setProductSearchResults] = useState<ProductSearchItem[]>([]);
-  const [productSearchLoading, setProductSearchLoading] = useState(false);
-  const [selectedProductKey, setSelectedProductKey] = useState<Set<string>>(new Set());
-  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   // WO-NETURE-MARKET-TRIAL-ANALYTICS-AND-KPI-V1
   const [trialKpi, setTrialKpi] = useState<MarketTrialDetailKpi | null>(null);
 
@@ -280,58 +266,6 @@ export default function MarketTrialApprovalDetailPage() {
     }
   };
 
-  const handleProductSearch = useCallback(async (keyword: string, supplierUserId?: string) => {
-    setProductSearchLoading(true);
-    try {
-      const result = await searchProductsForConversion(keyword, { supplierUserId, limit: 20 });
-      setProductSearchResults(result.data);
-    } catch {
-      setProductSearchResults([]);
-    } finally {
-      setProductSearchLoading(false);
-    }
-  }, []);
-
-  const handleSearchKeywordChange = (kw: string) => {
-    setProductSearchKeyword(kw);
-    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
-    searchDebounceRef.current = setTimeout(() => {
-      handleProductSearch(kw, trial?.supplierId);
-    }, 300);
-  };
-
-  const openConvertModal = () => {
-    setSelectedProductKey(new Set());
-    setProductSearchKeyword('');
-    setConvertNote('');
-    setShowConvertModal(true);
-    // Load initial list (filtered by trial supplier if available)
-    handleProductSearch('', trial?.supplierId);
-  };
-
-  const handleConvert = async () => {
-    if (!id) return;
-    const selectedId = [...selectedProductKey][0];
-    if (!selectedId) {
-      setError('연결할 상품을 선택해주세요.');
-      return;
-    }
-
-    setConvertLoading(true);
-    try {
-      await convertTrialToProduct(id, {
-        productId: selectedId,
-        conversionNote: convertNote.trim() || undefined,
-      });
-      setShowConvertModal(false);
-      await loadAll();
-    } catch (err: any) {
-      setError(err.response?.data?.message || err.message || '상품 전환에 실패했습니다.');
-    } finally {
-      setConvertLoading(false);
-    }
-  };
-
   const handleTrialStatusChange = async (newStatus: TrialStatus) => {
     if (!id) return;
     setActionLoading(true);
@@ -508,15 +442,6 @@ export default function MarketTrialApprovalDetailPage() {
         </div>
       )}
 
-      {/* Product Conversion Section — WO-MARKET-TRIAL-TO-PRODUCT-CONVERSION-FLOW-V1 */}
-      {SHOW_MARKET_TRIAL_COMMERCE_UI && (
-        <ProductConversionSection
-          trial={trial}
-          productRewardCount={summary?.productCount ?? 0}
-          onConvertClick={openConvertModal}
-        />
-      )}
-
       {/* Approve/Reject buttons + 승인 전 확인사항 — WO-O4O-NETURE-DISTRIBUTION-FUNDING-OPERATOR-PREAPPROVAL-CHECKLIST-V1 */}
       {isSubmitted && (
         <>
@@ -583,92 +508,6 @@ export default function MarketTrialApprovalDetailPage() {
               >
                 {actionLoading ? '처리 중...' : '반려하기'}
               </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Product Conversion Modal — WO-MARKET-TRIAL-PRODUCT-LINK-SEARCH-UI-V1 */}
-      {SHOW_MARKET_TRIAL_COMMERCE_UI && showConvertModal && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg w-full max-w-3xl max-h-[90vh] flex flex-col">
-            {/* Header */}
-            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">기존 상품으로 연결</h3>
-              <button
-                onClick={() => setShowConvertModal(false)}
-                className="text-gray-400 hover:text-gray-600 text-xl leading-none"
-              >
-                ×
-              </button>
-            </div>
-
-            {/* Search input */}
-            <div className="px-6 py-3 border-b border-gray-100">
-              <input
-                type="text"
-                value={productSearchKeyword}
-                onChange={(e) => handleSearchKeywordChange(e.target.value)}
-                placeholder="상품명으로 검색..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                autoFocus
-              />
-            </div>
-
-            {/* Product table */}
-            <div className="flex-1 overflow-auto px-6 py-3">
-              {productSearchLoading ? (
-                <p className="text-sm text-gray-400 text-center py-8">검색 중...</p>
-              ) : (
-                <ProductSearchTable
-                  products={productSearchResults}
-                  selectedKeys={selectedProductKey}
-                  onSelectionChange={setSelectedProductKey}
-                />
-              )}
-            </div>
-
-            {/* Selected product display */}
-            {selectedProductKey.size > 0 && (() => {
-              const sel = productSearchResults.find((p) => selectedProductKey.has(p.id));
-              return sel ? (
-                <div className="px-6 py-2 bg-blue-50 border-t border-blue-100 text-sm">
-                  <span className="text-gray-500">선택된 상품: </span>
-                  <span className="font-medium text-blue-800">{sel.name}</span>
-                  {sel.supplierName && (
-                    <span className="text-gray-500 ml-1">/ {sel.supplierName}</span>
-                  )}
-                </div>
-              ) : null;
-            })()}
-
-            {/* Note + actions */}
-            <div className="px-6 py-4 border-t border-gray-200 space-y-3">
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">운영자 메모 (선택)</label>
-                <input
-                  type="text"
-                  value={convertNote}
-                  onChange={(e) => setConvertNote(e.target.value)}
-                  placeholder="전환 사유 또는 메모"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div className="flex gap-2 justify-end">
-                <button
-                  onClick={() => setShowConvertModal(false)}
-                  className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
-                >
-                  취소
-                </button>
-                <button
-                  onClick={handleConvert}
-                  disabled={convertLoading || selectedProductKey.size === 0}
-                  className="px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50"
-                >
-                  {convertLoading ? '처리 중...' : '기존 상품으로 연결'}
-                </button>
-              </div>
             </div>
           </div>
         </div>
@@ -1312,176 +1151,6 @@ function ParticipantSection({
               </tbody>
             </table>
           </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ── Product Search Table ── WO-MARKET-TRIAL-PRODUCT-LINK-SEARCH-UI-V1
-
-const PRODUCT_SEARCH_COLUMNS: O4OColumn<ProductSearchItem>[] = [
-  {
-    key: 'name',
-    header: '상품명',
-    accessor: (r) => r.name,
-    render: (v) => <span className="font-medium text-gray-900 text-sm">{v}</span>,
-  },
-  {
-    key: 'supplierName',
-    header: '공급자',
-    accessor: (r) => r.supplierName,
-    render: (v) => <span className="text-sm text-gray-600">{v || '-'}</span>,
-  },
-  {
-    key: 'categoryName',
-    header: '카테고리',
-    accessor: (r) => r.categoryName,
-    render: (v) => <span className="text-sm text-gray-600">{v || '-'}</span>,
-  },
-  {
-    key: 'regulatoryType',
-    header: '규제 유형',
-    accessor: (r) => r.regulatoryType,
-    render: (v) => v ? (
-      <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">{v}</span>
-    ) : <span className="text-gray-400 text-xs">-</span>,
-  },
-  {
-    key: 'isActive',
-    header: '상태',
-    accessor: (r) => r.isActive,
-    render: (v) => (
-      <span className={`px-2 py-0.5 rounded text-xs font-medium ${v ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
-        {v ? '활성' : '비활성'}
-      </span>
-    ),
-    width: 70,
-  },
-  {
-    key: 'createdAt',
-    header: '등록일',
-    accessor: (r) => r.createdAt,
-    render: (v) => <span className="text-xs text-gray-400">{v ? new Date(v).toLocaleDateString('ko-KR') : '-'}</span>,
-    width: 90,
-  },
-];
-
-function ProductSearchTable({
-  products,
-  selectedKeys,
-  onSelectionChange,
-}: {
-  products: ProductSearchItem[];
-  selectedKeys: Set<string>;
-  onSelectionChange: (keys: Set<string>) => void;
-}) {
-  return (
-    <BaseTable<ProductSearchItem>
-      tableId="marketTrialProductSearchTable"
-      columns={PRODUCT_SEARCH_COLUMNS}
-      data={products}
-      rowKey={(r) => r.id}
-      selectable
-      selectedKeys={selectedKeys}
-      onSelectionChange={(keys) => {
-        // Single selection: keep only the most recently clicked key
-        if (keys.size > 1) {
-          const prev = [...selectedKeys][0];
-          const newKeys = [...keys].filter((k) => k !== prev);
-          onSelectionChange(new Set([newKeys[0]]));
-        } else {
-          onSelectionChange(keys);
-        }
-      }}
-      onRowClick={(row) => onSelectionChange(new Set([row.id]))}
-      emptyMessage={
-        <p className="text-sm text-gray-400 text-center py-6">검색 결과가 없습니다.</p>
-      }
-    />
-  );
-}
-
-// ── Product Conversion Section ── WO-MARKET-TRIAL-TO-PRODUCT-CONVERSION-FLOW-V1
-
-const CONVERSION_ELIGIBLE = new Set(['fulfilled', 'closed']);
-
-function ProductConversionSection({
-  trial,
-  productRewardCount,
-  onConvertClick,
-}: {
-  trial: OperatorTrial;
-  productRewardCount: number;
-  onConvertClick: () => void;
-}) {
-  const isConverted = !!trial.convertedProductId;
-  const isEligible = CONVERSION_ELIGIBLE.has(trial.status);
-
-  // Not eligible and not converted → show nothing (not ready)
-  if (!isEligible && !isConverted) {
-    return (
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4 text-sm text-gray-400">
-        상품 전환은 이행 완료(fulfilled) 또는 종료(closed) 상태에서 가능합니다.
-      </div>
-    );
-  }
-
-  return (
-    <div className={`border rounded-lg p-4 sm:p-5 mb-4 ${isConverted ? 'bg-green-50 border-green-200' : 'bg-white border-gray-200'}`}>
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-gray-700">상품 전환</h3>
-        {isConverted && (
-          <span className="px-2.5 py-1 bg-green-100 text-green-700 text-xs rounded-full font-medium">
-            전환 완료
-          </span>
-        )}
-        {!isConverted && isEligible && (
-          <span className="px-2.5 py-1 bg-blue-100 text-blue-700 text-xs rounded-full font-medium">
-            전환 가능
-          </span>
-        )}
-      </div>
-
-      {/* Participant stats relevant to conversion */}
-      <div className="flex gap-4 mb-3 text-sm">
-        <div>
-          <span className="text-gray-500">제품 보상 참여자</span>
-          <span className="ml-2 font-semibold text-gray-900">{productRewardCount}명</span>
-          {productRewardCount > 0 && (
-            <span className="ml-1 text-xs text-blue-600">→ 후속 공급 검토 대상</span>
-          )}
-        </div>
-      </div>
-
-      {isConverted ? (
-        <div className="space-y-1 text-sm">
-          <div>
-            <span className="text-gray-500">연결된 상품:</span>
-            <span className="ml-2 font-medium text-gray-900">{trial.convertedProductName}</span>
-          </div>
-          <div>
-            <span className="text-gray-500">상품 ID:</span>
-            <span className="ml-2 text-xs text-gray-500 font-mono break-all">{trial.convertedProductId}</span>
-          </div>
-          {trial.conversionNote && (
-            <div>
-              <span className="text-gray-500">메모:</span>
-              <span className="ml-2 text-gray-700">{trial.conversionNote}</span>
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="flex flex-col sm:flex-row gap-3">
-          <button
-            onClick={onConvertClick}
-            className="px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700"
-          >
-            상품 전환 실행
-          </button>
-          <p className="self-center text-xs text-gray-400">
-            기존 상품 연결 또는 새 상품(DRAFT) 생성
-          </p>
         </div>
       )}
     </div>

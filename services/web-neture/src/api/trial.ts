@@ -431,18 +431,7 @@ export interface TrialConversionResult {
   };
 }
 
-export async function convertTrialToProduct(
-  trialId: string,
-  payload: ConvertTrialPayload,
-): Promise<TrialConversionResult> {
-  marketTrialCommerceDisabled('유통참여형 펀딩은 제품 전환 기능을 제공하지 않습니다.');
-  // eslint-disable-next-line no-unreachable -- 정책 비활성화. 기존 로직 보존.
-  const { data } = await api.post(
-    `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/convert`,
-    payload,
-  );
-  return data.data || data;
-}
+// WO-O4O-MARKET-TRIAL-CONTRACT-CLEANUP-V1: convertTrialToProduct 제거 (content-only, 호출처 0).
 
 export interface ProductSearchItem {
   id: string;
@@ -459,25 +448,7 @@ export interface ProductSearchResponse {
   meta: { total: number; page: number; limit: number };
 }
 
-/**
- * WO-MARKET-TRIAL-PRODUCT-LINK-SEARCH-UI-V1:
- * 전환 모달용 상품(SupplierProductOffer) 검색
- */
-export async function searchProductsForConversion(
-  keyword: string,
-  opts?: { supplierUserId?: string; page?: number; limit?: number },
-): Promise<ProductSearchResponse> {
-  const params = new URLSearchParams();
-  if (keyword) params.set('keyword', keyword);
-  if (opts?.supplierUserId) params.set('supplierUserId', opts.supplierUserId);
-  if (opts?.page) params.set('page', String(opts.page));
-  if (opts?.limit) params.set('limit', String(opts.limit));
-  const qs = params.toString();
-  const { data } = await api.get(
-    `${API_BASE_URL}/api/v1/neture/operator/market-trial/products/search${qs ? `?${qs}` : ''}`,
-  );
-  return data;
-}
+// WO-O4O-MARKET-TRIAL-CONTRACT-CLEANUP-V1: searchProductsForConversion 제거 (content-only, 호출처 0).
 
 // ============================================================================
 // WO-MARKET-TRIAL-OPERATIONS-CONSOLIDATION-V1: Funnel API
@@ -766,15 +737,7 @@ export async function resolveForumSyncFailure(
 // Shipping / Fulfillment (existing)
 // ============================================================================
 
-export async function submitShippingAddress(
-  participationId: string,
-  address: Omit<ShippingAddress, 'participationId' | 'createdAt'>
-): Promise<ShippingAddress> {
-  marketTrialCommerceDisabled('유통참여형 펀딩은 O4O 배송/발송 기능을 제공하지 않습니다.');
-  // eslint-disable-next-line no-unreachable -- 정책 비활성화. 기존 로직 보존.
-  const { data } = await api.post(`${API_BASE_URL}/api/trial-shipping/${participationId}`, address);
-  return data.data || data;
-}
+// WO-O4O-MARKET-TRIAL-CONTRACT-CLEANUP-V1: submitShippingAddress 제거 (content-only, 호출처 0).
 
 export async function getShippingAddress(participationId: string): Promise<ShippingAddress | null> {
   try {
