@@ -659,6 +659,30 @@ export const supplierApi = {
     }
   },
 
+  // WO-O4O-NETURE-SUPPLIER-PRODUCT-SERVICE-SPECIFIC-PRICING-FLOW-V1: 서비스별 공급가
+  async getServicePrices(
+    id: string,
+  ): Promise<{ success: boolean; error?: string; data?: { priceGeneral: number; prices: Array<{ serviceKey: string; unitPrice: number }> } }> {
+    try {
+      const response = await api.get(`/neture/supplier/products/${id}/service-prices`);
+      return response.data;
+    } catch (error) {
+      return { success: false, error: extractApiError(error) };
+    }
+  },
+
+  async setServicePrices(
+    id: string,
+    prices: Array<{ serviceKey: string; unitPrice: number }>,
+  ): Promise<{ success: boolean; error?: string; data?: any }> {
+    try {
+      const response = await api.put(`/neture/supplier/products/${id}/service-prices`, { prices });
+      return response.data;
+    } catch (error) {
+      return { success: false, error: extractApiError(error) };
+    }
+  },
+
   // WO-NETURE-B2B-CONTENT-MANAGEMENT-V1
   async updateBusinessContent(
     offerId: string,

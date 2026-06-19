@@ -67,9 +67,19 @@
 → **migration 적용 + CRUD(설정/조회/검증/해제) + 소유권 PASS.** prices 비었을 때 주문 단가 fallback=price_general 보장(COALESCE/checkout 로직).
 > 주문 단가 우선순위(서비스가 적용 / event_price 최우선 / 정산 snapshot)는 **실주문=운영 데이터**라 typecheck + COALESCE/checkout 정적 결합으로 보증(실주문 smoke 비파괴 범위 외).
 
-## 6. Phase 2 (frontend) — 후속
+## 6. Phase 2 (frontend) — 구현 완료 (PASS 코드/타입)
 
-- 공급 방식 관리 모달(또는 상품 상세)에 **서비스별 공급가 입력**(serviceKey별 unitPrice) → `PUT /service-prices`. 표시: 서비스별 가격/미설정(=price_general). browser smoke.
+변경 파일(2): `lib/api/supplier.ts`(getServicePrices/setServicePrices) · `pages/supplier/ProductDetailDrawer.tsx`.
+
+- **drawer 공급 방식 섹션**: serviceKey별 **공급가 표시**(설정값 / "기본가 적용") + **[설정]** 버튼.
+- **서비스별 공급가 설정 모달**: offer의 serviceKey별(KPA/GlycoPharm/K-Cosmetics) 가격 input(빈 값=기본가 적용, placeholder=기본 ₩priceGeneral) → 정수>0 검증 → `PUT /service-prices`(replace) → GET 재로드 + onSaved.
+- drawer open 시 `GET /service-prices` 로드. web-neture tsc 0.
+
+### Phase 2 배포 후 실브라우저 smoke (비파괴·원복)
+1. drawer → 공급 방식 섹션 "서비스별 공급가" 표시 + [설정].
+2. 모달에서 kpa-society 가격 입력 → 저장 → 표시 갱신.
+3. 비우고 저장 → "기본가 적용" 복귀(원복).
+4. 공급 방식 모달/정보 편집 회귀 없음.
 
 ## 7. 준수
 

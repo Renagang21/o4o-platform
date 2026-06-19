@@ -119,6 +119,11 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
   const [distConfirmRemove, setDistConfirmRemove] = useState<string[] | null>(null);
   // WO-O4O-NETURE-SUPPLIER-PRODUCT-TO-EVENT-OFFER-ENTRY-V1
   const navigate = useNavigate();
+  // WO-O4O-NETURE-SUPPLIER-PRODUCT-SERVICE-SPECIFIC-PRICING-FLOW-V1: 서비스별 공급가
+  const [svcPrices, setSvcPrices] = useState<{ priceGeneral: number; prices: Array<{ serviceKey: string; unitPrice: number }> } | null>(null);
+  const [svcPriceOpen, setSvcPriceOpen] = useState(false);
+  const [svcPriceSaving, setSvcPriceSaving] = useState(false);
+  const [svcPriceForm, setSvcPriceForm] = useState<Record<string, string>>({});
 
   // Template integration (WO-O4O-TEMPLATE-ADOPTION-NETURE-PRODUCT-V1)
   const { user } = useAuth();
@@ -386,6 +391,16 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
     if (!product?.id || !open) return;
     setSpotLoading(true);
     supplierApi.listSpotPolicies(product.id).then(setSpotPolicies).finally(() => setSpotLoading(false));
+  }, [product?.id, open]);
+
+  // WO-O4O-NETURE-SUPPLIER-PRODUCT-SERVICE-SPECIFIC-PRICING-FLOW-V1: 서비스별 공급가 로드
+  useEffect(() => {
+    if (!product?.id || !open) { setSvcPrices(null); return; }
+    let cancelled = false;
+    supplierApi.getServicePrices(product.id).then((r) => {
+      if (!cancelled && r.success && r.data) setSvcPrices(r.data);
+    }).catch(() => {});
+    return () => { cancelled = true; };
   }, [product?.id, open]);
 
   // WO-NETURE-PRODUCT-DRAWER-FORM-STANDARD-COMPLIANCE-V1: validation 분리
@@ -704,6 +719,71 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                   </div>
                 </>
               )}
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* WO-O4O-NETURE-SUPPLIER-PRODUCT-SERVICE-SPECIFIC-PRICING-FLOW-V1: 서비스별 공급가 설정 모달 */}
+      {svcPriceOpen && product && (() => {
+        const SERVICE_LABELS: Record<string, string> = { 'kpa-society': 'KPA Society', 'glycopharm': 'GlycoPharm', 'k-cosmetics': 'K-Cosmetics' };
+        const supplyKeys = (product.serviceKeys || []).filter((k) => k !== 'neture');
+        const priceGeneral = Number(svcPrices?.priceGeneral ?? product.priceGeneral ?? 0);
+        const doSave = async () => {
+          setSvcPriceSaving(true);
+          try {
+            const prices: Array<{ serviceKey: string; unitPrice: number }> = [];
+            for (const sk of supplyKeys) {
+              const raw = (svcPriceForm[sk] ?? '').trim();
+              if (!raw) continue; // 빈 값 = 기본가 적용(서비스가 미설정)
+              const n = Number(raw);
+              if (!Number.isInteger(n) || n <= 0) {
+                toast.error(`${SERVICE_LABELS[sk] || sk}: 0보다 큰 정수를 입력하세요`);
+                setSvcPriceSaving(false);
+                return;
+              }
+              prices.push({ serviceKey: sk, unitPrice: n });
+            }
+            const r = await supplierApi.setServicePrices(product.id, prices);
+            if (!r.success) { toast.error(`서비스별 공급가 저장 실패: ${r.error || '오류'}`); setSvcPriceSaving(false); return; }
+            const g = await supplierApi.getServicePrices(product.id);
+            if (g.success && g.data) setSvcPrices(g.data);
+            toast.success('서비스별 공급가가 저장되었습니다');
+            setSvcPriceOpen(false);
+            onSaved?.();
+          } catch {
+            toast.error('서비스별 공급가 저장 중 오류가 발생했습니다');
+          } finally {
+            setSvcPriceSaving(false);
+          }
+        };
+        return (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4" onClick={(e) => { if (e.target === e.currentTarget && !svcPriceSaving) setSvcPriceOpen(false); }}>
+            <div className="bg-white rounded-xl shadow-xl p-5 w-full max-w-md max-h-[85vh] overflow-y-auto">
+              <h3 className="text-base font-bold text-slate-900 mb-1">서비스별 공급가</h3>
+              <p className="text-[11px] text-slate-500 mb-3">
+                서비스별 공급가를 입력하면 해당 서비스 주문에 우선 적용됩니다. 비우면 기본 공급가(₩{priceGeneral.toLocaleString()})가 적용됩니다.
+              </p>
+              <div className="space-y-2 mb-3">
+                {supplyKeys.map((sk) => (
+                  <div key={sk} className="flex items-center gap-2">
+                    <span className="text-sm text-slate-700 w-28 shrink-0">{SERVICE_LABELS[sk] || sk}</span>
+                    <input
+                      type="number"
+                      min={0}
+                      value={svcPriceForm[sk] ?? ''}
+                      onChange={(e) => setSvcPriceForm((f) => ({ ...f, [sk]: e.target.value }))}
+                      placeholder={`기본 ${priceGeneral.toLocaleString()}`}
+                      className="flex-1 px-2 py-1.5 border border-slate-200 rounded text-sm"
+                    />
+                    <span className="text-xs text-slate-400">원</span>
+                  </div>
+                ))}
+              </div>
+              <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
+                <button onClick={() => setSvcPriceOpen(false)} disabled={svcPriceSaving} className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg disabled:opacity-50">취소</button>
+                <button onClick={doSave} disabled={svcPriceSaving} className="px-4 py-2 text-sm text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg disabled:opacity-50">{svcPriceSaving ? '저장 중...' : '저장'}</button>
+              </div>
             </div>
           </div>
         );
@@ -1312,6 +1392,33 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                           }>
                             {st === 'approved' ? '승인됨' : st === 'pending' ? '승인대기' : st === 'rejected' ? '반려됨' : st === 'cancelled' ? '철회됨' : '미신청'}
                           </Badge>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+                {/* WO-O4O-NETURE-SUPPLIER-PRODUCT-SERVICE-SPECIFIC-PRICING-FLOW-V1: 서비스별 공급가 */}
+                {supplyKeys.length > 0 && (
+                  <div className="space-y-1 mt-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-slate-500">서비스별 공급가</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const form: Record<string, string> = {};
+                          (svcPrices?.prices || []).forEach((p) => { form[p.serviceKey] = String(p.unitPrice); });
+                          setSvcPriceForm(form);
+                          setSvcPriceOpen(true);
+                        }}
+                        className="text-[11px] font-medium text-emerald-700 hover:text-emerald-800"
+                      >설정</button>
+                    </div>
+                    {supplyKeys.map((sk) => {
+                      const sp = (svcPrices?.prices || []).find((p) => p.serviceKey === sk);
+                      return (
+                        <div key={sk} className="flex items-center justify-between pl-3">
+                          <span className="text-xs text-slate-600">{sk}</span>
+                          <span className="text-xs text-slate-700">{sp ? formatPrice(sp.unitPrice) : <span className="text-slate-400">기본가 적용</span>}</span>
                         </div>
                       );
                     })}
