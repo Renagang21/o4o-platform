@@ -34,9 +34,9 @@
 - **web-neture `tsc --noEmit`: EXIT 0** (문자열 리터럴만 변경).
 - 기능/flow/ProductForm/createProduct/API **무변경**.
 
-### 배포 후 실브라우저 smoke
-1. `/supplier/products/register` → 비의약품 → 하나씩 → GuideBlock: title "상품 정보를 먼저 등록합니다", Step2 "기본 공급가 … (공급 방식은 저장 후 별도 설정)", '유통 정책/서비스 노출' 표현 없음, 공급 방식 저장 후 설정 + HUB 미노출 안내.
-2. Step 1/2/3 이동·입력 회귀 없음.
+### 실브라우저 smoke — 2026-06-19 **PASS** (renagang21, `/supplier/products/new`)
+1. GuideBlock: title **"상품 정보를 먼저 등록합니다."** · description "…기본 공급가 저장. 공급 방식은 저장 후 [공급 방식 변경]에서 설정 … HUB 미노출" · **Step 2 "기본 공급가를 입력합니다 (공급 방식은 저장 후 별도 설정)"** — **'유통 정책/서비스 노출' 표현 제거 확인.** **PASS**
+2. 스텝 표시 "2 기본 공급가" + 정보-우선 배너 일관, Step1 입력 UI 회귀 없음. **PASS**
 
 ## 4. 비범위 / 준수
 
