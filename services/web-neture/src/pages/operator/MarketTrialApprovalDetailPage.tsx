@@ -17,10 +17,8 @@ import {
   rejectTrialFirst,
   exportParticipantsCSV,
   updateParticipantRewardStatus,
-  updateParticipantConversionStatus,
   updateParticipantSettlementStatus,
   updateParticipantPaymentStatus,
-  createListingFromTrialParticipant,
   updateTrialStatus,
   getOperatorTrialKpi,
 } from '../../api/trial';
@@ -29,7 +27,6 @@ import type {
   TrialParticipant,
   ParticipantListResponse,
   TrialStatus,
-  CustomerConversionStatus,
   SettlementStatus,
   PaymentStatus,
   MarketTrialDetailKpi,
@@ -42,8 +39,7 @@ import { PAYMENT_STATUS_LABELS } from '../../api/trial';
 const SHOW_MARKET_TRIAL_COMMERCE_UI = false;
 
 type ParticipantFilter =
-  | 'all' | 'product' | 'cash' | 'pending' | 'fulfilled'
-  | 'conv_interested' | 'conv_considering' | 'conv_adopted' | 'conv_first_order';
+  | 'all' | 'product' | 'cash' | 'pending' | 'fulfilled';
 
 const STATUS_LABELS: Record<string, string> = {
   draft: '작성 중',
@@ -77,8 +73,6 @@ export default function MarketTrialApprovalDetailPage() {
   const [exportLoading, setExportLoading] = useState(false);
   const [filter, setFilter] = useState<ParticipantFilter>('all');
   const [updatingId, setUpdatingId] = useState<string | null>(null);
-  const [updatingConversionId, setUpdatingConversionId] = useState<string | null>(null);
-  const [creatingListingId, setCreatingListingId] = useState<string | null>(null);
   // WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1
   const [updatingSettlementId, setUpdatingSettlementId] = useState<string | null>(null);
   // WO-NETURE-MARKET-TRIAL-PAYMENT-READINESS-V1
@@ -91,16 +85,11 @@ export default function MarketTrialApprovalDetailPage() {
     const filters: {
       rewardType?: 'product' | 'cash';
       rewardStatus?: 'pending' | 'fulfilled';
-      customerConversionStatus?: CustomerConversionStatus;
     } = {};
     if (f === 'product') filters.rewardType = 'product';
     else if (f === 'cash') filters.rewardType = 'cash';
     else if (f === 'pending') filters.rewardStatus = 'pending';
     else if (f === 'fulfilled') filters.rewardStatus = 'fulfilled';
-    else if (f === 'conv_interested') filters.customerConversionStatus = 'interested';
-    else if (f === 'conv_considering') filters.customerConversionStatus = 'considering';
-    else if (f === 'conv_adopted') filters.customerConversionStatus = 'adopted';
-    else if (f === 'conv_first_order') filters.customerConversionStatus = 'first_order';
     const pData = await getOperatorTrialParticipants(trialId, filters).catch(() => null);
     setParticipantData(pData);
   }, []);
@@ -183,32 +172,6 @@ export default function MarketTrialApprovalDetailPage() {
       setError(err.response?.data?.message || err.message || '상태 변경에 실패했습니다.');
     } finally {
       setUpdatingId(null);
-    }
-  };
-
-  const handleCreateListing = async (participant: TrialParticipant) => {
-    if (!id) return;
-    setCreatingListingId(participant.id);
-    try {
-      await createListingFromTrialParticipant(id, participant.id);
-      await loadParticipants(id, filter);
-    } catch (err: any) {
-      setError(err.response?.data?.message || err.message || '활용 상품 연결에 실패했습니다.');
-    } finally {
-      setCreatingListingId(null);
-    }
-  };
-
-  const handleConversionStatusChange = async (participant: TrialParticipant, newStatus: CustomerConversionStatus) => {
-    if (!id) return;
-    setUpdatingConversionId(participant.id);
-    try {
-      await updateParticipantConversionStatus(id, participant.id, newStatus);
-      await loadParticipants(id, filter);
-    } catch (err: any) {
-      setError(err.response?.data?.message || err.message || '매장 랜딩 단계 변경에 실패했습니다.');
-    } finally {
-      setUpdatingConversionId(null);
     }
   };
 
@@ -399,11 +362,6 @@ export default function MarketTrialApprovalDetailPage() {
         exportLoading={exportLoading}
         onToggleRewardStatus={handleToggleRewardStatus}
         updatingId={updatingId}
-        onConversionStatusChange={handleConversionStatusChange}
-        updatingConversionId={updatingConversionId}
-        onCreateListing={handleCreateListing}
-        creatingListingId={creatingListingId}
-        trialConverted={!!trial.convertedProductId}
         onSettlementStatusChange={handleSettlementStatusChange}
         updatingSettlementId={updatingSettlementId}
         onPaymentStatusChange={handlePaymentStatusChange}
@@ -646,24 +604,7 @@ const FILTER_OPTIONS: { value: ParticipantFilter; label: string; group?: string 
   // WO-O4O-MARKET-TRIAL-UI-COMMERCE-LABEL-CLEANUP-V1: content-only — 전환 퍼널(관심/취급/매장 도입/첫 주문) 필터 제거.
 ];
 
-// WO-O4O-NETURE-DISTRIBUTION-FUNDING-STORE-LANDING-TRACKING-V1: 매장 랜딩 단계 라벨
-const CONVERSION_STATUS_LABELS: Record<CustomerConversionStatus, string> = {
-  none: '랜딩 전',
-  interested: '관심 확인',
-  considering: '취급 검토',
-  adopted: '매장 도입',
-  first_order: '첫 주문 · 랜딩',
-};
-
-const CONVERSION_STATUS_COLORS: Record<CustomerConversionStatus, string> = {
-  none: 'bg-gray-100 text-gray-500',
-  interested: 'bg-blue-50 text-blue-700',
-  considering: 'bg-yellow-50 text-yellow-700',
-  adopted: 'bg-green-50 text-green-700',
-  first_order: 'bg-green-100 text-green-800',
-};
-
-const CONVERSION_STATUS_OPTIONS: CustomerConversionStatus[] = ['none', 'interested', 'considering', 'adopted', 'first_order'];
+// WO-O4O-MARKET-TRIAL-CONVERSION-COLUMNS-DROP-V1: 매장 랜딩 단계(전환) 라벨/색상/옵션 제거 (content-only).
 
 // WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1
 const SETTLEMENT_STATUS_LABELS: Record<SettlementStatus, string> = {
@@ -714,11 +655,6 @@ function ParticipantSection({
   exportLoading,
   onToggleRewardStatus,
   updatingId,
-  onConversionStatusChange,
-  updatingConversionId,
-  onCreateListing,
-  creatingListingId,
-  trialConverted,
   onSettlementStatusChange,
   updatingSettlementId,
   onPaymentStatusChange,
@@ -733,11 +669,6 @@ function ParticipantSection({
   exportLoading: boolean;
   onToggleRewardStatus: (p: TrialParticipant) => void;
   updatingId: string | null;
-  onConversionStatusChange: (p: TrialParticipant, s: CustomerConversionStatus) => void;
-  updatingConversionId: string | null;
-  onCreateListing: (p: TrialParticipant) => void;
-  creatingListingId: string | null;
-  trialConverted: boolean;
   // WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1
   onSettlementStatusChange: (p: TrialParticipant, s: SettlementStatus, note?: string) => void;
   updatingSettlementId: string | null;
@@ -816,12 +747,6 @@ function ParticipantSection({
           <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-violet-100 text-violet-700">
             제품 정산 완료 {participants.filter((p) => p.settlementStatus === 'offline_settled').length}명
           </span>
-          <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
-            매장 도입 {participants.filter((p) => { const c = p.customerConversionStatus ?? 'none'; return c === 'adopted' || c === 'first_order'; }).length}명
-          </span>
-          <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700">
-            활용 상품 연결 {participants.filter((p) => !!p.listingId).length}건
-          </span>
         </div>
       )}
       {SHOW_MARKET_TRIAL_COMMERCE_UI && totalCount > 0 && (
@@ -847,12 +772,6 @@ function ParticipantSection({
                 <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">유형</th>
                 <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">보상</th>
                 <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">이행</th>
-                {SHOW_MARKET_TRIAL_COMMERCE_UI && (
-                  <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">매장 랜딩 단계</th>
-                )}
-                {SHOW_MARKET_TRIAL_COMMERCE_UI && trialConverted && (
-                  <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">활용 상품 연결</th>
-                )}
                 <th className="text-left py-2 px-4 text-xs font-medium text-gray-500">참여일</th>
                 <th className="text-right py-2 px-4 text-xs font-medium text-gray-500">이행</th>
               </tr>
@@ -860,11 +779,7 @@ function ParticipantSection({
             <tbody>
               {participants.map((p) => {
                 const isUpdating = updatingId === p.id;
-                const isUpdatingConv = updatingConversionId === p.id;
-                const isCreatingListing = creatingListingId === p.id;
                 const isFulfilled = p.rewardStatus === 'fulfilled';
-                const convStatus = (p.customerConversionStatus ?? 'none') as CustomerConversionStatus;
-                const listingEligible = trialConverted && (convStatus === 'adopted' || convStatus === 'first_order');
                 return (
                   <tr key={p.id} className="border-b border-gray-50 hover:bg-gray-50">
                     <td className="py-2.5 px-4 text-gray-900 font-medium">{p.name}</td>
@@ -887,44 +802,6 @@ function ParticipantSection({
                         {isFulfilled ? '완료' : '대기'}
                       </span>
                     </td>
-                    {SHOW_MARKET_TRIAL_COMMERCE_UI && (
-                    <td className="py-2.5 px-2">
-                      {isUpdatingConv ? (
-                        <span className="text-xs text-gray-400">...</span>
-                      ) : (
-                        <select
-                          value={convStatus}
-                          onChange={(e) => onConversionStatusChange(p, e.target.value as CustomerConversionStatus)}
-                          className={`text-xs rounded px-1.5 py-1 border border-transparent cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 ${CONVERSION_STATUS_COLORS[convStatus]}`}
-                        >
-                          {CONVERSION_STATUS_OPTIONS.map((s) => (
-                            <option key={s} value={s}>{CONVERSION_STATUS_LABELS[s]}</option>
-                          ))}
-                        </select>
-                      )}
-                    </td>
-                    )}
-                    {SHOW_MARKET_TRIAL_COMMERCE_UI && trialConverted && (
-                      <td className="py-2.5 px-2">
-                        {p.listingId ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
-                            활용 상품 연결됨
-                          </span>
-                        ) : listingEligible ? (
-                          // WO-O4O-MARKET-TRIAL-CONVERSION-DISABLE-V1: 매장 상품 전환(매장 진열) 신규 실행 중단(Neture-only).
-                          <button
-                            onClick={() => onCreateListing(p)}
-                            disabled
-                            title="유통참여형 펀딩은 Neture 전용 — 매장 상품 전환(매장 진열)은 중단되었습니다."
-                            className="px-2 py-0.5 text-xs text-gray-400 bg-gray-100 rounded cursor-not-allowed"
-                          >
-                            {isCreatingListing ? '...' : '전환 중단'}
-                          </button>
-                        ) : (
-                          <span className="text-xs text-gray-300">-</span>
-                        )}
-                      </td>
-                    )}
                     <td className="py-2.5 px-4 text-gray-500 text-xs">
                       {new Date(p.joinedAt).toLocaleDateString('ko-KR')}
                     </td>

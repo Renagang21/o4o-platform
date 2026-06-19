@@ -13,15 +13,7 @@ import { getSupplierTrialResults } from '../../api/trial';
 import type { TrialResults } from '../../api/trial';
 import { ContentRenderer } from '@o4o/content-editor';
 
-// Conversion status derived from trial.convertedProductId
-type ConversionStatus = 'not_eligible' | 'ready' | 'converted';
-const CONVERSION_ELIGIBLE = new Set(['fulfilled', 'closed']);
-
-function getConversionStatus(trial: TrialResults['trial'] & { convertedProductId?: string | null }): ConversionStatus {
-  if (trial.convertedProductId) return 'converted';
-  if (CONVERSION_ELIGIBLE.has(trial.status)) return 'ready';
-  return 'not_eligible';
-}
+// WO-O4O-MARKET-TRIAL-CONVERSION-COLUMNS-DROP-V1: 제품 전환 상태 helper 제거 (content-only).
 
 const STATUS_LABEL: Record<string, string> = {
   draft: '초안',
@@ -76,13 +68,6 @@ const NEXT_ACTION: Record<string, { title: string; desc: string }> = {
     desc: '최종 결과 데이터를 참고하여 향후 제품 개발에 활용하세요.',
   },
 };
-
-const CONVERSION_STAGES: { key: string; label: string; color: string }[] = [
-  { key: 'interested',  label: '관심 있음',  color: '#3B82F6' },
-  { key: 'considering', label: '취급 검토',   color: '#F59E0B' },
-  { key: 'adopted',     label: '취급 시작',   color: '#10B981' },
-  { key: 'first_order', label: '첫 주문',     color: '#059669' },
-];
 
 /** WO-MARKET-TRIAL-VIDEO-FIELD-V1: URL → embed 분기 */
 function parseVideoEmbed(url: string): { type: 'youtube' | 'vimeo' | 'external'; embedUrl: string } {
@@ -151,7 +136,6 @@ export default function SupplierTrialDetailPage() {
   // WO-O4O-MARKET-TRIAL-UI-COMMERCE-LABEL-CLEANUP-V1:
   // content-only 정책 — 매장 진열/거래선 전환/이행/상품 전환 등 커머스 퍼널 섹션은 노출하지 않는다.
   const SHOW_MARKET_TRIAL_COMMERCE_UI = false;
-  const conversionStatus = getConversionStatus(trial as any);
 
   const isResultPhase = ['outcome_confirming', 'fulfilled', 'closed'].includes(trial.status);
 
@@ -409,82 +393,6 @@ export default function SupplierTrialDetailPage() {
         </div>
       )}
 
-      {/* 매장 진열 현황 (WO-MARKET-TRIAL-LISTING-AUTOLINK-V1) */}
-      {SHOW_MARKET_TRIAL_COMMERCE_UI && isResultPhase && (summary.listingCount ?? 0) > 0 && (
-        <div style={s.section}>
-          <h2 style={s.sectionTitle}>활용 상품 연결 현황</h2>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <div>
-              <span style={{ fontSize: '32px', fontWeight: 700, color: '#059669' }}>
-                {summary.listingCount}
-              </span>
-              <span style={{ ...s.muted, marginLeft: '6px' }}>개 매장 활용 상품 연결</span>
-            </div>
-            <span style={{ fontSize: '13px', color: '#6B7280' }}>
-              ← 유통참여형 펀딩 참여자 매장에서 이 상품을 실제로 취급 시작
-            </span>
-          </div>
-        </div>
-      )}
-
-      {/* 거래선 전환 현황 (WO-MARKET-TRIAL-PARTICIPANT-TO-CUSTOMER-FLOW-V1) */}
-      {SHOW_MARKET_TRIAL_COMMERCE_UI && isResultPhase && summary.conversionDistribution && summary.totalCount > 0 && (() => {
-        const dist = summary.conversionDistribution!;
-        const total = summary.totalCount;
-        const adoptedCount = (dist.adopted ?? 0) + (dist.first_order ?? 0);
-        const firstOrderCount = dist.first_order ?? 0;
-        const adoptedRate = total > 0 ? Math.round((adoptedCount / total) * 100) : 0;
-        const firstOrderRate = total > 0 ? Math.round((firstOrderCount / total) * 100) : 0;
-        return (
-          <div style={s.section}>
-            <h2 style={s.sectionTitle}>매장 랜딩 현황</h2>
-            {/* Conversion rate summary */}
-            <div style={{ display: 'flex', gap: '20px', marginBottom: '16px', flexWrap: 'wrap' }}>
-              <div style={s.rateCard}>
-                <span style={s.rateLabel}>매장 도입률</span>
-                <span style={{ ...s.rateValue, color: adoptedRate > 0 ? '#059669' : '#9CA3AF' }}>
-                  {adoptedRate}%
-                </span>
-                <span style={s.rateSub}>참여자 중 매장 도입 이상</span>
-              </div>
-              <div style={s.rateCard}>
-                <span style={s.rateLabel}>첫 주문 전환율</span>
-                <span style={{ ...s.rateValue, color: firstOrderRate > 0 ? '#047857' : '#9CA3AF' }}>
-                  {firstOrderRate}%
-                </span>
-                <span style={s.rateSub}>참여자 중 첫 주문 완료</span>
-              </div>
-              {(summary.listingCount ?? 0) > 0 && (
-                <div style={s.rateCard}>
-                  <span style={s.rateLabel}>활용 상품 연결률</span>
-                  <span style={{ ...s.rateValue, color: '#4F46E5' }}>
-                    {Math.round(((summary.listingCount ?? 0) / total) * 100)}%
-                  </span>
-                  <span style={s.rateSub}>{summary.listingCount}개 매장 진열</span>
-                </div>
-              )}
-            </div>
-            <p style={{ ...s.muted, marginBottom: '12px' }}>
-              단계별 분포
-            </p>
-            <div style={s.conversionPipeline}>
-              {CONVERSION_STAGES.map(({ key, label, color }) => {
-                const count = dist[key as keyof typeof dist] ?? 0;
-                return (
-                  <div key={key} style={s.conversionStage}>
-                    <div style={{ ...s.conversionDot, backgroundColor: color }} />
-                    <span style={s.conversionLabel}>{label}</span>
-                    <span style={{ ...s.conversionCount, color: count > 0 ? color : '#9CA3AF' }}>
-                      {count}명
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        );
-      })()}
-
       {/* 포럼 피드백 */}
       {forumPostId && (
         <div style={s.section}>
@@ -501,35 +409,6 @@ export default function SupplierTrialDetailPage() {
         </div>
       )}
 
-      {/* 상품 전환 상태 */}
-      {SHOW_MARKET_TRIAL_COMMERCE_UI && conversionStatus !== 'not_eligible' && (
-        <div style={s.section}>
-          <h2 style={s.sectionTitle}>상품 전환 상태</h2>
-          {conversionStatus === 'converted' ? (
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                <span style={{ ...s.convBadge, backgroundColor: '#059669' }}>상품 전환 완료</span>
-              </div>
-              <p style={s.muted}>이 유통참여형 펀딩은 정규 상품으로 전환되었습니다.</p>
-              {(trial as any).convertedProductName && (
-                <p style={{ fontSize: '15px', fontWeight: 600, color: '#111827', margin: '4px 0 0 0' }}>
-                  연결 상품: {(trial as any).convertedProductName}
-                </p>
-              )}
-              {(trial as any).conversionNote && (
-                <p style={{ ...s.muted, marginTop: '8px' }}>운영자 메모: {(trial as any).conversionNote}</p>
-              )}
-            </div>
-          ) : (
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                <span style={{ ...s.convBadge, backgroundColor: '#3B82F6' }}>상품 전환 검토 중</span>
-              </div>
-              <p style={s.muted}>운영자가 이 유통참여형 펀딩의 상품 전환 여부를 검토하고 있습니다.</p>
-            </div>
-          )}
-        </div>
-      )}
 
       {/* 초안이면 수정/새 등록 버튼 — WO-MARKET-TRIAL-EDIT-FLOW-V1 */}
       {trial.status === 'draft' && (

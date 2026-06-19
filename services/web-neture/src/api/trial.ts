@@ -57,10 +57,6 @@ export interface Trial {
   supplierId: string;
   supplierName?: string;
   status: TrialStatus;
-  // WO-MARKET-TRIAL-TO-PRODUCT-CONVERSION-FLOW-V1
-  convertedProductId?: string | null;
-  convertedProductName?: string | null;
-  conversionNote?: string | null;
   outcomeSnapshot?: {
     expectedType: 'product' | 'cash';
     description: string;
@@ -98,13 +94,7 @@ export interface OperatorTrial extends Trial {
     slug: string | null;
     url: string;
   } | null;
-  // WO-MARKET-TRIAL-TO-PRODUCT-CONVERSION-FLOW-V1
-  convertedProductId?: string | null;
-  convertedProductName?: string | null;
-  conversionNote?: string | null;
 }
-
-export type CustomerConversionStatus = 'none' | 'interested' | 'considering' | 'adopted' | 'first_order';
 
 // WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1
 export type SettlementStatus =
@@ -131,11 +121,6 @@ export interface TrialParticipant {
   type: string;
   rewardType: string | null;
   rewardStatus: string;
-  customerConversionStatus: CustomerConversionStatus;
-  customerConversionAt: string | null;
-  customerConversionNote: string | null;
-  // WO-MARKET-TRIAL-LISTING-AUTOLINK-V1
-  listingId: string | null;
   organizationId: string | null;
   joinedAt: string;
   // WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1
@@ -221,16 +206,6 @@ export interface TrialResultsSummary {
   pendingCount: number;
   fulfillmentRate: number;
   recruitRate: number | null;
-  // WO-MARKET-TRIAL-PARTICIPANT-TO-CUSTOMER-FLOW-V1
-  conversionDistribution?: {
-    none: number;
-    interested: number;
-    considering: number;
-    adopted: number;
-    first_order: number;
-  };
-  // WO-MARKET-TRIAL-LISTING-AUTOLINK-V1
-  listingCount?: number;
 }
 
 export interface TrialResults {
@@ -400,8 +375,6 @@ export interface ConvertTrialPayload {
   productId?: string;
   /** Create new ProductMaster (B안) */
   productName?: string;
-  /** Operator note */
-  conversionNote?: string;
 }
 
 export interface TrialConversionResult {
@@ -437,28 +410,8 @@ export interface ProductSearchResponse {
 // WO-MARKET-TRIAL-OPERATIONS-CONSOLIDATION-V1: Funnel API
 // ============================================================================
 
-export interface TrialFunnel {
-  recruitCount: number | null;
-  participantCount: number;
-  productRewardCount: number;
-  convertedProduct: boolean;
-  convertedProductId: string | null;
-  convertedProductName: string | null;
-  conversionDistribution: {
-    none: number;
-    interested: number;
-    considering: number;
-    adopted: number;
-    first_order: number;
-  };
-  listingCount: number;
-  firstOrderCount: number;
-}
-
-export async function getTrialFunnel(trialId: string): Promise<TrialFunnel> {
-  const { data } = await api.get(`${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/funnel`);
-  return data.data || data;
-}
+// WO-O4O-MARKET-TRIAL-CONVERSION-COLUMNS-DROP-V1: TrialFunnel / getTrialFunnel 제거
+// (전환 퍼널 = content-only 비대상, backend getFunnel 도 전환 집계 미반환).
 
 // ============================================================================
 // Neture Operator API — 1차 승인 (WO-O4O-MARKET-TRIAL-PHASE1-V1)
@@ -494,13 +447,11 @@ export async function getOperatorTrialParticipants(
   filters?: {
     rewardType?: 'product' | 'cash';
     rewardStatus?: 'pending' | 'fulfilled';
-    customerConversionStatus?: CustomerConversionStatus;
   },
 ): Promise<ParticipantListResponse> {
   const params = new URLSearchParams();
   if (filters?.rewardType) params.append('rewardType', filters.rewardType);
   if (filters?.rewardStatus) params.append('rewardStatus', filters.rewardStatus);
-  if (filters?.customerConversionStatus) params.append('customerConversionStatus', filters.customerConversionStatus);
   const qs = params.toString();
   const { data } = await api.get(
     `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/participants${qs ? `?${qs}` : ''}`,
@@ -508,24 +459,7 @@ export async function getOperatorTrialParticipants(
   return data.data || data;
 }
 
-/**
- * WO-MARKET-TRIAL-PARTICIPANT-TO-CUSTOMER-FLOW-V1:
- * 참여자 고객 전환 단계 변경
- */
-export async function updateParticipantConversionStatus(
-  trialId: string,
-  participantId: string,
-  status: CustomerConversionStatus,
-  note?: string,
-): Promise<{ id: string; customerConversionStatus: CustomerConversionStatus; customerConversionAt: string | null; customerConversionNote: string | null }> {
-  marketTrialCommerceDisabled('유통참여형 펀딩은 매장 도입/첫 주문 전환 상태를 관리하지 않습니다.');
-  // eslint-disable-next-line no-unreachable -- 정책 비활성화. 기존 로직 보존.
-  const { data } = await api.patch(
-    `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/participants/${participantId}/conversion`,
-    { status, note },
-  );
-  return data.data || data;
-}
+// WO-O4O-MARKET-TRIAL-CONVERSION-COLUMNS-DROP-V1: updateParticipantConversionStatus 제거 (content-only).
 
 /**
  * WO-MARKET-TRIAL-SETTLEMENT-AND-FULFILLMENT-MANAGEMENT-V1:
@@ -611,23 +545,7 @@ export async function updateParticipantPaymentStatus(
   return data.data || data;
 }
 
-/**
- * WO-MARKET-TRIAL-LISTING-AUTOLINK-V1:
- * adopted 참여자 매장에 Trial 상품 진열 등록
- */
-export async function createListingFromTrialParticipant(
-  trialId: string,
-  participantId: string,
-  price?: number,
-): Promise<{ listingId: string; organizationId: string; offerId: string; masterId: string }> {
-  marketTrialCommerceDisabled('유통참여형 펀딩은 매장 상품 전환(매장 진열) 기능을 제공하지 않습니다.');
-  // eslint-disable-next-line no-unreachable -- 정책 비활성화. 기존 로직 보존.
-  const { data } = await api.post(
-    `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/participants/${participantId}/listing`,
-    { price },
-  );
-  return data.data || data;
-}
+// WO-O4O-MARKET-TRIAL-CONVERSION-COLUMNS-DROP-V1: createListingFromTrialParticipant 제거 (content-only).
 
 /**
  * WO-MARKET-TRIAL-SETTLEMENT-AND-FULFILLMENT-MANAGEMENT-V1:

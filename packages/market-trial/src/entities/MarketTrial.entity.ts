@@ -188,27 +188,8 @@ export class MarketTrial {
   @Column({ type: 'int', default: 0 })
   currentParticipants!: number;
 
-  /**
-   * Linked ProductMaster ID after Trial → Product conversion
-   * WO-MARKET-TRIAL-TO-PRODUCT-CONVERSION-FLOW-V1
-   * Null = not yet converted, non-null = converted
-   */
-  @Column({ type: 'uuid', nullable: true })
-  convertedProductId?: string;
-
-  /**
-   * Denormalized product name for display (avoids JOIN)
-   * WO-MARKET-TRIAL-TO-PRODUCT-CONVERSION-FLOW-V1
-   */
-  @Column({ type: 'varchar', length: 500, nullable: true })
-  convertedProductName?: string;
-
-  /**
-   * Operator note on conversion decision
-   * WO-MARKET-TRIAL-TO-PRODUCT-CONVERSION-FLOW-V1
-   */
-  @Column({ type: 'text', nullable: true })
-  conversionNote?: string;
+  // WO-O4O-MARKET-TRIAL-CONVERSION-COLUMNS-DROP-V1:
+  // 제품 전환 컬럼(convertedProductId / convertedProductName / conversionNote) 제거 — content-only.
 
   /**
    * Timestamp when conversion notifications were dispatched to product-reward participants.

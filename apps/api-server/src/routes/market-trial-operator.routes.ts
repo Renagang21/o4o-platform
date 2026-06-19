@@ -113,19 +113,14 @@ export function createNetureOperatorTrialRoutes(): Router {
   router.get('/:id/participants/export', MarketTrialOperatorController.exportParticipantsCSV);
   // WO-MARKET-TRIAL-SETTLEMENT-AND-FULFILLMENT-MANAGEMENT-V1
   router.patch('/:id/participants/:participantId/reward-status', MarketTrialOperatorController.updateParticipantRewardStatus);
-  // WO-MARKET-TRIAL-PARTICIPANT-TO-CUSTOMER-FLOW-V1
-  router.patch('/:id/participants/:participantId/conversion', MarketTrialOperatorController.updateParticipantConversionStatus);
+  // WO-O4O-MARKET-TRIAL-CONVERSION-COLUMNS-DROP-V1: 전환 상태/매장 진열(listing)/제품 전환(convert) route 제거 (content-only).
   // WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1
   router.patch('/:id/participants/:participantId/settlement-status', MarketTrialOperatorController.updateParticipantSettlementStatus);
   // WO-NETURE-MARKET-TRIAL-PAYMENT-READINESS-V1
   router.patch('/:id/participants/:participantId/payment-status', MarketTrialOperatorController.updateParticipantPaymentStatus);
-  // WO-MARKET-TRIAL-LISTING-AUTOLINK-V1
-  router.post('/:id/participants/:participantId/listing', MarketTrialOperatorController.createListingFromParticipant);
   router.patch('/:id/status', MarketTrialOperatorController.updateTrialStatus);
   router.patch('/:id/approve', MarketTrialOperatorController.approve1st);
   router.patch('/:id/reject', MarketTrialOperatorController.reject1st);
-  // WO-MARKET-TRIAL-TO-PRODUCT-CONVERSION-FLOW-V1
-  router.post('/:id/convert', MarketTrialOperatorController.convertToProduct);
 
   return router;
 }
