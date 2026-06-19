@@ -13,7 +13,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
   getOperatorTrialDetail,
   getOperatorTrialParticipants,
-  getTrialFunnel,
   approveTrialFirst,
   rejectTrialFirst,
   exportParticipantsCSV,
@@ -28,7 +27,6 @@ import {
 import type {
   OperatorTrial,
   TrialParticipant,
-  TrialFunnel,
   ParticipantListResponse,
   TrialStatus,
   CustomerConversionStatus,
@@ -78,7 +76,6 @@ export default function MarketTrialApprovalDetailPage() {
   const [rejectReason, setRejectReason] = useState('');
   const [exportLoading, setExportLoading] = useState(false);
   const [filter, setFilter] = useState<ParticipantFilter>('all');
-  const [funnel, setFunnel] = useState<TrialFunnel | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [updatingConversionId, setUpdatingConversionId] = useState<string | null>(null);
   const [creatingListingId, setCreatingListingId] = useState<string | null>(null);
@@ -112,12 +109,8 @@ export default function MarketTrialApprovalDetailPage() {
     if (!id) return;
     setLoading(true);
     try {
-      const [trialData, funnelData] = await Promise.all([
-        getOperatorTrialDetail(id),
-        getTrialFunnel(id).catch(() => null),
-      ]);
+      const trialData = await getOperatorTrialDetail(id);
       setTrial(trialData);
-      setFunnel(funnelData);
       // KPI is best-effort — never blocks the page
       getOperatorTrialKpi(id).then(setTrialKpi).catch(() => null);
       await loadParticipants(id, filter);
@@ -339,10 +332,7 @@ export default function MarketTrialApprovalDetailPage() {
         <FulfillmentSummary summary={summary} allFulfilled={allFulfilled ?? false} />
       )}
 
-      {/* Funnel Section — WO-MARKET-TRIAL-OPERATIONS-CONSOLIDATION-V1 */}
-      {funnel && funnel.participantCount > 0 && (
-        <FunnelSection funnel={funnel} />
-      )}
+      {/* WO-O4O-MARKET-TRIAL-CONVERSION-READ-WIRING-CLEANUP-V1: content-only — 매장 랜딩 전환 퍼널 섹션 제거 */}
 
       {/* Trial Info */}
       <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-5 space-y-4 mb-4">
@@ -1153,73 +1143,6 @@ function ParticipantSection({
           </div>
         </div>
       )}
-    </div>
-  );
-}
-
-// ── Funnel Section ── WO-MARKET-TRIAL-OPERATIONS-CONSOLIDATION-V1
-
-function FunnelSection({ funnel }: { funnel: TrialFunnel }) {
-  const dist = funnel.conversionDistribution;
-  const total = funnel.participantCount;
-
-  const pct = (n: number) => total > 0 ? Math.round((n / total) * 100) : 0;
-
-  const steps = [
-    { key: 'none',        label: '참여만',    count: dist.none,        color: 'bg-gray-200 text-gray-600' },
-    { key: 'interested',  label: '관심',      count: dist.interested,  color: 'bg-blue-100 text-blue-700' },
-    { key: 'considering', label: '취급 검토',  count: dist.considering, color: 'bg-yellow-100 text-yellow-700' },
-    { key: 'adopted',     label: '취급 시작',  count: dist.adopted,     color: 'bg-green-100 text-green-700' },
-    { key: 'first_order', label: '첫 주문',   count: dist.first_order, color: 'bg-green-200 text-green-800' },
-  ];
-
-  const adoptedRate = pct(dist.adopted + dist.first_order);
-  const firstOrderRate = pct(dist.first_order);
-
-  return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-5 mb-4">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-gray-700">매장 랜딩 전환 퍼널</h3>
-        <div className="flex gap-3 text-xs text-gray-500">
-          <span>매장 도입률 <strong className="text-green-600">{adoptedRate}%</strong></span>
-          <span>첫주문률 <strong className="text-green-700">{firstOrderRate}%</strong></span>
-          {funnel.listingCount > 0 && (
-            <span>활용 상품 연결 <strong className="text-indigo-600">{funnel.listingCount}건</strong></span>
-          )}
-        </div>
-      </div>
-
-      {/* Flow bars */}
-      <div className="flex items-end gap-1 mb-3 overflow-x-auto pb-1">
-        {steps.map((step, idx) => (
-          <div key={step.key} className="flex items-center gap-1 flex-shrink-0">
-            {idx > 0 && <span className="text-gray-300 text-xs">›</span>}
-            <div className="flex flex-col items-center min-w-[56px]">
-              <span className="text-base font-bold text-gray-800 mb-0.5">{step.count}</span>
-              <div
-                className={`w-12 rounded-t transition-all ${step.color}`}
-                style={{ height: `${Math.max(4, Math.round((step.count / (total || 1)) * 60))}px` }}
-              />
-              <span className="text-[10px] text-gray-500 mt-1 text-center leading-tight">{step.label}</span>
-              <span className="text-[10px] text-gray-400">{pct(step.count)}%</span>
-            </div>
-          </div>
-        ))}
-
-        {/* Listing */}
-        <div className="flex items-center gap-1 flex-shrink-0">
-          <span className="text-gray-300 text-xs">›</span>
-          <div className="flex flex-col items-center min-w-[56px]">
-            <span className="text-base font-bold text-indigo-700 mb-0.5">{funnel.listingCount}</span>
-            <div
-              className="w-12 rounded-t bg-indigo-100 transition-all"
-              style={{ height: `${Math.max(4, Math.round((funnel.listingCount / (total || 1)) * 60))}px` }}
-            />
-            <span className="text-[10px] text-gray-500 mt-1 text-center leading-tight">매장 진열</span>
-            <span className="text-[10px] text-gray-400">{pct(funnel.listingCount)}%</span>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
