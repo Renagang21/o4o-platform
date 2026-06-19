@@ -74,6 +74,31 @@
 - **복구:** 10파일 복원 커밋(`ada03af5c`, `git commit -- <pathspec>`)으로 main 빌드 정합 환원. 동시 세션 WIP(편집 4파일 + 그들 migration)는 working tree 보존.
 - 교훈: 동시 세션 중 커밋은 반드시 `git commit -- <files>` pathspec. (memory feedback_commit_pathspec_concurrent_sessions)
 
+## 7-2. 최종 종료 절차 (사용자 실행 — 순서대로)
+
+**1) 이전 smoke 계정 정리 먼저** (operator suppliers count 혼동 방지 — 현재 6, 086f898f PENDING 잔존 확인됨)
+Cloud Console SQL Editor (o4o_platform):
+```sql
+BEGIN;
+DELETE FROM neture_suppliers    WHERE user_id = '086f898f-4177-474c-91f5-c867472a76c3';
+DELETE FROM organizations       WHERE code = 'neture-supplier-086f898f';
+DELETE FROM service_memberships WHERE user_id = '086f898f-4177-474c-91f5-c867472a76c3' AND service_key = 'neture';
+DELETE FROM role_assignments    WHERE user_id = '086f898f-4177-474c-91f5-c867472a76c3' AND role LIKE 'neture:%';
+COMMIT;
+-- 검증: SELECT COUNT(*) FROM neture_suppliers;  (6→5)
+```
+
+**2) 복수 서비스 모집 브라우저 smoke** (ACTIVE 공급자 계정으로 neture.co.kr)
+1. `/supplier/products` → PRIVATE(판매자 제한) 유통 상품에서 "판매자 모집 생성"
+2. **모집할 서비스에서 KPA Society + GlycoPharm 복수 체크** → 생성
+3. 모집 목록에서 동일 상품에 **모집 2건**(service kpa-society / glycopharm) 확인
+4. 각 모집 노출 승인 상태가 **독립 pending** 확인
+5. 운영자 노출 승인 화면에서 KPA/GP가 **별도 승인 대상**으로 보이는지 + KPA만 승인/GP 대기·반려 독립 확인
+6. (회귀) 단일 서비스 선택 생성도 정상 1건
+
+**판정:** row 2개 생성 + 서비스별 승인 독립 → 최종 PASS. 1개만/실패/승인 공유 → FAIL.
+**결과 전달 시** 본 CHECK §7 라이브 행을 확정 기록하고 WO 완전 종료.
+
 ## 8. PASS 기준 대비 (WO 수용)
 
 | 기준 | 상태 |
