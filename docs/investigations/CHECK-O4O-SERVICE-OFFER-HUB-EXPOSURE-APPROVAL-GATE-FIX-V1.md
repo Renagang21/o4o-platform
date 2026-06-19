@@ -150,4 +150,33 @@ catalog 팩토리 serviceKey(role-prefix) → `offer_service_approvals.service_k
 
 ---
 
-*P0 fix. 전역 is_active 의존 → distributionType별 승인 정책 정합. PUBLIC 예외 유지, SERVICE/PRIVATE per-service 게이트.*
+## 11. 완료 고정 (CLOSED / PASS) — 2026-06-18
+
+**판정: CLOSED / PASS.** 수정 지점이 명확하고(catalog main+count 동일 게이트, PUBLIC 예외, SERVICE/PRIVATE serviceKey approved 필수, service_key 격리, KPA/Glyco/KCos 공유 컨트롤러 단일 적용), 현재 검증 수준으로 충분.
+
+검증 충족: ① 결함 원인 확인 ② main/count 동시 수정 ③ serviceKey 매핑 정합 ④ typecheck PASS ⑤ 배포 성공 ⑥ PUBLIC 회귀 live 확인 ⑦ frontend/DB/migration 무영향.
+
+**SERVICE 테스트 offer 실증 = 선택(미수행).** 프로덕션에 `[SMOKE] SERVICE` offer를 일부러 생성하는 것은 운영 데이터 흔적을 남기므로 현 단계 필수 아님. 게이트 SQL이 SERVICE/PRIVATE에만 적용되는 구조로 명확하고 PUBLIC 회귀는 live 확인됨. → **추후 실제 SERVICE/PRIVATE 상품 등록·승인 시 자연 smoke로 확인.**
+
+### 결함 처리 상태
+- **결함 1 — HUB catalog 승인 게이트 부재**: ✅ 수정·배포·PUBLIC 회귀 확인 → **완료 고정.**
+- **결함 2 — KPA 승인 화면 scope 오류**: 정상 토큰에서 재현 안 됨 → **코드 결함 아님.** 운영 세션/토큰 점검 항목으로만 유지.
+
+### 정책 고정 (HUB catalog 노출 게이트 SSOT)
+```text
+PUBLIC
+  = 서비스 운영자 승인 없이 HUB catalog 노출 가능
+
+SERVICE / PRIVATE
+  = 현재 서비스의 offer_service_approvals.approval_status='approved' 필요
+  = 타 서비스 approved 는 osa.service_key 격리로 현재 서비스에 영향 없음(교차 누출 차단)
+
+spo.is_active = true
+  = 전역 노출 허가가 아니라 기본 활성 플래그
+  = SERVICE/PRIVATE 의 서비스별 HUB 노출 근거로 단독 사용 금지
+```
+> 향후 catalog/HUB 노출 로직 변경 시 위 축을 기준으로 판단한다. `is_active` 단독 게이트로의 회귀 금지.
+
+---
+
+*P0 fix. 전역 is_active 의존 → distributionType별 승인 정책 정합. PUBLIC 예외 유지, SERVICE/PRIVATE per-service 게이트. CLOSED/PASS 2026-06-18 — SERVICE 실증은 자연 smoke 보류, 결함2=코드결함 아님, 정책축 고정(is_active 단독 게이트 회귀 금지).*
