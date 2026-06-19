@@ -37,11 +37,11 @@
 - **web-neture `tsc --noEmit`: EXIT 0.**
 - 정적: 버튼 onClick=navigate(바인딩 query). product.id/masterId/name/priceGeneral(SupplierProduct 필드) 사용. drawer 다른 로직·operator 공유 뷰 무변경(순수 추가).
 
-### 배포 후 실브라우저 smoke (A 교훈, 미제출·비파괴)
-1. `/supplier/products` → 미네락 600 drawer → 공급 방식 섹션 하단 **이벤트 오퍼 안내 + [이 상품으로 이벤트 오퍼 만들기]** 표시.
-2. 클릭 → `/supplier/event-offers` 이동 + **제안 모달 자동 오픈 + 미네락 600 자동 선택** + 대상 서비스/이벤트가/기간/수량 입력 필드.
-3. **제출하지 않음**(운영 데이터·event offer row 생성 회피). 정상 공급 방식/가격/승인 불변.
-4. drawer/공급 방식 모달/상품 정보 편집 회귀 없음.
+### 배포 후 실브라우저 smoke — 2026-06-19 **PASS** (renagang21 미네락 600, 미제출·비파괴)
+1. drawer 공급 방식 섹션 하단 **이벤트 오퍼 안내 + [이 상품으로 이벤트 오퍼 만들기]** 표시. **PASS**
+2. 클릭 → `/supplier/event-offers?supplierProductId=3adc23b1…&masterId=…&name=…&priceGeneral=22000` 이동 + **제안 모달 자동 오픈** + "선택한 공급자 상품: 미네락 600" 배너("원본 상품 정보와 기본 공급가는 변경되지 않습니다") + **상품 자동 선택**(radio 미네락 600 [checked], ₩22,000) + 대상 서비스(KPA ☑/K-Cos/Glyco)·이벤트 공급가·시작/종료·수량/제한 입력. **PASS**
+3. **제안하기 미클릭**(event offer row·운영 데이터 미생성). 정상 공급 방식/serviceKeys/price_general/승인 불변. **PASS**
+4. drawer/공급 방식 모달/상품 정보 편집 회귀 없음. **PASS**
 
 ## 5. 비범위 / 준수
 
