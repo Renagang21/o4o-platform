@@ -37,10 +37,10 @@ D에서 SERVICE 제거 시 approval row를 `'cancelled'`(철회)로 전환하는
 - **web-neture `tsc --noEmit`: EXIT 0.**
 - 정적: pending/approved/rejected 기존 라벨/스타일 불변. cancelled만 신규 분기. rejected 반려 배너(`sa.status==='rejected'` 필터)는 cancelled 미포함(무변경).
 
-### 배포 후 실브라우저 smoke (cancelled offer 보유 — 미네락 600 k-cosmetics)
-1. 목록 "승인" 컬럼: 미네락 600 = **"승인"**(철회 `*` 제거), 반려 상품은 '*'/tooltip 유지.
-2. drawer 레거시 "서비스" 섹션: k-cosmetics = **'철회됨'** + '철회 사유', kpa/glyco = '승인'.
-3. 신규 공급 방식 섹션/모달 정상, 승인대기/승인/반려 라벨 회귀 없음.
+### 배포 후 실브라우저 smoke — 2026-06-19 **PASS** (renagang21 미네락 600, k-cosmetics cancelled)
+1. 목록 "승인" 컬럼: 미네락 600 = **"승인"** (철회 `*` 제거됨, 이전 "승인 *"). **PASS**
+2. drawer 레거시 "서비스" 섹션: k-cosmetics = **"철회됨"** + **"철회 사유: 공급자가 해당 서비스 공급을 철회했습니다."**, glycopharm/kpa-society = "승인". **PASS** (이전 '반려'/'반려 사유'에서 정정)
+3. 신규 공급 방식 섹션(kpa/glyco 승인됨, B2B 전체 공급, [공급 방식 변경]) 유지, 라벨 회귀 없음. **PASS**
 
 ## 6. 비범위 / 준수
 
