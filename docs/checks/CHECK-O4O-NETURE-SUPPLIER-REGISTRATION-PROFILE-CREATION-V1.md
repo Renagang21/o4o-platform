@@ -74,9 +74,13 @@
 
 **스모크 PASS.** 핵심(가입 시점 생성) 라이브 증명 + migration 정상 실행 + step1 무변경 구조 보증.
 
-### 7-1. 스모크 잔여 데이터 (정리 필요)
-- 프로덕션에 테스트 계정 생성됨: `smoke-regprofile-1781833640@example.com` (userId `086f898f-4177-474c-91f5-c867472a76c3`) — neture membership(pending) + neture_suppliers(PENDING) + org(`neture-supplier-086f898f`).
-- 정리 방법: operator 회원관리에서 거절/삭제 또는 admin hard-delete. (DB 직접 삭제는 방화벽/승인 필요 — 본 세션 미실행)
+### 7-1. 스모크 잔여 데이터 정리 (Cloud Console SQL — 사용자 실행 대기)
+- 대상(스모크 1건): `smoke-regprofile-1781833640@example.com` / userId `086f898f-4177-474c-91f5-c867472a76c3` / org `neture-supplier-086f898f` — neture membership(pending) + neture_suppliers(PENDING) + org.
+- **정정(중요):** admin hard-delete API(`DELETE /operator/members/:id?mode=hard`)는 `service_memberships`/`role_assignments`/users 비활성화까지만 처리하고 **`neture_suppliers`·supplier `organizations`는 삭제하지 않음**. `getAllSuppliers`는 `supplierRepo.find()`로 전체 row 반환 → API 만으로는 count 6→5 미충족(orphan 발생). 공급자 레벨 삭제 API 부재. → **API hard-delete 사용 안 함.**
+- **정리 수단 = Cloud Console SQL Editor**(프로덕션 DB 방화벽: 비대화식 일회성 SQL 수단 없음). BEGIN/COMMIT 트랜잭션, 삭제 전 SELECT 확인 → DELETE 4문(neture_suppliers→organizations→service_memberships→role_assignments). users(공통 Identity)는 hard-delete 금지.
+- **격리 확인(read-only, operator API):** 현재 공급자 6건 중 스모크는 `086f898f`(smoke-regprofile) **1건만**. 나머지 PENDING(test@test.com `20e1ebc2` / aop80 `6ab2e8a0` / sohae21 `52a4c1e6`) · ACTIVE(renagang21 `6967ebe0` / e2etest `d5284f7c`)는 userId 상이 → SQL(`user_id='086f898f…'` + org code) 영향 없음.
+- **PASS 조건:** neture_suppliers 6→5 · smoke userId/org/membership/role_assignments 행 0 · 타 공급자 무영향.
+- **상태: 사용자 Cloud Console SQL 실행 대기.** 실행 결과 수령 후 본 CHECK 에 최종 확정 추가 예정.
 
 ## 8. 비범위 / 후속
 
