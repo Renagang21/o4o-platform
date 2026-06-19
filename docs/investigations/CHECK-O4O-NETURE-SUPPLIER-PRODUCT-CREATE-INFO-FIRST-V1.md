@@ -54,6 +54,21 @@
 - `WO-O4O-NETURE-SUPPLIER-PRODUCT-TO-EVENT-OFFER-ENTRY-V1` (이벤트 오퍼 진입) · `IR-O4O-NETURE-SUPPLIER-PRODUCT-SERVICE-SPECIFIC-PRICING-V1` (서비스별 공급가).
 - (선택) 완료 화면 "공급 방식 설정" 버튼을 해당 상품 drawer+모달로 직접 deep-link(현재는 목록 경유 안내) — route/state 전달 복잡도로 V1 보류(§6.4).
 
+## 7. GuideBlock 라이브 문구 확인 (2026-06-19) — PASS
+
+> §4 에서 "후속 guide 콘텐츠 정정 대상"으로 남긴 CMS guide block(코드 STEPS 아님)의 **라이브 실측**.
+
+- 등록 흐름 GuideBlock = `SupplierProductCreatePage` 의 `GuideBlock`(serviceKey=`neture`, pageKey=`supplier.product.editor`). 다른 supplier 등록/목록/진입 페이지엔 GuideBlock 없음(RegisterEntryPage/ProductsPage 무 GuideBlock).
+- **라이브 API 실측**(read-only): `GET /guide/contents?serviceKey=neture&pageKey=supplier.product.editor` → **`{"sections": {}}`**(DB 콘텐츠 없음). event-offer/library pageKey 도 `{}`.
+- → DB override 없음 → **코드 fallback(정보-우선) 문구가 라이브 렌더**:
+  - title "상품 정보를 먼저 등록합니다."
+  - desc "기본 정보·기본 공급가 저장. 공급 방식(전체 공개/서비스 공급)은 **저장 후 [공급 방식 변경]에서 설정**, 설정 전 HUB 미노출."
+  - steps 정보 → 기본 공급가(공급 방식 별도) → 이미지/설명
+- **판정: PASS** — "유통 정책 / 서비스 노출 중심" guide 문구 없음, 정보-우선 흐름 정합. (종전 우려 "Step 2: 공급가, 유통 정책, 서비스 노출" CMS 콘텐츠는 현재 DB 부재.)
+- 잔여(경미·비차단): `SupplierProductsPage:1262` **목록 헤더 부제**(하드코딩, GuideBlock 아님) "…가격 및 유통 정책을 설정합니다" 에 '유통 정책' 어휘 잔존 → 정적 문구 마이크로 후속(선택).
+
+→ **공급자 상품 UX 축(A 표시분리 / B 정보-우선 / C 진입 / D 변경 API·cancelled / E 이벤트 진입 + GuideBlock 문구) 종료 조건 충족.**
+
 ---
 
-*Date: 2026-06-19 · 후보 B frontend-only · 등록 정보-우선(Step2 hideDistribution=공급방식 제거, 가격 유지) + 정보/완료 안내 · createProduct/backend 무변경 · 내부/미노출 생성 · web-neture tsc 0 · 배포 후 smoke · 다른 세션 WIP 미커밋.*
+*Date: 2026-06-19 · 후보 B frontend-only · 등록 정보-우선(Step2 hideDistribution=공급방식 제거, 가격 유지) + 정보/완료 안내 · createProduct/backend 무변경 · 내부/미노출 생성 · web-neture tsc 0 · GuideBlock 라이브 문구 PASS(supplier.product.editor=빈DB→fallback 정보-우선) · 공급자 상품 UX 축 종료 · 다른 세션 WIP 미커밋.*
