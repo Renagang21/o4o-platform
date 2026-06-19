@@ -305,12 +305,14 @@ export class EventOfferService {
          opl.per_store_limit AS "perStoreLimit",
          spo.supplier_id     AS "supplierId",
          spo.price_general::numeric AS "generalPrice",
-         COALESCE(opl.event_price, spo.price_general, opl.price)::numeric AS "unitPrice",
+         -- WO-O4O-NETURE-SUPPLIER-PRODUCT-SERVICE-SPECIFIC-PRICING-FLOW-V1: event_price > 서비스별가 > price_general > legacy opl.price
+         COALESCE(opl.event_price, osp.unit_price, spo.price_general, opl.price)::numeric AS "unitPrice",
          COALESCE(pm.name, '(상품명 없음)')  AS "productName",
          COALESCE(org.name, '(공급사 없음)') AS "supplierName",
          opl.source_type AS "sourceType"
        FROM organization_product_listings opl
        LEFT JOIN supplier_product_offers spo ON spo.id = opl.offer_id
+       LEFT JOIN offer_service_prices osp     ON osp.offer_id = spo.id AND osp.service_key = opl.service_key
        LEFT JOIN neture_suppliers ns          ON ns.id  = spo.supplier_id
        LEFT JOIN organizations org            ON org.id = ns.organization_id
        LEFT JOIN product_masters pm           ON pm.id  = opl.master_id
@@ -536,7 +538,8 @@ export class EventOfferService {
          opl.per_store_limit AS "perStoreLimit",
          spo.supplier_id     AS "supplierId",
          spo.price_general::numeric AS "generalPrice",
-         COALESCE(opl.event_price, spo.price_general, opl.price)::numeric AS "unitPrice",
+         -- WO-O4O-NETURE-SUPPLIER-PRODUCT-SERVICE-SPECIFIC-PRICING-FLOW-V1: event_price > 서비스별가 > price_general > legacy opl.price
+         COALESCE(opl.event_price, osp.unit_price, spo.price_general, opl.price)::numeric AS "unitPrice",
          COALESCE(pm.name, '(상품명 없음)')  AS "productName",
          COALESCE(org.name, '(공급사 없음)') AS "supplierName",
          ns.base_shipping_fee        AS "baseShippingFee",
@@ -544,6 +547,7 @@ export class EventOfferService {
          opl.source_type AS "sourceType"
        FROM organization_product_listings opl
        LEFT JOIN supplier_product_offers spo ON spo.id = opl.offer_id
+       LEFT JOIN offer_service_prices osp     ON osp.offer_id = spo.id AND osp.service_key = opl.service_key
        LEFT JOIN neture_suppliers ns          ON ns.id  = spo.supplier_id
        LEFT JOIN organizations org            ON org.id = ns.organization_id
        LEFT JOIN product_masters pm           ON pm.id  = opl.master_id
@@ -1094,11 +1098,18 @@ export class EventOfferService {
       if (!Number.isFinite(ec.eventPrice) || ec.eventPrice <= 0) {
         throw new EventOfferCreateError(400, 'eventPrice 는 0 보다 큰 숫자여야 합니다.', 'INTERNAL_ERROR');
       }
+      // WO-O4O-NETURE-SUPPLIER-PRODUCT-SERVICE-SPECIFIC-PRICING-FLOW-V1:
+      //   검증 기준 = 대상 서비스의 서비스별 공급가(있으면) ?? 기본 공급가(price_general).
       const generalPrice = offer.price_general != null ? Number(offer.price_general) : null;
-      if (generalPrice != null && ec.eventPrice > generalPrice) {
+      const [svcPriceRow] = await this.dataSource.query(
+        `SELECT unit_price FROM offer_service_prices WHERE offer_id = $1 AND service_key = $2`,
+        [input.offerId, input.serviceKey],
+      );
+      const basePrice = svcPriceRow?.unit_price != null ? Number(svcPriceRow.unit_price) : generalPrice;
+      if (basePrice != null && ec.eventPrice > basePrice) {
         throw new EventOfferCreateError(
           400,
-          `이벤트 가격(${ec.eventPrice})은 일반 공급가(${generalPrice}) 이하여야 합니다.`,
+          `이벤트 가격(${ec.eventPrice})은 공급가(${basePrice}) 이하여야 합니다.`,
           'INTERNAL_ERROR',
         );
       }

@@ -303,6 +303,41 @@ export function createSupplierProductController(dataSource: DataSource): Router 
     }
   });
 
+  // GET /supplier/products/:id/service-prices — 서비스별 공급가 조회
+  // WO-O4O-NETURE-SUPPLIER-PRODUCT-SERVICE-SPECIFIC-PRICING-FLOW-V1
+  router.get('/products/:id/service-prices', requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const supplierId = (req as SupplierRequest).supplierId;
+      const result = await netureService.getServicePrices(req.params.id, supplierId);
+      if (!result.success) {
+        return res.status(result.error === 'NOT_OWNED' ? 403 : 400).json(result);
+      }
+      res.json(result);
+    } catch (error) {
+      logger.error('[Neture API] Error fetching service prices:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+    }
+  });
+
+  // PUT /supplier/products/:id/service-prices — 서비스별 공급가 일괄 설정(replace)
+  router.put('/products/:id/service-prices', requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const supplierId = (req as SupplierRequest).supplierId;
+      const { prices } = req.body || {};
+      if (!Array.isArray(prices)) {
+        return res.status(400).json({ success: false, error: 'INVALID_PRICES' });
+      }
+      const result = await netureService.setServicePrices(req.params.id, supplierId, prices);
+      if (!result.success) {
+        return res.status(result.error === 'NOT_OWNED' ? 403 : 400).json(result);
+      }
+      res.json(result);
+    } catch (error) {
+      logger.error('[Neture API] Error setting service prices:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+    }
+  });
+
   // GET /supplier/products/template — XLSX 템플릿 다운로드 (WO-NETURE-BULK-IMPORT-TEMPLATE-UPGRADE-V1)
   router.get('/products/template', requireAuth, async (_req: AuthenticatedRequest, res: Response) => {
     try {

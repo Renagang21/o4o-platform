@@ -16,8 +16,10 @@
  *   - NeturePartnershipService (partnership request CRUD)
  */
 
+import { AppDataSource } from '../../database/connection.js';
 import { NetureCatalogService } from './services/catalog.service.js';
 import { NetureOfferService } from './services/offer.service.js';
+import { OfferServicePriceService, type ServicePriceInput } from './services/offer-service-price.service.js';
 import { NetureSupplierService } from './services/supplier.service.js';
 import { NetureDashboardService } from './services/neture-dashboard.service.js';
 import { NeturePartnerContractService } from './services/partner-contract.service.js';
@@ -47,6 +49,21 @@ export class NetureService {
   private get supplierService(): NetureSupplierService {
     if (!this._supplierService) this._supplierService = new NetureSupplierService();
     return this._supplierService;
+  }
+
+  // WO-O4O-NETURE-SUPPLIER-PRODUCT-SERVICE-SPECIFIC-PRICING-FLOW-V1
+  private _servicePriceService?: OfferServicePriceService;
+  private get servicePriceService(): OfferServicePriceService {
+    if (!this._servicePriceService) this._servicePriceService = new OfferServicePriceService(AppDataSource);
+    return this._servicePriceService;
+  }
+
+  async getServicePrices(offerId: string, supplierId: string) {
+    return this.servicePriceService.getByOfferForSupplier(offerId, supplierId);
+  }
+
+  async setServicePrices(offerId: string, supplierId: string, items: ServicePriceInput[]) {
+    return this.servicePriceService.setPrices(offerId, supplierId, items);
   }
 
   private _dashboardService?: NetureDashboardService;

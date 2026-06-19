@@ -79,6 +79,8 @@ export interface B2BCheckoutResult {
 interface OfferRow {
   id: string;
   price_general: number;
+  // WO-O4O-NETURE-SUPPLIER-PRODUCT-SERVICE-SPECIFIC-PRICING-FLOW-V1: scope.serviceKey 기준 서비스별 공급가(없으면 null → price_general)
+  service_unit_price: number | null;
   is_active: boolean;
   approval_status: string;
   distribution_type: string;
@@ -186,12 +188,15 @@ export class NetureB2BCartCheckoutService {
               spo.supplier_id::text AS supplier_id,
               pm.name AS product_name,
               ns.status AS supplier_status,
-              ns.base_shipping_fee, ns.free_shipping_threshold
+              ns.base_shipping_fee, ns.free_shipping_threshold,
+              -- WO-O4O-NETURE-SUPPLIER-PRODUCT-SERVICE-SPECIFIC-PRICING-FLOW-V1: scope.serviceKey 기준 서비스별 공급가
+              (SELECT osp.unit_price FROM offer_service_prices osp
+                 WHERE osp.offer_id = spo.id AND osp.service_key = $2) AS service_unit_price
        FROM supplier_product_offers spo
        JOIN product_masters pm ON pm.id = spo.master_id
        JOIN neture_suppliers ns ON ns.id = spo.supplier_id
        WHERE spo.id::text = ANY($1)`,
-      [offerIds],
+      [offerIds, scope.serviceKey],
     );
     const offerMap = new Map<string, OfferRow>(offerRows.map((o) => [o.id, o]));
 
@@ -223,7 +228,9 @@ export class NetureB2BCartCheckoutService {
       if (!Number.isInteger(it.quantity) || it.quantity <= 0 || it.quantity > 1000) {
         fail('INVALID_QUANTITY', `수량이 올바르지 않습니다: ${offer.product_name}`); continue;
       }
-      const unitPrice = Number(offer.price_general);
+      // WO-O4O-NETURE-SUPPLIER-PRODUCT-SERVICE-SPECIFIC-PRICING-FLOW-V1:
+      //   서비스별 공급가(scope.serviceKey) 우선, 없으면 price_general fallback. (event_price 는 listing 주문 경로 소관)
+      const unitPrice = offer.service_unit_price != null ? Number(offer.service_unit_price) : Number(offer.price_general);
       if (!(unitPrice > 0)) { fail('INVALID_PRICE', `가격이 올바르지 않습니다: ${offer.product_name}`); continue; }
       if (offer.track_inventory) {
         const available = Number(offer.stock_quantity) - Number(offer.reserved_quantity);
