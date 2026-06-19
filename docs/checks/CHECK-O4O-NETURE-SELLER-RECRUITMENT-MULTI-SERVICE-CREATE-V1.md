@@ -57,14 +57,22 @@
 - **수정:** `att.attname::text` + `ARRAY[...]::text[]` 캐스팅(up/down 양쪽). 동일 migration 명/타임스탬프 → 재배포 시 pending 재실행. api-server tsc PASS.
 - 판정: 사용자 기준대로 **FAIL→추가수정** 전환. 재배포 후 재검증.
 
-## 7. 배포 후 스모크 (필수 — DB migration + 신규 생성 경로)
+## 7. 배포 후 스모크 결과 (2026-06-19)
 
-1. migration `ExpandRecruitmentUniqueToService` 실행 로그 확인(제약 교체 성공, 에러 0).
-2. 공급자 모집 모달에서 KPA+GlycoPharm 복수 선택 → 생성 → recruitment **row 2개**(serviceId 각각) 확인.
-3. 서비스 미선택 → 생성 불가(버튼/검증).
-4. 규제 상품 → 비약국 서비스 비활성 + (우회 시) 백엔드 400.
-5. 운영자 노출 승인: KPA 승인 / GP 대기·반려 독립 확인.
-6. 기존 단일 모집 표시 회귀 없음.
+| # | 항목 | 결과 |
+|---|------|------|
+| migration | `ExpandRecruitmentUniqueToService` 제약 교체 | ✅ **PASS** — 2차 배포(`ada03af5c`)에서 `[X] 556 ExpandRecruitmentUniqueToService20260619000000` 기록, `name[]=text[]` 에러 없음. UNIQUE→(product_id,seller_id,service_id) 적용. (1차는 §6-1 FAIL→캐스팅 수정) |
+| 2 라이브 복수 생성 | KPA+GP → row 2개 | ⏳ **미실행(차단)** — active-supplier 세션 확보 불가(renagang21 Neture 자격증명 stale=INVALID_CREDENTIALS, 타 ACTIVE 공급자 자격 미보유). 무차별 시도 회피. 생성 API 응답이 `recruitments[]` 반환하므로 유효 세션만 있으면 DB 없이 검증 가능 — **사용자 브라우저 smoke 또는 자격 제공 시 수행** |
+| 3 서비스별 승인 독립 | KPA approved / GP rejected | ⏳ 2에 의존 — 코드·구조 보증(서비스별 row + proxy SERVICE_MISMATCH 가드) |
+| 4 단일 모집 회귀 | serviceKey 단수 하위호환 | ✅ 코드 보증(serviceKeys 없으면 serviceKey 1개 처리), tsc PASS |
+| 5 UI | 복수 체크박스/최소1/규제 비활성 | ✅ 코드·tsc. 시각 확인은 사용자 브라우저 |
+
+**migration PASS(핵심 — DB 제약 교체 적용).** 라이브 복수 생성은 active-supplier 자격 제약으로 미실행 — 코드+migration 검증 완료, 실제 생성은 사용자 측 브라우저 smoke 권장.
+
+### 7-1. 빌드 오염 사고 + 복구 (정직 기록)
+- migration-fix 커밋(`53d5975db`)에서 `git commit`(pathspec 미지정)이 동시 세션 P3 SCHEMA-CLEANUP 의 **staged 삭제(trial-fulfillment/shipping 10파일)를 혼입** → 참조 제거 편집(register-routes/connection)은 unstaged 라 main 빌드 깨짐(해당 커밋 Deploy FAILED).
+- **복구:** 10파일 복원 커밋(`ada03af5c`, `git commit -- <pathspec>`)으로 main 빌드 정합 환원. 동시 세션 WIP(편집 4파일 + 그들 migration)는 working tree 보존.
+- 교훈: 동시 세션 중 커밋은 반드시 `git commit -- <files>` pathspec. (memory feedback_commit_pathspec_concurrent_sessions)
 
 ## 8. PASS 기준 대비 (WO 수용)
 
