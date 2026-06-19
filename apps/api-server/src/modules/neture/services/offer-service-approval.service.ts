@@ -83,28 +83,43 @@ export class OfferServiceApprovalService {
   ): Promise<{ cancelledServiceKeys: string[]; deactivatedListings: number }> {
     if (!serviceKeys.length) return { cancelledServiceKeys: [], deactivatedListings: 0 };
 
-    const cancelled: Array<{ service_key: string }> = await executor.query(
-      `UPDATE offer_service_approvals
-       SET approval_status = 'cancelled', reason = $3, decided_at = NOW(), updated_at = NOW()
+    // RETURNING 의존 금지(queryRunner UPDATE...RETURNING 컬럼 null/형식 이슈, CLAUDE.md 주의사항) —
+    // SELECT 로 대상/카운트 확정 후 UPDATE.
+    const targets: Array<{ service_key: string }> = await executor.query(
+      `SELECT service_key FROM offer_service_approvals
        WHERE offer_id = $1 AND service_key = ANY($2::text[])
-         AND approval_status IN ('pending', 'approved', 'rejected')
-       RETURNING service_key`,
-      [offerId, serviceKeys, reason],
+         AND approval_status IN ('pending', 'approved', 'rejected')`,
+      [offerId, serviceKeys],
     );
+    const cancelledServiceKeys = targets.map((r) => r.service_key);
+    if (cancelledServiceKeys.length) {
+      await executor.query(
+        `UPDATE offer_service_approvals
+         SET approval_status = 'cancelled', reason = $3, decided_at = NOW(), updated_at = NOW()
+         WHERE offer_id = $1 AND service_key = ANY($2::text[])
+           AND approval_status IN ('pending', 'approved', 'rejected')`,
+        [offerId, cancelledServiceKeys, reason],
+      );
+    }
 
-    // 해당 serviceKey listing 비활성(삭제 금지) — 노출/판매 채널 중단
-    const listingResult = await executor.query(
-      `UPDATE organization_product_listings
-       SET is_active = false, updated_at = NOW()
+    // 해당 serviceKey listing 비활성(삭제 금지) — 사전 COUNT 후 UPDATE
+    const [cntRow]: Array<{ cnt: number }> = await executor.query(
+      `SELECT COUNT(*)::int AS cnt FROM organization_product_listings
        WHERE offer_id = $1 AND service_key = ANY($2::text[]) AND is_active = true`,
       [offerId, serviceKeys],
     );
-    const deactivatedListings = Array.isArray(listingResult)
-      ? listingResult.length
-      : (listingResult as { rowCount?: number })?.rowCount ?? 0;
+    const deactivatedListings = Number(cntRow?.cnt || 0);
+    if (deactivatedListings > 0) {
+      await executor.query(
+        `UPDATE organization_product_listings
+         SET is_active = false, updated_at = NOW()
+         WHERE offer_id = $1 AND service_key = ANY($2::text[]) AND is_active = true`,
+        [offerId, serviceKeys],
+      );
+    }
 
-    logger.info(`[ServiceApproval] cancelServiceApprovals offer ${offerId}: cancelled=[${cancelled.map(r => r.service_key).join(',')}], listingsDeactivated=${deactivatedListings}`);
-    return { cancelledServiceKeys: cancelled.map((r) => r.service_key), deactivatedListings };
+    logger.info(`[ServiceApproval] cancelServiceApprovals offer ${offerId}: cancelled=[${cancelledServiceKeys.join(',')}], listingsDeactivated=${deactivatedListings}`);
+    return { cancelledServiceKeys, deactivatedListings };
   }
 
   /**

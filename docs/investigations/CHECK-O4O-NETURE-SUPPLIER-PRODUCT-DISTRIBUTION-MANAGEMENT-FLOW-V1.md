@@ -51,12 +51,25 @@
 - **api-server `tsc --noEmit`: EXIT 0.**
 - 정적: 트랜잭션(queryRunner) 일괄, executor 전파로 tx 일관성. eligible 필터로 잘못된 키 차단. 기존 흐름 cancelled 부재 시 불변.
 
-### 배포 후 API smoke (Phase 1, 권장)
-1. serviceKeys=[] → PATCH `{serviceKeys:["kpa-society"]}` → offer.service_keys 포함 + osa(kpa-society)=pending + KPA HUB 미노출.
-2. operator 승인 → osa=approved → KPA HUB 노출.
-3. PATCH `{serviceKeys:[]}` → osa(kpa-society)=**cancelled**(row 보존) + 관련 listing is_active=false + KPA HUB 미노출.
-4. PATCH `{serviceKeys:["kpa-society"]}` 재추가 → osa=**pending**(자동 approved 복구 없음).
-5. PATCH `{isPublic:true, serviceKeys:[]}` → distribution_type=PUBLIC, HUB 노출.
+### 배포 후 API smoke (Phase 1) — 2026-06-19 **PASS** (실 API, 인증 fetch)
+
+- **방식(비파괴)**: ACTIVE 공급자(renagang21) 미네락 600 offer(이미 kpa-society/glycopharm approved, PUBLIC)에 **현재 없는 서비스 `k-cosmetics`만 추가→제거→재추가→원복** — 기존 kpa/glyco/PUBLIC 불변. 종료 후 원상복구.
+- **결과(`PATCH /supplier/products/:id/distribution` 응답)**:
+  - **추가**: `added=["k-cosmetics"]`, `addedResult.insertedServiceKeys=["k-cosmetics"]` → **pending 신규**. offer 유지 APPROVED. ✅
+  - **제거**: `removed=["k-cosmetics"]`, serviceKeys 복귀. ✅
+  - **재추가**: `addedResult.resubmittedServiceKeys=["k-cosmetics"]` → **cancelled→pending 재심사**(ON CONFLICT WHERE 가 cancelled 매칭). 이는 **직전 제거가 실제로 cancelled 전환됐음을 증명**(pending 이었으면 resubmit=0, skip). **자동 approved 복구 없음.** ✅
+  - **원복**: serviceKeys=[kpa-society, glycopharm], offer=APPROVED+PUBLIC 복귀(kpa/glyco 무결). ✅
+
+| smoke | 결과 |
+|------|:--:|
+| 1. SERVICE 추가 → pending | **PASS** |
+| 2. SERVICE 제거 → cancelled(재추가 resubmit로 입증) | **PASS** |
+| 3. cancelled 재추가 → pending(approved 복구 없음) | **PASS** |
+| 4. 기존 approved(kpa/glyco) 무결 + offer APPROVED 유지 | **PASS** |
+| 5. PUBLIC 유지(distribution_type=PUBLIC) | **PASS** |
+| 6. operator 승인→approved 후 제거(listing 비활성) | 미실행(운영자 자격 없음) — cancelServiceApprovals 가 approved 동일 처리(코드/typecheck) |
+
+> **발견·수정**: `cancelServiceApprovals` 의 응답 필드(`cancelledServiceKeys`/`deactivatedListings`)가 **queryRunner `UPDATE...RETURNING` 컬럼 null/형식 이슈**로 잘못 파싱(`[null,null]`/오카운트). **실제 DB 전이는 정상**(재추가 resubmit로 입증)이나 보고 필드가 틀려 → **SELECT→UPDATE 안전 패턴으로 수정**(RETURNING 의존 제거, 사전 COUNT). api-server tsc 0. ← 본 CHECK 커밋에 포함.
 
 ## 6. Phase 2 (frontend) — 후속 (이번 커밋 미포함)
 
