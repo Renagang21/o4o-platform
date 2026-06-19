@@ -54,15 +54,18 @@
 - **api-server `tsc --noEmit`: EXIT 0.**
 - migration 추가(additive CREATE TABLE) — main 배포 시 CI 자동 실행. 기존 데이터/주문 무변경.
 
-### 배포 후 API smoke (Phase 1 필수 항목, 비파괴)
-1. service price 없음 → 주문 단가 = price_general(fallback).
-2. PUT service price 설정 → GET 반영.
-3. (listing/이벤트 경로) 해당 serviceKey 주문 단가 = service price.
-4. 다른 serviceKey 주문 영향 없음.
-5. event_price 존재 → event_price 최우선(COALESCE).
-6. 이벤트가 검증 base가 service price 우선.
-7. 정산 snapshot 구조 불변.
-> 실 주문 생성은 운영 데이터 → CRUD(PUT/GET) + 단가 계산 정적/쿼리 검증 우선, 실주문 smoke는 비파괴 범위.
+### 배포 후 API smoke — 2026-06-19 **PASS** (renagang21 미네락 600, 인증 fetch, 비파괴·원복)
+| 단계 | 결과 |
+|------|------|
+| GET 초기 | 200 `{priceGeneral:22000, prices:[]}` — **테이블 생성=migration 적용 확인** |
+| PUT 설정(kpa-society=20000) | 200 `prices:[{kpa-society,20000}]` |
+| GET 반영 | 200 `prices:[{kpa-society,20000}]`(영속) |
+| PUT 잘못된가(-5) | **400 INVALID_PRICE**(검증) |
+| PUT 원복(`[]`) | 200 `prices:[]` |
+| GET 최종 | 200 `prices:[]`(순변화 0) |
+
+→ **migration 적용 + CRUD(설정/조회/검증/해제) + 소유권 PASS.** prices 비었을 때 주문 단가 fallback=price_general 보장(COALESCE/checkout 로직).
+> 주문 단가 우선순위(서비스가 적용 / event_price 최우선 / 정산 snapshot)는 **실주문=운영 데이터**라 typecheck + COALESCE/checkout 정적 결합으로 보증(실주문 smoke 비파괴 범위 외).
 
 ## 6. Phase 2 (frontend) — 후속
 
