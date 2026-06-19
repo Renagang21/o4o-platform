@@ -74,21 +74,13 @@
 - **복구:** 10파일 복원 커밋(`ada03af5c`, `git commit -- <pathspec>`)으로 main 빌드 정합 환원. 동시 세션 WIP(편집 4파일 + 그들 migration)는 working tree 보존.
 - 교훈: 동시 세션 중 커밋은 반드시 `git commit -- <files>` pathspec. (memory feedback_commit_pathspec_concurrent_sessions)
 
-## 7-2. 최종 종료 절차 (사용자 실행 — 순서대로)
+## 7-2. 최종 종료 절차 (사용자 실행)
 
-**1) 이전 smoke 계정 정리 먼저** (operator suppliers count 혼동 방지 — 현재 6, 086f898f PENDING 잔존 확인됨)
-Cloud Console SQL Editor (o4o_platform):
-```sql
-BEGIN;
-DELETE FROM neture_suppliers    WHERE user_id = '086f898f-4177-474c-91f5-c867472a76c3';
-DELETE FROM organizations       WHERE code = 'neture-supplier-086f898f';
-DELETE FROM service_memberships WHERE user_id = '086f898f-4177-474c-91f5-c867472a76c3' AND service_key = 'neture';
-DELETE FROM role_assignments    WHERE user_id = '086f898f-4177-474c-91f5-c867472a76c3' AND role LIKE 'neture:%';
-COMMIT;
--- 검증: SELECT COUNT(*) FROM neture_suppliers;  (6→5)
-```
+> **순서 변경(2026-06-19):** 086f898f 정리는 **보류 → backlog 분리**. gcloud sql connect 비대화식이 hang(150s timeout, exit 124, **DELETE 전 SELECT 단계 — 데이터 변경 0**)으로 실측 확인되어 재시도 안 함. admin API도 orphan 남겨 금지. 사용자의 Cloud Console SQL 실행이 어려워, **복수 모집 브라우저 smoke 를 먼저** 진행. → `BACKLOG-O4O-PROD-SMOKE-DATA-CLEANUP-V1`
 
-**2) 복수 서비스 모집 브라우저 smoke** (ACTIVE 공급자 계정으로 neture.co.kr)
+**count 보정 주의:** 현재 `/operator/suppliers` count=6 에는 **smoke-regprofile(086f898f) 1건 포함** → 정상 공급자는 5. smoke 결과 해석 시 +1 감안.
+
+**복수 서비스 모집 브라우저 smoke** (ACTIVE 공급자 계정으로 neture.co.kr)
 1. `/supplier/products` → PRIVATE(판매자 제한) 유통 상품에서 "판매자 모집 생성"
 2. **모집할 서비스에서 KPA Society + GlycoPharm 복수 체크** → 생성
 3. 모집 목록에서 동일 상품에 **모집 2건**(service kpa-society / glycopharm) 확인
