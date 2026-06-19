@@ -384,6 +384,16 @@ export class NetureService {
     return this.offerService.updateSupplierOffer(offerId, supplierId, updates);
   }
 
+  // WO-O4O-NETURE-SUPPLIER-PRODUCT-DISTRIBUTION-MANAGEMENT-FLOW-V1
+  async updateDistribution(
+    offerId: string,
+    supplierId: string,
+    userId: string,
+    input: { isPublic?: boolean; serviceKeys?: string[] },
+  ) {
+    return this.offerService.updateDistribution(offerId, supplierId, userId, input);
+  }
+
   // WO-NETURE-B2B-CONTENT-MANAGEMENT-V1
   async updateBusinessContent(
     offerId: string,

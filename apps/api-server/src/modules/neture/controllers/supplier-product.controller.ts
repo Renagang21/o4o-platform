@@ -279,6 +279,30 @@ export function createSupplierProductController(dataSource: DataSource): Router 
     }
   });
 
+  // PATCH /supplier/products/:id/distribution — 공급 방식(전체 공개 + 서비스 대상) 정식 변경
+  // WO-O4O-NETURE-SUPPLIER-PRODUCT-DISTRIBUTION-MANAGEMENT-FLOW-V1
+  router.patch('/products/:id/distribution', requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const supplierId = (req as SupplierRequest).supplierId;
+      const userId = req.user?.id;
+      if (!userId) return res.status(401).json({ success: false, error: 'UNAUTHORIZED' });
+      const { id } = req.params;
+      const { isPublic, serviceKeys } = req.body || {};
+      if (serviceKeys !== undefined && !Array.isArray(serviceKeys)) {
+        return res.status(400).json({ success: false, error: 'INVALID_SERVICE_KEYS' });
+      }
+      const result = await netureService.updateDistribution(id, supplierId, userId, { isPublic, serviceKeys });
+      if (!result.success) {
+        const statusCode = result.error === 'OFFER_NOT_FOUND' ? 404 : result.error === 'NOT_OWNED' ? 403 : 400;
+        return res.status(statusCode).json(result);
+      }
+      res.json(result);
+    } catch (error) {
+      logger.error('[Neture API] Error updating product distribution:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to update distribution' });
+    }
+  });
+
   // GET /supplier/products/template — XLSX 템플릿 다운로드 (WO-NETURE-BULK-IMPORT-TEMPLATE-UPGRADE-V1)
   router.get('/products/template', requireAuth, async (_req: AuthenticatedRequest, res: Response) => {
     try {

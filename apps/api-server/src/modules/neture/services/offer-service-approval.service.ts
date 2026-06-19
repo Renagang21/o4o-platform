@@ -38,6 +38,7 @@ export class OfferServiceApprovalService {
   async createPendingApprovals(
     offerId: string,
     serviceKeys: string[],
+    executor: QueryExecutor = this.dataSource,
   ): Promise<{ insertedServiceKeys: string[]; resubmittedServiceKeys: string[] }> {
     if (!serviceKeys.length) return { insertedServiceKeys: [], resubmittedServiceKeys: [] };
 
@@ -45,7 +46,10 @@ export class OfferServiceApprovalService {
       .map((_, i) => `($1, $${i + 2}, 'pending', NOW(), NOW())`)
       .join(', ');
 
-    const rows: Array<{ service_key: string; inserted: boolean }> = await this.dataSource.query(
+    // WO-O4O-NETURE-SUPPLIER-PRODUCT-DISTRIBUTION-MANAGEMENT-FLOW-V1:
+    //   재심사 대상에 'cancelled'(공급자 철회) 추가 — 철회한 서비스를 재추가하면 pending 재심사.
+    //   자동 approved 복구 금지(반드시 pending). pending/approved 행은 WHERE 가드로 보존.
+    const rows: Array<{ service_key: string; inserted: boolean }> = await executor.query(
       `INSERT INTO offer_service_approvals (offer_id, service_key, approval_status, created_at, updated_at)
        VALUES ${values}
        ON CONFLICT (offer_id, service_key) DO UPDATE SET
@@ -54,7 +58,7 @@ export class OfferServiceApprovalService {
          decided_by = NULL,
          decided_at = NULL,
          updated_at = NOW()
-       WHERE offer_service_approvals.approval_status = 'rejected'
+       WHERE offer_service_approvals.approval_status IN ('rejected', 'cancelled')
        RETURNING service_key, (xmax = 0) AS inserted`,
       [offerId, ...serviceKeys],
     );
@@ -63,6 +67,44 @@ export class OfferServiceApprovalService {
       insertedServiceKeys: rows.filter((r) => r.inserted).map((r) => r.service_key),
       resubmittedServiceKeys: rows.filter((r) => !r.inserted).map((r) => r.service_key),
     };
+  }
+
+  /**
+   * WO-O4O-NETURE-SUPPLIER-PRODUCT-DISTRIBUTION-MANAGEMENT-FLOW-V1:
+   * SERVICE 대상 제거(공급자 철회) — approval row를 'cancelled' 로 전환(삭제 금지) +
+   * 해당 serviceKey 의 listing 비활성(삭제 금지). catalog 게이트는 approved 만 통과하므로 cancelled 는 자연 노출 제외.
+   * decided_by 는 운영자 FK 의미이므로 변경하지 않는다(공급자 actor 필드 부재) — reason/decided_at 만 기록.
+   */
+  async cancelServiceApprovals(
+    offerId: string,
+    serviceKeys: string[],
+    executor: QueryExecutor,
+    reason = '공급자가 해당 서비스 공급을 철회했습니다.',
+  ): Promise<{ cancelledServiceKeys: string[]; deactivatedListings: number }> {
+    if (!serviceKeys.length) return { cancelledServiceKeys: [], deactivatedListings: 0 };
+
+    const cancelled: Array<{ service_key: string }> = await executor.query(
+      `UPDATE offer_service_approvals
+       SET approval_status = 'cancelled', reason = $3, decided_at = NOW(), updated_at = NOW()
+       WHERE offer_id = $1 AND service_key = ANY($2::text[])
+         AND approval_status IN ('pending', 'approved', 'rejected')
+       RETURNING service_key`,
+      [offerId, serviceKeys, reason],
+    );
+
+    // 해당 serviceKey listing 비활성(삭제 금지) — 노출/판매 채널 중단
+    const listingResult = await executor.query(
+      `UPDATE organization_product_listings
+       SET is_active = false, updated_at = NOW()
+       WHERE offer_id = $1 AND service_key = ANY($2::text[]) AND is_active = true`,
+      [offerId, serviceKeys],
+    );
+    const deactivatedListings = Array.isArray(listingResult)
+      ? listingResult.length
+      : (listingResult as { rowCount?: number })?.rowCount ?? 0;
+
+    logger.info(`[ServiceApproval] cancelServiceApprovals offer ${offerId}: cancelled=[${cancelled.map(r => r.service_key).join(',')}], listingsDeactivated=${deactivatedListings}`);
+    return { cancelledServiceKeys: cancelled.map((r) => r.service_key), deactivatedListings };
   }
 
   /**
@@ -358,13 +400,12 @@ export class OfferServiceApprovalService {
     //   ANY approved → APPROVED (하나라도 승인되면 제품 활성화)
     //   ALL rejected → REJECTED
     //   some pending, none approved → PENDING
-    const anyApproved = approvals.some(a => a.approval_status === 'approved');
-    const hasPending = approvals.some(a => a.approval_status === 'pending');
-
-    let derivedStatus: string;
-    if (anyApproved) derivedStatus = 'APPROVED';
-    else if (hasPending) derivedStatus = 'PENDING';
-    else derivedStatus = 'REJECTED';
+    // WO-O4O-NETURE-SUPPLIER-PRODUCT-DISTRIBUTION-MANAGEMENT-FLOW-V1:
+    //   'cancelled'(공급자 철회) 행은 파생에서 제외. 모든 행이 cancelled 면 상태를 변경하지 않는다
+    //   (REJECTED 오판 + 전체 listing 비활성 cascade 방지). 노출은 catalog 게이트(approved만)에서 자연 제외.
+    const active = approvals.filter(a => a.approval_status !== 'cancelled');
+    const anyApproved = active.some(a => a.approval_status === 'approved');
+    const hasPending = active.some(a => a.approval_status === 'pending');
 
     // 3. 현재 offer 상태 조회
     const [offer]: Array<{ approval_status: string; is_active: boolean; distribution_type: string; master_id: string }> =
@@ -373,8 +414,14 @@ export class OfferServiceApprovalService {
         [offerId],
       );
     if (!offer) {
-      return { previousStatus: 'PENDING', derivedStatus, changed: false, autoListedCount: 0 };
+      return { previousStatus: 'PENDING', derivedStatus: 'PENDING', changed: false, autoListedCount: 0 };
     }
+
+    let derivedStatus: string;
+    if (anyApproved) derivedStatus = 'APPROVED';
+    else if (hasPending) derivedStatus = 'PENDING';
+    else if (active.length === 0) derivedStatus = offer.approval_status; // 전부 cancelled → 변경 없음
+    else derivedStatus = 'REJECTED';
 
     const previousStatus = offer.approval_status;
     const changed = previousStatus !== derivedStatus;

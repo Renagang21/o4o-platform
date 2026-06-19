@@ -1196,6 +1196,92 @@ export class NetureOfferService {
     }
   }
 
+  // ==================== 공급 방식 변경 (WO-O4O-NETURE-SUPPLIER-PRODUCT-DISTRIBUTION-MANAGEMENT-FLOW-V1) ====================
+
+  /**
+   * 공급 방식(전체 공개 여부 + 서비스 대상) 정식 변경.
+   *   - serviceKeys diff: 추가 → pending 생성/재심사, 제거 → 'cancelled' 전환 + 해당 listing 비활성.
+   *   - offer.service_keys / is_public / distribution_type 갱신 후 파생 상태 재동기화.
+   *   - PUBLIC 은 승인 무관(게이트 예외). 가격은 이번 경로에서 변경하지 않음(별도 편집).
+   *   - 트랜잭션으로 일괄 처리.
+   * @param userId 공급자 user id (sync 의 decidedBy actor — 운영자 액션 아님)
+   */
+  async updateDistribution(
+    offerId: string,
+    supplierId: string,
+    userId: string,
+    input: { isPublic?: boolean; serviceKeys?: string[] },
+  ): Promise<{ success: boolean; error?: string; data?: Record<string, unknown> }> {
+    const [offer] = await AppDataSource.query(
+      `SELECT id, supplier_id, is_public, service_keys FROM supplier_product_offers WHERE id = $1 AND deleted_at IS NULL`,
+      [offerId],
+    );
+    if (!offer) return { success: false, error: 'OFFER_NOT_FOUND' };
+    if (offer.supplier_id !== supplierId) return { success: false, error: 'NOT_OWNED' };
+
+    const currentKeys: string[] = offer.service_keys || [];
+    // 서비스 대상은 승인 대상 키(SSOT)만 허용
+    const nextKeys = input.serviceKeys !== undefined
+      ? filterApprovalEligibleServiceKeys(input.serviceKeys)
+      : currentKeys;
+    const nextIsPublic = input.isPublic !== undefined ? !!input.isPublic : !!offer.is_public;
+
+    const added = nextKeys.filter((k) => !currentKeys.includes(k));
+    const removed = currentKeys.filter((k) => !nextKeys.includes(k));
+    const nextDist = deriveDistributionType(nextIsPublic, nextKeys);
+
+    const approvalService = new OfferServiceApprovalService(AppDataSource);
+    const queryRunner = AppDataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      // 1. offer 갱신 (service_keys / is_public / distribution_type)
+      await queryRunner.query(
+        `UPDATE supplier_product_offers
+         SET service_keys = $2::text[], is_public = $3, distribution_type = $4, updated_at = NOW()
+         WHERE id = $1`,
+        [offerId, nextKeys, nextIsPublic, nextDist],
+      );
+
+      // 2. 제거된 서비스 → cancelled + listing 비활성 (삭제 금지)
+      let removedResult = { cancelledServiceKeys: [] as string[], deactivatedListings: 0 };
+      if (removed.length) {
+        removedResult = await approvalService.cancelServiceApprovals(offerId, removed, queryRunner);
+      }
+
+      // 3. 추가된 서비스 → pending 생성/재심사 (cancelled/rejected → pending)
+      let addedResult = { insertedServiceKeys: [] as string[], resubmittedServiceKeys: [] as string[] };
+      if (added.length) {
+        addedResult = await approvalService.createPendingApprovals(offerId, added, queryRunner);
+      }
+
+      // 4. 파생 상태 재동기화 (cancelled 제외 규칙 반영)
+      const sync = await approvalService.syncOfferFromServiceApprovals(offerId, userId, queryRunner);
+
+      await queryRunner.commitTransaction();
+      logger.info(`[NetureOfferService] updateDistribution offer ${offerId}: +[${added.join(',')}] -[${removed.join(',')}] isPublic=${nextIsPublic} dist=${nextDist}`);
+      return {
+        success: true,
+        data: {
+          isPublic: nextIsPublic,
+          serviceKeys: nextKeys,
+          distributionType: nextDist,
+          added,
+          removed,
+          addedResult,
+          removedResult,
+          sync,
+        },
+      };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      logger.error(`[NetureOfferService] updateDistribution failed for ${offerId}:`, error);
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
   // ==================== B2B Content (WO-NETURE-B2B-CONTENT-MANAGEMENT-V1) ====================
 
   async updateBusinessContent(
