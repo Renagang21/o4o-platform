@@ -8,7 +8,7 @@
  * 운영자 상세 — Trial 정보 확인 + 승인/반려 + 참여자 이행 상태 관리
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Fragment } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   getOperatorTrialDetail,
@@ -34,9 +34,14 @@ import type {
 import { PAYMENT_STATUS_LABELS } from '../../api/trial';
 
 // WO-O4O-MARKET-TRIAL-UI-COMMERCE-LABEL-CLEANUP-V1:
-// content-only 정책 — 제품 전환 / 매장 진열 / 정산 / 결제(오프라인 입금) / 매장 랜딩 단계 등
+// content-only 정책 — 제품 전환 / 매장 진열 / 정산 / 매장 랜딩 단계 등
 // 커머스 퍼널 UI 는 노출하지 않는다. (신규 mutation 은 backend + api client 에서 이미 차단됨.)
 const SHOW_MARKET_TRIAL_COMMERCE_UI = false;
+
+// WO-O4O-MARKET-TRIAL-OFFLINE-PAYMENT-REACTIVATION-V1:
+// 오프라인 입금(payment) 확인은 content-only 운영 모델의 핵심(운영자 수령·명단 공유)이므로
+// 커머스 퍼널 플래그와 분리해 별도로 노출한다. 정산(settlement)·매장 랜딩은 위 플래그(off)에 묶여 계속 비노출.
+const SHOW_OFFLINE_PAYMENT_UI = true;
 
 type ParticipantFilter =
   | 'all' | 'product' | 'cash' | 'pending' | 'fulfilled';
@@ -695,6 +700,46 @@ function ParticipantSection({
     return '-';
   };
 
+  // WO-O4O-MARKET-TRIAL-OFFLINE-PAYMENT-REACTIVATION-V1: 오프라인 입금 확인 인라인 폼 (window.prompt 제거)
+  const [payForm, setPayForm] = useState<{
+    id: string;
+    action: 'confirm' | 'refund';
+    amount: string;
+    reference: string;
+    note: string;
+  } | null>(null);
+  const openConfirm = (p: TrialParticipant) =>
+    setPayForm({
+      id: p.id,
+      action: 'confirm',
+      amount: p.paidAmount != null ? String(p.paidAmount) : '',
+      reference: p.paymentReference || '',
+      note: p.paymentNote || '',
+    });
+  const openRefund = (p: TrialParticipant) =>
+    setPayForm({ id: p.id, action: 'refund', amount: '', reference: '', note: '' });
+  const closeForm = () => setPayForm(null);
+  const amountInvalid = (v: string) =>
+    v.trim() !== '' && !(Number.isFinite(Number(v)) && Number(v) >= 0);
+  const submitConfirm = (p: TrialParticipant, f: { amount: string; reference: string; note: string }) => {
+    const amt = f.amount.trim() !== '' ? Number(f.amount) : undefined;
+    onPaymentStatusChange(p, 'paid', {
+      paymentMethod: 'manual_transfer',
+      paymentProvider: 'internal',
+      paymentReference: f.reference.trim() !== '' ? f.reference.trim() : undefined,
+      paidAmount: amt != null && Number.isFinite(amt) ? amt : undefined,
+      paidAt: new Date().toISOString(),
+      paymentNote: f.note.trim() !== '' ? f.note.trim() : undefined,
+    });
+    closeForm();
+  };
+  const submitRefund = (p: TrialParticipant, f: { note: string }) => {
+    onPaymentStatusChange(p, 'refunded', {
+      paymentNote: f.note.trim() !== '' ? f.note.trim() : undefined,
+    });
+    closeForm();
+  };
+
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-5 mb-4">
       <div className="flex items-center justify-between mb-3">
@@ -826,8 +871,8 @@ function ParticipantSection({
         </div>
       )}
 
-      {/* WO-NETURE-MARKET-TRIAL-PAYMENT-READINESS-V1: 결제(수기 송금/PG-ready) 상태 관리 섹션 */}
-      {SHOW_MARKET_TRIAL_COMMERCE_UI && PAYMENT_VISIBLE_STATUSES.includes(trialStatus) && totalCount > 0 && (
+      {/* WO-NETURE-MARKET-TRIAL-PAYMENT-READINESS-V1 / OFFLINE-PAYMENT-REACTIVATION-V1: 오프라인 입금 확인 섹션 (커머스 퍼널과 분리) */}
+      {SHOW_OFFLINE_PAYMENT_UI && PAYMENT_VISIBLE_STATUSES.includes(trialStatus) && totalCount > 0 && (
         <div className="mt-4 border-t border-gray-100 pt-4">
           <div className="flex items-center flex-wrap gap-2 mb-3">
             <h3 className="text-sm font-semibold text-gray-700">오프라인 입금 관리</h3>
@@ -861,8 +906,10 @@ function ParticipantSection({
                   const isUpdating = updatingPaymentId === p.id;
                   const fmtDate = (iso: string | null) =>
                     iso ? new Date(iso).toLocaleDateString('ko-KR') : '-';
+                  const isOpen = payForm?.id === p.id;
                   return (
-                    <tr key={p.id} className="border-b border-gray-50 hover:bg-gray-50">
+                    <Fragment key={p.id}>
+                    <tr className="border-b border-gray-50 hover:bg-gray-50">
                       <td className="py-2.5 px-4 text-gray-900 font-medium">{p.name}</td>
                       <td className="py-2.5 px-2">
                         <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${PAYMENT_STATUS_COLORS[ps]}`}>
@@ -883,37 +930,20 @@ function ParticipantSection({
                       <td className="py-2.5 px-4 text-right space-x-1">
                         {ps === 'unpaid' || ps === 'pending' || ps === 'failed' ? (
                           <button
-                            onClick={() => {
-                              const ref = window.prompt('송금 메모/참조 (선택, 예: 은행 입금번호)', p.paymentReference || '') ?? undefined;
-                              const amtStr = window.prompt('입금 확인 금액 (원, 선택)', p.paidAmount != null ? String(p.paidAmount) : '');
-                              const amt = amtStr && amtStr.trim() !== '' ? Number(amtStr) : undefined;
-                              const note = window.prompt('운영자 메모 (선택)', p.paymentNote || '') ?? undefined;
-                              const nowIso = new Date().toISOString();
-                              onPaymentStatusChange(p, 'paid', {
-                                paymentMethod: 'manual_transfer',
-                                paymentProvider: 'internal',
-                                paymentReference: ref,
-                                paidAmount: Number.isFinite(amt) ? amt : undefined,
-                                paidAt: nowIso,
-                                paymentNote: note,
-                              });
-                            }}
+                            onClick={() => (isOpen ? closeForm() : openConfirm(p))}
                             disabled={isUpdating}
                             className="px-2.5 py-1 text-xs text-white bg-emerald-600 rounded hover:bg-emerald-700 disabled:opacity-50"
                           >
-                            {isUpdating ? '...' : '수기 송금 확인'}
+                            {isUpdating ? '...' : isOpen ? '닫기' : '수기 송금 확인'}
                           </button>
                         ) : ps === 'paid' ? (
                           <>
                             <button
-                              onClick={() => {
-                                const note = window.prompt('환불 사유 (선택)', '') ?? undefined;
-                                onPaymentStatusChange(p, 'refunded', { paymentNote: note });
-                              }}
+                              onClick={() => (isOpen ? closeForm() : openRefund(p))}
                               disabled={isUpdating}
                               className="px-2.5 py-1 text-xs text-purple-700 border border-purple-200 rounded hover:bg-purple-50 disabled:opacity-50"
                             >
-                              {isUpdating ? '...' : '환불'}
+                              {isUpdating ? '...' : isOpen ? '닫기' : '환불'}
                             </button>
                             <button
                               onClick={() => onPaymentStatusChange(p, 'unpaid')}
@@ -929,6 +959,93 @@ function ParticipantSection({
                         )}
                       </td>
                     </tr>
+                    {isOpen && payForm && (
+                      <tr className="bg-gray-50/70">
+                        <td colSpan={8} className="px-4 py-3">
+                          {payForm.action === 'confirm' ? (
+                            <div className="flex flex-wrap items-end gap-3">
+                              <label className="flex flex-col text-xs text-gray-600">
+                                입금 확인 금액 (원)
+                                <input
+                                  type="number"
+                                  min="0"
+                                  inputMode="numeric"
+                                  value={payForm.amount}
+                                  onChange={(e) => setPayForm({ ...payForm, amount: e.target.value })}
+                                  placeholder="예: 30000"
+                                  className={`mt-1 w-36 px-2 py-1 text-sm border rounded ${amountInvalid(payForm.amount) ? 'border-red-400' : 'border-gray-300'}`}
+                                />
+                              </label>
+                              <label className="flex flex-col text-xs text-gray-600">
+                                송금 참조 (선택)
+                                <input
+                                  type="text"
+                                  value={payForm.reference}
+                                  onChange={(e) => setPayForm({ ...payForm, reference: e.target.value })}
+                                  placeholder="예: 은행 입금번호"
+                                  className="mt-1 w-44 px-2 py-1 text-sm border border-gray-300 rounded"
+                                />
+                              </label>
+                              <label className="flex flex-col text-xs text-gray-600">
+                                운영자 메모 (선택)
+                                <input
+                                  type="text"
+                                  value={payForm.note}
+                                  onChange={(e) => setPayForm({ ...payForm, note: e.target.value })}
+                                  className="mt-1 w-48 px-2 py-1 text-sm border border-gray-300 rounded"
+                                />
+                              </label>
+                              <div className="flex items-center gap-1.5">
+                                <button
+                                  onClick={() => submitConfirm(p, payForm)}
+                                  disabled={isUpdating || amountInvalid(payForm.amount)}
+                                  className="px-3 py-1.5 text-xs text-white bg-emerald-600 rounded hover:bg-emerald-700 disabled:opacity-50"
+                                >
+                                  {isUpdating ? '처리 중...' : '입금 확인'}
+                                </button>
+                                <button
+                                  onClick={closeForm}
+                                  className="px-3 py-1.5 text-xs text-gray-600 border border-gray-200 rounded hover:bg-gray-50"
+                                >
+                                  취소
+                                </button>
+                              </div>
+                              {amountInvalid(payForm.amount) && (
+                                <span className="w-full text-xs text-red-500">금액은 0 이상의 숫자만 입력하세요.</span>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="flex flex-wrap items-end gap-3">
+                              <label className="flex flex-col text-xs text-gray-600">
+                                환불 사유 (선택)
+                                <input
+                                  type="text"
+                                  value={payForm.note}
+                                  onChange={(e) => setPayForm({ ...payForm, note: e.target.value })}
+                                  className="mt-1 w-64 px-2 py-1 text-sm border border-gray-300 rounded"
+                                />
+                              </label>
+                              <div className="flex items-center gap-1.5">
+                                <button
+                                  onClick={() => submitRefund(p, payForm)}
+                                  disabled={isUpdating}
+                                  className="px-3 py-1.5 text-xs text-white bg-purple-600 rounded hover:bg-purple-700 disabled:opacity-50"
+                                >
+                                  {isUpdating ? '처리 중...' : '환불 처리'}
+                                </button>
+                                <button
+                                  onClick={closeForm}
+                                  className="px-3 py-1.5 text-xs text-gray-600 border border-gray-200 rounded hover:bg-gray-50"
+                                >
+                                  취소
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    )}
+                    </Fragment>
                   );
                 })}
               </tbody>

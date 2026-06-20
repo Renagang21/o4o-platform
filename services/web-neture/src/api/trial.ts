@@ -536,8 +536,8 @@ export async function updateParticipantPaymentStatus(
   participantId: string,
   input: UpdateParticipantPaymentInput,
 ): Promise<UpdateParticipantPaymentResult> {
-  marketTrialCommerceDisabled('유통참여형 펀딩은 O4O 결제 기능을 제공하지 않습니다.');
-  // eslint-disable-next-line no-unreachable -- 정책 비활성화. 기존 로직 보존.
+  // WO-O4O-MARKET-TRIAL-OFFLINE-PAYMENT-REACTIVATION-V1: 오프라인 입금(payment) 확인 재활성화
+  // (settlement·매장 진열·전환은 content-only 로 계속 차단). 입금 확인 기록일 뿐 온라인 결제 아님.
   const { data } = await api.patch(
     `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/participants/${participantId}/payment-status`,
     input,

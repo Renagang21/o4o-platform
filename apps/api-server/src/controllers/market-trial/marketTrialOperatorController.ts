@@ -867,17 +867,11 @@ export class MarketTrialOperatorController {
    */
   static async updateParticipantPaymentStatus(req: AuthRequest, res: Response) {
     try {
-      // WO-O4O-MARKET-TRIAL-COMMERCE-WIRING-DISABLE-WITH-DATA-PRESERVATION-V1:
-      // 유통참여형 펀딩 = Neture 전용 content-only 모집. 신규 결제 상태 변경을 중단한다.
-      // (기존 paymentStatus 데이터는 건드리지 않음 — 신규 mutation 만 차단.)
-      return res.status(409).json({
-        success: false,
-        error: 'Market Trial payment is disabled by content-only boundary policy.',
-        message: '유통참여형 펀딩은 O4O 결제 기능을 제공하지 않습니다.',
-        code: 'MARKET_TRIAL_PAYMENT_DISABLED',
-      });
-
-      // eslint-disable-next-line no-unreachable -- 정책 비활성화. 기존 로직 보존(정의 재확인 시 참조).
+      // WO-O4O-MARKET-TRIAL-OFFLINE-PAYMENT-REACTIVATION-V1:
+      // content-only 운영 모델은 "운영자가 오프라인 입금을 확인·기록"하는 것을 전제한다
+      // (송금은 Neture 운영자 수령 → 입금 확인 완료자 명단 공유). 따라서 결제(payment) mutation 만
+      // 재활성화한다. 정산(settlement)·매장 진열·고객 전환은 content-only boundary 로 계속 차단(409 유지).
+      // 본 엔드포인트는 오프라인 입금 확인 기록일 뿐 온라인 결제(PG)가 아니다.
       const { id, participantId } = req.params;
       const {
         paymentStatus: newStatus,
