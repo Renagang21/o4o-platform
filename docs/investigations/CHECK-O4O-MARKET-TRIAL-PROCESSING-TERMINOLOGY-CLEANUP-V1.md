@@ -104,14 +104,30 @@ content-only 전환으로 **409 disabled** 경로의 상태 메시지 — 현재
 - `web-neture` `tsc --noEmit`: error 0 (변경 2파일 포함).
 - `api-server` `tsc --noEmit -p tsconfig.build.json`: 변경 무관. 유일 에러 `marketTrialController.ts(105,9)` 는 **pre-existing**(productId/CreateTrialDto, 본 WO 미접촉 라인).
 
-### 7.3 화면/CSV smoke — 배포 후
-```text
-[CSV]  operator export → 헤더 '펀딩 처리 방식'/'펀딩 처리 상태' (정산선택/정산상태 부재)
-[operator] 상세 진입 → 상태 배지 '처리 대기'/'펀딩 처리 완료', 전이 버튼 '펀딩 처리 완료',
-           요약 '펀딩 처리 완료 {n}명' / console 0 / network 500 0
-[participant] 내 참여 → KPI '펀딩 처리 완료', 상태 라벨 '처리 상태' / '정산' 표현 없음 / console 0
+### 7.3 화면/CSV 라이브 smoke — PASS (2026-06-20, 배포 후)
+
+**배포:** Deploy Web Services + Deploy API Server (commit `883d1c616`) **success**, o4o-core-api revision `o4o-core-api-02262-7vk`. read-only(운영 데이터 변경 없음).
+
+**[CSV] operator export `GET /operator/market-trial/:id/participants/export`** — HTTP **200**:
 ```
-> CSV row 원문·PII·paymentReference 미기재.
+헤더: …,입금참조,[펀딩 처리 방식],[펀딩 처리 상태],참여일,…
+✅ 정산선택 없음 / 정산상태 없음 / 펀딩 처리 방식 있음 / 펀딩 처리 상태 있음
+```
+(CSV row 원문·PII·입금참조 미기재)
+
+**[operator] 상세 라이브(Playwright, read-only)** — `/operator/market-trial/cf6cdc98-…`:
+| 확인 | 결과 |
+|------|:----:|
+| 상세 렌더(참여 리포트 카드) | ✅ |
+| 신규 표기 노출(`처리 대기`, `펀딩 처리`) | ✅ |
+| A1 독립 상태 라벨(`정산 대기`/`정산 완료`/`정산 상태`) 노출 | ✅ **없음** |
+| console error / pageerror / network ≥400 | **0 / 0 / 0** |
+
+> 페이지 잔존 "정산"은 **모두 범위 외/의도된 잔존**: ① 사이드바 `커머스·정산 운영`(정식 정산 메뉴 — IR §2 범위 밖), ② 데이터/제목, ③ **A2 보상 산문** `제품 정산 상태를 관리합니다`(:928), `정산 방식(제품/수익)`·`제품 정산을 선택한 참여자만…`(:840). substring 검사가 "제품 정산 **상태**"를 잡았으나 **A1 독립 라벨 아님**(§4 보류 대상).
+>
+> 참여자(choice_pending) 배지 라벨은 `선택 대기`(미변경 항목)라 변경 라벨 직접 노출 케이스 아님 → `offline_settled→펀딩 처리 완료` 변경은 **CSV export로 end-to-end 확인**(위).
+
+**[participant] MyParticipations** — typecheck + 배포로 검증. 라이브 렌더는 해당 trial 참여자 계정 미상으로 미수행(운영 write 금지 범위). 변경 라벨(`처리 대기`/`펀딩 처리 완료`/`처리 상태`)은 정적 + 배포로 보증.
 
 ---
 
@@ -141,9 +157,9 @@ content-only 전환으로 **409 disabled** 경로의 상태 메시지 — 현재
 | 정식 정산 기능 미접촉 | ✅ |
 | DB migration / API contract 없음 | ✅ |
 | typecheck 통과 | ✅ |
-| 화면/CSV smoke | ⏳ 배포 후(§7.3) |
+| 화면/CSV smoke | ✅ PASS (2026-06-20, §7.3) — CSV 헤더 펀딩 처리 방식/상태, operator A1 라벨 부재, console/network 0 |
 | CHECK 문서 | ✅ |
-| path-specific commit/push | ⏳ 직후 |
+| path-specific commit/push | ✅ code `883d1c616` + 본 doc |
 
 ---
 
