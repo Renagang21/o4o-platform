@@ -51,9 +51,28 @@ operator 유통참여형 펀딩 상세의 기존 요약 표면:
 | 금지 지표 (전환/매장진열/주문/배송/상품정산) | 응답·카드 **부재** (재확인) |
 | CSV (`exportParticipantsCSV`) | **무변경**. 헤더 14컬럼은 직전 WO 에서 content-only 확정 — 금지 컬럼(`listingId`/`customerConversion*`/`convertedProduct*`/매장랜딩/활용상품연결/첫주문/배송/발송/상품정산) **부재** |
 | 변경 범위 | 1 file (operator 상세). 다른 세션 untracked migration `20261118000000-CleanupNetureTestSuppliers.ts` **미접촉** |
-| 라이브 브라우저 스모크 | **배포 후 후속** (operator 상세 진입 → 참여 리포트 카드 수치 확인 → 입금 상태 변경 시 summary 반영 → CSV → 검증 후 원상 복원) |
+| 라이브 브라우저 스모크 | **PASS** (2026-06-20, §3-A) — 카드 렌더·수치·console·network 정상. 동적 write 검증(입금 상태 변경 반영)은 보류(§3-A) |
 
 > PII / `paymentReference` 원문은 본 문서·로그에 기재하지 않음.
+
+### 3-A. 라이브 브라우저 스모크 결과 (2026-06-20)
+
+- **배포:** Deploy Web Services (commit `8544f8494`) **success**. web-neture 배포 반영.
+- **방식:** Playwright(headless) — operator(sohae2100) 토큰 주입 후 `/operator/market-trial/cf6cdc98-…`([SMOKE] 유통참여형 펀딩 운영 루프 테스트) 직접 진입. read-only(운영 데이터 변경 없음).
+- **read-only API 정합 선확인:** `/:id/kpi` → participantCount 1 / paidParticipantCount 1 / unpaidParticipantCount 0 / **totalPaidAmount 5000** / refundCount 0. KPI 키에 금지/정산성 지표 부재. participants.summary.offlineSettledCount 0 → 펀딩 처리 대기 = 1.
+
+| 확인 항목 | 결과 |
+|------|:----:|
+| ParticipationReport 카드 실제 노출 | ✅ |
+| 총 참여자 1 / 입금 확인 1 / 입금 미확인 0 | ✅ |
+| **입금 확인 금액 합계 5,000원** | ✅ |
+| 펀딩 처리 대기 1 | ✅ |
+| 금지지표(전환/매장진열/배송/상품정산) 카드 내 부재 | ✅ |
+| console error | **0** |
+| pageerror | **0** |
+| network ≥400 | **0** |
+
+- **보류(이번 WO 미수행):** "입금 상태 변경 시 카드 수치 반영" 동적 검증은 참여자 `paymentStatus` **운영 write** 가 필요. 본 카드는 백엔드 `trialKpi`·`summary` 의 기존 값만 표시(자체 캐시 없음)하므로 데이터 정합은 read-only API 로 이미 확인됨. 다른 세션의 SMOKE trial 데이터에 운영 write 를 가하는 것은 과한 검증으로 판단 → **보류**. 추후 실제 입금 상태 변경 운영 시 자연 검증.
 
 ---
 
