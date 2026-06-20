@@ -292,6 +292,9 @@ export default function MarketTrialApprovalDetailPage() {
       {/* Summary Metrics Card */}
       <SummaryMetrics trial={trial} recruitRate={recruitRate} summary={summary} />
 
+      {/* WO-O4O-MARKET-TRIAL-PARTICIPATION-REPORT-CLEANUP-V1: content-only 참여 리포트 (오프라인 입금 기준) */}
+      {trialKpi && <ParticipationReport kpi={trialKpi} summary={summary} />}
+
       {/* KPI Bar — WO-NETURE-MARKET-TRIAL-ANALYTICS-AND-KPI-V1 */}
       {trialKpi && <TrialKpiBar kpi={trialKpi} />}
 
@@ -544,6 +547,43 @@ function SummaryMetrics({
             {trial.currentParticipants} / {trial.maxParticipants}명
           </p>
         </div>
+      )}
+    </div>
+  );
+}
+
+// ── Participation Report (content-only) ──
+
+// WO-O4O-MARKET-TRIAL-PARTICIPATION-REPORT-CLEANUP-V1:
+// 오프라인 입금 확인 기준 참여 요약. 전환/매장진열/주문/배송/상품정산 지표는 포함하지 않는다.
+// payment 집계는 trialKpi(/:id/kpi)에서, 펀딩 처리(settlementStatus 기반 read-only)는 summary 에서 가져온다.
+function ParticipationReport({
+  kpi,
+  summary,
+}: {
+  kpi: MarketTrialDetailKpi;
+  summary?: ParticipantListResponse['summary'] | null;
+}) {
+  const won = (n: number) => `${(n ?? 0).toLocaleString()}원`;
+  // 펀딩 처리 대기 = 전체 - 펀딩 처리 완료(offline_settled). settlementStatus 기반이나 사용자-facing 표기는 '펀딩 처리'.
+  const total = summary?.totalCount ?? kpi.participantCount;
+  const processedDone = summary?.offlineSettledCount ?? 0;
+  const processingPending = Math.max(0, total - processedDone);
+  return (
+    <div className="mb-5 bg-white border border-gray-200 rounded-lg p-4 sm:p-5">
+      <div className="flex flex-wrap items-center gap-2 mb-3">
+        <p className="text-xs font-medium text-gray-500">참여 리포트</p>
+        <span className="text-xs text-gray-400">오프라인 입금 확인 기준 · 온라인 결제 아님</span>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+        <MetricCell value={kpi.participantCount} label="총 참여자" />
+        <MetricCell value={kpi.paidParticipantCount} label="입금 확인" highlight={kpi.paidParticipantCount > 0} />
+        <MetricCell value={kpi.unpaidParticipantCount} label="입금 미확인" />
+        <MetricCell value={won(kpi.totalPaidAmount)} label="입금 확인 금액 합계" highlight={kpi.totalPaidAmount > 0} />
+        <MetricCell value={processingPending} label="펀딩 처리 대기" />
+      </div>
+      {kpi.refundCount > 0 && (
+        <p className="text-xs text-gray-400 mt-2">환불 처리 {kpi.refundCount}명</p>
       )}
     </div>
   );
