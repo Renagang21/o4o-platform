@@ -473,7 +473,8 @@ export function BaseTable<T extends Record<string, any>>({
         style={useFixedLayout ? { tableLayout: 'fixed', width: totalWidth } : undefined}
       >
         <thead className={headerClassName}>
-          <tr>
+          {/* backgroundColor:'inherit' → sticky 헤더 th 가 thead 배경(불투명)을 상속하도록 */}
+          <tr style={{ backgroundColor: 'inherit' }}>
             {effectiveColumns.map((col, ci) => {
               const widthStyle: React.CSSProperties = {};
               if (useFixedLayout && colWidths[ci] != null) {
@@ -603,7 +604,9 @@ export function BaseTable<T extends Record<string, any>>({
               const key = rowKey ? rowKey(row, rowIndex) : `row-${rowIndex}`;
               const rowCls = rowClassName
                 ? rowClassName(row, rowIndex)
-                : `hover:bg-gray-50 ${onRowClick ? 'cursor-pointer' : ''}`;
+                // bg-white: sticky 셀이 backgroundColor:'inherit' 로 불투명 배경을 상속하도록
+                // 기본 행 배경을 명시 (가로 스크롤 시 sticky 컬럼 뒤로 다른 셀이 비치는 것 방지)
+                : `bg-white hover:bg-gray-50 ${onRowClick ? 'cursor-pointer' : ''}`;
               const afterRow = renderAfterRow?.(row, rowIndex);
 
               return (

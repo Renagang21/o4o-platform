@@ -122,6 +122,8 @@ export function SelectionTable<T extends Record<string, any>>({
         key: '_select',
         header: '',
         system: true,
+        // sticky: 가로 스크롤과 무관하게 선택 체크박스 컬럼을 좌측 고정
+        sticky: true,
         width: 44,
         render: (_val, row) => {
           const key = resolveKey(row, rowKey);
