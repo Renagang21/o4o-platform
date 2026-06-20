@@ -770,7 +770,7 @@ export class MembershipConsoleController {
       });
 
       if (!result) {
-        res.status(404).json({ success: false, error: 'No suspended memberships found' });
+        res.status(404).json({ success: false, error: 'No reactivatable memberships found' });
         return;
       }
 

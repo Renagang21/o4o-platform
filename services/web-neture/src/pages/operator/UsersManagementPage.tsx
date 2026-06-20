@@ -453,14 +453,18 @@ export default function UsersManagementPage() {
           confirm: { title: '일괄 정지 확인', message: '선택한 회원을 정지 처리합니다.', confirmText: '정지', variant: 'danger' },
         },
         {
+          // WO-O4O-NETURE-SUPPLIER-WITHDRAWN-RESTORE-ACTION-V1:
+          //   정지(suspended) + 탈퇴(withdrawn) 양쪽을 canonical /reactivate 로 복구.
+          //   PATCH /status {active} 는 user 만 활성화하고 membership/role 을 되살리지 못하므로 사용하지 않는다.
           key: 'bulk-restore',
-          label: (n) => `복원 (${n})`,
+          label: (n) => `복구 (${n})`,
           variant: 'primary',
           icon: <UserCheck size={14} />,
-          getTargetIds: (users) => users.filter((u) => u.status === 'suspended').map((u) => u.id),
+          getTargetIds: (users) =>
+            users.filter((u) => ['suspended', 'withdrawn'].includes(u.status)).map((u) => u.id),
           executeBatch: async (ids) => {
             const settled = await Promise.allSettled(
-              ids.map((id) => api.patch(`/operator/members/${id}/status`, { status: 'active' })),
+              ids.map((id) => api.post(`/operator/members/${id}/reactivate`)),
             );
             return {
               data: {
@@ -472,7 +476,7 @@ export default function UsersManagementPage() {
               },
             };
           },
-          confirm: { title: '일괄 복원 확인', message: '선택한 회원을 활성으로 복원합니다.', confirmText: '복원', variant: 'default' },
+          confirm: { title: '일괄 복구 확인', message: '선택한 정지·탈퇴 회원을 활성으로 복구합니다.', confirmText: '복구', variant: 'default' },
         },
         {
           key: 'bulk-withdraw',

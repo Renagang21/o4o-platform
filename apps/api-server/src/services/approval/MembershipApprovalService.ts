@@ -505,8 +505,11 @@ export class MembershipApprovalService {
     await queryRunner.startTransaction();
 
     try {
-      // STEP0: SELECT suspended memberships FOR UPDATE
-      logger.info('[REACTIVATE][STEP0] SELECT suspended memberships FOR UPDATE', {
+      // STEP0: SELECT reactivatable memberships FOR UPDATE
+      // WO-O4O-NETURE-SUPPLIER-WITHDRAWN-RESTORE-ACTION-V1:
+      //   복구 대상을 suspended(정지) + withdrawn(탈퇴) 양쪽으로 broaden.
+      //   suspend / soft-delete(withdraw) 모두 이 canonical 경로로 되돌린다.
+      logger.info('[REACTIVATE][STEP0] SELECT reactivatable memberships FOR UPDATE', {
         userId, reactivatedBy, isPlatformAdmin,
       });
 
@@ -514,20 +517,20 @@ export class MembershipApprovalService {
         ? await queryRunner.query(
             `SELECT id, user_id, service_key, role, status
              FROM service_memberships
-             WHERE user_id = $1 AND status = 'suspended'
+             WHERE user_id = $1 AND status IN ('suspended', 'withdrawn')
              FOR UPDATE`,
             [userId]
           )
         : await queryRunner.query(
             `SELECT id, user_id, service_key, role, status
              FROM service_memberships
-             WHERE user_id = $1 AND status = 'suspended' AND service_key = ANY($2)
+             WHERE user_id = $1 AND status IN ('suspended', 'withdrawn') AND service_key = ANY($2)
              FOR UPDATE`,
             [userId, serviceKeys]
           );
 
       if (!selectResult || selectResult.length === 0) {
-        logger.warn('[REACTIVATE][STEP0] no suspended memberships found', {
+        logger.warn('[REACTIVATE][STEP0] no reactivatable memberships found', {
           userId, isPlatformAdmin, serviceKeys,
         });
         await queryRunner.rollbackTransaction();
@@ -556,7 +559,7 @@ export class MembershipApprovalService {
 
       await queryRunner.query(
         `UPDATE users SET status = 'active', "isActive" = true, "updatedAt" = NOW()
-         WHERE id = $1 AND status = 'suspended'`,
+         WHERE id = $1 AND status IN ('suspended', 'deleted')`,
         [userId]
       );
 
@@ -612,7 +615,22 @@ export class MembershipApprovalService {
         await queryRunner.query(
           `UPDATE kpa_members
            SET status = 'active', updated_at = NOW()
-           WHERE user_id = $1 AND status = 'suspended'`,
+           WHERE user_id = $1 AND status IN ('suspended', 'withdrawn')`,
+          [userId]
+        );
+      }
+
+      // STEP5: WO-O4O-NETURE-SUPPLIER-WITHDRAWN-RESTORE-ACTION-V1 — neture_suppliers 프로필 복구
+      //   neture membership 이 복구 대상에 포함된 경우, deactivate 로 INACTIVE 된 공급자 프로필을
+      //   ACTIVE 로 되돌린다. REJECTED(의도적 거절)는 복구 대상이 아니므로 INACTIVE 만 전환.
+      //   상품 승인/listing 재활성은 정책상 운영자 수동 (이 트랜잭션 범위 외).
+      const hasNetureMembership = selectResult.some((m: any) => m.service_key === 'neture');
+      if (hasNetureMembership) {
+        logger.info('[REACTIVATE][STEP5] neture_suppliers profile restore', { userId });
+        await queryRunner.query(
+          `UPDATE neture_suppliers
+           SET status = 'ACTIVE', updated_at = NOW()
+           WHERE user_id = $1 AND status = 'INACTIVE'`,
           [userId]
         );
       }
