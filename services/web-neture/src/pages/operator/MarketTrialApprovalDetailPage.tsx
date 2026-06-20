@@ -192,7 +192,7 @@ export default function MarketTrialApprovalDetailPage() {
       await updateParticipantSettlementStatus(id, participant.id, newStatus, note);
       await loadParticipants(id, filter);
     } catch (err: any) {
-      setError(err.response?.data?.message || err.message || '정산 상태 변경에 실패했습니다.');
+      setError(err.response?.data?.message || err.message || '펀딩 처리 상태 변경에 실패했습니다.');
     } finally {
       setUpdatingSettlementId(null);
     }
@@ -652,12 +652,13 @@ const FILTER_OPTIONS: { value: ParticipantFilter; label: string; group?: string 
 // WO-O4O-MARKET-TRIAL-CONVERSION-COLUMNS-DROP-V1: 매장 랜딩 단계(전환) 라벨/색상/옵션 제거 (content-only).
 
 // WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1
+// WO-O4O-MARKET-TRIAL-PROCESSING-TERMINOLOGY-CLEANUP-V1: 사용자-facing 표기 '정산'→'펀딩 처리'(enum 키/필드명은 유지)
 const SETTLEMENT_STATUS_LABELS: Record<SettlementStatus, string> = {
-  pending: '정산 대기',
+  pending: '처리 대기',
   choice_pending: '선택 대기',
   choice_completed: '선택 완료',
   offline_review: '운영 확인 중',
-  offline_settled: '정산 완료',
+  offline_settled: '펀딩 처리 완료',
 };
 
 const SETTLEMENT_STATUS_COLORS: Record<SettlementStatus, string> = {
@@ -672,7 +673,7 @@ const SETTLEMENT_STATUS_COLORS: Record<SettlementStatus, string> = {
 const OPERATOR_SETTLEMENT_NEXT: Partial<Record<SettlementStatus, { to: SettlementStatus; label: string }>> = {
   pending: { to: 'choice_pending', label: '선택 개방' },
   choice_completed: { to: 'offline_review', label: '운영 확인 시작' },
-  offline_review: { to: 'offline_settled', label: '정산 완료 처리' },
+  offline_review: { to: 'offline_settled', label: '펀딩 처리 완료' },
 };
 
 // Trial 상태 기준 정산 섹션 표시 여부
@@ -830,7 +831,7 @@ function ParticipantSection({
             입금 확인 완료 {participants.filter((p) => (p.paymentStatus ?? 'unpaid') === 'paid').length}명
           </span>
           <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-violet-100 text-violet-700">
-            제품 정산 완료 {participants.filter((p) => p.settlementStatus === 'offline_settled').length}명
+            펀딩 처리 완료 {participants.filter((p) => p.settlementStatus === 'offline_settled').length}명
           </span>
         </div>
       )}

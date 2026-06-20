@@ -28,12 +28,13 @@ const GUIDE_PAGE_KEY = 'market-trial.participation.status';
 const GUIDEBLOCK_SECTION_KEY = 'guideblock-page-help';
 const SERVICE_KEY = 'neture';
 
+// WO-O4O-MARKET-TRIAL-PROCESSING-TERMINOLOGY-CLEANUP-V1: 참여자 사용자-facing 상태 표기 '정산'→'펀딩 처리'(enum 키/필드 유지)
 const SETTLEMENT_STATUS_LABEL: Record<SettlementStatus, string> = {
-  pending: '정산 대기',
+  pending: '처리 대기',
   choice_pending: '선택 대기',
   choice_completed: '선택 완료',
   offline_review: '운영 확인 중',
-  offline_settled: '정산 완료',
+  offline_settled: '펀딩 처리 완료',
 };
 
 const SETTLEMENT_STATUS_COLOR: Record<SettlementStatus, { bg: string; text: string }> = {
@@ -229,7 +230,7 @@ function DetailDrawer({ trialId, onClose, onChoiceSaved }: DetailDrawerProps) {
 
             <div style={{ marginBottom: '20px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontWeight: 600, color: '#374151', fontSize: '0.9375rem' }}>정산 상태</span>
+                <span style={{ fontWeight: 600, color: '#374151', fontSize: '0.9375rem' }}>처리 상태</span>
                 {status && <SettlementBadge status={status} />}
               </div>
               {detail.settlementChoice && (
@@ -444,11 +445,11 @@ export function MyParticipationsPage() {
       <GuideBlock
         variant="info"
         title={guideTitle ?? '참여 내역 확인 안내'}
-        description={guideDesc ?? '유통참여형 펀딩의 정산 현황과 선택 가능한 옵션을 확인합니다.'}
+        description={guideDesc ?? '유통참여형 펀딩의 처리 현황과 선택 가능한 옵션을 확인합니다.'}
         steps={guideSteps ?? [
           '상단 KPI에서 전체 참여 수와 처리 대기 건수를 확인합니다.',
           '\'선택 대기\' 상태인 항목은 제품 수령 또는 금액 환급을 선택해 주세요.',
-          '정산 완료 건은 이미 처리가 끝난 상태입니다.',
+          '펀딩 처리 완료 건은 이미 처리가 끝난 상태입니다.',
         ]}
         compact
       />
@@ -457,7 +458,7 @@ export function MyParticipationsPage() {
         <KpiCard label="전체 참여" value={kpiTotal} />
         <KpiCard label="선택 대기" value={kpiChoicePending} highlight={kpiChoicePending > 0} />
         <KpiCard label="운영 확인 중" value={kpiReview} />
-        <KpiCard label="정산 완료" value={kpiSettled} />
+        <KpiCard label="펀딩 처리 완료" value={kpiSettled} />
       </div>
 
       {error && (

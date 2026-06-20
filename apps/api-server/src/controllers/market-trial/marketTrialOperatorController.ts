@@ -1052,7 +1052,7 @@ export class MarketTrialOperatorController {
       res.json({
         success: true,
         data: toOperatorTrialDTO(trial),
-        message: `Trial 상태가 "${newStatus}"로 변경되었습니다.${cascadeCount > 0 ? ` 참여자 ${cascadeCount}명 정산 선택 대기로 전환.` : ''}`,
+        message: `Trial 상태가 "${newStatus}"로 변경되었습니다.${cascadeCount > 0 ? ` 참여자 ${cascadeCount}명 선택 대기로 전환.` : ''}`,
       });
     } catch (error) {
       console.error('Update trial status error:', error);
@@ -1144,13 +1144,14 @@ export class MarketTrialOperatorController {
       // 오프라인 입금/정산 컬럼 보강 (송금 완료자 명단 공유용). 온라인 결제 아님.
       const paymentStatusLabel = (v: string | null) =>
         ({ unpaid: '입금 전', pending: '입금 확인 대기', paid: '입금 확인 완료', failed: '입금 확인 실패', canceled: '참여 취소', refunded: '환불 처리됨' } as Record<string, string>)[v || 'unpaid'] || v || '입금 전';
+      // WO-O4O-MARKET-TRIAL-PROCESSING-TERMINOLOGY-CLEANUP-V1: 사용자-facing 표기 '정산'→'펀딩 처리'(내부 enum 값/필드는 유지)
       const settlementStatusLabel = (v: string | null) =>
-        ({ pending: '대기', choice_pending: '선택 대기', choice_completed: '선택 완료', offline_review: '운영 확인 중', offline_settled: '정산 완료' } as Record<string, string>)[v || 'pending'] || v || '-';
+        ({ pending: '대기', choice_pending: '선택 대기', choice_completed: '선택 완료', offline_review: '운영 확인 중', offline_settled: '펀딩 처리 완료' } as Record<string, string>)[v || 'pending'] || v || '-';
       const settlementChoiceLabel = (v: string | null) => (v === 'product' ? '제품 수령' : v === 'cash' ? '금액 환급' : '-');
       const won = (n: string | number | null) => (n != null && n !== '' ? `${Number(n).toLocaleString()}원` : '-');
 
       // CSV header + rows
-      const header = ['참여자명', '참여자유형', '보상방식', '보상상태', '참여금', '입금상태', '입금확인금액', '입금확인일', '입금참조', '정산선택', '정산상태', '참여일', '유통참여형 펀딩 제목', '상태'];
+      const header = ['참여자명', '참여자유형', '보상방식', '보상상태', '참여금', '입금상태', '입금확인금액', '입금확인일', '입금참조', '펀딩 처리 방식', '펀딩 처리 상태', '참여일', '유통참여형 펀딩 제목', '상태'];
       const trialTitle = (trial.title || '').replace(/"/g, '""');
       const trialStatusLabel: Record<string, string> = {
         draft: '작성 중', submitted: '심사 대기',
