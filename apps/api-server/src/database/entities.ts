@@ -367,6 +367,9 @@ import {
   // WO-O4O-MULTILINGUAL-PRODUCT-CONTENT-ENTITY-REGISTRY-AND-ROUTE-MOUNT-V1
   StoreMultilingualProductContentGroup,
   StoreMultilingualProductContentPage,
+  // WO-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-HUB-FLOW-PILOT-V1 — operator-side HUB originals
+  OperatorMultilingualProductContentGroup,
+  OperatorMultilingualProductContentPage,
 } from '../routes/platform/entities/index.js';
 
 // WO-O4O-KPA-POP-PUBLISHING-PHASE2-BACKEND-V1: StorePop entity 등록 (Phase 1 누락분 정합).
@@ -954,6 +957,13 @@ export const entities = [
   // ============================================================================
   StoreMultilingualProductContentGroup,
   StoreMultilingualProductContentPage,
+  // ============================================================================
+  // OPERATOR MULTILINGUAL PRODUCT CONTENT ENTITIES (HUB originals)
+  // (WO-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-HUB-FLOW-PILOT-V1)
+  // operator_multilingual_product_content_groups + _pages — 운영자 HUB 원본
+  // ============================================================================
+  OperatorMultilingualProductContentGroup,
+  OperatorMultilingualProductContentPage,
   // ============================================================================
   // PLATFORM STORE POLICY & PAYMENT CONFIG ENTITIES
   // ============================================================================

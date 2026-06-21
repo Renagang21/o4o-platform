@@ -42,6 +42,7 @@ import { createBlogController } from '../o4o-store/controllers/blog.controller.j
 // WO-O4O-OPERATOR-BLOG-PUBLISHING-WRITE-API-V1: 운영자 HUB 게시 write API
 import { createOperatorBlogController } from '../o4o-store/controllers/operator-blog.controller.js';
 import { createOperatorPopController } from '../o4o-store/controllers/operator-pop.controller.js';
+import { createOperatorMultilingualContentController } from '../o4o-store/controllers/operator-multilingual-content.controller.js'; // WO-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-HUB-FLOW-PILOT-V1
 // WO-O4O-KCOSMETICS-OPERATOR-BLOG-POP-QR-BOOTSTRAP-V1: K-Cosmetics QR 운영자 write API
 import { createOperatorQrController } from '../o4o-store/controllers/operator-qr.controller.js';
 // WO-O4O-KCOS-STORE-HUB-POP-QR-PORT-V1: 매장 HUB POP/QR 가져가기(staff import) — 공유 컨트롤러 mount (GlycoPharm mirror)
@@ -195,6 +196,13 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
   router.use(
     '/operator/pop',
     createOperatorPopController(dataSource, coreRequireAuth as any, 'cosmetics'),
+  );
+
+  // WO-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-HUB-FLOW-PILOT-V1: 운영자 HUB 다국어 상품 콘텐츠 write API
+  // /api/v1/cosmetics/operator/multilingual-product-contents/groups (backend symmetry; UI는 KPA 파일럿 전용)
+  router.use(
+    '/operator/multilingual-product-contents',
+    createOperatorMultilingualContentController(dataSource, coreRequireAuth as any, 'cosmetics'),
   );
 
   // WO-O4O-KCOSMETICS-OPERATOR-BLOG-POP-QR-BOOTSTRAP-V1: 운영자 HUB QR 템플릿 write API

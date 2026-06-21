@@ -29,6 +29,7 @@ import { createBlogController } from '../o4o-store/controllers/blog.controller.j
 // WO-O4O-OPERATOR-BLOG-PUBLISHING-WRITE-API-V1: 운영자 HUB 게시 write API
 import { createOperatorBlogController } from '../o4o-store/controllers/operator-blog.controller.js';
 import { createOperatorPopController } from '../o4o-store/controllers/operator-pop.controller.js';
+import { createOperatorMultilingualContentController } from '../o4o-store/controllers/operator-multilingual-content.controller.js'; // WO-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-HUB-FLOW-PILOT-V1
 // WO-O4O-GLYCOPHARM-STORE-HUB-QR-BACKEND-FOUNDATION-V1
 import { createOperatorQrController } from '../o4o-store/controllers/operator-qr.controller.js';
 // WO-O4O-GLYCOPHARM-STORE-HUB-POP-QR-STAFF-BACKEND-V1: 매장 owner 가 운영자 HUB POP/QR 을 가져가는 staff import
@@ -455,6 +456,13 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
     'glycopharm',
   );
   router.use('/operator/pop', glycopharmOperatorPopController);
+
+  // WO-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-HUB-FLOW-PILOT-V1: 운영자 HUB 다국어 상품 콘텐츠 write API
+  // /api/v1/glycopharm/operator/multilingual-product-contents/groups (backend symmetry; UI는 KPA 파일럿 전용)
+  router.use(
+    '/operator/multilingual-product-contents',
+    createOperatorMultilingualContentController(dataSource, coreRequireAuth as any, 'glycopharm'),
+  );
 
   // WO-O4O-GLYCOPHARM-STORE-HUB-QR-BACKEND-FOUNDATION-V1: 운영자 HUB QR template write API
   // /api/v1/glycopharm/operator/qr/templates (운영자가 약국 HUB 에 게시하는 QR 템플릿)

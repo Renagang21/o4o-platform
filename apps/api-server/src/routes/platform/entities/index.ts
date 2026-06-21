@@ -31,3 +31,15 @@ export {
   type StoreMultilingualProductContentPageStatus,
   type StoreMultilingualProductContentFormat,
 } from './store-multilingual-product-content-page.entity.js';
+// WO-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-HUB-FLOW-PILOT-V1 — operator-side HUB originals
+export {
+  OperatorMultilingualProductContentGroup,
+  type OperatorMultilingualProductContentAuthorRole,
+  type OperatorMultilingualProductContentStatus,
+} from './operator-multilingual-product-content-group.entity.js';
+export {
+  OperatorMultilingualProductContentPage,
+  type OperatorMultilingualProductLocale,
+  type OperatorMultilingualProductContentPageStatus,
+  type OperatorMultilingualProductContentFormat,
+} from './operator-multilingual-product-content-page.entity.js';

@@ -258,6 +258,201 @@ export function createMultilingualProductContentController(
     }),
   );
 
+  // GET /pharmacy/multilingual-product-contents/hub — browse published operator HUB originals
+  // WO-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-HUB-FLOW-PILOT-V1
+  router.get(
+    '/pharmacy/multilingual-product-contents/hub',
+    requireAuth,
+    requireStoreOwner,
+    asyncHandler(async (req: Request, res: Response) => {
+      const page = Math.max(1, parseInt(req.query.page as string) || 1);
+      const limit = Math.min(50, Math.max(1, parseInt(req.query.limit as string) || 20));
+      const search = asString(req.query.search, 200);
+
+      // serviceKey is required to scope HUB originals; back-compat mount (no serviceKey) returns empty.
+      if (!serviceKey) {
+        res.json({ success: true, data: [], meta: { page, limit, total: 0, totalPages: 0 } });
+        return;
+      }
+
+      const params: unknown[] = [serviceKey];
+      let where = `WHERE service_key = $1 AND author_role = 'operator' AND status = 'published'`;
+      if (search) {
+        params.push(`%${search}%`);
+        where += ` AND title ILIKE $${params.length}`;
+      }
+
+      const totalRows = await dataSource.query(
+        `SELECT COUNT(*)::int AS count FROM operator_multilingual_product_content_groups ${where}`,
+        params,
+      );
+      const total = totalRows[0]?.count ?? 0;
+
+      params.push(limit, (page - 1) * limit);
+      const groups = await dataSource.query(
+        `SELECT
+           id,
+           service_key AS "serviceKey",
+           content_key AS "contentKey",
+           title,
+           description,
+           default_locale AS "defaultLocale",
+           published_at AS "publishedAt",
+           updated_at AS "updatedAt"
+         FROM operator_multilingual_product_content_groups
+         ${where}
+         ORDER BY published_at DESC NULLS LAST, updated_at DESC
+         LIMIT $${params.length - 1} OFFSET $${params.length}`,
+        params,
+      );
+
+      if (groups.length === 0) {
+        res.json({ success: true, data: [], meta: { page, limit, total, totalPages: Math.ceil(total / limit) } });
+        return;
+      }
+
+      // Only published locale pages are importable; surface their locales/count per group.
+      const groupIds = groups.map((g: any) => g.id);
+      const pages = await dataSource.query(
+        `SELECT group_id AS "groupId", locale, content_format AS "contentFormat"
+         FROM operator_multilingual_product_content_pages
+         WHERE group_id = ANY($1::uuid[]) AND status = 'published'
+         ORDER BY is_default DESC, sort_order ASC, locale ASC`,
+        [groupIds],
+      );
+      const localeMap = new Map<string, string[]>();
+      for (const p of pages) {
+        const list = localeMap.get(p.groupId) || [];
+        list.push(p.locale);
+        localeMap.set(p.groupId, list);
+      }
+
+      res.json({
+        success: true,
+        data: groups.map((g: any) => {
+          const locales = localeMap.get(g.id) || [];
+          return { ...g, locales, localeCount: locales.length };
+        }),
+        meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      });
+    }),
+  );
+
+  // POST /pharmacy/multilingual-product-contents/import — import (= copy) operator HUB original
+  // WO-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-HUB-FLOW-PILOT-V1
+  // Copies a published operator group + its published locale pages into a store-scoped group
+  // bound to a concrete store product target. The copy is detached from the operator original.
+  router.post(
+    '/pharmacy/multilingual-product-contents/import',
+    requireAuth,
+    requireStoreOwner,
+    asyncHandler(async (req: Request, res: Response) => {
+      const organizationId = (req as any).organizationId as string;
+      const userId = (req as any).user?.id as string | undefined;
+      const sourceGroupId = asString(req.body?.sourceGroupId, 80);
+      const targetKind = req.body?.targetKind;
+      const targetId = asString(req.body?.targetId, 80);
+      const contentKey = normalizeContentKey(req.body?.contentKey);
+
+      if (!sourceGroupId || !isOneOf(targetKind, TARGET_KINDS) || !targetId) {
+        res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'sourceGroupId, targetKind and targetId are required' } });
+        return;
+      }
+      if (!serviceKey) {
+        res.status(400).json({ success: false, error: { code: 'SERVICE_REQUIRED', message: 'Service-scoped store-owner context required for HUB import' } });
+        return;
+      }
+
+      // 1. Target must belong to this store.
+      const targetOk = await assertTargetBelongsToStore(dataSource, organizationId, serviceKey, targetKind, targetId);
+      if (!targetOk) {
+        res.status(404).json({ success: false, error: { code: 'TARGET_NOT_FOUND', message: 'Target product not found for this store' } });
+        return;
+      }
+
+      // 2. Operator original must exist, be in this service, and be published.
+      const [source] = await dataSource.query(
+        `SELECT id, title, default_locale AS "defaultLocale", metadata
+         FROM operator_multilingual_product_content_groups
+         WHERE id = $1 AND service_key = $2 AND author_role = 'operator' AND status = 'published'
+         LIMIT 1`,
+        [sourceGroupId, serviceKey],
+      );
+      if (!source) {
+        res.status(404).json({ success: false, error: { code: 'SOURCE_NOT_FOUND', message: 'Published operator HUB content not found' } });
+        return;
+      }
+
+      const importMeta = {
+        ...normalizeJsonObject(source.metadata),
+        importedFromOperatorGroupId: source.id,
+      };
+
+      // 3. Create (or refresh) the store-scoped copy group bound to the chosen target.
+      const [group] = await dataSource.query(
+        `INSERT INTO store_multilingual_product_content_groups
+           (organization_id, service_key, target_kind, target_id, content_key, title, default_locale, source_type, source_ref_id, status, metadata, created_by_user_id)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, 'operator_hub', $8, 'draft', $9::jsonb, $10)
+         ON CONFLICT (organization_id, target_kind, target_id, content_key)
+         DO UPDATE SET
+           title = EXCLUDED.title,
+           default_locale = EXCLUDED.default_locale,
+           source_type = EXCLUDED.source_type,
+           source_ref_id = EXCLUDED.source_ref_id,
+           metadata = EXCLUDED.metadata,
+           updated_at = now()
+         RETURNING id`,
+        [organizationId, serviceKey, targetKind, targetId, contentKey, source.title, source.defaultLocale || 'ko', source.id, JSON.stringify(importMeta), userId || null],
+      );
+
+      // 4. Copy published locale pages into the store group (idempotent upsert by locale).
+      const sourcePages = await dataSource.query(
+        `SELECT locale, title, summary, content_format AS "contentFormat", content, assets, buttons, is_default AS "isDefault", sort_order AS "sortOrder"
+         FROM operator_multilingual_product_content_pages
+         WHERE group_id = $1 AND status = 'published'
+         ORDER BY is_default DESC, sort_order ASC, locale ASC`,
+        [sourceGroupId],
+      );
+
+      for (const p of sourcePages) {
+        await dataSource.query(
+          `INSERT INTO store_multilingual_product_content_pages
+             (group_id, locale, title, summary, content_format, content, assets, buttons, status, is_default, sort_order, metadata, created_by_user_id)
+           VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7::jsonb, $8::jsonb, 'draft', $9, $10, $11::jsonb, $12)
+           ON CONFLICT (group_id, locale)
+           DO UPDATE SET
+             title = EXCLUDED.title,
+             summary = EXCLUDED.summary,
+             content_format = EXCLUDED.content_format,
+             content = EXCLUDED.content,
+             assets = EXCLUDED.assets,
+             buttons = EXCLUDED.buttons,
+             is_default = EXCLUDED.is_default,
+             sort_order = EXCLUDED.sort_order,
+             metadata = EXCLUDED.metadata,
+             updated_at = now()`,
+          [
+            group.id,
+            p.locale,
+            p.title,
+            p.summary,
+            p.contentFormat,
+            JSON.stringify(normalizeJsonObject(p.content)),
+            JSON.stringify(normalizeJsonArray(p.assets)),
+            JSON.stringify(normalizeJsonArray(p.buttons)),
+            p.isDefault === true,
+            Number.isFinite(Number(p.sortOrder)) ? Number(p.sortOrder) : 0,
+            JSON.stringify({ importedFromOperatorGroupId: source.id }),
+            userId || null,
+          ],
+        );
+      }
+
+      const data = await loadGroupWithPages(dataSource, group.id, organizationId);
+      res.status(201).json({ success: true, data, meta: { importedPages: sourcePages.length } });
+    }),
+  );
+
   // POST /pharmacy/multilingual-product-contents — create or update group by target+contentKey
   router.post(
     '/pharmacy/multilingual-product-contents',

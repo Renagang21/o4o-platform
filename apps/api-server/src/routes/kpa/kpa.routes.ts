@@ -94,6 +94,7 @@ import { createBlogController } from '../o4o-store/controllers/blog.controller.j
 // WO-O4O-OPERATOR-BLOG-PUBLISHING-WRITE-API-V1: 운영자 HUB 게시 write API
 import { createOperatorBlogController } from '../o4o-store/controllers/operator-blog.controller.js';
 import { createOperatorPopController } from '../o4o-store/controllers/operator-pop.controller.js';
+import { createOperatorMultilingualContentController } from '../o4o-store/controllers/operator-multilingual-content.controller.js'; // WO-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-HUB-FLOW-PILOT-V1
 import { createStorePopStaffController } from '../o4o-store/controllers/pop.controller.js';
 import { createOperatorQrController } from '../o4o-store/controllers/operator-qr.controller.js';
 import { createStoreQrStaffController } from '../o4o-store/controllers/qr.controller.js';
@@ -466,6 +467,14 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     'kpa',
   );
   router.use('/operator/pop', kpaOperatorPopController);
+
+  // WO-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-HUB-FLOW-PILOT-V1: 운영자 HUB 다국어 상품 콘텐츠 write API
+  // /api/v1/kpa/operator/multilingual-product-contents/groups (운영자 원본 — 매장이 가져가면 사본 생성)
+  // 권한: kpa:operator / kpa:admin / platform:admin / platform:super_admin
+  router.use(
+    '/operator/multilingual-product-contents',
+    createOperatorMultilingualContentController(dataSource, coreRequireAuth as any, 'kpa'),
+  );
 
   // WO-O4O-KPA-OPERATOR-QR-PUBLISHING-PHASE2-BACKEND-V1: 운영자 HUB QR template write API
   // /api/v1/kpa/operator/qr/templates (운영자가 매장 HUB 에 게시하는 QR 청사진 — 실제 QR 아님)
