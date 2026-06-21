@@ -92,6 +92,15 @@ export function createCosmeticsPaymentController(
       body('failUrl').notEmpty().isURL(),
     ],
     async (req: Request, res: Response) => {
+      // WO-O4O-STORE-SALE-CHECKOUT-ROUTE-DEPRECATION-V1: 소비자→매장 결제(STORE_SALE_PAYMENT)는 O4O 대상 아님.
+      //   PaymentCore.prepare/Toss 호출·DB 변경 전 차단. 조회성 GET /order/:orderId 는 보존(미차단).
+      return res.status(410).json({
+        success: false,
+        code: 'STORE_SALE_PAYMENT_DEPRECATED',
+        message: '매장 소비자 결제는 O4O에서 제공하지 않습니다. 상품 결제는 해당 매장의 POS 또는 현장 결제를 이용해 주세요.',
+      });
+      // 아래 기존 결제 생성 로직은 정책상 미도달(차단됨) — 구조 보존을 위해 유지.
+      // eslint-disable-next-line no-unreachable
       try {
         if (handleValidationErrors(req, res)) return;
 
@@ -179,6 +188,15 @@ export function createCosmeticsPaymentController(
       body('orderId').notEmpty().isUUID(),
     ],
     async (req: Request, res: Response) => {
+      // WO-O4O-STORE-SALE-CHECKOUT-ROUTE-DEPRECATION-V1: 소비자→매장 결제(STORE_SALE_PAYMENT)는 O4O 대상 아님.
+      //   PaymentCore.confirm/Toss 호출·DB 변경 전 차단. 조회성 GET /order/:orderId 는 보존(미차단).
+      return res.status(410).json({
+        success: false,
+        code: 'STORE_SALE_PAYMENT_DEPRECATED',
+        message: '매장 소비자 결제는 O4O에서 제공하지 않습니다. 상품 결제는 해당 매장의 POS 또는 현장 결제를 이용해 주세요.',
+      });
+      // 아래 기존 결제 승인 로직은 정책상 미도달(차단됨) — 구조 보존을 위해 유지.
+      // eslint-disable-next-line no-unreachable
       try {
         if (handleValidationErrors(req, res)) return;
 
