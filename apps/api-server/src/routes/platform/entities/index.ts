@@ -18,3 +18,16 @@ export { StoreAssetDerivation } from './store-asset-derivation.entity.js';
 export { StoreQrCode } from './store-qr-code.entity.js';
 export { StoreQrScanEvent } from './store-qr-scan-event.entity.js';
 export { ProductMarketingAsset } from './product-marketing-asset.entity.js';
+// WO-O4O-MULTILINGUAL-PRODUCT-CONTENT-STORAGE-V1
+export {
+  StoreMultilingualProductContentGroup,
+  type StoreMultilingualProductTargetKind,
+  type StoreMultilingualProductContentSourceType,
+  type StoreMultilingualProductContentStatus,
+} from './store-multilingual-product-content-group.entity.js';
+export {
+  StoreMultilingualProductContentPage,
+  type StoreMultilingualProductLocale,
+  type StoreMultilingualProductContentPageStatus,
+  type StoreMultilingualProductContentFormat,
+} from './store-multilingual-product-content-page.entity.js';
