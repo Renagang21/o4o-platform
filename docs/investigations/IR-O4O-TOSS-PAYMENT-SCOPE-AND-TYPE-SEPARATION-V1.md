@@ -1,5 +1,12 @@
 # IR — O4O Toss 결제 범위 및 타입 분리 V1
 
+> 🔧 **[정정 — WO-O4O-SERVICE-ACCESS-TERMINOLOGY-ALIGN-V1 / 2026-06-21]**
+> 본 문서의 `SERVICE_ACCESS`(결제 타입) 표현은 [`IR-O4O-TOSS-PAYMENT-SCOPE-REVISION-STORE-SUBSCRIPTION-AND-B2B-V1`](./IR-O4O-TOSS-PAYMENT-SCOPE-REVISION-STORE-SUBSCRIPTION-AND-B2B-V1.md) 에 의해 **`STORE_SERVICE_SUBSCRIPTION`** 으로 superseded 된다.
+> - `metadata.paymentType` = `STORE_SERVICE_SUBSCRIPTION` · orderId prefix `o4o_sa_` → **`o4o_sub_`**
+> - `FOREIGN_VISITOR_SALES_SUPPORT` = 고객 결제 타입이 아니라 **매장 경영자 서비스 구독 플랜**(고객→매장 판매 결제 아님)
+> - 소비자→매장 결제(`STORE_SALE_PAYMENT`)는 O4O Toss 대상이 아니다(매장 POS/일반 결제).
+> - 새 후속 WO 는 `SERVICE_ACCESS` 를 결제 타입으로 사용하지 않는다.
+
 **IR:** `IR-O4O-TOSS-PAYMENT-SCOPE-AND-TYPE-SEPARATION-V1`  
 **일자:** 2026-06-21  
 **범위:** 결제 범위/타입/후속 WO 순서 고정  

@@ -1,5 +1,8 @@
 # CHECK — Toss 결제 공통 Core V1 (중단 기준 #1·#2·#6 — 재구현 안 함)
 
+> 🔧 **[정정 — WO-O4O-SERVICE-ACCESS-TERMINOLOGY-ALIGN-V1 / 2026-06-21]**
+> 본 문서의 `SERVICE_ACCESS`(결제 타입) 표현은 [`IR-O4O-TOSS-PAYMENT-SCOPE-REVISION-STORE-SUBSCRIPTION-AND-B2B-V1`](./IR-O4O-TOSS-PAYMENT-SCOPE-REVISION-STORE-SUBSCRIPTION-AND-B2B-V1.md) 에 의해 **`STORE_SERVICE_SUBSCRIPTION`** 으로 superseded 된다(§3·§5 의 SERVICE_ACCESS 표기). 기존 PaymentCore 재사용·재구현 거부 결론은 유효. 새 후속 WO 는 `SERVICE_ACCESS` 를 결제 타입으로 쓰지 않는다.
+
 **WO:** `WO-O4O-TOSS-PAYMENT-CORE-V1`
 **일자:** 2026-06-21
 **성격:** 조사 → 중단 판정. **코드/DB/migration/entity/route 무변경.** 본 CHECK 문서 1개만 산출.

@@ -1,5 +1,12 @@
 # IR-O4O-PAYMENTCORE-PAYMENT-TYPE-AXIS-DECISION-V1
 
+> 🔧 **[정정 — WO-O4O-SERVICE-ACCESS-TERMINOLOGY-ALIGN-V1 / 2026-06-21]**
+> 본 문서의 `SERVICE_ACCESS`(결제 타입) 및 `o4o_sa_` orderId prefix 는 [`IR-O4O-TOSS-PAYMENT-SCOPE-REVISION-STORE-SUBSCRIPTION-AND-B2B-V1`](./IR-O4O-TOSS-PAYMENT-SCOPE-REVISION-STORE-SUBSCRIPTION-AND-B2B-V1.md) 에 의해 정정된다:
+> - `metadata.paymentType` = `SERVICE_ACCESS` → **`STORE_SERVICE_SUBSCRIPTION`**
+> - orderId prefix `o4o_sa_` → **`o4o_sub_`** · `targetRefType` = `paid_feature_entitlement` → `store_paid_feature_entitlement`
+> - `FOREIGN_VISITOR_SALES_SUPPORT` = 고객 결제 타입이 아니라 **매장 경영자 서비스 구독 플랜**
+> - §5 의 옵션 A(metadata 기반, o4o_payments 스키마 무변경) **결론 자체는 유효**하며, paymentType 값/용어만 정정된다.
+
 > **유형:** Decision IR (read-only) — 코드/DB/migration/API/UI **무변경**. 본 문서 1개만 산출.
 > **작성일:** 2026-06-21
 > **상위:** `CHECK-O4O-TOSS-PAYMENT-CORE-V1`(중단 #1·#2) · `IR-O4O-TOSS-PAYMENT-SCOPE-AND-TYPE-SEPARATION-V1` · `IR-O4O-PAYMENTCORE-O4O-PAYMENTS-SCHEMA-CONTRACT-AUDIT-V1`
