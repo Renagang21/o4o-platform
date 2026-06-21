@@ -769,7 +769,8 @@ function ParticipantSection({
       paymentProvider: 'internal',
       paymentReference: f.reference.trim() !== '' ? f.reference.trim() : undefined,
       paidAmount: amt != null && Number.isFinite(amt) ? amt : undefined,
-      paidAt: new Date().toISOString(),
+      // WO-O4O-MARKET-TRIAL-OFFLINE-PAYMENT-PAIDAT-PRESERVE-V1: paidAt 은 backend 가 최초 1회만 설정·보존.
+      // 프론트는 paidAt 을 전송하지 않는다(매 확인마다 today 로 덮어쓰던 문제 방지).
       paymentNote: f.note.trim() !== '' ? f.note.trim() : undefined,
     });
     closeForm();
@@ -935,8 +936,8 @@ function ParticipantSection({
                   <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">입금 상태</th>
                   <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">방법</th>
                   <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">금액</th>
-                  <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">입금일</th>
-                  <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">확인일</th>
+                  <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">최초 확인일</th>
+                  <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">마지막 확인일</th>
                   <th className="text-left py-2 px-2 text-xs font-medium text-gray-500">메모</th>
                   <th className="text-right py-2 px-4 text-xs font-medium text-gray-500">액션</th>
                 </tr>

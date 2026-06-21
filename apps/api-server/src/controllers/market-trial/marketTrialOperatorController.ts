@@ -925,24 +925,22 @@ export class MarketTrialOperatorController {
       pushSet('paymentReference', paymentReference);
       pushSet('paidAmount', paidAmount, (v) => Number(v));
 
-      // Auto-stamp paidAt on PAID transition unless caller supplies an explicit value.
-      if (paidAt !== undefined) {
-        pushSet('paidAt', paidAt, (v) => new Date(v));
-      } else if (newStatus === PaymentStatus.PAID) {
+      // WO-O4O-MARKET-TRIAL-OFFLINE-PAYMENT-PAIDAT-PRESERVE-V1:
+      // paidAt = 최초 입금 확인일. 기존 paidAt 이 있으면 보존(caller 가 값을 보내도 덮어쓰지 않음).
+      // PAID 최초 전환 시에만 설정(요청값 우선, 없으면 now). newStatus !== PAID 이면 paidAt 미변경(보존).
+      if (newStatus === PaymentStatus.PAID) {
         const idx = sqlParams.length + 1;
         sets.push(`"paidAt" = COALESCE("paidAt", $${idx})`);
-        sqlParams.push(new Date());
+        sqlParams.push(paidAt !== undefined && paidAt !== null ? new Date(paidAt) : new Date());
       }
 
       pushSet('paymentNote', paymentNote);
 
-      // Auto-stamp confirmedAt on PAID transition unless caller supplies an explicit value.
-      if (confirmedAt !== undefined) {
-        pushSet('confirmedAt', confirmedAt, (v) => (v === null ? null : new Date(v)));
-      } else if (newStatus === PaymentStatus.PAID) {
+      // confirmedAt = 마지막 운영자 확인 시각. 입금 상태 변경/수정마다 now 로 갱신(요청값 있으면 우선).
+      {
         const idx = sqlParams.length + 1;
-        sets.push(`"confirmedAt" = COALESCE("confirmedAt", $${idx})`);
-        sqlParams.push(new Date());
+        sets.push(`"confirmedAt" = $${idx}`);
+        sqlParams.push(confirmedAt !== undefined && confirmedAt !== null ? new Date(confirmedAt) : new Date());
       }
 
       sets.push(`"updatedAt" = now()`);
