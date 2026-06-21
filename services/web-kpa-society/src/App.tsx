@@ -193,6 +193,9 @@ const HubPopLibraryPage = lazy(() => import('./pages/pharmacy/HubPopLibraryPage'
 const PharmacyPopPage = lazy(() => import('./pages/pharmacy/PharmacyPopPage').then(m => ({ default: m.PharmacyPopPage })));
 // WO-O4O-KPA-STORE-HUB-QR-CONTENT-IMPORT-V1: 매장 HUB QR 진열 + 가져가기 (매장 사본은 기존 StoreQRPage)
 const HubQrLibraryPage = lazy(() => import('./pages/pharmacy/HubQrLibraryPage').then(m => ({ default: m.HubQrLibraryPage })));
+// WO-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-HUB-FLOW-WEB-PILOT-V1
+const HubMultilingualContentLibraryPage = lazy(() => import('./pages/pharmacy/HubMultilingualContentLibraryPage').then(m => ({ default: m.HubMultilingualContentLibraryPage })));
+const StoreMultilingualContentsMyPage = lazy(() => import('./pages/pharmacy/StoreMultilingualContentsMyPage').then(m => ({ default: m.StoreMultilingualContentsMyPage })));
 const PharmacySellPage = lazy(() => import('./pages/pharmacy/PharmacySellPage').then(m => ({ default: m.PharmacySellPage })));
 const TabletRequestsPage = lazy(() => import('./pages/pharmacy/TabletRequestsPage').then(m => ({ default: m.TabletRequestsPage })));
 const PharmacyBlogPage = lazy(() => import('./pages/pharmacy/PharmacyBlogPage').then(m => ({ default: m.PharmacyBlogPage })));
@@ -707,6 +710,9 @@ function App() {
             <Route path="pop" element={<HubPopLibraryPage />} />
             {/* WO-O4O-KPA-STORE-HUB-QR-CONTENT-IMPORT-V1: 매장 HUB QR 진열 + 가져가기 */}
             <Route path="qr" element={<HubQrLibraryPage />} />
+            {/* WO-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-HUB-FLOW-WEB-PILOT-V1: 다국어 상품 콘텐츠 진열 + 가져가기 */}
+            <Route path="multilingual-product-contents" element={<HubMultilingualContentLibraryPage />} />
+            <Route path="multilingual-product-contents/my" element={<StoreMultilingualContentsMyPage />} />
           </Route>
           {/* 자료실 Hub — 공동자료실 진입점 (WO-KPA-RESOURCE-SYSTEM-RESET-V1) */}
           <Route path="/resources" element={<Layout serviceName={SERVICE_NAME}><ResourcesHubPage /></Layout>} />

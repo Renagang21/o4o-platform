@@ -63,6 +63,9 @@ import OperatorPopWritePage from '../pages/operator/pop/OperatorPopWritePage';
 // WO-O4O-KPA-OPERATOR-QR-WRITE-PAGE-V1
 import OperatorQrListPage from '../pages/operator/qr/OperatorQrListPage';
 import OperatorQrWritePage from '../pages/operator/qr/OperatorQrWritePage';
+// WO-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-HUB-FLOW-WEB-PILOT-V1
+import OperatorMultilingualContentListPage from '../pages/operator/multilingual-product-content/OperatorMultilingualContentListPage';
+import OperatorMultilingualContentWritePage from '../pages/operator/multilingual-product-content/OperatorMultilingualContentWritePage';
 import { RoleGuard } from '../components/auth/RoleGuard';
 import { PLATFORM_ROLES, ROLES } from '../lib/role-constants';
 // WO-O4O-OPERATOR-UI-STANDARDIZATION-V1: shared OperatorShell wrapper
@@ -201,6 +204,11 @@ export function OperatorRoutes() {
           <Route path="qr" element={<OperatorQrListPage />} />
           <Route path="qr/new" element={<OperatorQrWritePage />} />
           <Route path="qr/:id/edit" element={<OperatorQrWritePage />} />
+
+          {/* 매장 HUB 다국어 상품 콘텐츠 (WO-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-HUB-FLOW-WEB-PILOT-V1) */}
+          <Route path="multilingual-product-contents" element={<OperatorMultilingualContentListPage />} />
+          <Route path="multilingual-product-contents/new" element={<OperatorMultilingualContentWritePage />} />
+          <Route path="multilingual-product-contents/:id" element={<OperatorMultilingualContentWritePage />} />
 
           {/* 협업 문의 관리 (WO-O4O-KPA-OPERATOR-COLLABORATION-INBOX-V1) */}
           <Route path="collaboration-requests" element={<CollaborationRequestsPage />} />

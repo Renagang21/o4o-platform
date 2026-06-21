@@ -63,6 +63,9 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '매장 HUB 블로그', path: '/operator/blog' },
     { label: '매장 HUB POP', path: '/operator/pop' },
     { label: '매장 HUB QR-code', path: '/operator/qr' },
+    // WO-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-HUB-FLOW-WEB-PILOT-V1:
+    //   운영자 게시 → 매장 가져가기(복사). 외국인 고객 대상 다국어 상품 안내 콘텐츠.
+    { label: '매장 HUB 다국어 상품 콘텐츠', path: '/operator/multilingual-product-contents' },
   ],
   // WO-KPA-OPERATOR-CONTENT-NOTICE-NEWS-MENU-NORMALIZATION-V1: "공지사항" + "콘텐츠 관리" → "공지사항/뉴스" 통합
   // WO-KPA-LMS-INSTRUCTOR-APPROVAL-RELOCATE-V1: 자료실 관리 → resources 그룹으로, 강의 관리 → lms 그룹으로 이동
