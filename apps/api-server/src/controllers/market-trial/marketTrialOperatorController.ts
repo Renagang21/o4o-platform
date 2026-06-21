@@ -974,20 +974,22 @@ export class MarketTrialOperatorController {
 
       const row = result[0];
       logger.info(
-        `[MarketTrialPayment] trial=${id} participant=${participantId} → paymentStatus=${row.paymentStatus} actor=${(req as any).user?.id ?? 'unknown'}`,
+        `[MarketTrialPayment] trial=${id} participant=${participantId} → paymentStatus=${newStatus} actor=${(req as any).user?.id ?? 'unknown'}`,
       );
 
       // WO-O4O-MARKET-TRIAL-OFFLINE-PAYMENT-AUDIT-LOG-V1: 구조화 감사(전후 상태/금액, reference·note 변경 여부).
       // 기존 action_logs 테이블 재사용(migration 없음). paymentReference/paymentNote 원문은 기록하지 않는다.
+      // afterStatus 는 검증된 newStatus 를, afterAmount 는 요청값(있으면)·없으면 기존 금액(보존)을 사용한다
+      // (UPDATE RETURNING row 직접 의존 회피).
       const beforeAmount = prev.paidAmount != null ? Number(prev.paidAmount) : null;
-      const afterAmount = row.paidAmount != null ? Number(row.paidAmount) : null;
+      const afterAmount = paidAmount !== undefined && paidAmount !== null ? Number(paidAmount) : beforeAmount;
       new ActionLogService(ds)
         .logSuccess('neture', (req as any).user?.id ?? null, 'neture.operator.market_trial_payment_change', {
           meta: {
             trialId: id,
             participantId,
             beforeStatus: prev.paymentStatus,
-            afterStatus: row.paymentStatus,
+            afterStatus: newStatus,
             beforeAmount,
             afterAmount,
             referenceChanged: paymentReference !== undefined && (paymentReference ?? null) !== (prev.paymentReference ?? null),
