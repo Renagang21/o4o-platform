@@ -249,6 +249,8 @@ const StoreOverviewPage = lazy(() => import('@/pages/store/StoreOverviewPage'));
 // 페이지 파일은 보존(별도 cleanup WO에서 판단). 라우트 사용 제거에 따른 import만 정리.
 const StoreAssetsPage = lazy(() => import('@/pages/store/StoreAssetsPage'));
 const StoreChannelsPage = lazy(() => import('@/pages/store/StoreChannelsPage'));
+// WO-O4O-FOREIGN-VISITOR-SALES-SUPPORT-MENU-GATE-V1
+const ForeignVisitorSalesSupportPage = lazy(() => import('@/pages/store/ForeignVisitorSalesSupportPage'));
 
 // Pharmacy Store Apply — REMOVED (WO-O4O-GLYCOPHARM-STORE-APPLY-DEAD-CODE-REMOVAL-V1)
 // 5개월 사용 0 + UI 진입로 0 + validation 부재로 submit 자체 불가 (soft dead).
@@ -1002,6 +1004,8 @@ function AppRoutes() {
         <Route path="commerce/recruitment-applications" element={<StoreRecruitmentApplicationsPage />} />
         {/* channels: 채널 관리 (WO-O4O-GLYCOPHARM-STORE-HUB-ADOPTION-V1) */}
         <Route path="channels" element={<StoreChannelsPage />} />
+        {/* WO-O4O-FOREIGN-VISITOR-SALES-SUPPORT-MENU-GATE-V1: 판매 채널 확장 > 외국인 여행객 판매지원 */}
+        <Route path="sales-channels/foreign-visitor" element={<ForeignVisitorSalesSupportPage />} />
         <Route path="content" element={<StoreAssetsPage />} />
         {/* Blog (WO-O4O-GLYCO-BLOG-INTRODUCE-V1) — staff 작성/관리 */}
         <Route path="content/blog" element={<PharmacyBlogPage />} />

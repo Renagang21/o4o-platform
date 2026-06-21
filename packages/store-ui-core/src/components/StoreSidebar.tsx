@@ -49,6 +49,7 @@ import {
   Play,
   ChevronDown,
   ChevronRight,
+  Globe,
 } from 'lucide-react';
 import type { StoreDashboardConfig, StoreMenuKey } from '../config/storeMenuConfig';
 import { ALL_STORE_MENUS } from '../config/storeMenuConfig';
@@ -86,6 +87,8 @@ const SECTION_ICONS: Record<string, typeof LayoutDashboard> = {
   suppliers: Truck,
   'order-worktable': ClipboardList,
   channels: LayoutGrid,
+  // WO-O4O-FOREIGN-VISITOR-SALES-SUPPORT-MENU-GATE-V1: 외국인 여행객 판매지원
+  'foreign-visitor-sales-support': Globe,
   // WO-O4O-TABLET-MENU-STRUCTURE-ALIGN-V1: dead 'tablet-channels' 매핑 제거
   // (어떤 menu config에서도 미사용, 'channel' 어휘는 Tablet device에 부적절)
   'tablet-displays': MonitorSmartphone,

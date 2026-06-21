@@ -141,6 +141,10 @@ export const COSMETICS_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'channels',        label: '채널 관리', subPath: '/channels' },
       { key: 'tablet-displays', label: '태블릿',    subPath: '/commerce/tablet-displays' },
     ]},
+    // WO-O4O-FOREIGN-VISITOR-SALES-SUPPORT-MENU-GATE-V1: 판매 채널 확장 (유료 기능 게이트)
+    { label: '판매 채널 확장', items: [
+      { key: 'foreign-visitor-sales-support', label: '외국인 여행객 판매지원', subPath: '/sales-channels/foreign-visitor' },
+    ]},
     // WO-O4O-STORE-MARKETING-ANALYTICS-CROSSSERVICE-V1 + V2 §2.6: 판매/매출은 분석 영역
     { label: '분석', items: [
       { key: 'analytics-marketing', label: '마케팅 분석', subPath: '/analytics/marketing' },
@@ -215,6 +219,10 @@ export const GLYCOPHARM_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'content',  label: '콘텐츠 가져오기', subPath: '/content' },
       { key: 'channels', label: '채널 관리',      subPath: '/channels' },
     ]},
+    // WO-O4O-FOREIGN-VISITOR-SALES-SUPPORT-MENU-GATE-V1: 판매 채널 확장 (유료 기능 게이트)
+    { label: '판매 채널 확장', items: [
+      { key: 'foreign-visitor-sales-support', label: '외국인 여행객 판매지원', subPath: '/sales-channels/foreign-visitor' },
+    ]},
     // WO-O4O-STORE-MARKETING-ANALYTICS-CROSSSERVICE-V1: 마케팅 분석
     { label: '분석', items: [
       { key: 'analytics-marketing', label: '마케팅 분석', subPath: '/analytics/marketing' },
@@ -285,6 +293,10 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'channels',         label: '채널 관리', subPath: '/channels' },
       { key: 'tablet-displays',  label: '태블릿',    subPath: '/commerce/tablet-displays' },
       { key: 'requests',         label: '상담 요청', subPath: '/requests' },
+    ]},
+    // WO-O4O-FOREIGN-VISITOR-SALES-SUPPORT-MENU-GATE-V1: 판매 채널 확장 (유료 기능 게이트)
+    { label: '판매 채널 확장', items: [
+      { key: 'foreign-visitor-sales-support', label: '외국인 여행객 판매지원', subPath: '/sales-channels/foreign-visitor' },
     ]},
     { label: '분석', items: [
       { key: 'analytics-marketing', label: '마케팅 분석', subPath: '/analytics/marketing' },

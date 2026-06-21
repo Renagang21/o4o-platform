@@ -30,6 +30,9 @@ export { StoreDashboardLayout } from './layout/StoreDashboardLayout';
 
 // Components
 export { StorePlaceholderPage } from './components/StorePlaceholderPage';
+// WO-O4O-FOREIGN-VISITOR-SALES-SUPPORT-MENU-GATE-V1
+export { ForeignVisitorSalesSupportPanel } from './components/ForeignVisitorSalesSupportPanel';
+export type { ForeignVisitorSalesSupportPanelProps } from './components/ForeignVisitorSalesSupportPanel';
 export { GuideBackLink } from './components/GuideBackLink';
 export type { GuideBackLinkProps } from './components/GuideBackLink';
 export { StoreTopBar } from './components/StoreTopBar';

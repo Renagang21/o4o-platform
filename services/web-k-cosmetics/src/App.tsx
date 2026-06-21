@@ -276,6 +276,8 @@ const ForumCategoriesManagementPage = lazy(() => import('@/pages/operator/ForumC
 
 // Store Channel Management (WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1)
 const StoreChannelsPage = lazy(() => import('@/pages/store/StoreChannelsPage'));
+// WO-O4O-FOREIGN-VISITOR-SALES-SUPPORT-MENU-GATE-V1
+const ForeignVisitorSalesSupportPage = lazy(() => import('@/pages/store/ForeignVisitorSalesSupportPage'));
 // WO-O4O-SIGNAGE-STORE-ACTION-EXPANSION-V1
 const StoreSignagePage = lazy(() => import('@/pages/store/StoreSignagePage'));
 // WO-O4O-SIGNAGE-PLAYLIST-CREATE-STANDARD-ALL-SURFACES-V1: 매장 플레이리스트 표준 /new 등록
@@ -787,6 +789,8 @@ function AppRoutes() {
         <Route path="my-products" element={<StoreProductsManagerPage title="O4O 주문 가능 상품" description="공급자 또는 운영자 승인 후 매장에서 반복 주문할 수 있는 O4O 공급 상품을 관리합니다." />} />
         {/* channels: 채널 관리 (WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1) */}
         <Route path="channels" element={<StoreChannelsPage />} />
+        {/* WO-O4O-FOREIGN-VISITOR-SALES-SUPPORT-MENU-GATE-V1: 판매 채널 확장 > 외국인 여행객 판매지원 */}
+        <Route path="sales-channels/foreign-visitor" element={<ForeignVisitorSalesSupportPage />} />
         {/* WO-O4O-KCOSMETICS-STORE-PATH-NESTED-MIGRATION-V1:
               KPA canonical 정합 — nested canonical routes (commerce/* · marketing/*) 가 실제 page 를 렌더한다.
               flat path 는 본 블록 하단의 redirect alias 그룹에서 nested canonical 으로 redirect.
