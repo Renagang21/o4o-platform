@@ -326,7 +326,7 @@ export function MarketTrialDetailPage() {
               const rem = total - qty * unit;
               return (
                 <div style={s.exampleBox}>
-                  <strong>정산 예시</strong>: 단가 {unit.toLocaleString()}원 참여 시
+                  <strong>보상 예시</strong>: 단가 {unit.toLocaleString()}원 참여 시
                   → 총 {total.toLocaleString()}원 환원
                   {qty > 0 && ` → 약 ${qty}개${rem > 0 ? ` + 잔액 ${rem.toLocaleString()}원` : ''}`}
                 </div>
@@ -364,7 +364,7 @@ export function MarketTrialDetailPage() {
             유통참여형 펀딩은 참여 의향을 확인하기 위한 모집 기능입니다. 실제 거래 조건, 발송, 정산은 공급자가 별도로 안내할 수 있으며, O4O 화면에서는 결제·정산·배송을 진행하지 않습니다.
           </p>
           <p style={{ fontSize: '0.6875rem', color: '#B45309', lineHeight: 1.6, margin: '8px 0 0 0' }}>
-            ※ 유통참여형 펀딩은 금융투자 상품이 아닙니다. 참여자는 주식·채권·배당·이자·원금 상환 같은 금융적 권리를 받지 않으며, 프로그램 조건에 따라 제품 정산과 초기 참여 혜택을 받습니다.
+            ※ 유통참여형 펀딩은 금융투자 상품이 아닙니다. 참여자는 주식·채권·배당·이자·원금 상환 같은 금융적 권리를 받지 않으며, 프로그램 조건에 따라 제품 보상과 초기 참여 혜택을 받습니다.
           </p>
         </div>
 

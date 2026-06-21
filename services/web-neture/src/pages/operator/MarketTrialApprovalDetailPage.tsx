@@ -404,13 +404,13 @@ export default function MarketTrialApprovalDetailPage() {
           <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
             <h3 className="text-sm font-semibold text-amber-900 mb-1">승인 전 확인사항</h3>
             <p className="text-xs text-amber-800 leading-relaxed mb-2">
-              유통참여형 펀딩은 Neture가 송금 흐름을 관리하는 참여형 유통 프로그램이며, <strong>운영자 승인 후에만 공개·모집</strong>됩니다. 제품 성공 가능성을 보증하는 심사가 아니라, 투자형 오해 방지·송금 흐름·정산 선택권·포럼 운영 가능성·제품 제공 위험을 확인하는 최소 운영 심사입니다.
+              유통참여형 펀딩은 Neture가 송금 흐름을 관리하는 참여형 유통 프로그램이며, <strong>운영자 승인 후에만 공개·모집</strong>됩니다. 제품 성공 가능성을 보증하는 심사가 아니라, 투자형 오해 방지·송금 흐름·보상 방식 선택·포럼 운영 가능성·제품 제공 위험을 확인하는 최소 운영 심사입니다.
             </p>
             <ul className="text-xs text-amber-900 space-y-1">
               <li>☐ 투자형 펀딩으로 오해될 표현(지분·배당·이자·원금 보장·확정 수익)이 없는가</li>
               <li>☐ 송금은 Neture 운영자가 받는 구조와 맞는가 (제품 개발자 직접 수령으로 안내하지 않는가)</li>
-              <li>☐ 참여자의 제품/수익 정산 선택권과 충돌하지 않는가 (제품 정산 선택자만 매장 랜딩 추적)</li>
-              <li>☐ 제품 정산 조건·정산 제품 구성·기준 가격이 설명되어 있는가</li>
+              <li>☐ 참여자의 제품/수익 보상 방식 선택과 충돌하지 않는가 (제품 보상 선택자만 매장 랜딩 추적)</li>
+              <li>☐ 제품 보상 조건·보상 제품 구성·기준 가격이 설명되어 있는가</li>
               <li>☐ 포럼 운영 방식·송금 기한·미송금자 처리 기준이 설명되어 있는가</li>
               <li>☐ 제품 제공 지연 또는 불가 시 안내 기준이 있는가</li>
               <li>☐ 표시·광고·인증상 위험(의약품·건기식·화장품·의료기기 등 규제 품목)이 커 보이지 않는가</li>
@@ -449,7 +449,7 @@ export default function MarketTrialApprovalDetailPage() {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 mb-1"
             />
             {/* WO-O4O-NETURE-DISTRIBUTION-FUNDING-OPERATOR-PREAPPROVAL-CHECKLIST-V1 */}
-            <p className="text-xs text-gray-500 mb-4">투자형 오해·송금 흐름·정산 조건·포럼 운영 기준 중 보완이 필요한 부분을 구체적으로 작성해 주세요.</p>
+            <p className="text-xs text-gray-500 mb-4">투자형 오해·송금 흐름·보상 조건·포럼 운영 기준 중 보완이 필요한 부분을 구체적으로 작성해 주세요.</p>
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => setShowRejectModal(false)}
@@ -837,7 +837,7 @@ function ParticipantSection({
       )}
       {SHOW_MARKET_TRIAL_COMMERCE_UI && totalCount > 0 && (
         <p className="text-xs text-gray-500 mb-3">
-          입금 확인 완료자는 정산 방식(제품/수익)을 선택합니다. <strong>제품 정산을 선택한 참여자만 제품 제공·매장 랜딩 추적 대상</strong>이며, 수익·현금성 정산 선택자는 랜딩 대상으로 분류하지 않습니다. <strong>매장 랜딩은 자동 확정되지 않으며</strong> 운영자가 정산·활용 상품 연결 상태를 참고해 확인하고, 필요하면 제품 개발자와 함께 확정합니다.
+          입금 확인 완료자는 보상 방식(제품/수익)을 선택합니다. <strong>제품 보상을 선택한 참여자만 제품 제공·매장 랜딩 추적 대상</strong>이며, 수익·현금성 보상 선택자는 랜딩 대상으로 분류하지 않습니다. <strong>매장 랜딩은 자동 확정되지 않으며</strong> 운영자가 보상·활용 상품 연결 상태를 참고해 확인하고, 필요하면 제품 개발자와 함께 확정합니다.
         </p>
       )}
 
@@ -925,7 +925,7 @@ function ParticipantSection({
           </div>
           {/* WO-O4O-NETURE-DISTRIBUTION-FUNDING-OFFLINE-OPERATION-SAFETY-V1 / OFFLINE-PAYMENT-LEDGER-V1: 오프라인 운영 + 송금 통제 기준 */}
           <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2 mb-3">
-            초기 유통참여형 펀딩은 온라인 결제 없이 운영자가 오프라인 입금 확인과 제품 정산 상태를 관리합니다. 송금은 Neture가 수령하며, 입금 확인 완료자 명단은 제품 개발자에게 공유됩니다. 아래 상태 변경은 온라인 결제가 아니라 오프라인 입금 확인 기록이며, 잘못 처리한 경우 되돌릴 수 있습니다.
+            초기 유통참여형 펀딩은 온라인 결제 없이 운영자가 오프라인 입금 확인과 제품 보상 상태를 관리합니다. 송금은 Neture가 수령하며, 입금 확인 완료자 명단은 제품 개발자에게 공유됩니다. 아래 상태 변경은 온라인 결제가 아니라 오프라인 입금 확인 기록이며, 잘못 처리한 경우 되돌릴 수 있습니다.
           </p>
           <div className="overflow-x-auto -mx-4 sm:-mx-5">
             <table className="w-full text-sm min-w-[820px]">

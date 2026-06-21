@@ -200,13 +200,13 @@ function DetailDrawer({ trialId, onClose, onChoiceSaved }: DetailDrawerProps) {
 
             <div style={{ marginBottom: '20px' }}>
               <div style={{ fontWeight: 600, color: '#374151', marginBottom: '12px', fontSize: '0.9375rem' }}>
-                정산 계산
+                보상 계산
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                 {([
                   ['참여금', fmt(detail.contributionAmount)],
                   ['리워드', detail.rewardRate != null ? `+${detail.rewardRate}%` : '–'],
-                  ['총 정산 기준 금액', fmt(detail.totalSettlementAmount)],
+                  ['총 보상 기준 금액', fmt(detail.totalSettlementAmount)],
                   ['제품 단가', fmt(detail.trialUnitPrice)],
                   ['예상 제품 수량', detail.estimatedProductQty != null ? `${detail.estimatedProductQty}개` : '–'],
                   ['예상 잔액', fmt(detail.estimatedRemainder)],
@@ -256,7 +256,7 @@ function DetailDrawer({ trialId, onClose, onChoiceSaved }: DetailDrawerProps) {
                 }}
               >
                 <div style={{ fontWeight: 600, color: '#92400E', marginBottom: '12px', fontSize: '0.9375rem' }}>
-                  정산 방식을 선택해 주세요
+                  보상 방식을 선택해 주세요
                 </div>
                 <div style={{ display: 'flex', gap: '12px' }}>
                   <button
@@ -334,7 +334,7 @@ function DetailDrawer({ trialId, onClose, onChoiceSaved }: DetailDrawerProps) {
               }}
             >
               소액 차액은 추후 운영 정책에 따라 처리될 수 있습니다.<br />
-              최종 정산 및 공급 관련 마감은 운영자/공급자 절차로 진행됩니다.
+              최종 보상 처리 및 공급 관련 마감은 운영자/공급자 절차로 진행됩니다.
             </div>
           </>
         )}
@@ -423,7 +423,7 @@ export function MyParticipationsPage() {
           내가 참여한 유통참여형 펀딩
         </h1>
         <p style={{ margin: 0, color: '#6B7280', fontSize: '0.9375rem' }}>
-          참여 내역, 예상 정산 정보, 선택 현황을 확인합니다.
+          참여 내역, 예상 보상 정보, 선택 현황을 확인합니다.
         </p>
       </div>
 
@@ -438,7 +438,7 @@ export function MyParticipationsPage() {
         }}
       >
         <p style={{ fontSize: '0.8125rem', color: '#9A3412', lineHeight: 1.6, margin: 0 }}>
-          참여금 입금 확인과 제품 정산 상태는 Neture 운영자가 오프라인으로 확인한 뒤 반영합니다. 온라인 결제는 아직 제공하지 않습니다.
+          참여금 입금 확인과 제품 보상 상태는 Neture 운영자가 오프라인으로 확인한 뒤 반영합니다. 온라인 결제는 아직 제공하지 않습니다.
         </p>
       </div>
 
@@ -539,7 +539,7 @@ export function MyParticipationsPage() {
                   )}
                   {p.totalSettlementAmount != null && p.totalSettlementAmount > 0 && (
                     <span style={{ color: '#4B5563' }}>
-                      총 정산 <strong style={{ color: '#1F2937' }}>{fmt(p.totalSettlementAmount)}</strong>
+                      총 보상 기준 금액 <strong style={{ color: '#1F2937' }}>{fmt(p.totalSettlementAmount)}</strong>
                     </span>
                   )}
                   {p.settlementChoice && (

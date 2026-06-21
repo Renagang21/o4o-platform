@@ -92,7 +92,7 @@ export function MarketTrialHubPage() {
         <h1 style={s.title}>유통참여형 펀딩</h1>
         <p style={s.subtitle}>
           공급자가 제안한 신제품을 매장에서 먼저 체험하고,
-          현장 의견을 공유하는 참여형 프로그램입니다. 모집부터 정산까지 이 공간에서 확인할 수 있습니다.
+          현장 의견을 공유하는 참여형 프로그램입니다. 모집부터 보상까지 이 공간에서 확인할 수 있습니다.
         </p>
       </header>
 
@@ -101,7 +101,7 @@ export function MarketTrialHubPage() {
         {[
           { step: '1', label: '공급자 제안', desc: '공급자가 신제품 유통참여형 펀딩을 제안하고, 운영자 검토를 거쳐 모집이 오픈됩니다.' },
           { step: '2', label: '매장 참여', desc: '모집 중인 유통참여형 펀딩에 참여 신청하고, 제품을 직접 체험합니다.' },
-          { step: '3', label: '결과/정산', desc: '체험 결과를 정리하고, 제품 또는 현금 보상을 선택하여 정산받습니다.' },
+          { step: '3', label: '결과/보상', desc: '체험 결과를 정리하고, 제품 또는 현금 보상을 선택하여 보상을 받습니다.' },
         ].map((item) => (
           <div key={item.step} style={s.guideCard}>
             <div style={s.guideStep}>{item.step}</div>
@@ -181,7 +181,7 @@ export function MarketTrialHubPage() {
             <p style={s.footerTitle}>유통참여형 펀딩 안내</p>
             <p style={s.footerDesc}>
               개별 유통참여형 펀딩의 토론과 공지는 각 상세 페이지에서 확인할 수 있습니다.
-              참여 후 진행 상황과 정산은 "내 참여 내역"에서 추적됩니다.
+              참여 후 진행 상황과 보상은 "내 참여 내역"에서 추적됩니다.
             </p>
           </div>
           <Link to="/market-trial/my" style={s.footerCta}>

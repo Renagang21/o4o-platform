@@ -190,7 +190,7 @@ export default function SupplierTrialDetailPage() {
             {trial.product.regulatoryType && <span>유형: {trial.product.regulatoryType}</span>}
           </div>
           <p style={{ fontSize: '12px', color: '#6366F1', margin: '10px 0 0 0', lineHeight: 1.6 }}>
-            이 펀딩은 위 등록 제품을 기준으로 개설되었습니다. 실제 정산 제품 구성·결과 약속은 상세 설명과 결과 약속 영역을 따릅니다.
+            이 펀딩은 위 등록 제품을 기준으로 개설되었습니다. 실제 보상 제품 구성·결과 약속은 상세 설명과 결과 약속 영역을 따릅니다.
           </p>
         </div>
       )}
@@ -336,7 +336,7 @@ export default function SupplierTrialDetailPage() {
               const rem = total - qty * unit;
               return (
                 <div style={s.settlementPreview}>
-                  <strong>정산 예시</strong>: 단가 {unit.toLocaleString()}원 참여 시
+                  <strong>보상 예시</strong>: 단가 {unit.toLocaleString()}원 참여 시
                   → 총 {total.toLocaleString()}원 환원
                   {qty > 0 && ` → 약 ${qty}개${rem > 0 ? ` + 잔액 ${rem.toLocaleString()}원` : ''}`}
                 </div>
@@ -344,7 +344,7 @@ export default function SupplierTrialDetailPage() {
             })()}
           {/* WO-O4O-NETURE-DISTRIBUTION-FUNDING-SUPPLIER-DESIGN-FIELDS-V1: 운영 모델 안내 */}
           <p style={{ fontSize: '12px', color: '#6B7280', lineHeight: 1.6, margin: '10px 0 0 0' }}>
-            참여금(송금)은 <strong>Neture 운영자가 수령</strong>하고 송금 완료자 명단을 공유합니다(온라인 결제 미제공). 제품 개발 진행·정산 조건·송금 기한·미송금자 처리는 <strong>제품 개발자가 포럼에서 운영</strong>합니다. 제품 정산 기준·정산 제품 구성·매장 활용 방식은 상세 설명/판매 시나리오 영역에 작성한 내용으로 안내하세요.
+            참여금(송금)은 <strong>Neture 운영자가 수령</strong>하고 송금 완료자 명단을 공유합니다(온라인 결제 미제공). 제품 개발 진행·보상 조건·송금 기한·미송금자 처리는 <strong>제품 개발자가 포럼에서 운영</strong>합니다. 제품 보상 기준·보상 제품 구성·매장 활용 방식은 상세 설명/판매 시나리오 영역에 작성한 내용으로 안내하세요.
           </p>
         </div>
       )}
