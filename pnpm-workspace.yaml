@@ -5,3 +5,7 @@ packages:
   - 'services/*'
   - '!apps/*.backup'
   - '!packages/*.backup'
+  # services/mobile-app 은 Expo SDK 54(React 19.1.0)를 독립 사용한다.
+  # 모노레포 전역 React 19.2.0 override 와 충돌하므로 워크스페이스에서 분리.
+  # (자체 pnpm-lock.yaml + node_modules — `pnpm install --ignore-workspace`)
+  - '!services/mobile-app'
