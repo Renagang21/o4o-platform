@@ -1,4 +1,4 @@
-import { Redirect, Tabs } from 'expo-router';
+import { Redirect, Stack } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function AppLayout() {
@@ -10,19 +10,19 @@ export default function AppLayout() {
   }
 
   return (
-    <Tabs
+    <Stack
       screenOptions={{
-        tabBarActiveTintColor: '#1976d2',
-        headerShown: false,
+        headerStyle: { backgroundColor: '#1976d2' },
+        headerTintColor: '#fff',
+        headerTitleStyle: { fontWeight: '600' },
       }}
     >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: '홈',
-          tabBarLabel: '홈',
-        }}
-      />
-    </Tabs>
+      <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="collect/index" options={{ title: '상품 수집' }} />
+      <Stack.Screen name="collect/new" options={{ title: '상품 정보 입력' }} />
+      <Stack.Screen name="collect/done" options={{ title: '제출 완료', headerBackVisible: false }} />
+      <Stack.Screen name="drafts/index" options={{ title: '내 제출 목록' }} />
+      <Stack.Screen name="drafts/[id]" options={{ title: '제출 상세' }} />
+    </Stack>
   );
 }

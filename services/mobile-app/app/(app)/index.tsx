@@ -1,6 +1,7 @@
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
+import { router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function HomeScreen() {
@@ -14,22 +15,38 @@ export default function HomeScreen() {
         <View style={styles.header}>
           <Text style={styles.title}>O4O 운영앱</Text>
           <Text style={styles.welcome}>
-            {user?.email ?? '운영자'}님, 환영합니다
+            {user?.displayName ?? user?.email ?? '운영자'}님, 환영합니다
           </Text>
         </View>
 
-        {/* 메뉴 placeholder */}
+        {/* 상품 수집 메뉴 */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>빠른 메뉴</Text>
+          <Text style={styles.sectionTitle}>상품 수집</Text>
           <View style={styles.menuGrid}>
-            <MenuCard label="상품 관리" emoji="📦" disabled />
-            <MenuCard label="주문 현황" emoji="🛒" disabled />
-            <MenuCard label="사이니지" emoji="📺" disabled />
-            <MenuCard label="카메라/업로드" emoji="📷" disabled />
+            <MenuCard
+              label="상품 수집 시작"
+              emoji="📝"
+              onPress={() => router.push('/collect')}
+            />
+            <MenuCard
+              label="내 제출 목록"
+              emoji="📋"
+              onPress={() => router.push('/drafts')}
+            />
+            <MenuCard label="이미지 촬영/업로드" emoji="📷" disabled />
+            <MenuCard label="바코드 스캔" emoji="🔎" disabled />
           </View>
         </View>
 
-        {/* API 상태 */}
+        {/* 안내 */}
+        <View style={styles.noticeCard}>
+          <Text style={styles.noticeText}>
+            상품 정보는 O4O 상품 자산 후보로 제출됩니다. O4O 관리자가 확인 후 상품 자산에
+            반영합니다.
+          </Text>
+        </View>
+
+        {/* 시스템 정보 */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>시스템 정보</Text>
           <View style={styles.infoCard}>
@@ -38,7 +55,7 @@ export default function HomeScreen() {
           </View>
           <View style={styles.infoCard}>
             <Text style={styles.infoLabel}>버전</Text>
-            <Text style={styles.infoValue}>v0.1.0 (Foundation)</Text>
+            <Text style={styles.infoValue}>v0.1.0 (Collection Shell)</Text>
           </View>
         </View>
 
@@ -51,13 +68,28 @@ export default function HomeScreen() {
   );
 }
 
-function MenuCard({ label, emoji, disabled }: { label: string; emoji: string; disabled?: boolean }) {
+function MenuCard({
+  label,
+  emoji,
+  disabled,
+  onPress,
+}: {
+  label: string;
+  emoji: string;
+  disabled?: boolean;
+  onPress?: () => void;
+}) {
   return (
-    <View style={[styles.menuCard, disabled && styles.menuCardDisabled]}>
+    <TouchableOpacity
+      style={[styles.menuCard, disabled && styles.menuCardDisabled]}
+      onPress={onPress}
+      disabled={disabled || !onPress}
+      activeOpacity={0.7}
+    >
       <Text style={styles.menuEmoji}>{emoji}</Text>
       <Text style={[styles.menuLabel, disabled && styles.menuLabelDisabled]}>{label}</Text>
       {disabled && <Text style={styles.comingSoon}>준비 중</Text>}
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -116,6 +148,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#1e293b',
+    textAlign: 'center',
   },
   menuLabelDisabled: {
     color: '#94a3b8',
@@ -127,6 +160,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 4,
+  },
+  noticeCard: {
+    backgroundColor: '#eff6ff',
+    borderRadius: 10,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: '#bfdbfe',
+  },
+  noticeText: {
+    fontSize: 13,
+    color: '#1d4ed8',
+    lineHeight: 19,
   },
   infoCard: {
     backgroundColor: '#fff',

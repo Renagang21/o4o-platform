@@ -15,6 +15,7 @@ interface User {
   id: string;
   email: string;
   name?: string;
+  displayName?: string;
 }
 
 interface AuthContextValue {
@@ -54,10 +55,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const result = await loginApi(email, password);
 
     if (!result.success || !result.data) {
-      throw new Error(result.error ?? '로그인에 실패했습니다.');
+      throw new Error(result.error ?? result.message ?? '로그인에 실패했습니다.');
     }
 
-    const { accessToken, user: userData } = result.data;
+    // 토큰은 data.tokens.accessToken (현행 봉투). data.accessToken 은 레거시 fallback.
+    const accessToken = result.data.tokens?.accessToken ?? result.data.accessToken;
+    const userData = result.data.user;
+
+    if (!accessToken) {
+      throw new Error('로그인 응답에서 토큰을 확인하지 못했습니다.');
+    }
 
     await SecureStore.setItemAsync(ACCESS_TOKEN_KEY, accessToken);
     setAuthToken(accessToken);
