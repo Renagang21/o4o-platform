@@ -403,6 +403,11 @@ import { PlatformService } from '../entities/PlatformService.js';
 import { PlatformPayment } from '../entities/payment/PlatformPayment.entity.js';
 
 // ============================================================================
+// STORE PAID FEATURE ENTITLEMENT (WO-O4O-STORE-PAID-FEATURE-ENTITLEMENT-V1)
+// ============================================================================
+import { StorePaidFeatureEntitlement } from '../modules/store-entitlement/store-paid-feature-entitlement.entity.js';
+
+// ============================================================================
 // E-COMMERCE CORE ENTITIES (Phase 4-B: GlycoPharm Core Integration)
 // Use official exports path (moduleResolution: bundler)
 // ============================================================================
@@ -874,6 +879,10 @@ export const AppDataSource = new DataSource({
     // PLATFORM PAYMENT ENTITY (WO-O4O-PAYMENT-CORE-GLYCOPHARM-PILOT-V1)
     // ============================================================================
     PlatformPayment,
+    // ============================================================================
+    // STORE PAID FEATURE ENTITLEMENT (WO-O4O-STORE-PAID-FEATURE-ENTITLEMENT-V1)
+    // ============================================================================
+    StorePaidFeatureEntitlement,
     // ============================================================================
     // E-COMMERCE CORE ENTITIES (Phase 4-B: GlycoPharm Core Integration)
     // ============================================================================

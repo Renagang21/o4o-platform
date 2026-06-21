@@ -564,6 +564,17 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Home Preview routes:', homeError);
     }
 
+    // 28b. Register Store Paid Feature Entitlement routes (WO-O4O-STORE-PAID-FEATURE-ENTITLEMENT-V1)
+    try {
+      const { createStoreEntitlementRoutes } = await import(
+        '../modules/store-entitlement/store-entitlement.routes.js'
+      );
+      app.use('/api/v1/store-entitlements', createStoreEntitlementRoutes(dataSource));
+      logger.info('✅ Store Entitlement routes registered at /api/v1/store-entitlements');
+    } catch (entitlementError) {
+      logger.error('Failed to register Store Entitlement routes:', entitlementError);
+    }
+
     // 29. Register Neture routes (Phase D-1)
     try {
       const netureRoutes = createNetureRoutes(dataSource);
