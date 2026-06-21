@@ -37,6 +37,7 @@ import {
 } from '../../extensions/trial-forum-monitor/entities/MarketTrialForumSyncFailure.entity.js';
 import { marketTrialNotification } from '../../services/marketTrial.notification.js';
 import logger from '../../utils/logger.js';
+import { ActionLogService } from '@o4o/action-log-core';
 
 // Allowed trial status transitions (operator-initiated)
 const ALLOWED_TRIAL_TRANSITIONS: Partial<Record<TrialStatus, TrialStatus[]>> = {
@@ -900,13 +901,23 @@ export class MarketTrialOperatorController {
         return res.status(404).json({ success: false, message: 'Trial not found' });
       }
 
-      const exists: Array<{ id: string }> = await ds.query(
-        `SELECT id FROM market_trial_participants WHERE id = $1 AND "marketTrialId" = $2`,
+      // WO-O4O-MARKET-TRIAL-OFFLINE-PAYMENT-AUDIT-LOG-V1: 감사용 변경 전 값(전후 비교).
+      const before: Array<{
+        id: string;
+        paymentStatus: string;
+        paidAmount: string | null;
+        paymentReference: string | null;
+        paymentNote: string | null;
+      }> = await ds.query(
+        `SELECT id, COALESCE("paymentStatus", 'unpaid') AS "paymentStatus",
+                "paidAmount", "paymentReference", "paymentNote"
+         FROM market_trial_participants WHERE id = $1 AND "marketTrialId" = $2`,
         [participantId, id],
       );
-      if (!exists || exists.length === 0) {
+      if (!before || before.length === 0) {
         return res.status(404).json({ success: false, message: 'Participant not found for this trial' });
       }
+      const prev = before[0];
 
       // Build the SET list dynamically so callers can omit fields they don't want
       // to overwrite (e.g. update paymentStatus only without clearing paidAt).
@@ -965,6 +976,25 @@ export class MarketTrialOperatorController {
       logger.info(
         `[MarketTrialPayment] trial=${id} participant=${participantId} → paymentStatus=${row.paymentStatus} actor=${(req as any).user?.id ?? 'unknown'}`,
       );
+
+      // WO-O4O-MARKET-TRIAL-OFFLINE-PAYMENT-AUDIT-LOG-V1: 구조화 감사(전후 상태/금액, reference·note 변경 여부).
+      // 기존 action_logs 테이블 재사용(migration 없음). paymentReference/paymentNote 원문은 기록하지 않는다.
+      const beforeAmount = prev.paidAmount != null ? Number(prev.paidAmount) : null;
+      const afterAmount = row.paidAmount != null ? Number(row.paidAmount) : null;
+      new ActionLogService(ds)
+        .logSuccess('neture', (req as any).user?.id ?? null, 'neture.operator.market_trial_payment_change', {
+          meta: {
+            trialId: id,
+            participantId,
+            beforeStatus: prev.paymentStatus,
+            afterStatus: row.paymentStatus,
+            beforeAmount,
+            afterAmount,
+            referenceChanged: paymentReference !== undefined && (paymentReference ?? null) !== (prev.paymentReference ?? null),
+            noteChanged: paymentNote !== undefined && (paymentNote ?? null) !== (prev.paymentNote ?? null),
+          },
+        })
+        .catch((e) => logger.warn(`[MarketTrialPayment] audit log failed: ${e?.message ?? e}`));
 
       res.json({
         success: true,
