@@ -84,6 +84,7 @@ import { createStoreQrLandingController } from '../o4o-store/controllers/store-q
 import { createStorePopController } from '../o4o-store/controllers/store-pop.controller.js';
 import { createStoreAnalyticsController } from '../o4o-store/controllers/store-analytics.controller.js';
 import { createProductMarketingController } from '../o4o-store/controllers/product-marketing.controller.js';
+import { createMultilingualProductContentController } from '../o4o-store/controllers/multilingual-product-content.controller.js'; // WO-O4O-MULTILINGUAL-PRODUCT-CONTENT-ENTITY-REGISTRY-AND-ROUTE-MOUNT-V1
 import { createStorePlaylistController } from '../o4o-store/controllers/store-playlist.controller.js';
 import { createStoreChannelProductsController } from '../o4o-store/controllers/store-channel-products.controller.js';
 import { createKpaStoreTemplateController } from '../o4o-store/controllers/kpa-store-template.controller.js';
@@ -420,6 +421,10 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // Product Marketing Graph (WO-O4O-PRODUCT-MARKETING-GRAPH-V1) — internal: /pharmacy/products/*/marketing
   // WO-O4O-STORE-GUARD-PHASE2B-LIBRARY-MARKETING-POP-V1: serviceKey='kpa' 전달.
   router.use('/', createProductMarketingController(dataSource, coreRequireAuth as any, 'kpa'));
+
+  // Multilingual Product Content (WO-O4O-MULTILINGUAL-PRODUCT-CONTENT-ENTITY-REGISTRY-AND-ROUTE-MOUNT-V1)
+  // store-owner: /pharmacy/multilingual-product-contents/*
+  router.use('/', createMultilingualProductContentController(dataSource, coreRequireAuth as any, 'kpa'));
 
   // ============================================================================
   // Store Channel Routes — WO-KPA-STORE-CHANNEL-INTEGRATION-V1

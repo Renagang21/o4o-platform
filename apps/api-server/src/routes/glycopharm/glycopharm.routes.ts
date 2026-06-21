@@ -50,6 +50,7 @@ import { createStoreQrLandingController } from '../o4o-store/controllers/store-q
 import { createStorePopController } from '../o4o-store/controllers/store-pop.controller.js';
 import { createPharmacyStoreConfigController } from '../o4o-store/controllers/pharmacy-store-config.controller.js';
 import { createProductMarketingController } from '../o4o-store/controllers/product-marketing.controller.js';
+import { createMultilingualProductContentController } from '../o4o-store/controllers/multilingual-product-content.controller.js'; // WO-O4O-MULTILINGUAL-PRODUCT-CONTENT-ENTITY-REGISTRY-AND-ROUTE-MOUNT-V1
 import { createAssetSnapshotController } from '../o4o-store/controllers/asset-snapshot.controller.js';
 import { createStoreAssetControlController } from '../o4o-store/controllers/store-asset-control.controller.js';
 import { createStoreExecutionAssetsController } from '../o4o-store/controllers/store-execution-assets.controller.js'; // WO-O4O-STORE-EXECUTION-ASSETS-CROSSSERVICE-PHASE2-D-V1
@@ -416,6 +417,10 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   // Product Marketing Graph (internal: /pharmacy/products/*/marketing)
   // WO-O4O-STORE-GUARD-PHASE2B-LIBRARY-MARKETING-POP-V1: serviceKey='glycopharm' 전달.
   router.use('/', createProductMarketingController(dataSource, coreRequireAuth as any, 'glycopharm'));
+
+  // Multilingual Product Content (WO-O4O-MULTILINGUAL-PRODUCT-CONTENT-ENTITY-REGISTRY-AND-ROUTE-MOUNT-V1)
+  // store-owner: /pharmacy/multilingual-product-contents/*
+  router.use('/', createMultilingualProductContentController(dataSource, coreRequireAuth as any, 'glycopharm'));
 
   // Published Assets
   router.use('/published-assets', createPublishedAssetsController(dataSource));

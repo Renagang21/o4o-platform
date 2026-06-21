@@ -364,6 +364,9 @@ import {
   StoreQrCode,
   StoreQrScanEvent,
   ProductMarketingAsset,
+  // WO-O4O-MULTILINGUAL-PRODUCT-CONTENT-ENTITY-REGISTRY-AND-ROUTE-MOUNT-V1
+  StoreMultilingualProductContentGroup,
+  StoreMultilingualProductContentPage,
 } from '../routes/platform/entities/index.js';
 
 // WO-O4O-KPA-POP-PUBLISHING-PHASE2-BACKEND-V1: StorePop entity 등록 (Phase 1 누락분 정합).
@@ -944,6 +947,13 @@ export const entities = [
   // PRODUCT MARKETING ASSET ENTITY (WO-O4O-PRODUCT-MARKETING-GRAPH-V1)
   // ============================================================================
   ProductMarketingAsset,
+  // ============================================================================
+  // MULTILINGUAL PRODUCT CONTENT ENTITIES
+  // (WO-O4O-MULTILINGUAL-PRODUCT-CONTENT-ENTITY-REGISTRY-AND-ROUTE-MOUNT-V1)
+  // store_multilingual_product_content_groups + _pages — 매장 다국어 상품 콘텐츠
+  // ============================================================================
+  StoreMultilingualProductContentGroup,
+  StoreMultilingualProductContentPage,
   // ============================================================================
   // PLATFORM STORE POLICY & PAYMENT CONFIG ENTITIES
   // ============================================================================
