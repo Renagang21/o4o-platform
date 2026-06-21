@@ -78,6 +78,35 @@ GET /api/v1/store-entitlements/me/check?serviceKey=<kpa|glycopharm|cosmetics>&pl
 
 ---
 
+## 6-A. 배포 후 운영 smoke (2026-06-21, PASS)
+
+push `b03f2c136` → Deploy API Server / Deploy Web Services / Deploy Admin Dashboard 전부 success.
+
+**Backend `/me/check` (API, Bearer)** — 3 serviceKey + 검증 경로:
+
+| 호출 | 결과 |
+|---|---|
+| `?serviceKey=kpa&planCode=FOREIGN_VISITOR_SALES_SUPPORT` | 200 `active:false` |
+| `?serviceKey=glycopharm&...` | 200 `active:false` |
+| `?serviceKey=cosmetics&...` | 200 `active:false` |
+| `?serviceKey=neture&...` | 400 `UNKNOWN_SERVICE_KEY` |
+| `?serviceKey=kpa&planCode=NOPE` | 400 `UNKNOWN_PLAN_CODE` |
+| `?serviceKey=kpa` (plan 누락) | 400 `MISSING_PARAMS` |
+
+**Frontend UI (브라우저)** — 3서비스 매장 진입:
+
+| 서비스 | 계정 | 메뉴 진입점 | 라우트 로드 | me/check | 잠금 안내 | 결제 버튼 | console |
+|---|---|---|---|---|---|---|---|
+| KPA-Society | renagang21 (kpa:store_owner) | ✅ 판매 채널 확장 > 외국인 여행객 판매지원 | ✅ | 200 | ✅ | disabled + "결제 기능은 준비 중입니다." | 로그인 전 auth 부트스트랩 401(무관) |
+| K-Cosmetics | sohae2100 (operator-or-above) | ✅ | ✅ | 200 | ✅ | disabled | 기존 `/cosmetics/store-hub/capabilities` 403(무관) |
+| GlycoPharm | renagang21 (glycopharm:store_owner) | ✅ | ✅ | 200 | ✅ | disabled | **0 errors** |
+
+운영에 `FOREIGN_VISITOR_SALES_SUPPORT` 활성 이용권이 없으므로 전 서비스 `active:false` → 잠금 안내 기준으로 수행했다. `active=true` 분기는 코드상 구현되어 있으나 운영 데이터 생성 없이 검증하지 않았다(후속 발급 WO 에서 실데이터 검증).
+
+**종료 고정.**
+
+---
+
 ## 7. 다음 작업
 
 IR §9.1: `WO-O4O-TOSS-PAYMENT-CORE-V1` → `WO-O4O-FOREIGN-VISITOR-SALES-SUPPORT-TOSS-PAYMENT-V1`(이용권 발급 write + active=true 경로 실데이터 검증).
