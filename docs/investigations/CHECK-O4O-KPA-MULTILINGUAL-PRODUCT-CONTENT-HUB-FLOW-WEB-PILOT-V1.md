@@ -53,8 +53,22 @@ import: store copy 생성 → /my 에서 확인 → resolve en/zh fallback
 회귀:   기존 operator blog/pop/qr · Store Hub content · 상품 목록 route 정상
 ```
 
-### 4.3 인증 기능 smoke (실제 row)
-KPA operator + store-owner 계정으로 §5 전체 흐름. 운영 흐름상 의미 있는 파일럿 데이터는 유지, 불필요 시 archived(물리 삭제 지양).
+### 4.3 인증 기능 smoke (실제 row) — **PASS** (2026-06-21, API-level, 배포본 대상)
+SSOT 계정(operator=sohae2100 / store-owner=renagang21, §51 무질의 주입)으로 전체 데이터 흐름 검증:
+
+| 단계 | 결과 |
+|------|------|
+| operator POST group | 201 ✓ |
+| operator PUT ko/en page (published) | 200 / 200 ✓ |
+| operator PATCH publish | 200 ✓ |
+| store-owner GET /hub | 발행 그룹 노출, `locales:["en","ko"]` ✓ |
+| store-owner POST /import (target=local) | 201 — `sourceType=operator_hub`, `sourceRefId`=운영자그룹, `metadata.importedFromOperatorGroupId`, pages 복사 ✓ |
+| store page publish + resolve `en` | resolvedLocale=en, fallback=null ✓ |
+| resolve `zh` / `ja` | resolvedLocale=**en**, fallbackReason=requested_locale_missing ✓ |
+| resolve `ko` | resolvedLocale=ko, fallback=null ✓ |
+
+> import 직후 store pages 는 `draft`(매장 검수 후 발행) — 의도된 설계. resolve 는 published page 만 대상.
+> **smoke 데이터 정리**: 운영자 원본/매장 사본 archived + [PILOT] local product 비활성화 → 실 HUB total:0 복귀(물리 삭제 없음).
 
 ## 5. 안전
 
