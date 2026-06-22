@@ -203,6 +203,9 @@ const PharmacyTemplatePage = lazy(() => import('./pages/pharmacy/PharmacyTemplat
 const StoreChannelsPage = lazy(() => import('./pages/pharmacy/StoreChannelsPage').then(m => ({ default: m.StoreChannelsPage })));
 // WO-O4O-FOREIGN-VISITOR-SALES-SUPPORT-MENU-GATE-V1
 const ForeignVisitorSalesSupportPage = lazy(() => import('./pages/pharmacy/ForeignVisitorSalesSupportPage').then(m => ({ default: m.ForeignVisitorSalesSupportPage })));
+// WO-O4O-STORE-SERVICE-SUBSCRIPTION-TOSS-PAYMENT-V1 (Phase 2): 구독 결제 결과 페이지
+const ForeignVisitorSalesSupportPaymentSuccessPage = lazy(() => import('./pages/pharmacy/ForeignVisitorSalesSupportPaymentResultPage').then(m => ({ default: m.ForeignVisitorSalesSupportPaymentSuccessPage })));
+const ForeignVisitorSalesSupportPaymentFailPage = lazy(() => import('./pages/pharmacy/ForeignVisitorSalesSupportPaymentResultPage').then(m => ({ default: m.ForeignVisitorSalesSupportPaymentFailPage })));
 const StoreOrdersPage = lazy(() => import('./pages/pharmacy/StoreOrdersPage').then(m => ({ default: m.StoreOrdersPage })));
 // WO-O4O-CROSSSERVICE-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1
 const StoreRecruitmentApplicationsPage = lazy(() => import('./pages/pharmacy/StoreRecruitmentApplicationsPage'));
@@ -995,6 +998,9 @@ function App() {
 
             {/* WO-O4O-FOREIGN-VISITOR-SALES-SUPPORT-MENU-GATE-V1: 판매 채널 확장 > 외국인 여행객 판매지원 */}
             <Route path="sales-channels/foreign-visitor" element={<ForeignVisitorSalesSupportPage />} />
+            {/* WO-O4O-STORE-SERVICE-SUBSCRIPTION-TOSS-PAYMENT-V1 (Phase 2): 구독 결제 결과 (Toss 리다이렉트 착지) */}
+            <Route path="sales-channels/foreign-visitor/payment/success" element={<ForeignVisitorSalesSupportPaymentSuccessPage />} />
+            <Route path="sales-channels/foreign-visitor/payment/fail" element={<ForeignVisitorSalesSupportPaymentFailPage />} />
             {/* ── Hidden routes (사이드바 미표시, URL 직접 접근 유지) ── */}
             <Route path="channels" element={<StoreChannelsPage />} />
             <Route path="channels/tablet" element={<Navigate to="/store/requests" replace />} />

@@ -2,7 +2,8 @@
 
 > **작업명:** WO-O4O-STORE-SERVICE-SUBSCRIPTION-TOSS-PAYMENT-V1
 > **유형:** backend(결제 prepare/confirm + entitlement 발급/연장) + frontend(결제 진입 UI). PaymentCore/Toss adapter **재사용**, schema/migration **0**.
-> **결과(Phase 1 backend): PASS(코드/타입) — `STORE_SERVICE_SUBSCRIPTION` 결제 prepare/confirm + FOREIGN_VISITOR_SALES_SUPPORT 이용권 ACTIVE 생성/30일 연장(idempotent). api-server tsc 0. Phase 2(frontend) 후속.**
+> **결과(Phase 1 backend): PASS(코드/타입) — `STORE_SERVICE_SUBSCRIPTION` 결제 prepare/confirm + FOREIGN_VISITOR_SALES_SUPPORT 이용권 ACTIVE 생성/30일 연장(idempotent). api-server tsc 0.**
+> **결과(Phase 2 frontend): PASS(코드/타입/빌드) — Panel 결제 버튼(하위호환) + prepare→Toss→success confirm 전용 흐름. web-kpa-society tsc 0 + build 0, Panel 3소비처(kpa/glyco/kcos) tsc 0. 브라우저 smoke(진입/위젯)는 배포 후 예정 · 실 결제 운영 금지.**
 > **작성일:** 2026-06-22
 > 선행: 소비자→매장 결제(STORE_SALE_PAYMENT) 410 제거 완료 · `store_paid_feature_entitlements`(WO-...-ENTITLEMENT-V1, read-only)
 
@@ -75,10 +76,31 @@
 5. confirm 재시도 → 중복 연장 없음(applied=false).
 > 실 결제(운영)는 실행 금지. confirm은 sandbox/local 한정.
 
-## 10. Phase 2 (frontend) — 후속
+## 10. Phase 2 (frontend) — 구현 완료 (PASS 코드/타입/빌드)
 
-- `ForeignVisitorSalesSupportPanel`(store-ui-core) locked 상태의 결제 버튼 → prepare → Toss requestPayment → success → confirm → `/me/check` 재조회. 소비자 checkout 경로와 분리된 전용 흐름.
-- API 클라이언트(coreApiClient) 추가, 결제 진행/성공/실패 상태 UI.
+변경 파일(5, frontend only):
+
+| 파일 | 변경 |
+|------|------|
+| `packages/store-ui-core/.../ForeignVisitorSalesSupportPanel.tsx` | **하위호환 확장** — `check` 반환을 `boolean \| {active,endsAt}` 로 확대, `onSubscribe?`/`priceLabel?` optional props 추가. `onSubscribe` 제공 시 잠금 화면 결제 버튼 활성화(+processing 상태), active 시 endsAt 표시. **미제공(glyco/kcos) 시 기존 "준비 중" disabled 그대로 유지** |
+| `services/web-kpa-society/src/api/storeServiceSubscription.ts` | **신규** — prepare/confirm/check API(coreApiClient) + `loadTossSdk`(CDN 주입, lockfile 무변경) |
+| `services/web-kpa-society/.../ForeignVisitorSalesSupportPage.tsx` | `onSubscribe`(prepare → Toss requestPayment 리다이렉트) + endsAt 포함 check 연결 |
+| `services/web-kpa-society/.../ForeignVisitorSalesSupportPaymentResultPage.tsx` | **신규** — success(confirm 호출 + endsAt 표시, StrictMode 이중호출 가드) / fail 페이지 |
+| `services/web-kpa-society/src/App.tsx` | lazy import + 라우트 2개(`sales-channels/foreign-visitor/payment/{success,fail}`) |
+
+- 흐름: `prepare → loadTossSdk(clientKey) → toss.requestPayment('카드', {amount, orderId, orderName, successUrl(+paymentId/serviceKey), failUrl}) → success 페이지 confirm → 이용권 ACTIVE`.
+- **소비자 storefront 결제(`/store/:slug/payment/success`, STORE_SALE_PAYMENT)와 분리된 전용 라우트/페이지** — 재사용·혼입 없음.
+- Toss SDK = web-neture B2B(`loadTossWidget`) 패턴 미러(코드 복제, import 의존 없음) — CDN `js.tosspayments.com/v1/payment`, **npm/lockfile 무변경**.
+- **shared-module 규칙 준수**: Panel 3개 소비처(kpa/glyco/kcos) 전부 `tsc --noEmit` EXIT 0 — 회귀 없음.
+
+### 검증 (Phase 2)
+- web-kpa-society `tsc --noEmit`: **EXIT 0**. web-glycopharm/web-k-cosmetics `tsc`: **EXIT 0**(Panel 변경 하위호환 실증).
+- `pnpm --filter @o4o/web-kpa-society build`(tsc && vite build): **EXIT 0**(✓ built 45.66s).
+- 브라우저 smoke: 진입 화면 결제 버튼 노출/prepare→Toss 위젯 진입은 배포 후 store-owner 계정으로 확인(예정). **실 결제(confirm)는 운영 금지 — sandbox/local 한정.**
+
+### 가격(placeholder)/me-check 후속
+- `STORE_SUBSCRIPTION_PLAN_PRICES.FOREIGN_VISITOR_SALES_SUPPORT = 99000` 하드코딩(Phase 1) — 프론트는 prepare 응답 amount 사용(위변조 불가). 가격 확정 + DB화는 PLAN-CATALOG-V1.
+- `/me/check` 는 `{active}` 만 반환(endsAt 미노출) — active 화면 만료일은 confirm 직후(success 페이지)에만 표시. `/me/check` endsAt 노출은 소규모 backend 후속 후보.
 
 ## 11. 후속 후보
 - V2 billing key(정기결제) · 환불/취소 V1 · PLAN-CATALOG-V1(plan/price DB화 + 가격 확정).
