@@ -75,9 +75,39 @@ QR 관련 문구 미사용 (후속 단계 안내만 약하게 표기).
 | 11 | 관련 4xx/5xx | ✅ 0 — `summary?targetKind=local` 200, `summary?targetKind=listing` 200 |
 
 **판정: 회귀/관찰성 PASS.** 신규 summary API 정상 배포·200 응답, 빈 상태 정상, 콘솔/네트워크 클린.
-배지·모달 상세의 **데이터 표시 경로**는 현재 환경에 다국어 콘텐츠 row 가 0(운영자 발행 0)이라 미검증.
-실제 row 생성은 별도 승인 후 진행 (체험 계정 password 기재값 불일치 — renagang21 정식 계정 자격 확인 필요).
 
-## 6. 후속
+### 5.3 데이터 표시 smoke (2026-06-22, 테스트 데이터 생성 승인 후 — [PILOT] prefix)
+운영자(sohae2100=kpa:admin) → store-owner(체험 약국 경영자=renagang21, 실제 password `3Lz157727791!`) 2계정 UI 흐름으로 실제 연결 데이터를 만들어 표시 경로 검증.
 
-PASS 시: WO-O4O-MULTILINGUAL-PRODUCT-QR-LANDING-V1 → TABLET-CONTENT → CROSS-SERVICE-ADOPTION
+생성·연결 흐름:
+1. 운영자: `[PILOT] 다국어 배지 스모크 콘텐츠` 그룹 생성 → ko/en 페이지 발행 → 그룹 발행(HUB 노출)
+2. store-owner: `[PILOT] 다국어 배지 테스트 상품`(매장 취급 상품=local) 1건 등록
+3. Store Hub `/store-hub/multilingual-product-contents` → 가져오기 → local 상품에 연결 (store-scoped 초안 복사)
+
+| # | 항목 | 결과 |
+|---|------|------|
+| 1 | 목록 "다국어" 컬럼 배지 표시 | ✅ **"다국어 2 · en · ko"** (tooltip "다국어 콘텐츠 · 언어 2개 (en · ko)") |
+| 2 | 편집 모달 연결 정보 패널 | ✅ 배지 + 제목 + **"운영자 자료 복사"**(sourceType=operator_hub) + "작성 중 · 2026.6.22" + English/한국어 + "QR/타블렛 후속 안내" |
+| 3 | summary API 필드 | ✅ 200 — `localeCount=2`, `locales=[en,ko]`, `publishedLocaleCount=0`(가져온 초안), `sourceType=operator_hub`, `status=draft` |
+| 4 | console error | ✅ 0 |
+| 5 | 관련 4xx/5xx | ✅ 0 (앱 요청 전부 200) |
+| 6 | archived 제외 필터 재확인 | ✅ store 그룹 archived 후 summary `data:[]` (0건) |
+
+**판정: 데이터 표시 경로 PASS.** 목록 배지·모달 상세·summary 필드 모두 실데이터로 정상 동작.
+
+### 5.4 테스트 데이터 정리 (물리 삭제 없음)
+- store-scoped 그룹 → `PATCH status=archived` (200, summary 0건 확인)
+- 매장 취급 상품 → UI 비활성화 (목록 0건)
+- 운영자 그룹 → UI 보관(archived) 처리 (HUB 비노출)
+
+> 참고: `docs/local/TEST-ACCOUNTS.local.md` 의 KPA 약국 경영자 password 가 실제와 불일치(`seochuran1!` → 실제 체험계정 `3Lz157727791!`). 별도 갱신 권장.
+
+## 6. 최종 판정
+
+**WO-O4O-KPA-STORE-PRODUCT-MULTILINGUAL-BADGES-PILOT-V1 → CLOSED / PASS**
+- 정적 검증 PASS · 회귀/관찰성 PASS · 데이터 표시 경로 PASS (실데이터 검증 완료)
+- 성공 기준 1~7 모두 충족, GP/KCos 무변경, QR 미노출, 테스트 데이터 정리 완료
+
+## 7. 후속
+
+WO-O4O-MULTILINGUAL-PRODUCT-QR-LANDING-V1 → TABLET-CONTENT → CROSS-SERVICE-ADOPTION
