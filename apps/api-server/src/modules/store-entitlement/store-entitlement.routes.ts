@@ -22,28 +22,23 @@ import { EventHubPaymentPublisher } from '../../services/payment/adapters/EventH
 import { StorePaidFeatureEntitlementService } from './store-paid-feature-entitlement.service.js';
 import {
   STORE_PAID_FEATURE_PLAN_CODES,
-  ACTIVE_STORE_PAID_FEATURE_PLAN_CODES,
   type StorePaidFeaturePlanCode,
 } from './store-paid-feature-entitlement.entity.js';
+import {
+  STORE_SERVICE_SUBSCRIPTION_PAYMENT_TYPE,
+  assertEnabledPlan,
+  getStoreServiceSubscriptionPlan,
+  listStoreServiceSubscriptionPlans,
+} from './store-service-subscription-plan-catalog.js';
 
 /** Store feature 이용권의 serviceKey 축 = store_owner role-prefix (kpa|glycopharm|cosmetics). */
 const STORE_OWNER_SERVICE_KEYS: StoreOwnerServiceKey[] = ['kpa', 'glycopharm', 'cosmetics'];
 
-// ── WO-O4O-STORE-SERVICE-SUBSCRIPTION-TOSS-PAYMENT-V1 ──
+// ── WO-O4O-STORE-SERVICE-SUBSCRIPTION-TOSS-PAYMENT-V1 (가격/기간/표시명은 plan catalog SSOT) ──
+// WO-O4O-STORE-SERVICE-SUBSCRIPTION-PLAN-CATALOG-V1: 하드코딩 제거 → store-service-subscription-plan-catalog
 const STORE_SUBSCRIPTION_SOURCE_SERVICE = 'store-service-subscription';
-const STORE_SUBSCRIPTION_PAYMENT_TYPE = 'STORE_SERVICE_SUBSCRIPTION';
-const SUBSCRIPTION_DURATION_DAYS = 30;
+const STORE_SUBSCRIPTION_PAYMENT_TYPE = STORE_SERVICE_SUBSCRIPTION_PAYMENT_TYPE;
 const SUBSCRIPTION_ORDER_PREFIX = 'o4o_sub_';
-/**
- * V1 1회 결제형 월 이용권 가격(원). 하드코딩 — 후속 WO-O4O-STORE-SERVICE-SUBSCRIPTION-PLAN-CATALOG-V1
- * 에서 plan/price DB화 예정. 값은 사업 정책 확정 필요(placeholder).
- */
-const STORE_SUBSCRIPTION_PLAN_PRICES: Partial<Record<StorePaidFeaturePlanCode, number>> = {
-  FOREIGN_VISITOR_SALES_SUPPORT: 99000,
-};
-const SUBSCRIPTION_PLAN_LABELS: Partial<Record<StorePaidFeaturePlanCode, string>> = {
-  FOREIGN_VISITOR_SALES_SUPPORT: '외국인 여행객 판매지원 월 이용권',
-};
 
 export function createStoreEntitlementRoutes(dataSource: DataSource): Router {
   const router = Router();
@@ -195,16 +190,15 @@ export function createStoreEntitlementRoutes(dataSource: DataSource): Router {
       if (!STORE_OWNER_SERVICE_KEYS.includes(serviceKey)) {
         return res.status(400).json({ success: false, error: `unknown serviceKey: ${serviceKey}`, code: 'UNKNOWN_SERVICE_KEY' });
       }
-      if (!ACTIVE_STORE_PAID_FEATURE_PLAN_CODES.includes(planCode)) {
-        return res.status(400).json({ success: false, error: `구독 불가 planCode: ${planCode}`, code: 'PLAN_NOT_PURCHASABLE' });
-      }
       if (!successUrl || !failUrl) {
         return res.status(400).json({ success: false, error: 'successUrl and failUrl are required', code: 'MISSING_PARAMS' });
       }
-      const amount = STORE_SUBSCRIPTION_PLAN_PRICES[planCode];
-      if (!amount || amount <= 0) {
-        return res.status(400).json({ success: false, error: `가격 미정의 planCode: ${planCode}`, code: 'PLAN_PRICE_UNDEFINED' });
+      // 가격/기간/표시명은 전적으로 서버 catalog 기준. client amount 는 수신/신뢰하지 않는다.
+      const planResult = assertEnabledPlan(planCode);
+      if ('error' in planResult) {
+        return res.status(planResult.error.status).json({ success: false, error: planResult.error.message, code: planResult.error.code });
       }
+      const { plan } = planResult;
 
       const resolved = await resolveOwnerStore(userId, serviceKey);
       if ('error' in resolved) return res.status(resolved.error.status).json({ success: false, error: resolved.error.message, code: resolved.error.code });
@@ -213,31 +207,43 @@ export function createStoreEntitlementRoutes(dataSource: DataSource): Router {
       const orderId = `${SUBSCRIPTION_ORDER_PREFIX}${organizationId}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
       const payment = await paymentService.prepare({
         orderId,
-        orderName: SUBSCRIPTION_PLAN_LABELS[planCode] || planCode,
-        amount,
-        currency: 'KRW',
+        orderName: plan.name,
+        amount: plan.amount,
+        currency: plan.currency,
         successUrl,
         failUrl,
         sourceService: STORE_SUBSCRIPTION_SOURCE_SERVICE,
         metadata: {
           paymentType: STORE_SUBSCRIPTION_PAYMENT_TYPE,
-          planCode,
+          planCode: plan.planCode,
+          planName: plan.name,
           organizationId,
           serviceCode: serviceKey,
-          durationDays: SUBSCRIPTION_DURATION_DAYS,
+          amount: plan.amount,
+          currency: plan.currency,
+          durationDays: plan.durationDays,
+          priceSource: plan.priceSource,
         },
       });
 
-      logger.info('[StoreSubscription] prepared', { paymentId: payment.id, organizationId, serviceKey, planCode, amount });
+      logger.info('[StoreSubscription] prepared', { paymentId: payment.id, organizationId, serviceKey, planCode: plan.planCode, amount: plan.amount });
       return res.status(201).json({
         success: true,
         data: {
           paymentId: payment.id,
           transactionId: payment.transactionId,
           orderId,
-          amount,
+          amount: plan.amount,
+          currency: plan.currency,
           clientKey: (payment.metadata as Record<string, unknown>)?.clientKey,
           isTestMode: (payment.metadata as Record<string, unknown>)?.isTestMode,
+          plan: {
+            planCode: plan.planCode,
+            name: plan.name,
+            durationDays: plan.durationDays,
+            amount: plan.amount,
+            currency: plan.currency,
+          },
         },
       });
     } catch (error) {
@@ -278,8 +284,15 @@ export function createStoreEntitlementRoutes(dataSource: DataSource): Router {
       if (md.organizationId !== organizationId) {
         return res.status(403).json({ success: false, error: '결제 대상 매장과 권한이 일치하지 않습니다.', code: 'STORE_MISMATCH' });
       }
-      if (!ACTIVE_STORE_PAID_FEATURE_PLAN_CODES.includes(planCode)) {
-        return res.status(400).json({ success: false, error: `구독 불가 planCode: ${planCode}`, code: 'PLAN_NOT_PURCHASABLE' });
+      const planResult = assertEnabledPlan(planCode);
+      if ('error' in planResult) {
+        return res.status(planResult.error.status).json({ success: false, error: planResult.error.message, code: planResult.error.code });
+      }
+      const { plan } = planResult;
+      // 결제 금액 위변조 방어: 결제 레코드 amount 가 현재 catalog amount 와 일치해야 한다.
+      if (typeof record.amount === 'number' && record.amount !== plan.amount) {
+        logger.warn('[StoreSubscription] amount mismatch', { paymentId, recordAmount: record.amount, catalogAmount: plan.amount });
+        return res.status(400).json({ success: false, error: '결제 금액이 plan 가격과 일치하지 않습니다.', code: 'PLAN_AMOUNT_MISMATCH' });
       }
 
       // PaymentCore.confirm — 상태머신이 중복 confirm 을 차단(CREATED→CONFIRMING→PAID 1회).
@@ -305,7 +318,7 @@ export function createStoreEntitlementRoutes(dataSource: DataSource): Router {
         organizationId,
         serviceKey,
         planCode,
-        durationDays: SUBSCRIPTION_DURATION_DAYS,
+        durationDays: plan.durationDays,
         paymentId,
       });
 
@@ -318,6 +331,22 @@ export function createStoreEntitlementRoutes(dataSource: DataSource): Router {
       logger.error('[StoreSubscription] confirm error:', error);
       return res.status(500).json({ success: false, error: 'Failed to confirm subscription payment', code: 'PAYMENT_CONFIRM_ERROR' });
     }
+  });
+
+  // ── WO-O4O-STORE-SERVICE-SUBSCRIPTION-PLAN-CATALOG-V1: plan catalog 조회(frontend 가격 표시용) ──
+
+  // GET /store-entitlements/subscriptions/plans — 판매 활성 plan 목록
+  router.get('/subscriptions/plans', requireAuth, async (_req: AuthRequest, res: Response) => {
+    return res.json({ success: true, data: { plans: listStoreServiceSubscriptionPlans() } });
+  });
+
+  // GET /store-entitlements/subscriptions/plans/:planCode — 단일 plan
+  router.get('/subscriptions/plans/:planCode', requireAuth, async (req: AuthRequest, res: Response) => {
+    const plan = getStoreServiceSubscriptionPlan(String(req.params.planCode || ''));
+    if (!plan || !plan.enabled) {
+      return res.status(404).json({ success: false, error: 'Plan not found', code: 'PLAN_NOT_FOUND' });
+    }
+    return res.json({ success: true, data: plan });
   });
 
   return router;

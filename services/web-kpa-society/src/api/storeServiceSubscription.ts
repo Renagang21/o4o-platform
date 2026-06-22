@@ -10,13 +10,32 @@
  */
 import { coreApiClient } from './client';
 
+/** plan catalog 항목(가격/기간/표시명은 서버 SSOT). */
+export interface SubscriptionPlan {
+  planCode: string;
+  name: string;
+  amount: number;
+  currency: string;
+  durationDays: number;
+  enabled?: boolean;
+}
+
 export interface SubscriptionPrepareResult {
   paymentId: string;
   transactionId?: string;
   orderId: string;
   amount: number;
+  currency?: string;
   clientKey?: string;
   isTestMode?: boolean;
+  /** prepare 시 적용된 plan snapshot(서버 기준). */
+  plan?: {
+    planCode: string;
+    name: string;
+    durationDays: number;
+    amount: number;
+    currency: string;
+  };
 }
 
 export interface SubscriptionConfirmResult {
@@ -38,6 +57,17 @@ interface Envelope<T> {
   data?: T;
   error?: string;
   code?: string;
+}
+
+/** plan catalog 단건 조회 — 가격/기간/표시명(서버 SSOT). 화면 가격 표시용. */
+export async function getSubscriptionPlan(planCode: string): Promise<SubscriptionPlan> {
+  const body = await coreApiClient.get<Envelope<SubscriptionPlan>>(
+    `/store-entitlements/subscriptions/plans/${encodeURIComponent(planCode)}`,
+  );
+  if (!body?.success || !body.data) {
+    throw new Error(body?.error || 'plan 정보를 불러오지 못했습니다.');
+  }
+  return body.data;
 }
 
 /** 구독 결제 세션 준비 — 서버가 금액/orderId 를 산정하고 clientKey 를 반환한다. */

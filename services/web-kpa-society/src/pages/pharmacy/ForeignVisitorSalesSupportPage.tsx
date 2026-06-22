@@ -8,8 +8,14 @@
  * 소비자 checkout(STORE_SALE_PAYMENT) 경로와 분리된 store service subscription 전용 흐름이다.
  * coreApiClient 사용 — /store-entitlements 는 /api/v1 (kpa 네임스페이스 밖).
  */
+import { useEffect, useState } from 'react';
 import { ForeignVisitorSalesSupportPanel } from '@o4o/store-ui-core';
-import { checkSubscription, prepareSubscription, loadTossSdk } from '../../api/storeServiceSubscription';
+import {
+  checkSubscription,
+  prepareSubscription,
+  getSubscriptionPlan,
+  loadTossSdk,
+} from '../../api/storeServiceSubscription';
 
 const SERVICE_KEY = 'kpa';
 const PLAN_CODE = 'FOREIGN_VISITOR_SALES_SUPPORT';
@@ -17,6 +23,27 @@ const ORDER_NAME = '외국인 여행객 판매지원 월 이용권';
 const RESULT_BASE = '/store/sales-channels/foreign-visitor/payment';
 
 export function ForeignVisitorSalesSupportPage() {
+  // 가격/기간은 서버 catalog 기준으로 표시(프론트 하드코딩 금지).
+  const [priceLabel, setPriceLabel] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    let cancelled = false;
+    getSubscriptionPlan(PLAN_CODE)
+      .then((plan) => {
+        if (cancelled) return;
+        const price = plan.currency === 'KRW'
+          ? `월 ${plan.amount.toLocaleString()}원`
+          : `${plan.amount.toLocaleString()} ${plan.currency}`;
+        setPriceLabel(`${price} · ${plan.durationDays}일 이용권`);
+      })
+      .catch(() => {
+        // catalog 조회 실패 시 가격 라벨 생략(버튼은 정상 동작)
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const handleSubscribe = async () => {
     const origin = window.location.origin;
     const successUrl = `${origin}${RESULT_BASE}/success?serviceKey=${encodeURIComponent(SERVICE_KEY)}`;
@@ -45,7 +72,7 @@ export function ForeignVisitorSalesSupportPage() {
 
   return (
     <ForeignVisitorSalesSupportPanel
-      priceLabel="월 이용권 (1회 결제 · 30일)"
+      priceLabel={priceLabel}
       check={async () => {
         const res = await checkSubscription({ serviceKey: SERVICE_KEY, planCode: PLAN_CODE });
         return { active: res.active, endsAt: res.endsAt };
