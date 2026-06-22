@@ -10,7 +10,7 @@
  */
 
 import { useState } from 'react';
-import { ExternalLink, Copy, QrCode, Check, Loader2 } from 'lucide-react';
+import { ExternalLink, Copy, QrCode, Check, Loader2, Tablet } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { ensureMlcPublicKey, getMlcQr } from '../api/multilingualProductContentStore';
 
@@ -18,8 +18,13 @@ interface Props {
   groupId: string;
 }
 
+/** url 에 mode=tablet 쿼리 부여 (기존 쿼리 유무 안전 처리). */
+function withTabletMode(url: string): string {
+  return url + (url.includes('?') ? '&' : '?') + 'mode=tablet';
+}
+
 export function MultilingualPublicActions({ groupId }: Props) {
-  const [busy, setBusy] = useState<null | 'open' | 'copy' | 'qr'>(null);
+  const [busy, setBusy] = useState<null | 'open' | 'tablet' | 'copy' | 'qr'>(null);
   const [copied, setCopied] = useState(false);
   const [qr, setQr] = useState<{ svg: string; url: string } | null>(null);
 
@@ -30,6 +35,19 @@ export function MultilingualPublicActions({ groupId }: Props) {
       window.open(url, '_blank', 'noopener');
     } catch (e: any) {
       toast.error(e?.message || '고객용 링크를 만들 수 없습니다');
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  // WO-O4O-MULTILINGUAL-PRODUCT-TABLET-CONTENT-V1: 매장 응대용 태블릿 표시 모드
+  const handleTablet = async () => {
+    setBusy('tablet');
+    try {
+      const { url } = await ensureMlcPublicKey(groupId);
+      window.open(withTabletMode(url), '_blank', 'noopener');
+    } catch (e: any) {
+      toast.error(e?.message || '태블릿 보기를 열 수 없습니다');
     } finally {
       setBusy(null);
     }
@@ -74,6 +92,10 @@ export function MultilingualPublicActions({ groupId }: Props) {
         <button type="button" onClick={handleOpen} disabled={busy !== null} className={btn}>
           {busy === 'open' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ExternalLink className="w-3.5 h-3.5" />}
           고객용 보기
+        </button>
+        <button type="button" onClick={handleTablet} disabled={busy !== null} className={btn}>
+          {busy === 'tablet' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Tablet className="w-3.5 h-3.5" />}
+          태블릿 보기
         </button>
         <button type="button" onClick={handleCopy} disabled={busy !== null} className={btn}>
           {busy === 'copy' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}

@@ -24,15 +24,19 @@ const LOCALE_LABELS: Record<string, string> = {
   ko: '한국어', en: 'English', zh: '中文', ja: '日本語', vi: 'Tiếng Việt', th: 'ภาษาไทย', id: 'Bahasa',
 };
 
-function PageBody({ page }: { page: NonNullable<PublicMlcResolve['page']> }) {
+function PageBody({ page, large = false }: { page: NonNullable<PublicMlcResolve['page']>; large?: boolean }) {
   const format = page.contentFormat;
+  const proseCls = large
+    ? 'prose prose-slate prose-lg max-w-none text-lg leading-relaxed'
+    : 'prose prose-slate max-w-none text-[15px] leading-relaxed';
+  const summaryCls = large ? 'text-slate-400 text-lg' : 'text-slate-400 text-sm';
 
   if (format === 'html') {
     const html = typeof (page.content as any)?.html === 'string' ? (page.content as any).html : '';
-    if (!html.trim()) return <p className="text-slate-400 text-sm">{page.summary || ''}</p>;
+    if (!html.trim()) return <p className={summaryCls}>{page.summary || ''}</p>;
     return (
       <div
-        className="prose prose-slate max-w-none text-[15px] leading-relaxed"
+        className={proseCls}
         dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(html) }}
       />
     );
@@ -42,9 +46,9 @@ function PageBody({ page }: { page: NonNullable<PublicMlcResolve['page']> }) {
     const images = (page.assets || [])
       .map((a) => (typeof (a as any)?.url === 'string' ? (a as any).url : null))
       .filter(Boolean) as string[];
-    if (images.length === 0) return <p className="text-slate-400 text-sm">{page.summary || ''}</p>;
+    if (images.length === 0) return <p className={summaryCls}>{page.summary || ''}</p>;
     return (
-      <div className="space-y-3">
+      <div className={large ? 'space-y-5' : 'space-y-3'}>
         {images.map((src, i) => (
           <img key={i} src={src} alt="" className="w-full rounded-lg" loading="lazy" />
         ))}
@@ -55,10 +59,40 @@ function PageBody({ page }: { page: NonNullable<PublicMlcResolve['page']> }) {
   // blocks / json 등 V1 미지원 포맷 → summary fallback + 안내
   return (
     <div className="space-y-2">
-      {page.summary && <p className="text-[15px] leading-relaxed text-slate-700">{page.summary}</p>}
-      <p className="text-xs text-slate-400">
-        이 안내는 현재 형식으로 표시할 수 없습니다. 매장에 문의해 주세요.
+      {page.summary && <p className={large ? 'text-lg leading-relaxed text-slate-700' : 'text-[15px] leading-relaxed text-slate-700'}>{page.summary}</p>}
+      <p className={large ? 'text-sm text-slate-400' : 'text-xs text-slate-400'}>
+        지원하지 않는 콘텐츠 형식입니다. 매장 직원에게 문의해 주세요.
       </p>
+    </div>
+  );
+}
+
+/** CTA 버튼 (page.buttons: {label,url}) — tablet 본문 하단. */
+function CtaButtons({ buttons, large = false }: { buttons: Array<Record<string, unknown>>; large?: boolean }) {
+  const items = (buttons || [])
+    .map((b) => ({
+      label: typeof (b as any)?.label === 'string' ? ((b as any).label as string) : '',
+      url: typeof (b as any)?.url === 'string' ? ((b as any).url as string) : '',
+    }))
+    .filter((b) => b.label && b.url);
+  if (items.length === 0) return null;
+  return (
+    <div className={large ? 'flex flex-col gap-3 mt-7' : 'flex flex-col gap-2 mt-4'}>
+      {items.map((b, i) => (
+        <a
+          key={i}
+          href={b.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={
+            large
+              ? 'block text-center px-6 py-4 min-h-[56px] text-lg font-semibold rounded-xl bg-slate-900 text-white hover:bg-slate-800'
+              : 'block text-center px-4 py-2.5 text-sm font-medium rounded-lg bg-slate-900 text-white hover:bg-slate-800'
+          }
+        >
+          {b.label}
+        </a>
+      ))}
     </div>
   );
 }
@@ -67,6 +101,8 @@ export function MultilingualProductPublicLandingPage() {
   const { publicKey = '' } = useParams<{ publicKey: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
   const localeParam = searchParams.get('locale') as StoreMlcLocale | null;
+  // WO-O4O-MULTILINGUAL-PRODUCT-TABLET-CONTENT-V1: 같은 publicKey/resolve 재사용, 렌더링 모드만 분리
+  const isTablet = searchParams.get('mode') === 'tablet';
 
   const [data, setData] = useState<PublicMlcResolve | null>(null);
   const [loading, setLoading] = useState(true);
@@ -92,8 +128,85 @@ export function MultilingualProductPublicLandingPage() {
   }, [publicKey, localeParam]);
 
   const switchLocale = (loc: StoreMlcLocale) => {
-    setSearchParams({ locale: loc }, { replace: true });
+    const next: Record<string, string> = { locale: loc };
+    if (isTablet) next.mode = 'tablet';
+    setSearchParams(next, { replace: true });
   };
+
+  // ── 태블릿 표시 모드 (매장 응대용 큰 화면 / 터치 친화) ──
+  if (isTablet) {
+    return (
+      <div className="min-h-screen bg-slate-100 flex flex-col">
+        <header className="bg-white border-b border-slate-200 px-8 py-5 sticky top-0 z-10">
+          <div className="max-w-4xl mx-auto flex flex-col gap-4">
+            <div>
+              <p className="text-xs uppercase tracking-wide text-slate-400">KPA-Society</p>
+              <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mt-1">
+                {data?.title || (loading ? ' ' : '다국어 상품 안내')}
+              </h1>
+            </div>
+            {/* 언어 선택 — 큰 터치 버튼 */}
+            {data && data.availableLocales.length > 1 && (
+              <div className="flex flex-wrap gap-2">
+                {data.availableLocales.map((loc) => {
+                  const active = (data.resolvedLocale || data.defaultLocale) === loc;
+                  return (
+                    <button
+                      key={loc}
+                      onClick={() => switchLocale(loc)}
+                      className={`min-h-[44px] px-5 py-2.5 text-base rounded-xl border ${
+                        active
+                          ? 'bg-slate-900 text-white border-slate-900'
+                          : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
+                      }`}
+                    >
+                      {LOCALE_LABELS[loc] || loc}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </header>
+
+        <main className="flex-1 w-full max-w-4xl mx-auto px-6 sm:px-8 py-8">
+          {loading ? (
+            <div className="py-32 text-center text-slate-300 text-lg">Loading…</div>
+          ) : notFound || !data ? (
+            <div className="py-32 text-center">
+              <p className="text-slate-500 text-lg">안내 콘텐츠를 찾을 수 없습니다.</p>
+              <p className="text-slate-400 text-base mt-2">This guide is not available.</p>
+            </div>
+          ) : (
+            <>
+              {data.fallbackUsed && data.requestedLocale && (
+                <p className="text-sm text-amber-600 mb-4">
+                  선택한 언어의 콘텐츠가 없어 대체 언어로 표시 중입니다.
+                </p>
+              )}
+              {data.page ? (
+                <article className="bg-white rounded-3xl border border-slate-200 p-8 sm:p-10 shadow-sm">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-5">{data.page.title}</h2>
+                  {data.page.summary && (
+                    <p className="text-lg text-slate-600 leading-relaxed mb-5">{data.page.summary}</p>
+                  )}
+                  <PageBody page={data.page} large />
+                  <CtaButtons buttons={data.page.buttons || []} large />
+                </article>
+              ) : (
+                <div className="py-24 text-center text-slate-400 text-lg">표시할 안내가 없습니다.</div>
+              )}
+            </>
+          )}
+        </main>
+
+        <footer className="px-8 py-8 text-center">
+          <p className="text-lg font-medium text-slate-600">매장 직원에게 문의해 주세요.</p>
+          <p className="text-sm text-slate-400 mt-1">Please ask our staff for assistance. · KPA-Society</p>
+        </footer>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
