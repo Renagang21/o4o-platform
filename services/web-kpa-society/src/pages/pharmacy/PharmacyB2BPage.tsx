@@ -24,7 +24,10 @@ import { colors, borderRadius } from '../../styles/theme';
 import { EventOfferContentPanel } from '../../components/event-offer/EventOfferContentPanel';
 // WO-O4O-KPA-STORE-PRODUCT-MULTILINGUAL-BADGES-PILOT-V1: 다국어 콘텐츠 연결 상태 배지
 import { getMlcSummaryMap, type StoreMlcSummaryItem } from '../../api/multilingualProductContentStore';
-import { MultilingualContentBadge } from '../../components/MultilingualContentBadge';
+import { MultilingualContentBadge, localeLabel } from '../../components/MultilingualContentBadge';
+// WO-O4O-KPA-O4O-LISTING-MULTILINGUAL-QR-ACTIONS-V1: O4O 주문 가능 상품(listing) 고객용 링크/QR
+import { MultilingualPublicActions } from '../../components/MultilingualPublicActions';
+import { QrCode, X as XIcon } from 'lucide-react';
 
 // ── 병합 타입 ──
 
@@ -83,6 +86,8 @@ export function PharmacyB2BPage() {
   const [error, setError] = useState<ErrorType>(null);
   // WO-O4O-KPA-STORE-PRODUCT-MULTILINGUAL-BADGES-PILOT-V1: listing 별 다국어 콘텐츠 연결 요약
   const [mlcSummary, setMlcSummary] = useState<Map<string, StoreMlcSummaryItem>>(new Map());
+  // WO-O4O-KPA-O4O-LISTING-MULTILINGUAL-QR-ACTIONS-V1: 고객용 링크/QR 패널 대상
+  const [qrPanel, setQrPanel] = useState<{ product: B2BProduct; summary: StoreMlcSummaryItem } | null>(null);
 
   // 선택 + 수량
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -283,10 +288,28 @@ export function PharmacyB2BPage() {
     },
     {
       // WO-O4O-KPA-STORE-PRODUCT-MULTILINGUAL-BADGES-PILOT-V1: targetKind=listing, targetId=listingId
+      // WO-O4O-KPA-O4O-LISTING-MULTILINGUAL-QR-ACTIONS-V1: 연결된 콘텐츠에 고객용 링크/QR 트리거
       key: 'multilingual',
       title: '다국어',
-      width: '160px',
-      render: (_v, row) => <MultilingualContentBadge summary={mlcSummary.get(row.listingId)} />,
+      width: '180px',
+      render: (_v, row) => {
+        const summary = mlcSummary.get(row.listingId);
+        if (!summary) return null;
+        return (
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <MultilingualContentBadge summary={summary} showLocales={false} />
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); setQrPanel({ product: row, summary }); }}
+              className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] rounded-md border border-indigo-200 text-indigo-600 hover:bg-indigo-50"
+              title="고객용 링크 / QR 보기"
+            >
+              <QrCode className="w-3 h-3" />
+              고객용
+            </button>
+          </div>
+        );
+      },
     },
     {
       key: 'retailPrice',
@@ -444,6 +467,43 @@ export function PharmacyB2BPage() {
           상품 추가/수정은 <Link to="/store/sell" style={{ color: colors.primary }}>상품 판매 관리</Link>에서 가능합니다.
         </span>
       </div>
+
+      {/* WO-O4O-KPA-O4O-LISTING-MULTILINGUAL-QR-ACTIONS-V1: O4O 주문 가능 상품 다국어 안내 고객용 링크/QR */}
+      {qrPanel && (
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/40 p-4" onClick={() => setQrPanel(null)}>
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <h2 className="text-base font-bold text-slate-900">다국어 상품 안내 — 고객용</h2>
+                <p className="text-xs text-slate-500 mt-1 truncate">
+                  {qrPanel.product.productName}
+                  <span className="text-slate-300"> · </span>
+                  O4O 주문 가능 상품
+                </p>
+              </div>
+              <button onClick={() => setQrPanel(null)} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400">
+                <XIcon className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="rounded-xl border border-indigo-100 bg-indigo-50/50 p-4">
+              <div className="flex items-center gap-2 flex-wrap">
+                <MultilingualContentBadge summary={qrPanel.summary} showLocales={false} />
+                <span className="text-sm font-medium text-slate-800 truncate">{qrPanel.summary.title}</span>
+                {qrPanel.summary.sourceType === 'operator_hub' && (
+                  <span className="inline-flex items-center px-2 py-0.5 text-[11px] rounded-full border bg-blue-50 border-blue-200 text-blue-700 shrink-0">운영자 자료 복사</span>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-1 mt-2">
+                {qrPanel.summary.locales.map((l) => (
+                  <span key={l} className="inline-flex items-center px-1.5 py-0.5 text-[11px] rounded border bg-white border-slate-200 text-slate-600">{localeLabel(l)}</span>
+                ))}
+              </div>
+              <MultilingualPublicActions groupId={qrPanel.summary.groupId} />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
