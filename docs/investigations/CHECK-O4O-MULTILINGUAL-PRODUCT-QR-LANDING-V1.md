@@ -45,13 +45,35 @@ WO: **WO-O4O-MULTILINGUAL-PRODUCT-QR-LANDING-V1**
 - api-server `tsc --noEmit`: error 0
 - web-kpa-society `tsc --noEmit`: error 0
 
-### 5.2 배포 후 smoke
-(작성 예정 — 배포 완료 후 API + UI smoke)
+### 5.2 배포 후 smoke (2026-06-22, [PILOT] 테스트 데이터)
+배포: Deploy API + Web Cloud Run 모두 success (migration 포함).
+
+setup: 운영자 [PILOT] 콘텐츠 ko/en 발행 → store-owner [PILOT] 상품 + 가져오기(draft).
+
+| # | 항목 | 결과 |
+|---|------|------|
+| 1 | 편집 모달 QR 액션 렌더 | ✅ 고객용 보기 / URL 복사 / QR 보기 |
+| 2 | QR 보기 → publicKey 발급 + QR SVG | ✅ QR 이미지 + URL `…/multilingual-products/4b2c5710…` (스샷) |
+| 3 | auto-publish (발급 시 store 사본 published 승격) | ✅ draft→published, landing 표시됨 |
+| 4 | public landing **인증 없이** 렌더 | ✅ 제목 + 본문 + 언어전환 (스샷) |
+| 5 | locale=en | ✅ "[PILOT] English product guide" |
+| 6 | locale 전환 ko | ✅ "[PILOT] 한국어 상품 안내" (URL ?locale=ko) |
+| 7 | fallback (zh 미작성) | ✅ resolvedLocale=en, fallbackUsed=true |
+| 8 | 정보 정제 (내부 ID 미노출) | ✅ top/page keys clean, leaks=[] (org/targetId/sourceRef/status/메모 없음) |
+| 9 | archived → 404 | ✅ store 그룹 archive 후 public resolve 404 NOT_FOUND |
+| 10 | console error | ✅ 0 (benign 법정정보 404 + 의도된 archived 404 외) |
+
+> smoke 중 **버그 1건 발견·수정**: public resolve 쿼리가 `status` 미select → `pickFallbackPage`의 published 판정 실패로 page=null. status select 추가(`5bcb45eae`) 후 재배포·재검증 PASS.
+
+### 5.3 테스트 데이터 정리 (물리 삭제 없음)
+- store 그룹 → archived  · 매장 상품 → 비활성화  · 운영자 그룹 → archived
 
 ## 6. 성공 기준 대비
-1. public URL 발급 — ✅(설계)  2. store-owner QR/링크 확인 — (smoke)  3. 인증 없이 열람 — (smoke)
-4. locale=en — (smoke)  5. fallback — (smoke)  6. archived/draft 미노출 — ✅(쿼리)  7. 내부 ID 미노출 — ✅(정제)
-8. 기존 흐름 회귀 — (smoke)
+1. public URL 발급 ✅  2. store-owner QR/링크 확인 ✅  3. 인증 없이 열람 ✅
+4. locale=en ✅  5. fallback ✅  6. archived/draft 미노출 ✅  7. 내부 ID 미노출 ✅
+8. 기존 흐름 회귀 — 배지/가져오기/Store Hub 정상 ✅
+
+**최종 판정: CLOSED / PASS** (정적 + API + UI smoke 전부 PASS, GP/KCos 무변경, lockfile 미변경)
 
 ## 7. 후속
 - listing(targetKind=listing) 상품의 QR UI는 PharmacyB2BPage에 후속 (현재 모달은 local 상품)
