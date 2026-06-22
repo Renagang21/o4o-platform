@@ -13,6 +13,7 @@ import { DataSource } from 'typeorm';
 import { randomBytes } from 'crypto';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
+import { generateQrSvg } from '../../../services/qr-print.service.js';
 
 type AuthMiddleware = RequestHandler;
 
@@ -162,6 +163,18 @@ function pickFallbackPage(pages: any[], requestedLocale: Locale | null, defaultL
 // Hard-to-guess url-safe key for the unauthenticated public/QR landing.
 function generatePublicKey(): string {
   return randomBytes(12).toString('hex'); // 24 chars
+}
+
+// Public web origin per store service — landing page lives on the service's own domain.
+const PUBLIC_WEB_ORIGIN_BY_SERVICE: Record<string, string> = {
+  kpa: 'https://kpa-society.co.kr',
+  glycopharm: 'https://glycopharm.co.kr',
+  cosmetics: 'https://cosmetics.neture.co.kr',
+};
+
+function buildLandingUrl(serviceKey: string | undefined, publicKey: string): string {
+  const origin = (serviceKey && PUBLIC_WEB_ORIGIN_BY_SERVICE[serviceKey]) || 'https://kpa-society.co.kr';
+  return `${origin}/multilingual-products/${publicKey}`;
 }
 
 export function createMultilingualProductContentController(
@@ -432,8 +445,24 @@ export function createMultilingualProductContentController(
         res.status(400).json({ success: false, error: 'Archived content cannot be published', code: 'GROUP_ARCHIVED' });
         return;
       }
+
+      // 고객용 링크 발급 = 고객 공개. store 사본은 가져올 때 draft 이므로, 공개 시점에
+      // 그룹/비보관 페이지를 published 로 승격한다 (운영자 원본과 무관, store copy 한정).
+      await dataSource.query(
+        `UPDATE store_multilingual_product_content_pages
+         SET status = 'published', updated_at = now()
+         WHERE group_id = $1 AND status = 'draft'`,
+        [groupId],
+      );
+      await dataSource.query(
+        `UPDATE store_multilingual_product_content_groups
+         SET status = 'published', updated_at = now()
+         WHERE id = $1 AND organization_id = $2 AND status <> 'published'`,
+        [groupId, organizationId],
+      );
+
       if (group.publicKey) {
-        res.json({ success: true, data: { publicKey: group.publicKey } });
+        res.json({ success: true, data: { publicKey: group.publicKey, url: buildLandingUrl(serviceKey, group.publicKey) } });
         return;
       }
 
@@ -467,7 +496,46 @@ export function createMultilingualProductContentController(
         res.status(500).json({ success: false, error: 'Failed to issue public key', code: 'PUBLIC_KEY_ISSUE_FAILED' });
         return;
       }
-      res.json({ success: true, data: { publicKey } });
+      res.json({ success: true, data: { publicKey, url: buildLandingUrl(serviceKey, publicKey) } });
+    }),
+  );
+
+  // GET /pharmacy/multilingual-product-contents/:groupId/qr
+  // WO-O4O-MULTILINGUAL-PRODUCT-QR-LANDING-V1
+  // Returns the landing URL + an inline QR SVG (no frontend QR dependency). Requires an
+  // already-issued public_key (call POST .../public-key first).
+  router.get(
+    '/pharmacy/multilingual-product-contents/:groupId/qr',
+    requireAuth,
+    requireStoreOwner,
+    asyncHandler(async (req: Request, res: Response) => {
+      const organizationId = (req as any).organizationId as string;
+      const groupId = asString(req.params.groupId, 80);
+      if (!groupId) {
+        res.status(400).json({ success: false, error: 'groupId is required', code: 'VALIDATION_ERROR' });
+        return;
+      }
+
+      const rows = await dataSource.query(
+        `SELECT public_key AS "publicKey", status
+         FROM store_multilingual_product_content_groups
+         WHERE id = $1 AND organization_id = $2
+         LIMIT 1`,
+        [groupId, organizationId],
+      );
+      const group = rows[0];
+      if (!group) {
+        res.status(404).json({ success: false, error: 'Content group not found', code: 'NOT_FOUND' });
+        return;
+      }
+      if (!group.publicKey) {
+        res.status(409).json({ success: false, error: 'Public key not issued', code: 'PUBLIC_KEY_NOT_ISSUED' });
+        return;
+      }
+
+      const url = buildLandingUrl(serviceKey, group.publicKey);
+      const svg = await generateQrSvg(url, 320);
+      res.json({ success: true, data: { publicKey: group.publicKey, url, svg } });
     }),
   );
 

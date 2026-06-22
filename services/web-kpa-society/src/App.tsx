@@ -313,6 +313,8 @@ const ContentSurveysPage = lazy(() => import('./pages/contents/ContentSurveysPag
 
 // QR Landing Page — Phase 2 lazy
 const QrLandingPage = lazy(() => import('./pages/qr/QrLandingPage'));
+// WO-O4O-MULTILINGUAL-PRODUCT-QR-LANDING-V1: 외국인 고객용 다국어 상품 안내 (public, no auth)
+const MultilingualProductPublicLandingPage = lazy(() => import('./pages/public/MultilingualProductPublicLandingPage').then(m => ({ default: m.MultilingualProductPublicLandingPage })));
 
 /**
  * KPA Society - 약사회 SaaS
@@ -1043,6 +1045,9 @@ function App() {
 
           {/* QR Landing Page (WO-O4O-QR-LANDING-PAGE-V1) — public, no auth */}
           <Route path="/qr/:slug" element={<QrLandingPage />} />
+
+          {/* Multilingual Product Public Landing (WO-O4O-MULTILINGUAL-PRODUCT-QR-LANDING-V1) — public, no auth */}
+          <Route path="/multilingual-products/:publicKey" element={<MultilingualProductPublicLandingPage />} />
 
           {/* Certificate Verification (WO-O4O-LMS-CERTIFICATE-VERIFICATION-V1) — public, no auth */}
           <Route path="/certificate/verify/:certificateId" element={<CertificateVerifyPage />} />

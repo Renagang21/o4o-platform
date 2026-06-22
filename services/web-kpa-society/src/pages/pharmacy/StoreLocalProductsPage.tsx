@@ -29,6 +29,8 @@ import { LOCAL_PRODUCT_BADGE_OPTIONS as BADGE_OPTIONS, LocalProductBadge } from 
 // WO-O4O-KPA-STORE-PRODUCT-MULTILINGUAL-BADGES-PILOT-V1: 다국어 콘텐츠 연결 상태 배지
 import { getMlcSummaryMap, type StoreMlcSummaryItem } from '../../api/multilingualProductContentStore';
 import { MultilingualContentBadge, localeLabel } from '../../components/MultilingualContentBadge';
+// WO-O4O-MULTILINGUAL-PRODUCT-QR-LANDING-V1: 고객용 보기 / QR / URL 복사
+import { MultilingualPublicActions } from '../../components/MultilingualPublicActions';
 
 // ==================== Constants ====================
 
@@ -564,7 +566,9 @@ function ProductFormModal({
                     <span key={l} className="inline-flex items-center px-1.5 py-0.5 text-[11px] rounded border bg-white border-slate-200 text-slate-600">{localeLabel(l)}</span>
                   ))}
                 </div>
-                <p className="text-[11px] text-slate-400 mt-2">QR/타블렛 노출은 후속 단계에서 연결됩니다.</p>
+                {/* WO-O4O-MULTILINGUAL-PRODUCT-QR-LANDING-V1: 고객용 보기 / QR / URL 복사 */}
+                <MultilingualPublicActions groupId={mlcSummary.groupId} />
+                <p className="text-[11px] text-slate-400 mt-2">타블렛 노출은 후속 단계에서 연결됩니다.</p>
               </div>
             ) : (
               <div className="rounded-xl border border-slate-100 bg-slate-50 p-4 text-sm">

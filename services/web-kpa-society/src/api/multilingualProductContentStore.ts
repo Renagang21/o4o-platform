@@ -172,3 +172,61 @@ export async function resolveMlc(
   );
   return json.data;
 }
+
+/* ─── WO-O4O-MULTILINGUAL-PRODUCT-QR-LANDING-V1 ─── */
+
+/** public/QR 키 발급(idempotent) — store-owner 가 고객용 링크/QR 를 요청할 때 */
+export async function ensureMlcPublicKey(groupId: string): Promise<{ publicKey: string; url: string }> {
+  const json = await authFetch(`${getApiBase()}/${encodeURIComponent(groupId)}/public-key`, { method: 'POST' });
+  return json.data;
+}
+
+/** 발급된 키 기준 landing URL + QR SVG (프론트 QR 의존성 없이 백엔드 생성) */
+export async function getMlcQr(groupId: string): Promise<{ publicKey: string; url: string; svg: string }> {
+  const json = await authFetch(`${getApiBase()}/${encodeURIComponent(groupId)}/qr`);
+  return json.data;
+}
+
+export interface PublicMlcPage {
+  locale: StoreMlcLocale;
+  title: string;
+  summary?: string | null;
+  contentFormat: string;
+  content: Record<string, unknown>;
+  assets: Array<Record<string, unknown>>;
+  buttons: Array<Record<string, unknown>>;
+  updatedAt: string;
+}
+
+export interface PublicMlcResolve {
+  title: string;
+  targetKind: StoreMlcTargetKind;
+  contentKey: string;
+  defaultLocale: StoreMlcLocale;
+  requestedLocale: StoreMlcLocale | null;
+  resolvedLocale: StoreMlcLocale | null;
+  fallbackUsed: boolean;
+  availableLocales: StoreMlcLocale[];
+  page: PublicMlcPage | null;
+}
+
+/** 비인증 public landing resolve (고객용) — 토큰 없이 호출 */
+export async function resolvePublicMlc(
+  publicKey: string,
+  locale?: StoreMlcLocale,
+): Promise<PublicMlcResolve> {
+  const base = import.meta.env.VITE_API_BASE_URL || '';
+  const qs = locale ? `?locale=${encodeURIComponent(locale)}` : '';
+  const res = await fetch(
+    `${base}/api/v1/kpa/public/multilingual-product-contents/${encodeURIComponent(publicKey)}${qs}`,
+  );
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok || !json.success) {
+    const err: any = new Error(json.error || `Request failed (${res.status})`);
+    err.status = res.status;
+    err.code = json.code;
+    err.data = json.data;
+    throw err;
+  }
+  return json.data;
+}
