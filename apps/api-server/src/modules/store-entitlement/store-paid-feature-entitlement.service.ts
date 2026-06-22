@@ -60,4 +60,75 @@ export class StorePaidFeatureEntitlementService {
     });
     return row ? StorePaidFeatureEntitlementService.isActive(row, now) : false;
   }
+
+  /**
+   * WO-O4O-STORE-SERVICE-SUBSCRIPTION-TOSS-PAYMENT-V1:
+   * 결제 성공 후처리 — 이용권 ACTIVE 생성/연장(1회 결제형 N일 이용권).
+   *   - 현재 ACTIVE & endsAt > now: startsAt 유지, endsAt += durationDays (연장)
+   *   - 없거나 만료/취소: startsAt=now, endsAt=now+durationDays, status='ACTIVE' (신규)
+   *   - idempotency: 같은 paymentId 가 이미 반영됐으면 재연장하지 않음(applied=false)
+   * UNIQUE(organizationId, serviceKey, planCode) — 플랜당 단일 행 upsert.
+   */
+  async activateOrExtend(params: {
+    organizationId: string;
+    serviceKey: string;
+    planCode: StorePaidFeaturePlanCode;
+    durationDays: number;
+    paymentId: string;
+    now?: Date;
+  }): Promise<{ entitlement: StorePaidFeatureEntitlement; applied: boolean }> {
+    const { organizationId, serviceKey, planCode, durationDays, paymentId } = params;
+    const now = params.now ?? new Date();
+    const durationMs = durationDays * 24 * 60 * 60 * 1000;
+
+    const existing = await this.repo.findOne({ where: { organizationId, serviceKey, planCode } });
+    const appliedIds: string[] = Array.isArray((existing?.metadata as Record<string, unknown> | undefined)?.appliedPaymentIds)
+      ? ((existing!.metadata as Record<string, unknown>).appliedPaymentIds as string[])
+      : [];
+
+    // idempotency: 동일 paymentId 가 이미 반영됨 → 중복 연장 금지
+    if (existing && appliedIds.includes(paymentId)) {
+      return { entitlement: existing, applied: false };
+    }
+
+    let startsAt: Date;
+    let endsAt: Date;
+    if (existing && StorePaidFeatureEntitlementService.isActive(existing, now) && existing.endsAt) {
+      startsAt = existing.startsAt ?? now;
+      endsAt = new Date(existing.endsAt.getTime() + durationMs);
+    } else {
+      startsAt = now;
+      endsAt = new Date(now.getTime() + durationMs);
+    }
+
+    const metadata: Record<string, unknown> = {
+      ...((existing?.metadata as Record<string, unknown>) ?? {}),
+      appliedPaymentIds: [...appliedIds, paymentId],
+      lastPaymentId: paymentId,
+    };
+    const source = `toss-payment:${paymentId}`;
+
+    if (existing) {
+      existing.status = 'ACTIVE';
+      existing.startsAt = startsAt;
+      existing.endsAt = endsAt;
+      existing.source = source;
+      existing.metadata = metadata;
+      const saved = await this.repo.save(existing);
+      return { entitlement: saved, applied: true };
+    }
+
+    const created = this.repo.create({
+      organizationId,
+      serviceKey,
+      planCode,
+      status: 'ACTIVE',
+      startsAt,
+      endsAt,
+      source,
+      metadata,
+    });
+    const saved = await this.repo.save(created);
+    return { entitlement: saved, applied: true };
+  }
 }
