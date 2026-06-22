@@ -53,9 +53,30 @@ QR 관련 문구 미사용 (후속 단계 안내만 약하게 표기).
 
 ## 5. 검증
 
+### 5.1 정적 검증
 - web-kpa-society `tsc --noEmit`: **error 0**
 - api-server `tsc --noEmit`: **error 0**
-- 기능 smoke: 배포 후 KPA store-owner 브라우저 검증 예정 (renagang21 = ACTIVE 상품 보유 계정 기준)
+
+### 5.2 배포 후 브라우저 smoke (2026-06-22, kpa-society.co.kr, 체험용 약국 경영자 계정)
+배포: Deploy Web + Deploy API Cloud Run 모두 success.
+
+| # | 항목 | 결과 |
+|---|------|------|
+| 1 | store-owner 로그인 | ✅ (체험 계정 "테스트 약국 매장") |
+| 2 | 매장 취급 상품 목록 진입 | ✅ 렌더 정상 (상품 0개 — 빈 상태) |
+| 3 | local 다국어 배지(데이터) | ⚠️ 데이터 0 — 검증 불가, 빈 상태 정상 |
+| 4 | 연결 없는 상품 배지 미표시 | ✅ 빈 목록 자연 처리 |
+| 5 | 편집 모달 연결 정보 패널 | ⚠️ 상품 0개 — 모달 대상 없음 |
+| 6 | 빈 상태 Store Hub 링크 | ⚠️ 모달 미검증 / Store Hub route 자체 정상 |
+| 7 | O4O 주문 가능 상품 목록 진입 | ✅ 렌더 정상 (상품 0개) |
+| 8 | listing 다국어 배지(데이터) | ⚠️ 데이터 0 — 검증 불가 |
+| 9 | 기존 Store Hub 다국어 route | ✅ 정상 ("매장 HUB 다국어 상품 콘텐츠" 렌더) |
+| 10 | console error | ✅ 0 (로그인 전 auth/me 401 1건은 benign) |
+| 11 | 관련 4xx/5xx | ✅ 0 — `summary?targetKind=local` 200, `summary?targetKind=listing` 200 |
+
+**판정: 회귀/관찰성 PASS.** 신규 summary API 정상 배포·200 응답, 빈 상태 정상, 콘솔/네트워크 클린.
+배지·모달 상세의 **데이터 표시 경로**는 현재 환경에 다국어 콘텐츠 row 가 0(운영자 발행 0)이라 미검증.
+실제 row 생성은 별도 승인 후 진행 (체험 계정 password 기재값 불일치 — renagang21 정식 계정 자격 확인 필요).
 
 ## 6. 후속
 
