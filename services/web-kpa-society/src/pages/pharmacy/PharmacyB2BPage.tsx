@@ -22,6 +22,9 @@ import { getListings, getCatalog } from '../../api/pharmacyProducts';
 import type { CatalogProduct } from '../../api/pharmacyProducts';
 import { colors, borderRadius } from '../../styles/theme';
 import { EventOfferContentPanel } from '../../components/event-offer/EventOfferContentPanel';
+// WO-O4O-KPA-STORE-PRODUCT-MULTILINGUAL-BADGES-PILOT-V1: 다국어 콘텐츠 연결 상태 배지
+import { getMlcSummaryMap, type StoreMlcSummaryItem } from '../../api/multilingualProductContentStore';
+import { MultilingualContentBadge } from '../../components/MultilingualContentBadge';
 
 // ── 병합 타입 ──
 
@@ -78,6 +81,8 @@ export function PharmacyB2BPage() {
   const [products, setProducts] = useState<B2BProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<ErrorType>(null);
+  // WO-O4O-KPA-STORE-PRODUCT-MULTILINGUAL-BADGES-PILOT-V1: listing 별 다국어 콘텐츠 연결 요약
+  const [mlcSummary, setMlcSummary] = useState<Map<string, StoreMlcSummaryItem>>(new Map());
 
   // 선택 + 수량
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -135,6 +140,15 @@ export function PharmacyB2BPage() {
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  // WO-O4O-KPA-STORE-PRODUCT-MULTILINGUAL-BADGES-PILOT-V1: 다국어 콘텐츠 연결 요약 (org 단위 1회 조회)
+  useEffect(() => {
+    let cancelled = false;
+    getMlcSummaryMap('listing')
+      .then((map) => { if (!cancelled) setMlcSummary(map); })
+      .catch(() => { /* 배지는 보조 정보 — 실패해도 목록 동작에 영향 없음 */ });
+    return () => { cancelled = true; };
+  }, []);
 
   // 탭 변경 시 선택/수량 초기화
   const handleTabChange = (tabId: string) => {
@@ -266,6 +280,13 @@ export function PharmacyB2BPage() {
           </span>
         );
       },
+    },
+    {
+      // WO-O4O-KPA-STORE-PRODUCT-MULTILINGUAL-BADGES-PILOT-V1: targetKind=listing, targetId=listingId
+      key: 'multilingual',
+      title: '다국어',
+      width: '160px',
+      render: (_v, row) => <MultilingualContentBadge summary={mlcSummary.get(row.listingId)} />,
     },
     {
       key: 'retailPrice',

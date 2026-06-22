@@ -26,6 +26,9 @@ import type { LocalProduct, LocalProductInput, BadgeType } from '../../api/local
 import { RichTextEditor } from '@o4o/content-editor';
 // WO-O4O-MY-STORE-LOCAL-PRODUCTS-COMMON-COMPONENT-EXTRACTION-V1: 공통 배지/옵션
 import { LOCAL_PRODUCT_BADGE_OPTIONS as BADGE_OPTIONS, LocalProductBadge } from '@o4o/store-ui-core';
+// WO-O4O-KPA-STORE-PRODUCT-MULTILINGUAL-BADGES-PILOT-V1: 다국어 콘텐츠 연결 상태 배지
+import { getMlcSummaryMap, type StoreMlcSummaryItem } from '../../api/multilingualProductContentStore';
+import { MultilingualContentBadge, localeLabel } from '../../components/MultilingualContentBadge';
 
 // ==================== Constants ====================
 
@@ -41,6 +44,8 @@ export default function StoreLocalProductsPage() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // WO-O4O-KPA-STORE-PRODUCT-MULTILINGUAL-BADGES-PILOT-V1: 상품별 다국어 콘텐츠 연결 요약
+  const [mlcSummary, setMlcSummary] = useState<Map<string, StoreMlcSummaryItem>>(new Map());
 
   // Filter state
   const [searchQuery, setSearchQuery] = useState('');
@@ -97,6 +102,15 @@ export default function StoreLocalProductsPage() {
   useEffect(() => {
     loadProducts();
   }, [loadProducts]);
+
+  // WO-O4O-KPA-STORE-PRODUCT-MULTILINGUAL-BADGES-PILOT-V1: 다국어 콘텐츠 연결 요약 (org 단위 1회 조회)
+  useEffect(() => {
+    let cancelled = false;
+    getMlcSummaryMap('local')
+      .then((map) => { if (!cancelled) setMlcSummary(map); })
+      .catch(() => { /* 배지는 보조 정보 — 실패해도 목록 동작에 영향 없음 */ });
+    return () => { cancelled = true; };
+  }, []);
 
   // Filter products client-side by search query
   const filteredProducts = debouncedSearch
@@ -216,6 +230,13 @@ export default function StoreLocalProductsPage() {
       render: (_, product) => <LocalProductBadge badgeType={product.badge_type} />,
     },
     {
+      // WO-O4O-KPA-STORE-PRODUCT-MULTILINGUAL-BADGES-PILOT-V1
+      key: 'multilingual',
+      header: '다국어',
+      width: 160,
+      render: (_, product) => <MultilingualContentBadge summary={mlcSummary.get(product.id)} />,
+    },
+    {
       key: 'is_active',
       header: '활성',
       width: 64,
@@ -269,7 +290,7 @@ export default function StoreLocalProductsPage() {
         </div>
       ),
     },
-  ], [navigate]);
+  ], [navigate, mlcSummary]);
 
   return (
     <div className="space-y-6">
@@ -436,6 +457,8 @@ export default function StoreLocalProductsPage() {
           product={editingProduct}
           saving={saving}
           error={modalError}
+          mlcSummary={editingProduct ? mlcSummary.get(editingProduct.id) : undefined}
+          onNavigateHub={() => navigate('/store-hub/multilingual-product-contents')}
           onSave={handleSave}
           onClose={() => setShowModal(false)}
         />
@@ -450,12 +473,16 @@ function ProductFormModal({
   product,
   saving,
   error,
+  mlcSummary,
+  onNavigateHub,
   onSave,
   onClose,
 }: {
   product: LocalProduct | null;
   saving: boolean;
   error: string | null;
+  mlcSummary?: StoreMlcSummaryItem;
+  onNavigateHub: () => void;
   onSave: (data: LocalProductInput) => void;
   onClose: () => void;
 }) {
@@ -514,6 +541,44 @@ function ProductFormModal({
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+          {/* WO-O4O-KPA-STORE-PRODUCT-MULTILINGUAL-BADGES-PILOT-V1: 연결된 다국어 콘텐츠 상세 */}
+          {product && (
+            mlcSummary ? (
+              <div className="rounded-xl border border-indigo-100 bg-indigo-50/50 p-4">
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <MultilingualContentBadge summary={mlcSummary} showLocales={false} />
+                    <span className="text-sm font-medium text-slate-800 truncate">{mlcSummary.title}</span>
+                    {mlcSummary.sourceType === 'operator_hub' && (
+                      <span className="inline-flex items-center px-2 py-0.5 text-[11px] rounded-full border bg-blue-50 border-blue-200 text-blue-700 shrink-0">운영자 자료 복사</span>
+                    )}
+                  </div>
+                  <span className="text-xs text-slate-400 shrink-0">
+                    {mlcSummary.status === 'published' ? '게시됨' : mlcSummary.status === 'draft' ? '작성 중' : mlcSummary.status}
+                    {' · '}
+                    {new Date(mlcSummary.updatedAt).toLocaleDateString('ko-KR')}
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {mlcSummary.locales.map((l) => (
+                    <span key={l} className="inline-flex items-center px-1.5 py-0.5 text-[11px] rounded border bg-white border-slate-200 text-slate-600">{localeLabel(l)}</span>
+                  ))}
+                </div>
+                <p className="text-[11px] text-slate-400 mt-2">QR/타블렛 노출은 후속 단계에서 연결됩니다.</p>
+              </div>
+            ) : (
+              <div className="rounded-xl border border-slate-100 bg-slate-50 p-4 text-sm">
+                <p className="text-slate-500">연결된 다국어 상품 안내 콘텐츠가 없습니다.</p>
+                <button
+                  type="button"
+                  onClick={onNavigateHub}
+                  className="mt-1 text-xs text-blue-600 hover:underline"
+                >
+                  Store Hub에서 다국어 상품 안내 콘텐츠 가져오기 →
+                </button>
+              </div>
+            )
+          )}
           <Field label="상품명" required>
             <input
               type="text"

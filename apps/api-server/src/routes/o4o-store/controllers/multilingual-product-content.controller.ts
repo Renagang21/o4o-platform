@@ -258,6 +258,63 @@ export function createMultilingualProductContentController(
     }),
   );
 
+  // GET /pharmacy/multilingual-product-contents/summary
+  // WO-O4O-KPA-STORE-PRODUCT-MULTILINGUAL-BADGES-PILOT-V1
+  // 상품 목록 화면에서 상품별 다국어 콘텐츠 연결 상태 배지를 N+1 없이 표시하기 위한 집계 API.
+  // org-scoped + contentKey='default' 한정. targetKind 로 필터(local|listing) 가능.
+  router.get(
+    '/pharmacy/multilingual-product-contents/summary',
+    requireAuth,
+    requireStoreOwner,
+    asyncHandler(async (req: Request, res: Response) => {
+      const organizationId = (req as any).organizationId as string;
+      const targetKind = req.query.targetKind;
+
+      const params: unknown[] = [organizationId];
+      let where = `WHERE g.organization_id = $1
+                     AND g.content_key = 'default'
+                     AND g.status <> 'archived'`;
+      if (isOneOf(targetKind, TARGET_KINDS)) {
+        params.push(targetKind);
+        where += ` AND g.target_kind = $${params.length}`;
+      }
+
+      const rows = await dataSource.query(
+        `SELECT
+           g.id AS "groupId",
+           g.target_kind AS "targetKind",
+           g.target_id AS "targetId",
+           g.title,
+           g.status,
+           g.source_type AS "sourceType",
+           g.default_locale AS "defaultLocale",
+           g.updated_at AS "updatedAt",
+           COALESCE(
+             ARRAY_AGG(p.locale ORDER BY p.is_default DESC, p.sort_order ASC, p.locale ASC)
+               FILTER (WHERE p.id IS NOT NULL AND p.status <> 'archived'),
+             '{}'
+           ) AS "locales",
+           COUNT(p.id) FILTER (WHERE p.status = 'published')::int AS "publishedLocaleCount"
+         FROM store_multilingual_product_content_groups g
+         LEFT JOIN store_multilingual_product_content_pages p ON p.group_id = g.id
+         ${where}
+         GROUP BY g.id
+         ORDER BY g.updated_at DESC
+         LIMIT 500`,
+        params,
+      );
+
+      res.json({
+        success: true,
+        data: rows.map((r: any) => ({
+          ...r,
+          locales: r.locales ?? [],
+          localeCount: (r.locales ?? []).length,
+        })),
+      });
+    }),
+  );
+
   // GET /pharmacy/multilingual-product-contents/hub — browse published operator HUB originals
   // WO-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-HUB-FLOW-PILOT-V1
   router.get(

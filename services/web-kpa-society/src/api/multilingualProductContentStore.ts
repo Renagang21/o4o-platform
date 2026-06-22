@@ -131,6 +131,37 @@ export async function listMyMlcGroups(
   return json.data;
 }
 
+/**
+ * 상품별 다국어 콘텐츠 연결 상태 요약 (목록 배지용)
+ * WO-O4O-KPA-STORE-PRODUCT-MULTILINGUAL-BADGES-PILOT-V1
+ */
+export interface StoreMlcSummaryItem {
+  groupId: string;
+  targetKind: StoreMlcTargetKind;
+  targetId: string;
+  title: string;
+  status: StoreMlcStatus;
+  sourceType: string;
+  defaultLocale: StoreMlcLocale;
+  updatedAt: string;
+  locales: StoreMlcLocale[];
+  localeCount: number;
+  publishedLocaleCount: number;
+}
+
+/** targetId → 요약 매핑 (N+1 없이 목록 배지 렌더) */
+export async function getMlcSummaryMap(
+  targetKind: StoreMlcTargetKind,
+): Promise<Map<string, StoreMlcSummaryItem>> {
+  const json = await authFetch(`${getApiBase()}/summary?targetKind=${encodeURIComponent(targetKind)}`);
+  const items: StoreMlcSummaryItem[] = json.data ?? [];
+  const map = new Map<string, StoreMlcSummaryItem>();
+  for (const item of items) {
+    if (item?.targetId) map.set(item.targetId, item);
+  }
+  return map;
+}
+
 /** 언어 fallback resolve (검증용) */
 export async function resolveMlc(
   groupId: string,
