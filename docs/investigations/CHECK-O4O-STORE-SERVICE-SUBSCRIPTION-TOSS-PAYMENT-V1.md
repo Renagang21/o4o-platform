@@ -3,7 +3,7 @@
 > **작업명:** WO-O4O-STORE-SERVICE-SUBSCRIPTION-TOSS-PAYMENT-V1
 > **유형:** backend(결제 prepare/confirm + entitlement 발급/연장) + frontend(결제 진입 UI). PaymentCore/Toss adapter **재사용**, schema/migration **0**.
 > **결과(Phase 1 backend): PASS(코드/타입) — `STORE_SERVICE_SUBSCRIPTION` 결제 prepare/confirm + FOREIGN_VISITOR_SALES_SUPPORT 이용권 ACTIVE 생성/30일 연장(idempotent). api-server tsc 0.**
-> **결과(Phase 2 frontend): PASS(코드/타입/빌드) — Panel 결제 버튼(하위호환) + prepare→Toss→success confirm 전용 흐름. web-kpa-society tsc 0 + build 0, Panel 3소비처(kpa/glyco/kcos) tsc 0. 브라우저 smoke(진입/위젯)는 배포 후 예정 · 실 결제 운영 금지.**
+> **결과(Phase 2 frontend): 조건부 완료 — 코드/타입/빌드/배포 PASS. Panel 결제 버튼(하위호환) + prepare→Toss→success confirm 전용 흐름. web-kpa-society tsc 0 + build 0 + 배포 success, Panel 3소비처(kpa/glyco/kcos) tsc 0. 브라우저 smoke는 환경 블로커(Playwright Chrome 프로필 점유)로 보류 — 코드 무관, 프로필 lock 해소 후 1회 비파괴 재시도(§9 절차). 실 결제(confirm) 운영 금지.**
 > **작성일:** 2026-06-22
 > 선행: 소비자→매장 결제(STORE_SALE_PAYMENT) 410 제거 완료 · `store_paid_feature_entitlements`(WO-...-ENTITLEMENT-V1, read-only)
 
@@ -96,7 +96,17 @@
 ### 검증 (Phase 2)
 - web-kpa-society `tsc --noEmit`: **EXIT 0**. web-glycopharm/web-k-cosmetics `tsc`: **EXIT 0**(Panel 변경 하위호환 실증).
 - `pnpm --filter @o4o/web-kpa-society build`(tsc && vite build): **EXIT 0**(✓ built 45.66s).
-- 브라우저 smoke: 진입 화면 결제 버튼 노출/prepare→Toss 위젯 진입은 배포 후 store-owner 계정으로 확인(예정). **실 결제(confirm)는 운영 금지 — sandbox/local 한정.**
+- web-kpa-society 배포: **success**(`Deploy Web Services` run 27932854454, detect-changes `kpa-society=true`, 2m49s) — 변경 4파일 감지 확인.
+- 브라우저 smoke: **보류(환경 블로커, 코드 무관)**. Playwright Chrome 프로필 `C:\Users\home\.playwright-o4o-profile` 가 이미 열려 있는 Chrome 인스턴스에 점유되어 새 브라우저 세션이 즉시 종료(exitCode=0, "현재 프로필이 사용 중입니다"). 동일 시도 반복 금지 — 코드/타입/빌드/배포 PASS 상태로 조건부 완료.
+
+#### 후속 비파괴 smoke 절차 (Chrome 프로필 점유 해소 후 1회)
+1. 열린 Chrome 전부 종료 → Playwright 프로필 lock 해제.
+2. 로그인 화면 → **"체험용 약국 경영자 계정"**(store-owner 자동 로그인).
+3. `/store/sales-channels/foreign-visitor` 진입 → 현재 구독 상태 + **"월 이용권 결제하기"** 버튼 노출 확인.
+4. 버튼 클릭 → `POST /api/v1/store-entitlements/subscriptions/prepare` 응답 확인: `orderId` prefix **`o4o_sub_`**, `clientKey` 포함. (metadata.paymentType=STORE_SERVICE_SUBSCRIPTION / planCode=FOREIGN_VISITOR_SALES_SUPPORT 는 서버 prepare 고정.)
+5. Toss 결제창 진입 확인 → **결제하지 말고 즉시 중단**(confirm 0건).
+6. network 혼입 0: 소비자 checkout(`STORE_SALE_PAYMENT` / `/store/:slug/payment`) route 미호출 확인.
+> 실 결제(confirm)는 운영 금지 — sandbox/local 한정.
 
 ### 가격(placeholder)/me-check 후속
 - `STORE_SUBSCRIPTION_PLAN_PRICES.FOREIGN_VISITOR_SALES_SUPPORT = 99000` 하드코딩(Phase 1) — 프론트는 prepare 응답 amount 사용(위변조 불가). 가격 확정 + DB화는 PLAN-CATALOG-V1.
