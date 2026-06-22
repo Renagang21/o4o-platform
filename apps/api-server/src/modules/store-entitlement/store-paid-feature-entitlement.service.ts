@@ -62,6 +62,32 @@ export class StorePaidFeatureEntitlementService {
   }
 
   /**
+   * WO-O4O-STORE-ENTITLEMENTS-CHECK-ENDSAT-EXPOSURE-V1:
+   * /me/check 응답용 — 활성 여부 + 만료일(endsAt)/상태 포함.
+   *   active = status==='ACTIVE' && startsAt<=now && endsAt>now && endsAt!=null
+   *           (endsAt null 은 V1 정책상 비활성으로 간주)
+   *   비활성(행 없음 / 만료 / 미시작 / 취소 / endsAt null) → status/startsAt/endsAt = null.
+   * 동일 플랜 다중 행 대비 endsAt DESC 우선(현재 UNIQUE(org,serviceKey,planCode) 로 단일 행).
+   */
+  async getEntitlementStatus(
+    organizationId: string,
+    serviceKey: string,
+    planCode: StorePaidFeaturePlanCode,
+    now: Date = new Date(),
+  ): Promise<{ active: boolean; status: 'ACTIVE' | null; startsAt: Date | null; endsAt: Date | null }> {
+    const row = await this.repo.findOne({
+      where: { organizationId, serviceKey, planCode },
+      order: { endsAt: 'DESC' },
+    });
+    const active =
+      !!row && row.endsAt != null && StorePaidFeatureEntitlementService.isActive(row, now);
+    if (!active || !row) {
+      return { active: false, status: null, startsAt: null, endsAt: null };
+    }
+    return { active: true, status: 'ACTIVE', startsAt: row.startsAt ?? null, endsAt: row.endsAt ?? null };
+  }
+
+  /**
    * WO-O4O-STORE-SERVICE-SUBSCRIPTION-TOSS-PAYMENT-V1:
    * 결제 성공 후처리 — 이용권 ACTIVE 생성/연장(1회 결제형 N일 이용권).
    *   - 현재 ACTIVE & endsAt > now: startsAt 유지, endsAt += durationDays (연장)

@@ -146,12 +146,24 @@ export function createStoreEntitlementRoutes(dataSource: DataSource): Router {
 
       const { isOwner, organizationId } = await isStoreOwner(dataSource, userId, serviceKey);
       // 조직을 해석할 수 없으면(비-owner 또는 org 미연결) 이용권 없음으로 간주.
-      const active =
+      // WO-O4O-STORE-ENTITLEMENTS-CHECK-ENDSAT-EXPOSURE-V1: active 뿐 아니라 endsAt/startsAt/status 노출.
+      const status =
         isOwner && organizationId
-          ? await service.hasActiveEntitlement(organizationId, serviceKey, planCode)
-          : false;
+          ? await service.getEntitlementStatus(organizationId, serviceKey, planCode)
+          : { active: false, status: null as 'ACTIVE' | null, startsAt: null as Date | null, endsAt: null as Date | null };
 
-      return res.json({ success: true, data: { serviceKey, planCode, active } });
+      return res.json({
+        success: true,
+        data: {
+          serviceKey,
+          planCode,
+          featureCode: planCode, // WO 표기 정합 (planCode 와 동일 값, 하위호환으로 둘 다 노출)
+          active: status.active,
+          status: status.status,
+          startsAt: status.startsAt ? status.startsAt.toISOString() : null,
+          endsAt: status.endsAt ? status.endsAt.toISOString() : null,
+        },
+      });
     } catch (error) {
       logger.error('[StoreEntitlement] me/check error:', error);
       return res.status(500).json({ success: false, error: 'Internal error', code: 'INTERNAL_ERROR' });
