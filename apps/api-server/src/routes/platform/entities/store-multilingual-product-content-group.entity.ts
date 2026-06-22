@@ -65,6 +65,13 @@ export class StoreMultilingualProductContentGroup {
   @Column({ name: 'source_ref_id', type: 'uuid', nullable: true })
   sourceRefId?: string | null;
 
+  /**
+   * WO-O4O-MULTILINGUAL-PRODUCT-QR-LANDING-V1
+   * Hard-to-guess key for the unauthenticated public/QR landing. Issued lazily.
+   */
+  @Column({ name: 'public_key', type: 'varchar', length: 40, nullable: true })
+  publicKey?: string | null;
+
   @Column({ type: 'varchar', length: 30, default: 'draft' })
   status!: StoreMultilingualProductContentStatus;
 

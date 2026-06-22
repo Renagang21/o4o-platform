@@ -10,6 +10,7 @@
 
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
+import { randomBytes } from 'crypto';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
 
@@ -157,6 +158,12 @@ function pickFallbackPage(pages: any[], requestedLocale: Locale | null, defaultL
   return null;
 }
 
+// WO-O4O-MULTILINGUAL-PRODUCT-QR-LANDING-V1
+// Hard-to-guess url-safe key for the unauthenticated public/QR landing.
+function generatePublicKey(): string {
+  return randomBytes(12).toString('hex'); // 24 chars
+}
+
 export function createMultilingualProductContentController(
   dataSource: DataSource,
   requireAuth: AuthMiddleware,
@@ -164,6 +171,85 @@ export function createMultilingualProductContentController(
 ): Router {
   const router = Router();
   const requireStoreOwner = createRequireStoreOwner(dataSource, serviceKey);
+
+  // ─── PUBLIC: GET /public/multilingual-product-contents/:publicKey?locale=en ───
+  // WO-O4O-MULTILINGUAL-PRODUCT-QR-LANDING-V1
+  // Unauthenticated landing resolve over the STORE COPY (never the operator original).
+  // Only published pages of a non-archived group are exposed; internal ids/refs are stripped.
+  router.get(
+    '/public/multilingual-product-contents/:publicKey',
+    asyncHandler(async (req: Request, res: Response) => {
+      const publicKey = typeof req.params.publicKey === 'string' ? req.params.publicKey.trim() : '';
+      if (!publicKey || publicKey.length > 40) {
+        res.status(404).json({ success: false, error: 'Not found', code: 'NOT_FOUND' });
+        return;
+      }
+
+      const groupRows = await dataSource.query(
+        `SELECT id, target_kind AS "targetKind", content_key AS "contentKey",
+                title, default_locale AS "defaultLocale", status, updated_at AS "updatedAt"
+         FROM store_multilingual_product_content_groups
+         WHERE public_key = $1
+         LIMIT 1`,
+        [publicKey],
+      );
+      const group = groupRows[0];
+      if (!group || group.status === 'archived') {
+        res.status(404).json({ success: false, error: 'Not found', code: 'NOT_FOUND' });
+        return;
+      }
+
+      const pages = await dataSource.query(
+        `SELECT locale, title, summary, content_format AS "contentFormat",
+                content, assets, buttons, is_default AS "isDefault",
+                sort_order AS "sortOrder", updated_at AS "updatedAt"
+         FROM store_multilingual_product_content_pages
+         WHERE group_id = $1 AND status = 'published'
+         ORDER BY is_default DESC, sort_order ASC, locale ASC`,
+        [group.id],
+      );
+
+      const availableLocales: string[] = pages.map((p: any) => p.locale);
+      if (pages.length === 0) {
+        res.status(404).json({
+          success: false,
+          error: 'No published page',
+          code: 'NO_PUBLISHED_PAGE',
+          data: { title: group.title, targetKind: group.targetKind, availableLocales: [] },
+        });
+        return;
+      }
+
+      const requested = isOneOf(req.query.locale, LOCALES) ? (req.query.locale as Locale) : null;
+      const page = pickFallbackPage(pages, requested, group.defaultLocale);
+
+      res.json({
+        success: true,
+        data: {
+          title: group.title,
+          targetKind: group.targetKind,
+          contentKey: group.contentKey,
+          defaultLocale: group.defaultLocale,
+          requestedLocale: requested,
+          resolvedLocale: page?.resolvedLocale ?? null,
+          fallbackUsed: page ? page.fallbackReason != null : false,
+          availableLocales,
+          page: page
+            ? {
+                locale: page.locale,
+                title: page.title,
+                summary: page.summary,
+                contentFormat: page.contentFormat,
+                content: page.content,
+                assets: page.assets,
+                buttons: page.buttons,
+                updatedAt: page.updatedAt,
+              }
+            : null,
+        },
+      });
+    }),
+  );
 
   // GET /pharmacy/multilingual-product-contents
   router.get(
@@ -312,6 +398,76 @@ export function createMultilingualProductContentController(
           localeCount: (r.locales ?? []).length,
         })),
       });
+    }),
+  );
+
+  // POST /pharmacy/multilingual-product-contents/:groupId/public-key
+  // WO-O4O-MULTILINGUAL-PRODUCT-QR-LANDING-V1
+  // Idempotently issue (or return existing) the public/QR key for a store-scoped group.
+  router.post(
+    '/pharmacy/multilingual-product-contents/:groupId/public-key',
+    requireAuth,
+    requireStoreOwner,
+    asyncHandler(async (req: Request, res: Response) => {
+      const organizationId = (req as any).organizationId as string;
+      const groupId = asString(req.params.groupId, 80);
+      if (!groupId) {
+        res.status(400).json({ success: false, error: 'groupId is required', code: 'VALIDATION_ERROR' });
+        return;
+      }
+
+      const rows = await dataSource.query(
+        `SELECT id, public_key AS "publicKey", status
+         FROM store_multilingual_product_content_groups
+         WHERE id = $1 AND organization_id = $2
+         LIMIT 1`,
+        [groupId, organizationId],
+      );
+      const group = rows[0];
+      if (!group) {
+        res.status(404).json({ success: false, error: 'Content group not found', code: 'NOT_FOUND' });
+        return;
+      }
+      if (group.status === 'archived') {
+        res.status(400).json({ success: false, error: 'Archived content cannot be published', code: 'GROUP_ARCHIVED' });
+        return;
+      }
+      if (group.publicKey) {
+        res.json({ success: true, data: { publicKey: group.publicKey } });
+        return;
+      }
+
+      // generate with a few collision retries against the unique index
+      let publicKey: string | null = null;
+      for (let attempt = 0; attempt < 5 && !publicKey; attempt++) {
+        const candidate = generatePublicKey();
+        const updated = await dataSource.query(
+          `UPDATE store_multilingual_product_content_groups
+           SET public_key = $1, updated_at = now()
+           WHERE id = $2 AND organization_id = $3 AND public_key IS NULL
+             AND NOT EXISTS (
+               SELECT 1 FROM store_multilingual_product_content_groups WHERE public_key = $1
+             )
+           RETURNING public_key AS "publicKey"`,
+          [candidate, groupId, organizationId],
+        );
+        if (updated[0]?.publicKey) {
+          publicKey = updated[0].publicKey;
+        } else {
+          // either another request set it first, or candidate collided — re-read
+          const reread = await dataSource.query(
+            `SELECT public_key AS "publicKey" FROM store_multilingual_product_content_groups WHERE id = $1`,
+            [groupId],
+          );
+          if (reread[0]?.publicKey) publicKey = reread[0].publicKey;
+        }
+      }
+
+      if (!publicKey) {
+        res.status(500).json({ success: false, error: 'Failed to issue public key', code: 'PUBLIC_KEY_ISSUE_FAILED' });
+        return;
+      }
+      res.json({ success: true, data: { publicKey } });
     }),
   );
 
