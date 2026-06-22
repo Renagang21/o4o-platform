@@ -214,7 +214,7 @@ export function createMultilingualProductContentController(
 
       const pages = await dataSource.query(
         `SELECT locale, title, summary, content_format AS "contentFormat",
-                content, assets, buttons, is_default AS "isDefault",
+                content, assets, buttons, status, is_default AS "isDefault",
                 sort_order AS "sortOrder", updated_at AS "updatedAt"
          FROM store_multilingual_product_content_pages
          WHERE group_id = $1 AND status = 'published'
