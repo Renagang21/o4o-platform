@@ -77,6 +77,24 @@ export class ForeignVisitorPartnerQrCodeService {
     return this.repo.findOne({ where: { id: qrCodeId, organizationId, serviceKey } });
   }
 
+  /**
+   * WO-O4O-FOREIGN-VISITOR-AFFILIATE-LANDING-V1:
+   * public landing 용 shortCode 해석(인증 없음). 활성(ACTIVE)이고 유효기간 내일 때만 반환.
+   *   - 비활성/미존재/유효기간 밖 → null (라우트가 404).
+   *   - scan event 미기록(no-op) · partnerId 미노출은 라우트 책임.
+   * shortCode 는 전역 UNIQUE 이므로 serviceKey 없이 식별 가능.
+   */
+  async resolvePublicByShortCode(
+    shortCode: string,
+    now: Date = new Date(),
+  ): Promise<ForeignVisitorPartnerQrCode | null> {
+    const qr = await this.repo.findOne({ where: { shortCode } });
+    if (!qr || qr.status !== 'ACTIVE') return null;
+    if (qr.validFrom && qr.validFrom.getTime() > now.getTime()) return null;
+    if (qr.validTo && qr.validTo.getTime() < now.getTime()) return null;
+    return qr;
+  }
+
   /** 생성 — shortCode/landingUrl 서버 생성, 템플릿 AFFILIATE_MARKETING 고정. */
   async create(
     organizationId: string,

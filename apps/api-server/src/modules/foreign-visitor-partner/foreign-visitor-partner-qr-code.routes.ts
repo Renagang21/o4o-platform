@@ -16,13 +16,15 @@
  * ⚠️ landing 본 구현/scan event/결제 와 무관. Neture partner 와 별개.
  */
 import { Router } from 'express';
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
 import { requireAuth } from '../../middleware/auth.middleware.js';
 import type { AuthRequest } from '../../types/auth.js';
 import logger from '../../utils/logger.js';
 import { isStoreOwner, type StoreOwnerServiceKey } from '../../utils/store-owner.utils.js';
 import { generateQrSvg } from '../../services/qr-print.service.js';
+// WO-O4O-FOREIGN-VISITOR-AFFILIATE-LANDING-V1: public landing 의 store slug 연결용(multilingual landing 과 동일 SSOT)
+import { StoreSlugService, type StoreSlugServiceKey } from '@o4o/platform-core/store-identity';
 import { StorePaidFeatureEntitlementService } from '../store-entitlement/store-paid-feature-entitlement.service.js';
 import { ForeignVisitorPartnerService } from './foreign-visitor-partner.service.js';
 import { ForeignVisitorPartnerQrCodeService } from './foreign-visitor-partner-qr-code.service.js';
@@ -237,6 +239,48 @@ export function createForeignVisitorPartnerQrCodeRoutes(dataSource: DataSource):
       return res.send(svg);
     } catch (error) {
       logger.error('[FVPartnerQr] svg error:', error);
+      return res.status(500).json({ success: false, error: 'Internal error', code: 'INTERNAL_ERROR' });
+    }
+  });
+
+  // ── PUBLIC (no auth): WO-O4O-FOREIGN-VISITOR-AFFILIATE-LANDING-V1 ──
+  // GET /affiliate/:shortCode/resolve — QR 스캔 landing 해석. shortCode → store 식별(공개 안전 필드만).
+  //   scan event 미기록(no-op) · partnerId/내부 id 미노출 · 결제 무관 · 비활성/만료/미존재 → 404.
+  router.get('/affiliate/:shortCode/resolve', async (req: Request, res: Response) => {
+    try {
+      const shortCode = String(req.params.shortCode || '').trim();
+      if (!shortCode || shortCode.length > 40) {
+        return res.status(404).json({ success: false, error: 'Not found', code: 'AFFILIATE_QR_NOT_FOUND' });
+      }
+      const qr = await qrService.resolvePublicByShortCode(shortCode);
+      if (!qr) {
+        return res.status(404).json({ success: false, error: 'Not found', code: 'AFFILIATE_QR_NOT_FOUND' });
+      }
+      // 조직명(storeName) + store slug — 공개 landing 표시/연결용(둘 다 graceful, 없으면 null).
+      let storeName: string | null = null;
+      try {
+        const rows = await dataSource.query(`SELECT name FROM organizations WHERE id = $1 LIMIT 1`, [qr.organizationId]);
+        storeName = rows?.[0]?.name ?? null;
+      } catch { /* graceful */ }
+      let storeSlug: string | null = null;
+      try {
+        const slugRecord = await new StoreSlugService(dataSource).findByStoreId(qr.organizationId, qr.serviceKey as StoreSlugServiceKey);
+        storeSlug = slugRecord?.slug ?? null;
+      } catch { /* graceful */ }
+
+      return res.json({
+        success: true,
+        data: {
+          shortCode: qr.shortCode,
+          serviceKey: qr.serviceKey,
+          storeName,
+          storeSlug,
+          campaignName: qr.campaignName ?? null,
+          language: qr.language ?? null,
+        },
+      });
+    } catch (error) {
+      logger.error('[FVPartnerQr] affiliate resolve error:', error);
       return res.status(500).json({ success: false, error: 'Internal error', code: 'INTERNAL_ERROR' });
     }
   });
