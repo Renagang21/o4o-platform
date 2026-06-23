@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
-import zipfile, os, re
+# 사용법: python repack.py "<출력 pptx 경로>"
+#   인자 없으면 환경변수 OSMU_OUT, 그것도 없으면 작업폴더에 out.pptx 생성.
+#   (집 PC 등 경로가 다른 환경에서 하드코딩 경로 의존 제거)
+import zipfile, os, re, sys
 
-out = r'C:\Users\home\OneDrive\개인계정\Documents\자일리톨 그린껌_동영상용.pptx'
+out = (sys.argv[1] if len(sys.argv) > 1
+       else os.environ.get('OSMU_OUT')
+       or os.path.abspath('out.pptx'))
 if os.path.exists(out):
     os.remove(out)
 
@@ -10,7 +15,7 @@ for root, dirs, fs in os.walk('.'):
     for f in fs:
         full = os.path.join(root, f)
         rel = os.path.relpath(full, '.').replace(os.sep, '/')
-        if rel in ('inject.py', 'repack.py'):
+        if rel.endswith('.py'):
             continue
         files.append(rel)
 
