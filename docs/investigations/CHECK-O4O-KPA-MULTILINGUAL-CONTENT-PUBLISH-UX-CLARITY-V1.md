@@ -56,16 +56,20 @@ GP / KCos / Neture / 태블릿 / 결제 / 관광객앱 — 미접촉
 - 변경 = web 2파일 + 본 CHECK. pnpm-lock.yaml·다른 세션 WIP 미접촉, 명시적 pathspec 커밋.
 - UI smoke(배포 후): §6.
 
-## 6. 배포 후 UI smoke — *pending*
+## 6. 배포 후 UI smoke — **PASS** (2026-06-23, Playwright)
+
+- 배포: Deploy Web Services (Cloud Run) `73e01a368` **success**.
+- KPA 운영자 로그인 → `/admin/kpa-dashboard` 랜딩(멀티롤) → operator route hard-nav.
+- **목록** `/operator/multilingual-product-contents`: "HUB 노출" 컬럼 렌더 ✅. 라이브 배지 `그룹 초안`·`보관됨` 관측(현재 5행 한정 — `HUB 노출 가능`/`발행된 언어 없음`은 해당 데이터 없어 미관측이나 코드 경로 동일). 첫 행 `test`(영어 page 발행 + 그룹 draft) → **`그룹 초안`** 올바른 우선 판정.
+- **발행 가드**: 발행된 언어 0개(그룹 초안) 행에서 발행 클릭 → toast **"발행된 언어 페이지가 없습니다 …"** 확인, backend 미호출(무변경) ✅.
+- **작성/수정**: 상단 안내 배너(상태별 문구 + 조건 설명) ✅ / 언어 탭 상태 텍스트 `발행됨`·`미작성` ✅ / 버튼 `임시 저장`·`저장 후 이 언어 발행` ✅ / `초안으로 내리기` 유지.
+- console error: footer 법령문서(terms/privacy) 404 4건 — **pre-existing/무관**(api.neture.co.kr legal docs 미시드, 본 WO와 무관). MLC API 4xx/5xx 0. pageError 0.
+- 회귀: 목록 로드·작성 화면 진입·언어 page 발행 상태 표시 정상. published-only 노출 정책 불변.
+
+## 7-A. 판정
 
 ```text
-1. KPA operator 로그인 → /operator/multilingual-product-contents
-2. 목록 "HUB 노출" 배지: 초안=그룹 초안 / 그룹만 발행=발행된 언어 없음 / 정상=HUB 노출 가능
-3. 발행 언어 0개인 그룹 발행 시도 → 차단 toast 확인
-4. 작성/수정 화면 상단 상태별 안내 배너 확인
-5. 언어 탭 상태 텍스트(발행됨/초안/미작성) 확인
-6. 버튼 문구 "임시 저장" / "저장 후 이 언어 발행" 확인
-7. console error 0 / 관련 4xx·5xx 0
+WO-O4O-KPA-MULTILINGUAL-CONTENT-PUBLISH-UX-CLARITY-V1 → CLOSED / PASS
 ```
 
 ## 7. 완료 기준 대비
