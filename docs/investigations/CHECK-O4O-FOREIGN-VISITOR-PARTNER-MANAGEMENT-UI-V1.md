@@ -62,12 +62,17 @@ updateForeignVisitorPartnerStatus(id, status)
 - web-kpa-society `tsc --noEmit`: **EXIT 0** · `build`(tsc && vite build): **EXIT 0**(✓ built 14.63s).
 - backend 무변경 → shared 소비처 영향 없음.
 
-### 배포 후 브라우저 smoke (예정, 비파괴)
-1. store-owner 로그인 → `/store/sales-channels/foreign-visitor` → "파트너 관리" 진입점.
-2. `/store/sales-channels/foreign-visitor/partners` → 목록 렌더 + `GET /foreign-visitor/partners?serviceKey=kpa` 200.
-3. entitlement 보유 → 등록 모달 작동(생성은 local/staging 또는 명시 승인 후).
-4. entitlement 미보유 → 등록/수정 버튼 disabled + 안내(또는 쓰기 시 403 ENTITLEMENT_REQUIRED 안내).
-> 운영 smoke 는 read-only(GET) 우선. 데이터 생성은 신중히.
+### 배포 후 smoke 결과 (2026-06-23, 비파괴)
+- web-kpa 배포 **success**(Deploy Web Services run 28004610970, 2m51s).
+- **backend route 라이브(서버측 확정):** `GET /api/v1/foreign-visitor/partners?serviceKey=kpa` 미인증 → **401 AUTH_REQUIRED**(404 아님) = 새 api 리비전에 route 등록·배포 확인.
+- **인증 visual smoke: 보류(환경 한계, 코드 무관).** ephemeral headless 로 데모 store-owner 로그인(/login 모달 "🧪 체험용 약국 경영자 계정") 시도 → **토큰·네트워크 호출 미발생**으로 인증 미성립(이전 CLIENT-KEY smoke 와 동일 — KPA 데모 로그인은 headless 에서 동작 안 함). 따라서 카드 노출/목록 GET 200/entitlement 배너 시각 확인은 **실브라우저 1회**로 분리.
+
+#### 실브라우저 read-only 확인 절차 (1회, 데이터 생성 없음)
+1. store-owner 로그인 → `/store/sales-channels/foreign-visitor` → "파트너 관리" 카드 노출.
+2. `/store/sales-channels/foreign-visitor/partners` → 목록/empty 렌더 + Network `GET /foreign-visitor/partners?serviceKey=kpa` **200**.
+3. entitlement 미보유 → 등록/수정 버튼 disabled + 안내 배너. 보유 → 등록 모달 작동(생성은 local/staging 또는 명시 승인 후).
+4. console error 0(본 WO 관련).
+> 운영은 read-only(GET) 우선. 데이터 생성은 신중히.
 
 ## 9. 후속 WO
 
