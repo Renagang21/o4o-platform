@@ -376,6 +376,8 @@ import {
 // Phase 1 에서 entity / migration / asset-snapshot 'pop' / queryPop placeholder 등은 적용됐으나
 // connection.ts entities 배열 등록이 누락되어 TypeORM repository 사용이 불가능했음.
 import { StorePop } from '../routes/o4o-store/entities/store-pop.entity.js';
+// WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: StoreVideo entity 등록 (POP 패턴 mirror, Phase 1 등록 포함).
+import { StoreVideo } from '../routes/o4o-store/entities/store-video.entity.js';
 // WO-O4O-KPA-OPERATOR-HUB-QR-TEMPLATE-FOUNDATION-V1: OperatorQrTemplate entity 등록.
 // POP Phase 1 누락 레슨 적용 — Phase 1 단계부터 entities 배열 등록 포함 (Phase 2 정합 보장).
 import { OperatorQrTemplate } from '../routes/o4o-store/entities/operator-qr-template.entity.js';
@@ -951,6 +953,8 @@ export const entities = [
   //   WO-O4O-KPA-POP-PUBLISHING-PHASE2-BACKEND-V1 entities 배열 등록)
   // ============================================================================
   StorePop,
+  // STORE VIDEO ENTITY (WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1) — QR 전용 동영상 콘텐츠
+  StoreVideo,
   // OPERATOR QR TEMPLATE ENTITY (WO-O4O-KPA-OPERATOR-HUB-QR-TEMPLATE-FOUNDATION-V1)
   // 운영자 발행 QR 청사진 — slug/organization_id/scan tracking 없음.
   // 매장 가져가기 시 기존 store_qr_codes 에 매장 사본 INSERT (Phase 3-B 후속).

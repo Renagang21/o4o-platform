@@ -112,6 +112,9 @@ export class HubContentQueryService {
         return this.queryPop(serviceKey, producer, page, limit);
       case 'qr':
         return this.queryQr(serviceKey, producer, page, limit);
+      case 'video':
+        // WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: 운영자 게시 동영상 (QR 전용)
+        return this.queryVideo(serviceKey, producer, page, limit);
       // (제거됨) case 'kpa-store-content' — WO-O4O-REMOVE-STORE-TO-COMMUNITY-SHARE-FLOW-V1.
       // Store → Community 공유 흐름 폐기로 store-shared 콘텐츠는 HUB 에 노출되지 않는다.
       default:
@@ -203,13 +206,17 @@ export class HubContentQueryService {
     // WO-O4O-KPA-OPERATOR-QR-PUBLISHING-PHASE2-BACKEND-V1:
     //   queryQr 추가 — 운영자 발행 QR template (author_role='operator', status='published')
     //   만 mixed 통합 목록에 포함. POP/Blog 와 동일 정책.
-    const [cms, media, playlists, blog, pop, qr] = await Promise.allSettled([
+    // WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1:
+    //   queryVideo 추가 — 운영자 게시 동영상 (author_role='operator', status='published') 만
+    //   mixed 통합 목록에 포함. POP/Blog 와 동일 정책. 사이니지와 무관 (QR 전용 도메인).
+    const [cms, media, playlists, blog, pop, qr, video] = await Promise.allSettled([
       this.queryCms(serviceKey, producer, 1, MAX_FETCH_PER_DOMAIN),
       this.querySignageMedia(serviceKey, producer, 1, MAX_FETCH_PER_DOMAIN),
       this.querySignagePlaylists(serviceKey, producer, 1, MAX_FETCH_PER_DOMAIN),
       this.queryBlog(serviceKey, producer, 1, MAX_FETCH_PER_DOMAIN),
       this.queryPop(serviceKey, producer, 1, MAX_FETCH_PER_DOMAIN),
       this.queryQr(serviceKey, producer, 1, MAX_FETCH_PER_DOMAIN),
+      this.queryVideo(serviceKey, producer, 1, MAX_FETCH_PER_DOMAIN),
     ]);
 
     const items: HubContentItemResponse[] = [];
@@ -217,6 +224,7 @@ export class HubContentQueryService {
     if (media.status === 'fulfilled') items.push(...media.value.data);
     if (playlists.status === 'fulfilled') items.push(...playlists.value.data);
     if (blog.status === 'fulfilled') items.push(...blog.value.data);
+    if (video.status === 'fulfilled') items.push(...video.value.data);
     if (pop.status === 'fulfilled') items.push(...pop.value.data);
     if (qr.status === 'fulfilled') items.push(...qr.value.data);
 
@@ -555,6 +563,82 @@ export class HubContentQueryService {
       title: p.title,
       description: p.excerpt ?? null,
       thumbnailUrl: null,
+      createdAt: createdAtRaw instanceof Date ? createdAtRaw.toISOString() : String(createdAtRaw),
+      authorRole: 'operator',
+    };
+  }
+
+  // ── Video (WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1 — Operator HUB Video Query) ──
+  //
+  //   QR 전용 동영상 콘텐츠. queryPop 패턴 그대로 mirror — store_videos 와 store_pops 의
+  //   스키마 형태가 동일하기 때문. 사이니지와 무관한 별도 도메인.
+  //
+  // 조회 조건:
+  //   - store_videos.author_role = 'operator'  (매장 사본 차단)
+  //   - store_videos.status = 'published'       (draft/archived 차단)
+  //   - store_videos.service_key = serviceKey   (cross-service 노출 차단)
+  //
+  // Raw SQL + Parameter Binding (Boundary Policy: Guard Rule 2).
+  // 복합 인덱스 IDX_store_videos_hub_query (service_key, author_role, status) 활용.
+  private async queryVideo(
+    serviceKey: string,
+    producer: HubProducer | undefined,
+    page: number,
+    limit: number,
+  ): Promise<HubContentListResponse> {
+    if (producer && producer !== 'operator') {
+      return { success: true, data: [], pagination: { page, limit, total: 0, totalPages: 0 } };
+    }
+    try {
+      const offset = (page - 1) * limit;
+
+      const rows = await this.dataSource.query(
+        `SELECT id, title, slug, description, video_url, status, published_at, created_at, service_key
+         FROM store_videos
+         WHERE service_key = $1
+           AND author_role = 'operator'
+           AND status = 'published'
+         ORDER BY COALESCE(published_at, created_at) DESC
+         LIMIT $2 OFFSET $3`,
+        [serviceKey, limit, offset],
+      );
+
+      const countRows = await this.dataSource.query(
+        `SELECT COUNT(*)::int AS total
+         FROM store_videos
+         WHERE service_key = $1
+           AND author_role = 'operator'
+           AND status = 'published'`,
+        [serviceKey],
+      );
+
+      const total = countRows[0]?.total ?? 0;
+
+      return {
+        success: true,
+        data: rows.map((r: any) => this.mapVideoItem(r)),
+        pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      };
+    } catch (error: any) {
+      if (error.message?.includes('does not exist')) {
+        return { success: true, data: [], pagination: { page, limit, total: 0, totalPages: 0 } };
+      }
+      throw error;
+    }
+  }
+
+  // store_videos row → HubContentItemResponse 매퍼. mapPopItem mirror.
+  //   sourceUrl 에 video_url 을 실어 frontend 가 미리보기/표시에 활용할 수 있게 한다.
+  private mapVideoItem(v: any): HubContentItemResponse {
+    const createdAtRaw = v.published_at ?? v.created_at;
+    return {
+      id: v.id,
+      sourceDomain: 'video',
+      producer: 'operator',
+      title: v.title,
+      description: v.description ?? null,
+      thumbnailUrl: null,
+      sourceUrl: v.video_url ?? null,
       createdAt: createdAtRaw instanceof Date ? createdAtRaw.toISOString() : String(createdAtRaw),
       authorRole: 'operator',
     };

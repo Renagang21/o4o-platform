@@ -37,7 +37,9 @@ export type HubVisibility = 'global' | 'service' | 'store';
  *   store_qr_codes 에 매장 사본 INSERT (IR-O4O-KPA-OPERATOR-HUB-QR-BUSINESS-DEFINITION-V1
  *   Option B 채택). 실 구현은 Phase 2 후속.
  */
-export type HubSourceDomain = 'cms' | 'signage-media' | 'signage-playlist' | 'blog' | 'pop' | 'qr';
+// WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1 (2026-06-23): 'video' 추가 (additive — 기존 소비처 무영향).
+//   QR 전용 동영상 콘텐츠 도메인. 사이니지와 무관 (별도 도메인).
+export type HubSourceDomain = 'cms' | 'signage-media' | 'signage-playlist' | 'blog' | 'pop' | 'qr' | 'video';
 
 // =============================================================================
 // API Response DTOs
@@ -111,4 +113,5 @@ export const HUB_SOURCE_DOMAIN_LABELS: Record<HubSourceDomain, string> = {
   blog: '블로그',
   pop: 'POP',
   qr: 'QR-code',
+  video: '동영상',
 };

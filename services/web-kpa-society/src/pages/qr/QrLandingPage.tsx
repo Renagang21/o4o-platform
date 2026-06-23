@@ -14,6 +14,8 @@ import { QrCode, ExternalLink, ArrowRight, AlertCircle } from 'lucide-react';
 import { colors } from '../../styles/theme';
 import { getQrLandingData } from '../../api/storeQr';
 import type { QrLandingData } from '../../api/storeQr';
+// WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: 동영상 전용 공개 뷰어
+import PublicVideoViewer from './PublicVideoViewer';
 
 const LANDING_TYPE_CONFIG: Record<string, { label: string; icon: 'arrow' | 'external' }> = {
   product: { label: '제품 보기', icon: 'arrow' },
@@ -117,6 +119,12 @@ export default function QrLandingPage() {
         </div>
       </div>
     );
+  }
+
+  // WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: 동영상 QR 이면 일반 카드 UI 대신 전용 뷰어로 분기.
+  //   헤더/사이드바/푸터 없는 전체 화면 동영상만 표시.
+  if (data.landingType === 'video') {
+    return <PublicVideoViewer videoUrl={data.videoUrl} title={data.title} />;
   }
 
   const config = LANDING_TYPE_CONFIG[data.landingType] || LANDING_TYPE_CONFIG.link;

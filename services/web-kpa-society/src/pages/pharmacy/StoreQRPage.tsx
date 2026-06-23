@@ -83,6 +83,8 @@ export function StoreQRPage() {
   const [formSlug, setFormSlug] = useState('');
   const [formLandingType, setFormLandingType] = useState('product');
   const [formLandingTargetId, setFormLandingTargetId] = useState('');
+  // WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: 내 매장 동영상 → QR 생성 prefill (library 자료와 별도 경로)
+  const [videoTarget, setVideoTarget] = useState<{ id: string; title: string } | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   // WO-O4O-QR-TEMPLATE-WORKFLOW-V1: title/description AI 생성 + template 상태
@@ -185,6 +187,56 @@ export function StoreQRPage() {
       })();
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: PharmacyVideoPage 에서 "QR 생성" 진입 시 동영상 대상 prefill.
+  //   landingType='video' + landingTargetId=동영상 사본 id. library 자료 흐름과 분리된 전용 폼.
+  useEffect(() => {
+    const state = location.state as { prefillVideo?: { id: string; title: string } } | null;
+    const pv = state?.prefillVideo;
+    if (pv && pv.id) {
+      setVideoTarget({ id: pv.id, title: pv.title });
+      setSelectedLibrary(null);
+      setFormLandingType('video');
+      setFormLandingTargetId(pv.id);
+      setFormTitle(pv.title);
+      setFormDescription('');
+      setFormSlug(toSlug(pv.title));
+      setFormError(null);
+      setCreating(true);
+      window.history.replaceState({}, document.title);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleCreateVideo = async () => {
+    if (!videoTarget) return;
+    if (!formSlug.trim()) {
+      setFormError('슬러그를 입력해주세요');
+      return;
+    }
+    setSaving(true);
+    setFormError(null);
+    try {
+      const res = await createStoreQrCode({
+        title: formTitle.trim() || videoTarget.title,
+        description: formDescription.trim() || undefined,
+        type: 'video',
+        landingType: 'video',
+        landingTargetId: videoTarget.id,
+        slug: formSlug.trim(),
+      });
+      if (res.success && res.data) {
+        setItems((prev) => [res.data, ...prev]);
+        setCreating(false);
+        setVideoTarget(null);
+      } else {
+        setFormError('저장에 실패했습니다');
+      }
+    } catch {
+      setFormError('슬러그가 이미 사용중이거나 저장에 실패했습니다');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const handleLibrarySelect = (item: LibrarySelectorResult) => {
     setSelectedLibrary(item);
@@ -428,6 +480,86 @@ export function StoreQRPage() {
               {printing ? 'PDF 생성 중...' : `선택 QR 출력 (${selectedIds.size})`}
             </button>
           )}
+        </div>
+      )}
+
+      {/* WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: 동영상 전용 QR 생성 폼 (library 자료 흐름과 분리) */}
+      {creating && videoTarget && (
+        <div style={styles.createForm}>
+          <div style={{ marginBottom: '16px' }}>
+            <h3 style={styles.formTitle}>동영상 QR 만들기</h3>
+            <p style={{ fontSize: '12px', color: colors.neutral400, margin: '6px 0 0' }}>
+              QR 스캔 시 동영상 전용 화면이 열립니다 (일반 메뉴 없이 동영상만 표시).
+            </p>
+          </div>
+
+          {/* 연결 대상 동영상 (읽기 전용) */}
+          <div style={styles.selectedLibraryCard}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                <span style={styles.assetTypeBadge}>동영상</span>
+              </div>
+              <p style={{ margin: 0, fontSize: '14px', fontWeight: 600, color: colors.neutral800 }}>
+                {videoTarget.title}
+              </p>
+            </div>
+          </div>
+
+          <div style={styles.formRow}>
+            <label style={styles.formLabel}>QR 제목</label>
+            <input
+              type="text"
+              value={formTitle}
+              onChange={(e) => setFormTitle(e.target.value)}
+              style={styles.input}
+              placeholder="QR 스캔 후 표시될 제목"
+              maxLength={60}
+            />
+          </div>
+
+          <div style={styles.formRow}>
+            <label style={styles.formLabel}>짧은 안내문 (선택)</label>
+            <input
+              type="text"
+              value={formDescription}
+              onChange={(e) => setFormDescription(e.target.value)}
+              style={styles.input}
+              placeholder="QR 스캔 후 표시될 짧은 설명 (선택)"
+              maxLength={150}
+            />
+          </div>
+
+          <div style={styles.formRow}>
+            <label style={styles.formLabel}>QR 주소 (URL 경로)</label>
+            <div style={styles.slugPreview}>
+              <span style={styles.slugBase}>{qrBaseUrl}</span>
+              <input
+                type="text"
+                value={formSlug}
+                onChange={(e) => setFormSlug(e.target.value.replace(/[^a-z0-9-]/g, ''))}
+                style={styles.slugInput}
+                placeholder="my-video-qr"
+              />
+            </div>
+          </div>
+
+          {formError && <p style={styles.formError}>{formError}</p>}
+
+          <div style={styles.formActions}>
+            <button
+              onClick={() => { setCreating(false); setVideoTarget(null); }}
+              style={styles.cancelBtn}
+            >
+              취소
+            </button>
+            <button
+              onClick={handleCreateVideo}
+              disabled={saving}
+              style={{ ...styles.saveBtn, opacity: saving ? 0.7 : 1 }}
+            >
+              {saving ? '저장 중...' : 'QR 만들기'}
+            </button>
+          </div>
         </div>
       )}
 

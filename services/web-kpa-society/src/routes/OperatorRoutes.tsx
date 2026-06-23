@@ -63,6 +63,9 @@ import OperatorPopWritePage from '../pages/operator/pop/OperatorPopWritePage';
 // WO-O4O-KPA-OPERATOR-QR-WRITE-PAGE-V1
 import OperatorQrListPage from '../pages/operator/qr/OperatorQrListPage';
 import OperatorQrWritePage from '../pages/operator/qr/OperatorQrWritePage';
+// WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: 운영자 매장 HUB 동영상 작성/관리 (QR 전용)
+import OperatorVideoListPage from '../pages/operator/video/OperatorVideoListPage';
+import OperatorVideoWritePage from '../pages/operator/video/OperatorVideoWritePage';
 // WO-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-HUB-FLOW-WEB-PILOT-V1
 import OperatorMultilingualContentListPage from '../pages/operator/multilingual-product-content/OperatorMultilingualContentListPage';
 import OperatorMultilingualContentWritePage from '../pages/operator/multilingual-product-content/OperatorMultilingualContentWritePage';
@@ -204,6 +207,11 @@ export function OperatorRoutes() {
           <Route path="qr" element={<OperatorQrListPage />} />
           <Route path="qr/new" element={<OperatorQrWritePage />} />
           <Route path="qr/:id/edit" element={<OperatorQrWritePage />} />
+
+          {/* 매장 HUB 동영상 (WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1 — QR 전용) */}
+          <Route path="video" element={<OperatorVideoListPage />} />
+          <Route path="video/new" element={<OperatorVideoWritePage />} />
+          <Route path="video/:id/edit" element={<OperatorVideoWritePage />} />
 
           {/* 매장 HUB 다국어 상품 콘텐츠 (WO-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-HUB-FLOW-WEB-PILOT-V1) */}
           <Route path="multilingual-product-contents" element={<OperatorMultilingualContentListPage />} />

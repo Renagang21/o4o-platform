@@ -40,6 +40,8 @@ export interface QrLandingData {
   imageUrl: string | null;
   libraryItemTitle: string | null;
   storeSlug: string | null;
+  // WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: landingType='video' 일 때 store_videos 사본의 외부 URL.
+  videoUrl?: string | null;
 }
 
 export interface StoreQrPaginatedResponse {

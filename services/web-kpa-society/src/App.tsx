@@ -191,6 +191,9 @@ const HubBlogLibraryPage = lazy(() => import('./pages/pharmacy/HubBlogLibraryPag
 // WO-O4O-KPA-STORE-HUB-POP-CONTENT-IMPORT-V1: 매장 HUB POP 진열 + 가져가기, 내 매장 POP 사본 관리
 const HubPopLibraryPage = lazy(() => import('./pages/pharmacy/HubPopLibraryPage').then(m => ({ default: m.HubPopLibraryPage })));
 const PharmacyPopPage = lazy(() => import('./pages/pharmacy/PharmacyPopPage').then(m => ({ default: m.PharmacyPopPage })));
+// WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: 매장 HUB 동영상 진열 + 가져가기, 내 매장 동영상 사본 관리 (QR 전용)
+const HubVideoLibraryPage = lazy(() => import('./pages/pharmacy/HubVideoLibraryPage').then(m => ({ default: m.HubVideoLibraryPage })));
+const PharmacyVideoPage = lazy(() => import('./pages/pharmacy/PharmacyVideoPage').then(m => ({ default: m.PharmacyVideoPage })));
 // WO-O4O-KPA-STORE-HUB-QR-CONTENT-IMPORT-V1: 매장 HUB QR 진열 + 가져가기 (매장 사본은 기존 StoreQRPage)
 const HubQrLibraryPage = lazy(() => import('./pages/pharmacy/HubQrLibraryPage').then(m => ({ default: m.HubQrLibraryPage })));
 // WO-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-HUB-FLOW-WEB-PILOT-V1
@@ -721,6 +724,8 @@ function App() {
             <Route path="pop" element={<HubPopLibraryPage />} />
             {/* WO-O4O-KPA-STORE-HUB-QR-CONTENT-IMPORT-V1: 매장 HUB QR 진열 + 가져가기 */}
             <Route path="qr" element={<HubQrLibraryPage />} />
+            {/* WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: 매장 HUB 동영상 진열 + 가져가기 */}
+            <Route path="video" element={<HubVideoLibraryPage />} />
             {/* WO-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-HUB-FLOW-WEB-PILOT-V1: 다국어 상품 콘텐츠 진열 + 가져가기 */}
             <Route path="multilingual-product-contents" element={<HubMultilingualContentLibraryPage />} />
             <Route path="multilingual-product-contents/my" element={<StoreMultilingualContentsMyPage />} />
@@ -1020,6 +1025,8 @@ function App() {
             <Route path="content/blog" element={<PharmacyBlogPage />} />
             {/* WO-O4O-KPA-STORE-HUB-POP-CONTENT-IMPORT-V1: 매장 POP 사본 관리 (운영자 HUB 에서 가져온 사본 수정) */}
             <Route path="content/pop" element={<PharmacyPopPage />} />
+            {/* WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: 매장 동영상 사본 관리 (가져온 사본 수정 + QR 생성 진입) */}
+            <Route path="content/video" element={<PharmacyVideoPage />} />
             <Route path="content/direct/:id" element={<StoreDirectContentPage />} />
             <Route path="content/:snapshotId/edit" element={<StoreContentEditPage />} />
             {/* WO-O4O-STORE-HUB-LEGACY-LIST-CLEANUP-V1: billing 라우트 제거 (사이드바 미노출, API 미연결 placeholder) */}

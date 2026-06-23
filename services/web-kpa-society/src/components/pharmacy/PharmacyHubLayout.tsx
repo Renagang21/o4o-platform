@@ -26,6 +26,7 @@ import {
   Newspaper,
   Megaphone,
   QrCode,
+  Video,
   type LucideIcon,
 } from 'lucide-react';
 import { colors } from '../../styles/theme';
@@ -54,6 +55,8 @@ const HUB_MENU_ITEMS: HubMenuItem[] = [
   // WO-O4O-KPA-STORE-HUB-QR-CONTENT-IMPORT-V1: 매장 HUB QR 진열 + 가져가기
   // 매장 사본은 기존 StoreQRPage (/store/marketing/qr) 가 그대로 표시 — 별도 사본 관리 화면 없음.
   { label: 'QR-code', path: '/store-hub/qr', icon: QrCode, description: '운영자 게시 QR 템플릿 · 내 매장으로 가져가기' },
+  // WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: 매장 HUB 동영상 진열 + 가져가기 (QR 전용)
+  { label: '동영상', path: '/store-hub/video', icon: Video, description: '운영자 게시 동영상 · 내 매장으로 가져가기 · QR 연결' },
 ];
 
 function isMenuActive(pathname: string, menuPath: string): boolean {

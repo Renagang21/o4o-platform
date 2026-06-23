@@ -96,6 +96,9 @@ import { createOperatorBlogController } from '../o4o-store/controllers/operator-
 import { createOperatorPopController } from '../o4o-store/controllers/operator-pop.controller.js';
 import { createOperatorMultilingualContentController } from '../o4o-store/controllers/operator-multilingual-content.controller.js'; // WO-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-HUB-FLOW-PILOT-V1
 import { createStorePopStaffController } from '../o4o-store/controllers/pop.controller.js';
+// WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: QR 전용 동영상 콘텐츠 controllers (POP 패턴 mirror)
+import { createOperatorVideoController } from '../o4o-store/controllers/operator-video.controller.js';
+import { createStoreVideoStaffController } from '../o4o-store/controllers/video.controller.js';
 import { createOperatorQrController } from '../o4o-store/controllers/operator-qr.controller.js';
 import { createStoreQrStaffController } from '../o4o-store/controllers/qr.controller.js';
 import { createLayoutController } from '../o4o-store/controllers/layout.controller.js'; // WO-STORE-BLOCK-ENGINE-V1
@@ -448,6 +451,15 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   );
   router.use('/stores', kpaStorePopStaffController);
 
+  // WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: 매장 동영상 staff (가져오기 import + 사본 관리)
+  // /api/v1/kpa/stores/:slug/video/staff/* (매장 owner가 자기 매장 store_videos 사본 관리)
+  const kpaStoreVideoStaffController = createStoreVideoStaffController(
+    dataSource,
+    coreRequireAuth as any,
+    'kpa',
+  );
+  router.use('/stores', kpaStoreVideoStaffController);
+
   // WO-O4O-OPERATOR-BLOG-PUBLISHING-WRITE-API-V1: 운영자 HUB 게시 write API
   // /api/v1/kpa/operator/blog/posts (운영자가 매장 HUB 에 게시하는 블로그)
   // 권한: kpa:operator / kpa:admin / platform:admin / platform:super_admin
@@ -467,6 +479,16 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     'kpa',
   );
   router.use('/operator/pop', kpaOperatorPopController);
+
+  // WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: 운영자 HUB 동영상 write API (QR 전용)
+  // /api/v1/kpa/operator/video/posts (운영자가 매장 HUB 에 게시하는 외부 동영상 URL)
+  // 권한: kpa:operator / kpa:admin / platform:admin / platform:super_admin
+  const kpaOperatorVideoController = createOperatorVideoController(
+    dataSource,
+    coreRequireAuth as any,
+    'kpa',
+  );
+  router.use('/operator/video', kpaOperatorVideoController);
 
   // WO-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-HUB-FLOW-PILOT-V1: 운영자 HUB 다국어 상품 콘텐츠 write API
   // /api/v1/kpa/operator/multilingual-product-contents/groups (운영자 원본 — 매장이 가져가면 사본 생성)

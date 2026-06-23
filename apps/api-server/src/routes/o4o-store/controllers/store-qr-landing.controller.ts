@@ -163,12 +163,28 @@ export function createStoreQrLandingController(
         productDetails = productRows[0] || null;
       }
 
+      // WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: video 타입 QR이면 store_videos 사본의 외부 URL 포함.
+      //   landingTargetId = store_videos 사본 id. 같은 organization 의 사본만 통과 (boundary).
+      //   공개 뷰어가 일반 KPA 레이아웃 없이 동영상만 렌더하기 위해 videoUrl 을 직접 내려준다.
+      let videoUrl: string | null = null;
+      if (qrData.landingType === 'video' && qrData.landingTargetId) {
+        const videoRows = await dataSource.query(
+          `SELECT video_url AS "videoUrl"
+           FROM store_videos
+           WHERE id = $1 AND store_id = $2
+           LIMIT 1`,
+          [qrData.landingTargetId, qrData.organizationId],
+        );
+        videoUrl = videoRows[0]?.videoUrl || null;
+      }
+
       res.json({
         success: true,
         data: {
           ...qrData,
           storeSlug: storeRows[0]?.slug || null,
           productDetails,
+          videoUrl,
         },
       });
     }),
@@ -548,7 +564,9 @@ export function createStoreQrLandingController(
         });
         return;
       }
-      if (!landingType || !['product', 'promotion', 'page', 'link'].includes(landingType)) {
+      // WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: 'video' 추가 (landingTargetId = store_videos 사본 id).
+      //   QR 전용 연결 타입 — 사이니지/블로그/POP 와 의미가 섞이지 않는다.
+      if (!landingType || !['product', 'promotion', 'page', 'link', 'video'].includes(landingType)) {
         res.status(400).json({
           success: false,
           error: { code: 'VALIDATION_ERROR', message: 'Invalid landingType' },
