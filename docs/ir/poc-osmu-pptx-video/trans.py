@@ -159,6 +159,9 @@ for n in range(1, 13):
         # 원본 첫 run 의 rPr(폰트/크기/색/굵기) 보존
         rm = re.search(r'<a:r>\s*(<a:rPr.*?</a:rPr>|<a:rPr[^>]*/>)', inner, re.S)
         rpr = rm.group(1) if rm else '<a:rPr lang="en-US" dirty="0"/>'
+        # stale 교정 메타데이터 제거 — 한국어 run 의 맞춤법 플래그(err/dirty/smtClean/noProof)가
+        # 번역 텍스트에 남으면 PowerPoint 가 "복구 필요"로 플래그함. 새 저장본처럼 깨끗하게.
+        rpr = re.sub(r'\s+(?:err|dirty|smtClean|noProof)="[^"]*"', '', rpr)
         # 선두 pPr / 말미 endParaRPr 보존
         ppr = ''
         pm = re.match(r'\s*(<a:pPr.*?</a:pPr>|<a:pPr[^>]*/>)', inner, re.S)
