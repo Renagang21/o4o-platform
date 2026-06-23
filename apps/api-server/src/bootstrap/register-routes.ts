@@ -575,6 +575,17 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Store Entitlement routes:', entitlementError);
     }
 
+    // 28c. Register Foreign Visitor Partner routes (WO-O4O-FOREIGN-VISITOR-PARTNER-MODEL-V1)
+    try {
+      const { createForeignVisitorPartnerRoutes } = await import(
+        '../modules/foreign-visitor-partner/foreign-visitor-partner.routes.js'
+      );
+      app.use('/api/v1/foreign-visitor/partners', createForeignVisitorPartnerRoutes(dataSource));
+      logger.info('✅ Foreign Visitor Partner routes registered at /api/v1/foreign-visitor/partners');
+    } catch (fvpError) {
+      logger.error('Failed to register Foreign Visitor Partner routes:', fvpError);
+    }
+
     // 29. Register Neture routes (Phase D-1)
     try {
       const netureRoutes = createNetureRoutes(dataSource);
