@@ -586,6 +586,18 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Foreign Visitor Partner routes:', fvpError);
     }
 
+    // 28d. Register Foreign Visitor Partner QR routes (WO-O4O-FOREIGN-VISITOR-AFFILIATE-QR-TEMPLATE-V1)
+    // mount at /api/v1/foreign-visitor — /partners/:partnerId/qr-codes 는 위 /partners 라우터 비매칭 시 fall-through.
+    try {
+      const { createForeignVisitorPartnerQrCodeRoutes } = await import(
+        '../modules/foreign-visitor-partner/foreign-visitor-partner-qr-code.routes.js'
+      );
+      app.use('/api/v1/foreign-visitor', createForeignVisitorPartnerQrCodeRoutes(dataSource));
+      logger.info('✅ Foreign Visitor Partner QR routes registered at /api/v1/foreign-visitor');
+    } catch (fvpQrError) {
+      logger.error('Failed to register Foreign Visitor Partner QR routes:', fvpQrError);
+    }
+
     // 29. Register Neture routes (Phase D-1)
     try {
       const netureRoutes = createNetureRoutes(dataSource);

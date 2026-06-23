@@ -208,6 +208,8 @@ const ForeignVisitorSalesSupportPaymentSuccessPage = lazy(() => import('./pages/
 const ForeignVisitorSalesSupportPaymentFailPage = lazy(() => import('./pages/pharmacy/ForeignVisitorSalesSupportPaymentResultPage').then(m => ({ default: m.ForeignVisitorSalesSupportPaymentFailPage })));
 // WO-O4O-FOREIGN-VISITOR-PARTNER-MANAGEMENT-UI-V1: 유입 파트너 관리
 const ForeignVisitorPartnersPage = lazy(() => import('./pages/pharmacy/ForeignVisitorPartnersPage').then(m => ({ default: m.ForeignVisitorPartnersPage })));
+// WO-O4O-FOREIGN-VISITOR-AFFILIATE-QR-TEMPLATE-V1: 파트너별 제휴마케팅 QR 관리
+const ForeignVisitorPartnerQrCodesPage = lazy(() => import('./pages/pharmacy/ForeignVisitorPartnerQrCodesPage').then(m => ({ default: m.ForeignVisitorPartnerQrCodesPage })));
 const StoreOrdersPage = lazy(() => import('./pages/pharmacy/StoreOrdersPage').then(m => ({ default: m.StoreOrdersPage })));
 // WO-O4O-CROSSSERVICE-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1
 const StoreRecruitmentApplicationsPage = lazy(() => import('./pages/pharmacy/StoreRecruitmentApplicationsPage'));
@@ -1007,6 +1009,8 @@ function App() {
             <Route path="sales-channels/foreign-visitor/payment/fail" element={<ForeignVisitorSalesSupportPaymentFailPage />} />
             {/* WO-O4O-FOREIGN-VISITOR-PARTNER-MANAGEMENT-UI-V1: 유입 파트너 관리 */}
             <Route path="sales-channels/foreign-visitor/partners" element={<ForeignVisitorPartnersPage />} />
+            {/* WO-O4O-FOREIGN-VISITOR-AFFILIATE-QR-TEMPLATE-V1: 파트너별 QR 관리 */}
+            <Route path="sales-channels/foreign-visitor/partners/:partnerId/qr-codes" element={<ForeignVisitorPartnerQrCodesPage />} />
             {/* ── Hidden routes (사이드바 미표시, URL 직접 접근 유지) ── */}
             <Route path="channels" element={<StoreChannelsPage />} />
             <Route path="channels/tablet" element={<Navigate to="/store/requests" replace />} />

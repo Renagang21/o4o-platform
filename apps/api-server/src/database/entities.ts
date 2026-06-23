@@ -417,6 +417,8 @@ import { PlatformPayment } from '../entities/payment/PlatformPayment.entity.js';
 import { StorePaidFeatureEntitlement } from '../modules/store-entitlement/store-paid-feature-entitlement.entity.js';
 // FOREIGN VISITOR PARTNER (WO-O4O-FOREIGN-VISITOR-PARTNER-MODEL-V1)
 import { ForeignVisitorPartner } from '../modules/foreign-visitor-partner/foreign-visitor-partner.entity.js';
+// FOREIGN VISITOR PARTNER QR (WO-O4O-FOREIGN-VISITOR-AFFILIATE-QR-TEMPLATE-V1)
+import { ForeignVisitorPartnerQrCode } from '../modules/foreign-visitor-partner/foreign-visitor-partner-qr-code.entity.js';
 
 // ============================================================================
 // E-COMMERCE CORE ENTITIES (Phase 4-B: GlycoPharm Core Integration)
@@ -828,6 +830,8 @@ export const entities = [
   StorePaidFeatureEntitlement,
   // FOREIGN VISITOR PARTNER (WO-O4O-FOREIGN-VISITOR-PARTNER-MODEL-V1)
   ForeignVisitorPartner,
+  // FOREIGN VISITOR PARTNER QR (WO-O4O-FOREIGN-VISITOR-AFFILIATE-QR-TEMPLATE-V1)
+  ForeignVisitorPartnerQrCode,
   // ============================================================================
   // E-COMMERCE CORE ENTITIES (Phase 4-B: GlycoPharm Core Integration)
   // ============================================================================

@@ -7,8 +7,8 @@
  * QR/랜딩/스캔 이벤트는 후속 WO(이번 범위 아님).
  */
 import { useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Loader2, Plus, Pencil, Lock, AlertCircle, Globe, Users, Search } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Loader2, Plus, Pencil, Lock, AlertCircle, Globe, Users, Search, QrCode } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { checkSubscription } from '../../api/storeServiceSubscription';
 import {
@@ -49,6 +49,7 @@ export function ForeignVisitorPartnersPage() {
 
   const [editing, setEditing] = useState<ForeignVisitorPartner | null>(null);
   const [creating, setCreating] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     checkSubscription({ serviceKey: 'kpa', planCode: PLAN_CODE })
@@ -235,6 +236,13 @@ export function ForeignVisitorPartnersPage() {
                   <td className="px-3 py-2.5 text-slate-500">{fmtDate(p.createdAt)}</td>
                   <td className="px-3 py-2.5">
                     <div className="flex items-center justify-end gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => navigate(`/store/sales-channels/foreign-visitor/partners/${p.id}/qr-codes`)}
+                        className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded border border-slate-200 text-slate-600 hover:bg-white"
+                      >
+                        <QrCode className="w-3 h-3" /> QR 관리
+                      </button>
                       <button
                         type="button"
                         disabled={!canWrite}
