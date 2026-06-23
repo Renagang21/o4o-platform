@@ -110,6 +110,11 @@ export default function OperatorMultilingualContentWritePage() {
     return set;
   }, [drafts]);
 
+  const publishedLocaleCount = useMemo(
+    () => OPERATOR_MLC_LOCALES.filter((loc) => drafts[loc]?.status === 'published').length,
+    [drafts],
+  );
+
   const handleSaveGroup = async (): Promise<OperatorMlcGroup | null> => {
     if (!title.trim()) {
       toast.error('콘텐츠 제목을 입력하세요');
@@ -266,6 +271,41 @@ export default function OperatorMultilingualContentWritePage() {
         </div>
       </div>
 
+      {!isNew && group && (() => {
+        const vis: 'visible' | 'group_draft' | 'no_locale' | 'archived' =
+          group.status === 'archived'
+            ? 'archived'
+            : group.status !== 'published'
+              ? 'group_draft'
+              : publishedLocaleCount === 0
+                ? 'no_locale'
+                : 'visible';
+        const tone: Record<typeof vis, string> = {
+          visible: 'bg-emerald-50/70 border-emerald-200 text-emerald-800',
+          group_draft: 'bg-amber-50/70 border-amber-200 text-amber-800',
+          no_locale: 'bg-orange-50/70 border-orange-200 text-orange-800',
+          archived: 'bg-slate-50 border-slate-200 text-slate-600',
+        };
+        const statusLine: Record<typeof vis, string> = {
+          visible: '현재 Store Hub 에 노출 가능한 상태입니다.',
+          group_draft: '이 콘텐츠 그룹은 아직 발행되지 않았습니다. 목록에서 그룹을 "발행"해야 매장 HUB 에 노출됩니다.',
+          no_locale: '그룹은 발행되었지만 발행된 언어 페이지가 없습니다. 아래에서 언어를 "저장 후 이 언어 발행" 해주세요.',
+          archived: '보관됨 — 매장 HUB 에 노출되지 않습니다.',
+        };
+        return (
+          <div className={`flex items-start gap-3 p-4 border rounded-xl text-sm ${tone[vis]}`}>
+            <Globe className="w-4 h-4 shrink-0 mt-0.5 opacity-70" />
+            <div className="space-y-1">
+              <p className="font-semibold">{statusLine[vis]}</p>
+              <p className="text-xs opacity-80">
+                저장만 하면 Store Hub 에 노출되지 않습니다. 노출하려면 언어 페이지를 "저장 후 이 언어 발행"하고, 콘텐츠 그룹도 발행해야 합니다.
+                (조건: 그룹 발행 + 발행된 언어 1개 이상)
+              </p>
+            </div>
+          </div>
+        );
+      })()}
+
       {isNew ? (
         <div className="flex items-start gap-3 p-5 bg-blue-50/60 border border-blue-100 rounded-xl text-sm text-slate-600">
           <Globe className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
@@ -288,9 +328,13 @@ export default function OperatorMultilingualContentWritePage() {
                 >
                   {OPERATOR_MLC_LOCALE_LABELS[loc]}
                   {loc === defaultLocale && <span className="ml-1 text-[10px] text-blue-500">기본</span>}
-                  {has && (
-                    <span className={`ml-1.5 inline-block w-1.5 h-1.5 rounded-full align-middle ${published ? 'bg-emerald-500' : 'bg-amber-400'}`} />
-                  )}
+                  <span
+                    className={`ml-1.5 text-[10px] align-middle ${
+                      published ? 'text-emerald-600' : has ? 'text-amber-600' : 'text-slate-300'
+                    }`}
+                  >
+                    {published ? '· 발행됨' : has ? '· 초안' : '· 미작성'}
+                  </span>
                 </button>
               );
             })}
@@ -323,7 +367,7 @@ export default function OperatorMultilingualContentWritePage() {
                   className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 text-slate-700 rounded-lg text-xs font-medium hover:bg-slate-200 disabled:opacity-50"
                 >
                   {isSavingPage ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-                  저장
+                  임시 저장
                 </button>
                 <button
                   onClick={() => handleSavePage(true)}
@@ -331,7 +375,7 @@ export default function OperatorMultilingualContentWritePage() {
                   className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-700 disabled:opacity-50"
                 >
                   {isSavingPage ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
-                  저장 후 발행
+                  저장 후 이 언어 발행
                 </button>
               </div>
             </div>

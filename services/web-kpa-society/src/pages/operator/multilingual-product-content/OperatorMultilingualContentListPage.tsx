@@ -34,6 +34,24 @@ const STATUS_LABEL: Record<OperatorMlcStatus, string> = {
   archived: '보관됨',
 };
 
+/**
+ * HUB 노출 상태 — group.status + 발행된 언어 페이지 수로 판정.
+ * Store Hub 노출 조건(불변): group.status='published' AND published page 1개 이상.
+ */
+type HubVisibility = 'visible' | 'group_draft' | 'no_locale' | 'archived';
+const HUB_VIS_PILL: Record<HubVisibility, string> = {
+  visible: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  group_draft: 'bg-slate-100 text-slate-600 border-slate-200',
+  no_locale: 'bg-orange-50 text-orange-700 border-orange-200',
+  archived: 'bg-slate-100 text-slate-400 border-slate-200',
+};
+const HUB_VIS_LABEL: Record<HubVisibility, string> = {
+  visible: 'HUB 노출 가능',
+  group_draft: '그룹 초안',
+  no_locale: '발행된 언어 없음',
+  archived: '보관됨',
+};
+
 export default function OperatorMultilingualContentListPage() {
   const navigate = useNavigate();
   const [items, setItems] = useState<OperatorMlcGroup[]>([]);
@@ -69,6 +87,11 @@ export default function OperatorMultilingualContentListPage() {
   }, [loadData]);
 
   const handlePublish = async (id: string) => {
+    const g = items.find((x) => x.id === id);
+    if (g && publishedLocales(g).length === 0) {
+      toast.error('발행된 언어 페이지가 없습니다. 먼저 1개 이상의 언어를 "저장 후 발행"해 주세요.');
+      return;
+    }
     setBusyId(id);
     try {
       await publishOperatorMlcGroup(id);
@@ -97,6 +120,12 @@ export default function OperatorMultilingualContentListPage() {
 
   const publishedLocales = (g: OperatorMlcGroup): string[] =>
     (g.pages || []).filter((p) => p.status === 'published').map((p) => p.locale);
+
+  const hubVisibility = (g: OperatorMlcGroup): HubVisibility => {
+    if (g.status === 'archived') return 'archived';
+    if (g.status !== 'published') return 'group_draft';
+    return publishedLocales(g).length > 0 ? 'visible' : 'no_locale';
+  };
 
   return (
     <div className="max-w-6xl space-y-6">
@@ -159,6 +188,7 @@ export default function OperatorMultilingualContentListPage() {
               <thead>
                 <tr className="border-b border-slate-100 text-left text-xs text-slate-400">
                   <th className="px-5 py-3 font-medium">제목</th>
+                  <th className="px-5 py-3 font-medium">HUB 노출</th>
                   <th className="px-5 py-3 font-medium">상태</th>
                   <th className="px-5 py-3 font-medium">발행 언어</th>
                   <th className="px-5 py-3 font-medium">수정일</th>
@@ -168,6 +198,7 @@ export default function OperatorMultilingualContentListPage() {
               <tbody>
                 {items.map((g) => {
                   const locales = publishedLocales(g);
+                  const vis = hubVisibility(g);
                   return (
                     <tr key={g.id} className="border-b border-slate-50 hover:bg-slate-50/60">
                       <td className="px-5 py-3">
@@ -180,6 +211,11 @@ export default function OperatorMultilingualContentListPage() {
                           </span>
                           <span className="font-medium text-slate-800 truncate hover:text-blue-600">{g.title}</span>
                         </button>
+                      </td>
+                      <td className="px-5 py-3">
+                        <span className={`inline-flex items-center px-2 py-0.5 text-xs rounded-full border ${HUB_VIS_PILL[vis]}`}>
+                          {HUB_VIS_LABEL[vis]}
+                        </span>
                       </td>
                       <td className="px-5 py-3">
                         <span className={`inline-flex items-center px-2 py-0.5 text-xs rounded-full border ${STATUS_PILL[g.status]}`}>
