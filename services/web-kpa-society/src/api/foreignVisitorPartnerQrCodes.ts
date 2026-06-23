@@ -29,6 +29,9 @@ export interface ForeignVisitorPartnerQrCode {
   validTo?: string | null;
   createdAt: string;
   updatedAt: string;
+  // WO-O4O-FOREIGN-VISITOR-AFFILIATE-QR-SCAN-EVENT-V1: 목록 batch count(유입 신호)
+  scanCount?: number;
+  lastScannedAt?: string | null;
 }
 
 export interface QrWritePayload {

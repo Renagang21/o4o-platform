@@ -28,6 +28,8 @@ import { StoreSlugService, type StoreSlugServiceKey } from '@o4o/platform-core/s
 import { StorePaidFeatureEntitlementService } from '../store-entitlement/store-paid-feature-entitlement.service.js';
 import { ForeignVisitorPartnerService } from './foreign-visitor-partner.service.js';
 import { ForeignVisitorPartnerQrCodeService } from './foreign-visitor-partner-qr-code.service.js';
+// WO-O4O-FOREIGN-VISITOR-AFFILIATE-QR-SCAN-EVENT-V1: 익명 스캔 이벤트 기록/집계
+import { ForeignVisitorPartnerQrScanEventService, hashWithSalt } from './foreign-visitor-partner-qr-scan-event.service.js';
 import { FOREIGN_VISITOR_QR_STATUSES, type ForeignVisitorQrStatus } from './foreign-visitor-partner-qr-code.entity.js';
 
 const STORE_OWNER_SERVICE_KEYS: StoreOwnerServiceKey[] = ['kpa', 'glycopharm', 'cosmetics'];
@@ -48,6 +50,24 @@ export function createForeignVisitorPartnerQrCodeRoutes(dataSource: DataSource):
   const partnerService = new ForeignVisitorPartnerService(dataSource);
   const qrService = new ForeignVisitorPartnerQrCodeService(dataSource);
   const entitlementService = new StorePaidFeatureEntitlementService(dataSource);
+  const scanService = new ForeignVisitorPartnerQrScanEventService(dataSource);
+
+  // WO-O4O-FOREIGN-VISITOR-AFFILIATE-QR-SCAN-EVENT-V1:
+  //   요청에서 개인정보 최소 스캔 메타 추출 — IP/UA 는 hash 만(원문 미저장).
+  function deriveScanMeta(req: Request): {
+    ipHash: string | null; userAgentHash: string | null; userAgentSummary: string | null; referrer: string | null;
+  } {
+    const xff = typeof req.headers['x-forwarded-for'] === 'string' ? req.headers['x-forwarded-for'] : '';
+    const clientIp = (xff.split(',')[0] || '').trim() || req.ip || req.socket?.remoteAddress || '';
+    const ua = typeof req.headers['user-agent'] === 'string' ? req.headers['user-agent'] : '';
+    const ref = typeof req.headers['referer'] === 'string' ? req.headers['referer'] : '';
+    return {
+      ipHash: hashWithSalt(clientIp || null),
+      userAgentHash: hashWithSalt(ua || null),
+      userAgentSummary: ua ? ua.slice(0, 160) : null,
+      referrer: ref ? ref.slice(0, 500) : null,
+    };
+  }
 
   async function resolveOwnerStore(
     userId: string,
@@ -89,9 +109,16 @@ export function createForeignVisitorPartnerQrCodeRoutes(dataSource: DataSource):
         page: req.query.page ? parseInt(String(req.query.page), 10) : undefined,
         limit: req.query.limit ? parseInt(String(req.query.limit), 10) : undefined,
       });
+      // WO-O4O-FOREIGN-VISITOR-AFFILIATE-QR-SCAN-EVENT-V1: 목록에 scanCount/lastScannedAt 포함(batch).
+      const counts = await scanService.getCountsForQrCodeIds(result.items.map((q) => q.id));
+      const data = result.items.map((q) => ({
+        ...q,
+        scanCount: counts.get(q.id)?.scanCount ?? 0,
+        lastScannedAt: counts.get(q.id)?.lastScannedAt ?? null,
+      }));
       return res.json({
         success: true,
-        data: result.items,
+        data,
         pagination: { page: result.page, limit: result.limit, total: result.total, totalPages: Math.ceil(result.total / result.limit) },
       });
     } catch (error) {
@@ -243,9 +270,9 @@ export function createForeignVisitorPartnerQrCodeRoutes(dataSource: DataSource):
     }
   });
 
-  // ── PUBLIC (no auth): WO-O4O-FOREIGN-VISITOR-AFFILIATE-LANDING-V1 ──
+  // ── PUBLIC (no auth): WO-O4O-FOREIGN-VISITOR-AFFILIATE-LANDING-V1 / -QR-SCAN-EVENT-V1 ──
   // GET /affiliate/:shortCode/resolve — QR 스캔 landing 해석. shortCode → store 식별(공개 안전 필드만).
-  //   scan event 미기록(no-op) · partnerId/내부 id 미노출 · 결제 무관 · 비활성/만료/미존재 → 404.
+  //   resolve 성공 시 익명 scan event 기록(IP/UA hash 만) · partnerId/내부 id 미노출 · 결제 무관 · 비활성/만료/미존재 → 404(미기록).
   router.get('/affiliate/:shortCode/resolve', async (req: Request, res: Response) => {
     try {
       const shortCode = String(req.params.shortCode || '').trim();
@@ -268,6 +295,27 @@ export function createForeignVisitorPartnerQrCodeRoutes(dataSource: DataSource):
         storeSlug = slugRecord?.slug ?? null;
       } catch { /* graceful */ }
 
+      // WO-O4O-FOREIGN-VISITOR-AFFILIATE-QR-SCAN-EVENT-V1: 익명 스캔 기록(best-effort — 실패해도 resolve 응답 영향 없음).
+      try {
+        const meta = deriveScanMeta(req);
+        await scanService.recordScan({
+          organizationId: qr.organizationId,
+          serviceKey: qr.serviceKey,
+          partnerId: qr.partnerId,
+          qrCodeId: qr.id,
+          shortCode: qr.shortCode,
+          campaignName: qr.campaignName ?? null,
+          language: qr.language ?? null,
+          landingPath: `/foreign-visitor/affiliate/${qr.shortCode}`,
+          referrer: meta.referrer,
+          ipHash: meta.ipHash,
+          userAgentHash: meta.userAgentHash,
+          userAgentSummary: meta.userAgentSummary,
+        });
+      } catch (scanErr) {
+        logger.warn('[FVPartnerQr] scan record failed (non-blocking):', scanErr);
+      }
+
       return res.json({
         success: true,
         data: {
@@ -281,6 +329,27 @@ export function createForeignVisitorPartnerQrCodeRoutes(dataSource: DataSource):
       });
     } catch (error) {
       logger.error('[FVPartnerQr] affiliate resolve error:', error);
+      return res.status(500).json({ success: false, error: 'Internal error', code: 'INTERNAL_ERROR' });
+    }
+  });
+
+  // GET /partner-qr-codes/:qrCodeId/stats — QR 스캔 통계(인증, 자기 매장 QR 만)
+  //   WO-O4O-FOREIGN-VISITOR-AFFILIATE-QR-SCAN-EVENT-V1
+  router.get('/partner-qr-codes/:qrCodeId/stats', requireAuth, async (req: AuthRequest, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) return res.status(401).json({ success: false, error: 'Authentication required', code: 'AUTH_REQUIRED' });
+      const resolved = await resolveOwnerStore(userId, req.query.serviceKey);
+      if ('error' in resolved) return res.status(resolved.error.status).json({ success: false, error: resolved.error.message, code: resolved.error.code });
+
+      // 소유권 검증: qrCodeId 가 자기 (org, serviceKey) 스코프인지 선확인(타 매장 접근 차단).
+      const qr = await qrService.getById(resolved.organizationId, resolved.serviceKey, String(req.params.qrCodeId));
+      if (!qr) return res.status(404).json({ success: false, error: 'QR not found', code: 'QR_NOT_FOUND' });
+
+      const stats = await scanService.getStatsForQr(qr.id);
+      return res.json({ success: true, data: stats });
+    } catch (error) {
+      logger.error('[FVPartnerQr] stats error:', error);
       return res.status(500).json({ success: false, error: 'Internal error', code: 'INTERNAL_ERROR' });
     }
   });

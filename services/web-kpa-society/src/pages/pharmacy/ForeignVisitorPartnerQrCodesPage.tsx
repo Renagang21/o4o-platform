@@ -148,6 +148,7 @@ export function ForeignVisitorPartnerQrCodesPage() {
                 <th className="px-3 py-2.5 font-medium">캠페인</th>
                 <th className="px-3 py-2.5 font-medium">언어</th>
                 <th className="px-3 py-2.5 font-medium">상태</th>
+                <th className="px-3 py-2.5 font-medium">스캔</th>
                 <th className="px-3 py-2.5 font-medium">유효기간</th>
                 <th className="px-3 py-2.5 font-medium">생성일</th>
                 <th className="px-3 py-2.5 font-medium text-right">관리</th>
@@ -166,6 +167,11 @@ export function ForeignVisitorPartnerQrCodesPage() {
                     <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${q.status === 'ACTIVE' ? 'bg-teal-50 text-teal-700' : 'bg-slate-100 text-slate-500'}`}>
                       {q.status === 'ACTIVE' ? '활성' : '비활성'}
                     </span>
+                  </td>
+                  {/* WO-O4O-FOREIGN-VISITOR-AFFILIATE-QR-SCAN-EVENT-V1: 유입 신호(스캔 수/최근 스캔) */}
+                  <td className="px-3 py-2.5">
+                    <div className="font-medium text-slate-700">{q.scanCount ?? 0}</div>
+                    {q.lastScannedAt && <div className="text-xs text-slate-400">최근 {fmtDate(q.lastScannedAt)}</div>}
                   </td>
                   <td className="px-3 py-2.5 text-slate-500">{validityLabel(q)}</td>
                   <td className="px-3 py-2.5 text-slate-500">{fmtDate(q.createdAt)}</td>
