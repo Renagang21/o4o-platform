@@ -90,14 +90,14 @@ ip_hash? · user_agent_hash? · user_agent_summary? · created_at
 - migration 신규 1개(`...QrScanEventsTable`). 기존 schema 변경 0.
 - 배포 후 운영 smoke: §12.
 
-## 12. 배포 후 운영 smoke
+## 12. 배포 후 운영 smoke — **PASS**
 
-- (배포 완료 후 보강)
-```text
-GET /affiliate/<unknown>/resolve → 404 (scan 미기록, resolve 정상)
-GET /partner-qr-codes/<unknown>/stats (authed) → 404 QR_NOT_FOUND (route 마운트 + 스코프 검증)
-양성(실 ACTIVE QR → resolve → scan 1건 → 목록 scanCount/stats) 은 store 가 ACTIVE entitlement 없어 QR 발급 불가 → 코드/마운트로 확인, 발급 후 후속.
-```
+- 배포: api `deploy-api`(push) + web `deploy-web-services`(kpa-society) **둘 다 success**. api 리비전 `o4o-core-api-02288-mdr` 정상 부팅(신규 `ForeignVisitorPartnerQrScanEvent` entity 등록 검증 통과 → 테이블/엔티티 정합 · 스캔 dir migration CI/CD 적용).
+- **API:**
+  - `GET /affiliate/fvq_scantest404/resolve` → **404 `AFFILIATE_QR_NOT_FOUND`** ✅ (resolve 정상, scan 미기록)
+  - `GET /partner-qr-codes/<unknown>/stats?serviceKey=kpa` (authed) → **404 `QR_NOT_FOUND`** ✅ (route 마운트 + store-owner 스코프 검증, 500 아님 → 정상 동작)
+  - 동 stats 미인증 → **401 `AUTH_REQUIRED`** ✅
+- **양성 경로** (실 ACTIVE QR → resolve → scan 1건 → 목록 scanCount/stats 증가): store 가 ACTIVE entitlement 없어 QR 발급 불가 → **코드/마운트/부팅으로 확인**, QR 발급 후 후속 검증.
 
 ## 13. 완료 기준 대비
 
