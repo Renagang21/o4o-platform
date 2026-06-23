@@ -9,6 +9,8 @@
  * coreApiClient 사용 — /store-entitlements 는 /api/v1 (kpa 네임스페이스 밖).
  */
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Users, ChevronRight } from 'lucide-react';
 import { ForeignVisitorSalesSupportPanel } from '@o4o/store-ui-core';
 import {
   checkSubscription,
@@ -71,14 +73,35 @@ export function ForeignVisitorSalesSupportPage() {
   };
 
   return (
-    <ForeignVisitorSalesSupportPanel
-      priceLabel={priceLabel}
-      check={async () => {
-        const res = await checkSubscription({ serviceKey: SERVICE_KEY, planCode: PLAN_CODE });
-        return { active: res.active, endsAt: res.endsAt };
-      }}
-      onSubscribe={handleSubscribe}
-    />
+    <>
+      <ForeignVisitorSalesSupportPanel
+        priceLabel={priceLabel}
+        check={async () => {
+          const res = await checkSubscription({ serviceKey: SERVICE_KEY, planCode: PLAN_CODE });
+          return { active: res.active, endsAt: res.endsAt };
+        }}
+        onSubscribe={handleSubscribe}
+      />
+
+      {/* WO-O4O-FOREIGN-VISITOR-PARTNER-MANAGEMENT-UI-V1: 유입 파트너 관리 진입점 */}
+      <div className="max-w-3xl mx-auto px-6 pb-8">
+        <Link
+          to="/store/sales-channels/foreign-visitor/partners"
+          className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-5 hover:border-teal-300 hover:bg-teal-50/30 transition-colors"
+        >
+          <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
+            <Users className="w-5 h-5 text-slate-600" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-slate-800">파트너 관리</p>
+            <p className="text-xs text-slate-500 mt-0.5">
+              여행사·가이드·호텔 등 유입 파트너를 등록하고, 이후 파트너별 QR을 발급할 수 있습니다.
+            </p>
+          </div>
+          <ChevronRight className="w-5 h-5 text-slate-300 shrink-0" />
+        </Link>
+      </div>
+    </>
   );
 }
 
