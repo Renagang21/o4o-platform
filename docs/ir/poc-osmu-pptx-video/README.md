@@ -39,6 +39,33 @@
 - 제목–부제 간격 균일화의 정답 = **단일 프레임 병합 + 문단간격(spcBef)** (추정 제거). → `merge.py`.
 - 줄수 추정은 보수적(영어폭 ≈0.55em). 단 병합 방식에선 이미지 배치에만 사용(텍스트 간격은 PowerPoint가 직접 처리).
 
+## 집에서 이어서 작업하기 (resume)
+
+> `C:\tmp` 작업 폴더는 동기화 안 됨 — 아래로 재생성한다. 스크립트·원본은 git/OneDrive 로 동기화됨.
+
+```bash
+# 0) 최신 받기
+git pull origin main                       # 스크립트·문서
+#    OneDrive 동기화 완료 확인              # 원본/결과물 pptx
+
+# 1) 작업 폴더 만들고 원본 pptx 전체 압축 해제
+mkdir -p /c/tmp/pptx_xyl && cd /c/tmp/pptx_xyl
+unzip -o "/c/Users/home/OneDrive/개인계정/Documents/자일리톨 그린껌.pptx"
+
+# 2) 저장소의 PoC 스크립트 복사
+cp /c/Users/home/coding/o4o-platform/docs/ir/poc-osmu-pptx-video/*.py .
+
+# 3) 파이프라인 실행 (번역 → 병합 → 동적 애니메이션)
+python trans.py && python merge.py && python inject_dyn.py
+
+# 4) 결과 pptx 재압축 (출력 경로는 repack.py 안에 하드코딩)
+python repack.py
+```
+
+**경로 주의:** 스크립트 출력 경로가 `C:\Users\home\OneDrive\개인계정\Documents\...` 로 하드코딩됨.
+집 PC 의 윈도우 사용자명/ OneDrive 경로가 다르면 `trans.py`/`merge.py`/`repack.py`/`inject_dyn.py` 상단·`out=` 경로만 수정.
+또한 `trans.py`(TRANS)·`inject_dyn.py`(KEY_PIC) 등은 **이 자일리톨 pptx 전용 하드코딩** — 다른 pptx 엔 재작성 필요(PoC 특성).
+
 ## 한계 / 미해결
 
 - 부제 개별 등장 애니는 병합으로 블록 단위가 됨 (문단별 build 애니는 미구현).
