@@ -44,33 +44,37 @@ def _eff_width(t):
     return w
 
 def deorphan(nb, wpt):
-    """CJK 한정: 제목급(≥30pt) 문단이 1글자급 orphan 으로 줄넘김되면 그 문단 폰트만
-    한 단계씩 축소(플로어 0.82)해 한 줄에 맞추거나 orphan 제거. 좌우 inset·라틴폭 반영."""
+    """CJK 폴백: trans.py 의 의미단위 <a:br> 세그먼트가 1차. 그래도 한 세그먼트(줄)가
+    프레임 폭을 넘어 자동 줄넘김(orphan) 되면 제목급(≥30pt) 문단 폰트만 단계 축소(플로어 0.82).
+    <a:br> 단위로 각 줄 폭을 따로 평가 — 이미 끊긴 줄이 충분히 짧으면 무동작."""
     if LANG not in ('zh', 'ja'):
         return nb
     usable = wpt - 14.4   # 기본 좌우 inset(0.1in*2 = 14.4pt)
     def fix_para(pm):
         p = pm.group(0)
-        t = ''.join(re.findall(r'<a:t>(.*?)</a:t>', p, re.S)).strip()
         szs = re.findall(r'sz="(\d+)"', p)
-        if not t or not szs:
+        if not szs:
             return p
         fs = max(int(z) / 100 for z in szs)
         if fs < 30:
             return p
-        Lw = _eff_width(t)
-        def tail_of(f):
-            cpl = max(1.0, usable / f)
-            lines = max(1, math.ceil(Lw / cpl - 1e-6))
-            return lines, (Lw - (lines - 1) * cpl)
-        lines, tw = tail_of(fs)
-        if lines <= 1 or tw >= 1.0:
+        # <a:br> 로 끊긴 각 줄(세그먼트)의 폭을 따로 평가
+        segs = re.split(r'<a:br\b.*?</a:br>|<a:br\b[^>]*/>', p, flags=re.S)
+        widths = []
+        for sg in segs:
+            t = ''.join(re.findall(r'<a:t>(.*?)</a:t>', sg, re.S)).strip()
+            if t:
+                widths.append(_eff_width(t))
+        if not widths:
+            return p
+        def fits(f):
+            return all(w <= usable / f + 1e-6 for w in widths)
+        if fits(fs):
             return p
         for step in (0.94, 0.90, 0.86, 0.82):
-            nlines, ntw = tail_of(fs * step)
-            if nlines < lines or ntw >= 1.0:
+            if fits(fs * step):
                 return re.sub(r'sz="(\d+)"', lambda mm: f'sz="{int(round(int(mm.group(1))*step))}"', p)
-        return p
+        return re.sub(r'sz="(\d+)"', lambda mm: f'sz="{int(round(int(mm.group(1))*0.82))}"', p)
     return re.sub(r'<a:p>.*?</a:p>', fix_para, nb, flags=re.S)
 
 def attr(b, tag):
