@@ -16,13 +16,19 @@ CW = {'ko': 1.0, 'en': 0.55, 'zh': 1.0, 'ja': 1.0, 'vi': 0.55, 'id': 0.55, 'th':
 #   9x16=폰/세로사이니지 · 3x4·4x5=세로피드 · 1x1=정사각피드 · 4x3=구형 디스플레이.
 RATIO = os.environ.get('OSMU_RATIO', '9x16').lower()
 RATIO_SIZE = {
-    '9x16': (6858000, 12192000),   # 7.50 x 13.33
-    '3x4':  (6858000,  9144000),   # 7.50 x 10.00
-    '4x5':  (8229600, 10287000),   # 9.00 x 11.25
-    '1x1':  (9144000,  9144000),   # 10.0 x 10.0
-    '4x3':  (9144000,  6858000),   # 10.0 x 7.50
+    '9x16':  (6858000, 12192000),   # 7.50 x 13.33  세로 폰/사이니지
+    '3x4':   (6858000,  9144000),   # 7.50 x 10.00  세로 태블릿
+    '4x5':   (8229600, 10287000),   # 9.00 x 11.25  SNS 세로
+    '1x1':   (9144000,  9144000),   # 10.0 x 10.0   SNS 정사각
+    '16x10': (10972800, 6858000),   # 12.0 x 7.50   가로 태블릿(안드로이드)
+    '4x3':   (9144000,  6858000),   # 10.0 x 7.50   가로 4:3
 }
 PW, PH = RATIO_SIZE.get(RATIO, RATIO_SIZE['9x16'])
+
+# 16:9 원본 슬라이드 크기(전경 좌표 기준).
+BASE_W, BASE_H = 12192000, 6858000
+# 모드: 가로(aspect>1.2)=FIT(16:9 레이아웃 그대로 균일 축소·중앙) / 세로·정사각=STACK(세로 재배치).
+MODE = 'fit' if (PW / PH) >= 1.2 else 'stack'
 
 EMU_PT = 12700
 MARGIN = int(PW * 0.06)             # 좌우 여백 ~6%
@@ -114,57 +120,55 @@ for n in range(1, 13):
         open(path, 'w', encoding='utf-8').write(s)
         continue
     blocks.sort(key=lambda d: d['y'])   # 읽기 순서(위→아래)
+    new_pos = {}        # id(block) -> (x,y,cx,cy)
+    font_scale = 1.0
 
-    texts = [b for b in blocks if b['is_text']]
-    pics  = [b for b in blocks if not b['is_text']]
+    if MODE == 'fit':
+        # 가로(16:10·4:3): 16:9 레이아웃을 균일 축소 + 중앙 배치(좌우 배치 보존). 폰트도 동일 축소.
+        sc = min(PW / BASE_W, PH / BASE_H)
+        ox = (PW - BASE_W * sc) / 2
+        oy = (PH - BASE_H * sc) / 2
+        for b in blocks:
+            new_pos[id(b)] = (ox + b['x'] * sc, oy + b['y'] * sc, b['cx'] * sc, b['cy'] * sc)
+        font_scale = sc
+        cur = oy + BASE_H * sc
+    else:
+        # 세로/정사각: 상단 텍스트(풀폭) → 하단 이미지 세로 스택
+        texts = [b for b in blocks if b['is_text']]
+        pics  = [b for b in blocks if not b['is_text']]
+        layout = []
+        for b in texts:
+            layout.append([b, MARGIN, CONTENT_W, est_text_h(b['raw'], CONTENT_W)])
+        img_specs = []
+        for b in pics:
+            sc = min(CONTENT_W / b['cx'], IMG_MAX_UP)
+            ncx = int(b['cx'] * sc); ncy = int(b['cy'] * sc)
+            img_specs.append([b, MARGIN + (CONTENT_W - ncx) // 2, ncx, ncy])
+        text_h = sum(l[3] for l in layout)
+        img_h  = sum(sp[3] for sp in img_specs)
+        n_blocks = len(layout) + len(img_specs)
+        avail = PH - TOPM - BOTM - max(0, n_blocks - 1) * GAP
+        if text_h + img_h > avail and img_h > 0:
+            f = max(0.45, (avail - text_h) / img_h)   # 이미지만 축소(텍스트 보존), 하한 45%
+            for sp in img_specs:
+                sp[2] = int(sp[2] * f); sp[3] = int(sp[3] * f)
+                sp[1] = MARGIN + (CONTENT_W - sp[2]) // 2
+        cur = TOPM
+        for (b, x, cx, h) in layout:
+            new_pos[id(b)] = (x, cur, cx, h); cur += h + GAP
+        for (b, x, cx, cy) in img_specs:
+            new_pos[id(b)] = (x, cur, cx, cy); cur += cy + GAP
 
-    # ── 세로 흐름 배치: 상단 텍스트(풀폭) → 하단 이미지 스택 ──
-    # 1차: 각 블록 목표 크기 산정
-    layout = []   # (block, x, cx, h)
-    for b in texts:
-        h = est_text_h(b['raw'], CONTENT_W)
-        layout.append([b, MARGIN, CONTENT_W, h])
-    img_specs = []
-    for b in pics:
-        scale = CONTENT_W / b['cx']
-        scale = min(scale, IMG_MAX_UP)          # 과도 업스케일 방지
-        ncx = int(b['cx'] * scale); ncy = int(b['cy'] * scale)
-        nx = MARGIN + (CONTENT_W - ncx) // 2     # 가로 중앙
-        img_specs.append([b, nx, ncx, ncy])
-
-    # 2차: 총 높이 점검 → 이미지 과다 시 축소
-    text_h = sum(l[3] for l in layout)
-    img_h  = sum(sp[3] for sp in img_specs)
-    n_blocks = len(layout) + len(img_specs)
-    avail = PH - TOPM - BOTM - max(0, n_blocks - 1) * GAP
-    if text_h + img_h > avail and img_h > 0:
-        f = max(0.45, (avail - text_h) / img_h)   # 이미지만 축소(텍스트 보존), 하한 45%
-        for sp in img_specs:
-            sp[2] = int(sp[2] * f); sp[3] = int(sp[3] * f)
-            sp[1] = MARGIN + (CONTENT_W - sp[2]) // 2
-
-    # 3차: y 커서로 순차 배치(텍스트 먼저, 이미지 그 아래)
-    new_pos = {}   # id(block) -> (x,y,cx,cy)
-    cur = TOPM
-    for (b, x, cx, h) in layout:
-        new_pos[id(b)] = (x, cur, cx, h)
-        cur += h + GAP
-    for (b, x, cx, cy) in img_specs:
-        new_pos[id(b)] = (x, cur, cx, cy)
-        cur += cy + GAP
-
-    # ── 4) 슬라이드 재기록(뒤에서부터) ──
+    # ── 슬라이드 재기록(뒤에서부터) ──
     for b in sorted(blocks, key=lambda d: d['start'], reverse=True):
         x, y, cx, cy = new_pos[id(b)]
-        nb = b['raw']
-        if b['is_text']:
-            # 폭만 새로 지정(높이는 spAutoFit 유지 → 위치/폭만 강제). off+ext 둘 다 설정.
-            nb = set_geo(nb, x, y, cx, cy)
-        else:
-            nb = set_geo(nb, x, y, cx, cy)
+        nb = set_geo(b['raw'], x, y, cx, cy)
+        if font_scale != 1.0:
+            nb = re.sub(r'sz="(\d+)"', lambda m: f'sz="{int(int(m.group(1)) * font_scale)}"', nb)
         s = s[:b['start']] + nb + s[b['end']:]
 
     open(path, 'w', encoding='utf-8').write(s)
-    print(f"slide{n}: texts={len(texts)} pics={len(pics)} bottom={cur/914400:.1f}in (<={PH/914400:.1f})")
+    nt = sum(1 for b in blocks if b['is_text']); ni = len(blocks) - nt
+    print(f"slide{n}: mode={MODE} texts={nt} pics={ni} bottom={cur/914400:.1f}in (<={PH/914400:.1f})")
 
 print(f"DONE portrait {RATIO} ({PW/914400:.1f}x{PH/914400:.1f}in)")
