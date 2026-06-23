@@ -66,9 +66,20 @@ python repack.py
 집 PC 의 윈도우 사용자명/ OneDrive 경로가 다르면 `trans.py`/`merge.py`/`repack.py`/`inject_dyn.py` 상단·`out=` 경로만 수정.
 또한 `trans.py`(TRANS)·`inject_dyn.py`(KEY_PIC) 등은 **이 자일리톨 pptx 전용 하드코딩** — 다른 pptx 엔 재작성 필요(PoC 특성).
 
+## 다국어 (✅ EN/ZH/JA 실증 — 2026-06-23)
+
+언어 선택 = 환경변수 `OSMU_LANG=en|zh|ja` (`trans.py`·`merge.py`, 기본 en). CJK 는 전각이라 `merge.py` 글자폭 `CW=1.0`(라틴 0.55).
+
+```bash
+OSMU_LANG=zh python trans.py && OSMU_LANG=zh python merge.py && python inject_dyn.py
+python repack.py "<...>/자일리톨그린_동영상_ZH_16x9.pptx"
+```
+
+결과(KO 대비 길이비 / 솔버 tscale): **EN 2.64x**(최장, 7·8·10·11 축소 0.76~0.80) · **ZH 0.78x**(최단, slide12 외 무축소) · **JA 1.01x**(중간, 미세). slide12(4블록 연락처)는 세 언어 모두 0.84 = 언어무관 구조적 제약. 상세 표 = IR §10.7.
+
 ## 한계 / 미해결
 
 - 부제 개별 등장 애니는 병합으로 블록 단위가 됨 (문단별 build 애니는 미구현).
 - 슬라이드별 폰트 축소율 차이 시 spcBef 의 시각 간격이 미세하게 달라질 수 있음 (검증 대기).
-- 세로(9:16) 비율 / 다른 언어(ZH/JA) 미실행.
+- 세로(9:16) 비율 미실행.
 - 배경 이미지는 비율별 별도 등록 필요 (리플로우 불가) — IR §10.3.

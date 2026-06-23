@@ -1,16 +1,20 @@
 # -*- coding: utf-8 -*-
 # 같은 열(x겹침) 텍스트 박스를 1개 프레임으로 병합 + 문단간격(spcBef)으로 균일 간격
 # + 이미지 밀기/축소. 번역(trans.py) 후 실행.
-import sys
+import sys, os
 try: sys.stdout.reconfigure(encoding="utf-8")
 except: pass
 import re, math
+
+LANG = os.environ.get('OSMU_LANG', 'en').lower()
 
 EMU_PT = 12700
 SLIDE_H = 6858000
 MARGIN  = 150000
 GUTTER  = 120000
-EN_CW   = 0.55
+# 평균 글자폭(em). 라틴=좁음(0.55), CJK(中/日)=전각이라 1글자≈1em.
+#   텍스트 간격은 spcBef 가 정확히 처리하므로 CW 는 이미지 리플로우(R4/R5)·축소 판정에만 영향.
+CW      = {'en': 0.55, 'zh': 1.0, 'ja': 1.0}.get(LANG, 0.55)
 LH      = 1.2
 SPCBEF_PT = 10           # 텍스트 블록 사이 고정 간격(pt) — 모든 슬라이드 동일
 FONT_FLOOR = 0.78
@@ -54,7 +58,7 @@ def group_height_emu(group, tscale):
         wpt = box['cx'] / EMU_PT
         for (ln, f) in box['plist']:
             fs = f * tscale
-            cpl = max(1, wpt / (fs * EN_CW))
+            cpl = max(1, wpt / (fs * CW))
             lines = max(1, math.ceil(ln / cpl))
             total_pt += lines * fs * LH
     total_pt += (len(group) - 1) * SPCBEF_PT      # 박스 경계 간격
