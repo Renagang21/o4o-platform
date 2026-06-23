@@ -16,6 +16,13 @@ import re
 
 LANG = os.environ.get('OSMU_LANG', 'en').lower()
 
+# 한국어 = 원본 언어 → 번역 생략(원본 한국어 텍스트·디자이너 줄바꿈 유지).
+# 이후 merge(병합·간격표준화)·inject_dyn(애니)·portrait(세로) 는 동일 적용.
+if LANG == 'ko':
+    print("[LANG=KO] 원본 한국어 유지 — 번역 생략 (merge/portrait 만 적용)")
+    print("DONE")
+    raise SystemExit(0)
+
 # 영어 — 단어 경계 자동 줄바꿈이라 orphan 문제 없음 → str 유지(세그먼트 불요).
 TRANS_EN = {
  1: ["Made with Lotte Wellfood's gum technology",

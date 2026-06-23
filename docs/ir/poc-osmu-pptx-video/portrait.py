@@ -10,21 +10,38 @@ try: sys.stdout.reconfigure(encoding="utf-8")
 except: pass
 
 LANG = os.environ.get('OSMU_LANG', 'en').lower()
-CW = {'en': 0.55, 'zh': 1.0, 'ja': 1.0, 'vi': 0.55, 'id': 0.55, 'th': 0.55}.get(LANG, 0.55)
+CW = {'ko': 1.0, 'en': 0.55, 'zh': 1.0, 'ja': 1.0, 'vi': 0.55, 'id': 0.55, 'th': 0.55}.get(LANG, 0.55)
+
+# 목표 비율(디바이스 크기) — OSMU_RATIO. 16:9 가로는 본 스크립트 대상 아님(원본 그대로).
+#   9x16=폰/세로사이니지 · 3x4·4x5=세로피드 · 1x1=정사각피드 · 4x3=구형 디스플레이.
+RATIO = os.environ.get('OSMU_RATIO', '9x16').lower()
+RATIO_SIZE = {
+    '9x16': (6858000, 12192000),   # 7.50 x 13.33
+    '3x4':  (6858000,  9144000),   # 7.50 x 10.00
+    '4x5':  (8229600, 10287000),   # 9.00 x 11.25
+    '1x1':  (9144000,  9144000),   # 10.0 x 10.0
+    '4x3':  (9144000,  6858000),   # 10.0 x 7.50
+}
+PW, PH = RATIO_SIZE.get(RATIO, RATIO_SIZE['9x16'])
 
 EMU_PT = 12700
-PW, PH = 6858000, 12192000          # 9:16 세로 (7.5in x 13.333in)
-MARGIN = 411480                     # 0.45in 좌우 여백
+MARGIN = int(PW * 0.06)             # 좌우 여백 ~6%
 CONTENT_W = PW - 2 * MARGIN         # 전경 폭
-TOPM = 520000                       # 상단 여백
-BOTM = 460000                       # 하단 여백
-GAP  = 230000                       # 블록 사이 간격
+TOPM = int(PH * 0.043)              # 상단 여백
+BOTM = int(PH * 0.038)              # 하단 여백
+GAP  = int(PH * 0.019)              # 블록 사이 간격
 IMG_MAX_UP = 1.5                    # 이미지 업스케일 상한(원본 대비)
 LH = 1.2
 
-# 배경 중앙 크롭: 16:9(1.778) 소스 → 9:16(0.5625) 프레임 cover.
-# 유지 폭비 = 0.5625/1.778 = 0.3164 → 좌우 각 (1-0.3164)/2 = 34.18% 크롭. 단위 1000=1%.
-SRC_CROP = 34180
+# 배경 중앙 크롭(§10.3): 16:9(1.778) 소스 → 목표 비율 cover. 단위 1000=1%.
+SRC_AR = 16 / 9
+_tgt = PW / PH
+if _tgt <= SRC_AR:                  # 목표가 더 좁음/높음 → 좌우 크롭
+    _c = int(round((1 - _tgt / SRC_AR) / 2 * 100000))
+    SRCRECT = f'<a:srcRect l="{_c}" r="{_c}"/>'
+else:                              # 목표가 더 넓음 → 상하 크롭
+    _c = int(round((1 - SRC_AR / _tgt) / 2 * 100000))
+    SRCRECT = f'<a:srcRect t="{_c}" b="{_c}"/>'
 
 def eff_width(t):
     w = 0.0
@@ -78,7 +95,7 @@ for n in range(1, 13):
 
     # ── 2) 배경 중앙 크롭 (빈 <a:srcRect/> → 크롭) ──
     s = re.sub(r'<p:bg>.*?</p:bg>',
-               lambda m: m.group(0).replace('<a:srcRect/>', f'<a:srcRect l="{SRC_CROP}" r="{SRC_CROP}"/>'),
+               lambda m: m.group(0).replace('<a:srcRect/>', SRCRECT),
                s, flags=re.S)
 
     # ── 3) 전경 수집 ──
@@ -148,6 +165,6 @@ for n in range(1, 13):
         s = s[:b['start']] + nb + s[b['end']:]
 
     open(path, 'w', encoding='utf-8').write(s)
-    print(f"slide{n}: texts={len(texts)} pics={len(pics)} bottom={cur/914400:.1f}in (<=13.3)")
+    print(f"slide{n}: texts={len(texts)} pics={len(pics)} bottom={cur/914400:.1f}in (<={PH/914400:.1f})")
 
-print("DONE portrait 9:16")
+print(f"DONE portrait {RATIO} ({PW/914400:.1f}x{PH/914400:.1f}in)")
