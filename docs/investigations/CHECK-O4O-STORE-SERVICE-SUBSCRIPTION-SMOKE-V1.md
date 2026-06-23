@@ -60,7 +60,8 @@
 ## 7. Toss 진입 (§7.7, §11.10) — **부분 (config 한계)**
 
 - 결제 버튼 클릭 → prepare 성공 → **Toss SDK 로드됨(`window.TossPayments` present)**. 그러나 실제 Toss 결제창으로 **navigate 안 됨**(`navigated_to_toss:false`).
-- 원인: prepare 가 반환한 `clientKey`가 **placeholder `test_ck_test_key`**(실 Toss 테스트 키 아님) → `requestPayment` 가 유효 키 부재로 결제창을 열지 못함. **코드 결함 아님 — 운영 env 의 `TOSS_CLIENT_KEY` 미설정.**
+- 원인: prepare 가 반환한 `clientKey`가 **placeholder `test_ck_test_key`**(실 Toss 테스트 키 아님) → `requestPayment` 가 유효 키 부재로 결제창을 열지 못함. **코드 결함 아님 — 운영 env 미설정.**
+- **⚠️ 정확한 env 변수명:** 구독 흐름은 PaymentCore `TossPaymentProviderAdapter` 사용 → `process.env.TOSS_PAYMENTS_CLIENT_KEY || 'test_ck_test_key'`(`TossPaymentProviderAdapter.ts:29`). 따라서 o4o-core-api 에 설정할 변수는 **`TOSS_PAYMENTS_CLIENT_KEY`** 이다. (레거시 `TOSS_CLIENT_KEY` 는 ecommerce-core/`toss-payments.service` 경로용 — **다른 변수**라 이 흐름엔 무효. 후속 WO 가 변수명을 혼동하면 결제창이 여전히 안 열림.)
 - 결론: 구독 결제는 prepare + Toss SDK 로드까지 정상 연결. **결제창 실오픈 검증은 실 `test_ck_` 키 설정 후 가능**(후속).
 
 ## 8. confirm 미호출 / 실결제 없음 (§7.8, §11.11–12) — PASS
@@ -93,7 +94,7 @@
 ## 11. 결론 / 후속
 
 - **PASS (11/12)** — STORE_SERVICE_SUBSCRIPTION V1 축(기능·가격·상태표시·운영 진입·prepare 규약·confirm 안전)이 운영에서 검증됨. 소비자 결제(STORE_SALE_PAYMENT) 차단도 유지.
-- **유일 미검증:** Toss 결제창 실오픈 — 운영 `TOSS_CLIENT_KEY`가 placeholder(`test_ck_test_key`)라서. **후속:** 실 Toss test/live `clientKey` 설정 후 결제창 진입 1회 재확인(`WO-O4O-TOSS-CLIENT-KEY-CONFIG-AND-WIDGET-SMOKE-V1` 후보). 코드는 SDK 로드까지 정상.
+- **유일 미검증:** Toss 결제창 실오픈 — 운영 env **`TOSS_PAYMENTS_CLIENT_KEY`** 미설정이라 prepare 가 placeholder(`test_ck_test_key`) 반환. **후속:** o4o-core-api 에 실 Toss test/live `clientKey` 를 **`TOSS_PAYMENTS_CLIENT_KEY`** 로 설정(레거시 `TOSS_CLIENT_KEY` 아님) 후 결제창 진입 1회 재확인(`WO-O4O-TOSS-CLIENT-KEY-CONFIG-AND-WIDGET-SMOKE-V1`). 코드는 SDK 로드까지 정상.
 - abandoned CREATED o4o_payments 세션(prepare 2건)은 미승인·미과금·test mode — 정리 불요(무해).
 
 ---
