@@ -16,9 +16,62 @@ GUTTER  = 120000
 #   텍스트 간격은 spcBef 가 정확히 처리하므로 CW 는 이미지 리플로우(R4/R5)·축소 판정에만 영향.
 CW      = {'en': 0.55, 'zh': 1.0, 'ja': 1.0}.get(LANG, 0.55)
 LH      = 1.2
-SPCBEF_PT = 10           # 텍스트 블록 사이 고정 간격(pt) — 모든 슬라이드 동일
 FONT_FLOOR = 0.78
 IMG_FLOOR  = 0.80
+
+# === 블록 간격 표준화 (R10/R11 보정) ===
+# PowerPoint 는 spcBef 위에 폰트크기 비례 leading 을 더해 렌더 → 상수 spcBef 면
+# 시각 간격이 폰트 조합마다 달라짐(제목44 vs 부제24/28/44 …)이 "표준화 안됨"의 원인.
+# 시각간격 ≈ LEAD*prev_fs + spcBef + LEAD*next_fs 를 GAP_VISUAL 로 고정 →
+#   spcBef = GAP_VISUAL − LEAD*(prev_fs+next_fs)  (큰 폰트일수록 spcBef 작게 = 상수화).
+GAP_VISUAL = 22.0        # 목표 시각 간격(pt) — 전 슬라이드/언어 동일
+LEAD       = 0.20        # 폰트당 leading 추정(em)
+SPCBEF_MIN = 3.0         # spcBef 하한(pt)
+SPCBEF_EST = 10          # 이미지 높이 추정용 대표값(레이아웃 추정 전용)
+
+def comp_spcbef(prev_fs, next_fs):
+    """블록 경계 보정 spcBef(pt). 폰트 클수록 작아져 시각 간격을 상수화."""
+    return max(SPCBEF_MIN, GAP_VISUAL - LEAD * (prev_fs + next_fs))
+
+def _eff_width(t):
+    """문자열의 시각 폭(전각=1.0, 라틴/숫자/기호=0.55). 혼용(예: Wellfood) 정확화."""
+    w = 0.0
+    for ch in t:
+        o = ord(ch)
+        full = (0x2E80 <= o <= 0x9FFF or 0xAC00 <= o <= 0xD7A3 or
+                0xF900 <= o <= 0xFAFF or 0x3000 <= o <= 0x30FF or 0xFF00 <= o <= 0xFFEF)
+        w += 1.0 if full else 0.55
+    return w
+
+def deorphan(nb, wpt):
+    """CJK 한정: 제목급(≥30pt) 문단이 1글자급 orphan 으로 줄넘김되면 그 문단 폰트만
+    한 단계씩 축소(플로어 0.82)해 한 줄에 맞추거나 orphan 제거. 좌우 inset·라틴폭 반영."""
+    if LANG not in ('zh', 'ja'):
+        return nb
+    usable = wpt - 14.4   # 기본 좌우 inset(0.1in*2 = 14.4pt)
+    def fix_para(pm):
+        p = pm.group(0)
+        t = ''.join(re.findall(r'<a:t>(.*?)</a:t>', p, re.S)).strip()
+        szs = re.findall(r'sz="(\d+)"', p)
+        if not t or not szs:
+            return p
+        fs = max(int(z) / 100 for z in szs)
+        if fs < 30:
+            return p
+        Lw = _eff_width(t)
+        def tail_of(f):
+            cpl = max(1.0, usable / f)
+            lines = max(1, math.ceil(Lw / cpl - 1e-6))
+            return lines, (Lw - (lines - 1) * cpl)
+        lines, tw = tail_of(fs)
+        if lines <= 1 or tw >= 1.0:
+            return p
+        for step in (0.94, 0.90, 0.86, 0.82):
+            nlines, ntw = tail_of(fs * step)
+            if nlines < lines or ntw >= 1.0:
+                return re.sub(r'sz="(\d+)"', lambda mm: f'sz="{int(round(int(mm.group(1))*step))}"', p)
+        return p
+    return re.sub(r'<a:p>.*?</a:p>', fix_para, nb, flags=re.S)
 
 def attr(b, tag):
     return re.search(tag, b)
@@ -61,12 +114,13 @@ def group_height_emu(group, tscale):
             cpl = max(1, wpt / (fs * CW))
             lines = max(1, math.ceil(ln / cpl))
             total_pt += lines * fs * LH
-    total_pt += (len(group) - 1) * SPCBEF_PT      # 박스 경계 간격
+    total_pt += (len(group) - 1) * SPCBEF_EST     # 박스 경계 간격(추정용 대표값)
     return int(total_pt * EMU_PT)
 
-def add_spcbef(paras):
-    """paras 문자열의 첫 <a:p> 에 spcBef 삽입"""
-    return paras.replace('<a:p>', f'<a:p><a:pPr><a:spcBef><a:spcPts val="{SPCBEF_PT*100}"/></a:spcBef></a:pPr>', 1)
+def add_spcbef(paras, pt):
+    """paras 문자열의 첫 <a:p> 에 보정 spcBef(pt) 삽입"""
+    val = int(round(pt * 100))
+    return paras.replace('<a:p>', f'<a:p><a:pPr><a:spcBef><a:spcPts val="{val}"/></a:spcBef></a:pPr>', 1)
 
 for n in range(1, 13):
     path = f'ppt/slides/slide{n}.xml'
@@ -143,8 +197,12 @@ for n in range(1, 13):
             top = min(g, key=lambda x: x['y'])
             if b['id'] == top['id'] and len(g) > 1:
                 merged_paras = top['paras']
+                # 보정 spcBef: 경계 양쪽 폰트로 시각 간격 상수화
+                prev_fs = top['plist'][-1][1] if top['plist'] else 24
                 for child in sorted(g, key=lambda x: x['y'])[1:]:
-                    merged_paras += add_spcbef(child['paras'])
+                    next_fs = child['plist'][0][1] if child['plist'] else 24
+                    merged_paras += add_spcbef(child['paras'], comp_spcbef(prev_fs, next_fs))
+                    prev_fs = child['plist'][-1][1] if child['plist'] else next_fs
                 new_body = top['pre'] + merged_paras
                 nb = re.sub(r'<p:txBody>.*?</p:txBody>', '<p:txBody>'+new_body+'</p:txBody>', nb, flags=re.S)
             # autofit: 축소 필요시 normAutofit, 아니면 spAutoFit 유지
@@ -153,6 +211,8 @@ for n in range(1, 13):
                 fs = int(round(tscale*100000)); lnr = 10000
                 af = f'<a:normAutofit fontScale="{fs}" lnSpcReduction="{lnr}"/>'
                 nb = nb.replace('<a:spAutoFit/>', af)
+            # CJK orphan(1글자 줄넘김) 제거 — 제목급 문단 폰트 미세 축소
+            nb = deorphan(nb, b['cx'] / EMU_PT)
         else:
             nx, ny, ncx, ncy = img[b['id']]
             nb = re.sub(r'<a:off x="-?\d+" y="-?\d+"/>', f'<a:off x="{nx}" y="{ny}"/>', nb, count=1)
