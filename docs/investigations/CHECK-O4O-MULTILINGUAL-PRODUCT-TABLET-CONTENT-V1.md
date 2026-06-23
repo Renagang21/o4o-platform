@@ -41,10 +41,23 @@
 - `web-kpa-society` `npx tsc --noEmit` — **error 0**.
 - backend 무변경 → api-server typecheck 불요.
 
-### 4.2 기능 smoke (배포 후)
-- public resolve(무인증) en/zh fallback 정상 = 태블릿 페이지 데이터원 동작(아래 §5).
-- store-owner: MultilingualPublicActions "태블릿 보기" → `/multilingual-products/:publicKey?mode=tablet` 새 창, 언어 전환 시 mode 유지.
-- 회귀: 모바일 landing / QR SVG / URL 복사 / 고객용 보기 무영향(additive).
+### 4.2 기능 smoke (배포 후 — 2026-06-23, [PILOT] 데이터, kpa-society.co.kr)
+배포: Deploy Web (Cloud Run) `0d978a08d` success. setup: 운영자 [PILOT] ko/en 발행 → store-owner [PILOT] 상품+가져오기.
+
+| # | 항목 | 결과 |
+|---|------|------|
+| 1 | 편집 모달 "태블릿 보기" 버튼 노출 | ✅ 고객용 보기 / **태블릿 보기** / URL 복사 / QR 보기 |
+| 2 | 태블릿 보기 → `?mode=tablet` 새 탭 | ✅ `/multilingual-products/eeb93e7b…?mode=tablet` |
+| 3 | 태블릿 레이아웃 렌더 | ✅ 헤더 내 큰 언어버튼 + 카드형 본문 + 이중언어 footer "매장 직원에게 문의…/Please ask our staff" (스샷) |
+| 4 | 언어 전환 시 mode=tablet 유지 | ✅ 한국어 클릭 → `?locale=ko&mode=tablet`, 본문 "[PILOT] 한국어 상품 안내" |
+| 5 | 태블릿 fallback (zh 미작성) | ✅ "선택한 언어의 콘텐츠가 없어 대체 언어로 표시 중입니다." + English 본문 |
+| 6 | 모바일 모드 회귀 (mode 없음) | ✅ 언어버튼 본문에·단일행 footer (태블릿과 구분, 불변) |
+| 7 | QR 보기 / URL 복사 회귀 | ✅ QR SVG + canonical URL(mode 없음) 정상 |
+| 8 | console error / 4xx·5xx | ✅ 0 / 0 (store-owner·landing 양 탭, resolve en/ko/zh 전부 200) |
+
+정리: store 그룹·운영자 그룹 archived, 상품 비활성화 (물리삭제 없음).
+
+**최종 판정: CLOSED / PASS**
 
 ## 5. 무변경/안전
 - backend·route·저장소·public API 무변경. `connection.ts`/store-entitlement·payment WIP/`mobile-app`/`pnpm-lock` 미접촉. 명시 pathspec.
