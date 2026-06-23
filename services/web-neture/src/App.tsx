@@ -529,6 +529,8 @@ const GuideBusinessTouristStorePage = lazy(() => import('./pages/guide').then(m 
 const GuideBusinessForeignCustomerStorePage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideBusinessForeignCustomerStorePage })));
 // WO-O4O-NETURE-BUSINESS-WAREHOUSE-PHARMACY-DETAIL-PAGE-V1: 창고형 약국 전용 상세 페이지
 const GuideBusinessWarehousePharmacyPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideBusinessWarehousePharmacyPage })));
+// WO-O4O-NETURE-GUIDE-FOREIGN-CUSTOMER-SUPPORT-V1: 외국인 고객 응대 운영 매뉴얼
+const GuideForeignCustomerSupportPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideForeignCustomerSupportPage })));
 // WO-O4O-NETURE-GUIDE-ACTIVE-SERVICE-CARDS-AND-PAGES-V1: 운영 중인 O4O 서비스 소개 페이지
 const GuideServiceKpaSocietyPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideServiceKpaSocietyPage })));
 const GuideServiceGlycoPharmPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideServiceGlycoPharmPage })));
@@ -730,6 +732,8 @@ function App() {
               <Route path="/guide/business/tourist-store" element={<GuideBusinessTouristStorePage />} />
               <Route path="/guide/business/foreign-customer-store" element={<GuideBusinessForeignCustomerStorePage />} />
               <Route path="/guide/business/warehouse-pharmacy" element={<GuideBusinessWarehousePharmacyPage />} />
+              {/* WO-O4O-NETURE-GUIDE-FOREIGN-CUSTOMER-SUPPORT-V1: 외국인 고객 응대 운영 매뉴얼 */}
+              <Route path="/guide/foreign-customer-support" element={<GuideForeignCustomerSupportPage />} />
               {/* WO-O4O-NETURE-GUIDE-ACTIVE-SERVICE-CARDS-AND-PAGES-V1: 운영 중인 O4O 서비스 소개 */}
               <Route path="/guide/services/kpa-society" element={<GuideServiceKpaSocietyPage />} />
               <Route path="/guide/services/glycopharm" element={<GuideServiceGlycoPharmPage />} />

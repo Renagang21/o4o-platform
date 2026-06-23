@@ -155,6 +155,8 @@ const homeProps: GuideFeaturesPageProps = {
         { label: '매장 HUB', route: '/workspace/hub' },
         { label: '내 매장 상품', route: '/store/my-products' },
         { label: 'QR 가이드', route: '/seller/qr-guide' },
+        // WO-O4O-NETURE-GUIDE-FOREIGN-CUSTOMER-SUPPORT-V1: 외국인 고객 응대 운영 매뉴얼
+        { label: '외국인 고객 응대 가이드', route: '/guide/foreign-customer-support' },
         { label: 'POP 활용', route: '/guide/for-seller#pop' },
         { label: '블로그 활용', route: '/guide/for-seller#blog' },
         // WO-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1: '디지털사이니지' 진입 링크 제거 (route 삭제됨, Neture signage 미대상)
