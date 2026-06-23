@@ -66,7 +66,7 @@ python repack.py "<출력 경로>/자일리톨그린_동영상_EN_16x9.pptx"
 
 **완료:**
 - EN 번역 + 애니메이션(v4) + R11 단일프레임 병합 → `자일리톨그린_동영상_EN_16x9.pptx`.
-- **다국어 대조 (✅ 2026-06-23):** ZH·JA 동일 파이프라인 통과. 언어선택 `OSMU_LANG=en|zh|ja`(trans·merge), CJK 글자폭 `CW=1.0`. 결과: **EN 2.64x**(최장 — slide 7·8·10·11 축소) / **ZH 0.78x**(최단 — slide12 외 무축소) / **JA 1.01x**(중간). slide12는 언어무관 0.84(4블록 구조적). 상세 = IR §10.7.
+- **다국어 6언어 완성 (✅ 2026-06-23):** EN·ZH·JA·**VI·TH·ID** 동일 파이프라인. 언어선택 `OSMU_LANG=en|zh|ja|vi|th|id`(trans·merge). CJK(zh/ja) 글자폭 `CW=1.0`+`<a:br>` 의미단위 줄바꿈+deorphan, 라틴(vi/id) `CW=0.55` 단어 줄바꿈(str), 태국(th) `CW=0.55` PowerPoint 태국어 줄바꿈(str). 길이비(KO 대비): ZH 0.78x / JA 1.01x / TH 2.28x / VI 2.60x / EN 2.64x / ID 2.87x. slide12는 언어무관 0.84(4블록 구조적). 파일 `자일리톨그린_동영상_{EN,ZH,JA,VI,TH,ID}_16x9.pptx`. 상세 = IR §10.7.
 - **간격 표준화 (✅ 2026-06-23, 사용자 검수 반영):** "제목–부제 간격이 슬라이드마다 다름" 원인 = PowerPoint 가 spcBef 위에 **폰트크기 비례 leading** 을 더함 → 상수 spcBef 로는 절대 균일 안 됨. **해법:** `spcBef = 22 − 0.2·(prev_fs+next_fs)` 폰트 역보정(시각간격 상수화: 44→24=8 / 36→44=6 / 24↔28=11pt). `merge.py` `comp_spcbef`.
 - **CJK 줄바꿈 = 의미 단위 (✅ 2026-06-23, 사용자 통찰 채택):** orphan 의 진짜 해법은 폰트 축소가 아니라 **의미 단위 줄바꿈**. 원본은 이미 `<a:br>` 로 디자이너 줄바꿈을 했는데 치환이 버려 자동 줄바꿈(orphan)이 됨. → `trans.py` 번역을 **의미 단위 줄 목록(list)**으로(AI 가 폭·문맥에 맞게 끊음) + `<a:br>` 명시 줄바꿈(rPr 보존). 例: 美味持久，\|唾液也自然分泌(쉼표) · 采用乐天Wellfood的\|口香糖技术制成(的 뒤). **폰트 안 줄이고 orphan 제거**(slide1 36pt·slide2 44pt 그대로). `deorphan`(폰트축소)은 폴백으로 강등.
 
