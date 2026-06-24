@@ -12,6 +12,8 @@ import {
   Sparkles, Copy, CheckCircle2, ExternalLink,
 } from 'lucide-react';
 import { BlockRenderer } from '@o4o/block-renderer';
+// WO-O4O-KPA-QR-CONTENT-RICH-EDITOR-ADOPTION-V1: body(HTML) 우선 렌더
+import { ContentRenderer } from '@o4o/content-editor';
 import { getAccessToken } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
 import { kpaBlocksToRendererBlocks, type KpaBlock } from '../../utils/kpa-block-adapter';
@@ -25,6 +27,7 @@ interface ContentDetail {
   title: string;
   summary: string | null;
   blocks: KpaBlock[];
+  body: string | null;
   tags: string[];
   category: string | null;
   thumbnail_url: string | null;
@@ -235,14 +238,18 @@ export default function OperatorContentDetailPage() {
               <FileText className="w-4 h-4 text-slate-400" />
               <h2 className="text-sm font-medium text-slate-600">콘텐츠</h2>
             </div>
-            {content.blocks && content.blocks.length > 0 ? (
+            {/* WO-O4O-KPA-QR-CONTENT-RICH-EDITOR-ADOPTION-V1:
+                body(HTML) 우선 — 없으면 legacy blocks 로 폴백 */}
+            {content.body && content.body.trim() ? (
+              <ContentRenderer html={content.body} variant="guide" />
+            ) : content.blocks && content.blocks.length > 0 ? (
               <BlockRenderer
                 blocks={kpaBlocksToRendererBlocks(content.blocks)}
                 className="space-y-4"
               />
             ) : (
               <p className="text-sm text-slate-400 text-center py-8">
-                등록된 콘텐츠 블록이 없습니다.
+                등록된 콘텐츠가 없습니다.
               </p>
             )}
           </div>

@@ -18,6 +18,11 @@ import { DataTable } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { getAccessToken } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
+// WO-O4O-KPA-QR-CONTENT-RICH-EDITOR-ADOPTION-V1:
+//   콘텐츠 등록 모달의 JSON textarea → canonical RichTextEditor (body HTML 저장).
+//   O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1 §3.2 "RichTextEditor 기반" 준수.
+import { RichTextEditor } from '@o4o/content-editor';
+import { mediaApi } from '../../api/media';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 
@@ -100,8 +105,9 @@ export default function OperatorContentHubPage() {
     status: 'draft' as 'draft' | 'ready',
     source_type: 'manual' as 'manual' | 'upload' | 'external',
     source_url: '',
-    blocks: '[]',   // JSON string
+    body: '',       // RichTextEditor HTML (canonical 본문)
   });
+  const [editLoading, setEditLoading] = useState(false);
 
   const fetchItems = useCallback(async () => {
     setIsLoading(true);
@@ -159,13 +165,21 @@ export default function OperatorContentHubPage() {
   };
 
   // ─── Modal helpers ────────────────────────────────────────────────────────
+  // WO-O4O-KPA-QR-CONTENT-RICH-EDITOR-ADOPTION-V1: editor 이미지 업로드 핸들러
+  //   (PharmacyBlogPage 와 동일한 canonical 패턴 — mediaApi.upload)
+  const handleImageUpload = async (file: File): Promise<string> => {
+    const res = await mediaApi.upload(file, true, 'kpa-society', 'content-hub');
+    if (res.success && res.data) return res.data.url;
+    throw new Error(res.error || '이미지 업로드에 실패했습니다.');
+  };
+
   const openCreate = () => {
     setEditingId(null);
-    setForm({ title: '', summary: '', category: '', tags: '', status: 'draft', source_type: 'manual', source_url: '', blocks: '[]' });
+    setForm({ title: '', summary: '', category: '', tags: '', status: 'draft', source_type: 'manual', source_url: '', body: '' });
     setShowModal(true);
   };
 
-  const openEdit = (item: ContentItem) => {
+  const openEdit = async (item: ContentItem) => {
     setEditingId(item.id);
     setForm({
       title: item.title,
@@ -175,9 +189,27 @@ export default function OperatorContentHubPage() {
       status: item.status,
       source_type: (item.source_type as any) || 'manual',
       source_url: '',
-      blocks: '[]',
+      body: '',
     });
     setShowModal(true);
+    // 본문(body HTML)은 리스트 응답에 없으므로 상세 조회로 prefill
+    setEditLoading(true);
+    try {
+      const detail = await apiFetch<{ success: boolean; data: { body?: string | null; source_url?: string | null } }>(
+        `/api/v1/kpa/contents/${item.id}`
+      );
+      if (detail.success) {
+        setForm(f => ({
+          ...f,
+          body: detail.data.body || '',
+          source_url: detail.data.source_url || '',
+        }));
+      }
+    } catch {
+      /* prefill 실패 시 빈 본문으로 편집 시작 — 저장 시 기존 blocks 는 보존됨 */
+    } finally {
+      setEditLoading(false);
+    }
   };
 
   const handleSave = async () => {
@@ -191,9 +223,8 @@ export default function OperatorContentHubPage() {
 
     setSaving(true);
     try {
-      let parsedBlocks: object[] = [];
-      try { parsedBlocks = JSON.parse(form.blocks); } catch { parsedBlocks = []; }
-
+      // WO-O4O-KPA-QR-CONTENT-RICH-EDITOR-ADOPTION-V1:
+      //   본문은 RichTextEditor HTML(body)로 저장. legacy blocks 는 미전송 → PATCH 시 보존.
       const payload = {
         title: form.title.trim(),
         summary: form.summary || null,
@@ -202,7 +233,7 @@ export default function OperatorContentHubPage() {
         status: form.status,
         source_type: form.source_type,
         source_url: form.source_url || null,
-        blocks: parsedBlocks,
+        body: form.body || null,
       };
 
       if (editingId) {
@@ -598,18 +629,23 @@ export default function OperatorContentHubPage() {
                   />
                 </div>
               )}
-              {/* Block 콘텐츠 (JSON) */}
+              {/* 본문 — canonical RichTextEditor (WO-O4O-KPA-QR-CONTENT-RICH-EDITOR-ADOPTION-V1) */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  콘텐츠 블록 <span className="text-slate-400 text-xs font-normal">(JSON)</span>
-                </label>
-                <textarea
-                  value={form.blocks}
-                  onChange={e => setForm(f => ({ ...f, blocks: e.target.value }))}
-                  rows={5}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                  placeholder={`[\n  {"type": "text", "content": "내용..."},\n  {"type": "list", "items": ["항목1", "항목2"]}\n]`}
-                />
+                <label className="block text-sm font-medium text-slate-700 mb-1">본문</label>
+                {editLoading ? (
+                  <div className="flex items-center justify-center gap-2 py-12 text-sm text-slate-400 border border-slate-200 rounded-lg">
+                    <Loader2 className="w-4 h-4 animate-spin" /> 본문 불러오는 중…
+                  </div>
+                ) : (
+                  <RichTextEditor
+                    value={form.body}
+                    onChange={(c) => setForm(f => ({ ...f, body: c.html }))}
+                    onImageUpload={handleImageUpload}
+                    placeholder="고객에게 보여줄 안내 콘텐츠를 작성하세요"
+                    minHeight="320px"
+                    preset="full"
+                  />
+                )}
               </div>
             </div>
             <div className="flex items-center justify-end gap-3 p-5 border-t border-slate-100">
