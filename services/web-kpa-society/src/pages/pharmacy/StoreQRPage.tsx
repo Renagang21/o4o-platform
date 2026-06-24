@@ -35,8 +35,11 @@ import {
   createStoreQrCode,
   deleteStoreQrCode,
   getQrAnalytics,
+  // WO-O4O-KPA-STORE-QR-PRINT-EXPORT-UI-WIRING-V1: export foundation 연결
+  downloadQrExport,
+  QR_EXPORT_PRESETS,
 } from '../../api/storeQr';
-import type { StoreQrCode, QrAnalyticsData } from '../../api/storeQr';
+import type { StoreQrCode, QrAnalyticsData, QrExportFormat, QrExportPreset } from '../../api/storeQr';
 import { getListings } from '../../api/pharmacyProducts';
 import { fetchLocalProducts } from '../../api/localProducts';
 import { getAccessToken } from '../../contexts/AuthContext';
@@ -103,6 +106,8 @@ export function StoreQRPage() {
   const [printing, setPrinting] = useState(false);
   const [downloadMenuId, setDownloadMenuId] = useState<string | null>(null);
   const [showPrintModal, setShowPrintModal] = useState(false);
+  // WO-O4O-KPA-STORE-QR-PRINT-EXPORT-UI-WIRING-V1: 출력 진행 중인 QR id (중복 클릭 방지 + 로딩 표시)
+  const [exportingId, setExportingId] = useState<string | null>(null);
 
   // Product dropdown state
   const [productOptions, setProductOptions] = useState<{ id: string; name: string }[]>([]);
@@ -359,15 +364,20 @@ export function StoreQRPage() {
     }
   };
 
-  const handleDownload = (id: string, format: 'png' | 'svg') => {
-    const url = `${apiBase}/pharmacy/qr/${id}/image?format=${format}`;
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = '';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+  // WO-O4O-KPA-STORE-QR-PRINT-EXPORT-UI-WIRING-V1:
+  //   레거시 image?format= 직접 다운로드 → export foundation(downloadQrExport) 연결.
+  //   preset 별 PDF(A4·4분할)/PNG/SVG 다운로드. 동일 QR 출력 중 중복 클릭 방지.
+  const handleExport = async (id: string, format: QrExportFormat, preset: QrExportPreset) => {
+    if (exportingId === id) return;
     setDownloadMenuId(null);
+    setExportingId(id);
+    try {
+      await downloadQrExport(id, format, preset);
+    } catch {
+      toast.error('QR 출력 파일을 만들지 못했습니다. 잠시 후 다시 시도해 주세요.');
+    } finally {
+      setExportingId(null);
+    }
   };
 
   const handleOpenPrintModal = () => {
@@ -858,27 +868,28 @@ export function StoreQRPage() {
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px' }}>
                       <div style={{ position: 'relative' }}>
                         <button
-                          onClick={(e) => { e.stopPropagation(); setDownloadMenuId(downloadMenuId === item.id ? null : item.id); }}
-                          style={styles.downloadBtn}
-                          title="QR 다운로드"
+                          onClick={(e) => { e.stopPropagation(); if (exportingId === item.id) return; setDownloadMenuId(downloadMenuId === item.id ? null : item.id); }}
+                          style={{ ...styles.downloadBtn, opacity: exportingId === item.id ? 0.6 : 1, cursor: exportingId === item.id ? 'wait' : 'pointer' }}
+                          disabled={exportingId === item.id}
+                          title="QR 출력/다운로드"
                         >
                           <Download size={14} />
-                          출력
+                          {exportingId === item.id ? '준비 중…' : '출력'}
                         </button>
+                        {/* WO-O4O-KPA-STORE-QR-PRINT-EXPORT-UI-WIRING-V1:
+                            QR_EXPORT_PRESETS 기반 메뉴 — A4 안내문 PDF / A4 4분할 PDF / PNG / SVG */}
                         {downloadMenuId === item.id && (
                           <div style={styles.downloadMenu}>
-                            <button
-                              onClick={(e) => { e.stopPropagation(); handleDownload(item.id, 'png'); }}
-                              style={styles.downloadMenuItem}
-                            >
-                              PNG 다운로드
-                            </button>
-                            <button
-                              onClick={(e) => { e.stopPropagation(); handleDownload(item.id, 'svg'); }}
-                              style={styles.downloadMenuItem}
-                            >
-                              SVG 다운로드
-                            </button>
+                            {QR_EXPORT_PRESETS.map((opt) => (
+                              <button
+                                key={`${opt.format}-${opt.preset}`}
+                                onClick={(e) => { e.stopPropagation(); handleExport(item.id, opt.format, opt.preset); }}
+                                style={styles.downloadMenuItem}
+                              >
+                                <span style={{ display: 'block', fontWeight: 600, color: colors.neutral700 }}>{opt.label}</span>
+                                <span style={{ display: 'block', fontSize: '11px', color: colors.neutral400, marginTop: '1px' }}>{opt.hint}</span>
+                              </button>
+                            ))}
                           </div>
                         )}
                       </div>
@@ -1527,7 +1538,7 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: '8px',
     boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
     overflow: 'hidden',
-    minWidth: '130px',
+    minWidth: '190px',
   },
   downloadMenuItem: {
     display: 'block',
