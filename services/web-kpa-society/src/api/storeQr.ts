@@ -48,7 +48,7 @@ export interface QrLandingData {
 }
 
 export type QrPageContent =
-  | { available: false; reason: 'private' | 'not_found' }
+  | { available: false; reason: 'unpublished' }
   | {
       available: true;
       title: string;

@@ -183,10 +183,13 @@ export function createStoreQrLandingController(
       //   공개 landing 에서 바로 본문을 읽음). content_hub picker 가 저장한 landing_target_id =
       //   kpa_contents.id (UUID). UUID 형태가 아니면(blog/cms/pop slug 등) 시도하지 않고
       //   frontend 기존 redirect 흐름으로 폴백.
-      //   노출 정책: is_deleted=false 且 status<>'private'. (QR 발행·매장 가져오기 체인이 노출 의도.
-      //   'private' 는 명시적 비노출 신호 → fallback 안내.) body(HTML) 우선, legacy blocks 폴백.
+      //   노출 정책(WO-O4O-KPA-CONTENT-STATUS-SEMANTICS-AUDIT-V1):
+      //   is_deleted=false 且 status IN ('ready','published'). content-meta SSOT 상 kpa_contents 의
+      //   노출 가능 상태는 'ready'('발행 가능/검토 완료'=운영자 '완료'). 'draft'/'private'/기타는
+      //   고객에게 노출하지 않고 fallback 안내. body(HTML) 우선, legacy blocks 폴백.
+      const EXPOSABLE_CONTENT_STATUS = ['ready', 'published'];
       let pageContent:
-        | { available: false; reason: 'private' | 'not_found' }
+        | { available: false; reason: 'unpublished' }
         | { available: true; title: string; summary: string | null; body: string | null; blocks: unknown[]; source: 'content_hub' }
         | null = null;
       const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -202,9 +205,7 @@ export function createStoreQrLandingController(
         // 행이 없으면 pageContent=null 로 둔다 — content_hub 가 아닌 page ref(blog/cms/pop)의
         // 기존 redirect 폴백을 보존하기 위함(비-content_hub 회귀 방지).
         if (c) {
-          if (c.status === 'private') {
-            pageContent = { available: false, reason: 'private' };
-          } else {
+          if (EXPOSABLE_CONTENT_STATUS.includes(c.status)) {
             pageContent = {
               available: true,
               title: c.title,
@@ -213,6 +214,9 @@ export function createStoreQrLandingController(
               blocks: Array.isArray(c.blocks) ? c.blocks : [],
               source: 'content_hub',
             };
+          } else {
+            // draft/private/archived 등 — 비노출(상태 세부는 고객에게 노출하지 않음)
+            pageContent = { available: false, reason: 'unpublished' };
           }
         }
       }

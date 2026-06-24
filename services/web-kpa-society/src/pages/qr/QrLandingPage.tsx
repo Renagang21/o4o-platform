@@ -158,9 +158,7 @@ export default function QrLandingPage() {
               <>
                 <h1 style={styles.title}>{data.title}</h1>
                 <p style={styles.description}>
-                  {pc.reason === 'private'
-                    ? '이 콘텐츠는 현재 비공개 상태입니다.'
-                    : '연결된 콘텐츠를 찾을 수 없습니다.'}
+                  아직 공개되지 않은 콘텐츠입니다.
                 </p>
               </>
             )}

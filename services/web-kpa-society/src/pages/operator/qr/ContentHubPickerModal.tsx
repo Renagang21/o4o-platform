@@ -30,7 +30,9 @@ export default function ContentHubPickerModal({ onSelect, onClose }: Props) {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await listContentHubItems({ page, limit: 8, search });
+      // WO-O4O-KPA-CONTENT-STATUS-SEMANTICS-AUDIT-V1:
+      //   QR 공개 노출 대상은 '완료'(ready) 콘텐츠만 → picker 도 ready 만 노출.
+      const data = await listContentHubItems({ page, limit: 8, search, status: 'ready' });
       setItems(data.items);
       setTotalPages(data.totalPages || 1);
     } catch (e: any) {
@@ -93,9 +95,10 @@ export default function ContentHubPickerModal({ onSelect, onClose }: Props) {
               <p className="text-sm">{error}</p>
             </div>
           ) : items.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 gap-2 text-slate-400">
+            <div className="flex flex-col items-center justify-center py-16 gap-2 text-slate-400 px-6 text-center">
               <FileText className="w-6 h-6" />
-              <p className="text-sm">콘텐츠가 없습니다</p>
+              <p className="text-sm">선택 가능한 콘텐츠가 없습니다</p>
+              <p className="text-xs">QR 공개에는 <span className="font-medium">완료</span> 상태 콘텐츠만 연결할 수 있습니다. 콘텐츠 허브에서 상태를 <span className="font-medium">완료</span>로 변경하세요.</p>
             </div>
           ) : (
             <ul className="divide-y divide-slate-100">

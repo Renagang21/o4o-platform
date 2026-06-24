@@ -1553,7 +1553,11 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         return;
       }
 
-      const validStatuses = ['draft', 'published', 'private'];
+      // WO-O4O-KPA-CONTENT-STATUS-SEMANTICS-AUDIT-V1: 'ready' 추가.
+      //   content-meta SSOT 상 kpa_contents.status = draft|ready('발행 가능/검토 완료').
+      //   기존엔 'ready'(운영자 '완료')가 누락돼 draft 로 silently coercion 되던 버그를 수정한다.
+      //   published/private 는 backward-compat 유지(제거 시 기존 행 영향).
+      const validStatuses = ['draft', 'ready', 'published', 'private'];
       const status = validStatuses.includes(reqStatus) ? reqStatus : 'draft';
       const validContentTypes = ['participation', 'information'];
       const cType = validContentTypes.includes(content_type) ? content_type : 'information';
@@ -1713,7 +1717,11 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       if (source_url !== undefined) { sets.push(`source_url = $${idx++}`); params.push(source_url || null); }
       if (source_file_name !== undefined) { sets.push(`source_file_name = $${idx++}`); params.push(source_file_name || null); }
       if (reqStatus !== undefined) {
-        const validStatuses = ['draft', 'published', 'private'];
+        // WO-O4O-KPA-CONTENT-STATUS-SEMANTICS-AUDIT-V1: 'ready' 추가.
+      //   content-meta SSOT 상 kpa_contents.status = draft|ready('발행 가능/검토 완료').
+      //   기존엔 'ready'(운영자 '완료')가 누락돼 draft 로 silently coercion 되던 버그를 수정한다.
+      //   published/private 는 backward-compat 유지(제거 시 기존 행 영향).
+      const validStatuses = ['draft', 'ready', 'published', 'private'];
         sets.push(`status = $${idx++}`);
         params.push(validStatuses.includes(reqStatus) ? reqStatus : existing.status);
       }
@@ -2066,7 +2074,11 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       asyncHandler(async (req: Request, res: Response) => {
         const user = (req as any).user;
         const { status: newStatus } = req.body;
-        const validStatuses = ['draft', 'published', 'private'];
+        // WO-O4O-KPA-CONTENT-STATUS-SEMANTICS-AUDIT-V1: 'ready' 추가.
+      //   content-meta SSOT 상 kpa_contents.status = draft|ready('발행 가능/검토 완료').
+      //   기존엔 'ready'(운영자 '완료')가 누락돼 draft 로 silently coercion 되던 버그를 수정한다.
+      //   published/private 는 backward-compat 유지(제거 시 기존 행 영향).
+      const validStatuses = ['draft', 'ready', 'published', 'private'];
         if (!newStatus || !validStatuses.includes(newStatus)) {
           res.status(400).json({
             success: false,
