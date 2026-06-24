@@ -1,0 +1,17 @@
+# Gradle
+.gradle/
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Local config
+local.properties
+
+# IDE
+*.iml
+.idea/
+
+# Keystore / secrets
+*.keystore
+*.jks
