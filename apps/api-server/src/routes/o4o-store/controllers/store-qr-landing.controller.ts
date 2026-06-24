@@ -178,6 +178,45 @@ export function createStoreQrLandingController(
         videoUrl = videoRows[0]?.videoUrl || null;
       }
 
+      // WO-O4O-KPA-QR-PAGE-LANDING-RENDER-V1:
+      //   landing_type='page' 이면 콘텐츠 본문을 inline 으로 내려준다(고객이 앱 내부로 진입하지 않고
+      //   공개 landing 에서 바로 본문을 읽음). content_hub picker 가 저장한 landing_target_id =
+      //   kpa_contents.id (UUID). UUID 형태가 아니면(blog/cms/pop slug 등) 시도하지 않고
+      //   frontend 기존 redirect 흐름으로 폴백.
+      //   노출 정책: is_deleted=false 且 status<>'private'. (QR 발행·매장 가져오기 체인이 노출 의도.
+      //   'private' 는 명시적 비노출 신호 → fallback 안내.) body(HTML) 우선, legacy blocks 폴백.
+      let pageContent:
+        | { available: false; reason: 'private' | 'not_found' }
+        | { available: true; title: string; summary: string | null; body: string | null; blocks: unknown[]; source: 'content_hub' }
+        | null = null;
+      const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (qrData.landingType === 'page' && qrData.landingTargetId && UUID_RE.test(qrData.landingTargetId)) {
+        const contentRows = await dataSource.query(
+          `SELECT title, summary, body, blocks, status
+           FROM kpa_contents
+           WHERE id = $1 AND is_deleted = false
+           LIMIT 1`,
+          [qrData.landingTargetId],
+        );
+        const c = contentRows[0];
+        // 행이 없으면 pageContent=null 로 둔다 — content_hub 가 아닌 page ref(blog/cms/pop)의
+        // 기존 redirect 폴백을 보존하기 위함(비-content_hub 회귀 방지).
+        if (c) {
+          if (c.status === 'private') {
+            pageContent = { available: false, reason: 'private' };
+          } else {
+            pageContent = {
+              available: true,
+              title: c.title,
+              summary: c.summary ?? null,
+              body: c.body ?? null,
+              blocks: Array.isArray(c.blocks) ? c.blocks : [],
+              source: 'content_hub',
+            };
+          }
+        }
+      }
+
       res.json({
         success: true,
         data: {
@@ -185,6 +224,7 @@ export function createStoreQrLandingController(
           storeSlug: storeRows[0]?.slug || null,
           productDetails,
           videoUrl,
+          pageContent,
         },
       });
     }),

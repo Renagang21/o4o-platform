@@ -16,6 +16,10 @@ import { getQrLandingData } from '../../api/storeQr';
 import type { QrLandingData } from '../../api/storeQr';
 // WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: 동영상 전용 공개 뷰어
 import PublicVideoViewer from './PublicVideoViewer';
+// WO-O4O-KPA-QR-PAGE-LANDING-RENDER-V1: page 콘텐츠 inline 렌더 (body 우선 / legacy blocks 폴백)
+import { ContentRenderer } from '@o4o/content-editor';
+import { BlockRenderer } from '@o4o/block-renderer';
+import { kpaBlocksToRendererBlocks, type KpaBlock } from '../../utils/kpa-block-adapter';
 
 const LANDING_TYPE_CONFIG: Record<string, { label: string; icon: 'arrow' | 'external' }> = {
   product: { label: '제품 보기', icon: 'arrow' },
@@ -127,6 +131,49 @@ export default function QrLandingPage() {
     return <PublicVideoViewer videoUrl={data.videoUrl} title={data.title} />;
   }
 
+  // WO-O4O-KPA-QR-PAGE-LANDING-RENDER-V1: page 콘텐츠는 공개 landing 에서 본문을 바로 렌더한다
+  //   (앱 내부 /content/:id 인증 화면으로 보내지 않음). content_hub 콘텐츠만 inline 데이터 보유 —
+  //   그 외(blog/cms/pop ref) pageContent=null 이면 아래 카드+버튼 redirect 폴백.
+  if (data.landingType === 'page' && data.pageContent) {
+    const pc = data.pageContent;
+    return (
+      <div style={styles.page}>
+        <div style={{ ...styles.card, maxWidth: '640px' }}>
+          <div style={styles.content}>
+            {pc.available ? (
+              <>
+                <h1 style={styles.title}>{pc.title}</h1>
+                {pc.summary && <p style={styles.description}>{pc.summary}</p>}
+                <div style={styles.pageBody}>
+                  {pc.body && pc.body.trim() ? (
+                    <ContentRenderer html={pc.body} variant="guide" />
+                  ) : pc.blocks && pc.blocks.length > 0 ? (
+                    <BlockRenderer blocks={kpaBlocksToRendererBlocks(pc.blocks as KpaBlock[])} />
+                  ) : (
+                    <p style={styles.description}>본문이 없습니다.</p>
+                  )}
+                </div>
+              </>
+            ) : (
+              <>
+                <h1 style={styles.title}>{data.title}</h1>
+                <p style={styles.description}>
+                  {pc.reason === 'private'
+                    ? '이 콘텐츠는 현재 비공개 상태입니다.'
+                    : '연결된 콘텐츠를 찾을 수 없습니다.'}
+                </p>
+              </>
+            )}
+          </div>
+          <div style={styles.footer}>
+            <QrCode size={14} style={{ color: colors.neutral400 }} />
+            <span style={styles.footerText}>O4O Platform</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const config = LANDING_TYPE_CONFIG[data.landingType] || LANDING_TYPE_CONFIG.link;
   const hasAction = !!data.landingTargetId || (data.landingType === 'tablet' && !!data.storeSlug);
 
@@ -224,6 +271,13 @@ const styles: Record<string, React.CSSProperties> = {
     lineHeight: 1.6,
     marginTop: '12px',
     marginBottom: 0,
+  },
+  // WO-O4O-KPA-QR-PAGE-LANDING-RENDER-V1: page 본문 영역
+  pageBody: {
+    marginTop: '20px',
+    fontSize: '15px',
+    color: colors.neutral700,
+    lineHeight: 1.7,
   },
   actionBtn: {
     display: 'flex',

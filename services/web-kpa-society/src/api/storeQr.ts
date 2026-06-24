@@ -42,7 +42,21 @@ export interface QrLandingData {
   storeSlug: string | null;
   // WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: landingType='video' 일 때 store_videos 사본의 외부 URL.
   videoUrl?: string | null;
+  // WO-O4O-KPA-QR-PAGE-LANDING-RENDER-V1: landingType='page' 일 때 콘텐츠 본문 inline 데이터.
+  //   content_hub(kpa_contents) 만 해석 — 그 외 page ref 는 null(기존 redirect 폴백).
+  pageContent?: QrPageContent | null;
 }
+
+export type QrPageContent =
+  | { available: false; reason: 'private' | 'not_found' }
+  | {
+      available: true;
+      title: string;
+      summary: string | null;
+      body: string | null;
+      blocks: unknown[];
+      source: 'content_hub';
+    };
 
 export interface StoreQrPaginatedResponse {
   items: StoreQrCode[];
