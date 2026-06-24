@@ -31,8 +31,8 @@ import { asyncHandler } from '../../../middleware/error-handler.js';
 import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
 // WO-KPA-STORE-ASSET-DERIVATION-QR-BLOG-WRITEPATH-V1: 원본(library)→qr_code 관계 기록
 import { recordDerivations } from '../services/store-asset-derivation.service.js';
-import { generateQrPng, generateQrSvg, generateQrPrintPdf } from '../../../services/qr-print.service.js';
-import type { QrPrintItem } from '../../../services/qr-print.service.js';
+import { generateQrPng, generateQrSvg, generateQrPrintPdf, generateQrPosterPdf, presetToPixelSize } from '../../../services/qr-print.service.js';
+import type { QrPrintItem, QrExportPreset, QrPosterItem } from '../../../services/qr-print.service.js';
 import { generateProductFlyer } from '../../../services/qr-flyer.service.js';
 import type { FlyerProduct } from '../../../services/qr-flyer.service.js';
 
@@ -426,6 +426,85 @@ export function createStoreQrLandingController(
         res.send(svg);
       } else {
         const png = await generateQrPng(qrUrl, size);
+        res.setHeader('Content-Type', 'image/png');
+        res.setHeader('Content-Disposition', `attachment; filename="qr-${qr.slug}.png"`);
+        res.send(png);
+      }
+    }),
+  );
+
+  // ─── GET /pharmacy/qr/:id/export — 단일 QR 통합 export (PNG/SVG/PDF + preset) ─
+  // WO-O4O-KPA-STORE-QR-PRINT-EXPORT-FOUNDATION-V1
+  //   format: png | svg | pdf
+  //   preset: small | medium | large (png/svg 해상도) | a4 | a4_4up (pdf 레이아웃)
+  //   모든 QR 타입 지원(상품 전용 flyer 와 별개). 매장 소유 + is_active QR 만.
+  //   QR 에는 항상 /qr/:slug public URL 을 담는다(외부 URL QR 도 추적 위해 slug 경유).
+  router.get(
+    '/pharmacy/qr/:id/export',
+    requireAuth,
+    requirePharmacyOwner,
+    asyncHandler(async (req: Request, res: Response) => {
+      const organizationId = (req as any).organizationId;
+      const { id } = req.params;
+      const format = ((req.query.format as string) || 'png').toLowerCase();
+      const presetRaw = ((req.query.preset as string) || '').toLowerCase();
+
+      const VALID_FORMATS = ['png', 'svg', 'pdf'];
+      if (!VALID_FORMATS.includes(format)) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'VALIDATION_ERROR', message: `format must be one of: ${VALID_FORMATS.join(', ')}` },
+        });
+        return;
+      }
+
+      // 삭제(비활성) QR 은 export 불가
+      const qr = await qrRepo.findOne({ where: { id, organizationId, isActive: true } });
+      if (!qr) {
+        res.status(404).json({
+          success: false,
+          error: { code: 'QR_NOT_FOUND', message: 'QR code not found' },
+        });
+        return;
+      }
+
+      // 외부 URL QR 이라도 public /qr/:slug 를 담는다(스캔 추적 보존)
+      const qrUrl = `https://${PUBLIC_DOMAIN}/qr/${qr.slug}`;
+
+      if (format === 'pdf') {
+        const perPage: 1 | 4 = presetRaw === 'a4_4up' ? 4 : 1;
+        const [orgRow] = await dataSource.query(
+          `SELECT name FROM organizations WHERE id = $1 LIMIT 1`,
+          [organizationId],
+        );
+        const item: QrPosterItem = {
+          url: qrUrl,
+          title: qr.title,
+          description: qr.description || undefined,
+          storeName: orgRow?.name || undefined,
+        };
+        // 4분할은 동일 QR 4개를 한 장에 배치(절취 사용)
+        const items = perPage === 4 ? [item, item, item, item] : [item];
+        const pdfBuffer = await generateQrPosterPdf(items, perPage);
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename="qr-${qr.slug}-${perPage === 4 ? 'a4-4up' : 'a4'}.pdf"`);
+        res.send(pdfBuffer);
+        return;
+      }
+
+      // png | svg — preset(small/medium/large) → 픽셀 해상도. quiet zone(margin=4) 보장.
+      const rasterPreset: QrExportPreset = (['small', 'medium', 'large'] as const).includes(presetRaw as any)
+        ? (presetRaw as QrExportPreset)
+        : 'medium';
+      const size = presetToPixelSize(rasterPreset);
+
+      if (format === 'svg') {
+        const svg = await generateQrSvg(qrUrl, size, 4);
+        res.setHeader('Content-Type', 'image/svg+xml');
+        res.setHeader('Content-Disposition', `attachment; filename="qr-${qr.slug}.svg"`);
+        res.send(svg);
+      } else {
+        const png = await generateQrPng(qrUrl, size, 4);
         res.setHeader('Content-Type', 'image/png');
         res.setHeader('Content-Disposition', `attachment; filename="qr-${qr.slug}.png"`);
         res.send(png);
