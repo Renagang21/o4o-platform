@@ -436,7 +436,7 @@ export function StoreQRPage() {
         <GuideBlock
           variant="warning"
           title="QR 코드는 '연결 대상'을 저장합니다"
-          description="QR 코드는 내용을 저장하는 것이 아니라 연결 대상을 저장합니다. 사용자가 QR을 스캔하면 선택한 상품/콘텐츠/페이지/URL로 이동합니다. 내용 자체는 자료실/상품/콘텐츠 페이지에서 관리하세요."
+          description="QR 코드는 내용을 직접 저장하지 않고, 고객이 스캔했을 때 이동할 연결 대상을 저장합니다. 운영자가 제공한 QR 템플릿을 가져오거나, 내 자료/외부 URL을 연결해 새 QR을 만들 수 있습니다."
         />
       </div>
 
@@ -455,7 +455,13 @@ export function StoreQRPage() {
           <div style={{ marginTop: 8 }}><GuideBackLink to="/guide/features/qr" label="QR 활용 방법" /></div>
         </div>
         {/* WO-O4O-KPA-STORE-PRODUCTION-ENTRY-CANONICAL-CORRECTION-V1:
-            "QR 코드 생성" 신규 진입 버튼 제거 — 제작 시작은 "내 자료함"에서만. */}
+            "QR 코드 생성" 신규 진입 버튼 제거 — 제작 시작은 "내 자료함"에서만.
+            WO-O4O-KPA-STORE-QR-WORKFLOW-UX-ALIGNMENT-V1:
+            "생성" 이 아닌 운영자 제공 QR "가져오기" 동선만 상단에 상시 노출. */}
+        <Link to="/store-hub/qr" style={styles.hubImportBtn}>
+          <Download size={14} />
+          매장 HUB에서 가져오기
+        </Link>
       </div>
 
       {/* Batch Print Toolbar */}
@@ -752,17 +758,35 @@ export function StoreQRPage() {
       <div style={styles.body}>
         {!loading && items.length === 0 && !creating ? (
           <div style={styles.emptyState}>
+            {/* WO-O4O-KPA-STORE-QR-WORKFLOW-UX-ALIGNMENT-V1:
+                QR 사용 입구를 3개로 분리 — 운영자 제공 가져오기 / 내 자료 제작 / 외부 URL(준비 중). */}
             <QrCode size={48} style={{ color: colors.neutral300, marginBottom: '12px' }} />
             <p style={{ color: colors.neutral500, fontSize: '14px', margin: 0 }}>
               등록된 QR 코드가 없습니다
             </p>
-            <p style={{ color: colors.neutral400, fontSize: '13px', marginTop: '4px', textAlign: 'center' }}>
-              내 자료함에서 자료를 선택해 QR 코드를 제작할 수 있습니다.
+            <p style={{ color: colors.neutral400, fontSize: '13px', marginTop: '6px', textAlign: 'center', lineHeight: 1.6, maxWidth: 380 }}>
+              운영자가 제공한 QR 템플릿을 가져오거나,<br />
+              내 자료 또는 외부 URL로 새 QR 코드를 만들 수 있습니다.
             </p>
-            <Link to="/store/library/resources" style={styles.emptyStateBtn}>
-              <FolderOpen size={14} />
-              내 자료함 열기
-            </Link>
+            <div style={styles.emptyCtaRow}>
+              <Link to="/store-hub/qr" style={styles.emptyCtaPrimary}>
+                <Download size={14} />
+                매장 HUB에서 QR 가져오기
+              </Link>
+              <Link to="/store/library/resources" style={styles.emptyStateBtn}>
+                <FolderOpen size={14} />
+                내 자료에서 QR 만들기
+              </Link>
+              <button
+                type="button"
+                disabled
+                style={styles.emptyCtaDisabled}
+                title="준비 중 — 외부 URL은 내 자료함에 자료로 등록한 뒤 QR로 만들 수 있습니다."
+              >
+                <ExternalLink size={14} />
+                외부 URL QR 만들기 (준비 중)
+              </button>
+            </div>
           </div>
         ) : (
           <>
@@ -1128,7 +1152,6 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'inline-flex',
     alignItems: 'center',
     gap: '6px',
-    marginTop: '16px',
     padding: '8px 14px',
     border: `1px solid ${colors.primary}`,
     backgroundColor: '#fff',
@@ -1138,6 +1161,58 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 500,
     textDecoration: 'none',
     cursor: 'pointer',
+  },
+  // WO-O4O-KPA-STORE-QR-WORKFLOW-UX-ALIGNMENT-V1: 빈 상태 3-CTA 행
+  emptyCtaRow: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: '8px',
+    marginTop: '20px',
+  },
+  emptyCtaPrimary: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '8px 14px',
+    border: 'none',
+    backgroundColor: colors.primary,
+    color: '#fff',
+    borderRadius: '8px',
+    fontSize: '13px',
+    fontWeight: 600,
+    textDecoration: 'none',
+    cursor: 'pointer',
+  },
+  emptyCtaDisabled: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '8px 14px',
+    border: `1px dashed ${colors.neutral200}`,
+    backgroundColor: colors.neutral50,
+    color: colors.neutral400,
+    borderRadius: '8px',
+    fontSize: '13px',
+    fontWeight: 500,
+    cursor: 'not-allowed',
+  },
+  // 헤더 상시 노출 — 운영자 제공 QR 가져오기 동선
+  hubImportBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '8px 14px',
+    border: `1px solid ${colors.primary}`,
+    backgroundColor: '#fff',
+    color: colors.primary,
+    borderRadius: '8px',
+    fontSize: '13px',
+    fontWeight: 500,
+    textDecoration: 'none',
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+    flexShrink: 0,
   },
 
   // Selected library card
