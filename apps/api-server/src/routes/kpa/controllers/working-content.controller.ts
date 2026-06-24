@@ -120,7 +120,7 @@ export function createWorkingContentController(
       return;
     }
 
-    const { title, edited_blocks, tags, category } = req.body;
+    const { title, edited_blocks, body, tags, category } = req.body;
 
     // O4O Tag Policy V1 — sanitize + 최소 1개 필수
     if (tags !== undefined) {
@@ -137,6 +137,8 @@ export function createWorkingContentController(
 
     if (title !== undefined) { sets.push(`title = $${idx++}`); params.push(title); }
     if (edited_blocks !== undefined) { sets.push(`edited_blocks = $${idx++}`); params.push(JSON.stringify(edited_blocks)); }
+    // WO-O4O-KPA-QR-CONTENT-RICH-EDITOR-ADOPTION-V1: body(HTML) 편집 반영
+    if (body !== undefined) { sets.push(`body = $${idx++}`); params.push(body || null); }
     if (tags !== undefined) { sets.push(`tags = $${idx++}`); params.push(JSON.stringify(sanitizeContentTags(tags))); }
     if (category !== undefined) { sets.push(`category = $${idx++}`); params.push(category || null); }
 
@@ -194,9 +196,11 @@ export function createWorkingContentController(
     }
 
     // Build content_json for asset snapshot
+    // WO-O4O-KPA-QR-CONTENT-RICH-EDITOR-ADOPTION-V1: body(HTML) 도 스냅샷에 포함 (유실 방지)
     const contentJson = {
       title: wc.title,
       blocks: wc.edited_blocks,
+      body: wc.body ?? null,
       tags: wc.tags,
       category: wc.category,
     };

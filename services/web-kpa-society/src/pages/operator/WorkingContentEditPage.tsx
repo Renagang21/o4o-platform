@@ -13,6 +13,9 @@ import {
   Plus, Trash2, FileText,
 } from 'lucide-react';
 import { BlockRenderer } from '@o4o/block-renderer';
+// WO-O4O-KPA-QR-CONTENT-RICH-EDITOR-ADOPTION-V1: body(HTML) canonical 편집/렌더
+import { RichTextEditor, ContentRenderer } from '@o4o/content-editor';
+import { mediaApi } from '../../api/media';
 import {
   fetchWorkingContent,
   updateWorkingContent,
@@ -42,6 +45,10 @@ export default function WorkingContentEditPage() {
   const [content, setContent] = useState<WorkingContentDetail | null>(null);
   const [title, setTitle] = useState('');
   const [blocks, setBlocks] = useState<EditBlock[]>([]);
+  // WO-O4O-KPA-QR-CONTENT-RICH-EDITOR-ADOPTION-V1:
+  //   body 가 있거나 legacy blocks 가 없으면 RichTextEditor(body) 모드, 아니면 legacy 블록 에디터.
+  const [body, setBody] = useState('');
+  const [useBodyEditor, setUseBodyEditor] = useState(false);
   const [tags, setTags] = useState<string[]>([]);
   const [category, setCategory] = useState('');
   const [tagInput, setTagInput] = useState('');
@@ -60,6 +67,10 @@ export default function WorkingContentEditPage() {
         setContent(data);
         setTitle(data.title);
         setBlocks(toEditBlocks(data.edited_blocks as KpaBlock[]));
+        setBody(data.body || '');
+        const hasBody = !!(data.body && data.body.trim());
+        const hasBlocks = (data.edited_blocks?.length ?? 0) > 0;
+        setUseBodyEditor(hasBody || !hasBlocks);
         setTags(data.tags || []);
         setCategory(data.category || '');
       })
@@ -67,17 +78,26 @@ export default function WorkingContentEditPage() {
       .finally(() => setIsLoading(false));
   }, [id]);
 
+  // WO-O4O-KPA-QR-CONTENT-RICH-EDITOR-ADOPTION-V1: editor 이미지 업로드 (canonical mediaApi)
+  const handleImageUpload = async (file: File): Promise<string> => {
+    const res = await mediaApi.upload(file, true, 'kpa-society', 'content-hub');
+    if (res.success && res.data) return res.data.url;
+    throw new Error(res.error || '이미지 업로드에 실패했습니다.');
+  };
+
+  // 저장 페이로드 — body 모드는 body 만, legacy 블록 모드는 edited_blocks 만 전송
+  const buildSavePayload = () => (
+    useBodyEditor
+      ? { title, body: body || null, tags, category: category || null }
+      : { title, edited_blocks: fromEditBlocks(blocks), tags, category: category || null }
+  );
+
   const handleSave = async () => {
     if (!id) return;
     if (tags.length === 0) { toast.error('태그를 1개 이상 입력해주세요'); return; }
     setIsSaving(true);
     try {
-      await updateWorkingContent(id, {
-        title,
-        edited_blocks: fromEditBlocks(blocks),
-        tags,
-        category: category || null,
-      });
+      await updateWorkingContent(id, buildSavePayload());
       toast.success('저장되었습니다');
     } catch (e: any) {
       toast.error(e?.message || '저장에 실패했습니다');
@@ -93,12 +113,7 @@ export default function WorkingContentEditPage() {
     setIsPublishing(true);
     try {
       // Save first
-      await updateWorkingContent(id, {
-        title,
-        edited_blocks: fromEditBlocks(blocks),
-        tags,
-        category: category || null,
-      });
+      await updateWorkingContent(id, buildSavePayload());
       const result = await publishWorkingContent(id);
       toast.success(`발행 완료! (Snapshot: ${result.snapshotId.slice(0, 8)}...)`);
     } catch (e: any) {
@@ -194,7 +209,14 @@ export default function WorkingContentEditPage() {
         /* ── Preview Mode ── */
         <div className="bg-white rounded-xl border border-slate-100 p-6">
           <h2 className="text-lg font-bold text-slate-800 mb-4">{title}</h2>
-          {blocks.length > 0 ? (
+          {/* WO-O4O-KPA-QR-CONTENT-RICH-EDITOR-ADOPTION-V1: body 우선, legacy blocks 폴백 */}
+          {useBodyEditor ? (
+            body && body.trim() ? (
+              <ContentRenderer html={body} variant="guide" />
+            ) : (
+              <p className="text-sm text-slate-400 text-center py-8">본문이 없습니다</p>
+            )
+          ) : blocks.length > 0 ? (
             <BlockRenderer
               blocks={kpaBlocksToRendererBlocks(fromEditBlocks(blocks))}
               className="space-y-4"
@@ -217,7 +239,26 @@ export default function WorkingContentEditPage() {
             />
           </div>
 
-          {/* Blocks */}
+          {/* WO-O4O-KPA-QR-CONTENT-RICH-EDITOR-ADOPTION-V1: body 모드 = canonical RichTextEditor */}
+          {useBodyEditor && (
+            <div className="bg-white rounded-xl border border-slate-100 p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <FileText className="w-4 h-4 text-slate-400" />
+                <h2 className="text-sm font-medium text-slate-600">본문</h2>
+              </div>
+              <RichTextEditor
+                value={body}
+                onChange={(c) => setBody(c.html)}
+                onImageUpload={handleImageUpload}
+                placeholder="고객에게 보여줄 안내 콘텐츠를 작성하세요"
+                minHeight="320px"
+                preset="full"
+              />
+            </div>
+          )}
+
+          {/* Blocks (legacy — body 없는 기존 사본) */}
+          {!useBodyEditor && (
           <div className="bg-white rounded-xl border border-slate-100 p-4">
             <div className="flex items-center gap-2 mb-3">
               <FileText className="w-4 h-4 text-slate-400" />
@@ -317,6 +358,7 @@ export default function WorkingContentEditPage() {
               </button>
             </div>
           </div>
+          )}
 
           {/* Category + Tags */}
           <div className="bg-white rounded-xl border border-slate-100 p-4 space-y-4">

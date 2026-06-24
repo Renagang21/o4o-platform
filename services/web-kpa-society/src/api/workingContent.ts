@@ -28,6 +28,8 @@ export interface WorkingContentDetail extends WorkingContentItem {
     url?: string;
     items?: string[];
   }>;
+  // WO-O4O-KPA-QR-CONTENT-RICH-EDITOR-ADOPTION-V1: body(HTML) canonical 본문
+  body: string | null;
 }
 
 export interface WorkingContentListResponse {
@@ -85,6 +87,7 @@ export async function updateWorkingContent(
   body: {
     title?: string;
     edited_blocks?: object[];
+    body?: string | null;
     tags?: string[];
     category?: string | null;
   },

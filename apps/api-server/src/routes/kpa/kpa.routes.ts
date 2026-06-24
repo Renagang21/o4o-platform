@@ -1955,15 +1955,17 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         return;
       }
       // 완전 독립 복사 — 원본과 분리, sync 없음
+      // WO-O4O-KPA-QR-CONTENT-RICH-EDITOR-ADOPTION-V1: body(HTML) 도 함께 복사 (유실 방지)
       const [saved] = await dataSource.query(
-        `INSERT INTO kpa_working_contents (source_content_id, owner_id, title, edited_blocks, tags, category)
-         VALUES ($1,$2,$3,$4,$5,$6)
+        `INSERT INTO kpa_working_contents (source_content_id, owner_id, title, edited_blocks, body, tags, category)
+         VALUES ($1,$2,$3,$4,$5,$6,$7)
          RETURNING *`,
         [
           content.id,
           userId,
           content.title,
           JSON.stringify(content.blocks),
+          content.body || null,
           JSON.stringify(Array.isArray(content.tags) ? content.tags : []),
           content.category,
         ]

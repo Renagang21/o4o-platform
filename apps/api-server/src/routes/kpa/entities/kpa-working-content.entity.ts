@@ -48,6 +48,13 @@ export class KpaWorkingContent {
   @Column({ type: 'jsonb', default: '[]' })
   edited_blocks: object[];
 
+  /**
+   * 본문 HTML (RichTextEditor canonical) — WO-O4O-KPA-QR-CONTENT-RICH-EDITOR-ADOPTION-V1.
+   * 신규 콘텐츠는 body 우선. legacy 사본은 NULL → edited_blocks 폴백.
+   */
+  @Column({ type: 'text', nullable: true })
+  body: string | null;
+
   @Column({ type: 'jsonb', default: '[]' })
   tags: string[];
 
