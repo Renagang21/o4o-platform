@@ -6,7 +6,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import { ContentRenderer } from './ContentRenderer';
-import { sanitizeRichHtml } from '../sanitize';
+import { sanitizeRichHtml, isBlankHtml } from '../sanitize';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 import Link from '@tiptap/extension-link';
@@ -146,14 +146,21 @@ export function RichTextEditor({
     return () => clearInterval(interval);
   }, [autoSaveInterval, onSave, editor]);
 
-  // 탭 전환 — HTML 탭→편집 탭 시 sanitize 후 editor에 반영
+  // 탭 전환 — HTML draft ↔ editor state 동기화
+  // WO-O4O-STANDARD-EDITOR-HTML-DIRECT-INPUT-PREVIEW-SAVE-FIX-V1 §4.1/§4.4
   function switchTab(tab: 'edit' | 'html' | 'preview') {
-    if (activeTab === 'html' && tab === 'edit') {
+    if (tab === activeTab) return;
+    if (activeTab === 'html') {
+      // HTML 탭을 떠날 때: draft 를 sanitize/normalize 후 editor 에 commit (편집/미리보기/저장 일관성).
+      //   - sanitize 가 malformed wrapper(`</div></p>` 등) 및 위험 태그를 정리 (§4.3)
+      //   - emitUpdate=true → onUpdate 가 onChange 를 호출하여 부모 본문 값까지 동기화 (§4.5)
+      //   - htmlSource(draft) 는 유지 → 미리보기는 사용자가 입력한 그대로 렌더 (§4.4)
       const clean = sanitizeRichHtml(htmlSource);
-      editor?.commands.setContent(clean);
-      // onUpdate가 onChange를 호출하므로 별도 호출 불필요
-    } else if (tab !== 'edit') {
-      setHtmlSource(editor?.getHTML() || '');
+      editor?.commands.setContent(isBlankHtml(clean) ? '' : clean, true);
+    } else if (activeTab === 'edit') {
+      // 편집 탭을 떠날 때만 editor → draft 스냅샷. 빈 문서는 빈 textarea 로 (`<p></p>` 노출 방지, §4.2)
+      const html = editor?.getHTML() || '';
+      setHtmlSource(isBlankHtml(html) ? '' : html);
     }
     setActiveTab(tab);
   }
@@ -252,7 +259,15 @@ export function RichTextEditor({
         <div style={{ padding: '12px' }}>
           <textarea
             value={htmlSource}
-            onChange={(e) => setHtmlSource(e.target.value)}
+            onChange={(e) => {
+              // §4.1/§4.5: HTML draft 를 입력 즉시 부모 본문 값으로 반영.
+              //   저장 버튼은 에디터 외부(소비처)에 있어 탭 전환 없이 저장될 수 있으므로,
+              //   keystroke 마다 onChange 로 전파해야 미리보기·저장이 draft 기준으로 동작한다.
+              //   빈 placeholder(`<p></p>` 등)는 빈 본문('')으로 정규화하여 "내용 없음" 검사가 정상 동작.
+              const next = e.target.value;
+              setHtmlSource(next);
+              onChange?.({ html: isBlankHtml(next) ? '' : next });
+            }}
             style={{
               width: '100%',
               minHeight,

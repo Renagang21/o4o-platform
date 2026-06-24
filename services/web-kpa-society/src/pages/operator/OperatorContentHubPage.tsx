@@ -21,7 +21,7 @@ import { toast } from '@o4o/error-handling';
 // WO-O4O-KPA-QR-CONTENT-RICH-EDITOR-ADOPTION-V1:
 //   콘텐츠 등록 모달의 JSON textarea → canonical RichTextEditor (body HTML 저장).
 //   O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1 §3.2 "RichTextEditor 기반" 준수.
-import { RichTextEditor } from '@o4o/content-editor';
+import { RichTextEditor, isBlankHtml } from '@o4o/content-editor';
 import { mediaApi } from '../../api/media';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
@@ -221,6 +221,14 @@ export default function OperatorContentHubPage() {
     )];
     if (sanitizedTags.length === 0) { toast.error('태그를 1개 이상 입력해주세요'); return; }
 
+    // WO-O4O-STANDARD-EDITOR-HTML-DIRECT-INPUT-PREVIEW-SAVE-FIX-V1 §4.2/§5.4:
+    //   빈 태그(<p></p> 등)만 있는 본문은 빈 본문으로 정규화. 직접 입력(manual)은 본문 필수.
+    const normalizedBody = isBlankHtml(form.body) ? null : form.body;
+    if (form.source_type === 'manual' && !normalizedBody) {
+      toast.error('내용이 없습니다. 본문을 입력해주세요');
+      return;
+    }
+
     setSaving(true);
     try {
       // WO-O4O-KPA-QR-CONTENT-RICH-EDITOR-ADOPTION-V1:
@@ -233,7 +241,7 @@ export default function OperatorContentHubPage() {
         status: form.status,
         source_type: form.source_type,
         source_url: form.source_url || null,
-        body: form.body || null,
+        body: normalizedBody,
       };
 
       if (editingId) {

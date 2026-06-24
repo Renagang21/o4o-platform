@@ -5,7 +5,7 @@
 
 // WO-O4O-LMS-LESSON-AI-ASSIST-V1: AiContentModal 외부 export 추가 (LessonModal 직접 mount용)
 export { RichTextEditor, Toolbar, ContentPreview, ContentRenderer, TemplateModal, SaveTemplateModal, AiContentModal } from './components';
-export { sanitizeHtml, sanitizeRichHtml } from './sanitize';
+export { sanitizeHtml, sanitizeRichHtml, isBlankHtml } from './sanitize';
 export { handleClipboardPaste, compressImage } from './utils/handleImagePaste';
 export type {
   ContentEditorProps,

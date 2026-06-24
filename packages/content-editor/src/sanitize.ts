@@ -8,6 +8,27 @@
 import DOMPurify from 'dompurify';
 
 /**
+ * "빈 본문" 판정 — HTML 직접 입력 모드의 placeholder/공백 정규화.
+ * WO-O4O-STANDARD-EDITOR-HTML-DIRECT-INPUT-PREVIEW-SAVE-FIX-V1 §4.2
+ *
+ * `<p></p>`, `<p><br></p>`, `<div></div>`, `<br>`, 공백만 있는 경우 빈 본문으로 간주.
+ * 단, 텍스트가 없어도 img/iframe/video/hr 등 미디어가 있으면 본문 있음으로 본다.
+ *
+ * 에디터(미리보기·저장 분기)와 소비처(저장 전 본문 존재 여부 검사)가
+ * 동일한 정의를 공유하도록 단일 출처로 export 한다.
+ */
+export function isBlankHtml(html: string | null | undefined): boolean {
+  if (!html) return true;
+  const stripped = html
+    .replace(/<br\s*\/?>/gi, '')
+    .replace(/&nbsp;/gi, '')
+    .replace(/<[^>]*>/g, '')
+    .replace(/\s+/g, '');
+  if (stripped.length > 0) return false;
+  return !/<(img|iframe|video|hr)\b/i.test(html);
+}
+
+/**
  * HTML 문자열을 새니타이즈하여 XSS 공격을 방지합니다.
  */
 export function sanitizeHtml(dirty: string): string {
