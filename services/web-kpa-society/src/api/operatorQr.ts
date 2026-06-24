@@ -32,7 +32,8 @@ function getApiBase(): string {
 
 export type OperatorQrTemplateStatus = 'draft' | 'published' | 'archived';
 export type OperatorQrTemplateTargetType = 'url' | 'content';
-export type OperatorQrTemplateContentKind = 'blog' | 'cms' | 'pop';
+// WO-O4O-KPA-QR-CONTENT-PICKER-V1: 'content_hub' (kpa_contents 콘텐츠 허브) 추가
+export type OperatorQrTemplateContentKind = 'blog' | 'cms' | 'pop' | 'content_hub';
 
 export interface OperatorQrTemplate {
   id: string;

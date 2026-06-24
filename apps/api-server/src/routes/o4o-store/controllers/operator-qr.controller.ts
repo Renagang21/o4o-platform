@@ -60,7 +60,8 @@ import { hasAnyServiceRole } from '../../../utils/role.utils.js';
 import type { PrefixedRole } from '../../../types/roles.js';
 
 const ALLOWED_TARGET_TYPES: ReadonlyArray<OperatorQrTemplateTargetType> = ['url', 'content'];
-const ALLOWED_CONTENT_KINDS: ReadonlyArray<OperatorQrTemplateContentKind> = ['blog', 'cms', 'pop'];
+// WO-O4O-KPA-QR-CONTENT-PICKER-V1: 'content_hub' (kpa_contents 콘텐츠 허브) 추가
+const ALLOWED_CONTENT_KINDS: ReadonlyArray<OperatorQrTemplateContentKind> = ['blog', 'cms', 'pop', 'content_hub'];
 
 /**
  * Operator 게시 허용 역할 — serviceKey 기반 동적 구성.

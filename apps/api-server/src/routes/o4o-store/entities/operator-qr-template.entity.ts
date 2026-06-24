@@ -60,12 +60,17 @@ export type OperatorQrTemplateAuthorRole = 'operator';
 export type OperatorQrTemplateTargetType = 'url' | 'content';
 
 /**
- * target_type='content' 시 콘텐츠 종류 — 1차 범위 3 종.
- *   - 'blog' : store_blog_posts 운영자 게시 블로그
- *   - 'cms'  : cms_contents 운영자 게시 CMS
- *   - 'pop'  : store_pops 운영자 게시 POP
+ * target_type='content' 시 콘텐츠 종류.
+ *   - 'blog'        : store_blog_posts 운영자 게시 블로그
+ *   - 'cms'         : cms_contents 운영자 게시 CMS
+ *   - 'pop'         : store_pops 운영자 게시 POP
+ *   - 'content_hub' : kpa_contents 운영자 콘텐츠 허브 항목
+ *                     (WO-O4O-KPA-QR-CONTENT-PICKER-V1 — 운영자가 picker 로 선택, ref = kpa_contents.id)
+ *
+ * NOTE: target_content_kind 는 DB 에 값 CHECK 제약이 없다(varchar(20)).
+ * 화이트리스트는 app layer(ALLOWED_CONTENT_KINDS)에서만 강제 → 신규 kind 추가에 migration 불필요.
  */
-export type OperatorQrTemplateContentKind = 'blog' | 'cms' | 'pop';
+export type OperatorQrTemplateContentKind = 'blog' | 'cms' | 'pop' | 'content_hub';
 
 @Entity({ name: 'operator_qr_templates' })
 // HUB query 최적화 — service_key + author_role + status 복합 조건
@@ -109,7 +114,7 @@ export class OperatorQrTemplate {
   targetUrl?: string;
 
   /**
-   * target_type='content' 시 콘텐츠 종류 ('blog' | 'cms' | 'pop').
+   * target_type='content' 시 콘텐츠 종류 ('blog' | 'cms' | 'pop' | 'content_hub').
    * target_type='url' 시 NULL.
    */
   @Column({ name: 'target_content_kind', type: 'varchar', length: 20, nullable: true })

@@ -33,7 +33,7 @@
 
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Loader2, AlertCircle, Save, Send, ArrowLeft, Link as LinkIcon, FileText } from 'lucide-react';
+import { Loader2, AlertCircle, Save, Send, ArrowLeft, Link as LinkIcon, FileText, Search, CheckCircle2 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import {
   createOperatorQrTemplate,
@@ -44,8 +44,13 @@ import {
   type OperatorQrTemplateTargetType,
   type OperatorQrTemplateContentKind,
 } from '../../../api/operatorQr';
+// WO-O4O-KPA-QR-CONTENT-PICKER-V1: 콘텐츠 허브 선택기
+import ContentHubPickerModal from './ContentHubPickerModal';
+import { getContentHubItem } from '../../../api/contentHub';
 
 const CONTENT_KINDS: { value: OperatorQrTemplateContentKind; label: string; hint: string }[] = [
+  // WO-O4O-KPA-QR-CONTENT-PICKER-V1: 콘텐츠 허브를 기본 1순위로
+  { value: 'content_hub', label: '콘텐츠 허브', hint: '운영자 콘텐츠 허브에서 선택' },
   { value: 'blog', label: '블로그', hint: '운영자 게시 블로그 slug 또는 id' },
   { value: 'cms', label: 'CMS', hint: 'CMS 콘텐츠 id' },
   { value: 'pop', label: 'POP', hint: '운영자 게시 POP slug 또는 id' },
@@ -60,8 +65,11 @@ export default function OperatorQrWritePage() {
   const [description, setDescription] = useState('');
   const [targetType, setTargetType] = useState<OperatorQrTemplateTargetType>('url');
   const [targetUrl, setTargetUrl] = useState('');
-  const [targetContentKind, setTargetContentKind] = useState<OperatorQrTemplateContentKind>('blog');
+  const [targetContentKind, setTargetContentKind] = useState<OperatorQrTemplateContentKind>('content_hub');
   const [targetContentRef, setTargetContentRef] = useState('');
+  // WO-O4O-KPA-QR-CONTENT-PICKER-V1: 콘텐츠 허브 선택 상태
+  const [showPicker, setShowPicker] = useState(false);
+  const [pickedTitle, setPickedTitle] = useState('');
 
   const [template, setTemplate] = useState<OperatorQrTemplate | null>(null);
   const [isLoading, setIsLoading] = useState(!isNew);
@@ -84,8 +92,14 @@ export default function OperatorQrWritePage() {
         setDescription(data.description ?? '');
         setTargetType(data.targetType);
         setTargetUrl(data.targetUrl ?? '');
-        setTargetContentKind(data.targetContentKind ?? 'blog');
+        setTargetContentKind(data.targetContentKind ?? 'content_hub');
         setTargetContentRef(data.targetContentRef ?? '');
+        // WO-O4O-KPA-QR-CONTENT-PICKER-V1: 콘텐츠 허브 항목이면 제목 표시용 단건 조회
+        if (data.targetType === 'content' && data.targetContentKind === 'content_hub' && data.targetContentRef) {
+          getContentHubItem(data.targetContentRef)
+            .then(c => { if (!canceled) setPickedTitle(c.title); })
+            .catch(() => { /* 제목 표시 실패해도 ref(id)는 유지 — 선택 자체엔 영향 없음 */ });
+        }
       } catch (e: any) {
         if (canceled) return;
         setError(e?.message || 'QR 템플릿을 불러올 수 없습니다');
@@ -346,7 +360,12 @@ export default function OperatorQrWritePage() {
                   <button
                     key={kind.value}
                     type="button"
-                    onClick={() => setTargetContentKind(kind.value)}
+                    onClick={() => {
+                      // kind 전환 시 이전 식별자/제목 초기화 (blog slug 가 content_hub 로 새는 것 방지)
+                      setTargetContentKind(kind.value);
+                      setTargetContentRef('');
+                      setPickedTitle('');
+                    }}
                     disabled={disabled}
                     className={`px-3 py-1.5 rounded-lg text-sm border ${
                       targetContentKind === kind.value
@@ -363,23 +382,75 @@ export default function OperatorQrWritePage() {
               </p>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">콘텐츠 식별자</label>
-              <input
-                type="text"
-                value={targetContentRef}
-                onChange={(e) => setTargetContentRef(e.target.value)}
-                placeholder="slug 또는 id"
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
-                disabled={disabled}
-              />
-              <p className="text-xs text-slate-400 mt-1">
-                매장이 가져갈 때 backend 가 매장 사본 store_qr_codes 의 landing_target_id 로 변환합니다 (Phase 3-B).
-              </p>
-            </div>
+            {/* WO-O4O-KPA-QR-CONTENT-PICKER-V1:
+                content_hub → 콘텐츠 선택기(운영자 기본 흐름). blog/cms/pop → free-form(legacy/dev). */}
+            {targetContentKind === 'content_hub' ? (
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">연결할 콘텐츠</label>
+                {targetContentRef ? (
+                  <div className="flex items-center gap-3 px-3 py-2.5 border border-green-200 bg-green-50 rounded-lg">
+                    <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-slate-800 truncate">
+                        {pickedTitle || '선택된 콘텐츠'}
+                      </p>
+                      <p className="text-xs text-slate-400 font-mono truncate">{targetContentRef}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowPicker(true)}
+                      disabled={disabled}
+                      className="text-sm text-blue-600 hover:underline flex-shrink-0 disabled:opacity-50"
+                    >
+                      변경
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setShowPicker(true)}
+                    disabled={disabled}
+                    className="w-full flex items-center justify-center gap-2 px-3 py-2.5 border border-dashed border-slate-300 rounded-lg text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                  >
+                    <Search className="w-4 h-4" />
+                    콘텐츠 선택
+                  </button>
+                )}
+                <p className="text-xs text-slate-400 mt-1">
+                  콘텐츠 허브에서 항목을 선택하면 매장 가져가기 시 landing 콘텐츠로 연결됩니다.
+                </p>
+              </div>
+            ) : (
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">콘텐츠 식별자</label>
+                <input
+                  type="text"
+                  value={targetContentRef}
+                  onChange={(e) => setTargetContentRef(e.target.value)}
+                  placeholder="slug 또는 id"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={disabled}
+                />
+                <p className="text-xs text-slate-400 mt-1">
+                  매장이 가져갈 때 backend 가 매장 사본 store_qr_codes 의 landing_target_id 로 변환합니다 (Phase 3-B).
+                </p>
+              </div>
+            )}
           </div>
         )}
       </div>
+
+      {/* WO-O4O-KPA-QR-CONTENT-PICKER-V1: 콘텐츠 허브 선택 모달 */}
+      {showPicker && (
+        <ContentHubPickerModal
+          onSelect={({ id, title }) => {
+            setTargetContentRef(id);
+            setPickedTitle(title);
+            setShowPicker(false);
+          }}
+          onClose={() => setShowPicker(false)}
+        />
+      )}
     </div>
   );
 }
