@@ -88,7 +88,9 @@ export default function OperatorContentHubPage() {
   const [searchInput, setSearchInput] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
+  // WO-O4O-KPA-OPERATOR-CONTENT-LIST-STATUS-FILTER-UX-FIX-V1:
+  //   기본 = '전체'(all) — 운영자 관리 목록은 draft+ready 를 함께 보여준다(초안→완료 전환 시 사라지지 않음).
+  const [statusFilter, setStatusFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [copying, setCopying] = useState<string | null>(null);
@@ -471,9 +473,11 @@ export default function OperatorContentHubPage() {
             onChange={e => { setStatusFilter(e.target.value); setCurrentPage(1); }}
             className="px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="">전체 상태</option>
-            <option value="draft">초안</option>
-            <option value="ready">완료</option>
+            {/* WO-O4O-KPA-OPERATOR-CONTENT-LIST-STATUS-FILTER-UX-FIX-V1:
+                기본 '전체'(all)=draft+ready. '' (published OR 본인) legacy 분기는 사용 안 함. */}
+            <option value="all">전체</option>
+            <option value="ready">완료 (즉시 사용)</option>
+            <option value="draft">초안 (비노출)</option>
           </select>
           <button
             onClick={handleSearch}

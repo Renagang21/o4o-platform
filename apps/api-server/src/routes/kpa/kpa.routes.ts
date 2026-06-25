@@ -1462,12 +1462,25 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       const params: any[] = [];
       let idx = 1;
 
+      // WO-O4O-KPA-OPERATOR-CONTENT-LIST-STATUS-FILTER-UX-FIX-V1:
+      //   status=all = 운영자 콘텐츠 허브 '전체 관리 목록'(draft+ready 등 전체 상태, 작성자 무관).
+      //   운영자/관리자만 전체 노출 — 그 외 로그인 사용자는 기존 기본(published OR 본인)으로 폴백,
+      //   비로그인은 published 만(아래 분기). status 미지정('') 기본 동작은 변경하지 않는다.
+      const isAllStatus = statusFilter === 'all';
+      const isOperatorUser = isKpaOperatorOrAdmin((req as any).user);
+
       // my=true: 내 콘텐츠만 (로그인 필수)
       if (my === 'true' && userId) {
         conditions.push(`c.created_by = $${idx++}`);
         params.push(userId);
       } else if (!userId) {
         conditions.push(`c.status = 'published'`);
+      } else if (isAllStatus) {
+        // 운영자/관리자: status 조건 미추가 → 전체 상태 관리 목록. 그 외: 기존 기본으로 폴백.
+        if (!isOperatorUser) {
+          conditions.push(`(c.status = 'published' OR c.created_by = $${idx++})`);
+          params.push(userId);
+        }
       } else if (!statusFilter) {
         // 비로그인 시 published만, 로그인 시 본인 draft/private도 포함
         conditions.push(`(c.status = 'published' OR c.created_by = $${idx++})`);
@@ -1475,7 +1488,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       }
 
       if (category) { conditions.push(`c.category = $${idx++}`); params.push(category); }
-      if (statusFilter) { conditions.push(`c.status = $${idx++}`); params.push(statusFilter); }
+      if (statusFilter && !isAllStatus) { conditions.push(`c.status = $${idx++}`); params.push(statusFilter); }
       if (contentTypeFilter) { conditions.push(`c.content_type = $${idx++}`); params.push(contentTypeFilter); }
       if (subTypeFilter) { conditions.push(`c.sub_type = $${idx++}`); params.push(subTypeFilter); }
       if (search) {
