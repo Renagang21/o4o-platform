@@ -1,5 +1,7 @@
 /**
- * PharmacyStorePage - 매장 설정
+ * PharmacyStorePage - 매장 홈 디자인 (공개 storefront 레이아웃/테마/블록 편집)
+ *   WO-O4O-KPA-STORE-SETTINGS-NAME-ALIGNMENT-V1: 라벨 '매장 설정' → '매장 홈 디자인' 정합.
+ *   URL(/store/settings)·기능 불변. 매장 기본정보는 /store/info(약국 정보) 별도.
  *
  * WO-STORE-COMMON-SETTINGS-KPA-MIGRATION-V1
  *
@@ -213,12 +215,12 @@ export function PharmacyStorePage() {
       <div style={S.container}>
         <header style={S.header}>
           <Link to="/store" style={S.backLink}>&larr; 내 매장관리</Link>
-          <h1 style={S.pageTitle}>매장 설정</h1>
+          <h1 style={S.pageTitle}>매장 홈 디자인</h1>
         </header>
         <div style={S.accessDenied}>
           <span style={{ fontSize: '48px', marginBottom: '16px' }}>🔒</span>
           <h2 style={S.accessDeniedTitle}>접근 권한 없음</h2>
-          <p style={S.accessDeniedText}>매장 설정은 개설약사만 변경할 수 있습니다.</p>
+          <p style={S.accessDeniedText}>매장 홈 디자인은 개설약사만 변경할 수 있습니다.</p>
           <Link to="/store" style={S.backButton}>돌아가기</Link>
         </div>
       </div>
@@ -242,7 +244,7 @@ export function PharmacyStorePage() {
       <div style={S.container}>
         <header style={S.header}>
           <Link to="/store" style={S.backLink}>&larr; 내 매장관리</Link>
-          <h1 style={S.pageTitle}>매장 설정</h1>
+          <h1 style={S.pageTitle}>매장 홈 디자인</h1>
         </header>
         <div style={S.accessDenied}>
           <span style={{ fontSize: '48px', marginBottom: '16px' }}>🏪</span>
@@ -263,10 +265,16 @@ export function PharmacyStorePage() {
           <div style={S.headerMain}>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
               <h1 style={S.pharmacyName}>{pharmacyName}</h1>
-              <span style={S.subLabel}>· 매장 설정</span>
+              <span style={S.subLabel}>· 매장 홈 디자인</span>
             </div>
             <span style={S.roleBadge}>{roleLabel}</span>
           </div>
+          {/* WO-O4O-KPA-STORE-SETTINGS-NAME-ALIGNMENT-V1: 이 화면의 실제 역할 안내 +
+              매장 기본정보는 '약국 정보'에서 관리함을 명시(혼동 방지). 기능 불변. */}
+          <p style={S.headerNote}>
+            공개 매장 홈에 보이는 테마와 콘텐츠 블록을 편집합니다. 약국명·주소·연락처 등 기본정보는{' '}
+            <Link to="/store/info" style={S.headerNoteLink}>약국 정보</Link>에서 관리합니다.
+          </p>
         </div>
       </header>
 
@@ -555,6 +563,9 @@ const S: Record<string, React.CSSProperties> = {
   pharmacyName: { fontSize: '1.5rem', fontWeight: 700, color: colors.neutral900, margin: 0 },
   pageTitle: { fontSize: '1.5rem', fontWeight: 700, color: colors.neutral900, margin: 0 },
   subLabel: { fontSize: '1rem', color: colors.neutral500, fontWeight: 500 },
+  // WO-O4O-KPA-STORE-SETTINGS-NAME-ALIGNMENT-V1
+  headerNote: { fontSize: '0.8125rem', color: colors.neutral500, margin: '8px 0 0', lineHeight: 1.6 },
+  headerNoteLink: { color: colors.primary, textDecoration: 'none', fontWeight: 600 },
   roleBadge: {
     padding: '4px 12px',
     backgroundColor: colors.primary + '15',

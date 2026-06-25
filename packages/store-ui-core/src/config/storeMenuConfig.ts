@@ -303,7 +303,10 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
     ]},
     { label: '설정', items: [
       { key: 'pharmacy-info',  label: '약국 정보', subPath: '/info' },
-      { key: 'store-settings', label: '매장 설정', subPath: '/settings' },
+      // WO-O4O-KPA-STORE-SETTINGS-NAME-ALIGNMENT-V1: /settings 는 일반 설정이 아니라
+      //   공개 매장 홈(storefront) 레이아웃/디자인 편집기 → 라벨을 '매장 홈 디자인' 으로 정합.
+      //   URL(/settings)·기능은 불변. (KPA 전용 config — GP/KCos 무영향)
+      { key: 'store-settings', label: '매장 홈 디자인', subPath: '/settings' },
     ]},
   ],
 };
