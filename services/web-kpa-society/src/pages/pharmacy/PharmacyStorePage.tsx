@@ -33,7 +33,10 @@ import { StoreBlockRegistry, type StoreBlock, type StoreBlockType } from '@o4o/u
 
 type StoreTemplate = 'BASIC' | 'COMMERCE_FOCUS' | 'CONTENT_FOCUS' | 'MINIMAL';
 type StoreTheme = 'professional' | 'neutral' | 'clean' | 'modern';
-type PreviewDevice = 'B2C' | 'TABLET' | 'KIOSK';
+// WO-O4O-KPA-STORE-HOME-DESIGN-LAYOUT-EDITOR-FUNCTIONAL-FIX-V1:
+//   기존 B2C/TABLET/KIOSK '디바이스' 탭은 같은 공개 매장 홈을 폭만 다르게 보여줄 뿐(채널 미리보기 아님),
+//   KIOSK 는 HOLD 라 사용자 노출 부적절 → 정직한 뷰포트 폭(데스크톱/모바일) 토글로 대체.
+type PreviewWidth = 'wide' | 'mobile';
 type SaveState = 'idle' | 'saving' | 'saved' | 'error';
 
 interface StoreSettings {
@@ -58,10 +61,10 @@ const THEMES: Array<{ id: StoreTheme; name: string; primaryColor: string; accent
   { id: 'modern',       name: '모던',   primaryColor: '#0f172a', accentColor: '#475569' },
 ];
 
-const DEVICES: Array<{ id: PreviewDevice; name: string; icon: string; maxWidth: string }> = [
-  { id: 'B2C',    name: 'B2C 몰',   icon: '🛒', maxWidth: '100%' },
-  { id: 'TABLET', name: '태블릿',   icon: '📱', maxWidth: '280px' },
-  { id: 'KIOSK',  name: '키오스크', icon: '🖥️', maxWidth: '200px' },
+// WO-O4O-KPA-STORE-HOME-DESIGN-LAYOUT-EDITOR-FUNCTIONAL-FIX-V1: 뷰포트 폭 토글(채널 아님)
+const PREVIEW_WIDTHS: Array<{ id: PreviewWidth; name: string; icon: string; maxWidth: string }> = [
+  { id: 'wide',   name: '데스크톱', icon: '🖥️', maxWidth: '100%' },
+  { id: 'mobile', name: '모바일',   icon: '📱', maxWidth: '390px' },
 ];
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -87,7 +90,10 @@ export function PharmacyStorePage() {
   const [isDefaultLayout, setIsDefaultLayout] = useState(false);
 
   // UI state
-  const [previewDevice, setPreviewDevice] = useState<PreviewDevice>('B2C');
+  const [previewWidth, setPreviewWidth] = useState<PreviewWidth>('wide');
+  // WO-O4O-KPA-STORE-HOME-DESIGN-LAYOUT-EDITOR-FUNCTIONAL-FIX-V1:
+  //   저장 성공 시 bump → iframe key 갱신으로 미리보기(실제 공개 매장 홈)를 강제 새로고침.
+  const [previewVersion, setPreviewVersion] = useState(0);
   const [saveState, setSaveState] = useState<SaveState>('idle');
   const [error, setError] = useState<string | null>(null);
 
@@ -201,6 +207,8 @@ export function PharmacyStorePage() {
       });
       setSaveState('saved');
       setIsDefaultLayout(false);
+      // 저장된 결과를 미리보기(실제 공개 매장 홈)에 반영하기 위해 iframe 새로고침
+      setPreviewVersion((v) => v + 1);
       setTimeout(() => setSaveState('idle'), 2000);
     } catch (e: any) {
       setSaveState('error');
@@ -460,19 +468,19 @@ export function PharmacyStorePage() {
 
         {/* ── Right: Preview Panel ──────────────────────────────────────── */}
         <div style={S.previewPanel}>
-          {/* Device tabs */}
+          {/* Viewport-width tabs (WO-O4O-KPA-STORE-HOME-DESIGN-LAYOUT-EDITOR-FUNCTIONAL-FIX-V1) */}
           <div style={S.previewHeader}>
             <h2 style={S.previewTitle}>미리보기</h2>
             <div style={{ display: 'flex', gap: '6px' }}>
-              {DEVICES.map(d => (
+              {PREVIEW_WIDTHS.map(d => (
                 <button
                   key={d.id}
                   style={{
                     ...S.deviceTab,
-                    backgroundColor: previewDevice === d.id ? colors.primary : colors.white,
-                    color: previewDevice === d.id ? colors.white : colors.neutral600,
+                    backgroundColor: previewWidth === d.id ? colors.primary : colors.white,
+                    color: previewWidth === d.id ? colors.white : colors.neutral600,
                   }}
-                  onClick={() => setPreviewDevice(d.id)}
+                  onClick={() => setPreviewWidth(d.id)}
                 >
                   <span style={{ fontSize: '1rem' }}>{d.icon}</span>
                   <span>{d.name}</span>
@@ -480,14 +488,16 @@ export function PharmacyStorePage() {
               ))}
             </div>
           </div>
+          {/* 미리보기 성격 안내: 실제 공개 매장 홈(저장본). 저장 시 갱신 */}
+          <p style={S.previewNote}>저장된 실제 매장 홈입니다. 편집 후 <b>변경사항 저장</b>을 누르면 갱신됩니다.</p>
 
           {/* iframe preview */}
           <div style={S.previewFrame}>
             {slug ? (
-              <div style={{ maxWidth: DEVICES.find(d => d.id === previewDevice)?.maxWidth ?? '100%', margin: '0 auto', overflow: 'hidden', borderRadius: '8px', border: `1px solid ${colors.neutral200}` }}>
+              <div style={{ maxWidth: PREVIEW_WIDTHS.find(d => d.id === previewWidth)?.maxWidth ?? '100%', margin: '0 auto', overflow: 'hidden', borderRadius: '8px', border: `1px solid ${colors.neutral200}` }}>
                 <iframe
-                  key={`${slug}-${previewDevice}`}
-                  src={`/store/${encodeURIComponent(slug)}`}
+                  key={`${slug}-${previewWidth}-${previewVersion}`}
+                  src={`/store/${encodeURIComponent(slug)}?preview=${previewVersion}`}
                   title="매장 미리보기"
                   style={{
                     width: '100%',
@@ -535,11 +545,12 @@ export function PharmacyStorePage() {
             </button>
           </div>
 
-          {/* Info notice */}
+          {/* Info notice — WO-O4O-KPA-STORE-HOME-DESIGN-LAYOUT-EDITOR-FUNCTIONAL-FIX-V1:
+              제거된 '채널' 메뉴(현 온라인 판매/고객 응대) 참조 문구 정리 */}
           <div style={S.boundaryNotice}>
             <p style={{ margin: 0, fontSize: '12px', color: colors.neutral500, lineHeight: 1.6 }}>
-              블록 순서·활성화, 템플릿, 테마를 저장하면 실제 매장에 즉시 반영됩니다.
-              채널 설정(B2C·태블릿·키오스크 승인)은 운영자에게 문의하세요.
+              블록 순서·활성화, 템플릿, 테마를 저장하면 실제 공개 매장 홈에 반영됩니다.
+              온라인 판매·고객 응대 설정은 각 전용 메뉴에서 관리합니다.
             </p>
           </div>
         </div>
@@ -676,6 +687,8 @@ const S: Record<string, React.CSSProperties> = {
     display: 'flex', flexDirection: 'column', gap: '12px',
   },
   previewTitle: { fontSize: '1.125rem', fontWeight: 600, color: colors.neutral800, margin: 0 },
+  // WO-O4O-KPA-STORE-HOME-DESIGN-LAYOUT-EDITOR-FUNCTIONAL-FIX-V1
+  previewNote: { fontSize: '0.75rem', color: colors.neutral500, margin: '0 0 8px', lineHeight: 1.5 },
   deviceTab: {
     display: 'flex', alignItems: 'center', gap: '6px',
     padding: '8px 10px', border: `1px solid ${colors.neutral200}`,
