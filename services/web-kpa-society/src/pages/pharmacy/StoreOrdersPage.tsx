@@ -141,8 +141,8 @@ export function StoreOrdersPage() {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
-          <h1 style={S.title}>구매/발주 내역</h1>
-          <p style={S.subtitle}>매장 허브에서 주문한 O4O 상품·이벤트 오퍼의 주문·결제 내역을 확인합니다</p>
+          <h1 style={S.title}>발주 내역</h1>
+          <p style={S.subtitle}>공급자에게 주문한 상품의 발주·결제·배송 진행 상태를 확인합니다 (온라인 판매 고객 주문은 ‘온라인 판매 &gt; 주문 관리’)</p>
         </div>
         <Link to="/store/commerce/order-worktable" style={S.worktableLink}>
           주문 작업대 →
