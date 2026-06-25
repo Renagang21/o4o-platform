@@ -244,10 +244,11 @@ export const GLYCOPHARM_STORE_CONFIG: StoreDashboardConfig = {
  * WO-STORE-SIDEBAR-RESTRUCTURE-V1 / WO-KPA-STORE-MENU-NORMALIZATION-V1 등 이전 정렬 이력 생략.
  * WO-O4O-MY-STORE-PRODUCT-CENTERED-ACTIVATION-V1: 운영/활성화 축 1차 정렬.
  * WO-O4O-STORE-MENU-CANONICAL-TREE-ALIGNMENT-V2 (2026-06-05):
- *   "약국 상품·거래"(거래·주문 대상) 최상단, 활성화 앵커는 "내 약국 제품"(제품=제작 기준 데이터).
- *   상품 설명을 활성화에 추가(라우트 /marketing/product-descriptions 확인됨).
- *   KPA는 거래 신청 전용 라우트 부재로 상품·거래=상품·주문 관리만(데드링크 방지).
+ *   "약국 상품·거래"(거래·주문 대상) 최상단. 상품 설명을 경영지원에 추가(라우트 /marketing/product-descriptions 확인됨).
  *   태블릿/상담 요청은 실기능이라 채널 그룹 보존. 사이니지/분석/설정 유지. subPath 불변.
+ * WO-O4O-KPA-STORE-MENU-ACTIVATION-RELABEL-AND-MY-PRODUCTS-MOVE-V1:
+ *   "약국 활성화" → "약국 경영지원" 라벨 변경 + "내 약국 제품"을 "약국 상품·거래" 그룹으로 이동(route 무변경).
+ *   KPA 섹션 한정 — GP/KCos 무변경.
  */
 export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
   serviceKey: 'kpa-society',
@@ -262,14 +263,18 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       // 상품 = 공급자 거래 상품(B2B). PharmacyB2BPage(/commerce/products).
       // 거래 신청 전용 라우트는 KPA에 없음 → 별도 항목 미추가(데드링크 방지).
       { key: 'products', label: '상품',     subPath: '/commerce/products' },
+      // WO-O4O-KPA-STORE-MENU-ACTIVATION-RELABEL-AND-MY-PRODUCTS-MOVE-V1:
+      //   "내 약국 제품"을 활성화 그룹 → 상품·거래 그룹으로 이동(route 무변경 /my-products).
+      { key: 'my-products', label: '내 약국 제품', subPath: '/my-products' },
       { key: 'orders',   label: '주문 관리', subPath: '/commerce/orders' },
       // WO-O4O-CROSSSERVICE-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1: 판매자 모집 신청 현황(조회)
       { key: 'recruitment-applications', label: '신청·승인 현황', subPath: '/commerce/recruitment-applications' },
     ]},
-    // 약국 활성화 — 내 약국 제품을 앵커로, 제품 파생 콘텐츠(상품 설명/블로그/POP/QR)를 함께 배치.
+    // 약국 경영지원 — 제품 파생 콘텐츠(상품 설명/블로그/POP/QR) 배치.
+    // WO-O4O-KPA-STORE-MENU-ACTIVATION-RELABEL-AND-MY-PRODUCTS-MOVE-V1:
+    //   "약국 활성화" → "약국 경영지원" 라벨 변경. "내 약국 제품"은 "약국 상품·거래" 그룹으로 이동(위 참조).
     // WO-O4O-KPA-STORE-MENU-BLOG-POP-QR-ALIGNMENT-V1 의 라우트/페이지/API 그대로 사용.
-    { label: '약국 활성화', items: [
-      { key: 'my-products',  label: '내 약국 제품', subPath: '/my-products' },
+    { label: '약국 경영지원', items: [
       // WO-O4O-KPA-STORE-MATERIALS-AND-PRODUCTIONS-CANONICAL-ALIGN-V1: StoreProductDescriptionsPage
       { key: 'product-descriptions', label: '상품 설명', subPath: '/marketing/product-descriptions' },
       { key: 'content-blog', label: '블로그',   subPath: '/content/blog' },
