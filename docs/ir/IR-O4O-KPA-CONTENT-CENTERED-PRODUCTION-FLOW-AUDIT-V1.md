@@ -152,30 +152,91 @@
 
 ---
 
-## 11. 기존 데이터 영향 (read-only SQL — 미실행, 실행 시 아래 쿼리)
+## 11. 기존 데이터 영향 (운영 DB read-only count 실행 완료)
 
-> 본 IR은 구조 조사이므로 운영 DB count는 미실행. 필요 시 아래 read-only SELECT를 `gcloud sql` 경유로 실행(데이터 변경 없음). renagang21/테스트 약국, Sohae 약국 대표 사례 포함 권장.
+> **WO-O4O-KPA-CONTENT-CENTERED-PRODUCTION-FLOW-DB-COUNT-BACKFILL-V1**
+> - **실행 일시**: 2026-06-26
+> - **실행 방식**: `cloud-sql-proxy`(127.0.0.1:15433) → `psql` **read-only SELECT** (프로젝트 표준 prod read-only 접속). 데이터/스키마 변경 없음. 자격증명·접속 정보 미기록.
+> - **범위**: §11.1~§11.5 전역 count + §11.6 대표 매장(테스트 약국 / Sohae 약국) per-store count.
+
+### 11.0 실행한 SQL (요약)
 
 ```sql
 -- 콘텐츠 source별 건수
-SELECT 'snapshot' src, count(*) FROM o4o_asset_snapshots WHERE asset_type IN ('cms','content');
-SELECT 'direct' src, count(*) FROM kpa_store_contents WHERE source_type='direct';
-SELECT 'exec-content' src, count(*) FROM store_execution_assets WHERE is_active AND asset_type='content';
-
--- QR target source별 (page=content 참조 / video / link / product)
+SELECT count(*) FROM o4o_asset_snapshots WHERE asset_type IN ('cms','content');           -- snapshot
+SELECT count(*) FROM kpa_store_contents  WHERE source_type='direct';                       -- direct
+SELECT count(*) FROM store_execution_assets WHERE is_active AND asset_type='content';      -- exec-content
+-- QR landing_type별 (active)
 SELECT landing_type, count(*) FROM store_qr_codes WHERE is_active GROUP BY landing_type;
-
--- 기존 QR이 참조하는 execution asset 건수(삭제 시 파손 위험)
-SELECT count(*) FROM store_qr_codes WHERE is_active AND library_item_id IS NOT NULL;
-
--- POP usage_type 자산(결과물) 건수
+-- QR이 execution asset 참조(삭제 시 파손 위험) + 실제 매칭
+SELECT count(*) AS refs, count(e.id) AS matched
+  FROM store_qr_codes q LEFT JOIN store_execution_assets e ON e.id=q.library_item_id
+ WHERE q.is_active AND q.library_item_id IS NOT NULL;
+-- POP usage_type 자산
 SELECT count(*) FROM store_execution_assets WHERE is_active AND usage_type='pop';
-
--- execution_assets 고아 후보(QR/POP 미참조 + generated)
+-- execution_assets 고아 후보(generated + QR 미참조 [+ pop 제외])
 SELECT count(*) FROM store_execution_assets e
  WHERE e.is_active AND e.source_type='generated'
    AND NOT EXISTS (SELECT 1 FROM store_qr_codes q WHERE q.library_item_id=e.id AND q.is_active);
+-- 대표 매장: 위 쿼리에 organization_id=<org> 추가
 ```
+
+### 11.1 콘텐츠 source별 전체 건수
+
+| source | count | 비고 |
+|--------|----:|------|
+| snapshot | **5** | o4o_asset_snapshots asset_type cms/content |
+| direct | **4** | kpa_store_contents source_type direct |
+| exec-content | **3** | store_execution_assets active content |
+
+### 11.2 QR target source별 건수 (active)
+
+| landing_type | count | 비고 |
+|--------------|----:|------|
+| page | **7** | 전부 page (video/link/product/tablet 등 active 0건) |
+
+### 11.3 QR이 execution asset을 참조하는 건수
+
+| 항목 | count | 의미 |
+|------|----:|------|
+| active QR with library_item_id | **3** | execution asset 직접 참조 |
+| matched execution assets | **3** | 실제 active execution asset row 매칭(100%) |
+
+→ active QR 3건이 `store_execution_assets`를 `library_item_id`로 직접 참조. **삭제/타깃 변경 시 공개 URL 파손**.
+
+### 11.4 POP usage_type 자산 건수
+
+| asset_type | count | 비고 |
+|-----------|----:|------|
+| (전체) | **0** | `usage_type='pop'` active execution asset 0건 |
+
+→ 현재 POP 결과물 execution asset **없음** → 콘텐츠/제작자료 목록에 POP 결과물이 섞이는 중복 노출 위험은 **현재 0**.
+
+### 11.5 execution_assets 고아 후보
+
+| 후보 조건 | count | 해석 |
+|----------|----:|------|
+| generated + QR 미참조 | **0** | POP 포함 가능 |
+| generated + QR 미참조 + usage_type != pop | **0** | 고아 후보 |
+
+→ active generated execution-content **3건이 전부 QR에 참조**됨(§11.3 matched=3). **고아 0**. 정리/마이그레이션 대상 없음.
+
+### 11.6 대표 매장별 count
+
+| 매장 | organization_id | snapshot | direct | exec-content | active QR | QR libref | POP |
+|------|-----------------|-------:|-----:|-----------:|--------:|--------:|---:|
+| 테스트 약국 (renagang21) | 9c87f46b… | 1 | 4 | 3 | 7 | 3 | 0 |
+| Sohae 약국 | c9beb4a2… | 1 | 0 | 0 | 0 | 0 | 0 |
+
+> 전역 active QR 7건·direct 4건·exec-content 3건이 **전부 테스트 약국 1개 매장에 집중**(테스트 환경 데이터). Sohae 약국은 snapshot 1건 외 비어 있음. 즉 현재 운영 DB는 **실데이터가 아닌 테스트 데이터 우세** — 절대 건수는 작으나 production 스케일 대표성은 낮음.
+
+### 11.7 해석 및 후속 WO 우선순위 영향
+
+- **QR**: §11.3 = active QR 3건이 execution asset 직접 참조(matched 100%) → `store_execution_assets` 즉시 삭제·타깃 변경 금지. **legacy target 해석 유지 필수**(C안 = `WO-...-CONTENT-SOURCE-CANONICAL-V1` 정당화). 제작자료 **route는 유지**, 메뉴만 숨김 가능.
+- **POP**: §11.4 = POP 결과물 execution asset **0건** → **`WO-O4O-KPA-QR-POP-RESULT-SCOPE-V1` 우선순위 하향**. 현재 중복 노출 실데이터 없음 → 긴급도 낮음(POP 생성 경로 정착 후 재측정 권장).
+- **고아 정리**: §11.5 = 고아 0 → execution-asset 정리·마이그레이션 전용 WO **불필요**.
+- **검색/태그**: §11.1 = source별 ≤5건(소규모) → **1차 검색 확장은 단순 `ILIKE`/text cast로 시작 가능**, GIN index·tags 컬럼·text search는 데이터 증가 후로 연기 가능. → `WO-O4O-KPA-CONTENT-LIST-SEARCH-TAG-V1`은 **(1) 본문/요약 검색 확장(작게) → (2) 태그 컬럼/UX** 2단계로 분리 착수가 안전.
+- **제작자료 메뉴**: QR 참조 3건 존재 → `/store/library/production-materials` **route·legacy landing 유지**, 사용자 메뉴 숨김만 검토(`WO-...-PRODUCTION-MATERIALS-MENU-HIDE-V1`).
 
 ---
 
@@ -201,4 +262,4 @@ SELECT count(*) FROM store_execution_assets e
 - [x] QR/POP 콘텐츠 목록 직접 제작 경로 제시(후속 WO 2·3)
 - [x] AI 제거 범위 정리(QR 안전 / POP·블로그 GP·KCos 공유 / 백엔드 유지)
 - [x] 기존 QR/POP 공개 URL 비파손 전략 제시(참조 유지 + legacy 보존 C안)
-- [ ] 운영 DB 실제 count (§11 쿼리 미실행 — 요청 시 read-only 실행)
+- [x] 운영 DB 실제 count (§11 read-only 실행 완료 — 2026-06-26, WO-...-DB-COUNT-BACKFILL-V1)
