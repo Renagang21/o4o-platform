@@ -10,10 +10,12 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { QrCode, ExternalLink, ArrowRight, AlertCircle } from 'lucide-react';
+import { QrCode, ExternalLink, ArrowRight, AlertCircle, MessageSquare, CheckCircle2 } from 'lucide-react';
 import { colors } from '../../styles/theme';
 import { getQrLandingData } from '../../api/storeQr';
 import type { QrLandingData } from '../../api/storeQr';
+// WO-O4O-KPA-QR-PAGE-CONSULTATION-CTA-V1: QR page 콘텐츠 하단 상담 요청
+import { submitQrPageConsultation } from '../../api/tablet';
 // WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: 동영상 전용 공개 뷰어
 import PublicVideoViewer from './PublicVideoViewer';
 // WO-O4O-KPA-QR-PAGE-LANDING-RENDER-V1: page 콘텐츠 inline 렌더 (body 우선 / legacy blocks 폴백)
@@ -163,6 +165,16 @@ export default function QrLandingPage() {
               </>
             )}
           </div>
+          {/* WO-O4O-KPA-QR-PAGE-CONSULTATION-CTA-V1: 본문 하단 상담 요청 CTA (설정 ON + 공개 콘텐츠 + store slug 필요) */}
+          {pc.available && data.consultationCtaEnabled && data.storeSlug && (
+            <ConsultationCta
+              storeSlug={data.storeSlug}
+              qrSlug={data.slug}
+              landingTargetId={data.landingTargetId}
+              productName={pc.title || data.title}
+              label={data.consultationCtaLabel || '상담 요청하기'}
+            />
+          )}
           <div style={styles.footer}>
             <QrCode size={14} style={{ color: colors.neutral400 }} />
             <span style={styles.footerText}>O4O Platform</span>
@@ -222,6 +234,196 @@ export default function QrLandingPage() {
     </div>
   );
 }
+
+// WO-O4O-KPA-QR-PAGE-CONSULTATION-CTA-V1
+//   QR page 콘텐츠 하단 상담 요청 CTA + 인라인 폼.
+//   상품(masterId) 없는 콘텐츠 상담 — submitQrPageConsultation(source='qr') 호출.
+//   본문 HTML 에 버튼을 박지 않고 설정값(consultationCtaEnabled)으로 렌더(콘텐츠 재사용성 보존).
+function ConsultationCta(props: {
+  storeSlug: string;
+  qrSlug: string;
+  landingTargetId: string | null;
+  productName: string;
+  label: string;
+}) {
+  const { storeSlug, qrSlug, landingTargetId, productName, label } = props;
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState('');
+  const [contact, setContact] = useState('');
+  const [note, setNote] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [done, setDone] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async () => {
+    if (submitting || done) return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      // 연락처/문의 내용을 customer_note 로 합쳐 보존 (별도 컬럼 미도입)
+      const parts: string[] = ['[QR 콘텐츠 상담]'];
+      if (contact.trim()) parts.push(`연락처: ${contact.trim()}`);
+      if (note.trim()) parts.push(`문의: ${note.trim()}`);
+      const customerNote = parts.join(' / ').slice(0, 1000);
+      await submitQrPageConsultation(storeSlug, {
+        productName,
+        customerName: name.trim() || undefined,
+        customerNote,
+        qrSlug,
+        landingTargetId: landingTargetId || undefined,
+      });
+      setDone(true);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '상담 요청에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (done) {
+    return (
+      <div style={ctaStyles.wrap}>
+        <div style={ctaStyles.doneBox}>
+          <CheckCircle2 size={20} style={{ color: colors.primary, flexShrink: 0 }} />
+          <span style={ctaStyles.doneText}>상담 요청이 접수되었습니다. 매장에서 확인 후 연락드립니다.</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!open) {
+    return (
+      <div style={ctaStyles.wrap}>
+        <p style={ctaStyles.lead}>궁금한 점이 있으면 매장에 상담을 요청할 수 있습니다.</p>
+        <button type="button" onClick={() => setOpen(true)} style={ctaStyles.openBtn}>
+          <MessageSquare size={18} />
+          {label}
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div style={ctaStyles.wrap}>
+      <p style={ctaStyles.lead}>아래 정보를 남겨주시면 매장에서 확인 후 연락드립니다. (모두 선택 입력)</p>
+      <input
+        style={ctaStyles.input}
+        placeholder="이름 (선택)"
+        value={name}
+        maxLength={100}
+        onChange={(e) => setName(e.target.value)}
+      />
+      <input
+        style={ctaStyles.input}
+        placeholder="연락처 (선택)"
+        value={contact}
+        maxLength={100}
+        onChange={(e) => setContact(e.target.value)}
+      />
+      <textarea
+        style={{ ...ctaStyles.input, minHeight: 72, resize: 'vertical' }}
+        placeholder="문의 내용 (선택)"
+        value={note}
+        maxLength={500}
+        onChange={(e) => setNote(e.target.value)}
+      />
+      {error && <p style={ctaStyles.error}>{error}</p>}
+      <div style={ctaStyles.btnRow}>
+        <button type="button" onClick={() => setOpen(false)} style={ctaStyles.cancelBtn} disabled={submitting}>
+          취소
+        </button>
+        <button type="button" onClick={handleSubmit} style={ctaStyles.submitBtn} disabled={submitting}>
+          {submitting ? '전송 중...' : '상담 요청 보내기'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+const ctaStyles: Record<string, React.CSSProperties> = {
+  wrap: {
+    margin: '8px 24px 24px',
+    paddingTop: '20px',
+    borderTop: `1px solid ${colors.neutral100}`,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px',
+  },
+  lead: {
+    fontSize: '14px',
+    color: colors.neutral600,
+    margin: 0,
+    lineHeight: 1.5,
+  },
+  openBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '8px',
+    width: '100%',
+    padding: '14px',
+    backgroundColor: colors.primary,
+    color: '#fff',
+    border: 'none',
+    borderRadius: '12px',
+    fontSize: '16px',
+    fontWeight: 600,
+    cursor: 'pointer',
+  },
+  input: {
+    width: '100%',
+    padding: '12px',
+    borderRadius: '10px',
+    border: `1px solid ${colors.neutral300}`,
+    fontSize: '15px',
+    boxSizing: 'border-box',
+  },
+  btnRow: {
+    display: 'flex',
+    gap: '8px',
+  },
+  cancelBtn: {
+    flex: '0 0 auto',
+    padding: '12px 18px',
+    backgroundColor: colors.neutral100,
+    color: colors.neutral700,
+    border: 'none',
+    borderRadius: '10px',
+    fontSize: '15px',
+    fontWeight: 600,
+    cursor: 'pointer',
+  },
+  submitBtn: {
+    flex: 1,
+    padding: '12px',
+    backgroundColor: colors.primary,
+    color: '#fff',
+    border: 'none',
+    borderRadius: '10px',
+    fontSize: '15px',
+    fontWeight: 600,
+    cursor: 'pointer',
+  },
+  error: {
+    fontSize: '13px',
+    color: '#dc2626',
+    margin: 0,
+  },
+  doneBox: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    padding: '14px',
+    backgroundColor: '#f0fdf4',
+    border: '1px solid #bbf7d0',
+    borderRadius: '12px',
+  },
+  doneText: {
+    fontSize: '14px',
+    color: '#166534',
+    lineHeight: 1.5,
+  },
+};
 
 // ── 스타일 (모바일 중심) ──
 

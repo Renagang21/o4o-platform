@@ -53,6 +53,16 @@ export class StoreQrCode {
   @Column({ name: 'is_active', type: 'boolean', default: true })
   isActive!: boolean;
 
+  // WO-O4O-KPA-QR-PAGE-CONSULTATION-CTA-V1
+  //   landingType='page' 콘텐츠 하단에 상담 요청 버튼을 노출할지 여부 (기본 OFF — 기존 QR 회귀 0).
+  //   본문 HTML 에 버튼을 박지 않고 설정값 + landing 렌더러로 처리(콘텐츠 재사용성 보존).
+  @Column({ name: 'consultation_cta_enabled', type: 'boolean', default: false })
+  consultationCtaEnabled!: boolean;
+
+  // 버튼 문구. NULL 이면 프론트 기본값('상담 요청하기') 사용.
+  @Column({ name: 'consultation_cta_label', type: 'varchar', length: 100, nullable: true })
+  consultationCtaLabel?: string | null;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 

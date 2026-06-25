@@ -46,6 +46,9 @@ export interface QrLandingData {
   // WO-O4O-KPA-QR-PAGE-LANDING-RENDER-V1: landingType='page' 일 때 콘텐츠 본문 inline 데이터.
   //   content_hub(kpa_contents) 만 해석 — 그 외 page ref 는 null(기존 redirect 폴백).
   pageContent?: QrPageContent | null;
+  // WO-O4O-KPA-QR-PAGE-CONSULTATION-CTA-V1: page 콘텐츠 하단 상담 요청 버튼 노출 설정.
+  consultationCtaEnabled?: boolean;
+  consultationCtaLabel?: string | null;
 }
 
 export type QrPageContent =
@@ -95,6 +98,9 @@ export async function createStoreQrCode(data: {
   landingType: string;
   landingTargetId?: string;
   slug: string;
+  // WO-O4O-KPA-QR-PAGE-CONSULTATION-CTA-V1: page 콘텐츠 상담 CTA 설정
+  consultationCtaEnabled?: boolean;
+  consultationCtaLabel?: string;
 }): Promise<{ success: boolean; data: StoreQrCode }> {
   return apiClient.post('/pharmacy/qr', data);
 }
@@ -109,6 +115,8 @@ export async function updateStoreQrCode(
     landingType: string;
     landingTargetId: string;
     slug: string;
+    consultationCtaEnabled: boolean;
+    consultationCtaLabel: string;
   }>,
 ): Promise<{ success: boolean; data: StoreQrCode }> {
   return apiClient.put(`/pharmacy/qr/${id}`, data);

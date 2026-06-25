@@ -40,10 +40,12 @@ export class TabletInterestRequest {
   @Column({ name: 'organization_id', type: 'uuid' })
   organizationId!: string;
 
-  @Column({ name: 'master_id', type: 'uuid' })
-  masterId!: string;
+  // WO-O4O-KPA-QR-PAGE-CONSULTATION-CTA-V1: master_id nullable 완화.
+  //   상품 상담(태블릿)은 master_id 저장, QR page(콘텐츠) 상담은 master_id=NULL 허용.
+  @Column({ name: 'master_id', type: 'uuid', nullable: true })
+  masterId?: string | null;
 
-  @ManyToOne('ProductMaster', { onDelete: 'CASCADE' })
+  @ManyToOne('ProductMaster', { onDelete: 'CASCADE', nullable: true })
   @JoinColumn({ name: 'master_id' })
   master?: ProductMaster;
 

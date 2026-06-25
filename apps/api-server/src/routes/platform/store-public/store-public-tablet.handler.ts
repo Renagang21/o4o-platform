@@ -82,41 +82,65 @@ export function createStorePublicTabletRoutes(deps: {
 
   // POST /:slug/tablet/interest — Interest request creation (public, rate-limited)
   // WO-O4O-TABLET-MODULE-V1: 고객이 개별 상품에 관심 표시
+  // WO-O4O-KPA-QR-PAGE-CONSULTATION-CTA-V1: 상품 없는 콘텐츠 상담(QR page CTA) 허용.
+  //   masterId 있으면 상품 상담(기존), 없으면 콘텐츠 상담(master_id=NULL, productName fallback).
   router.post('/:slug/tablet/interest', tabletRequestLimiter as any, async (req: Request, res: Response): Promise<void> => {
     try {
       const resolved = await resolvePublicStore(dataSource, req.params.slug, req, res);
       if (!resolved) return;
 
-      const { masterId, customerName, customerNote } = req.body;
+      const {
+        masterId,
+        customerName,
+        customerNote,
+        // QR page 콘텐츠 상담 확장 필드
+        productName: bodyProductName,
+        source: bodySource,
+        qrSlug,
+        landingType: bodyLandingType,
+        landingTargetId: bodyLandingTargetId,
+      } = req.body;
 
-      if (!masterId || typeof masterId !== 'string') {
-        res.status(400).json({
-          success: false,
-          error: { code: 'INVALID_MASTER_ID', message: '상품 ID가 필요합니다.' },
-        });
-        return;
-      }
+      const source: 'tablet' | 'qr' = bodySource === 'qr' ? 'qr' : 'tablet';
 
-      // Master 존재 확인
-      const masterRepo = dataSource.getRepository(ProductMaster);
-      const master = await masterRepo.findOne({
-        where: { id: masterId },
-        select: ['id', 'name'],
-      });
-      if (!master) {
-        res.status(404).json({
-          success: false,
-          error: { code: 'PRODUCT_NOT_FOUND', message: '상품을 찾을 수 없습니다.' },
+      let resolvedMasterId: string | null = null;
+      let productName: string;
+
+      if (masterId) {
+        if (typeof masterId !== 'string') {
+          res.status(400).json({
+            success: false,
+            error: { code: 'INVALID_MASTER_ID', message: '상품 ID가 올바르지 않습니다.' },
+          });
+          return;
+        }
+        // Master 존재 확인 (상품 상담)
+        const masterRepo = dataSource.getRepository(ProductMaster);
+        const master = await masterRepo.findOne({
+          where: { id: masterId },
+          select: ['id', 'name'],
         });
-        return;
+        if (!master) {
+          res.status(404).json({
+            success: false,
+            error: { code: 'PRODUCT_NOT_FOUND', message: '상품을 찾을 수 없습니다.' },
+          });
+          return;
+        }
+        resolvedMasterId = master.id;
+        productName = master.name;
+      } else {
+        // 상품 없는 콘텐츠 상담 (QR page CTA 등) — master_id=NULL, 표시명 fallback
+        const trimmed = typeof bodyProductName === 'string' ? bodyProductName.trim() : '';
+        productName = (trimmed || 'QR 콘텐츠 상담 요청').slice(0, 255);
       }
 
       // 관심 요청 생성
       const interestRepo = dataSource.getRepository(TabletInterestRequest);
       const interest = interestRepo.create({
         organizationId: resolved.storeId,
-        masterId: master.id,
-        productName: master.name,
+        masterId: resolvedMasterId,
+        productName,
         customerName: customerName?.trim() || undefined,
         customerNote: customerNote?.trim() || undefined,
         status: InterestRequestStatus.REQUESTED,
@@ -164,9 +188,17 @@ export function createStorePublicTabletRoutes(deps: {
                   requestId: saved.id,
                   organizationId: resolved.storeId,
                   storeSlug: req.params.slug,
-                  source: 'tablet',
+                  source,
                   targetType: 'tablet_interest_request',
                   productName,
+                  // QR page 콘텐츠 상담일 때 출처 컨텍스트 기록 (source 컬럼 미도입 — metadata 로 보존)
+                  ...(source === 'qr'
+                    ? {
+                        qrSlug: qrSlug || null,
+                        landingType: bodyLandingType || 'page',
+                        landingTargetId: bodyLandingTargetId || null,
+                      }
+                    : {}),
                 },
               }),
             ),

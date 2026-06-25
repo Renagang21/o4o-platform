@@ -193,6 +193,9 @@ export function StoreQRPage() {
   const [formDescription, setFormDescription] = useState('');
   const [selectedTemplate, setSelectedTemplate] = useState<ProductionTemplate | null>(null);
   const [aiOpen, setAiOpen] = useState(false);
+  // WO-O4O-KPA-QR-PAGE-CONSULTATION-CTA-V1: 콘텐츠(page) QR 하단 상담 요청 버튼 옵션
+  const [ctaEnabled, setCtaEnabled] = useState(false);
+  const [ctaLabel, setCtaLabel] = useState('');
 
   // Analytics state
   const [analyticsId, setAnalyticsId] = useState<string | null>(null);
@@ -411,12 +414,18 @@ export function StoreQRPage() {
         landingType: isContentRef ? 'page' : formLandingType,
         landingTargetId: isContentRef ? selectedLibrary.id : (formLandingTargetId || undefined),
         slug: formSlug.trim(),
+        // WO-O4O-KPA-QR-PAGE-CONSULTATION-CTA-V1: page(콘텐츠 참조) QR 에서만 상담 CTA 설정 전송
+        ...(isContentRef && ctaEnabled
+          ? { consultationCtaEnabled: true, consultationCtaLabel: ctaLabel.trim() || undefined }
+          : {}),
       });
 
       if (res.success && res.data) {
         setItems((prev) => [res.data, ...prev]);
         setCreating(false);
         setSelectedLibrary(null);
+        setCtaEnabled(false);
+        setCtaLabel('');
       } else {
         setFormError('저장에 실패했습니다');
       }
@@ -835,6 +844,33 @@ export function StoreQRPage() {
                 description="QR을 스캔하면 선택한 운영자 콘텐츠가 표시됩니다. 운영자 원본을 가리키는 연결이며, 매장 사본을 만들지 않습니다(원본이 수정되면 함께 반영됩니다)."
                 compact
               />
+              {/* WO-O4O-KPA-QR-PAGE-CONSULTATION-CTA-V1: 콘텐츠 하단 상담 요청 버튼 옵션 (page 타입 전용) */}
+              <div style={{ marginTop: '12px', padding: '12px', border: `1px solid ${colors.neutral200}`, borderRadius: '8px' }}>
+                <label style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={ctaEnabled}
+                    onChange={(e) => setCtaEnabled(e.target.checked)}
+                    style={{ marginTop: '3px' }}
+                  />
+                  <span>
+                    <span style={{ fontSize: '14px', fontWeight: 600, color: colors.neutral800 }}>콘텐츠 하단에 상담 요청 버튼 표시</span>
+                    <span style={{ display: 'block', fontSize: '12px', color: colors.neutral500, marginTop: '2px', lineHeight: 1.5 }}>
+                      QR을 본 고객이 콘텐츠 하단에서 바로 상담을 요청할 수 있습니다. 요청은 매장 알림으로 전달됩니다.
+                    </span>
+                  </span>
+                </label>
+                {ctaEnabled && (
+                  <input
+                    type="text"
+                    value={ctaLabel}
+                    onChange={(e) => setCtaLabel(e.target.value)}
+                    style={{ ...styles.input, marginTop: '10px' }}
+                    placeholder="버튼 문구 (기본: 상담 요청하기)"
+                    maxLength={100}
+                  />
+                )}
+              </div>
             </div>
           ) : (
             <>
@@ -896,7 +932,7 @@ export function StoreQRPage() {
 
           <div style={styles.formActions}>
             <button
-              onClick={() => { setCreating(false); setSelectedLibrary(null); }}
+              onClick={() => { setCreating(false); setSelectedLibrary(null); setCtaEnabled(false); setCtaLabel(''); }}
               style={styles.cancelBtn}
             >
               취소

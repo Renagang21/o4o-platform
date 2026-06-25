@@ -83,6 +83,33 @@ export async function submitTabletInterest(
   return json.data;
 }
 
+/**
+ * WO-O4O-KPA-QR-PAGE-CONSULTATION-CTA-V1
+ * QR page 콘텐츠 상담 요청 — 상품(masterId) 없는 상담.
+ * 같은 공개 엔드포인트(/stores/:slug/tablet/interest)를 재사용하되 source='qr' 로 전송.
+ * 서버에서 master_id=NULL, productName fallback, 알림 metadata 에 qr 컨텍스트 기록.
+ */
+export async function submitQrPageConsultation(
+  slug: string,
+  body: {
+    productName?: string;
+    customerName?: string;
+    customerNote?: string;
+    qrSlug?: string;
+    landingTargetId?: string;
+  },
+): Promise<InterestSubmitResult> {
+  const url = `${getApiBase()}/${encodeURIComponent(slug)}/tablet/interest`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ...body, source: 'qr', landingType: 'page' }),
+  });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error?.message || '상담 요청 생성에 실패했습니다.');
+  return json.data;
+}
+
 export async function checkTabletInterestStatus(
   slug: string,
   interestId: string,
