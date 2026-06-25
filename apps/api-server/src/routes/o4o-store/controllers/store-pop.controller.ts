@@ -27,6 +27,9 @@ import { KpaStoreContent } from '../../kpa/entities/kpa-store-content.entity.js'
 import { AssetSnapshot } from '../../../modules/asset-snapshot/entities/asset-snapshot.entity.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
+// HOTFIX-O4O-STORE-POP-PUBLIC-DOMAIN-CANONICAL-FIX-V1:
+//   POP 에 embed 되는 QR URL 도 서비스별 canonical 공개 도메인(service-catalog SSOT)을 사용.
+import { getService } from '../../../config/service-catalog.js';
 import { generatePopPdf } from '../../../services/pop-generator.service.js';
 import type { PopGenerateInput, PopAiContent } from '../../../services/pop-generator.service.js';
 // WO-KPA-POP-RESULT-PERSIST-AND-CONTENT-PDF-PATH-V1: 생성 POP PDF durable 저장(GCS)
@@ -36,7 +39,21 @@ import { recordDerivations } from '../services/store-asset-derivation.service.js
 
 type AuthMiddleware = RequestHandler;
 
-const PUBLIC_DOMAIN = process.env.PUBLIC_DOMAIN || 'o4o.kr';
+// HOTFIX-O4O-STORE-POP-PUBLIC-DOMAIN-CANONICAL-FIX-V1:
+//   StoreOwnerServiceKey(role-prefix) → service-catalog key 매핑 + 서비스별 공개 origin.
+//   과거 전역 `PUBLIC_DOMAIN || 'o4o.kr'` fallback 으로 POP QR URL 이 o4o.kr 로 박히던 문제 수정.
+//   (store-qr-landing.controller 의 qrPublicOrigin 과 동일 정책 — 도메인 출처는 service-catalog 단일.)
+const POP_SERVICE_TO_CATALOG_KEY: Record<StoreOwnerServiceKey, string> = {
+  kpa: 'kpa-society',
+  glycopharm: 'glycopharm',
+  cosmetics: 'k-cosmetics',
+};
+
+function storePublicOrigin(serviceKey?: StoreOwnerServiceKey): string {
+  const catalogKey = serviceKey ? POP_SERVICE_TO_CATALOG_KEY[serviceKey] : 'kpa-society';
+  const domain = getService(catalogKey)?.domain;
+  return `https://${domain || 'kpa-society.co.kr'}`;
+}
 
 // 이미지로 사용 가능한 MIME 타입
 const IMAGE_MIME_TYPES = new Set([
@@ -325,7 +342,7 @@ export function createStorePopController(
       if (qrId) {
         const qr = await qrRepo.findOne({ where: { id: qrId, organizationId } });
         if (qr) {
-          qrUrl = `https://${PUBLIC_DOMAIN}/qr/${qr.slug}`;
+          qrUrl = `${storePublicOrigin(serviceKey)}/qr/${qr.slug}`;
         }
       }
       if (qrUrl) {
