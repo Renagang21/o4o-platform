@@ -14,7 +14,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { QrCode, Trash2, ExternalLink, Copy, Check, BarChart3, X, Smartphone, Monitor, Tablet, Download, Printer, ArrowRight, FolderOpen, Sparkles, LayoutTemplate } from 'lucide-react';
+import { QrCode, Trash2, ExternalLink, Copy, Check, BarChart3, X, Smartphone, Monitor, Tablet, Download, Printer, ArrowRight, FolderOpen, Sparkles, LayoutTemplate, Info } from 'lucide-react';
 // WO-O4O-KPA-MY-STORE-COPIES-STANDARD-TABLE-V1: list rendering 표준 테이블 (자체 selection + bulk print 보존)
 import { DataTable, type Column } from '@o4o/ui';
 import { getStoreExecutionAsset } from '../../api/storeExecutionAssets';
@@ -74,6 +74,16 @@ function autoLandingType(assetType: string): string {
   if (assetType === 'external-link') return 'link';
   return 'page'; // file, content → page
 }
+
+// WO-O4O-KPA-STORE-QR-EXPORT-FILE-GUIDE-V1: 출력 파일 선택 안내(상황 → 추천 파일 → 이유)
+const QR_EXPORT_GUIDE: { situation: string; recommend: string; reason: string }[] = [
+  { situation: '전문 출력소·디자인 업체에 전달', recommend: 'SVG (벡터)', reason: '크기를 키우거나 줄여도 선명하게 출력됩니다' },
+  { situation: '대형 POP·포스터·진열대 출력', recommend: 'SVG 우선 · PNG 고해상도', reason: '큰 사이즈 출력에 유리합니다' },
+  { situation: 'PPT·문서·POP 편집에 삽입', recommend: 'PNG 고해상도', reason: '일반 문서 편집 도구에서 사용하기 쉽습니다' },
+  { situation: '약국에서 A4로 바로 출력', recommend: 'A4 1장 PDF', reason: '별도 편집 없이 바로 출력하기 좋습니다' },
+  { situation: '작은 안내카드 여러 장', recommend: 'A4 4분할 PDF', reason: '잘라서 여러 곳에 부착하기 좋습니다' },
+  { situation: '임시 확인·간단 공유', recommend: 'PNG (이미지)', reason: '가장 간단하지만 확대 출력에는 적합하지 않습니다' },
+];
 
 // WO-O4O-KPA-STORE-QR-EXPORT-MENU-CLIP-FIX-V1:
 //   QR 목록은 @o4o/ui DataTable(BaseTable) 을 쓰는데, 내부 wrapper 가 `overflow-x-auto` 라
@@ -191,6 +201,8 @@ export function StoreQRPage() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [printing, setPrinting] = useState(false);
   const [showPrintModal, setShowPrintModal] = useState(false);
+  // WO-O4O-KPA-STORE-QR-EXPORT-FILE-GUIDE-V1: 출력 파일 선택 안내 모달
+  const [showExportGuide, setShowExportGuide] = useState(false);
   // WO-O4O-KPA-STORE-QR-PRINT-EXPORT-UI-WIRING-V1: 출력 진행 중인 QR id (중복 클릭 방지 + 로딩 표시)
   const [exportingId, setExportingId] = useState<string | null>(null);
 
@@ -562,7 +574,18 @@ export function StoreQRPage() {
           </div>
           <h1 style={styles.title}>QR 코드</h1>
           <p style={styles.subtitle}>매장에 부착·재사용할 QR 코드를 모아 출력합니다</p>
-          <div style={{ marginTop: 8 }}><GuideBackLink to="/guide/features/qr" label="QR 활용 방법" /></div>
+          <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+            <GuideBackLink to="/guide/features/qr" label="QR 활용 방법" />
+            {/* WO-O4O-KPA-STORE-QR-EXPORT-FILE-GUIDE-V1: 출력 파일 선택 기준 안내 보조 버튼 */}
+            <button
+              type="button"
+              onClick={() => setShowExportGuide(true)}
+              style={styles.exportGuideBtn}
+            >
+              <Info size={13} />
+              파일 선택 안내
+            </button>
+          </div>
         </div>
         {/* WO-O4O-KPA-STORE-QR-TARGET-SCOPE-AUDIT-V1 (A안):
             QR 생성 진입을 페이지 내부 선택 모달로 직접 오픈 (내 자료함 이탈 동선 보완).
@@ -1137,6 +1160,36 @@ export function StoreQRPage() {
         onConfirm={handleConfirmPrint}
         onClose={() => setShowPrintModal(false)}
       />
+
+      {/* WO-O4O-KPA-STORE-QR-EXPORT-FILE-GUIDE-V1: 출력 파일 선택 안내 모달
+          상황별 추천 파일/이유를 카드형으로 안내(모바일에서도 표 깨짐 없음). */}
+      {showExportGuide && (
+        <div style={styles.guideOverlay} onClick={() => setShowExportGuide(false)}>
+          <div style={styles.guideModal} onClick={(e) => e.stopPropagation()}>
+            <div style={styles.guideHeader}>
+              <h2 style={styles.guideTitle}>QR 출력 파일은 이렇게 선택하세요</h2>
+              <button onClick={() => setShowExportGuide(false)} style={styles.iconBtn} aria-label="닫기">
+                <X size={20} />
+              </button>
+            </div>
+            <div style={styles.guideBody}>
+              {QR_EXPORT_GUIDE.map((g) => (
+                <div key={g.situation} style={styles.guideCard}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={styles.guideSituation}>{g.situation}</p>
+                    <p style={styles.guideReason}>{g.reason}</p>
+                  </div>
+                  <span style={styles.guideRecommend}>{g.recommend}</span>
+                </div>
+              ))}
+            </div>
+            <div style={styles.guideFooterNote}>
+              크기 조절이나 전문 출력소 전달이 필요하면 <strong>SVG (벡터)</strong>를 선택하세요.<br />
+              약국에서 바로 종이에 출력할 때는 <strong>A4 PDF</strong>가 가장 간단합니다.
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1666,5 +1719,103 @@ const styles: Record<string, React.CSSProperties> = {
     color: colors.neutral700,
     cursor: 'pointer',
     textAlign: 'left',
+  },
+
+  // WO-O4O-KPA-STORE-QR-EXPORT-FILE-GUIDE-V1: 파일 선택 안내 버튼 + 모달
+  exportGuideBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '4px',
+    padding: '4px 10px',
+    border: `1px solid ${colors.neutral200}`,
+    backgroundColor: '#fff',
+    color: colors.neutral600,
+    borderRadius: '6px',
+    fontSize: '12px',
+    fontWeight: 500,
+    cursor: 'pointer',
+  },
+  guideOverlay: {
+    position: 'fixed',
+    inset: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1000,
+    padding: '16px',
+  },
+  guideModal: {
+    width: '560px',
+    maxWidth: '95vw',
+    maxHeight: '85vh',
+    backgroundColor: '#fff',
+    borderRadius: '16px',
+    display: 'flex',
+    flexDirection: 'column',
+    boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
+  },
+  guideHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '20px 24px 12px',
+  },
+  guideTitle: {
+    fontSize: '17px',
+    fontWeight: 700,
+    color: colors.neutral800,
+    margin: 0,
+  },
+  guideBody: {
+    flex: 1,
+    overflow: 'auto',
+    padding: '4px 24px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+  },
+  guideCard: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    padding: '12px 14px',
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: '10px',
+    backgroundColor: colors.neutral50,
+  },
+  guideSituation: {
+    fontSize: '14px',
+    fontWeight: 600,
+    color: colors.neutral800,
+    margin: 0,
+  },
+  guideReason: {
+    fontSize: '12px',
+    color: colors.neutral500,
+    margin: '3px 0 0',
+    lineHeight: 1.5,
+  },
+  guideRecommend: {
+    flexShrink: 0,
+    maxWidth: '40%',
+    padding: '4px 10px',
+    backgroundColor: '#eef2ff',
+    color: '#4338ca',
+    borderRadius: '12px',
+    fontSize: '12px',
+    fontWeight: 600,
+    textAlign: 'center',
+    lineHeight: 1.4,
+  },
+  guideFooterNote: {
+    margin: '12px 24px 20px',
+    padding: '12px 14px',
+    backgroundColor: '#fffbeb',
+    border: '1px solid #fde68a',
+    borderRadius: '10px',
+    fontSize: '13px',
+    color: colors.neutral700,
+    lineHeight: 1.7,
   },
 };

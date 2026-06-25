@@ -149,11 +149,12 @@ export const QR_EXPORT_PRESETS: ReadonlyArray<{
   label: string;
   hint: string;
 }> = [
-  { preset: 'medium', format: 'png', label: 'PNG (이미지)', hint: '문서·POP·PPT 삽입' },
-  { preset: 'large', format: 'png', label: 'PNG 고해상도', hint: '대형 출력' },
-  { preset: 'medium', format: 'svg', label: 'SVG (벡터)', hint: '인쇄소·디자인 편집' },
-  { preset: 'a4', format: 'pdf', label: 'A4 1장 PDF', hint: '매장 안내문 출력' },
-  { preset: 'a4_4up', format: 'pdf', label: 'A4 4분할 PDF', hint: '절취하여 4장 사용' },
+  // WO-O4O-KPA-STORE-QR-EXPORT-FILE-GUIDE-V1: 선택 기준이 드러나도록 hint 개선
+  { preset: 'medium', format: 'png', label: 'PNG (이미지)', hint: '간단 삽입·공유' },
+  { preset: 'large', format: 'png', label: 'PNG 고해상도', hint: '문서·POP 편집' },
+  { preset: 'medium', format: 'svg', label: 'SVG (벡터)', hint: '전문 출력소·크기 조절' },
+  { preset: 'a4', format: 'pdf', label: 'A4 1장 PDF', hint: '약국에서 바로 출력' },
+  { preset: 'a4_4up', format: 'pdf', label: 'A4 4분할 PDF', hint: '잘라서 여러 곳에 부착' },
 ];
 
 // client.ts 와 동일한 base URL 규약 (private 이라 재구성)
