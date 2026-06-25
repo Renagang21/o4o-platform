@@ -116,9 +116,33 @@ SELECT DISTINCT user_id
 | best-effort try/catch | ✅ |
 | metadata 필수 필드(targetUrl/requestId/organizationId/source) | ✅ |
 | 알림 클릭 → 내부 path navigate | ✅ (KpaGlobalHeader 기존+가드) |
-| 브라우저 smoke (요청 생성 → 알림 도착 → 클릭 → /store/requests) | ⏳ 배포 후 별도 수행 권장 |
+| 브라우저 smoke (요청 생성 → 알림 도착 → 클릭 → /store/requests → 처리) | ✅ **PASS** (아래 §9-1) |
 
-> 브라우저 smoke 는 프로덕션 배포 후 매장 계정 로그인 + 태블릿 공개 화면 상담 요청으로 검증 필요(메모리 정책: 배포 success 만으로 PASS 금지).
+### 9-1. 운영(프로덕션) 브라우저 smoke 결과 — 2026-06-25 PASS
+
+- 환경: `https://kpa-society.co.kr` (배포 리비전 — Deploy API Server / Deploy Web Services 모두 success, 커밋 `9c49a0c9b`)
+- 계정: 로그인 화면 "🧪 체험용 약국 경영자 계정" → 매장 **Sohae 약국**(org `c9beb4a2…`)의 owner(`sohae2100@gmail.com`, userId `cfd2a5e7…`) 세션.
+- 요청 생성: 매장 슬러그 `sohae-약국` 에 태블릿 공개 API(`POST /api/v1/stores/sohae-약국/tablet/interest`, masterId=미네락 600, customerName=스모크검증고객) 호출 → **201**, requestId `e2d524f0…`, status REQUESTED. (해당 매장은 진열 상품 0 이라 태블릿 UI 그리드가 비어 있어, 태블릿 페이지가 호출하는 것과 동일한 공개 엔드포인트로 제출.)
+
+| smoke 단계 | 결과 |
+|---|---|
+| 1. 요청 생성 → `tablet_interest_requests` 레코드 | ✅ status=REQUESTED |
+| 2. 매장 사용자 알림 생성 (DB) | ✅ userId=`cfd2a5e7…`(owner), type=`store.consultation_requested` |
+| 3. serviceKey 저장값 | ✅ `kpa-society` (bell 필터 정합) |
+| 4. metadata | ✅ targetUrl=`/store/requests`, requestId, organizationId=`c9beb4a2…`, storeSlug=`sohae-약국`, source=`tablet`, productName |
+| 5. bell 미읽음 배지 | ✅ "읽지 않은 알림 1건" 노출 |
+| 6. 알림 제목/본문 | ✅ "새 상담 요청이 도착했습니다" / "미네락 600 [1000ml*10병] 상담 요청이 접수되었습니다." / "방금 전" |
+| 7. 알림 클릭 → 이동 | ✅ `/store/requests` 로 navigate |
+| 8. 클릭 시 읽음 처리 (DB) | ✅ isRead=true, readAt set |
+| 9. `/store/requests` 목록 표시 | ✅ "대기 1건", NEW, 미네락 600, 스모크검증고객 |
+| 10. 확인 처리 | ✅ status=ACKNOWLEDGED ("확인 1건", 응답시간 표시) |
+| 11. 완료 처리 | ✅ status=COMPLETED (목록에서 제거) |
+| 12. best-effort | ✅ (요청 201 정상; 알림은 정상 생성) |
+| 13. 대상 한정 | ✅ 운영자 전체 아님 — 해당 매장 owner 1명에게만 생성 |
+
+- 회귀: `/store/requests` 직접 진입·5초 polling·확인/완료/취소 동작 유지 확인.
+- GP/KCos: 코드 게이트(`resolved.serviceKey==='kpa'`)로 알림 미생성 — 동작 무변경(코드 기준 확인).
+- 검증 채널: 프론트(브라우저 DOM) + 백엔드(프로덕션 DB read-only SELECT via cloud-sql-proxy).
 
 ---
 
