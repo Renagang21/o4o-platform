@@ -38,6 +38,7 @@ import {
   ArrowLeft,
   Save,
   CheckCircle2,
+  PenLine,
 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { RichTextEditor, type EditorContent } from '@o4o/content-editor';
@@ -502,6 +503,16 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated }: Pr
     });
   }, []);
 
+  // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-BLANK-EDITOR-ENTRY-RESTORE-V1:
+  //   "원본 없이 바로 제작" 진입점 복원. 자료 선택 없이 빈 제작자료 편집기로 이동한다.
+  //   canonical 빈 제작 흐름 재사용 — /store/library/production-materials/new 빈 상태 진입 →
+  //   ProductionMaterialEditorPage(빈 편집기) → 저장 시 내 매장 제작자료(store_execution_assets) 생성.
+  //   source asset/derivation 없음. POP/QR/블로그/사이니지 활용 대상이 된다.
+  const handleCreateBlank = useCallback(() => {
+    onClose();
+    navigate('/store/library/production-materials/new');
+  }, [onClose, navigate]);
+
   const goCompose = useCallback(() => {
     if (selectedRows.length === 0) return;
     setSourceText(composeSourceText(selectedRows));
@@ -695,7 +706,20 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated }: Pr
         <footer style={styles.footer}>
           {step === 'select' ? (
             <>
-              <span style={styles.footerHint}>{selected.size}개 선택됨</span>
+              {/* WO-O4O-KPA-STORE-LIBRARY-CONTENTS-BLANK-EDITOR-ENTRY-RESTORE-V1:
+                  자료 선택 없이 빈 편집기로 바로 진입(항상 노출, 0개 선택이어도 클릭 가능). */}
+              <div style={styles.footerLeft}>
+                <button
+                  type="button"
+                  onClick={handleCreateBlank}
+                  style={styles.blankBtn}
+                  title="자료를 선택하지 않고 빈 편집기에서 새 제작자료를 작성합니다"
+                >
+                  <PenLine size={14} />
+                  빈 편집기에서 바로 작성
+                </button>
+                <span style={styles.footerHint}>{selected.size}개 선택됨</span>
+              </div>
               <div style={styles.footerActions}>
                 <button type="button" onClick={onClose} style={styles.secondaryBtn}>
                   취소
@@ -1316,6 +1340,26 @@ const styles: Record<string, CSSProperties> = {
   footerHint: {
     fontSize: 12,
     color: colors.neutral500,
+  },
+  // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-BLANK-EDITOR-ENTRY-RESTORE-V1
+  footerLeft: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 10,
+    flexWrap: 'wrap',
+  },
+  blankBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 6,
+    padding: '8px 12px',
+    border: `1px solid ${colors.primary}`,
+    borderRadius: 6,
+    background: colors.white,
+    color: colors.primary,
+    fontSize: 13,
+    fontWeight: 500,
+    cursor: 'pointer',
   },
   footerActions: {
     display: 'flex',
