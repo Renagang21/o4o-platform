@@ -33,6 +33,10 @@ import { getStoreSlug } from '../../api/pharmacyInfo';
 //   선택 시 idempotent publicKey 발급 → 공개 landing URL 로 link 형 QR 연결(기존 다국어 화면 재사용).
 import { listMyMlcGroups, ensureMlcPublicKey } from '../../api/multilingualProductContentStore';
 import type { StoreMlcGroup, StoreMlcLocale } from '../../api/multilingualProductContentStore';
+// WO-O4O-KPA-QR-ASSET-PICKER-INCLUDE-DIRECT-CONTENTS-V1:
+//   '내 매장 자료' 탭에 매장 직접 작성 콘텐츠(kpa_store_contents direct)도 포함(opt-in).
+//   /store/library/contents 통합 feed 의 origin='direct' 항목 — 콘텐츠 목록과 동일 소스 정합.
+import { storeLibraryApi } from '../../api/assetSnapshot';
 
 // ── 선택 결과 타입 ──
 
@@ -51,7 +55,9 @@ export interface AssetSelectorResult {
   //   'blog' = 매장 블로그(store_blog_posts) 공개 URL 참조(landingType='link', landingTargetId=url).
   // WO-O4O-KPA-QR-MULTILINGUAL-PRODUCT-LINK-SOURCE-V1:
   //   'mlc' = 다국어 제품 콘텐츠 공개 landing URL 참조(landingType='link', landingTargetId=url).
-  source?: 'asset' | 'content-hub' | 'blog' | 'mlc';
+  // WO-O4O-KPA-QR-ASSET-PICKER-INCLUDE-DIRECT-CONTENTS-V1:
+  //   'direct-content' = 매장 직접 작성 콘텐츠(kpa_store_contents) 참조(landingType='page', landingTargetId=id).
+  source?: 'asset' | 'content-hub' | 'blog' | 'mlc' | 'direct-content';
 }
 
 /** @deprecated Use AssetSelectorResult */
@@ -87,6 +93,13 @@ interface StoreAssetSelectorModalProps {
    *   기존 다국어 공개 landing 이 처리(QR 측 다국어 UI 미구현). 미지정(기본) 시 무영향.
    */
   enableMlcSource?: boolean;
+  /**
+   * WO-O4O-KPA-QR-ASSET-PICKER-INCLUDE-DIRECT-CONTENTS-V1:
+   *   true 시 "내 매장 자료" 탭에 매장 직접 작성 콘텐츠(kpa_store_contents)도 함께 표시한다.
+   *   선택 시 landingType='page', landingTargetId=id 로 연결(공개 landing 이 본문 inline 렌더).
+   *   미지정(기본) 시 기존 동작 그대로 — 다른 소비처(사이니지 등) 무영향.
+   */
+  enableDirectContentSource?: boolean;
 }
 
 // WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4 / QR-TARGET-SCOPE (B안) / MLC: 소스 종류
@@ -119,6 +132,7 @@ export function StoreAssetSelectorModal({
   enableContentHubSource = false,
   enableBlogSource = false,
   enableMlcSource = false,
+  enableDirectContentSource = false,
 }: StoreAssetSelectorModalProps) {
   const [items, setItems] = useState<StoreExecutionAsset[]>([]);
   const [loading, setLoading] = useState(false);
@@ -135,6 +149,8 @@ export function StoreAssetSelectorModal({
   // WO-O4O-KPA-QR-MULTILINGUAL-PRODUCT-LINK-SOURCE-V1: 다국어 제품 콘텐츠 그룹 + 발급 진행 상태
   const [mlcItems, setMlcItems] = useState<StoreMlcGroup[]>([]);
   const [issuingMlc, setIssuingMlc] = useState(false);
+  // WO-O4O-KPA-QR-ASSET-PICKER-INCLUDE-DIRECT-CONTENTS-V1: '내 매장 자료' 탭 병합용 직접 작성 콘텐츠
+  const [directItems, setDirectItems] = useState<{ id: string; title: string }[]>([]);
   const slugRef = useRef<string | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -153,6 +169,7 @@ export function StoreAssetSelectorModal({
     setBlogItems([]);
     setMlcItems([]);
     setIssuingMlc(false);
+    setDirectItems([]);
   }, [open]);
 
   // 서버 데이터 로드 (page/source 변경 시 즉시)
@@ -213,6 +230,24 @@ export function StoreAssetSelectorModal({
         setTotal(filtered.length);
         return;
       }
+      // WO-O4O-KPA-QR-ASSET-PICKER-INCLUDE-DIRECT-CONTENTS-V1:
+      //   '내 매장 자료' 탭에 매장 직접 작성 콘텐츠(kpa_store_contents direct)도 병합(opt-in).
+      //   통합 feed(/store-library/contents)에서 origin='direct'만 추려 1페이지에 prepend.
+      //   목록 규모가 작아 50건 fetch 후 클라이언트 필터로 충분.
+      if (enableDirectContentSource && p === 1) {
+        try {
+          const feed = await storeLibraryApi.listContents({ page: 1, limit: 50, search: q.trim() || undefined, type: 'document' });
+          setDirectItems(
+            feed.data.items
+              .filter((it) => it.origin === 'direct')
+              .map((it) => ({ id: it.id, title: it.title })),
+          );
+        } catch {
+          setDirectItems([]);
+        }
+      } else if (p !== 1) {
+        setDirectItems([]);
+      }
       const res = await getStoreExecutionAssets({
         page: p,
         limit: PAGE_SIZE,
@@ -238,6 +273,7 @@ export function StoreAssetSelectorModal({
     setAssetTypeFilter('all');
     setPage(1);
     setTotal(0);
+    setDirectItems([]);
   };
 
   // 클라이언트 자산 타입 필터링 (asset 소스에만 적용)
@@ -250,6 +286,11 @@ export function StoreAssetSelectorModal({
   const selectedContent = contentItems.find((i) => i.id === selectedId) ?? null;
   const selectedBlog = blogItems.find((i) => i.id === selectedId) ?? null;
   const selectedMlc = mlcItems.find((i) => i.id === selectedId) ?? null;
+  // WO-O4O-KPA-QR-ASSET-PICKER-INCLUDE-DIRECT-CONTENTS-V1: '내 매장 자료' 탭의 직접 작성 콘텐츠
+  const selectedDirect = directItems.find((i) => i.id === selectedId) ?? null;
+  const showDirects = source === 'asset' && enableDirectContentSource && page === 1
+    && (assetTypeFilter === 'all' || assetTypeFilter === 'content');
+  const assetDirects = showDirects ? directItems : [];
 
   const handleConfirm = useCallback(async () => {
     // WO-O4O-KPA-QR-MULTILINGUAL-PRODUCT-LINK-SOURCE-V1:
@@ -313,6 +354,22 @@ export function StoreAssetSelectorModal({
       });
       return;
     }
+    // WO-O4O-KPA-QR-ASSET-PICKER-INCLUDE-DIRECT-CONTENTS-V1:
+    //   매장 직접 작성 콘텐츠(kpa_store_contents) — page 참조형(landingType='page', landingTargetId=id).
+    //   사본 복사 없음, 공개 landing 이 본문 inline 렌더.
+    if (source === 'asset' && selectedDirect) {
+      onSelect({
+        id: selectedDirect.id,
+        title: selectedDirect.title,
+        category: null,
+        fileUrl: null,
+        assetType: 'content',
+        url: null,
+        htmlContent: null,
+        source: 'direct-content',
+      });
+      return;
+    }
     if (!selectedItem) return;
     onSelect({
       id: selectedItem.id,
@@ -324,7 +381,7 @@ export function StoreAssetSelectorModal({
       htmlContent: selectedItem.htmlContent ?? null,
       source: 'asset',
     });
-  }, [source, selectedItem, selectedContent, selectedBlog, selectedMlc, issuingMlc, onSelect]);
+  }, [source, selectedItem, selectedContent, selectedBlog, selectedMlc, selectedDirect, issuingMlc, onSelect]);
 
   if (!open) return null;
 
@@ -554,7 +611,7 @@ export function StoreAssetSelectorModal({
             <div style={styles.emptyState}>
               <p style={{ color: colors.neutral500 }}>자산을 불러오는 중...</p>
             </div>
-          ) : displayItems.length === 0 ? (
+          ) : (displayItems.length === 0 && assetDirects.length === 0) ? (
             <div style={styles.emptyState}>
               <p style={{ color: colors.neutral500 }}>
                 {search.trim() || assetTypeFilter !== 'all'
@@ -570,6 +627,26 @@ export function StoreAssetSelectorModal({
             </div>
           ) : (
             <div style={styles.grid}>
+              {/* WO-O4O-KPA-QR-ASSET-PICKER-INCLUDE-DIRECT-CONTENTS-V1: 매장 직접 작성 콘텐츠(병합) */}
+              {assetDirects.map((d) => (
+                <button
+                  key={`direct-${d.id}`}
+                  onClick={() => setSelectedId(d.id)}
+                  style={{ ...styles.card, ...(selectedId === d.id ? styles.cardSelected : {}) }}
+                >
+                  <div style={styles.cardPreview}>
+                    <FileText size={28} style={{ color: '#8b5cf6' }} />
+                  </div>
+                  <div style={styles.cardInfo}>
+                    <p style={styles.cardTitle}>{d.title}</p>
+                    <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' as const }}>
+                      <span style={styles.assetTypeBadge}>콘텐츠</span>
+                      <span style={styles.cardCategory}>직접 작성</span>
+                    </div>
+                  </div>
+                  {selectedId === d.id && <div style={styles.selectedBadge}>선택됨</div>}
+                </button>
+              ))}
               {displayItems.map((item) => (
                 <button
                   key={item.id}

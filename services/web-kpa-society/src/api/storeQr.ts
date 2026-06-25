@@ -59,7 +59,8 @@ export type QrPageContent =
       summary: string | null;
       body: string | null;
       blocks: unknown[];
-      source: 'content_hub';
+      // content_hub=운영자 콘텐츠 / store_asset=매장 제작자료 / direct_content=매장 직접 작성
+      source: 'content_hub' | 'store_asset' | 'direct_content';
     };
 
 export interface StoreQrPaginatedResponse {
