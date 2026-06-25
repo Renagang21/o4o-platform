@@ -15,13 +15,19 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, X, FileText, Image, Film, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { Search, X, FileText, Image, Film, ChevronLeft, ChevronRight, Plus, PenLine } from 'lucide-react';
 import { colors } from '../../styles/theme';
 import { getStoreExecutionAssets } from '../../api/storeExecutionAssets';
 import type { StoreExecutionAsset, UsageType } from '../../api/storeExecutionAssets';
 // WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4:
 //   운영자 콘텐츠 허브(kpa_contents, status='ready') 를 QR 대상 소스로 추가(opt-in).
 import { listContentHubItems } from '../../api/contentHub';
+// WO-O4O-KPA-STORE-QR-TARGET-SCOPE-AUDIT-V1 (B안):
+//   내 매장 제작자료 중 블로그(store_blog_posts) 를 QR 대상 소스로 추가(opt-in).
+//   블로그는 공개 URL 이 있으므로 landingType='link' 로 연결(사본 복사 없음).
+import { fetchStaffBlogPosts } from '../../api/blogStaff';
+import type { StaffBlogPost } from '../../api/blogStaff';
+import { getStoreSlug } from '../../api/pharmacyInfo';
 
 // ── 선택 결과 타입 ──
 
@@ -36,7 +42,9 @@ export interface AssetSelectorResult {
   // WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4:
   //   'asset' = store_execution_assets(내 매장 자료/제작자료/가져온 콘텐츠),
   //   'content-hub' = 운영자 콘텐츠 허브(kpa_contents) 참조(landingType='page', landingTargetId=id).
-  source?: 'asset' | 'content-hub';
+  // WO-O4O-KPA-STORE-QR-TARGET-SCOPE-AUDIT-V1 (B안):
+  //   'blog' = 매장 블로그(store_blog_posts) 공개 URL 참조(landingType='link', landingTargetId=url).
+  source?: 'asset' | 'content-hub' | 'blog';
 }
 
 /** @deprecated Use AssetSelectorResult */
@@ -58,10 +66,17 @@ interface StoreAssetSelectorModalProps {
    *   미지정(기본) 시 기존 동작 그대로 — 다른 소비처(사이니지 등) 무영향.
    */
   enableContentHubSource?: boolean;
+  /**
+   * WO-O4O-KPA-STORE-QR-TARGET-SCOPE-AUDIT-V1 (B안):
+   *   true 시 "블로그" 소스 탭 추가 — 매장 블로그(store_blog_posts) 를 보여주고,
+   *   선택 시 공개 URL 로 연결하는 link 형 QR 을 만든다(landingType='link').
+   *   미지정(기본) 시 기존 동작 그대로 — 다른 소비처(사이니지 등) 무영향.
+   */
+  enableBlogSource?: boolean;
 }
 
-// WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4: 소스 종류
-type AssetSource = 'asset' | 'content';
+// WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4 / QR-TARGET-SCOPE (B안): 소스 종류
+type AssetSource = 'asset' | 'content' | 'blog';
 
 // ── 자산 타입 필터 ──
 
@@ -83,6 +98,7 @@ export function StoreAssetSelectorModal({
   onCreateNew,
   usageType,
   enableContentHubSource = false,
+  enableBlogSource = false,
 }: StoreAssetSelectorModalProps) {
   const [items, setItems] = useState<StoreExecutionAsset[]>([]);
   const [loading, setLoading] = useState(false);
@@ -94,6 +110,9 @@ export function StoreAssetSelectorModal({
   // WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4: 소스 전환 + 콘텐츠 허브 목록
   const [source, setSource] = useState<AssetSource>('asset');
   const [contentItems, setContentItems] = useState<{ id: string; title: string; summary: string | null; category: string | null }[]>([]);
+  // WO-O4O-KPA-STORE-QR-TARGET-SCOPE-AUDIT-V1 (B안): 블로그 결과물 + 공개 URL 조합용 store slug
+  const [blogItems, setBlogItems] = useState<StaffBlogPost[]>([]);
+  const slugRef = useRef<string | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -108,6 +127,7 @@ export function StoreAssetSelectorModal({
     setTotal(0);
     setSource('asset');
     setContentItems([]);
+    setBlogItems([]);
   }, [open]);
 
   // 서버 데이터 로드 (page/source 변경 시 즉시)
@@ -138,6 +158,21 @@ export function StoreAssetSelectorModal({
         const res = await listContentHubItems({ page: p, limit: PAGE_SIZE, search: q.trim() || undefined, status: 'ready' });
         setContentItems(res.items.map((it) => ({ id: it.id, title: it.title, summary: it.summary, category: it.category })));
         setTotal(res.total);
+        return;
+      }
+      // WO-O4O-KPA-STORE-QR-TARGET-SCOPE-AUDIT-V1 (B안):
+      //   블로그 결과물(store_blog_posts) — 전체 노출. draft 도 연결 허용(QR=연결 대상 저장, 발행 시 작동).
+      //   페이지네이션은 클라이언트 검색 필터로 대체(목록 규모 작음).
+      if (source === 'blog') {
+        if (!slugRef.current) slugRef.current = await getStoreSlug().catch(() => null);
+        const slug = slugRef.current;
+        const res = slug ? await fetchStaffBlogPosts(slug, { limit: 100 }).catch(() => null) : null;
+        const all = (res?.data ?? []) as StaffBlogPost[];
+        const filtered = q.trim()
+          ? all.filter((b) => b.title.toLowerCase().includes(q.trim().toLowerCase()))
+          : all;
+        setBlogItems(filtered);
+        setTotal(filtered.length);
         return;
       }
       const res = await getStoreExecutionAssets({
@@ -175,6 +210,7 @@ export function StoreAssetSelectorModal({
 
   const selectedItem = items.find((i) => i.id === selectedId) ?? null;
   const selectedContent = contentItems.find((i) => i.id === selectedId) ?? null;
+  const selectedBlog = blogItems.find((i) => i.id === selectedId) ?? null;
 
   const handleConfirm = useCallback(() => {
     // WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4:
@@ -193,6 +229,26 @@ export function StoreAssetSelectorModal({
       });
       return;
     }
+    // WO-O4O-KPA-STORE-QR-TARGET-SCOPE-AUDIT-V1 (B안):
+    //   블로그는 공개 URL 참조형(landingType='link', landingTargetId=절대 URL) — 사본 복사 없음.
+    //   외부 스캔 안전을 위해 origin 포함 절대 URL 로 통일.
+    if (source === 'blog') {
+      if (!selectedBlog) return;
+      const url = slugRef.current
+        ? `${window.location.origin}/store/${slugRef.current}/blog/${selectedBlog.slug}`
+        : '';
+      onSelect({
+        id: selectedBlog.id,
+        title: selectedBlog.title,
+        category: null,
+        fileUrl: null,
+        assetType: 'blog',
+        url,
+        htmlContent: null,
+        source: 'blog',
+      });
+      return;
+    }
     if (!selectedItem) return;
     onSelect({
       id: selectedItem.id,
@@ -204,7 +260,7 @@ export function StoreAssetSelectorModal({
       htmlContent: selectedItem.htmlContent ?? null,
       source: 'asset',
     });
-  }, [source, selectedItem, selectedContent, onSelect]);
+  }, [source, selectedItem, selectedContent, selectedBlog, onSelect]);
 
   if (!open) return null;
 
@@ -228,8 +284,8 @@ export function StoreAssetSelectorModal({
           </button>
         </div>
 
-        {/* WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4: 소스 전환 탭 */}
-        {enableContentHubSource && (
+        {/* WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4 / QR-TARGET-SCOPE (B안): 소스 전환 탭 */}
+        {(enableContentHubSource || enableBlogSource) && (
           <div style={styles.sourceTabs}>
             <button
               onClick={() => switchSource('asset')}
@@ -237,12 +293,22 @@ export function StoreAssetSelectorModal({
             >
               내 매장 자료
             </button>
-            <button
-              onClick={() => switchSource('content')}
-              style={{ ...styles.sourceTab, ...(source === 'content' ? styles.sourceTabActive : {}) }}
-            >
-              운영자 콘텐츠
-            </button>
+            {enableContentHubSource && (
+              <button
+                onClick={() => switchSource('content')}
+                style={{ ...styles.sourceTab, ...(source === 'content' ? styles.sourceTabActive : {}) }}
+              >
+                운영자 콘텐츠
+              </button>
+            )}
+            {enableBlogSource && (
+              <button
+                onClick={() => switchSource('blog')}
+                style={{ ...styles.sourceTab, ...(source === 'blog' ? styles.sourceTabActive : {}) }}
+              >
+                블로그
+              </button>
+            )}
           </div>
         )}
 
@@ -254,7 +320,7 @@ export function StoreAssetSelectorModal({
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder={source === 'content' ? '콘텐츠 검색...' : '자산 검색...'}
+              placeholder={source === 'content' ? '콘텐츠 검색...' : source === 'blog' ? '블로그 검색...' : '자산 검색...'}
               style={styles.searchInput}
             />
           </div>
@@ -279,11 +345,53 @@ export function StoreAssetSelectorModal({
               운영자가 '완료' 상태로 저장한 콘텐츠입니다. 선택하면 원본을 가리키는 QR이 만들어집니다(사본 복사 없음).
             </p>
           )}
+          {source === 'blog' && (
+            <p style={styles.contentHint}>
+              매장 블로그 글입니다. 선택하면 공개 블로그 페이지로 연결되는 QR이 만들어집니다. 초안은 발행 후 정상 표시됩니다.
+            </p>
+          )}
         </div>
 
         {/* Card Grid */}
         <div style={styles.body}>
-          {source === 'content' ? (
+          {source === 'blog' ? (
+            loading ? (
+              <div style={styles.emptyState}>
+                <p style={{ color: colors.neutral500 }}>블로그를 불러오는 중...</p>
+              </div>
+            ) : blogItems.length === 0 ? (
+              <div style={styles.emptyState}>
+                <p style={{ color: colors.neutral500 }}>
+                  {search.trim() ? '검색 결과가 없습니다' : '작성한 블로그 글이 없습니다'}
+                </p>
+              </div>
+            ) : (
+              <div style={styles.grid}>
+                {blogItems.map((post) => {
+                  const statusLabel = post.status === 'published' ? '발행' : post.status === 'archived' ? '보관' : '초안';
+                  return (
+                    <button
+                      key={post.id}
+                      onClick={() => setSelectedId(post.id)}
+                      style={{ ...styles.card, ...(selectedId === post.id ? styles.cardSelected : {}) }}
+                    >
+                      <div style={styles.cardPreview}>
+                        <PenLine size={28} style={{ color: '#047857' }} />
+                      </div>
+                      <div style={styles.cardInfo}>
+                        <p style={styles.cardTitle}>{post.title}</p>
+                        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' as const }}>
+                          <span style={styles.assetTypeBadge}>블로그</span>
+                          <span style={styles.cardCategory}>{statusLabel}</span>
+                        </div>
+                      </div>
+                      {selectedId === post.id && <div style={styles.selectedBadge}>선택됨</div>}
+                    </button>
+                  );
+                })}
+              </div>
+            )
+          ) : source === 'content' ? (
             loading ? (
               <div style={styles.emptyState}>
                 <p style={{ color: colors.neutral500 }}>콘텐츠를 불러오는 중...</p>
