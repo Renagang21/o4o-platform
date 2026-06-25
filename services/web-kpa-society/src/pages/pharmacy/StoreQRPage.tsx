@@ -464,14 +464,23 @@ export function StoreQRPage() {
           <p style={styles.subtitle}>매장에 부착·재사용할 QR 코드를 모아 출력합니다</p>
           <div style={{ marginTop: 8 }}><GuideBackLink to="/guide/features/qr" label="QR 활용 방법" /></div>
         </div>
-        {/* WO-O4O-KPA-STORE-PRODUCTION-ENTRY-CANONICAL-CORRECTION-V1:
-            "QR 코드 생성" 신규 진입 버튼 제거 — 제작 시작은 "내 자료함"에서만.
-            WO-O4O-KPA-STORE-QR-WORKFLOW-UX-ALIGNMENT-V1:
-            "생성" 이 아닌 운영자 제공 QR "가져오기" 동선만 상단에 상시 노출. */}
-        <Link to="/store-hub/qr" style={styles.hubImportBtn}>
-          <Download size={14} />
-          매장 HUB에서 가져오기
-        </Link>
+        {/* WO-O4O-KPA-STORE-QR-TARGET-SCOPE-AUDIT-V1 (A안):
+            QR 생성 진입을 페이지 내부 선택 모달로 직접 오픈 (내 자료함 이탈 동선 보완).
+            기존 운영자 제공 QR "가져오기" 동선은 보조로 유지. */}
+        <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
+          <button
+            type="button"
+            onClick={() => setShowSelector(true)}
+            style={styles.addBtn}
+          >
+            <QrCode size={14} />
+            QR 만들기
+          </button>
+          <Link to="/store-hub/qr" style={styles.hubImportBtn}>
+            <Download size={14} />
+            매장 HUB에서 가져오기
+          </Link>
+        </div>
       </div>
 
       {/* Batch Print Toolbar */}
@@ -783,10 +792,17 @@ export function StoreQRPage() {
                 <Download size={14} />
                 매장 HUB에서 QR 가져오기
               </Link>
-              <Link to="/store/library/resources" style={styles.emptyStateBtn}>
+              {/* WO-O4O-KPA-STORE-QR-TARGET-SCOPE-AUDIT-V1 (A안):
+                  내 자료함(/store/library/resources) 이탈 링크 → 페이지 내 선택 모달 직접 오픈.
+                  대상 범위가 콘텐츠·자료·내 매장 제작자료 전체임을 문구로 명시. */}
+              <button
+                type="button"
+                onClick={() => setShowSelector(true)}
+                style={styles.emptyStateBtn}
+              >
                 <FolderOpen size={14} />
-                내 자료에서 QR 만들기
-              </Link>
+                콘텐츠·자료·내 매장 제작자료에서 QR 만들기
+              </button>
               <button
                 type="button"
                 disabled
@@ -1003,12 +1019,14 @@ export function StoreQRPage() {
         templateForcedOptions={selectedTemplate?.forcedOptions}
       />
 
-      {/* Asset Selector Modal */}
+      {/* Asset Selector Modal
+          WO-O4O-KPA-STORE-QR-TARGET-SCOPE-AUDIT-V1 (A안): usageType="qr" 제거 —
+          QR은 file/content/external-link 모두 연결 가능하므로 usage_type='qr' 태깅
+          여부와 무관하게 전체 자산을 대상으로 노출한다 (autoLandingType 로 안전 변환). */}
       <StoreAssetSelectorModal
         open={showSelector}
         onSelect={handleLibrarySelect}
         onClose={() => setShowSelector(false)}
-        usageType="qr"
       />
 
       {/* Print Template Modal */}
