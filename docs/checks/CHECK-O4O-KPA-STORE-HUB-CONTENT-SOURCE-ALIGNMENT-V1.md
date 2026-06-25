@@ -49,3 +49,40 @@ KPA `/store-hub/content`(`HubContentLibraryPage`)가 기존 `cms_contents(publis
 ### 후속 후보
 - MERGE_CAP 초과 단계 진입 시 서버측 통합 페이지네이션(예: `/store-library/contents` 패턴) 승격.
 - GP/KCos 동일 정합은 별도 IR/WO(현재 GP/KCos는 공통 `StoreProductionMaterialsView`/CMS-only 경로).
+
+---
+
+## Update — WO-O4O-KPA-STORE-HUB-CONTENT-SOURCE-TABS-V1 (병합 → 소스 탭 분리)
+
+> 구현 커밋: `8538ee754` (frontend + 공통 ContentHubTemplate opt-in) — 배포 완료
+> 검증: Playwright 실제 브라우저(운영자/매장 동일 계정), 2026-06-25
+
+### 변경 이유
+
+병합(C안)은 두 소스를 한 목록에 섞어 정렬/페이지네이션 경계가 모호(MERGE_CAP 한계)했다. 후속으로 **소스 탭 분리**로 전환 — 콘텐츠 허브(kpa_contents ready) / 운영 자료(cms published)를 탭으로 구분, 탭별 단일 소스 조회(병합/정렬/중복제거 불필요), '전체' 탭 없음, 기본 탭=콘텐츠 허브. 검색은 현재 탭 안에서만.
+
+### 변경 내역
+
+| 파일 | 변경 |
+|---|---|
+| `packages/shared-space-ui/src/ContentHubTemplate.tsx` | opt-in `filtersAsSourceTabs` + `filterEmptyMessages` 추가. 탭 모드에서 탭 전환을 '필터'로 취급하지 않음(chip/초기화 행 숨김, "총 N개" 표기, 탭별 빈 상태). 미지정 시 기존 동작 환원 |
+| `services/web-kpa-society/.../HubContentLibraryPage.tsx` | filters=[콘텐츠 허브, 운영 자료], filtersAsSourceTabs=true, 탭별 단일 소스 fetch, filterEmptyMessages. 가져오기=복사 + 출처별 assetType 분기(cms/content) 유지 |
+
+→ 공통 템플릿 변경은 **순수 additive·opt-in**. GP/KCos/Neture는 `filtersAsSourceTabs` 미지정 → 기존 동작 그대로(typecheck: kpa·glycopharm 클린).
+
+### 소스 탭 버전 운영 브라우저 smoke (배포본 `8538ee754`)
+
+| 기준 | 결과 |
+|---|---|
+| 소스 탭 2개(콘텐츠 허브 / 운영 자료) 노출, 기본=콘텐츠 허브 | ✅ |
+| 9.2 콘텐츠 허브 탭 = kpa_contents ready 노출('콘텐츠 허브' 배지) | ✅ ("총 2개", ready 콘텐츠 2건) |
+| 9.3 draft 비노출 | ✅ (ready만, 원본 draft 6건 미노출) |
+| 9.1 운영 자료 탭 = cms published | ✅ ("총 0개" — cms published=0, 경로 유지) |
+| 탭별 빈 상태 문구 | ✅ 운영 자료 탭 "현재 제공되는 운영 자료가 없습니다…" |
+| 9.4 가져오기=복사(복사 상태 표시) | ✅ 복사됨/미복사 정확(loadCopiedIds=cms+content 병합). 복사 e2e는 병합 smoke에서 실증(onCopy 동일) |
+| 9.5 사본이 내 약국 콘텐츠 자료함 → 제작자료/QR 재사용 | ✅ origin=snapshot, '커뮤니티(콘텐츠 허브)' 표기 |
+| 테스트 데이터 정리 | ✅ 사본 + ready 콘텐츠 2건 삭제, 원본 draft 6건 보존 |
+
+### 결론(업데이트)
+
+소스 탭 분리 버전이 배포·검증됨. "저장한 운영자 콘텐츠가 매장 허브에 보이고 가져와 사본으로 사용" + "기존 CMS 게시 콘텐츠 유지(운영 자료 탭)"를 충족하며, 공통 템플릿 opt-in 변경으로 GP/KCos/Neture 무영향.
