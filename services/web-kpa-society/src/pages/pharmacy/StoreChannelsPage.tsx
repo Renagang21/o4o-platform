@@ -15,6 +15,13 @@
  *  - 사용자 노출 문구 정비: "B2C/채널 만들기/채널 생성" → "온라인 스토어 시작/활성화".
  *    DB/API channel_type='B2C' 는 불변(내부 식별자). 백엔드/DB/마이그레이션 변경 없음.
  *  - IR 근거: IR-O4O-KPA-STORE-CHANNEL-MENU-PURPOSE-AUDIT-V1 (채널 관리=실기능, 주문/결제 연결).
+ * WO-O4O-KPA-ONLINE-SALES-FIRST-CLASS-MENU-PHASE1-V1:
+ *  - 온라인 판매(B2C)를 1급 메뉴로 분리. 본 페이지는 `section` prop('settings'|'products')으로 재사용.
+ *    온라인 판매 모드(section 지정): B2C 전용 — 탭 바/KIOSK 미노출.
+ *      settings = 활성화/상태/공개 URL(slug 단일 소유)/KPI/자산 채널맵
+ *      products = 판매 상품 진열(추가/순서/노출/삭제/벌크/판매한도)
+ *    section 미지정(legacy /store/channels)은 → 온라인 판매 설정으로 redirect(App route).
+ *  - 라우트: /store/online-sales/settings · /store/online-sales/products. backend/DB 무변경.
  *
  * 구조:
  *  [A] 채널 탭 (온라인 스토어=B2C / 키오스크=KIOSK)
@@ -497,8 +504,19 @@ function ChannelPublicUrlCard({
 
 /* ─── Main Component ─────────────────────────── */
 
-export function StoreChannelsPage() {
+export function StoreChannelsPage({ section }: { section?: 'settings' | 'products' } = {}) {
   const navigate = useNavigate();
+  // WO-O4O-KPA-ONLINE-SALES-FIRST-CLASS-MENU-PHASE1-V1:
+  //   section 지정(온라인 판매 모드) 시 B2C(온라인 스토어) 전용 — 탭 바/KIOSK 미노출.
+  //   'settings' = 활성화/공개주소/KPI/자산채널맵, 'products' = 판매 상품 진열. section 없으면 legacy 전체.
+  const onlineSalesMode = section != null;
+  const pageTitle = section === 'products' ? '판매 상품' : section === 'settings' ? '판매 설정' : '채널 관리';
+  const heroDesc =
+    section === 'products' ? '온라인 스토어에 노출할 판매 상품을 관리합니다'
+    : section === 'settings' ? '온라인 스토어 활성화·공개 주소·노출 설정을 관리합니다'
+    : '각 채널의 제품 진열과 콘텐츠 노출을 관리합니다';
+  const showSettings = section !== 'products'; // settings 또는 legacy
+  const showProducts = section !== 'settings'; // products 또는 legacy
   const [activeTab, setActiveTab] = useState<ChannelType>('B2C');
   const [channels, setChannels] = useState<ChannelOverview[]>([]);
   const [assets, setAssets] = useState<StoreAssetItem[]>([]);
@@ -835,7 +853,7 @@ export function StoreChannelsPage() {
         <div className="text-sm text-slate-500 mb-1">
           <Link to="/store" className="text-blue-600 hover:underline">&larr; 대시보드</Link>
         </div>
-        <h1 className="text-2xl font-bold text-slate-900 mb-8">채널 관리</h1>
+        <h1 className="text-2xl font-bold text-slate-900 mb-8">{pageTitle}</h1>
         <div className="text-center py-16 bg-white rounded-lg border border-slate-200">
           <Package className="w-10 h-10 mx-auto mb-3 text-slate-300" />
           <p className="text-sm text-slate-500">아직 온라인 스토어가 시작되지 않았습니다.</p>
@@ -861,12 +879,12 @@ export function StoreChannelsPage() {
           <div className="text-sm text-slate-500 mb-1">
             <Link to="/store" className="text-blue-600 hover:underline">&larr; 대시보드</Link>
           </div>
-          <h1 className="text-2xl font-bold text-slate-900">채널 관리</h1>
+          <h1 className="text-2xl font-bold text-slate-900">{pageTitle}</h1>
           <p className="text-sm text-slate-500 mt-1">
             <GuideEditableSection
               pageKey="store/channels"
               sectionKey="hero-description"
-              defaultContent="각 채널의 제품 진열과 콘텐츠 노출을 관리합니다"
+              defaultContent={heroDesc}
             />
           </p>
         </div>
@@ -894,6 +912,8 @@ export function StoreChannelsPage() {
       />
 
       {/* ─── [A] Channel Tabs ────────────────────── */}
+      {/* WO-O4O-KPA-ONLINE-SALES-FIRST-CLASS-MENU-PHASE1-V1: 온라인 판매 모드에서는 탭 바 미노출(B2C 전용). */}
+      {!onlineSalesMode && (
       <div className="border-b border-slate-200 mb-6">
         <div className="flex gap-1">
           {CHANNEL_TABS.map(tab => {
@@ -925,6 +945,7 @@ export function StoreChannelsPage() {
           })}
         </div>
       </div>
+      )}
 
       {/* ─── Toast Feedback (WO-STORE-CHANNEL-BETA-READINESS-V1) ─── */}
       {toast && (
@@ -941,7 +962,8 @@ export function StoreChannelsPage() {
         </div>
       )}
 
-      {/* ─── Channel Detail Header ────────────────── */}
+      {/* ─── Channel Detail Header (settings 전용) ────────────────── */}
+      {showSettings && (
       <div className="flex items-center gap-4 mb-6 p-5 bg-white rounded-xl border border-slate-200">
         <div
           className="flex items-center justify-center w-12 h-12 rounded-xl"
@@ -980,6 +1002,7 @@ export function StoreChannelsPage() {
           </button>
         )}
       </div>
+      )}
 
       {/* WO-O4O-STORE-CHANNEL-MANAGEMENT-CLEANUP-V1: KIOSK 보류 안내 배너 */}
       {activeTab === 'KIOSK' && (
@@ -994,9 +1017,9 @@ export function StoreChannelsPage() {
         </div>
       )}
 
-      {/* ─── Public URL Card (WO-O4O-STORE-CHANNEL-PUBLIC-URL-GUIDE-V1) ─── */}
+      {/* ─── Public URL Card (settings 전용 — slug 단일 소유 위치) ─── */}
       {/* WO-O4O-STORE-SLUG-EDITABLE-V1: editable mode props */}
-      {currentChannel && (
+      {showSettings && currentChannel && (
         <ChannelPublicUrlCard
           channelType={activeTab}
           orgCode={orgCode}
@@ -1011,7 +1034,7 @@ export function StoreChannelsPage() {
 
       {/* ─── 상태 기반 행동 유도 (WO-O4O-CHANNEL-UX-STEP2-STATE-DRIVEN-V1) ─── */}
       {/* WO-O4O-STORE-CHANNEL-MANAGEMENT-CLEANUP-V1: KIOSK 보류 시 행동 유도 숨김 */}
-      {isProductChannel && activeTab !== 'KIOSK' && currentChannel?.status === 'APPROVED' && !productLoading && (() => {
+      {showProducts && isProductChannel && activeTab !== 'KIOSK' && currentChannel?.status === 'APPROVED' && !productLoading && (() => {
         if (channelProducts.length > 0) {
           return (
             <div className="flex items-start gap-4 p-5 mb-6 rounded-xl border border-green-200 bg-green-50">
@@ -1058,8 +1081,8 @@ export function StoreChannelsPage() {
         );
       })()}
 
-      {/* ─── [B] Channel KPI ─────────────────────── */}
-      {currentChannel && (
+      {/* ─── [B] Channel KPI (settings 전용) ─────────────────────── */}
+      {showSettings && currentChannel && (
         <div className={`grid ${forcedAssets.length > 0 ? 'grid-cols-3' : 'grid-cols-2'} gap-4 mb-6`}>
           <div className="rounded-lg border border-slate-200 p-4 bg-white">
             <div className="text-xs text-slate-500 mb-1">노출 상품</div>
@@ -1088,8 +1111,8 @@ export function StoreChannelsPage() {
         </div>
       )}
 
-      {/* ─── [C] Quick Actions ───────────────────── */}
-      {currentChannel && (
+      {/* ─── [C] Quick Actions (settings 전용) ───────────────────── */}
+      {showSettings && currentChannel && (
         <div className="flex flex-wrap gap-2 mb-6">
           {activeTab === 'B2C' && orgCode && (
             <a
@@ -1116,8 +1139,8 @@ export function StoreChannelsPage() {
         </div>
       )}
 
-      {/* ─── [D] Channel Product List (B2C/KIOSK only) ─── */}
-      {isProductChannel && (
+      {/* ─── [D] Channel Product List (products 전용) ─── */}
+      {showProducts && isProductChannel && (
         <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-semibold text-slate-700">진열 제품</h2>
@@ -1374,8 +1397,8 @@ export function StoreChannelsPage() {
         </div>
       )}
 
-      {/* ─── [E] 노출 자산 리스트 ─────────────────── */}
-      {currentTab.assetKey ? (
+      {/* ─── [E] 노출 자산 리스트 (settings 전용 — 자산 채널맵) ─── */}
+      {showSettings && (currentTab.assetKey ? (
         channelAssets.length === 0 ? (
           <div className="text-center py-16 text-slate-400">
             <p className="text-sm">이 채널에 배치된 콘텐츠가 없습니다.</p>
@@ -1464,7 +1487,7 @@ export function StoreChannelsPage() {
             </table>
           </div>
         )
-      ) : null}
+      ) : null)}
 
       {/* WO-O4O-STORE-CHANNEL-MANAGEMENT-CLEANUP-V1:
           블로그 카드 섹션 제거. 블로그는 콘텐츠 채널로 별도 메뉴(/store/content/blog)에서 관리. */}

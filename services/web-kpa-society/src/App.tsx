@@ -1018,8 +1018,13 @@ function App() {
             <Route path="sales-channels/foreign-visitor/partners" element={<ForeignVisitorPartnersPage />} />
             {/* WO-O4O-FOREIGN-VISITOR-AFFILIATE-QR-TEMPLATE-V1: 파트너별 QR 관리 */}
             <Route path="sales-channels/foreign-visitor/partners/:partnerId/qr-codes" element={<ForeignVisitorPartnerQrCodesPage />} />
+            {/* WO-O4O-KPA-ONLINE-SALES-FIRST-CLASS-MENU-PHASE1-V1: 온라인 판매(B2C) 1급 메뉴 분리.
+                StoreChannelsPage 를 B2C 전용 section('settings'|'products') 모드로 재사용. */}
+            <Route path="online-sales/settings" element={<StoreChannelsPage section="settings" />} />
+            <Route path="online-sales/products" element={<StoreChannelsPage section="products" />} />
             {/* ── Hidden routes (사이드바 미표시, URL 직접 접근 유지) ── */}
-            <Route path="channels" element={<StoreChannelsPage />} />
+            {/* /store/channels → 온라인 판매 설정으로 redirect (채널 관리 메뉴 제거) */}
+            <Route path="channels" element={<Navigate to="/store/online-sales/settings" replace />} />
             <Route path="channels/tablet" element={<Navigate to="/store/requests" replace />} />
             <Route path="content" element={<StoreAssetsPage />} />
             <Route path="content/blog" element={<PharmacyBlogPage />} />

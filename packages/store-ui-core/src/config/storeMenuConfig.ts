@@ -293,9 +293,15 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'signage-schedules', label: '스케줄',       subPath: '/marketing/signage/schedules' },
       { key: 'signage-player',    label: 'TV 재생',      subPath: '/marketing/signage/player' },
     ]},
-    // 채널 — 매장 운영 보조 기능 (채널 관리 / 태블릿 / 상담 요청).
-    { label: '채널', items: [
-      { key: 'channels',         label: '채널 관리', subPath: '/channels' },
+    // WO-O4O-KPA-ONLINE-SALES-FIRST-CLASS-MENU-PHASE1-V1 (KPA 블록 한정):
+    //   온라인 판매(B2C)를 '채널 관리'에서 분리해 1급 메뉴로 승격(판매 설정/판매 상품).
+    //   '채널 관리' 항목 제거, 채널 그룹은 '고객 응대'(태블릿/상담 요청)로 개편.
+    //   KIOSK 는 출시 전 placeholder 라 사용자 메뉴 미노출. /store/channels → /store/online-sales/settings redirect.
+    { label: '온라인 판매', items: [
+      { key: 'online-sales-settings', label: '판매 설정', subPath: '/online-sales/settings' },
+      { key: 'online-sales-products', label: '판매 상품', subPath: '/online-sales/products' },
+    ]},
+    { label: '고객 응대', items: [
       { key: 'tablet-displays',  label: '태블릿',    subPath: '/commerce/tablet-displays' },
       { key: 'requests',         label: '상담 요청', subPath: '/requests' },
     ]},
