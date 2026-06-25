@@ -60,22 +60,15 @@ export interface StoreBlock {
  *   - blocks: if null/undefined, derived from storefront_blocks or template
  *   - template: if null/undefined, derived from template_profile column
  *   - theme: defaults to 'professional' if missing
- *   - components: KPA legacy toggle map (maps to block.enabled in new model)
+ *
+ * WO-O4O-STORE-HOME-DESIGN-UNUSED-FIELDS-CLEANUP-V1:
+ *   레거시 고아 필드 `components`/`customizations` 제거 — 3서비스 프론트 미참조 +
+ *   공개 storefront 렌더 미사용 + 운영 DB 0건(키 부재). (IR-O4O-KPA-STORE-HOME-DESIGN-UNUSED-SETTINGS-AUDIT-V1)
  */
 export interface StorefrontConfig {
   template?: StoreTemplate;
   theme?: StoreTheme;
   blocks?: StoreBlock[];
-  /**
-   * Component visibility map — KPA legacy.
-   * New code should prefer blocks[].enabled instead.
-   */
-  components?: Record<string, boolean>;
-  /**
-   * Service-specific extensions.
-   * Use for fields that don't fit the common model.
-   */
-  customizations?: Record<string, any>;
 }
 
 // ── Channels ─────────────────────────────────────────────────────────────────
@@ -141,8 +134,6 @@ export interface StoreSettingsData {
     template: StoreTemplate;
     theme: StoreTheme;
     blocks: StoreBlock[];
-    components: Record<string, boolean>;
-    customizations: Record<string, any>;
   };
   channels: StoreChannel[];
 }

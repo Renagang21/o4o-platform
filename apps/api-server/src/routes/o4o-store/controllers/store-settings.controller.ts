@@ -84,23 +84,6 @@ function normalizeTemplate(raw: string | null | undefined): StoreTemplate {
   return LEGACY_TEMPLATE_MAP[raw] ?? 'BASIC';
 }
 
-// ── Merge Helpers ─────────────────────────────────────────────────────────────
-
-function deepMerge(target: Record<string, any>, source: Record<string, any>): Record<string, any> {
-  const result = { ...target };
-  for (const key of Object.keys(source)) {
-    const sv = source[key];
-    const tv = target[key];
-    if (sv !== null && typeof sv === 'object' && !Array.isArray(sv)
-        && tv !== null && typeof tv === 'object' && !Array.isArray(tv)) {
-      result[key] = deepMerge(tv, sv);
-    } else {
-      result[key] = sv;
-    }
-  }
-  return result;
-}
-
 // ── Channel Config Validators ─────────────────────────────────────────────────
 
 function validateChannelConfig(type: ChannelType, config: Record<string, any>): string | null {
@@ -213,8 +196,6 @@ export function createStoreSettingsController(
         template,
         theme: (cfg.theme as StoreTheme) ?? 'professional',
         blocks,
-        components: cfg.components ?? {},
-        customizations: cfg.customizations ?? {},
       },
       channels: channels.map((ch) => ({
         id: ch.id,
@@ -305,14 +286,8 @@ export function createStoreSettingsController(
         // blocks = full replace
         updated.blocks = patch.blocks;
       }
-      if (patch.components !== undefined && typeof patch.components === 'object') {
-        // components = shallow merge (per-key override)
-        updated.components = { ...(existing.components ?? {}), ...patch.components };
-      }
-      if (patch.customizations !== undefined && typeof patch.customizations === 'object') {
-        // customizations = deep merge
-        updated.customizations = deepMerge(existing.customizations ?? {}, patch.customizations);
-      }
+      // WO-O4O-STORE-HOME-DESIGN-UNUSED-FIELDS-CLEANUP-V1:
+      //   components/customizations 고아 필드 제거 — 수용/병합 로직 삭제(미참조·데이터 0).
 
       // Write storefront_config; if blocks changed also sync storefront_blocks for backward compat
       if (patch.blocks !== undefined) {
