@@ -15,7 +15,7 @@
 
 import { useEffect, useMemo, useRef, useState, useCallback, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Sparkles, Trash2, Search, FileText, Info } from 'lucide-react';
+import { BookOpen, Sparkles, Trash2, Search, FileText, Info, Printer } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { Pagination } from '@o4o/operator-ux-core';
 import { DataTable, type Column, ActionBar } from '@o4o/ui';
@@ -27,6 +27,8 @@ import {
 } from '../../api/assetSnapshot';
 import { colors } from '../../styles/theme';
 import type { ProductionSourceItem } from './productionTargets';
+// WO-O4O-KPA-STORE-LIBRARY-CONTENTS-PDF-EXPORT-OPTIONS-V1: 선택 콘텐츠 인쇄용 PDF
+import { ContentPdfExportModal, type PdfExportContent } from './ContentPdfExportModal';
 
 const PAGE_LIMIT = 20;
 const SEARCH_DEBOUNCE_MS = 300;
@@ -238,6 +240,12 @@ export interface StoreContentsSelectorProps {
   mode?: 'page' | 'modal';
   /** "제작 시작" 버튼 라벨 오버라이드 (modal 에선 보통 "선택 완료") */
   startButtonLabel?: string;
+  /**
+   * WO-O4O-KPA-STORE-LIBRARY-CONTENTS-PDF-EXPORT-OPTIONS-V1:
+   * 문서형 콘텐츠 선택 작업 영역에 "인쇄용 PDF 만들기" 추가 (page 모드 전용 opt-in).
+   * 미지정 시 기존 동작 유지 — production-materials 선택 모달(mode='modal')은 영향 없음.
+   */
+  enablePdfExport?: boolean;
 }
 
 export function StoreContentsSelector({
@@ -247,6 +255,7 @@ export function StoreContentsSelector({
   onAfterRemove,
   mode = 'page',
   startButtonLabel,
+  enablePdfExport = false,
 }: StoreContentsSelectorProps) {
   const [topTab, setTopTab] = useState<TopTab>('contents');
   const [contentsSubTab, setContentsSubTab] = useState<ContentsSubTab>('document');
@@ -267,6 +276,7 @@ export function StoreContentsSelector({
               onRemoveSnapshots={onRemoveSnapshots}
               mode={mode}
               startButtonLabel={startButtonLabel}
+              enablePdfExport={enablePdfExport}
             />
           )}
 
@@ -297,6 +307,7 @@ function DocumentsSection({
   onRemoveSnapshots,
   mode,
   startButtonLabel,
+  enablePdfExport = false,
 }: {
   reloadKey: number;
   onStartProduction: (items: ProductionSourceItem[]) => void;
@@ -304,6 +315,7 @@ function DocumentsSection({
   onRemoveSnapshots?: (snapshotIds: string[]) => Promise<number>;
   mode: 'page' | 'modal';
   startButtonLabel?: string;
+  enablePdfExport?: boolean;
 }) {
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -313,6 +325,8 @@ function DocumentsSection({
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-PDF-EXPORT-OPTIONS-V1: 인쇄용 PDF 대상(단일)
+  const [pdfTarget, setPdfTarget] = useState<PdfExportContent | null>(null);
 
   useEffect(() => {
     const handle = setTimeout(() => {
@@ -399,6 +413,16 @@ function DocumentsSection({
       toast.error(e?.message || '삭제에 실패했습니다');
     }
   }, [selected, rows, onRemoveSnapshots, onAfterRemove]);
+
+  // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-PDF-EXPORT-OPTIONS-V1:
+  //   콘텐츠 1개 선택 시에만 인쇄용 PDF 만들기 활성. 선택 행에서 id/title/origin 을 PDF 모달로 전달.
+  const handlePdfExport = useCallback(() => {
+    if (selected.size !== 1) return;
+    const key = Array.from(selected)[0];
+    const row = rows.find((r) => r.selectionKey === key);
+    if (!row) return;
+    setPdfTarget({ id: row.id, title: row.title, origin: row.origin });
+  }, [selected, rows]);
 
   // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-STANDARD-TABLE-V1: @o4o/ui Column<T>
   const columns = useMemo<Column<DocumentRow>[]>(
@@ -492,6 +516,8 @@ function DocumentsSection({
   );
 
   const showRemoveButton = mode === 'page' && !!onRemoveSnapshots;
+  // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-PDF-EXPORT-OPTIONS-V1: page 모드 opt-in 일 때만 노출
+  const showPdfExport = mode === 'page' && enablePdfExport;
 
   return (
     <section style={styles.section}>
@@ -529,6 +555,15 @@ function DocumentsSection({
             onClick: handleStart,
             disabled: selected.size === 0,
           },
+          // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-PDF-EXPORT-OPTIONS-V1:
+          //   1차는 단일 콘텐츠만 지원 — 1개 선택 시에만 활성(2개+ 비활성 + 아래 안내).
+          ...(showPdfExport ? [{
+            key: 'pdf',
+            label: '인쇄용 PDF 만들기',
+            icon: <Printer size={14} />,
+            onClick: handlePdfExport,
+            disabled: selected.size !== 1,
+          }] : []),
           ...(showRemoveButton ? [{
             key: 'remove',
             label: '선택 삭제',
@@ -538,6 +573,11 @@ function DocumentsSection({
           }] : []),
         ]}
       />
+
+      {/* 인쇄용 PDF 는 콘텐츠 1개 선택 시 사용 가능 — 복수 선택 시 안내 */}
+      {showPdfExport && selected.size >= 2 && (
+        <p style={styles.pdfHint}>인쇄용 PDF 만들기는 콘텐츠 1개 선택 시 사용할 수 있습니다.</p>
+      )}
 
       <DataTable<DocumentRow>
         columns={columns}
@@ -557,6 +597,15 @@ function DocumentsSection({
         onPageChange={setPage}
         total={total}
       />
+
+      {/* WO-O4O-KPA-STORE-LIBRARY-CONTENTS-PDF-EXPORT-OPTIONS-V1: 옵션 모달 */}
+      {showPdfExport && (
+        <ContentPdfExportModal
+          open={!!pdfTarget}
+          content={pdfTarget}
+          onClose={() => setPdfTarget(null)}
+        />
+      )}
     </section>
   );
 }
@@ -899,6 +948,14 @@ const styles: Record<string, CSSProperties> = {
     color: colors.neutral600,
     background: colors.neutral100,
     borderRadius: '999px',
+  },
+  pdfHint: {
+    fontSize: '12px',
+    color: colors.neutral500,
+    margin: '0 0 10px',
+    padding: '8px 12px',
+    background: colors.neutral100,
+    borderRadius: '6px',
   },
   infoBar: {
     display: 'flex',

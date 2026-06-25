@@ -161,6 +161,8 @@ export default function StoreLibraryContentsPage() {
         onRemoveSnapshots={removeSnapshots}
         onAfterRemove={reload}
         mode="page"
+        // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-PDF-EXPORT-OPTIONS-V1: 선택 작업 영역에 인쇄용 PDF 만들기
+        enablePdfExport
       />
 
       <StartProductionModal
