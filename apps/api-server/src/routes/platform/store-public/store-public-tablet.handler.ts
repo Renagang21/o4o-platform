@@ -16,6 +16,7 @@ import { Router, Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
 import { TabletInterestRequest, InterestRequestStatus } from '../entities/tablet-interest-request.entity.js';
 import { ProductMaster } from '../../../modules/neture/entities/ProductMaster.entity.js';
+import { notificationService } from '../../../services/NotificationService.js';
 import {
   resolvePublicStore,
   queryTabletVisibleProducts,
@@ -122,6 +123,61 @@ export function createStorePublicTabletRoutes(deps: {
       });
 
       const saved = await interestRepo.save(interest);
+
+      // WO-O4O-KPA-STORE-CONSULTATION-REQUEST-NOTIFICATION-WIRING-V1
+      // 상담 요청 생성 시 매장 사용자(경영자/직원)에게 in-app 알림 생성.
+      // - 기존엔 알림이 없어 직원이 /store/requests 화면을 5초 polling 으로 직접 봐야 인지 가능했음.
+      // - best-effort: 알림 실패가 요청 생성(본 기능)을 막지 않는다.
+      // - KPA 한정: 본 handler 는 service-neutral 이나 본 WO 범위는 KPA. GP 는 별도
+      //   customer_requests 모델을 사용하므로 의도치 않은 동작 변경을 피하기 위해 'kpa' 만 처리.
+      //   GP/KCos parity 는 후속 WO 에서 판단(IR-...-CONSULTATION-REQUESTS-NOTIFICATION-REPLACEMENT-AUDIT-V1).
+      if (resolved.serviceKey === 'kpa') {
+        try {
+          // 대상: 해당 매장(organization)의 owner/admin/manager. 운영자 전체가 아닌 매장 사용자에게만.
+          const members: { userId: string }[] = await dataSource.query(
+            `SELECT DISTINCT user_id AS "userId"
+               FROM organization_members
+              WHERE organization_id = $1
+                AND role IN ('owner','admin','manager')
+                AND left_at IS NULL
+              LIMIT 20`,
+            [resolved.storeId],
+          );
+
+          const productName = saved.productName || '';
+          const message = productName
+            ? `${productName} 상담 요청이 접수되었습니다.`
+            : '매장 상담 요청이 접수되었습니다.';
+
+          await Promise.allSettled(
+            members.map((m) =>
+              notificationService.createNotification({
+                userId: m.userId,
+                type: 'store.consultation_requested',
+                title: '새 상담 요청이 도착했습니다',
+                message,
+                // bell 필터는 'kpa-society'(membership/service key) 기준 — slug service_key('kpa')와 다름.
+                serviceKey: 'kpa-society',
+                organizationId: resolved.storeId,
+                metadata: {
+                  targetUrl: '/store/requests',
+                  requestId: saved.id,
+                  organizationId: resolved.storeId,
+                  storeSlug: req.params.slug,
+                  source: 'tablet',
+                  targetType: 'tablet_interest_request',
+                  productName,
+                },
+              }),
+            ),
+          );
+        } catch (notifyError) {
+          console.error(
+            '[UnifiedStore] consultation request notification failed (best-effort):',
+            notifyError,
+          );
+        }
+      }
 
       res.status(201).json({
         success: true,

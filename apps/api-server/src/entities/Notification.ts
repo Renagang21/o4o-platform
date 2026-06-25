@@ -65,6 +65,8 @@ export type NotificationType =
   | 'recruitment.application_approved'     // 판매자: 모집 신청 승인
   | 'recruitment.application_rejected'     // 판매자: 모집 신청 반려
   | 'recruitment.participation_terminated' // 판매자: 모집 참여 해지
+  // WO-O4O-KPA-STORE-CONSULTATION-REQUEST-NOTIFICATION-WIRING-V1
+  | 'store.consultation_requested'   // 매장 사용자: 신규 상담(태블릿 관심) 요청 접수
   | 'custom';
 
 // Legacy interface for backward compatibility

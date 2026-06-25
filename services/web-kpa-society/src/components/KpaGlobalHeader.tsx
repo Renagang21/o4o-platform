@@ -82,7 +82,13 @@ export function KpaGlobalHeader() {
   const handleNotificationClick = useCallback(
     (n: NotificationItem) => {
       const target = (n.metadata as Record<string, unknown> | undefined)?.targetUrl;
-      if (typeof target === 'string' && target.length > 0) {
+      // WO-O4O-KPA-STORE-CONSULTATION-REQUEST-NOTIFICATION-WIRING-V1:
+      //   내부 path 만 허용 — 외부 URL(`//`, `http://`, `https://`)로의 navigate 차단.
+      if (
+        typeof target === 'string' &&
+        target.startsWith('/') &&
+        !target.startsWith('//')
+      ) {
         navigate(target);
       }
     },
