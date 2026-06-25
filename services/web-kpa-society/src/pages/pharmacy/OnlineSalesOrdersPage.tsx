@@ -95,7 +95,12 @@ export function OnlineSalesOrdersPage() {
       key: 'orderNumber',
       title: '주문번호',
       render: (_v: unknown, row: StoreOrder) => (
-        <span style={{ fontWeight: 500, fontSize: '13px', color: colors.neutral800 }}>{row.orderNumber}</span>
+        <Link
+          to={`/store/online-sales/orders/${row.id}`}
+          style={{ fontWeight: 500, fontSize: '13px', color: colors.primary, textDecoration: 'none' }}
+        >
+          {row.orderNumber}
+        </Link>
       ),
     },
     {
@@ -148,6 +153,20 @@ export function OnlineSalesOrdersPage() {
         <span style={{ fontSize: '12px', color: colors.neutral500 }}>
           {new Date(row.createdAt).toLocaleString('ko-KR')}
         </span>
+      ),
+    },
+    {
+      key: 'detail',
+      title: '',
+      width: '72px',
+      align: 'center' as const,
+      render: (_v: unknown, row: StoreOrder) => (
+        <Link
+          to={`/store/online-sales/orders/${row.id}`}
+          style={{ fontSize: '12px', color: colors.primary, textDecoration: 'none', fontWeight: 500 }}
+        >
+          상세 보기
+        </Link>
       ),
     },
   ];

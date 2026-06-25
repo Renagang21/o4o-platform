@@ -206,6 +206,8 @@ const PharmacyTemplatePage = lazy(() => import('./pages/pharmacy/PharmacyTemplat
 const StoreChannelsPage = lazy(() => import('./pages/pharmacy/StoreChannelsPage').then(m => ({ default: m.StoreChannelsPage })));
 // WO-O4O-KPA-ONLINE-SALES-ORDER-MANAGEMENT-AND-BUYER-ORDER-RELABEL-V1: 온라인 판매(seller) 주문 관리
 const OnlineSalesOrdersPage = lazy(() => import('./pages/pharmacy/OnlineSalesOrdersPage').then(m => ({ default: m.OnlineSalesOrdersPage })));
+// WO-O4O-KPA-ONLINE-SALES-ORDER-DETAIL-V1: 온라인 판매 주문 상세(읽기 전용)
+const OnlineSalesOrderDetailPage = lazy(() => import('./pages/pharmacy/OnlineSalesOrderDetailPage').then(m => ({ default: m.OnlineSalesOrderDetailPage })));
 // WO-O4O-FOREIGN-VISITOR-SALES-SUPPORT-MENU-GATE-V1
 const ForeignVisitorSalesSupportPage = lazy(() => import('./pages/pharmacy/ForeignVisitorSalesSupportPage').then(m => ({ default: m.ForeignVisitorSalesSupportPage })));
 // WO-O4O-STORE-SERVICE-SUBSCRIPTION-TOSS-PAYMENT-V1 (Phase 2): 구독 결제 결과 페이지
@@ -1031,6 +1033,8 @@ function App() {
             <Route path="online-sales/products" element={<StoreChannelsPage section="products" />} />
             {/* WO-O4O-KPA-ONLINE-SALES-ORDER-MANAGEMENT-AND-BUYER-ORDER-RELABEL-V1: 판매(seller) 주문 관리 */}
             <Route path="online-sales/orders" element={<OnlineSalesOrdersPage />} />
+            {/* WO-O4O-KPA-ONLINE-SALES-ORDER-DETAIL-V1: 판매 주문 상세(읽기 전용) */}
+            <Route path="online-sales/orders/:orderId" element={<OnlineSalesOrderDetailPage />} />
             {/* ── Hidden routes (사이드바 미표시, URL 직접 접근 유지) ── */}
             {/* /store/channels → 온라인 판매 설정으로 redirect (채널 관리 메뉴 제거) */}
             <Route path="channels" element={<Navigate to="/store/online-sales/settings" replace />} />
