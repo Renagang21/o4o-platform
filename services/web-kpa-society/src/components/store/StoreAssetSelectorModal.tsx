@@ -28,6 +28,11 @@ import { listContentHubItems } from '../../api/contentHub';
 import { fetchStaffBlogPosts } from '../../api/blogStaff';
 import type { StaffBlogPost } from '../../api/blogStaff';
 import { getStoreSlug } from '../../api/pharmacyInfo';
+// WO-O4O-KPA-QR-MULTILINGUAL-PRODUCT-LINK-SOURCE-V1:
+//   다국어 제품 콘텐츠(store_multilingual_product_content_*)를 QR 대상 소스로 추가(opt-in).
+//   선택 시 idempotent publicKey 발급 → 공개 landing URL 로 link 형 QR 연결(기존 다국어 화면 재사용).
+import { listMyMlcGroups, ensureMlcPublicKey } from '../../api/multilingualProductContentStore';
+import type { StoreMlcGroup, StoreMlcLocale } from '../../api/multilingualProductContentStore';
 
 // ── 선택 결과 타입 ──
 
@@ -44,7 +49,9 @@ export interface AssetSelectorResult {
   //   'content-hub' = 운영자 콘텐츠 허브(kpa_contents) 참조(landingType='page', landingTargetId=id).
   // WO-O4O-KPA-STORE-QR-TARGET-SCOPE-AUDIT-V1 (B안):
   //   'blog' = 매장 블로그(store_blog_posts) 공개 URL 참조(landingType='link', landingTargetId=url).
-  source?: 'asset' | 'content-hub' | 'blog';
+  // WO-O4O-KPA-QR-MULTILINGUAL-PRODUCT-LINK-SOURCE-V1:
+  //   'mlc' = 다국어 제품 콘텐츠 공개 landing URL 참조(landingType='link', landingTargetId=url).
+  source?: 'asset' | 'content-hub' | 'blog' | 'mlc';
 }
 
 /** @deprecated Use AssetSelectorResult */
@@ -73,10 +80,22 @@ interface StoreAssetSelectorModalProps {
    *   미지정(기본) 시 기존 동작 그대로 — 다른 소비처(사이니지 등) 무영향.
    */
   enableBlogSource?: boolean;
+  /**
+   * WO-O4O-KPA-QR-MULTILINGUAL-PRODUCT-LINK-SOURCE-V1:
+   *   true 시 "다국어 제품 콘텐츠" 소스 탭 추가 — 선택 시 publicKey 발급(idempotent) 후
+   *   공개 landing URL 로 연결하는 link 형 QR 을 만든다. 언어 선택/없는 언어 숨김/fallback 은
+   *   기존 다국어 공개 landing 이 처리(QR 측 다국어 UI 미구현). 미지정(기본) 시 무영향.
+   */
+  enableMlcSource?: boolean;
 }
 
-// WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4 / QR-TARGET-SCOPE (B안): 소스 종류
-type AssetSource = 'asset' | 'content' | 'blog';
+// WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4 / QR-TARGET-SCOPE (B안) / MLC: 소스 종류
+type AssetSource = 'asset' | 'content' | 'blog' | 'mlc';
+
+// WO-O4O-KPA-QR-MULTILINGUAL-PRODUCT-LINK-SOURCE-V1: locale 배지 라벨
+const MLC_LOCALE_LABELS: Record<string, string> = {
+  ko: '한국어', en: 'English', zh: '中文', ja: '日本語', vi: 'Tiếng Việt', th: 'ไทย', id: 'Indonesia',
+};
 
 // ── 자산 타입 필터 ──
 
@@ -99,6 +118,7 @@ export function StoreAssetSelectorModal({
   usageType,
   enableContentHubSource = false,
   enableBlogSource = false,
+  enableMlcSource = false,
 }: StoreAssetSelectorModalProps) {
   const [items, setItems] = useState<StoreExecutionAsset[]>([]);
   const [loading, setLoading] = useState(false);
@@ -112,6 +132,9 @@ export function StoreAssetSelectorModal({
   const [contentItems, setContentItems] = useState<{ id: string; title: string; summary: string | null; category: string | null }[]>([]);
   // WO-O4O-KPA-STORE-QR-TARGET-SCOPE-AUDIT-V1 (B안): 블로그 결과물 + 공개 URL 조합용 store slug
   const [blogItems, setBlogItems] = useState<StaffBlogPost[]>([]);
+  // WO-O4O-KPA-QR-MULTILINGUAL-PRODUCT-LINK-SOURCE-V1: 다국어 제품 콘텐츠 그룹 + 발급 진행 상태
+  const [mlcItems, setMlcItems] = useState<StoreMlcGroup[]>([]);
+  const [issuingMlc, setIssuingMlc] = useState(false);
   const slugRef = useRef<string | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -128,6 +151,8 @@ export function StoreAssetSelectorModal({
     setSource('asset');
     setContentItems([]);
     setBlogItems([]);
+    setMlcItems([]);
+    setIssuingMlc(false);
   }, [open]);
 
   // 서버 데이터 로드 (page/source 변경 시 즉시)
@@ -175,6 +200,19 @@ export function StoreAssetSelectorModal({
         setTotal(filtered.length);
         return;
       }
+      // WO-O4O-KPA-QR-MULTILINGUAL-PRODUCT-LINK-SOURCE-V1:
+      //   다국어 제품 콘텐츠 그룹 — archived 제외, 본문(page) 1개 이상 보유한 것만 노출.
+      //   클라이언트 검색 필터(목록 규모 작음). 공개 가능 여부는 발급 시점에 published 승격됨.
+      if (source === 'mlc') {
+        const all = await listMyMlcGroups({ includeArchived: false }).catch(() => [] as StoreMlcGroup[]);
+        const usable = all.filter((g) => Array.isArray(g.pages) && g.pages.some((p) => p.status !== 'archived'));
+        const filtered = q.trim()
+          ? usable.filter((g) => g.title.toLowerCase().includes(q.trim().toLowerCase()))
+          : usable;
+        setMlcItems(filtered);
+        setTotal(filtered.length);
+        return;
+      }
       const res = await getStoreExecutionAssets({
         page: p,
         limit: PAGE_SIZE,
@@ -211,8 +249,34 @@ export function StoreAssetSelectorModal({
   const selectedItem = items.find((i) => i.id === selectedId) ?? null;
   const selectedContent = contentItems.find((i) => i.id === selectedId) ?? null;
   const selectedBlog = blogItems.find((i) => i.id === selectedId) ?? null;
+  const selectedMlc = mlcItems.find((i) => i.id === selectedId) ?? null;
 
-  const handleConfirm = useCallback(() => {
+  const handleConfirm = useCallback(async () => {
+    // WO-O4O-KPA-QR-MULTILINGUAL-PRODUCT-LINK-SOURCE-V1:
+    //   다국어 제품 콘텐츠 — 선택 시 publicKey 발급(idempotent, 발급 시 draft→published 승격) 후
+    //   공개 landing 절대 URL 로 link 형 QR 연결. 언어 선택/없는 언어 숨김/fallback 은 기존 공개 landing 처리.
+    if (source === 'mlc') {
+      if (!selectedMlc || issuingMlc) return;
+      setIssuingMlc(true);
+      try {
+        const { url } = await ensureMlcPublicKey(selectedMlc.id);
+        onSelect({
+          id: selectedMlc.id,
+          title: selectedMlc.title,
+          category: null,
+          fileUrl: null,
+          assetType: 'mlc',
+          url,
+          htmlContent: null,
+          source: 'mlc',
+        });
+      } catch {
+        // 발급 실패 시 모달 유지 (사용자가 재시도)
+      } finally {
+        setIssuingMlc(false);
+      }
+      return;
+    }
     // WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4:
     //   운영자 콘텐츠는 참조형(landingType='page', landingTargetId=content.id) — 사본 복사 없음.
     if (source === 'content') {
@@ -260,7 +324,7 @@ export function StoreAssetSelectorModal({
       htmlContent: selectedItem.htmlContent ?? null,
       source: 'asset',
     });
-  }, [source, selectedItem, selectedContent, selectedBlog, onSelect]);
+  }, [source, selectedItem, selectedContent, selectedBlog, selectedMlc, issuingMlc, onSelect]);
 
   if (!open) return null;
 
@@ -284,8 +348,8 @@ export function StoreAssetSelectorModal({
           </button>
         </div>
 
-        {/* WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4 / QR-TARGET-SCOPE (B안): 소스 전환 탭 */}
-        {(enableContentHubSource || enableBlogSource) && (
+        {/* WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4 / QR-TARGET-SCOPE (B안) / MLC: 소스 전환 탭 */}
+        {(enableContentHubSource || enableBlogSource || enableMlcSource) && (
           <div style={styles.sourceTabs}>
             <button
               onClick={() => switchSource('asset')}
@@ -309,6 +373,14 @@ export function StoreAssetSelectorModal({
                 블로그
               </button>
             )}
+            {enableMlcSource && (
+              <button
+                onClick={() => switchSource('mlc')}
+                style={{ ...styles.sourceTab, ...(source === 'mlc' ? styles.sourceTabActive : {}) }}
+              >
+                다국어 제품 콘텐츠
+              </button>
+            )}
           </div>
         )}
 
@@ -320,7 +392,7 @@ export function StoreAssetSelectorModal({
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder={source === 'content' ? '콘텐츠 검색...' : source === 'blog' ? '블로그 검색...' : '자산 검색...'}
+              placeholder={source === 'content' ? '콘텐츠 검색...' : source === 'blog' ? '블로그 검색...' : source === 'mlc' ? '다국어 제품 콘텐츠 검색...' : '자산 검색...'}
               style={styles.searchInput}
             />
           </div>
@@ -350,11 +422,58 @@ export function StoreAssetSelectorModal({
               매장 블로그 글입니다. 선택하면 공개 블로그 페이지로 연결되는 QR이 만들어집니다. 초안은 발행 후 정상 표시됩니다.
             </p>
           )}
+          {source === 'mlc' && (
+            <p style={styles.contentHint}>
+              다국어 제품 콘텐츠입니다. 선택하면 공개 링크가 발급되어 QR로 연결됩니다.
+              스캔 시 본문이 있는 언어만 선택지로 표시되며, 한 언어만 있으면 바로 표시됩니다(하나의 QR).
+            </p>
+          )}
         </div>
 
         {/* Card Grid */}
         <div style={styles.body}>
-          {source === 'blog' ? (
+          {source === 'mlc' ? (
+            loading ? (
+              <div style={styles.emptyState}>
+                <p style={{ color: colors.neutral500 }}>다국어 제품 콘텐츠를 불러오는 중...</p>
+              </div>
+            ) : mlcItems.length === 0 ? (
+              <div style={styles.emptyState}>
+                <p style={{ color: colors.neutral500 }}>
+                  {search.trim() ? '검색 결과가 없습니다' : '연결할 다국어 제품 콘텐츠가 없습니다'}
+                </p>
+              </div>
+            ) : (
+              <div style={styles.grid}>
+                {mlcItems.map((g) => {
+                  // 본문(page) 있는 언어만 배지로 노출 (archived 제외, 중복 제거)
+                  const locales = Array.from(
+                    new Set((g.pages ?? []).filter((p) => p.status !== 'archived').map((p) => p.locale)),
+                  ) as StoreMlcLocale[];
+                  return (
+                    <button
+                      key={g.id}
+                      onClick={() => setSelectedId(g.id)}
+                      style={{ ...styles.card, ...(selectedId === g.id ? styles.cardSelected : {}) }}
+                    >
+                      <div style={styles.cardPreview}>
+                        <FileText size={28} style={{ color: '#0e7490' }} />
+                      </div>
+                      <div style={styles.cardInfo}>
+                        <p style={styles.cardTitle}>{g.title}</p>
+                        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' as const }}>
+                          {locales.map((loc) => (
+                            <span key={loc} style={styles.localeBadge}>{MLC_LOCALE_LABELS[loc] ?? loc}</span>
+                          ))}
+                        </div>
+                      </div>
+                      {selectedId === g.id && <div style={styles.selectedBadge}>선택됨</div>}
+                    </button>
+                  );
+                })}
+              </div>
+            )
+          ) : source === 'blog' ? (
             loading ? (
               <div style={styles.emptyState}>
                 <p style={{ color: colors.neutral500 }}>블로그를 불러오는 중...</p>
@@ -522,14 +641,14 @@ export function StoreAssetSelectorModal({
           <button onClick={onClose} style={styles.cancelBtn}>취소</button>
           <button
             onClick={handleConfirm}
-            disabled={!selectedId}
+            disabled={!selectedId || issuingMlc}
             style={{
               ...styles.confirmBtn,
-              opacity: selectedId ? 1 : 0.5,
-              cursor: selectedId ? 'pointer' : 'not-allowed',
+              opacity: selectedId && !issuingMlc ? 1 : 0.5,
+              cursor: selectedId && !issuingMlc ? 'pointer' : 'not-allowed',
             }}
           >
-            선택 완료
+            {issuingMlc ? '링크 발급 중…' : '선택 완료'}
           </button>
         </div>
       </div>
@@ -797,6 +916,17 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: '10px',
     backgroundColor: '#f0fdf4',
     color: '#16a34a',
+    fontSize: '11px',
+    fontWeight: 500,
+  },
+  // WO-O4O-KPA-QR-MULTILINGUAL-PRODUCT-LINK-SOURCE-V1: 다국어 locale 배지
+  localeBadge: {
+    display: 'inline-block',
+    marginTop: '4px',
+    padding: '2px 8px',
+    borderRadius: '10px',
+    backgroundColor: '#ecfeff',
+    color: '#0e7490',
     fontSize: '11px',
     fontWeight: 500,
   },

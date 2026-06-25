@@ -68,6 +68,8 @@ const ASSET_TYPE_LABELS: Record<string, string> = {
   'external-link': '외부 링크',
   // WO-O4O-KPA-STORE-QR-TARGET-SCOPE-AUDIT-V1 (B안): 블로그 대상 배지
   blog: '블로그',
+  // WO-O4O-KPA-QR-MULTILINGUAL-PRODUCT-LINK-SOURCE-V1: 다국어 제품 콘텐츠 배지
+  mlc: '다국어 제품',
 };
 
 function autoLandingType(assetType: string): string {
@@ -343,11 +345,12 @@ export function StoreQRPage() {
   const handleLibrarySelect = (item: LibrarySelectorResult) => {
     setSelectedLibrary(item);
     setFormSlug(toSlug(item.title));
-    // WO-O4O-KPA-STORE-QR-TARGET-SCOPE-AUDIT-V1 (B안):
-    //   블로그(source='blog')는 공개 URL link 연결 — landingType='link', landingTargetId=절대 URL.
+    // WO-O4O-KPA-STORE-QR-TARGET-SCOPE-AUDIT-V1 (B안) / MLC:
+    //   블로그(source='blog')·다국어 제품 콘텐츠(source='mlc')는 공개 URL link 연결 —
+    //   landingType='link', landingTargetId=절대 URL.
     //   콘텐츠 허브(source='content-hub')는 handleCreate 에서 page 참조형으로 처리(여기선 page prefill).
     //   그 외(asset)는 기존 autoLandingType 규칙.
-    if (item.source === 'blog') {
+    if (item.source === 'blog' || item.source === 'mlc') {
       setFormLandingType('link');
       setFormLandingTargetId(item.url || '');
     } else {
@@ -395,9 +398,10 @@ export function StoreQRPage() {
       //   운영자 콘텐츠 허브(kpa_contents) 참조형 — landingType='page', landingTargetId=content.id.
       //   사본 복사가 아니므로 libraryItemId 는 보내지 않는다(백엔드가 page 랜딩으로 inline 렌더).
       const isContentRef = selectedLibrary.source === 'content-hub';
-      // WO-O4O-KPA-STORE-QR-TARGET-SCOPE-AUDIT-V1 (B안):
-      //   블로그 참조형 — landingType='link', landingTargetId=공개 URL(form 값). libraryItemId 미전송.
-      const isBlogRef = selectedLibrary.source === 'blog';
+      // WO-O4O-KPA-STORE-QR-TARGET-SCOPE-AUDIT-V1 (B안) / MLC:
+      //   블로그·다국어 제품 콘텐츠 참조형 — landingType='link', landingTargetId=공개 URL(form 값).
+      //   사본 복사 아님(다국어는 publicKey 발급으로 매장 사본 그룹을 공개) → libraryItemId 미전송.
+      const isBlogRef = selectedLibrary.source === 'blog' || selectedLibrary.source === 'mlc';
       const res = await createStoreQrCode({
         // WO-O4O-QR-TEMPLATE-WORKFLOW-V1: AI 생성 제목/설명 우선 사용
         title: formTitle.trim() || selectedLibrary.title,
@@ -1151,6 +1155,9 @@ export function StoreQRPage() {
         // WO-O4O-KPA-STORE-QR-TARGET-SCOPE-AUDIT-V1 (B안):
         //   '블로그'(store_blog_posts) 소스 탭 활성화 — 내 매장 제작자료 중 블로그를 link 형 QR 로 연결.
         enableBlogSource
+        // WO-O4O-KPA-QR-MULTILINGUAL-PRODUCT-LINK-SOURCE-V1:
+        //   '다국어 제품 콘텐츠' 소스 탭 활성화 — publicKey 발급 후 공개 landing 으로 link 연결.
+        enableMlcSource
       />
 
       {/* Print Template Modal */}
