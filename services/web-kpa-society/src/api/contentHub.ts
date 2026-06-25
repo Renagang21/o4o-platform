@@ -23,6 +23,9 @@ export interface ContentHubItem {
   source_type: string;
   created_at: string;
   updated_at: string;
+  // WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-SOURCE-LOAD-FIX-V1:
+  //   단건 조회(GET /contents/:id) 시 본문 HTML 포함. 목록 응답에는 없음.
+  body?: string | null;
 }
 
 export interface ContentHubListResponse {

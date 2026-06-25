@@ -71,6 +71,15 @@ export default function ProductionMaterialEditorPage() {
   // WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-DIRECT-CREATE-V1:
   //   AI 결과/콘텐츠 출처 없이 빈 상태로 진입한 경우(처음부터 만들기) 헤더 문구를 맞춘다.
   const isFromScratch = !state.generatedHtml && !selectedTemplate && !state.sourceMetadata;
+  // WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-SOURCE-LOAD-FIX-V1:
+  //   기존 자료(운영자 콘텐츠/내 제작자료)를 본문째 불러온 경우 — AI 초안이 아니므로 헤더를 구분.
+  const sourceOrigin = state.sourceMetadata?.sourceOrigin;
+  const isFromExistingSource = sourceOrigin === 'content-hub' || sourceOrigin === 'production-copy';
+  const headerTitle = isFromScratch
+    ? '새 제작 자료 작성'
+    : isFromExistingSource
+      ? '제작 자료 편집'
+      : 'AI 제작 자료 초안 편집';
 
   const [title, setTitle] = useState(state.title ?? '');
   const [selectedType, setSelectedType] = useState<ProductionTarget | null>(null);
@@ -132,7 +141,7 @@ export default function ProductionMaterialEditorPage() {
         </button>
         <div style={styles.headerCenter}>
           <FileText size={18} style={{ color: colors.primary }} />
-          <h1 style={styles.pageTitle}>{isFromScratch ? '새 제작 자료 작성' : 'AI 제작 자료 초안 편집'}</h1>
+          <h1 style={styles.pageTitle}>{headerTitle}</h1>
         </div>
         <button onClick={handleSave} disabled={saving} style={styles.saveBtn}>
           <Save size={14} />
@@ -178,18 +187,26 @@ export default function ProductionMaterialEditorPage() {
         </div>
       </div>
 
-      {/* Source info */}
+      {/* Source info
+          WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-SOURCE-LOAD-FIX-V1:
+            content-hub(운영자 콘텐츠) / production-copy(내 제작자료 복제) 출처 추가.
+            저장 시 항상 새 사본으로 저장되며 원본은 변경되지 않음을 안내. */}
       {state.sourceMetadata?.sourceTitle && (
         <div style={styles.sourceInfo}>
-          <span style={styles.sourceLabel}>선택 콘텐츠:</span>
+          <span style={styles.sourceLabel}>
+            {state.sourceMetadata.sourceOrigin === 'production-copy' ? '복제 원본:' : '선택 콘텐츠:'}
+          </span>
           <span style={styles.sourceTitle}>{state.sourceMetadata.sourceTitle}</span>
           {state.sourceMetadata.sourceOrigin && (
             <span style={styles.sourceOrigin}>
               ({state.sourceMetadata.sourceOrigin === 'snapshot' ? '커뮤니티'
                 : state.sourceMetadata.sourceOrigin === 'direct' ? '매장 직접 작성'
+                : state.sourceMetadata.sourceOrigin === 'content-hub' ? '운영자 콘텐츠'
+                : state.sourceMetadata.sourceOrigin === 'production-copy' ? '내 제작자료 복제'
                 : '자료함'})
             </span>
           )}
+          <span style={styles.sourceNote}>· 저장하면 내 매장 제작자료로 별도 저장됩니다(원본 변경 없음).</span>
         </div>
       )}
 
@@ -345,6 +362,10 @@ const styles: Record<string, CSSProperties> = {
   },
   sourceOrigin: {
     color: colors.neutral400,
+  },
+  sourceNote: {
+    color: colors.neutral400,
+    fontSize: '11px',
   },
   editorWrap: {
     border: `1px solid ${colors.neutral200}`,

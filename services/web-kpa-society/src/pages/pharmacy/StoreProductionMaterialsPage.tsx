@@ -244,6 +244,28 @@ export default function StoreProductionMaterialsPage() {
     navigate('/store/library/production-materials/new');
   }, [navigate]);
 
+  // WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-SOURCE-LOAD-FIX-V1:
+  //   기존 자료(운영자 콘텐츠 kpa_contents / 내 제작자료 store_execution_assets)의 본문을
+  //   편집기에 직접 prefill 하여 새 store-owned 사본을 작성한다. AI 단계를 거치지 않고 본문을
+  //   generatedHtml 로 넘긴다(편집기는 기존 prefill 메커니즘 재사용, 저장 시 항상 신규 사본 생성).
+  const handleCreateFromSource = useCallback(
+    (prefill: { html: string; title: string; sourceTitle: string; sourceOrigin: string; sourceContentId?: string }) => {
+      setSelectModalOpen(false);
+      navigate('/store/library/production-materials/new', {
+        state: {
+          generatedHtml: prefill.html,
+          title: prefill.title || undefined,
+          sourceMetadata: {
+            sourceContentId: prefill.sourceContentId,
+            sourceTitle: prefill.sourceTitle,
+            sourceOrigin: prefill.sourceOrigin,
+          },
+        },
+      });
+    },
+    [navigate],
+  );
+
   // WO-KPA-STORE-CONTENT-LIBRARY-CROSS-CREATE-CTA-V1:
   // 제작 자료를 source 로 전달하며 제작 화면으로 이동. 대상 화면이 state 를 읽지 않아도 안전(무시됨).
   // WO-KPA-POP-CONTENT-TO-PDF-GENERATION-V1:
@@ -744,6 +766,7 @@ export default function StoreProductionMaterialsPage() {
         onClose={() => setSelectModalOpen(false)}
         onConfirm={handleSelectConfirm}
         onCreateBlank={handleCreateBlank}
+        onCreateFromSource={handleCreateFromSource}
       />
 
       <StartProductionModal
