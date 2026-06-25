@@ -64,7 +64,28 @@ DB/API/migration: **없음.**
 | 편집 블록 KPA 한정 (`KPA_SOCIETY_STORE_CONFIG`) | ✅ (Cosmetics/GlycoPharm config 무변경) |
 | `고객 응대` 그룹 빈 그룹화 여부 | ✅ 아님 (`태블릿` 단독 유지) |
 | route 유지 | ✅ |
-| 브라우저 smoke (메뉴 미노출 / 알림→이동 / 처리 / URL 직접) | ⏳ 배포 후 수행 |
+| 브라우저 smoke (메뉴 미노출 / 알림→이동 / 처리 / URL 직접) | ✅ **PASS** (§6-1) |
+
+### 6-1. 운영 브라우저 smoke 결과 — 2026-06-25 PASS
+
+- 환경: `https://kpa-society.co.kr` (Deploy Web Services success, 커밋 `66df866b1`)
+- 계정: "🧪 체험용 약국 경영자 계정" → Sohae 약국 owner(`sohae2100`, org `c9beb4a2…`) 세션
+
+| smoke 단계 | 결과 |
+|---|---|
+| 1. 사이드바 `고객 응대` 그룹에 `상담 요청` 메뉴 미노출 | ✅ (그룹 펼침 시 `태블릿`(/store/commerce/tablet-displays) 단독) |
+| 2. 상담 요청 생성 (`POST /stores/sohae-약국/tablet/interest`) | ✅ 201, requestId `d4febf3d…` |
+| 3. 알림 생성·도착 (bell) | ✅ store.consultation_requested, serviceKey=kpa-society |
+| 4. 알림 클릭 → 이동 | ✅ `/store/requests` (route 유지 확인) |
+| 5. 안내 문구 갱신 노출 | ✅ "상담 요청이 접수되면 알림으로 알려드립니다. 이 화면에서 접수된 요청을 확인·완료 처리할 수 있습니다." |
+| 6. 목록 표시 | ✅ 대기 1건, NEW, 미네락 600, 메뉴정리smoke |
+| 7. 확인 처리 | ✅ ACKNOWLEDGED |
+| 8. 완료 처리 | ✅ COMPLETED (목록에서 제거) |
+| 9. `/store/requests` URL 직접 진입 (새 로드) | ✅ 정상 렌더 (404 아님) |
+| 10. 알림 읽음 처리 | ✅ isRead=true |
+
+- 회귀: 확인/완료 동작·5초 polling·직접 진입 유지. 요청 생성/알림 생성 정상.
+- 검증 채널: 프론트(브라우저 DOM) + 프로덕션 DB read-only SELECT.
 
 ---
 
