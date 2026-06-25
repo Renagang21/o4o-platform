@@ -38,8 +38,10 @@ type ContentsSubTab = 'document' | 'course-resource';
 
 // ─── Row Types ───────────────────────────────────────────────────────────────
 
-type RowOrigin = 'snapshot' | 'direct';
-type DocSourceType = 'cms' | 'content' | 'direct';
+// WO-O4O-KPA-STORE-LIBRARY-CONTENT-CREATED-BUT-LIST-MISSING-V1 (A안):
+//   'execution-asset' = store_execution_assets(content) — QR "내 매장 자료"와 동일 소스를 콘텐츠 목록에 노출.
+type RowOrigin = 'snapshot' | 'direct' | 'execution-asset';
+type DocSourceType = 'cms' | 'content' | 'direct' | 'execution';
 
 interface DocumentRow {
   id: string;
@@ -70,6 +72,7 @@ const SOURCE_TYPE_LABEL: Record<DocSourceType, string> = {
   cms: '커뮤니티 (CMS)',
   content: '커뮤니티 (콘텐츠 허브)',
   direct: '매장 직접 작성',
+  execution: '매장 제작 자료',
 };
 
 function readString(json: unknown, key: string): string {
@@ -92,9 +95,24 @@ function formatDate(iso?: string | null): string {
 
 function toDocumentRow(it: LibraryContentItem): DocumentRow {
   const sourceType: DocSourceType =
-    it.origin === 'direct' ? 'direct' : it.assetType === 'content' ? 'content' : 'cms';
-  const href = it.origin === 'direct' ? `/store/content/direct/${it.id}` : `/view/${it.id}`;
-  const authorName = it.origin === 'direct' ? '내 매장' : readString(it.contentJson, 'authorName') || '-';
+    it.origin === 'execution-asset'
+      ? 'execution'
+      : it.origin === 'direct'
+        ? 'direct'
+        : it.assetType === 'content'
+          ? 'content'
+          : 'cms';
+  // execution-asset(매장 제작 자료)는 전용 단건 뷰어가 없어 매장 제작 자료 목록에서 열람/관리한다.
+  const href =
+    it.origin === 'execution-asset'
+      ? '/store/library/production-materials'
+      : it.origin === 'direct'
+        ? `/store/content/direct/${it.id}`
+        : `/view/${it.id}`;
+  const authorName =
+    it.origin === 'direct' || it.origin === 'execution-asset'
+      ? '내 매장'
+      : readString(it.contentJson, 'authorName') || '-';
   return {
     id: it.id,
     origin: it.origin,
@@ -346,7 +364,9 @@ function DocumentsSection({
     if (selected.size === 0) return;
     const items: ProductionSourceItem[] = rows
       .filter((r) => selected.has(r.selectionKey))
-      .map((r) => ({ id: r.id, title: r.title, origin: r.origin }));
+      // WO-O4O-KPA-STORE-LIBRARY-CONTENT-CREATED-BUT-LIST-MISSING-V1:
+      //   'execution-asset'(store_execution_assets) → ProductionSourceItem 의 canonical origin 'library' 로 매핑.
+      .map((r) => ({ id: r.id, title: r.title, origin: r.origin === 'execution-asset' ? 'library' : r.origin }));
     onStartProduction(items);
   }, [selected, rows, onStartProduction]);
 
@@ -411,6 +431,10 @@ function DocumentsSection({
             {row.origin === 'direct' && (
               <span style={{ ...styles.badge, background: '#DCFCE7', color: '#16A34A', flexShrink: 0 }}>내 콘텐츠</span>
             )}
+            {/* WO-O4O-KPA-STORE-LIBRARY-CONTENT-CREATED-BUT-LIST-MISSING-V1: 제작 자료(store_execution_assets) 표식 */}
+            {row.origin === 'execution-asset' && (
+              <span style={{ ...styles.badge, background: '#EDE9FE', color: '#7C3AED', flexShrink: 0 }}>제작 자료</span>
+            )}
             {row.lifecycleStatus === 'archived' && (
               <span style={{ ...styles.badge, background: '#FEF3C7', color: '#D97706' }}>보관</span>
             )}
@@ -457,9 +481,9 @@ function DocumentsSection({
             target={mode === 'modal' ? '_blank' : undefined}
             rel={mode === 'modal' ? 'noreferrer' : undefined}
             style={styles.viewBtn}
-            aria-label={row.origin === 'direct' ? '콘텐츠 편집' : '자료 보기'}
+            aria-label={row.origin === 'direct' ? '콘텐츠 편집' : row.origin === 'execution-asset' ? '제작 자료에서 열기' : '자료 보기'}
           >
-            {row.origin === 'direct' ? '편집' : '보기'}
+            {row.origin === 'direct' ? '편집' : row.origin === 'execution-asset' ? '열기' : '보기'}
           </a>
         ),
       },

@@ -322,7 +322,9 @@ export const directContentApi = {
 // snapshot(cms+content) + direct contents 통합 paginated feed
 // ─────────────────────────────────────────────────────
 
-export type LibraryContentOrigin = 'snapshot' | 'direct';
+// WO-O4O-KPA-STORE-LIBRARY-CONTENT-CREATED-BUT-LIST-MISSING-V1 (A안):
+//   'execution-asset' = store_execution_assets(asset_type='content') — QR "내 매장 자료"와 동일 소스.
+export type LibraryContentOrigin = 'snapshot' | 'direct' | 'execution-asset';
 
 export interface LibraryContentItem {
   id: string;
