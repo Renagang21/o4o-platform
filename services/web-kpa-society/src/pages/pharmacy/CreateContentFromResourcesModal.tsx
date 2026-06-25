@@ -503,15 +503,26 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated }: Pr
     });
   }, []);
 
-  // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-BLANK-EDITOR-ENTRY-RESTORE-V1:
-  //   "원본 없이 바로 제작" 진입점 복원. 자료 선택 없이 빈 제작자료 편집기로 이동한다.
-  //   canonical 빈 제작 흐름 재사용 — /store/library/production-materials/new 빈 상태 진입 →
-  //   ProductionMaterialEditorPage(빈 편집기) → 저장 시 내 매장 제작자료(store_execution_assets) 생성.
-  //   source asset/derivation 없음. POP/QR/블로그/사이니지 활용 대상이 된다.
+  // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-BLANK-EDITOR-SAVE-TARGET-ALIGN-V1:
+  //   "빈 편집기에서 바로 작성"은 같은 모달의 compose 단계로 진입한다(자료 0개 = 직접 작성 모드).
+  //   저장은 기존 handleSave 의 /store-contents POST(=direct 콘텐츠) 흐름을 그대로 재사용 →
+  //   결과가 시작 화면 /store/library/contents 문서형 목록에 '내 콘텐츠'로 표시된다.
+  //   (이전 V1: /store/library/production-materials/new 로 navigate 하여 저장 위치가 어긋나던 것을 정합.)
   const handleCreateBlank = useCallback(() => {
-    onClose();
-    navigate('/store/library/production-materials/new');
-  }, [onClose, navigate]);
+    setSelected(new Set());
+    setSourceText('');
+    setTitle('');
+    setEditorHtml('');
+    setAiGenerated(false);
+    setAiError(null);
+    setUserIntent('');
+    setPresetLength(null);
+    setPresetTone(null);
+    setPresetDirection(null);
+    setPresetImage(null);
+    setPresetUrl(null);
+    setStep('compose');
+  }, []);
 
   const goCompose = useCallback(() => {
     if (selectedRows.length === 0) return;
@@ -611,8 +622,10 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated }: Pr
           title: title.trim(),
           contentJson: {
             html,
+            // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-BLANK-EDITOR-SAVE-TARGET-ALIGN-V1:
+            //   원소스 0개 = 직접 작성(manual-direct). 자료 기반은 create-from-resources 유지.
             sourceResources: sourceMetadata,
-            generatedBy: 'create-from-resources',
+            generatedBy: selectedRows.length > 0 ? 'create-from-resources' : 'manual-direct',
             userIntent: userIntent.trim() || undefined,
             presets: {
               length: presetLength,
@@ -641,6 +654,9 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated }: Pr
   }, [title, editorHtml, selectedRows, userIntent, presetLength, presetTone, presetDirection, presetImage, presetUrl, onCreated, onClose, navigate]);
 
   if (!open) return null;
+
+  // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-BLANK-EDITOR-SAVE-TARGET-ALIGN-V1: compose 단계 + 원소스 0개 = 빈 직접 작성.
+  const isBlankMode = step === 'compose' && selectedRows.length === 0;
 
   return (
     <div style={styles.backdrop} role="presentation" onClick={onClose}>
@@ -737,10 +753,16 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated }: Pr
           ) : (
             <>
               <span style={styles.footerHint}>
-                {aiGenerated ? <CheckCircle2 size={14} style={{ marginRight: 4, verticalAlign: 'middle' }} /> : null}
-                {aiGenerated
-                  ? 'AI 콘텐츠 생성 완료 — 편집기에서 수정 후 저장하세요'
-                  : '먼저 "AI 콘텐츠 생성"을 실행해 주세요'}
+                {isBlankMode ? (
+                  '본문을 직접 작성한 뒤 저장하세요'
+                ) : (
+                  <>
+                    {aiGenerated ? <CheckCircle2 size={14} style={{ marginRight: 4, verticalAlign: 'middle' }} /> : null}
+                    {aiGenerated
+                      ? 'AI 콘텐츠 생성 완료 — 편집기에서 수정 후 저장하세요'
+                      : '먼저 "AI 콘텐츠 생성"을 실행해 주세요'}
+                  </>
+                )}
               </span>
               <div style={styles.footerActions}>
                 <button type="button" onClick={onClose} style={styles.secondaryBtn} disabled={saving}>
@@ -940,6 +962,11 @@ function ComposeStep({
     return token ? { Authorization: `Bearer ${token}` } : undefined;
   }, []);
 
+  // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-BLANK-EDITOR-SAVE-TARGET-ALIGN-V1:
+  //   원소스 0개 = "빈 편집기 직접 작성" 모드. 원소스/AI 생성 섹션을 숨기고 빈 편집기를 즉시 노출한다.
+  //   (compose 단계는 자료 선택→다음(원소스 1개 이상) 또는 빈 작성(0개) 두 경로로만 진입한다.)
+  const isBlankMode = selectedRows.length === 0;
+
   return (
     <div style={styles.body}>
       <div style={styles.composeRow}>
@@ -954,70 +981,81 @@ function ComposeStep({
         />
       </div>
 
-      <div style={styles.composeRow}>
-        <label style={styles.label}>선택한 원소스 ({selectedRows.length}개)</label>
-        <ul style={styles.chipList}>
-          {selectedRows.map((r) => (
-            <li key={r.id} style={styles.chip} title={r.title}>
-              {r.title}
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div style={styles.composeRow}>
-        <label style={styles.label} htmlFor="cgu-user-intent">제작 요청 (자유 입력)</label>
-        <textarea
-          id="cgu-user-intent"
-          value={userIntent}
-          onChange={(e) => onUserIntentChange(e.target.value)}
-          rows={3}
-          style={styles.textarea}
-          placeholder='예: "당뇨 고객에게 도움이 된다는 내용을 설득력 있게 A4 1장 분량으로 작성해 주세요." / "약사가 고객에게 설명하는 느낌으로 쉽게 풀어 주세요."'
-          maxLength={400}
-        />
-        <span style={styles.helpText}>
-          원소스를 어떻게 활용할지 자유롭게 입력하세요. 선택한 원소스의 본문·URL·이미지가 함께 AI에 전달됩니다.
-        </span>
-      </div>
-
-      <div style={styles.composeRow}>
-        <span style={styles.label}>보조 옵션 (선택)</span>
-        <PresetChipGroup label="분량"      options={LENGTH_OPTIONS}    value={presetLength}    onChange={onPresetLengthChange} />
-        <PresetChipGroup label="문장 톤"   options={TONE_OPTIONS}      value={presetTone}      onChange={onPresetToneChange} />
-        <PresetChipGroup label="내용 방향" options={DIRECTION_OPTIONS} value={presetDirection} onChange={onPresetDirectionChange} />
-        <PresetChipGroup label="이미지"    options={IMAGE_OPTIONS}     value={presetImage}     onChange={onPresetImageChange} />
-        <PresetChipGroup label="URL"       options={URL_OPTIONS}       value={presetUrl}       onChange={onPresetUrlChange} />
-      </div>
-
-      <div style={styles.composeRow}>
-        <div style={styles.labelRow}>
-          <label style={styles.label}>AI 매장 콘텐츠 생성</label>
-          <button
-            type="button"
-            onClick={onGenerate}
-            disabled={generating}
-            style={{ ...styles.aiBtn, opacity: generating ? 0.5 : 1 }}
-          >
-            {generating ? (
-              <>
-                <Loader2 size={12} style={{ marginRight: 4, verticalAlign: 'middle' }} className="animate-spin" />
-                생성 중...
-              </>
-            ) : (
-              <>
-                <Sparkles size={12} style={{ marginRight: 4, verticalAlign: 'middle' }} />
-                AI 콘텐츠 생성
-              </>
-            )}
-          </button>
+      {!isBlankMode && (
+        <div style={styles.composeRow}>
+          <label style={styles.label}>선택한 원소스 ({selectedRows.length}개)</label>
+          <ul style={styles.chipList}>
+            {selectedRows.map((r) => (
+              <li key={r.id} style={styles.chip} title={r.title}>
+                {r.title}
+              </li>
+            ))}
+          </ul>
         </div>
-        {aiError && <p style={styles.error}>{aiError}</p>}
-      </div>
+      )}
+
+      {!isBlankMode && (
+        <div style={styles.composeRow}>
+          <label style={styles.label} htmlFor="cgu-user-intent">제작 요청 (자유 입력)</label>
+          <textarea
+            id="cgu-user-intent"
+            value={userIntent}
+            onChange={(e) => onUserIntentChange(e.target.value)}
+            rows={3}
+            style={styles.textarea}
+            placeholder='예: "당뇨 고객에게 도움이 된다는 내용을 설득력 있게 A4 1장 분량으로 작성해 주세요." / "약사가 고객에게 설명하는 느낌으로 쉽게 풀어 주세요."'
+            maxLength={400}
+          />
+          <span style={styles.helpText}>
+            원소스를 어떻게 활용할지 자유롭게 입력하세요. 선택한 원소스의 본문·URL·이미지가 함께 AI에 전달됩니다.
+          </span>
+        </div>
+      )}
+
+      {!isBlankMode && (
+        <div style={styles.composeRow}>
+          <span style={styles.label}>보조 옵션 (선택)</span>
+          <PresetChipGroup label="분량"      options={LENGTH_OPTIONS}    value={presetLength}    onChange={onPresetLengthChange} />
+          <PresetChipGroup label="문장 톤"   options={TONE_OPTIONS}      value={presetTone}      onChange={onPresetToneChange} />
+          <PresetChipGroup label="내용 방향" options={DIRECTION_OPTIONS} value={presetDirection} onChange={onPresetDirectionChange} />
+          <PresetChipGroup label="이미지"    options={IMAGE_OPTIONS}     value={presetImage}     onChange={onPresetImageChange} />
+          <PresetChipGroup label="URL"       options={URL_OPTIONS}       value={presetUrl}       onChange={onPresetUrlChange} />
+        </div>
+      )}
+
+      {!isBlankMode && (
+        <div style={styles.composeRow}>
+          <div style={styles.labelRow}>
+            <label style={styles.label}>AI 매장 콘텐츠 생성</label>
+            <button
+              type="button"
+              onClick={onGenerate}
+              disabled={generating}
+              style={{ ...styles.aiBtn, opacity: generating ? 0.5 : 1 }}
+            >
+              {generating ? (
+                <>
+                  <Loader2 size={12} style={{ marginRight: 4, verticalAlign: 'middle' }} className="animate-spin" />
+                  생성 중...
+                </>
+              ) : (
+                <>
+                  <Sparkles size={12} style={{ marginRight: 4, verticalAlign: 'middle' }} />
+                  AI 콘텐츠 생성
+                </>
+              )}
+            </button>
+          </div>
+          {aiError && <p style={styles.error}>{aiError}</p>}
+        </div>
+      )}
 
       <div style={styles.composeRow}>
-        <label style={styles.label}>매장 콘텐츠 본문 (편집 가능)</label>
-        {aiGenerated || editorHtml ? (
+        <label style={styles.label}>
+          매장 콘텐츠 본문 (편집 가능)
+          {isBlankMode && <span style={styles.helpText}> — 자료 없이 직접 작성합니다.</span>}
+        </label>
+        {aiGenerated || editorHtml || isBlankMode ? (
           <div style={styles.editorWrap}>
             <RichTextEditor
               value={editorHtml}
