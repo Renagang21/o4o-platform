@@ -54,7 +54,7 @@ const corsOptions = {
   credentials: true, // 쿠키 포함 요청 허용
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  exposedHeaders: ['X-Total-Count', 'X-Page-Count']
+  exposedHeaders: ['X-Total-Count', 'X-Page-Count', 'Content-Disposition']
 };
 
 app.use(cors(corsOptions));

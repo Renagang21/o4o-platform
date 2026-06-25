@@ -143,7 +143,9 @@ export function setupMiddlewares(app: Application, options: { redisEnabled: bool
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'X-Organization-Id'],
-    exposedHeaders: ['X-Total-Count', 'X-Page-Count', 'X-RateLimit-Limit', 'X-RateLimit-Remaining', 'Retry-After'],
+    // WO-O4O-KPA-QR-EXPORT-FILENAME-BY-TITLE-V1: 교차출처 다운로드에서 파일명(Content-Disposition)을
+    //   프론트가 읽을 수 있도록 노출 (QR/CSV/PDF 등 모든 첨부 다운로드 공통 혜택).
+    exposedHeaders: ['X-Total-Count', 'X-Page-Count', 'X-RateLimit-Limit', 'X-RateLimit-Remaining', 'Retry-After', 'Content-Disposition'],
     maxAge: 86400,
     preflightContinue: false,
     optionsSuccessStatus: 204
