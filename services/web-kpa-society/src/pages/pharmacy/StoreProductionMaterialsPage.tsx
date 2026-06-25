@@ -236,6 +236,14 @@ export default function StoreProductionMaterialsPage() {
 
   const openSelectModal = useCallback(() => setSelectModalOpen(true), []);
 
+  // WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-DIRECT-CREATE-V1:
+  //   원본 콘텐츠 없이 빈 제작 자료를 바로 작성. 편집기는 generatedHtml/template 없으면 빈 상태로 진입하고,
+  //   저장 시 store-owned 자료(store_execution_assets, sourceType='generated')로 즉시 사용 가능 상태가 된다.
+  const handleCreateBlank = useCallback(() => {
+    setSelectModalOpen(false);
+    navigate('/store/library/production-materials/new');
+  }, [navigate]);
+
   // WO-KPA-STORE-CONTENT-LIBRARY-CROSS-CREATE-CTA-V1:
   // 제작 자료를 source 로 전달하며 제작 화면으로 이동. 대상 화면이 state 를 읽지 않아도 안전(무시됨).
   // WO-KPA-POP-CONTENT-TO-PDF-GENERATION-V1:
@@ -494,7 +502,7 @@ export default function StoreProductionMaterialsPage() {
           </h1>
           <p style={styles.subtitle}>
             AI로 생성하거나 편집한 POP·QR·블로그·상품 상세설명 제작 결과물을 관리합니다.
-            새 제작 자료를 만들려면 <strong>내 자료함 → 콘텐츠</strong>에서 콘텐츠 또는 강의를 선택한 뒤 제작 작업을 시작합니다.
+            <strong>새 제작 자료 만들기</strong>로 처음부터 직접 작성하거나, 콘텐츠·강의를 원본으로 선택해 제작을 시작할 수 있습니다.
           </p>
           <div style={{ marginTop: 8 }}><GuideBackLink to="/guide/features/production-materials" label="제작 자료 활용 방법" /></div>
         </div>
@@ -556,7 +564,7 @@ export default function StoreProductionMaterialsPage() {
             저장된 제작 자료가 없습니다.
           </p>
           <p style={{ margin: '8px 0 0 0', color: colors.neutral400, fontSize: 13, lineHeight: 1.6 }}>
-            내 자료함 → 콘텐츠에서 콘텐츠 또는 강의를 선택한 뒤 "AI 제작 자료 초안 만들기"를 실행하세요.
+            "새 제작 자료 만들기"로 처음부터 직접 작성하거나, 콘텐츠·강의를 선택해 시작하세요.
           </p>
           <button
             type="button"
@@ -735,6 +743,7 @@ export default function StoreProductionMaterialsPage() {
         open={selectModalOpen}
         onClose={() => setSelectModalOpen(false)}
         onConfirm={handleSelectConfirm}
+        onCreateBlank={handleCreateBlank}
       />
 
       <StartProductionModal

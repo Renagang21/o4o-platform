@@ -68,6 +68,10 @@ export default function ProductionMaterialEditorPage() {
   const selectedTemplate = state.selectedTemplateId ? findTemplate(state.selectedTemplateId) : undefined;
   const initialHtml = state.generatedHtml ?? selectedTemplate?.starterHtml ?? '';
 
+  // WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-DIRECT-CREATE-V1:
+  //   AI 결과/콘텐츠 출처 없이 빈 상태로 진입한 경우(처음부터 만들기) 헤더 문구를 맞춘다.
+  const isFromScratch = !state.generatedHtml && !selectedTemplate && !state.sourceMetadata;
+
   const [title, setTitle] = useState(state.title ?? '');
   const [selectedType, setSelectedType] = useState<ProductionTarget | null>(null);
   const [editorContent, setEditorContent] = useState<EditorContent>({ html: initialHtml });
@@ -124,11 +128,11 @@ export default function ProductionMaterialEditorPage() {
       <div style={styles.header}>
         <button onClick={handleCancel} style={styles.backBtn} aria-label="뒤로">
           <ArrowLeft size={16} />
-          <span>콘텐츠로</span>
+          <span>{isFromScratch ? '목록으로' : '콘텐츠로'}</span>
         </button>
         <div style={styles.headerCenter}>
           <FileText size={18} style={{ color: colors.primary }} />
-          <h1 style={styles.pageTitle}>AI 제작 자료 초안 편집</h1>
+          <h1 style={styles.pageTitle}>{isFromScratch ? '새 제작 자료 작성' : 'AI 제작 자료 초안 편집'}</h1>
         </div>
         <button onClick={handleSave} disabled={saving} style={styles.saveBtn}>
           <Save size={14} />
