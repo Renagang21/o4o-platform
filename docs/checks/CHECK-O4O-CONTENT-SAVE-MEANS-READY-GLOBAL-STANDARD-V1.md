@@ -2,7 +2,7 @@
 
 > WO: **WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1**
 > 작업 제목: **콘텐츠 "저장 = 즉시 사용 가능" 표준화 + 내 매장 QR 대상 확장**
-> 작업일: 2026-06-25 / 범위: KPA-Society 1차 / 상태: **코드 완료 · typecheck PASS · 운영 브라우저 smoke 보류(배포 후)**
+> 작업일: 2026-06-25 / 범위: KPA-Society 1차 / 상태: **코드 완료 · typecheck PASS · 운영 브라우저 smoke PASS**
 
 ---
 
@@ -70,11 +70,11 @@ KPA 콘텐츠는 **두 개의 분리된 파이프라인**으로 존재한다:
 
 | 기준 | 결과 |
 |------|------|
-| 7.1 운영자 저장 → 초안 아닌 사용 가능 상태, `/operator/docs` 노출 | ✅ 코드 (기본 ready) — 브라우저 smoke 보류 |
-| 7.2 저장 직후 `/operator/qr/new` 선택기 노출 + QR 생성 | ✅ 코드 (ready 필터 일치) — 브라우저 smoke 보류 |
+| 7.1 운영자 저장 → 초안 아닌 사용 가능 상태, `/operator/docs` 노출 | ✅ **PASS** (브라우저 smoke 확인) |
+| 7.2 저장 직후 `/operator/qr/new` 선택기 노출 + QR 생성 | ✅ **PASS** (브라우저 smoke 확인) |
 | 7.3 매장 허브(`/store-hub/content`) 노출 | ⏸ **별도 WO 분리** (cms_contents 별도 파이프라인, F5 동결) |
-| 7.4 `/store/marketing/qr` 대상이 내 자료에만 제한되지 않음 | ✅ 코드 (운영자 콘텐츠 소스 탭 + 기존 자료/제작자료) — 브라우저 smoke 보류 |
-| 7.5 명시적 초안은 QR 선택기/사용처 비노출 + 안내 | ✅ 코드 (모달 안내 문구) |
+| 7.4 `/store/marketing/qr` 대상이 내 자료에만 제한되지 않음 | ✅ **PASS** (운영자 콘텐츠 탭 + 공개 랜딩 확인) |
+| 7.5 명시적 초안은 QR 선택기/사용처 비노출 + 안내 | ✅ **PASS** (초안 제외 확인) |
 
 ---
 
@@ -100,15 +100,21 @@ KPA 콘텐츠는 **두 개의 분리된 파이프라인**으로 존재한다:
 | `services/web-kpa-society` 전체 `tsc --noEmit` | ✅ PASS (오류 0) |
 | `apps/api-server` `tsc` (kpa.routes 변경) | ✅ 변경 파일 오류 0 |
 | 공유 컴포넌트 `StoreAssetSelectorModal` 다른 소비처(`StoreSignagePage`) 영향 | ✅ opt-in prop 기본 false → 기존 동작 무변경 |
-| 운영 브라우저 smoke (§8.3) | ⏸ 배포 후 수행 |
+| 운영 브라우저 smoke (§8.3) | ✅ **PASS** (2026-06-25, 배포본 `95ccfe50f`) |
 
-### 배포 후 운영 smoke 절차 (§8.3)
+### 운영 브라우저 smoke 결과 (2026-06-25, 배포본 `95ccfe50f`)
 
-1. 운영자 로그인 → `/operator/content-hub` 새 콘텐츠 작성 → **일반 저장** → 상태 "완료" 확인
-2. `/operator/qr/new` 콘텐츠 선택기에 방금 콘텐츠 노출 확인 → QR 생성 → 공개 QR 페이지 렌더 확인
-3. 매장 경영자 로그인 → `/store/marketing/qr` → "QR 만들기" → 선택 모달 "운영자 콘텐츠" 탭에서 ready 콘텐츠 선택 → QR 생성
-4. 생성된 QR `/qr/:slug` 접속 → 콘텐츠 inline 렌더(`pageContent.available=true`) 확인
-5. 명시적 "초안" 저장 콘텐츠가 QR 선택기/콘텐츠 탭에 비노출 확인
+| 단계 | 결과 |
+|------|------|
+| 운영자 `/operator/docs` 신규 콘텐츠 작성 모달 — 상태 기본값 | ✅ "완료 (저장 즉시 사용 가능)" [selected], 초안 옵션 "(사용처에 노출 안 됨)" |
+| 일반 저장 → 목록 상태 배지 | ✅ "완료"(ready) — 초안 아님 (7.1) |
+| `/operator/qr/new` 콘텐츠 선택기 노출 | ✅ 방금 저장한 ready 콘텐츠만 노출, 기존 6개 초안 제외 (7.2 / 7.5) |
+| QR 템플릿 생성 + 저장 후 발행 | ✅ "발행됨" — 매장 HUB 노출 (operator 단계 slug 미발급은 설계상 정상) |
+| 매장 `/store/marketing/qr` "QR 만들기" 선택 모달 | ✅ 소스 탭 "내 매장 자료" / "운영자 콘텐츠" 노출 (7.4) |
+| "운영자 콘텐츠" 탭 | ✅ ready 콘텐츠 노출 + "원본 참조·사본 복사 없음" 안내, 초안 제외 |
+| 콘텐츠 참조형 QR 생성 폼 | ✅ "운영자 콘텐츠 연결 QR" 잠금 안내(연결 유형/대상 입력 대체) |
+| QR 생성 → 공개 랜딩 `/qr/qr-250625` | ✅ 제목·본문 inline 렌더 (참조형 C-1 end-to-end) |
+| smoke 테스트 데이터 정리 | ✅ 매장 QR·운영자 QR 템플릿·콘텐츠 삭제 완료 (기존 6개 초안은 §5 대상으로 보존) |
 
 ---
 
