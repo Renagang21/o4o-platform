@@ -42,17 +42,35 @@
 
 ## 3. 검증
 
-| 항목 | 방식 | 결과 |
-|---|---|---|
-| 타입체크 (`tsc --noEmit`, web-kpa-society) | 정적 | ✅ PASS (에러 0) |
-| 빈 상태 새 버튼 → 모달 직접 오픈 | 브라우저 smoke | ⏳ 배포 후 |
-| `usage_type='qr'` 미태깅 자료 노출 | 브라우저 smoke | ⏳ 배포 후 |
-| 자료 선택 → QR 저장 성공 | 브라우저 smoke | ⏳ 배포 후 |
-| external-link → `landingType='link'` 저장 | 브라우저 smoke | ⏳ 배포 후 |
-| file/content → `landingType='page'` 저장 | 브라우저 smoke | ⏳ 배포 후 |
-| HUB 가져오기 / 동영상 prefill 회귀 없음 | 브라우저 smoke | ⏳ 배포 후 |
+### 정적 검증
+| 항목 | 결과 |
+|---|---|
+| 타입체크 (`tsc --noEmit`, web-kpa-society) | ✅ PASS (에러 0) |
 
-> 브라우저 smoke 는 Cloud Run 배포 후 실 화면 DOM 확인으로 별도 수행.
+### 브라우저 smoke (배포본 `3e5e4b363`, kpa-society.co.kr, 체험용 약국 경영자 계정, 2026-06-25)
+
+| # | 확인 항목 | 결과 |
+|---|---|---|
+| 1 | 매장 경영자 로그인 후 `/store/marketing/qr` 진입 | ✅ |
+| 2 | 헤더에 "QR 만들기" 1차 버튼 노출 | ✅ |
+| 3 | "QR 만들기" 클릭 → 페이지 이동 없이 선택 모달 직접 오픈 (URL 유지) | ✅ |
+| 4 | 빈 상태에 "콘텐츠·자료·내 매장 제작자료에서 QR 만들기" 버튼 노출 | ✅ |
+| 5 | 빈 상태 버튼 클릭 → `/store/library/resources` 이동 없이 모달 직접 오픈 | ✅ |
+| 6 | 모달 API 요청에 `usage_type=qr` 미포함 (`GET /store/assets?page=1&limit=20`) | ✅ |
+| 6b | 모달 제목에서 "QR" 용도 배지 사라짐 (usageType 미전달 시각 확인) | ✅ |
+| 7 | "매장 HUB에서 가져오기" → `/store-hub/qr` 정상 | ✅ |
+
+### 데이터 부재로 미검증 (체험 계정 `store_execution_assets` = 0개)
+| 항목 | 상태 |
+|---|---|
+| `usage_type='qr'` 미태깅 자료가 모달에 실제 노출 | ⚠️ 미검증 (자산 0 → "등록된 자산이 없습니다") |
+| 자료 선택 → QR 생성 → 목록 추가 → `/qr/:slug` 열림 | ⚠️ 미검증 |
+| external-link → `landingType='link'` / file·content → `landingType='page'` 저장 | ⚠️ 미검증 (코드 경로 `autoLandingType` 정적 확인됨) |
+| 동영상 prefill 회귀 (`landingType='video'`) | ⚠️ 미검증 (코드 미변경 영역, 동영상 데이터 필요) |
+
+> A안의 핵심(진입 동선·모달 직접 오픈·usageType 제거)은 실화면 PASS.
+> 데이터 의존 항목은 자산 보유 계정으로 후속 재검 필요 — `usageType` 제거 자체는
+> 네트워크 파라미터 부재로 확인되었으므로, 자산이 존재하면 전체 노출됨이 보장됨.
 
 ---
 
