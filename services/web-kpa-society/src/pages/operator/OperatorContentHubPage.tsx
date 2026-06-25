@@ -601,9 +601,16 @@ export default function OperatorContentHubPage() {
                     onChange={e => setForm(f => ({ ...f, status: e.target.value as 'draft' | 'ready' }))}
                     className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="ready">완료 (저장 즉시 사용 가능)</option>
-                    <option value="draft">초안 (사용처에 노출 안 됨)</option>
+                    <option value="ready">완료 (즉시 사용)</option>
+                    <option value="draft">초안 (비노출)</option>
                   </select>
+                  {/* WO-O4O-KPA-OPERATOR-CONTENT-DRAFT-TO-READY-UI-V1 §6.2:
+                      기존 초안 → 완료 전환 시 노출 범위를 명확히 안내. */}
+                  <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                    {form.status === 'ready'
+                      ? '완료: QR 만들기와 매장 허브 콘텐츠 허브 탭에 표시됩니다.'
+                      : '초안: 운영자 콘텐츠 허브에만 보이며 QR·매장 허브에는 표시되지 않습니다.'}
+                  </p>
                 </div>
               </div>
               {/* 태그 */}
