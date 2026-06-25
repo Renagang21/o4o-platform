@@ -11,6 +11,14 @@
  *   6-필터(전체/공지/가이드/지식/프로모션/뉴스, key=CMS DB type), 용어 '내 약국'.
  *   복합 탭 display remap(notice+news / promo+event) 제거 — 단일 type 직매핑.
  *   backend/route/copy-API/링크 대상(/store/content) 무변경. legacy 'event' 콘텐츠는 '전체' 탭 노출 유지.
+ *
+ * WO-O4O-KPA-STORE-HUB-CONTENT-SOURCE-ALIGNMENT-V1:
+ *   cms_contents(published) + kpa_contents(ready)를 KPA 프론트에서 정합(가져오기=복사, 출처별 assetType 분기).
+ *
+ * WO-O4O-KPA-STORE-HUB-CONTENT-SOURCE-TABS-V1:
+ *   두 소스를 한 목록으로 병합하지 않고 '소스 탭'으로 구분한다 — 콘텐츠 허브(kpa_contents ready) / 운영 자료(cms published).
+ *   전체 탭 없음, 기본 탭 = 콘텐츠 허브. 탭별 빈 상태 문구(filterEmptyMessages). 검색은 현재 탭 소스 안에서만.
+ *   복사(가져오기=복사) 및 출처별 assetType 분기(cms/content)는 유지. backend/DB 무변경. GP/KCos 무영향(KPA config 한정).
  */
 
 import { useMemo, useRef } from 'react';
@@ -110,73 +118,50 @@ function useKpaContentHubConfig(userId?: string): ContentHubConfig {
     heroDesc: 'KPA-Society 약국을 위한 콘텐츠 자료실',
     searchPlaceholder: '콘텐츠 검색',
 
-    // WO-O4O-STOREHUB-CONTENT-FILTER-TABS-DEFER-V1: 콘텐츠 수 적은 단계에서 CMS type 탭 보류.
-    // filters 배열은 보존(재도입 시 showTypeFilters 만 true). 기본 fetch=전체('all') 유지.
+    // WO-O4O-KPA-STORE-HUB-CONTENT-SOURCE-TABS-V1:
+    //   filters 를 '콘텐츠 소스 탭'으로 사용한다. 전체 탭 없이 콘텐츠 허브 / 운영 자료 2탭만 제공.
+    //   기본 탭 = 콘텐츠 허브(filters[0]) — 운영자 콘텐츠 허브 저장 흐름과 정합.
+    //   CMS type 필터(공지/가이드 등)는 본 화면에서 제거(소스 구분이 우선). 재도입은 별도 WO.
     filters: [
-      { key: 'all',       label: '전체' },
-      { key: 'notice',    label: '공지' },
-      { key: 'guide',     label: '가이드' },
-      { key: 'knowledge', label: '지식' },
-      { key: 'promo',     label: '프로모션' },
-      { key: 'news',      label: '뉴스' },
+      { key: 'kpa_content', label: '콘텐츠 허브' },
+      { key: 'cms',         label: '운영 자료' },
     ],
-    showTypeFilters: false,
+    showTypeFilters: true,
+    filtersAsSourceTabs: true,
+    filterEmptyMessages: {
+      kpa_content: '현재 제공되는 콘텐츠 허브 자료가 없습니다. 운영자가 콘텐츠 허브에서 사용 가능 콘텐츠를 저장하면 이곳에 표시됩니다.',
+      cms: '현재 제공되는 운영 자료가 없습니다. 운영자가 게시한 자료가 있으면 이곳에 표시됩니다.',
+    },
 
     pageLimit: PAGE_LIMIT,
 
-    // WO-O4O-KPA-STORE-HUB-CONTENT-SOURCE-ALIGNMENT-V1 (C안: 병합 조회):
-    //   filter='all' 일 때 cms_contents(published) + kpa_contents(ready)를 함께 조회·병합한다.
-    //   콘텐츠 수가 적은 단계이므로 클라이언트 병합/정렬/페이지네이션(소프트 캡 MERGE_CAP)으로 처리.
-    //   특정 CMS type 필터('공지' 등)는 cms taxonomy 전용이므로 기존 CMS-only 동작 유지.
-    //   제목만으로 중복 제거하지 않는다(연결 필드 없음 — 서로 다른 콘텐츠일 수 있음).
+    // WO-O4O-KPA-STORE-HUB-CONTENT-SOURCE-TABS-V1 (소스 탭 분리):
+    //   탭(filter)별로 단일 소스만 조회한다 — 병합/정렬/중복제거 없음(섞이지 않음).
+    //     - 'cms'         → cms_contents(status='published')   (운영 자료)
+    //     - 'kpa_content' → kpa_contents(status='ready')        (콘텐츠 허브, draft 비노출)
+    //   각 항목 출처를 sourceDomainRef 에 기록 → onCopy 가 assetType 을 분기한다.
+    //   검색은 현재 탭 소스 안에서만 수행(탭 간 결과 섞지 않음).
     fetchItems: async ({ filter, search, page, limit }) => {
-      if (filter !== 'all') {
+      if (filter === 'cms') {
         const offset = (page - 1) * limit;
         const res = await cmsApi.getContents({
           serviceKey: 'kpa',
-          type: filter,
           status: 'published',
           search: search || undefined,
           limit,
           offset,
         });
-        const items = (res.data as CmsContent[])
-          .filter(c => c.type !== 'hero' && c.type !== 'featured')
-          .map(cmsToItem);
-        items.forEach((it) => sourceDomainRef.current.set(it.id, 'cms'));
+        const rows = (res.data as CmsContent[]).filter((c) => c.type !== 'hero' && c.type !== 'featured');
+        rows.forEach((c) => sourceDomainRef.current.set(c.id, 'cms'));
+        const items = rows.map(cmsToItem);
         const total = res.pagination.total - ((res.data as CmsContent[]).length - items.length);
         return { items, total };
       }
 
-      const MERGE_CAP = 100;
-      const [cmsRes, kpaRes] = await Promise.all([
-        cmsApi
-          .getContents({ serviceKey: 'kpa', status: 'published', search: search || undefined, limit: MERGE_CAP, offset: 0 })
-          .catch(() => null),
-        listContentHubItems({ status: 'ready', search: search || undefined, page: 1, limit: MERGE_CAP }).catch(() => null),
-      ]);
-
-      const cmsRows = ((cmsRes?.data as CmsContent[] | undefined) ?? []).filter(
-        (c) => c.type !== 'hero' && c.type !== 'featured',
-      );
-      const kpaRows = kpaRes?.items ?? [];
-
-      const tagged: { item: ContentHubItem; ts: number }[] = [
-        ...cmsRows.map((c) => {
-          sourceDomainRef.current.set(c.id, 'cms');
-          return { item: cmsToItem(c), ts: new Date(c.publishedAt || c.createdAt).getTime() };
-        }),
-        ...kpaRows.map((k) => {
-          sourceDomainRef.current.set(k.id, 'kpa_content');
-          return { item: kpaContentToItem(k), ts: new Date(k.created_at).getTime() };
-        }),
-      ];
-      tagged.sort((a, b) => b.ts - a.ts);
-
-      const total = tagged.length;
-      const start = (page - 1) * limit;
-      const items = tagged.slice(start, start + limit).map((t) => t.item);
-      return { items, total };
+      // 'kpa_content' (기본 탭) — 운영자 콘텐츠 허브 ready
+      const res = await listContentHubItems({ status: 'ready', search: search || undefined, page, limit });
+      res.items.forEach((k) => sourceDomainRef.current.set(k.id, 'kpa_content'));
+      return { items: res.items.map(kpaContentToItem), total: res.total };
     },
 
     loadCopiedIds: async () => {

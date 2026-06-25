@@ -103,6 +103,19 @@ export interface ContentHubConfig {
    * WO-O4O-STOREHUB-CONTENT-FILTER-TABS-DEFER-V1: 콘텐츠 수 적은 단계에서 탭 보류(재도입 여지 유지).
    */
   showTypeFilters?: boolean;
+  /**
+   * WO-O4O-KPA-STORE-HUB-CONTENT-SOURCE-TABS-V1:
+   *   filters 를 'CMS type 필터'가 아니라 '콘텐츠 소스 탭'으로 사용한다(예: 운영 자료 / 콘텐츠 허브).
+   *   true 시 탭 선택은 검색 필터가 아니므로 active-filter chip/초기화 행을 숨기고,
+   *   "검색 결과 N건"·빈 상태 판정도 검색 유무로만 처리한다(탭 전환은 필터 아님).
+   *   미지정(기본) 시 기존 동작 그대로 — 다른 서비스(GP/KCos) 무영향.
+   */
+  filtersAsSourceTabs?: boolean;
+  /**
+   * 탭(filter key)별 빈 상태 문구. filtersAsSourceTabs=true 且 검색이 없을 때 활성 탭 메시지로 사용.
+   * 키 누락 시 emptyMessage 로 폴백.
+   */
+  filterEmptyMessages?: Record<string, string>;
 
   /** Block 3: Content List */
   pageLimit?: number;
@@ -247,6 +260,10 @@ export function ContentHubTemplate({ config }: { config: ContentHubConfig }) {
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
   const hasFilters = !!searchQuery || activeFilter !== firstFilterKey;
+  // WO-O4O-KPA-STORE-HUB-CONTENT-SOURCE-TABS-V1: 소스 탭 모드에서는 탭 전환을 '필터'로 취급하지 않는다.
+  const tabMode = !!config.filtersAsSourceTabs;
+  const showFilterChipRow = !!searchQuery || (!tabMode && activeFilter !== firstFilterKey);
+  const listFiltered = tabMode ? !!searchQuery : hasFilters;
 
   const itemCtx: ContentHubItemContext = useMemo(() => ({
     copiedIds,
@@ -300,10 +317,10 @@ export function ContentHubTemplate({ config }: { config: ContentHubConfig }) {
         </div>
       )}
 
-      {hasFilters && (
+      {showFilterChipRow && (
         <div style={st.activeFiltersRow}>
           <div style={st.chips}>
-            {activeFilter !== firstFilterKey && (
+            {!tabMode && activeFilter !== firstFilterKey && (
               <span style={st.chip}>
                 {config.filters?.find(f => f.key === activeFilter)?.label}
                 <button onClick={() => setActiveFilter(firstFilterKey)} style={st.chipX}>&times;</button>
@@ -324,7 +341,7 @@ export function ContentHubTemplate({ config }: { config: ContentHubConfig }) {
       {!loading && !error && (
         <div style={st.infoBar}>
           <span style={st.totalText}>
-            {hasFilters ? `검색 결과 ${total}건` : `총 ${total}개의 콘텐츠`}
+            {listFiltered ? `검색 결과 ${total}건` : `총 ${total}개의 콘텐츠`}
           </span>
           {totalPages > 1 && (
             <span style={st.pageInfo}>{page} / {totalPages} 페이지</span>
@@ -338,8 +355,12 @@ export function ContentHubTemplate({ config }: { config: ContentHubConfig }) {
         <ErrorView error={error} onRetry={() => doFetch(page, activeFilter, searchQuery)} />
       ) : items.length === 0 ? (
         <EmptyView
-          hasFilters={hasFilters}
-          emptyMessage={config.emptyMessage}
+          hasFilters={listFiltered}
+          emptyMessage={
+            tabMode && !searchQuery
+              ? (config.filterEmptyMessages?.[activeFilter] ?? config.emptyMessage)
+              : config.emptyMessage
+          }
           emptyFilteredMessage={config.emptyFilteredMessage}
           activeFilterLabel={config.filters?.find(f => f.key === activeFilter)?.label}
           searchQuery={searchQuery}
