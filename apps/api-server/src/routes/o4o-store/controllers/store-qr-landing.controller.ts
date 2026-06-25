@@ -29,6 +29,9 @@ import { StoreQrCode } from '../../platform/entities/store-qr-code.entity.js';
 import { StoreExecutionAsset } from '../../platform/entities/store-execution-asset.entity.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
+// HOTFIX-O4O-QR-PUBLIC-URL-SERVICE-DOMAIN-FIRST-V1:
+//   QR payload URL 은 서비스별 canonical 공개 도메인을 사용한다 (service-catalog SSOT).
+import { getService } from '../../../config/service-catalog.js';
 // WO-KPA-STORE-ASSET-DERIVATION-QR-BLOG-WRITEPATH-V1: 원본(library)→qr_code 관계 기록
 import { recordDerivations } from '../services/store-asset-derivation.service.js';
 import { generateQrPng, generateQrSvg, generateQrPrintPdf, generateQrPosterPdf, presetToPixelSize } from '../../../services/qr-print.service.js';
@@ -38,7 +41,26 @@ import type { FlyerProduct } from '../../../services/qr-flyer.service.js';
 
 type AuthMiddleware = RequestHandler;
 
-const PUBLIC_DOMAIN = process.env.PUBLIC_DOMAIN || 'o4o.kr';
+// HOTFIX-O4O-QR-PUBLIC-URL-SERVICE-DOMAIN-FIRST-V1:
+//   StoreOwnerServiceKey(role-prefix) → service-catalog key 매핑.
+//   (store-owner.utils STORE_OWNER_SCOPE_TO_MEMBERSHIP_KEY 와 동일 의미)
+const QR_SERVICE_TO_CATALOG_KEY: Record<StoreOwnerServiceKey, string> = {
+  kpa: 'kpa-society',
+  glycopharm: 'glycopharm',
+  cosmetics: 'k-cosmetics',
+};
+
+/**
+ * QR payload(이미지/PDF)에 담을 공개 절대 URL 의 origin.
+ * 서비스별 canonical 도메인(service-catalog)을 사용한다. 과거 `PUBLIC_DOMAIN || 'o4o.kr'`
+ * 전역 fallback 으로 인해 KPA QR 이 https://o4o.kr/qr/* 로 생성되던 장애를 수정.
+ * 서비스 미상/카탈로그 누락 시 kpa-society.co.kr 로 안전 폴백.
+ */
+function qrPublicOrigin(serviceKey?: StoreOwnerServiceKey): string {
+  const catalogKey = serviceKey ? QR_SERVICE_TO_CATALOG_KEY[serviceKey] : 'kpa-society';
+  const domain = getService(catalogKey)?.domain;
+  return `https://${domain || 'kpa-society.co.kr'}`;
+}
 
 function detectDeviceType(ua: string | undefined): string {
   if (!ua) return 'desktop';
@@ -440,7 +462,7 @@ export function createStoreQrLandingController(
         return;
       }
 
-      const qrUrl = `https://${PUBLIC_DOMAIN}/qr/${qr.slug}`;
+      const qrUrl = `${qrPublicOrigin(serviceKey)}/qr/${qr.slug}`;
 
       if (format === 'svg') {
         const svg = await generateQrSvg(qrUrl, size);
@@ -492,7 +514,7 @@ export function createStoreQrLandingController(
       }
 
       // 외부 URL QR 이라도 public /qr/:slug 를 담는다(스캔 추적 보존)
-      const qrUrl = `https://${PUBLIC_DOMAIN}/qr/${qr.slug}`;
+      const qrUrl = `${qrPublicOrigin(serviceKey)}/qr/${qr.slug}`;
 
       if (format === 'pdf') {
         const perPage: 1 | 4 = presetRaw === 'a4_4up' ? 4 : 1;
@@ -576,7 +598,7 @@ export function createStoreQrLandingController(
       }
 
       const printItems: QrPrintItem[] = qrCodes.map((qr) => ({
-        url: `https://${PUBLIC_DOMAIN}/qr/${qr.slug}`,
+        url: `${qrPublicOrigin(serviceKey)}/qr/${qr.slug}`,
         title: qr.title,
         subtitle: `/qr/${qr.slug}`,
       }));
@@ -667,7 +689,7 @@ export function createStoreQrLandingController(
         [organizationId],
       );
 
-      const qrUrl = `https://${PUBLIC_DOMAIN}/qr/${qr.slug}`;
+      const qrUrl = `${qrPublicOrigin(serviceKey)}/qr/${qr.slug}`;
       const flyerProduct: FlyerProduct = {
         productName: productRow.product_name,
         brandName: productRow.brand_name || undefined,
