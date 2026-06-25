@@ -283,7 +283,7 @@ export function TabletRequestsPage() {
           <GuideEditableSection
             pageKey="store/requests"
             sectionKey="hero-description"
-            defaultContent="매장에서 접수된 상담 요청을 관리합니다."
+            defaultContent="상담 요청이 접수되면 알림으로 알려드립니다. 이 화면에서 접수된 요청을 확인·완료 처리할 수 있습니다."
           />
         </p>
       </div>

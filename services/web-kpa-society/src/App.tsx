@@ -1006,7 +1006,12 @@ function App() {
             {/* WO-O4O-STORE-HUB-LEGACY-LIST-CLEANUP-V1: products/suppliers legacy redirect 제거 */}
             <Route path="orders" element={<Navigate to="/store/commerce/orders" replace />} />
 
-            {/* ── WO-O4O-STORE-REQUESTS-UNIFIED-MENU-V1: 상담 요청 독립 메뉴 ── */}
+            {/* ── 상담 요청 처리 화면 (hidden route) ──
+                WO-O4O-STORE-REQUESTS-UNIFIED-MENU-V1: 최초 독립 메뉴로 승격.
+                WO-O4O-KPA-STORE-CONSULTATION-REQUEST-MENU-HIDDEN-ROUTE-CLEANUP-V1:
+                  사이드바 '상담 요청' 메뉴 제거 후 hidden route 로 전환.
+                  진입 동선 = (1) 요청 알림(metadata.targetUrl=/store/requests) 클릭, (2) URL 직접,
+                  (3) 홈 Live Signals '상담 요청 N건 대기' CTA. route/페이지/처리 기능 불변. */}
             <Route path="requests" element={<TabletRequestsPage />} />
 
             {/* WO-O4O-FOREIGN-VISITOR-SALES-SUPPORT-MENU-GATE-V1: 판매 채널 확장 > 외국인 여행객 판매지원 */}

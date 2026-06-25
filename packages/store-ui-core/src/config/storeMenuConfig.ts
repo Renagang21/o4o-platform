@@ -301,9 +301,12 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'online-sales-settings', label: '판매 설정', subPath: '/online-sales/settings' },
       { key: 'online-sales-products', label: '판매 상품', subPath: '/online-sales/products' },
     ]},
+    // WO-O4O-KPA-STORE-CONSULTATION-REQUEST-MENU-HIDDEN-ROUTE-CLEANUP-V1 (KPA 블록 한정):
+    //   상담 요청은 요청 생성 시 매장 사용자 알림이 생성되고(WO-...-NOTIFICATION-WIRING-V1, smoke PASS),
+    //   알림 클릭으로 /store/requests 처리 화면에 진입한다. → 사이드바 메뉴에서 '상담 요청' 제거.
+    //   /store/requests route 는 hidden(URL 직접/알림 진입)으로 유지(App.tsx). 요청 테이블·API·처리 기능 불변.
     { label: '고객 응대', items: [
       { key: 'tablet-displays',  label: '태블릿',    subPath: '/commerce/tablet-displays' },
-      { key: 'requests',         label: '상담 요청', subPath: '/requests' },
     ]},
     // WO-O4O-FOREIGN-VISITOR-SALES-SUPPORT-MENU-GATE-V1: 판매 채널 확장 (유료 기능 게이트)
     { label: '판매 채널 확장', items: [
