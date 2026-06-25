@@ -12,7 +12,8 @@
  * 출력: PNG/SVG 개별 다운로드 + 선택 QR A4 PDF 일괄 출력
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { QrCode, Trash2, ExternalLink, Copy, Check, BarChart3, X, Smartphone, Monitor, Tablet, Download, Printer, ArrowRight, FolderOpen, Sparkles, LayoutTemplate } from 'lucide-react';
 // WO-O4O-KPA-MY-STORE-COPIES-STANDARD-TABLE-V1: list rendering 표준 테이블 (자체 selection + bulk print 보존)
 import { DataTable, type Column } from '@o4o/ui';
@@ -74,6 +75,89 @@ function autoLandingType(assetType: string): string {
   return 'page'; // file, content → page
 }
 
+// WO-O4O-KPA-STORE-QR-EXPORT-MENU-CLIP-FIX-V1:
+//   QR 목록은 @o4o/ui DataTable(BaseTable) 을 쓰는데, 내부 wrapper 가 `overflow-x-auto` 라
+//   CSS 규칙상 overflow-y 도 visible 이 아닌 auto 로 계산되어 행 내 position:absolute 출력
+//   메뉴가 세로로 잘린다. BaseTable 은 공통 표준(가로 스크롤 필요)이라 수정하지 않고,
+//   출력 메뉴를 body 로 portal(position:fixed) 하여 클리핑을 우회한다. 화면 하단 공간이
+//   부족하면 위로 펼치고, 바깥 클릭/스크롤/리사이즈 시 닫는다.
+function QrExportMenu({ exporting, onExport }: {
+  exporting: boolean;
+  onExport: (format: QrExportFormat, preset: QrExportPreset) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const btnRef = useRef<HTMLButtonElement | null>(null);
+  const [rect, setRect] = useState<{ top: number; bottom: number; right: number } | null>(null);
+
+  const MENU_W = 200;
+  const MENU_H = 248; // QR_EXPORT_PRESETS 5항목 근사 높이
+
+  const toggle = () => {
+    if (exporting) return;
+    if (open) { setOpen(false); return; }
+    const r = btnRef.current?.getBoundingClientRect();
+    if (r) setRect({ top: r.top, bottom: r.bottom, right: r.right });
+    setOpen(true);
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    const close = () => setOpen(false);
+    window.addEventListener('scroll', close, true);
+    window.addEventListener('resize', close);
+    return () => {
+      window.removeEventListener('scroll', close, true);
+      window.removeEventListener('resize', close);
+    };
+  }, [open]);
+
+  const openUp = rect ? (window.innerHeight - rect.bottom < MENU_H && rect.top > MENU_H) : false;
+  const left = rect ? Math.max(8, rect.right - MENU_W) : 0;
+
+  return (
+    <>
+      <button
+        ref={btnRef}
+        onClick={(e) => { e.stopPropagation(); toggle(); }}
+        style={{ ...styles.downloadBtn, opacity: exporting ? 0.6 : 1, cursor: exporting ? 'wait' : 'pointer' }}
+        disabled={exporting}
+        title="QR 출력/다운로드"
+      >
+        <Download size={14} />
+        {exporting ? '준비 중…' : '출력'}
+      </button>
+      {open && rect && createPortal(
+        <>
+          <div style={{ position: 'fixed', inset: 0, zIndex: 1000 }} onClick={() => setOpen(false)} />
+          <div
+            style={{
+              position: 'fixed',
+              left,
+              ...(openUp ? { bottom: window.innerHeight - rect.top + 4 } : { top: rect.bottom + 4 }),
+              zIndex: 1001,
+              width: MENU_W,
+              ...styles.downloadMenuPortal,
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {QR_EXPORT_PRESETS.map((opt) => (
+              <button
+                key={`${opt.format}-${opt.preset}`}
+                onClick={() => { setOpen(false); onExport(opt.format, opt.preset); }}
+                style={styles.downloadMenuItem}
+              >
+                <span style={{ display: 'block', fontWeight: 600, color: colors.neutral700 }}>{opt.label}</span>
+                <span style={{ display: 'block', fontSize: '11px', color: colors.neutral400, marginTop: '1px' }}>{opt.hint}</span>
+              </button>
+            ))}
+          </div>
+        </>,
+        document.body,
+      )}
+    </>
+  );
+}
+
 export function StoreQRPage() {
   const location = useLocation();
 
@@ -106,7 +190,6 @@ export function StoreQRPage() {
   // Print / download state
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [printing, setPrinting] = useState(false);
-  const [downloadMenuId, setDownloadMenuId] = useState<string | null>(null);
   const [showPrintModal, setShowPrintModal] = useState(false);
   // WO-O4O-KPA-STORE-QR-PRINT-EXPORT-UI-WIRING-V1: 출력 진행 중인 QR id (중복 클릭 방지 + 로딩 표시)
   const [exportingId, setExportingId] = useState<string | null>(null);
@@ -387,7 +470,6 @@ export function StoreQRPage() {
   //   preset 별 PDF(A4·4분할)/PNG/SVG 다운로드. 동일 QR 출력 중 중복 클릭 방지.
   const handleExport = async (id: string, format: QrExportFormat, preset: QrExportPreset) => {
     if (exportingId === id) return;
-    setDownloadMenuId(null);
     setExportingId(id);
     try {
       await downloadQrExport(id, format, preset);
@@ -915,33 +997,13 @@ export function StoreQRPage() {
                   align: 'right',
                   render: (_v, item) => (
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px' }}>
-                      <div style={{ position: 'relative' }}>
-                        <button
-                          onClick={(e) => { e.stopPropagation(); if (exportingId === item.id) return; setDownloadMenuId(downloadMenuId === item.id ? null : item.id); }}
-                          style={{ ...styles.downloadBtn, opacity: exportingId === item.id ? 0.6 : 1, cursor: exportingId === item.id ? 'wait' : 'pointer' }}
-                          disabled={exportingId === item.id}
-                          title="QR 출력/다운로드"
-                        >
-                          <Download size={14} />
-                          {exportingId === item.id ? '준비 중…' : '출력'}
-                        </button>
-                        {/* WO-O4O-KPA-STORE-QR-PRINT-EXPORT-UI-WIRING-V1:
-                            QR_EXPORT_PRESETS 기반 메뉴 — A4 안내문 PDF / A4 4분할 PDF / PNG / SVG */}
-                        {downloadMenuId === item.id && (
-                          <div style={styles.downloadMenu}>
-                            {QR_EXPORT_PRESETS.map((opt) => (
-                              <button
-                                key={`${opt.format}-${opt.preset}`}
-                                onClick={(e) => { e.stopPropagation(); handleExport(item.id, opt.format, opt.preset); }}
-                                style={styles.downloadMenuItem}
-                              >
-                                <span style={{ display: 'block', fontWeight: 600, color: colors.neutral700 }}>{opt.label}</span>
-                                <span style={{ display: 'block', fontSize: '11px', color: colors.neutral400, marginTop: '1px' }}>{opt.hint}</span>
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
+                      {/* WO-O4O-KPA-STORE-QR-EXPORT-MENU-CLIP-FIX-V1:
+                          QR_EXPORT_PRESETS 메뉴(A4 PDF/4분할/PNG/SVG)를 portal 로 띄워 DataTable
+                          overflow 클리핑 회피. handleExport 동작은 그대로 유지. */}
+                      <QrExportMenu
+                        exporting={exportingId === item.id}
+                        onExport={(format, preset) => handleExport(item.id, format, preset)}
+                      />
                       <button
                         onClick={(e) => { e.stopPropagation(); handleShowAnalytics(item.id); }}
                         style={{ ...styles.iconBtn, color: analyticsId === item.id ? colors.primary : colors.neutral400 }}
@@ -1585,15 +1647,12 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
     whiteSpace: 'nowrap',
   },
-  downloadMenu: {
-    position: 'absolute',
-    top: '34px',
-    right: 0,
-    zIndex: 10,
+  // WO-O4O-KPA-STORE-QR-EXPORT-MENU-CLIP-FIX-V1: portal 메뉴 박스 (위치는 인라인 fixed 로 지정)
+  downloadMenuPortal: {
     backgroundColor: '#fff',
     border: `1px solid ${colors.neutral200}`,
     borderRadius: '8px',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
     overflow: 'hidden',
     minWidth: '190px',
   },
