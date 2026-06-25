@@ -621,11 +621,14 @@ export default function StoreProductionMaterialsPage() {
           </div>
 
           {/* 테이블 행 */}
-          {items.map((item) => {
+          {items.map((item, idx) => {
             const isSelected = selected.has(item.id);
             const isMaterial = item.kind === 'material';
             const kindBadge = KIND_BADGE[item.kind];
             const stage = stageInfo(item.stage);
+            // WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-ROWMENU-CLIP-FIX-V1:
+            //   wrapper overflow:visible 전환에 따른 마지막 행 하단 사각 코너 보정.
+            const isLast = idx === items.length - 1;
             const blogStatus =
               item.kind === 'blog'
                 ? (BLOG_STATUS_LABELS[item.status ?? 'draft'] ?? BLOG_STATUS_LABELS.draft)
@@ -637,6 +640,7 @@ export default function StoreProductionMaterialsPage() {
                   ...styles.tableRow,
                   background: isSelected ? '#F5F3FF' : colors.white,
                   borderLeft: isSelected ? `3px solid ${colors.primary}` : '3px solid transparent',
+                  ...(isLast ? { borderBottomLeftRadius: '7px', borderBottomRightRadius: '7px', borderBottom: 'none' } : {}),
                 }}
               >
                 <div style={{ ...styles.col, width: 28 }}>
@@ -999,7 +1003,10 @@ const styles: Record<string, CSSProperties> = {
   tableWrap: {
     border: `1px solid ${colors.neutral200}`,
     borderRadius: '8px',
-    overflow: 'hidden',
+    // WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-ROWMENU-CLIP-FIX-V1:
+    //   '활용하기' 드롭다운(position:absolute, 행 아래로 펼침)이 wrapper 밖으로
+    //   나가도 잘리지 않도록 visible. 코너 아티팩트는 헤더 상단 라운딩으로 보정.
+    overflow: 'visible',
   },
   tableHead: {
     display: 'flex',
@@ -1007,6 +1014,9 @@ const styles: Record<string, CSSProperties> = {
     gap: '12px',
     padding: '10px 14px',
     background: colors.neutral50,
+    // overflow:visible 전환에 따른 헤더 상단 사각 코너 노출 방지(내부 7px 라운딩)
+    borderTopLeftRadius: '7px',
+    borderTopRightRadius: '7px',
     borderBottom: `1px solid ${colors.neutral200}`,
     fontSize: '12px',
     fontWeight: 600,
