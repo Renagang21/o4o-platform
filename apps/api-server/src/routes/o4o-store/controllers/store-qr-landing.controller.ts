@@ -82,7 +82,8 @@ export function createStoreQrLandingController(
            qr.slug,
            qr.organization_id AS "organizationId",
            li.file_url AS "imageUrl",
-           li.title AS "libraryItemTitle"
+           li.title AS "libraryItemTitle",
+           li.html_content AS "libraryItemHtml"
          FROM store_qr_codes qr
          LEFT JOIN store_execution_assets li
            ON li.id = qr.library_item_id AND li.is_active = true
@@ -190,7 +191,7 @@ export function createStoreQrLandingController(
       const EXPOSABLE_CONTENT_STATUS = ['ready', 'published'];
       let pageContent:
         | { available: false; reason: 'unpublished' }
-        | { available: true; title: string; summary: string | null; body: string | null; blocks: unknown[]; source: 'content_hub' }
+        | { available: true; title: string; summary: string | null; body: string | null; blocks: unknown[]; source: 'content_hub' | 'store_asset' }
         | null = null;
       const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
       if (qrData.landingType === 'page' && qrData.landingTargetId && UUID_RE.test(qrData.landingTargetId)) {
@@ -219,6 +220,28 @@ export function createStoreQrLandingController(
             pageContent = { available: false, reason: 'unpublished' };
           }
         }
+      }
+
+      // WO-O4O-KPA-PRODUCTION-MATERIALS-DIRECT-CREATE-SMOKE-AND-QR-BUILD-CLEANUP-V1:
+      //   내 매장 제작자료(store_execution_assets, assetType='content')를 QR 대상으로 만든 경우,
+      //   landing_target_id 없이 library_item_id 만 가진다(콘텐츠 허브 kpa_contents 와 별개 경로).
+      //   위 kpa_contents 조회로 본문을 못 찾았고(page + libraryItem html 보유), 제작자료 본문이 있으면
+      //   그 htmlContent 를 공개 landing 본문으로 렌더한다. html 없는 file 자산은 기존 redirect 폴백 유지.
+      //   library_item 은 QR 과 동일 organization 소유(LEFT JOIN library_item_id) — 추가 경계 검사 불필요.
+      if (
+        pageContent === null &&
+        qrData.landingType === 'page' &&
+        typeof qrData.libraryItemHtml === 'string' &&
+        qrData.libraryItemHtml.trim() !== ''
+      ) {
+        pageContent = {
+          available: true,
+          title: qrData.libraryItemTitle || qrData.title,
+          summary: null,
+          body: qrData.libraryItemHtml,
+          blocks: [],
+          source: 'store_asset',
+        };
       }
 
       res.json({
