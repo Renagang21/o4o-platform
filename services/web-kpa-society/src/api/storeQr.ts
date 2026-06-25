@@ -164,8 +164,14 @@ const KPA_API_BASE = import.meta.env.VITE_API_BASE_URL
 
 function parseFilename(disposition: string | null, fallback: string): string {
   if (!disposition) return fallback;
-  const m = /filename="?([^"]+)"?/.exec(disposition);
-  return m?.[1] || fallback;
+  // WO-O4O-KPA-QR-EXPORT-FILENAME-BY-TITLE-V1:
+  //   RFC 5987 `filename*=UTF-8''<percent-encoded>` 우선(한글 제목 보존), 없으면 ASCII `filename=` 폴백.
+  const star = /filename\*=UTF-8''([^;]+)/i.exec(disposition);
+  if (star?.[1]) {
+    try { return decodeURIComponent(star[1].trim()); } catch { /* fallthrough */ }
+  }
+  const m = /filename="?([^";]+)"?/.exec(disposition);
+  return m?.[1]?.trim() || fallback;
 }
 
 /**
