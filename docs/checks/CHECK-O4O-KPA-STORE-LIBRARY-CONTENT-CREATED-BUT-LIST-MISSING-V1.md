@@ -2,7 +2,7 @@
 
 > 작업: **KPA 매장 — QR 선택기엔 보이나 `/store/library/contents` 목록엔 안 보이는 콘텐츠 정합 (A안: 목록 소스 확장)**
 > 대상: `/store/library/contents` 문서형 목록 + `/store/marketing/qr` 콘텐츠 선택기
-> 작업일: 2026-06-25 / 상태: **코드 완료 · typecheck PASS · 배포 `aeb84cdcf` · 운영 smoke 대기**
+> 작업일: 2026-06-25 / 상태: **코드 완료 · typecheck PASS · 배포 `aeb84cdcf` · 운영 smoke PASS**
 
 ---
 
@@ -65,14 +65,21 @@ QR 만들기 선택기와 콘텐츠 목록이 **서로 다른 데이터 소스**
 |------|------|
 | `web-kpa-society` tsc --noEmit | ✅ 오류 0 |
 | `api-server` tsc --noEmit (store-library-feed) | ✅ 오류 0 |
-| 운영 브라우저 smoke (renagang21 / 테스트 약국) | ⏳ 배포 후 |
+| 운영 브라우저 smoke (renagang21 / 테스트 약국, 배포 `aeb84cdcf`) | ✅ PASS |
 
-### smoke 계획 (배포 후)
-1. renagang21 로그인 → `/store/library/contents` → 3개 콘텐츠가 "매장 제작 자료 / 제작 자료" 배지로 표시되는지.
-2. 행 "열기" → `/store/library/production-materials` 이동 + 본문 열람 가능.
-3. `/store/marketing/qr` 3개 콘텐츠형 QR 유지 + 공개 URL(/qr/slug) 정상 렌더(자산 무변경).
-4. 검색/페이지네이션 정합(UNION search 바인딩).
-5. GP/KCos 무영향(피드는 KPA mount 전용).
+### smoke 결과 (배포 `aeb84cdcf`, renagang21 / "테스트 약국" org 9c87f46b)
+
+| 검증 | 결과 |
+|------|------|
+| **DB**: 새 피드 UNION 이 org 9c87f46b 에 대해 execution-asset 3 + snapshot 1 반환 (미백/혈당/역노화, html 3259/2605/579자) | ✅ |
+| renagang21 로그인 → `/store/library/contents` **4건** 표시 | ✅ |
+| 3개 콘텐츠 = 배지 **"제작 자료"** · 원본유형 **"매장 제작 자료"** · 작성자 "내 매장" · 액션 **"열기"** | ✅ |
+| 행 "열기" → `/store/library/production-materials` 링크 | ✅ |
+| 기존 스냅샷 **해양 심층수 효능**(커뮤니티 콘텐츠 허브, `/view/…`) 보존 | ✅ |
+| 기존 QR 공개 URL `/qr/3`(역노화) 본문 전체 정상 렌더 (store_execution_assets html 무변경 → **QR 안 깨짐**) | ✅ |
+| GP/KCos 무영향(피드는 `kpa.routes.ts` mount 전용) | ✅ (코드) |
+
+> 비고: renagang21 계정은 1·2차 비밀번호 불일치 후 3차(`3Lz1…`)로 로그인 성공. 데이터 삭제/이동/마이그레이션 0 — 원본 store_execution_assets·QR 무변경(비파괴 노출).
 
 ---
 
