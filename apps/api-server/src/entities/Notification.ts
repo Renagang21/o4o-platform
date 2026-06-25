@@ -67,6 +67,8 @@ export type NotificationType =
   | 'recruitment.participation_terminated' // 판매자: 모집 참여 해지
   // WO-O4O-KPA-STORE-CONSULTATION-REQUEST-NOTIFICATION-WIRING-V1
   | 'store.consultation_requested'   // 매장 사용자: 신규 상담(태블릿 관심) 요청 접수
+  // WO-O4O-KPA-ONLINE-SALES-ORDER-NOTIFICATION-V1
+  | 'store.online_sales_order_created' // 매장 사용자: 온라인 스토어 신규 판매 주문 접수
   | 'custom';
 
 // Legacy interface for backward compatibility

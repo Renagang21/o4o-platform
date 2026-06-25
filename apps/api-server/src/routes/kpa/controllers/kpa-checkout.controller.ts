@@ -29,6 +29,8 @@ import {
 } from '../../../entities/checkout/CheckoutOrder.entity.js';
 import { OrderLog, OrderAction } from '../../../entities/checkout/OrderLog.entity.js';
 import { checkoutService } from '../../../services/checkout.service.js';
+// WO-O4O-KPA-ONLINE-SALES-ORDER-NOTIFICATION-V1: 주문 생성 시 매장 경영자 in-app 알림
+import { notificationService } from '../../../services/NotificationService.js';
 
 // ============================================================================
 // Type Definitions
@@ -517,6 +519,49 @@ export function createKpaCheckoutController(
             totalAmount: savedOrder.totalAmount,
             itemCount: orderItems.length,
           });
+
+          // WO-O4O-KPA-ONLINE-SALES-ORDER-NOTIFICATION-V1:
+          //   온라인 스토어 신규 판매 주문 접수 시 매장 경영자(organization_members owner/admin/manager)에게 in-app 알림.
+          //   - 클릭 시 내부 주문 상세(/store/online-sales/orders/:id)로 이동(targetUrl). 공개 storefront 로 보내지 않음.
+          //   - best-effort, fire-and-forget: 알림 실패가 주문 생성(이미 commit 완료)에 절대 영향 주지 않도록
+          //     자체 try/catch 로 격리하고 await 하지 않는다(고객 응답 지연 방지 + 커밋된 tx 의 catch/rollback 회피).
+          //   - 개인정보(고객명/연락처) 미포함. 주문번호/금액만 노출. KPA(serviceKey='kpa-society') 한정.
+          void (async () => {
+            try {
+              const members: { userId: string }[] = await dataSource.query(
+                `SELECT DISTINCT user_id AS "userId"
+                   FROM organization_members
+                  WHERE organization_id = $1
+                    AND role IN ('owner','admin','manager')
+                    AND left_at IS NULL
+                  LIMIT 20`,
+                [organization.id],
+              );
+              if (members.length === 0) return;
+              const amountText = `${Number(savedOrder.totalAmount || 0).toLocaleString('ko-KR')}원`;
+              await Promise.allSettled(
+                members.map((m) =>
+                  notificationService.createNotification({
+                    userId: m.userId,
+                    type: 'store.online_sales_order_created',
+                    title: '새 온라인 판매 주문이 접수되었습니다',
+                    message: `주문 ${savedOrder.orderNumber} · ${amountText}이 접수되었습니다.`,
+                    serviceKey: 'kpa-society',
+                    organizationId: organization.id,
+                    metadata: {
+                      targetUrl: `/store/online-sales/orders/${savedOrder.id}`,
+                      orderId: savedOrder.id,
+                      orderNumber: savedOrder.orderNumber,
+                      totalAmount: savedOrder.totalAmount,
+                      targetType: 'checkout_order',
+                    },
+                  }),
+                ),
+              );
+            } catch (notifyError) {
+              logger.error('[KPA Checkout] Order notification failed (non-blocking):', notifyError);
+            }
+          })();
 
           res.status(201).json({
             success: true,
