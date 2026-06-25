@@ -1557,8 +1557,11 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       //   content-meta SSOT 상 kpa_contents.status = draft|ready('발행 가능/검토 완료').
       //   기존엔 'ready'(운영자 '완료')가 누락돼 draft 로 silently coercion 되던 버그를 수정한다.
       //   published/private 는 backward-compat 유지(제거 시 기존 행 영향).
+      // WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1:
+      //   "저장 = 즉시 사용 가능" 표준. status 미지정/무효 시 기본값을 'draft' → 'ready' 로 변경.
+      //   draft 는 클라이언트가 명시적으로 'draft' 를 보냈을 때만 만들어진다.
       const validStatuses = ['draft', 'ready', 'published', 'private'];
-      const status = validStatuses.includes(reqStatus) ? reqStatus : 'draft';
+      const status = validStatuses.includes(reqStatus) ? reqStatus : 'ready';
       const validContentTypes = ['participation', 'information'];
       const cType = validContentTypes.includes(content_type) ? content_type : 'information';
 

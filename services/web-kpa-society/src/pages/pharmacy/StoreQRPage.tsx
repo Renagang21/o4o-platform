@@ -285,14 +285,18 @@ export function StoreQRPage() {
     setFormError(null);
 
     try {
+      // WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4:
+      //   운영자 콘텐츠 허브(kpa_contents) 참조형 — landingType='page', landingTargetId=content.id.
+      //   사본 복사가 아니므로 libraryItemId 는 보내지 않는다(백엔드가 page 랜딩으로 inline 렌더).
+      const isContentRef = selectedLibrary.source === 'content-hub';
       const res = await createStoreQrCode({
         // WO-O4O-QR-TEMPLATE-WORKFLOW-V1: AI 생성 제목/설명 우선 사용
         title: formTitle.trim() || selectedLibrary.title,
         description: formDescription.trim() || undefined,
-        type: formLandingType,
-        libraryItemId: selectedLibrary.id,
-        landingType: formLandingType,
-        landingTargetId: formLandingTargetId || undefined,
+        type: isContentRef ? 'page' : formLandingType,
+        libraryItemId: isContentRef ? undefined : selectedLibrary.id,
+        landingType: isContentRef ? 'page' : formLandingType,
+        landingTargetId: isContentRef ? selectedLibrary.id : (formLandingTargetId || undefined),
         slug: formSlug.trim(),
       });
 
@@ -698,57 +702,72 @@ export function StoreQRPage() {
             </div>
           </div>
 
-          <div style={styles.formRow}>
-            <label style={styles.formLabel}>연결 유형</label>
-            <select
-              value={formLandingType}
-              onChange={(e) => setFormLandingType(e.target.value)}
-              style={styles.select}
-            >
-              {LANDING_TYPE_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* WO-O4O-STORE-WORKSPACE-QR-PREFILL-V2: link 타입 추가 경고 */}
-          {formLandingType === 'link' && (
+          {/* WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4:
+              운영자 콘텐츠(참조형)는 연결 유형/대상이 'page'+content.id 로 고정 — 잠금 안내로 대체. */}
+          {selectedLibrary.source === 'content-hub' ? (
             <div style={{ marginBottom: '12px' }}>
               <GuideBlock
-                variant="warning"
-                title="URL 연결형 QR"
-                description="URL 연결형 QR입니다. QR 자체에 콘텐츠가 저장되지 않으며, 입력한 URL로 바로 이동합니다. 대상 URL이 사라지면 QR도 작동하지 않습니다."
+                variant="info"
+                title="운영자 콘텐츠 연결 QR"
+                description="QR을 스캔하면 선택한 운영자 콘텐츠가 표시됩니다. 운영자 원본을 가리키는 연결이며, 매장 사본을 만들지 않습니다(원본이 수정되면 함께 반영됩니다)."
                 compact
               />
             </div>
-          )}
+          ) : (
+            <>
+              <div style={styles.formRow}>
+                <label style={styles.formLabel}>연결 유형</label>
+                <select
+                  value={formLandingType}
+                  onChange={(e) => setFormLandingType(e.target.value)}
+                  style={styles.select}
+                >
+                  {LANDING_TYPE_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+              </div>
 
-          <div style={styles.formRow}>
-            <label style={styles.formLabel}>
-              {formLandingType === 'product' ? '연결 상품 (선택)' : formLandingType === 'link' ? '연결 URL' : '연결 대상 (선택)'}
-            </label>
-            {formLandingType === 'product' ? (
-              <select
-                value={formLandingTargetId}
-                onChange={(e) => setFormLandingTargetId(e.target.value)}
-                style={styles.select}
-                disabled={loadingProducts}
-              >
-                <option value="">{loadingProducts ? '상품 목록 로딩 중...' : '상품 선택 (선택사항)'}</option>
-                {productOptions.map((p) => (
-                  <option key={p.id} value={p.id}>{p.name}</option>
-                ))}
-              </select>
-            ) : (
-              <input
-                type="text"
-                value={formLandingTargetId}
-                onChange={(e) => setFormLandingTargetId(e.target.value)}
-                style={styles.input}
-                placeholder={formLandingType === 'link' ? 'https://example.com' : '비워두면 자료 페이지로 이동합니다'}
-              />
-            )}
-          </div>
+              {/* WO-O4O-STORE-WORKSPACE-QR-PREFILL-V2: link 타입 추가 경고 */}
+              {formLandingType === 'link' && (
+                <div style={{ marginBottom: '12px' }}>
+                  <GuideBlock
+                    variant="warning"
+                    title="URL 연결형 QR"
+                    description="URL 연결형 QR입니다. QR 자체에 콘텐츠가 저장되지 않으며, 입력한 URL로 바로 이동합니다. 대상 URL이 사라지면 QR도 작동하지 않습니다."
+                    compact
+                  />
+                </div>
+              )}
+
+              <div style={styles.formRow}>
+                <label style={styles.formLabel}>
+                  {formLandingType === 'product' ? '연결 상품 (선택)' : formLandingType === 'link' ? '연결 URL' : '연결 대상 (선택)'}
+                </label>
+                {formLandingType === 'product' ? (
+                  <select
+                    value={formLandingTargetId}
+                    onChange={(e) => setFormLandingTargetId(e.target.value)}
+                    style={styles.select}
+                    disabled={loadingProducts}
+                  >
+                    <option value="">{loadingProducts ? '상품 목록 로딩 중...' : '상품 선택 (선택사항)'}</option>
+                    {productOptions.map((p) => (
+                      <option key={p.id} value={p.id}>{p.name}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    type="text"
+                    value={formLandingTargetId}
+                    onChange={(e) => setFormLandingTargetId(e.target.value)}
+                    style={styles.input}
+                    placeholder={formLandingType === 'link' ? 'https://example.com' : '비워두면 자료 페이지로 이동합니다'}
+                  />
+                )}
+              </div>
+            </>
+          )}
 
           {formError && <p style={styles.formError}>{formError}</p>}
 
@@ -1027,6 +1046,9 @@ export function StoreQRPage() {
         open={showSelector}
         onSelect={handleLibrarySelect}
         onClose={() => setShowSelector(false)}
+        // WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4:
+        //   QR 대상 범위 확장 — '운영자 콘텐츠'(kpa_contents ready) 소스 탭 활성화.
+        enableContentHubSource
       />
 
       {/* Print Template Modal */}

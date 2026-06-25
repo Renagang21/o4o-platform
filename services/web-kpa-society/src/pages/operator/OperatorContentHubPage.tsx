@@ -175,7 +175,11 @@ export default function OperatorContentHubPage() {
 
   const openCreate = () => {
     setEditingId(null);
-    setForm({ title: '', summary: '', category: '', tags: '', status: 'draft', source_type: 'manual', source_url: '', body: '' });
+    // WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1:
+    //   "저장 = 즉시 사용 가능" 표준. 신규 콘텐츠 기본값은 'ready'(완료) — 저장 직후
+    //   QR 선택기/사용처에서 바로 선택 가능해야 한다. 초안은 사용자가 모달 상태를
+    //   '초안'으로 명시적으로 바꿨을 때만 만들어진다.
+    setForm({ title: '', summary: '', category: '', tags: '', status: 'ready', source_type: 'manual', source_url: '', body: '' });
     setShowModal(true);
   };
 
@@ -590,13 +594,15 @@ export default function OperatorContentHubPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">상태</label>
+                  {/* WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1:
+                      기본=완료(저장 즉시 사용 가능). 초안은 QR 선택기/사용처에 노출되지 않는다. */}
                   <select
                     value={form.status}
                     onChange={e => setForm(f => ({ ...f, status: e.target.value as 'draft' | 'ready' }))}
                     className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="draft">초안</option>
-                    <option value="ready">완료</option>
+                    <option value="ready">완료 (저장 즉시 사용 가능)</option>
+                    <option value="draft">초안 (사용처에 노출 안 됨)</option>
                   </select>
                 </div>
               </div>

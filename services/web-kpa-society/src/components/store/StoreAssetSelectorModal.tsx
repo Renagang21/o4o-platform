@@ -19,6 +19,9 @@ import { Search, X, FileText, Image, Film, ChevronLeft, ChevronRight, Plus } fro
 import { colors } from '../../styles/theme';
 import { getStoreExecutionAssets } from '../../api/storeExecutionAssets';
 import type { StoreExecutionAsset, UsageType } from '../../api/storeExecutionAssets';
+// WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4:
+//   운영자 콘텐츠 허브(kpa_contents, status='ready') 를 QR 대상 소스로 추가(opt-in).
+import { listContentHubItems } from '../../api/contentHub';
 
 // ── 선택 결과 타입 ──
 
@@ -30,6 +33,10 @@ export interface AssetSelectorResult {
   assetType: string;
   url: string | null;
   htmlContent: string | null;
+  // WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4:
+  //   'asset' = store_execution_assets(내 매장 자료/제작자료/가져온 콘텐츠),
+  //   'content-hub' = 운영자 콘텐츠 허브(kpa_contents) 참조(landingType='page', landingTargetId=id).
+  source?: 'asset' | 'content-hub';
 }
 
 /** @deprecated Use AssetSelectorResult */
@@ -44,7 +51,17 @@ interface StoreAssetSelectorModalProps {
   onCreateNew?: () => void;
   /** 용도별 필터 — 지정 시 해당 usage_type 자산만 표시 */
   usageType?: UsageType;
+  /**
+   * WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4:
+   *   true 시 상단에 소스 전환("내 매장 자료" ↔ "운영자 콘텐츠")을 노출하고,
+   *   "운영자 콘텐츠" 탭은 운영자 콘텐츠 허브(kpa_contents, status='ready')를 보여준다.
+   *   미지정(기본) 시 기존 동작 그대로 — 다른 소비처(사이니지 등) 무영향.
+   */
+  enableContentHubSource?: boolean;
 }
+
+// WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4: 소스 종류
+type AssetSource = 'asset' | 'content';
 
 // ── 자산 타입 필터 ──
 
@@ -65,6 +82,7 @@ export function StoreAssetSelectorModal({
   onClose,
   onCreateNew,
   usageType,
+  enableContentHubSource = false,
 }: StoreAssetSelectorModalProps) {
   const [items, setItems] = useState<StoreExecutionAsset[]>([]);
   const [loading, setLoading] = useState(false);
@@ -73,6 +91,9 @@ export function StoreAssetSelectorModal({
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+  // WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4: 소스 전환 + 콘텐츠 허브 목록
+  const [source, setSource] = useState<AssetSource>('asset');
+  const [contentItems, setContentItems] = useState<{ id: string; title: string; summary: string | null; category: string | null }[]>([]);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -85,13 +106,15 @@ export function StoreAssetSelectorModal({
     setSelectedId(null);
     setPage(1);
     setTotal(0);
+    setSource('asset');
+    setContentItems([]);
   }, [open]);
 
-  // 서버 데이터 로드 (page 변경 시 즉시)
+  // 서버 데이터 로드 (page/source 변경 시 즉시)
   useEffect(() => {
     if (!open) return;
     loadItems(page, search);
-  }, [open, page]);
+  }, [open, page, source]);
 
   // 검색어 디바운스
   useEffect(() => {
@@ -109,6 +132,14 @@ export function StoreAssetSelectorModal({
   const loadItems = async (p: number, q: string) => {
     try {
       setLoading(true);
+      // WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4:
+      //   '운영자 콘텐츠' 소스는 kpa_contents(status='ready')만 — 저장 즉시 사용 가능한 콘텐츠.
+      if (source === 'content') {
+        const res = await listContentHubItems({ page: p, limit: PAGE_SIZE, search: q.trim() || undefined, status: 'ready' });
+        setContentItems(res.items.map((it) => ({ id: it.id, title: it.title, summary: it.summary, category: it.category })));
+        setTotal(res.total);
+        return;
+      }
       const res = await getStoreExecutionAssets({
         page: p,
         limit: PAGE_SIZE,
@@ -126,15 +157,42 @@ export function StoreAssetSelectorModal({
     }
   };
 
-  // 클라이언트 자산 타입 필터링
+  const switchSource = (next: AssetSource) => {
+    if (next === source) return;
+    setSource(next);
+    setSelectedId(null);
+    setSearch('');
+    setAssetTypeFilter('all');
+    setPage(1);
+    setTotal(0);
+  };
+
+  // 클라이언트 자산 타입 필터링 (asset 소스에만 적용)
   const displayItems = items.filter((item) => {
     if (assetTypeFilter === 'all') return true;
     return (item.assetType || 'file') === assetTypeFilter;
   });
 
   const selectedItem = items.find((i) => i.id === selectedId) ?? null;
+  const selectedContent = contentItems.find((i) => i.id === selectedId) ?? null;
 
   const handleConfirm = useCallback(() => {
+    // WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4:
+    //   운영자 콘텐츠는 참조형(landingType='page', landingTargetId=content.id) — 사본 복사 없음.
+    if (source === 'content') {
+      if (!selectedContent) return;
+      onSelect({
+        id: selectedContent.id,
+        title: selectedContent.title,
+        category: selectedContent.category,
+        fileUrl: null,
+        assetType: 'content',
+        url: null,
+        htmlContent: null,
+        source: 'content-hub',
+      });
+      return;
+    }
     if (!selectedItem) return;
     onSelect({
       id: selectedItem.id,
@@ -144,8 +202,9 @@ export function StoreAssetSelectorModal({
       assetType: selectedItem.assetType || 'file',
       url: selectedItem.url ?? null,
       htmlContent: selectedItem.htmlContent ?? null,
+      source: 'asset',
     });
-  }, [selectedItem, onSelect]);
+  }, [source, selectedItem, selectedContent, onSelect]);
 
   if (!open) return null;
 
@@ -169,6 +228,24 @@ export function StoreAssetSelectorModal({
           </button>
         </div>
 
+        {/* WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4: 소스 전환 탭 */}
+        {enableContentHubSource && (
+          <div style={styles.sourceTabs}>
+            <button
+              onClick={() => switchSource('asset')}
+              style={{ ...styles.sourceTab, ...(source === 'asset' ? styles.sourceTabActive : {}) }}
+            >
+              내 매장 자료
+            </button>
+            <button
+              onClick={() => switchSource('content')}
+              style={{ ...styles.sourceTab, ...(source === 'content' ? styles.sourceTabActive : {}) }}
+            >
+              운영자 콘텐츠
+            </button>
+          </div>
+        )}
+
         {/* Search + Filter */}
         <div style={styles.toolbar}>
           <div style={styles.searchBox}>
@@ -177,29 +254,76 @@ export function StoreAssetSelectorModal({
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="자산 검색..."
+              placeholder={source === 'content' ? '콘텐츠 검색...' : '자산 검색...'}
               style={styles.searchInput}
             />
           </div>
-          <div style={styles.filterRow}>
-            {ASSET_TYPES.map((at) => (
-              <button
-                key={at.key}
-                onClick={() => { setAssetTypeFilter(at.key); setSelectedId(null); }}
-                style={{
-                  ...styles.filterChip,
-                  ...(assetTypeFilter === at.key ? styles.filterChipActive : {}),
-                }}
-              >
-                {at.label}
-              </button>
-            ))}
-          </div>
+          {source === 'asset' && (
+            <div style={styles.filterRow}>
+              {ASSET_TYPES.map((at) => (
+                <button
+                  key={at.key}
+                  onClick={() => { setAssetTypeFilter(at.key); setSelectedId(null); }}
+                  style={{
+                    ...styles.filterChip,
+                    ...(assetTypeFilter === at.key ? styles.filterChipActive : {}),
+                  }}
+                >
+                  {at.label}
+                </button>
+              ))}
+            </div>
+          )}
+          {source === 'content' && (
+            <p style={styles.contentHint}>
+              운영자가 '완료' 상태로 저장한 콘텐츠입니다. 선택하면 원본을 가리키는 QR이 만들어집니다(사본 복사 없음).
+            </p>
+          )}
         </div>
 
         {/* Card Grid */}
         <div style={styles.body}>
-          {loading ? (
+          {source === 'content' ? (
+            loading ? (
+              <div style={styles.emptyState}>
+                <p style={{ color: colors.neutral500 }}>콘텐츠를 불러오는 중...</p>
+              </div>
+            ) : contentItems.length === 0 ? (
+              <div style={styles.emptyState}>
+                <p style={{ color: colors.neutral500 }}>
+                  {search.trim() ? '검색 결과가 없습니다' : '사용 가능한 콘텐츠가 없습니다'}
+                </p>
+                {!search.trim() && (
+                  <p style={{ color: colors.neutral400, fontSize: '12px', textAlign: 'center', lineHeight: 1.6, maxWidth: 320 }}>
+                    운영자가 콘텐츠 허브에서 '완료' 상태로 저장한 콘텐츠가 여기에 표시됩니다.
+                    초안 상태 콘텐츠는 표시되지 않습니다.
+                  </p>
+                )}
+              </div>
+            ) : (
+              <div style={styles.grid}>
+                {contentItems.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => setSelectedId(item.id)}
+                    style={{ ...styles.card, ...(selectedId === item.id ? styles.cardSelected : {}) }}
+                  >
+                    <div style={styles.cardPreview}>
+                      <FileText size={28} style={{ color: '#8b5cf6' }} />
+                    </div>
+                    <div style={styles.cardInfo}>
+                      <p style={styles.cardTitle}>{item.title}</p>
+                      <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' as const }}>
+                        <span style={styles.assetTypeBadge}>콘텐츠</span>
+                        {item.category && <span style={styles.cardCategory}>{item.category}</span>}
+                      </div>
+                    </div>
+                    {selectedId === item.id && <div style={styles.selectedBadge}>선택됨</div>}
+                  </button>
+                ))}
+              </div>
+            )
+          ) : loading ? (
             <div style={styles.emptyState}>
               <p style={{ color: colors.neutral500 }}>자산을 불러오는 중...</p>
             </div>
@@ -409,6 +533,32 @@ const styles: Record<string, React.CSSProperties> = {
     color: colors.neutral500,
     cursor: 'pointer',
     borderRadius: '6px',
+  },
+  // WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4: 소스 전환 탭
+  sourceTabs: {
+    display: 'flex',
+    gap: '4px',
+    padding: '12px 24px 0',
+  },
+  sourceTab: {
+    padding: '8px 16px',
+    border: 'none',
+    borderBottom: `2px solid transparent`,
+    backgroundColor: 'transparent',
+    fontSize: '14px',
+    fontWeight: 500,
+    color: colors.neutral500,
+    cursor: 'pointer',
+  },
+  sourceTabActive: {
+    color: colors.primary,
+    borderBottomColor: colors.primary,
+  },
+  contentHint: {
+    fontSize: '12px',
+    color: colors.neutral400,
+    margin: 0,
+    lineHeight: 1.5,
   },
   toolbar: {
     padding: '16px 24px',
