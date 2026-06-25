@@ -262,7 +262,10 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
     { label: '약국 상품·거래', items: [
       // 상품 = 공급자 거래 상품(B2B). PharmacyB2BPage(/commerce/products).
       // 거래 신청 전용 라우트는 KPA에 없음 → 별도 항목 미추가(데드링크 방지).
-      { key: 'products', label: '상품',     subPath: '/commerce/products' },
+      // WO-O4O-KPA-STORE-MENU-PRODUCTS-RELABEL-TO-O4O-PRODUCTS-V1:
+      //   라벨만 '상품' → 'O4O 제품'(플랫폼 제공·신청·주문 가능 제품). '내 약국 제품'(자체 취급)과 구분.
+      //   key/subPath/route/권한/기능 무변경. KPA 블록 한정(GP/KCos 무영향).
+      { key: 'products', label: 'O4O 제품', subPath: '/commerce/products' },
       // WO-O4O-KPA-STORE-MENU-ACTIVATION-RELABEL-AND-MY-PRODUCTS-MOVE-V1:
       //   "내 약국 제품"을 활성화 그룹 → 상품·거래 그룹으로 이동(route 무변경 /my-products).
       { key: 'my-products', label: '내 약국 제품', subPath: '/my-products' },
