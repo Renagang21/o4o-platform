@@ -51,6 +51,7 @@ import { assetSnapshotApi, type AssetSnapshotItem } from '../../api/assetSnapsho
 import { apiClient } from '../../api/client';
 import { getAccessToken } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
+import { TagInput } from '../../components/store/TagInput';
 
 const FETCH_LIMIT = 100;
 const AI_OUTPUT_TYPE = 'product_detail'; // 자료 정리 → 고객용 정리 톤 (AiContentModal mode 와 동일 endpoint)
@@ -418,6 +419,8 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated }: Pr
 
   // compose step
   const [title, setTitle] = useState('');
+  // WO-O4O-KPA-CONTENT-LIST-TAG-FIELD-AND-DISPLAY-V1: 콘텐츠 태그 (string[])
+  const [tags, setTags] = useState<string[]>([]);
   const [sourceText, setSourceText] = useState('');
   const [generating, setGenerating] = useState(false);
   const [editorHtml, setEditorHtml] = useState('');
@@ -468,6 +471,7 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated }: Pr
       setSelected(new Set());
       setSearch('');
       setTitle('');
+      setTags([]);
       setSourceText('');
       setEditorHtml('');
       setAiGenerated(false);
@@ -512,6 +516,7 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated }: Pr
     setSelected(new Set());
     setSourceText('');
     setTitle('');
+    setTags([]);
     setEditorHtml('');
     setAiGenerated(false);
     setAiError(null);
@@ -620,6 +625,8 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated }: Pr
         '/store-contents',
         {
           title: title.trim(),
+          // WO-O4O-KPA-CONTENT-LIST-TAG-FIELD-AND-DISPLAY-V1: 태그(string[]) 전달 — 백엔드에서 sanitize.
+          tags,
           contentJson: {
             html,
             // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-BLANK-EDITOR-SAVE-TARGET-ALIGN-V1:
@@ -651,7 +658,7 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated }: Pr
     } finally {
       setSaving(false);
     }
-  }, [title, editorHtml, selectedRows, userIntent, presetLength, presetTone, presetDirection, presetImage, presetUrl, onCreated, onClose, navigate]);
+  }, [title, tags, editorHtml, selectedRows, userIntent, presetLength, presetTone, presetDirection, presetImage, presetUrl, onCreated, onClose, navigate]);
 
   if (!open) return null;
 
@@ -698,6 +705,8 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated }: Pr
             selectedRows={selectedRows}
             title={title}
             onTitleChange={setTitle}
+            tags={tags}
+            onTagsChange={setTags}
             userIntent={userIntent}
             onUserIntentChange={setUserIntent}
             presetLength={presetLength}
@@ -912,6 +921,8 @@ function ComposeStep({
   selectedRows,
   title,
   onTitleChange,
+  tags,
+  onTagsChange,
   userIntent,
   onUserIntentChange,
   presetLength,
@@ -934,6 +945,8 @@ function ComposeStep({
   selectedRows: ResourceRow[];
   title: string;
   onTitleChange: (v: string) => void;
+  tags: string[];
+  onTagsChange: (v: string[]) => void;
   userIntent: string;
   onUserIntentChange: (v: string) => void;
   presetLength: LengthPreset | null;
@@ -979,6 +992,11 @@ function ComposeStep({
           style={styles.input}
           maxLength={200}
         />
+      </div>
+      {/* WO-O4O-KPA-CONTENT-LIST-TAG-FIELD-AND-DISPLAY-V1: 태그 입력 (검색/필터는 후속 WO) */}
+      <div style={styles.composeRow}>
+        <label style={styles.label}>태그</label>
+        <TagInput tags={tags} onChange={onTagsChange} placeholder="예: 간 건강, 면역 (Enter·쉼표로 구분)" />
       </div>
 
       {!isBlankMode && (

@@ -42,6 +42,23 @@ type AuthMiddleware = import('express').RequestHandler;
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+// WO-O4O-KPA-CONTENT-LIST-TAG-FIELD-AND-DISPLAY-V1:
+//   태그 정규화 — 문자열 배열만 허용, trim, 빈 문자열 제거, 중복 제거, 길이/개수 제한.
+const TAG_MAX_COUNT = 20;
+const TAG_MAX_LEN = 30;
+export function normalizeTags(input: unknown): string[] {
+  if (!Array.isArray(input)) return [];
+  return Array.from(
+    new Set(
+      input
+        .filter((v): v is string => typeof v === 'string')
+        .map((v) => v.trim())
+        .filter(Boolean)
+        .map((v) => v.slice(0, TAG_MAX_LEN)),
+    ),
+  ).slice(0, TAG_MAX_COUNT);
+}
+
 async function resolveOrgId(
   dataSource: DataSource,
   userId: string,
@@ -165,9 +182,10 @@ export function createStoreContentController(
           return;
         }
 
-        const { title, contentJson } = req.body as {
+        const { title, contentJson, tags } = req.body as {
           title?: string;
           contentJson?: unknown;
+          tags?: unknown;
         };
 
         if (!title || !title.trim()) {
@@ -185,6 +203,7 @@ export function createStoreContentController(
           organization_id: organizationId,
           title: title.trim(),
           content_json: (contentJson ?? {}) as Record<string, unknown>,
+          tags: normalizeTags(tags),
           updated_by: userId,
         });
         const saved = await repo.save(content);
@@ -197,6 +216,7 @@ export function createStoreContentController(
             organizationId: saved.organization_id,
             title: saved.title,
             contentJson: saved.content_json,
+            tags: saved.tags ?? [],
             updatedAt: saved.updated_at,
             updatedBy: saved.updated_by,
           },
@@ -273,6 +293,7 @@ export function createStoreContentController(
             sourceType: content.source_type,
             title: content.title,
             contentJson: content.content_json,
+            tags: content.tags ?? [],
             updatedAt: content.updated_at,
             updatedBy: content.updated_by,
           },
@@ -323,7 +344,7 @@ export function createStoreContentController(
           return;
         }
 
-        const { title, contentJson } = req.body as { title?: string; contentJson?: Record<string, unknown> };
+        const { title, contentJson, tags } = req.body as { title?: string; contentJson?: Record<string, unknown>; tags?: unknown };
 
         const repo = dataSource.getRepository(KpaStoreContent);
         const content = await repo.findOne({
@@ -337,6 +358,8 @@ export function createStoreContentController(
 
         if (title !== undefined) content.title = title.trim() || content.title;
         if (contentJson !== undefined) content.content_json = contentJson as Record<string, unknown>;
+        // tags 미전송 시 기존 값 보존, 전송 시 sanitize 후 교체.
+        if (tags !== undefined) content.tags = normalizeTags(tags);
         content.updated_by = userId;
 
         const saved = await repo.save(content);
@@ -348,6 +371,7 @@ export function createStoreContentController(
             sourceType: saved.source_type,
             title: saved.title,
             contentJson: saved.content_json,
+            tags: saved.tags ?? [],
             updatedAt: saved.updated_at,
             updatedBy: saved.updated_by,
           },

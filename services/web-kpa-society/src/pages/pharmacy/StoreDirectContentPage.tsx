@@ -31,6 +31,7 @@ import {
 import { BlockRenderer } from '@o4o/block-renderer';
 import { directContentApi, type DirectContentItem } from '../../api/assetSnapshot';
 import { kpaBlocksToRendererBlocks } from '../../utils/kpa-block-adapter';
+import { TagInput } from '../../components/store/TagInput';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -106,6 +107,8 @@ export default function StoreDirectContentPage() {
   const [editing, setEditing] = useState(false);
   const [editTitle, setEditTitle] = useState('');
   const [editBlocks, setEditBlocks] = useState<ContentBlock[]>([]);
+  // WO-O4O-KPA-CONTENT-LIST-TAG-FIELD-AND-DISPLAY-V1: 태그 편집 state
+  const [editTags, setEditTags] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null);
 
@@ -138,6 +141,7 @@ export default function StoreDirectContentPage() {
     if (!content) return;
     setEditTitle(content.title);
     setEditBlocks(parseBlocks(content.contentJson));
+    setEditTags(Array.isArray(content.tags) ? content.tags : []);
     setEditing(true);
   };
 
@@ -145,6 +149,7 @@ export default function StoreDirectContentPage() {
     setEditing(false);
     setEditTitle('');
     setEditBlocks([]);
+    setEditTags([]);
   };
 
   const handleSave = async () => {
@@ -152,7 +157,7 @@ export default function StoreDirectContentPage() {
     setSaving(true);
     try {
       const contentJson = blocksToContentJson(editBlocks, content.contentJson);
-      const res = await directContentApi.update(id, { title: editTitle, contentJson });
+      const res = await directContentApi.update(id, { title: editTitle, contentJson, tags: editTags });
       setContent(res.data);
       setEditing(false);
       showToast('저장되었습니다', true);
@@ -255,6 +260,24 @@ export default function StoreDirectContentPage() {
             <span className="text-xs text-slate-400">
               {content.updatedAt ? new Date(content.updatedAt).toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : ''}
             </span>
+          </div>
+          {/* WO-O4O-KPA-CONTENT-LIST-TAG-FIELD-AND-DISPLAY-V1: 태그 — 편집 시 입력, 보기 시 chip */}
+          <div className="mt-2">
+            {editing ? (
+              <div style={{ maxWidth: 520 }}>
+                <TagInput tags={editTags} onChange={setEditTags} placeholder="예: 간 건강, 면역 (Enter·쉼표로 구분)" />
+              </div>
+            ) : (
+              Array.isArray(content.tags) && content.tags.length > 0 && (
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {content.tags.map(tag => (
+                    <span key={tag} className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-blue-50 text-blue-700 border border-blue-200">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )
+            )}
           </div>
         </div>
 

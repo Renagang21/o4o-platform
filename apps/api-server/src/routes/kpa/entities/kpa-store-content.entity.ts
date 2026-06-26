@@ -57,6 +57,10 @@ export class KpaStoreContent {
   @Column({ type: 'jsonb', default: '{}' })
   content_json: Record<string, unknown>;
 
+  // WO-O4O-KPA-CONTENT-LIST-TAG-FIELD-AND-DISPLAY-V1: 태그 저장/표시 기반 (string[]).
+  @Column({ type: 'jsonb', default: () => "'[]'::jsonb" })
+  tags: string[];
+
   // WO-O4O-DIRECT-CONTENT-CREATED-AT-COLUMN-V1: 생성 시점 보존 (수정과 분리).
   // 기존 row 는 migration 으로 updated_at 값 backfill.
   @CreateDateColumn({ type: 'timestamp' })

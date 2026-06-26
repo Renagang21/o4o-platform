@@ -150,7 +150,10 @@ export function createStoreLibraryFeedController(
                 s.title AS title,
                 s.content_json AS content_json,
                 s.created_at AS sort_at,
-                COALESCE(c.lifecycle_status, 'active') AS lifecycle_status
+                COALESCE(c.lifecycle_status, 'active') AS lifecycle_status,
+                -- WO-O4O-KPA-CONTENT-LIST-TAG-FIELD-AND-DISPLAY-V1: snapshot 태그는 기존 content_json 에 존재(resolver 복사).
+                --   신규 tags 컬럼이 비어있으면 content_json->'tags' 로 fallback.
+                COALESCE(NULLIF(s.tags, '[]'::jsonb), s.content_json->'tags', '[]'::jsonb) AS tags
               FROM o4o_asset_snapshots s
               LEFT JOIN kpa_store_asset_controls c
                 ON c.snapshot_id = s.id AND c.organization_id = s.organization_id
@@ -168,7 +171,8 @@ export function createStoreLibraryFeedController(
                 d.title AS title,
                 d.content_json AS content_json,
                 d.created_at AS sort_at,
-                NULL::varchar AS lifecycle_status
+                NULL::varchar AS lifecycle_status,
+                COALESCE(d.tags, '[]'::jsonb) AS tags
               FROM kpa_store_contents d
               WHERE d.organization_id = $1
                 AND d.source_type = 'direct'
@@ -183,7 +187,8 @@ export function createStoreLibraryFeedController(
                 e.title AS title,
                 jsonb_build_object('html', e.html_content) AS content_json,
                 e.created_at AS sort_at,
-                NULL::varchar AS lifecycle_status
+                NULL::varchar AS lifecycle_status,
+                COALESCE(e.tags, '[]'::jsonb) AS tags
               FROM store_execution_assets e
               WHERE e.organization_id = $1
                 AND e.is_active = true
@@ -250,6 +255,7 @@ export function createStoreLibraryFeedController(
           content_json: Record<string, unknown> | null;
           sort_at: string;
           lifecycle_status: string | null;
+          tags: unknown;
         }>).map((row) => ({
           id: row.id,
           origin: row.origin,
@@ -259,6 +265,10 @@ export function createStoreLibraryFeedController(
           contentJson: row.content_json ?? {},
           createdAt: row.sort_at,
           lifecycleStatus: row.lifecycle_status,
+          // WO-O4O-KPA-CONTENT-LIST-TAG-FIELD-AND-DISPLAY-V1: 항상 string[] 로 정규화.
+          tags: Array.isArray(row.tags)
+            ? row.tags.filter((t): t is string => typeof t === 'string')
+            : [],
         }));
 
         res.json({

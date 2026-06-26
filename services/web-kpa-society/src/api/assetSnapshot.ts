@@ -286,6 +286,8 @@ export interface DirectContentItem {
   sourceType: 'direct';
   title: string;
   contentJson: Record<string, unknown>;
+  // WO-O4O-KPA-CONTENT-LIST-TAG-FIELD-AND-DISPLAY-V1: 태그 (string[])
+  tags?: string[];
   updatedAt: string;
   updatedBy: string | null;
 }
@@ -304,7 +306,7 @@ export const directContentApi = {
     ),
 
   /** direct 콘텐츠 수정 */
-  update: (id: string, body: { title?: string; contentJson?: Record<string, unknown> }) =>
+  update: (id: string, body: { title?: string; contentJson?: Record<string, unknown>; tags?: string[] }) =>
     apiClient.put<{ success: boolean; data: DirectContentItem }>(
       `/store-contents/direct/${id}`,
       body,
@@ -338,6 +340,8 @@ export interface LibraryContentItem {
   createdAt: string;
   /** snapshot 의 lifecycle 상태. direct 는 null */
   lifecycleStatus: string | null;
+  // WO-O4O-KPA-CONTENT-LIST-TAG-FIELD-AND-DISPLAY-V1: 태그 chip 표시용 (항상 string[])
+  tags?: string[];
 }
 
 export interface PaginatedLibraryContents {

@@ -58,6 +58,8 @@ interface DocumentRow {
   // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-PDF-EXPORT-OPTIONS-V1:
   //   인쇄용 PDF 본문 추출용 — 피드가 origin별 본문을 contentJson 에 포함(html/body/blocks).
   contentJson: Record<string, unknown>;
+  // WO-O4O-KPA-CONTENT-LIST-TAG-FIELD-AND-DISPLAY-V1: 태그 chip 표시 (단순 표시, 클릭 필터 없음)
+  tags: string[];
 }
 
 interface LessonRow {
@@ -129,6 +131,7 @@ function toDocumentRow(it: LibraryContentItem): DocumentRow {
     lifecycleStatus: it.lifecycleStatus,
     href,
     contentJson: it.contentJson || {},
+    tags: Array.isArray(it.tags) ? it.tags.filter((t): t is string => typeof t === 'string') : [],
   };
 }
 
@@ -468,6 +471,13 @@ function DocumentsSection({
             )}
             {row.lifecycleStatus === 'expired' && (
               <span style={{ ...styles.badge, background: '#FEE2E2', color: '#DC2626' }}>만료</span>
+            )}
+            {/* WO-O4O-KPA-CONTENT-LIST-TAG-FIELD-AND-DISPLAY-V1: 태그 chip (최대 5개 + N, 단순 표시 — 클릭 필터 없음) */}
+            {row.tags.slice(0, 5).map((tag) => (
+              <span key={tag} style={styles.tagChip}>{tag}</span>
+            ))}
+            {row.tags.length > 5 && (
+              <span style={styles.tagMore}>+{row.tags.length - 5}</span>
             )}
           </div>
         ),
@@ -1060,6 +1070,27 @@ const styles: Record<string, CSSProperties> = {
     fontSize: '11px',
     fontWeight: 500,
     borderRadius: '4px',
+    flexShrink: 0,
+  },
+  // WO-O4O-KPA-CONTENT-LIST-TAG-FIELD-AND-DISPLAY-V1: 태그 chip (단순 표시)
+  tagChip: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    padding: '2px 8px',
+    fontSize: '11px',
+    fontWeight: 500,
+    background: '#EFF6FF',
+    color: '#1D4ED8',
+    border: '1px solid #BFDBFE',
+    borderRadius: '999px',
+    flexShrink: 0,
+  },
+  tagMore: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    fontSize: '11px',
+    fontWeight: 500,
+    color: '#6B7280',
     flexShrink: 0,
   },
   viewBtn: {

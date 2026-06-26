@@ -68,6 +68,10 @@ export class StoreExecutionAsset {
   @Column({ name: 'is_active', type: 'boolean', default: true })
   isActive!: boolean;
 
+  // WO-O4O-KPA-CONTENT-LIST-TAG-FIELD-AND-DISPLAY-V1: 태그 저장/표시 기반 (string[]).
+  @Column({ name: 'tags', type: 'jsonb', default: () => "'[]'::jsonb" })
+  tags!: string[];
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 
