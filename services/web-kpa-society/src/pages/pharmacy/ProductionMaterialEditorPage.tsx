@@ -26,13 +26,17 @@
  *   - 저장 후 → /store/library/production-materials 이동
  */
 
-import { useState, useCallback, type CSSProperties } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft, Save, FileText } from 'lucide-react';
+import { useState, useCallback, useEffect, type CSSProperties } from 'react';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { ArrowLeft, Save, FileText, Loader2 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { RichTextEditor } from '@o4o/content-editor';
 import type { EditorContent } from '@o4o/content-editor';
-import { createStoreExecutionAsset } from '../../api/storeExecutionAssets';
+import {
+  createStoreExecutionAsset,
+  getStoreExecutionAsset,
+  updateStoreExecutionAsset,
+} from '../../api/storeExecutionAssets';
 import { getAccessToken } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
 import { PRODUCTION_TARGET_CATALOG, type ProductionTarget } from './productionTargets';
@@ -62,29 +66,73 @@ export default function ProductionMaterialEditorPage() {
   const location = useLocation();
   const state = (location.state as EditorPageState | null) ?? {};
 
+  // WO-O4O-KPA-STORE-LIBRARY-EXECUTION-ASSET-EDIT-ACTION-V1:
+  //   :id 가 있으면 기존 콘텐츠형 제작 자료(store_execution_assets) 단건 편집 모드.
+  //   같은 row 를 update 하므로 id 불변 → 이 자산을 참조하는 QR(library_item_id)은 그대로 유지된다.
+  const { id: editId } = useParams<{ id?: string }>();
+  const isEditMode = !!editId;
+
   // WO-O4O-STORE-PRODUCTION-TEMPLATE-REGISTRY-V1:
   //   generatedHtml 우선. 없을 때 template.starterHtml fallback.
   //   둘 다 없으면 빈 editor (기존 동작).
   const selectedTemplate = state.selectedTemplateId ? findTemplate(state.selectedTemplateId) : undefined;
-  const initialHtml = state.generatedHtml ?? selectedTemplate?.starterHtml ?? '';
+  const createInitialHtml = state.generatedHtml ?? selectedTemplate?.starterHtml ?? '';
 
   // WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-DIRECT-CREATE-V1:
   //   AI 결과/콘텐츠 출처 없이 빈 상태로 진입한 경우(처음부터 만들기) 헤더 문구를 맞춘다.
-  const isFromScratch = !state.generatedHtml && !selectedTemplate && !state.sourceMetadata;
+  const isFromScratch = !isEditMode && !state.generatedHtml && !selectedTemplate && !state.sourceMetadata;
   // WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-SOURCE-LOAD-FIX-V1:
   //   기존 자료(운영자 콘텐츠/내 제작자료)를 본문째 불러온 경우 — AI 초안이 아니므로 헤더를 구분.
   const sourceOrigin = state.sourceMetadata?.sourceOrigin;
   const isFromExistingSource = sourceOrigin === 'content-hub' || sourceOrigin === 'production-copy';
-  const headerTitle = isFromScratch
-    ? '새 제작 자료 작성'
-    : isFromExistingSource
-      ? '제작 자료 편집'
-      : 'AI 제작 자료 초안 편집';
+  const headerTitle = isEditMode
+    ? '제작 자료 편집'
+    : isFromScratch
+      ? '새 제작 자료 작성'
+      : isFromExistingSource
+        ? '제작 자료 편집'
+        : 'AI 제작 자료 초안 편집';
 
   const [title, setTitle] = useState(state.title ?? '');
   const [selectedType, setSelectedType] = useState<ProductionTarget | null>(null);
-  const [editorContent, setEditorContent] = useState<EditorContent>({ html: initialHtml });
+  const [editorContent, setEditorContent] = useState<EditorContent>({ html: createInitialHtml });
   const [saving, setSaving] = useState(false);
+
+  // 편집 모드: 본문 로드 전까지 editor 를 렌더하지 않아 RichTextEditor 초기값이 정확히 주입되게 한다.
+  const [loading, setLoading] = useState(isEditMode);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [editorInitialHtml, setEditorInitialHtml] = useState(createInitialHtml);
+
+  useEffect(() => {
+    if (!editId) return;
+    let cancelled = false;
+    setLoading(true);
+    setLoadError(null);
+    (async () => {
+      try {
+        const res = await getStoreExecutionAsset(editId);
+        if (cancelled) return;
+        const asset = res.data;
+        const html = asset.htmlContent ?? '';
+        setTitle(asset.title ?? '');
+        setEditorInitialHtml(html);
+        setEditorContent({ html });
+        // 콘텐츠형이 아닌 자산은 본문 편집 대상이 아님 — 방어적으로 안내 후 목록 복귀.
+        if (asset.assetType !== 'content') {
+          toast.error('이 자료는 본문 편집을 지원하지 않습니다.');
+          navigate('/store/library/contents', { replace: true });
+          return;
+        }
+      } catch {
+        if (!cancelled) setLoadError('제작 자료를 불러올 수 없습니다.');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [editId, navigate]);
 
   const aiHeaders = useCallback((): Record<string, string> | undefined => {
     const token = getAccessToken();
@@ -108,28 +156,60 @@ export default function ProductionMaterialEditorPage() {
 
     setSaving(true);
     try {
-      await createStoreExecutionAsset({
-        title: title.trim(),
-        assetType: 'content',
-        sourceType: 'generated',
-        category: selectedType ?? undefined,
-        htmlContent: html,
-        description: state.sourceMetadata?.sourceTitle
-          ? `출처: ${state.sourceMetadata.sourceTitle}`
-          : undefined,
-      });
-      toast.success('제작 자료가 저장되었습니다.');
-      navigate('/store/library/production-materials');
+      if (isEditMode && editId) {
+        // WO-O4O-KPA-STORE-LIBRARY-EXECUTION-ASSET-EDIT-ACTION-V1:
+        //   같은 store_execution_assets row 를 update — id/organization_id/asset_type 보존.
+        //   이 자산을 참조하는 QR(library_item_id)은 무변경, 공개 랜딩은 수정된 최신 본문을 표시.
+        await updateStoreExecutionAsset(editId, {
+          title: title.trim(),
+          htmlContent: html,
+          ...(selectedType ? { category: selectedType } : {}),
+        });
+        toast.success('제작 자료가 저장되었습니다.');
+        navigate('/store/library/contents');
+      } else {
+        await createStoreExecutionAsset({
+          title: title.trim(),
+          assetType: 'content',
+          sourceType: 'generated',
+          category: selectedType ?? undefined,
+          htmlContent: html,
+          description: state.sourceMetadata?.sourceTitle
+            ? `출처: ${state.sourceMetadata.sourceTitle}`
+            : undefined,
+        });
+        toast.success('제작 자료가 저장되었습니다.');
+        navigate('/store/library/production-materials');
+      }
     } catch {
       toast.error('저장에 실패했습니다. 다시 시도해 주세요.');
     } finally {
       setSaving(false);
     }
-  }, [title, selectedType, editorContent, state.sourceMetadata, navigate]);
+  }, [title, selectedType, editorContent, state.sourceMetadata, navigate, isEditMode, editId]);
 
   const handleCancel = useCallback(() => {
     navigate(-1);
   }, [navigate]);
+
+  // WO-O4O-KPA-STORE-LIBRARY-EXECUTION-ASSET-EDIT-ACTION-V1: 편집 모드 본문 로드 중/실패 처리
+  if (isEditMode && loading) {
+    return (
+      <div style={{ ...styles.page, alignItems: 'center', paddingTop: '80px' }}>
+        <Loader2 size={20} style={{ color: colors.neutral400, animation: 'spin 1s linear infinite' }} />
+      </div>
+    );
+  }
+  if (isEditMode && loadError) {
+    return (
+      <div style={{ ...styles.page, alignItems: 'center', paddingTop: '80px', gap: '12px' }}>
+        <p style={{ color: colors.neutral600, fontSize: '14px' }}>{loadError}</p>
+        <button onClick={() => navigate('/store/library/contents')} style={styles.cancelBtn}>
+          내 자료함 콘텐츠로 돌아가기
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div style={styles.page}>
@@ -213,7 +293,7 @@ export default function ProductionMaterialEditorPage() {
       {/* Editor */}
       <div style={styles.editorWrap}>
         <RichTextEditor
-          value={initialHtml}
+          value={editorInitialHtml}
           onChange={handleChange}
           placeholder="AI가 정리한 내용을 편집하거나, 직접 내용을 입력하세요."
           minHeight="520px"

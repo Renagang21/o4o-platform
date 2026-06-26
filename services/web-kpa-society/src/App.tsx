@@ -996,6 +996,8 @@ function App() {
             <Route path="library/production-materials" element={<StoreProductionMaterialsPage />} />
             {/* WO-O4O-STORE-PRODUCTION-MATERIALS-STANDARD-EDITOR-APPLY-V1: 제작 자료 편집기 */}
             <Route path="library/production-materials/new" element={<ProductionMaterialEditorPage />} />
+            {/* WO-O4O-KPA-STORE-LIBRARY-EXECUTION-ASSET-EDIT-ACTION-V1: 콘텐츠형 제작 자료 단건 편집 (같은 row update, QR library_item_id 무변경) */}
+            <Route path="library/production-materials/:id/edit" element={<ProductionMaterialEditorPage />} />
             {/* WO-O4O-KPA-STORE-MATERIALS-AND-PRODUCTIONS-CANONICAL-ALIGN-V1: 내 제작물 / 상품 상세설명 */}
             <Route path="marketing/product-descriptions" element={<StoreProductDescriptionsPage />} />
             <Route path="commerce/local-products" element={<StoreLocalProductsPage />} />

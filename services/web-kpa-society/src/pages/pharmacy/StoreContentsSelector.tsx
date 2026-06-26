@@ -109,10 +109,12 @@ function toDocumentRow(it: LibraryContentItem): DocumentRow {
         : it.assetType === 'content'
           ? 'content'
           : 'cms';
-  // execution-asset(매장 제작 자료)는 전용 단건 뷰어가 없어 매장 제작 자료 목록에서 열람/관리한다.
+  // WO-O4O-KPA-STORE-LIBRARY-EXECUTION-ASSET-EDIT-ACTION-V1:
+  //   execution-asset(매장 제작 자료, asset_type='content')은 매장 소유 사본이므로 단건 편집기로 연결.
+  //   편집 저장은 같은 row update(id 불변) → 이 자산을 참조하는 QR(library_item_id)은 그대로 유지.
   const href =
     it.origin === 'execution-asset'
-      ? '/store/library/production-materials'
+      ? `/store/library/production-materials/${it.id}/edit`
       : it.origin === 'direct'
         ? `/store/content/direct/${it.id}`
         : `/view/${it.id}`;
@@ -511,19 +513,23 @@ function DocumentsSection({
         title: '액션',
         align: 'center' as const,
         width: '80px',
-        // WO-O4O-STORE-LIBRARY-CONTENTS-DIRECT-CONTENT-REENTRY-UX-V1:
-        // direct 콘텐츠는 편집 가능 — action label 을 "편집"으로 분기
-        render: (_v, row) => (
-          <a
-            href={row.href}
-            target={mode === 'modal' ? '_blank' : undefined}
-            rel={mode === 'modal' ? 'noreferrer' : undefined}
-            style={styles.viewBtn}
-            aria-label={row.origin === 'direct' ? '콘텐츠 편집' : row.origin === 'execution-asset' ? '제작 자료에서 열기' : '자료 보기'}
-          >
-            {row.origin === 'direct' ? '편집' : row.origin === 'execution-asset' ? '열기' : '보기'}
-          </a>
-        ),
+        // WO-O4O-STORE-LIBRARY-CONTENTS-DIRECT-CONTENT-REENTRY-UX-V1: direct 콘텐츠는 편집 가능
+        // WO-O4O-KPA-STORE-LIBRARY-EXECUTION-ASSET-EDIT-ACTION-V1:
+        //   execution-asset(매장 사본)도 편집 가능 — "열기" → "편집". snapshot 만 "보기" 유지.
+        render: (_v, row) => {
+          const isEditable = row.origin === 'direct' || row.origin === 'execution-asset';
+          return (
+            <a
+              href={row.href}
+              target={mode === 'modal' ? '_blank' : undefined}
+              rel={mode === 'modal' ? 'noreferrer' : undefined}
+              style={styles.viewBtn}
+              aria-label={isEditable ? '콘텐츠 편집' : '자료 보기'}
+            >
+              {isEditable ? '편집' : '보기'}
+            </a>
+          );
+        },
       },
     ],
     [mode],

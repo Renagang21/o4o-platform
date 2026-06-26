@@ -98,6 +98,35 @@ export function createStoreExecutionAssetsController(
     }),
   );
 
+  // ─── GET /store/assets/:id — 자산 단건 조회 (org 격리) ──────
+  // WO-O4O-KPA-STORE-LIBRARY-EXECUTION-ASSET-EDIT-ACTION-V1:
+  //   콘텐츠형 제작 자료(execution-asset) 단건 편집 화면이 본문(htmlContent)을
+  //   직접링크/새로고침에서도 로드할 수 있도록 read-only 단건 조회를 추가.
+  //   PUT/DELETE 와 동일하게 { id, organizationId } 로 소유권 격리 — 다른 매장 자료 조회 차단.
+  router.get(
+    '/store/assets/:id',
+    requireAuth,
+    requirePharmacyOwner,
+    asyncHandler(async (req: Request, res: Response) => {
+      const organizationId = (req as any).organizationId;
+      const { id } = req.params;
+
+      const item = await assetsRepo.findOne({
+        where: { id, organizationId },
+      });
+
+      if (!item) {
+        res.status(404).json({
+          success: false,
+          error: { code: 'ASSET_NOT_FOUND', message: 'Asset not found' },
+        });
+        return;
+      }
+
+      res.json({ success: true, data: item });
+    }),
+  );
+
   // ─── GET /store/asset-derivations — 원본↔파생 관계 조회 ──────
   // WO-KPA-STORE-ASSET-DERIVATION-TABLE-V1:
   //   derivedKind+derivedId (결과물 기준 원본 역추적) 또는
