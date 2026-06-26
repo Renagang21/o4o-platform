@@ -265,6 +265,20 @@ export interface TabletKioskPageProps {
    * 본 패키지는 자체 minimal player 만 제공 (signage runtime 미사용).
    */
   idlePlaylist?: IdlePlaylistItem[];
+  /**
+   * 매장 전시 설정(WO-O4O-KPA-TABLET-DISPLAY-SETTINGS-V1, opt-in).
+   * undefined / 각 필드 undefined 면 기존 동작 유지(전부 표시, idle 기본 5s).
+   * 가격/QR/상담버튼 노출 + idle 전환 시간을 매장이 제어.
+   */
+  displaySettings?: TabletKioskDisplaySettings;
+}
+
+export interface TabletKioskDisplaySettings {
+  showPrice?: boolean;
+  showQr?: boolean;
+  showConsultationButton?: boolean;
+  autoSlideSeconds?: number;
+  idleSlideSeconds?: number;
 }
 
 export function TabletKioskPage({
@@ -272,6 +286,7 @@ export function TabletKioskPage({
   showQrBadge = false,
   idleTimeoutMs,
   idlePlaylist,
+  displaySettings,
 }: TabletKioskPageProps) {
   const { slug } = useParams<{ slug: string }>();
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -482,9 +497,11 @@ export function TabletKioskPage({
               <span style={styles.categoryBadge}>{selectedProduct.category}</span>
             )}
             <h2 style={{ fontSize: '24px', fontWeight: 700, margin: '8px 0' }}>{selectedProduct.name}</h2>
-            <p style={{ fontSize: '22px', fontWeight: 700, color: '#2563eb', margin: '0 0 16px' }}>
-              {selectedProduct.price ? formatPrice(selectedProduct.price) : selectedProduct.priceDisplay || '가격 문의'}
-            </p>
+            {displaySettings?.showPrice !== false && (
+              <p style={{ fontSize: '22px', fontWeight: 700, color: '#2563eb', margin: '0 0 16px' }}>
+                {selectedProduct.price ? formatPrice(selectedProduct.price) : selectedProduct.priceDisplay || '가격 문의'}
+              </p>
+            )}
             {selectedProduct.description && (
               <ContentRenderer
                 html={selectedProduct.description}
@@ -537,7 +554,7 @@ export function TabletKioskPage({
           >
             돌아가기
           </button>
-          {!isLocal && (
+          {!isLocal && displaySettings?.showConsultationButton !== false && (
             <button
               onClick={handleSubmitInterest}
               disabled={submitting}
@@ -560,6 +577,7 @@ export function TabletKioskPage({
       <IdleOverlay
         items={idlePlaylist ?? []}
         onUserInteraction={() => dispatch({ type: 'IDLE_EXIT' })}
+        defaultDurationMs={displaySettings?.idleSlideSeconds ? displaySettings.idleSlideSeconds * 1000 : undefined}
       />
     );
   }
@@ -571,7 +589,7 @@ export function TabletKioskPage({
       <div style={styles.header}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <h1 style={{ fontSize: '20px', fontWeight: 700 }}>상품 안내</h1>
-          {showQrBadge && (
+          {showQrBadge && displaySettings?.showQr !== false && (
             <span style={{ fontSize: '11px', fontWeight: 600, backgroundColor: '#f0fdf4', color: '#16a34a', padding: '2px 8px', borderRadius: '4px' }}>
               QR 코드로 접속
             </span>
@@ -606,9 +624,11 @@ export function TabletKioskPage({
                 </div>
                 <div style={styles.productInfo}>
                   <span style={styles.productName}>{p.name}</span>
-                  <span style={styles.productPrice}>
-                    {p.price ? formatPrice(p.price) : p.priceDisplay || '가격 문의'}
-                  </span>
+                  {displaySettings?.showPrice !== false && (
+                    <span style={styles.productPrice}>
+                      {p.price ? formatPrice(p.price) : p.priceDisplay || '가격 문의'}
+                    </span>
+                  )}
                 </div>
                 {p.type === 'local' && (
                   <div style={styles.localBadge}>자체</div>
@@ -632,21 +652,24 @@ export function TabletKioskPage({
 interface IdleOverlayProps {
   items: IdlePlaylistItem[];
   onUserInteraction: () => void;
+  /** 항목별 durationMs 미지정 시 적용할 매장 전시 설정 기본 전환 시간(ms). 미지정 시 5s. */
+  defaultDurationMs?: number;
 }
 
-function IdleOverlay({ items, onUserInteraction }: IdleOverlayProps) {
+function IdleOverlay({ items, onUserInteraction, defaultDurationMs }: IdleOverlayProps) {
   const [index, setIndex] = useState(0);
   const safeIndex = items.length > 0 ? index % items.length : 0;
   const current = items.length > 0 ? items[safeIndex] : null;
 
   // image 항목 자동 진행 (video 는 onEnded 로 진행)
+  // 항목별 durationMs 우선 → 매장 전시 설정(defaultDurationMs) → 패키지 기본값
   useEffect(() => {
     if (!current || current.type !== 'image' || items.length <= 1) return;
     const t = setTimeout(() => {
       setIndex((i) => (i + 1) % items.length);
-    }, current.durationMs ?? DEFAULT_IDLE_IMAGE_DURATION_MS);
+    }, current.durationMs ?? defaultDurationMs ?? DEFAULT_IDLE_IMAGE_DURATION_MS);
     return () => clearTimeout(t);
-  }, [current, items.length]);
+  }, [current, items.length, defaultDurationMs]);
 
   return (
     <div

@@ -81,6 +81,34 @@ async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
   return response.json();
 }
 
+// ==================== Display Settings (WO-O4O-KPA-TABLET-DISPLAY-SETTINGS-V1) ====================
+
+export interface TabletDisplaySettings {
+  showPrice: boolean;
+  showQr: boolean;
+  showConsultationButton: boolean;
+  /** 0 = 사용 안 함, 그 외 5/10/15/30 */
+  autoSlideSeconds: number;
+  idleSlideSeconds: number;
+}
+
+export async function fetchTabletDisplaySettings(): Promise<TabletDisplaySettings> {
+  const res = await request<{ success: boolean; data: TabletDisplaySettings }>(
+    `${BASE}/tablet-display-settings`,
+  );
+  return res.data;
+}
+
+export async function saveTabletDisplaySettings(
+  settings: TabletDisplaySettings,
+): Promise<TabletDisplaySettings> {
+  const res = await request<{ success: boolean; data: TabletDisplaySettings }>(
+    `${BASE}/tablet-display-settings`,
+    { method: 'PUT', body: JSON.stringify(settings) },
+  );
+  return res.data;
+}
+
 // ==================== API ====================
 
 export async function fetchTablets(): Promise<Tablet[]> {

@@ -547,6 +547,88 @@ export function createStoreTabletRoutes(
     }
   }));
 
+  // ─── Display Settings (WO-O4O-KPA-TABLET-DISPLAY-SETTINGS-V1) ──────────
+  // 매장(organization) 공통 타블렛 전시 설정. /tablets/:id 충돌을 피해 별도 세그먼트 사용.
+  // 가격/QR/상담버튼 노출 + 자동 넘김/idle 전환 시간. 주문/결제와 무관(전시·안내 노출 규칙).
+
+  const DISPLAY_SETTINGS_DEFAULT = {
+    showPrice: true,
+    showQr: true,
+    showConsultationButton: true,
+    autoSlideSeconds: 10,
+    idleSlideSeconds: 10,
+  };
+
+  /** GET /tablet-display-settings — 매장 전시 설정 조회(없으면 기본값) */
+  router.get('/tablet-display-settings', withStoreAuth(async (_req, res, organizationId) => {
+    try {
+      const rows = await dataSource.query(
+        `SELECT show_price, show_qr, show_consultation_button, auto_slide_seconds, idle_slide_seconds
+         FROM store_tablet_display_settings WHERE organization_id = $1 LIMIT 1`,
+        [organizationId],
+      );
+      const r = rows?.[0];
+      res.json({
+        success: true,
+        data: r
+          ? {
+              showPrice: r.show_price,
+              showQr: r.show_qr,
+              showConsultationButton: r.show_consultation_button,
+              autoSlideSeconds: r.auto_slide_seconds,
+              idleSlideSeconds: r.idle_slide_seconds,
+            }
+          : { ...DISPLAY_SETTINGS_DEFAULT },
+      });
+    } catch (error: any) {
+      console.error('[StoreTablet] GET /tablet-display-settings error:', error);
+      res.status(500).json({ success: false, error: 'Failed to fetch display settings', code: 'INTERNAL_ERROR' });
+    }
+  }));
+
+  /** PUT /tablet-display-settings — 매장 전시 설정 저장(upsert) */
+  router.put('/tablet-display-settings', withStoreAuth(async (req, res, organizationId) => {
+    try {
+      const b = req.body ?? {};
+      const AUTO_ALLOWED = [0, 5, 10, 15, 30];
+      const IDLE_ALLOWED = [5, 10, 15, 30];
+      const showPrice = b.showPrice !== false;
+      const showQr = b.showQr !== false;
+      const showConsultationButton = b.showConsultationButton !== false;
+      const autoSlideSeconds = AUTO_ALLOWED.includes(Number(b.autoSlideSeconds)) ? Number(b.autoSlideSeconds) : 10;
+      const idleSlideSeconds = IDLE_ALLOWED.includes(Number(b.idleSlideSeconds)) ? Number(b.idleSlideSeconds) : 10;
+
+      const rows = await dataSource.query(
+        `INSERT INTO store_tablet_display_settings
+           (organization_id, show_price, show_qr, show_consultation_button, auto_slide_seconds, idle_slide_seconds, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, NOW())
+         ON CONFLICT (organization_id) DO UPDATE SET
+           show_price = EXCLUDED.show_price,
+           show_qr = EXCLUDED.show_qr,
+           show_consultation_button = EXCLUDED.show_consultation_button,
+           auto_slide_seconds = EXCLUDED.auto_slide_seconds,
+           idle_slide_seconds = EXCLUDED.idle_slide_seconds,
+           updated_at = NOW()
+         RETURNING show_price, show_qr, show_consultation_button, auto_slide_seconds, idle_slide_seconds`,
+        [organizationId, showPrice, showQr, showConsultationButton, autoSlideSeconds, idleSlideSeconds],
+      );
+      const r = rows[0];
+      res.json({
+        success: true,
+        data: {
+          showPrice: r.show_price,
+          showQr: r.show_qr,
+          showConsultationButton: r.show_consultation_button,
+          autoSlideSeconds: r.auto_slide_seconds,
+          idleSlideSeconds: r.idle_slide_seconds,
+        },
+      });
+    } catch (error: any) {
+      console.error('[StoreTablet] PUT /tablet-display-settings error:', error);
+      res.status(500).json({ success: false, error: 'Failed to save display settings', code: 'INTERNAL_ERROR' });
+    }
+  }));
+
   // ─── Product Pool ──────────────────────────────────
 
   /**

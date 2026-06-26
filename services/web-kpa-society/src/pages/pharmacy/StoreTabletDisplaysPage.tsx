@@ -34,8 +34,10 @@ import {
   saveTabletDisplays,
   fetchTabletIdlePlaylist,
   saveTabletIdlePlaylist,
+  fetchTabletDisplaySettings,
+  saveTabletDisplaySettings,
 } from '../../api/tabletDisplays';
-import type { Tablet as TabletType, ProductPool } from '../../api/tabletDisplays';
+import type { Tablet as TabletType, ProductPool, TabletDisplaySettings } from '../../api/tabletDisplays';
 import { DataTable, type Column, ActionBar } from '@o4o/ui';
 
 // ==================== Types ====================
@@ -73,6 +75,38 @@ export default function StoreTabletDisplaysPage() {
   const [idleItems, setIdleItems] = useState<IdlePlaylistItem[]>([]);
   const [idleInitial, setIdleInitial] = useState<IdlePlaylistItem[]>([]);
   const [savingIdle, setSavingIdle] = useState(false);
+
+  // Display settings state (WO-O4O-KPA-TABLET-DISPLAY-SETTINGS-V1) — 매장 공통
+  const [settings, setSettings] = useState<TabletDisplaySettings>({
+    showPrice: true,
+    showQr: true,
+    showConsultationButton: true,
+    autoSlideSeconds: 10,
+    idleSlideSeconds: 10,
+  });
+  const [savingSettings, setSavingSettings] = useState(false);
+
+  // Load display settings (once)
+  useEffect(() => {
+    let cancelled = false;
+    fetchTabletDisplaySettings()
+      .then((s) => { if (!cancelled) setSettings(s); })
+      .catch(() => { /* 기본값 유지 */ });
+    return () => { cancelled = true; };
+  }, []);
+
+  const handleSaveSettings = useCallback(async () => {
+    setSavingSettings(true);
+    try {
+      const saved = await saveTabletDisplaySettings(settings);
+      setSettings(saved);
+      setToast({ type: 'success', message: '전시 설정이 저장되었습니다.' });
+    } catch {
+      setToast({ type: 'error', message: '전시 설정 저장에 실패했습니다.' });
+    } finally {
+      setSavingSettings(false);
+    }
+  }, [settings]);
 
   // Tablet registration form (WO-O4O-STORE-TABLET-REGISTER-UI-V1)
   const [showRegisterForm, setShowRegisterForm] = useState(false);
@@ -664,6 +698,85 @@ export default function StoreTabletDisplaysPage() {
                   disabled={savingIdle}
                   fetchLibraryAssets={fetchIdleLibraryAssets}
                 />
+              </div>
+            </div>
+          )}
+
+          {/* 전시 설정 (WO-O4O-KPA-TABLET-DISPLAY-SETTINGS-V1) — 매장 공통 */}
+          {!loadingPool && (
+            <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+              <div className="px-4 py-3 border-b bg-slate-50 flex items-center justify-between">
+                <h3 className="text-sm font-bold text-slate-700">전시 설정</h3>
+                <button
+                  onClick={handleSaveSettings}
+                  disabled={savingSettings}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-teal-600 text-white text-xs font-medium rounded-lg hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {savingSettings ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                  전시 설정 저장
+                </button>
+              </div>
+              <div className="p-4 space-y-4">
+                <p className="text-xs text-slate-500">
+                  타블렛 고객 화면에서 가격, QR, 상담 버튼, 자동 전환 방식을 설정합니다. 매장의 모든 타블렛에 공통 적용됩니다.
+                </p>
+
+                {/* 토글: 가격 / QR / 상담 버튼 */}
+                {([
+                  { key: 'showPrice', label: '가격 표시', desc: '타블렛 고객 화면에 제품 가격을 표시합니다.' },
+                  { key: 'showQr', label: 'QR 표시', desc: '제품 상세·모바일 확인용 QR을 표시합니다.' },
+                  { key: 'showConsultationButton', label: '상담 요청 버튼', desc: '상담 요청은 주문이 아니며, 고객이 관심을 표시하면 약국 근무자에게 알림이 전송됩니다.' },
+                ] as const).map(({ key, label, desc }) => (
+                  <label key={key} className="flex items-start justify-between gap-3 cursor-pointer">
+                    <div className="min-w-0">
+                      <span className="text-sm font-medium text-slate-800">{label}</span>
+                      <p className="text-xs text-slate-400 mt-0.5">{desc}</p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={settings[key]}
+                      onChange={(e) => setSettings((s) => ({ ...s, [key]: e.target.checked }))}
+                      className="mt-1 h-4 w-4 flex-shrink-0 rounded border-slate-300 text-teal-600 focus:ring-teal-500"
+                    />
+                  </label>
+                ))}
+
+                {/* 자동 넘김 시간 */}
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <span className="text-sm font-medium text-slate-800">자동 넘김 시간</span>
+                    <p className="text-xs text-slate-400 mt-0.5">제품·안내 화면이 자동으로 넘어가는 시간입니다.</p>
+                  </div>
+                  <select
+                    value={settings.autoSlideSeconds}
+                    onChange={(e) => setSettings((s) => ({ ...s, autoSlideSeconds: Number(e.target.value) }))}
+                    className="rounded-lg border border-slate-300 px-2 py-1.5 text-sm text-slate-700 focus:ring-teal-500"
+                  >
+                    <option value={0}>사용 안 함</option>
+                    <option value={5}>5초</option>
+                    <option value={10}>10초</option>
+                    <option value={15}>15초</option>
+                    <option value={30}>30초</option>
+                  </select>
+                </div>
+
+                {/* Idle 화면 전환 시간 */}
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <span className="text-sm font-medium text-slate-800">Idle 화면 전환 시간</span>
+                    <p className="text-xs text-slate-400 mt-0.5">사용하지 않을 때 재생되는 이미지·영상의 전환 시간입니다. (영상은 재생 시간 우선)</p>
+                  </div>
+                  <select
+                    value={settings.idleSlideSeconds}
+                    onChange={(e) => setSettings((s) => ({ ...s, idleSlideSeconds: Number(e.target.value) }))}
+                    className="rounded-lg border border-slate-300 px-2 py-1.5 text-sm text-slate-700 focus:ring-teal-500"
+                  >
+                    <option value={5}>5초</option>
+                    <option value={10}>10초</option>
+                    <option value={15}>15초</option>
+                    <option value={30}>30초</option>
+                  </select>
+                </div>
               </div>
             </div>
           )}

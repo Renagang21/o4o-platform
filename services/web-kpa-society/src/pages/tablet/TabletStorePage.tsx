@@ -22,12 +22,13 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { TabletKioskPage, type IdlePlaylistItem } from '@o4o/tablet-kiosk-core';
+import { TabletKioskPage, type IdlePlaylistItem, type TabletKioskDisplaySettings } from '@o4o/tablet-kiosk-core';
 import {
   fetchTabletProducts,
   submitTabletInterest,
   checkTabletInterestStatus,
   fetchTabletIdle,
+  fetchTabletSettings,
 } from '../../api/tablet';
 
 const IDLE_TIMEOUT_MS = 60_000;
@@ -38,6 +39,8 @@ export function TabletStorePage() {
   const fromQr = new URLSearchParams(window.location.search).get('from') === 'qr';
 
   const [idlePlaylist, setIdlePlaylist] = useState<IdlePlaylistItem[]>([]);
+  // WO-O4O-KPA-TABLET-DISPLAY-SETTINGS-V1: 매장 전시 설정 (가격/QR/상담/전환시간)
+  const [displaySettings, setDisplaySettings] = useState<TabletKioskDisplaySettings | undefined>(undefined);
 
   useEffect(() => {
     if (!slug) return;
@@ -45,6 +48,11 @@ export function TabletStorePage() {
       .then((items) => setIdlePlaylist(items))
       .catch(() => {
         // fetch 실패 시 placeholder 그대로. silent fail (kiosk 정상 동작 우선).
+      });
+    fetchTabletSettings(slug)
+      .then((s) => setDisplaySettings(s))
+      .catch(() => {
+        // fetch 실패 시 undefined → kiosk 기본 동작(전부 표시). silent fail.
       });
   }, [slug]);
 
@@ -58,6 +66,7 @@ export function TabletStorePage() {
       showQrBadge={fromQr}
       idleTimeoutMs={IDLE_TIMEOUT_MS}
       idlePlaylist={idlePlaylist}
+      displaySettings={displaySettings}
     />
   );
 }

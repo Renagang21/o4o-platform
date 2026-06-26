@@ -103,6 +103,23 @@ export function createStorePublicTabletRoutes(deps: {
 
       const source: 'tablet' | 'qr' = bodySource === 'qr' ? 'qr' : 'tablet';
 
+      // WO-O4O-KPA-TABLET-DISPLAY-SETTINGS-V1: 상담 버튼 OFF 방어.
+      //   타블렛 상담 버튼이 꺼진 매장에서는 타블렛 발신 상담 요청을 차단(403).
+      //   QR page 콘텐츠 상담(source='qr')은 별도 CTA 흐름이므로 적용하지 않음.
+      if (source === 'tablet') {
+        const settingsRows = await dataSource.query(
+          `SELECT show_consultation_button FROM store_tablet_display_settings WHERE organization_id = $1 LIMIT 1`,
+          [resolved.storeId],
+        );
+        if (settingsRows?.[0] && settingsRows[0].show_consultation_button === false) {
+          res.status(403).json({
+            success: false,
+            error: { code: 'CONSULTATION_DISABLED', message: '이 매장은 현재 타블렛 상담 요청을 받지 않습니다.' },
+          });
+          return;
+        }
+      }
+
       let resolvedMasterId: string | null = null;
       let productName: string;
 
@@ -316,6 +333,46 @@ export function createStorePublicTabletRoutes(deps: {
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch idle playlist' },
+      });
+    }
+  });
+
+  // GET /:slug/tablet/settings — 매장 전시 설정(공개). 공개 뷰어가 가격/QR/상담버튼/전환시간 반영에 사용.
+  // WO-O4O-KPA-TABLET-DISPLAY-SETTINGS-V1. 행이 없으면 기본값(전부 표시 / 10초).
+  router.get('/:slug/tablet/settings', async (req: Request, res: Response): Promise<void> => {
+    try {
+      const resolved = await resolvePublicStore(dataSource, req.params.slug, req, res);
+      if (!resolved) return;
+
+      const rows = await dataSource.query(
+        `SELECT show_price, show_qr, show_consultation_button, auto_slide_seconds, idle_slide_seconds
+         FROM store_tablet_display_settings WHERE organization_id = $1 LIMIT 1`,
+        [resolved.storeId],
+      );
+      const r = rows?.[0];
+      res.json({
+        success: true,
+        data: r
+          ? {
+              showPrice: r.show_price,
+              showQr: r.show_qr,
+              showConsultationButton: r.show_consultation_button,
+              autoSlideSeconds: r.auto_slide_seconds,
+              idleSlideSeconds: r.idle_slide_seconds,
+            }
+          : {
+              showPrice: true,
+              showQr: true,
+              showConsultationButton: true,
+              autoSlideSeconds: 10,
+              idleSlideSeconds: 10,
+            },
+      });
+    } catch (error: any) {
+      console.error('[UnifiedStore] GET /:slug/tablet/settings error:', error);
+      res.status(500).json({
+        success: false,
+        error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch tablet settings' },
       });
     }
   });

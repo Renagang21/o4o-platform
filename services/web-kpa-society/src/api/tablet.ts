@@ -135,3 +135,25 @@ export async function fetchTabletIdle(slug: string): Promise<IdlePlaylistItem[]>
   return Array.isArray(json.data?.items) ? json.data.items : [];
 }
 
+// ==================== Display Settings (WO-O4O-KPA-TABLET-DISPLAY-SETTINGS-V1) ====================
+
+export interface TabletDisplaySettings {
+  showPrice: boolean;
+  showQr: boolean;
+  showConsultationButton: boolean;
+  autoSlideSeconds: number;
+  idleSlideSeconds: number;
+}
+
+/**
+ * 매장 전시 설정 조회(공개). 가격/QR/상담버튼 노출 + 전환 시간.
+ * 에러 시 호출자가 기본값(전부 표시)으로 처리.
+ */
+export async function fetchTabletSettings(slug: string): Promise<TabletDisplaySettings> {
+  const url = `${getApiBase()}/${encodeURIComponent(slug)}/tablet/settings`;
+  const res = await fetch(url);
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error?.message || 'Failed to fetch tablet settings');
+  return json.data;
+}
+
