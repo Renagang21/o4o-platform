@@ -39,6 +39,36 @@ function sanitizeHtml(input: string): string {
     .replace(/\bon\w+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, '');
 }
 
+/**
+ * WO-O4O-KPA-STORE-LOCAL-PRODUCT-PRICE-INPUT-HARDENING-V1
+ * price_display 는 numeric(12,2) 컬럼이다. 표시 가격으로 "10,000원"·"₩10000" 같은
+ * 비숫자 포함 문자열이 들어오면 Postgres numeric 캐스팅 실패로 500 이 났다.
+ *   - 빈 값/null → null (가격 미지정)
+ *   - 쉼표·통화기호(₩/원)·공백은 정제 후 숫자로 사용
+ *   - 정제 후에도 숫자가 아니면 ok:false → 호출부에서 400 VALIDATION_ERROR
+ *   - 음수는 0 미만 불가(표시 가격) → ok:false
+ */
+function normalizePriceDisplay(raw: unknown): { ok: true; value: number | null } | { ok: false } {
+  if (raw == null || raw === '') return { ok: true, value: null };
+  if (typeof raw === 'number') {
+    return Number.isFinite(raw) && raw >= 0 ? { ok: true, value: raw } : { ok: false };
+  }
+  if (typeof raw === 'string') {
+    const cleaned = raw.replace(/[,\s₩원]/g, '');
+    if (cleaned === '') return { ok: false };
+    if (!/^\d+(\.\d+)?$/.test(cleaned)) return { ok: false };
+    const n = Number(cleaned);
+    return Number.isFinite(n) ? { ok: true, value: n } : { ok: false };
+  }
+  return { ok: false };
+}
+
+const PRICE_DISPLAY_ERROR = {
+  success: false as const,
+  error: '표시 가격은 숫자만 입력할 수 있습니다. (예: 10000)',
+  code: 'VALIDATION_ERROR' as const,
+};
+
 // ─────────────────────────────────────────────────────
 // Controller
 // ─────────────────────────────────────────────────────
@@ -193,6 +223,13 @@ export function createStoreLocalProductRoutes(
         return;
       }
 
+      // WO-O4O-KPA-STORE-LOCAL-PRODUCT-PRICE-INPUT-HARDENING-V1: numeric 캐스팅 500 방지
+      const priceResult = normalizePriceDisplay(priceDisplay);
+      if (!priceResult.ok) {
+        res.status(400).json(PRICE_DISPLAY_ERROR);
+        return;
+      }
+
       const repo = dataSource.getRepository(StoreLocalProduct);
       const product = repo.create({
         organizationId,
@@ -200,7 +237,7 @@ export function createStoreLocalProductRoutes(
         description: description || null,
         images: Array.isArray(images) ? images : [],
         category: category || null,
-        priceDisplay: priceDisplay != null ? String(priceDisplay) : null,
+        priceDisplay: priceResult.value != null ? String(priceResult.value) : null,
         sortOrder: typeof sortOrder === 'number' ? sortOrder : 0,
         isActive: true,
         summary: summary || null,
@@ -280,11 +317,20 @@ export function createStoreLocalProductRoutes(
         return;
       }
 
+      // WO-O4O-KPA-STORE-LOCAL-PRODUCT-PRICE-INPUT-HARDENING-V1: numeric 캐스팅 500 방지
+      if (priceDisplay !== undefined) {
+        const priceResult = normalizePriceDisplay(priceDisplay);
+        if (!priceResult.ok) {
+          res.status(400).json(PRICE_DISPLAY_ERROR);
+          return;
+        }
+        existing.priceDisplay = priceResult.value != null ? String(priceResult.value) : null;
+      }
+
       if (name !== undefined) existing.name = String(name).trim();
       if (description !== undefined) existing.description = description;
       if (images !== undefined) existing.images = Array.isArray(images) ? images : existing.images;
       if (category !== undefined) existing.category = category;
-      if (priceDisplay !== undefined) existing.priceDisplay = priceDisplay != null ? String(priceDisplay) : null;
       if (sortOrder !== undefined) existing.sortOrder = Number(sortOrder);
       if (isActive !== undefined) existing.isActive = Boolean(isActive);
       if (summary !== undefined) existing.summary = summary || null;
