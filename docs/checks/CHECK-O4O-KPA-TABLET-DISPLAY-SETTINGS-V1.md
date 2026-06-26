@@ -65,10 +65,15 @@
 |---|---|
 | tsc `web-kpa-society` / `web-k-cosmetics` / `api-server` | ✅ 전부 error 0 |
 | 배포 (web + api) | ✅ 둘 다 success (`dd581403b`). API 배포에 migration 자동 실행 포함 |
+| 14.1 관리 화면 전시 설정 영역 + 기존 기능 | ✅ PASS — '전시 설정' 카드(가격/QR/상담 토글 + 자동넘김/idle select) 렌더, 타블렛 목록/Idle/진열 picker 유지 |
+| 14.2 설정 저장/새로고침 유지 | ✅ PASS — 상담 OFF + 자동넘김 15초 저장(toast) → **새로고침 후 유지**(상담=false, 자동넘김 select=15) |
+| 14.3 공개 화면 반영 | ✅ PASS — 공개 `GET /stores/네뚜레-약국/tablet/settings` 가 저장값 반영(`showConsultationButton:false, autoSlideSeconds:15`). 공개 뷰어는 이 값을 opt-in prop 으로 소비(가격/QR 시각 토글은 demo 매장 진열 0건이라 데이터 경로로 검증) |
+| 14.4 상담 OFF API 방어(403) | ✅ PASS — 상담 OFF 상태에서 `POST /stores/네뚜레-약국/tablet/interest` → **403 CONSULTATION_DISABLED** ("이 매장은 현재 타블렛 상담 요청을 받지 않습니다.") |
+| 14.5 기존 기능 회귀 | ✅ PASS — 타블렛 목록/Idle/진열 picker/내 매장 제품 연결 정상 |
 | 14.6 온라인 판매 무변경 | ✅ (git diff) |
-| 14.1~14.5 브라우저 시각 smoke (관리 저장 / 공개 반영 / 상담 403 / 회귀) | ⬜ **보류** — Playwright 영속 프로필이 다른 Chrome 세션에 재점유되어 launch 실패(로컬 환경 제약). 프로필 해제 후 재검증 필요 |
 
-> 비고: tsc(kpa/kcos/api) 전부 통과 + web/api 배포 success. 공개 뷰어 변경은 opt-in prop(미지정 시 기존 동작)이라 KCos 회귀 위험 낮음. 관리 저장/공개 반영/상담 403 의 시각 확인만 프로필 점유로 보류.
+> 브라우저 smoke 실측(배포본 `dd581403b`, 2026-06-26, store-owner 로그인 + in-page API): 14.1~14.6 PASS. tsc(kpa/kcos/api) 통과 + web/api 배포 success. 공개 뷰어 변경은 opt-in prop(미지정 시 기존 동작)이라 KCos 무영향. **검증 후 데모 매장 설정은 기본값(상담 ON)으로 복구.**
+> 비고: 가격/QR 표시 OFF 의 **공개 뷰어 시각 hide** 는 demo 매장 진열 상품 0건이라 화면에서 직접 토글 확인 불가 — kiosk-core 조건부(`showPrice/showQr !== false`)는 코드+설정 전달 경로로 검증. 진열 상품 있는 매장에서 1회 시각 확인 권장(후속).
 
 ## 9. 남은 후속 과제
 
