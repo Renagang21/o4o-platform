@@ -55,6 +55,9 @@ interface DocumentRow {
   createdAt: string;
   lifecycleStatus: string | null;
   href: string;
+  // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-PDF-EXPORT-OPTIONS-V1:
+  //   인쇄용 PDF 본문 추출용 — 피드가 origin별 본문을 contentJson 에 포함(html/body/blocks).
+  contentJson: Record<string, unknown>;
 }
 
 interface LessonRow {
@@ -125,6 +128,7 @@ function toDocumentRow(it: LibraryContentItem): DocumentRow {
     createdAt: it.createdAt,
     lifecycleStatus: it.lifecycleStatus,
     href,
+    contentJson: it.contentJson || {},
   };
 }
 
@@ -421,7 +425,7 @@ function DocumentsSection({
     const key = Array.from(selected)[0];
     const row = rows.find((r) => r.selectionKey === key);
     if (!row) return;
-    setPdfTarget({ id: row.id, title: row.title, origin: row.origin });
+    setPdfTarget({ id: row.id, title: row.title, origin: row.origin, contentJson: row.contentJson });
   }, [selected, rows]);
 
   // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-STANDARD-TABLE-V1: @o4o/ui Column<T>

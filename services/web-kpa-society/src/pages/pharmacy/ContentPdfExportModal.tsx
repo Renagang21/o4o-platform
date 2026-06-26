@@ -18,16 +18,22 @@
 import { useEffect, useState, type CSSProperties } from 'react';
 import { Printer, X } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
-import { publishedAssetsApi, directContentApi } from '../../api/assetSnapshot';
-import { getStoreExecutionAsset } from '../../api/storeExecutionAssets';
 import { getPharmacyInfo, type PharmacyInfoData } from '../../api/pharmacyInfo';
 import { colors } from '../../styles/theme';
 
 // 호출 측에서 전달하는 선택 콘텐츠 (StoreContentsSelector DocumentRow 의 부분 집합)
+//
+// WO-O4O-KPA-STORE-LIBRARY-CONTENTS-PDF-EXPORT-OPTIONS-V1:
+//   본문은 /store-library/contents 피드가 origin별로 contentJson 에 이미 포함한다.
+//   - execution-asset: contentJson.html (= store_execution_assets.html_content)
+//   - direct          : contentJson.html (kpa_store_contents.content_json 의 html 키)
+//   - snapshot        : o4o_asset_snapshots.content_json 원본 (html/body/content/blocks)
+//   따라서 별도 단건 API 호출 없이 목록 contentJson 에서 본문을 추출한다.
 export interface PdfExportContent {
   id: string;
   title: string;
   origin: 'snapshot' | 'direct' | 'execution-asset';
+  contentJson: Record<string, unknown>;
 }
 
 interface PdfOptions {
@@ -121,7 +127,7 @@ export function ContentPdfExportModal({
     );
     setGenerating(true);
     try {
-      const bodyHtml = await fetchContentHtml(content, info?.organizationId);
+      const bodyHtml = contentJsonToHtml(content.contentJson);
       const printHtml = buildPrintHtml({
         contentTitle: content.title,
         bodyHtml,
@@ -141,7 +147,7 @@ export function ContentPdfExportModal({
       } catch {
         /* noop */
       }
-      toast.error(e?.message || 'PDF 생성에 실패했습니다. 콘텐츠 본문을 불러오지 못했습니다.');
+      toast.error(e?.message || 'PDF 생성에 실패했습니다.');
     } finally {
       setGenerating(false);
     }
@@ -280,32 +286,19 @@ export function ContentPdfExportModal({
   );
 }
 
-// ─── 본문 HTML 취득 (origin 별) ───────────────────────────────────────────────
+// ─── 본문 HTML 추출 (contentJson) ─────────────────────────────────────────────
 
-async function fetchContentHtml(
-  content: PdfExportContent,
-  organizationId?: string,
-): Promise<string> {
-  if (content.origin === 'execution-asset') {
-    const res = await getStoreExecutionAsset(content.id);
-    return (res?.data?.htmlContent || '').trim();
-  }
-  if (content.origin === 'direct') {
-    const res = await directContentApi.get(content.id);
-    return contentJsonToHtml(res?.data?.contentJson);
-  }
-  // snapshot — 공개 자산 단건 조회(orgId 필요)
-  if (!organizationId) {
-    throw new Error('매장 정보를 확인할 수 없어 콘텐츠를 불러오지 못했습니다.');
-  }
-  const res = await publishedAssetsApi.get(organizationId, content.id);
-  return contentJsonToHtml(res?.data?.contentJson);
-}
-
-// contentJson(blocks[] | body/content HTML) → HTML 문자열.
-// PrintContentPage 의 parseBlocks 와 동일한 해석 규칙.
+// /store-library/contents 피드의 contentJson 에서 본문 HTML 을 추출한다.
+// 우선순위: html(direct/execution + 일부 snapshot) → blocks[] → body/content → imageUrl.
 function contentJsonToHtml(json: Record<string, unknown> | undefined): string {
   if (!json) return '';
+
+  // 1) html 키 — execution-asset(html_content) / direct(content_json.html) / RichText snapshot
+  if (typeof json.html === 'string' && json.html.trim()) {
+    return json.html;
+  }
+
+  // 2) blocks[] — 구조화 콘텐츠(PrintContentPage parseBlocks 와 동일 해석)
   const blocks = Array.isArray(json.blocks) ? (json.blocks as Array<Record<string, unknown>>) : null;
   if (blocks && blocks.length > 0) {
     return blocks
@@ -323,7 +316,8 @@ function contentJsonToHtml(json: Record<string, unknown> | undefined): string {
       })
       .join('\n');
   }
-  // body/content 는 RichText HTML 그대로 사용
+
+  // 3) body/content RichText HTML + 단일 imageUrl
   const body =
     typeof json.body === 'string' ? json.body : typeof json.content === 'string' ? json.content : '';
   let html = body || '';
