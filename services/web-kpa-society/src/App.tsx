@@ -974,7 +974,17 @@ function App() {
             {/* WO-O4O-STORE-PRODUCTS-SERVICE-ROUTING-V1: 내 매장 상품 (ProductMaster + Listing)
                 WO-O4O-STORE-PRODUCTS-MANAGER-HEADING-PROP-ALIGNMENT-V1: OrganizationProductListing 기반
                 기본 O4O 주문 가능 상품 화면 — 포괄 heading "내 매장 상품" 대신 의미를 명시 주입. */}
-            <Route path="my-products" element={<PharmacyOwnerOnlyGuard><StoreProductsManagerPage title="O4O 주문 가능 상품" description="공급자 또는 운영자 승인 후 약국에서 반복 주문할 수 있는 O4O 공급 상품을 관리합니다." /></PharmacyOwnerOnlyGuard>} />
+            {/* WO-O4O-KPA-STORE-MY-PRODUCTS-REBUILD-AS-STORE-PRODUCT-BASE-V1:
+                /store/my-products = '내 매장 제품'(타블렛/QR/사이니지/자체 온라인몰 활용 제품 관리).
+                기존 'O4O 주문 가능 상품' 프레이밍 제거. route 유지, 공유 StoreProductsManagerPage 재사용(문구 prop 주입). */}
+            <Route path="my-products" element={<PharmacyOwnerOnlyGuard><StoreProductsManagerPage
+              title="내 매장 제품"
+              description="타블렛, QR, 사이니지, 자체 온라인몰 등 매장 서비스에 활용할 제품을 관리합니다."
+              registerButtonLabel="내 매장 제품 등록"
+              infoText="O4O 제품 또는 매장 자체 제품을 내 매장 제품으로 등록할 수 있습니다. 등록한 제품은 타블렛 전시, QR 안내, 사이니지, 자체 온라인몰 등에 연결해 활용할 수 있습니다."
+              emptyTitle="등록된 내 매장 제품이 없습니다"
+              emptyDescription="제품을 등록해 타블렛과 매장 안내 서비스에 활용해 주세요."
+            /></PharmacyOwnerOnlyGuard>} />
             {/* WO-O4O-STORE-HUB-LEGACY-LIST-CLEANUP-V1: suppliers 라우트 제거 (mock-only, /store-hub/b2b 와 redundant) */}
             <Route path="commerce/products/:productId/marketing" element={<ProductMarketingPage />} />
             {/* WO-O4O-AI-AUTO-POP-BUILDER-V1: 상품 POP 만들기 (AI prefill + 편집 + PDF) */}

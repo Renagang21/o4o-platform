@@ -266,9 +266,8 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       //   라벨만 '상품' → 'O4O 제품'(플랫폼 제공·신청·주문 가능 제품). '내 약국 제품'(자체 취급)과 구분.
       //   key/subPath/route/권한/기능 무변경. KPA 블록 한정(GP/KCos 무영향).
       { key: 'products', label: 'O4O 제품', subPath: '/commerce/products' },
-      // WO-O4O-KPA-STORE-MENU-ACTIVATION-RELABEL-AND-MY-PRODUCTS-MOVE-V1:
-      //   "내 약국 제품"을 활성화 그룹 → 상품·거래 그룹으로 이동(route 무변경 /my-products).
-      { key: 'my-products', label: '내 약국 제품', subPath: '/my-products' },
+      // WO-O4O-KPA-STORE-MY-PRODUCTS-REBUILD-AS-STORE-PRODUCT-BASE-V1:
+      //   '내 매장 제품'(/my-products)을 '타블렛' 그룹으로 이동(아래) — O4O 거래 영역과 분리.
       // WO-O4O-KPA-ONLINE-SALES-ORDER-MANAGEMENT-AND-BUYER-ORDER-RELABEL-V1:
       //   /commerce/orders 는 매장이 공급자에게 주문한 '구매/발주' 내역(buyer) → '발주 내역'으로 라벨 정비.
       //   고객에게 판매한 주문(seller)은 '온라인 판매 > 주문 관리'(/online-sales/orders)로 분리.
@@ -313,8 +312,13 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
     //   상담 요청은 요청 생성 시 매장 사용자 알림이 생성되고(WO-...-NOTIFICATION-WIRING-V1, smoke PASS),
     //   알림 클릭으로 /store/requests 처리 화면에 진입한다. → 사이드바 메뉴에서 '상담 요청' 제거.
     //   /store/requests route 는 hidden(URL 직접/알림 진입)으로 유지(App.tsx). 요청 테이블·API·처리 기능 불변.
-    { label: '고객 응대', items: [
-      { key: 'tablet-displays',  label: '태블릿',    subPath: '/commerce/tablet-displays' },
+    // WO-O4O-KPA-STORE-MY-PRODUCTS-REBUILD-AS-STORE-PRODUCT-BASE-V1 (KPA 블록 한정):
+    //   '고객 응대' → '타블렛' 그룹 개편. '내 매장 제품'(/my-products, 매장 서비스 활용 제품)을 최상단에 두고,
+    //   기존 태블릿 진열 화면(/commerce/tablet-displays)을 '타블렛 구성'으로 정렬. route/page 무변경.
+    //   '타블렛 구성' 하위 통합(위치별 타블렛/전시 설정)은 후속 별도 WO.
+    { label: '타블렛', items: [
+      { key: 'my-products',     label: '내 매장 제품', subPath: '/my-products' },
+      { key: 'tablet-displays', label: '타블렛 구성',  subPath: '/commerce/tablet-displays' },
     ]},
     // WO-O4O-FOREIGN-VISITOR-SALES-SUPPORT-MENU-GATE-V1: 판매 채널 확장 (유료 기능 게이트)
     { label: '판매 채널 확장', items: [

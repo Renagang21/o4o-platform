@@ -499,6 +499,16 @@ export interface StoreProductsManagerPageProps {
    */
   guideSlot?: ReactNode;
 
+  /**
+   * WO-O4O-KPA-STORE-MY-PRODUCTS-REBUILD-AS-STORE-PRODUCT-BASE-V1:
+   *   서비스별 사용자 문구 커스터마이즈(opt-in). 미지정 시 기존 문구 유지 →
+   *   기존 소비처(GP/KCos/Neture) 무영향. KPA 는 '내 매장 제품(매장 서비스 활용)' 프레이밍을 주입.
+   */
+  registerButtonLabel?: string;
+  infoText?: string;
+  emptyTitle?: string;
+  emptyDescription?: string;
+
 }
 
 export default function StoreProductsManagerPage({
@@ -507,6 +517,10 @@ export default function StoreProductsManagerPage({
   headerSlot,
   containerClassName = 'p-6',
   guideSlot,
+  registerButtonLabel = '내 매장 상품 등록',
+  infoText = '상품 정보(ProductMaster)를 검색하여 매장 상품으로 등록하세요. 등록 후 채널별 노출을 개별 제어할 수 있습니다.',
+  emptyTitle = '등록된 내 매장 상품이 없습니다',
+  emptyDescription = '상품을 검색하여 내 매장 상품으로 등록해 주세요.',
 }: StoreProductsManagerPageProps = {}) {
   const [activeModal, setActiveModal] = useState<ActiveModal>(null);
   const [selectedListing, setSelectedListing] = useState<StoreListingItem | null>(null);
@@ -689,7 +703,7 @@ export default function StoreProductsManagerPage({
           title={title}
           subtitle={description}
           actions={[
-            { id: 'register', label: '내 매장 상품 등록', icon: <Plus size={14} />, onClick: handleRegister, variant: 'primary' },
+            { id: 'register', label: registerButtonLabel, icon: <Plus size={14} />, onClick: handleRegister, variant: 'primary' },
             { id: 'refresh', label: '새로고침', icon: <RefreshCw size={14} />, onClick: handleRefresh },
           ]}
         />
@@ -700,8 +714,7 @@ export default function StoreProductsManagerPage({
       <div className="mb-4 flex items-start gap-3 rounded-lg border border-blue-100 bg-blue-50 p-3">
         <Package size={16} className="mt-0.5 flex-shrink-0 text-blue-500" />
         <p className="text-xs text-blue-800">
-          상품 정보(ProductMaster)를 검색하여 매장 상품으로 등록하세요.
-          등록 후 채널별 노출을 개별 제어할 수 있습니다.
+          {infoText}
         </p>
       </div>
 
@@ -727,9 +740,9 @@ export default function StoreProductsManagerPage({
         <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 bg-gray-50 py-16 gap-4">
           <Package size={40} className="text-gray-300" />
           <div className="text-center">
-            <p className="text-sm font-semibold text-gray-700">등록된 내 매장 상품이 없습니다</p>
+            <p className="text-sm font-semibold text-gray-700">{emptyTitle}</p>
             <p className="text-xs text-gray-400 mt-1.5 max-w-xs">
-              상품을 검색하여 내 매장 상품으로 등록해 주세요.
+              {emptyDescription}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -738,7 +751,7 @@ export default function StoreProductsManagerPage({
               className="flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-700"
             >
               <Plus size={14} />
-              상품 등록
+              {registerButtonLabel}
             </button>
           </div>
         </div>
