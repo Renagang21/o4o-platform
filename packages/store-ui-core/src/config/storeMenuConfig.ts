@@ -266,8 +266,12 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       //   라벨만 '상품' → 'O4O 제품'(플랫폼 제공·신청·주문 가능 제품). '내 약국 제품'(자체 취급)과 구분.
       //   key/subPath/route/권한/기능 무변경. KPA 블록 한정(GP/KCos 무영향).
       { key: 'products', label: 'O4O 제품', subPath: '/commerce/products' },
-      // WO-O4O-KPA-STORE-MY-PRODUCTS-REBUILD-AS-STORE-PRODUCT-BASE-V1:
-      //   '내 매장 제품'(/my-products)을 '타블렛' 그룹으로 이동(아래) — O4O 거래 영역과 분리.
+      // WO-O4O-KPA-STORE-PRODUCT-MENU-IA-REORG-V1:
+      //   제품 기준 관리(내 매장 제품=organization_product_listings / 매장 자체 제품=store_local_products)를
+      //   '약국 상품·거래'(제품 기준 영역)에 모은다. 기존 '타블렛' 그룹에서 이동(타블렛=노출 채널만 남김).
+      //   route/page/API/DB 무변경 — 메뉴 위치만 정리.
+      { key: 'my-products',     label: '내 매장 제품',   subPath: '/my-products' },
+      { key: 'local-products',  label: '매장 자체 제품', subPath: '/commerce/local-products' },
       // WO-O4O-KPA-ONLINE-SALES-ORDER-MANAGEMENT-AND-BUYER-ORDER-RELABEL-V1:
       //   /commerce/orders 는 매장이 공급자에게 주문한 '구매/발주' 내역(buyer) → '발주 내역'으로 라벨 정비.
       //   고객에게 판매한 주문(seller)은 '온라인 판매 > 주문 관리'(/online-sales/orders)로 분리.
@@ -285,6 +289,10 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'content-blog', label: '블로그',   subPath: '/content/blog' },
       { key: 'pop',          label: 'POP',     subPath: '/marketing/pop' },
       { key: 'qr',           label: 'QR-code', subPath: '/marketing/qr' },
+      // WO-O4O-KPA-STORE-PRODUCT-MENU-IA-REORG-V1:
+      //   타블렛 구성은 제품 등록이 아니라 기존 제품을 고객 안내 화면(타블렛)에 노출/구성하는 활용 채널 →
+      //   POP/QR/블로그와 같은 '약국 경영지원'으로 이동. route(/commerce/tablet-displays) 무변경.
+      { key: 'tablet-displays', label: '타블렛 구성', subPath: '/commerce/tablet-displays' },
     ]},
     // WO-O4O-KPA-QR-POP-RESULT-SCOPE-V1: KPA 사이드바에서 "매장 제작 자료" 메뉴 숨김.
     //   POP/제작 결과물은 콘텐츠 목록(QR·POP 바로 만들기) + 결과물 메뉴 중심으로 안내한다.
@@ -314,18 +322,11 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
     //   상담 요청은 요청 생성 시 매장 사용자 알림이 생성되고(WO-...-NOTIFICATION-WIRING-V1, smoke PASS),
     //   알림 클릭으로 /store/requests 처리 화면에 진입한다. → 사이드바 메뉴에서 '상담 요청' 제거.
     //   /store/requests route 는 hidden(URL 직접/알림 진입)으로 유지(App.tsx). 요청 테이블·API·처리 기능 불변.
-    // WO-O4O-KPA-STORE-MY-PRODUCTS-REBUILD-AS-STORE-PRODUCT-BASE-V1 (KPA 블록 한정):
-    //   '고객 응대' → '타블렛' 그룹 개편. '내 매장 제품'(/my-products, 매장 서비스 활용 제품)을 최상단에 두고,
-    //   기존 태블릿 진열 화면(/commerce/tablet-displays)을 '타블렛 구성'으로 정렬. route/page 무변경.
-    //   '타블렛 구성' 하위 통합(위치별 타블렛/전시 설정)은 후속 별도 WO.
-    { label: '타블렛', items: [
-      { key: 'my-products',     label: '내 매장 제품', subPath: '/my-products' },
-      // WO-O4O-KPA-STORE-LOCAL-PRODUCT-MENU-ACCESS-V1:
-      //   기존 자체 제품 화면(/commerce/local-products, StoreLocalProductsPage)을 KPA 메뉴에 노출.
-      //   O4O 제품 아님(약국 직접 등록) → 타블렛 진열의 주요 공급원. route 재사용, 신규 API/DB 없음.
-      { key: 'local-products',  label: '매장 자체 제품', subPath: '/commerce/local-products' },
-      { key: 'tablet-displays', label: '타블렛 구성',  subPath: '/commerce/tablet-displays' },
-    ]},
+    // WO-O4O-KPA-STORE-PRODUCT-MENU-IA-REORG-V1 (KPA 블록 한정):
+    //   기존 '타블렛' 그룹 제거. 선행 IR(IR-O4O-KPA-STORE-PRODUCT-MENU-AND-LOCAL-PRODUCT-IA-AUDIT-V1):
+    //   '내 매장 제품'(organization_product_listings)·'매장 자체 제품'(store_local_products)은 제품 기준 관리 →
+    //   '약국 상품·거래'로 이동(위). '타블렛 구성'(노출 채널)은 '약국 경영지원'으로 이동(위).
+    //   route/page/API/DB 무변경, 빈 그룹 잔존 없음.
     // WO-O4O-FOREIGN-VISITOR-SALES-SUPPORT-MENU-GATE-V1: 판매 채널 확장 (유료 기능 게이트)
     { label: '판매 채널 확장', items: [
       { key: 'foreign-visitor-sales-support', label: '외국인 여행객 판매지원', subPath: '/sales-channels/foreign-visitor' },
