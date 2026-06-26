@@ -1,7 +1,7 @@
 # CHECK-O4O-KPA-OPERATOR-DOCS-CONTENT-CREATION-GUIDE-MODAL-V1
 
 > WO: **WO-O4O-KPA-OPERATOR-DOCS-CONTENT-CREATION-GUIDE-MODAL-V1**
-> 작업일: 2026-06-26 · 상태: **구현·배포 완료 / operator 페이지 라이브 smoke 보류(브라우저 프로필 점유)** · 커밋: `b708eceb4`
+> 작업일: 2026-06-26 · 상태: **COMPLETE (operator 라이브 smoke PASS)** · 커밋: `b708eceb4`
 > 선행: WO-O4O-KPA-STORE-LIBRARY-CONTENT-CREATION-GUIDE-MODAL-V1 (store 모달)
 
 ## 작업 배경
@@ -54,12 +54,19 @@ store 모달과 동일 CSS(`.ccg-*`, `<style>` 1회 주입). `width: min(720px, 
 
 - Web 배포(Cloud Run) success (커밋 b708eceb4 포함 HEAD).
 
-## 브라우저 smoke
+## 브라우저 smoke (kpa-society.co.kr, KPA operator = sohae2100@gmail.com)
 
-- **store 모달(공유 컴포넌트)**: 동일 세션에서 이미 PASS — 열기/닫기, 섹션, 반응형 768/390, 복사 버튼. operator는 같은 컴포넌트의 mode 분기(텍스트 데이터)만 다름.
-- **/operator/docs 라이브 smoke: 보류** — 작업 시점에 Playwright 전용 프로필(`.playwright-o4o-profile`)을 **동시 실행 중인 다른 세션이 점유**하여 브라우저 기동 실패("이미 다른 세션에서 실행 중"). 프로필이 해제되면 아래로 완료 가능:
-  - 운영자 로그인: KPA-society operator = `sohae2100@gmail.com` (TEST-ACCOUNTS.local.md SSOT)
-  - `/operator/docs` → 헤더 '콘텐츠 제작 가이드' 버튼 확인 → 모달 열기 → 4단계/작성 기준/이미지/AI 예시 + 사이니지 없음 확인 → 768/390 반응형 → 목록/검색/필터/등록 회귀 확인.
+> 회원이 점유 중이던 브라우저를 닫아 프로필이 해제된 뒤 operator 라이브 smoke 완료.
+
+| Case | 내용 | 결과 |
+|------|------|------|
+| 1 | operator 로그인 → `/operator/docs` 접근(콘텐츠 허브), 헤더 '콘텐츠 제작 가이드' 버튼 + '콘텐츠 등록' 노출 | ✅ |
+| 2 | 가이드 버튼 클릭 → 모달 열림 | ✅ |
+| 3 | 모달 내용 = **operator 모드**: 부제(운영자 콘텐츠로 정리), 4단계 흐름(매장 재활용 구조 + 미리보기), **운영자 콘텐츠 작성 기준**, 이미지 안내, AI 요청 예시(여러 매장이 가져가서 + 디자인 입힌 HTML) | ✅ |
+| 4 | 사이니지 문구 없음 / 체크리스트 없음 | ✅ |
+| 5 | 요청문 복사 버튼 존재 | ✅ |
+| 6 | 반응형 390: 모달 343px·뷰포트 내·본문 내부 스크롤·예시 박스 가로넘침 없음·배경 가로스크롤 없음 (768/store는 선행 WO에서 PASS, 동일 컴포넌트/CSS) | ✅ |
+| 7 | 회귀: /operator/docs 콘텐츠 허브 목록/등록 버튼 정상 | ✅ |
 
 ## 회귀
 
@@ -67,5 +74,4 @@ store 모달과 동일 CSS(`.ccg-*`, `<style>` 1회 주입). `width: min(720px, 
 
 ## 후속
 
-- 프로필 점유 해제 후 operator 라이브 smoke 마무리(위 절차).
 - GP/K-Cosmetics operator docs parity는 별도(공통 모달이라 mode 재사용 가능).
