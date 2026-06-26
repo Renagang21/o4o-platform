@@ -15,10 +15,10 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 const BASE = `${API_BASE}/api/v1/store`;
 
 export type HandledProductSource = 'listing' | 'local';
-export type TabletExposure = 'exposed' | 'partial' | 'not_exposed';
-export type OnlineExposure = 'exposed' | 'inactive' | 'not_exposed' | 'not_supported';
-export type DescriptionStatus = 'available' | 'none' | 'not_supported';
 
+// WO-O4O-KPA-STORE-HANDLED-PRODUCTS-DISPLAY-POOL-SIMPLIFY-V1:
+//   제품 풀 화면에서 채널 상태(타블렛/온라인몰/상품설명) 컬럼을 제거 → 해당 필드도 응답/타입에서 제거.
+//   채널 노출은 각 채널 메뉴에서 관리한다.
 export interface HandledProduct {
   sourceType: HandledProductSource;
   sourceId: string;
@@ -29,9 +29,6 @@ export interface HandledProduct {
   price: number | null;
   statusLabel: string;
   isActive: boolean;
-  tabletExposure: TabletExposure;
-  onlineSalesExposure: OnlineExposure;
-  productDescriptionStatus: DescriptionStatus;
   updatedAt: string;
   managePath: string;
 }

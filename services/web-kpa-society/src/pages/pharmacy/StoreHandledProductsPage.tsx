@@ -263,6 +263,8 @@ export default function StoreHandledProductsPage() {
 
       <p style={styles.footnote}>
         ※ <strong>매장 취급제품</strong>은 진열·콘텐츠·온라인 노출에 활용할 제품 풀입니다. 타블렛 진열·온라인 판매 등 채널별 설정은 각 채널 메뉴에서 관리합니다.
+        {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-DISPLAY-POOL-SIMPLIFY-V1: 온라인몰 미지원 = 컬럼 대신 보조 안내 */}
+        {' '}매장 자체 제품은 온라인 판매(온라인몰) 노출을 지원하지 않습니다.
         온라인 주문 이후의 조달·재고·배송·발송·응대는 매장 경영자가 자체적으로 처리합니다.
       </p>
     </div>

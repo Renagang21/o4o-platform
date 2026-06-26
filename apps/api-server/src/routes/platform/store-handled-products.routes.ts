@@ -8,11 +8,12 @@
  * 두 소스를 물리 통합하지 않고 sourceType 으로 구분해 조회 통합한다(읽기 전용).
  *
  * API Namespace: /api/v1/store
- *   GET /handled-products  — 통합 목록(검색/출처필터/페이지네이션 + 채널상태 3종)
+ *   GET /handled-products  — 통합 목록(검색/출처필터/페이지네이션)
  *
- * 채널 상태(V1 신뢰 표시): 타블렛(both) / 온라인몰(listing only) / 상품설명(listing only).
- *   - 매장 자체 제품(local)의 온라인몰·상품설명은 구조적으로 미지원 → 'not_supported' 고정.
- *     (store_local_products 는 Display Domain — ecommerce/channel 교차 차단, migration 20260224300000)
+ * WO-O4O-KPA-STORE-HANDLED-PRODUCTS-DISPLAY-POOL-SIMPLIFY-V1:
+ *   제품 풀(매장 취급제품)은 채널 상태판이 아니다. 채널 상태(타블렛/온라인몰/상품설명) 컬럼·enrich 를 제거하고
+ *   제품 풀 핵심 필드(이름/구분/표시가/상태/수정일)만 반환한다. 채널 노출은 각 채널 메뉴에서 관리.
+ *   - 매장 자체 제품(local)의 온라인몰 미지원은 화면 하단 보조 안내로 고지(컬럼 아님).
  *
  * Boundary Policy: organization_id 필터 필수, Raw SQL parameter binding 필수.
  */
@@ -23,10 +24,6 @@ import type { AuthRequest } from '../../types/auth.js';
 import { resolveStoreAccess } from '../../utils/store-owner.utils.js';
 
 type AuthMiddleware = RequestHandler;
-
-type TabletExposure = 'exposed' | 'partial' | 'not_exposed';
-type OnlineExposure = 'exposed' | 'inactive' | 'not_exposed' | 'not_supported';
-type DescriptionStatus = 'available' | 'none' | 'not_supported';
 
 interface UnifiedRow {
   source_type: 'listing' | 'local';
@@ -147,83 +144,13 @@ export function createStoreHandledProductsRoutes(dataSource: DataSource): Router
       ]);
       const total = countRes[0]?.total ?? 0;
 
-      // ── 채널 상태 enrich (현재 페이지 한정) ──
-      const listingIds = rows.filter((r) => r.source_type === 'listing').map((r) => r.source_id);
-      const localIds = rows.filter((r) => r.source_type === 'local').map((r) => r.source_id);
-      const masterIds = rows
-        .filter((r) => r.source_type === 'listing' && r.master_id)
-        .map((r) => r.master_id as string);
-
-      const tabletMap = new Map<string, number>(); // `${type}:${id}` → tablet_count
-      const onlineMap = new Map<string, boolean>(); // listingId → active?
-      const descSet = new Set<string>(); // masterId with visible description
-      let totalTablets = 0;
-
-      if (listingIds.length > 0 || localIds.length > 0) {
-        const [tabletRows, totalTabletRows] = await Promise.all([
-          dataSource.query(
-            `SELECT std.product_type, std.product_id, count(DISTINCT std.tablet_id)::int AS cnt
-             FROM store_tablet_displays std
-             JOIN store_tablets st ON st.id = std.tablet_id
-             WHERE st.organization_id = $1 AND std.is_visible = true
-               AND ( (std.product_type = 'supplier' AND std.product_id = ANY($2::uuid[]))
-                  OR (std.product_type = 'local'    AND std.product_id = ANY($3::uuid[])) )
-             GROUP BY std.product_type, std.product_id`,
-            [organizationId, listingIds.length ? listingIds : ['00000000-0000-0000-0000-000000000000'],
-              localIds.length ? localIds : ['00000000-0000-0000-0000-000000000000']],
-          ),
-          dataSource.query(`SELECT count(*)::int AS total FROM store_tablets WHERE organization_id = $1`, [organizationId]),
-        ]);
-        totalTablets = totalTabletRows[0]?.total ?? 0;
-        for (const t of tabletRows as { product_type: string; product_id: string; cnt: number }[]) {
-          const key = `${t.product_type === 'supplier' ? 'listing' : 'local'}:${t.product_id}`;
-          tabletMap.set(key, t.cnt);
-        }
-      }
-
-      if (listingIds.length > 0) {
-        const onlineRows = await dataSource.query(
-          `SELECT opc.product_listing_id AS id, bool_or(opc.is_active) AS active
-           FROM organization_product_channels opc
-           JOIN organization_channels oc ON oc.id = opc.channel_id
-           WHERE oc.organization_id = $1 AND oc.channel_type = 'B2C'
-             AND opc.product_listing_id = ANY($2::uuid[])
-           GROUP BY opc.product_listing_id`,
-          [organizationId, listingIds],
-        );
-        for (const o of onlineRows as { id: string; active: boolean }[]) onlineMap.set(o.id, !!o.active);
-      }
-
-      if (masterIds.length > 0) {
-        const descRows = await dataSource.query(
-          `SELECT master_id FROM shared_product_descriptions
-           WHERE master_id = ANY($1::uuid[]) AND status <> 'hidden'
-           GROUP BY master_id`,
-          [masterIds],
-        );
-        for (const d of descRows as { master_id: string }[]) descSet.add(d.master_id);
-      }
-
+      // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-DISPLAY-POOL-SIMPLIFY-V1:
+      //   제품 풀(매장 취급제품)은 채널 상태판이 아니다. 화면에서 채널 상태 컬럼(타블렛/온라인몰/상품설명)을
+      //   제거했으므로, 그를 위한 enrich 조인 3종(store_tablet_displays / organization_product_channels /
+      //   shared_product_descriptions)도 함께 제거한다. 채널 노출은 각 채널 메뉴에서 관리한다.
       const now = Date.now();
       const items = rows.map((r) => {
         const isListing = r.source_type === 'listing';
-
-        // 타블렛 노출
-        const tabletCnt = tabletMap.get(`${r.source_type}:${r.source_id}`) ?? 0;
-        let tabletExposure: TabletExposure = 'not_exposed';
-        if (tabletCnt > 0) tabletExposure = totalTablets > 0 && tabletCnt >= totalTablets ? 'exposed' : 'partial';
-
-        // 온라인몰 노출
-        let onlineSalesExposure: OnlineExposure = 'not_supported';
-        if (isListing) {
-          if (onlineMap.has(r.source_id)) onlineSalesExposure = onlineMap.get(r.source_id) ? 'exposed' : 'inactive';
-          else onlineSalesExposure = 'not_exposed';
-        }
-
-        // 상품설명
-        let productDescriptionStatus: DescriptionStatus = 'not_supported';
-        if (isListing) productDescriptionStatus = r.master_id && descSet.has(r.master_id) ? 'available' : 'none';
-
         return {
           sourceType: r.source_type,
           sourceId: r.source_id,
@@ -234,9 +161,6 @@ export function createStoreHandledProductsRoutes(dataSource: DataSource): Router
           price: r.price != null ? Number(r.price) : null,
           statusLabel: isListing ? listingStatusLabel(r, now) : r.is_active ? '활성' : '비활성',
           isActive: r.is_active,
-          tabletExposure,
-          onlineSalesExposure,
-          productDescriptionStatus,
           updatedAt: r.updated_at,
           managePath: isListing
             ? `/store/my-products?highlight=${r.source_id}`
