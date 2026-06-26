@@ -15,7 +15,7 @@
 
 import { useEffect, useMemo, useRef, useState, useCallback, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Sparkles, Trash2, Search, FileText, Info, Printer } from 'lucide-react';
+import { BookOpen, Sparkles, Trash2, Search, FileText, Info, Printer, QrCode } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { Pagination } from '@o4o/operator-ux-core';
 import { DataTable, type Column, ActionBar } from '@o4o/ui';
@@ -29,6 +29,8 @@ import { colors } from '../../styles/theme';
 import type { ProductionSourceItem } from './productionTargets';
 // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-PDF-EXPORT-OPTIONS-V1: 선택 콘텐츠 인쇄용 PDF
 import { ContentPdfExportModal, type PdfExportContent } from './ContentPdfExportModal';
+// WO-O4O-KPA-CONTENT-LIST-INLINE-QR-CREATE-V1: 콘텐츠 선택 → QR 만들기 바로 호출
+import { StoreQrCreateModal, type InlineQrTarget } from '../../components/store/StoreQrCreateModal';
 
 const PAGE_LIMIT = 20;
 const SEARCH_DEBOUNCE_MS = 300;
@@ -346,6 +348,8 @@ function DocumentsSection({
   const [selected, setSelected] = useState<Set<string>>(new Set());
   // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-PDF-EXPORT-OPTIONS-V1: 인쇄용 PDF 대상(단일)
   const [pdfTarget, setPdfTarget] = useState<PdfExportContent | null>(null);
+  // WO-O4O-KPA-CONTENT-LIST-INLINE-QR-CREATE-V1: 인라인 QR 생성 대상(단일)
+  const [qrTarget, setQrTarget] = useState<InlineQrTarget | null>(null);
   // WO-O4O-KPA-CONTENT-LIST-TAG-SEARCH-FILTER-V1: 출처 탭 + 태그 정확 필터
   const [source, setSource] = useState<SourceFilter>('all');
   const [activeTag, setActiveTag] = useState<string | null>(null);
@@ -452,6 +456,21 @@ function DocumentsSection({
     if (!row) return;
     setPdfTarget({ id: row.id, title: row.title, origin: row.origin, contentJson: row.contentJson });
   }, [selected, rows]);
+
+  // WO-O4O-KPA-CONTENT-LIST-INLINE-QR-CREATE-V1:
+  //   콘텐츠 1개 선택 시 QR 만들기 바로 호출. direct/execution-asset 만 공개 landing 이 렌더 가능 →
+  //   snapshot 은 QR 대상 미지원(아래 안내). QR 결과는 store_qr_codes 에만 생성(원본/제작자료 신규 생성 없음).
+  const singleSelectedRow = useMemo(() => {
+    if (selected.size !== 1) return null;
+    const key = Array.from(selected)[0];
+    return rows.find((r) => r.selectionKey === key) ?? null;
+  }, [selected, rows]);
+  const qrEligible = !!singleSelectedRow && (singleSelectedRow.origin === 'direct' || singleSelectedRow.origin === 'execution-asset');
+  const handleCreateQr = useCallback(() => {
+    if (!singleSelectedRow) return;
+    if (singleSelectedRow.origin !== 'direct' && singleSelectedRow.origin !== 'execution-asset') return;
+    setQrTarget({ id: singleSelectedRow.id, title: singleSelectedRow.title, origin: singleSelectedRow.origin });
+  }, [singleSelectedRow]);
 
   // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-STANDARD-TABLE-V1: @o4o/ui Column<T>
   const columns = useMemo<Column<DocumentRow>[]>(
@@ -566,6 +585,8 @@ function DocumentsSection({
   const showRemoveButton = mode === 'page' && !!onRemoveSnapshots;
   // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-PDF-EXPORT-OPTIONS-V1: page 모드 opt-in 일 때만 노출
   const showPdfExport = mode === 'page' && enablePdfExport;
+  // WO-O4O-KPA-CONTENT-LIST-INLINE-QR-CREATE-V1: page 모드에서만 QR 만들기 노출
+  const showInlineQr = mode === 'page';
 
   return (
     <section style={styles.section}>
@@ -631,6 +652,15 @@ function DocumentsSection({
             onClick: handleStart,
             disabled: selected.size === 0,
           },
+          // WO-O4O-KPA-CONTENT-LIST-INLINE-QR-CREATE-V1:
+          //   콘텐츠 1개(direct/execution-asset) 선택 시 QR 만들기 활성. snapshot/복수 선택 비활성(아래 안내).
+          ...(showInlineQr ? [{
+            key: 'qr',
+            label: 'QR-code 만들기',
+            icon: <QrCode size={14} />,
+            onClick: handleCreateQr,
+            disabled: !qrEligible,
+          }] : []),
           // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-PDF-EXPORT-OPTIONS-V1:
           //   1차는 단일 콘텐츠만 지원 — 1개 선택 시에만 활성(2개+ 비활성 + 아래 안내).
           ...(showPdfExport ? [{
@@ -649,6 +679,14 @@ function DocumentsSection({
           }] : []),
         ]}
       />
+
+      {/* WO-O4O-KPA-CONTENT-LIST-INLINE-QR-CREATE-V1: QR 만들기 선택 안내 */}
+      {showInlineQr && selected.size >= 2 && (
+        <p style={styles.pdfHint}>QR-code는 콘텐츠 1개를 선택해 주세요.</p>
+      )}
+      {showInlineQr && selected.size === 1 && !qrEligible && (
+        <p style={styles.pdfHint}>가져온 콘텐츠(운영자 제공/커뮤니티)는 QR-code 대상이 아닙니다. 내가 만든 콘텐츠/제작 자료를 선택해 주세요.</p>
+      )}
 
       {/* 인쇄용 PDF 는 콘텐츠 1개 선택 시 사용 가능 — 복수 선택 시 안내 */}
       {showPdfExport && selected.size >= 2 && (
@@ -680,6 +718,16 @@ function DocumentsSection({
           open={!!pdfTarget}
           content={pdfTarget}
           onClose={() => setPdfTarget(null)}
+        />
+      )}
+
+      {/* WO-O4O-KPA-CONTENT-LIST-INLINE-QR-CREATE-V1: 인라인 QR 생성 모달 (생성 성공 시 선택 해제) */}
+      {showInlineQr && (
+        <StoreQrCreateModal
+          open={!!qrTarget}
+          target={qrTarget}
+          onClose={() => setQrTarget(null)}
+          onCreated={() => setSelected(new Set())}
         />
       )}
     </section>
