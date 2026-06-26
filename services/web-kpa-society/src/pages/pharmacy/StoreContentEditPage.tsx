@@ -291,12 +291,13 @@ export default function StoreContentEditPage() {
 
       {/* Header */}
       <div className="mb-6">
+        {/* WO-O4O-KPA-STORE-LIBRARY-SNAPSHOT-SINGLE-EDIT-V1: 진입점(내 자료함 콘텐츠)으로 복귀 — canonical 정렬 */}
         <Link
-          to="/store/content"
+          to="/store/library/contents"
           className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline mb-3"
         >
           <ArrowLeft className="w-4 h-4" />
-          자산 목록
+          내 자료함 콘텐츠로
         </Link>
         <div className="flex items-center justify-between">
           <div>

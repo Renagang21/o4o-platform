@@ -124,12 +124,15 @@ function toDocumentRow(it: LibraryContentItem): DocumentRow {
   // WO-O4O-KPA-STORE-LIBRARY-EXECUTION-ASSET-EDIT-ACTION-V1:
   //   execution-asset(매장 제작 자료, asset_type='content')은 매장 소유 사본이므로 단건 편집기로 연결.
   //   편집 저장은 같은 row update(id 불변) → 이 자산을 참조하는 QR(library_item_id)은 그대로 유지.
+  // WO-O4O-KPA-STORE-LIBRARY-SNAPSHOT-SINGLE-EDIT-V1:
+  //   snapshot(o4o_asset_snapshots, 매장 소유 사본)도 편집 — kpa_store_contents(snapshot_edit) override 편집기로 연결.
+  //   원본 o4o_asset_snapshots/kpa_contents 불변, snapshot id 불변. 자료함 콘텐츠형은 모두 편집.
   const href =
     it.origin === 'execution-asset'
       ? `/store/library/production-materials/${it.id}/edit`
       : it.origin === 'direct'
         ? `/store/content/direct/${it.id}`
-        : `/view/${it.id}`;
+        : `/store/content/${it.id}/edit`;
   const authorName =
     it.origin === 'direct' || it.origin === 'execution-asset'
       ? '내 매장'
@@ -482,11 +485,8 @@ function DocumentsSection({
         sorter: (a, b) => a.title.localeCompare(b.title),
         render: (_v, row) => (
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-            {row.origin === 'direct' ? (
-              <FileText size={14} style={{ color: colors.accentGreen, flexShrink: 0 }} />
-            ) : (
-              <BookOpen size={14} style={{ color: colors.primary, flexShrink: 0 }} />
-            )}
+            {/* WO-O4O-KPA-STORE-LIBRARY-SNAPSHOT-SINGLE-EDIT-V1: 자료함 콘텐츠형은 모두 편집 가능 → 아이콘 통일(FileText) */}
+            <FileText size={14} style={{ color: colors.primary, flexShrink: 0 }} />
             {mode === 'modal' ? (
               // WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-SELECTOR-MODAL-V1:
               // 모달 안에서 router Link 사용 시 host 페이지가 unmount → 작업 흐름 끊김.
@@ -562,21 +562,20 @@ function DocumentsSection({
         width: '80px',
         // WO-O4O-STORE-LIBRARY-CONTENTS-DIRECT-CONTENT-REENTRY-UX-V1: direct 콘텐츠는 편집 가능
         // WO-O4O-KPA-STORE-LIBRARY-EXECUTION-ASSET-EDIT-ACTION-V1:
-        //   execution-asset(매장 사본)도 편집 가능 — "열기" → "편집". snapshot 만 "보기" 유지.
-        render: (_v, row) => {
-          const isEditable = row.origin === 'direct' || row.origin === 'execution-asset';
-          return (
-            <a
-              href={row.href}
-              target={mode === 'modal' ? '_blank' : undefined}
-              rel={mode === 'modal' ? 'noreferrer' : undefined}
-              style={styles.viewBtn}
-              aria-label={isEditable ? '콘텐츠 편집' : '자료 보기'}
-            >
-              {isEditable ? '편집' : '보기'}
-            </a>
-          );
-        },
+        //   execution-asset(매장 사본)도 편집 가능 — "열기" → "편집".
+        // WO-O4O-KPA-STORE-LIBRARY-SNAPSHOT-SINGLE-EDIT-V1: snapshot 도 매장 사본 → "보기" → "편집".
+        //   자료함의 콘텐츠형 항목은 direct/execution-asset/snapshot 모두 편집으로 통일(보기 전용 없음).
+        render: (_v, row) => (
+          <a
+            href={row.href}
+            target={mode === 'modal' ? '_blank' : undefined}
+            rel={mode === 'modal' ? 'noreferrer' : undefined}
+            style={styles.viewBtn}
+            aria-label="콘텐츠 편집"
+          >
+            편집
+          </a>
+        ),
       },
     ],
     [mode, applyTag],

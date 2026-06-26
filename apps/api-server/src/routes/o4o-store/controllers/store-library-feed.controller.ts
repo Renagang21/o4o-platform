@@ -158,8 +158,11 @@ export function createStoreLibraryFeedController(
                 'snapshot'::text AS origin,
                 s.asset_type AS asset_type,
                 CASE WHEN s.asset_type = 'cms' THEN 'operator' ELSE 'community' END AS source_group,
-                s.title AS title,
-                s.content_json AS content_json,
+                -- WO-O4O-KPA-STORE-LIBRARY-SNAPSHOT-SINGLE-EDIT-V1:
+                --   snapshot 은 o4o_asset_snapshots(불변 Core) + kpa_store_contents(snapshot_edit override) 구조.
+                --   매장 편집본(override)이 있으면 우선 노출 — 공개 렌더(published-assets)와 동일한 COALESCE 정책.
+                COALESCE(sc.title, s.title) AS title,
+                COALESCE(sc.content_json, s.content_json) AS content_json,
                 s.created_at AS sort_at,
                 COALESCE(c.lifecycle_status, 'active') AS lifecycle_status,
                 -- WO-O4O-KPA-CONTENT-LIST-TAG-FIELD-AND-DISPLAY-V1: snapshot 태그는 기존 content_json 에 존재(resolver 복사).
@@ -168,6 +171,9 @@ export function createStoreLibraryFeedController(
               FROM o4o_asset_snapshots s
               LEFT JOIN kpa_store_asset_controls c
                 ON c.snapshot_id = s.id AND c.organization_id = s.organization_id
+              LEFT JOIN kpa_store_contents sc
+                ON sc.snapshot_id = s.id AND sc.organization_id = s.organization_id
+                AND sc.source_type = 'snapshot_edit'
               WHERE s.organization_id = $1
                 AND s.asset_type IN ('cms', 'content')
                 AND (c.publish_status IS NULL OR c.publish_status != 'hidden')
