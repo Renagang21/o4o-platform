@@ -307,6 +307,32 @@ export function TabletKioskPage({
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const idleRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Browse 자동 넘김 (WO-O4O-KPA-TABLET-BROWSE-AUTO-SLIDE-V1)
+  //   displaySettings.autoSlideSeconds>0 + browse + 제품 2개+ 일 때만 현재 강조 카드를 순환.
+  //   미주입/0/1개 → 타이머 없음(기존 동작). KCos 등 미주입 서비스 무영향.
+  const [browseIndex, setBrowseIndex] = useState(0);
+  const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const autoSlideSeconds = displaySettings?.autoSlideSeconds ?? 0;
+
+  useEffect(() => {
+    if (mode !== 'browse' || autoSlideSeconds <= 0 || products.length <= 1) return;
+    const t = setInterval(() => {
+      setBrowseIndex((i) => (i + 1) % products.length);
+    }, autoSlideSeconds * 1000);
+    return () => clearInterval(t);
+  }, [mode, autoSlideSeconds, products.length]);
+
+  // products 변경 시 인덱스 범위 보정
+  useEffect(() => {
+    if (browseIndex >= products.length) setBrowseIndex(0);
+  }, [products.length, browseIndex]);
+
+  // 강조 카드가 화면 안에 보이도록 스크롤(자동 넘김 활성 + browse 일 때만)
+  useEffect(() => {
+    if (mode !== 'browse' || autoSlideSeconds <= 0 || products.length <= 1) return;
+    cardRefs.current[browseIndex]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, [browseIndex, mode, autoSlideSeconds, products.length]);
+
   // Load products (supplier + local merged)
   useEffect(() => {
     if (!slug) return;
@@ -609,11 +635,14 @@ export function TabletKioskPage({
           </div>
         ) : (
           <div style={styles.grid}>
-            {products.map((p) => (
+            {products.map((p, idx) => {
+              const highlighted = autoSlideSeconds > 0 && products.length > 1 && idx === browseIndex;
+              return (
               <div
                 key={`${p.type}-${p.id}`}
-                onClick={() => dispatch({ type: 'SELECT_PRODUCT', product: p })}
-                style={styles.productCard}
+                ref={(el) => { cardRefs.current[idx] = el; }}
+                onClick={() => { setBrowseIndex(idx); dispatch({ type: 'SELECT_PRODUCT', product: p }); }}
+                style={highlighted ? { ...styles.productCard, outline: '3px solid #14b8a6', outlineOffset: '2px', transform: 'scale(1.02)' } : styles.productCard}
               >
                 <div style={styles.productImgArea}>
                   {p.imageUrl ? (
@@ -634,7 +663,8 @@ export function TabletKioskPage({
                   <div style={styles.localBadge}>자체</div>
                 )}
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
