@@ -47,16 +47,20 @@
 
 ## 4. 검증 결과
 
+브라우저 smoke: 2026-06-26, KPA `테스트 약국 매장`, 배포본(`3c485977e` deploy success), `해양 심층수 효능`(source=store).
+
 | 항목 | 결과 |
 |---|---|
 | web-kpa-society `tsc --noEmit` | ✅ PASS |
-| snapshot [편집] → o4o 표준 RichTextEditor(편집/HTML/미리보기) 노출 | ⏳ 배포 후 smoke |
-| 레거시 블록 textarea 미노출 | ⏳ |
-| 기존 snapshot 본문(body html) 손실 없이 표시 | ⏳ |
-| 저장 후 재오픈 본문 유지 + 공개 보기 렌더 정상 | ⏳ |
-| HTML 탭 inline style(background/border 등) 보존 | ⏳ (편집기 = HTML탭 raw 보존 WO 반영) |
-| 활용 설정(usage) 보존 | ⏳ |
-| direct / 제작 자료 편집 회귀 없음 | ⏳ (해당 페이지 미변경) |
+| snapshot [편집] → o4o 표준 RichTextEditor(편집/HTML/미리보기 + 툴바) 노출 | ✅ |
+| 레거시 블록 textarea 미노출 | ✅ |
+| 기존 snapshot 본문(body html) 손실 없이 표시 | ✅ 링크/마크/목록/구분선/주의사항 전부 서식 렌더 |
+| 저장 후 본문 유지(무손실) | ✅ 저장 후 API 재확인 — `body` 2530자 동일(editor-link·`<mark>` 보존), `blocks=[]`, `usage` 보존(keys=15), source=store |
+| HTML 탭 inline style 보존 | ✅ (편집기 = HTML탭 raw 보존 WO 반영) |
+| 활용 설정(usage: 디스플레이/CTA/QR/인쇄) 보존 | ✅ |
+| direct / 제작 자료 편집 회귀 없음 | ✅ (해당 페이지 미변경) |
+
+→ **자료함 콘텐츠 3종(direct / execution-asset / snapshot) 편집기 모두 o4o 표준 RichTextEditor 로 통일 완료.**
 
 ---
 
