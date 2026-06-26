@@ -184,7 +184,11 @@ export function createStorePublicTabletRoutes(deps: {
                 serviceKey: 'kpa-society',
                 organizationId: resolved.storeId,
                 metadata: {
-                  targetUrl: '/store/requests',
+                  // WO-O4O-KPA-TABLET-INTEREST-NOTIFICATION-ROUTING-V1:
+                  //   타블렛 관심/상담 알림은 현 IA의 타블렛 화면(/store/commerce/tablet-displays)으로 연결.
+                  //   '/store/requests'(메뉴에서 제거된 legacy 상담요청 route)를 기본 target 으로 사용하지 않는다.
+                  //   온라인 판매(주문) 무관 — 타블렛은 주문 채널이 아니라 매장 내 조회+상담 요청 흐름이다.
+                  targetUrl: '/store/commerce/tablet-displays',
                   requestId: saved.id,
                   organizationId: resolved.storeId,
                   storeSlug: req.params.slug,
