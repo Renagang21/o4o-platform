@@ -35,7 +35,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { AiContentModal } from '@o4o/content-editor';
 import { colors } from '../../styles/theme';
-import { getStoreExecutionAsset } from '../../api/storeExecutionAssets';
+import { getStoreExecutionAsset, getStoreExecutionAssets, deleteStoreExecutionAsset, type StoreExecutionAsset } from '../../api/storeExecutionAssets';
 import { getStoreQrCodes } from '../../api/storeQr';
 import type { StoreQrCode } from '../../api/storeQr';
 // WO-O4O-POP-SAVE-AS-CONTENT-V1: 제작 결과를 재편집 가능한 POP 콘텐츠(store_pops)로 저장
@@ -113,6 +113,36 @@ export function StorePopPage() {
   // Layout + generate
   const [layout, setLayout] = useState<'A4' | 'A5'>('A4');
   const [generating, setGenerating] = useState(false);
+
+  // WO-O4O-KPA-POP-LIST-GENERATED-ASSETS-V1: 생성된 POP PDF 목록(store_execution_assets usage_type='pop')
+  const [generatedPops, setGeneratedPops] = useState<StoreExecutionAsset[]>([]);
+  const [loadingPops, setLoadingPops] = useState(true);
+  const [deletingPopId, setDeletingPopId] = useState<string | null>(null);
+  const loadGeneratedPops = useCallback(async () => {
+    setLoadingPops(true);
+    try {
+      const res = await getStoreExecutionAssets({ usageType: 'pop', limit: 50 });
+      setGeneratedPops(res?.data?.items ?? []);
+    } catch {
+      // best-effort — 목록 로드 실패는 생성 흐름을 막지 않는다
+    } finally {
+      setLoadingPops(false);
+    }
+  }, []);
+  useEffect(() => { loadGeneratedPops(); }, [loadGeneratedPops]);
+  const handleDeletePop = useCallback(async (id: string) => {
+    if (!confirm('이 POP을 삭제하시겠습니까?')) return;
+    setDeletingPopId(id);
+    try {
+      await deleteStoreExecutionAsset(id);
+      setGeneratedPops((prev) => prev.filter((p) => p.id !== id));
+      toast.success('POP을 삭제했습니다');
+    } catch {
+      toast.error('삭제에 실패했습니다');
+    } finally {
+      setDeletingPopId(null);
+    }
+  }, []);
 
   // WO-O4O-POP-SAVE-AS-CONTENT-V1: POP 콘텐츠로 저장
   const [savingContent, setSavingContent] = useState(false);
@@ -324,7 +354,9 @@ export function StorePopPage() {
       const fileUrl: string | undefined = result?.data?.fileUrl;
       if (!fileUrl) throw new Error('No fileUrl in response');
       window.open(fileUrl, '_blank');
-      toast.success('POP가 생성되어 내 자료함 → 매장 제작 자료에 저장되었습니다. 언제든 다시 출력할 수 있습니다.');
+      toast.success('POP가 생성되었습니다. 아래 "생성된 POP" 목록에서 다시 열고 출력할 수 있습니다.');
+      // WO-O4O-KPA-POP-LIST-GENERATED-ASSETS-V1: 생성 직후 POP 목록 갱신
+      loadGeneratedPops();
     } catch {
       toast.error('POP PDF 생성에 실패했습니다');
     } finally {
@@ -375,10 +407,58 @@ export function StorePopPage() {
               lineHeight: 1.6,
             }}
           >
-            파일형 자료뿐 아니라 <strong>내 자료함의 콘텐츠와 매장 제작 자료</strong>를 바탕으로 POP를 만들 수 있습니다.
-            생성한 POP는 <strong>내 자료함 → 매장 제작 자료</strong>에 저장되어 다시 열고 출력할 수 있습니다.
+            콘텐츠를 선택해 POP를 만들 수 있습니다. 생성한 POP는 아래 <strong>생성된 POP</strong> 목록에서 다시 열고 출력할 수 있습니다.
           </p>
         </div>
+      </div>
+
+      {/* WO-O4O-KPA-POP-LIST-GENERATED-ASSETS-V1: 생성된 POP PDF 목록 (store_execution_assets usage_type='pop') */}
+      <div style={styles.body}>
+        <div style={styles.genPopHeader}>
+          <h2 style={styles.genPopTitle}>생성된 POP</h2>
+          <Link to="/store/library/contents" style={styles.genPopNewBtn}>
+            <FolderOpen size={14} />
+            콘텐츠에서 새 POP 만들기
+          </Link>
+        </div>
+        {loadingPops ? (
+          <p style={{ color: colors.neutral400, fontSize: 13, padding: '8px 0' }}>불러오는 중…</p>
+        ) : generatedPops.length === 0 ? (
+          <div style={styles.genPopEmpty}>
+            <p style={{ color: colors.neutral500, fontSize: 14, margin: 0 }}>아직 만든 POP이 없습니다.</p>
+            <p style={{ color: colors.neutral400, fontSize: 13, marginTop: 4 }}>콘텐츠 목록에서 콘텐츠를 선택해 POP을 만들 수 있습니다.</p>
+          </div>
+        ) : (
+          <div style={styles.genPopList}>
+            {generatedPops.map((pop) => (
+              <div key={pop.id} style={styles.genPopCard}>
+                <div style={styles.genPopInfo}>
+                  <span style={styles.genPopName}>{pop.title}</span>
+                  <span style={styles.genPopMeta}>
+                    {pop.createdAt ? new Date(pop.createdAt).toLocaleDateString('ko-KR') : ''}
+                    {pop.mimeType === 'application/pdf' ? ' · PDF' : ''}
+                  </span>
+                </div>
+                <div style={styles.genPopActions}>
+                  {pop.fileUrl && (
+                    <a href={pop.fileUrl} target="_blank" rel="noreferrer" style={styles.genPopOpenBtn}>
+                      <ExternalLink size={13} /> PDF 열기
+                    </a>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => handleDeletePop(pop.id)}
+                    disabled={deletingPopId === pop.id}
+                    style={styles.genPopDelBtn}
+                    aria-label="POP 삭제"
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* POP Item List */}
@@ -656,6 +736,19 @@ const styles: Record<string, CSSProperties> = {
   body: {
     minHeight: '300px',
   },
+  // WO-O4O-KPA-POP-LIST-GENERATED-ASSETS-V1
+  genPopHeader: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10, flexWrap: 'wrap', gap: 8 },
+  genPopTitle: { fontSize: 16, fontWeight: 700, color: colors.neutral800, margin: 0 },
+  genPopNewBtn: { display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 12px', fontSize: 13, fontWeight: 600, color: '#EA580C', background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: 8, textDecoration: 'none' },
+  genPopEmpty: { padding: '24px 16px', border: `1px dashed ${colors.neutral200}`, borderRadius: 12, background: colors.neutral50, textAlign: 'center' },
+  genPopList: { display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 28 },
+  genPopCard: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '12px 14px', border: `1px solid ${colors.neutral200}`, borderRadius: 10, background: '#fff' },
+  genPopInfo: { display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 },
+  genPopName: { fontSize: 14, fontWeight: 600, color: colors.neutral800, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
+  genPopMeta: { fontSize: 12, color: colors.neutral400 },
+  genPopActions: { display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 },
+  genPopOpenBtn: { display: 'inline-flex', alignItems: 'center', gap: 4, padding: '6px 10px', fontSize: 13, fontWeight: 600, color: '#1D4ED8', background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 8, textDecoration: 'none' },
+  genPopDelBtn: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 30, height: 30, border: `1px solid ${colors.neutral200}`, background: '#fff', borderRadius: 8, color: '#DC2626', cursor: 'pointer' },
   emptyState: {
     display: 'flex',
     flexDirection: 'column',
