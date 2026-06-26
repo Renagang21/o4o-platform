@@ -25,7 +25,7 @@
 
 | 파일 | 변경 |
 |---|---|
-| `services/web-kpa-society/src/pages/pharmacy/ContentPdfExportModal.tsx` | (신규) PDF 옵션 모달 + origin별 본문 HTML 취득 + A4 조판 + 새 창 인쇄 |
+| `services/web-kpa-society/src/pages/pharmacy/ContentPdfExportModal.tsx` | (신규) PDF 옵션 모달 + 목록 contentJson 본문 추출 + A4 조판 + 새 창 인쇄(클릭 동기 open → 팝업차단 회피) |
 | `services/web-kpa-society/src/pages/pharmacy/StoreContentsSelector.tsx` | `enablePdfExport` opt-in prop. DocumentsSection 선택 작업 영역에 `인쇄용 PDF 만들기` 액션(1개 선택 시만 활성) + 복수 선택 안내 + 모달 mount |
 | `services/web-kpa-society/src/pages/pharmacy/StoreLibraryContentsPage.tsx` | `StoreContentsSelector` 에 `enablePdfExport` 전달 |
 
@@ -33,18 +33,21 @@
 
 ---
 
-## 3. 본문 HTML 취득 (origin 별)
+## 3. 본문 HTML 취득 (목록 contentJson)
 
-`/store/library/contents` 문서형 row 의 origin 3종에 따라 기존 함수로 본문을 가져온다.
+`/store-library/contents` 피드(`store-library-feed.controller`)가 origin 3종의 본문을
+**이미 `contentJson` 에 포함**한다. 따라서 별도 단건 API 호출 없이 목록 row 의 `contentJson` 을
+모달로 전달해 추출한다(브라우저 검증으로 확정 — 초기 per-origin fetch 안은 direct=html 키 누락,
+snapshot=publishedAssets 404 문제가 있었음).
 
-| origin | 함수 | 본문 필드 |
-|---|---|---|
-| `execution-asset` | `getStoreExecutionAsset(id)` | `data.htmlContent` (HTML) |
-| `direct` | `directContentApi.get(id)` | `data.contentJson` → blocks/body 해석 |
-| `snapshot` | `publishedAssetsApi.get(orgId, id)` | `data.contentJson` → blocks/body 해석 |
+| origin | contentJson 본문 위치 |
+|---|---|
+| `execution-asset` | `contentJson.html` (= `store_execution_assets.html_content`, 피드가 `jsonb_build_object('html', …)`) |
+| `direct` | `contentJson.html` (`kpa_store_contents.content_json` 의 `html` 키) |
+| `snapshot` | `o4o_asset_snapshots.content_json` 원본 (`html` / `blocks[]` / `body`/`content`) |
 
-- `orgId` 는 `getPharmacyInfo().organizationId` 에서 취득(snapshot 조회용).
-- contentJson 해석은 PrintContentPage 의 parseBlocks 와 동일(blocks[] → text/image/link, 없으면 body/content HTML).
+추출 우선순위: `html` → `blocks[]`(PrintContentPage parseBlocks 동일) → `body`/`content` → `imageUrl`.
+`getPharmacyInfo()` 는 약국명/전화/주소 표시용으로만 호출(본문과 무관).
 
 ---
 
@@ -89,18 +92,30 @@
 
 ## 7. 검증 결과
 
+브라우저 운영 smoke: 2026-06-26, KPA `테스트 약국 매장`, 배포본(43eec61e3). 자동 `window.print()` 가
+헤드풀 Playwright 를 중단시키므로, 배포된 모달의 `window.open` 을 가로채 실제 생성 HTML 을 캡처(인쇄
+다이얼로그 미발생)하고, 자동인쇄 스크립트만 제거해 iframe 으로 렌더·스크린샷 검증.
+
 | 항목 | 결과 |
 |---|---|
 | web-kpa-society `tsc --noEmit` | ✅ PASS (error 0) |
-| 콘텐츠 0개 선택 — PDF 버튼 비활성 | ⏳ 배포 후 smoke |
-| 콘텐츠 1개 선택 — PDF 버튼 활성 + 모달 | ⏳ |
-| 콘텐츠 2개+ 선택 — 비활성 + 안내 | ⏳ |
-| 옵션별 PDF 반영(제목/약국명/전화/주소/상담/출력일) | ⏳ |
-| 본문 필수·해제 불가 | ⏳ |
-| QR 비활성 + 안내 | ⏳ |
-| A4 세로 / 브라우저 인쇄 | ⏳ |
-| 원본 무변경 / 목록 비노출 / DB 미저장 | ⏳ (구조상 보장 — 조회 전용) |
-| production-materials 선택 모달 무영향 | ⏳ |
+| 콘텐츠 1개 선택 — PDF 버튼 활성 + 모달 | ✅ |
+| 콘텐츠 2개+ 선택 — 비활성 + 안내("…1개 선택 시 사용할 수 있습니다.") | ✅ |
+| 모달 기본값(본문 체크·disabled / 제목 체크 / 나머지 미체크) | ✅ |
+| 약국명·전화·주소 — 매장정보 존재 시 활성(`getPharmacyInfo`) | ✅ (테스트 약국 / 15772779 / 구로구 공원로 …) |
+| QR 비활성 + 안내 | ✅ |
+| 생성 HTML 에 제목/본문/약국명/전화/주소/상담문구/출력일/`@page A4` 포함 | ✅ (캡처 10203자 전수 확인) |
+| 본문 — 깨끗한 RichText 콘텐츠가 서식대로 렌더 | ✅ (type-3 항목 iframe 스크린샷) |
+| 3 origin 본문 추출(html/blocks/body) 비어있지 않음 | ✅ (direct·execution-asset·snapshot 전수) |
+| 원본 무변경 / 목록 비노출 / DB 미저장 | ✅ (조회 전용 — 쓰기 경로 없음) |
+| production-materials 선택 모달 무영향 | ✅ (enablePdfExport 미전달) |
+
+### 7-1. 관찰 — 일부 콘텐츠의 이스케이프된 본문
+
+데모 데이터 중 `관절·연골·뼈 건강 골든 세트 - 1`(direct) 의 저장 `contentJson.html` 이
+`<p>&lt;div style="…"&gt;</p>` 형태(작성자가 HTML 소스를 이스케이프된 텍스트로 저장)였다.
+이 경우 어떤 HTML 렌더러에서도 태그가 텍스트로 보이며, **PDF 도 동일하게 텍스트로 표시**된다.
+코드 결함이 아닌 **콘텐츠 데이터 특성**(API 직접 확인). 깨끗한 RichText 콘텐츠(type-3 등)는 정상 서식 렌더.
 
 ---
 
