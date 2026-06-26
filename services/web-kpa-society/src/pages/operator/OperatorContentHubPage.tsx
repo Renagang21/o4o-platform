@@ -12,8 +12,10 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Plus, Search, RefreshCw, Pencil, Trash2, Copy, Tag,
-  FileText, ChevronRight, Loader2, AlertCircle,
+  FileText, ChevronRight, Loader2, AlertCircle, Lightbulb,
 } from 'lucide-react';
+// WO-O4O-KPA-OPERATOR-DOCS-CONTENT-CREATION-GUIDE-MODAL-V1: 콘텐츠 제작 가이드(공통 모달, operator 모드)
+import { ContentCreationGuideModal } from '../pharmacy/ContentCreationGuideModal';
 import { DataTable } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { getAccessToken } from '../../contexts/AuthContext';
@@ -94,6 +96,8 @@ export default function OperatorContentHubPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [copying, setCopying] = useState<string | null>(null);
+  // WO-O4O-KPA-OPERATOR-DOCS-CONTENT-CREATION-GUIDE-MODAL-V1
+  const [guideOpen, setGuideOpen] = useState(false);
 
   // ─── Modal: 등록/수정 ──────────────────────────────────────────────────────
   const [showModal, setShowModal] = useState(false);
@@ -407,6 +411,14 @@ export default function OperatorContentHubPage() {
             <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
             새로고침
           </button>
+          {/* WO-O4O-KPA-OPERATOR-DOCS-CONTENT-CREATION-GUIDE-MODAL-V1: 보조(outline) 버튼 */}
+          <button
+            onClick={() => setGuideOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 border border-blue-500 text-blue-600 rounded-lg hover:bg-blue-50 text-sm font-medium"
+          >
+            <Lightbulb className="w-4 h-4" />
+            콘텐츠 제작 가이드
+          </button>
           <button
             onClick={openCreate}
             className="flex items-center gap-2 px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 text-sm font-medium"
@@ -692,6 +704,9 @@ export default function OperatorContentHubPage() {
           </div>
         </div>
       )}
+
+      {/* WO-O4O-KPA-OPERATOR-DOCS-CONTENT-CREATION-GUIDE-MODAL-V1 */}
+      <ContentCreationGuideModal open={guideOpen} onClose={() => setGuideOpen(false)} mode="operator" />
     </div>
   );
 }
