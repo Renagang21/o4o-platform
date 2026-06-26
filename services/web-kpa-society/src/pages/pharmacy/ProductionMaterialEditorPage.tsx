@@ -179,7 +179,9 @@ export default function ProductionMaterialEditorPage() {
             : undefined,
         });
         toast.success('제작 자료가 저장되었습니다.');
-        navigate('/store/library/production-materials');
+        // WO-O4O-KPA-QR-POP-RESULT-SCOPE-V1: 제작 자료 메뉴를 숨겼으므로 저장 후 콘텐츠 자료함으로 이동.
+        //   신규 자산(asset_type='content')은 콘텐츠 목록(origin='execution-asset')에 노출되어 결과를 바로 확인할 수 있다.
+        navigate('/store/library/contents');
       }
     } catch {
       toast.error('저장에 실패했습니다. 다시 시도해 주세요.');

@@ -12,7 +12,6 @@
  * 3 origin 모두 지원: direct / execution-asset / snapshot (백엔드가 id 로 organization 격리 조회).
  */
 import { useEffect, useMemo, useState, type CSSProperties } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { X, Image as ImageIcon, ExternalLink, Loader2 } from 'lucide-react';
 import { generateStorePop } from '../../api/storePop';
 
@@ -32,7 +31,6 @@ interface StorePopCreateModalProps {
 }
 
 export function StorePopCreateModal({ open, target, onClose, onCreated }: StorePopCreateModalProps) {
-  const navigate = useNavigate();
   const [title, setTitle] = useState('');
   const [layout, setLayout] = useState<'A4' | 'A5'>('A4');
   const [generating, setGenerating] = useState(false);
@@ -101,18 +99,18 @@ export function StorePopCreateModal({ open, target, onClose, onCreated }: StoreP
 
         {fileUrl ? (
           // ── 완료 화면 ──
+          // WO-O4O-KPA-QR-POP-RESULT-SCOPE-V1: POP 결과는 PDF 중심으로 안내.
+          //   "매장 제작 자료 보기"(production-materials) 안내 제거 — 사용자에게 제작 자료 메뉴를 노출하지 않는다.
+          //   (/store/marketing/pop 은 생성기일 뿐 결과 목록을 보여주지 않으므로 "POP 목록 보기"도 넣지 않음 — 후속 WO.)
           <div style={styles.body}>
-            <p style={styles.successMsg}>POP이 생성되어 매장 제작 자료에 저장되었습니다.</p>
+            <p style={styles.successMsg}>POP PDF가 생성되었습니다.</p>
             <div style={styles.urlRow}>
               <a href={fileUrl} target="_blank" rel="noreferrer" style={styles.urlLink}>
                 POP PDF 열기 <ExternalLink size={12} />
               </a>
             </div>
             <div style={styles.footer}>
-              <button type="button" onClick={onClose} style={styles.secondaryBtn}>닫기</button>
-              <button type="button" onClick={() => navigate('/store/library/production-materials')} style={styles.primaryBtn}>
-                매장 제작 자료 보기
-              </button>
+              <button type="button" onClick={onClose} style={styles.primaryBtn}>닫기</button>
             </div>
           </div>
         ) : (

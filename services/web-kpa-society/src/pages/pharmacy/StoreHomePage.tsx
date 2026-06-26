@@ -299,17 +299,18 @@ export function StoreHomePage() {
 
               <div className="h-px bg-slate-100" />
 
-              {/* Step 2: 제작 자료 만들기 (WO-O4O-KPA-STORE-HOME-EXECUTION-FLOW-ALIGN-V1) */}
+              {/* Step 2: 콘텐츠에서 만들기 (WO-O4O-KPA-QR-POP-RESULT-SCOPE-V1)
+                  제작 자료 메뉴를 사용자에게 노출하지 않으므로, 콘텐츠 자료함(콘텐츠 선택 → QR·POP 바로 만들기)으로 안내. */}
               <div className="py-3">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="inline-flex items-center justify-center w-[22px] h-[22px] rounded-full bg-emerald-600 text-[11px] font-bold text-white flex-shrink-0">2</span>
-                  <span className="text-[13px] font-semibold text-emerald-600 tracking-wide">제작 자료 만들기</span>
+                  <span className="text-[13px] font-semibold text-emerald-600 tracking-wide">콘텐츠에서 만들기</span>
                 </div>
-                <p className="text-[12px] text-slate-500 m-0 mb-2.5 pl-[30px]">POP·QR·블로그·상품 상세설명은 모두 매장 제작 자료에서 만듭니다.</p>
+                <p className="text-[12px] text-slate-500 m-0 mb-2.5 pl-[30px]">콘텐츠를 선택해 QR-code · POP을 바로 만듭니다.</p>
                 <div className="flex flex-wrap gap-2 pl-[30px]">
-                  <Link to="/store/library/production-materials" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
+                  <Link to="/store/library/contents" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
                     <FileEdit size={16} className="text-emerald-600" />
-                    <span>매장 제작 자료</span>
+                    <span>콘텐츠 자료함</span>
                   </Link>
                 </div>
               </div>

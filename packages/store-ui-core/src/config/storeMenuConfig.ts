@@ -286,11 +286,13 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'pop',          label: 'POP',     subPath: '/marketing/pop' },
       { key: 'qr',           label: 'QR-code', subPath: '/marketing/qr' },
     ]},
-    // WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-LIBRARY-TAB-V1: "매장 제작 자료" 항목 포함
+    // WO-O4O-KPA-QR-POP-RESULT-SCOPE-V1: KPA 사이드바에서 "매장 제작 자료" 메뉴 숨김.
+    //   POP/제작 결과물은 콘텐츠 목록(QR·POP 바로 만들기) + 결과물 메뉴 중심으로 안내한다.
+    //   route(/store/library/production-materials, /new, /:id/edit)는 App.tsx 에 유지 — 딥링크/저장 후 redirect/legacy 접근 보호.
+    //   GP/KCos 는 자체 '제작 자료' 메뉴 유지(미변경).
     { label: '약국 자료함', items: [
       { key: 'library-contents',              label: '콘텐츠',       subPath: '/library/contents' },
       { key: 'library-resources',             label: '자료',         subPath: '/library/resources' },
-      { key: 'library-production-materials',  label: '매장 제작 자료', subPath: '/library/production-materials' },
     ]},
     { label: '디지털 사이니지', items: [
       { key: 'signage-playlist',  label: '플레이리스트', subPath: '/marketing/signage/playlist' },
