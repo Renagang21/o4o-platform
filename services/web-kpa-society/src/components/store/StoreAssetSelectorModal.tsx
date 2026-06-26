@@ -319,7 +319,10 @@ export function StoreAssetSelectorModal({
       return;
     }
     // WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4:
-    //   운영자 콘텐츠는 참조형(landingType='page', landingTargetId=content.id) — 사본 복사 없음.
+    //   운영자 콘텐츠 선택 시 landingType='page', landingTargetId=content.id 를 보낸다.
+    // WO-O4O-KPA-QR-TARGET-COPY-GUARD-V1:
+    //   백엔드(ensureStoreCopyForPageTarget)가 content_hub 원본을 매장 사본(store_execution_assets)으로
+    //   치환하므로, 생성된 QR 은 원본이 아니라 매장 사본을 참조한다.
     if (source === 'content') {
       if (!selectedContent) return;
       onSelect({
@@ -471,7 +474,7 @@ export function StoreAssetSelectorModal({
           )}
           {source === 'content' && (
             <p style={styles.contentHint}>
-              운영자가 '완료' 상태로 저장한 콘텐츠입니다. 선택하면 원본을 가리키는 QR이 만들어집니다(사본 복사 없음).
+              운영자가 '완료' 상태로 저장한 콘텐츠입니다. 선택하면 매장 사본이 만들어지고 QR은 그 사본을 가리킵니다(이후 원본 수정은 반영되지 않으며, 매장에서 사본을 직접 편집할 수 있습니다).
             </p>
           )}
           {source === 'blog' && (

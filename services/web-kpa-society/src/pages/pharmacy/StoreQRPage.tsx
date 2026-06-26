@@ -846,7 +846,7 @@ export function StoreQRPage() {
               <GuideBlock
                 variant="info"
                 title="운영자 콘텐츠 연결 QR"
-                description="QR을 스캔하면 선택한 운영자 콘텐츠가 표시됩니다. 운영자 원본을 가리키는 연결이며, 매장 사본을 만들지 않습니다(원본이 수정되면 함께 반영됩니다)."
+                description="QR을 스캔하면 선택한 콘텐츠가 표시됩니다. 선택 시 매장 사본이 생성되어 QR은 매장 사본을 가리킵니다(원본 수정은 자동 반영되지 않으며, 매장에서 사본을 직접 편집할 수 있습니다)."
                 compact
               />
               {/* WO-O4O-KPA-QR-PAGE-CONSULTATION-CTA-V1: 콘텐츠 하단 상담 요청 버튼 옵션 (page 타입 전용) */}
