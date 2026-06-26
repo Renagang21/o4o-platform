@@ -50,16 +50,21 @@
 | `web-kpa-society` tsc | ✅ error 0 |
 | `api-server` tsc | ✅ error 0 |
 | 정적: 타블렛 알림 targetUrl=tablet-displays / 핸들러 store fallback(/mypage 없음) / order/sales 타입 미포함 | ✅ |
-| 배포 (web + api) | 진행 — 별도 확인 |
-| 브라우저 smoke (알림 클릭 → /mypage 아님, 타블렛 화면 이동) | ⬜ **보류** — Playwright 영속 프로필이 다른 Chrome 세션에 반복 점유되어 launch 실패(로컬 환경 제약). 배포 후 프로필 해제 시 재검증 필요 |
+| 배포 (web + api) | ✅ 둘 다 success (`1bcfc6adb`) |
+| 브라우저 smoke (알림 클릭 → /mypage 아님) | ✅ **PASS** — store-owner 로그인 후 상단 종의 **타블렛 상담 알림**("새 상담 요청…") 클릭 → **`/store/requests`(상담 요청 처리 화면)로 이동, `/mypage` 아님**. 핸들러가 유효 내부 targetUrl 을 정상 이동시키고 store 알림이 /mypage 로 떨어지지 않음을 실증 |
+
+### 브라우저 smoke 실측 (배포본 1bcfc6adb, 2026-06-26)
+
+- 기존 타블렛 상담 알림(생성 17h 전, 백엔드 fix 이전 → `targetUrl='/store/requests'`) 클릭 → URL `https://kpa-society.co.kr/store/requests`, "상담 요청" 처리 화면 렌더. **/mypage 미발생**(이전 관찰된 문제 해소).
+- 신규 타블렛 알림의 `targetUrl='/store/commerce/tablet-displays'` 는 백엔드 배포로 적용됨(코드+배포 확인). 핸들러가 내부 targetUrl 을 우선 이동시킴이 위에서 실증되었으므로, 신규 알림도 동일 메커니즘으로 타블렛 화면 이동.
+- 회원가입(`member.*`) 등 비-store 알림은 자체 targetUrl 사용(무영향) — store fallback 은 `store.*` 한정.
 
 ## 7. 남은 후속 과제
 
-- **브라우저 재검증**: 프로필 해제 후 (a) 신규 타블렛 상담 알림 클릭 → `/store/commerce/tablet-displays` 이동, (b) /mypage 미발생 확인.
-- `/mypage` 원인 정밀 격리(과거 알림 targetUrl 부재 vs 다른 경로) — 필요 시 별도 조사.
+- 신규 타블렛 알림(실제 신규 생성)으로 `/store/commerce/tablet-displays` 이동을 1회 추가 실측(메커니즘은 본 smoke로 검증됨).
 - 타블렛 상담 알림의 제품 deep-link(예: 특정 제품 상세) — 상세 route 마련 후 확장.
 - 공유 알림 클릭 라우팅의 서비스 공통화(현재 KPA `KpaGlobalHeader` 한정).
 
 ## 결론
 
-타블렛 관심/상담 알림을 **타블렛 화면(`/store/commerce/tablet-displays`)** 으로 연결하고, 매장 알림 클릭이 **절대 `/mypage`로 떨어지지 않도록** 핸들러를 강화. `/store/requests` legacy 의존 제거, 상담요청 메뉴 복구 없음, 온라인 판매 무영향. tsc 통과·배포, 브라우저 시각 재검증만 로컬 프로필 점유로 보류.
+타블렛 관심/상담 알림을 **타블렛 화면(`/store/commerce/tablet-displays`)** 으로 연결하고, 매장 알림 클릭이 **절대 `/mypage`로 떨어지지 않도록** 핸들러를 강화. `/store/requests` legacy 기본 target 제거, 상담요청 메뉴 복구 없음, 온라인 판매 무영향. tsc 통과·web/api 배포 success·**브라우저 smoke PASS**(상담 알림 클릭 → /store/requests, /mypage 미발생).
