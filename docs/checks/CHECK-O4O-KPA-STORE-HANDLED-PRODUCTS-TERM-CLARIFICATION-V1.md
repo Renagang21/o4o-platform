@@ -58,7 +58,20 @@ O4O 취급 제품  → O4O 기반 제품 (handled-products 화면 구분/탭)
 
 ## 9. browser smoke 결과
 
-⏳ 배포 후 — handled-products 탭/구분/버튼/빈상태 신규 라벨, /my-products 제목 '취급 중인 O4O 제품', /commerce/local-products 제목 '매장 경영활용 제품', tablet-displays 풀 탭 라벨, 관리 동선 정상, 콘솔 오류 없음.
+✅ PASS (2026-06-26, KPA `테스트 약국 매장`, 배포본 c1aa16c99 web deploy success).
+
+| 화면 | 확인 |
+|---|---|
+| /store/handled-products 부제 | O4O 기반 제품 + 매장 경영활용 제품 ✅ |
+| handled-products 출처 탭 | 전체 / O4O 기반 제품 / 매장 경영활용 제품 ✅ |
+| handled-products 상단 버튼 | 매장 경영활용 제품 등록 ✅ |
+| handled-products 빈 상태/하단 안내 | 매장 경영활용 제품 ✅ |
+| /store/commerce/local-products 제목/도움말/빈상태 | 매장 경영활용 제품 ✅ |
+| /store/my-products 제목/설명/버튼/빈상태 | 취급 중인 O4O 제품 / O4O 제품 취급 등록 ✅ |
+| 원본 관리 화면 직접 접근 | 정상(2화면) ✅ |
+| 콘솔 페이지 오류 없음 | ✅ |
+
+> StoreTabletDisplaysPage 풀 탭(취급 중인 O4O 제품/매장 경영활용 제품)은 타블렛 보유 시 노출 — 라벨 결정적·typecheck PASS로 확인.
 
 ## 10. 후속 후보
 
