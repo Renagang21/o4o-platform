@@ -5,15 +5,24 @@
  *   (@o4o/operator-core-ui) 로 위임. 저장(createCourse)·라우팅은 본 wrapper 가 담당.
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Lightbulb } from 'lucide-react';
 import { InstructorCourseFormShell, type InstructorCourseFormValues } from '@o4o/operator-core-ui';
 import { lmsInstructorApi, type ContentKind } from '../../../api/lms-instructor';
+// WO-O4O-KPA-COMMUNITY-CONTENT-LECTURE-CREATION-GUIDE-MODAL-V1: 강의 제작 가이드(공통 모달, communityLecture 모드)
+import { ContentCreationGuideModal } from '../../pharmacy/ContentCreationGuideModal';
 
 const styles: Record<string, React.CSSProperties> = {
   page: { maxWidth: 680, margin: '0 auto', padding: '32px 20px' },
   backLink: { fontSize: 13, color: '#6b7280', cursor: 'pointer', marginBottom: 20, display: 'inline-block' },
-  title: { fontSize: 22, fontWeight: 700, color: '#111827', margin: '0 0 28px' },
+  titleRow: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', margin: '0 0 28px' },
+  title: { fontSize: 22, fontWeight: 700, color: '#111827', margin: 0 },
+  guideBtn: {
+    display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 12px',
+    background: '#fff', border: '1px solid #4f46e5', borderRadius: 6,
+    fontSize: 13, fontWeight: 500, color: '#4f46e5', cursor: 'pointer',
+  },
 };
 
 interface CourseNewPageProps {
@@ -49,6 +58,7 @@ export default function CourseNewPage({
   contentKind,
 }: CourseNewPageProps = {}) {
   const navigate = useNavigate();
+  const [guideOpen, setGuideOpen] = useState(false);
   const back = () => navigate(returnTo ?? '/instructor/courses');
 
   const handleSubmit = async (values: InstructorCourseFormValues) => {
@@ -74,7 +84,16 @@ export default function CourseNewPage({
   return (
     <div style={styles.page}>
       <span style={styles.backLink} onClick={back}>{backLinkText ?? '← 강의 목록'}</span>
-      <h1 style={styles.title}>{pageTitle ?? '새 강의 만들기'}</h1>
+      <div style={styles.titleRow}>
+        <h1 style={styles.title}>{pageTitle ?? '새 강의 만들기'}</h1>
+        {/* WO-O4O-KPA-COMMUNITY-CONTENT-LECTURE-CREATION-GUIDE-MODAL-V1: 보조(outline) 강의 제작 가이드 */}
+        <button type="button" onClick={() => setGuideOpen(true)} style={styles.guideBtn}>
+          <Lightbulb size={14} />
+          강의 제작 가이드
+        </button>
+      </div>
+
+      <ContentCreationGuideModal open={guideOpen} onClose={() => setGuideOpen(false)} mode="communityLecture" />
 
       <InstructorCourseFormShell
         config={{

@@ -12,12 +12,15 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Lightbulb } from 'lucide-react';
 import { CommunityContentWriteShell, GuideBlock } from '@o4o/shared-space-ui';
 import type { CommunityContentWriteValues } from '@o4o/shared-space-ui';
 import { contentApi } from '../../api/content';
 import { useAuth, getAccessToken } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
 import { fetchGuidePageContent } from '../../api/guideContent';
+// WO-O4O-KPA-COMMUNITY-CONTENT-LECTURE-CREATION-GUIDE-MODAL-V1: 콘텐츠 제작 가이드(공통 모달, communityContent 모드)
+import { ContentCreationGuideModal } from '../pharmacy/ContentCreationGuideModal';
 
 export function ContentWritePage() {
   const { id } = useParams<{ id: string }>();
@@ -25,6 +28,8 @@ export function ContentWritePage() {
   const { user, isAuthenticated } = useAuth();
   const isEditMode = Boolean(id);
 
+  // WO-O4O-KPA-COMMUNITY-CONTENT-LECTURE-CREATION-GUIDE-MODAL-V1
+  const [guideOpen, setGuideOpen] = useState(false);
   const [initialValues, setInitialValues] = useState<Partial<CommunityContentWriteValues> | undefined>(undefined);
   // 수정 모드는 detail 로드 완료 후 shell 을 mount(=초기값 1회 적용) — 로드 전 빈 폼 mount 방지
   const [loading, setLoading] = useState(isEditMode);
@@ -133,7 +138,16 @@ export function ContentWritePage() {
 
   return (
     <div style={styles.page}>
-      <h1 style={styles.pageTitle}>{isEditMode ? '콘텐츠 수정' : '콘텐츠 작성'}</h1>
+      <div style={styles.headerRow}>
+        <h1 style={styles.pageTitle}>{isEditMode ? '콘텐츠 수정' : '콘텐츠 작성'}</h1>
+        {/* WO-O4O-KPA-COMMUNITY-CONTENT-LECTURE-CREATION-GUIDE-MODAL-V1: 보조(outline) 가이드 버튼 */}
+        <button type="button" onClick={() => setGuideOpen(true)} style={styles.guideBtn}>
+          <Lightbulb size={14} />
+          콘텐츠 제작 가이드
+        </button>
+      </div>
+
+      <ContentCreationGuideModal open={guideOpen} onClose={() => setGuideOpen(false)} mode="communityContent" />
 
       <CommunityContentWriteShell
         config={{ mode: isEditMode ? 'edit' : 'create' }}
@@ -152,7 +166,13 @@ export function ContentWritePage() {
 const styles: Record<string, React.CSSProperties> = {
   page: { maxWidth: 780, margin: '0 auto', padding: '24px 16px 60px' },
   center: { display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '40vh' },
-  pageTitle: { fontSize: '1.375rem', fontWeight: 700, color: '#0f172a', margin: '0 0 20px' },
+  headerRow: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', margin: '0 0 20px' },
+  pageTitle: { fontSize: '1.375rem', fontWeight: 700, color: '#0f172a', margin: 0 },
+  guideBtn: {
+    display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 12px',
+    background: '#fff', border: '1px solid #2563eb', borderRadius: 6,
+    fontSize: 13, fontWeight: 500, color: '#2563eb', cursor: 'pointer',
+  },
 };
 
 export default ContentWritePage;

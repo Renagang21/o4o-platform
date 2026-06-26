@@ -15,16 +15,18 @@
 import { useEffect, useState } from 'react';
 import { X, Copy, Check, Sparkles } from 'lucide-react';
 
-export type GuideMode = 'store' | 'operator';
+export type GuideMode = 'store' | 'operator' | 'communityContent' | 'communityLecture';
 
 interface GuideStep {
   title: string;
   desc: string;
 }
 interface GuideContent {
+  /** 모달 제목 override (기본 '콘텐츠 제작 가이드') */
+  title?: string;
   subtitle: string;
   flow: GuideStep[];
-  /** mode='operator' 전용 — 운영자 콘텐츠 작성 기준 등 추가 섹션 */
+  /** 작성 기준 등 추가 섹션 */
   extraSections: { title: string; paras: string[] }[];
   imageParas: string[];
   prompt: string;
@@ -62,6 +64,43 @@ h1, h2, h3, p, ul, li, strong, div, section 정도만 사용해 주세요.
 대상 고객:
 핵심 메시지:
 활용 목적:
+피해야 할 표현:
+원하는 길이:`;
+
+const COMMUNITY_CONTENT_PROMPT = `아래 내용을 커뮤니티 회원에게 공유할 콘텐츠로 정리해 주세요.
+
+O4O 편집기의 HTML 탭에 붙여 넣을 수 있도록, 내용에 디자인을 입힌 HTML로 만들어 주세요.
+색상, 배경, 여백, 카드형 구성을 적절히 사용해 읽기 좋게 정리해 주세요.
+디자인은 inline style 중심으로 넣어 주세요.
+
+script, iframe, 외부 CSS, 외부 폰트, 외부 스크립트는 사용하지 마세요.
+h1, h2, h3, p, ul, li, strong, div, section 정도만 사용해 주세요.
+모바일에서도 읽기 좋게 만들어 주세요.
+이미지가 필요한 곳은 [이미지 삽입 위치]라고 표시해 주세요.
+
+주제:
+대상 독자:
+핵심 메시지:
+참고할 내용:
+피해야 할 표현:
+원하는 길이:`;
+
+const COMMUNITY_LECTURE_PROMPT = `아래 내용을 바탕으로 강의 소개와 학습 안내 콘텐츠를 만들어 주세요.
+
+O4O 편집기의 HTML 탭에 붙여 넣을 수 있도록, 내용에 디자인을 입힌 HTML로 만들어 주세요.
+색상, 배경, 여백, 카드형 구성을 적절히 사용해 읽기 좋게 정리해 주세요.
+디자인은 inline style 중심으로 넣어 주세요.
+
+script, iframe, 외부 CSS, 외부 폰트, 외부 스크립트는 사용하지 마세요.
+h1, h2, h3, p, ul, li, strong, div, section 정도만 사용해 주세요.
+모바일에서도 읽기 좋게 만들어 주세요.
+이미지가 필요한 곳은 [이미지 삽입 위치]라고 표시해 주세요.
+
+강의 주제:
+대상 학습자:
+학습 목표:
+커리큘럼:
+준비물:
 피해야 할 표현:
 원하는 길이:`;
 
@@ -108,6 +147,59 @@ const CONTENT: Record<GuideMode, GuideContent> = {
     ],
     prompt: OPERATOR_PROMPT,
     footer: '완성된 운영자 콘텐츠는 매장 자료함에서 가져가 편집한 뒤 QR, PDF, POP, 블로그 제작에 활용할 수 있습니다.',
+  },
+  communityContent: {
+    subtitle: 'AI 도구로 정리한 글을 O4O 커뮤니티 콘텐츠로 활용할 수 있습니다.',
+    flow: [
+      { title: 'AI와 대화하며 내용을 정리하세요.', desc: '주제, 대상 독자, 핵심 메시지, 참고할 내용, 피해야 할 표현을 알려주면 더 좋은 콘텐츠를 만들 수 있습니다.' },
+      { title: '읽기 쉬운 구조로 나누세요.', desc: '제목, 요약, 핵심 설명, 사례, 정리 문장처럼 구역을 나누면 커뮤니티 회원이 이해하기 쉽습니다.' },
+      { title: 'AI에게 내용에 디자인을 입힌 HTML로 정리해 달라고 요청하세요.', desc: '“O4O 편집기의 HTML 탭에 붙여 넣을 수 있도록, 내용에 디자인을 입힌 HTML로 만들어 주세요”라고 요청하면 됩니다.' },
+      { title: 'O4O 편집기에 붙여 넣고 미리보기로 확인하세요.', desc: 'HTML 탭에 붙여 넣은 뒤 화면 보기와 모바일 보기를 고려해 문구와 여백을 조정합니다.' },
+    ],
+    extraSections: [
+      {
+        title: '커뮤니티 콘텐츠 작성 기준',
+        paras: [
+          '커뮤니티 콘텐츠는 다른 회원이 읽고 참고할 수 있는 공유 글입니다.',
+          '개인 경험이나 의견을 담을 수 있지만, 사실과 의견이 섞이지 않도록 문장을 분명하게 쓰는 것이 좋습니다.',
+          '특정 제품이나 서비스에 대한 설명은 과장하지 말고, 필요한 경우 출처나 확인이 필요한 부분을 구분해 주세요.',
+        ],
+      },
+    ],
+    imageParas: [
+      '이미지는 PC에 있는 파일 경로를 그대로 붙여 넣으면 다른 회원의 화면에서 보이지 않을 수 있습니다.',
+      '이미지를 사용할 때는 O4O에 업로드한 이미지 URL이나 안정적으로 접근 가능한 이미지 URL을 사용하세요.',
+      '다국어 또는 재편집을 고려한다면, 글자가 들어간 이미지는 가능하면 피하고 문구는 편집기에서 입력하는 것이 좋습니다.',
+    ],
+    prompt: COMMUNITY_CONTENT_PROMPT,
+    footer: 'HTML을 붙여 넣은 뒤에는 편집 화면에서 문구를 다시 수정할 수 있습니다. 완성된 글은 커뮤니티 회원에게 공유됩니다.',
+  },
+  communityLecture: {
+    title: '강의 콘텐츠 제작 가이드',
+    subtitle: 'AI 도구로 강의 소개, 커리큘럼, 학습자료를 보기 좋게 정리할 수 있습니다.',
+    flow: [
+      { title: 'AI와 대화하며 강의 내용을 정리하세요.', desc: '강의 주제, 대상 학습자, 학습 목표, 차시 구성, 핵심 내용을 알려주면 더 좋은 강의 소개와 학습자료를 만들 수 있습니다.' },
+      { title: '학습자가 이해하기 쉬운 구조로 나누세요.', desc: '강의 목표, 이런 분께 추천, 커리큘럼, 준비물, 학습 후 기대 효과처럼 구역을 나누면 좋습니다.' },
+      { title: 'AI에게 내용에 디자인을 입힌 HTML로 정리해 달라고 요청하세요.', desc: '“O4O 편집기의 HTML 탭에 붙여 넣을 수 있도록, 내용에 디자인을 입힌 HTML로 만들어 주세요”라고 요청하면 됩니다. (강의 소개·요약은 폼에, 풍부한 본문은 레슨 본문 편집의 HTML 탭에 붙여 넣습니다.)' },
+      { title: 'O4O 편집기에 붙여 넣고 미리보기로 확인하세요.', desc: 'HTML 탭에 붙여 넣은 뒤 모바일 화면과 긴 문단의 가독성을 확인합니다.' },
+    ],
+    extraSections: [
+      {
+        title: '강의 콘텐츠 작성 기준',
+        paras: [
+          '강의 콘텐츠는 학습자가 무엇을 배울 수 있는지 빠르게 이해할 수 있어야 합니다.',
+          '강의 소개는 짧고 명확하게 쓰고, 커리큘럼은 차시별로 나누는 것이 좋습니다.',
+          '학습 목표, 대상, 준비물, 수강 후 기대 효과를 구분하면 강의 선택에 도움이 됩니다.',
+        ],
+      },
+    ],
+    imageParas: [
+      '이미지는 PC에 있는 파일 경로를 그대로 붙여 넣으면 다른 사용자의 화면에서 보이지 않을 수 있습니다.',
+      '강의 대표 이미지나 설명 이미지는 O4O에 업로드한 이미지 URL이나 안정적으로 접근 가능한 이미지 URL을 사용하세요.',
+      '슬라이드나 배경 이미지를 사용할 때는 글자가 너무 많은 이미지를 피하고, 중요한 문구는 편집기에서 입력하는 것이 좋습니다.',
+    ],
+    prompt: COMMUNITY_LECTURE_PROMPT,
+    footer: 'HTML을 붙여 넣은 뒤에는 편집 화면에서 다시 수정할 수 있습니다. 완성된 강의 소개·학습자료는 학습자에게 표시됩니다.',
   },
 };
 
@@ -217,7 +309,7 @@ export function ContentCreationGuideModal({
         <div className="ccg-header">
           <h2 className="ccg-title">
             <Sparkles size={18} style={{ color: '#2563eb' }} />
-            콘텐츠 제작 가이드
+            {content.title ?? '콘텐츠 제작 가이드'}
           </h2>
           <button type="button" className="ccg-close" onClick={onClose} aria-label="닫기">
             <X size={18} />

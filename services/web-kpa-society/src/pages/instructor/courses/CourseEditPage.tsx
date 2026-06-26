@@ -7,7 +7,10 @@
 
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { Lightbulb } from 'lucide-react';
 import { RichTextEditor, AiContentModal } from '@o4o/content-editor';
+// WO-O4O-KPA-COMMUNITY-CONTENT-LECTURE-CREATION-GUIDE-MODAL-V1: 강의 제작 가이드(공통 모달, communityLecture 모드)
+import { ContentCreationGuideModal } from '../../pharmacy/ContentCreationGuideModal';
 // WO-O4O-AI-PRODUCTION-TEMPLATE-SURFACE-PRESET-EXTEND-V1: store 바깥 surface(lms-lesson) preset
 import { findEditingPreset } from '@o4o/types';
 // WO-O4O-GUIDE-UI-COMPONENT-V1
@@ -501,6 +504,8 @@ export default function CourseEditPage() {
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // WO-O4O-KPA-COMMUNITY-CONTENT-LECTURE-CREATION-GUIDE-MODAL-V1
+  const [guideOpen, setGuideOpen] = useState(false);
 
   // WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1: lms.course.editor guide override
   const [courseGuide, setCourseGuide] = useState<LessonGuideOverride>({});
@@ -689,7 +694,20 @@ export default function CourseEditPage() {
 
   return (
     <div style={s.page}>
-      <span style={s.backLink} onClick={() => navigate('/instructor/courses')}>← 강의 목록</span>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+        <span style={s.backLink} onClick={() => navigate('/instructor/courses')}>← 강의 목록</span>
+        {/* WO-O4O-KPA-COMMUNITY-CONTENT-LECTURE-CREATION-GUIDE-MODAL-V1: 보조(outline) 강의 제작 가이드 */}
+        <button
+          type="button"
+          onClick={() => setGuideOpen(true)}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 12px', background: '#fff', border: '1px solid #4f46e5', borderRadius: 6, fontSize: 13, fontWeight: 500, color: '#4f46e5', cursor: 'pointer' }}
+        >
+          <Lightbulb size={14} />
+          강의 제작 가이드
+        </button>
+      </div>
+
+      <ContentCreationGuideModal open={guideOpen} onClose={() => setGuideOpen(false)} mode="communityLecture" />
 
       {/* Course Info Edit */}
       <div style={s.section}>
