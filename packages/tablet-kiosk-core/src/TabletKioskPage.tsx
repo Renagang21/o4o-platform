@@ -271,6 +271,12 @@ export interface TabletKioskPageProps {
    * 가격/QR/상담버튼 노출 + idle 전환 시간을 매장이 제어.
    */
   displaySettings?: TabletKioskDisplaySettings;
+  /**
+   * slug 직접 주입(opt-in). 미지정 시 `useParams().slug` 사용(기존 동작).
+   * 라우트 밖 임베드(예: 관리자 미리보기 모달)에서 Router 중첩 없이 slug 를 넘길 때 사용.
+   * WO-O4O-KPA-TABLET-PREVIEW-V1.
+   */
+  slug?: string;
 }
 
 export interface TabletKioskDisplaySettings {
@@ -287,8 +293,10 @@ export function TabletKioskPage({
   idleTimeoutMs,
   idlePlaylist,
   displaySettings,
+  slug: slugProp,
 }: TabletKioskPageProps) {
-  const { slug } = useParams<{ slug: string }>();
+  const { slug: routeSlug } = useParams<{ slug: string }>();
+  const slug = slugProp ?? routeSlug;
   const [state, dispatch] = useReducer(reducer, initialState);
   const {
     mode,

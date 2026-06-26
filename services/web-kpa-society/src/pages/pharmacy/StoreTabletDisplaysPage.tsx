@@ -16,7 +16,7 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useNavigate, MemoryRouter, Routes, Route } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
   Loader2, Tablet, ChevronUp, ChevronDown, X, Plus,
   ArrowLeft, Save, Package, ShoppingBag, AlertTriangle, Tv,
@@ -1052,22 +1052,14 @@ export default function StoreTabletDisplaysPage() {
               <X className="w-4 h-4" /> 닫기
             </button>
           </div>
-          {/* kiosk-core 재사용: 상단 바(40px) 아래로 밀어 표시 */}
+          {/* kiosk-core 재사용 (Router 중첩 금지 → slug prop 직접 주입) */}
           <div style={{ position: 'absolute', top: 48, left: 0, right: 0, bottom: 0, overflow: 'hidden' }}>
-            <MemoryRouter initialEntries={[`/${encodeURIComponent(previewSlug)}`]}>
-              <Routes>
-                <Route
-                  path=":slug"
-                  element={
-                    <TabletKioskPage
-                      api={previewApi}
-                      displaySettings={previewSettings}
-                      showQrBadge={previewSettings?.showQr !== false}
-                    />
-                  }
-                />
-              </Routes>
-            </MemoryRouter>
+            <TabletKioskPage
+              api={previewApi}
+              slug={previewSlug}
+              displaySettings={previewSettings}
+              showQrBadge={previewSettings?.showQr !== false}
+            />
           </div>
         </div>
       )}
