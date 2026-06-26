@@ -843,7 +843,17 @@ export default function StoreTabletDisplaysPage() {
                           </button>
                         </>
                       ) : (
-                        '추가 가능한 매장 자체 제품이 없습니다.'
+                        <>
+                          <p>타블렛에 진열할 매장 자체 제품이 없습니다.</p>
+                          <p className="mt-1">매장 자체 제품을 먼저 등록한 뒤 타블렛에 배치해 주세요.</p>
+                          <button
+                            type="button"
+                            onClick={() => navigate('/store/commerce/local-products')}
+                            className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-600 text-white text-xs font-medium rounded-lg hover:bg-teal-700"
+                          >
+                            <Plus className="w-3.5 h-3.5" /> 매장 자체 제품 등록
+                          </button>
+                        </>
                       )}
                     </div>
                   ) : (

@@ -318,6 +318,10 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
     //   '타블렛 구성' 하위 통합(위치별 타블렛/전시 설정)은 후속 별도 WO.
     { label: '타블렛', items: [
       { key: 'my-products',     label: '내 매장 제품', subPath: '/my-products' },
+      // WO-O4O-KPA-STORE-LOCAL-PRODUCT-MENU-ACCESS-V1:
+      //   기존 자체 제품 화면(/commerce/local-products, StoreLocalProductsPage)을 KPA 메뉴에 노출.
+      //   O4O 제품 아님(약국 직접 등록) → 타블렛 진열의 주요 공급원. route 재사용, 신규 API/DB 없음.
+      { key: 'local-products',  label: '매장 자체 제품', subPath: '/commerce/local-products' },
       { key: 'tablet-displays', label: '타블렛 구성',  subPath: '/commerce/tablet-displays' },
     ]},
     // WO-O4O-FOREIGN-VISITOR-SALES-SUPPORT-MENU-GATE-V1: 판매 채널 확장 (유료 기능 게이트)
