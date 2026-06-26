@@ -362,12 +362,17 @@ export const storeLibraryApi = {
     limit?: number;
     search?: string;
     type?: 'document';
+    // WO-O4O-KPA-CONTENT-LIST-TAG-SEARCH-FILTER-V1: 출처 탭 + 태그 정확 필터
+    source?: 'operator' | 'community' | 'mine';
+    tag?: string;
   }) => {
     const query: Record<string, string> = {};
     if (params?.page) query.page = String(params.page);
     if (params?.limit) query.limit = String(params.limit);
     if (params?.search) query.search = params.search;
     if (params?.type) query.type = params.type;
+    if (params?.source) query.source = params.source;
+    if (params?.tag) query.tag = params.tag;
     return apiClient.get<{ success: boolean; data: PaginatedLibraryContents }>(
       '/store-library/contents',
       Object.keys(query).length > 0 ? query : undefined,

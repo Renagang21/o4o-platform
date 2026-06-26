@@ -45,6 +45,16 @@ type ContentsSubTab = 'document' | 'course-resource';
 type RowOrigin = 'snapshot' | 'direct' | 'execution-asset';
 type DocSourceType = 'cms' | 'content' | 'direct' | 'execution';
 
+// WO-O4O-KPA-CONTENT-LIST-TAG-SEARCH-FILTER-V1: 출처 탭
+//   all=전체 / operator=운영자 제공(snapshot cms) / community=커뮤니티 가져옴(snapshot content) / mine=내가 만든(direct+execution-asset)
+type SourceFilter = 'all' | 'operator' | 'community' | 'mine';
+const SOURCE_TABS: { key: SourceFilter; label: string }[] = [
+  { key: 'all', label: '전체' },
+  { key: 'operator', label: '운영자 제공' },
+  { key: 'community', label: '커뮤니티 가져옴' },
+  { key: 'mine', label: '내가 만든 콘텐츠' },
+];
+
 interface DocumentRow {
   id: string;
   origin: RowOrigin;
@@ -336,6 +346,14 @@ function DocumentsSection({
   const [selected, setSelected] = useState<Set<string>>(new Set());
   // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-PDF-EXPORT-OPTIONS-V1: 인쇄용 PDF 대상(단일)
   const [pdfTarget, setPdfTarget] = useState<PdfExportContent | null>(null);
+  // WO-O4O-KPA-CONTENT-LIST-TAG-SEARCH-FILTER-V1: 출처 탭 + 태그 정확 필터
+  const [source, setSource] = useState<SourceFilter>('all');
+  const [activeTag, setActiveTag] = useState<string | null>(null);
+
+  // 출처 탭/태그 필터 변경 시 1페이지로 리셋
+  const changeSource = useCallback((s: SourceFilter) => { setSource(s); setPage(1); }, []);
+  const applyTag = useCallback((t: string) => { setActiveTag(t); setPage(1); }, []);
+  const clearTag = useCallback(() => { setActiveTag(null); setPage(1); }, []);
 
   useEffect(() => {
     const handle = setTimeout(() => {
@@ -357,6 +375,8 @@ function DocumentsSection({
           page,
           limit: PAGE_LIMIT,
           search: searchQuery || undefined,
+          source: source !== 'all' ? source : undefined,
+          tag: activeTag || undefined,
         })
         .catch(() => null);
       if (cancelled || myReq !== reqIdRef.current) return;
@@ -370,7 +390,7 @@ function DocumentsSection({
     return () => {
       cancelled = true;
     };
-  }, [page, searchQuery, reloadKey]);
+  }, [page, searchQuery, source, activeTag, reloadKey]);
 
   useEffect(() => {
     setSelected((prev) => {
@@ -474,9 +494,17 @@ function DocumentsSection({
             {row.lifecycleStatus === 'expired' && (
               <span style={{ ...styles.badge, background: '#FEE2E2', color: '#DC2626' }}>만료</span>
             )}
-            {/* WO-O4O-KPA-CONTENT-LIST-TAG-FIELD-AND-DISPLAY-V1: 태그 chip (최대 5개 + N, 단순 표시 — 클릭 필터 없음) */}
+            {/* WO-O4O-KPA-CONTENT-LIST-TAG-SEARCH-FILTER-V1: 태그 chip 클릭 → 해당 태그 필터 적용 (행 클릭/선택과 분리) */}
             {row.tags.slice(0, 5).map((tag) => (
-              <span key={tag} style={styles.tagChip}>{tag}</span>
+              <button
+                key={tag}
+                type="button"
+                onClick={(e) => { e.stopPropagation(); applyTag(tag); }}
+                style={{ ...styles.tagChip, ...styles.tagChipClickable }}
+                title={`'${tag}' 태그로 필터`}
+              >
+                {tag}
+              </button>
             ))}
             {row.tags.length > 5 && (
               <span style={styles.tagMore}>+{row.tags.length - 5}</span>
@@ -532,7 +560,7 @@ function DocumentsSection({
         },
       },
     ],
-    [mode],
+    [mode, applyTag],
   );
 
   const showRemoveButton = mode === 'page' && !!onRemoveSnapshots;
@@ -549,15 +577,43 @@ function DocumentsSection({
         </span>
       </div>
 
+      {/* WO-O4O-KPA-CONTENT-LIST-TAG-SEARCH-FILTER-V1: 출처 탭 (page 모드 전용) */}
+      {mode === 'page' && (
+        <div style={styles.sourceTabBar}>
+          {SOURCE_TABS.map(({ key, label }) => {
+            const active = source === key;
+            return (
+              <button
+                key={key}
+                type="button"
+                onClick={() => changeSource(key)}
+                style={{ ...styles.sourceTab, ...(active ? styles.sourceTabActive : styles.sourceTabInactive) }}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       <div style={styles.sectionHeader}>
         <span style={styles.countBadge}>{total}건</span>
+        {/* WO-O4O-KPA-CONTENT-LIST-TAG-SEARCH-FILTER-V1: 적용된 태그 필터 chip */}
+        {activeTag && (
+          <span style={styles.activeTagChip}>
+            태그: {activeTag}
+            <button type="button" onClick={clearTag} style={styles.activeTagRemove} aria-label="태그 필터 해제">
+              <span aria-hidden>×</span>
+            </button>
+          </span>
+        )}
         <div style={styles.searchWrap}>
           <Search size={14} style={styles.searchIcon} />
           <input
             type="search"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            placeholder="제목·요약·본문 검색"
+            placeholder="제목·요약·본문·태그 검색"
             style={styles.searchInput}
           />
         </div>
@@ -1098,6 +1154,64 @@ const styles: Record<string, CSSProperties> = {
     fontWeight: 500,
     color: '#6B7280',
     flexShrink: 0,
+  },
+  // WO-O4O-KPA-CONTENT-LIST-TAG-SEARCH-FILTER-V1
+  tagChipClickable: {
+    cursor: 'pointer',
+    border: '1px solid #BFDBFE',
+    background: '#EFF6FF',
+  },
+  sourceTabBar: {
+    display: 'flex',
+    gap: 6,
+    flexWrap: 'wrap',
+    padding: '4px 0 10px',
+    borderBottom: '1px solid #F1F5F9',
+    marginBottom: 10,
+  },
+  sourceTab: {
+    padding: '5px 12px',
+    fontSize: '13px',
+    fontWeight: 600,
+    borderRadius: '999px',
+    cursor: 'pointer',
+    border: '1px solid transparent',
+  },
+  sourceTabActive: {
+    background: '#1D4ED8',
+    color: '#fff',
+    borderColor: '#1D4ED8',
+  },
+  sourceTabInactive: {
+    background: '#F8FAFC',
+    color: '#475569',
+    borderColor: '#E2E8F0',
+  },
+  activeTagChip: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 4,
+    padding: '3px 6px 3px 10px',
+    fontSize: '12px',
+    fontWeight: 600,
+    background: '#EFF6FF',
+    color: '#1D4ED8',
+    border: '1px solid #BFDBFE',
+    borderRadius: '999px',
+  },
+  activeTagRemove: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 16,
+    height: 16,
+    border: 'none',
+    background: 'transparent',
+    color: '#1D4ED8',
+    cursor: 'pointer',
+    fontSize: '14px',
+    lineHeight: 1,
+    padding: 0,
   },
   viewBtn: {
     display: 'inline-flex',

@@ -108,37 +108,47 @@ export function createStoreLibraryFeedController(
         const useSearch = !!search;
         const searchPattern = useSearch ? `%${search}%` : null;
 
-        // bind 순서:
-        //   - data query: $1=orgId, $2=limit, $3=offset, [$4=searchPattern]
-        //   - count query: $1=orgId, [$2=searchPattern]
-        // WO-O4O-KPA-CONTENT-LIST-SEARCH-BODY-SUMMARY-V1 (검색 1단계):
-        //   제목만 → 제목 + 본문/요약(content_json::text) + exec html_content/description/category 로 확장.
-        //   동일 바인딩 파라미터($4 data / $2 count)를 여러 컬럼에 OR 적용 → 문자열 보간 없음(injection 안전).
-        //   migration/tags 컬럼 없음. raw HTML/JSON text 검색은 1차 허용(데이터 소규모). branch 별 컬럼은 실제 스키마 기준:
-        //     - snapshot/direct: title + content_json(jsonb)::text
-        //     - exec(store_execution_assets): title + description + html_content + category (content_json 컬럼 없음)
-        const snapshotSearchClauseData = useSearch
-          ? `AND (s.title ILIKE $4 OR s.content_json::text ILIKE $4)`
-          : '';
-        const directSearchClauseData = useSearch
-          ? `AND (d.title ILIKE $4 OR d.content_json::text ILIKE $4)`
-          : '';
-        // WO-O4O-KPA-STORE-LIBRARY-CONTENT-CREATED-BUT-LIST-MISSING-V1 (A안):
-        //   store_execution_assets(asset_type='content') 도 콘텐츠 피드에 포함한다.
-        //   QR 만들기 "내 매장 자료" 선택기(getStoreExecutionAssets)와 동일 소스를 콘텐츠 목록에도 노출 →
-        //   "QR 선택 가능 = 콘텐츠 목록에서도 접근 가능" 정합. 비파괴(원본/QR libraryItemId 무변경).
-        const execSearchClauseData = useSearch
-          ? `AND (e.title ILIKE $4 OR COALESCE(e.description, '') ILIKE $4 OR COALESCE(e.html_content, '') ILIKE $4 OR COALESCE(e.category, '') ILIKE $4)`
-          : '';
-        const snapshotSearchClauseCount = useSearch
-          ? `AND (s.title ILIKE $2 OR s.content_json::text ILIKE $2)`
-          : '';
-        const directSearchClauseCount = useSearch
-          ? `AND (d.title ILIKE $2 OR d.content_json::text ILIKE $2)`
-          : '';
-        const execSearchClauseCount = useSearch
-          ? `AND (e.title ILIKE $2 OR COALESCE(e.description, '') ILIKE $2 OR COALESCE(e.html_content, '') ILIKE $2 OR COALESCE(e.category, '') ILIKE $2)`
-          : '';
+        // WO-O4O-KPA-CONTENT-LIST-TAG-SEARCH-FILTER-V1:
+        //   출처 탭(source) + 태그 정확 필터(tag) + 태그 텍스트 검색(tags::text) 추가.
+        //   source_group 매핑: snapshot.asset_type='cms' → 'operator'(운영자 제공),
+        //     snapshot.asset_type='content' → 'community'(커뮤니티 가져옴),
+        //     direct/execution-asset → 'mine'(내가 만든 콘텐츠).
+        //   (kpa_contents 에 producer/author_role 컬럼이 없어 그 이상의 세분화는 불가 — asset_type 기준 매핑.)
+        const ALLOWED_SOURCES = new Set(['operator', 'community', 'mine']);
+        const rawSource = typeof req.query.source === 'string' ? req.query.source.trim() : '';
+        const sourceFilter = ALLOWED_SOURCES.has(rawSource) ? rawSource : null; // 'all'/미지정 → null
+        const rawTag = typeof req.query.tag === 'string' ? req.query.tag.trim().slice(0, 30) : '';
+        const tagFilter = rawTag.length > 0 ? rawTag : null;
+        const tagJson = tagFilter ? JSON.stringify([tagFilter]) : null;
+
+        // bind 순서 (동적):
+        //   data:  $1=orgId, $2=limit, $3=offset, [$4=search], [source], [tag]
+        //   count: $1=orgId,                       [$2=search], [source], [tag]
+        // search 는 limit/offset 뒤(data=$4), 그 다음 source/tag 가 이어진다.
+        let dNext = useSearch ? 5 : 4;
+        const dSourceIdx = sourceFilter ? dNext++ : 0;
+        const dTagIdx = tagFilter ? dNext++ : 0;
+        let cNext = useSearch ? 3 : 2;
+        const cSourceIdx = sourceFilter ? cNext++ : 0;
+        const cTagIdx = tagFilter ? cNext++ : 0;
+
+        // 검색: 제목 + 본문/요약(content_json::text) + tags::text. exec 는 description/html_content/category 추가.
+        const mkSnapDirSearch = (alias: string, idx: number) =>
+          `AND (${alias}.title ILIKE $${idx} OR ${alias}.content_json::text ILIKE $${idx} OR ${alias}.tags::text ILIKE $${idx})`;
+        const mkExecSearch = (idx: number) =>
+          `AND (e.title ILIKE $${idx} OR COALESCE(e.description, '') ILIKE $${idx} OR COALESCE(e.html_content, '') ILIKE $${idx} OR COALESCE(e.category, '') ILIKE $${idx} OR e.tags::text ILIKE $${idx})`;
+        const snapshotSearchClauseData = useSearch ? mkSnapDirSearch('s', 4) : '';
+        const directSearchClauseData = useSearch ? mkSnapDirSearch('d', 4) : '';
+        const execSearchClauseData = useSearch ? mkExecSearch(4) : '';
+        const snapshotSearchClauseCount = useSearch ? mkSnapDirSearch('s', 2) : '';
+        const directSearchClauseCount = useSearch ? mkSnapDirSearch('d', 2) : '';
+        const execSearchClauseCount = useSearch ? mkExecSearch(2) : '';
+
+        // outer 필터 (source_group / tags @> 정확 매칭). 'all' 은 source 절 없음.
+        const mkOuterFilter = (sourceIdx: number, tagIdx: number) =>
+          `${sourceIdx ? `AND source_group = $${sourceIdx}` : ''} ${tagIdx ? `AND tags @> $${tagIdx}::jsonb` : ''}`;
+        const dataOuterFilter = mkOuterFilter(dSourceIdx, dTagIdx);
+        const countOuterFilter = mkOuterFilter(cSourceIdx, cTagIdx);
 
         const dataQuery = `
           SELECT * FROM (
@@ -147,6 +157,7 @@ export function createStoreLibraryFeedController(
                 s.id::text AS id,
                 'snapshot'::text AS origin,
                 s.asset_type AS asset_type,
+                CASE WHEN s.asset_type = 'cms' THEN 'operator' ELSE 'community' END AS source_group,
                 s.title AS title,
                 s.content_json AS content_json,
                 s.created_at AS sort_at,
@@ -168,6 +179,7 @@ export function createStoreLibraryFeedController(
                 d.id::text AS id,
                 'direct'::text AS origin,
                 NULL::varchar AS asset_type,
+                'mine'::text AS source_group,
                 d.title AS title,
                 d.content_json AS content_json,
                 d.created_at AS sort_at,
@@ -184,6 +196,7 @@ export function createStoreLibraryFeedController(
                 e.id::text AS id,
                 'execution-asset'::text AS origin,
                 'content'::varchar AS asset_type,
+                'mine'::text AS source_group,
                 e.title AS title,
                 jsonb_build_object('html', e.html_content) AS content_json,
                 e.created_at AS sort_at,
@@ -196,6 +209,7 @@ export function createStoreLibraryFeedController(
                 ${execSearchClauseData}
             )
           ) AS unified
+          WHERE 1=1 ${dataOuterFilter}
           ORDER BY sort_at DESC
           LIMIT $2 OFFSET $3
         `;
@@ -203,7 +217,9 @@ export function createStoreLibraryFeedController(
         const countQuery = `
           SELECT COUNT(*)::int AS total FROM (
             (
-              SELECT 1
+              SELECT
+                (CASE WHEN s.asset_type = 'cms' THEN 'operator' ELSE 'community' END) AS source_group,
+                COALESCE(NULLIF(s.tags, '[]'::jsonb), s.content_json->'tags', '[]'::jsonb) AS tags
               FROM o4o_asset_snapshots s
               LEFT JOIN kpa_store_asset_controls c
                 ON c.snapshot_id = s.id AND c.organization_id = s.organization_id
@@ -214,7 +230,7 @@ export function createStoreLibraryFeedController(
             )
             UNION ALL
             (
-              SELECT 1
+              SELECT 'mine'::text AS source_group, COALESCE(d.tags, '[]'::jsonb) AS tags
               FROM kpa_store_contents d
               WHERE d.organization_id = $1
                 AND d.source_type = 'direct'
@@ -222,7 +238,7 @@ export function createStoreLibraryFeedController(
             )
             UNION ALL
             (
-              SELECT 1
+              SELECT 'mine'::text AS source_group, COALESCE(e.tags, '[]'::jsonb) AS tags
               FROM store_execution_assets e
               WHERE e.organization_id = $1
                 AND e.is_active = true
@@ -230,14 +246,17 @@ export function createStoreLibraryFeedController(
                 ${execSearchClauseCount}
             )
           ) AS unified
+          WHERE 1=1 ${countOuterFilter}
         `;
 
-        const dataParams: any[] = useSearch
-          ? [organizationId, limit, offset, searchPattern]
-          : [organizationId, limit, offset];
-        const countParams: any[] = useSearch
-          ? [organizationId, searchPattern]
-          : [organizationId];
+        const dataParams: any[] = [organizationId, limit, offset];
+        if (useSearch) dataParams.push(searchPattern);
+        if (sourceFilter) dataParams.push(sourceFilter);
+        if (tagJson) dataParams.push(tagJson);
+        const countParams: any[] = [organizationId];
+        if (useSearch) countParams.push(searchPattern);
+        if (sourceFilter) countParams.push(sourceFilter);
+        if (tagJson) countParams.push(tagJson);
 
         const [items, countResult] = await Promise.all([
           dataSource.query(dataQuery, dataParams),
