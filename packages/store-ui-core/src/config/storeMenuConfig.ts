@@ -266,6 +266,10 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       //   라벨만 '상품' → 'O4O 제품'(플랫폼 제공·신청·주문 가능 제품). '내 약국 제품'(자체 취급)과 구분.
       //   key/subPath/route/권한/기능 무변경. KPA 블록 한정(GP/KCos 무영향).
       { key: 'products', label: 'O4O 제품', subPath: '/commerce/products' },
+      // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-UNIFIED-VIEW-V1:
+      //   매장 취급제품 = O4O 취급 제품(organization_product_listings) + 매장 자체 제품(store_local_products)
+      //   통합 조회(읽기). 등록·수정은 아래 원본 메뉴(내 매장 제품/매장 자체 제품)에서. KPA 블록 한정.
+      { key: 'handled-products', label: '매장 취급제품', subPath: '/handled-products' },
       // WO-O4O-KPA-STORE-PRODUCT-MENU-IA-REORG-V1:
       //   제품 기준 관리(내 매장 제품=organization_product_listings / 매장 자체 제품=store_local_products)를
       //   '약국 상품·거래'(제품 기준 영역)에 모은다. 기존 '타블렛' 그룹에서 이동(타블렛=노출 채널만 남김).

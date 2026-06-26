@@ -1,0 +1,296 @@
+/**
+ * StoreHandledProductsPage — 매장 취급제품 (통합 조회, 읽기 전용)
+ *
+ * WO-O4O-KPA-STORE-HANDLED-PRODUCTS-UNIFIED-VIEW-V1
+ * 선행: IR-O4O-KPA-STORE-HANDLED-PRODUCTS-UNIFIED-VIEW-DESIGN-V1
+ *
+ * O4O 취급 제품(organization_product_listings) + 매장 자체 제품(store_local_products)을
+ * 한 화면에서 조회한다. 직접 CRUD 하지 않고 원본 관리 화면(/my-products, /commerce/local-products)으로 이동.
+ * 매장 자체 제품의 온라인몰/상품설명은 'not_supported' = "미지원"으로 표시(절대 "배치 가능" 금지).
+ */
+
+import { useEffect, useState, useCallback, type CSSProperties } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Package, RefreshCw, Search, ExternalLink, Boxes } from 'lucide-react';
+import { Pagination } from '@o4o/operator-ux-core';
+import {
+  fetchHandledProducts,
+  type HandledProduct,
+  type TabletExposure,
+  type OnlineExposure,
+  type DescriptionStatus,
+} from '../../api/handledProducts';
+import { colors } from '../../styles/theme';
+
+type SourceFilter = 'all' | 'listing' | 'local';
+const PAGE_LIMIT = 20;
+const SEARCH_DEBOUNCE_MS = 300;
+
+const SOURCE_TABS: { key: SourceFilter; label: string }[] = [
+  { key: 'all', label: '전체' },
+  { key: 'listing', label: 'O4O 취급 제품' },
+  { key: 'local', label: '매장 자체 제품' },
+];
+
+function Badge({ text, tone }: { text: string; tone: 'green' | 'gray' | 'amber' | 'blue' | 'muted' }) {
+  const palette: Record<string, CSSProperties> = {
+    green: { background: '#DCFCE7', color: '#16A34A' },
+    blue: { background: '#DBEAFE', color: '#1D4ED8' },
+    amber: { background: '#FEF3C7', color: '#D97706' },
+    gray: { background: colors.neutral100, color: colors.neutral600 },
+    muted: { background: '#F1F5F9', color: '#94A3B8' },
+  };
+  return <span style={{ ...styles.badge, ...palette[tone] }}>{text}</span>;
+}
+
+function tabletBadge(v: TabletExposure) {
+  if (v === 'exposed') return <Badge text="노출 중" tone="green" />;
+  if (v === 'partial') return <Badge text="일부 노출" tone="blue" />;
+  return <Badge text="노출 안함" tone="gray" />;
+}
+function onlineBadge(v: OnlineExposure) {
+  if (v === 'exposed') return <Badge text="노출 중" tone="green" />;
+  if (v === 'inactive') return <Badge text="비활성" tone="amber" />;
+  if (v === 'not_supported') return <Badge text="미지원" tone="muted" />;
+  return <Badge text="미노출" tone="gray" />;
+}
+function descBadge(v: DescriptionStatus) {
+  if (v === 'available') return <Badge text="있음" tone="green" />;
+  if (v === 'not_supported') return <Badge text="미지원" tone="muted" />;
+  return <Badge text="없음" tone="gray" />;
+}
+
+function formatPrice(p: number | null): string {
+  if (p == null) return '—';
+  return `${p.toLocaleString('ko-KR')}원`;
+}
+function formatDate(iso: string): string {
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? '-' : d.toLocaleDateString('ko-KR');
+}
+
+export default function StoreHandledProductsPage() {
+  const navigate = useNavigate();
+
+  const [source, setSource] = useState<SourceFilter>('all');
+  const [searchInput, setSearchInput] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [items, setItems] = useState<HandledProduct[]>([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
+
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
+
+  useEffect(() => {
+    const handle = setTimeout(() => {
+      setSearchQuery(searchInput.trim());
+      setPage(1);
+    }, SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(handle);
+  }, [searchInput]);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    fetchHandledProducts({ page, limit: PAGE_LIMIT, search: searchQuery || undefined, source })
+      .then((d) => {
+        if (cancelled) return;
+        setItems(d.items);
+        setTotal(d.pagination.total);
+      })
+      .catch((e: any) => {
+        if (!cancelled) setError(e?.message || '목록을 불러오지 못했습니다');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [page, searchQuery, source, reloadKey]);
+
+  const reload = useCallback(() => setReloadKey((k) => k + 1), []);
+
+  return (
+    <div style={styles.container}>
+      <div style={styles.header}>
+        <div>
+          <div style={styles.breadcrumb}>
+            <span>약국 상품·거래</span>
+            <span style={{ color: colors.neutral300 }}>/</span>
+            <span style={{ color: colors.neutral700 }}>매장 취급제품</span>
+          </div>
+          <h1 style={styles.title}>
+            <Boxes size={20} style={{ color: colors.primary }} />
+            매장 취급제품
+          </h1>
+          <p style={styles.subtitle}>
+            약국이 취급하는 전체 제품(<strong>O4O 취급 제품</strong> + <strong>매장 자체 제품</strong>)을 한 화면에서 확인합니다.
+            등록·수정은 각 원본 관리 화면에서 합니다.
+          </p>
+        </div>
+        <button onClick={reload} style={styles.refreshBtn}>
+          <RefreshCw size={14} />
+          새로고침
+        </button>
+      </div>
+
+      <div style={styles.toolbar}>
+        <div style={styles.tabs}>
+          {SOURCE_TABS.map((t) => {
+            const active = source === t.key;
+            return (
+              <button
+                key={t.key}
+                type="button"
+                onClick={() => {
+                  setSource(t.key);
+                  setPage(1);
+                }}
+                style={{ ...styles.tab, ...(active ? styles.tabActive : styles.tabInactive) }}
+              >
+                {t.label}
+              </button>
+            );
+          })}
+        </div>
+        <div style={styles.searchWrap}>
+          <Search size={14} style={styles.searchIcon} />
+          <input
+            type="search"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            placeholder="제품명 검색"
+            style={styles.searchInput}
+          />
+        </div>
+      </div>
+
+      <div style={styles.countRow}>
+        <span style={styles.countBadge}>{total}건</span>
+      </div>
+
+      <div style={styles.tableWrap}>
+        <table style={styles.table}>
+          <thead>
+            <tr>
+              <th style={{ ...styles.th, textAlign: 'left' }}>제품</th>
+              <th style={styles.th}>출처</th>
+              <th style={styles.th}>표시 가격</th>
+              <th style={styles.th}>상태</th>
+              <th style={styles.th}>타블렛</th>
+              <th style={styles.th}>온라인몰</th>
+              <th style={styles.th}>상품 설명</th>
+              <th style={styles.th}>최근 수정일</th>
+              <th style={styles.th}>관리</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
+              <tr>
+                <td colSpan={9} style={styles.empty}>불러오는 중…</td>
+              </tr>
+            ) : error ? (
+              <tr>
+                <td colSpan={9} style={{ ...styles.empty, color: '#DC2626' }}>{error}</td>
+              </tr>
+            ) : items.length === 0 ? (
+              <tr>
+                <td colSpan={9} style={styles.empty}>{searchQuery ? '검색 결과가 없습니다' : '취급 중인 제품이 없습니다'}</td>
+              </tr>
+            ) : (
+              items.map((it) => (
+                <tr key={`${it.sourceType}:${it.sourceId}`} style={styles.row}>
+                  <td style={styles.tdProduct}>
+                    <div style={styles.productCell}>
+                      {it.imageUrl ? (
+                        <img src={it.imageUrl} alt="" style={styles.thumb} />
+                      ) : (
+                        <div style={styles.thumbPlaceholder}>
+                          <Package size={16} style={{ color: colors.neutral400 }} />
+                        </div>
+                      )}
+                      <span style={styles.productName} title={it.name}>{it.name}</span>
+                    </div>
+                  </td>
+                  <td style={styles.td}>
+                    {it.sourceType === 'listing' ? (
+                      <Badge text={it.originLabel} tone="blue" />
+                    ) : (
+                      <Badge text={it.originLabel} tone="amber" />
+                    )}
+                  </td>
+                  <td style={styles.td}>{formatPrice(it.price)}</td>
+                  <td style={styles.td}>
+                    <Badge text={it.statusLabel} tone={it.isActive ? 'green' : 'gray'} />
+                  </td>
+                  <td style={styles.td}>{tabletBadge(it.tabletExposure)}</td>
+                  <td style={styles.td}>{onlineBadge(it.onlineSalesExposure)}</td>
+                  <td style={styles.td}>{descBadge(it.productDescriptionStatus)}</td>
+                  <td style={styles.td}>{formatDate(it.updatedAt)}</td>
+                  <td style={styles.td}>
+                    <button
+                      type="button"
+                      onClick={() => navigate(it.managePath)}
+                      style={styles.manageBtn}
+                      aria-label="원본 관리 화면으로 이동"
+                    >
+                      관리
+                      <ExternalLink size={12} />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <Pagination page={page} totalPages={totalPages} onPageChange={setPage} total={total} />
+
+      <p style={styles.footnote}>
+        ※ 매장 자체 제품은 <strong>온라인몰 미지원</strong>입니다(전시·타블렛 전용). 온라인 판매가 필요한 제품은 O4O 취급 제품으로 등록하세요.
+        QR · POP · 블로그 활용 상태는 후속 제공 예정입니다.
+      </p>
+    </div>
+  );
+}
+
+// ─── Styles ──────────────────────────────────────────────────────────────────
+
+const styles: Record<string, CSSProperties> = {
+  container: { padding: '24px', maxWidth: '1180px', margin: '0 auto' },
+  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '18px', flexWrap: 'wrap' },
+  breadcrumb: { display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: colors.neutral400, marginBottom: '6px' },
+  title: { display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '20px', fontWeight: 600, color: colors.neutral800, margin: 0 },
+  subtitle: { fontSize: '13px', color: colors.neutral500, margin: '6px 0 0', maxWidth: '720px', lineHeight: 1.6 },
+  refreshBtn: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: colors.white, border: `1px solid ${colors.neutral300}`, borderRadius: '6px', fontSize: '13px', color: colors.neutral700, cursor: 'pointer' },
+  toolbar: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '12px', flexWrap: 'wrap' },
+  tabs: { display: 'flex', gap: '4px', background: colors.neutral100, border: `1px solid ${colors.neutral200}`, borderRadius: '8px', padding: '3px' },
+  tab: { padding: '6px 14px', fontSize: '13px', fontWeight: 500, border: 'none', borderRadius: '6px', cursor: 'pointer' },
+  tabActive: { background: colors.white, color: colors.primary, boxShadow: '0 1px 3px rgba(0,0,0,0.08)' },
+  tabInactive: { background: 'transparent', color: colors.neutral500 },
+  searchWrap: { position: 'relative', minWidth: '220px' },
+  searchIcon: { position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: colors.neutral400, pointerEvents: 'none' },
+  searchInput: { width: '100%', padding: '8px 12px 8px 30px', border: `1px solid ${colors.neutral300}`, borderRadius: '6px', fontSize: '13px', outline: 'none', background: colors.white, boxSizing: 'border-box' },
+  countRow: { marginBottom: '10px' },
+  countBadge: { display: 'inline-flex', alignItems: 'center', padding: '2px 8px', fontSize: '12px', fontWeight: 500, color: colors.neutral600, background: colors.neutral100, borderRadius: '999px' },
+  tableWrap: { overflowX: 'auto', border: `1px solid ${colors.neutral200}`, borderRadius: '8px', background: colors.white },
+  table: { width: '100%', borderCollapse: 'collapse', fontSize: '13px' },
+  th: { padding: '10px 12px', textAlign: 'center', fontSize: '12px', fontWeight: 600, color: colors.neutral500, background: '#F8FAFC', borderBottom: `1px solid ${colors.neutral200}`, whiteSpace: 'nowrap' },
+  row: { borderBottom: `1px solid ${colors.neutral100}` },
+  td: { padding: '10px 12px', textAlign: 'center', color: colors.neutral700, whiteSpace: 'nowrap' },
+  tdProduct: { padding: '10px 12px', textAlign: 'left', minWidth: '240px' },
+  productCell: { display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 },
+  thumb: { width: '36px', height: '36px', borderRadius: '6px', objectFit: 'cover', border: `1px solid ${colors.neutral200}`, flexShrink: 0 },
+  thumbPlaceholder: { width: '36px', height: '36px', borderRadius: '6px', background: colors.neutral100, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+  productName: { fontSize: '14px', fontWeight: 500, color: colors.neutral800, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
+  badge: { display: 'inline-flex', alignItems: 'center', padding: '2px 8px', fontSize: '11px', fontWeight: 500, borderRadius: '999px', whiteSpace: 'nowrap' },
+  manageBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 10px', background: colors.white, border: `1px solid ${colors.neutral300}`, borderRadius: '6px', fontSize: '12px', color: colors.neutral700, cursor: 'pointer' },
+  empty: { padding: '40px 12px', textAlign: 'center', color: colors.neutral400, fontSize: '13px' },
+  footnote: { marginTop: '14px', fontSize: '12px', color: colors.neutral500, lineHeight: 1.7, padding: '10px 12px', background: colors.neutral100, borderRadius: '6px' },
+};

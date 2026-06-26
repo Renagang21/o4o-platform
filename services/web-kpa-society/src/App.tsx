@@ -243,6 +243,8 @@ const StoreAssetsPage = lazy(() => import('./pages/pharmacy/StoreAssetsPage'));
 const StoreContentEditPage = lazy(() => import('./pages/pharmacy/StoreContentEditPage'));
 const StoreDirectContentPage = lazy(() => import('./pages/pharmacy/StoreDirectContentPage'));
 const StoreLocalProductsPage = lazy(() => import('./pages/pharmacy/StoreLocalProductsPage'));
+// WO-O4O-KPA-STORE-HANDLED-PRODUCTS-UNIFIED-VIEW-V1: 매장 취급제품 통합 조회
+const StoreHandledProductsPage = lazy(() => import('./pages/pharmacy/StoreHandledProductsPage'));
 const StoreTabletDisplaysPage = lazy(() => import('./pages/pharmacy/StoreTabletDisplaysPage'));
 const StoreProductInfoCreatorPage = lazy(() => import('./pages/pharmacy/StoreProductInfoCreatorPage'));
 // Pharmacy specific (not in barrel)
@@ -985,6 +987,8 @@ function App() {
               emptyTitle="등록된 내 매장 제품이 없습니다"
               emptyDescription="제품을 등록해 타블렛과 매장 안내 서비스에 활용해 주세요."
             /></PharmacyOwnerOnlyGuard>} />
+            {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-UNIFIED-VIEW-V1: 매장 취급제품 통합 조회(읽기) — listings+local 합산, 원본 관리 이동 */}
+            <Route path="handled-products" element={<PharmacyOwnerOnlyGuard><StoreHandledProductsPage /></PharmacyOwnerOnlyGuard>} />
             {/* WO-O4O-STORE-HUB-LEGACY-LIST-CLEANUP-V1: suppliers 라우트 제거 (mock-only, /store-hub/b2b 와 redundant) */}
             <Route path="commerce/products/:productId/marketing" element={<ProductMarketingPage />} />
             {/* WO-O4O-AI-AUTO-POP-BUILDER-V1: 상품 POP 만들기 (AI prefill + 편집 + PDF) */}

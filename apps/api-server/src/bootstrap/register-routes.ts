@@ -69,6 +69,8 @@ import { createStorePolicyRoutes } from '../routes/platform/store-policy.routes.
 import { createUnifiedStorePublicRoutes } from '../routes/platform/unified-store-public.routes.js';
 import { createStoreLocalProductRoutes } from '../routes/platform/store-local-product.routes.js';
 import { createStoreTabletRoutes } from '../routes/platform/store-tablet.routes.js';
+// WO-O4O-KPA-STORE-HANDLED-PRODUCTS-UNIFIED-VIEW-V1: 매장 취급제품 통합 조회
+import { createStoreHandledProductsRoutes } from '../routes/platform/store-handled-products.routes.js';
 import { createStoreCartRoutes } from '../routes/cart/store-cart.routes.js';
 import userRoleRoutes from '../routes/user-role.routes.js';
 import { createRoleApplicationController } from '../routes/v2/role-application.controller.js';
@@ -312,6 +314,7 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     // 8.12. Register Store Local Product & Tablet Display routes (WO-STORE-LOCAL-PRODUCT-DISPLAY-V1)
     app.use('/api/v1/store', createStoreLocalProductRoutes(dataSource));
     app.use('/api/v1/store', createStoreTabletRoutes(dataSource));
+    app.use('/api/v1/store', createStoreHandledProductsRoutes(dataSource));
     logger.info('✅ Store Local Product & Tablet Display routes registered at /api/v1/store/*');
 
     // WO-O4O-STORE-CANONICAL-CART-CHECKOUT-FOUNDATION-V1: canonical store cart foundation
