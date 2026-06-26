@@ -140,15 +140,23 @@ export function RichTextEditor({
     }
   }, [value, editor]);
 
+  // 현재 activeTab 을 ref 로 미러 — 아래 동기화 effect 가 탭 전환마다 재실행되지 않도록(클로저 stale 방지).
+  const activeTabRef = useRef(activeTab);
+  useEffect(() => {
+    activeTabRef.current = activeTab;
+  }, [activeTab]);
+
   // WO-O4O-COMMON-EDITOR-HTML-TAB-SAVE-RAW-PRESERVE-V1:
   //   htmlSource(원문)를 외부 value 와 동기화한다. 단, WYSIWYG 편집 중(getHTML authoritative)이거나
   //   HTML 탭 입력 중에는 clobber 하지 않는다. 재오픈/외부 로딩 시 raw value 가 HTML 탭·미리보기에 보존되도록 함.
+  //   deps 는 [value] 만 — 탭 전환 시점에 (부모 value 가 onChange 를 아직 반영하기 전인) stale value 로
+  //   htmlSource 를 덮어쓰는 회귀를 막는다. activeTab 은 ref 로 현재값 참조.
   useEffect(() => {
     if (wysiwygDirtyRef.current) return;
-    if (activeTab === 'html') return;
+    if (activeTabRef.current === 'html') return;
     const v = isBlankHtml(value) ? '' : value;
     setHtmlSource((prev) => (prev === v ? prev : v));
-  }, [value, activeTab]);
+  }, [value]);
 
   // WO-O4O-COMMON-EDITOR-HTML-TAB-SAVE-RAW-PRESERVE-V1:
   //   autosave/Ctrl+S 등 콜백 클로저에서 최신 htmlSource 를 읽기 위한 ref 미러.
