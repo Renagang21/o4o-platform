@@ -11,8 +11,8 @@
  * - 삭제 (store owner 전용)
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   ArrowLeft,
   Edit2,
@@ -98,6 +98,7 @@ function blocksToContentJson(blocks: ContentBlock[], original: unknown): Record<
 export default function StoreDirectContentPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [content, setContent] = useState<DirectContentItem | null>(null);
   const [loading, setLoading] = useState(true);
@@ -151,6 +152,19 @@ export default function StoreDirectContentPage() {
     setEditBlocks([]);
     setEditTags([]);
   };
+
+  // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-EDIT-ROUTE-UNIFY-V1:
+  //   목록의 [편집] 은 ?edit=1 로 진입한다 → 상세 보기를 거치지 않고 편집기를 바로 연다.
+  //   콘텐츠 로딩 완료 후 1회만 자동 진입(사용자가 취소하면 재진입하지 않음).
+  const autoEditRef = useRef(false);
+  useEffect(() => {
+    if (content && !autoEditRef.current && searchParams.get('edit') === '1') {
+      autoEditRef.current = true;
+      startEdit();
+    }
+    // startEdit 는 매 렌더 재생성되지만 content 로딩 시 1회만 호출 — autoEditRef 가드.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [content, searchParams]);
 
   const handleSave = async () => {
     if (!id || !content) return;

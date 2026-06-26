@@ -129,11 +129,14 @@ function toDocumentRow(it: LibraryContentItem): DocumentRow {
   // WO-O4O-KPA-STORE-LIBRARY-SNAPSHOT-SINGLE-EDIT-V1:
   //   snapshot(o4o_asset_snapshots, 매장 소유 사본)도 편집 — kpa_store_contents(snapshot_edit) override 편집기로 연결.
   //   원본 o4o_asset_snapshots/kpa_contents 불변, snapshot id 불변. 자료함 콘텐츠형은 모두 편집.
+  // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-EDIT-ROUTE-UNIFY-V1:
+  //   direct 도 목록 [편집] 클릭 시 상세 보기를 거치지 않고 편집기로 직행하도록 ?edit=1 부여
+  //   (StoreDirectContentPage 가 ?edit=1 시 편집 모드로 자동 진입). execution-asset/snapshot 은 이미 편집기 직행.
   const href =
     it.origin === 'execution-asset'
       ? `/store/library/production-materials/${it.id}/edit`
       : it.origin === 'direct'
-        ? `/store/content/direct/${it.id}`
+        ? `/store/content/direct/${it.id}?edit=1`
         : `/store/content/${it.id}/edit`;
   const authorName =
     it.origin === 'direct' || it.origin === 'execution-asset'
