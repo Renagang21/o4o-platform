@@ -537,7 +537,7 @@ function DocumentsSection({
             type="search"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            placeholder="제목 검색"
+            placeholder="제목·요약·본문 검색"
             style={styles.searchInput}
           />
         </div>

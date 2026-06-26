@@ -111,16 +111,34 @@ export function createStoreLibraryFeedController(
         // bind 순서:
         //   - data query: $1=orgId, $2=limit, $3=offset, [$4=searchPattern]
         //   - count query: $1=orgId, [$2=searchPattern]
-        const snapshotSearchClauseData = useSearch ? `AND s.title ILIKE $4` : '';
-        const directSearchClauseData = useSearch ? `AND d.title ILIKE $4` : '';
+        // WO-O4O-KPA-CONTENT-LIST-SEARCH-BODY-SUMMARY-V1 (검색 1단계):
+        //   제목만 → 제목 + 본문/요약(content_json::text) + exec html_content/description/category 로 확장.
+        //   동일 바인딩 파라미터($4 data / $2 count)를 여러 컬럼에 OR 적용 → 문자열 보간 없음(injection 안전).
+        //   migration/tags 컬럼 없음. raw HTML/JSON text 검색은 1차 허용(데이터 소규모). branch 별 컬럼은 실제 스키마 기준:
+        //     - snapshot/direct: title + content_json(jsonb)::text
+        //     - exec(store_execution_assets): title + description + html_content + category (content_json 컬럼 없음)
+        const snapshotSearchClauseData = useSearch
+          ? `AND (s.title ILIKE $4 OR s.content_json::text ILIKE $4)`
+          : '';
+        const directSearchClauseData = useSearch
+          ? `AND (d.title ILIKE $4 OR d.content_json::text ILIKE $4)`
+          : '';
         // WO-O4O-KPA-STORE-LIBRARY-CONTENT-CREATED-BUT-LIST-MISSING-V1 (A안):
         //   store_execution_assets(asset_type='content') 도 콘텐츠 피드에 포함한다.
         //   QR 만들기 "내 매장 자료" 선택기(getStoreExecutionAssets)와 동일 소스를 콘텐츠 목록에도 노출 →
         //   "QR 선택 가능 = 콘텐츠 목록에서도 접근 가능" 정합. 비파괴(원본/QR libraryItemId 무변경).
-        const execSearchClauseData = useSearch ? `AND e.title ILIKE $4` : '';
-        const snapshotSearchClauseCount = useSearch ? `AND s.title ILIKE $2` : '';
-        const directSearchClauseCount = useSearch ? `AND d.title ILIKE $2` : '';
-        const execSearchClauseCount = useSearch ? `AND e.title ILIKE $2` : '';
+        const execSearchClauseData = useSearch
+          ? `AND (e.title ILIKE $4 OR COALESCE(e.description, '') ILIKE $4 OR COALESCE(e.html_content, '') ILIKE $4 OR COALESCE(e.category, '') ILIKE $4)`
+          : '';
+        const snapshotSearchClauseCount = useSearch
+          ? `AND (s.title ILIKE $2 OR s.content_json::text ILIKE $2)`
+          : '';
+        const directSearchClauseCount = useSearch
+          ? `AND (d.title ILIKE $2 OR d.content_json::text ILIKE $2)`
+          : '';
+        const execSearchClauseCount = useSearch
+          ? `AND (e.title ILIKE $2 OR COALESCE(e.description, '') ILIKE $2 OR COALESCE(e.html_content, '') ILIKE $2 OR COALESCE(e.category, '') ILIKE $2)`
+          : '';
 
         const dataQuery = `
           SELECT * FROM (
