@@ -109,6 +109,16 @@ export function ContentPdfExportModal({
 
   const handleGenerate = async () => {
     if (!content) return;
+    // 팝업 차단 회피: 클릭 동기 컨텍스트에서 창을 먼저 연다(본문 fetch await 이후에 열면 차단될 수 있음).
+    const win = window.open('', '_blank', 'width=900,height=1000');
+    if (!win) {
+      toast.error('팝업이 차단되었습니다. 브라우저 팝업을 허용한 뒤 다시 시도하세요.');
+      return;
+    }
+    win.document.write(
+      '<!doctype html><html lang="ko"><head><meta charset="utf-8" /><title>인쇄용 PDF 준비 중…</title></head>' +
+        '<body style="font-family:sans-serif;padding:40px;color:#475569">인쇄용 PDF를 준비 중입니다…</body></html>',
+    );
     setGenerating(true);
     try {
       const bodyHtml = await fetchContentHtml(content, info?.organizationId);
@@ -121,17 +131,16 @@ export function ContentPdfExportModal({
         address,
         consultText: DEFAULT_CONSULT_TEXT,
       });
-
-      const win = window.open('', '_blank', 'width=900,height=1000');
-      if (!win) {
-        toast.error('팝업이 차단되었습니다. 브라우저 팝업을 허용한 뒤 다시 시도하세요.');
-        return;
-      }
       win.document.open();
       win.document.write(printHtml);
       win.document.close();
       onClose();
     } catch (e: any) {
+      try {
+        win.close();
+      } catch {
+        /* noop */
+      }
       toast.error(e?.message || 'PDF 생성에 실패했습니다. 콘텐츠 본문을 불러오지 못했습니다.');
     } finally {
       setGenerating(false);
