@@ -69,11 +69,28 @@
 
 ## 11. API smoke 결과
 
-⏳ 배포 후 — `GET /api/v1/store/handled-products` 200, listing/local 포함, sourceType 구분, local onlineSalesExposure=not_supported, pagination total, 검색.
+✅ PASS (배포본 9e7dd0241, o4o-core-api/kpa-society-web deploy success). 브라우저 경유로 `GET /api/v1/store/handled-products` 200.
+- 빈 상태: 매장 자체 제품(0)+내 매장 제품(0) → 통합 0건 (0=0+0, 누락/오류 없음).
+- 데이터 1건(매장 자체 제품 등록): 통합 1건, sourceType=local, price=12000, onlineSalesExposure=`not_supported`("미지원"), productDescriptionStatus=`not_supported`, tabletExposure=`not_exposed`.
+- 비활성화 후: 통합 0건 (activeOnly 정상).
 
 ## 12. browser smoke 결과
 
-⏳ 배포 후 — 약국 상품·거래 하위 매장 취급제품 노출, /store/handled-products 접근, 같은 표에 두 출처 노출, 매장 자체 제품 온라인몰="미지원", 관리 버튼 원본 이동, 콘솔 오류 없음.
+✅ PASS (2026-06-26, KPA `테스트 약국 매장`).
+
+| 항목 | 결과 |
+|---|---|
+| 약국 상품·거래 하위 '매장 취급제품' 노출(O4O 제품 다음) | ✅ |
+| /store/handled-products 접근(헤더/breadcrumb/출처탭/검색/9컬럼 표) | ✅ |
+| 같은 표에 매장 자체 제품 행 표시(출처 배지 '매장 자체 제품') | ✅ |
+| 표시 가격 12,000원 포맷 · 상태 '활성' | ✅ |
+| **매장 자체 제품 온라인몰 = '미지원'** (핵심 불변식) | ✅ |
+| 상품 설명 '미지원' · 타블렛 '노출 안함' | ✅ |
+| 관리 버튼 → /store/commerce/local-products?highlight=<id> 이동 | ✅ |
+| 비활성화 후 통합 뷰 0건 반영(테스트 데이터 정리) | ✅ |
+| 콘솔 페이지 오류 없음(로그인 시점 401만) | ✅ |
+
+> 검증용 매장 자체 제품 1건 등록 → 통합 뷰/미지원 배지 확인 → 비활성화로 정리(잔여 active 0).
 
 ## 13. 후속 후보
 
