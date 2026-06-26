@@ -48,6 +48,35 @@ interface PdfOptions {
 // WO §9: 1차 상담 안내 기본 문구(직접 편집은 2차)
 const DEFAULT_CONSULT_TEXT = '궁금한 점은 약사에게 문의하세요.';
 
+// WO-O4O-KPA-CONTENT-PDF-PRINT-DENSITY-STYLES-V1:
+//   화면(QR/태블릿)용 스타일이 그대로 인쇄되면 글자·줄간격·여백이 커서 페이지 수가 과도하다.
+//   PDF 전용 밀도 프리셋을 두어 출력 형식을 선택한다(콘텐츠 원본 HTML 은 변경하지 않음 —
+//   본문 inline 디자인은 보존하고, 기본 스타일의 heading/line-height/여백/이미지 높이만 조정).
+type PdfDensity = 'standard' | 'compact' | 'large';
+
+interface DensityPreset {
+  page: string;       // @page margin
+  body: string;       // 본문 글자
+  lh: number;         // line-height
+  h1: string;
+  h2: string;
+  h3: string;
+  pGap: string;       // 문단/목록 아래 여백
+  imgMax: string;     // 이미지 최대 높이 추가 규칙(절약형 페이지 절약)
+}
+
+const DENSITY_PRESETS: Record<PdfDensity, DensityPreset> = {
+  standard: { page: '14mm 14mm', body: '11pt', lh: 1.45, h1: '19pt', h2: '15pt', h3: '13pt', pGap: '7px', imgMax: '' },
+  compact:  { page: '11mm 12mm', body: '10pt', lh: 1.3,  h1: '16pt', h2: '13pt', h3: '12pt', pGap: '5px', imgMax: 'max-height: 95mm;' },
+  large:    { page: '15mm 15mm', body: '13pt', lh: 1.6,  h1: '22pt', h2: '17pt', h3: '14pt', pGap: '9px', imgMax: '' },
+};
+
+const DENSITY_OPTIONS: { key: PdfDensity; label: string; desc: string }[] = [
+  { key: 'standard', label: '표준형', desc: '일반 고객 설명자료' },
+  { key: 'compact', label: '절약형', desc: '페이지 절약 · 보관/내부용' },
+  { key: 'large', label: '큰 글씨형', desc: '고령 고객 · 카운터 비치' },
+];
+
 export function ContentPdfExportModal({
   open,
   content,
@@ -68,6 +97,8 @@ export function ContentPdfExportModal({
     consult: false,
     printDate: false,
   });
+  // WO-O4O-KPA-CONTENT-PDF-PRINT-DENSITY-STYLES-V1: 출력 밀도(기본 표준형)
+  const [density, setDensity] = useState<PdfDensity>('standard');
 
   // 모달 열릴 때 매장 기본정보 로드 + 옵션 초기화
   useEffect(() => {
@@ -80,6 +111,7 @@ export function ContentPdfExportModal({
       consult: false,
       printDate: false,
     });
+    setDensity('standard');
     let cancelled = false;
     setInfoLoading(true);
     getPharmacyInfo()
@@ -132,6 +164,7 @@ export function ContentPdfExportModal({
         contentTitle: content.title,
         bodyHtml,
         opts,
+        density,
         storeName,
         phone,
         address,
@@ -170,6 +203,28 @@ export function ContentPdfExportModal({
           <p style={styles.contentName} title={content.title}>
             대상 콘텐츠: <strong>{content.title}</strong>
           </p>
+
+          {/* WO-O4O-KPA-CONTENT-PDF-PRINT-DENSITY-STYLES-V1: 출력 형식(밀도) 선택 */}
+          <p style={styles.sectionLabel}>출력 형식</p>
+          <div style={styles.densityRow}>
+            {DENSITY_OPTIONS.map((d) => {
+              const active = density === d.key;
+              return (
+                <button
+                  key={d.key}
+                  type="button"
+                  onClick={() => setDensity(d.key)}
+                  style={{ ...styles.densityBtn, ...(active ? styles.densityBtnActive : {}) }}
+                  aria-pressed={active}
+                >
+                  <span style={{ ...styles.densityLabel, color: active ? colors.primary : colors.neutral700 }}>
+                    {d.label}
+                  </span>
+                  <span style={styles.densityDesc}>{d.desc}</span>
+                </button>
+              );
+            })}
+          </div>
 
           <p style={styles.sectionLabel}>PDF에 포함할 항목</p>
 
@@ -333,12 +388,14 @@ function buildPrintHtml(args: {
   contentTitle: string;
   bodyHtml: string;
   opts: PdfOptions;
+  density: PdfDensity;
   storeName: string;
   phone: string;
   address: string;
   consultText: string;
 }): string {
-  const { contentTitle, bodyHtml, opts, storeName, phone, address, consultText } = args;
+  const { contentTitle, bodyHtml, opts, density, storeName, phone, address, consultText } = args;
+  const d = DENSITY_PRESETS[density];
 
   const titleBlock = opts.title
     ? `<h1 class="pdf-title">${escHtml(contentTitle)}</h1>`
@@ -365,13 +422,14 @@ function buildPrintHtml(args: {
 <meta charset="utf-8" />
 <title>${escHtml(opts.title ? contentTitle : '인쇄용 PDF')}</title>
 <style>
-  @page { size: A4 portrait; margin: 18mm 16mm; }
+  /* WO-O4O-KPA-CONTENT-PDF-PRINT-DENSITY-STYLES-V1: 밀도 프리셋(${density}) */
+  @page { size: A4 portrait; margin: ${d.page}; }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
   body {
     font-family: "Noto Sans KR", "Malgun Gothic", -apple-system, sans-serif;
     color: #1f2937;
-    line-height: 1.7;
+    line-height: ${d.lh};
   }
   /* WO-O4O-KPA-STORE-LIBRARY-CONTENTS-PDF-EXPORT-OPTIONS-V1: 본문 디자인 보존.
      콘텐츠 본문 HTML 의 배경색·글자색·카드 박스가 인쇄/PDF 에 그대로 출력되도록 강제한다.
@@ -381,16 +439,24 @@ function buildPrintHtml(args: {
     print-color-adjust: exact !important;
   }
   .pdf-sheet { max-width: 800px; margin: 0 auto; padding: 24px; }
-  .pdf-title { font-size: 22px; font-weight: 700; color: #0f172a; margin: 0 0 18px; padding-bottom: 12px; border-bottom: 2px solid #e2e8f0; }
+  .pdf-title { font-size: ${d.h1}; font-weight: 700; color: #0f172a; margin: 0 0 14px; padding-bottom: 10px; border-bottom: 2px solid #e2e8f0; }
   /* 본문 영역: 콘텐츠 제작자가 넣은 inline 디자인(색/배경/박스/정렬)을 덮어쓰지 않는다.
-     색 강제 없음 — inline style 또는 body 기본색을 그대로 사용. */
-  .pdf-body { font-size: 14px; }
-  .pdf-body img, .pdf-img img { max-width: 100%; height: auto; }
+     색/배경 강제 없음 — inline style 또는 body 기본색 그대로. 단 인쇄 밀도(글자/줄간격/여백/제목 크기)는
+     PDF 전용 기본값으로 조정해 페이지 수를 줄인다. inline font-size 가 있는 요소는 그 값이 우선한다. */
+  .pdf-body { font-size: ${d.body}; line-height: ${d.lh}; }
+  /* 본문 내 기본 제목 — 화면 기본(대형) 대신 인쇄용 크기. inline 지정 시 inline 우선. */
+  .pdf-body h1 { font-size: ${d.h1}; line-height: 1.25; margin: 14px 0 8px; }
+  .pdf-body h2 { font-size: ${d.h2}; line-height: 1.3; margin: 14px 0 6px; }
+  .pdf-body h3 { font-size: ${d.h3}; line-height: 1.3; margin: 10px 0 5px; }
+  .pdf-body p { margin: 0 0 ${d.pGap}; }
+  .pdf-body ul, .pdf-body ol { margin: 0 0 ${d.pGap}; padding-left: 1.4em; }
+  .pdf-body li { margin: 0 0 2px; }
+  .pdf-body img, .pdf-img img { max-width: 100%; height: auto; ${d.imgMax} }
   .pdf-body table { border-collapse: collapse; max-width: 100%; }
-  .pdf-text { white-space: pre-wrap; margin: 0 0 10px; }
-  .pdf-link { font-size: 13px; color: #2563eb; margin: 0 0 6px; }
+  .pdf-text { white-space: pre-wrap; margin: 0 0 ${d.pGap}; }
+  .pdf-link { font-size: ${d.h3}; color: #2563eb; margin: 0 0 6px; }
   .pdf-empty { color: #94a3b8; }
-  .pdf-footer { margin-top: 28px; padding-top: 14px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; }
+  .pdf-footer { margin-top: 22px; padding-top: 12px; border-top: 1px solid #e2e8f0; font-size: 11px; color: #64748b; }
   .pdf-store-name { font-size: 14px; font-weight: 600; color: #334155; margin-bottom: 2px; }
   .pdf-store-contact { margin-bottom: 4px; }
   .pdf-consult { margin-top: 6px; color: #475569; }
@@ -504,6 +570,38 @@ const styles: Record<string, CSSProperties> = {
     fontWeight: 600,
     color: colors.neutral700,
     margin: '0 0 10px',
+  },
+  // WO-O4O-KPA-CONTENT-PDF-PRINT-DENSITY-STYLES-V1: 출력 형식 선택
+  densityRow: {
+    display: 'flex',
+    gap: '8px',
+    margin: '0 0 18px',
+  },
+  densityBtn: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    gap: '2px',
+    padding: '8px 10px',
+    background: colors.white,
+    border: `1px solid ${colors.neutral300}`,
+    borderRadius: '8px',
+    cursor: 'pointer',
+    textAlign: 'left',
+  },
+  densityBtnActive: {
+    borderColor: colors.primary,
+    background: '#EFF6FF',
+  },
+  densityLabel: {
+    fontSize: '13px',
+    fontWeight: 600,
+  },
+  densityDesc: {
+    fontSize: '11px',
+    color: colors.neutral500,
+    lineHeight: 1.3,
   },
   optionList: {
     display: 'flex',
