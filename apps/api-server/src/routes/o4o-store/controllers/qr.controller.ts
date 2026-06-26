@@ -54,6 +54,8 @@ import type {
 } from '../entities/operator-qr-template.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import { StoreSlugService } from '@o4o/platform-core/store-identity';
+// WO-O4O-KPA-QR-TARGET-COPY-GUARD-V1: 운영자 템플릿 변환 시 content_hub 원본 → 매장 사본 치환
+import { ensureStoreCopyForPageTarget } from '../services/qr-content-hub-copy.service.js';
 
 const DEFAULT_SERVICE_KEY = 'kpa';
 
@@ -190,6 +192,22 @@ export function createStoreQrStaffController(
         landingTargetId = source.targetContentRef;
       }
 
+      // WO-O4O-KPA-QR-TARGET-COPY-GUARD-V1 (P1=A안):
+      //   page 변환 시 targetContentRef 가 content_hub 원본(kpa_contents)이면 매장 사본으로 치환한다.
+      //   매장 QR 은 운영자 원본이 아니라 매장 소유 사본(store_execution_assets)을 참조해야 한다.
+      let importLibraryItemId: string | null = null;
+      if (landingType === 'page') {
+        const guarded = await ensureStoreCopyForPageTarget(dataSource, {
+          organizationId: pharmacy.id,
+          serviceKey,
+          landingTargetId,
+          libraryItemId: null,
+          createdBy: userId ?? null,
+        });
+        importLibraryItemId = guarded.libraryItemId;
+        landingTargetId = guarded.landingTargetId;
+      }
+
       // 3. slug 발급 + 충돌 fallback (global unique)
       const baseSlug = generateSlug(source.title);
       let finalSlug = baseSlug;
@@ -211,7 +229,7 @@ export function createStoreQrStaffController(
         type: landingType, // store-qr-landing.controller 의 fallback 패턴 (type ?? landingType)
         title: source.title,
         description: copiedDescription,
-        libraryItemId: null,
+        libraryItemId: importLibraryItemId,
         landingType,
         landingTargetId,
         slug: finalSlug,

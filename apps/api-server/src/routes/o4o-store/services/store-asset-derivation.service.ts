@@ -17,6 +17,8 @@ export const STORE_ASSET_SOURCE_KINDS = [
   'library_resource',     // store_execution_assets (source_type=uploaded)
   'production_material',  // store_execution_assets (source_type=generated, content)
   'store_execution_asset', // store_execution_assets (일반)
+  // WO-O4O-KPA-QR-TARGET-COPY-GUARD-V1: content_hub 원본(kpa_contents) → 매장 사본 추적
+  'content_hub',          // kpa_contents (운영자 콘텐츠 허브 원본)
 ] as const;
 
 export const STORE_ASSET_DERIVED_KINDS = [
@@ -25,6 +27,8 @@ export const STORE_ASSET_DERIVED_KINDS = [
   'blog_post',        // store_blog_posts
   'signage_item',     // store_playlist_items (후속)
   'signage_playlist', // store_playlists (후속)
+  // WO-O4O-KPA-QR-TARGET-COPY-GUARD-V1: content_hub 원본에서 생성된 매장 사본
+  'store_execution_asset', // store_execution_assets (content_hub 사본 등)
 ] as const;
 
 export type StoreAssetSourceKind = (typeof STORE_ASSET_SOURCE_KINDS)[number];
