@@ -29,11 +29,10 @@
 import { useState, useEffect, useCallback, type CSSProperties } from 'react';
 import {
   Megaphone, Trash2, ExternalLink, FileDown, QrCode, FolderOpen,
-  Sparkles, ChevronDown, ChevronUp, CheckCircle2, LayoutTemplate, Save,
+  ChevronDown, ChevronUp, CheckCircle2, LayoutTemplate, Save,
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
-import { AiContentModal } from '@o4o/content-editor';
 import { colors } from '../../styles/theme';
 import { getStoreExecutionAsset, getStoreExecutionAssets, deleteStoreExecutionAsset, type StoreExecutionAsset } from '../../api/storeExecutionAssets';
 import { getStoreQrCodes } from '../../api/storeQr';
@@ -92,7 +91,6 @@ export function StorePopPage() {
   const [selectedTemplate, setSelectedTemplate] = useState<ProductionTemplate | null>(null);
 
   // WO-O4O-POP-TEMPLATE-WORKFLOW-V1: AI 생성 문구
-  const [aiOpen, setAiOpen] = useState(false);
   const [popAiContent, setPopAiContent] = useState<PopAiContent | null>(null);
   const [aiPanelExpanded, setAiPanelExpanded] = useState(false);
 
@@ -271,41 +269,8 @@ export function StorePopPage() {
     setPopItems((prev) => prev.filter((p) => p.id !== id));
   };
 
-  // ─── AI 문구 생성 ──────────────────────────────────────────────────────────
-
-  /** items에서 AI 입력용 텍스트 조합 */
-  const buildAiInputText = (): string => {
-    if (popItems.length === 0) return '';
-    const lines = ['다음 자료를 참고하여 POP 인쇄물용 문구 세트를 만들어 주세요.', ''];
-    popItems.forEach((item, i) => {
-      lines.push(`${i + 1}. ${item.title}`);
-      if (item.description) lines.push(`   설명: ${item.description}`);
-    });
-    return lines.join('\n').trim();
-  };
-
-  /** AiContentModal onInsert 콜백 */
-  const handleAiInsert = useCallback((data: { html: string; title: string }) => {
-    // AiContentModal의 onInsert는 html + title만 보내므로,
-    // result 전체는 모달 내부에서 소비됨.
-    // 여기서는 data.html을 파싱해 title/bullets/shortText/longText 추출.
-    setAiOpen(false);
-    // html에서 구조 파싱 (POP AI output은 title/bullets/shortText/longText가 html로 조합되어 있음)
-    // 단순하게 title과 html을 그대로 저장하고, bullets는 html의 <li> 항목으로 추출.
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(data.html, 'text/html');
-    const bullets = Array.from(doc.querySelectorAll('li')).map((li) => li.textContent?.trim() || '').filter(Boolean);
-    const paragraphs = Array.from(doc.querySelectorAll('p')).map((p) => p.textContent?.trim() || '').filter(Boolean);
-
-    setPopAiContent({
-      title: data.title || paragraphs[0] || '',
-      bullets: bullets.slice(0, 3),
-      shortText: paragraphs[0] || '',
-      longText: paragraphs.slice(0, 3).join(' '),
-    });
-    setAiPanelExpanded(true);
-    toast.success('AI 문구가 생성되었습니다. 내용을 확인하고 PDF를 출력하세요.');
-  }, []);
+  // WO-O4O-KPA-POP-AI-STEP-REMOVE-V1: AI 문구 생성(buildAiInputText/handleAiInsert/AiContentModal) 제거.
+  //   popAiContent 는 가져온 POP(prefillPop) 경로에서만 설정된다.
 
   // ─── PDF 생성 ─────────────────────────────────────────────────────────────
 
@@ -522,31 +487,20 @@ export function StorePopPage() {
               })}
             </div>
 
-            {/* ── WO-O4O-POP-TEMPLATE-WORKFLOW-V1: AI 문구 생성 패널 ── */}
-            <div style={styles.aiPanel}>
-              <div style={styles.aiPanelHeader}>
-                <div style={styles.aiPanelHeaderLeft}>
-                  <Sparkles size={16} style={{ color: '#16a34a' }} />
-                  <span style={styles.aiPanelTitle}>
-                    AI 문구 생성
-                    {popAiContent && (
-                      <CheckCircle2 size={14} style={{ color: '#16a34a', marginLeft: '6px' }} />
+            {/* WO-O4O-KPA-POP-AI-STEP-REMOVE-V1: AI 문구 생성 진입점 제거(초안 생성 AI 제거 정책).
+                POP 문구는 선택 자료의 제목·설명을 그대로 사용한다. 가져온 POP(prefill) 문구가 있을 때만
+                미리보기/저장 패널을 노출한다. (AiContentModal·/api/ai/content·Toolbar AI 정리는 유지.) */}
+            {popAiContent && (
+              <div style={styles.aiPanel}>
+                <div style={styles.aiPanelHeader}>
+                  <div style={styles.aiPanelHeaderLeft}>
+                    <CheckCircle2 size={16} style={{ color: '#16a34a' }} />
+                    <span style={styles.aiPanelTitle}>가져온 POP 문구</span>
+                    {selectedTemplate && (
+                      <span style={styles.aiPanelTemplateBadge}>{selectedTemplate.name} 스타일 적용</span>
                     )}
-                  </span>
-                  {selectedTemplate && (
-                    <span style={styles.aiPanelTemplateBadge}>{selectedTemplate.name} 스타일 적용</span>
-                  )}
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <button
-                    type="button"
-                    onClick={() => setAiOpen(true)}
-                    style={styles.aiGenerateBtn}
-                  >
-                    <Sparkles size={13} />
-                    {popAiContent ? '재생성' : 'AI 문구 만들기'}
-                  </button>
-                  {popAiContent && (
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <button
                       type="button"
                       onClick={handleSaveAsContent}
@@ -557,8 +511,6 @@ export function StorePopPage() {
                       <Save size={13} />
                       {savingContent ? '저장 중...' : 'POP 콘텐츠로 저장'}
                     </button>
-                  )}
-                  {popAiContent && (
                     <button
                       type="button"
                       onClick={() => setAiPanelExpanded((v) => !v)}
@@ -566,56 +518,48 @@ export function StorePopPage() {
                     >
                       {aiPanelExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                     </button>
-                  )}
-                </div>
-              </div>
-
-              {/* AI 문구 프리뷰 */}
-              {popAiContent && aiPanelExpanded && (
-                <div style={styles.aiContentPreview}>
-                  <div style={styles.aiPreviewRow}>
-                    <span style={styles.aiPreviewLabel}>제목</span>
-                    <span style={styles.aiPreviewValue}>{popAiContent.title}</span>
                   </div>
-                  {popAiContent.shortText && (
-                    <div style={styles.aiPreviewRow}>
-                      <span style={styles.aiPreviewLabel}>짧은 문구</span>
-                      <span style={styles.aiPreviewValue}>{popAiContent.shortText}</span>
-                    </div>
-                  )}
-                  {popAiContent.bullets.length > 0 && (
-                    <div style={styles.aiPreviewRow}>
-                      <span style={styles.aiPreviewLabel}>핵심 포인트</span>
-                      <ul style={styles.aiPreviewBullets}>
-                        {popAiContent.bullets.map((b, i) => (
-                          <li key={i} style={styles.aiPreviewBulletItem}>{b}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  {popAiContent.longText && (
-                    <div style={styles.aiPreviewRow}>
-                      <span style={styles.aiPreviewLabel}>본문</span>
-                      <span style={{ ...styles.aiPreviewValue, color: colors.neutral500 }}>{popAiContent.longText}</span>
-                    </div>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => setPopAiContent(null)}
-                    style={styles.aiClearBtn}
-                  >
-                    AI 문구 제거 (원본 자료로 출력)
-                  </button>
                 </div>
-              )}
 
-              {!popAiContent && (
-                <p style={styles.aiPanelHint}>
-                  AI 문구를 생성하면 PDF에 {selectedTemplate?.name ?? 'POP'} 스타일 레이아웃이 적용됩니다.
-                  생성하지 않으면 자료의 제목·설명을 그대로 사용합니다.
-                </p>
-              )}
-            </div>
+                {aiPanelExpanded && (
+                  <div style={styles.aiContentPreview}>
+                    <div style={styles.aiPreviewRow}>
+                      <span style={styles.aiPreviewLabel}>제목</span>
+                      <span style={styles.aiPreviewValue}>{popAiContent.title}</span>
+                    </div>
+                    {popAiContent.shortText && (
+                      <div style={styles.aiPreviewRow}>
+                        <span style={styles.aiPreviewLabel}>짧은 문구</span>
+                        <span style={styles.aiPreviewValue}>{popAiContent.shortText}</span>
+                      </div>
+                    )}
+                    {popAiContent.bullets.length > 0 && (
+                      <div style={styles.aiPreviewRow}>
+                        <span style={styles.aiPreviewLabel}>핵심 포인트</span>
+                        <ul style={styles.aiPreviewBullets}>
+                          {popAiContent.bullets.map((b, i) => (
+                            <li key={i} style={styles.aiPreviewBulletItem}>{b}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {popAiContent.longText && (
+                      <div style={styles.aiPreviewRow}>
+                        <span style={styles.aiPreviewLabel}>본문</span>
+                        <span style={{ ...styles.aiPreviewValue, color: colors.neutral500 }}>{popAiContent.longText}</span>
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setPopAiContent(null)}
+                      style={styles.aiClearBtn}
+                    >
+                      문구 제거 (원본 자료로 출력)
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Generate Settings */}
             <div style={styles.settingsPanel}>
@@ -676,23 +620,7 @@ export function StorePopPage() {
         )}
       </div>
 
-      {/* WO-O4O-POP-TEMPLATE-WORKFLOW-V1: AiContentModal (template-aware) */}
-      <AiContentModal
-        open={aiOpen}
-        onClose={() => setAiOpen(false)}
-        editor={null}
-        onInsert={handleAiInsert}
-        initialMode="pop"
-        initialText={buildAiInputText()}
-        templateId={selectedTemplate?.id}
-        templateSystemPrompt={selectedTemplate?.systemPromptOverride}
-        templateForcedOptions={selectedTemplate?.forcedOptions}
-        headerLabel="POP 문구 AI 생성"
-        aiRequestHeaders={(() => {
-          const token = getAccessToken();
-          return token ? { Authorization: `Bearer ${token}` } : undefined;
-        })()}
-      />
+      {/* WO-O4O-KPA-POP-AI-STEP-REMOVE-V1: POP 문구 AI 생성 모달 진입점 제거 (AiContentModal 컴포넌트는 유지) */}
     </div>
   );
 }
