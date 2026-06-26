@@ -22,16 +22,15 @@ import {
   Loader2,
   AlertCircle,
   CheckCircle,
-  Plus,
-  FileText,
-  Image,
-  Link as LinkIcon,
-  List,
 } from 'lucide-react';
+// WO-O4O-KPA-STORE-LIBRARY-CONTENTS-DIRECT-EDITOR-UNIFY-V1:
+//   direct 콘텐츠 편집을 o4o 표준 RichTextEditor(@o4o/content-editor)로 통일 — 제작 자료 편집기와 동일 모듈.
+import { RichTextEditor, type EditorContent } from '@o4o/content-editor';
 import { BlockRenderer } from '@o4o/block-renderer';
 import { directContentApi, type DirectContentItem } from '../../api/assetSnapshot';
 import { kpaBlocksToRendererBlocks } from '../../utils/kpa-block-adapter';
 import { TagInput } from '../../components/store/TagInput';
+import { getAccessToken } from '../../contexts/AuthContext';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -79,18 +78,21 @@ function parseBlocks(contentJson: Record<string, unknown>): ContentBlock[] {
   return [{ type: 'text', value: JSON.stringify(contentJson, null, 2) }];
 }
 
-function blocksToContentJson(blocks: ContentBlock[], original: unknown): Record<string, unknown> {
-  // 원래 형식이 배열이면 {blocks:[...]} 래퍼로 변환 (배열 spread 방지)
-  if (Array.isArray(original)) {
-    return { blocks: blocks.map(b => {
-      if (b.type === 'list') return { type: 'list', items: b.items || [] };
-      if (b.type === 'image') return { type: 'image', url: b.value };
-      if (b.type === 'link') return { type: 'link', url: b.value, label: b.label };
-      return { type: 'text', content: b.value };
-    }) };
-  }
-  const orig = (original || {}) as Record<string, unknown>;
-  return { ...orig, blocks };
+// WO-O4O-KPA-STORE-LIBRARY-CONTENTS-DIRECT-EDITOR-UNIFY-V1:
+//   저장된 contentJson 을 o4o 표준 편집기(html)용으로 정규화. direct 콘텐츠는 contentJson.html 이 표준.
+//   레거시 블록/배열 형태도 html 로 정규화해 표준 편집기에 진입(유형 분기 없이 동일 편집기 사용).
+function contentJsonToHtml(contentJson: Record<string, unknown>): string {
+  if (typeof contentJson?.html === 'string') return contentJson.html;
+  const blocks = parseBlocks(contentJson);
+  return blocks
+    .map((b) => {
+      if (b.type === 'image' && b.value) return `<p><img src="${b.value}" alt="" /></p>`;
+      if (b.type === 'link' && b.value) return `<p><a href="${b.value}">${b.label || b.value}</a></p>`;
+      if (b.type === 'list' && b.items?.length) return `<ul>${b.items.map((i) => `<li>${i}</li>`).join('')}</ul>`;
+      return b.value ? `<p>${b.value}</p>` : '';
+    })
+    .filter(Boolean)
+    .join('\n');
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -107,7 +109,10 @@ export default function StoreDirectContentPage() {
   // Edit state
   const [editing, setEditing] = useState(false);
   const [editTitle, setEditTitle] = useState('');
-  const [editBlocks, setEditBlocks] = useState<ContentBlock[]>([]);
+  // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-DIRECT-EDITOR-UNIFY-V1:
+  //   레거시 블록 편집기(editBlocks) 대신 o4o 표준 RichTextEditor(html) 사용. 유형 구분 없이 균일 적용.
+  const [editorContent, setEditorContent] = useState<EditorContent>({ html: '' });
+  const [editorInitialHtml, setEditorInitialHtml] = useState('');
   // WO-O4O-KPA-CONTENT-LIST-TAG-FIELD-AND-DISPLAY-V1: 태그 편집 state
   const [editTags, setEditTags] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
@@ -138,10 +143,18 @@ export default function StoreDirectContentPage() {
 
   useEffect(() => { fetchContent(); }, [fetchContent]);
 
+  // 표준 편집기는 html 로 동작 — 저장된 contentJson 을 html 로 정규화해 주입(유형 분기 아님).
+  const aiHeaders = useCallback((): Record<string, string> | undefined => {
+    const token = getAccessToken();
+    return token ? { Authorization: `Bearer ${token}` } : undefined;
+  }, []);
+
   const startEdit = () => {
     if (!content) return;
     setEditTitle(content.title);
-    setEditBlocks(parseBlocks(content.contentJson));
+    const html = contentJsonToHtml(content.contentJson);
+    setEditorInitialHtml(html);
+    setEditorContent({ html });
     setEditTags(Array.isArray(content.tags) ? content.tags : []);
     setEditing(true);
   };
@@ -149,7 +162,8 @@ export default function StoreDirectContentPage() {
   const cancelEdit = () => {
     setEditing(false);
     setEditTitle('');
-    setEditBlocks([]);
+    setEditorContent({ html: '' });
+    setEditorInitialHtml('');
     setEditTags([]);
   };
 
@@ -170,7 +184,13 @@ export default function StoreDirectContentPage() {
     if (!id || !content) return;
     setSaving(true);
     try {
-      const contentJson = blocksToContentJson(editBlocks, content.contentJson);
+      // html 이 authoritative — 기존 contentJson 의 부가 키(presets/generatedBy 등)는 보존하고
+      // 레거시 blocks 키는 제거(중복 시 렌더 우선순위 충돌 방지).
+      const contentJson: Record<string, unknown> = {
+        ...(content.contentJson as Record<string, unknown>),
+        html: editorContent.html,
+      };
+      delete contentJson.blocks;
       const res = await directContentApi.update(id, { title: editTitle, contentJson, tags: editTags });
       setContent(res.data);
       setEditing(false);
@@ -194,19 +214,6 @@ export default function StoreDirectContentPage() {
       setDeleting(false);
       setConfirmDelete(false);
     }
-  };
-
-  // Block editor helpers
-  const updateBlock = (idx: number, field: keyof ContentBlock, value: string) => {
-    setEditBlocks(prev => prev.map((b, i) => i === idx ? { ...b, [field]: value } : b));
-  };
-
-  const addBlock = (type: ContentBlock['type']) => {
-    setEditBlocks(prev => [...prev, { type, value: '', label: type === 'link' ? '' : undefined, items: type === 'list' ? [''] : undefined }]);
-  };
-
-  const removeBlock = (idx: number) => {
-    setEditBlocks(prev => prev.filter((_, i) => i !== idx));
   };
 
   // ─── Render ─────────────────────────────────────────────────────────────────
@@ -338,87 +345,17 @@ export default function StoreDirectContentPage() {
 
       {/* Content area */}
       {editing ? (
-        <div className="bg-white border border-slate-200 rounded-lg p-5 mb-4">
-          <label className="block text-sm font-medium text-slate-700 mb-3">본문 편집</label>
-
-          <div className="space-y-3 mb-4">
-            {editBlocks.map((block, idx) => (
-              <div key={idx} className="border border-slate-200 rounded-lg p-3">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="flex items-center gap-1.5 text-xs text-slate-500">
-                    {block.type === 'text' && <><FileText className="w-3.5 h-3.5" />텍스트</>}
-                    {block.type === 'image' && <><Image className="w-3.5 h-3.5" />이미지</>}
-                    {block.type === 'link' && <><LinkIcon className="w-3.5 h-3.5" />링크</>}
-                    {block.type === 'list' && <><List className="w-3.5 h-3.5" />목록</>}
-                  </span>
-                  <button onClick={() => removeBlock(idx)} className="text-slate-400 hover:text-red-500">
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-
-                {block.type === 'text' && (
-                  <textarea
-                    value={block.value}
-                    onChange={e => updateBlock(idx, 'value', e.target.value)}
-                    rows={5}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm resize-y outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="본문 내용"
-                  />
-                )}
-                {block.type === 'image' && (
-                  <input type="url" value={block.value} onChange={e => updateBlock(idx, 'value', e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="https://example.com/image.jpg" />
-                )}
-                {block.type === 'link' && (
-                  <div className="space-y-2">
-                    <input type="url" value={block.value} onChange={e => updateBlock(idx, 'value', e.target.value)}
-                      className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="https://example.com" />
-                    <input type="text" value={block.label || ''} onChange={e => updateBlock(idx, 'label', e.target.value)}
-                      className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="링크 텍스트" />
-                  </div>
-                )}
-                {block.type === 'list' && (
-                  <div className="space-y-1.5">
-                    {(block.items || []).map((item, i) => (
-                      <div key={i} className="flex items-center gap-2">
-                        <span className="text-xs text-slate-400 w-5">{i + 1}.</span>
-                        <input type="text" value={item}
-                          onChange={e => {
-                            const items = [...(block.items || [])];
-                            items[i] = e.target.value;
-                            setEditBlocks(prev => prev.map((b, bi) => bi === idx ? { ...b, items } : b));
-                          }}
-                          className="flex-1 px-3 py-1.5 border border-slate-200 rounded-md text-sm outline-none focus:ring-2 focus:ring-blue-500" />
-                        <button onClick={() => {
-                          const items = (block.items || []).filter((_, j) => j !== i);
-                          setEditBlocks(prev => prev.map((b, bi) => bi === idx ? { ...b, items } : b));
-                        }} className="text-slate-400 hover:text-red-500">
-                          <Trash2 className="w-3 h-3" />
-                        </button>
-                      </div>
-                    ))}
-                    <button onClick={() => {
-                      const items = [...(block.items || []), ''];
-                      setEditBlocks(prev => prev.map((b, bi) => bi === idx ? { ...b, items } : b));
-                    }} className="text-xs text-blue-500 hover:underline">+ 항목 추가</button>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-
-          <div className="flex gap-2">
-            {(['text', 'image', 'list', 'link'] as ContentBlock['type'][]).map(t => (
-              <button key={t} onClick={() => addBlock(t)}
-                className="flex items-center gap-1 px-2.5 py-1.5 text-xs text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50">
-                <Plus className="w-3.5 h-3.5" />
-                {t === 'text' ? '텍스트' : t === 'image' ? '이미지' : t === 'list' ? '목록' : '링크'}
-              </button>
-            ))}
-          </div>
+        // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-DIRECT-EDITOR-UNIFY-V1:
+        //   o4o 표준 RichTextEditor(편집/HTML/미리보기 탭) — 제작 자료 편집기와 동일 모듈. 유형 구분 없음.
+        <div className="bg-white border border-slate-200 rounded-lg p-2 mb-4">
+          <RichTextEditor
+            value={editorInitialHtml}
+            onChange={(c) => setEditorContent(c)}
+            placeholder="본문 내용을 입력하세요"
+            minHeight="420px"
+            preset="full"
+            aiRequestHeaders={aiHeaders()}
+          />
         </div>
       ) : (
         <div className="bg-white border border-slate-200 rounded-lg p-6 mb-4">
