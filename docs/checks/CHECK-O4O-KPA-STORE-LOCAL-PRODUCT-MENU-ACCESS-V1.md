@@ -59,7 +59,18 @@
 | 배포 (Web Cloud Run, 797eb3937) | ✅ success |
 | 9.6 GP/KCos 비영향 | ✅ (KPA 블록/KPA 파일 한정) |
 | 9.7 온라인 판매 비영향 | ✅ (git diff) |
-| 9.1 메뉴 노출/이동 · 9.2 화면 진입 · 9.3 생성 smoke · 9.4 타블렛 연결 · 9.5 회귀 | ⬜ **보류** — Playwright 영속 프로필이 다른 Chrome 세션에 재점유되어 launch 실패. route 재사용·문구 변경이라 회귀 위험 낮음. 프로필 해제 후 재검증 |
+| 9.1 메뉴 노출/이동 | ✅ PASS — '타블렛' 그룹 `내 매장 제품 / 매장 자체 제품 / 타블렛 구성`, '매장 자체 제품' → `/store/commerce/local-products` 이동 |
+| 9.2 화면 진입 | ✅ PASS — 제목 '매장 자체 제품 (n)' + 새 설명(O4O 무관·타블렛 활용). 404/권한오류 없음 |
+| 9.3 생성 smoke | ✅ PASS — SMOKE 제품 2건 생성(숫자 가격 10000/20000 → ₩10,000/₩20,000), toast 성공. **IR 결론(숫자 입력 정상) 실증**. 검증 후 삭제 |
+| 9.4 타블렛 연결 | ✅ PASS(부분) — 타블렛 구성 '매장 자체 제품 (2)' 탭에 노출 + 진열 저장(200). **단, 공개 타블렛 화면 노출은 별도 버그로 미표시 — §9-A** |
+| 9.5 기존 기능 회귀 | ✅ (타블렛 목록/Idle/전시 설정/진열 picker 정상) |
+
+### §9-A. 신규 발견 (공개 뷰어가 자체 제품 미표시) — 본 WO 범위 밖, 별도 버그
+
+- 공개 API `GET /stores/:slug/tablet/products` 는 `localProducts` 를 정상 반환(생성한 2건 확인). 그러나 **KPA 공개 뷰어가 화면에 표시하지 못함**("표시할 상품이 없습니다").
+- 원인: kiosk-core(`TabletKioskPage.tsx:343`)는 `res.localProducts` 를 읽지만, **KPA `services/web-kpa-society/src/api/tablet.ts` `fetchTabletProducts` 가 `{ data, meta }` 만 반환하고 `localProducts` 를 누락**(드롭)함.
+- 영향: KPA 공개 타블렛 뷰어는 supplier listing 만 노출, **자체 제품(local) 미노출**. → 자동 넘김 시각 smoke(WO-...-BROWSE-AUTO-SLIDE)도 이 때문에 막힘.
+- 본 WO(메뉴 동선)와 무관한 **기존 버그**. **후속 WO 권장**: `fetchTabletProducts` 반환에 `localProducts: json.localProducts` 추가(1줄, KPA only). (`/tablet/:slug` URL 인코딩 주의 — '뚜'=`%EB%9A%9C`.)
 
 ## 9. 남은 후속 작업
 
@@ -70,4 +81,4 @@
 
 ## 결론
 
-기존 `/store/commerce/local-products` 화면을 KPA '타블렛' 그룹 메뉴 + 타블렛 구성 빈 상태 링크로 노출하고, KPA 전용 페이지 제목을 '매장 자체 제품'으로 정합. 신규 API/DB 없음, GP/KCos·온라인 판매 무영향, tsc·배포 통과. 브라우저 시각 smoke 만 로컬 프로필 점유로 보류 — 이 동선 확보로 타블렛 테스트 데이터/자동 넘김 시각 재검증이 가능해짐.
+기존 `/store/commerce/local-products` 화면을 KPA '타블렛' 그룹 메뉴 + 타블렛 구성 빈 상태 링크로 노출하고, KPA 전용 페이지 제목을 '매장 자체 제품'으로 정합. 신규 API/DB 없음, GP/KCos·온라인 판매 무영향, tsc·배포 통과. **브라우저 smoke 9.1~9.5 PASS**(메뉴/진입/생성/타블렛 pool/회귀). 단, **공개 타블렛 뷰어가 자체 제품을 표시하지 못하는 별도 기존 버그(§9-A: KPA `fetchTabletProducts` 의 `localProducts` 드롭)** 를 발견 — 자동 넘김 시각 smoke 는 이 버그 해소(후속 1줄 WO) 후 가능.
