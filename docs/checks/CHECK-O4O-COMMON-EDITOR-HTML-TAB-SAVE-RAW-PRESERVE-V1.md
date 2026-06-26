@@ -69,15 +69,26 @@ main-site 7 / shared-space-ui 6 …` — 전 서비스 admin·operator·store·f
 
 ## 5. 검증 결과
 
+브라우저 smoke: 2026-06-26, KPA `테스트 약국 매장`, 배포본(`83cbd1c08`), 제작 자료 편집기
+(`/store/library/production-materials/new`, RichTextEditor 탭 사용).
+
 | 항목 | 결과 |
 |---|---|
 | content-editor `tsc --noEmit` | ✅ PASS |
 | content-editor build(tsup) | ✅ PASS |
 | web-kpa-society `tsc --noEmit` (소비처 계약) | ✅ PASS |
-| HTML 탭 디자인 입력 → 미리보기 → 저장 raw 보존 | ⏳ 배포 후 smoke |
-| 재오픈 시 디자인 보존 + 백엔드 저장값 inline style 유지 | ⏳ |
-| 인쇄용 PDF 에서 디자인 보존(PDF WO 연계) | ⏳ |
-| WYSIWYG 콘텐츠 저장/수정 회귀 없음 | ⏳ |
+| HTML 탭 디자인 입력 → 미리보기 디자인 렌더 | ✅ (청록 배경 카드 + 민트 테두리 카드 스크린샷) |
+| HTML 탭 → 미리보기 → 저장 시 저장값 raw 보존 | ✅ 저장 htmlContent 에 `background:#0f766e`/`color:#ffffff`/`border:2px solid`/`border-radius`/`background:#ecfdf5`/`font-size:28px` 전수 보존(464자, API 확인) |
+| WYSIWYG(편집 탭) 저장 회귀 없음 | ✅ 저장값 `<p>위지윅 본문 테스트입니다</p>`(정상 직렬화) |
+| 인쇄용 PDF 에서 디자인 보존(PDF WO 연계) | ✅ (PDF WO 에서 raw 본문 주입 + print-color-adjust 로 확인 완료) |
+
+### 5-1. 배포 중 발견·수정한 회귀 (clobber)
+
+1차 배포(`ff472c759`) smoke 에서 **HTML 탭 입력 → 미리보기 전환 시 미리보기가 비는** 회귀 발견.
+원인: htmlSource↔value 동기화 effect 의 deps 에 `activeTab` 이 포함되어, 탭 전환 시점(부모 value 가
+onChange(raw)를 아직 반영하기 전, 빈값)에 stale value 로 htmlSource 를 덮어씀.
+수정(`83cbd1c08`): effect deps 를 `[value]` 로 한정하고 activeTab 은 `activeTabRef` 로 참조 →
+탭 전환만으로는 동기화가 재실행되지 않음. 재배포 후 위 표 전 항목 PASS.
 
 ---
 
