@@ -270,12 +270,11 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       //   매장 취급제품 = O4O 취급 제품(organization_product_listings) + 매장 자체 제품(store_local_products)
       //   통합 조회(읽기). 등록·수정은 아래 원본 메뉴(내 매장 제품/매장 자체 제품)에서. KPA 블록 한정.
       { key: 'handled-products', label: '매장 취급제품', subPath: '/handled-products' },
-      // WO-O4O-KPA-STORE-PRODUCT-MENU-IA-REORG-V1:
-      //   제품 기준 관리(내 매장 제품=organization_product_listings / 매장 자체 제품=store_local_products)를
-      //   '약국 상품·거래'(제품 기준 영역)에 모은다. 기존 '타블렛' 그룹에서 이동(타블렛=노출 채널만 남김).
-      //   route/page/API/DB 무변경 — 메뉴 위치만 정리.
-      { key: 'my-products',     label: '내 매장 제품',   subPath: '/my-products' },
-      { key: 'local-products',  label: '매장 자체 제품', subPath: '/commerce/local-products' },
+      // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-INTERNAL-TABS-V1:
+      //   '내 매장 제품'(/my-products)·'매장 자체 제품'(/commerce/local-products) 사이드바 메뉴를 제거하고
+      //   '매장 취급제품' 화면 내부(출처 탭 전체/O4O 취급/매장 자체 + 상단 관리 버튼 + 행 관리 버튼)로 흡수.
+      //   route/page/API/DB 무변경 — 기능 삭제 아님, 메뉴 노출만 정리(데드링크 0, 직접 URL 접근 유지).
+      //   선행 WO-O4O-KPA-STORE-PRODUCT-MENU-IA-REORG-V1(두 메뉴를 이 그룹으로 이동).
       // WO-O4O-KPA-ONLINE-SALES-ORDER-MANAGEMENT-AND-BUYER-ORDER-RELABEL-V1:
       //   /commerce/orders 는 매장이 공급자에게 주문한 '구매/발주' 내역(buyer) → '발주 내역'으로 라벨 정비.
       //   고객에게 판매한 주문(seller)은 '온라인 판매 > 주문 관리'(/online-sales/orders)로 분리.

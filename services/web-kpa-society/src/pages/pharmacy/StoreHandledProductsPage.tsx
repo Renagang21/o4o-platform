@@ -10,8 +10,8 @@
  */
 
 import { useEffect, useState, useCallback, type CSSProperties } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Package, RefreshCw, Search, ExternalLink, Boxes } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Package, RefreshCw, Search, ExternalLink, Boxes, Plus, ShoppingBag } from 'lucide-react';
 import { Pagination } from '@o4o/operator-ux-core';
 import {
   fetchHandledProducts,
@@ -69,10 +69,24 @@ function formatDate(iso: string): string {
   return Number.isNaN(d.getTime()) ? '-' : d.toLocaleDateString('ko-KR');
 }
 
+const EMPTY_BY_SOURCE: Record<SourceFilter, string> = {
+  all: '아직 등록된 매장 취급제품이 없습니다. 상단 버튼에서 O4O 제품 취급 신청 또는 매장 자체 제품 등록을 진행하세요.',
+  listing: '아직 취급 중인 O4O 제품이 없습니다. ‘O4O 제품 신청’에서 취급 신청을 진행할 수 있습니다.',
+  local: '아직 등록된 매장 자체 제품이 없습니다. ‘매장 자체 제품 등록’에서 추가할 수 있습니다.',
+};
+
+function isSourceFilter(v: string | null): v is SourceFilter {
+  return v === 'all' || v === 'listing' || v === 'local';
+}
+
 export default function StoreHandledProductsPage() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [source, setSource] = useState<SourceFilter>('all');
+  const initialSource: SourceFilter = isSourceFilter(searchParams.get('source'))
+    ? (searchParams.get('source') as SourceFilter)
+    : 'all';
+  const [source, setSource] = useState<SourceFilter>(initialSource);
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
@@ -115,6 +129,23 @@ export default function StoreHandledProductsPage() {
 
   const reload = useCallback(() => setReloadKey((k) => k + 1), []);
 
+  const selectSource = useCallback(
+    (next: SourceFilter) => {
+      setSource(next);
+      setPage(1);
+      setSearchParams(
+        (prev) => {
+          const params = new URLSearchParams(prev);
+          if (next === 'all') params.delete('source');
+          else params.set('source', next);
+          return params;
+        },
+        { replace: true },
+      );
+    },
+    [setSearchParams],
+  );
+
   return (
     <div style={styles.container}>
       <div style={styles.header}>
@@ -133,10 +164,20 @@ export default function StoreHandledProductsPage() {
             등록·수정은 각 원본 관리 화면에서 합니다.
           </p>
         </div>
-        <button onClick={reload} style={styles.refreshBtn}>
-          <RefreshCw size={14} />
-          새로고침
-        </button>
+        <div style={styles.headerActions}>
+          <button onClick={() => navigate('/store/commerce/products')} style={styles.secondaryBtn}>
+            <ShoppingBag size={14} />
+            O4O 제품 신청
+          </button>
+          <button onClick={() => navigate('/store/commerce/local-products')} style={styles.primaryBtn}>
+            <Plus size={14} />
+            매장 자체 제품 등록
+          </button>
+          <button onClick={reload} style={styles.refreshBtn}>
+            <RefreshCw size={14} />
+            새로고침
+          </button>
+        </div>
       </div>
 
       <div style={styles.toolbar}>
@@ -147,10 +188,7 @@ export default function StoreHandledProductsPage() {
               <button
                 key={t.key}
                 type="button"
-                onClick={() => {
-                  setSource(t.key);
-                  setPage(1);
-                }}
+                onClick={() => selectSource(t.key)}
                 style={{ ...styles.tab, ...(active ? styles.tabActive : styles.tabInactive) }}
               >
                 {t.label}
@@ -200,7 +238,7 @@ export default function StoreHandledProductsPage() {
               </tr>
             ) : items.length === 0 ? (
               <tr>
-                <td colSpan={9} style={styles.empty}>{searchQuery ? '검색 결과가 없습니다' : '취급 중인 제품이 없습니다'}</td>
+                <td colSpan={9} style={styles.empty}>{searchQuery ? '검색 결과가 없습니다' : EMPTY_BY_SOURCE[source]}</td>
               </tr>
             ) : (
               items.map((it) => (
@@ -268,7 +306,10 @@ const styles: Record<string, CSSProperties> = {
   breadcrumb: { display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: colors.neutral400, marginBottom: '6px' },
   title: { display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '20px', fontWeight: 600, color: colors.neutral800, margin: 0 },
   subtitle: { fontSize: '13px', color: colors.neutral500, margin: '6px 0 0', maxWidth: '720px', lineHeight: 1.6 },
+  headerActions: { display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' },
   refreshBtn: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: colors.white, border: `1px solid ${colors.neutral300}`, borderRadius: '6px', fontSize: '13px', color: colors.neutral700, cursor: 'pointer' },
+  secondaryBtn: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: colors.white, border: `1px solid ${colors.primary}`, borderRadius: '6px', fontSize: '13px', color: colors.primary, cursor: 'pointer' },
+  primaryBtn: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: colors.primary, border: `1px solid ${colors.primary}`, borderRadius: '6px', fontSize: '13px', color: colors.white, cursor: 'pointer' },
   toolbar: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '12px', flexWrap: 'wrap' },
   tabs: { display: 'flex', gap: '4px', background: colors.neutral100, border: `1px solid ${colors.neutral200}`, borderRadius: '8px', padding: '3px' },
   tab: { padding: '6px 14px', fontSize: '13px', fontWeight: 500, border: 'none', borderRadius: '6px', cursor: 'pointer' },
