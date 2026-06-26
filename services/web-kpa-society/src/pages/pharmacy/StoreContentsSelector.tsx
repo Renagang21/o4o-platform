@@ -15,7 +15,7 @@
 
 import { useEffect, useMemo, useRef, useState, useCallback, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Sparkles, Trash2, Search, FileText, Info, Printer, QrCode } from 'lucide-react';
+import { BookOpen, Sparkles, Trash2, Search, FileText, Info, Printer, QrCode, Image as ImageIcon } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { Pagination } from '@o4o/operator-ux-core';
 import { DataTable, type Column, ActionBar } from '@o4o/ui';
@@ -31,6 +31,8 @@ import type { ProductionSourceItem } from './productionTargets';
 import { ContentPdfExportModal, type PdfExportContent } from './ContentPdfExportModal';
 // WO-O4O-KPA-CONTENT-LIST-INLINE-QR-CREATE-V1: 콘텐츠 선택 → QR 만들기 바로 호출
 import { StoreQrCreateModal, type InlineQrTarget } from '../../components/store/StoreQrCreateModal';
+// WO-O4O-KPA-CONTENT-LIST-INLINE-POP-CREATE-V1: 콘텐츠 선택 → POP 만들기 바로 호출
+import { StorePopCreateModal, type InlinePopTarget } from '../../components/store/StorePopCreateModal';
 
 const PAGE_LIMIT = 20;
 const SEARCH_DEBOUNCE_MS = 300;
@@ -353,6 +355,8 @@ function DocumentsSection({
   const [pdfTarget, setPdfTarget] = useState<PdfExportContent | null>(null);
   // WO-O4O-KPA-CONTENT-LIST-INLINE-QR-CREATE-V1: 인라인 QR 생성 대상(단일)
   const [qrTarget, setQrTarget] = useState<InlineQrTarget | null>(null);
+  // WO-O4O-KPA-CONTENT-LIST-INLINE-POP-CREATE-V1: 인라인 POP 생성 대상(단일)
+  const [popTarget, setPopTarget] = useState<InlinePopTarget | null>(null);
   // WO-O4O-KPA-CONTENT-LIST-TAG-SEARCH-FILTER-V1: 출처 탭 + 태그 정확 필터
   const [source, setSource] = useState<SourceFilter>('all');
   const [activeTag, setActiveTag] = useState<string | null>(null);
@@ -475,6 +479,15 @@ function DocumentsSection({
     setQrTarget({ id: singleSelectedRow.id, title: singleSelectedRow.title, origin: singleSelectedRow.origin });
   }, [singleSelectedRow]);
 
+  // WO-O4O-KPA-CONTENT-LIST-INLINE-POP-CREATE-V1:
+  //   POP 은 백엔드 generate 가 direct/execution-asset/snapshot 3 origin 모두 받으므로 1개 선택이면 활성.
+  //   결과는 store_execution_assets(file/pop)=매장 제작 자료에 저장(콘텐츠 목록 asset_type='content' 필터로 미노출).
+  const popEligible = !!singleSelectedRow;
+  const handleCreatePop = useCallback(() => {
+    if (!singleSelectedRow) return;
+    setPopTarget({ id: singleSelectedRow.id, title: singleSelectedRow.title, origin: singleSelectedRow.origin });
+  }, [singleSelectedRow]);
+
   // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-STANDARD-TABLE-V1: @o4o/ui Column<T>
   const columns = useMemo<Column<DocumentRow>[]>(
     () => [
@@ -586,6 +599,8 @@ function DocumentsSection({
   const showPdfExport = mode === 'page' && enablePdfExport;
   // WO-O4O-KPA-CONTENT-LIST-INLINE-QR-CREATE-V1: page 모드에서만 QR 만들기 노출
   const showInlineQr = mode === 'page';
+  // WO-O4O-KPA-CONTENT-LIST-INLINE-POP-CREATE-V1: page 모드에서만 POP 만들기 노출
+  const showInlinePop = mode === 'page';
 
   return (
     <section style={styles.section}>
@@ -660,6 +675,15 @@ function DocumentsSection({
             onClick: handleCreateQr,
             disabled: !qrEligible,
           }] : []),
+          // WO-O4O-KPA-CONTENT-LIST-INLINE-POP-CREATE-V1:
+          //   POP 은 3 origin 모두 지원 → 1개 선택 시 활성(복수 선택 비활성+안내).
+          ...(showInlinePop ? [{
+            key: 'pop',
+            label: 'POP 만들기',
+            icon: <ImageIcon size={14} />,
+            onClick: handleCreatePop,
+            disabled: !popEligible,
+          }] : []),
           // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-PDF-EXPORT-OPTIONS-V1:
           //   1차는 단일 콘텐츠만 지원 — 1개 선택 시에만 활성(2개+ 비활성 + 아래 안내).
           ...(showPdfExport ? [{
@@ -679,12 +703,12 @@ function DocumentsSection({
         ]}
       />
 
-      {/* WO-O4O-KPA-CONTENT-LIST-INLINE-QR-CREATE-V1: QR 만들기 선택 안내 */}
-      {showInlineQr && selected.size >= 2 && (
-        <p style={styles.pdfHint}>QR-code는 콘텐츠 1개를 선택해 주세요.</p>
+      {/* WO-O4O-KPA-CONTENT-LIST-INLINE-QR-CREATE-V1 / INLINE-POP: QR·POP 만들기 선택 안내 */}
+      {(showInlineQr || showInlinePop) && selected.size >= 2 && (
+        <p style={styles.pdfHint}>QR-code · POP은 콘텐츠 1개를 선택해 주세요.</p>
       )}
       {showInlineQr && selected.size === 1 && !qrEligible && (
-        <p style={styles.pdfHint}>가져온 콘텐츠(운영자 제공/커뮤니티)는 QR-code 대상이 아닙니다. 내가 만든 콘텐츠/제작 자료를 선택해 주세요.</p>
+        <p style={styles.pdfHint}>가져온 콘텐츠(운영자 제공/커뮤니티)는 QR-code 대상이 아닙니다(POP은 가능). 내가 만든 콘텐츠/제작 자료를 선택하면 QR도 만들 수 있습니다.</p>
       )}
 
       {/* 인쇄용 PDF 는 콘텐츠 1개 선택 시 사용 가능 — 복수 선택 시 안내 */}
@@ -726,6 +750,16 @@ function DocumentsSection({
           open={!!qrTarget}
           target={qrTarget}
           onClose={() => setQrTarget(null)}
+          onCreated={() => setSelected(new Set())}
+        />
+      )}
+
+      {/* WO-O4O-KPA-CONTENT-LIST-INLINE-POP-CREATE-V1: 인라인 POP 생성 모달 (생성 성공 시 선택 해제) */}
+      {showInlinePop && (
+        <StorePopCreateModal
+          open={!!popTarget}
+          target={popTarget}
+          onClose={() => setPopTarget(null)}
           onCreated={() => setSelected(new Set())}
         />
       )}
