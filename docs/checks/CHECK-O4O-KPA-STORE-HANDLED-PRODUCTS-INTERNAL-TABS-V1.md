@@ -66,7 +66,21 @@
 
 ## 12. browser smoke 결과
 
-⏳ 배포 후 — 약국 상품·거래에 매장 취급제품만(내 매장 제품·매장 자체 제품 미노출), 출처 탭 3종+URL sync, 상단 관리 버튼, local 온라인몰=미지원, 직접 URL /my-products·/commerce/local-products 접근, 관리 버튼 이동, 콘솔 오류 없음.
+✅ PASS (2026-06-26, KPA `테스트 약국 매장`, 배포본 3324d3d2f web deploy success).
+
+| 항목 | 결과 |
+|---|---|
+| 약국 상품·거래 = O4O 제품 · 매장 취급제품 · 발주 내역 · 신청·승인 현황 | ✅ |
+| 사이드바에 '내 매장 제품' 미노출 | ✅ |
+| 사이드바에 '매장 자체 제품' 미노출 | ✅ |
+| /store/handled-products 접근(헤더/탭/표) | ✅ |
+| URL `?source=local` 진입 → local 탭 + 전용 빈 상태 문구 | ✅ (URL sync) |
+| 상단 관리 버튼 'O4O 제품 신청' · '매장 자체 제품 등록' · '새로고침' | ✅ |
+| 출처 탭 3종(전체/O4O 취급 제품/매장 자체 제품) | ✅ |
+| 매장 자체 제품 온라인몰 '미지원' 고지 유지 | ✅ |
+| 직접 URL /store/my-products 접근(heading '내 매장 제품') | ✅ route 유지 |
+| 직접 URL /store/commerce/local-products 접근 | ✅ (선행 V1 smoke + route 무변경) |
+| 콘솔 페이지 오류 없음(로그인 시점 401만) | ✅ |
 
 ## 13. 후속 후보
 
