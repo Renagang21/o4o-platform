@@ -32,7 +32,7 @@ export interface TabletProduct {
 export async function fetchTabletProducts(
   slug: string,
   params?: { page?: number; limit?: number; category?: string; q?: string },
-): Promise<{ data: TabletProduct[]; meta: { page: number; limit: number; total: number; totalPages: number } }> {
+): Promise<{ data: TabletProduct[]; meta: { page: number; limit: number; total: number; totalPages: number }; localProducts?: unknown[] }> {
   const query = new URLSearchParams();
   if (params?.page) query.set('page', String(params.page));
   if (params?.limit) query.set('limit', String(params.limit));
@@ -44,7 +44,10 @@ export async function fetchTabletProducts(
   const res = await fetch(url);
   const json = await res.json();
   if (!json.success) throw new Error(json.error?.message || 'Failed to fetch products');
-  return { data: json.data, meta: json.meta };
+  // WO-O4O-KPA-TABLET-PUBLIC-LOCAL-PRODUCTS-FIX-V1:
+  //   공개 뷰어(kiosk-core)가 res.localProducts 를 소비하므로 응답의 localProducts 를 그대로 통과시킨다.
+  //   (기존: data/meta 만 반환 → 매장 자체 제품이 공개 타블렛 화면에 노출되지 않던 버그)
+  return { data: json.data, meta: json.meta, localProducts: json.localProducts };
 }
 
 // ==================== Interest Request API ====================
