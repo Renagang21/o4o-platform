@@ -40,10 +40,12 @@ GET /stores/:slug/tablet/products
 |---|---|
 | `web-kpa-society` tsc | ✅ error 0 |
 | 배포 (Web Cloud Run, 2d72854ca) | ✅ success |
-| 데이터 경로 (공개 API localProducts 반환 → KPA 통과 → kiosk 소비) | ✅ 코드 검증 (공개 API 응답에 SMOKE 제품 2건 실측 — 선행 smoke) |
-| 공개 뷰어 자체 제품 시각 노출 + 자동 넘김 순환 | ⬜ **보류** — Playwright 영속 프로필 재점유로 launch 실패. 프로필 해제 후: 자체 제품 2건 진열 + autoSlide 5초 → `/tablet/<slug>` 에서 카드 노출 + 강조 순환 확인 |
+| 데이터 경로 (공개 API localProducts 반환 → KPA 통과 → kiosk 소비) | ✅ 코드 + 실측 |
+| 공개 뷰어 자체 제품 시각 노출 | ✅ **PASS** — 자체 제품 2건 진열 후 `/tablet/네뚜레-약국` Browse 에 "SMOKE_자체제품_A 10000.00 자체 / _B 20000.00 자체" 카드 노출(수정 전 "표시할 상품이 없습니다" → 해소) |
 
 > 슬러그 인코딩 주의: 데모 매장 `네뚜레-약국` 의 '뚜' = `%EB%9A%9C`(`%EB%9A%B0` 아님).
+>
+> 브라우저 smoke 실측(배포본 `2d72854ca`, 2026-06-26): 로컬 프로필을 점유하던 잔여 chrome.exe 9개(playwright 전용 프로필) 정리 후 검증. 자체 제품 2건이 공개 Browse 에 정상 노출. **자동 넘김(WO-...-BROWSE-AUTO-SLIDE)도 같은 화면에서 A→B 강조 순환 PASS.** 검증 후 SMOKE 제품 2건·진열·설정 정리.
 
 ## 6. 남은 후속
 
