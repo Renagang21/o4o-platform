@@ -14,14 +14,13 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { QrCode, Trash2, ExternalLink, Copy, Check, BarChart3, X, Smartphone, Monitor, Tablet, Download, Printer, ArrowRight, FolderOpen, Sparkles, LayoutTemplate, Info } from 'lucide-react';
+import { QrCode, Trash2, ExternalLink, Copy, Check, BarChart3, X, Smartphone, Monitor, Tablet, Download, Printer, ArrowRight, FolderOpen, LayoutTemplate, Info } from 'lucide-react';
 // WO-O4O-KPA-MY-STORE-COPIES-STANDARD-TABLE-V1: list rendering 표준 테이블 (자체 selection + bulk print 보존)
 import { DataTable, type Column } from '@o4o/ui';
 import { getStoreExecutionAsset } from '../../api/storeExecutionAssets';
 import { Link, useLocation } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { GuideBlock } from '@o4o/shared-space-ui';
-import { AiContentModal } from '@o4o/content-editor';
 import { colors } from '../../styles/theme';
 // WO-O4O-QR-TEMPLATE-WORKFLOW-V1
 import { findTemplate } from './productionTemplates';
@@ -192,7 +191,6 @@ export function StoreQRPage() {
   const [formTitle, setFormTitle] = useState('');
   const [formDescription, setFormDescription] = useState('');
   const [selectedTemplate, setSelectedTemplate] = useState<ProductionTemplate | null>(null);
-  const [aiOpen, setAiOpen] = useState(false);
   // WO-O4O-KPA-QR-PAGE-CONSULTATION-CTA-V1: 콘텐츠(page) QR 하단 상담 요청 버튼 옵션
   const [ctaEnabled, setCtaEnabled] = useState(false);
   const [ctaLabel, setCtaLabel] = useState('');
@@ -367,24 +365,6 @@ export function StoreQRPage() {
     setShowSelector(false);
     setCreating(true);
   };
-
-  // WO-O4O-QR-TEMPLATE-WORKFLOW-V1: AI 문구 생성 결과 주입
-  // html에서 title과 description을 추출해 form state에 반영.
-  // QR은 짧은 structured output이므로 첫 heading → title, 첫 p → description.
-  const handleAiInsert = useCallback(({ html, title: aiTitle }: { html: string; title: string }) => {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-
-    const titleFromHtml = doc.querySelector('h1,h2,h3')?.textContent?.trim() || '';
-    const descFromHtml = doc.querySelector('p')?.textContent?.trim() || '';
-    const finalTitle = aiTitle?.trim() || titleFromHtml;
-    const finalDesc = descFromHtml;
-
-    if (finalTitle) setFormTitle(finalTitle);
-    if (finalDesc) setFormDescription(finalDesc.slice(0, 150));
-    setAiOpen(false);
-    toast.success('AI 문구가 적용되었습니다. 내용을 확인하고 QR을 저장하세요.');
-  }, []);
 
   const handleCreate = async () => {
     if (!selectedLibrary) return;
@@ -773,26 +753,9 @@ export function StoreQRPage() {
             </button>
           </div>
 
-          {/* WO-O4O-QR-TEMPLATE-WORKFLOW-V1: AI 문구 보조 배너 */}
-          <div style={styles.aiBanner}>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={styles.aiBannerTitle}>✨ AI 문구 보조</div>
-              <div style={styles.aiBannerDesc}>
-                {selectedTemplate
-                  ? `${selectedTemplate.name} 스타일로 QR 제목과 짧은 안내문을 생성합니다.`
-                  : 'QR 스캔 후 보여줄 짧은 제목과 안내문을 AI로 생성합니다.'}
-                {' '}선택 사항입니다.
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => setAiOpen(true)}
-              style={styles.aiBannerBtn}
-            >
-              <Sparkles size={13} />
-              AI 문구 생성
-            </button>
-          </div>
+          {/* WO-O4O-KPA-QR-AI-STEP-REMOVE-V1: QR 문구 AI 생성(초안 생성) 진입점 제거.
+              QR 제목/안내문은 직접 입력하거나, 선택한 콘텐츠 본문을 기반으로 생성한다.
+              (편집기 Toolbar의 AI 정리·AiContentModal 컴포넌트·/api/ai/content 는 유지.) */}
 
           {/* WO-O4O-QR-TEMPLATE-WORKFLOW-V1: QR 제목 */}
           <div style={styles.formRow}>
@@ -1165,22 +1128,7 @@ export function StoreQRPage() {
         )}
       </div>
 
-      {/* WO-O4O-QR-TEMPLATE-WORKFLOW-V1: AI 문구 생성 모달 (template-aware) */}
-      <AiContentModal
-        open={aiOpen}
-        onClose={() => setAiOpen(false)}
-        editor={null}
-        onInsert={handleAiInsert}
-        aiRequestHeaders={(() => {
-          const token = getAccessToken();
-          return token ? { Authorization: `Bearer ${token}` } : undefined;
-        })()}
-        headerLabel="QR 안내문 생성"
-        urlPlaceholder="https://example.com/product 또는 QR 연결 대상 URL"
-        templateId={selectedTemplate?.id}
-        templateSystemPrompt={selectedTemplate?.systemPromptOverride}
-        templateForcedOptions={selectedTemplate?.forcedOptions}
-      />
+      {/* WO-O4O-KPA-QR-AI-STEP-REMOVE-V1: QR 문구 AI 생성 모달 진입점 제거 (AiContentModal 컴포넌트는 유지) */}
 
       {/* Asset Selector Modal
           WO-O4O-KPA-STORE-QR-TARGET-SCOPE-AUDIT-V1 (A안): usageType="qr" 제거 —
@@ -1664,42 +1612,6 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: '5px',
     fontSize: '11px',
     fontWeight: 600,
-  },
-  aiBanner: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    padding: '10px 14px',
-    marginBottom: '16px',
-    background: '#eef2ff',
-    border: '1px solid #c7d2fe',
-    borderRadius: '8px',
-  },
-  aiBannerTitle: {
-    fontSize: '13px',
-    fontWeight: 600,
-    color: '#4338ca',
-    marginBottom: '2px',
-  },
-  aiBannerDesc: {
-    fontSize: '12px',
-    color: '#6366f1',
-    lineHeight: 1.5,
-  },
-  aiBannerBtn: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '6px',
-    padding: '7px 14px',
-    background: '#4f46e5',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '6px',
-    fontSize: '12px',
-    fontWeight: 600,
-    cursor: 'pointer',
-    whiteSpace: 'nowrap',
-    flexShrink: 0,
   },
   cardDescription: {
     fontSize: '12px',
