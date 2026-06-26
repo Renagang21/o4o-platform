@@ -301,12 +301,12 @@ export default function StoreLocalProductsPage() {
         <div>
           <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
             <ShoppingBag className="w-7 h-7 text-teal-600" />
-            매장 자체 제품
+            매장 경영활용 제품
             <span className="text-base font-normal text-slate-400">({total})</span>
           </h1>
-          {/* WO-O4O-KPA-STORE-LOCAL-PRODUCT-MENU-ACCESS-V1: 메뉴명('매장 자체 제품')과 정합 + 타블렛 활용 안내 */}
+          {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-TERM-CLARIFICATION-V1: '매장 자체 제품' → '매장 경영활용 제품' */}
           <p className="text-sm text-slate-500 mt-1">
-            O4O 제품이 아니더라도 매장에서 직접 취급하는 제품을 등록해 타블렛 전시·매장 안내에 활용할 수 있습니다. 결제/주문 시스템과 연결되지 않습니다.
+            O4O 제품이 아니더라도 매장이 직접 등록해 타블렛 전시·매장 안내·콘텐츠 제작 등 경영 활동에 활용하는 제품입니다. 결제/주문 시스템과 연결되지 않습니다.
           </p>
         </div>
         <button
@@ -382,12 +382,12 @@ export default function StoreLocalProductsPage() {
         <div className="text-center py-16 bg-white rounded-2xl shadow-sm">
           <ShoppingBag className="w-16 h-16 text-slate-200 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-slate-800 mb-2">
-            {debouncedSearch ? '검색 결과가 없습니다' : '등록된 매장 취급 상품이 없습니다'}
+            {debouncedSearch ? '검색 결과가 없습니다' : '등록된 매장 경영활용 제품이 없습니다'}
           </h3>
           <p className="text-slate-500 mb-6">
             {debouncedSearch
               ? '다른 검색어로 시도해 보세요.'
-              : '매장에서 자체적으로 취급하는 상품을 등록해 보세요.'}
+              : '매장 경영 활동에 활용할 제품을 등록해 보세요.'}
           </p>
           {!debouncedSearch && (
             <button

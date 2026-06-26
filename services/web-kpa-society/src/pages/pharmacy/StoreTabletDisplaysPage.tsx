@@ -543,7 +543,7 @@ export default function StoreTabletDisplaysPage() {
               태블릿 진열 관리
             </h1>
             <p className="text-sm text-slate-500 mt-1">
-              내 매장 제품에 등록된 제품을 타블렛별로 선택해 진열합니다. 타블렛은 주문 채널이 아니라 매장 내 제품 안내·상담 유도 화면입니다.
+              취급 중인 O4O 제품에 등록된 제품을 타블렛별로 선택해 진열합니다. 타블렛은 주문 채널이 아니라 매장 내 제품 안내·상담 유도 화면입니다.
             </p>
           </div>
         </div>
@@ -845,7 +845,7 @@ export default function StoreTabletDisplaysPage() {
               {/* Left: Product Pool */}
               <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
                 <div className="px-4 py-3 border-b bg-slate-50">
-                  {/* WO-O4O-KPA-TABLET-STORE-PRODUCT-LINKING-V1: 내 매장 제품 ↔ 타블렛 진열 연결 명시 */}
+                  {/* WO-O4O-KPA-TABLET-STORE-PRODUCT-LINKING-V1: 취급 중인 O4O 제품 ↔ 타블렛 진열 연결 명시 */}
                   <div className="flex items-center justify-between gap-2">
                     <h3 className="text-sm font-bold text-slate-700">진열할 제품 선택</h3>
                     <button
@@ -853,11 +853,11 @@ export default function StoreTabletDisplaysPage() {
                       onClick={() => navigate('/store/my-products')}
                       className="text-xs font-medium text-teal-700 hover:underline whitespace-nowrap"
                     >
-                      내 매장 제품 관리 →
+                      취급 중인 O4O 제품 관리 →
                     </button>
                   </div>
                   <p className="text-[11px] text-slate-400 mt-1">
-                    내 매장 제품에 등록된 제품을 선택해 이 타블렛에 진열합니다.
+                    취급 중인 O4O 제품에 등록된 제품을 선택해 이 타블렛에 진열합니다.
                   </p>
                   <div className="flex gap-1 mt-2">
                     <button
@@ -869,7 +869,7 @@ export default function StoreTabletDisplaysPage() {
                       }`}
                     >
                       <Package className="w-3.5 h-3.5" />
-                      내 매장 제품 ({pool.supplierProducts.filter((p) => !isInDisplay('supplier', p.id)).length})
+                      취급 중인 O4O 제품 ({pool.supplierProducts.filter((p) => !isInDisplay('supplier', p.id)).length})
                     </button>
                     <button
                       onClick={() => { setPoolTab('local'); setSelectedPoolIds(new Set()); }}
@@ -880,7 +880,7 @@ export default function StoreTabletDisplaysPage() {
                       }`}
                     >
                       <ShoppingBag className="w-3.5 h-3.5" />
-                      매장 자체 제품 ({pool.localProducts.filter((p) => !isInDisplay('local', p.id)).length})
+                      매장 경영활용 제품 ({pool.localProducts.filter((p) => !isInDisplay('local', p.id)).length})
                     </button>
                   </div>
                 </div>
@@ -890,26 +890,26 @@ export default function StoreTabletDisplaysPage() {
                     <div className="py-8 px-4 text-center text-sm text-slate-400">
                       {poolTab === 'supplier' ? (
                         <>
-                          <p>타블렛에 진열할 내 매장 제품이 없습니다.</p>
-                          <p className="mt-1">내 매장 제품을 먼저 등록한 뒤 타블렛에 배치해 주세요.</p>
+                          <p>타블렛에 진열할 취급 중인 O4O 제품이 없습니다.</p>
+                          <p className="mt-1">취급 중인 O4O 제품을 먼저 등록한 뒤 타블렛에 배치해 주세요.</p>
                           <button
                             type="button"
                             onClick={() => navigate('/store/my-products')}
                             className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-600 text-white text-xs font-medium rounded-lg hover:bg-teal-700"
                           >
-                            <Plus className="w-3.5 h-3.5" /> 내 매장 제품 등록
+                            <Plus className="w-3.5 h-3.5" /> 취급 중인 O4O 제품 등록
                           </button>
                         </>
                       ) : (
                         <>
-                          <p>타블렛에 진열할 매장 자체 제품이 없습니다.</p>
-                          <p className="mt-1">매장 자체 제품을 먼저 등록한 뒤 타블렛에 배치해 주세요.</p>
+                          <p>타블렛에 진열할 매장 경영활용 제품이 없습니다.</p>
+                          <p className="mt-1">매장 경영활용 제품을 먼저 등록한 뒤 타블렛에 배치해 주세요.</p>
                           <button
                             type="button"
                             onClick={() => navigate('/store/commerce/local-products')}
                             className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-600 text-white text-xs font-medium rounded-lg hover:bg-teal-700"
                           >
-                            <Plus className="w-3.5 h-3.5" /> 매장 자체 제품 등록
+                            <Plus className="w-3.5 h-3.5" /> 매장 경영활용 제품 등록
                           </button>
                         </>
                       )}

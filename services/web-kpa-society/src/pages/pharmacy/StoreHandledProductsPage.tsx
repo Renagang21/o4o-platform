@@ -4,9 +4,9 @@
  * WO-O4O-KPA-STORE-HANDLED-PRODUCTS-UNIFIED-VIEW-V1
  * 선행: IR-O4O-KPA-STORE-HANDLED-PRODUCTS-UNIFIED-VIEW-DESIGN-V1
  *
- * O4O 취급 제품(organization_product_listings) + 매장 자체 제품(store_local_products)을
+ * O4O 기반 제품(organization_product_listings) + 매장 경영활용 제품(store_local_products)을
  * 한 화면에서 조회한다. 직접 CRUD 하지 않고 원본 관리 화면(/my-products, /commerce/local-products)으로 이동.
- * 매장 자체 제품의 온라인몰/상품설명은 'not_supported' = "미지원"으로 표시(절대 "배치 가능" 금지).
+ * 매장 경영활용 제품의 온라인몰 노출은 미지원(Display Domain). 라벨 정책: WO-...-TERM-CLARIFICATION-V1.
  */
 
 import { useEffect, useState, useCallback, type CSSProperties } from 'react';
@@ -22,9 +22,14 @@ const SEARCH_DEBOUNCE_MS = 300;
 
 const SOURCE_TABS: { key: SourceFilter; label: string }[] = [
   { key: 'all', label: '전체' },
-  { key: 'listing', label: 'O4O 취급 제품' },
-  { key: 'local', label: '매장 자체 제품' },
+  { key: 'listing', label: 'O4O 기반 제품' },
+  { key: 'local', label: '매장 경영활용 제품' },
 ];
+
+/** 구분 라벨 — 정책 용어(WO-...-TERM-CLARIFICATION-V1). 백엔드 originLabel 대신 sourceType 기준 프론트 도출(KPA 단독). */
+function originLabel(sourceType: HandledProduct['sourceType']): string {
+  return sourceType === 'listing' ? 'O4O 기반 제품' : '매장 경영활용 제품';
+}
 
 function Badge({ text, tone }: { text: string; tone: 'green' | 'gray' | 'amber' | 'blue' | 'muted' }) {
   const palette: Record<string, CSSProperties> = {
@@ -47,9 +52,9 @@ function formatDate(iso: string): string {
 }
 
 const EMPTY_BY_SOURCE: Record<SourceFilter, string> = {
-  all: '아직 등록된 매장 취급제품이 없습니다. 상단 버튼에서 O4O 제품 취급 신청 또는 매장 자체 제품 등록을 진행하세요.',
+  all: '아직 등록된 매장 취급제품이 없습니다. 상단 버튼에서 O4O 제품 취급 신청 또는 매장 경영활용 제품 등록을 진행하세요.',
   listing: '아직 취급 중인 O4O 제품이 없습니다. ‘O4O 제품 신청’에서 취급 신청을 진행할 수 있습니다.',
-  local: '아직 등록된 매장 자체 제품이 없습니다. ‘매장 자체 제품 등록’에서 추가할 수 있습니다.',
+  local: '아직 등록된 매장 경영활용 제품이 없습니다. ‘매장 경영활용 제품 등록’에서 추가할 수 있습니다.',
 };
 
 function isSourceFilter(v: string | null): v is SourceFilter {
@@ -137,7 +142,7 @@ export default function StoreHandledProductsPage() {
             매장 취급제품
           </h1>
           <p style={styles.subtitle}>
-            약국이 취급하는 전체 제품(<strong>O4O 취급 제품</strong> + <strong>매장 자체 제품</strong>)을 한 화면에서 확인합니다.
+            약국이 취급하는 전체 제품(<strong>O4O 기반 제품</strong> + <strong>매장 경영활용 제품</strong>)을 한 화면에서 확인합니다.
             등록·수정은 각 원본 관리 화면에서 합니다.
           </p>
         </div>
@@ -148,7 +153,7 @@ export default function StoreHandledProductsPage() {
           </button>
           <button onClick={() => navigate('/store/commerce/local-products')} style={styles.primaryBtn}>
             <Plus size={14} />
-            매장 자체 제품 등록
+            매장 경영활용 제품 등록
           </button>
           <button onClick={reload} style={styles.refreshBtn}>
             <RefreshCw size={14} />
@@ -230,11 +235,7 @@ export default function StoreHandledProductsPage() {
                     </div>
                   </td>
                   <td style={styles.td}>
-                    {it.sourceType === 'listing' ? (
-                      <Badge text={it.originLabel} tone="blue" />
-                    ) : (
-                      <Badge text={it.originLabel} tone="amber" />
-                    )}
+                    <Badge text={originLabel(it.sourceType)} tone={it.sourceType === 'listing' ? 'blue' : 'amber'} />
                   </td>
                   <td style={styles.td}>{formatPrice(it.price)}</td>
                   <td style={styles.td}>
@@ -264,7 +265,7 @@ export default function StoreHandledProductsPage() {
       <p style={styles.footnote}>
         ※ <strong>매장 취급제품</strong>은 진열·콘텐츠·온라인 노출에 활용할 제품 풀입니다. 타블렛 진열·온라인 판매 등 채널별 설정은 각 채널 메뉴에서 관리합니다.
         {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-DISPLAY-POOL-SIMPLIFY-V1: 온라인몰 미지원 = 컬럼 대신 보조 안내 */}
-        {' '}매장 자체 제품은 온라인 판매(온라인몰) 노출을 지원하지 않습니다.
+        {' '}매장 경영활용 제품은 온라인 판매(온라인몰) 노출을 지원하지 않습니다.
         온라인 주문 이후의 조달·재고·배송·발송·응대는 매장 경영자가 자체적으로 처리합니다.
       </p>
     </div>

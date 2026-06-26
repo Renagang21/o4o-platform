@@ -977,15 +977,16 @@ function App() {
                 WO-O4O-STORE-PRODUCTS-MANAGER-HEADING-PROP-ALIGNMENT-V1: OrganizationProductListing 기반
                 기본 O4O 주문 가능 상품 화면 — 포괄 heading "내 매장 상품" 대신 의미를 명시 주입. */}
             {/* WO-O4O-KPA-STORE-MY-PRODUCTS-REBUILD-AS-STORE-PRODUCT-BASE-V1:
-                /store/my-products = '내 매장 제품'(타블렛/QR/사이니지/자체 온라인몰 활용 제품 관리).
+                /store/my-products = '취급 중인 O4O 제품'(타블렛/QR/사이니지/자체 온라인몰 활용 제품 관리).
                 기존 'O4O 주문 가능 상품' 프레이밍 제거. route 유지, 공유 StoreProductsManagerPage 재사용(문구 prop 주입). */}
+            {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-TERM-CLARIFICATION-V1: '내 매장 제품' → '취급 중인 O4O 제품' (라벨 prop만, route/공유 컴포넌트 무변경) */}
             <Route path="my-products" element={<PharmacyOwnerOnlyGuard><StoreProductsManagerPage
-              title="내 매장 제품"
-              description="타블렛, QR, 사이니지, 자체 온라인몰 등 매장 서비스에 활용할 제품을 관리합니다."
-              registerButtonLabel="내 매장 제품 등록"
-              infoText="O4O 제품 또는 매장 자체 제품을 내 매장 제품으로 등록할 수 있습니다. 등록한 제품은 타블렛 전시, QR 안내, 사이니지, 자체 온라인몰 등에 연결해 활용할 수 있습니다."
-              emptyTitle="등록된 내 매장 제품이 없습니다"
-              emptyDescription="제품을 등록해 타블렛과 매장 안내 서비스에 활용해 주세요."
+              title="취급 중인 O4O 제품"
+              description="O4O 제품 중 매장이 취급 등록한 제품을 관리합니다. 타블렛, QR, 사이니지, 자체 온라인몰 등 매장 서비스에 활용합니다."
+              registerButtonLabel="O4O 제품 취급 등록"
+              infoText="O4O 제품을 매장 취급 제품으로 등록할 수 있습니다. 등록한 제품은 타블렛 전시, QR 안내, 사이니지, 자체 온라인몰 등에 연결해 활용할 수 있습니다."
+              emptyTitle="취급 중인 O4O 제품이 없습니다"
+              emptyDescription="O4O 제품을 취급 등록해 타블렛과 매장 안내 서비스에 활용해 주세요."
             /></PharmacyOwnerOnlyGuard>} />
             {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-UNIFIED-VIEW-V1: 매장 취급제품 통합 조회(읽기) — listings+local 합산, 원본 관리 이동 */}
             <Route path="handled-products" element={<PharmacyOwnerOnlyGuard><StoreHandledProductsPage /></PharmacyOwnerOnlyGuard>} />
