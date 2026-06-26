@@ -59,15 +59,6 @@ export function normalizeTags(input: unknown): string[] {
   ).slice(0, TAG_MAX_COUNT);
 }
 
-async function resolveOrgId(
-  dataSource: DataSource,
-  userId: string,
-): Promise<string | null> {
-  const memberRepo = dataSource.getRepository(KpaMember);
-  const member = await memberRepo.findOne({ where: { user_id: userId } });
-  return member?.organization_id || null;
-}
-
 export function createStoreContentController(
   dataSource: DataSource,
   requireAuth: AuthMiddleware,
@@ -469,7 +460,10 @@ export function createStoreContentController(
           return;
         }
 
-        const organizationId = await resolveOrgId(dataSource, userId);
+        // WO-O4O-KPA-STORE-LIBRARY-SNAPSHOT-SINGLE-EDIT-V1:
+        //   org 해석을 목록/POST 와 동일하게 resolveDualOrgId(organization_members 우선, kpa_members fallback)로 통일.
+        //   기존 resolveOrgId(kpa_members only)는 store_owner(organization_members)만 있는 매장에서 404 유발.
+        const organizationId = await resolveDualOrgId(userId);
         if (!organizationId) {
           res.status(403).json({ success: false, error: { code: 'NO_ORG', message: 'No organization membership' } });
           return;
@@ -555,7 +549,10 @@ export function createStoreContentController(
           return;
         }
 
-        const organizationId = await resolveOrgId(dataSource, userId);
+        // WO-O4O-KPA-STORE-LIBRARY-SNAPSHOT-SINGLE-EDIT-V1:
+        //   org 해석을 목록/POST 와 동일하게 resolveDualOrgId(organization_members 우선, kpa_members fallback)로 통일.
+        //   기존 resolveOrgId(kpa_members only)는 store_owner(organization_members)만 있는 매장에서 404 유발.
+        const organizationId = await resolveDualOrgId(userId);
         if (!organizationId) {
           res.status(403).json({ success: false, error: { code: 'NO_ORG', message: 'No organization membership' } });
           return;
