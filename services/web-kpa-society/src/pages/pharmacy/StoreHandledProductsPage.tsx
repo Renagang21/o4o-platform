@@ -13,13 +13,7 @@ import { useEffect, useState, useCallback, type CSSProperties } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Package, RefreshCw, Search, ExternalLink, Boxes, Plus, ShoppingBag } from 'lucide-react';
 import { Pagination } from '@o4o/operator-ux-core';
-import {
-  fetchHandledProducts,
-  type HandledProduct,
-  type TabletExposure,
-  type OnlineExposure,
-  type DescriptionStatus,
-} from '../../api/handledProducts';
+import { fetchHandledProducts, type HandledProduct } from '../../api/handledProducts';
 import { colors } from '../../styles/theme';
 
 type SourceFilter = 'all' | 'listing' | 'local';
@@ -41,23 +35,6 @@ function Badge({ text, tone }: { text: string; tone: 'green' | 'gray' | 'amber' 
     muted: { background: '#F1F5F9', color: '#94A3B8' },
   };
   return <span style={{ ...styles.badge, ...palette[tone] }}>{text}</span>;
-}
-
-function tabletBadge(v: TabletExposure) {
-  if (v === 'exposed') return <Badge text="노출 중" tone="green" />;
-  if (v === 'partial') return <Badge text="일부 노출" tone="blue" />;
-  return <Badge text="노출 안함" tone="gray" />;
-}
-function onlineBadge(v: OnlineExposure) {
-  if (v === 'exposed') return <Badge text="노출 중" tone="green" />;
-  if (v === 'inactive') return <Badge text="비활성" tone="amber" />;
-  if (v === 'not_supported') return <Badge text="미지원" tone="muted" />;
-  return <Badge text="미노출" tone="gray" />;
-}
-function descBadge(v: DescriptionStatus) {
-  if (v === 'available') return <Badge text="있음" tone="green" />;
-  if (v === 'not_supported') return <Badge text="미지원" tone="muted" />;
-  return <Badge text="없음" tone="gray" />;
 }
 
 function formatPrice(p: number | null): string {
@@ -217,12 +194,9 @@ export default function StoreHandledProductsPage() {
           <thead>
             <tr>
               <th style={{ ...styles.th, textAlign: 'left' }}>제품</th>
-              <th style={styles.th}>출처</th>
-              <th style={styles.th}>표시 가격</th>
+              <th style={styles.th}>구분</th>
+              <th style={styles.th}>매장 표시 가격</th>
               <th style={styles.th}>상태</th>
-              <th style={styles.th}>타블렛</th>
-              <th style={styles.th}>온라인몰</th>
-              <th style={styles.th}>상품 설명</th>
               <th style={styles.th}>최근 수정일</th>
               <th style={styles.th}>관리</th>
             </tr>
@@ -230,15 +204,15 @@ export default function StoreHandledProductsPage() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={9} style={styles.empty}>불러오는 중…</td>
+                <td colSpan={6} style={styles.empty}>불러오는 중…</td>
               </tr>
             ) : error ? (
               <tr>
-                <td colSpan={9} style={{ ...styles.empty, color: '#DC2626' }}>{error}</td>
+                <td colSpan={6} style={{ ...styles.empty, color: '#DC2626' }}>{error}</td>
               </tr>
             ) : items.length === 0 ? (
               <tr>
-                <td colSpan={9} style={styles.empty}>{searchQuery ? '검색 결과가 없습니다' : EMPTY_BY_SOURCE[source]}</td>
+                <td colSpan={6} style={styles.empty}>{searchQuery ? '검색 결과가 없습니다' : EMPTY_BY_SOURCE[source]}</td>
               </tr>
             ) : (
               items.map((it) => (
@@ -266,9 +240,6 @@ export default function StoreHandledProductsPage() {
                   <td style={styles.td}>
                     <Badge text={it.statusLabel} tone={it.isActive ? 'green' : 'gray'} />
                   </td>
-                  <td style={styles.td}>{tabletBadge(it.tabletExposure)}</td>
-                  <td style={styles.td}>{onlineBadge(it.onlineSalesExposure)}</td>
-                  <td style={styles.td}>{descBadge(it.productDescriptionStatus)}</td>
                   <td style={styles.td}>{formatDate(it.updatedAt)}</td>
                   <td style={styles.td}>
                     <button
@@ -291,8 +262,8 @@ export default function StoreHandledProductsPage() {
       <Pagination page={page} totalPages={totalPages} onPageChange={setPage} total={total} />
 
       <p style={styles.footnote}>
-        ※ 매장 자체 제품은 <strong>온라인몰 미지원</strong>입니다(전시·타블렛 전용). 온라인 판매가 필요한 제품은 O4O 취급 제품으로 등록하세요.
-        QR · POP · 블로그 활용 상태는 후속 제공 예정입니다.
+        ※ <strong>매장 취급제품</strong>은 진열·콘텐츠·온라인 노출에 활용할 제품 풀입니다. 타블렛 진열·온라인 판매 등 채널별 설정은 각 채널 메뉴에서 관리합니다.
+        온라인 주문 이후의 조달·재고·배송·발송·응대는 매장 경영자가 자체적으로 처리합니다.
       </p>
     </div>
   );
