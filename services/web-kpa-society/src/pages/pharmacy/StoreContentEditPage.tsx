@@ -27,21 +27,18 @@ import {
   Save,
   ArrowLeft,
   CheckCircle,
-  FileText,
-  Image,
-  Link as LinkIcon,
-  List,
-  Plus,
-  Trash2,
   Settings2,
   QrCode,
   Printer,
   MousePointerClick,
   Eye,
 } from 'lucide-react';
-import { BlockRenderer } from '@o4o/block-renderer';
+// WO-O4O-KPA-STORE-LIBRARY-SNAPSHOT-EDITOR-UNIFY-V1:
+//   snapshot 콘텐츠 편집을 o4o 표준 RichTextEditor 로 통일(direct/제작자료와 동일 모듈). 레거시 블록 편집기 대체.
+//   snapshot 은 body(html) 권위 + usage 설정 별도 보존. body 없으면 blocks→html 정규화.
+import { RichTextEditor, type EditorContent } from '@o4o/content-editor';
 import { storeContentApi } from '../../api/assetSnapshot';
-import { kpaBlocksToRendererBlocks } from '../../utils/kpa-block-adapter';
+import { getAccessToken } from '../../contexts/AuthContext';
 
 type ContentBlock = {
   type: 'text' | 'image' | 'link' | 'list';
@@ -135,36 +132,28 @@ function parseContentJson(json: Record<string, unknown>): {
   return { blocks, usage, raw: json };
 }
 
-function blocksToContentJson(
-  blocks: ContentBlock[],
-  usage: UsageSettings,
-  originalRaw: Record<string, unknown>,
-): Record<string, unknown> {
-  // If original had blocks format, preserve it
-  if (Array.isArray(originalRaw.blocks)) {
-    return { ...originalRaw, blocks, usage };
+// WO-O4O-KPA-STORE-LIBRARY-SNAPSHOT-EDITOR-UNIFY-V1:
+//   저장된 contentJson 을 o4o 표준 편집기(html)용으로 정규화. snapshot 은 body(html) 가 권위 출처.
+//   body 없으면 html/content, 그래도 없으면 레거시 blocks 를 html 로 변환(내용 무손실).
+function contentJsonToHtml(json: Record<string, unknown>): string {
+  if (typeof json.html === 'string' && json.html.trim()) return json.html;
+  if (typeof json.body === 'string' && json.body.trim()) return json.body;
+  if (typeof json.content === 'string' && json.content.trim()) return json.content as string;
+  if (Array.isArray(json.blocks) && json.blocks.length > 0) {
+    return (json.blocks as any[])
+      .map((b) => {
+        const type = b?.type || 'text';
+        const value = b?.value ?? b?.content ?? '';
+        const url = b?.url ?? value;
+        if (type === 'image') return url ? `<p><img src="${url}" alt="" /></p>` : '';
+        if (type === 'link') return value || url ? `<p><a href="${value || url}">${b?.label || value || url}</a></p>` : '';
+        if (type === 'list' && Array.isArray(b?.items)) return `<ul>${b.items.map((i: string) => `<li>${i}</li>`).join('')}</ul>`;
+        return value ? `<p>${value}</p>` : '';
+      })
+      .filter(Boolean)
+      .join('\n');
   }
-
-  // Reconstruct flat fields
-  const result: Record<string, unknown> = { ...originalRaw };
-  const textBlock = blocks.find(b => b.type === 'text');
-  const imageBlock = blocks.find(b => b.type === 'image');
-  const linkBlock = blocks.find(b => b.type === 'link');
-
-  if (textBlock) {
-    if ('body' in originalRaw) result.body = textBlock.value;
-    else if ('content' in originalRaw) result.content = textBlock.value;
-    else result.body = textBlock.value;
-  }
-  if (imageBlock) result.imageUrl = imageBlock.value;
-  if (linkBlock) {
-    result.linkUrl = linkBlock.value;
-    result.linkLabel = linkBlock.label || '';
-  }
-
-  result.blocks = blocks;
-  result.usage = usage;
-  return result;
+  return '';
 }
 
 const DISPLAY_MODE_OPTIONS: { value: DisplayMode; label: string; desc: string }[] = [
@@ -182,12 +171,18 @@ export default function StoreContentEditPage() {
   const [toast, setToast] = useState<string | null>(null);
 
   const [title, setTitle] = useState('');
-  const [blocks, setBlocks] = useState<ContentBlock[]>([]);
+  // WO-O4O-KPA-STORE-LIBRARY-SNAPSHOT-EDITOR-UNIFY-V1: 레거시 블록 편집기 → o4o 표준 RichTextEditor(html)
+  const [editorContent, setEditorContent] = useState<EditorContent>({ html: '' });
+  const [editorInitialHtml, setEditorInitialHtml] = useState('');
   const [usage, setUsage] = useState<UsageSettings>(DEFAULT_USAGE);
   const [rawJson, setRawJson] = useState<Record<string, unknown>>({});
   const [orgId, setOrgId] = useState<string | null>(null);
   const [source, setSource] = useState<'store' | 'snapshot'>('snapshot');
-  const [showPreview, setShowPreview] = useState(false);
+
+  const aiHeaders = useCallback((): Record<string, string> | undefined => {
+    const token = getAccessToken();
+    return token ? { Authorization: `Bearer ${token}` } : undefined;
+  }, []);
 
   const fetchContent = useCallback(async () => {
     if (!snapshotId) return;
@@ -200,7 +195,9 @@ export default function StoreContentEditPage() {
       setSource(data.source);
       setOrgId(data.organizationId);
       const parsed = parseContentJson(data.contentJson);
-      setBlocks(parsed.blocks);
+      const html = contentJsonToHtml(data.contentJson);
+      setEditorInitialHtml(html);
+      setEditorContent({ html });
       setUsage(parsed.usage);
       setRawJson(parsed.raw);
     } catch (e: any) {
@@ -216,7 +213,15 @@ export default function StoreContentEditPage() {
     if (!snapshotId) return;
     setSaving(true);
     try {
-      const contentJson = blocksToContentJson(blocks, usage, rawJson);
+      // WO-O4O-KPA-STORE-LIBRARY-SNAPSHOT-EDITOR-UNIFY-V1:
+      //   body(html) 를 권위 출처로 저장 + 레거시 blocks 비움(공개 소비처는 body 우선 — 데모 작동 포맷).
+      //   usage 설정 및 기타 키(tags/summary 등)는 보존.
+      const contentJson: Record<string, unknown> = {
+        ...rawJson,
+        body: editorContent.html,
+        blocks: [],
+        usage,
+      };
       await storeContentApi.save(snapshotId, { title, contentJson });
       setSource('store');
       setToast('저장 완료');
@@ -227,23 +232,6 @@ export default function StoreContentEditPage() {
     } finally {
       setSaving(false);
     }
-  };
-
-  const updateBlock = (index: number, field: keyof ContentBlock, value: string) => {
-    setBlocks(prev => prev.map((b, i) => i === index ? { ...b, [field]: value } : b));
-  };
-
-  const addBlock = (type: ContentBlock['type']) => {
-    setBlocks(prev => [...prev, {
-      type,
-      value: '',
-      label: type === 'link' ? '' : undefined,
-      items: type === 'list' ? [''] : undefined,
-    }]);
-  };
-
-  const removeBlock = (index: number) => {
-    setBlocks(prev => prev.filter((_, i) => i !== index));
   };
 
   const updateUsage = (patch: Partial<UsageSettings>) => {
@@ -307,13 +295,6 @@ export default function StoreContentEditPage() {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowPreview(!showPreview)}
-              className="flex items-center gap-1.5 px-3 py-2 text-sm text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50"
-            >
-              <Eye className="w-4 h-4" />
-              {showPreview ? '편집' : '미리보기'}
-            </button>
             {source === 'store' && orgId && (
               <Link
                 to={`/view/${snapshotId}?org=${orgId}`}
@@ -336,26 +317,6 @@ export default function StoreContentEditPage() {
         </div>
       </div>
 
-      {showPreview ? (
-        /* ── Preview Mode ── */
-        <div className="bg-white border border-slate-200 rounded-lg p-6 mb-6">
-          <h2 className="text-lg font-bold text-slate-800 mb-4">{title}</h2>
-          {blocks.length > 0 ? (
-            <BlockRenderer
-              blocks={kpaBlocksToRendererBlocks(blocks.map(b => {
-                if (b.type === 'text') return { type: 'text', content: b.value };
-                if (b.type === 'image') return { type: 'image', url: b.value };
-                if (b.type === 'list') return { type: 'list', items: b.items || [] };
-                return { type: 'text', content: b.value };
-              }))}
-              className="space-y-4"
-            />
-          ) : (
-            <p className="text-sm text-slate-400 text-center py-8">블록이 없습니다</p>
-          )}
-        </div>
-      ) : (
-        <>
       {/* Title */}
       <div className="mb-6">
         <label className="block text-sm font-medium text-slate-700 mb-1">제목</label>
@@ -368,141 +329,20 @@ export default function StoreContentEditPage() {
         />
       </div>
 
-      {/* Content Blocks */}
-      <div className="space-y-4 mb-6">
-        <label className="block text-sm font-medium text-slate-700">본문</label>
-        {blocks.map((block, idx) => (
-          <div key={idx} className="bg-white border border-slate-200 rounded-lg p-4">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2 text-xs text-slate-500">
-                {block.type === 'text' && <><FileText className="w-3.5 h-3.5" /> 텍스트</>}
-                {block.type === 'image' && <><Image className="w-3.5 h-3.5" /> 이미지 URL</>}
-                {block.type === 'link' && <><LinkIcon className="w-3.5 h-3.5" /> 링크</>}
-                {block.type === 'list' && <><List className="w-3.5 h-3.5" /> 목록</>}
-              </div>
-              <button
-                onClick={() => removeBlock(idx)}
-                className="text-slate-400 hover:text-red-500 transition-colors"
-                title="블록 삭제"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
-            </div>
-
-            {block.type === 'text' && (
-              <textarea
-                value={block.value}
-                onChange={e => updateBlock(idx, 'value', e.target.value)}
-                rows={6}
-                className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm resize-y focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                placeholder="본문 내용을 입력하세요"
-              />
-            )}
-
-            {block.type === 'image' && (
-              <input
-                type="url"
-                value={block.value}
-                onChange={e => updateBlock(idx, 'value', e.target.value)}
-                className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                placeholder="https://example.com/image.jpg"
-              />
-            )}
-
-            {block.type === 'link' && (
-              <div className="space-y-2">
-                <input
-                  type="url"
-                  value={block.value}
-                  onChange={e => updateBlock(idx, 'value', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                  placeholder="https://example.com"
-                />
-                <input
-                  type="text"
-                  value={block.label || ''}
-                  onChange={e => updateBlock(idx, 'label', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                  placeholder="링크 표시 텍스트"
-                />
-              </div>
-            )}
-
-            {block.type === 'list' && (
-              <div className="space-y-1.5">
-                {(block.items || []).map((item, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <span className="text-xs text-slate-400 w-5">{i + 1}.</span>
-                    <input
-                      type="text"
-                      value={item}
-                      onChange={e => {
-                        const newItems = [...(block.items || [])];
-                        newItems[i] = e.target.value;
-                        setBlocks(prev => prev.map((b, bi) => bi === idx ? { ...b, items: newItems } : b));
-                      }}
-                      className="flex-1 px-3 py-1.5 border border-slate-200 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                    />
-                    <button
-                      onClick={() => {
-                        const newItems = (block.items || []).filter((_, j) => j !== i);
-                        setBlocks(prev => prev.map((b, bi) => bi === idx ? { ...b, items: newItems } : b));
-                      }}
-                      className="text-slate-400 hover:text-red-500"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </button>
-                  </div>
-                ))}
-                <button
-                  onClick={() => {
-                    const newItems = [...(block.items || []), ''];
-                    setBlocks(prev => prev.map((b, bi) => bi === idx ? { ...b, items: newItems } : b));
-                  }}
-                  className="text-xs text-blue-500 hover:underline"
-                >
-                  + 항목 추가
-                </button>
-              </div>
-            )}
-          </div>
-        ))}
+      {/* 본문 — WO-O4O-KPA-STORE-LIBRARY-SNAPSHOT-EDITOR-UNIFY-V1: o4o 표준 RichTextEditor(편집/HTML/미리보기) */}
+      <div className="mb-8">
+        <label className="block text-sm font-medium text-slate-700 mb-2">본문</label>
+        <div className="bg-white border border-slate-200 rounded-lg p-2">
+          <RichTextEditor
+            value={editorInitialHtml}
+            onChange={(c) => setEditorContent(c)}
+            placeholder="본문 내용을 입력하세요"
+            minHeight="420px"
+            preset="full"
+            aiRequestHeaders={aiHeaders()}
+          />
+        </div>
       </div>
-
-      {/* Add Block Buttons */}
-      <div className="flex gap-2 mb-8">
-        <button
-          onClick={() => addBlock('text')}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          텍스트
-        </button>
-        <button
-          onClick={() => addBlock('image')}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          이미지
-        </button>
-        <button
-          onClick={() => addBlock('list')}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          목록
-        </button>
-        <button
-          onClick={() => addBlock('link')}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          링크
-        </button>
-      </div>
-
-        </>
-      )}
 
       {/* ─────────────────────────────────────────── */}
       {/* Usage Settings — WO-KPA-A-CONTENT-USAGE-MODE-EXTENSION-V1 */}
