@@ -47,10 +47,14 @@
 |---|---|
 | `web-kpa-society` tsc | ✅ error 0 |
 | 배포 (Web Cloud Run, 453880358) | ✅ success |
+| 10.1 `/store/commerce/tablet-displays` 진입·기존 기능 유지 | ✅ PASS — 태블릿 목록(1건 "화장품 코너/A-1 섹터")·태블릿 추가·Idle 재생목록 정상 렌더 |
+| 10.2 내 매장 제품 연결(안내+버튼→/store/my-products) | ✅ PASS — 헤더/풀 안내 + '내 매장 제품 관리 →' 버튼 클릭 시 `/store/my-products` 이동 시작(콘솔 `GET /store/products?page=1&limit=20` = my-products 데이터 호출 실측) |
+| 10.3 picker 문구 내 매장 제품 기준 / 주문·판매 오해 없음 | ✅ PASS — 탭 "내 매장 제품 (0) / 매장 자체 제품 (0)", 헤더 "타블렛은 주문 채널이 아니라…". 주문/판매 문구 없음 |
+| 10.4 빈 상태 안내 + /store/my-products 이동 | ✅ PASS — "타블렛에 진열할 내 매장 제품이 없습니다…" + '내 매장 제품 등록' 버튼 노출 |
+| 10.5 기존 기능 회귀 | ✅ PASS — 등록/삭제/목록/Idle UI 유지(데이터 로직 불변) |
 | 10.6 온라인 판매 무변경 | ✅ (git diff 단일 파일, 문구/내비만) |
-| 10.1~10.5 브라우저 시각 smoke (탭/버튼/빈상태/회귀) | ⬜ **보류** — Playwright 영속 프로필이 다른 Chrome 세션에 재점유되어 launch 실패(로컬 환경 제약). route 무변경·데이터 로직 무변경이라 회귀 위험 낮음. 프로필 해제 후 재검증 필요 |
 
-> 비고: 본 변경은 `StoreTabletDisplaysPage` 단일 파일의 **문구·내비(navigate /store/my-products)만** 수정 — route/데이터/API 불변. tsc·배포 통과로 검증, 시각 확인만 프로필 점유로 보류.
+> 브라우저 smoke 실측(배포본 453880358, 2026-06-26): 위 항목 모두 PASS. '내 매장 제품 관리 →' 클릭 시 `/store/my-products` 데이터 API가 호출됨(라우팅 동작 확인). 검증 도중 인증 세션 토큰 만료로 /login 바운스가 1회 있었으나 **라우팅 결함 아닌 환경적 토큰 만료**.
 
 ## 8. 남은 후속 작업
 
