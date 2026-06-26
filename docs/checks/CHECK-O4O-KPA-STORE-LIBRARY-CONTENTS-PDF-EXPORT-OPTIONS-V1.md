@@ -68,6 +68,20 @@ snapshot=publishedAssets 404 문제가 있었음).
 
 ---
 
+## 4-1. 본문 HTML 디자인 보존 정책 (보완)
+
+인쇄용 PDF 는 본문을 **plain text 로 변환하지 않는다.** 콘텐츠 제작자가 본문 HTML 에 넣은
+inline 디자인(배경색·글자색·폰트 크기·정렬·여백·테두리·카드형 박스·이미지·표·강조)을 가능한 한 보존한다.
+
+- 본문은 `<div class="pdf-body">` 안에 **raw HTML 그대로 주입** — sanitize/strip/텍스트 변환 없음.
+- `.pdf-body` 는 본문색을 **강제하지 않는다**(inline style 또는 body 기본색 사용) → 콘텐츠 상세 화면과 동일 디자인.
+- 외곽 A4 템플릿(제목/footer)은 제공하되 본문 내부 디자인을 덮어쓰거나 초기화하지 않는다(`all: unset` / reset 없음).
+- **배경색·배경이미지 인쇄 보존**: 브라우저는 기본적으로 배경을 인쇄에서 생략하므로,
+  `html, body, .pdf-sheet, .pdf-sheet *` 에 `-webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;` 적용.
+- 이미지/표 반응형: `.pdf-body img { max-width:100% }`, `.pdf-body table { border-collapse:collapse; max-width:100% }`.
+
+> 사용자가 "PDF로 저장" 시 인쇄 대화상자의 **배경 그래픽** 옵션은 기본 ON 으로 동작(브라우저 기본). 위 CSS 로 강제.
+
 ## 5. A4 인쇄 레이아웃 (WO §10)
 
 ```

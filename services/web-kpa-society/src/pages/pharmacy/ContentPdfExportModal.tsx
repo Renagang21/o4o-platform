@@ -372,13 +372,21 @@ function buildPrintHtml(args: {
     font-family: "Noto Sans KR", "Malgun Gothic", -apple-system, sans-serif;
     color: #1f2937;
     line-height: 1.7;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
+  }
+  /* WO-O4O-KPA-STORE-LIBRARY-CONTENTS-PDF-EXPORT-OPTIONS-V1: 본문 디자인 보존.
+     콘텐츠 본문 HTML 의 배경색·글자색·카드 박스가 인쇄/PDF 에 그대로 출력되도록 강제한다.
+     (브라우저는 기본적으로 배경색/배경이미지를 인쇄에서 생략하므로 모든 요소에 적용) */
+  html, body, .pdf-sheet, .pdf-sheet * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
   .pdf-sheet { max-width: 800px; margin: 0 auto; padding: 24px; }
   .pdf-title { font-size: 22px; font-weight: 700; color: #0f172a; margin: 0 0 18px; padding-bottom: 12px; border-bottom: 2px solid #e2e8f0; }
-  .pdf-body { font-size: 14px; color: #334155; }
+  /* 본문 영역: 콘텐츠 제작자가 넣은 inline 디자인(색/배경/박스/정렬)을 덮어쓰지 않는다.
+     색 강제 없음 — inline style 또는 body 기본색을 그대로 사용. */
+  .pdf-body { font-size: 14px; }
   .pdf-body img, .pdf-img img { max-width: 100%; height: auto; }
+  .pdf-body table { border-collapse: collapse; max-width: 100%; }
   .pdf-text { white-space: pre-wrap; margin: 0 0 10px; }
   .pdf-link { font-size: 13px; color: #2563eb; margin: 0 0 6px; }
   .pdf-empty { color: #94a3b8; }
