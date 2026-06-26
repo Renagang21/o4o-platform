@@ -16,12 +16,18 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, MemoryRouter, Routes, Route } from 'react-router-dom';
 import {
   Loader2, Tablet, ChevronUp, ChevronDown, X, Plus,
   ArrowLeft, Save, Package, ShoppingBag, AlertTriangle, Tv,
 } from 'lucide-react';
-import { IdlePlaylistEditor, type IdlePlaylistItem, type LibraryAsset } from '@o4o/tablet-kiosk-core';
+import {
+  IdlePlaylistEditor, TabletKioskPage,
+  type IdlePlaylistItem, type LibraryAsset, type TabletKioskApi,
+} from '@o4o/tablet-kiosk-core';
+// WO-O4O-KPA-TABLET-PREVIEW-V1: 공개 뷰어 재사용 미리보기 — 공개 데이터 조회 + 매장 slug
+import { fetchTabletProducts, fetchTabletSettings } from '../../api/tablet';
+import { getStoreSlug } from '../../api/pharmacyInfo';
 import { extractSnapshotMediaList, type SnapshotForMedia } from '@o4o/store-asset-policy-core';
 import { getStoreExecutionAssets } from '../../api/storeExecutionAssets';
 import { assetSnapshotApi } from '../../api/assetSnapshot';
@@ -107,6 +113,48 @@ export default function StoreTabletDisplaysPage() {
       setSavingSettings(false);
     }
   }, [settings]);
+
+  // ── 고객 화면 미리보기 (WO-O4O-KPA-TABLET-PREVIEW-V1) ──
+  //   kiosk-core 공개 뷰어를 재사용. 저장된 공개 데이터(products/settings) 기준.
+  //   V1은 매장 단위 공개 화면 기준(위치별 분리는 후속). 상담 POST 는 차단.
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewSlug, setPreviewSlug] = useState<string | null>(null);
+  const [previewSettings, setPreviewSettings] = useState<TabletDisplaySettings | undefined>(undefined);
+  const [previewLoading, setPreviewLoading] = useState(false);
+
+  // 미리보기 전용 api: products 는 공개 조회, 상담은 실제 전송하지 않고 안내만.
+  const previewApi = useMemo<TabletKioskApi>(() => ({
+    fetchProducts: (slug, params) => fetchTabletProducts(slug, params),
+    submitInterest: async () => {
+      throw new Error('미리보기에서는 상담 요청이 전송되지 않습니다.');
+    },
+    checkStatus: async () => {
+      throw new Error('미리보기에서는 상담 요청이 전송되지 않습니다.');
+    },
+  }), []);
+
+  const handleOpenPreview = useCallback(async () => {
+    setPreviewLoading(true);
+    try {
+      const slug = await getStoreSlug();
+      if (!slug) {
+        setToast({ type: 'error', message: '매장 공개 주소(slug)를 찾을 수 없어 미리보기를 열 수 없습니다.' });
+        return;
+      }
+      // 저장된 전시 설정 기준(공개 endpoint)
+      const saved = await fetchTabletSettings(slug).catch(() => undefined);
+      setPreviewSettings(saved);
+      setPreviewSlug(slug);
+      setPreviewOpen(true);
+    } finally {
+      setPreviewLoading(false);
+    }
+  }, []);
+
+  const handleClosePreview = useCallback(() => {
+    setPreviewOpen(false);
+    setPreviewSlug(null);
+  }, []);
 
   // Tablet registration form (WO-O4O-STORE-TABLET-REGISTER-UI-V1)
   const [showRegisterForm, setShowRegisterForm] = useState(false);
@@ -500,6 +548,16 @@ export default function StoreTabletDisplaysPage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          {/* WO-O4O-KPA-TABLET-PREVIEW-V1: 고객 화면 미리보기 (타블렛 선택 시) */}
+          <button
+            onClick={handleOpenPreview}
+            disabled={!selectedTabletId || previewLoading}
+            title={selectedTabletId ? '고객 화면 미리보기' : '미리보기를 보려면 먼저 타블렛을 선택해 주세요.'}
+            className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 text-sm font-medium rounded-xl hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {previewLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Tv className="w-4 h-4" />}
+            고객 화면 미리보기
+          </button>
           {/* WO-O4O-STORE-TABLET-REGISTER-UI-V1: 목록 있을 때도 추가 버튼 */}
           <button
             onClick={() => setShowRegisterForm((v) => !v)}
@@ -971,6 +1029,47 @@ export default function StoreTabletDisplaysPage() {
             </div>
           )}
         </>
+      )}
+
+      {/* 고객 화면 미리보기 오버레이 (WO-O4O-KPA-TABLET-PREVIEW-V1) */}
+      {previewOpen && previewSlug && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 100000 }}>
+          {/* 상단 안내 + 닫기 (kiosk fullscreen 위에 표시) */}
+          <div
+            style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100001 }}
+            className="flex items-center justify-between gap-3 bg-slate-900/90 text-white px-4 py-2"
+          >
+            <div className="min-w-0">
+              <p className="text-sm font-semibold">타블렛 고객 화면 미리보기</p>
+              <p className="text-[11px] text-slate-300 truncate">
+                현재 저장된 타블렛 구성·전시 설정 기준 (매장 공개 화면 기준 — 위치별 타블렛 분리는 후속). 상담 요청은 전송되지 않습니다.
+              </p>
+            </div>
+            <button
+              onClick={handleClosePreview}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-medium whitespace-nowrap"
+            >
+              <X className="w-4 h-4" /> 닫기
+            </button>
+          </div>
+          {/* kiosk-core 재사용: 상단 바(40px) 아래로 밀어 표시 */}
+          <div style={{ position: 'absolute', top: 48, left: 0, right: 0, bottom: 0, overflow: 'hidden' }}>
+            <MemoryRouter initialEntries={[`/${encodeURIComponent(previewSlug)}`]}>
+              <Routes>
+                <Route
+                  path=":slug"
+                  element={
+                    <TabletKioskPage
+                      api={previewApi}
+                      displaySettings={previewSettings}
+                      showQrBadge={previewSettings?.showQr !== false}
+                    />
+                  }
+                />
+              </Routes>
+            </MemoryRouter>
+          </div>
+        </div>
       )}
 
       {/* Toast */}
