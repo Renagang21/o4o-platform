@@ -3,7 +3,7 @@
  * TipTap 기반 리치 텍스트 에디터
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import { ContentRenderer } from './ContentRenderer';
 import { sanitizeRichHtml, isBlankHtml } from '../sanitize';
@@ -53,7 +53,12 @@ export function RichTextEditor({
   const [saveModalOpen, setSaveModalOpen] = useState(false);
   const [pasteUploading, setPasteUploading] = useState(false);
   const [activeTab, setActiveTab] = useState<'edit' | 'html' | 'preview'>('edit');
-  const [htmlSource, setHtmlSource] = useState('');
+  // WO-O4O-COMMON-EDITOR-HTML-TAB-SAVE-RAW-PRESERVE-V1:
+  //   htmlSource(HTML 탭/미리보기 원문)를 외부 value 로 초기화 → 재오픈 시 raw HTML 보존 노출.
+  const [htmlSource, setHtmlSource] = useState(() => (isBlankHtml(value) ? '' : value));
+  // 사용자가 WYSIWYG(편집) 탭에서 실제로 편집했는지 추적. true 면 getHTML()(TipTap 직렬화)이 authoritative,
+  //   false 면 HTML 원문(htmlSource)이 authoritative → 임의 inline style(배경/박스 등) 보존.
+  const wysiwygDirtyRef = useRef(false);
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -95,6 +100,9 @@ export function RichTextEditor({
     content: value,
     editable,
     onUpdate: ({ editor }) => {
+      // onUpdate 는 setContent(…, false) 에서는 발생하지 않으므로(switchTab/value-sync 는 emit=false 사용)
+      //   여기 진입 = 사용자의 실제 WYSIWYG 편집(타이핑/툴바/붙여넣기). WYSIWYG 를 authoritative 로 표시.
+      wysiwygDirtyRef.current = true;
       if (onChange) {
         onChange({
           html: editor.getHTML(),
@@ -132,35 +140,67 @@ export function RichTextEditor({
     }
   }, [value, editor]);
 
+  // WO-O4O-COMMON-EDITOR-HTML-TAB-SAVE-RAW-PRESERVE-V1:
+  //   htmlSource(원문)를 외부 value 와 동기화한다. 단, WYSIWYG 편집 중(getHTML authoritative)이거나
+  //   HTML 탭 입력 중에는 clobber 하지 않는다. 재오픈/외부 로딩 시 raw value 가 HTML 탭·미리보기에 보존되도록 함.
+  useEffect(() => {
+    if (wysiwygDirtyRef.current) return;
+    if (activeTab === 'html') return;
+    const v = isBlankHtml(value) ? '' : value;
+    setHtmlSource((prev) => (prev === v ? prev : v));
+  }, [value, activeTab]);
+
+  // WO-O4O-COMMON-EDITOR-HTML-TAB-SAVE-RAW-PRESERVE-V1:
+  //   autosave/Ctrl+S 등 콜백 클로저에서 최신 htmlSource 를 읽기 위한 ref 미러.
+  const htmlSourceRef = useRef(htmlSource);
+  useEffect(() => {
+    htmlSourceRef.current = htmlSource;
+  }, [htmlSource]);
+
+  // 저장 authoritative html 해석: WYSIWYG 편집을 했으면 getHTML()(직렬화), 아니면 HTML 원문(보존).
+  const resolveSaveHtml = useCallback(
+    () =>
+      wysiwygDirtyRef.current
+        ? editor?.getHTML() || ''
+        : htmlSourceRef.current || editor?.getHTML() || '',
+    [editor],
+  );
+
   // 자동 저장
   useEffect(() => {
     if (!autoSaveInterval || !onSave || !editor) return;
 
     const interval = setInterval(() => {
       onSave({
-        html: editor.getHTML(),
+        html: resolveSaveHtml(),
         json: editor.getJSON(),
       });
     }, autoSaveInterval);
 
     return () => clearInterval(interval);
-  }, [autoSaveInterval, onSave, editor]);
+  }, [autoSaveInterval, onSave, editor, resolveSaveHtml]);
 
   // 탭 전환 — HTML draft ↔ editor state 동기화
   // WO-O4O-STANDARD-EDITOR-HTML-DIRECT-INPUT-PREVIEW-SAVE-FIX-V1 §4.1/§4.4
   function switchTab(tab: 'edit' | 'html' | 'preview') {
     if (tab === activeTab) return;
     if (activeTab === 'html') {
-      // HTML 탭을 떠날 때: draft 를 sanitize/normalize 후 editor 에 commit (편집/미리보기/저장 일관성).
-      //   - sanitize 가 malformed wrapper(`</div></p>` 등) 및 위험 태그를 정리 (§4.3)
-      //   - emitUpdate=true → onUpdate 가 onChange 를 호출하여 부모 본문 값까지 동기화 (§4.5)
-      //   - htmlSource(draft) 는 유지 → 미리보기는 사용자가 입력한 그대로 렌더 (§4.4)
+      // HTML 탭을 떠날 때: draft 를 sanitize 후 editor 에 commit 하되 **emit=false**(편집 탭 준비용 동기화만).
+      //   WO-O4O-COMMON-EDITOR-HTML-TAB-SAVE-RAW-PRESERVE-V1:
+      //   기존엔 emit=true 로 getHTML()(TipTap 직렬화) 결과가 부모 저장값이 되어 inline style(배경/박스 등)이
+      //   유실됐다. 이제 부모 저장값은 raw htmlSource(원문)로 직접 onChange 하여 디자인을 보존한다.
+      //   sanitize 는 위험 태그/malformed wrapper 정리용으로 editor 동기화에만 사용(저장값은 원문).
       const clean = sanitizeRichHtml(htmlSource);
-      editor?.commands.setContent(isBlankHtml(clean) ? '' : clean, true);
+      editor?.commands.setContent(isBlankHtml(clean) ? '' : clean, false);
+      wysiwygDirtyRef.current = false; // HTML 원문이 authoritative
+      onChange?.({ html: isBlankHtml(htmlSource) ? '' : htmlSource, json: editor?.getJSON() });
     } else if (activeTab === 'edit') {
-      // 편집 탭을 떠날 때만 editor → draft 스냅샷. 빈 문서는 빈 textarea 로 (`<p></p>` 노출 방지, §4.2)
-      const html = editor?.getHTML() || '';
-      setHtmlSource(isBlankHtml(html) ? '' : html);
+      // 편집 탭을 떠날 때: 사용자가 실제 WYSIWYG 편집을 한 경우에만 editor → draft 스냅샷.
+      //   편집하지 않았으면 htmlSource(원문)를 유지 → HTML 작성 콘텐츠의 디자인 보존(재오픈 포함).
+      if (wysiwygDirtyRef.current) {
+        const html = editor?.getHTML() || '';
+        setHtmlSource(isBlankHtml(html) ? '' : html);
+      }
     }
     setActiveTab(tab);
   }
@@ -172,13 +212,13 @@ export function RichTextEditor({
         e.preventDefault();
         if (onSave && editor) {
           onSave({
-            html: editor.getHTML(),
+            html: resolveSaveHtml(),
             json: editor.getJSON(),
           });
         }
       }
     },
-    [onSave, editor]
+    [onSave, editor, resolveSaveHtml]
   );
 
   return (
@@ -266,6 +306,8 @@ export function RichTextEditor({
               //   빈 placeholder(`<p></p>` 등)는 빈 본문('')으로 정규화하여 "내용 없음" 검사가 정상 동작.
               const next = e.target.value;
               setHtmlSource(next);
+              // WO-O4O-COMMON-EDITOR-HTML-TAB-SAVE-RAW-PRESERVE-V1: HTML 원문 입력 → 원문이 authoritative
+              wysiwygDirtyRef.current = false;
               onChange?.({ html: isBlankHtml(next) ? '' : next });
             }}
             style={{
