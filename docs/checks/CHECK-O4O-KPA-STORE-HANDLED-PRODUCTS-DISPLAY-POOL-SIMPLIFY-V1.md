@@ -29,10 +29,14 @@
 - 행 관리 버튼(managePath /my-products?highlight= · /commerce/local-products?highlight=) 유지.
 - 검색·페이지네이션 유지.
 
-## 6. API/DB/route 무변경 확인
+## 6. API/DB/route 변경 확인
 
-- `GET /api/v1/store/handled-products` 응답 무변경(tabletExposure/onlineSalesExposure/productDescriptionStatus 필드는 그대로 반환, 프론트 미표시만). 백엔드 다이어트는 후속.
-- DB/migration/route/메뉴 변경 없음. handledProducts.ts 타입 무변경(필드 유지).
+> 업데이트(커밋 `6665be2ed`, 동시 진행 후속분): 프론트 컬럼 제거(이 CHECK 본문)에 이어 **백엔드 API 다이어트까지 완료**됨. 본 절의 "API 무변경"은 그 시점 기준이며 현재는 아래와 같이 정리됨.
+
+- `GET /api/v1/store/handled-products`: 채널 상태 enrich **조인 3종 제거**(store_tablet_displays / organization_product_channels / shared_product_descriptions) — 요청당 추가 DB 쿼리 3개 감소. 응답 필드 `tabletExposure`/`onlineSalesExposure`/`productDescriptionStatus` **제거**(타 소비처 0건 grep 확인). `handledProducts.ts` 타입도 동기 제거.
+- 화면 하단 보조 안내에 "매장 자체 제품 온라인몰 미지원" 1문장 추가.
+- DB/migration/route/메뉴 변경 없음. api-server·web tsc PASS, API+Web 배포 success.
+- smoke(약국 경영자 renagang21): 6컬럼·온라인몰 미지원 안내·API 200 확인(테스트 매장 취급제품 0건이라 실 항목 키 확인은 불가, 백엔드 map 제거로 코드 보장).
 
 ## 7. 공급처/구매처 미표시 확인
 
