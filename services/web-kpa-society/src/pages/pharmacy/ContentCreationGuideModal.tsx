@@ -13,11 +13,11 @@
 import { useEffect, useState } from 'react';
 import { X, Copy, Check, Sparkles } from 'lucide-react';
 
-const AI_PROMPT_EXAMPLE = `아래 내용을 약국 고객에게 안내할 콘텐츠로 정리해 주세요.
+const AI_PROMPT_EXAMPLE = `아래 내용을 약국 고객에게 보여줄 콘텐츠로 정리하고, 보기 좋게 디자인을 입힌 HTML로 만들어 주세요.
 
-O4O 편집기의 HTML 탭에 붙여 넣을 수 있는 안전한 HTML로 만들어 주세요.
-script, iframe, 외부 CSS, 외부 폰트는 사용하지 마세요.
-h1, h2, h3, p, ul, li, strong, div, section 정도만 사용해 주세요.
+O4O 편집기의 HTML 탭에 붙여 넣을 수 있는 형태로 만들어 주세요.
+제목 강조, 색상, 배경, 여백, 카드 박스 같은 디자인은 태그 안의 style 속성(인라인 CSS)으로 적용해 주세요.
+script, iframe, 외부 CSS 파일, 외부 폰트, 외부 스크립트는 사용하지 마세요.
 모바일과 PDF 출력에서도 읽기 좋게 만들어 주세요.
 이미지가 필요한 곳은 [이미지 삽입 위치]라고 표시해 주세요.
 
@@ -144,8 +144,8 @@ export function ContentCreationGuideModal({ open, onClose }: { open: boolean; on
             </p>
             <p className="ccg-step">
               <span className="ccg-step-num">2</span>
-              <strong>AI에게 HTML로 정리해 달라고 요청하세요.</strong>
-              <span>“O4O 편집기의 HTML 탭에 붙여 넣을 수 있는 안전한 HTML로 만들어 주세요”라고 요청하면 됩니다.</span>
+              <strong>AI에게 디자인을 입힌 HTML로 만들어 달라고 요청하세요.</strong>
+              <span>“내용에 보기 좋은 디자인을 입혀서, O4O 편집기의 HTML 탭에 붙여 넣을 수 있는 HTML로 만들어 주세요”라고 요청하면 됩니다. 색상·배경·여백 같은 디자인은 인라인 style 로 넣어 달라고 하면 좋습니다.</span>
             </p>
             <p className="ccg-step">
               <span className="ccg-step-num">3</span>
