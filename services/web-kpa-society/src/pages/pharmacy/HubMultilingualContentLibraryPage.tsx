@@ -222,7 +222,8 @@ export function HubMultilingualContentLibraryPage() {
                   onClick={() => handleChangeKind('local')}
                   className={`px-3 py-2.5 rounded-lg border text-sm text-left ${targetKind === 'local' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-slate-200 text-slate-600 hover:bg-slate-50'}`}
                 >
-                  <div className="font-medium">매장 취급 상품</div>
+                  {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-TERM-CLARIFICATION-V1: '매장 취급 상품' → '매장 경영활용 제품' */}
+                  <div className="font-medium">매장 경영활용 제품</div>
                   <div className="text-[11px] text-slate-400 mt-0.5">매장 진열용</div>
                 </button>
                 <button
@@ -243,7 +244,7 @@ export function HubMultilingualContentLibraryPage() {
               ) : targetOptions.length === 0 ? (
                 <div className="flex items-center gap-2 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2.5">
                   <Search className="w-4 h-4 shrink-0" />
-                  연결 가능한 {targetKind === 'local' ? '매장 취급 상품' : 'O4O 주문 가능 상품'}이 없습니다.
+                  연결 가능한 {targetKind === 'local' ? '매장 경영활용 제품' : 'O4O 주문 가능 상품'}이 없습니다.
                 </div>
               ) : (
                 <select

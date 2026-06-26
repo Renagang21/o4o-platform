@@ -5,7 +5,7 @@
  *
  * GET /api/v1/store/handled-products
  *   organization_product_listings(O4O 취급) + store_local_products(매장 자체) 통합 조회.
- *   매장 자체 제품의 온라인몰/상품설명은 구조적으로 'not_supported'.
+ *   매장 경영활용 제품의 온라인몰/상품설명은 구조적으로 'not_supported'.
  */
 
 import { getAccessToken } from '../contexts/AuthContext';

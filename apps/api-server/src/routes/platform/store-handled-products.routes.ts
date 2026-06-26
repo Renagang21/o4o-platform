@@ -4,7 +4,7 @@
  * WO-O4O-KPA-STORE-HANDLED-PRODUCTS-UNIFIED-VIEW-V1
  * 선행: IR-O4O-KPA-STORE-HANDLED-PRODUCTS-UNIFIED-VIEW-DESIGN-V1
  *
- * "매장 취급제품" = O4O 취급 제품(organization_product_listings) + 매장 자체 제품(store_local_products)
+ * "매장 취급제품" = O4O 기반 제품(organization_product_listings) + 매장 경영활용 제품(store_local_products)
  * 두 소스를 물리 통합하지 않고 sourceType 으로 구분해 조회 통합한다(읽기 전용).
  *
  * API Namespace: /api/v1/store
@@ -13,7 +13,7 @@
  * WO-O4O-KPA-STORE-HANDLED-PRODUCTS-DISPLAY-POOL-SIMPLIFY-V1:
  *   제품 풀(매장 취급제품)은 채널 상태판이 아니다. 채널 상태(타블렛/온라인몰/상품설명) 컬럼·enrich 를 제거하고
  *   제품 풀 핵심 필드(이름/구분/표시가/상태/수정일)만 반환한다. 채널 노출은 각 채널 메뉴에서 관리.
- *   - 매장 자체 제품(local)의 온라인몰 미지원은 화면 하단 보조 안내로 고지(컬럼 아님).
+ *   - 매장 경영활용 제품(local)의 온라인몰 미지원은 화면 하단 보조 안내로 고지(컬럼 아님).
  *
  * Boundary Policy: organization_id 필터 필수, Raw SQL parameter binding 필수.
  */
@@ -156,7 +156,7 @@ export function createStoreHandledProductsRoutes(dataSource: DataSource): Router
           sourceId: r.source_id,
           name: r.name || '(이름 없음)',
           imageUrl: r.image_url || null,
-          originLabel: isListing ? 'O4O 취급 제품' : '매장 자체 제품',
+          originLabel: isListing ? 'O4O 기반 제품' : '매장 경영활용 제품',
           ownerLabel: isListing ? '공급/플랫폼' : '내 매장',
           price: r.price != null ? Number(r.price) : null,
           statusLabel: isListing ? listingStatusLabel(r, now) : r.is_active ? '활성' : '비활성',

@@ -46,7 +46,7 @@ export async function fetchTabletProducts(
   if (!json.success) throw new Error(json.error?.message || 'Failed to fetch products');
   // WO-O4O-KPA-TABLET-PUBLIC-LOCAL-PRODUCTS-FIX-V1:
   //   공개 뷰어(kiosk-core)가 res.localProducts 를 소비하므로 응답의 localProducts 를 그대로 통과시킨다.
-  //   (기존: data/meta 만 반환 → 매장 자체 제품이 공개 타블렛 화면에 노출되지 않던 버그)
+  //   (기존: data/meta 만 반환 → 매장 경영활용 제품이 공개 타블렛 화면에 노출되지 않던 버그)
   return { data: json.data, meta: json.meta, localProducts: json.localProducts };
 }
 

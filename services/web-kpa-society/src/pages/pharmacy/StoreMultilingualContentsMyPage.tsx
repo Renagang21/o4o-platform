@@ -24,7 +24,8 @@ import {
 const LOCALE_LABELS: Record<string, string> = {
   ko: '한국어', en: 'English', zh: '中文', ja: '日本語', vi: 'Tiếng Việt', th: 'ภาษาไทย', id: 'Bahasa',
 };
-const TARGET_LABEL: Record<string, string> = { local: '매장 취급 상품', listing: 'O4O 주문 가능 상품' };
+// WO-O4O-KPA-STORE-HANDLED-PRODUCTS-TERM-CLARIFICATION-V1: '매장 취급 상품' → '매장 경영활용 제품'
+const TARGET_LABEL: Record<string, string> = { local: '매장 경영활용 제품', listing: 'O4O 주문 가능 상품' };
 const RESOLVE_LOCALES: StoreMlcLocale[] = ['en', 'zh', 'ja'];
 
 export function StoreMultilingualContentsMyPage() {
