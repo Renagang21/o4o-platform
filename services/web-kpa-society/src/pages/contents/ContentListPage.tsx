@@ -14,10 +14,9 @@
  *   - "링크 복사" → "내 자료함 가져가기" (contentApi.copyToStore)
  *   - "상세보기" 액션 제거 → 제목/row 클릭 시 Drawer 오픈
  *
- * /content를 3개 섹션의 허브로 표시:
+ * /content를 2개 섹션의 허브로 표시:
  *   1. 문서형 콘텐츠 — 메인 섹션 (리스트, BaseTable + Drawer)
- *   2. 코스형 자료  — 두 번째 섹션 (리스트, 등록 + 더보기)
- *   3. 설문조사     — 세 번째 섹션
+ *   2. 설문조사     — 두 번째 섹션
  *
  * 권한: 작성자만 수정/삭제 노출 (createdBy === currentUserId)
  */
@@ -27,9 +26,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { ContentRenderer } from '@o4o/content-editor';
 import { contentApi, type ContentItem } from '../../api/content';
 import { assetSnapshotApi } from '../../api/assetSnapshot';
-import { lmsApi } from '../../api/lms';
 import { participationApi } from '../../api/participation';
-import type { Course } from '../../types';
 import type { ParticipationSet } from '../participation/types';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
@@ -456,265 +453,7 @@ function DocumentsSection({
   );
 }
 
-// ─── Section 2: 코스형 자료 ──────────────────────────────────────────────────
-// WO-O4O-CONTENT-LIST-CANONICAL-TABLE-ALIGN-V1:
-//   - raw <table> → BaseTable + RowActionMenu
-//   - "내 자료함 가져가기" 액션 추가 (assetType='lesson')
-//   - reusablePolicy='restricted' 차단
-
-function CoursesSection({ canCreateCourse }: { canCreateCourse: boolean }) {
-  const navigate = useNavigate();
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [copying, setCopying] = useState<string | null>(null);
-  const [selected, setSelected] = useState<Set<string>>(new Set());
-  // WO-O4O-STORE-LIBRARY-COPY-INDEPENDENCE-ALIGN-V1: 중복 허용 — addedCourseIds 제거
-
-  useEffect(() => {
-    setSelected((prev) => {
-      const validKeys = new Set(courses.map((r) => r.id));
-      const next = new Set<string>();
-      for (const k of prev) { if (validKeys.has(k)) next.add(k); }
-      return next.size === prev.size ? prev : next;
-    });
-  }, [courses]);
-
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    // WO-KPA-CONTENT-COURSES-PUBLIC-VISIBILITY-FIX-V1:
-    // 공개 API로 교체 — 모든 이용자가 published content_resource를 조회할 수 있음
-    lmsApi.getCourses({ page: 1, limit: 10, status: 'published', contentKind: 'content_resource' })
-      .then((res: any) => {
-        if (cancelled) return;
-        // apiClient (fetch) response shape: { success, data: Course[], pagination }
-        const list = res?.data ?? [];
-        setCourses(Array.isArray(list) ? list : []);
-      })
-      .catch(() => {
-        if (cancelled) return;
-        setCourses([]);
-      })
-      .finally(() => {
-        if (cancelled) return;
-        setLoading(false);
-      });
-    return () => { cancelled = true; };
-  }, []);
-
-  const handleBulkCopyToStore = useCallback(async () => {
-    const selectedCourses = courses.filter((r) => selected.has(r.id) && r.reusablePolicy !== 'restricted');
-    if (selectedCourses.length === 0) {
-      toast.error('가져갈 수 있는 항목이 없습니다');
-      return;
-    }
-    setCopying('bulk');
-    try {
-      await Promise.all(
-        selectedCourses.map((r) =>
-          assetSnapshotApi.copy({ sourceService: 'kpa', sourceAssetId: r.id, assetType: 'lesson' }),
-        ),
-      );
-      toast.success(`${selectedCourses.length}개를 내 자료함에 가져왔습니다`);
-      setSelected(new Set());
-    } catch (e: any) {
-      toast.error(e?.message || '가져오기에 실패했습니다');
-    } finally {
-      setCopying(null);
-    }
-  }, [courses, selected]);
-
-  // WO-O4O-STORE-LIBRARY-COPY-INDEPENDENCE-ALIGN-V1: 중복 허용 — 매번 새 library item 생성
-  const handleCopyToStore = useCallback(async (course: Course) => {
-    setCopying(course.id);
-    try {
-      await assetSnapshotApi.copy({
-        sourceService: 'kpa',
-        sourceAssetId: course.id,
-        assetType: 'lesson',
-      });
-      toast.success('내 자료함에 가져왔습니다');
-    } catch (e: any) {
-      toast.error(e?.message || '가져오기에 실패했습니다');
-    } finally {
-      setCopying(null);
-    }
-  }, []);
-
-  const columns: O4OColumn<Course>[] = [
-    {
-      key: '_select',
-      header: '',
-      system: true,
-      width: '44px',
-      align: 'center',
-      onCellClick: () => {},
-      render: (_v, row) => (
-        <input
-          type="checkbox"
-          checked={selected.has(row.id)}
-          onChange={(e) => {
-            e.stopPropagation();
-            setSelected((prev) => {
-              const next = new Set(prev);
-              if (next.has(row.id)) next.delete(row.id);
-              else next.add(row.id);
-              return next;
-            });
-          }}
-          onClick={(e) => e.stopPropagation()}
-          className="w-4 h-4 accent-blue-600 cursor-pointer"
-        />
-      ),
-    },
-    {
-      key: 'title',
-      header: '제목',
-      render: (_v, row) => (
-        <span className="font-semibold text-sm text-slate-800 overflow-hidden text-ellipsis whitespace-nowrap">{row.title}</span>
-      ),
-    },
-    {
-      key: 'instructorName',
-      header: '강사',
-      width: '100px',
-      render: (val) => <span className="text-[13px] text-slate-500">{val || '-'}</span>,
-    },
-    {
-      key: 'lessonCount',
-      header: '레슨',
-      width: '60px',
-      align: 'center',
-      render: (val) => <span className="text-[13px] text-slate-400">{val ?? 0}</span>,
-    },
-    {
-      key: 'createdAt',
-      header: '작성일',
-      width: '100px',
-      render: (val) => <span className="text-[13px] text-slate-400">{formatDate(val)}</span>,
-    },
-    {
-      key: 'status',
-      header: '상태',
-      width: '70px',
-      render: (val) => (
-        <span className={`inline-block px-2 py-0.5 text-[11px] font-semibold rounded ${
-          val === 'published' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'
-        }`}>
-          {val === 'published' ? '공개' : val === 'archived' ? '보관' : '초안'}
-        </span>
-      ),
-    },
-    {
-      key: '_actions',
-      header: '',
-      width: '52px',
-      align: 'center',
-      system: 'last',
-      render: (_v, row) => {
-        const isRestricted = row.reusablePolicy === 'restricted';
-        const actions: RowActionItem[] = [
-          {
-            key: 'copy-to-store',
-            label: isRestricted ? '내 자료함 가져가기 (불가)' : '내 자료함 가져가기',
-            onClick: () => handleCopyToStore(row),
-            loading: copying === row.id,
-            disabled: isRestricted,
-          },
-          {
-            key: 'view',
-            label: '자세히 보기',
-            onClick: () => navigate(`/content/courses/${row.id}`),
-          },
-        ];
-        return <RowActionMenu actions={actions} />;
-      },
-    },
-  ];
-
-  return (
-    <section className="mb-10">
-      <SectionHeader
-        title="코스형 자료"
-        description="목록형으로 구성된 분량 많은 콘텐츠"
-        primaryAction={canCreateCourse ? { label: '코스형 자료 등록', to: '/content/courses/new' } : undefined}
-        moreLink={{ label: '전체 보기', to: '/content/courses' }}
-      />
-
-      {loading ? (
-        <Card className="overflow-hidden">
-          <div className="py-8 px-4 text-sm text-slate-400 text-center">불러오는 중...</div>
-        </Card>
-      ) : (
-        <>
-          {/* Desktop: BaseTable */}
-          <div className="hidden md:block bg-white rounded-lg border border-slate-200 overflow-hidden">
-            {selected.size > 0 && (
-              <ActionBar
-                selectedCount={selected.size}
-                actions={[
-                  {
-                    key: 'bulk-copy',
-                    label: '내 자료함 가져가기',
-                    onClick: handleBulkCopyToStore,
-                    loading: copying === 'bulk',
-                  },
-                ]}
-                onClearSelection={() => setSelected(new Set())}
-              />
-            )}
-            <BaseTable<Course>
-              columns={columns}
-              data={courses}
-              rowKey={(row) => row.id}
-              selectable
-              selectedKeys={selected}
-              onSelectionChange={setSelected}
-              onRowClick={(row) => navigate(`/content/courses/${row.id}`)}
-              emptyMessage={
-                <div className="py-8 px-4 text-sm text-slate-400 text-center">아직 코스형 자료가 없습니다</div>
-              }
-            />
-          </div>
-
-          {/* Mobile: Card List */}
-          <div className="block md:hidden flex flex-col gap-3">
-            {courses.length === 0 ? (
-              <Card className="overflow-hidden">
-                <div className="py-8 px-4 text-sm text-slate-400 text-center">아직 코스형 자료가 없습니다</div>
-              </Card>
-            ) : (
-              courses.map((c) => (
-                <Card
-                  key={c.id}
-                  className="p-4 cursor-pointer hover:bg-slate-50 transition-colors"
-                  onClick={() => navigate(`/content/courses/${c.id}`)}
-                >
-                  <div className="flex flex-col gap-2">
-                    <span className="text-sm font-medium text-slate-800 line-clamp-2">{c.title}</span>
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-slate-500">
-                        {formatDate(c.createdAt)}
-                        {c.lessonCount > 0 && ` · 레슨 ${c.lessonCount}개`}
-                      </span>
-                      <span className={`inline-block px-2 py-0.5 text-[11px] font-semibold rounded ${
-                        c.status === 'published' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'
-                      }`}>
-                        {c.status === 'published' ? '공개' : c.status === 'archived' ? '보관' : '초안'}
-                      </span>
-                    </div>
-                  </div>
-                </Card>
-              ))
-            )}
-          </div>
-        </>
-      )}
-    </section>
-  );
-}
-
-// ─── Section 3: 설문조사 ──────────────────────────────────────────────────
+// ─── Section 2: 설문조사 ──────────────────────────────────────────────────
 // WO-O4O-SURVEY-CORE-PHASE1-V1: O4O 공통 Survey API 연결, placeholder 제거.
 // participationApi는 내부에서 /api/v1/surveys?serviceKey=kpa-society를 호출한다.
 
@@ -903,11 +642,6 @@ function SurveysSection({ isAuthenticated }: { isAuthenticated: boolean }) {
 export function ContentListPage() {
   const { user, isAuthenticated } = useAuth();
 
-  // WO-KPA-CONTENT-COURSES-PUBLIC-VISIBILITY-FIX-V1:
-  // 코스형 자료 등록은 lms:instructor 또는 kpa:admin 역할 필요
-  const roles = user?.roles ?? [];
-  const canCreateCourse = roles.includes('lms:instructor') || roles.includes('kpa:admin');
-
   // 문서 섹션의 삭제 후 재조회 트리거
   const [refreshKey, setRefreshKey] = useState(0);
   const handleDocumentsChanged = useCallback(() => {
@@ -919,7 +653,7 @@ export function ContentListPage() {
       <header className="mb-8 flex items-end justify-between gap-3 flex-wrap">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 mb-1 mt-0">콘텐츠</h1>
-          <p className="text-[15px] text-slate-500 m-0">문서·코스형 자료·설문조사를 한 곳에서 관리합니다.</p>
+          <p className="text-[15px] text-slate-500 m-0">문서형 콘텐츠와 설문조사를 한 곳에서 관리합니다.</p>
         </div>
         {/* WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: 자료실 진입 링크 */}
         <Link
@@ -936,8 +670,6 @@ export function ContentListPage() {
         refreshKey={refreshKey}
         onChanged={handleDocumentsChanged}
       />
-
-      <CoursesSection canCreateCourse={canCreateCourse} />
 
       <SurveysSection isAuthenticated={isAuthenticated} />
     </div>
