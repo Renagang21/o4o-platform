@@ -49,7 +49,7 @@ export default function StoreLibraryContentsPage() {
   const [guideOpen, setGuideOpen] = useState(false);
 
   // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1:
-  //   매장 경영활용 제품 화면의 "콘텐츠 만들기"에서 URL 파라미터로 진입 → 작성 모달을 제품 연결 컨텍스트와 함께 자동 오픈.
+  //   매장 취급제품 화면의 "콘텐츠 만들기"에서 URL 파라미터로 진입 → 작성 모달을 제품 연결 컨텍스트와 함께 자동 오픈.
   //   (URL 기반 전달 → 새로고침 후에도 연결 대상 유실 없음)
   const [searchParams, setSearchParams] = useSearchParams();
   const productCtx = useMemo<CreateContentProductContext | null>(() => {
