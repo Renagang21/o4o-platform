@@ -69,7 +69,7 @@ import { createStorePolicyRoutes } from '../routes/platform/store-policy.routes.
 import { createUnifiedStorePublicRoutes } from '../routes/platform/unified-store-public.routes.js';
 import { createStoreLocalProductRoutes } from '../routes/platform/store-local-product.routes.js';
 import { createStoreTabletRoutes } from '../routes/platform/store-tablet.routes.js';
-// WO-O4O-KPA-STORE-HANDLED-PRODUCTS-UNIFIED-VIEW-V1: 매장 취급제품 통합 조회
+// WO-O4O-KPA-STORE-HANDLED-PRODUCTS-UNIFIED-VIEW-V1: 매장 경영활용 제품 통합 조회
 import { createStoreHandledProductsRoutes } from '../routes/platform/store-handled-products.routes.js';
 import { createStoreCartRoutes } from '../routes/cart/store-cart.routes.js';
 import userRoleRoutes from '../routes/user-role.routes.js';
