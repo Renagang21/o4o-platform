@@ -4,7 +4,7 @@ import type { MigrationInterface, QueryRunner } from 'typeorm';
  * WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-LINK-V1
  * 선행 IR: IR-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-LINK-MODEL-V1
  *
- * 매장 자료함 콘텐츠(kpa_store_contents) ↔ 매장 취급제품 연결 조인 테이블 신설.
+ * 매장 자료함 콘텐츠(kpa_store_contents) ↔ 매장 경영활용 제품 연결 조인 테이블 신설.
  *
  * 연결 기준 (확정):
  *   - O4O 기반 제품      → product_source_type='listing', product_source_id=organization_product_listings.id
