@@ -243,7 +243,7 @@ const StoreAssetsPage = lazy(() => import('./pages/pharmacy/StoreAssetsPage'));
 const StoreContentEditPage = lazy(() => import('./pages/pharmacy/StoreContentEditPage'));
 const StoreDirectContentPage = lazy(() => import('./pages/pharmacy/StoreDirectContentPage'));
 const StoreLocalProductsPage = lazy(() => import('./pages/pharmacy/StoreLocalProductsPage'));
-// WO-O4O-KPA-STORE-HANDLED-PRODUCTS-UNIFIED-VIEW-V1: 매장 취급제품 통합 조회
+// WO-O4O-KPA-STORE-HANDLED-PRODUCTS-UNIFIED-VIEW-V1: 매장 경영활용 제품 통합 조회
 const StoreHandledProductsPage = lazy(() => import('./pages/pharmacy/StoreHandledProductsPage'));
 const StoreTabletDisplaysPage = lazy(() => import('./pages/pharmacy/StoreTabletDisplaysPage'));
 const StoreProductInfoCreatorPage = lazy(() => import('./pages/pharmacy/StoreProductInfoCreatorPage'));
@@ -962,11 +962,11 @@ function App() {
               title="취급 중인 O4O 제품"
               description="O4O 제품 중 매장이 취급 등록한 제품을 관리합니다. 타블렛, QR, 사이니지, 자체 온라인몰 등 매장 서비스에 활용합니다."
               registerButtonLabel="O4O 제품 취급 등록"
-              infoText="O4O 제품을 매장 취급 제품으로 등록할 수 있습니다. 등록한 제품은 타블렛 전시, QR 안내, 사이니지, 자체 온라인몰 등에 연결해 활용할 수 있습니다."
+              infoText="O4O 제품을 매장 경영활용 제품으로 등록할 수 있습니다. 등록한 제품은 타블렛 전시, QR 안내, 사이니지, 자체 온라인몰 등에 연결해 활용할 수 있습니다."
               emptyTitle="취급 중인 O4O 제품이 없습니다"
               emptyDescription="O4O 제품을 취급 등록해 타블렛과 매장 안내 서비스에 활용해 주세요."
             /></PharmacyOwnerOnlyGuard>} />
-            {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-UNIFIED-VIEW-V1: 매장 취급제품 통합 조회(읽기) — listings+local 합산, 원본 관리 이동 */}
+            {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-UNIFIED-VIEW-V1: 매장 경영활용 제품 통합 조회(읽기) — listings+local 합산, 원본 관리 이동 */}
             <Route path="handled-products" element={<PharmacyOwnerOnlyGuard><StoreHandledProductsPage /></PharmacyOwnerOnlyGuard>} />
             {/* WO-O4O-STORE-HUB-LEGACY-LIST-CLEANUP-V1: suppliers 라우트 제거 (mock-only, /store-hub/b2b 와 redundant) */}
             <Route path="commerce/products/:productId/marketing" element={<ProductMarketingPage />} />

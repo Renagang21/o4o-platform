@@ -267,12 +267,12 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       //   key/subPath/route/권한/기능 무변경. KPA 블록 한정(GP/KCos 무영향).
       { key: 'products', label: 'O4O 제품', subPath: '/commerce/products' },
       // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-UNIFIED-VIEW-V1:
-      //   매장 취급제품 = O4O 취급 제품(organization_product_listings) + 매장 자체 제품(store_local_products)
+      //   매장 경영활용 제품 = O4O 취급 제품(organization_product_listings) + 매장 자체 제품(store_local_products)
       //   통합 조회(읽기). 등록·수정은 아래 원본 메뉴(내 매장 제품/매장 자체 제품)에서. KPA 블록 한정.
-      { key: 'handled-products', label: '매장 취급제품', subPath: '/handled-products' },
+      { key: 'handled-products', label: '매장 경영활용 제품', subPath: '/handled-products' },
       // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-INTERNAL-TABS-V1:
       //   '내 매장 제품'(/my-products)·'매장 자체 제품'(/commerce/local-products) 사이드바 메뉴를 제거하고
-      //   '매장 취급제품' 화면 내부(출처 탭 전체/O4O 취급/매장 자체 + 상단 관리 버튼 + 행 관리 버튼)로 흡수.
+      //   '매장 경영활용 제품' 화면 내부(출처 탭 전체/O4O 취급/매장 자체 + 상단 관리 버튼 + 행 관리 버튼)로 흡수.
       //   route/page/API/DB 무변경 — 기능 삭제 아님, 메뉴 노출만 정리(데드링크 0, 직접 URL 접근 유지).
       //   선행 WO-O4O-KPA-STORE-PRODUCT-MENU-IA-REORG-V1(두 메뉴를 이 그룹으로 이동).
       // WO-O4O-KPA-ONLINE-SALES-ORDER-MANAGEMENT-AND-BUYER-ORDER-RELABEL-V1:
