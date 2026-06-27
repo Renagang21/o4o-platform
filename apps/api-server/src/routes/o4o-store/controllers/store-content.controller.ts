@@ -67,7 +67,7 @@ export function createStoreContentController(
 
   // ───────────────────────────────────────────────────────────────────────────
   // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-LINK-V1
-  //   콘텐츠 ↔ 매장 경영활용 제품 연결(kpa_store_content_product_links) 처리 헬퍼.
+  //   콘텐츠 ↔ 매장 취급제품 연결(kpa_store_content_product_links) 처리 헬퍼.
   //   - productRef 미전송 → 기존 link 유지 (tags 와 동일 정책)
   //   - productRef: null  → 기존 product_description link 제거
   //   - productRef: { sourceType, sourceId } → 검증 후 link 교체(1개 유지)
@@ -359,7 +359,7 @@ export function createStoreContentController(
    * GET /store-contents/by-product
    * WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-LINK-V1
    *
-   * 특정 매장 경영활용 제품에 연결된 콘텐츠 목록.
+   * 특정 매장 취급제품에 연결된 콘텐츠 목록.
    * Query: sourceType(listing|local), sourceId(uuid)
    * NOTE: /:snapshotId 보다 먼저 등록해야 한다(리터럴 경로 우선).
    */
