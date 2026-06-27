@@ -43,6 +43,12 @@ export class StoreTabletDisplay {
   @Column({ name: 'is_visible', type: 'boolean', default: true })
   isVisible!: boolean;
 
+  // WO-O4O-KPA-TABLET-DISPLAY-CONTENT-SELECTION-V1:
+  //   진열별 선택 콘텐츠(kpa_store_contents.id). 기본 콘텐츠 미지정 — 진열마다 직접 선택.
+  //   FK ON DELETE SET NULL (콘텐츠 삭제 시 진열 유지 + 선택 해제). 관계는 두지 않는다(ESM/soft ref).
+  @Column({ name: 'content_id', type: 'uuid', nullable: true })
+  contentId?: string | null;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 

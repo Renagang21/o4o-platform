@@ -54,6 +54,14 @@ interface DisplayItem {
   productId: string;
   sortOrder: number;
   isVisible: boolean;
+  // WO-O4O-KPA-TABLET-DISPLAY-CONTENT-SELECTION-V1: 진열별 선택 콘텐츠(optional, null=선택 해제).
+  contentId?: string | null;
+}
+
+// 타블렛 진열 product_type ↔ 콘텐츠 연결 sourceType 매핑.
+//   supplier(O4O 기반 제품) ↔ listing / local ↔ local
+function contentSourceTypeFor(productType: 'supplier' | 'local'): 'listing' | 'local' {
+  return productType === 'supplier' ? 'listing' : 'local';
 }
 
 async function validateDisplayItems(
@@ -86,6 +94,28 @@ async function validateDisplayItems(
       );
       if (!local.length) {
         return `Local product not found: ${item.productId}`;
+      }
+    }
+
+    // WO-O4O-KPA-TABLET-DISPLAY-CONTENT-SELECTION-V1:
+    //   선택 콘텐츠가 있으면 (a) 같은 org 소유 + (b) 해당 진열 제품에 product_description 으로 실제 연결,
+    //   (c) 제품 sourceType/sourceId 정확 일치 까지 확인. 미연결/타제품/타조직/삭제 콘텐츠는 차단.
+    if (item.contentId != null) {
+      const linked = await dataSource.query(
+        `SELECT 1
+         FROM kpa_store_content_product_links l
+         JOIN kpa_store_contents c
+           ON c.id = l.content_id AND c.organization_id = l.organization_id
+         WHERE l.organization_id = $1
+           AND l.content_id = $2
+           AND l.link_type = 'product_description'
+           AND l.product_source_type = $3
+           AND l.product_source_id = $4
+         LIMIT 1`,
+        [organizationId, item.contentId, contentSourceTypeFor(item.productType), item.productId],
+      );
+      if (!linked.length) {
+        return `Selected content is not linked to this product: ${item.contentId}`;
       }
     }
   }
@@ -299,10 +329,16 @@ export function createStoreTabletRoutes(
       }
 
       const displays = await dataSource.query(
-        `SELECT id, product_type, product_id, sort_order, is_visible, created_at
-         FROM store_tablet_displays
-         WHERE tablet_id = $1
-         ORDER BY sort_order ASC`,
+        // WO-O4O-KPA-TABLET-DISPLAY-CONTENT-SELECTION-V1: 선택 콘텐츠 메타 동봉(미선택/삭제 시 null).
+        `SELECT d.id, d.product_type, d.product_id, d.sort_order, d.is_visible, d.created_at,
+                d.content_id AS "contentId",
+                c.title AS "contentTitle",
+                c.source_type AS "contentSourceType",
+                c.workspace_status AS "contentStatus"
+         FROM store_tablet_displays d
+         LEFT JOIN kpa_store_contents c ON c.id = d.content_id
+         WHERE d.tablet_id = $1
+         ORDER BY d.sort_order ASC`,
         [tabletId],
       );
 
@@ -374,14 +410,16 @@ export function createStoreTabletRoutes(
         for (let i = 0; i < displays.length; i++) {
           const item = displays[i];
           await manager.query(
-            `INSERT INTO store_tablet_displays (tablet_id, product_type, product_id, sort_order, is_visible)
-             VALUES ($1, $2, $3, $4, $5)`,
+            `INSERT INTO store_tablet_displays (tablet_id, product_type, product_id, sort_order, is_visible, content_id)
+             VALUES ($1, $2, $3, $4, $5, $6)`,
             [
               tabletId,
               item.productType,
               item.productId,
               item.sortOrder ?? i,
               item.isVisible !== false,
+              // WO-O4O-KPA-TABLET-DISPLAY-CONTENT-SELECTION-V1: 진열별 선택 콘텐츠(없으면 NULL).
+              item.contentId ?? null,
             ],
           );
         }
@@ -389,10 +427,16 @@ export function createStoreTabletRoutes(
 
       // Return updated displays
       const updated = await dataSource.query(
-        `SELECT id, product_type, product_id, sort_order, is_visible, created_at
-         FROM store_tablet_displays
-         WHERE tablet_id = $1
-         ORDER BY sort_order ASC`,
+        // WO-O4O-KPA-TABLET-DISPLAY-CONTENT-SELECTION-V1: 선택 콘텐츠 메타 동봉(미선택/삭제 시 null).
+        `SELECT d.id, d.product_type, d.product_id, d.sort_order, d.is_visible, d.created_at,
+                d.content_id AS "contentId",
+                c.title AS "contentTitle",
+                c.source_type AS "contentSourceType",
+                c.workspace_status AS "contentStatus"
+         FROM store_tablet_displays d
+         LEFT JOIN kpa_store_contents c ON c.id = d.content_id
+         WHERE d.tablet_id = $1
+         ORDER BY d.sort_order ASC`,
         [tabletId],
       );
 
