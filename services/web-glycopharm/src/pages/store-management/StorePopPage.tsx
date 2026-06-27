@@ -2,15 +2,13 @@
  * StorePopPage — GlycoPharm POP 생성
  *
  * WO-O4O-GLYCOPHARM-POP-STORE-EXECUTION-V1
- * WO-O4O-AI-EDITING-MODAL-ADOPTION-ALIGNMENT-V1: POP AI 진입을 인라인 fetch →
- *   공통 AiContentModal(@o4o/content-editor)로 정렬(KPA 패턴). 모델 resolver/preset 적용 가능.
- *
- * Community Canonical Store Execution 첫 축.
- * Resource → AI Content → POP 흐름 완성.
+ * WO-O4O-GP-KCOS-POP-QR-BLOG-AI-ENTRY-REMOVE-V1: 페이지형 AI 문구 생성 진입(AiContentModal
+ *   initialMode='pop') 제거. POP 문구는 선택 자료 원문 사용. 가져온 POP(prefill) 문구만 패널 표시.
+ *   공통 AiContentModal 컴포넌트·백엔드 API 무변경. 편집기 Toolbar "AI 정리"는 본 화면 비대상.
  *
  * 흐름:
  *   1. 공급자 자료 선택 (GET /glycopharm/pharmacy/pop/source/supplier-items)
- *   2. AI 문구 생성 (AiContentModal initialMode='pop' → POST /api/ai/content) — 선택
+ *   2. (가져온 POP 문구가 있을 때만) 문구 패널 — POP 콘텐츠로 저장 / 제거
  *   3. 레이아웃/템플릿 선택
  *   4. POP PDF 생성 (POST /glycopharm/pharmacy/pop/generate, aiContent 포함)
  *
@@ -20,11 +18,10 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { parseProductionRouterState, GuideBackLink } from '@o4o/store-ui-core';
+import { GuideBackLink } from '@o4o/store-ui-core';
 import {
   ArrowLeft,
   Megaphone,
-  Sparkles,
   Loader2,
   AlertCircle,
   CheckSquare,
@@ -41,10 +38,6 @@ import { createStaffPopPost } from '@/api/popStaff';
 import { getStoreSlug } from '@/api/storeHub';
 // WO-O4O-POP-QR-SELECTOR-GP-KCOS-PARITY-V1: POP 에 QR 연결
 import { getStoreQrCodes } from '@/api/storeProductionSources';
-import type { ProductionTemplate } from '@o4o/types/production-template';
-import { findTemplate } from '@/config/productionTemplates';
-// WO-O4O-AI-EDITING-MODAL-ADOPTION-ALIGNMENT-V1: POP AI 진입을 KPA 와 동일한 공통 모달로 정렬
-import { AiContentModal } from '@o4o/content-editor';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -83,22 +76,8 @@ export default function StorePopPage() {
   const [itemsError, setItemsError] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-  // Step 2: AI content — prefill from library router state if present
-  const [selectedTemplate] = useState<ProductionTemplate | null>(() => {
-    const prod = parseProductionRouterState(location.state);
-    const templateId = prod?.selectedTemplateId;
-    return templateId ? (findTemplate(templateId) ?? null) : null;
-  });
-
-  const [aiPrompt, setAiPrompt] = useState(() => {
-    const prod = parseProductionRouterState(location.state);
-    if (prod?.source?.items?.length) {
-      const item = prod.source.items[0];
-      return [item.title, item.description].filter(Boolean).join('\n');
-    }
-    return '';
-  });
-  const [aiOpen, setAiOpen] = useState(false);
+  // WO-O4O-GP-KCOS-POP-QR-BLOG-AI-ENTRY-REMOVE-V1: AI 문구 생성 진입 제거.
+  //   popAiContent 는 가져온 POP(prefillPop) 경로에서만 설정된다. POP 문구는 선택 자료 원문 사용.
   const [popAiContent, setPopAiContent] = useState<PopAiContent | null>(null);
 
   // WO-O4O-POP-IMPORT-TO-BUILDER-LINK-V1: 가져온 POP 사본 prefill (router state)
@@ -188,38 +167,6 @@ export default function StorePopPage() {
       }
       return [...prev, id];
     });
-  };
-
-  // ─── AI content generation ────────────────────────────────────────────────
-
-  // AiContentModal 진입 시 seed 할 입력 텍스트(주제 직접입력 우선, 없으면 선택 자료 원문).
-  const buildAiInputText = (): string => {
-    const fromPrompt = aiPrompt.trim();
-    if (fromPrompt) return fromPrompt;
-    return selectedIds
-      .map((id) => {
-        const item = items.find((it) => it.id === id);
-        return item ? `${item.title}\n${item.description ?? ''}` : '';
-      })
-      .filter(Boolean)
-      .join('\n\n')
-      .slice(0, 3000);
-  };
-
-  // AiContentModal onInsert — KPA POP 패턴과 동일: html 을 파싱해 popAiContent 로 변환.
-  const handleAiInsert = (data: { html: string; title: string }) => {
-    setAiOpen(false);
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(data.html, 'text/html');
-    const bullets = Array.from(doc.querySelectorAll('li')).map((li) => li.textContent?.trim() || '').filter(Boolean);
-    const paragraphs = Array.from(doc.querySelectorAll('p')).map((p) => p.textContent?.trim() || '').filter(Boolean);
-    setPopAiContent({
-      title: data.title || paragraphs[0] || '',
-      bullets: bullets.slice(0, 3),
-      shortText: paragraphs[0] || '',
-      longText: paragraphs.slice(0, 3).join(' '),
-    });
-    toast.success('AI 문구가 생성되었습니다');
   };
 
   // ─── POP PDF generation ───────────────────────────────────────────────────
@@ -370,32 +317,17 @@ export default function StorePopPage() {
         )}
       </section>
 
-      {/* Step 2: AI 문구 생성 (선택) */}
-      <section style={sectionStyle}>
-        <div style={sectionHeaderStyle}>
-          <span style={stepBadgeStyle}>2</span>
-          <span style={{ fontWeight: 600, color: '#1e293b' }}>AI 문구 생성</span>
-          <span style={{ fontSize: 12, color: '#94a3b8', marginLeft: 8 }}>선택 사항 — 미적용 시 자료 원문 사용</span>
-        </div>
+      {/* WO-O4O-GP-KCOS-POP-QR-BLOG-AI-ENTRY-REMOVE-V1: AI 문구 생성 진입 제거.
+          POP 문구는 선택 자료 원문을 사용한다. 가져온 POP(prefill) 문구가 있을 때만 패널 표시. */}
+      {popAiContent && (
+        <section style={sectionStyle}>
+          <div style={sectionHeaderStyle}>
+            <span style={stepBadgeStyle}>2</span>
+            <span style={{ fontWeight: 600, color: '#1e293b' }}>가져온 POP 문구</span>
+          </div>
 
-        <textarea
-          value={aiPrompt}
-          onChange={(e) => setAiPrompt(e.target.value)}
-          placeholder="POP에 담을 내용을 입력하세요 (비워두면 선택한 자료의 설명을 사용합니다)"
-          rows={3}
-          style={textareaStyle}
-        />
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 10 }}>
-          <button
-            onClick={() => setAiOpen(true)}
-            style={aiGenBtnStyle}
-          >
-            <Sparkles size={14} />
-            AI 문구 생성
-          </button>
-          {/* WO-O4O-POP-SAVE-AS-CONTENT-V1: POP 콘텐츠로 저장 (내 약국 POP 재편집·재제작) */}
-          {popAiContent && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            {/* WO-O4O-POP-SAVE-AS-CONTENT-V1: POP 콘텐츠로 저장 (내 약국 POP 재편집·재제작) */}
             <button
               onClick={handleSaveAsContent}
               disabled={savingContent}
@@ -405,21 +337,17 @@ export default function StorePopPage() {
               <Save size={14} />
               {savingContent ? '저장 중...' : 'POP 콘텐츠로 저장'}
             </button>
-          )}
-          {popAiContent && (
             <button
               onClick={() => setPopAiContent(null)}
               style={{ fontSize: 12, color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
             >
-              AI 문구 제거
+              문구 제거
             </button>
-          )}
-        </div>
+          </div>
 
-        {popAiContent && (
           <div style={aiPreviewStyle}>
             <p style={{ fontWeight: 600, fontSize: 13, color: '#1e293b', marginBottom: 8 }}>
-              ✨ AI 생성 문구 ({popAiContent.title && '제목 포함'})
+              가져온 POP 문구 ({popAiContent.title && '제목 포함'})
             </p>
             {popAiContent.title && (
               <p style={{ fontSize: 14, fontWeight: 600, color: '#1e293b', marginBottom: 6 }}>{popAiContent.title}</p>
@@ -433,8 +361,8 @@ export default function StorePopPage() {
               </ul>
             )}
           </div>
-        )}
-      </section>
+        </section>
+      )}
 
       {/* Step 3: 레이아웃 & 템플릿 */}
       <section style={sectionStyle}>
@@ -545,23 +473,6 @@ export default function StorePopPage() {
         </p>
       )}
 
-      {/* WO-O4O-AI-EDITING-MODAL-ADOPTION-ALIGNMENT-V1: POP 문구 AI 공통 모달(KPA 패턴) */}
-      <AiContentModal
-        open={aiOpen}
-        onClose={() => setAiOpen(false)}
-        editor={null}
-        onInsert={handleAiInsert}
-        initialMode="pop"
-        initialText={buildAiInputText()}
-        templateId={selectedTemplate?.id}
-        templateSystemPrompt={selectedTemplate?.systemPromptOverride}
-        templateForcedOptions={selectedTemplate?.forcedOptions}
-        headerLabel="POP 문구 AI 생성"
-        aiRequestHeaders={(() => {
-          const token = getAccessToken();
-          return token ? { Authorization: `Bearer ${token}` } : undefined;
-        })()}
-      />
     </div>
   );
 }
@@ -629,18 +540,6 @@ const retryBtnStyle: React.CSSProperties = {
   color: '#475569',
   backgroundColor: '#fff',
   cursor: 'pointer',
-};
-
-const textareaStyle: React.CSSProperties = {
-  width: '100%',
-  padding: '10px 12px',
-  border: '1px solid #e2e8f0',
-  borderRadius: 8,
-  fontSize: 14,
-  resize: 'vertical',
-  outline: 'none',
-  fontFamily: 'inherit',
-  boxSizing: 'border-box',
 };
 
 const aiGenBtnStyle: React.CSSProperties = {

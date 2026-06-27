@@ -27,7 +27,7 @@ import {
   type StaffBlogSettings,
 } from '@/api/blogStaff';
 import { fetchChannelOverviewWithCode } from '@/api/storeHub';
-import { RichTextEditor, AiContentModal } from '@o4o/content-editor';
+import { RichTextEditor } from '@o4o/content-editor';
 import { getAccessToken } from '@o4o/auth-client';
 
 type ViewMode = 'list' | 'editor' | 'settings';
@@ -46,19 +46,6 @@ function formatDate(dateStr: string): string {
   return d.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
 }
 
-function extractTitleFromHtml(html: string): string {
-  const match = html.match(/<h[1-3][^>]*>([\s\S]*?)<\/h[1-3]>/i);
-  if (!match) return '';
-  return match[1].replace(/<[^>]+>/g, '').trim();
-}
-
-function htmlToPlain(html: string): string {
-  return html
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
 
 export default function StoreBlogManagePage() {
   const [slug, setSlug] = useState<string | null>(null);
@@ -74,7 +61,6 @@ export default function StoreBlogManagePage() {
   const [editorExcerpt, setEditorExcerpt] = useState('');
   const [editorSlug, setEditorSlug] = useState('');
   const [saving, setSaving] = useState(false);
-  const [aiOpen, setAiOpen] = useState(false);
 
   const [settings, setSettings] = useState<StaffBlogSettings | null>(null);
   const [settingsLoading, setSettingsLoading] = useState(false);
@@ -215,16 +201,6 @@ export default function StoreBlogManagePage() {
     const url = buildPublicUrl(postSlug);
     if (!url) return;
     window.open(url, '_blank', 'noopener,noreferrer');
-  };
-
-  const handleAiInsert = ({ html, title: aiTitle }: { html: string; title: string; sourceUrl?: string }) => {
-    const finalTitle = (aiTitle || '').trim() || extractTitleFromHtml(html);
-    if (finalTitle && !editorTitle.trim()) setEditorTitle(finalTitle);
-    if (!editorExcerpt.trim()) {
-      const plain = htmlToPlain(html);
-      if (plain) setEditorExcerpt(plain.slice(0, 120));
-    }
-    setEditorContent(html);
   };
 
   const openSettings = useCallback(async () => {
@@ -442,18 +418,6 @@ export default function StoreBlogManagePage() {
             />
           </div>
 
-          <div style={aiBanner}>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={aiBannerTitle}>✨ AI 콘텐츠 보조</div>
-              <div style={aiBannerDesc}>
-                URL이나 자료를 정리해 칼럼 초안을 다듬습니다. 최종 글은 직접 작성·검토하세요.
-              </div>
-            </div>
-            <button type="button" onClick={() => setAiOpen(true)} style={aiBannerBtn}>
-              AI로 정리하기
-            </button>
-          </div>
-
           <div>
             <label style={labelStyle}>본문</label>
             <RichTextEditor
@@ -479,19 +443,6 @@ export default function StoreBlogManagePage() {
             </button>
           </div>
         </div>
-
-        <AiContentModal
-          open={aiOpen}
-          onClose={() => setAiOpen(false)}
-          editor={null}
-          onInsert={handleAiInsert}
-          aiRequestHeaders={(() => {
-            const token = getAccessToken();
-            return token ? { Authorization: `Bearer ${token}` } : undefined;
-          })()}
-          headerLabel="AI 칼럼 보조"
-          urlPlaceholder="https://example.com/article 또는 https://www.youtube.com/watch?v=..."
-        />
       </div>
     );
   }
@@ -649,38 +600,3 @@ const inputStyle: React.CSSProperties = {
   boxSizing: 'border-box',
 };
 
-const aiBanner: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: 12,
-  padding: '12px 14px',
-  background: '#eef2ff',
-  border: '1px solid #c7d2fe',
-  borderRadius: 8,
-};
-
-const aiBannerTitle: React.CSSProperties = {
-  fontSize: 13,
-  fontWeight: 600,
-  color: '#4338ca',
-  marginBottom: 2,
-};
-
-const aiBannerDesc: React.CSSProperties = {
-  fontSize: 12,
-  color: '#6366f1',
-  lineHeight: 1.5,
-};
-
-const aiBannerBtn: React.CSSProperties = {
-  padding: '8px 16px',
-  background: '#4f46e5',
-  color: '#fff',
-  border: 'none',
-  borderRadius: 7,
-  fontSize: 13,
-  fontWeight: 600,
-  cursor: 'pointer',
-  whiteSpace: 'nowrap',
-};

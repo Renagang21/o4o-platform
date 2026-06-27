@@ -8,10 +8,9 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
-import { RichTextEditor, AiContentModal } from '@o4o/content-editor';
+import { RichTextEditor } from '@o4o/content-editor';
 import { resourcesApi } from '../../api/resources';
 import { mediaApi } from '../../api/media';
-import { getAccessToken } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -29,12 +28,6 @@ interface UploadedFile {
   url: string;
   fileName: string;
   fileSize: number;
-}
-
-function extractTitleFromHtml(html: string): string {
-  const match = html.match(/<h[1-3][^>]*>([\s\S]*?)<\/h[1-3]>/i);
-  if (!match) return '';
-  return match[1].replace(/<[^>]+>/g, '').trim();
 }
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -60,7 +53,6 @@ export function ResourceWriteModal({ open, onClose, onSuccess }: Props) {
   const [uploadedFile, setUploadedFile] = useState<UploadedFile | null>(null);
   const [usageType, setUsageType] = useState<UsageType>('DOWNLOAD');
   const [externalUrl, setExternalUrl] = useState('');
-  const [aiOpen, setAiOpen] = useState(false);
 
   // body 스크롤 잠금
   useEffect(() => {
@@ -86,12 +78,6 @@ export function ResourceWriteModal({ open, onClose, onSuccess }: Props) {
   const handleClose = () => {
     resetForm();
     onClose();
-  };
-
-  const handleAiInsert = ({ html, title: aiTitle }: { html: string; title: string }) => {
-    const finalTitle = (aiTitle || '').trim() || extractTitleFromHtml(html);
-    if (finalTitle && !title.trim()) setTitle(finalTitle);
-    setBody(html);
   };
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -318,19 +304,6 @@ export function ResourceWriteModal({ open, onClose, onSuccess }: Props) {
           {/* READ / COPY: 본문 편집기 */}
           {(usageType === 'READ' || usageType === 'COPY') && (
             <>
-              <div style={S.aiBanner}>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: '#4338ca', marginBottom: 2 }}>
-                    ✨ AI 보조
-                  </div>
-                  <div style={{ fontSize: 12, color: '#6366f1' }}>
-                    유튜브 URL 또는 콘텐츠 URL로 제목과 본문을 한 번에 생성합니다.
-                  </div>
-                </div>
-                <button type="button" onClick={() => setAiOpen(true)} style={S.aiBannerBtn}>
-                  AI로 만들기
-                </button>
-              </div>
               <div style={S.field}>
                 <label style={S.label}>
                   본문 {usageType === 'COPY' && <span style={S.required}>*</span>}
@@ -426,18 +399,6 @@ export function ResourceWriteModal({ open, onClose, onSuccess }: Props) {
           </button>
         </div>
       </div>
-
-      {/* AI 콘텐츠 생성 모달 (READ/COPY에서만 진입) */}
-      <AiContentModal
-        open={aiOpen}
-        onClose={() => setAiOpen(false)}
-        editor={null}
-        onInsert={handleAiInsert}
-        aiRequestHeaders={(() => {
-          const token = getAccessToken();
-          return token ? { Authorization: `Bearer ${token}` } : undefined;
-        })()}
-      />
     </div>
   );
 }
@@ -679,27 +640,5 @@ const S: Record<string, React.CSSProperties> = {
     border: '1px solid #2563eb',
     borderRadius: 8,
     cursor: 'pointer',
-  },
-  aiBanner: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 12,
-    padding: '12px 14px',
-    marginBottom: 16,
-    background: '#eef2ff',
-    border: '1px solid #c7d2fe',
-    borderRadius: 8,
-  },
-  aiBannerBtn: {
-    padding: '8px 16px',
-    background: '#4f46e5',
-    color: '#fff',
-    border: 'none',
-    borderRadius: 7,
-    fontSize: 13,
-    fontWeight: 600,
-    cursor: 'pointer',
-    whiteSpace: 'nowrap' as const,
   },
 };
