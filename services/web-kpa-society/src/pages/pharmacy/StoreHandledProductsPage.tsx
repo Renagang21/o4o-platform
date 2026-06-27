@@ -1,5 +1,5 @@
 /**
- * StoreHandledProductsPage — 매장 취급제품 (통합 조회, 읽기 전용)
+ * StoreHandledProductsPage — 매장 경영활용 제품 (통합 조회, 읽기 전용)
  *
  * WO-O4O-KPA-STORE-HANDLED-PRODUCTS-UNIFIED-VIEW-V1
  * 선행: IR-O4O-KPA-STORE-HANDLED-PRODUCTS-UNIFIED-VIEW-DESIGN-V1
@@ -57,7 +57,7 @@ function formatDate(iso: string): string {
 }
 
 const EMPTY_BY_SOURCE: Record<SourceFilter, string> = {
-  all: '아직 등록된 매장 취급제품이 없습니다. 상단 버튼에서 O4O 제품 취급 신청 또는 매장 경영활용 제품 등록을 진행하세요.',
+  all: '아직 등록된 매장 경영활용 제품이 없습니다. 상단 버튼에서 O4O 제품 취급 신청 또는 매장 경영활용 제품 등록을 진행하세요.',
   listing: '아직 취급 중인 O4O 제품이 없습니다. ‘O4O 제품 신청’에서 취급 신청을 진행할 수 있습니다.',
   local: '아직 등록된 매장 경영활용 제품이 없습니다. ‘매장 경영활용 제품 등록’에서 추가할 수 있습니다.',
 };
@@ -154,11 +154,11 @@ export default function StoreHandledProductsPage() {
           <div style={styles.breadcrumb}>
             <span>약국 상품·거래</span>
             <span style={{ color: colors.neutral300 }}>/</span>
-            <span style={{ color: colors.neutral700 }}>매장 취급제품</span>
+            <span style={{ color: colors.neutral700 }}>매장 경영활용 제품</span>
           </div>
           <h1 style={styles.title}>
             <Boxes size={20} style={{ color: colors.primary }} />
-            매장 취급제품
+            매장 경영활용 제품
           </h1>
           <p style={styles.subtitle}>
             약국이 취급하는 전체 제품(<strong>O4O 기반 제품</strong> + <strong>매장 경영활용 제품</strong>)을 한 화면에서 확인합니다.
@@ -345,7 +345,7 @@ export default function StoreHandledProductsPage() {
       />
 
       <p style={styles.footnote}>
-        ※ <strong>매장 취급제품</strong>은 진열·콘텐츠·온라인 노출에 활용할 제품 풀입니다. 타블렛 진열·온라인 판매 등 채널별 설정은 각 채널 메뉴에서 관리합니다.
+        ※ <strong>매장 경영활용 제품</strong>은 진열·콘텐츠·온라인 노출에 활용할 제품 풀입니다. 타블렛 진열·온라인 판매 등 채널별 설정은 각 채널 메뉴에서 관리합니다.
         {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-DISPLAY-POOL-SIMPLIFY-V1: 온라인몰 미지원 = 컬럼 대신 보조 안내 */}
         {' '}매장 경영활용 제품은 온라인 판매(온라인몰) 노출을 지원하지 않습니다.
         온라인 주문 이후의 조달·재고·배송·발송·응대는 매장 경영자가 자체적으로 처리합니다.
