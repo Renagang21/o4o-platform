@@ -1,5 +1,5 @@
 /**
- * KpaStoreContentProductLink Entity — 매장 자료함 콘텐츠 ↔ 매장 취급제품 연결
+ * KpaStoreContentProductLink Entity — 매장 자료함 콘텐츠 ↔ 매장 경영활용 제품 연결
  *
  * WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-LINK-V1
  * 선행 IR: IR-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-LINK-MODEL-V1
