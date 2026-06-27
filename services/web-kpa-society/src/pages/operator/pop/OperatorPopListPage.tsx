@@ -332,7 +332,7 @@ export default function OperatorPopListPage() {
           onClick={() => navigate('/operator/pop/new')}
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 shrink-0"
         >
-          <Plus className="w-4 h-4" />새 POP
+          <Plus className="w-4 h-4" />POP 만들기
         </button>
       </header>
 
@@ -423,7 +423,7 @@ export default function OperatorPopListPage() {
             emptyMessage={
               statusFilter
                 ? '해당 상태의 POP 이 없습니다'
-                : '아직 작성한 POP 이 없습니다'
+                : '아직 만든 POP 이 없습니다'
             }
             tableId="operator-pop-list"
             selectable

@@ -369,7 +369,7 @@ export default function OperatorQrListPage() {
           onClick={() => navigate('/operator/qr/new')}
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 shrink-0"
         >
-          <Plus className="w-4 h-4" />새 QR 템플릿
+          <Plus className="w-4 h-4" />QR 템플릿 만들기
         </button>
       </header>
 

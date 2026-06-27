@@ -350,7 +350,7 @@ export default function OperatorBlogListPage() {
           onClick={() => navigate('/operator/blog/new')}
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 shrink-0"
         >
-          <Plus className="w-4 h-4" />새 블로그
+          <Plus className="w-4 h-4" />블로그 글쓰기
         </button>
       </header>
 

@@ -399,7 +399,7 @@ export default function OperatorContentHubPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">콘텐츠 허브</h1>
+          <h1 className="text-2xl font-bold text-slate-800">콘텐츠 허브 관리</h1>
           <p className="text-slate-500 text-sm mt-1">재사용 가능한 콘텐츠를 구조화하여 관리합니다</p>
         </div>
         <div className="flex items-center gap-2">
@@ -424,7 +424,7 @@ export default function OperatorContentHubPage() {
             className="flex items-center gap-2 px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 text-sm font-medium"
           >
             <Plus className="w-4 h-4" />
-            콘텐츠 등록
+            콘텐츠 만들기
           </button>
         </div>
       </div>

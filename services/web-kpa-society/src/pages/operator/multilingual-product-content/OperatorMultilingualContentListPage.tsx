@@ -29,9 +29,10 @@ const STATUS_PILL: Record<OperatorMlcStatus, string> = {
   archived: 'bg-amber-50 text-amber-700 border-amber-200',
 };
 const STATUS_LABEL: Record<OperatorMlcStatus, string> = {
+  // WO-O4O-KPA-OPERATOR-STORE-CONTENT-MENU-TERMINOLOGY-ALIGNMENT-V1: 상태 라벨 통일(초안/발행/보관)
   draft: '초안',
-  published: '발행됨',
-  archived: '보관됨',
+  published: '발행',
+  archived: '보관',
 };
 
 /**
@@ -142,7 +143,7 @@ export default function OperatorMultilingualContentListPage() {
           className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 shrink-0"
         >
           <Plus className="w-4 h-4" />
-          새 콘텐츠 작성
+          콘텐츠 만들기
         </button>
       </header>
 

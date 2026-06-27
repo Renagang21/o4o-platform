@@ -42,8 +42,9 @@ type ViewMode = 'list' | 'editor' | 'settings';
 type StatusFilter = 'all' | 'draft' | 'published' | 'archived';
 
 const STATUS_LABELS: Record<string, { label: string; color: string; bg: string }> = {
-  draft: { label: '임시저장', color: '#64748b', bg: '#f1f5f9' },
-  published: { label: '발행됨', color: '#16a34a', bg: '#f0fdf4' },
+  // WO-O4O-KPA-OPERATOR-STORE-CONTENT-MENU-TERMINOLOGY-ALIGNMENT-V1: 상태 라벨 통일(초안/발행/보관)
+  draft: { label: '초안', color: '#64748b', bg: '#f1f5f9' },
+  published: { label: '발행', color: '#16a34a', bg: '#f0fdf4' },
   archived: { label: '보관', color: '#d97706', bg: '#fefce8' },
 };
 

@@ -325,7 +325,7 @@ export default function OperatorVideoListPage() {
           onClick={() => navigate('/operator/video/new')}
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 shrink-0"
         >
-          <Plus className="w-4 h-4" />새 동영상
+          <Plus className="w-4 h-4" />동영상 만들기
         </button>
       </header>
 
@@ -416,7 +416,7 @@ export default function OperatorVideoListPage() {
             emptyMessage={
               statusFilter
                 ? '해당 상태의 동영상이 없습니다'
-                : '아직 등록한 동영상이 없습니다'
+                : '아직 만든 동영상이 없습니다'
             }
             tableId="operator-video-list"
             selectable

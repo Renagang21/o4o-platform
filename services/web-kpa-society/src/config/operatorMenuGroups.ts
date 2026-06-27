@@ -76,7 +76,7 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   content: [
     { label: '공지사항/뉴스', path: '/operator/content' },
     { label: 'Home 편집', path: '/operator/community' },
-    { label: '콘텐츠 허브', path: '/operator/docs' },
+    { label: '콘텐츠 허브 관리', path: '/operator/docs' },
     { label: '설문조사 관리', path: '/operator/surveys' },
   ],
   // WO-KPA-LMS-INSTRUCTOR-APPROVAL-RELOCATE-V1: 자료실 독립 최상위 그룹
@@ -166,7 +166,7 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
   content: [
     { label: '공지사항/뉴스', path: '/operator/content' },
     { label: 'Home 편집', path: '/operator/community' },
-    { label: '콘텐츠 허브', path: '/operator/docs' },
+    { label: '콘텐츠 허브 관리', path: '/operator/docs' },
     // WO-O4O-CROSSSERVICE-OPERATOR-CONTENT-MENU-PARITY-V1
     { label: '설문조사 관리', path: '/operator/surveys' },
   ],
