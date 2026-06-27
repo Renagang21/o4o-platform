@@ -1,8 +1,10 @@
 # IR-O4O-KPA-CONTENT-CENTERED-PRODUCTION-FLOW-AUDIT-V1
 
 > KPA 매장 콘텐츠/QR/POP/블로그/사이니지/제작자료 흐름 전수 조사 (read-only)
-> 작성: 2026-06-25 · 상태: Investigation (코드/DB 무변경)
+> 작성: 2026-06-25 · 상태: **Superseded (대부분 구현 완료)** · 갱신: 2026-06-27
 > 목적: "무엇이 어디에서 만들어지고 어디에서 참조되는가"를 확정하여 후속 정비 WO의 기준선 수립
+
+> ⚠️ **SUPERSEDED 노트 (2026-06-27):** 본 IR 작성(2026-06-25) 시점과 거의 동시에 **병렬 세션이 §13 후속 후보 1~7을 이미 구현·smoke PASS** 완료했다(아래 §13 각 항목의 ✅ 커밋 참조). 따라서 본 IR의 구조 분석(§A~F, §8)은 기준선으로 유효하나, **§13 "후속 WO"는 대부분 obsolete**이며 신규 착수 대상이 아니다. 명확히 남은 항목(#8 등)은 병렬 작업 종료 후 별도 재조사 예정.
 
 ---
 
@@ -240,16 +242,22 @@ SELECT count(*) FROM store_execution_assets e
 
 ---
 
-## 13. 후속 WO 후보 (우선순위 순)
+## 13. 후속 WO 후보 → 실제 구현 현황 (2026-06-27 git log 대조)
 
-1. **`WO-O4O-KPA-CONTENT-LIST-SEARCH-TAG-V1`** — feed 검색을 제목→본문+요약+태그로 확장. `kpa_store_contents`/`o4o_asset_snapshots`/`store_execution_assets`에 `tags jsonb` 추가(migration) + GIN 인덱스. (선행: 태그 입력 UX)
-2. **`WO-O4O-KPA-CONTENT-LIST-INLINE-QR-CREATE-V1`** — 콘텐츠 목록에서 항목 선택 → 그 자리에서 QR 만들기 모달 호출(메뉴 이동 제거). 기존 QR 생성 계약 재사용.
-3. **`WO-O4O-KPA-CONTENT-LIST-INLINE-POP-CREATE-V1`** — 콘텐츠 목록에서 POP 만들기 모달/에디터 직접 호출.
-4. **`WO-O4O-KPA-QR-POP-RESULT-SCOPE-V1`** — QR/POP 저장 결과가 각 메뉴에만 남도록 정리(POP PDF 결과물이 콘텐츠 목록에 섞이는 중복 노출 제거).
-5. **`WO-O4O-KPA-PRODUCTION-MATERIALS-MENU-HIDE-V1`** — 제작자료 **메뉴만 숨김**(route 유지), 저장 후 redirect 목적지 재지정. config의 KPA 항목만 수정.
-6. **`WO-O4O-KPA-BLOG-EDITOR-ONLY-V1`** — 블로그 자동 생성/콘텐츠 변환/AI 버튼 제거(편집기만). GP 동일 페이지 영향 협의.
-7. **`WO-O4O-KPA-QR-AI-STEP-REMOVE-V1`** — QR 제작 흐름의 AI 생성 버튼 제거(KPA 전용 안전). POP/블로그는 GP/KCos 공유라 별도 협의.
-8. **`WO-O4O-KPA-CONTENT-SOURCE-CANONICAL-V1`** — 신규 콘텐츠 생성을 direct content로 수렴, execution-asset content는 legacy target 유지(C안 실행).
+> 본 IR 작성과 거의 동시에 병렬 세션이 1~7을 구현·smoke PASS 완료. 신규 착수 대상은 #8(장기)만 남음.
+
+| # | 후보 WO | 상태 | 증거 커밋 |
+|:-:|---------|:----:|-----------|
+| 1 | 콘텐츠 목록 검색/태그 확장 | ✅ **완료** | `b95f131c4` 태그 검색/필터+출처 탭 (`WO-O4O-KPA-CONTENT-LIST-TAG-SEARCH-FILTER-V1`), `efdf36125` 태그 필드, `4d5f942be` 검색 제목→본문/요약 |
+| 2 | 콘텐츠 목록 인라인 QR 생성 | ✅ **완료** | `3895d5cd9` (`WO-O4O-KPA-CONTENT-LIST-INLINE-QR-CREATE-V1`) + `794501935` smoke PASS |
+| 3 | 콘텐츠 목록 인라인 POP 생성 | ✅ **완료** | `b194e01ed` (`WO-O4O-KPA-CONTENT-LIST-INLINE-POP-CREATE-V1`) + `05d4211c2` smoke PASS |
+| 4 | QR/POP 결과물 노출 범위 정리 | ✅ **완료** | `4a56bd3fb` (`WO-O4O-KPA-QR-POP-RESULT-SCOPE-V1`) + `d40a679d5` smoke PASS, `0bf9da384` POP PDF 목록 |
+| 5 | 제작자료 메뉴 숨김 | ✅ **완료** | `4a56bd3fb` (#4와 동일 WO에 포함 — 매장 제작 자료 메뉴 숨김) |
+| 6 | 블로그/콘텐츠 AI 진입 제거 | ✅ **완료** | `5d39312a6` POP/Blog/resources AI 진입 제거(gp/kcos/kpa), `8b71a4ff8`/`cd1ab82a8` content-creation AI 제거, `422132d13` dead client wrapper 정리 |
+| 7 | QR 제작 AI 단계 제거 | ✅ **완료** | `5d022ae00` (`WO-O4O-KPA-QR-AI-STEP-REMOVE-V1`) + `0ed225f18` smoke PASS |
+| 8 | 콘텐츠 source canonical 전환 | ⏳ **재조사 필요** | 신규 생성 direct 수렴 / execution legacy 정리(C안). 병렬 작업 종료 후 현재 코드 기준 재감사 예정 |
+
+**남은 작업 = #8 뿐(추정).** 1~7은 본 IR이 제안하기 전/동시에 이미 완료됨. #8의 실제 잔여 범위는 병렬 세션 종료 후 별도 재조사로 확정한다.
 
 ---
 
