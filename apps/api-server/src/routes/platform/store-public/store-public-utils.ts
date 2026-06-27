@@ -331,6 +331,10 @@ export async function queryTabletVisibleProducts(
          -- 기존 tablet 도 description 을 strip 없이 반환 → HTML 보존(기존 처리 방식 유지).
          COALESCE(spd.content, sp.description, spo.consumer_detail_description, '') AS description,
          COALESCE(spd.summary, spo.consumer_short_description, '') AS short_description,
+         -- WO-O4O-KPA-TABLET-DISPLAY-CONTENT-SELECTION-V1: 진열 선택 콘텐츠(첫 active tablet, 링크 유효 시에만).
+         tc.id AS "selectedContentId",
+         tc.title AS "selectedContentTitle",
+         COALESCE(tc.content_json->>'html', tc.content_json->>'body', '') AS "selectedContentHtml",
          opl.created_at AS sort_order,
          spo.created_at, spo.updated_at,
          opl.organization_id AS pharmacy_id
@@ -358,6 +362,22 @@ export async function queryTabletVisibleProducts(
          ON spd.master_id = pm.id
          AND spd.status = 'canonical'
          AND spd.deleted_at IS NULL
+       -- WO-O4O-KPA-TABLET-DISPLAY-CONTENT-SELECTION-V1: 첫 active tablet 진열의 선택 콘텐츠 attach.
+       --   링크(kpa_store_content_product_links)가 유효할 때만 노출 → 연결 해제 시 폴백.
+       --   콘텐츠 삭제 시 store_tablet_displays.content_id 가 SET NULL → IS NOT NULL 필터로 자동 폴백.
+       LEFT JOIN store_tablet_displays std
+         ON std.product_id = opl.id AND std.product_type = 'supplier' AND std.content_id IS NOT NULL
+         AND std.tablet_id = (
+           SELECT id FROM store_tablets
+           WHERE organization_id = $1 AND is_active = true
+           ORDER BY created_at ASC LIMIT 1
+         )
+       LEFT JOIN kpa_store_content_product_links scl
+         ON scl.organization_id = $1 AND scl.content_id = std.content_id
+         AND scl.link_type = 'product_description'
+         AND scl.product_source_type = 'listing' AND scl.product_source_id = opl.id
+       LEFT JOIN kpa_store_contents tc
+         ON tc.id = scl.content_id AND tc.organization_id = $1
        WHERE spo.is_active = true
          AND s.status = 'ACTIVE'
          ${whereExtra}

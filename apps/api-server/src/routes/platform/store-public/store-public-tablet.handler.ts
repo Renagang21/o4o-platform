@@ -57,12 +57,29 @@ export function createStorePublicTabletRoutes(deps: {
       // DB UNION 금지, 애플리케이션 레벨 merge
       // WO-STORE-LOCAL-PRODUCT-CONTENT-REFINEMENT-V1: 콘텐츠 블록 필드 포함
       // detail_html, usage_info, caution_info는 목록에서 제외 (상세 조회 시에만)
+      // WO-O4O-KPA-TABLET-DISPLAY-CONTENT-SELECTION-V1: 첫 active tablet 진열의 선택 콘텐츠 attach(링크 유효 시에만).
       const localProducts = await dataSource.query(
-        `SELECT id, name, description, summary, thumbnail_url, images, gallery_images,
-                category, price_display, badge_type, highlight_flag, sort_order
-         FROM store_local_products
-         WHERE organization_id = $1 AND is_active = true
-         ORDER BY sort_order ASC, name ASC`,
+        `SELECT lp.id, lp.name, lp.description, lp.summary, lp.thumbnail_url, lp.images, lp.gallery_images,
+                lp.category, lp.price_display, lp.badge_type, lp.highlight_flag, lp.sort_order,
+                tc.id AS "selectedContentId",
+                tc.title AS "selectedContentTitle",
+                COALESCE(tc.content_json->>'html', tc.content_json->>'body', '') AS "selectedContentHtml"
+         FROM store_local_products lp
+         LEFT JOIN store_tablet_displays std
+           ON std.product_id = lp.id AND std.product_type = 'local' AND std.content_id IS NOT NULL
+           AND std.tablet_id = (
+             SELECT id FROM store_tablets
+             WHERE organization_id = $1 AND is_active = true
+             ORDER BY created_at ASC LIMIT 1
+           )
+         LEFT JOIN kpa_store_content_product_links scl
+           ON scl.organization_id = $1 AND scl.content_id = std.content_id
+           AND scl.link_type = 'product_description'
+           AND scl.product_source_type = 'local' AND scl.product_source_id = lp.id
+         LEFT JOIN kpa_store_contents tc
+           ON tc.id = scl.content_id AND tc.organization_id = $1
+         WHERE lp.organization_id = $1 AND lp.is_active = true
+         ORDER BY lp.sort_order ASC, lp.name ASC`,
         [resolved.storeId],
       );
 
