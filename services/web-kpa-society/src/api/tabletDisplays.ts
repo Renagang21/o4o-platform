@@ -31,6 +31,11 @@ export interface DisplayItem {
   sort_order: number;
   is_visible: boolean;
   created_at?: string;
+  // WO-O4O-KPA-TABLET-DISPLAY-CONTENT-SELECTION-V1: 진열별 선택 콘텐츠(미선택/삭제 시 null).
+  contentId?: string | null;
+  contentTitle?: string | null;
+  contentSourceType?: 'direct' | 'snapshot_edit' | null;
+  contentStatus?: string | null;
 }
 
 export interface PoolSupplierProduct {
@@ -152,6 +157,8 @@ export async function saveTabletDisplays(
     productId: string;
     sortOrder: number;
     isVisible?: boolean;
+    // WO-O4O-KPA-TABLET-DISPLAY-CONTENT-SELECTION-V1: 진열별 선택 콘텐츠(null=선택 해제).
+    contentId?: string | null;
   }>,
 ): Promise<DisplayItem[]> {
   const res = await request<{ success: boolean; data: DisplayItem[] }>(

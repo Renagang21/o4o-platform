@@ -15,7 +15,7 @@
  *      - kiosk runtime 은 매장의 첫 active tablet row 의 값을 사용 (public API)
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Loader2, Tablet, ChevronUp, ChevronDown, X, Plus,
@@ -30,7 +30,7 @@ import { fetchTabletProducts, fetchTabletSettings } from '../../api/tablet';
 import { getStoreSlug } from '../../api/pharmacyInfo';
 import { extractSnapshotMediaList, type SnapshotForMedia } from '@o4o/store-asset-policy-core';
 import { getStoreExecutionAssets } from '../../api/storeExecutionAssets';
-import { assetSnapshotApi } from '../../api/assetSnapshot';
+import { assetSnapshotApi, handledProductContentApi, type LinkedContentItem } from '../../api/assetSnapshot';
 import {
   fetchTablets,
   createTablet,
@@ -54,6 +54,26 @@ interface DisplayEntry {
   productName: string;
   sortOrder: number;
   isVisible: boolean;
+  // WO-O4O-KPA-TABLET-DISPLAY-CONTENT-SELECTION-V1: 진열별 선택 콘텐츠(null=선택 안 함). 기본 콘텐츠 미지정.
+  contentId: string | null;
+}
+
+// 콘텐츠 상태 → 한글 라벨 (workspace_status)
+const CONTENT_STATUS_LABEL: Record<string, string> = {
+  draft: '초안',
+  pending_ai: 'AI 대기',
+  ai_processed: 'AI 처리됨',
+  ready_curation: '큐레이션 준비',
+  archived: '보관됨',
+};
+
+function contentOptionLabel(it: LinkedContentItem): string {
+  const status = CONTENT_STATUS_LABEL[it.status] ?? it.status;
+  const date = (() => {
+    const d = new Date(it.updatedAt);
+    return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString('ko-KR');
+  })();
+  return [it.title || '(제목 없음)', status, date].filter(Boolean).join(' · ');
 }
 
 // ==================== Component ====================
@@ -72,6 +92,11 @@ export default function StoreTabletDisplaysPage() {
   const [loadingPool, setLoadingPool] = useState(false);
   const [saving, setSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
+
+  // WO-O4O-KPA-TABLET-DISPLAY-CONTENT-SELECTION-V1: 진열 제품별 연결 콘텐츠 후보(by-product) 캐시.
+  const [contentCandidates, setContentCandidates] = useState<Record<string, LinkedContentItem[]>>({});
+  const contentCandidatesRef = useRef(contentCandidates);
+  contentCandidatesRef.current = contentCandidates;
 
   // Pool tab
   const [poolTab, setPoolTab] = useState<'supplier' | 'local'>('supplier');
@@ -229,6 +254,7 @@ export default function StoreTabletDisplaysPage() {
           productName,
           sortOrder: d.sort_order,
           isVisible: d.is_visible,
+          contentId: d.contentId ?? null,
         };
       });
       setDisplays(entries);
@@ -244,6 +270,64 @@ export default function StoreTabletDisplaysPage() {
   useEffect(() => {
     loadTabletData();
   }, [loadTabletData]);
+
+  // WO-O4O-KPA-TABLET-DISPLAY-CONTENT-SELECTION-V1:
+  //   진열 제품별 연결 콘텐츠 후보를 by-product 로 조회(캐시). supplier↔listing / local↔local 매핑.
+  const displayKeysStr = useMemo(
+    () => Array.from(new Set(displays.map((d) => `${d.productType}:${d.productId}`))).join('|'),
+    [displays],
+  );
+  useEffect(() => {
+    const keys = displayKeysStr ? displayKeysStr.split('|') : [];
+    const missing = keys.filter((k) => !(k in contentCandidatesRef.current));
+    if (missing.length === 0) return;
+    let cancelled = false;
+    (async () => {
+      const results = await Promise.all(
+        missing.map(async (k) => {
+          const [ptype, pid] = k.split(':');
+          const sourceType = ptype === 'supplier' ? 'listing' : 'local';
+          try {
+            const res = await handledProductContentApi.byProduct(sourceType, pid);
+            return [k, res?.data?.items ?? []] as const;
+          } catch {
+            return [k, [] as LinkedContentItem[]] as const;
+          }
+        }),
+      );
+      if (cancelled) return;
+      setContentCandidates((prev) => {
+        const next = { ...prev };
+        results.forEach(([k, v]) => { next[k] = v; });
+        return next;
+      });
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [displayKeysStr]);
+
+  // 진열 항목 선택 콘텐츠 변경(null=선택 안 함). 콘텐츠가 1개여도 자동 선택하지 않는다(직접 선택).
+  const setContentForIndex = useCallback((index: number, contentId: string | null) => {
+    setDisplays((prev) => prev.map((d, i) => (i === index ? { ...d, contentId } : d)));
+    setHasChanges(true);
+  }, []);
+
+  // 후보 로드 후, 더 이상 연결되지 않은(unlink) 선택 콘텐츠는 자동 해제 → 저장 시 400 방지 + 폴백 정합.
+  useEffect(() => {
+    setDisplays((prev) => {
+      let changed = false;
+      const next = prev.map((d) => {
+        if (!d.contentId) return d;
+        const cands = contentCandidates[`${d.productType}:${d.productId}`];
+        if (cands && !cands.some((c) => c.contentId === d.contentId)) {
+          changed = true;
+          return { ...d, contentId: null };
+        }
+        return d;
+      });
+      return changed ? next : prev;
+    });
+  }, [contentCandidates]);
 
   // Already in display?
   const isInDisplay = (productType: string, productId: string) =>
@@ -280,6 +364,7 @@ export default function StoreTabletDisplaysPage() {
           productName: item.name,
           sortOrder: displays.length + newEntries.length,
           isVisible: true,
+          contentId: null,
         });
       }
     }
@@ -318,6 +403,7 @@ export default function StoreTabletDisplaysPage() {
           productId: d.productId,
           sortOrder: i,
           isVisible: d.isVisible,
+          contentId: d.contentId,
         })),
       );
       setToast({ type: 'success', message: '진열 구성이 저장되었습니다.' });
@@ -973,55 +1059,90 @@ export default function StoreTabletDisplaysPage() {
                     </div>
                   ) : (
                     <div className="divide-y">
-                      {displays.map((entry, index) => (
-                        <div
-                          key={`${entry.productType}-${entry.productId}`}
-                          className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50"
-                        >
-                          <span className="text-xs text-slate-400 w-5 text-right">
-                            {index + 1}
-                          </span>
-                          <div className="flex-1 min-w-0">
-                            <span className="text-sm text-slate-900 truncate block">
-                              {entry.productName}
-                            </span>
-                          </div>
-                          <span
-                            className={`text-[10px] font-medium px-1.5 py-0.5 rounded flex-shrink-0 ${
-                              entry.productType === 'supplier'
-                                ? 'bg-blue-50 text-blue-600'
-                                : 'bg-amber-50 text-amber-600'
-                            }`}
+                      {displays.map((entry, index) => {
+                        // WO-O4O-KPA-TABLET-DISPLAY-CONTENT-SELECTION-V1: 진열별 표시 콘텐츠 후보/선택.
+                        const candKey = `${entry.productType}:${entry.productId}`;
+                        const candidates = contentCandidates[candKey];
+                        const selectValue = candidates?.some((c) => c.contentId === entry.contentId)
+                          ? (entry.contentId as string)
+                          : '';
+                        return (
+                          <div
+                            key={`${entry.productType}-${entry.productId}`}
+                            className="px-4 py-2.5 hover:bg-slate-50"
                           >
-                            {entry.productType === 'supplier' ? '공급' : '자체'}
-                          </span>
-                          <div className="flex items-center gap-0.5 flex-shrink-0">
-                            <button
-                              onClick={() => moveItem(index, 'up')}
-                              disabled={index === 0}
-                              className="p-1 rounded hover:bg-slate-100 disabled:opacity-30"
-                              title="위로"
-                            >
-                              <ChevronUp className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                              onClick={() => moveItem(index, 'down')}
-                              disabled={index === displays.length - 1}
-                              className="p-1 rounded hover:bg-slate-100 disabled:opacity-30"
-                              title="아래로"
-                            >
-                              <ChevronDown className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                              onClick={() => removeItem(index)}
-                              className="p-1 rounded hover:bg-red-50 text-slate-400 hover:text-red-600"
-                              title="제거"
-                            >
-                              <X className="w-3.5 h-3.5" />
-                            </button>
+                            <div className="flex items-center gap-3">
+                              <span className="text-xs text-slate-400 w-5 text-right">
+                                {index + 1}
+                              </span>
+                              <div className="flex-1 min-w-0">
+                                <span className="text-sm text-slate-900 truncate block">
+                                  {entry.productName}
+                                </span>
+                              </div>
+                              <span
+                                className={`text-[10px] font-medium px-1.5 py-0.5 rounded flex-shrink-0 ${
+                                  entry.productType === 'supplier'
+                                    ? 'bg-blue-50 text-blue-600'
+                                    : 'bg-amber-50 text-amber-600'
+                                }`}
+                              >
+                                {entry.productType === 'supplier' ? '공급' : '자체'}
+                              </span>
+                              <div className="flex items-center gap-0.5 flex-shrink-0">
+                                <button
+                                  onClick={() => moveItem(index, 'up')}
+                                  disabled={index === 0}
+                                  className="p-1 rounded hover:bg-slate-100 disabled:opacity-30"
+                                  title="위로"
+                                >
+                                  <ChevronUp className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  onClick={() => moveItem(index, 'down')}
+                                  disabled={index === displays.length - 1}
+                                  className="p-1 rounded hover:bg-slate-100 disabled:opacity-30"
+                                  title="아래로"
+                                >
+                                  <ChevronDown className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  onClick={() => removeItem(index)}
+                                  className="p-1 rounded hover:bg-red-50 text-slate-400 hover:text-red-600"
+                                  title="제거"
+                                >
+                                  <X className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* 표시할 설명 콘텐츠 선택 (기본 콘텐츠 미지정 — 진열마다 직접 선택) */}
+                            <div className="mt-2 pl-7">
+                              <label className="block text-[11px] font-medium text-slate-500 mb-1">
+                                표시할 설명 콘텐츠
+                              </label>
+                              {candidates === undefined ? (
+                                <span className="text-xs text-slate-400">불러오는 중…</span>
+                              ) : candidates.length === 0 ? (
+                                <span className="text-xs text-slate-400">이 제품에 연결된 콘텐츠가 없습니다.</span>
+                              ) : (
+                                <select
+                                  value={selectValue}
+                                  onChange={(e) => setContentForIndex(index, e.target.value || null)}
+                                  className="w-full text-xs border border-slate-300 rounded px-2 py-1.5 bg-white"
+                                >
+                                  <option value="">설명 콘텐츠 선택 안 함</option>
+                                  {candidates.map((c) => (
+                                    <option key={c.contentId} value={c.contentId}>
+                                      {contentOptionLabel(c)}
+                                    </option>
+                                  ))}
+                                </select>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </div>

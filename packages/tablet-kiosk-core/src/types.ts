@@ -20,6 +20,10 @@ export interface TabletProduct {
   description?: string;
   short_description?: string;
   channel_price?: number;
+  // WO-O4O-KPA-TABLET-DISPLAY-CONTENT-SELECTION-V1: 진열 선택 콘텐츠(없으면 미포함/null). additive — 미사용 서비스 무영향.
+  selectedContentId?: string | null;
+  selectedContentTitle?: string | null;
+  selectedContentHtml?: string | null;
 }
 
 export interface TabletProductsResponse {

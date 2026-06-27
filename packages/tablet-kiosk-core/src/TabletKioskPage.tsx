@@ -81,6 +81,9 @@ interface DisplayProduct {
   summary?: string;
   category?: string;
   imageUrl?: string;
+  // WO-O4O-KPA-TABLET-DISPLAY-CONTENT-SELECTION-V1: 진열 선택 콘텐츠(있으면 상세를 이 콘텐츠로 표시).
+  selectedContentTitle?: string | null;
+  selectedContentHtml?: string | null;
 }
 
 // ── Reducer (internal) ──
@@ -230,6 +233,8 @@ function mapSupplierProduct(p: TabletProduct): DisplayProduct {
     summary: p.short_description,
     category: p.category,
     imageUrl: p.images?.[0]?.url,
+    selectedContentTitle: p.selectedContentTitle,
+    selectedContentHtml: p.selectedContentHtml,
   };
 }
 
@@ -243,6 +248,8 @@ function mapLocalProduct(p: any): DisplayProduct {
     summary: p.summary,
     category: p.category,
     imageUrl: p.thumbnail_url || p.images?.[0],
+    selectedContentTitle: p.selectedContentTitle,
+    selectedContentHtml: p.selectedContentHtml,
   };
 }
 
@@ -536,17 +543,36 @@ export function TabletKioskPage({
                 {selectedProduct.price ? formatPrice(selectedProduct.price) : selectedProduct.priceDisplay || '가격 문의'}
               </p>
             )}
-            {selectedProduct.description && (
-              <ContentRenderer
-                html={selectedProduct.description}
-                style={{ fontSize: '15px', color: '#475569', lineHeight: 1.6, margin: '0 0 8px' }}
-              />
-            )}
-            {selectedProduct.summary && (
-              <ContentRenderer
-                html={selectedProduct.summary}
-                style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.5, margin: '0 0 16px' }}
-              />
+            {/* WO-O4O-KPA-TABLET-DISPLAY-CONTENT-SELECTION-V1:
+                진열 선택 콘텐츠가 있으면 제목+본문으로 상세를 표시(기존 sanitizer 경로 ContentRenderer 재사용).
+                없으면 기존 제품 description/summary 표시. 선택 콘텐츠 삭제/연결 해제 시 백엔드가 null 로 폴백. */}
+            {selectedProduct.selectedContentHtml ? (
+              <>
+                {selectedProduct.selectedContentTitle && (
+                  <h3 style={{ fontSize: '17px', fontWeight: 700, color: '#0f172a', margin: '4px 0 8px' }}>
+                    {selectedProduct.selectedContentTitle}
+                  </h3>
+                )}
+                <ContentRenderer
+                  html={selectedProduct.selectedContentHtml}
+                  style={{ fontSize: '15px', color: '#475569', lineHeight: 1.6, margin: '0 0 16px' }}
+                />
+              </>
+            ) : (
+              <>
+                {selectedProduct.description && (
+                  <ContentRenderer
+                    html={selectedProduct.description}
+                    style={{ fontSize: '15px', color: '#475569', lineHeight: 1.6, margin: '0 0 8px' }}
+                  />
+                )}
+                {selectedProduct.summary && (
+                  <ContentRenderer
+                    html={selectedProduct.summary}
+                    style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.5, margin: '0 0 16px' }}
+                  />
+                )}
+              </>
             )}
 
             {/* Customer Info (optional) */}
