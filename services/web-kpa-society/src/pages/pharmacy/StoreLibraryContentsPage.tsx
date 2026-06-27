@@ -22,7 +22,7 @@
 
 import { useState, useCallback, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, RefreshCw, PenSquare, Megaphone, QrCode, PenLine, Lightbulb } from 'lucide-react';
+import { BookOpen, RefreshCw, PenSquare, Lightbulb } from 'lucide-react';
 import { AiContentModal } from '@o4o/content-editor';
 // WO-O4O-KPA-STORE-LIBRARY-CONTENT-CREATION-GUIDE-MODAL-V1: 콘텐츠 제작 가이드(안내 UI)
 import { ContentCreationGuideModal } from './ContentCreationGuideModal';
@@ -35,17 +35,6 @@ import { StartProductionModal, type ProductionSource, type ProductionSourceItem 
 import { CreateContentFromResourcesModal } from './CreateContentFromResourcesModal';
 import { composeSourceTextFromItems } from './productionTargets';
 import { StoreContentsSelector } from './StoreContentsSelector';
-
-// ─── WO-KPA-STORE-CONTENT-LIBRARY-CROSS-CREATE-CTA-V1 ─────────────────────────
-// 콘텐츠를 기반으로 POP·QR·블로그 제작 화면으로 바로 이동(교차 진입).
-// 기존 제작 화면(route)만 재사용 — 신규 API/DB 없음. (IR Phase 1)
-// WO-O4O-KPA-STORE-LIBRARY-CONTENT-CREATION-GUIDE-MODAL-V1:
-//   사이니지는 별도 디스플레이/재생 운영 영역(전용 메뉴 보유)이므로 콘텐츠 자료함 활용처에서 제외.
-const QUICK_CREATE: { key: string; label: string; icon: typeof Megaphone; to: string }[] = [
-  { key: 'pop',     label: 'POP 만들기',      icon: Megaphone,   to: '/store/marketing/pop' },
-  { key: 'qr',      label: 'QR-code 만들기',  icon: QrCode,      to: '/store/marketing/qr' },
-  { key: 'blog',    label: '블로그 글쓰기',    icon: PenLine,     to: '/store/content/blog' },
-];
 
 export default function StoreLibraryContentsPage() {
   const navigate = useNavigate();
@@ -120,7 +109,7 @@ export default function StoreLibraryContentsPage() {
             콘텐츠
           </h1>
           <p style={styles.subtitle}>
-            콘텐츠(Full Copy 자산)와 강의(LMS 참조 자산)를 함께 관리합니다. 선택 후 "제작 시작"으로 POP / QR / 블로그 / 상품 상세설명을 만들 수 있습니다.
+            콘텐츠(Full Copy 자산)와 강의(LMS 참조 자산)를 함께 관리합니다. 콘텐츠를 선택하면 하단 작업막대에서 필요한 제작 기능을 사용할 수 있습니다.
           </p>
         </div>
         <div style={styles.headerActions}>
@@ -141,25 +130,6 @@ export default function StoreLibraryContentsPage() {
             <RefreshCw size={14} />
             새로고침
           </button>
-        </div>
-      </div>
-
-      {/* WO-KPA-STORE-CONTENT-LIBRARY-CROSS-CREATE-CTA-V1: 재사용 안내 + 바로 만들기 진입 */}
-      {/* WO-O4O-KPA-STORE-LIBRARY-CONTENT-CREATION-GUIDE-MODAL-V1: 안내문 축약(사이니지 제외). 상세는 가이드 모달. */}
-      <div style={styles.useBanner}>
-        <p style={styles.useBannerText}>
-          콘텐츠를 편집하고 <strong>QR · PDF · POP · 블로그</strong> 제작에 활용하세요.
-        </p>
-        <div style={styles.useBannerActions}>
-          {QUICK_CREATE.map((c) => {
-            const Icon = c.icon;
-            return (
-              <button key={c.key} type="button" onClick={() => navigate(c.to)} style={styles.useChip}>
-                <Icon size={13} />
-                {c.label}
-              </button>
-            );
-          })}
         </div>
       </div>
 
@@ -293,40 +263,6 @@ const styles: Record<string, CSSProperties> = {
     fontSize: '13px',
     fontWeight: 500,
     color: colors.primary,
-    cursor: 'pointer',
-  },
-  useBanner: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '10px',
-    padding: '12px 14px',
-    background: '#EFF6FF',
-    border: '1px solid #DBEAFE',
-    borderRadius: '8px',
-    marginBottom: '16px',
-  },
-  useBannerText: {
-    fontSize: '13px',
-    color: colors.neutral600,
-    lineHeight: 1.6,
-    margin: 0,
-  },
-  useBannerActions: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: '8px',
-  },
-  useChip: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '6px',
-    padding: '6px 12px',
-    background: colors.white,
-    border: `1px solid ${colors.neutral300}`,
-    borderRadius: '6px',
-    fontSize: '13px',
-    fontWeight: 500,
-    color: colors.neutral700,
     cursor: 'pointer',
   },
 };
