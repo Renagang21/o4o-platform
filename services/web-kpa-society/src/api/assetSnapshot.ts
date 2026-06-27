@@ -337,7 +337,7 @@ export interface LinkedContentItem {
 
 export const handledProductContentApi = {
   /**
-   * 특정 매장 취급제품에 연결된 자료함 콘텐츠 목록.
+   * 특정 매장 경영활용 제품에 연결된 자료함 콘텐츠 목록.
    * GET /store-contents/by-product?sourceType=listing|local&sourceId=...
    */
   byProduct: (sourceType: HandledProductSourceType, sourceId: string) =>
