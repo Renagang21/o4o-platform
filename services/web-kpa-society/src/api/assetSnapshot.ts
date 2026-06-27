@@ -347,6 +347,43 @@ export const handledProductContentApi = {
     ),
 };
 
+// ─── O4O B2C 상세설명 가져오기 (WO-O4O-KPA-O4O-B2C-DESCRIPTION-COPY-TO-STORE-CONTENT-V1) ──
+
+export interface B2cDescriptionItem {
+  descriptionId: string;
+  /** 제목 필드 없음 → 제품명 표시 */
+  title: string;
+  language: string;
+  status: string;
+  summary: string | null;
+  updatedAt: string;
+}
+
+export interface ImportedB2cContent {
+  id: string;
+  sourceType: 'direct';
+  title: string;
+  status: string;
+  masterId: string;
+  updatedAt: string;
+}
+
+export const b2cDescriptionApi = {
+  /** listing(=master)에 가져올 수 있는 canonical B2C 상세설명 목록 */
+  list: (listingId: string) =>
+    apiClient.get<{ success: boolean; data: { items: B2cDescriptionItem[] } }>(
+      '/store-contents/b2c-descriptions',
+      { listingId },
+    ),
+
+  /** 가져오기=복사 — 독립 direct 콘텐츠 + product_description 링크 생성 */
+  import: (listingId: string, descriptionId: string) =>
+    apiClient.post<{ success: boolean; data: ImportedB2cContent }>(
+      '/store-contents/import-b2c-description',
+      { listingId, descriptionId },
+    ),
+};
+
 // ─────────────────────────────────────────────────────
 // Store Library Unified Feed — WO-O4O-STORE-LIBRARY-DIRECT-CONTENT-UNIFIED-V1
 // snapshot(cms+content) + direct contents 통합 paginated feed
