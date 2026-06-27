@@ -16,21 +16,18 @@
 
 import { useEffect, useState, useCallback, useRef, type CSSProperties } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { Sparkles, Save, RefreshCw, FileText, Package, FolderOpen, LayoutTemplate } from 'lucide-react';
+import { Save, RefreshCw, FileText, Package, FolderOpen, LayoutTemplate } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
-import { RichTextEditor, AiContentModal } from '@o4o/content-editor';
+import { RichTextEditor } from '@o4o/content-editor';
 import { getAccessToken } from '@o4o/auth-client';
 import { parseProductionRouterState } from '@o4o/store-ui-core';
 import { fetchLocalProducts, type LocalProduct } from '@/api/localProducts';
 import {
   getProductAiContents,
   saveProductAiContent,
-  generateProductAiContent,
 } from '@/api/productAiContent';
 import { findTemplate } from '@/config/productionTemplates';
 import type { ProductionTemplate } from '@o4o/types/production-template';
-
-const POLL_DELAY_MS = 4000;
 
 export default function StoreProductDescriptionsPage() {
   const location = useLocation();
@@ -39,13 +36,11 @@ export default function StoreProductDescriptionsPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [content, setContent] = useState('');
   const [contentLoading, setContentLoading] = useState(false);
-  const [regenerating, setRegenerating] = useState(false);
   const [saving, setSaving] = useState(false);
   const [model, setModel] = useState<string | null>(null);
   const [updatedAt, setUpdatedAt] = useState<string | null>(null);
   const [prefillNote, setPrefillNote] = useState<string | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<ProductionTemplate | null>(null);
-  const [aiOpen, setAiOpen] = useState(false);
 
   const starterHtmlRef = useRef<string | null>(null);
 
@@ -123,22 +118,6 @@ export default function StoreProductDescriptionsPage() {
     toast.success('자료 내용을 편집기에 채웠습니다');
   };
 
-  const handleRegenerate = async () => {
-    if (!selectedId) return;
-    setRegenerating(true);
-    try {
-      await generateProductAiContent(selectedId, 'product_description');
-      toast.success('AI 재생성을 시작했습니다. 잠시 후 결과를 표시합니다.');
-      setTimeout(() => {
-        if (selectedId) fetchContent(selectedId);
-        setRegenerating(false);
-      }, POLL_DELAY_MS);
-    } catch (e: any) {
-      toast.error(e?.message || 'AI 재생성에 실패했습니다');
-      setRegenerating(false);
-    }
-  };
-
   const handleSave = async () => {
     if (!selectedId) return;
     const trimmed = content.trim();
@@ -159,12 +138,6 @@ export default function StoreProductDescriptionsPage() {
       setSaving(false);
     }
   };
-
-  const handleAiInsert = useCallback(({ html }: { html: string; title: string }) => {
-    setContent(html);
-    setAiOpen(false);
-    toast.success('AI 작성 내용이 편집기에 적용되었습니다. 검토 후 저장하세요.');
-  }, []);
 
   const selectedProduct = products.find((p) => p.id === selectedId) || null;
   const hasExisting = !!updatedAt;
@@ -312,26 +285,6 @@ export default function StoreProductDescriptionsPage() {
                 </div>
               )}
 
-              <div style={styles.aiBanner}>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={styles.aiBannerTitle}>✨ AI 상품설명 보조</div>
-                  <div style={styles.aiBannerDesc}>
-                    {selectedTemplate
-                      ? `${selectedTemplate.name} 스타일로 AI가 약국 상품설명 초안을 작성합니다.`
-                      : '자료를 기반으로 AI가 약국 상품설명 초안을 작성합니다.'}
-                    {' '}최종 내용은 직접 검토 후 저장하세요.
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setAiOpen(true)}
-                  style={styles.aiBannerBtn}
-                >
-                  <Sparkles size={13} />
-                  AI로 작성
-                </button>
-              </div>
-
               {contentLoading ? (
                 <div style={styles.editorLoading}>불러오는 중...</div>
               ) : (
@@ -343,7 +296,7 @@ export default function StoreProductDescriptionsPage() {
                     hasExisting
                       ? '저장된 약국 상품 설명을 수정하세요.'
                       : selectedTemplate
-                        ? `${selectedTemplate.name} 템플릿 구조로 작성하세요. AI 보조를 활용하면 빠르게 초안을 만들 수 있습니다.`
+                        ? `${selectedTemplate.name} 템플릿 구조로 작성하세요.`
                         : '신규 생성은 "내 자료함 → 제작 시작 → 약국 상품 설명"에서 시작하세요.'
                   }
                   minHeight="360px"
@@ -356,22 +309,11 @@ export default function StoreProductDescriptionsPage() {
               )}
 
               <div style={styles.actions}>
-                {hasExisting && (
-                  <button
-                    type="button"
-                    onClick={handleRegenerate}
-                    disabled={regenerating || saving}
-                    style={{ ...styles.aiBtn, opacity: regenerating || saving ? 0.7 : 1 }}
-                  >
-                    <Sparkles size={14} />
-                    {regenerating ? 'AI 재생성 중...' : 'AI 재생성'}
-                  </button>
-                )}
                 <button
                   type="button"
                   onClick={handleSave}
-                  disabled={regenerating || saving || !content.trim()}
-                  style={{ ...styles.saveBtn, opacity: regenerating || saving || !content.trim() ? 0.7 : 1 }}
+                  disabled={saving || !content.trim()}
+                  style={{ ...styles.saveBtn, opacity: saving || !content.trim() ? 0.7 : 1 }}
                 >
                   <Save size={14} />
                   {saving ? '저장 중...' : '저장'}
@@ -381,22 +323,6 @@ export default function StoreProductDescriptionsPage() {
           )}
         </section>
       </div>
-
-      <AiContentModal
-        open={aiOpen}
-        onClose={() => setAiOpen(false)}
-        editor={null}
-        onInsert={handleAiInsert}
-        aiRequestHeaders={(() => {
-          const token = getAccessToken();
-          return token ? { Authorization: `Bearer ${token}` } : undefined;
-        })()}
-        headerLabel="약국 상품설명 AI 보조"
-        urlPlaceholder="https://example.com/product 또는 제품 페이지 URL"
-        templateId={selectedTemplate?.id}
-        templateSystemPrompt={selectedTemplate?.systemPromptOverride}
-        templateForcedOptions={selectedTemplate?.forcedOptions}
-      />
     </div>
   );
 }
@@ -430,12 +356,7 @@ const styles: Record<string, CSSProperties> = {
   metaTextMuted: { fontSize: '11px', color: '#9CA3AF', fontStyle: 'italic' },
   prefillBanner: { display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 14px', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: '6px' },
   prefillBtn: { padding: '6px 12px', background: '#fff', border: '1px solid #FDE68A', borderRadius: '6px', fontSize: '12px', color: '#92400E', fontWeight: 500, cursor: 'pointer', flexShrink: 0 },
-  aiBanner: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', padding: '10px 14px', background: '#EEF2FF', border: '1px solid #C7D2FE', borderRadius: '8px' },
-  aiBannerTitle: { fontSize: '13px', fontWeight: 600, color: '#4338CA', marginBottom: '2px' },
-  aiBannerDesc: { fontSize: '12px', color: '#6366F1', lineHeight: 1.5 },
-  aiBannerBtn: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: '#4F46E5', color: '#fff', border: 'none', borderRadius: '7px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' as const, flexShrink: 0 },
   actions: { display: 'flex', justifyContent: 'flex-end', gap: '8px' },
-  aiBtn: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: '#fff', border: '1px solid #0EA5E9', borderRadius: '6px', fontSize: '13px', color: '#0EA5E9', fontWeight: 500, cursor: 'pointer' },
   saveBtn: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: '#0EA5E9', border: 'none', borderRadius: '6px', fontSize: '13px', color: '#fff', fontWeight: 500, cursor: 'pointer' },
   sidebarLink: { display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '6px 10px', background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: '6px', fontSize: '12px', color: '#2563EB', fontWeight: 500, textDecoration: 'none', marginTop: '4px' },
   libraryLink: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '8px 14px', border: '1px solid #0EA5E9', backgroundColor: '#fff', color: '#0EA5E9', borderRadius: '8px', fontSize: '13px', fontWeight: 500, textDecoration: 'none' },

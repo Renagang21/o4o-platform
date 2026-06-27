@@ -15,18 +15,12 @@
  */
 
 import { useEffect, useState, useCallback, type CSSProperties } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { BookOpen, RefreshCw, Megaphone, QrCode } from 'lucide-react';
-import { AiContentModal } from '@o4o/content-editor';
-// WO-O4O-AI-EDITING-PRESET-ADOPTION-LMS-RESOURCES-V1: 라이브러리 진입(타깃 미선택) 범용 preset
-import { findEditingPreset } from '@o4o/types';
-import { getAccessToken } from '@o4o/auth-client';
 import { assetSnapshotApi, type AssetSnapshotItem } from '../../api/assetSnapshot';
 import {
   StartProductionModal,
   type StartProductionTargetConfig,
   type ProductionSource,
-  composeSourceTextFromItems,
 } from '@o4o/store-ui-core';
 import { getTemplatesForTarget } from '../../config/productionTemplates';
 
@@ -52,16 +46,9 @@ const COSMETICS_PRODUCTION_TARGETS: StartProductionTargetConfig[] = [
 ];
 
 export default function StoreLibraryContentsPage() {
-  const navigate = useNavigate();
   const [items, setItems] = useState<AssetSnapshotItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [productionSource, setProductionSource] = useState<ProductionSource | null>(null);
-
-  const [aiOpen, setAiOpen] = useState(false);
-  const [aiInitialText, setAiInitialText] = useState('');
-  const [aiSourceMetadata, setAiSourceMetadata] = useState<
-    { sourceContentId?: string; sourceTitle?: string; sourceOrigin?: string } | null
-  >(null);
 
   const fetchItems = useCallback(async () => {
     setLoading(true);
@@ -88,33 +75,6 @@ export default function StoreLibraryContentsPage() {
       }],
     });
   };
-
-  const handleAiAction = useCallback((source: ProductionSource) => {
-    const text = composeSourceTextFromItems(source.items);
-    const first = source.items[0];
-    setAiInitialText(text);
-    setAiSourceMetadata(
-      first
-        ? { sourceContentId: first.id, sourceTitle: first.title, sourceOrigin: first.origin }
-        : null,
-    );
-    setProductionSource(null);
-    setAiOpen(true);
-  }, []);
-
-  const handleAiInsert = useCallback(
-    (data: { html: string; title: string }) => {
-      setAiOpen(false);
-      navigate('/store/library/production-materials/new', {
-        state: {
-          generatedHtml: data.html,
-          title: data.title || undefined,
-          sourceMetadata: aiSourceMetadata ?? undefined,
-        },
-      });
-    },
-    [navigate, aiSourceMetadata],
-  );
 
   return (
     <div style={styles.container}>
@@ -168,23 +128,7 @@ export default function StoreLibraryContentsPage() {
         source={productionSource}
         targets={COSMETICS_PRODUCTION_TARGETS}
         onClose={() => setProductionSource(null)}
-        onAiAction={handleAiAction}
         getTemplates={getTemplatesForTarget}
-      />
-
-      <AiContentModal
-        open={aiOpen}
-        onClose={() => setAiOpen(false)}
-        editor={null}
-        onInsert={handleAiInsert}
-        initialText={aiInitialText}
-        headerLabel="AI 매장 제작 자료 초안"
-        templateSystemPrompt={findEditingPreset('library-entry')?.systemPromptOverride}
-        templateForcedOptions={findEditingPreset('library-entry')?.forcedOptions}
-        aiRequestHeaders={(() => {
-          const token = getAccessToken();
-          return token ? { Authorization: `Bearer ${token}` } : undefined;
-        })()}
       />
     </div>
   );
