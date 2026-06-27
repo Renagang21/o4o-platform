@@ -1,17 +1,17 @@
 /**
- * Store Handled Products Routes — "매장 경영활용 제품" 통합 조회 (read-only)
+ * Store Handled Products Routes — "매장 취급제품" 통합 조회 (read-only)
  *
  * WO-O4O-KPA-STORE-HANDLED-PRODUCTS-UNIFIED-VIEW-V1
  * 선행: IR-O4O-KPA-STORE-HANDLED-PRODUCTS-UNIFIED-VIEW-DESIGN-V1
  *
- * "매장 경영활용 제품" = O4O 기반 제품(organization_product_listings) + 매장 경영활용 제품(store_local_products)
+ * "매장 취급제품" = O4O 기반 제품(organization_product_listings) + 매장 경영활용 제품(store_local_products)
  * 두 소스를 물리 통합하지 않고 sourceType 으로 구분해 조회 통합한다(읽기 전용).
  *
  * API Namespace: /api/v1/store
  *   GET /handled-products  — 통합 목록(검색/출처필터/페이지네이션)
  *
  * WO-O4O-KPA-STORE-HANDLED-PRODUCTS-DISPLAY-POOL-SIMPLIFY-V1:
- *   제품 풀(매장 경영활용 제품)은 채널 상태판이 아니다. 채널 상태(타블렛/온라인몰/상품설명) 컬럼·enrich 를 제거하고
+ *   제품 풀(매장 취급제품)은 채널 상태판이 아니다. 채널 상태(타블렛/온라인몰/상품설명) 컬럼·enrich 를 제거하고
  *   제품 풀 핵심 필드(이름/구분/표시가/상태/수정일)만 반환한다. 채널 노출은 각 채널 메뉴에서 관리.
  *   - 매장 경영활용 제품(local)의 온라인몰 미지원은 화면 하단 보조 안내로 고지(컬럼 아님).
  *
@@ -164,7 +164,7 @@ export function createStoreHandledProductsRoutes(dataSource: DataSource): Router
       }
 
       // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-DISPLAY-POOL-SIMPLIFY-V1:
-      //   제품 풀(매장 경영활용 제품)은 채널 상태판이 아니다. 화면에서 채널 상태 컬럼(타블렛/온라인몰/상품설명)을
+      //   제품 풀(매장 취급제품)은 채널 상태판이 아니다. 화면에서 채널 상태 컬럼(타블렛/온라인몰/상품설명)을
       //   제거했으므로, 그를 위한 enrich 조인 3종(store_tablet_displays / organization_product_channels /
       //   shared_product_descriptions)도 함께 제거한다. 채널 노출은 각 채널 메뉴에서 관리한다.
       const now = Date.now();
