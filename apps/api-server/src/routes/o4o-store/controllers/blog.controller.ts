@@ -20,6 +20,8 @@
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource, LessThanOrEqual } from 'typeorm';
 import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
+// WO-O4O-KPA-APPROVED-STORE-OWNER-AUTO-AUTHORIZATION-FIX-V1
+import { kpaStoreOwnerOwnsStore } from '../utils/kpa-store-owner.util.js';
 import { StoreBlogPost } from '../../glycopharm/entities/store-blog-post.entity.js';
 import type {
   StoreBlogPostStatus,
@@ -83,7 +85,15 @@ export function createBlogController(
   }
 
   // Helper: verify store ownership
-  function verifyOwner(pharmacy: OrganizationStore, userId: string): boolean {
+  // WO-O4O-KPA-APPROVED-STORE-OWNER-AUTO-AUTHORIZATION-FIX-V1:
+  // KPA 는 승인된 매장 경영자(role_assignments.kpa:store_owner, RBAC SSOT)면 소유자다.
+  // created_by 는 생성자일 뿐 권한 SSOT 가 아니므로, 승인 경영자가 차단되던 결함을 수정.
+  // 교차 매장 차단은 kpaStoreOwnerOwnsStore 내부(resolved org === store.id)에서 보장.
+  // GlycoPharm / K-Cosmetics 는 기존 created_by 유지 — 별도 parity WO.
+  async function verifyOwner(pharmacy: OrganizationStore, userId: string): Promise<boolean> {
+    if (serviceKey === 'kpa') {
+      return kpaStoreOwnerOwnsStore(dataSource, userId, pharmacy.id);
+    }
     return pharmacy.created_by_user_id === userId;
   }
 
@@ -146,8 +156,8 @@ export function createBlogController(
         return;
       }
 
-      if (!userId || !verifyOwner(pharmacy, userId)) {
-        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Not the store owner' } });
+      if (!userId || !(await verifyOwner(pharmacy, userId))) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: '이 매장의 경영자만 접근할 수 있습니다.' } });
         return;
       }
 
@@ -196,8 +206,8 @@ export function createBlogController(
         return;
       }
 
-      if (!userId || !verifyOwner(pharmacy, userId)) {
-        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Not the store owner' } });
+      if (!userId || !(await verifyOwner(pharmacy, userId))) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: '이 매장의 경영자만 접근할 수 있습니다.' } });
         return;
       }
 
@@ -267,8 +277,8 @@ export function createBlogController(
         return;
       }
 
-      if (!userId || !verifyOwner(pharmacy, userId)) {
-        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Not the store owner' } });
+      if (!userId || !(await verifyOwner(pharmacy, userId))) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: '이 매장의 경영자만 접근할 수 있습니다.' } });
         return;
       }
 
@@ -315,8 +325,8 @@ export function createBlogController(
         return;
       }
 
-      if (!userId || !verifyOwner(pharmacy, userId)) {
-        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Not the store owner' } });
+      if (!userId || !(await verifyOwner(pharmacy, userId))) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: '이 매장의 경영자만 접근할 수 있습니다.' } });
         return;
       }
 
@@ -356,8 +366,8 @@ export function createBlogController(
         return;
       }
 
-      if (!userId || !verifyOwner(pharmacy, userId)) {
-        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Not the store owner' } });
+      if (!userId || !(await verifyOwner(pharmacy, userId))) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: '이 매장의 경영자만 접근할 수 있습니다.' } });
         return;
       }
 
@@ -395,8 +405,8 @@ export function createBlogController(
         res.status(404).json({ success: false, error: { code: 'STORE_NOT_FOUND', message: 'Store not found' } });
         return;
       }
-      if (!userId || !verifyOwner(pharmacy, userId)) {
-        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Not the store owner' } });
+      if (!userId || !(await verifyOwner(pharmacy, userId))) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: '이 매장의 경영자만 접근할 수 있습니다.' } });
         return;
       }
 
@@ -425,8 +435,8 @@ export function createBlogController(
         res.status(404).json({ success: false, error: { code: 'STORE_NOT_FOUND', message: 'Store not found' } });
         return;
       }
-      if (!userId || !verifyOwner(pharmacy, userId)) {
-        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Not the store owner' } });
+      if (!userId || !(await verifyOwner(pharmacy, userId))) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: '이 매장의 경영자만 접근할 수 있습니다.' } });
         return;
       }
 
@@ -507,8 +517,8 @@ export function createBlogController(
         return;
       }
 
-      if (!userId || !verifyOwner(pharmacy, userId)) {
-        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Not the store owner' } });
+      if (!userId || !(await verifyOwner(pharmacy, userId))) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: '이 매장의 경영자만 접근할 수 있습니다.' } });
         return;
       }
 
@@ -596,8 +606,8 @@ export function createBlogController(
         return;
       }
 
-      if (!userId || !verifyOwner(pharmacy, userId)) {
-        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Not the store owner' } });
+      if (!userId || !(await verifyOwner(pharmacy, userId))) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: '이 매장의 경영자만 접근할 수 있습니다.' } });
         return;
       }
 

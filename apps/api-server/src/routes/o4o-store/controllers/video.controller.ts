@@ -27,6 +27,8 @@
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
+// WO-O4O-KPA-APPROVED-STORE-OWNER-AUTO-AUTHORIZATION-FIX-V1
+import { kpaStoreOwnerOwnsStore } from '../utils/kpa-store-owner.util.js';
 import { StoreVideo } from '../entities/store-video.entity.js';
 import type { StoreVideoStatus, StoreVideoAuthorRole } from '../entities/store-video.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';
@@ -50,7 +52,13 @@ export function createStoreVideoStaffController(
     return orgRepo.findOne({ where: { id: record.storeId, isActive: true } });
   }
 
-  function verifyOwner(pharmacy: OrganizationStore, userId: string): boolean {
+  // WO-O4O-KPA-APPROVED-STORE-OWNER-AUTO-AUTHORIZATION-FIX-V1:
+  // KPA 승인 매장 경영자(role_assignments.kpa:store_owner, RBAC SSOT) 기준. created_by 아님.
+  // 교차 매장 차단은 kpaStoreOwnerOwnsStore 내부(resolved org === store.id). GP/Cosmetics 는 created_by 유지.
+  async function verifyOwner(pharmacy: OrganizationStore, userId: string): Promise<boolean> {
+    if (serviceKey === 'kpa') {
+      return kpaStoreOwnerOwnsStore(dataSource, userId, pharmacy.id);
+    }
     return pharmacy.created_by_user_id === userId;
   }
 
@@ -72,8 +80,8 @@ export function createStoreVideoStaffController(
         res.status(404).json({ success: false, error: { code: 'STORE_NOT_FOUND', message: 'Store not found' } });
         return;
       }
-      if (!userId || !verifyOwner(pharmacy, userId)) {
-        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Not the store owner' } });
+      if (!userId || !(await verifyOwner(pharmacy, userId))) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: '이 매장의 경영자만 접근할 수 있습니다.' } });
         return;
       }
 
@@ -131,8 +139,8 @@ export function createStoreVideoStaffController(
         res.status(404).json({ success: false, error: { code: 'STORE_NOT_FOUND', message: 'Store not found' } });
         return;
       }
-      if (!userId || !verifyOwner(pharmacy, userId)) {
-        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Not the store owner' } });
+      if (!userId || !(await verifyOwner(pharmacy, userId))) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: '이 매장의 경영자만 접근할 수 있습니다.' } });
         return;
       }
 
@@ -210,8 +218,8 @@ export function createStoreVideoStaffController(
         res.status(404).json({ success: false, error: { code: 'STORE_NOT_FOUND', message: 'Store not found' } });
         return;
       }
-      if (!userId || !verifyOwner(pharmacy, userId)) {
-        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Not the store owner' } });
+      if (!userId || !(await verifyOwner(pharmacy, userId))) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: '이 매장의 경영자만 접근할 수 있습니다.' } });
         return;
       }
 
@@ -267,8 +275,8 @@ export function createStoreVideoStaffController(
         res.status(404).json({ success: false, error: { code: 'STORE_NOT_FOUND', message: 'Store not found' } });
         return;
       }
-      if (!userId || !verifyOwner(pharmacy, userId)) {
-        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Not the store owner' } });
+      if (!userId || !(await verifyOwner(pharmacy, userId))) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: '이 매장의 경영자만 접근할 수 있습니다.' } });
         return;
       }
 
