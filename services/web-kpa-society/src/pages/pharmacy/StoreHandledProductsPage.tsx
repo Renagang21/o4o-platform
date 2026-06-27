@@ -161,8 +161,8 @@ export default function StoreHandledProductsPage() {
             매장 경영활용 제품
           </h1>
           <p style={styles.subtitle}>
-            약국이 취급하는 전체 제품(<strong>O4O 기반 제품</strong> + <strong>매장 경영활용 제품</strong>)을 한 화면에서 확인합니다.
-            등록·수정은 각 원본 관리 화면에서 합니다.
+            약국 경영에 활용하는 전체 제품을 한 화면에서 확인합니다.
+            O4O 기반 제품과 매장에서 직접 등록한 제품의 등록·수정은 각 원본 관리 화면에서 합니다.
           </p>
         </div>
         <div style={styles.headerActions}>
@@ -345,9 +345,9 @@ export default function StoreHandledProductsPage() {
       />
 
       <p style={styles.footnote}>
-        ※ <strong>매장 경영활용 제품</strong>은 진열·콘텐츠·온라인 노출에 활용할 제품 풀입니다. 타블렛 진열·온라인 판매 등 채널별 설정은 각 채널 메뉴에서 관리합니다.
+        ※ 이 목록은 진열·콘텐츠·온라인 노출에 활용할 전체 제품 풀입니다. 타블렛 진열·온라인 판매 등 채널별 설정은 각 채널 메뉴에서 관리합니다.
         {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-DISPLAY-POOL-SIMPLIFY-V1: 온라인몰 미지원 = 컬럼 대신 보조 안내 */}
-        {' '}매장 경영활용 제품은 온라인 판매(온라인몰) 노출을 지원하지 않습니다.
+        {' '}매장에서 직접 등록한 제품은 온라인 판매(온라인몰) 노출을 지원하지 않습니다.
         온라인 주문 이후의 조달·재고·배송·발송·응대는 매장 경영자가 자체적으로 처리합니다.
       </p>
     </div>
