@@ -60,7 +60,9 @@ services/web-kpa-society/src/pages/resources/ResourceWriteModal.tsx
 
 - web-glycopharm / web-k-cosmetics / web-kpa-society `tsc --noEmit` PASS
 - 잔존 참조 0 (grep: aiOpen/handleAiInsert/AiContentModal/aiBanner/initialMode 등)
-- 배포·브라우저 smoke: 후속 단계
+- 배포: deploy-glycopharm / deploy-k-cosmetics / deploy-kpa-society 전부 success
+- 브라우저 smoke(라이브): **GP POP**(섹션 1→3, AI Step 제거 / 레이아웃·QR·PDF 보존, console 0) · **GP Blog**(AI 배너 제거 / Toolbar "AI 정리" 보존, console 0) · **KCos POP**(섹션 1→3, AI Step 제거; 403 은 sohae2100 non-store_owner 기존 권한, 무관) PASS
+- **KCos Blog · GP OperatorResources · KPA ResourceWriteModal**: 정적 검증·타입체크 완료. **이 화면들은 공통화 전 개별(서비스별) 구현이므로 최종 통합 smoke 는 공통화 작업 시점으로 보류** (개별 화면을 현재 억지로 각각 보완·테스트하지 않음).
 
 ---
 
