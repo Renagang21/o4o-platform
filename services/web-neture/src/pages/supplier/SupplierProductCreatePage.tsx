@@ -477,11 +477,39 @@ export default function SupplierProductCreatePage() {
     );
   }
 
+  // WO-O4O-NETURE-SUPPLIER-PRODUCT-SOURCE-IMPORT-ENTRY-AUDIT-V1:
+  //   기존 Import Assistant(등록 도우미) 재연결 — 외부 상세페이지 소스를 붙여넣어 폼을 자동 채운다.
+  //   입력 중인 값이 있으면 명시적 확인 후 이동(이동 시 현재 입력은 도우미 흐름으로 대체됨).
+  const goToSourceImport = () => {
+    const hasInput =
+      !!form.marketingName.trim() ||
+      !!form.packagingName.trim() ||
+      !!form.brandName.trim() ||
+      !!form.manufacturerName.trim() ||
+      !!consumerShortDesc.trim() ||
+      !!consumerDetailDesc.trim();
+    if (hasInput && !window.confirm('현재 입력한 내용이 있습니다. 상세페이지 소스 자동 입력으로 이동하면 지금까지 입력한 값은 저장되지 않습니다. 계속할까요?')) {
+      return;
+    }
+    navigate('/supplier/products/import-assistant');
+  };
+
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-800">상품 등록</h1>
-        <p className="text-slate-500 mt-1">상품 정보를 입력하여 새 상품을 등록합니다</p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800">상품 등록</h1>
+          <p className="text-slate-500 mt-1">상품 정보를 입력하여 새 상품을 등록합니다</p>
+        </div>
+        {/* WO-O4O-NETURE-SUPPLIER-PRODUCT-SOURCE-IMPORT-ENTRY-AUDIT-V1: 소스 자동 입력 진입 복원 */}
+        <button
+          type="button"
+          onClick={goToSourceImport}
+          title="상품 상세페이지에서 '페이지 소스 보기'를 열어 소스 전체를 복사해 붙여넣으면, 추출 가능한 항목이 등록 폼에 자동 입력됩니다. 자동으로 채워진 내용은 등록 전 반드시 확인하세요."
+          className="shrink-0 inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+        >
+          ⚡ 상세페이지 소스로 자동 입력
+        </button>
       </div>
 
       {/* GuideBlock */}
