@@ -6,7 +6,7 @@
  * `/store/library/contents` 페이지와 `/store/library/production-materials`의
  * "새 제작 자료 만들기" 모달이 같은 selector 구조를 공유한다.
  *
- * 이전: StoreLibraryContentsPage 내부에 DocumentsSection / LessonsSection / TopTabBar / SubTabBar
+ * 이전: StoreLibraryContentsPage 내부에 DocumentsSection / LessonsSection / TopTabBar
  *       가 정의되어 있었음. 이 파일로 추출 — 페이지/모달 양쪽에서 mount.
  *
  * 데이터 source / 페이지네이션 / 검색 / row selection / "제작 시작" 호출 흐름 모두 동일.
@@ -40,7 +40,6 @@ const SEARCH_DEBOUNCE_MS = 300;
 // ─── Tab Types ───────────────────────────────────────────────────────────────
 
 type TopTab = 'contents' | 'lessons';
-type ContentsSubTab = 'document' | 'course-resource';
 
 // ─── Row Types ───────────────────────────────────────────────────────────────
 
@@ -224,36 +223,6 @@ function TopTabBar({
   );
 }
 
-function SubTabBar({
-  active,
-  onChange,
-}: {
-  active: ContentsSubTab;
-  onChange: (t: ContentsSubTab) => void;
-}) {
-  return (
-    <div style={styles.subTabBar}>
-      {(['document', 'course-resource'] as ContentsSubTab[]).map((tab) => {
-        const label = tab === 'document' ? '문서형' : '코스형';
-        const isActive = active === tab;
-        return (
-          <button
-            key={tab}
-            type="button"
-            onClick={() => onChange(tab)}
-            style={{
-              ...styles.subTabBtn,
-              ...(isActive ? styles.subTabBtnActive : styles.subTabBtnInactive),
-            }}
-          >
-            {label}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
 // ─── Selector — public API ───────────────────────────────────────────────────
 
 export interface StoreContentsSelectorProps {
@@ -287,30 +256,21 @@ export function StoreContentsSelector({
   enablePdfExport = false,
 }: StoreContentsSelectorProps) {
   const [topTab, setTopTab] = useState<TopTab>('contents');
-  const [contentsSubTab, setContentsSubTab] = useState<ContentsSubTab>('document');
 
   return (
     <>
       <TopTabBar active={topTab} onChange={setTopTab} />
 
       {topTab === 'contents' && (
-        <>
-          <SubTabBar active={contentsSubTab} onChange={setContentsSubTab} />
-
-          {contentsSubTab === 'document' && (
-            <DocumentsSection
-              reloadKey={reloadKey}
-              onStartProduction={onStartProduction}
-              onAfterRemove={onAfterRemove}
-              onRemoveSnapshots={onRemoveSnapshots}
-              mode={mode}
-              startButtonLabel={startButtonLabel}
-              enablePdfExport={enablePdfExport}
-            />
-          )}
-
-          {contentsSubTab === 'course-resource' && <CourseResourceEmptySection />}
-        </>
+        <DocumentsSection
+          reloadKey={reloadKey}
+          onStartProduction={onStartProduction}
+          onAfterRemove={onAfterRemove}
+          onRemoveSnapshots={onRemoveSnapshots}
+          mode={mode}
+          startButtonLabel={startButtonLabel}
+          enablePdfExport={enablePdfExport}
+        />
       )}
 
       {topTab === 'lessons' && (
@@ -766,22 +726,6 @@ function DocumentsSection({
           onCreated={() => setSelected(new Set())}
         />
       )}
-    </section>
-  );
-}
-
-// ─── CourseResourceEmptySection ──────────────────────────────────────────────
-
-function CourseResourceEmptySection() {
-  return (
-    <section style={styles.section}>
-      <div style={styles.emptyState}>
-        <BookOpen size={32} style={{ color: colors.neutral300, marginBottom: 12 }} />
-        <p style={styles.emptyTitle}>코스형 콘텐츠</p>
-        <p style={styles.emptyDesc}>
-          콘텐츠 허브에서 코스형 콘텐츠(CONTENT_RESOURCE)를 가져오면 여기에 표시됩니다.
-        </p>
-      </div>
     </section>
   );
 }

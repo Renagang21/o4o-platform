@@ -319,8 +319,6 @@ const ContentDetailPage = lazy(() => import('./pages/contents/ContentDetailPage'
 const ContentWritePage = lazy(() => import('./pages/contents/ContentWritePage').then(m => ({ default: m.ContentWritePage })));
 // WO-KPA-CONTENT-HUB-UNIFIED-SECTION-RULES-V1: 문서형 콘텐츠 전용 목록
 const ContentDocumentsPage = lazy(() => import('./pages/contents/ContentDocumentsPage').then(m => ({ default: m.ContentDocumentsPage })));
-// WO-KPA-CONTENT-COURSES-LIST-V1: 코스형 자료 전용 목록
-const ContentCoursesPage = lazy(() => import('./pages/contents/ContentCoursesPage').then(m => ({ default: m.ContentCoursesPage })));
 // WO-KPA-CONTENT-SURVEYS-LIST-V1: 설문조사 전용 목록 (콘텐츠 허브 하위)
 const ContentSurveysPage = lazy(() => import('./pages/contents/ContentSurveysPage').then(m => ({ default: m.ContentSurveysPage })));
 
@@ -473,13 +471,6 @@ function MyPageGuard({ children }: { children: ReactNode }) {
  * /select-function URL 접근 시 대시보드로 리다이렉트 + 모달 표시
  * (페이지 → 모달 전환 후 하위호환용)
  */
-// WO-KPA-CONTENT-COURSES-LIST-V1: /content/courses/:id → /instructor/courses/:id (상세/편집).
-// Phase에서 ContentCourseDetailPage 도입 시 본 wrapper 제거.
-function ContentCourseDetailRedirect() {
-  const { id } = useParams<{ id: string }>();
-  return <Navigate to={id ? `/instructor/courses/${id}` : '/content/courses'} replace />;
-}
-
 // WO-O4O-ROLEBASED-HOME-REMOVAL-AND-ROUTING-NORMALIZATION-V1:
 // RoleBasedHome 제거 — "/" 는 항상 커뮤니티 홈 (역할 기반 자동 redirect 없음)
 // 역할별 대시보드 진입은 Header 드롭다운("운영 대시보드" 등) 명시적 링크로만 제공
@@ -762,9 +753,8 @@ function App() {
               Content Hub
               WO-KPA-CONTENT-HUB-FOUNDATION-V1 / WO-CONTENT-HUB-STRUCTURE-AND-TABLE-FOUNDATION-V1
               WO-KPA-CONTENT-SECTION-CREATE-FLOW-ALIGN-V1 (Phase 1):
-                섹션별 등록 라우트(/content/{documents,surveys,courses}/new) 도입.
-                저장 후 returnTo/redirectAfterCreate가 content hub 섹션으로 복귀.
-                레거시 /content/new* 는 신규 라우트로 redirect.
+                문서·설문 등록 라우트 도입.
+                레거시 /content/new* 는 canonical 라우트로 redirect.
               ────────────────────────────────────────────────────────────────── */}
           <Route path="/content" element={<Layout serviceName={SERVICE_NAME}><ContentListPage /></Layout>} />
 
@@ -787,31 +777,19 @@ function App() {
               />
             </Layout>
           } />
-          <Route path="/content/courses/new" element={
-            <Layout serviceName={SERVICE_NAME}>
-              <CourseNewPage
-                pageTitle="새 코스형 자료 만들기"
-                backLinkText="← 콘텐츠 허브"
-                returnTo="/content/courses"
-                redirectAfterCreate={(id) => `/content/courses/${id}`}
-                redirectAfterCreateFallback="/content/courses"
-                contentKind="content_resource"
-              />
-            </Layout>
-          } />
+          {/* 코스형 자료 폐기: 기존 북마크는 콘텐츠 허브로 복귀 */}
+          <Route path="/content/courses/new" element={<Navigate to="/content" replace />} />
 
           {/* 섹션 목록
               - /content/documents: WO-KPA-CONTENT-HUB-UNIFIED-SECTION-RULES-V1 — 문서형 콘텐츠 전용 목록
-              - /content/surveys: WO-KPA-CONTENT-SURVEYS-LIST-V1 — 전용 목록 페이지
-              - /content/courses: WO-KPA-CONTENT-COURSES-LIST-V1 — 전용 목록 페이지
-              - /content/courses/:id: /instructor/courses/:id 상세로 wrapper redirect (Phase에서 전용 페이지 도입 시 변경) */}
+              - /content/surveys: WO-KPA-CONTENT-SURVEYS-LIST-V1 — 전용 목록 페이지 */}
           <Route path="/content/documents" element={<Layout serviceName={SERVICE_NAME}><ContentDocumentsPage /></Layout>} />
           {/* WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1:
               자료실 — 동일 컴포넌트, sub_type='resource' 필터. 가져가기 흐름 동일. */}
           <Route path="/content/resources" element={<Layout serviceName={SERVICE_NAME}><ContentDocumentsPage subType="resource" /></Layout>} />
           <Route path="/content/surveys" element={<Layout serviceName={SERVICE_NAME}><ContentSurveysPage /></Layout>} />
-          <Route path="/content/courses" element={<Layout serviceName={SERVICE_NAME}><ContentCoursesPage /></Layout>} />
-          <Route path="/content/courses/:id" element={<ContentCourseDetailRedirect />} />
+          <Route path="/content/courses" element={<Navigate to="/content" replace />} />
+          <Route path="/content/courses/:id" element={<Navigate to="/content" replace />} />
 
           {/* 콘텐츠 상세/수정 (sub_type='content' 문서) */}
           <Route path="/content/:id" element={<Layout serviceName={SERVICE_NAME}><ContentDetailPage /></Layout>} />
@@ -821,8 +799,8 @@ function App() {
           <Route path="/content/new" element={<Navigate to="/content/documents/new" replace />} />
           <Route path="/content/write" element={<Navigate to="/content/documents/new" replace />} />
           <Route path="/content/new/survey" element={<Navigate to="/content/surveys/new" replace />} />
-          <Route path="/content/new/course" element={<Navigate to="/content/courses/new" replace />} />
-          <Route path="/content/new/lecture" element={<Navigate to="/content/courses/new" replace />} />
+          <Route path="/content/new/course" element={<Navigate to="/content" replace />} />
+          <Route path="/content/new/lecture" element={<Navigate to="/content" replace />} />
 
           {/* Legacy redirects: /contents → /content */}
           <Route path="/contents" element={<Navigate to="/content" replace />} />

@@ -9,7 +9,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lightbulb } from 'lucide-react';
 import { InstructorCourseFormShell, type InstructorCourseFormValues } from '@o4o/operator-core-ui';
-import { lmsInstructorApi, type ContentKind } from '../../../api/lms-instructor';
+import { lmsInstructorApi } from '../../../api/lms-instructor';
 // WO-O4O-KPA-COMMUNITY-CONTENT-LECTURE-CREATION-GUIDE-MODAL-V1: 강의 제작 가이드(공통 모달, communityLecture 모드)
 import { ContentCreationGuideModal } from '../../pharmacy/ContentCreationGuideModal';
 
@@ -25,48 +25,16 @@ const styles: Record<string, React.CSSProperties> = {
   },
 };
 
-interface CourseNewPageProps {
-  /** Override page title (default: "새 강의 만들기") */
-  pageTitle?: string;
-  /** Override back link text (default: "← 강의 목록") */
-  backLinkText?: string;
-  /** Override cancel/back navigation target (default: "/instructor/courses") */
-  returnTo?: string;
-  /**
-   * 저장 성공 후 이동할 경로를 반환.
-   * 미지정 시 기본 LMS 흐름(`/instructor/courses/${id}`)을 따른다.
-   * WO-KPA-CONTENT-SECTION-CREATE-FLOW-ALIGN-V1: content hub 진입 시 hub 섹션으로 복귀.
-   */
-  redirectAfterCreate?: (courseId: string) => string;
-  /** id 없이 저장 성공 시(이론상 없음) 이동할 fallback. 미지정 시 returnTo, 그것도 없으면 /instructor/courses. */
-  redirectAfterCreateFallback?: string;
-  /**
-   * WO-KPA-CONTENT-COURSE-KIND-SEPARATION-V1: 코스 분류.
-   *   - 'lecture'(기본): /instructor/courses/new에서 생성 — 일반 강의로 저장
-   *   - 'content_resource': /content/courses/new에서 생성 — 콘텐츠 허브의 코스형 자료
-   * 미지정 시 백엔드에서 'lecture' 기본 적용.
-   */
-  contentKind?: ContentKind;
-}
-
-export default function CourseNewPage({
-  pageTitle,
-  backLinkText,
-  returnTo,
-  redirectAfterCreate,
-  redirectAfterCreateFallback,
-  contentKind,
-}: CourseNewPageProps = {}) {
+export default function CourseNewPage() {
   const navigate = useNavigate();
   const [guideOpen, setGuideOpen] = useState(false);
-  const back = () => navigate(returnTo ?? '/instructor/courses');
+  const back = () => navigate('/instructor/courses');
 
   const handleSubmit = async (values: InstructorCourseFormValues) => {
     const res: any = await lmsInstructorApi.createCourse({
       title: values.title,
       description: values.description,
       tags: values.tags.length > 0 ? values.tags : undefined,
-      contentKind, // 미지정 시 백엔드에서 'lecture' 기본
       visibility: values.visibility,            // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1
       reusablePolicy: values.reusablePolicy,     // WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1
       requiresApproval: values.requiresApproval, // WO-O4O-LMS-VISIBILITY-ENROLLMENT-INTEGRATION-V1
@@ -74,18 +42,17 @@ export default function CourseNewPage({
     // API returns { success, data: Course }
     const courseId = res.data?.data?.id;
     if (courseId) {
-      const target = redirectAfterCreate ? redirectAfterCreate(courseId) : `/instructor/courses/${courseId}`;
-      navigate(target, { state: { justCreated: true } });
+      navigate(`/instructor/courses/${courseId}`, { state: { justCreated: true } });
     } else {
-      navigate(redirectAfterCreateFallback ?? returnTo ?? '/instructor/courses');
+      navigate('/instructor/courses');
     }
   };
 
   return (
     <div style={styles.page}>
-      <span style={styles.backLink} onClick={back}>{backLinkText ?? '← 강의 목록'}</span>
+      <span style={styles.backLink} onClick={back}>← 강의 목록</span>
       <div style={styles.titleRow}>
-        <h1 style={styles.title}>{pageTitle ?? '새 강의 만들기'}</h1>
+        <h1 style={styles.title}>새 강의 만들기</h1>
         {/* WO-O4O-KPA-COMMUNITY-CONTENT-LECTURE-CREATION-GUIDE-MODAL-V1: 보조(outline) 강의 제작 가이드 */}
         <button type="button" onClick={() => setGuideOpen(true)} style={styles.guideBtn}>
           <Lightbulb size={14} />
