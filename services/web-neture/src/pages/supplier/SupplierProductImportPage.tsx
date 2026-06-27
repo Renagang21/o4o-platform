@@ -7,14 +7,22 @@
  */
 
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { RichTextEditor } from '@o4o/content-editor';
 import { parseProductHtml } from '../../lib/product-import/parser';
 import { saveDraft } from '../../lib/product-import/storage';
 import type { ParsedProductData, ImportDraft } from '../../lib/product-import/types';
 // WO-O4O-NETURE-SUPPLIER-MENU-ASSISTANT-IA-CLEANUP-V1
-import { SUPPLIER_PRODUCT_TYPES, type SupplierProductTypeDef } from '../../lib/supplierProductTypes';
+// WO-O4O-NETURE-SUPPLIER-IMPORT-ASSISTANT-PRODUCT-TYPE-PASSTHROUGH-V1:
+//   유형 선택을 등록 진입 화면(SupplierProductRegisterEntryPage)과 동일한 2분기 모델로 통일.
+//   의약외품은 비의약품 하위(등록 폼 '규제 구분'에서 확정) — 진입 화면 정책과 정합.
+import { getSupplierProductType, type SupplierProductTypeDef } from '../../lib/supplierProductTypes';
 import { productApi, type CategoryTreeItem } from '../../lib/api';
+
+const NON_DRUG = getSupplierProductType('non_drug')!;
+const OTC_DRUG = getSupplierProductType('otc_drug')!;
+const RX_DRUG = getSupplierProductType('rx_drug')!;
+type TopChoice = 'drug' | 'non_drug';
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                           */
@@ -92,12 +100,43 @@ export default function SupplierProductImportPage() {
   const [o4oIsPublic, setO4oIsPublic] = useState(false);
   const [o4oServiceKeys, setO4oServiceKeys] = useState<string[]>([]);
   const [o4oRegulatoryType, setO4oRegulatoryType] = useState('GENERAL');
-  // WO-O4O-NETURE-SUPPLIER-MENU-ASSISTANT-IA-CLEANUP-V1: 분석 전 제품 유형 선택
-  const [productType, setProductType] = useState<SupplierProductTypeDef | null>(null);
+  // WO-O4O-NETURE-SUPPLIER-IMPORT-ASSISTANT-PRODUCT-TYPE-PASSTHROUGH-V1:
+  //   진입 화면과 동일한 2분기(의약품/비의약품) 모델. 의약외품은 비의약품 하위.
+  const [searchParams] = useSearchParams();
+  const [topChoice, setTopChoice] = useState<TopChoice | null>(null);
+  const [drugSub, setDrugSub] = useState<SupplierProductTypeDef | null>(null);
+  // 정식 등록 폼으로 전달할 최종 유형. 전달받은 정밀 유형(예: 의약외품)을 보존하되, 분기를 바꾸면 재해석.
+  const [resolvedType, setResolvedType] = useState<SupplierProductTypeDef | null>(null);
 
   useEffect(() => {
     productApi.getCategories().then(setCategories);
   }, []);
+
+  // 앞 단계에서 전달된 productType 을 미리 선택(재선택 불필요). 값 유실/직접 진입 시엔 미선택 → 사용자 선택.
+  useEffect(() => {
+    const incoming = getSupplierProductType(searchParams.get('productType'));
+    if (!incoming) return;
+    if (incoming.key === 'otc_drug' || incoming.key === 'rx_drug') {
+      setTopChoice('drug');
+      setDrugSub(incoming);
+      setResolvedType(incoming);
+    } else if (incoming.key === 'non_drug' || incoming.key === 'quasi_drug') {
+      // 의약외품(quasi_drug)은 비의약품 하위 — 비의약품으로 표시하되 정밀 유형 보존(임의 강등 금지)
+      setTopChoice('non_drug');
+      setResolvedType(incoming);
+    }
+    // unclassified/미전달은 사용자가 직접 선택
+  }, [searchParams]);
+
+  const selectTop = (choice: TopChoice) => {
+    setTopChoice(choice);
+    setDrugSub(null);
+    setResolvedType(choice === 'non_drug' ? NON_DRUG : null);
+  };
+  const selectDrugSub = (t: SupplierProductTypeDef) => {
+    setDrugSub(t);
+    setResolvedType(t);
+  };
 
   const flatCats = useMemo(() => flattenCats(categories), [categories]);
   const selectedCatIsRegulated = flatCats.find((c) => c.id === o4oCategoryId)?.isRegulated ?? false;
@@ -107,6 +146,11 @@ export default function SupplierProductImportPage() {
   /* ---------------------------------------------------------------- */
 
   const handleParse = useCallback(() => {
+    // WO-...PASSTHROUGH: 유형 선택 전에는 분석 제한(직접 진입/값 유실 대비)
+    if (!resolvedType) {
+      setError('먼저 제품 유형(의약품/비의약품)을 선택해 주세요.');
+      return;
+    }
     if (!html.trim()) {
       setError('HTML을 붙여넣어 주세요.');
       return;
@@ -138,7 +182,7 @@ export default function SupplierProductImportPage() {
     setCorrectedDataUrl(null);
     setCorrectionStatus('idle');
     setThumbNaturalSize(null);
-  }, [html, sourceUrl]);
+  }, [html, sourceUrl, resolvedType]);
 
   /* ---------------------------------------------------------------- */
   /*  Navigate to Create                                               */
@@ -180,13 +224,13 @@ export default function SupplierProductImportPage() {
       serviceKeys: o4oServiceKeys.length > 0 ? o4oServiceKeys : undefined,
       // WO-O4O-NETURE-SUPPLIER-MENU-ASSISTANT-IA-CLEANUP-V1: 선택 유형 우선, 없으면 기존 설정
       regulatoryType:
-        (productType?.regulatoryType || undefined) ??
+        (resolvedType?.regulatoryType || undefined) ??
         (o4oRegulatoryType !== 'GENERAL' ? o4oRegulatoryType : undefined),
     };
 
     saveDraft(draft);
-    // 선택 유형을 정식 wizard 로 전달(유형-우선 IA 정합)
-    navigate(productType ? `/supplier/products/new?productType=${productType.key}` : '/supplier/products/new');
+    // 최종 유형을 정식 wizard 로 전달(전달받은 정밀 유형 보존)
+    navigate(resolvedType ? `/supplier/products/new?productType=${resolvedType.key}` : '/supplier/products/new');
   }, [
     parsed,
     name,
@@ -207,7 +251,7 @@ export default function SupplierProductImportPage() {
     o4oIsPublic,
     o4oServiceKeys,
     o4oRegulatoryType,
-    productType,
+    resolvedType,
   ]);
 
   /* ---------------------------------------------------------------- */
@@ -355,36 +399,60 @@ export default function SupplierProductImportPage() {
         </div>
       </div>
 
-      {/* WO-O4O-NETURE-SUPPLIER-MENU-ASSISTANT-IA-CLEANUP-V1: 제품 유형 선택(분석 전) + 유형별 경고 */}
+      {/* WO-O4O-NETURE-SUPPLIER-IMPORT-ASSISTANT-PRODUCT-TYPE-PASSTHROUGH-V1:
+          제품 유형 선택 — 진입 화면과 동일한 2분기(의약품/비의약품). 앞 단계에서 전달되면 미리 선택됨.
+          직접 진입/값 유실 시 안전장치로 선택 UI 유지. 의약외품은 비의약품 하위(등록 폼 규제 구분에서 확정). */}
       <div className="mb-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
         <h2 className="mb-1 text-base font-semibold text-slate-800">제품 유형 선택</h2>
-        <p className="mb-3 text-xs text-slate-500">유형에 따라 검토 절차와 안내가 달라집니다. 정식 등록 화면으로 그대로 이어집니다.</p>
+        <p className="mb-3 text-xs text-slate-500">
+          의약품/비의약품을 먼저 선택하세요. 앞 단계에서 선택했다면 미리 선택되어 있으며, 분석 후 같은 유형의 정식 등록 화면으로 이어집니다.
+        </p>
+        {/* 1차: 의약품 / 비의약품 */}
         <div className="grid sm:grid-cols-2 gap-2">
-          {SUPPLIER_PRODUCT_TYPES.map((t) => {
-            const active = productType?.key === t.key;
-            return (
+          <button
+            onClick={() => selectTop('non_drug')}
+            className={`text-left rounded-lg border p-3 transition-colors ${topChoice === 'non_drug' ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-300' : 'border-slate-200 hover:border-slate-300'}`}
+          >
+            <span className="text-sm font-medium text-slate-800">비의약품</span>
+            <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">일반 상품(식품·생활·잡화 등). 의약외품·의료기기·건기식·화장품 등 세부 분류는 등록 폼의 규제 구분에서 선택합니다.</p>
+          </button>
+          <button
+            onClick={() => selectTop('drug')}
+            className={`text-left rounded-lg border p-3 transition-colors ${topChoice === 'drug' ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-300' : 'border-slate-200 hover:border-slate-300'}`}
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-slate-800">의약품</span>
+              <span className="text-[11px] px-1.5 py-0.5 rounded bg-amber-50 text-amber-700">약국 대상</span>
+            </div>
+            <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">일반의약품 또는 전문의약품. 비처방/처방을 이어서 선택합니다.</p>
+          </button>
+        </div>
+        {/* 1차 의약품 → 비처방/처방 세부 */}
+        {topChoice === 'drug' && (
+          <div className="mt-2 grid sm:grid-cols-2 gap-2">
+            {[OTC_DRUG, RX_DRUG].map((t) => (
               <button
                 key={t.key}
-                onClick={() => setProductType(t)}
-                className={`text-left rounded-lg border p-3 transition-colors ${active ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-300' : 'border-slate-200 hover:border-slate-300'}`}
+                onClick={() => selectDrugSub(t)}
+                className={`text-left rounded-lg border p-3 transition-colors ${drugSub?.key === t.key ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-300' : 'border-slate-200 hover:border-slate-300'}`}
               >
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-slate-800">{t.label}</span>
-                  {t.pharmacyTarget && <span className="text-[11px] px-1.5 py-0.5 rounded bg-amber-50 text-amber-700">약국 대상</span>}
-                </div>
+                <span className="text-sm font-medium text-slate-800">{t.label}</span>
                 <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{t.desc}</p>
               </button>
-            );
-          })}
-        </div>
-        {productType && (
-          <div className={`mt-3 rounded-md border px-3 py-2 text-xs ${productType.rx ? 'border-amber-300 bg-amber-50 text-amber-800' : productType.pharmacyTarget ? 'border-blue-200 bg-blue-50 text-blue-800' : 'border-slate-200 bg-slate-50 text-slate-600'}`}>
-            {productType.key === 'non_drug' && '일반 매장·약국 매장 유형에 공급 가능한 일반 제품입니다.'}
-            {productType.key === 'quasi_drug' && '의약외품은 등록 후 운영자 검토가 필요할 수 있습니다. 효능·효과/신고·허가 문구는 제출 전 확인하세요.'}
-            {productType.key === 'otc_drug' && '비처방 의약품은 약국 매장 유형 중심으로 검토되며, 운영자 검토 전까지 일반 공급 활동으로 자동 연결되지 않습니다.'}
-            {productType.key === 'rx_drug' && '처방의약품은 일반 판매·고객 노출·이벤트 오퍼·유통참여형 펀딩으로 자동 연결되지 않습니다. O4O는 처방의약품을 제품/유통 정보 단위로만 다루며 유효기간·일련번호·lot 정보를 수집하지 않습니다.'}
-            {productType.key === 'unclassified' && '유형이 확실하지 않으면 운영자 검토 대상으로 초안을 생성합니다. 검토 전까지 후속 공급 활동으로 자동 연결되지 않습니다.'}
+            ))}
           </div>
+        )}
+        {/* 전달받은 정밀 유형 안내(의약외품 등 보존 표시) + 유형별 경고 */}
+        {resolvedType && (
+          <div className={`mt-3 rounded-md border px-3 py-2 text-xs ${resolvedType.rx ? 'border-amber-300 bg-amber-50 text-amber-800' : resolvedType.pharmacyTarget ? 'border-blue-200 bg-blue-50 text-blue-800' : 'border-slate-200 bg-slate-50 text-slate-600'}`}>
+            <span className="font-medium">선택된 유형: {resolvedType.label}</span>
+            {resolvedType.key === 'quasi_drug' && ' — 의약외품(비의약품 하위). 효능·효과/신고·허가 문구는 제출 전 확인하세요.'}
+            {resolvedType.key === 'otc_drug' && ' — 비처방 의약품은 약국 매장 유형 중심으로 검토되며, 운영자 검토 전까지 일반 공급 활동으로 자동 연결되지 않습니다.'}
+            {resolvedType.key === 'rx_drug' && ' — 처방의약품은 제품/유통 정보 단위로만 관리되며 일반 판매·이벤트·펀딩으로 자동 연결되지 않습니다.'}
+          </div>
+        )}
+        {topChoice === 'drug' && !drugSub && (
+          <p className="mt-2 text-xs text-amber-700">의약품 세부(비처방/처방)를 선택해 주세요.</p>
         )}
       </div>
 

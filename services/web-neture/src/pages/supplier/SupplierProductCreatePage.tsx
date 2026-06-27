@@ -491,7 +491,15 @@ export default function SupplierProductCreatePage() {
     if (hasInput && !window.confirm('현재 입력한 내용이 있습니다. 상세페이지 소스 자동 입력으로 이동하면 지금까지 입력한 값은 저장되지 않습니다. 계속할까요?')) {
       return;
     }
-    navigate('/supplier/products/import-assistant');
+    // WO-O4O-NETURE-SUPPLIER-IMPORT-ASSISTANT-PRODUCT-TYPE-PASSTHROUGH-V1:
+    //   앞 단계에서 선택된 제품 유형을 도우미로 전달 → 도우미가 미리 선택해 보여준다(재선택 불필요).
+    const params = new URLSearchParams();
+    if (productType) {
+      params.set('productType', productType.key);
+      if (productType.regulatoryType) params.set('regulatoryType', productType.regulatoryType);
+    }
+    const qs = params.toString();
+    navigate(qs ? `/supplier/products/import-assistant?${qs}` : '/supplier/products/import-assistant');
   };
 
   return (
