@@ -40,11 +40,20 @@
 
 ---
 
-## 2. 즉시 ORPHAN (프론트 호출 0 — 제거 후보)
+## 2. ORPHAN 후보
+
+> ### ⚠️ 정정 (2026-06-27) — generate **라우트는 orphan 아님(KEEP)**
+> 본 IR 최초 작성 시 `POST /products/:id/ai-contents/generate[/:type]` 를 "즉시 orphan"으로 분류했으나 **오판**이었다. 후속 검증에서 **살아있는 호출처 2곳** 확인:
+> - `apps/admin-dashboard/src/pages/store/pop/PopCreatePage.tsx:334-335` → `pop.api.ts:97 generateAiContent('pop_short'|'pop_long')` → `POST .../generate/:type` (**admin 운영자 POP 생성**, live)
+> - `apps/api-server/.../modules/store-ai/controllers/product-ai-tag.controller.ts:66-73` → `ProductAiContentService.generateAllContents()` (**AI 태깅 → 콘텐츠 자동생성 파이프라인** WO-O4O-PRODUCT-AI-CONTENT-PIPELINE-V1, live)
+>
+> **누락 원인:** 최초 orphan 확인이 `services/web-*` 만 grep — admin-dashboard·백엔드 내부 파이프라인 미포함.
+> **결론:** generate 라우트·`generateAllContents`·`generateContent`·`product_ai_contents` entity·5 contentType·PRODUCT_CONTENT_PROMPTS 는 **KEEP** (admin + pipeline 이 소비). 제품 방향 "매장 제작 화면 AI 배제" 와 무관 — admin 상품마스터 콘텐츠 자동화는 별개(`product_ai_contents` = draft/seed).
 
 | 자산 | 확인 | 분류 |
 |---|---|---|
-| **`generateProductAiContent()`** (3 services `api/productAiContent.ts`) + 백엔드 **`POST /products/:id/ai-contents/generate[/:type]`** | 정의만 존재, **호출 0** (R1 "AI 재생성" 제거로 소멸). get/save/list/delete 는 유지 | **제거 후보** (generate 경로만 — entity/get/save 는 유지) |
+| **`generateProductAiContent()`** (매장 프론트 래퍼, 3 services `services/web-*/api/productAiContent.ts`) | 정의만 존재, **매장 측 호출 0** (R1 "AI 재생성" 제거로 소멸). 백엔드 라우트는 admin/pipeline 이 별도 호출 | **제거 후보 (래퍼만)** — 백엔드 라우트/service/entity/prompt 무관·유지 |
+| ~~백엔드 `POST /products/:id/ai-contents/generate[/:type]`~~ | ~~orphan~~ → **KEEP** (위 정정 참조) | admin PopCreatePage + 태깅 파이프라인 사용 |
 | **`StoreUseModal` + `POST /api/ai/content-to-store-use`** (`store_sns` 등 useCase) | Toolbar 마운트 제거(`Toolbar.tsx:689`), 컴포넌트·API 코드만 잔존 | **기존 WO 존재** → `WO-O4O-STORE-USE-MODAL-DECISION-V1` (별도). 본 축 비포함 |
 
 > `O4O-AI-CONTENT-AUTOMATION-V1.md:340` 도 StoreUseModal/content-to-store-use 를 "코드 유지, UI 비활성"으로 명시. 복원 옵션이 열려 있어 **삭제 아님 — 결정 WO 로 분리**.
@@ -111,13 +120,15 @@ docs/architecture/O4O-AI-CONTENT-AUTOMATION-V1.md         StoreUseModal/content-
    (+ KPA ResourceWriteModal / StoreProductionMaterialsPage / GP OperatorResourcesPage 페이지 진입 평가)
    → 완료 시 pop/blog/store_qr outputType 의 프론트 호출이 비로소 0.
 
-2. WO-O4O-PRODUCT-AI-CONTENT-GENERATE-ROUTE-RETIRE-V1
-   generateProductAiContent 래퍼(3) + POST /products/:id/ai-contents/generate[/:type] 회수.
-   (get/save/list/delete 및 entity 는 유지.)
+2. WO-O4O-STORE-PRODUCT-AI-GENERATE-CLIENT-WRAPPER-CLEANUP-V1   (구 …-GENERATE-ROUTE-RETIRE-V1 폐기)
+   ⚠️ 정정(§2): 백엔드 라우트는 admin PopCreatePage + 태깅 파이프라인이 사용 → KEEP.
+   매장 프론트 래퍼 generateProductAiContent(3 services) 만 dead-code 제거.
+   백엔드·admin-dashboard·prompt·entity·get/save/list/delete 무변경.
 
-3. WO-O4O-AI-OUTPUTTYPE-PROMPT-DIET-V1
-   1·2 완료 후 orphan 확정된 제작 outputType(pop/blog/store_qr/product_detail/store_sns/title_suggest)
-   및 ai-prompts 제작 프롬프트 정리. 타입/dispatcher 동반.
+3. WO-O4O-AI-OUTPUTTYPE-PROMPT-DIET-V1   (즉시 진행 금지 — 재조사 선행)
+   ⚠️ #2 오판 교훈: outputType/프롬프트 다이어트 전 services + apps/admin-dashboard + apps/api-server
+   내부 service 호출까지 **전체 모노레포 소비자 재조사** 필수. pop_short/pop_long 등 admin·pipeline
+   사용 프롬프트는 KEEP. orphan 확정분만 정리.
 
 별도: WO-O4O-STORE-USE-MODAL-DECISION-V1 (기존), LMS/Signage/admin builder = RESERVED.
 ```
@@ -139,4 +150,4 @@ docs/architecture/O4O-AI-CONTENT-AUTOMATION-V1.md         StoreUseModal/content-
 
 ## 9. 결론
 
-운영자/관리자 AI 설정 화면은 **모델·쿼터·관측·과금 전용**이며 제작 프롬프트/outputType 잔재가 없다(clean). 제작 AI 자산 중 **즉시 orphan = `generateProductAiContent` + `POST .../ai-contents/generate`** 와 (기존 WO 보유) **StoreUseModal/content-to-store-use** 뿐이다. 제작 outputType(`pop`/`blog`/`store_qr` 등) 은 **GP/KCos POP/QR/Blog 페이지 진입 AI 가 아직 남아 있어 orphan 이 아니며**, 따라서 정비는 `WO-O4O-GP-KCOS-POP-QR-BLOG-AI-ENTRY-REMOVE-V1`(진입 제거) → 라우트 회수 → 프롬프트/타입 다이어트 순으로 분리한다.
+운영자/관리자 AI 설정 화면은 **모델·쿼터·관측·과금 전용**이며 제작 프롬프트/outputType 잔재가 없다(clean). 제작 AI 자산 중 **즉시 orphan 은 매장 프론트 래퍼 `generateProductAiContent`(3) 뿐**이며, **백엔드 generate 라우트·service·entity·프롬프트는 admin PopCreatePage + 태깅 파이프라인이 사용하므로 KEEP**(§2 정정 참조). StoreUseModal/content-to-store-use 는 기존 결정 WO 로 분리. 제작 outputType(`pop`/`blog`/`store_qr` 등) 은 GP/KCos 진입 제거 후에도 admin/pipeline 소비 가능성이 있어 **전체 모노레포 재조사 후** 다이어트한다(역순·성급한 삭제 금지).
