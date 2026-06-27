@@ -319,6 +319,34 @@ export const directContentApi = {
     ),
 };
 
+// ─── Handled-Product ↔ Content Links (WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1) ──
+
+export type HandledProductSourceType = 'listing' | 'local';
+
+export interface LinkedContentItem {
+  contentId: string;
+  title: string;
+  /** kpa_store_contents.workspace_status (draft / pending_ai / ai_processed / ready_curation / archived) */
+  status: string;
+  linkType: string;
+  /** 'direct' = direct 콘텐츠 / 'snapshot_edit' = 스냅샷 편집 */
+  sourceType: 'direct' | 'snapshot_edit';
+  snapshotId: string | null;
+  updatedAt: string;
+}
+
+export const handledProductContentApi = {
+  /**
+   * 특정 매장 취급제품에 연결된 자료함 콘텐츠 목록.
+   * GET /store-contents/by-product?sourceType=listing|local&sourceId=...
+   */
+  byProduct: (sourceType: HandledProductSourceType, sourceId: string) =>
+    apiClient.get<{ success: boolean; data: { items: LinkedContentItem[] } }>(
+      '/store-contents/by-product',
+      { sourceType, sourceId },
+    ),
+};
+
 // ─────────────────────────────────────────────────────
 // Store Library Unified Feed — WO-O4O-STORE-LIBRARY-DIRECT-CONTENT-UNIFIED-V1
 // snapshot(cms+content) + direct contents 통합 paginated feed

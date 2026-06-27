@@ -392,9 +392,11 @@ export function createStoreContentController(
           return;
         }
 
-        const rows: Array<{ id: string; title: string; workspace_status: string; link_type: string; updated_at: Date }> =
+        // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1:
+        //   source_type / snapshot_id 를 함께 반환 → 프론트가 편집 경로(direct vs snapshot)를 판별.
+        const rows: Array<{ id: string; title: string; workspace_status: string; link_type: string; source_type: string; snapshot_id: string | null; updated_at: Date }> =
           await dataSource.query(
-            `SELECT c.id, c.title, c.workspace_status, l.link_type, c.updated_at
+            `SELECT c.id, c.title, c.workspace_status, l.link_type, c.source_type, c.snapshot_id, c.updated_at
              FROM kpa_store_content_product_links l
              JOIN kpa_store_contents c
                ON c.id = l.content_id AND c.organization_id = l.organization_id
@@ -411,6 +413,9 @@ export function createStoreContentController(
               title: r.title,
               status: r.workspace_status,
               linkType: r.link_type,
+              // 'direct' = direct 콘텐츠(/store/content/direct/:id) / 'snapshot_edit' = 스냅샷 편집(/store/content/:snapshotId/edit)
+              sourceType: r.source_type,
+              snapshotId: r.snapshot_id,
               updatedAt: r.updated_at,
             })),
           },

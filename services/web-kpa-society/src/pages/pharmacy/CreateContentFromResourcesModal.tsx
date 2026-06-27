@@ -29,13 +29,23 @@ import { getAccessToken } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
 import { TagInput } from '../../components/store/TagInput';
 
+// WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1:
+//   매장 취급제품에서 진입 시 연결 대상 제품 정보. 저장 시 top-level productRef 로 전달되어
+//   생성 콘텐츠가 해당 제품에 자동 연결된다. (listing=O4O 기반 제품 / local=매장 경영활용 제품)
+export interface CreateContentProductContext {
+  sourceType: 'listing' | 'local';
+  sourceId: string;
+  name: string;
+}
+
 interface Props {
   open: boolean;
   onClose: () => void;
   onCreated?: (newContentId: string) => void;
+  product?: CreateContentProductContext | null;
 }
 
-export function CreateContentFromResourcesModal({ open, onClose, onCreated }: Props) {
+export function CreateContentFromResourcesModal({ open, onClose, onCreated, product }: Props) {
   const navigate = useNavigate();
 
   const [title, setTitle] = useState('');
@@ -87,6 +97,8 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated }: Pr
             sourceResources: [],
             generatedBy: 'manual-direct',
           },
+          // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1: 제품 진입 시 자동 연결.
+          ...(product ? { productRef: { sourceType: product.sourceType, sourceId: product.sourceId } } : {}),
         },
       );
       const newId = res?.data?.id;
@@ -103,7 +115,7 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated }: Pr
     } finally {
       setSaving(false);
     }
-  }, [title, tags, editorHtml, onCreated, onClose, navigate]);
+  }, [title, tags, editorHtml, product, onCreated, onClose, navigate]);
 
   if (!open) return null;
 
@@ -122,6 +134,17 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated }: Pr
         </header>
 
         <div style={styles.body}>
+          {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1: 제품에서 진입한 경우 연결 대상 표시 */}
+          {product && (
+            <div style={styles.productBanner}>
+              <span style={styles.productBannerLabel}>관련 매장 취급제품</span>
+              <span style={styles.productBannerName}>{product.name}</span>
+              <span style={styles.productBannerKind}>
+                {product.sourceType === 'listing' ? 'O4O 기반 제품' : '매장 경영활용 제품'}
+              </span>
+            </div>
+          )}
+
           <p style={styles.guideHint}>
             외부 AI 도구(ChatGPT·Claude·Gemini 등)나 문서에서 작성한 초안을 붙여넣고 편집한 뒤 저장하세요.
           </p>
@@ -231,6 +254,28 @@ const styles: Record<string, CSSProperties> = {
     borderRadius: 6,
   },
   body: { padding: 18, overflowY: 'auto', flex: 1 },
+  // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1: 연결 대상 제품 배너
+  productBanner: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 10,
+    flexWrap: 'wrap',
+    margin: '0 0 14px',
+    padding: '10px 12px',
+    background: '#F0FDF4',
+    border: '1px solid #BBF7D0',
+    borderRadius: 8,
+  },
+  productBannerLabel: { fontSize: 11, fontWeight: 700, color: '#15803D' },
+  productBannerName: { fontSize: 14, fontWeight: 600, color: colors.neutral800 },
+  productBannerKind: {
+    fontSize: 11,
+    fontWeight: 500,
+    color: '#1D4ED8',
+    background: '#DBEAFE',
+    padding: '2px 8px',
+    borderRadius: 999,
+  },
   guideHint: {
     margin: '0 0 14px',
     padding: '9px 12px',
