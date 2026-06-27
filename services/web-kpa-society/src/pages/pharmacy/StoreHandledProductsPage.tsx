@@ -201,6 +201,7 @@ export default function StoreHandledProductsPage() {
               <th style={{ ...styles.th, textAlign: 'left' }}>제품</th>
               <th style={styles.th}>구분</th>
               <th style={styles.th}>매장 표시 가격</th>
+              <th style={styles.th}>연결 콘텐츠</th>
               <th style={styles.th}>상태</th>
               <th style={styles.th}>최근 수정일</th>
               <th style={styles.th}>관리</th>
@@ -209,15 +210,15 @@ export default function StoreHandledProductsPage() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={6} style={styles.empty}>불러오는 중…</td>
+                <td colSpan={7} style={styles.empty}>불러오는 중…</td>
               </tr>
             ) : error ? (
               <tr>
-                <td colSpan={6} style={{ ...styles.empty, color: '#DC2626' }}>{error}</td>
+                <td colSpan={7} style={{ ...styles.empty, color: '#DC2626' }}>{error}</td>
               </tr>
             ) : items.length === 0 ? (
               <tr>
-                <td colSpan={6} style={styles.empty}>{searchQuery ? '검색 결과가 없습니다' : EMPTY_BY_SOURCE[source]}</td>
+                <td colSpan={7} style={styles.empty}>{searchQuery ? '검색 결과가 없습니다' : EMPTY_BY_SOURCE[source]}</td>
               </tr>
             ) : (
               items.map((it) => (
@@ -238,6 +239,14 @@ export default function StoreHandledProductsPage() {
                     <Badge text={originLabel(it.sourceType)} tone={it.sourceType === 'listing' ? 'blue' : 'amber'} />
                   </td>
                   <td style={styles.td}>{formatPrice(it.price)}</td>
+                  <td style={styles.td}>
+                    {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-LINK-V1: 연결 콘텐츠 수(0 = 없음). */}
+                    {it.linkedContentCount > 0 ? (
+                      <Badge text={`${it.linkedContentCount}개`} tone="blue" />
+                    ) : (
+                      <span style={{ color: colors.neutral400 }}>없음</span>
+                    )}
+                  </td>
                   <td style={styles.td}>
                     <Badge text={it.statusLabel} tone={it.isActive ? 'green' : 'gray'} />
                   </td>

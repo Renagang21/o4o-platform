@@ -308,6 +308,7 @@ import {
   KpaAuditLog,
   KpaStoreAssetControl,
   KpaStoreContent, // WO-KPA-A-CONTENT-OVERRIDE-EXTENSION-V1
+  KpaStoreContentProductLink, // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-LINK-V1
   KpaPharmacyRequest, // WO-KPA-A-PHARMACY-REQUEST-STRUCTURE-REALIGN-V1
   OrganizationServiceEnrollment, // WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1
   KpaPharmacistProfile, // WO-ROLE-NORMALIZATION-PHASE3-B-V1
@@ -782,6 +783,8 @@ export const entities = [
   KpaStoreAssetControl,
   // WO-KPA-A-CONTENT-OVERRIDE-EXTENSION-V1
   KpaStoreContent,
+  // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-LINK-V1
+  KpaStoreContentProductLink,
   // WO-KPA-A-PHARMACY-REQUEST-STRUCTURE-REALIGN-V1
   KpaPharmacyRequest,
   OrganizationServiceEnrollment,

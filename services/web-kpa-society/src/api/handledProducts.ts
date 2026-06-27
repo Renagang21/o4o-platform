@@ -29,6 +29,8 @@ export interface HandledProduct {
   price: number | null;
   statusLabel: string;
   isActive: boolean;
+  // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-LINK-V1: 연결된 자료함 콘텐츠 수(0 = 없음).
+  linkedContentCount: number;
   updatedAt: string;
   managePath: string;
 }

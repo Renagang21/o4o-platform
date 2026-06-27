@@ -144,6 +144,25 @@ export function createStoreHandledProductsRoutes(dataSource: DataSource): Router
       ]);
       const total = countRes[0]?.total ?? 0;
 
+      // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-LINK-V1:
+      //   현재 페이지 제품들의 연결 콘텐츠 수(linkedContentCount)를 1회 집계 쿼리로 조회(N+1 회피).
+      //   UNION 본 쿼리는 건드리지 않고, 페이지 결과(source_id)에 대해서만 group count 한다.
+      const linkCountMap = new Map<string, number>();
+      if (rows.length > 0) {
+        const pageSourceIds = rows.map((r) => r.source_id);
+        const linkRows: Array<{ product_source_type: string; product_source_id: string; cnt: number }> =
+          await dataSource.query(
+            `SELECT product_source_type, product_source_id, COUNT(*)::int AS cnt
+             FROM kpa_store_content_product_links
+             WHERE organization_id = $1 AND product_source_id = ANY($2::uuid[])
+             GROUP BY product_source_type, product_source_id`,
+            [organizationId, pageSourceIds],
+          );
+        for (const lr of linkRows) {
+          linkCountMap.set(`${lr.product_source_type}:${lr.product_source_id}`, lr.cnt);
+        }
+      }
+
       // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-DISPLAY-POOL-SIMPLIFY-V1:
       //   제품 풀(매장 취급제품)은 채널 상태판이 아니다. 화면에서 채널 상태 컬럼(타블렛/온라인몰/상품설명)을
       //   제거했으므로, 그를 위한 enrich 조인 3종(store_tablet_displays / organization_product_channels /
@@ -161,6 +180,8 @@ export function createStoreHandledProductsRoutes(dataSource: DataSource): Router
           price: r.price != null ? Number(r.price) : null,
           statusLabel: isListing ? listingStatusLabel(r, now) : r.is_active ? '활성' : '비활성',
           isActive: r.is_active,
+          // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-LINK-V1: 연결 콘텐츠 수(0 = 없음).
+          linkedContentCount: linkCountMap.get(`${r.source_type}:${r.source_id}`) ?? 0,
           updatedAt: r.updated_at,
           managePath: isListing
             ? `/store/my-products?highlight=${r.source_id}`

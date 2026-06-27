@@ -65,6 +65,129 @@ export function createStoreContentController(
 ): Router {
   const router = Router();
 
+  // ───────────────────────────────────────────────────────────────────────────
+  // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-LINK-V1
+  //   콘텐츠 ↔ 매장 취급제품 연결(kpa_store_content_product_links) 처리 헬퍼.
+  //   - productRef 미전송 → 기존 link 유지 (tags 와 동일 정책)
+  //   - productRef: null  → 기존 product_description link 제거
+  //   - productRef: { sourceType, sourceId } → 검증 후 link 교체(1개 유지)
+  //   - sourceType: 'listing'=O4O 기반 제품 / 'local'=매장 경영활용 제품
+  //   - org 스코프 검증 + listing 의 master_id 부가 보존.
+  // ───────────────────────────────────────────────────────────────────────────
+  const LINK_TYPE = 'product_description';
+
+  type ParsedProductRef =
+    | { kind: 'absent' }
+    | { kind: 'clear' }
+    | { kind: 'set'; sourceType: 'listing' | 'local'; sourceId: string }
+    | { kind: 'invalid'; message: string };
+
+  function parseProductRef(raw: unknown): ParsedProductRef {
+    if (raw === undefined) return { kind: 'absent' };
+    if (raw === null) return { kind: 'clear' };
+    if (typeof raw !== 'object') return { kind: 'invalid', message: 'productRef는 객체여야 합니다.' };
+    const ref = raw as { sourceType?: unknown; sourceId?: unknown };
+    if (ref.sourceType !== 'listing' && ref.sourceType !== 'local') {
+      return { kind: 'invalid', message: "productRef.sourceType은 'listing' 또는 'local' 이어야 합니다." };
+    }
+    if (typeof ref.sourceId !== 'string' || !UUID_RE.test(ref.sourceId)) {
+      return { kind: 'invalid', message: 'productRef.sourceId는 유효한 UUID 여야 합니다.' };
+    }
+    return { kind: 'set', sourceType: ref.sourceType, sourceId: ref.sourceId };
+  }
+
+  /**
+   * 제품이 해당 매장(organization)에 속하는지 검증하고 listing 의 master_id 를 반환.
+   * - listing: organization_product_listings 에서 master_id 조회
+   * - local:   store_local_products 존재만 확인 (master 없음)
+   * 미존재/타 매장이면 ok=false.
+   */
+  async function resolveProductForLink(
+    organizationId: string,
+    sourceType: 'listing' | 'local',
+    sourceId: string,
+  ): Promise<{ ok: true; masterId: string | null } | { ok: false }> {
+    if (sourceType === 'listing') {
+      const rows = await dataSource.query(
+        `SELECT master_id FROM organization_product_listings WHERE id = $1 AND organization_id = $2 LIMIT 1`,
+        [sourceId, organizationId],
+      );
+      if (!rows.length) return { ok: false };
+      return { ok: true, masterId: rows[0].master_id ?? null };
+    }
+    const rows = await dataSource.query(
+      `SELECT id FROM store_local_products WHERE id = $1 AND organization_id = $2 LIMIT 1`,
+      [sourceId, organizationId],
+    );
+    if (!rows.length) return { ok: false };
+    return { ok: true, masterId: null };
+  }
+
+  async function clearProductLink(organizationId: string, contentId: string): Promise<void> {
+    await dataSource.query(
+      `DELETE FROM kpa_store_content_product_links
+       WHERE organization_id = $1 AND content_id = $2 AND link_type = $3`,
+      [organizationId, contentId, LINK_TYPE],
+    );
+  }
+
+  async function replaceProductLink(
+    organizationId: string,
+    contentId: string,
+    sourceType: 'listing' | 'local',
+    sourceId: string,
+    masterId: string | null,
+  ): Promise<void> {
+    // V1: 콘텐츠당 product_description link 1개 유지 → 기존 제거 후 삽입.
+    await clearProductLink(organizationId, contentId);
+    await dataSource.query(
+      `INSERT INTO kpa_store_content_product_links
+         (organization_id, content_id, product_source_type, product_source_id, master_id, link_type)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       ON CONFLICT (organization_id, content_id, product_source_type, product_source_id, link_type) DO NOTHING`,
+      [organizationId, contentId, sourceType, sourceId, masterId, LINK_TYPE],
+    );
+  }
+
+  type ProductRefPlan =
+    | { action: 'noop' }
+    | { action: 'clear' }
+    | { action: 'set'; sourceType: 'listing' | 'local'; sourceId: string; masterId: string | null };
+
+  /**
+   * productRef 형식 검증 + 제품 org 스코프 검증을 콘텐츠 저장 *이전* 에 수행한다
+   * (잘못된 productRef 로 콘텐츠가 먼저 저장되는 orphan 방지).
+   * ok=false 면 호출측이 400 으로 응답. ok=true 면 plan 을 저장 후 applyProductRefPlan 으로 적용.
+   */
+  async function prepareProductRef(
+    organizationId: string,
+    raw: unknown,
+  ): Promise<{ ok: true; plan: ProductRefPlan; error?: undefined } | { ok: false; error: string; plan?: undefined }> {
+    const parsed = parseProductRef(raw);
+    if (parsed.kind === 'absent') return { ok: true, plan: { action: 'noop' } };
+    if (parsed.kind === 'invalid') return { ok: false, error: parsed.message };
+    if (parsed.kind === 'clear') return { ok: true, plan: { action: 'clear' } };
+    const resolved = await resolveProductForLink(organizationId, parsed.sourceType, parsed.sourceId);
+    if (!resolved.ok) return { ok: false, error: '연결할 제품을 현재 매장에서 찾을 수 없습니다.' };
+    return {
+      ok: true,
+      plan: { action: 'set', sourceType: parsed.sourceType, sourceId: parsed.sourceId, masterId: resolved.masterId },
+    };
+  }
+
+  async function applyProductRefPlan(
+    organizationId: string,
+    contentId: string,
+    plan: ProductRefPlan,
+  ): Promise<void> {
+    if (plan.action === 'noop') return;
+    if (plan.action === 'clear') {
+      await clearProductLink(organizationId, contentId);
+      return;
+    }
+    await replaceProductLink(organizationId, contentId, plan.sourceType, plan.sourceId, plan.masterId);
+  }
+
   /**
    * GET /store-contents
    *
@@ -173,10 +296,11 @@ export function createStoreContentController(
           return;
         }
 
-        const { title, contentJson, tags } = req.body as {
+        const { title, contentJson, tags, productRef } = req.body as {
           title?: string;
           contentJson?: unknown;
           tags?: unknown;
+          productRef?: unknown;
         };
 
         if (!title || !title.trim()) {
@@ -184,6 +308,14 @@ export function createStoreContentController(
             success: false,
             error: { code: 'VALIDATION_ERROR', message: 'title은 필수입니다.' },
           });
+          return;
+        }
+
+        // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-LINK-V1:
+        //   productRef 는 optional. 저장 전 형식/제품 org 스코프 검증.
+        const prepared = await prepareProductRef(organizationId, productRef);
+        if (!prepared.ok) {
+          res.status(400).json({ success: false, error: { code: 'INVALID_PRODUCT_REF', message: prepared.error } });
           return;
         }
 
@@ -198,6 +330,8 @@ export function createStoreContentController(
           updated_by: userId,
         });
         const saved = await repo.save(content);
+
+        await applyProductRefPlan(organizationId, saved.id, prepared.plan);
 
         res.status(201).json({
           success: true,
@@ -217,6 +351,72 @@ export function createStoreContentController(
           success: false,
           error: { code: 'INTERNAL_ERROR', message: error.message },
         });
+      }
+    },
+  );
+
+  /**
+   * GET /store-contents/by-product
+   * WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-LINK-V1
+   *
+   * 특정 매장 취급제품에 연결된 콘텐츠 목록.
+   * Query: sourceType(listing|local), sourceId(uuid)
+   * NOTE: /:snapshotId 보다 먼저 등록해야 한다(리터럴 경로 우선).
+   */
+  router.get(
+    '/by-product',
+    requireAuth,
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const authReq = req as AuthRequest;
+        const userId = authReq.user?.id;
+        if (!userId) {
+          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
+          return;
+        }
+
+        const sourceType = req.query.sourceType as string;
+        const sourceId = req.query.sourceId as string;
+        if (sourceType !== 'listing' && sourceType !== 'local') {
+          res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: "sourceType은 'listing' 또는 'local' 이어야 합니다." } });
+          return;
+        }
+        if (!sourceId || !UUID_RE.test(sourceId)) {
+          res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'sourceId는 유효한 UUID 여야 합니다.' } });
+          return;
+        }
+
+        const organizationId = await resolveDualOrgId(userId);
+        if (!organizationId) {
+          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: 'No organization membership' } });
+          return;
+        }
+
+        const rows: Array<{ id: string; title: string; workspace_status: string; link_type: string; updated_at: Date }> =
+          await dataSource.query(
+            `SELECT c.id, c.title, c.workspace_status, l.link_type, c.updated_at
+             FROM kpa_store_content_product_links l
+             JOIN kpa_store_contents c
+               ON c.id = l.content_id AND c.organization_id = l.organization_id
+             WHERE l.organization_id = $1 AND l.product_source_type = $2 AND l.product_source_id = $3
+             ORDER BY c.updated_at DESC`,
+            [organizationId, sourceType, sourceId],
+          );
+
+        res.json({
+          success: true,
+          data: {
+            items: rows.map((r) => ({
+              contentId: r.id,
+              title: r.title,
+              status: r.workspace_status,
+              linkType: r.link_type,
+              updatedAt: r.updated_at,
+            })),
+          },
+        });
+      } catch (error: any) {
+        res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
       }
     },
   );
@@ -335,7 +535,7 @@ export function createStoreContentController(
           return;
         }
 
-        const { title, contentJson, tags } = req.body as { title?: string; contentJson?: Record<string, unknown>; tags?: unknown };
+        const { title, contentJson, tags, productRef } = req.body as { title?: string; contentJson?: Record<string, unknown>; tags?: unknown; productRef?: unknown };
 
         const repo = dataSource.getRepository(KpaStoreContent);
         const content = await repo.findOne({
@@ -347,6 +547,13 @@ export function createStoreContentController(
           return;
         }
 
+        // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-LINK-V1: productRef optional, 저장 전 검증.
+        const prepared = await prepareProductRef(organizationId, productRef);
+        if (!prepared.ok) {
+          res.status(400).json({ success: false, error: { code: 'INVALID_PRODUCT_REF', message: prepared.error } });
+          return;
+        }
+
         if (title !== undefined) content.title = title.trim() || content.title;
         if (contentJson !== undefined) content.content_json = contentJson as Record<string, unknown>;
         // tags 미전송 시 기존 값 보존, 전송 시 sanitize 후 교체.
@@ -354,6 +561,9 @@ export function createStoreContentController(
         content.updated_by = userId;
 
         const saved = await repo.save(content);
+
+        // productRef 미전송 → 기존 link 유지 / null → 제거 / 객체 → 교체.
+        await applyProductRefPlan(organizationId, saved.id, prepared.plan);
 
         res.json({
           success: true,
@@ -559,9 +769,10 @@ export function createStoreContentController(
         }
 
         const { snapshotId } = req.params;
-        const { title, contentJson } = req.body as {
+        const { title, contentJson, productRef } = req.body as {
           title?: string;
           contentJson?: Record<string, unknown>;
+          productRef?: unknown;
         };
 
         if (!title || !contentJson) {
@@ -569,6 +780,13 @@ export function createStoreContentController(
             success: false,
             error: { code: 'VALIDATION_ERROR', message: 'title and contentJson are required' },
           });
+          return;
+        }
+
+        // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-LINK-V1: productRef optional, 저장 전 검증.
+        const prepared = await prepareProductRef(organizationId, productRef);
+        if (!prepared.ok) {
+          res.status(400).json({ success: false, error: { code: 'INVALID_PRODUCT_REF', message: prepared.error } });
           return;
         }
 
@@ -602,6 +820,8 @@ export function createStoreContentController(
           });
           content = await repo.save(content);
         }
+
+        await applyProductRefPlan(organizationId, content.id, prepared.plan);
 
         res.json({
           success: true,

@@ -15,6 +15,8 @@ export * from '../../../modules/store-core/entities/organization-product-channel
 export * from './kpa-store-asset-control.entity.js';
 // WO-KPA-A-CONTENT-OVERRIDE-EXTENSION-V1
 export * from './kpa-store-content.entity.js';
+// WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-LINK-V1
+export * from './kpa-store-content-product-link.entity.js';
 // WO-KPA-A-PHARMACY-REQUEST-STRUCTURE-REALIGN-V1
 export * from './kpa-pharmacy-request.entity.js';
 // WO-O4O-STORE-CORE-ENTITY-EXTRACTION-V1: re-export from store-core
