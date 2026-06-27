@@ -734,11 +734,11 @@ export const kpaGuideFeatureSignageProps: GuideFeatureManualPageProps = {
 
 // ─── /guide/features/content ───────────────────────────────────────────
 // WO-O4O-KPA-GUIDE-CONTENT-MANUAL-REFRESH-V1: 실제 구현 기준 전면 정비
-// - /content = 3-섹션 허브 (문서형/코스형/설문) + 자료실 진입
+// - /content = 2-섹션 허브 (문서형/설문) + 자료실 진입
 // - 문서형 콘텐츠 (/content/documents) — 작성·상세·추천·감사 포인트
 // - AI로 만들기: URL/텍스트 → HTML 생성 (요약·매장용 변환 설명 제거)
 // - 자료실 (/content/resources) — 내 자료함 가져가기
-// - 코스형 자료 · 설문은 별도 가이드로 위임
+// - 설문 · LMS는 별도 가이드로 위임
 
 export const kpaGuideFeatureContentProps: GuideFeatureManualPageProps = {
   hero: {
@@ -747,19 +747,18 @@ export const kpaGuideFeatureContentProps: GuideFeatureManualPageProps = {
     description: '문서형 콘텐츠를 읽고 작성하고, AI로 만들고, 자료실에서 가져오는 방법을 안내합니다',
     primaryAction: { label: '콘텐츠 허브로 이동 →', to: '/content' },
     flowBarTitle: '이용 흐름',
-    flowLabels: ['콘텐츠 허브', '문서형 콘텐츠', '콘텐츠 작성', 'AI로 만들기', '자료실', '다른 콘텐츠'],
+    flowLabels: ['콘텐츠 허브', '문서형 콘텐츠', '콘텐츠 작성', 'AI로 만들기', '자료실', '설문·강의'],
   },
   sections: [
     {
       step: '01',
       title: '콘텐츠 허브',
       routeLabel: '/content',
-      description: '문서형 콘텐츠, 코스형 자료, 설문조사를 한 화면에서 미리 보고 진입합니다. 우상단의 자료실 링크로 가져갈 수 있는 자료도 바로 확인합니다.',
+      description: '문서형 콘텐츠와 설문조사를 한 화면에서 미리 보고 진입합니다. 우상단의 자료실 링크로 가져갈 수 있는 자료도 바로 확인합니다.',
       items: [
         { label: '문서형 콘텐츠 섹션', detail: '최근 문서 미리보기. 우측 "더 보기 →"로 전체 목록(/content/documents)으로 이동합니다.' },
-        { label: '코스형 자료 섹션', detail: '공개된 코스형 자료가 카드로 표시됩니다. 더 보기로 /content/courses 로 이동합니다.' },
         { label: '설문조사 섹션', detail: '진행 중·완료된 설문이 표시됩니다. 더 보기로 /content/surveys 로 이동합니다.' },
-        { label: '등록 버튼', detail: '로그인한 회원은 각 섹션 우상단에서 "문서 등록", "코스형 자료 등록", "설문 등록"으로 진입합니다.' },
+        { label: '등록 버튼', detail: '로그인한 회원은 각 섹션 우상단에서 "문서 등록" 또는 "설문 등록"으로 진입합니다.' },
         { label: '자료실 진입', detail: '페이지 우상단 "자료실 →" 링크로 /content/resources 로 이동합니다.' },
       ],
     },
@@ -816,12 +815,11 @@ export const kpaGuideFeatureContentProps: GuideFeatureManualPageProps = {
     },
     {
       step: '06',
-      title: '다른 콘텐츠 이동',
-      description: '콘텐츠 허브에서 코스형 자료와 설문조사로 바로 이동합니다. 사용 방법은 각 전용 가이드를 참고합니다.',
+      title: '설문·강의 이용',
+      description: '설문조사와 강의는 각각의 전용 화면과 가이드에서 이용합니다.',
       items: [
-        { label: '코스형 자료', detail: '/content/courses 에서 공개된 코스형 자료를 확인합니다. 작성은 강사(lms:instructor) 또는 운영자 권한이 필요합니다.' },
-        { label: '강의(LMS) 가이드', detail: '강의 수강·작성 흐름은 /guide/features/lms 가이드를 참고합니다.' },
         { label: '설문조사 가이드', detail: '설문 참여·작성·결과 확인·포인트 보상은 /guide/features/survey 가이드를 참고합니다.' },
+        { label: '강의(LMS) 가이드', detail: '강의 수강·작성 흐름은 /guide/features/lms 가이드를 참고합니다.' },
       ],
     },
   ],
