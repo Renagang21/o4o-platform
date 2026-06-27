@@ -1,5 +1,5 @@
 /**
- * SelectContentsForProductionModal — production-materials 페이지의 콘텐츠/강의 선택 모달
+ * SelectContentsForProductionModal — production-materials 페이지의 콘텐츠 선택 모달
  *
  * WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-SELECTOR-MODAL-V1
  *
@@ -10,12 +10,12 @@
  * 선택 완료 → onConfirm(items) → 호출 측이 StartProductionModal 로 전달.
  *
  * WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-DIRECT-CREATE-V1:
- *   기존 콘텐츠/강의 선택은 유지하되, 모달 상단에 "처음부터 만들기" 액션을 추가한다.
+ *   기존 콘텐츠 선택은 유지하되, 모달 상단에 "처음부터 만들기" 액션을 추가한다.
  *   원본 콘텐츠가 0건이어도 매장 경영자가 빈 제작 자료를 바로 작성할 수 있도록 onCreateBlank 를 노출.
  *
  * WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-SOURCE-LOAD-FIX-V1:
  *   "기존 자료를 불러와 제작자료로 만들기" 흐름 정비. 소스 탭을 추가한다.
- *     - 콘텐츠·강의 : 기존 StoreContentsSelector (내 자료함 snapshot/direct → AI 제작 흐름)
+ *     - 콘텐츠 : 기존 StoreContentsSelector (내 자료함 snapshot/direct → AI 제작 흐름)
  *     - 운영자 콘텐츠 : kpa_contents(status='ready') 본문을 편집기에 직접 prefill (가져오기=복사, 사본 저장)
  *     - 내 제작자료   : store_execution_assets(generated) 복제 → 편집기에 직접 prefill
  *   운영자 콘텐츠/내 제작자료는 AI 단계 없이 본문을 바로 편집기로 넘겨 새 store-owned 사본으로 저장한다.
@@ -44,7 +44,7 @@ export interface ProductionSourcePrefill {
 interface Props {
   open: boolean;
   onClose: () => void;
-  /** 선택 완료 → 부모가 StartProductionModal 로 전달 (콘텐츠·강의 → AI 흐름) */
+  /** 선택 완료 → 부모가 StartProductionModal 로 전달 (콘텐츠 → AI 흐름) */
   onConfirm: (items: ProductionSourceItem[]) => void;
   /**
    * WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-DIRECT-CREATE-V1:
@@ -61,7 +61,8 @@ interface Props {
 type SourceTab = 'library' | 'content-hub' | 'production-copy';
 
 const SOURCE_TABS: { key: SourceTab; label: string }[] = [
-  { key: 'library', label: '콘텐츠·강의' },
+  // WO-O4O-KPA-STORE-LIBRARY-CONTENT-ONLY-SELECTOR-V1: 강의 제거 — 콘텐츠 전용 selector.
+  { key: 'library', label: '콘텐츠' },
   { key: 'content-hub', label: '운영자 콘텐츠' },
   { key: 'production-copy', label: '내 제작자료' },
 ];

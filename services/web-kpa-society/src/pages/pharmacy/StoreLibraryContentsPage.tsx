@@ -2,8 +2,10 @@
  * StoreLibraryContentsPage — 내 자료함 / 콘텐츠
  *
  * WO-O4O-STORE-LIBRARY-CONTENTS-TAB-RESTRUCTURE-V1
- *   - 상위 탭: [콘텐츠] [강의]
- *   - 콘텐츠 탭 내부: [문서형] [코스형]
+ *   - (이전) 상위 탭: [콘텐츠] [강의]
+ *
+ * WO-O4O-KPA-STORE-LIBRARY-CONTENT-ONLY-SELECTOR-V1:
+ *   콘텐츠/강의 상위 전환을 제거하고 콘텐츠 목록을 바로 표시한다(콘텐츠 전용). 강의 선택 UI 미노출.
  *
  * 이전 WO 흐름 보존:
  *   WO-O4O-STORE-LIBRARY-CONTENTS-CANONICAL-TABLE-SPLIT-V1
@@ -106,7 +108,7 @@ export default function StoreLibraryContentsPage() {
             콘텐츠
           </h1>
           <p style={styles.subtitle}>
-            콘텐츠(Full Copy 자산)와 강의(LMS 참조 자산)를 함께 관리합니다. 콘텐츠를 선택하면 하단 작업막대에서 필요한 제작 기능을 사용할 수 있습니다.
+            매장 콘텐츠를 관리합니다. 콘텐츠를 선택하면 하단 작업막대에서 QR·POP·인쇄용 PDF 등 제작 기능을 사용할 수 있습니다.
           </p>
         </div>
         <div style={styles.headerActions}>
@@ -131,7 +133,7 @@ export default function StoreLibraryContentsPage() {
       </div>
 
       {/* WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-SELECTOR-MODAL-V1:
-          공통 selector 를 'page' 모드로 mount — 콘텐츠/강의 탭 + 검색 + 선택 + 제작 시작 + 선택 제거 */}
+          공통 selector 를 'page' 모드로 mount — 콘텐츠 목록 + 검색 + 선택 + 제작 시작 + 선택 제거 */}
       <StoreContentsSelector
         reloadKey={reloadKey}
         onStartProduction={openProduction}

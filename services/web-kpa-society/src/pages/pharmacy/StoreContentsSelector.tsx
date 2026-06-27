@@ -1,13 +1,15 @@
 /**
- * StoreContentsSelector — 콘텐츠/강의 선택 canonical 셀렉터 (공유)
+ * StoreContentsSelector — 콘텐츠 선택 canonical 셀렉터 (공유)
  *
  * WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-SELECTOR-MODAL-V1
  *
  * `/store/library/contents` 페이지와 `/store/library/production-materials`의
  * "새 제작 자료 만들기" 모달이 같은 selector 구조를 공유한다.
  *
- * 이전: StoreLibraryContentsPage 내부에 DocumentsSection / LessonsSection / TopTabBar
- *       가 정의되어 있었음. 이 파일로 추출 — 페이지/모달 양쪽에서 mount.
+ * WO-O4O-KPA-STORE-LIBRARY-CONTENT-ONLY-SELECTOR-V1:
+ *   콘텐츠/강의 상위 전환(TopTabBar)과 LessonsSection 을 제거하고 콘텐츠 전용으로 정리한다.
+ *   selector 는 DocumentsSection 을 직접 렌더한다. 기존 lesson snapshot 데이터/조회 호환은
+ *   백엔드에 그대로 유지(2단계에서 신규 생성만 차단). 콘텐츠 선택 → QR/POP/PDF/제작 흐름 보존.
  *
  * 데이터 source / 페이지네이션 / 검색 / row selection / "제작 시작" 호출 흐름 모두 동일.
  * mode='modal' 시 destructive action(선택 제거) 및 내부 router Link 를 안전한 형태로 대체.
@@ -15,14 +17,12 @@
 
 import { useEffect, useMemo, useRef, useState, useCallback, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Sparkles, Trash2, Search, FileText, Info, Printer, QrCode, Image as ImageIcon } from 'lucide-react';
+import { Sparkles, Trash2, Search, FileText, Info, Printer, QrCode, Image as ImageIcon } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { Pagination } from '@o4o/operator-ux-core';
 import { DataTable, type Column, ActionBar } from '@o4o/ui';
 import {
-  storeAssetControlApi,
   storeLibraryApi,
-  type StoreAssetItem,
   type LibraryContentItem,
 } from '../../api/assetSnapshot';
 import { colors } from '../../styles/theme';
@@ -36,10 +36,6 @@ import { StorePopCreateModal, type InlinePopTarget } from '../../components/stor
 
 const PAGE_LIMIT = 20;
 const SEARCH_DEBOUNCE_MS = 300;
-
-// ─── Tab Types ───────────────────────────────────────────────────────────────
-
-type TopTab = 'contents' | 'lessons';
 
 // ─── Row Types ───────────────────────────────────────────────────────────────
 
@@ -75,17 +71,6 @@ interface DocumentRow {
   tags: string[];
 }
 
-interface LessonRow {
-  id: string;
-  selectionKey: string;
-  title: string;
-  instructorName: string;
-  lessonCount: number | null;
-  createdAt: string;
-  lifecycleStatus: string | null;
-  href: string;
-}
-
 const keyOf = (origin: RowOrigin, id: string) => `${origin}:${id}`;
 
 const SOURCE_TYPE_LABEL: Record<DocSourceType, string> = {
@@ -99,12 +84,6 @@ function readString(json: unknown, key: string): string {
   if (!json || typeof json !== 'object') return '';
   const v = (json as Record<string, unknown>)[key];
   return typeof v === 'string' ? v : '';
-}
-
-function readNumber(json: unknown, key: string): number | null {
-  if (!json || typeof json !== 'object') return null;
-  const v = (json as Record<string, unknown>)[key];
-  return typeof v === 'number' ? v : null;
 }
 
 function formatDate(iso?: string | null): string {
@@ -156,73 +135,6 @@ function toDocumentRow(it: LibraryContentItem): DocumentRow {
   };
 }
 
-function toLessonRow(s: StoreAssetItem): LessonRow {
-  const publicUrl = readString(s.contentJson, 'publicUrl');
-  return {
-    id: s.id,
-    selectionKey: keyOf('snapshot', s.id),
-    title: s.title || readString(s.contentJson, 'title') || '(제목 없음)',
-    instructorName: readString(s.contentJson, 'instructorName') || '-',
-    lessonCount: readNumber(s.contentJson, 'lessonCount'),
-    createdAt: s.createdAt,
-    lifecycleStatus: s.lifecycleStatus ?? null,
-    href: publicUrl || `/lms/course/${readString(s.contentJson, 'courseId') || s.id}`,
-  };
-}
-
-// ─── Tab Bars ────────────────────────────────────────────────────────────────
-
-function TopTabBar({
-  active,
-  onChange,
-}: {
-  active: TopTab;
-  onChange: (t: TopTab) => void;
-}) {
-  const TAB_META: { key: TopTab; label: string; desc: string }[] = [
-    { key: 'contents', label: '콘텐츠', desc: 'Full Copy 자산' },
-    { key: 'lessons',  label: '강의',   desc: 'LMS 참조 자산' },
-  ];
-
-  return (
-    <div style={styles.segmentedWrapper}>
-      <div style={styles.segmentedGroup}>
-        {TAB_META.map(({ key, label, desc }) => {
-          const isActive = active === key;
-          return (
-            <button
-              key={key}
-              type="button"
-              onClick={() => onChange(key)}
-              style={{
-                ...styles.segmentedBtn,
-                ...(isActive ? styles.segmentedBtnActive : styles.segmentedBtnInactive),
-              }}
-            >
-              <span
-                style={{
-                  ...styles.segmentedLabel,
-                  color: isActive ? colors.neutral800 : colors.neutral500,
-                }}
-              >
-                {label}
-              </span>
-              <span
-                style={{
-                  ...styles.segmentedDesc,
-                  ...(isActive ? styles.segmentedDescActive : styles.segmentedDescInactive),
-                }}
-              >
-                {desc}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
 // ─── Selector — public API ───────────────────────────────────────────────────
 
 export interface StoreContentsSelectorProps {
@@ -255,35 +167,17 @@ export function StoreContentsSelector({
   startButtonLabel,
   enablePdfExport = false,
 }: StoreContentsSelectorProps) {
-  const [topTab, setTopTab] = useState<TopTab>('contents');
-
+  // WO-O4O-KPA-STORE-LIBRARY-CONTENT-ONLY-SELECTOR-V1: 콘텐츠 전용 — DocumentsSection 직접 렌더.
   return (
-    <>
-      <TopTabBar active={topTab} onChange={setTopTab} />
-
-      {topTab === 'contents' && (
-        <DocumentsSection
-          reloadKey={reloadKey}
-          onStartProduction={onStartProduction}
-          onAfterRemove={onAfterRemove}
-          onRemoveSnapshots={onRemoveSnapshots}
-          mode={mode}
-          startButtonLabel={startButtonLabel}
-          enablePdfExport={enablePdfExport}
-        />
-      )}
-
-      {topTab === 'lessons' && (
-        <LessonsSection
-          reloadKey={reloadKey}
-          onStartProduction={onStartProduction}
-          onAfterRemove={onAfterRemove}
-          onRemoveSnapshots={onRemoveSnapshots}
-          mode={mode}
-          startButtonLabel={startButtonLabel}
-        />
-      )}
-    </>
+    <DocumentsSection
+      reloadKey={reloadKey}
+      onStartProduction={onStartProduction}
+      onAfterRemove={onAfterRemove}
+      onRemoveSnapshots={onRemoveSnapshots}
+      mode={mode}
+      startButtonLabel={startButtonLabel}
+      enablePdfExport={enablePdfExport}
+    />
   );
 }
 
@@ -730,283 +624,9 @@ function DocumentsSection({
   );
 }
 
-// ─── LessonsSection ──────────────────────────────────────────────────────────
-
-function LessonsSection({
-  reloadKey,
-  onStartProduction,
-  onAfterRemove,
-  onRemoveSnapshots,
-  mode,
-  startButtonLabel,
-}: {
-  reloadKey: number;
-  onStartProduction: (items: ProductionSourceItem[]) => void;
-  onAfterRemove?: () => void;
-  onRemoveSnapshots?: (snapshotIds: string[]) => Promise<number>;
-  mode: 'page' | 'modal';
-  startButtonLabel?: string;
-}) {
-  const [searchInput, setSearchInput] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [page, setPage] = useState(1);
-  const [rows, setRows] = useState<LessonRow[]>([]);
-  const [total, setTotal] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
-  const [loading, setLoading] = useState(true);
-  const [selected, setSelected] = useState<Set<string>>(new Set());
-
-  useEffect(() => {
-    const handle = setTimeout(() => {
-      setSearchQuery(searchInput.trim());
-      setPage(1);
-    }, SEARCH_DEBOUNCE_MS);
-    return () => clearTimeout(handle);
-  }, [searchInput]);
-
-  const reqIdRef = useRef(0);
-  useEffect(() => {
-    const myReq = ++reqIdRef.current;
-    let cancelled = false;
-    setLoading(true);
-    (async () => {
-      const res = await storeAssetControlApi
-        .list({ type: 'lesson', page, limit: PAGE_LIMIT, search: searchQuery || undefined })
-        .catch(() => null);
-      if (cancelled || myReq !== reqIdRef.current) return;
-      const snapshots: StoreAssetItem[] = res?.data?.items ?? [];
-      setRows(snapshots.map(toLessonRow));
-      setTotal(res?.data?.total ?? 0);
-      setTotalPages(Math.max(1, res?.data?.totalPages ?? 1));
-      setLoading(false);
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [page, searchQuery, reloadKey]);
-
-  useEffect(() => {
-    setSelected((prev) => {
-      const validKeys = new Set(rows.map((r) => r.selectionKey));
-      const next = new Set<string>();
-      for (const k of prev) {
-        if (validKeys.has(k)) next.add(k);
-      }
-      return next.size === prev.size ? prev : next;
-    });
-  }, [rows]);
-
-  const handleStart = useCallback(() => {
-    if (selected.size === 0) return;
-    const items: ProductionSourceItem[] = rows
-      .filter((r) => selected.has(r.selectionKey))
-      .map((r) => ({ id: r.id, title: r.title, origin: 'snapshot' }));
-    onStartProduction(items);
-  }, [selected, rows, onStartProduction]);
-
-  const handleRemove = useCallback(async () => {
-    if (!onRemoveSnapshots) return;
-    const ids = rows.filter((r) => selected.has(r.selectionKey)).map((r) => r.id);
-    if (ids.length === 0) return;
-    if (!confirm(`선택한 ${ids.length}개 강의를 내 자료함에서 삭제하시겠습니까?`)) return;
-    try {
-      const n = await onRemoveSnapshots(ids);
-      if (n > 0) {
-        toast.success(`${n}개 강의를 내 자료함에서 삭제했습니다`);
-        setSelected(new Set());
-        onAfterRemove?.();
-      }
-    } catch (e: any) {
-      toast.error(e?.message || '삭제에 실패했습니다');
-    }
-  }, [selected, rows, onRemoveSnapshots, onAfterRemove]);
-
-  // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-STANDARD-TABLE-V1: @o4o/ui Column<T>
-  const columns = useMemo<Column<LessonRow>[]>(
-    () => [
-      {
-        key: 'title',
-        title: '강의명',
-        sortable: true,
-        sorter: (a, b) => a.title.localeCompare(b.title),
-        render: (_v, row) => (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-            <BookOpen size={14} style={{ color: colors.primary, flexShrink: 0 }} />
-            <a href={row.href} target="_blank" rel="noreferrer" style={styles.titleLink} title={row.title}>
-              {row.title}
-            </a>
-            {row.lifecycleStatus === 'archived' && (
-              <span style={{ ...styles.badge, background: '#FEF3C7', color: '#D97706' }}>보관</span>
-            )}
-            {row.lifecycleStatus === 'expired' && (
-              <span style={{ ...styles.badge, background: '#FEE2E2', color: '#DC2626' }}>만료</span>
-            )}
-          </div>
-        ),
-      },
-      {
-        key: 'instructorName',
-        title: '강사',
-        width: '140px',
-        sortable: true,
-        sorter: (a, b) => a.instructorName.localeCompare(b.instructorName),
-        render: (_v, row) => <span style={styles.metaText}>{row.instructorName}</span>,
-      },
-      {
-        key: 'lessonCount',
-        title: '레슨 수',
-        width: '90px',
-        align: 'center' as const,
-        sortable: true,
-        sorter: (a, b) => (a.lessonCount ?? -1) - (b.lessonCount ?? -1),
-        render: (_v, row) => (
-          <span style={styles.metaText}>{row.lessonCount == null ? '-' : `${row.lessonCount}개`}</span>
-        ),
-      },
-      {
-        key: 'createdAt',
-        title: '가져온 날짜',
-        width: '120px',
-        sortable: true,
-        sorter: (a, b) => a.createdAt.localeCompare(b.createdAt),
-        render: (_v, row) => <span style={styles.metaText}>{formatDate(row.createdAt)}</span>,
-      },
-      {
-        key: '_actions',
-        title: '액션',
-        align: 'center' as const,
-        width: '80px',
-        render: (_v, row) => (
-          <a
-            href={row.href}
-            target="_blank"
-            rel="noreferrer"
-            style={styles.viewBtn}
-            aria-label="강의 보기"
-          >
-            보기
-          </a>
-        ),
-      },
-    ],
-    [],
-  );
-
-  const showRemoveButton = mode === 'page' && !!onRemoveSnapshots;
-
-  return (
-    <section style={styles.section}>
-      <div style={styles.infoBar}>
-        <Info size={14} style={{ color: colors.primary, flexShrink: 0 }} />
-        <span>강의는 LMS 참조 자산입니다. 강의 본문은 LMS 원본에서 확인합니다.</span>
-      </div>
-
-      <div style={styles.sectionHeader}>
-        <span style={styles.countBadge}>{total}건</span>
-        <div style={styles.searchWrap}>
-          <Search size={14} style={styles.searchIcon} />
-          <input
-            type="search"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            placeholder="강의명 검색"
-            style={styles.searchInput}
-          />
-        </div>
-      </div>
-
-      {/* WO-O4O-KPA-STORE-LIBRARY-CONTENTS-STANDARD-TABLE-V1: custom toolbar → @o4o/ui ActionBar */}
-      <ActionBar
-        selectedCount={selected.size}
-        onClearSelection={() => setSelected(new Set())}
-        actions={[
-          {
-            key: 'start',
-            label: startButtonLabel ?? '제작 시작',
-            icon: <Sparkles size={14} />,
-            onClick: handleStart,
-            disabled: selected.size === 0,
-          },
-          ...(showRemoveButton ? [{
-            key: 'remove',
-            label: '선택 삭제',
-            icon: <Trash2 size={14} />,
-            variant: 'danger' as const,
-            onClick: handleRemove,
-          }] : []),
-        ]}
-      />
-
-      <DataTable<LessonRow>
-        columns={columns}
-        dataSource={rows}
-        rowKey="selectionKey"
-        loading={loading}
-        emptyText={searchQuery ? '검색 결과가 없습니다' : '가져온 강의가 없습니다'}
-        rowSelection={{
-          selectedRowKeys: Array.from(selected),
-          onChange: (keys: string[]) => setSelected(new Set(keys)),
-        }}
-      />
-
-      <Pagination
-        page={page}
-        totalPages={totalPages}
-        onPageChange={setPage}
-        total={total}
-      />
-    </section>
-  );
-}
-
 // ─── Styles ──────────────────────────────────────────────────────────────────
 
 const styles: Record<string, CSSProperties> = {
-  segmentedWrapper: {
-    marginBottom: '20px',
-  },
-  segmentedGroup: {
-    display: 'inline-flex',
-    gap: '3px',
-    background: colors.neutral100,
-    border: `1px solid ${colors.neutral200}`,
-    borderRadius: '10px',
-    padding: '3px',
-  },
-  segmentedBtn: {
-    display: 'inline-flex',
-    flexDirection: 'column',
-    alignItems: 'flex-start',
-    gap: '1px',
-    padding: '8px 20px',
-    border: 'none',
-    borderRadius: '7px',
-    cursor: 'pointer',
-    transition: 'all 0.15s',
-    minWidth: '96px',
-  },
-  segmentedBtnActive: {
-    background: colors.white,
-    boxShadow: '0 1px 4px rgba(0,0,0,0.10)',
-  },
-  segmentedBtnInactive: {
-    background: 'transparent',
-  },
-  segmentedLabel: {
-    fontSize: '14px',
-    fontWeight: 600,
-    lineHeight: 1.3,
-  },
-  segmentedDesc: {
-    fontSize: '11px',
-    lineHeight: 1.2,
-  },
-  segmentedDescActive: {
-    color: colors.primary,
-  },
-  segmentedDescInactive: {
-    color: colors.neutral400,
-  },
   subTabBar: {
     display: 'flex',
     gap: '0',
