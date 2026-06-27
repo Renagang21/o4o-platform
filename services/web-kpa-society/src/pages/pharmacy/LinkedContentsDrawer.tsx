@@ -1,5 +1,5 @@
 /**
- * LinkedContentsDrawer — 매장 경영활용 제품에 연결된 자료함 콘텐츠 보기 (read + 열기/편집 진입)
+ * LinkedContentsDrawer — 매장 취급제품에 연결된 자료함 콘텐츠 보기 (read + 열기/편집 진입)
  *
  * WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1
  * 선행: WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-LINK-V1 (연결 구조 + by-product API)
