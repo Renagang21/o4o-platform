@@ -1,5 +1,5 @@
 /**
- * Handled Products API Client — "매장 경영활용 제품" 통합 조회 (read-only)
+ * Handled Products API Client — "매장 취급제품" 통합 조회 (read-only)
  *
  * WO-O4O-KPA-STORE-HANDLED-PRODUCTS-UNIFIED-VIEW-V1
  *
