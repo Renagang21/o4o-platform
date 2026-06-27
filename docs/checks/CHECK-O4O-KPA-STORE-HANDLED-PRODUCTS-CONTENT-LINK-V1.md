@@ -171,25 +171,39 @@
 
 ---
 
-## 14. API smoke 결과
+## 14. API smoke 결과 — **ALL PASS** (2026-06-27, prod `api.neture.co.kr`)
 
-- [ ] **배포 후 수행 예정** (main 배포 → CI/CD migration 자동 실행 후):
-  - `POST /api/v1/kpa/store-contents` productRef 없이 → 201, link 없음
-  - productRef listing → 201, link 1개 + master_id 보존
-  - productRef local → 201, link 1개 + master_id NULL
-  - `PUT /direct/:id` productRef 변경 → link 교체 / `null` → 제거
-  - `GET /store-contents/by-product?sourceType=&sourceId=` → 연결 목록
-  - `GET /store/handled-products` → linkedContentCount 반영
-  - 타 매장 제품 sourceId → 400 INVALID_PRODUCT_REF (org 스코프 차단)
+배포(커밋 `a121551a7`) 후 `renagang21@gmail.com`(kpa:store_owner)로 라이브 검증.
+임시 `store_local_product` 1건 생성 → 전체 라이프사이클 검증 → 삭제(정리 완료).
 
-> 본 테이블은 신규 → 배포 전 prod 데이터 없음. migration 적용 확인은 `o4o-api-migrations` job + `migration:show` 기준.
+| 검증 | 결과 |
+|---|---|
+| `POST /api/v1/kpa/store-contents` productRef 없이 → 201, link 없음 | ✓ |
+| productRef `local` → 201, link 1개 생성 | ✓ |
+| `GET /store-contents/by-product?sourceType=local&sourceId=` → 연결 콘텐츠 1건 + `linkType='product_description'` | ✓ |
+| `GET /store/handled-products` → 해당 제품 `linkedContentCount` 0→1 반영 | ✓ |
+| 타 매장/미존재 제품 sourceId → **400 `INVALID_PRODUCT_REF`** (org 스코프 차단) | ✓ |
+| `PUT /direct/:id` productRef `null` → link 제거 → by-product 0건 + count 0 복귀 | ✓ |
+| 임시 콘텐츠/제품 DELETE → 200 (정리 완료, handled-products total 0 복귀) | ✓ |
 
-## 15. browser smoke 결과
+- migration 적용 확인: `o4o-api-migrations` job execution `o4o-api-migrations-49hnf` 로그에서
+  `[X] 573 CreateKpaStoreContentProductLinks20261128000000` (applied, 최신 id) 확인.
+- **migration 번호 20261128000000 의도성 확인**: repo 는 synthetic sequential 스킴(모두 ~2026-11,
+  실제 달력일과 무관). 직전 최신 `20261127000000`(CreateStoreTabletDisplaySettings) 바로 다음 번호로 정상.
+- **O4O 기반 제품(listing) happy-path 는 정적 검증**: renagang21 KPA org 에 listing 0건이라
+  라이브 미실행. 단 listing 분기는 local 과 동일 코드 경로(`prepareProductRef`/`resolveProductForLink`)이며
+  차이는 `organization_product_listings` 대상 master_id 조회 SQL 1줄뿐 — 정적 확인 완료.
 
-- [ ] **배포 후 수행 예정**:
-  - `/store/handled-products` 접근, "연결 콘텐츠" 컬럼 표시, 기존 컬럼 구조 유지
-  - 콘텐츠 작성/수정(제품 연결 없이/포함) 정상 저장
-  - 콘솔 주요 오류 없음
+## 15. browser smoke 결과 — **PASS** (2026-06-27, live `kpa-society.co.kr`)
+
+`renagang21` 로그인 → `/store/handled-products` (Playwright MCP). 시각 확인용 임시 제품+연결 콘텐츠 seed 후 검증, 검증 후 삭제(정리 완료).
+
+| 검증 | 결과 |
+|---|---|
+| 테이블 헤더 `제품 / 구분 / 매장 표시 가격 / 연결 콘텐츠 / 상태 / 최근 수정일 / 관리` (7컬럼) | ✓ |
+| 연결 콘텐츠 셀에 **"1개" 배지** 렌더 | ✓ |
+| 기존 컬럼 구조/레이아웃 유지(깨짐 없음) | ✓ |
+| 콘솔 error 0 (handled-products 페이지) | ✓ |
 
 > V1 프론트 범위는 count 표시까지. 콘텐츠 작성 화면의 제품 picker 는 후속 CONTENT-ACTIONS WO.
 
@@ -207,4 +221,9 @@
 ## 상태
 
 - 구현/typecheck: **완료**
-- API/browser smoke: **배포 후 수행 예정** (migration CI/CD 자동 실행 후)
+- 배포: 커밋 `a121551a7` → Deploy API/Web + migration job 전부 success
+- migration 적용: **완료** (id 573, prod)
+- API smoke: **ALL PASS** (local 라이브 / listing 정적)
+- browser smoke: **PASS** (연결 콘텐츠 "1개" 배지 + 콘솔 error 0)
+- 테스트 데이터: **정리 완료** (임시 제품/콘텐츠 전부 삭제, total 0 복귀)
+- **WO 최종 완료**
