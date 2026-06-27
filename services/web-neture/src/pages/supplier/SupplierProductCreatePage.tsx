@@ -2,7 +2,6 @@
  * SupplierProductCreatePage - 공급자 상품 등록 (3-Step Wizard)
  *
  * WO-NETURE-PRODUCT-REGISTRATION-REFACTOR-AND-AI-TAGGING-V1
- * WO-O4O-TEMPLATE-ADOPTION-NETURE-PRODUCT-V1: 상세 설명 에디터에 템플릿 기능 연결
  *
  * Step 1: 기본 정보 (상품명, 카테고리, 브랜드, 제조사, 바코드 optional, 규제)
  * Step 2: 가격/유통/서비스 (공급가, 소비자참고가, 유통정책, 서비스선택)
@@ -23,8 +22,6 @@ import {
 } from '../../lib/api';
 import { mediaApi } from '../../lib/api/media';
 import { ProductForm, type ProductFormData } from '../../components/product';
-import { useContentTemplates } from '../../hooks/useContentTemplates';
-import { useAuth } from '../../contexts';
 import MediaPickerModal from '../../components/common/MediaPickerModal';
 import { loadAndClearDraft } from '../../lib/product-import/storage';
 import { GuideBlock } from '@o4o/shared-space-ui';
@@ -144,9 +141,8 @@ export default function SupplierProductCreatePage() {
   // Reference data
   const [categories, setCategories] = useState<CategoryTreeItem[]>([]);
 
-  // Description editors — WO-O4O-PRODUCT-IMPORT-ASSISTANT-V1: draft 초기값 지원
+  // Description editor — WO-O4O-PRODUCT-IMPORT-ASSISTANT-V1: draft 초기값 지원
   const [consumerShortDesc, setConsumerShortDesc] = useState(importDraft?.consumerShortDesc ?? '');
-  const [consumerDetailDesc, setConsumerDetailDesc] = useState(importDraft?.consumerDetailDesc ?? '');
 
   // Images — WO-NETURE-IMAGE-ASSET-STRUCTURE-V1: 3구역 분리
   // WO-NETURE-PRODUCT-PRIMARY-IMAGE-MEDIA-LIBRARY-INTEGRATION-V1: 라이브러리 선택 지원
@@ -180,13 +176,6 @@ export default function SupplierProductCreatePage() {
   const [imagePickerTarget, setImagePickerTarget] = useState<'content' | null>(null);
   // 에디터 인라인 이미지 라이브러리 선택 콜백
   const [mediaPickerTarget, setMediaPickerTarget] = useState<((url: string) => void) | null>(null);
-
-  // Template integration (WO-O4O-TEMPLATE-ADOPTION-NETURE-PRODUCT-V1)
-  const { user } = useAuth();
-  const tpl = useContentTemplates();
-  const canCreatePublicTemplate = user?.roles?.some(
-    (r: string) => r.includes('admin') || r.includes('operator') || r.includes('super_admin'),
-  ) ?? false;
 
   // Submit
   const [submitting, setSubmitting] = useState(false);
@@ -329,7 +318,6 @@ export default function SupplierProductCreatePage() {
       priceGeneral: Number(form.priceGeneral),
       consumerReferencePrice: form.consumerReferencePrice ? Number(form.consumerReferencePrice) : null,
       consumerShortDescription: consumerShortDesc || null,
-      consumerDetailDescription: consumerDetailDesc || null,
       // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
       isFeatured: form.isFeatured,
     });
@@ -486,8 +474,7 @@ export default function SupplierProductCreatePage() {
       !!form.packagingName.trim() ||
       !!form.brandName.trim() ||
       !!form.manufacturerName.trim() ||
-      !!consumerShortDesc.trim() ||
-      !!consumerDetailDesc.trim();
+      !!consumerShortDesc.trim();
     if (hasInput && !window.confirm('현재 입력한 내용이 있습니다. 상세페이지 소스 자동 입력으로 이동하면 지금까지 입력한 값은 저장되지 않습니다. 계속할까요?')) {
       return;
     }
@@ -910,27 +897,6 @@ export default function SupplierProductCreatePage() {
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">소비자용 상세 설명</label>
-              <RichTextEditor
-                value={consumerDetailDesc}
-                onChange={(c) => setConsumerDetailDesc(c.html)}
-                placeholder="소비자에게 보이는 상세 설명을 입력하세요..."
-                minHeight="200px"
-                onImageUpload={editorImageUpload}
-                onMediaLibraryPick={(insertImage) => setMediaPickerTarget(() => insertImage)}
-                showTemplateActions
-                templates={tpl.templates}
-                templatesLoading={tpl.loading}
-                templatesSaving={tpl.saving}
-                onLoadTemplates={tpl.loadTemplates}
-                onSaveAsTemplate={(name, category, isPublic) =>
-                  tpl.saveTemplate(consumerDetailDesc, name, category, isPublic)
-                }
-                onUseTemplate={tpl.recordUse}
-                canCreatePublicTemplate={canCreatePublicTemplate}
-              />
-            </div>
           </div>
 
           {/* Additional Info */}
