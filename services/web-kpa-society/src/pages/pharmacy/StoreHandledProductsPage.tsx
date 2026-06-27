@@ -11,10 +11,12 @@
 
 import { useEffect, useState, useCallback, type CSSProperties } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Package, RefreshCw, Search, ExternalLink, Boxes, Plus, ShoppingBag } from 'lucide-react';
+import { Package, RefreshCw, Search, ExternalLink, Boxes, Plus, ShoppingBag, PenSquare } from 'lucide-react';
 import { Pagination } from '@o4o/operator-ux-core';
 import { fetchHandledProducts, type HandledProduct } from '../../api/handledProducts';
 import { colors } from '../../styles/theme';
+// WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1: 연결 콘텐츠 보기 드로어
+import { LinkedContentsDrawer, type LinkedDrawerProduct } from './LinkedContentsDrawer';
 
 type SourceFilter = 'all' | 'listing' | 'local';
 const PAGE_LIMIT = 20;
@@ -110,6 +112,18 @@ export default function StoreHandledProductsPage() {
   }, [page, searchQuery, source, reloadKey]);
 
   const reload = useCallback(() => setReloadKey((k) => k + 1), []);
+
+  // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1: 연결 콘텐츠 보기 드로어 + 콘텐츠 만들기 진입
+  const [drawerProduct, setDrawerProduct] = useState<LinkedDrawerProduct | null>(null);
+
+  // 콘텐츠 만들기 — 기존 자료함 작성 화면으로 이동(URL 기반 전달 → 새로고침 안전).
+  const goCreateContent = useCallback(
+    (p: { sourceType: HandledProduct['sourceType']; sourceId: string; name: string }) => {
+      const qs = new URLSearchParams({ create: '1', pType: p.sourceType, pId: p.sourceId, pName: p.name });
+      navigate(`/store/library/contents?${qs.toString()}`);
+    },
+    [navigate],
+  );
 
   const selectSource = useCallback(
     (next: SourceFilter) => {
@@ -240,9 +254,17 @@ export default function StoreHandledProductsPage() {
                   </td>
                   <td style={styles.td}>{formatPrice(it.price)}</td>
                   <td style={styles.td}>
-                    {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-LINK-V1: 연결 콘텐츠 수(0 = 없음). */}
+                    {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1:
+                        연결 콘텐츠 수 — N개는 보기 동작 진입, 없음은 단순 표시. */}
                     {it.linkedContentCount > 0 ? (
-                      <Badge text={`${it.linkedContentCount}개`} tone="blue" />
+                      <button
+                        type="button"
+                        onClick={() => setDrawerProduct({ sourceType: it.sourceType, sourceId: it.sourceId, name: it.name })}
+                        style={styles.countBtn}
+                        aria-label="연결 콘텐츠 보기"
+                      >
+                        <Badge text={`${it.linkedContentCount}개`} tone="blue" />
+                      </button>
                     ) : (
                       <span style={{ color: colors.neutral400 }}>없음</span>
                     )}
@@ -252,15 +274,27 @@ export default function StoreHandledProductsPage() {
                   </td>
                   <td style={styles.td}>{formatDate(it.updatedAt)}</td>
                   <td style={styles.td}>
-                    <button
-                      type="button"
-                      onClick={() => navigate(it.managePath)}
-                      style={styles.manageBtn}
-                      aria-label="원본 관리 화면으로 이동"
-                    >
-                      관리
-                      <ExternalLink size={12} />
-                    </button>
+                    {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1: 관리 영역에 콘텐츠 만들기 추가 */}
+                    <div style={styles.manageActions}>
+                      <button
+                        type="button"
+                        onClick={() => goCreateContent({ sourceType: it.sourceType, sourceId: it.sourceId, name: it.name })}
+                        style={styles.createContentBtn}
+                        aria-label="이 제품으로 콘텐츠 만들기"
+                      >
+                        <PenSquare size={12} />
+                        콘텐츠 만들기
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => navigate(it.managePath)}
+                        style={styles.manageBtn}
+                        aria-label="원본 관리 화면으로 이동"
+                      >
+                        관리
+                        <ExternalLink size={12} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -270,6 +304,16 @@ export default function StoreHandledProductsPage() {
       </div>
 
       <Pagination page={page} totalPages={totalPages} onPageChange={setPage} total={total} />
+
+      {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1: 연결 콘텐츠 보기 드로어 */}
+      <LinkedContentsDrawer
+        open={!!drawerProduct}
+        product={drawerProduct}
+        onClose={() => setDrawerProduct(null)}
+        onCreateNew={() => {
+          if (drawerProduct) goCreateContent(drawerProduct);
+        }}
+      />
 
       <p style={styles.footnote}>
         ※ <strong>매장 취급제품</strong>은 진열·콘텐츠·온라인 노출에 활용할 제품 풀입니다. 타블렛 진열·온라인 판매 등 채널별 설정은 각 채널 메뉴에서 관리합니다.
@@ -315,6 +359,10 @@ const styles: Record<string, CSSProperties> = {
   productName: { fontSize: '14px', fontWeight: 500, color: colors.neutral800, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
   badge: { display: 'inline-flex', alignItems: 'center', padding: '2px 8px', fontSize: '11px', fontWeight: 500, borderRadius: '999px', whiteSpace: 'nowrap' },
   manageBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 10px', background: colors.white, border: `1px solid ${colors.neutral300}`, borderRadius: '6px', fontSize: '12px', color: colors.neutral700, cursor: 'pointer' },
+  // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1
+  manageActions: { display: 'inline-flex', alignItems: 'center', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' },
+  createContentBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 10px', background: colors.white, border: `1px solid ${colors.primary}`, borderRadius: '6px', fontSize: '12px', color: colors.primary, cursor: 'pointer', whiteSpace: 'nowrap' },
+  countBtn: { display: 'inline-flex', padding: 0, border: 'none', background: 'transparent', cursor: 'pointer' },
   empty: { padding: '40px 12px', textAlign: 'center', color: colors.neutral400, fontSize: '13px' },
   footnote: { marginTop: '14px', fontSize: '12px', color: colors.neutral500, lineHeight: 1.7, padding: '10px 12px', background: colors.neutral100, borderRadius: '6px' },
 };

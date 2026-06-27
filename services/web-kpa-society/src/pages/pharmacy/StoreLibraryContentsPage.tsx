@@ -25,14 +25,15 @@
  *   모달이 같은 canonical selector 를 공유한다. 페이지 동작/UX 변경 없음.
  */
 
-import { useState, useCallback, type CSSProperties } from 'react';
+import { useState, useCallback, useEffect, useMemo, type CSSProperties } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { BookOpen, RefreshCw, PenSquare, Lightbulb } from 'lucide-react';
 // WO-O4O-KPA-STORE-LIBRARY-CONTENT-CREATION-GUIDE-MODAL-V1: 콘텐츠 제작 가이드(안내 UI)
 import { ContentCreationGuideModal } from './ContentCreationGuideModal';
 import { storeAssetControlApi } from '../../api/assetSnapshot';
 import { colors } from '../../styles/theme';
 import { StartProductionModal, type ProductionSource, type ProductionSourceItem } from './StartProductionModal';
-import { CreateContentFromResourcesModal } from './CreateContentFromResourcesModal';
+import { CreateContentFromResourcesModal, type CreateContentProductContext } from './CreateContentFromResourcesModal';
 import { StoreContentsSelector } from './StoreContentsSelector';
 
 export default function StoreLibraryContentsPage() {
@@ -44,6 +45,40 @@ export default function StoreLibraryContentsPage() {
   const [createFromResourcesOpen, setCreateFromResourcesOpen] = useState(false);
   // WO-O4O-KPA-STORE-LIBRARY-CONTENT-CREATION-GUIDE-MODAL-V1
   const [guideOpen, setGuideOpen] = useState(false);
+
+  // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1:
+  //   매장 취급제품 화면의 "콘텐츠 만들기"에서 URL 파라미터로 진입 → 작성 모달을 제품 연결 컨텍스트와 함께 자동 오픈.
+  //   (URL 기반 전달 → 새로고침 후에도 연결 대상 유실 없음)
+  const [searchParams, setSearchParams] = useSearchParams();
+  const productCtx = useMemo<CreateContentProductContext | null>(() => {
+    if (searchParams.get('create') !== '1') return null;
+    const pType = searchParams.get('pType');
+    const pId = searchParams.get('pId');
+    const pName = searchParams.get('pName');
+    if ((pType === 'listing' || pType === 'local') && pId) {
+      return { sourceType: pType, sourceId: pId, name: pName || '선택한 제품' };
+    }
+    return null;
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (productCtx) setCreateFromResourcesOpen(true);
+  }, [productCtx]);
+
+  const closeCreateModal = useCallback(() => {
+    setCreateFromResourcesOpen(false);
+    // 제품 진입 파라미터 정리 — 닫은 뒤 새로고침해도 재오픈되지 않게.
+    if (searchParams.get('create')) {
+      setSearchParams(
+        (prev) => {
+          const p = new URLSearchParams(prev);
+          ['create', 'pType', 'pId', 'pName'].forEach((k) => p.delete(k));
+          return p;
+        },
+        { replace: true },
+      );
+    }
+  }, [searchParams, setSearchParams]);
 
   const openProduction = useCallback((items: ProductionSourceItem[]) => {
     if (items.length === 0) return;
@@ -115,8 +150,9 @@ export default function StoreLibraryContentsPage() {
 
       <CreateContentFromResourcesModal
         open={createFromResourcesOpen}
-        onClose={() => setCreateFromResourcesOpen(false)}
+        onClose={closeCreateModal}
         onCreated={reload}
+        product={productCtx}
       />
 
       {/* WO-O4O-KPA-STORE-LIBRARY-CONTENT-CREATION-GUIDE-MODAL-V1 */}
