@@ -11,7 +11,7 @@
 
 import { useEffect, useState, useCallback, type CSSProperties } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Package, RefreshCw, Search, ExternalLink, Boxes, Plus, ShoppingBag, PenSquare } from 'lucide-react';
+import { Package, RefreshCw, Search, ExternalLink, Boxes, Plus, PenSquare } from 'lucide-react';
 import { Pagination } from '@o4o/operator-ux-core';
 import { fetchHandledProducts, type HandledProduct } from '../../api/handledProducts';
 import { colors } from '../../styles/theme';
@@ -57,8 +57,8 @@ function formatDate(iso: string): string {
 }
 
 const EMPTY_BY_SOURCE: Record<SourceFilter, string> = {
-  all: '아직 등록된 매장 경영활용 제품이 없습니다. 상단 버튼에서 O4O 제품 취급 신청 또는 매장 경영활용 제품 등록을 진행하세요.',
-  listing: '아직 취급 중인 O4O 제품이 없습니다. ‘O4O 제품 신청’에서 취급 신청을 진행할 수 있습니다.',
+  all: '아직 등록된 매장 경영활용 제품이 없습니다. O4O 제품은 O4O 제품 화면에서 선택하여 등록할 수 있습니다.',
+  listing: '아직 취급 중인 O4O 제품이 없습니다. O4O 제품 화면에서 제품을 선택해 매장 경영활용 제품으로 등록할 수 있습니다.',
   local: '아직 등록된 매장 경영활용 제품이 없습니다. ‘매장 경영활용 제품 등록’에서 추가할 수 있습니다.',
 };
 
@@ -166,10 +166,8 @@ export default function StoreHandledProductsPage() {
           </p>
         </div>
         <div style={styles.headerActions}>
-          <button onClick={() => navigate('/store/commerce/products')} style={styles.secondaryBtn}>
-            <ShoppingBag size={14} />
-            O4O 제품 신청
-          </button>
+          {/* WO-O4O-KPA-COMMERCE-PRODUCT-TO-STORE-MANAGEMENT-USE-FLOW-V1:
+              'O4O 제품 신청' 버튼 제거 — O4O 제품 등록은 O4O 제품 화면(/store/commerce/products)에서 직접 선택·등록한다(대체 버튼 없음). */}
           <button onClick={() => navigate('/store/commerce/local-products')} style={styles.primaryBtn}>
             <Plus size={14} />
             매장 경영활용 제품 등록
@@ -364,7 +362,6 @@ const styles: Record<string, CSSProperties> = {
   subtitle: { fontSize: '13px', color: colors.neutral500, margin: '6px 0 0', maxWidth: '720px', lineHeight: 1.6 },
   headerActions: { display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' },
   refreshBtn: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: colors.white, border: `1px solid ${colors.neutral300}`, borderRadius: '6px', fontSize: '13px', color: colors.neutral700, cursor: 'pointer' },
-  secondaryBtn: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: colors.white, border: `1px solid ${colors.primary}`, borderRadius: '6px', fontSize: '13px', color: colors.primary, cursor: 'pointer' },
   primaryBtn: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: colors.primary, border: `1px solid ${colors.primary}`, borderRadius: '6px', fontSize: '13px', color: colors.white, cursor: 'pointer' },
   toolbar: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '12px', flexWrap: 'wrap' },
   tabs: { display: 'flex', gap: '4px', background: colors.neutral100, border: `1px solid ${colors.neutral200}`, borderRadius: '8px', padding: '3px' },
