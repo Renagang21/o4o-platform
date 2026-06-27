@@ -20,8 +20,6 @@ import { getSupplierProductType, type SupplierProductTypeDef } from '../../lib/s
 import { productApi, type CategoryTreeItem } from '../../lib/api';
 
 const NON_DRUG = getSupplierProductType('non_drug')!;
-const OTC_DRUG = getSupplierProductType('otc_drug')!;
-const RX_DRUG = getSupplierProductType('rx_drug')!;
 type TopChoice = 'drug' | 'non_drug';
 
 /* ------------------------------------------------------------------ */
@@ -101,42 +99,52 @@ export default function SupplierProductImportPage() {
   const [o4oServiceKeys, setO4oServiceKeys] = useState<string[]>([]);
   const [o4oRegulatoryType, setO4oRegulatoryType] = useState('GENERAL');
   // WO-O4O-NETURE-SUPPLIER-IMPORT-ASSISTANT-PRODUCT-TYPE-PASSTHROUGH-V1:
-  //   진입 화면과 동일한 2분기(의약품/비의약품) 모델. 의약외품은 비의약품 하위.
+  //   등록 도우미는 상위 2분기(의약품/비의약품)만 선택한다. 의약품 세부 분류는 분석 후 정식 Wizard 가 처리.
+  //   앞 단계에서 전달된 정밀 유형(otc/rx/의약외품)은 보존하되 도우미에서 재선택을 요구하지 않는다.
   const [searchParams] = useSearchParams();
   const [topChoice, setTopChoice] = useState<TopChoice | null>(null);
-  const [drugSub, setDrugSub] = useState<SupplierProductTypeDef | null>(null);
-  // 정식 등록 폼으로 전달할 최종 유형. 전달받은 정밀 유형(예: 의약외품)을 보존하되, 분기를 바꾸면 재해석.
-  const [resolvedType, setResolvedType] = useState<SupplierProductTypeDef | null>(null);
+  const [passedType, setPassedType] = useState<SupplierProductTypeDef | null>(null);
 
   useEffect(() => {
     productApi.getCategories().then(setCategories);
   }, []);
 
-  // 앞 단계에서 전달된 productType 을 미리 선택(재선택 불필요). 값 유실/직접 진입 시엔 미선택 → 사용자 선택.
+  // 앞 단계 전달 유형 → 상위 분기 미리 선택(정밀 유형 보존). 미전달/직접 진입은 사용자가 상위만 선택.
   useEffect(() => {
     const incoming = getSupplierProductType(searchParams.get('productType'));
     if (!incoming) return;
     if (incoming.key === 'otc_drug' || incoming.key === 'rx_drug') {
       setTopChoice('drug');
-      setDrugSub(incoming);
-      setResolvedType(incoming);
+      setPassedType(incoming);
     } else if (incoming.key === 'non_drug' || incoming.key === 'quasi_drug') {
-      // 의약외품(quasi_drug)은 비의약품 하위 — 비의약품으로 표시하되 정밀 유형 보존(임의 강등 금지)
       setTopChoice('non_drug');
-      setResolvedType(incoming);
+      setPassedType(incoming); // 의약외품은 비의약품 하위 — 정밀 유형 보존(임의 강등 금지)
     }
     // unclassified/미전달은 사용자가 직접 선택
   }, [searchParams]);
 
   const selectTop = (choice: TopChoice) => {
     setTopChoice(choice);
-    setDrugSub(null);
-    setResolvedType(choice === 'non_drug' ? NON_DRUG : null);
+    // 다른 상위 분기로 바꾸면 전달된 정밀 유형 폐기(사용자 override)
+    setPassedType((prev) => {
+      if (!prev) return null;
+      const prevBucket: TopChoice = prev.key === 'otc_drug' || prev.key === 'rx_drug' ? 'drug' : 'non_drug';
+      return prevBucket === choice ? prev : null;
+    });
   };
-  const selectDrugSub = (t: SupplierProductTypeDef) => {
-    setDrugSub(t);
-    setResolvedType(t);
-  };
+
+  // 정식 Wizard 로 넘길 유효 유형/규제값 — 도우미는 상위만, 세부 미지정 의약품은 regulatoryType=DRUG 로만 전달.
+  const effective = useMemo<{ productKey?: string; regulatoryType?: string }>(() => {
+    if (topChoice === 'non_drug') {
+      const keep = passedType && (passedType.key === 'non_drug' || passedType.key === 'quasi_drug') ? passedType : NON_DRUG;
+      return { productKey: keep.key, regulatoryType: keep.regulatoryType || 'GENERAL' };
+    }
+    if (topChoice === 'drug') {
+      const keep = passedType && (passedType.key === 'otc_drug' || passedType.key === 'rx_drug') ? passedType : null;
+      return { productKey: keep?.key, regulatoryType: 'DRUG' }; // 세부 미지정이면 productType 없이 DRUG 만
+    }
+    return {};
+  }, [topChoice, passedType]);
 
   const flatCats = useMemo(() => flattenCats(categories), [categories]);
   const selectedCatIsRegulated = flatCats.find((c) => c.id === o4oCategoryId)?.isRegulated ?? false;
@@ -146,8 +154,8 @@ export default function SupplierProductImportPage() {
   /* ---------------------------------------------------------------- */
 
   const handleParse = useCallback(() => {
-    // WO-...PASSTHROUGH: 유형 선택 전에는 분석 제한(직접 진입/값 유실 대비)
-    if (!resolvedType) {
+    // WO-...PASSTHROUGH: 상위 유형(의약품/비의약품) 선택 전에는 분석 제한. 세부 유형 없이도 분석 가능.
+    if (!topChoice) {
       setError('먼저 제품 유형(의약품/비의약품)을 선택해 주세요.');
       return;
     }
@@ -182,7 +190,7 @@ export default function SupplierProductImportPage() {
     setCorrectedDataUrl(null);
     setCorrectionStatus('idle');
     setThumbNaturalSize(null);
-  }, [html, sourceUrl, resolvedType]);
+  }, [html, sourceUrl, topChoice]);
 
   /* ---------------------------------------------------------------- */
   /*  Navigate to Create                                               */
@@ -224,13 +232,17 @@ export default function SupplierProductImportPage() {
       serviceKeys: o4oServiceKeys.length > 0 ? o4oServiceKeys : undefined,
       // WO-O4O-NETURE-SUPPLIER-MENU-ASSISTANT-IA-CLEANUP-V1: 선택 유형 우선, 없으면 기존 설정
       regulatoryType:
-        (resolvedType?.regulatoryType || undefined) ??
+        (effective.regulatoryType && effective.regulatoryType !== 'GENERAL' ? effective.regulatoryType : undefined) ??
         (o4oRegulatoryType !== 'GENERAL' ? o4oRegulatoryType : undefined),
     };
 
     saveDraft(draft);
-    // 최종 유형을 정식 wizard 로 전달(전달받은 정밀 유형 보존)
-    navigate(resolvedType ? `/supplier/products/new?productType=${resolvedType.key}` : '/supplier/products/new');
+    // 상위 분기(+보존된 정밀 유형)를 정식 wizard 로 전달. 세부 미지정 의약품은 regulatoryType=DRUG 만.
+    const params = new URLSearchParams();
+    if (effective.productKey) params.set('productType', effective.productKey);
+    if (effective.regulatoryType) params.set('regulatoryType', effective.regulatoryType);
+    const qs = params.toString();
+    navigate(qs ? `/supplier/products/new?${qs}` : '/supplier/products/new');
   }, [
     parsed,
     name,
@@ -251,7 +263,7 @@ export default function SupplierProductImportPage() {
     o4oIsPublic,
     o4oServiceKeys,
     o4oRegulatoryType,
-    resolvedType,
+    effective,
   ]);
 
   /* ---------------------------------------------------------------- */
@@ -400,14 +412,13 @@ export default function SupplierProductImportPage() {
       </div>
 
       {/* WO-O4O-NETURE-SUPPLIER-IMPORT-ASSISTANT-PRODUCT-TYPE-PASSTHROUGH-V1:
-          제품 유형 선택 — 진입 화면과 동일한 2분기(의약품/비의약품). 앞 단계에서 전달되면 미리 선택됨.
-          직접 진입/값 유실 시 안전장치로 선택 UI 유지. 의약외품은 비의약품 하위(등록 폼 규제 구분에서 확정). */}
+          등록 도우미는 상위 2분기(의약품/비의약품)만 선택한다. 의약품 세부 분류는 분석 후
+          정식 등록 Wizard 가 처리. 앞 단계에서 전달되면 상위 분기가 미리 선택되고 정밀 유형은 보존된다. */}
       <div className="mb-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
         <h2 className="mb-1 text-base font-semibold text-slate-800">제품 유형 선택</h2>
         <p className="mb-3 text-xs text-slate-500">
-          의약품/비의약품을 먼저 선택하세요. 앞 단계에서 선택했다면 미리 선택되어 있으며, 분석 후 같은 유형의 정식 등록 화면으로 이어집니다.
+          의약품 / 비의약품만 선택하세요. 앞 단계에서 선택했다면 미리 선택되어 있으며, 세부 분류는 분석 후 정식 등록 화면에서 확정합니다.
         </p>
-        {/* 1차: 의약품 / 비의약품 */}
         <div className="grid sm:grid-cols-2 gap-2">
           <button
             onClick={() => selectTop('non_drug')}
@@ -424,35 +435,15 @@ export default function SupplierProductImportPage() {
               <span className="text-sm font-medium text-slate-800">의약품</span>
               <span className="text-[11px] px-1.5 py-0.5 rounded bg-amber-50 text-amber-700">약국 대상</span>
             </div>
-            <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">일반의약품 또는 전문의약품. 비처방/처방을 이어서 선택합니다.</p>
+            <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">일반의약품 또는 전문의약품. 세부 분류는 분석 후 정식 등록 화면에서 확정합니다.</p>
           </button>
         </div>
-        {/* 1차 의약품 → 비처방/처방 세부 */}
-        {topChoice === 'drug' && (
-          <div className="mt-2 grid sm:grid-cols-2 gap-2">
-            {[OTC_DRUG, RX_DRUG].map((t) => (
-              <button
-                key={t.key}
-                onClick={() => selectDrugSub(t)}
-                className={`text-left rounded-lg border p-3 transition-colors ${drugSub?.key === t.key ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-300' : 'border-slate-200 hover:border-slate-300'}`}
-              >
-                <span className="text-sm font-medium text-slate-800">{t.label}</span>
-                <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{t.desc}</p>
-              </button>
-            ))}
-          </div>
-        )}
-        {/* 전달받은 정밀 유형 안내(의약외품 등 보존 표시) + 유형별 경고 */}
-        {resolvedType && (
-          <div className={`mt-3 rounded-md border px-3 py-2 text-xs ${resolvedType.rx ? 'border-amber-300 bg-amber-50 text-amber-800' : resolvedType.pharmacyTarget ? 'border-blue-200 bg-blue-50 text-blue-800' : 'border-slate-200 bg-slate-50 text-slate-600'}`}>
-            <span className="font-medium">선택된 유형: {resolvedType.label}</span>
-            {resolvedType.key === 'quasi_drug' && ' — 의약외품(비의약품 하위). 효능·효과/신고·허가 문구는 제출 전 확인하세요.'}
-            {resolvedType.key === 'otc_drug' && ' — 비처방 의약품은 약국 매장 유형 중심으로 검토되며, 운영자 검토 전까지 일반 공급 활동으로 자동 연결되지 않습니다.'}
-            {resolvedType.key === 'rx_drug' && ' — 처방의약품은 제품/유통 정보 단위로만 관리되며 일반 판매·이벤트·펀딩으로 자동 연결되지 않습니다.'}
-          </div>
-        )}
-        {topChoice === 'drug' && !drugSub && (
-          <p className="mt-2 text-xs text-amber-700">의약품 세부(비처방/처방)를 선택해 주세요.</p>
+        {topChoice && (
+          <p className="mt-3 text-xs text-slate-500">
+            선택: <strong className="text-slate-700">{topChoice === 'drug' ? '의약품' : '비의약품'}</strong>
+            {passedType?.key === 'quasi_drug' && ' (의약외품 — 비의약품 하위)'}
+            . 세부 분류는 분석 후 정식 등록 화면에서 확정합니다.
+          </p>
         )}
       </div>
 
