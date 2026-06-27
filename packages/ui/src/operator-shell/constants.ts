@@ -40,19 +40,23 @@ export interface StandardGroup {
  * 순서, 라벨, 아이콘, Capability 매핑 — 모두 고정.
  * 서비스는 이 구조를 변경할 수 없고, 항목(items)만 제공.
  */
+// WO-O4O-KPA-OPERATOR-STORE-CONTENT-MENU-TERMINOLOGY-ALIGNMENT-V1:
+//   운영자 사이드바 최상위 그룹 라벨 국문화 (영문 → 국문). 매장 사이드바와 언어 정합.
+//   SHARED — KPA / Neture / GlycoPharm / K-Cosmetics 4개 operator 대시보드 공통 적용
+//   (DomainIASidebar / OperatorAreaShell 소비). label 만 변경, key/capability/순서 불변.
 export const STANDARD_GROUPS: StandardGroup[] = [
-  { key: 'dashboard', label: 'Dashboard', icon: Home },
-  { key: 'users', label: 'Users', icon: Users, capability: OperatorCapability.USER_MANAGEMENT },
-  { key: 'approvals', label: 'Approvals', icon: FileCheck, capability: OperatorCapability.MEMBERSHIP_APPROVAL },
-  { key: 'products', label: 'Products', icon: Package, capability: OperatorCapability.STORE_MANAGEMENT },
-  { key: 'stores', label: 'Stores', icon: Store, capability: OperatorCapability.STORE_MANAGEMENT },
-  { key: 'orders', label: 'Orders', icon: ShoppingCart, capability: OperatorCapability.STORE_MANAGEMENT },
-  { key: 'content', label: 'Content', icon: FileText, capability: OperatorCapability.CONTENT_MANAGEMENT },
+  { key: 'dashboard', label: '대시보드', icon: Home },
+  { key: 'users', label: '회원', icon: Users, capability: OperatorCapability.USER_MANAGEMENT },
+  { key: 'approvals', label: '승인', icon: FileCheck, capability: OperatorCapability.MEMBERSHIP_APPROVAL },
+  { key: 'products', label: '상품', icon: Package, capability: OperatorCapability.STORE_MANAGEMENT },
+  { key: 'stores', label: '매장', icon: Store, capability: OperatorCapability.STORE_MANAGEMENT },
+  { key: 'orders', label: '주문', icon: ShoppingCart, capability: OperatorCapability.STORE_MANAGEMENT },
+  { key: 'content', label: '콘텐츠', icon: FileText, capability: OperatorCapability.CONTENT_MANAGEMENT },
   // WO-KPA-LMS-INSTRUCTOR-APPROVAL-RELOCATE-V1
-  { key: 'resources', label: 'Resources', icon: Archive, capability: OperatorCapability.CONTENT_MANAGEMENT },
-  { key: 'lms', label: 'LMS', icon: BookOpen, capability: OperatorCapability.CONTENT_MANAGEMENT },
-  { key: 'signage', label: 'Signage', icon: Monitor, capability: OperatorCapability.SIGNAGE },
-  { key: 'forum', label: 'Forum', icon: MessageSquare, capability: OperatorCapability.COMMUNITY },
-  { key: 'analytics', label: 'Analytics', icon: BarChart3, capability: OperatorCapability.ANALYTICS },
-  { key: 'system', label: 'System', icon: Settings, capability: OperatorCapability.SETTINGS },
+  { key: 'resources', label: '자료실', icon: Archive, capability: OperatorCapability.CONTENT_MANAGEMENT },
+  { key: 'lms', label: '강의', icon: BookOpen, capability: OperatorCapability.CONTENT_MANAGEMENT },
+  { key: 'signage', label: '사이니지', icon: Monitor, capability: OperatorCapability.SIGNAGE },
+  { key: 'forum', label: '포럼', icon: MessageSquare, capability: OperatorCapability.COMMUNITY },
+  { key: 'analytics', label: '분석', icon: BarChart3, capability: OperatorCapability.ANALYTICS },
+  { key: 'system', label: '시스템', icon: Settings, capability: OperatorCapability.SETTINGS },
 ];
