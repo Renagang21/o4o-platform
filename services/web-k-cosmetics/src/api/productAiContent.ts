@@ -47,14 +47,3 @@ export async function saveProductAiContent(
   );
   return res.data;
 }
-
-export async function generateProductAiContent(
-  productId: string,
-  type: ProductAiContentType,
-): Promise<{ success: boolean; message?: string }> {
-  const res = await api.post<{ success: boolean; message?: string }>(
-    `/products/${productId}/ai-contents/generate/${type}`,
-    {},
-  );
-  return res.data;
-}
