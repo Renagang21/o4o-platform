@@ -43,6 +43,13 @@ export interface ProductListing {
   display_order: number;
   created_at: string;
   updated_at: string;
+  // WO-O4O-KPA-COMMERCE-PRODUCT-TO-STORE-MANAGEMENT-USE-FLOW-V1:
+  //   master_id+offer_id 리팩토링(WO-O4O-PRODUCT-MASTER-CORE-RESET-V1) 이후 실제 엔티티 필드.
+  //   product_name/external_product_id 는 컬럼 제거됨(런타임 undefined) → offer_id 로 catalog 병합해 상품명 도출.
+  offer_id?: string | null;
+  master_id?: string;
+  price?: number | null;
+  status?: string;
 }
 
 export interface PaginatedResponse<T> {
@@ -167,6 +174,10 @@ export async function updateListing(
     retailPrice?: number;
     isActive?: boolean;
     displayOrder?: number;
+    // WO-O4O-KPA-COMMERCE-PRODUCT-TO-STORE-MANAGEMENT-USE-FLOW-V1:
+    //   백엔드 PUT /listings/:id 는 { id, organization_id, service_key } 로 listing 을 조회한다.
+    //   혼합 도메인(all 탭) listing 활성화 시 해당 row 의 실제 service_key 를 전달해야 정확히 매칭된다.
+    service_key?: string;
   }
 ): Promise<{ success: boolean; data: ProductListing }> {
   return apiClient.put(`/pharmacy/products/listings/${id}`, params);

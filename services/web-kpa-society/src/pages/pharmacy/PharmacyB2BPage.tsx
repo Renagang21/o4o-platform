@@ -18,7 +18,7 @@ import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { DataTable } from '@o4o/ui';
 import type { Column } from '@o4o/ui';
 import { toast } from '@o4o/error-handling';
-import { getListings, getCatalog } from '../../api/pharmacyProducts';
+import { getListings, getCatalog, updateListing } from '../../api/pharmacyProducts';
 import type { CatalogProduct } from '../../api/pharmacyProducts';
 import { colors, borderRadius } from '../../styles/theme';
 import { EventOfferContentPanel } from '../../components/event-offer/EventOfferContentPanel';
@@ -33,6 +33,7 @@ import { QrCode, X as XIcon } from 'lucide-react';
 
 interface B2BProduct {
   listingId: string;
+  /** offer id (= catalog product id). 작업대 주문/공급사 매칭 키. WO-O4O-PRODUCT-MASTER-CORE-RESET-V1 이후 listing.offer_id 에서 도출. */
   catalogProductId: string;
   productName: string;
   serviceKey: string;
@@ -41,6 +42,9 @@ interface B2BProduct {
   supplierName: string;
   category: string | null;
   createdAt: string;
+  // WO-O4O-KPA-COMMERCE-PRODUCT-TO-STORE-MANAGEMENT-USE-FLOW-V1:
+  //   is_active=true 인 listing 은 매장 경영활용 제품 리스트(/store/handled-products)에 노출 중 = "경영활용 중".
+  isActive: boolean;
 }
 
 // ── 도메인 탭 ──
@@ -89,9 +93,11 @@ export function PharmacyB2BPage() {
   // WO-O4O-KPA-O4O-LISTING-MULTILINGUAL-QR-ACTIONS-V1: 고객용 링크/QR 패널 대상
   const [qrPanel, setQrPanel] = useState<{ product: B2BProduct; summary: StoreMlcSummaryItem } | null>(null);
 
-  // 선택 + 수량
+  // 선택 + 수량 (선택 키 = listingId — WO-O4O-KPA-COMMERCE-PRODUCT-TO-STORE-MANAGEMENT-USE-FLOW-V1)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [quantities, setQuantities] = useState<Record<string, number>>({});
+  // 매장 경영활용 제품 등록 진행 상태
+  const [registering, setRegistering] = useState(false);
 
   const loadData = useCallback(async () => {
     try {
@@ -112,18 +118,22 @@ export function PharmacyB2BPage() {
       catalog.forEach(c => catalogMap.set(c.id, c));
 
       // Merge listings with catalog
+      // WO-O4O-KPA-COMMERCE-PRODUCT-TO-STORE-MANAGEMENT-USE-FLOW-V1:
+      //   external_product_id 컬럼 제거(WO-...-RemoveExternalProductIdFromListings) 이후 listing 응답에는
+      //   product_name/external_product_id 가 없다. offer_id ↔ catalog(spo.id) 로 병합해 상품명/공급사를 복원한다.
       const merged: B2BProduct[] = listings.map(l => {
-        const cat = catalogMap.get(l.external_product_id);
+        const cat = l.offer_id ? catalogMap.get(l.offer_id) : undefined;
         return {
           listingId: l.id,
-          catalogProductId: l.external_product_id,
-          productName: l.product_name,
+          catalogProductId: l.offer_id || '',
+          productName: cat?.name || l.product_name || '(상품 정보 없음)',
           serviceKey: l.service_key,
-          retailPrice: l.retail_price,
+          retailPrice: (l.price ?? l.retail_price) ?? null,
           supplierId: cat?.supplierId || '',
           supplierName: cat?.supplierName || '—',
           category: cat?.category || null,
           createdAt: l.created_at,
+          isActive: l.is_active,
         };
       });
 
@@ -185,13 +195,20 @@ export function PharmacyB2BPage() {
     [selectedIds, quantities],
   );
 
+  // WO-O4O-KPA-COMMERCE-PRODUCT-TO-STORE-MANAGEMENT-USE-FLOW-V1:
+  //   선택된 listing 중 아직 경영활용(is_active=false)이 아닌 것 = 등록 대상.
+  const registerableCount = useMemo(
+    () => products.filter(p => selectedIds.has(p.listingId) && !p.isActive).length,
+    [products, selectedIds],
+  );
+
   const handleAddToWorktable = useCallback(() => {
     if (selectedIds.size === 0) {
       toast.error('상품을 선택해주세요.');
       return;
     }
 
-    // 선택된 상품 중 수량이 1 이상인 것만
+    // 선택된 상품(listingId) 중 수량이 1 이상이고 공급사가 있는 것만 → 작업대 preselect 는 offer id 키
     const validItems: [string, number][] = [];
     let noQtyCount = 0;
     let noSupplierCount = 0;
@@ -199,9 +216,9 @@ export function PharmacyB2BPage() {
     for (const id of selectedIds) {
       const qty = quantities[id] || 0;
       if (qty < 1) { noQtyCount++; continue; }
-      const product = products.find(p => p.catalogProductId === id);
-      if (!product?.supplierId) { noSupplierCount++; continue; }
-      validItems.push([id, qty]);
+      const product = products.find(p => p.listingId === id);
+      if (!product?.supplierId || !product.catalogProductId) { noSupplierCount++; continue; }
+      validItems.push([product.catalogProductId, qty]);
     }
 
     if (validItems.length === 0) {
@@ -221,6 +238,58 @@ export function PharmacyB2BPage() {
     toast.success(`${validItems.length}건의 상품을 작업대에 담았습니다.`);
     navigate('/store/commerce/order-worktable');
   }, [selectedIds, quantities, products, navigate]);
+
+  // ── 매장 경영활용 제품으로 등록 ──
+  // WO-O4O-KPA-COMMERCE-PRODUCT-TO-STORE-MANAGEMENT-USE-FLOW-V1:
+  //   선택한 O4O 제품(listing)을 복사하지 않고, 같은 row 의 is_active=true 로 전환해
+  //   매장 경영활용 제품 리스트(/store/handled-products)에 노출시킨다. 기존 PUT /listings/:id 재사용.
+  //   이미 경영활용 중(is_active=true)인 항목은 건너뛴다(중복 등록 방지).
+  const handleRegisterManagement = useCallback(async () => {
+    if (registering) return;
+    const targets = products.filter(p => selectedIds.has(p.listingId) && !p.isActive);
+    if (targets.length === 0) {
+      const allActive = [...selectedIds].every(id => products.find(p => p.listingId === id)?.isActive);
+      toast.error(allActive ? '선택한 제품이 이미 모두 매장 경영활용 제품입니다.' : '등록할 제품을 선택해주세요.');
+      return;
+    }
+
+    setRegistering(true);
+    const results = await Promise.allSettled(
+      targets.map(p => updateListing(p.listingId, { isActive: true, service_key: p.serviceKey }).then(() => p.listingId)),
+    );
+
+    const successIds = new Set<string>();
+    let failCount = 0;
+    for (const r of results) {
+      if (r.status === 'fulfilled') successIds.add(r.value);
+      else failCount++;
+    }
+
+    // 성공 항목 로컬 즉시 반영(새로고침 없이 상태 갱신)
+    if (successIds.size > 0) {
+      setProducts(prev => prev.map(p => successIds.has(p.listingId) ? { ...p, isActive: true } : p));
+      setSelectedIds(prev => {
+        const next = new Set(prev);
+        successIds.forEach(id => next.delete(id));
+        return next;
+      });
+    }
+
+    if (successIds.size > 0 && failCount === 0) {
+      toast.success(
+        `${successIds.size}개 제품을 매장 경영활용 제품에 등록했습니다.`,
+        {
+          duration: 5000,
+          // 완료 후 등록된 제품 보기 진입 (현재 목록 유지 — 별도 자동 이동 안 함)
+        },
+      );
+    } else if (successIds.size > 0) {
+      toast.success(`${successIds.size}개 등록 완료. ${failCount}개 실패.`);
+    } else {
+      toast.error('등록에 실패했습니다. 다시 시도해주세요.');
+    }
+    setRegistering(false);
+  }, [registering, products, selectedIds]);
 
   // ── 포맷 ──
 
@@ -243,8 +312,8 @@ export function PharmacyB2BPage() {
       render: (_v, row) => (
         <input
           type="checkbox"
-          checked={selectedIds.has(row.catalogProductId)}
-          onChange={() => toggleSelect(row.catalogProductId)}
+          checked={selectedIds.has(row.listingId)}
+          onChange={() => toggleSelect(row.listingId)}
           style={{ cursor: 'pointer', width: '16px', height: '16px' }}
         />
       ),
@@ -256,6 +325,23 @@ export function PharmacyB2BPage() {
       render: (_v, row) => (
         <span style={{ fontWeight: 500, color: colors.neutral900 }}>{row.productName}</span>
       ),
+    },
+    {
+      // WO-O4O-KPA-COMMERCE-PRODUCT-TO-STORE-MANAGEMENT-USE-FLOW-V1: 매장 경영활용 등록 상태
+      key: 'manageStatus',
+      title: '경영활용',
+      width: '110px',
+      align: 'center' as const,
+      render: (_v, row) =>
+        row.isActive ? (
+          <span style={{ padding: '2px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, color: '#059669', backgroundColor: '#D1FAE5' }}>
+            경영활용 중
+          </span>
+        ) : (
+          <span style={{ padding: '2px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 500, color: colors.neutral500, backgroundColor: colors.neutral100 }}>
+            등록 가능
+          </span>
+        ),
     },
     {
       key: 'supplierName',
@@ -328,8 +414,8 @@ export function PharmacyB2BPage() {
         <input
           type="number"
           min={0}
-          value={quantities[row.catalogProductId] || 0}
-          onChange={e => updateQuantity(row.catalogProductId, parseInt(e.target.value) || 0)}
+          value={quantities[row.listingId] || 0}
+          onChange={e => updateQuantity(row.listingId, parseInt(e.target.value) || 0)}
           onClick={e => e.stopPropagation()}
           style={styles.qtyInput}
         />
@@ -356,8 +442,14 @@ export function PharmacyB2BPage() {
         <div style={styles.headerMain}>
           <div>
             <h1 style={styles.pageTitle}>상품 관리</h1>
-            <p style={styles.pageDesc}>약국에서 거래할 상품을 확인하고 주문 작업대에 담을 수 있습니다</p>
+            <p style={styles.pageDesc}>
+              약국의 O4O 제품을 확인하고, 매장 경영활용 제품으로 등록하거나 주문 작업대에 담을 수 있습니다
+            </p>
           </div>
+          {/* WO-O4O-KPA-COMMERCE-PRODUCT-TO-STORE-MANAGEMENT-USE-FLOW-V1: 등록된 제품 보기 진입 */}
+          <Link to="/store/handled-products" style={styles.handledLink}>
+            매장 경영활용 제품 보기 &rarr;
+          </Link>
         </div>
       </header>
 
@@ -388,16 +480,33 @@ export function PharmacyB2BPage() {
         <EventOfferContentPanel compact />
       ) : (
         <>
-          {/* 결과 카운트 + 작업대 담기 */}
+          {/* 결과 카운트 + 선택 작업 영역 */}
           <div style={styles.resultBar}>
             <span style={styles.resultCount}>
               {loading ? '불러오는 중...' : `${products.length}개 상품`}
               {selectedIds.size > 0 && ` · ${selectedIds.size}개 선택`}
             </span>
+            {/* WO-O4O-KPA-COMMERCE-PRODUCT-TO-STORE-MANAGEMENT-USE-FLOW-V1:
+                선택 작업 영역 — 경영활용 등록(기본) + 작업대 담기(주문) + 선택 해제 */}
             {selectedIds.size > 0 && (
-              <button onClick={handleAddToWorktable} style={styles.worktableButton}>
-                {selectedCount > 0 ? `선택 상품 ${selectedCount}건 작업대 담기` : '작업대 담기'}
-              </button>
+              <div style={styles.selectionActions}>
+                <button
+                  onClick={handleRegisterManagement}
+                  disabled={registering || registerableCount === 0}
+                  style={{ ...styles.registerButton, opacity: registering || registerableCount === 0 ? 0.55 : 1 }}
+                  title={registerableCount === 0 ? '선택한 제품이 모두 경영활용 중입니다' : '선택한 제품을 매장 경영활용 제품에 등록'}
+                >
+                  {registering
+                    ? '등록 중...'
+                    : `매장 경영활용 제품으로 등록${registerableCount > 0 ? ` (${registerableCount}건)` : ''}`}
+                </button>
+                <button onClick={handleAddToWorktable} style={styles.worktableButton}>
+                  {selectedCount > 0 ? `작업대 담기 (${selectedCount}건)` : '작업대 담기'}
+                </button>
+                <button onClick={() => { setSelectedIds(new Set()); setQuantities({}); }} style={styles.clearSelectionButton}>
+                  선택 해제
+                </button>
+              </div>
             )}
           </div>
 
@@ -529,7 +638,19 @@ const styles: Record<string, React.CSSProperties> = {
   },
   headerMain: {
     marginTop: '12px',
-  },
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    gap: '16px',
+    flexWrap: 'wrap',
+  } as React.CSSProperties,
+  handledLink: {
+    color: colors.primary,
+    textDecoration: 'none',
+    fontSize: '0.875rem',
+    fontWeight: 600,
+    whiteSpace: 'nowrap',
+  } as React.CSSProperties,
   pageTitle: {
     fontSize: '1.75rem',
     fontWeight: 700,
@@ -609,6 +730,35 @@ const styles: Record<string, React.CSSProperties> = {
     color: colors.neutral500,
     fontWeight: 500,
   },
+
+  // Selection actions (WO-O4O-KPA-COMMERCE-PRODUCT-TO-STORE-MANAGEMENT-USE-FLOW-V1)
+  selectionActions: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    flexWrap: 'wrap',
+  } as React.CSSProperties,
+  registerButton: {
+    padding: '8px 20px',
+    fontSize: '0.875rem',
+    fontWeight: 600,
+    color: colors.white,
+    backgroundColor: '#059669',
+    border: 'none',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+  } as React.CSSProperties,
+  clearSelectionButton: {
+    padding: '8px 12px',
+    fontSize: '0.875rem',
+    fontWeight: 500,
+    color: colors.neutral500,
+    backgroundColor: 'transparent',
+    border: 'none',
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+  } as React.CSSProperties,
 
   // Worktable button
   worktableButton: {
