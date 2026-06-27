@@ -30,7 +30,7 @@ import { colors } from '../../styles/theme';
 import { TagInput } from '../../components/store/TagInput';
 
 // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1:
-//   매장 취급제품에서 진입 시 연결 대상 제품 정보. 저장 시 top-level productRef 로 전달되어
+//   매장 경영활용 제품에서 진입 시 연결 대상 제품 정보. 저장 시 top-level productRef 로 전달되어
 //   생성 콘텐츠가 해당 제품에 자동 연결된다. (listing=O4O 기반 제품 / local=매장 경영활용 제품)
 export interface CreateContentProductContext {
   sourceType: 'listing' | 'local';
@@ -137,7 +137,7 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated, prod
           {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1: 제품에서 진입한 경우 연결 대상 표시 */}
           {product && (
             <div style={styles.productBanner}>
-              <span style={styles.productBannerLabel}>관련 매장 취급제품</span>
+              <span style={styles.productBannerLabel}>관련 매장 경영활용 제품</span>
               <span style={styles.productBannerName}>{product.name}</span>
               <span style={styles.productBannerKind}>
                 {product.sourceType === 'listing' ? 'O4O 기반 제품' : '매장 경영활용 제품'}
