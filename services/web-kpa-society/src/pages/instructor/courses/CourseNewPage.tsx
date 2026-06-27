@@ -36,7 +36,6 @@ export default function CourseNewPage() {
       description: values.description,
       tags: values.tags.length > 0 ? values.tags : undefined,
       visibility: values.visibility,            // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-V1
-      reusablePolicy: values.reusablePolicy,     // WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1
       requiresApproval: values.requiresApproval, // WO-O4O-LMS-VISIBILITY-ENROLLMENT-INTEGRATION-V1
     });
     // API returns { success, data: Course }
@@ -69,6 +68,7 @@ export default function CourseNewPage() {
           submittingLabel: '생성 중...',
           requireDescription: true,
           requireTags: true,
+          fields: { reusablePolicy: false },
         }}
         onSubmit={handleSubmit}
         onCancel={back}
