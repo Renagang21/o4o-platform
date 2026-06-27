@@ -83,27 +83,30 @@ WO §7 허용 범위 — "콘텐츠 종류 또는 편집 경로 판별 필드만
 
 > listing(O4O 기반 제품) 경로는 CONTENT-LINK-V1 에서 정적 검증 — 분기 차이는 master_id 조회뿐(동일 코드 경로).
 
-## 10~11. browser smoke 결과 — **보류(BLOCKED)**: 공유 브라우저 점유
+## 10~11. browser smoke 결과 — **ALL PASS** (2026-06-27, live `kpa-society.co.kr`, renagang21)
 
-- 검증 시점에 Playwright MCP 공유 프로필(`mcp-chrome-59d9d40`)을 **병렬 세션의 활성 chrome 프로세스**(7개, 13:23 기동)가
-  점유 중이어서 브라우저 자동화 실행 불가(`Browser is already in use`). 병렬 세션 작업 방해 방지를 위해 강제 종료하지 않음.
-  bounded wait(~3분) 후에도 STILL_LOCKED.
-- **보완 근거(현재 확보된 검증):**
-  - API smoke **ALL PASS** — 콘텐츠 생성+productRef 자동연결 / by-product sourceType·snapshotId / linkedContentCount (9절).
-  - typecheck **PASS** (api-server + web-kpa-society).
-  - 동일 화면(`/store/handled-products`)의 렌더링/레이아웃/콘솔 error 0 은 **선행 CONTENT-LINK-V1 browser smoke 에서 PASS** 확인됨.
-    본 WO 추가분(콘텐츠 만들기 버튼 / count→드로어 / 모달 배너 / 라이브러리 URL 진입)은 정적·타입 검증 + API 백킹 완료.
-- **잔여 항목:** 공유 브라우저 가용 시 아래 흐름 라이브 확인 후 본 절 갱신.
-  1. handled-products "콘텐츠 만들기" → 라이브러리 작성 모달 자동 오픈 + "관련 매장 취급제품" 배너(제품명/구분)
-  2. 저장 → handled-products 복귀 시 연결 콘텐츠 수 증가
-  3. `N개` → 드로어 목록 → 열기(direct/snapshot 분기)
-  4. 일반 콘텐츠 작성 흐름 무영향 / 모바일·데스크톱 레이아웃 / 콘솔 error 0
-  5. smoke 데이터 정리
+> 1차 시도 시 Playwright MCP 공유 프로필을 병렬 세션 chrome 이 점유(`Browser is already in use`)하여 보류 →
+> 사용자가 해당 브라우저 종료 후 재실행. 강제 종료 없이 가용 시점에 전 흐름 라이브 검증.
+
+임시 local product 1건 seed → UI 로 콘텐츠 생성·연결·열람 검증 → 삭제(정리 완료).
+
+| 단계 | 결과 |
+|---|---|
+| `/store/handled-products` — "콘텐츠 만들기" 버튼 + "연결 콘텐츠" 셀(없음) 렌더, 7컬럼 유지 | ✓ |
+| "콘텐츠 만들기" → `?create=1&pType=local&pId=&pName=` 로 이동 + 작성 모달 자동 오픈 | ✓ |
+| 모달 "관련 매장 취급제품" 배너: 제품명 + "매장 경영활용 제품" 노출 | ✓ |
+| 제목·본문 입력 후 저장 → direct 콘텐츠 상세로 이동(생성 성공) | ✓ |
+| handled-products 복귀 → 연결 콘텐츠 "없음" → **"1개"** (자동 연결 확인) | ✓ |
+| "1개"(연결 콘텐츠 보기) → 드로어: 제목 / 상태 "초안" / 날짜 / 열기 / 새 콘텐츠 만들기 | ✓ |
+| "열기" → `/store/content/direct/:id` (direct 편집 경로) 정상 이동 | ✓ |
+| 콘솔 error 0 | ✓ |
+
+> listing/local/UUID/productRef 화면 미노출 확인. 신규 컬럼 없음(관리 영역 버튼만 추가).
 
 ## 12. 데이터 정리
 
 - API smoke 임시 product/content: **삭제 완료** (handled-products total 0 복귀).
-- browser smoke seed product: 보류로 전환하며 **삭제 완료**.
+- browser smoke seed product + 생성 콘텐츠: **삭제 완료** (content 삭제 시 link FK CASCADE 제거, total 0 복귀).
 
 ## 13. 후속 후보
 
@@ -117,5 +120,5 @@ WO §7 허용 범위 — "콘텐츠 종류 또는 편집 경로 판별 필드만
 - 구현 / typecheck: **완료**
 - 배포: `f162be9ca` + `be80f064a` → Deploy API/Web 전부 success
 - API smoke: **ALL PASS** (데이터 정리 완료)
-- browser smoke: **보류** — 공유 브라우저를 병렬 세션이 점유. 가용 시 즉시 실행 예정.
-- 잔여: browser smoke 1건 외 모든 완료 기준 충족.
+- browser smoke: **ALL PASS** (전 흐름 라이브 검증, 콘솔 error 0, 데이터 정리 완료)
+- **WO 최종 완료** — 모든 완료 기준 충족.
