@@ -104,7 +104,7 @@ export function ImportB2cDescriptionModal({ open, product, onClose, onImported, 
                 <button type="button" style={styles.secondaryBtn} onClick={() => { onClose(); onViewLinked(); }}>
                   <ListChecks size={14} /> 연결 콘텐츠 보기
                 </button>
-                <button type="button" style={styles.ghostBtn} onClick={onClose}>매장 취급제품 목록으로</button>
+                <button type="button" style={styles.ghostBtn} onClick={onClose}>매장 경영활용 제품 목록으로</button>
               </div>
             </div>
           ) : loading ? (
