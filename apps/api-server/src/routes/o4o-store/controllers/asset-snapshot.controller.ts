@@ -64,8 +64,6 @@ export function createAssetSnapshotController(
     resolveOrgId: resolveKpaOrgId,
     noOrgErrorCode: 'NO_ORGANIZATION',
     noOrgMessage: 'User has no KPA organization membership',
-    // WO-O4O-LMS-STORE-LIBRARY-FOUNDATION-V1: LMS 강의(lesson) 자료함 가져가기 허용.
-    //   Resolver가 published + reusable_policy != restricted 만 통과시킨다.
     // WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1: KPA 콘텐츠 허브(content) 가져가기 허용.
     //   Resolver가 is_deleted=false 만 통과시킨다.
     // WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: KPA 자료실(resource) 가져가기 허용.
@@ -81,6 +79,8 @@ export function createAssetSnapshotController(
     //   QR 은 본 trace 에서는 자료함 사본 흐름 (asset-snapshot copy) 대신 직접 import endpoint
     //   (Phase 3-B 의 /stores/:slug/qr/staff/import) 가 채택될 가능성 높음. allowedAssetTypes
     //   등록은 추후 자료함 통합 시 옵션으로 열어두는 의미.
-    allowedAssetTypes: ['cms', 'signage', 'lesson', 'content', 'resource', 'blog', 'pop', 'qr'],
+    // CHECK-O4O-LMS-KPA-LESSON-SNAPSHOT-CREATION-REMOVAL-V1: 'lesson' 제거 — 신규 lesson snapshot
+    //   생성 경로를 닫는다. 기존 row / store-assets?type=lesson 조회 호환은 별도 경로로 유지.
+    allowedAssetTypes: ['cms', 'signage', 'content', 'resource', 'blog', 'pop', 'qr'],
   });
 }
