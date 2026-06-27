@@ -426,6 +426,196 @@ export function createStoreContentController(
     },
   );
 
+  // ───────────────────────────────────────────────────────────────────────────
+  // WO-O4O-KPA-O4O-B2C-DESCRIPTION-COPY-TO-STORE-CONTENT-V1
+  //   O4O 기반 제품(listing)의 B2C 상세설명(shared_product_descriptions, canonical)을
+  //   매장 자료함 direct 콘텐츠로 가져오기(=복사). 원본과 사본은 독립.
+  //   - 이미지: 본문 내 영구 공개 GCS URL 그대로 복사(재호스팅 없음). master 하드삭제 시에만
+  //     이미지 깨짐 가능(문서화된 한계, V1 범위 외).
+  //   - 제목 필드 없음 → ProductMaster.name 파생.
+  //   NOTE: 리터럴 경로이므로 /:snapshotId 보다 먼저 등록.
+  // ───────────────────────────────────────────────────────────────────────────
+
+  /**
+   * GET /store-contents/b2c-descriptions?listingId=<uuid>
+   * 해당 listing(=master)에 가져올 수 있는 B2C 상세설명(canonical) 목록. 미발행/숨김/타제품 제외.
+   */
+  router.get(
+    '/b2c-descriptions',
+    requireAuth,
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const authReq = req as AuthRequest;
+        const userId = authReq.user?.id;
+        if (!userId) {
+          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
+          return;
+        }
+        const listingId = req.query.listingId as string;
+        if (!listingId || !UUID_RE.test(listingId)) {
+          res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'listingId는 유효한 UUID 여야 합니다.' } });
+          return;
+        }
+        const organizationId = await resolveDualOrgId(userId);
+        if (!organizationId) {
+          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: 'No organization membership' } });
+          return;
+        }
+        // org → listing 소유 + master_id 확인 (서버가 관계를 직접 검증)
+        const resolved = await resolveProductForLink(organizationId, 'listing', listingId);
+        if (!resolved.ok) {
+          res.status(404).json({ success: false, error: { code: 'LISTING_NOT_FOUND', message: 'O4O 제품을 현재 매장에서 찾을 수 없습니다.' } });
+          return;
+        }
+        if (!resolved.masterId) {
+          res.json({ success: true, data: { items: [] } });
+          return;
+        }
+        const rows: Array<{ id: string; summary: string | null; language: string | null; status: string; updated_at: Date; product_name: string | null }> =
+          await dataSource.query(
+            `SELECT spd.id, spd.summary, spd.language, spd.status, spd.updated_at, pm.name AS product_name
+             FROM shared_product_descriptions spd
+             JOIN product_masters pm ON pm.id = spd.master_id
+             WHERE spd.master_id = $1 AND spd.status = 'canonical' AND spd.deleted_at IS NULL
+             ORDER BY spd.updated_at DESC`,
+            [resolved.masterId],
+          );
+        res.json({
+          success: true,
+          data: {
+            items: rows.map((r) => ({
+              descriptionId: r.id,
+              // 제목 필드가 없으므로 제품명을 사용자 표시 제목으로 사용.
+              title: r.product_name || 'O4O 상세설명',
+              language: r.language || 'ko',
+              status: r.status,
+              summary: r.summary,
+              updatedAt: r.updated_at,
+            })),
+          },
+        });
+      } catch (error: any) {
+        res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
+      }
+    },
+  );
+
+  /**
+   * POST /store-contents/import-b2c-description  { listingId, descriptionId }
+   * 가져오기=복사. 서버가 org→listing→master→description 관계를 검증하고 원본을 직접 읽어
+   * 독립 direct 콘텐츠 + product_description 링크를 한 transaction 으로 생성. 출처 metadata 보존.
+   */
+  router.post(
+    '/import-b2c-description',
+    requireAuth,
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const authReq = req as AuthRequest;
+        const userId = authReq.user?.id;
+        if (!userId) {
+          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
+          return;
+        }
+        // 쓰기 = store owner 권한 (POST / 와 동일)
+        const { isOwner, organizationId: orgFromRa } = await isStoreOwner(dataSource, userId, 'kpa');
+        if (!isOwner) {
+          res.status(403).json({ success: false, error: { code: 'STORE_OWNER_REQUIRED', message: '매장 경영자(kpa:store_owner)만 가져올 수 있습니다.' } });
+          return;
+        }
+        let organizationId: string | null = orgFromRa;
+        if (!organizationId) {
+          const member = await dataSource.getRepository(KpaMember).findOne({ where: { user_id: userId } });
+          organizationId = member?.organization_id || null;
+        }
+        if (!organizationId) {
+          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: '매장 조직 정보를 찾을 수 없습니다.' } });
+          return;
+        }
+
+        const { listingId, descriptionId } = req.body as { listingId?: string; descriptionId?: string };
+        if (!listingId || !UUID_RE.test(listingId) || !descriptionId || !UUID_RE.test(descriptionId)) {
+          res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'listingId, descriptionId는 유효한 UUID 여야 합니다.' } });
+          return;
+        }
+
+        // org → listing 소유 + master_id
+        const resolved = await resolveProductForLink(organizationId, 'listing', listingId);
+        if (!resolved.ok || !resolved.masterId) {
+          res.status(404).json({ success: false, error: { code: 'LISTING_NOT_FOUND', message: 'O4O 제품을 현재 매장에서 찾을 수 없습니다.' } });
+          return;
+        }
+        const masterId = resolved.masterId;
+
+        // 복사: 원본 읽기 + 콘텐츠 + 링크를 한 transaction. 실패 시 흔적 없음.
+        const result = await dataSource.transaction(async (manager) => {
+          const src: Array<{ content: string | null; summary: string | null; product_name: string | null }> =
+            await manager.query(
+              `SELECT spd.content, spd.summary, pm.name AS product_name
+               FROM shared_product_descriptions spd
+               JOIN product_masters pm ON pm.id = spd.master_id
+               WHERE spd.id = $1 AND spd.master_id = $2 AND spd.status = 'canonical' AND spd.deleted_at IS NULL
+               LIMIT 1`,
+              [descriptionId, masterId],
+            );
+          if (!src.length) {
+            const e: any = new Error('가져올 수 있는 B2C 상세설명이 아닙니다(타 제품/미공개/미존재).');
+            e.code = 'NOT_IMPORTABLE';
+            throw e;
+          }
+          const s = src[0];
+          const title = s.product_name || 'O4O 상세설명';
+          const contentJson = {
+            html: s.content || '',
+            summary: s.summary || null,
+            sourceResources: [],
+            generatedBy: 'o4o-b2c-import',
+          };
+          const sourceMetadata = {
+            copiedFrom: 'o4o_b2c_product_description',
+            sourceRefId: descriptionId,
+            masterId,
+            copiedAt: new Date().toISOString(),
+          };
+          const ins: Array<{ id: string; workspace_status: string; updated_at: Date }> = await manager.query(
+            `INSERT INTO kpa_store_contents
+               (organization_id, source_type, snapshot_id, title, content_json, tags, updated_by,
+                source_metadata, author_role, visibility_scope, workspace_status)
+             VALUES ($1, 'direct', NULL, $2, $3::jsonb, '[]'::jsonb, $4, $5::jsonb, 'operator', 'organization', 'draft')
+             RETURNING id, workspace_status, updated_at`,
+            [organizationId, title, JSON.stringify(contentJson), userId, JSON.stringify(sourceMetadata)],
+          );
+          const contentId = ins[0].id;
+          await manager.query(
+            `INSERT INTO kpa_store_content_product_links
+               (organization_id, content_id, product_source_type, product_source_id, master_id, link_type)
+             VALUES ($1, $2, 'listing', $3, $4, $5)
+             ON CONFLICT (organization_id, content_id, product_source_type, product_source_id, link_type) DO NOTHING`,
+            [organizationId, contentId, listingId, masterId, LINK_TYPE],
+          );
+          return { contentId, title, status: ins[0].workspace_status, updatedAt: ins[0].updated_at };
+        });
+
+        res.status(201).json({
+          success: true,
+          data: {
+            id: result.contentId,
+            sourceType: 'direct' as const,
+            title: result.title,
+            status: result.status,
+            masterId,
+            updatedAt: result.updatedAt,
+          },
+        });
+      } catch (error: any) {
+        if (error?.code === 'NOT_IMPORTABLE') {
+          res.status(400).json({ success: false, error: { code: 'NOT_IMPORTABLE', message: error.message } });
+          return;
+        }
+        res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
+      }
+    },
+  );
+
   // ─────────────────────────────────────────────────────────────────────────
   // direct 콘텐츠 전용 CRUD (WO-O4O-STORE-CONTENT-DIRECT-DETAIL-EDIT-UX-V1)
   // NOTE: /direct/:id 라우트는 /:snapshotId 보다 먼저 등록해야 한다.
