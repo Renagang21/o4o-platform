@@ -20,6 +20,7 @@
 | `services/web-kpa-society/src/pages/pharmacy/StoreContentsSelector.tsx` | `TopTab`/`TopTabBar`, `LessonRow`, `toLessonRow`, `readNumber`, `LessonsSection`, `topTab` state, 강의 데이터 호출(`list({type:'lesson'})`) 제거. `StoreContentsSelector` 가 `DocumentsSection` 직접 렌더. 미사용 import(`BookOpen`/`storeAssetControlApi`/`StoreAssetItem`)·dead `segmented*` style 제거 |
 | `services/web-kpa-society/src/pages/pharmacy/StoreLibraryContentsPage.tsx` | 부제·헤더 주석에서 `강의(LMS 참조 자산)` 표현 제거, 콘텐츠 전용 설명으로 정리 |
 | `services/web-kpa-society/src/pages/pharmacy/SelectContentsForProductionModal.tsx` | 소스 탭 라벨 `콘텐츠·강의` → `콘텐츠`, 관련 주석 정리 |
+| `services/web-kpa-society/src/pages/pharmacy/StoreProductionMaterialsPage.tsx` | 제작 자료 페이지 부제/빈 상태 안내 2곳의 `콘텐츠·강의` → `콘텐츠` (브라우저 smoke 중 발견한 stray 표기) |
 | `docs/checks/CHECK-O4O-KPA-STORE-LIBRARY-CONTENT-ONLY-SELECTOR-V1.md` | 본 CHECK 기록 |
 
 ## 3. 제거한 강의 UI·코드
@@ -54,17 +55,18 @@
 ## 8. 배포 커밋과 배포 상태
 
 - 2단계(backend) commit `d2aaf6194` — **push 완료**(origin/main).
-- 3단계(frontend) commit `f138b96b0` — **로컬 커밋, push 보류**.
-  - 사유: 동일 로컬 main 에 병행 세션의 미push 커밋(tablet display WO P1-2/P3)이 선행 ancestor 로 존재. 본 stage-3 push 시 해당 세션의 진행 중 커밋이 함께 publish 되므로, 사용자 결정에 따라 보류. 병행 세션이 자신의 커밋을 push 한 뒤 본 커밋만 별도 push 예정.
-- Stage-2 와 Stage-3 는 별도 커밋으로 분리(합치지 않음).
+- 3단계(frontend) commit `f138b96b0` + CHECK `2f8f10cf6` — **push 완료**(origin/main). 병행 세션이 자신의 tablet 커밋을 push 할 때 본 ancestor 커밋이 함께 올라가 자연 해소(별도 강제 push 불필요). 확인: `git branch -r --contains` 으로 3개 모두 origin/main 확인.
+- 배포: "Deploy Web Services (Cloud Run)" run `28280735029`(commit `aa1dda2ec`, 본 stage-3 커밋이 ancestor) **success** → KPA web 라이브 반영.
+- Stage-2 와 Stage-3 는 별도 커밋으로 분리(합치지 않음). 본 smoke·stray-fix 는 stage-3 후속 커밋.
 
-## 9. 운영 브라우저 smoke
+## 9. 운영 브라우저 smoke — **PASS** (2026-06-27, `renagang21` = kpa:store_owner, kpa-society.co.kr)
 
-- **미수행(배포 전)** — push 보류로 KPA web 미배포. 배포 후 다음을 확인 예정:
-  - `/store/library/contents`: `콘텐츠/강의` 전환 미표시, 콘텐츠 목록 즉시 표시, 강의 목록·검색 미표시, 콘텐츠 검색·출처 필터 정상, 하단 QR·POP·PDF 표시, 편집·삭제 정상.
-  - 제작 자료 생성/선택 모달: `콘텐츠/강의` 미표시, 콘텐츠 목록 즉시 표시, 선택 완료·제작 시작 정상, 강의 선택 경로 없음.
-  - 회귀: `/lms` 강의 목록·수강 정상, 콘솔 오류 없음.
+- `/store/library/contents`: **PASS** — `콘텐츠/강의` 상위 전환 미표시, 콘텐츠 목록(표) 즉시 표시, 강의 목록·강의 검색 미표시, 출처 필터(전체/운영자 제공/커뮤니티 가져옴/내가 만든 콘텐츠)·제목 검색·헤더(콘텐츠 제작/가이드/새로고침) 정상. 부제 강의 표현 제거 확인.
+- 제작 자료 선택 모달(`/store/library/production-materials` → 새 제작 자료 만들기): **PASS** — 소스 탭 `콘텐츠`(이전 `콘텐츠·강의`)·운영자 콘텐츠·내 제작자료. `콘텐츠` 탭 내부에 `콘텐츠/강의` 하위 전환 없음, 콘텐츠 표 직접 표시, 강의 선택 경로 없음. `처음부터 만들기`/`빈 제작 자료 만들기` 유지.
+- 회귀 `/lms`: **PASS** — 강의 5건 목록·수강하기/바로 보기 정상(LMS 무영향).
+- 하단 QR·POP·인쇄용 PDF 액션: 선택 행이 있을 때만 노출되는 ActionBar 인데 테스트 매장(Sohae 약국 매장)에 콘텐츠 0건이라 행 선택 불가 → 화면 노출 미확인. 코드/정적 검증(§7)에서 액션·모달 존재 확인됨.
+- smoke 중 발견한 stray: 제작 자료 페이지 부제 2곳의 `콘텐츠·강의` 표기 → `콘텐츠` 로 정정(§2 표 반영).
 
 ## 10. 완료 판정
 
-**PASS (구현/타입체크/정적 검증).** 강의 선택 UI·소비 코드를 KPA 매장 콘텐츠 화면과 제작 자료 선택 모달에서 제거하고 콘텐츠 전용으로 정리했다. 콘텐츠 제작(QR/POP/PDF) 기능과 LMS 수강 기능은 그대로다. 기존 lesson snapshot 데이터는 보존되며 GP/KCos 무변경이다. 운영 브라우저 smoke 는 push·배포 후 수행한다.
+**PASS (구현/타입체크/정적 검증/운영 브라우저 smoke).** 강의 선택 UI·소비 코드를 KPA 매장 콘텐츠 화면과 제작 자료 선택 모달에서 제거하고 콘텐츠 전용으로 정리했다. 콘텐츠 제작(QR/POP/PDF) 기능과 LMS 수강 기능은 그대로다. 기존 lesson snapshot 데이터는 보존되며 GP/KCos 무변경이다. 배포(run `28280735029`) 후 운영 화면 smoke 에서 콘텐츠 전용 표시·모달 정합·LMS 무영향을 확인했다.

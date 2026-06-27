@@ -524,7 +524,7 @@ export default function StoreProductionMaterialsPage() {
           </h1>
           <p style={styles.subtitle}>
             AI로 생성하거나 편집한 POP·QR·블로그·상품 상세설명 제작 결과물을 관리합니다.
-            <strong>새 제작 자료 만들기</strong>로 처음부터 직접 작성하거나, 콘텐츠·강의를 원본으로 선택해 제작을 시작할 수 있습니다.
+            <strong>새 제작 자료 만들기</strong>로 처음부터 직접 작성하거나, 콘텐츠를 원본으로 선택해 제작을 시작할 수 있습니다.
           </p>
           <div style={{ marginTop: 8 }}><GuideBackLink to="/guide/features/production-materials" label="제작 자료 활용 방법" /></div>
         </div>
@@ -586,7 +586,7 @@ export default function StoreProductionMaterialsPage() {
             저장된 제작 자료가 없습니다.
           </p>
           <p style={{ margin: '8px 0 0 0', color: colors.neutral400, fontSize: 13, lineHeight: 1.6 }}>
-            "새 제작 자료 만들기"로 처음부터 직접 작성하거나, 콘텐츠·강의를 선택해 시작하세요.
+            "새 제작 자료 만들기"로 처음부터 직접 작성하거나, 콘텐츠를 선택해 시작하세요.
           </p>
           <button
             type="button"
