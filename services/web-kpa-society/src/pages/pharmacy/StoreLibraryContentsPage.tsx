@@ -12,7 +12,12 @@
  *   WO-O4O-LMS-STORE-LIBRARY-UX-WIRING-V1: lesson Reference Metadata 노출
  *   WO-O4O-KPA-STORE-LIBRARY-CONTENTS-REMOVE-FLOW-FIX-V1
  *   WO-O4O-STORE-LIBRARY-COPY-INDEPENDENCE-ALIGN-V1: duplicate 허용 유지
- *   WO-O4O-STORE-PRODUCTION-MATERIALS-FLOW-RECOVERY-V1: AiContentModal 호출 흐름 복구
+ *
+ * WO-O4O-KPA-CONTENT-CREATION-AI-ENTRY-REMOVE-V1:
+ *   페이지형 AI 진입 제거 — StartProductionModal 의 AI 카드(onAiAction 미전달로 숨김) +
+ *   in-page AiContentModal("AI 매장 제작 자료 초안") 제거. 콘텐츠 선택·복사, 제작 시작(POP/QR/
+ *   블로그/상품설명), 빈 편집기 콘텐츠 제작(CreateContentFromResourcesModal)은 보존.
+ *   공통 StartProductionModal(@o4o/store-ui-core)은 미변경 — GP/KCos 무영향.
  *
  * WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-SELECTOR-MODAL-V1:
  *   기존 페이지 내부에 직접 정의되어 있던 TopTabBar / SubTabBar / DocumentsSection /
@@ -21,24 +26,16 @@
  */
 
 import { useState, useCallback, type CSSProperties } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { BookOpen, RefreshCw, PenSquare, Lightbulb } from 'lucide-react';
-import { AiContentModal } from '@o4o/content-editor';
 // WO-O4O-KPA-STORE-LIBRARY-CONTENT-CREATION-GUIDE-MODAL-V1: 콘텐츠 제작 가이드(안내 UI)
 import { ContentCreationGuideModal } from './ContentCreationGuideModal';
-// WO-O4O-AI-EDITING-PRESET-ADOPTION-LMS-RESOURCES-V1: 라이브러리 진입(타깃 미선택) 범용 preset
-import { findEditingPreset } from '@o4o/types';
 import { storeAssetControlApi } from '../../api/assetSnapshot';
-import { getAccessToken } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
 import { StartProductionModal, type ProductionSource, type ProductionSourceItem } from './StartProductionModal';
 import { CreateContentFromResourcesModal } from './CreateContentFromResourcesModal';
-import { composeSourceTextFromItems } from './productionTargets';
 import { StoreContentsSelector } from './StoreContentsSelector';
 
 export default function StoreLibraryContentsPage() {
-  const navigate = useNavigate();
-
   const [reloadKey, setReloadKey] = useState(0);
   const reload = useCallback(() => setReloadKey((k) => k + 1), []);
 
@@ -48,46 +45,11 @@ export default function StoreLibraryContentsPage() {
   // WO-O4O-KPA-STORE-LIBRARY-CONTENT-CREATION-GUIDE-MODAL-V1
   const [guideOpen, setGuideOpen] = useState(false);
 
-  // WO-O4O-STORE-PRODUCTION-MATERIALS-FLOW-RECOVERY-V1:
-  // AI 흐름은 in-page AiContentModal 호출 → onInsert 시 ProductionMaterialEditorPage 로 결과 HTML 전달.
-  const [aiOpen, setAiOpen] = useState(false);
-  const [aiInitialText, setAiInitialText] = useState('');
-  const [aiSourceMetadata, setAiSourceMetadata] = useState<
-    { sourceContentId?: string; sourceTitle?: string; sourceOrigin?: string } | null
-  >(null);
-
   const openProduction = useCallback((items: ProductionSourceItem[]) => {
     if (items.length === 0) return;
     setModalSource({ fromLibrary: 'contents', items });
     setModalOpen(true);
   }, []);
-
-  const handleAiAction = useCallback((source: ProductionSource) => {
-    const text = composeSourceTextFromItems(source.items);
-    const first = source.items[0];
-    setAiInitialText(text);
-    setAiSourceMetadata(
-      first
-        ? { sourceContentId: first.id, sourceTitle: first.title, sourceOrigin: first.origin }
-        : null,
-    );
-    setModalOpen(false);
-    setAiOpen(true);
-  }, []);
-
-  const handleAiInsert = useCallback(
-    (data: { html: string; title: string }) => {
-      setAiOpen(false);
-      navigate('/store/library/production-materials/new', {
-        state: {
-          generatedHtml: data.html,
-          title: data.title || undefined,
-          sourceMetadata: aiSourceMetadata ?? undefined,
-        },
-      });
-    },
-    [navigate, aiSourceMetadata],
-  );
 
   const removeSnapshots = useCallback(async (snapshotIds: string[]): Promise<number> => {
     if (snapshotIds.length === 0) return 0;
@@ -149,7 +111,6 @@ export default function StoreLibraryContentsPage() {
         open={modalOpen}
         source={modalSource}
         onClose={() => setModalOpen(false)}
-        onAiAction={handleAiAction}
       />
 
       <CreateContentFromResourcesModal
@@ -160,24 +121,6 @@ export default function StoreLibraryContentsPage() {
 
       {/* WO-O4O-KPA-STORE-LIBRARY-CONTENT-CREATION-GUIDE-MODAL-V1 */}
       <ContentCreationGuideModal open={guideOpen} onClose={() => setGuideOpen(false)} />
-
-      {/* WO-O4O-STORE-PRODUCTION-MATERIALS-FLOW-RECOVERY-V1
-          콘텐츠/강의 선택 → StartProductionModal 의 AI 카드 → 본 모달에서 AI 생성 →
-          onInsert 시 ProductionMaterialEditorPage 로 결과 HTML 전달 */}
-      <AiContentModal
-        open={aiOpen}
-        onClose={() => setAiOpen(false)}
-        editor={null}
-        onInsert={handleAiInsert}
-        initialText={aiInitialText}
-        headerLabel="AI 매장 제작 자료 초안"
-        templateSystemPrompt={findEditingPreset('library-entry')?.systemPromptOverride}
-        templateForcedOptions={findEditingPreset('library-entry')?.forcedOptions}
-        aiRequestHeaders={(() => {
-          const token = getAccessToken();
-          return token ? { Authorization: `Bearer ${token}` } : undefined;
-        })()}
-      />
     </div>
   );
 }

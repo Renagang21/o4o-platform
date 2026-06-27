@@ -10,9 +10,11 @@
  *   - ProductionRouterState에서 selectedTemplateId 수신
  *   - template badge + 설명 유형 표시
  *   - template starterHtml 초기 구조 주입 (기존 저장 내용 없을 때)
- *   - AiContentModal template-aware 연결 (templateSystemPrompt / templateForcedOptions)
+ * WO-O4O-KPA-CONTENT-CREATION-AI-ENTRY-REMOVE-V1:
+ *   - 페이지형 AI 진입(AI 보조 배너 "AI로 작성" + AiContentModal + "AI 재생성") 제거.
+ *   - 직접 작성/저장/prefill 및 RichTextEditor Toolbar "AI 정리"(편집 보조)는 보존.
  *
- * Backend: ProductAiContent (contentType='product_description') — 기존 active entity/API 재사용.
+ * Backend: ProductAiContent (contentType='product_description') — 조회/저장 API 재사용.
  *
  * 진입 시 location.state.production.source.items 가 있으면 첫 항목을 기반으로
  * 상품 선택 + 자료 description prefill 처리.
@@ -20,9 +22,9 @@
 
 import { useEffect, useState, useCallback, useRef, type CSSProperties } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { Sparkles, Save, RefreshCw, FileText, Package, FolderOpen, LayoutTemplate } from 'lucide-react';
+import { Save, RefreshCw, FileText, Package, FolderOpen, LayoutTemplate } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
-import { RichTextEditor, AiContentModal } from '@o4o/content-editor';
+import { RichTextEditor } from '@o4o/content-editor';
 import {
   fetchLocalProducts,
   type LocalProduct,
@@ -30,7 +32,6 @@ import {
 import {
   getProductAiContents,
   saveProductAiContent,
-  generateProductAiContent,
 } from '../../api/productAiContent';
 import { mediaApi } from '../../api/media';
 import { getAccessToken } from '../../contexts/AuthContext';
@@ -39,8 +40,6 @@ import { findTemplate } from './productionTemplates';
 import type { ProductionTemplate } from './productionTemplates';
 import type { ProductionRouterState } from './productionTargets';
 
-const POLL_DELAY_MS = 4000;
-
 export default function StoreProductDescriptionsPage() {
   const location = useLocation();
   const [products, setProducts] = useState<LocalProduct[]>([]);
@@ -48,7 +47,6 @@ export default function StoreProductDescriptionsPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [content, setContent] = useState('');
   const [contentLoading, setContentLoading] = useState(false);
-  const [regenerating, setRegenerating] = useState(false);
   const [saving, setSaving] = useState(false);
   const [model, setModel] = useState<string | null>(null);
   const [updatedAt, setUpdatedAt] = useState<string | null>(null);
@@ -56,7 +54,6 @@ export default function StoreProductDescriptionsPage() {
 
   // WO-O4O-PRODUCT-DESCRIPTION-TEMPLATE-WORKFLOW-V1: template 상태
   const [selectedTemplate, setSelectedTemplate] = useState<ProductionTemplate | null>(null);
-  const [aiOpen, setAiOpen] = useState(false);
 
   /**
    * starterHtml은 1회 소비용 ref.
@@ -148,22 +145,6 @@ export default function StoreProductDescriptionsPage() {
     toast.success('자료 내용을 편집기에 채웠습니다');
   };
 
-  const handleRegenerate = async () => {
-    if (!selectedId) return;
-    setRegenerating(true);
-    try {
-      await generateProductAiContent(selectedId, 'product_description');
-      toast.success('AI 재생성을 시작했습니다. 잠시 후 결과를 표시합니다.');
-      setTimeout(() => {
-        if (selectedId) fetchContent(selectedId);
-        setRegenerating(false);
-      }, POLL_DELAY_MS);
-    } catch (e: any) {
-      toast.error(e?.message || 'AI 재생성에 실패했습니다');
-      setRegenerating(false);
-    }
-  };
-
   const handleSave = async () => {
     if (!selectedId) return;
     const trimmed = content.trim();
@@ -190,13 +171,6 @@ export default function StoreProductDescriptionsPage() {
     if (res.success && res.data) return res.data.url;
     throw new Error(res.error || '이미지 업로드에 실패했습니다.');
   };
-
-  // WO-O4O-PRODUCT-DESCRIPTION-TEMPLATE-WORKFLOW-V1: AiContentModal onInsert
-  const handleAiInsert = useCallback(({ html }: { html: string; title: string }) => {
-    setContent(html);
-    setAiOpen(false);
-    toast.success('AI 작성 내용이 편집기에 적용되었습니다. 검토 후 저장하세요.');
-  }, []);
 
   const selectedProduct = products.find((p) => p.id === selectedId) || null;
   const hasExisting = !!updatedAt;
@@ -347,27 +321,6 @@ export default function StoreProductDescriptionsPage() {
                 </div>
               )}
 
-              {/* WO-O4O-PRODUCT-DESCRIPTION-TEMPLATE-WORKFLOW-V1: AI 보조 배너 */}
-              <div style={styles.aiBanner}>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={styles.aiBannerTitle}>✨ AI 상품설명 보조</div>
-                  <div style={styles.aiBannerDesc}>
-                    {selectedTemplate
-                      ? `${selectedTemplate.name} 스타일로 AI가 상품설명 초안을 작성합니다.`
-                      : 'URL이나 자료를 기반으로 AI가 상품설명 초안을 작성합니다.'}
-                    {' '}최종 내용은 직접 검토 후 저장하세요.
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setAiOpen(true)}
-                  style={styles.aiBannerBtn}
-                >
-                  <Sparkles size={13} />
-                  AI로 작성
-                </button>
-              </div>
-
               {/* WO-O4O-PRODUCT-DESCRIPTION-TEMPLATE-WORKFLOW-V1: RichTextEditor */}
               {contentLoading ? (
                 <div style={styles.editorLoading}>불러오는 중...</div>
@@ -381,7 +334,7 @@ export default function StoreProductDescriptionsPage() {
                     hasExisting
                       ? '저장된 상품 상세설명을 수정하세요.'
                       : selectedTemplate
-                        ? `${selectedTemplate.name} 템플릿 구조로 작성하세요. AI 보조를 활용하면 빠르게 초안을 만들 수 있습니다.`
+                        ? `${selectedTemplate.name} 템플릿 구조로 작성하세요.`
                         : '신규 생성은 "내 자료함 → 제작 시작 → 상품 상세설명"에서 시작하세요.'
                   }
                   minHeight="360px"
@@ -394,23 +347,11 @@ export default function StoreProductDescriptionsPage() {
               )}
 
               <div style={styles.actions}>
-                {hasExisting && (
-                  <button
-                    type="button"
-                    onClick={handleRegenerate}
-                    disabled={regenerating || saving}
-                    style={{ ...styles.aiBtn, opacity: regenerating || saving ? 0.7 : 1 }}
-                    title="기존 결과물을 AI로 다시 생성합니다"
-                  >
-                    <Sparkles size={14} />
-                    {regenerating ? 'AI 재생성 중...' : 'AI 재생성'}
-                  </button>
-                )}
                 <button
                   type="button"
                   onClick={handleSave}
-                  disabled={regenerating || saving || !content.trim()}
-                  style={{ ...styles.saveBtn, opacity: regenerating || saving || !content.trim() ? 0.7 : 1 }}
+                  disabled={saving || !content.trim()}
+                  style={{ ...styles.saveBtn, opacity: saving || !content.trim() ? 0.7 : 1 }}
                 >
                   <Save size={14} />
                   {saving ? '저장 중...' : '저장'}
@@ -420,23 +361,6 @@ export default function StoreProductDescriptionsPage() {
           )}
         </section>
       </div>
-
-      {/* WO-O4O-PRODUCT-DESCRIPTION-TEMPLATE-WORKFLOW-V1: AiContentModal (template-aware) */}
-      <AiContentModal
-        open={aiOpen}
-        onClose={() => setAiOpen(false)}
-        editor={null}
-        onInsert={handleAiInsert}
-        aiRequestHeaders={(() => {
-          const token = getAccessToken();
-          return token ? { Authorization: `Bearer ${token}` } : undefined;
-        })()}
-        headerLabel="상품설명 AI 보조"
-        urlPlaceholder="https://example.com/product 또는 제품 페이지 URL"
-        templateId={selectedTemplate?.id}
-        templateSystemPrompt={selectedTemplate?.systemPromptOverride}
-        templateForcedOptions={selectedTemplate?.forcedOptions}
-      />
     </div>
   );
 }
@@ -662,59 +586,10 @@ const styles: Record<string, CSSProperties> = {
     cursor: 'pointer',
     flexShrink: 0,
   },
-  aiBanner: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: '12px',
-    padding: '10px 14px',
-    background: '#eef2ff',
-    border: '1px solid #c7d2fe',
-    borderRadius: '8px',
-  },
-  aiBannerTitle: {
-    fontSize: '13px',
-    fontWeight: 600,
-    color: '#4338ca',
-    marginBottom: '2px',
-  },
-  aiBannerDesc: {
-    fontSize: '12px',
-    color: '#6366f1',
-    lineHeight: 1.5,
-  },
-  aiBannerBtn: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '6px',
-    padding: '8px 16px',
-    background: '#4f46e5',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '7px',
-    fontSize: '13px',
-    fontWeight: 600,
-    cursor: 'pointer',
-    whiteSpace: 'nowrap',
-    flexShrink: 0,
-  },
   actions: {
     display: 'flex',
     justifyContent: 'flex-end',
     gap: '8px',
-  },
-  aiBtn: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '6px',
-    padding: '8px 16px',
-    background: colors.white,
-    border: `1px solid ${colors.primary}`,
-    borderRadius: '6px',
-    fontSize: '13px',
-    color: colors.primary,
-    fontWeight: 500,
-    cursor: 'pointer',
   },
   saveBtn: {
     display: 'inline-flex',
