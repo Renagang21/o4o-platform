@@ -18,16 +18,16 @@
 
 | 단계 | 파일:라인 | 비고 |
 |---|---|---|
-| 등록 진입(유형 선택) | `SupplierProductRegisterEntryPage.tsx:40-43` | `productType`/`regulatoryType` 를 URL 쿼리로 전달 |
-| 유형 정의(5종) | `supplierProductTypes.ts:28-64` | non_drug/quasi_drug/otc_drug/rx_drug/unclassified → regulatoryType 매핑 |
+| 등록 진입(유형 선택) | [`SupplierProductRegisterEntryPage.tsx:40-43`](services/web-neture/src/pages/supplier/SupplierProductRegisterEntryPage.tsx#L40-L43) | `productType`/`regulatoryType` 를 URL 쿼리로 전달 |
+| 유형 정의(5종) | [`supplierProductTypes.ts:28-64`](services/web-neture/src/lib/supplierProductTypes.ts#L28-L64) | non_drug/quasi_drug/otc_drug/rx_drug/unclassified → regulatoryType 매핑 |
 | Import Assistant draft | `product-import/storage.ts:13-14`, `SupplierProductCreatePage.tsx:79,92-176` | 외부 페이지 파싱 → sessionStorage draft → Wizard prefill(이름/브랜드/제조사/규격/원산지/카테고리/가격/규제유형/이미지/B2C간이) |
 | Wizard Step1 기본정보 | `SupplierProductCreatePage.tsx:612-731,735-784` | marketingName·category·제조사·**바코드 조회**·규제정보(규제 카테고리 시) |
 | Wizard Step2 공급가 | (ProductForm) | priceGeneral 필수 |
 | Wizard Step3 설명/이미지 | `:908-929` | specification·originCountry·B2C 설명 |
 | 바코드 조회(기존) | `:206-225` | `productApi.getMasterByBarcode()` → Master hit 시 marketingName/manufacturerName prefill, miss 시 자동 생성 안내 |
-| 생성 | `supplier.ts:605` `POST /neture/supplier/products` | `name`+`manualData{regulatoryType/Name/mfdsPermitNumber/manufacturerName/specification/originCountry/stockQty}`+가격+serviceKeys |
-| 수정 Drawer | `ProductDetailDrawer.tsx`, `supplier.ts:633` `PATCH /neture/supplier/products/:id` | 기본정보+B2C 설명 / B2B 설명은 별도 `:299` `updateBusinessContent` / 공급방식은 별도 모달 |
-| 승인요청 | `offer.service.ts:411-524` `submitForApproval` | 정부 연결 미요구(§아래) |
+| 생성 | [`supplier.ts:605`](services/web-neture/src/lib/api/supplier.ts#L605) `POST /neture/supplier/products` | `name`+`manualData{regulatoryType/Name/mfdsPermitNumber/manufacturerName/specification/originCountry/stockQty}`+가격+serviceKeys |
+| 수정 Drawer | `ProductDetailDrawer.tsx`, [`supplier.ts:633`](services/web-neture/src/lib/api/supplier.ts#L633) `PATCH /neture/supplier/products/:id` | 기본정보+B2C 설명 / B2B 설명은 별도 `:299` `updateBusinessContent` / 공급방식은 별도 모달 |
+| 승인요청 | [`offer.service.ts:411-524`](apps/api-server/src/modules/neture/services/offer.service.ts#L411-L524) `submitForApproval` | 정부 연결 미요구(§아래) |
 
 **Step 검증(required):** Step1 marketingName·categoryId(+규제 카테고리 시 regulatoryType·regulatoryName) `:258-264`; Step2 priceGeneral>0 `:268`; Step3 PUBLIC 시 consumerShortDesc `:291-294`. 그 외 제조사/규격/원산지/바코드/허가번호 = **optional**.
 
@@ -61,12 +61,12 @@ ProductMaster (SSOT, barcode UNIQUE)
 ProductCandidate (검토 큐): raw_payload(JSONB)★원문 snapshot, match_status, matched_product_master_id, confidence
 MobileProductDraft / SupplierCsvImportRow(raw_json JSONB) — 수집·일괄 경로
 ```
-근거(엔티티): `ProductMaster.entity.ts:36-104`, `SupplierProductOffer.entity.ts:40-123`, `ProductDrugExtension.entity.ts:87-166`, `ProductIdentifier.entity.ts:90-171`, `ProductCandidate.entity.ts:203-204`, `SharedProductDescription.entity.ts:69-73`, `SupplierCsvImportRow.entity.ts:50`.
+근거(엔티티): [`ProductMaster.entity.ts:36-104`](apps/api-server/src/modules/neture/entities/ProductMaster.entity.ts#L36-L104), [`SupplierProductOffer.entity.ts:40-123`](apps/api-server/src/modules/neture/entities/SupplierProductOffer.entity.ts#L40-L123), [`ProductDrugExtension.entity.ts:87-166`](apps/api-server/src/modules/neture/entities/ProductDrugExtension.entity.ts#L87-L166), [`ProductIdentifier.entity.ts:90-171`](apps/api-server/src/modules/neture/entities/ProductIdentifier.entity.ts#L90-L171), [`ProductCandidate.entity.ts:203-204`](apps/api-server/src/modules/neture/entities/ProductCandidate.entity.ts#L203-L204), [`SharedProductDescription.entity.ts:69-73`](apps/api-server/src/modules/neture/entities/SharedProductDescription.entity.ts#L69-L73), [`SupplierCsvImportRow.entity.ts:50`](apps/api-server/src/modules/neture/entities/SupplierCsvImportRow.entity.ts#L50).
 
 **핵심 사실**
-- **등록 단위 = 제품(barcode/Master)**. 1 Master = 1 supplier = 1 Offer max (`SupplierProductOffer.entity.ts:40-41`).
+- **등록 단위 = 제품(barcode/Master)**. 1 Master = 1 supplier = 1 Offer max ([`SupplierProductOffer.entity.ts:40-41`](apps/api-server/src/modules/neture/entities/SupplierProductOffer.entity.ts#L40-L41)).
 - **동일 제품 다중 포장 = 현재 미지원**(다른 barcode → 다른 Master). 포장정보는 `ProductDrugExtension.package_unit/quantity` + `specification` 텍스트로만 표현.
-- **승인 ↔ master 느슨한 결합**: Master 생성은 승인과 독립, 승인은 OfferServiceApproval 상태 변경뿐. **정부 연결을 승인이 강제하지 않음**(`offer.service.ts:411-524`). 규제 상품만 **승인 시 허가번호(mfdsPermitNumber) 필요**(`offer.service.ts:79-94,202-224` `assertRegulatedPermit(mode:'approval')`).
+- **승인 ↔ master 느슨한 결합**: Master 생성은 승인과 독립, 승인은 OfferServiceApproval 상태 변경뿐. **정부 연결을 승인이 강제하지 않음**([`offer.service.ts:411-524`](apps/api-server/src/modules/neture/services/offer.service.ts#L411-L524)). 규제 상품만 **승인 시 허가번호(mfdsPermitNumber) 필요**(`offer.service.ts:79-94,202-224` `assertRegulatedPermit(mode:'approval')`).
 
 ---
 
@@ -121,15 +121,15 @@ MobileProductDraft / SupplierCsvImportRow(raw_json JSONB) — 수집·일괄 경
 ## 6. 현재 구조 재사용 가능 영역
 | 자산 | 재사용 포인트 | 파일 |
 |---|---|---|
-| **MFDS Service** | 바코드→식별(이미 호출), timeout/AbortController, graceful degradation, 2단계 폴백 | `mfds.service.ts:53-128` |
-| **ProductDrugExtension** | 효능/용법/주의·성분(JSON)·코드·원문URL·포장 — **정부 콘텐츠 저장 그릇 그대로** | `ProductDrugExtension.entity.ts:87-166` |
-| **ProductIdentifier(+metadata)** | MFDS_CODE/KOREA_DRUG_CODE 식별자 + metadata JSONB로 item_seq/부가코드 | `ProductIdentifier.entity.ts:90-171` |
-| **ProductCandidate.rawPayload** | 정부 API 응답 원문 전체 snapshot | `ProductCandidate.entity.ts:203-204` |
-| **SharedProductDescription** | source_type=`drug_extension` 등으로 정부 기반 설명을 canonical 풀에 수용 | `SharedProductDescription.entity.ts:69-73` |
+| **MFDS Service** | 바코드→식별(이미 호출), timeout/AbortController, graceful degradation, 2단계 폴백 | [`mfds.service.ts:53-128`](apps/api-server/src/modules/neture/services/mfds.service.ts#L53-L128) |
+| **ProductDrugExtension** | 효능/용법/주의·성분(JSON)·코드·원문URL·포장 — **정부 콘텐츠 저장 그릇 그대로** | [`ProductDrugExtension.entity.ts:87-166`](apps/api-server/src/modules/neture/entities/ProductDrugExtension.entity.ts#L87-L166) |
+| **ProductIdentifier(+metadata)** | MFDS_CODE/KOREA_DRUG_CODE 식별자 + metadata JSONB로 item_seq/부가코드 | [`ProductIdentifier.entity.ts:90-171`](apps/api-server/src/modules/neture/entities/ProductIdentifier.entity.ts#L90-L171) |
+| **ProductCandidate.rawPayload** | 정부 API 응답 원문 전체 snapshot | [`ProductCandidate.entity.ts:203-204`](apps/api-server/src/modules/neture/entities/ProductCandidate.entity.ts#L203-L204) |
+| **SharedProductDescription** | source_type=`drug_extension` 등으로 정부 기반 설명을 canonical 풀에 수용 | [`SharedProductDescription.entity.ts:69-73`](apps/api-server/src/modules/neture/entities/SharedProductDescription.entity.ts#L69-L73) |
 | **CacheService(L1+L2 TTL)** | 정부 응답 캐싱(중복호출 방지) | `services/CacheService.ts` |
 | **CircuitBreakerService** | 외부 API 장애 격리/복구 | `services/CircuitBreakerService.ts` |
 | **gtin.ts** | 바코드 검증·내부생성 | `utils/gtin.ts` |
-| **getMasterByBarcode UI 패턴** | "검색 버튼→prefill" 동일 UX 확장 | `SupplierProductCreatePage.tsx:206-225` |
+| **getMasterByBarcode UI 패턴** | "검색 버튼→prefill" 동일 UX 확장 | [`SupplierProductCreatePage.tsx:206-225`](services/web-neture/src/pages/supplier/SupplierProductCreatePage.tsx#L206-L225) |
 
 ---
 
@@ -146,8 +146,8 @@ MobileProductDraft / SupplierCsvImportRow(raw_json JSONB) — 수집·일괄 경
 **원칙:** 기존 흐름·검증·승인정책 불변, 추가는 "옵트인 검색 + 선택 병합".
 
 **최소 변경 위치 Top 2**
-1. **Wizard Step1 바코드 조회 인접**(`SupplierProductCreatePage.tsx:692-731`): "정부 정보 검색" 버튼 추가 → 모달(제품명/업체명/바코드 입력, 입력값 자동 제안) → 후보 목록 → 선택 시 제조사/규격/원산지/허가번호/규제명(선택)만 **기존값 우선**으로 병합. 마케팅명·B2C 설명은 제외.
-2. **수정 Drawer 기본정보 섹션**(`ProductDetailDrawer.tsx:937-990`): 동일 검색 버튼 → 현재 수정 필드에만 병합(운영자/공급자 검토 시).
+1. **Wizard Step1 바코드 조회 인접**([`SupplierProductCreatePage.tsx:692-731`](services/web-neture/src/pages/supplier/SupplierProductCreatePage.tsx#L692-L731)): "정부 정보 검색" 버튼 추가 → 모달(제품명/업체명/바코드 입력, 입력값 자동 제안) → 후보 목록 → 선택 시 제조사/규격/원산지/허가번호/규제명(선택)만 **기존값 우선**으로 병합. 마케팅명·B2C 설명은 제외.
+2. **수정 Drawer 기본정보 섹션**([`ProductDetailDrawer.tsx:937-990`](services/web-neture/src/pages/supplier/ProductDetailDrawer.tsx#L937-L990)): 동일 검색 버튼 → 현재 수정 필드에만 병합(운영자/공급자 검토 시).
 
 **병합 규칙**: 공급자 원문(마케팅명·consumer/business 설명) **덮어쓰기 금지**, regulatoryName은 사용자 확인 시만, 나머지는 기존값 있으면 skip. 후보 0건/실패 시 기존 수기 흐름 그대로(§정책8).
 

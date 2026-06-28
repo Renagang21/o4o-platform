@@ -24,10 +24,10 @@
 ### A-1. productType / regulatoryType 전달 구조
 | 항목 | 근거 | 설명 |
 |---|---|---|
-| URL 파라미터 결정 | `SupplierProductRegisterEntryPage.tsx:40-43` | `navigate('/supplier/products/new?productType=${t.key}&regulatoryType=${t.regulatoryType}')` |
+| URL 파라미터 결정 | [`SupplierProductRegisterEntryPage.tsx:40-43`](services/web-neture/src/pages/supplier/SupplierProductRegisterEntryPage.tsx#L40-L43) | `navigate('/supplier/products/new?productType=${t.key}&regulatoryType=${t.regulatoryType}')` |
 | Wizard prefill | `SupplierProductCreatePage.tsx:82,105` ✔ | `searchParams.get('productType')`→`getSupplierProductType()`; `regulatoryType` 동일 prefill(기본 'GENERAL') |
-| Import Assistant 전달 | `SupplierProductCreatePage.tsx:483-491` | 도우미→등록 이동 시 동일 쿼리 |
-| 유형 정의(5종) | `supplierProductTypes.ts:28-64` | non_drug / quasi_drug / otc_drug / rx_drug / unclassified → regulatoryType(GENERAL/QUASI_DRUG/DRUG/빈값) |
+| Import Assistant 전달 | [`SupplierProductCreatePage.tsx:483-491`](services/web-neture/src/pages/supplier/SupplierProductCreatePage.tsx#L483-L491) | 도우미→등록 이동 시 동일 쿼리 |
+| 유형 정의(5종) | [`supplierProductTypes.ts:28-64`](services/web-neture/src/lib/supplierProductTypes.ts#L28-L64) | non_drug / quasi_drug / otc_drug / rx_drug / unclassified → regulatoryType(GENERAL/QUASI_DRUG/DRUG/빈값) |
 
 ### A-2. 상품명 필드와 저장 위치
 | 필드 | 입력 위치 | 저장 키(payload) | 근거 |
@@ -96,7 +96,7 @@
 | 항목 | Create(POST) | Update(PATCH) | 근거 |
 |---|---|---|---|
 | endpoint | `/neture/supplier/products` | `/neture/supplier/products/{id}` | `supplier.ts:605,633` ✔ |
-| 데이터 형태 | `manualData{}` 구조체 | flat 필드 | create `:299-310` vs `ProductDetailDrawer.tsx:328-350` |
+| 데이터 형태 | `manualData{}` 구조체 | flat 필드 | create `:299-310` vs [`ProductDetailDrawer.tsx:328-350`](services/web-neture/src/pages/supplier/ProductDetailDrawer.tsx#L328-L350) |
 | serviceKeys | payload 포함 | **제외**(공급방식 변경 모달 전용) | `:318` vs `Drawer:349` ✔ |
 | regulatoryType | manualData 저장 | **업데이트 불가(읽기전용)** | `:302` |
 | 분리 호출 | 단일 | updateProduct + **updateBusinessContent**(B2B) | `Drawer:353` vs `:366` ✔ |
@@ -176,33 +176,33 @@ NetureSupplier — slug(UNIQUE) · user_id · status(PENDING|ACTIVE|INACTIVE|REJ
 ProductCategory — name · slug · parent_id · depth(0~3) · is_regulated
 Brand — name · slug · manufacturer_name · country_of_origin · is_active
 ```
-근거: `ProductMaster.entity.ts:36-104`, `SupplierProductOffer.entity.ts:40-123`, `ProductDrugExtension.entity.ts:87-166`, `ProductIdentifier.entity.ts:90-171`, `SharedProductDescription.entity.ts:69-73`, `ProductCandidate.entity.ts:203-204`, `SupplierCsvImportRow.entity.ts:50`, migration `20260301100000-ProductMasterCoreReset.ts:50-73`, `20260606000000-CreateProductIdentifiers.ts:90-121`.
+근거: [`ProductMaster.entity.ts:36-104`](apps/api-server/src/modules/neture/entities/ProductMaster.entity.ts#L36-L104), [`SupplierProductOffer.entity.ts:40-123`](apps/api-server/src/modules/neture/entities/SupplierProductOffer.entity.ts#L40-L123), [`ProductDrugExtension.entity.ts:87-166`](apps/api-server/src/modules/neture/entities/ProductDrugExtension.entity.ts#L87-L166), [`ProductIdentifier.entity.ts:90-171`](apps/api-server/src/modules/neture/entities/ProductIdentifier.entity.ts#L90-L171), [`SharedProductDescription.entity.ts:69-73`](apps/api-server/src/modules/neture/entities/SharedProductDescription.entity.ts#L69-L73), [`ProductCandidate.entity.ts:203-204`](apps/api-server/src/modules/neture/entities/ProductCandidate.entity.ts#L203-L204), [`SupplierCsvImportRow.entity.ts:50`](apps/api-server/src/modules/neture/entities/SupplierCsvImportRow.entity.ts#L50), migration [`20260301100000-ProductMasterCoreReset.ts:50-73`](apps/api-server/src/database/migrations/20260301100000-ProductMasterCoreReset.ts#L50-L73), [`20260606000000-CreateProductIdentifiers.ts:90-121`](apps/api-server/src/database/migrations/20260606000000-CreateProductIdentifiers.ts#L90-L121).
 
 ### B-2. 9개 핵심 질문 — 답과 근거
 | # | 질문 | 답 | 근거 |
 |---|---|---|---|
-| 1 | 등록 단위 = 제품 vs 포장 | **제품(barcode/Master)**. 1 Master = 1 supplier = 1 Offer max | `SupplierProductOffer.entity.ts:40-41`; `ProductMaster.entity.ts:5-6` |
-| 2 | 동일 제품 다중 포장 표현 | **미지원** — 다른 barcode→다른 Master. 포장정보는 `ProductDrugExtension.package_unit/quantity` + `specification` 텍스트 | `ProductMaster.entity.ts:82-84`, `ProductDrugExtension.entity.ts:121-125` |
+| 1 | 등록 단위 = 제품 vs 포장 | **제품(barcode/Master)**. 1 Master = 1 supplier = 1 Offer max | [`SupplierProductOffer.entity.ts:40-41`](apps/api-server/src/modules/neture/entities/SupplierProductOffer.entity.ts#L40-L41); [`ProductMaster.entity.ts:5-6`](apps/api-server/src/modules/neture/entities/ProductMaster.entity.ts#L5-L6) |
+| 2 | 동일 제품 다중 포장 표현 | **미지원** — 다른 barcode→다른 Master. 포장정보는 `ProductDrugExtension.package_unit/quantity` + `specification` 텍스트 | [`ProductMaster.entity.ts:82-84`](apps/api-server/src/modules/neture/entities/ProductMaster.entity.ts#L82-L84), [`ProductDrugExtension.entity.ts:121-125`](apps/api-server/src/modules/neture/entities/ProductDrugExtension.entity.ts#L121-L125) |
 | 3 | barcode 컬럼/타입/unique | **VARCHAR(14), UNIQUE, immutable, index** | entity `:36-38`; migration `:50-73`(uq_product_masters_barcode) |
-| 4 | 정부 품목기준코드 저장 기존 필드 | `ProductMaster.mfdsProductId`(item_seq 용) + `ProductIdentifier.metadata` + `ProductDrugExtension.mfds_code` | entity `:103-104`, `ProductIdentifier.entity.ts:170-171`, `ProductDrugExtension.entity.ts:93-94` |
+| 4 | 정부 품목기준코드 저장 기존 필드 | `ProductMaster.mfdsProductId`(item_seq 용) + `ProductIdentifier.metadata` + `ProductDrugExtension.mfds_code` | entity `:103-104`, [`ProductIdentifier.entity.ts:170-171`](apps/api-server/src/modules/neture/entities/ProductIdentifier.entity.ts#L170-L171), [`ProductDrugExtension.entity.ts:93-94`](apps/api-server/src/modules/neture/entities/ProductDrugExtension.entity.ts#L93-L94) |
 | 5 | 재사용 가능 JSONB metadata | tags / ProductIdentifier.metadata / active_ingredients / ProductCandidate.raw_payload / SupplierCsvImportRow.raw_json | 위 근거 |
-| 6 | 정부 원문 snapshot 기존 구조 | **있음** — ProductDrugExtension(mfds_source_url/source_updated_at/*_source/active_ingredients) + ProductCandidate.raw_payload | `ProductDrugExtension.entity.ts:147-166`, `ProductCandidate.entity.ts:203-204` |
-| 7 | 신규 테이블 필요 범위 | **V1 불필요**(기존 컬럼 충분). 선택: `ProductDrugExtension.metadata(JSONB)` 추가. 향후 정책 시: govt_audit / sync_reconciliation 테이블 | `offer.service.ts:79-94` 등 |
-| 8 | 승인 ↔ master 결합 | **느슨**. Master 생성·Offer 생성·승인(OfferServiceApproval 상태)은 독립. 승인이 Master 연결을 만들지 않음 | `offer.service.ts:185-286`, `offer-service-approval.service.ts` |
-| 9 | 정부 연결 없이 승인 가능 코드 경로 | **가능**. submitForApproval은 카테고리 게이트+서비스키 필터+약국 대상 검사뿐, 정부 link 미요구. 규제 상품만 승인 시 허가번호 필요 | `offer.service.ts:411-524`(submitForApproval), `:79-94`(assertRegulatedPermit mode:'approval'), `:202-224`(approveProduct) |
+| 6 | 정부 원문 snapshot 기존 구조 | **있음** — ProductDrugExtension(mfds_source_url/source_updated_at/*_source/active_ingredients) + ProductCandidate.raw_payload | [`ProductDrugExtension.entity.ts:147-166`](apps/api-server/src/modules/neture/entities/ProductDrugExtension.entity.ts#L147-L166), [`ProductCandidate.entity.ts:203-204`](apps/api-server/src/modules/neture/entities/ProductCandidate.entity.ts#L203-L204) |
+| 7 | 신규 테이블 필요 범위 | **V1 불필요**(기존 컬럼 충분). 선택: `ProductDrugExtension.metadata(JSONB)` 추가. 향후 정책 시: govt_audit / sync_reconciliation 테이블 | [`offer.service.ts:79-94`](apps/api-server/src/modules/neture/services/offer.service.ts#L79-L94) 등 |
+| 8 | 승인 ↔ master 결합 | **느슨**. Master 생성·Offer 생성·승인(OfferServiceApproval 상태)은 독립. 승인이 Master 연결을 만들지 않음 | [`offer.service.ts:185-286`](apps/api-server/src/modules/neture/services/offer.service.ts#L185-L286), `offer-service-approval.service.ts` |
+| 9 | 정부 연결 없이 승인 가능 코드 경로 | **가능**. submitForApproval은 카테고리 게이트+서비스키 필터+약국 대상 검사뿐, 정부 link 미요구. 규제 상품만 승인 시 허가번호 필요 | [`offer.service.ts:411-524`](apps/api-server/src/modules/neture/services/offer.service.ts#L411-L524)(submitForApproval), `:79-94`(assertRegulatedPermit mode:'approval'), `:202-224`(approveProduct) |
 
 ### B-3. 정부코드/원문 저장 — 재사용 가능 기존 컬럼
 | 저장 대상 | 컬럼 | 엔티티:라인 |
 |---|---|---|
-| item_seq(품목기준코드) | mfdsProductId(VARCHAR100 UNIQUE) | ProductMaster.entity.ts:103-104 |
-| 허가번호 | mfdsPermitNumber | ProductMaster.entity.ts:99-100 |
-| 규제유형/공식명/제조사 | regulatory_type/regulatory_name/manufacturerName | ProductMaster.entity.ts:41-42,55-56,95-96 |
-| 의약품 코드류 | drug_code/insurance_code/mfds_code/atc_code | ProductDrugExtension.entity.ts:87-97 |
-| 성분(JSON) | active_ingredients | ProductDrugExtension.entity.ts:112-113 |
-| 효능/용법/주의(+출처) | efficacy_text/dosage_text/caution_text/*_source | ProductDrugExtension.entity.ts:156-166 |
-| 원문 URL/동기화시각 | mfds_source_url/source_updated_at | ProductDrugExtension.entity.ts:150-154 |
-| 식별자 부가코드(JSON) | ProductIdentifier.metadata | ProductIdentifier.entity.ts:170-171 |
-| 정부 응답 원문 전체(JSON) | ProductCandidate.raw_payload | ProductCandidate.entity.ts:203-204 |
+| item_seq(품목기준코드) | mfdsProductId(VARCHAR100 UNIQUE) | [ProductMaster.entity.ts:103-104](apps/api-server/src/modules/neture/entities/ProductMaster.entity.ts#L103-L104) |
+| 허가번호 | mfdsPermitNumber | [ProductMaster.entity.ts:99-100](apps/api-server/src/modules/neture/entities/ProductMaster.entity.ts#L99-L100) |
+| 규제유형/공식명/제조사 | regulatory_type/regulatory_name/manufacturerName | [ProductMaster.entity.ts:41-42](apps/api-server/src/modules/neture/entities/ProductMaster.entity.ts#L41-L42),55-56,95-96 |
+| 의약품 코드류 | drug_code/insurance_code/mfds_code/atc_code | [ProductDrugExtension.entity.ts:87-97](apps/api-server/src/modules/neture/entities/ProductDrugExtension.entity.ts#L87-L97) |
+| 성분(JSON) | active_ingredients | [ProductDrugExtension.entity.ts:112-113](apps/api-server/src/modules/neture/entities/ProductDrugExtension.entity.ts#L112-L113) |
+| 효능/용법/주의(+출처) | efficacy_text/dosage_text/caution_text/*_source | [ProductDrugExtension.entity.ts:156-166](apps/api-server/src/modules/neture/entities/ProductDrugExtension.entity.ts#L156-L166) |
+| 원문 URL/동기화시각 | mfds_source_url/source_updated_at | [ProductDrugExtension.entity.ts:150-154](apps/api-server/src/modules/neture/entities/ProductDrugExtension.entity.ts#L150-L154) |
+| 식별자 부가코드(JSON) | ProductIdentifier.metadata | [ProductIdentifier.entity.ts:170-171](apps/api-server/src/modules/neture/entities/ProductIdentifier.entity.ts#L170-L171) |
+| 정부 응답 원문 전체(JSON) | ProductCandidate.raw_payload | [ProductCandidate.entity.ts:203-204](apps/api-server/src/modules/neture/entities/ProductCandidate.entity.ts#L203-L204) |
 
 ### B-4. 신규 컬럼/테이블이 불가피한 최소 항목(향후)
 - **선택 신규 컬럼**: `ProductDrugExtension.metadata(JSONB)` — 확장 코드 여분(없어도 ProductIdentifier.metadata 대체).
@@ -217,15 +217,15 @@ Brand — name · slug · manufacturer_name · country_of_origin · is_active
 ### C-1. 키워드 매치 현황
 | 키워드 | 매치 | 핵심 위치 |
 |---|---|---|
-| data.go.kr / apis.data.go.kr | ✅ | `mfds.service.ts:41-44` ✔ |
+| data.go.kr / apis.data.go.kr | ✅ | [`mfds.service.ts:41-44`](apps/api-server/src/modules/neture/services/mfds.service.ts#L41-L44) ✔ |
 | MFDS/식약처 | ✅ (29+ 파일) | `mfds.service.ts` 전체 |
-| itemSeq/item_seq/품목기준코드 | ✅ | `mfds.service.ts:83` ✔ |
+| itemSeq/item_seq/품목기준코드 | ✅ | [`mfds.service.ts:83`](apps/api-server/src/modules/neture/services/mfds.service.ts#L83) ✔ |
 | barcode/GTIN/바코드 | ✅ (126 파일) | `utils/gtin.ts`, 검증/생성 |
 | 의약품/e약은요/낱알 | ✅ (116 파일) | 의약품 엔티티/서비스 |
 | government/external source | ✅ (27 파일) | — |
 | API cache/snapshot | ✅ | CacheService, asset-snapshot, store-ai snapshot |
 | scheduler/cron/queue/retry | ✅ (제한적) | `packages/yaksa-scheduler`, CacheService |
-| 외부 API service key env | ✅ | `mfds.service.ts:37-38`(이름만: MFDS_API_KEY/MFDS_TIMEOUT_MS) |
+| 외부 API service key env | ✅ | [`mfds.service.ts:37-38`](apps/api-server/src/modules/neture/services/mfds.service.ts#L37-L38)(이름만: MFDS_API_KEY/MFDS_TIMEOUT_MS) |
 
 ### C-2. MFDS Service (이미 구현) ✔
 - 파일 `apps/api-server/src/modules/neture/services/mfds.service.ts` (184줄, 인터페이스 FROZEN).
@@ -250,7 +250,7 @@ Brand — name · slug · manufacturer_name · country_of_origin · is_active
 | Yaksa Scheduler | `packages/yaksa-scheduler` | job 생성/모니터/failure queue |
 
 ### C-5. 환경변수(값 제외, 이름만)
-- `MFDS_API_KEY`, `MFDS_TIMEOUT_MS`(`mfds.service.ts:37-38`)
+- `MFDS_API_KEY`, `MFDS_TIMEOUT_MS`([`mfds.service.ts:37-38`](apps/api-server/src/modules/neture/services/mfds.service.ts#L37-L38))
 - `REDIS_HOST/PORT/PASSWORD`, `CACHE_MEMORY_MAX/TTL`, `CACHE_REDIS_TTL`, `CACHE_COMPRESSION_THRESHOLD`, `CACHE_KEY_PREFIX`(CacheService)
 - ⚠ `.env.example`에 MFDS_* 미기록 → 운영 가이드 보강 권장. **시크릿 값 0건 출력**.
 
