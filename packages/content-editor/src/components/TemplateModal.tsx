@@ -6,10 +6,12 @@
  * 인라인 스타일 모달 (외부 UI 라이브러리 의존 없음).
  */
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import type { CSSProperties } from 'react';
 import { ContentRenderer } from './ContentRenderer';
 import type { ContentTemplate } from '../types';
+// WO-O4O-STANDARD-EDITOR-TEMPLATE-PURPOSE-CATEGORY-V1: 고정 4분류
+import { TEMPLATE_CATEGORIES, templateCategoryLabel, normalizeTemplateCategory } from '../types';
 
 interface TemplateModalProps {
   open: boolean;
@@ -17,12 +19,26 @@ interface TemplateModalProps {
   onSelect: (html: string, templateId: string) => void;
   templates: ContentTemplate[];
   loading?: boolean;
+  /** 편집기 사용 화면의 용도 — 열릴 때 해당 분류 탭 자동선택 (미전달 시 '전체') */
+  defaultCategory?: string;
 }
 
-export function TemplateModal({ open, onClose, onSelect, templates, loading }: TemplateModalProps) {
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+/** defaultCategory 가 고정 4분류 중 하나면 그 code, 아니면 'all' */
+function initialTab(defaultCategory?: string): string {
+  return defaultCategory && TEMPLATE_CATEGORIES.some((c) => c.code === defaultCategory)
+    ? defaultCategory
+    : 'all';
+}
+
+export function TemplateModal({ open, onClose, onSelect, templates, loading, defaultCategory }: TemplateModalProps) {
+  const [selectedCategory, setSelectedCategory] = useState<string>(() => initialTab(defaultCategory));
   const [previewId, setPreviewId] = useState<string | null>(null);
   const [scope, setScope] = useState<'all' | 'my' | 'public'>('all');
+
+  // 모달 열릴 때 호출 화면 용도로 분류 탭 자동선택 (다른 분류 수동 선택은 항상 가능)
+  useEffect(() => {
+    if (open) setSelectedCategory(initialTab(defaultCategory));
+  }, [open, defaultCategory]);
 
   const hasPublic = templates.some((t) => t.isPublic);
 
@@ -32,14 +48,22 @@ export function TemplateModal({ open, onClose, onSelect, templates, loading }: T
     return templates;
   }, [templates, scope]);
 
-  const categories = useMemo(() => {
-    const cats = new Set(scopedTemplates.map((t) => t.category));
-    return ['all', ...Array.from(cats)];
+  /** 고정 분류 탭: 전체 + product/qr_code/pop/general */
+  const categoryTabs = useMemo(() => ['all', ...TEMPLATE_CATEGORIES.map((c) => c.code)], []);
+
+  /** 분류별 개수 (정규화 기준 — legacy/미분류는 '기타'로 집계) */
+  const counts = useMemo(() => {
+    const m: Record<string, number> = { all: scopedTemplates.length };
+    for (const t of scopedTemplates) {
+      const c = normalizeTemplateCategory(t.category);
+      m[c] = (m[c] ?? 0) + 1;
+    }
+    return m;
   }, [scopedTemplates]);
 
   const filtered = useMemo(() => {
     if (selectedCategory === 'all') return scopedTemplates;
-    return scopedTemplates.filter((t) => t.category === selectedCategory);
+    return scopedTemplates.filter((t) => normalizeTemplateCategory(t.category) === selectedCategory);
   }, [scopedTemplates, selectedCategory]);
 
   const popularTemplates = useMemo(() => {
@@ -83,31 +107,34 @@ export function TemplateModal({ open, onClose, onSelect, templates, loading }: T
           </div>
         )}
 
-        {/* Category Tabs */}
-        {categories.length > 2 && (
-          <div style={{ ...styles.tabs, borderBottom: '1px solid #f1f5f9' }}>
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                type="button"
-                style={{
-                  ...styles.tab,
-                  ...(selectedCategory === cat ? styles.tabActive : {}),
-                }}
-                onClick={() => setSelectedCategory(cat)}
-              >
-                {cat === 'all' ? '전체' : cat}
-              </button>
-            ))}
-          </div>
-        )}
+        {/* Category Tabs — 고정 4분류 (전체/상품/QR 코드/POP/기타) + 개수 */}
+        <div style={{ ...styles.tabs, borderBottom: '1px solid #f1f5f9' }}>
+          {categoryTabs.map((cat) => (
+            <button
+              key={cat}
+              type="button"
+              style={{
+                ...styles.tab,
+                ...(selectedCategory === cat ? styles.tabActive : {}),
+              }}
+              onClick={() => { setSelectedCategory(cat); setPreviewId(null); }}
+            >
+              {cat === 'all' ? '전체' : templateCategoryLabel(cat)}
+              <span style={styles.tabCount}>{counts[cat] ?? 0}</span>
+            </button>
+          ))}
+        </div>
 
         {/* Content */}
         <div style={styles.body}>
           {loading ? (
             <p style={styles.emptyText}>불러오는 중...</p>
           ) : filtered.length === 0 ? (
-            <p style={styles.emptyText}>저장된 템플릿이 없습니다.</p>
+            <p style={styles.emptyText}>
+              {selectedCategory === 'all'
+                ? '저장된 템플릿이 없습니다.'
+                : `${templateCategoryLabel(selectedCategory)} 분류에 저장된 템플릿이 없습니다.`}
+            </p>
           ) : (
             <>
             {/* Recommendations */}
@@ -148,7 +175,7 @@ export function TemplateModal({ open, onClose, onSelect, templates, loading }: T
                       {t.isPublic && <span style={styles.publicBadge}>공용</span>}
                       {t.name}
                     </span>
-                    <span style={styles.cardCategory}>{t.category}</span>
+                    <span style={styles.cardCategory}>{templateCategoryLabel(normalizeTemplateCategory(t.category))}</span>
                   </div>
                   <div style={styles.cardPreview}>
                     <ContentRenderer html={t.contentHtml} style={{ fontSize: '11px', lineHeight: '1.4' }} />
@@ -264,6 +291,12 @@ const styles: Record<string, CSSProperties> = {
     background: '#f0fdf4',
     borderColor: '#86efac',
     color: '#16a34a',
+  },
+  tabCount: {
+    marginLeft: 5,
+    fontSize: 10,
+    color: '#94a3b8',
+    fontWeight: 400,
   },
   body: {
     flex: 1,

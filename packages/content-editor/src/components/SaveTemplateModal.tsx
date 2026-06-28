@@ -4,8 +4,10 @@
  * WO-O4O-CONTENT-TEMPLATE-SYSTEM-V1
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { CSSProperties } from 'react';
+// WO-O4O-STANDARD-EDITOR-TEMPLATE-PURPOSE-CATEGORY-V1: 고정 4분류
+import { TEMPLATE_CATEGORIES, normalizeTemplateCategory } from '../types';
 
 interface SaveTemplateModalProps {
   open: boolean;
@@ -13,14 +15,19 @@ interface SaveTemplateModalProps {
   onSave: (name: string, category: string, isPublic: boolean) => void;
   saving?: boolean;
   canCreatePublic?: boolean;
+  /** 편집기 사용 화면의 용도 — 저장 시 기본 선택 (미전달 시 '기타') */
+  defaultCategory?: string;
 }
 
-const CATEGORIES = ['general', 'product', 'notice', 'guide', 'email', 'forum'];
-
-export function SaveTemplateModal({ open, onClose, onSave, saving, canCreatePublic }: SaveTemplateModalProps) {
+export function SaveTemplateModal({ open, onClose, onSave, saving, canCreatePublic, defaultCategory }: SaveTemplateModalProps) {
   const [name, setName] = useState('');
-  const [category, setCategory] = useState('general');
+  const [category, setCategory] = useState(() => normalizeTemplateCategory(defaultCategory));
   const [isPublic, setIsPublic] = useState(false);
+
+  // 모달 열릴 때 용도를 호출 화면 기본값으로 초기화 (다른 분류 수동 변경은 가능)
+  useEffect(() => {
+    if (open) setCategory(normalizeTemplateCategory(defaultCategory));
+  }, [open, defaultCategory]);
 
   if (!open) return null;
 
@@ -29,7 +36,7 @@ export function SaveTemplateModal({ open, onClose, onSave, saving, canCreatePubl
     if (!name.trim()) return;
     onSave(name.trim(), category, isPublic && !!canCreatePublic);
     setName('');
-    setCategory('general');
+    setCategory(normalizeTemplateCategory(defaultCategory));
     setIsPublic(false);
   };
 
@@ -58,15 +65,15 @@ export function SaveTemplateModal({ open, onClose, onSave, saving, canCreatePubl
           </div>
 
           <div style={styles.field}>
-            <label style={styles.label}>카테고리</label>
+            <label style={styles.label}>용도 <span style={{ color: '#dc2626' }}>*</span></label>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               style={styles.select}
             >
-              {CATEGORIES.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
+              {TEMPLATE_CATEGORIES.map((cat) => (
+                <option key={cat.code} value={cat.code}>
+                  {cat.label}
                 </option>
               ))}
             </select>

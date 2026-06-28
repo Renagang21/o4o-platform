@@ -39,6 +39,13 @@ export interface ContentEditorProps {
   preset?: EditorPreset;
   /** 템플릿 기능 활성화 (기본: false) */
   showTemplateActions?: boolean;
+  /**
+   * WO-O4O-STANDARD-EDITOR-TEMPLATE-PURPOSE-CATEGORY-V1:
+   *   편집기 사용 화면의 용도 분류 (product / qr_code / pop / general).
+   *   불러오기 모달의 분류 탭 자동선택 + 저장 모달의 용도 기본선택에 사용.
+   *   미전달 시 불러오기='전체', 저장 기본='general'(기타). 다른 분류 수동 선택은 항상 가능.
+   */
+  templateCategory?: string;
   /** 템플릿 목록 */
   templates?: ContentTemplate[];
   /** 템플릿 로딩 콜백 (모달 열릴 때 호출) */
@@ -119,4 +126,41 @@ export interface ContentTemplate {
   isPublic?: boolean;
   usageCount?: number;
   lastUsedAt?: string | null;
+}
+
+/**
+ * 템플릿 용도 분류 (고정) — WO-O4O-STANDARD-EDITOR-TEMPLATE-PURPOSE-CATEGORY-V1
+ *
+ * 자유 입력이 아닌 고정 분류. 향후 용도 추가는 이 배열에만 항목을 더한다.
+ * 내부 코드(code)는 `content_templates.category`(기존 컬럼) 값과 동일하게 저장한다.
+ */
+export interface TemplateCategoryDef {
+  /** 내부 코드 — DB category 컬럼 값 */
+  code: string;
+  /** 화면 명칭 */
+  label: string;
+}
+
+export const TEMPLATE_CATEGORIES: TemplateCategoryDef[] = [
+  { code: 'product', label: '상품' },
+  { code: 'qr_code', label: 'QR 코드' },
+  { code: 'pop', label: 'POP' },
+  { code: 'general', label: '기타' },
+];
+
+const TEMPLATE_CATEGORY_CODES = TEMPLATE_CATEGORIES.map((c) => c.code);
+
+/** code → 화면 명칭 (미정의/legacy code 는 '기타') */
+export function templateCategoryLabel(code: string | null | undefined): string {
+  const found = TEMPLATE_CATEGORIES.find((c) => c.code === code);
+  return found ? found.label : '기타';
+}
+
+/**
+ * 분류값 정규화 — 고정 분류(product/qr_code/pop/general)가 아니면 'general'(기타)로 취급.
+ * 기존(notice/guide/email/forum 등) 또는 분류값 없는 템플릿 호환 처리(§10).
+ * 원본 템플릿 데이터는 변경하지 않고 표시·필터 단계에서만 정규화한다.
+ */
+export function normalizeTemplateCategory(category: string | null | undefined): string {
+  return category && TEMPLATE_CATEGORY_CODES.includes(category) ? category : 'general';
 }

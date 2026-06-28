@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import type { CSSProperties } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import { ContentRenderer } from './ContentRenderer';
 import { sanitizeRichHtml, isBlankHtml } from '../sanitize';
@@ -24,6 +25,22 @@ import { SaveTemplateModal } from './SaveTemplateModal';
 import type { ContentEditorProps } from '../types';
 import { handleClipboardPaste } from '../utils/handleImagePaste';
 
+// WO-O4O-STANDARD-EDITOR-TEMPLATE-PURPOSE-CATEGORY-V1: 템플릿 드롭다운 항목 스타일
+const menuItemStyle: CSSProperties = {
+  display: 'block',
+  width: '100%',
+  textAlign: 'left',
+  padding: '8px 12px',
+  fontSize: 12,
+  fontWeight: 500,
+  border: 'none',
+  borderRadius: 6,
+  background: 'transparent',
+  color: '#334155',
+  cursor: 'pointer',
+  whiteSpace: 'nowrap',
+};
+
 export function RichTextEditor({
   value = '',
   onChange,
@@ -35,6 +52,7 @@ export function RichTextEditor({
   className = '',
   preset = 'full',
   showTemplateActions = false,
+  templateCategory,
   templates = [],
   onLoadTemplates,
   onSaveAsTemplate,
@@ -51,6 +69,8 @@ export function RichTextEditor({
 }: ContentEditorProps) {
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
   const [saveModalOpen, setSaveModalOpen] = useState(false);
+  // WO-O4O-STANDARD-EDITOR-TEMPLATE-PURPOSE-CATEGORY-V1: 탭 행 우측 "템플릿 ▾" 메뉴
+  const [templateMenuOpen, setTemplateMenuOpen] = useState(false);
   const [pasteUploading, setPasteUploading] = useState(false);
   const [activeTab, setActiveTab] = useState<'edit' | 'html' | 'preview'>('edit');
   // WO-O4O-COMMON-EDITOR-HTML-TAB-SAVE-RAW-PRESERVE-V1:
@@ -260,29 +280,82 @@ export function RichTextEditor({
         </div>
       )}
 
-      {/* 탭 바 — full preset + 편집 가능 모드에서만 표시 */}
+      {/* 탭 바 — full preset + 편집 가능 모드에서만 표시. 좌: 탭 / 우: 템플릿 메뉴 */}
       {editable && preset !== 'compact' && (
-        <div style={{ display: 'flex', borderBottom: '1px solid #e5e7eb', background: '#f9fafb' }}>
-          {(['edit', 'html', 'preview'] as const).map((tab) => (
-            <button
-              key={tab}
-              type="button"
-              onClick={() => switchTab(tab)}
-              style={{
-                padding: '7px 16px',
-                fontSize: 13,
-                fontWeight: activeTab === tab ? 600 : 400,
-                color: activeTab === tab ? '#4f46e5' : '#6b7280',
-                background: 'none',
-                border: 'none',
-                borderBottom: activeTab === tab ? '2px solid #4f46e5' : '2px solid transparent',
-                cursor: 'pointer',
-                lineHeight: 1,
-              }}
-            >
-              {tab === 'edit' ? '편집' : tab === 'html' ? 'HTML' : '미리보기'}
-            </button>
-          ))}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e5e7eb', background: '#f9fafb' }}>
+          <div style={{ display: 'flex' }}>
+            {(['edit', 'html', 'preview'] as const).map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => switchTab(tab)}
+                style={{
+                  padding: '7px 16px',
+                  fontSize: 13,
+                  fontWeight: activeTab === tab ? 600 : 400,
+                  color: activeTab === tab ? '#4f46e5' : '#6b7280',
+                  background: 'none',
+                  border: 'none',
+                  borderBottom: activeTab === tab ? '2px solid #4f46e5' : '2px solid transparent',
+                  cursor: 'pointer',
+                  lineHeight: 1,
+                }}
+              >
+                {tab === 'edit' ? '편집' : tab === 'html' ? 'HTML' : '미리보기'}
+              </button>
+            ))}
+          </div>
+
+          {/* 템플릿 메뉴 (문서 전체 적용 기능 → 탭 행 우측) */}
+          {showTemplateActions && (
+            <div style={{ position: 'relative', paddingRight: 6 }}>
+              <button
+                type="button"
+                onClick={() => setTemplateMenuOpen((o) => !o)}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 4,
+                  padding: '5px 12px', fontSize: 12, fontWeight: 500,
+                  border: '1px solid #e2e8f0', borderRadius: 6,
+                  background: 'white', color: '#475569', cursor: 'pointer',
+                }}
+              >
+                템플릿 <span style={{ fontSize: 9 }}>▾</span>
+              </button>
+              {templateMenuOpen && (
+                <>
+                  {/* click-outside backdrop */}
+                  <div
+                    onClick={() => setTemplateMenuOpen(false)}
+                    style={{ position: 'fixed', inset: 0, zIndex: 50 }}
+                  />
+                  <div
+                    style={{
+                      position: 'absolute', top: 'calc(100% + 4px)', right: 6, zIndex: 51,
+                      minWidth: 200, background: 'white', border: '1px solid #e5e7eb',
+                      borderRadius: 8, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', padding: 4,
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => { setTemplateMenuOpen(false); onLoadTemplates?.(); setTemplateModalOpen(true); }}
+                      style={menuItemStyle}
+                    >
+                      템플릿 불러오기
+                    </button>
+                    {onSaveAsTemplate && (
+                      <button
+                        type="button"
+                        onClick={() => { setTemplateMenuOpen(false); setSaveModalOpen(true); }}
+                        style={menuItemStyle}
+                      >
+                        현재 내용을 템플릿으로 저장
+                      </button>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
         </div>
       )}
 
@@ -292,7 +365,7 @@ export function RichTextEditor({
       )}
 
       {/* 편집 탭 — 항상 마운트, 다른 탭에서는 숨김 (에디터 상태 유지) */}
-      <div style={{ display: activeTab === 'edit' ? undefined : 'none', overflow: 'hidden', borderRadius: showTemplateActions ? '0' : '0 0 8px 8px' }}>
+      <div style={{ display: activeTab === 'edit' ? undefined : 'none', overflow: 'hidden', borderRadius: '0 0 8px 8px' }}>
         <EditorContent
           editor={editor}
           style={{
@@ -352,56 +425,8 @@ export function RichTextEditor({
           )}
         </div>
       )}
-      {showTemplateActions && (
-        <div
-          style={{
-            display: 'flex',
-            gap: '8px',
-            padding: '8px 12px',
-            borderTop: '1px solid #e5e7eb',
-            background: '#f8fafc',
-            borderRadius: '0 0 8px 8px',
-          }}
-        >
-          <button
-            type="button"
-            onClick={() => {
-              onLoadTemplates?.();
-              setTemplateModalOpen(true);
-            }}
-            style={{
-              padding: '4px 12px',
-              fontSize: 12,
-              fontWeight: 500,
-              border: '1px solid #e2e8f0',
-              borderRadius: 4,
-              background: 'white',
-              color: '#475569',
-              cursor: 'pointer',
-            }}
-          >
-            템플릿 불러오기
-          </button>
-          {onSaveAsTemplate && (
-            <button
-              type="button"
-              onClick={() => setSaveModalOpen(true)}
-              style={{
-                padding: '4px 12px',
-                fontSize: 12,
-                fontWeight: 500,
-                border: '1px solid #e2e8f0',
-                borderRadius: 4,
-                background: 'white',
-                color: '#475569',
-                cursor: 'pointer',
-              }}
-            >
-              템플릿으로 저장
-            </button>
-          )}
-        </div>
-      )}
+      {/* 템플릿 불러오기/저장 버튼은 탭 행 우측 "템플릿 ▾" 메뉴로 이동됨
+          (WO-O4O-STANDARD-EDITOR-TEMPLATE-PURPOSE-CATEGORY-V1). 하단 버튼 바 제거. */}
       {showTemplateActions && (
         <>
           <TemplateModal
@@ -421,6 +446,7 @@ export function RichTextEditor({
             }}
             templates={templates}
             loading={templatesLoading}
+            defaultCategory={templateCategory}
           />
           <SaveTemplateModal
             open={saveModalOpen}
@@ -431,6 +457,7 @@ export function RichTextEditor({
             }}
             saving={templatesSaving}
             canCreatePublic={canCreatePublicTemplate}
+            defaultCategory={templateCategory}
           />
         </>
       )}

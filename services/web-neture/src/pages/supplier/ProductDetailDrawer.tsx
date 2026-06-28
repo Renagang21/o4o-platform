@@ -907,6 +907,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                   onMediaLibraryPick={(insertImage) => setMediaPickerTarget(() => insertImage)}
                   existingImages={images.filter((i) => i.type !== 'thumbnail').map((i) => ({ id: i.id, url: i.imageUrl }))}
                   showTemplateActions
+                  templateCategory="product"
                   templates={tpl.templates}
                   templatesLoading={tpl.loading}
                   templatesSaving={tpl.saving}
@@ -1031,6 +1032,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                   onMediaLibraryPick={(insertImage) => setMediaPickerTarget(() => insertImage)}
                   existingImages={images.filter((i) => i.type !== 'thumbnail').map((i) => ({ id: i.id, url: i.imageUrl }))}
                   showTemplateActions
+                  templateCategory="product"
                   templates={tpl.templates}
                   templatesLoading={tpl.loading}
                   templatesSaving={tpl.saving}
@@ -1074,6 +1076,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                   onMediaLibraryPick={(insertImage) => setMediaPickerTarget(() => insertImage)}
                   existingImages={images.filter((i) => i.type !== 'thumbnail').map((i) => ({ id: i.id, url: i.imageUrl }))}
                   showTemplateActions
+                  templateCategory="product"
                   templates={tpl.templates}
                   templatesLoading={tpl.loading}
                   templatesSaving={tpl.saving}
