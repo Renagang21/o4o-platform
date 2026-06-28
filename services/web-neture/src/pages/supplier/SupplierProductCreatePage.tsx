@@ -142,7 +142,9 @@ export default function SupplierProductCreatePage() {
   const [categories, setCategories] = useState<CategoryTreeItem[]>([]);
 
   // Description editor — WO-O4O-PRODUCT-IMPORT-ASSISTANT-V1: draft 초기값 지원
-  const [consumerShortDesc, setConsumerShortDesc] = useState(importDraft?.consumerShortDesc ?? '');
+  const [consumerShortDesc, setConsumerShortDesc] = useState(
+    importDraft?.consumerDetailDesc || importDraft?.consumerShortDesc || '',
+  );
 
   // Images — WO-NETURE-IMAGE-ASSET-STRUCTURE-V1: 3구역 분리
   // WO-NETURE-PRODUCT-PRIMARY-IMAGE-MEDIA-LIBRARY-INTEGRATION-V1: 라이브러리 선택 지원
