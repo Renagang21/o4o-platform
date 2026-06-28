@@ -4,6 +4,7 @@
 >
 > 작성일: 2026-06-28 · 범위: 공급자(1단계). Admin·매장·POS·허브는 후속.
 > 근거: 코드 정적 추적(파일:라인) + 공공데이터포털 공식 명세(서비스키 미사용, 미호출).
+> **상세 근거(엔티티 스키마·필드 매핑·페이로드·정부 API 실측 전체):** [`IR-O4O-GOVERNMENT-PRODUCT-DATA-ON-DEMAND-SUPPLIER-AUDIT-V1-DETAIL.md`](IR-O4O-GOVERNMENT-PRODUCT-DATA-ON-DEMAND-SUPPLIER-AUDIT-V1-DETAIL.md)
 
 ---
 
