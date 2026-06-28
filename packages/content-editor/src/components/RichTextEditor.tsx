@@ -499,8 +499,10 @@ export function RichTextEditor({
           />
         </>
       )}
-      {/* WO-O4O-STANDARD-EDITOR-IMAGE-DISPLAY-WIDTH-V1: 이미지 선택 버블 메뉴 (폭/정렬/삭제) */}
-      {editor && editable && (
+      {/* WO-O4O-STANDARD-EDITOR-IMAGE-DISPLAY-WIDTH-V1: 이미지 선택 버블 메뉴 (폭/정렬/삭제)
+          편집 탭에서만 마운트 — HTML/미리보기 탭(편집 캔버스 숨김)에서 tippy positioning 시
+          insertBefore DOM 오류 발생하므로 activeTab='edit' 일 때만 렌더. */}
+      {editor && editable && activeTab === 'edit' && (
         <BubbleMenu
           editor={editor}
           shouldShow={({ editor: ed }) => ed.isActive('image')}
