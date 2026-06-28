@@ -18,6 +18,8 @@ import type { ParsedProductData, ImportDraft } from '../../lib/product-import/ty
 //   의약외품은 비의약품 하위(등록 폼 '규제 구분'에서 확정) — 진입 화면 정책과 정합.
 import { getSupplierProductType, type SupplierProductTypeDef } from '../../lib/supplierProductTypes';
 import { productApi, type CategoryTreeItem } from '../../lib/api';
+import { mediaApi } from '../../lib/api/media';
+import MediaPickerModal from '../../components/common/MediaPickerModal';
 
 const NON_DRUG = getSupplierProductType('non_drug')!;
 type TopChoice = 'drug' | 'non_drug';
@@ -76,6 +78,7 @@ export default function SupplierProductImportPage() {
 
   // Editable detail description
   const [detailDesc, setDetailDesc] = useState('');
+  const [mediaPickerTarget, setMediaPickerTarget] = useState<((url: string) => void) | null>(null);
 
   // Image selection
   const [selectedImages, setSelectedImages] = useState<Set<number>>(new Set());
@@ -148,6 +151,12 @@ export default function SupplierProductImportPage() {
 
   const flatCats = useMemo(() => flattenCats(categories), [categories]);
   const selectedCatIsRegulated = flatCats.find((c) => c.id === o4oCategoryId)?.isRegulated ?? false;
+
+  const editorImageUpload = useCallback(async (file: File): Promise<string> => {
+    const res = await mediaApi.upload(file, true, undefined, 'description');
+    if (res.success && res.data) return res.data.url;
+    throw new Error(res.error || '이미지 업로드 실패');
+  }, []);
 
   /* ---------------------------------------------------------------- */
   /*  Parse                                                            */
@@ -683,6 +692,8 @@ export default function SupplierProductImportPage() {
               onChange={(c) => setDetailDesc(c.html)}
               placeholder="상세 설명이 없습니다"
               minHeight="200px"
+              onImageUpload={editorImageUpload}
+              onMediaLibraryPick={(insertImage) => setMediaPickerTarget(() => insertImage)}
             />
           </div>
 
@@ -829,6 +840,17 @@ export default function SupplierProductImportPage() {
           </div>
         </div>
       )}
+
+      <MediaPickerModal
+        open={!!mediaPickerTarget}
+        onClose={() => setMediaPickerTarget(null)}
+        onSelect={(asset) => {
+          mediaPickerTarget?.(asset.url);
+          setMediaPickerTarget(null);
+        }}
+        title="상세 설명 이미지 선택"
+        defaultFolder="description"
+      />
     </div>
   );
 }
