@@ -114,8 +114,27 @@ fixture(로고/상세/lazy/srcset/중복/썸네일동일/1×1픽셀/아이콘/sv
 - ✅ 작은 아이콘·추적(1×1)·logo·svg 제외
 - ✅ 원본 순서(`order`) 유지
 
-### 브라우저 smoke (배포 후 — 라이브 검증 대기)
-1~13 항목(WO §17 브라우저 smoke)은 배포 후 라이브에서 수행. 본 커밋 시점에는 정적+오프라인 PASS.
+### 브라우저 smoke (배포 후 라이브 — `neture.co.kr`, 공급자 계정) — **PASS**
+- 배포: `deploy-web-services.yml` run `28306748960` → `deploy-neture` 성공(2m12s), 타 서비스 정상 skip. 커밋 `71491e37e` 라이브 반영.
+- 검증 방식: Playwright(headless chromium), 자격증명은 gitignored SSOT(`docs/local/TEST-ACCOUNTS.local.md`)에서 런타임 주입(하드코딩/로그 노출 없음). fixture HTML(상세 본문 텍스트 + 갤러리 이미지: 정상 2 + lazy `data-src` 1 + `width/height` 1 + 썸네일중복 1 + URL중복 1 + logo 1 + 1×1 픽셀 1).
+
+| # | 항목 | 결과 |
+|---|------|------|
+| 1 | 가져오기 도우미 진입 (로그인→공급자) | ✅ `/supplier/products/import-assistant` |
+| 2 | HTML 붙여넣기 → 분석 | ✅ |
+| 3 | 기존 썸네일/이미지 후보 영역 정상 표시 | ✅ "등록할 이미지를 직접 선택하세요" 유지 |
+| 4 | 상세설명 이미지 섹션 표시 | ✅ |
+| 5 | 후보 추출/순서/제외 | ✅ 후보 order 배지 `[1,2,3]` (정상 2 + lazy + width 만; 썸네일중복·URL중복·logo·1×1 제외) |
+| 6 | 개별 선택 / 전체 선택 / 전체 해제 | ✅ (선택 1개 시 확인란 노출, 전체 해제 시 확인란 숨김) |
+| 7 | 확인란 미체크 시 삽입 버튼 비활성 | ✅ 초기 disabled / 선택만 disabled / 확인 후 enabled |
+| 8 | 확인 후 선택 이미지 삽입 | ✅ 삽입 후 3장 |
+| 9 | 원본 페이지 순서 유지 | ✅ 삽입 순서 `[d1,d2,d3]` (본문 하단 append) |
+| 10 | 기존 편집기 본문 보존 | ✅ 삽입 전 본문 텍스트 존재 → 삽입 후에도 보존(이미지는 하단 추가) |
+| 11 | 표준 폭 / 모바일 반응형 | ✅ `class=editor-image`, computed `max-width:100%; display:block`; 데스크톱 렌더 780px / 375px 뷰포트 227px, 가로 스크롤 없음(`docScrollW<=winW`) |
+| 12 | 콘솔 주요 오류 없음 | ✅ console error 0 / pageerror 0 / neture 4xx-5xx 0 |
+| 13 | smoke 상품·임시 데이터 정리 | ✅ **불필요 — 핵심 흐름 검증에 실제 상품 미생성(저장/등록 미실행). 생성된 임시 row 없음** |
+
+> 참고(보정 1회): 최초 fixture 의 본문 텍스트가 파서의 detail-selector 200자 임계 직하라서 본문이 갤러리 div(이미지) 로 폴백 → 본문 보존 항목이 모호했음. 본문 텍스트를 충분히 늘린 2차 run 에서 IMGS_BEFORE=0 / BODY_TEXT_BEFORE=true / IMGS_AFTER=3 / INSERTED_ORDER=[d1,d2,d3] / BODY_TEXT_PRESERVED=true 로 명확 PASS. 제품 동작 자체는 두 run 모두 동일(삽입분은 항상 원본 순서로 본문 하단 추가).
 
 ---
 
