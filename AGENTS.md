@@ -1,5 +1,10 @@
 # Repository Guidelines
 
+## Required Project Context
+- Before starting work, read the root `CLAUDE.md` and the `docs/baseline/` documents applicable to the assigned scope.
+- The current user's explicit instructions take precedence over repository documentation when they conflict.
+- Do not ask the user for facts that can be determined from the codebase, Git history, tests, or official documentation.
+
 ## Project Structure & Module Organization
 - Monorepo managed by pnpm workspaces. Deployable apps in `apps/`: `admin-dashboard`, `main-site`, `api-server`.
 - Feature code lives in `src/`; static assets in `public/`. Co-locate tests beside implementation.
@@ -37,8 +42,15 @@
 - Codex and Claude Code may each perform independent WO tasks from separate workspaces. Each WO must define allowed files, forbidden files, validation commands, and whether commit or push is allowed.
 - Keep commits path-specific to the assigned WO. Stage only the allowed files, then verify with `git diff --cached --name-only` before committing.
 - Do not mix unrelated client, server, docs, dependency, or lockfile changes in one commit. Treat unexpected dirty files as existing workspace state unless the user explicitly assigns them.
+- Treat existing dirty files, especially an out-of-scope `pnpm-lock.yaml`, as owned by another session; do not modify, restore, or stage them.
+- Do not run `pull`, `rebase`, `reset`, or `stash` when another session's changes are present unless the current WO explicitly authorizes it.
+- Before pushing, verify ahead/behind state and list every commit that will be published.
 
-## Progress Approval and Reporting Guidelines
+## Default Autonomy and Progress Approval
+- If the user requests investigation, review, or advice only, work read-only.
+- If the user requests a fix or implementation, continue through investigation, implementation, and validation without asking for separate plan approval.
+- When implementation details are open, follow existing code patterns and choose the most conservative safe option; explain material choices in the completion report.
+- Do not ask “continue?” after routine steps or seek confirmation before searches, file reads, Git status checks, or non-destructive validation.
 - Agents should not ask the user after every small file edit or routine step. Within the approved Work Order scope, continue without additional confirmation for simple, local, and expected actions.
 - Agents should also avoid showing full modified file contents, long diffs, or verbose patch details after each file edit. Do not paste large file contents into the conversation just to show what changed. Instead, keep implementation moving and summarize the completed work at the end.
 - Proceed without asking for confirmation when the action is clearly inside the current WO scope, such as:
@@ -60,7 +72,10 @@
   - Staged file status
   - Known exclusions or follow-up work
   - Git status, commit, and push state when applicable
-- Stop and ask the user before proceeding in any of the following cases:
+### Ask Only When Blocking
+
+Stop and ask the user only when one of the following conditions blocks safe progress:
+
   - A file outside the WO scope must be modified
   - Existing dirty or untracked files would need to be touched
   - DB schema or migration changes are required
@@ -71,9 +86,10 @@
   - The implementation would cross into an explicitly excluded scope
   - The validation failure appears unrelated to the current WO
   - Product, legal, compliance, settlement, or business-policy judgment is needed
+  - Credentials, payment, or external-service approval is required
   - File access or private document security is unclear
   - The agent is unsure whether the change is safe
-  - Staging, commit, or push is about to be performed
+  - Staging, commit, or push is about to be performed and the current WO does not explicitly authorize it
 - For git operations:
   - Never use `git add .`
   - Never use `git commit -am`
@@ -81,12 +97,12 @@
   - Ask before staging, committing, or pushing unless the WO explicitly grants that permission
   - Even when a WO grants commit or push permission, verify the staged file list first with `git diff --cached --name-only`
   - Do not include existing dirty or untracked files in a commit unless the user explicitly assigns them to the current WO
-- Default behavior:
-  - Continue through routine implementation steps without interrupting the user
-  - Do not show full modified file contents after every edit
-  - Stop only at meaningful decision points
-  - Report what was done, what was not touched, and what remains
 - O4O 운영 맥락: 사용자가 전체 조율자이며, 여러 작업공간과 여러 에이전트가 GitHub를 기준으로 동기화한다. 따라서 단순 작업마다 확인을 요구하지 말고 WO 범위 안에서는 계속 진행한다. 또한 파일을 수정할 때마다 전체 파일 내용이나 긴 diff를 사용자에게 보여주지 않으며, 작업 결과는 완료 후 CHECK/IR 문서와 완료 보고로 정리한다. 단, 경계 변경·위험 변경·기존 dirty 파일 접촉·DB/migration/package/core/API/permission 변경·정책 판단이 필요한 경우에는 반드시 중단하고 사용자에게 판단을 요청한다.
+
+## Delivery
+- If the request explicitly includes commit, push, deploy, or smoke validation, continue through the last requested step without intermediate confirmation, subject to the blocking and Git-safety rules above.
+- If those steps are not requested, stop after implementation and validation; do not add commit, push, or deploy on your own.
+- When a command requires system approval, present one clear, scoped approval request.
 
 ## Environment & Configuration Tips
 - Use Node `22.18.0` and pnpm `9.x` (Volta or `.nvmrc` recommended).
