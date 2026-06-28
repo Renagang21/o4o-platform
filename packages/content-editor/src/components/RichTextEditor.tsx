@@ -18,6 +18,9 @@ import Highlight from '@tiptap/extension-highlight';
 import Placeholder from '@tiptap/extension-placeholder';
 import TextStyle from '@tiptap/extension-text-style';
 import Color from '@tiptap/extension-color';
+// WO-O4O-STANDARD-EDITOR-TEMPLATE-PURPOSE-CATEGORY-V1 Phase 2: 고정 레이아웃 노드 + built-in 템플릿
+import { ProductDetailLayout } from '../extensions/productDetailLayout';
+import { BUILTIN_TEMPLATES, isBuiltinTemplateId } from '../builtinTemplates';
 
 import { Toolbar } from './Toolbar';
 import { TemplateModal } from './TemplateModal';
@@ -116,6 +119,8 @@ export function RichTextEditor({
       }),
       TextStyle,
       Color,
+      // 고정 레이아웃(860px) 컨테이너 — 마커 div 만 parse, 내부 편집 가능
+      ProductDetailLayout,
     ],
     content: value,
     editable,
@@ -440,11 +445,16 @@ export function RichTextEditor({
                   if (!ok) return;
                 }
                 editor.commands.setContent(html);
-                onChange?.({ html: editor.getHTML(), json: editor.getJSON() });
-                onUseTemplate?.(templateId);
+                const appliedHtml = editor.getHTML();
+                // HTML 탭/미리보기 원문도 동기화 → 적용 직후 탭 왕복에서 레이아웃 보존
+                setHtmlSource(appliedHtml);
+                wysiwygDirtyRef.current = false;
+                onChange?.({ html: appliedHtml, json: editor.getJSON() });
+                // built-in 템플릿은 백엔드 row 가 없으므로 사용 기록 생략
+                if (!isBuiltinTemplateId(templateId)) onUseTemplate?.(templateId);
               }
             }}
-            templates={templates}
+            templates={[...BUILTIN_TEMPLATES, ...templates]}
             loading={templatesLoading}
             defaultCategory={templateCategory}
           />
