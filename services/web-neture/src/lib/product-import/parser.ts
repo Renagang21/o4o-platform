@@ -10,7 +10,14 @@
  * - 상대 URL → 절대 URL 변환 (sourceUrl 제공 시)
  */
 
-import type { ParsedProductData } from './types';
+import type { DetailImageCandidate, ParsedProductData } from './types';
+
+/**
+ * WO-O4O-NETURE-SUPPLIER-PRODUCT-IMPORT-ASSISTANT-DETAIL-IMAGE-IMPORT-V1
+ * 후보 수가 비정상적으로 많은 페이지를 고려한 합리적 상한.
+ * (분석 입력 HTML 자체는 2MB 로 제한됨 — handleParse)
+ */
+const DETAIL_IMAGE_CANDIDATE_LIMIT = 60;
 
 /* ------------------------------------------------------------------ */
 /*  Public API                                                         */
@@ -25,6 +32,7 @@ export function parseProductHtml(
   const text = doc.body?.innerText ?? '';
 
   const imageUrls = extractImages(doc, sourceUrl);
+  const thumbnailUrl = pickThumbnail(doc, imageUrls, sourceUrl);
 
   return {
     name: extractName(doc),
@@ -33,10 +41,11 @@ export function parseProductHtml(
     price: extractPrice(text),
     specification: extractSpecification(text),
     originCountry: extractByLabel(text, '원산지'),
-    thumbnailUrl: pickThumbnail(doc, imageUrls, sourceUrl),
+    thumbnailUrl,
     imageUrls,
     shortDescription: buildShortDescription(doc),
     detailDescription: extractDetailDescription(doc, sourceUrl),
+    detailImageCandidates: extractDetailImageCandidates(doc, sourceUrl, thumbnailUrl),
   };
 }
 
@@ -137,6 +146,98 @@ function pickThumbnail(
 
   // 3) 첫 번째 이미지
   return images[0] ?? null;
+}
+
+/* ------------------------------------------------------------------ */
+/*  상세설명 이미지 후보 추출                                              */
+/*  WO-O4O-NETURE-SUPPLIER-PRODUCT-IMPORT-ASSISTANT-DETAIL-IMAGE-IMPORT-V1 */
+/* ------------------------------------------------------------------ */
+
+/**
+ * img 요소에서 실제 이미지 후보 src(원본 속성값)를 고른다.
+ * lazy-load 패턴(data-src/data-original/data-lazy-src/data-lazy) 우선,
+ * 없으면 src, 마지막으로 srcset 의 최댓 후보.
+ */
+function pickImgCandidateSrc(img: Element): string | null {
+  const lazy =
+    img.getAttribute('data-src') ??
+    img.getAttribute('data-original') ??
+    img.getAttribute('data-lazy-src') ??
+    img.getAttribute('data-lazy');
+  if (lazy && lazy.trim()) return lazy.trim();
+
+  const src = img.getAttribute('src');
+  if (src && src.trim() && !src.trim().startsWith('data:')) return src.trim();
+
+  const srcset = img.getAttribute('srcset') ?? img.getAttribute('data-srcset');
+  const fromSet = pickLargestFromSrcset(srcset);
+  if (fromSet) return fromSet;
+
+  // src 가 data:placeholder 뿐이고 다른 후보가 없으면 그 값이라도 반환(이후 필터에서 제외됨)
+  return src && src.trim() ? src.trim() : null;
+}
+
+/** "url 480w, url 800w" / "url 1x, url 2x" 에서 마지막(최댓) 후보 URL 추출 */
+function pickLargestFromSrcset(srcset?: string | null): string | null {
+  if (!srcset) return null;
+  const entries = srcset
+    .split(',')
+    .map((e) => e.trim().split(/\s+/)[0])
+    .filter(Boolean);
+  return entries.length > 0 ? entries[entries.length - 1] : null;
+}
+
+function parseDimensionAttr(value: string | null): number | null {
+  if (!value) return null;
+  const n = parseInt(value.replace(/px$/i, '').trim(), 10);
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+
+function extractDetailImageCandidates(
+  doc: Document,
+  sourceUrl: string | undefined,
+  thumbnailUrl: string | null,
+): DetailImageCandidate[] {
+  const seen = new Set<string>();
+  if (thumbnailUrl) seen.add(thumbnailUrl);
+
+  const candidates: DetailImageCandidate[] = [];
+  const imgs = doc.querySelectorAll('img');
+
+  for (const img of imgs) {
+    if (candidates.length >= DETAIL_IMAGE_CANDIDATE_LIMIT) break;
+
+    const original = pickImgCandidateSrc(img);
+    if (!original) continue;
+
+    const resolved = resolveUrl(original, sourceUrl);
+
+    // data: 추적 이미지 / 로고·아이콘·픽셀 / gif·svg 제외 (기존 썸네일 필터 재사용)
+    if (isIgnorableImage(resolved)) continue;
+
+    // 중복 URL + 대표 썸네일 중복 제거
+    if (seen.has(resolved)) continue;
+    seen.add(resolved);
+
+    const width = parseDimensionAttr(img.getAttribute('width'));
+    const height = parseDimensionAttr(img.getAttribute('height'));
+
+    // 1×1 등 명백히 작은 추적/스페이서 이미지 제외 (크기 확인 가능한 경우만)
+    if (width !== null && height !== null && width <= 2 && height <= 2) continue;
+
+    const alt = img.getAttribute('alt');
+
+    candidates.push({
+      url: resolved,
+      originalUrl: original,
+      alt: alt && alt.trim() ? alt.trim() : null,
+      width,
+      height,
+      order: candidates.length + 1,
+    });
+  }
+
+  return candidates;
 }
 
 /* ------------------------------------------------------------------ */

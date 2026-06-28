@@ -42,6 +42,18 @@ const REGULATORY_TYPE_OPTIONS = [
   { value: 'COSMETIC', label: '화장품' },
 ];
 
+/**
+ * WO-O4O-NETURE-SUPPLIER-PRODUCT-IMPORT-ASSISTANT-DETAIL-IMAGE-IMPORT-V1
+ * HTML 속성값(src/alt) 안전 삽입용 이스케이프.
+ */
+function escapeHtmlAttr(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
 function flattenCats(
   cats: CategoryTreeItem[],
   depth = 0,
@@ -83,6 +95,12 @@ export default function SupplierProductImportPage() {
   // Image selection
   const [selectedImages, setSelectedImages] = useState<Set<number>>(new Set());
   const [thumbnailIdx, setThumbnailIdx] = useState<number | null>(null);
+
+  // 상세설명 이미지 가져오기 (WO-O4O-NETURE-SUPPLIER-PRODUCT-IMPORT-ASSISTANT-DETAIL-IMAGE-IMPORT-V1)
+  //   selectedDetailImages: detailImageCandidates 배열 인덱스 기준 선택 집합
+  const [selectedDetailImages, setSelectedDetailImages] = useState<Set<number>>(new Set());
+  const [detailImagesConfirmed, setDetailImagesConfirmed] = useState(false);
+  const [detailImgPreviewErrors, setDetailImgPreviewErrors] = useState<Set<number>>(new Set());
 
   // Thumbnail correction
   const [thumbNaturalSize, setThumbNaturalSize] = useState<{ w: number; h: number } | null>(null);
@@ -199,6 +217,11 @@ export default function SupplierProductImportPage() {
     setCorrectedDataUrl(null);
     setCorrectionStatus('idle');
     setThumbNaturalSize(null);
+
+    // 상세설명 이미지 선택/확인 초기화
+    setSelectedDetailImages(new Set());
+    setDetailImagesConfirmed(false);
+    setDetailImgPreviewErrors(new Set());
   }, [html, sourceUrl, topChoice]);
 
   /* ---------------------------------------------------------------- */
@@ -366,6 +389,56 @@ export default function SupplierProductImportPage() {
   }, []);
 
   /* ---------------------------------------------------------------- */
+  /*  상세설명 이미지 가져오기                                            */
+  /*  WO-O4O-NETURE-SUPPLIER-PRODUCT-IMPORT-ASSISTANT-DETAIL-IMAGE-IMPORT-V1 */
+  /* ---------------------------------------------------------------- */
+
+  const detailCandidates = parsed?.detailImageCandidates ?? [];
+
+  const toggleDetailImage = useCallback((idx: number) => {
+    setSelectedDetailImages((prev) => {
+      const next = new Set(prev);
+      if (next.has(idx)) next.delete(idx);
+      else next.add(idx);
+      return next;
+    });
+  }, []);
+
+  const selectAllDetailImages = useCallback(() => {
+    setSelectedDetailImages(new Set(detailCandidates.map((_, i) => i)));
+  }, [detailCandidates]);
+
+  const clearAllDetailImages = useCallback(() => {
+    setSelectedDetailImages(new Set());
+  }, []);
+
+  // 선택 이미지를 원본 순서로 정렬해 표준 폭 <img> HTML 로 에디터 본문 하단에 추가.
+  //   에디터(TipTap Image extension)가 inline style 은 제거하되 .editor-image 클래스(max-width:100%,
+  //   height:auto, display:block)를 부여하므로 — 클래스 기반 표준 반응형 폭으로 일관 적용된다(WO §11).
+  const handleInsertDetailImages = useCallback(() => {
+    if (selectedDetailImages.size === 0 || !detailImagesConfirmed) return;
+
+    const chosen = detailCandidates
+      .filter((_, i) => selectedDetailImages.has(i))
+      .slice(); // detailCandidates 는 이미 원본 DOM 순서(order 1-based)
+
+    const productName = name.trim() || '상품';
+    const html = chosen
+      .map((c, i) => {
+        const alt = escapeHtmlAttr(c.alt || `${productName} 상세설명 이미지 ${i + 1}`);
+        return `<p><img src="${escapeHtmlAttr(c.url)}" alt="${alt}" /></p>`;
+      })
+      .join('');
+
+    // 기존 본문 보존 — 하단 append (커서 삽입 API 미노출, WO §10.4 fallback)
+    setDetailDesc((prev) => (prev ? prev + html : html));
+
+    // 실수 중복 삽입 방지 — 선택/확인 상태 정리
+    setSelectedDetailImages(new Set());
+    setDetailImagesConfirmed(false);
+  }, [selectedDetailImages, detailImagesConfirmed, detailCandidates, name]);
+
+  /* ---------------------------------------------------------------- */
   /*  Reset                                                            */
   /* ---------------------------------------------------------------- */
 
@@ -382,6 +455,9 @@ export default function SupplierProductImportPage() {
     setDetailDesc('');
     setSelectedImages(new Set());
     setThumbnailIdx(null);
+    setSelectedDetailImages(new Set());
+    setDetailImagesConfirmed(false);
+    setDetailImgPreviewErrors(new Set());
     setThumbNaturalSize(null);
     setCorrectedDataUrl(null);
     setCorrectionStatus('idle');
@@ -678,6 +754,130 @@ export default function SupplierProductImportPage() {
               )}
             </div>
           )}
+
+          {/* 상세설명 이미지 가져오기
+              WO-O4O-NETURE-SUPPLIER-PRODUCT-IMPORT-ASSISTANT-DETAIL-IMAGE-IMPORT-V1 */}
+          <div className="mt-6 rounded-lg border border-slate-200 p-4">
+            <h3 className="mb-1 text-sm font-semibold text-slate-700">
+              상세설명 이미지 가져오기
+            </h3>
+            <p className="mb-3 text-xs text-slate-500">
+              상품 페이지에서 발견한 상세설명 이미지입니다. 사용할 이미지를 선택한 뒤
+              아래 상세설명 편집기에 넣을 수 있습니다.
+            </p>
+
+            {detailCandidates.length === 0 ? (
+              <p className="rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-500">
+                상품 페이지에서 가져올 수 있는 상세설명 이미지를 찾지 못했습니다.
+              </p>
+            ) : (
+              <>
+                <div className="mb-2 flex items-center gap-2">
+                  <span className="text-xs text-slate-500">
+                    {selectedDetailImages.size}/{detailCandidates.length} 선택
+                  </span>
+                  <button
+                    type="button"
+                    onClick={selectAllDetailImages}
+                    className="rounded border border-slate-300 px-2 py-1 text-xs text-slate-600 hover:bg-slate-50"
+                  >
+                    전체 선택
+                  </button>
+                  <button
+                    type="button"
+                    onClick={clearAllDetailImages}
+                    className="rounded border border-slate-300 px-2 py-1 text-xs text-slate-600 hover:bg-slate-50"
+                  >
+                    전체 해제
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+                  {detailCandidates.map((cand, idx) => {
+                    const selected = selectedDetailImages.has(idx);
+                    const previewFailed = detailImgPreviewErrors.has(idx);
+                    return (
+                      <label
+                        key={idx}
+                        className={`relative block cursor-pointer overflow-hidden rounded-lg border-2 ${
+                          selected ? 'border-emerald-500' : 'border-slate-200 opacity-70'
+                        }`}
+                      >
+                        {previewFailed ? (
+                          <div className="flex aspect-[3/4] w-full items-center justify-center bg-slate-50 px-2 text-center text-[11px] text-slate-400">
+                            미리보기 실패
+                          </div>
+                        ) : (
+                          <img
+                            src={cand.url}
+                            alt={cand.alt ?? `상세 이미지 ${cand.order}`}
+                            className="aspect-[3/4] w-full bg-slate-50 object-contain"
+                            loading="lazy"
+                            onError={() =>
+                              setDetailImgPreviewErrors((prev) => {
+                                const next = new Set(prev);
+                                next.add(idx);
+                                return next;
+                              })
+                            }
+                          />
+                        )}
+
+                        {/* 선택 체크박스 */}
+                        <span className="absolute left-1 top-1 flex h-5 w-5 items-center justify-center rounded bg-white/80">
+                          <input
+                            type="checkbox"
+                            checked={selected}
+                            onChange={() => toggleDetailImage(idx)}
+                            className="h-3.5 w-3.5 accent-emerald-600"
+                          />
+                        </span>
+
+                        {/* 순서 배지 */}
+                        <span className="absolute right-1 top-1 rounded bg-slate-900/70 px-1.5 py-0.5 text-[10px] font-medium text-white">
+                          {cand.order}
+                        </span>
+
+                        {/* 원본 크기 (확인 가능한 경우) */}
+                        {cand.width != null && cand.height != null && (
+                          <span className="absolute bottom-1 left-1 rounded bg-slate-900/60 px-1 py-0.5 text-[10px] text-white">
+                            {cand.width}×{cand.height}
+                          </span>
+                        )}
+                      </label>
+                    );
+                  })}
+                </div>
+
+                {/* 사용자 확인 — 선택 1개 이상일 때만 노출 */}
+                {selectedDetailImages.size > 0 && (
+                  <label className="mt-3 flex items-start gap-2 text-xs text-slate-600">
+                    <input
+                      type="checkbox"
+                      checked={detailImagesConfirmed}
+                      onChange={(e) => setDetailImagesConfirmed(e.target.checked)}
+                      className="mt-0.5 h-3.5 w-3.5 accent-emerald-600"
+                    />
+                    <span>선택한 이미지가 해당 상품의 상세설명 이미지임을 확인합니다.</span>
+                  </label>
+                )}
+
+                <div className="mt-3">
+                  <button
+                    type="button"
+                    onClick={handleInsertDetailImages}
+                    disabled={selectedDetailImages.size === 0 || !detailImagesConfirmed}
+                    className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    선택 이미지를 상세설명에 넣기
+                  </button>
+                  <p className="mt-1.5 text-[11px] text-slate-400">
+                    원본 페이지 순서대로 아래 상세설명 본문 하단에 추가됩니다. 추가 후 순서 변경·삭제·편집할 수 있습니다.
+                  </p>
+                </div>
+              </>
+            )}
+          </div>
 
           {/* Detail Description Editor */}
           <div className="mt-6">
