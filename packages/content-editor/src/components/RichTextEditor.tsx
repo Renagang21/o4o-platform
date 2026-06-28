@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { CSSProperties } from 'react';
-import { useEditor, EditorContent, BubbleMenu } from '@tiptap/react';
+import { useEditor, EditorContent } from '@tiptap/react';
 import { ContentRenderer } from './ContentRenderer';
 import { sanitizeRichHtml, isBlankHtml } from '../sanitize';
 import StarterKit from '@tiptap/starter-kit';
@@ -80,6 +80,22 @@ export function RichTextEditor({
   const [pendingImageUrl, setPendingImageUrl] = useState<string | null>(null);
   // 기본 표시 폭: product 화면=본문 폭, 그 외=원본(기존 동작 보존)
   const defaultImageWidth: DisplayWidth = templateCategory === 'product' ? 'full' : 'original';
+  // 이미지 선택 시 React-제어 폭/정렬/삭제 툴바 (tippy BubbleMenu 미사용 — React reconcile 크래시 방지)
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [imgMenuPos, setImgMenuPos] = useState<{ top: number; left: number } | null>(null);
+
+  // 이미지 선택 시 폭/정렬/삭제 툴바 위치 계산. 탭 가시성은 렌더에서 activeTab==='edit' 로 게이트.
+  const updateImageMenu = useCallback((ed: any) => {
+    if (!ed || !ed.isActive('image')) { setImgMenuPos(null); return; }
+    try {
+      const dom = ed.view.nodeDOM(ed.state.selection.from) as HTMLElement | null;
+      const cont = containerRef.current;
+      if (!dom || !cont || typeof dom.getBoundingClientRect !== 'function') { setImgMenuPos(null); return; }
+      const ir = dom.getBoundingClientRect();
+      const cr = cont.getBoundingClientRect();
+      setImgMenuPos({ top: Math.max(0, ir.top - cr.top - 40), left: Math.max(0, ir.left - cr.left) });
+    } catch { setImgMenuPos(null); }
+  }, []);
   const [pasteUploading, setPasteUploading] = useState(false);
   const [activeTab, setActiveTab] = useState<'edit' | 'html' | 'preview'>('edit');
   // WO-O4O-COMMON-EDITOR-HTML-TAB-SAVE-RAW-PRESERVE-V1:
@@ -137,7 +153,9 @@ export function RichTextEditor({
           json: editor.getJSON(),
         });
       }
+      updateImageMenu(editor);
     },
+    onSelectionUpdate: ({ editor }) => updateImageMenu(editor),
     editorProps: {
       handlePaste: (_view, event) => {
         if (!onImageUpload) return false;
@@ -292,6 +310,7 @@ export function RichTextEditor({
 
   return (
     <div
+      ref={containerRef}
       className={`content-editor ${className}`}
       style={{
         border: '1px solid #e5e7eb',
@@ -510,11 +529,10 @@ export function RichTextEditor({
       {/* WO-O4O-STANDARD-EDITOR-IMAGE-DISPLAY-WIDTH-V1: 이미지 선택 버블 메뉴 (폭/정렬/삭제)
           항상 마운트(언마운트 시 tippy removeChild 오류) + shouldShow 로 편집 탭에서만 표시.
           탭 이탈 시 switchTab 에서 blur 로 선택 해제 → 캔버스 숨김 전에 버블 사라짐(insertBefore 방지). */}
-      {editor && editable && (
-        <BubbleMenu
-          editor={editor}
-          shouldShow={({ editor: ed }) => activeTab === 'edit' && ed.isActive('image')}
-          tippyOptions={{ placement: 'top', zIndex: 60 }}
+      {editor && editable && imgMenuPos && activeTab === 'edit' && (
+        <div
+          style={{ position: 'absolute', top: imgMenuPos.top, left: imgMenuPos.left, zIndex: 60 }}
+          onMouseDown={(e) => e.preventDefault()}
         >
           <div style={bubbleStyles.bar}>
             <span style={bubbleStyles.group}>
@@ -554,7 +572,7 @@ export function RichTextEditor({
               삭제
             </button>
           </div>
-        </BubbleMenu>
+        </div>
       )}
 
       <ImageInsertModal
