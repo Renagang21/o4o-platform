@@ -5,14 +5,16 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { CSSProperties } from 'react';
-import { useEditor, EditorContent } from '@tiptap/react';
+import { useEditor, EditorContent, BubbleMenu } from '@tiptap/react';
 import { ContentRenderer } from './ContentRenderer';
 import { sanitizeRichHtml, isBlankHtml } from '../sanitize';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 import Link from '@tiptap/extension-link';
-import Image from '@tiptap/extension-image';
 import Youtube from '@tiptap/extension-youtube';
+// WO-O4O-STANDARD-EDITOR-IMAGE-DISPLAY-WIDTH-V1: 표시 폭/정렬 이미지 노드
+import { DisplayImage, IMAGE_DISPLAY_STYLES, DISPLAY_WIDTHS, IMAGE_ALIGNS, DISPLAY_WIDTH_LABEL, IMAGE_ALIGN_LABEL, type DisplayWidth, type ImageAlign } from '../extensions/displayImage';
+import { ImageInsertModal } from './ImageInsertModal';
 import TextAlign from '@tiptap/extension-text-align';
 import Highlight from '@tiptap/extension-highlight';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -74,6 +76,10 @@ export function RichTextEditor({
   const [saveModalOpen, setSaveModalOpen] = useState(false);
   // WO-O4O-STANDARD-EDITOR-TEMPLATE-PURPOSE-CATEGORY-V1: 탭 행 우측 "템플릿 ▾" 메뉴
   const [templateMenuOpen, setTemplateMenuOpen] = useState(false);
+  // WO-O4O-STANDARD-EDITOR-IMAGE-DISPLAY-WIDTH-V1: 삽입 설정 모달용 pending URL
+  const [pendingImageUrl, setPendingImageUrl] = useState<string | null>(null);
+  // 기본 표시 폭: product 화면=본문 폭, 그 외=원본(기존 동작 보존)
+  const defaultImageWidth: DisplayWidth = templateCategory === 'product' ? 'full' : 'original';
   const [pasteUploading, setPasteUploading] = useState(false);
   const [activeTab, setActiveTab] = useState<'edit' | 'html' | 'preview'>('edit');
   // WO-O4O-COMMON-EDITOR-HTML-TAB-SAVE-RAW-PRESERVE-V1:
@@ -96,11 +102,8 @@ export function RichTextEditor({
           class: 'editor-link',
         },
       }),
-      Image.configure({
-        HTMLAttributes: {
-          class: 'editor-image',
-        },
-      }),
+      // 표시 폭/정렬 속성 + legacy width 보존 (renderHTML 이 class 부여)
+      DisplayImage,
       Youtube.configure({
         width: 640,
         height: 360,
@@ -149,7 +152,11 @@ export function RichTextEditor({
           event,
           onImageUpload,
           (url) => {
-            editor?.chain().focus().setImage({ src: url }).run();
+            // 클립보드 붙여넣기는 모달 없이 기본값으로 즉시 삽입 (버블 메뉴로 변경)
+            editor?.chain().focus().insertContent({
+              type: 'image',
+              attrs: { src: url, displayWidth: defaultImageWidth, align: 'center' },
+            }).run();
           },
         ).finally(() => setPasteUploading(false));
 
@@ -253,6 +260,27 @@ export function RichTextEditor({
     },
     [onSave, editor, resolveSaveHtml]
   );
+
+  // WO-O4O-STANDARD-EDITOR-IMAGE-DISPLAY-WIDTH-V1:
+  //   라이브러리/URL/명시 업로드 → URL 을 pending 으로 잡고 삽입 설정 모달 표시(공통 흐름).
+  const requestImageInsert = useCallback((url: string) => setPendingImageUrl(url), []);
+  const finalizeImageInsert = (width: DisplayWidth, align: ImageAlign) => {
+    if (pendingImageUrl && editor) {
+      editor.chain().focus().insertContent({
+        type: 'image',
+        attrs: { src: pendingImageUrl, displayWidth: width, align },
+      }).run();
+    }
+    setPendingImageUrl(null);
+  };
+  // 버블 메뉴: 선택 이미지의 폭/정렬 즉시 변경 (legacy width 는 폭 변경 시 정규화됨)
+  const setImageAttr = (attrs: { displayWidth?: DisplayWidth; align?: ImageAlign }) => {
+    if (!editor) return;
+    const patch: Record<string, unknown> = { ...attrs };
+    // 폭을 명시 변경하면 legacy width 제거(정규화)
+    if (attrs.displayWidth) patch.legacyWidth = null;
+    editor.chain().focus().updateAttributes('image', patch).run();
+  };
 
   return (
     <div
@@ -366,7 +394,7 @@ export function RichTextEditor({
 
       {/* 툴바 — 편집 탭에서만 표시 */}
       {editable && activeTab === 'edit' && (
-        <Toolbar editor={editor} preset={preset} onImageUpload={onImageUpload} existingImages={existingImages} onMediaLibraryPick={onMediaLibraryPick} aiRequestHeaders={aiRequestHeaders} showCommunitySave={showCommunitySave} showStoreSave={showStoreSave} />
+        <Toolbar editor={editor} preset={preset} onImageUpload={onImageUpload} existingImages={existingImages} onMediaLibraryPick={onMediaLibraryPick} onRequestImageInsert={requestImageInsert} aiRequestHeaders={aiRequestHeaders} showCommunitySave={showCommunitySave} showStoreSave={showStoreSave} />
       )}
 
       {/* 편집 탭 — 항상 마운트, 다른 탭에서는 숨김 (에디터 상태 유지) */}
@@ -471,10 +499,76 @@ export function RichTextEditor({
           />
         </>
       )}
+      {/* WO-O4O-STANDARD-EDITOR-IMAGE-DISPLAY-WIDTH-V1: 이미지 선택 버블 메뉴 (폭/정렬/삭제) */}
+      {editor && editable && (
+        <BubbleMenu
+          editor={editor}
+          shouldShow={({ editor: ed }) => ed.isActive('image')}
+          tippyOptions={{ placement: 'top', zIndex: 60 }}
+        >
+          <div style={bubbleStyles.bar}>
+            <span style={bubbleStyles.group}>
+              {DISPLAY_WIDTHS.map((w) => (
+                <button
+                  key={w}
+                  type="button"
+                  title={DISPLAY_WIDTH_LABEL[w]}
+                  style={{ ...bubbleStyles.btn, ...(editor.getAttributes('image').displayWidth === w ? bubbleStyles.btnActive : {}) }}
+                  onClick={() => setImageAttr({ displayWidth: w })}
+                >
+                  {w === 'full' ? '본문' : w === 'original' ? '원본' : `${w}%`}
+                </button>
+              ))}
+            </span>
+            <span style={bubbleStyles.sep} />
+            <span style={bubbleStyles.group}>
+              {IMAGE_ALIGNS.map((a) => (
+                <button
+                  key={a}
+                  type="button"
+                  title={IMAGE_ALIGN_LABEL[a]}
+                  style={{ ...bubbleStyles.btn, ...((editor.getAttributes('image').align || 'center') === a ? bubbleStyles.btnActive : {}) }}
+                  onClick={() => setImageAttr({ align: a })}
+                >
+                  {a === 'left' ? '좌' : a === 'center' ? '중' : '우'}
+                </button>
+              ))}
+            </span>
+            <span style={bubbleStyles.sep} />
+            <button
+              type="button"
+              title="이미지 삭제"
+              style={{ ...bubbleStyles.btn, color: '#dc2626' }}
+              onClick={() => editor.chain().focus().deleteSelection().run()}
+            >
+              삭제
+            </button>
+          </div>
+        </BubbleMenu>
+      )}
+
+      <ImageInsertModal
+        open={!!pendingImageUrl}
+        url={pendingImageUrl}
+        defaultWidth={defaultImageWidth}
+        defaultAlign="center"
+        onInsert={finalizeImageInsert}
+        onCancel={() => setPendingImageUrl(null)}
+      />
+
       <style>{editorStyles}</style>
+      <style>{IMAGE_DISPLAY_STYLES}</style>
     </div>
   );
 }
+
+const bubbleStyles: Record<string, CSSProperties> = {
+  bar: { display: 'flex', alignItems: 'center', gap: 4, padding: '4px 6px', background: 'white', border: '1px solid #e2e8f0', borderRadius: 8, boxShadow: '0 6px 20px rgba(0,0,0,0.12)' },
+  group: { display: 'inline-flex', gap: 2 },
+  sep: { width: 1, height: 16, background: '#e5e7eb', margin: '0 2px' },
+  btn: { padding: '3px 7px', fontSize: 11, fontWeight: 600, border: '1px solid transparent', borderRadius: 5, background: 'transparent', color: '#475569', cursor: 'pointer', lineHeight: 1 },
+  btnActive: { background: '#eff6ff', borderColor: '#93c5fd', color: '#2563eb' },
+};
 
 const editorStyles = `
   .content-editor .ProseMirror {
@@ -563,13 +657,7 @@ const editorStyles = `
     cursor: pointer;
   }
 
-  .content-editor .ProseMirror .editor-image {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-    margin: 1em auto;
-    display: block;
-  }
+  /* .editor-image 표시 폭/정렬은 IMAGE_DISPLAY_STYLES(img.editor-image.*)에서 처리 — WO-O4O-STANDARD-EDITOR-IMAGE-DISPLAY-WIDTH-V1 */
 
   .content-editor .ProseMirror .editor-youtube {
     width: 100%;

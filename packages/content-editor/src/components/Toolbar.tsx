@@ -46,6 +46,8 @@ interface ToolbarProps {
   existingImages?: ExistingImage[];
   preset?: EditorPreset;
   onMediaLibraryPick?: (insertImage: (url: string) => void) => void;
+  /** WO-O4O-STANDARD-EDITOR-IMAGE-DISPLAY-WIDTH-V1: URL 확보 후 삽입 설정 모달로 라우팅 (미제공 시 즉시 삽입) */
+  onRequestImageInsert?: (url: string) => void;
   /** WO-O4O-CONTENT-EDITOR-AI-AUTH-HEADERS-V1: AiContentModal로 전달할 AI API 추가 헤더 */
   aiRequestHeaders?: Record<string, string>;
   /** WO-O4O-AI-CONTENT-COMMUNITY-SAVE-INTEGRATION-V1: AI 결과를 커뮤니티(포럼)에 저장 버튼 표시 */
@@ -54,7 +56,12 @@ interface ToolbarProps {
   showStoreSave?: boolean;
 }
 
-export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full', onMediaLibraryPick, aiRequestHeaders, showCommunitySave, showStoreSave }: ToolbarProps) {
+export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full', onMediaLibraryPick, onRequestImageInsert, aiRequestHeaders, showCommunitySave, showStoreSave }: ToolbarProps) {
+  // WO-O4O-STANDARD-EDITOR-IMAGE-DISPLAY-WIDTH-V1: 삽입 설정 모달 경유(있으면), 없으면 즉시 삽입(back-compat)
+  const insertImg = (url: string) => {
+    if (onRequestImageInsert) onRequestImageInsert(url);
+    else editor?.chain().focus().setImage({ src: url }).run();
+  };
   const [showLinkInput, setShowLinkInput] = useState(false);
   const [showVideoInput, setShowVideoInput] = useState(false);
   const [showImageInput, setShowImageInput] = useState(false);
@@ -147,7 +154,7 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
 
   const handleAddImage = async () => {
     if (imageUrl) {
-      editor.chain().focus().setImage({ src: imageUrl }).run();
+      insertImg(imageUrl);
       setImageUrl('');
       setShowImageInput(false);
     }
@@ -158,7 +165,7 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
     if (file && onImageUpload) {
       try {
         const url = await onImageUpload(file);
-        editor.chain().focus().setImage({ src: url }).run();
+        insertImg(url);
       } catch (error) {
         console.error('Image upload failed:', error);
       }
@@ -495,7 +502,7 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
                     type="button"
                     onClick={() => {
                       onMediaLibraryPick((url: string) => {
-                        editor.chain().focus().setImage({ src: url }).run();
+                        insertImg(url);
                         setShowImageInput(false);
                       });
                     }}
@@ -538,7 +545,7 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
                         key={img.id}
                         type="button"
                         onClick={() => {
-                          editor.chain().focus().setImage({ src: img.url }).run();
+                          insertImg(img.url);
                           setShowImageInput(false);
                         }}
                         style={{

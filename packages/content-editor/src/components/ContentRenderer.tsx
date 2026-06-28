@@ -12,6 +12,17 @@
  */
 
 import { sanitizeHtml, sanitizeRichHtml } from '../sanitize';
+// WO-O4O-STANDARD-EDITOR-IMAGE-DISPLAY-WIDTH-V1: 이미지 표시 폭/정렬 CSS (편집기와 동일)
+import { IMAGE_DISPLAY_STYLES } from '../extensions/displayImage';
+
+let imageDisplayCssInjected = false;
+function injectImageDisplayCss() {
+  if (imageDisplayCssInjected || typeof document === 'undefined') return;
+  const style = document.createElement('style');
+  style.textContent = IMAGE_DISPLAY_STYLES;
+  document.head.appendChild(style);
+  imageDisplayCssInjected = true;
+}
 
 interface ContentRendererProps {
   /** 렌더링할 HTML 콘텐츠 */
@@ -79,6 +90,7 @@ function injectGuideCss() {
 }
 
 export function ContentRenderer({ html = '', className, style, variant }: ContentRendererProps) {
+  injectImageDisplayCss();
   if (variant === 'product-detail') {
     injectProductDetailCss();
     return (
