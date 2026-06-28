@@ -241,6 +241,8 @@ export function RichTextEditor({
         const html = editor?.getHTML() || '';
         setHtmlSource(isBlankHtml(html) ? '' : html);
       }
+      // WO-O4O-STANDARD-EDITOR-IMAGE-DISPLAY-WIDTH-V1: 이미지 선택 해제 → 버블 메뉴 사라짐(탭 전환 크래시 방지)
+      editor?.commands.blur();
     }
     setActiveTab(tab);
   }
@@ -500,12 +502,12 @@ export function RichTextEditor({
         </>
       )}
       {/* WO-O4O-STANDARD-EDITOR-IMAGE-DISPLAY-WIDTH-V1: 이미지 선택 버블 메뉴 (폭/정렬/삭제)
-          편집 탭에서만 마운트 — HTML/미리보기 탭(편집 캔버스 숨김)에서 tippy positioning 시
-          insertBefore DOM 오류 발생하므로 activeTab='edit' 일 때만 렌더. */}
-      {editor && editable && activeTab === 'edit' && (
+          항상 마운트(언마운트 시 tippy removeChild 오류) + shouldShow 로 편집 탭에서만 표시.
+          탭 이탈 시 switchTab 에서 blur 로 선택 해제 → 캔버스 숨김 전에 버블 사라짐(insertBefore 방지). */}
+      {editor && editable && (
         <BubbleMenu
           editor={editor}
-          shouldShow={({ editor: ed }) => ed.isActive('image')}
+          shouldShow={({ editor: ed }) => activeTab === 'edit' && ed.isActive('image')}
           tippyOptions={{ placement: 'top', zIndex: 60 }}
         >
           <div style={bubbleStyles.bar}>
