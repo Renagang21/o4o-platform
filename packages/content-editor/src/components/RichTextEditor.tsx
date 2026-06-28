@@ -241,8 +241,14 @@ export function RichTextEditor({
         const html = editor?.getHTML() || '';
         setHtmlSource(isBlankHtml(html) ? '' : html);
       }
-      // WO-O4O-STANDARD-EDITOR-IMAGE-DISPLAY-WIDTH-V1: 이미지 선택 해제 → 버블 메뉴 사라짐(탭 전환 크래시 방지)
-      editor?.commands.blur();
+      // WO-O4O-STANDARD-EDITOR-IMAGE-DISPLAY-WIDTH-V1:
+      //   이미지 NodeSelection 해제(텍스트 커서로 collapse) → selectednode decoration 제거 →
+      //   버블 메뉴가 캔버스 display:none 전에 사라져 tippy/PM redraw 크래시(insertBefore) 방지.
+      if (editor) {
+        const from = editor.state.selection.from;
+        editor.commands.setTextSelection(from);
+        editor.commands.blur();
+      }
     }
     setActiveTab(tab);
   }
