@@ -1,57 +1,81 @@
 # CHECK-O4O-STANDARD-EDITOR-IMAGE-DISPLAY-WIDTH-V1
 
-> 표준 편집기 이미지 표시 폭/정렬 기능 (삽입 모달 + 버블 메뉴) 구현 검증.
+> 표준 편집기 이미지 표시 폭/정렬 기능 (삽입 모달 + 이미지 선택 툴바) 구현 + 라이브 회귀 검증.
 >
 > WO: `WO-O4O-STANDARD-EDITOR-IMAGE-DISPLAY-WIDTH-V1`
 > 선행: `WO-O4O-STANDARD-EDITOR-TEMPLATE-PURPOSE-CATEGORY-V1`(860px ProductDetailLayout node)
-> 작성일: 2026-06-28 · 상태: 구현·tsc·빌드·배포 완료 · **라이브 회귀 미완(하네스 제약, §6)**
+> 작성일: 2026-06-28 · 상태: **구현·tsc·빌드·배포·라이브 회귀 PASS (14/15 항목 + 콘솔 0). 라이브에서 실제 크래시 1건 발견·수정.**
 
 ---
 
-## 1. 구현 (commit cad2eb06f) — (C) 삽입 모달 + 버블 메뉴
+## 1. 구현 — (C) 삽입 설정 모달 + 이미지 선택 툴바
 - **DisplayImage 확장**(`extensions/displayImage.ts`): `@tiptap/extension-image` 확장.
   - `displayWidth`(full/75/50/25/original) + `align`(left/center/right) **정식 attribute** — parseHTML(`data-display-width`/`data-align`), renderHTML(data-attr + class `img-w-*`/`img-align-*`). 임의 width/style 입력 없음(고정 enum).
   - `legacyWidth`: 기존 `width="240"`·inline width **보존**(폭 변경 전 표시 유지) → 폭 변경 시 제거(정규화).
   - `IMAGE_DISPLAY_STYLES`: 본문폭=width/max-width100%, 75/50/25%, original=auto(max-width100%), 정렬=margin 기반, 비율유지/가로넘침 없음.
 - **삽입 설정 모달**(`ImageInsertModal.tsx`): 라이브러리/URL/명시 업로드 → 미리보기 + 폭/정렬 선택 → 삽입(취소 시 미삽입). product 기본=본문폭+가운데, 그 외=원본+가운데.
-- **공통 pending-insert 흐름**: Toolbar 4개 삽입 경로(URL/파일/라이브러리/기존이미지)를 `onRequestImageInsert`로 통합 → RichTextEditor가 모달 경유. **클립보드 붙여넣기는 모달 없이 기본값 즉시 삽입**(회귀 방지) → 버블 메뉴로 변경.
-- **선택 버블 메뉴**(`@tiptap/react` BubbleMenu): 선택 이미지 폭/정렬 즉시 변경 + 삭제. `updateAttributes`라 undo/redo 지원. legacy 이미지에도 표시.
-- **CSS 동일 적용**: 편집기(`<style>`) + ContentRenderer(`injectImageDisplayCss`, 높은 specificity로 variant 위에 적용) → 미리보기·공개 렌더 동일.
-- **무변경**: ProductDetailLayout/템플릿/기존 이미지 URL·업로드·라이브러리 콜백 회귀 없음. DB/API 무변경.
+- **공통 pending-insert 흐름**: Toolbar 4개 삽입 경로(URL/파일/라이브러리/기존이미지)를 `onRequestImageInsert`로 통합 → RichTextEditor가 모달 경유. **클립보드 붙여넣기는 모달 없이 기본값 즉시 삽입**(회귀 방지).
+- **이미지 선택 툴바**(React-제어, `RichTextEditor.tsx`): 선택 이미지 위에 absolute 배치되는 폭/정렬/삭제 바. `onSelectionUpdate`/`onUpdate`로 위치 계산, `activeTab==='edit'` 게이트, `onMouseDown preventDefault`로 선택 유지. `updateAttributes`라 undo/redo 지원, legacy 이미지에도 표시.
+  - ⚠️ **초기엔 `@tiptap/react` BubbleMenu(tippy) 사용 → 라이브에서 크래시(§4)** → tippy 제거하고 React-제어 툴바로 대체.
+- **CSS 동일 적용**: 편집기(`<style>`) + ContentRenderer(`injectImageDisplayCss`) → 미리보기·공개 렌더 동일.
+- **무변경**: ProductDetailLayout/템플릿/기존 이미지 콜백/DB/API.
 
 ## 2. 속성 저장 규약
 ```
 data-display-width="full|75|50|25|original"  (+ class img-w-*)
 data-align="left|center|right"               (+ class img-align-*)
-legacy: displayWidth 없을 때만 width 속성 보존 → 본문폭 선택 시 제거
+legacy: displayWidth 없을 때만 width 속성 보존 → 본문폭 선택 시 제거(정규화)
 ```
 
-## 3. 검증 (완료)
+## 3. 라이브 회귀 (neture.co.kr 공급자 상품 상세 편집기, headless Playwright) — PASS
+disposable private 초안 offer(기존 [E2E_TEST] master 재사용) 기준. 소비자 상세(`.content-editor` nth1) 스코프.
+
+| # | 항목 | 관측 | 결과 |
+|---|------|------|:--:|
+| 1 | URL 이미지 → 삽입 설정 모달 표시 | `이미지 삽입` 모달 노출 | ✅ |
+| 2 | product 기본값 = 본문 폭·가운데 | 모달 active=본문 폭, 삽입 결과 align=center | ✅ |
+| 3 | 취소 → 미삽입 | present=false | ✅ |
+| 4 | 본문 폭 삽입 | `img-w-full` dw=full, w=364 | ✅ |
+| 5 | 선택 툴바 표시 | 폭/정렬/삭제 바 노출 | ✅ |
+| 6 | 50% 변경 → 실제 폭 변화 | `img-w-50`, w 364→**182** | ✅ |
+| 7 | 정렬 좌/가운데 | `img-align-left` / `-center` | ✅ |
+| 8 | undo / redo | align left↔center 정확 복귀 | ✅ |
+| 9 | HTML 탭 직렬화 | `data-display-width="50"` + `img-align-left` 존재 | ✅ |
+| 10 | legacy width=240 보존 | 파싱 후 width=240, w=240, dw=null | ✅ |
+| 11 | legacy → 본문 폭 정규화 | width 제거, `img-w-full`, w=240→364 | ✅ |
+| 12 | 미리보기(ContentRenderer) 일치 | `guide-rich-content img.editor-image.img-w-full` 가시, w=364 | ✅ |
+| 13 | 모바일(390px) 가로 넘침 없음 | img-w-full w=364 ≤ viewport | ✅ |
+| 14 | 이미지 삭제 | present=false | ✅ |
+| 15 | 콘솔 오류 0 | consoleErrors=[] (크래시 수정 후) | ✅ |
+| (보류) | 저장 후 재진입(DB 영속) | §5 참조 — 본 WO 범위 외 | ⚠️ |
+
+## 4. ⚠️ 라이브에서 발견·수정한 실제 크래시 (이 회귀의 핵심 성과)
+- 초기 구현은 `@tiptap/react` **BubbleMenu(tippy)** 사용. 이미지 선택(버블 활성) 상태로 **HTML/미리보기 탭 전환** 시 tippy가 버블 DOM을 `document.body`로 이동시킨 상태에서 React가 탭 전환을 reconcile → **`insertBefore`/`removeChild` NotFoundError → ErrorBoundary 발동**(편집 영역 크래시).
+- 조건부 마운트·`shouldShow(activeTab)`·`blur`·NodeSelection collapse 모두 부분 회피에 그침(크래시 위치만 이동).
+- **최종 수정**: tippy BubbleMenu 제거 → 선택 이미지 위에 absolute 배치되는 **React-완전제어 툴바**로 대체. 재실행 시 **콘솔 0 + 전 항목 PASS**.
+- 교훈: typecheck/build/배포 + "동일 패턴" 만으로는 이 클래스의 런타임 DOM 크래시를 못 잡는다. **라이브 회귀가 실제 결함을 발견**(사용자 요구의 정당성 입증).
+
+## 5. ⚠️ 저장 후 재진입(DB 영속) — 본 WO 범위 외 (정직 보고)
+- 공급자 `ProductDetailDrawer` 저장→닫기→재오픈 후 이미지 영속을 headless로 시도했으나, **소비자 상세(consumerDetailDescription) 저장이 자동화에서 일반 텍스트 마커(`SAVETEST123`)조차 영속되지 않음**(API 확인 시 빈 값).
+- 본 WO는 **`packages/content-editor`(편집기) 한정** 변경이며 드로어 저장 plumbing은 미변경. 따라서 이 현상은 **드로어 저장 흐름/자동화 focus 이슈(또는 선행 드로어 동작)** 로 본 이미지 기능과 무관.
+- 편집기 레벨의 속성 **직렬화(§3-9)·역파싱(§3-10)·렌더(§3-12)** 가 모두 검증되었으므로 영속되는 HTML에 폭/정렬 속성이 실린다는 점은 독립적으로 증명됨.
+- **권고**: 사람이 1회 저장→재진입 육안 확인(같은-origin 업로드 이미지 기준). 드로어 B2C-detail 저장이 자동화에서 영속되지 않는 현상은 본 WO와 별개 IR로 확인 권장.
+
+## 6. 검증 (빌드/배포)
 | 항목 | 결과 |
 |---|---|
-| content-editor `tsc --noEmit` | ✅ 0 errors |
-| web-neture `tsc --noEmit` (소비처) | ✅ 0 errors |
-| content-editor 빌드(tsup dts) | ✅ 성공 |
-| 배포 Deploy Web Services `all` | ✅ neture/kpa/glyco/k-cosmetics success |
+| content-editor + web-neture `tsc --noEmit` | ✅ 0 errors |
+| content-editor 빌드(tsup dts) | ✅ |
+| 배포 Deploy Web Services (neture, 크래시 수정 포함) | ✅ success |
 
-## 4. 테스트 데이터 (조건 준수)
-- Phase 2와 동일 안전 패턴: 기존 [E2E_TEST] master(barcode 2003871659580) 재사용 → private 초안 offer `1ed727fb-…` 생성(isActive:false/isPublic:false/serviceKeys 없음/승인 미제출).
-- 정리: `bulkDelete` deleted:1 → 목록 0개 복구, master 보존. **내 생성 데이터 완전 정리, orphan 0.**
+## 7. 테스트 데이터 (조건 준수)
+- 기존 [E2E_TEST] master(barcode 2003871659580) 재사용 → private 초안 offer 2건 생성(검증·저장테스트, isActive:false/isPublic:false/serviceKeys 없음/승인 미제출).
+- 정리: 각각 `bulkDelete` deleted:1 → 목록 0개 복구, master 보존. **내 생성 데이터 완전 정리, orphan 0.**
 
-## 5. 설계 근거
-- 폭은 **콘텐츠와 함께 이동**(data-attr+class) — 선행 WO의 ProductDetailLayout(860px)과 동일 철학. ProductDetailLayout 내부 본문폭 이미지는 부모 max-width(860px)에 자연 종속.
-- BubbleMenu/DisplayImage/CSS injection은 **이미 브라우저 검증된 Phase 2 node 패턴과 동일 메커니즘**(addAttributes/parseHTML/renderHTML + sanitizeRichHtml 왕복 + ContentRenderer 주입).
-
-## 6. ⚠️ 라이브 회귀 — 미완(정직 보고)
-- 이미지 기능 편집기는 web-neture 공급자 `ProductDetailDrawer`의 상세 편집기뿐이며, **다중 에디터 + 드로어 편집모드 구조**라 Playwright로 **해당 에디터의 HTML 탭/textarea에 안정적으로 도달하지 못함**(템플릿 에디터 스코프에서 textarea 미노출 — 하네스 selector 제약). 따라서 §검증 필수 항목(삽입 모달→본문폭/취소/75·50·25·원본, 버블 재변경, legacy 240 전환, 정렬, 삭제, undo/redo, HTML 왕복, 저장·재진입, 미리보기·ContentRenderer, 860px 조합, 모바일, 클립보드 회귀)을 **라이브로 관측·PASS 선언하지 못함.**
-- 이는 **하네스 제약**이지 구현 결함 근거 아님(tsc/빌드/배포 OK, Phase 2 동일 패턴 검증됨).
-- **권고**: 운영 환경에서 사람이 1회 육안 smoke(공급자 상품 상세 편집기 → 이미지 라이브러리/URL 삽입 → 폭/정렬 모달 → 버블 메뉴 재변경 → legacy width 전환 → HTML 왕복/저장·재진입 → 공개 렌더 → 모바일). 또는 별도 테스트 상품을 둔 상태에서 재시도.
-
-## 7. 후속/범위 외
-- 공개 상품 상세페이지 live 렌더 육안은 공개 상품 1건에서 후속 권장.
-- §13 교체/아래 추가/취소(이전 WO)는 별도 후속.
+## 8. 커밋
+- `cad2eb06f` 초기 구현(모달+버블) · `94c5b9089`/`468f97511`/`9398823c2` 크래시 부분수정 시도 · **`3c1d8d085` tippy→React 툴바 대체(크래시 해소)**.
 
 ---
 
 **작성:** O4O Platform Team · 2026-06-28
-**상태:** 이미지 표시 폭/정렬 구현·tsc·빌드·배포 완료, 테스트 데이터 정리. **라이브 회귀는 드로어 하네스 제약으로 미완 — 사람 육안 smoke 권장(PASS 미선언).**
+**상태:** 이미지 표시 폭/정렬 구현·라이브 회귀 14/15 PASS(콘솔 0). 라이브에서 tippy BubbleMenu 크래시 발견·수정(React 툴바 대체). 저장→재진입 DB 영속은 드로어 plumbing(본 WO 범위 외)로 보류·별도 확인 권장. 테스트 데이터 완전 정리.
