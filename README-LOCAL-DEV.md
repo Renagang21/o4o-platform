@@ -3,8 +3,8 @@
 ## 🎯 현재 상태: 설치 완료! ✅
 
 모든 필수 도구가 설치되었습니다:
-- ✅ Node.js v24.12.0
-- ✅ pnpm 10.27.0
+- ✅ Node.js: 루트 `package.json`의 Volta 설정 사용
+- ✅ pnpm: 루트 `package.json`의 Volta 설정 사용
 - ✅ gcloud CLI 550.0.0
 - ✅ Cloud SQL Proxy
 - ✅ 프로젝트 의존성 2,798개 패키지
@@ -63,8 +63,8 @@ https://console.cloud.google.com/sql/instances/o4o-platform-db/users?project=net
 
 **터미널 2** - 개발 서버 시작:
 ```cmd
-.\pnpm.cmd run build:packages
-.\pnpm.cmd run dev:admin
+pnpm run build:packages
+pnpm run dev:admin
 ```
 
 브라우저에서 열기: **http://localhost:5173**
@@ -78,9 +78,9 @@ https://console.cloud.google.com/sql/instances/o4o-platform-db/users?project=net
 
 **터미널 2** - API 서버:
 ```cmd
-.\pnpm.cmd run build:packages
-.\pnpm.cmd run build:api
-.\pnpm.cmd run dev:api
+pnpm run build:packages
+pnpm run build:api
+pnpm run dev:api
 ```
 
 API 주소: **http://localhost:3001**
@@ -100,7 +100,7 @@ Health Check: **http://localhost:3001/health**
 
 **터미널 2** (개발):
 ```cmd
-.\pnpm.cmd run dev:admin
+pnpm run dev:admin
 ```
 → 코드 수정하면 자동 리로드
 
@@ -122,31 +122,31 @@ Health Check: **http://localhost:3001/health**
 ### 개발 중
 ```cmd
 # 타입 체크
-.\pnpm.cmd run type-check
+pnpm run type-check
 
 # 린트 확인
-.\pnpm.cmd run lint
+pnpm run lint
 
 # 린트 자동 수정
-.\pnpm.cmd run lint:fix
+pnpm run lint:fix
 ```
 
 ### 패키지 수정했을 때
 ```cmd
 # 패키지 재빌드
-.\pnpm.cmd run build:packages
+pnpm run build:packages
 
 # 개발 서버 재시작 (Ctrl+C 후)
-.\pnpm.cmd run dev:admin
+pnpm run dev:admin
 ```
 
 ### 새 의존성 추가
 ```cmd
 # 패키지 설치
-.\pnpm.cmd add <package-name>
+pnpm add <package-name>
 
 # 특정 워크스페이스에 설치
-.\pnpm.cmd add <package-name> --filter @o4o/admin-dashboard
+pnpm add <package-name> --filter @o4o/admin-dashboard
 ```
 
 ---
@@ -170,7 +170,7 @@ Health Check: **http://localhost:3001/health**
 ### "Module not found" 에러
 ```cmd
 # 패키지 재빌드
-.\pnpm.cmd run build:packages
+pnpm run build:packages
 ```
 
 ### "Port 5173 is already in use"
@@ -231,10 +231,10 @@ taskkill /PID 12345 /F
 ### 성능 최적화
 ```cmd
 # 불필요한 패키지 정리
-.\pnpm.cmd prune
+pnpm prune
 
 # 캐시 정리
-.\pnpm.cmd store prune
+pnpm store prune
 ```
 
 ---

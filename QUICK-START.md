@@ -1,8 +1,8 @@
 # O4O Platform - 빠른 시작 가이드 (로컬 개발)
 
 ## ✅ 설치 완료된 항목
-- Node.js v24.12.0 ✅
-- pnpm 10.27.0 ✅
+- Node.js: 루트 `package.json`의 Volta 설정 사용 ✅
+- pnpm: 루트 `package.json`의 Volta 설정 사용 ✅
 - gcloud CLI 550.0.0 ✅
 - Cloud SQL Proxy ✅
 - 프로젝트 의존성 2,798개 패키지 ✅
@@ -75,17 +75,17 @@ https://console.cloud.google.com/sql/instances/o4o-platform-db/users?project=net
 
 ### 옵션 1: Admin Dashboard 개발
 ```cmd
-.\pnpm.cmd run build:packages
-.\pnpm.cmd run dev:admin
+pnpm run build:packages
+pnpm run dev:admin
 ```
 
 브라우저에서 열기: http://localhost:5173
 
 ### 옵션 2: API 서버 개발
 ```cmd
-.\pnpm.cmd run build:packages
-.\pnpm.cmd run build:api
-.\pnpm.cmd run dev:api
+pnpm run build:packages
+pnpm run build:api
+pnpm run dev:api
 ```
 
 API 주소: http://localhost:3001
@@ -93,8 +93,8 @@ Health Check: http://localhost:3001/health
 
 ### 옵션 3: 전체 개발 (웹 + 관리자)
 ```cmd
-.\pnpm.cmd run build:packages
-.\pnpm.cmd run dev
+pnpm run build:packages
+pnpm run dev
 ```
 
 ---
@@ -110,7 +110,6 @@ o4o-platform/
 │   └── */                   # 기타 웹 서비스들
 ├── packages/                # 공유 패키지
 ├── .env                     # 환경 변수 (로컬)
-├── pnpm.cmd                 # pnpm 래퍼
 ├── gcloud.cmd               # gcloud CLI 래퍼
 ├── start-cloud-sql-proxy.cmd # Cloud SQL Proxy 시작
 └── CLAUDE.md                # 플랫폼 개발 헌법
@@ -123,53 +122,53 @@ o4o-platform/
 ### 빌드 관련
 ```cmd
 # 패키지 빌드 (필수 - 최초 1회 또는 패키지 수정 시)
-.\pnpm.cmd run build:packages
+pnpm run build:packages
 
 # API 서버 빌드
-.\pnpm.cmd run build:api
+pnpm run build:api
 
 # Admin Dashboard 빌드
-.\pnpm.cmd run build:admin
+pnpm run build:admin
 
 # 전체 빌드
-.\pnpm.cmd run build
+pnpm run build
 ```
 
 ### 개발 서버
 ```cmd
 # Admin Dashboard (권장 포트: 5173)
-.\pnpm.cmd run dev:admin
+pnpm run dev:admin
 
 # Main Site
-.\pnpm.cmd run dev:web
+pnpm run dev:web
 
 # API Server
-.\pnpm.cmd run dev:api
+pnpm run dev:api
 
 # 전체
-.\pnpm.cmd run dev
+pnpm run dev
 ```
 
 ### 타입 체크 & 린트
 ```cmd
 # 타입 체크
-.\pnpm.cmd run type-check
+pnpm run type-check
 
 # 린트
-.\pnpm.cmd run lint
+pnpm run lint
 
 # 린트 자동 수정
-.\pnpm.cmd run lint:fix
+pnpm run lint:fix
 ```
 
 ### 데이터베이스
 ```cmd
 # 마이그레이션 실행
 cd apps/api-server
-..\pnpm.cmd run migration:run
+pnpm run migration:run
 
 # 마이그레이션 생성
-..\pnpm.cmd run migration:generate MigrationName
+pnpm run migration:generate MigrationName
 ```
 
 ---
@@ -183,7 +182,7 @@ cd apps/api-server
 
 ### 2. "Module not found" 빌드 에러
 ```cmd
-.\pnpm.cmd run build:packages
+pnpm run build:packages
 ```
 
 ### 3. "Port already in use"
@@ -198,10 +197,11 @@ taskkill /PID <PID> /F
 ```
 
 ### 4. pnpm 명령어 오류
-프로젝트 루트의 `.\pnpm.cmd` 사용:
+저장소 루트의 `package.json`에 선언된 Volta 설정을 사용합니다. 새 PowerShell에서 버전을 확인하세요:
 ```cmd
-.\pnpm.cmd install
-.\pnpm.cmd run dev
+node --version
+pnpm --version
+volta list
 ```
 
 ---
@@ -235,20 +235,20 @@ taskkill /PID <PID> /F
 
 2. **패키지 빌드** (최초 1회 또는 패키지 수정 시)
    ```cmd
-   .\pnpm.cmd run build:packages
+   pnpm run build:packages
    ```
 
 3. **개발 서버 실행** (새 터미널)
    ```cmd
-   .\pnpm.cmd run dev:admin
+   pnpm run dev:admin
    ```
 
 4. **코드 수정** → 브라우저 자동 리로드
 
 5. **커밋 전 확인**
    ```cmd
-   .\pnpm.cmd run type-check
-   .\pnpm.cmd run lint
+   pnpm run type-check
+   pnpm run lint
    ```
 
 6. **Git 커밋 & 푸시**
