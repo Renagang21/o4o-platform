@@ -88,3 +88,25 @@
 ## 8. 커밋
 
 `45300cecf`(공통 기반) · `e17e5078f`(단일) · `3f14865a4`(코너+공개) · `393e4100e`(목록 식별+publicUrl) · `2cebe4653`(QR 목록 핫픽스)
+
+---
+
+## 9. 관리 closure (재개 — additive, 핵심 E2E 미회귀)
+
+핵심 생성·공개는 PASS였으나 "QR 목록에서 이해하기 쉽게 수정" 관리 UX 가 미완 → 같은 WO 재개로 보완. 커밋 `9f6f35b6f`.
+
+| # | 항목 | 구현 | smoke |
+|---|------|------|-------|
+| 1 | QR 목록 필터 탭 | StoreQRPage 전체/콘텐츠 연결/AI 설명(count) — client filter(aiDescriptionMode) | 전체9/콘텐츠7/AI 2, 필터 OK |
+| 2 | AI QR 행 액션 | 내용 수정(연결 direct `?edit=1`) / AI 입력·다시 만들기(`?content=&qr=`) / QR 설정 모달 | 표시·이동 OK, 일반 QR=설정만 |
+| 3 | 생성·재생성 입력 편집 | 생성 후 `disabled` 제거(강조점·items 편집) → 'AI 다시 만들기' 새 초안(저장 전 기존 불변) | 강조점 변경→재생성 OK |
+| 4 | edit 모드 | `?content=` GET prefill → PUT 갱신(같은 id). 신규 QR 생성 없음 → QR id/slug/landingTarget 유지 | 저장 후 공개=동일 slug 갱신 반영 |
+| 5 | 취소 원본 불변 | 재생성은 로컬 draft 만, PUT 은 '수정 저장' 클릭 시에만 | 미저장 이탈→공개 저장본 유지 |
+| 6 | QR 설정 | 모달(제목·slug·상담 CTA) → `updateStoreQrCode` PUT | 제목 변경 저장, slug·배지 유지 |
+| 7 | 분류 SSOT | `content_json.aiDescription.mode` (feed `ai_mode` 컬럼/필터 `source='ai-description'`). 태그는 보조 | 콘텐츠 배지 'AI 설명·단일/·코너', 탭 2건 |
+| 8 | generatedAt | AI endpoint aiDescription.generatedAt(신규·재생성) | edit reload 영속 확인 |
+| 9 | 코너 미리보기 | `dangerouslySetInnerHTML` 제거 → `ContentRenderer` | 코너 공개 아코디언 ContentRenderer |
+| 10 | 안내문 일치 | "구성 편집" 문구 → 실제 'AI 다시 만들기' 진입 안내로 교체 | — |
+
+### closure 함정
+- **QR 목록 쿼리 재깨짐 위험**: aiDescriptionMode JOIN 은 §6(2cebe4653)에서 `dc.id::text = qr.landing_target_id` 로 이미 안전. 본 closure 는 consultation 필드만 SELECT 추가(영향 없음, 9건 정상 로드 재확인).
