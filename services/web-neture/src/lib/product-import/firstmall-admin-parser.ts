@@ -201,18 +201,18 @@ function isIgnorableImage(src: string): boolean {
   );
 }
 
-/** 허용 태그/속성만 남기는 경량 sanitize — script/style/iframe 제거, img/a 절대화 */
+/**
+ * 허용 태그/속성만 남기는 경량 sanitize — script/style/iframe 제거.
+ *
+ * 중요: 상세설명 본문의 <img> 는 모두 제거한다(외부 URL 삽입 방지 — WO 원칙).
+ * 상세 이미지는 detailImageUrls 로 별도 surface 되어 사용자가 선택→O4O 복사 후 삽입한다.
+ * 따라서 자동 로드되는 본문은 텍스트/구조만 남고 이미지는 O4O 사본만 들어간다.
+ */
 function sanitizeDetailHtml(rawHtml: string, base: string | null): string {
   const doc = new DOMParser().parseFromString(`<div id="__r">${rawHtml}</div>`, 'text/html');
   const root = doc.getElementById('__r');
   if (!root) return '';
-  root.querySelectorAll('script, style, iframe, object, embed, link, meta').forEach((e) => e.remove());
-  root.querySelectorAll('img').forEach((img) => {
-    const src = img.getAttribute('src') || img.getAttribute('data-original') || img.getAttribute('data-src');
-    if (src) img.setAttribute('src', resolveUrl(src, base) || src);
-    img.removeAttribute('onerror');
-    img.removeAttribute('onload');
-  });
+  root.querySelectorAll('script, style, iframe, object, embed, link, meta, img').forEach((e) => e.remove());
   root.querySelectorAll('a[href]').forEach((a) => {
     const href = a.getAttribute('href');
     if (href) a.setAttribute('href', resolveUrl(href, base) || href);
