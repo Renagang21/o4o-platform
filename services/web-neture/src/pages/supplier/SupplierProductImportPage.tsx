@@ -1,17 +1,21 @@
 /**
- * SupplierProductImportPage — 상품 Import Assistant
+ * SupplierProductImportPage — 내 쇼핑몰 관리자 상품 가져오기
  *
- * WO-O4O-PRODUCT-IMPORT-ASSISTANT-V1
+ * WO-O4O-NETURE-SUPPLIER-OWN-ADMIN-PRODUCT-IMPORT-V1
  *
- * 외부 상품 페이지 HTML → 파싱 → 프리뷰/편집 → 등록 페이지 자동 채움
+ * 공급자가 자신이 운영하는 쇼핑몰(Firstmall) 관리자 상품 수정 페이지의 HTML 을
+ * 붙여넣거나 파일로 불러와 → 브라우저에서 분석 → 필요한 필드/이미지만 추출 →
+ * 선택 이미지는 O4O 저장소로 복사 → 표준 편집기에 삽입 → 정식 등록 입력을 돕는다.
+ *
+ * 원칙: 관리자 HTML 원문은 서버/DB/로그에 저장하지 않는다(선택 이미지 URL 만 복사 요청).
  */
 
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { RichTextEditor } from '@o4o/content-editor';
-import { parseProductHtml } from '../../lib/product-import/parser';
+import { parseFirstmallAdmin, looksLikeFirstmallAdmin } from '../../lib/product-import/firstmall-admin-parser';
 import { saveDraft } from '../../lib/product-import/storage';
-import type { ParsedProductData, ImportDraft, DetailImageCandidate } from '../../lib/product-import/types';
+import type { ParsedProductData, ImportDraft, DetailImageCandidate, FirstmallAdminProduct } from '../../lib/product-import/types';
 import { supplierApi } from '../../lib/api/supplier';
 // WO-O4O-NETURE-SUPPLIER-MENU-ASSISTANT-IA-CLEANUP-V1
 // WO-O4O-NETURE-SUPPLIER-IMPORT-ASSISTANT-PRODUCT-TYPE-PASSTHROUGH-V1:
@@ -74,12 +78,15 @@ function flattenCats(
 export default function SupplierProductImportPage() {
   const navigate = useNavigate();
 
-  // Input state
+  // Input state — sourceUrl 은 "내 쇼핑몰 주소"(상대 이미지 URL 절대화 기준)
   const [sourceUrl, setSourceUrl] = useState('');
   const [html, setHtml] = useState('');
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Parsed result
   const [parsed, setParsed] = useState<ParsedProductData | null>(null);
+  // 관리자 추출 원본(구조화) — subInfo/도메인/경고 표시용
+  const [adminProduct, setAdminProduct] = useState<FirstmallAdminProduct | null>(null);
 
   // Editable fields (initialized from parsed result)
   const [name, setName] = useState('');
@@ -103,12 +110,9 @@ export default function SupplierProductImportPage() {
   const [detailImagesConfirmed, setDetailImagesConfirmed] = useState(false);
   const [detailImgPreviewErrors, setDetailImgPreviewErrors] = useState<Set<number>>(new Set());
 
-  // 동적 상세설명 원본 가져오기 (WO-O4O-NETURE-SUPPLIER-IMPORT-ASSISTANT-DYNAMIC-DETAIL-CONTENTS-DETECTION-V1)
-  //   상세설명을 별도 주소(AJAX)에서 불러오는 페이지 — 서버 SSRF-safe 경로로 원본을 조회한 결과.
-  //   조회 성공 시 base HTML 의 (로고/메뉴 오탐) 후보를 실제 상세 이미지 후보로 교체한다.
-  const [fetchedDetail, setFetchedDetail] = useState<{ candidates: DetailImageCandidate[]; fetchedUrl: string; copiedCount: number } | null>(null);
-  const [dynamicFetchStatus, setDynamicFetchStatus] = useState<'idle' | 'loading' | 'error'>('idle');
-  const [dynamicFetchError, setDynamicFetchError] = useState('');
+  // 이미지 O4O 저장소 복사 상태 (선택 → 복사 → 편집기 삽입)
+  const [imageCopyStatus, setImageCopyStatus] = useState<'idle' | 'copying' | 'error'>('idle');
+  const [imageCopyError, setImageCopyError] = useState('');
 
   // Thumbnail correction
   const [thumbNaturalSize, setThumbNaturalSize] = useState<{ w: number; h: number } | null>(null);
@@ -188,6 +192,7 @@ export default function SupplierProductImportPage() {
   /*  Parse                                                            */
   /* ---------------------------------------------------------------- */
 
+  /** 관리자 HTML → ParsedProductData(다운스트림 호환) 매핑 */
   const handleParse = useCallback(() => {
     // WO-...PASSTHROUGH: 상위 유형(의약품/비의약품) 선택 전에는 분석 제한. 세부 유형 없이도 분석 가능.
     if (!topChoice) {
@@ -195,28 +200,56 @@ export default function SupplierProductImportPage() {
       return;
     }
     if (!html.trim()) {
-      setError('HTML을 붙여넣어 주세요.');
+      setError('관리자 상품 수정 페이지 HTML을 붙여넣거나 파일을 불러와 주세요.');
       return;
     }
-
-    // Size limit: 2MB
-    if (html.length > 2 * 1024 * 1024) {
-      setError('HTML이 너무 큽니다 (2MB 제한). 상품 상세 부분만 복사해 주세요.');
+    if (html.length > 5 * 1024 * 1024) {
+      setError('HTML이 너무 큽니다 (5MB 제한).');
+      return;
+    }
+    if (!looksLikeFirstmallAdmin(html)) {
+      setError('Firstmall 관리자 상품 수정 페이지 HTML로 보이지 않습니다. 관리자에서 상품 수정 화면의 전체 HTML(Ctrl+U)을 복사해 주세요.');
       return;
     }
 
     setError('');
 
-    const result = parseProductHtml(html, sourceUrl || undefined);
+    const admin = parseFirstmallAdmin(html, sourceUrl || undefined);
+    setAdminProduct(admin);
+    // 도메인 자동 감지 시 입력칸 prefill (사용자 확인용)
+    if (!sourceUrl && admin.shopDomain) setSourceUrl(admin.shopDomain);
+
+    // 상세 이미지 후보 (원본 https 쇼핑몰 URL — 미리보기는 원본, 삽입 시 O4O 복사)
+    const detailCandidates: DetailImageCandidate[] = admin.detailImageUrls.map((url, i) => ({
+      url,
+      originalUrl: url,
+      alt: null,
+      width: null,
+      height: null,
+      order: i + 1,
+    }));
+
+    const result: ParsedProductData = {
+      name: admin.name,
+      brand: null,
+      manufacturer: admin.manufacturer,
+      specification: admin.subInfo.find((s) => /용량|내용량|규격/.test(s.label))?.value ?? null,
+      originCountry: admin.originCountry,
+      price: null,
+      thumbnailUrl: admin.productImageUrls[0] ?? null,
+      imageUrls: admin.productImageUrls,
+      shortDescription: admin.summary ? `<p>${escapeHtmlAttr(admin.summary)}</p>` : null,
+      detailDescription: admin.detailHtml ?? '',
+      detailImageCandidates: detailCandidates,
+    };
     setParsed(result);
 
-    // Initialize editable fields
     setName(result.name ?? '');
-    setBrand(result.brand ?? '');
+    setBrand('');
     setManufacturer(result.manufacturer ?? '');
     setSpecification(result.specification ?? '');
     setOriginCountry(result.originCountry ?? '');
-    setPrice(result.price ? String(result.price) : '');
+    setPrice('');
     setDetailDesc(result.detailDescription ?? '');
 
     // WO-PRODUCT-HELPER-IMAGE-SELECTION-DEFAULT-OFF-V1: 기본 미선택
@@ -230,12 +263,28 @@ export default function SupplierProductImportPage() {
     setSelectedDetailImages(new Set());
     setDetailImagesConfirmed(false);
     setDetailImgPreviewErrors(new Set());
-
-    // 동적 상세설명 조회 상태 초기화 (재분석 시 base HTML 후보로 복귀)
-    setFetchedDetail(null);
-    setDynamicFetchStatus('idle');
-    setDynamicFetchError('');
+    setImageCopyStatus('idle');
+    setImageCopyError('');
   }, [html, sourceUrl, topChoice]);
+
+  /** .html / .txt 파일 불러오기 → textarea 채움 (서버 전송 없음) */
+  const handleFileLoad = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      setError('파일이 너무 큽니다 (5MB 제한).');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      setHtml(typeof reader.result === 'string' ? reader.result : '');
+      setError('');
+    };
+    reader.onerror = () => setError('파일을 읽지 못했습니다.');
+    reader.readAsText(file, 'utf-8');
+    // 같은 파일 재선택 허용
+    e.target.value = '';
+  }, []);
 
   /* ---------------------------------------------------------------- */
   /*  Navigate to Create                                               */
@@ -406,35 +455,8 @@ export default function SupplierProductImportPage() {
   /*  WO-O4O-NETURE-SUPPLIER-PRODUCT-IMPORT-ASSISTANT-DETAIL-IMAGE-IMPORT-V1 */
   /* ---------------------------------------------------------------- */
 
-  // 동적 원본 조회에 성공하면 그 결과(실제 상세 이미지)를 우선 표시 — base HTML 오탐 후보를 대체.
-  const detailCandidates = fetchedDetail?.candidates ?? parsed?.detailImageCandidates ?? [];
-  const dynamicSource = parsed?.dynamicDetailSource ?? null;
-
-  const handleFetchDynamicDetail = useCallback(async () => {
-    if (!dynamicSource?.resolvedUrl) return;
-    setDynamicFetchStatus('loading');
-    setDynamicFetchError('');
-    try {
-      const result = await supplierApi.fetchDetailContents(
-        dynamicSource.resolvedUrl,
-        sourceUrl.trim() || undefined,
-      );
-      if (result.candidates.length === 0) {
-        setDynamicFetchStatus('error');
-        setDynamicFetchError('상세설명 원본에서 이미지를 찾지 못했습니다.');
-        return;
-      }
-      setFetchedDetail({ candidates: result.candidates, fetchedUrl: result.fetchedUrl, copiedCount: result.copiedCount });
-      // 선택/확인/미리보기 상태 초기화 (후보 목록이 교체됨)
-      setSelectedDetailImages(new Set());
-      setDetailImagesConfirmed(false);
-      setDetailImgPreviewErrors(new Set());
-      setDynamicFetchStatus('idle');
-    } catch (e) {
-      setDynamicFetchStatus('error');
-      setDynamicFetchError(e instanceof Error ? e.message : '상세설명 원본 조회에 실패했습니다.');
-    }
-  }, [dynamicSource, sourceUrl]);
+  // 상세 이미지 후보 — 관리자 HTML 에서 직접 추출(원본 https 쇼핑몰 URL).
+  const detailCandidates = parsed?.detailImageCandidates ?? [];
 
   const toggleDetailImage = useCallback((idx: number) => {
     setSelectedDetailImages((prev) => {
@@ -460,31 +482,53 @@ export default function SupplierProductImportPage() {
     setSelectedDetailImages(new Set());
   }, []);
 
-  // 선택 이미지를 원본 순서로 정렬해 표준 폭 <img> HTML 로 에디터 본문 하단에 추가.
-  //   에디터(TipTap Image extension)가 inline style 은 제거하되 .editor-image 클래스(max-width:100%,
-  //   height:auto, display:block)를 부여하므로 — 클래스 기반 표준 반응형 폭으로 일관 적용된다(WO §11).
-  const handleInsertDetailImages = useCallback(() => {
-    if (selectedDetailImages.size === 0 || !detailImagesConfirmed) return;
+  // 선택 이미지를 O4O 저장소로 복사한 뒤, 표준 폭 <img>(가운데 정렬)로 에디터 본문 하단에 삽입.
+  //   외부 URL 이 아닌 O4O https URL 을 삽입한다(원본 사이트 차단/변경에 영향받지 않음).
+  //   에디터(.editor-image 클래스)가 표준 반응형 폭을 적용한다(WO §10).
+  const handleInsertDetailImages = useCallback(async () => {
+    if (selectedDetailImages.size === 0 || !detailImagesConfirmed || imageCopyStatus === 'copying') return;
 
-    const chosen = detailCandidates
-      .filter((_, i) => selectedDetailImages.has(i))
-      .slice(); // detailCandidates 는 이미 원본 DOM 순서(order 1-based)
+    const chosen = detailCandidates.filter((_, i) => selectedDetailImages.has(i)); // 이미 원본 순서
 
-    const productName = name.trim() || '상품';
-    const html = chosen
-      .map((c, i) => {
-        const alt = escapeHtmlAttr(c.alt || `${productName} 상세설명 이미지 ${i + 1}`);
-        return `<p><img src="${escapeHtmlAttr(c.url)}" alt="${alt}" /></p>`;
-      })
-      .join('');
+    setImageCopyStatus('copying');
+    setImageCopyError('');
+    try {
+      const shopOrigin = (sourceUrl.trim() || adminProduct?.shopDomain) ?? undefined;
+      const res = await supplierApi.copyImages(
+        chosen.map((c) => c.originalUrl),
+        shopOrigin,
+      );
+      // originalUrl → O4O url 매핑
+      const map = new Map(res.results.filter((r) => r.ok && r.url).map((r) => [r.originalUrl, r.url as string]));
+      const productName = name.trim() || '상품';
+      const html = chosen
+        .map((c, i) => {
+          const o4oUrl = map.get(c.originalUrl);
+          if (!o4oUrl) return '';
+          const alt = escapeHtmlAttr(c.alt || `${productName} 상세설명 이미지 ${i + 1}`);
+          return `<p><img src="${escapeHtmlAttr(o4oUrl)}" alt="${alt}" class="editor-image img-align-center" /></p>`;
+        })
+        .filter(Boolean)
+        .join('');
 
-    // 기존 본문 보존 — 하단 append (커서 삽입 API 미노출, WO §10.4 fallback)
-    setDetailDesc((prev) => (prev ? prev + html : html));
+      if (!html) {
+        setImageCopyStatus('error');
+        setImageCopyError('선택한 이미지를 O4O 저장소로 복사하지 못했습니다. 쇼핑몰 주소가 올바른지 확인해 주세요.');
+        return;
+      }
 
-    // 실수 중복 삽입 방지 — 선택/확인 상태 정리
-    setSelectedDetailImages(new Set());
-    setDetailImagesConfirmed(false);
-  }, [selectedDetailImages, detailImagesConfirmed, detailCandidates, name]);
+      setDetailDesc((prev) => (prev ? prev + html : html));
+      if (res.copied < chosen.length) {
+        setImageCopyError(`${chosen.length}개 중 ${res.copied}개만 복사되어 삽입했습니다. 일부 이미지는 가져오지 못했습니다.`);
+      }
+      setSelectedDetailImages(new Set());
+      setDetailImagesConfirmed(false);
+      setImageCopyStatus('idle');
+    } catch (e) {
+      setImageCopyStatus('error');
+      setImageCopyError(e instanceof Error ? e.message : '이미지 복사에 실패했습니다.');
+    }
+  }, [selectedDetailImages, detailImagesConfirmed, imageCopyStatus, detailCandidates, sourceUrl, adminProduct, name]);
 
   /* ---------------------------------------------------------------- */
   /*  Reset                                                            */
@@ -506,9 +550,9 @@ export default function SupplierProductImportPage() {
     setSelectedDetailImages(new Set());
     setDetailImagesConfirmed(false);
     setDetailImgPreviewErrors(new Set());
-    setFetchedDetail(null);
-    setDynamicFetchStatus('idle');
-    setDynamicFetchError('');
+    setAdminProduct(null);
+    setImageCopyStatus('idle');
+    setImageCopyError('');
     setThumbNaturalSize(null);
     setCorrectedDataUrl(null);
     setCorrectionStatus('idle');
@@ -529,20 +573,24 @@ export default function SupplierProductImportPage() {
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-xl font-bold text-slate-900">
-          등록 도우미
+          내 쇼핑몰 관리자 상품 가져오기
         </h1>
-        {/* WO-O4O-NETURE-SUPPLIER-MENU-ASSISTANT-IA-CLEANUP-V1: 보조 기능 안내(자동 등록 아님) */}
+        {/* WO-O4O-NETURE-SUPPLIER-OWN-ADMIN-PRODUCT-IMPORT-V1 */}
+        <div className="mt-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+          본인이 운영하거나 상품 정보 사용 권한을 가진 쇼핑몰의 <strong>관리자 상품 데이터만</strong> 가져올 수 있습니다.
+          현재 <strong>Firstmall 관리자 상품 수정 페이지</strong>를 지원합니다.
+        </div>
         <div className="mt-2 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600">
-          등록 도우미는 제품을 <strong>자동 등록하는 기능이 아닙니다.</strong> 외부 상품 페이지·HTML·기존 설명에서
-          제품명·브랜드·설명·이미지 후보를 추출해 <strong>정식 제품 등록 Wizard 입력을 돕는 보조 기능</strong>입니다.
-          최종 제출 전에는 반드시 내용을 확인하세요.
+          관리자 HTML 은 <strong>브라우저에서만 분석</strong>되며 <strong>원본 관리자 데이터는 서버·DB·로그에 저장하지 않습니다.</strong>
+          선택한 이미지만 O4O 저장소로 복사됩니다. 자동 등록이 아니며, 정식 제품 등록 입력을 돕는 보조 기능입니다.
         </div>
         <div className="mt-2">
           <strong className="text-sm text-slate-700">사용 방법</strong>
           <ol className="mt-1 ml-4 list-decimal text-sm text-slate-500 space-y-0.5">
             <li>제품 유형을 먼저 선택합니다</li>
-            <li>외부 상품 페이지를 Ctrl+A → Ctrl+C 로 복사합니다</li>
-            <li>아래에 붙여넣고 [분석하기] → 확인 후 [정식 등록으로 계속]</li>
+            <li>쇼핑몰 관리자에서 상품 수정 페이지를 열고 Ctrl+U 로 HTML을 확인합니다</li>
+            <li>전체 HTML을 복사해 붙여넣거나 HTML 파일을 불러옵니다</li>
+            <li>[관리자 상품 데이터 분석] → 이미지 선택 → [정식 등록으로 계속]</li>
           </ol>
         </div>
       </div>
@@ -586,35 +634,49 @@ export default function SupplierProductImportPage() {
       {/* Input Card */}
       <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="mb-4 text-base font-semibold text-slate-800">
-          1. HTML 붙여넣기
+          1. 관리자 상품 HTML 입력
         </h2>
 
         <p className="mb-3 text-sm text-slate-500">
-          외부 상품 페이지에서 Ctrl+A → Ctrl+C로 복사한 후 아래에 붙여넣어
-          주세요. (페이지 소스 보기의 HTML도 가능)
+          쇼핑몰 관리자 상품 수정 페이지의 HTML을 붙여넣거나 <strong>HTML 파일을 불러오세요.</strong>
+          관리자 페이지에서 Ctrl+U(페이지 소스 보기) → 전체 복사가 가장 정확합니다.
         </p>
 
-        {/* Source URL */}
+        {/* Shop domain */}
         <label className="mb-1 block text-sm font-medium text-slate-700">
-          소스 URL (선택)
+          내 쇼핑몰 주소 <span className="font-normal text-slate-400">(이미지 주소 기준 — 자동 감지되며 필요 시 수정)</span>
         </label>
         <input
           type="url"
           value={sourceUrl}
           onChange={(e) => setSourceUrl(e.target.value)}
-          placeholder="https://example.com/product/123"
+          placeholder="https://myshop.co.kr"
           className="mb-4 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
         />
 
-        {/* HTML textarea */}
-        <label className="mb-1 block text-sm font-medium text-slate-700">
-          HTML *
-        </label>
+        {/* HTML textarea + file load */}
+        <div className="mb-1 flex items-center justify-between">
+          <label className="block text-sm font-medium text-slate-700">관리자 HTML *</label>
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="rounded border border-slate-300 px-3 py-1 text-xs text-slate-600 hover:bg-slate-50"
+          >
+            HTML 파일 불러오기 (.html / .txt)
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".html,.htm,.txt,text/html,text/plain"
+            onChange={handleFileLoad}
+            className="hidden"
+          />
+        </div>
         <textarea
           value={html}
           onChange={(e) => setHtml(e.target.value)}
           rows={12}
-          placeholder="<html>...</html> 또는 상품 상세 HTML을 붙여넣으세요"
+          placeholder="관리자 상품 수정 페이지의 HTML을 붙여넣으세요"
           className="w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-xs focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
         />
 
@@ -628,7 +690,7 @@ export default function SupplierProductImportPage() {
             disabled={!html.trim()}
             className="rounded-lg bg-emerald-600 px-5 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            분석하기
+            관리자 상품 데이터 분석
           </button>
           {parsed && (
             <button
@@ -674,6 +736,39 @@ export default function SupplierProductImportPage() {
               type="number"
             />
           </div>
+
+          {/* 관리자 추출 안내 + 추가정보 + 가져오지 않는 정보 */}
+          {adminProduct && (
+            <div className="mt-4 space-y-3">
+              {adminProduct.warnings.length > 0 && (
+                <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+                  {adminProduct.warnings.map((w, i) => (
+                    <p key={i}>· {w}</p>
+                  ))}
+                </div>
+              )}
+              {adminProduct.subInfo.length > 0 && (
+                <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
+                  <p className="mb-1 text-xs font-semibold text-slate-600">
+                    직접입력 추가정보 {adminProduct.keyword ? '· 검색어' : ''}
+                  </p>
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-600">
+                    {adminProduct.subInfo.filter((s) => s.label || s.value).map((s, i) => (
+                      <span key={i}><strong className="text-slate-700">{s.label || '항목'}:</strong> {s.value}</span>
+                    ))}
+                  </div>
+                  {adminProduct.keyword && (
+                    <p className="mt-1 truncate text-[11px] text-slate-400">검색어: {adminProduct.keyword}</p>
+                  )}
+                </div>
+              )}
+              <p className="text-[11px] text-slate-400">
+                가져오지 않는 관리자 전용 정보(재고·가격정책·옵션·배송·노출설정·주문/회원 등)는 분석에서 제외됩니다.
+                {adminProduct.goodsSeq && <> 원본 상품번호: {adminProduct.goodsSeq}</>}
+                {adminProduct.shopDomain && <> · 이미지 기준: {adminProduct.shopDomain}</>}
+              </p>
+            </div>
+          )}
 
           {/* Images */}
           {parsed.imageUrls.length > 0 && (
@@ -806,67 +901,20 @@ export default function SupplierProductImportPage() {
             </div>
           )}
 
-          {/* 상세설명 이미지 가져오기
-              WO-O4O-NETURE-SUPPLIER-PRODUCT-IMPORT-ASSISTANT-DETAIL-IMAGE-IMPORT-V1 */}
+          {/* 상세설명 이미지 (관리자 HTML 추출) — 선택 시 O4O 저장소로 복사 후 삽입
+              WO-O4O-NETURE-SUPPLIER-OWN-ADMIN-PRODUCT-IMPORT-V1 */}
           <div className="mt-6 rounded-lg border border-slate-200 p-4">
             <h3 className="mb-1 text-sm font-semibold text-slate-700">
-              상세설명 이미지 가져오기
+              상세설명 이미지
             </h3>
             <p className="mb-3 text-xs text-slate-500">
-              상품 페이지에서 발견한 상세설명 이미지입니다. 사용할 이미지를 선택한 뒤
-              아래 상세설명 편집기에 넣을 수 있습니다.
+              관리자 상세설명에서 추출한 이미지입니다. 사용할 이미지를 선택하면 <strong>O4O 저장소로 복사</strong>한 뒤
+              아래 상세설명 편집기에 본문 폭으로 삽입합니다.
             </p>
-
-            {/* 동적 상세설명 안내 — 별도 주소(AJAX)에서 불러오는 페이지
-                WO-O4O-NETURE-SUPPLIER-IMPORT-ASSISTANT-DYNAMIC-DETAIL-CONTENTS-DETECTION-V1 */}
-            {dynamicSource && !fetchedDetail && (
-              <div className="mb-3 rounded-lg border border-amber-200 bg-amber-50 p-3">
-                <p className="text-sm font-medium text-amber-800">
-                  이 상품은 상세설명을 별도 주소에서 불러옵니다.
-                </p>
-                <p className="mt-1 text-xs text-amber-700">
-                  상품 페이지 HTML 에 상세설명 이미지가 직접 들어 있지 않습니다. 아래에서 상세설명 원본을
-                  가져와 분석하면 실제 상세 이미지만 후보로 표시됩니다.
-                </p>
-                {dynamicSource.resolvedUrl ? (
-                  <>
-                    <button
-                      type="button"
-                      onClick={handleFetchDynamicDetail}
-                      disabled={dynamicFetchStatus === 'loading'}
-                      className="mt-2 rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      {dynamicFetchStatus === 'loading' ? '상세설명 원본 가져오는 중…' : '상세설명 원본 가져와 분석'}
-                    </button>
-                    <p className="mt-1.5 break-all text-[11px] text-amber-600">
-                      원본: {dynamicSource.resolvedUrl}
-                    </p>
-                  </>
-                ) : (
-                  <p className="mt-2 rounded bg-white px-3 py-2 text-xs text-amber-700">
-                    상세설명 주소가 상대경로라 절대주소로 변환하지 못했습니다. 위 <strong>소스 URL</strong>에
-                    상품 페이지 주소를 입력한 뒤 다시 <strong>분석하기</strong>를 눌러 주세요.
-                  </p>
-                )}
-                {dynamicFetchStatus === 'error' && dynamicFetchError && (
-                  <p className="mt-2 text-xs text-red-600">{dynamicFetchError}</p>
-                )}
-              </div>
-            )}
-
-            {/* 동적 원본 조회 성공 안내 */}
-            {fetchedDetail && (
-              <p className="mb-3 rounded-lg bg-emerald-50 px-3 py-2 text-xs text-emerald-700">
-                상세설명 원본에서 이미지 {fetchedDetail.candidates.length}개를 가져왔습니다. (로고·SNS·메뉴 이미지 제외)
-                {fetchedDetail.copiedCount > 0 && (
-                  <> 이 중 {fetchedDetail.copiedCount}개를 O4O 저장소로 복사해 원본 사이트와 무관하게 안전하게 사용할 수 있습니다.</>
-                )}
-              </p>
-            )}
 
             {detailCandidates.length === 0 ? (
               <p className="rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-500">
-                상품 페이지에서 가져올 수 있는 상세설명 이미지를 찾지 못했습니다.
+                관리자 상세설명에서 가져올 수 있는 이미지를 찾지 못했습니다.
               </p>
             ) : (
               <>
@@ -955,7 +1003,7 @@ export default function SupplierProductImportPage() {
                   })}
                 </div>
 
-                {/* 사용자 확인 — 선택 1개 이상일 때만 노출 */}
+                {/* 사용자 확인 — 선택 1개 이상일 때만 노출 (내 상품 데이터가 맞습니다) */}
                 {selectedDetailImages.size > 0 && (
                   <label className="mt-3 flex items-start gap-2 text-xs text-slate-600">
                     <input
@@ -964,7 +1012,7 @@ export default function SupplierProductImportPage() {
                       onChange={(e) => setDetailImagesConfirmed(e.target.checked)}
                       className="mt-0.5 h-3.5 w-3.5 accent-emerald-600"
                     />
-                    <span>선택한 이미지가 해당 상품의 상세설명 이미지임을 확인합니다.</span>
+                    <span>내 상품(또는 사용 권한이 있는 상품)의 상세설명 이미지가 맞습니다.</span>
                   </label>
                 )}
 
@@ -972,13 +1020,16 @@ export default function SupplierProductImportPage() {
                   <button
                     type="button"
                     onClick={handleInsertDetailImages}
-                    disabled={selectedDetailImages.size === 0 || !detailImagesConfirmed}
+                    disabled={selectedDetailImages.size === 0 || !detailImagesConfirmed || imageCopyStatus === 'copying'}
                     className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    선택 이미지를 상세설명에 넣기
+                    {imageCopyStatus === 'copying' ? 'O4O 저장소로 복사 중…' : '선택 이미지를 O4O로 복사 후 상세설명에 넣기'}
                   </button>
+                  {imageCopyError && (
+                    <p className="mt-2 text-xs text-amber-700">{imageCopyError}</p>
+                  )}
                   <p className="mt-1.5 text-[11px] text-slate-400">
-                    원본 페이지 순서대로 아래 상세설명 본문 하단에 추가됩니다. 추가 후 순서 변경·삭제·편집할 수 있습니다.
+                    원본 순서대로 O4O 저장소(https)로 복사한 뒤 본문 폭·가운데 정렬로 상세설명 하단에 추가됩니다. 추가 후 순서 변경·삭제·편집할 수 있습니다.
                   </p>
                 </div>
               </>

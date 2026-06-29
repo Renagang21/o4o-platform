@@ -1,16 +1,13 @@
 /**
  * SupplierImportController
  *
- * WO-O4O-NETURE-SUPPLIER-IMPORT-ASSISTANT-DYNAMIC-DETAIL-CONTENTS-DETECTION-V1
+ * WO-O4O-NETURE-SUPPLIER-OWN-ADMIN-PRODUCT-IMPORT-V1
  *
- * 등록 도우미(import assistant) 가 상품 페이지에서 탐지한 "동적 상세설명 주소"
- * (Firstmall `/goods/view_contents?...` 등) 를 서버에서 SSRF 안전 경로로 조회하고
- * 상세설명 이미지 후보만 추출해 반환한다.
- *
- * 브라우저는 cross-origin 상품 사이트를 직접 fetch 할 수 없으므로(CORS) 서버 경유가 필요하다.
+ * 공급자가 자사 관리자 HTML 에서 추출한 이미지 URL 을 O4O 미디어 라이브러리로 복사한다.
+ * (공개페이지 server fetch 기능은 제거됨 — 관리자 HTML 은 클라이언트에서만 분석한다)
  *
  * Routes:
- *   POST /supplier/import/fetch-detail-contents  (linked supplier)
+ *   POST /supplier/import/copy-images  (linked supplier)
  */
 
 import { Router } from 'express';
@@ -19,7 +16,7 @@ import type { DataSource } from 'typeorm';
 import { requireAuth } from '../../../middleware/auth.middleware.js';
 import { createRequireLinkedSupplier } from '../middleware/neture-identity.middleware.js';
 import type { SupplierRequest } from '../middleware/neture-identity.middleware.js';
-import { fetchDetailContents, DetailFetchError } from '../services/product-detail-fetch.service.js';
+import { copyImages } from '../services/product-detail-fetch.service.js';
 import logger from '../../../utils/logger.js';
 
 export function createSupplierImportController(dataSource: DataSource): Router {
@@ -27,51 +24,66 @@ export function createSupplierImportController(dataSource: DataSource): Router {
   const requireLinkedSupplier = createRequireLinkedSupplier(dataSource);
 
   /**
-   * POST /supplier/import/fetch-detail-contents
-   * body: { url: string, sourceUrl?: string }
+   * POST /supplier/import/copy-images
+   * body: { urls: string[], shopOrigin?: string }
    *
-   * url       — 탐지된 상세설명 원본 절대 URL (view_contents 등)
-   * sourceUrl — 상품 페이지 URL (제공 시 same-origin 으로 제한)
+   * 클라이언트가 자사 관리자 HTML 에서 추출한 이미지 URL 을 O4O 미디어 라이브러리로 복사한다.
+   * 관리자 HTML 원문은 받지 않는다(이미지 URL 만). shopOrigin 제공 시 same-origin 으로 제한.
+   * WO-O4O-NETURE-SUPPLIER-OWN-ADMIN-PRODUCT-IMPORT-V1
    */
   router.post(
-    '/import/fetch-detail-contents',
+    '/import/copy-images',
     requireAuth,
     requireLinkedSupplier,
     async (req: SupplierRequest, res: Response) => {
       try {
-        const url = typeof req.body?.url === 'string' ? req.body.url.trim() : '';
-        const sourceUrl = typeof req.body?.sourceUrl === 'string' ? req.body.sourceUrl.trim() : undefined;
+        const urls = Array.isArray(req.body?.urls) ? req.body.urls : null;
+        const shopOrigin = typeof req.body?.shopOrigin === 'string' ? req.body.shopOrigin.trim() : undefined;
 
-        if (!url) {
+        if (!urls || urls.length === 0) {
           return res.status(400).json({
             success: false,
-            error: { code: 'URL_REQUIRED', message: '상세설명 주소가 필요합니다.' },
+            error: { code: 'URLS_REQUIRED', message: '복사할 이미지 주소가 필요합니다.' },
           });
         }
-        if (url.length > 2048) {
+        if (urls.length > 60) {
           return res.status(400).json({
             success: false,
-            error: { code: 'URL_TOO_LONG', message: '주소가 너무 깁니다.' },
+            error: { code: 'TOO_MANY', message: '한 번에 복사 가능한 이미지는 최대 60개입니다.' },
+          });
+        }
+        if (!urls.every((u: unknown) => typeof u === 'string' && u.length <= 2048)) {
+          return res.status(400).json({
+            success: false,
+            error: { code: 'INVALID_URLS', message: '이미지 주소 형식이 올바르지 않습니다.' },
           });
         }
 
-        const result = await fetchDetailContents(url, {
-          sourceUrl: sourceUrl || undefined,
-          dataSource, // O4O 미디어 라이브러리 복사용
-          userId: req.user?.id, // 업로더 기록
+        // shopOrigin 정규화 (origin 만)
+        let normalizedOrigin: string | undefined;
+        if (shopOrigin) {
+          try {
+            normalizedOrigin = new URL(shopOrigin).origin;
+          } catch {
+            return res.status(400).json({
+              success: false,
+              error: { code: 'INVALID_SHOP_ORIGIN', message: '쇼핑몰 주소 형식이 올바르지 않습니다.' },
+            });
+          }
+        }
+
+        const results = await copyImages(urls, {
+          dataSource,
+          userId: req.user!.id,
+          shopOrigin: normalizedOrigin,
         });
-        return res.json({ success: true, data: result });
+        const copied = results.filter((r) => r.ok).length;
+        return res.json({ success: true, data: { copied, total: results.length, results } });
       } catch (error) {
-        if (error instanceof DetailFetchError) {
-          return res.status(error.status).json({
-            success: false,
-            error: { code: error.code, message: error.message },
-          });
-        }
-        logger.error('[Neture SupplierImport] fetch-detail-contents failed:', error);
+        logger.error('[Neture SupplierImport] copy-images failed:', error);
         return res.status(500).json({
           success: false,
-          error: { code: 'INTERNAL_ERROR', message: '상세설명 원본 조회 중 오류가 발생했습니다.' },
+          error: { code: 'INTERNAL_ERROR', message: '이미지 복사 중 오류가 발생했습니다.' },
         });
       }
     },

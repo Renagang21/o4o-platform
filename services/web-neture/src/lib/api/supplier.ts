@@ -450,45 +450,36 @@ export interface UnifiedOrdersResponse {
   meta: { page: number; limit: number; total: number; totalPages: number };
 }
 
-// ==================== Import Assistant: Dynamic Detail Contents ====================
-// WO-O4O-NETURE-SUPPLIER-IMPORT-ASSISTANT-DYNAMIC-DETAIL-CONTENTS-DETECTION-V1
+// ==================== Import Assistant: 자사 관리자 상품 이미지 복사 ====================
+// WO-O4O-NETURE-SUPPLIER-OWN-ADMIN-PRODUCT-IMPORT-V1
 
-export interface FetchedDetailImageCandidate {
-  /** 미리보기·삽입 URL — copy 성공 시 O4O 저장소 https URL */
-  url: string;
-  /** 원본 상품 사이트 이미지 URL */
+/** copy-images 결과 */
+export interface CopiedImageResult {
   originalUrl: string;
-  /** O4O 저장소로 복사되었는지 */
-  copiedToStorage: boolean;
-  alt: string | null;
-  width: number | null;
-  height: number | null;
-  order: number;
+  url: string | null;
+  ok: boolean;
+  reason?: string;
 }
-
-export interface FetchDetailContentsResult {
-  fetchedUrl: string;
-  fromContainer: boolean;
-  /** O4O 저장소로 복사된 이미지 수 */
-  copiedCount: number;
-  candidates: FetchedDetailImageCandidate[];
+export interface CopyImagesResult {
+  copied: number;
+  total: number;
+  results: CopiedImageResult[];
 }
 
 // ==================== Supplier API ====================
 
 export const supplierApi = {
   /**
-   * 동적 상세설명 주소(view_contents 등)를 서버 SSRF-safe 경로로 조회해
-   * 상세 이미지 후보를 받아온다. (WO-...-DYNAMIC-DETAIL-CONTENTS-DETECTION-V1)
-   * @throws 서버 에러 메시지(extractApiError) — 호출부에서 사용자에게 노출
+   * 자사 관리자 HTML 에서 추출한 이미지 URL 을 O4O 미디어 라이브러리로 복사.
+   * (WO-O4O-NETURE-SUPPLIER-OWN-ADMIN-PRODUCT-IMPORT-V1)
    */
-  async fetchDetailContents(url: string, sourceUrl?: string): Promise<FetchDetailContentsResult> {
+  async copyImages(urls: string[], shopOrigin?: string): Promise<CopyImagesResult> {
     try {
-      const response = await api.post('/neture/supplier/import/fetch-detail-contents', {
-        url,
-        ...(sourceUrl ? { sourceUrl } : {}),
+      const response = await api.post('/neture/supplier/import/copy-images', {
+        urls,
+        ...(shopOrigin ? { shopOrigin } : {}),
       });
-      return response.data.data as FetchDetailContentsResult;
+      return response.data.data as CopyImagesResult;
     } catch (error) {
       throw new Error(extractApiError(error));
     }
