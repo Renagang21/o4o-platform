@@ -17,6 +17,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { GuideBackLink } from '../../components/GuideBackLink';
+import SupplierActivationGate from '../../components/supplier/SupplierActivationGate';
 import { FlaskConical, ArrowRight } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import {
@@ -113,6 +114,12 @@ export default function SupplierDashboardPage() {
 
   return (
     <div className="space-y-6">
+      {/* WO-O4O-NETURE-SUPPLIER-ACTIVATION-GATE-ALIGN-AND-ERROR-SURFACE-V1:
+          PENDING 공급자 상태 배너 (활성화 누락 정보 안내 + 프로필 링크). ACTIVE 면 미표시. */}
+      <SupplierActivationGate mode="banner">
+        <></>
+      </SupplierActivationGate>
+
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>

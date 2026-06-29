@@ -111,6 +111,26 @@ export interface AdminSupplier {
   // WO-O4O-NETURE-OPERATOR-MEMBER-SUPPLIER-STATUS-VISIBILITY-V1:
   // backend(getAllSuppliers)는 userId 를 내려주나 타입에 누락돼 있던 것을 명시 (회원 목록 매핑용).
   userId?: string;
+  // WO-O4O-NETURE-SUPPLIER-ACTIVATION-GATE-ALIGN-AND-ERROR-SURFACE-V1:
+  // 활성화 가능 여부의 단일 권위 — backend(getMissingActivationFields) 산출. 프론트 재계산 금지.
+  managerName?: string | null;
+  managerPhone?: string | null;
+  activationReady?: boolean;
+  missingActivationFields?: string[];
+}
+
+// WO-O4O-NETURE-SUPPLIER-ACTIVATION-GATE-ALIGN-AND-ERROR-SURFACE-V1:
+// 활성화 필드 코드 → 한글 라벨 (운영자/공급자 화면 공용)
+export const ACTIVATION_FIELD_LABELS: Record<string, string> = {
+  representativeName: '대표자명',
+  managerName: '담당자명',
+  managerPhone: '담당자 연락처',
+};
+
+export interface SupplierApproveResult {
+  success: boolean;
+  code?: string;
+  missingFields?: string[];
 }
 
 export const adminSupplierApi = {
@@ -137,11 +157,14 @@ export const adminSupplierApi = {
     }
   },
 
-  async approveSupplier(id: string): Promise<boolean> {
+  async approveSupplier(id: string): Promise<SupplierApproveResult> {
     try {
       await api.post(`/neture/admin/suppliers/${id}/approve`);
-      return true;
-    } catch { return false; }
+      return { success: true };
+    } catch (error: any) {
+      const err = error?.response?.data?.error;
+      return { success: false, code: err?.code, missingFields: err?.missingFields ?? [] };
+    }
   },
 
   async rejectSupplier(id: string, reason?: string): Promise<boolean> {
@@ -234,11 +257,14 @@ export const operatorSupplierApi = {
     }
   },
 
-  async approveSupplier(id: string): Promise<boolean> {
+  async approveSupplier(id: string): Promise<SupplierApproveResult> {
     try {
       await api.post(`/neture/operator/suppliers/${id}/approve`);
-      return true;
-    } catch { return false; }
+      return { success: true };
+    } catch (error: any) {
+      const err = error?.response?.data?.error;
+      return { success: false, code: err?.code, missingFields: err?.missingFields ?? [] };
+    }
   },
 
   async rejectSupplier(id: string, reason?: string): Promise<boolean> {

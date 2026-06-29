@@ -17,8 +17,15 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { operatorSupplierApi, type AdminSupplier } from '../../lib/api';
+import { operatorSupplierApi, type AdminSupplier, ACTIVATION_FIELD_LABELS } from '../../lib/api';
 import SupplierRegulatedCategoriesModal from '../../components/supplier/SupplierRegulatedCategoriesModal';
+
+// WO-O4O-NETURE-SUPPLIER-ACTIVATION-GATE-ALIGN-AND-ERROR-SURFACE-V1:
+// 활성화 가능 여부는 backend(activationReady/missingActivationFields)가 단일 권위.
+// 프론트는 필드를 재계산하지 않고 그대로 사용한다. (구버전 payload 대비 fallback 만 유지)
+function activationLabels(s: AdminSupplier): string[] {
+  return (s.missingActivationFields ?? []).map((f) => ACTIVATION_FIELD_LABELS[f] || f);
+}
 
 const statusLabels: Record<string, string> = {
   PENDING: '승인대기',
@@ -71,6 +78,7 @@ export default function OperatorSupplierApprovalPage() {
   const [statusFilter, setStatusFilter] = useState('PENDING');
   const [searchTerm, setSearchTerm] = useState('');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [actionMessage, setActionMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [approveConfirmId, setApproveConfirmId] = useState<string | null>(null);
   const [rejectModal, setRejectModal] = useState<{ id: string; name: string } | null>(null);
   const [rejectReason, setRejectReason] = useState('');
@@ -89,21 +97,46 @@ export default function OperatorSupplierApprovalPage() {
   const handleApprove = async () => {
     if (!approveConfirmId) return;
     const id = approveConfirmId;
+    const target = suppliers.find((s) => s.id === id);
     setApproveConfirmId(null);
     setActionLoading(id);
-    const ok = await operatorSupplierApi.approveSupplier(id);
+    const result = await operatorSupplierApi.approveSupplier(id);
     setActionLoading(null);
-    if (ok) await loadSuppliers();
+    if (result.success) {
+      setActionMessage({ type: 'success', text: `${target?.name || '공급자'} 활성화 완료 (ACTIVE)` });
+      await loadSuppliers();
+      return;
+    }
+    // 실패 사유를 사람이 읽을 메시지로 변환 (silent no-op 제거)
+    let text = '활성화에 실패했습니다. 잠시 후 다시 시도해 주세요.';
+    if (result.code === 'ONBOARDING_INCOMPLETE') {
+      const labels = (result.missingFields ?? []).map((f) => ACTIVATION_FIELD_LABELS[f] || f);
+      text = labels.length
+        ? `${labels.join(', ')}이(가) 비어 있어 활성화할 수 없습니다. 공급자가 해당 정보를 입력해야 합니다.`
+        : '필수 정보가 비어 있어 활성화할 수 없습니다.';
+    } else if (result.code === 'INVALID_STATUS') {
+      text = '이미 처리된 공급자입니다. 목록을 새로고침합니다.';
+      await loadSuppliers();
+    } else if (result.code === 'SUPPLIER_NOT_FOUND') {
+      text = '공급자를 찾을 수 없습니다.';
+    }
+    setActionMessage({ type: 'error', text });
   };
 
   const handleReject = async () => {
     if (!rejectModal) return;
     setActionLoading(rejectModal.id);
+    const name = rejectModal.name;
     const ok = await operatorSupplierApi.rejectSupplier(rejectModal.id, rejectReason);
     setActionLoading(null);
     setRejectModal(null);
     setRejectReason('');
-    if (ok) await loadSuppliers();
+    if (ok) {
+      setActionMessage({ type: 'success', text: `${name} 거절 처리 완료` });
+      await loadSuppliers();
+    } else {
+      setActionMessage({ type: 'error', text: '거절 처리에 실패했습니다. 다시 시도해 주세요.' });
+    }
   };
 
   const handleDownloadDocument = async (
@@ -138,6 +171,26 @@ export default function OperatorSupplierApprovalPage() {
           가입 승인 완료된 공급자의 2단계 활성화를 처리합니다 (PENDING → ACTIVE/REJECTED).
         </p>
       </div>
+
+      {actionMessage && (
+        <div
+          className={`flex items-start justify-between gap-3 rounded-lg border p-3 text-sm ${
+            actionMessage.type === 'success'
+              ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+              : 'border-red-200 bg-red-50 text-red-800'
+          }`}
+        >
+          <span>{actionMessage.text}</span>
+          <button
+            type="button"
+            onClick={() => setActionMessage(null)}
+            className="shrink-0 text-slate-400 hover:text-slate-600"
+            aria-label="닫기"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
@@ -211,7 +264,9 @@ export default function OperatorSupplierApprovalPage() {
             <tbody className="divide-y divide-slate-100">
               {filtered.map((s) => {
                 const deferred = getDeferredItems(s);
-                const activationReady = !!s.representativeName;
+                // backend 단일 권위. 구버전 payload(activationReady undefined) 대비 representativeName fallback.
+                const activationReady = s.activationReady ?? !!s.representativeName;
+                const missingActivation = activationLabels(s);
                 return (
                 <tr key={s.id} className="hover:bg-slate-50 transition-colors">
                   <td className="px-6 py-4">
@@ -229,7 +284,9 @@ export default function OperatorSupplierApprovalPage() {
                   <td className="px-6 py-4 text-sm text-slate-600">
                     <div className="space-y-1">
                       <div className={activationReady ? 'text-emerald-700' : 'text-amber-700'}>
-                        {activationReady ? '승인 가능 (기본 정보 완료)' : '기본 사업자 정보 미완료'}
+                        {activationReady
+                          ? '승인 가능 (기본 정보 완료)'
+                          : `활성화 불가 — 누락: ${missingActivation.join(', ')}`}
                       </div>
                       {deferred.length > 0 && (
                         <div className="text-xs text-amber-600">{describeDeferred(deferred)}</div>
@@ -295,7 +352,7 @@ export default function OperatorSupplierApprovalPage() {
                         <button
                           onClick={() => setApproveConfirmId(s.id)}
                           disabled={actionLoading === s.id || !activationReady}
-                          title={!activationReady ? '기본 사업자 정보(대표자명 등) 미완료' : undefined}
+                          title={!activationReady ? `누락: ${missingActivation.join(', ')}` : undefined}
                           className="text-emerald-600 hover:text-emerald-800 font-medium text-sm disabled:opacity-50"
                         >
                           {actionLoading === s.id ? '처리중...' : '활성화'}

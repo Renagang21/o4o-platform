@@ -112,7 +112,7 @@ export class NetureService {
   async approveSupplier(
     supplierId: string,
     approvedByUserId: string,
-  ): Promise<{ success: boolean; data?: Record<string, unknown>; error?: string }> {
+  ): Promise<{ success: boolean; data?: Record<string, unknown>; error?: string; missingFields?: string[] }> {
     return this.supplierService.approveSupplier(supplierId, approvedByUserId);
   }
 

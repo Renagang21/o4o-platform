@@ -208,7 +208,12 @@ export function createOperatorSupplierController(dataSource: DataSource): Router
       const result = await netureService.approveSupplier(id, approvedBy);
       if (!result.success) {
         const status = result.error === 'SUPPLIER_NOT_FOUND' ? 404 : 400;
-        return res.status(status).json({ success: false, error: { code: result.error, message: result.error } });
+        // WO-O4O-NETURE-SUPPLIER-ACTIVATION-GATE-ALIGN-AND-ERROR-SURFACE-V1:
+        // 구조화된 누락 필드를 함께 반환 — 프론트가 사람이 읽을 메시지로 변환.
+        return res.status(status).json({
+          success: false,
+          error: { code: result.error, message: result.error, missingFields: result.missingFields ?? [] },
+        });
       }
 
       // operator-scope action log: admin 측 'neture.admin.supplier_approve' 와 별도 키

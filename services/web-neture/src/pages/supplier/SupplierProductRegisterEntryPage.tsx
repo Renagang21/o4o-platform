@@ -21,6 +21,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Package, Layers, ArrowRight, AlertTriangle, Pill, Box } from 'lucide-react';
 import { getSupplierProductType, type SupplierProductTypeDef } from '../../lib/supplierProductTypes';
+import SupplierActivationGate from '../../components/supplier/SupplierActivationGate';
 
 const NON_DRUG = getSupplierProductType('non_drug')!;
 const OTC_DRUG = getSupplierProductType('otc_drug')!;
@@ -53,6 +54,7 @@ export default function SupplierProductRegisterEntryPage() {
   };
 
   return (
+    <SupplierActivationGate mode="gate">
     <div className="max-w-3xl">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-slate-900">제품 등록</h1>
@@ -194,5 +196,6 @@ export default function SupplierProductRegisterEntryPage() {
         </p>
       </div>
     </div>
+    </SupplierActivationGate>
   );
 }

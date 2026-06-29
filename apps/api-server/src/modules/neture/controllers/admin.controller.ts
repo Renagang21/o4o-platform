@@ -95,7 +95,8 @@ export function createAdminController(dataSource: DataSource): Router {
       const result = await netureService.approveSupplier(id, approvedBy);
       if (!result.success) {
         const status = result.error === 'SUPPLIER_NOT_FOUND' ? 404 : 400;
-        return res.status(status).json({ success: false, error: { code: result.error, message: result.error } });
+        // WO-O4O-NETURE-SUPPLIER-ACTIVATION-GATE-ALIGN-AND-ERROR-SURFACE-V1: 구조화된 누락 필드 전달
+        return res.status(status).json({ success: false, error: { code: result.error, message: result.error, missingFields: result.missingFields ?? [] } });
       }
 
       netureActionLogService.logSuccess('neture', approvedBy, 'neture.admin.supplier_approve', {

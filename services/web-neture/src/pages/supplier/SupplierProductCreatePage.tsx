@@ -23,6 +23,7 @@ import {
 import { mediaApi } from '../../lib/api/media';
 import { ProductForm, type ProductFormData } from '../../components/product';
 import MediaPickerModal from '../../components/common/MediaPickerModal';
+import SupplierActivationGate from '../../components/supplier/SupplierActivationGate';
 import { loadAndClearDraft } from '../../lib/product-import/storage';
 import { GuideBlock } from '@o4o/shared-space-ui';
 // WO-O4O-NETURE-SUPPLIER-PRODUCT-REGISTRATION-WIZARD-V2
@@ -492,6 +493,7 @@ export default function SupplierProductCreatePage() {
   };
 
   return (
+    <SupplierActivationGate mode="gate">
     <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
@@ -1004,5 +1006,6 @@ export default function SupplierProductCreatePage() {
         defaultFolder="description"
       />
     </div>
+    </SupplierActivationGate>
   );
 }

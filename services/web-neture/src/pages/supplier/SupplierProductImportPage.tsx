@@ -13,6 +13,7 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { RichTextEditor } from '@o4o/content-editor';
+import SupplierActivationGate from '../../components/supplier/SupplierActivationGate';
 import { parseFirstmallAdmin, looksLikeFirstmallAdmin } from '../../lib/product-import/firstmall-admin-parser';
 import { saveDraft } from '../../lib/product-import/storage';
 import type { ParsedProductData, ImportDraft, DetailImageCandidate, FirstmallAdminProduct } from '../../lib/product-import/types';
@@ -539,6 +540,7 @@ export default function SupplierProductImportPage() {
   /* ---------------------------------------------------------------- */
 
   return (
+    <SupplierActivationGate mode="gate">
     <div className="mx-auto max-w-4xl px-4 py-6">
       {/* Header */}
       <div className="mb-6">
@@ -1109,6 +1111,7 @@ export default function SupplierProductImportPage() {
         defaultFolder="description"
       />
     </div>
+    </SupplierActivationGate>
   );
 }
 

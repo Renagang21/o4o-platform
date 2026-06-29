@@ -111,7 +111,7 @@ export class NetureSupplierService {
   async approveSupplier(
     supplierId: string,
     approvedByUserId: string,
-  ): Promise<{ success: boolean; data?: Record<string, unknown>; error?: string }> {
+  ): Promise<{ success: boolean; data?: Record<string, unknown>; error?: string; missingFields?: string[] }> {
     try {
       const supplier = await this.supplierRepo.findOne({ where: { id: supplierId } });
       if (!supplier) return { success: false, error: 'SUPPLIER_NOT_FOUND' };
@@ -119,11 +119,14 @@ export class NetureSupplierService {
 
       // WO-O4O-NETURE-SUPPLIER-ACTIVATION-DOCUMENT-GATE-RELAXATION-V1:
       // ACTIVE 전환은 기본 사업자/담당자 정보만 요구. 사업자등록증·정산정보는 판매전/정산전 게이트로 이동.
+      // WO-O4O-NETURE-SUPPLIER-ACTIVATION-GATE-ALIGN-AND-ERROR-SURFACE-V1:
+      // 누락 필드를 구조화(missingFields)해서 반환 — 문자열 파싱 의존 제거.
       const missingActivationFields = this.getMissingActivationFields(supplier);
       if (missingActivationFields.length > 0) {
         return {
           success: false,
-          error: `ONBOARDING_INCOMPLETE:${missingActivationFields.join(',')}`,
+          error: 'ONBOARDING_INCOMPLETE',
+          missingFields: missingActivationFields,
         };
       }
 
@@ -335,6 +338,12 @@ export class NetureSupplierService {
     mailOrderSalesStatus: string | null;
     mailOrderSalesRegistrationNumber: string | null;
     mailOrderSalesDocumentId: string | null;
+    // WO-O4O-NETURE-SUPPLIER-ACTIVATION-GATE-ALIGN-AND-ERROR-SURFACE-V1:
+    // 활성화 가능 여부의 단일 권위 — 프론트는 이 값을 그대로 사용(필드 중복 계산 금지).
+    managerName: string | null;
+    managerPhone: string | null;
+    activationReady: boolean;
+    missingActivationFields: string[];
     createdAt: Date;
     updatedAt: Date;
   }>> {
@@ -365,6 +374,7 @@ export class NetureSupplierService {
       return suppliers.map((s) => {
         const org = s.organizationId ? orgMap.get(s.organizationId) : null;
         const userInfo = s.userId ? userStatusMap.get(s.userId) : null;
+        const missing = this.getMissingActivationFields(s);
         return {
           id: s.id, name: org?.name ?? '', slug: s.slug, status: s.status,
           contactEmail: s.contactEmail || '',
@@ -384,6 +394,11 @@ export class NetureSupplierService {
           mailOrderSalesStatus: s.mailOrderSalesStatus || null,
           mailOrderSalesRegistrationNumber: s.mailOrderSalesRegistrationNumber || null,
           mailOrderSalesDocumentId: s.mailOrderSalesDocumentId || null,
+          // WO-O4O-NETURE-SUPPLIER-ACTIVATION-GATE-ALIGN-AND-ERROR-SURFACE-V1
+          managerName: s.managerName || null,
+          managerPhone: s.managerPhone || null,
+          activationReady: missing.length === 0,
+          missingActivationFields: missing,
           createdAt: s.createdAt,
           updatedAt: s.updatedAt,
         };
@@ -571,11 +586,17 @@ export class NetureSupplierService {
       // WO-O4O-POSTAL-CODE-ADDRESS-V1
       const addrDetail = org?.address_detail;
 
+      // WO-O4O-NETURE-SUPPLIER-ACTIVATION-GATE-ALIGN-AND-ERROR-SURFACE-V1:
+      // 공급자 본인 화면(대시보드 배너)이 활성화 가능 여부를 단일 권위로 받도록 포함.
+      const missingActivationFields = this.getMissingActivationFields(supplier);
+
       return {
         id: supplier.id,
         name: org?.name ?? '',
         slug: supplier.slug,
         status: supplier.status,
+        activationReady: missingActivationFields.length === 0,
+        missingActivationFields,
         // Business profile — org-primary with supplier + prefill fallback
         businessNumber: org?.business_number ?? prefilled.businessNumber ?? null,
         representativeName: supplier.representativeName || null,
