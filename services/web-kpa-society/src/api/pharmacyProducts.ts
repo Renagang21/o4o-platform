@@ -86,6 +86,8 @@ export interface CatalogProduct {
   supplierCategory: string | null;
   /** 내 매장 취급 여부 (WO-O4O-STORE-PRODUCT-STATUS-REMOVAL-V1) */
   isAdded: boolean;
+  /** WO-O4O-KPA-STORE-HUB-HOME-LATEST-RESOURCE-FEED-V1: 대표 이미지(additive, 없으면 null). 홈 피드 카드용. */
+  imageUrl?: string | null;
 }
 
 export interface CatalogResponse {

@@ -155,6 +155,13 @@ export function createPharmacyProductsController(
          o.name AS "supplierName",
          s.logo_url AS "supplierLogoUrl",
          s.category AS "supplierCategory",
+         -- WO-O4O-KPA-STORE-HUB-HOME-LATEST-RESOURCE-FEED-V1:
+         --   대표 이미지 1개 additive (카탈로그 카드/홈 피드용). 이미지 없으면 NULL — row 누락 없음.
+         --   우선순위: is_primary → type=thumbnail → sort_order ASC → created_at ASC.
+         (SELECT pi.image_url FROM product_images pi
+            WHERE pi.master_id = pm.id
+            ORDER BY pi.is_primary DESC, (pi.type = 'thumbnail') DESC, pi.sort_order ASC, pi.created_at ASC
+            LIMIT 1) AS "imageUrl",
          -- 내 매장 취급 여부 (신청 또는 진열 어느 하나라도 존재)
          (EXISTS(
            SELECT 1 FROM product_approvals pa2

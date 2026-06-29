@@ -94,6 +94,15 @@ export interface StoreHubConfig {
 
   /** AI section override — 실제 AI 결과 또는 커스텀 추천 블록 */
   renderAiSection?: () => React.ReactNode;
+
+  /**
+   * WO-O4O-KPA-STORE-HUB-HOME-LATEST-RESOURCE-FEED-V1 (KPA opt-in, additive):
+   *   제공 시 Block 2~5(자원 카드 / AI / Store CTA / Flow) 대신 이 본문을 렌더한다.
+   *   미전달 시 기존 5-block 기본 렌더 그대로 — GP/KCos 무영향.
+   */
+  renderMainSections?: () => React.ReactNode;
+  /** Hero 우측 큰 store CTA 버튼 표시 여부 (기본 true). KPA 최신피드 홈은 false 로 숨긴다. */
+  showHeroCta?: boolean;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -120,6 +129,8 @@ export function StoreHubTemplate({ config }: StoreHubTemplateProps) {
     showStoreCtaBlock = true,
     showFlowBlock = true,
     renderAiSection,
+    renderMainSections,
+    showHeroCta = true,
   } = config;
 
   return (
@@ -131,13 +142,22 @@ export function StoreHubTemplate({ config }: StoreHubTemplateProps) {
           <h1 style={st.summaryTitle}>{heroTitle}</h1>
           <p style={st.summaryDesc}>{heroDesc}</p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-          {headerAction}
-          <Link to={storeCta.href} style={st.storeCta}>
-            {storeCta.label}
-          </Link>
-        </div>
+        {(headerAction || showHeroCta) && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+            {headerAction}
+            {showHeroCta && (
+              <Link to={storeCta.href} style={st.storeCta}>
+                {storeCta.label}
+              </Link>
+            )}
+          </div>
+        )}
       </section>
+
+      {/* WO-O4O-KPA-STORE-HUB-HOME-LATEST-RESOURCE-FEED-V1:
+          renderMainSections 제공 시 Block 2~5 대신 커스텀 본문(KPA 최신 피드). 미전달 시 기존 5-block. */}
+      {renderMainSections ? renderMainSections() : (
+      <>
 
       {/* ── Block 2: Resource Discovery ────────────────────────────────────── */}
       <section style={st.section}>
@@ -209,6 +229,9 @@ export function StoreHubTemplate({ config }: StoreHubTemplateProps) {
             ))}
           </div>
         </section>
+      )}
+
+      </>
       )}
 
     </div>

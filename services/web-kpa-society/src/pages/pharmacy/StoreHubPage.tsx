@@ -3,23 +3,18 @@
  *
  * WO-O4O-STORE-HUB-TEMPLATE-FOUNDATION-V1
  * WO-O4O-SERVICE-CONFIG-INTRODUCTION-V1: kpaConfig 기반 텍스트 치환
- *
- * StoreHubTemplate + KPA config.
- * KPA 전용 문구/링크/카드/단계는 kpaStoreHubConfig에만 위치한다.
+ * WO-O4O-KPA-STORE-HUB-HOME-LATEST-RESOURCE-FEED-V1:
+ *   정적 안내 카드(자원 4카드 / AI 추천 placeholder / 내 약국 CTA 블록 / 운영 흐름 3단계) 제거.
+ *   첫 화면 = 최신 자원 피드(StoreHubLatestFeed) — 새 상품 + 최신 콘텐츠 + 최신 디지털 자료 미리보기.
+ *   StoreHubTemplate.renderMainSections 슬롯 + showHeroCta=false (KPA opt-in, GP/KCos 무영향).
  */
 
 import { StoreHubTemplate, type StoreHubConfig } from '@o4o/shared-space-ui';
 import { kpaConfig } from '@o4o/operator-ux-core';
-import { PackageSearch, MonitorPlay, Files, BadgePercent, Store, Sparkles } from 'lucide-react';
 import { GuideEditableSection } from '../../components/guide';
+import { StoreHubLatestFeed } from './StoreHubLatestFeed';
 
-const { terminology, uiText } = kpaConfig;
-
-// WO-O4O-KPA-STORE-HUB-ICON-ALIGNMENT-V1:
-// O4O-GLOBAL-ICON-SYSTEM-STANDARD-V1 — emoji 제거, lucide line icon 통일 (KPA blue tone)
-const ICON_COLOR = '#2563EB'; // KPA primary (StoreHubTemplate PRIMARY 정합)
-const CARD_ICON_SIZE = 22;
-const CTA_ICON_SIZE = 28;
+const { terminology } = kpaConfig;
 
 // WO-O4O-SERVICE-INLINE-EDIT-EXPANSION-V1: 서비스 페이지 설명 영역 인라인 편집
 const PAGE_KEY = 'store-hub';
@@ -31,92 +26,29 @@ function editable(sectionKey: string, defaultText: string) {
 }
 
 // ─── KPA Config ────────────────────────────────────────────────────────────────
+// renderMainSections 가 Block 2~5 를 대체하므로 resourceCards/operationSteps 는 비워 둔다.
+// storeCta 는 타입상 필수지만 showHeroCta=false 로 Hero 버튼은 숨긴다.
 
 const kpaStoreHubConfig: StoreHubConfig = {
   serviceKey: 'kpa-society',
 
   heroTitle: terminology.storeHubLabel,
-  heroDesc: editable('hero-description', `플랫폼이 제공하는 상품·콘텐츠·사이니지를 탐색하고, ${terminology.myStoreLabel}으로 가져가 운영에 활용합니다.`),
-  storeCta: {
-    label: `${terminology.myStoreLabel} 관리 →`,
-    href: '/store',
-  },
+  heroDesc: editable(
+    'hero-description',
+    `새로 공급된 상품과 ${terminology.myStoreLabel} 운영에 활용할 콘텐츠·디지털 자료를 확인하세요.`,
+  ),
+  storeCta: { label: `${terminology.myStoreLabel} 관리 →`, href: '/store' },
+  showHeroCta: false,
 
-  resourceSectionTitle: '자원 탐색',
-  resourceSectionDesc: editable('resource-section-description', `플랫폼 자원을 탐색하고 ${terminology.myStoreLabel}으로 가져가세요`),
-  resourceCards: [
-    {
-      icon: <PackageSearch size={CARD_ICON_SIZE} color={ICON_COLOR} />,
-      title: '상품 카탈로그',
-      desc: '공급 가능 상품을 탐색하고 취급 신청합니다',
-      href: '/store-hub/b2b',
-      actionLabel: '상품 탐색',
-    },
-    {
-      icon: <MonitorPlay size={CARD_ICON_SIZE} color={ICON_COLOR} />,
-      title: '디지털 사이니지',
-      desc: '매장 화면에 송출할 콘텐츠와 플레이리스트를 탐색해 내 약국에 추가합니다',
-      href: '/store-hub/signage',
-      actionLabel: '디지털 사이니지 탐색',
-    },
-    {
-      icon: <Files size={CARD_ICON_SIZE} color={ICON_COLOR} />,
-      title: '콘텐츠 가져오기',
-      desc: 'CMS 콘텐츠를 탐색하고 내 약국에 복사합니다',
-      href: '/store-hub/content',
-      actionLabel: '콘텐츠 탐색',
-    },
-    {
-      icon: <BadgePercent size={CARD_ICON_SIZE} color={ICON_COLOR} />,
-      title: '이벤트·특가',
-      desc: 'KPA-Society 이벤트 상품을 확인하고 신청합니다',
-      href: '/store-hub/event-offers',
-      actionLabel: '이벤트 보기',
-    },
-  ],
+  // 기존 5-block 미사용 (renderMainSections 가 대체)
+  resourceCards: [],
+  operationSteps: [],
+  showAiBlock: false,
+  showStoreCtaBlock: false,
+  showFlowBlock: false,
 
-  aiBlock: {
-    icon: <Sparkles size={28} color={ICON_COLOR} />,
-    title: 'AI 맞춤 추천',
-    badge: '준비 중',
-    desc: '매장 운영 데이터를 기반으로 지금 필요한 상품·콘텐츠·사이니지를 자동으로 추천하는 기능을 준비 중입니다.',
-    features: [
-      '취급 신청 후 오래된 상품 상태 안내',
-      '미복사 콘텐츠 중 현재 시즌 관련 항목 제안',
-      '사이니지 업데이트 주기 기반 교체 제안',
-    ],
-  },
-
-  storeCtaBlock: {
-    icon: <Store size={CTA_ICON_SIZE} color={ICON_COLOR} />,
-    title: `${terminology.myStoreLabel}으로 이동`,
-    desc: `탐색한 상품·콘텐츠·사이니지의 실제 설정과 운영은 ${terminology.myStoreLabel}에서 합니다`,
-    buttonLabel: `${terminology.myStoreLabel} 관리 →`,
-    href: '/store',
-  },
-
-  flowSectionTitle: '운영 흐름',
-  flowSectionDesc: uiText.storeHubFlow,
-  operationSteps: [
-    {
-      step: '1',
-      title: '탐색',
-      desc: '상품·사이니지·콘텐츠를 이곳에서 탐색합니다',
-      where: terminology.storeHubLabel,
-    },
-    {
-      step: '2',
-      title: '복사 · 신청',
-      desc: '"내 약국에 추가" 또는 "취급 신청"으로 가져옵니다',
-      where: terminology.storeHubLabel,
-    },
-    {
-      step: '3',
-      title: '실행',
-      desc: `${terminology.myStoreLabel}에서 게시, 스케줄, 판매 설정을 완료합니다`,
-      where: `${terminology.myStoreLabel} (/store)`,
-    },
-  ],
+  // 최신 자원 피드 (KPA opt-in 본문)
+  renderMainSections: () => <StoreHubLatestFeed />,
 };
 
 // ─── Page Component ────────────────────────────────────────────────────────────
