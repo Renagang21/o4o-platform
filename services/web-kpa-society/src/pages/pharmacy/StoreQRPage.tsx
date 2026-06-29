@@ -14,7 +14,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { QrCode, Trash2, ExternalLink, Copy, Check, BarChart3, X, Smartphone, Monitor, Tablet, Download, Printer, ArrowRight, FolderOpen, LayoutTemplate, Info, Sparkles } from 'lucide-react';
+import { QrCode, Trash2, ExternalLink, Copy, Check, BarChart3, X, Smartphone, Monitor, Tablet, Download, Printer, ArrowRight, FolderOpen, LayoutTemplate, Info, Sparkles, Settings, Pencil } from 'lucide-react';
 // WO-O4O-KPA-MY-STORE-COPIES-STANDARD-TABLE-V1: list rendering 표준 테이블 (자체 selection + bulk print 보존)
 import { DataTable, type Column } from '@o4o/ui';
 import { getStoreExecutionAsset } from '../../api/storeExecutionAssets';
@@ -38,6 +38,8 @@ import {
   // WO-O4O-KPA-STORE-QR-PRINT-EXPORT-UI-WIRING-V1: export foundation 연결
   downloadQrExport,
   QR_EXPORT_PRESETS,
+  // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: QR 설정 모달 저장
+  updateStoreQrCode,
 } from '../../api/storeQr';
 import type { StoreQrCode, QrAnalyticsData, QrExportFormat, QrExportPreset } from '../../api/storeQr';
 import { getListings } from '../../api/pharmacyProducts';
@@ -174,6 +176,9 @@ export function StoreQRPage() {
 
   const [items, setItems] = useState<StoreQrCode[]>([]);
   const [loading, setLoading] = useState(true);
+  // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: 목록 필터 + QR 설정 모달
+  const [listFilter, setListFilter] = useState<'all' | 'content' | 'ai'>('all');
+  const [settingsQr, setSettingsQr] = useState<StoreQrCode | null>(null);
   const [showSelector, setShowSelector] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
@@ -548,6 +553,20 @@ export function StoreQRPage() {
   };
 
   const qrBaseUrl = `${window.location.origin}/qr/`;
+
+  // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: 목록 필터(전체 | 콘텐츠 연결 | AI 설명)
+  const filteredItems = items.filter((q) => {
+    if (listFilter === 'ai') return !!q.aiDescriptionMode;
+    if (listFilter === 'content') return q.landingType === 'page' && !q.aiDescriptionMode;
+    return true;
+  });
+  const aiCount = items.filter((q) => !!q.aiDescriptionMode).length;
+  const contentCount = items.filter((q) => q.landingType === 'page' && !q.aiDescriptionMode).length;
+  const FILTER_TABS: { key: 'all' | 'content' | 'ai'; label: string; count: number }[] = [
+    { key: 'all', label: '전체', count: items.length },
+    { key: 'content', label: '콘텐츠 연결', count: contentCount },
+    { key: 'ai', label: 'AI 설명', count: aiCount },
+  ];
 
   return (
     <div style={styles.container}>
@@ -967,6 +986,19 @@ export function StoreQRPage() {
           </div>
         ) : (
           <>
+            {/* WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: 목록 필터 탭 */}
+            <div style={styles.filterTabs}>
+              {FILTER_TABS.map((t) => (
+                <button
+                  key={t.key}
+                  type="button"
+                  onClick={() => setListFilter(t.key)}
+                  style={listFilter === t.key ? styles.filterTabActive : styles.filterTab}
+                >
+                  {t.label} <span style={styles.filterTabCount}>{t.count}</span>
+                </button>
+              ))}
+            </div>
             <DataTable<StoreQrCode>
               rowSelection={{
                 selectedRowKeys: Array.from(selectedIds),
@@ -1039,6 +1071,34 @@ export function StoreQRPage() {
                   align: 'right',
                   render: (_v, item) => (
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px' }}>
+                      {/* WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: AI 설명 QR 관리 진입 (내용 수정 / AI 다시 만들기 / QR 설정) */}
+                      {item.aiDescriptionMode && item.landingTargetId && (
+                        <>
+                          <Link
+                            to={`/store/content/direct/${item.landingTargetId}?edit=1`}
+                            onClick={(e) => e.stopPropagation()}
+                            style={styles.iconBtn}
+                            title="내용 수정 (본문 편집)"
+                          >
+                            <Pencil size={16} />
+                          </Link>
+                          <Link
+                            to={`/store/marketing/qr/ai-description?content=${item.landingTargetId}&qr=${encodeURIComponent(item.slug)}`}
+                            onClick={(e) => e.stopPropagation()}
+                            style={styles.iconBtn}
+                            title="AI 입력·다시 만들기"
+                          >
+                            <Sparkles size={16} />
+                          </Link>
+                        </>
+                      )}
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setSettingsQr(item); }}
+                        style={styles.iconBtn}
+                        title="QR 설정 (제목·URL·상담 CTA)"
+                      >
+                        <Settings size={16} />
+                      </button>
                       {/* WO-O4O-KPA-STORE-QR-EXPORT-MENU-CLIP-FIX-V1:
                           QR_EXPORT_PRESETS 메뉴(A4 PDF/4분할/PNG/SVG)를 portal 로 띄워 DataTable
                           overflow 클리핑 회피. handleExport 동작은 그대로 유지. */}
@@ -1081,10 +1141,10 @@ export function StoreQRPage() {
                   ),
                 },
               ] as Column<StoreQrCode>[]}
-              dataSource={items}
+              dataSource={filteredItems}
               rowKey="id"
               loading={loading}
-              emptyText="등록된 QR 코드가 없습니다"
+              emptyText={listFilter === 'all' ? '등록된 QR 코드가 없습니다' : '해당 조건의 QR이 없습니다'}
             />
 
             {/* Analytics Panel — DataTable 행 아래 펼침이 직접 지원 안 되므로 표 하단에 표시 */}
@@ -1140,6 +1200,15 @@ export function StoreQRPage() {
       </div>
 
       {/* WO-O4O-KPA-QR-AI-STEP-REMOVE-V1: QR 문구 AI 생성 모달 진입점 제거 (AiContentModal 컴포넌트는 유지) */}
+
+      {/* WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: QR 설정 모달 (제목·slug·상담 CTA) */}
+      {settingsQr && (
+        <QrSettingsModal
+          qr={settingsQr}
+          onClose={() => setSettingsQr(null)}
+          onSaved={() => { setSettingsQr(null); fetchItems(); }}
+        />
+      )}
 
       {/* Asset Selector Modal
           WO-O4O-KPA-STORE-QR-TARGET-SCOPE-AUDIT-V1 (A안): usageType="qr" 제거 —
@@ -1204,6 +1273,71 @@ export function StoreQRPage() {
   );
 }
 
+// WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: QR 설정 모달 — 제목/slug/상담 CTA 를 기존 PUT API 로 수정.
+function QrSettingsModal({ qr, onClose, onSaved }: { qr: StoreQrCode; onClose: () => void; onSaved: () => void }) {
+  const [title, setTitle] = useState(qr.title || '');
+  const [slug, setSlug] = useState(qr.slug || '');
+  const [ctaEnabled, setCtaEnabled] = useState(!!qr.consultationCtaEnabled);
+  const [ctaLabel, setCtaLabel] = useState(qr.consultationCtaLabel || '');
+  const [saving, setSaving] = useState(false);
+
+  const save = async () => {
+    if (!title.trim()) { toast.error('제목을 입력해 주세요'); return; }
+    if (!slug.trim()) { toast.error('공개 URL(slug)을 입력해 주세요'); return; }
+    setSaving(true);
+    try {
+      const res = await updateStoreQrCode(qr.id, {
+        title: title.trim(),
+        slug: slug.trim(),
+        consultationCtaEnabled: ctaEnabled,
+        consultationCtaLabel: ctaEnabled ? (ctaLabel.trim() || '상담 요청하기') : '',
+      });
+      if (res?.success) { toast.success('QR 설정이 저장되었습니다'); onSaved(); }
+      else toast.error('저장에 실패했습니다');
+    } catch (e: any) {
+      toast.error(e?.message || 'slug 가 이미 사용 중이거나 저장에 실패했습니다');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const ov: React.CSSProperties = { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 16 };
+  const dlg: React.CSSProperties = { background: '#fff', borderRadius: 12, padding: 20, width: '100%', maxWidth: 420, boxShadow: '0 8px 32px rgba(0,0,0,0.18)' };
+  const lab: React.CSSProperties = { display: 'block', fontSize: 12.5, fontWeight: 500, color: colors.neutral600, margin: '12px 0 4px' };
+  const inp: React.CSSProperties = { width: '100%', boxSizing: 'border-box', padding: '8px 10px', fontSize: 13, border: `1px solid ${colors.neutral300}`, borderRadius: 6 };
+
+  return (
+    <div style={ov} onClick={onClose}>
+      <div style={dlg} onClick={(e) => e.stopPropagation()}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: colors.neutral800 }}>QR 설정</h3>
+          <button type="button" onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: colors.neutral400 }}><X size={18} /></button>
+        </div>
+        <label style={lab}>제목</label>
+        <input style={inp} value={title} onChange={(e) => setTitle(e.target.value)} />
+        <label style={lab}>공개 URL (slug)</label>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <span style={{ fontSize: 13, color: colors.neutral400 }}>/qr/</span>
+          <input style={{ ...inp, margin: 0 }} value={slug} onChange={(e) => setSlug(e.target.value)} />
+        </div>
+        <label style={{ ...lab, display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+          <input type="checkbox" checked={ctaEnabled} onChange={(e) => setCtaEnabled(e.target.checked)} />
+          상담 요청 버튼 표시
+        </label>
+        {ctaEnabled && (
+          <input style={inp} value={ctaLabel} onChange={(e) => setCtaLabel(e.target.value)} placeholder="상담 요청하기" />
+        )}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 18 }}>
+          <button type="button" onClick={onClose} style={{ padding: '8px 14px', background: '#fff', border: `1px solid ${colors.neutral300}`, borderRadius: 6, fontSize: 13, cursor: 'pointer', color: colors.neutral700 }}>취소</button>
+          <button type="button" onClick={save} disabled={saving} style={{ padding: '8px 16px', background: colors.primary, color: '#fff', border: 'none', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+            {saving ? '저장 중…' : '저장'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── 스타일 ──
 
 const styles: Record<string, React.CSSProperties> = {
@@ -1217,6 +1351,19 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: 'flex-start',
     marginBottom: '24px',
   },
+  // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: 목록 필터 탭
+  filterTabs: { display: 'flex', gap: '6px', marginBottom: '12px', flexWrap: 'wrap' },
+  filterTab: {
+    display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px',
+    background: '#fff', border: `1px solid ${colors.neutral200}`, borderRadius: '999px',
+    fontSize: '13px', color: colors.neutral600, cursor: 'pointer',
+  },
+  filterTabActive: {
+    display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px',
+    background: colors.primary, border: `1px solid ${colors.primary}`, borderRadius: '999px',
+    fontSize: '13px', fontWeight: 600, color: '#fff', cursor: 'pointer',
+  },
+  filterTabCount: { fontSize: '11px', opacity: 0.8 },
   title: {
     fontSize: '20px',
     fontWeight: 700,

@@ -117,6 +117,9 @@ export function createStoreLibraryFeedController(
         const ALLOWED_SOURCES = new Set(['operator', 'community', 'mine']);
         const rawSource = typeof req.query.source === 'string' ? req.query.source.trim() : '';
         const sourceFilter = ALLOWED_SOURCES.has(rawSource) ? rawSource : null; // 'all'/미지정 → null
+        // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: AI 설명 분류 SSOT = content_json.aiDescription.mode.
+        //   source='ai-description' 는 source_group 이 아니라 ai_mode IS NOT NULL outer 필터(바인드 불필요).
+        const aiOnly = rawSource === 'ai-description';
         const rawTag = typeof req.query.tag === 'string' ? req.query.tag.trim().slice(0, 30) : '';
         const tagFilter = rawTag.length > 0 ? rawTag : null;
         const tagJson = tagFilter ? JSON.stringify([tagFilter]) : null;
@@ -144,9 +147,9 @@ export function createStoreLibraryFeedController(
         const directSearchClauseCount = useSearch ? mkSnapDirSearch('d', 2) : '';
         const execSearchClauseCount = useSearch ? mkExecSearch(2) : '';
 
-        // outer 필터 (source_group / tags @> 정확 매칭). 'all' 은 source 절 없음.
+        // outer 필터 (source_group / tags @> 정확 매칭 / ai_mode). 'all' 은 source 절 없음.
         const mkOuterFilter = (sourceIdx: number, tagIdx: number) =>
-          `${sourceIdx ? `AND source_group = $${sourceIdx}` : ''} ${tagIdx ? `AND tags @> $${tagIdx}::jsonb` : ''}`;
+          `${sourceIdx ? `AND source_group = $${sourceIdx}` : ''} ${tagIdx ? `AND tags @> $${tagIdx}::jsonb` : ''} ${aiOnly ? `AND ai_mode IS NOT NULL` : ''}`;
         const dataOuterFilter = mkOuterFilter(dSourceIdx, dTagIdx);
         const countOuterFilter = mkOuterFilter(cSourceIdx, cTagIdx);
 
@@ -167,7 +170,8 @@ export function createStoreLibraryFeedController(
                 COALESCE(c.lifecycle_status, 'active') AS lifecycle_status,
                 -- WO-O4O-KPA-CONTENT-LIST-TAG-FIELD-AND-DISPLAY-V1: snapshot 태그는 기존 content_json 에 존재(resolver 복사).
                 --   신규 tags 컬럼이 비어있으면 content_json->'tags' 로 fallback.
-                COALESCE(NULLIF(s.tags, '[]'::jsonb), s.content_json->'tags', '[]'::jsonb) AS tags
+                COALESCE(NULLIF(s.tags, '[]'::jsonb), s.content_json->'tags', '[]'::jsonb) AS tags,
+                NULL::varchar AS ai_mode
               FROM o4o_asset_snapshots s
               LEFT JOIN kpa_store_asset_controls c
                 ON c.snapshot_id = s.id AND c.organization_id = s.organization_id
@@ -190,7 +194,8 @@ export function createStoreLibraryFeedController(
                 d.content_json AS content_json,
                 d.created_at AS sort_at,
                 NULL::varchar AS lifecycle_status,
-                COALESCE(d.tags, '[]'::jsonb) AS tags
+                COALESCE(d.tags, '[]'::jsonb) AS tags,
+                d.content_json->'aiDescription'->>'mode' AS ai_mode
               FROM kpa_store_contents d
               WHERE d.organization_id = $1
                 AND d.source_type = 'direct'
@@ -207,7 +212,8 @@ export function createStoreLibraryFeedController(
                 jsonb_build_object('html', e.html_content) AS content_json,
                 e.created_at AS sort_at,
                 NULL::varchar AS lifecycle_status,
-                COALESCE(e.tags, '[]'::jsonb) AS tags
+                COALESCE(e.tags, '[]'::jsonb) AS tags,
+                NULL::varchar AS ai_mode
               FROM store_execution_assets e
               WHERE e.organization_id = $1
                 AND e.is_active = true
@@ -225,7 +231,8 @@ export function createStoreLibraryFeedController(
             (
               SELECT
                 (CASE WHEN s.asset_type = 'cms' THEN 'operator' ELSE 'community' END) AS source_group,
-                COALESCE(NULLIF(s.tags, '[]'::jsonb), s.content_json->'tags', '[]'::jsonb) AS tags
+                COALESCE(NULLIF(s.tags, '[]'::jsonb), s.content_json->'tags', '[]'::jsonb) AS tags,
+                NULL::varchar AS ai_mode
               FROM o4o_asset_snapshots s
               LEFT JOIN kpa_store_asset_controls c
                 ON c.snapshot_id = s.id AND c.organization_id = s.organization_id
@@ -236,7 +243,8 @@ export function createStoreLibraryFeedController(
             )
             UNION ALL
             (
-              SELECT 'mine'::text AS source_group, COALESCE(d.tags, '[]'::jsonb) AS tags
+              SELECT 'mine'::text AS source_group, COALESCE(d.tags, '[]'::jsonb) AS tags,
+                d.content_json->'aiDescription'->>'mode' AS ai_mode
               FROM kpa_store_contents d
               WHERE d.organization_id = $1
                 AND d.source_type = 'direct'
@@ -244,7 +252,8 @@ export function createStoreLibraryFeedController(
             )
             UNION ALL
             (
-              SELECT 'mine'::text AS source_group, COALESCE(e.tags, '[]'::jsonb) AS tags
+              SELECT 'mine'::text AS source_group, COALESCE(e.tags, '[]'::jsonb) AS tags,
+                NULL::varchar AS ai_mode
               FROM store_execution_assets e
               WHERE e.organization_id = $1
                 AND e.is_active = true
@@ -281,6 +290,7 @@ export function createStoreLibraryFeedController(
           sort_at: string;
           lifecycle_status: string | null;
           tags: unknown;
+          ai_mode: string | null;
         }>).map((row) => ({
           id: row.id,
           origin: row.origin,
@@ -294,6 +304,8 @@ export function createStoreLibraryFeedController(
           tags: Array.isArray(row.tags)
             ? row.tags.filter((t): t is string => typeof t === 'string')
             : [],
+          // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: AI 설명 분류 SSOT(content_json.aiDescription.mode)
+          aiDescriptionMode: row.ai_mode ?? null,
         }));
 
         res.json({

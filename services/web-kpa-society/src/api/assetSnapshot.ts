@@ -407,6 +407,8 @@ export interface LibraryContentItem {
   lifecycleStatus: string | null;
   // WO-O4O-KPA-CONTENT-LIST-TAG-FIELD-AND-DISPLAY-V1: 태그 chip 표시용 (항상 string[])
   tags?: string[];
+  // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: AI 설명 분류 SSOT(content_json.aiDescription.mode) — 'single'|'corner'|null
+  aiDescriptionMode?: string | null;
 }
 
 export interface PaginatedLibraryContents {
@@ -428,7 +430,8 @@ export const storeLibraryApi = {
     search?: string;
     type?: 'document';
     // WO-O4O-KPA-CONTENT-LIST-TAG-SEARCH-FILTER-V1: 출처 탭 + 태그 정확 필터
-    source?: 'operator' | 'community' | 'mine';
+    // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: 'ai-description' = content_json.aiDescription.mode 필터
+    source?: 'operator' | 'community' | 'mine' | 'ai-description';
     tag?: string;
   }) => {
     const query: Record<string, string> = {};

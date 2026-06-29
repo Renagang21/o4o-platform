@@ -378,6 +378,8 @@ router.post('/qr-description', authenticate, async (req, res: Response) => {
           : undefined,
       model: rawResponse.model,
       generatedBy: 'gemini-qr-description',
+      // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: 신규 생성·재생성 시각 기록
+      generatedAt: new Date().toISOString(),
     };
 
     logger.info('AI qr-description generated', { requestId, userId, mode, model: rawResponse.model });

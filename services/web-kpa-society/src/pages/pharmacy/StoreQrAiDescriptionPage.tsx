@@ -15,13 +15,14 @@
  * 코너 모드(다품목)는 같은 페이지에 후속 단계로 추가. 본 단계는 단일 상품 E2E.
  */
 
-import { useCallback, useMemo, useState, type CSSProperties } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useState, type CSSProperties } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Sparkles, ArrowLeft, QrCode, ExternalLink, Trash2, Plus } from 'lucide-react';
-import { RichTextEditor, type EditorContent } from '@o4o/content-editor';
+import { RichTextEditor, ContentRenderer, type EditorContent } from '@o4o/content-editor';
 import { toast } from '@o4o/error-handling';
 import { apiClient } from '../../api/client';
 import { createStoreQrCode } from '../../api/storeQr';
+import { directContentApi } from '../../api/assetSnapshot';
 import { getAccessToken } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
 
@@ -33,9 +34,10 @@ interface AiDescriptionMeta {
   productName?: string;
   cornerName?: string;
   emphasis?: string;
-  items?: unknown[];
+  items?: any[];
   model?: string;
   generatedBy?: string;
+  generatedAt?: string;
 }
 
 function slugify(title: string): string {
@@ -66,6 +68,11 @@ function makeKey(): string {
 
 export default function StoreQrAiDescriptionPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  // 편집 모드: ?content=<direct id> (기존 AI 설명 콘텐츠 수정·재생성). ?qr=<slug> 는 성공 화면 공개링크용.
+  const editContentId = searchParams.get('content');
+  const editQrSlug = searchParams.get('qr');
+  const isEdit = !!editContentId;
 
   // 모드
   const [mode, setMode] = useState<'single' | 'corner'>('single');
@@ -94,6 +101,50 @@ export default function StoreQrAiDescriptionPage() {
   const [saving, setSaving] = useState(false);
   const [savedContentId, setSavedContentId] = useState<string | null>(null);
   const [createdSlug, setCreatedSlug] = useState<string | null>(null);
+  const [updated, setUpdated] = useState(false);
+  const [loadingExisting, setLoadingExisting] = useState(isEdit);
+
+  // 편집 모드: 기존 direct 콘텐츠(content_json.html + aiDescription)를 불러와 폼/편집기 prefill.
+  useEffect(() => {
+    if (!editContentId) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await directContentApi.get(editContentId);
+        if (cancelled) return;
+        const cj = (res?.data?.contentJson ?? {}) as Record<string, any>;
+        const ai = (cj.aiDescription ?? {}) as AiDescriptionMeta;
+        const loadedMode: 'single' | 'corner' = ai.mode === 'corner' ? 'corner' : 'single';
+        setMode(loadedMode);
+        setProductName(typeof ai.productName === 'string' ? ai.productName : '');
+        setCornerName(typeof ai.cornerName === 'string' ? ai.cornerName : '');
+        setEmphasis(typeof ai.emphasis === 'string' ? ai.emphasis : '');
+        if (loadedMode === 'corner' && Array.isArray(ai.items) && ai.items.length > 0) {
+          setCornerItems(
+            ai.items.map((it: any) => ({
+              key: typeof it?.key === 'string' ? it.key : makeKey(),
+              name: typeof it?.name === 'string' ? it.name : '',
+              emphasis: typeof it?.emphasis === 'string' ? it.emphasis : '',
+            })),
+          );
+        }
+        const html = typeof cj.html === 'string' ? cj.html : '';
+        setEditorSeed(html);
+        setEditorContent({ html });
+        setTitle(res?.data?.title || ai.productName || ai.cornerName || 'AI 설명');
+        setAiMeta(ai && Object.keys(ai).length > 0 ? ai : null);
+        setSavedContentId(editContentId);
+        setGenerated(true); // 기존 콘텐츠가 있으므로 확인·수정 영역 노출
+      } catch {
+        toast.error('기존 콘텐츠를 불러오지 못했습니다');
+      } finally {
+        if (!cancelled) setLoadingExisting(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [editContentId]);
 
   const validCornerItems = cornerItems.filter((it) => it.name.trim().length > 0);
   const canGenerate =
@@ -248,10 +299,44 @@ export default function StoreQrAiDescriptionPage() {
     }
   }, [savedContentId, createQr]);
 
+  // 편집 모드: 기존 콘텐츠 PUT 업데이트(같은 id) → QR(landingTargetId) 불변. 신규 QR 생성 없음.
+  //   기존 content_json 키 보존을 위해 GET 후 merge → PUT. 새 초안 확인 전에는 호출되지 않음(저장 클릭 시에만).
+  const handleUpdate = useCallback(async () => {
+    if (!editContentId) return;
+    const html = editorContent.html.trim();
+    if (!html || html === '<p></p>') {
+      toast.error('본문이 비어 있습니다');
+      return;
+    }
+    setSaving(true);
+    try {
+      const cur = await directContentApi.get(editContentId);
+      const curJson = (cur?.data?.contentJson ?? {}) as Record<string, unknown>;
+      await directContentApi.update(editContentId, {
+        title: title.trim() || productName.trim() || cornerName.trim() || 'AI 설명',
+        contentJson: {
+          ...curJson,
+          html,
+          generatedBy: 'gemini-qr-description',
+          aiDescription: aiMeta ?? (curJson.aiDescription as unknown),
+        },
+        tags: ['AI 설명'],
+      });
+      setUpdated(true);
+      toast.success('AI 설명이 수정되었습니다');
+    } catch (err: any) {
+      if (err?.status === 403) toast.error('매장 경영자 권한이 필요합니다');
+      else toast.error(err?.message || '수정에 실패했습니다');
+    } finally {
+      setSaving(false);
+    }
+  }, [editContentId, editorContent, title, productName, cornerName, aiMeta]);
+
   // 공개 QR 페이지는 웹 호스트(현재 origin)의 /qr/:slug 라우트(QrLandingPage)에서 렌더된다 — API 호스트 아님.
+  const publicSlug = createdSlug || editQrSlug;
   const publicUrl = useMemo(
-    () => (createdSlug ? `${window.location.origin}/qr/${createdSlug}` : ''),
-    [createdSlug],
+    () => (publicSlug ? `${window.location.origin}/qr/${publicSlug}` : ''),
+    [publicSlug],
   );
 
   return (
@@ -262,25 +347,33 @@ export default function StoreQrAiDescriptionPage() {
         </button>
         <h1 style={styles.title}>
           <Sparkles size={20} style={{ color: colors.primary }} />
-          AI 설명 QR 만들기
+          {isEdit ? 'AI 설명 수정' : 'AI 설명 QR 만들기'}
         </h1>
         <p style={styles.subtitle}>
-          상품명과 강조점을 입력하면 AI가 QR 안내 콘텐츠 초안을 만듭니다. 확인·수정 후 콘텐츠로 저장하면 QR이 함께 생성됩니다.
+          {isEdit
+            ? '강조점·상품 항목을 바꿔 다시 만들거나 본문을 직접 수정한 뒤 저장하면 연결된 QR에 그대로 반영됩니다(같은 QR 주소 유지).'
+            : '상품명과 강조점을 입력하면 AI가 QR 안내 콘텐츠 초안을 만듭니다. 확인·수정 후 콘텐츠로 저장하면 QR이 함께 생성됩니다.'}
         </p>
       </div>
 
-      {/* 성공 화면 */}
-      {createdSlug ? (
+      {loadingExisting ? (
+        <div style={styles.card}>불러오는 중…</div>
+      ) : createdSlug || updated ? (
+        /* 성공 화면 */
         <div style={styles.successCard}>
           <QrCode size={28} style={{ color: colors.primary }} />
-          <h2 style={styles.successTitle}>QR이 만들어졌습니다</h2>
-          <p style={styles.successDesc}>
-            공개 주소: <code style={styles.code}>/qr/{createdSlug}</code>
-          </p>
+          <h2 style={styles.successTitle}>{updated ? 'AI 설명이 수정되었습니다' : 'QR이 만들어졌습니다'}</h2>
+          {publicSlug && (
+            <p style={styles.successDesc}>
+              공개 주소: <code style={styles.code}>/qr/{publicSlug}</code>
+            </p>
+          )}
           <div style={styles.successActions}>
-            <a href={publicUrl} target="_blank" rel="noreferrer" style={styles.primaryBtn}>
-              <ExternalLink size={14} /> 공개 페이지 열기
-            </a>
+            {publicUrl && (
+              <a href={publicUrl} target="_blank" rel="noreferrer" style={styles.primaryBtn}>
+                <ExternalLink size={14} /> 공개 페이지 열기
+              </a>
+            )}
             <button type="button" onClick={() => navigate('/store/marketing/qr')} style={styles.secondaryBtn}>
               QR 목록으로
             </button>
@@ -296,7 +389,7 @@ export default function StoreQrAiDescriptionPage() {
               <button
                 type="button"
                 onClick={() => setMode('single')}
-                disabled={generated}
+                disabled={generated || isEdit}
                 style={mode === 'single' ? styles.modeBtnActive : styles.modeBtn}
               >
                 단일 상품
@@ -304,7 +397,7 @@ export default function StoreQrAiDescriptionPage() {
               <button
                 type="button"
                 onClick={() => setMode('corner')}
-                disabled={generated}
+                disabled={generated || isEdit}
                 style={mode === 'corner' ? styles.modeBtnActive : styles.modeBtn}
               >
                 코너·다품목
@@ -320,7 +413,6 @@ export default function StoreQrAiDescriptionPage() {
                   onChange={(e) => setProductName(e.target.value)}
                   placeholder="예: 종합비타민 골드"
                   style={styles.input}
-                  disabled={generated}
                 />
                 <label style={styles.label}>강조점 (선택)</label>
                 <input
@@ -329,7 +421,6 @@ export default function StoreQrAiDescriptionPage() {
                   onChange={(e) => setEmphasis(e.target.value)}
                   placeholder="예: 하루 한 알, 가족 모두"
                   style={styles.input}
-                  disabled={generated}
                 />
               </>
             ) : (
@@ -341,7 +432,6 @@ export default function StoreQrAiDescriptionPage() {
                   onChange={(e) => setCornerName(e.target.value)}
                   placeholder="예: 환절기 면역 코너"
                   style={styles.input}
-                  disabled={generated}
                 />
                 <label style={styles.label}>코너 강조점 (선택)</label>
                 <input
@@ -350,7 +440,6 @@ export default function StoreQrAiDescriptionPage() {
                   onChange={(e) => setEmphasis(e.target.value)}
                   placeholder="예: 환절기 건강관리"
                   style={styles.input}
-                  disabled={generated}
                 />
                 <label style={styles.label}>상품 항목 *</label>
                 {cornerItems.map((it, idx) => (
@@ -362,7 +451,6 @@ export default function StoreQrAiDescriptionPage() {
                       onChange={(e) => updateCornerItem(it.key, 'name', e.target.value)}
                       placeholder="상품명"
                       style={{ ...styles.input, margin: 0, flex: 1 }}
-                      disabled={generated}
                     />
                     <input
                       type="text"
@@ -370,19 +458,19 @@ export default function StoreQrAiDescriptionPage() {
                       onChange={(e) => updateCornerItem(it.key, 'emphasis', e.target.value)}
                       placeholder="강조점(선택)"
                       style={{ ...styles.input, margin: 0, flex: 1 }}
-                      disabled={generated}
                     />
-                    {!generated && cornerItems.length > 1 && (
+                    {cornerItems.length > 1 && (
                       <button type="button" onClick={() => removeCornerItem(it.key)} style={styles.itemRemoveBtn} aria-label="삭제">
                         <Trash2 size={14} />
                       </button>
                     )}
                   </div>
                 ))}
-                {!generated && (
-                  <button type="button" onClick={addCornerItem} style={styles.addItemBtn}>
-                    <Plus size={14} /> 상품 추가
-                  </button>
+                <button type="button" onClick={addCornerItem} style={styles.addItemBtn}>
+                  <Plus size={14} /> 상품 추가
+                </button>
+                {generated && (
+                  <p style={styles.previewNote}>※ 항목·강조점을 바꾼 뒤 아래 ‘AI 다시 만들기’를 누르면 새 초안이 만들어집니다(저장 전까지 기존 콘텐츠는 변경되지 않습니다).</p>
                 )}
               </>
             )}
@@ -406,7 +494,9 @@ export default function StoreQrAiDescriptionPage() {
             <div style={styles.card}>
               <h3 style={styles.cardTitle}>2. 확인 후 저장</h3>
               <p style={styles.helper}>
-                AI 초안입니다. 내용을 확인하고 필요하면 수정한 뒤 저장하세요. 저장하면 내 자료함 콘텐츠로 보관되고 QR이 생성됩니다.
+                {isEdit
+                  ? '내용을 확인하고 필요하면 수정한 뒤 저장하세요. 같은 콘텐츠를 갱신하므로 연결된 QR(주소·landingTarget)은 그대로 유지됩니다.'
+                  : 'AI 초안입니다. 내용을 확인하고 필요하면 수정한 뒤 저장하세요. 저장하면 내 자료함 콘텐츠로 보관되고 QR이 생성됩니다.'}
               </p>
               <label style={styles.label}>제목</label>
               <input
@@ -420,36 +510,45 @@ export default function StoreQrAiDescriptionPage() {
                 <RichTextEditor value={editorSeed} onChange={setEditorContent} preset="full" />
               </div>
 
-              {/* 코너 모드: 생성된 상품별 설명 미리보기(공개 QR 에서 아코디언으로 노출). 항목 본문 수정은 저장 후 '구성 편집'에서. */}
+              {/* 코너 모드: 생성된 상품별 설명 미리보기(공개 QR 아코디언과 동일 정제 — ContentRenderer). */}
               {mode === 'corner' && aiMeta?.items && aiMeta.items.length > 0 && (
                 <div style={styles.previewBox}>
                   <p style={styles.previewTitle}>상품별 설명 ({aiMeta.items.length}개)</p>
                   {(aiMeta.items as any[]).map((it) => (
                     <div key={it.key} style={styles.previewItem}>
                       <strong style={styles.previewItemName}>{it.name}</strong>
-                      <div
-                        style={styles.previewItemBody}
-                        dangerouslySetInnerHTML={{ __html: it.descriptionHtml || '' }}
-                      />
+                      <div style={styles.previewItemBody}>
+                        <ContentRenderer html={it.descriptionHtml || ''} variant="guide" />
+                      </div>
                     </div>
                   ))}
-                  <p style={styles.previewNote}>※ 입력한 상품만 설명됩니다. 항목 본문 수정은 저장 후 QR 목록의 ‘구성 편집’에서 가능합니다.</p>
+                  <p style={styles.previewNote}>※ 입력한 상품만 설명됩니다. 항목 본문을 바꾸려면 위 상품 항목을 수정하고 ‘AI 다시 만들기’를 누르세요.</p>
                 </div>
               )}
 
-              <label style={styles.label}>QR 공개 URL (slug)</label>
-              <div style={styles.slugRow}>
-                <span style={styles.slugPrefix}>/qr/</span>
-                <input
-                  type="text"
-                  value={slug}
-                  onChange={(e) => setSlug(e.target.value)}
-                  placeholder="slug"
-                  style={{ ...styles.input, margin: 0 }}
-                />
-              </div>
+              {/* slug 는 신규 생성에서만(편집은 기존 QR 유지) */}
+              {!isEdit && (
+                <>
+                  <label style={styles.label}>QR 공개 URL (slug)</label>
+                  <div style={styles.slugRow}>
+                    <span style={styles.slugPrefix}>/qr/</span>
+                    <input
+                      type="text"
+                      value={slug}
+                      onChange={(e) => setSlug(e.target.value)}
+                      placeholder="slug"
+                      style={{ ...styles.input, margin: 0 }}
+                    />
+                  </div>
+                </>
+              )}
 
-              {savedContentId && !createdSlug ? (
+              {isEdit ? (
+                <button type="button" onClick={handleUpdate} disabled={saving} style={styles.saveBtn}>
+                  <QrCode size={14} />
+                  {saving ? '저장 중…' : '수정 저장 (QR 유지)'}
+                </button>
+              ) : savedContentId && !createdSlug ? (
                 <div style={styles.retryBox}>
                   <p style={styles.retryText}>콘텐츠는 저장되었지만 QR 생성에 실패했습니다. slug를 확인하고 다시 시도해 주세요.</p>
                   <button type="button" onClick={handleRetryQr} disabled={saving} style={styles.saveBtn}>
