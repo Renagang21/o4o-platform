@@ -42,8 +42,8 @@
 |------|------|
 | web-neture `tsc --noEmit` | ✅ EXIT 0 |
 | api-server `tsc --noEmit` | ✅ EXIT 0 |
-| 배포 (API/Web Cloud Run) | (CI 진행 — 아래 §6 기록) |
-| 라이브 브라우저 smoke | (아래 §6 기록 — Chrome 프로필 잠김 시 사람 관측 필요) |
+| 배포 (API/Web Cloud Run) | ✅ 077100f20 Deploy API/Web 모두 success |
+| 라이브 브라우저 smoke | ⏳ Chrome 프로필 잠김(사용자 Chrome 점유)으로 AI 자동화 차단 → **사람 관측 필요** |
 
 ## 5. 데이터 (후속, 미수행)
 WO 요구대로 **UI/API 배포 후** 별도 수행:
