@@ -59,9 +59,18 @@ export type QrPageContent =
       summary: string | null;
       body: string | null;
       blocks: unknown[];
+      // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: 코너 모드 상품별 설명(저장본만, 추가 AI 호출 없음)
+      items?: QrPublicItem[];
       // content_hub=운영자 콘텐츠 / store_asset=매장 제작자료 / direct_content=매장 직접 작성
       source: 'content_hub' | 'store_asset' | 'direct_content';
     };
+
+export interface QrPublicItem {
+  key: string;
+  name: string;
+  descriptionHtml: string;
+  relatedKeys: string[];
+}
 
 export interface StoreQrPaginatedResponse {
   items: StoreQrCode[];

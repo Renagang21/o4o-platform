@@ -17,7 +17,7 @@
 
 import { useCallback, useMemo, useState, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, ArrowLeft, QrCode, ExternalLink } from 'lucide-react';
+import { Sparkles, ArrowLeft, QrCode, ExternalLink, Trash2, Plus } from 'lucide-react';
 import { RichTextEditor, type EditorContent } from '@o4o/content-editor';
 import { toast } from '@o4o/error-handling';
 import { apiClient } from '../../api/client';
@@ -50,12 +50,35 @@ function slugify(title: string): string {
   return stripped || `qr-${Date.now().toString(36)}`;
 }
 
+interface CornerItemInput {
+  key: string;
+  name: string;
+  emphasis: string;
+}
+
+function makeKey(): string {
+  try {
+    return crypto.randomUUID();
+  } catch {
+    return `it-${Date.now().toString(36)}-${Math.floor(Math.random() * 1e6).toString(36)}`;
+  }
+}
+
 export default function StoreQrAiDescriptionPage() {
   const navigate = useNavigate();
 
-  // 입력
+  // 모드
+  const [mode, setMode] = useState<'single' | 'corner'>('single');
+
+  // 입력 (single)
   const [productName, setProductName] = useState('');
   const [emphasis, setEmphasis] = useState('');
+
+  // 입력 (corner)
+  const [cornerName, setCornerName] = useState('');
+  const [cornerItems, setCornerItems] = useState<CornerItemInput[]>([
+    { key: makeKey(), name: '', emphasis: '' },
+  ]);
 
   // 생성 결과
   const [generating, setGenerating] = useState(false);
@@ -72,34 +95,67 @@ export default function StoreQrAiDescriptionPage() {
   const [savedContentId, setSavedContentId] = useState<string | null>(null);
   const [createdSlug, setCreatedSlug] = useState<string | null>(null);
 
-  const canGenerate = productName.trim().length > 0 && !generating;
+  const validCornerItems = cornerItems.filter((it) => it.name.trim().length > 0);
+  const canGenerate =
+    !generating &&
+    (mode === 'single'
+      ? productName.trim().length > 0
+      : cornerName.trim().length > 0 && validCornerItems.length > 0);
+
+  // 코너 항목 편집 헬퍼
+  const addCornerItem = useCallback(
+    () => setCornerItems((prev) => [...prev, { key: makeKey(), name: '', emphasis: '' }]),
+    [],
+  );
+  const removeCornerItem = useCallback(
+    (key: string) => setCornerItems((prev) => (prev.length <= 1 ? prev : prev.filter((it) => it.key !== key))),
+    [],
+  );
+  const updateCornerItem = useCallback(
+    (key: string, field: 'name' | 'emphasis', value: string) =>
+      setCornerItems((prev) => prev.map((it) => (it.key === key ? { ...it, [field]: value } : it))),
+    [],
+  );
 
   const handleGenerate = useCallback(async () => {
-    if (!productName.trim()) {
+    if (mode === 'single' && !productName.trim()) {
       toast.error('상품명을 입력해 주세요');
+      return;
+    }
+    if (mode === 'corner' && (!cornerName.trim() || validCornerItems.length === 0)) {
+      toast.error('코너명과 1개 이상의 상품 항목을 입력해 주세요');
       return;
     }
     setGenerating(true);
     try {
       const token = getAccessToken();
+      const reqBody =
+        mode === 'single'
+          ? { mode, productName: productName.trim(), emphasis: emphasis.trim() || undefined }
+          : {
+              mode,
+              cornerName: cornerName.trim(),
+              emphasis: emphasis.trim() || undefined,
+              items: validCornerItems.map((it) => ({
+                key: it.key,
+                name: it.name.trim(),
+                emphasis: it.emphasis.trim() || undefined,
+              })),
+            };
       const resp = await fetch(`${AI_ROOT_BASE}/api/ai/qr-description`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({
-          mode: 'single',
-          productName: productName.trim(),
-          emphasis: emphasis.trim() || undefined,
-        }),
+        body: JSON.stringify(reqBody),
       });
       const data = await resp.json();
       if (!resp.ok || !data?.success) {
         throw new Error(data?.error || 'AI 설명 생성에 실패했습니다');
       }
       const html: string = data.html || '';
-      const aiTitle: string = data.title || productName.trim();
+      const aiTitle: string = mode === 'single' ? data.title || productName.trim() : cornerName.trim();
       setEditorSeed(html);
       setEditorContent({ html });
       setTitle(aiTitle);
@@ -114,7 +170,7 @@ export default function StoreQrAiDescriptionPage() {
     } finally {
       setGenerating(false);
     }
-  }, [productName, emphasis]);
+  }, [mode, productName, emphasis, cornerName, validCornerItems]);
 
   // 콘텐츠 저장(없으면 생성) → 저장된 콘텐츠 ID 반환
   const ensureContentSaved = useCallback(async (): Promise<string | null> => {
@@ -233,25 +289,103 @@ export default function StoreQrAiDescriptionPage() {
         <>
           {/* 1단계: 입력 */}
           <div style={styles.card}>
-            <h3 style={styles.cardTitle}>1. 상품 정보</h3>
-            <label style={styles.label}>상품명 *</label>
-            <input
-              type="text"
-              value={productName}
-              onChange={(e) => setProductName(e.target.value)}
-              placeholder="예: 종합비타민 골드"
-              style={styles.input}
-              disabled={generated}
-            />
-            <label style={styles.label}>강조점 (선택)</label>
-            <input
-              type="text"
-              value={emphasis}
-              onChange={(e) => setEmphasis(e.target.value)}
-              placeholder="예: 하루 한 알, 가족 모두"
-              style={styles.input}
-              disabled={generated}
-            />
+            <h3 style={styles.cardTitle}>1. 무엇을 안내할까요?</h3>
+            {/* 모드 선택 — 단일 상품 / 코너·다품목 */}
+            <div style={styles.modeRow}>
+              <button
+                type="button"
+                onClick={() => setMode('single')}
+                disabled={generated}
+                style={mode === 'single' ? styles.modeBtnActive : styles.modeBtn}
+              >
+                단일 상품
+              </button>
+              <button
+                type="button"
+                onClick={() => setMode('corner')}
+                disabled={generated}
+                style={mode === 'corner' ? styles.modeBtnActive : styles.modeBtn}
+              >
+                코너·다품목
+              </button>
+            </div>
+
+            {mode === 'single' ? (
+              <>
+                <label style={styles.label}>상품명 *</label>
+                <input
+                  type="text"
+                  value={productName}
+                  onChange={(e) => setProductName(e.target.value)}
+                  placeholder="예: 종합비타민 골드"
+                  style={styles.input}
+                  disabled={generated}
+                />
+                <label style={styles.label}>강조점 (선택)</label>
+                <input
+                  type="text"
+                  value={emphasis}
+                  onChange={(e) => setEmphasis(e.target.value)}
+                  placeholder="예: 하루 한 알, 가족 모두"
+                  style={styles.input}
+                  disabled={generated}
+                />
+              </>
+            ) : (
+              <>
+                <label style={styles.label}>코너명 *</label>
+                <input
+                  type="text"
+                  value={cornerName}
+                  onChange={(e) => setCornerName(e.target.value)}
+                  placeholder="예: 환절기 면역 코너"
+                  style={styles.input}
+                  disabled={generated}
+                />
+                <label style={styles.label}>코너 강조점 (선택)</label>
+                <input
+                  type="text"
+                  value={emphasis}
+                  onChange={(e) => setEmphasis(e.target.value)}
+                  placeholder="예: 환절기 건강관리"
+                  style={styles.input}
+                  disabled={generated}
+                />
+                <label style={styles.label}>상품 항목 *</label>
+                {cornerItems.map((it, idx) => (
+                  <div key={it.key} style={styles.itemRow}>
+                    <span style={styles.itemIndex}>{idx + 1}</span>
+                    <input
+                      type="text"
+                      value={it.name}
+                      onChange={(e) => updateCornerItem(it.key, 'name', e.target.value)}
+                      placeholder="상품명"
+                      style={{ ...styles.input, margin: 0, flex: 1 }}
+                      disabled={generated}
+                    />
+                    <input
+                      type="text"
+                      value={it.emphasis}
+                      onChange={(e) => updateCornerItem(it.key, 'emphasis', e.target.value)}
+                      placeholder="강조점(선택)"
+                      style={{ ...styles.input, margin: 0, flex: 1 }}
+                      disabled={generated}
+                    />
+                    {!generated && cornerItems.length > 1 && (
+                      <button type="button" onClick={() => removeCornerItem(it.key)} style={styles.itemRemoveBtn} aria-label="삭제">
+                        <Trash2 size={14} />
+                      </button>
+                    )}
+                  </div>
+                ))}
+                {!generated && (
+                  <button type="button" onClick={addCornerItem} style={styles.addItemBtn}>
+                    <Plus size={14} /> 상품 추가
+                  </button>
+                )}
+              </>
+            )}
+
             {!generated && (
               <button type="button" onClick={handleGenerate} disabled={!canGenerate} style={styles.generateBtn}>
                 <Sparkles size={14} />
@@ -280,10 +414,28 @@ export default function StoreQrAiDescriptionPage() {
                 onChange={(e) => setTitle(e.target.value)}
                 style={styles.input}
               />
-              <label style={styles.label}>본문</label>
+              <label style={styles.label}>{mode === 'corner' ? '코너 소개 본문' : '본문'}</label>
               <div style={styles.editorWrap}>
                 <RichTextEditor value={editorSeed} onChange={setEditorContent} preset="full" />
               </div>
+
+              {/* 코너 모드: 생성된 상품별 설명 미리보기(공개 QR 에서 아코디언으로 노출). 항목 본문 수정은 저장 후 '구성 편집'에서. */}
+              {mode === 'corner' && aiMeta?.items && aiMeta.items.length > 0 && (
+                <div style={styles.previewBox}>
+                  <p style={styles.previewTitle}>상품별 설명 ({aiMeta.items.length}개)</p>
+                  {(aiMeta.items as any[]).map((it) => (
+                    <div key={it.key} style={styles.previewItem}>
+                      <strong style={styles.previewItemName}>{it.name}</strong>
+                      <div
+                        style={styles.previewItemBody}
+                        dangerouslySetInnerHTML={{ __html: it.descriptionHtml || '' }}
+                      />
+                    </div>
+                  ))}
+                  <p style={styles.previewNote}>※ 입력한 상품만 설명됩니다. 항목 본문 수정은 저장 후 QR 목록의 ‘구성 편집’에서 가능합니다.</p>
+                </div>
+              )}
+
               <label style={styles.label}>QR 공개 URL (slug)</label>
               <div style={styles.slugRow}>
                 <span style={styles.slugPrefix}>/qr/</span>
@@ -332,6 +484,33 @@ const styles: Record<string, CSSProperties> = {
     padding: 20, marginBottom: 16,
   },
   cardTitle: { fontSize: 15, fontWeight: 600, color: colors.neutral800, margin: '0 0 12px' },
+  modeRow: { display: 'flex', gap: 8, marginBottom: 8 },
+  modeBtn: {
+    flex: 1, padding: '8px 12px', background: colors.white, color: colors.neutral600,
+    border: `1px solid ${colors.neutral300}`, borderRadius: 6, fontSize: 13, cursor: 'pointer',
+  },
+  modeBtnActive: {
+    flex: 1, padding: '8px 12px', background: colors.primary, color: colors.white,
+    border: `1px solid ${colors.primary}`, borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer',
+  },
+  itemRow: { display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 },
+  itemIndex: { fontSize: 12, color: colors.neutral400, width: 16, textAlign: 'center', flexShrink: 0 },
+  itemRemoveBtn: {
+    display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: 6,
+    background: colors.white, color: colors.neutral500, border: `1px solid ${colors.neutral300}`,
+    borderRadius: 6, cursor: 'pointer', flexShrink: 0,
+  },
+  addItemBtn: {
+    display: 'inline-flex', alignItems: 'center', gap: 4, marginTop: 4, padding: '6px 10px',
+    background: colors.white, color: colors.primary, border: `1px dashed ${colors.primary}`,
+    borderRadius: 6, fontSize: 12.5, cursor: 'pointer',
+  },
+  previewBox: { marginTop: 14, padding: 14, background: colors.neutral100, borderRadius: 8 },
+  previewTitle: { fontSize: 13, fontWeight: 600, color: colors.neutral700, margin: '0 0 8px' },
+  previewItem: { padding: '8px 0', borderTop: `1px solid ${colors.neutral200}` },
+  previewItemName: { fontSize: 13, color: colors.neutral800, display: 'block', marginBottom: 4 },
+  previewItemBody: { fontSize: 12.5, color: colors.neutral600, lineHeight: 1.5 },
+  previewNote: { fontSize: 11.5, color: colors.neutral400, margin: '8px 0 0' },
   helper: { fontSize: 12.5, color: colors.neutral500, margin: '0 0 12px', lineHeight: 1.5 },
   label: { display: 'block', fontSize: 12.5, fontWeight: 500, color: colors.neutral600, margin: '12px 0 4px' },
   input: {

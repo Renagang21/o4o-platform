@@ -13,7 +13,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { QrCode, ExternalLink, ArrowRight, AlertCircle, MessageSquare, CheckCircle2 } from 'lucide-react';
 import { colors } from '../../styles/theme';
 import { getQrLandingData } from '../../api/storeQr';
-import type { QrLandingData } from '../../api/storeQr';
+import type { QrLandingData, QrPublicItem } from '../../api/storeQr';
 // WO-O4O-KPA-QR-PAGE-CONSULTATION-CTA-V1: QR page 콘텐츠 하단 상담 요청
 import { submitQrPageConsultation } from '../../api/tablet';
 // WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: 동영상 전용 공개 뷰어
@@ -155,6 +155,8 @@ export default function QrLandingPage() {
                     <p style={styles.description}>본문이 없습니다.</p>
                   )}
                 </div>
+                {/* WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: 코너 모드 상품별 설명(저장본만, AI 호출 없음) */}
+                {pc.items && pc.items.length > 0 && <QrCornerItems items={pc.items} />}
               </>
             ) : (
               <>
@@ -231,6 +233,43 @@ export default function QrLandingPage() {
           <span style={styles.footerText}>O4O Platform</span>
         </div>
       </div>
+    </div>
+  );
+}
+
+// WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1
+//   코너 모드 상품별 설명을 아코디언 카드로 노출. 저장된 descriptionHtml 만 표시(공개 스캔 시 AI 호출 0).
+function QrCornerItems({ items }: { items: QrPublicItem[] }) {
+  const [openKey, setOpenKey] = useState<string | null>(items.length === 1 ? items[0].key : null);
+  const nameByKey = new Map(items.map((it) => [it.key, it.name]));
+  return (
+    <div style={styles.cornerWrap}>
+      <h2 style={styles.cornerHeading}>상품 안내</h2>
+      {items.map((it) => {
+        const open = openKey === it.key;
+        const related = it.relatedKeys.map((k) => nameByKey.get(k)).filter(Boolean) as string[];
+        return (
+          <div key={it.key} style={styles.cornerItem}>
+            <button
+              type="button"
+              onClick={() => setOpenKey(open ? null : it.key)}
+              style={styles.cornerItemHeader}
+              aria-expanded={open}
+            >
+              <span style={styles.cornerItemName}>{it.name}</span>
+              <span style={styles.cornerItemToggle}>{open ? '−' : '+'}</span>
+            </button>
+            {open && (
+              <div style={styles.cornerItemBody}>
+                <ContentRenderer html={it.descriptionHtml} variant="guide" />
+                {related.length > 0 && (
+                  <p style={styles.cornerRelated}>함께 보기: {related.join(', ')}</p>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -436,6 +475,18 @@ const styles: Record<string, React.CSSProperties> = {
     padding: '16px',
     backgroundColor: colors.neutral100,
   },
+  // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: 코너 상품별 설명 아코디언
+  cornerWrap: { marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '8px' },
+  cornerHeading: { fontSize: '15px', fontWeight: 600, color: colors.neutral800, margin: '0 0 4px' },
+  cornerItem: { border: `1px solid ${colors.neutral200}`, borderRadius: '10px', overflow: 'hidden' },
+  cornerItemHeader: {
+    width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+    padding: '12px 14px', background: '#fff', border: 'none', cursor: 'pointer', textAlign: 'left',
+  },
+  cornerItemName: { fontSize: '14px', fontWeight: 500, color: colors.neutral800 },
+  cornerItemToggle: { fontSize: '18px', color: colors.neutral400, lineHeight: 1 },
+  cornerItemBody: { padding: '0 14px 14px', borderTop: `1px solid ${colors.neutral100}` },
+  cornerRelated: { marginTop: '10px', fontSize: '12px', color: colors.neutral500 },
   card: {
     width: '100%',
     maxWidth: '420px',
