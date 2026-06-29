@@ -13,8 +13,13 @@ import { useNavigate } from 'react-router-dom';
 import {
   Plus, Search, X, Loader2, ShoppingBag, AlertTriangle,
   Edit2, Trash2, ChevronLeft, ChevronRight, Tablet, BarChart3, FileText,
+  ImagePlus, FileDown,
 } from 'lucide-react';
 import { BaseTable, type O4OColumn } from '@o4o/ui';
+// WO-O4O-KPA-STORE-LOCAL-PRODUCT-REGISTRATION-ENHANCEMENT-V1:
+//   대표 이미지 파일 업로드(공용 미디어 라이브러리) + 내 매장 콘텐츠 본문 가져오기(복사)
+import MediaPickerModal from '../../components/common/MediaPickerModal';
+import StoreContentImportModal from '../../components/store/StoreContentImportModal';
 import {
   fetchLocalProducts,
   createLocalProduct,
@@ -490,6 +495,7 @@ function ProductFormModal({
   onClose: () => void;
 }) {
   const [name, setName] = useState(product?.name || '');
+  const [barcode, setBarcode] = useState(product?.barcode || '');
   const [category, setCategory] = useState(product?.category || '');
   const [description, setDescription] = useState(product?.description || '');
   const [summary, setSummary] = useState(product?.summary || '');
@@ -502,6 +508,34 @@ function ProductFormModal({
   const [highlightFlag, setHighlightFlag] = useState(product?.highlight_flag || false);
   const [sortOrder, setSortOrder] = useState(String(product?.sort_order ?? 0));
 
+  // WO-O4O-KPA-STORE-LOCAL-PRODUCT-REGISTRATION-ENHANCEMENT-V1:
+  //   이미지 선택 모달 / 콘텐츠 가져오기 모달 / 가져오기 충돌 시 처리 방식 선택
+  const [showMediaPicker, setShowMediaPicker] = useState(false);
+  const [showContentImport, setShowContentImport] = useState(false);
+  const [pendingImportHtml, setPendingImportHtml] = useState<string | null>(null);
+  // RichTextEditor 에 외부에서 본문을 주입할 때 재마운트로 확실히 반영
+  const [editorKey, setEditorKey] = useState(0);
+
+  const descIsEmpty = description.replace(/<[^>]*>/g, '').trim().length === 0;
+
+  // 콘텐츠 본문 가져오기 — 비어 있으면 즉시 삽입, 내용이 있으면 처리 방식 선택
+  const handleContentImport = (html: string) => {
+    setShowContentImport(false);
+    if (descIsEmpty) {
+      setDescription(html);
+      setEditorKey((k) => k + 1);
+    } else {
+      setPendingImportHtml(html);
+    }
+  };
+
+  const applyImport = (mode: 'replace' | 'append') => {
+    if (pendingImportHtml == null) return;
+    setDescription((prev) => (mode === 'replace' ? pendingImportHtml : `${prev}\n${pendingImportHtml}`));
+    setEditorKey((k) => k + 1);
+    setPendingImportHtml(null);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
@@ -511,12 +545,14 @@ function ProductFormModal({
     };
 
     if (category.trim()) data.category = category.trim();
+    // 바코드/대표 이미지는 항상 전송 — 수정 시 비우면(삭제) null 로 정규화되도록
+    data.barcode = barcode.trim();
+    data.thumbnailUrl = thumbnailUrl.trim();
     // RichTextEditor returns HTML — strip tags to detect genuinely empty content
     const descText = description.replace(/<[^>]*>/g, '').trim();
     if (descText) data.description = description;
     if (summary.trim()) data.summary = summary.trim();
     if (priceDisplay.trim()) data.priceDisplay = priceDisplay.trim();
-    if (thumbnailUrl.trim()) data.thumbnailUrl = thumbnailUrl.trim();
     const gallery = galleryImages
       .split('\n')
       .map((s) => s.trim())
@@ -535,7 +571,7 @@ function ProductFormModal({
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b">
           <h2 className="text-lg font-bold text-slate-900">
-            {product ? '상품 수정' : '상품 등록'}
+            {product ? '매장 경영활용 제품 수정' : '매장 경영활용 제품 등록'}
           </h2>
           <button onClick={onClose} className="p-1 rounded-lg hover:bg-slate-100">
             <X className="w-5 h-5" />
@@ -584,17 +620,76 @@ function ProductFormModal({
               </div>
             )
           )}
-          <Field label="상품명" required>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="상품명을 입력하세요"
-              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-              required
-            />
+          {/* 1. 제품 이미지 — 파일에서 불러오기 기본(공용 미디어 라이브러리, URL 저장 · base64 금지) */}
+          <Field label="제품 이미지">
+            {thumbnailUrl ? (
+              <div className="flex items-start gap-3">
+                <img
+                  src={thumbnailUrl}
+                  alt="대표 이미지"
+                  className="w-24 h-24 rounded-xl object-cover border border-slate-200 flex-shrink-0"
+                />
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowMediaPicker(true)}
+                      className="px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200"
+                    >
+                      이미지 교체
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setThumbnailUrl('')}
+                      className="px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100"
+                    >
+                      삭제
+                    </button>
+                  </div>
+                  <p className="text-[11px] text-slate-400 leading-relaxed">
+                    사진이 충분히 좋으면 그대로 등록하세요. AI 보정 없이 원본을 사용합니다.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setShowMediaPicker(true)}
+                className="w-full flex flex-col items-center gap-1 border-2 border-dashed border-slate-200 rounded-xl py-6 text-slate-500 hover:border-teal-300 hover:bg-teal-50/30 transition-colors"
+              >
+                <ImagePlus className="w-6 h-6 text-slate-300" />
+                <span className="text-sm font-medium">이미지 불러오기</span>
+                <span className="text-xs text-slate-400">파일에서 대표 이미지 1장 (JPEG, PNG, WebP, GIF)</span>
+              </button>
+            )}
           </Field>
 
+          {/* 2~3. 상품명(필수) · 바코드(선택) — PC 2열, 모바일 1열 */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Field label="상품명" required>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="상품명을 입력하세요"
+                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                required
+              />
+            </Field>
+
+            <Field label="바코드 (선택)">
+              <input
+                type="text"
+                inputMode="numeric"
+                value={barcode}
+                onChange={(e) => setBarcode(e.target.value)}
+                placeholder="비워둘 수 있습니다"
+                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+              />
+            </Field>
+          </div>
+
+          {/* 4. 카테고리 등 기본 정보 */}
           <Field label="카테고리">
             <input
               type="text"
@@ -605,16 +700,30 @@ function ProductFormModal({
             />
           </Field>
 
-          <Field label="설명">
+          {/* 5. 설명 표준 편집기 (+ 콘텐츠에서 가져오기 보조 기능) */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-sm font-medium text-slate-700">설명</label>
+              <button
+                type="button"
+                onClick={() => setShowContentImport(true)}
+                className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-teal-700 bg-teal-50 rounded-lg hover:bg-teal-100"
+              >
+                <FileDown className="w-3.5 h-3.5" />
+                콘텐츠에서 가져오기
+              </button>
+            </div>
             <RichTextEditor
+              key={editorKey}
               value={description}
               onChange={({ html }) => setDescription(html)}
               preset="full"
               minHeight="200px"
-              placeholder="상품 상세 설명을 입력하세요..."
+              placeholder="상품 상세 설명을 직접 작성하거나 외부에서 작성한 내용을 붙여넣으세요..."
             />
-          </Field>
+          </div>
 
+          {/* 6. 요약 · 가격 등 기존 항목 */}
           <Field label="요약">
             <input
               type="text"
@@ -631,16 +740,6 @@ function ProductFormModal({
               value={priceDisplay}
               onChange={(e) => setPriceDisplay(e.target.value)}
               placeholder="0"
-              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-            />
-          </Field>
-
-          <Field label="썸네일 URL">
-            <input
-              type="url"
-              value={thumbnailUrl}
-              onChange={(e) => setThumbnailUrl(e.target.value)}
-              placeholder="https://..."
               className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
             />
           </Field>
@@ -724,6 +823,57 @@ function ProductFormModal({
           </button>
         </div>
       </div>
+
+      {/* 대표 이미지 선택 — 공용 미디어 라이브러리 업로드/라이브러리 (URL 반환, base64 미사용) */}
+      <MediaPickerModal
+        open={showMediaPicker}
+        onClose={() => setShowMediaPicker(false)}
+        onSelect={(asset) => setThumbnailUrl(asset.url)}
+        title="제품 대표 이미지"
+        defaultFolder="product-thumbnail"
+      />
+
+      {/* 콘텐츠에서 가져오기 — 내 매장 콘텐츠 본문 복사 */}
+      <StoreContentImportModal
+        open={showContentImport}
+        onClose={() => setShowContentImport(false)}
+        onImport={handleContentImport}
+      />
+
+      {/* 가져오기 충돌 — 기존 설명이 있을 때 처리 방식 선택 */}
+      {pendingImportHtml != null && (
+        <div className="fixed inset-0 bg-black/50 z-[1200] flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-sm p-5 shadow-2xl">
+            <h4 className="text-sm font-bold text-slate-900 mb-1">기존 설명이 있습니다</h4>
+            <p className="text-xs text-slate-500 mb-4 leading-relaxed">
+              가져온 콘텐츠를 어떻게 적용할까요?
+            </p>
+            <div className="flex flex-col gap-2">
+              <button
+                type="button"
+                onClick={() => applyImport('replace')}
+                className="px-4 py-2 text-sm font-medium text-white bg-teal-600 rounded-lg hover:bg-teal-700"
+              >
+                기존 내용 교체
+              </button>
+              <button
+                type="button"
+                onClick={() => applyImport('append')}
+                className="px-4 py-2 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200"
+              >
+                아래에 추가
+              </button>
+              <button
+                type="button"
+                onClick={() => setPendingImportHtml(null)}
+                className="px-4 py-2 text-sm text-slate-500 hover:text-slate-700"
+              >
+                취소
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

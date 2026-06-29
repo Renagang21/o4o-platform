@@ -42,6 +42,12 @@ export class StoreLocalProduct {
   @Column({ type: 'varchar', length: 100, nullable: true })
   category?: string | null;
 
+  // WO-O4O-KPA-STORE-LOCAL-PRODUCT-REGISTRATION-ENHANCEMENT-V1:
+  //   바코드는 선택 입력. varchar(숫자형 금지 — 앞자리 0 보존), 빈 값은 null 로 정규화.
+  //   스캔/OCR/외부조회/중복제한 없음 — 단순 식별 메모 필드.
+  @Column({ type: 'varchar', length: 64, nullable: true })
+  barcode?: string | null;
+
   @Column({ name: 'price_display', type: 'numeric', precision: 12, scale: 2, nullable: true })
   priceDisplay?: string | null;
 

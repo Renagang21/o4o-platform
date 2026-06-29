@@ -23,6 +23,8 @@ export interface LocalProduct {
   description: string | null;
   summary: string | null;
   category: string | null;
+  // WO-O4O-KPA-STORE-LOCAL-PRODUCT-REGISTRATION-ENHANCEMENT-V1: 선택 입력 바코드(빈 값=null)
+  barcode: string | null;
   price_display: string | null;
   thumbnail_url: string | null;
   images: string[];
@@ -40,6 +42,7 @@ export interface LocalProductInput {
   description?: string;
   summary?: string;
   category?: string;
+  barcode?: string;
   priceDisplay?: string;
   thumbnailUrl?: string;
   images?: string[];

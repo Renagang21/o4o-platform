@@ -69,6 +69,17 @@ const PRICE_DISPLAY_ERROR = {
   code: 'VALIDATION_ERROR' as const,
 };
 
+/**
+ * WO-O4O-KPA-STORE-LOCAL-PRODUCT-REGISTRATION-ENHANCEMENT-V1
+ * 바코드는 선택 입력. 빈 문자열/공백은 null 로 정규화(숫자형 캐스팅 없음 → 앞자리 0 보존).
+ * 64자 초과는 잘라내지 않고 그대로 저장 시도(컬럼 한도 내). 중복 검사/외부 조회 없음.
+ */
+function normalizeBarcode(raw: unknown): string | null {
+  if (raw == null) return null;
+  const s = String(raw).trim();
+  return s === '' ? null : s;
+}
+
 // ─────────────────────────────────────────────────────
 // Controller
 // ─────────────────────────────────────────────────────
@@ -141,7 +152,7 @@ export function createStoreLocalProductRoutes(
       const [items, countResult] = await Promise.all([
         dataSource.query(
           `SELECT id, name, description, summary, images, thumbnail_url, gallery_images,
-                  category, price_display, badge_type, highlight_flag,
+                  category, barcode, price_display, badge_type, highlight_flag,
                   is_active, sort_order, created_at, updated_at
            FROM store_local_products
            ${whereClause}
@@ -200,7 +211,7 @@ export function createStoreLocalProductRoutes(
       }
 
       const {
-        name, description, images, category, priceDisplay, sortOrder,
+        name, description, images, category, barcode, priceDisplay, sortOrder,
         summary, detailHtml, usageInfo, cautionInfo,
         thumbnailUrl, galleryImages, badgeType, highlightFlag,
       } = req.body;
@@ -237,6 +248,7 @@ export function createStoreLocalProductRoutes(
         description: description || null,
         images: Array.isArray(images) ? images : [],
         category: category || null,
+        barcode: normalizeBarcode(barcode),
         priceDisplay: priceResult.value != null ? String(priceResult.value) : null,
         sortOrder: typeof sortOrder === 'number' ? sortOrder : 0,
         isActive: true,
@@ -303,7 +315,7 @@ export function createStoreLocalProductRoutes(
       }
 
       const {
-        name, description, images, category, priceDisplay, sortOrder, isActive,
+        name, description, images, category, barcode, priceDisplay, sortOrder, isActive,
         summary, detailHtml, usageInfo, cautionInfo,
         thumbnailUrl, galleryImages, badgeType, highlightFlag,
       } = req.body;
@@ -331,6 +343,8 @@ export function createStoreLocalProductRoutes(
       if (description !== undefined) existing.description = description;
       if (images !== undefined) existing.images = Array.isArray(images) ? images : existing.images;
       if (category !== undefined) existing.category = category;
+      // WO-O4O-KPA-STORE-LOCAL-PRODUCT-REGISTRATION-ENHANCEMENT-V1: 빈 값 → null 정규화
+      if (barcode !== undefined) existing.barcode = normalizeBarcode(barcode);
       if (sortOrder !== undefined) existing.sortOrder = Number(sortOrder);
       if (isActive !== undefined) existing.isActive = Boolean(isActive);
       if (summary !== undefined) existing.summary = summary || null;
