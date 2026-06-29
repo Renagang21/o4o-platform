@@ -984,6 +984,12 @@ export function StoreQRPage() {
                       <div style={{ minWidth: 0 }}>
                         <p style={{ fontSize: '14px', fontWeight: 600, color: colors.neutral800, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {item.title}
+                          {/* WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: AI 설명 QR 표식 */}
+                          {item.aiDescriptionMode && (
+                            <span style={{ marginLeft: 6, display: 'inline-flex', padding: '1px 7px', borderRadius: '999px', fontSize: '10px', fontWeight: 600, backgroundColor: '#FEF3C7', color: '#B45309', verticalAlign: 'middle' }}>
+                              AI 설명{item.aiDescriptionMode === 'corner' ? '·코너' : ''}
+                            </span>
+                          )}
                         </p>
                         {item.description && (
                           <p style={{ fontSize: '12px', color: colors.neutral500, margin: '2px 0 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>

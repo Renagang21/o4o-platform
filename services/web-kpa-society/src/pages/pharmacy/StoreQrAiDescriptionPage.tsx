@@ -248,8 +248,9 @@ export default function StoreQrAiDescriptionPage() {
     }
   }, [savedContentId, createQr]);
 
+  // 공개 QR 페이지는 웹 호스트(현재 origin)의 /qr/:slug 라우트(QrLandingPage)에서 렌더된다 — API 호스트 아님.
   const publicUrl = useMemo(
-    () => (createdSlug ? `${AI_ROOT_BASE.replace(/\/$/, '')}/qr/${createdSlug}` : ''),
+    () => (createdSlug ? `${window.location.origin}/qr/${createdSlug}` : ''),
     [createdSlug],
   );
 

@@ -46,12 +46,15 @@ type DocSourceType = 'cms' | 'content' | 'direct' | 'execution';
 
 // WO-O4O-KPA-CONTENT-LIST-TAG-SEARCH-FILTER-V1: 출처 탭
 //   all=전체 / operator=운영자 제공(snapshot cms) / community=커뮤니티 가져옴(snapshot content) / mine=내가 만든(direct+execution-asset)
-type SourceFilter = 'all' | 'operator' | 'community' | 'mine';
+// WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: ai-description = 'AI 설명' 태그 필터(저장 시 tags=['AI 설명'])
+const AI_DESCRIPTION_TAG = 'AI 설명';
+type SourceFilter = 'all' | 'operator' | 'community' | 'mine' | 'ai-description';
 const SOURCE_TABS: { key: SourceFilter; label: string }[] = [
   { key: 'all', label: '전체' },
   { key: 'operator', label: '운영자 제공' },
   { key: 'community', label: '커뮤니티 가져옴' },
   { key: 'mine', label: '내가 만든 콘텐츠' },
+  { key: 'ai-description', label: 'AI 설명' },
 ];
 
 interface DocumentRow {
@@ -243,8 +246,9 @@ function DocumentsSection({
           page,
           limit: PAGE_LIMIT,
           search: searchQuery || undefined,
-          source: source !== 'all' ? source : undefined,
-          tag: activeTag || undefined,
+          // 'ai-description' 탭은 source 가 아니라 'AI 설명' 태그 필터로 매핑(피드 tag 필터 재사용).
+          source: source !== 'all' && source !== 'ai-description' ? source : undefined,
+          tag: source === 'ai-description' ? AI_DESCRIPTION_TAG : activeTag || undefined,
         })
         .catch(() => null);
       if (cancelled || myReq !== reqIdRef.current) return;
@@ -372,6 +376,10 @@ function DocumentsSection({
             {/* WO-O4O-STORE-LIBRARY-CONTENTS-DIRECT-CONTENT-REENTRY-UX-V1: direct 콘텐츠 visual indicator */}
             {row.origin === 'direct' && (
               <span style={{ ...styles.badge, background: '#DCFCE7', color: '#16A34A', flexShrink: 0 }}>내 콘텐츠</span>
+            )}
+            {/* WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: AI 설명 콘텐츠 표식 */}
+            {row.tags.includes(AI_DESCRIPTION_TAG) && (
+              <span style={{ ...styles.badge, background: '#FEF3C7', color: '#B45309', flexShrink: 0 }}>AI 설명</span>
             )}
             {/* WO-O4O-KPA-STORE-LIBRARY-CONTENT-CREATED-BUT-LIST-MISSING-V1: 제작 자료(store_execution_assets) 표식 */}
             {row.origin === 'execution-asset' && (

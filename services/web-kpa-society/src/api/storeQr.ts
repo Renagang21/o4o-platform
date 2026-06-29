@@ -27,6 +27,8 @@ export interface StoreQrCode {
   createdAt: string;
   updatedAt: string;
   scanCount?: number;
+  // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: 연결된 direct 콘텐츠가 AI 설명이면 'single'|'corner'
+  aiDescriptionMode?: string | null;
 }
 
 export interface QrLandingData {
