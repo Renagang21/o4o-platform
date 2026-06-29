@@ -24,8 +24,9 @@
 import { JSDOM } from 'jsdom';
 import dns from 'node:dns';
 import net from 'node:net';
+import type { DataSource } from 'typeorm';
 import logger from '../../../utils/logger.js';
-import { ImageStorageService } from './image-storage.service.js';
+import { MediaLibraryService } from '../../media/services/media-library.service.js';
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -384,16 +385,17 @@ function extractCandidates(
 /*  V2: 이미지 O4O 저장소 복사 (가져오기=복사)                            */
 /* ------------------------------------------------------------------ */
 
-const imageStorageService = new ImageStorageService();
-
 /**
- * 원본 이미지 URL → 다운로드(SSRF-safe, same-origin) → GCS 업로드 → O4O https URL 반환.
- * 실패 시 null (호출부에서 원본 URL 유지). pageOrigin 으로 same-origin 강제.
+ * 원본 이미지 URL → 다운로드(SSRF-safe, same-origin) → 공용 미디어 라이브러리(GCS https) 업로드
+ * → O4O https URL 반환. 실패 시 null (호출부에서 원본 URL 유지). pageOrigin 으로 same-origin 강제.
+ *
+ * 저장은 editor 이미지 업로드와 동일한 MediaLibraryService(o4o-media-library 버킷, 공개)를 사용한다.
  */
 async function copyImageToStorage(
   imageUrl: string,
   pageOrigin: string,
-  storageKey: string,
+  mediaService: MediaLibraryService,
+  userId: string,
 ): Promise<string | null> {
   try {
     // same-origin + private IP 차단 재검증 (페이지와 동일 사이트 이미지만 허용)
@@ -417,7 +419,8 @@ async function copyImageToStorage(
     }
     if (!response.ok) return null;
 
-    const mime = (response.headers.get('content-type') || '').split(';')[0].trim();
+    let mime = (response.headers.get('content-type') || '').split(';')[0].trim().toLowerCase();
+    if (mime === 'image/jpg') mime = 'image/jpeg';
     if (!ALLOWED_IMAGE_MIME.test(mime)) return null;
 
     const declaredLen = Number(response.headers.get('content-length') ?? '');
@@ -426,26 +429,31 @@ async function copyImageToStorage(
     const buffer = Buffer.from(await response.arrayBuffer());
     if (buffer.length === 0 || buffer.length > MAX_IMAGE_BYTES) return null;
 
-    const name = safe.pathname.split('/').pop() || 'detail-image';
-    const { url } = await imageStorageService.uploadImage(storageKey, buffer, mime, name, 'detail');
-    return url;
+    const originalname = decodeURIComponent(safe.pathname.split('/').pop() || 'detail-image');
+    const asset = await mediaService.upload(
+      { buffer, originalname, mimetype: mime, size: buffer.length },
+      userId,
+      'neture',
+      'description',
+    );
+    return asset.url;
   } catch (e) {
     logger.warn('[DetailFetch] image copy failed:', e);
     return null;
   }
 }
 
-/** 추출 후보를 순차로 O4O 저장소에 복사하고 url 을 교체한다. 반환: 복사 성공 개수. */
+/** 추출 후보를 순차로 O4O 미디어 라이브러리에 복사하고 url 을 교체한다. 반환: 복사 성공 개수. */
 async function copyCandidatesToStorage(
   candidates: FetchedDetailImageCandidate[],
   pageOrigin: string,
-  supplierId: string,
+  mediaService: MediaLibraryService,
+  userId: string,
 ): Promise<number> {
-  const storageKey = `import-staging/${supplierId}`;
   let copied = 0;
   for (const cand of candidates) {
     if (copied >= IMAGE_COPY_LIMIT) break;
-    const o4oUrl = await copyImageToStorage(cand.originalUrl, pageOrigin, storageKey);
+    const o4oUrl = await copyImageToStorage(cand.originalUrl, pageOrigin, mediaService, userId);
     if (o4oUrl) {
       cand.url = o4oUrl;
       cand.copiedToStorage = true;
@@ -464,13 +472,13 @@ async function copyCandidatesToStorage(
  * 추출 이미지는 O4O 저장소(GCS https)로 복사해 미리보기·삽입을 보장한다(가져오기=복사).
  * @param url        상세설명 원본 절대 URL (view_contents 등)
  * @param opts.sourceUrl  상품 페이지 URL — 제공 시 same-origin 으로 제한
- * @param opts.supplierId 복사 저장 키 네임스페이스. 제공 시 O4O 저장소로 복사.
+ * @param opts.dataSource + opts.userId  제공 시 추출 이미지를 O4O 미디어 라이브러리로 복사.
  */
 export async function fetchDetailContents(
   url: string,
-  opts: { sourceUrl?: string; supplierId?: string } = {},
+  opts: { sourceUrl?: string; dataSource?: DataSource; userId?: string } = {},
 ): Promise<FetchDetailContentsResult> {
-  const { sourceUrl, supplierId } = opts;
+  const { sourceUrl, dataSource, userId } = opts;
   const safe = await assertSafeFetchUrl(url, sourceUrl);
   const { html, finalUrl } = await fetchHtmlWithLimits(safe.href);
 
@@ -484,11 +492,12 @@ export async function fetchDetailContents(
 
   const { candidates, fromContainer } = extractCandidates(doc, finalUrl);
 
-  // 가져오기=복사: 추출 이미지를 O4O 저장소로 복사 (원본 사이트 의존 제거 + http 혼합콘텐츠 미리보기 문제 해결)
+  // 가져오기=복사: 추출 이미지를 O4O 미디어 라이브러리로 복사 (원본 사이트 의존 제거 + http 혼합콘텐츠 미리보기 문제 해결)
   let copiedCount = 0;
-  if (supplierId && candidates.length > 0) {
+  if (dataSource && userId && candidates.length > 0) {
     const pageOrigin = new URL(finalUrl).origin;
-    copiedCount = await copyCandidatesToStorage(candidates, pageOrigin, supplierId);
+    const mediaService = new MediaLibraryService(dataSource);
+    copiedCount = await copyCandidatesToStorage(candidates, pageOrigin, mediaService, userId);
   }
 
   return { fetchedUrl: finalUrl, fromContainer, copiedCount, candidates };

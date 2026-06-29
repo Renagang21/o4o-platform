@@ -57,7 +57,8 @@ export function createSupplierImportController(dataSource: DataSource): Router {
 
         const result = await fetchDetailContents(url, {
           sourceUrl: sourceUrl || undefined,
-          supplierId: req.supplierId, // requireLinkedSupplier 가 설정 — O4O 저장소 복사 네임스페이스
+          dataSource, // O4O 미디어 라이브러리 복사용
+          userId: req.user?.id, // 업로더 기록
         });
         return res.json({ success: true, data: result });
       } catch (error) {
