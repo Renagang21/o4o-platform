@@ -25,16 +25,19 @@ import { JSDOM } from 'jsdom';
 import dns from 'node:dns';
 import net from 'node:net';
 import logger from '../../../utils/logger.js';
+import { ImageStorageService } from './image-storage.service.js';
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
 export interface FetchedDetailImageCandidate {
-  /** 절대 URL */
+  /** 미리보기·삽입에 사용할 URL — copy 성공 시 O4O 저장소 https URL, 실패 시 원본 URL */
   url: string;
-  /** 추출에 사용한 원본 속성값 (resolve 이전) */
+  /** 원본 상품 사이트의 이미지 절대 URL (resolve 후) */
   originalUrl: string;
+  /** O4O 저장소(GCS)로 복사되었는지 — false 면 url 은 원본(미리보기 실패 가능) */
+  copiedToStorage: boolean;
   /** img alt (없으면 null) */
   alt: string | null;
   /** width 속성(없으면 null) */
@@ -46,12 +49,22 @@ export interface FetchedDetailImageCandidate {
 }
 
 export interface FetchDetailContentsResult {
-  /** 최종 조회한 절대 URL */
+  /** 최종 조회한 절대 URL (redirect 추적 후) */
   fetchedUrl: string;
   /** 상세설명 컨테이너에서 추출했는지 (false = 문서 전체 fallback) */
   fromContainer: boolean;
+  /** O4O 저장소로 복사된 이미지 수 */
+  copiedCount: number;
   candidates: FetchedDetailImageCandidate[];
 }
+
+/**
+ * 로그인/회원 전용 게이트로 redirect 되는 URL 패턴.
+ * 일부 쇼핑몰(예: 3lifezone)은 비회원이 view_contents 조회 시 member_only/login 으로 보낸다.
+ * 이 경우 게이트 페이지의 chrome 이미지를 상세 후보로 오인하지 않도록 명시적으로 거부한다.
+ * (로그인·쿠키 우회는 하지 않는다 — 정책)
+ */
+const LOGIN_GATE_RE = /(member_only|members?_only|\/login|need_?login|needlogin|\/intro\/|auth\/login|signin|sign_in)/i;
 
 export class DetailFetchError extends Error {
   constructor(
@@ -71,6 +84,12 @@ export class DetailFetchError extends Error {
 const FETCH_TIMEOUT_MS = 8_000;
 const MAX_RESPONSE_BYTES = 4 * 1024 * 1024; // 4MB
 const CANDIDATE_LIMIT = 60;
+
+// V2 (가져오기=복사): 추출 이미지를 O4O 저장소(GCS https)로 복사 — 원본 사이트 차단/변경/http 혼합콘텐츠 대응
+const IMAGE_COPY_LIMIT = 40; // 한 번에 복사할 이미지 상한
+const IMAGE_FETCH_TIMEOUT_MS = 8_000;
+const MAX_IMAGE_BYTES = 8 * 1024 * 1024; // 8MB/이미지
+const ALLOWED_IMAGE_MIME = /^image\/(jpeg|jpg|png|webp|gif)$/i;
 
 /* ------------------------------------------------------------------ */
 /*  SSRF Guard                                                         */
@@ -172,7 +191,7 @@ async function assertSafeFetchUrl(rawUrl: string, sourceUrl?: string): Promise<U
 /*  Fetch (timeout + size limit)                                       */
 /* ------------------------------------------------------------------ */
 
-async function fetchHtmlWithLimits(url: string): Promise<string> {
+async function fetchHtmlWithLimits(url: string): Promise<{ html: string; finalUrl: string }> {
   let response: Response;
   try {
     response = await fetch(url, {
@@ -196,6 +215,17 @@ async function fetchHtmlWithLimits(url: string): Promise<string> {
 
   if (!response.ok) {
     throw new DetailFetchError('UPSTREAM_ERROR', `상세설명 원본 응답 오류 (${response.status}).`, 502);
+  }
+
+  // 로그인/회원 전용 게이트로 redirect 된 경우 — 게이트 페이지 chrome 이미지 추출 방지.
+  // (redirect 추적 후 최종 URL 이 로그인/회원 페이지면 거부. 로그인·쿠키 우회 안 함)
+  const finalUrl = response.url || url;
+  if (response.redirected && LOGIN_GATE_RE.test(finalUrl)) {
+    throw new DetailFetchError(
+      'LOGIN_REQUIRED',
+      '이 상품 사이트는 비회원에게 상세설명을 제공하지 않습니다(로그인 전용). 로그인된 브라우저에서 상품 페이지를 직접 복사해 붙여넣어 주세요.',
+      422,
+    );
   }
 
   const contentType = response.headers.get('content-type') ?? '';
@@ -227,7 +257,10 @@ async function fetchHtmlWithLimits(url: string): Promise<string> {
       chunks.push(value);
     }
   }
-  return Buffer.concat(chunks.map((c) => Buffer.from(c))).toString('utf-8');
+  return {
+    html: Buffer.concat(chunks.map((c) => Buffer.from(c))).toString('utf-8'),
+    finalUrl,
+  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -266,6 +299,8 @@ function isIgnorableImage(src: string): boolean {
     '/sns', 'sns_', 'facebook', 'twitter', 'instagram', 'kakao', 'youtube',
     'btn_', '_btn', 'button', 'thumb', 'thumbnail', '/common/', 'favicon',
     'badge', 'arrow', 'bullet',
+    // Firstmall 등 쇼핑몰 테마 chrome 은 /data/skin/ 아래에 위치 — 상세 이미지는 /data/goods|editor 등
+    '/skin/', '/design/', '/design_resp/',
   ].some((kw) => lower.includes(kw));
 }
 
@@ -333,7 +368,8 @@ function extractCandidates(
     const alt = img.getAttribute('alt');
     candidates.push({
       url: resolved,
-      originalUrl: original,
+      originalUrl: resolved,
+      copiedToStorage: false,
       alt: alt && alt.trim() ? alt.trim() : null,
       width,
       height,
@@ -345,30 +381,115 @@ function extractCandidates(
 }
 
 /* ------------------------------------------------------------------ */
+/*  V2: 이미지 O4O 저장소 복사 (가져오기=복사)                            */
+/* ------------------------------------------------------------------ */
+
+const imageStorageService = new ImageStorageService();
+
+/**
+ * 원본 이미지 URL → 다운로드(SSRF-safe, same-origin) → GCS 업로드 → O4O https URL 반환.
+ * 실패 시 null (호출부에서 원본 URL 유지). pageOrigin 으로 same-origin 강제.
+ */
+async function copyImageToStorage(
+  imageUrl: string,
+  pageOrigin: string,
+  storageKey: string,
+): Promise<string | null> {
+  try {
+    // same-origin + private IP 차단 재검증 (페이지와 동일 사이트 이미지만 허용)
+    const safe = await assertSafeFetchUrl(imageUrl, pageOrigin);
+
+    let response: Response;
+    try {
+      response = await fetch(safe.href, {
+        method: 'GET',
+        redirect: 'follow',
+        signal: AbortSignal.timeout(IMAGE_FETCH_TIMEOUT_MS),
+        headers: {
+          'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36',
+          Accept: 'image/*',
+          Referer: pageOrigin,
+        },
+      });
+    } catch {
+      return null;
+    }
+    if (!response.ok) return null;
+
+    const mime = (response.headers.get('content-type') || '').split(';')[0].trim();
+    if (!ALLOWED_IMAGE_MIME.test(mime)) return null;
+
+    const declaredLen = Number(response.headers.get('content-length') ?? '');
+    if (Number.isFinite(declaredLen) && declaredLen > MAX_IMAGE_BYTES) return null;
+
+    const buffer = Buffer.from(await response.arrayBuffer());
+    if (buffer.length === 0 || buffer.length > MAX_IMAGE_BYTES) return null;
+
+    const name = safe.pathname.split('/').pop() || 'detail-image';
+    const { url } = await imageStorageService.uploadImage(storageKey, buffer, mime, name, 'detail');
+    return url;
+  } catch (e) {
+    logger.warn('[DetailFetch] image copy failed:', e);
+    return null;
+  }
+}
+
+/** 추출 후보를 순차로 O4O 저장소에 복사하고 url 을 교체한다. 반환: 복사 성공 개수. */
+async function copyCandidatesToStorage(
+  candidates: FetchedDetailImageCandidate[],
+  pageOrigin: string,
+  supplierId: string,
+): Promise<number> {
+  const storageKey = `import-staging/${supplierId}`;
+  let copied = 0;
+  for (const cand of candidates) {
+    if (copied >= IMAGE_COPY_LIMIT) break;
+    const o4oUrl = await copyImageToStorage(cand.originalUrl, pageOrigin, storageKey);
+    if (o4oUrl) {
+      cand.url = o4oUrl;
+      cand.copiedToStorage = true;
+      copied++;
+    }
+  }
+  return copied;
+}
+
+/* ------------------------------------------------------------------ */
 /*  Public API                                                         */
 /* ------------------------------------------------------------------ */
 
 /**
  * 동적 상세설명 주소를 SSRF 안전 경로로 조회하고 상세 이미지 후보를 추출한다.
+ * 추출 이미지는 O4O 저장소(GCS https)로 복사해 미리보기·삽입을 보장한다(가져오기=복사).
  * @param url        상세설명 원본 절대 URL (view_contents 등)
- * @param sourceUrl  상품 페이지 URL — 제공 시 same-origin 으로 제한
+ * @param opts.sourceUrl  상품 페이지 URL — 제공 시 same-origin 으로 제한
+ * @param opts.supplierId 복사 저장 키 네임스페이스. 제공 시 O4O 저장소로 복사.
  */
 export async function fetchDetailContents(
   url: string,
-  sourceUrl?: string,
+  opts: { sourceUrl?: string; supplierId?: string } = {},
 ): Promise<FetchDetailContentsResult> {
+  const { sourceUrl, supplierId } = opts;
   const safe = await assertSafeFetchUrl(url, sourceUrl);
-  const html = await fetchHtmlWithLimits(safe.href);
+  const { html, finalUrl } = await fetchHtmlWithLimits(safe.href);
 
   let doc: Document;
   try {
-    doc = new JSDOM(html, { url: safe.href }).window.document;
+    doc = new JSDOM(html, { url: finalUrl }).window.document;
   } catch (e) {
     logger.warn('[DetailFetch] jsdom parse failed:', e);
     throw new DetailFetchError('PARSE_FAILED', '상세설명 원본을 분석하지 못했습니다.', 502);
   }
 
-  const { candidates, fromContainer } = extractCandidates(doc, safe.href);
+  const { candidates, fromContainer } = extractCandidates(doc, finalUrl);
 
-  return { fetchedUrl: safe.href, fromContainer, candidates };
+  // 가져오기=복사: 추출 이미지를 O4O 저장소로 복사 (원본 사이트 의존 제거 + http 혼합콘텐츠 미리보기 문제 해결)
+  let copiedCount = 0;
+  if (supplierId && candidates.length > 0) {
+    const pageOrigin = new URL(finalUrl).origin;
+    copiedCount = await copyCandidatesToStorage(candidates, pageOrigin, supplierId);
+  }
+
+  return { fetchedUrl: finalUrl, fromContainer, copiedCount, candidates };
 }

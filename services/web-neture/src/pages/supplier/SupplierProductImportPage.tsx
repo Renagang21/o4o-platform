@@ -106,7 +106,7 @@ export default function SupplierProductImportPage() {
   // 동적 상세설명 원본 가져오기 (WO-O4O-NETURE-SUPPLIER-IMPORT-ASSISTANT-DYNAMIC-DETAIL-CONTENTS-DETECTION-V1)
   //   상세설명을 별도 주소(AJAX)에서 불러오는 페이지 — 서버 SSRF-safe 경로로 원본을 조회한 결과.
   //   조회 성공 시 base HTML 의 (로고/메뉴 오탐) 후보를 실제 상세 이미지 후보로 교체한다.
-  const [fetchedDetail, setFetchedDetail] = useState<{ candidates: DetailImageCandidate[]; fetchedUrl: string } | null>(null);
+  const [fetchedDetail, setFetchedDetail] = useState<{ candidates: DetailImageCandidate[]; fetchedUrl: string; copiedCount: number } | null>(null);
   const [dynamicFetchStatus, setDynamicFetchStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [dynamicFetchError, setDynamicFetchError] = useState('');
 
@@ -424,7 +424,7 @@ export default function SupplierProductImportPage() {
         setDynamicFetchError('상세설명 원본에서 이미지를 찾지 못했습니다.');
         return;
       }
-      setFetchedDetail({ candidates: result.candidates, fetchedUrl: result.fetchedUrl });
+      setFetchedDetail({ candidates: result.candidates, fetchedUrl: result.fetchedUrl, copiedCount: result.copiedCount });
       // 선택/확인/미리보기 상태 초기화 (후보 목록이 교체됨)
       setSelectedDetailImages(new Set());
       setDetailImagesConfirmed(false);
@@ -858,6 +858,9 @@ export default function SupplierProductImportPage() {
             {fetchedDetail && (
               <p className="mb-3 rounded-lg bg-emerald-50 px-3 py-2 text-xs text-emerald-700">
                 상세설명 원본에서 이미지 {fetchedDetail.candidates.length}개를 가져왔습니다. (로고·SNS·메뉴 이미지 제외)
+                {fetchedDetail.copiedCount > 0 && (
+                  <> 이 중 {fetchedDetail.copiedCount}개를 O4O 저장소로 복사해 원본 사이트와 무관하게 안전하게 사용할 수 있습니다.</>
+                )}
               </p>
             )}
 

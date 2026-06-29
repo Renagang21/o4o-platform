@@ -454,8 +454,12 @@ export interface UnifiedOrdersResponse {
 // WO-O4O-NETURE-SUPPLIER-IMPORT-ASSISTANT-DYNAMIC-DETAIL-CONTENTS-DETECTION-V1
 
 export interface FetchedDetailImageCandidate {
+  /** 미리보기·삽입 URL — copy 성공 시 O4O 저장소 https URL */
   url: string;
+  /** 원본 상품 사이트 이미지 URL */
   originalUrl: string;
+  /** O4O 저장소로 복사되었는지 */
+  copiedToStorage: boolean;
   alt: string | null;
   width: number | null;
   height: number | null;
@@ -465,6 +469,8 @@ export interface FetchedDetailImageCandidate {
 export interface FetchDetailContentsResult {
   fetchedUrl: string;
   fromContainer: boolean;
+  /** O4O 저장소로 복사된 이미지 수 */
+  copiedCount: number;
   candidates: FetchedDetailImageCandidate[];
 }
 
