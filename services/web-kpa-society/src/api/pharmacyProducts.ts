@@ -108,6 +108,55 @@ export async function getCatalog(params?: {
   return apiClient.get('/pharmacy/products/catalog', params);
 }
 
+// ─────────────────────────────────────────────────────
+// 주문 가능 상품 통합 조회 (공급유형 탭)
+// WO-O4O-KPA-STORE-ORDERABLE-PRODUCT-SOURCE-TABS-V1
+// ─────────────────────────────────────────────────────
+
+export type OrderableSourceType = 'b2b' | 'operator' | 'event_offer' | 'seller_recruitment';
+export type OrderableSourceTab = 'all' | 'b2b' | 'operator' | 'event' | 'seller-recruitment';
+
+export interface OrderableProduct {
+  listingId: string;
+  offerId: string | null;
+  masterId: string | null;
+  sourceType: OrderableSourceType;
+  serviceKey: string;
+  productName: string;
+  category: string | null;
+  supplierId: string | null;
+  supplierName: string;
+  supplierLogoUrl: string | null;
+  unitPrice: number | null;
+  eventPrice: number | null;
+  consumerReferencePrice: number | null;
+  startAt: string | null;
+  endAt: string | null;
+  totalQuantity: number | null;
+  perOrderLimit: number | null;
+  perStoreLimit: number | null;
+  createdAt: string | null;
+}
+
+export interface OrderableResponse {
+  success: boolean;
+  data: OrderableProduct[];
+  pagination: { total: number; page: number; limit: number; totalPages: number };
+}
+
+/**
+ * 주문 가능 상품 통합 조회 — 공급유형(source)별 권위 조회.
+ * source: all | b2b | operator | event | seller-recruitment
+ */
+export async function getOrderable(params?: {
+  source?: OrderableSourceTab;
+  search?: string;
+  page?: number;
+  limit?: number;
+}): Promise<OrderableResponse> {
+  return apiClient.get('/pharmacy/products/orderable', params);
+}
+
 /**
  * 상품 판매 신청 (카탈로그 기반 — supplyProductId)
  */
