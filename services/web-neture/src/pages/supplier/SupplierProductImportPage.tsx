@@ -792,30 +792,33 @@ export default function SupplierProductImportPage() {
                       }`}
                       title="대표 이미지로 지정"
                     >
-                      {thumbnailIdx === idx ? '\u2605' : '\u2606'}
+                      {thumbnailIdx === idx ? '★' : '☆'}
                     </button>
 
-                    {/* \ub300\ud45c \ubc30\uc9c0 + \uc6d0\ubcf8 \ud06c\uae30 */}
-                    {thumbnailIdx === idx && (
-                      <span className="absolute bottom-1 left-1 rounded bg-emerald-600/90 px-1.5 py-0.5 text-[10px] font-medium text-white">
-                        \ub300\ud45c
-                      </span>
-                    )}
-                    {imgNaturalSizes[idx] && (
-                      <span className="absolute bottom-1 right-1 rounded bg-slate-900/60 px-1 py-0.5 text-[10px] text-white">
-                        {imgNaturalSizes[idx].w}\u00d7{imgNaturalSizes[idx].h}
+                    {/* 대표 배지 · 원본 크기 (예: 대표 · 850×850) */}
+                    {(thumbnailIdx === idx || imgNaturalSizes[idx]) && (
+                      <span
+                        className={`absolute bottom-1 left-1 rounded px-1.5 py-0.5 text-[10px] text-white ${
+                          thumbnailIdx === idx ? 'bg-emerald-600/90 font-medium' : 'bg-slate-900/60'
+                        }`}
+                      >
+                        {[
+                          thumbnailIdx === idx ? '대표' : null,
+                          imgNaturalSizes[idx] ? `${imgNaturalSizes[idx].w}×${imgNaturalSizes[idx].h}` : null,
+                        ]
+                          .filter(Boolean)
+                          .join(' · ')}
                       </span>
                     )}
                   </div>
                 ))}
               </div>
 
-              {/* \ub300\ud45c \uc378\ub124\uc77c \ud45c\uc900\ud654 \uc548\ub0b4 */}
+              {/* 대표 썸네일 표준화 안내 */}
               <p className="mt-2 text-xs text-slate-500">
-                <strong className="text-slate-700">{'\u2605'} \ub300\ud45c \uc774\ubbf8\uc9c0</strong>\ub294 \ub4f1\ub85d \uc2dc \uc11c\ubc84\uc5d0\uc11c <strong>1000\u00d71000</strong>\uc73c\ub85c \ud45c\uc900\ud654\ub429\ub2c8\ub2e4(\uc0c1\ud488 \uc804\uccb4 \ubcf4\uc874, \uc798\ub9bc \uc5c6\uc74c).
-                \uac00\uc7a5 \ud070 <strong>large</strong> \ud6c4\ubcf4\ub97c \uae30\ubcf8 \ub300\ud45c\ub85c \ucd94\ucc9c\ud569\ub2c8\ub2e4.
+                대표 이미지는 상품 전체가 보이도록 1000×1000으로 맞춰집니다. 가장 큰 이미지를 기본으로 선택했습니다.
                 {thumbnailIdx !== null && imgNaturalSizes[thumbnailIdx] && (
-                  <> \ud604\uc7ac \ub300\ud45c \uc6d0\ubcf8 {imgNaturalSizes[thumbnailIdx].w}\u00d7{imgNaturalSizes[thumbnailIdx].h} \u2192 \ub4f1\ub85d 1000\u00d71000.</>
+                  <> 현재 {imgNaturalSizes[thumbnailIdx].w}×{imgNaturalSizes[thumbnailIdx].h} → 1000×1000</>
                 )}
               </p>
             </div>
