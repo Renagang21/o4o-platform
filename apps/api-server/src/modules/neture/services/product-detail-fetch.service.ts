@@ -253,8 +253,10 @@ async function copyImageToStorage(
     );
     return { url: asset.url };
   } catch (e) {
-    logger.warn(`[ImportCopy] upload failed: ${imageUrl}`, e);
-    return { url: null, reason: 'upload_error' };
+    const msg = e instanceof Error ? e.message : String(e);
+    const reason = msg.startsWith('IMAGE_TOO_TALL') ? 'too_tall' : 'upload_error';
+    logger.warn(`[ImportCopy] upload failed (${reason}): ${imageUrl}`);
+    return { url: null, reason };
   }
 }
 

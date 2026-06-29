@@ -79,24 +79,31 @@ export class MediaLibraryService {
       //   상세설명 이미지(긴 세로 이미지)는 일반 max-height 규칙으로 축소하면 본문 폭 표시 시 흐려진다.
       //   preserveOriginal=true 면 원본 픽셀/비율을 보존한다. 단, 안전 상한 초과 시에만 고품질 재인코딩.
       if (opts?.preserveOriginal) {
-        const overCaps =
-          ow > PRESERVE_MAX_WIDTH ||
-          oh > PRESERVE_MAX_HEIGHT ||
-          ow * oh > PRESERVE_MAX_PIXELS ||
-          file.buffer.length > PRESERVE_MAX_BYTES;
-        if (!overCaps) {
-          // 원본 바이트 + MIME 그대로 저장 (재인코딩 없음 → 텍스트 선명도 손실 0, EXIF orientation 보존)
+        // 상세설명 이미지는 **폭 기준**으로만 처리한다. 높이/용량 제한을 맞추려고
+        // fit:inside 로 전체를 줄여 가로폭까지 축소하면 안 된다(흐림 재발 방지).
+        //  - 높이 초과 또는 총 픽셀 초과: 폭 축소로 해결 불가 → 명확히 거부
+        //  - 폭만 초과: 폭=2000 으로 비율 축소(높이 자동)
+        //  - 용량만 초과: 해상도 유지하고 고품질 재압축
+        //  - 그 외: 원본 바이트+MIME 그대로 (재인코딩 0)
+        if (oh > PRESERVE_MAX_HEIGHT || ow * oh > PRESERVE_MAX_PIXELS) {
+          throw new Error(`IMAGE_TOO_TALL: ${ow}x${oh} exceeds height(${PRESERVE_MAX_HEIGHT})/pixel(${PRESERVE_MAX_PIXELS}) limit`);
+        }
+        const needWidthResize = ow > PRESERVE_MAX_WIDTH;
+        const needRecompress = file.buffer.length > PRESERVE_MAX_BYTES;
+        if (!needWidthResize && !needRecompress) {
+          // 원본 바이트 + MIME 그대로 저장 (텍스트 선명도 손실 0, EXIF orientation 보존)
           buffer = file.buffer;
           mimeType = file.mimetype;
           width = ow || null;
           height = oh || null;
         } else {
-          // 안전 상한 초과 — 고품질(quality 92) 로 상한 내 축소 (긴 세로 비율 유지)
-          const processed = await sharp(file.buffer)
-            .rotate()
-            .resize(PRESERVE_MAX_WIDTH, PRESERVE_MAX_HEIGHT, { fit: 'inside', withoutEnlargement: true })
-            .webp({ quality: 92 })
-            .toBuffer();
+          // 폭만 2000 으로 축소(높이 자동 비율) 또는 동일 해상도 고품질 재압축.
+          // 높이/용량 때문에 폭을 강제로 줄이지 않는다(width-only).
+          let pipeline = sharp(file.buffer).rotate();
+          if (needWidthResize) {
+            pipeline = pipeline.resize({ width: PRESERVE_MAX_WIDTH, withoutEnlargement: true });
+          }
+          const processed = await pipeline.webp({ quality: 90 }).toBuffer();
           const pm = await sharp(processed).metadata();
           buffer = processed;
           mimeType = 'image/webp';
