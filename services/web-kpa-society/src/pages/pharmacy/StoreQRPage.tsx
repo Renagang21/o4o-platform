@@ -14,7 +14,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { QrCode, Trash2, ExternalLink, Copy, Check, BarChart3, X, Smartphone, Monitor, Tablet, Download, Printer, ArrowRight, FolderOpen, LayoutTemplate, Info } from 'lucide-react';
+import { QrCode, Trash2, ExternalLink, Copy, Check, BarChart3, X, Smartphone, Monitor, Tablet, Download, Printer, ArrowRight, FolderOpen, LayoutTemplate, Info, Sparkles } from 'lucide-react';
 // WO-O4O-KPA-MY-STORE-COPIES-STANDARD-TABLE-V1: list rendering 표준 테이블 (자체 selection + bulk print 보존)
 import { DataTable, type Column } from '@o4o/ui';
 import { getStoreExecutionAsset } from '../../api/storeExecutionAssets';
@@ -597,6 +597,11 @@ export function StoreQRPage() {
             <QrCode size={14} />
             QR 만들기
           </button>
+          {/* WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: QR 전용 AI 설명 만들기 진입 */}
+          <Link to="/store/marketing/qr/ai-description" style={styles.aiDescBtn}>
+            <Sparkles size={14} />
+            AI 설명 QR 만들기
+          </Link>
           <Link to="/store-hub/qr" style={styles.hubImportBtn}>
             <Download size={14} />
             매장 HUB에서 가져오기
@@ -1388,6 +1393,23 @@ const styles: Record<string, React.CSSProperties> = {
     border: `1px solid ${colors.primary}`,
     backgroundColor: '#fff',
     color: colors.primary,
+    borderRadius: '8px',
+    fontSize: '13px',
+    fontWeight: 500,
+    textDecoration: 'none',
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+    flexShrink: 0,
+  },
+  // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: AI 설명 QR 진입 버튼
+  aiDescBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '8px 14px',
+    border: 'none',
+    backgroundColor: colors.primary,
+    color: '#fff',
     borderRadius: '8px',
     fontSize: '13px',
     fontWeight: 500,
