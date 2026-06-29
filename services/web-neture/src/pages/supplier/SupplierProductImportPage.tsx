@@ -474,7 +474,10 @@ export default function SupplierProductImportPage() {
           const o4oUrl = map.get(c.originalUrl);
           if (!o4oUrl) return '';
           const alt = escapeHtmlAttr(c.alt || `${productName} 상세설명 이미지 ${i + 1}`);
-          return `<p><img src="${escapeHtmlAttr(o4oUrl)}" alt="${alt}" class="editor-image img-align-center" /></p>`;
+          // 블록 이미지를 <p> 로 감싸지 않는다. DisplayImage 는 블록 노드라
+          // <p><img></p> 로 넣으면 TipTap 이 이미지를 단락 밖으로 빼며 빈 <p></p> 가 남고
+          // (편집기 상단 여백), 그 빈 단락이 이미지에 붙어 함께 지워진다. bare <img> 로 삽입.
+          return `<img src="${escapeHtmlAttr(o4oUrl)}" alt="${alt}" class="editor-image img-align-center" data-align="center" />`;
         })
         .filter(Boolean)
         .join('');
