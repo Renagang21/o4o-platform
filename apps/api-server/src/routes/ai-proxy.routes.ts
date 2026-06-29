@@ -31,6 +31,15 @@ import {
   buildUserPrompt,
   parseResponse,
 } from '../services/ai-prompts/index.js';
+// WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: QR 전용 AI 설명(단일/코너) prompt
+import {
+  buildQrDescriptionSystemPrompt,
+  buildQrDescriptionUserPrompt,
+  parseQrDescriptionResponse,
+  type QrDescriptionInput,
+  type QrDescriptionItemInput,
+  type QrDescriptionMode,
+} from '../services/ai-prompts/qrDescription.js';
 // WO-O4O-AI-URL-TO-BLOCKS-YOUTUBE-SUPPORT-V1
 import { isYouTubeUrl, fetchYouTubeContent, fetchYouTubeOEmbed } from './ai-proxy/youtube-fetcher.js';
 
@@ -268,6 +277,131 @@ router.post('/content', authenticate, async (req, res: Response) => {
     return res.status(status).json({
       success: false,
       error: error.message || 'AI 콘텐츠 생성 중 오류가 발생했습니다.',
+      requestId,
+    });
+  }
+});
+
+// ===========================================
+// POST /api/ai/qr-description — QR 전용 AI 설명(단일/코너)
+// WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1
+//
+// 입력 (등록 상품 ID 무관 — 매장 입력만 사용):
+//   single: { mode:'single', productName, emphasis?, options? }
+//   corner: { mode:'corner', cornerName, emphasis?, items:[{key,name,emphasis?}], options? }
+// 출력:
+//   single: { success, mode, title, html, aiDescription }
+//   corner: { success, mode, html, items:[{key,descriptionHtml,relatedKeys}], aiDescription }
+//
+// 기존 provider abstraction(aiProxyService.generateEditingRawContent, surface='qr') 재사용.
+// 입력에 없는 item key 는 서버가 검증·제거(parseQrDescriptionResponse).
+// ===========================================
+router.post('/qr-description', authenticate, async (req, res: Response) => {
+  const authReq = req as AuthRequest;
+  const userId = authReq.user?.id;
+
+  if (!userId) {
+    return res.status(401).json({ success: false, error: '로그인이 필요합니다.' });
+  }
+
+  const body = (req.body ?? {}) as Record<string, unknown>;
+  const mode: QrDescriptionMode = body.mode === 'corner' ? 'corner' : 'single';
+  const productName = typeof body.productName === 'string' ? body.productName.trim() : '';
+  const cornerName = typeof body.cornerName === 'string' ? body.cornerName.trim() : '';
+  const emphasis = typeof body.emphasis === 'string' ? body.emphasis.trim() : '';
+  const options =
+    body.options && typeof body.options === 'object' ? (body.options as QrDescriptionInput['options']) : {};
+
+  // corner items 정규화 — key/name 필수, 입력 key 화이트리스트 산출
+  const rawItems = Array.isArray(body.items) ? body.items : [];
+  const items: QrDescriptionItemInput[] = rawItems
+    .map((it: any) => ({
+      key: typeof it?.key === 'string' ? it.key.trim() : '',
+      name: typeof it?.name === 'string' ? it.name.trim() : '',
+      emphasis: typeof it?.emphasis === 'string' ? it.emphasis.trim() : undefined,
+    }))
+    .filter((it: QrDescriptionItemInput) => it.key.length > 0 && it.name.length > 0);
+
+  if (mode === 'single' && !productName) {
+    return res.status(400).json({ success: false, error: '상품명을 입력해 주세요.' });
+  }
+  if (mode === 'corner' && (!cornerName || items.length === 0)) {
+    return res.status(400).json({ success: false, error: '코너명과 1개 이상의 상품 항목이 필요합니다.' });
+  }
+
+  const input: QrDescriptionInput = { mode, productName, cornerName, emphasis, items, options };
+  const systemPrompt = buildQrDescriptionSystemPrompt(mode);
+  const userPrompt = buildQrDescriptionUserPrompt(input);
+  const requestId = crypto.randomUUID();
+
+  try {
+    const rawResponse = await aiProxyService.generateEditingRawContent(
+      { systemPrompt, userPrompt, temperature: 0.5, maxTokens: 4096 },
+      userId,
+      requestId,
+      { surface: 'qr' },
+    );
+
+    const inputKeys = items.map((it) => it.key);
+    const parsed = parseQrDescriptionResponse(mode, rawResponse.parsed, rawResponse.rawText, inputKeys);
+
+    // 입력 원문(상품명/코너명/강조점/항목)에 사용조건 감지 적용
+    const usageInput = [
+      productName,
+      cornerName,
+      emphasis,
+      ...items.map((it) => `${it.name} ${it.emphasis ?? ''}`),
+    ]
+      .filter(Boolean)
+      .join('\n');
+    const usageWarning = detectUsageConditions(usageInput);
+
+    // 저장 metadata(content_json.aiDescription) — 프론트가 GET-merge-PUT 로 보존
+    const aiDescription = {
+      version: 1,
+      mode,
+      productName: mode === 'single' ? productName : undefined,
+      cornerName: mode === 'corner' ? cornerName : undefined,
+      emphasis: emphasis || undefined,
+      items:
+        mode === 'corner'
+          ? parsed.items.map((out) => {
+              const src = items.find((it) => it.key === out.key);
+              return {
+                key: out.key,
+                name: src?.name ?? '',
+                emphasis: src?.emphasis,
+                descriptionHtml: out.descriptionHtml,
+                relatedKeys: out.relatedKeys,
+              };
+            })
+          : undefined,
+      model: rawResponse.model,
+      generatedBy: 'gemini-qr-description',
+    };
+
+    logger.info('AI qr-description generated', { requestId, userId, mode, model: rawResponse.model });
+
+    return res.json({
+      success: true,
+      mode,
+      title: parsed.title,
+      html: parsed.html,
+      items: mode === 'corner' ? aiDescription.items : undefined,
+      aiDescription,
+      requestId,
+      usageWarning: usageWarning.detected ? usageWarning : undefined,
+    });
+  } catch (error: any) {
+    const status = error.type === 'RATE_LIMIT_ERROR' ? 429
+                 : error.type === 'AUTH_ERROR' ? 401
+                 : error.type === 'VALIDATION_ERROR' ? 400
+                 : error.type === 'TIMEOUT_ERROR' ? 504
+                 : 500;
+    logger.error('AI qr-description error', { requestId, error: error.message, type: error.type });
+    return res.status(status).json({
+      success: false,
+      error: error.message || 'AI 설명 생성 중 오류가 발생했습니다.',
       requestId,
     });
   }
