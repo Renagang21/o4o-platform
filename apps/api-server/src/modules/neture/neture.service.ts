@@ -139,6 +139,18 @@ export class NetureService {
     return this.supplierService.getAllSuppliers(filters);
   }
 
+  // WO-O4O-NETURE-OPERATOR-SUPPLIER-APPROVAL-STANDARD-LIST-AND-MEMBER-IA-V1
+  async getAllSuppliersPaged(params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: SupplierStatus;
+    sortBy?: 'createdAt' | 'name' | 'status';
+    sortOrder?: 'asc' | 'desc';
+  }) {
+    return this.supplierService.getAllSuppliersPaged(params);
+  }
+
   // ==================== Admin: Product Management ====================
 
   async getPendingProducts() {

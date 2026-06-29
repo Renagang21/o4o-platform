@@ -233,6 +233,35 @@ export const adminSupplierApi = {
 //   로 별도 노출하는 endpoint. AdminSupplier 와 schema 동일 — 타입 재사용.
 //   admin 의 deactivate 는 의도적으로 operator 노출 제외 (활성 공급자 비활성화는 admin 정책).
 
+// WO-O4O-NETURE-OPERATOR-SUPPLIER-APPROVAL-STANDARD-LIST-AND-MEMBER-IA-V1
+// O4O 표준 리스트(paged) + 일괄 처리(batch) 응답 계약.
+export interface SupplierListSummary {
+  total: number;
+  pending: number;
+  active: number;
+  rejected: number;
+  inactive: number;
+}
+
+export interface SupplierPagedResult {
+  items: AdminSupplier[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  };
+  summary: SupplierListSummary;
+}
+
+export interface SupplierBatchResultItem {
+  id: string;
+  status: 'success' | 'failed';
+  error?: string;
+}
+
 export const operatorSupplierApi = {
   async getSuppliers(status?: string): Promise<AdminSupplier[]> {
     try {
@@ -244,6 +273,38 @@ export const operatorSupplierApi = {
       console.warn('[Operator API] Failed to fetch suppliers:', error);
       return [];
     }
+  },
+
+  // O4O 표준 리스트용 paged 조회. 조회 실패는 빈 배열로 은폐하지 않고 throw 하여
+  // useStandardListQuery.error 로 전달한다(WO 8.3).
+  async getSuppliersPaged(params: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: string;
+    sortBy?: string;
+    sortOrder?: string;
+  }): Promise<SupplierPagedResult> {
+    const sp = new URLSearchParams();
+    if (params.page) sp.append('page', String(params.page));
+    if (params.limit) sp.append('limit', String(params.limit));
+    if (params.search) sp.append('search', params.search);
+    if (params.status && params.status !== 'all') sp.append('status', params.status);
+    if (params.sortBy) sp.append('sortBy', params.sortBy);
+    if (params.sortOrder) sp.append('sortOrder', params.sortOrder);
+    const qs = sp.toString();
+    const response = await api.get(`/neture/operator/suppliers/list${qs ? `?${qs}` : ''}`);
+    return response.data.data;
+  },
+
+  // 일괄 승인/거절. useBatchAction.executeBatch 가 res.data.results 를 읽도록 본문(response.data)을 반환.
+  async batchProcess(
+    ids: string[],
+    action: 'approve' | 'reject',
+    reason?: string,
+  ): Promise<{ success: boolean; data: { results: SupplierBatchResultItem[] } }> {
+    const response = await api.post('/neture/operator/suppliers/batch', { ids, action, reason });
+    return response.data;
   },
 
   async getPendingSuppliers(): Promise<AdminSupplier[]> {

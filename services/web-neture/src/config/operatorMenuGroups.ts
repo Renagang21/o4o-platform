@@ -33,6 +33,11 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     // WO-O4O-NETURE-MEMBER-MANAGEMENT-BULK-AND-ROUTE-ALIGNMENT-V1:
     // 회원 관리 표준 경로를 /operator/members 로 통일. /operator/users 는 legacy alias 로 잔존.
     { label: '회원 관리', path: '/operator/members' },
+    // WO-O4O-NETURE-OPERATOR-SUPPLIER-APPROVAL-STANDARD-LIST-AND-MEMBER-IA-V1:
+    // 공급자 승인은 회원 가입(1단계) 이후의 공급자 활성화(2단계) 업무 → 회원 영역에 배치.
+    // route(/operator/suppliers) 유지. Neture 는 USER_MANAGEMENT/MEMBERSHIP_APPROVAL 모두 활성이라
+    // 그룹 이동으로 인한 권한 회귀 없음. (라벨: '공급자 활성화' → '공급자 승인')
+    { label: '공급자 승인', path: '/operator/suppliers' },
     // WO-O4O-NETURE-OPERATOR-SIDEBAR-DEAD-LINKS-CLEANUP-V1: adminOnly 항목은 /operator/* 라우트가
     // 없으므로 실제 존재하는 /admin/* 로 정정 (회원 완전삭제 와 동일 패턴). 권한자에게만 노출.
     // WO-O4O-NETURE-PLATFORM-ADMIN-SCOPE-SEPARATION-V1: 플랫폼 관리 성격 표면화(라벨).
@@ -46,8 +51,6 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '가입 승인', path: '/operator/applications' },
     { label: '유통참여형 펀딩', path: '/operator/market-trial' },
     { label: '서비스 승인', path: '/admin/service-approvals', adminOnly: true },
-    // WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1: dead link 정정
-    { label: '공급자 활성화', path: '/operator/suppliers' },
   ],
   // WO-NETURE-OPERATOR-PRODUCTS-UNIFIED-LIST-FINAL-V1: Products 영역 단일 통합
   products: [

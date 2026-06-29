@@ -91,6 +91,102 @@ export function createOperatorSupplierController(dataSource: DataSource): Router
   });
 
   /**
+   * GET /operator/suppliers/list
+   * WO-O4O-NETURE-OPERATOR-SUPPLIER-APPROVAL-STANDARD-LIST-AND-MEMBER-IA-V1
+   * O4O 표준 리스트용 paged endpoint (page/limit/search/status/sortBy/sortOrder).
+   * 기존 GET /operator/suppliers (전체 배열)은 회원 관리 화면 호환을 위해 그대로 유지.
+   */
+  router.get('/suppliers/list', async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const SORT_WHITELIST = ['createdAt', 'name', 'status'] as const;
+      const { page, limit, search, status, sortBy, sortOrder } = req.query;
+
+      const statusFilter =
+        typeof status === 'string' && Object.values(SupplierStatus).includes(status as SupplierStatus)
+          ? (status as SupplierStatus)
+          : undefined;
+      const sortByValue = SORT_WHITELIST.includes(sortBy as (typeof SORT_WHITELIST)[number])
+        ? (sortBy as (typeof SORT_WHITELIST)[number])
+        : 'createdAt';
+      const sortOrderValue = sortOrder === 'asc' ? 'asc' : 'desc';
+
+      const result = await netureService.getAllSuppliersPaged({
+        page: typeof page === 'string' ? Number(page) : undefined,
+        limit: typeof limit === 'string' ? Number(limit) : undefined,
+        search: typeof search === 'string' ? search : undefined,
+        status: statusFilter,
+        sortBy: sortByValue,
+        sortOrder: sortOrderValue,
+      });
+
+      res.json({ success: true, data: result });
+    } catch (error) {
+      logger.error('[Neture Operator API] Error fetching suppliers (paged):', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch suppliers' } });
+    }
+  });
+
+  /**
+   * POST /operator/suppliers/batch
+   * WO-O4O-NETURE-OPERATOR-SUPPLIER-APPROVAL-STANDARD-LIST-AND-MEMBER-IA-V1
+   * 일괄 승인/거절. 항목별 결과를 반환(첫 실패에서 중단하지 않음).
+   * 각 대상은 기존 approveSupplier/rejectSupplier 도메인 로직을 재사용 — PENDING/activationReady 재검증은
+   * 도메인 메서드가 수행하며, 항목별 action log 를 남긴다.
+   */
+  router.post('/suppliers/batch', async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const operatorId = req.user?.id;
+      if (!operatorId) {
+        return res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED' } });
+      }
+
+      const { ids, action, reason } = req.body || {};
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ success: false, error: { code: 'INVALID_IDS', message: 'ids must be a non-empty array' } });
+      }
+      if (action !== 'approve' && action !== 'reject') {
+        return res.status(400).json({ success: false, error: { code: 'INVALID_ACTION', message: "action must be 'approve' or 'reject'" } });
+      }
+
+      const uniqueIds = Array.from(new Set(ids.filter((v: unknown): v is string => typeof v === 'string')));
+      if (uniqueIds.length === 0) {
+        return res.status(400).json({ success: false, error: { code: 'INVALID_IDS', message: 'ids must contain valid string ids' } });
+      }
+      if (uniqueIds.length > 100) {
+        return res.status(400).json({ success: false, error: { code: 'TOO_MANY_IDS', message: 'A maximum of 100 ids per request is allowed' } });
+      }
+
+      const results: Array<{ id: string; status: 'success' | 'failed'; error?: string }> = [];
+      for (const id of uniqueIds) {
+        try {
+          const result =
+            action === 'approve'
+              ? await netureService.approveSupplier(id, operatorId)
+              : await netureService.rejectSupplier(id, operatorId, typeof reason === 'string' ? reason : undefined);
+          if (result.success) {
+            results.push({ id, status: 'success' });
+            actionLogService
+              .logSuccess('neture', operatorId, `neture.operator.supplier_${action}`, {
+                meta: { supplierId: id, batch: true, ...(action === 'reject' ? { reason } : {}) },
+              })
+              .catch(() => {});
+          } else {
+            results.push({ id, status: 'failed', error: result.error });
+          }
+        } catch (itemError) {
+          logger.error(`[Neture Operator API] Batch ${action} failed for supplier ${id}:`, itemError);
+          results.push({ id, status: 'failed', error: 'INTERNAL_ERROR' });
+        }
+      }
+
+      res.json({ success: true, data: { results } });
+    } catch (error) {
+      logger.error('[Neture Operator API] Error processing supplier batch:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to process supplier batch' } });
+    }
+  });
+
+  /**
    * GET /operator/suppliers/:id/onboarding
    * 공급자 기본 서류/정산 정보 상세
    */

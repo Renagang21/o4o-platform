@@ -409,6 +409,16 @@ export class NetureSupplierService {
     }
   }
 
+  // ==================== Paged Supplier List ====================
+  // WO-O4O-NETURE-OPERATOR-SUPPLIER-APPROVAL-STANDARD-LIST-AND-MEMBER-IA-V1
+  // 검색 대상 중 name·businessNumber 는 organization 스토어에서 enrich 되므로(cross-domain SQL JOIN 금지),
+  // 기존 getAllSuppliers() 의 enriched 결과 위에서 검색·정렬·페이지네이션을 수행한다(applySupplierListQuery).
+  // 기존 배열 endpoint(getAllSuppliers)는 그대로 유지(회원 관리 화면 호환 — 회귀 방지).
+  async getAllSuppliersPaged(params?: SupplierListQueryParams) {
+    const all = await this.getAllSuppliers();
+    return applySupplierListQuery(all, params);
+  }
+
   // ==================== Public Supplier List & Detail ====================
 
   async getSuppliers(filters?: { category?: string; status?: SupplierStatus }) {
@@ -1235,4 +1245,98 @@ export class NetureSupplierService {
     }
     return missing;
   }
+}
+
+// ==================== Paged Supplier List — pure helper ====================
+// WO-O4O-NETURE-OPERATOR-SUPPLIER-APPROVAL-STANDARD-LIST-AND-MEMBER-IA-V1
+// getAllSuppliers() 의 enriched 결과 위에서 검색·상태필터·정렬·페이지네이션을 수행하는 순수 함수.
+// DB 비의존 → 단위 테스트 가능. (count(total)/summary/data 가 동일 배열에서 파생되어 일관성 보장)
+
+export interface SupplierListQueryParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  status?: SupplierStatus;
+  sortBy?: 'createdAt' | 'name' | 'status';
+  sortOrder?: 'asc' | 'desc';
+}
+
+/** applySupplierListQuery 가 사용하는 최소 필드 — 검색/정렬/집계 대상. */
+export interface SupplierListItemLike {
+  status: SupplierStatus | string;
+  name: string;
+  contactEmail?: string | null;
+  userEmail?: string | null;
+  businessNumber?: string | null;
+  representativeName?: string | null;
+  createdAt: Date | string;
+}
+
+export function applySupplierListQuery<T extends SupplierListItemLike>(
+  all: T[],
+  params?: SupplierListQueryParams,
+): {
+  items: T[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  };
+  summary: { total: number; pending: number; active: number; rejected: number; inactive: number };
+} {
+  const page = Math.max(1, Math.floor(params?.page ?? 1));
+  const limit = Math.min(100, Math.max(1, Math.floor(params?.limit ?? 20)));
+  const sortBy = params?.sortBy ?? 'createdAt';
+  const sortOrder = params?.sortOrder ?? 'desc';
+
+  // 검색: 공급자명 / 이메일(연락·계정) / 사업자번호 / 대표자명
+  const term = (params?.search ?? '').trim().toLowerCase();
+  const searched = term
+    ? all.filter((s) =>
+        [s.name, s.contactEmail, s.userEmail, s.businessNumber, s.representativeName].some((v) =>
+          (v ?? '').toLowerCase().includes(term),
+        ),
+      )
+    : all;
+
+  // summary: 검색 기준(상태 필터 무관) 전체 상태 집계
+  const summary = {
+    total: searched.length,
+    pending: searched.filter((s) => s.status === SupplierStatus.PENDING).length,
+    active: searched.filter((s) => s.status === SupplierStatus.ACTIVE).length,
+    rejected: searched.filter((s) => s.status === SupplierStatus.REJECTED).length,
+    inactive: searched.filter((s) => s.status === SupplierStatus.INACTIVE).length,
+  };
+
+  const filtered = params?.status ? searched.filter((s) => s.status === params.status) : searched;
+
+  const dir = sortOrder === 'asc' ? 1 : -1;
+  const sorted = [...filtered].sort((a, b) => {
+    let cmp = 0;
+    if (sortBy === 'name') cmp = (a.name ?? '').localeCompare(b.name ?? '', 'ko');
+    else if (sortBy === 'status') cmp = String(a.status).localeCompare(String(b.status));
+    else cmp = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+    return cmp * dir;
+  });
+
+  const total = sorted.length;
+  const totalPages = total === 0 ? 0 : Math.ceil(total / limit);
+  const start = (page - 1) * limit;
+  const items = sorted.slice(start, start + limit);
+
+  return {
+    items,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages,
+      hasNextPage: page < totalPages,
+      hasPreviousPage: page > 1,
+    },
+    summary,
+  };
 }
