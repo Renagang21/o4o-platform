@@ -155,10 +155,80 @@ async function assertSafeFetchUrl(rawUrl: string, sameOrigin?: string): Promise<
 /* ------------------------------------------------------------------ */
 
 /**
+ * 원본 이미지 URL → 다운로드(SSRF-safe, same-origin). 저장하지 않고 bytes+mime 만 반환.
+ * 미리보기 프록시와 복사 업로드가 공유하는 단일 fetch 경로.
+ */
+async function fetchImageSafe(
+  imageUrl: string,
+  sameOrigin: string,
+): Promise<{ buffer: Buffer; mime: string; filename: string } | { error: string }> {
+  let safe: URL;
+  try {
+    safe = await assertSafeFetchUrl(imageUrl, sameOrigin);
+  } catch (e) {
+    return { error: e instanceof DetailFetchError ? e.code : 'unsafe_url' };
+  }
+
+  let response: Response;
+  try {
+    response = await fetch(safe.href, {
+      method: 'GET',
+      redirect: 'follow',
+      signal: AbortSignal.timeout(IMAGE_FETCH_TIMEOUT_MS),
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36',
+        Accept: 'image/*',
+        Referer: sameOrigin,
+      },
+    });
+  } catch {
+    return { error: 'fetch_error' };
+  }
+  if (!response.ok) return { error: `fetch_${response.status}` };
+
+  let mime = (response.headers.get('content-type') || '').split(';')[0].trim().toLowerCase();
+  if (mime === 'image/jpg') mime = 'image/jpeg';
+  if (!ALLOWED_IMAGE_MIME.test(mime)) return { error: `bad_mime_${mime || 'none'}` };
+
+  const declaredLen = Number(response.headers.get('content-length') ?? '');
+  if (Number.isFinite(declaredLen) && declaredLen > MAX_IMAGE_BYTES) return { error: 'too_large' };
+
+  const buffer = Buffer.from(await response.arrayBuffer());
+  if (buffer.length === 0 || buffer.length > MAX_IMAGE_BYTES) return { error: 'too_large' };
+
+  const filename = decodeURIComponent(safe.pathname.split('/').pop() || 'image');
+  return { buffer, mime, filename };
+}
+
+/**
+ * 미리보기 프록시: 원본 이미지를 SSRF-safe 로 가져와 bytes 반환(저장 없음).
+ * HTTPS Neture 화면에서 http 외부 이미지를 직접 표시하지 않기 위해 사용한다(혼합 콘텐츠 회피).
+ */
+export async function proxyImage(
+  imageUrl: string,
+  shopOrigin?: string,
+): Promise<{ buffer: Buffer; mime: string }> {
+  const constraint = shopOrigin || safeOriginOf(imageUrl);
+  const r = await fetchImageSafe(imageUrl, constraint);
+  if ('error' in r) {
+    throw new DetailFetchError(r.error, '이미지 미리보기를 가져오지 못했습니다.', 502);
+  }
+  return { buffer: r.buffer, mime: r.mime };
+}
+
+/** url 의 origin (실패 시 빈 문자열 — assertSafeFetchUrl 에서 INVALID_URL 처리됨) */
+function safeOriginOf(url: string): string {
+  try {
+    return new URL(url).origin;
+  } catch {
+    return '';
+  }
+}
+
+/**
  * 원본 이미지 URL → 다운로드(SSRF-safe) → 공용 미디어 라이브러리(o4o-media-library, 공개 https) 업로드
  * → O4O https URL 반환. 실패 시 { url: null, reason }.
- *
- * 저장은 editor 이미지 업로드와 동일한 MediaLibraryService(sharp webp, 공개)를 사용한다.
  */
 async function copyImageToStorage(
   imageUrl: string,
@@ -166,50 +236,22 @@ async function copyImageToStorage(
   mediaService: MediaLibraryService,
   userId: string,
 ): Promise<{ url: string | null; reason?: string }> {
+  const r = await fetchImageSafe(imageUrl, sameOrigin);
+  if ('error' in r) {
+    logger.warn(`[ImportCopy] image copy failed (${r.error}): ${imageUrl}`);
+    return { url: null, reason: r.error };
+  }
   try {
-    // same-origin + private IP 차단 재검증
-    const safe = await assertSafeFetchUrl(imageUrl, sameOrigin);
-
-    let response: Response;
-    try {
-      response = await fetch(safe.href, {
-        method: 'GET',
-        redirect: 'follow',
-        signal: AbortSignal.timeout(IMAGE_FETCH_TIMEOUT_MS),
-        headers: {
-          'User-Agent':
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36',
-          Accept: 'image/*',
-          Referer: sameOrigin,
-        },
-      });
-    } catch {
-      return { url: null, reason: 'fetch_error' };
-    }
-    if (!response.ok) return { url: null, reason: `fetch_${response.status}` };
-
-    let mime = (response.headers.get('content-type') || '').split(';')[0].trim().toLowerCase();
-    if (mime === 'image/jpg') mime = 'image/jpeg';
-    if (!ALLOWED_IMAGE_MIME.test(mime)) return { url: null, reason: `bad_mime_${mime || 'none'}` };
-
-    const declaredLen = Number(response.headers.get('content-length') ?? '');
-    if (Number.isFinite(declaredLen) && declaredLen > MAX_IMAGE_BYTES) return { url: null, reason: 'too_large' };
-
-    const buffer = Buffer.from(await response.arrayBuffer());
-    if (buffer.length === 0 || buffer.length > MAX_IMAGE_BYTES) return { url: null, reason: 'too_large' };
-
-    const originalname = decodeURIComponent(safe.pathname.split('/').pop() || 'detail-image');
     const asset = await mediaService.upload(
-      { buffer, originalname, mimetype: mime, size: buffer.length },
+      { buffer: r.buffer, originalname: r.filename, mimetype: r.mime, size: r.buffer.length },
       userId,
       'neture',
       'description',
     );
     return { url: asset.url };
   } catch (e) {
-    const reason = e instanceof DetailFetchError ? e.code : 'copy_error';
-    logger.warn(`[ImportCopy] image copy failed (${reason}): ${imageUrl}`);
-    return { url: null, reason };
+    logger.warn(`[ImportCopy] upload failed: ${imageUrl}`, e);
+    return { url: null, reason: 'upload_error' };
   }
 }
 

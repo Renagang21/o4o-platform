@@ -108,18 +108,14 @@ export default function SupplierProductImportPage() {
   //   selectedDetailImages: detailImageCandidates 배열 인덱스 기준 선택 집합
   const [selectedDetailImages, setSelectedDetailImages] = useState<Set<number>>(new Set());
   const [detailImagesConfirmed, setDetailImagesConfirmed] = useState(false);
-  const [detailImgPreviewErrors, setDetailImgPreviewErrors] = useState<Set<number>>(new Set());
 
   // 이미지 O4O 저장소 복사 상태 (선택 → 복사 → 편집기 삽입)
   const [imageCopyStatus, setImageCopyStatus] = useState<'idle' | 'copying' | 'error'>('idle');
   const [imageCopyError, setImageCopyError] = useState('');
 
-  // Thumbnail correction
-  const [thumbNaturalSize, setThumbNaturalSize] = useState<{ w: number; h: number } | null>(null);
-  const [correctionMode, setCorrectionMode] = useState<'crop' | 'pad' | 'resize'>('crop');
-  const [correctedDataUrl, setCorrectedDataUrl] = useState<string | null>(null);
-  const [correctionStatus, setCorrectionStatus] = useState<'idle' | 'applied' | 'cors-blocked'>('idle');
-  const correctionImgRef = useRef<HTMLImageElement | null>(null);
+  // 등록 이동 시 대표/갤러리 이미지 O4O 복사 상태
+  const [navStatus, setNavStatus] = useState<'idle' | 'copying'>('idle');
+  const [navError, setNavError] = useState('');
 
   // UI state
   const [error, setError] = useState('');
@@ -252,19 +248,23 @@ export default function SupplierProductImportPage() {
     setPrice('');
     setDetailDesc(result.detailDescription ?? '');
 
-    // WO-PRODUCT-HELPER-IMAGE-SELECTION-DEFAULT-OFF-V1: 기본 미선택
-    setSelectedImages(new Set());
-    setThumbnailIdx(null);
-    setCorrectedDataUrl(null);
-    setCorrectionStatus('idle');
-    setThumbNaturalSize(null);
+    // 기본 선택: 대표 이미지 후보(view/large 우선 = index 0) 1개 자동 선택 + 대표 지정.
+    //   productImageUrls 는 [view, large, list1, ...] 순서라 index 0 이 가장 적합한 대표.
+    if (result.imageUrls.length > 0) {
+      setSelectedImages(new Set([0]));
+      setThumbnailIdx(0);
+    } else {
+      setSelectedImages(new Set());
+      setThumbnailIdx(null);
+    }
 
-    // 상세설명 이미지 선택/확인 초기화
-    setSelectedDetailImages(new Set());
+    // 상세설명 이미지: 정상 후보 기본 전체 선택(사용자가 해제 가능)
+    setSelectedDetailImages(new Set(detailCandidates.map((_, i) => i)));
     setDetailImagesConfirmed(false);
-    setDetailImgPreviewErrors(new Set());
     setImageCopyStatus('idle');
     setImageCopyError('');
+    setNavStatus('idle');
+    setNavError('');
   }, [html, sourceUrl, topChoice]);
 
   /** .html / .txt 파일 불러오기 → textarea 채움 (서버 전송 없음) */
@@ -290,8 +290,8 @@ export default function SupplierProductImportPage() {
   /*  Navigate to Create                                               */
   /* ---------------------------------------------------------------- */
 
-  const handleNavigateToCreate = useCallback(() => {
-    if (!parsed) return;
+  const handleNavigateToCreate = useCallback(async () => {
+    if (!parsed || navStatus === 'copying') return;
 
     const selectedImgUrls = parsed.imageUrls.filter((_, i) =>
       selectedImages.has(i),
@@ -302,7 +302,31 @@ export default function SupplierProductImportPage() {
         ? parsed.imageUrls[thumbnailIdx]
         : selectedImgUrls[0] ?? null;
 
-    const detailUrls = selectedImgUrls.filter((u) => u !== thumbUrl);
+    const detailSelUrls = selectedImgUrls.filter((u) => u !== thumbUrl);
+
+    // 선택 대표/갤러리 이미지를 O4O 로 복사 — 외부 http/https URL 이 등록 데이터에 남지 않도록.
+    let o4oThumb: string | null = null;
+    let o4oDetailUrls: string[] = [];
+    if (selectedImgUrls.length > 0) {
+      setNavStatus('copying');
+      setNavError('');
+      try {
+        const shopOrigin = (sourceUrl.trim() || adminProduct?.shopDomain) || undefined;
+        const res = await supplierApi.copyImages(selectedImgUrls, shopOrigin);
+        const map = new Map(res.results.filter((r) => r.ok && r.url).map((r) => [r.originalUrl, r.url as string]));
+        o4oThumb = thumbUrl ? map.get(thumbUrl) ?? null : null;
+        o4oDetailUrls = detailSelUrls.map((u) => map.get(u)).filter((u): u is string => !!u);
+        if (!o4oThumb && o4oDetailUrls.length === 0) {
+          setNavStatus('idle');
+          setNavError('선택 이미지를 O4O 저장소로 복사하지 못했습니다. 내 쇼핑몰 주소가 올바른지 확인해 주세요.');
+          return;
+        }
+      } catch (e) {
+        setNavStatus('idle');
+        setNavError(e instanceof Error ? e.message : '이미지 복사에 실패했습니다.');
+        return;
+      }
+    }
 
     const draft: ImportDraft = {
       marketingName: name,
@@ -313,9 +337,10 @@ export default function SupplierProductImportPage() {
       consumerReferencePrice: price,
       consumerShortDesc: parsed.shortDescription ?? '',
       consumerDetailDesc: detailDesc,
-      thumbnailUrl: correctionStatus === 'applied' ? null : thumbUrl,
-      thumbnailCorrectedDataUrl: correctionStatus === 'applied' && correctedDataUrl ? correctedDataUrl : undefined,
-      detailImageUrls: detailUrls.slice(0, 10),
+      // O4O https URL 만 전달 (외부 URL 미전달)
+      thumbnailUrl: o4oThumb,
+      thumbnailCorrectedDataUrl: undefined,
+      detailImageUrls: o4oDetailUrls.slice(0, 10),
       contentImageUrls: [],
       sourceUrl: sourceUrl || '',
       importedAt: new Date().toISOString(),
@@ -331,6 +356,7 @@ export default function SupplierProductImportPage() {
     };
 
     saveDraft(draft);
+    setNavStatus('idle');
     // 상위 분기(+보존된 정밀 유형)를 정식 wizard 로 전달. 세부 미지정 의약품은 regulatoryType=DRUG 만.
     const params = new URLSearchParams();
     if (effective.productKey) params.set('productType', effective.productKey);
@@ -339,6 +365,7 @@ export default function SupplierProductImportPage() {
     navigate(qs ? `/supplier/products/new?${qs}` : '/supplier/products/new');
   }, [
     parsed,
+    navStatus,
     name,
     brand,
     manufacturer,
@@ -348,9 +375,8 @@ export default function SupplierProductImportPage() {
     detailDesc,
     selectedImages,
     thumbnailIdx,
-    correctionStatus,
-    correctedDataUrl,
     sourceUrl,
+    adminProduct,
     navigate,
     o4oCategoryId,
     o4oPriceGeneral,
@@ -359,70 +385,6 @@ export default function SupplierProductImportPage() {
     o4oRegulatoryType,
     effective,
   ]);
-
-  /* ---------------------------------------------------------------- */
-  /*  Thumbnail dimension check                                        */
-  /* ---------------------------------------------------------------- */
-
-  useEffect(() => {
-    setThumbNaturalSize(null);
-    setCorrectedDataUrl(null);
-    setCorrectionStatus('idle');
-
-    if (thumbnailIdx === null || !parsed) return;
-    const url = parsed.imageUrls[thumbnailIdx];
-    if (!url) return;
-
-    const img = new Image();
-    img.onload = () => {
-      const w = img.naturalWidth;
-      const h = img.naturalHeight;
-      setThumbNaturalSize(w === 1000 && h === 1000 ? null : { w, h });
-    };
-    img.onerror = () => setThumbNaturalSize(null);
-    img.src = url;
-  }, [thumbnailIdx, parsed]);
-
-  const applyThumbnailCorrection = useCallback(() => {
-    if (thumbnailIdx === null || !parsed || !thumbNaturalSize) return;
-    const url = parsed.imageUrls[thumbnailIdx];
-
-    const canvas = document.createElement('canvas');
-    canvas.width = 1000;
-    canvas.height = 1000;
-    const ctx = canvas.getContext('2d')!;
-
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    correctionImgRef.current = img;
-
-    img.onload = () => {
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, 1000, 1000);
-      const { w, h } = thumbNaturalSize;
-
-      if (correctionMode === 'crop') {
-        const size = Math.min(w, h);
-        ctx.drawImage(img, (w - size) / 2, (h - size) / 2, size, size, 0, 0, 1000, 1000);
-      } else if (correctionMode === 'pad') {
-        const scale = Math.min(1000 / w, 1000 / h);
-        const dw = w * scale;
-        const dh = h * scale;
-        ctx.drawImage(img, 0, 0, w, h, (1000 - dw) / 2, (1000 - dh) / 2, dw, dh);
-      } else {
-        ctx.drawImage(img, 0, 0, 1000, 1000);
-      }
-
-      try {
-        setCorrectedDataUrl(canvas.toDataURL('image/jpeg', 0.92));
-        setCorrectionStatus('applied');
-      } catch {
-        setCorrectionStatus('cors-blocked');
-      }
-    };
-    img.onerror = () => setCorrectionStatus('cors-blocked');
-    img.src = url;
-  }, [thumbnailIdx, parsed, thumbNaturalSize, correctionMode]);
 
   /* ---------------------------------------------------------------- */
   /*  Image toggle                                                     */
@@ -468,15 +430,8 @@ export default function SupplierProductImportPage() {
   }, []);
 
   const selectAllDetailImages = useCallback(() => {
-    // 미리보기 실패 후보는 제외 (WO §6 — 실패 이미지는 후보 선택에서 자동 제외)
-    setSelectedDetailImages(
-      new Set(
-        detailCandidates
-          .map((_, i) => i)
-          .filter((i) => !detailImgPreviewErrors.has(i)),
-      ),
-    );
-  }, [detailCandidates, detailImgPreviewErrors]);
+    setSelectedDetailImages(new Set(detailCandidates.map((_, i) => i)));
+  }, [detailCandidates]);
 
   const clearAllDetailImages = useCallback(() => {
     setSelectedDetailImages(new Set());
@@ -549,13 +504,11 @@ export default function SupplierProductImportPage() {
     setThumbnailIdx(null);
     setSelectedDetailImages(new Set());
     setDetailImagesConfirmed(false);
-    setDetailImgPreviewErrors(new Set());
     setAdminProduct(null);
     setImageCopyStatus('idle');
     setImageCopyError('');
-    setThumbNaturalSize(null);
-    setCorrectedDataUrl(null);
-    setCorrectionStatus('idle');
+    setNavStatus('idle');
+    setNavError('');
     setError('');
     setO4oCategoryId('');
     setO4oPriceGeneral('');
@@ -794,15 +747,12 @@ export default function SupplierProductImportPage() {
                         : 'border-slate-200 opacity-50'
                     }`}
                   >
-                    <img
-                      src={url}
-                      alt={`img-${idx}`}
-                      className="aspect-square w-full object-cover"
-                      loading="lazy"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src =
-                          'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"><rect fill="%23f1f5f9"/></svg>';
-                      }}
+                    {/* 프록시 미리보기 (http 외부 URL 직접 삽입 금지 → 혼합 콘텐츠 회피) */}
+                    <ProxiedImg
+                      url={url}
+                      shopOrigin={(sourceUrl.trim() || adminProduct?.shopDomain) || undefined}
+                      alt={`상품 이미지 ${idx + 1}`}
+                      imgClassName="aspect-square w-full object-cover"
                     />
 
                     {/* Checkbox */}
@@ -831,73 +781,6 @@ export default function SupplierProductImportPage() {
                 ))}
               </div>
 
-              {/* Thumbnail correction panel */}
-              {thumbnailIdx !== null && thumbNaturalSize !== null && (
-                <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
-                  <p className="mb-3 text-sm font-medium text-amber-800">
-                    ⚠ 대표 이미지 규격 불일치 — {thumbNaturalSize.w}×{thumbNaturalSize.h}px
-                    (기준: 1000×1000)
-                  </p>
-
-                  <div className="flex gap-6">
-                    {/* CSS preview */}
-                    <div className="flex-shrink-0">
-                      <p className="mb-1 text-xs text-slate-500">보정 미리보기</p>
-                      <div className="h-28 w-28 overflow-hidden rounded border border-slate-300 bg-white">
-                        <img
-                          src={parsed.imageUrls[thumbnailIdx]}
-                          alt="보정 미리보기"
-                          className={`h-full w-full ${
-                            correctionMode === 'crop'
-                              ? 'object-cover'
-                              : correctionMode === 'pad'
-                              ? 'object-contain'
-                              : 'object-fill'
-                          }`}
-                        />
-                      </div>
-                      {correctionStatus === 'applied' && (
-                        <p className="mt-1 text-xs text-emerald-600">✓ 1000×1000 보정 완료</p>
-                      )}
-                      {correctionStatus === 'cors-blocked' && (
-                        <p className="mt-1 text-xs text-slate-400">원본 이미지로 전달됩니다</p>
-                      )}
-                    </div>
-
-                    {/* Mode selector + button */}
-                    <div className="flex flex-col gap-2">
-                      <p className="text-xs font-medium text-slate-700">보정 방식</p>
-                      {(['crop', 'pad', 'resize'] as const).map((mode) => (
-                        <label key={mode} className="flex cursor-pointer items-center gap-2 text-sm">
-                          <input
-                            type="radio"
-                            name="correctionMode"
-                            value={mode}
-                            checked={correctionMode === mode}
-                            onChange={() => {
-                              setCorrectionMode(mode);
-                              setCorrectionStatus('idle');
-                              setCorrectedDataUrl(null);
-                            }}
-                            className="accent-amber-600"
-                          />
-                          <span className="text-slate-700">
-                            {mode === 'crop' && '정사각형 크롭 (중앙 기준)'}
-                            {mode === 'pad' && '여백 추가 (흰 배경)'}
-                            {mode === 'resize' && '1000×1000 리사이즈'}
-                          </span>
-                        </label>
-                      ))}
-                      <button
-                        onClick={applyThumbnailCorrection}
-                        className="mt-2 rounded-lg bg-amber-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-amber-700"
-                      >
-                        보정 적용
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           )}
 
@@ -941,7 +824,6 @@ export default function SupplierProductImportPage() {
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
                   {detailCandidates.map((cand, idx) => {
                     const selected = selectedDetailImages.has(idx);
-                    const previewFailed = detailImgPreviewErrors.has(idx);
                     return (
                       <label
                         key={idx}
@@ -949,41 +831,21 @@ export default function SupplierProductImportPage() {
                           selected ? 'border-emerald-500' : 'border-slate-200 opacity-70'
                         }`}
                       >
-                        {previewFailed ? (
-                          <div className="flex aspect-[3/4] w-full items-center justify-center bg-slate-50 px-2 text-center text-[11px] text-slate-400">
-                            미리보기 실패
-                          </div>
-                        ) : (
-                          <img
-                            src={cand.url}
-                            alt={cand.alt ?? `상세 이미지 ${cand.order}`}
-                            className="aspect-[3/4] w-full bg-slate-50 object-contain"
-                            loading="lazy"
-                            onError={() => {
-                              setDetailImgPreviewErrors((prev) => {
-                                const next = new Set(prev);
-                                next.add(idx);
-                                return next;
-                              });
-                              // 실패 후보는 선택에서 자동 제외 (WO §6)
-                              setSelectedDetailImages((prev) => {
-                                if (!prev.has(idx)) return prev;
-                                const next = new Set(prev);
-                                next.delete(idx);
-                                return next;
-                              });
-                            }}
-                          />
-                        )}
+                        {/* 프록시 미리보기 (실패 시 재시도 카드) */}
+                        <ProxiedImg
+                          url={cand.originalUrl}
+                          shopOrigin={(sourceUrl.trim() || adminProduct?.shopDomain) || undefined}
+                          alt={cand.alt ?? `상세 이미지 ${cand.order}`}
+                          imgClassName="aspect-[3/4] w-full bg-slate-50 object-contain"
+                        />
 
                         {/* 선택 체크박스 */}
                         <span className="absolute left-1 top-1 flex h-5 w-5 items-center justify-center rounded bg-white/80">
                           <input
                             type="checkbox"
                             checked={selected}
-                            disabled={previewFailed}
                             onChange={() => toggleDetailImage(idx)}
-                            className="h-3.5 w-3.5 accent-emerald-600 disabled:cursor-not-allowed"
+                            className="h-3.5 w-3.5 accent-emerald-600"
                           />
                         </span>
 
@@ -991,13 +853,6 @@ export default function SupplierProductImportPage() {
                         <span className="absolute right-1 top-1 rounded bg-slate-900/70 px-1.5 py-0.5 text-[10px] font-medium text-white">
                           {cand.order}
                         </span>
-
-                        {/* 원본 크기 (확인 가능한 경우) */}
-                        {cand.width != null && cand.height != null && (
-                          <span className="absolute bottom-1 left-1 rounded bg-slate-900/60 px-1 py-0.5 text-[10px] text-white">
-                            {cand.width}×{cand.height}
-                          </span>
-                        )}
                       </label>
                     );
                   })}
@@ -1184,9 +1039,10 @@ export default function SupplierProductImportPage() {
           <div className="mt-5 flex gap-3">
             <button
               onClick={handleNavigateToCreate}
-              className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-700"
+              disabled={navStatus === 'copying'}
+              className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              상품 등록 페이지로 이동 →
+              {navStatus === 'copying' ? '이미지 O4O 복사 중…' : '상품 등록 페이지로 이동 →'}
             </button>
             <button
               onClick={() => navigate('/supplier/products')}
@@ -1195,6 +1051,7 @@ export default function SupplierProductImportPage() {
               취소
             </button>
           </div>
+          {navError && <p className="mt-2 text-sm text-amber-700">{navError}</p>}
         </div>
       )}
 
@@ -1210,6 +1067,80 @@ export default function SupplierProductImportPage() {
       />
     </div>
   );
+}
+
+/* ------------------------------------------------------------------ */
+/*  ProxiedImg — 서버 SSRF-safe 프록시 미리보기 (혼합 콘텐츠 회피)          */
+/*  WO-O4O-NETURE-SUPPLIER-OWN-ADMIN-PRODUCT-IMPORT-V1                  */
+/* ------------------------------------------------------------------ */
+
+function ProxiedImg({
+  url,
+  shopOrigin,
+  alt,
+  imgClassName,
+  onStatus,
+}: {
+  url: string;
+  shopOrigin?: string;
+  alt: string;
+  imgClassName?: string;
+  /** 미리보기 성공(true)/실패(false) 보고 — 부모가 선택 가능 여부 판단 */
+  onStatus?: (ok: boolean) => void;
+}) {
+  const [state, setState] = useState<'loading' | 'ok' | 'fail'>('loading');
+  const [src, setSrc] = useState<string | null>(null);
+  const objRef = useRef<string | null>(null);
+  const statusRef = useRef(onStatus);
+  statusRef.current = onStatus;
+
+  const load = useCallback(async () => {
+    setState('loading');
+    if (objRef.current) {
+      URL.revokeObjectURL(objRef.current);
+      objRef.current = null;
+    }
+    try {
+      const obj = await supplierApi.proxyImageObjectUrl(url, shopOrigin);
+      objRef.current = obj;
+      setSrc(obj);
+      setState('ok');
+      statusRef.current?.(true);
+    } catch {
+      setState('fail');
+      statusRef.current?.(false);
+    }
+  }, [url, shopOrigin]);
+
+  useEffect(() => {
+    load();
+    return () => {
+      if (objRef.current) URL.revokeObjectURL(objRef.current);
+    };
+  }, [load]);
+
+  if (state === 'loading') {
+    return (
+      <div className={`flex aspect-[3/4] w-full items-center justify-center bg-slate-50 text-[11px] text-slate-400 ${imgClassName ?? ''}`}>
+        불러오는 중…
+      </div>
+    );
+  }
+  if (state === 'fail' || !src) {
+    return (
+      <div className={`flex aspect-[3/4] w-full flex-col items-center justify-center gap-1 bg-slate-50 px-2 text-center text-[11px] text-slate-500 ${imgClassName ?? ''}`}>
+        <span>미리보기 실패</span>
+        <button
+          type="button"
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); load(); }}
+          className="rounded border border-slate-300 px-2 py-0.5 text-[10px] text-slate-600 hover:bg-white"
+        >
+          재시도
+        </button>
+      </div>
+    );
+  }
+  return <img src={src} alt={alt} className={imgClassName} loading="lazy" />;
 }
 
 /* ------------------------------------------------------------------ */

@@ -250,26 +250,28 @@ function detectShopBase(html: string): string | null {
   const isBlocked = (h: string) =>
     blocked.some((b) => h.includes(b)) || fmInfra.test(h) || h === 'firstmall.kr';
 
-  // 호스트 빈도 집계
-  const freq = new Map<string, number>();
+  // 호스트 빈도 집계 — custom(공개 도메인) 과 firstmall 서브도메인(내부) 분리
+  const customFreq = new Map<string, number>();
+  const fmFreq = new Map<string, number>();
   for (const m of html.matchAll(/https?:\/\/([a-z0-9-]+(?:\.[a-z0-9-]+)+)/gi)) {
     const h = m[1].toLowerCase();
     if (isBlocked(h)) continue;
-    freq.set(h, (freq.get(h) ?? 0) + 1);
+    if (h.endsWith('.firstmall.kr')) fmFreq.set(h, (fmFreq.get(h) ?? 0) + 1);
+    else customFreq.set(h, (customFreq.get(h) ?? 0) + 1);
   }
+  const top = (m: Map<string, number>): string | null => {
+    let best: string | null = null;
+    let bestN = 0;
+    for (const [h, n] of m) if (n > bestN) { best = h; bestN = n; }
+    return best;
+  };
 
-  let best: string | null = null;
-  let bestN = 0;
-  for (const [h, n] of freq) {
-    if (n > bestN) {
-      best = h;
-      bestN = n;
-    }
-  }
-  if (best) {
-    // 자사 firstmall 서브도메인은 http-only — 그 외 custom 도메인은 https 우선
-    return best.endsWith('.firstmall.kr') ? `http://${best}` : `https://${best}`;
-  }
+  // 우선순위: custom 공개 도메인(https) > firstmall 서브도메인(http, 내부/관리자 도메인)
+  // 공개 storefront 는 custom 도메인이며 https 라 미리보기/복사가 안정적이다.
+  const custom = top(customFreq);
+  if (custom) return `https://${custom}`;
+  const fm = top(fmFreq);
+  if (fm) return `http://${fm}`;
 
   // fallback: krdomain = gl_protocol+'xxx.firstmall.kr'
   const kr = html.match(/krdomain\s*=\s*[^'"]*['"]([a-z0-9.-]+\.firstmall\.kr)['"]/i);

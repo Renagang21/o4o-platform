@@ -16,7 +16,7 @@ import type { DataSource } from 'typeorm';
 import { requireAuth } from '../../../middleware/auth.middleware.js';
 import { createRequireLinkedSupplier } from '../middleware/neture-identity.middleware.js';
 import type { SupplierRequest } from '../middleware/neture-identity.middleware.js';
-import { copyImages } from '../services/product-detail-fetch.service.js';
+import { copyImages, proxyImage, DetailFetchError } from '../services/product-detail-fetch.service.js';
 import logger from '../../../utils/logger.js';
 
 export function createSupplierImportController(dataSource: DataSource): Router {
@@ -85,6 +85,45 @@ export function createSupplierImportController(dataSource: DataSource): Router {
           success: false,
           error: { code: 'INTERNAL_ERROR', message: '이미지 복사 중 오류가 발생했습니다.' },
         });
+      }
+    },
+  );
+
+  /**
+   * POST /supplier/import/image-proxy
+   * body: { url: string, shopOrigin?: string }
+   *
+   * 미리보기 전용: 자사 쇼핑몰 이미지를 SSRF-safe 로 가져와 bytes 를 그대로 반환한다(저장 없음).
+   * HTTPS Neture 화면에서 http 외부 이미지를 직접 표시하지 않기 위함(혼합 콘텐츠 회피).
+   * 클라이언트는 인증 fetch → blob → objectURL 로 미리보기한다.
+   * WO-O4O-NETURE-SUPPLIER-OWN-ADMIN-PRODUCT-IMPORT-V1
+   */
+  router.post(
+    '/import/image-proxy',
+    requireAuth,
+    requireLinkedSupplier,
+    async (req: SupplierRequest, res: Response) => {
+      try {
+        const url = typeof req.body?.url === 'string' ? req.body.url.trim() : '';
+        const shopOrigin = typeof req.body?.shopOrigin === 'string' ? req.body.shopOrigin.trim() : undefined;
+        if (!url || url.length > 2048) {
+          return res.status(400).json({ success: false, error: { code: 'INVALID_URL', message: '이미지 주소가 올바르지 않습니다.' } });
+        }
+        let normalizedOrigin: string | undefined;
+        if (shopOrigin) {
+          try { normalizedOrigin = new URL(shopOrigin).origin; } catch { /* 무시 — url 자체 origin 사용 */ }
+        }
+        const { buffer, mime } = await proxyImage(url, normalizedOrigin);
+        res.setHeader('Content-Type', mime);
+        res.setHeader('Cache-Control', 'private, max-age=300');
+        res.setHeader('Content-Length', String(buffer.length));
+        return res.end(buffer);
+      } catch (error) {
+        if (error instanceof DetailFetchError) {
+          return res.status(error.status).json({ success: false, error: { code: error.code, message: error.message } });
+        }
+        logger.error('[Neture SupplierImport] image-proxy failed:', error);
+        return res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: '이미지 미리보기 오류' } });
       }
     },
   );
