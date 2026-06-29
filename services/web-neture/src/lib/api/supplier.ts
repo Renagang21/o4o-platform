@@ -487,11 +487,16 @@ export const supplierApi = {
     return URL.createObjectURL(response.data as Blob);
   },
 
-  async copyImages(urls: string[], shopOrigin?: string): Promise<CopyImagesResult> {
+  async copyImages(
+    urls: string[],
+    shopOrigin?: string,
+    opts?: { preserveOriginal?: boolean },
+  ): Promise<CopyImagesResult> {
     try {
       const response = await api.post('/neture/supplier/import/copy-images', {
         urls,
         ...(shopOrigin ? { shopOrigin } : {}),
+        ...(opts?.preserveOriginal ? { preserveOriginal: true } : {}),
       });
       return response.data.data as CopyImagesResult;
     } catch (error) {

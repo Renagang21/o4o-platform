@@ -235,6 +235,7 @@ async function copyImageToStorage(
   sameOrigin: string,
   mediaService: MediaLibraryService,
   userId: string,
+  preserveOriginal: boolean,
 ): Promise<{ url: string | null; reason?: string }> {
   const r = await fetchImageSafe(imageUrl, sameOrigin);
   if ('error' in r) {
@@ -247,6 +248,8 @@ async function copyImageToStorage(
       userId,
       'neture',
       'description',
+      // 상세설명 이미지는 원본 픽셀/비율 보존 (대표/갤러리는 표준 1200 webp)
+      { preserveOriginal },
     );
     return { url: asset.url };
   } catch (e) {
@@ -268,9 +271,9 @@ async function copyImageToStorage(
  */
 export async function copyImages(
   urls: string[],
-  opts: { dataSource: DataSource; userId: string; shopOrigin?: string },
+  opts: { dataSource: DataSource; userId: string; shopOrigin?: string; preserveOriginal?: boolean },
 ): Promise<CopiedImageResult[]> {
-  const { dataSource, userId, shopOrigin } = opts;
+  const { dataSource, userId, shopOrigin, preserveOriginal = false } = opts;
   const mediaService = new MediaLibraryService(dataSource);
   const out: CopiedImageResult[] = [];
   const seen = new Set<string>();
@@ -291,7 +294,7 @@ export async function copyImages(
         continue;
       }
     }
-    const { url, reason } = await copyImageToStorage(originalUrl, originConstraint, mediaService, userId);
+    const { url, reason } = await copyImageToStorage(originalUrl, originConstraint, mediaService, userId, preserveOriginal);
     out.push({ originalUrl, url, ok: !!url, reason: url ? undefined : reason });
   }
   return out;

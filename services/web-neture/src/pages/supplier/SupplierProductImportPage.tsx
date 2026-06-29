@@ -449,9 +449,11 @@ export default function SupplierProductImportPage() {
     setImageCopyError('');
     try {
       const shopOrigin = (sourceUrl.trim() || adminProduct?.shopDomain) ?? undefined;
+      // 상세설명 이미지는 원본 해상도 보존(긴 세로 이미지를 축소하지 않음 → 본문 폭 표시 시 선명).
       const res = await supplierApi.copyImages(
         chosen.map((c) => c.originalUrl),
         shopOrigin,
+        { preserveOriginal: true },
       );
       // originalUrl → O4O url 매핑
       const map = new Map(res.results.filter((r) => r.ok && r.url).map((r) => [r.originalUrl, r.url as string]));

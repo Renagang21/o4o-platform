@@ -72,10 +72,13 @@ export function createSupplierImportController(dataSource: DataSource): Router {
           }
         }
 
+        // 상세설명 이미지는 원본 픽셀/비율 보존(preserveOriginal), 대표/갤러리는 표준 정책.
+        const preserveOriginal = req.body?.preserveOriginal === true;
         const results = await copyImages(urls, {
           dataSource,
           userId: req.user!.id,
           shopOrigin: normalizedOrigin,
+          preserveOriginal,
         });
         const copied = results.filter((r) => r.ok).length;
         return res.json({ success: true, data: { copied, total: results.length, results } });

@@ -14,6 +14,12 @@ import logger from '../../../utils/logger.js';
 
 const IMAGE_MIMES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
+// preserveOriginal 안전 상한 (상세설명 등 원본 보존 업로드) — 초과 시에만 고품질 축소
+const PRESERVE_MAX_WIDTH = 2000;
+const PRESERVE_MAX_HEIGHT = 30000;
+const PRESERVE_MAX_PIXELS = 40_000_000; // 40MP
+const PRESERVE_MAX_BYTES = 8 * 1024 * 1024; // 8MB
+
 /**
  * 한글 파일명 보정 (WO-O4O-KPA-RESOURCES-CREATE-MODAL-UX-V1)
  *
@@ -55,6 +61,7 @@ export class MediaLibraryService {
     userId: string,
     serviceKey?: string,
     folder = 'general',
+    opts?: { preserveOriginal?: boolean },
   ): Promise<MediaAsset> {
     const isImage = IMAGE_MIMES.includes(file.mimetype);
     let buffer = file.buffer;
@@ -62,26 +69,60 @@ export class MediaLibraryService {
     let width: number | null = null;
     let height: number | null = null;
 
-    // 이미지 처리: 리사이즈 + WebP 변환
+    // 이미지 처리
     if (isImage) {
       const metadata = await sharp(file.buffer).metadata();
-      const processed = await sharp(file.buffer)
-        .resize(1200, 1200, { fit: 'inside', withoutEnlargement: true })
-        .webp({ quality: 85 })
-        .toBuffer();
+      const ow = metadata.width ?? 0;
+      const oh = metadata.height ?? 0;
 
-      const processedMeta = await sharp(processed).metadata();
-      buffer = processed;
-      mimeType = 'image/webp';
-      width = processedMeta.width || metadata.width || null;
-      height = processedMeta.height || metadata.height || null;
+      // WO-O4O-NETURE-SUPPLIER-OWN-ADMIN-PRODUCT-IMPORT-V1 (품질):
+      //   상세설명 이미지(긴 세로 이미지)는 일반 max-height 규칙으로 축소하면 본문 폭 표시 시 흐려진다.
+      //   preserveOriginal=true 면 원본 픽셀/비율을 보존한다. 단, 안전 상한 초과 시에만 고품질 재인코딩.
+      if (opts?.preserveOriginal) {
+        const overCaps =
+          ow > PRESERVE_MAX_WIDTH ||
+          oh > PRESERVE_MAX_HEIGHT ||
+          ow * oh > PRESERVE_MAX_PIXELS ||
+          file.buffer.length > PRESERVE_MAX_BYTES;
+        if (!overCaps) {
+          // 원본 바이트 + MIME 그대로 저장 (재인코딩 없음 → 텍스트 선명도 손실 0, EXIF orientation 보존)
+          buffer = file.buffer;
+          mimeType = file.mimetype;
+          width = ow || null;
+          height = oh || null;
+        } else {
+          // 안전 상한 초과 — 고품질(quality 92) 로 상한 내 축소 (긴 세로 비율 유지)
+          const processed = await sharp(file.buffer)
+            .rotate()
+            .resize(PRESERVE_MAX_WIDTH, PRESERVE_MAX_HEIGHT, { fit: 'inside', withoutEnlargement: true })
+            .webp({ quality: 92 })
+            .toBuffer();
+          const pm = await sharp(processed).metadata();
+          buffer = processed;
+          mimeType = 'image/webp';
+          width = pm.width || ow || null;
+          height = pm.height || oh || null;
+        }
+      } else {
+        // 표준 정책: 1200x1200 fit-inside + WebP(85) (대표/썸네일/일반 업로드)
+        const processed = await sharp(file.buffer)
+          .resize(1200, 1200, { fit: 'inside', withoutEnlargement: true })
+          .webp({ quality: 85 })
+          .toBuffer();
+        const processedMeta = await sharp(processed).metadata();
+        buffer = processed;
+        mimeType = 'image/webp';
+        width = processedMeta.width || ow || null;
+        height = processedMeta.height || oh || null;
+      }
     }
 
     // GCS 업로드
     const now = new Date();
     const yyyy = now.getFullYear();
     const mm = String(now.getMonth() + 1).padStart(2, '0');
-    const ext = isImage ? '.webp' : this.getExtension(file.mimetype, file.originalname);
+    // 저장된 실제 mimeType 기준 확장자 (preserve 시 원본 mime, 그 외 webp)
+    const ext = isImage ? this.getExtension(mimeType, file.originalname) : this.getExtension(file.mimetype, file.originalname);
     const fileName = `${randomUUID()}${ext}`;
     const gcsPath = `media/${yyyy}/${mm}/${fileName}`;
 
