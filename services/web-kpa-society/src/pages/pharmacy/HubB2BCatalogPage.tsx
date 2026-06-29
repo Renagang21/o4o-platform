@@ -2,19 +2,19 @@
  * HubB2BCatalogPage - 플랫폼 B2B 상품 카탈로그
  *
  * WO-O4O-HUB-B2B-CATALOG-V1
- * WO-O4O-STORE-HUB-B2B-UI-REFINEMENT-V1: 내 매장에 추가/제외 UX 정비
+ * WO-O4O-STORE-HUB-B2B-UI-REFINEMENT-V1: 내 약국에 추가/제외 UX 정비
  * WO-O4O-STORE-PRODUCT-STATUS-REMOVAL-V1: 매장 상품 상태 제거 — 단순 취급 목록 모델
  * WO-O4O-STORE-HUB-B2B-CANONICAL-DATATABLE-V1:
  *   raw div 테이블 → @o4o/operator-ux-core DataTable 전환
- *   체크박스 multi-select + ActionBar(내 매장에 추가 bulk / 선택 해제) 추가
+ *   체크박스 multi-select + ActionBar(내 약국에 추가 bulk / 선택 해제) 추가
  *
  * Hub 공용공간에서 플랫폼 공급자 상품을 탐색하고
- * "내 매장에 추가" 버튼 또는 bulk ActionBar로 내 매장 상품 신청을 진행하는 페이지.
+ * "내 약국에 추가" 버튼 또는 bulk ActionBar로 내 약국 상품 신청을 진행하는 페이지.
  *
  * 사용 API:
  *   - getCatalog() : 플랫폼 B2B 상품 카탈로그 (neture_supplier_products PUBLIC)
  *   - applyBySupplyProductId() : 카탈로그 기반 상품 추가 (단건/bulk 병렬)
- *   - cancelProductByOfferId() : 내 매장에서 상품 제외
+ *   - cancelProductByOfferId() : 내 약국에서 상품 제외
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
@@ -115,12 +115,12 @@ export function HubB2BCatalogPage() {
     setApplyingId(product.id);
     try {
       await applyBySupplyProductId(product.id);
-      toast.success(`"${product.name}" 내 매장에 추가되었습니다.`);
+      toast.success(`"${product.name}" 내 약국에 추가되었습니다.`);
       setProducts(prev => prev.map(p => p.id === product.id ? { ...p, isAdded: true } : p));
     } catch (e: any) {
       const code = e?.response?.data?.error?.code || e?.code;
       if (code === 'DUPLICATE_APPLICATION') {
-        toast.error('이미 내 매장에 추가된 상품입니다.');
+        toast.error('이미 내 약국에 추가된 상품입니다.');
       } else {
         toast.error(e.message || '상품 추가에 실패했습니다.');
       }
@@ -137,7 +137,7 @@ export function HubB2BCatalogPage() {
     setRemoveConfirmId(null);
     try {
       await cancelProductByOfferId(product.id);
-      toast.success(`"${product.name}"을(를) 내 매장에서 제외했습니다.`);
+      toast.success(`"${product.name}"을(를) 내 약국에서 제외했습니다.`);
       setProducts(prev => prev.map(p => p.id === product.id ? { ...p, isAdded: false } : p));
     } catch (e: any) {
       toast.error(e.message || '상품 제외에 실패했습니다.');
@@ -155,7 +155,7 @@ export function HubB2BCatalogPage() {
     if (targets.length === 0) {
       const alreadyAll = [...selectedKeys].every(k => products.find(p => p.id === k)?.isAdded);
       if (alreadyAll) {
-        toast.error('선택한 상품이 이미 모두 내 매장에 추가되어 있습니다.');
+        toast.error('선택한 상품이 이미 모두 내 약국에 추가되어 있습니다.');
       } else {
         toast.error('추가할 상품을 선택해주세요.');
       }
@@ -190,11 +190,11 @@ export function HubB2BCatalogPage() {
 
     // 토스트
     if (successCount > 0 && failCount === 0) {
-      toast.success(`${successCount}개 상품을 내 매장에 추가했습니다.`);
+      toast.success(`${successCount}개 상품을 내 약국에 추가했습니다.`);
     } else if (successCount > 0) {
       toast.success(`${successCount}개 추가 완료. ${failCount}개 실패.`);
     } else if (duplicateCount > 0) {
-      toast.error('선택한 상품이 이미 내 매장에 추가되어 있습니다.');
+      toast.error('선택한 상품이 이미 내 약국에 추가되어 있습니다.');
     } else {
       toast.error('상품 추가에 실패했습니다. 다시 시도해주세요.');
     }
@@ -219,7 +219,7 @@ export function HubB2BCatalogPage() {
                 {row.name}
               </span>
               {row.isAdded && (
-                <span style={styles.myStoreBadge}>내 매장</span>
+                <span style={styles.myStoreBadge}>내 약국</span>
               )}
             </div>
             {row.description && (
@@ -295,7 +295,7 @@ export function HubB2BCatalogPage() {
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
                 <button
                   disabled
-                  title="이미 내 매장에 추가됨"
+                  title="이미 내 약국에 추가됨"
                   style={styles.iconButtonAdded}
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -305,7 +305,7 @@ export function HubB2BCatalogPage() {
                 <button
                   onClick={() => setRemoveConfirmId(row.id)}
                   disabled={isRemoving}
-                  title="내 매장에서 제외"
+                  title="내 약국에서 제외"
                   style={{ ...styles.iconButtonRemove, opacity: isRemoving ? 0.5 : 1 }}
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -323,7 +323,7 @@ export function HubB2BCatalogPage() {
               <button
                 onClick={() => handleApply(row)}
                 disabled={isApplying}
-                title={isApplying ? '추가 중...' : '내 매장에 추가'}
+                title={isApplying ? '추가 중...' : '내 약국에 추가'}
                 style={{ ...styles.iconButtonAdd, opacity: isApplying ? 0.6 : 1 }}
               >
                 {isApplying ? (
@@ -364,7 +364,7 @@ export function HubB2BCatalogPage() {
         return (
           <div style={styles.confirmOverlay}>
             <div style={styles.confirmBox}>
-              <p style={styles.confirmText}>이 상품을 내 매장에서 제외하시겠습니까?</p>
+              <p style={styles.confirmText}>이 상품을 내 약국에서 제외하시겠습니까?</p>
               <p style={styles.confirmProductName}>{target.name}</p>
               <div style={styles.confirmActions}>
                 <button onClick={() => setRemoveConfirmId(null)} style={styles.confirmCancel}>취소</button>
@@ -385,7 +385,7 @@ export function HubB2BCatalogPage() {
       <header style={styles.hero}>
         <h1 style={styles.heroTitle}>상품 카탈로그</h1>
         <p style={styles.heroDesc}>
-          현재 활성 공급자가 제공 중인 상품을 탐색하고 내 매장에 추가할 수 있습니다.
+          현재 활성 공급자가 제공 중인 상품을 탐색하고 내 약국에 추가할 수 있습니다.
         </p>
       </header>
 
@@ -425,7 +425,7 @@ export function HubB2BCatalogPage() {
             disabled={bulkAdding}
             style={{ ...styles.actionBarBtn, opacity: bulkAdding ? 0.6 : 1 }}
           >
-            {bulkAdding ? '추가 중...' : `내 매장에 추가 (${notAddedSelectedCount || selectedKeys.size}건)`}
+            {bulkAdding ? '추가 중...' : `내 약국에 추가 (${notAddedSelectedCount || selectedKeys.size}건)`}
           </button>
           <button
             type="button"
@@ -484,7 +484,7 @@ export function HubB2BCatalogPage() {
       <div style={styles.notice}>
         <span style={styles.noticeIcon}>💡</span>
         <span>
-          상품을 선택한 뒤 "내 매장에 추가"로 한 번에 추가하거나, 각 행의 + 버튼으로 단건 추가할 수 있습니다.
+          상품을 선택한 뒤 "내 약국에 추가"로 한 번에 추가하거나, 각 행의 + 버튼으로 단건 추가할 수 있습니다.
           추가된 상품은 <a href="/store/channels" style={{ color: colors.primary }}>채널 관리</a>에서 진열하면 고객에게 보여집니다.
         </span>
       </div>

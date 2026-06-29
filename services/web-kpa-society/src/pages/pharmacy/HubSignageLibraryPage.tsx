@@ -5,7 +5,7 @@
  * WO-O4O-STORE-HUB-SIGNAGE-CANONICAL-DATATABLE-V1: 카드리스트 → canonical DataTable 전환
  *
  * Hub 공용공간에서 플랫폼이 제공하는 사이니지 미디어/플레이리스트를 탐색하고
- * "내 매장에 추가" 버튼으로 Asset Snapshot Copy를 실행하는 페이지.
+ * "내 약국에 추가" 버튼으로 Asset Snapshot Copy를 실행하는 페이지.
  *
  * 전이 패턴 (CMS와 동일):
  *   /hub/signage 탐색
@@ -16,7 +16,7 @@
  * 데이터 소스:
  *   - hubContentApi.list({ sourceDomain: 'signage-media' })   : 공개 미디어 목록
  *   - hubContentApi.list({ sourceDomain: 'signage-playlist' }): 공개 플레이리스트 목록
- *   - assetSnapshotApi.copy()                                 : 내 매장에 복사
+ *   - assetSnapshotApi.copy()                                 : 내 약국에 복사
  *
  * ❌ globalContentApi.cloneMedia/clonePlaylist 사용 금지
  *
@@ -183,7 +183,7 @@ export function HubSignageLibraryPage() {
         sourceAssetId: item.id,
         assetType: 'signage',
       });
-      toast.success(`"${item.title}" 이(가) 내 매장에 추가되었습니다.`);
+      toast.success(`"${item.title}" 이(가) 내 약국에 추가되었습니다.`);
       setSelectedItem(null);
     } catch (e: any) {
       const msg = e?.message || '';
@@ -222,7 +222,7 @@ export function HubSignageLibraryPage() {
       // Show quick summary toast
       const successCount = results.filter(r => r.status === 'success').length;
       const failCount = results.filter(r => r.status === 'failed').length;
-      if (successCount > 0) toast.success(`${successCount}개 항목이 내 매장에 추가되었습니다.`);
+      if (successCount > 0) toast.success(`${successCount}개 항목이 내 약국에 추가되었습니다.`);
       if (failCount > 0) toast.error(`${failCount}개 항목 추가에 실패했습니다.`);
       // Suppress unused variable warning
       void currentData;
@@ -347,12 +347,12 @@ export function HubSignageLibraryPage() {
     <div className="max-w-7xl mx-auto px-6 py-8">
       {/* Hero */}
       {/* WO-KPA-STORE-HUB-ASSET-CREATE-ACTION-RESTORE-V1:
-          플랫폼 자료 "가져오기"(행별 내 매장에 추가)와 "내 약국용 직접 만들기"를 분리 노출 */}
+          플랫폼 자료 "가져오기"(행별 내 약국에 추가)와 "내 약국용 직접 만들기"를 분리 노출 */}
       <header className="mb-6 pb-5 border-b-2 border-slate-200 flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">플랫폼 디지털사이니지</h1>
           <p className="mt-1.5 text-sm text-slate-500">
-            플랫폼이 제공하는 매장 화면 콘텐츠·플레이리스트를 탐색해 내 매장에 추가하거나,
+            플랫폼이 제공하는 매장 화면 콘텐츠·플레이리스트를 탐색해 내 약국에 추가하거나,
             내 약국 전용 플레이리스트를 직접 구성하세요.
           </p>
         </div>
@@ -428,13 +428,13 @@ export function HubSignageLibraryPage() {
               actions={[
                 {
                   key: 'bulk-add',
-                  label: `내 매장에 추가 (${selectedIds.size})`,
+                  label: `내 약국에 추가 (${selectedIds.size})`,
                   onClick: handleBulkAdd,
                   variant: 'primary' as const,
                   icon: <Plus className="w-3.5 h-3.5" />,
                   loading: batch.loading,
                   group: 'actions',
-                  tooltip: '선택한 항목을 내 매장 사이니지에 일괄 추가합니다',
+                  tooltip: '선택한 항목을 내 약국 사이니지에 일괄 추가합니다',
                   visible: selectedIds.size > 0,
                 },
                 {
@@ -525,7 +525,7 @@ export function HubSignageLibraryPage() {
         width={480}
         actions={selectedItem ? [
           {
-            label: '내 매장에 추가',
+            label: '내 약국에 추가',
             onClick: () => handleCopySingle(selectedItem),
             variant: 'primary' as const,
           },

@@ -107,7 +107,7 @@ export function HubPopLibraryPage() {
       setSingleImporting(true);
       try {
         const result = await importOperatorPop(slug, item.id);
-        toast.success(`"${result.title}" 가져오기 완료 — 내 매장 POP(초안)에 추가되었습니다`);
+        toast.success(`"${result.title}" 가져오기 완료 — 내 약국 POP(초안)에 추가되었습니다`);
         setSelectedItem(null);
       } catch (e: any) {
         toast.error(e?.message || '가져오기에 실패했습니다');
@@ -139,7 +139,7 @@ export function HubPopLibraryPage() {
       });
       const successCount = results.filter((r) => r.status === 'success').length;
       const failCount = results.filter((r) => r.status === 'failed').length;
-      if (successCount > 0) toast.success(`${successCount}개 POP 이 내 매장에 추가되었습니다`);
+      if (successCount > 0) toast.success(`${successCount}개 POP 이 내 약국에 추가되었습니다`);
       if (failCount > 0) toast.error(`${failCount}개 POP 가져오기에 실패했습니다`);
       return { data: { results } };
     },
@@ -216,7 +216,7 @@ export function HubPopLibraryPage() {
         <div>
           <h1 className="text-2xl font-bold text-slate-900">매장 HUB POP</h1>
           <p className="mt-1.5 text-sm text-slate-500">
-            KPA 운영자가 발행한 POP 을 선택해 내 매장으로 가져가거나(초안 사본),
+            KPA 운영자가 발행한 POP 을 선택해 내 약국으로 가져가거나(초안 사본),
             내 약국용 POP 을 직접 만드세요.
           </p>
         </div>
@@ -257,13 +257,13 @@ export function HubPopLibraryPage() {
               actions={[
                 {
                   key: 'bulk-import',
-                  label: `내 매장에 가져가기 (${selectedIds.size})`,
+                  label: `내 약국에 가져가기 (${selectedIds.size})`,
                   onClick: handleBulkImport,
                   variant: 'primary' as const,
                   icon: <Download className="w-3.5 h-3.5" />,
                   loading: batch.loading,
                   group: 'actions',
-                  tooltip: '선택한 POP 을 내 매장 POP(초안)으로 일괄 가져갑니다',
+                  tooltip: '선택한 POP 을 내 약국 POP(초안)으로 일괄 가져갑니다',
                   visible: selectedIds.size > 0,
                   disabled: !slug,
                 },
@@ -333,7 +333,7 @@ export function HubPopLibraryPage() {
               onClick={() => navigate('/store/content/pop')}
               className="text-blue-600 hover:underline font-medium"
             >
-              내 매장 POP
+              내 약국 POP
             </button>{' '}
             에서 수정할 수 있습니다.
           </span>
@@ -349,7 +349,7 @@ export function HubPopLibraryPage() {
           selectedItem
             ? [
                 {
-                  label: singleImporting ? '가져오는 중...' : '내 매장에 가져가기',
+                  label: singleImporting ? '가져오는 중...' : '내 약국에 가져가기',
                   onClick: () => handleSingleImport(selectedItem),
                   variant: 'primary' as const,
                   disabled: !slug || singleImporting,

@@ -13,23 +13,24 @@
  * Outlet으로 선택된 메뉴의 페이지를 렌더링한다.
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import {
   Menu,
   Home,
   PackageSearch,
   MonitorPlay,
-  BadgePercent,
+  Megaphone,
   ShoppingCart,
   Files,
   Newspaper,
-  Megaphone,
+  StickyNote,
   QrCode,
   Video,
   type LucideIcon,
 } from 'lucide-react';
 import { colors } from '../../styles/theme';
+import { eventOfferApi } from '../../api/eventOffer';
 
 interface HubMenuItem {
   label: string;
@@ -38,25 +39,54 @@ interface HubMenuItem {
   // O4O-GLOBAL-ICON-SYSTEM-STANDARD-V1 — emoji 제거, lucide line icon 통일
   icon: LucideIcon;
   description: string;
+  /** WO-O4O-KPA-STORE-HUB-MENU-ALIGNMENT-WITH-MY-STORE-V1: 진행 중 이벤트 수 배지 표시 대상 */
+  showEventBadge?: boolean;
+  /** 광고·홍보 성격 강조(이벤트·특가) */
+  accent?: boolean;
 }
 
-const HUB_MENU_ITEMS: HubMenuItem[] = [
-  { label: '홈', path: '/store-hub', icon: Home, description: '자원 탐색 허브 · 운영 흐름 안내' },
-  { label: '상품 카탈로그', path: '/store-hub/b2b', icon: PackageSearch, description: '공급 가능 상품 탐색 · 내 매장에 추가' },
-  { label: '디지털사이니지', path: '/store-hub/signage', icon: MonitorPlay, description: '매장 화면 콘텐츠 · 플레이리스트' },
-  { label: '이벤트/특가', path: '/store-hub/event-offers', icon: BadgePercent, description: 'KPA-Society 이벤트 상품' },
-  // WO-O4O-EVENT-OFFER-TO-CART-PHASE1A-FOLLOWUP-V1: 이벤트오퍼 담기 → 장바구니 확인
-  { label: '내 장바구니', path: '/store-hub/cart', icon: ShoppingCart, description: '장바구니에 담은 상품 확인 · 수량 조정' },
-  { label: '콘텐츠/자료', path: '/store-hub/content', icon: Files, description: 'CMS 콘텐츠 탐색 · 복사' },
-  // WO-O4O-STORE-HUB-BLOG-CONTENT-IMPORT-V1: 매장 HUB 블로그 진열 + 가져가기
-  { label: '블로그', path: '/store-hub/blog', icon: Newspaper, description: '운영자 게시 블로그 · 내 매장으로 가져가기' },
-  // WO-O4O-KPA-STORE-HUB-POP-CONTENT-IMPORT-V1: 매장 HUB POP 진열 + 가져가기
-  { label: 'POP', path: '/store-hub/pop', icon: Megaphone, description: '운영자 게시 POP · 내 매장으로 가져가기' },
-  // WO-O4O-KPA-STORE-HUB-QR-CONTENT-IMPORT-V1: 매장 HUB QR 진열 + 가져가기
-  // 매장 사본은 기존 StoreQRPage (/store/marketing/qr) 가 그대로 표시 — 별도 사본 관리 화면 없음.
-  { label: 'QR-code', path: '/store-hub/qr', icon: QrCode, description: '운영자 게시 QR 템플릿 · 내 매장으로 가져가기' },
-  // WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: 매장 HUB 동영상 진열 + 가져가기 (QR 전용)
-  { label: '동영상', path: '/store-hub/video', icon: Video, description: '운영자 게시 동영상 · 내 매장으로 가져가기 · QR 연결' },
+/** 그룹 헤더(빈 문자열이면 헤더 미표시) + 항목 */
+interface HubMenuGroup {
+  label: string;
+  items: HubMenuItem[];
+}
+
+/**
+ * WO-O4O-KPA-STORE-HUB-MENU-ALIGNMENT-WITH-MY-STORE-V1:
+ *   약국 운영 허브 메뉴를 내 약국(/store) 상위 그룹 축(홈 → 약국 상품·거래 → 약국 경영지원 →
+ *   약국 자료함 → 디지털 사이니지)에 정렬. 허브는 '탐색·가져오기' 공간이므로 자원이 있는 그룹만 노출
+ *   (온라인 판매/분석/설정 등 빈 그룹 미생성). 라우트/페이지/API 무변경 — 메뉴 재배치·라벨 정비만.
+ *   이벤트·특가: 독립 최상위 메뉴 제거 → '약국 상품·거래' 하위로 편입(광고·홍보 성격 보존,
+ *   메가폰 아이콘 + 진행 중 이벤트 수 배지). /store-hub/event-offers 직접 접근·기존 API 유지.
+ */
+const HUB_MENU_GROUPS: HubMenuGroup[] = [
+  { label: '', items: [
+    { label: '홈', path: '/store-hub', icon: Home, description: '자원 탐색 허브 · 운영 흐름 안내' },
+  ]},
+  { label: '약국 상품·거래', items: [
+    { label: '상품 카탈로그', path: '/store-hub/b2b', icon: PackageSearch, description: '공급 가능 상품 탐색 · 취급 신청' },
+    // 이벤트·특가 = 별도 시스템(event_offers). 광고·홍보성으로 시인성 강조(메가폰 + 진행 수 배지).
+    { label: '이벤트·특가', path: '/store-hub/event-offers', icon: Megaphone, description: '진행 중 이벤트·특가 상품 · 신청', showEventBadge: true, accent: true },
+    // WO-O4O-EVENT-OFFER-TO-CART-PHASE1A-FOLLOWUP-V1: 이벤트오퍼 담기 → 장바구니 확인
+    { label: '장바구니', path: '/store-hub/cart', icon: ShoppingCart, description: '장바구니에 담은 상품 확인 · 수량 조정' },
+  ]},
+  { label: '약국 경영지원', items: [
+    // WO-O4O-STORE-HUB-BLOG-CONTENT-IMPORT-V1: 매장 HUB 블로그 진열 + 가져가기
+    { label: '블로그', path: '/store-hub/blog', icon: Newspaper, description: '운영자 게시 블로그 · 내 약국으로 가져가기' },
+    // WO-O4O-KPA-STORE-HUB-POP-CONTENT-IMPORT-V1: 매장 HUB POP 진열 + 가져가기
+    { label: 'POP', path: '/store-hub/pop', icon: StickyNote, description: '운영자 게시 POP · 내 약국으로 가져가기' },
+    // WO-O4O-KPA-STORE-HUB-QR-CONTENT-IMPORT-V1: 매장 HUB QR 진열 + 가져가기
+    // 매장 사본은 기존 StoreQRPage (/store/marketing/qr) 가 그대로 표시 — 별도 사본 관리 화면 없음.
+    { label: 'QR-code', path: '/store-hub/qr', icon: QrCode, description: '운영자 게시 QR 템플릿 · 내 약국으로 가져가기' },
+    // WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: 매장 HUB 동영상 진열 + 가져가기 (QR 전용)
+    { label: '동영상', path: '/store-hub/video', icon: Video, description: '운영자 게시 동영상 · 내 약국으로 가져가기 · QR 연결' },
+  ]},
+  { label: '약국 자료함', items: [
+    { label: '콘텐츠 가져오기', path: '/store-hub/content', icon: Files, description: 'CMS 콘텐츠 탐색 · 내 약국으로 복사' },
+  ]},
+  { label: '디지털 사이니지', items: [
+    { label: '사이니지 콘텐츠', path: '/store-hub/signage', icon: MonitorPlay, description: '매장 화면 송출 콘텐츠 · 플레이리스트' },
+  ]},
 ];
 
 function isMenuActive(pathname: string, menuPath: string): boolean {
@@ -70,6 +100,18 @@ export function PharmacyHubLayout() {
   const { pathname } = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const closeMobileMenu = () => setMobileMenuOpen(false);
+
+  // WO-O4O-KPA-STORE-HUB-MENU-ALIGNMENT-WITH-MY-STORE-V1:
+  //   이벤트·특가 시인성 — 진행 중(active) 이벤트 수 배지. 실패/0건 시 배지 미표시(조용한 실패).
+  const [activeEventCount, setActiveEventCount] = useState<number | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    eventOfferApi
+      .getEnrichedOffers({ status: 'active', limit: 1 })
+      .then(res => { if (!cancelled) setActiveEventCount(res?.pagination?.total ?? null); })
+      .catch(() => { if (!cancelled) setActiveEventCount(null); });
+    return () => { cancelled = true; };
+  }, []);
 
   return (
     <div style={layoutStyles.wrapper} className="flex-col md:flex-row">
@@ -106,44 +148,61 @@ export function PharmacyHubLayout() {
         }`}
       >
         <div style={layoutStyles.sidebarHeader}>
-          <h2 style={layoutStyles.sidebarTitle}>매장 운영 허브</h2>
+          <h2 style={layoutStyles.sidebarTitle}>약국 운영 허브</h2>
           <p style={layoutStyles.sidebarSubtitle}>
-            플랫폼이 제공하는 자원을 탐색하고 내 매장으로 가져갑니다
+            플랫폼이 제공하는 자원을 탐색하고 내 약국으로 가져갑니다
           </p>
         </div>
 
         <nav style={layoutStyles.nav}>
-          {HUB_MENU_ITEMS.map(item => {
-            const active = isMenuActive(pathname, item.path);
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                onClick={closeMobileMenu}
-                style={{
-                  ...layoutStyles.menuItem,
-                  ...(active ? layoutStyles.menuItemActive : {}),
-                }}
-              >
-                <span style={layoutStyles.menuIcon}>
-                  <Icon size={18} color={active ? colors.primary : colors.neutral600} />
-                </span>
-                <div style={layoutStyles.menuText}>
-                  <span
+          {HUB_MENU_GROUPS.map(group => (
+            <div key={group.label || '_root'} style={layoutStyles.group}>
+              {group.label && (
+                <span style={layoutStyles.groupHeader}>{group.label}</span>
+              )}
+              {group.items.map(item => {
+                const active = isMenuActive(pathname, item.path);
+                const Icon = item.icon;
+                const showBadge = item.showEventBadge && activeEventCount != null && activeEventCount > 0;
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={closeMobileMenu}
                     style={{
-                      ...layoutStyles.menuLabel,
-                      ...(active ? layoutStyles.menuLabelActive : {}),
+                      ...layoutStyles.menuItem,
+                      ...(active ? layoutStyles.menuItemActive : {}),
                     }}
                   >
-                    {item.label}
-                  </span>
-                  <span style={layoutStyles.menuDesc}>{item.description}</span>
-                </div>
-                {active && <span style={layoutStyles.activeIndicator} />}
-              </Link>
-            );
-          })}
+                    <span style={layoutStyles.menuIcon}>
+                      <Icon
+                        size={18}
+                        color={active ? colors.primary : item.accent ? '#dc2626' : colors.neutral600}
+                      />
+                    </span>
+                    <div style={layoutStyles.menuText}>
+                      <span style={layoutStyles.menuLabelRow}>
+                        <span
+                          style={{
+                            ...layoutStyles.menuLabel,
+                            ...(active ? layoutStyles.menuLabelActive : {}),
+                            ...(item.accent && !active ? layoutStyles.menuLabelAccent : {}),
+                          }}
+                        >
+                          {item.label}
+                        </span>
+                        {showBadge && (
+                          <span style={layoutStyles.eventBadge}>진행 {activeEventCount}</span>
+                        )}
+                      </span>
+                      <span style={layoutStyles.menuDesc}>{item.description}</span>
+                    </div>
+                    {active && <span style={layoutStyles.activeIndicator} />}
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
         </nav>
 
         <div style={layoutStyles.sidebarFooter}>
@@ -204,6 +263,42 @@ const layoutStyles: Record<string, React.CSSProperties> = {
     display: 'flex',
     flexDirection: 'column',
     gap: '2px',
+  },
+  group: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '2px',
+    marginBottom: '10px',
+  },
+  groupHeader: {
+    padding: '8px 14px 4px',
+    fontSize: '0.6875rem',
+    fontWeight: 700,
+    letterSpacing: '0.02em',
+    color: colors.neutral400,
+    textTransform: 'none' as const,
+  },
+  menuLabelRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    minWidth: 0,
+  },
+  menuLabelAccent: {
+    color: '#dc2626',
+    fontWeight: 600,
+  },
+  eventBadge: {
+    display: 'inline-block',
+    padding: '1px 6px',
+    fontSize: '0.625rem',
+    fontWeight: 700,
+    lineHeight: 1.4,
+    color: '#fff',
+    backgroundColor: '#dc2626',
+    borderRadius: '9px',
+    whiteSpace: 'nowrap' as const,
+    flexShrink: 0,
   },
   menuItem: {
     display: 'flex',

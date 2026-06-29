@@ -4,8 +4,8 @@
  * WO-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-HUB-FLOW-WEB-PILOT-V1
  *
  * 매장 경영자(store-owner)가 KPA HUB 에 게시된 운영자 발행 다국어 상품 콘텐츠를 보고,
- * "가져오기" 로 내 매장 상품(취급 상품=local / O4O 주문 가능 상품=listing)에 연결한다.
- * 가져오면 내 매장 콘텐츠로 복사되어 이후 원본과 분리된다.
+ * "가져오기" 로 내 약국 상품(취급 상품=local / O4O 주문 가능 상품=listing)에 연결한다.
+ * 가져오면 내 약국 콘텐츠로 복사되어 이후 원본과 분리된다.
  *
  * 데이터 흐름:
  *   - HUB 목록: listMlcHub()  → GET /pharmacy/multilingual-product-contents/hub
@@ -120,7 +120,7 @@ export function HubMultilingualContentLibraryPage() {
         targetKind,
         targetId: selectedTargetId,
       });
-      toast.success(`"${importTarget.title}" 가져오기 완료 — 내 매장 콘텐츠(초안)에 복사되었습니다`);
+      toast.success(`"${importTarget.title}" 가져오기 완료 — 내 약국 콘텐츠(초안)에 복사되었습니다`);
       setImportTarget(null);
       navigate(`/store-hub/multilingual-product-contents/my?groupId=${group.id}`);
     } catch (e: any) {
@@ -136,7 +136,7 @@ export function HubMultilingualContentLibraryPage() {
         <h1 className="text-2xl font-bold text-slate-900">매장 HUB 다국어 상품 콘텐츠</h1>
         <p className="mt-1.5 text-sm text-slate-500">
           외국인 고객에게 QR 또는 타블렛으로 보여줄 수 있는 다국어 상품 안내 자료입니다.
-          가져오면 내 매장 콘텐츠로 복사되어 이후 원본과 분리됩니다.
+          가져오면 내 약국 콘텐츠로 복사되어 이후 원본과 분리됩니다.
         </p>
       </header>
 
@@ -209,7 +209,7 @@ export function HubMultilingualContentLibraryPage() {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h2 className="text-lg font-bold text-slate-900">가져오기 — 매장 상품 연결</h2>
-                <p className="text-xs text-slate-500 mt-1">"{importTarget.title}" 을(를) 내 매장 상품에 연결합니다.</p>
+                <p className="text-xs text-slate-500 mt-1">"{importTarget.title}" 을(를) 내 약국 상품에 연결합니다.</p>
               </div>
               <button onClick={() => !importing && setImportTarget(null)} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400"><X className="w-4 h-4" /></button>
             </div>

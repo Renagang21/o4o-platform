@@ -54,21 +54,21 @@ const kpaStoreHubConfig: StoreHubConfig = {
     },
     {
       icon: <MonitorPlay size={CARD_ICON_SIZE} color={ICON_COLOR} />,
-      title: '디지털사이니지',
-      desc: '매장 화면에 송출할 콘텐츠와 플레이리스트를 탐색해 내 매장에 추가합니다',
+      title: '디지털 사이니지',
+      desc: '매장 화면에 송출할 콘텐츠와 플레이리스트를 탐색해 내 약국에 추가합니다',
       href: '/store-hub/signage',
-      actionLabel: '디지털사이니지 탐색',
+      actionLabel: '디지털 사이니지 탐색',
     },
     {
       icon: <Files size={CARD_ICON_SIZE} color={ICON_COLOR} />,
-      title: '콘텐츠/자료',
-      desc: 'CMS 콘텐츠를 탐색하고 내 매장에 복사합니다',
+      title: '콘텐츠 가져오기',
+      desc: 'CMS 콘텐츠를 탐색하고 내 약국에 복사합니다',
       href: '/store-hub/content',
       actionLabel: '콘텐츠 탐색',
     },
     {
       icon: <BadgePercent size={CARD_ICON_SIZE} color={ICON_COLOR} />,
-      title: '이벤트/특가',
+      title: '이벤트·특가',
       desc: 'KPA-Society 이벤트 상품을 확인하고 신청합니다',
       href: '/store-hub/event-offers',
       actionLabel: '이벤트 보기',
@@ -107,7 +107,7 @@ const kpaStoreHubConfig: StoreHubConfig = {
     {
       step: '2',
       title: '복사 · 신청',
-      desc: '"내 매장에 추가" 또는 "취급 신청"으로 가져옵니다',
+      desc: '"내 약국에 추가" 또는 "취급 신청"으로 가져옵니다',
       where: terminology.storeHubLabel,
     },
     {

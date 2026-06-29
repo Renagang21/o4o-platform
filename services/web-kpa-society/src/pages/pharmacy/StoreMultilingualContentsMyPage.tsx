@@ -1,5 +1,5 @@
 /**
- * StoreMultilingualContentsMyPage — 내 매장 다국어 상품 콘텐츠 + resolve 검증
+ * StoreMultilingualContentsMyPage — 내 약국 다국어 상품 콘텐츠 + resolve 검증
  *
  * WO-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-HUB-FLOW-WEB-PILOT-V1
  *
@@ -43,7 +43,7 @@ export function StoreMultilingualContentsMyPage() {
       const data = await listMyMlcGroups({ includeArchived: false });
       setGroups(data ?? []);
     } catch (e: any) {
-      setError(e?.message || '내 매장 다국어 콘텐츠를 불러올 수 없습니다');
+      setError(e?.message || '내 약국 다국어 콘텐츠를 불러올 수 없습니다');
     } finally {
       setIsLoading(false);
     }
@@ -80,7 +80,7 @@ export function StoreMultilingualContentsMyPage() {
           <ArrowLeft className="w-4 h-4" />
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">내 매장 다국어 상품 콘텐츠</h1>
+          <h1 className="text-2xl font-bold text-slate-900">내 약국 다국어 상품 콘텐츠</h1>
           <p className="mt-1 text-sm text-slate-500">가져온 다국어 콘텐츠와 연결 상품을 확인하고 언어 fallback 을 검증합니다.</p>
         </div>
       </header>

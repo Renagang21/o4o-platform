@@ -114,7 +114,7 @@ export function HubQrLibraryPage() {
       try {
         const result = await importOperatorQr(slug, item.id);
         toast.success(
-          `"${result.title}" 가져오기 완료 — 내 매장 QR 에 추가되었습니다 (slug: ${result.slug})`,
+          `"${result.title}" 가져오기 완료 — 내 약국 QR 에 추가되었습니다 (slug: ${result.slug})`,
         );
         setSelectedItem(null);
       } catch (e: any) {
@@ -147,7 +147,7 @@ export function HubQrLibraryPage() {
       });
       const successCount = results.filter((r) => r.status === 'success').length;
       const failCount = results.filter((r) => r.status === 'failed').length;
-      if (successCount > 0) toast.success(`${successCount}개 QR 이 내 매장에 추가되었습니다`);
+      if (successCount > 0) toast.success(`${successCount}개 QR 이 내 약국에 추가되었습니다`);
       if (failCount > 0) toast.error(`${failCount}개 QR 가져오기에 실패했습니다`);
       return { data: { results } };
     },
@@ -265,13 +265,13 @@ export function HubQrLibraryPage() {
               actions={[
                 {
                   key: 'bulk-import',
-                  label: `내 매장에 가져가기 (${selectedIds.size})`,
+                  label: `내 약국에 가져가기 (${selectedIds.size})`,
                   onClick: handleBulkImport,
                   variant: 'primary' as const,
                   icon: <Download className="w-3.5 h-3.5" />,
                   loading: batch.loading,
                   group: 'actions',
-                  tooltip: '선택한 QR 템플릿을 내 매장 QR-code 로 일괄 가져갑니다',
+                  tooltip: '선택한 QR 템플릿을 내 약국 QR-code 로 일괄 가져갑니다',
                   visible: selectedIds.size > 0,
                   disabled: !slug,
                 },
@@ -341,7 +341,7 @@ export function HubQrLibraryPage() {
               onClick={() => navigate('/store/marketing/qr')}
               className="text-blue-600 hover:underline font-medium"
             >
-              내 매장 QR
+              내 약국 QR
             </button>{' '}
             에서 수정·출력·통계를 활용할 수 있습니다.
           </span>
@@ -357,7 +357,7 @@ export function HubQrLibraryPage() {
           selectedItem
             ? [
                 {
-                  label: singleImporting ? '가져오는 중...' : '내 매장에 가져가기',
+                  label: singleImporting ? '가져오는 중...' : '내 약국에 가져가기',
                   onClick: () => handleSingleImport(selectedItem),
                   variant: 'primary' as const,
                   disabled: !slug || singleImporting,

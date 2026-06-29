@@ -195,7 +195,7 @@ function useKpaContentHubConfig(userId?: string): ContentHubConfig {
     infoLinks: [{ label: '내 약국 > 자산 관리', href: '/store/content' }],
     // WO-O4O-STORE-CONTENT-TERMINOLOGY-AND-GUIDE-COPY-V1: 가져오기=복사·원본 단절 안내
     // WO-O4O-STORE-LIBRARY-DUPLICATE-COPY-UX-POLICY-V1: 재복사 허용 안내
-    // WO-O4O-KPA-STOREHUB-CONTENT-CANONICAL-ALIGN-V1: '내 매장' → '내 약국' 용어 정렬(KPA=약국 서비스)
+    // WO-O4O-KPA-STOREHUB-CONTENT-CANONICAL-ALIGN-V1: '내 약국' → '내 약국' 용어 정렬(KPA=약국 서비스)
     infoTextAfter: '에 별도 사본으로 저장됩니다. 원본이 수정·삭제되어도 내 약국 사본은 영향받지 않습니다. 다시 복사하면 새 사본으로 저장되며, 필요 없는 사본은 내 약국에서 삭제할 수 있습니다.',
 
     // WO-O4O-KPA-STORE-HUB-CONTENT-SOURCE-ALIGNMENT-V1 §8.5: 원인 안내(기술 용어 비노출)
