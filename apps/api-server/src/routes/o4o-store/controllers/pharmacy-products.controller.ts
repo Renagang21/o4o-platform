@@ -462,6 +462,11 @@ export function createPharmacyProductsController(
           AND opl.is_active = true
           AND spo.is_active = true
           AND s.status = 'ACTIVE'
+          -- WO 답변 정정: 이벤트·특가는 약국 OPL 권위가 아니다. 이벤트 OPL 은 운영자 조직 소유이며
+          --   약국은 이벤트 탭(/groupbuy)에서 별도 조회한다. 약국 org OPL 에 존재할 수 있는 유일한
+          --   이벤트 관련 행은 '주문 후 파생 진열 행'(service_key='kpa', source_type='event-offer')뿐인데,
+          --   이는 재주문 가능한 B2B 상품이 아니라 이벤트 주문 산출물이므로 주문 상품 목록에서 제외한다.
+          AND opl.source_type IS DISTINCT FROM 'event-offer'
           AND (
             opl.service_key <> 'kpa-groupbuy'
             OR (
