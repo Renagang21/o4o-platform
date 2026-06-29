@@ -270,12 +270,16 @@ const layoutStyles: Record<string, React.CSSProperties> = {
     gap: '2px',
     marginBottom: '10px',
   },
+  // WO-O4O-KPA-STORE-HUB-SIDEBAR-HIERARCHY-TOKEN-ALIGNMENT-V1:
+  //   최상위(그룹) 헤딩을 O4O 사이드바 계층 토큰 표준(StoreSidebar / DomainIASidebar)에 정렬.
+  //   기존 11px(0.6875rem) → 14px(text-sm) font-semibold tracking-wide(가독성). uppercase 없음(한국어 no-op).
+  //   내 약국(/store) 사이드바와 동일 규칙 — 운영 허브만 누락됐던 표준 적용. 구조/라우트/항목 무변경.
   groupHeader: {
-    padding: '8px 14px 4px',
-    fontSize: '0.6875rem',
-    fontWeight: 700,
-    letterSpacing: '0.02em',
-    color: colors.neutral400,
+    padding: '10px 14px 6px',
+    fontSize: '0.875rem',
+    fontWeight: 600,
+    letterSpacing: '0.025em',
+    color: colors.neutral600,
     textTransform: 'none' as const,
   },
   menuLabelRow: {
