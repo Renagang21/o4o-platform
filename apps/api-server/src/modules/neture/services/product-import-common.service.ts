@@ -22,6 +22,25 @@ import type { ProductContentInput } from '@o4o/ai-prompts/store';
 import { generateSlug } from '../../../utils/slug.js';
 import logger from '../../../utils/logger.js';
 
+/** 이미지 1건 복사 결과 (WO-O4O-NETURE-PRODUCT-IMPORT-IMAGE-STORAGE-BUCKET-ALIGNMENT-V1) */
+export interface ImageImportItemResult {
+  masterId: string;
+  imageUrl: string;
+  ok: boolean;
+  /** 성공 시 O4O GCS URL */
+  gcsUrl?: string;
+  /** 실패 사유 (fetch_404 / 에러 메시지 등) */
+  reason?: string;
+}
+
+/** processImportImages 결과 요약 — 조용한 실패 방지 + batch 저장/사용자 표시용 */
+export interface ImageImportSummary {
+  total: number;
+  copied: number;
+  failed: number;
+  results: ImageImportItemResult[];
+}
+
 export class ProductImportCommonService {
   private imageStorageService: ImageStorageService;
   private aiContentService: ProductAiContentService;
@@ -155,18 +174,23 @@ export class ProductImportCommonService {
   /**
    * 외부 이미지 URL → fetch → GCS 업로드 → product_images INSERT
    *
-   * Fire-and-forget — 실패해도 Offer 생성에 영향 없음
+   * Fire-and-forget — 실패해도 Offer 생성에 영향 없음.
+   * WO-O4O-NETURE-PRODUCT-IMPORT-IMAGE-STORAGE-BUCKET-ALIGNMENT-V1:
+   *   이미지별 성공/실패를 더 이상 조용히 삼키지 않고 구조화된 요약을 반환한다.
+   *   호출부는 이를 로깅하거나 batch 에 저장해 사용자에게 표시한다.
    */
   async processImportImages(
     jobs: Array<{ masterId: string; imageUrls: string[] }>,
-  ): Promise<void> {
+  ): Promise<ImageImportSummary> {
+    const results: ImageImportItemResult[] = [];
+
     for (const job of jobs) {
       for (let i = 0; i < job.imageUrls.length; i++) {
+        const url = job.imageUrls[i];
         try {
-          const url = job.imageUrls[i];
           const response = await fetch(url);
           if (!response.ok) {
-            logger.warn(`[ImportCommon] Image fetch failed (${response.status}): ${url}`);
+            results.push({ masterId: job.masterId, imageUrl: url, ok: false, reason: `fetch_${response.status}` });
             continue;
           }
           const buffer = Buffer.from(await response.arrayBuffer());
@@ -195,11 +219,24 @@ export class ProductImportCommonService {
           );
 
           logger.info(`[ImportCommon] Image uploaded: master=${job.masterId}, ${gcsUrl}`);
+          results.push({ masterId: job.masterId, imageUrl: url, ok: true, gcsUrl });
         } catch (err) {
-          logger.warn(`[ImportCommon] Image failed: master=${job.masterId}, index=${i}:`, err);
+          const reason = err instanceof Error ? err.message : String(err);
+          logger.warn(`[ImportCommon] Image failed: master=${job.masterId}, index=${i}: ${reason}`);
+          results.push({ masterId: job.masterId, imageUrl: url, ok: false, reason });
         }
       }
     }
+
+    const copied = results.filter((r) => r.ok).length;
+    const failed = results.length - copied;
+    if (failed > 0) {
+      logger.warn(
+        `[ImportCommon] Image pipeline partial: ${copied} copied, ${failed} failed. ` +
+          `failures=${JSON.stringify(results.filter((r) => !r.ok).map((r) => ({ m: r.masterId, u: r.imageUrl, r: r.reason })))}`,
+      );
+    }
+    return { total: results.length, copied, failed, results };
   }
 
   // ── AI Content Generation ─────────────────────────────────────────────

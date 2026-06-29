@@ -16,7 +16,12 @@ export class ImageStorageService {
 
   constructor() {
     this.storage = new Storage();
-    this.bucketName = process.env.GCS_PRODUCT_IMAGE_BUCKET || 'o4o-neture-product-images';
+    // WO-O4O-NETURE-PRODUCT-IMPORT-IMAGE-STORAGE-BUCKET-ALIGNMENT-V1:
+    //   기존 기본 버킷 'o4o-neture-product-images' 는 프로젝트에 존재하지 않아(404) 모든 업로드가 실패해 왔다.
+    //   실가동 공용 이미지 버킷은 'o4o-media-library' (MediaLibraryService/에디터 업로드가 사용 — 공개 read).
+    //   제품 이미지는 'products/{masterId}/...' prefix 로 같은 버킷 내 namespace 분리. gcsPath 기반 삭제는 불변.
+    //   GCS_PRODUCT_IMAGE_BUCKET 으로 override 가능.
+    this.bucketName = process.env.GCS_PRODUCT_IMAGE_BUCKET || 'o4o-media-library';
   }
 
   /**

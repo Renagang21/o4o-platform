@@ -527,11 +527,33 @@ export class CsvImportService {
     );
 
     // Fire-and-forget: Image pipeline (성공한 행만)
+    // WO-O4O-NETURE-PRODUCT-IMPORT-IMAGE-STORAGE-BUCKET-ALIGNMENT-V1:
+    //   요약을 batch.image_import_result 에 비동기 저장 → 부분 실패를 공급자에게 표시. 응답은 블로킹하지 않음.
     if (imageJobs.length > 0) {
       const imageJobsGrouped = imageJobs.map((j) => ({ masterId: j.masterId, imageUrls: [j.imageUrl] }));
-      this.importCommon.processImportImages(imageJobsGrouped).catch((err) => {
-        logger.error('[CsvImport] Image pipeline error:', err);
-      });
+      this.importCommon
+        .processImportImages(imageJobsGrouped)
+        .then(async (summary) => {
+          const failedItems = summary.results
+            .filter((r) => !r.ok)
+            .slice(0, 50)
+            .map((r) => ({ masterId: r.masterId, imageUrl: r.imageUrl, reason: r.reason }));
+          await this.batchRepo.update(batchId, {
+            imageImportResult: {
+              total: summary.total,
+              copied: summary.copied,
+              failed: summary.failed,
+              failedItems,
+              completedAt: new Date().toISOString(),
+            },
+          });
+          if (summary.failed > 0) {
+            logger.warn(`[CsvImport] Batch ${batchId} image import partial: ${summary.copied} copied, ${summary.failed} failed`);
+          }
+        })
+        .catch((err) => {
+          logger.error('[CsvImport] Image pipeline error:', err);
+        });
     }
 
     // Fire-and-forget: AI content generation (성공한 행만)
@@ -830,12 +852,32 @@ export class CsvImportService {
       `[CsvImport] Retry batch ${batchId} — retried: ${failedRows.length}, newApplied: ${appliedOffers}, stillFailed: ${stillFailed}, batchStatus: ${batch.status}`,
     );
 
-    // Fire-and-forget: Image + AI
+    // Fire-and-forget: Image + AI (WO-...-IMAGE-STORAGE-BUCKET-ALIGNMENT-V1: 요약 저장)
     if (imageJobs.length > 0) {
       const imageJobsGrouped = imageJobs.map((j) => ({ masterId: j.masterId, imageUrls: [j.imageUrl] }));
-      this.importCommon.processImportImages(imageJobsGrouped).catch((err) => {
-        logger.error('[CsvImport] Retry image pipeline error:', err);
-      });
+      this.importCommon
+        .processImportImages(imageJobsGrouped)
+        .then(async (summary) => {
+          const failedItems = summary.results
+            .filter((r) => !r.ok)
+            .slice(0, 50)
+            .map((r) => ({ masterId: r.masterId, imageUrl: r.imageUrl, reason: r.reason }));
+          await this.batchRepo.update(batchId, {
+            imageImportResult: {
+              total: summary.total,
+              copied: summary.copied,
+              failed: summary.failed,
+              failedItems,
+              completedAt: new Date().toISOString(),
+            },
+          });
+          if (summary.failed > 0) {
+            logger.warn(`[CsvImport] Retry batch ${batchId} image import partial: ${summary.copied} copied, ${summary.failed} failed`);
+          }
+        })
+        .catch((err) => {
+          logger.error('[CsvImport] Retry image pipeline error:', err);
+        });
     }
     if (aiContentInputs.length > 0) {
       this.importCommon.triggerAiContentGeneration(aiContentInputs).catch((err) => {

@@ -5,6 +5,15 @@
  */
 import { api } from './client.js';
 
+/** 이미지 복사 요약 (WO-O4O-NETURE-PRODUCT-IMPORT-IMAGE-STORAGE-BUCKET-ALIGNMENT-V1) */
+export interface CsvBatchImageImportResult {
+  total: number;
+  copied: number;
+  failed: number;
+  failedItems: Array<{ masterId: string; imageUrl: string; reason?: string }>;
+  completedAt: string;
+}
+
 export interface CsvBatch {
   id: string;
   supplierId: string;
@@ -16,6 +25,8 @@ export interface CsvBatch {
   fileName: string | null;
   createdAt: string;
   updatedAt: string;
+  /** apply 이후 비동기로 채워짐 (완료 전 null) */
+  imageImportResult?: CsvBatchImageImportResult | null;
 }
 
 export interface CsvBatchRow {

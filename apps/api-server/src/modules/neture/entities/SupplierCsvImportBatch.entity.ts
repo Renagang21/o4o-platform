@@ -75,6 +75,24 @@ export class SupplierCsvImportBatch {
   @Column({ name: 'applied_at', type: 'timestamp', nullable: true })
   appliedAt: Date | null;
 
+  /**
+   * 이미지 복사 파이프라인 요약 (WO-O4O-NETURE-PRODUCT-IMPORT-IMAGE-STORAGE-BUCKET-ALIGNMENT-V1).
+   * apply 이후 비동기로 채워진다(완료 전엔 null). 부분 실패를 공급자에게 표시하기 위함.
+   */
+  @Column({ name: 'image_import_result', type: 'jsonb', nullable: true })
+  imageImportResult: CsvBatchImageImportResult | null;
+
   @OneToMany('SupplierCsvImportRow', 'batch')
   rows: SupplierCsvImportRow[];
+}
+
+/** batch 에 저장하는 이미지 복사 요약 (실패 항목만 보존 — 성공 URL 은 product_images 에 존재) */
+export interface CsvBatchImageImportResult {
+  total: number;
+  copied: number;
+  failed: number;
+  /** 실패한 이미지 (최대 50건만 저장) */
+  failedItems: Array<{ masterId: string; imageUrl: string; reason?: string }>;
+  /** 파이프라인 완료 시각(ISO) */
+  completedAt: string;
 }

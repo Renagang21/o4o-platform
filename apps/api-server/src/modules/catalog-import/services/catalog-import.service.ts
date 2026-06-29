@@ -325,10 +325,20 @@ export class CatalogImportService {
       logger.info(`[CatalogImport] Job ${jobId} applied — offers: ${appliedOffers}, masters: ${createdMasters}`);
 
       // Fire-and-forget via common service (WO-REFINEMENT-V1 3.5)
+      // WO-O4O-NETURE-PRODUCT-IMPORT-IMAGE-STORAGE-BUCKET-ALIGNMENT-V1: 부분 실패를 조용히 삼키지 않고 요약 로깅
       if (imageJobs.length > 0) {
-        this.importCommon.processImportImages(imageJobs).catch((err) => {
-          logger.error('[CatalogImport] Image pipeline error:', err);
-        });
+        this.importCommon
+          .processImportImages(imageJobs)
+          .then((summary) => {
+            if (summary.failed > 0) {
+              logger.warn(`[CatalogImport] Job ${jobId} image import partial: ${summary.copied} copied, ${summary.failed} failed`);
+            } else {
+              logger.info(`[CatalogImport] Job ${jobId} image import: ${summary.copied} copied`);
+            }
+          })
+          .catch((err) => {
+            logger.error('[CatalogImport] Image pipeline error:', err);
+          });
       }
 
       if (aiContentInputs.length > 0) {

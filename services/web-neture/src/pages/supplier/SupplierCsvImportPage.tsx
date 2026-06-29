@@ -630,6 +630,30 @@ export default function SupplierCsvImportPage() {
                     )}
                   </div>
 
+                  {/* WO-O4O-NETURE-PRODUCT-IMPORT-IMAGE-STORAGE-BUCKET-ALIGNMENT-V1: 이미지 복사 결과 */}
+                  {selectedBatch.imageImportResult && (
+                    <div className={`mb-4 p-3 rounded-lg text-xs ${selectedBatch.imageImportResult.failed > 0 ? 'bg-amber-50 border border-amber-200' : 'bg-emerald-50 border border-emerald-200'}`}>
+                      <div className="flex flex-wrap gap-3">
+                        <span className="font-medium text-gray-700">이미지 복사</span>
+                        <span className="text-emerald-700">성공 {selectedBatch.imageImportResult.copied}건</span>
+                        {selectedBatch.imageImportResult.failed > 0 && (
+                          <span className="text-amber-700">실패 {selectedBatch.imageImportResult.failed}건</span>
+                        )}
+                        <span className="text-gray-400">/ 전체 {selectedBatch.imageImportResult.total}건</span>
+                      </div>
+                      {selectedBatch.imageImportResult.failed > 0 && selectedBatch.imageImportResult.failedItems.length > 0 && (
+                        <ul className="mt-1.5 space-y-0.5 text-amber-700">
+                          {selectedBatch.imageImportResult.failedItems.slice(0, 5).map((f, i) => (
+                            <li key={i} className="truncate">· {f.imageUrl} {f.reason ? `(${f.reason})` : ''}</li>
+                          ))}
+                          {selectedBatch.imageImportResult.failedItems.length > 5 && (
+                            <li className="text-amber-600">외 {selectedBatch.imageImportResult.failedItems.length - 5}건</li>
+                          )}
+                        </ul>
+                      )}
+                    </div>
+                  )}
+
                   {/* WO-NETURE-IMPORT-DATA-QUALITY-GUARD-V1: Quality summary */}
                   {selectedBatch.status === 'READY' && selectedBatch.rows && (() => {
                     const quality = computeBatchQuality(selectedBatch.rows);
