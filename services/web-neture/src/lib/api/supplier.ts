@@ -490,13 +490,13 @@ export const supplierApi = {
   async copyImages(
     urls: string[],
     shopOrigin?: string,
-    opts?: { preserveOriginal?: boolean },
+    opts?: { mode?: 'standard' | 'thumbnail' | 'preserve' },
   ): Promise<CopyImagesResult> {
     try {
       const response = await api.post('/neture/supplier/import/copy-images', {
         urls,
         ...(shopOrigin ? { shopOrigin } : {}),
-        ...(opts?.preserveOriginal ? { preserveOriginal: true } : {}),
+        ...(opts?.mode && opts.mode !== 'standard' ? { mode: opts.mode } : {}),
       });
       return response.data.data as CopyImagesResult;
     } catch (error) {

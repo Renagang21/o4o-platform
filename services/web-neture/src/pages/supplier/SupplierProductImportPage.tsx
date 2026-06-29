@@ -103,6 +103,8 @@ export default function SupplierProductImportPage() {
   // Image selection
   const [selectedImages, setSelectedImages] = useState<Set<number>>(new Set());
   const [thumbnailIdx, setThumbnailIdx] = useState<number | null>(null);
+  // 상품 이미지 후보의 실제 자연 크기 (원본 크기 표시 — 대표는 등록 시 1000x1000 표준화)
+  const [imgNaturalSizes, setImgNaturalSizes] = useState<Record<number, { w: number; h: number }>>({});
 
   // 상세설명 이미지 가져오기 (WO-O4O-NETURE-SUPPLIER-PRODUCT-IMPORT-ASSISTANT-DETAIL-IMAGE-IMPORT-V1)
   //   selectedDetailImages: detailImageCandidates 배열 인덱스 기준 선택 집합
@@ -257,6 +259,7 @@ export default function SupplierProductImportPage() {
       setSelectedImages(new Set());
       setThumbnailIdx(null);
     }
+    setImgNaturalSizes({});
 
     // 상세설명 이미지: 정상 후보 기본 전체 선택(사용자가 해제 가능)
     setSelectedDetailImages(new Set(detailCandidates.map((_, i) => i)));
@@ -304,7 +307,8 @@ export default function SupplierProductImportPage() {
 
     const detailSelUrls = selectedImgUrls.filter((u) => u !== thumbUrl);
 
-    // 선택 대표/갤러리 이미지를 O4O 로 복사 — 외부 http/https URL 이 등록 데이터에 남지 않도록.
+    // 선택 이미지를 O4O 로 복사 — 정책 분리: 대표=1000x1000(thumbnail), 갤러리=표준(standard).
+    //   외부 http/https URL 이 등록 데이터에 남지 않도록 O4O URL 만 전달.
     let o4oThumb: string | null = null;
     let o4oDetailUrls: string[] = [];
     if (selectedImgUrls.length > 0) {
@@ -312,10 +316,17 @@ export default function SupplierProductImportPage() {
       setNavError('');
       try {
         const shopOrigin = (sourceUrl.trim() || adminProduct?.shopDomain) || undefined;
-        const res = await supplierApi.copyImages(selectedImgUrls, shopOrigin);
-        const map = new Map(res.results.filter((r) => r.ok && r.url).map((r) => [r.originalUrl, r.url as string]));
-        o4oThumb = thumbUrl ? map.get(thumbUrl) ?? null : null;
-        o4oDetailUrls = detailSelUrls.map((u) => map.get(u)).filter((u): u is string => !!u);
+        // 대표 썸네일: 서버에서 1000x1000 표준화
+        if (thumbUrl) {
+          const tRes = await supplierApi.copyImages([thumbUrl], shopOrigin, { mode: 'thumbnail' });
+          o4oThumb = tRes.results.find((r) => r.ok && r.url)?.url ?? null;
+        }
+        // 갤러리(대표 외 선택): 표준 정책
+        if (detailSelUrls.length > 0) {
+          const gRes = await supplierApi.copyImages(detailSelUrls, shopOrigin, { mode: 'standard' });
+          const map = new Map(gRes.results.filter((r) => r.ok && r.url).map((r) => [r.originalUrl, r.url as string]));
+          o4oDetailUrls = detailSelUrls.map((u) => map.get(u)).filter((u): u is string => !!u);
+        }
         if (!o4oThumb && o4oDetailUrls.length === 0) {
           setNavStatus('idle');
           setNavError('선택 이미지를 O4O 저장소로 복사하지 못했습니다. 내 쇼핑몰 주소가 올바른지 확인해 주세요.');
@@ -453,7 +464,7 @@ export default function SupplierProductImportPage() {
       const res = await supplierApi.copyImages(
         chosen.map((c) => c.originalUrl),
         shopOrigin,
-        { preserveOriginal: true },
+        { mode: 'preserve' },
       );
       // originalUrl → O4O url 매핑
       const map = new Map(res.results.filter((r) => r.ok && r.url).map((r) => [r.originalUrl, r.url as string]));
@@ -504,6 +515,7 @@ export default function SupplierProductImportPage() {
     setDetailDesc('');
     setSelectedImages(new Set());
     setThumbnailIdx(null);
+    setImgNaturalSizes({});
     setSelectedDetailImages(new Set());
     setDetailImagesConfirmed(false);
     setAdminProduct(null);
@@ -755,6 +767,9 @@ export default function SupplierProductImportPage() {
                       shopOrigin={(sourceUrl.trim() || adminProduct?.shopDomain) || undefined}
                       alt={`상품 이미지 ${idx + 1}`}
                       imgClassName="aspect-square w-full object-cover"
+                      onLoaded={(w, h) =>
+                        setImgNaturalSizes((prev) => (prev[idx] ? prev : { ...prev, [idx]: { w, h } }))
+                      }
                     />
 
                     {/* Checkbox */}
@@ -779,10 +794,30 @@ export default function SupplierProductImportPage() {
                     >
                       {thumbnailIdx === idx ? '\u2605' : '\u2606'}
                     </button>
+
+                    {/* \ub300\ud45c \ubc30\uc9c0 + \uc6d0\ubcf8 \ud06c\uae30 */}
+                    {thumbnailIdx === idx && (
+                      <span className="absolute bottom-1 left-1 rounded bg-emerald-600/90 px-1.5 py-0.5 text-[10px] font-medium text-white">
+                        \ub300\ud45c
+                      </span>
+                    )}
+                    {imgNaturalSizes[idx] && (
+                      <span className="absolute bottom-1 right-1 rounded bg-slate-900/60 px-1 py-0.5 text-[10px] text-white">
+                        {imgNaturalSizes[idx].w}\u00d7{imgNaturalSizes[idx].h}
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>
 
+              {/* \ub300\ud45c \uc378\ub124\uc77c \ud45c\uc900\ud654 \uc548\ub0b4 */}
+              <p className="mt-2 text-xs text-slate-500">
+                <strong className="text-slate-700">{'\u2605'} \ub300\ud45c \uc774\ubbf8\uc9c0</strong>\ub294 \ub4f1\ub85d \uc2dc \uc11c\ubc84\uc5d0\uc11c <strong>1000\u00d71000</strong>\uc73c\ub85c \ud45c\uc900\ud654\ub429\ub2c8\ub2e4(\uc0c1\ud488 \uc804\uccb4 \ubcf4\uc874, \uc798\ub9bc \uc5c6\uc74c).
+                \uac00\uc7a5 \ud070 <strong>large</strong> \ud6c4\ubcf4\ub97c \uae30\ubcf8 \ub300\ud45c\ub85c \ucd94\ucc9c\ud569\ub2c8\ub2e4.
+                {thumbnailIdx !== null && imgNaturalSizes[thumbnailIdx] && (
+                  <> \ud604\uc7ac \ub300\ud45c \uc6d0\ubcf8 {imgNaturalSizes[thumbnailIdx].w}\u00d7{imgNaturalSizes[thumbnailIdx].h} \u2192 \ub4f1\ub85d 1000\u00d71000.</>
+                )}
+              </p>
             </div>
           )}
 
@@ -1082,6 +1117,7 @@ function ProxiedImg({
   alt,
   imgClassName,
   onStatus,
+  onLoaded,
 }: {
   url: string;
   shopOrigin?: string;
@@ -1089,6 +1125,8 @@ function ProxiedImg({
   imgClassName?: string;
   /** 미리보기 성공(true)/실패(false) 보고 — 부모가 선택 가능 여부 판단 */
   onStatus?: (ok: boolean) => void;
+  /** 실제 자연 크기 보고 (원본 크기 표시용) */
+  onLoaded?: (w: number, h: number) => void;
 }) {
   const [state, setState] = useState<'loading' | 'ok' | 'fail'>('loading');
   const [src, setSrc] = useState<string | null>(null);
@@ -1142,7 +1180,18 @@ function ProxiedImg({
       </div>
     );
   }
-  return <img src={src} alt={alt} className={imgClassName} loading="lazy" />;
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className={imgClassName}
+      loading="lazy"
+      onLoad={(e) => {
+        const t = e.currentTarget;
+        if (t.naturalWidth) onLoaded?.(t.naturalWidth, t.naturalHeight);
+      }}
+    />
+  );
 }
 
 /* ------------------------------------------------------------------ */

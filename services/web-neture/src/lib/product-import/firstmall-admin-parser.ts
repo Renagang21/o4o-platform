@@ -47,11 +47,13 @@ export function parseFirstmallAdmin(
   const manufacturer = findByLabel(subInfo, ['제조사', '생산자', '제조원', '판매원']);
   const originCountry = findByLabel(subInfo, ['원산지', '원산국']);
 
-  // 상품(대표/갤러리) 이미지 — Firstmall 표준 이미지 필드
+  // 상품(대표/갤러리) 이미지 — Firstmall 표준 이미지 필드.
+  //   크기 우선순위로 수집(large > view > list > thumb). dedupe 후 index 0 = 가장 큰 large 원본
+  //   → 기본 대표 선택이 가장 큰 후보가 되어 1000x1000 표준화 시 업스케일 최소화(선명).
   const productImageUrls = dedupe(
     collectArrayInputs(doc, [
-      'viewGoodsImage[]',
       'largeGoodsImage[]',
+      'viewGoodsImage[]',
       'list1GoodsImage[]',
       'list2GoodsImage[]',
       'thumbViewGoodsImage[]',

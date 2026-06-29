@@ -61,7 +61,7 @@ export class MediaLibraryService {
     userId: string,
     serviceKey?: string,
     folder = 'general',
-    opts?: { preserveOriginal?: boolean },
+    opts?: { imageMode?: 'thumbnail-1000' | 'preserve-original' },
   ): Promise<MediaAsset> {
     const isImage = IMAGE_MIMES.includes(file.mimetype);
     let buffer = file.buffer;
@@ -75,10 +75,24 @@ export class MediaLibraryService {
       const ow = metadata.width ?? 0;
       const oh = metadata.height ?? 0;
 
+      // WO-O4O-NETURE-OWN-ADMIN-IMPORT-THUMBNAIL-1000-RESTORE-V1:
+      //   대표 썸네일은 서버에서 정확히 1000x1000 표준화(브라우저 canvas 금지).
+      //   상품 전체가 잘리지 않도록 fit:contain(잘림 없음) + 흰 배경. EXIF orientation 반영(rotate).
+      if (opts?.imageMode === 'thumbnail-1000') {
+        const processed = await sharp(file.buffer)
+          .rotate()
+          .resize(1000, 1000, { fit: 'contain', background: { r: 255, g: 255, b: 255, alpha: 1 } })
+          .webp({ quality: 90 })
+          .toBuffer();
+        const pm = await sharp(processed).metadata();
+        buffer = processed;
+        mimeType = 'image/webp';
+        width = pm.width || 1000;
+        height = pm.height || 1000;
+      }
       // WO-O4O-NETURE-SUPPLIER-OWN-ADMIN-PRODUCT-IMPORT-V1 (품질):
-      //   상세설명 이미지(긴 세로 이미지)는 일반 max-height 규칙으로 축소하면 본문 폭 표시 시 흐려진다.
-      //   preserveOriginal=true 면 원본 픽셀/비율을 보존한다. 단, 안전 상한 초과 시에만 고품질 재인코딩.
-      if (opts?.preserveOriginal) {
+      //   상세설명 이미지는 원본 픽셀/비율 보존(폭 기준 처리). 1000x1000 표준화를 적용하지 않는다.
+      else if (opts?.imageMode === 'preserve-original') {
         // 상세설명 이미지는 **폭 기준**으로만 처리한다. 높이/용량 제한을 맞추려고
         // fit:inside 로 전체를 줄여 가로폭까지 축소하면 안 된다(흐림 재발 방지).
         //  - 높이 초과 또는 총 픽셀 초과: 폭 축소로 해결 불가 → 명확히 거부
