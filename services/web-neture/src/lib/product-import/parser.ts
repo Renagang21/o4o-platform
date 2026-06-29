@@ -10,7 +10,7 @@
  * - 상대 URL → 절대 URL 변환 (sourceUrl 제공 시)
  */
 
-import type { DetailImageCandidate, ParsedProductData } from './types';
+import type { DetailImageCandidate, DynamicDetailSource, ParsedProductData } from './types';
 
 /**
  * WO-O4O-NETURE-SUPPLIER-PRODUCT-IMPORT-ASSISTANT-DETAIL-IMAGE-IMPORT-V1
@@ -37,7 +37,7 @@ export function parseProductHtml(
   return {
     name: extractName(doc),
     brand: extractByLabel(text, '브랜드'),
-    manufacturer: extractByLabel(text, '제��사'),
+    manufacturer: extractByLabel(text, '제조사'),
     price: extractPrice(text),
     specification: extractSpecification(text),
     originCountry: extractByLabel(text, '원산지'),
@@ -46,6 +46,95 @@ export function parseProductHtml(
     shortDescription: buildShortDescription(doc),
     detailDescription: extractDetailDescription(doc, sourceUrl),
     detailImageCandidates: extractDetailImageCandidates(doc, sourceUrl, thumbnailUrl),
+    dynamicDetailSource: detectDynamicDetailSource(html, doc, sourceUrl),
+  };
+}
+
+/* ------------------------------------------------------------------ */
+/*  동적 상세설명 소스 탐지                                              */
+/*  WO-O4O-NETURE-SUPPLIER-IMPORT-ASSISTANT-DYNAMIC-DETAIL-CONTENTS-DETECTION-V1 */
+/* ------------------------------------------------------------------ */
+
+/** Firstmall 계열 view_contents 주소 — ajax url / 원본 보기 href 모두 매칭 */
+const VIEW_CONTENTS_RE = /["'`]([^"'`\s]*\/goods\/view_contents\?[^"'`\s]*\bno=\d+[^"'`\s]*)["'`]/i;
+
+/** 상세설명 컨테이너 — 비어 있으면 동적 로딩 신호 */
+const DYNAMIC_DETAIL_CONTAINER_SELECTORS = [
+  '.goods_view_contents',
+  '#goods_view_contents',
+  '.goods_description_images',
+  '#goods_description_images',
+];
+
+/** HTML entity 로 인코딩된 &amp; 등을 원복 (속성값에서 추출한 URL 정규화) */
+function decodeHtmlEntities(value: string): string {
+  return value
+    .replace(/&amp;/gi, '&')
+    .replace(/&#38;/g, '&')
+    .replace(/&#x26;/gi, '&');
+}
+
+/** sourceUrl 미제공 시 문서에서 origin 후보 추출 (og:url / canonical / base) */
+function extractBaseUrlFromDoc(doc: Document): string | null {
+  const candidates = [
+    doc.querySelector('meta[property="og:url"]')?.getAttribute('content'),
+    doc.querySelector('link[rel="canonical"]')?.getAttribute('href'),
+    doc.querySelector('base[href]')?.getAttribute('href'),
+  ];
+  for (const c of candidates) {
+    if (c && /^https?:\/\//i.test(c.trim())) {
+      try {
+        return new URL(c.trim()).origin;
+      } catch {
+        /* 다음 후보 */
+      }
+    }
+  }
+  return null;
+}
+
+function isDetailContainerEmpty(doc: Document): boolean {
+  for (const sel of DYNAMIC_DETAIL_CONTAINER_SELECTORS) {
+    const el = doc.querySelector(sel);
+    if (el) {
+      // 컨테이너는 존재하나 이미지가 없으면 동적 로딩으로 본다
+      return el.querySelectorAll('img').length === 0;
+    }
+  }
+  return false;
+}
+
+function detectDynamicDetailSource(
+  html: string,
+  doc: Document,
+  sourceUrl?: string,
+): DynamicDetailSource | null {
+  const m = html.match(VIEW_CONTENTS_RE);
+  if (!m) return null;
+
+  const rawUrl = decodeHtmlEntities(m[1].trim());
+  // view_preload / preload 파라미터가 있으면 AJAX 프리로드 주소로 본다
+  const reason: DynamicDetailSource['reason'] = /view_preload|preload/i.test(rawUrl)
+    ? 'ajax'
+    : 'original-link';
+
+  const base = sourceUrl?.trim() || extractBaseUrlFromDoc(doc);
+  let resolvedUrl: string | null = null;
+  if (/^https?:\/\//i.test(rawUrl)) {
+    resolvedUrl = rawUrl;
+  } else if (base) {
+    try {
+      resolvedUrl = new URL(rawUrl, base).href;
+    } catch {
+      resolvedUrl = null;
+    }
+  }
+
+  return {
+    rawUrl,
+    resolvedUrl,
+    reason,
+    containerEmpty: isDetailContainerEmpty(doc),
   };
 }
 

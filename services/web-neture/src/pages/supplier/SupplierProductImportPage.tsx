@@ -11,7 +11,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { RichTextEditor } from '@o4o/content-editor';
 import { parseProductHtml } from '../../lib/product-import/parser';
 import { saveDraft } from '../../lib/product-import/storage';
-import type { ParsedProductData, ImportDraft } from '../../lib/product-import/types';
+import type { ParsedProductData, ImportDraft, DetailImageCandidate } from '../../lib/product-import/types';
+import { supplierApi } from '../../lib/api/supplier';
 // WO-O4O-NETURE-SUPPLIER-MENU-ASSISTANT-IA-CLEANUP-V1
 // WO-O4O-NETURE-SUPPLIER-IMPORT-ASSISTANT-PRODUCT-TYPE-PASSTHROUGH-V1:
 //   유형 선택을 등록 진입 화면(SupplierProductRegisterEntryPage)과 동일한 2분기 모델로 통일.
@@ -101,6 +102,13 @@ export default function SupplierProductImportPage() {
   const [selectedDetailImages, setSelectedDetailImages] = useState<Set<number>>(new Set());
   const [detailImagesConfirmed, setDetailImagesConfirmed] = useState(false);
   const [detailImgPreviewErrors, setDetailImgPreviewErrors] = useState<Set<number>>(new Set());
+
+  // 동적 상세설명 원본 가져오기 (WO-O4O-NETURE-SUPPLIER-IMPORT-ASSISTANT-DYNAMIC-DETAIL-CONTENTS-DETECTION-V1)
+  //   상세설명을 별도 주소(AJAX)에서 불러오는 페이지 — 서버 SSRF-safe 경로로 원본을 조회한 결과.
+  //   조회 성공 시 base HTML 의 (로고/메뉴 오탐) 후보를 실제 상세 이미지 후보로 교체한다.
+  const [fetchedDetail, setFetchedDetail] = useState<{ candidates: DetailImageCandidate[]; fetchedUrl: string } | null>(null);
+  const [dynamicFetchStatus, setDynamicFetchStatus] = useState<'idle' | 'loading' | 'error'>('idle');
+  const [dynamicFetchError, setDynamicFetchError] = useState('');
 
   // Thumbnail correction
   const [thumbNaturalSize, setThumbNaturalSize] = useState<{ w: number; h: number } | null>(null);
@@ -222,6 +230,11 @@ export default function SupplierProductImportPage() {
     setSelectedDetailImages(new Set());
     setDetailImagesConfirmed(false);
     setDetailImgPreviewErrors(new Set());
+
+    // 동적 상세설명 조회 상태 초기화 (재분석 시 base HTML 후보로 복귀)
+    setFetchedDetail(null);
+    setDynamicFetchStatus('idle');
+    setDynamicFetchError('');
   }, [html, sourceUrl, topChoice]);
 
   /* ---------------------------------------------------------------- */
@@ -393,7 +406,35 @@ export default function SupplierProductImportPage() {
   /*  WO-O4O-NETURE-SUPPLIER-PRODUCT-IMPORT-ASSISTANT-DETAIL-IMAGE-IMPORT-V1 */
   /* ---------------------------------------------------------------- */
 
-  const detailCandidates = parsed?.detailImageCandidates ?? [];
+  // 동적 원본 조회에 성공하면 그 결과(실제 상세 이미지)를 우선 표시 — base HTML 오탐 후보를 대체.
+  const detailCandidates = fetchedDetail?.candidates ?? parsed?.detailImageCandidates ?? [];
+  const dynamicSource = parsed?.dynamicDetailSource ?? null;
+
+  const handleFetchDynamicDetail = useCallback(async () => {
+    if (!dynamicSource?.resolvedUrl) return;
+    setDynamicFetchStatus('loading');
+    setDynamicFetchError('');
+    try {
+      const result = await supplierApi.fetchDetailContents(
+        dynamicSource.resolvedUrl,
+        sourceUrl.trim() || undefined,
+      );
+      if (result.candidates.length === 0) {
+        setDynamicFetchStatus('error');
+        setDynamicFetchError('상세설명 원본에서 이미지를 찾지 못했습니다.');
+        return;
+      }
+      setFetchedDetail({ candidates: result.candidates, fetchedUrl: result.fetchedUrl });
+      // 선택/확인/미리보기 상태 초기화 (후보 목록이 교체됨)
+      setSelectedDetailImages(new Set());
+      setDetailImagesConfirmed(false);
+      setDetailImgPreviewErrors(new Set());
+      setDynamicFetchStatus('idle');
+    } catch (e) {
+      setDynamicFetchStatus('error');
+      setDynamicFetchError(e instanceof Error ? e.message : '상세설명 원본 조회에 실패했습니다.');
+    }
+  }, [dynamicSource, sourceUrl]);
 
   const toggleDetailImage = useCallback((idx: number) => {
     setSelectedDetailImages((prev) => {
@@ -405,8 +446,15 @@ export default function SupplierProductImportPage() {
   }, []);
 
   const selectAllDetailImages = useCallback(() => {
-    setSelectedDetailImages(new Set(detailCandidates.map((_, i) => i)));
-  }, [detailCandidates]);
+    // 미리보기 실패 후보는 제외 (WO §6 — 실패 이미지는 후보 선택에서 자동 제외)
+    setSelectedDetailImages(
+      new Set(
+        detailCandidates
+          .map((_, i) => i)
+          .filter((i) => !detailImgPreviewErrors.has(i)),
+      ),
+    );
+  }, [detailCandidates, detailImgPreviewErrors]);
 
   const clearAllDetailImages = useCallback(() => {
     setSelectedDetailImages(new Set());
@@ -458,6 +506,9 @@ export default function SupplierProductImportPage() {
     setSelectedDetailImages(new Set());
     setDetailImagesConfirmed(false);
     setDetailImgPreviewErrors(new Set());
+    setFetchedDetail(null);
+    setDynamicFetchStatus('idle');
+    setDynamicFetchError('');
     setThumbNaturalSize(null);
     setCorrectedDataUrl(null);
     setCorrectionStatus('idle');
@@ -766,6 +817,50 @@ export default function SupplierProductImportPage() {
               아래 상세설명 편집기에 넣을 수 있습니다.
             </p>
 
+            {/* 동적 상세설명 안내 — 별도 주소(AJAX)에서 불러오는 페이지
+                WO-O4O-NETURE-SUPPLIER-IMPORT-ASSISTANT-DYNAMIC-DETAIL-CONTENTS-DETECTION-V1 */}
+            {dynamicSource && !fetchedDetail && (
+              <div className="mb-3 rounded-lg border border-amber-200 bg-amber-50 p-3">
+                <p className="text-sm font-medium text-amber-800">
+                  이 상품은 상세설명을 별도 주소에서 불러옵니다.
+                </p>
+                <p className="mt-1 text-xs text-amber-700">
+                  상품 페이지 HTML 에 상세설명 이미지가 직접 들어 있지 않습니다. 아래에서 상세설명 원본을
+                  가져와 분석하면 실제 상세 이미지만 후보로 표시됩니다.
+                </p>
+                {dynamicSource.resolvedUrl ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handleFetchDynamicDetail}
+                      disabled={dynamicFetchStatus === 'loading'}
+                      className="mt-2 rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {dynamicFetchStatus === 'loading' ? '상세설명 원본 가져오는 중…' : '상세설명 원본 가져와 분석'}
+                    </button>
+                    <p className="mt-1.5 break-all text-[11px] text-amber-600">
+                      원본: {dynamicSource.resolvedUrl}
+                    </p>
+                  </>
+                ) : (
+                  <p className="mt-2 rounded bg-white px-3 py-2 text-xs text-amber-700">
+                    상세설명 주소가 상대경로라 절대주소로 변환하지 못했습니다. 위 <strong>소스 URL</strong>에
+                    상품 페이지 주소를 입력한 뒤 다시 <strong>분석하기</strong>를 눌러 주세요.
+                  </p>
+                )}
+                {dynamicFetchStatus === 'error' && dynamicFetchError && (
+                  <p className="mt-2 text-xs text-red-600">{dynamicFetchError}</p>
+                )}
+              </div>
+            )}
+
+            {/* 동적 원본 조회 성공 안내 */}
+            {fetchedDetail && (
+              <p className="mb-3 rounded-lg bg-emerald-50 px-3 py-2 text-xs text-emerald-700">
+                상세설명 원본에서 이미지 {fetchedDetail.candidates.length}개를 가져왔습니다. (로고·SNS·메뉴 이미지 제외)
+              </p>
+            )}
+
             {detailCandidates.length === 0 ? (
               <p className="rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-500">
                 상품 페이지에서 가져올 수 있는 상세설명 이미지를 찾지 못했습니다.
@@ -813,13 +908,20 @@ export default function SupplierProductImportPage() {
                             alt={cand.alt ?? `상세 이미지 ${cand.order}`}
                             className="aspect-[3/4] w-full bg-slate-50 object-contain"
                             loading="lazy"
-                            onError={() =>
+                            onError={() => {
                               setDetailImgPreviewErrors((prev) => {
                                 const next = new Set(prev);
                                 next.add(idx);
                                 return next;
-                              })
-                            }
+                              });
+                              // 실패 후보는 선택에서 자동 제외 (WO §6)
+                              setSelectedDetailImages((prev) => {
+                                if (!prev.has(idx)) return prev;
+                                const next = new Set(prev);
+                                next.delete(idx);
+                                return next;
+                              });
+                            }}
                           />
                         )}
 
@@ -828,8 +930,9 @@ export default function SupplierProductImportPage() {
                           <input
                             type="checkbox"
                             checked={selected}
+                            disabled={previewFailed}
                             onChange={() => toggleDetailImage(idx)}
-                            className="h-3.5 w-3.5 accent-emerald-600"
+                            className="h-3.5 w-3.5 accent-emerald-600 disabled:cursor-not-allowed"
                           />
                         </span>
 

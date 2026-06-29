@@ -450,9 +450,44 @@ export interface UnifiedOrdersResponse {
   meta: { page: number; limit: number; total: number; totalPages: number };
 }
 
+// ==================== Import Assistant: Dynamic Detail Contents ====================
+// WO-O4O-NETURE-SUPPLIER-IMPORT-ASSISTANT-DYNAMIC-DETAIL-CONTENTS-DETECTION-V1
+
+export interface FetchedDetailImageCandidate {
+  url: string;
+  originalUrl: string;
+  alt: string | null;
+  width: number | null;
+  height: number | null;
+  order: number;
+}
+
+export interface FetchDetailContentsResult {
+  fetchedUrl: string;
+  fromContainer: boolean;
+  candidates: FetchedDetailImageCandidate[];
+}
+
 // ==================== Supplier API ====================
 
 export const supplierApi = {
+  /**
+   * 동적 상세설명 주소(view_contents 등)를 서버 SSRF-safe 경로로 조회해
+   * 상세 이미지 후보를 받아온다. (WO-...-DYNAMIC-DETAIL-CONTENTS-DETECTION-V1)
+   * @throws 서버 에러 메시지(extractApiError) — 호출부에서 사용자에게 노출
+   */
+  async fetchDetailContents(url: string, sourceUrl?: string): Promise<FetchDetailContentsResult> {
+    try {
+      const response = await api.post('/neture/supplier/import/fetch-detail-contents', {
+        url,
+        ...(sourceUrl ? { sourceUrl } : {}),
+      });
+      return response.data.data as FetchDetailContentsResult;
+    } catch (error) {
+      throw new Error(extractApiError(error));
+    }
+  },
+
   async getProducts(): Promise<SupplierProduct[]> {
     try {
       const response = await api.get('/neture/supplier/products');

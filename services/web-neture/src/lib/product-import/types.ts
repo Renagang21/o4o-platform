@@ -59,6 +59,24 @@ export interface DetailImageCandidate {
   order: number;
 }
 
+/**
+ * 동적 상세설명 소스 (WO-O4O-NETURE-SUPPLIER-IMPORT-ASSISTANT-DYNAMIC-DETAIL-CONTENTS-DETECTION-V1)
+ *
+ * Firstmall 계열 상품 페이지는 상세설명 이미지를 기본 HTML 에 두지 않고
+ * 로딩 후 AJAX(`/goods/view_contents?...`) 로 가져온다. 붙여넣은 HTML 안에서
+ * 그 주소를 탐지하면 이 객체를 채워 사용자에게 "원본 가져오기" 를 안내한다.
+ */
+export interface DynamicDetailSource {
+  /** 탐지한 원본 속성값 (resolve 이전 — 상대주소일 수 있음) */
+  rawUrl: string;
+  /** sourceUrl / og:url / canonical 기준 절대 URL (resolve 불가 시 null) */
+  resolvedUrl: string | null;
+  /** 탐지 근거 */
+  reason: 'ajax' | 'original-link';
+  /** 상세설명 컨테이너(goods_view_contents 등)가 비어 있는지 (추가 신호) */
+  containerEmpty: boolean;
+}
+
 /** parseProductHtml 반환 타입 */
 export interface ParsedProductData {
   name: string | null;
@@ -76,4 +94,9 @@ export interface ParsedProductData {
    * 원본 페이지 DOM 순서, 중복/대표 썸네일/추적 픽셀 제외.
    */
   detailImageCandidates: DetailImageCandidate[];
+  /**
+   * 동적 상세설명 소스 (WO-...-DYNAMIC-DETAIL-CONTENTS-DETECTION-V1).
+   * 상세설명을 별도 주소(AJAX)에서 불러오는 페이지면 채워진다. 아니면 null.
+   */
+  dynamicDetailSource: DynamicDetailSource | null;
 }

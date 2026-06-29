@@ -30,6 +30,7 @@ import { createAdminSettlementController } from './controllers/admin-settlement.
 import { createPartnerController } from './controllers/partner.controller.js';
 import { createSellerController, createPartnerContractController } from './controllers/seller.controller.js';
 import { createSupplierContractController } from './controllers/supplier-contract.controller.js';
+import { createSupplierImportController } from './controllers/supplier-import.controller.js';
 import { createContactController } from './controllers/contact.controller.js';
 import { createOperatorRegistrationController } from './controllers/operator-registration.controller.js';
 import { createOperatorDashboardController } from './controllers/operator-dashboard.controller.js';
@@ -82,6 +83,8 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
   router.use('/supplier', createSupplierSettlementController(dataSource));
   // WO-O4O-NETURE-SELLER-CONTRACT-TO-SUPPLIER-MIGRATION-V1: 공급자 계약 API
   router.use('/supplier', createSupplierContractController(dataSource));
+  // WO-O4O-NETURE-SUPPLIER-IMPORT-ASSISTANT-DYNAMIC-DETAIL-CONTENTS-DETECTION-V1: 동적 상세설명 SSRF-safe 조회
+  router.use('/supplier', createSupplierImportController(dataSource));
 
   // Admin domain
   router.use('/admin', createAdminController(dataSource));
