@@ -230,27 +230,50 @@ function sanitizeDetailHtml(rawHtml: string, base: string | null): string {
 /*  Domain / URL                                                       */
 /* ------------------------------------------------------------------ */
 
-/** 관리자 HTML 에서 쇼핑몰 표시 도메인 후보를 감지 (custom .co.kr/.com 우선, firstmall 인프라 도메인 제외) */
+/**
+ * 관리자 HTML 에서 쇼핑몰 표시 도메인을 감지한다.
+ * 네임스페이스(w3.org 등)·CDN·소셜·결제·Firstmall 인프라 도메인을 제외하고,
+ * 가장 자주 등장하는 호스트를 자사 쇼핑몰 도메인으로 본다(예: 3lifezone.co.kr 66회).
+ */
 function detectShopBase(html: string): string | null {
-  const infra = /(design|gmanual|www|cdn|img|static|errdoc)?\.?firstmall\.kr$/i;
+  // 자사 쇼핑몰이 아닌(인프라/네임스페이스/CDN/소셜/결제) 호스트
+  const blocked = [
+    'w3.org', 'schema.org', 'purl.org', 'ogp.me', 'xmlns',
+    'googleapis', 'gstatic', 'google.com', 'jsdelivr', 'cloudflare', 'jquery',
+    'bootstrapcdn', 'fontawesome', 'kakaocdn', 'daumcdn', 'pstatic',
+    'facebook', 'twitter', 'instagram', 'kakao', 'naver', 'daum', 'youtube',
+    'payco', 'toss', 'geditor.co.kr',
+  ];
+  // Firstmall 인프라 서브도메인(자사 쇼핑몰의 firstmall 서브도메인은 허용)
+  const fmInfra = /^(www|design|gmanual|cdn|img|image|static|errdoc|s|api)\.firstmall\.kr$/i;
 
-  // 1) krdomain = gl_protocol+'xxx.firstmall.kr'
-  const kr = html.match(/krdomain\s*=\s*[^'"]*['"]([a-z0-9.-]+\.[a-z]{2,})['"]/i);
+  const isBlocked = (h: string) =>
+    blocked.some((b) => h.includes(b)) || fmInfra.test(h) || h === 'firstmall.kr';
 
-  // 2) HTML 내 모든 절대 도메인 수집
-  const hosts = new Set<string>();
+  // 호스트 빈도 집계
+  const freq = new Map<string, number>();
   for (const m of html.matchAll(/https?:\/\/([a-z0-9-]+(?:\.[a-z0-9-]+)+)/gi)) {
-    hosts.add(m[1].toLowerCase());
+    const h = m[1].toLowerCase();
+    if (isBlocked(h)) continue;
+    freq.set(h, (freq.get(h) ?? 0) + 1);
   }
-  // custom 도메인 우선 (firstmall 인프라/구글/소셜 제외)
-  const social = /(google|facebook|twitter|instagram|kakao|naver\.|daum|youtube|gstatic|googleapis|jsdelivr|cloudflare|jquery)/i;
-  const custom = [...hosts].find((h) => !infra.test(h) && !social.test(h) && !h.endsWith('firstmall.kr'));
-  if (custom) return `https://${custom}`;
 
-  // firstmall 서브도메인 (http) — custom 없을 때 fallback
-  if (kr && !infra.test(kr[1])) return `http://${kr[1]}`;
-  const fm = [...hosts].find((h) => /^[a-z0-9-]+\.firstmall\.kr$/i.test(h) && !infra.test(h));
-  if (fm) return `http://${fm}`;
+  let best: string | null = null;
+  let bestN = 0;
+  for (const [h, n] of freq) {
+    if (n > bestN) {
+      best = h;
+      bestN = n;
+    }
+  }
+  if (best) {
+    // 자사 firstmall 서브도메인은 http-only — 그 외 custom 도메인은 https 우선
+    return best.endsWith('.firstmall.kr') ? `http://${best}` : `https://${best}`;
+  }
+
+  // fallback: krdomain = gl_protocol+'xxx.firstmall.kr'
+  const kr = html.match(/krdomain\s*=\s*[^'"]*['"]([a-z0-9.-]+\.firstmall\.kr)['"]/i);
+  if (kr && !fmInfra.test(kr[1])) return `http://${kr[1]}`;
   return null;
 }
 
