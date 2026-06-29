@@ -1,14 +1,18 @@
 # IR — WO-O4O-SHARED-AI-IMAGE-ENHANCEMENT-FOUNDATION-V1 (선행 조사)
 
-> 상태: **결정 완료 · Photoroom API 키 발급 대기 → 키 수령 후 일괄 구현** (코드 미작성, 비작동 버튼/mock 미배포)
+> 상태: **CANCELLED (2026-06-29) — 개발 취소, 구현하지 않음.**
 > 작성일: 2026-06-29
 
-## 결정 요약 (사용자 승인)
-- **범위 = 옵션 B**: Sharp 결정적 보정 + 외부 **배경 제거 API**.
-- **배경 제거 공급자 = Photoroom API** (Remove Background, $0.02/장; 테스트 10장 무료). 이미지가 외부 Photoroom 서버로 전송됨(egress) 인지함.
-- **진행 방식 = 키 준비 후 일괄**: 사용자가 Photoroom API 키 발급·전달 → 그 후 Sharp + 배경제거를 한 번에 구현·배포·실브라우저 smoke. 그전까지 **작업 중지**.
-- **필요 조치(사용자)**: ① photoroom.com 계정 + API 키 발급 ② 키를 api-server 시크릿(`PHOTOROOM_API_KEY` env 또는 `ai_settings` 행)에 주입(코드/깃 하드코딩 금지) ③ 건당 비용 예산 승인.
-- **키 수령 후 구현 범위**: 공용 `SharedImageEnhancementService`(서버 Sharp 결정적 보정 + Photoroom 배경제거 adapter, in-memory 무영속) + `POST /api/v1/platform/image-enhancement/preview`(보정 bytes 반환, 미저장) + `ImageEnhancementModal`(원본↔보완본 비교·보완본/원본/다시보완/취소, 이미지 있을 때만 노출) + 임시→영구 흐름(상품 저장 시점만 영구 1장, 취소/실패 시 고아 0) + KPA `/store/commerce/local-products` 등록·수정 연결 + 메타데이터(§9) + 권한/MIME/픽셀·용량 한도/요청제한/중복클릭 가드/AIUsageLog(또는 ImageEnhancementLog) 비용·실패 기록. 배경제거 외 원근/제품중심 배치는 Phase 2.
+## 최종 결정 (사용자, 2026-06-29) — 개발 취소
+배경 제거는 "사진 보정" 전체가 아니라 제한적 기능이며, 외부 API·건당 비용·이미지 외부 전송(egress)까지 추가할 만큼 우선순위가 높지 않다고 판단. 따라서:
+
+- **AI 사진 보정 기능 개발 전면 취소.** 공용 AI 이미지 보정 서비스(SharedImageEnhancementService 등) 만들지 않음.
+- **외부 배경 제거 API 미도입** (Photoroom·remove.bg 등). 자체 호스팅(rembg)도 미도입.
+- **별도 계정·API 키·예산 설정 없음.** `PHOTOROOM_API_KEY` 등 시크릿 주입 불필요.
+- **유지되는 것**: 현재 구현된 대표 이미지 **불러오기·미리보기·교체·삭제**(WO-O4O-KPA-STORE-LOCAL-PRODUCT-REGISTRATION-ENHANCEMENT-V1) 와 기존 공용 미디어 업로드의 일반 **리사이즈·압축**(Sharp 1200²·webp) — 변경 없음.
+- 코드 산출물 없음(본 IR 문서만 작성). 본 문서는 "조사 후 의도적으로 미구현" 기록으로 보존 — 추후 방향 변경 없이는 재착수하지 않는다.
+
+> ⚠️ 아래 §1 선행 조사 결과는 **참고용 기록**일 뿐, 실행 계획이 아님. (이전 검토 단계의 옵션 B/Photoroom 선택은 위 최종 결정으로 **철회됨**.)
 
 ---
 
