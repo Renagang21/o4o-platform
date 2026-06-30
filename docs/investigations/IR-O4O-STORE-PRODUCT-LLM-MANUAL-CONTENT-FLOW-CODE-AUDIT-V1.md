@@ -201,7 +201,7 @@ metadata로 느슨히 연결.
 
 ### 5.3 반드시 검증할 게이트 (구현 전)
 
-> **게이트 G1 (인라인 style sanitize — 최우선)**: LLM 생성 HTML은 인라인 `style`(배경/박스/색)이 핵심이다. 현재 `sanitize.ts`(DOMPurify 기본)는 `style`을 제거할 수 있고, 반대로 HTML탭 raw 보존 WO는 인라인 style을 살린다. **저장→QR/블로그 렌더까지 인라인 style이 실제로 보존되는지** §2.4 경로(content-editor sanitize + QR 랜딩 `sanitizeHtml`)를 실측 후 구현 착수. 보존 안 되면 (a) 허용 attribute 화이트리스트 조정 WO 선행, 또는 (b) "디자인 입힌 HTML" 대신 구조 HTML만 권장(메모상 기존 안내 문구 정책과 정합).
+> **게이트 G1 (인라인 style sanitize) — ✅ 실측 완료·PASS**: `CHECK-O4O-CONTENT-EDITOR-INLINE-STYLE-PRESERVE-G1-V1`(2026-06-30)에서 **레포 실설치 DOMPurify 3.3.0** 을 직접 실행해 검증한 결과, **기본 정책상 `style` attribute가 보존**되며(사전 추적의 "기본값이 style 제거" 가설은 거짓으로 정정) 입력(HTML 탭 raw 경로)→저장→QR/블로그 렌더 전 구간에서 인라인 style이 살아남는다. **sanitize 변경 불필요, 디자인 HTML 그대로 활용 가능.** 단 (A) WYSIWYG('edit' 탭) 재편집 시 TipTap 직렬화로 소실되므로 "HTML 탭 붙여넣기 후 그대로 저장"을 작성 가이드로 안내, (B) CSS 위험 토큰(`url(javascript:)`·`expression()`) 미제거는 낮은 우선순위 hardening 후보(별도 보안 WO, blocker 아님).
 
 > **게이트 G2 (썸네일 외부 URL)**: thumbnailUrl은 외부 URL을 받지만 핫링크 깨짐 위험. V1은 URL 허용하되 MediaPickerModal 업로드(`o4o-media-library`)를 1순위로 안내.
 
@@ -247,15 +247,18 @@ metadata로 느슨히 연결.
 
 ### WO-O4O-STORE-PRODUCT-LLM-MANUAL-CONTENT-FLOW-V1 (핵심)
 - **방향**: 제품 등록과 콘텐츠 제작을 **분리**. 제품 등록 화면에 콘텐츠 생성을 붙이지 않는다.
-- **선행 게이트**: G1(인라인 style sanitize 실측) → 결과에 따라 콘텐츠 입력 형식(디자인 HTML vs 구조 HTML) 분기.
+- **선행 게이트 G1 = ✅ PASS** (`CHECK-O4O-CONTENT-EDITOR-INLINE-STYLE-PRESERVE-G1-V1`): 인라인 style 보존 확인 → **디자인 HTML 그대로 활용**, sanitize 변경 없이 착수 가능. 작성 UX는 "HTML 탭 붙여넣기 후 그대로 저장"(WYSIWYG 재편집 시 style 소실) 안내.
 - **제품 등록**: 기존 store local-products 등록 흐름 그대로 사용(LLM 조사 결과/주요 문구/주의사항/썸네일을 제품 기본 정보로 저장). 신규 입력기 불필요.
 - **진입점**: 제품 상세/리스트에 **"제품 콘텐츠 만들기"** 버튼 추가 → 클릭 시 **기존 콘텐츠 편집기로 이동**. 제목/요약/본문 초안은 제품 정보에서 prefill(가능 범위 내).
 - **콘텐츠 작성/저장**: 기존 콘텐츠 편집기(RichTextEditor 'HTML'탭에 외부 LLM HTML 붙여넣기/편집) → **기존 저장 흐름** 사용. 매장=내 매장 콘텐츠 리스트(direct, author_role='store'), 운영자=운영자 콘텐츠 리스트(author_role='operator'). 매장은 운영자 콘텐츠를 **가져오기=복사**로 활용(기존 `import-b2c-description` 동형 경로 재사용 가능).
 - **연결(느슨)**: content_json/source_metadata 에 `sourceProductName`·`storeLocalProductId`·`contentPurpose='product_explanation'`·`reviewStatus`(또는 workspace_status)·`copiedFrom='llm_manual'`. **FK/링크테이블 신규 0.**
 - **약사 검토**: reviewStatus='pharmacist_review_required' → 'ready'(또는 workspace_status draft→ready_curation). 미검토 의약품 콘텐츠 공개 QR 노출 차단.
 
-### (선행, 조건부) WO-O4O-CONTENT-EDITOR-INLINE-STYLE-PRESERVE-AUDIT-V1
-- G1 전용. content-editor sanitize + QR 랜딩 렌더까지 인라인 style 보존 여부 실측·정책 확정. 보존 정책에 따라 핵심 WO 입력 형식(디자인 HTML vs 구조 HTML) 결정.
+### ~~(선행) WO-O4O-CONTENT-EDITOR-INLINE-STYLE-PRESERVE-AUDIT-V1~~ → ✅ `CHECK-O4O-CONTENT-EDITOR-INLINE-STYLE-PRESERVE-G1-V1`로 충족·종료
+- G1 실측 완료(인라인 style 보존 PASS). 별도 선행 audit WO 불필요.
+
+### (선택, 낮은 우선순위) WO-O4O-CONTENT-EDITOR-CSS-VALUE-HARDENING-V1
+- G1 CHECK 유보 B 전용. 인라인 style 보존은 유지하되 CSS 값에서 `javascript:`/`expression(`/위험 `url()` 토큰 필터. dangerouslySetInnerHTML 결합 방어용. 실질 위험 낮음 → blocker 아님, 별도 보안 트랙.
 
 ### (조건부) WO-O4O-STORE-PRODUCT-CONTENT-LINK-PROMOTION-V1
 - 제품 단위 콘텐츠 조회·집계(제품당 콘텐츠 N) 성능이 필요하면, metadata 느슨한 연결 → 기존 `kpa_store_content_product_links`(약참조, `product_source_type='local'`, `link_type='product_description'`) 정식 연결로 승격. 신규 테이블 없음. 입증 전 보류.
