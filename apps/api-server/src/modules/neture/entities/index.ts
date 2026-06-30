@@ -10,6 +10,8 @@ export {
 // WO-O4O-SERVICE-PHARMACY-AUDIENCE-POLICY-SETTINGS-V1
 export { ServiceAudiencePolicy } from './ServiceAudiencePolicy.entity.js';
 export { ProductMaster } from './ProductMaster.entity.js';
+// WO-O4O-PRODUCT-MASTER-REPRESENTATIVE-LINK-FOUNDATION-V1: 대표상품 그룹핑 계층
+export { RepresentativeProduct } from './RepresentativeProduct.entity.js';
 // WO-O4O-PRODUCT-IDENTIFIER-CORE-V1: Identifier Core (Phase 2)
 export {
   ProductIdentifier,

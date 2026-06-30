@@ -27,6 +27,7 @@ import type { ProductImage } from './ProductImage.entity.js';
 import type { ProductIdentifier } from './ProductIdentifier.entity.js';
 import type { ProductDrugCategory } from '../utils/product-type.util.js';
 import type { ProductDrugExtension } from './ProductDrugExtension.entity.js';
+import type { RepresentativeProduct } from './RepresentativeProduct.entity.js';
 
 @Entity('product_masters')
 export class ProductMaster {
@@ -110,6 +111,20 @@ export class ProductMaster {
   /** 식약처 동기화 시각 */
   @Column({ name: 'mfds_synced_at', type: 'timestamp', nullable: true })
   mfdsSyncedAt: Date | null;
+
+  /**
+   * 대표상품(그룹핑) 연결 — WO-O4O-PRODUCT-MASTER-REPRESENTATIVE-LINK-FOUNDATION-V1
+   *
+   * nullable additive FK. 대표상품 미연결 허용(신규 등록 시 미지정 허용).
+   * ProductMaster 의미(포장단위/SKU SSOT)는 불변. 주문/공급 단위 아님.
+   * 기존 backfill 없음. FK 삭제 시 SET NULL.
+   */
+  @Column({ name: 'representative_product_id', type: 'uuid', nullable: true })
+  representativeProductId: string | null;
+
+  @ManyToOne('RepresentativeProduct', 'productMasters', { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'representative_product_id' })
+  representativeProduct?: RepresentativeProduct;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
