@@ -12,3 +12,11 @@ export {
 export { PRODUCT_TAGGING_SYSTEM, PRODUCT_TAGGING_B2B_SYSTEM } from './product-tagging.prompt.js';
 export { STORE_INSIGHT_SYSTEM } from './store-insight.prompt.js';
 export { STORE_PRODUCT_INSIGHT_SYSTEM } from './store-product-insight.prompt.js';
+export {
+  CONTENT_TRANSLATION_SYSTEM,
+  CONTENT_TRANSLATION_PROMPT,
+  TRANSLATION_LOCALE_NAMES,
+  buildContentTranslationUserPrompt,
+  type TranslationLocale,
+  type ContentTranslationInput,
+} from './content-translation.prompt.js';
