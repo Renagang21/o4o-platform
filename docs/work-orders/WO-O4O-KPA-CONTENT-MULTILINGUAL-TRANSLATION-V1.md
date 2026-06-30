@@ -35,53 +35,56 @@
 - 콘텐츠 리스트 UI 패턴(BaseTable + ActionBar + 체크박스 선택 이미 존재).
 - 7언어 locale 정의(ko/en/zh/ja/vi/th/id).
 
-## 3. 설계 결정 (✅ 2026-06-24)
+## 3. 설계 결정 (✅ 2026-06-24, 대상 교정)
 
 > **상품-다국어 모델에 끼우지 않고, 콘텐츠 네이티브 방식.** (최소수정 + 리스트 정합)
+> **대상 교정:** 콘텐츠 리스트 = **`kpa_store_contents`**(내 매장 콘텐츠 = 자료함 = `StoreLibraryContentsPage` `/store/library/contents`). `/content`(=`kpa_contents`, 커뮤니티)가 아님. 이게 QR/POP/블로그 재사용 대상이며 본문 HTML이 `content_json.html`에 있음.
 
-- **신규 테이블 `kpa_content_translations`**: `content_id`(FK kpa_contents) + `locale` + `title` + `summary` + `body`(html) + `status`(draft/ready) + 표준 타임스탬프. (content_id, locale) UNIQUE.
+- **저장 = `kpa_store_contents.content_json.translations[locale] = { title, html }`** → **신규 테이블/마이그레이션 0.** (content_json 은 이미 jsonb 자유 슬롯 — audit IR "신규 테이블 0" 원칙과 정합)
 - **번역 = AI 초안**(`AiPolicyExecutorService` 재사용) → 매장이 수정 가능. (우리 원칙: 최대한 자동 + 미세조정은 사람)
-- **번역 엔진 = 외부 AI API 빌림, 결과는 o4o 스키마(kpa_content_translations)로 저장.** (엔진은 빌려도 그릇은 내가)
+- **번역 엔진 = 외부 AI API 빌림, 결과는 content_json.translations 로 저장.** (엔진은 빌려도 그릇은 내가)
 - **트리거 = 매장.** 운영자 경유 아님.
+- **대상 본문 = content_json.html (+ title).** 인라인 style 보존은 기존 HTML 경로 그대로(audit IR G1과 동일 이슈 — 번역은 텍스트만 교체, 마크업/style 유지).
 
 ### 3.1 흐름
 ```
-[매장] 콘텐츠 리스트(/content) → 항목 체크
+[매장] 내 매장 콘텐츠 리스트(/store/library/contents) → 항목 체크
   → 나라 1개 선택(en/zh/ja/vi/th/id)
-  → POST 번역 (content body/title/summary → 대상 언어 AI 번역)
-  → kpa_content_translations upsert (status=draft)
+  → POST 번역 (content_json.html + title → 대상 언어 AI 번역, 마크업 유지)
+  → kpa_store_contents.content_json.translations[locale] = {title, html} upsert (status=draft)
   → 매장 필요시 수정
-  → (표시 단계: §6 결정에 따름)
+  → (표시: §6 = 나 — 이번 범위 외, 후속)
   → 나라마다 반복
 ```
 
-## 4. 구현 범위 (확정 후)
+## 4. 구현 범위 (확정 — §6=나, 마이그레이션 0)
 
-**백엔드**
-1. Migration `kpa_content_translations` (타임스탬프=직전+1 규칙).
-2. Entity `KpaContentTranslation` (ESM: import type + 문자열 관계명).
-3. 번역 프롬프트 `@o4o/ai-prompts` (언어별 마케팅 번역, 고유명사 보존 지시).
-4. `ContentTranslationService` (`AiPolicyExecutorService` 호출 → title/summary/body 번역).
-5. 엔드포인트: `POST /api/v1/kpa/store/contents/:id/translate` (locale 1개), `GET .../translations`, `PUT .../translations/:locale`. 가드 = store_owner + org 스코프.
+**백엔드** (신규 테이블/엔티티 0)
+1. 번역 프롬프트 `@o4o/ai-prompts` (언어별, 마크업/style 유지 + 텍스트만 번역 + 고유명사/숫자 보존 지시).
+2. 번역 서비스 (`AiPolicyExecutorService` 재사용 → content_json.html + title 의 텍스트를 대상 언어로 번역, 마크업 유지).
+3. 엔드포인트 (기존 kpa store-content 컨트롤러에 추가):
+   - `POST /api/v1/kpa/.../store-contents/:id/translate` body `{ locale }` (1개) → AI 번역 → content_json.translations[locale] upsert(draft) 후 반환.
+   - `PUT  .../store-contents/:id/translations/:locale` (매장 수정 저장).
+   - 가드 = store_owner + org 스코프 (기존 패턴).
 
 **프론트엔드**
-6. `contentTranslation.ts` API client.
-7. `ContentTranslateModal.tsx` (나라 선택 1개 + 진행 + 결과 preview/save).
-8. ContentListPage ActionBar 에 "다국어 변환" 액션(체크 시 노출).
+4. `kpaContents`(또는 store-content) API client 에 translate/saveTranslation 추가.
+5. `ContentTranslateModal.tsx` (나라 1개 선택 + 진행 + 결과 preview/edit/save).
+6. **StoreLibraryContentsPage** ActionBar 에 "다국어 변환" 액션(항목 체크 시 노출) + 번역 보유 배지(locale 칩).
+
+**비범위(이번)**: 외국인 표시(QR/공개 페이지 locale 렌더) = §6 (나) → 후속 WO.
 
 ## 5. 검증
 - tsc/build PASS(api + web-kpa-society).
 - 실제 브라우저 smoke: 콘텐츠 체크 → 나라 선택 → 번역 → translations 저장 확인(실제 화면, 스크린샷).
 - AI 키 없을 때 graceful(번역 비활성/안내).
 
-## 6. 오픈 질문 (구현 전 결정 필요) ⚠️
+## 6. 표시 범위 결정 (✅ 2026-06-24)
 
-**번역한 콘텐츠를 외국인 고객이 "어디서" 보나?** (표시 경로)
-- 저장은 본 WO로 가능. 그러나 **표시**(locale별 공개 화면)가 있어야 가치 완성.
-- 기존 상품-다국어엔 공개 landing(`resolvePublicMlc`)이 있으나, 일반 콘텐츠엔 locale별 공개 화면 유무 불확실.
-- **(가)** QR/공개 페이지 locale 표시까지 이번 범위 / **(나)** 번역 저장·관리(매장 내부)까지만, 표시는 후속.
-
-→ (가)/(나) 결정 후 §4 범위 확정.
+**결정 = (나)**: 이번 WO 는 **번역 생성·저장·관리(매장 내부)까지.**
+- 외국인 표시(QR/공개 페이지 locale 렌더)는 **후속 WO**(`...-PUBLIC-LOCALE-VIEW-V1`).
+- 근거: 번역 품질을 먼저 안정화·검증한 뒤 표시를 붙이는 단계 분리(한 단계씩 검증).
+- 참고: QR `page` 랜딩은 이미 `kpa_store_contents.id` 대상 → 후속에서 locale 파라미터만 추가하면 표시 가능(구조적으로 열려 있음).
 
 ---
 
