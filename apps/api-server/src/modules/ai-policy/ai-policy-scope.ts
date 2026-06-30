@@ -13,6 +13,7 @@ export type AiPolicyScope =
   | 'PRODUCT_TAGGING'
   | 'STORE_PRODUCT_INSIGHT'
   | 'PRODUCT_CONTENT'
+  | 'CONTENT_TRANSLATION'
   | 'AI_PROXY';
 
 /** Scope → Service 매핑 (quota 계층 해결용) */
@@ -25,5 +26,6 @@ export const SERVICE_FOR_SCOPE: Record<AiPolicyScope, string> = {
   PRODUCT_TAGGING: 'store',
   STORE_PRODUCT_INSIGHT: 'store',
   PRODUCT_CONTENT: 'store',
+  CONTENT_TRANSLATION: 'store',
   AI_PROXY: 'proxy',
 };

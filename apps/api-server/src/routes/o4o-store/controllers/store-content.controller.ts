@@ -37,10 +37,15 @@ import { KpaMember } from '../../kpa/entities/kpa-member.entity.js';
 import { KpaStoreContent } from '../../kpa/entities/kpa-store-content.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import { isStoreOwner } from '../../../utils/store-owner.utils.js';
+import { ContentTranslationService } from '../../../modules/store-ai/services/content-ai-translation.service.js';
+import type { TranslationLocale } from '@o4o/ai-prompts/store';
 
 type AuthMiddleware = import('express').RequestHandler;
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// WO-O4O-KPA-CONTENT-MULTILINGUAL-TRANSLATION-V1: 매장이 선택 가능한 번역 대상 언어.
+const TRANSLATION_LOCALES: TranslationLocale[] = ['en', 'zh', 'ja', 'vi', 'th', 'id'];
 
 // WO-O4O-KPA-CONTENT-LIST-TAG-FIELD-AND-DISPLAY-V1:
 //   태그 정규화 — 문자열 배열만 허용, trim, 빈 문자열 제거, 중복 제거, 길이/개수 제한.
@@ -64,6 +69,7 @@ export function createStoreContentController(
   requireAuth: AuthMiddleware,
 ): Router {
   const router = Router();
+  const translationService = new ContentTranslationService(dataSource);
 
   // ───────────────────────────────────────────────────────────────────────────
   // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-LINK-V1
@@ -829,6 +835,170 @@ export function createStoreContentController(
         await repo.remove(content);
 
         res.json({ success: true, data: { deleted: true, id } });
+      } catch (error: any) {
+        res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
+      }
+    },
+  );
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // WO-O4O-KPA-CONTENT-MULTILINGUAL-TRANSLATION-V1: 콘텐츠 다국어 번역 (매장)
+  //   - 나라 1개씩 AI 번역 → content_json.translations[locale] 저장(draft)
+  //   - 매장 수정 저장(PUT) → status=ready
+  // ───────────────────────────────────────────────────────────────────────────
+
+  /**
+   * POST /store-contents/direct/:id/translate  body: { locale }
+   * direct 콘텐츠(title + content_json.html)를 대상 언어 1개로 AI 번역 →
+   * content_json.translations[locale] = { title, html, status:'draft', model, updatedAt } upsert.
+   */
+  router.post(
+    '/direct/:id/translate',
+    requireAuth,
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const authReq = req as AuthRequest;
+        const userId = authReq.user?.id;
+        if (!userId) {
+          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
+          return;
+        }
+        const { id } = req.params;
+        if (!UUID_RE.test(id)) {
+          res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid content ID' } });
+          return;
+        }
+        const locale = (req.body as { locale?: string })?.locale as TranslationLocale;
+        if (!locale || !TRANSLATION_LOCALES.includes(locale)) {
+          res.status(400).json({ success: false, error: { code: 'INVALID_LOCALE', message: `locale must be one of ${TRANSLATION_LOCALES.join(', ')}` } });
+          return;
+        }
+
+        const { isOwner, organizationId: orgFromRa } = await isStoreOwner(dataSource, userId, 'kpa');
+        if (!isOwner) {
+          res.status(403).json({ success: false, error: { code: 'STORE_OWNER_REQUIRED', message: '매장 경영자(kpa:store_owner)만 번역할 수 있습니다.' } });
+          return;
+        }
+        let organizationId: string | null = orgFromRa;
+        if (!organizationId) {
+          const member = await dataSource.getRepository(KpaMember).findOne({ where: { user_id: userId } });
+          organizationId = member?.organization_id || null;
+        }
+        if (!organizationId) {
+          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: '매장 조직 정보를 찾을 수 없습니다.' } });
+          return;
+        }
+
+        const repo = dataSource.getRepository(KpaStoreContent);
+        const content = await repo.findOne({
+          where: { id, organization_id: organizationId, source_type: 'direct' },
+        });
+        if (!content) {
+          res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Direct content not found' } });
+          return;
+        }
+
+        const cj = (content.content_json ?? {}) as Record<string, unknown>;
+        const html = typeof cj.html === 'string' ? cj.html : '';
+        if (!html && !content.title.trim()) {
+          res.status(400).json({ success: false, error: { code: 'EMPTY_CONTENT', message: '번역할 본문이 없습니다.' } });
+          return;
+        }
+
+        const out = await translationService.translate(content.title, html, locale);
+        if (!out) {
+          res.status(502).json({ success: false, error: { code: 'TRANSLATION_FAILED', message: 'AI 번역에 실패했습니다. (AI 설정/키 확인)' } });
+          return;
+        }
+
+        const translations = (cj.translations && typeof cj.translations === 'object')
+          ? (cj.translations as Record<string, unknown>) : {};
+        const entry = {
+          title: out.result.title,
+          html: out.result.html,
+          status: 'draft',
+          model: out.model,
+          updatedAt: new Date().toISOString(),
+        };
+        translations[locale] = entry;
+        content.content_json = { ...cj, translations };
+        content.updated_by = userId;
+        await repo.save(content);
+
+        res.json({ success: true, data: { id, locale, translation: entry } });
+      } catch (error: any) {
+        res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
+      }
+    },
+  );
+
+  /**
+   * PUT /store-contents/direct/:id/translations/:locale  body: { title?, html? }
+   * 번역본을 매장이 수정 저장 → status='ready'.
+   */
+  router.put(
+    '/direct/:id/translations/:locale',
+    requireAuth,
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const authReq = req as AuthRequest;
+        const userId = authReq.user?.id;
+        if (!userId) {
+          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
+          return;
+        }
+        const { id, locale } = req.params as { id: string; locale: string };
+        if (!UUID_RE.test(id)) {
+          res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid content ID' } });
+          return;
+        }
+        if (!TRANSLATION_LOCALES.includes(locale as TranslationLocale)) {
+          res.status(400).json({ success: false, error: { code: 'INVALID_LOCALE', message: `locale must be one of ${TRANSLATION_LOCALES.join(', ')}` } });
+          return;
+        }
+
+        const { isOwner, organizationId: orgFromRa } = await isStoreOwner(dataSource, userId, 'kpa');
+        if (!isOwner) {
+          res.status(403).json({ success: false, error: { code: 'STORE_OWNER_REQUIRED', message: '매장 경영자(kpa:store_owner)만 수정할 수 있습니다.' } });
+          return;
+        }
+        let organizationId: string | null = orgFromRa;
+        if (!organizationId) {
+          const member = await dataSource.getRepository(KpaMember).findOne({ where: { user_id: userId } });
+          organizationId = member?.organization_id || null;
+        }
+        if (!organizationId) {
+          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: '매장 조직 정보를 찾을 수 없습니다.' } });
+          return;
+        }
+
+        const repo = dataSource.getRepository(KpaStoreContent);
+        const content = await repo.findOne({
+          where: { id, organization_id: organizationId, source_type: 'direct' },
+        });
+        if (!content) {
+          res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Direct content not found' } });
+          return;
+        }
+
+        const cj = (content.content_json ?? {}) as Record<string, unknown>;
+        const translations = (cj.translations && typeof cj.translations === 'object')
+          ? (cj.translations as Record<string, unknown>) : {};
+        const prev = (translations[locale] && typeof translations[locale] === 'object')
+          ? (translations[locale] as Record<string, unknown>) : {};
+        const { title, html } = req.body as { title?: string; html?: string };
+        translations[locale] = {
+          ...prev,
+          title: typeof title === 'string' ? title : prev.title,
+          html: typeof html === 'string' ? html : prev.html,
+          status: 'ready',
+          updatedAt: new Date().toISOString(),
+        };
+        content.content_json = { ...cj, translations };
+        content.updated_by = userId;
+        await repo.save(content);
+
+        res.json({ success: true, data: { id, locale, translation: translations[locale] } });
       } catch (error: any) {
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
       }
