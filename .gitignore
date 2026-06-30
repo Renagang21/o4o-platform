@@ -144,3 +144,6 @@ scripts/verify/output/
 # Vite config build artifacts — source is vite.config.ts (services/web-* 는 .ts 만 추적)
 services/web-*/vite.config.js
 services/web-*/vite.config.d.ts
+
+# Drug master CSV samples/raw (WO-O4O-DRUG-CANDIDATE-IMPORT-PIPELINE-V1) — never commit bulk/sample CSV
+docs/checks/artifacts/*.csv
