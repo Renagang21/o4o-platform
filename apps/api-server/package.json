@@ -23,6 +23,7 @@
     "create-admin": "npx tsx src/scripts/create-admin-user.ts",
     "drug:candidate-import": "npx tsx src/scripts/drug-candidate-import.ts",
     "easy-drug-info:import": "npx tsx src/scripts/easy-drug-info-candidate-import.ts",
+    "easy-drug-match:simulate": "npx tsx src/scripts/easy-drug-to-master-offline-match.ts",
     "create-test-users": "npx ts-node src/scripts/create-test-users.ts",
     "batch:settlement:daily": "npx tsx src/scripts/run-daily-settlement.ts",
     "ai:admin": "npx ts-node scripts/ai-admin-cli.ts",
