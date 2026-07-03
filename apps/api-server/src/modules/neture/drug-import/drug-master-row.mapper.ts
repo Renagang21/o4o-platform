@@ -94,6 +94,16 @@ function clean(v: string | undefined | null): string | null {
   return t.length === 0 ? null : t;
 }
 
+/**
+ * ProductCandidate 컬럼 길이 제한에 맞춰 절단 (varchar overflow 방지).
+ * 원본 전체값은 rawPayload.source 에 무손실 보존되므로 표시/매칭용 절단은 무손실.
+ * 수출명 병기 등으로 한글상품명·약품규격이 255자, 포장형태가 64자를 넘는 소수 row 존재.
+ */
+function truncate(v: string | null, max: number): string | null {
+  if (v == null) return null;
+  return v.length <= max ? v : v.slice(0, max);
+}
+
 /** U+FFFD(replacement char) 또는 NUL 포함 시 인코딩 변환 이상 의심 */
 function looksEncodingBroken(values: (string | null)[]): boolean {
   const NUL = String.fromCharCode(0);
@@ -219,11 +229,11 @@ export function mapDrugMasterRow(
       // 식별자 후보로 KOREA_DRUG_CODE(표준코드)만 매칭 입력으로 사용. 형식이상이면 미부착.
       identifierType: validStandardCode ? 'KOREA_DRUG_CODE' : null,
       identifierValue: validStandardCode,
-      candidateName: productName,
-      candidateManufacturer: manufacturer, // 후보값 — 대표상품 자동 파생 아님
-      candidateCategory: rxOtc, // 전문/일반 구분 (분류 보조)
-      candidateSpec: spec,
-      candidateUnit: packageForm, // 결측 시 null (fallback 합성은 승격 시점)
+      candidateName: truncate(productName, 255),
+      candidateManufacturer: truncate(manufacturer, 255), // 후보값 — 대표상품 자동 파생 아님
+      candidateCategory: truncate(rxOtc, 255), // 전문/일반 구분 (분류 보조)
+      candidateSpec: truncate(spec, 255),
+      candidateUnit: truncate(packageForm, 64), // 결측 시 null (fallback 합성은 승격 시점)
       rawPayload,
     },
     dedupKey: {
