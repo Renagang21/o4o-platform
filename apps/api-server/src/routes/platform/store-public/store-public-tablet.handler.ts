@@ -23,6 +23,7 @@ import {
   tabletRequestLimiter,
   sanitizePublishableTranslations,
   resolveTabletDisplaySource,
+  resolveServiceKeys,
 } from './store-public-utils.js';
 
 export function createStorePublicTabletRoutes(deps: {
@@ -391,7 +392,10 @@ export function createStorePublicTabletRoutes(deps: {
       //   3) 유효 후보 0개면 기존 store idle 만.
       let operatorSource: 'selected' | 'fallback' | null = null;
       if (tabletId) {
-        const svc = resolved.serviceKey;
+        // WO-O4O-KPA-TABLET-OPERATOR-COMMON-IDLE-VIDEO-SELECTION-V1:
+        //   forced content service_key 는 'kpa-society'(운영자/candidates 기준)인데 slug serviceKey 는 'kpa'.
+        //   resolveServiceKeys 로 ['kpa','kpa-society'] 확장해 매칭(서비스 일반화).
+        const svcKeys = resolveServiceKeys(resolved.serviceKey);
         let picked: any = null;
         const sel = await dataSource.query(
           `SELECT fc.id, fc.video_url AS "videoUrl", fc.source_type AS "sourceType",
@@ -399,11 +403,11 @@ export function createStorePublicTabletRoutes(deps: {
            FROM store_tablet_operator_idle_selections s
            JOIN signage_forced_content fc ON fc.id = s.forced_content_id
            WHERE s.tablet_id = $1 AND s.cleared_at IS NULL
-             AND fc.service_key = $2 AND fc.is_active = true AND fc.deleted_at IS NULL
+             AND fc.service_key = ANY($2) AND fc.is_active = true AND fc.deleted_at IS NULL
              AND fc.target_surface IN ('tablet_idle','both')
              AND NOW() BETWEEN fc.start_at AND fc.end_at
            LIMIT 1`,
-          [tabletId, svc],
+          [tabletId, svcKeys],
         );
         if (sel?.[0]) { picked = sel[0]; operatorSource = 'selected'; }
         else {
@@ -411,11 +415,11 @@ export function createStorePublicTabletRoutes(deps: {
             `SELECT fc.id, fc.video_url AS "videoUrl", fc.source_type AS "sourceType",
                     fc.tablet_duration_seconds AS "tabletDurationSeconds"
              FROM signage_forced_content fc
-             WHERE fc.service_key = $1 AND fc.is_active = true AND fc.deleted_at IS NULL
+             WHERE fc.service_key = ANY($1) AND fc.is_active = true AND fc.deleted_at IS NULL
                AND fc.target_surface IN ('tablet_idle','both')
                AND NOW() BETWEEN fc.start_at AND fc.end_at
              ORDER BY fc.id ASC`,
-            [svc],
+            [svcKeys],
           );
           if (cands.length > 0) {
             const seed = `${tabletId}:${new Date().toISOString().slice(0, 10)}`;
