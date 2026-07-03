@@ -255,87 +255,119 @@ export class DrugCandidateImportService {
   }
 
   /**
-   * --apply: 실제 DB write. created/updated/skipped/errored 카운트.
+   * --apply: 실제 DB write (배치). created/updated/skipped/errored 카운트.
    *
-   * ⚠️ 이 WO 에서는 프로덕션 DB 에 실행하지 않는다(안전 경계). 구현만 둔다.
-   *    write 는 product_candidates INSERT/UPDATE 만 — ProductMaster/Identifier 미생성.
+   * write 는 product_candidates INSERT 만 — ProductMaster/Identifier 미생성.
+   *
+   * 성능: 305k row 규모에서 per-row SELECT+INSERT(≈460k round-trip)는 Cloud Run Job
+   *       1시간 timeout 을 초과한다. 따라서:
+   *         1) 기존 dedup 키(표준코드)를 sourceBaseDate 당 **단일 SELECT** 로 선적재.
+   *         2) 파일 내부 dedup + 기존 존재분(updated) skip.
+   *         3) 신규분만 **청크 multi-row INSERT** (기본 500行/문). idempotent(재실행 시 기존 skip).
+   *       기존 존재 row 는 값 재갱신하지 않는다(seed 목적상 불필요·고속화). 재실행 안전.
    */
+  private static readonly APPLY_CHUNK = 500;
+
   private async applyRows(
     ds: DataSource,
     mapped: MappedDrugCandidate[],
     report: DrugImportReport,
   ): Promise<void> {
+    // 1) 기존 dedup 키(표준코드) 선적재 — sourceBaseDate 당 단일 SELECT
+    const baseDate = mapped.find((m) => m.dedupKey.sourceBaseDate)?.dedupKey.sourceBaseDate ?? null;
+    const existing = new Set<string>();
+    if (baseDate != null) {
+      const rows: Array<{ normalized_identifier_value: string | null }> = await ds.query(
+        `SELECT normalized_identifier_value FROM product_candidates
+          WHERE source_type = 'csv_import'
+            AND identifier_type = 'KOREA_DRUG_CODE'
+            AND raw_payload->>'sourceBaseDate' = $1
+            AND deleted_at IS NULL`,
+        [baseDate],
+      );
+      for (const r of rows) if (r.normalized_identifier_value) existing.add(r.normalized_identifier_value);
+    }
+
+    // 2) 신규 대상 수집 (파일 내부 dedup + 기존 존재분 updated 로 skip)
     const seen = new Set<string>();
+    const toInsert: MappedDrugCandidate[] = [];
     for (const m of mapped) {
-      const key = this.dedupKeyOf(m);
-      if (key == null) {
-        report.counts.skipped += 1;
+      const sc = m.dedupKey.standardCode;
+      if (sc == null) {
+        report.counts.skipped += 1; // 표준코드 결측/형식이상
         continue;
       }
-      if (seen.has(key)) {
-        report.counts.skipped += 1;
+      if (seen.has(sc)) {
+        report.counts.skipped += 1; // 파일 내부 중복
         continue;
       }
-      seen.add(key);
+      seen.add(sc);
+      if (existing.has(sc)) {
+        report.counts.updated += 1; // 이미 존재 → write 생략(재실행 안전)
+        continue;
+      }
+      toInsert.push(m);
+    }
+
+    // 3) 청크 multi-row INSERT
+    const CHUNK = DrugCandidateImportService.APPLY_CHUNK;
+    for (let i = 0; i < toInsert.length; i += CHUNK) {
+      const chunk = toInsert.slice(i, i + CHUNK);
       try {
-        const existing = await this.findExisting(ds, m);
-        const ci = m.candidateInput;
-        if (existing) {
-          await ds.query(
-            `UPDATE product_candidates
-               SET candidate_name = $2,
-                   candidate_manufacturer = $3,
-                   candidate_category = $4,
-                   candidate_spec = $5,
-                   candidate_unit = $6,
-                   raw_payload = $7::jsonb,
-                   source_label = $8,
-                   updated_at = NOW()
-             WHERE id = $1`,
-            [
-              existing.id,
-              ci.candidateName,
-              ci.candidateManufacturer,
-              ci.candidateCategory,
-              ci.candidateSpec,
-              ci.candidateUnit,
-              JSON.stringify(ci.rawPayload),
-              ci.sourceLabel,
-            ],
-          );
-          report.counts.updated += 1;
-        } else {
-          await ds.query(
-            `INSERT INTO product_candidates
-               (id, service_key, source_type, source_label, candidate_status, match_status,
-                identifier_type, identifier_value, normalized_identifier_value,
-                candidate_name, candidate_manufacturer, candidate_category, candidate_spec, candidate_unit,
-                raw_payload, created_at, updated_at)
-             VALUES
-               (gen_random_uuid(), $1, 'csv_import', $2, 'pending', 'unmatched',
-                $3, $4, $5,
-                $6, $7, $8, $9, $10,
-                $11::jsonb, NOW(), NOW())`,
-            [
-              ci.serviceKey,
-              ci.sourceLabel,
-              ci.identifierType,
-              ci.identifierValue,
-              ci.identifierValue, // KOREA_DRUG_CODE 는 trim 만 — normalized = 표준코드
-              ci.candidateName,
-              ci.candidateManufacturer,
-              ci.candidateCategory,
-              ci.candidateSpec,
-              ci.candidateUnit,
-              JSON.stringify(ci.rawPayload),
-            ],
-          );
-          report.counts.created += 1;
+        await this.insertChunk(ds, chunk);
+        report.counts.created += chunk.length;
+      } catch {
+        // 청크 실패 시 per-row 폴백으로 불량 row 격리
+        for (const m of chunk) {
+          try {
+            await this.insertChunk(ds, [m]);
+            report.counts.created += 1;
+          } catch (e) {
+            report.errors.push({
+              rowNumber: (m.candidateInput.rawPayload.rowNumber as number) ?? null,
+              reason: `APPLY_ERROR: ${(e as Error).message}`,
+            });
+            report.counts.errored += 1;
+          }
         }
-      } catch (e) {
-        report.errors.push({ rowNumber: (m.candidateInput.rawPayload.rowNumber as number) ?? null, reason: `APPLY_ERROR: ${(e as Error).message}` });
-        report.counts.errored += 1;
       }
     }
+  }
+
+  /** 후보 청크 multi-row INSERT (파라미터 바인딩). */
+  private async insertChunk(ds: DataSource, chunk: MappedDrugCandidate[]): Promise<void> {
+    if (chunk.length === 0) return;
+    const valuesSql: string[] = [];
+    const params: unknown[] = [];
+    let p = 1;
+    for (const m of chunk) {
+      const ci = m.candidateInput;
+      valuesSql.push(
+        `(gen_random_uuid(), $${p++}, 'csv_import', $${p++}, 'pending', 'unmatched', ` +
+          `$${p++}, $${p++}, $${p++}, $${p++}, $${p++}, $${p++}, $${p++}, $${p++}, $${p++}::jsonb, NOW(), NOW())`,
+      );
+      params.push(
+        ci.serviceKey,
+        ci.sourceLabel,
+        ci.identifierType,
+        ci.identifierValue,
+        ci.identifierValue, // normalized = 표준코드(trim)
+        ci.candidateName,
+        ci.candidateManufacturer,
+        ci.candidateCategory,
+        ci.candidateSpec,
+        ci.candidateUnit,
+        JSON.stringify(ci.rawPayload),
+      );
+    }
+    await ds.query(
+      `INSERT INTO product_candidates
+         (id, service_key, source_type, source_label, candidate_status, match_status,
+          identifier_type, identifier_value, normalized_identifier_value,
+          candidate_name, candidate_manufacturer, candidate_category, candidate_spec, candidate_unit,
+          raw_payload, created_at, updated_at)
+       VALUES ${valuesSql.join(', ')}`,
+      params,
+    );
   }
 }
