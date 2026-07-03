@@ -17,6 +17,8 @@
 !dist/migrate.js.map
 !dist/drug-seed-candidate-import-job.js
 !dist/drug-seed-candidate-import-job.js.map
+!dist/drug-seed-promotion-apply-job.js
+!dist/drug-seed-promotion-apply-job.js.map
 
 # Allow migrations for TypeORM auto-migration on startup
 !dist/database
