@@ -58,6 +58,9 @@ COPY dist/main.js ./dist/main.js
 COPY dist/main.js.map ./dist/main.js.map
 COPY dist/migrate.js ./dist/migrate.js
 COPY dist/migrate.js.map ./dist/migrate.js.map
+# - drug-seed-candidate-import-job.js: 약가마스터 candidate 적재 one-off Job entry
+COPY dist/drug-seed-candidate-import-job.js ./dist/drug-seed-candidate-import-job.js
+COPY dist/drug-seed-candidate-import-job.js.map ./dist/drug-seed-candidate-import-job.js.map
 
 # Copy database folder for migrations
 # - migration-config.js: Lightweight DataSource for TypeORM CLI (fallback)
