@@ -361,18 +361,17 @@ export async function queryTabletVisibleProducts(
     //   first active tablet 이 있으면 그 태블릿의 visible display row(supplier)로 content attach.
     //   configured 면 그 rows 로 상품 집합/순서까지 제한. 없으면 legacy(TABLET gate 전체).
     const hasTablet = !!options.firstTabletId;
-    let ftIdx = 0;
-    if (hasTablet) {
-      params.push(options.firstTabletId);
-      ftIdx = params.length; // $N
-    }
     const configured = hasTablet && !!options.configured;
+    // firstTabletId 를 참조할 파라미터 위치($N). count/data 각각 참조 시에만 append 한다
+    // (참조하지 않는 쿼리에 여분 파라미터를 넘기면 Postgres 가 개수 불일치로 실패한다).
+    const ftIdx = params.length + 1;
     // count: configured 면 visible display supplier row 로 제한(INNER), 아니면 legacy.
     const countDispJoin = configured
       ? `INNER JOIN store_tablet_displays cdisp
            ON cdisp.product_id = opl.id AND cdisp.product_type = 'supplier'
            AND cdisp.tablet_id = $${ftIdx} AND cdisp.is_visible = true`
       : '';
+    const countParams = configured ? [...params, options.firstTabletId] : params;
 
     const countResult: Array<{ count: string }> = await dataSource.query(
       `SELECT COUNT(DISTINCT spo.id)::int AS count
@@ -395,7 +394,7 @@ export async function queryTabletVisibleProducts(
        WHERE spo.is_active = true
          AND s.status = 'ACTIVE'
          ${whereExtra}`,
-      params,
+      countParams,
     );
     const total = Number(countResult[0]?.count || 0);
 
@@ -426,6 +425,8 @@ export async function queryTabletVisibleProducts(
     // configured: visible display row 있는 supplier 만(집합 제한) + 편성 순서(disp.sort_order).
     const configuredFilter = configured ? 'AND disp.id IS NOT NULL' : '';
     const secondaryOrder = configured ? 'disp.sort_order ASC NULLS LAST' : `${sortField} ${sortOrder}`;
+    // data 쿼리는 hasTablet 이면 disp 조인($ftIdx)을 쓰므로 firstTabletId append.
+    const dataParams = hasTablet ? [...params, options.firstTabletId] : params;
 
     const data = await dataSource.query(
       `SELECT DISTINCT ON (spo.id)
@@ -475,7 +476,7 @@ export async function queryTabletVisibleProducts(
          ${configuredFilter}
        ORDER by spo.id, ${secondaryOrder}
        LIMIT ${limit} OFFSET ${offset}`,
-      params,
+      dataParams,
     );
 
     // WO-O4O-KPA-TABLET-PUBLIC-DISPLAY-SOURCE-ALIGNMENT-V1:
