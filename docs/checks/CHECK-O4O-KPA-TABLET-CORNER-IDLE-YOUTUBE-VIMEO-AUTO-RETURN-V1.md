@@ -43,16 +43,29 @@
 | web-k-cosmetics (공유 패키지 소비처) | ✅ PASS |
 | web-glycopharm (공유 패키지 소비처) | ✅ PASS |
 
-### 6.2 API/브라우저 E2E
+### 6.2 API/브라우저 E2E (2026-07-03, 네뚜레-약국 · 약국 경영자 체험 계정)
 
-> 배포 후 기록.
+배포: Deploy API + Web (Cloud Run) success.
 
-- [ ] 태블릿 A/B에 서로 다른 YouTube idle 저장 → `GET /idle?tabletId=A/B` 각각 반환
-- [ ] tabletId 없음 → first active, 잘못된 tabletId → fallback(tabletSource 확인)
-- [ ] youtube 저장 검증(정상 저장 / 잘못된 URL 400)
-- [ ] products?tabletId 동일 기준
-- [ ] Chrome: `/tablet/:slug?tabletId=A` 대기화면 YouTube iframe(autoplay/mute/loop) + 터치 복귀 + 60초 자동 복귀
-- [ ] 테스트 데이터 정리
+**API (인증 fetch):**
+| 항목 | 결과 |
+|---|---|
+| 태블릿 A/B YouTube idle 저장(PUT idle-playlist) | ✅ 200 / 200 |
+| 잘못된 youtube URL(type=youtube, non-youtube url) | ✅ **400 VALIDATION_ERROR**(provider 도메인 검증) |
+| `GET /idle?tabletId=A` / `=B` | ✅ 각각 `tabletSource:'query'` + 해당 YouTube |
+| `GET /idle`(tabletId 없음) | ✅ `tabletSource:'first_active'` + A |
+| `GET /idle?tabletId=<invalid uuid>` | ✅ **안전 fallback** `first_active` + A |
+| `GET /products?tabletId=A/B` | ✅ 200, `tabletDisplayTabletId` 일치(idle과 동일 기준) |
+
+**브라우저(Chrome, `/tablet/네뚜레-약국`, first active=A):**
+| 항목 | 결과 |
+|---|---|
+| ~60초 무조작 → idle 진입 | ✅ |
+| 대기화면 YouTube iframe | ✅ src=`youtube.com/embed/…?autoplay=1&mute=1&loop=1&playlist=…&controls=0&playsinline=1`, `allow="autoplay; …"` |
+| 투명 tap-catcher | ✅ iframe 위 존재 |
+| 터치(pointerdown) → 상품 안내 복귀 | ✅ iframe 제거, browse 복귀, 이전 상세 미잔존 |
+
+**정리**: 태블릿 B 삭제(200), A idle 비움(200) → 매장 원상 복구. Vimeo는 테스트 영상 미보유로 라이브 재생은 보류(판별/저장/embed 경로는 코드+동일 로직 커버).
 
 ## 7. 운영자 공통 영상 (§10)
 재사용 가능한 forced-content/operator-video 백엔드 구조 없음(사이니지 UI 페이지만 존재). 신규 DB/권한/운영 UI 필요 → **이번 V1 미구현, 후속 WO로 분리**.
