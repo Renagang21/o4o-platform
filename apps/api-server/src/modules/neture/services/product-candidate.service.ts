@@ -36,6 +36,9 @@ import {
 import type { ProductTypeClass, ProductDrugCategory, DrugDisplayPolicy } from '../utils/product-type.util.js';
 // WO-O4O-PRODUCT-DRUG-EXTENSION-PERSISTENCE-V1
 import { ProductDrugExtensionService } from './product-drug-extension.service.js';
+// WO-O4O-DRUG-MASTER-CANDIDATE-PROMOTION-APPLY-V1
+import { promoteOne, promotionFieldsFromCandidate } from '../drug-import/drug-master-promotion-apply.service.js';
+import { DbPromotionMasterStore } from '../drug-import/drug-master-promotion-apply.db.js';
 
 /** classification 에 부착하는 drug extension 요약 (표시용 — 권한 아님) */
 export interface CandidateDrugExtensionSummary {
@@ -607,12 +610,55 @@ export class ProductCandidateService {
   }
 
   /**
-   * 신규 ProductMaster 승격 — guarded skeleton.
+   * 신규 ProductMaster 승격 — WO-O4O-DRUG-MASTER-CANDIDATE-PROMOTION-APPLY-V1.
    *
-   * 이번 WO 에서는 실제 ProductMaster 생성을 하지 않는다 (미검증 데이터의 SSOT 오염 방지).
-   * barcode 검증/MFDS regulatory/Identifier Core 동기화를 동반한 정식 승격은 후속 WO 로 분리한다.
+   * 약가마스터(HIRA_DRUG_MASTER) source candidate 를 확정 정책(승격 설계 CHECK §2~§9)에 따라
+   * ProductMaster + ProductIdentifier 로 승격한다. 기존 barcode Master 는 link(immutable 덮어쓰기 금지),
+   * KOREA_DRUG_CODE/mfdsProductId 가 다른 Master 에 있으면 conflict(생성 거부).
+   *
+   * 생성 대상은 ProductMaster + ProductIdentifier 뿐. RepresentativeProduct/SharedProductDescription/
+   * ProductDrugExtension/ProductImage/Offer/Listing 을 생성하지 않는다.
    */
-  async approveAsNewProductMaster(_candidateId: string): Promise<never> {
-    throw new Error('NOT_IMPLEMENTED: approveAsNewProductMaster 는 후속 WO 에서 구현됩니다. 현재는 manual-match 만 지원합니다.');
+  async approveAsNewProductMaster(
+    candidateId: string,
+    opts?: { sourceBaseDate?: string; importBatchId?: string },
+  ): Promise<{
+    outcome: 'create' | 'link' | 'conflict' | 'skip';
+    masterId?: string;
+    skipReason?: string;
+    conflictReason?: string;
+  }> {
+    const candidate = await this.getCandidate(candidateId);
+    if (!candidate) throw new Error('CANDIDATE_NOT_FOUND');
+
+    const raw = candidate.rawPayload ?? {};
+    const sourceBaseDate = opts?.sourceBaseDate ?? (typeof raw['sourceBaseDate'] === 'string' ? (raw['sourceBaseDate'] as string) : '');
+    const importBatchId = opts?.importBatchId ?? `promote-${candidateId}`;
+    const sourceLabel = candidate.sourceLabel ?? 'HIRA_DRUG_MASTER';
+
+    const fields = promotionFieldsFromCandidate({
+      id: candidate.id,
+      candidateName: candidate.candidateName,
+      candidateManufacturer: candidate.candidateManufacturer,
+      candidateCategory: candidate.candidateCategory,
+      candidateSpec: candidate.candidateSpec,
+      candidateUnit: candidate.candidateUnit,
+      identifierValue: candidate.identifierValue,
+      normalizedIdentifierValue: candidate.normalizedIdentifierValue,
+      rawPayload: candidate.rawPayload,
+    });
+
+    const ctx = { apply: true, importBatchId, sourceBaseDate, sourceLabel };
+    const outcome = await this.dataSource.transaction(async (manager) => {
+      const store = new DbPromotionMasterStore(manager, sourceBaseDate);
+      return promoteOne(fields, store, ctx);
+    });
+
+    return {
+      outcome: outcome.outcome,
+      masterId: outcome.masterId,
+      skipReason: outcome.skipReason,
+      conflictReason: outcome.conflictReason,
+    };
   }
 }
