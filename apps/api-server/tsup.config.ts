@@ -50,9 +50,9 @@ const jsToTsPlugin: Plugin = {
  * - Output ESM format for Node.js 22+
  */
 export default defineConfig({
-  // Bundle main.ts (API server) and migrate.ts (migration CLI)
-  // Two separate entry points - Service vs Job in Cloud Run
-  entry: ['src/main.ts', 'src/migrate.ts'],
+  // Bundle main.ts (API server), migrate.ts (migration CLI), and one-off seed jobs
+  // Separate entry points - Service vs Job in Cloud Run
+  entry: ['src/main.ts', 'src/migrate.ts', 'src/drug-seed-candidate-import-job.ts'],
   format: ['esm'],
   target: 'node22',
   platform: 'node',
