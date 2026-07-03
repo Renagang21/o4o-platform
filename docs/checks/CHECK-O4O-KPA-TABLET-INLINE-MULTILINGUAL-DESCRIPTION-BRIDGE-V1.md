@@ -54,7 +54,22 @@
 | 2 | 응답에 `selectedContentTranslations` 필드 | ✅ 코드상 모든 행에 무조건 set(게시가능 없으면 null), `selectedContentTranslationsRaw`는 삭제되어 draft html 유출 없음 (supplier·local 양쪽 후처리) |
 | 3 | 번역 없는 상품/서비스 상세 | ✅ 언어 버튼 조건부(`localeKeys.length>0`)라 미표시 → 기존 상세와 동일. K-Cosmetics(translations 미전달) 무영향 |
 
-> **검증 데이터 한계**: 접근 가능한 테스트/데모 매장에 **태블릿 진열 상품 + 검수 완료(ready) 번역이 연결된 데이터가 없어**, 언어 버튼이 실제로 뜨는 **positive-path(버튼 노출 → 언어 전환 → 해당 언어 본문)는 라이브로 재현하지 못했다.** SQL·엔드포인트 무회귀는 라이브 확인, UI 조건부 렌더/fallback/서버 필터는 코드 + 3개 서비스 typecheck로 커버. 실데이터 E2E(로컬 상품 + direct 콘텐츠 번역 ready + 링크 + 태블릿 진열) 셋업이 필요하면 별도로 수행 가능.
+### 4.3 positive-path 실데이터 E2E (2026-07-03, 테스트 약국 매장 · 약국 경영자 체험 계정)
+
+셋업(인증된 API): 로컬 상품 1개 + direct 콘텐츠 1개(`content_json.translations` = **en/zh `ready`, ja `draft`**) + `productRef` 링크 → 편성 UI에서 태블릿 진열에 추가 + 콘텐츠 연결 저장 → **고객 화면 미리보기**(실제 공개 `tablet/products` 엔드포인트 사용)에서 검증.
+
+| # | 항목 | 결과 |
+|---|---|---|
+| 1 | 언어 버튼 노출 | ✅ **기본 / English / 中文** 3개. **日本語(ja=draft)는 미노출** (게시가능 필터 동작) |
+| 2 | 기본 선택 | ✅ 한국어 기본 콘텐츠("ML 검증 상품 설명" + "기본 한국어 상품 설명입니다") |
+| 3 | English 전환 | ✅ title "Multilingual Test Product" + "English description for verification." |
+| 4 | 中文 전환 | ✅ title "多语言测试产品" + "用于验证的中文说明。" |
+| 5 | draft 숨김 | ✅ ja(draft)는 버튼·본문 어디에도 노출되지 않음 |
+| 6 | 편성 화면 다국어 안내 | ✅ "선택한 설명 콘텐츠에 검수 완료된 다국어 번역이 있으면, 태블릿 상세 화면에서 고객이 언어를 선택해 볼 수 있습니다." 라이브 표시 |
+
+**테스트 데이터 정리**: 진열 제거·저장 → direct 콘텐츠 DELETE(200) + 로컬 상품 DELETE(200) → 로컬 상품 total 0 확인. 운영 실매장 데이터·QR·상담·주문/결제·DB 마이그레이션 무접촉.
+
+> 판정: **positive-path 라이브 PASS**. negative(번역 없음→버튼 미표시)·회귀는 4.2에서 확인.
 
 ## 5. 미구현(범위 밖)
 - 다국어 번역 생성/검수 기능 (기존 `WO-O4O-KPA-CONTENT-MULTILINGUAL-TRANSLATION-V1` 흐름 사용)
