@@ -218,3 +218,30 @@ WHERE source_type='csv_import'
 ```
 
 **다음**: 사용자가 게이트 A 를 승인하면 §3→§4→§5→§6 순으로 실행하고, promotion dry-run 결과를 근거로 게이트 B(ProductMaster 승격)를 별도 판단한다.
+
+---
+
+## 11. 게이트 B 실행 로그 (2026-07-03) — **부분 적용·정지**
+
+> 게이트 B 승인 후 Cloud Run one-off `o4o-drug-seed-promotion-apply`(이미지 커밋 `6ec364773`)로 승격 apply 실행. **사용자 요청으로 부분 적용 상태에서 정지**. 데이터 정합성 정상, 멱등 재개 가능.
+
+| 항목 | 값 |
+|---|---|
+| 사전 백업 (게이트 B) | ✅ id **1783057732444** (SUCCESSFUL) |
+| ProductMaster (HIRA) 생성 | **173,493** / 목표 230,841 (75%) |
+| ProductIdentifier 생성 | 528,293 |
+| candidate 승격 완료(approved_new_master) | 172,493 / 남은 133,029(취소·checkdigit 74,681 포함) |
+| barcode 중복 | **0** (grain 정합성 정상) |
+| identifier 미부착 master | 176 (마지막 flush 중단 흔적 — 재개 시 barcode link 로 보완) |
+
+**정지 사유**: 승격 write(Master 230,841 + Identifier 703,483 ≈ 934k)가 배치화(청크 multi-row INSERT)에도 Cloud SQL 쓰기 처리량(~1,500 master/분)으로 Job **1시간 task-timeout** 을 초과. 멱등 재실행으로 92k→166k→173k 전진했으나, 반복 실행 부담으로 사용자가 현 상태 유지를 선택.
+
+**재개 절차**(별도 승인 시): 멱등 — 기존 barcode→link, 기존 identifier→skip, `approved_new_master` candidate 는 스캔 제외. 잔여 ~58k 만 처리하면 완료.
+```
+gcloud run jobs update o4o-drug-seed-promotion-apply --region=asia-northeast3 --task-timeout=7200
+gcloud run jobs execute o4o-drug-seed-promotion-apply --region=asia-northeast3   # DRUG_PROMOTE_APPLY=true 설정됨
+```
+
+**롤백**(전체 되돌리기): 백업 `1783057732444` 복원, 또는 `product_masters WHERE tags @> '["import:hira-drug-master"]'` + `product_identifiers WHERE source_type='drug_master_import'` 삭제(offer/listing 미부착이라 FK 안전). 사용자 승인 필요.
+
+**해소한 실행 이슈**: (1) 승격 Job entry(`src/drug-seed-promotion-apply-job.ts`) 신설+tsup/Dockerfile/.dockerignore 3곳 등록. (2) 스캔이 raw_payload jsonb 전량 전송→필드 `->>`추출 최적화. (3) idKey 구분자 NUL→공백 통일(멱등성 정상화 — 미수정 시 재실행 중복 INSERT 크래시).
