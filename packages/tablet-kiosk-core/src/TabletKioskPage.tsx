@@ -562,19 +562,19 @@ export function TabletKioskPage({
               </>
             )}
 
-            {/* 최종 행동 안내 (WO-O4O-KPA-TABLET-PUBLIC-INFO-UX-PRIVACY-INPUT-REMOVAL-V1)
-                태블릿 V1 = 공용 안내 화면. 개인정보 입력/상담 접수 대신
-                "직원에게 이 화면 보여주기"로 마무리한다. */}
+            {/* 최종 행동 안내 (WO-O4O-KPA-TABLET-PUBLIC-INFO-UX-PRIVACY-INPUT-REMOVAL-V1
+                / WO-O4O-KPA-TABLET-CORNER-PRODUCT-GUIDE-UX-AND-CHROME-OPERABILITY-V1)
+                태블릿 V1 = 공용 안내 화면. 개인정보 입력/상담 접수 대신 "직원에게 이 화면 보여주기"로 마무리한다.
+                버튼처럼 보이되 접수 동작이 없는 UI 를 피하고, 안내(info) 영역으로 고정한다(click/submit handler 없음). */}
             {isLocal ? (
-              <div style={{ padding: '12px 16px', backgroundColor: '#fffbeb', border: '1px solid #fde68a', borderRadius: '8px', margin: '16px 0' }}>
-                <span style={{ fontSize: '14px', color: '#92400e' }}>
-                  이 제품은 매장에서 직접 안내하는 상품입니다. 이 화면을 직원에게 보여주세요.
-                </span>
+              <div style={styles.guideNoteLocal}>
+                <p style={{ fontSize: '15px', fontWeight: 600, color: '#92400e', margin: 0 }}>매장에서 직접 안내하는 상품입니다</p>
+                <p style={{ fontSize: '14px', color: '#b45309', margin: '4px 0 0' }}>자세한 내용은 이 화면을 직원에게 보여주세요.</p>
               </div>
             ) : (
-              <div style={{ padding: '14px 16px', backgroundColor: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: '8px', margin: '16px 0' }}>
-                <p style={{ fontSize: '15px', fontWeight: 600, color: '#0369a1', margin: 0 }}>이 제품이 궁금하신가요?</p>
-                <p style={{ fontSize: '14px', color: '#0284c7', margin: '4px 0 0' }}>이 화면을 직원에게 보여주세요.</p>
+              <div style={styles.guideNote}>
+                <p style={{ fontSize: '15px', fontWeight: 600, color: '#0369a1', margin: 0 }}>궁금하신 점이 있나요?</p>
+                <p style={{ fontSize: '14px', color: '#0284c7', margin: '4px 0 0' }}>이 화면을 직원에게 보여주세요. 직원이 상품을 더 쉽게 안내할 수 있습니다.</p>
               </div>
             )}
           </div>
@@ -625,14 +625,14 @@ export function TabletKioskPage({
       {/* Header */}
       <div style={styles.header}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <h1 style={{ fontSize: '20px', fontWeight: 700 }}>상품 안내</h1>
+          <h1 style={{ fontSize: '20px', fontWeight: 700 }}>매장 상품 안내</h1>
           {showQrBadge && displaySettings?.showQr !== false && (
             <span style={{ fontSize: '11px', fontWeight: 600, backgroundColor: '#f0fdf4', color: '#16a34a', padding: '2px 8px', borderRadius: '4px' }}>
               QR 코드로 접속
             </span>
           )}
         </div>
-        <span style={{ fontSize: '14px', color: '#64748b' }}>관심 있는 상품을 터치하면 자세히 안내해드립니다</span>
+        <span style={{ fontSize: '14px', color: '#64748b' }}>궁금한 상품을 터치해 설명을 확인해 보세요</span>
       </div>
 
       <div style={styles.body}>
@@ -892,6 +892,21 @@ const styles: Record<string, React.CSSProperties> = {
     flex: 1,
     textAlign: 'center' as const,
     padding: '48px',
+  },
+  // "직원에게 보여주기" 안내 영역 (info, 접수 동작 없음 — click/submit handler 미부착)
+  guideNote: {
+    padding: '14px 16px',
+    backgroundColor: '#f0f9ff',
+    border: '1px solid #bae6fd',
+    borderRadius: '8px',
+    margin: '16px 0',
+  },
+  guideNoteLocal: {
+    padding: '14px 16px',
+    backgroundColor: '#fffbeb',
+    border: '1px solid #fde68a',
+    borderRadius: '8px',
+    margin: '16px 0',
   },
   // Idle overlay (WO-O4O-TABLET-IDLE-LAYER-V1)
   idleOverlay: {

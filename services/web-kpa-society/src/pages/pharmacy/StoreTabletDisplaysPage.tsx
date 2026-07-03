@@ -628,10 +628,10 @@ export default function StoreTabletDisplaysPage() {
           <div>
             <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
               <Tablet className="w-7 h-7 text-teal-600" />
-              태블릿 진열 관리
+              태블릿 상품 안내 관리
             </h1>
             <p className="text-sm text-slate-500 mt-1">
-              취급 중인 O4O 제품에 등록된 제품을 타블렛별로 선택해 진열합니다. 타블렛은 주문 채널이 아니라 매장 내 제품 안내·상담 유도 화면입니다.
+              크롬 태블릿에서 실행되는 매장 공용 안내 화면입니다. 태블릿에 보여줄 상품과 상세 설명, 대기 화면을 구성합니다. 주문 채널이 아니라 매장 내 제품·코너 안내 화면입니다.
             </p>
           </div>
         </div>
@@ -662,6 +662,25 @@ export default function StoreTabletDisplaysPage() {
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             저장
           </button>
+        </div>
+      </div>
+
+      {/* WO-O4O-KPA-TABLET-CORNER-PRODUCT-GUIDE-UX-AND-CHROME-OPERABILITY-V1:
+          크롬 태블릿 운영 안내. 앱이 아니라 크롬 브라우저에서 매장 태블릿 주소를 열어 사용한다.
+          (PWA/서비스워커/키오스크 연동은 이번 범위 아님 — 안내 문구만.) */}
+      <div className="bg-sky-50 border border-sky-100 rounded-2xl p-4">
+        <div className="flex items-start gap-2">
+          <Tablet className="w-4 h-4 text-sky-600 mt-0.5 flex-shrink-0" />
+          <div className="text-sm text-sky-900">
+            <p className="font-semibold mb-1">크롬 태블릿 운영 안내</p>
+            <ul className="list-disc pl-4 space-y-0.5 text-sky-800">
+              <li>크롬 브라우저에서 매장 태블릿 주소를 열어 사용합니다.</li>
+              <li>홈 화면에 바로가기로 추가하면 주소 입력 없이 실행할 수 있습니다.</li>
+              <li>화면 자동 꺼짐(절전) 시간을 매장 상황에 맞게 확인하세요.</li>
+              <li>구성을 바꾼 뒤에는 새로고침하거나 다시 열어 최신 화면을 확인하세요.</li>
+              <li>‘고객 화면 미리보기’로 상품 상세·대기 화면을 미리 확인할 수 있습니다.</li>
+            </ul>
+          </div>
         </div>
       </div>
 
@@ -817,7 +836,7 @@ export default function StoreTabletDisplaysPage() {
               <div className="px-4 py-3 border-b bg-slate-50 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Tv className="w-4 h-4 text-slate-600" />
-                  <h3 className="text-sm font-bold text-slate-700">Idle 재생 목록</h3>
+                  <h3 className="text-sm font-bold text-slate-700">대기 화면</h3>
                   {idleHasChanges && (
                     <span className="text-xs text-amber-600 font-medium bg-amber-50 px-2 py-0.5 rounded">
                       변경사항 있음
@@ -830,7 +849,7 @@ export default function StoreTabletDisplaysPage() {
                   className="flex items-center gap-1.5 px-3 py-1.5 bg-teal-600 text-white text-xs font-medium rounded-lg hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {savingIdle ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-                  Idle 저장
+                  대기 화면 저장
                 </button>
               </div>
               <div className="p-4">
@@ -852,14 +871,14 @@ export default function StoreTabletDisplaysPage() {
           {!loadingPool && (
             <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
               <div className="px-4 py-3 border-b bg-slate-50 flex items-center justify-between">
-                <h3 className="text-sm font-bold text-slate-700">전시 설정</h3>
+                <h3 className="text-sm font-bold text-slate-700">태블릿 화면 설정</h3>
                 <button
                   onClick={handleSaveSettings}
                   disabled={savingSettings}
                   className="flex items-center gap-1.5 px-3 py-1.5 bg-teal-600 text-white text-xs font-medium rounded-lg hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {savingSettings ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-                  전시 설정 저장
+                  화면 설정 저장
                 </button>
               </div>
               <div className="p-4 space-y-4">
@@ -935,7 +954,7 @@ export default function StoreTabletDisplaysPage() {
                 <div className="px-4 py-3 border-b bg-slate-50">
                   {/* WO-O4O-KPA-TABLET-STORE-PRODUCT-LINKING-V1: 취급 중인 O4O 제품 ↔ 타블렛 진열 연결 명시 */}
                   <div className="flex items-center justify-between gap-2">
-                    <h3 className="text-sm font-bold text-slate-700">진열할 제품 선택</h3>
+                    <h3 className="text-sm font-bold text-slate-700">태블릿에 보여줄 상품 선택</h3>
                     <button
                       type="button"
                       onClick={() => navigate('/store/my-products')}
@@ -1050,7 +1069,7 @@ export default function StoreTabletDisplaysPage() {
               <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
                 <div className="px-4 py-3 border-b bg-slate-50">
                   <h3 className="text-sm font-bold text-slate-700">
-                    현재 진열 구성 ({displays.length})
+                    현재 태블릿 화면 구성 ({displays.length})
                   </h3>
                 </div>
 
@@ -1118,31 +1137,37 @@ export default function StoreTabletDisplaysPage() {
                               </div>
                             </div>
 
-                            {/* 표시할 설명 콘텐츠 선택 (기본 콘텐츠 미지정 — 진열마다 직접 선택) */}
+                            {/* 상품 상세에서 보여줄 설명 선택 (기본 콘텐츠 미지정 — 진열마다 직접 선택)
+                                WO-O4O-KPA-TABLET-CORNER-PRODUCT-GUIDE-UX-AND-CHROME-OPERABILITY-V1 */}
                             <div className="mt-2 pl-7">
                               <label className="block text-[11px] font-medium text-slate-500 mb-1">
-                                표시할 설명 콘텐츠
+                                상품 상세에서 보여줄 설명
                               </label>
                               {candidates === undefined ? (
                                 <span className="text-xs text-slate-400">불러오는 중…</span>
                               ) : candidates.length === 0 ? (
                                 <span className="text-xs text-slate-400">
-                                  이 제품에 연결된 설명 콘텐츠가 없습니다. 태블릿에는 기본 상품 설명이 표시됩니다.
-                                  상품별 설명을 별도로 보여주려면 먼저 상품 설명 콘텐츠를 만들고 이 제품에 연결하세요.
+                                  연결된 설명 콘텐츠가 없습니다. 태블릿 상세 화면에는 기본 상품 설명이 표시됩니다.
+                                  상품별 설명을 따로 보여주려면 먼저 상품 설명 콘텐츠를 만들고 이 제품에 연결하세요.
                                 </span>
                               ) : (
-                                <select
-                                  value={selectValue}
-                                  onChange={(e) => setContentForIndex(index, e.target.value || null)}
-                                  className="w-full text-xs border border-slate-300 rounded px-2 py-1.5 bg-white"
-                                >
-                                  <option value="">설명 콘텐츠 선택 안 함</option>
-                                  {candidates.map((c) => (
-                                    <option key={c.contentId} value={c.contentId}>
-                                      {contentOptionLabel(c)}
-                                    </option>
-                                  ))}
-                                </select>
+                                <>
+                                  <select
+                                    value={selectValue}
+                                    onChange={(e) => setContentForIndex(index, e.target.value || null)}
+                                    className="w-full text-xs border border-slate-300 rounded px-2 py-1.5 bg-white"
+                                  >
+                                    <option value="">설명 콘텐츠 선택 안 함 (기본 상품 설명 사용)</option>
+                                    {candidates.map((c) => (
+                                      <option key={c.contentId} value={c.contentId}>
+                                        {contentOptionLabel(c)}
+                                      </option>
+                                    ))}
+                                  </select>
+                                  <p className="mt-1 text-[10px] text-slate-400">
+                                    연결된 설명 콘텐츠가 있으면 태블릿 상세 화면에서 우선 표시됩니다. 선택 안 함 = 기본 상품 설명이 표시됩니다.
+                                  </p>
+                                </>
                               )}
                             </div>
                           </div>
@@ -1166,9 +1191,9 @@ export default function StoreTabletDisplaysPage() {
             className="flex items-center justify-between gap-3 bg-slate-900/90 text-white px-4 py-2"
           >
             <div className="min-w-0">
-              <p className="text-sm font-semibold">타블렛 고객 화면 미리보기</p>
-              <p className="text-[11px] text-slate-300 truncate">
-                현재 저장된 타블렛 구성·전시 설정 기준 (매장 공개 화면 기준 — 위치별 타블렛 분리는 후속). 상담 요청은 전송되지 않습니다.
+              <p className="text-sm font-semibold">태블릿 고객 화면 미리보기</p>
+              <p className="text-[11px] text-slate-300">
+                현재 저장된 태블릿 화면을 미리 봅니다(매장 공개 화면 기준 — 위치별 태블릿 분리는 후속). 실제 크롬 태블릿에서는 화면 크기·방향에 따라 표시가 달라질 수 있습니다. 상담 요청은 전송되지 않습니다.
               </p>
             </div>
             <button

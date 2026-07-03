@@ -1,0 +1,99 @@
+# CHECK-O4O-KPA-TABLET-CORNER-PRODUCT-GUIDE-UX-AND-CHROME-OPERABILITY-V1
+
+> 작업 완료 보고서
+>
+> 작업 제목: **O4O KPA 태블릿 공용 안내 UX 개선: 코너/상품 설명 구조 + 크롬 태블릿 운영성**
+>
+> 관련 WO: `docs/work-orders/WO-O4O-KPA-TABLET-CORNER-PRODUCT-GUIDE-UX-AND-CHROME-OPERABILITY-V1.md`
+> 선행: `WO-O4O-KPA-TABLET-PUBLIC-INFO-UX-PRIVACY-INPUT-REMOVAL-V1`
+>
+> 작성일: 2026-07-03
+
+---
+
+## 1. 요약
+
+태블릿 V1을 "작업 기능"이 아니라 **매장 공용 안내 경험**으로 보이도록 문구·화면 흐름을 정리했다. 데이터 모델/route/API 이름은 변경하지 않았고, 신규 코너 모델·QR 자동생성·PWA·사이니지 통합은 만들지 않았다.
+
+- 공개 화면: 목록 헤더/서브텍스트를 공용 안내 관점으로, 상세 최종 행동을 "설명 확인 → 직원에게 보여주기" 안내(접수 동작 없는 info 영역)로 정리
+- 관리자: 섹션명(진열→상품 안내/화면 구성, Idle→대기 화면, 전시 설정→화면 설정), 상품 설명 콘텐츠 선택 의미 안내, 크롬 태블릿 운영 안내, 미리보기 설명 보강
+- read-only DB 조사: `show_consultation_button=true` row 실태 확인(데이터 변경 없음)
+
+---
+
+## 2. Read-only DB 조사 결과 (§5 · 데이터 변경 없음)
+
+프로덕션 `o4o_platform` 에 cloud-sql-proxy read-only 접속(SELECT만) 후 확인.
+
+```
+store_tablet_display_settings 총 row: 2
+  show_consultation_button = true  : 2
+  show_consultation_button = false : 0
+```
+
+`true` row 2건 (org_id + updated_at만 조회, 개인정보 미조회):
+
+| organization_id | updated_at |
+|---|---|
+| 9c87f46b-57a1-4afe-80bd-60782c49ce96 | 2026-06-26 06:47 |
+| c9beb4a2-04d2-4d7d-a694-0207f7bac048 | 2026-06-26 05:50 |
+
+**판단**: 설정 row 자체가 **2건뿐**이고 둘 다 `updated_at`이 2026-06-26(선행 태블릿 설정 기능 테스트 시점)으로, 실 운영 매장이 의도적으로 켠 설정이라기보다 **테스트/데모 매장 데이터**로 보인다. 대다수 매장은 설정 row가 없어 신규 기본값(false)이 적용된다. 일괄 마이그레이션 없이 **그대로 둬도 리스크가 매우 낮다.** (이번 WO 범위: 변경 없음. 최종 처리는 사용자 판단으로 남김.)
+
+> 조사 채널: `cloud-sql-proxy` + `psql` read-only. UPDATE/DELETE/마이그레이션 미수행. 자격증명은 커밋/문서에 미기록.
+
+---
+
+## 3. 변경 파일 목록
+
+| 계층 | 파일 | 변경 |
+|---|---|---|
+| 공통 런타임 | `packages/tablet-kiosk-core/src/TabletKioskPage.tsx` | 목록 헤더 "상품 안내"→"매장 상품 안내", 서브텍스트 "…자세히 안내해드립니다"→"궁금한 상품을 터치해 설명을 확인해 보세요", 상세 "직원에게 보여주기" info 영역 재정리(접수 동작 없음)·자체상품 문구 정리, `guideNote`/`guideNoteLocal` 스타일 추가 |
+| KPA 편성 화면 | `services/web-kpa-society/src/pages/pharmacy/StoreTabletDisplaysPage.tsx` | 화면 제목/서브텍스트, 섹션명(진열할 제품 선택→태블릿에 보여줄 상품 선택 / 현재 진열 구성→현재 태블릿 화면 구성 / Idle 재생 목록→대기 화면 / 전시 설정→태블릿 화면 설정), 상품 설명 콘텐츠 선택 라벨·의미 안내, 크롬 태블릿 운영 안내 패널 추가, 미리보기 설명 보강 |
+| 문서 | WO 저장소 반영 + 본 CHECK |
+
+**변경 없음**: `types.ts`, `tablet.ts`, `tabletDisplays.ts`, api-server 라우트/핸들러, `store-public-utils.ts`(공개 API는 이미 `COALESCE(선택콘텐츠→description→summary)`로 조용히 폴백 — 고객 화면에 "콘텐츠 없음" 내부 문구 미노출). route/데이터/API 이름 불변.
+
+---
+
+## 4. 문구 변경 상세
+
+### 공개 태블릿 (kiosk-core)
+- 목록 헤더: **매장 상품 안내** / 서브: **궁금한 상품을 터치해 설명을 확인해 보세요**
+- 상세 상단→하단 순서 유지(이미지→상품명→가격→선택 콘텐츠→(없으면)기본 설명/요약→안내→돌아가기)
+- 최종 행동(공급 상품): **"궁금하신 점이 있나요? / 이 화면을 직원에게 보여주세요. 직원이 상품을 더 쉽게 안내할 수 있습니다."** — 버튼 아닌 info 영역(click/submit handler 없음)
+- 자체(local) 상품: **"매장에서 직접 안내하는 상품입니다 / 자세한 내용은 이 화면을 직원에게 보여주세요."**
+- 고객 화면에 "콘텐츠 없음" 등 내부 문구 미노출(기존 폴백 유지)
+
+### 관리자 편성 화면
+- 제목 **태블릿 상품 안내 관리**, 서브 "크롬 태블릿에서 실행되는 매장 공용 안내 화면…제품·코너 안내 화면입니다."
+- 섹션명: **태블릿에 보여줄 상품 선택 / 현재 태블릿 화면 구성 / 대기 화면 / 태블릿 화면 설정**
+- 상품 설명 콘텐츠 선택: 라벨 **상품 상세에서 보여줄 설명**, 옵션 "설명 콘텐츠 선택 안 함 (기본 상품 설명 사용)", 하단 의미 안내 "연결된 설명 콘텐츠가 있으면 우선 표시 / 선택 안 함 = 기본 상품 설명"
+- **크롬 태블릿 운영 안내** 패널(주소 열기/홈 바로가기/절전 시간/새로고침/미리보기 체크리스트) 추가
+- 미리보기 오버레이 설명: "실제 크롬 태블릿에서는 화면 크기·방향에 따라 표시가 달라질 수 있습니다" 보강
+
+---
+
+## 5. 검증
+
+### 5.1 정적 (typecheck)
+| 대상 | 결과 |
+|---|---|
+| `services/web-kpa-society` | ✅ PASS |
+| `services/web-k-cosmetics` (kiosk-core 소비처) | ✅ PASS |
+
+api-server 변경 없음. 미사용 import/state/style 잔재 없음.
+
+### 5.2 브라우저
+
+> 배포 후 실제 브라우저 검증 결과를 기록한다.
+
+- [ ] 관리 화면: 제목/섹션 문구, 상품 설명 콘텐츠 선택 의미 안내, 크롬 운영 안내 패널, 대기 화면 문구, 미리보기 정상
+- [ ] 공개/미리보기: 목록 문구, 상세 진입·선택 콘텐츠 우선/기본 설명 폴백, "콘텐츠 없음" 내부 문구 미노출, 직원에게 보여주기 안내, 개인정보/상담 버튼 미재노출, 돌아가기/idle 정상
+
+---
+
+## 6. 회귀 방지 / 비범위
+
+- QR Core 새 구현 없음 · 상담 요청 기능 재노출 없음 · 주문/장바구니/결제 없음 · signage runtime import 없음 · DB 마이그레이션 없음 · 신규 코너 DB 모델 없음 · PWA/service worker 없음 · device pairing 없음
+- 기존 `showQr`/QR 진입 배지 유지(깨지지 않음)
