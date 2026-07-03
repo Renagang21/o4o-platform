@@ -70,7 +70,23 @@ class FakeDS {
       return this.candidates
         .filter((c) => c.id > lastId)
         .sort((a, b) => (a.id < b.id ? -1 : 1))
-        .slice(0, lim);
+        .slice(0, lim)
+        .map((c) => {
+          // lean 투영(apply 경로) + raw_payload(dry-run 경로) superset
+          const rp = c.raw_payload ?? {};
+          const src = (rp.source as Record<string, unknown>) ?? {};
+          return {
+            ...c,
+            std: (rp.standardCode as string) ?? c.normalized_identifier_value,
+            mfds_code: (rp.mfdsCode as string) ?? (src['품목기준코드'] as string) ?? null,
+            atc: (rp.atcCode as string) ?? (src['국제표준코드(ATC코드)'] as string) ?? null,
+            insurance: (src['제품코드(개정후)'] as string) ?? null,
+            total_qty: (src['제품총수량'] as string) ?? null,
+            dosage_form: (src['제형구분'] as string) ?? null,
+            is_cancelled: rp.isCancelled === true ? 'true' : rp.isCancelled === false ? 'false' : null,
+            row_number: rp.rowNumber != null ? String(rp.rowNumber) : null,
+          };
+        });
     }
     if (/INSERT INTO product_masters/i.test(sql)) {
       this.masterInsertCalls += 1;
