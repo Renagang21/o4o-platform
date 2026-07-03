@@ -679,6 +679,9 @@ export default function StoreTabletDisplaysPage() {
               <li>화면 자동 꺼짐(절전) 시간을 매장 상황에 맞게 확인하세요.</li>
               <li>구성을 바꾼 뒤에는 새로고침하거나 다시 열어 최신 화면을 확인하세요.</li>
               <li>‘고객 화면 미리보기’로 상품 상세·대기 화면을 미리 확인할 수 있습니다.</li>
+              {/* WO-O4O-KPA-TABLET-PUBLIC-DISPLAY-SOURCE-ALIGNMENT-V1 */}
+              <li>고객 태블릿 화면에는 저장된 진열 구성(선택·저장한 상품)만 표시됩니다.</li>
+              <li>공개 화면은 첫 번째 활성 태블릿의 구성을 기준으로 표시됩니다. 위치별로 서로 다른 화면을 띄우는 기능은 후속 기기 연결 기능에서 다룹니다.</li>
             </ul>
           </div>
         </div>
@@ -1197,7 +1200,7 @@ export default function StoreTabletDisplaysPage() {
             <div className="min-w-0">
               <p className="text-sm font-semibold">태블릿 고객 화면 미리보기</p>
               <p className="text-[11px] text-slate-300">
-                현재 저장된 태블릿 화면을 미리 봅니다(매장 공개 화면 기준 — 위치별 태블릿 분리는 후속). 실제 크롬 태블릿에서는 화면 크기·방향에 따라 표시가 달라질 수 있습니다. 상담 요청은 전송되지 않습니다.
+                저장된 진열 구성 기준으로 미리 봅니다(첫 번째 활성 태블릿 · 위치별 태블릿 분리는 후속). 변경 후에는 저장한 다음 확인해 주세요. 실제 크롬 태블릿에서는 화면 크기·방향에 따라 표시가 달라질 수 있습니다. 상담 요청은 전송되지 않습니다.
               </p>
             </div>
             <button

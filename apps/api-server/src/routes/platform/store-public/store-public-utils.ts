@@ -263,6 +263,34 @@ export function sanitizePublishableTranslations(
 }
 
 // ============================================================================
+// WO-O4O-KPA-TABLET-PUBLIC-DISPLAY-SOURCE-ALIGNMENT-V1
+//   공개 태블릿 상품 집합의 권위 = 매장 first active tablet 의 visible display rows.
+//   - configured: first active tablet 이 있고 visible display row 가 1개 이상 → 그 rows 로 집합/순서 제한.
+//   - legacy_fallback: active tablet 없음 또는 visible row 0 → 기존 legacy 집합(supplier=TABLET gate, local=active 전체).
+//   device pairing 없는 V1 이므로 공개 URL 은 first active tablet 기준(관리 화면에 안내).
+// ============================================================================
+
+export async function resolveTabletDisplaySource(
+  dataSource: DataSource,
+  organizationId: string,
+): Promise<{ tabletId: string | null; configured: boolean }> {
+  const rows = await dataSource.query(
+    `SELECT id FROM store_tablets
+     WHERE organization_id = $1 AND is_active = true
+     ORDER BY created_at ASC LIMIT 1`,
+    [organizationId],
+  );
+  const tabletId = rows?.[0]?.id ?? null;
+  if (!tabletId) return { tabletId: null, configured: false };
+  const cnt = await dataSource.query(
+    `SELECT COUNT(*)::int AS c FROM store_tablet_displays
+     WHERE tablet_id = $1 AND is_visible = true`,
+    [tabletId],
+  );
+  return { tabletId, configured: Number(cnt?.[0]?.c || 0) > 0 };
+}
+
+// ============================================================================
 // TABLET Visibility-Gated Product Query (serviceKey parameterized)
 // ============================================================================
 
@@ -277,6 +305,11 @@ export async function queryTabletVisibleProducts(
     order?: string;
     page?: number;
     limit?: number;
+    // WO-O4O-KPA-TABLET-PUBLIC-DISPLAY-SOURCE-ALIGNMENT-V1: first active tablet 진열 정합.
+    //   firstTabletId 가 있으면 그 태블릿의 visible display row 로 content attach.
+    //   configured=true 면 그 rows 로 상품 집합/순서까지 제한(없으면 legacy).
+    firstTabletId?: string | null;
+    configured?: boolean;
   } = {},
 ): Promise<{ data: any[]; meta: { page: number; limit: number; total: number; totalPages: number } }> {
   // WO-O4O-GA-PRELAUNCH-VERIFICATION-V1: SHA1 hash key (collision-safe)
@@ -288,6 +321,9 @@ export async function queryTabletVisibleProducts(
     q: options.q,
     s: options.sort,
     o: options.order,
+    // 진열 정합 상태를 키에 포함 → 태블릿 구성 변경 시 캐시 분리
+    ft: options.firstTabletId || null,
+    cfg: options.configured ? 1 : 0,
   });
 
   return cacheAside(ck, READ_CACHE_TTL.STOREFRONT, async () => {
@@ -321,6 +357,23 @@ export async function queryTabletVisibleProducts(
     const sortField = sortMap[options.sort || 'sort_order'] || 'opl.created_at';
     const sortOrder = options.order?.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
 
+    // WO-O4O-KPA-TABLET-PUBLIC-DISPLAY-SOURCE-ALIGNMENT-V1:
+    //   first active tablet 이 있으면 그 태블릿의 visible display row(supplier)로 content attach.
+    //   configured 면 그 rows 로 상품 집합/순서까지 제한. 없으면 legacy(TABLET gate 전체).
+    const hasTablet = !!options.firstTabletId;
+    let ftIdx = 0;
+    if (hasTablet) {
+      params.push(options.firstTabletId);
+      ftIdx = params.length; // $N
+    }
+    const configured = hasTablet && !!options.configured;
+    // count: configured 면 visible display supplier row 로 제한(INNER), 아니면 legacy.
+    const countDispJoin = configured
+      ? `INNER JOIN store_tablet_displays cdisp
+           ON cdisp.product_id = opl.id AND cdisp.product_type = 'supplier'
+           AND cdisp.tablet_id = $${ftIdx} AND cdisp.is_visible = true`
+      : '';
+
     const countResult: Array<{ count: string }> = await dataSource.query(
       `SELECT COUNT(DISTINCT spo.id)::int AS count
        FROM supplier_product_offers spo
@@ -338,12 +391,41 @@ export async function queryTabletVisibleProducts(
          ON oc.id = opc.channel_id
          AND oc.channel_type = 'TABLET'
          AND oc.status = 'APPROVED'
+       ${countDispJoin}
        WHERE spo.is_active = true
          AND s.status = 'ACTIVE'
          ${whereExtra}`,
       params,
     );
     const total = Number(countResult[0]?.count || 0);
+
+    // WO-O4O-KPA-TABLET-PUBLIC-DISPLAY-SOURCE-ALIGNMENT-V1: content attach 와 상품 집합/순서를
+    //   first active tablet 의 visible display row(disp)로 정합. hasTablet 이 아니면 legacy(콘텐츠 attach 없음).
+    const contentSelect = hasTablet
+      ? `tc.id AS "selectedContentId",
+         tc.title AS "selectedContentTitle",
+         COALESCE(tc.content_json->>'html', tc.content_json->>'body', '') AS "selectedContentHtml",
+         tc.content_json->'translations' AS "selectedContentTranslationsRaw",
+         disp.sort_order AS display_sort_order`
+      : `NULL AS "selectedContentId",
+         NULL AS "selectedContentTitle",
+         '' AS "selectedContentHtml",
+         NULL AS "selectedContentTranslationsRaw",
+         NULL::int AS display_sort_order`;
+    const dispJoins = hasTablet
+      ? `LEFT JOIN store_tablet_displays disp
+           ON disp.product_id = opl.id AND disp.product_type = 'supplier'
+           AND disp.tablet_id = $${ftIdx} AND disp.is_visible = true
+         LEFT JOIN kpa_store_content_product_links scl
+           ON scl.organization_id = $1 AND scl.content_id = disp.content_id
+           AND scl.link_type = 'product_description'
+           AND scl.product_source_type = 'listing' AND scl.product_source_id = opl.id
+         LEFT JOIN kpa_store_contents tc
+           ON tc.id = scl.content_id AND tc.organization_id = $1`
+      : '';
+    // configured: visible display row 있는 supplier 만(집합 제한) + 편성 순서(disp.sort_order).
+    const configuredFilter = configured ? 'AND disp.id IS NOT NULL' : '';
+    const secondaryOrder = configured ? 'disp.sort_order ASC NULLS LAST' : `${sortField} ${sortOrder}`;
 
     const data = await dataSource.query(
       `SELECT DISTINCT ON (spo.id)
@@ -356,15 +438,9 @@ export async function queryTabletVisibleProducts(
          s.slug AS manufacturer,
          -- WO-O4O-KPA-TABLET-DESCRIPTION-CANONICAL-LINK-V1: storefront 와 동일 정책 — canonical 우선,
          -- store_product_profiles override(sp.description)는 legacy fallback 으로 보존(데이터 무삭제).
-         -- 기존 tablet 도 description 을 strip 없이 반환 → HTML 보존(기존 처리 방식 유지).
          COALESCE(spd.content, sp.description, spo.consumer_detail_description, '') AS description,
          COALESCE(spd.summary, spo.consumer_short_description, '') AS short_description,
-         -- WO-O4O-KPA-TABLET-DISPLAY-CONTENT-SELECTION-V1: 진열 선택 콘텐츠(첫 active tablet, 링크 유효 시에만).
-         tc.id AS "selectedContentId",
-         tc.title AS "selectedContentTitle",
-         COALESCE(tc.content_json->>'html', tc.content_json->>'body', '') AS "selectedContentHtml",
-         -- WO-O4O-KPA-TABLET-INLINE-MULTILINGUAL-DESCRIPTION-BRIDGE-V1: 선택 콘텐츠 번역(원본, 게시가능 필터는 JS)
-         tc.content_json->'translations' AS "selectedContentTranslationsRaw",
+         ${contentSelect},
          opl.created_at AS sort_order,
          spo.created_at, spo.updated_at,
          opl.organization_id AS pharmacy_id
@@ -392,35 +468,28 @@ export async function queryTabletVisibleProducts(
          ON spd.master_id = pm.id
          AND spd.status = 'canonical'
          AND spd.deleted_at IS NULL
-       -- WO-O4O-KPA-TABLET-DISPLAY-CONTENT-SELECTION-V1: 첫 active tablet 진열의 선택 콘텐츠 attach.
-       --   링크(kpa_store_content_product_links)가 유효할 때만 노출 → 연결 해제 시 폴백.
-       --   콘텐츠 삭제 시 store_tablet_displays.content_id 가 SET NULL → IS NOT NULL 필터로 자동 폴백.
-       LEFT JOIN store_tablet_displays std
-         ON std.product_id = opl.id AND std.product_type = 'supplier' AND std.content_id IS NOT NULL
-         AND std.tablet_id = (
-           SELECT id FROM store_tablets
-           WHERE organization_id = $1 AND is_active = true
-           ORDER BY created_at ASC LIMIT 1
-         )
-       LEFT JOIN kpa_store_content_product_links scl
-         ON scl.organization_id = $1 AND scl.content_id = std.content_id
-         AND scl.link_type = 'product_description'
-         AND scl.product_source_type = 'listing' AND scl.product_source_id = opl.id
-       LEFT JOIN kpa_store_contents tc
-         ON tc.id = scl.content_id AND tc.organization_id = $1
+       ${dispJoins}
        WHERE spo.is_active = true
          AND s.status = 'ACTIVE'
          ${whereExtra}
-       ORDER by spo.id, ${sortField} ${sortOrder}
+         ${configuredFilter}
+       ORDER by spo.id, ${secondaryOrder}
        LIMIT ${limit} OFFSET ${offset}`,
       params,
     );
+
+    // WO-O4O-KPA-TABLET-PUBLIC-DISPLAY-SOURCE-ALIGNMENT-V1:
+    //   configured 면 편성 순서(disp.sort_order)로 정렬. DISTINCT ON 은 spo.id 선두라 여기서 재정렬.
+    if (configured) {
+      data.sort((a: any, b: any) => (a.display_sort_order ?? 0) - (b.display_sort_order ?? 0));
+    }
 
     // WO-O4O-KPA-TABLET-INLINE-MULTILINGUAL-DESCRIPTION-BRIDGE-V1:
     //   선택 콘텐츠 번역을 게시 가능(검수 완료) locale 만 남기고 status/model 은 제거.
     for (const row of data) {
       row.selectedContentTranslations = sanitizePublishableTranslations(row.selectedContentTranslationsRaw);
       delete row.selectedContentTranslationsRaw;
+      delete row.display_sort_order;
     }
 
     return {

@@ -22,6 +22,7 @@ import {
   queryTabletVisibleProducts,
   tabletRequestLimiter,
   sanitizePublishableTranslations,
+  resolveTabletDisplaySource,
 } from './store-public-utils.js';
 
 export function createStorePublicTabletRoutes(deps: {
@@ -44,6 +45,13 @@ export function createStorePublicTabletRoutes(deps: {
       const resolved = await resolvePublicStore(dataSource, req.params.slug, req, res);
       if (!resolved) return;
 
+      // WO-O4O-KPA-TABLET-PUBLIC-DISPLAY-SOURCE-ALIGNMENT-V1:
+      //   공개 상품 집합의 권위 = first active tablet 의 visible display rows(configured).
+      //   없으면 legacy fallback. supplier/local 이 같은 기준을 쓰도록 한 번 산출해 공유.
+      const displaySource = await resolveTabletDisplaySource(dataSource, resolved.storeId);
+      const configured = displaySource.configured;
+      const firstTabletId = displaySource.tabletId;
+
       // Supplier products: 기존 4중 게이트 쿼리 (Commerce Domain — Checkout 진입 가능)
       const supplierResult = await queryTabletVisibleProducts(dataSource, resolved.storeId, resolved.serviceKey, {
         page: req.query.page ? Number(req.query.page) : 1,
@@ -52,38 +60,56 @@ export function createStorePublicTabletRoutes(deps: {
         sort: (req.query.sort as string) || 'sort_order',
         order: (req.query.order as string) || 'asc',
         q: req.query.q as string,
+        firstTabletId,
+        configured,
       });
 
       // Local products: Display Domain only (Checkout 진입 불가)
       // DB UNION 금지, 애플리케이션 레벨 merge
       // WO-STORE-LOCAL-PRODUCT-CONTENT-REFINEMENT-V1: 콘텐츠 블록 필드 포함
       // detail_html, usage_info, caution_info는 목록에서 제외 (상세 조회 시에만)
-      // WO-O4O-KPA-TABLET-DISPLAY-CONTENT-SELECTION-V1: 첫 active tablet 진열의 선택 콘텐츠 attach(링크 유효 시에만).
-      const localProducts = await dataSource.query(
-        `SELECT lp.id, lp.name, lp.description, lp.summary, lp.thumbnail_url, lp.images, lp.gallery_images,
-                lp.category, lp.price_display, lp.badge_type, lp.highlight_flag, lp.sort_order,
-                tc.id AS "selectedContentId",
-                tc.title AS "selectedContentTitle",
-                COALESCE(tc.content_json->>'html', tc.content_json->>'body', '') AS "selectedContentHtml",
-                -- WO-O4O-KPA-TABLET-INLINE-MULTILINGUAL-DESCRIPTION-BRIDGE-V1: 선택 콘텐츠 번역(원본, 게시가능 필터는 JS)
-                tc.content_json->'translations' AS "selectedContentTranslationsRaw"
-         FROM store_local_products lp
-         LEFT JOIN store_tablet_displays std
-           ON std.product_id = lp.id AND std.product_type = 'local' AND std.content_id IS NOT NULL
-           AND std.tablet_id = (
-             SELECT id FROM store_tablets
-             WHERE organization_id = $1 AND is_active = true
-             ORDER BY created_at ASC LIMIT 1
-           )
+      // WO-O4O-KPA-TABLET-PUBLIC-DISPLAY-SOURCE-ALIGNMENT-V1:
+      //   local 집합도 first active tablet 의 visible display row(disp)로 정합.
+      //   - configured: disp 있는 local 만(집합 제한) + 편성 순서(disp.sort_order).
+      //   - legacy fallback: active local 전체(+tablet 있으면 disp 로 content attach).
+      //   content attach 는 disp.content_id 링크 유효 시에만 → 연결 해제/삭제 시 폴백.
+      const localParams: any[] = [resolved.storeId];
+      let localDispJoin = '';
+      let localContentSelect =
+        `NULL AS "selectedContentId", NULL AS "selectedContentTitle", '' AS "selectedContentHtml", NULL AS "selectedContentTranslationsRaw"`;
+      let localFilter = '';
+      let localOrder = 'ORDER BY lp.sort_order ASC, lp.name ASC';
+      if (firstTabletId) {
+        localParams.push(firstTabletId); // $2
+        localDispJoin = `
+         LEFT JOIN store_tablet_displays disp
+           ON disp.product_id = lp.id AND disp.product_type = 'local'
+           AND disp.tablet_id = $2 AND disp.is_visible = true
          LEFT JOIN kpa_store_content_product_links scl
-           ON scl.organization_id = $1 AND scl.content_id = std.content_id
+           ON scl.organization_id = $1 AND scl.content_id = disp.content_id
            AND scl.link_type = 'product_description'
            AND scl.product_source_type = 'local' AND scl.product_source_id = lp.id
          LEFT JOIN kpa_store_contents tc
-           ON tc.id = scl.content_id AND tc.organization_id = $1
+           ON tc.id = scl.content_id AND tc.organization_id = $1`;
+        localContentSelect =
+          `tc.id AS "selectedContentId", tc.title AS "selectedContentTitle",
+           COALESCE(tc.content_json->>'html', tc.content_json->>'body', '') AS "selectedContentHtml",
+           tc.content_json->'translations' AS "selectedContentTranslationsRaw"`;
+        if (configured) {
+          localFilter = 'AND disp.id IS NOT NULL';
+          localOrder = 'ORDER BY disp.sort_order ASC NULLS LAST, lp.name ASC';
+        }
+      }
+      const localProducts = await dataSource.query(
+        `SELECT lp.id, lp.name, lp.description, lp.summary, lp.thumbnail_url, lp.images, lp.gallery_images,
+                lp.category, lp.price_display, lp.badge_type, lp.highlight_flag, lp.sort_order,
+                ${localContentSelect}
+         FROM store_local_products lp
+         ${localDispJoin}
          WHERE lp.organization_id = $1 AND lp.is_active = true
-         ORDER BY lp.sort_order ASC, lp.name ASC`,
-        [resolved.storeId],
+           ${localFilter}
+         ${localOrder}`,
+        localParams,
       );
 
       // WO-O4O-KPA-TABLET-INLINE-MULTILINGUAL-DESCRIPTION-BRIDGE-V1:
@@ -97,6 +123,9 @@ export function createStorePublicTabletRoutes(deps: {
         success: true,
         ...supplierResult,
         localProducts,
+        // WO-O4O-KPA-TABLET-PUBLIC-DISPLAY-SOURCE-ALIGNMENT-V1: 진열 정합 상태(additive, 프론트 필수 아님).
+        tabletDisplaySource: configured ? 'configured' : 'legacy_fallback',
+        tabletDisplayTabletId: firstTabletId,
       });
     } catch (error: any) {
       console.error('[UnifiedStore] GET /:slug/tablet/products error:', error);
