@@ -46,12 +46,15 @@
 
 ### 4.2 화면/API 검증 (배포 후)
 
-> 배포 후 실제 검증 결과 기록.
+배포: Deploy API Server + Deploy Web Services (Cloud Run) 모두 success.
 
-- [ ] 공개 `GET /stores/:slug/tablet/products` 응답에 `selectedContentTranslations` 포함(번역 없으면 null), 기존 필드/회귀 없음
-- [ ] 태블릿 상세: 게시 가능 번역 있는 상품에서 언어 버튼 노출 + 전환 시 해당 언어 본문, "기본" 선택 시 기본 콘텐츠
-- [ ] 번역 없는 상품/서비스: 언어 버튼 미표시, 기존 상세 그대로
-- [ ] draft 번역은 노출되지 않음
+| # | 항목 | 결과 |
+|---|---|---|
+| 1 | 공개 `GET /stores/네뚜레-약국/tablet/products` | ✅ `success:true`, 200. 새 `content_json->'translations'` 컬럼 추가 후에도 SQL 정상 실행(회귀 0). 해당 매장은 태블릿 상품 0건이라 행 단위 값은 미관측 |
+| 2 | 응답에 `selectedContentTranslations` 필드 | ✅ 코드상 모든 행에 무조건 set(게시가능 없으면 null), `selectedContentTranslationsRaw`는 삭제되어 draft html 유출 없음 (supplier·local 양쪽 후처리) |
+| 3 | 번역 없는 상품/서비스 상세 | ✅ 언어 버튼 조건부(`localeKeys.length>0`)라 미표시 → 기존 상세와 동일. K-Cosmetics(translations 미전달) 무영향 |
+
+> **검증 데이터 한계**: 접근 가능한 테스트/데모 매장에 **태블릿 진열 상품 + 검수 완료(ready) 번역이 연결된 데이터가 없어**, 언어 버튼이 실제로 뜨는 **positive-path(버튼 노출 → 언어 전환 → 해당 언어 본문)는 라이브로 재현하지 못했다.** SQL·엔드포인트 무회귀는 라이브 확인, UI 조건부 렌더/fallback/서버 필터는 코드 + 3개 서비스 typecheck로 커버. 실데이터 E2E(로컬 상품 + direct 콘텐츠 번역 ready + 링크 + 태블릿 진열) 셋업이 필요하면 별도로 수행 가능.
 
 ## 5. 미구현(범위 밖)
 - 다국어 번역 생성/검수 기능 (기존 `WO-O4O-KPA-CONTENT-MULTILINGUAL-TRANSLATION-V1` 흐름 사용)
