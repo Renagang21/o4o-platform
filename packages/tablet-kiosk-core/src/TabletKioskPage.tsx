@@ -56,10 +56,25 @@ import { useParams } from 'react-router-dom';
 import { ContentRenderer } from '@o4o/content-editor';
 import type {
   TabletProduct,
+  TabletContentTranslation,
   InterestStatusDetail,
   TabletKioskApi,
   IdlePlaylistItem,
 } from './types';
+
+// WO-O4O-KPA-TABLET-INLINE-MULTILINGUAL-DESCRIPTION-BRIDGE-V1:
+//   선택 콘텐츠에 게시 가능(검수 완료) 번역이 있으면 상세에서 언어 버튼으로 전환.
+//   라벨은 기존 다국어 상품 파일럿과 동일 집합. 미지원 locale 은 코드 그대로 표기(안전).
+const LOCALE_LABELS: Record<string, string> = {
+  ko: '한국어',
+  en: 'English',
+  zh: '中文',
+  ja: '日本語',
+  vi: 'Tiếng Việt',
+  th: 'ภาษาไทย',
+  id: 'Bahasa',
+};
+const localeLabel = (code: string): string => LOCALE_LABELS[code] ?? code.toUpperCase();
 
 // ── Display & view types (internal) ──
 
@@ -90,6 +105,8 @@ interface DisplayProduct {
   // WO-O4O-KPA-TABLET-DISPLAY-CONTENT-SELECTION-V1: 진열 선택 콘텐츠(있으면 상세를 이 콘텐츠로 표시).
   selectedContentTitle?: string | null;
   selectedContentHtml?: string | null;
+  // WO-O4O-KPA-TABLET-INLINE-MULTILINGUAL-DESCRIPTION-BRIDGE-V1: 게시 가능 번역(locale → {title?, html}).
+  selectedContentTranslations?: Record<string, TabletContentTranslation> | null;
 }
 
 // ── Reducer (internal) ──
@@ -223,6 +240,7 @@ function mapSupplierProduct(p: TabletProduct): DisplayProduct {
     imageUrl: p.images?.[0]?.url,
     selectedContentTitle: p.selectedContentTitle,
     selectedContentHtml: p.selectedContentHtml,
+    selectedContentTranslations: p.selectedContentTranslations,
   };
 }
 
@@ -238,6 +256,7 @@ function mapLocalProduct(p: any): DisplayProduct {
     imageUrl: p.thumbnail_url || p.images?.[0],
     selectedContentTitle: p.selectedContentTitle,
     selectedContentHtml: p.selectedContentHtml,
+    selectedContentTranslations: p.selectedContentTranslations,
   };
 }
 
@@ -313,6 +332,13 @@ export function TabletKioskPage({
   //   미주입/0/1개 → 타이머 없음(기존 동작). KCos 등 미주입 서비스 무영향.
   const [browseIndex, setBrowseIndex] = useState(0);
   const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
+
+  // WO-O4O-KPA-TABLET-INLINE-MULTILINGUAL-DESCRIPTION-BRIDGE-V1:
+  //   상세에서 선택한 표시 언어(null = 기본 선택콘텐츠/기본 설명). 상품이 바뀌면 기본으로 리셋.
+  const [detailLocale, setDetailLocale] = useState<string | null>(null);
+  useEffect(() => {
+    setDetailLocale(null);
+  }, [selectedProduct?.id]);
   const autoSlideSeconds = displaySettings?.autoSlideSeconds ?? 0;
 
   useEffect(() => {
@@ -507,6 +533,16 @@ export function TabletKioskPage({
   // ── Detail view ──
   if (mode === 'detail' && selectedProduct) {
     const isLocal = selectedProduct.type === 'local';
+
+    // WO-O4O-KPA-TABLET-INLINE-MULTILINGUAL-DESCRIPTION-BRIDGE-V1:
+    //   선택 콘텐츠에 게시 가능 번역이 있으면 언어 버튼 노출. 표시 우선순위:
+    //   선택 언어 번역 → 기본 선택콘텐츠(selectedContentHtml) → 기존 제품 설명(description/summary).
+    //   고객 화면에는 "콘텐츠 없음" 같은 내부 문구를 노출하지 않는다(버튼/안내만).
+    const translations = selectedProduct.selectedContentTranslations || null;
+    const localeKeys = translations ? Object.keys(translations) : [];
+    const activeTranslation = detailLocale && translations ? translations[detailLocale] ?? null : null;
+    const showLangSwitch = localeKeys.length > 0;
+
     return (
       <div style={styles.fullscreen}>
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column' as const, overflow: 'auto' }}>
@@ -530,10 +566,45 @@ export function TabletKioskPage({
                 {selectedProduct.price ? formatPrice(selectedProduct.price) : selectedProduct.priceDisplay || '가격 문의'}
               </p>
             )}
-            {/* WO-O4O-KPA-TABLET-DISPLAY-CONTENT-SELECTION-V1:
-                진열 선택 콘텐츠가 있으면 제목+본문으로 상세를 표시(기존 sanitizer 경로 ContentRenderer 재사용).
-                없으면 기존 제품 description/summary 표시. 선택 콘텐츠 삭제/연결 해제 시 백엔드가 null 로 폴백. */}
-            {selectedProduct.selectedContentHtml ? (
+            {/* WO-O4O-KPA-TABLET-INLINE-MULTILINGUAL-DESCRIPTION-BRIDGE-V1:
+                게시 가능 번역이 있으면 언어 버튼(기본 + locale별) 노출. 다인종/다언어 고객 응대용.
+                번역 생성 기능은 여기서 만들지 않는다(기존 검수 완료 번역만 표시). */}
+            {showLangSwitch && (
+              <div style={styles.langSwitch}>
+                <button
+                  onClick={() => setDetailLocale(null)}
+                  style={detailLocale === null ? { ...styles.langBtn, ...styles.langBtnActive } : styles.langBtn}
+                >
+                  기본
+                </button>
+                {localeKeys.map((code) => (
+                  <button
+                    key={code}
+                    onClick={() => setDetailLocale(code)}
+                    style={detailLocale === code ? { ...styles.langBtn, ...styles.langBtnActive } : styles.langBtn}
+                  >
+                    {localeLabel(code)}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* WO-O4O-KPA-TABLET-DISPLAY-CONTENT-SELECTION-V1 (+ MULTILINGUAL BRIDGE):
+                우선순위 = 선택 언어 번역 → 기본 선택콘텐츠 → 기존 제품 description/summary.
+                선택 콘텐츠 삭제/연결 해제 시 백엔드가 null 로 폴백. */}
+            {activeTranslation ? (
+              <>
+                {(activeTranslation.title || selectedProduct.selectedContentTitle) && (
+                  <h3 style={{ fontSize: '17px', fontWeight: 700, color: '#0f172a', margin: '4px 0 8px' }}>
+                    {activeTranslation.title || selectedProduct.selectedContentTitle}
+                  </h3>
+                )}
+                <ContentRenderer
+                  html={activeTranslation.html}
+                  style={{ fontSize: '15px', color: '#475569', lineHeight: 1.6, margin: '0 0 16px' }}
+                />
+              </>
+            ) : selectedProduct.selectedContentHtml ? (
               <>
                 {selectedProduct.selectedContentTitle && (
                   <h3 style={{ fontSize: '17px', fontWeight: 700, color: '#0f172a', margin: '4px 0 8px' }}>
@@ -873,6 +944,29 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 700,
     cursor: 'pointer',
     flex: 2,
+  },
+  // WO-O4O-KPA-TABLET-INLINE-MULTILINGUAL-DESCRIPTION-BRIDGE-V1: 언어 선택 버튼(터치 대응 min 44px)
+  langSwitch: {
+    display: 'flex',
+    flexWrap: 'wrap' as const,
+    gap: '8px',
+    margin: '0 0 16px',
+  },
+  langBtn: {
+    minHeight: '44px',
+    padding: '8px 16px',
+    borderRadius: '10px',
+    border: '1px solid #cbd5e1',
+    backgroundColor: '#fff',
+    color: '#334155',
+    fontSize: '15px',
+    fontWeight: 600,
+    cursor: 'pointer',
+  },
+  langBtnActive: {
+    borderColor: '#2563eb',
+    backgroundColor: '#eff6ff',
+    color: '#1d4ed8',
   },
   primaryBtn: {
     padding: '14px 24px',

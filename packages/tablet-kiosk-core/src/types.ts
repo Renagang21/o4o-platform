@@ -24,6 +24,15 @@ export interface TabletProduct {
   selectedContentId?: string | null;
   selectedContentTitle?: string | null;
   selectedContentHtml?: string | null;
+  // WO-O4O-KPA-TABLET-INLINE-MULTILINGUAL-DESCRIPTION-BRIDGE-V1:
+  //   선택 콘텐츠의 게시 가능(검수 완료) 번역만 { locale: { title?, html } } 형태로 전달(없으면 미포함/null).
+  //   태블릿 상세에서 언어 버튼 + fallback(선택 언어 → 기본 선택콘텐츠 → 기본 설명)에 사용. 미포함 서비스 무영향.
+  selectedContentTranslations?: Record<string, TabletContentTranslation> | null;
+}
+
+export interface TabletContentTranslation {
+  title?: string;
+  html: string;
 }
 
 export interface TabletProductsResponse {

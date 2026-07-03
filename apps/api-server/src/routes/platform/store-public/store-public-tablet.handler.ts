@@ -21,6 +21,7 @@ import {
   resolvePublicStore,
   queryTabletVisibleProducts,
   tabletRequestLimiter,
+  sanitizePublishableTranslations,
 } from './store-public-utils.js';
 
 export function createStorePublicTabletRoutes(deps: {
@@ -63,7 +64,9 @@ export function createStorePublicTabletRoutes(deps: {
                 lp.category, lp.price_display, lp.badge_type, lp.highlight_flag, lp.sort_order,
                 tc.id AS "selectedContentId",
                 tc.title AS "selectedContentTitle",
-                COALESCE(tc.content_json->>'html', tc.content_json->>'body', '') AS "selectedContentHtml"
+                COALESCE(tc.content_json->>'html', tc.content_json->>'body', '') AS "selectedContentHtml",
+                -- WO-O4O-KPA-TABLET-INLINE-MULTILINGUAL-DESCRIPTION-BRIDGE-V1: 선택 콘텐츠 번역(원본, 게시가능 필터는 JS)
+                tc.content_json->'translations' AS "selectedContentTranslationsRaw"
          FROM store_local_products lp
          LEFT JOIN store_tablet_displays std
            ON std.product_id = lp.id AND std.product_type = 'local' AND std.content_id IS NOT NULL
@@ -82,6 +85,13 @@ export function createStorePublicTabletRoutes(deps: {
          ORDER BY lp.sort_order ASC, lp.name ASC`,
         [resolved.storeId],
       );
+
+      // WO-O4O-KPA-TABLET-INLINE-MULTILINGUAL-DESCRIPTION-BRIDGE-V1:
+      //   선택 콘텐츠 번역을 게시 가능(검수 완료) locale 만 남기고 status/model 은 제거.
+      for (const row of localProducts) {
+        row.selectedContentTranslations = sanitizePublishableTranslations(row.selectedContentTranslationsRaw);
+        delete row.selectedContentTranslationsRaw;
+      }
 
       res.json({
         success: true,

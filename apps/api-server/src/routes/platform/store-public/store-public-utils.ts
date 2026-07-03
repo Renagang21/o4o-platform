@@ -235,6 +235,34 @@ export async function queryVisibleProducts(
 }
 
 // ============================================================================
+// WO-O4O-KPA-TABLET-INLINE-MULTILINGUAL-DESCRIPTION-BRIDGE-V1
+//   진열 선택 콘텐츠(kpa_store_contents.content_json)에 저장된 다국어 번역을
+//   태블릿 공개 화면으로 실어보낼 때, **게시 가능(검수 완료) 번역만** 통과시킨다.
+//   - 노출 기준 = 검수 상태(status). 누가/무엇으로 번역했는지는 구분하지 않는다.
+//   - draft/pending/미검수/자동생성 직후 번역은 숨긴다(고객 화면 유출 방지).
+//   - status/model 등 내부 필드는 벗겨 { locale: { title, html } } 만 전달한다.
+//   translations 자체가 없거나 게시가능 항목이 0개면 null 반환 → 프론트는 언어 버튼 미표시.
+// ============================================================================
+
+const PUBLISHABLE_TRANSLATION_STATUSES = new Set(['ready', 'published']);
+
+export function sanitizePublishableTranslations(
+  raw: unknown,
+): Record<string, { title?: string; html: string }> | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const out: Record<string, { title?: string; html: string }> = {};
+  for (const [locale, value] of Object.entries(raw as Record<string, unknown>)) {
+    if (!value || typeof value !== 'object') continue;
+    const v = value as Record<string, unknown>;
+    if (typeof v.status !== 'string' || !PUBLISHABLE_TRANSLATION_STATUSES.has(v.status)) continue;
+    const html = typeof v.html === 'string' ? v.html : '';
+    if (!html.trim()) continue;
+    out[locale] = { html, ...(typeof v.title === 'string' ? { title: v.title } : {}) };
+  }
+  return Object.keys(out).length > 0 ? out : null;
+}
+
+// ============================================================================
 // TABLET Visibility-Gated Product Query (serviceKey parameterized)
 // ============================================================================
 
@@ -335,6 +363,8 @@ export async function queryTabletVisibleProducts(
          tc.id AS "selectedContentId",
          tc.title AS "selectedContentTitle",
          COALESCE(tc.content_json->>'html', tc.content_json->>'body', '') AS "selectedContentHtml",
+         -- WO-O4O-KPA-TABLET-INLINE-MULTILINGUAL-DESCRIPTION-BRIDGE-V1: 선택 콘텐츠 번역(원본, 게시가능 필터는 JS)
+         tc.content_json->'translations' AS "selectedContentTranslationsRaw",
          opl.created_at AS sort_order,
          spo.created_at, spo.updated_at,
          opl.organization_id AS pharmacy_id
@@ -385,6 +415,13 @@ export async function queryTabletVisibleProducts(
        LIMIT ${limit} OFFSET ${offset}`,
       params,
     );
+
+    // WO-O4O-KPA-TABLET-INLINE-MULTILINGUAL-DESCRIPTION-BRIDGE-V1:
+    //   선택 콘텐츠 번역을 게시 가능(검수 완료) locale 만 남기고 status/model 은 제거.
+    for (const row of data) {
+      row.selectedContentTranslations = sanitizePublishableTranslations(row.selectedContentTranslationsRaw);
+      delete row.selectedContentTranslationsRaw;
+    }
 
     return {
       data,

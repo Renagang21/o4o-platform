@@ -1167,6 +1167,10 @@ export default function StoreTabletDisplaysPage() {
                                   <p className="mt-1 text-[10px] text-slate-400">
                                     연결된 설명 콘텐츠가 있으면 태블릿 상세 화면에서 우선 표시됩니다. 선택 안 함 = 기본 상품 설명이 표시됩니다.
                                   </p>
+                                  {/* WO-O4O-KPA-TABLET-INLINE-MULTILINGUAL-DESCRIPTION-BRIDGE-V1 */}
+                                  <p className="mt-0.5 text-[10px] text-teal-600">
+                                    선택한 설명 콘텐츠에 검수 완료된 다국어 번역이 있으면, 태블릿 상세 화면에서 고객이 언어를 선택해 볼 수 있습니다.
+                                  </p>
                                 </>
                               )}
                             </div>
