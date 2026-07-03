@@ -45,17 +45,26 @@
 | web-kpa-society | ✅ PASS |
 | (kiosk-core 미변경 → KCos/GP 무영향; ForcedContentPage는 서비스별 별도 파일) | — |
 
-### 7.2 API/브라우저 E2E
+### 7.2 API/브라우저 E2E (2026-07-03, 배포+마이그레이션 CI/CD success)
 
-> 배포(마이그레이션 CI/CD) 후 기록.
+운영자 계정(sohae2100/kpa:admin) + 매장 경영자(renagang21/store owner) 2계정, 인증 fetch.
 
-- [ ] 운영자 tablet 대상 공통 영상 생성 → 매장 candidates에 노출
-- [ ] 매장 태블릿 A 선택 → 공개 idle?tabletId=A 앞에 operator_common item
-- [ ] 태블릿 B(미선택) → fallback 또는 store idle
-- [ ] 만료 선택 → 공개에서 직접 재생 안 됨, 편성 화면 만료 표시
-- [ ] targetSurface=signage forced content는 태블릿 후보/공개에 미노출
-- [ ] 태블릿당 1개 제약(재선택 시 교체)
-- [ ] 테스트 데이터 정리
+| 항목 | 결과 |
+|---|---|
+| 운영자 tablet_idle forced content 생성 | ✅ 201, **targetSurface='tablet_idle', tabletDurationSeconds=30**(마이그레이션 컬럼 동작) |
+| 운영자 기본 생성(미지정) | ✅ **targetSurface='signage'**(기본) |
+| 매장 candidates | ✅ tablet_idle 포함, **signage 제외** |
+| 매장 선택(POST) | ✅ 201 |
+| signage forced content 선택 시도 | ✅ **400 INVALID_CANDIDATE**(태블릿 후보 아님 거부) |
+| 선택 GET | ✅ fcId 일치, status='active' |
+| 공개 idle?tabletId=A (선택 있음) | ✅ `operatorCommonSource='selected'`, **첫 항목 youtube isOperatorCommon durationMs=30000** |
+| 공개 idle (선택 해제 후) | ✅ `operatorCommonSource='fallback'`, deterministic 후보 노출 |
+| 태블릿당 1개 제약 | ✅ 재선택 시 기존 해제 후 교체(partial unique) |
+| 테스트 데이터 정리 | ✅ 매장 selection 해제, forced content 2건 삭제(200), leftover 0 |
+
+> **버그 수정(E2E 중 발견)**: 공개 idle이 `resolved.serviceKey`(='kpa')로 forced content(service_key='kpa-society')를 조회해 매칭 실패 → operator_common 미노출. `resolveServiceKeys('kpa')=['kpa','kpa-society']`로 `service_key=ANY(...)` 조회로 수정, 재배포 후 selected/fallback 모두 PASS.
+
+> Vimeo/편성 화면 UI(모달·만료 안내)는 코드+API E2E로 커버(youtube로 대표 검증). 만료 상태는 status 계산 로직으로 커버.
 
 ### 7.3 Regression
 기존 사이니지 forced content CRUD, 매장 사이니지 playlist, 태블릿 코너 idle/YouTube/자동복귀, 개인정보/상담/주문 미노출.
