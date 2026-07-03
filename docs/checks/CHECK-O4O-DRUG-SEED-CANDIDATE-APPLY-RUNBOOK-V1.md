@@ -245,3 +245,40 @@ gcloud run jobs execute o4o-drug-seed-promotion-apply --region=asia-northeast3  
 **롤백**(전체 되돌리기): 백업 `1783057732444` 복원, 또는 `product_masters WHERE tags @> '["import:hira-drug-master"]'` + `product_identifiers WHERE source_type='drug_master_import'` 삭제(offer/listing 미부착이라 FK 안전). 사용자 승인 필요.
 
 **해소한 실행 이슈**: (1) 승격 Job entry(`src/drug-seed-promotion-apply-job.ts`) 신설+tsup/Dockerfile/.dockerignore 3곳 등록. (2) 스캔이 raw_payload jsonb 전량 전송→필드 `->>`추출 최적화. (3) idKey 구분자 NUL→공백 통일(멱등성 정상화 — 미수정 시 재실행 중복 INSERT 크래시).
+
+---
+
+## 12. 게이트 B 실행 로그 (2026-07-03) — **재개 완료**
+
+> §11 부분 적용(173,493/230,841) 상태에서 멱등 재개. Cloud Run Job `o4o-drug-seed-promotion-apply`(이미지 커밋 `6ec364773`) timeout 7200초로 연장 후 재실행하여 **잔여 eligible 승격 완료**. 실행 전 백업 확인, 완료 후 read-only 검증 통과.
+
+| 항목 | 값 |
+|---|---|
+| 실행일시 | 2026-07-03 11:54~13:07 UTC (execution `o4o-drug-seed-promotion-apply-96wtl`, 4,364s ≈ 72.7분) |
+| 사전 백업 (재개) | ✅ id **1783079396967** (SUCCESSFUL, `pre-drug-master-promotion-resume-20260703`) — §11 백업 `1783057732444`(게이트 B 전체 롤백)와 별도로 173k 부분 상태 캡처 |
+| Cloud Run Job | `o4o-drug-seed-promotion-apply` (region asia-northeast3) |
+| timeout 변경 | 3600 → **7200초** |
+| 실행 결과 | ✅ exit(0), succeeded=1 / failed=0 |
+| 재개 report | eligible=58,348 · createdMaster=**57,348** · linkedExistingMaster=1,000 · wouldCreateMaster=**0** · createdIdentifiers=175,190 · skippedExistingIdentifiers=2,521 |
+
+**완료 후 검증 SQL (read-only, §9)**:
+
+| 검증 | 결과 | 판정 |
+|---|---|---|
+| 9-1 HIRA ProductMaster 총량 | **230,841** | ✅ 목표 230,841 일치 (§11 173,493 + 재개 57,348) |
+| 9-2 barcode 중복 | **0행** | ✅ grain 정합성 정상 |
+| 9-3 identifier KOREA_DRUG_CODE | **230,841** | ✅ master 수 일치 |
+| 9-3 identifier MFDS_CODE | **230,841** | ✅ master 수 일치 |
+| 9-3 identifier ATC_CODE / KOREA_INSURANCE_CODE | 177,056 / 64,745 | ✅ 값 존재분만 |
+| 9-3 identifier 총량 | **703,483** | ✅ (KOREA_DRUG 230,841 + MFDS 230,841 + ATC 177,056 + INSURANCE 64,745) |
+| 9-4 KOREA_DRUG_CODE 누락 master | **0** | ✅ §11 잔여 176건 해소 |
+| 9-5 candidate 상태 | approved_new_master **229,841** / matched **1,000** / pending **74,681** | ✅ 합 305,522 = 적재 총량 (matched=재개 시 기존 master link 1,000, pending=cancelled 74,680+checkDigit 1) |
+| conflict (report) | barcode=0 / mfdsProductId=0 / idOtherMaster=0 | ✅ 0 |
+
+**정합성 결론**: ProductMaster(HIRA) 230,841 = 목표 완주. barcode 중복 0, identifier 누락 0, conflict 0. **게이트 B 승격 apply 완료.**
+
+**후속 작업(미실행, 별도 WO)**:
+1. e약은요 → master별 `SharedProductDescription` 파생
+2. `RepresentativeProduct` 그룹핑 (multiPackage/multiManufacturer MFDS 코드 기준)
+3. e약은요 이미지 GCS 사본
+4. rollback CLI 또는 운영 정리 도구 필요 여부 검토 (offer/listing 부착 전에만 안전 삭제 가능)
