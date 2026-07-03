@@ -187,16 +187,24 @@ WHERE source_type='csv_import'
 
 ---
 
-## 9. 실행 로그 기록란 (운영 시 채움)
+## 9. 실행 로그 (2026-07-03 실행 — 게이트 A)
 
-| 단계 | 시각 | 실행자 | 결과 |
-|---|---|---|---|
-| 백업 생성 (§3) | | | backup id: |
-| dry-run 재확인 (§4-1/4-2) | | | active/cancelled: |
-| **게이트 A 승인** (§7) | | | |
-| candidate apply (§4-3) | | | created/updated: |
-| 검증 SQL (§5) | | | total: |
-| promotion dry-run (§6) | | | wouldCreate/conflict: |
+> 채널: **Cloud Run one-off Job** `o4o-drug-seed-candidate-import`(region asia-northeast3). CSV=GCS `gs://o4o-media-library/data-seed/mfds-drug-master-standard-code.csv`. 이미지=커밋 `b6a7db06b`.
+
+| 단계 | 결과 |
+|---|---|
+| 백업 생성 (§3) | ✅ backup id **1783044238390** (SUCCESSFUL) |
+| 게이트 A 승인 (§7) | ✅ 사용자 승인, 채널=Cloud Run one-off |
+| candidate apply (§4-3) | ✅ exit(0), **created=145,415 / updated=160,107 / skipped=0 / errored=0** (총 305,522). active=230,842 cancelled=74,680 |
+| 검증 SQL (§5) | ✅ total=**305,522** (active 230,842 / cancelled 74,680), 표준코드 중복 **0** |
+| promotion dry-run (§6) | ⏸ 미실행 (게이트 B 영역) |
+
+**실행 중 해소한 파이프라인 이슈**:
+- `src/scripts/**` 는 tsup entry/build 제외 → 이미지 미포함. **src 루트 전용 Job entry** `drug-seed-candidate-import-job.ts`(GCS 다운로드) 신설 + tsup entry + Dockerfile COPY + `.dockerignore` 허용 추가.
+- 수출명 병기로 한글상품명/약품규격>255·포장형태>64 → varchar overflow. mapper 절단(원본은 rawPayload.source 무손실).
+- per-row SELECT+INSERT(≈460k)가 Job 1h timeout 초과 → **배치(단일 SELECT + 청크 multi-row INSERT)** 로 전환, ~2분 완료.
+
+**보존 자산**(재시드용): GCS CSV, Cloud Run Job `o4o-drug-seed-candidate-import`(idempotent). 재실행 시 기존분 updated(write 생략)+신규분만 insert.
 
 ---
 
