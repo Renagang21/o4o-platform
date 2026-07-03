@@ -6,10 +6,17 @@
  * WO-O4O-TABLET-KIOSK-PAGE-DEDUP-V1
  * WO-O4O-TABLET-RUNTIME-REDUCER-V1 — useState 9개 분산 → useReducer 단일 runtime state
  * WO-O4O-TABLET-IDLE-LAYER-V1 — 'idle' 모드 + inactivity detection + idle overlay 추가
+ * WO-O4O-KPA-TABLET-PUBLIC-INFO-UX-PRIVACY-INPUT-REMOVAL-V1 —
+ *   태블릿 V1 = 공용 안내 화면. 상품 상세의 개인정보 입력(이름/요청사항) 제거,
+ *   상담 요청 버튼은 기본 미노출(매장이 명시적으로 showConsultationButton=true 로 opt-in 시에만 렌더),
+ *   상세 최종 행동은 "이 화면을 직원에게 보여주세요" 안내로 정리.
+ *   개인정보 입력·상담 접수는 태블릿 V1 범위 밖 — 후속 모바일 앱/PWA 또는 O4O 소비자 관리 기능에서 별도 설계.
+ *   submitInterest/submitted/status polling 흐름은 후속 호환을 위해 남기되 기본 UI 에서는 접근 불가.
  *
- * 성격: 매장 내 interactive device.
+ * 성격: 매장 내 공용 안내 device.
  *   ─ "쇼핑몰"이 아니라 "매장 안내 디바이스"이다.
- *   ─ 결제/장바구니/주문 흐름 없음. 핵심은 "관심 → 직원 안내" 연결.
+ *   ─ 결제/장바구니/주문 흐름 없음. 고객을 식별하지 않는다(입력/로그인/상담 접수 없음).
+ *   ─ 상품 상세의 최종 행동은 "직원에게 이 화면 보여주기"로 마무리한다.
  *   ─ idle 은 보조 상태(매장 대기 화면)다. signage 처럼 항상 재생되는 구조 아님.
  *     사용자 터치 시 즉시 interactive 우선.
  *   ─ 향후 확장 가능 영역(별도 WO):
@@ -19,9 +26,8 @@
  *
  * 구조:
  * ├─ 상품 그리드 (TABLET 채널 상품 — Supplier + Local 혼합)
- * ├─ 상품 상세 오버레이
- * ├─ 관심 표시 (Interest Request, 결제 없음)
- * ├─ 요청 상태 추적 화면
+ * ├─ 상품 상세 오버레이 ("직원에게 이 화면 보여주기" 안내로 마무리)
+ * ├─ (opt-in) 상담 요청 / 요청 상태 추적 — showConsultationButton=true 인 매장 한정, 개인정보 입력 없음
  * └─ Idle overlay (fullscreen, 자체 minimal player — signage runtime 미사용)
  *
  * - Layout/Header 없음 (전체화면 kiosk mode)
@@ -96,8 +102,6 @@ interface RuntimeState {
   errorMessage: string | null;
   submitting: boolean;
   selectedProduct: DisplayProduct | null;
-  customerName: string;
-  customerNote: string;
   interestId: string | null;
   interestStatus: InterestStatusDetail | null;
 }
@@ -107,9 +111,7 @@ type Action =
   | { type: 'LOAD_SUCCESS'; products: DisplayProduct[] }
   | { type: 'LOAD_ERROR'; message: string }
   | { type: 'SELECT_PRODUCT'; product: DisplayProduct }
-  | { type: 'UPDATE_CUSTOMER_NAME'; value: string }
-  | { type: 'UPDATE_CUSTOMER_NOTE'; value: string }
-  /** detail → browse (selectedProduct + customer 입력 클리어, interest 상태는 손대지 않음) */
+  /** detail → browse (selectedProduct 클리어, interest 상태는 손대지 않음) */
   | { type: 'BACK_TO_BROWSE' }
   | { type: 'SUBMIT_START' }
   | { type: 'SUBMIT_SUCCESS'; requestId: string }
@@ -133,8 +135,6 @@ const initialState: RuntimeState = {
   errorMessage: null,
   submitting: false,
   selectedProduct: null,
-  customerName: '',
-  customerNote: '',
   interestId: null,
   interestStatus: null,
 };
@@ -151,17 +151,11 @@ function reducer(state: RuntimeState, action: Action): RuntimeState {
       return { ...state, loading: false, errorMessage: action.message };
     case 'SELECT_PRODUCT':
       return { ...state, mode: 'detail', selectedProduct: action.product };
-    case 'UPDATE_CUSTOMER_NAME':
-      return { ...state, customerName: action.value };
-    case 'UPDATE_CUSTOMER_NOTE':
-      return { ...state, customerNote: action.value };
     case 'BACK_TO_BROWSE':
       return {
         ...state,
         mode: 'browse',
         selectedProduct: null,
-        customerName: '',
-        customerNote: '',
       };
     case 'SUBMIT_START':
       return { ...state, submitting: true };
@@ -171,8 +165,6 @@ function reducer(state: RuntimeState, action: Action): RuntimeState {
         mode: 'submitted',
         submitting: false,
         interestId: action.requestId,
-        customerName: '',
-        customerNote: '',
       };
     case 'SUBMIT_ERROR':
       return {
@@ -188,8 +180,6 @@ function reducer(state: RuntimeState, action: Action): RuntimeState {
         ...state,
         mode: 'browse',
         selectedProduct: null,
-        customerName: '',
-        customerNote: '',
         interestId: null,
         interestStatus: null,
         errorMessage: null,
@@ -208,8 +198,6 @@ function reducer(state: RuntimeState, action: Action): RuntimeState {
         ...state,
         mode: 'browse',
         selectedProduct: null,
-        customerName: '',
-        customerNote: '',
       };
     default:
       return state;
@@ -312,8 +300,6 @@ export function TabletKioskPage({
     errorMessage,
     submitting,
     selectedProduct,
-    customerName,
-    customerNote,
     interestId,
     interestStatus,
   } = state;
@@ -362,6 +348,9 @@ export function TabletKioskPage({
   }, [slug, api]);
 
   // Submit interest request
+  // WO-O4O-KPA-TABLET-PUBLIC-INFO-UX-PRIVACY-INPUT-REMOVAL-V1:
+  //   태블릿 V1 은 개인정보를 받지 않는다. 상담 opt-in(showConsultationButton=true) 매장에서만
+  //   버튼이 노출되며, 이때도 이름/요청사항 없이 관심(masterId)만 전송한다.
   const handleSubmitInterest = async () => {
     if (!slug || !selectedProduct) return;
     if (selectedProduct.type === 'local') return; // Local products cannot create interest
@@ -370,8 +359,6 @@ export function TabletKioskPage({
     try {
       const result = await api.submitInterest(slug, {
         masterId: selectedProduct.masterId || selectedProduct.id,
-        customerName: customerName.trim() || undefined,
-        customerNote: customerNote.trim() || undefined,
       });
       dispatch({ type: 'SUBMIT_SUCCESS', requestId: result.requestId });
     } catch (e: any) {
@@ -575,32 +562,19 @@ export function TabletKioskPage({
               </>
             )}
 
-            {/* Customer Info (optional) */}
-            {!isLocal && (
-              <div style={{ margin: '16px 0' }}>
-                <input
-                  type="text"
-                  value={customerName}
-                  onChange={(e) => dispatch({ type: 'UPDATE_CUSTOMER_NAME', value: e.target.value })}
-                  placeholder="이름 (선택사항)"
-                  style={styles.input}
-                  maxLength={100}
-                />
-                <input
-                  type="text"
-                  value={customerNote}
-                  onChange={(e) => dispatch({ type: 'UPDATE_CUSTOMER_NOTE', value: e.target.value })}
-                  placeholder="요청 사항 (선택사항)"
-                  style={{ ...styles.input, marginTop: '8px' }}
-                  maxLength={200}
-                />
-              </div>
-            )}
-
-            {/* Local product notice */}
-            {isLocal && (
+            {/* 최종 행동 안내 (WO-O4O-KPA-TABLET-PUBLIC-INFO-UX-PRIVACY-INPUT-REMOVAL-V1)
+                태블릿 V1 = 공용 안내 화면. 개인정보 입력/상담 접수 대신
+                "직원에게 이 화면 보여주기"로 마무리한다. */}
+            {isLocal ? (
               <div style={{ padding: '12px 16px', backgroundColor: '#fffbeb', border: '1px solid #fde68a', borderRadius: '8px', margin: '16px 0' }}>
-                <span style={{ fontSize: '14px', color: '#92400e' }}>매장 자체 상품입니다. 직원에게 직접 문의해주세요.</span>
+                <span style={{ fontSize: '14px', color: '#92400e' }}>
+                  이 제품은 매장에서 직접 안내하는 상품입니다. 이 화면을 직원에게 보여주세요.
+                </span>
+              </div>
+            ) : (
+              <div style={{ padding: '14px 16px', backgroundColor: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: '8px', margin: '16px 0' }}>
+                <p style={{ fontSize: '15px', fontWeight: 600, color: '#0369a1', margin: 0 }}>이 제품이 궁금하신가요?</p>
+                <p style={{ fontSize: '14px', color: '#0284c7', margin: '4px 0 0' }}>이 화면을 직원에게 보여주세요.</p>
               </div>
             )}
           </div>
@@ -614,7 +588,10 @@ export function TabletKioskPage({
           >
             돌아가기
           </button>
-          {!isLocal && displaySettings?.showConsultationButton !== false && (
+          {/* WO-O4O-KPA-TABLET-PUBLIC-INFO-UX-PRIVACY-INPUT-REMOVAL-V1:
+              상담 요청 버튼은 기본 미노출. 매장이 showConsultationButton=true 로 명시적으로 켠 경우에만
+              노출한다(개인정보 입력 없이 관심만 전송). displaySettings 미주입(예: 기본 wrapper)이면 노출하지 않는다. */}
+          {!isLocal && displaySettings?.showConsultationButton === true && (
             <button
               onClick={handleSubmitInterest}
               disabled={submitting}
@@ -896,15 +873,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 700,
     cursor: 'pointer',
     flex: 2,
-  },
-  input: {
-    width: '100%',
-    padding: '10px 12px',
-    borderRadius: '8px',
-    border: '1px solid #e2e8f0',
-    fontSize: '14px',
-    outline: 'none',
-    boxSizing: 'border-box' as const,
   },
   primaryBtn: {
     padding: '14px 24px',

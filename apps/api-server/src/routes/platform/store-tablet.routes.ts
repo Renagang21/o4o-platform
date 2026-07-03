@@ -595,10 +595,13 @@ export function createStoreTabletRoutes(
   // 매장(organization) 공통 타블렛 전시 설정. /tablets/:id 충돌을 피해 별도 세그먼트 사용.
   // 가격/QR/상담버튼 노출 + 자동 넘김/idle 전환 시간. 주문/결제와 무관(전시·안내 노출 규칙).
 
+  // WO-O4O-KPA-TABLET-PUBLIC-INFO-UX-PRIVACY-INPUT-REMOVAL-V1:
+  //   태블릿 V1 = 공용 안내 화면. 상담 요청 버튼은 신규 기본값 OFF(후속 기능).
+  //   (기존 row 가 true 인 매장은 그대로 유지 — 일괄 마이그레이션은 별도 판단)
   const DISPLAY_SETTINGS_DEFAULT = {
     showPrice: true,
     showQr: true,
-    showConsultationButton: true,
+    showConsultationButton: false,
     autoSlideSeconds: 10,
     idleSlideSeconds: 10,
   };

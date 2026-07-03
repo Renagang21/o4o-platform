@@ -378,9 +378,11 @@ export function createStorePublicTabletRoutes(deps: {
               idleSlideSeconds: r.idle_slide_seconds,
             }
           : {
+              // WO-O4O-KPA-TABLET-PUBLIC-INFO-UX-PRIVACY-INPUT-REMOVAL-V1:
+              //   태블릿 V1 = 공용 안내 화면. 상담 요청 버튼 신규 기본값 OFF.
               showPrice: true,
               showQr: true,
-              showConsultationButton: true,
+              showConsultationButton: false,
               autoSlideSeconds: 10,
               idleSlideSeconds: 10,
             },

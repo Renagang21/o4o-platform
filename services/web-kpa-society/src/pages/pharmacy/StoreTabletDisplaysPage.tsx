@@ -108,10 +108,12 @@ export default function StoreTabletDisplaysPage() {
   const [savingIdle, setSavingIdle] = useState(false);
 
   // Display settings state (WO-O4O-KPA-TABLET-DISPLAY-SETTINGS-V1) — 매장 공통
+  // WO-O4O-KPA-TABLET-PUBLIC-INFO-UX-PRIVACY-INPUT-REMOVAL-V1:
+  //   태블릿 V1 = 공용 안내 화면. 상담 요청 버튼 기본 OFF(후속 기능).
   const [settings, setSettings] = useState<TabletDisplaySettings>({
     showPrice: true,
     showQr: true,
-    showConsultationButton: true,
+    showConsultationButton: false,
     autoSlideSeconds: 10,
     idleSlideSeconds: 10,
   });
@@ -869,7 +871,7 @@ export default function StoreTabletDisplaysPage() {
                 {([
                   { key: 'showPrice', label: '가격 표시', desc: '타블렛 고객 화면에 제품 가격을 표시합니다.' },
                   { key: 'showQr', label: 'QR 표시', desc: '제품 상세·모바일 확인용 QR을 표시합니다.' },
-                  { key: 'showConsultationButton', label: '상담 요청 버튼', desc: '상담 요청은 주문이 아니며, 고객이 관심을 표시하면 약국 근무자에게 알림이 전송됩니다.' },
+                  { key: 'showConsultationButton', label: '상담 요청 버튼 (후속 기능 · 권장하지 않음)', desc: '태블릿 V1은 공용 안내 화면으로, 고객 개인정보 입력·상담 접수를 받지 않습니다. 상담 요청/개인정보 입력은 후속 모바일 앱/PWA 기능에서 다룹니다. 기본은 꺼짐이며, 켜더라도 개인정보 없이 관심만 전송됩니다.' },
                 ] as const).map(({ key, label, desc }) => (
                   <label key={key} className="flex items-start justify-between gap-3 cursor-pointer">
                     <div className="min-w-0">
@@ -1124,7 +1126,10 @@ export default function StoreTabletDisplaysPage() {
                               {candidates === undefined ? (
                                 <span className="text-xs text-slate-400">불러오는 중…</span>
                               ) : candidates.length === 0 ? (
-                                <span className="text-xs text-slate-400">이 제품에 연결된 콘텐츠가 없습니다.</span>
+                                <span className="text-xs text-slate-400">
+                                  이 제품에 연결된 설명 콘텐츠가 없습니다. 태블릿에는 기본 상품 설명이 표시됩니다.
+                                  상품별 설명을 별도로 보여주려면 먼저 상품 설명 콘텐츠를 만들고 이 제품에 연결하세요.
+                                </span>
                               ) : (
                                 <select
                                   value={selectValue}
