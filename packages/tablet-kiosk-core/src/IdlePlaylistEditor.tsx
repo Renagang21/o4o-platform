@@ -34,6 +34,8 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import type { IdlePlaylistItem, LibraryAsset } from './types';
+// WO-O4O-KPA-TABLET-CORNER-IDLE-YOUTUBE-VIMEO-AUTO-RETURN-V1
+import { detectIdleMediaType, toIdleEmbedUrl, type IdleMediaType } from './idleMedia';
 
 export interface IdlePlaylistEditorProps {
   items: IdlePlaylistItem[];
@@ -56,15 +58,28 @@ function normalizeUrl(url: string): string {
   return url.trim();
 }
 
-function inferTypeFromUrl(url: string): 'image' | 'video' {
-  const lower = url.toLowerCase();
-  if (/\.(mp4|webm|ogg|mov|m4v)(\?.*)?$/.test(lower)) return 'video';
-  return 'image';
+// WO-O4O-KPA-TABLET-CORNER-IDLE-YOUTUBE-VIMEO-AUTO-RETURN-V1: 공통 판별 헬퍼 사용(youtube/vimeo 포함).
+function inferTypeFromUrl(url: string): IdleMediaType {
+  return detectIdleMediaType(url);
 }
 
 function isLikelyValidUrl(url: string): boolean {
   if (!url) return false;
   return /^https?:\/\//i.test(url) || url.startsWith('/');
+}
+
+const TYPE_LABEL: Record<IdleMediaType, string> = {
+  image: '이미지',
+  video: '직접 영상',
+  youtube: 'YouTube',
+  vimeo: 'Vimeo',
+};
+
+function badgeStyleFor(type: string): React.CSSProperties {
+  if (type === 'youtube') return styles.badgeYouTube;
+  if (type === 'vimeo') return styles.badgeVimeo;
+  if (type === 'video') return styles.badgeVideo;
+  return styles.badgeImage;
 }
 
 export function IdlePlaylistEditor({
@@ -74,7 +89,7 @@ export function IdlePlaylistEditor({
   fetchLibraryAssets,
 }: IdlePlaylistEditorProps) {
   const [newUrl, setNewUrl] = useState('');
-  const [newType, setNewType] = useState<'image' | 'video'>('image');
+  const [newType, setNewType] = useState<IdleMediaType>('image');
   const [newDuration, setNewDuration] = useState<string>(String(DEFAULT_IMAGE_DURATION_MS));
   const [autoType, setAutoType] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -108,6 +123,12 @@ export function IdlePlaylistEditor({
       return;
     }
     const type = autoType ? inferTypeFromUrl(url) : newType;
+    // WO-O4O-KPA-TABLET-CORNER-IDLE-YOUTUBE-VIMEO-AUTO-RETURN-V1:
+    //   youtube/vimeo 는 embed 변환 가능한 URL 인지 확인(id 추출 실패 시 거부).
+    if ((type === 'youtube' || type === 'vimeo') && !toIdleEmbedUrl(url)) {
+      setError('YouTube/Vimeo 영상 URL을 인식할 수 없습니다. 주소를 확인해 주세요.');
+      return;
+    }
     let durationMs: number | undefined;
     if (type === 'image') {
       const n = Number(newDuration);
@@ -151,21 +172,23 @@ export function IdlePlaylistEditor({
             setNewUrl(e.target.value);
             if (autoType) setNewType(inferTypeFromUrl(e.target.value));
           }}
-          placeholder="이미지 또는 영상 URL (https://... 또는 /...)"
+          placeholder="이미지 / 영상 / YouTube / Vimeo URL (https://... 또는 /...)"
           disabled={disabled}
           style={styles.input}
         />
         <select
-          value={newType}
+          value={autoType ? inferTypeFromUrl(newUrl) : newType}
           onChange={(e) => {
-            setNewType(e.target.value as 'image' | 'video');
+            setNewType(e.target.value as IdleMediaType);
             setAutoType(false);
           }}
           disabled={disabled}
           style={styles.select}
         >
           <option value="image">이미지</option>
-          <option value="video">영상</option>
+          <option value="video">직접 영상</option>
+          <option value="youtube">YouTube</option>
+          <option value="vimeo">Vimeo</option>
         </select>
         {(autoType ? inferTypeFromUrl(newUrl) : newType) === 'image' && (
           <input
@@ -235,8 +258,8 @@ export function IdlePlaylistEditor({
           {items.map((item, index) => (
             <li key={`${item.type}-${index}-${item.url}`} style={styles.row}>
               <span style={styles.idx}>{index + 1}</span>
-              <span style={item.type === 'video' ? styles.badgeVideo : styles.badgeImage}>
-                {item.type === 'video' ? '영상' : '이미지'}
+              <span style={badgeStyleFor(item.type)}>
+                {TYPE_LABEL[item.type as IdleMediaType] ?? item.type}
               </span>
               <span style={styles.url} title={item.url}>{item.url}</span>
               {item.type === 'image' && (
@@ -606,7 +629,7 @@ function IdlePlaylistPreview({ items }: IdlePlaylistPreviewProps) {
       <div style={styles.previewStage}>
         {loadError ? (
           <div style={styles.previewEmpty}>
-            {current.type === 'video' ? '영상' : '이미지'} 로드 실패
+            {TYPE_LABEL[current.type as IdleMediaType] ?? current.type} 로드 실패
             <div style={styles.previewHint}>{current.url}</div>
           </div>
         ) : current.type === 'image' ? (
@@ -617,7 +640,7 @@ function IdlePlaylistPreview({ items }: IdlePlaylistPreviewProps) {
             onError={() => setLoadError(true)}
             draggable={false}
           />
-        ) : (
+        ) : current.type === 'video' ? (
           <video
             key={current.url}
             src={current.url}
@@ -627,6 +650,25 @@ function IdlePlaylistPreview({ items }: IdlePlaylistPreviewProps) {
             style={styles.previewMedia}
             onError={() => setLoadError(true)}
           />
+        ) : (
+          // WO-O4O-KPA-TABLET-CORNER-IDLE-YOUTUBE-VIMEO-AUTO-RETURN-V1: youtube/vimeo 미리보기(자동재생 off)
+          (() => {
+            const embed = toIdleEmbedUrl(current.url, { autoplay: false });
+            return embed ? (
+              <iframe
+                key={current.url}
+                src={embed}
+                title="대기화면 영상 미리보기"
+                allow="encrypted-media; picture-in-picture"
+                style={{ width: '100%', height: '100%', border: 0 }}
+              />
+            ) : (
+              <div style={styles.previewEmpty}>
+                영상 URL을 인식할 수 없습니다
+                <div style={styles.previewHint}>{current.url}</div>
+              </div>
+            );
+          })()
         )}
       </div>
       <div style={styles.previewControls}>
@@ -641,8 +683,8 @@ function IdlePlaylistPreview({ items }: IdlePlaylistPreviewProps) {
           ‹ 이전
         </button>
         <span style={styles.previewMeta}>
-          <span style={current.type === 'video' ? styles.badgeVideo : styles.badgeImage}>
-            {current.type === 'video' ? '영상' : '이미지'}
+          <span style={badgeStyleFor(current.type)}>
+            {TYPE_LABEL[current.type as IdleMediaType] ?? current.type}
           </span>
           <span style={styles.previewUrl} title={current.url}>{current.url}</span>
         </span>
@@ -774,6 +816,23 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: '4px',
     backgroundColor: '#ede9fe',
     color: '#6d28d9',
+  },
+  // WO-O4O-KPA-TABLET-CORNER-IDLE-YOUTUBE-VIMEO-AUTO-RETURN-V1
+  badgeYouTube: {
+    fontSize: '11px',
+    fontWeight: 600,
+    padding: '2px 8px',
+    borderRadius: '4px',
+    backgroundColor: '#fee2e2',
+    color: '#b91c1c',
+  },
+  badgeVimeo: {
+    fontSize: '11px',
+    fontWeight: 600,
+    padding: '2px 8px',
+    borderRadius: '4px',
+    backgroundColor: '#cffafe',
+    color: '#0e7490',
   },
   url: {
     flex: 1,

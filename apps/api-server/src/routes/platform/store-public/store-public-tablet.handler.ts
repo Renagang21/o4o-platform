@@ -48,7 +48,9 @@ export function createStorePublicTabletRoutes(deps: {
       // WO-O4O-KPA-TABLET-PUBLIC-DISPLAY-SOURCE-ALIGNMENT-V1:
       //   공개 상품 집합의 권위 = first active tablet 의 visible display rows(configured).
       //   없으면 legacy fallback. supplier/local 이 같은 기준을 쓰도록 한 번 산출해 공유.
-      const displaySource = await resolveTabletDisplaySource(dataSource, resolved.storeId);
+      // WO-O4O-KPA-TABLET-CORNER-IDLE-YOUTUBE-VIMEO-AUTO-RETURN-V1: optional tabletId query(코너별 태블릿).
+      const requestedTabletId = typeof req.query.tabletId === 'string' ? req.query.tabletId : null;
+      const displaySource = await resolveTabletDisplaySource(dataSource, resolved.storeId, requestedTabletId);
       const configured = displaySource.configured;
       const firstTabletId = displaySource.tabletId;
 
@@ -366,23 +368,28 @@ export function createStorePublicTabletRoutes(deps: {
       const resolved = await resolvePublicStore(dataSource, req.params.slug, req, res);
       if (!resolved) return;
 
-      // 매장의 첫 active tablet row → idle_playlist_items
-      const rows = await dataSource.query(
-        `SELECT idle_playlist_items
-         FROM store_tablets
-         WHERE organization_id = $1 AND is_active = true
-         ORDER BY created_at ASC
-         LIMIT 1`,
-        [resolved.storeId],
-      );
+      // WO-O4O-KPA-TABLET-CORNER-IDLE-YOUTUBE-VIMEO-AUTO-RETURN-V1:
+      //   optional tabletId query(코너별 태블릿). 유효한 이 매장 active tablet 이면 그 태블릿,
+      //   아니면 first active fallback. products endpoint 와 동일 기준(resolveTabletDisplaySource).
+      const requestedTabletId = typeof req.query.tabletId === 'string' ? req.query.tabletId : null;
+      const displaySource = await resolveTabletDisplaySource(dataSource, resolved.storeId, requestedTabletId);
+      const tabletId = displaySource.tabletId;
 
-      const items = Array.isArray(rows?.[0]?.idle_playlist_items)
-        ? rows[0].idle_playlist_items
-        : [];
+      let items: unknown[] = [];
+      if (tabletId) {
+        const rows = await dataSource.query(
+          `SELECT idle_playlist_items FROM store_tablets WHERE id = $1 LIMIT 1`,
+          [tabletId],
+        );
+        items = Array.isArray(rows?.[0]?.idle_playlist_items) ? rows[0].idle_playlist_items : [];
+      }
 
       res.json({
         success: true,
         data: { items },
+        // additive: 어느 태블릿 기준인지(디버그/후속). 기존 client 는 data.items 만 사용.
+        tabletId,
+        tabletSource: displaySource.source,
       });
     } catch (error: any) {
       console.error('[UnifiedStore] GET /:slug/tablet/idle error:', error);

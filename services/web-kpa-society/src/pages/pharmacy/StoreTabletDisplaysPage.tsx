@@ -149,9 +149,26 @@ export default function StoreTabletDisplaysPage() {
   const [previewSettings, setPreviewSettings] = useState<TabletDisplaySettings | undefined>(undefined);
   const [previewLoading, setPreviewLoading] = useState(false);
 
+  // WO-O4O-KPA-TABLET-CORNER-IDLE-YOUTUBE-VIMEO-AUTO-RETURN-V1:
+  //   코너별 태블릿 공개 URL(?tabletId=). 매장 slug 는 한 번 조회해 보관.
+  const [storeSlug, setStoreSlug] = useState<string | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    getStoreSlug().then((s) => { if (!cancelled) setStoreSlug(s); }).catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+  // 미리보기가 열릴 때 대상 tabletId(선택 태블릿). previewApi 재생성을 피하려 ref 사용.
+  const previewTabletIdRef = useRef<string | null>(null);
+
+  const publicTabletUrl = (tabletId: string): string => {
+    const base = (import.meta.env.VITE_KPA_WEB_ORIGIN as string | undefined) || window.location.origin;
+    return `${base}/tablet/${encodeURIComponent(storeSlug ?? '')}?tabletId=${tabletId}`;
+  };
+
   // 미리보기 전용 api: products 는 공개 조회, 상담은 실제 전송하지 않고 안내만.
   const previewApi = useMemo<TabletKioskApi>(() => ({
-    fetchProducts: (slug, params) => fetchTabletProducts(slug, params),
+    fetchProducts: (slug, params) =>
+      fetchTabletProducts(slug, { ...params, tabletId: previewTabletIdRef.current ?? undefined }),
     submitInterest: async () => {
       throw new Error('미리보기에서는 상담 요청이 전송되지 않습니다.');
     },
@@ -170,13 +187,14 @@ export default function StoreTabletDisplaysPage() {
       }
       // 저장된 전시 설정 기준(공개 endpoint)
       const saved = await fetchTabletSettings(slug).catch(() => undefined);
+      previewTabletIdRef.current = selectedTabletId; // 선택 태블릿 기준으로 미리보기
       setPreviewSettings(saved);
       setPreviewSlug(slug);
       setPreviewOpen(true);
     } finally {
       setPreviewLoading(false);
     }
-  }, []);
+  }, [selectedTabletId]);
 
   const handleClosePreview = useCallback(() => {
     setPreviewOpen(false);
@@ -824,6 +842,40 @@ export default function StoreTabletDisplaysPage() {
               emptyText="등록된 태블릿이 없습니다"
             />
           </div>
+
+          {/* WO-O4O-KPA-TABLET-CORNER-IDLE-YOUTUBE-VIMEO-AUTO-RETURN-V1:
+              선택 태블릿의 코너별 공개 URL(크롬 북마크용). */}
+          {selectedTabletId && storeSlug && (
+            <div className="bg-white rounded-2xl shadow-sm p-4 border border-slate-100">
+              <p className="text-sm font-semibold text-slate-700 mb-1">이 태블릿의 공개 화면 URL</p>
+              <p className="text-[11px] text-slate-400 mb-2">
+                코너별로 다른 대기화면·진열을 쓰려면 각 태블릿의 Chrome에 아래 URL을 북마크하세요.
+                (tabletId가 없거나 유효하지 않으면 첫 번째 활성 태블릿 기준으로 표시됩니다.)
+              </p>
+              <div className="flex items-center gap-2 flex-wrap">
+                <code className="flex-1 min-w-[240px] text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-700 break-all">
+                  {publicTabletUrl(selectedTabletId)}
+                </code>
+                <button
+                  onClick={() => {
+                    navigator.clipboard?.writeText(publicTabletUrl(selectedTabletId))
+                      .then(() => setToast({ type: 'success', message: '공개 URL이 복사되었습니다.' }))
+                      .catch(() => setToast({ type: 'error', message: '복사에 실패했습니다. URL을 직접 선택해 복사해 주세요.' }));
+                  }}
+                  className="px-3 py-2 text-xs font-medium text-white bg-teal-600 rounded-lg hover:bg-teal-700 whitespace-nowrap"
+                >
+                  공개 URL 복사
+                </button>
+                <button
+                  onClick={handleOpenPreview}
+                  disabled={previewLoading}
+                  className="px-3 py-2 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 whitespace-nowrap disabled:opacity-50"
+                >
+                  미리보기 열기
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Loading pool */}
           {loadingPool && (

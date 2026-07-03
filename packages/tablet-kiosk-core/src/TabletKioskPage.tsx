@@ -61,6 +61,8 @@ import type {
   TabletKioskApi,
   IdlePlaylistItem,
 } from './types';
+// WO-O4O-KPA-TABLET-CORNER-IDLE-YOUTUBE-VIMEO-AUTO-RETURN-V1: idle 대기화면 YouTube/Vimeo embed.
+import { toIdleEmbedUrl } from './idleMedia';
 
 // WO-O4O-KPA-TABLET-INLINE-MULTILINGUAL-DESCRIPTION-BRIDGE-V1:
 //   선택 콘텐츠에 게시 가능(검수 완료) 번역이 있으면 상세에서 언어 버튼으로 전환.
@@ -758,8 +760,10 @@ export function TabletKioskPage({
 // 자체 minimal player. signage runtime 을 import 하지 않음.
 //   - image: durationMs (default 5000) 후 다음 항목
 //   - video: onEnded 시 다음 항목
+//   - youtube/vimeo: iframe 무음 자동재생 + loop. durationMs 지정 시 그 시간 후 다음 항목(미지정=단일 반복)
 //   - 빈 playlist: "화면을 터치해주세요" placeholder
 //   - 컨테이너 onPointerDown → IDLE_EXIT (window-level handler 와 이중 안전망)
+//   - iframe(youtube/vimeo)은 pointer 이벤트를 삼키므로 투명 tap-catcher 를 위에 덮어 터치 복귀 보장.
 
 interface IdleOverlayProps {
   items: IdlePlaylistItem[];
@@ -773,15 +777,29 @@ function IdleOverlay({ items, onUserInteraction, defaultDurationMs }: IdleOverla
   const safeIndex = items.length > 0 ? index % items.length : 0;
   const current = items.length > 0 ? items[safeIndex] : null;
 
-  // image 항목 자동 진행 (video 는 onEnded 로 진행)
-  // 항목별 durationMs 우선 → 매장 전시 설정(defaultDurationMs) → 패키지 기본값
+  // 자동 진행:
+  //   - image: durationMs → defaultDurationMs → 패키지 기본값
+  //   - youtube/vimeo: durationMs 지정 시에만(미지정이면 iframe loop 로 단일 반복 — V1 허용)
+  //   - video: onEnded 로 진행(여기서 타이머 없음)
   useEffect(() => {
-    if (!current || current.type !== 'image' || items.length <= 1) return;
+    if (!current || items.length <= 1) return;
+    let ms: number | null = null;
+    if (current.type === 'image') {
+      ms = current.durationMs ?? defaultDurationMs ?? DEFAULT_IDLE_IMAGE_DURATION_MS;
+    } else if (current.type === 'youtube' || current.type === 'vimeo') {
+      ms = current.durationMs ?? null;
+    }
+    if (ms == null) return;
     const t = setTimeout(() => {
       setIndex((i) => (i + 1) % items.length);
-    }, current.durationMs ?? defaultDurationMs ?? DEFAULT_IDLE_IMAGE_DURATION_MS);
+    }, ms);
     return () => clearTimeout(t);
   }, [current, items.length, defaultDurationMs]);
+
+  const embedUrl =
+    current && (current.type === 'youtube' || current.type === 'vimeo')
+      ? toIdleEmbedUrl(current.url)
+      : null;
 
   return (
     <div
@@ -810,6 +828,30 @@ function IdleOverlay({ items, onUserInteraction, defaultDurationMs }: IdleOverla
           }}
           style={styles.idleMedia}
         />
+      )}
+      {(current?.type === 'youtube' || current?.type === 'vimeo') && (
+        embedUrl ? (
+          <div style={styles.idleEmbedWrap}>
+            <iframe
+              src={embedUrl}
+              title="대기화면 영상"
+              allow="autoplay; encrypted-media; picture-in-picture"
+              style={styles.idleEmbed}
+            />
+            {/* iframe 이 터치를 삼키므로 투명 캐처로 터치 → idle 종료(상품 안내로 복귀) */}
+            <div
+              style={styles.idleTapCatcher}
+              onPointerDown={onUserInteraction}
+              role="presentation"
+            />
+          </div>
+        ) : (
+          <div style={styles.idleEmpty}>
+            <span style={{ fontSize: '16px', color: '#cbd5e1' }}>
+              화면을 터치해주세요
+            </span>
+          </div>
+        )
       )}
     </div>
   );
@@ -1019,6 +1061,24 @@ const styles: Record<string, React.CSSProperties> = {
     maxWidth: '100%',
     maxHeight: '100%',
     objectFit: 'contain' as const,
+  },
+  // WO-O4O-KPA-TABLET-CORNER-IDLE-YOUTUBE-VIMEO-AUTO-RETURN-V1: YouTube/Vimeo iframe + tap-catcher
+  idleEmbedWrap: {
+    position: 'relative' as const,
+    width: '100%',
+    height: '100%',
+  },
+  idleEmbed: {
+    width: '100%',
+    height: '100%',
+    border: 0,
+    display: 'block',
+  },
+  idleTapCatcher: {
+    position: 'absolute' as const,
+    inset: 0,
+    cursor: 'pointer',
+    background: 'transparent',
   },
   idleEmpty: {
     display: 'flex',

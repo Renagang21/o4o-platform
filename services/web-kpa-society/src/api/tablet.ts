@@ -31,13 +31,15 @@ export interface TabletProduct {
 
 export async function fetchTabletProducts(
   slug: string,
-  params?: { page?: number; limit?: number; category?: string; q?: string },
+  // WO-O4O-KPA-TABLET-CORNER-IDLE-YOUTUBE-VIMEO-AUTO-RETURN-V1: optional tabletId(코너별 태블릿)
+  params?: { page?: number; limit?: number; category?: string; q?: string; tabletId?: string },
 ): Promise<{ data: TabletProduct[]; meta: { page: number; limit: number; total: number; totalPages: number }; localProducts?: unknown[] }> {
   const query = new URLSearchParams();
   if (params?.page) query.set('page', String(params.page));
   if (params?.limit) query.set('limit', String(params.limit));
   if (params?.category) query.set('category', params.category);
   if (params?.q) query.set('q', params.q);
+  if (params?.tabletId) query.set('tabletId', params.tabletId);
 
   const qs = query.toString();
   const url = `${getApiBase()}/${encodeURIComponent(slug)}/tablet/products${qs ? `?${qs}` : ''}`;
@@ -130,8 +132,9 @@ export async function checkTabletInterestStatus(
  * 매장 idle playlist 조회 (store-level 설정).
  * 값이 없거나 에러 발생 시 빈 배열 반환 — kiosk 는 placeholder 표시.
  */
-export async function fetchTabletIdle(slug: string): Promise<IdlePlaylistItem[]> {
-  const url = `${getApiBase()}/${encodeURIComponent(slug)}/tablet/idle`;
+export async function fetchTabletIdle(slug: string, tabletId?: string): Promise<IdlePlaylistItem[]> {
+  const qs = tabletId ? `?tabletId=${encodeURIComponent(tabletId)}` : '';
+  const url = `${getApiBase()}/${encodeURIComponent(slug)}/tablet/idle${qs}`;
   const res = await fetch(url);
   const json = await res.json();
   if (!json.success) throw new Error(json.error?.message || 'Failed to fetch idle playlist');

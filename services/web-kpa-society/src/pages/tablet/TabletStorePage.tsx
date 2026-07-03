@@ -37,6 +37,9 @@ export function TabletStorePage() {
   const { slug } = useParams<{ slug: string }>();
   // WO-O4O-STORE-REQUEST-CONTEXT-LIGHT-V1: QR 접속 경로 감지
   const fromQr = new URLSearchParams(window.location.search).get('from') === 'qr';
+  // WO-O4O-KPA-TABLET-CORNER-IDLE-YOUTUBE-VIMEO-AUTO-RETURN-V1: 코너별 태블릿(크롬 북마크용 ?tabletId=).
+  //   유효하지 않으면 백엔드가 first active 로 fallback. 없으면 기존 동작.
+  const tabletId = new URLSearchParams(window.location.search).get('tabletId') || undefined;
 
   const [idlePlaylist, setIdlePlaylist] = useState<IdlePlaylistItem[]>([]);
   // WO-O4O-KPA-TABLET-DISPLAY-SETTINGS-V1: 매장 전시 설정 (가격/QR/상담/전환시간)
@@ -44,7 +47,7 @@ export function TabletStorePage() {
 
   useEffect(() => {
     if (!slug) return;
-    fetchTabletIdle(slug)
+    fetchTabletIdle(slug, tabletId)
       .then((items) => setIdlePlaylist(items))
       .catch(() => {
         // fetch 실패 시 placeholder 그대로. silent fail (kiosk 정상 동작 우선).
@@ -54,12 +57,13 @@ export function TabletStorePage() {
       .catch(() => {
         // fetch 실패 시 undefined → kiosk 기본 동작(전부 표시). silent fail.
       });
-  }, [slug]);
+  }, [slug, tabletId]);
 
   return (
     <TabletKioskPage
       api={{
-        fetchProducts: fetchTabletProducts,
+        // WO-O4O-KPA-TABLET-CORNER-IDLE-YOUTUBE-VIMEO-AUTO-RETURN-V1: 코너별 태블릿 tabletId 주입
+        fetchProducts: (s, params) => fetchTabletProducts(s, { ...params, tabletId }),
         submitInterest: submitTabletInterest,
         checkStatus: checkTabletInterestStatus,
       }}

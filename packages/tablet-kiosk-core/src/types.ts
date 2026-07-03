@@ -86,9 +86,12 @@ export type TabletProductsParams = {
  * Runtime 정책: render-ready URL 저장. assetId 기반 lookup 미도입.
  */
 export interface IdlePlaylistItem {
-  type: 'image' | 'video';
+  // WO-O4O-KPA-TABLET-CORNER-IDLE-YOUTUBE-VIMEO-AUTO-RETURN-V1: youtube/vimeo 추가(additive).
+  //   image: durationMs 후 다음. video: onEnded 후 다음. youtube/vimeo: iframe loop(무음 자동재생),
+  //   durationMs 지정 시 그 시간 후 다음 항목(미지정이면 단일 영상 반복).
+  type: 'image' | 'video' | 'youtube' | 'vimeo';
   url: string;
-  /** image 전용. video 는 onEnded 로 자동 진행. default 5000ms */
+  /** image 전용(youtube/vimeo 는 optional 순차 전환용). video 는 onEnded 로 자동 진행. default 5000ms */
   durationMs?: number;
 }
 

@@ -273,21 +273,46 @@ export function sanitizePublishableTranslations(
 export async function resolveTabletDisplaySource(
   dataSource: DataSource,
   organizationId: string,
-): Promise<{ tabletId: string | null; configured: boolean }> {
-  const rows = await dataSource.query(
-    `SELECT id FROM store_tablets
-     WHERE organization_id = $1 AND is_active = true
-     ORDER BY created_at ASC LIMIT 1`,
-    [organizationId],
-  );
-  const tabletId = rows?.[0]?.id ?? null;
-  if (!tabletId) return { tabletId: null, configured: false };
+  // WO-O4O-KPA-TABLET-CORNER-IDLE-YOUTUBE-VIMEO-AUTO-RETURN-V1:
+  //   코너별 태블릿 지정(크롬 북마크용). requestedTabletId 가 이 매장의 active tablet 이면 그 태블릿,
+  //   아니면 first active 로 안전 fallback. products/idle 가 같은 기준을 쓰도록 공용화.
+  requestedTabletId?: string | null,
+): Promise<{ tabletId: string | null; configured: boolean; source: 'query' | 'first_active' | 'none' }> {
+  let tabletId: string | null = null;
+  let source: 'query' | 'first_active' | 'none' = 'none';
+
+  const uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (requestedTabletId && uuidRe.test(requestedTabletId)) {
+    const q = await dataSource.query(
+      `SELECT id FROM store_tablets
+       WHERE id = $1 AND organization_id = $2 AND is_active = true
+       LIMIT 1`,
+      [requestedTabletId, organizationId],
+    );
+    if (q?.[0]?.id) {
+      tabletId = q[0].id;
+      source = 'query';
+    }
+  }
+
+  if (!tabletId) {
+    const rows = await dataSource.query(
+      `SELECT id FROM store_tablets
+       WHERE organization_id = $1 AND is_active = true
+       ORDER BY created_at ASC LIMIT 1`,
+      [organizationId],
+    );
+    tabletId = rows?.[0]?.id ?? null;
+    if (tabletId) source = 'first_active';
+  }
+
+  if (!tabletId) return { tabletId: null, configured: false, source: 'none' };
   const cnt = await dataSource.query(
     `SELECT COUNT(*)::int AS c FROM store_tablet_displays
      WHERE tablet_id = $1 AND is_visible = true`,
     [tabletId],
   );
-  return { tabletId, configured: Number(cnt?.[0]?.c || 0) > 0 };
+  return { tabletId, configured: Number(cnt?.[0]?.c || 0) > 0, source };
 }
 
 // ============================================================================

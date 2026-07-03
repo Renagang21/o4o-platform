@@ -462,20 +462,22 @@ export function createStoreTabletRoutes(
 
   /**
    * Validate idle playlist items.
-   * 형식: [{ type: 'image'|'video', url: string, durationMs?: number }, ...]
+   * 형식: [{ type: 'image'|'video'|'youtube'|'vimeo', url: string, durationMs?: number }, ...]
+   * WO-O4O-KPA-TABLET-CORNER-IDLE-YOUTUBE-VIMEO-AUTO-RETURN-V1: youtube/vimeo 추가.
    */
   function validateIdlePlaylistItems(items: unknown): { items: any[] } | string {
     if (!Array.isArray(items)) {
       return 'items must be an array';
     }
+    const ALLOWED_TYPES = ['image', 'video', 'youtube', 'vimeo'];
     const out: any[] = [];
     for (let i = 0; i < items.length; i++) {
       const it = items[i] as any;
       if (!it || typeof it !== 'object') {
         return `items[${i}] must be an object`;
       }
-      if (it.type !== 'image' && it.type !== 'video') {
-        return `items[${i}].type must be 'image' or 'video'`;
+      if (!ALLOWED_TYPES.includes(it.type)) {
+        return `items[${i}].type must be one of ${ALLOWED_TYPES.join(', ')}`;
       }
       if (typeof it.url !== 'string' || it.url.trim().length === 0) {
         return `items[${i}].url must be a non-empty string`;
@@ -484,6 +486,13 @@ export function createStoreTabletRoutes(
       // 보수적 검증: http(s) 또는 / 시작 (relative)
       if (!/^https?:\/\//i.test(url) && !url.startsWith('/')) {
         return `items[${i}].url must start with http(s):// or /`;
+      }
+      // provider 별 도메인 검증
+      if (it.type === 'youtube' && !/(?:youtube\.com|youtu\.be)/i.test(url)) {
+        return `items[${i}].url must be a youtube.com / youtu.be URL`;
+      }
+      if (it.type === 'vimeo' && !/vimeo\.com/i.test(url)) {
+        return `items[${i}].url must be a vimeo.com URL`;
       }
       let durationMs: number | undefined;
       if (it.durationMs !== undefined && it.durationMs !== null) {
