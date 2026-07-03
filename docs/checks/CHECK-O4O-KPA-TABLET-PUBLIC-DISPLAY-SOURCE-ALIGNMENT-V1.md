@@ -36,15 +36,21 @@
 | web-kpa-society | ✅ PASS |
 | (kiosk-core 미변경 → KCos/GP typecheck 불요) | — |
 
-### 5.2 API/브라우저 E2E
+### 5.2 API/브라우저 E2E (2026-07-03, 네뚜레-약국 · 약국 경영자 체험 계정, 인증 API)
 
-> 배포 후 기록.
+셋업: local 2개(ALIGN A/B) 생성 후 first active tablet("화장품 코너") 진열을 시나리오별로 저장 → 공개 `GET /stores/네뚜레-약국/tablet/products` 관측 → 정리.
 
-- [ ] configured: local 2개 중 1개만 visible 저장 → 공개 응답 localProducts에 그 1개만, `tabletDisplaySource:'configured'`
-- [ ] 순서 = 편성 sort_order
-- [ ] display rows 제거(visible 0) → `legacy_fallback`, 기존 동작
-- [ ] supplier gate 유지(가능 시)
-- [ ] 테스트 데이터 정리
+| # | 시나리오 | 결과 |
+|---|---|---|
+| 1 | A만 visible 저장 | ✅ `tabletDisplaySource:'configured'`, localProducts=**[ALIGN A]** — active인 B는 **제외**(회귀 해소), http 200 |
+| 2 | B(sort0)+A(sort1) 저장 | ✅ localProducts 순서 = **[ALIGN B, ALIGN A]** (편성 sort_order 반영) |
+| 3 | 진열 비움(visible 0) | ✅ `tabletDisplaySource:'legacy_fallback'`, localProducts=**[ALIGN A, ALIGN B]** 둘 다 노출(기존 동작 유지), http 200 |
+| 4 | 테스트 데이터 정리 | ✅ local A/B DELETE 200 |
+
+- supplier: 해당 매장에 TABLET gate 통과 상품 0건이라 supplierCount=0(자연). supplier positive(display 포함/제외)는 진열 데이터 부재로 보류 — commerce gate 불변 + 동일 disp 로직(코드/typecheck) 커버.
+- **버그 수정 반영**: 초기 구현에서 `hasTablet && !configured`(fallback) 시 supplier count 쿼리 파라미터 개수 불일치로 공개 엔드포인트 500 → count/data 파라미터 분리(`countParams`/`dataParams`)로 수정, 재배포 후 s3 200 확인.
+
+> 판정: **configured 집합 제한 / 편성 순서 / legacy fallback 모두 라이브 PASS.**
 
 ## 6. 미착수(범위 밖)
 device pairing / per-tablet public URL, QR Core, 소비자 관리, 상담/주문/결제, 사이니지 통합, GP/KCos 확장, 신규 마이그레이션. 전체 혼합(supplier+local) 단일 순서는 현행 분리 응답 유지(필요 시 후속).
