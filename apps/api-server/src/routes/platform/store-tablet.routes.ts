@@ -600,6 +600,139 @@ export function createStoreTabletRoutes(
     }
   }));
 
+  // ─── 서비스 운영자 공통 대기 영상 (WO-O4O-KPA-TABLET-OPERATOR-COMMON-IDLE-VIDEO-SELECTION-V1) ───
+  //   운영자가 등록한 signage_forced_content(target_surface in tablet_idle/both) 중
+  //   매장 경영자가 태블릿별로 1개 선택. 영상 등록/수정/삭제 권한은 운영자 전용(여기선 조회·선택만).
+  //   KPA 스코프: service_key='kpa-society' (공개 idle/운영자 화면과 동일).
+  const KPA_FORCED_SERVICE_KEY = 'kpa-society';
+
+  // GET /tablet-operator-common-idle-candidates — 태블릿 대상 공통 영상 후보(상태 포함)
+  router.get('/tablet-operator-common-idle-candidates', withStoreAuth(async (_req, res, _organizationId) => {
+    try {
+      const rows = await dataSource.query(
+        `SELECT id, title, video_url AS "videoUrl", source_type AS "sourceType",
+                embed_id AS "embedId", thumbnail_url AS "thumbnailUrl",
+                start_at AS "startAt", end_at AS "endAt",
+                tablet_duration_seconds AS "tabletDurationSeconds",
+                CASE
+                  WHEN NOW() < start_at THEN 'upcoming'
+                  WHEN NOW() > end_at THEN 'expired'
+                  ELSE 'active'
+                END AS status
+         FROM signage_forced_content
+         WHERE service_key = $1
+           AND target_surface IN ('tablet_idle','both')
+           AND is_active = true
+           AND deleted_at IS NULL
+         ORDER BY start_at DESC`,
+        [KPA_FORCED_SERVICE_KEY],
+      );
+      res.json({ success: true, data: rows });
+    } catch (error: any) {
+      console.error('[StoreTablet] GET /tablet-operator-common-idle-candidates error:', error);
+      res.status(500).json({ success: false, error: 'Failed to fetch candidates', code: 'INTERNAL_ERROR' });
+    }
+  }));
+
+  // POST /tablets/:id/operator-common-idle-selection { forcedContentId } — 태블릿별 1개 선택
+  router.post('/tablets/:id/operator-common-idle-selection', withStoreAuth(async (req, res, organizationId) => {
+    try {
+      const tabletId = req.params.id;
+      const userId = (req as any).user?.id ?? null;
+      const forcedContentId = req.body?.forcedContentId;
+      if (!forcedContentId || typeof forcedContentId !== 'string') {
+        res.status(400).json({ success: false, error: 'forcedContentId is required', code: 'VALIDATION_ERROR' });
+        return;
+      }
+      // 태블릿이 이 매장 소속인지 확인
+      const t = await dataSource.query(
+        `SELECT id FROM store_tablets WHERE id = $1 AND organization_id = $2 LIMIT 1`,
+        [tabletId, organizationId],
+      );
+      if (!t?.[0]) {
+        res.status(404).json({ success: false, error: 'Tablet not found', code: 'NOT_FOUND' });
+        return;
+      }
+      // forced content 가 유효한 태블릿 후보인지 확인(등록/수정 권한 아님 — 선택 대상 검증만)
+      const fc = await dataSource.query(
+        `SELECT id FROM signage_forced_content
+         WHERE id = $1 AND service_key = $2
+           AND target_surface IN ('tablet_idle','both')
+           AND is_active = true AND deleted_at IS NULL
+         LIMIT 1`,
+        [forcedContentId, KPA_FORCED_SERVICE_KEY],
+      );
+      if (!fc?.[0]) {
+        res.status(400).json({ success: false, error: '유효한 태블릿 공통 영상 후보가 아닙니다.', code: 'INVALID_CANDIDATE' });
+        return;
+      }
+      // 태블릿당 active 1개: 기존 active 해제 후 삽입(partial unique 충돌 방지)
+      await dataSource.query(
+        `UPDATE store_tablet_operator_idle_selections
+         SET cleared_at = NOW(), updated_at = NOW()
+         WHERE tablet_id = $1 AND cleared_at IS NULL`,
+        [tabletId],
+      );
+      const ins = await dataSource.query(
+        `INSERT INTO store_tablet_operator_idle_selections
+           (organization_id, tablet_id, forced_content_id, selected_by_user_id)
+         VALUES ($1, $2, $3, $4)
+         RETURNING id, forced_content_id AS "forcedContentId", selected_at AS "selectedAt"`,
+        [organizationId, tabletId, forcedContentId, userId],
+      );
+      res.status(201).json({ success: true, data: ins[0] });
+    } catch (error: any) {
+      console.error('[StoreTablet] POST operator-common-idle-selection error:', error);
+      res.status(500).json({ success: false, error: 'Failed to save selection', code: 'INTERNAL_ERROR' });
+    }
+  }));
+
+  // DELETE /tablets/:id/operator-common-idle-selection — 선택 해제
+  router.delete('/tablets/:id/operator-common-idle-selection', withStoreAuth(async (req, res, organizationId) => {
+    try {
+      const tabletId = req.params.id;
+      await dataSource.query(
+        `UPDATE store_tablet_operator_idle_selections
+         SET cleared_at = NOW(), updated_at = NOW()
+         WHERE tablet_id = $1 AND organization_id = $2 AND cleared_at IS NULL`,
+        [tabletId, organizationId],
+      );
+      res.json({ success: true, data: { tabletId, cleared: true } });
+    } catch (error: any) {
+      console.error('[StoreTablet] DELETE operator-common-idle-selection error:', error);
+      res.status(500).json({ success: false, error: 'Failed to clear selection', code: 'INTERNAL_ERROR' });
+    }
+  }));
+
+  // GET /tablets/:id/operator-common-idle-selection — 현재 선택(상태 포함, 만료여도 보존 반환)
+  router.get('/tablets/:id/operator-common-idle-selection', withStoreAuth(async (req, res, organizationId) => {
+    try {
+      const tabletId = req.params.id;
+      const rows = await dataSource.query(
+        `SELECT s.id, s.forced_content_id AS "forcedContentId", s.selected_at AS "selectedAt",
+                fc.title, fc.video_url AS "videoUrl", fc.source_type AS "sourceType",
+                fc.thumbnail_url AS "thumbnailUrl", fc.start_at AS "startAt", fc.end_at AS "endAt",
+                fc.is_active AS "isActive", fc.deleted_at AS "deletedAt", fc.target_surface AS "targetSurface",
+                CASE
+                  WHEN fc.deleted_at IS NOT NULL OR fc.is_active = false
+                    OR fc.target_surface NOT IN ('tablet_idle','both') THEN 'unavailable'
+                  WHEN NOW() < fc.start_at THEN 'upcoming'
+                  WHEN NOW() > fc.end_at THEN 'expired'
+                  ELSE 'active'
+                END AS status
+         FROM store_tablet_operator_idle_selections s
+         JOIN signage_forced_content fc ON fc.id = s.forced_content_id
+         WHERE s.tablet_id = $1 AND s.organization_id = $2 AND s.cleared_at IS NULL
+         LIMIT 1`,
+        [tabletId, organizationId],
+      );
+      res.json({ success: true, data: rows?.[0] ?? null });
+    } catch (error: any) {
+      console.error('[StoreTablet] GET operator-common-idle-selection error:', error);
+      res.status(500).json({ success: false, error: 'Failed to fetch selection', code: 'INTERNAL_ERROR' });
+    }
+  }));
+
   // ─── Display Settings (WO-O4O-KPA-TABLET-DISPLAY-SETTINGS-V1) ──────────
   // 매장(organization) 공통 타블렛 전시 설정. /tablets/:id 충돌을 피해 별도 세그먼트 사용.
   // 가격/QR/상담버튼 노출 + 자동 넘김/idle 전환 시간. 주문/결제와 무관(전시·안내 노출 규칙).

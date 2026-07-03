@@ -29,6 +29,9 @@ interface ForcedContentItem {
   endAt: string;
   isActive: boolean;
   note: string | null;
+  // WO-O4O-KPA-TABLET-OPERATOR-COMMON-IDLE-VIDEO-SELECTION-V1
+  targetSurface?: 'signage' | 'tablet_idle' | 'both';
+  tabletDurationSeconds?: number | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -113,6 +116,9 @@ export default function ForcedContentPage() {
   const [formStartAt, setFormStartAt] = useState('');
   const [formEndAt, setFormEndAt] = useState('');
   const [formNote, setFormNote] = useState('');
+  // WO-O4O-KPA-TABLET-OPERATOR-COMMON-IDLE-VIDEO-SELECTION-V1
+  const [formTargetSurface, setFormTargetSurface] = useState<'signage' | 'tablet_idle' | 'both'>('signage');
+  const [formTabletDuration, setFormTabletDuration] = useState('30');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const apiFetch = useCallback(async (path: string, options?: RequestInit) => {
@@ -154,6 +160,8 @@ export default function ForcedContentPage() {
     setFormStartAt('');
     setFormEndAt('');
     setFormNote('');
+    setFormTargetSurface('signage');
+    setFormTabletDuration('30');
     setEditingId(null);
   };
 
@@ -169,6 +177,8 @@ export default function ForcedContentPage() {
     setFormStartAt(item.startAt.slice(0, 16));
     setFormEndAt(item.endAt.slice(0, 16));
     setFormNote(item.note || '');
+    setFormTargetSurface(item.targetSurface || 'signage');
+    setFormTabletDuration(String(item.tabletDurationSeconds ?? 30));
     setEditingId(item.id);
     setShowForm(true);
   };
@@ -185,6 +195,10 @@ export default function ForcedContentPage() {
         startAt: new Date(formStartAt).toISOString(),
         endAt: new Date(formEndAt).toISOString(),
         note: formNote.trim() || undefined,
+        // WO-O4O-KPA-TABLET-OPERATOR-COMMON-IDLE-VIDEO-SELECTION-V1
+        targetSurface: formTargetSurface,
+        tabletDurationSeconds:
+          formTargetSurface === 'signage' ? undefined : Number(formTabletDuration) || 30,
       };
 
       if (editingId) {
@@ -438,6 +452,36 @@ export default function ForcedContentPage() {
                 className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
               />
             </div>
+            {/* WO-O4O-KPA-TABLET-OPERATOR-COMMON-IDLE-VIDEO-SELECTION-V1: 노출 대상 */}
+            <div>
+              <label className="block text-xs font-medium text-slate-500 mb-1">노출 대상 *</label>
+              <select
+                value={formTargetSurface}
+                onChange={e => setFormTargetSurface(e.target.value as 'signage' | 'tablet_idle' | 'both')}
+                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-red-500"
+              >
+                <option value="signage">디지털 사이니지</option>
+                <option value="tablet_idle">태블릿 대기화면</option>
+                <option value="both">둘 다</option>
+              </select>
+              <p className="text-[11px] text-slate-400 mt-1">기존 사이니지 콘텐츠가 태블릿에 자동 노출되지 않도록 기본은 디지털 사이니지입니다.</p>
+            </div>
+            {formTargetSurface !== 'signage' && (
+              <div>
+                <label className="block text-xs font-medium text-slate-500 mb-1">태블릿 재생 시간(초)</label>
+                <select
+                  value={formTabletDuration}
+                  onChange={e => setFormTabletDuration(e.target.value)}
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-red-500"
+                >
+                  <option value="15">15초</option>
+                  <option value="30">30초</option>
+                  <option value="60">60초</option>
+                  <option value="90">90초</option>
+                </select>
+                <p className="text-[11px] text-slate-400 mt-1">태블릿 대기화면에서 이 영상을 보여줄 시간(이후 매장 대기화면으로 넘어감).</p>
+              </div>
+            )}
             <div className="md:col-span-2">
               <label className="block text-xs font-medium text-slate-500 mb-1">메모 (선택)</label>
               <input

@@ -29,6 +29,9 @@ function detectVideoSourceType(url: string): { sourceType: 'youtube' | 'vimeo'; 
   });
 }
 
+// WO-O4O-KPA-TABLET-OPERATOR-COMMON-IDLE-VIDEO-SELECTION-V1: 노출 대상(디지털 사이니지/태블릿/둘 다)
+const VALID_TARGET_SURFACES = ['signage', 'tablet_idle', 'both'];
+
 export class SignageForcedContentController {
   constructor(private readonly dataSource: DataSource) {}
 
@@ -52,6 +55,8 @@ export class SignageForcedContentController {
            end_at AS "endAt",
            is_active AS "isActive",
            note,
+           target_surface AS "targetSurface",
+           tablet_duration_seconds AS "tabletDurationSeconds",
            created_at AS "createdAt",
            updated_at AS "updatedAt"
          FROM signage_forced_content
@@ -75,6 +80,18 @@ export class SignageForcedContentController {
       const { serviceKey } = req.params;
       const userId = (req as any).user?.id;
       const { title, videoUrl, thumbnailUrl, startAt, endAt, note } = req.body;
+      // WO-O4O-KPA-TABLET-OPERATOR-COMMON-IDLE-VIDEO-SELECTION-V1
+      const targetSurface = typeof req.body.targetSurface === 'string' ? req.body.targetSurface : 'signage';
+      if (!VALID_TARGET_SURFACES.includes(targetSurface)) {
+        res.status(400).json({ success: false, error: { code: 'INVALID_INPUT', message: `targetSurface must be one of ${VALID_TARGET_SURFACES.join(', ')}` } });
+        return;
+      }
+      const isTabletTarget = targetSurface === 'tablet_idle' || targetSurface === 'both';
+      let tabletDurationSeconds: number | null = null;
+      if (isTabletTarget) {
+        const n = Number(req.body.tabletDurationSeconds ?? 30);
+        tabletDurationSeconds = Number.isFinite(n) && n >= 5 && n <= 600 ? Math.floor(n) : 30;
+      }
 
       if (!title?.trim()) {
         res.status(400).json({ success: false, error: { code: 'INVALID_INPUT', message: 'title is required' } });
@@ -106,8 +123,8 @@ export class SignageForcedContentController {
 
       const rows = await this.dataSource.query(
         `INSERT INTO signage_forced_content
-           (service_key, title, video_url, source_type, embed_id, thumbnail_url, start_at, end_at, note, created_by_user_id)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+           (service_key, title, video_url, source_type, embed_id, thumbnail_url, start_at, end_at, note, created_by_user_id, target_surface, tablet_duration_seconds)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
          RETURNING
            id,
            title,
@@ -119,8 +136,10 @@ export class SignageForcedContentController {
            end_at AS "endAt",
            is_active AS "isActive",
            note,
+           target_surface AS "targetSurface",
+           tablet_duration_seconds AS "tabletDurationSeconds",
            created_at AS "createdAt"`,
-        [serviceKey, title.trim(), videoUrl.trim(), sourceType, embedId, thumbnailUrl || null, startAt, endAt, note || null, userId || null],
+        [serviceKey, title.trim(), videoUrl.trim(), sourceType, embedId, thumbnailUrl || null, startAt, endAt, note || null, userId || null, targetSurface, tabletDurationSeconds],
       );
 
       res.status(201).json({ success: true, data: rows[0] });
@@ -137,6 +156,12 @@ export class SignageForcedContentController {
     try {
       const { serviceKey, id } = req.params;
       const { title, videoUrl, thumbnailUrl, startAt, endAt, isActive, note } = req.body;
+      // WO-O4O-KPA-TABLET-OPERATOR-COMMON-IDLE-VIDEO-SELECTION-V1
+      const { targetSurface, tabletDurationSeconds } = req.body as { targetSurface?: string; tabletDurationSeconds?: number };
+      if (targetSurface !== undefined && !VALID_TARGET_SURFACES.includes(targetSurface)) {
+        res.status(400).json({ success: false, error: { code: 'INVALID_INPUT', message: `targetSurface must be one of ${VALID_TARGET_SURFACES.join(', ')}` } });
+        return;
+      }
 
       const sets: string[] = ['updated_at = NOW()'];
       const params: any[] = [id, serviceKey];
@@ -185,6 +210,15 @@ export class SignageForcedContentController {
         params.push(note || null);
         sets.push(`note = $${params.length}`);
       }
+      if (targetSurface !== undefined) {
+        params.push(targetSurface);
+        sets.push(`target_surface = $${params.length}`);
+      }
+      if (tabletDurationSeconds !== undefined) {
+        const n = Number(tabletDurationSeconds);
+        params.push(Number.isFinite(n) && n >= 5 && n <= 600 ? Math.floor(n) : null);
+        sets.push(`tablet_duration_seconds = $${params.length}`);
+      }
 
       if (sets.length === 1) {
         res.status(400).json({ success: false, error: { code: 'INVALID_INPUT', message: 'Nothing to update' } });
@@ -206,6 +240,8 @@ export class SignageForcedContentController {
            end_at AS "endAt",
            is_active AS "isActive",
            note,
+           target_surface AS "targetSurface",
+           tablet_duration_seconds AS "tabletDurationSeconds",
            updated_at AS "updatedAt"`,
         params,
       );

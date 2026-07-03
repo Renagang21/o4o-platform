@@ -375,7 +375,7 @@ export function createStorePublicTabletRoutes(deps: {
       const displaySource = await resolveTabletDisplaySource(dataSource, resolved.storeId, requestedTabletId);
       const tabletId = displaySource.tabletId;
 
-      let items: unknown[] = [];
+      let items: any[] = [];
       if (tabletId) {
         const rows = await dataSource.query(
           `SELECT idle_playlist_items FROM store_tablets WHERE id = $1 LIMIT 1`,
@@ -384,12 +384,71 @@ export function createStorePublicTabletRoutes(deps: {
         items = Array.isArray(rows?.[0]?.idle_playlist_items) ? rows[0].idle_playlist_items : [];
       }
 
+      // WO-O4O-KPA-TABLET-OPERATOR-COMMON-IDLE-VIDEO-SELECTION-V1:
+      //   서비스 운영자 공통 영상 1개를 대기화면 앞에 삽입.
+      //   1) 매장이 선택한 영상이 방영 기간 내면 그 영상.
+      //   2) 없거나 만료면 유효한 태블릿 대상 후보 중 deterministic(seed=tabletId+오늘) 1개.
+      //   3) 유효 후보 0개면 기존 store idle 만.
+      let operatorSource: 'selected' | 'fallback' | null = null;
+      if (tabletId) {
+        const svc = resolved.serviceKey;
+        let picked: any = null;
+        const sel = await dataSource.query(
+          `SELECT fc.id, fc.video_url AS "videoUrl", fc.source_type AS "sourceType",
+                  fc.tablet_duration_seconds AS "tabletDurationSeconds"
+           FROM store_tablet_operator_idle_selections s
+           JOIN signage_forced_content fc ON fc.id = s.forced_content_id
+           WHERE s.tablet_id = $1 AND s.cleared_at IS NULL
+             AND fc.service_key = $2 AND fc.is_active = true AND fc.deleted_at IS NULL
+             AND fc.target_surface IN ('tablet_idle','both')
+             AND NOW() BETWEEN fc.start_at AND fc.end_at
+           LIMIT 1`,
+          [tabletId, svc],
+        );
+        if (sel?.[0]) { picked = sel[0]; operatorSource = 'selected'; }
+        else {
+          const cands = await dataSource.query(
+            `SELECT fc.id, fc.video_url AS "videoUrl", fc.source_type AS "sourceType",
+                    fc.tablet_duration_seconds AS "tabletDurationSeconds"
+             FROM signage_forced_content fc
+             WHERE fc.service_key = $1 AND fc.is_active = true AND fc.deleted_at IS NULL
+               AND fc.target_surface IN ('tablet_idle','both')
+               AND NOW() BETWEEN fc.start_at AND fc.end_at
+             ORDER BY fc.id ASC`,
+            [svc],
+          );
+          if (cands.length > 0) {
+            const seed = `${tabletId}:${new Date().toISOString().slice(0, 10)}`;
+            let h = 0;
+            for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
+            picked = cands[h % cands.length];
+            operatorSource = 'fallback';
+          }
+        }
+        if (picked && (picked.sourceType === 'youtube' || picked.sourceType === 'vimeo')) {
+          const durationMs = picked.tabletDurationSeconds ? Number(picked.tabletDurationSeconds) * 1000 : 30000;
+          items = [
+            {
+              type: picked.sourceType,
+              url: picked.videoUrl,
+              durationMs,
+              // additive metadata (kiosk 는 type/url/durationMs 만 사용)
+              source: 'operator_common',
+              forcedContentId: picked.id,
+              isOperatorCommon: true,
+            },
+            ...items,
+          ];
+        }
+      }
+
       res.json({
         success: true,
         data: { items },
         // additive: 어느 태블릿 기준인지(디버그/후속). 기존 client 는 data.items 만 사용.
         tabletId,
         tabletSource: displaySource.source,
+        operatorCommonSource: operatorSource,
       });
     } catch (error: any) {
       console.error('[UnifiedStore] GET /:slug/tablet/idle error:', error);

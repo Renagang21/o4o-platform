@@ -86,6 +86,56 @@ async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
   return response.json();
 }
 
+// ==================== 운영자 공통 대기 영상 (WO-O4O-KPA-TABLET-OPERATOR-COMMON-IDLE-VIDEO-SELECTION-V1) ====================
+
+export interface OperatorCommonIdleCandidate {
+  id: string;
+  title: string;
+  videoUrl: string;
+  sourceType: 'youtube' | 'vimeo';
+  thumbnailUrl: string | null;
+  startAt: string;
+  endAt: string;
+  tabletDurationSeconds: number | null;
+  status: 'active' | 'upcoming' | 'expired';
+}
+
+export interface OperatorCommonIdleSelection {
+  id: string;
+  forcedContentId: string;
+  title: string;
+  sourceType: 'youtube' | 'vimeo';
+  thumbnailUrl: string | null;
+  startAt: string;
+  endAt: string;
+  status: 'active' | 'upcoming' | 'expired' | 'unavailable';
+}
+
+export async function fetchOperatorCommonIdleCandidates(): Promise<OperatorCommonIdleCandidate[]> {
+  const res = await request<{ success: boolean; data: OperatorCommonIdleCandidate[] }>(
+    `${BASE}/tablet-operator-common-idle-candidates`,
+  );
+  return res.data;
+}
+
+export async function fetchOperatorCommonIdleSelection(tabletId: string): Promise<OperatorCommonIdleSelection | null> {
+  const res = await request<{ success: boolean; data: OperatorCommonIdleSelection | null }>(
+    `${BASE}/tablets/${tabletId}/operator-common-idle-selection`,
+  );
+  return res.data;
+}
+
+export async function selectOperatorCommonIdle(tabletId: string, forcedContentId: string): Promise<void> {
+  await request(`${BASE}/tablets/${tabletId}/operator-common-idle-selection`, {
+    method: 'POST',
+    body: JSON.stringify({ forcedContentId }),
+  });
+}
+
+export async function clearOperatorCommonIdle(tabletId: string): Promise<void> {
+  await request(`${BASE}/tablets/${tabletId}/operator-common-idle-selection`, { method: 'DELETE' });
+}
+
 // ==================== Display Settings (WO-O4O-KPA-TABLET-DISPLAY-SETTINGS-V1) ====================
 
 export interface TabletDisplaySettings {

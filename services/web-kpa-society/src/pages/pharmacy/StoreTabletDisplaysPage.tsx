@@ -42,6 +42,13 @@ import {
   saveTabletIdlePlaylist,
   fetchTabletDisplaySettings,
   saveTabletDisplaySettings,
+  // WO-O4O-KPA-TABLET-OPERATOR-COMMON-IDLE-VIDEO-SELECTION-V1
+  fetchOperatorCommonIdleCandidates,
+  fetchOperatorCommonIdleSelection,
+  selectOperatorCommonIdle,
+  clearOperatorCommonIdle,
+  type OperatorCommonIdleCandidate,
+  type OperatorCommonIdleSelection,
 } from '../../api/tabletDisplays';
 import type { Tablet as TabletType, ProductPool, TabletDisplaySettings } from '../../api/tabletDisplays';
 import { DataTable, type Column, ActionBar } from '@o4o/ui';
@@ -163,6 +170,67 @@ export default function StoreTabletDisplaysPage() {
   const publicTabletUrl = (tabletId: string): string => {
     const base = (import.meta.env.VITE_KPA_WEB_ORIGIN as string | undefined) || window.location.origin;
     return `${base}/tablet/${encodeURIComponent(storeSlug ?? '')}?tabletId=${tabletId}`;
+  };
+
+  // WO-O4O-KPA-TABLET-OPERATOR-COMMON-IDLE-VIDEO-SELECTION-V1: 서비스 공통 대기 영상(태블릿별 1개 선택)
+  const [ocSelection, setOcSelection] = useState<OperatorCommonIdleSelection | null>(null);
+  const [ocModalOpen, setOcModalOpen] = useState(false);
+  const [ocCandidates, setOcCandidates] = useState<OperatorCommonIdleCandidate[]>([]);
+  const [ocLoading, setOcLoading] = useState(false);
+  const [ocBusy, setOcBusy] = useState(false);
+
+  useEffect(() => {
+    if (!selectedTabletId) { setOcSelection(null); return; }
+    let cancelled = false;
+    fetchOperatorCommonIdleSelection(selectedTabletId)
+      .then((s) => { if (!cancelled) setOcSelection(s); })
+      .catch(() => { if (!cancelled) setOcSelection(null); });
+    return () => { cancelled = true; };
+  }, [selectedTabletId]);
+
+  const openOcModal = useCallback(async () => {
+    setOcModalOpen(true);
+    setOcLoading(true);
+    try {
+      setOcCandidates(await fetchOperatorCommonIdleCandidates());
+    } catch {
+      setOcCandidates([]);
+    } finally {
+      setOcLoading(false);
+    }
+  }, []);
+
+  const handleOcSelect = useCallback(async (forcedContentId: string) => {
+    if (!selectedTabletId || ocBusy) return;
+    setOcBusy(true);
+    try {
+      await selectOperatorCommonIdle(selectedTabletId, forcedContentId);
+      setOcSelection(await fetchOperatorCommonIdleSelection(selectedTabletId));
+      setOcModalOpen(false);
+      setToast({ type: 'success', message: '서비스 공통 대기 영상이 선택되었습니다.' });
+    } catch (e: any) {
+      setToast({ type: 'error', message: e?.message || '선택에 실패했습니다.' });
+    } finally {
+      setOcBusy(false);
+    }
+  }, [selectedTabletId, ocBusy]);
+
+  const handleOcClear = useCallback(async () => {
+    if (!selectedTabletId || ocBusy) return;
+    setOcBusy(true);
+    try {
+      await clearOperatorCommonIdle(selectedTabletId);
+      setOcSelection(null);
+      setToast({ type: 'success', message: '선택이 해제되었습니다.' });
+    } catch (e: any) {
+      setToast({ type: 'error', message: e?.message || '해제에 실패했습니다.' });
+    } finally {
+      setOcBusy(false);
+    }
+  }, [selectedTabletId, ocBusy]);
+
+  const ocStatusLabel: Record<string, string> = {
+    active: '방영 중', upcoming: '방영 예정', expired: '기간 만료', unavailable: '사용 불가',
   };
 
   // 미리보기 전용 api: products 는 공개 조회, 상담은 실제 전송하지 않고 안내만.
@@ -877,6 +945,51 @@ export default function StoreTabletDisplaysPage() {
             </div>
           )}
 
+          {/* WO-O4O-KPA-TABLET-OPERATOR-COMMON-IDLE-VIDEO-SELECTION-V1: 서비스 공통 대기 영상(태블릿별 1개) */}
+          {selectedTabletId && (
+            <div className="bg-white rounded-2xl shadow-sm p-4 border border-slate-100">
+              <div className="flex items-center justify-between gap-2 mb-1">
+                <p className="text-sm font-semibold text-slate-700">서비스 공통 대기 영상</p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={openOcModal}
+                    disabled={ocBusy}
+                    className="px-3 py-1.5 text-xs font-medium text-white bg-teal-600 rounded-lg hover:bg-teal-700 disabled:opacity-50"
+                  >
+                    {ocSelection ? '다른 영상 선택' : '영상 선택'}
+                  </button>
+                  {ocSelection && (
+                    <button
+                      onClick={handleOcClear}
+                      disabled={ocBusy}
+                      className="px-3 py-1.5 text-xs font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50"
+                    >
+                      선택 해제
+                    </button>
+                  )}
+                </div>
+              </div>
+              <p className="text-[11px] text-slate-400 mb-2">
+                서비스 운영자가 제공한 영상 중 이 태블릿 대기화면에 사용할 영상을 1개 선택합니다. 영상 자체는 매장에서 수정할 수 없습니다.
+              </p>
+              {ocSelection ? (
+                <div className="text-xs text-slate-700 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                  <div className="font-medium">{ocSelection.title}</div>
+                  <div className="text-slate-500 mt-0.5">
+                    {ocSelection.sourceType.toUpperCase()} · 방영 {ocSelection.startAt.slice(0, 10)} ~ {ocSelection.endAt.slice(0, 10)} · 상태: {ocStatusLabel[ocSelection.status] ?? ocSelection.status}
+                  </div>
+                  {(ocSelection.status === 'expired' || ocSelection.status === 'unavailable') && (
+                    <div className="text-amber-600 mt-1">
+                      선택한 서비스 공통 영상의 방영 기간이 종료되었습니다. 현재 태블릿에는 사용 가능한 공통 영상이 자동 노출됩니다. 코너에 맞는 다른 공통 영상을 선택해 주세요.
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-xs text-slate-400">선택된 서비스 공통 영상이 없습니다. 사용 가능한 공통 영상이 있으면 자동으로 노출될 수 있습니다.</div>
+              )}
+            </div>
+          )}
+
           {/* Loading pool */}
           {loadingPool && (
             <div className="flex items-center justify-center py-12">
@@ -1270,6 +1383,46 @@ export default function StoreTabletDisplaysPage() {
               displaySettings={previewSettings}
               showQrBadge={previewSettings?.showQr !== false}
             />
+          </div>
+        </div>
+      )}
+
+      {/* WO-O4O-KPA-TABLET-OPERATOR-COMMON-IDLE-VIDEO-SELECTION-V1: 공통 영상 선택 모달 */}
+      {ocModalOpen && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 100000, background: 'rgba(15,23,42,0.5)' }} className="flex items-center justify-center p-4" onClick={() => setOcModalOpen(false)}>
+          <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
+            <div className="px-4 py-3 border-b flex items-center justify-between">
+              <h3 className="text-sm font-bold text-slate-700">서비스 공통 대기 영상 선택</h3>
+              <button onClick={() => setOcModalOpen(false)} className="text-slate-400 hover:text-slate-600 text-lg">×</button>
+            </div>
+            <div className="p-4 overflow-y-auto">
+              {ocLoading ? (
+                <div className="text-center py-8 text-sm text-slate-400">불러오는 중…</div>
+              ) : ocCandidates.filter(c => c.status !== 'expired').length === 0 ? (
+                <div className="text-center py-8 text-sm text-slate-400">현재 사용 가능한 서비스 공통 영상이 없습니다.</div>
+              ) : (
+                <ul className="divide-y">
+                  {ocCandidates.filter(c => c.status !== 'expired').map((c) => (
+                    <li key={c.id} className="flex items-center gap-3 py-2.5">
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm text-slate-900 truncate">{c.title}</div>
+                        <div className="text-[11px] text-slate-500">
+                          {c.sourceType.toUpperCase()} · 방영 {c.startAt.slice(0, 10)} ~ {c.endAt.slice(0, 10)} · {ocStatusLabel[c.status] ?? c.status}
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => handleOcSelect(c.id)}
+                        disabled={ocBusy}
+                        className="px-3 py-1.5 text-xs font-medium text-white bg-teal-600 rounded-lg hover:bg-teal-700 disabled:opacity-50 whitespace-nowrap"
+                      >
+                        선택
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <p className="text-[11px] text-slate-400 mt-3">영상 등록·수정·삭제·기간 변경은 서비스 운영자만 할 수 있습니다.</p>
+            </div>
           </div>
         </div>
       )}
