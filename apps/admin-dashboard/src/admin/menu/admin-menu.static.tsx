@@ -121,6 +121,37 @@ export const adminMenuStatic: MenuItem[] = [
     ],
   },
 
+  // ============================================
+  // O4O PRODUCT DB (공공/공통 기본 상품 DB — read-only)
+  // WO-O4O-ADMIN-PUBLIC-PRODUCT-DB-READONLY-SKELETON-V1
+  // ============================================
+  {
+    id: 'o4o-product-db',
+    label: 'O4O 상품 DB',
+    icon: <Database className="w-5 h-5" />,
+    roles: ['admin', 'super_admin'],
+    children: [
+      {
+        id: 'o4o-product-db-candidates',
+        label: '공공데이터 후보',
+        icon: <ClipboardList className="w-4 h-4" />,
+        path: '/admin/o4o-product-db/candidates',
+      },
+      {
+        id: 'o4o-product-db-masters',
+        label: '기본 상품',
+        icon: <Package className="w-4 h-4" />,
+        path: '/admin/o4o-product-db/masters',
+      },
+      {
+        id: 'o4o-product-db-maintenance',
+        label: '데이터 정비',
+        icon: <Settings className="w-4 h-4" />,
+        path: '/admin/o4o-product-db/maintenance',
+      },
+    ],
+  },
+
   // Content
   {
     id: 'content',

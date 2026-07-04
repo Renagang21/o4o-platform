@@ -61,6 +61,7 @@ import { YaksaRoutes } from '@/routes/yaksa.routes';
 import { AppRoutes } from '@/routes/apps.routes';
 import { LmsMarketingRoutes } from '@/routes/lms-marketing.routes';
 import { PlatformRoutes } from '@/routes/platform.routes';
+import { O4OProductDbRoutes } from '@/routes/o4o-product-db.routes';
 import { TestRoutes } from '@/routes/test.routes';
 
 // SSO 클라이언트 인스턴스 생성
@@ -198,6 +199,7 @@ function App() {
                     {AppRoutes()}
                     {LmsMarketingRoutes()}
                     {PlatformRoutes()}
+                    {O4OProductDbRoutes()}
                     {TestRoutes()}
 
                     {/* 404 핸들링 */}
