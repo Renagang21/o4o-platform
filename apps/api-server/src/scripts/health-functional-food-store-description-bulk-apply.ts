@@ -61,15 +61,15 @@ function parseArgs(argv: string[]): CliArgs {
 }
 
 /**
- * live 생성 능력 확인. standalone 에서는 미가용(§6.4 게이트 실패 사유 반환).
- * in-app 구현 시: AiPolicyExecutorService + HFF scope + GEMINI_API_KEY 확인으로 대체.
+ * live 생성 능력 확인.
+ * scope(HEALTH_FUNCTIONAL_FOOD_STORE_DESCRIPTION)는 코드 union + ai_llm_policies seed 로 정의됨.
+ * 그러나 standalone tsx 는 in-app AiPolicyExecutor(전체 app DataSource + ai_settings 키 + AIUsageLog write)
+ * 를 구성할 수 없어 live 생성 불가 → **배포 환경(Cloud Run Job / in-app job)에서 실행**해야 한다.
  */
 function resolveGenerationCapability(): { available: boolean; reason: string } {
   const reasons: string[] = [];
-  if (!process.env.GEMINI_API_KEY) reasons.push('GEMINI_API_KEY 미설정');
-  // HFF scope(ai_llm_policies) 미정의 + AiPolicyExecutor 는 live DataSource + AIUsageLog write 필요 → standalone 불가
-  reasons.push(`AiPolicyScope '${HFF_STORE_DESCRIPTION_AI_SCOPE}' 미정의(ai_llm_policies seed 필요)`);
-  reasons.push('AiPolicyExecutor 는 live DataSource + AIUsageLog write 필요(standalone 미지원)');
+  if (!process.env.GEMINI_API_KEY) reasons.push('GEMINI_API_KEY env 미설정(운영 키는 ai_settings/Secret — standalone 미접근)');
+  reasons.push('in-app AiPolicyExecutor(전체 app DataSource + AIUsageLog write) standalone 미구성 → 배포 환경(Cloud Run Job) 실행 필요');
   return { available: false, reason: reasons.join(' / ') };
 }
 

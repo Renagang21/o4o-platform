@@ -14,6 +14,8 @@ export type AiPolicyScope =
   | 'STORE_PRODUCT_INSIGHT'
   | 'PRODUCT_CONTENT'
   | 'CONTENT_TRANSLATION'
+  // WO-O4O-HEALTH-FUNCTIONAL-FOOD-STORE-DESCRIPTION-BULK-APPLY-EXECUTE-V1: 건기식 후보 매장 설명 생성
+  | 'HEALTH_FUNCTIONAL_FOOD_STORE_DESCRIPTION'
   | 'AI_PROXY';
 
 /** Scope → Service 매핑 (quota 계층 해결용) */
@@ -27,5 +29,7 @@ export const SERVICE_FOR_SCOPE: Record<AiPolicyScope, string> = {
   STORE_PRODUCT_INSIGHT: 'store',
   PRODUCT_CONTENT: 'store',
   CONTENT_TRANSLATION: 'store',
+  // 매장 내 소비자 설명 content → store/content 계층
+  HEALTH_FUNCTIONAL_FOOD_STORE_DESCRIPTION: 'store',
   AI_PROXY: 'proxy',
 };
