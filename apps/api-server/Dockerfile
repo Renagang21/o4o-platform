@@ -64,6 +64,9 @@ COPY dist/drug-seed-candidate-import-job.js.map ./dist/drug-seed-candidate-impor
 # - drug-seed-promotion-apply-job.js: candidate → ProductMaster/Identifier 승격 one-off Job entry
 COPY dist/drug-seed-promotion-apply-job.js ./dist/drug-seed-promotion-apply-job.js
 COPY dist/drug-seed-promotion-apply-job.js.map ./dist/drug-seed-promotion-apply-job.js.map
+# - easy-drug-seed-candidate-import-job.js: e약은요 JSONL → ProductCandidate 적재 one-off Job entry
+COPY dist/easy-drug-seed-candidate-import-job.js ./dist/easy-drug-seed-candidate-import-job.js
+COPY dist/easy-drug-seed-candidate-import-job.js.map ./dist/easy-drug-seed-candidate-import-job.js.map
 
 # Copy database folder for migrations
 # - migration-config.js: Lightweight DataSource for TypeORM CLI (fallback)
