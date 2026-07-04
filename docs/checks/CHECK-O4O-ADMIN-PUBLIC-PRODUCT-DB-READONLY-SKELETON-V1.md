@@ -107,23 +107,30 @@ typecheck 통과. 신규 파일 8개 / 수정 파일 2개, 기존 라우트·메
 
 ---
 
-## 7. 브라우저 smoke (배포 후 기록 예정)
+## 7. 브라우저 smoke — PASS
 
-> ⚠️ 미완 — 운영 배포 후 약국/운영자 계정으로 확인 필요.
+- 배포: `deploy-admin.yml` (push 자동 트리거, run `28701273192`) → 성공, 서비스 `o4o-admin-dashboard`.
+- 검증: Playwright, 계정 `sohae2100@gmail.com` (SSOT `docs/local/TEST-ACCOUNTS.local.md`, env 주입 — 자격증명 미노출).
+- 로그인 랜딩 = `/home`. 보호 라우트는 hard-reload 시 auth 재수화 전 `/login` 리다이렉트되므로(앱 전역 동작) **사이드바 in-app 클릭**으로 검증.
 
-| 항목 | 기대 |
-|---|---|
-| 사이드바 `O4O 상품 DB` | 표시 |
-| 공공데이터 후보 | 목록 접근, 건강기능식품 후보(44,885) 표시 여부 |
-| 후보 상세 rawPayload | 접기/펼치기 |
-| 기본 상품 | 검색/목록(ProductMaster 230,841) |
-| 기본 상품 상세 | 필드·식별자·이미지 |
-| 데이터 정비 | 준비중 화면 |
-| mutation | write 버튼 0 |
+| 항목 | 기대 | 실측 |
+|---|---|---|
+| 사이드바 `O4O 상품 DB` | 표시 | ✅ 표시 |
+| 공공데이터 후보 | 목록 접근 | ✅ 20행. `GET /api/v1/operator/product-candidates?all=true&page=1&limit=20` → **200**, total **378,119** |
+| 후보 상세 rawPayload | 접기/펼치기 | ✅ `:id` → 200, `<pre>` 렌더 |
+| 기본 상품 | 검색/목록 | ✅ 20행. `GET /api/v1/neture/products/library/search?page=1&limit=20` → **200**, total **230,843** |
+| 기본 상품 상세 | 필드·식별자·이미지 | ✅ `:id` → 200, 규제구분·바코드·이미지 표시 |
+| 데이터 정비 | 준비중 | ✅ |
+| mutation | write 호출 0 | ✅ POST/PUT/PATCH/DELETE **0** |
+| console / pageerror / API 4xx-5xx | 0 | ✅ 0 / 0 / 0 |
 
-### smoke 시 반드시 확인할 리스크 (보정 #4)
+스크린샷: 스크래치패드 `smoke-01~06-*.png`.
 
-후보 API 는 `platform:admin`/`platform:super_admin` (또는 service `:admin`/`:operator`) 역할을 요구한다. admin-dashboard 계정이 **bare `admin`/`super_admin` 만** 보유하면 `requireRole` 에서 403 가능. `all=true` 는 전송하나 platform-admin 스코프가 아니면 400/403 발생 → 후보 화면 실패 시 **계정의 실제 role 스코프**부터 확인.
+### 리스크 #4 (후보 API 스코프) — 미발동
+
+smoke 계정은 실제 role 에 **`platform:super_admin`** 포함(+ `neture:admin`/`neture:operator`). 따라서 `resolveOperatorScope` 가 platform-cross-service(`all=true`) 로 해석되어 후보 목록 200. bare `admin`/`super_admin` 만 가진 계정은 여전히 403/400 가능 — 그 경우는 UI 결함이 아니라 **계정 role/scope 이슈**로 분리 판단한다.
+
+> 참고: `masters` 목록은 초기 로드가 느려(230k, ILIKE 없음) 렌더 전 측정하면 로딩 행 1개로 보였다 — API 응답 대기 후 재측정 시 20행 정상. UI 버그 아님(로딩 상태 정상 동작).
 
 ---
 
