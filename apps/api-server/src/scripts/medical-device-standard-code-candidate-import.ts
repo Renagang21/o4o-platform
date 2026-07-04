@@ -79,6 +79,10 @@ async function main(): Promise<void> {
   if (needDb) {
     const { DataSource } = await import('typeorm');
     const host = process.env.DB_HOST;
+    // SSL: Cloud SQL public IP(TCP) 는 SSL 필수. Unix socket(/cloudsql/) 은 이미 암호화.
+    // 로컬 Cloud SQL Auth Proxy(127.0.0.1/localhost) 는 평문 리스너 → SSL 비활성(runbook 채널 a).
+    const isLocalProxy = host === '127.0.0.1' || host === 'localhost';
+    const useSsl = !!host && !host.startsWith('/cloudsql/') && !isLocalProxy;
     dataSource = new DataSource({
       type: 'postgres',
       host,
@@ -89,7 +93,7 @@ async function main(): Promise<void> {
       entities: [],
       synchronize: false,
       logging: ['error'],
-      ...(host && !host.startsWith('/cloudsql/') ? { ssl: { rejectUnauthorized: false } } : {}),
+      ...(useSsl ? { ssl: { rejectUnauthorized: false } } : {}),
     });
     await dataSource.initialize();
   }

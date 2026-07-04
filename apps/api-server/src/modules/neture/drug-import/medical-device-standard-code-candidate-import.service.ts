@@ -243,127 +243,165 @@ export class MedicalDeviceStandardCodeCandidateImportService {
     mapped: MappedMedicalDeviceCandidate[],
     report: MedicalDeviceImportReport,
   ): Promise<void> {
+    const existing = await this.fetchExistingSignatures(ds);
     const seen = new Set<string>();
     for (const m of mapped) {
-      const key = this.dedupKeyOf(m);
+      const key = m.dedupKey.rowSignature;
       if (seen.has(key)) {
         report.counts.skipped += 1;
         continue;
       }
       seen.add(key);
-      const exists = await this.findExisting(ds, m);
-      if (exists) report.counts.updatedExpected += 1;
+      if (existing.has(key)) report.counts.updatedExpected += 1;
       else report.counts.createdExpected += 1;
     }
   }
 
-  private async findExisting(
-    ds: DataSource,
-    m: MappedMedicalDeviceCandidate,
-  ): Promise<{ id: string } | null> {
-    const rows: Array<{ id: string }> = await ds.query(
-      `SELECT id FROM product_candidates
+  /** 이 sourceKind 의 기존 rowSignature 집합을 1회 조회(행별 SELECT 회피 → 견고·고속). */
+  private async fetchExistingSignatures(ds: DataSource): Promise<Set<string>> {
+    const rows: Array<{ sig: string | null }> = await ds.query(
+      `SELECT raw_payload->>'sourceRowSignature' AS sig
+         FROM product_candidates
         WHERE source_type = 'external_api'
           AND source_label = $1
           AND raw_payload->>'sourceKind' = $2
-          AND raw_payload->>'sourceRowSignature' = $3
-          AND deleted_at IS NULL
-        LIMIT 1`,
-      [MDS_SOURCE_LABEL, MDS_SOURCE_KIND, m.dedupKey.rowSignature],
+          AND deleted_at IS NULL`,
+      [MDS_SOURCE_LABEL, MDS_SOURCE_KIND],
     );
-    return rows[0] ?? null;
+    const s = new Set<string>();
+    for (const r of rows) if (r.sig) s.add(r.sig);
+    return s;
   }
 
   /**
    * --apply: 실제 DB write (product_candidates INSERT/UPDATE only).
-   * ⚠️ 이 WO 에서는 프로덕션 DB 에 실행하지 않는다(안전 경계). 구현만 둔다.
+   * 단일 트랜잭션 + 다중행 배치 INSERT (40k 순차 왕복 회피 → 연결 취약성 해소).
+   * ⚠️ 프로덕션 실행은 사용자 "의료기기 apply 승인" + env gate(MEDICAL_DEVICE_IMPORT_ALLOW_APPLY) 후에만.
    */
   private async applyRows(
     ds: DataSource,
     mapped: MappedMedicalDeviceCandidate[],
     report: MedicalDeviceImportReport,
   ): Promise<void> {
+    const existing = await this.fetchExistingSignatures(ds);
     const seen = new Set<string>();
+    const toInsert: MappedMedicalDeviceCandidate[] = [];
+    const toUpdate: MappedMedicalDeviceCandidate[] = [];
     for (const m of mapped) {
-      const key = this.dedupKeyOf(m);
+      const key = m.dedupKey.rowSignature;
       if (seen.has(key)) {
         report.counts.skipped += 1;
         continue;
       }
       seen.add(key);
-      const ci = m.candidateInput;
-      try {
-        const existing = await this.findExisting(ds, m);
-        if (existing) {
-          await ds.query(
-            `UPDATE product_candidates
-               SET match_status = $2,
-                   identifier_type = $3,
-                   identifier_value = $4,
-                   normalized_identifier_value = $5,
-                   candidate_name = $6,
-                   candidate_manufacturer = $7,
-                   candidate_category = $8,
-                   candidate_spec = $9,
-                   candidate_unit = $10,
-                   candidate_image_url = $11,
-                   raw_payload = $12::jsonb,
-                   source_label = $13,
-                   updated_at = NOW()
-             WHERE id = $1`,
-            [
-              existing.id,
-              ci.matchStatus,
-              ci.identifierType,
-              ci.identifierValue,
-              ci.normalizedIdentifierValue,
-              ci.candidateName,
-              ci.candidateManufacturer,
-              ci.candidateCategory,
-              ci.candidateSpec,
-              ci.candidateUnit,
-              ci.candidateImageUrl,
-              JSON.stringify(ci.rawPayload),
-              ci.sourceLabel,
-            ],
+      if (existing.has(key)) toUpdate.push(m);
+      else toInsert.push(m);
+    }
+
+    const qr = ds.createQueryRunner();
+    await qr.connect();
+    await qr.startTransaction();
+    try {
+      const BATCH = 500;
+      for (let i = 0; i < toInsert.length; i += BATCH) {
+        const batch = toInsert.slice(i, i + BATCH);
+        const valuesSql: string[] = [];
+        const params: unknown[] = [];
+        let p = 0;
+        for (const m of batch) {
+          const ci = m.candidateInput;
+          const ph = [
+            'gen_random_uuid()',
+            `$${++p}`, // service_key
+            `'external_api'`,
+            `$${++p}`, // source_label
+            `'pending'`,
+            `$${++p}`, // match_status
+            `$${++p}`, // identifier_type
+            `$${++p}`, // identifier_value
+            `$${++p}`, // normalized_identifier_value
+            `$${++p}`, // candidate_name
+            `$${++p}`, // candidate_manufacturer
+            `$${++p}`, // candidate_category
+            `$${++p}`, // candidate_spec
+            `$${++p}`, // candidate_unit
+            `$${++p}`, // candidate_image_url
+            `$${++p}::jsonb`, // raw_payload
+            'NOW()',
+            'NOW()',
+          ];
+          params.push(
+            ci.serviceKey,
+            ci.sourceLabel,
+            ci.matchStatus,
+            ci.identifierType,
+            ci.identifierValue,
+            ci.normalizedIdentifierValue,
+            ci.candidateName,
+            ci.candidateManufacturer,
+            ci.candidateCategory,
+            ci.candidateSpec,
+            ci.candidateUnit,
+            ci.candidateImageUrl,
+            JSON.stringify(ci.rawPayload),
           );
-          report.counts.updatedExpected += 1;
-        } else {
-          await ds.query(
-            `INSERT INTO product_candidates
-               (id, service_key, source_type, source_label, candidate_status, match_status,
-                identifier_type, identifier_value, normalized_identifier_value,
-                candidate_name, candidate_manufacturer, candidate_category,
-                candidate_spec, candidate_unit, candidate_image_url,
-                raw_payload, created_at, updated_at)
-             VALUES
-               (gen_random_uuid(), $1, 'external_api', $2, 'pending', $3,
-                $4, $5, $6,
-                $7, $8, $9,
-                $10, $11, $12,
-                $13::jsonb, NOW(), NOW())`,
-            [
-              ci.serviceKey,
-              ci.sourceLabel,
-              ci.matchStatus,
-              ci.identifierType,
-              ci.identifierValue,
-              ci.normalizedIdentifierValue,
-              ci.candidateName,
-              ci.candidateManufacturer,
-              ci.candidateCategory,
-              ci.candidateSpec,
-              ci.candidateUnit,
-              ci.candidateImageUrl,
-              JSON.stringify(ci.rawPayload),
-            ],
-          );
-          report.counts.createdExpected += 1;
+          valuesSql.push(`(${ph.join(',')})`);
         }
-      } catch (e) {
-        report.errors.push({ lineNumber: null, reason: `APPLY_ERROR: ${(e as Error).message}` });
-        report.counts.errored += 1;
+        await qr.query(
+          `INSERT INTO product_candidates
+             (id, service_key, source_type, source_label, candidate_status, match_status,
+              identifier_type, identifier_value, normalized_identifier_value,
+              candidate_name, candidate_manufacturer, candidate_category,
+              candidate_spec, candidate_unit, candidate_image_url,
+              raw_payload, created_at, updated_at)
+           VALUES ${valuesSql.join(',')}`,
+          params,
+        );
+        report.counts.createdExpected += batch.length;
       }
+
+      for (const m of toUpdate) {
+        const ci = m.candidateInput;
+        await qr.query(
+          `UPDATE product_candidates
+             SET match_status = $2, identifier_type = $3, identifier_value = $4,
+                 normalized_identifier_value = $5, candidate_name = $6,
+                 candidate_manufacturer = $7, candidate_category = $8, candidate_spec = $9,
+                 candidate_unit = $10, candidate_image_url = $11, raw_payload = $12::jsonb,
+                 source_label = $13, updated_at = NOW()
+           WHERE source_type = 'external_api' AND source_label = $13
+             AND raw_payload->>'sourceKind' = $14
+             AND raw_payload->>'sourceRowSignature' = $1
+             AND deleted_at IS NULL`,
+          [
+            m.dedupKey.rowSignature,
+            ci.matchStatus,
+            ci.identifierType,
+            ci.identifierValue,
+            ci.normalizedIdentifierValue,
+            ci.candidateName,
+            ci.candidateManufacturer,
+            ci.candidateCategory,
+            ci.candidateSpec,
+            ci.candidateUnit,
+            ci.candidateImageUrl,
+            JSON.stringify(ci.rawPayload),
+            ci.sourceLabel,
+            MDS_SOURCE_KIND,
+          ],
+        );
+        report.counts.updatedExpected += 1;
+      }
+
+      await qr.commitTransaction();
+    } catch (e) {
+      await qr.rollbackTransaction();
+      report.errors.push({ lineNumber: null, reason: `APPLY_ERROR: ${(e as Error).message}` });
+      report.counts.errored += toInsert.length + toUpdate.length;
+      report.counts.createdExpected = 0;
+      report.counts.updatedExpected = 0;
+    } finally {
+      await qr.release();
     }
   }
 }
