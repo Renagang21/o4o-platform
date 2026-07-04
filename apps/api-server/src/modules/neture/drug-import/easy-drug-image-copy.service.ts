@@ -27,6 +27,12 @@ import { ImageStorageService } from '../services/image-storage.service.js';
 
 export const EASY_DRUG_SOURCE_KIND = 'easy_drug_info';
 const FETCH_TIMEOUT_MS = 30000;
+/** 429/5xx backoff 대기(ms) — 시도별. nedrug.mfds.go.kr rate-limit 회피. */
+const BACKOFF_MS = [2000, 5000, 12000];
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 interface WorkItem {
   candidate_id: string;
@@ -40,6 +46,7 @@ export interface ImageCopyOptions {
   apply: boolean;
   limit?: number | null;
   concurrency?: number;
+  interChunkDelayMs?: number;
   nowIso: string; // 호출자(Job)가 주입 — 서비스는 시간 소스 없음
 }
 
@@ -97,9 +104,14 @@ export class EasyDrugImageCopyService {
     );
   }
 
-  /** 외부 이미지 fetch (1회 재시도). 성공 시 {buffer, mime}. 실패/비이미지 → null + reason */
+  /**
+   * 외부 이미지 fetch. rate-limit(429)·5xx 는 backoff 재시도(최대 4시도), 그 외는 1회 재시도.
+   * 성공 시 {buffer, mime}. 실패/비이미지 → {error}.
+   */
   private async fetchImage(url: string): Promise<{ buffer: Buffer; mime: string } | { error: string }> {
-    for (let attempt = 0; attempt < 2; attempt++) {
+    const maxAttempts = 4;
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      const last = attempt === maxAttempts - 1;
       try {
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
@@ -109,23 +121,26 @@ export class EasyDrugImageCopyService {
         } finally {
           clearTimeout(timer);
         }
-        if (!res.ok) {
-          if (attempt === 1) return { error: `HTTP_${res.status}` };
+        if (res.status === 429 || res.status >= 500) {
+          // rate-limit/서버오류 → backoff 후 재시도
+          if (last) return { error: `HTTP_${res.status}` };
+          await sleep(BACKOFF_MS[Math.min(attempt, BACKOFF_MS.length - 1)]);
           continue;
         }
+        if (!res.ok) return { error: `HTTP_${res.status}` }; // 404 등 영구 실패 — 재시도 무의미
         const mime = (res.headers.get('content-type') || '').split(';')[0].trim().toLowerCase();
-        if (!mime.startsWith('image/')) {
-          return { error: `NOT_IMAGE(${mime || 'unknown'})` };
-        }
+        if (!mime.startsWith('image/')) return { error: `NOT_IMAGE(${mime || 'unknown'})` };
         const arr = await res.arrayBuffer();
         const buffer = Buffer.from(arr);
         if (buffer.length === 0) {
-          if (attempt === 1) return { error: 'EMPTY_BODY' };
+          if (last) return { error: 'EMPTY_BODY' };
+          await sleep(BACKOFF_MS[Math.min(attempt, BACKOFF_MS.length - 1)]);
           continue;
         }
         return { buffer, mime };
       } catch (e) {
-        if (attempt === 1) return { error: `FETCH_ERR:${(e as Error).message}` };
+        if (last) return { error: `FETCH_ERR:${(e as Error).message}` };
+        await sleep(BACKOFF_MS[Math.min(attempt, BACKOFF_MS.length - 1)]);
       }
     }
     return { error: 'FETCH_ERR:unreachable' };
@@ -219,11 +234,13 @@ export class EasyDrugImageCopyService {
       return report;
     }
 
-    // 동시성 제한 배치 처리 (I/O bound: fetch + GCS)
-    const concurrency = Math.max(1, opts.concurrency ?? 16);
+    // 동시성 제한 배치 처리 (I/O bound: fetch + GCS). nedrug.mfds.go.kr rate-limit 회피 위해 보수적.
+    const concurrency = Math.max(1, opts.concurrency ?? 4);
+    const interChunkDelayMs = opts.interChunkDelayMs ?? 300;
     for (let i = 0; i < items.length; i += concurrency) {
       const chunk = items.slice(i, i + concurrency);
       await Promise.all(chunk.map((it) => this.processOne(it, report, opts.nowIso)));
+      if (interChunkDelayMs > 0 && i + concurrency < items.length) await sleep(interChunkDelayMs);
     }
     return report;
   }

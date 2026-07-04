@@ -73,8 +73,10 @@ async function main(): Promise<void> {
   const limitRaw = process.env.EASY_DRUG_IMG_LIMIT;
   const limit = limitRaw != null && limitRaw !== '' ? parseInt(limitRaw, 10) : null;
   const concRaw = process.env.EASY_DRUG_IMG_CONCURRENCY;
-  const concurrency = concRaw != null && concRaw !== '' ? parseInt(concRaw, 10) : 16;
-  log.info(`mode = ${apply ? 'APPLY (GCS copy + ProductImage + thumbnail)' : 'dry-run (read-only)'} | limit=${limit ?? 'none'} concurrency=${concurrency}`);
+  const concurrency = concRaw != null && concRaw !== '' ? parseInt(concRaw, 10) : 4;
+  const delayRaw = process.env.EASY_DRUG_IMG_DELAY_MS;
+  const interChunkDelayMs = delayRaw != null && delayRaw !== '' ? parseInt(delayRaw, 10) : 300;
+  log.info(`mode = ${apply ? 'APPLY (GCS copy + ProductImage + thumbnail)' : 'dry-run (read-only)'} | limit=${limit ?? 'none'} concurrency=${concurrency} delayMs=${interChunkDelayMs}`);
 
   const ds = createDataSource();
   await ds.initialize();
@@ -83,7 +85,7 @@ async function main(): Promise<void> {
   try {
     const start = Date.now();
     const service = new EasyDrugImageCopyService(ds);
-    const report = await service.run({ apply, limit, concurrency, nowIso: new Date().toISOString() });
+    const report = await service.run({ apply, limit, concurrency, interChunkDelayMs, nowIso: new Date().toISOString() });
     const sec = Math.round((Date.now() - start) / 1000);
 
     log.info('─'.repeat(50));
