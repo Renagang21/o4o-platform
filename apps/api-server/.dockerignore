@@ -25,6 +25,8 @@
 !dist/easy-drug-shared-description-derive-job.js.map
 !dist/drug-representative-grouping-job.js
 !dist/drug-representative-grouping-job.js.map
+!dist/easy-drug-image-copy-job.js
+!dist/easy-drug-image-copy-job.js.map
 
 # Allow migrations for TypeORM auto-migration on startup
 !dist/database

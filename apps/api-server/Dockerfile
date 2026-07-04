@@ -73,6 +73,9 @@ COPY dist/easy-drug-shared-description-derive-job.js.map ./dist/easy-drug-shared
 # - drug-representative-grouping-job.js: MFDS_CODE 기준 representative_products 생성+연결 one-off Job entry
 COPY dist/drug-representative-grouping-job.js ./dist/drug-representative-grouping-job.js
 COPY dist/drug-representative-grouping-job.js.map ./dist/drug-representative-grouping-job.js.map
+# - easy-drug-image-copy-job.js: e약은요 외부이미지 → GCS 사본 → ProductImage → 대표 thumbnail one-off Job entry
+COPY dist/easy-drug-image-copy-job.js ./dist/easy-drug-image-copy-job.js
+COPY dist/easy-drug-image-copy-job.js.map ./dist/easy-drug-image-copy-job.js.map
 
 # Copy database folder for migrations
 # - migration-config.js: Lightweight DataSource for TypeORM CLI (fallback)
