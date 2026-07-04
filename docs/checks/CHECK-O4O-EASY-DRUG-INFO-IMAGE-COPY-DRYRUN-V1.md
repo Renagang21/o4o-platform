@@ -134,4 +134,46 @@ GCS object                                (products/{masterId}/thumbnail/{uuid}.
 
 ---
 
-**작성**: O4O Platform 조사 CHECK · 2026-07-04 · read-only(1단계). apply 는 §8 게이트 B 승인 후. serviceKey·비밀 미출력.
+**작성**: O4O Platform 조사 CHECK · 2026-07-04 · 1단계 read-only(§1~§10) → Gate A/B apply 완료(§11~§12). serviceKey·비밀 미출력.
+
+---
+
+## 11. Gate A 실행 로그 (2026-07-04) — 구현 + dry-run
+
+> 채널: Cloud Run Job `o4o-easy-drug-image-copy`. 서비스 `easy-drug-image-copy.service.ts`(fetch+GCS ImageStorageService+ProductImage INSERT+representative thumbnail/metadata UPDATE) + Job entry(commit `f851cf32d`). raw ds.query(entities:[]).
+
+| 항목 | 값 |
+|---|---|
+| dry-run (exec tvrdc, 13s) | candidatesWithImage 2,789 / workItems 2,789 / wouldCopy 2,789 / skippedNoAnchor 0 / errored 0 |
+
+**→ §3·§7 실측과 일치.** write 0.
+
+---
+
+## 12. Gate B 실행 로그 (2026-07-04) — **apply 완료 (WO 종결)**
+
+| 항목 | 값 |
+|---|---|
+| 사전 백업 | ✅ id **1783156940641** (SUCCESSFUL, `pre-easy-drug-image-copy-20260704`) |
+| APPLY 이중가드 | `EASY_DRUG_IMG_APPLY=true` + `DRUG_IMPORT_ALLOW_APPLY=I_UNDERSTAND` |
+| 1차 apply (exec 2fz2m) | copied **124** / skippedFetchFailed **2,665**(전량 HTTP_429) / errored 0 — **rate-limit** |
+| 스로틀 개선 (commit `7f6f43cb4`) | 429/5xx backoff(2s/5s/12s, 최대 4시도), 404 즉시 실패, 동시성 16→**4**, 청크간 300ms |
+| 2차 apply (exec 87rpb, 404s, 멱등) | workItems **2,665** / copied **2,665** / errored **0** |
+| **누계** | **2,789 / 2,789 (100%)** |
+
+**검증 SQL (read-only, 사용자 기준):**
+
+| 기준 | 결과 | 판정 |
+|---|---:|:---:|
+| ProductImage(thumbnail) created | **2,789** | ✅ |
+| GCS path 중복 | **0** (distinct 2,789) | ✅ |
+| representative thumbnail linked | **2,789** | ✅ |
+| itemSeq(이미지) 성공 / 미연결 | 2,789 / **0** | ✅ 100% |
+| metadata.thumbnailSource 기록 | **2,789** (selectionPolicy=min_master_id) | ✅ |
+| HIRA master / Identifier / Description / Candidate | 230,841 / 703,483 / 19,431 / 4,757 **불변** | ✅ 미생성 |
+
+**교훈(429 rate-limit)**: 외부 공공 이미지 서버(nedrug.mfds.go.kr)는 동시성 16 에서 즉시 429. **backoff + 저동시성(4) + 청크 지연**으로 2차 재실행 시 전량 성공. 멱등(thumbnail_image_id NULL 만 처리) 덕에 1차 성공분 124 는 재처리 없이 잔여만 복구.
+
+**→ Gate B 완료. WO 종결.** e약은요 이미지 보유 품목 2,789 의 대표상품에 GCS 사본 썸네일(`products/{masterId}/thumbnail/`) + provenance 연결. 이미지 없는 itemSeq(1,968)는 DB placeholder 미생성(UI 시점 처리 — 설계 §8 원칙).
+
+**후속(별도 WO)**: (1) 이미지 없는 대표 UI placeholder. (2) 다제조사/multiName/dupName 대표 큐레이션. (3) SharedProductDescription canonical 승격.
