@@ -240,6 +240,7 @@ import {
   MobileProductDraft, // WO-O4O-MOBILE-PRODUCT-DRAFT-TO-CANDIDATE-V1
   ProductDrugExtension, // WO-O4O-PRODUCT-DRUG-EXTENSION-PERSISTENCE-V1
   SharedProductDescription, // WO-O4O-PRODUCT-DESCRIPTION-SHARED-CANDIDATE-STORAGE-V1
+  ProductCandidateDescriptionDraft, // WO-O4O-HEALTH-FUNCTIONAL-FOOD-STORE-DESCRIPTION-BULK-APPLY-V1
   ProductCategory,
   Brand,
   SupplierProductOffer,
@@ -730,6 +731,7 @@ export const entities = [
   MobileProductDraft, // WO-O4O-MOBILE-PRODUCT-DRAFT-TO-CANDIDATE-V1
   ProductDrugExtension, // WO-O4O-PRODUCT-DRUG-EXTENSION-PERSISTENCE-V1
   SharedProductDescription, // WO-O4O-PRODUCT-DESCRIPTION-SHARED-CANDIDATE-STORAGE-V1
+  ProductCandidateDescriptionDraft, // WO-O4O-HEALTH-FUNCTIONAL-FOOD-STORE-DESCRIPTION-BULK-APPLY-V1
   ProductCategory,
   Brand,
   SupplierProductOffer,

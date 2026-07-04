@@ -54,6 +54,14 @@ export {
   type SharedProductDescriptionSourceType,
   type SharedProductDescriptionStatus,
 } from './SharedProductDescription.entity.js';
+// WO-O4O-HEALTH-FUNCTIONAL-FOOD-STORE-DESCRIPTION-BULK-APPLY-V1: 후보 기반 AI 설명 draft
+export {
+  ProductCandidateDescriptionDraft,
+  PRODUCT_CANDIDATE_DESCRIPTION_DRAFT_TYPES,
+  PRODUCT_CANDIDATE_DESCRIPTION_REVIEW_STATUSES,
+  type ProductCandidateDescriptionDraftType,
+  type ProductCandidateDescriptionReviewStatus,
+} from './ProductCandidateDescriptionDraft.entity.js';
 export { ProductCategory } from './ProductCategory.entity.js';
 export { Brand } from './Brand.entity.js';
 export { SupplierProductOffer, OfferDistributionType, OfferApprovalStatus } from './SupplierProductOffer.entity.js';
