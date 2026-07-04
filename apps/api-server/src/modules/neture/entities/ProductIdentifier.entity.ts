@@ -46,6 +46,7 @@ import type { ProductMaster } from './ProductMaster.entity.js';
  * - KOREA_INSURANCE_CODE : 보험코드 (PharmaProductMaster.insuranceCode 대응)
  * - ATC_CODE           : ATC 분류코드 (PharmaProductMaster.atcCode 대응)
  * - MFDS_CODE          : 식약처 코드
+ * - UDI_DI             : 의료기기 UDI-DI (GTIN형·HIBCC형 공존. 원형 보존 — WO-O4O-MEDICAL-DEVICE-UDI-DI-IDENTIFIER-TYPE-IMPLEMENTATION-V1)
  * - UNKNOWN            : 미분류
  */
 export type ProductIdentifierType =
@@ -61,6 +62,7 @@ export type ProductIdentifierType =
   | 'KOREA_INSURANCE_CODE'
   | 'ATC_CODE'
   | 'MFDS_CODE'
+  | 'UDI_DI'
   | 'UNKNOWN';
 
 export const PRODUCT_IDENTIFIER_TYPES: ProductIdentifierType[] = [
@@ -76,6 +78,7 @@ export const PRODUCT_IDENTIFIER_TYPES: ProductIdentifierType[] = [
   'KOREA_INSURANCE_CODE',
   'ATC_CODE',
   'MFDS_CODE',
+  'UDI_DI',
   'UNKNOWN',
 ];
 
