@@ -125,11 +125,11 @@
 | **Gate A** (구현+dry-run) | 그룹핑 서비스+Job 구현(raw batch) → dry-run 수치 확정 | 0 | ⏸ 승인 후 |
 | **Gate B** (apply) | representative_products 64,672 INSERT + product_masters 230,841 UPDATE(link) | 대량 | ⏸ **별도 승인 + 사전 백업** |
 
-**미결 결정 (사용자):**
-1. **생성 범위**: (A) 전 품목 64,672 (권장) vs (B) multi-master 61,113.
-2. **display_name 충돌 처리**: (i) 중복 허용+flag vs (ii) 충돌 144그룹 mfdsCode 접미(권장).
-3. **대표명 선택 규칙**: `min(name)`(결정적, 권장) vs 최단명 vs 최빈명.
-4. **apply 채널**: Cloud Run Job 신설(drug-seed 패턴, 권장) vs local tsx+authorized-network.
+**확정 결정 (사용자, 2026-07-04):**
+1. **생성 범위**: **(A) 전 품목 64,672** — single-master 3,559 포함, 품목 축 완결.
+2. **display_name 충돌 처리**: **충돌 144그룹에만 `"{name} ({mfdsCode})"` 접미** + `reviewFlags.duplicateDisplayName=true`. 나머지 64,528 원명.
+3. **대표명 선택 규칙**: **`min(name)` 결정적** + multi-name 5,298 은 `reviewFlags.multiName=true`.
+4. **apply 채널**: **Cloud Run Job 신설** (drug-seed/easy-drug 패턴 미러). 사전 백업 + 이중가드 + batch.
 
 ---
 

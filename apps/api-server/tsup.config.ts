@@ -52,7 +52,7 @@ const jsToTsPlugin: Plugin = {
 export default defineConfig({
   // Bundle main.ts (API server), migrate.ts (migration CLI), and one-off seed jobs
   // Separate entry points - Service vs Job in Cloud Run
-  entry: ['src/main.ts', 'src/migrate.ts', 'src/drug-seed-candidate-import-job.ts', 'src/drug-seed-promotion-apply-job.ts', 'src/easy-drug-seed-candidate-import-job.ts', 'src/easy-drug-shared-description-derive-job.ts'],
+  entry: ['src/main.ts', 'src/migrate.ts', 'src/drug-seed-candidate-import-job.ts', 'src/drug-seed-promotion-apply-job.ts', 'src/easy-drug-seed-candidate-import-job.ts', 'src/easy-drug-shared-description-derive-job.ts', 'src/drug-representative-grouping-job.ts'],
   format: ['esm'],
   target: 'node22',
   platform: 'node',

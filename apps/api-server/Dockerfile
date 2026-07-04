@@ -70,6 +70,9 @@ COPY dist/easy-drug-seed-candidate-import-job.js.map ./dist/easy-drug-seed-candi
 # - easy-drug-shared-description-derive-job.js: e약은요 candidate → master별 SharedProductDescription 파생 one-off Job entry
 COPY dist/easy-drug-shared-description-derive-job.js ./dist/easy-drug-shared-description-derive-job.js
 COPY dist/easy-drug-shared-description-derive-job.js.map ./dist/easy-drug-shared-description-derive-job.js.map
+# - drug-representative-grouping-job.js: MFDS_CODE 기준 representative_products 생성+연결 one-off Job entry
+COPY dist/drug-representative-grouping-job.js ./dist/drug-representative-grouping-job.js
+COPY dist/drug-representative-grouping-job.js.map ./dist/drug-representative-grouping-job.js.map
 
 # Copy database folder for migrations
 # - migration-config.js: Lightweight DataSource for TypeORM CLI (fallback)
