@@ -57,6 +57,31 @@ write 대상 테이블: **`product_candidates` 단 하나.** INSERT (기존 없�
 
 ---
 
+## 2-A. 실측 baseline (pre-snapshot, 2026-07-04)
+
+> 채널: `gcloud sql instances patch` 로 authorized-network **임시 추가(기존 `124.194.156.36/32` 보존) → psql read-only → 즉시 원복**. 전부 SELECT. DB write 0 / apply 0. DB secret 미출력.
+
+| 지표 | 측정값 | apply 후 기대 |
+|---|---:|---|
+| **B. 기존 `MFDS_QUASI_DRUG_PERMIT` count** | **0** | 22,953 (전량 신규) |
+| A. product_candidates 전체 | 355,166 | 378,119 (=355,166+22,953) |
+| **G. product_masters** | **230,843** | **230,843 (불변)** |
+| **G. product_identifiers** | **703,483** | **703,483 (불변)** |
+| (참조) easy_drug candidates (`sourceKind='easy_drug_info'`) | 4,757 | 4,757 (불변 — 트랙 격리 확인용) |
+
+**해석:**
+- 기존 의약외품 후보 **0건** → apply 예상 = **created 22,953 / updated 0** (offline dry-run 과 일치). `--use-db` dry-run 없이도 B=0 이 이를 확정.
+- `product_masters` 230,843 / `product_identifiers` 703,483 는 apply 후 **불변**이어야 한다(candidate-only write 증명).
+- `easy_drug` 4,757 은 `sourceKind` 격리로 의약외품 적재와 무관 — apply·rollback 이 타 트랙에 영향 없음을 재확인.
+
+**정합 확인:**
+- `identifier_type=MFDS_CODE` / `identifier_value=normalized=trim(ITEM_SEQ)` — mapper·ProductIdentifier union·선례(easy-drug/HIRA)·CHECK §5 결정과 일치. `MFDS_ITEM_SEQ` 미사용(중앙 리뷰 보류). 정정 불필요.
+- 방화벽: 임시 오픈 후 **원복 완료**(`124.194.156.36/32` 만 잔존).
+
+> caveat(후속 매칭 WO): `MFDS_CODE` 는 의약품/e약은요와 공유 네임스페이스 → candidate→master 자동매칭 시 `sourceKind` 스코프 필수. apply 자체는 매칭 없음(전량 pending/unmatched)이라 무관.
+
+---
+
 ## 3. 실행 명령
 
 ### 3-1. offline dry-run (DB 무관, 언제든 안전)
