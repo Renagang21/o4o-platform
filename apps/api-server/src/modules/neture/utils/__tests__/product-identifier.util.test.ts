@@ -3,8 +3,9 @@
  *
  * UDI_DI identifier type normalize 규칙 검증. 실 DB 불필요.
  * - GTIN형 UDI-DI(숫자 13/14): 원형 숫자 보존
- * - HIBCC형 UDI-DI('+' prefix): '+'/문자 보존 + 대문자화
+ * - HIBCC형 UDI-DI('+' prefix): '+'/문자/하이픈·점 원형 보존, 대문자화 안 함
  * - 기존 GTIN/코드류 normalize 회귀 없음
+ * WO-O4O-MEDICAL-DEVICE-UDI-DI-IDENTIFIER-TYPE-IMPLEMENTATION-V1
  */
 import { normalizeIdentifier } from '../product-identifier.util.js';
 import { PRODUCT_IDENTIFIER_TYPES } from '../../entities/ProductIdentifier.entity.js';
@@ -24,13 +25,17 @@ describe('normalizeIdentifier — UDI_DI (원형 보존)', () => {
     expect(normalizeIdentifier('UDI_DI', '8806485001234')).toBe('8806485001234');
   });
 
-  it("HIBCC형 UDI-DI 는 '+' prefix 와 문자를 보존하고 대문자화한다", () => {
-    expect(normalizeIdentifier('UDI_DI', '+J022abc01')).toBe('+J022ABC01');
+  it("HIBCC형 UDI-DI 는 '+' prefix·문자·하이픈·점을 원형 그대로 보존한다 (대문자화 안 함)", () => {
+    // 대소문자 원형 보존 — 대문자화 금지 (dedup 키 오병합 방지)
+    expect(normalizeIdentifier('UDI_DI', '+J022abc01')).toBe('+J022abc01');
     // '+' 는 제거되지 않는다
-    expect(normalizeIdentifier('UDI_DI', '+E2xy')).toBe('+E2XY');
+    expect(normalizeIdentifier('UDI_DI', '+E2xy')).toBe('+E2xy');
+    // 하이픈·점도 보존 (WO 예시)
+    expect(normalizeIdentifier('UDI_DI', ' +J0123-AB ')).toBe('+J0123-AB');
+    expect(normalizeIdentifier('UDI_DI', '+A1.B2-C3')).toBe('+A1.B2-C3');
   });
 
-  it('앞뒤 공백은 제거된다', () => {
+  it('앞뒤 공백만 trim 되고 내부 문자는 원형 보존', () => {
     expect(normalizeIdentifier('UDI_DI', '  08800158900007  ')).toBe('08800158900007');
   });
 

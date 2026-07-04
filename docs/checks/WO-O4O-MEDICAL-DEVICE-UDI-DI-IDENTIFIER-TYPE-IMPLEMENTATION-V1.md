@@ -36,19 +36,24 @@
 ## 3. normalize 규칙 (UDI_DI)
 
 ```ts
-case 'UDI_DI':
-  // GTIN형(숫자 13/14)은 숫자 그대로, HIBCC형('+' prefix)은 '+'/문자 보존.
-  // sanitize(trim + 공백·하이픈 제거) 후 대문자화만. 숫자만 남기지 않는다.
-  return v.toUpperCase();
+// UDI_DI 는 sanitizeIdentifierValue(공백·하이픈 제거)를 태우지 않고
+// trim + 제어문자 제거만 수행한다. 대문자화·구분기호 제거 금지.
+if (type === 'UDI_DI') {
+  if (value == null) return '';
+  return String(value).replace(/[\x00-\x1F\x7F]/g, '').trim();
+}
 ```
 
 | 입력 | UDI_DI normalize | 대비: GTIN normalize |
 |---|---|---|
 | `08800158900007` (GTIN-14) | `08800158900007` (원형) | `08800158900007` |
 | `8806485001234` (GTIN-13) | `8806485001234` (원형, zero-pad 안 함) | `8806485001234` |
-| `+J022abc01` (HIBCC) | `+J022ABC01` (`+`·문자 보존) | `02201` (`+`·문자 제거 — 부적합) |
+| `+J022abc01` (HIBCC) | `+J022abc01` (`+`·문자·대소문자 원형 보존) | `02201` (`+`·문자 제거 — 부적합) |
+| ` +J0123-AB ` (HIBCC, 하이픈) | `+J0123-AB` (trim만, 하이픈 보존) | `0123` (`+`·문자·하이픈 제거 — 부적합) |
 
 핵심: HIBCC형 UDI-DI는 `GTIN` normalize(`\D` 제거)를 태우면 `+`와 문자가 사라져 의미가 붕괴된다. `UDI_DI` type은 이를 원형 보존한다. GTIN형 숫자 UDI-DI는 두 규칙 결과가 동일하다.
+
+> **정정(2026-07-04)**: 최초 커밋(545d10d1c)은 `sanitizeIdentifierValue`(공백·하이픈 제거) 후 `.toUpperCase()` 를 적용해, WO 정책("공백·하이픈·점 제거 또는 대문자화 금지")과 WO 예시(`normalizeIdentifier('UDI_DI',' +J0123-AB ') === '+J0123-AB'`)를 위반했다. 하이픈이 제거되고(`+J0123AB`) 대소문자가 변형되어 medical-device 식별자 dedup 키가 오병합될 수 있었다. 후속 커밋에서 UDI_DI 를 `sanitizeIdentifierValue` 경로에서 분리하여 **trim + 제어문자 제거만** 수행하도록 정정. `sanitizeIdentifierValue` 자체는 GTIN 추론이 의존하므로 무변경.
 
 > 저장 정책(선행 D3): 숫자형 UDI-DI는 `GTIN`(barcode mirror) + `UDI_DI`(맥락) 이중 보존, HIBCC형은 `UDI_DI`만. 본 구현은 그 normalize 기반을 제공하며, 실제 저장(import)은 Gate A WO에서 수행한다.
 
