@@ -164,11 +164,23 @@ SELECT flag, COUNT(*) FROM (
 -- 기대: SKU_IDENTIFIER_MISSING 44,885 / INTAKE_HINT_MISSING 1,663 / PRESERVATION_MISSING 415 / MAIN_FUNCTION_MISSING 31 / CANDIDATE_NAME_OVERLENGTH 0
 
 -- SQL-I: ProductMaster / ProductIdentifier 불변 확인 (apply 전/후 동일)
-SELECT COUNT(*) AS master_count FROM product_master;         -- apply 전후 불변
+-- ⚠️ 실제 테이블명은 product_masters(복수) / product_identifiers (2026-07-04 실측 확정)
+SELECT COUNT(*) AS master_count FROM product_masters;        -- apply 전후 불변
 SELECT COUNT(*) AS identifier_count FROM product_identifiers; -- apply 전후 불변
 ```
 
 **합격 기준:** SQL-B=44,885 · SQL-C=SQL-D=44,885 · SQL-E=SQL-F=SQL-G=0 · SQL-I(master/identifier) apply 전후 **불변**.
+
+### 5.1 Pre-snapshot 실측 (2026-07-04, apply 전 read-only)
+| 지표 | apply 전 | apply 후 기대 |
+|---|---:|---:|
+| total product_candidates (SQL-A) | **310,281** | 354,166 (+44,885) |
+| HFF source_label (SQL-B) | **0** (최초) | 44,885 |
+| product_masters (SQL-I) | **230,843** | 230,843 (불변) |
+| product_identifiers (SQL-I) | **703,483** | 703,483 (불변) |
+
+기존 분포: `csv_import` drug-master 305,522 · `external_api` MFDS_EASY_DRUG_INFO 4,757 · smoke 2.
+방화벽: 실행 시점 IP 를 authorized-networks 임시 추가 후 **반드시 원복**(원상태 `124.194.156.36/32` only).
 
 ---
 
