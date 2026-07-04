@@ -94,6 +94,10 @@ export interface FindCandidatesFilter {
   candidateStatus?: ProductCandidateStatus;
   matchStatus?: ProductCandidateMatchStatus;
   sourceType?: ProductCandidateSourceType;
+  /** 공공 seed 라벨 정확일치 필터 (예: MFDS_HEALTH_FUNCTIONAL_FOOD) — external_api 후보 분리용 */
+  sourceLabel?: string;
+  /** 후보명/제조사/식별자(STTEMNT_NO 등) 부분검색 (ILIKE) */
+  search?: string;
   serviceKey?: string;
   organizationId?: string;
   /** operator scope: null = cross-service(platform admin), 배열 = 제한 */
@@ -243,6 +247,7 @@ export class ProductCandidateService {
     if (filter.candidateStatus) where.candidateStatus = filter.candidateStatus;
     if (filter.matchStatus) where.matchStatus = filter.matchStatus;
     if (filter.sourceType) where.sourceType = filter.sourceType;
+    if (filter.sourceLabel) where.sourceLabel = filter.sourceLabel;
     if (filter.organizationId) where.organizationId = filter.organizationId;
     if (filter.serviceKey) where.serviceKey = filter.serviceKey;
 
@@ -261,6 +266,17 @@ export class ProductCandidateService {
       qb.andWhere('(pc.service_key = ANY(:keys) OR pc.service_key IS NULL)', {
         keys: filter.scopeServiceKeys,
       });
+    }
+
+    // 부분검색(ILIKE): 후보명/제조사/식별자/정규화식별자. % _ 는 리터럴로 이스케이프.
+    const searchTerm = filter.search?.trim();
+    if (searchTerm) {
+      const escaped = searchTerm.replace(/[%_\\]/g, (m) => `\\${m}`);
+      qb.andWhere(
+        `(pc.candidate_name ILIKE :q OR pc.candidate_manufacturer ILIKE :q
+          OR pc.identifier_value ILIKE :q OR pc.normalized_identifier_value ILIKE :q)`,
+        { q: `%${escaped}%` },
+      );
     }
 
     const [items, total] = await qb.getManyAndCount();

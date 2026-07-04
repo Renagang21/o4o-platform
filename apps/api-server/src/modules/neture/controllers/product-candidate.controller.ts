@@ -54,11 +54,13 @@ export function createProductCandidateController(dataSource: DataSource): Router
       }
       if (resolved.crossService) logCrossServiceQuery(req);
 
-      const { status, matchStatus, sourceType, serviceKey, organizationId, page, limit } = req.query;
+      const { status, matchStatus, sourceType, sourceLabel, search, q, serviceKey, organizationId, page, limit } = req.query;
       const result = await service.findCandidates({
         candidateStatus: status as ProductCandidateStatus | undefined,
         matchStatus: matchStatus as ProductCandidateMatchStatus | undefined,
         sourceType: sourceType as ProductCandidateSourceType | undefined,
+        sourceLabel: (sourceLabel as string | undefined) || undefined,
+        search: ((search ?? q) as string | undefined) || undefined,
         serviceKey: serviceKey as string | undefined,
         organizationId: organizationId as string | undefined,
         scopeServiceKeys: resolved.serviceKeys,

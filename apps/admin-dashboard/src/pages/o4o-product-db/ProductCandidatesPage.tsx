@@ -8,8 +8,15 @@
  */
 
 import { useEffect, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { listProductCandidates, ProductCandidateRow } from '@/api/o4o-product-db.api';
+
+// 공공 seed 라벨 프리셋 (external_api 후보 분리용 — 직접 입력도 가능)
+const SOURCE_LABEL_PRESETS = [
+  'MFDS_HEALTH_FUNCTIONAL_FOOD',
+  'MFDS_EASY_DRUG_INFO',
+  'MFDS_QUASI_DRUG_PERMIT',
+];
 
 const STATUS_OPTIONS = [
   'pending', 'reviewing', 'matched', 'linked',
@@ -28,12 +35,18 @@ const LIMIT = 20;
 
 export default function ProductCandidatesPage() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [rows, setRows] = useState<ProductCandidateRow[]>([]);
   const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
-  const [status, setStatus] = useState('');
-  const [matchStatus, setMatchStatus] = useState('');
-  const [sourceType, setSourceType] = useState('');
+  const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
+  const [status, setStatus] = useState(searchParams.get('status') || '');
+  const [matchStatus, setMatchStatus] = useState(searchParams.get('matchStatus') || '');
+  const [sourceType, setSourceType] = useState(searchParams.get('sourceType') || '');
+  // committed(쿼리에 반영되는) source_label / search 와 입력 버퍼 분리 — 타이핑마다 조회 방지
+  const [sourceLabel, setSourceLabel] = useState(searchParams.get('sourceLabel') || '');
+  const [search, setSearch] = useState(searchParams.get('search') || '');
+  const [sourceLabelInput, setSourceLabelInput] = useState(sourceLabel);
+  const [searchInput, setSearchInput] = useState(search);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -45,6 +58,8 @@ export default function ProductCandidatesPage() {
         status: status || undefined,
         matchStatus: matchStatus || undefined,
         sourceType: sourceType || undefined,
+        sourceLabel: sourceLabel || undefined,
+        search: search || undefined,
         page,
         limit: LIMIT,
       });
@@ -57,11 +72,23 @@ export default function ProductCandidatesPage() {
     } finally {
       setLoading(false);
     }
-  }, [status, matchStatus, sourceType, page]);
+  }, [status, matchStatus, sourceType, sourceLabel, search, page]);
 
   useEffect(() => {
     load();
   }, [load]);
+
+  // URL query sync (공유/새로고침/뒤로가기 유지) — 기본값은 생략
+  useEffect(() => {
+    const q: Record<string, string> = {};
+    if (status) q.status = status;
+    if (matchStatus) q.matchStatus = matchStatus;
+    if (sourceType) q.sourceType = sourceType;
+    if (sourceLabel) q.sourceLabel = sourceLabel;
+    if (search) q.search = search;
+    if (page > 1) q.page = String(page);
+    setSearchParams(q, { replace: true });
+  }, [status, matchStatus, sourceType, sourceLabel, search, page, setSearchParams]);
 
   const totalPages = Math.max(1, Math.ceil(total / LIMIT));
 
@@ -70,10 +97,25 @@ export default function ProductCandidatesPage() {
     setter(e.target.value);
   };
 
+  // source_label + search 는 폼 제출(Enter / 버튼) 시에만 commit
+  const onSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setPage(1);
+    setSourceLabel(sourceLabelInput.trim());
+    setSearch(searchInput.trim());
+  };
+  const onSearchReset = () => {
+    setPage(1);
+    setSourceLabelInput('');
+    setSearchInput('');
+    setSourceLabel('');
+    setSearch('');
+  };
+
   return (
     <div>
       {/* Toolbar */}
-      <div className="flex flex-wrap gap-3 mb-4">
+      <div className="flex flex-wrap gap-3 mb-4 items-center">
         <select value={status} onChange={onFilterChange(setStatus)} className="border border-gray-300 rounded px-3 py-2 text-sm">
           <option value="">전체 상태</option>
           {STATUS_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}
@@ -86,6 +128,31 @@ export default function ProductCandidatesPage() {
           <option value="">전체 source</option>
           {SOURCE_TYPE_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}
         </select>
+
+        {/* source_label(공공 seed 라벨) + 검색 — 폼 제출 시에만 commit */}
+        <form onSubmit={onSearchSubmit} className="flex flex-wrap gap-2 items-center">
+          <input
+            list="source-label-presets"
+            value={sourceLabelInput}
+            onChange={(e) => setSourceLabelInput(e.target.value)}
+            placeholder="source_label (예: MFDS_HEALTH_FUNCTIONAL_FOOD)"
+            className="border border-gray-300 rounded px-3 py-2 text-sm w-72"
+          />
+          <datalist id="source-label-presets">
+            {SOURCE_LABEL_PRESETS.map((o) => <option key={o} value={o} />)}
+          </datalist>
+          <input
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            placeholder="상품명 / 업체명 / 식별번호(STTEMNT_NO) 검색"
+            className="border border-gray-300 rounded px-3 py-2 text-sm w-72"
+          />
+          <button type="submit" className="px-3 py-2 border border-gray-300 rounded text-sm bg-gray-50 hover:bg-gray-100">검색</button>
+          {(sourceLabel || search) && (
+            <button type="button" onClick={onSearchReset} className="px-3 py-2 text-sm text-gray-500 underline">초기화</button>
+          )}
+        </form>
+
         <div className="ml-auto text-sm text-gray-500 self-center">총 {total.toLocaleString()}건</div>
       </div>
 
