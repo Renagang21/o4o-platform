@@ -156,4 +156,46 @@
 
 ---
 
-**작성**: O4O Platform 조사 CHECK · 2026-07-04 · read-only(1단계). apply 는 §7 게이트 B 승인 후. serviceKey·비밀 미출력.
+**작성**: O4O Platform 조사 CHECK · 2026-07-04 · 1단계 read-only(§1~§9) → Gate A/B apply 완료(§10~§11). serviceKey·비밀 미출력.
+
+---
+
+## 10. Gate A 실행 로그 (2026-07-04) — 구현 + dry-run
+
+> 채널: Cloud Run Job `o4o-drug-representative-grouping`. 서비스 `drug-master-representative-grouping.service.ts`(SQL 집계 + 전역 display_name 충돌판정 + batch INSERT + set-based link UPDATE) + Job entry(commit `9b4d0cbe9`). raw ds.query(entities:[]).
+
+| 항목 | 값 |
+|---|---|
+| dry-run (exec 97xh9, 7s) | total 64,672 / new 64,672 / single 3,559 / multi 61,113 / multiManuf 5,101 / multiName 5,298 / dupName 144 / manufacturerFilled 59,571 / masterLinksExpected 230,841 / createdReps(would) 64,672 / errored 0 |
+
+**→ §3~§6 실측과 완전 일치.** apply 이중가드로 write 0.
+
+---
+
+## 11. Gate B 실행 로그 (2026-07-04) — **apply 완료 (WO 종결)**
+
+| 항목 | 값 |
+|---|---|
+| 사전 백업 | ✅ id **1783150914005** (SUCCESSFUL, `pre-drug-representative-grouping-20260704`) |
+| APPLY 이중가드 | `DRUG_REP_APPLY=true` + `DRUG_IMPORT_ALLOW_APPLY=I_UNDERSTAND` |
+| **apply (exec bwvx7, 314s)** | **createdReps 64,672 / linkedMasters 230,841 / errored 0** |
+
+**검증 SQL (read-only, 사용자 기준):**
+
+| 기준 | 결과 | 판정 |
+|---|---:|:---:|
+| representative_products created | **64,672** | ✅ |
+| linked product_masters | **230,841** | ✅ (HIRA master 전량) |
+| representative_product_id NULL | 2 | ✅ (비의약품·E2E 테스트 master 2건, MFDS_CODE 0 → 대상 외. HIRA 230,841 전량 링크) |
+| distinct mfdsCode 그룹 | **64,672** | ✅ |
+| display_name 잔여 중복 | **0** | ✅ (충돌 144그룹 `{name} (mfdsCode)` 접미 적용) |
+| duplicateDisplayName flag 그룹 | **144** | ✅ |
+| multiManufacturer / multiName flag | 5,101 / 5,298 | ✅ |
+| manufacturer_name 채움(단일 제조사) | 59,571 | ✅ |
+| ProductMaster(HIRA) / Identifier / Description / Image 추가 | 230,841 / 703,483 / 19,431 / 변동 없음 | ✅ 미생성 |
+
+> 미링크 2건: `[E2E_TEST] Neture B2B 테스트 상품`, `미네락 600 [1000ml*10병]` — tags `[]`, MFDS_CODE identifier 0개. 본 Job(MFDS_CODE 축)의 대상이 아니며 병렬 작업 산물. Job 은 master 를 생성/변경(link 외)하지 않음.
+
+**→ Gate B 완료. WO 종결.** 의약품 상품 구조가 **SKU(ProductMaster) → 대표상품(RepresentativeProduct)** 계층까지 완성됨. 그룹키 `metadata.sourceIdentifiers.mfdsCode`, 멱등 재실행 가능(기존 mfds skip, link NULL만).
+
+**후속(별도 WO)**: (1) e약은요 이미지 GCS 사본 → ProductImage → 대표 `thumbnail_image_id` 지정. (2) 다제조사 5,101 / multiName 5,298 / dupName 144 그룹 운영자 큐레이션(대표명·제조사 확정). (3) SharedProductDescription canonical 승격.
