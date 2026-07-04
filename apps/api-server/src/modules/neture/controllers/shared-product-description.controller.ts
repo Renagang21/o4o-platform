@@ -58,6 +58,65 @@ export function createSharedProductDescriptionController(dataSource: DataSource)
   router.use(authenticate);
   router.use(requireRole(ADMIN_ROLES));
 
+  // WO-O4O-DRUG-SHARED-DESCRIPTION-CANONICAL-CURATION-V1 — master 횡단 검토 목록/상세/bulk dry-run (read-only)
+
+  // GET / — 검토 목록/검색 (status/sourceType/q/multiManufacturer/multiName/page/limit)
+  router.get('/', async (req: Request, res: Response) => {
+    try {
+      const { status, sourceType, q, multiManufacturer, multiName, page, limit } = req.query as Record<string, string>;
+      const result = await service.listForReview({
+        status: status || undefined,
+        sourceType: sourceType || undefined,
+        q: q || undefined,
+        multiManufacturer: multiManufacturer === 'true',
+        multiName: multiName === 'true',
+        page: page ? parseInt(page, 10) : 1,
+        limit: limit ? parseInt(limit, 10) : 20,
+      });
+      const lim = limit ? parseInt(limit, 10) : 20;
+      res.json({
+        success: true,
+        data: result.items,
+        meta: {
+          page: page ? parseInt(page, 10) : 1,
+          limit: lim,
+          total: result.total,
+          totalPages: Math.max(1, Math.ceil(result.total / lim)),
+        },
+      });
+    } catch (error) {
+      logger.error('[SharedProductDescription] listForReview error:', error);
+      res.status(500).json({ success: false, error: 'Failed to list descriptions for review' });
+    }
+  });
+
+  // GET /bulk-canonical/dry-run — bulk 후보 dry-run (write 0)
+  router.get('/bulk-canonical/dry-run', async (req: Request, res: Response) => {
+    try {
+      const sourceType = (req.query.sourceType as string) || 'mfds_easy_drug';
+      const report = await service.bulkCanonicalDryRun(sourceType);
+      res.json({ success: true, data: report });
+    } catch (error) {
+      logger.error('[SharedProductDescription] bulkCanonicalDryRun error:', error);
+      res.status(500).json({ success: false, error: 'Failed to run bulk canonical dry-run' });
+    }
+  });
+
+  // GET /:id/detail — 검토 상세 (join)
+  router.get('/:id/detail', async (req: Request, res: Response) => {
+    try {
+      const detail = await service.getReviewDetail(req.params.id);
+      if (!detail) {
+        res.status(404).json({ success: false, error: 'Description not found' });
+        return;
+      }
+      res.json({ success: true, data: detail });
+    } catch (error) {
+      logger.error('[SharedProductDescription] getReviewDetail error:', error);
+      res.status(500).json({ success: false, error: 'Failed to get description detail' });
+    }
+  });
+
   // GET /by-master/:masterId — 후보 목록
   router.get('/by-master/:masterId', async (req: Request, res: Response) => {
     try {

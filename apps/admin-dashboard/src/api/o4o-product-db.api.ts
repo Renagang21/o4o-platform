@@ -49,6 +49,10 @@ export interface ProductCandidateListParams {
   status?: string;
   matchStatus?: string;
   sourceType?: string;
+  /** 공공 seed 라벨 정확일치 (예: MFDS_HEALTH_FUNCTIONAL_FOOD) */
+  sourceLabel?: string;
+  /** 후보명/제조사/식별자(STTEMNT_NO 등) 부분검색 */
+  search?: string;
   serviceKey?: string;
   page?: number;
   limit?: number;
@@ -75,6 +79,8 @@ export async function listProductCandidates(
   if (params.status) query.status = params.status;
   if (params.matchStatus) query.matchStatus = params.matchStatus;
   if (params.sourceType) query.sourceType = params.sourceType;
+  if (params.sourceLabel?.trim()) query.sourceLabel = params.sourceLabel.trim();
+  if (params.search?.trim()) query.search = params.search.trim();
   query.page = String(params.page ?? 1);
   query.limit = String(params.limit ?? 20);
 
@@ -182,6 +188,133 @@ export interface ProductMasterDetail {
 export async function getProductMaster(id: string): Promise<ProductMasterDetail | null> {
   const res = await authClient.api.get<{ success: boolean; data: ProductMasterDetail }>(
     `/neture/products/library/${encodeURIComponent(id)}`,
+  );
+  return res.data?.data ?? null;
+}
+
+// ─── SharedProductDescription 검토 (WO-O4O-DRUG-SHARED-DESCRIPTION-CANONICAL-CURATION-V1) ──
+// mount: /admin/shared-product-descriptions. read-only 목록/상세/dry-run + 단건 setCanonical(PATCH).
+
+export interface DescriptionReviewRow {
+  id: string;
+  masterId: string;
+  sourceType: string;
+  status: string;
+  updatedAt: string;
+  masterName: string | null;
+  manufacturerName: string | null;
+  barcode: string | null;
+  representativeId: string | null;
+  representativeName: string | null;
+  mfdsCode: string | null;
+  multiManufacturer: boolean | null;
+  multiName: boolean | null;
+  hasRepresentativeImage: boolean;
+}
+
+export interface DescriptionReviewListParams {
+  status?: string;
+  sourceType?: string;
+  q?: string;
+  multiManufacturer?: boolean;
+  multiName?: boolean;
+  page?: number;
+  limit?: number;
+}
+
+export interface DescriptionReviewListResult {
+  items: DescriptionReviewRow[];
+  meta: ProductMasterListMeta;
+}
+
+export async function listDescriptionReviews(
+  params: DescriptionReviewListParams = {},
+): Promise<DescriptionReviewListResult> {
+  const query: Record<string, string> = {};
+  if (params.status) query.status = params.status;
+  if (params.sourceType) query.sourceType = params.sourceType;
+  if (params.q?.trim()) query.q = params.q.trim();
+  if (params.multiManufacturer) query.multiManufacturer = 'true';
+  if (params.multiName) query.multiName = 'true';
+  query.page = String(params.page ?? 1);
+  query.limit = String(params.limit ?? 20);
+
+  const res = await authClient.api.get<{
+    success: boolean;
+    data: DescriptionReviewRow[];
+    meta: ProductMasterListMeta;
+  }>(`/admin/shared-product-descriptions?${new URLSearchParams(query).toString()}`);
+
+  return {
+    items: res.data?.data ?? [],
+    meta: res.data?.meta ?? { page: 1, limit: 20, total: 0, totalPages: 0 },
+  };
+}
+
+export interface DescriptionReviewDetail {
+  id: string;
+  masterId: string;
+  sourceType: string;
+  status: string;
+  content: string;
+  summary: string | null;
+  language: string | null;
+  curatedBy: string | null;
+  curatedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  masterName: string | null;
+  regulatoryName: string | null;
+  manufacturerName: string | null;
+  barcode: string | null;
+  specification: string | null;
+  mfdsProductId: string | null;
+  drugCategory: string | null;
+  representativeId: string | null;
+  representativeName: string | null;
+  mfdsCode: string | null;
+  reviewFlags: Record<string, unknown> | null;
+  thumbnailUrl: string | null;
+  identifiers: Array<{ identifierType: string; identifierValue: string; isPrimary: boolean }>;
+}
+
+export async function getDescriptionReviewDetail(id: string): Promise<DescriptionReviewDetail | null> {
+  const res = await authClient.api.get<{ success: boolean; data: DescriptionReviewDetail }>(
+    `/admin/shared-product-descriptions/${encodeURIComponent(id)}/detail`,
+  );
+  return res.data?.data ?? null;
+}
+
+/** 단건 canonical 승격 (기존 setCanonical 재사용 — 같은 master 기존 canonical 강등) */
+export async function setDescriptionCanonical(id: string): Promise<DescriptionReviewDetail | null> {
+  const res = await authClient.api.patch<{ success: boolean; data: DescriptionReviewDetail }>(
+    `/admin/shared-product-descriptions/${encodeURIComponent(id)}/canonical`,
+    {},
+  );
+  return res.data?.data ?? null;
+}
+
+/** 상태 변경 (reject=deprecated 등). canonical 은 setDescriptionCanonical 사용 */
+export async function setDescriptionStatus(id: string, status: string): Promise<void> {
+  await authClient.api.patch(`/admin/shared-product-descriptions/${encodeURIComponent(id)}/status`, { status });
+}
+
+export interface BulkCanonicalDryRunResult {
+  sourceType: string;
+  totalNeedsReview: number;
+  eligibleForBulkCanonical: number;
+  excludedExistingCanonical: number;
+  excludedMultiManufacturer: number;
+  excludedEmptyContent: number;
+  excludedAmbiguous: number;
+  sampleEligible: Array<{ id: string; masterName: string | null; mfdsCode: string | null }>;
+}
+
+export async function getBulkCanonicalDryRun(
+  sourceType = 'mfds_easy_drug',
+): Promise<BulkCanonicalDryRunResult | null> {
+  const res = await authClient.api.get<{ success: boolean; data: BulkCanonicalDryRunResult }>(
+    `/admin/shared-product-descriptions/bulk-canonical/dry-run?sourceType=${encodeURIComponent(sourceType)}`,
   );
   return res.data?.data ?? null;
 }

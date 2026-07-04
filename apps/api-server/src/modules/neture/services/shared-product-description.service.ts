@@ -346,4 +346,244 @@ export class SharedProductDescriptionService {
     }
     return { created, skipped };
   }
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // WO-O4O-DRUG-SHARED-DESCRIPTION-CANONICAL-CURATION-V1
+  // master 횡단 검토 목록/상세 + bulk canonical dry-run (read-only). setCanonical 은 위 재사용.
+  // ──────────────────────────────────────────────────────────────────────────
+
+  /** 검토 목록/검색 (master/representative join). read-only, 서버 페이지네이션. */
+  async listForReview(params: {
+    status?: string; // needs_review | canonical | candidate | hidden | deprecated | all
+    sourceType?: string;
+    q?: string;
+    multiManufacturer?: boolean;
+    multiName?: boolean;
+    page?: number;
+    limit?: number;
+  }): Promise<{ items: ReviewListRow[]; total: number }> {
+    const page = Math.max(1, params.page ?? 1);
+    const limit = Math.min(100, Math.max(1, params.limit ?? 20));
+    const offset = (page - 1) * limit;
+
+    const where: string[] = ['spd.deleted_at IS NULL'];
+    const args: unknown[] = [];
+    let p = 1;
+
+    if (params.status && params.status !== 'all') {
+      where.push(`spd.status = $${p++}`);
+      args.push(params.status);
+    }
+    if (params.sourceType) {
+      where.push(`spd.source_type = $${p++}`);
+      args.push(params.sourceType);
+    }
+    if (params.multiManufacturer === true) where.push(`(rp.metadata->'reviewFlags'->>'multiManufacturer')::bool IS TRUE`);
+    if (params.multiName === true) where.push(`(rp.metadata->'reviewFlags'->>'multiName')::bool IS TRUE`);
+    if (params.q && params.q.trim()) {
+      const like = `%${params.q.trim()}%`;
+      where.push(
+        `(pm.name ILIKE $${p} OR pm.barcode ILIKE $${p} OR rp.display_name ILIKE $${p} OR rp.metadata->'sourceIdentifiers'->>'mfdsCode' ILIKE $${p})`,
+      );
+      args.push(like);
+      p++;
+    }
+    const whereSql = where.join(' AND ');
+
+    const countRows: Array<{ c: string }> = await this.dataSource.query(
+      `SELECT count(*)::text AS c
+         FROM shared_product_descriptions spd
+         JOIN product_masters pm ON pm.id = spd.master_id
+         LEFT JOIN representative_products rp ON rp.id = pm.representative_product_id
+        WHERE ${whereSql}`,
+      args,
+    );
+    const total = parseInt(countRows[0]?.c ?? '0', 10);
+
+    const rows: ReviewListRow[] = await this.dataSource.query(
+      `SELECT spd.id, spd.master_id AS "masterId", spd.source_type AS "sourceType", spd.status,
+              spd.updated_at AS "updatedAt",
+              pm.name AS "masterName", pm.manufacturer_name AS "manufacturerName", pm.barcode,
+              rp.id AS "representativeId", rp.display_name AS "representativeName",
+              rp.metadata->'sourceIdentifiers'->>'mfdsCode' AS "mfdsCode",
+              (rp.metadata->'reviewFlags'->>'multiManufacturer')::bool AS "multiManufacturer",
+              (rp.metadata->'reviewFlags'->>'multiName')::bool AS "multiName",
+              (rp.thumbnail_image_id IS NOT NULL) AS "hasRepresentativeImage"
+         FROM shared_product_descriptions spd
+         JOIN product_masters pm ON pm.id = spd.master_id
+         LEFT JOIN representative_products rp ON rp.id = pm.representative_product_id
+        WHERE ${whereSql}
+        ORDER BY spd.updated_at DESC
+        LIMIT ${limit} OFFSET ${offset}`,
+      args,
+    );
+    return { items: rows, total };
+  }
+
+  /** 검토 상세 (master/representative/identifier 요약 + content). read-only. */
+  async getReviewDetail(id: string): Promise<ReviewDetail | null> {
+    const rows: Array<Record<string, unknown>> = await this.dataSource.query(
+      `SELECT spd.id, spd.master_id AS "masterId", spd.source_type AS "sourceType", spd.status,
+              spd.content, spd.summary, spd.language, spd.source_ref_id AS "sourceRefId",
+              spd.curated_by AS "curatedBy", spd.curated_at AS "curatedAt",
+              spd.created_at AS "createdAt", spd.updated_at AS "updatedAt",
+              pm.name AS "masterName", pm.regulatory_name AS "regulatoryName",
+              pm.manufacturer_name AS "manufacturerName", pm.barcode, pm.specification,
+              pm.mfds_product_id AS "mfdsProductId", pm.drug_category AS "drugCategory",
+              rp.id AS "representativeId", rp.display_name AS "representativeName",
+              rp.metadata->'sourceIdentifiers'->>'mfdsCode' AS "mfdsCode",
+              rp.metadata->'reviewFlags' AS "reviewFlags",
+              rp.thumbnail_image_id AS "thumbnailImageId"
+         FROM shared_product_descriptions spd
+         JOIN product_masters pm ON pm.id = spd.master_id
+         LEFT JOIN representative_products rp ON rp.id = pm.representative_product_id
+        WHERE spd.id = $1 AND spd.deleted_at IS NULL
+        LIMIT 1`,
+      [id],
+    );
+    if (!rows[0]) return null;
+    const detail = rows[0] as unknown as ReviewDetail;
+
+    // identifier 요약 (master 의 식별자)
+    detail.identifiers = await this.dataSource.query(
+      `SELECT identifier_type AS "identifierType", identifier_value AS "identifierValue", is_primary AS "isPrimary"
+         FROM product_identifiers
+        WHERE product_master_id = $1 AND deleted_at IS NULL
+        ORDER BY is_primary DESC, identifier_type ASC`,
+      [detail.masterId],
+    );
+
+    // 대표 썸네일 URL
+    if (detail.thumbnailImageId) {
+      const img: Array<{ image_url: string }> = await this.dataSource.query(
+        `SELECT image_url FROM product_images WHERE id = $1 LIMIT 1`,
+        [detail.thumbnailImageId],
+      );
+      detail.thumbnailUrl = img[0]?.image_url ?? null;
+    } else {
+      detail.thumbnailUrl = null;
+    }
+    return detail;
+  }
+
+  /**
+   * bulk canonical 후보 dry-run (write 0).
+   * eligible = source_type + status=needs_review + master당 1개 + content 비어있지 않음
+   *            + 기존 canonical 없음 + 다제조사 아님.
+   */
+  async bulkCanonicalDryRun(sourceType = 'mfds_easy_drug'): Promise<BulkCanonicalDryRun> {
+    const base: Array<Record<string, string>> = await this.dataSource.query(
+      `WITH nr AS (
+         SELECT spd.id, spd.master_id, spd.content
+           FROM shared_product_descriptions spd
+          WHERE spd.source_type = $1 AND spd.status='needs_review' AND spd.deleted_at IS NULL
+       ),
+       per_master AS (
+         SELECT master_id, count(*) AS cnt FROM nr GROUP BY master_id
+       )
+       SELECT
+         (SELECT count(*)::text FROM nr) AS total,
+         (SELECT count(*)::text FROM nr WHERE content IS NULL OR btrim(content)='') AS empty_content,
+         (SELECT count(*)::text FROM per_master WHERE cnt>1) AS ambiguous_masters,
+         (SELECT count(DISTINCT c.master_id)::text FROM shared_product_descriptions c
+            WHERE c.status='canonical' AND c.deleted_at IS NULL
+              AND c.master_id IN (SELECT master_id FROM nr)) AS existing_canonical,
+         (SELECT count(*)::text FROM nr
+            JOIN product_masters pm ON pm.id = nr.master_id
+            LEFT JOIN representative_products rp ON rp.id = pm.representative_product_id
+           WHERE (rp.metadata->'reviewFlags'->>'multiManufacturer')::bool IS TRUE) AS multi_manufacturer`,
+      [sourceType],
+    );
+    const r = base[0] ?? {};
+    const total = parseInt(r.total ?? '0', 10);
+    const excludedEmptyContent = parseInt(r.empty_content ?? '0', 10);
+    const excludedAmbiguous = parseInt(r.ambiguous_masters ?? '0', 10);
+    const excludedExistingCanonical = parseInt(r.existing_canonical ?? '0', 10);
+    const excludedMultiManufacturer = parseInt(r.multi_manufacturer ?? '0', 10);
+    const eligibleForBulkCanonical =
+      total - excludedEmptyContent - excludedExistingCanonical - excludedMultiManufacturer;
+
+    const sampleEligible: Array<{ id: string; masterName: string | null; mfdsCode: string | null }> =
+      await this.dataSource.query(
+        `SELECT spd.id, pm.name AS "masterName", rp.metadata->'sourceIdentifiers'->>'mfdsCode' AS "mfdsCode"
+           FROM shared_product_descriptions spd
+           JOIN product_masters pm ON pm.id = spd.master_id
+           LEFT JOIN representative_products rp ON rp.id = pm.representative_product_id
+          WHERE spd.source_type=$1 AND spd.status='needs_review' AND spd.deleted_at IS NULL
+            AND btrim(coalesce(spd.content,''))<>''
+            AND (rp.metadata->'reviewFlags'->>'multiManufacturer')::bool IS NOT TRUE
+            AND NOT EXISTS (SELECT 1 FROM shared_product_descriptions c
+                             WHERE c.master_id=spd.master_id AND c.status='canonical' AND c.deleted_at IS NULL)
+          ORDER BY spd.updated_at DESC LIMIT 10`,
+        [sourceType],
+      );
+
+    return {
+      sourceType,
+      totalNeedsReview: total,
+      eligibleForBulkCanonical,
+      excludedExistingCanonical,
+      excludedMultiManufacturer,
+      excludedEmptyContent,
+      excludedAmbiguous,
+      sampleEligible,
+    };
+  }
+}
+
+export interface ReviewListRow {
+  id: string;
+  masterId: string;
+  sourceType: string;
+  status: string;
+  updatedAt: string;
+  masterName: string | null;
+  manufacturerName: string | null;
+  barcode: string | null;
+  representativeId: string | null;
+  representativeName: string | null;
+  mfdsCode: string | null;
+  multiManufacturer: boolean | null;
+  multiName: boolean | null;
+  hasRepresentativeImage: boolean;
+}
+
+export interface ReviewDetail {
+  id: string;
+  masterId: string;
+  sourceType: string;
+  status: string;
+  content: string;
+  summary: string | null;
+  language: string | null;
+  sourceRefId: string | null;
+  curatedBy: string | null;
+  curatedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  masterName: string | null;
+  regulatoryName: string | null;
+  manufacturerName: string | null;
+  barcode: string | null;
+  specification: string | null;
+  mfdsProductId: string | null;
+  drugCategory: string | null;
+  representativeId: string | null;
+  representativeName: string | null;
+  mfdsCode: string | null;
+  reviewFlags: Record<string, unknown> | null;
+  thumbnailImageId: string | null;
+  thumbnailUrl: string | null;
+  identifiers: Array<{ identifierType: string; identifierValue: string; isPrimary: boolean }>;
+}
+
+export interface BulkCanonicalDryRun {
+  sourceType: string;
+  totalNeedsReview: number;
+  eligibleForBulkCanonical: number;
+  excludedExistingCanonical: number;
+  excludedMultiManufacturer: number;
+  excludedEmptyContent: number;
+  excludedAmbiguous: number;
+  sampleEligible: Array<{ id: string; masterName: string | null; mfdsCode: string | null }>;
 }

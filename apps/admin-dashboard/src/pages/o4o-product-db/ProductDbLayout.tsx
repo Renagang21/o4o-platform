@@ -16,6 +16,7 @@ import { Database } from 'lucide-react';
 const TABS = [
   { to: 'candidates', label: '공공데이터 후보' },
   { to: 'masters', label: '기본 상품' },
+  { to: 'review', label: '설명 검토' },
   { to: 'maintenance', label: '데이터 정비' },
 ];
 
