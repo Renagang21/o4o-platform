@@ -76,6 +76,9 @@ COPY dist/drug-representative-grouping-job.js.map ./dist/drug-representative-gro
 # - easy-drug-image-copy-job.js: e약은요 외부이미지 → GCS 사본 → ProductImage → 대표 thumbnail one-off Job entry
 COPY dist/easy-drug-image-copy-job.js ./dist/easy-drug-image-copy-job.js
 COPY dist/easy-drug-image-copy-job.js.map ./dist/easy-drug-image-copy-job.js.map
+# - drug-shared-description-bulk-canonical-job.js: e약은요 설명 안전후보 → canonical 일괄 승격 one-off Job entry
+COPY dist/drug-shared-description-bulk-canonical-job.js ./dist/drug-shared-description-bulk-canonical-job.js
+COPY dist/drug-shared-description-bulk-canonical-job.js.map ./dist/drug-shared-description-bulk-canonical-job.js.map
 
 # Copy database folder for migrations
 # - migration-config.js: Lightweight DataSource for TypeORM CLI (fallback)

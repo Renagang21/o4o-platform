@@ -11,6 +11,96 @@
 
 import type { DataSource, Repository } from 'typeorm';
 import { SharedProductDescription } from '../entities/SharedProductDescription.entity.js';
+
+// ── bulk canonical eligibility — 단일 소스(서비스 + Job 공유). repo 미의존(raw ds.query). ──
+// WO-O4O-DRUG-SHARED-DESCRIPTION-BULK-CANONICAL-APPLY-V1
+
+/** eligibility 판정식 dry-run (write 0). */
+export async function bulkCanonicalDryRunQuery(
+  dataSource: DataSource,
+  sourceType = 'mfds_easy_drug',
+): Promise<BulkCanonicalDryRun> {
+  const base: Array<Record<string, string>> = await dataSource.query(
+    `WITH nr AS (
+       SELECT spd.id, spd.master_id, spd.content
+         FROM shared_product_descriptions spd
+        WHERE spd.source_type = $1 AND spd.status='needs_review' AND spd.deleted_at IS NULL
+     ),
+     per_master AS (SELECT master_id, count(*) AS cnt FROM nr GROUP BY master_id)
+     SELECT
+       (SELECT count(*)::text FROM nr) AS total,
+       (SELECT count(*)::text FROM nr WHERE content IS NULL OR btrim(content)='') AS empty_content,
+       (SELECT count(*)::text FROM per_master WHERE cnt>1) AS ambiguous_masters,
+       (SELECT count(DISTINCT c.master_id)::text FROM shared_product_descriptions c
+          WHERE c.status='canonical' AND c.deleted_at IS NULL
+            AND c.master_id IN (SELECT master_id FROM nr)) AS existing_canonical,
+       (SELECT count(*)::text FROM nr
+          JOIN product_masters pm ON pm.id = nr.master_id
+          LEFT JOIN representative_products rp ON rp.id = pm.representative_product_id
+         WHERE (rp.metadata->'reviewFlags'->>'multiManufacturer')::bool IS TRUE) AS multi_manufacturer`,
+    [sourceType],
+  );
+  const r = base[0] ?? {};
+  const total = parseInt(r.total ?? '0', 10);
+  const excludedEmptyContent = parseInt(r.empty_content ?? '0', 10);
+  const excludedAmbiguous = parseInt(r.ambiguous_masters ?? '0', 10);
+  const excludedExistingCanonical = parseInt(r.existing_canonical ?? '0', 10);
+  const excludedMultiManufacturer = parseInt(r.multi_manufacturer ?? '0', 10);
+  const eligibleForBulkCanonical =
+    total - excludedEmptyContent - excludedExistingCanonical - excludedMultiManufacturer;
+
+  const sampleEligible: Array<{ id: string; masterName: string | null; mfdsCode: string | null }> =
+    await dataSource.query(
+      `SELECT spd.id, pm.name AS "masterName", rp.metadata->'sourceIdentifiers'->>'mfdsCode' AS "mfdsCode"
+         FROM shared_product_descriptions spd
+         JOIN product_masters pm ON pm.id = spd.master_id
+         LEFT JOIN representative_products rp ON rp.id = pm.representative_product_id
+        WHERE spd.source_type=$1 AND spd.status='needs_review' AND spd.deleted_at IS NULL
+          AND btrim(coalesce(spd.content,''))<>''
+          AND (rp.metadata->'reviewFlags'->>'multiManufacturer')::bool IS NOT TRUE
+          AND NOT EXISTS (SELECT 1 FROM shared_product_descriptions c
+                           WHERE c.master_id=spd.master_id AND c.status='canonical' AND c.deleted_at IS NULL)
+        ORDER BY spd.updated_at DESC LIMIT 10`,
+      [sourceType],
+    );
+
+  return {
+    sourceType,
+    totalNeedsReview: total,
+    eligibleForBulkCanonical,
+    excludedExistingCanonical,
+    excludedMultiManufacturer,
+    excludedEmptyContent,
+    excludedAmbiguous,
+    sampleEligible,
+  };
+}
+
+/** eligibility 와 **동일 WHERE** 로 set-based UPDATE 승격. 멱등(canonical 재실행 제외). */
+export async function bulkCanonicalApplyQuery(
+  dataSource: DataSource,
+  sourceType: string,
+  actorId: string | null,
+): Promise<number> {
+  const rows: Array<{ applied: string }> = await dataSource.query(
+    `WITH upd AS (
+       UPDATE shared_product_descriptions spd
+          SET status='canonical', curated_at=NOW(), curated_by=$2, updated_by=$2, updated_at=NOW()
+         FROM product_masters pm
+         LEFT JOIN representative_products rp ON rp.id = pm.representative_product_id
+        WHERE spd.master_id = pm.id
+          AND spd.source_type = $1 AND spd.status='needs_review' AND spd.deleted_at IS NULL
+          AND btrim(coalesce(spd.content,'')) <> ''
+          AND (rp.metadata->'reviewFlags'->>'multiManufacturer')::bool IS NOT TRUE
+          AND NOT EXISTS (SELECT 1 FROM shared_product_descriptions c
+                           WHERE c.master_id = spd.master_id AND c.status='canonical' AND c.deleted_at IS NULL)
+        RETURNING spd.id
+     )
+     SELECT count(*)::text AS applied FROM upd`,
+    [sourceType, actorId],
+  );
+  return parseInt(rows[0]?.applied ?? '0', 10);
+}
 import type {
   SharedProductDescriptionSourceType,
   SharedProductDescriptionStatus,
@@ -472,62 +562,26 @@ export class SharedProductDescriptionService {
    *            + 기존 canonical 없음 + 다제조사 아님.
    */
   async bulkCanonicalDryRun(sourceType = 'mfds_easy_drug'): Promise<BulkCanonicalDryRun> {
-    const base: Array<Record<string, string>> = await this.dataSource.query(
-      `WITH nr AS (
-         SELECT spd.id, spd.master_id, spd.content
-           FROM shared_product_descriptions spd
-          WHERE spd.source_type = $1 AND spd.status='needs_review' AND spd.deleted_at IS NULL
-       ),
-       per_master AS (
-         SELECT master_id, count(*) AS cnt FROM nr GROUP BY master_id
-       )
-       SELECT
-         (SELECT count(*)::text FROM nr) AS total,
-         (SELECT count(*)::text FROM nr WHERE content IS NULL OR btrim(content)='') AS empty_content,
-         (SELECT count(*)::text FROM per_master WHERE cnt>1) AS ambiguous_masters,
-         (SELECT count(DISTINCT c.master_id)::text FROM shared_product_descriptions c
-            WHERE c.status='canonical' AND c.deleted_at IS NULL
-              AND c.master_id IN (SELECT master_id FROM nr)) AS existing_canonical,
-         (SELECT count(*)::text FROM nr
-            JOIN product_masters pm ON pm.id = nr.master_id
-            LEFT JOIN representative_products rp ON rp.id = pm.representative_product_id
-           WHERE (rp.metadata->'reviewFlags'->>'multiManufacturer')::bool IS TRUE) AS multi_manufacturer`,
-      [sourceType],
-    );
-    const r = base[0] ?? {};
-    const total = parseInt(r.total ?? '0', 10);
-    const excludedEmptyContent = parseInt(r.empty_content ?? '0', 10);
-    const excludedAmbiguous = parseInt(r.ambiguous_masters ?? '0', 10);
-    const excludedExistingCanonical = parseInt(r.existing_canonical ?? '0', 10);
-    const excludedMultiManufacturer = parseInt(r.multi_manufacturer ?? '0', 10);
-    const eligibleForBulkCanonical =
-      total - excludedEmptyContent - excludedExistingCanonical - excludedMultiManufacturer;
+    return bulkCanonicalDryRunQuery(this.dataSource, sourceType);
+  }
 
-    const sampleEligible: Array<{ id: string; masterName: string | null; mfdsCode: string | null }> =
-      await this.dataSource.query(
-        `SELECT spd.id, pm.name AS "masterName", rp.metadata->'sourceIdentifiers'->>'mfdsCode' AS "mfdsCode"
-           FROM shared_product_descriptions spd
-           JOIN product_masters pm ON pm.id = spd.master_id
-           LEFT JOIN representative_products rp ON rp.id = pm.representative_product_id
-          WHERE spd.source_type=$1 AND spd.status='needs_review' AND spd.deleted_at IS NULL
-            AND btrim(coalesce(spd.content,''))<>''
-            AND (rp.metadata->'reviewFlags'->>'multiManufacturer')::bool IS NOT TRUE
-            AND NOT EXISTS (SELECT 1 FROM shared_product_descriptions c
-                             WHERE c.master_id=spd.master_id AND c.status='canonical' AND c.deleted_at IS NULL)
-          ORDER BY spd.updated_at DESC LIMIT 10`,
-        [sourceType],
-      );
-
-    return {
-      sourceType,
-      totalNeedsReview: total,
-      eligibleForBulkCanonical,
-      excludedExistingCanonical,
-      excludedMultiManufacturer,
-      excludedEmptyContent,
-      excludedAmbiguous,
-      sampleEligible,
-    };
+  /**
+   * bulk canonical apply — dry-run 과 **동일 eligibility**(bulkCanonicalApplyQuery, 단일 소스)로
+   * set-based UPDATE 승격. WO-O4O-DRUG-SHARED-DESCRIPTION-BULK-CANONICAL-APPLY-V1.
+   * 멱등(canonical 재실행 제외). ambiguous=0 전제 → master당 canonical 1개 partial-unique 만족.
+   */
+  async bulkCanonicalApply(params: {
+    apply: boolean;
+    actorId?: string | null;
+    sourceType?: string;
+  }): Promise<{ mode: 'dry-run' | 'apply'; eligible: number; applied: number }> {
+    const sourceType = params.sourceType ?? 'mfds_easy_drug';
+    const dry = await bulkCanonicalDryRunQuery(this.dataSource, sourceType);
+    if (!params.apply) {
+      return { mode: 'dry-run', eligible: dry.eligibleForBulkCanonical, applied: 0 };
+    }
+    const applied = await bulkCanonicalApplyQuery(this.dataSource, sourceType, params.actorId ?? null);
+    return { mode: 'apply', eligible: dry.eligibleForBulkCanonical, applied };
   }
 }
 
