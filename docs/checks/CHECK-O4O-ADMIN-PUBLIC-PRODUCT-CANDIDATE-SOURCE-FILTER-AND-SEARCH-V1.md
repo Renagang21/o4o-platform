@@ -52,12 +52,18 @@ ILIKE 파라미터는 `%` `_` `\` 를 리터럴 이스케이프 후 `%term%` 바
 
 → `source_label` 필터가 external_api 후보를 정확히 분리하고, 검색이 상품명/업체명/식별번호 3축에서 동작함을 실데이터로 확인.
 
-### 2.3 Browser smoke (admin.neture.co.kr) — **후속(배포 대기)**
-admin-dashboard 변경은 배포 후 라이브 확인 대상. 배포 완료 후:
-1. `/admin/o4o-product-db/candidates` 진입
-2. source_label = `MFDS_HEALTH_FUNCTIONAL_FOOD` 필터 → 총 44,885 표시
-3. STTEMNT_NO 검색 → 단건, 상세 rawPayload 확인
-(본 CHECK 시점 미실행 — 별도 browser verification 으로 기록 예정.)
+### 2.3 Browser smoke (admin.neture.co.kr) — **PASS (2026-07-04, Playwright)**
+배포 확인: 커밋 `4e4c76876` → "Deploy Admin Dashboard (Cloud Run)" + "Deploy API Server" 모두 success. admin.neture.co.kr 라이브.
+Admin 계정(sohae2100) 로그인 → `/admin/o4o-product-db/candidates`(공공데이터 후보 탭):
+
+| 확인 | 기대 | 실측 |
+|---|---|---|
+| source_label = `MFDS_HEALTH_FUNCTIONAL_FOOD` 필터 | 총 44,885건 | **총 44,885건** ✅ |
+| + STTEMNT_NO `20140017002183` 검색 | 단건 | **총 1건, row 1** (`11종 혼합유산균`/`일동바이오사이언스(주)`/`MFDS_STTEMNT_NO`) ✅ |
+| 상세 rawPayload | MAIN_FNCTN/INTAKE_HINT1/STTEMNT_NO 표시 | **전부 표시** ✅ |
+| console error / pageerror / network 4xx-5xx | 0 | **0 / 0 / 0** ✅ |
+
+→ 배포된 admin UI + api-server + 프로덕션 DB 전 구간 end-to-end 확인. 건기식 후보를 `source_label` 로 분리하고 STTEMNT_NO 로 정확검색해 상세까지 진입 가능함을 라이브로 확정.
 
 ---
 
