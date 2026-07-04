@@ -77,10 +77,25 @@ async function main(): Promise<void> {
   const needDb = args.apply || args.useDb;
   let dataSource = null;
   if (needDb) {
-    // DB 가 필요할 때만 connection.ts 를 import (import 즉시 초기화 시도하므로 dry-run offline 보호)
-    const mod = await import('../database/connection.js');
-    dataSource = mod.AppDataSource;
-    if (!dataSource.isInitialized) await dataSource.initialize();
+    // 최소 DataSource(entities:[]) — service 는 raw ds.query 만 사용하므로 엔티티 메타데이터 불필요.
+    // AppDataSource(전체 엔티티) 는 tsx 로컬 실행 시 emitDecoratorMetadata 미적용으로 초기화 실패 →
+    // 의약품 seed Job 선례와 동일하게 raw DataSource 로 우회. DB 접속값은 env-loader 가 로드한 process.env.
+    const { DataSource } = await import('typeorm');
+    const host = process.env.DB_HOST;
+    dataSource = new DataSource({
+      type: 'postgres',
+      host,
+      port: parseInt(process.env.DB_PORT || '5432', 10),
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+      entities: [],
+      synchronize: false,
+      logging: ['error'],
+      // TCP(공인 IP) 접속은 SSL 필수. Cloud SQL Unix socket(/cloudsql/) 은 이미 암호화 → 불필요.
+      ...(host && !host.startsWith('/cloudsql/') ? { ssl: { rejectUnauthorized: false } } : {}),
+    });
+    await dataSource.initialize();
   }
 
   const service = new HealthFunctionalFoodCandidateImportService();
