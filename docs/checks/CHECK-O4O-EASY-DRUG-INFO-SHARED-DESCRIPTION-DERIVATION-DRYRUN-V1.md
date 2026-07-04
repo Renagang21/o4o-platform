@@ -119,4 +119,23 @@ ProductImage / SupplierProductOffer / OrganizationProductListing / StoreLocalPro
 
 ---
 
-**작성**: O4O Platform 조사 CHECK · 2026-07-04 · read-only. 코드/DB/migration/import/git 변경 0. serviceKey·비밀·raw 원문 미출력.
+**작성**: O4O Platform 조사 CHECK · 2026-07-04 · read-only(조사 §1~§8). serviceKey·비밀·raw 원문 미출력.
+
+---
+
+## 9. Gate A 실행 로그 (2026-07-04) — **candidate apply 완료**
+
+> 채널: Cloud Run Job 신설(사용자 결정). drug-seed 패턴 미러링 — src 루트 Job entry `easy-drug-seed-candidate-import-job.ts`(commit `d8749a645`) + tsup/Dockerfile/.dockerignore 등록. GCS `gs://o4o-media-library/data-seed/mfds-easy-drug-info-raw.jsonl` 업로드 후 다운로드 처리.
+
+| 항목 | 값 |
+|---|---|
+| 사전 백업 | 기존 id **1783079396967** (§12 이후 read-only만 발생 → 현 상태 커버) |
+| Cloud Run Job | `o4o-easy-drug-seed-candidate-import` (region asia-northeast3, cpu2/2Gi, cloudsql gen2) |
+| APPLY 이중가드 | `EASY_DRUG_APPLY=true` + `DRUG_IMPORT_ALLOW_APPLY=I_UNDERSTAND` |
+| dry-run (exec n5dm4) | created=4,757 / updated=0 / skipped=17(파일내 중복) / errored=0, officialText 100% |
+| **apply (exec tjzpr)** | **created=4,757 / updated=0 / skipped=17 / errored=0** |
+| 검증 SQL (read-only) | easy_candidates **4,757**(distinct itemSeq 4,757, 전량 pending) · 매칭 itemSeq 4,757 → **derivable_masters 19,431** |
+
+**→ Gate A 완료.** e약은요 4,757 품목이 `product_candidates`(external_api/MFDS_CODE/easy_drug_info)로 적재됨. ProductMaster/Identifier 등 다른 테이블 미생성. **Gate C(SharedProductDescription 19,431 파생)는 별도 게이트 — 파생 서비스 신규 구현 + 승인 후 진행.**
+
+**Gate C 결정(사용자 확정)**: source_type=**`mfds_easy_drug`**(신규, union 추가) · status=**`needs_review`** · 채널=Cloud Run Job(파생 apply).
