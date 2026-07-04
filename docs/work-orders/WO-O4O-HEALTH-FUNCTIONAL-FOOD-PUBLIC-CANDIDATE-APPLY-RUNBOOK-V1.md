@@ -228,3 +228,36 @@ WHERE source_type = 'external_api'
 이번 변경 = runbook 문서 1건.
 
 **최종: 건강기능식품 Gate A apply 는 실행 준비(코드·검증·근거) 완료 상태다. 본 runbook 은 백업·사전조건 10개·실행명령·검증SQL 9종·rollback·승인게이트를 고정한다. apply 실행은 사용자의 명시적 "apply 승인" 이후에만 별도 진행하며, 승인 전까지 DB write 는 발생하지 않는다.**
+
+---
+
+## 9. Apply 실행 완료 기록 (2026-07-04, 사용자 "write 진행" 승인)
+
+**실행:** `NODE_ENV=production HFF_IMPORT_ALLOW_APPLY=I_UNDERSTAND pnpm --filter @o4o/api-server hff:candidate-import -- --file <raw> --apply --use-db`
+- CLI 리포트: mode=apply, processedRows 44,885, **created 44,885 / updated 0 / skipped 0 / errored 0**, nameTruncated 0.
+
+### 9.1 프로덕션 검증 SQL 결과 (전부 합격)
+| 검증 | 기대 | 실측 |
+|---|---|---|
+| SQL-B HFF count | 44,885 | **44,885** ✅ |
+| SQL-A total candidates | 355,166 | **355,166** ✅ |
+| SQL-C distinct normalized STTEMNT_NO | 44,885 | **44,885** ✅ |
+| SQL-D distinct identifier_value | 44,885 | **44,885** ✅ |
+| SQL-E/F/G name·mfr·raw null | 0/0/0 | **0/0/0** ✅ |
+| SQL-I product_masters (불변) | 230,843 | **230,843** ✅ |
+| SQL-I product_identifiers (불변) | 703,483 | **703,483** ✅ |
+| flags | SKU 44,885·INTAKE_HINT 1,663·PRSRV 415·MAIN_FUNCTION 31 | 일치 ✅ |
+| candidate_status | pending 44,885 | **pending 44,885** ✅ |
+
+**ProductMaster/ProductIdentifier 완전 불변 → Gate A 격리 성공(후보만 적재).**
+
+### 9.2 실행 gotcha (기록)
+1. **SSL/env**: 프로덕션 DB TCP 접속은 SSL 필수. CLI 를 `NODE_ENV=production` 으로 실행(→ env-loader 가 `.env.production` 없으면 `apps/api-server/.env` 폴백, connection ssl 활성).
+2. **AppDataSource 회피**: tsx 로컬 실행 시 전체 엔티티 메타데이터 오류(`DeploymentInstance#domain`) → CLI 를 최소 `entities:[]` DataSource 로 수정(commit 7905010d3, raw ds.query 전용).
+3. **numOfRows / 방화벽**: 프로덕션 DB 방화벽에 실행 IP 임시 추가 → **병렬 세션이 authorized-networks 를 "원복"하며 내 임시 IP 를 clobber**(리스트 전체 교체 특성) → 1차 apply ETIMEDOUT(0 write, idempotent 라 무해) → 2차 성공. 교훈: 동시 세션이 있을 때 방화벽 기반 로컬 apply 는 창을 최소화하거나 Cloud Run Job(방화벽 무관) 권장.
+4. **firewall 원복**: 완료 후 `124.194.156.36/32` only 로 원복 확인.
+
+### 9.3 rollback (미사용 — 검증 합격)
+문제 없어 rollback 불필요. 필요 시 §6 (`source_label='MFDS_HEALTH_FUNCTIONAL_FOOD'` 삭제).
+
+**Gate A 완료: 건강기능식품 ProductCandidate 44,885건 프로덕션 적재·검증 완료. ProductMaster 승격(Gate B)은 barcode/포장/허가상태 원천 확보 후 별도.**
