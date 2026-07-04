@@ -139,3 +139,24 @@ ProductImage / SupplierProductOffer / OrganizationProductListing / StoreLocalPro
 **→ Gate A 완료.** e약은요 4,757 품목이 `product_candidates`(external_api/MFDS_CODE/easy_drug_info)로 적재됨. ProductMaster/Identifier 등 다른 테이블 미생성. **Gate C(SharedProductDescription 19,431 파생)는 별도 게이트 — 파생 서비스 신규 구현 + 승인 후 진행.**
 
 **Gate C 결정(사용자 확정)**: source_type=**`mfds_easy_drug`**(신규, union 추가) · status=**`needs_review`** · 채널=Cloud Run Job(파생 apply).
+
+---
+
+## 10. Gate C 실행 로그 (2026-07-04) — **SharedProductDescription 파생 완료**
+
+> 채널: Cloud Run Job `o4o-easy-drug-shared-description-derive`. 파생 서비스 `easy-drug-shared-description-derive.service.ts`(raw batch INSERT + `sanitizeDescriptionHtml`) + Job entry(commit `2889c92d6`). union `mfds_easy_drug` 추가(additive). e약은요 candidate `raw_payload.officialConsumerText` → 매칭 master별 `<p><strong>섹션</strong>…</p>` 조합 → 청크 multi-row INSERT.
+
+| 항목 | 값 |
+|---|---|
+| 사전 백업 (Gate C) | ✅ id **1783144286700** (SUCCESSFUL, `pre-easy-drug-shared-description-derive-20260704`) |
+| Cloud Run Job | `o4o-easy-drug-shared-description-derive` (cpu2/2Gi, cloudsql gen2, timeout 3600) |
+| APPLY 이중가드 | `EASY_DRUG_DERIVE_APPLY=true` + `DRUG_IMPORT_ALLOW_APPLY=I_UNDERSTAND` |
+| dry-run (exec qhtft) | matched 4,757 / unmatched 0 / emptyContent 0 · created 19,431 / errored 0 |
+| **apply (exec pqr65)** | **created 19,431 / errored 0** (39s) |
+| 검증 SQL (read-only) | mfds_easy_drug **19,431행**(status=needs_review 전량), distinct master **19,431** / candidate **4,757**, empty_content **0**, dup_pair **0**, canonical **0** |
+
+**해소 이슈**: 초기 파생 Job 이 `SharedProductDescriptionService`(repository) 경유 → `SharedProductDescription.master` ManyToOne('ProductMaster') 메타 미등록으로 DataSource init 실패. → drug promotion 과 동일하게 **raw ds.query + sanitizeDescriptionHtml 직접 호출 + 청크 INSERT**(entities:[]) 로 전환하여 해소.
+
+**→ Gate C 완료. WO 종결.** e약은요 4,757 품목의 공식 소비자 설명이 매칭 ProductMaster 19,431건에 `shared_product_descriptions`(source_type=`mfds_easy_drug`, status=`needs_review`)로 파생됨. 다른 테이블 미생성.
+
+**후속(별도 WO)**: (1) 운영자 큐레이션 → master당 canonical 승격(`setCanonical`). (2) e약은요 이미지 GCS 사본 → ProductImage(2,789 itemSeq 보유). (3) RepresentativeProduct 품목 그룹핑. (4) 다제조사 476 itemSeq 큐레이션 플래그.
