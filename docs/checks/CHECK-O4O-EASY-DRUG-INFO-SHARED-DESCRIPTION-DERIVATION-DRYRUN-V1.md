@@ -1,7 +1,7 @@
 # CHECK-O4O-EASY-DRUG-INFO-SHARED-DESCRIPTION-DERIVATION-DRYRUN-V1
 
-> **작업명**: WO-O4O-EASY-DRUG-INFO-CANDIDATE-APPLY-AND-SHARED-DESCRIPTION-DERIVATION-V1 (조사·dry-run 단계)
-> **일자**: 2026-07-04 · **성격**: read-only 조사 CHECK — 코드/DB/migration/import/git write 0. 산출물 = 본 문서 1개.
+> **작업명**: WO-O4O-EASY-DRUG-INFO-CANDIDATE-APPLY-AND-SHARED-DESCRIPTION-DERIVATION-V1 (**WO 종료** — Gate A/C apply 완료)
+> **일자**: 2026-07-04 · **성격**: 초기 dry-run 조사 CHECK(§1~§8)에서 **Gate A/C apply 완료 기록(§9·§10)까지 확장된 WO 종료 문서**. 코드/DB write 는 §9·§10 의 승인 게이트에 따라 수행됨.
 > **선행**: `CHECK-O4O-EASY-DRUG-INFO-CANDIDATE-TO-MASTER-DRUGEXTENSION-DESIGN-V1`(설계), `CHECK-O4O-EASY-DRUG-TO-DRUG-MASTER-OFFLINE-MATCH-SIMULATION-V1`, `CHECK-O4O-DRUG-SEED-CANDIDATE-APPLY-RUNBOOK-V1 §12`(ProductMaster 230,841 완주), `IR-O4O-PUBLIC-PRODUCT-SEED-STANDARD-PROCESS-V1`.
 > **목적**: 이미 생성된 ProductMaster 230,841건에 **e약은요 공식 소비자 설명을 연결**(itemSeq=MFDS_CODE 기준 SharedProductDescription 파생)하기 위한 **운영 DB 실측 dry-run** + 게이트 계획 고정. **e약은요로 ProductMaster 재생성 아님.**
 
