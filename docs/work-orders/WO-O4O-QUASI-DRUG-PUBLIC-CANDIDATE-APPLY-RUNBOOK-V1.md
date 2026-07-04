@@ -223,3 +223,36 @@ UPDATE product_candidates SET deleted_at = NOW()
 ---
 
 **최종: 의약외품 Gate A apply 절차·검증 SQL·rollback·트랙 격리(sourceKind='quasi_drug_permit')·승인 게이트를 고정했다. apply 는 사용자 "의약외품 apply 승인" 후 pre-snapshot → dry-run --use-db → apply → §5 검증 순으로만 진행한다.**
+
+---
+
+## 9. Gate A 실행 로그 (2026-07-04) — **candidate apply 완료**
+
+> 승인: 사용자 "의약외품 apply 승인" (지금 실행 승인).
+> 채널: local + 임시 authorized-network(기존 `124.194.156.36/32` 보존 → 내 IP 임시 추가 → 즉시 원복). write 는 **tested mapper(`mapQuasiDrugRow`) + 직접 pg 청크 INSERT(트랜잭션 + 사전 count=0 가드 + in-tx verify)** 로 수행 — AppDataSource init 우회(easy-drug Gate C 메타 이슈 회피) + per-row 왕복 대신 청크로 고속화. INSERT 컬럼 매핑은 서비스 `applyRows` 와 동일. 임시 스크립트는 커밋하지 않고 실행 후 삭제.
+
+| 항목 | 값 |
+|---|---|
+| 사전 백업 (on-demand) | ✅ id **1783151804720** (SUCCESSFUL, `pre-quasi-drug-candidate-apply-20260704`) |
+| APPLY 가드 | 스크립트 사전 `existing quasi_drug candidates=0` 확인 후 진행 (재실행/중복 방지) |
+| 매핑 | parsed 22,953 / parseErrors 0 / skipped 0 / **truncated 283** |
+| 트랜잭션 | BEGIN → 청크 INSERT(500/stmt) → in-tx verifyCount 22,953 == toInsert → **COMMIT OK** |
+| **apply 결과** | **created 22,953 / errored 0** |
+
+### §5 검증 결과 (apply 후, read-only)
+
+| 지표 | baseline | apply 후 | 판정 |
+|---|---:|---:|:--:|
+| B. `MFDS_QUASI_DRUG_PERMIT` count | 0 | **22,953** | ✅ |
+| A. product_candidates 전체 | 355,166 | **378,119** | ✅ |
+| C. distinct ITEM_SEQ | — | **22,953** | ✅ (유일) |
+| D. candidate_name / manufacturer 결측 | — | **0 / 0** | ✅ |
+| E. candidate_name truncate | — | **283** | ✅ |
+| F. candidate_status=pending | — | **22,953** | ✅ (전량) |
+| **G. product_masters** | 230,843 | **230,843** | ✅ 불변 |
+| **G. product_identifiers** | 703,483 | **703,483** | ✅ 불변 |
+| easy_drug candidates (격리) | 4,757 | **4,757** | ✅ 불변 |
+
+**→ Gate A 완료. rollback 불필요(전 지표 기대치 일치).** 의약외품 22,953 품목이 `product_candidates`(external_api / MFDS_CODE / sourceKind=`quasi_drug_permit`, 전량 pending/unmatched)로 적재됨. ProductMaster/Identifier 등 다른 테이블 **불변**. 방화벽 원복 완료(`124.194.156.36/32`만 잔존). DB secret 미출력.
+
+**후속(별도 WO)**: XML 공식 설명 파서(EE/UD/NB CDATA) → SKU/barcode 원천 audit → Gate B(ProductMaster 승격) 재판정. candidate→master 매칭 시 `sourceKind` 스코프 필수(MFDS_CODE 공유 네임스페이스).
