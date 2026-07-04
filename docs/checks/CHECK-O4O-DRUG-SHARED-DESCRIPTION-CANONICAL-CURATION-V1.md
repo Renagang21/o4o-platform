@@ -113,4 +113,36 @@
 
 ---
 
-**작성**: O4O Platform 조사 CHECK · 2026-07-04 · read-only(1단계). 2~4단계(엔드포인트+UI+dry-run) 는 후속 커밋. serviceKey·비밀 미출력.
+**작성**: O4O Platform 조사 CHECK · 2026-07-04 · 1단계 조사(§1~§9) → 2~4단계 구현 완료(§10). serviceKey·비밀 미출력.
+
+---
+
+## 10. 구현 완료 (2~4단계, commit `c54c5082c`)
+
+> read-only 조회 + 단건 액션만. 대량 canonical apply 없음. 백/프론트 tsc 0 에러.
+
+**백엔드** (`shared-product-description`):
+| 추가 | 내용 |
+|---|---|
+| `service.listForReview(params)` | master/representative join, status/sourceType/q/multiManufacturer/multiName 필터, 서버 페이지네이션 |
+| `service.getReviewDetail(id)` | master/representative/identifier 요약 + content + 대표 썸네일 URL |
+| `service.bulkCanonicalDryRun(sourceType)` | §5 수치(write 0) |
+| `GET /api/v1/admin/shared-product-descriptions` | 목록 (meta 페이지네이션) |
+| `GET /:id/detail` | 상세 |
+| `GET /bulk-canonical/dry-run` | bulk 후보 dry-run |
+| `PATCH /:id/canonical` | **기존 재사용** (단건 승격) |
+
+**프론트** (`apps/admin-dashboard`, admin.neture.co.kr):
+| 추가 | 내용 |
+|---|---|
+| `ProductDbLayout` 탭 | `설명 검토`(review) |
+| `o4o-product-db.routes.tsx` | `review`, `review/:id` (admin/super_admin 게이트 상속) |
+| `DescriptionReviewPage.tsx` | 목록/필터(status·다제조사)/검색 + bulk dry-run 배너 |
+| `DescriptionReviewDetailPage.tsx` | 공식 설명 content + 단건 canonical 승격/반려 + 대표/SKU/식별자/이미지 표시 |
+| `o4o-product-db.api.ts` | listDescriptionReviews / getDescriptionReviewDetail / setDescriptionCanonical / setDescriptionStatus / getBulkCanonicalDryRun |
+
+**검증**: 백엔드 tsup 번들 + `tsc --noEmit` 0 에러(touched 모듈), 프론트 `tsc --noEmit` 0 에러. deploy-api + deploy-admin 트리거.
+
+**생성/수정하지 않은 것**: ProductMaster / ProductIdentifier / RepresentativeProduct / ProductImage / StoreLocalProduct / Offer / Listing / ProductDrugExtension / AI 설명 / 대량 canonical apply — **0**. 병렬 세션 파일(ProductCandidatesPage.tsx) 미포함.
+
+**후속**: 배포 완료 후 브라우저 smoke(약국·operator 계정 아닌 admin 로그인 → /admin/o4o-product-db/review). bulk apply 는 별도 Gate(§8).
