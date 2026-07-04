@@ -37,6 +37,7 @@ export type SharedProductDescriptionSourceType =
   | 'ai'
   | 'store_contribution'
   | 'drug_extension'
+  | 'mfds_easy_drug' // e약은요(공식 소비자 설명) 파생 — WO-O4O-EASY-DRUG-INFO-CANDIDATE-APPLY-AND-SHARED-DESCRIPTION-DERIVATION-V1
   | 'migration'
   | 'manual';
 
@@ -46,6 +47,7 @@ export const SHARED_PRODUCT_DESCRIPTION_SOURCE_TYPES: SharedProductDescriptionSo
   'ai',
   'store_contribution',
   'drug_extension',
+  'mfds_easy_drug',
   'migration',
   'manual',
 ];

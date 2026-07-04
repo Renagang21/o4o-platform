@@ -21,6 +21,8 @@
 !dist/drug-seed-promotion-apply-job.js.map
 !dist/easy-drug-seed-candidate-import-job.js
 !dist/easy-drug-seed-candidate-import-job.js.map
+!dist/easy-drug-shared-description-derive-job.js
+!dist/easy-drug-shared-description-derive-job.js.map
 
 # Allow migrations for TypeORM auto-migration on startup
 !dist/database
