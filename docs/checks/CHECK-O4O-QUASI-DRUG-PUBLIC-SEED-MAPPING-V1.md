@@ -34,10 +34,11 @@
 | data.go.kr ID | `15095679` |
 | endpoint | `https://apis.data.go.kr/1471000/QdrgPrdtPrmsnInfoService03/getQdrgPrdtPrmsnInfoInq03` |
 | 응답 형식 | JSON/XML 지원, 선행 수집은 JSON |
-| 선행 raw 파일 위치(문서 기록) | `C:\Users\home\coding\o4o-public-data-samples\mfds-quasi-drug-permit-raw.jsonl` |
-| 현재 실행환경에서 raw JSONL 확인 | **미확인**. `/workspace`, `/tmp` 검색 결과 원본 JSONL 없음 |
+| 선행 raw 파일 위치(회사 PC 기준) | `C:\Users\home\coding\o4o-public-data-samples\mfds-quasi-drug-permit-raw.jsonl` |
+| **canonical raw 위치(확정)** | `G:\내 드라이브\자료실\public-data-api-samples\mfds-quasi-drug-permit-raw.jsonl` (53.72 MB / 20,000 rec / 수집 2026-07-02) |
+| raw JSONL 확인 상태 | **확인 완료** (2026-07-04 집 PC, `WO-O4O-QUASI-DRUG-PUBLIC-RAW-RESTORE-AND-FIELD-SAMPLE-DRYRUN-V1`) |
 
-> 주의: 이번 CHECK는 현재 컨테이너에서 repo 밖 Windows 경로와 GCS/Google Drive 원본을 직접 열지 못했다. 따라서 실제 row 분석은 선행 CHECK에 기록된 수집 결과를 근거로 하며, 다음 Gate A WO에서 raw 파일 위치를 재확인해야 한다.
+> **정정(2026-07-04):** 최초 CHECK 시 실행환경(Linux 컨테이너)에서 repo 밖 원본을 열지 못해 "미확인"으로 기록했으나, 이후 집 PC에서 raw를 복원해 실측 완료했다. 문서에 기록된 `C:\Users\home\coding\...` 경로는 **회사 PC 기준**이며 틀린 값이 아니다. canonical 저장소는 Google Drive `G:\내 드라이브\자료실\public-data-api-samples\`이다. 실측 결과 및 §2 상태 분포 검증은 `docs/work-orders/WO-O4O-QUASI-DRUG-PUBLIC-RAW-RESTORE-AND-FIELD-SAMPLE-DRYRUN-V1.md` 참조(상태 분포 완전 일치, ITEM_SEQ 표본 유일성·barcode 부재·EE/UD/NB CDATA 실측 확정).
 
 ---
 
