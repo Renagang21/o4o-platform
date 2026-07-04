@@ -71,6 +71,33 @@ export default function ProductMasterDetailPage() {
             <Field label="생성일" value={row.createdAt} />
           </Section>
 
+          {/* WO-O4O-DRUG-CANONICAL-DESCRIPTION-OUTPUT-LINK-V1: 공식 소비자 설명 (매장용 AI 설명 아님) */}
+          <div className="border border-gray-200 rounded-lg overflow-hidden">
+            <div className="bg-gray-50 px-4 py-2 flex items-center justify-between">
+              <span className="text-sm font-semibold text-gray-700">공식 소비자 설명</span>
+              {row.canonicalDescription && (
+                <span className="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-xs">canonical</span>
+              )}
+            </div>
+            <div className="p-4">
+              {row.canonicalDescription ? (
+                <>
+                  <div className="text-xs text-gray-400 mb-2">
+                    출처: {row.canonicalDescription.sourceType === 'mfds_easy_drug' ? '식품의약품안전처 e약은요' : row.canonicalDescription.sourceType}
+                    {row.canonicalDescription.curatedAt && ` · 승격 ${row.canonicalDescription.curatedAt.slice(0, 10)}`}
+                    {' · 매장용 AI 설명이 아닌 공식 소비자 설명입니다'}
+                  </div>
+                  <div
+                    className="prose prose-sm max-w-none text-gray-800"
+                    dangerouslySetInnerHTML={{ __html: row.canonicalDescription.content }}
+                  />
+                </>
+              ) : (
+                <div className="text-sm text-gray-400">공식 설명 없음</div>
+              )}
+            </div>
+          </div>
+
           <div className="border border-gray-200 rounded-lg overflow-hidden">
             <div className="bg-gray-50 px-4 py-2 text-sm font-semibold text-gray-700">
               이미지 ({row.images?.length ?? 0})

@@ -101,6 +101,36 @@ export function createProductLibraryController(dataSource: DataSource): Router {
           [id],
         );
 
+      // WO-O4O-DRUG-CANONICAL-DESCRIPTION-OUTPUT-LINK-V1:
+      //   canonical 공식 설명(status='canonical') 연결. is_canonical 컬럼은 없음 → status 기준.
+      //   방어적: 2건 이상이면 최신 1건만 반환 + warning (partial-unique 상 정상은 1건).
+      const canonRows: Array<{
+        id: string; source_type: string; source_ref_id: string | null; content: string;
+        summary: string | null; status: string; curated_at: string | null; updated_at: string;
+      }> = await dataSource.query(
+        `SELECT id, source_type, source_ref_id, content, summary, status, curated_at, updated_at
+           FROM shared_product_descriptions
+          WHERE master_id = $1 AND status='canonical' AND deleted_at IS NULL
+          ORDER BY updated_at DESC LIMIT 2`,
+        [id],
+      );
+      if (canonRows.length > 1) {
+        logger.warn(`[ProductLibrary] master ${id} has multiple canonical descriptions; returning latest`);
+      }
+      const canonicalDescription = canonRows[0]
+        ? {
+            id: canonRows[0].id,
+            sourceType: canonRows[0].source_type,
+            sourceRefId: canonRows[0].source_ref_id,
+            content: canonRows[0].content,
+            summary: canonRows[0].summary,
+            status: canonRows[0].status,
+            isCanonical: true,
+            curatedAt: canonRows[0].curated_at,
+            updatedAt: canonRows[0].updated_at,
+          }
+        : null;
+
       res.json({
         success: true,
         data: {
@@ -124,6 +154,7 @@ export function createProductLibraryController(dataSource: DataSource): Router {
             sortOrder: img.sort_order,
             type: img.type || 'detail',
           })),
+          canonicalDescription,
           createdAt: master.createdAt,
         },
       });

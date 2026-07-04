@@ -167,6 +167,19 @@ export interface ProductMasterImage {
   type: string;
 }
 
+/** WO-O4O-DRUG-CANONICAL-DESCRIPTION-OUTPUT-LINK-V1: 공식 canonical 설명(status='canonical') */
+export interface CanonicalDescription {
+  id: string;
+  sourceType: string;
+  sourceRefId: string | null;
+  content: string;
+  summary: string | null;
+  status: string;
+  isCanonical: boolean;
+  curatedAt: string | null;
+  updatedAt: string;
+}
+
 export interface ProductMasterDetail {
   id: string;
   barcode: string;
@@ -182,6 +195,8 @@ export interface ProductMasterDetail {
   category: { id: string; name: string } | null;
   brand: { id: string; name: string } | null;
   images: ProductMasterImage[];
+  /** 공식 소비자 설명 (없으면 null). 매장용 AI 설명과 구분. */
+  canonicalDescription: CanonicalDescription | null;
   createdAt: string;
 }
 
