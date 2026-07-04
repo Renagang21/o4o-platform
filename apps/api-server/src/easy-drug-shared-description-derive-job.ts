@@ -24,7 +24,6 @@
 
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
-import { SharedProductDescription } from './modules/neture/entities/SharedProductDescription.entity.js';
 import { EasyDrugSharedDescriptionDeriveService } from './modules/neture/drug-import/easy-drug-shared-description-derive.service.js';
 
 const log = {
@@ -53,7 +52,7 @@ function createDataSource(): DataSource {
     username: DB_USERNAME,
     password: DB_PASSWORD,
     database: DB_NAME,
-    entities: [SharedProductDescription], // createCandidate repo 용 — 그 외는 raw ds.query
+    entities: [], // raw ds.query 만 사용 — 엔티티 메타 불필요
     synchronize: false,
     logging: ['error'],
   });

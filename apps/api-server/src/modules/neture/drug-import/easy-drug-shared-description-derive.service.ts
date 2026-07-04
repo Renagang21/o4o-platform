@@ -1,5 +1,5 @@
 /**
- * Easy Drug → SharedProductDescription Derivation Service
+ * Easy Drug → SharedProductDescription Derivation Service (raw batch, DataSource-backed)
  *
  * WO-O4O-EASY-DRUG-INFO-CANDIDATE-APPLY-AND-SHARED-DESCRIPTION-DERIVATION-V1 / Gate C
  * 설계: CHECK-O4O-EASY-DRUG-INFO-CANDIDATE-TO-MASTER-DRUGEXTENSION-DESIGN-V1 §10,
@@ -17,13 +17,16 @@
  *   - source_type = 'mfds_easy_drug' (신규 union), status = 'needs_review' (공식 설명 법적 검수 전제).
  *   - dedup = (master_id, source_type='mfds_easy_drug', source_ref_id=candidate.id) → 재실행 멱등.
  *   - dry-run 기본. apply 는 호출자(Job)가 이중 가드로 결정.
- *   - 저장값 sanitize 는 SharedProductDescriptionService.createCandidate 가 수행(sanitize-on-write).
+ *   - 저장값 sanitize = sanitizeDescriptionHtml (sanitize-on-write 계약 유지). 대량 write 는 청크 INSERT.
+ *   - raw ds.query 만 사용(엔티티 메타 불필요) — drug promotion 배치와 동일 패턴.
  */
 
 import type { DataSource } from 'typeorm';
-import { SharedProductDescriptionService } from '../services/shared-product-description.service.js';
+import { randomUUID } from 'crypto';
+import { sanitizeDescriptionHtml } from '../utils/sanitize-description-html.util.js';
 
-export const EASY_DRUG_SPD_SOURCE_TYPE = 'mfds_easy_drug' as const;
+export const EASY_DRUG_SPD_SOURCE_TYPE = 'mfds_easy_drug';
+export const EASY_DRUG_SPD_STATUS = 'needs_review';
 export const EASY_DRUG_SOURCE_KIND = 'easy_drug_info';
 
 /** e약은요 공식 소비자 설명 원문 (candidate.raw_payload.officialConsumerText) */
@@ -71,19 +74,12 @@ export interface DeriveReport {
   sourceType: string;
   totalEasyCandidates: number;
   scannedCandidates: number;
-  /** 매칭 master 가 1개 이상인 candidate */
   matchedCandidates: number;
-  /** 매칭 master 0개 candidate (active master 없음) */
   unmatchedCandidates: number;
-  /** 조합 결과 빈 content candidate (officialConsumerText 전무) */
   emptyContentCandidates: number;
-  /** candidate×master 로 고려된 파생 링크 총수 */
   masterLinksConsidered: number;
-  /** 신규 생성(apply) 또는 생성 예정(dry-run) */
   created: number;
-  /** dedup 으로 skip (기존 동일 source_ref) */
   skippedDuplicate: number;
-  /** 빈 content 로 skip */
   skippedEmpty: number;
   errored: number;
   errors: Array<{ candidateId: string; masterId: string | null; reason: string }>;
@@ -95,14 +91,16 @@ interface EasyCandRow {
   oct: OfficialConsumerText | null;
 }
 
+interface BufferedSpd {
+  id: string;
+  masterId: string;
+  content: string;
+  sourceRefId: string;
+}
+
 export class EasyDrugSharedDescriptionDeriveService {
-  private readonly spdService: SharedProductDescriptionService;
+  constructor(private readonly dataSource: DataSource) {}
 
-  constructor(private readonly dataSource: DataSource) {
-    this.spdService = new SharedProductDescriptionService(dataSource);
-  }
-
-  /** e약은요 candidate 총수 */
   private async countCandidates(): Promise<number> {
     const rows: Array<{ c: string }> = await this.dataSource.query(
       `SELECT count(*)::text AS c FROM product_candidates
@@ -123,15 +121,42 @@ export class EasyDrugSharedDescriptionDeriveService {
     return rows.map((r) => r.product_master_id);
   }
 
-  /** 기존 파생 존재 (master_id, source_type, source_ref_id) — dedup */
-  private async existsDerived(masterId: string, candidateId: string): Promise<boolean> {
-    const rows: Array<{ id: string }> = await this.dataSource.query(
-      `SELECT id FROM shared_product_descriptions
-        WHERE master_id=$1 AND source_type=$2 AND source_ref_id=$3 AND deleted_at IS NULL
-        LIMIT 1`,
-      [masterId, EASY_DRUG_SPD_SOURCE_TYPE, candidateId],
-    );
-    return rows.length > 0;
+  /** 기존 mfds_easy_drug 파생 (master_id, source_ref_id) 선적재 → dedup Set */
+  private async preloadExisting(): Promise<Set<string>> {
+    const rows: Array<{ master_id: string; source_ref_id: string | null }> =
+      await this.dataSource.query(
+        `SELECT master_id, source_ref_id FROM shared_product_descriptions
+          WHERE source_type=$1 AND deleted_at IS NULL`,
+        [EASY_DRUG_SPD_SOURCE_TYPE],
+      );
+    const set = new Set<string>();
+    for (const r of rows) if (r.source_ref_id) set.add(`${r.master_id}::${r.source_ref_id}`);
+    return set;
+  }
+
+  /** 청크 multi-row INSERT (10 param/row, chunk 500) */
+  private async flush(buf: BufferedSpd[]): Promise<void> {
+    const size = 500;
+    for (let i = 0; i < buf.length; i += size) {
+      const chunk = buf.slice(i, i + size);
+      if (chunk.length === 0) continue;
+      const vals: string[] = [];
+      const params: unknown[] = [];
+      let p = 1;
+      for (const b of chunk) {
+        // id, master_id, content, summary(null), source_type, source_ref_id, status, language, created_at, updated_at
+        vals.push(
+          `($${p++}, $${p++}, $${p++}, NULL, $${p++}, $${p++}, $${p++}, 'ko', NOW(), NOW())`,
+        );
+        params.push(b.id, b.masterId, b.content, EASY_DRUG_SPD_SOURCE_TYPE, b.sourceRefId, EASY_DRUG_SPD_STATUS);
+      }
+      await this.dataSource.query(
+        `INSERT INTO shared_product_descriptions
+           (id, master_id, content, summary, source_type, source_ref_id, status, language, created_at, updated_at)
+         VALUES ${vals.join(', ')}`,
+        params,
+      );
+    }
   }
 
   async run(opts: DeriveOptions): Promise<DeriveReport> {
@@ -151,6 +176,9 @@ export class EasyDrugSharedDescriptionDeriveService {
       errored: 0,
       errors: [],
     };
+
+    const existing = await this.preloadExisting();
+    const buf: BufferedSpd[] = [];
 
     let lastId = '00000000-0000-0000-0000-000000000000';
     for (;;) {
@@ -174,7 +202,8 @@ export class EasyDrugSharedDescriptionDeriveService {
         lastId = cand.id;
         report.scannedCandidates += 1;
 
-        const content = composeEasyDrugContent(cand.oct);
+        const composed = composeEasyDrugContent(cand.oct);
+        const content = sanitizeDescriptionHtml(composed);
         const itemSeq = cand.item_seq != null ? String(cand.item_seq).trim() : '';
         const masterIds = itemSeq ? await this.findMasterIds(itemSeq) : [];
 
@@ -185,7 +214,6 @@ export class EasyDrugSharedDescriptionDeriveService {
         report.matchedCandidates += 1;
 
         if (!content.trim()) {
-          // 매칭은 됐으나 조합 content 가 비어 파생 불가
           report.emptyContentCandidates += 1;
           report.masterLinksConsidered += masterIds.length;
           report.skippedEmpty += masterIds.length;
@@ -194,36 +222,29 @@ export class EasyDrugSharedDescriptionDeriveService {
 
         for (const masterId of masterIds) {
           report.masterLinksConsidered += 1;
-          try {
-            if (await this.existsDerived(masterId, cand.id)) {
-              report.skippedDuplicate += 1;
-              continue;
-            }
-            if (opts.apply) {
-              await this.spdService.createCandidate({
-                masterId,
-                content,
-                sourceType: EASY_DRUG_SPD_SOURCE_TYPE,
-                sourceRefId: cand.id,
-                status: 'needs_review',
-                createdBy: opts.actorId ?? null,
-              });
-            }
-            report.created += 1;
-          } catch (e) {
-            report.errored += 1;
-            if (report.errors.length < 20) {
-              report.errors.push({
-                candidateId: cand.id,
-                masterId,
-                reason: (e as Error).message,
-              });
+          const key = `${masterId}::${cand.id}`;
+          if (existing.has(key)) {
+            report.skippedDuplicate += 1;
+            continue;
+          }
+          existing.add(key); // in-run dedup 방어
+          report.created += 1;
+          if (opts.apply) {
+            buf.push({ id: randomUUID(), masterId, content, sourceRefId: cand.id });
+            if (buf.length >= 2000) {
+              await this.flush(buf);
+              buf.length = 0;
             }
           }
         }
       }
 
       if (rows.length < take) break;
+    }
+
+    if (opts.apply && buf.length > 0) {
+      await this.flush(buf);
+      buf.length = 0;
     }
 
     return report;
