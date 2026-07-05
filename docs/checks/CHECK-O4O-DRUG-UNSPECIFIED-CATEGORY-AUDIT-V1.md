@@ -2,8 +2,8 @@
 
 > WO: `WO-O4O-DRUG-UNSPECIFIED-CATEGORY-AUDIT-AND-CLEANUP-V1`
 > 작업일: 2026-07-05
-> 검증 채널: Cloud SQL Auth Proxy v2 (read-only SELECT, port 5433) — 프로덕션 `o4o_platform`
-> 상태: **조사 완료 / 표시·삭제 미실행 (사용자 승인 대기)**
+> 검증 채널: Cloud SQL Auth Proxy v2 (port 5433) — 프로덕션 `o4o_platform`
+> 상태: **완료 — 표시(53,428 delete_marked / 293 review) 적용 + 삭제 53,428 실행·검증 (2026-07-05)**
 
 ---
 
@@ -253,7 +253,9 @@ GROUP BY 1 ORDER BY count DESC;
 | `drug_unspecified` 중 Rx 재분류 후보 | 0 |
 | `drug_unspecified` 중 review_required | 293 |
 | 연결 보호로 삭제 제외 | 0 (연결 4건 메코마그민은 애초에 review 버킷) |
-| 실제 삭제 | **0 (미실행, 승인 대기)** |
+| 실제 삭제 | **53,428 (완료, 2026-07-05)** |
+| 삭제 후 drug_unspecified | 293 (전량 review_required) |
+| CASCADE 삭제 identifiers | 107,003 (orphan 0 검증) |
 
 ---
 
@@ -268,5 +270,27 @@ GROUP BY 1 ORDER BY count DESC;
    dry-run: 삭제 대상 53,428 / RESTRICT 자식(offer·listing·service_product) 0 / CASCADE identifiers 107,003 / drug_ext 0. review_required 293 제외.
 3. review_required 293건(일반 제약사 비주사 완제의약품)의 otc/rx 여부 확정.
 4. 상세설명서 대상 산출에서 `drug_unspecified` **전량 제외** (재분류 결과 OTC 0건이므로 추가 편입 없음).
+
+---
+
+## 12. 실행 기록 & 인시던트 (2026-07-05)
+
+### 12.1 표시(1/2) — 정상
+
+- 마이그레이션 `20261210000000-MarkDrugUnspecifiedByRawGubun.ts` 커밋(`05d70e1f4`) → CI/CD 적용 → 프로덕션 검증(delete_marked 53,428 / review_required 293, 미표시 0). **문제 없음, repo 유지.**
+
+### 12.2 삭제(2/2) — 마이그레이션 방식 실패 → 청크 실행으로 완료
+
+- 초기 삭제 마이그레이션 `20261210010000-DeleteDrugUnspecifiedDeleteMarked.ts`(커밋 `aec82553f`)는 53,428 master + CASCADE 107,003 identifiers 를 **단일 트랜잭션**으로 삭제.
+- **인시던트**: 배포 서비스가 `GRACEFUL_STARTUP=true` 라 앱 인스턴스가 기동 시 pending 마이그레이션을 async 실행하는데, 대량 삭제가 느려 헬스체크(startup probe 4m)를 초과 → Cloud Run 이 인스턴스를 계속 재기동 → **여러 삭제 트랜잭션이 동시에 `product_masters`(핵심 라이브 테이블) 락을 잡고 20분+ 경합**. 병렬 세션의 연쇄 배포가 가중.
+- **수습**: 경합 backend 전부 `pg_terminate_backend` 종료(전부 트랜잭션 롤백, 부분삭제 0) → 삭제 마이그레이션을 repo 에서 제거(revert `07e5587c6`, 자동 삭제 시도 차단) → clean 리비전(delete 마이그레이션 없음)이 serving 되도록 안정화 배포 성공.
+- **실제 삭제**: 안정화 후 Cloud SQL proxy 로 **소배치(2,000~3,000건/트랜잭션) 청크 삭제**를 count-driven 루프로 실행. proxy 가 응답을 끊어도 각 배치는 서버에서 커밋되므로 남은 count 를 재확인하며 0까지 반복. 감사 snapshot 53,428 은 삭제 전 `product_master_cleanup_audits`(cleanup_key=`drug_unspecified_raw_gubun_hard_delete_20260705`)에 확보.
+- **최종 검증**: drug_unspecified 293(전량 review_required) / rx 119,548 · otc 57,572 무변경 / audit_snapshots 53,428 / **orphan identifiers 0** / stray backend 0.
+
+### 12.3 교훈 (후속 대량삭제 표준)
+
+- `GRACEFUL_STARTUP=true` + Cloud Run startup probe(4m) + migration job task-timeout(300s) 환경에서 **1만건+ 단일 트랜잭션 삭제 마이그레이션 금지**. 기존 의료기기 cleanup(최대 1,664건)은 통과했으나 5만건 규모는 초과.
+- 대량삭제는 (a) 청크 삭제 스크립트/전용 Job, 또는 (b) `transaction:false` + 내부 배치 커밋 마이그레이션으로 설계. 단일 트랜잭션 대량삭제는 라이브 테이블 락 경합 위험.
+- 삭제 마이그레이션은 **snapshot 을 별도(먼저) 커밋**해 두면 재시도가 빨라진다(NOT EXISTS 가드).
 
 > **삭제·표시는 본 CHECK 승인 전까지 실행하지 않는다.**
