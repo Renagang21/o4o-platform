@@ -1,5 +1,10 @@
 # WO-O4O-MEDICAL-DEVICE-FULL-SCALE-GATE-A-APPLY-RUNBOOK-V1
 
+> 🛑 **HOLD — 실행하지 않음 (2026-07-05 결정).**
+> 유통 증거 우선 원칙([`O4O-DISTRIBUTION-EVIDENCE-SEED-PRINCIPLE-V1`](../baseline/O4O-DISTRIBUTION-EVIDENCE-SEED-PRINCIPLE-V1.md))에 따라
+> 전량 2.66M 는 유통 증거 0(공급자/매장/판매/이미지/가격 전무)인 **규제 SKU 덤프**이므로 적재하지 않는다.
+> 본 문서는 절차 기록으로만 보존한다. 재개하려면 유통 증거 기반 선별 기준을 먼저 정의해야 한다.
+
 > 작업 성격: **전량 2.66M Gate A ProductCandidate apply 실행 전 runbook (문서만).** apply 미실행, DB write 0, migration 0, Cloud Run Job 0. 산출물 = 본 문서 1개.
 > 작성일: 2026-07-05 · 기준 저장소: `C:\Users\sohae\o4o-platform` (집 PC). Linux `/workspace` 무시.
 > 선행: `WO-O4O-MEDICAL-DEVICE-STREAMING-IMPORTER-DRYRUN-V1`(streaming dry-run 완주, commit 356f9aa6d), `WO-O4O-MEDICAL-DEVICE-PUBLIC-CANDIDATE-APPLY-RUNBOOK-V1`(표본 20k), `CHECK-O4O-MEDICAL-DEVICE-FULL-SCALE-RAW-FETCH-AND-GATE-A-IMPORT-DRYRUN-V1`
