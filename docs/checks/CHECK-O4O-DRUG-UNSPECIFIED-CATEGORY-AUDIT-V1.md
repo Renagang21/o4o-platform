@@ -263,7 +263,9 @@ GROUP BY 1 ORDER BY count DESC;
    `product_data_status = 'delete_marked'`(53,428) / `'review_required'`(293), `product_data_curation_reason` 에 버킷 근거 기록.
    프로덕션 dry-run(동일 CASE SELECT)으로 **delete_marked 53,428 / review_required 293(link_guard 4 포함)** 검증됨.
    → **커밋·push 시 CI/CD 마이그레이션 자동 실행 (사용자 승인 필요).**
-2. 승인 후 `delete_marked` hard delete (product_masters + product_identifiers + product_drug_extensions + snapshot). → **별도 승인.**
+2. **삭제 마이그레이션(2/2)** — `apps/api-server/src/database/migrations/20261210010000-DeleteDrugUnspecifiedDeleteMarked.ts` (사용자 승인 2026-07-05).
+   `delete_marked` 53,428 master hard delete + snapshot(`product_master_cleanup_audits`, cleanup_key=`drug_unspecified_raw_gubun_hard_delete_20260705`).
+   dry-run: 삭제 대상 53,428 / RESTRICT 자식(offer·listing·service_product) 0 / CASCADE identifiers 107,003 / drug_ext 0. review_required 293 제외.
 3. review_required 293건(일반 제약사 비주사 완제의약품)의 otc/rx 여부 확정.
 4. 상세설명서 대상 산출에서 `drug_unspecified` **전량 제외** (재분류 결과 OTC 0건이므로 추가 편입 없음).
 
