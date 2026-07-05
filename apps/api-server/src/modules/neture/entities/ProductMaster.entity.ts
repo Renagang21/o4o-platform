@@ -113,6 +113,28 @@ export class ProductMaster {
   mfdsSyncedAt: Date | null;
 
   /**
+   * 상품 데이터 정제 필드 — WO-O4O-MEDICAL-DEVICE-GRADE4-HARD-DELETE-EXECUTE-WITH-COUNT-REPORT-V1
+   *
+   * 정부 원천 데이터(의료기기 표준코드별 제품정보)의 법정 등급을 master 로 백필하여
+   * 등급 기반 데이터 정제(삭제/보류)에 사용한다. candidate raw_payload 의 등급 필드에서 백필.
+   * 값: '1' | '2' | '3' | '4' (varchar, DB enum 아님). null = 비의료기기 또는 미백필.
+   */
+  @Column({ name: 'medical_device_grade', type: 'varchar', length: 8, nullable: true })
+  medicalDeviceGrade: string | null;
+
+  /** 상품 데이터 정제 상태 (예: 'graded') — nullable */
+  @Column({ name: 'product_data_status', type: 'varchar', length: 32, nullable: true })
+  productDataStatus: string | null;
+
+  /** 상품 데이터 정제 사유 (자유 텍스트) — nullable */
+  @Column({ name: 'product_data_curation_reason', type: 'text', nullable: true })
+  productDataCurationReason: string | null;
+
+  /** 상품 데이터 정제 시각 — nullable */
+  @Column({ name: 'product_data_curated_at', type: 'timestamp', nullable: true })
+  productDataCuratedAt: Date | null;
+
+  /**
    * 대표상품(그룹핑) 연결 — WO-O4O-PRODUCT-MASTER-REPRESENTATIVE-LINK-FOUNDATION-V1
    *
    * nullable additive FK. 대표상품 미연결 허용(신규 등록 시 미지정 허용).
