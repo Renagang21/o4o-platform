@@ -1,7 +1,7 @@
 # CHECK-O4O-MEDICAL-DEVICE-GRADE1-CONSUMER-VS-PROFESSIONAL-CATEGORY-AUDIT-AND-CLEANUP-V1
 
 > WO: `WO-O4O-MEDICAL-DEVICE-GRADE1-CONSUMER-VS-PROFESSIONAL-CATEGORY-AUDIT-AND-CLEANUP-V1`
-> 상태: **구현 + 사용자 승인 + 트랜잭션 dry-run 검증 완료 · 실제 삭제는 CI/CD 대기**
+> 상태: **완료 — 사용자 승인 + CI/CD 배포 migration 으로 프로덕션 실삭제·검증 완료 (2026-07-05)**
 
 ---
 
@@ -12,8 +12,9 @@
 | 실행 환경 | 프로덕션 `o4o_platform` (Cloud SQL `o4o-platform-db`) |
 | 검증 채널 | Cloud SQL Auth Proxy v2 (localhost:5433, read/verify only) |
 | dry-run 일시 | 2026-07-05 (KST) |
-| 실제 삭제 방식 | main 배포 → CI/CD 자동 migration |
-| 실행 커밋 | _(CI/CD 배포 후 기록)_ |
+| 실제 삭제 방식 | main 배포 → CI/CD 자동 migration (Deploy API Server, run 28738743524 success) |
+| 실행 커밋 | `ed40c0433` |
+| 실제 삭제 일시 | 2026-07-05 (KST) · 배포 성공 후 프록시 read-only 검증 |
 | 상세설명서 생성 | 0건 |
 
 선행 완료: 4등급(755), 3등급(1,664), 2등급(12,125) hard delete. 삭제 전 의료기기 5,058 (등급1 4,632 / 2 408 / 3 18).
@@ -149,17 +150,21 @@ ROLLBACK 후 1등급 4,632 복원 확인(미영속).
 
 ---
 
-## 7. CI/CD 실제 실행 후 확정 기록 _(배포 후 채움)_
+## 7. CI/CD 실제 실행 후 확정 기록 (프로덕션 검증 완료)
 
-| 항목 | dry-run 예측 | 실제(CI/CD 후) |
+배포(run 28738743524, success) 후 Cloud SQL Auth Proxy read-only 실측:
+
+| 항목 | dry-run 예측 | **실제(CI/CD 후)** |
 |---|---:|---:|
-| 삭제 감사 로그 hard_delete 수 | 1,221 | _( )_ |
-| 삭제 후 1등급 의료기기 | 3,411 | _( )_ |
-| 삭제 후 의료기기 | 3,837 | _( )_ |
-| 삭제 후 전체 | 234,680 | _( )_ |
-| review_required 잔존 | 413 | _( )_ |
-| active 잔존 | 2,998 | _( )_ |
+| 삭제 감사 로그 hard_delete 수 | 1,221 | **1,221** ✅ |
+| 삭제 후 1등급 delete_marked 잔존 | 0 | **0** ✅ |
+| 삭제 후 1등급 의료기기 | 3,411 | **3,411** ✅ |
+| 삭제 후 의료기기 | 3,837 | **3,837** ✅ |
+| 삭제 후 전체 | 234,680 | **234,680** ✅ |
+| review_required 잔존 | 413 | **413** ✅ |
+| active 잔존 | 2,998 | **2,998** ✅ |
 
+예측과 실측 100% 일치. 두 migration(typeorm_migrations 등록) 적용 확인.
 확인 SQL: `cleanup_key='medical_device_grade1_category_based_hard_delete_20260705'`.
 
 ---
@@ -178,11 +183,12 @@ ROLLBACK 후 1등급 4,632 복원 확인(미영속).
 | 삭제 수·비율 기록 | ✅ §6 |
 | 삭제대상 0건 시 no-op | 해당 없음(1,221 존재) |
 | 상세설명서 0건 | ✅ |
-| 운영 DB 적용 후 count 확정 | ⏳ CI/CD 후 §7 |
+| 운영 DB 적용 후 count 확정 | ✅ §7 (실측 = 예측 일치) |
 
 ---
 
 ## 9. 실패/보류 사유
 
-- 실제 hard delete 는 CI/CD 배포 시 실행(§7 확정 필요).
-- WO 후속(§13): 1등급 review_required(413) 소비자 흔적 조사 → 의료기기 정리 후 잔존 확정 → 건기식/의약외품.
+- 없음. 마킹·삭제·검증 전 항목 완료(실제 삭제 1,221, 1등급 delete_marked 잔존 0).
+- **의료기기 4·3·2·1등급 정리 완주**: master 19,602 → 3,837 (등급1 3,411 / 2 408 / 3 18). review_required 총 712(1등급 413+2등급 286+3등급 13).
+- WO 후속(§13): 1등급 review_required(413) 소비자 흔적 조사 → 건기식/의약외품.
