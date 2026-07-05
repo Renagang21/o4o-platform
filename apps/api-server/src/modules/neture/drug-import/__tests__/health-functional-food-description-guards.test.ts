@@ -87,6 +87,29 @@ describe('sourceFidelityGuard', () => {
     const r = sourceFidelityGuard(s, draft({ sections: { mainFunction: ['혈당 조절과 다이어트 효과가 뛰어남'], howToTake: [], caution: [] } }));
     expect(r.beyondSource).toBe(true);
   });
+
+  // ── BEYONDSOURCE-MINI-AUDIT 회귀: 원문 붙여쓰기 ↔ draft 자연 띄어쓰기/조사 차이는 오탐 아님 ──
+  it('붙여쓰기 원문 vs 띄어쓰기 draft(식이섬유) → 통과', () => {
+    const s = seed({ mainFunction: '1. 콜레스테롤 조절 2. 식후혈당상승억제에 도움 3. 배변활동 원활', functionalClaims: [] });
+    const r = sourceFidelityGuard(s, draft({ sections: {
+      mainFunction: ['콜레스테롤 조절에 도움을 줄 수 있습니다.', '식후 혈당 상승 억제에 도움을 줄 수 있습니다.', '배변 활동 원활에 도움을 줄 수 있습니다.'],
+      howToTake: [], caution: [] } }));
+    expect(r.beyondSource).toBe(false);
+  });
+  it('조사/승인어미 부가(비타민C·프로바이오틱스) → 통과', () => {
+    const s = seed({ mainFunction: '[프로바이오틱스 제품]①유익한 유산균 증식②유해균 억제 또는 배변활동 원활', functionalClaims: [] });
+    const r = sourceFidelityGuard(s, draft({ sections: {
+      mainFunction: ['유익한 유산균 증식에 도움을 줄 수 있습니다.', '유해균 억제에 도움을 줄 수 있습니다.', '배변 활동 원활에 도움을 줄 수 있습니다.'],
+      howToTake: [], caution: [] } }));
+    expect(r.beyondSource).toBe(false);
+  });
+  it('다원료 결합·연결어 재작성(철/비타민C) → 통과', () => {
+    const s = seed({ mainFunction: '철 : (1) 체내 산소운반과 혈액생성에 필요 (2) 에너지 생성에 필요', functionalClaims: [] });
+    const r = sourceFidelityGuard(s, draft({ sections: {
+      mainFunction: ['철은 체내 산소 운반과 혈액 생성에 필요하며, 에너지 생성에도 필요합니다.'],
+      howToTake: [], caution: [] } }));
+    expect(r.beyondSource).toBe(false);
+  });
 });
 
 describe('medicineLikeWordingGuard', () => {

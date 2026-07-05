@@ -111,6 +111,22 @@ function contentTokens(s: string): string[] {
     .filter((t) => !FRAMING_STOPWORDS.has(t));
 }
 
+/**
+ * 한국어 조사/어미 절삭 stem. 원문은 붙여쓰기·draft 는 자연 띄어쓰기라
+ * 공백 토큰 exact 비교는 오탐한다("억제"≠"억제에", "필요"≠"필요합니다").
+ * → 조사/어미를 벗겨 어간만 남긴 뒤 공백 제거된 원문에서 substring 매칭한다.
+ */
+const KO_JOSA_SUFFIX = /(으로써|으로|에서|에게|에도|이나|하여|하며|합니다|습니다|하는|하고|한다|에|을|를|이|가|은|는|의|과|와|로|도|만|께|서|한|함|해|및)$/;
+function stem(token: string): string {
+  let s = token;
+  for (let i = 0; i < 2; i++) {
+    const m = s.match(KO_JOSA_SUFFIX);
+    if (m && s.length - m[0].length >= 2) s = s.slice(0, s.length - m[0].length);
+    else break;
+  }
+  return s;
+}
+
 export interface SourceFidelityResult {
   beyondSource: boolean;
   reasons: string[];
@@ -133,12 +149,20 @@ export function sourceFidelityGuard(
     reasons.push('FABRICATED_MAIN_FUNCTION: 원문 기능성 결측인데 draft 가 기능성 문구 생성');
   }
 
-  const sourceBlob = `${seed.mainFunction ?? ''}\n${seed.functionalClaims.join('\n')}`;
-  const sourceSet = new Set(contentTokens(sourceBlob));
+  // 원문 근거: 공백 전부 제거한 blob 에서 draft 어간을 substring 매칭한다.
+  // (원문 "식후혈당상승억제" ↔ draft "식후 혈당 상승 억제" 처럼 띄어쓰기만 다른 경우 오탐 방지)
+  const sourceCompact = `${seed.mainFunction ?? ''}\n${seed.functionalClaims.join('\n')}`
+    .replace(/\s+/g, '')
+    .toLowerCase();
   for (const line of mainLines) {
     const toks = contentTokens(line);
     if (toks.length === 0) continue;
-    const unmatched = toks.filter((t) => !sourceSet.has(t));
+    const unmatched = toks.filter((t) => {
+      const core = stem(t);
+      if (core.length < 2) return false; // 1자 어간은 노이즈 → 판정 제외
+      if (FRAMING_STOPWORDS.has(core)) return false; // 조사 벗긴 framing(도움을→도움, 필요합니다→필요)
+      return !sourceCompact.includes(core);
+    });
     const overlap = (toks.length - unmatched.length) / toks.length;
     // overlap 부족 + 미매치 content 토큰 2개 이상일 때만 확장으로 판정(framing 단어 오탐 방지)
     if (overlap < 0.5 && unmatched.length >= 2) {
