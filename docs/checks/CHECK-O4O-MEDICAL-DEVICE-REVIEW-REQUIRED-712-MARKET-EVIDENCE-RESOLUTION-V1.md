@@ -1,7 +1,7 @@
 # CHECK-O4O-MEDICAL-DEVICE-REVIEW-REQUIRED-712-MARKET-EVIDENCE-RESOLUTION-V1
 
 > WO: `WO-O4O-MEDICAL-DEVICE-REVIEW-REQUIRED-712-MARKET-EVIDENCE-RESOLUTION-V1`
-> 상태: **구현 + 사용자 승인 + 트랜잭션 dry-run 검증 완료 · 실제 삭제는 CI/CD 대기**
+> 상태: **완료 — 사용자 승인 + CI/CD migration 으로 프로덕션 재분류·실삭제·검증 완료 (2026-07-05)**
 
 ---
 
@@ -14,7 +14,9 @@
 | 조사 일시 | 2026-07-05 (KST) |
 | 검색원 | **네이버 쇼핑/검색 위주(+ 일부 쿠팡)** — 6개 병렬 리서치 에이전트 |
 | 실제 삭제 방식 | main 배포 → CI/CD 자동 migration |
-| 실행 커밋 | _(CI/CD 배포 후 기록)_ |
+| 실행 커밋 | `a6d89c030` (migration 적용은 후속 배포 run 28739677725 시점) |
+| 실제 삭제 일시 | 2026-07-05 (KST) · 배포 후 프록시 read-only 검증 |
+| 배포 참고 | 병렬 세션 동시 push 로 초기 배포 cancelled/failed 되었으나, TypeORM 은 이 WO 의 두 migration(Reclassify/Delete)을 정상 적용·commit 함(typeorm_migrations 등록 확인). 배포 실패는 병렬 세션의 무관한 drug-unspecified delete migration 오류 때문. **동일 timestamp(20261210000000/010000) 충돌 주의** — 클래스명·데이터 도메인이 달라 무해하나 후속 세션과 timestamp 조율 권장. |
 | 상세설명서 생성 | 0건 |
 
 선행: 의료기기 4·3·2·1등급 정리 완료(삭제 15,765). 조사 전 의료기기 3,837(active 3,125 + review 712).
@@ -208,23 +210,28 @@ ev: f=found, x=not_found, ~=ambiguous.
 
 ---
 
-## 7. CI/CD 실제 실행 후 확정 기록 _(배포 후 채움)_
+## 7. CI/CD 실제 실행 후 확정 기록 (프로덕션 검증 완료)
 
-| 항목 | dry-run 예측 | 실제(CI/CD 후) |
+배포 후 Cloud SQL Auth Proxy read-only 실측:
+
+| 항목 | dry-run 예측 | **실제(CI/CD 후)** |
 |---|---:|---:|
-| 삭제 감사 로그 hard_delete 수 | 11 | _( )_ |
-| 삭제 후 의료기기 | 3,826 | _( )_ |
-| 삭제 후 active | 3,682 | _( )_ |
-| 삭제 후 review_required | 144 | _( )_ |
-| 삭제 후 전체 | 234,669 | _( )_ |
+| 삭제 감사 로그 hard_delete 수 | 11 | **11** ✅ |
+| 삭제 후 의료기기 delete_marked 잔존 | 0 | **0** ✅ |
+| 삭제 후 의료기기 | 3,826 | **3,826** ✅ |
+| 삭제 후 active | 3,682 | **3,682** ✅ (market_evidence_active reason 557 + 기존 3,125) |
+| 삭제 후 review_required | 144 | **144** ✅ |
+| 삭제 후 전체 | 234,669 | **234,669** ✅ |
 
+예측과 실측 100% 일치. 두 migration(Reclassify/Delete) typeorm_migrations 등록 확인.
 확인 SQL: `cleanup_key='medical_device_review_required_resolved_hard_delete_20260705'`.
 
 ---
 
 ## 8. 실패/보류 사유
 
-- 실제 hard delete 는 CI/CD 배포 시 실행(§7 확정 필요).
+- 없음(이 WO 범위). 재분류·삭제·검증 전 항목 완료(실제 삭제 11, delete_marked 잔존 0).
 - review_required 144(18 카테고리)는 병원·가정 혼재/불명확으로 계속 유지 — 향후 공급자/매장 요청 시 개별 확인.
 - **의료기기 정리 최종 마무리**: 삭제 누계 15,776(등급별 15,765 + review 11), 잔존 3,826(active 3,682 + review 144).
+- 배포 인프라 참고(범위 외): 병렬 세션의 `DeleteDrugUnspecifiedDeleteMarked20261210010000` migration 이 실패하여 배포가 failure 로 종료됨(이 WO migration 은 그 전에 정상 적용). 병렬 세션이 해당 migration 을 수정해야 배포 파이프라인 green 복구.
 - WO 후속(§12): active 상품리스트 노출 정책 → 건강기능식품 candidate 정책 → 의약외품.
