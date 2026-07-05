@@ -193,3 +193,119 @@ export function parsePermitStatusMapTsv(text: string): PermitStatusMap {
   }
   return map;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Apply (write) — WO-O4O-MEDICAL-DEVICE-GATE-B-PROMOTION-APPLY-IMPLEMENTATION-V1
+// 계획→연산 변환(순수) + Sink 추상화(테스트: fake, 프로덕션: QueryRunner).
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface MasterRow {
+  barcode: string;
+  regulatoryType: string;
+  regulatoryName: string;
+  name: string;
+  manufacturerName: string;
+  mfdsProductId: string;
+  mfdsPermitNumber: string | null;
+  specification: string | null;
+}
+
+export interface IdentifierRow {
+  productMasterId: string;
+  identifierType: 'GTIN' | 'UDI_DI';
+  identifierValue: string;
+  normalizedValue: string;
+  isPrimary: boolean;
+  verificationStatus: 'imported';
+  sourceType: string;
+  sourceId: string; // representative candidate id
+  sourceLabel: string;
+  metadata: Record<string, unknown>;
+}
+
+export interface CandidateUpdate {
+  candidateId: string;
+  masterId: string;
+  role: 'representative' | 'duplicate';
+}
+
+/** apply 저장소 추상화 (프로덕션=QueryRunner, 테스트=fake). */
+export interface PromotionSink {
+  /** master 배치 INSERT → barcode↔id 반환 */
+  insertMasters(rows: MasterRow[]): Promise<Array<{ barcode: string; id: string }>>;
+  insertIdentifiers(rows: IdentifierRow[]): Promise<void>;
+  updateCandidates(updates: CandidateUpdate[]): Promise<void>;
+}
+
+/** identifier source_type (규약값) */
+export const MDS_PROMOTION_SOURCE_TYPE = 'medical_device_standard_code_promotion';
+
+export function toMasterRow(m: MasterPreview): MasterRow {
+  return {
+    barcode: m.barcode,
+    regulatoryType: m.regulatoryType,
+    regulatoryName: m.regulatoryName,
+    name: m.name,
+    manufacturerName: m.manufacturerName,
+    mfdsProductId: m.mfdsProductId,
+    mfdsPermitNumber: m.mfdsPermitNumber,
+    specification: m.specification,
+  };
+}
+
+export function toIdentifierRows(m: MasterPreview, masterId: string): IdentifierRow[] {
+  return m.identifiers.map((i) => ({
+    productMasterId: masterId,
+    identifierType: i.identifierType,
+    identifierValue: i.identifierValue,
+    normalizedValue: i.normalizedValue,
+    isPrimary: i.isPrimary,
+    verificationStatus: 'imported' as const,
+    sourceType: MDS_PROMOTION_SOURCE_TYPE,
+    sourceId: m.representativeCandidateId,
+    sourceLabel: MDS_SOURCE_LABEL,
+    metadata: {
+      permitNo: m.mfdsPermitNumber,
+      model: m.specification,
+      sourceDatasetId: '15073875',
+      sourceKind: MDS_SOURCE_KIND,
+      candidateIds: [m.representativeCandidateId, ...m.duplicateCandidateIds],
+    },
+  }));
+}
+
+/**
+ * 승격 실행: master 배치 INSERT(RETURNING) → identifier/candidate 배치. Sink 로 추상화.
+ * 호출측이 단일 트랜잭션 안에서 부른다. 실패 시 트랜잭션 rollback 은 호출측 책임.
+ */
+export async function executePromotion(
+  sink: PromotionSink,
+  masters: MasterPreview[],
+  batchSize = 500,
+): Promise<{ masters: number; identifiers: number; candidateUpdates: number }> {
+  let mc = 0;
+  let ic = 0;
+  let cc = 0;
+  for (let i = 0; i < masters.length; i += batchSize) {
+    const chunk = masters.slice(i, i + batchSize);
+    const inserted = await sink.insertMasters(chunk.map(toMasterRow));
+    const barcodeToId = new Map(inserted.map((r) => [r.barcode, r.id]));
+    const idRows: IdentifierRow[] = [];
+    const candUpdates: CandidateUpdate[] = [];
+    for (const m of chunk) {
+      const id = barcodeToId.get(m.barcode);
+      if (!id) throw new Error(`master id 매핑 실패: ${m.barcode}`);
+      idRows.push(...toIdentifierRows(m, id));
+      candUpdates.push({ candidateId: m.representativeCandidateId, masterId: id, role: 'representative' });
+      for (const dup of m.duplicateCandidateIds) {
+        candUpdates.push({ candidateId: dup, masterId: id, role: 'duplicate' });
+      }
+    }
+    await sink.insertIdentifiers(idRows);
+    await sink.updateCandidates(candUpdates);
+    mc += chunk.length;
+    ic += idRows.length;
+    cc += candUpdates.length;
+  }
+  return { masters: mc, identifiers: ic, candidateUpdates: cc };
+}

@@ -8,8 +8,14 @@ import {
   buildPromotionPlan,
   groupIntoMasters,
   parsePermitStatusMapTsv,
+  executePromotion,
+  toIdentifierRows,
   type GateBCandidate,
   type PermitStatusMap,
+  type PromotionSink,
+  type MasterRow,
+  type IdentifierRow,
+  type CandidateUpdate,
 } from '../medical-device-gate-b-promotion.service.js';
 
 const cand = (over: Partial<GateBCandidate> = {}): GateBCandidate => ({
@@ -101,5 +107,65 @@ describe('parsePermitStatusMapTsv', () => {
     expect(m.get('P1')).toEqual({ matched: true, active: true });
     expect(m.get('P2')).toEqual({ matched: true, active: false }); // matched 이나 RTRCN non-null → inactive
     expect(m.get('P3')).toEqual({ matched: false, active: false });
+  });
+});
+
+/** apply 로직 검증용 in-memory fake sink */
+class FakeSink implements PromotionSink {
+  masters: MasterRow[] = [];
+  identifiers: IdentifierRow[] = [];
+  updates: CandidateUpdate[] = [];
+  async insertMasters(rows: MasterRow[]): Promise<Array<{ barcode: string; id: string }>> {
+    this.masters.push(...rows);
+    return rows.map((r) => ({ barcode: r.barcode, id: `M-${r.barcode}` }));
+  }
+  async insertIdentifiers(rows: IdentifierRow[]): Promise<void> {
+    this.identifiers.push(...rows);
+  }
+  async updateCandidates(u: CandidateUpdate[]): Promise<void> {
+    this.updates.push(...u);
+  }
+}
+
+describe('executePromotion (apply, fake sink)', () => {
+  it('master 수 = distinct barcode, identifier = master*2, candidateUpdate = 대표+중복', async () => {
+    const masters = groupIntoMasters([
+      cand({ id: 'a', identifierValue: '08800158900007', permitNo: '제인 26-4585 호' }),
+      cand({ id: 'b', identifierValue: '08800158900007', permitNo: '제인 26-4585 호' }), // 동일 barcode → 병합(중복)
+      cand({ id: 'c', identifierValue: '8809878302719', permitNo: '제인 26-4585 호' }),
+    ]);
+    expect(masters).toHaveLength(2); // distinct barcode 2
+
+    const sink = new FakeSink();
+    const result = await executePromotion(sink, masters);
+    expect(result.masters).toBe(2);
+    expect(result.identifiers).toBe(4); // 2 master * 2
+    expect(result.candidateUpdates).toBe(3); // (a rep + b dup) + (c rep)
+
+    // master_id 연결 확인
+    expect(sink.identifiers.every((i) => i.productMasterId.startsWith('M-'))).toBe(true);
+    // 대표/중복 role
+    const rep = sink.updates.filter((u) => u.role === 'representative').map((u) => u.candidateId).sort();
+    const dup = sink.updates.filter((u) => u.role === 'duplicate').map((u) => u.candidateId);
+    expect(rep).toEqual(['a', 'c']);
+    expect(dup).toEqual(['b']);
+  });
+
+  it('빈 masters → write 호출 없음', async () => {
+    const sink = new FakeSink();
+    const result = await executePromotion(sink, []);
+    expect(result).toEqual({ masters: 0, identifiers: 0, candidateUpdates: 0 });
+    expect(sink.masters).toHaveLength(0);
+  });
+});
+
+describe('toIdentifierRows', () => {
+  it('master 당 GTIN(primary)+UDI_DI, metadata 에 candidateIds 보존', () => {
+    const m = groupIntoMasters([cand({ id: 'a' }), cand({ id: 'b' })])[0]; // a rep, b dup
+    const rows = toIdentifierRows(m, 'MID-1');
+    expect(rows.map((r) => r.identifierType)).toEqual(['GTIN', 'UDI_DI']);
+    expect(rows.every((r) => r.productMasterId === 'MID-1')).toBe(true);
+    expect(rows[0].sourceId).toBe('a');
+    expect((rows[0].metadata as { candidateIds: string[] }).candidateIds).toEqual(['a', 'b']);
   });
 });

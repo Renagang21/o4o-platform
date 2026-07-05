@@ -24,10 +24,105 @@ import {
   buildPromotionPlan,
   groupIntoMasters,
   parsePermitStatusMapTsv,
+  executePromotion,
   MDS_SOURCE_LABEL,
   MDS_SOURCE_KIND,
   type GateBCandidate,
+  type MasterPreview,
+  type MasterRow,
+  type IdentifierRow,
+  type CandidateUpdate,
+  type PromotionSink,
 } from '../modules/neture/drug-import/medical-device-gate-b-promotion.service.js';
+
+/** 프로덕션 Sink — QueryRunner(트랜잭션) 기반 배치 write. */
+class QueryRunnerSink implements PromotionSink {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  constructor(private qr: any) {}
+
+  async insertMasters(rows: MasterRow[]): Promise<Array<{ barcode: string; id: string }>> {
+    const values: string[] = [];
+    const params: unknown[] = [];
+    let p = 0;
+    for (const r of rows) {
+      values.push(
+        `(gen_random_uuid(), $${++p}, $${++p}, $${++p}, $${++p}, $${++p}, $${++p}, $${++p}, $${++p}, true, '[]'::jsonb, NOW(), NOW())`,
+      );
+      params.push(
+        r.barcode,
+        r.regulatoryType,
+        r.regulatoryName,
+        r.name,
+        r.manufacturerName,
+        r.mfdsProductId,
+        r.mfdsPermitNumber,
+        r.specification,
+      );
+    }
+    const res: Array<{ id: string; barcode: string }> = await this.qr.query(
+      `INSERT INTO product_masters
+         (id, barcode, regulatory_type, regulatory_name, name, manufacturer_name,
+          mfds_product_id, mfds_permit_number, specification, is_mfds_verified, tags, created_at, updated_at)
+       VALUES ${values.join(',')}
+       RETURNING id, barcode`,
+      params,
+    );
+    return res.map((r) => ({ id: String(r.id), barcode: String(r.barcode) }));
+  }
+
+  async insertIdentifiers(rows: IdentifierRow[]): Promise<void> {
+    if (!rows.length) return;
+    const values: string[] = [];
+    const params: unknown[] = [];
+    let p = 0;
+    for (const r of rows) {
+      values.push(
+        `(gen_random_uuid(), $${++p}, $${++p}, $${++p}, $${++p}, $${++p}, $${++p}, $${++p}, $${++p}, $${++p}, $${++p}::jsonb, NOW(), NOW())`,
+      );
+      params.push(
+        r.productMasterId,
+        r.identifierType,
+        r.identifierValue,
+        r.normalizedValue,
+        r.isPrimary,
+        r.verificationStatus,
+        r.sourceType,
+        r.sourceId,
+        r.sourceLabel,
+        JSON.stringify(r.metadata),
+      );
+    }
+    await this.qr.query(
+      `INSERT INTO product_identifiers
+         (id, product_master_id, identifier_type, identifier_value, normalized_value,
+          is_primary, verification_status, source_type, source_id, source_label,
+          metadata, created_at, updated_at)
+       VALUES ${values.join(',')}`,
+      params,
+    );
+  }
+
+  async updateCandidates(updates: CandidateUpdate[]): Promise<void> {
+    if (!updates.length) return;
+    const values: string[] = [];
+    const params: unknown[] = [];
+    let p = 0;
+    for (const u of updates) {
+      const status = u.role === 'representative' ? 'approved_new_master' : 'merged';
+      values.push(`($${++p}, $${++p}, $${++p})`);
+      params.push(u.candidateId, u.masterId, status);
+    }
+    await this.qr.query(
+      `UPDATE product_candidates c
+          SET candidate_status = v.status,
+              matched_product_master_id = v.master_id::uuid,
+              updated_at = NOW()
+         FROM (VALUES ${values.join(',')}) AS v(cand_id, master_id, status)
+        WHERE c.id = v.cand_id::uuid`,
+      params,
+    );
+  }
+}
 
 interface CliArgs {
   apply: boolean;
@@ -59,18 +154,15 @@ function parseArgs(argv: string[]): CliArgs {
 async function main(): Promise<void> {
   const args = parseArgs(process.argv.slice(2));
 
-  // 🚨 apply 가드
-  if (args.apply && process.env.MEDICAL_DEVICE_GATE_B_ALLOW_APPLY !== 'I_UNDERSTAND') {
-    throw new Error(
-      'APPLY_BLOCKED: --apply 는 WO-O4O-MEDICAL-DEVICE-GATE-B-PROMOTION-SCRIPT-V1 안전 경계에 의해 차단됨. ' +
-        '(해제: MEDICAL_DEVICE_GATE_B_ALLOW_APPLY=I_UNDERSTAND)',
-    );
-  }
+  // 🚨 apply 가드: env gate + use-db + permit-status-map 모두 필요. 하나라도 없으면 fail-fast.
   if (args.apply) {
-    throw new Error(
-      'APPLY_NOT_IMPLEMENTED: 이번 WO 는 Gate B promotion dry-run 전용이다. ' +
-        '실제 승격 write 는 사용자 "의료기기 Gate B apply 승인" 후 별도 WO 에서 구현한다.',
-    );
+    if (process.env.MEDICAL_DEVICE_GATE_B_ALLOW_APPLY !== 'I_UNDERSTAND') {
+      throw new Error(
+        'APPLY_BLOCKED: --apply 는 안전 경계에 의해 차단됨. (해제: MEDICAL_DEVICE_GATE_B_ALLOW_APPLY=I_UNDERSTAND)',
+      );
+    }
+    if (!args.useDb) throw new Error('APPLY_BLOCKED: --apply 는 --use-db 필수');
+    if (!args.permitStatusMap) throw new Error('APPLY_BLOCKED: --apply 는 --permit-status-map 필수');
   }
 
   // status map (fail-fast)
@@ -158,6 +250,44 @@ async function main(): Promise<void> {
     }
 
     const wouldCreateIdentifiers = masters.reduce((n, m) => n + m.identifiers.length, 0);
+
+    if (args.apply) {
+      // ── APPLY: 단일 트랜잭션 배치 승격 (ProductMaster + ProductIdentifier + candidate status) ──
+      const qr = ds.createQueryRunner();
+      await qr.connect();
+      await qr.startTransaction();
+      let applied: { masters: number; identifiers: number; candidateUpdates: number };
+      try {
+        applied = await executePromotion(new QueryRunnerSink(qr), masters);
+        await qr.commitTransaction();
+      } catch (e) {
+        await qr.rollbackTransaction();
+        throw e;
+      } finally {
+        await qr.release();
+      }
+      const areport = {
+        mode: 'apply',
+        sourceLabel: MDS_SOURCE_LABEL,
+        statusMapEntries: statusMap.size,
+        candidateInput: candidates.length,
+        promotableRows: promotable.length,
+        createdMasters: applied.masters,
+        createdIdentifiers: applied.identifiers,
+        candidateUpdates: applied.candidateUpdates,
+        dbBarcodeConflicts: dbBarcodeConflict,
+        dbIdentifierConflicts: dbIdentifierConflict,
+        holdBreakdown: holds,
+      };
+      console.log('의료기기 Gate B promotion APPLY 결과');
+      console.log(`createdMasters       : ${areport.createdMasters}`);
+      console.log(`createdIdentifiers   : ${areport.createdIdentifiers}`);
+      console.log(`candidateUpdates     : ${areport.candidateUpdates}`);
+      console.log('JSON_REPORT_BEGIN');
+      console.log(JSON.stringify(areport));
+      console.log('JSON_REPORT_END');
+      return;
+    }
 
     const report = {
       mode: 'dry-run',
