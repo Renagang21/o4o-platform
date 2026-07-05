@@ -12,6 +12,7 @@ import {
   mapMedicalDeviceItem,
   MDS_SOURCE_LABEL,
 } from '../medical-device-standard-code-candidate.mapper.js';
+import { MedicalDeviceStandardCodeCandidateImportService } from '../medical-device-standard-code-candidate-import.service.js';
 
 const wrap = (item: Record<string, unknown>): string =>
   JSON.stringify({ sourceDataset: 'MFDS', fetchedAt: '2026-07-02T06:36:25Z', pageNo: 1, rowIndex: 0, item });
@@ -108,5 +109,54 @@ describe('mapMedicalDeviceItem — 필드/플래그', () => {
     // 같은 제품 반복은 같은 signature
     const c = mapMedicalDeviceItem({ UDIDI_CD: '08800158900007', PRDLST_NM: 'X', PERMIT_NO: '제1', MNFT_IPRT_ENTP_NM: 'M1' });
     expect(a.dedupKey.rowSignature).toBe(c.dedupKey.rowSignature);
+  });
+});
+
+describe('baseline 보호 가드 (재import dry-run)', () => {
+  const itemA = { UDIDI_CD: '08800158900007', PRDLST_NM: 'PA', FOML_INFO: 'FA', PERMIT_NO: 'PMA', MNFT_IPRT_ENTP_NM: 'MA', MDEQ_CLSF_NO: 'CA' };
+  const itemB = { UDIDI_CD: '08800209331613', PRDLST_NM: 'PB', FOML_INFO: 'FB', PERMIT_NO: 'PMB', MNFT_IPRT_ENTP_NM: 'MB', MDEQ_CLSF_NO: 'CB' };
+  const itemC = { UDIDI_CD: '08809878302713', PRDLST_NM: 'PC', FOML_INFO: 'FC', PERMIT_NO: 'PMC', MNFT_IPRT_ENTP_NM: 'MC', MDEQ_CLSF_NO: 'CC' };
+  const sigA = mapMedicalDeviceItem(itemA).dedupKey.rowSignature;
+  const sigB = mapMedicalDeviceItem(itemB).dedupKey.rowSignature;
+
+  it('approved_new_master 기존행은 protected skip, pending은 update, 신규는 insert (dry-run, DB write 0)', async () => {
+    const text = [wrap(itemA), wrap(itemB), wrap(itemC)].join('\n');
+    const queries: string[] = [];
+    // fake DataSource: SELECT 만 응답, INSERT/UPDATE 호출 시 실패시킴(write 0 보장)
+    const fakeDs = {
+      isInitialized: true,
+      query: async (sql: string) => {
+        queries.push(sql);
+        if (/^\s*SELECT/i.test(sql)) {
+          return [
+            { sig: sigA, status: 'approved_new_master' },
+            { sig: sigB, status: 'pending' },
+          ];
+        }
+        throw new Error('WRITE_ATTEMPTED_IN_DRYRUN');
+      },
+    };
+    const svc = new MedicalDeviceStandardCodeCandidateImportService();
+    const report = await svc.run({ text, sourceFileName: 't', apply: false, dataSource: fakeDs as never });
+
+    expect(report.dedupChecked).toBe(true);
+    expect(report.protectedBaselineSkipped).toBe(1); // A
+    expect(report.counts.updatedExpected).toBe(1); // B
+    expect(report.counts.createdExpected).toBe(1); // C
+    // dry-run 은 SELECT 만 (INSERT/UPDATE 없음)
+    expect(queries.every((q) => /^\s*SELECT/i.test(q))).toBe(true);
+  });
+
+  it('merged 상태도 protected skip', async () => {
+    const text = [wrap(itemA)].join('\n');
+    const fakeDs = {
+      isInitialized: true,
+      query: async (sql: string) => (/^\s*SELECT/i.test(sql) ? [{ sig: sigA, status: 'merged' }] : []),
+    };
+    const svc = new MedicalDeviceStandardCodeCandidateImportService();
+    const report = await svc.run({ text, sourceFileName: 't', apply: false, dataSource: fakeDs as never });
+    expect(report.protectedBaselineSkipped).toBe(1);
+    expect(report.counts.updatedExpected).toBe(0);
+    expect(report.counts.createdExpected).toBe(0);
   });
 });

@@ -54,6 +54,8 @@ export interface MedicalDeviceImportReport {
     missing: number;
   };
   counts: { createdExpected: number; updatedExpected: number; skipped: number; errored: number };
+  /** 이미 승격된(approved_new_master/merged) baseline 후보 보호 skip 수 (재import 훼손 방지) */
+  protectedBaselineSkipped: number;
   nameTruncatedCount: number;
   candidateNameMissing: number;
   manufacturerMissing: number;
@@ -73,6 +75,13 @@ const EMPTY_FLAG_COUNTS = (): Record<MedicalDeviceReviewFlag, number> => {
   return o;
 };
 
+/**
+ * baseline 보호: 이미 Gate B 승격이 반영된 candidate_status.
+ * 재import(전량 확장) 시 이 상태의 후보는 UPDATE 하지 않는다(status/matched master/raw_payload 훼손 방지).
+ * WO-O4O-MEDICAL-DEVICE-FULL-SCALE-RAW-FETCH-AND-GATE-A-IMPORT-DRYRUN-V1
+ */
+const PROTECTED_BASELINE_STATUSES = new Set(['approved_new_master', 'merged']);
+
 export class MedicalDeviceStandardCodeCandidateImportService {
   async run(opts: MedicalDeviceImportOptions): Promise<MedicalDeviceImportReport> {
     const mode: 'dry-run' | 'apply' = opts.apply ? 'apply' : 'dry-run';
@@ -91,6 +100,7 @@ export class MedicalDeviceStandardCodeCandidateImportService {
       identifierTypeCounts: { GTIN: 0, UDI_DI: 0, null: 0 },
       formatCounts: { gtin14CheckPass: 0, gtin13: 0, checkDigitFail: 0, hibccNonGtin: 0, missing: 0 },
       counts: { createdExpected: 0, updatedExpected: 0, skipped: 0, errored: 0 },
+      protectedBaselineSkipped: 0,
       nameTruncatedCount: 0,
       candidateNameMissing: 0,
       manufacturerMissing: 0,
@@ -243,7 +253,7 @@ export class MedicalDeviceStandardCodeCandidateImportService {
     mapped: MappedMedicalDeviceCandidate[],
     report: MedicalDeviceImportReport,
   ): Promise<void> {
-    const existing = await this.fetchExistingSignatures(ds);
+    const existing = await this.fetchExistingSignatureStatus(ds);
     const seen = new Set<string>();
     for (const m of mapped) {
       const key = m.dedupKey.rowSignature;
@@ -252,15 +262,24 @@ export class MedicalDeviceStandardCodeCandidateImportService {
         continue;
       }
       seen.add(key);
-      if (existing.has(key)) report.counts.updatedExpected += 1;
-      else report.counts.createdExpected += 1;
+      const status = existing.get(key);
+      if (status === undefined) {
+        report.counts.createdExpected += 1; // wouldInsert
+      } else if (PROTECTED_BASELINE_STATUSES.has(status)) {
+        report.protectedBaselineSkipped += 1; // wouldSkipProtectedBaseline (승격 baseline 보호)
+      } else {
+        report.counts.updatedExpected += 1; // wouldUpdate
+      }
     }
   }
 
-  /** 이 sourceKind 의 기존 rowSignature 집합을 1회 조회(행별 SELECT 회피 → 견고·고속). */
-  private async fetchExistingSignatures(ds: DataSource): Promise<Set<string>> {
-    const rows: Array<{ sig: string | null }> = await ds.query(
-      `SELECT raw_payload->>'sourceRowSignature' AS sig
+  /**
+   * 이 sourceKind 의 기존 rowSignature → candidate_status 매핑을 1회 조회.
+   * status 로 baseline 보호(approved_new_master/merged) 판정.
+   */
+  private async fetchExistingSignatureStatus(ds: DataSource): Promise<Map<string, string>> {
+    const rows: Array<{ sig: string | null; status: string | null }> = await ds.query(
+      `SELECT raw_payload->>'sourceRowSignature' AS sig, candidate_status AS status
          FROM product_candidates
         WHERE source_type = 'external_api'
           AND source_label = $1
@@ -268,9 +287,9 @@ export class MedicalDeviceStandardCodeCandidateImportService {
           AND deleted_at IS NULL`,
       [MDS_SOURCE_LABEL, MDS_SOURCE_KIND],
     );
-    const s = new Set<string>();
-    for (const r of rows) if (r.sig) s.add(r.sig);
-    return s;
+    const m = new Map<string, string>();
+    for (const r of rows) if (r.sig) m.set(r.sig, r.status ?? '');
+    return m;
   }
 
   /**
@@ -283,7 +302,7 @@ export class MedicalDeviceStandardCodeCandidateImportService {
     mapped: MappedMedicalDeviceCandidate[],
     report: MedicalDeviceImportReport,
   ): Promise<void> {
-    const existing = await this.fetchExistingSignatures(ds);
+    const existing = await this.fetchExistingSignatureStatus(ds);
     const seen = new Set<string>();
     const toInsert: MappedMedicalDeviceCandidate[] = [];
     const toUpdate: MappedMedicalDeviceCandidate[] = [];
@@ -294,8 +313,15 @@ export class MedicalDeviceStandardCodeCandidateImportService {
         continue;
       }
       seen.add(key);
-      if (existing.has(key)) toUpdate.push(m);
-      else toInsert.push(m);
+      const status = existing.get(key);
+      if (status === undefined) {
+        toInsert.push(m);
+      } else if (PROTECTED_BASELINE_STATUSES.has(status)) {
+        // 승격 baseline 보호: UPDATE 하지 않음 (status/matched master/raw_payload 훼손 금지)
+        report.protectedBaselineSkipped += 1;
+      } else {
+        toUpdate.push(m);
+      }
     }
 
     const qr = ds.createQueryRunner();

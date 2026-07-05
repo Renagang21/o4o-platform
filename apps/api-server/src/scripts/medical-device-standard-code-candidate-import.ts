@@ -123,6 +123,7 @@ async function main(): Promise<void> {
   console.log(
     `counts              : createdExpected=${report.counts.createdExpected} updatedExpected=${report.counts.updatedExpected} skipped=${report.counts.skipped} errored=${report.counts.errored}`,
   );
+  console.log(`protectedBaselineSkip: ${report.protectedBaselineSkipped}`);
   console.log(`nameTruncatedCount  : ${report.nameTruncatedCount}`);
   console.log(`candidateNameMissing: ${report.candidateNameMissing}`);
   console.log(`manufacturerMissing : ${report.manufacturerMissing}`);
