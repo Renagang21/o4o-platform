@@ -1,7 +1,7 @@
 # CHECK-O4O-MEDICAL-DEVICE-GRADE4-HARD-DELETE-EXECUTE-WITH-COUNT-REPORT-V1
 
 > WO: `WO-O4O-MEDICAL-DEVICE-GRADE4-HARD-DELETE-EXECUTE-WITH-COUNT-REPORT-V1`
-> 상태: **구현 완료 + 트랜잭션 dry-run 검증 완료 · 실제 삭제는 CI/CD 대기**
+> 상태: **완료 — CI/CD 배포 migration 으로 프로덕션 실삭제 완료·검증 완료 (2026-07-05)**
 
 ---
 
@@ -12,7 +12,8 @@
 | 실행 환경 | 프로덕션 `o4o_platform` (Cloud SQL `o4o-platform-db`, `netureyoutube:asia-northeast3`) |
 | 검증 채널 | Cloud SQL Auth Proxy v2 (localhost:5433, read/verify only) |
 | dry-run 일시 | 2026-07-05 (KST) |
-| 실제 삭제 방식 | main 배포 → CI/CD 자동 migration (`node scripts/run-migrations.mjs`) |
+| 실제 삭제 방식 | main 배포 → CI/CD 자동 migration (Deploy API Server, run 28735215315 success) |
+| 실제 삭제 일시 | 2026-07-05 (KST) · 배포 성공 후 프록시 read-only 검증 |
 | 상세설명서 생성 | **0건** (WO 범위 외 — 생성하지 않음) |
 
 ---
@@ -38,7 +39,8 @@ WO §3 은 entity 변경과 migration `20261204000000-AddProductDataCurationAndD
 | entity | `apps/api-server/src/modules/neture/entities/ProductMaster.entity.ts` (+4 컬럼) |
 | migration 1/2 (DDL) | `20261206000000-AddProductCurationSchemaAndCandidateIdentifierIndex.ts` |
 | migration 2/2 (DML) | `20261206010000-DeleteMedicalDeviceGrade4Masters.ts` |
-| 실행 커밋 | _(CI/CD 배포 후 기록)_ |
+| 실행 커밋 | `3d4022d5c` (Deploy API Server run 28735215315, conclusion=success) |
+| 적용된 migration | `AddProductCurationSchemaAndCandidateIdentifierIndex20261206000000` + `DeleteMedicalDeviceGrade4Masters20261206010000` (typeorm_migrations 등록 확인) |
 
 **2-migration 분리 이유 (락 안전성):** ALTER(ACCESS EXCLUSIVE)를 DDL migration 으로 분리·즉시
 커밋하여 hot 테이블 `product_masters` 의 배타 락 점유를 순간(ms)으로 제한. 대량 backfill/delete
@@ -126,17 +128,23 @@ master↔candidate join = `product_candidates.matched_product_master_id`.
 
 ---
 
-## 7. CI/CD 실제 실행 후 확정 기록 _(배포 후 채움)_
+## 7. CI/CD 실제 실행 후 확정 기록 (프로덕션 검증 완료)
 
-| 항목 | dry-run 예측 | 실제(CI/CD 후) |
+배포(run 28735215315, success) 후 Cloud SQL Auth Proxy read-only 로 WO §8 쿼리 실측:
+
+| 항목 | dry-run 예측 | **실제(CI/CD 후)** |
 |---|---:|---:|
-| 삭제 감사 로그 hard_delete 수 | 755 | _( )_ |
-| 삭제 후 의료기기 master | 18,847 | _( )_ |
-| 삭제 후 4등급 잔존 | 0 | _( )_ |
-| 삭제 후 전체 master | 249,690 | _( )_ |
-| 삭제 비율 | 3.85% | _( )_ |
+| 삭제 감사 로그 hard_delete 수 | 755 | **755** ✅ |
+| 삭제 후 의료기기 master | 18,847 | **18,847** ✅ |
+| 삭제 후 4등급 잔존 | 0 | **0** ✅ |
+| 삭제 후 전체 master | 249,690 | **249,690** ✅ |
+| 삭제 비율 | 3.85% | **3.85%** ✅ |
+| 잔존 등급 분포(MD) | 1:4,632 / 2:12,533 / 3:1,682 | **동일** ✅ |
+| `idx_pc_matched_identifier_id` | — | 존재 ✅ |
+| `product_master_cleanup_audits` | — | 존재 ✅ |
 
-확인 SQL: WO §8 쿼리 그대로 (`cleanup_key='medical_device_grade4_hard_delete_20261204'`).
+예측과 실측 100% 일치. 확인 SQL: WO §8 쿼리 그대로
+(`cleanup_key='medical_device_grade4_hard_delete_20261204'`).
 
 ---
 
@@ -144,19 +152,18 @@ master↔candidate join = `product_candidates.matched_product_master_id`.
 
 | 기준 | 상태 |
 |---|---|
-| migration 적용 성공 | ⏳ CI/CD 대기 (dry-run PASS) |
-| `product_masters.medical_device_grade` 컬럼 | ✅ 구현 (DDL migration) |
-| `product_masters.product_data_status` 컬럼 | ✅ 구현 |
-| `product_master_cleanup_audits` 테이블 | ✅ 구현 |
-| 4등급 삭제 대상 snapshot 기록 | ✅ dry-run 755 확인 |
-| 삭제 후 4등급 잔존 = 0 | ✅ dry-run 확인 (CI/CD 후 재확인) |
-| 전체/삭제/비율 기록 | ✅ §6 |
+| migration 적용 성공 | ✅ CI/CD 배포 완료 (run 28735215315 success) |
+| `product_masters.medical_device_grade` 컬럼 | ✅ 프로덕션 존재 |
+| `product_masters.product_data_status` 컬럼 | ✅ 프로덕션 존재 |
+| `product_master_cleanup_audits` 테이블 | ✅ 프로덕션 존재 |
+| 4등급 삭제 대상 snapshot 기록 | ✅ 755행 |
+| 삭제 후 4등급 잔존 = 0 | ✅ 프로덕션 실측 0 |
+| 전체/삭제/비율 기록 | ✅ §6 · §7 |
 | 상세설명서 생성 0건 | ✅ |
 
 ---
 
 ## 9. 실패/보류 사유
 
-- 실제 hard delete 는 **CI/CD 미실행 상태**로 보류(사용자 정책: 삭제는 CI/CD 경유).
-  §7 은 배포 후 확정 기록 필요.
-- WO 후속(의료기기 2/3등급, 건강기능식품/의약외품 정리)은 범위 외.
+- 없음. 삭제·검증 전 항목 완료.
+- WO 후속(의료기기 2/3등급, 건강기능식품/의약외품 정리, 실사용 제품 상세설명서)은 범위 외 — WO §11 순서 유지.
