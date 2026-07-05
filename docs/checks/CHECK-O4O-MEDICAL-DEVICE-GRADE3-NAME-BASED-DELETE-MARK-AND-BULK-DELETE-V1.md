@@ -1,7 +1,7 @@
 # CHECK-O4O-MEDICAL-DEVICE-GRADE3-NAME-BASED-DELETE-MARK-AND-BULK-DELETE-V1
 
 > WO: `WO-O4O-MEDICAL-DEVICE-GRADE3-NAME-BASED-DELETE-MARK-AND-BULK-DELETE-V1`
-> 상태: **구현 + 사용자 승인 + 트랜잭션 dry-run 검증 완료 · 실제 삭제는 CI/CD 대기**
+> 상태: **완료 — 사용자 승인 + CI/CD 배포 migration 으로 프로덕션 실삭제·검증 완료 (2026-07-05)**
 
 ---
 
@@ -12,8 +12,9 @@
 | 실행 환경 | 프로덕션 `o4o_platform` (Cloud SQL `o4o-platform-db`, `netureyoutube:asia-northeast3`) |
 | 검증 채널 | Cloud SQL Auth Proxy v2 (localhost:5433, read/verify only) |
 | dry-run 일시 | 2026-07-05 (KST) |
-| 실제 삭제 방식 | main 배포 → CI/CD 자동 migration |
-| 실행 커밋 | _(CI/CD 배포 후 기록)_ |
+| 실제 삭제 방식 | main 배포 → CI/CD 자동 migration (Deploy API Server, run 28735708237 success) |
+| 실행 커밋 | `25adaa901` |
+| 실제 삭제 일시 | 2026-07-05 (KST) · 배포 성공 후 프록시 read-only 검증 |
 | 상세설명서 생성 | **0건** (WO 범위 외) |
 
 선행 조건 충족: 4등급 hard delete 완료(의료기기 18,847), `medical_device_grade` /
@@ -132,17 +133,21 @@ ROLLBACK 후 3등급 1,682 복원 확인(미영속).
 
 ---
 
-## 6. CI/CD 실제 실행 후 확정 기록 _(배포 후 채움)_
+## 6. CI/CD 실제 실행 후 확정 기록 (프로덕션 검증 완료)
 
-| 항목 | dry-run 예측 | 실제(CI/CD 후) |
+배포(run 28735708237, success) 후 Cloud SQL Auth Proxy read-only 실측:
+
+| 항목 | dry-run 예측 | **실제(CI/CD 후)** |
 |---|---:|---:|
-| 삭제 감사 로그 hard_delete 수 | 1,664 | _( )_ |
-| 삭제 후 3등급 의료기기 | 18 | _( )_ |
-| 삭제 후 의료기기 | 17,183 | _( )_ |
-| 삭제 후 전체 | 248,026 | _( )_ |
-| review_required 잔존 | 13 | _( )_ |
-| active 잔존 | 5 | _( )_ |
+| 삭제 감사 로그 hard_delete 수 | 1,664 | **1,664** ✅ |
+| 삭제 후 3등급 delete_marked 잔존 | 0 | **0** ✅ |
+| 삭제 후 3등급 의료기기 | 18 | **18** ✅ |
+| 삭제 후 의료기기 | 17,183 | **17,183** ✅ |
+| 삭제 후 전체 | 248,026 | **248,026** ✅ |
+| review_required 잔존 | 13 | **13** ✅ |
+| active 잔존 | 5 | **5** ✅ |
 
+예측과 실측 100% 일치. 두 migration(typeorm_migrations 등록) 적용 확인.
 확인 SQL: `cleanup_key='medical_device_grade3_name_based_hard_delete_20260705'`.
 
 ---
@@ -159,11 +164,11 @@ ROLLBACK 후 3등급 1,682 복원 확인(미영속).
 | hard delete 전 snapshot | ✅ dry-run 1,664 |
 | 삭제 수·비율 기록 | ✅ §5 |
 | 상세설명서 생성 0건 | ✅ |
-| 운영 DB 적용 후 count 확정 | ⏳ CI/CD 후 §6 |
+| 운영 DB 적용 후 count 확정 | ✅ §6 (실측 = 예측 일치) |
 
 ---
 
 ## 8. 실패/보류 사유
 
-- 실제 hard delete 는 CI/CD 배포 시 실행(§6 확정 필요).
-- WO 후속(§12): review_required 3등급 쿠팡/네이버 조사 → 2등급 정리 → 건기식/의약외품 → 상세설명서.
+- 없음. 마킹·삭제·검증 전 항목 완료(실제 삭제 1,664, 3등급 delete_marked 잔존 0).
+- WO 후속(§12): review_required 3등급(13) 쿠팡/네이버 조사 → 2등급 정리 → 건기식/의약외품 → 상세설명서.
