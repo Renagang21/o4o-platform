@@ -1,6 +1,6 @@
 # WO-O4O-DRUG-PRODUCT-DRUG-EXTENSION-CREATION-V1
 
-Status: DESIGN — 설계 확정, dry-run/apply는 승인 후 별도
+Status: DONE — dry-run + apply 완료 (2026-07-06, 177,413 생성). 결과: `CHECK-...-CREATION-APPLY-V1`
 Date: 2026-07-06
 Scope: DRUG ProductMaster 177,413건에 `ProductDrugExtension`(의약품 표시/노출/광고/판매 **정책 mirror 계층**)을 생성한다. **설명 문구(효능/용법/주의 텍스트) 채움은 범위 밖.**
 
