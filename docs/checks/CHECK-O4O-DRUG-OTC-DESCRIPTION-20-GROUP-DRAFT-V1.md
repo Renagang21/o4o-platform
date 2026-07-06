@@ -759,4 +759,4 @@ OTC 순도(otc/rx)와 단일성분성은 `drug_category IN ('otc','rx')` 재집�
 
 - CHECK: `docs/checks/CHECK-O4O-DRUG-OTC-DESCRIPTION-20-GROUP-DRAFT-V1.md` (본 문서, 신규)
 - 가이드: `docs/guides/O4O-DRUG-STORE-DESCRIPTION-WRITING-GUIDE-V1.md` (§3.6 additive)
-- commit SHA: (반영 후 최종 보고에 기재)
+- commit SHA: `7234e86ee` (생성 커밋). GitHub `main` fetch/read 확인 완료.
