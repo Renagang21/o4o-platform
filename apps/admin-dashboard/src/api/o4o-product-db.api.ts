@@ -263,8 +263,15 @@ export interface DescriptionReviewRow {
   masterId: string;
   sourceType: string;
   status: string;
+  language: string | null;
+  qualityScore: number | null;
+  summary: string | null;
+  contentPreview: string | null;
+  createdAt: string;
   updatedAt: string;
   masterName: string | null;
+  regulatoryName: string | null;
+  regulatoryType: string | null;
   manufacturerName: string | null;
   barcode: string | null;
   representativeId: string | null;
@@ -278,6 +285,8 @@ export interface DescriptionReviewRow {
 export interface DescriptionReviewListParams {
   status?: string;
   sourceType?: string;
+  regulatoryType?: string;
+  language?: string;
   q?: string;
   multiManufacturer?: boolean;
   multiName?: boolean;
@@ -296,6 +305,8 @@ export async function listDescriptionReviews(
   const query: Record<string, string> = {};
   if (params.status) query.status = params.status;
   if (params.sourceType) query.sourceType = params.sourceType;
+  if (params.regulatoryType) query.regulatoryType = params.regulatoryType;
+  if (params.language) query.language = params.language;
   if (params.q?.trim()) query.q = params.q.trim();
   if (params.multiManufacturer) query.multiManufacturer = 'true';
   if (params.multiName) query.multiName = 'true';

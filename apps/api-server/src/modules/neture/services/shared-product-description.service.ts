@@ -446,6 +446,8 @@ export class SharedProductDescriptionService {
   async listForReview(params: {
     status?: string; // needs_review | canonical | candidate | hidden | deprecated | all
     sourceType?: string;
+    regulatoryType?: string; // DRUG | MEDICAL_DEVICE | HEALTH_FUNCTIONAL_FOOD | QUASI_DRUG ...
+    language?: string; // ko | en ...
     q?: string;
     multiManufacturer?: boolean;
     multiName?: boolean;
@@ -464,9 +466,17 @@ export class SharedProductDescriptionService {
       where.push(`spd.status = $${p++}`);
       args.push(params.status);
     }
-    if (params.sourceType) {
+    if (params.sourceType && params.sourceType !== 'all') {
       where.push(`spd.source_type = $${p++}`);
       args.push(params.sourceType);
+    }
+    if (params.regulatoryType && params.regulatoryType !== 'all') {
+      where.push(`pm.regulatory_type = $${p++}`);
+      args.push(params.regulatoryType);
+    }
+    if (params.language && params.language !== 'all') {
+      where.push(`spd.language = $${p++}`);
+      args.push(params.language);
     }
     if (params.multiManufacturer === true) where.push(`(rp.metadata->'reviewFlags'->>'multiManufacturer')::bool IS TRUE`);
     if (params.multiName === true) where.push(`(rp.metadata->'reviewFlags'->>'multiName')::bool IS TRUE`);
@@ -492,8 +502,11 @@ export class SharedProductDescriptionService {
 
     const rows: ReviewListRow[] = await this.dataSource.query(
       `SELECT spd.id, spd.master_id AS "masterId", spd.source_type AS "sourceType", spd.status,
-              spd.updated_at AS "updatedAt",
-              pm.name AS "masterName", pm.manufacturer_name AS "manufacturerName", pm.barcode,
+              spd.language, spd.quality_score::float8 AS "qualityScore", spd.summary,
+              LEFT(spd.content, 140) AS "contentPreview",
+              spd.created_at AS "createdAt", spd.updated_at AS "updatedAt",
+              pm.name AS "masterName", pm.regulatory_name AS "regulatoryName",
+              pm.regulatory_type AS "regulatoryType", pm.manufacturer_name AS "manufacturerName", pm.barcode,
               rp.id AS "representativeId", rp.display_name AS "representativeName",
               rp.metadata->'sourceIdentifiers'->>'mfdsCode' AS "mfdsCode",
               (rp.metadata->'reviewFlags'->>'multiManufacturer')::bool AS "multiManufacturer",
@@ -503,7 +516,12 @@ export class SharedProductDescriptionService {
          JOIN product_masters pm ON pm.id = spd.master_id
          LEFT JOIN representative_products rp ON rp.id = pm.representative_product_id
         WHERE ${whereSql}
-        ORDER BY spd.updated_at DESC
+        ORDER BY (CASE spd.status
+                    WHEN 'needs_review' THEN 0
+                    WHEN 'candidate' THEN 1
+                    WHEN 'canonical' THEN 2
+                    ELSE 3 END),
+                 spd.updated_at DESC
         LIMIT ${limit} OFFSET ${offset}`,
       args,
     );
@@ -590,8 +608,15 @@ export interface ReviewListRow {
   masterId: string;
   sourceType: string;
   status: string;
+  language: string | null;
+  qualityScore: number | null;
+  summary: string | null;
+  contentPreview: string | null;
+  createdAt: string;
   updatedAt: string;
   masterName: string | null;
+  regulatoryName: string | null;
+  regulatoryType: string | null;
   manufacturerName: string | null;
   barcode: string | null;
   representativeId: string | null;

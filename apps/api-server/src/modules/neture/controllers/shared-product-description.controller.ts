@@ -63,10 +63,13 @@ export function createSharedProductDescriptionController(dataSource: DataSource)
   // GET / — 검토 목록/검색 (status/sourceType/q/multiManufacturer/multiName/page/limit)
   router.get('/', async (req: Request, res: Response) => {
     try {
-      const { status, sourceType, q, multiManufacturer, multiName, page, limit } = req.query as Record<string, string>;
+      const { status, sourceType, regulatoryType, language, q, multiManufacturer, multiName, page, limit } =
+        req.query as Record<string, string>;
       const result = await service.listForReview({
         status: status || undefined,
         sourceType: sourceType || undefined,
+        regulatoryType: regulatoryType || undefined,
+        language: language || undefined,
         q: q || undefined,
         multiManufacturer: multiManufacturer === 'true',
         multiName: multiName === 'true',

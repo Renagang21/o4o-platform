@@ -1,29 +1,54 @@
 /**
- * DescriptionReviewPage — SharedProductDescription 검토 목록/검색
+ * DescriptionReviewPage — SharedProductDescription 설명 검토 목록 (read-only)
  *
- * WO-O4O-DRUG-SHARED-DESCRIPTION-CANONICAL-CURATION-V1
+ * WO-O4O-ADMIN-O4O-PRODUCT-DESCRIPTION-REVIEW-SHELL-V1
+ * (기반: WO-O4O-DRUG-SHARED-DESCRIPTION-CANONICAL-CURATION-V1)
  *
- * e약은요 파생 설명(needs_review)을 master 횡단으로 조회. 필터: status/sourceType/flag/검색.
- * row 클릭 → 상세(canonical 승격). bulk 후보 dry-run 배너 표시(자동 승격 없음).
+ * ProductMaster 횡단으로 설명 후보/공식 설명 상태를 조회하는 read-only 검토 화면.
+ * 규제구분·출처·언어·상태·검색 필터(모두 GET query param). row → 기본 상품 상세(read-only)로 이동.
+ * 설명 생성/승인/수정/삭제 기능은 제공하지 않는다 (mutation 0).
  */
 
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, CheckCircle2, AlertTriangle } from 'lucide-react';
-import {
-  listDescriptionReviews,
-  getBulkCanonicalDryRun,
-  DescriptionReviewRow,
-  BulkCanonicalDryRunResult,
-} from '@/api/o4o-product-db.api';
+import { Search } from 'lucide-react';
+import { listDescriptionReviews, DescriptionReviewRow } from '@/api/o4o-product-db.api';
 
 const LIMIT = 20;
+
 const STATUS_OPTIONS = [
+  { value: 'all', label: '상태 전체' },
   { value: 'needs_review', label: '검토 대기' },
   { value: 'canonical', label: '대표(canonical)' },
   { value: 'candidate', label: '후보' },
   { value: 'deprecated', label: '반려' },
-  { value: 'all', label: '전체' },
+  { value: 'hidden', label: '숨김' },
+];
+
+const REGULATORY_OPTIONS = [
+  { value: 'all', label: '규제구분 전체' },
+  { value: 'DRUG', label: '의약품' },
+  { value: 'MEDICAL_DEVICE', label: '의료기기' },
+  { value: 'HEALTH_FUNCTIONAL_FOOD', label: '건강기능식품' },
+  { value: 'QUASI_DRUG', label: '의약외품' },
+];
+
+const SOURCE_OPTIONS = [
+  { value: 'all', label: '출처 전체' },
+  { value: 'mfds_easy_drug', label: 'e약은요' },
+  { value: 'drug_extension', label: '허가정보' },
+  { value: 'supplier', label: '공급자' },
+  { value: 'operator', label: '운영자' },
+  { value: 'ai', label: 'AI' },
+  { value: 'store_contribution', label: '매장' },
+  { value: 'manual', label: '수기' },
+  { value: 'migration', label: '이관' },
+];
+
+const LANGUAGE_OPTIONS = [
+  { value: 'all', label: '언어 전체' },
+  { value: 'ko', label: '한국어' },
+  { value: 'en', label: 'English' },
 ];
 
 export default function DescriptionReviewPage() {
@@ -32,13 +57,14 @@ export default function DescriptionReviewPage() {
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [page, setPage] = useState(1);
-  const [status, setStatus] = useState('needs_review');
-  const [multiManuf, setMultiManuf] = useState(false);
+  const [status, setStatus] = useState('all');
+  const [regulatoryType, setRegulatoryType] = useState('all');
+  const [sourceType, setSourceType] = useState('all');
+  const [language, setLanguage] = useState('all');
   const [term, setTerm] = useState('');
   const [q, setQ] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [dryRun, setDryRun] = useState<BulkCanonicalDryRunResult | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -46,9 +72,10 @@ export default function DescriptionReviewPage() {
     try {
       const res = await listDescriptionReviews({
         status,
-        sourceType: 'mfds_easy_drug',
+        regulatoryType,
+        sourceType,
+        language,
         q: q || undefined,
-        multiManufacturer: multiManuf || undefined,
         page,
         limit: LIMIT,
       });
@@ -63,15 +90,11 @@ export default function DescriptionReviewPage() {
     } finally {
       setLoading(false);
     }
-  }, [status, q, multiManuf, page]);
+  }, [status, regulatoryType, sourceType, language, q, page]);
 
   useEffect(() => {
     load();
   }, [load]);
-
-  useEffect(() => {
-    getBulkCanonicalDryRun('mfds_easy_drug').then(setDryRun).catch(() => setDryRun(null));
-  }, []);
 
   const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,39 +102,50 @@ export default function DescriptionReviewPage() {
     setQ(term.trim());
   };
 
+  const resetPage = () => setPage(1);
+
   return (
     <div>
-      {dryRun && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 text-sm text-gray-700">
-          <div className="flex items-center gap-2 font-medium text-blue-800 mb-1">
-            <CheckCircle2 className="w-4 h-4" /> 대량 canonical 후보 (dry-run · 자동 승격 없음)
-          </div>
-          검토 대기 <b>{dryRun.totalNeedsReview.toLocaleString()}</b>건 중 안전 후보{' '}
-          <b>{dryRun.eligibleForBulkCanonical.toLocaleString()}</b>건 · 제외: 다제조사{' '}
-          {dryRun.excludedMultiManufacturer.toLocaleString()} / 기존 canonical{' '}
-          {dryRun.excludedExistingCanonical.toLocaleString()} / 빈 내용{' '}
-          {dryRun.excludedEmptyContent.toLocaleString()}
-        </div>
-      )}
+      <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 mb-4 text-xs text-gray-600">
+        이 화면은 설명 데이터를 조회하는 read-only 검토 화면입니다. 목록은 read-only이며 설명 생성·승인·수정·삭제 기능은 제공하지 않습니다.
+        행을 클릭하면 해당 기본 상품 상세로 이동하고, 기존 큐레이션 상세(대표 승격·반려)는 각 행의 <b>큐레이션</b> 링크에서 별도 화면으로 유지됩니다.
+      </div>
 
       <div className="flex flex-wrap gap-3 mb-4 items-center">
         <select
           value={status}
-          onChange={(e) => { setStatus(e.target.value); setPage(1); }}
+          onChange={(e) => { setStatus(e.target.value); resetPage(); }}
           className="border border-gray-300 rounded px-3 py-2 text-sm"
         >
           {STATUS_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
-        <label className="flex items-center gap-1.5 text-sm text-gray-600">
-          <input type="checkbox" checked={multiManuf} onChange={(e) => { setMultiManuf(e.target.checked); setPage(1); }} />
-          다제조사만
-        </label>
+        <select
+          value={regulatoryType}
+          onChange={(e) => { setRegulatoryType(e.target.value); resetPage(); }}
+          className="border border-gray-300 rounded px-3 py-2 text-sm"
+        >
+          {REGULATORY_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+        </select>
+        <select
+          value={sourceType}
+          onChange={(e) => { setSourceType(e.target.value); resetPage(); }}
+          className="border border-gray-300 rounded px-3 py-2 text-sm"
+        >
+          {SOURCE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+        </select>
+        <select
+          value={language}
+          onChange={(e) => { setLanguage(e.target.value); resetPage(); }}
+          className="border border-gray-300 rounded px-3 py-2 text-sm"
+        >
+          {LANGUAGE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+        </select>
         <form onSubmit={submitSearch} className="flex gap-2">
           <input
             value={term}
             onChange={(e) => setTerm(e.target.value)}
-            placeholder="상품명 / MFDS코드 / 바코드"
-            className="border border-gray-300 rounded px-3 py-2 text-sm w-64"
+            placeholder="상품명 / 제조사 / 바코드"
+            className="border border-gray-300 rounded px-3 py-2 text-sm w-60"
           />
           <button type="submit" className="flex items-center gap-1 bg-admin-blue text-white px-3 py-2 rounded text-sm">
             <Search className="w-4 h-4" /> 검색
@@ -134,36 +168,54 @@ export default function DescriptionReviewPage() {
         <table className="min-w-full divide-y divide-gray-200 text-sm">
           <thead className="bg-gray-50">
             <tr>
-              <Th>대표상품명</Th>
-              <Th>상품명(SKU)</Th>
+              <Th>상품명</Th>
+              <Th>공식명</Th>
               <Th>제조사</Th>
-              <Th>MFDS코드</Th>
+              <Th>규제구분</Th>
               <Th>상태</Th>
-              <Th>플래그</Th>
+              <Th>출처</Th>
+              <Th>언어</Th>
+              <Th>요약</Th>
+              <Th>품질</Th>
               <Th>수정일</Th>
+              <Th>상세</Th>
+              <Th>큐레이션</Th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 bg-white">
             {loading ? (
-              <tr><td colSpan={7} className="px-4 py-10 text-center text-gray-400">불러오는 중…</td></tr>
+              <tr><td colSpan={12} className="px-4 py-10 text-center text-gray-400">불러오는 중…</td></tr>
             ) : rows.length === 0 ? (
-              <tr><td colSpan={7} className="px-4 py-10 text-center text-gray-400">표시할 설명이 없습니다</td></tr>
+              <tr><td colSpan={12} className="px-4 py-10 text-center text-gray-400">현재 조건에 맞는 설명 데이터가 없습니다.</td></tr>
             ) : (
               rows.map((r) => (
-                <tr key={r.id} onClick={() => navigate(r.id)} className="hover:bg-blue-50 cursor-pointer">
-                  <Td className="font-medium text-gray-900">{r.representativeName || '—'}</Td>
-                  <Td>{r.masterName || '—'}</Td>
-                  <Td>{r.manufacturerName || '—'}</Td>
-                  <Td className="text-gray-500">{r.mfdsCode || '—'}</Td>
+                <tr
+                  key={r.id}
+                  onClick={() => navigate(`/admin/o4o-product-db/masters/${r.masterId}`)}
+                  className="hover:bg-blue-50 cursor-pointer"
+                >
+                  <Td className="font-medium text-gray-900 max-w-xs truncate">{r.masterName || r.representativeName || '—'}</Td>
+                  <Td className="text-gray-500 max-w-xs truncate">{r.regulatoryName || '—'}</Td>
+                  <Td className="max-w-[10rem] truncate">{r.manufacturerName || '—'}</Td>
+                  <Td>{regulatoryLabel(r.regulatoryType)}</Td>
                   <Td><StatusBadge status={r.status} /></Td>
-                  <Td>
-                    <div className="flex gap-1">
-                      {r.multiManufacturer && <Flag>다제조사</Flag>}
-                      {r.multiName && <Flag>다품명</Flag>}
-                      {r.hasRepresentativeImage && <Flag tone="green">이미지</Flag>}
-                    </div>
+                  <Td className="text-gray-500">{sourceLabel(r.sourceType)}</Td>
+                  <Td className="text-gray-500 uppercase">{r.language || '—'}</Td>
+                  <Td className="max-w-[16rem]">
+                    <span className="block truncate text-gray-600">{r.summary || r.contentPreview || '—'}</span>
                   </Td>
-                  <Td className="text-gray-400">{r.updatedAt?.slice(0, 10) || '—'}</Td>
+                  <Td className="text-gray-500">{typeof r.qualityScore === 'number' ? r.qualityScore.toFixed(2) : '—'}</Td>
+                  <Td className="text-gray-400">{(r.updatedAt || r.createdAt)?.slice(0, 10) || '—'}</Td>
+                  <Td className="text-admin-blue whitespace-nowrap">상품 상세 →</Td>
+                  <Td className="whitespace-nowrap">
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); navigate(`/admin/o4o-product-db/review/${r.id}`); }}
+                      className="text-gray-600 hover:text-admin-blue underline underline-offset-2"
+                    >
+                      큐레이션 상세
+                    </button>
+                  </Td>
                 </tr>
               ))
             )}
@@ -182,6 +234,31 @@ export default function DescriptionReviewPage() {
   );
 }
 
+const REGULATORY_LABEL: Record<string, string> = {
+  DRUG: '의약품',
+  MEDICAL_DEVICE: '의료기기',
+  HEALTH_FUNCTIONAL_FOOD: '건강기능식품',
+  QUASI_DRUG: '의약외품',
+};
+function regulatoryLabel(v: string | null): string {
+  if (!v) return '—';
+  return REGULATORY_LABEL[v] ?? v;
+}
+
+const SOURCE_LABEL: Record<string, string> = {
+  mfds_easy_drug: 'e약은요',
+  drug_extension: '허가정보',
+  supplier: '공급자',
+  operator: '운영자',
+  ai: 'AI',
+  store_contribution: '매장',
+  manual: '수기',
+  migration: '이관',
+};
+function sourceLabel(v: string): string {
+  return SOURCE_LABEL[v] ?? v;
+}
+
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, { label: string; cls: string }> = {
     needs_review: { label: '검토 대기', cls: 'bg-amber-100 text-amber-700' },
@@ -192,11 +269,6 @@ function StatusBadge({ status }: { status: string }) {
   };
   const m = map[status] ?? { label: status, cls: 'bg-gray-100 text-gray-600' };
   return <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${m.cls}`}>{m.label}</span>;
-}
-
-function Flag({ children, tone = 'amber' }: { children: React.ReactNode; tone?: 'amber' | 'green' }) {
-  const cls = tone === 'green' ? 'bg-green-50 text-green-600 border-green-200' : 'bg-amber-50 text-amber-600 border-amber-200';
-  return <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs border ${cls}`}>{tone === 'amber' && <AlertTriangle className="w-3 h-3" />}{children}</span>;
 }
 
 function Th({ children }: { children: React.ReactNode }) {
