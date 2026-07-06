@@ -1,6 +1,6 @@
 # WO-O4O-DRUG-O4O-DB-APPLY-HANDOFF-V1
 
-Status: HOLD — O4O 상품 DB 구조 정비 및 CHECK-A 재실측 완료 후 갱신 필요
+Status: DONE / 완료 종결 — Gate B 완료 확인(CHECK-A 2026-07-06). **재실행 금지**
 Date: 2026-07-06
 Scope: 의약품 공공/식약처 데이터를 O4O 상품 데이터베이스 구조에 맞춰 저장하는 1차 작업 지시서.
 
@@ -16,7 +16,33 @@ Related:
 
 ---
 
-## 0. 에이전트에게 전달할 핵심
+## 0-A. 완료 종결 (2026-07-06 · CHECK-A 반영)
+
+> **이 WO는 완료 종결됐다. 다시 실행하지 않는다.**
+
+`CHECK-O4O-PRODUCT-DB-STRUCTURE-REFINEMENT-CHECK-A-V1` 프로덕션 read-only 실측 결과, 의약품 Gate B ProductMaster/Identifier apply는 **이미 완료**됐다.
+
+| 항목 | 현재 상태 (2026-07-06) |
+| --- | --- |
+| Gate B ProductMaster apply | **완료** — candidate `approved_new_master` 229,841 + `matched` 1,000 = **230,841 승격** |
+| 후처리 | `drug_unspecified` **53,428건 삭제** 반영 (commit 3914b5400) |
+| 현재 DRUG ProductMaster | **177,413** (rx 119,548 / otc 57,572 / 잔여 unspecified 293 / null 0) |
+| ProductIdentifier | `KOREA_DRUG_CODE` / `MFDS_CODE` **100%**, `ATC_CODE` 99.7%(176,962), `KOREA_INSURANCE_CODE` 36%(64,692) |
+| RepresentativeProduct | **100% 연결** (MFDS_CODE 그룹핑 이미 적용) |
+| ProductDrugExtension | **0** (후속 별도 WO 대상) |
+
+**따라서:**
+
+- 아래 §4 Step 2(게이트 B 승인)·Step 3(운영 apply) 절차는 **실행 금지 · historical reference**.
+- §1.1 dry-run 수치(candidate 305,522 / eligible 230,841 / wouldCreateIdentifier 703,483)는 **historical reference**로만 남긴다. 현재 운영 상태는 위 표 기준.
+- **재승격/재apply 금지.** 잔여 작업은 본 WO가 아니라 후속에서 다룬다:
+  - orphan RepresentativeProduct 16,571 정리 → `CHECK-O4O-DRUG-ORPHAN-REPRESENTATIVE-PRODUCT-CLEANUP-V1`
+  - ProductDrugExtension mirror/정책 생성 → `WO-O4O-DRUG-PRODUCT-DRUG-EXTENSION-CREATION-V1`
+  - 잔여 `drug_unspecified` 293 후처리
+
+---
+
+## 0. 에이전트에게 전달할 핵심 (historical — Gate B 실행 전 기준)
 
 이 문서는 **O4O 상품 데이터베이스 구조 정비가 끝난 뒤** 실행한다.
 
