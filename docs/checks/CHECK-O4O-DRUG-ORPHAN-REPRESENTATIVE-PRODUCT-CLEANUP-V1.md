@@ -1,6 +1,6 @@
 # CHECK-O4O-DRUG-ORPHAN-REPRESENTATIVE-PRODUCT-CLEANUP-V1
 
-Status: INVESTIGATION DONE — 정리 판단 완료, apply(write)는 승인 대기
+Status: DONE — hard delete 실행 완료 (2026-07-06, 16,571 삭제, 승인·백업 하)
 Date: 2026-07-06
 Scope: `drug_unspecified` master 삭제로 생긴 member 0 RepresentativeProduct 16,571건의 정리 여부/방식 판단. read-only 조사만 수행, DB write 없음.
 
@@ -82,7 +82,25 @@ CHECK-A에서 확인된 잔여 `drug_unspecified` master 293건은 본 CHECK 범
 
 ---
 
-## 3. 후속 apply (승인 대기 — 별도 실행)
+## 3-A. 실행 결과 (2026-07-06 · 승인 후 완료)
+
+사용자 승인 하에 백업 → count 검증 → hard delete → 삭제 후 검증을 트랜잭션으로 수행. count 불일치 시 롤백되도록 원자 처리.
+
+| 항목 | 기대 | 실측 |
+| --- | ---: | ---: |
+| 백업 count (`_bak_orphan_representative_products_20260706`) | 16,571 | **16,571** |
+| 삭제 count | 16,571 | **16,571** |
+| 삭제 후 `representative_products` | 48,101 | **48,101** |
+| orphan(member 0) 잔여 | 0 | **0** |
+| DRUG master 연결 유지 | 177,413 | **177,413** |
+
+- 삭제 조건 = member 0 AND `metadata.source='WO-O4O-DRUG-REPRESENTATIVE-PRODUCT-GROUPING-V1'` AND `metadata.groupKey LIKE 'MFDS_CODE:%'` AND `thumbnail_image_id IS NULL` (백업·삭제 동일 조건).
+- 가드: `GET DIAGNOSTICS` 삭제 count ≠ 16,571 또는 삭제 후 total ≠ 48,101 시 `RAISE EXCEPTION` → 롤백. 실제로는 전부 통과 후 COMMIT.
+- **백업 테이블 `_bak_orphan_representative_products_20260706`(16,571행)은 DB에 보존** — 가역성 확보. 안정 확인 후 별도 정리.
+
+---
+
+## 3. 후속 apply 절차 (historical — 위 3-A에서 실행 완료)
 
 정리 apply는 DB write이므로 **사용자 승인 + 백업 후** 별도 실행한다.
 
