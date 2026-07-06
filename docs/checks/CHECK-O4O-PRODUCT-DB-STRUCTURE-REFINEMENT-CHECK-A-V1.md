@@ -1,6 +1,6 @@
 # CHECK-O4O-PRODUCT-DB-STRUCTURE-REFINEMENT-CHECK-A-V1
 
-Status: READY — read-only SQL runbook
+Status: DONE — 실측 완료 (2026-07-06, read-only). 결과·해석 §3-§4 반영
 Date: 2026-07-06
 Scope: O4O 상품 DB 구조 정비 전, 운영 DB의 현재 의약품/ProductMaster/Identifier/Extension/Representative/Description 상태를 실측한다.
 
@@ -288,35 +288,55 @@ WHERE pm.regulatory_type = 'DRUG';
 
 ---
 
-## 3. 결과 기록 양식
+## 3. 실측 결과 (2026-07-06)
 
 | 항목 | 결과 |
 | --- | --- |
-| 실행일시 |  |
-| 실행자/채널 |  |
-| DB write 여부 | 0 |
-| DRUG ProductMaster 수 |  |
-| `rx` 수 |  |
-| `otc` 수 |  |
-| `drug_unspecified` 수 |  |
-| `KOREA_DRUG_CODE` identifier 수 |  |
-| `MFDS_CODE` identifier 수 |  |
-| `KOREA_INSURANCE_CODE` identifier 수 |  |
-| `ATC_CODE` identifier 수 |  |
-| ProductDrugExtension 생성률 |  |
-| RepresentativeProduct 연결률 |  |
-| SharedProductDescription 생성률 |  |
-| MFDS_CODE multi-manufacturer group 수 |  |
-| CHECK-A 결론 |  |
+| 실행일시 | 2026-07-06 ~11:53 KST |
+| 실행자/채널 | Claude Code · cloud-sql-proxy(127.0.0.1:15432) + psql read-only |
+| DB write 여부 | **0** (전부 SELECT) |
+| DRUG ProductMaster 수 | **177,413** |
+| `rx` 수 | 119,548 |
+| `otc` 수 | 57,572 |
+| `drug_unspecified` 수 | **293** (잔여) / `drug_category` NULL 0 |
+| `KOREA_DRUG_CODE` identifier 수 | 177,413 (연결률 **100%**) |
+| `MFDS_CODE` identifier 수 | 177,413 (연결률 **100%**) |
+| `KOREA_INSURANCE_CODE` identifier 수 | 64,692 (36%) |
+| `ATC_CODE` identifier 수 | 176,962 (99.7%) |
+| ProductDrugExtension 생성률 | **0 / 177,413 (0%)** — 전무 |
+| RepresentativeProduct 연결률 | **177,413 / 177,413 (100%)** — 이미 그룹핑 완료 |
+| SharedProductDescription 생성률 | 19,431 master (11%), canonical 15,962, 전량 `mfds_easy_drug`, `drug_extension` 0 |
+| MFDS_CODE 그룹 수 | 48,101 |
+| MFDS_CODE multi-manufacturer group 수 | **4,899 / 48,101 (10.2%)** (max 6 제조사, max 487 master/그룹) |
+| candidate 승격 상태 | approved_new_master 229,841 + matched 1,000 + pending(cancel) 74,681 |
+
+### 3.1 대표상품(RepresentativeProduct) 실태 — 이미 적용됨
+
+- 총 `representative_products` = **64,672**. 그중 DRUG 연결 rep = **48,101**, **member 0개 orphan rep = 16,571**.
+- 그룹핑 근거(metadata): `source='WO-O4O-DRUG-REPRESENTATIVE-PRODUCT-GROUPING-V1'`, `groupKey='MFDS_CODE:{n}'`, `reviewFlags.multiManufacturer/multiName/duplicateDisplayName`, `memberMasterCount`.
+- **그룹핑 키 = `MFDS_CODE` 단독** (rep당 distinct MFDS_CODE = 1, 전건). 제조사 분리는 하지 않았고, 다제조사 4,899건은 **`reviewFlags.multiManufacturer=true`로 표시만** 되어 있음(침묵 병합 아님).
+- orphan rep 16,571 = drug_unspecified master 53,428 삭제(commit 3914b5400)로 member를 잃은 대표상품 잔재로 추정.
+
+### 3.2 핵심 해석
+
+- **Gate B는 부분 적용이 아니라 사실상 완료.** 230,841 승격(approved_new 229,841 + matched 1,000) → drug_unspecified 53,428 삭제 → 현재 177,413. (230,841 − 53,428 = 177,413, 정확히 일치)
+- **Identifier 계층은 100% 건강.** KOREA_DRUG_CODE/MFDS_CODE 결측 0.
+- **대표상품 그룹핑도 이미 완료(MFDS_CODE 키).** 제안서의 "grouping apply 실측 전 금지"는 이미 무의미 — 이미 라이브.
+- **ProductDrugExtension은 전무(0).** 코드 이중저장 divergence는 아직 물리적으로 존재하지 않음(mirror 미생성).
+- **설명(SharedProductDescription)은 11%만, 전량 e약은요.** drug_extension 소스 0.
 
 ---
 
-## 4. 다음 판단
+## 4. 다음 판단 (실측 반영)
 
-CHECK-A 결과로 결정할 것:
+1. **의약품 apply WO** — 신규 apply 불필요. Gate B 완료 + drug_unspecified 정제 완료. `WO-O4O-DRUG-O4O-DB-APPLY-HANDOFF-V1`은 **"완료 처리(HOLD 해제 불요)"**로 종결하고, 잔여 293 drug_unspecified 처리만 별도 판단.
+2. **결정 2(그룹핑 키)** — 이미 `MFDS_CODE` 단독으로 적용됨. 개방 이슈는 "키 선택"이 아니라 **"multiManufacturer 10.2%(4,899)를 그대로 둘지 재분할할지"** 의 refinement. reviewFlags로 이미 격리돼 있어 긴급도 낮음.
+3. **결정 4(anchorType)** — drug rep은 이미 `metadata.groupKey='MFDS_CODE:*'`/`source`로 식별 가능. HFF는 다른 groupKey/source면 충돌 없음. anchorType 신설은 정합성 개선이지 필수 아님. **단 orphan rep 16,571 정리 필요 여부는 별도 판단.**
+4. **결정 1(코드 SSOT)** — ProductDrugExtension 0개라 divergence 없음. Extension 생성 WO에서 정책으로만 명문화.
+5. **설명 파생** — e약은요 19,431건 이미 파생. 나머지 89%는 미파생. 후속 설명 WO 필요.
 
-1. 의약품 apply WO를 갱신할지, 완료 처리할지, 복구/재검증 WO가 필요한지
-2. `RepresentativeProduct` grouping key를 `MFDS_CODE` 단독으로 둘 수 있는 범위
-3. 다제조사 혼입 케이스의 처리 방식
-4. `ProductDrugExtension` mirror 생성/정합성 보정이 필요한지
-5. `SharedProductDescription` 파생이 이미 되었는지, 후속 설명 WO가 필요한지
+### 새로 드러난 후속 작업
+
+- **orphan RepresentativeProduct 16,571** (drug_unspecified 삭제 잔재) 정리 여부 판단 WO.
+- **ProductDrugExtension 전무** — 의약품 표시/정책 계층 미존재. 매장 설명서/노출 단계 전 mirror 생성 필요.
+- **drug_unspecified 잔여 293** 후처리.
