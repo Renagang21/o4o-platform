@@ -4,6 +4,7 @@
  * WO-O4O-ADMIN-PUBLIC-PRODUCT-DB-READONLY-SKELETON-V1
  *
  * 정부/공공데이터 기반 기본 상품 DB 조회 허브. 하위 탭:
+ *  - 현황 (요약 대시보드)
  *  - 공공데이터 후보 (ProductCandidate)
  *  - 기본 상품 (ProductMaster)
  *  - 데이터 정비 (준비중)
@@ -14,6 +15,7 @@ import { NavLink, Outlet } from 'react-router-dom';
 import { Database } from 'lucide-react';
 
 const TABS = [
+  { to: 'overview', label: '현황' },
   { to: 'candidates', label: '공공데이터 후보' },
   { to: 'masters', label: '기본 상품' },
   { to: 'review', label: '설명 검토' },

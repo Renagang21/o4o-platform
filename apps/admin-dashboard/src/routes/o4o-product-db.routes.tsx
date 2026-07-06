@@ -12,6 +12,7 @@ import { AdminProtectedRoute } from '@o4o/auth-context';
 import { Suspense, lazy } from 'react';
 
 const ProductDbLayout = lazy(() => import('@/pages/o4o-product-db/ProductDbLayout'));
+const ProductDbOverviewPage = lazy(() => import('@/pages/o4o-product-db/ProductDbOverviewPage'));
 const ProductCandidatesPage = lazy(() => import('@/pages/o4o-product-db/ProductCandidatesPage'));
 const ProductCandidateDetailPage = lazy(() => import('@/pages/o4o-product-db/ProductCandidateDetailPage'));
 const ProductMastersPage = lazy(() => import('@/pages/o4o-product-db/ProductMastersPage'));
@@ -39,7 +40,8 @@ export function O4OProductDbRoutes() {
         </AdminProtectedRoute>
       }
     >
-      <Route index element={<Navigate to="candidates" replace />} />
+      <Route index element={<Navigate to="overview" replace />} />
+      <Route path="overview" element={<ProductDbOverviewPage />} />
       <Route path="candidates" element={<ProductCandidatesPage />} />
       <Route path="candidates/:id" element={<ProductCandidateDetailPage />} />
       <Route path="masters" element={<ProductMastersPage />} />

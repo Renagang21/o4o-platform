@@ -132,6 +132,12 @@ export const adminMenuStatic: MenuItem[] = [
     roles: ['admin', 'super_admin'],
     children: [
       {
+        id: 'o4o-product-db-overview',
+        label: '현황',
+        icon: <BarChart2 className="w-4 h-4" />,
+        path: '/admin/o4o-product-db/overview',
+      },
+      {
         id: 'o4o-product-db-candidates',
         label: '공공데이터 후보',
         icon: <ClipboardList className="w-4 h-4" />,
