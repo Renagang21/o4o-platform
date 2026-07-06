@@ -147,3 +147,6 @@ services/web-*/vite.config.d.ts
 
 # Drug master CSV samples/raw (WO-O4O-DRUG-CANDIDATE-IMPORT-PIPELINE-V1) — never commit bulk/sample CSV
 docs/checks/artifacts/*.csv
+
+# Local CLI tool binaries (e.g. Cloud SQL Auth Proxy) — downloaded per-environment, not project source
+/bin/
