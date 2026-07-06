@@ -114,6 +114,12 @@ export default function ProductCandidatesPage() {
 
   return (
     <div>
+      {/* 유입 확인용 안내 (정비 action 화면 아님) — WO-O4O-ADMIN-O4O-PRODUCT-MANAGEMENT-BASE-CONSOLE-V1 */}
+      <div className="mb-4 text-sm text-gray-600 bg-blue-50/60 border border-blue-100 rounded p-3">
+        공공데이터, import, 공급자/매장 입력 등에서 들어온 상품 후보를 확인합니다.
+        현재 화면에서는 후보를 승격하거나 삭제하지 않습니다.
+      </div>
+
       {/* Toolbar */}
       <div className="flex flex-wrap gap-3 mb-4 items-center">
         <select value={status} onChange={onFilterChange(setStatus)} className="border border-gray-300 rounded px-3 py-2 text-sm">

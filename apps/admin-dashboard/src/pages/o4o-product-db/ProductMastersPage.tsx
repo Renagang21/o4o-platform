@@ -4,8 +4,9 @@
  * WO-O4O-ADMIN-PUBLIC-PRODUCT-DB-READONLY-SKELETON-V1
  *
  * ProductMaster 목록/검색 + 서버 페이지네이션(meta 사용).
- * 검증: 목록 응답에는 regulatoryType 이 없어 목록 컬럼/필터에서 제외 (상세에만 표시).
- * mutation 없음.
+ * 관리 콘솔 컬럼: 이미지/상품명/공식명/제조사/브랜드/분류/규격/바코드/이미지 상태.
+ * 검증: 목록 응답에는 regulatoryType·설명 상태가 없어 목록 컬럼에서 제외 (상세에만 표시).
+ * WO-O4O-ADMIN-O4O-PRODUCT-MANAGEMENT-BASE-CONSOLE-V1. mutation 없음 (GET-only).
  */
 
 import { useEffect, useState, useCallback } from 'react';
@@ -93,15 +94,18 @@ export default function ProductMastersPage() {
               <Th>상품명</Th>
               <Th>공식명</Th>
               <Th>제조사</Th>
+              <Th>브랜드</Th>
+              <Th>분류</Th>
               <Th>규격</Th>
               <Th>바코드</Th>
+              <Th>이미지 상태</Th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 bg-white">
             {loading ? (
-              <tr><td colSpan={6} className="px-4 py-10 text-center text-gray-400">불러오는 중…</td></tr>
+              <tr><td colSpan={9} className="px-4 py-10 text-center text-gray-400">불러오는 중…</td></tr>
             ) : rows.length === 0 ? (
-              <tr><td colSpan={6} className="px-4 py-10 text-center text-gray-400">아직 표시할 데이터가 없습니다</td></tr>
+              <tr><td colSpan={9} className="px-4 py-10 text-center text-gray-400">아직 표시할 데이터가 없습니다</td></tr>
             ) : (
               rows.map((r) => (
                 <tr key={r.id} onClick={() => navigate(r.id)} className="hover:bg-blue-50 cursor-pointer">
@@ -113,8 +117,15 @@ export default function ProductMastersPage() {
                   <Td className="font-medium text-gray-900">{r.name || '—'}</Td>
                   <Td>{r.regulatoryName || '—'}</Td>
                   <Td>{r.manufacturerName || '—'}</Td>
+                  <Td>{r.brand?.name || '—'}</Td>
+                  <Td>{r.category?.name || '—'}</Td>
                   <Td>{r.specification || '—'}</Td>
                   <Td className="text-gray-500">{r.barcode || '—'}</Td>
+                  <Td>
+                    {r.primaryImageUrl
+                      ? <span className="inline-block px-2 py-0.5 rounded-full bg-green-50 text-green-700 text-xs">있음</span>
+                      : <span className="inline-block px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 text-xs">없음</span>}
+                  </Td>
                 </tr>
               ))
             )}
