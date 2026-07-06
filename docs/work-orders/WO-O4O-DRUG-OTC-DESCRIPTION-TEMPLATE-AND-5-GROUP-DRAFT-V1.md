@@ -1,5 +1,55 @@
 # WO-O4O-DRUG-OTC-DESCRIPTION-TEMPLATE-AND-5-GROUP-DRAFT-V1
 
+## START HERE — 작업 시작 지시
+
+이 파일을 작업 요청서로 받으면 **가장 먼저 저장소를 동기화**한다.
+
+```bash
+git fetch --all --prune
+git pull origin main
+```
+
+동기화 후 아래 파일들이 존재하는지 확인한다.
+
+```text
+docs/work-orders/WO-O4O-DRUG-OTC-DESCRIPTION-TEMPLATE-AND-5-GROUP-DRAFT-V1.md
+docs/guides/O4O-DRUG-STORE-DESCRIPTION-WRITING-GUIDE-V1.md
+docs/checks/CHECK-O4O-DRUG-OTC-ONE-GROUP-DESCRIPTION-PILOT-V1.md
+```
+
+간단히 말하면 이번 작업은 다음이다.
+
+```text
+에르도스테인 pilot 다음 단계로,
+카피제품이 많은 일반의약품 OTC 성분·함량·제형 그룹 5개를 선정/검증하고,
+성분 중심 매장용 설명서 초안 5개를 작성한다.
+DB write는 하지 않는다.
+결과 CHECK와 보완 문서는 GitHub main에 저장한다.
+```
+
+작업 대상 기본 후보는 다음 5개다.
+
+```text
+세티리진염산염 10mg 정
+알벤다졸 400mg 정
+알마게이트 500mg 정
+나프록센나트륨 275mg 정
+트리메부틴말레산염 100mg 정
+```
+
+반드시 지킬 것:
+
+```text
+DB write 0
+SharedProductDescription insert/update 0
+ProductDrugExtension 임상 텍스트 입력 0
+canonical 승격 0
+매장 콘텐츠/QR/POP/태블릿 연결 0
+처방의약품/건강기능식품/의료기기/의약외품 제외
+```
+
+---
+
 ## 0. 작업 목적
 
 의약품 매장용 설명서 작성 기준을 템플릿화하고, 실제 O4O DB 기준으로 카피제품이 많은 OTC 성분·함량·제형 그룹 5개에 대해 설명서 초안을 작성한다.
@@ -116,20 +166,21 @@ pilot CHECK의 후보 목록과 사용자 지시에 따라, 기본 후보는 다
 
 이번 작업에서 해야 할 것:
 
-1. 기준 문서와 pilot CHECK 읽기
-2. 프로덕션 DB에서 후보 5개 그룹을 read-only로 재검증
-3. 제조사 수, ProductMaster 수, 포장단위 수, e약은요 보유 수 확인
-4. OTC 순도 확인
-5. 단일성분/복합제 혼입 여부 확인
-6. 각 그룹의 ProductMaster 샘플 일부 확인
-7. e약은요 원문 또는 허가 원문 확인
-8. 설명서 템플릿 문서화
-9. AI 에이전트 작성 프롬프트 초안 작성
-10. 약사 검수 체크리스트 작성
-11. 후보 5개 그룹 설명서 초안 작성
-12. 작성 중 발견한 기준 보완점을 가이드에 additive로 반영
-13. 결과 CHECK 문서 작성
-14. 생성/수정 문서를 GitHub `main`에 반영하고 fetch 확인
+1. 저장소를 먼저 동기화한다: `git fetch --all --prune`, `git pull origin main`
+2. 기준 문서와 pilot CHECK 읽기
+3. 프로덕션 DB에서 후보 5개 그룹을 read-only로 재검증
+4. 제조사 수, ProductMaster 수, 포장단위 수, e약은요 보유 수 확인
+5. OTC 순도 확인
+6. 단일성분/복합제 혼입 여부 확인
+7. 각 그룹의 ProductMaster 샘플 일부 확인
+8. e약은요 원문 또는 허가 원문 확인
+9. 설명서 템플릿 문서화
+10. AI 에이전트 작성 프롬프트 초안 작성
+11. 약사 검수 체크리스트 작성
+12. 후보 5개 그룹 설명서 초안 작성
+13. 작성 중 발견한 기준 보완점을 가이드에 additive로 반영
+14. 결과 CHECK 문서 작성
+15. 생성/수정 문서를 GitHub `main`에 반영하고 fetch 확인
 
 이번 작업에서 하지 말 것:
 
@@ -306,6 +357,7 @@ https://github.com/Renagang21/o4o-platform
 
 이번 작업은 다음을 만족하면 완료로 본다.
 
+- 시작 전 저장소 동기화를 수행함
 - 기준 가이드와 pilot CHECK를 반영함
 - 카피제품 많은 OTC 성분·함량·제형 그룹 5개를 선정 또는 적절히 교체함
 - 각 그룹의 제조사 수/ProductMaster 수/포장단위 수/e약은요 수를 기록함
