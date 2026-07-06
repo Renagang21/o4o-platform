@@ -131,6 +131,107 @@ export function createProductLibraryController(dataSource: DataSource): Router {
           }
         : null;
 
+      // ── WO-O4O-ADMIN-O4O-PRODUCT-MASTER-DETAIL-GET-ENRICHMENT-V1 ──
+      //   상품관리 콘솔 상세용 GET-only enrichment (identifiers / descriptions / sourceLinks / usageSummary).
+      //   모두 read-only 집계. mutation 없음. 병렬 실행으로 상세 로딩 지연 최소화.
+      const DESC_LIMIT = 20;
+      const LINK_LIMIT = 20;
+      const [identifierRows, descriptionRows, sourceLinkRows, usageRows] = await Promise.all([
+        // 식별자 — 활성(soft-delete 제외), primary 우선
+        dataSource.query(
+          `SELECT id, identifier_type, identifier_value, normalized_value,
+                  source_type, source_id, source_label, is_primary, verification_status, created_at
+             FROM product_identifiers
+            WHERE product_master_id = $1 AND deleted_at IS NULL
+            ORDER BY is_primary DESC, identifier_type ASC, created_at ASC`,
+          [id],
+        ) as Promise<Array<{
+          id: string; identifier_type: string; identifier_value: string; normalized_value: string | null;
+          source_type: string | null; source_id: string | null; source_label: string | null;
+          is_primary: boolean; verification_status: string | null; created_at: string | null;
+        }>>,
+        // 설명 후보 — canonical > needs_review > candidate > 기타, 최신순, 상한 20
+        dataSource.query(
+          `SELECT id, status, source_type, language, summary,
+                  LEFT(content, 400) AS content_preview, quality_score, created_at, updated_at
+             FROM shared_product_descriptions
+            WHERE master_id = $1 AND deleted_at IS NULL
+            ORDER BY (CASE status
+                        WHEN 'canonical' THEN 0
+                        WHEN 'needs_review' THEN 1
+                        WHEN 'candidate' THEN 2
+                        ELSE 3 END),
+                     updated_at DESC
+            LIMIT ${DESC_LIMIT}`,
+          [id],
+        ) as Promise<Array<{
+          id: string; status: string; source_type: string; language: string | null; summary: string | null;
+          content_preview: string | null; quality_score: string | null; created_at: string | null; updated_at: string | null;
+        }>>,
+        // 후보/원천 연결 — 이 master 로 매칭된 ProductCandidate, 최신순, 상한 20
+        dataSource.query(
+          `SELECT id AS candidate_id, source_type, source_label, candidate_name,
+                  candidate_manufacturer, candidate_status, match_status, created_at
+             FROM product_candidates
+            WHERE matched_product_master_id = $1
+            ORDER BY created_at DESC
+            LIMIT ${LINK_LIMIT}`,
+          [id],
+        ) as Promise<Array<{
+          candidate_id: string; source_type: string; source_label: string | null; candidate_name: string | null;
+          candidate_manufacturer: string | null; candidate_status: string | null; match_status: string | null; created_at: string | null;
+        }>>,
+        // 사용 상태 요약 — count only. store_local_products 는 barcode 기반 loose 연결.
+        dataSource.query(
+          `SELECT
+             (SELECT COUNT(*) FROM organization_product_listings WHERE master_id = $1) AS organization_listing_count,
+             (SELECT COUNT(*) FROM store_local_products
+               WHERE barcode IS NOT NULL AND barcode <> '' AND barcode = $2) AS store_local_product_count`,
+          [id, master.barcode ?? ''],
+        ) as Promise<Array<{ organization_listing_count: string; store_local_product_count: string }>>,
+      ]);
+
+      const identifiers = identifierRows.map((r) => ({
+        id: r.id,
+        type: r.identifier_type,
+        value: r.identifier_value,
+        normalizedValue: r.normalized_value,
+        sourceType: r.source_type,
+        sourceRefId: r.source_id,
+        sourceLabel: r.source_label,
+        isPrimary: r.is_primary,
+        verificationStatus: r.verification_status,
+        createdAt: r.created_at,
+      }));
+
+      const descriptions = descriptionRows.map((r) => ({
+        id: r.id,
+        status: r.status,
+        sourceType: r.source_type,
+        language: r.language,
+        summary: r.summary,
+        contentPreview: r.content_preview,
+        qualityScore: r.quality_score != null ? Number(r.quality_score) : null,
+        createdAt: r.created_at,
+        updatedAt: r.updated_at,
+      }));
+
+      const sourceLinks = sourceLinkRows.map((r) => ({
+        candidateId: r.candidate_id,
+        sourceType: r.source_type,
+        sourceLabel: r.source_label,
+        candidateName: r.candidate_name,
+        candidateManufacturer: r.candidate_manufacturer,
+        candidateStatus: r.candidate_status,
+        matchStatus: r.match_status,
+        createdAt: r.created_at,
+      }));
+
+      const usageSummary = {
+        organizationListingCount: Number(usageRows[0]?.organization_listing_count ?? 0),
+        storeLocalProductCount: Number(usageRows[0]?.store_local_product_count ?? 0),
+      };
+
       res.json({
         success: true,
         data: {
@@ -155,6 +256,11 @@ export function createProductLibraryController(dataSource: DataSource): Router {
             type: img.type || 'detail',
           })),
           canonicalDescription,
+          // WO-O4O-ADMIN-O4O-PRODUCT-MASTER-DETAIL-GET-ENRICHMENT-V1 (additive, read-only)
+          identifiers,
+          descriptions,
+          sourceLinks,
+          usageSummary,
           createdAt: master.createdAt,
         },
       });

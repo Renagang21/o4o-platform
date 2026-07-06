@@ -180,6 +180,49 @@ export interface CanonicalDescription {
   updatedAt: string;
 }
 
+// ── WO-O4O-ADMIN-O4O-PRODUCT-MASTER-DETAIL-GET-ENRICHMENT-V1: 상세 enrichment (read-only) ──
+
+export interface ProductIdentifierSummary {
+  id: string;
+  type: string;
+  value: string;
+  normalizedValue: string | null;
+  sourceType: string | null;
+  sourceRefId: string | null;
+  sourceLabel: string | null;
+  isPrimary: boolean;
+  verificationStatus: string | null;
+  createdAt: string | null;
+}
+
+export interface ProductDescriptionSummary {
+  id: string;
+  status: string;
+  sourceType: string;
+  language: string | null;
+  summary: string | null;
+  contentPreview: string | null;
+  qualityScore: number | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+
+export interface ProductSourceLinkSummary {
+  candidateId: string | null;
+  sourceType: string;
+  sourceLabel: string | null;
+  candidateName: string | null;
+  candidateManufacturer: string | null;
+  candidateStatus: string | null;
+  matchStatus: string | null;
+  createdAt: string | null;
+}
+
+export interface ProductUsageSummary {
+  organizationListingCount: number;
+  storeLocalProductCount: number;
+}
+
 export interface ProductMasterDetail {
   id: string;
   barcode: string;
@@ -197,6 +240,11 @@ export interface ProductMasterDetail {
   images: ProductMasterImage[];
   /** 공식 소비자 설명 (없으면 null). 매장용 AI 설명과 구분. */
   canonicalDescription: CanonicalDescription | null;
+  /** 상세 enrichment (additive, read-only). 구버전 API 응답에는 없을 수 있어 optional. */
+  identifiers?: ProductIdentifierSummary[];
+  descriptions?: ProductDescriptionSummary[];
+  sourceLinks?: ProductSourceLinkSummary[];
+  usageSummary?: ProductUsageSummary;
   createdAt: string;
 }
 

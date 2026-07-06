@@ -1,13 +1,13 @@
 /**
  * ProductMasterDetailPage — 기본 상품 상세 (관리 콘솔형, read-only)
  *
- * WO-O4O-ADMIN-O4O-PRODUCT-MANAGEMENT-BASE-CONSOLE-V1
- * (기반: WO-O4O-ADMIN-PUBLIC-PRODUCT-DB-READONLY-SKELETON-V1)
+ * WO-O4O-ADMIN-O4O-PRODUCT-MASTER-DETAIL-GET-ENRICHMENT-V1
+ * (기반: WO-O4O-ADMIN-O4O-PRODUCT-MANAGEMENT-BASE-CONSOLE-V1 / ...-READONLY-SKELETON-V1)
  *
- * 상품 관리 콘솔의 중심 화면. 향후 write 기능이 붙을 자리를 섹션으로 마련하되,
- * 이번 WO 는 GET-only 이며 어떤 mutation 버튼도 두지 않는다.
- * 현재 상세 API(GET /neture/products/library/:id)에 없는 정보(추가 식별자/원천 연결/
- * 사용 상태/메모/이력)는 "후속 GET API 필요" placeholder 로 명확히 표시한다.
+ * 상품 관리 콘솔의 중심 화면. GET-only 이며 어떤 mutation 버튼도 두지 않는다.
+ * 상세 API(GET /neture/products/library/:id)가 additive 로 제공하는 enrichment
+ * (identifiers / descriptions / sourceLinks / usageSummary)를 read-only 로 표시한다.
+ * 관리 메모 / 작업 이력은 후속 write/audit WO 자리로 placeholder 유지.
  */
 
 import { useEffect, useState } from 'react';
@@ -83,14 +83,41 @@ export default function ProductMasterDetailPage() {
             <Field label="MFDS 검증 여부" value={row.isMfdsVerified ? '검증됨' : '미검증'} />
           </Section>
 
-          {/* 식별자 — 현재 상세 API 는 barcode 만 제공 */}
-          <Section title="식별자">
-            <Field label="바코드" value={row.barcode} />
-            <FollowupNote>
-              추가 식별자(MFDS_CODE / KOREA_DRUG_CODE / ATC_CODE / 보험코드 등)는 후속 GET API 필요
-              (<code className="text-gray-500">GET /neture/products/library/:id/identifiers</code>)
-            </FollowupNote>
-          </Section>
+          {/* 식별자 — barcode(primary) + ProductIdentifier 목록 (read-only) */}
+          <PanelSection title={`식별자 (${row.identifiers?.length ?? 0})`}>
+            <div className="mb-3 text-sm">
+              <span className="text-gray-500 mr-2">대표 바코드</span>
+              <span className="text-gray-900 break-all">{row.barcode || '—'}</span>
+            </div>
+            {row.identifiers?.length ? (
+              <div className="overflow-x-auto">
+                <table className="min-w-full text-sm border border-gray-200 rounded">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <ThMini>유형</ThMini>
+                      <ThMini>값</ThMini>
+                      <ThMini>출처</ThMini>
+                      <ThMini>검증 상태</ThMini>
+                      <ThMini>primary</ThMini>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {row.identifiers.map((idf) => (
+                      <tr key={idf.id}>
+                        <TdMini><span className="font-medium text-gray-800">{identifierTypeLabel(idf.type)}</span></TdMini>
+                        <TdMini className="break-all">{idf.value}</TdMini>
+                        <TdMini className="text-gray-500">{idf.sourceLabel || idf.sourceType || '—'}</TdMini>
+                        <TdMini className="text-gray-500">{idf.verificationStatus || '—'}</TdMini>
+                        <TdMini>{idf.isPrimary ? <span className="text-green-600">●</span> : <span className="text-gray-300">○</span>}</TdMini>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="text-sm text-gray-400">등록된 식별자가 없습니다.</div>
+            )}
+          </PanelSection>
 
           {/* 이미지 */}
           <PanelSection
@@ -140,27 +167,82 @@ export default function ProductMasterDetailPage() {
                 />
               </>
             ) : (
-              <div className="text-sm text-gray-400">
-                공식 설명 없음
-                <div className="text-xs text-gray-400 mt-1">draft / needs_review 설명 및 설명 생성·검수는 후속 WO.</div>
-              </div>
+              <div className="text-sm text-gray-400">공식 설명 없음</div>
             )}
           </PanelSection>
 
-          {/* 후보/원천 연결 — 후속 GET API */}
-          <PanelSection title="후보 / 원천 연결">
-            <FollowupNote>
-              이 상품을 만든 후보(ProductCandidate) 및 원천(source) 연결 정보는 후속 GET API 필요
-              (<code className="text-gray-500">GET /neture/products/library/:id/source-links</code>)
-            </FollowupNote>
+          {/* 설명 후보 — SharedProductDescription 요약 (read-only preview) */}
+          <PanelSection title={`설명 후보 (${row.descriptions?.length ?? 0})`}>
+            {row.descriptions?.length ? (
+              <ul className="space-y-2">
+                {row.descriptions.map((d) => (
+                  <li key={d.id} className="border border-gray-200 rounded p-3">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <DescriptionStatusBadge status={d.status} />
+                      <span className="text-xs text-gray-400">{d.sourceType}</span>
+                      {d.language && <span className="text-xs text-gray-400">· {d.language}</span>}
+                      {d.qualityScore != null && <span className="text-xs text-gray-400">· 품질 {d.qualityScore.toFixed(2)}</span>}
+                      {d.updatedAt && <span className="text-xs text-gray-400 ml-auto">{d.updatedAt.slice(0, 10)}</span>}
+                    </div>
+                    <div className="text-sm text-gray-700 line-clamp-2">
+                      {d.summary || d.contentPreview || <span className="text-gray-400">내용 미리보기 없음</span>}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="text-sm text-gray-400">표시할 설명 데이터가 없습니다.</div>
+            )}
+            <div className="text-xs text-gray-400 mt-2">설명 생성·승인·수정은 이번 WO 범위 밖(GET-only)입니다.</div>
           </PanelSection>
 
-          {/* 사용 상태 — 후속 */}
+          {/* 후보/원천 연결 — 이 master 로 매칭된 ProductCandidate (read-only) */}
+          <PanelSection title={`후보 / 원천 연결 (${row.sourceLinks?.length ?? 0})`}>
+            {row.sourceLinks?.length ? (
+              <div className="overflow-x-auto">
+                <table className="min-w-full text-sm border border-gray-200 rounded">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <ThMini>후보명</ThMini>
+                      <ThMini>제조사</ThMini>
+                      <ThMini>source</ThMini>
+                      <ThMini>후보 상태</ThMini>
+                      <ThMini>매칭 상태</ThMini>
+                      <ThMini>생성일</ThMini>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {row.sourceLinks.map((s, i) => (
+                      <tr key={s.candidateId ?? i}>
+                        <TdMini className="text-gray-800">{s.candidateName || '—'}</TdMini>
+                        <TdMini className="text-gray-500">{s.candidateManufacturer || '—'}</TdMini>
+                        <TdMini className="text-gray-500">
+                          {s.sourceType}{s.sourceLabel ? <span className="text-gray-400"> · {s.sourceLabel}</span> : null}
+                        </TdMini>
+                        <TdMini className="text-gray-500">{s.candidateStatus || '—'}</TdMini>
+                        <TdMini className="text-gray-500">{s.matchStatus || '—'}</TdMini>
+                        <TdMini className="text-gray-400">{s.createdAt ? s.createdAt.slice(0, 10) : '—'}</TdMini>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="text-sm text-gray-400">연결된 원천 후보가 없습니다.</div>
+            )}
+          </PanelSection>
+
+          {/* 사용 상태 — listing/store 연결 count 요약 (read-only) */}
           <PanelSection title="사용 상태">
-            <FollowupNote>
-              O4O 주문 가능 상품 / 매장 취급 상품 연결 상태는 후속 GET API 필요
-              (<code className="text-gray-500">GET /neture/products/library/:id/usage-summary</code>)
-            </FollowupNote>
+            {row.usageSummary ? (
+              <div className="grid grid-cols-2 gap-3">
+                <UsageCard label="O4O 주문 상품 연결 (organization listing)" value={row.usageSummary.organizationListingCount} />
+                <UsageCard label="매장 취급 상품 (store local · barcode 기준)" value={row.usageSummary.storeLocalProductCount} />
+              </div>
+            ) : (
+              <div className="text-sm text-gray-400">아직 사용 연결 정보가 없습니다.</div>
+            )}
+            <div className="text-xs text-gray-400 mt-2">count 조회 전용 — 연결 생성/해제는 이번 WO 범위 밖입니다.</div>
           </PanelSection>
 
           {/* 관리 메모 — 후속 write */}
@@ -217,4 +299,53 @@ function FollowupNote({ children }: { children: React.ReactNode }) {
       {children}
     </div>
   );
+}
+
+function ThMini({ children }: { children: React.ReactNode }) {
+  return <th className="px-3 py-2 text-left font-semibold text-gray-500 whitespace-nowrap">{children}</th>;
+}
+function TdMini({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+  return <td className={`px-3 py-2 align-top whitespace-nowrap ${className}`}>{children}</td>;
+}
+
+function UsageCard({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="border border-gray-200 rounded-lg p-4">
+      <div className="text-2xl font-bold text-gray-900">{value.toLocaleString()}</div>
+      <div className="text-xs text-gray-500 mt-1">{label}</div>
+    </div>
+  );
+}
+
+const DESCRIPTION_STATUS_TONE: Record<string, string> = {
+  canonical: 'bg-green-100 text-green-700',
+  needs_review: 'bg-amber-100 text-amber-700',
+  candidate: 'bg-blue-50 text-blue-700',
+  hidden: 'bg-gray-100 text-gray-500',
+  deprecated: 'bg-gray-100 text-gray-400',
+};
+function DescriptionStatusBadge({ status }: { status: string }) {
+  const tone = DESCRIPTION_STATUS_TONE[status] ?? 'bg-gray-100 text-gray-600';
+  return <span className={`px-2 py-0.5 rounded-full text-xs ${tone}`}>{status}</span>;
+}
+
+/** identifier 유형 한글 라벨 (표시용, 없으면 원본 코드) */
+const IDENTIFIER_TYPE_LABEL: Record<string, string> = {
+  GTIN: '바코드(GTIN)',
+  EAN13: '바코드(EAN13)',
+  UPC: '바코드(UPC)',
+  JAN: '바코드(JAN)',
+  INTERNAL_O4O: 'O4O 내부코드',
+  SUPPLIER_SKU: '공급자 SKU',
+  PHARMACY_LOCAL: '약국 로컬코드',
+  STORE_LOCAL: '매장 로컬코드',
+  KOREA_DRUG_CODE: '의약품 표준/약가코드',
+  KOREA_INSURANCE_CODE: '보험코드',
+  ATC_CODE: 'ATC 코드',
+  MFDS_CODE: '식약처 코드',
+  UDI_DI: '의료기기 UDI-DI',
+  UNKNOWN: '기타',
+};
+function identifierTypeLabel(type: string): string {
+  return IDENTIFIER_TYPE_LABEL[type] ?? type;
 }
