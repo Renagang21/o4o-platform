@@ -1,14 +1,21 @@
 /**
- * ProductMasterImage Controller — O4O 상품 DB 이미지 action (admin write, Phase 1)
+ * ProductMasterImage Controller — O4O 상품 DB 이미지 action (admin write)
  *
- * WO-O4O-ADMIN-O4O-PRODUCT-IMAGE-ACTION-V1
+ * WO-O4O-ADMIN-O4O-PRODUCT-IMAGE-ACTION-V1 (Phase 1: 추가 / 대표 지정)
+ * WO-O4O-ADMIN-O4O-PRODUCT-IMAGE-SOFT-DELETE-RESTORE-V1 (Phase 2: 숨김 / 복원 / 목록)
  *
  * mount: /api/v1/admin/o4o-product-db/masters
+ *   GET  /:id/images                       — 이미지 목록 (숨김 포함, admin 전용). active 먼저, 숨김 뒤.
  *   POST /:id/images                       — 이미지 추가 (multipart 'image'). 첫 active 이미지면 자동 대표.
  *   POST /:id/images/:imageId/set-primary  — 대표 이미지 지정 (트랜잭션, master당 active primary 1개).
+ *   DELETE /:id/images/:imageId            — 이미지 숨김 (soft delete). 대표였으면 is_primary 해제(자동 승계 없음).
+ *   POST /:id/images/:imageId/restore      — 숨김 이미지 복원 (대표 자동 지정 없음).
+ *
+ * 정책(Phase 2): "삭제가 아니라 숨김". GCS 원본 삭제 없음(gcs_path 보존). active primary 는 항상 1개 이하
+ *   (숨김 시 is_primary 해제 → 0 가능, 새 대표는 admin 이 명시 지정). 작업 이력에 image_hidden / image_restored 기록.
  *
  * 범위: product_images 에만 write. ProductMaster 본문/설명/후보 무변경.
- * 숨김/복원/교체/삭제/GCS delete 없음(후속 WO). audit_logs 에 image_added / image_primary_changed 기록.
+ * audit_logs 에 image_added / image_primary_changed / image_hidden / image_restored 기록.
  * 권한: ADMIN_ROLES (operator write 금지 — operator scope 는 이 컨트롤러에 없음).
  */
 
@@ -52,7 +59,7 @@ export function createProductMasterImageController(dataSource: DataSource): Rout
   // audit 기록 (fire-and-forget — 실패해도 main action 롤백하지 않음)
   async function writeAudit(
     masterId: string,
-    action: 'image_added' | 'image_primary_changed',
+    action: 'image_added' | 'image_primary_changed' | 'image_hidden' | 'image_restored',
     userId: string | null,
     changes: Record<string, unknown>,
   ): Promise<void> {
@@ -78,6 +85,47 @@ export function createProductMasterImageController(dataSource: DataSource): Rout
     );
     return !!rows[0]?.exists;
   }
+
+  // GET /:id/images — 이미지 목록 (admin 전용, 숨김 포함). active(대표 먼저) → 숨김 순.
+  // 공유 상세 API(/neture/products/library/:id)는 active 만 반환하므로, 숨김 복원 UI 를 위해 별도 제공.
+  router.get('/:id/images', async (req: Request, res: Response) => {
+    try {
+      const masterId = req.params.id;
+      if (!(await masterExists(masterId))) {
+        res.status(404).json({ success: false, error: 'ProductMaster not found', code: 'MASTER_NOT_FOUND' });
+        return;
+      }
+      const all = await imageRepo.find({ where: { masterId } });
+      // active(대표 먼저, sortOrder 순) → 숨김(최근 숨김 먼저)
+      const rows = all.sort((a, b) => {
+        const aHidden = a.deletedAt ? 1 : 0;
+        const bHidden = b.deletedAt ? 1 : 0;
+        if (aHidden !== bHidden) return aHidden - bHidden;
+        if (aHidden === 0) {
+          if (a.isPrimary !== b.isPrimary) return a.isPrimary ? -1 : 1;
+          return a.sortOrder - b.sortOrder;
+        }
+        return (b.deletedAt?.getTime() ?? 0) - (a.deletedAt?.getTime() ?? 0);
+      });
+      res.json({
+        success: true,
+        data: rows.map((r) => ({
+          id: r.id,
+          imageUrl: r.imageUrl,
+          isPrimary: r.isPrimary,
+          sortOrder: r.sortOrder,
+          type: r.type,
+          source: r.source,
+          createdAt: r.createdAt,
+          deletedAt: r.deletedAt,
+          deletedBy: r.deletedBy,
+        })),
+      });
+    } catch (error) {
+      logger.error('[ProductMasterImage] list images error:', error);
+      res.status(500).json({ success: false, error: 'Failed to list images' });
+    }
+  });
 
   // POST /:id/images — 이미지 추가
   router.post('/:id/images', uploadSingleMiddleware('image'), async (req: Request, res: Response) => {
@@ -196,6 +244,72 @@ export function createProductMasterImageController(dataSource: DataSource): Rout
     } catch (error) {
       logger.error('[ProductMasterImage] set-primary error:', error);
       res.status(500).json({ success: false, error: 'Failed to set primary image' });
+    }
+  });
+
+  // DELETE /:id/images/:imageId — 이미지 숨김 (soft delete, GCS 원본 보존)
+  //   대표였으면 is_primary 해제(자동 승계 없음 — active primary 는 0 가능, 새 대표는 admin 이 명시 지정).
+  router.delete('/:id/images/:imageId', async (req: Request, res: Response) => {
+    try {
+      const masterId = req.params.id;
+      const imageId = req.params.imageId;
+
+      // 이미 숨김이면 404(멱등 아님 — 상태 혼동 방지)
+      const target = await imageRepo.findOne({ where: { id: imageId, masterId, deletedAt: IsNull() } });
+      if (!target) {
+        res.status(404).json({ success: false, error: 'Active image not found for this master', code: 'IMAGE_NOT_FOUND' });
+        return;
+      }
+
+      const actor = actorId(req);
+      const wasPrimary = target.isPrimary;
+
+      await imageRepo.update(
+        { id: imageId, masterId, deletedAt: IsNull() },
+        { deletedAt: new Date(), deletedBy: actor, isPrimary: false, updatedBy: actor },
+      );
+
+      await writeAudit(masterId, 'image_hidden', actor, { imageId, wasPrimary });
+
+      res.json({
+        success: true,
+        data: { id: imageId, masterId, hidden: true, primaryCleared: wasPrimary },
+      });
+    } catch (error) {
+      logger.error('[ProductMasterImage] hide image error:', error);
+      res.status(500).json({ success: false, error: 'Failed to hide image' });
+    }
+  });
+
+  // POST /:id/images/:imageId/restore — 숨김 이미지 복원 (대표 자동 지정 없음)
+  router.post('/:id/images/:imageId/restore', async (req: Request, res: Response) => {
+    try {
+      const masterId = req.params.id;
+      const imageId = req.params.imageId;
+
+      const target = await imageRepo.findOne({ where: { id: imageId, masterId } });
+      if (!target) {
+        res.status(404).json({ success: false, error: 'Image not found for this master', code: 'IMAGE_NOT_FOUND' });
+        return;
+      }
+      if (!target.deletedAt) {
+        res.status(409).json({ success: false, error: 'Image is not hidden', code: 'IMAGE_NOT_HIDDEN' });
+        return;
+      }
+
+      const actor = actorId(req);
+      // is_primary 는 false 유지(복원은 대표를 되돌리지 않음). active-primary UNIQUE 충돌 없음.
+      await imageRepo.update({ id: imageId, masterId }, { deletedAt: null, deletedBy: null, updatedBy: actor });
+
+      await writeAudit(masterId, 'image_restored', actor, { imageId });
+
+      res.json({
+        success: true,
+        data: { id: imageId, masterId, restored: true, isPrimary: false },
+      });
+    } catch (error) {
+      logger.error('[ProductMasterImage] restore image error:', error);
+      res.status(500).json({ success: false, error: 'Failed to restore image' });
     }
   });
 

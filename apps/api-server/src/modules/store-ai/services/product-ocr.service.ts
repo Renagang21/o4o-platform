@@ -77,6 +77,7 @@ export class ProductOcrService {
          FROM product_images
          WHERE master_id = $1
            AND is_primary = false
+           AND deleted_at IS NULL
          ORDER BY sort_order ASC`,
         [productId],
       );

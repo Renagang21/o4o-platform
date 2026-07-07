@@ -18,6 +18,7 @@ import {
   listProductMasterNotes, addProductMasterNote, deleteProductMasterNote, ProductMasterNote,
   getProductMasterAuditLog, ProductMasterAuditLog,
   uploadProductMasterImage, setProductMasterPrimaryImage,
+  listProductMasterImages, hideProductMasterImage, restoreProductMasterImage, ProductMasterImageAdminRow,
 } from '@/api/o4o-product-db.api';
 
 export default function ProductMasterDetailPage() {
@@ -37,6 +38,14 @@ export default function ProductMasterDetailPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imageBusy, setImageBusy] = useState(false);
   const [imageError, setImageError] = useState<string | null>(null);
+  // WO-O4O-ADMIN-O4O-PRODUCT-IMAGE-SOFT-DELETE-RESTORE-V1: admin 이미지 목록(숨김 포함).
+  // 공유 상세(row.images)는 active 만 → 복원 UI 위해 별도 조회.
+  const [images, setImages] = useState<ProductMasterImageAdminRow[]>([]);
+
+  const reloadImages = async () => {
+    if (!id) return;
+    try { setImages(await listProductMasterImages(id)); } catch { /* 무시 */ }
+  };
 
   const reloadMaster = async () => {
     if (!id) return;
@@ -90,6 +99,7 @@ export default function ProductMasterDetailPage() {
     setImageError(null);
     try {
       await uploadProductMasterImage(id, file);
+      await reloadImages();
       await reloadMaster();
       await reloadAudit();
     } catch (e: any) {
@@ -104,10 +114,43 @@ export default function ProductMasterDetailPage() {
     setImageError(null);
     try {
       await setProductMasterPrimaryImage(id, imageId);
+      await reloadImages();
       await reloadMaster();
       await reloadAudit();
     } catch (e: any) {
       setImageError(e?.response?.data?.error || e?.message || '대표 지정에 실패했습니다');
+    } finally {
+      setImageBusy(false);
+    }
+  };
+  const onHideImage = async (imageId: string) => {
+    if (!id) return;
+    if (!window.confirm('이 이미지를 숨기시겠습니까? 원본은 보존되며 언제든 복원할 수 있습니다.')) return;
+    setImageBusy(true);
+    setImageError(null);
+    try {
+      const r = await hideProductMasterImage(id, imageId);
+      await reloadImages();
+      await reloadMaster();
+      await reloadAudit();
+      if (r?.primaryCleared) setImageError('대표 이미지를 숨겼습니다. 새 대표를 지정하세요.');
+    } catch (e: any) {
+      setImageError(e?.response?.data?.error || e?.message || '이미지 숨김에 실패했습니다');
+    } finally {
+      setImageBusy(false);
+    }
+  };
+  const onRestoreImage = async (imageId: string) => {
+    if (!id) return;
+    setImageBusy(true);
+    setImageError(null);
+    try {
+      await restoreProductMasterImage(id, imageId);
+      await reloadImages();
+      await reloadMaster();
+      await reloadAudit();
+    } catch (e: any) {
+      setImageError(e?.response?.data?.error || e?.message || '이미지 복원에 실패했습니다');
     } finally {
       setImageBusy(false);
     }
@@ -134,6 +177,8 @@ export default function ProductMasterDetailPage() {
     listProductMasterNotes(id).then((n) => { if (alive) setNotes(n); }).catch(() => { if (alive) setNotes([]); });
     // 작업 이력(별도 GET)
     getProductMasterAuditLog(id).then((a) => { if (alive) setAudit(a); }).catch(() => { if (alive) setAudit(null); });
+    // admin 이미지 목록(숨김 포함, 별도 GET)
+    listProductMasterImages(id).then((im) => { if (alive) setImages(im); }).catch(() => { if (alive) setImages([]); });
     return () => { alive = false; };
   }, [id]);
 
@@ -216,25 +261,46 @@ export default function ProductMasterDetailPage() {
             )}
           </PanelSection>
 
-          {/* 이미지 — WO-O4O-ADMIN-O4O-PRODUCT-IMAGE-ACTION-V1: 추가 / 대표 지정 (admin write, Phase 1) */}
+          {/* 이미지 — WO-...-IMAGE-ACTION-V1(추가/대표) + WO-...-IMAGE-SOFT-DELETE-RESTORE-V1(숨김/복원) */}
+          {(() => {
+            const activeImages = images.filter((i) => !i.deletedAt);
+            const hiddenImages = images.filter((i) => i.deletedAt);
+            return (
           <PanelSection
-            title={`이미지 (${row.images?.length ?? 0})`}
-            badge={<ImageStatusBadge images={row.images} />}
+            title={`이미지 (${activeImages.length}${hiddenImages.length ? ` · 숨김 ${hiddenImages.length}` : ''})`}
+            badge={<ImageStatusBadge images={activeImages} />}
           >
-            {row.images?.length ? (
+            {activeImages.length ? (
               <div className="flex flex-wrap gap-3">
-                {row.images.map((img) => (
+                {activeImages.map((img) => (
                   <MasterThumb
                     key={img.id}
                     img={img}
-                    canAct={!img.isPrimary}
                     busy={imageBusy}
                     onSetPrimary={() => onSetPrimary(img.id)}
+                    onHide={() => onHideImage(img.id)}
                   />
                 ))}
               </div>
             ) : (
               <div className="text-sm text-gray-400">이미지 없음</div>
+            )}
+
+            {hiddenImages.length > 0 && (
+              <div className="mt-4">
+                <div className="text-xs font-medium text-gray-500 mb-2">숨긴 이미지 ({hiddenImages.length})</div>
+                <div className="flex flex-wrap gap-3">
+                  {hiddenImages.map((img) => (
+                    <MasterThumb
+                      key={img.id}
+                      img={img}
+                      hidden
+                      busy={imageBusy}
+                      onRestore={() => onRestoreImage(img.id)}
+                    />
+                  ))}
+                </div>
+              </div>
             )}
 
             <div className="mt-3 flex flex-wrap items-center gap-3">
@@ -246,7 +312,7 @@ export default function ProductMasterDetailPage() {
               >
                 <ImagePlus className="w-4 h-4" /> {imageBusy ? '처리 중…' : '이미지 추가'}
               </button>
-              <span className="text-xs text-gray-400">첫 이미지는 자동으로 대표가 됩니다. 숨김·교체·삭제는 제공하지 않습니다.</span>
+              <span className="text-xs text-gray-400">첫 이미지는 자동으로 대표가 됩니다. 숨김은 삭제가 아니며(원본 보존) 복원할 수 있습니다.</span>
             </div>
             {imageError && <div className="mt-2 text-sm text-red-600">{imageError}</div>}
 
@@ -255,6 +321,8 @@ export default function ProductMasterDetailPage() {
               에서 전체 상품의 이미지 보유/누락 현황을 확인할 수 있습니다.
             </div>
           </PanelSection>
+            );
+          })()}
 
           {/* 설명 — WO-O4O-DRUG-CANONICAL-DESCRIPTION-OUTPUT-LINK-V1: 공식 소비자 설명 (매장용 AI 설명 아님) */}
           <PanelSection
@@ -570,12 +638,17 @@ function ImageStatusBadge({ images }: { images?: { isPrimary: boolean }[] }) {
   return <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 text-xs">대표 없음</span>;
 }
 
-/** 이미지 썸네일 — onError fallback + (admin) 대표 지정 */
-function MasterThumb({ img, canAct, busy, onSetPrimary }: {
+/**
+ * 이미지 썸네일 — onError fallback + (admin) 대표 지정 / 숨김 / 복원.
+ * active: 대표 배지 + (비대표) 대표로 지정 + 숨김.  hidden: 숨김 오버레이 + 복원.
+ */
+function MasterThumb({ img, busy, hidden, onSetPrimary, onHide, onRestore }: {
   img: { id: string; imageUrl: string; isPrimary: boolean };
-  canAct: boolean;
   busy: boolean;
-  onSetPrimary: () => void;
+  hidden?: boolean;
+  onSetPrimary?: () => void;
+  onHide?: () => void;
+  onRestore?: () => void;
 }) {
   const [broken, setBroken] = useState(false);
   return (
@@ -583,17 +656,46 @@ function MasterThumb({ img, canAct, busy, onSetPrimary }: {
       {broken ? (
         <div className="w-28 h-28 rounded border border-gray-200 bg-gray-50 flex items-center justify-center text-xs text-gray-400">불러올 수 없음</div>
       ) : (
-        <img src={img.imageUrl} alt="" className="w-28 h-28 object-cover rounded border border-gray-200" loading="lazy" onError={() => setBroken(true)} />
+        <img
+          src={img.imageUrl}
+          alt=""
+          className={`w-28 h-28 object-cover rounded border border-gray-200 ${hidden ? 'opacity-40 grayscale' : ''}`}
+          loading="lazy"
+          onError={() => setBroken(true)}
+        />
       )}
-      {img.isPrimary && <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-black/60 text-white text-[10px]">대표</span>}
-      {canAct && (
+      {!hidden && img.isPrimary && <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-black/60 text-white text-[10px]">대표</span>}
+      {hidden && <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-gray-700/80 text-white text-[10px]">숨김</span>}
+
+      {hidden ? (
         <button
-          onClick={onSetPrimary}
+          onClick={onRestore}
           disabled={busy}
-          className="absolute bottom-1 left-1 right-1 px-1 py-0.5 rounded bg-white/90 border border-gray-200 text-[10px] text-gray-700 hover:bg-admin-blue hover:text-white disabled:opacity-50"
+          className="absolute bottom-1 left-1 right-1 px-1 py-0.5 rounded bg-white/90 border border-gray-200 text-[10px] text-gray-700 hover:bg-green-600 hover:text-white disabled:opacity-50"
         >
-          대표로 지정
+          복원
         </button>
+      ) : (
+        <div className="absolute bottom-1 left-1 right-1 flex gap-1">
+          {!img.isPrimary && onSetPrimary && (
+            <button
+              onClick={onSetPrimary}
+              disabled={busy}
+              className="flex-1 px-1 py-0.5 rounded bg-white/90 border border-gray-200 text-[10px] text-gray-700 hover:bg-admin-blue hover:text-white disabled:opacity-50"
+            >
+              대표
+            </button>
+          )}
+          {onHide && (
+            <button
+              onClick={onHide}
+              disabled={busy}
+              className="flex-1 px-1 py-0.5 rounded bg-white/90 border border-gray-200 text-[10px] text-gray-700 hover:bg-red-600 hover:text-white disabled:opacity-50"
+            >
+              숨김
+            </button>
+          )}
+        </div>
       )}
     </div>
   );
@@ -605,6 +707,8 @@ const AUDIT_ACTION_LABEL: Record<string, { label: string; cls: string }> = {
   description_curated: { label: '설명 지정', cls: 'bg-green-100 text-green-700' },
   image_added: { label: '이미지 추가', cls: 'bg-amber-100 text-amber-700' },
   image_primary_changed: { label: '대표 지정', cls: 'bg-green-50 text-green-700' },
+  image_hidden: { label: '이미지 숨김', cls: 'bg-gray-100 text-gray-500' },
+  image_restored: { label: '이미지 복원', cls: 'bg-blue-50 text-blue-700' },
 };
 function AuditActionBadge({ action }: { action: string }) {
   const m = AUDIT_ACTION_LABEL[action] ?? { label: action, cls: 'bg-gray-100 text-gray-600' };

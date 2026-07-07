@@ -22,7 +22,9 @@ export type AuditAction =
   | 'note_hidden'
   | 'description_curated'
   | 'image_added'
-  | 'image_primary_changed';
+  | 'image_primary_changed'
+  | 'image_hidden'
+  | 'image_restored';
 
 export interface AuditLogItem {
   id: string;
@@ -48,7 +50,7 @@ export interface ProductMasterAuditLog {
 const GAPS: AuditLogGap[] = [
   // common_audit_log: WO-O4O-ADMIN-O4O-PRODUCT-IMAGE-ACTION-V1 에서 audit_logs 를 image_added/image_primary_changed 로 연결(해소).
   { area: 'candidate_lifecycle', reason: 'ProductCandidate 상태변경 이력은 operator 리뷰 큐 소관(별도 트랙)' },
-  { area: 'basic_edit_archive', reason: '기본정보 수정 / 이미지 교체·삭제 / archive 는 후속 write WO 에서 이력 생성' },
+  { area: 'basic_edit_archive', reason: '기본정보 수정 / 이미지 교체(replace) / archive 는 후속 write WO 에서 이력 생성 (이미지 숨김·복원은 image_hidden/image_restored 로 기록됨)' },
 ];
 
 export class ProductMasterAuditLogService {
@@ -94,12 +96,14 @@ export class ProductMasterAuditLogService {
                 CASE a.action
                   WHEN 'image_added' THEN '이미지 추가' || (CASE WHEN COALESCE((a.changes->>'isPrimary')::bool, false) THEN ' (대표)' ELSE '' END)
                   WHEN 'image_primary_changed' THEN '대표 이미지 지정'
+                  WHEN 'image_hidden' THEN '이미지 숨김' || (CASE WHEN COALESCE((a.changes->>'wasPrimary')::bool, false) THEN ' (대표 해제)' ELSE '' END)
+                  WHEN 'image_restored' THEN '이미지 복원'
                   ELSE a.action
                 END,
                 a."userId", a."createdAt"
            FROM audit_logs a
           WHERE a."entityType" = 'ProductMaster' AND a."entityId" = $1
-            AND a.action IN ('image_added', 'image_primary_changed')
+            AND a.action IN ('image_added', 'image_primary_changed', 'image_hidden', 'image_restored')
        )
        SELECT e.id, e.source, e.action, e.summary, e.actor_id,
               COALESCE(u.name, u.email) AS actor_name, e.occurred_at

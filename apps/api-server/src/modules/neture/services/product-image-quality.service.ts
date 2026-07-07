@@ -49,7 +49,7 @@ const BASE_CTE = `
       (array_agg(image_url ORDER BY is_primary DESC, sort_order ASC))[1] AS thumb_url,
       (array_agg(type ORDER BY is_primary DESC, sort_order ASC))[1] AS thumb_type,
       max(updated_at) AS img_updated_at
-    FROM product_images GROUP BY master_id
+    FROM product_images WHERE deleted_at IS NULL GROUP BY master_id
   ),
   joined AS (
     SELECT m.id AS master_id, m.name, m.manufacturer_name, m.regulatory_type, m.barcode,

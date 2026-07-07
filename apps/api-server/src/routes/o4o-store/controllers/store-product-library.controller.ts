@@ -131,7 +131,7 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
     if (masterIds.length > 0) {
       const images: Array<{ master_id: string; image_url: string }> = await dataSource.query(
         `SELECT master_id, image_url FROM product_images
-         WHERE master_id = ANY($1) AND is_primary = true`,
+         WHERE master_id = ANY($1) AND is_primary = true AND deleted_at IS NULL`,
         [masterIds],
       );
       imageMap = new Map(images.map((i) => [i.master_id, i.image_url]));
@@ -384,7 +384,7 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
               type, is_primary AS "isPrimary", sort_order AS "sortOrder",
               created_at AS "createdAt"
        FROM product_images
-       WHERE master_id = $1
+       WHERE master_id = $1 AND deleted_at IS NULL
        ORDER BY sort_order ASC, created_at ASC`,
       [masterId],
     );

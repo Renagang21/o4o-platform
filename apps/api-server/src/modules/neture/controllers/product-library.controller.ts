@@ -44,7 +44,7 @@ export function createProductLibraryController(dataSource: DataSource): Router {
       if (masterIds.length > 0) {
         const images: Array<{ master_id: string; image_url: string }> = await dataSource.query(
           `SELECT master_id, image_url FROM product_images
-           WHERE master_id = ANY($1) AND is_primary = true`,
+           WHERE master_id = ANY($1) AND is_primary = true AND deleted_at IS NULL`,
           [masterIds],
         );
         imageMap = new Map(images.map((i) => [i.master_id, i.image_url]));
@@ -97,7 +97,7 @@ export function createProductLibraryController(dataSource: DataSource): Router {
       const images: Array<{ id: string; image_url: string; is_primary: boolean; sort_order: number; type: string }> =
         await dataSource.query(
           `SELECT id, image_url, is_primary, sort_order, type FROM product_images
-           WHERE master_id = $1 ORDER BY sort_order ASC`,
+           WHERE master_id = $1 AND deleted_at IS NULL ORDER BY sort_order ASC`,
           [id],
         );
 

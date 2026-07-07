@@ -715,7 +715,14 @@ export async function deleteProductMasterNote(id: string, noteId: string): Promi
 export interface AuditLogItem {
   id: string;
   source: 'product_master_notes' | 'shared_product_descriptions' | 'image' | 'audit_log';
-  action: 'note_created' | 'note_hidden' | 'description_curated' | 'image_added' | 'image_primary_changed';
+  action:
+    | 'note_created'
+    | 'note_hidden'
+    | 'description_curated'
+    | 'image_added'
+    | 'image_primary_changed'
+    | 'image_hidden'
+    | 'image_restored';
   summary: string;
   actorId: string | null;
   actorName: string | null;
@@ -796,4 +803,51 @@ export async function setProductMasterPrimaryImage(
     {},
   );
   return res.data?.data ?? null;
+}
+
+// ─── Image soft-delete / restore (admin write, Phase 2) ──────────────────────
+// WO-O4O-ADMIN-O4O-PRODUCT-IMAGE-SOFT-DELETE-RESTORE-V1
+// 정책: "삭제가 아니라 숨김". GCS 원본 삭제 없음. 숨김 시 대표 자동 해제(승계 없음).
+
+/** admin 이미지 목록 (숨김 포함). 공유 상세(getProductMaster)는 active 만 반환하므로 복원 UI 용 별도 조회. */
+export interface ProductMasterImageAdminRow {
+  id: string;
+  imageUrl: string;
+  isPrimary: boolean;
+  sortOrder: number;
+  type: string;
+  source: string | null;
+  createdAt: string;
+  deletedAt: string | null;
+  deletedBy: string | null;
+}
+
+export async function listProductMasterImages(id: string): Promise<ProductMasterImageAdminRow[]> {
+  const res = await authClient.api.get<{ success: boolean; data: ProductMasterImageAdminRow[] }>(
+    `/admin/o4o-product-db/masters/${id}/images`,
+  );
+  return res.data?.data ?? [];
+}
+
+export interface ProductMasterImageHideResult {
+  id: string;
+  masterId: string;
+  hidden: boolean;
+  primaryCleared: boolean;
+}
+
+/** 이미지 숨김 (soft delete). 대표였으면 대표 해제되고 primaryCleared=true. */
+export async function hideProductMasterImage(
+  id: string,
+  imageId: string,
+): Promise<ProductMasterImageHideResult | null> {
+  const res = await authClient.api.delete<{ success: boolean; data: ProductMasterImageHideResult }>(
+    `/admin/o4o-product-db/masters/${id}/images/${imageId}`,
+  );
+  return res.data?.data ?? null;
+}
+
+/** 숨김 이미지 복원 (대표 자동 지정 없음). */
+export async function restoreProductMasterImage(id: string, imageId: string): Promise<void> {
+  await authClient.api.post(`/admin/o4o-product-db/masters/${id}/images/${imageId}/restore`, {});
 }
