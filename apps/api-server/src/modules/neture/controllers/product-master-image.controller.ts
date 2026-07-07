@@ -8,11 +8,13 @@
  *   GET  /:id/images                       — 이미지 목록 (숨김 포함, admin 전용). active 먼저, 숨김 뒤.
  *   POST /:id/images                       — 이미지 추가 (multipart 'image'). 첫 active 이미지면 자동 대표.
  *   POST /:id/images/:imageId/set-primary  — 대표 이미지 지정 (트랜잭션, master당 active primary 1개).
- *   DELETE /:id/images/:imageId            — 이미지 숨김 (soft delete). 대표였으면 is_primary 해제(자동 승계 없음).
- *   POST /:id/images/:imageId/restore      — 숨김 이미지 복원 (대표 자동 지정 없음).
+ *   DELETE /:id/images/:imageId            — 이미지 숨김 (soft delete). 대표였으면 남은 active 다음(sortOrder)이 자동 승계.
+ *   POST /:id/images/:imageId/restore      — 숨김 이미지 복원. active 대표가 없으면 복원 이미지를 대표로 자동 지정.
  *
- * 정책(Phase 2): "삭제가 아니라 숨김". GCS 원본 삭제 없음(gcs_path 보존). active primary 는 항상 1개 이하
- *   (숨김 시 is_primary 해제 → 0 가능, 새 대표는 admin 이 명시 지정). 작업 이력에 image_hidden / image_restored 기록.
+ * 정책(Phase 2): "삭제가 아니라 숨김". GCS 원본 삭제 없음(gcs_path 보존).
+ *   대표 승계(WO §7): 숨김으로 대표가 비면 남은 active 중 sortOrder 다음을 대표 승계(없으면 0),
+ *   복원 시 active 대표가 없으면 복원 이미지를 대표로. active primary 는 항상 1개 이하 유지.
+ *   작업 이력: image_hidden / image_restored + 승계 발생 시 image_primary_changed(auto) 기록.
  *
  * 범위: product_images 에만 write. ProductMaster 본문/설명/후보 무변경.
  * audit_logs 에 image_added / image_primary_changed / image_hidden / image_restored 기록.
@@ -248,7 +250,7 @@ export function createProductMasterImageController(dataSource: DataSource): Rout
   });
 
   // DELETE /:id/images/:imageId — 이미지 숨김 (soft delete, GCS 원본 보존)
-  //   대표였으면 is_primary 해제(자동 승계 없음 — active primary 는 0 가능, 새 대표는 admin 이 명시 지정).
+  //   대표였으면 남은 active 중 sortOrder 다음을 대표로 자동 승계(WO §7). 없으면 대표 0.
   router.delete('/:id/images/:imageId', async (req: Request, res: Response) => {
     try {
       const masterId = req.params.id;
@@ -263,17 +265,40 @@ export function createProductMasterImageController(dataSource: DataSource): Rout
 
       const actor = actorId(req);
       const wasPrimary = target.isPrimary;
+      let newPrimaryImageId: string | null = null;
 
-      await imageRepo.update(
-        { id: imageId, masterId, deletedAt: IsNull() },
-        { deletedAt: new Date(), deletedBy: actor, isPrimary: false, updatedBy: actor },
-      );
+      await dataSource.transaction(async (manager) => {
+        await manager.update(
+          ProductImage,
+          { id: imageId, masterId, deletedAt: IsNull() },
+          { deletedAt: new Date(), deletedBy: actor, isPrimary: false, updatedBy: actor },
+        );
+        // 대표를 숨겼으면 남은 active 중 다음(sortOrder ASC, createdAt ASC)을 대표 승계
+        if (wasPrimary) {
+          const next = await manager.findOne(ProductImage, {
+            where: { masterId, deletedAt: IsNull() },
+            order: { sortOrder: 'ASC', createdAt: 'ASC' },
+          });
+          if (next) {
+            await manager.update(ProductImage, { id: next.id, masterId }, { isPrimary: true, updatedBy: actor });
+            newPrimaryImageId = next.id;
+          }
+        }
+      });
 
-      await writeAudit(masterId, 'image_hidden', actor, { imageId, wasPrimary });
+      await writeAudit(masterId, 'image_hidden', actor, { imageId, wasPrimary, newPrimaryImageId });
+      if (newPrimaryImageId) {
+        await writeAudit(masterId, 'image_primary_changed', actor, {
+          imageId: newPrimaryImageId,
+          previousPrimaryImageId: imageId,
+          newPrimaryImageId,
+          auto: true,
+        });
+      }
 
       res.json({
         success: true,
-        data: { id: imageId, masterId, hidden: true, primaryCleared: wasPrimary },
+        data: { id: imageId, masterId, hidden: true, wasPrimary, newPrimaryImageId },
       });
     } catch (error) {
       logger.error('[ProductMasterImage] hide image error:', error);
@@ -281,7 +306,8 @@ export function createProductMasterImageController(dataSource: DataSource): Rout
     }
   });
 
-  // POST /:id/images/:imageId/restore — 숨김 이미지 복원 (대표 자동 지정 없음)
+  // POST /:id/images/:imageId/restore — 숨김 이미지 복원
+  //   active 대표가 없으면 복원 이미지를 대표로 자동 지정(WO §7). 있으면 비대표로 복원.
   router.post('/:id/images/:imageId/restore', async (req: Request, res: Response) => {
     try {
       const masterId = req.params.id;
@@ -298,14 +324,37 @@ export function createProductMasterImageController(dataSource: DataSource): Rout
       }
 
       const actor = actorId(req);
-      // is_primary 는 false 유지(복원은 대표를 되돌리지 않음). active-primary UNIQUE 충돌 없음.
-      await imageRepo.update({ id: imageId, masterId }, { deletedAt: null, deletedBy: null, updatedBy: actor });
+      let becamePrimary = false;
 
-      await writeAudit(masterId, 'image_restored', actor, { imageId });
+      await dataSource.transaction(async (manager) => {
+        await manager.update(
+          ProductImage,
+          { id: imageId, masterId },
+          { deletedAt: null, deletedBy: null, updatedBy: actor },
+        );
+        // active 대표가 없으면 복원 이미지를 대표로 자동 지정
+        const activePrimary = await manager.findOne(ProductImage, {
+          where: { masterId, isPrimary: true, deletedAt: IsNull() },
+        });
+        if (!activePrimary) {
+          await manager.update(ProductImage, { id: imageId, masterId }, { isPrimary: true, updatedBy: actor });
+          becamePrimary = true;
+        }
+      });
+
+      await writeAudit(masterId, 'image_restored', actor, { imageId, becamePrimary });
+      if (becamePrimary) {
+        await writeAudit(masterId, 'image_primary_changed', actor, {
+          imageId,
+          previousPrimaryImageId: null,
+          newPrimaryImageId: imageId,
+          auto: true,
+        });
+      }
 
       res.json({
         success: true,
-        data: { id: imageId, masterId, restored: true, isPrimary: false },
+        data: { id: imageId, masterId, restored: true, isPrimary: becamePrimary },
       });
     } catch (error) {
       logger.error('[ProductMasterImage] restore image error:', error);

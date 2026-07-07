@@ -133,7 +133,8 @@ export default function ProductMasterDetailPage() {
       await reloadImages();
       await reloadMaster();
       await reloadAudit();
-      if (r?.primaryCleared) setImageError('대표 이미지를 숨겼습니다. 새 대표를 지정하세요.');
+      // 자동 승계(WO §7): 대표를 숨겼는데 남은 active 가 없어 승계 못한 경우만 안내
+      if (r?.wasPrimary && !r?.newPrimaryImageId) setImageError('대표 이미지를 숨겼고 남은 이미지가 없어 대표가 없습니다.');
     } catch (e: any) {
       setImageError(e?.response?.data?.error || e?.message || '이미지 숨김에 실패했습니다');
     } finally {

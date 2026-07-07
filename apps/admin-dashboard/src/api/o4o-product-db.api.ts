@@ -833,7 +833,10 @@ export interface ProductMasterImageHideResult {
   id: string;
   masterId: string;
   hidden: boolean;
-  primaryCleared: boolean;
+  /** 숨긴 이미지가 대표였는지 */
+  wasPrimary: boolean;
+  /** 대표 자동 승계된 이미지 id (남은 active 없으면 null) */
+  newPrimaryImageId: string | null;
 }
 
 /** 이미지 숨김 (soft delete). 대표였으면 대표 해제되고 primaryCleared=true. */
