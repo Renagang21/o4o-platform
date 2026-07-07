@@ -3,22 +3,43 @@
 - WO: `WO-O4O-DRUG-OTC-DESCRIPTION-NUTRITION-COMBO-DRAFT-DB-APPLY-V1`
 - 선행: `...STRENGTH-SPLIT-V1`, `...SPLIT-DRAFT-REVISION-V1`, `O4O-DRUG-STORE-DESCRIPTION-WRITING-GUIDE-V1`
 - 작성일: 2026-07-07
-- 작업 유형: **DB apply DRY-RUN + 사전조건 검증 + apply 스크립트 준비** (실제 write는 승인 후)
-- 현재 상태: **DRY-RUN COMPLETE · AWAITING EXPLICIT APPROVAL · DB write 0**
-- 결론: ready_for_apply 25건 anchor/candidate/scope **전부 해결(missing 0, 충돌 0)**. **단 2건(비타민C 500mg·100mg)은 e약은요 grounding 0 → apply 대상에서 보류 권고(→ 실제 insert 대상 23)**. 실제 insert는 승인 토큰 충족 시에만 실행.
+- 작업 유형: **DB apply DRY-RUN → 사용자 승인 → 실제 apply 실행**
+- 현재 상태: **✅ APPLIED (2026-07-07) · 23건 insert 완료 · post-verify 통과**
+- 결론: ready_for_apply 25건 중 grounding 확인된 **23건을 `product_candidate_description_drafts`에 단일 트랜잭션으로 insert 완료**. 비타민C 500mg·100mg 2건은 grounding 0으로 보류. 제외 대상 불변 확인. DB write 범위는 draft insert로만 한정.
 
 ---
 
-## 0. 실행 여부 (중요)
+## 0. 실행 결과 (POST-APPLY)
 
-이번 실행에서 **DB write는 수행하지 않았다.** 아래 apply 조건이 모두 충족되지 않았기 때문이다(WO apply 조건).
+> **DRY-RUN(§1~§7) 후 사용자 승인**(2026-07-07, `--apply` + `DRUG_OTC_NUTRITION_COMBO_DRAFT_APPLY_CONFIRM=YES` + 비타민C 500/100mg 보류 + nutritionExcluded=false 정책 전환 승인)**을 받아 실제 apply를 실행했다.**
 
 ```
-필요: 사용자 명시 승인  +  --apply  +  DRUG_OTC_NUTRITION_COMBO_DRAFT_APPLY_CONFIRM=YES
-현재: 미충족 → dry-run/preview까지만 수행
+applyRunId : otc-nutrition-combo-draft-v1
+대상       : ready_for_apply 25 − 보류 2(비타민C 500·100mg) = 23
+insert     : 23  (단일 트랜잭션, product_candidate_description_drafts only)
+방식       : BEGIN → 사전조건 재확인(DO) → 23 INSERT → post-count → COMMIT
 ```
 
-본 문서는 승인 시 실행할 insert의 **preview·사전조건·스크립트**를 확정한 것이다. 승인 절차는 §7.
+### 0.1 post-apply 검증 결과
+
+| 검증 | 목표 | 결과 |
+|---|---|---|
+| insert 행수 | 23 | ✅ `inserted_this_run=23` |
+| distinct candidate_id | 23 | ✅ 23 (중복 0) |
+| distinct source_identifier_value | 23 | ✅ 23 |
+| 전체 live draft (72 → +23) | 95 | ✅ 95 |
+| 신규 draft `nutritionExcluded=false` | 23 | ✅ 23 |
+| 신규 draft `review_status` | needs_review | ✅ 23/23 |
+| 신규 draft grounding spdMasters | 전부 >0 | ✅ min=2, zero=0 |
+| **보류 비타민C 500·100mg 적재** | 0 | ✅ 0 |
+| **철분/엽산(b03) 적재** | 0 | ✅ 0 |
+| **Fe 포함 변형(A-Fe/noA-Fe) 적재** | 0 | ✅ 0 |
+| `shared_product_descriptions`(easy_drug) | 19,431 불변 | ✅ 19,431 |
+| ProductMaster/Identifier/canonical/매장 | 무변경 | ✅ 미접촉 |
+
+→ **DB write 범위 = `product_candidate_description_drafts` 23행 insert only.** 다른 테이블·canonical·매장 자산 변경 0.
+
+아래 §1~§7은 실행 근거가 된 dry-run 기록이다(원형 보존).
 
 ---
 
@@ -216,19 +237,20 @@ generated_at            = now()
 
 ---
 
-## 9. 완료 보고 (dry-run 단계)
+## 9. 완료 보고 (APPLIED)
 
 ```
-완료 보고 — WO-O4O-DRUG-OTC-DESCRIPTION-NUTRITION-COMBO-DRAFT-DB-APPLY-V1 (DRY-RUN)
+완료 보고 — WO-O4O-DRUG-OTC-DESCRIPTION-NUTRITION-COMBO-DRAFT-DB-APPLY-V1
 
 결과:
 - target(ready_for_apply): 25
 - resolved(anchor+candidate): 25 (missing 0, 충돌 0)
-- insert 권고 대상: 23 (비타민C 500·100mg grounding gap 보류)
-- inserted: 0  (승인 토큰 미충족)
-- excluded: needs_pharmacist_review 10 + pending 1 + grounding gap 2
-- DB write: 0
-- run_id(예정): otc-nutrition-combo-draft-v1
+- inserted: 23  (product_candidate_description_drafts, 단일 트랜잭션)
+- skipped(보류): 2 (비타민C 500mg·100mg — grounding 0)
+- excluded: needs_pharmacist_review 10 + pending 1
+- DB write: 23 draft insert only (다른 테이블/canonical/매장 무변경)
+- run_id: otc-nutrition-combo-draft-v1
+- post-verify: 23/23, distinct cand 23, held/excluded 적재 0, easy_drug SPD 19,431 불변
 
 산출물:
 - docs/checks/CHECK-O4O-DRUG-OTC-DESCRIPTION-NUTRITION-COMBO-DRAFT-DB-APPLY-V1.md
