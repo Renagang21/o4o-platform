@@ -457,6 +457,16 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Product Description Status routes:', descStatusError);
     }
 
+    // 24-e2e. Register Product Usage Links (read-only) — master 활용 연결 조회
+    //         (WO-O4O-ADMIN-O4O-PRODUCT-USAGE-LINKS-READONLY-V1)
+    try {
+      const { createProductUsageLinksController } = await import('../modules/neture/controllers/product-usage-links.controller.js');
+      app.use('/api/v1/admin/o4o-product-db/masters', createProductUsageLinksController(dataSource));
+      logger.info('✅ Product Usage Links (read-only) routes registered at /api/v1/admin/o4o-product-db/masters/:id/usage-links');
+    } catch (usageLinksError) {
+      logger.error('Failed to register Product Usage Links routes:', usageLinksError);
+    }
+
     // 24-e3. Register Mobile Product Draft routes (WO-O4O-MOBILE-PRODUCT-DRAFT-TO-CANDIDATE-V1, Phase 4)
     try {
       const { createMobileProductDraftController } = await import('../modules/neture/controllers/mobile-product-draft.controller.js');

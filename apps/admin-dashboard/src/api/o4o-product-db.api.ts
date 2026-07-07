@@ -554,3 +554,64 @@ export async function getDescriptionStatusSummary(): Promise<Record<string, numb
   );
   return res.data?.data ?? {};
 }
+
+// ─── Product Usage Links (master 활용 연결, read-only) ────────────────────────
+// WO-O4O-ADMIN-O4O-PRODUCT-USAGE-LINKS-READONLY-V1
+// mount: GET /api/v1/admin/o4o-product-db/masters/:id/usage-links
+
+export interface UsageOrganizationListing {
+  id: string;
+  organizationId: string;
+  organizationName: string | null;
+  serviceKey: string | null;
+  status: string | null;
+  sourceType: string | null;
+  price: number | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+
+export interface UsageStoreLocalProduct {
+  id: string;
+  organizationId: string;
+  organizationName: string | null;
+  displayName: string | null;
+  price: number | null;
+  isActive: boolean | null;
+  thumbnailUrl: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+
+export interface UsageContentLink {
+  linkId: string;
+  productSourceType: string;
+  contentId: string;
+  title: string | null;
+  contentSourceType: string | null;
+  workspaceStatus: string | null;
+  shareStatus: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+
+export interface ProductUsageLinks {
+  masterId: string;
+  barcode: string | null;
+  summary: {
+    organizationListingCount: number;
+    storeLocalProductCount: number;
+    contentLinkCount: number;
+  };
+  organizationListings: UsageOrganizationListing[];
+  storeLocalProducts: UsageStoreLocalProduct[];
+  contentLinks: UsageContentLink[];
+  notMapped: string[];
+}
+
+export async function getProductUsageLinks(id: string): Promise<ProductUsageLinks | null> {
+  const res = await authClient.api.get<{ success: boolean; data: ProductUsageLinks }>(
+    `/admin/o4o-product-db/masters/${id}/usage-links`,
+  );
+  return res.data?.data ?? null;
+}
