@@ -714,8 +714,8 @@ export async function deleteProductMasterNote(id: string, noteId: string): Promi
 
 export interface AuditLogItem {
   id: string;
-  source: 'product_master_notes' | 'shared_product_descriptions' | 'image';
-  action: 'note_created' | 'note_hidden' | 'description_curated' | 'image_added';
+  source: 'product_master_notes' | 'shared_product_descriptions' | 'image' | 'audit_log';
+  action: 'note_created' | 'note_hidden' | 'description_curated' | 'image_added' | 'image_primary_changed';
   summary: string;
   actorId: string | null;
   actorName: string | null;
@@ -736,6 +736,50 @@ export interface ProductMasterAuditLog {
 export async function getProductMasterAuditLog(id: string): Promise<ProductMasterAuditLog | null> {
   const res = await authClient.api.get<{ success: boolean; data: ProductMasterAuditLog }>(
     `/admin/o4o-product-db/masters/${id}/audit-logs`,
+  );
+  return res.data?.data ?? null;
+}
+
+// ─── Product Master Image actions (admin write, Phase 1) ─────────────────────
+// WO-O4O-ADMIN-O4O-PRODUCT-IMAGE-ACTION-V1
+// mount: POST /api/v1/admin/o4o-product-db/masters/:id/images (+ /:imageId/set-primary)
+
+export interface ProductMasterImageAdded {
+  id: string;
+  masterId: string;
+  imageUrl: string;
+  gcsPath: string;
+  isPrimary: boolean;
+  source: string | null;
+  createdAt: string;
+}
+
+/** 이미지 추가 (multipart). Content-Type 은 수동 설정하지 않는다(boundary 자동). */
+export async function uploadProductMasterImage(id: string, file: File): Promise<ProductMasterImageAdded | null> {
+  const formData = new FormData();
+  formData.append('image', file);
+  const res = await authClient.api.post<{ success: boolean; data: ProductMasterImageAdded }>(
+    `/admin/o4o-product-db/masters/${id}/images`,
+    formData,
+  );
+  return res.data?.data ?? null;
+}
+
+export interface ProductMasterPrimaryResult {
+  id: string;
+  masterId: string;
+  isPrimary: boolean;
+  previousPrimaryImageId: string | null;
+}
+
+/** 대표 이미지 지정 */
+export async function setProductMasterPrimaryImage(
+  id: string,
+  imageId: string,
+): Promise<ProductMasterPrimaryResult | null> {
+  const res = await authClient.api.post<{ success: boolean; data: ProductMasterPrimaryResult }>(
+    `/admin/o4o-product-db/masters/${id}/images/${imageId}/set-primary`,
+    {},
   );
   return res.data?.data ?? null;
 }

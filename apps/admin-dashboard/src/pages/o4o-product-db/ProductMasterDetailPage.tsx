@@ -10,13 +10,15 @@
  * 관리 메모 / 작업 이력은 후속 write/audit WO 자리로 placeholder 유지.
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ImagePlus } from 'lucide-react';
+import usePermissions from '@/hooks/usePermissions';
 import {
   getProductMaster, ProductMasterDetail, getProductUsageLinks, ProductUsageLinks,
   listProductMasterNotes, addProductMasterNote, deleteProductMasterNote, ProductMasterNote,
   getProductMasterAuditLog, ProductMasterAuditLog,
+  uploadProductMasterImage, setProductMasterPrimaryImage,
 } from '@/api/o4o-product-db.api';
 
 export default function ProductMasterDetailPage() {
@@ -31,6 +33,16 @@ export default function ProductMasterDetailPage() {
   const [noteError, setNoteError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // WO-O4O-ADMIN-O4O-PRODUCT-IMAGE-ACTION-V1: 이미지 추가 / 대표 지정 (admin write)
+  const { isAdmin } = usePermissions();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [imageBusy, setImageBusy] = useState(false);
+  const [imageError, setImageError] = useState<string | null>(null);
+
+  const reloadMaster = async () => {
+    if (!id) return;
+    try { setRow(await getProductMaster(id)); } catch { /* 무시 */ }
+  };
 
   const reloadAudit = async () => {
     if (!id) return;
@@ -67,6 +79,38 @@ export default function ProductMasterDetailPage() {
       setNoteError(e?.response?.data?.error || e?.message || '메모 삭제에 실패했습니다');
     } finally {
       setNoteBusy(false);
+    }
+  };
+
+  const onPickImage = () => fileInputRef.current?.click();
+  const onFileSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // 같은 파일 재선택 허용
+    if (!file || !id) return;
+    setImageBusy(true);
+    setImageError(null);
+    try {
+      await uploadProductMasterImage(id, file);
+      await reloadMaster();
+      await reloadAudit();
+    } catch (e: any) {
+      setImageError(e?.response?.data?.error || e?.message || '이미지 추가에 실패했습니다');
+    } finally {
+      setImageBusy(false);
+    }
+  };
+  const onSetPrimary = async (imageId: string) => {
+    if (!id) return;
+    setImageBusy(true);
+    setImageError(null);
+    try {
+      await setProductMasterPrimaryImage(id, imageId);
+      await reloadMaster();
+      await reloadAudit();
+    } catch (e: any) {
+      setImageError(e?.response?.data?.error || e?.message || '대표 지정에 실패했습니다');
+    } finally {
+      setImageBusy(false);
     }
   };
 
@@ -173,7 +217,7 @@ export default function ProductMasterDetailPage() {
             )}
           </PanelSection>
 
-          {/* 이미지 */}
+          {/* 이미지 — WO-O4O-ADMIN-O4O-PRODUCT-IMAGE-ACTION-V1: 추가 / 대표 지정 (admin write, Phase 1) */}
           <PanelSection
             title={`이미지 (${row.images?.length ?? 0})`}
             badge={<ImageStatusBadge images={row.images} />}
@@ -181,15 +225,34 @@ export default function ProductMasterDetailPage() {
             {row.images?.length ? (
               <div className="flex flex-wrap gap-3">
                 {row.images.map((img) => (
-                  <MasterThumb key={img.id} url={img.imageUrl} primary={img.isPrimary} />
+                  <MasterThumb
+                    key={img.id}
+                    img={img}
+                    canAct={isAdmin && !img.isPrimary}
+                    busy={imageBusy}
+                    onSetPrimary={() => onSetPrimary(img.id)}
+                  />
                 ))}
               </div>
             ) : (
-              <div className="text-sm text-gray-400">
-                이미지 없음
-                <div className="text-xs text-gray-400 mt-1">이미지 업로드/교체/보강은 후속 WO (이번 WO 는 상태 확인만).</div>
+              <div className="text-sm text-gray-400">이미지 없음</div>
+            )}
+
+            {isAdmin && (
+              <div className="mt-3 flex flex-wrap items-center gap-3">
+                <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={onFileSelected} />
+                <button
+                  onClick={onPickImage}
+                  disabled={imageBusy}
+                  className="flex items-center gap-1.5 bg-admin-blue text-white px-3 py-2 rounded text-sm disabled:opacity-50"
+                >
+                  <ImagePlus className="w-4 h-4" /> {imageBusy ? '처리 중…' : '이미지 추가'}
+                </button>
+                <span className="text-xs text-gray-400">첫 이미지는 자동으로 대표가 됩니다. 숨김·교체·삭제는 제공하지 않습니다.</span>
               </div>
             )}
+            {imageError && <div className="mt-2 text-sm text-red-600">{imageError}</div>}
+
             <div className="text-xs text-gray-400 mt-3">
               <button onClick={() => navigate('/admin/o4o-product-db/image-quality')} className="text-admin-blue underline underline-offset-2">이미지 상태 화면</button>
               에서 전체 상품의 이미지 보유/누락 현황을 확인할 수 있습니다.
@@ -510,17 +573,31 @@ function ImageStatusBadge({ images }: { images?: { isPrimary: boolean }[] }) {
   return <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 text-xs">대표 없음</span>;
 }
 
-/** 대표 이미지 썸네일 — onError fallback */
-function MasterThumb({ url, primary }: { url: string; primary: boolean }) {
+/** 이미지 썸네일 — onError fallback + (admin) 대표 지정 */
+function MasterThumb({ img, canAct, busy, onSetPrimary }: {
+  img: { id: string; imageUrl: string; isPrimary: boolean };
+  canAct: boolean;
+  busy: boolean;
+  onSetPrimary: () => void;
+}) {
   const [broken, setBroken] = useState(false);
   return (
     <div className="relative">
       {broken ? (
         <div className="w-28 h-28 rounded border border-gray-200 bg-gray-50 flex items-center justify-center text-xs text-gray-400">불러올 수 없음</div>
       ) : (
-        <img src={url} alt="" className="w-28 h-28 object-cover rounded border border-gray-200" loading="lazy" onError={() => setBroken(true)} />
+        <img src={img.imageUrl} alt="" className="w-28 h-28 object-cover rounded border border-gray-200" loading="lazy" onError={() => setBroken(true)} />
       )}
-      {primary && <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-black/60 text-white text-[10px]">primary</span>}
+      {img.isPrimary && <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-black/60 text-white text-[10px]">대표</span>}
+      {canAct && (
+        <button
+          onClick={onSetPrimary}
+          disabled={busy}
+          className="absolute bottom-1 left-1 right-1 px-1 py-0.5 rounded bg-white/90 border border-gray-200 text-[10px] text-gray-700 hover:bg-admin-blue hover:text-white disabled:opacity-50"
+        >
+          대표로 지정
+        </button>
+      )}
     </div>
   );
 }
@@ -530,6 +607,7 @@ const AUDIT_ACTION_LABEL: Record<string, { label: string; cls: string }> = {
   note_hidden: { label: '메모 숨김', cls: 'bg-gray-100 text-gray-500' },
   description_curated: { label: '설명 지정', cls: 'bg-green-100 text-green-700' },
   image_added: { label: '이미지 추가', cls: 'bg-amber-100 text-amber-700' },
+  image_primary_changed: { label: '대표 지정', cls: 'bg-green-50 text-green-700' },
 };
 function AuditActionBadge({ action }: { action: string }) {
   const m = AUDIT_ACTION_LABEL[action] ?? { label: action, cls: 'bg-gray-100 text-gray-600' };

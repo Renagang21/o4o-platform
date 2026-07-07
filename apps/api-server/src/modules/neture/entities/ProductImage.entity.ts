@@ -50,4 +50,22 @@ export class ProductImage {
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
+
+  // WO-O4O-ADMIN-O4O-PRODUCT-IMAGE-ACTION-V1: action/audit 지원 컬럼 (additive).
+  // deleted_at/deleted_by 는 후속 soft-delete WO 용 placeholder (이번 WO 는 write 안 함).
+  @Column({ name: 'created_by', type: 'uuid', nullable: true })
+  createdBy: string | null;
+
+  @Column({ name: 'updated_by', type: 'uuid', nullable: true })
+  updatedBy: string | null;
+
+  @Column({ name: 'deleted_at', type: 'timestamptz', nullable: true })
+  deletedAt: Date | null;
+
+  @Column({ name: 'deleted_by', type: 'uuid', nullable: true })
+  deletedBy: string | null;
+
+  /** 이미지 출처. admin 업로드는 'admin_upload'. */
+  @Column({ name: 'source', type: 'varchar', length: 32, nullable: true })
+  source: string | null;
 }

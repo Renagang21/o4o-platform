@@ -16,8 +16,13 @@
 
 import type { DataSource } from 'typeorm';
 
-export type AuditSource = 'product_master_notes' | 'shared_product_descriptions' | 'image';
-export type AuditAction = 'note_created' | 'note_hidden' | 'description_curated' | 'image_added';
+export type AuditSource = 'product_master_notes' | 'shared_product_descriptions' | 'image' | 'audit_log';
+export type AuditAction =
+  | 'note_created'
+  | 'note_hidden'
+  | 'description_curated'
+  | 'image_added'
+  | 'image_primary_changed';
 
 export interface AuditLogItem {
   id: string;
@@ -41,7 +46,7 @@ export interface ProductMasterAuditLog {
 }
 
 const GAPS: AuditLogGap[] = [
-  { area: 'common_audit_log', reason: 'audit_logs 테이블은 존재하나 ProductMaster 이벤트는 기록되지 않음 — action-log-core 연결 필요(후속)' },
+  // common_audit_log: WO-O4O-ADMIN-O4O-PRODUCT-IMAGE-ACTION-V1 에서 audit_logs 를 image_added/image_primary_changed 로 연결(해소).
   { area: 'candidate_lifecycle', reason: 'ProductCandidate 상태변경 이력은 operator 리뷰 큐 소관(별도 트랙)' },
   { area: 'basic_edit_archive', reason: '기본정보 수정 / 이미지 교체·삭제 / archive 는 후속 write WO 에서 이력 생성' },
 ];
@@ -76,8 +81,25 @@ export class ProductMasterAuditLogService {
          UNION ALL
          SELECT i.id::text || ':img', 'image', 'image_added',
                 COALESCE(i.type, 'image') || (CASE WHEN i.is_primary THEN ' (대표)' ELSE '' END),
-                NULL::uuid, i.created_at
-           FROM product_images i WHERE i.master_id = $1
+                i.created_by, i.created_at
+           FROM product_images i
+          WHERE i.master_id = $1 AND i.deleted_at IS NULL
+            AND NOT EXISTS (
+              SELECT 1 FROM audit_logs a
+               WHERE a."entityType" = 'ProductMaster' AND a."entityId" = $1
+                 AND a.action = 'image_added' AND (a.changes->>'imageId') = i.id::text
+            )
+         UNION ALL
+         SELECT a.id::text || ':al', 'audit_log', a.action,
+                CASE a.action
+                  WHEN 'image_added' THEN '이미지 추가' || (CASE WHEN COALESCE((a.changes->>'isPrimary')::bool, false) THEN ' (대표)' ELSE '' END)
+                  WHEN 'image_primary_changed' THEN '대표 이미지 지정'
+                  ELSE a.action
+                END,
+                a."userId", a."createdAt"
+           FROM audit_logs a
+          WHERE a."entityType" = 'ProductMaster' AND a."entityId" = $1
+            AND a.action IN ('image_added', 'image_primary_changed')
        )
        SELECT e.id, e.source, e.action, e.summary, e.actor_id,
               COALESCE(u.name, u.email) AS actor_name, e.occurred_at

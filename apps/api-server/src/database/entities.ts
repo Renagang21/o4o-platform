@@ -16,6 +16,7 @@
 // other files that import from entities/User.js (e.g., authentication.service.ts)
 // This prevents "No metadata for User was found" TypeORM errors.
 import { User } from '../entities/User.js';
+import { AuditLog } from '../entities/AuditLog.js'; // WO-O4O-ADMIN-O4O-PRODUCT-IMAGE-ACTION-V1: 공통 audit 테이블 등록
 import { Role } from '../modules/auth/entities/Role.js';
 import { Permission } from '../modules/auth/entities/Permission.js';
 import { RefreshToken } from '../modules/auth/entities/RefreshToken.js';
@@ -561,6 +562,7 @@ import {
 export const entities = [
   // AUTH Module entities
   User,
+  AuditLog, // WO-O4O-ADMIN-O4O-PRODUCT-IMAGE-ACTION-V1: 공통 audit_logs
   Role,
   Permission,
   RefreshToken,

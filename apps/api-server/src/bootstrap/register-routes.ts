@@ -497,6 +497,16 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Product Master Audit Log routes:', auditLogError);
     }
 
+    // 24-e2i. Register Product Master Image action routes (admin write — 이미지 추가 / 대표 지정)
+    //         (WO-O4O-ADMIN-O4O-PRODUCT-IMAGE-ACTION-V1, Phase 1)
+    try {
+      const { createProductMasterImageController } = await import('../modules/neture/controllers/product-master-image.controller.js');
+      app.use('/api/v1/admin/o4o-product-db/masters', createProductMasterImageController(dataSource));
+      logger.info('✅ Product Master Image routes registered at /api/v1/admin/o4o-product-db/masters/:id/images');
+    } catch (masterImageError) {
+      logger.error('Failed to register Product Master Image routes:', masterImageError);
+    }
+
     // 24-e3. Register Mobile Product Draft routes (WO-O4O-MOBILE-PRODUCT-DRAFT-TO-CANDIDATE-V1, Phase 4)
     try {
       const { createMobileProductDraftController } = await import('../modules/neture/controllers/mobile-product-draft.controller.js');
