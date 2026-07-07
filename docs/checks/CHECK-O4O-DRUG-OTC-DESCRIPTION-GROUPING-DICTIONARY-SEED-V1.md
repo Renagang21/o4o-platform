@@ -1,7 +1,7 @@
 # CHECK-O4O-DRUG-OTC-DESCRIPTION-GROUPING-DICTIONARY-SEED-V1
 
 Status: DONE — 운영 DB read-only 조사 + 표기변형/노이즈 사전 seed 산출 (2026-07-07)
-WO: `WO-O4O-DRUG-OTC-DESCRIPTION-GROUPING-DICTIONARY-SEED-V1`
+WO: [`WO-O4O-DRUG-OTC-DESCRIPTION-GROUPING-DICTIONARY-SEED-V1`](../work-orders/WO-O4O-DRUG-OTC-DESCRIPTION-GROUPING-DICTIONARY-SEED-V1.md)
 Scope: 100그룹 확장 전 후보 산출 표준화를 위한 **성분 표기변형 사전 seed + 노이즈 필터 seed + ATC7 hybrid 기준** 확정. **DB write 0. 신규 설명서 작성 0.**
 
 > **결론: seed 확보 완료(표기변형 97 ATC7군/308 문자열에서 55+ alias 추출, 노이즈 4,018행). 다만 100그룹은 여전히 보류(C) — 이 seed 는 후보 산출 품질을 높이는 도구일 뿐 신규 후보를 만들지 않는다.** 추가 발견: ATC7 hybrid 는 생균(A07FA)·인공눈물(S01XA20) 등에서 **서로 다른 주성분을 과병합**하므로 무조건 병합 금지 예외가 필요하다.
