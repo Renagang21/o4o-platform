@@ -11,6 +11,10 @@ import {
   type DrugOtcGroupFixture,
   type DrugOtcGroupResolution,
 } from '../../drug-import/drug-otc-description-draft-plan.js';
+import {
+  extractDraftsFromDoc,
+  normalizeDraftHeaderLabel,
+} from '../../drug-import/drug-otc-description-draft-content.js';
 
 const baseFix: DrugOtcGroupFixture = {
   seq: 999, doc: '20g', label: '테스트 100mg 정', ingredient: '테스트', strengthToken: '100밀리그램',
@@ -86,5 +90,58 @@ describe('fixture 무결성', () => {
       const v = classifyGroup(g, res({}));
       expect(typeof isInsertable(v)).toBe('boolean');
     }
+  });
+  it('#51 은 축약표기(…)가 아니라 실제 DB 파싱 성분명', () => {
+    const g51 = DRUG_OTC_DESCRIPTION_GROUPS.find((g) => g.seq === 51)!;
+    expect(g51.ingredient).not.toContain('…');
+    expect(g51.ingredient).toBe('엔테로코쿠스페슘스트레인세르넬레68균');
+  });
+});
+
+const SAMPLE_DOC = `
+## 9. 최종 설명서 초안 (pilot)
+
+## 에르도스테인 300mg 캡슐
+
+| 항목 | 내용 |
+|---|---|
+| 성분 | 에르도스테인 300mg |
+| 분류 | 일반의약품 |
+| 선택 포인트 | 가래 배출을 돕는 점액용해제 |
+
+**효능·효과**
+급·만성 기관지염의 객담 배출에 사용합니다.
+
+**복용 안내**
+성인은 1회 1캡슐 1일 2회 복용합니다.
+
+**주의 대상**
+임부·수유부는 상담하세요.
+
+**성분 기준 선택**
+성분·함량 기준으로 약사에게 확인하세요.
+
+## 10. 다음
+내용 없음`;
+
+describe('content 파서', () => {
+  it('normalizeDraftHeaderLabel: 섹션번호·약효군 괄호 제거', () => {
+    expect(normalizeDraftHeaderLabel('### 13.1 덱시부프로펜 300mg 정 (NSAID)')).toBe('덱시부프로펜 300mg 정');
+    expect(normalizeDraftHeaderLabel('## 에르도스테인 300mg 캡슐')).toBe('에르도스테인 300mg 캡슐');
+    expect(normalizeDraftHeaderLabel('일반 문단')).toBeNull();
+  });
+  it('효능·효과 있는 섹션만 draft 로 추출 + 요약표/본문 파싱', () => {
+    const m = extractDraftsFromDoc(SAMPLE_DOC);
+    expect(m.has('에르도스테인 300mg 캡슐')).toBe(true);
+    expect(m.has('9. 최종 설명서 초안 (pilot)')).toBe(false); // 효능 없음 → draft 아님
+    const d = m.get('에르도스테인 300mg 캡슐')!;
+    expect(d.summaryTable['성분']).toBe('에르도스테인 300mg');
+    expect(d.summaryTable['항목']).toBeUndefined(); // 헤더 행 제외
+    expect(d.efficacy).toContain('객담 배출');
+    expect(d.usageLabel).toBe('복용 안내');
+    expect(d.usage).toContain('1일 2회');
+    expect(d.caution).toContain('임부');
+    expect(d.ingredientSelection).toContain('약사');
+    expect(d.bodyMarkdown).toContain('**효능·효과**');
   });
 });

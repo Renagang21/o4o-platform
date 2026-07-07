@@ -90,6 +90,8 @@ export function classifyGroup(f: DrugOtcGroupFixture, r: DrugOtcGroupResolution)
   return 'INSERT_auto';
 }
 
+import type { ParsedDrugOtcDraft } from './drug-otc-description-draft-content.js';
+
 /** product_candidate_description_drafts 컬럼과 1:1 대응하는 적재 plan row(순수 조립, DB write 아님). */
 export interface DrugOtcDraftRowPlan {
   candidate_id: string;
@@ -138,11 +140,32 @@ export function buildDrugOtcDraftRowPlan(
   f: DrugOtcGroupFixture,
   r: DrugOtcGroupResolution,
   verdict: DrugOtcDraftVerdict,
+  content?: ParsedDrugOtcDraft,
 ): DrugOtcDraftRowPlan {
   if (!r.anchorCandidateId) {
     throw new Error(`buildDrugOtcDraftRowPlan: seq=${f.seq} anchorCandidateId 없음(호출 전 EXCLUDE 처리 필요)`);
   }
   const groupKey = `${f.ingredient}|${f.strengthToken}|${f.doseForm}`;
+  const contentSource = { doc: f.doc, seq: f.seq, ref: `CHECK-O4O-DRUG-OTC-DESCRIPTION-*-V1 §draft ${f.label}` };
+  // content 있으면 본문 ETL 결과 주입(apply), 없으면 contentPending(설계 dry-run)
+  const content_json: Record<string, unknown> = content
+    ? {
+        groupKey,
+        ingredient: f.ingredient,
+        strengthToken: f.strengthToken,
+        doseForm: f.doseForm,
+        format: 'structured',
+        summaryTable: content.summaryTable,
+        efficacy: content.efficacy,
+        usage: content.usage,
+        usageLabel: content.usageLabel,
+        caution: content.caution,
+        ingredientSelection: content.ingredientSelection,
+        bodyMarkdown: content.bodyMarkdown,
+        contentSource,
+        contentPending: false,
+      }
+    : { groupKey, ingredient: f.ingredient, strengthToken: f.strengthToken, doseForm: f.doseForm, contentSource, contentPending: true };
   return {
     candidate_id: r.anchorCandidateId,
     source_label: DRUG_OTC_SOURCE_LABEL,
@@ -150,16 +173,8 @@ export function buildDrugOtcDraftRowPlan(
     draft_type: 'store_description',
     language: 'ko',
     title: f.label,
-    summary: null,
-    content_json: {
-      groupKey,
-      ingredient: f.ingredient,
-      strengthToken: f.strengthToken,
-      doseForm: f.doseForm,
-      // 본문(요약표 + 효능·효과 + 복용/사용 안내 + 주의 대상 + 성분 기준 선택)은 apply ETL 에서 채움
-      contentSource: { doc: f.doc, seq: f.seq, ref: `CHECK-O4O-DRUG-OTC-DESCRIPTION-*-V1 §draft ${f.label}` },
-      contentPending: true,
-    },
+    summary: content?.summaryTable?.['선택 포인트'] ?? null,
+    content_json,
     content_html: null,
     seed_json: {
       groupKey,
@@ -250,7 +265,7 @@ export const DRUG_OTC_DESCRIPTION_GROUPS: DrugOtcGroupFixture[] = [
   { seq: 48, doc: '50g', label: '니푸록사지드 200mg 캡슐', ingredient: '니푸록사지드', strengthToken: '200밀리그램', doseForm: '캡슐', klass: 'auto', grounding: 19 },
   { seq: 49, doc: '50g', label: '로페라미드염산염 2mg 캡슐', ingredient: '로페라미드염산염', strengthToken: '2밀리그램', doseForm: '캡슐', klass: 'auto', grounding: 19 },
   { seq: 50, doc: '50g', label: '락토바실루스아시도필루스균 300mg 캡슐', ingredient: '락토바실루스아시도필루스균', strengthToken: '300밀리그램', doseForm: '캡슐', klass: 'auto', grounding: 13 },
-  { seq: 51, doc: '50g', label: '엔테로코쿠스페슘…균 30mg 캡슐', ingredient: '엔테로코쿠스페슘…균', strengthToken: '30밀리그램', doseForm: '캡슐', klass: 'auto', grounding: 27 },
+  { seq: 51, doc: '50g', label: '엔테로코쿠스페슘균 30mg 캡슐', ingredient: '엔테로코쿠스페슘스트레인세르넬레68균', strengthToken: '30밀리그램', doseForm: '캡슐', klass: 'auto', grounding: 27 },
   { seq: 52, doc: '50g', label: '사카로마이세스보울라르디균 282.5mg 캡슐', ingredient: '사카로마이세스보울라르디균', strengthToken: '282.5밀리그램', doseForm: '캡슐', klass: 'auto', grounding: 11 },
   { seq: 53, doc: '50g', label: '플루벤다졸 500mg 정', ingredient: '플루벤다졸', strengthToken: '500밀리그램', doseForm: '정', klass: 'auto', grounding: 7 },
   { seq: 54, doc: '50g', label: '비오틴 5mg 정', ingredient: '비오틴', strengthToken: '5밀리그램', doseForm: '정', klass: 'auto', grounding: 19 },

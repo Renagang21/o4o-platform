@@ -21,9 +21,9 @@ import {
   isInsertable,
   buildDrugOtcDraftRowPlan,
   DRUG_OTC_SOURCE_LABEL,
-  type DrugOtcGroupResolution,
   type DrugOtcDraftVerdict,
 } from '../modules/neture/drug-import/drug-otc-description-draft-plan.js';
+import { resolveDrugOtcGroups } from '../modules/neture/drug-import/drug-otc-description-draft-resolve.js';
 
 interface CliArgs {
   out: string | null;
@@ -40,8 +40,8 @@ function parseArgs(argv: string[]): CliArgs {
   return { out: get('out') ?? null, samples: parseInt(get('samples') ?? '8', 10) };
 }
 
-/** 프로덕션 DB read-only 해상도. 그룹 fixture 를 VALUES 로 바인딩(파라미터), master 파싱 CTE 와 조인. */
-async function resolveGroups(): Promise<Map<number, DrugOtcGroupResolution>> {
+/** 프로덕션 DB read-only 해상도(공유 resolver 사용). */
+async function resolveGroups() {
   const { DataSource } = await import('typeorm');
   const host = process.env.DB_HOST;
   if (!host) throw new Error('DB_HOST 미설정 — Cloud SQL Auth Proxy(127.0.0.1) 또는 /cloudsql 소켓 필요');
@@ -62,75 +62,7 @@ async function resolveGroups(): Promise<Map<number, DrugOtcGroupResolution>> {
   });
   await ds.initialize();
   try {
-    // fixture VALUES 파라미터 조립 (seq, ing, str, form)
-    const params: (number | string)[] = [];
-    const rows = DRUG_OTC_DESCRIPTION_GROUPS.map((g, i) => {
-      const b = i * 4;
-      params.push(g.seq, g.ingredient, g.strengthToken, g.doseForm);
-      return `($${b + 1}::int,$${b + 2}::text,$${b + 3}::text,$${b + 4}::text)`;
-    }).join(',');
-
-    const sql = `
-      WITH fixture(seq, ing, str, form) AS ( VALUES ${rows} ),
-      parsed AS (
-        SELECT pm.id, pm.manufacturer_name AS mfr, pm.drug_category AS cat,
-          substring(pm.name from '\\(([^()]+)\\)\\s*$') AS ing,
-          split_part(pm.specification, ' / ', 1) AS str,
-          CASE WHEN pm.name LIKE '%연질캡슐%' THEN '연질캡슐'
-               WHEN pm.name LIKE '%캡슐%' THEN '캡슐'
-               WHEN pm.name LIKE '%정%' THEN '정' ELSE NULL END AS form
-        FROM product_masters pm WHERE pm.regulatory_type='DRUG'
-      ),
-      matched AS (
-        SELECT f.seq, p.id, p.mfr, p.cat
-        FROM fixture f JOIN parsed p ON p.ing=f.ing AND p.str=f.str AND p.form=f.form
-      ),
-      agg AS (
-        SELECT seq, count(*) AS master_total,
-          count(*) FILTER (WHERE cat='otc') AS otc,
-          count(*) FILTER (WHERE cat='rx') AS rx,
-          count(*) FILTER (WHERE cat NOT IN ('otc','rx') OR cat IS NULL) AS other_cat,
-          count(DISTINCT mfr) AS mfrs
-        FROM matched GROUP BY seq
-      ),
-      spd AS (
-        SELECT m.seq, count(DISTINCT s.master_id) AS spd_masters
-        FROM matched m
-        JOIN shared_product_descriptions s ON s.master_id=m.id AND s.deleted_at IS NULL AND s.source_type='mfds_easy_drug'
-        WHERE m.cat='otc' GROUP BY m.seq
-      ),
-      anchor AS (
-        SELECT m.seq, count(DISTINCT c.matched_product_master_id) AS anchor_masters, min(c.id::text) AS anchor_candidate
-        FROM matched m
-        JOIN product_candidates c ON c.matched_product_master_id=m.id AND c.source_type='csv_import' AND c.deleted_at IS NULL
-        WHERE m.cat='otc' GROUP BY m.seq
-      )
-      SELECT f.seq,
-        COALESCE(a.master_total,0) AS master_total, COALESCE(a.otc,0) AS otc, COALESCE(a.rx,0) AS rx,
-        COALESCE(a.other_cat,0) AS other_cat, COALESCE(a.mfrs,0) AS mfrs,
-        COALESCE(sp.spd_masters,0) AS spd_masters, COALESCE(an.anchor_masters,0) AS anchor_masters,
-        an.anchor_candidate
-      FROM fixture f
-      LEFT JOIN agg a ON a.seq=f.seq
-      LEFT JOIN spd sp ON sp.seq=f.seq
-      LEFT JOIN anchor an ON an.seq=f.seq
-      ORDER BY f.seq`;
-
-    type Raw = {
-      seq: number; master_total: string; otc: string; rx: string; other_cat: string;
-      mfrs: string; spd_masters: string; anchor_masters: string; anchor_candidate: string | null;
-    };
-    const raw: Raw[] = await ds.query(sql, params);
-    const map = new Map<number, DrugOtcGroupResolution>();
-    for (const r of raw) {
-      map.set(Number(r.seq), {
-        masterTotal: Number(r.master_total), otc: Number(r.otc), rx: Number(r.rx),
-        otherCat: Number(r.other_cat), manufacturers: Number(r.mfrs),
-        spdMasters: Number(r.spd_masters), anchorMasters: Number(r.anchor_masters),
-        anchorCandidateId: r.anchor_candidate,
-      });
-    }
-    return map;
+    return await resolveDrugOtcGroups(ds);
   } finally {
     if (ds.isInitialized) await ds.destroy();
   }
