@@ -1,8 +1,8 @@
 # CHECK-O4O-DRUG-OTC-DESCRIPTION-COMBO-NONCOLD-NONNUTRITION-DRAFT-DB-APPLY-V1
 
-> **Status: PREPARED — dry-run 검증 완료 · apply(실제 COMMIT) 사용자 최종 승인 대기 (2026-07-07)**
+> **Status: DONE — 운영 DB 적재 완료 (2026-07-07, 사용자 승인 후 --apply)**
 > **WO:** WO-O4O-DRUG-OTC-DESCRIPTION-COMBO-NONCOLD-NONNUTRITION-DRAFT-DB-APPLY-V1
-> **현재 DB write: 0** (dry-run only). apply 승인 시 `product_candidate_description_drafts` **6행**.
+> **DB write: `product_candidate_description_drafts` 6행** (그 외 0). inserted=6, 트랜잭션 내 검산 6==6. draft 테이블 66→**72**.
 > **선행:** [`GROUNDING-DRAFT-V1`](CHECK-O4O-DRUG-OTC-DESCRIPTION-COMBO-NONCOLD-NONNUTRITION-GROUNDING-DRAFT-V1.md) · [`DRAFT-DB-APPLY-DESIGN-V1`](CHECK-O4O-DRUG-OTC-DESCRIPTION-COMBO-NONCOLD-NONNUTRITION-DRAFT-DB-APPLY-DESIGN-V1.md)
 
 ---
@@ -16,7 +16,7 @@
 | 3. insert 예정 6행 최종 preview | ✅ (§4) |
 | 4. 단일 TX apply SQL/script 준비 | ✅ (§5) |
 | 5. 실행 직전 이중 게이트 | ✅ (§3, dry-run 통과) |
-| 6. 사용자 최종 승인 후 실제 COMMIT | ⏳ **대기** |
+| 6. 사용자 최종 승인 후 실제 COMMIT | ✅ **완료 (inserted=6)** |
 
 ## 2. content_json ETL 결과 (오프라인 파싱, 6/6)
 
@@ -94,10 +94,31 @@ inserted / dbWrite : 0 / 0
 | 감기약/영양제/멀미 포함 | ✅ 0 (제외) |
 | **승인 전 --apply 실행** | ✅ 0 (대기) |
 
-## 8. 최종 승인 요청
+## 8. apply 실행 결과 (사용자 승인 후, 2026-07-07)
 
-위 preview 6행 + 이중 게이트(preconditionOk=true, dbWrite 0) 확인. **사용자 승인 시** `--apply` 로 단일 TX 6행 적재 후 본 CHECK 를 **DONE** 으로 갱신(inserted=6, 검산 6==6).
+```txt
+mode: apply   runId: otc-combo-draft-v1
+preconditionOk: true (existingThisRunId 0 · distinctAnchors 6 · anchorsExistInDb 6 · anchorActiveDraftConflicts 0 · missingContent 0)
+inserted: 6   dbWrite: 6   트랜잭션 내 검산: 6 == 6 (commit)
+```
+
+**적재 후 불변식 검증(read-only):**
+
+| 항목 | 기대 | 실측 |
+|---|--:|--:|
+| product_candidate_description_drafts 총계 | 72 | **72** (66+6) |
+| combo runId(otc-combo-draft-v1) | 6 | **6** |
+| SINGLE runId(otc-draft-v1) 불변 | 66 | **66** |
+| combo 6행 review_status | needs_review | **needs_review** (전부) |
+| registryGroups 합 | 27 | **27** (14+1+3+2+2+5) |
+| distinct 앵커 candidate | 6 | **6** (anchorOk=true) |
+| product_masters | 불변 | **198,389** |
+| shared_product_descriptions | 불변 | **19,431** |
+| product_drug_extensions | 불변 | **177,413** |
+
+- **rollback 가능:** `source_label='MFDS_DRUG_OTC' AND seed_json->>'applyRunId'='otc-combo-draft-v1'` soft delete(6행). SINGLE 66행 독립·불변.
+- masters/SPD/candidate/extension **무변경** 확인. canonical/imported 승격 없음(전 행 needs_review).
 
 ---
 
-*V1 · 2026-07-07 · PREPARED · A-family 6행 · dry-run preconditionOk=true · apply 승인 대기 · DB write 0*
+*V1 · 2026-07-07 · DONE · A-family 6행 적재 완료 · inserted=6 · 검산 6==6 · draft 66→72 · SINGLE 66/masters/SPD/ext 불변*
