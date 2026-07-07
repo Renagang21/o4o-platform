@@ -447,6 +447,16 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Product Candidate Description Draft routes:', draftReviewError);
     }
 
+    // 24-e2d. Register Product Description Status unified view (read-only)
+    //         (WO-O4O-ADMIN-O4O-PRODUCT-DESCRIPTION-STATUS-UNIFIED-VIEW-V1)
+    try {
+      const { createProductDescriptionStatusController } = await import('../modules/neture/controllers/product-description-status.controller.js');
+      app.use('/api/v1/admin/o4o-product-db/description-status', createProductDescriptionStatusController(dataSource));
+      logger.info('✅ Product Description Status (read-only) routes registered at /api/v1/admin/o4o-product-db/description-status');
+    } catch (descStatusError) {
+      logger.error('Failed to register Product Description Status routes:', descStatusError);
+    }
+
     // 24-e3. Register Mobile Product Draft routes (WO-O4O-MOBILE-PRODUCT-DRAFT-TO-CANDIDATE-V1, Phase 4)
     try {
       const { createMobileProductDraftController } = await import('../modules/neture/controllers/mobile-product-draft.controller.js');

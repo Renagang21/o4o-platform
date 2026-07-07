@@ -484,3 +484,73 @@ export async function getDrugDescriptionDraft(id: string): Promise<DrugDescripti
   );
   return res.data?.data ?? null;
 }
+
+// ─── Description Status (master 기준 설명 상태 통합 뷰, read-only) ────────────
+// WO-O4O-ADMIN-O4O-PRODUCT-DESCRIPTION-STATUS-UNIFIED-VIEW-V1
+// mount: /api/v1/admin/o4o-product-db/description-status (GET only)
+
+export type DescriptionFinalStatus = 'canonical' | 'needs_review' | 'draft' | 'none';
+
+export interface DescriptionStatusRow {
+  masterId: string;
+  productName: string;
+  manufacturerName: string | null;
+  regulatoryType: string | null;
+  primaryIdentifier: string | null;
+  canonicalCount: number;
+  needsReviewCount: number;
+  draftCount: number;
+  finalStatus: DescriptionFinalStatus;
+  canonicalSourceTypes: string[];
+  needsReviewSourceTypes: string[];
+  draftVerdicts: string[];
+  canonicalDescriptionId: string | null;
+  needsReviewDescriptionId: string | null;
+  draftId: string | null;
+}
+
+export interface DescriptionStatusListParams {
+  finalStatus?: string;
+  regulatoryType?: string;
+  sourceType?: string;
+  draftOnly?: boolean;
+  q?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface DescriptionStatusListResult {
+  items: DescriptionStatusRow[];
+  meta: ProductMasterListMeta;
+}
+
+export async function listDescriptionStatus(
+  params: DescriptionStatusListParams = {},
+): Promise<DescriptionStatusListResult> {
+  const query: Record<string, string> = {};
+  if (params.finalStatus) query.finalStatus = params.finalStatus;
+  if (params.regulatoryType) query.regulatoryType = params.regulatoryType;
+  if (params.sourceType) query.sourceType = params.sourceType;
+  if (params.draftOnly) query.draftOnly = 'true';
+  if (params.q?.trim()) query.q = params.q.trim();
+  query.page = String(params.page ?? 1);
+  query.limit = String(params.limit ?? 20);
+
+  const res = await authClient.api.get<{
+    success: boolean;
+    data: DescriptionStatusRow[];
+    meta: ProductMasterListMeta;
+  }>(`/admin/o4o-product-db/description-status?${new URLSearchParams(query).toString()}`);
+
+  return {
+    items: res.data?.data ?? [],
+    meta: res.data?.meta ?? { page: 1, limit: 20, total: 0, totalPages: 0 },
+  };
+}
+
+export async function getDescriptionStatusSummary(): Promise<Record<string, number>> {
+  const res = await authClient.api.get<{ success: boolean; data: Record<string, number> }>(
+    `/admin/o4o-product-db/description-status/summary`,
+  );
+  return res.data?.data ?? {};
+}
