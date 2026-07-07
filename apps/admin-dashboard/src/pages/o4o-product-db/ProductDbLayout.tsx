@@ -18,6 +18,7 @@ const TABS = [
   { to: 'overview', label: '현황' },
   { to: 'candidates', label: '공공데이터 후보' },
   { to: 'masters', label: '기본 상품' },
+  { to: 'image-quality', label: '이미지 상태' },
   { to: 'description-status', label: '설명 상태' },
   { to: 'review', label: '설명 검토' },
   { to: 'drug-description-drafts', label: 'OTC 설명 초안' },

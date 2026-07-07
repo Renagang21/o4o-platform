@@ -125,21 +125,12 @@ export default function ProductMasterDetailPage() {
           {/* 이미지 */}
           <PanelSection
             title={`이미지 (${row.images?.length ?? 0})`}
-            badge={
-              (row.images?.length ?? 0) > 0
-                ? <span className="px-2 py-0.5 rounded-full bg-green-50 text-green-700 text-xs">있음</span>
-                : <span className="px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 text-xs">없음</span>
-            }
+            badge={<ImageStatusBadge images={row.images} />}
           >
             {row.images?.length ? (
               <div className="flex flex-wrap gap-3">
                 {row.images.map((img) => (
-                  <div key={img.id} className="relative">
-                    <img src={img.imageUrl} alt="" className="w-28 h-28 object-cover rounded border border-gray-200" />
-                    {img.isPrimary && (
-                      <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-black/60 text-white text-[10px]">primary</span>
-                    )}
-                  </div>
+                  <MasterThumb key={img.id} url={img.imageUrl} primary={img.isPrimary} />
                 ))}
               </div>
             ) : (
@@ -148,6 +139,10 @@ export default function ProductMasterDetailPage() {
                 <div className="text-xs text-gray-400 mt-1">이미지 업로드/교체/보강은 후속 WO (이번 WO 는 상태 확인만).</div>
               </div>
             )}
+            <div className="text-xs text-gray-400 mt-3">
+              <button onClick={() => navigate('/admin/o4o-product-db/image-quality')} className="text-admin-blue underline underline-offset-2">이미지 상태 화면</button>
+              에서 전체 상품의 이미지 보유/누락 현황을 확인할 수 있습니다.
+            </div>
           </PanelSection>
 
           {/* 설명 — WO-O4O-DRUG-CANONICAL-DESCRIPTION-OUTPUT-LINK-V1: 공식 소비자 설명 (매장용 AI 설명 아님) */}
@@ -379,6 +374,29 @@ function UsageRow({ main, meta, date }: { main: string; meta: (string | null | u
         )}
       </div>
       <div className="text-xs text-gray-400 shrink-0 ml-3">{date?.slice(0, 10) || '—'}</div>
+    </div>
+  );
+}
+
+/** 이미지 배열 → 3상태 배지(대표 있음 / 대표 없음 / 없음) */
+function ImageStatusBadge({ images }: { images?: { isPrimary: boolean }[] }) {
+  const count = images?.length ?? 0;
+  if (count === 0) return <span className="px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 text-xs">없음</span>;
+  if (images!.some((i) => i.isPrimary)) return <span className="px-2 py-0.5 rounded-full bg-green-50 text-green-700 text-xs">대표 있음</span>;
+  return <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 text-xs">대표 없음</span>;
+}
+
+/** 대표 이미지 썸네일 — onError fallback */
+function MasterThumb({ url, primary }: { url: string; primary: boolean }) {
+  const [broken, setBroken] = useState(false);
+  return (
+    <div className="relative">
+      {broken ? (
+        <div className="w-28 h-28 rounded border border-gray-200 bg-gray-50 flex items-center justify-center text-xs text-gray-400">불러올 수 없음</div>
+      ) : (
+        <img src={url} alt="" className="w-28 h-28 object-cover rounded border border-gray-200" loading="lazy" onError={() => setBroken(true)} />
+      )}
+      {primary && <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-black/60 text-white text-[10px]">primary</span>}
     </div>
   );
 }

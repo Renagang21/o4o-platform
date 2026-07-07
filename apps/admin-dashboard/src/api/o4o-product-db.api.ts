@@ -615,3 +615,64 @@ export async function getProductUsageLinks(id: string): Promise<ProductUsageLink
   );
   return res.data?.data ?? null;
 }
+
+// ─── Image Quality (master 이미지 상태, read-only) ───────────────────────────
+// WO-O4O-ADMIN-O4O-PRODUCT-IMAGE-QUALITY-SHELL-V1
+
+export type ImageStatus = 'has_representative_image' | 'has_images_no_representative' | 'missing_image';
+
+export interface ImageQualityRow {
+  masterId: string;
+  productName: string;
+  manufacturerName: string | null;
+  regulatoryType: string | null;
+  barcode: string | null;
+  imageCount: number;
+  hasRepresentative: boolean;
+  thumbnailUrl: string | null;
+  thumbnailType: string | null;
+  imageStatus: ImageStatus;
+  imageUpdatedAt: string | null;
+}
+
+export interface ImageQualityListParams {
+  imageStatus?: string;
+  regulatoryType?: string;
+  hasRepresentative?: boolean;
+  q?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface ImageQualityListResult {
+  items: ImageQualityRow[];
+  meta: ProductMasterListMeta;
+}
+
+export async function listImageQuality(params: ImageQualityListParams = {}): Promise<ImageQualityListResult> {
+  const query: Record<string, string> = {};
+  if (params.imageStatus) query.imageStatus = params.imageStatus;
+  if (params.regulatoryType) query.regulatoryType = params.regulatoryType;
+  if (params.hasRepresentative !== undefined) query.hasRepresentative = String(params.hasRepresentative);
+  if (params.q?.trim()) query.q = params.q.trim();
+  query.page = String(params.page ?? 1);
+  query.limit = String(params.limit ?? 20);
+
+  const res = await authClient.api.get<{
+    success: boolean;
+    data: ImageQualityRow[];
+    meta: ProductMasterListMeta;
+  }>(`/admin/o4o-product-db/image-quality?${new URLSearchParams(query).toString()}`);
+
+  return {
+    items: res.data?.data ?? [],
+    meta: res.data?.meta ?? { page: 1, limit: 20, total: 0, totalPages: 0 },
+  };
+}
+
+export async function getImageQualitySummary(): Promise<Record<string, number>> {
+  const res = await authClient.api.get<{ success: boolean; data: Record<string, number> }>(
+    `/admin/o4o-product-db/image-quality/summary`,
+  );
+  return res.data?.data ?? {};
+}

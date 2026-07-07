@@ -467,6 +467,16 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Product Usage Links routes:', usageLinksError);
     }
 
+    // 24-e2f. Register Product Image Quality (read-only) — master 이미지 상태 조회
+    //         (WO-O4O-ADMIN-O4O-PRODUCT-IMAGE-QUALITY-SHELL-V1)
+    try {
+      const { createProductImageQualityController } = await import('../modules/neture/controllers/product-image-quality.controller.js');
+      app.use('/api/v1/admin/o4o-product-db/image-quality', createProductImageQualityController(dataSource));
+      logger.info('✅ Product Image Quality (read-only) routes registered at /api/v1/admin/o4o-product-db/image-quality');
+    } catch (imageQualityError) {
+      logger.error('Failed to register Product Image Quality routes:', imageQualityError);
+    }
+
     // 24-e3. Register Mobile Product Draft routes (WO-O4O-MOBILE-PRODUCT-DRAFT-TO-CANDIDATE-V1, Phase 4)
     try {
       const { createMobileProductDraftController } = await import('../modules/neture/controllers/mobile-product-draft.controller.js');
