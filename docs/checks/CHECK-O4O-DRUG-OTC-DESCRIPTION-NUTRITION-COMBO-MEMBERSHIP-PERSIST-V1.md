@@ -1,8 +1,8 @@
 # CHECK-O4O-DRUG-OTC-DESCRIPTION-NUTRITION-COMBO-MEMBERSHIP-PERSIST-V1
 
-- WO: WO-O4O-DRUG-OTC-DESCRIPTION-NUTRITION-COMBO-MEMBERSHIP-PERSIST-V1
+- WO: WO-O4O-DRUG-OTC-DESCRIPTION-NUTRITION-COMBO-MEMBERSHIP-PERSIST-V1 (+ APPLY-V1)
 - 일자: 2026-07-07
-- 모드: **분류 복원 + 멤버십 재현 DRY-RUN** (persist 토큰 미부여 → DB write 0)
+- 모드: **분류 복원 + 멤버십 재현 DRY-RUN → APPLY 완료** (§8 apply 결과)
 - 선행: STRENGTH-SPLIT-V1(분류 SSOT) / CANONICAL-PROMOTION-SCRIPT-V1(16 ENUM_MISMATCH) / REVIEW-PREP `455892206`
 - 산출물: `apps/api-server/src/scripts/drug-otc-nutrition-combo-membership-persist.ts`
 
@@ -95,8 +95,39 @@ persist-ready 18 / MISMATCH 2 / dbWrite 0
 
 ## 7. 다음 단계
 
-1. **persist 토큰 부여**(`--apply` + `…_MEMBERSHIP_PERSIST_CONFIRM=YES`) → 18그룹 masterIds 저장.
-2. promotion 스크립트 enumeration 축을 **저장된 masterIds** 로 교체(게이트 제거) → 18그룹 승격 경로 확보.
-3. 보정 WO: (a) 비타민C 1000mg `groupScope.masterTotal` 31→38 확인·보정, (b) mgB 액제 Mg 성분 검출 축 추가.
+1. ~~persist 토큰 부여 → 18그룹 masterIds 저장~~ → **§8 APPLY 완료**.
+2. promotion 스크립트 enumeration 축을 **저장된 masterIds** 로 교체(게이트 제거) → 18그룹 승격 경로 확보. (WO: CANONICAL-PROMOTION-MASTERIDS-DRYRUN-V1)
+3. 보정 WO(MISMATCH-FIX-V1): (a) 비타민C 1000mg `groupScope.masterTotal` 31→38 확인·보정, (b) mgB 액제 Mg 성분 검출 축 추가.
 4. content markdown→HTML 정책(promotion 직전).
 5. #13/#14 제목 충돌 별도 처리.
+
+---
+
+## 8. APPLY 결과 (WO-...-MEMBERSHIP-PERSIST-APPLY-V1)
+
+- 실행: `--apply` + `DRUG_OTC_NUTRITION_COMBO_MEMBERSHIP_PERSIST_CONFIRM=YES`, 단일 트랜잭션.
+- pre-state: run 23건 중 masterIds 보유 **0**.
+
+| 항목 | 결과 |
+|------|-----:|
+| persist-ready (write 대상) | 18 |
+| **dbWrite (persistedGroups)** | **18** |
+| 트랜잭션 내 postVerify allOk | **true** (18/18, storedLen==masterTotal) |
+| MISMATCH (write 제외) | 2 |
+
+### 독립 사후검증 (별도 SELECT)
+
+| 검사 | 결과 |
+|------|------|
+| masterIds 보유 / 미보유 | **18 / 5** |
+| 미보유 5건 정체 | mismatch 2(비타민C `6f143bbc`·mgB 액제 `41fc4904`) + excluded 3(#1 `a3c46e34`·#12 `1eb608e0`·#14 `d5265213`) — 정확 |
+| 18건 `masterIds.length <> masterTotal` | **0행** (전부 일치) |
+| review_status | 23건 전부 `needs_review` 불변 |
+| content_json bodyMarkdown | 23건 보존 |
+
+### DB write 범위 확인
+- 변경: `product_candidate_description_drafts.seed_json.groupScope.masterIds`(18행 신규) + `updated_at`.
+- 무변경: content_json / review_status / shared_product_descriptions / ProductMaster / ProductIdentifier. canonical 승격·매장 연결 없음.
+- excluded 3 + mismatch 2 = **미접촉 확인**.
+
+→ 18그룹 멤버십 확보 완료. 후속 promotion 은 저장된 `groupScope.masterIds` 를 enumeration 없이 사용 가능.
