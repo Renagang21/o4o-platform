@@ -13,6 +13,12 @@
  *   - CDATA 본문을 언랩, PARAGRAPH/ARTICLE/TR 은 줄바꿈, TD 는 탭, BR 은 줄바꿈으로 평문화.
  *   - IMG 는 텍스트에서 제거하되 hasImg 플래그로 존재를 표시(이미지는 Gate C 별도).
  *   - HTML entity 디코드. 원문 XML 은 호출측이 raw_payload 에 계속 보존(무손실).
+ *
+ * title 속성 편입 (WO-O4O-QUASI-DRUG-OFFICIAL-TEXT-PARSER-TITLE-ATTR-REFINEMENT-V1):
+ *   - 실 데이터의 상당수(특히 NB)는 본문이 ARTICLE title 속성에 저장됨(<ARTICLE title="본문..."></ARTICLE>).
+ *   - ARTICLE/SECTION/PARAGRAPH 의 title 텍스트를 여는 태그 위치에 본문으로 편입한다.
+ *   - DOC 의 title 은 섹션 라벨(효능효과/용법용량/사용상주의사항)이므로 편입하지 않는다.
+ *   - title==본문 중복은 연속 중복 줄 제거로 정리한다.
  */
 
 export interface QuasiDrugOfficialText {
@@ -26,6 +32,22 @@ export interface QuasiDrugOfficialText {
     hasImg: boolean;
     hadEntities: boolean;
   };
+}
+
+/**
+ * 연속 중복 줄 제거 — title 속성 텍스트가 본문과 동일할 때 과도한 반복을 막는다.
+ * 직전에 출력한 non-empty 줄과 (trim 비교) 같은 줄만 제거한다(비연속 중복은 보존).
+ */
+function dedupeConsecutiveLines(s: string): string {
+  const out: string[] = [];
+  let prev = '';
+  for (const raw of s.split('\n')) {
+    const line = raw.trim();
+    if (line !== '' && line === prev) continue;
+    out.push(raw);
+    if (line !== '') prev = line;
+  }
+  return out.join('\n');
 }
 
 function decodeEntities(s: string): string {
@@ -47,20 +69,32 @@ export function xmlDocToPlainText(xml: string | null | undefined): string {
   if (s.trim() === '') return '';
   // 1) CDATA 언랩 (내용 보존)
   s = s.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1');
-  // 2) 블록/행 구분자
+  // 2) title 속성 본문 편입 — ARTICLE/SECTION/PARAGRAPH 의 title 텍스트를 여는 태그 위치에 삽입.
+  //    실 데이터의 상당수(특히 NB 사용상주의사항)는 본문이 아니라 ARTICLE title 속성에 저장된다.
+  //    DOC 의 title 은 섹션 라벨(효능효과/용법용량/사용상주의사항)이므로 제외한다(본문 아님).
+  s = s.replace(
+    /<(?:ARTICLE|SECTION|PARAGRAPH)\b[^>]*?\btitle\s*=\s*(?:"([^"]*)"|'([^']*)')[^>]*>/gi,
+    (_m, dq: string | undefined, sq: string | undefined) => {
+      const t = (dq ?? sq ?? '').trim();
+      return t === '' ? '\n' : `\n${t}\n`;
+    },
+  );
+  // 3) 블록/행 구분자
   s = s.replace(/<\s*br\s*\/?\s*>/gi, '\n');
   s = s.replace(/<\/\s*(paragraph|article|tr|caption|p|li)\s*>/gi, '\n');
   s = s.replace(/<\/\s*td\s*>/gi, '\t');
-  // 3) 나머지 태그 제거 (IMG 포함 — 존재는 flags 로 별도 기록)
+  // 4) 나머지 태그 제거 (IMG 포함 — 존재는 flags 로 별도 기록)
   s = s.replace(/<[^>]+>/g, '');
-  // 4) 엔티티 디코드
+  // 5) 엔티티 디코드
   s = decodeEntities(s);
-  // 5) 공백 정리
+  // 6) 연속 중복 줄 제거 (title==body 반복 방지)
+  s = dedupeConsecutiveLines(s);
+  // 7) 공백 정리 (빈 줄 없이 단일 줄바꿈으로 — title 편입 seam 정리 포함)
   s = s
     .replace(/\r/g, '')
     .replace(/[ \t]+\n/g, '\n')
     .replace(/\n[ \t]+/g, '\n')
-    .replace(/\n{3,}/g, '\n\n')
+    .replace(/\n{2,}/g, '\n')
     .replace(/[ \t]{2,}/g, ' ');
   return s.trim();
 }
