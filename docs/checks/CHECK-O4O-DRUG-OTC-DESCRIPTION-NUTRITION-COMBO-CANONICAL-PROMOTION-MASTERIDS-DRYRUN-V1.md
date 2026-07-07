@@ -86,6 +86,41 @@ content format: html (bodyMarkdown→mdToHtml)
 3. 승인 토큰(`--apply` + `DRUG_OTC_NUTRITION_COMBO_CANONICAL_APPLY_CONFIRM=YES`) 부여 시 1,890 canonical INSERT.
 
 ## 7. 다음 단계
-1. apply WO: 토큰 부여 → 18그룹 1,890 canonical INSERT(단일 트랜잭션 권장) + post-count.
+1. ~~apply WO: 18그룹 1,890 canonical INSERT~~ → **§8 APPLY 완료**.
 2. MISMATCH-FIX-V1: 비타민C 1000mg masterTotal 31→38 / mgB 액제 Mg 축 → 멤버십 확보 후 재-persist → 편입.
 3. #13/#14 제목 충돌 처리.
+
+---
+
+## 8. APPLY 결과 (WO-...-CANONICAL-PROMOTION-APPLY-V1)
+
+- 결정 반영: source_type = **`mfds_drug_otc_nutrition_combo`**(신규, entity union 등재) / content = self-contained `mdToHtml`.
+- 실행: `--apply` + `DRUG_OTC_NUTRITION_COMBO_CANONICAL_APPLY_CONFIRM=YES`, **단일 트랜잭션**(INSERT 후 트랜잭션 내 post-count==expected + master-canonical 중복 검사 → 불일치 시 rollback).
+- pre-state: 신규 source canonical 0 / 전체 canonical 15,962.
+
+| 항목 | 결과 |
+|------|-----:|
+| ELIGIBLE(masterIds) | 18 |
+| **신규 canonical INSERT (dbWrite)** | **1,890** |
+| 기존 canonical 보존 | 1,366 |
+| BLOCKED (미승격) | 2 (비타민C·mgB) |
+| 트랜잭션 post-count | inserted 1,890 == expected 1,890 ✅ |
+
+### 독립 사후검증 (별도 SELECT)
+
+| 검사 | 결과 |
+|------|------|
+| 신규 source canonical | **1,890** |
+| 전체 canonical | **17,852** (=15,962+1,890) |
+| master-canonical 중복 | **0** (partial-unique 준수) |
+| 신규 1,890행 content HTML(`<h2>…`) / source_ref 설정 / ko | 1,890 / 1,890 / 1,890 |
+| distinct source_ref(candidate) | 15 (newInsert>0 그룹 = 18−3 no-op) |
+| draft review_status | 23건 `needs_review` 불변 |
+| draft masterIds / bodyMarkdown | 18 / 23 보존 |
+
+### DB write 범위 확인
+- 변경: `shared_product_descriptions` **INSERT 1,890행**(status='canonical', source_type='mfds_drug_otc_nutrition_combo', content=HTML).
+- 무변경: 기존 canonical UPDATE 0 / draft content_json·seed_json·review_status / ProductMaster·ProductIdentifier / 매장 연결.
+- excluded 3 + mismatch 2 = master 미접촉(그들 그룹은 INSERT 대상 아님).
+
+→ **영양제류 복합제 18그룹 canonical 승격 완료.** display 는 (master_id, status='canonical')로 조회하므로 해당 3,256 master(신규 1,890 + 기존 1,366) 매장 상품에 설명서 노출 가능.

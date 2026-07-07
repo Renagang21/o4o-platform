@@ -30,8 +30,8 @@
 
 const RUN_ID = 'otc-nutrition-combo-draft-v1';
 const SOURCE_LABEL = 'MFDS_DRUG_OTC';
-/** 승격 SPD source_type. entity union 은 'mfds_easy_drug' 를 이미 포함(파생 출처 동일) → 신규 enum 추가 불필요. */
-const PROMOTION_SOURCE_TYPE = 'mfds_easy_drug';
+/** 승격 SPD source_type (사용자 확정): e약은요 파생이나 O4O 가공 canonical 이라 감사·rollback·필터 위해 전용 값. entity union 등재됨. */
+const PROMOTION_SOURCE_TYPE = 'mfds_drug_otc_nutrition_combo';
 const PROMOTION_LANGUAGE = 'ko';
 
 /** REVIEW-PREP CHECK 의 pass 20 candidate_id (SSOT: CHECK-...-REVIEW-CANONICAL-PREP-V1 §5) */
@@ -76,6 +76,10 @@ interface GroupPlan {
   newCanonicalInsert: number;
   contentHtmlLen: number;
   reason: string;
+  // apply payload (write phase 전용)
+  masterIds: string[];
+  contentHtml: string;
+  summary: string | null;
 }
 
 /** bodyMarkdown → HTML (이 draft 본문 구조 전용: ## 제목 / 파이프 표 / **볼드** / 문단). 외부 의존 없음. */
@@ -166,6 +170,7 @@ async function main(): Promise<void> {
           targetMasters: 0, validOtcMasters: 0, existingCanonical: 0, alreadyApplied: 0,
           newCanonicalInsert: 0, contentHtmlLen: 0,
           reason: 'NO_MASTERIDS: MEMBERSHIP-PERSIST 미저장 그룹(mismatch) — 승격 보류',
+          masterIds: [], contentHtml: '', summary: null,
         });
         continue;
       }
@@ -190,23 +195,7 @@ async function main(): Promise<void> {
 
       const contentHtml = mdToHtml(String((d.content_json as any)?.bodyMarkdown ?? d.content_html ?? ''));
       if (!sampleHtml) sampleHtml = contentHtml;
-
-      if (apply && newInsert > 0) {
-        const summary =
-          String((d.content_json as any)?.summaryTable?.['사용목적'] ?? '') || null;
-        const res = await ds.query(
-          `INSERT INTO shared_product_descriptions
-             (master_id, content, summary, source_type, source_ref_id, status, language, created_at, updated_at)
-           SELECT mid, $4, $5, $2, $3::uuid, 'canonical', $6, now(), now()
-           FROM unnest($1::uuid[]) mid
-           WHERE NOT EXISTS(
-             SELECT 1 FROM shared_product_descriptions s
-             WHERE s.master_id=mid AND s.deleted_at IS NULL AND s.status='canonical')
-           RETURNING id`,
-          [masterIds, PROMOTION_SOURCE_TYPE, d.candidate_id, contentHtml, summary, PROMOTION_LANGUAGE],
-        );
-        insertedTotal += Array.isArray(res) ? res.length : 0;
-      }
+      const summary = String((d.content_json as any)?.summaryTable?.['사용목적'] ?? '') || null;
 
       const otcWarn = validOtc !== masterIds.length ? ` ⚠️validOtc ${validOtc}/${masterIds.length}` : '';
       plans.push({
@@ -215,7 +204,60 @@ async function main(): Promise<void> {
         existingCanonical, alreadyApplied, newCanonicalInsert: newInsert,
         contentHtmlLen: contentHtml.length,
         reason: `masterIds 기반 승격 대상${otcWarn}`,
+        masterIds, contentHtml, summary,
       });
+    }
+
+    // ── apply: 단일 트랜잭션으로 eligible 그룹 canonical INSERT + post-count ──
+    const eligibleForWrite = plans.filter((p) => p.hasMasterIds);
+    if (eligibleForWrite.some((p) => p.validOtcMasters !== p.targetMasters)) {
+      throw new Error('otc 방어검증 실패 — masterIds 에 비-OTC master 포함, apply 중단');
+    }
+    let postInsertedByGroup: { candidateId: string; inserted: number }[] = [];
+    if (apply) {
+      const qr = ds.createQueryRunner();
+      await qr.connect();
+      await qr.startTransaction();
+      try {
+        for (const p of eligibleForWrite) {
+          const res = await qr.query(
+            `INSERT INTO shared_product_descriptions
+               (master_id, content, summary, source_type, source_ref_id, status, language, created_at, updated_at)
+             SELECT mid, $4, $5, $2, $3::uuid, 'canonical', $6, now(), now()
+             FROM unnest($1::uuid[]) mid
+             WHERE NOT EXISTS(
+               SELECT 1 FROM shared_product_descriptions s
+               WHERE s.master_id=mid AND s.deleted_at IS NULL AND s.status='canonical')
+             RETURNING id`,
+            [p.masterIds, PROMOTION_SOURCE_TYPE, p.candidateId, p.contentHtml, p.summary, PROMOTION_LANGUAGE],
+          );
+          const n = Array.isArray(res) ? res.length : 0;
+          insertedTotal += n;
+          postInsertedByGroup.push({ candidateId: p.candidateId, inserted: n });
+        }
+        // post-count 검증: 실제 insert 합 == 예상 newInsert 합, master 당 canonical 중복 0
+        const expected = eligibleForWrite.reduce((n, p) => n + Math.max(0, p.newCanonicalInsert), 0);
+        const [{ dup }]: { dup: string }[] = await qr.query(
+          `SELECT count(*) AS dup FROM (
+             SELECT master_id FROM shared_product_descriptions
+             WHERE status='canonical' AND deleted_at IS NULL
+             GROUP BY master_id HAVING count(*) > 1) t`,
+        );
+        if (insertedTotal !== expected) {
+          await qr.rollbackTransaction();
+          throw new Error(`post-count 불일치 → rollback. inserted=${insertedTotal} expected=${expected}`);
+        }
+        if (Number(dup) > 0) {
+          await qr.rollbackTransaction();
+          throw new Error(`master 당 canonical 중복 ${dup} 감지 → rollback`);
+        }
+        await qr.commitTransaction();
+      } catch (e) {
+        if (qr.isTransactionActive) await qr.rollbackTransaction();
+        throw e;
+      } finally {
+        await qr.release();
+      }
     }
 
     const eligible = plans.filter((p) => p.hasMasterIds);
@@ -232,8 +274,16 @@ async function main(): Promise<void> {
       expectedNewCanonicalInsert: expectedInsert, preservedExistingCanonical: preservedCanonical,
       otcDefenseMismatchGroups: otcMismatch.length,
       insertedTotal: apply ? insertedTotal : 0, dbWrite: apply ? insertedTotal : 0,
+      postInsertedByGroup: apply ? postInsertedByGroup : [],
       contentFormat: 'html (bodyMarkdown→mdToHtml)',
-      plans,
+      sourceType: PROMOTION_SOURCE_TYPE,
+      // 무거운 필드(masterIds 배열·contentHtml) 제외한 lean plan
+      plans: plans.map((p) => ({
+        candidateId: p.candidateId, title: p.title, groupKey: p.groupKey, hasMasterIds: p.hasMasterIds,
+        targetMasters: p.targetMasters, validOtcMasters: p.validOtcMasters,
+        existingCanonical: p.existingCanonical, alreadyApplied: p.alreadyApplied,
+        newCanonicalInsert: p.newCanonicalInsert, contentHtmlLen: p.contentHtmlLen, reason: p.reason,
+      })),
     };
 
     console.log('───────────────────────────────────────────────');
