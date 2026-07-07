@@ -676,3 +676,35 @@ export async function getImageQualitySummary(): Promise<Record<string, number>> 
   );
   return res.data?.data ?? {};
 }
+
+// ─── Product Master Notes (내부 운영 메모, 첫 write) ──────────────────────────
+// WO-O4O-ADMIN-O4O-PRODUCT-MASTER-NOTE-V1
+
+export interface ProductMasterNote {
+  id: string;
+  productMasterId: string;
+  note: string;
+  visibility: string;
+  createdBy: string;
+  createdByName: string | null;
+  createdAt: string;
+}
+
+export async function listProductMasterNotes(id: string): Promise<ProductMasterNote[]> {
+  const res = await authClient.api.get<{ success: boolean; data: ProductMasterNote[] }>(
+    `/admin/o4o-product-db/masters/${id}/notes`,
+  );
+  return res.data?.data ?? [];
+}
+
+export async function addProductMasterNote(id: string, note: string): Promise<ProductMasterNote | null> {
+  const res = await authClient.api.post<{ success: boolean; data: ProductMasterNote }>(
+    `/admin/o4o-product-db/masters/${id}/notes`,
+    { note },
+  );
+  return res.data?.data ?? null;
+}
+
+export async function deleteProductMasterNote(id: string, noteId: string): Promise<void> {
+  await authClient.api.delete(`/admin/o4o-product-db/masters/${id}/notes/${noteId}`);
+}

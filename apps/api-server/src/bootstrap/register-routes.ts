@@ -477,6 +477,16 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Product Image Quality routes:', imageQualityError);
     }
 
+    // 24-e2g. Register Product Master Note routes (첫 write — 내부 운영 메모, ProductMaster 무변경)
+    //         (WO-O4O-ADMIN-O4O-PRODUCT-MASTER-NOTE-V1)
+    try {
+      const { createProductMasterNoteController } = await import('../modules/neture/controllers/product-master-note.controller.js');
+      app.use('/api/v1/admin/o4o-product-db/masters', createProductMasterNoteController(dataSource));
+      logger.info('✅ Product Master Note routes registered at /api/v1/admin/o4o-product-db/masters/:id/notes');
+    } catch (masterNoteError) {
+      logger.error('Failed to register Product Master Note routes:', masterNoteError);
+    }
+
     // 24-e3. Register Mobile Product Draft routes (WO-O4O-MOBILE-PRODUCT-DRAFT-TO-CANDIDATE-V1, Phase 4)
     try {
       const { createMobileProductDraftController } = await import('../modules/neture/controllers/mobile-product-draft.controller.js');

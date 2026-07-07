@@ -13,15 +13,56 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import { getProductMaster, ProductMasterDetail, getProductUsageLinks, ProductUsageLinks } from '@/api/o4o-product-db.api';
+import {
+  getProductMaster, ProductMasterDetail, getProductUsageLinks, ProductUsageLinks,
+  listProductMasterNotes, addProductMasterNote, deleteProductMasterNote, ProductMasterNote,
+} from '@/api/o4o-product-db.api';
 
 export default function ProductMasterDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [row, setRow] = useState<ProductMasterDetail | null>(null);
   const [usage, setUsage] = useState<ProductUsageLinks | null>(null);
+  const [notes, setNotes] = useState<ProductMasterNote[]>([]);
+  const [noteText, setNoteText] = useState('');
+  const [noteBusy, setNoteBusy] = useState(false);
+  const [noteError, setNoteError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const reloadNotes = async () => {
+    if (!id) return;
+    try { setNotes(await listProductMasterNotes(id)); } catch { /* 무시(read-only 표시 유지) */ }
+  };
+  const submitNote = async () => {
+    if (!id) return;
+    const body = noteText.trim();
+    if (!body) return;
+    setNoteBusy(true);
+    setNoteError(null);
+    try {
+      await addProductMasterNote(id, body);
+      setNoteText('');
+      await reloadNotes();
+    } catch (e: any) {
+      setNoteError(e?.response?.data?.error || e?.message || '메모 추가에 실패했습니다');
+    } finally {
+      setNoteBusy(false);
+    }
+  };
+  const removeNote = async (noteId: string) => {
+    if (!id) return;
+    setNoteBusy(true);
+    setNoteError(null);
+    try {
+      await deleteProductMasterNote(id, noteId);
+      await reloadNotes();
+    } catch (e: any) {
+      setNoteError(e?.response?.data?.error || e?.message || '메모 삭제에 실패했습니다');
+    } finally {
+      setNoteBusy(false);
+    }
+  };
 
   useEffect(() => {
     if (!id) return;
@@ -40,6 +81,8 @@ export default function ProductMasterDetailPage() {
     })();
     // 활용 연결(별도 read-only GET) — 실패해도 상세 렌더에 영향 없음
     getProductUsageLinks(id).then((u) => { if (alive) setUsage(u); }).catch(() => { if (alive) setUsage(null); });
+    // 내부 운영 메모(별도 GET)
+    listProductMasterNotes(id).then((n) => { if (alive) setNotes(n); }).catch(() => { if (alive) setNotes([]); });
     return () => { alive = false; };
   }, [id]);
 
@@ -274,9 +317,55 @@ export default function ProductMasterDetailPage() {
             </div>
           </PanelSection>
 
-          {/* 관리 메모 — 후속 write */}
-          <PanelSection title="관리 메모">
-            <FollowupNote>관리 메모(write) 기능은 후속 WO 에서 제공됩니다. 이번 WO 는 GET-only.</FollowupNote>
+          {/* 관리 메모 — 내부 운영 메모(append + soft delete). ProductMaster 본문 무변경 */}
+          <PanelSection title={`관리 메모 (${notes.length})`}>
+            <div className="text-xs text-gray-500 bg-gray-50 border border-gray-200 rounded p-2 mb-3">
+              이 메모는 <b>내부 운영 기록</b>입니다. 상품명·바코드·설명·이미지 데이터는 변경되지 않습니다.
+            </div>
+            {noteError && <div className="text-xs text-red-600 mb-2">{noteError}</div>}
+            <div className="flex flex-col gap-2 mb-4">
+              <textarea
+                value={noteText}
+                onChange={(e) => setNoteText(e.target.value)}
+                placeholder="확인 사항 / 보류 사유 / 후속 작업을 기록하세요"
+                rows={3}
+                maxLength={4000}
+                className="border border-gray-300 rounded px-3 py-2 text-sm resize-y"
+              />
+              <div className="flex justify-end">
+                <button
+                  onClick={submitNote}
+                  disabled={noteBusy || !noteText.trim()}
+                  className="bg-admin-blue text-white px-4 py-1.5 rounded text-sm disabled:opacity-40"
+                >
+                  메모 추가
+                </button>
+              </div>
+            </div>
+            {notes.length === 0 ? (
+              <div className="text-sm text-gray-400">아직 등록된 메모가 없습니다.</div>
+            ) : (
+              <ul className="divide-y divide-gray-100 border border-gray-200 rounded-lg">
+                {notes.map((n) => (
+                  <li key={n.id} className="px-3 py-2 flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-sm text-gray-800 whitespace-pre-wrap break-words">{n.note}</p>
+                      <div className="text-xs text-gray-400 mt-1">
+                        {n.createdByName || n.createdBy?.slice(0, 8)} · {n.createdAt?.slice(0, 16).replace('T', ' ')}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => removeNote(n.id)}
+                      disabled={noteBusy}
+                      className="text-xs text-gray-400 hover:text-red-500 shrink-0 disabled:opacity-40"
+                      title="숨김(soft delete)"
+                    >
+                      숨김
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
           </PanelSection>
 
           {/* 작업 이력 — 후속 audit */}
