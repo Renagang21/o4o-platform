@@ -754,13 +754,26 @@ export interface ProductMasterImageAdded {
   createdAt: string;
 }
 
-/** 이미지 추가 (multipart). Content-Type 은 수동 설정하지 않는다(boundary 자동). */
+/**
+ * 이미지 추가 (multipart).
+ * authClient.api 인스턴스는 기본 Content-Type: application/json 을 강제하므로,
+ * FormData 전송 시 이를 제거해 브라우저가 multipart/form-data + boundary 를 설정하게 한다.
+ * (제거하지 않으면 서버 multer 가 body 를 파싱하지 못해 req.file 이 비어 NO_FILE 400)
+ */
 export async function uploadProductMasterImage(id: string, file: File): Promise<ProductMasterImageAdded | null> {
   const formData = new FormData();
   formData.append('image', file);
   const res = await authClient.api.post<{ success: boolean; data: ProductMasterImageAdded }>(
     `/admin/o4o-product-db/masters/${id}/images`,
     formData,
+    {
+      transformRequest: (data: unknown, headers?: any) => {
+        // AxiosHeaders(.delete) / plain object 양쪽 대응 — Content-Type 제거
+        if (headers?.delete) headers.delete('Content-Type');
+        if (headers) { delete headers['Content-Type']; delete headers['content-type']; }
+        return data;
+      },
+    },
   );
   return res.data?.data ?? null;
 }
