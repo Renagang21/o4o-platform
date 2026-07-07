@@ -13,7 +13,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ImagePlus } from 'lucide-react';
-import usePermissions from '@/hooks/usePermissions';
 import {
   getProductMaster, ProductMasterDetail, getProductUsageLinks, ProductUsageLinks,
   listProductMasterNotes, addProductMasterNote, deleteProductMasterNote, ProductMasterNote,
@@ -33,8 +32,8 @@ export default function ProductMasterDetailPage() {
   const [noteError, setNoteError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  // WO-O4O-ADMIN-O4O-PRODUCT-IMAGE-ACTION-V1: 이미지 추가 / 대표 지정 (admin write)
-  const { isAdmin } = usePermissions();
+  // WO-O4O-ADMIN-O4O-PRODUCT-IMAGE-ACTION-V1: 이미지 추가 / 대표 지정 (admin write).
+  // 권한 게이트는 라우트(AdminProtectedRoute: admin/super_admin) + 백엔드(ADMIN_ROLES). 메모 write 와 동일 패턴.
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imageBusy, setImageBusy] = useState(false);
   const [imageError, setImageError] = useState<string | null>(null);
@@ -228,7 +227,7 @@ export default function ProductMasterDetailPage() {
                   <MasterThumb
                     key={img.id}
                     img={img}
-                    canAct={isAdmin && !img.isPrimary}
+                    canAct={!img.isPrimary}
                     busy={imageBusy}
                     onSetPrimary={() => onSetPrimary(img.id)}
                   />
@@ -238,19 +237,17 @@ export default function ProductMasterDetailPage() {
               <div className="text-sm text-gray-400">이미지 없음</div>
             )}
 
-            {isAdmin && (
-              <div className="mt-3 flex flex-wrap items-center gap-3">
-                <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={onFileSelected} />
-                <button
-                  onClick={onPickImage}
-                  disabled={imageBusy}
-                  className="flex items-center gap-1.5 bg-admin-blue text-white px-3 py-2 rounded text-sm disabled:opacity-50"
-                >
-                  <ImagePlus className="w-4 h-4" /> {imageBusy ? '처리 중…' : '이미지 추가'}
-                </button>
-                <span className="text-xs text-gray-400">첫 이미지는 자동으로 대표가 됩니다. 숨김·교체·삭제는 제공하지 않습니다.</span>
-              </div>
-            )}
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={onFileSelected} />
+              <button
+                onClick={onPickImage}
+                disabled={imageBusy}
+                className="flex items-center gap-1.5 bg-admin-blue text-white px-3 py-2 rounded text-sm disabled:opacity-50"
+              >
+                <ImagePlus className="w-4 h-4" /> {imageBusy ? '처리 중…' : '이미지 추가'}
+              </button>
+              <span className="text-xs text-gray-400">첫 이미지는 자동으로 대표가 됩니다. 숨김·교체·삭제는 제공하지 않습니다.</span>
+            </div>
             {imageError && <div className="mt-2 text-sm text-red-600">{imageError}</div>}
 
             <div className="text-xs text-gray-400 mt-3">
