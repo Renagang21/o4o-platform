@@ -766,14 +766,15 @@ export async function uploadProductMasterImage(id: string, file: File): Promise<
   const res = await authClient.api.post<{ success: boolean; data: ProductMasterImageAdded }>(
     `/admin/o4o-product-db/masters/${id}/images`,
     formData,
-    {
+    // 좁은 AxiosRequestConfig 타입에 transformRequest 가 없어 as any (런타임 axios 는 지원)
+    ({
       transformRequest: (data: unknown, headers?: any) => {
-        // AxiosHeaders(.delete) / plain object 양쪽 대응 — Content-Type 제거
+        // AxiosHeaders(.delete) / plain object 양쪽 대응 — Content-Type 제거 → 브라우저가 boundary 설정
         if (headers?.delete) headers.delete('Content-Type');
         if (headers) { delete headers['Content-Type']; delete headers['content-type']; }
         return data;
       },
-    },
+    } as any),
   );
   return res.data?.data ?? null;
 }
