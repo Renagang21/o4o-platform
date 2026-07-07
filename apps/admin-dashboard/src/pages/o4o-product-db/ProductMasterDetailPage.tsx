@@ -16,6 +16,7 @@ import { ArrowLeft } from 'lucide-react';
 import {
   getProductMaster, ProductMasterDetail, getProductUsageLinks, ProductUsageLinks,
   listProductMasterNotes, addProductMasterNote, deleteProductMasterNote, ProductMasterNote,
+  getProductMasterAuditLog, ProductMasterAuditLog,
 } from '@/api/o4o-product-db.api';
 
 export default function ProductMasterDetailPage() {
@@ -24,15 +25,20 @@ export default function ProductMasterDetailPage() {
   const [row, setRow] = useState<ProductMasterDetail | null>(null);
   const [usage, setUsage] = useState<ProductUsageLinks | null>(null);
   const [notes, setNotes] = useState<ProductMasterNote[]>([]);
+  const [audit, setAudit] = useState<ProductMasterAuditLog | null>(null);
   const [noteText, setNoteText] = useState('');
   const [noteBusy, setNoteBusy] = useState(false);
   const [noteError, setNoteError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const reloadAudit = async () => {
+    if (!id) return;
+    try { setAudit(await getProductMasterAuditLog(id)); } catch { /* 무시 */ }
+  };
   const reloadNotes = async () => {
     if (!id) return;
-    try { setNotes(await listProductMasterNotes(id)); } catch { /* 무시(read-only 표시 유지) */ }
+    try { setNotes(await listProductMasterNotes(id)); await reloadAudit(); } catch { /* 무시(read-only 표시 유지) */ }
   };
   const submitNote = async () => {
     if (!id) return;
@@ -83,6 +89,8 @@ export default function ProductMasterDetailPage() {
     getProductUsageLinks(id).then((u) => { if (alive) setUsage(u); }).catch(() => { if (alive) setUsage(null); });
     // 내부 운영 메모(별도 GET)
     listProductMasterNotes(id).then((n) => { if (alive) setNotes(n); }).catch(() => { if (alive) setNotes([]); });
+    // 작업 이력(별도 GET)
+    getProductMasterAuditLog(id).then((a) => { if (alive) setAudit(a); }).catch(() => { if (alive) setAudit(null); });
     return () => { alive = false; };
   }, [id]);
 
@@ -368,9 +376,36 @@ export default function ProductMasterDetailPage() {
             )}
           </PanelSection>
 
-          {/* 작업 이력 — 후속 audit */}
-          <PanelSection title="작업 이력">
-            <FollowupNote>변경/승격/검수 audit log 는 후속 WO 에서 제공됩니다.</FollowupNote>
+          {/* 작업 이력 — 확실한 이벤트 source 타임라인 (read-only) */}
+          <PanelSection title={`작업 이력 (${audit?.items.length ?? 0})`}>
+            {audit && audit.items.length > 0 ? (
+              <ol className="relative border-l border-gray-200 ml-2 pl-4 space-y-3">
+                {audit.items.map((it) => (
+                  <li key={it.id} className="relative">
+                    <span className="absolute -left-[1.4rem] top-1 w-2 h-2 rounded-full bg-admin-blue" />
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <AuditActionBadge action={it.action} />
+                      <span className="text-sm text-gray-800 truncate max-w-md">{it.summary}</span>
+                    </div>
+                    <div className="text-xs text-gray-400 mt-0.5">
+                      {it.actorName || (it.actorId ? it.actorId.slice(0, 8) : '시스템')} · {it.occurredAt?.slice(0, 16).replace('T', ' ')}
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <div className="text-sm text-gray-400">
+                현재 기록된 작업 이력이 없습니다. 향후 메모·이미지·설명 검토 action이 이 영역에 표시됩니다.
+              </div>
+            )}
+            {audit && audit.gaps.length > 0 && (
+              <details className="mt-3 text-xs text-gray-400">
+                <summary className="cursor-pointer">아직 기록되지 않는 이력 영역 ({audit.gaps.length})</summary>
+                <ul className="mt-1 space-y-1 pl-3 list-disc">
+                  {audit.gaps.map((g) => <li key={g.area}><b>{g.area}</b> — {g.reason}</li>)}
+                </ul>
+              </details>
+            )}
           </PanelSection>
         </div>
       )}
@@ -488,6 +523,17 @@ function MasterThumb({ url, primary }: { url: string; primary: boolean }) {
       {primary && <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-black/60 text-white text-[10px]">primary</span>}
     </div>
   );
+}
+
+const AUDIT_ACTION_LABEL: Record<string, { label: string; cls: string }> = {
+  note_created: { label: '메모 작성', cls: 'bg-blue-100 text-blue-700' },
+  note_hidden: { label: '메모 숨김', cls: 'bg-gray-100 text-gray-500' },
+  description_curated: { label: '설명 지정', cls: 'bg-green-100 text-green-700' },
+  image_added: { label: '이미지 추가', cls: 'bg-amber-100 text-amber-700' },
+};
+function AuditActionBadge({ action }: { action: string }) {
+  const m = AUDIT_ACTION_LABEL[action] ?? { label: action, cls: 'bg-gray-100 text-gray-600' };
+  return <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${m.cls}`}>{m.label}</span>;
 }
 
 function statusLabel(v: string | null): string | null {

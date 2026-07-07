@@ -487,6 +487,16 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Product Master Note routes:', masterNoteError);
     }
 
+    // 24-e2h. Register Product Master Audit Log (read-only) — master 작업 이력 조회
+    //         (WO-O4O-ADMIN-O4O-PRODUCT-MASTER-AUDIT-LOG-VIEW-V1)
+    try {
+      const { createProductMasterAuditLogController } = await import('../modules/neture/controllers/product-master-audit-log.controller.js');
+      app.use('/api/v1/admin/o4o-product-db/masters', createProductMasterAuditLogController(dataSource));
+      logger.info('✅ Product Master Audit Log routes registered at /api/v1/admin/o4o-product-db/masters/:id/audit-logs');
+    } catch (auditLogError) {
+      logger.error('Failed to register Product Master Audit Log routes:', auditLogError);
+    }
+
     // 24-e3. Register Mobile Product Draft routes (WO-O4O-MOBILE-PRODUCT-DRAFT-TO-CANDIDATE-V1, Phase 4)
     try {
       const { createMobileProductDraftController } = await import('../modules/neture/controllers/mobile-product-draft.controller.js');

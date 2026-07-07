@@ -708,3 +708,34 @@ export async function addProductMasterNote(id: string, note: string): Promise<Pr
 export async function deleteProductMasterNote(id: string, noteId: string): Promise<void> {
   await authClient.api.delete(`/admin/o4o-product-db/masters/${id}/notes/${noteId}`);
 }
+
+// ─── Product Master Audit Log (작업 이력, read-only) ─────────────────────────
+// WO-O4O-ADMIN-O4O-PRODUCT-MASTER-AUDIT-LOG-VIEW-V1
+
+export interface AuditLogItem {
+  id: string;
+  source: 'product_master_notes' | 'shared_product_descriptions' | 'image';
+  action: 'note_created' | 'note_hidden' | 'description_curated' | 'image_added';
+  summary: string;
+  actorId: string | null;
+  actorName: string | null;
+  occurredAt: string;
+}
+
+export interface AuditLogGap {
+  area: string;
+  reason: string;
+}
+
+export interface ProductMasterAuditLog {
+  masterId: string;
+  items: AuditLogItem[];
+  gaps: AuditLogGap[];
+}
+
+export async function getProductMasterAuditLog(id: string): Promise<ProductMasterAuditLog | null> {
+  const res = await authClient.api.get<{ success: boolean; data: ProductMasterAuditLog }>(
+    `/admin/o4o-product-db/masters/${id}/audit-logs`,
+  );
+  return res.data?.data ?? null;
+}
