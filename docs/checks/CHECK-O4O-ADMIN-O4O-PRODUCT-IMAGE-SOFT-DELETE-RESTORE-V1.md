@@ -66,9 +66,27 @@ product_images 에만 write. ProductMaster 본문/설명/후보 무변경.
 8. ProductMaster `updated_at` 불변 / 설명·후보 mutation 0
 9. 허용 mutation: images DELETE / restore POST / set-primary POST / auth-login. GCS delete·row hard delete 0
 
-### smoke 결과
+### smoke 결과 (2026-07-07, PASS)
 
-> _(배포 후 채움)_
+배포: `56aafb454` (admin) + `ac2f7297a`/`56aafb454` (api) 배포 success.
+대상: `[E2E_TEST]` master `6f6f7be8-…` (검증 후 hard delete 로 원상복구, 0 images).
+방식: 로그인 세션 쿠키로 `api.neture.co.kr/api/v1` 엔드포인트 직접 호출(9-step 매트릭스) + DB 대조.
+
+| step | 결과 |
+|---|---|
+| upload×2 | 201 / 첫장 auto-primary, 둘째 non-primary |
+| 대표 숨김 → 승계 | 200, newPrimary = 다음 active (2회 검증) |
+| 복원(대표 있음) → 비대표 | 200, isPrimary=false |
+| 마지막 대표 숨김 → 대표 0 | 200, newPrimary=null |
+| 복원(대표 없음) → 대표 승격 | 200, isPrimary=true |
+| 이미 숨김 재숨김 | 404 |
+| active 이미지 복원 | 409 |
+
+DB 대조: active-primary count 항상 **1 이하**, **hard delete 0**(soft delete 만, 2행 보존),
+audit `image_added`×2 / `image_hidden`×3 / `image_primary_changed`×3 / `image_restored`×2,
+ProductMaster `updated_at` 불변, `shared_product_descriptions` 0. GCS delete 0(hide/restore).
+
+정리: smoke 이미지 2장 + audit 10행 + GCS 2오브젝트 hard delete 로 제거(master 원상복구).
 
 ## 7. 커밋
 
