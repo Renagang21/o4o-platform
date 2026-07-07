@@ -19,6 +19,8 @@ const ProductMastersPage = lazy(() => import('@/pages/o4o-product-db/ProductMast
 const ProductMasterDetailPage = lazy(() => import('@/pages/o4o-product-db/ProductMasterDetailPage'));
 const DescriptionReviewPage = lazy(() => import('@/pages/o4o-product-db/DescriptionReviewPage'));
 const DescriptionReviewDetailPage = lazy(() => import('@/pages/o4o-product-db/DescriptionReviewDetailPage'));
+const DrugDescriptionDraftsPage = lazy(() => import('@/pages/o4o-product-db/DrugDescriptionDraftsPage'));
+const DrugDescriptionDraftDetailPage = lazy(() => import('@/pages/o4o-product-db/DrugDescriptionDraftDetailPage'));
 const ProductDbMaintenancePage = lazy(() => import('@/pages/o4o-product-db/ProductDbMaintenancePage'));
 
 const PageLoader = () => (
@@ -48,6 +50,8 @@ export function O4OProductDbRoutes() {
       <Route path="masters/:id" element={<ProductMasterDetailPage />} />
       <Route path="review" element={<DescriptionReviewPage />} />
       <Route path="review/:id" element={<DescriptionReviewDetailPage />} />
+      <Route path="drug-description-drafts" element={<DrugDescriptionDraftsPage />} />
+      <Route path="drug-description-drafts/:id" element={<DrugDescriptionDraftDetailPage />} />
       <Route path="maintenance" element={<ProductDbMaintenancePage />} />
     </Route>,
   ];

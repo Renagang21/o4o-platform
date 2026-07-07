@@ -177,4 +177,127 @@ export class ProductCandidateDescriptionDraftService {
     );
     return Object.fromEntries(rows.map((r) => [r.review_status, Number(r.count)]));
   }
+
+  // ── WO-O4O-ADMIN-O4O-DRUG-DESCRIPTION-DRAFT-REVIEW-SHELL-V1: read-only admin 조회 ──
+
+  /** 목록(preview) — 본문 전체는 내려보내지 않음(요약/미리보기만). 모든 인자 parameterized. */
+  async listForAdmin(params: AdminDraftListParams): Promise<{ items: AdminDraftListRow[]; total: number }> {
+    const where: string[] = ['deleted_at IS NULL'];
+    const args: unknown[] = [];
+    const add = (clause: (i: number) => string, value: unknown) => {
+      args.push(value);
+      where.push(clause(args.length));
+    };
+    if (params.sourceLabel) add((i) => `source_label = $${i}`, params.sourceLabel);
+    if (params.applyRunId) add((i) => `seed_json->>'applyRunId' = $${i}`, params.applyRunId);
+    if (params.reviewStatus) add((i) => `review_status = $${i}`, params.reviewStatus);
+    if (params.draftType) add((i) => `draft_type = $${i}`, params.draftType);
+    if (params.language) add((i) => `language = $${i}`, params.language);
+    if (params.verdict) add((i) => `guard_result->>'verdict' = $${i}`, params.verdict);
+    if (params.q?.trim()) {
+      args.push(`%${params.q.trim()}%`);
+      const i = args.length;
+      where.push(`(title ILIKE $${i} OR source_identifier_value ILIKE $${i} OR candidate_id::text ILIKE $${i})`);
+    }
+    const whereSql = where.join(' AND ');
+
+    const [{ count }]: { count: string }[] = await this.dataSource.query(
+      `SELECT COUNT(*) AS count FROM product_candidate_description_drafts WHERE ${whereSql}`,
+      args,
+    );
+    const total = Number(count);
+
+    const limit = Math.min(Math.max(params.limit ?? 20, 1), 100);
+    const offset = Math.max(((params.page ?? 1) - 1) * limit, 0);
+    const rows: AdminDraftListRow[] = await this.dataSource.query(
+      `SELECT id, title, source_label AS "sourceLabel", language, review_status AS "reviewStatus",
+        draft_type AS "draftType", source_identifier_value AS "groupKey", candidate_id AS "anchorCandidateId",
+        guard_result->>'verdict' AS verdict,
+        seed_json->>'applyRunId' AS "applyRunId",
+        NULLIF(seed_json->'groupScope'->>'masterTotal','')::int AS "masterTotal",
+        NULLIF(seed_json->'groupScope'->>'otc','')::int AS otc,
+        NULLIF(seed_json->'groupScope'->>'rx','')::int AS rx,
+        NULLIF(seed_json->'groupScope'->>'manufacturers','')::int AS manufacturers,
+        NULLIF(seed_json->'groupScope'->>'spdMasters','')::int AS "spdMasters",
+        review_flags AS "reviewFlags",
+        LEFT(content_json->>'efficacy', 140) AS "efficacyPreview",
+        created_at AS "createdAt", updated_at AS "updatedAt"
+       FROM product_candidate_description_drafts
+       WHERE ${whereSql}
+       ORDER BY created_at ASC, title ASC
+       LIMIT ${limit} OFFSET ${offset}`,
+      args,
+    );
+    return { items: rows, total };
+  }
+
+  /** 상세 — content_json/seed_json/guard_result 전체(read-only). */
+  async getByIdForAdmin(id: string): Promise<AdminDraftDetail | null> {
+    const rows: AdminDraftDetail[] = await this.dataSource.query(
+      `SELECT id, candidate_id AS "anchorCandidateId", source_label AS "sourceLabel",
+        source_identifier_value AS "groupKey", draft_type AS "draftType", language,
+        title, summary, content_json AS "contentJson", seed_json AS "seedJson",
+        guard_result AS "guardResult", review_status AS "reviewStatus", review_flags AS "reviewFlags",
+        ai_provider AS "aiProvider", ai_model AS "aiModel",
+        created_at AS "createdAt", updated_at AS "updatedAt"
+       FROM product_candidate_description_drafts
+       WHERE id = $1 AND deleted_at IS NULL`,
+      [id],
+    );
+    return rows[0] ?? null;
+  }
+}
+
+export interface AdminDraftListParams {
+  sourceLabel?: string;
+  applyRunId?: string;
+  reviewStatus?: string;
+  draftType?: string;
+  language?: string;
+  verdict?: string;
+  q?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface AdminDraftListRow {
+  id: string;
+  title: string | null;
+  sourceLabel: string;
+  language: string;
+  reviewStatus: string;
+  draftType: string;
+  groupKey: string | null;
+  anchorCandidateId: string;
+  verdict: string | null;
+  applyRunId: string | null;
+  masterTotal: number | null;
+  otc: number | null;
+  rx: number | null;
+  manufacturers: number | null;
+  spdMasters: number | null;
+  reviewFlags: string[];
+  efficacyPreview: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminDraftDetail {
+  id: string;
+  anchorCandidateId: string;
+  sourceLabel: string;
+  groupKey: string | null;
+  draftType: string;
+  language: string;
+  title: string | null;
+  summary: string | null;
+  contentJson: Record<string, unknown>;
+  seedJson: Record<string, unknown>;
+  guardResult: Record<string, unknown>;
+  reviewStatus: string;
+  reviewFlags: string[];
+  aiProvider: string | null;
+  aiModel: string | null;
+  createdAt: string;
+  updatedAt: string;
 }

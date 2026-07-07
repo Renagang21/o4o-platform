@@ -392,3 +392,95 @@ export async function getBulkCanonicalDryRun(
   );
   return res.data?.data ?? null;
 }
+
+// ─── ProductCandidate Description Draft (read-only 검토 shell) ────────────────
+// WO-O4O-ADMIN-O4O-DRUG-DESCRIPTION-DRAFT-REVIEW-SHELL-V1
+// mount: /api/v1/admin/product-candidate-description-drafts (GET only)
+
+export interface DrugDescriptionDraftRow {
+  id: string;
+  title: string | null;
+  sourceLabel: string;
+  language: string;
+  reviewStatus: string;
+  draftType: string;
+  groupKey: string | null;
+  anchorCandidateId: string;
+  verdict: string | null;
+  applyRunId: string | null;
+  masterTotal: number | null;
+  otc: number | null;
+  rx: number | null;
+  manufacturers: number | null;
+  spdMasters: number | null;
+  reviewFlags: string[];
+  efficacyPreview: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DrugDescriptionDraftListParams {
+  sourceLabel?: string;
+  applyRunId?: string;
+  reviewStatus?: string;
+  verdict?: string;
+  q?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface DrugDescriptionDraftListResult {
+  items: DrugDescriptionDraftRow[];
+  meta: ProductMasterListMeta;
+}
+
+export async function listDrugDescriptionDrafts(
+  params: DrugDescriptionDraftListParams = {},
+): Promise<DrugDescriptionDraftListResult> {
+  const query: Record<string, string> = {};
+  if (params.sourceLabel) query.sourceLabel = params.sourceLabel;
+  if (params.applyRunId) query.applyRunId = params.applyRunId;
+  if (params.reviewStatus) query.reviewStatus = params.reviewStatus;
+  if (params.verdict) query.verdict = params.verdict;
+  if (params.q?.trim()) query.q = params.q.trim();
+  query.page = String(params.page ?? 1);
+  query.limit = String(params.limit ?? 20);
+
+  const res = await authClient.api.get<{
+    success: boolean;
+    data: DrugDescriptionDraftRow[];
+    meta: ProductMasterListMeta;
+  }>(`/admin/product-candidate-description-drafts?${new URLSearchParams(query).toString()}`);
+
+  return {
+    items: res.data?.data ?? [],
+    meta: res.data?.meta ?? { page: 1, limit: 20, total: 0, totalPages: 0 },
+  };
+}
+
+export interface DrugDescriptionDraftDetail {
+  id: string;
+  anchorCandidateId: string;
+  sourceLabel: string;
+  groupKey: string | null;
+  draftType: string;
+  language: string;
+  title: string | null;
+  summary: string | null;
+  contentJson: Record<string, unknown>;
+  seedJson: Record<string, unknown>;
+  guardResult: Record<string, unknown>;
+  reviewStatus: string;
+  reviewFlags: string[];
+  aiProvider: string | null;
+  aiModel: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export async function getDrugDescriptionDraft(id: string): Promise<DrugDescriptionDraftDetail | null> {
+  const res = await authClient.api.get<{ success: boolean; data: DrugDescriptionDraftDetail }>(
+    `/admin/product-candidate-description-drafts/${id}`,
+  );
+  return res.data?.data ?? null;
+}
