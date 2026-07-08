@@ -24,6 +24,8 @@ import Color from '@tiptap/extension-color';
 import { ProductDetailLayout } from '../extensions/productDetailLayout';
 // WO-O4O-CONTENT-EDITOR-TABLE-SUPPORT-STANDARDIZATION-V1: 표준 Table 확장 4종 + 표시 CSS
 import { TABLE_EXTENSIONS, TABLE_STYLES } from '../extensions/tableKit';
+// WO-O4O-CONTENT-EDITOR-VIDEO-STANDARDIZATION-V1: HTML5 <video> 노드(o4o_storage/external) + CSS
+import { VideoNode, VIDEO_STYLES } from '../extensions/videoNode';
 import { BUILTIN_TEMPLATES, isBuiltinTemplateId } from '../builtinTemplates';
 
 import { Toolbar } from './Toolbar';
@@ -144,6 +146,8 @@ export function RichTextEditor({
       ProductDetailLayout,
       // WO-O4O-CONTENT-EDITOR-TABLE-SUPPORT-STANDARDIZATION-V1: Table/Row/Header/Cell
       ...TABLE_EXTENSIONS,
+      // WO-O4O-CONTENT-EDITOR-VIDEO-STANDARDIZATION-V1: HTML5 <video>(o4o_storage/external)
+      VideoNode,
     ],
     content: value,
     editable,
@@ -591,6 +595,7 @@ export function RichTextEditor({
       <style>{editorStyles}</style>
       <style>{IMAGE_DISPLAY_STYLES}</style>
       <style>{TABLE_STYLES}</style>
+      <style>{VIDEO_STYLES}</style>
     </div>
   );
 }

@@ -63,13 +63,18 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
     if (onRequestImageInsert) onRequestImageInsert(url);
     else editor?.chain().focus().setImage({ src: url }).run();
   };
-  // WO-O4O-CONTENT-ASSET-MEDIA-LIBRARY-STANDARDIZATION-V1 §8: Media Type 인지형 삽입.
-  // WO-1 범위 = image + video(sourceType='youtube') 만 실제 처리.
-  // mp4/O4O Storage/External video 는 WO-3 에서 시그니처 변경 없이 확장한다.
+  // WO-O4O-CONTENT-ASSET-MEDIA-LIBRARY-STANDARDIZATION-V1 §8 + WO-O4O-CONTENT-EDITOR-VIDEO-STANDARDIZATION-V1:
+  //   Media Type 인지형 삽입. sourceType 3종 분기(youtube=iframe / o4o_storage·external=HTML5 <video>).
   const insertMediaIntoEditor = (media: MediaInsert) => {
     if (media.type === 'video') {
-      // 동영상은 기존 YouTube 경로만 유지(WO-1). youtube/vimeo URL 은 setYoutubeVideo 가 처리.
-      if (media.url) editor?.chain().focus().setYoutubeVideo({ src: media.url }).run();
+      if (!media.url) return;
+      const st = media.sourceType;
+      // o4o_storage / external → HTML5 <video>. youtube(및 미지정 youtube/vimeo URL) → iframe.
+      if (st === 'o4o_storage' || st === 'external') {
+        editor?.chain().focus().setVideo({ src: media.url, poster: media.thumbnailUrl ?? null, sourceType: st, title: media.title ?? null }).run();
+      } else {
+        editor?.chain().focus().setYoutubeVideo({ src: media.url }).run();
+      }
       return;
     }
     insertImg(media.url);
@@ -148,7 +153,7 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
 
   const handleAddVideo = () => {
     if (videoUrl) {
-      // YouTube URL 처리
+      // YouTube URL 처리 (기존 iframe 경로 — 하위호환)
       if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
         editor.chain().focus().setYoutubeVideo({ src: videoUrl }).run();
       }
@@ -160,6 +165,10 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
             src: `https://player.vimeo.com/video/${vimeoId}`
           }).run();
         }
+      }
+      // WO-O4O-CONTENT-EDITOR-VIDEO-STANDARDIZATION-V1: 그 외 URL(mp4 등 external) → HTML5 <video>
+      else {
+        editor.chain().focus().setVideo({ src: videoUrl, sourceType: 'external' }).run();
       }
       setVideoUrl('');
       setShowVideoInput(false);
@@ -723,7 +732,7 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
               minWidth: '300px',
             }}>
               <div style={{ marginBottom: '8px', fontSize: '13px', color: '#6b7280' }}>
-                YouTube 또는 Vimeo URL 입력
+                동영상 URL 입력 (YouTube · Vimeo · mp4 등)
               </div>
               <div style={{ display: 'flex', gap: '4px' }}>
                 <input
@@ -759,7 +768,7 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
                 fontSize: '11px',
                 color: '#9ca3af'
               }}>
-                지원: YouTube, Vimeo
+                지원: YouTube · Vimeo · mp4/webm 등 동영상 URL
               </div>
             </div>
           )}

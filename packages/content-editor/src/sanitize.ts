@@ -52,7 +52,12 @@ export function sanitizeRichHtml(dirty: string): string {
     ADD_TAGS: ['iframe'],
     // WO-O4O-CONTENT-EDITOR-TABLE-SUPPORT-STANDARDIZATION-V1: TipTap 표 열 폭(colwidth) 보존.
     //   table/thead/tbody/tr/td/th/colgroup/col/colspan/rowspan 은 DOMPurify 기본 allowlist 로 이미 통과.
-    ADD_ATTR: ['allowfullscreen', 'frameborder', 'allow', 'width', 'height', 'colwidth'],
+    // WO-O4O-CONTENT-EDITOR-VIDEO-STANDARDIZATION-V1: HTML5 <video> 속성 보존.
+    //   video/source 태그와 src 는 DOMPurify 기본 통과(URL javascript: 등은 DOMPurify 가 차단).
+    ADD_ATTR: [
+      'allowfullscreen', 'frameborder', 'allow', 'width', 'height', 'colwidth',
+      'poster', 'controls', 'preload', 'playsinline',
+    ],
   });
 
   // 브라우저 환경에서만 iframe src 후처리 (YouTube/Vimeo 외 제거)

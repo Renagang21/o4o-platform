@@ -17,6 +17,8 @@ import { sanitizeRichHtml } from '../sanitize';
 import { IMAGE_DISPLAY_STYLES } from '../extensions/displayImage';
 // WO-O4O-CONTENT-EDITOR-TABLE-SUPPORT-STANDARDIZATION-V1: 표 표시 CSS (편집기와 동일 — §5.5)
 import { TABLE_STYLES } from '../extensions/tableKit';
+// WO-O4O-CONTENT-EDITOR-VIDEO-STANDARDIZATION-V1: <video> 표시 CSS (편집기와 동일)
+import { VIDEO_STYLES } from '../extensions/videoNode';
 
 let imageDisplayCssInjected = false;
 function injectImageDisplayCss() {
@@ -110,6 +112,7 @@ const embedCss = `
 iframe.editor-youtube { width: 100%; max-width: 640px; height: auto; aspect-ratio: 16 / 9; border: none; border-radius: 6px; display: block; margin: 12px 0; }
 div[data-youtube-video] { max-width: 640px; margin: 12px 0; }
 div[data-youtube-video] iframe { width: 100%; height: auto; aspect-ratio: 16 / 9; border: none; border-radius: 6px; display: block; }
+${VIDEO_STYLES}
 `;
 let embedCssInjected = false;
 function injectEmbedCss() {
