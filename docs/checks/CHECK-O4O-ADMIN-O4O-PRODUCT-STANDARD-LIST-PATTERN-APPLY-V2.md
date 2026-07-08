@@ -1,6 +1,6 @@
 # CHECK-O4O-ADMIN-O4O-PRODUCT-STANDARD-LIST-PATTERN-APPLY-V2
 
-Status: 코드 완료 + typecheck/build 통과 → 프로덕션 smoke 진행 (2026-07-08)
+Status: DONE — 코드 완료 + typecheck/build 통과 + 프로덕션 브라우저 smoke PASS (2026-07-08)
 WO: `WO-O4O-ADMIN-O4O-PRODUCT-STANDARD-LIST-PATTERN-APPLY-V2`
 선행: `WO-...-STANDARD-LIST-PATTERN-V1`(ProductMasters+Candidates canonical 확정)
 
@@ -55,8 +55,15 @@ Scope: V1에서 확정한 표준 목록 패턴을 **나머지 4개 o4o-product-d
 | admin-dashboard typecheck | **에러 0** (`tsc --noEmit`) |
 | admin-dashboard build | **EXIT 0** (`vite build`, 4개 페이지 청크 정상 생성) |
 | 변경 파일 | 4개 (DescriptionStatus/DescriptionReview/ImageQuality/DrugDescriptionDrafts) — API/백엔드/공통 컴포넌트 무변경 |
-| DB write | **0** (GET-only 유지) |
-| 프로덕션 브라우저 smoke | 진행 (배포 후) |
+| DB write | **0** (GET-only 유지 — 네트워크상 유일 POST=/auth/login) |
+| 프로덕션 브라우저 smoke | **PASS** (admin.neture.co.kr, 2026-07-08, 서철환 admin) |
+
+**smoke 상세 (4/4 페이지 PASS):**
+- **설명 검토**(총 21,346, 1/1068): BaseTable · 4필터+검색 · 컬럼 설정 · 헤더/행 체크박스 · 더보기(상품/큐레이션) · pagination footer
+- **이미지 상태**(총 198,389, 1/9920): summary pill(대표 2,790/없음 195,599) · 썸네일 컬럼 · 체크박스 · 더보기(상품) · pagination
+- **설명 상태**(총 198,389, 1/9920): summary pill(공식17,877/검토3,215/초안1,294/없음176,003) · FinalBadge · 체크박스 · **더보기 조건부 다중액션**(검토 필요 행=상품 상세+설명 상세 노출 확인) · pagination
+- **OTC 초안**(총 95, 1/5): VerdictBadge/StatusBadge · 체크박스 · 더보기(초안) · pagination
+- **네트워크 GET-only**: shared-product-descriptions / image-quality(+summary) / description-status(+summary) / product-candidate-description-drafts 전부 GET 200, mutation 0
 
 ---
 
