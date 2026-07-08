@@ -13,8 +13,8 @@
 bucket별 수
 grounding 수
 대표 콘텐츠 수
-대표 콘텐츠 목록 (group_key 단위)
-적용 대상 수 (ProductMaster 등, 총 / grounded)
+대표 콘텐츠 목록 (group_key 단위)                    ← 필수
+적용 ProductMaster 수 (대표가 커버하는 master, 총 / grounded)  ← 필수(의약품)
 HOLD_SOURCE 수
 EXCLUDE 수 / 제외 사유
 SOURCE GAP 적용 결과
@@ -23,6 +23,8 @@ DB write (반드시 0 확인)
 commit hash
 push 여부
 ```
+
+> **적용 ProductMaster 수(D-020)**: 의약품 batch CHECK는 각 대표 콘텐츠가 실제로 적용되는 ProductMaster 수를 **총계 / grounded**로 남긴다(예: 비염 8건 → 적용 ≈700). canonical 승격 규모 판단의 근거가 된다.
 
 ## 2. 필수 표
 

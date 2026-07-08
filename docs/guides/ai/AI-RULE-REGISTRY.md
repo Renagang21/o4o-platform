@@ -12,7 +12,7 @@
 | **AR-002** | AI는 원문 grounding 없이 성분·효능·수치를 생성하지 않는다(창작 0) | ai/AI-GROUNDING | active |
 | **AR-003** | AI 출력은 검수 단계를 거친다(자기검증 + 교차검증) | ai/AI-REVIEW | active |
 | **AR-004** | 환각·과장·민감정보 노출 금지 | ai/AI-SAFETY | active |
-| **AR-005** | O4O는 소비자 설명서 초안을 외부 LLM으로 자동 생성하지 않는다(편집 보조만) | ai/AI-SAFETY | active |
+| **AR-005** | O4O는 소비자 설명서 초안을 외부 LLM으로 자동 생성하지 않는다. AI는 **편집 보조·검수 보조·번역 보조**로 제한한다(초안 근거는 공식 원문) | ai/AI-SAFETY | active |
 | **AR-006** | AI 출력은 사람/전문가 승인 전까지 배포 상태로 승격하지 않는다 | ai/AI-REVIEW · common/WORKFLOW | active |
 
 > CR-004(Grounding 필수)의 AI 실행형이 AR-002다. 신규 AI 규칙은 AR-007부터 부여한다.

@@ -34,12 +34,13 @@ services/          서비스(KPA·GP·KCos·Neture)               (제품군과 
 | 1 | [DOCUMENT-ARCHITECTURE](DOCUMENT-ARCHITECTURE.md) | 문서 체계 운영 매뉴얼 (최상위). "왜 이 구조인가"는 IR, "어떻게 운영하나"는 여기. |
 | 2 | [WORKFLOW](WORKFLOW.md) | 작성 → 검토 → 승인 → 배포. 이중게이트·rollback 포함. |
 | 3 | [CONTENT-CHECK-STANDARD](CONTENT-CHECK-STANDARD.md) | CHECK 문서 작성 규칙(필수 항목·표·완료 보고). |
-| 4 | [CONTENT-RULE-REGISTRY](CONTENT-RULE-REGISTRY.md) | 공통 규칙 목록 (CR-NNN). |
+| 4 | [CONTENT-RULE-REGISTRY](CONTENT-RULE-REGISTRY.md) · [OPERATIONAL-RULE-REGISTRY](OPERATIONAL-RULE-REGISTRY.md) | 공통 규칙(CR-NNN) · 운영/Git/문서 관리 규칙(OR-NNN). |
 | 5 | [content-authoring/CONTENT-AUTHORING-PRINCIPLES](../content-authoring/CONTENT-AUTHORING-PRINCIPLES.md) | 소비자 중심·원문 우선·과장 금지·grounding 필수. |
 | 6 | [ai/*](../ai/) | AI-PROMPT-STANDARD · AI-GROUNDING · AI-REVIEW · AI-SAFETY · AI-RULE-REGISTRY(AR-NNN). |
 | 7 | [products/drug/*](../products/drug/) | DRUG-STANDARD · DRUG-WRITING · DRUG-GROUPING · DRUG-TEMPLATE · DRUG-RULE-REGISTRY(DR-NNN). |
-| 8 | products/{medical-device,quasi-drug,health-functional-food}/ | 제품군 확장 (스캐폴드). |
-| 9 | services/{kpa,gp,kcos,neture}/ | 서비스별 채널·운영 특성 (Rule Registry 없음, CR/DR/AR 참조). |
+| 8 | [products/drug/knowledge/*](../products/drug/knowledge/) | **Knowledge Catalog(Rule 아님)**: ATC-FALSE-POSITIVE-CATALOG · GROUPING-PATTERNS · CONSUMER-WRITING-PATTERNS. |
+| 9 | products/{medical-device,quasi-drug,health-functional-food}/ · services/{kpa,gp,kcos,neture}/ | 제품군 확장 · 서비스 채널(Registry 없음, Rule ID 참조). |
+| 10 | [../../adr/](../../adr/) | **ADR** — 채택된 결정 기록(IR=논의, ADR=결정). 소급 변환 없음, 새 결정부터. |
 
 ---
 

@@ -3,7 +3,7 @@
 상태: Active · V1 (2026-07-08) · 진입: [DOCUMENT-INDEX](DOCUMENT-INDEX.md)
 
 > 제품군·서비스·콘텐츠 유형에 걸쳐 성립하는 **공통 규칙**. 다른 문서는 Rule ID(CR-NNN)로만 참조한다.
-> 제품군 전용은 [DR](../products/drug/DRUG-RULE-REGISTRY.md), AI 전용은 [AR](../ai/AI-RULE-REGISTRY.md).
+> 제품군 전용은 [DR](../products/drug/DRUG-RULE-REGISTRY.md), AI 전용은 [AR](../ai/AI-RULE-REGISTRY.md), 운영/Git/문서 관리는 [OR](OPERATIONAL-RULE-REGISTRY.md).
 > 정본 이력: `CHECK-O4O-DRUG-DESCRIPTION-RULES-CONSOLIDATION-V1 §4` (R1~R62).
 
 ---
@@ -20,9 +20,14 @@
 | **CR-008** | 작업은 read-only 조사, DB 반영은 승인·이중게이트 후에만 | WORKFLOW §4 | active |
 | **CR-009** | Pipeline: 작성→검토→승인→배포. canonical 승격은 항상 별도 승인 | WORKFLOW | active |
 | **CR-010** | Registry = 문서(운영 상태), 상태 변경 중앙 전용 | WORKFLOW §4 · registries/* | active |
-| **CR-011** | CHECK = 결과만 기록(규칙 미반복, Rule ID 참조) | CONTENT-CHECK-STANDARD | active |
+| **CR-011** | CHECK = 결과만 기록(규칙 미반복, Rule ID 참조). **신규 규칙은 CHECK가 아니라 Guide/Registry에 등재** | CONTENT-CHECK-STANDARD · DOCUMENT-ARCHITECTURE §6 | active |
 | **CR-012** | WO = 작업 차이만(대상·제외·bucket·키워드·주의문구·우선순위·후속) | DOCUMENT-ARCHITECTURE §3 | active |
 | **CR-013** | 하단 공통 신뢰 문구 등 콘텐츠 유형별 필수 블록 유지 | content-authoring/CONTENT-AUTHORING-PRINCIPLES | active |
 | **CR-014** | DB 비밀정보 비기록(env에서만 추출, 문서/커밋 미기록) | WORKFLOW §6 | active |
+| **CR-015** | IR=역사(불변) / DOCUMENT-ARCHITECTURE=운영. 문서 체계 운영·갱신은 ARCHITECTURE가 담당 | DOCUMENT-ARCHITECTURE §1-1 | active |
+| **CR-016** | 결정 계보: IR(회의·논의·반려·후보) → ADR(채택 결정만) → Guide(운영). ADR 소급 변환 금지, 새 결정부터 기록 | DOCUMENT-ARCHITECTURE §1-2 · docs/adr/ | active |
+| **CR-017** | 문서 4역할: Guide=설계 / CHECK=실행 결과 / Registry=운영 상태 / Memory=불변 결정 | DOCUMENT-ARCHITECTURE §1 | active |
+| **CR-018** | DOCUMENT-INDEX = 단일 진입점(새 합류자는 여기부터). CLAUDE.md는 규칙 복사 없이 INDEX 포인터만 | DOCUMENT-INDEX · CLAUDE.md | active |
+| **CR-019** | products·services 축은 직교. 서비스는 자체 Rule Registry 없이 CR/DR/AR/OR를 Rule ID로 참조 | DOCUMENT-ARCHITECTURE §2 · services/*/README | active |
 
-> 신규 공통 규칙은 CR-015부터 부여하고 해당 SSOT Guide 본문을 함께 수정한다.
+> 신규 공통 규칙은 CR-020부터 부여하고 해당 SSOT Guide 본문을 함께 수정한다. 운영/Git/문서 관리 규칙은 CR이 아니라 [OR](OPERATIONAL-RULE-REGISTRY.md)에 등재한다.
