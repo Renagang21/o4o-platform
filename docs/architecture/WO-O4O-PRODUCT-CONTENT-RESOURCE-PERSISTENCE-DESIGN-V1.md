@@ -190,8 +190,9 @@ store_blog_posts)는 Resource 를 "소비"하는 별개 계층으로 유지 — 
 
 **Freeze 선언:**
 - 후속 WO 는 **본 Persistence 구조를 변경하지 않고 구현만 수행**한다.
-- 즉 (a) DESCRIPTION Resource = `shared_product_descriptions`, (b) canonical = (master, resourceType, descriptionType), (c) Resource ID = UUID + 공개 permalink `/r/{id}`, (d) QR 비저장, (e) 계층 1/계층 2 분리 — 이 5가지는 후속 WO 에서 **재설계 대상이 아니다**.
+- 즉 (a) DESCRIPTION Resource = `shared_product_descriptions`, (b) canonical = (master, resourceType, descriptionType), (c) Resource ID = UUID + 공개 permalink `/r/{id}`, (d) QR 비저장, (e) 계층 1/계층 2 분리, (f) **ProductMaster 는 Resource 를 모른다 — ProductMaster 에 Resource FK 신설 금지, 항상 `Resource.product_master_id` 단방향 참조** — 이 6가지는 후속 WO 에서 **재설계 대상이 아니다**.
 - 구조 변경이 필요하면 별도 WO 로 본 문서를 개정한다.
+- **Baseline 승격**: 본 Freeze 는 WO-0.5(`FREEZE-CONFIRMATION-V1`)로 [`O4O-PRODUCT-RESOURCE-ARCHITECTURE-BASELINE-V1`](../baseline/O4O-PRODUCT-RESOURCE-ARCHITECTURE-BASELINE-V1.md)(CLAUDE.md F12)로 승격됨.
 
 ---
 

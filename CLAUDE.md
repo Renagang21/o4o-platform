@@ -351,6 +351,7 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | F9 | **RBAC SSOT** — role_assignments 단일 소스, users.role/roles/user_roles 제거, write-path 통일 | 2026-02-27 | `docs/rbac/RBAC-FREEZE-DECLARATION-V1.md` |
 | F10 | **O4O Core** — Auth, Membership, Approval, RBAC 4개 모듈 Core Layer 고정 | 2026-03-11 | `docs/architecture/O4O-CORE-FREEZE-V1.md` |
 | F11 | **User/Operator** — users·service_memberships·role_assignments 3테이블 고정, Operator=membership 기반, user.role 사용 금지. **KPA-a 예외**: OperatorRoute 대신 RoleGuard+allowedRoles 사용 (role은 membership에서 파생, 구조 동등) | 2026-03-19 | `docs/architecture/USER-OPERATOR-FREEZE-V1.md` |
+| F12 | **Product Resource Architecture** — 2계층(계층1 Product Resource=master기준 canonical=`shared_product_descriptions` / 계층2 Store Production Material=매장 실행자산) 분리. 6불변식: ①DESCRIPTION=SPD ②canonical (master,resourceType,descriptionType) ③Resource ID=UUID+공개 `/r/{id}` ④QR 비저장·동적생성 ⑤계층1/2 분리 ⑥**ProductMaster는 Resource를 모른다**(FK 신설 금지, Resource→ProductMaster 단방향) | 2026-07-08 | `docs/baseline/O4O-PRODUCT-RESOURCE-ARCHITECTURE-BASELINE-V1.md` |
 
 ---
 
@@ -431,6 +432,7 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | **Store Products Canonical** | `docs/architecture/STORE-PRODUCTS-CANONICAL-V1.md` |
 | **RBAC Canonical State** | `docs/rbac/RBAC-CANONICAL-STATE-V1.md` |
 | **콘텐츠 문서 체계 (진입점)** | `docs/guides/common/DOCUMENT-INDEX.md` — 설명서·QR·POP·블로그·동영상 등 콘텐츠 규칙의 단일 진입점(common/content-authoring/ai/products/services 5축, Rule Registry CR/DR/AR). 상세 규칙은 이 진입점에서만 찾고 CLAUDE.md에 복사하지 않는다. |
+| **Product Resource Architecture (F12 Baseline)** | `docs/baseline/O4O-PRODUCT-RESOURCE-ARCHITECTURE-BASELINE-V1.md` — 2계층(Product Resource / Store Production Material) + 6불변식. 상세=`docs/architecture/IR-O4O-PRODUCT-CONTENT-RESOURCE-ARCHITECTURE-V1.md` · `docs/architecture/WO-O4O-PRODUCT-CONTENT-RESOURCE-PERSISTENCE-DESIGN-V1.md` |
 
 > **콘텐츠 작성 불변 원칙**: 의약품 등 소비자 콘텐츠는 **외부 LLM 초안 자동생성 안 함**(공식 원문 grounding) · **투여경로/제형 다르면 공유 금지** · **read-only 조사**(DB 반영은 승인·이중게이트 후). 상세는 `docs/guides/common/DOCUMENT-INDEX.md`.
 
