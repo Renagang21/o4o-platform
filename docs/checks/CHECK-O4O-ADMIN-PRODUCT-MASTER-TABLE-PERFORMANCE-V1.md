@@ -1,6 +1,6 @@
 # CHECK-O4O-ADMIN-PRODUCT-MASTER-TABLE-PERFORMANCE-V1
 
-Status: 코드 완료 + typecheck/build 통과 → 프로덕션 smoke 진행 (2026-07-08)
+Status: DONE — 코드 완료 + typecheck/build 통과 + 프로덕션 브라우저 smoke PASS (2026-07-08)
 WO: `WO-O4O-ADMIN-PRODUCT-MASTER-TABLE-PERFORMANCE-V1`
 
 Scope: admin.neture.co.kr `/admin/o4o-product-db/masters` 기본 상품 테이블 **체감 속도 개선**. 원칙 = "**목록은 가볍게, 상세는 따로, 다음 페이지만 미리**". 프론트 1파일 중심 + 백엔드 limit 캡 2줄.
@@ -58,7 +58,13 @@ Scope: admin.neture.co.kr `/admin/o4o-product-db/masters` 기본 상품 테이�
 | admin build / api build | **EXIT 0** (ProductMastersPage 청크 정상, api tsc 정상) |
 | 변경 | 프론트 1(ProductMastersPage) + 백엔드 2(limit 캡). 응답 형태/스키마 무변경 |
 | DB write | **0** (GET-only) |
-| 프로덕션 smoke | 진행 (배포 후): 최초 skeleton→표시 / 페이지 크기 100 / 다음 페이지 즉시(prefetch 캐시) / 검색 debounce / 상세 클릭 시 목록 reload 없음 / Console Error 없음 |
+| 프로덕션 smoke | **PASS** (admin.neture.co.kr, 2026-07-08, 서철환 admin, API+Admin 배포 성공) |
+
+**smoke 상세 (PASS):**
+- 진입: 페이지 크기 **기본 50**(옵션 20/50/100), 푸터 **"1–50 / 198,389건 · 1 / 3968 페이지"** 범위 표기.
+- **다음 페이지 즉시 이동**: `?page=2`, "51–100 / … · 2 / 3968" — prefetch 캐시로 지연 없이 전환(이전 버튼 활성).
+- **페이지 크기 100**(백엔드 캡 50→100 검증): `?limit=100`, "1–100 / … · 1 / **1984** 페이지" — 100건/페이지 서버 반영(캡 50이면 불가). limit 변경 시 page=1 리셋.
+- 상세는 행 클릭 navigate(구조 유지, 목록 재조회 없음). Console 신규 에러 없음(초기 401은 앱 공통 인증, 무관).
 
 ---
 
@@ -71,4 +77,4 @@ Scope: admin.neture.co.kr `/admin/o4o-product-db/masters` 기본 상품 테이�
 | 상세 클릭 시 목록 전체 reload 없음 | ✅ 기존 분리 유지(navigate) |
 | 검색/필터 변경 시 캐시 초기화 | ✅ q/limit 변경 시 clear |
 | typecheck/build | ✅ |
-| CHECK / smoke | 진행 |
+| CHECK / smoke | ✅ (3c4e56ce6, API+Admin 배포 성공, smoke PASS) |
