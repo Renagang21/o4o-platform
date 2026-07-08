@@ -19,6 +19,25 @@
 
 하나의 정보는 자신의 역할 문서에만 존재한다.
 
+## 1-2. 결정 계보 (IR → ADR → Guide)
+
+문서 체계 전체 흐름:
+
+```text
+IR → ADR → Guide → Registry(CR/DR/AR/OR) → Knowledge(ATC/Grouping/Writing) → WO → CHECK
+```
+
+| 문서 | 성격 | 담는 것 |
+|---|---|---|
+| **IR** | 회의 (Historical) | 조사·논의·반려·후보안. 여러 방향이 모두 남는다. 확정 후 수정하지 않음(역사). |
+| **ADR** (Architecture Decision Record) | 결정 (Adopted) | 그 중 **실제 채택된 결정만** 짧게 기록(ADR-NNN). |
+| **Guide** | 운영 (Operation) | 채택된 결정을 어떻게 운영하는가. |
+
+- 예: IR에서 `drug-description → content-authoring → products/services → OR → Knowledge`로 여러 번 방향이 바뀌었으나, **최종 채택은 하나**다. 그 채택을 ADR이 기록한다.
+- ADR 예시(향후 기록 대상): `ADR-001 Guide=SSOT` · `ADR-002 ATC는 후보 검색용` · `ADR-003 Route 다르면 공유 금지` · `ADR-004 대표 설명서 우선 수정`.
+- **소급 변환 금지**: 기존 IR은 그대로 보존한다. **새로운 중요한 설계 결정부터** ADR로 기록하여 자연히 정착시킨다.
+- 위치: `docs/adr/` (프로젝트 전역 결정 기록). 폴더·템플릿 생성은 `WO-O4O-CONTENT-RULES-DELTA-APPLY-V1`.
+
 ## 2. 5축 구조
 
 ```text
@@ -62,10 +81,12 @@ guides/
 
 | 카탈로그 | 위치 | 내용 |
 |---|---|---|
-| ATC 오탐 카탈로그 | products/drug/knowledge/ATC-FALSE-POSITIVE-CATALOG.md | ATC 내 경구/타경로 혼입 실사례(R01B·R02A·S01…) |
+| ATC 오탐 카탈로그 | products/drug/knowledge/ATC-FALSE-POSITIVE-CATALOG.md | ATC 내 경구/타경로 혼입 실사례(R01B·R02A·S01… → 향후 A07·D11·G02) |
 | 그룹핑 패턴 | products/drug/knowledge/GROUPING-PATTERNS.md | 함량축 분할 등 반복 패턴(펙소페나딘 60/120…) |
+| 소비자 문체 패턴 | products/drug/knowledge/CONSUMER-WRITING-PATTERNS.md | 반복되는 소비자 설명 문체("사용합니다"·"도움을 줄 수 있습니다"·"약사에게 상담하세요"·"병원을 방문하세요"…) |
 
-> OR 계층과 Knowledge Catalog 실체화는 `WO-O4O-CONTENT-RULES-DELTA-APPLY-V1`에서 수행한다(본 표는 go-forward 구조 확정).
+> 문체 패턴은 Rule(CR/DR)이 아니라 **축적되는 표현 패턴**이다. Rule은 "무엇을 지켜야 하나", Knowledge는 "실제로 어떻게 반복되나".
+> OR 계층·Knowledge Catalog(3종)·ADR 폴더 실체화는 `WO-O4O-CONTENT-RULES-DELTA-APPLY-V1`에서 수행한다(본 표는 go-forward 구조 확정).
 
 ## 5. 참조 관계
 

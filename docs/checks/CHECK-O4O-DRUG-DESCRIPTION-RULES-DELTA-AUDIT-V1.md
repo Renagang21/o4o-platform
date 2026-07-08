@@ -176,10 +176,31 @@ WO: `WO-O4O-DRUG-DESCRIPTION-RULES-DELTA-AUDIT-V1`
 CR 추가 (CR-015~019)         아키텍처 정체성 5
 DR 추가 (DR-018)             성분별/세대별 대표 공존 1
 AR 보강 (AR-005)             편집·검수·번역 보조 제한
-OR 생성 (OPERATIONAL-RULE-REGISTRY, OR-001~004)   ← 신규 계층
-Knowledge Catalog 생성        ATC-FALSE-POSITIVE-CATALOG · GROUPING-PATTERNS   ← 신규 문서 유형
+OR 생성 (OPERATIONAL-RULE-REGISTRY, OR-001~004)          ← 신규 계층
+Knowledge Catalog 생성 (3종) ATC-FALSE-POSITIVE-CATALOG · GROUPING-PATTERNS · CONSUMER-WRITING-PATTERNS
+ADR 폴더+템플릿 생성 (docs/adr/)                          ← 신규 문서 유형(결정 기록)
 CHECK-STANDARD 보강 (적용 ProductMaster 수 명시)
-DOCUMENT-ARCHITECTURE 갱신 (Rule Registry 3→4계층 + KB 유형)
+DOCUMENT-ARCHITECTURE 갱신 (완료: 4계층·KB 3종·IR→ADR→Guide 계보)
 ```
 
 > 효과: 설명서 규칙(CR/DR/AR)은 간결 유지, **운영 노하우(OR)** 와 **도메인 지식(KB)** 은 독립 성장. 의료기기·의약외품·건기식 확장 시에도 Registry 비대화 없음.
+
+### 10-5. ADR (Architecture Decision Record) 추가
+
+문서 계보에 **결정(ADR)** 계층을 IR(회의)과 Guide(운영) 사이에 둔다. IR은 조사·논의·반려·후보안까지 남기지만, **실제 채택된 결정은 일부**다 — 그 채택만 ADR-NNN으로 짧게 기록한다.
+
+- **조건(중요)**: DELTA-APPLY에서는 **ADR 폴더 + 템플릿만 생성**한다. **기존 IR을 ADR로 소급 변환하지 않는다**(IR의 역사적 논의·조사 보존). **새 중요한 설계 결정부터** ADR로 기록하여 정착시킨다.
+- 위치: `docs/adr/` (프로젝트 전역). 템플릿: `docs/adr/ADR-TEMPLATE.md` + `docs/adr/README.md`(인덱스).
+- 최종 문서 계보: **IR(조사·논의) → ADR(채택 결정) → Guide(운영) → Registry(CR/DR/AR/OR) → Knowledge(ATC/Grouping/Writing) → WO → CHECK.**
+
+### 10-6. 재분류 후 최종 집계
+
+| 분류 | 수 |
+|---|---:|
+| EXISTING | 8 |
+| NEW_RULE — CR | 5 |
+| NEW_RULE — DR | 1 |
+| NEW_RULE — OR | 4 |
+| KB (Knowledge Catalog) | 3 (ATC·Grouping·**Writing**) |
+| NEW_DOC_TYPE — ADR | 1 (폴더+템플릿, 소급 변환 없음) |
+| MERGE / UPDATE / ARCHIVE / CONFLICT | 3 / 1 / 3 / 0 |

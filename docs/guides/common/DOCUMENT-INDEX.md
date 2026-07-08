@@ -21,7 +21,9 @@ services/          서비스(KPA·GP·KCos·Neture)               (제품군과 
 
 문서는 **4역할**로 분리된다: **Guide=설계 / CHECK=실행 결과 / Registry=운영 상태 / Memory=불변 결정.**
 
-규칙은 **4계층 Registry**로 관리한다: **CR**(공통)·**DR**(의약품)·**AR**(AI)·**OR**(운영/Git/문서 관리). 규칙이 아닌 축적형 지식(ATC 오탐·그룹핑 패턴)은 **Knowledge Catalog**(Registry 아님)에 둔다.
+규칙은 **4계층 Registry**로 관리한다: **CR**(공통)·**DR**(의약품)·**AR**(AI)·**OR**(운영/Git/문서 관리). 규칙이 아닌 축적형 지식(ATC 오탐·그룹핑 패턴·소비자 문체)은 **Knowledge Catalog 3종**(Registry 아님)에 둔다.
+
+문서 계보: **IR**(조사·논의) → **ADR**(최종 채택 결정, `docs/adr/`) → **Guide**(운영) → **Registry** → **Knowledge** → **WO** → **CHECK**.
 
 ---
 
