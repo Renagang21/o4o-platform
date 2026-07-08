@@ -60,6 +60,16 @@ HTML에는 `img` / `iframe` / `video` 의 **URL만 저장**한다.
 
 Media Picker는 선택된 미디어 정보를 반환하고, RichTextEditor는 **URL만 삽입**한다.
 
+### 5.4 Media Library의 역할 (기준 정의)
+
+Media Library는 이미지·동영상 등 콘텐츠 자산을 관리하는 시스템이며, **RichTextEditor에 대해 URL 제공자**다.
+
+RichTextEditor는 Media Library에서 선택된 미디어의 **URL만 사용**한다. RichTextEditor는 다음을 담당하지 않는다.
+
+- 파일 업로드 / 저장 / 삭제 / 이동
+
+**미디어의 생명주기(업로드·보관·삭제)는 Media Library가 관리한다.** 이 역할 정의는 이후 모든 콘텐츠 기능(WO-2 Table, WO-3 Video, HTML Snippet, Template, AI 콘텐츠 자산 등)이 공유하는 기준이 된다.
+
 ---
 
 ## 6. 공통 인터페이스 표준화
@@ -170,6 +180,13 @@ onMediaLibraryPick(insertMedia: (media: {
 **WO-2 · HTML Table 지원** — 독립 진행.
 
 **WO-3 · Video(mp4) 표준화** — 다음 항목 추가: HTML5 video node / O4O Storage / External URL / sanitize 확장 / 동영상 정책. **이번 WO에서 만든 Media Type 인터페이스를 그대로 사용하며 시그니처 변경은 하지 않는다.**
+
+> **WO-3 결정사항 (미리 기록 — 본 WO 범위 외):** 동영상 `sourceType` 3종을 정책으로 확정한다.
+> - `youtube` — URL 저장 + iframe 삽입 (본 WO에서 이미 구현)
+> - `o4o_storage` — Media Library URL 저장 + `<video>` 태그 사용
+> - `external` — 외부 URL 저장 + `<video>` 또는 `iframe`
+>
+> 자동 다운로드/자동 업로드/자동 변환은 WO-3에서도 구현하지 않는다.
 
 ---
 
