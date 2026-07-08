@@ -11,7 +11,8 @@
  *   max-width 720px, 가운데 정렬, 이미지 반응형(width:100%, height:auto, display:block)
  */
 
-import { sanitizeHtml, sanitizeRichHtml } from '../sanitize';
+// WO-O4O-CONTENT-RENDERER-PLATFORM-CONSISTENCY-V1: sanitize 단일화(모든 variant sanitizeRichHtml)
+import { sanitizeRichHtml } from '../sanitize';
 // WO-O4O-STANDARD-EDITOR-IMAGE-DISPLAY-WIDTH-V1: 이미지 표시 폭/정렬 CSS (편집기와 동일)
 import { IMAGE_DISPLAY_STYLES } from '../extensions/displayImage';
 // WO-O4O-CONTENT-EDITOR-TABLE-SUPPORT-STANDARDIZATION-V1: 표 표시 CSS (편집기와 동일 — §5.5)
@@ -100,16 +101,41 @@ function injectGuideCss() {
   guideCssInjected = true;
 }
 
+/**
+ * 임베드(YouTube/Vimeo iframe) 표시 CSS — WO-O4O-CONTENT-RENDERER-PLATFORM-CONSISTENCY-V1.
+ * TipTap Youtube 확장이 직렬화한 iframe(class="editor-youtube")을 모든 variant 소비 표면에서
+ * 반응형(16:9)으로 표시. 편집기와 동일 출력 정합.
+ */
+const embedCss = `
+iframe.editor-youtube { width: 100%; max-width: 640px; height: auto; aspect-ratio: 16 / 9; border: none; border-radius: 6px; display: block; margin: 12px 0; }
+div[data-youtube-video] { max-width: 640px; margin: 12px 0; }
+div[data-youtube-video] iframe { width: 100%; height: auto; aspect-ratio: 16 / 9; border: none; border-radius: 6px; display: block; }
+`;
+let embedCssInjected = false;
+function injectEmbedCss() {
+  if (embedCssInjected || typeof document === 'undefined') return;
+  const style = document.createElement('style');
+  style.textContent = embedCss;
+  document.head.appendChild(style);
+  embedCssInjected = true;
+}
+
 export function ContentRenderer({ html = '', className, style, variant }: ContentRendererProps) {
+  // WO-O4O-CONTENT-RENDERER-PLATFORM-CONSISTENCY-V1: 이미지·표·임베드 CSS 를 모든 variant 공통 주입.
   injectImageDisplayCss();
   injectTableCss();
+  injectEmbedCss();
+  // WO-O4O-CONTENT-RENDERER-PLATFORM-CONSISTENCY-V1: sanitize 단일화 —
+  //   모든 variant 에서 sanitizeRichHtml 사용(iframe = youtube/vimeo 호스트 allowlist 보존).
+  //   기존 기본/product-detail variant 는 sanitizeHtml 로 iframe 을 제거해 소비 표면에서 YouTube 가
+  //   드롭됐다(LMS/상품상세/공지/자료실). variant 는 이제 CSS/레이아웃만 좌우하고 sanitize 는 항상 동일.
   if (variant === 'product-detail') {
     injectProductDetailCss();
     return (
       <div
         className={`product-detail-content ${className || ''}`}
         style={{ ...productDetailStyle, ...style }}
-        dangerouslySetInnerHTML={{ __html: sanitizeHtml(html) }}
+        dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(html) }}
       />
     );
   }
@@ -129,7 +155,7 @@ export function ContentRenderer({ html = '', className, style, variant }: Conten
     <div
       className={className}
       style={style}
-      dangerouslySetInnerHTML={{ __html: sanitizeHtml(html) }}
+      dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(html) }}
     />
   );
 }
