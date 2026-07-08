@@ -20,6 +20,8 @@ import { LinkedContentsDrawer, type LinkedDrawerProduct } from './LinkedContents
 // WO-O4O-KPA-O4O-B2C-DESCRIPTION-COPY-TO-STORE-CONTENT-V1: O4O 상세설명 가져오기(listing 전용)
 import { ImportB2cDescriptionModal, type ImportB2cProduct } from './ImportB2cDescriptionModal';
 import { FileDown } from 'lucide-react';
+// WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1: O4O 표준 상품 검색·선택·등록 모달
+import { AddO4oStandardProductModal } from './AddO4oStandardProductModal';
 
 type SourceFilter = 'all' | 'listing' | 'local';
 const PAGE_LIMIT = 20;
@@ -120,6 +122,8 @@ export default function StoreHandledProductsPage() {
   const [drawerProduct, setDrawerProduct] = useState<LinkedDrawerProduct | null>(null);
   // WO-O4O-KPA-O4O-B2C-DESCRIPTION-COPY-TO-STORE-CONTENT-V1: O4O 상세설명 가져오기 모달(listing 전용)
   const [importProduct, setImportProduct] = useState<ImportB2cProduct | null>(null);
+  // WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1: O4O 표준 상품 검색·선택·등록 모달
+  const [showAddO4oModal, setShowAddO4oModal] = useState(false);
 
   // 콘텐츠 만들기 — 기존 자료함 작성 화면으로 이동(URL 기반 전달 → 새로고침 안전).
   const goCreateContent = useCallback(
@@ -166,11 +170,17 @@ export default function StoreHandledProductsPage() {
           </p>
         </div>
         <div style={styles.headerActions}>
+          {/* WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1:
+              O4O 표준 상품 DB(ProductMaster)를 검색·선택하여 매장 경영활용 제품으로 등록. */}
+          <button onClick={() => setShowAddO4oModal(true)} style={styles.primaryBtn}>
+            <Boxes size={14} />
+            O4O 표준 상품에서 추가
+          </button>
           {/* WO-O4O-KPA-COMMERCE-PRODUCT-TO-STORE-MANAGEMENT-USE-FLOW-V1:
               'O4O 제품 신청' 버튼 제거 — O4O 제품 등록은 O4O 제품 화면(/store/commerce/products)에서 직접 선택·등록한다(대체 버튼 없음). */}
-          <button onClick={() => navigate('/store/commerce/local-products')} style={styles.primaryBtn}>
+          <button onClick={() => navigate('/store/commerce/local-products')} style={styles.secondaryBtn}>
             <Plus size={14} />
-            매장 경영활용 제품 등록
+            매장 직접 등록
           </button>
           <button onClick={reload} style={styles.refreshBtn}>
             <RefreshCw size={14} />
@@ -331,6 +341,13 @@ export default function StoreHandledProductsPage() {
         }}
       />
 
+      {/* WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1: O4O 표준 상품 검색·선택·등록 모달 */}
+      <AddO4oStandardProductModal
+        open={showAddO4oModal}
+        onClose={() => setShowAddO4oModal(false)}
+        onRegistered={reload}
+      />
+
       {/* WO-O4O-KPA-O4O-B2C-DESCRIPTION-COPY-TO-STORE-CONTENT-V1: O4O 상세설명 가져오기 모달 */}
       <ImportB2cDescriptionModal
         open={!!importProduct}
@@ -363,6 +380,7 @@ const styles: Record<string, CSSProperties> = {
   headerActions: { display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' },
   refreshBtn: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: colors.white, border: `1px solid ${colors.neutral300}`, borderRadius: '6px', fontSize: '13px', color: colors.neutral700, cursor: 'pointer' },
   primaryBtn: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: colors.primary, border: `1px solid ${colors.primary}`, borderRadius: '6px', fontSize: '13px', color: colors.white, cursor: 'pointer' },
+  secondaryBtn: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: colors.white, border: `1px solid ${colors.primary}`, borderRadius: '6px', fontSize: '13px', color: colors.primary, cursor: 'pointer' },
   toolbar: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '12px', flexWrap: 'wrap' },
   tabs: { display: 'flex', gap: '4px', background: colors.neutral100, border: `1px solid ${colors.neutral200}`, borderRadius: '8px', padding: '3px' },
   tab: { padding: '6px 14px', fontSize: '13px', fontWeight: 500, border: 'none', borderRadius: '6px', cursor: 'pointer' },
