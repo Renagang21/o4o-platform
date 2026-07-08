@@ -1,6 +1,6 @@
 # CHECK-O4O-ADMIN-PRODUCT-CANDIDATE-UNMATCHED-ACTIONS-V1
 
-Status: 코드 완료 + typecheck/build 통과 → 프로덕션 smoke 진행 (2026-07-08)
+Status: DONE — 코드 완료 + typecheck/build 통과 + 프로덕션 smoke PASS (2026-07-08)
 WO: `WO-O4O-ADMIN-PRODUCT-CANDIDATE-UNMATCHED-ACTIONS-V1`
 선행: `WO-...-CANDIDATE-CONFLICT-ACTIONS-V1`(conflict 드로어·bulk-action·manual-match)
 
@@ -70,7 +70,21 @@ mount `/api/v1/operator/product-candidates` (guard OPERATOR_ROLES).
 | admin/api build | **EXIT 0** |
 | 변경 파일 | 백엔드 2(controller/service) + 프론트 2(api client/CandidateConflictDrawer) |
 | ProductMaster/Identifier 생성 | promote-master(=approveAsNewProductMaster) 트랜잭션 내부에서만 |
-| 프로덕션 smoke | 진행 (배포 후): unmatched 진입 → 드로어 → drug 후보=승격 preview·비-drug=비활성 안내 → 승격 outcome / 수동매칭 / bulk / Console Error 없음 |
+| 프로덕션 smoke | **PASS** (배포 후 admin.neture.co.kr) |
+
+### smoke 결과 (2026-07-08, admin.neture.co.kr, GET-only·write 미실행)
+
+배포: commit `5f13ad957`, API+Admin Cloud Run 배포 EXIT 0.
+
+| 케이스 | 후보 | 결과 |
+| --- | --- | --- |
+| 비-drug(승격 미지원) | 의료기구용 클립 (MFDS_MEDICAL_DEVICE_STANDARD_CODE, unmatched) | "신규 기본상품 승격" 섹션 = **비활성 안내**("의료기기·의약외품·건강기능식품·e약은요 등…별도 트랙") + **승격 버튼 없음** ✅ |
+| drug(승격 가능) | 유파티렌정(애엽…) 환인제약 (mfds-drug-master-standard-code, pending, unmatched, KOREA_DRUG_CODE 8806572030603) | "신규 기본상품 승격" 섹션 = **`신규 기본상품으로 승격` 버튼 활성** (promotable.eligible=true) ✅ |
+| 필터 | status=pending + sourceLabel=`mfds-drug-master-standard-code_2025-10-31` | 총 74,681건, drug 후보만 정상 필터 |
+| Console Error | 0 (errors/warnings 0) |
+
+- 실제 승격(promote-master POST) 은 ProductMaster write 이므로 **미실행**(smoke=버튼 렌더/게이트 검증까지). preview·outcome 로직은 배포 코드 정적 검증 완료.
+- prod read-only 확인: drug pending+unmatched 74,681 (source_label 단일값 `mfds-drug-master-standard-code_2025-10-31`).
 
 ---
 
