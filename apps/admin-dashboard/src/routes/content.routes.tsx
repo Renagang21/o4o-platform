@@ -56,6 +56,8 @@ const CPTACFRouter = lazy(() => import('@/pages/cpt-acf/CPTACFRouter'));
 
 // Media & Custom Fields
 const MediaLibrary = lazy(() => import('@/pages/media/Media'));
+// Content Resource — media_assets 관리 (WO-O4O-CONTENT-RESOURCE-METADATA-STANDARDIZATION-V1)
+const ContentResourceMediaAssets = lazy(() => import('@/pages/content-resource/MediaAssetsPage'));
 const CustomFields = lazy(() => import('@/pages/custom-fields/CustomFields'));
 const Analytics = lazy(() => import('@/pages/analytics/Analytics'));
 
@@ -322,6 +324,16 @@ export function ContentRoutes() {
       <AdminProtectedRoute requiredPermissions={['media:read']}>
         <Suspense fallback={<PageLoader />}>
           <MediaLibrary />
+        </Suspense>
+      </AdminProtectedRoute>
+    } />,
+
+    // Content Resource — Media Assets 관리 (WO-O4O-CONTENT-RESOURCE-METADATA-STANDARDIZATION-V1)
+    //   media_assets(/platform/media-library) metadata 조회·수정. 레거시 /media(/content/media)와 별개.
+    <Route key="/content-resource/media-assets" path="/content-resource/media-assets" element={
+      <AdminProtectedRoute requiredRoles={['admin']}>
+        <Suspense fallback={<PageLoader />}>
+          <ContentResourceMediaAssets />
         </Suspense>
       </AdminProtectedRoute>
     } />,

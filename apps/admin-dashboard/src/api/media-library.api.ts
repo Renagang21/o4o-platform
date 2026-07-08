@@ -38,3 +38,84 @@ export async function uploadImageForEditor(
   }
   return res.data.data.url;
 }
+
+// ─── Content Resource: media_assets 관리 (WO-O4O-CONTENT-RESOURCE-METADATA-STANDARDIZATION-V1) ───
+//   /platform/media-library(=media_assets) 목록 + metadata 수정. 레거시 /content/media 와 별개.
+
+export interface MediaAssetAdmin {
+  id: string;
+  url: string;
+  fileName: string;
+  originalName: string;
+  mimeType: string;
+  fileSize: number;
+  assetType: string;
+  width: number | null;
+  height: number | null;
+  folder: string;
+  serviceKey: string | null;
+  uploadedBy: string | null;
+  isLibraryPublic: boolean;
+  consentedAt: string;
+  createdAt: string;
+  updatedAt: string;
+  // Content Resource metadata
+  title: string | null;
+  description: string | null;
+  tags: string[] | null;
+  keywords: string[] | null;
+  language: string | null;
+  source: string | null;
+  usageType: string | null;
+  status: string | null;
+  memo: string | null;
+  updatedBy: string | null;
+}
+
+export interface MediaAssetMetadataPatch {
+  title?: string | null;
+  description?: string | null;
+  tags?: string[] | null;
+  keywords?: string[] | null;
+  language?: string | null;
+  source?: string | null;
+  usageType?: string | null;
+  status?: string | null;
+  memo?: string | null;
+  isLibraryPublic?: boolean;
+}
+
+/** media_assets 목록 (공개 자산). GET /platform/media-library */
+export async function listMediaAssets(
+  params: { page?: number; limit?: number; assetType?: string; folder?: string } = {},
+): Promise<{ data: MediaAssetAdmin[]; total: number; page: number; limit: number }> {
+  const qs = new URLSearchParams();
+  if (params.page) qs.set('page', String(params.page));
+  if (params.limit) qs.set('limit', String(params.limit));
+  if (params.assetType) qs.set('assetType', params.assetType);
+  if (params.folder) qs.set('folder', params.folder);
+  const res = await authClient.api.get<{ success: boolean; data?: MediaAssetAdmin[]; total?: number; page?: number; limit?: number }>(
+    `/platform/media-library?${qs.toString()}`,
+  );
+  return {
+    data: res.data?.data ?? [],
+    total: res.data?.total ?? 0,
+    page: res.data?.page ?? 1,
+    limit: res.data?.limit ?? 20,
+  };
+}
+
+/** metadata 수정. PATCH /platform/media-library/:id/metadata (파일 속성 불변) */
+export async function updateMediaAssetMetadata(
+  id: string,
+  patch: MediaAssetMetadataPatch,
+): Promise<MediaAssetAdmin> {
+  const res = await authClient.api.patch<{ success: boolean; data?: MediaAssetAdmin; error?: string }>(
+    `/platform/media-library/${id}/metadata`,
+    patch,
+  );
+  if (!res.data?.success || !res.data?.data) {
+    throw new Error(res.data?.error || 'metadata 저장에 실패했습니다.');
+  }
+  return res.data.data;
+}
