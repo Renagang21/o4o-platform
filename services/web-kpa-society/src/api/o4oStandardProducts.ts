@@ -17,6 +17,12 @@ import { tryRefreshToken } from './token-refresh';
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 const BASE = `${API_BASE}/api/v1/store/products`;
 
+/** 표시용 상품 분류(배지) — 백엔드 deriveProductClassification 파생 */
+export interface ProductClassification {
+  code: 'otc' | 'rx' | 'drug' | 'quasi' | 'health_functional' | 'medical_device' | 'cosmetic' | 'general' | 'unknown';
+  label: string;
+}
+
 export interface O4oStandardProduct {
   id: string;
   barcode: string | null;
@@ -26,6 +32,7 @@ export interface O4oStandardProduct {
   specification: string | null;
   category: { id: string; name: string } | null;
   brand: { id: string; name: string } | null;
+  classification: ProductClassification | null;
   primaryImageUrl: string | null;
 }
 
@@ -61,11 +68,14 @@ async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
 /** O4O 표준 상품(ProductMaster) 검색. 빈 q 는 전체 목록(이름순). */
 export async function searchO4oStandardProducts(params: {
   q?: string;
+  /** 표시용 분류 필터 (배지 buckets). 미전달 시 전체. */
+  classification?: string;
   page?: number;
   limit?: number;
 }): Promise<O4oStandardProductsResult> {
   const qs = new URLSearchParams();
   if (params.q?.trim()) qs.set('q', params.q.trim());
+  if (params.classification) qs.set('classification', params.classification);
   qs.set('page', String(params.page ?? 1));
   qs.set('limit', String(params.limit ?? 20));
   const res = await request<{ success: boolean; data: O4oStandardProduct[]; meta: O4oStandardProductsResult['meta'] }>(

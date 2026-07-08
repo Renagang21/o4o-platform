@@ -473,6 +473,8 @@ export class NetureService {
     q?: string;
     categoryId?: string;
     brandId?: string;
+    regulatoryType?: string;
+    drugCategory?: string;
     page?: number;
     limit?: number;
   }): Promise<{ data: ProductMaster[]; total: number }> {

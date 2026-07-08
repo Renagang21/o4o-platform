@@ -29,9 +29,35 @@ interface Props {
 const PAGE_LIMIT = 20;
 const SEARCH_DEBOUNCE_MS = 300;
 
+/** 분류 필터 chip (code '' = 전체) — 백엔드 classificationToFilter 버킷과 정합 */
+const CLASSIFICATION_CHIPS: { code: string; label: string }[] = [
+  { code: '', label: '전체' },
+  { code: 'otc', label: '일반의약품' },
+  { code: 'rx', label: '전문의약품' },
+  { code: 'quasi', label: '의약외품' },
+  { code: 'health_functional', label: '건강기능식품' },
+  { code: 'medical_device', label: '의료기기' },
+  { code: 'cosmetic', label: '화장품' },
+  { code: 'general', label: '일반·기타' },
+];
+
+/** 분류 배지 색상 (code → {배경, 글자}) */
+const CLASSIFICATION_COLORS: Record<string, { bg: string; fg: string }> = {
+  otc: { bg: '#DBEAFE', fg: '#1D4ED8' },
+  rx: { bg: '#FEE2E2', fg: '#B91C1C' },
+  drug: { bg: '#E0E7FF', fg: '#4338CA' },
+  quasi: { bg: '#FEF3C7', fg: '#B45309' },
+  health_functional: { bg: '#DCFCE7', fg: '#15803D' },
+  medical_device: { bg: '#CFFAFE', fg: '#0E7490' },
+  cosmetic: { bg: '#FCE7F3', fg: '#BE185D' },
+  general: { bg: '#F1F5F9', fg: '#475569' },
+  unknown: { bg: '#F1F5F9', fg: '#94A3B8' },
+};
+
 export function AddO4oStandardProductModal({ open, onClose, onRegistered }: Props) {
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [classification, setClassification] = useState('');
   const [page, setPage] = useState(1);
   const [items, setItems] = useState<O4oStandardProduct[]>([]);
   const [total, setTotal] = useState(0);
@@ -47,6 +73,7 @@ export function AddO4oStandardProductModal({ open, onClose, onRegistered }: Prop
     if (open) {
       setSearchInput('');
       setSearchQuery('');
+      setClassification('');
       setPage(1);
       setRegisteredIds(new Set());
     }
@@ -67,7 +94,7 @@ export function AddO4oStandardProductModal({ open, onClose, onRegistered }: Prop
     let cancelled = false;
     setLoading(true);
     setError(null);
-    searchO4oStandardProducts({ q: searchQuery || undefined, page, limit: PAGE_LIMIT })
+    searchO4oStandardProducts({ q: searchQuery || undefined, classification: classification || undefined, page, limit: PAGE_LIMIT })
       .then((r) => {
         if (cancelled) return;
         setItems(r.items);
@@ -80,7 +107,7 @@ export function AddO4oStandardProductModal({ open, onClose, onRegistered }: Prop
         if (!cancelled) setLoading(false);
       });
     return () => { cancelled = true; };
-  }, [open, searchQuery, page]);
+  }, [open, searchQuery, classification, page]);
 
   const handleRegister = useCallback(async (p: O4oStandardProduct) => {
     setRegisteringId(p.id);
@@ -131,6 +158,22 @@ export function AddO4oStandardProductModal({ open, onClose, onRegistered }: Prop
           />
         </div>
 
+        <div style={styles.chipRow}>
+          {CLASSIFICATION_CHIPS.map((chip) => {
+            const active = classification === chip.code;
+            return (
+              <button
+                key={chip.code || 'all'}
+                type="button"
+                onClick={() => { setClassification(chip.code); setPage(1); }}
+                style={{ ...styles.chip, ...(active ? styles.chipActive : {}) }}
+              >
+                {chip.label}
+              </button>
+            );
+          })}
+        </div>
+
         <div style={styles.countRow}>
           <span style={styles.countBadge}>{total.toLocaleString()}건</span>
         </div>
@@ -176,7 +219,22 @@ export function AddO4oStandardProductModal({ open, onClose, onRegistered }: Prop
                       </td>
                       <td style={styles.td}>{p.manufacturerName || '—'}</td>
                       <td style={styles.tdMono}>{p.barcode || '—'}</td>
-                      <td style={styles.td}>{p.category?.name || '—'}</td>
+                      <td style={styles.td}>
+                        {p.classification ? (
+                          <span
+                            style={{
+                              ...styles.classBadge,
+                              background: (CLASSIFICATION_COLORS[p.classification.code] ?? CLASSIFICATION_COLORS.unknown).bg,
+                              color: (CLASSIFICATION_COLORS[p.classification.code] ?? CLASSIFICATION_COLORS.unknown).fg,
+                            }}
+                            title={p.category?.name || undefined}
+                          >
+                            {p.classification.label}
+                          </span>
+                        ) : (
+                          p.category?.name || '—'
+                        )}
+                      </td>
                       <td style={styles.td}>
                         {done ? (
                           <span style={styles.doneBadge}><Check size={13} /> 등록됨</span>
@@ -221,6 +279,10 @@ const styles: Record<string, CSSProperties> = {
   searchWrap: { position: 'relative', marginBottom: '10px' },
   searchIcon: { position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: colors.neutral400, pointerEvents: 'none' },
   searchInput: { width: '100%', padding: '10px 14px 10px 34px', border: `1px solid ${colors.neutral300}`, borderRadius: '8px', fontSize: '14px', outline: 'none', background: colors.white, boxSizing: 'border-box' },
+  chipRow: { display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '10px' },
+  chip: { padding: '5px 12px', border: `1px solid ${colors.neutral300}`, borderRadius: '999px', background: colors.white, fontSize: '12px', fontWeight: 500, color: colors.neutral600, cursor: 'pointer', whiteSpace: 'nowrap' },
+  chipActive: { background: colors.primary, borderColor: colors.primary, color: colors.white },
+  classBadge: { display: 'inline-block', padding: '3px 9px', borderRadius: '999px', fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap' },
   countRow: { marginBottom: '8px' },
   countBadge: { display: 'inline-flex', alignItems: 'center', padding: '2px 8px', fontSize: '12px', fontWeight: 500, color: colors.neutral600, background: colors.neutral100, borderRadius: '999px' },
   tableWrap: { overflowX: 'auto', border: `1px solid ${colors.neutral200}`, borderRadius: '8px', maxHeight: '52vh', overflowY: 'auto' },

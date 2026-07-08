@@ -36,6 +36,7 @@ import { requireAuth } from '../../../middleware/auth.middleware.js';
 import { createRequireStoreOwner } from '../../../utils/store-owner.utils.js';
 import { NetureService } from '../../../modules/neture/neture.service.js';
 import { ImageStorageService } from '../../../modules/neture/services/image-storage.service.js';
+import { deriveProductClassification, classificationToFilter } from '../../../modules/neture/utils/product-type.util.js';
 import logger from '../../../utils/logger.js';
 
 // ─────────────────────────────────────────────────────
@@ -114,12 +115,17 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
   // ─── GET /search — 제품 검색 (ProductMaster 기반) ────────────────────
   // WO-O4O-KPA-STORE-MY-PRODUCTS-OFFER-DEPENDENCY-CLEANUP-V1: offerCount 제거
   router.get('/search', requireAuth, requireStoreOwner as RequestHandler, asyncHandler(async (req: Request, res: Response) => {
-    const { q, categoryId, brandId, page, limit } = req.query;
+    const { q, categoryId, brandId, classification, page, limit } = req.query;
+
+    // 표시용 분류 필터 chip → (regulatory_type, drug_category) 조건으로 변환 (WO-...-STANDARD-PICKER...)
+    const classFilter = typeof classification === 'string' ? classificationToFilter(classification) : null;
 
     const result = await netureService.searchProductMasters({
       q: typeof q === 'string' ? q : undefined,
       categoryId: typeof categoryId === 'string' ? categoryId : undefined,
       brandId: typeof brandId === 'string' ? brandId : undefined,
+      regulatoryType: classFilter?.regulatoryType,
+      drugCategory: classFilter?.drugCategory,
       page: page ? Number(page) : 1,
       limit: limit ? Number(limit) : 20,
     });
@@ -149,6 +155,8 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
       specification: m.specification || null,
       category: m.category ? { id: m.category.id, name: m.category.name } : null,
       brand: m.brand ? { id: m.brand.id, name: m.brand.name } : null,
+      // 표시용 분류(배지) — regulatoryType(+drugCategory) 파생. category(ProductCategory)와 별개.
+      classification: deriveProductClassification({ regulatoryType: m.regulatoryType, drugCategory: m.drugCategory }),
       primaryImageUrl: imageMap.get(m.id) || null,
     }));
 

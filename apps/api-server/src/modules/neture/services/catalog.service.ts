@@ -247,6 +247,9 @@ export class NetureCatalogService {
     q?: string;
     categoryId?: string;
     brandId?: string;
+    /** 표시용 분류 필터 (WO-...-STANDARD-PICKER...): additive, 미전달 시 미적용 */
+    regulatoryType?: string;
+    drugCategory?: string;
     page?: number;
     limit?: number;
   }): Promise<{ data: ProductMaster[]; total: number }> {
@@ -297,6 +300,12 @@ export class NetureCatalogService {
     }
     if (params.brandId) {
       qb.andWhere('m.brand_id = :brandId', { brandId: params.brandId });
+    }
+    if (params.regulatoryType) {
+      qb.andWhere('m.regulatory_type = :regulatoryType', { regulatoryType: params.regulatoryType });
+    }
+    if (params.drugCategory) {
+      qb.andWhere('m.drug_category = :drugCategory', { drugCategory: params.drugCategory });
     }
 
     qb.skip(offset).take(limit);

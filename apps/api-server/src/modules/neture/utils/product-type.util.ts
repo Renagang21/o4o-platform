@@ -167,6 +167,119 @@ export function classifyProductType(input: ClassifyInput): ProductTypeClass {
   return 'unknown';
 }
 
+/**
+ * 표시용 상품 분류(배지/필터 버킷) — WO-O4O-KPA-HANDLED-PRODUCTS-STANDARD-PICKER-SERVER-SEARCH-CATEGORY-UX-V1
+ *
+ * regulatoryType(+drugCategory)에서 파생하는 **소비자/매장 표시용** 분류.
+ * classifyProductType 은 OTC 등록정책 중심(non_drug 로 화장품/의료기기/일반 뭉침)이라
+ * 매장 picker 배지에는 부적합 → 규제유형을 그대로 살린 별도 버킷을 제공한다.
+ *
+ * 데이터 한계: regulatory_type='GENERAL' 은 식품/공산품/기타를 구분하지 않으므로
+ * 'general'(일반·기타) 로만 표시한다 (원천 데이터 부재 — SOURCE GAP).
+ */
+export type ProductClassification =
+  | 'otc' // 일반의약품
+  | 'rx' // 전문의약품
+  | 'drug' // 의약품(OTC/Rx 미확정)
+  | 'quasi' // 의약외품
+  | 'health_functional' // 건강기능식품
+  | 'medical_device' // 의료기기
+  | 'cosmetic' // 화장품
+  | 'general' // 일반·기타 (식품/공산품 미분리)
+  | 'unknown'; // 미분류
+
+export interface ProductClassificationInfo {
+  code: ProductClassification;
+  label: string;
+}
+
+const CLASSIFICATION_LABELS: Record<ProductClassification, string> = {
+  otc: '일반의약품',
+  rx: '전문의약품',
+  drug: '의약품',
+  quasi: '의약외품',
+  health_functional: '건강기능식품',
+  medical_device: '의료기기',
+  cosmetic: '화장품',
+  general: '일반·기타',
+  unknown: '미분류',
+};
+
+/** ProductClassification → 한글 라벨 */
+export function classificationLabel(code: ProductClassification): string {
+  return CLASSIFICATION_LABELS[code] ?? CLASSIFICATION_LABELS.unknown;
+}
+
+/** regulatoryType(+drugCategory) → 표시용 분류(code + label) */
+export function deriveProductClassification(input: {
+  regulatoryType?: string | null;
+  drugCategory?: string | null;
+}): ProductClassificationInfo {
+  const reg = norm(input.regulatoryType);
+  const drug = norm(input.drugCategory);
+
+  let code: ProductClassification;
+  switch (reg) {
+    case 'drug':
+    case '의약품':
+      if (drug === 'otc') code = 'otc';
+      else if (drug === 'rx' || drug === 'etc') code = 'rx';
+      else code = 'drug';
+      break;
+    case 'quasi_drug':
+    case '의약외품':
+      code = 'quasi';
+      break;
+    case 'health_functional':
+    case '건강기능식품':
+      code = 'health_functional';
+      break;
+    case 'medical_device':
+    case '의료기기':
+      code = 'medical_device';
+      break;
+    case 'cosmetic':
+    case '화장품':
+      code = 'cosmetic';
+      break;
+    case 'general':
+    case '일반':
+      code = 'general';
+      break;
+    default:
+      code = reg ? 'unknown' : 'unknown';
+  }
+  return { code, label: classificationLabel(code) };
+}
+
+/**
+ * 필터 버킷 code → (regulatory_type, drug_category) 조회 조건.
+ * catalog.searchProductMasters 의 optional 필터 파라미터로 전달하기 위한 매핑.
+ * null 값은 해당 조건 미적용.
+ */
+export function classificationToFilter(code: string): { regulatoryType?: string; drugCategory?: string } | null {
+  switch (code) {
+    case 'otc':
+      return { regulatoryType: 'DRUG', drugCategory: 'otc' };
+    case 'rx':
+      return { regulatoryType: 'DRUG', drugCategory: 'rx' };
+    case 'drug':
+      return { regulatoryType: 'DRUG' };
+    case 'quasi':
+      return { regulatoryType: 'QUASI_DRUG' };
+    case 'health_functional':
+      return { regulatoryType: 'HEALTH_FUNCTIONAL' };
+    case 'medical_device':
+      return { regulatoryType: 'MEDICAL_DEVICE' };
+    case 'cosmetic':
+      return { regulatoryType: 'COSMETIC' };
+    case 'general':
+      return { regulatoryType: 'GENERAL' };
+    default:
+      return null;
+  }
+}
+
 /** 의약품(OTC/Rx/미확정) 여부 */
 export function isDrugClass(cls: ProductTypeClass): boolean {
   return cls === 'otc_drug' || cls === 'rx_drug' || cls === 'drug_unspecified';
