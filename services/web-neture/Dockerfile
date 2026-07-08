@@ -37,6 +37,7 @@ COPY packages/error-handling/package.json ./packages/error-handling/
 COPY packages/account-ui/package.json ./packages/account-ui/
 COPY packages/shared-space-ui/package.json ./packages/shared-space-ui/
 COPY packages/store-products-ui/package.json ./packages/store-products-ui/
+COPY packages/store-ui-core/package.json ./packages/store-ui-core/
 
 # Copy service package.json
 COPY services/web-neture/package.json ./services/web-neture/
@@ -65,6 +66,7 @@ COPY packages/error-handling/ ./packages/error-handling/
 COPY packages/account-ui/ ./packages/account-ui/
 COPY packages/shared-space-ui/ ./packages/shared-space-ui/
 COPY packages/store-products-ui/ ./packages/store-products-ui/
+COPY packages/store-ui-core/ ./packages/store-ui-core/
 
 # Copy service source
 COPY services/web-neture/ ./services/web-neture/
