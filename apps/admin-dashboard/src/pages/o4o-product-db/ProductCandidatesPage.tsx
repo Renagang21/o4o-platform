@@ -11,11 +11,13 @@
  */
 
 import { useEffect, useState, useCallback } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Eye } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
+import { Eye, Archive, XCircle, PauseCircle } from 'lucide-react';
 import { BaseTable, RowActionMenu, ActionBar } from '@o4o/ui';
 import type { O4OColumn } from '@o4o/ui';
-import { listProductCandidates, ProductCandidateRow } from '@/api/o4o-product-db.api';
+import { listProductCandidates, ProductCandidateRow, bulkCandidateAction } from '@/api/o4o-product-db.api';
+// WO-O4O-ADMIN-PRODUCT-CANDIDATE-CONFLICT-ACTIONS-V1: 충돌 상세 + 처리 드로어
+import CandidateConflictDrawer from './CandidateConflictDrawer';
 
 // 공공 seed 라벨 프리셋 (external_api 후보 분리용 — 직접 입력도 가능)
 const SOURCE_LABEL_PRESETS = [
@@ -40,7 +42,6 @@ const SOURCE_TYPE_OPTIONS = [
 const LIMIT = 20;
 
 export default function ProductCandidatesPage() {
-  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [rows, setRows] = useState<ProductCandidateRow[]>([]);
   const [total, setTotal] = useState(0);
@@ -56,6 +57,9 @@ export default function ProductCandidatesPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+  // WO-O4O-ADMIN-PRODUCT-CANDIDATE-CONFLICT-ACTIONS-V1
+  const [drawerId, setDrawerId] = useState<string | null>(null);
+  const [bulkBusy, setBulkBusy] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -128,6 +132,22 @@ export default function ProductCandidatesPage() {
     setSelectedKeys(next);
   };
 
+  // WO-O4O-ADMIN-PRODUCT-CANDIDATE-CONFLICT-ACTIONS-V1: 선택 후보 일괄 처리 (hard delete 없음)
+  const runBulk = async (action: 'archive' | 'ignore' | 'manual_review') => {
+    const ids = Array.from(selectedKeys);
+    if (ids.length === 0) return;
+    setBulkBusy(true);
+    try {
+      await bulkCandidateAction(ids, action);
+      setSelectedKeys(new Set());
+      load();
+    } catch (e: any) {
+      setError(e?.response?.data?.error || e?.message || '일괄 처리에 실패했습니다');
+    } finally {
+      setBulkBusy(false);
+    }
+  };
+
   const columns: O4OColumn<ProductCandidateRow>[] = [
     {
       key: '_select',
@@ -186,7 +206,7 @@ export default function ProductCandidatesPage() {
       render: (_, r) => (
         <RowActionMenu
           actions={[
-            { key: 'view', label: '상세 보기', icon: <Eye size={14} />, onClick: () => navigate(r.id) },
+            { key: 'view', label: '상세·충돌 검토', icon: <Eye size={14} />, onClick: () => setDrawerId(r.id) },
           ]}
         />
       ),
@@ -250,14 +270,30 @@ export default function ProductCandidatesPage() {
         </div>
       )}
 
-      {/* 선택 시 일괄 작업 바 (구조 확립 — write 액션은 후속 WO) */}
+      {/* 선택 시 일괄 작업 바 — archive / ignore / manual_review (hard delete 없음) */}
       {selectedKeys.size > 0 && (
         <div className="mb-3">
           <ActionBar
             selectedCount={selectedKeys.size}
             onClearSelection={() => setSelectedKeys(new Set())}
-            statusInfo="선택 항목에 대한 일괄 작업(승격/매칭 등)은 후속 WO에서 제공됩니다."
-            actions={[]}
+            statusInfo="선택 후보의 상태를 일괄 변경합니다. 원천 데이터는 삭제되지 않습니다. (기존 상품 매칭은 각 후보 상세에서 진행)"
+            actions={[
+              {
+                key: 'archive', label: 'archive', icon: <Archive size={14} />, disabled: bulkBusy,
+                confirm: { title: 'archive 처리', message: `선택한 ${selectedKeys.size}개 후보를 archive 처리합니다. 원천 데이터는 삭제되지 않습니다. 계속할까요?`, confirmText: 'archive' },
+                onClick: () => runBulk('archive'),
+              },
+              {
+                key: 'ignore', label: '제외(ignored)', icon: <XCircle size={14} />, disabled: bulkBusy,
+                confirm: { title: 'ignored 처리', message: `선택한 ${selectedKeys.size}개 후보를 O4O 상품화 대상 아님(제외)으로 처리합니다. 원천 데이터는 삭제되지 않습니다. 계속할까요?`, variant: 'warning', confirmText: '제외' },
+                onClick: () => runBulk('ignore'),
+              },
+              {
+                key: 'manual_review', label: '보류(manual review)', icon: <PauseCircle size={14} />, disabled: bulkBusy,
+                confirm: { title: 'manual review', message: `선택한 ${selectedKeys.size}개 후보를 판단 보류(검토 중)로 표시합니다. 계속할까요?`, confirmText: '보류' },
+                onClick: () => runBulk('manual_review'),
+              },
+            ]}
           />
         </div>
       )}
@@ -267,7 +303,7 @@ export default function ProductCandidatesPage() {
           columns={columns}
           data={rows}
           rowKey={(r) => r.id}
-          onRowClick={(r) => navigate(r.id)}
+          onRowClick={(r) => setDrawerId(r.id)}
           emptyMessage={loading ? '불러오는 중…' : '아직 표시할 데이터가 없습니다'}
           selectable
           selectedKeys={selectedKeys}
@@ -296,6 +332,14 @@ export default function ProductCandidatesPage() {
           </div>
         )}
       </div>
+
+      {/* WO-O4O-ADMIN-PRODUCT-CANDIDATE-CONFLICT-ACTIONS-V1: 충돌 상세 + 처리 드로어 */}
+      <CandidateConflictDrawer
+        candidateId={drawerId}
+        open={!!drawerId}
+        onClose={() => setDrawerId(null)}
+        onProcessed={load}
+      />
     </div>
   );
 }

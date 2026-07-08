@@ -102,6 +102,50 @@ export async function getProductCandidate(id: string): Promise<ProductCandidateR
   return res.data?.data ?? null;
 }
 
+// ─── Candidate Conflict Actions (WO-O4O-ADMIN-PRODUCT-CANDIDATE-CONFLICT-ACTIONS-V1) ─────
+
+export interface CandidateConflictInfo {
+  candidate: ProductCandidateRow;
+  conflictKey: { identifierType: string | null; identifierValue: string | null; normalizedIdentifierValue: string | null };
+  conflictingCandidates: Array<{
+    id: string; candidateName: string | null; candidateManufacturer: string | null;
+    identifierValue: string | null; matchStatus: string; candidateStatus: string;
+    matchedProductMasterId: string | null; sourceLabel: string | null; createdAt: string;
+  }>;
+  possibleMasters: Array<{
+    id: string; name: string; regulatoryName: string; manufacturerName: string;
+    barcode: string; category: { id: string; name: string } | null; brand: { id: string; name: string } | null;
+  }>;
+  rawPayloadSummary: Record<string, unknown>;
+}
+
+/** 후보 충돌 근거 조회 (read-only). */
+export async function getCandidateConflictInfo(id: string): Promise<CandidateConflictInfo> {
+  const res = await authClient.api.get<{ success: boolean; data: CandidateConflictInfo }>(
+    `/operator/product-candidates/${encodeURIComponent(id)}/conflict-info`,
+  );
+  return res.data.data;
+}
+
+export type CandidateBulkAction = 'archive' | 'ignore' | 'manual_review';
+
+/** 선택 후보 일괄 상태 처리 (archive/ignore/manual_review). hard delete 없음. */
+export async function bulkCandidateAction(ids: string[], action: CandidateBulkAction): Promise<{ updated: number; status: string }> {
+  const res = await authClient.api.post<{ success: boolean; data: { updated: number; status: string } }>(
+    `/operator/product-candidates/bulk-action`,
+    { ids, action },
+  );
+  return res.data.data;
+}
+
+/** 후보를 기존 ProductMaster 에 수동 매칭 (candidate 만 갱신, master 무변경). */
+export async function manualMatchCandidate(id: string, productMasterId: string): Promise<void> {
+  await authClient.api.post(
+    `/operator/product-candidates/${encodeURIComponent(id)}/manual-match`,
+    { productMasterId },
+  );
+}
+
 // ─── ProductMaster ─────────────────────────────────────────────────────────
 
 export interface ProductMasterRow {

@@ -15,7 +15,7 @@
  */
 
 import type { DataSource, Repository, FindOptionsWhere } from 'typeorm';
-import { IsNull, ILike } from 'typeorm';
+import { IsNull, ILike, In, Not } from 'typeorm';
 import { ProductCandidate } from '../entities/ProductCandidate.entity.js';
 import type {
   ProductCandidateSourceType,
@@ -425,6 +425,112 @@ export class ProductCandidateService {
     candidate.reviewedBy = reviewedBy ?? null;
     candidate.reviewedAt = new Date();
     return this.repo.save(candidate);
+  }
+
+  // ─── WO-O4O-ADMIN-PRODUCT-CANDIDATE-CONFLICT-ACTIONS-V1 ──────────────────────
+
+  /**
+   * 후보 충돌 정보 (read-only 계산). 전용 conflictReason 필드가 없으므로
+   * 동일 식별자를 공유하는 다른 후보 + 식별자(바코드) 일치 ProductMaster 를 계산해 근거로 제시한다.
+   * ProductCandidate/ProductMaster 를 변경하지 않는다. rawPayload 보존.
+   */
+  async getConflictInfo(candidateId: string): Promise<{
+    candidate: ProductCandidate;
+    conflictKey: { identifierType: string | null; identifierValue: string | null; normalizedIdentifierValue: string | null };
+    conflictingCandidates: Array<{
+      id: string; candidateName: string | null; candidateManufacturer: string | null;
+      identifierValue: string | null; matchStatus: string; candidateStatus: string;
+      matchedProductMasterId: string | null; sourceLabel: string | null; createdAt: Date;
+    }>;
+    possibleMasters: Array<{
+      id: string; name: string; regulatoryName: string; manufacturerName: string;
+      barcode: string; category: { id: string; name: string } | null; brand: { id: string; name: string } | null;
+    }>;
+    rawPayloadSummary: Record<string, unknown>;
+  }> {
+    const candidate = await this.getCandidate(candidateId);
+    if (!candidate) throw new Error('CANDIDATE_NOT_FOUND');
+
+    const nv = candidate.normalizedIdentifierValue;
+    const iv = candidate.identifierValue;
+
+    // 동일 식별자를 공유하는 다른 후보 (self 제외, 최대 50)
+    let conflicting: ProductCandidate[] = [];
+    if (nv) {
+      conflicting = await this.repo.find({
+        where: { normalizedIdentifierValue: nv, id: Not(candidateId), deletedAt: IsNull() },
+        order: { createdAt: 'ASC' }, take: 50,
+      });
+    } else if (iv) {
+      conflicting = await this.repo.find({
+        where: { identifierValue: iv, id: Not(candidateId), deletedAt: IsNull() },
+        order: { createdAt: 'ASC' }, take: 50,
+      });
+    }
+
+    // 식별자(표준코드=barcode) 일치 ProductMaster (최대 50)
+    let masters: ProductMaster[] = [];
+    if (iv) {
+      masters = await this.masterRepo.find({ where: { barcode: iv }, relations: ['category', 'brand'], take: 50 });
+    }
+
+    return {
+      candidate,
+      conflictKey: { identifierType: candidate.identifierType, identifierValue: iv, normalizedIdentifierValue: nv },
+      conflictingCandidates: conflicting.map((c) => ({
+        id: c.id, candidateName: c.candidateName, candidateManufacturer: c.candidateManufacturer,
+        identifierValue: c.identifierValue, matchStatus: c.matchStatus, candidateStatus: c.candidateStatus,
+        matchedProductMasterId: c.matchedProductMasterId, sourceLabel: c.sourceLabel, createdAt: c.createdAt,
+      })),
+      possibleMasters: masters.map((m) => ({
+        id: m.id, name: m.name, regulatoryName: m.regulatoryName, manufacturerName: m.manufacturerName,
+        barcode: m.barcode,
+        category: m.category ? { id: m.category.id, name: m.category.name } : null,
+        brand: m.brand ? { id: m.brand.id, name: m.brand.name } : null,
+      })),
+      rawPayloadSummary: this.summarizeRawPayload(candidate.rawPayload),
+    };
+  }
+
+  /** rawPayload 요약 — 최상위 scalar 필드만(중첩/배열 제외), 최대 20개. 원본은 변경하지 않는다. */
+  private summarizeRawPayload(raw: Record<string, unknown> | null): Record<string, unknown> {
+    if (!raw || typeof raw !== 'object') return {};
+    const out: Record<string, unknown> = {};
+    let n = 0;
+    for (const [k, v] of Object.entries(raw)) {
+      if (n >= 20) break;
+      if (v == null || typeof v === 'object') continue;
+      out[k] = v;
+      n++;
+    }
+    return out;
+  }
+
+  /**
+   * 선택 후보 일괄 상태 처리 (hard delete 없음, product_candidates 만 갱신).
+   * archive→archived / ignore→rejected / manual_review→reviewing.
+   * matchStatus 는 변경하지 않는다(기존 archiveCandidate 와 일관 — 매칭 신호 보존).
+   */
+  async bulkAction(
+    ids: string[],
+    action: 'archive' | 'ignore' | 'manual_review',
+    reviewedBy?: string | null,
+  ): Promise<{ updated: number; status: ProductCandidateStatus }> {
+    if (!Array.isArray(ids) || ids.length === 0) throw new Error('IDS_REQUIRED');
+    if (ids.length > 100) throw new Error('TOO_MANY_IDS');
+    const statusMap: Record<string, ProductCandidateStatus> = {
+      archive: 'archived',
+      ignore: 'rejected',
+      manual_review: 'reviewing',
+    };
+    const nextStatus = statusMap[action];
+    if (!nextStatus) throw new Error('INVALID_ACTION');
+
+    const result = await this.repo.update(
+      { id: In(ids), deletedAt: IsNull() },
+      { candidateStatus: nextStatus, reviewedBy: reviewedBy ?? null, reviewedAt: new Date() },
+    );
+    return { updated: result.affected ?? 0, status: nextStatus };
   }
 
   /**

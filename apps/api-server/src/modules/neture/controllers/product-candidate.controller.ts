@@ -90,6 +90,38 @@ export function createProductCandidateController(dataSource: DataSource): Router
     }
   }) as RequestHandler);
 
+  // GET /:id/conflict-info — 충돌 근거 (read-only): 동일 식별자 후보 + 일치 ProductMaster + rawPayload 요약
+  // WO-O4O-ADMIN-PRODUCT-CANDIDATE-CONFLICT-ACTIONS-V1
+  router.get('/:id/conflict-info', (async (req: Request, res: Response) => {
+    try {
+      const info = await service.getConflictInfo(req.params.id);
+      return res.json({ success: true, data: info });
+    } catch (error) {
+      return handleMutationError(res, error, 'conflict-info');
+    }
+  }) as RequestHandler);
+
+  // POST /bulk-action — 선택 후보 일괄 상태 처리 (archive/ignore/manual_review). hard delete 없음.
+  // WO-O4O-ADMIN-PRODUCT-CANDIDATE-CONFLICT-ACTIONS-V1
+  router.post('/bulk-action', (async (req: Request, res: Response) => {
+    try {
+      const { ids, action } = req.body ?? {};
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ success: false, error: 'IDS_REQUIRED' });
+      }
+      if (ids.length > 100) {
+        return res.status(400).json({ success: false, error: 'TOO_MANY_IDS' });
+      }
+      if (!['archive', 'ignore', 'manual_review'].includes(action)) {
+        return res.status(400).json({ success: false, error: 'INVALID_ACTION' });
+      }
+      const result = await service.bulkAction(ids, action, userId(req));
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      return handleMutationError(res, error, 'bulk-action');
+    }
+  }) as RequestHandler);
+
   // POST / — 후보 생성 (+ 식별자 있으면 즉시 매칭 시도)
   router.post('/', (async (req: Request, res: Response) => {
     try {
