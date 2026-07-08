@@ -1,6 +1,6 @@
 # CHECK-O4O-ADMIN-PRODUCT-CANDIDATE-CONFLICT-ACTIONS-V1
 
-Status: 코드 완료 + typecheck/build 통과 → 프로덕션 smoke 진행 (2026-07-08)
+Status: DONE — 코드 완료 + typecheck/build 통과 + 프로덕션 브라우저 smoke PASS (2026-07-08)
 WO: `WO-O4O-ADMIN-PRODUCT-CANDIDATE-CONFLICT-ACTIONS-V1`
 
 Scope: `/admin/o4o-product-db/candidates` conflict(및 일반) 후보를 **안전하게 검토·정리**. 충돌 근거 표시 + 상세 drawer + 일괄 처리(archive/ignore/manual_review) + 기존 ProductMaster 수동 매칭. **hard delete·rawPayload 제거·ProductMaster/Identifier 변경 없음.**
@@ -78,7 +78,14 @@ mount `/api/v1/operator/product-candidates` (guard = OPERATOR_ROLES: platform/ne
 | hard delete | **없음**(repo.update/save 만) |
 | rawPayload 보존 | ✅(요약만 계산, 원본 무변경) |
 | ProductMaster/Identifier 변경 | **없음**(manual-match=candidate 만 갱신) |
-| 프로덕션 smoke | 진행 (배포 후): conflict 필터 진입 → 상세 drawer(충돌 근거) → archive/ignore/manual_review 처리 → 목록 갱신 → 수동 매칭 검색·연결 / Console Error 없음 |
+| 프로덕션 smoke | **PASS** (admin.neture.co.kr, 2026-07-08, 서철환 admin, API+Admin 배포 성공) |
+
+**smoke 상세 (PASS):**
+- conflict 필터 진입 → **총 244건**(심미수복용 복합레진 등 pending/conflict).
+- 행 클릭 → **드로어 렌더**: 후보 기본정보 / 주요 원천값(sourceKind=medical_device_standard_code, rawPayload 요약) / **동일 식별자 다른 후보(0) — §4.1 fallback 안내**("동일 식별자 후보 없음 → rawPayload 확인") / 식별자 일치 기본상품(0) / 수동 매칭 검색 / rawPayload 접힘 / footer archive·제외·보류.
+- **archive** → **ConfirmActionDialog**("원천 데이터(rawPayload)는 삭제되지 않으며… 계속할까요?") → 확인 → 처리 → 드로어 닫힘 + 목록 갱신.
+- **네트워크**: `GET /:id/conflict-info` **200** · `POST /bulk-action` **200** · 목록 갱신 GET 200. 쓰기 POST = login + bulk-action 뿐 → **hard delete/ProductMaster write 없음**. Console Error 없음.
+- (수동 매칭 검색 UI 구조 존재, 엔드포인트=기존 manual-match 재사용.)
 
 ---
 
