@@ -18,6 +18,6 @@
 
 | ADR | 제목 | 상태 | 날짜 |
 |---|---|---|---|
-| — | (첫 결정부터 여기에 등재) | — | — |
+| [ADR-0001](ADR-0001-content-documentation-architecture-baseline.md) | O4O Content Documentation Architecture Baseline | Accepted | 2026-07-08 |
 
-> 향후 채택되는 결정 예시(참고, 아직 미기록): Guide=SSOT · ATC는 후보 검색용 · Route 다르면 공유 금지 · 대표 설명서 우선 수정 · Rule Registry 4계층(CR/DR/AR/OR) · 문서 계보 IR→ADR→Guide.
+> ADR-0001로 문서 체계를 **Baseline 선언**했다. 이후 구조 변경은 Major(새 IR/ADR 필요), 신규 규칙=Registry·사례=Knowledge·결정=ADR·작업=WO·결과=CHECK.
