@@ -206,7 +206,7 @@ export class ProductImportCommonService {
 
           // Check existing image count for is_primary decision
           const existingImages: Array<{ cnt: string }> = await this.dataSource.query(
-            `SELECT COUNT(*)::text AS cnt FROM product_images WHERE master_id = $1`,
+            `SELECT COUNT(*)::text AS cnt FROM product_images WHERE master_id = $1 AND deleted_at IS NULL`,
             [job.masterId],
           );
           const isPrimary = i === 0 && Number(existingImages[0]?.cnt ?? 0) === 0;

@@ -159,7 +159,7 @@ export function createPharmacyProductsController(
          --   대표 이미지 1개 additive (카탈로그 카드/홈 피드용). 이미지 없으면 NULL — row 누락 없음.
          --   우선순위: is_primary → type=thumbnail → sort_order ASC → created_at ASC.
          (SELECT pi.image_url FROM product_images pi
-            WHERE pi.master_id = pm.id
+            WHERE pi.master_id = pm.id AND pi.deleted_at IS NULL
             ORDER BY pi.is_primary DESC, (pi.type = 'thumbnail') DESC, pi.sort_order ASC, pi.created_at ASC
             LIMIT 1) AS "imageUrl",
          -- 내 매장 취급 여부 (신청 또는 진열 어느 하나라도 존재)

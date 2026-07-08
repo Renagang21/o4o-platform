@@ -319,7 +319,7 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
                 pm.regulatory_name AS "regulatoryName", pm.manufacturer_name AS "manufacturerName",
                 (SELECT pi.image_url FROM product_images pi
                  WHERE pi.master_id = pm.id AND pi.is_primary = true LIMIT 1) AS "primaryImage",
-                (SELECT COUNT(*)::int FROM product_images pi WHERE pi.master_id = pm.id) AS "imageCount",
+                (SELECT COUNT(*)::int FROM product_images pi WHERE pi.master_id = pm.id AND pi.deleted_at IS NULL) AS "imageCount",
                 spo.price_general AS "offerPrice", spo.distribution_type AS "distributionType",
                 s.id AS "supplierId", o.name AS "supplierName"
          FROM organization_product_listings opl
@@ -482,7 +482,7 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
     }
 
     const countResult = await dataSource.query(
-      `SELECT COUNT(*)::int AS cnt FROM product_images WHERE master_id = $1`,
+      `SELECT COUNT(*)::int AS cnt FROM product_images WHERE master_id = $1 AND deleted_at IS NULL`,
       [masterId],
     );
     const existingCount: number = countResult[0]?.cnt ?? 0;
@@ -586,7 +586,7 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
     if (wasPrimary) {
       await dataSource.query(
         `UPDATE product_images SET is_primary = true
-         WHERE id = (SELECT id FROM product_images WHERE master_id = $1 ORDER BY sort_order ASC, created_at ASC LIMIT 1)`,
+         WHERE id = (SELECT id FROM product_images WHERE master_id = $1 AND deleted_at IS NULL ORDER BY sort_order ASC, created_at ASC LIMIT 1)`,
         [masterId],
       );
     }

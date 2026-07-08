@@ -127,7 +127,7 @@ export class ProductConsoleController {
       const statsResult = await AppDataSource.query(
         `SELECT
            COUNT(*)::int as total_products,
-           COUNT(CASE WHEN EXISTS (SELECT 1 FROM product_images pi2 WHERE pi2.master_id = pm.id) THEN 1 END)::int as with_image,
+           COUNT(CASE WHEN EXISTS (SELECT 1 FROM product_images pi2 WHERE pi2.master_id = pm.id AND pi2.deleted_at IS NULL) THEN 1 END)::int as with_image,
            COUNT(CASE WHEN EXISTS (SELECT 1 FROM supplier_product_offers spo2 WHERE spo2.master_id = pm.id) THEN 1 END)::int as with_supplier
          FROM product_masters pm
          ${scopeFilter}`,
@@ -266,7 +266,7 @@ export class ProductConsoleController {
       const images = await AppDataSource.query(
         `SELECT id, image_url, gcs_path, sort_order, is_primary, created_at
          FROM product_images
-         WHERE master_id = $1
+         WHERE master_id = $1 AND deleted_at IS NULL
          ORDER BY is_primary DESC, sort_order ASC`,
         [productId]
       );

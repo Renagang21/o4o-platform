@@ -174,7 +174,7 @@ export class OfferServiceApprovalService {
     // WO-O4O-NETURE-OPERATOR-APPROVAL-UX-ADVANCED-V1: quality filters
     const completenessExpr = `(
       CASE WHEN spo.price_general IS NOT NULL AND spo.price_general > 0 THEN 20 ELSE 0 END
-      + CASE WHEN EXISTS (SELECT 1 FROM product_images WHERE master_id = pm.id) THEN 20 ELSE 0 END
+      + CASE WHEN EXISTS (SELECT 1 FROM product_images WHERE master_id = pm.id AND deleted_at IS NULL) THEN 20 ELSE 0 END
       + CASE WHEN spo.consumer_short_description IS NOT NULL AND spo.consumer_short_description != '' THEN 20 ELSE 0 END
       + CASE WHEN spo.consumer_detail_description IS NOT NULL AND spo.consumer_detail_description != '' THEN 20 ELSE 0 END
       + CASE WHEN spo.distribution_type IS NOT NULL THEN 20 ELSE 0 END
@@ -253,7 +253,7 @@ export class OfferServiceApprovalService {
            spo.allowed_seller_ids AS "allowedSellerIds",
            (
              CASE WHEN spo.price_general IS NOT NULL AND spo.price_general > 0 THEN 10 ELSE 0 END
-             + CASE WHEN EXISTS (SELECT 1 FROM product_images WHERE master_id = pm.id) THEN 10 ELSE 0 END
+             + CASE WHEN EXISTS (SELECT 1 FROM product_images WHERE master_id = pm.id AND deleted_at IS NULL) THEN 10 ELSE 0 END
              + CASE WHEN spo.consumer_short_description IS NOT NULL AND spo.consumer_short_description != '' THEN 10 ELSE 0 END
              + CASE WHEN spo.consumer_detail_description IS NOT NULL AND spo.consumer_detail_description != '' THEN 10 ELSE 0 END
              + CASE WHEN spo.distribution_type IS NOT NULL THEN 10 ELSE 0 END
@@ -268,7 +268,7 @@ export class OfferServiceApprovalService {
            spo.price_general AS "priceGeneral",
            (spo.consumer_short_description IS NOT NULL AND spo.consumer_short_description != '') AS "hasShortDescription",
            (spo.consumer_detail_description IS NOT NULL AND spo.consumer_detail_description != '') AS "hasDetailDescription",
-           (SELECT COUNT(*)::int FROM product_images pi2 WHERE pi2.master_id = pm.id) AS "imageCount",
+           (SELECT COUNT(*)::int FROM product_images pi2 WHERE pi2.master_id = pm.id AND pi2.deleted_at IS NULL) AS "imageCount",
            (osa.created_at < NOW() - INTERVAL '2 days' AND osa.approval_status = 'pending') AS "isStale",
            (COALESCE(supplier_stats.approval_rate, 100) < 50 AND COALESCE(supplier_stats.total_count, 0) >= 5) AS "isLowQualitySupplier",
            CASE

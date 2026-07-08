@@ -103,7 +103,7 @@ export function createStoreHandledProductsRoutes(dataSource: DataSource): Router
 
       const listingSelect = `
         SELECT 'listing'::text AS source_type, opl.id AS source_id, pm.name AS name,
-               (SELECT pi.image_url FROM product_images pi WHERE pi.master_id = opl.master_id
+               (SELECT pi.image_url FROM product_images pi WHERE pi.master_id = opl.master_id AND pi.deleted_at IS NULL
                  ORDER BY pi.is_primary DESC, pi.sort_order ASC LIMIT 1) AS image_url,
                COALESCE(opl.price, spo.price_general) AS price,
                opl.is_active AS is_active, opl.status AS listing_status,
