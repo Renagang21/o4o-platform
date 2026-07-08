@@ -2,7 +2,8 @@
  * DescriptionReviewPage — SharedProductDescription 설명 검토 목록 (read-only)
  *
  * WO-O4O-ADMIN-O4O-PRODUCT-DESCRIPTION-REVIEW-SHELL-V1
- * (기반: WO-O4O-DRUG-SHARED-DESCRIPTION-CANONICAL-CURATION-V1)
+ * WO-O4O-ADMIN-O4O-PRODUCT-STANDARD-LIST-PATTERN-APPLY-V2 — V1 표준 목록 패턴 적용
+ *   (BaseTable + O4OColumn + RowActionMenu + selectable/_select + ActionBar + pagination footer + columnVisibility)
  *
  * ProductMaster 횡단으로 설명 후보/공식 설명 상태를 조회하는 read-only 검토 화면.
  * 규제구분·출처·언어·상태·검색 필터(모두 GET query param). row → 기본 상품 상세(read-only)로 이동.
@@ -11,7 +12,9 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search } from 'lucide-react';
+import { Search, Eye, Wand2 } from 'lucide-react';
+import { BaseTable, RowActionMenu, ActionBar } from '@o4o/ui';
+import type { O4OColumn } from '@o4o/ui';
 import { listDescriptionReviews, DescriptionReviewRow } from '@/api/o4o-product-db.api';
 
 const LIMIT = 20;
@@ -65,6 +68,7 @@ export default function DescriptionReviewPage() {
   const [q, setQ] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -99,45 +103,82 @@ export default function DescriptionReviewPage() {
   const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setPage(1);
+    setSelectedKeys(new Set());
     setQ(term.trim());
   };
 
-  const resetPage = () => setPage(1);
+  const resetPage = () => { setPage(1); setSelectedKeys(new Set()); };
+
+  const toggleSelect = (id: string, checked: boolean) => {
+    const next = new Set(selectedKeys);
+    if (checked) next.add(id); else next.delete(id);
+    setSelectedKeys(next);
+  };
+
+  const columns: O4OColumn<DescriptionReviewRow>[] = [
+    {
+      key: '_select',
+      system: true,
+      header: '',
+      width: 40,
+      align: 'center',
+      render: (_, r) => (
+        <input
+          type="checkbox"
+          checked={selectedKeys.has(r.id)}
+          onChange={(e) => toggleSelect(r.id, e.target.checked)}
+          onClick={(e) => e.stopPropagation()}
+          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+        />
+      ),
+      onCellClick: () => {},
+    },
+    { key: 'masterName', header: '상품명', maxWidth: 240, render: (_, r) => <span className="block max-w-[15rem] truncate font-medium text-gray-900">{r.masterName || r.representativeName || '—'}</span> },
+    { key: 'regulatoryName', header: '공식명', maxWidth: 200, render: (_, r) => <span className="block max-w-[12rem] truncate text-gray-500">{r.regulatoryName || '—'}</span> },
+    { key: 'manufacturerName', header: '제조사', maxWidth: 160, render: (_, r) => <span className="block max-w-[10rem] truncate">{r.manufacturerName || '—'}</span> },
+    { key: 'regulatoryType', header: '규제구분', render: (_, r) => regulatoryLabel(r.regulatoryType) },
+    { key: 'status', header: '상태', align: 'center', render: (_, r) => <StatusBadge status={r.status} /> },
+    { key: 'sourceType', header: '출처', render: (_, r) => <span className="text-gray-500">{sourceLabel(r.sourceType)}</span> },
+    { key: 'language', header: '언어', align: 'center', render: (_, r) => <span className="text-gray-500 uppercase">{r.language || '—'}</span> },
+    { key: 'summary', header: '요약', maxWidth: 260, render: (_, r) => <span className="block max-w-[16rem] truncate text-gray-600">{r.summary || r.contentPreview || '—'}</span> },
+    { key: 'qualityScore', header: '품질', align: 'right', render: (_, r) => <span className="text-gray-500 tabular-nums">{typeof r.qualityScore === 'number' ? r.qualityScore.toFixed(2) : '—'}</span> },
+    { key: 'updatedAt', header: '수정일', render: (_, r) => <span className="text-gray-400">{(r.updatedAt || r.createdAt)?.slice(0, 10) || '—'}</span> },
+    {
+      key: '_actions',
+      header: '',
+      width: 56,
+      system: 'last',
+      align: 'center',
+      render: (_, r) => (
+        <RowActionMenu
+          actions={[
+            { key: 'product', label: '상품 상세', icon: <Eye size={14} />, onClick: () => navigate(`/admin/o4o-product-db/masters/${r.masterId}`) },
+            { key: 'curation', label: '큐레이션 상세', icon: <Wand2 size={14} />, onClick: () => navigate(`/admin/o4o-product-db/review/${r.id}`) },
+          ]}
+        />
+      ),
+      onCellClick: () => {},
+    },
+  ];
 
   return (
     <div>
       <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 mb-4 text-xs text-gray-600">
         이 화면은 설명 데이터를 조회하는 read-only 검토 화면입니다. 목록은 read-only이며 설명 생성·승인·수정·삭제 기능은 제공하지 않습니다.
-        행을 클릭하면 해당 기본 상품 상세로 이동하고, 기존 큐레이션 상세(대표 승격·반려)는 각 행의 <b>큐레이션</b> 링크에서 별도 화면으로 유지됩니다.
+        행을 클릭하면 해당 기본 상품 상세로 이동하고, 기존 큐레이션 상세(대표 승격·반려)는 각 행의 <b>큐레이션 상세</b> 액션에서 별도 화면으로 유지됩니다.
       </div>
 
       <div className="flex flex-wrap gap-3 mb-4 items-center">
-        <select
-          value={status}
-          onChange={(e) => { setStatus(e.target.value); resetPage(); }}
-          className="border border-gray-300 rounded px-3 py-2 text-sm"
-        >
+        <select value={status} onChange={(e) => { setStatus(e.target.value); resetPage(); }} className="border border-gray-300 rounded px-3 py-2 text-sm">
           {STATUS_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
-        <select
-          value={regulatoryType}
-          onChange={(e) => { setRegulatoryType(e.target.value); resetPage(); }}
-          className="border border-gray-300 rounded px-3 py-2 text-sm"
-        >
+        <select value={regulatoryType} onChange={(e) => { setRegulatoryType(e.target.value); resetPage(); }} className="border border-gray-300 rounded px-3 py-2 text-sm">
           {REGULATORY_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
-        <select
-          value={sourceType}
-          onChange={(e) => { setSourceType(e.target.value); resetPage(); }}
-          className="border border-gray-300 rounded px-3 py-2 text-sm"
-        >
+        <select value={sourceType} onChange={(e) => { setSourceType(e.target.value); resetPage(); }} className="border border-gray-300 rounded px-3 py-2 text-sm">
           {SOURCE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
-        <select
-          value={language}
-          onChange={(e) => { setLanguage(e.target.value); resetPage(); }}
-          className="border border-gray-300 rounded px-3 py-2 text-sm"
-        >
+        <select value={language} onChange={(e) => { setLanguage(e.target.value); resetPage(); }} className="border border-gray-300 rounded px-3 py-2 text-sm">
           {LANGUAGE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
         <form onSubmit={submitSearch} className="flex gap-2">
@@ -151,7 +192,7 @@ export default function DescriptionReviewPage() {
             <Search className="w-4 h-4" /> 검색
           </button>
           {q && (
-            <button type="button" onClick={() => { setTerm(''); setQ(''); setPage(1); }} className="text-sm text-gray-500 px-2">초기화</button>
+            <button type="button" onClick={() => { setTerm(''); setQ(''); setPage(1); setSelectedKeys(new Set()); }} className="text-sm text-gray-500 px-2">초기화</button>
           )}
         </form>
         <div className="ml-auto text-sm text-gray-500">총 {total.toLocaleString()}건</div>
@@ -164,71 +205,41 @@ export default function DescriptionReviewPage() {
         </div>
       )}
 
-      <div className="overflow-x-auto border border-gray-200 rounded-lg">
-        <table className="min-w-full divide-y divide-gray-200 text-sm">
-          <thead className="bg-gray-50">
-            <tr>
-              <Th>상품명</Th>
-              <Th>공식명</Th>
-              <Th>제조사</Th>
-              <Th>규제구분</Th>
-              <Th>상태</Th>
-              <Th>출처</Th>
-              <Th>언어</Th>
-              <Th>요약</Th>
-              <Th>품질</Th>
-              <Th>수정일</Th>
-              <Th>상세</Th>
-              <Th>큐레이션</Th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100 bg-white">
-            {loading ? (
-              <tr><td colSpan={12} className="px-4 py-10 text-center text-gray-400">불러오는 중…</td></tr>
-            ) : rows.length === 0 ? (
-              <tr><td colSpan={12} className="px-4 py-10 text-center text-gray-400">현재 조건에 맞는 설명 데이터가 없습니다.</td></tr>
-            ) : (
-              rows.map((r) => (
-                <tr
-                  key={r.id}
-                  onClick={() => navigate(`/admin/o4o-product-db/masters/${r.masterId}`)}
-                  className="hover:bg-blue-50 cursor-pointer"
-                >
-                  <Td className="font-medium text-gray-900 max-w-xs truncate">{r.masterName || r.representativeName || '—'}</Td>
-                  <Td className="text-gray-500 max-w-xs truncate">{r.regulatoryName || '—'}</Td>
-                  <Td className="max-w-[10rem] truncate">{r.manufacturerName || '—'}</Td>
-                  <Td>{regulatoryLabel(r.regulatoryType)}</Td>
-                  <Td><StatusBadge status={r.status} /></Td>
-                  <Td className="text-gray-500">{sourceLabel(r.sourceType)}</Td>
-                  <Td className="text-gray-500 uppercase">{r.language || '—'}</Td>
-                  <Td className="max-w-[16rem]">
-                    <span className="block truncate text-gray-600">{r.summary || r.contentPreview || '—'}</span>
-                  </Td>
-                  <Td className="text-gray-500">{typeof r.qualityScore === 'number' ? r.qualityScore.toFixed(2) : '—'}</Td>
-                  <Td className="text-gray-400">{(r.updatedAt || r.createdAt)?.slice(0, 10) || '—'}</Td>
-                  <Td className="text-admin-blue whitespace-nowrap">상품 상세 →</Td>
-                  <Td className="whitespace-nowrap">
-                    <button
-                      type="button"
-                      onClick={(e) => { e.stopPropagation(); navigate(`/admin/o4o-product-db/review/${r.id}`); }}
-                      className="text-gray-600 hover:text-admin-blue underline underline-offset-2"
-                    >
-                      큐레이션 상세
-                    </button>
-                  </Td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="flex items-center justify-between mt-4 text-sm">
-        <span className="text-gray-500">{page} / {totalPages} 페이지</span>
-        <div className="flex gap-2">
-          <button disabled={page <= 1 || loading} onClick={() => setPage((p) => Math.max(1, p - 1))} className="px-3 py-1.5 border border-gray-300 rounded disabled:opacity-40">이전</button>
-          <button disabled={page >= totalPages || loading} onClick={() => setPage((p) => Math.min(totalPages, p + 1))} className="px-3 py-1.5 border border-gray-300 rounded disabled:opacity-40">다음</button>
+      {selectedKeys.size > 0 && (
+        <div className="mb-3">
+          <ActionBar
+            selectedCount={selectedKeys.size}
+            onClearSelection={() => setSelectedKeys(new Set())}
+            statusInfo="선택 항목에 대한 일괄 작업은 후속 WO에서 제공됩니다."
+            actions={[]}
+          />
         </div>
+      )}
+
+      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <BaseTable<DescriptionReviewRow>
+          columns={columns}
+          data={rows}
+          rowKey={(r) => r.id}
+          onRowClick={(r) => navigate(`/admin/o4o-product-db/masters/${r.masterId}`)}
+          emptyMessage={loading ? '불러오는 중…' : '현재 조건에 맞는 설명 데이터가 없습니다.'}
+          selectable
+          selectedKeys={selectedKeys}
+          onSelectionChange={setSelectedKeys}
+          tableId="o4o-product-description-review"
+          columnVisibility
+          persistState
+        />
+
+        {total > 0 && (
+          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 text-sm">
+            <span className="text-gray-500">{page} / {totalPages} 페이지</span>
+            <div className="flex gap-2">
+              <button disabled={page <= 1 || loading} onClick={() => setPage((p) => Math.max(1, p - 1))} className="px-3 py-1.5 border border-gray-300 rounded disabled:opacity-40">이전</button>
+              <button disabled={page >= totalPages || loading} onClick={() => setPage((p) => Math.min(totalPages, p + 1))} className="px-3 py-1.5 border border-gray-300 rounded disabled:opacity-40">다음</button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -269,11 +280,4 @@ function StatusBadge({ status }: { status: string }) {
   };
   const m = map[status] ?? { label: status, cls: 'bg-gray-100 text-gray-600' };
   return <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${m.cls}`}>{m.label}</span>;
-}
-
-function Th({ children }: { children: React.ReactNode }) {
-  return <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap">{children}</th>;
-}
-function Td({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-  return <td className={`px-4 py-3 align-middle whitespace-nowrap ${className}`}>{children}</td>;
 }

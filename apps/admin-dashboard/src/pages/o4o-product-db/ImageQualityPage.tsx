@@ -2,6 +2,8 @@
  * ImageQualityPage — 기본상품(master) 이미지 상태 점검 (read-only)
  *
  * WO-O4O-ADMIN-O4O-PRODUCT-IMAGE-QUALITY-SHELL-V1
+ * WO-O4O-ADMIN-O4O-PRODUCT-STANDARD-LIST-PATTERN-APPLY-V2 — V1 표준 목록 패턴 적용
+ *   (BaseTable + O4OColumn + RowActionMenu + selectable/_select + ActionBar + pagination footer + columnVisibility)
  *
  * 이미지 있음/없음/대표 여부를 master 축으로 조회. 썸네일 미리보기(onError fallback).
  * 이미지 업로드/교체/삭제·AI 보정 없음(GET-only). ProductMaster 상세로 이동만.
@@ -9,7 +11,9 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, ImageOff } from 'lucide-react';
+import { Search, ImageOff, Eye } from 'lucide-react';
+import { BaseTable, RowActionMenu, ActionBar } from '@o4o/ui';
+import type { O4OColumn } from '@o4o/ui';
 import { listImageQuality, getImageQualitySummary, ImageQualityRow } from '@/api/o4o-product-db.api';
 
 const LIMIT = 20;
@@ -43,6 +47,7 @@ export default function ImageQualityPage() {
   const [summary, setSummary] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     getImageQualitySummary().then(setSummary).catch(() => setSummary({}));
@@ -74,8 +79,58 @@ export default function ImageQualityPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  const submitSearch = (e: React.FormEvent) => { e.preventDefault(); setPage(1); setQ(term.trim()); };
-  const resetPage = () => setPage(1);
+  const submitSearch = (e: React.FormEvent) => { e.preventDefault(); setPage(1); setSelectedKeys(new Set()); setQ(term.trim()); };
+  const resetPage = () => { setPage(1); setSelectedKeys(new Set()); };
+
+  const toggleSelect = (id: string, checked: boolean) => {
+    const next = new Set(selectedKeys);
+    if (checked) next.add(id); else next.delete(id);
+    setSelectedKeys(next);
+  };
+
+  const columns: O4OColumn<ImageQualityRow>[] = [
+    {
+      key: '_select',
+      system: true,
+      header: '',
+      width: 40,
+      align: 'center',
+      render: (_, r) => (
+        <input
+          type="checkbox"
+          checked={selectedKeys.has(r.masterId)}
+          onChange={(e) => toggleSelect(r.masterId, e.target.checked)}
+          onClick={(e) => e.stopPropagation()}
+          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+        />
+      ),
+      onCellClick: () => {},
+    },
+    { key: 'thumbnail', header: '대표 이미지', width: 72, align: 'center', render: (_, r) => <Thumb url={r.thumbnailUrl} /> },
+    { key: 'productName', header: '상품명', maxWidth: 260, render: (_, r) => <span className="block max-w-[16rem] truncate font-medium text-gray-900">{r.productName || '—'}</span> },
+    { key: 'manufacturerName', header: '제조사', maxWidth: 160, render: (_, r) => <span className="block max-w-[10rem] truncate text-gray-500">{r.manufacturerName || '—'}</span> },
+    { key: 'regulatoryType', header: '규제구분', render: (_, r) => <span className="text-gray-500">{regulatoryLabel(r.regulatoryType)}</span> },
+    { key: 'barcode', header: '바코드', render: (_, r) => <span className="text-gray-400 font-mono text-xs">{r.barcode || '—'}</span> },
+    { key: 'imageStatus', header: '이미지 상태', align: 'center', render: (_, r) => <ImageStatusBadge status={r.imageStatus} /> },
+    { key: 'imageCount', header: '이미지 수', align: 'center', render: (_, r) => <span className="text-gray-600">{r.imageCount}</span> },
+    { key: 'thumbnailType', header: '출처', render: (_, r) => <span className="text-gray-500 text-xs">{r.thumbnailType || '—'}</span> },
+    { key: 'imageUpdatedAt', header: '최근 수정', render: (_, r) => <span className="text-gray-400">{r.imageUpdatedAt?.slice(0, 10) || '—'}</span> },
+    {
+      key: '_actions',
+      header: '',
+      width: 56,
+      system: 'last',
+      align: 'center',
+      render: (_, r) => (
+        <RowActionMenu
+          actions={[
+            { key: 'product', label: '상품 상세', icon: <Eye size={14} />, onClick: () => navigate(`/admin/o4o-product-db/masters/${r.masterId}`) },
+          ]}
+        />
+      ),
+      onCellClick: () => {},
+    },
+  ];
 
   return (
     <div>
@@ -100,7 +155,7 @@ export default function ImageQualityPage() {
         <form onSubmit={submitSearch} className="flex gap-2">
           <input value={term} onChange={(e) => setTerm(e.target.value)} placeholder="상품명 / 제조사 / 바코드 / master id" className="border border-gray-300 rounded px-3 py-2 text-sm w-72" />
           <button type="submit" className="flex items-center gap-1 bg-admin-blue text-white px-3 py-2 rounded text-sm"><Search className="w-4 h-4" /> 검색</button>
-          {q && <button type="button" onClick={() => { setTerm(''); setQ(''); setPage(1); }} className="text-sm text-gray-500 px-2">초기화</button>}
+          {q && <button type="button" onClick={() => { setTerm(''); setQ(''); setPage(1); setSelectedKeys(new Set()); }} className="text-sm text-gray-500 px-2">초기화</button>}
         </form>
         <div className="ml-auto text-sm text-gray-500">총 {total.toLocaleString()}건</div>
       </div>
@@ -112,53 +167,41 @@ export default function ImageQualityPage() {
         </div>
       )}
 
-      <div className="overflow-x-auto border border-gray-200 rounded-lg">
-        <table className="min-w-full divide-y divide-gray-200 text-sm">
-          <thead className="bg-gray-50">
-            <tr>
-              <Th>대표 이미지</Th>
-              <Th>상품명</Th>
-              <Th>제조사</Th>
-              <Th>규제구분</Th>
-              <Th>바코드</Th>
-              <Th>이미지 상태</Th>
-              <Th>이미지 수</Th>
-              <Th>출처</Th>
-              <Th>최근 수정</Th>
-              <Th>상세</Th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100 bg-white">
-            {loading ? (
-              <tr><td colSpan={10} className="px-4 py-10 text-center text-gray-400">불러오는 중…</td></tr>
-            ) : rows.length === 0 ? (
-              <tr><td colSpan={10} className="px-4 py-10 text-center text-gray-400">현재 조건에 맞는 상품이 없습니다.</td></tr>
-            ) : (
-              rows.map((r) => (
-                <tr key={r.masterId} onClick={() => navigate(`/admin/o4o-product-db/masters/${r.masterId}`)} className="hover:bg-blue-50 cursor-pointer">
-                  <Td><Thumb url={r.thumbnailUrl} /></Td>
-                  <Td className="font-medium text-gray-900 max-w-xs truncate">{r.productName || '—'}</Td>
-                  <Td className="max-w-[10rem] truncate text-gray-500">{r.manufacturerName || '—'}</Td>
-                  <Td className="text-gray-500">{regulatoryLabel(r.regulatoryType)}</Td>
-                  <Td className="text-gray-400 font-mono text-xs">{r.barcode || '—'}</Td>
-                  <Td><ImageStatusBadge status={r.imageStatus} /></Td>
-                  <Td className="text-center text-gray-600">{r.imageCount}</Td>
-                  <Td className="text-gray-500 text-xs">{r.thumbnailType || '—'}</Td>
-                  <Td className="text-gray-400">{r.imageUpdatedAt?.slice(0, 10) || '—'}</Td>
-                  <Td className="text-admin-blue whitespace-nowrap">상품 상세 →</Td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="flex items-center justify-between mt-4 text-sm">
-        <span className="text-gray-500">{page} / {totalPages} 페이지</span>
-        <div className="flex gap-2">
-          <button disabled={page <= 1 || loading} onClick={() => setPage((p) => Math.max(1, p - 1))} className="px-3 py-1.5 border border-gray-300 rounded disabled:opacity-40">이전</button>
-          <button disabled={page >= totalPages || loading} onClick={() => setPage((p) => Math.min(totalPages, p + 1))} className="px-3 py-1.5 border border-gray-300 rounded disabled:opacity-40">다음</button>
+      {selectedKeys.size > 0 && (
+        <div className="mb-3">
+          <ActionBar
+            selectedCount={selectedKeys.size}
+            onClearSelection={() => setSelectedKeys(new Set())}
+            statusInfo="선택 항목에 대한 일괄 작업(이미지 보강 등)은 후속 WO에서 제공됩니다."
+            actions={[]}
+          />
         </div>
+      )}
+
+      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <BaseTable<ImageQualityRow>
+          columns={columns}
+          data={rows}
+          rowKey={(r) => r.masterId}
+          onRowClick={(r) => navigate(`/admin/o4o-product-db/masters/${r.masterId}`)}
+          emptyMessage={loading ? '불러오는 중…' : '현재 조건에 맞는 상품이 없습니다.'}
+          selectable
+          selectedKeys={selectedKeys}
+          onSelectionChange={setSelectedKeys}
+          tableId="o4o-product-image-quality"
+          columnVisibility
+          persistState
+        />
+
+        {total > 0 && (
+          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 text-sm">
+            <span className="text-gray-500">{page} / {totalPages} 페이지</span>
+            <div className="flex gap-2">
+              <button disabled={page <= 1 || loading} onClick={() => setPage((p) => Math.max(1, p - 1))} className="px-3 py-1.5 border border-gray-300 rounded disabled:opacity-40">이전</button>
+              <button disabled={page >= totalPages || loading} onClick={() => setPage((p) => Math.min(totalPages, p + 1))} className="px-3 py-1.5 border border-gray-300 rounded disabled:opacity-40">다음</button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -168,12 +211,12 @@ function Thumb({ url }: { url: string | null }) {
   const [broken, setBroken] = useState(false);
   if (!url || broken) {
     return (
-      <div className="w-10 h-10 rounded bg-gray-100 flex items-center justify-center text-gray-300" title={url ? '이미지를 불러올 수 없음' : '이미지 없음'}>
+      <div className="w-10 h-10 rounded bg-gray-100 flex items-center justify-center text-gray-300 mx-auto" title={url ? '이미지를 불러올 수 없음' : '이미지 없음'}>
         <ImageOff className="w-4 h-4" />
       </div>
     );
   }
-  return <img src={url} alt="" className="w-10 h-10 rounded object-cover border border-gray-200" loading="lazy" onError={() => setBroken(true)} />;
+  return <img src={url} alt="" className="w-10 h-10 rounded object-cover border border-gray-200 mx-auto" loading="lazy" onError={() => setBroken(true)} />;
 }
 
 const REGULATORY_LABEL: Record<string, string> = {
@@ -199,10 +242,4 @@ function SummaryPill({ label, value, cls, onClick }: { label: string; value?: nu
       {label} {typeof value === 'number' ? value.toLocaleString() : '—'}
     </button>
   );
-}
-function Th({ children }: { children: React.ReactNode }) {
-  return <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap">{children}</th>;
-}
-function Td({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-  return <td className={`px-4 py-3 align-middle whitespace-nowrap ${className}`}>{children}</td>;
 }

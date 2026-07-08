@@ -2,6 +2,8 @@
  * DrugDescriptionDraftsPage — OTC 의약품 설명 초안(draft) 검토 목록 (read-only)
  *
  * WO-O4O-ADMIN-O4O-DRUG-DESCRIPTION-DRAFT-REVIEW-SHELL-V1
+ * WO-O4O-ADMIN-O4O-PRODUCT-STANDARD-LIST-PATTERN-APPLY-V2 — V1 표준 목록 패턴 적용
+ *   (BaseTable + O4OColumn + RowActionMenu + selectable/_select + ActionBar + pagination footer + columnVisibility)
  *
  * product_candidate_description_drafts (source_label=MFDS_DRUG_OTC) 검토 대기 draft 목록.
  * verdict/상태/검색 필터(모두 GET query param). row → draft 상세(read-only).
@@ -10,7 +12,9 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search } from 'lucide-react';
+import { Search, Eye } from 'lucide-react';
+import { BaseTable, RowActionMenu, ActionBar } from '@o4o/ui';
+import type { O4OColumn } from '@o4o/ui';
 import { listDrugDescriptionDrafts, DrugDescriptionDraftRow } from '@/api/o4o-product-db.api';
 
 const LIMIT = 20;
@@ -46,6 +50,7 @@ export default function DrugDescriptionDraftsPage() {
   const [q, setQ] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -79,9 +84,60 @@ export default function DrugDescriptionDraftsPage() {
   const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setPage(1);
+    setSelectedKeys(new Set());
     setQ(term.trim());
   };
-  const resetPage = () => setPage(1);
+  const resetPage = () => { setPage(1); setSelectedKeys(new Set()); };
+
+  const toggleSelect = (id: string, checked: boolean) => {
+    const next = new Set(selectedKeys);
+    if (checked) next.add(id); else next.delete(id);
+    setSelectedKeys(next);
+  };
+
+  const columns: O4OColumn<DrugDescriptionDraftRow>[] = [
+    {
+      key: '_select',
+      system: true,
+      header: '',
+      width: 40,
+      align: 'center',
+      render: (_, r) => (
+        <input
+          type="checkbox"
+          checked={selectedKeys.has(r.id)}
+          onChange={(e) => toggleSelect(r.id, e.target.checked)}
+          onClick={(e) => e.stopPropagation()}
+          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+        />
+      ),
+      onCellClick: () => {},
+    },
+    { key: 'title', header: '그룹명', maxWidth: 260, render: (_, r) => <span className="block max-w-[16rem] truncate font-medium text-gray-900">{r.title || r.groupKey || '—'}</span> },
+    { key: 'verdict', header: 'verdict', align: 'center', render: (_, r) => <VerdictBadge verdict={r.verdict} /> },
+    { key: 'reviewStatus', header: '상태', align: 'center', render: (_, r) => <StatusBadge status={r.reviewStatus} /> },
+    { key: 'masterTotal', header: 'SKU(master)', align: 'center', render: (_, r) => <span className="text-gray-600">{r.masterTotal ?? '—'}</span> },
+    { key: 'otcRx', header: 'OTC/RX', align: 'center', render: (_, r) => <span className="text-gray-600">{r.otc ?? '—'}/{r.rx ?? 0}</span> },
+    { key: 'manufacturers', header: '제조사', maxWidth: 160, render: (_, r) => <span className="block max-w-[10rem] truncate text-gray-500">{r.manufacturers ?? '—'}</span> },
+    { key: 'spdMasters', header: 'e약은요 중복', align: 'center', render: (_, r) => <span className="text-gray-500">{r.spdMasters != null && r.spdMasters > 0 ? `${r.spdMasters}건` : '—'}</span> },
+    { key: 'efficacyPreview', header: '효능(미리보기)', maxWidth: 300, render: (_, r) => <span className="block max-w-[18rem] truncate text-gray-600">{r.efficacyPreview || '—'}</span> },
+    { key: 'createdAt', header: '생성일', render: (_, r) => <span className="text-gray-400">{r.createdAt?.slice(0, 10) || '—'}</span> },
+    {
+      key: '_actions',
+      header: '',
+      width: 56,
+      system: 'last',
+      align: 'center',
+      render: (_, r) => (
+        <RowActionMenu
+          actions={[
+            { key: 'draft', label: '초안 상세', icon: <Eye size={14} />, onClick: () => navigate(`/admin/o4o-product-db/drug-description-drafts/${r.id}`) },
+          ]}
+        />
+      ),
+      onCellClick: () => {},
+    },
+  ];
 
   return (
     <div>
@@ -109,7 +165,7 @@ export default function DrugDescriptionDraftsPage() {
             <Search className="w-4 h-4" /> 검색
           </button>
           {q && (
-            <button type="button" onClick={() => { setTerm(''); setQ(''); setPage(1); }} className="text-sm text-gray-500 px-2">초기화</button>
+            <button type="button" onClick={() => { setTerm(''); setQ(''); setPage(1); setSelectedKeys(new Set()); }} className="text-sm text-gray-500 px-2">초기화</button>
           )}
         </form>
         <div className="ml-auto text-sm text-gray-500">총 {total.toLocaleString()}건</div>
@@ -122,57 +178,41 @@ export default function DrugDescriptionDraftsPage() {
         </div>
       )}
 
-      <div className="overflow-x-auto border border-gray-200 rounded-lg">
-        <table className="min-w-full divide-y divide-gray-200 text-sm">
-          <thead className="bg-gray-50">
-            <tr>
-              <Th>그룹명</Th>
-              <Th>verdict</Th>
-              <Th>상태</Th>
-              <Th>SKU(master)</Th>
-              <Th>OTC/RX</Th>
-              <Th>제조사</Th>
-              <Th>e약은요 중복</Th>
-              <Th>효능(미리보기)</Th>
-              <Th>생성일</Th>
-              <Th>상세</Th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100 bg-white">
-            {loading ? (
-              <tr><td colSpan={10} className="px-4 py-10 text-center text-gray-400">불러오는 중…</td></tr>
-            ) : rows.length === 0 ? (
-              <tr><td colSpan={10} className="px-4 py-10 text-center text-gray-400">현재 조건에 맞는 설명 초안이 없습니다.</td></tr>
-            ) : (
-              rows.map((r) => (
-                <tr
-                  key={r.id}
-                  onClick={() => navigate(`/admin/o4o-product-db/drug-description-drafts/${r.id}`)}
-                  className="hover:bg-blue-50 cursor-pointer"
-                >
-                  <Td className="font-medium text-gray-900 max-w-xs truncate">{r.title || r.groupKey || '—'}</Td>
-                  <Td><VerdictBadge verdict={r.verdict} /></Td>
-                  <Td><StatusBadge status={r.reviewStatus} /></Td>
-                  <Td className="text-gray-600">{r.masterTotal ?? '—'}</Td>
-                  <Td className="text-gray-600">{r.otc ?? '—'}/{r.rx ?? 0}</Td>
-                  <Td className="text-gray-500">{r.manufacturers ?? '—'}</Td>
-                  <Td className="text-gray-500">{r.spdMasters != null && r.spdMasters > 0 ? `${r.spdMasters}건` : '—'}</Td>
-                  <Td className="max-w-[18rem]"><span className="block truncate text-gray-600">{r.efficacyPreview || '—'}</span></Td>
-                  <Td className="text-gray-400">{r.createdAt?.slice(0, 10) || '—'}</Td>
-                  <Td className="text-admin-blue whitespace-nowrap">초안 상세 →</Td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="flex items-center justify-between mt-4 text-sm">
-        <span className="text-gray-500">{page} / {totalPages} 페이지</span>
-        <div className="flex gap-2">
-          <button disabled={page <= 1 || loading} onClick={() => setPage((p) => Math.max(1, p - 1))} className="px-3 py-1.5 border border-gray-300 rounded disabled:opacity-40">이전</button>
-          <button disabled={page >= totalPages || loading} onClick={() => setPage((p) => Math.min(totalPages, p + 1))} className="px-3 py-1.5 border border-gray-300 rounded disabled:opacity-40">다음</button>
+      {selectedKeys.size > 0 && (
+        <div className="mb-3">
+          <ActionBar
+            selectedCount={selectedKeys.size}
+            onClearSelection={() => setSelectedKeys(new Set())}
+            statusInfo="선택 항목에 대한 일괄 작업(승인/승격 등)은 후속 WO에서 제공됩니다."
+            actions={[]}
+          />
         </div>
+      )}
+
+      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <BaseTable<DrugDescriptionDraftRow>
+          columns={columns}
+          data={rows}
+          rowKey={(r) => r.id}
+          onRowClick={(r) => navigate(`/admin/o4o-product-db/drug-description-drafts/${r.id}`)}
+          emptyMessage={loading ? '불러오는 중…' : '현재 조건에 맞는 설명 초안이 없습니다.'}
+          selectable
+          selectedKeys={selectedKeys}
+          onSelectionChange={setSelectedKeys}
+          tableId="o4o-product-drug-description-drafts"
+          columnVisibility
+          persistState
+        />
+
+        {total > 0 && (
+          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 text-sm">
+            <span className="text-gray-500">{page} / {totalPages} 페이지</span>
+            <div className="flex gap-2">
+              <button disabled={page <= 1 || loading} onClick={() => setPage((p) => Math.max(1, p - 1))} className="px-3 py-1.5 border border-gray-300 rounded disabled:opacity-40">이전</button>
+              <button disabled={page >= totalPages || loading} onClick={() => setPage((p) => Math.min(totalPages, p + 1))} className="px-3 py-1.5 border border-gray-300 rounded disabled:opacity-40">다음</button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -201,11 +241,4 @@ function StatusBadge({ status }: { status: string }) {
   };
   const m = map[status] ?? { label: status, cls: 'bg-gray-100 text-gray-600' };
   return <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${m.cls}`}>{m.label}</span>;
-}
-
-function Th({ children }: { children: React.ReactNode }) {
-  return <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap">{children}</th>;
-}
-function Td({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-  return <td className={`px-4 py-3 align-middle whitespace-nowrap ${className}`}>{children}</td>;
 }
