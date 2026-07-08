@@ -1,9 +1,9 @@
 # CHECK-O4O-CONTENT-ASSET-MEDIA-LIBRARY-STANDARDIZATION-V1
 
-Status: 코드 완료 + 4서비스 typecheck EXIT0 + Cloud Run 배포 성공 (2026-07-08)
+Status: DONE — 코드 완료 + 4서비스 typecheck EXIT0 + Cloud Run 배포 성공 + 통합 picker 프로덕션 브라우저 smoke PASS (2026-07-08)
 WO: `WO-O4O-CONTENT-ASSET-MEDIA-LIBRARY-STANDARDIZATION-V1`
 
-> **브라우저 DOM smoke는 미수행(환경 blocked)** — Playwright 프로파일 잠금(§6.2). 코드/배포 검증은 완료.
+> **Unit A(공용 MediaPickerModal) 프로덕션 브라우저 smoke PASS** (kpa-society.co.kr, §6.1). Unit B 편집기 배선은 코드/typecheck/배포 검증(테스트 계정 게이트로 해당 DOM 미클릭, §6.1).
 
 ---
 
@@ -68,8 +68,17 @@ IR-O4O-STANDARD-CONTENT-EDITOR-PLATFORM-EVALUATION-V1 P0 Gap "미디어 라이�
 
 ## 6. 미완/주의
 
-### 6.1 브라우저 DOM smoke — **미수행(환경 blocked)**
-Playwright 프로파일 `C:\Users\home\.playwright-o4o-profile` 이 이미 실행 중인 Chrome 창에 점유되어 자동화 브라우저 프로세스가 즉시 종료("이미 실행 중인 세션"). 코드/배포 문제 아님. **재현/후속**: 해당 Chrome 창 종료 후 Neture 공급자 상품등록 편집기 → 이미지 툴바 → "라이브러리에서 선택" → 공용 MediaPickerModal 모달 렌더·목록 로드·삽입 확인 필요.
+### 6.1 브라우저 DOM smoke
+**Unit A (공용 MediaPickerModal) — PASS.** kpa-society.co.kr, 2026-07-08, KPA admin(sohae2100). `내 약국 → 매장 경영활용 제품(/store/commerce/local-products) → 상품 등록 → "이미지 불러오기"` → **공용 MediaPickerModal 정상 렌더**:
+- 제목 "제품 대표 이미지", 탭 "새 이미지 업로드"/"라이브러리"
+- 폴더: 상품 대표이미지/설명 이미지/배너·홍보/브랜드·로고/기타 (공용 FOLDERS 일치)
+- 동의 문구 = 공용 컴포넌트 CONSENT_TEXT 일치
+- 라이브러리 탭: 폴더 필터·그리드/리스트 토글·빈 상태("등록된 이미지가 없습니다") — 주입 어댑터 `api.list` 정상 호출
+- **Console 에러 0** (해당 인터랙션). 스크린샷 `wo1-media-picker-smoke-kpa.png`
+
+→ store-ui-core 공용 picker가 KPA wrapper(주입 mediaApi+isOperator) 경유로 프로덕션에서 정상 동작. 기존 소비처(StoreLocalProductsPage) 회귀 없음.
+
+**Unit B (편집기 onMediaLibraryPick 배선) — 코드/배포 검증(해당 DOM 미클릭).** 미디어-연동 편집기 화면(Neture 공급자 상품등록/ProductDetailDrawer, GP/KCos 제작편집)은 테스트 계정 게이트로 브라우저 도달 실패: (a) 작동하는 Neture 공급자 계정(sohae21@naver.com)은 **공급자 활성화 미완료**로 상품등록 게이트 차단, (b) 트라이얼/store-owner 계정(renagang21@gmail.com)은 **401(스테일 자격증명)**. typecheck EXIT 0 + 배포 성공 + 동일 계약(Neture 3화면=기존 연동, GP/KCos=셸 경유)으로 검증. 후속: 계정 활성화/자격증명 갱신 후 편집기 툴바 이미지→라이브러리 삽입 DOM 확인.
 
 ### 6.2 커버리지 범위 (범위 미확대 — WO §caution 준수)
 이번 WO는 **표준 인프라(공용 picker·Media Type 계약·셸 prop) + 기준 배선**을 확립. 편집기 미디어 라이브러리 실제 배선은 **Neture 공급자 3화면 + GP/KCos 제작편집(셸 경로)**. KPA 및 GP/KCos의 개별 콘텐츠 화면(블로그·상품설명·QR 등 다수)의 화면별 배선은 회귀 위험 관리를 위해 **후속 커버리지 WO**로 분리(한 번에 40+ 화면 배선 지양).
@@ -96,12 +105,12 @@ WO-1 명시대로 mp4/O4O Storage/External video **미구현**. 동영상은 기
 | 삽입 계약 Media Type 표준화 | ✅ MediaInsert |
 | /media-library 접근성 CHECK 기록 | ✅ §2 |
 | 기존 Neture 3화면 흡수 | ✅ §4 |
-| 기존 기능 회귀 없음 | typecheck/deploy PASS. **DOM 회귀 확인은 §6.1 blocked** |
+| 기존 기능 회귀 없음 | ✅ typecheck/deploy PASS + 통합 picker DOM 회귀 없음(§6.1) |
 | typecheck / build | ✅ |
 | 배포 | ✅ 4서비스 |
-| 브라우저 smoke | ⚠ **미수행(§6.1)** |
+| 브라우저 smoke | ✅ Unit A PASS(§6.1) / Unit B 코드·배포 검증(DOM 미클릭·계정게이트) |
 | CHECK / commit·push | ✅ 본 문서 |
 
 ---
 
-*Status: 코드·배포 완료. 브라우저 DOM smoke는 프로파일 잠금 해제 후 수행 필요(§6.1).*
+*Status: DONE. 공용 picker 프로덕션 smoke PASS. Unit B 편집기 배선 DOM은 테스트 계정 게이트 해제 후 확인 권장(§6.1).*
