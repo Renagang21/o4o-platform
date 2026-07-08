@@ -2,13 +2,19 @@
  * ProductCandidatesPage — 공공데이터 후보 목록 (read-only)
  *
  * WO-O4O-ADMIN-PUBLIC-PRODUCT-DB-READONLY-SKELETON-V1
+ * WO-O4O-ADMIN-O4O-PRODUCT-STANDARD-LIST-PATTERN-V1
+ *   O4O 표준 목록 패턴: BaseTable + O4OColumn + RowActionMenu + ActionBar(선택) + 서버 페이지네이션 + URL sync.
+ *   필터(status/matchStatus/sourceType/sourceLabel/search)·서버 페이지네이션은 기존과 동일.
+ *   표준 컴포넌트 적용 + row action/선택 구조만 추가. 후보 승격/삭제는 이 화면에서 하지 않는다(구조만).
  *
- * ProductCandidate 목록 조회 + 필터(status/matchStatus/sourceType) + 서버 페이지네이션.
  * mutation 없음. 후보 API 는 all=true(platform cross-service) 로 조회한다.
  */
 
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Eye } from 'lucide-react';
+import { BaseTable, RowActionMenu, ActionBar } from '@o4o/ui';
+import type { O4OColumn } from '@o4o/ui';
 import { listProductCandidates, ProductCandidateRow } from '@/api/o4o-product-db.api';
 
 // 공공 seed 라벨 프리셋 (external_api 후보 분리용 — 직접 입력도 가능)
@@ -49,6 +55,7 @@ export default function ProductCandidatesPage() {
   const [searchInput, setSearchInput] = useState(search);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -94,6 +101,7 @@ export default function ProductCandidatesPage() {
 
   const onFilterChange = (setter: (v: string) => void) => (e: React.ChangeEvent<HTMLSelectElement>) => {
     setPage(1);
+    setSelectedKeys(new Set());
     setter(e.target.value);
   };
 
@@ -101,16 +109,66 @@ export default function ProductCandidatesPage() {
   const onSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setPage(1);
+    setSelectedKeys(new Set());
     setSourceLabel(sourceLabelInput.trim());
     setSearch(searchInput.trim());
   };
   const onSearchReset = () => {
     setPage(1);
+    setSelectedKeys(new Set());
     setSourceLabelInput('');
     setSearchInput('');
     setSourceLabel('');
     setSearch('');
   };
+
+  const columns: O4OColumn<ProductCandidateRow>[] = [
+    {
+      key: 'candidateName',
+      header: '상품명',
+      render: (_, r) => <span className="font-medium text-gray-900">{r.candidateName || '—'}</span>,
+    },
+    { key: 'candidateManufacturer', header: '제조/업체', render: (_, r) => r.candidateManufacturer || '—' },
+    { key: 'candidateCategory', header: '분류', render: (_, r) => r.candidateCategory || '—' },
+    {
+      key: 'sourceType',
+      header: 'source',
+      render: (_, r) => (
+        <div>
+          <div>{r.sourceType}</div>
+          {r.sourceLabel && <div className="text-xs text-gray-400">{r.sourceLabel}</div>}
+        </div>
+      ),
+    },
+    {
+      key: 'identifier',
+      header: '식별자',
+      render: (_, r) =>
+        r.identifierType ? (
+          <div>
+            <div className="text-xs text-gray-400">{r.identifierType}</div>
+            <div>{r.identifierValue}</div>
+          </div>
+        ) : '—',
+    },
+    { key: 'candidateStatus', header: '후보 상태', align: 'center', render: (_, r) => <Badge value={r.candidateStatus} /> },
+    { key: 'matchStatus', header: '매칭 상태', align: 'center', render: (_, r) => <Badge value={r.matchStatus} /> },
+    { key: 'createdAt', header: '생성일', render: (_, r) => <span className="text-gray-500">{formatDate(r.createdAt)}</span> },
+    {
+      key: '_actions',
+      header: '',
+      width: 56,
+      system: 'last',
+      align: 'center',
+      render: (_, r) => (
+        <RowActionMenu
+          actions={[
+            { key: 'view', label: '상세 보기', icon: <Eye size={14} />, onClick: () => navigate(r.id) },
+          ]}
+        />
+      ),
+    },
+  ];
 
   return (
     <div>
@@ -169,83 +227,56 @@ export default function ProductCandidatesPage() {
         </div>
       )}
 
-      <div className="overflow-x-auto border border-gray-200 rounded-lg">
-        <table className="min-w-full divide-y divide-gray-200 text-sm">
-          <thead className="bg-gray-50">
-            <tr>
-              <Th>상품명</Th>
-              <Th>제조/업체</Th>
-              <Th>분류</Th>
-              <Th>source</Th>
-              <Th>식별자</Th>
-              <Th>후보 상태</Th>
-              <Th>매칭 상태</Th>
-              <Th>생성일</Th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100 bg-white">
-            {loading ? (
-              <tr><td colSpan={8} className="px-4 py-10 text-center text-gray-400">불러오는 중…</td></tr>
-            ) : rows.length === 0 ? (
-              <tr><td colSpan={8} className="px-4 py-10 text-center text-gray-400">아직 표시할 데이터가 없습니다</td></tr>
-            ) : (
-              rows.map((r) => (
-                <tr
-                  key={r.id}
-                  onClick={() => navigate(r.id)}
-                  className="hover:bg-blue-50 cursor-pointer"
-                >
-                  <Td className="font-medium text-gray-900">{r.candidateName || '—'}</Td>
-                  <Td>{r.candidateManufacturer || '—'}</Td>
-                  <Td>{r.candidateCategory || '—'}</Td>
-                  <Td>
-                    <div>{r.sourceType}</div>
-                    {r.sourceLabel && <div className="text-xs text-gray-400">{r.sourceLabel}</div>}
-                  </Td>
-                  <Td>
-                    {r.identifierType ? (
-                      <div>
-                        <div className="text-xs text-gray-400">{r.identifierType}</div>
-                        <div>{r.identifierValue}</div>
-                      </div>
-                    ) : '—'}
-                  </Td>
-                  <Td><Badge value={r.candidateStatus} /></Td>
-                  <Td><Badge value={r.matchStatus} /></Td>
-                  <Td className="text-gray-500">{formatDate(r.createdAt)}</Td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Pagination */}
-      <div className="flex items-center justify-between mt-4 text-sm">
-        <span className="text-gray-500">{page} / {totalPages} 페이지</span>
-        <div className="flex gap-2">
-          <button
-            disabled={page <= 1 || loading}
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            className="px-3 py-1.5 border border-gray-300 rounded disabled:opacity-40"
-          >이전</button>
-          <button
-            disabled={page >= totalPages || loading}
-            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-            className="px-3 py-1.5 border border-gray-300 rounded disabled:opacity-40"
-          >다음</button>
+      {/* 선택 시 일괄 작업 바 (구조 확립 — write 액션은 후속 WO) */}
+      {selectedKeys.size > 0 && (
+        <div className="mb-3">
+          <ActionBar
+            selectedCount={selectedKeys.size}
+            onClearSelection={() => setSelectedKeys(new Set())}
+            statusInfo="선택 항목에 대한 일괄 작업(승격/매칭 등)은 후속 WO에서 제공됩니다."
+            actions={[]}
+          />
         </div>
+      )}
+
+      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <BaseTable<ProductCandidateRow>
+          columns={columns}
+          data={rows}
+          rowKey={(r) => r.id}
+          onRowClick={(r) => navigate(r.id)}
+          emptyMessage={loading ? '불러오는 중…' : '아직 표시할 데이터가 없습니다'}
+          selectable
+          selectedKeys={selectedKeys}
+          onSelectionChange={setSelectedKeys}
+          tableId="o4o-product-candidates"
+          columnVisibility
+          persistState
+        />
+
+        {/* Pagination (서버) */}
+        {total > 0 && (
+          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 text-sm">
+            <span className="text-gray-500">{page} / {totalPages} 페이지</span>
+            <div className="flex gap-2">
+              <button
+                disabled={page <= 1 || loading}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                className="px-3 py-1.5 border border-gray-300 rounded disabled:opacity-40"
+              >이전</button>
+              <button
+                disabled={page >= totalPages || loading}
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                className="px-3 py-1.5 border border-gray-300 rounded disabled:opacity-40"
+              >다음</button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
-function Th({ children }: { children: React.ReactNode }) {
-  return <th className="px-4 py-3 text-left font-semibold text-gray-600 whitespace-nowrap">{children}</th>;
-}
-function Td({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-  return <td className={`px-4 py-3 align-top whitespace-nowrap ${className}`}>{children}</td>;
-}
 function Badge({ value }: { value: string }) {
   return <span className="inline-block px-2 py-0.5 rounded-full bg-gray-100 text-gray-700 text-xs">{value}</span>;
 }
