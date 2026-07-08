@@ -12,7 +12,9 @@ import DOMPurify from 'dompurify';
  * WO-O4O-STANDARD-EDITOR-HTML-DIRECT-INPUT-PREVIEW-SAVE-FIX-V1 §4.2
  *
  * `<p></p>`, `<p><br></p>`, `<div></div>`, `<br>`, 공백만 있는 경우 빈 본문으로 간주.
- * 단, 텍스트가 없어도 img/iframe/video/hr 등 미디어가 있으면 본문 있음으로 본다.
+ * 단, 텍스트가 없어도 img/iframe/video/hr/table 등 구조·미디어가 있으면 본문 있음으로 본다.
+ * (WO-O4O-CONTENT-EDITOR-TABLE-SUPPORT-STANDARDIZATION-V1: 빈 셀 표도 콘텐츠로 인정 —
+ *  table 누락 시 빈 표가 "빈 본문"으로 판정되어 HTML 탭/저장에서 드롭되는 회귀 방지.)
  *
  * 에디터(미리보기·저장 분기)와 소비처(저장 전 본문 존재 여부 검사)가
  * 동일한 정의를 공유하도록 단일 출처로 export 한다.
@@ -25,7 +27,7 @@ export function isBlankHtml(html: string | null | undefined): boolean {
     .replace(/<[^>]*>/g, '')
     .replace(/\s+/g, '');
   if (stripped.length > 0) return false;
-  return !/<(img|iframe|video|hr)\b/i.test(html);
+  return !/<(img|iframe|video|hr|table)\b/i.test(html);
 }
 
 /**
