@@ -12,11 +12,13 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { BaseDetailDrawer, ConfirmActionDialog } from '@o4o/ui';
-import { Search, Link2 } from 'lucide-react';
+import { Search, Link2, PackagePlus } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 import {
   getCandidateConflictInfo,
   bulkCandidateAction,
   manualMatchCandidate,
+  promoteCandidateToMaster,
   listProductMasters,
   type CandidateConflictInfo,
   type CandidateBulkAction,
@@ -116,6 +118,23 @@ export default function CandidateConflictDrawer({ candidateId, open, onClose, on
       confirmText: '매칭',
       variant: 'default',
       run: async () => { await manualMatchCandidate(candidateId, master.id); },
+    });
+  };
+
+  const askPromote = () => {
+    if (!candidateId || !c) return;
+    setConfirm({
+      title: '신규 기본상품으로 승격',
+      message: `이 후보를 신규 기본상품(ProductMaster)으로 생성합니다.\n\n생성될 정보:\n상품명: ${c.candidateName || '—'}\n제조/업체: ${c.candidateManufacturer || '—'}\n식별자/바코드: ${c.identifierValue || '—'}\n규격: ${c.candidateSpec || '—'}\n\n이 작업은 ProductMaster 와 필요한 ProductIdentifier 를 생성합니다(중복 시 기존 연결·충돌 시 중단). 원천 rawPayload 는 삭제되지 않으며 기본상품 정보는 별도 변경하지 않습니다. 계속할까요?`,
+      confirmText: '승격',
+      variant: 'default',
+      run: async () => {
+        const r = await promoteCandidateToMaster(candidateId);
+        if (r.outcome === 'create') toast.success('신규 기본상품이 생성되었습니다');
+        else if (r.outcome === 'link') toast.success('동일 식별자 기본상품에 연결되었습니다');
+        else if (r.outcome === 'conflict') toast.error(`승격 충돌: ${r.conflictReason || '식별자 불일치'} (생성 안 함)`);
+        else toast(`승격 건너뜀: ${r.skipReason || '자격 미달'}`);
+      },
     });
   };
 
@@ -235,6 +254,23 @@ export default function CandidateConflictDrawer({ candidateId, open, onClose, on
                       ))}
                     </div>
                   )}
+                </div>
+              )}
+            </Section>
+
+            {/* 신규 ProductMaster 승격 (drug 소스만) */}
+            <Section title="신규 기본상품 승격">
+              {info.promotable?.eligible ? (
+                <button onClick={askPromote} className="flex items-center gap-1.5 text-sm px-3 py-2 rounded bg-admin-blue text-white">
+                  <PackagePlus size={14} /> 신규 기본상품으로 승격
+                </button>
+              ) : (
+                <div className="text-xs text-gray-500 bg-gray-50 border border-gray-200 rounded p-2.5">
+                  {info.promotable?.reason === 'NOT_DRUG_SOURCE'
+                    ? '이 후보 유형(의료기기·의약외품·건강기능식품·e약은요 등)은 신규 승격을 지원하지 않습니다. 현재 승격 파이프라인은 의약품 표준코드 전용이며, 비-의약품 승격은 별도 트랙(후속 WO)에서 처리합니다. 기존 기본상품 수동 매칭 또는 보류/제외/archive 로 처리하세요.'
+                    : info.promotable?.reason === 'ALREADY_MATCHED' || info.promotable?.reason === 'ALREADY_LINKED'
+                      ? '이미 매칭/연결된 후보입니다.'
+                      : '현재 상태(pending/reviewing·unmatched)가 아니어서 승격할 수 없습니다.'}
                 </div>
               )}
             </Section>

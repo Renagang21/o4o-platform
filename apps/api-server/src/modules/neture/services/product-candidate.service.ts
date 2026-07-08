@@ -436,6 +436,7 @@ export class ProductCandidateService {
    */
   async getConflictInfo(candidateId: string): Promise<{
     candidate: ProductCandidate;
+    promotable: { eligible: boolean; reason: string | null };
     conflictKey: { identifierType: string | null; identifierValue: string | null; normalizedIdentifierValue: string | null };
     conflictingCandidates: Array<{
       id: string; candidateName: string | null; candidateManufacturer: string | null;
@@ -476,6 +477,7 @@ export class ProductCandidateService {
 
     return {
       candidate,
+      promotable: this.evaluatePromotable(candidate),
       conflictKey: { identifierType: candidate.identifierType, identifierValue: iv, normalizedIdentifierValue: nv },
       conflictingCandidates: conflicting.map((c) => ({
         id: c.id, candidateName: c.candidateName, candidateManufacturer: c.candidateManufacturer,
@@ -531,6 +533,50 @@ export class ProductCandidateService {
       { candidateStatus: nextStatus, reviewedBy: reviewedBy ?? null, reviewedAt: new Date() },
     );
     return { updated: result.affected ?? 0, status: nextStatus };
+  }
+
+  // ─── WO-O4O-ADMIN-PRODUCT-CANDIDATE-UNMATCHED-ACTIONS-V1 ─────────────────────
+
+  /**
+   * 신규 ProductMaster 승격 가능 여부 (표시/게이트용).
+   * **중요**: 기존 승격 파이프라인(promoteOne/buildMasterPreview)은 regulatoryType='DRUG' 하드코딩·
+   * KOREA_DRUG_CODE/GTIN 기준 = **의약품 표준코드 전용**. 의료기기/의약외품/건기식/e약은요 등 비-drug
+   * 소스 후보를 이 파이프라인으로 승격하면 잘못된 DRUG master 를 만든다 → 게이트로 차단(§12 결정).
+   * 안전 소스 = `mfds-drug-master-standard-code*`(의약품 표준코드 데이터셋)만 허용. 나머지는 별도 WO.
+   */
+  private evaluatePromotable(candidate: ProductCandidate): { eligible: boolean; reason: string | null } {
+    const label = (candidate.sourceLabel ?? '').toLowerCase();
+    if (!label.startsWith('mfds-drug-master-standard-code')) {
+      return { eligible: false, reason: 'NOT_DRUG_SOURCE' };
+    }
+    if (!(candidate.candidateStatus === 'pending' || candidate.candidateStatus === 'reviewing')) {
+      return { eligible: false, reason: 'STATUS_NOT_PENDING_OR_REVIEWING' };
+    }
+    if (candidate.matchStatus === 'manually_matched' || candidate.matchStatus === 'exact_identifier_match' || candidate.matchStatus === 'possible_identifier_match') {
+      return { eligible: false, reason: 'ALREADY_MATCHED' };
+    }
+    if (candidate.matchedProductMasterId) {
+      return { eligible: false, reason: 'ALREADY_LINKED' };
+    }
+    return { eligible: true, reason: null };
+  }
+
+  /**
+   * 후보 1건을 신규 ProductMaster 로 승격 (drug 소스만). 기존 approveAsNewProductMaster(transaction+
+   * dedup+create/link/conflict/skip) 재사용. 게이트 통과 못 하면 승격하지 않는다.
+   * ProductMaster/Identifier 생성은 approveAsNewProductMaster(=promoteOne) 내부에서만·트랜잭션.
+   */
+  async promoteMasterFromCandidate(candidateId: string): Promise<{
+    outcome: 'create' | 'link' | 'conflict' | 'skip';
+    masterId?: string;
+    skipReason?: string;
+    conflictReason?: string;
+  }> {
+    const candidate = await this.getCandidate(candidateId);
+    if (!candidate) throw new Error('CANDIDATE_NOT_FOUND');
+    const gate = this.evaluatePromotable(candidate);
+    if (!gate.eligible) throw new Error(`NOT_PROMOTABLE_${gate.reason}`);
+    return this.approveAsNewProductMaster(candidateId);
   }
 
   /**

@@ -106,6 +106,8 @@ export async function getProductCandidate(id: string): Promise<ProductCandidateR
 
 export interface CandidateConflictInfo {
   candidate: ProductCandidateRow;
+  /** WO-...-UNMATCHED-ACTIONS-V1: 신규 ProductMaster 승격 가능 여부 (drug 소스만 eligible) */
+  promotable?: { eligible: boolean; reason: string | null };
   conflictKey: { identifierType: string | null; identifierValue: string | null; normalizedIdentifierValue: string | null };
   conflictingCandidates: Array<{
     id: string; candidateName: string | null; candidateManufacturer: string | null;
@@ -144,6 +146,22 @@ export async function manualMatchCandidate(id: string, productMasterId: string):
     `/operator/product-candidates/${encodeURIComponent(id)}/manual-match`,
     { productMasterId },
   );
+}
+
+export interface PromoteMasterResult {
+  outcome: 'create' | 'link' | 'conflict' | 'skip';
+  masterId?: string;
+  skipReason?: string;
+  conflictReason?: string;
+}
+
+/** 후보를 신규 ProductMaster 로 승격 (drug 소스만, 1건). approveAsNewProductMaster(TX+dedup) 재사용. */
+export async function promoteCandidateToMaster(id: string): Promise<PromoteMasterResult> {
+  const res = await authClient.api.post<{ success: boolean; data: PromoteMasterResult }>(
+    `/operator/product-candidates/${encodeURIComponent(id)}/promote-master`,
+    {},
+  );
+  return res.data.data;
 }
 
 // ─── ProductMaster ─────────────────────────────────────────────────────────

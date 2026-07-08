@@ -169,6 +169,21 @@ export function createProductCandidateController(dataSource: DataSource): Router
     }
   }) as RequestHandler);
 
+  // POST /:id/promote-master — 후보를 신규 ProductMaster 로 승격 (drug 소스만, 1건씩)
+  // WO-O4O-ADMIN-PRODUCT-CANDIDATE-UNMATCHED-ACTIONS-V1. approveAsNewProductMaster(TX+dedup) 재사용.
+  router.post('/:id/promote-master', (async (req: Request, res: Response) => {
+    try {
+      const result = await service.promoteMasterFromCandidate(req.params.id);
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      if (msg.startsWith('NOT_PROMOTABLE_')) {
+        return res.status(400).json({ success: false, error: msg });
+      }
+      return handleMutationError(res, error, 'promote-master');
+    }
+  }) as RequestHandler);
+
   // POST /:id/manual-match — 운영자 수동 매칭 (기존 Master 연결)
   router.post('/:id/manual-match', (async (req: Request, res: Response) => {
     try {
