@@ -22,6 +22,8 @@ import TextStyle from '@tiptap/extension-text-style';
 import Color from '@tiptap/extension-color';
 // WO-O4O-STANDARD-EDITOR-TEMPLATE-PURPOSE-CATEGORY-V1 Phase 2: 고정 레이아웃 노드 + built-in 템플릿
 import { ProductDetailLayout } from '../extensions/productDetailLayout';
+// WO-O4O-CONTENT-EDITOR-TABLE-SUPPORT-STANDARDIZATION-V1: 표준 Table 확장 4종 + 표시 CSS
+import { TABLE_EXTENSIONS, TABLE_STYLES } from '../extensions/tableKit';
 import { BUILTIN_TEMPLATES, isBuiltinTemplateId } from '../builtinTemplates';
 
 import { Toolbar } from './Toolbar';
@@ -140,6 +142,8 @@ export function RichTextEditor({
       Color,
       // 고정 레이아웃(860px) 컨테이너 — 마커 div 만 parse, 내부 편집 가능
       ProductDetailLayout,
+      // WO-O4O-CONTENT-EDITOR-TABLE-SUPPORT-STANDARDIZATION-V1: Table/Row/Header/Cell
+      ...TABLE_EXTENSIONS,
     ],
     content: value,
     editable,
@@ -586,6 +590,7 @@ export function RichTextEditor({
 
       <style>{editorStyles}</style>
       <style>{IMAGE_DISPLAY_STYLES}</style>
+      <style>{TABLE_STYLES}</style>
     </div>
   );
 }

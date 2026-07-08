@@ -28,6 +28,7 @@ import {
   Minus,
   Highlighter,
   Sparkles,
+  Table2,
   // WO-O4O-AI-CONTENT-AUTOMATION-SCOPE-CLEANUP-V1: ShoppingBag(매장 활용 아이콘)은 후속 WO 재사용을 위해 import 제거.
   // StoreUseModal 컴포넌트는 packages/content-editor/src/components/StoreUseModal.tsx 에 유지됨.
 } from 'lucide-react';
@@ -76,6 +77,7 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
   const [showLinkInput, setShowLinkInput] = useState(false);
   const [showVideoInput, setShowVideoInput] = useState(false);
   const [showImageInput, setShowImageInput] = useState(false);
+  const [showTableMenu, setShowTableMenu] = useState(false);
   const [showAiModal, setShowAiModal] = useState(false);
   // WO-O4O-AI-CONTENT-AUTOMATION-SCOPE-CLEANUP-V1: showStoreModal 상태는 후속 WO에서 복원 예정.
   const [linkUrl, setLinkUrl] = useState('');
@@ -92,6 +94,7 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
         setShowImageInput(false);
         setShowLinkInput(false);
         setShowVideoInput(false);
+        setShowTableMenu(false);
       }
     };
     window.addEventListener('content-editor-popup-open', handler);
@@ -619,6 +622,75 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
         </>
       )}
 
+      {/* Table — full only (WO-O4O-CONTENT-EDITOR-TABLE-SUPPORT-STANDARDIZATION-V1) */}
+      {preset === 'full' && (
+        <div style={{ position: 'relative' }}>
+          <ToolButton
+            onClick={() => {
+              const next = !showTableMenu;
+              if (next) {
+                window.dispatchEvent(new CustomEvent('content-editor-popup-open', { detail: toolbarId.current }));
+                setShowLinkInput(false);
+                setShowImageInput(false);
+                setShowVideoInput(false);
+              }
+              setShowTableMenu(next);
+            }}
+            isActive={editor.isActive('table')}
+            title="표"
+          >
+            <Table2 size={18} />
+          </ToolButton>
+          {showTableMenu && (
+            <div style={{
+              position: 'absolute', top: '100%', left: 0, zIndex: 10,
+              background: 'white', border: '1px solid #e5e7eb', borderRadius: 8,
+              padding: 6, boxShadow: '0 4px 6px rgba(0,0,0,0.1)', minWidth: 190,
+              display: 'flex', flexDirection: 'column', gap: 1,
+            }}>
+              {(() => {
+                const inTable = editor.isActive('table');
+                const item = (label: string, run: () => void, enabled: boolean) => (
+                  <button
+                    key={label}
+                    type="button"
+                    disabled={!enabled}
+                    onClick={() => { run(); }}
+                    style={{
+                      display: 'block', width: '100%', textAlign: 'left',
+                      padding: '6px 10px', fontSize: 12, border: 'none', borderRadius: 4,
+                      background: 'transparent', color: enabled ? '#334155' : '#cbd5e1',
+                      cursor: enabled ? 'pointer' : 'not-allowed', whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {label}
+                  </button>
+                );
+                const sep = (k: string) => <div key={k} style={{ height: 1, background: '#f1f5f9', margin: '3px 0' }} />;
+                return [
+                  item('표 삽입 (3×3)', () => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run(), !inTable),
+                  sep('s1'),
+                  item('위에 행 추가', () => editor.chain().focus().addRowBefore().run(), inTable),
+                  item('아래에 행 추가', () => editor.chain().focus().addRowAfter().run(), inTable),
+                  item('행 삭제', () => editor.chain().focus().deleteRow().run(), inTable),
+                  sep('s2'),
+                  item('왼쪽에 열 추가', () => editor.chain().focus().addColumnBefore().run(), inTable),
+                  item('오른쪽에 열 추가', () => editor.chain().focus().addColumnAfter().run(), inTable),
+                  item('열 삭제', () => editor.chain().focus().deleteColumn().run(), inTable),
+                  sep('s3'),
+                  item('셀 병합', () => editor.chain().focus().mergeCells().run(), inTable),
+                  item('셀 분할', () => editor.chain().focus().splitCell().run(), inTable),
+                  item('머리글 행 전환', () => editor.chain().focus().toggleHeaderRow().run(), inTable),
+                  item('머리글 열 전환', () => editor.chain().focus().toggleHeaderColumn().run(), inTable),
+                  sep('s4'),
+                  item('표 삭제', () => { editor.chain().focus().deleteTable().run(); setShowTableMenu(false); }, inTable),
+                ];
+              })()}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Video — full only */}
       {preset === 'full' && (
         <div style={{ position: 'relative' }}>
@@ -629,6 +701,7 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
                 window.dispatchEvent(new CustomEvent('content-editor-popup-open', { detail: toolbarId.current }));
                 setShowLinkInput(false);
                 setShowImageInput(false);
+                setShowTableMenu(false);
               }
               setShowVideoInput(next);
             }}

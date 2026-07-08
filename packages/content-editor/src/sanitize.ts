@@ -48,7 +48,9 @@ export function sanitizeHtml(dirty: string): string {
 export function sanitizeRichHtml(dirty: string): string {
   const clean = DOMPurify.sanitize(dirty, {
     ADD_TAGS: ['iframe'],
-    ADD_ATTR: ['allowfullscreen', 'frameborder', 'allow', 'width', 'height'],
+    // WO-O4O-CONTENT-EDITOR-TABLE-SUPPORT-STANDARDIZATION-V1: TipTap 표 열 폭(colwidth) 보존.
+    //   table/thead/tbody/tr/td/th/colgroup/col/colspan/rowspan 은 DOMPurify 기본 allowlist 로 이미 통과.
+    ADD_ATTR: ['allowfullscreen', 'frameborder', 'allow', 'width', 'height', 'colwidth'],
   });
 
   // 브라우저 환경에서만 iframe src 후처리 (YouTube/Vimeo 외 제거)
