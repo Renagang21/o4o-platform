@@ -43,17 +43,29 @@ guides/
 - **MEMORY는 불변식만**: 배치 진행은 track memory.
 - **공통 우선(common-first)**: 축에 걸쳐 같은 규칙은 common으로 올린다.
 
-## 4. Rule Registry — 3계층
+## 4. Rule Registry — 4계층 (CR / DR / AR / OR)
 
 | 계층 | 파일 | 대상 |
 |---|---|---|
-| **CR** | common/CONTENT-RULE-REGISTRY.md | 콘텐츠 공통(소비자 중심·원문 우선·과장 금지·grounding·pipeline·registry 등) |
+| **CR** | common/CONTENT-RULE-REGISTRY.md | 콘텐츠 공통(소비자 중심·원문 우선·과장 금지·grounding·pipeline 등) |
 | **DR** | products/drug/DRUG-RULE-REGISTRY.md | 의약품 전용(ATC·성분·함량·제형·복합·과병합 예외 등) |
 | **AR** | ai/AI-RULE-REGISTRY.md | AI 전용(프롬프트·grounding·검수·안전) |
+| **OR** | common/OPERATIONAL-RULE-REGISTRY.md | 운영/Git/문서 관리(운영 이관 헤더·대량 삭제 금지·force rewrite 금지·병렬 보호·이동보다 참조 우선·path-specific commit) |
 
-- 정본 이력: `CHECK-O4O-DRUG-DESCRIPTION-RULES-CONSOLIDATION-V1 §4`의 R1~R62.
-- 서비스는 자체 registry를 만들지 않고 CR/DR/AR를 Rule ID로 참조한다.
-- 신규/변경 규칙: 공통=CR, 제품군=DR, AI=AR로 ID 부여 + 해당 Guide 본문 수정.
+- 정본 이력: `CHECK-O4O-DRUG-DESCRIPTION-RULES-CONSOLIDATION-V1 §4`(R1~R62) + `CHECK-O4O-DRUG-DESCRIPTION-RULES-DELTA-AUDIT-V1 §10`(OR/KB 분리).
+- 서비스는 자체 registry를 만들지 않고 CR/DR/AR/OR를 Rule ID로 참조한다.
+- 신규/변경 규칙: 공통=CR, 제품군=DR, AI=AR, 운영=OR로 ID 부여 + 해당 Guide 본문 수정.
+
+### 4-1. Knowledge Catalog (Rule 아님)
+
+규칙이 아니라 **사례·패턴이 계속 축적되는 지식**은 Registry가 아닌 별도 카탈로그로 둔다(Registry 비대화 방지). 규칙 문장은 Registry에 두고, 실증 사례는 카탈로그를 참조한다.
+
+| 카탈로그 | 위치 | 내용 |
+|---|---|---|
+| ATC 오탐 카탈로그 | products/drug/knowledge/ATC-FALSE-POSITIVE-CATALOG.md | ATC 내 경구/타경로 혼입 실사례(R01B·R02A·S01…) |
+| 그룹핑 패턴 | products/drug/knowledge/GROUPING-PATTERNS.md | 함량축 분할 등 반복 패턴(펙소페나딘 60/120…) |
+
+> OR 계층과 Knowledge Catalog 실체화는 `WO-O4O-CONTENT-RULES-DELTA-APPLY-V1`에서 수행한다(본 표는 go-forward 구조 확정).
 
 ## 5. 참조 관계
 

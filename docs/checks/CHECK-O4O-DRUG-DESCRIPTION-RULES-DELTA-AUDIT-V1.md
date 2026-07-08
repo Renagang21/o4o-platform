@@ -123,4 +123,63 @@ WO: `WO-O4O-DRUG-DESCRIPTION-RULES-DELTA-AUDIT-V1`
 
 ## 9. 후속 WO
 
-`WO-O4O-CONTENT-RULES-DELTA-APPLY-V1` — 본 감사의 NEW_RULE(CR-015~019, DR-018)·UPDATE(DR-001/005, CHECK-STANDARD)·MERGE(CR-011, AR-005)를 Registry·Guide에 실제 반영. 기존 문서 삭제 금지, CHECK/WO 역사 보존.
+`WO-O4O-CONTENT-RULES-DELTA-APPLY-V1` — 본 감사(§10 재분류 반영)의 CR/DR/AR/**OR** 신규·보강 + **Knowledge Catalog** 신설을 Registry·Guide에 실제 반영. 기존 문서 삭제 금지, CHECK/WO 역사 보존.
+
+---
+
+## 10. 보강 (2026-07-08) — OR 계층 + Knowledge Catalog 분리
+
+> 감사 결과, 늘어나는 규칙이 **성격상 3종이 아니라 5종**임이 드러났다. **운영/Git/문서 관리 규칙(OR)** 은 CR·DR에 속하지 않고, **ATC 오탐·함량 분할** 은 규칙이 아니라 **축적형 지식(Knowledge Catalog)** 이다. DELTA-APPLY 전에 이 두 갈래를 분리한다.
+
+### 10-1. OR (Operational Rules) 신설
+
+문서 운영·Git·병렬 협업 규칙을 **CR에서 분리**하여 OR로 둔다(CR 비대화 방지). 기존 §2의 doc-ops NEW_RULE(D-008·D-009·D-010)을 **CR → OR**로 재분류하고, APPLY에서 관측된 "이동보다 참조 우선"을 D-026으로 추가한다.
+
+| delta_id | OR 후보 규칙 | 출처 | 재분류 |
+|---|---|---|---|
+| D-008 | 기존 문서 삭제 금지 · 운영 이관 헤더로 처리 · 대량 삭제 금지 | APPLY CHECK §2 | CR→**OR-001** |
+| D-009 | 병렬 세션 보호 — 이미 push된 히스토리 force rewrite 금지(commit 오염이 있어도) | APPLY CHECK §7 | CR→**OR-002** |
+| D-010 | 참조 많은 기존 문서는 원위치 보존 가능(대량 삭제 대안) | APPLY CHECK §2 | →**OR-001**(병합) |
+| **D-026** | 문서 이동보다 **참조 변경 우선**(66참조 guide 원위치+헤더 사례) | APPLY CHECK §2 | **OR-003**(신규) |
+| D-027 | 동시 세션에서는 **path-specific commit**(`git add -A` 지양) | APPLY CHECK §7 정황 | **OR-004**(신규) |
+
+→ **OR Registry 신설**: `docs/guides/common/OPERATIONAL-RULE-REGISTRY.md` (OR-001~). Rule Registry는 **4계층 CR/DR/AR/OR**가 된다.
+
+### 10-2. Knowledge Catalog 신설 (Rule 아님)
+
+규칙이 아니라 **사례·패턴이 계속 축적되는 지식**은 Registry가 아닌 별도 카탈로그로 둔다.
+
+| delta_id | 지식 | 기존 분류 | 재분류 | 대상 문서 |
+|---|---|---|---|---|
+| D-021 | ATC 오탐 카탈로그(R01B 경구감기약·R02A 경구인후약·S01 눈영양 캡슐, 향후 A07·D11·G02…) | UPDATE(DR-001) | **KB** | `docs/guides/products/drug/knowledge/ATC-FALSE-POSITIVE-CATALOG.md` |
+| D-023 | 함량축 분할 패턴(펙소페나딘 60mg/120mg = 설명서 공유·group_key 분리, 향후 축적) | UPDATE(DR-005) | **KB** | `docs/guides/products/drug/knowledge/GROUPING-PATTERNS.md` |
+
+→ DR-001·DR-005는 **규칙 문장은 유지**하고, 사례·패턴은 KB 문서를 **참조**한다("실증 카탈로그는 KB 참조"). KB는 계속 성장하되 Registry는 간결하게 유지.
+
+### 10-3. 재분류 후 집계
+
+| 분류 | 수 | 비고 |
+|---|---:|---|
+| EXISTING | 8 | 변동 없음 |
+| NEW_RULE — CR | 5 | D-001·002·003·005·006 (아키텍처 정체성) |
+| NEW_RULE — DR | 1 | D-022 (성분별↔세대별 대표 공존) |
+| NEW_RULE — **OR** | 4 | D-008·009·026·027 (D-010 병합) |
+| **KB (Knowledge Catalog)** | 2 | D-021·023 (Registry 아님) |
+| MERGE | 3 | D-007(CR-011)·D-017(AR-005)·D-010(OR-001) |
+| UPDATE | 1 | D-020(CHECK-STANDARD). DR-001/005는 KB 참조 링크만(경미) |
+| ARCHIVE | 3 | D-004·012·014 |
+| CONFLICT | 0 | — |
+
+### 10-4. DELTA-APPLY 수정된 범위
+
+```text
+CR 추가 (CR-015~019)         아키텍처 정체성 5
+DR 추가 (DR-018)             성분별/세대별 대표 공존 1
+AR 보강 (AR-005)             편집·검수·번역 보조 제한
+OR 생성 (OPERATIONAL-RULE-REGISTRY, OR-001~004)   ← 신규 계층
+Knowledge Catalog 생성        ATC-FALSE-POSITIVE-CATALOG · GROUPING-PATTERNS   ← 신규 문서 유형
+CHECK-STANDARD 보강 (적용 ProductMaster 수 명시)
+DOCUMENT-ARCHITECTURE 갱신 (Rule Registry 3→4계층 + KB 유형)
+```
+
+> 효과: 설명서 규칙(CR/DR/AR)은 간결 유지, **운영 노하우(OR)** 와 **도메인 지식(KB)** 은 독립 성장. 의료기기·의약외품·건기식 확장 시에도 Registry 비대화 없음.
