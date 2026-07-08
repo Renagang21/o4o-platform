@@ -137,6 +137,11 @@ export type { StartProductionModalProps, StartProductionTargetConfig, StartProdu
 export { ProductionMaterialEditorShell } from './components/ProductionMaterialEditorShell';
 export type { ProductionMaterialEditorShellProps, ProductionMaterialCreateInput } from './components/ProductionMaterialEditorShell';
 
+// 공용 Media Picker (WO-O4O-CONTENT-ASSET-MEDIA-LIBRARY-STANDARDIZATION-V1)
+// 서비스별 MediaPickerModal 사본을 이 단일 공용 컴포넌트로 통합. 어댑터(api)+isOperator 주입.
+export { MediaPickerModal } from './components/media/MediaPickerModal';
+export type { MediaPickerModalProps, MediaPickerApi, MediaAssetItem } from './components/media/MediaPickerModal';
+
 // Auth Guard (WO-O4O-MY-STORE-CROSSSERVICE-CANONICAL-GUARD-ALIGNMENT-V1)
 export { StoreOwnerGuard } from './auth/StoreOwnerGuard';
 export type {
