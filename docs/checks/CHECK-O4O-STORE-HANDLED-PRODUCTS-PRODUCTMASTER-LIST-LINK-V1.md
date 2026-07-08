@@ -1,6 +1,6 @@
 # CHECK-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1
 
-Status: 코드 완료 + typecheck/build 통과 → 프로덕션 smoke 진행 (2026-07-08)
+Status: DONE — 코드 완료 + typecheck/build 통과 + 프로덕션 브라우저 smoke PASS (2026-07-08)
 WO: `WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1`
 
 Scope: KPA `/store/handled-products`(매장 경영활용 제품)에서 매장 경영자가 **O4O 표준 상품 DB(ProductMaster)를 검색·조회·선택**하고, 선택 상품을 매장 경영활용 제품(O4O 기반 제품 listing)으로 등록할 수 있게 한다. 1단계 — 리스트 조회·선택·등록. **프론트만 변경, 백엔드 무변경, DB 스키마 무변경.**
@@ -62,7 +62,14 @@ Scope: KPA `/store/handled-products`(매장 경영활용 제품)에서 매장 �
 | web-kpa-society build | **EXIT 0** (`tsc && vite build`, StoreHandledProductsPage 청크 정상) |
 | 변경 | 프론트 3파일(신규 2 + 편집 1) — 백엔드/API/스키마 무변경 |
 | 기존 매장 취급/통합 뷰 회귀 | 기존 UNION 목록·탭·검색·관리 액션 유지(추가만) |
-| 프로덕션 브라우저 smoke | 진행 (배포 후): /store/handled-products → O4O 표준 상품에서 추가 → 검색(예: 타이레놀) → 결과·페이지네이션·이미지 → 등록 → 목록 반영 / Console Error 없음 |
+| 프로덕션 브라우저 smoke | **PASS** (kpa-society.co.kr, 2026-07-08, 체험용 약국 경영자 계정) |
+
+**smoke 상세 (PASS, deploy-kpa-society 성공):**
+- `/store/handled-products` 진입 → 헤더 **`O4O 표준 상품에서 추가`** 버튼(+`매장 직접 등록`) 노출.
+- 모달 오픈 → O4O 표준 상품 검색 로드: **총 198,389건, 1/9920 페이지**, 이미지·상품명·제조사·바코드·분류·등록 버튼.
+- 검색 **"타이레놀" → 43건, 1/3 페이지** 재계산.
+- **등록**(타이레놀콜드-에스정) → toast "매장 경영활용 제품으로 등록되었습니다" → 배경 통합 목록 **0건 → 1건**("O4O 기반 제품 / 승인 대기" 행 추가) + 모달 해당 행 **"등록됨"**(idempotent 반영).
+- 검색→선택→등록→목록 갱신 end-to-end 루프 정상. Console Error 없음(인증 관련 초기 401은 앱 공통, 기능 무관).
 
 ---
 
@@ -76,7 +83,7 @@ Scope: KPA `/store/handled-products`(매장 경영활용 제품)에서 매장 �
 | 상품 기본정보(이미지/상품명/제조사/바코드/분류) | ✅ |
 | 선택 흐름 / 후속 등록 분리 | ✅ 등록 API 연결(단건 등록) |
 | 기존 매장 취급 제품 회귀 없음 | ✅ 추가만, 기존 유지 |
-| CHECK / commit·push·deploy | 진행 |
+| CHECK / commit·push·deploy | ✅ (283606aca, deploy-kpa-society 성공, smoke PASS) |
 
 ---
 
