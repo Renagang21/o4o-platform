@@ -70,9 +70,10 @@ docs/guides/
 
 ## 7. 검증 / commit
 
-- `git diff --stat` 로 변경 범위 확인: 신규 24 파일 + 수정 3 파일, 삭제 0. 코드·스키마 무변경.
+- `git diff --stat` 로 변경 범위 확인: 신규 24 파일 + 수정 3 파일, 삭제 0. 코드·스키마 무변경. IR diff 0(미수정).
 - 참조 무결성: 신규 문서 간 상대경로 링크 정합(common ↔ products/drug ↔ ai ↔ content-authoring), 기존 CHECK의 옛 경로 참조 유지.
-- commit: (커밋 시 기록) · push: main
+- **commit: `260014922`** (main에 push 완료). ⚠️ **동시 세션 스테이징 레이스**로 본 APPLY 파일 전체가 병렬 세션 커밋("add EAR OTC check")에 함께 묶여 커밋·push됨 — 내용 전량 정상(29 files/1,110 insertions), 손실 0. 이미 push된 히스토리라 force 재작성은 동시 세션 보호를 위해 수행하지 않음.
+- 본 §7 갱신은 별도 후속 커밋으로 기록.
 
 ## 8. 후속
 
