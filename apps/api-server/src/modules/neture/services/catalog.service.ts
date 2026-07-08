@@ -251,7 +251,8 @@ export class NetureCatalogService {
     limit?: number;
   }): Promise<{ data: ProductMaster[]; total: number }> {
     const page = params.page || 1;
-    const limit = Math.min(params.limit || 20, 50);
+    // WO-O4O-ADMIN-PRODUCT-MASTER-TABLE-PERFORMANCE-V1: 관리 목록 페이지 크기 최대 100 지원 (cap 50→100)
+    const limit = Math.min(params.limit || 20, 100);
     const offset = (page - 1) * limit;
 
     const qb = this.masterRepo

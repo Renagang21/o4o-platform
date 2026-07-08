@@ -51,7 +51,8 @@ export function createProductLibraryController(dataSource: DataSource): Router {
       }
 
       const pageNum = page ? Number(page) : 1;
-      const limitNum = limit ? Math.min(Number(limit), 50) : 20;
+      // WO-O4O-ADMIN-PRODUCT-MASTER-TABLE-PERFORMANCE-V1: 관리 목록 페이지 크기 20/50/100 지원 (cap 50→100)
+      const limitNum = limit ? Math.min(Number(limit), 100) : 20;
 
       const data = result.data.map((m) => ({
         id: m.id,

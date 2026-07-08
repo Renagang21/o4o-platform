@@ -2,23 +2,35 @@
  * ProductMastersPage — 기본 상품 목록/검색 (read-only)
  *
  * WO-O4O-ADMIN-PUBLIC-PRODUCT-DB-READONLY-SKELETON-V1
- * WO-O4O-ADMIN-O4O-PRODUCT-STANDARD-LIST-PATTERN-V1
- *   O4O 표준 목록 패턴: BaseTable + O4OColumn + RowActionMenu + ActionBar(선택) + 서버 페이지네이션 + URL sync.
- *   서버 페이지네이션은 기존과 동일(meta 사용). 표준 컴포넌트 적용 + row action/선택 구조만 추가.
- *   canonical reference — 나머지 목록(설명/이미지/초안)은 본 패턴을 복사 적용.
+ * WO-O4O-ADMIN-O4O-PRODUCT-STANDARD-LIST-PATTERN-V1 — BaseTable + O4OColumn + RowActionMenu + ActionBar + URL sync
+ * WO-O4O-ADMIN-PRODUCT-MASTER-TABLE-PERFORMANCE-V1 — 체감 속도 개선
+ *   "목록은 가볍게, 상세는 따로, 다음 페이지만 미리":
+ *   - 목록 응답은 이미 테이블 필드만(경량). 상세는 행 클릭 시 별도 /masters/:id 로 이동(목록 재조회 없음).
+ *   - 다음 1~2 페이지 백그라운드 prefetch + 페이지 캐시 → 페이지 이동 체감 지연 감소.
+ *   - 페이지 크기 20/50/100(기본 50). 검색 debounce + 버튼 즉시 실행 + page reset.
+ *   - 로딩 UX: 최초 skeleton, 페이지 이동 시 기존 데이터 유지 + 상단 얇은 로딩바(비블로킹).
+ *   - 검색어/페이지 크기 변경 시 캐시 초기화.
  *
- * 관리 콘솔 컬럼: 이미지/상품명/공식명/제조사/브랜드/분류/규격/바코드/이미지 상태.
- * mutation 없음 (GET-only). 선택 후 일괄 작업(write)은 후속 WO — 구조만 확립.
+ * 관리 콘솔 컬럼: 선택/이미지/상품명/공식명/제조사/브랜드/분류/규격/바코드/이미지 상태/액션.
+ * mutation 없음 (GET-only).
  */
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Search, Eye } from 'lucide-react';
 import { BaseTable, RowActionMenu, ActionBar } from '@o4o/ui';
 import type { O4OColumn } from '@o4o/ui';
-import { listProductMasters, ProductMasterRow } from '@/api/o4o-product-db.api';
+import { listProductMasters, ProductMasterRow, ProductMasterListResult } from '@/api/o4o-product-db.api';
 
-const LIMIT = 20;
+const PAGE_SIZE_OPTIONS = [20, 50, 100];
+const DEFAULT_LIMIT = 50;
+const SEARCH_DEBOUNCE_MS = 400;
+const PREFETCH_AHEAD = 2; // 현재 페이지 이후 미리 불러올 페이지 수
+
+function parseLimit(v: string | null): number {
+  const n = Number(v);
+  return PAGE_SIZE_OPTIONS.includes(n) ? n : DEFAULT_LIMIT;
+}
 
 export default function ProductMastersPage() {
   const navigate = useNavigate();
@@ -27,47 +39,122 @@ export default function ProductMastersPage() {
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
-  const [q, setQ] = useState(searchParams.get('q') || '');           // 실제 적용된 검색어
-  const [term, setTerm] = useState(searchParams.get('q') || '');     // 입력 중인 검색어 버퍼
-  const [loading, setLoading] = useState(false);
+  const [limit, setLimit] = useState(parseLimit(searchParams.get('limit')));
+  const [q, setQ] = useState(searchParams.get('q') || '');        // 적용된 검색어
+  const [term, setTerm] = useState(searchParams.get('q') || '');  // 입력 버퍼
+  const [hardLoading, setHardLoading] = useState(true);   // 표시할 데이터 없음 → skeleton
+  const [softLoading, setSoftLoading] = useState(false);  // 기존 데이터 유지한 채 갱신 중
   const [error, setError] = useState<string | null>(null);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await listProductMasters({ q: q || undefined, page, limit: LIMIT });
-      setRows(res.items);
-      setTotal(res.meta.total);
-      setTotalPages(Math.max(1, res.meta.totalPages));
-    } catch (e: any) {
-      setError(e?.response?.data?.error || e?.message || '기본 상품을 불러오지 못했습니다');
-      setRows([]);
-      setTotal(0);
-      setTotalPages(1);
-    } finally {
-      setLoading(false);
-    }
-  }, [q, page]);
+  // 페이지 캐시 (key=`${q}|${limit}|${page}`). q/limit 변경 시 초기화.
+  const cacheRef = useRef<Map<string, ProductMasterListResult>>(new Map());
+  const reqIdRef = useRef(0);
+  const rowsLenRef = useRef(0); // 현재 표시 중인 행 수 (로딩 모드 결정용)
 
+  const keyFor = useCallback((pg: number) => `${q}|${limit}|${pg}`, [q, limit]);
+
+  // 검색어/페이지 크기 변경 → 캐시 초기화 (load effect 보다 먼저 선언되어 먼저 실행)
   useEffect(() => {
-    load();
-  }, [load]);
+    cacheRef.current.clear();
+  }, [q, limit]);
 
-  // URL query sync (공유/새로고침/뒤로가기 유지) — 기본값은 생략
+  // 다음 1~2 페이지 백그라운드 prefetch (화면 blocking 없음)
+  const prefetchNext = useCallback((fromPage: number, tp: number) => {
+    for (let i = 1; i <= PREFETCH_AHEAD; i++) {
+      const pg = fromPage + i;
+      if (pg > tp) break;
+      const key = `${q}|${limit}|${pg}`;
+      if (cacheRef.current.has(key)) continue;
+      listProductMasters({ q: q || undefined, page: pg, limit })
+        .then((r) => { cacheRef.current.set(key, r); })
+        .catch(() => { /* prefetch 실패는 무시 */ });
+    }
+  }, [q, limit]);
+
+  // 메인 로드 (q/limit/page 변경 시). 캐시 히트면 즉시 표시, 미스면 네트워크.
+  useEffect(() => {
+    const myReq = ++reqIdRef.current;
+    setError(null);
+    const key = keyFor(page);
+    const cached = cacheRef.current.get(key);
+
+    if (cached) {
+      setRows(cached.items);
+      rowsLenRef.current = cached.items.length;
+      setTotal(cached.meta.total);
+      const tp = Math.max(1, cached.meta.totalPages);
+      setTotalPages(tp);
+      setHardLoading(false);
+      setSoftLoading(false);
+      prefetchNext(page, tp);
+      return;
+    }
+
+    // 데이터가 있으면 유지(soft), 없으면 skeleton(hard)
+    if (rowsLenRef.current > 0) setSoftLoading(true); else setHardLoading(true);
+
+    listProductMasters({ q: q || undefined, page, limit })
+      .then((res) => {
+        if (myReq !== reqIdRef.current) return; // 최신 요청만 반영
+        cacheRef.current.set(key, res);
+        setRows(res.items);
+        rowsLenRef.current = res.items.length;
+        setTotal(res.meta.total);
+        const tp = Math.max(1, res.meta.totalPages);
+        setTotalPages(tp);
+        prefetchNext(page, tp);
+      })
+      .catch((e: any) => {
+        if (myReq !== reqIdRef.current) return;
+        setError(e?.response?.data?.error || e?.message || '기본 상품을 불러오지 못했습니다');
+        setRows([]);
+        rowsLenRef.current = 0;
+        setTotal(0);
+        setTotalPages(1);
+      })
+      .finally(() => {
+        if (myReq !== reqIdRef.current) return;
+        setHardLoading(false);
+        setSoftLoading(false);
+      });
+  }, [q, limit, page, keyFor, prefetchNext]);
+
+  // 검색 debounce → 적용 검색어 commit + page reset
+  useEffect(() => {
+    const h = setTimeout(() => {
+      const t = term.trim();
+      setQ((prev) => {
+        if (prev === t) return prev;
+        setPage(1);
+        setSelectedKeys(new Set());
+        return t;
+      });
+    }, SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(h);
+  }, [term]);
+
+  // URL sync (공유/새로고침/뒤로가기)
   useEffect(() => {
     const nq: Record<string, string> = {};
     if (q) nq.q = q;
     if (page > 1) nq.page = String(page);
+    if (limit !== DEFAULT_LIMIT) nq.limit = String(limit);
     setSearchParams(nq, { replace: true });
-  }, [q, page, setSearchParams]);
+  }, [q, page, limit, setSearchParams]);
 
   const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    setPage(1);
+    const t = term.trim();
     setSelectedKeys(new Set());
-    setQ(term.trim());
+    setPage(1);
+    setQ(t);
+  };
+
+  const changeLimit = (n: number) => {
+    setSelectedKeys(new Set());
+    setPage(1);
+    setLimit(n);
   };
 
   const toggleSelect = (id: string, checked: boolean) => {
@@ -101,7 +188,7 @@ export default function ProductMastersPage() {
       align: 'center',
       render: (_, r) =>
         r.primaryImageUrl
-          ? <img src={r.primaryImageUrl} alt="" className="w-10 h-10 object-cover rounded" />
+          ? <img src={r.primaryImageUrl} alt="" className="w-10 h-10 object-cover rounded" loading="lazy" />
           : <div className="w-10 h-10 bg-gray-100 rounded" />,
     },
     {
@@ -140,6 +227,9 @@ export default function ProductMastersPage() {
     },
   ];
 
+  const rangeStart = total === 0 ? 0 : (page - 1) * limit + 1;
+  const rangeEnd = Math.min(page * limit, total);
+
   return (
     <div>
       {/* Toolbar */}
@@ -162,13 +252,26 @@ export default function ProductMastersPage() {
             >초기화</button>
           )}
         </form>
+
+        {/* 페이지 크기 */}
+        <label className="flex items-center gap-1.5 text-sm text-gray-500">
+          페이지당
+          <select
+            value={limit}
+            onChange={(e) => changeLimit(Number(e.target.value))}
+            className="border border-gray-300 rounded px-2 py-1.5 text-sm"
+          >
+            {PAGE_SIZE_OPTIONS.map((n) => <option key={n} value={n}>{n}건</option>)}
+          </select>
+        </label>
+
         <div className="ml-auto text-sm text-gray-500">총 {total.toLocaleString()}건</div>
       </div>
 
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 rounded p-4 mb-4 flex items-center justify-between">
           <span>{error}</span>
-          <button onClick={load} className="text-sm underline">재시도</button>
+          <button onClick={() => { cacheRef.current.delete(keyFor(page)); setPage((p) => p); setHardLoading(true); }} className="text-sm underline">재시도</button>
         </div>
       )}
 
@@ -184,33 +287,46 @@ export default function ProductMastersPage() {
         </div>
       )}
 
-      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-        <BaseTable<ProductMasterRow>
-          columns={columns}
-          data={rows}
-          rowKey={(r) => r.id}
-          onRowClick={(r) => navigate(r.id)}
-          emptyMessage={loading ? '불러오는 중…' : '아직 표시할 데이터가 없습니다'}
-          selectable
-          selectedKeys={selectedKeys}
-          onSelectionChange={setSelectedKeys}
-          tableId="o4o-product-masters"
-          columnVisibility
-          persistState
-        />
+      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden relative">
+        {/* 비블로킹 로딩바 — 기존 데이터 유지한 채 갱신 중 */}
+        {softLoading && (
+          <div className="absolute top-0 left-0 right-0 h-0.5 overflow-hidden z-10">
+            <div className="h-full w-1/3 bg-admin-blue animate-pulse" />
+          </div>
+        )}
+
+        {hardLoading && rows.length === 0 ? (
+          <TableSkeleton rows={Math.min(limit, 12)} />
+        ) : (
+          <BaseTable<ProductMasterRow>
+            columns={columns}
+            data={rows}
+            rowKey={(r) => r.id}
+            onRowClick={(r) => navigate(r.id)}
+            emptyMessage="아직 표시할 데이터가 없습니다"
+            selectable
+            selectedKeys={selectedKeys}
+            onSelectionChange={setSelectedKeys}
+            tableId="o4o-product-masters"
+            columnVisibility
+            persistState
+          />
+        )}
 
         {/* Pagination (서버) */}
         {total > 0 && (
           <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 text-sm">
-            <span className="text-gray-500">{page} / {totalPages} 페이지</span>
+            <span className="text-gray-500">
+              {rangeStart.toLocaleString()}–{rangeEnd.toLocaleString()} / {total.toLocaleString()}건 · {page} / {totalPages} 페이지
+            </span>
             <div className="flex gap-2">
               <button
-                disabled={page <= 1 || loading}
+                disabled={page <= 1}
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 className="px-3 py-1.5 border border-gray-300 rounded disabled:opacity-40"
               >이전</button>
               <button
-                disabled={page >= totalPages || loading}
+                disabled={page >= totalPages}
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 className="px-3 py-1.5 border border-gray-300 rounded disabled:opacity-40"
               >다음</button>
@@ -218,6 +334,23 @@ export default function ProductMastersPage() {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+/** 최초 로딩 skeleton — lightweight (blocking 아님, 화면 자리만 확보) */
+function TableSkeleton({ rows }: { rows: number }) {
+  return (
+    <div className="p-4 space-y-2 animate-pulse">
+      <div className="h-8 bg-gray-100 rounded" />
+      {Array.from({ length: rows }).map((_, i) => (
+        <div key={i} className="h-11 bg-gray-50 rounded flex items-center gap-3 px-3">
+          <div className="w-10 h-10 bg-gray-100 rounded shrink-0" />
+          <div className="h-3 bg-gray-100 rounded flex-1 max-w-[40%]" />
+          <div className="h-3 bg-gray-100 rounded w-24" />
+          <div className="h-3 bg-gray-100 rounded w-20" />
+        </div>
+      ))}
     </div>
   );
 }
