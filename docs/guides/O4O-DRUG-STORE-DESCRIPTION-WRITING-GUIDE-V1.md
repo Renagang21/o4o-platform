@@ -3,6 +3,8 @@
 > 작성일: 2026-07-06  
 > 적용 대상: O4O 의약품 설명서 작업, 우선 일반의약품 OTC  
 > 목적: 성분 중심의 신뢰성 있는 약국 매장용/소비자 안내 설명서 작성 기준을 고정하고, 실제 작성 결과를 반영해 계속 개선한다.
+>
+> **상위 문서**: 설명서 **설계 철학**(계층·질환 중심·분리 원칙·MFDS 우선·Canonical 게이트)은 [`O4O-DRUG-STORE-DESCRIPTION-CANONICAL-STANDARD-V1`](O4O-DRUG-STORE-DESCRIPTION-CANONICAL-STANDARD-V1.md)에 정의된다. 본 문서는 그 하위의 **작성 규칙**(문체·구조·요약표·SOURCE GAP §3.11)이다.
 
 ---
 
