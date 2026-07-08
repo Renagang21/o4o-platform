@@ -70,6 +70,23 @@ export const SHARED_PRODUCT_DESCRIPTION_STATUSES: SharedProductDescriptionStatus
   'deprecated',
 ];
 
+/**
+ * 설명서 유형 축 (application-level union, varchar) — WO-O4O-PRODUCT-DESCRIPTION-TYPE-IMPLEMENTATION-V1
+ * Baseline: O4O-PRODUCT-RESOURCE-ARCHITECTURE-BASELINE-V1 (F12) — Resource Type=DESCRIPTION 하위 속성.
+ *   B2B/B2C/STORE/SUPPLIER_STORE. canonical 은 (master_id, description_type) 당 1개(Freeze #2).
+ */
+export type SharedProductDescriptionType = 'B2B' | 'B2C' | 'STORE' | 'SUPPLIER_STORE';
+
+export const SHARED_PRODUCT_DESCRIPTION_TYPES: SharedProductDescriptionType[] = [
+  'B2B',
+  'B2C',
+  'STORE',
+  'SUPPLIER_STORE',
+];
+
+/** 조회 기본값 — 기존 소비자/매장 화면 회귀 방지 (전량 STORE 백필과 정합) */
+export const DEFAULT_SHARED_PRODUCT_DESCRIPTION_TYPE: SharedProductDescriptionType = 'STORE';
+
 @Entity('shared_product_descriptions')
 @Index('idx_shared_product_descriptions_master', ['masterId'])
 @Index('idx_shared_product_descriptions_master_status', ['masterId', 'status'])
@@ -98,6 +115,13 @@ export class SharedProductDescription {
   /** 후보 출처 유형 */
   @Column({ name: 'source_type', type: 'varchar', length: 32 })
   sourceType: SharedProductDescriptionSourceType;
+
+  /**
+   * 설명서 유형 (B2B/B2C/STORE/SUPPLIER_STORE) — WO-...-DESCRIPTION-TYPE-IMPLEMENTATION-V1
+   * canonical 은 (master_id, description_type) 당 1개. 기본값 STORE(기존 데이터·신규 insert).
+   */
+  @Column({ name: 'description_type', type: 'varchar', length: 32, default: 'STORE' })
+  descriptionType: SharedProductDescriptionType;
 
   /** 출처 레코드 ID (offer_id / ai_content_id / user 등) */
   @Column({ name: 'source_ref_id', type: 'uuid', nullable: true })

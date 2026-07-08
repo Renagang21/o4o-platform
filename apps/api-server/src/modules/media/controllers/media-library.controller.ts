@@ -137,6 +137,52 @@ export function createMediaLibraryRouter(dataSource: DataSource): Router {
   });
 
   /**
+   * PATCH /media-library/:id/metadata
+   * Content Resource 메타데이터 수정 (운영자 전용) — WO-O4O-CONTENT-RESOURCE-METADATA-STANDARDIZATION-V1
+   *   title/description/tags/keywords/language/source/usage_type/status/memo/is_library_public 만 수정.
+   *   url/gcs_path/file_name/original_name(파일 속성)은 절대 변경하지 않음.
+   */
+  router.patch('/media-library/:id/metadata', authenticate, async (req: any, res: Response) => {
+    try {
+      const roles: string[] = req.user?.roles || [];
+      const isOperator = roles.some((r: string) =>
+        r.includes('admin') || r.includes('operator') || r.includes('super_admin')
+      );
+      if (!isOperator) {
+        res.status(403).json({ success: false, error: 'Operator access required' });
+        return;
+      }
+
+      const { id } = req.params;
+      const b = req.body ?? {};
+      // 파일 속성 차단: 화이트리스트 필드만 추출(url/gcs_path/file_name/original_name 등은 무시)
+      const patch = {
+        title: b.title,
+        description: b.description,
+        tags: Array.isArray(b.tags) ? b.tags : undefined,
+        keywords: Array.isArray(b.keywords) ? b.keywords : undefined,
+        language: b.language,
+        source: b.source,
+        usageType: b.usageType,
+        status: b.status,
+        memo: b.memo,
+        isLibraryPublic: typeof b.isLibraryPublic === 'boolean' ? b.isLibraryPublic : undefined,
+      };
+
+      const service = new MediaLibraryService(dataSource);
+      const asset = await service.updateMetadata(id, patch, req.user?.id ?? null);
+      res.json({ success: true, data: asset });
+    } catch (error: any) {
+      logger.error('[MediaLibrary] Update metadata error:', error);
+      if (error.message === 'Asset not found') {
+        res.status(404).json({ success: false, error: 'Asset not found' });
+        return;
+      }
+      res.status(500).json({ success: false, error: 'Failed to update metadata' });
+    }
+  });
+
+  /**
    * DELETE /media-library/:id
    * 자산 삭제 (운영자 전용)
    */

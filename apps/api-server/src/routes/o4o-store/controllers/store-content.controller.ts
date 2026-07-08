@@ -482,7 +482,7 @@ export function createStoreContentController(
             `SELECT spd.id, spd.summary, spd.language, spd.status, spd.updated_at, pm.name AS product_name
              FROM shared_product_descriptions spd
              JOIN product_masters pm ON pm.id = spd.master_id
-             WHERE spd.master_id = $1 AND spd.status = 'canonical' AND spd.deleted_at IS NULL
+             WHERE spd.master_id = $1 AND spd.status = 'canonical' AND spd.description_type = 'STORE' AND spd.deleted_at IS NULL
              ORDER BY spd.updated_at DESC`,
             [resolved.masterId],
           );

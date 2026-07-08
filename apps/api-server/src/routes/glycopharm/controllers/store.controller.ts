@@ -160,6 +160,7 @@ async function queryVisibleProducts(
      LEFT JOIN shared_product_descriptions spd
        ON spd.master_id = pm.id
        AND spd.status = 'canonical'
+       AND spd.description_type = 'STORE'
        AND spd.deleted_at IS NULL
      INNER JOIN organization_product_listings opl
        ON opl.offer_id = spo.id

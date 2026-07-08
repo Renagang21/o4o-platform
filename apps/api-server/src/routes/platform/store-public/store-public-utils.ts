@@ -218,6 +218,7 @@ export async function queryVisibleProducts(
        LEFT JOIN shared_product_descriptions spd
          ON spd.master_id = pm.id
          AND spd.status = 'canonical'
+         AND spd.description_type = 'STORE'
          AND spd.deleted_at IS NULL
        WHERE spo.is_active = true
          AND s.status = 'ACTIVE'
@@ -493,6 +494,7 @@ export async function queryTabletVisibleProducts(
        LEFT JOIN shared_product_descriptions spd
          ON spd.master_id = pm.id
          AND spd.status = 'canonical'
+         AND spd.description_type = 'STORE'
          AND spd.deleted_at IS NULL
        ${dispJoins}
        WHERE spo.is_active = true

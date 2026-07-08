@@ -234,6 +234,46 @@ export class MediaLibraryService {
   }
 
   /**
+   * Content Resource Metadata 수정 — WO-O4O-CONTENT-RESOURCE-METADATA-STANDARDIZATION-V1.
+   *   서술 메타데이터만 수정한다. 파일 속성(url/gcs_path/file_name/original_name/mime_type/file_size/
+   *   width/height)은 절대 변경하지 않는다(URL 불변). 파일 재업로드 없이 metadata 갱신.
+   */
+  async updateMetadata(
+    assetId: string,
+    patch: {
+      title?: string | null;
+      description?: string | null;
+      tags?: string[] | null;
+      keywords?: string[] | null;
+      language?: string | null;
+      source?: string | null;
+      usageType?: string | null;
+      status?: string | null;
+      memo?: string | null;
+      isLibraryPublic?: boolean;
+    },
+    userId?: string | null,
+  ): Promise<MediaAsset> {
+    const asset = await this.repo.findOne({ where: { id: assetId } });
+    if (!asset) throw new Error('Asset not found');
+
+    // 화이트리스트 필드만 반영(파일 속성은 절대 미변경)
+    if (patch.title !== undefined) asset.title = patch.title;
+    if (patch.description !== undefined) asset.description = patch.description;
+    if (patch.tags !== undefined) asset.tags = patch.tags;
+    if (patch.keywords !== undefined) asset.keywords = patch.keywords;
+    if (patch.language !== undefined) asset.language = patch.language;
+    if (patch.source !== undefined) asset.source = patch.source;
+    if (patch.usageType !== undefined) asset.usageType = patch.usageType;
+    if (patch.status !== undefined) asset.status = patch.status;
+    if (patch.memo !== undefined) asset.memo = patch.memo;
+    if (patch.isLibraryPublic !== undefined) asset.isLibraryPublic = patch.isLibraryPublic;
+    asset.updatedBy = userId ?? asset.updatedBy;
+
+    return this.repo.save(asset);
+  }
+
+  /**
    * 자산 삭제 (DB + GCS).
    */
   async deleteAsset(assetId: string): Promise<void> {

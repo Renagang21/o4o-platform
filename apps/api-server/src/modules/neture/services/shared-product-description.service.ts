@@ -104,7 +104,9 @@ export async function bulkCanonicalApplyQuery(
 import type {
   SharedProductDescriptionSourceType,
   SharedProductDescriptionStatus,
+  SharedProductDescriptionType,
 } from '../entities/SharedProductDescription.entity.js';
+import { DEFAULT_SHARED_PRODUCT_DESCRIPTION_TYPE } from '../entities/SharedProductDescription.entity.js';
 import { sanitizeDescriptionHtml } from '../utils/sanitize-description-html.util.js';
 
 export interface CreateCandidateInput {
@@ -118,6 +120,8 @@ export interface CreateCandidateInput {
   createdBy?: string | null;
   /** 생성 직후 상태 (기본 candidate). canonical 은 setCanonical 경유 권장 */
   status?: SharedProductDescriptionStatus;
+  /** 설명서 유형 (기본 STORE) — WO-...-DESCRIPTION-TYPE-IMPLEMENTATION-V1 */
+  descriptionType?: SharedProductDescriptionType;
 }
 
 /** WO-O4O-PRODUCT-DESCRIPTION-CANDIDATE-SEED-V1: seed 가능 소스 */
@@ -160,9 +164,15 @@ export class SharedProductDescriptionService {
     });
   }
 
-  /** master 의 canonical 대표 설명 (없으면 null) */
-  async getCanonical(masterId: string): Promise<SharedProductDescription | null> {
-    return this.repo.findOne({ where: { masterId, status: 'canonical' } });
+  /**
+   * master 의 canonical 대표 설명 (없으면 null).
+   * WO-...-DESCRIPTION-TYPE-IMPLEMENTATION-V1: descriptionType 기본값 STORE (기존 화면 회귀 방지).
+   */
+  async getCanonical(
+    masterId: string,
+    descriptionType: SharedProductDescriptionType = DEFAULT_SHARED_PRODUCT_DESCRIPTION_TYPE,
+  ): Promise<SharedProductDescription | null> {
+    return this.repo.findOne({ where: { masterId, status: 'canonical', descriptionType } });
   }
 
   async getById(id: string): Promise<SharedProductDescription | null> {
@@ -198,6 +208,7 @@ export class SharedProductDescriptionService {
           ? null
           : String(input.qualityScore),
       status: input.status ?? 'candidate',
+      descriptionType: input.descriptionType ?? DEFAULT_SHARED_PRODUCT_DESCRIPTION_TYPE,
       createdBy: input.createdBy ?? null,
       updatedBy: input.createdBy ?? null,
     });
@@ -219,12 +230,14 @@ export class SharedProductDescriptionService {
         throw new Error('Cannot set a deleted description as canonical');
       }
 
-      // 기존 canonical 강등 (대상 자신 제외)
+      // 기존 canonical 강등 (대상 자신 제외) — 같은 description_type 만 강등 (Freeze #2:
+      // canonical 은 (master_id, description_type) 당 1개. 타입이 다른 canonical 은 건드리지 않는다).
       await repo
         .createQueryBuilder()
         .update(SharedProductDescription)
         .set({ status: 'candidate', updatedBy: actorId ?? null })
         .where('master_id = :masterId', { masterId: target.masterId })
+        .andWhere('description_type = :descriptionType', { descriptionType: target.descriptionType })
         .andWhere('status = :status', { status: 'canonical' })
         .andWhere('id != :id', { id })
         .andWhere('deleted_at IS NULL')
@@ -502,6 +515,7 @@ export class SharedProductDescriptionService {
 
     const rows: ReviewListRow[] = await this.dataSource.query(
       `SELECT spd.id, spd.master_id AS "masterId", spd.source_type AS "sourceType", spd.status,
+              spd.description_type AS "descriptionType",
               spd.language, spd.quality_score::float8 AS "qualityScore", spd.summary,
               LEFT(spd.content, 140) AS "contentPreview",
               spd.created_at AS "createdAt", spd.updated_at AS "updatedAt",
@@ -532,6 +546,7 @@ export class SharedProductDescriptionService {
   async getReviewDetail(id: string): Promise<ReviewDetail | null> {
     const rows: Array<Record<string, unknown>> = await this.dataSource.query(
       `SELECT spd.id, spd.master_id AS "masterId", spd.source_type AS "sourceType", spd.status,
+              spd.description_type AS "descriptionType",
               spd.content, spd.summary, spd.language, spd.source_ref_id AS "sourceRefId",
               spd.curated_by AS "curatedBy", spd.curated_at AS "curatedAt",
               spd.created_at AS "createdAt", spd.updated_at AS "updatedAt",
@@ -608,6 +623,7 @@ export interface ReviewListRow {
   masterId: string;
   sourceType: string;
   status: string;
+  descriptionType: string;
   language: string | null;
   qualityScore: number | null;
   summary: string | null;
@@ -632,6 +648,7 @@ export interface ReviewDetail {
   masterId: string;
   sourceType: string;
   status: string;
+  descriptionType: string;
   content: string;
   summary: string | null;
   language: string | null;
