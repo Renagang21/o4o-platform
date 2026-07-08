@@ -1,5 +1,7 @@
 # O4O 의약품 설명서 작성 기준 V1
 
+> ⚠️ **운영 이관 (2026-07-08, `WO-O4O-CONTENT-DOCUMENT-ARCHITECTURE-APPLY-V1`)**: 본 문서는 **상세 원문·역사로 보존**된다. 신규 참조는 운영 진입점 [`guides/products/drug/DRUG-WRITING`](products/drug/DRUG-WRITING.md)·[`DRUG-TEMPLATE`](products/drug/DRUG-TEMPLATE.md)를 사용한다(규칙 ID = [DR](products/drug/DRUG-RULE-REGISTRY.md)). 전체 구조는 [`guides/common/DOCUMENT-INDEX`](common/DOCUMENT-INDEX.md) 참조. 본 원문은 삭제하지 않으며, 기존 CHECK의 참조는 그대로 유효하다.
+
 > 작성일: 2026-07-06  
 > 적용 대상: O4O 의약품 설명서 작업, 우선 일반의약품 OTC  
 > 목적: 성분 중심의 신뢰성 있는 약국 매장용/소비자 안내 설명서 작성 기준을 고정하고, 실제 작성 결과를 반영해 계속 개선한다.

@@ -430,6 +430,9 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | **O4O AI Usage Flow Baseline** | `docs/baseline/O4O-AI-USAGE-FLOW-BASELINE-V1.md` |
 | **Store Products Canonical** | `docs/architecture/STORE-PRODUCTS-CANONICAL-V1.md` |
 | **RBAC Canonical State** | `docs/rbac/RBAC-CANONICAL-STATE-V1.md` |
+| **콘텐츠 문서 체계 (진입점)** | `docs/guides/common/DOCUMENT-INDEX.md` — 설명서·QR·POP·블로그·동영상 등 콘텐츠 규칙의 단일 진입점(common/content-authoring/ai/products/services 5축, Rule Registry CR/DR/AR). 상세 규칙은 이 진입점에서만 찾고 CLAUDE.md에 복사하지 않는다. |
+
+> **콘텐츠 작성 불변 원칙**: 의약품 등 소비자 콘텐츠는 **외부 LLM 초안 자동생성 안 함**(공식 원문 grounding) · **투여경로/제형 다르면 공유 금지** · **read-only 조사**(DB 반영은 승인·이중게이트 후). 상세는 `docs/guides/common/DOCUMENT-INDEX.md`.
 
 ---
 
