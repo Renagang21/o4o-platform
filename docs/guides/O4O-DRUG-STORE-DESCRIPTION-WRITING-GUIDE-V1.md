@@ -335,6 +335,17 @@ SOURCE GAP이면 **대표 설명서만** 작성한다. 허가 효능과 용법�
 | 소화제 | 소화효소 복합제 |
 | 정장제 | 단일균 설명서 |
 
+**대표 설명서 허용 게이트** — SOURCE GAP이라도 대표 설명서를 아무 때나 쓰는 것이 아니다. 다음 조건을 **모두 만족할 때만** 대표 설명서를 작성한다.
+
+```text
+- 허가 효능·효과가 동일하거나 실질적으로 동일한 범위로 수렴한다.
+- 허가 용법·용량이 동일하거나 대표 설명서 범위에서 표현 가능하다.
+- 사용상 주의사항이 조성에 따라 크게 달라지지 않는다.
+- 대표 설명서가 소비자에게 오해를 유발하지 않는다.
+```
+
+위 조건 중 하나라도 만족하지 않으면 **대표 설명서도 작성하지 않고 HOLD_SOURCE로 처리한다**. 즉 SOURCE GAP의 출구는 "대표 설명서 작성"과 "HOLD_SOURCE" 둘 뿐이며, 효능·용법이 수렴하지 않거나 조성별 주의사항 차이가 큰 그룹은 대표 설명서로 뭉개지 않는다.
+
 #### 3.11.4 HOLD_SOURCE — 조성이 필요한 경우
 
 조성 구분이 필요한데 원천이 없으면 `HOLD_SOURCE`로 분류한다.
@@ -379,8 +390,9 @@ HOLD_SOURCE
 | Case 1 | A07FA51 정장제 | 균주 조성 없음 | 단일균 대표 설명서만 작성 · 다균주 = HOLD_SOURCE |
 | Case 2 | N02BE51 해열진통 복합제 | 카페인·IPA·에텐자미드 구분 불가 | IPA signature만 일부 가능 · 나머지 = HOLD_SOURCE |
 | Case 3 | A09A 소화효소 복합제 | UDCA·담즙·시메티콘·건위생약 구분 불가 | 소화효소 대표 설명서만 작성 · 세분 = HOLD_SOURCE |
+| Case 4 | A02 위장약 | 단일 제산제(마그네슘·알루미늄·칼슘)·파모티딘·알긴산 = 성분 식별 가능(대표 작성) / 종합위장약 복합(제산염·시메티콘·건위생약·감초) = 조성 미표기 | 성분 식별 그룹 대표 6건 작성 · 복합 조성 세분 = HOLD_SOURCE |
 
-> 실측 근거: `CHECK-O4O-DRUG-OTC-DESCRIPTION-PROBIOTIC-STRAIN-GROUPING-AND-DRAFT-STANDARD-V1`(A07FA51 균주 조성 DB 부재), `CHECK-O4O-DRUG-OTC-DESCRIPTION-ANALGESIC-ANTIPYRETIC-COMBO-DRAFT-V1`(N02BE51 조성 세분 불가), `CHECK-O4O-DRUG-OTC-DESCRIPTION-DIGESTIVE-COMBO-DRAFT-V1`(A09A 조성 세분 name·pde·원문 어디로도 판별 불가).
+> 실측 근거: `CHECK-O4O-DRUG-OTC-DESCRIPTION-PROBIOTIC-STRAIN-GROUPING-AND-DRAFT-STANDARD-V1`(A07FA51 균주 조성 DB 부재), `CHECK-O4O-DRUG-OTC-DESCRIPTION-ANALGESIC-ANTIPYRETIC-COMBO-DRAFT-V1`(N02BE51 조성 세분 불가), `CHECK-O4O-DRUG-OTC-DESCRIPTION-DIGESTIVE-COMBO-DRAFT-V1`(A09A 조성 세분 name·pde·원문 어디로도 판별 불가), `CHECK-O4O-DRUG-OTC-DESCRIPTION-ANTACID-GASTRIC-COMBO-DRAFT-V1`(A02 위장약 = 단일 제산제·H2·알긴산 대표 가능 / 종합위장약 복합 세분 HOLD).
 
 #### 3.11.7 적용 대상 트랙
 
@@ -394,14 +406,18 @@ HOLD_SOURCE
 #### 3.11.8 설명서 제작 흐름 (조성 확인 선행)
 
 ```text
-설명서 작성
+후보 조사
+  ↓
+grounding 확인
   ↓
 조성 확인 가능?
   ├── 가능 → 세분 설명서 작성
-  └── 불가능 → 대표 설명서 작성 → HOLD_SOURCE → 후속 MFDS ETL
+  └── 불가능 → 효능·용법 수렴 여부 확인 (대표 설명서 허용 게이트 §3.11.3)
+                ├── 수렴 → 대표 설명서 작성 → HOLD_SOURCE(세분) → 후속 MFDS ETL
+                └── 수렴하지 않음 → HOLD_SOURCE (대표 설명서도 작성하지 않음)
 ```
 
-기존의 "설명서 작성 → SOURCE GAP 조사" 사후 확인 순서를, "조성 확인 → 가능/불가 분기" 선행 확인으로 바꾼다.
+기존의 "설명서 작성 → SOURCE GAP 조사" 사후 확인 순서를, "조성 확인 → 가능/불가 분기 → (불가 시) 효능·용법 수렴 여부" 선행 확인으로 바꾼다. 조성 불가 그룹은 무조건 대표 설명서를 쓰는 것이 아니라, 대표 설명서 허용 게이트(§3.11.3)를 통과할 때만 작성한다.
 
 ---
 
