@@ -81,13 +81,19 @@ docs/
 └── guides/
       ├── common/                              ← 제품군·콘텐츠 유형 불변
       │     DOCUMENT-ARCHITECTURE.md           (본 IR이 정한 문서 체계 원칙)
-      │     CONTENT-PROCESS.md                 (작업 절차: WO→조사→grounding→작성→CHECK→commit→push)
-      │     CONTENT-PIPELINE.md                (draft → review → canonical 승격 · 이중게이트 · rollback)
+      │     WORKFLOW.md                        (작성→검수→승인→canonical→배포: 절차+승격 통합)
       │     CONTENT-CHECK-STANDARD.md          (CHECK 작성 규칙)
       │     CONTENT-RULE-REGISTRY.md           (CR-NNN 공통 규칙)
       │
       ├── content-authoring/                   ← 콘텐츠 유형 공통(설명서/QR/POP/블로그/동영상/태블릿)
       │     CONTENT-AUTHORING-PRINCIPLES.md    (소비자 중심·원문 우선·과장 금지·grounding 필수)
+      │
+      ├── ai/                                  ← AI 계층 (제품군·콘텐츠 유형과 독립)
+      │     AI-PROMPT-STANDARD.md              (프롬프트 표준)
+      │     AI-GROUNDING.md                    (근거 주입·원문 결합)
+      │     AI-REVIEW.md                       (AI 검수·자기검증)
+      │     AI-SAFETY.md                       (안전·금지·환각 방지)
+      │     AI-RULE-REGISTRY.md                (AR-NNN AI 전용 규칙)
       │
       ├── drug/                                ← 의약품 전용 (레퍼런스 구현)
       │     DRUG-WRITING.md                    (소비자 설명서 작성 방법)
@@ -106,20 +112,45 @@ docs/registries/O4O-DRUG-OTC-DESCRIPTION-GROUP-REGISTRY-V1.md   ← 운영 상�
 
 | 항목 | 위치 | 이유 |
 |---|---|---|
-| Process (작업 절차) | **common/** | 모든 제품군·콘텐츠 유형 동일 |
-| Pipeline (draft→review→canonical) | **common/** | 의료기기·의약외품·건기식도 동일 |
+| **Workflow** (작성→검수→승인→canonical→배포) | **common/** | 절차(Process)와 승격(Pipeline)은 겹치므로 단일 WORKFLOW로 통합, 전 제품군 동일 |
 | CHECK Standard | **common/** | CHECK 형식은 제품군 무관 |
 | 공통 작성 원칙(소비자 중심·원문 우선·과장 금지·grounding) | **content-authoring/** | 콘텐츠 유형 공통 |
+| **AI 규칙(프롬프트·grounding·검수·안전)** | **ai/** | 제품군·콘텐츠 유형과 독립, AI 종류별 공통 |
 | Writing / Grouping / Template | **drug/** | 의약품 전용(성분·함량·제형·ATC) |
 | STANDARD(설계 철학) | drug/ 또는 content-authoring/로 분할 | 공통 철학은 위로, 의약품 분리 4축은 drug/ |
 
 의약품에 **고유하게 남는 것은 Writing · Grouping · Template + DR Registry** 정도이며, 나머지는 대부분 공통으로 상승한다.
 
+## 4-1. WORKFLOW 통합 (Process + Pipeline)
+
+기존의 `CONTENT-PROCESS`(작업 절차)와 `CONTENT-PIPELINE`(draft→review→canonical 승격)은 내용이 상당히 겹친다(둘 다 "만들어서 검수·승인·반영"의 단계를 서술). 이를 단일 `common/WORKFLOW.md` 로 통합하여 하나의 흐름으로 설명한다:
+
+```text
+작성 → 검수 → 승인 → canonical → 배포
+(draft) (review) (approve) (promote) (publish)
+```
+
+- 앞단(작성·검수)은 기존 Process, 뒷단(승인·canonical·배포)은 기존 Pipeline에 해당하며, 이중게이트·rollback·중앙 승인은 WORKFLOW의 승격 단계 규칙으로 흡수한다.
+
+## 4-2. AI 계층 (`ai/`)
+
+AI 규칙은 **제품군과도 다르고 콘텐츠 유형과도 다른** 독립 축이다(콘텐츠 생성 AI·번역 AI·요약 AI·분류 AI·검수 AI 등이 계속 늘어남). 따라서 `guides/ai/` 를 별도 계층으로 둔다:
+
+| 문서 | 역할 |
+|---|---|
+| `AI-PROMPT-STANDARD.md` | 프롬프트 표준(구조·역할·출력 형식) |
+| `AI-GROUNDING.md` | 근거 주입·원문 결합(창작 금지의 AI 실행 규칙) |
+| `AI-REVIEW.md` | AI 검수·자기검증·교차검증 |
+| `AI-SAFETY.md` | 안전·금지·환각 방지·민감정보 |
+| `AI-RULE-REGISTRY.md` | AR-NNN AI 전용 규칙 |
+
+AI 계층은 common/content-authoring/제품군 어디에도 종속되지 않고, 각 작업이 필요 시 AR 규칙을 참조한다.
+
 ---
 
-# 5. Rule Registry — 2계층 (CR / DR)
+# 5. Rule Registry — 3계층 (CR / DR / AR)
 
-규칙을 **콘텐츠 공통(CR)** 과 **의약품 전용(DR)** 으로 분리한다. 다른 문서는 **Rule ID만 참조**한다.
+규칙을 **콘텐츠 공통(CR)** · **의약품 전용(DR)** · **AI 전용(AR)** 으로 분리한다. 다른 문서는 **Rule ID만 참조**한다.
 
 ## 5-1. Content Rule Registry (CR — common/CONTENT-RULE-REGISTRY.md)
 
@@ -152,9 +183,19 @@ DR-009  route별 "사용 안내" 템플릿 (복용→사용, 좌제/질정 경�
 DR-010  group_key = drug_otc::{single|combo}::{route}::{ingredient}::{strength}::{form}
 ```
 
-- 정본: `CHECK-O4O-DRUG-DESCRIPTION-RULES-CONSOLIDATION-V1 §4`의 R1~R62. APPLY 시 **각 규칙을 CR/DR로 분류**하여 등재(공통성 판단 = 다른 제품군·콘텐츠 유형에도 성립하는가).
+## 5-3. AI Rule Registry (AR — ai/AI-RULE-REGISTRY.md)
+
+```text
+AR-001  프롬프트는 역할·입력·출력 형식을 명시한다
+AR-002  AI는 원문 grounding 없이 성분·효능·수치를 생성하지 않는다 (창작 0)
+AR-003  AI 출력은 검수 단계를 거친다 (자기검증 + 교차검증)
+AR-004  환각·과장·민감정보 노출 금지
+AR-005  O4O는 소비자 설명서 초안을 외부 LLM으로 자동 생성하지 않는다 (편집 보조만)
+```
+
+- 정본: `CHECK-O4O-DRUG-DESCRIPTION-RULES-CONSOLIDATION-V1 §4`의 R1~R62. APPLY 시 **각 규칙을 CR/DR/AR로 분류**하여 등재(공통성 판단 = 다른 제품군·콘텐츠 유형·AI에도 성립하는가).
 - 각 엔트리: `Rule ID · 요지 · SSOT 문서(§) · 상태(active/superseded)`.
-- 신규/변경 규칙: 공통이면 CR, 제품군 전용이면 DR로 ID 부여 + 해당 Guide 본문 수정.
+- 신규/변경 규칙: 공통이면 CR, 제품군 전용이면 DR, AI 전용이면 AR로 ID 부여 + 해당 Guide 본문 수정.
 
 ---
 
@@ -207,9 +248,9 @@ Batch 진행 상세는 track memory로 유지, MEMORY.md는 포인터 1행만.
 # 10. 참조 관계
 
 ```text
-CLAUDE.md ─▶ Guide(common/* · content-authoring/* · drug/*) ─▶ WO ─▶ CHECK ─▶ Registry(운영상태) · Track Memory
+CLAUDE.md ─▶ Guide(common/* · content-authoring/* · ai/* · drug/*) ─▶ WO ─▶ CHECK ─▶ Registry(운영상태) · Track Memory
                         │
-                        └── Rule Registry: CR(common) · DR(drug) — 모든 문서는 Rule ID만 참조
+                        └── Rule Registry: CR(common) · DR(drug) · AR(ai) — 모든 문서는 Rule ID만 참조
 ```
 
 ---
@@ -240,10 +281,11 @@ CLAUDE.md ─▶ Guide(common/* · content-authoring/* · drug/*) ─▶ WO ─�
 이 WO에서 한 번에 수행:
 
 ```text
-common/ 생성 (DOCUMENT-ARCHITECTURE · CONTENT-PROCESS · CONTENT-PIPELINE · CONTENT-CHECK-STANDARD · CONTENT-RULE-REGISTRY)
+common/ 생성 (DOCUMENT-ARCHITECTURE · WORKFLOW · CONTENT-CHECK-STANDARD · CONTENT-RULE-REGISTRY)
 content-authoring/ 생성 (CONTENT-AUTHORING-PRINCIPLES)
+ai/ 생성 (AI-PROMPT-STANDARD · AI-GROUNDING · AI-REVIEW · AI-SAFETY · AI-RULE-REGISTRY)
 drug/ 정리 (DRUG-WRITING · DRUG-GROUPING · DRUG-TEMPLATE · DRUG-RULE-REGISTRY)
-Rule Registry 생성 (R1~R62 → CR/DR 분류)
+Rule Registry 생성 (R1~R62 → CR/DR/AR 분류)
 CLAUDE.md 수정 (포인터 1행 + 불변 1행)
 MEMORY.md 수정 (불변식 블록 + track 이관)
 문서 이동 · 참조 변경 · 중복 규칙 제거(MERGE/REMOVE)
@@ -256,5 +298,7 @@ MEMORY.md 수정 (불변식 블록 + track 이관)
 - 콘텐츠 규칙의 Source of Truth를 **Guide로 단일화**, 4역할(설계/실행결과/운영상태/불변결정) 명확화
 - WO·CHECK 중복 제거, CLAUDE.md·MEMORY.md 역할 명확화
 - **의료기기·의약외품·건기식 + QR·POP·블로그·동영상**까지 동일 문서 체계로 확장
+- Process/Pipeline을 **WORKFLOW**로 통합해 중복 서술 제거, **AI 계층(`ai/`)** 분리로 AI 종류 확장 대비
+- Rule Registry 3계층(CR/DR/AR)으로 공통·제품군·AI 규칙을 독립 관리
 - 공통 규칙은 `common/` 한 곳 수정으로 전 제품군·전 콘텐츠 유형에 반영
-- 신규 제품군/콘텐츠 유형 추가 시 최소 문서 작성(common 상속)
+- 신규 제품군/콘텐츠 유형/AI 추가 시 최소 문서 작성(common 상속)
