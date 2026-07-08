@@ -27,15 +27,21 @@ export const TABLE_EXTENSIONS = [
 /**
  * 표 표시 CSS — 편집기와 ContentRenderer 양쪽에 동일 주입.
  * 테두리 · 헤더 배경 · 셀 패딩 + 모바일 가로 스크롤(.tableWrapper).
+ *
+ * 선택자 주의: TipTap 은 HTMLAttributes(class="editor-table")를 **직렬화(getHTML)에만** 부여하고
+ * 편집기 live 노드뷰(ProseMirror) table 에는 class 를 붙이지 않는다. 따라서
+ *   - 편집기: `.content-editor .ProseMirror table` (class 무관)
+ *   - 소비 렌더(ContentRenderer)·저장 HTML: `table.editor-table`
+ * 두 선택자군에 동일 규칙을 적용해 편집기와 소비 표면 출력을 일치시킨다.
  */
 export const TABLE_STYLES = `
-table.editor-table { border-collapse: collapse; table-layout: fixed; width: 100%; margin: 1em 0; overflow: hidden; }
-table.editor-table td, table.editor-table th { border: 1px solid #d1d5db; padding: 6px 10px; vertical-align: top; box-sizing: border-box; position: relative; min-width: 1em; }
-table.editor-table th { background: #f9fafb; font-weight: 600; text-align: left; }
-table.editor-table p { margin: 0; }
+.content-editor .ProseMirror table, table.editor-table { border-collapse: collapse; table-layout: fixed; width: 100%; margin: 1em 0; overflow: hidden; }
+.content-editor .ProseMirror table td, .content-editor .ProseMirror table th, table.editor-table td, table.editor-table th { border: 1px solid #d1d5db; padding: 6px 10px; vertical-align: top; box-sizing: border-box; position: relative; min-width: 1em; }
+.content-editor .ProseMirror table th, table.editor-table th { background: #f9fafb; font-weight: 600; text-align: left; }
+.content-editor .ProseMirror table p, table.editor-table p { margin: 0; }
 /* 편집기 셀 선택/열 리사이즈 데코 (ProseMirror table) */
-.content-editor .ProseMirror table.editor-table .selectedCell:after { content: ""; position: absolute; inset: 0; background: rgba(79,70,229,0.1); pointer-events: none; z-index: 2; }
-.content-editor .ProseMirror table.editor-table .column-resize-handle { position: absolute; right: -2px; top: 0; bottom: -2px; width: 3px; background: #4f46e5; pointer-events: none; }
+.content-editor .ProseMirror table .selectedCell:after { content: ""; position: absolute; inset: 0; background: rgba(79,70,229,0.1); pointer-events: none; z-index: 2; }
+.content-editor .ProseMirror table .column-resize-handle { position: absolute; right: -2px; top: 0; bottom: -2px; width: 3px; background: #4f46e5; pointer-events: none; }
 .content-editor .ProseMirror .tableWrapper { overflow-x: auto; }
 .content-editor .ProseMirror.resize-cursor { cursor: col-resize; }
 `;
