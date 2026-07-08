@@ -29,6 +29,19 @@ const PRODUCTION_TYPES: { key: ProductionType; label: string; Icon: ComponentTyp
 
 // ─── 주입 타입 (구조적 — @o4o 타입 import 금지) ──────────────────────────────
 
+/**
+ * 미디어 삽입 계약 — WO-O4O-CONTENT-ASSET-MEDIA-LIBRARY-STANDARDIZATION-V1 §8.
+ * store-ui-core 는 @o4o/content-editor 를 직접 import 하지 않으므로(제로-의존 원칙),
+ * content-editor 의 MediaInsert 와 **구조적으로 동일한** 타입을 여기 선언한다.
+ */
+type InjectedMediaInsert = {
+  type: 'image' | 'video';
+  url: string;
+  title?: string;
+  thumbnailUrl?: string;
+  sourceType?: 'youtube' | 'o4o_storage' | 'external';
+};
+
 /** RichTextEditor(@o4o/content-editor) 구조적 호환 prop 집합 (필요한 것만) */
 interface InjectedEditorProps {
   value?: string;
@@ -37,6 +50,9 @@ interface InjectedEditorProps {
   minHeight?: string;
   preset?: 'full' | 'compact';
   aiRequestHeaders?: Record<string, string>;
+  // WO-O4O-CONTENT-ASSET-MEDIA-LIBRARY-STANDARDIZATION-V1 §6: 미디어 라이브러리/업로드 주입
+  onImageUpload?: (file: File) => Promise<string>;
+  onMediaLibraryPick?: (insertMedia: (media: InjectedMediaInsert) => void) => void;
 }
 
 /** createStoreExecutionAsset 호출 입력 (shell 이 실제로 보내는 형태) */
@@ -62,6 +78,13 @@ export interface ProductionMaterialEditorShellProps {
   notify: { success: (msg: string) => void; error: (msg: string) => void };
   /** 저장 성공 후 이동 경로 (기본: /store/library/production-materials) */
   savedPath?: string;
+  // WO-O4O-CONTENT-ASSET-MEDIA-LIBRARY-STANDARDIZATION-V1 §6:
+  //   공용 미디어 라이브러리/업로드 어댑터. 서비스가 picker 열기 콜백/업로드 핸들러를 주입하면
+  //   편집기 툴바에 "라이브러리에서 선택" / 파일 업로드가 노출된다. 미주입 시 기존 동작 유지.
+  /** 공용 미디어 라이브러리 선택 — insertMedia({type,url,...}) 로 편집기에 삽입 */
+  onMediaLibraryPick?: (insertMedia: (media: InjectedMediaInsert) => void) => void;
+  /** 이미지 직접 업로드 (파일 → URL) */
+  onImageUpload?: (file: File) => Promise<string>;
 }
 
 // ─── Location State ──────────────────────────────────────────────────────────
@@ -86,6 +109,8 @@ export function ProductionMaterialEditorShell({
   getAccessToken,
   notify,
   savedPath = '/store/library/production-materials',
+  onMediaLibraryPick,
+  onImageUpload,
 }: ProductionMaterialEditorShellProps) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -222,6 +247,8 @@ export function ProductionMaterialEditorShell({
           minHeight="520px"
           preset="full"
           aiRequestHeaders={aiHeaders()}
+          onImageUpload={onImageUpload}
+          onMediaLibraryPick={onMediaLibraryPick}
         />
       </div>
 

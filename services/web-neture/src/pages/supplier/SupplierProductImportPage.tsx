@@ -12,7 +12,7 @@
 
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { RichTextEditor } from '@o4o/content-editor';
+import { RichTextEditor, type MediaInsert } from '@o4o/content-editor';
 import SupplierActivationGate from '../../components/supplier/SupplierActivationGate';
 import { parseFirstmallAdmin, looksLikeFirstmallAdmin } from '../../lib/product-import/firstmall-admin-parser';
 import { saveDraft } from '../../lib/product-import/storage';
@@ -99,7 +99,7 @@ export default function SupplierProductImportPage() {
 
   // Editable detail description
   const [detailDesc, setDetailDesc] = useState('');
-  const [mediaPickerTarget, setMediaPickerTarget] = useState<((url: string) => void) | null>(null);
+  const [mediaPickerTarget, setMediaPickerTarget] = useState<((media: MediaInsert) => void) | null>(null);
 
   // Image selection
   const [selectedImages, setSelectedImages] = useState<Set<number>>(new Set());
@@ -950,7 +950,7 @@ export default function SupplierProductImportPage() {
               placeholder="상세 설명이 없습니다"
               minHeight="200px"
               onImageUpload={editorImageUpload}
-              onMediaLibraryPick={(insertImage) => setMediaPickerTarget(() => insertImage)}
+              onMediaLibraryPick={(insertMedia) => setMediaPickerTarget(() => insertMedia)}
             />
           </div>
 
@@ -1104,7 +1104,7 @@ export default function SupplierProductImportPage() {
         open={!!mediaPickerTarget}
         onClose={() => setMediaPickerTarget(null)}
         onSelect={(asset) => {
-          mediaPickerTarget?.(asset.url);
+          mediaPickerTarget?.({ type: 'image', url: asset.url, title: asset.originalName });
           setMediaPickerTarget(null);
         }}
         title="상세 설명 이미지 선택"

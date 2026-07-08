@@ -31,7 +31,7 @@ import {
   // WO-O4O-AI-CONTENT-AUTOMATION-SCOPE-CLEANUP-V1: ShoppingBag(매장 활용 아이콘)은 후속 WO 재사용을 위해 import 제거.
   // StoreUseModal 컴포넌트는 packages/content-editor/src/components/StoreUseModal.tsx 에 유지됨.
 } from 'lucide-react';
-import type { EditorPreset } from '../types';
+import type { EditorPreset, MediaInsert } from '../types';
 import { AiContentModal } from './AiContentModal';
 
 interface ExistingImage {
@@ -45,7 +45,7 @@ interface ToolbarProps {
   onImageUpload?: (file: File) => Promise<string>;
   existingImages?: ExistingImage[];
   preset?: EditorPreset;
-  onMediaLibraryPick?: (insertImage: (url: string) => void) => void;
+  onMediaLibraryPick?: (insertMedia: (media: MediaInsert) => void) => void;
   /** WO-O4O-STANDARD-EDITOR-IMAGE-DISPLAY-WIDTH-V1: URL 확보 후 삽입 설정 모달로 라우팅 (미제공 시 즉시 삽입) */
   onRequestImageInsert?: (url: string) => void;
   /** WO-O4O-CONTENT-EDITOR-AI-AUTH-HEADERS-V1: AiContentModal로 전달할 AI API 추가 헤더 */
@@ -61,6 +61,17 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
   const insertImg = (url: string) => {
     if (onRequestImageInsert) onRequestImageInsert(url);
     else editor?.chain().focus().setImage({ src: url }).run();
+  };
+  // WO-O4O-CONTENT-ASSET-MEDIA-LIBRARY-STANDARDIZATION-V1 §8: Media Type 인지형 삽입.
+  // WO-1 범위 = image + video(sourceType='youtube') 만 실제 처리.
+  // mp4/O4O Storage/External video 는 WO-3 에서 시그니처 변경 없이 확장한다.
+  const insertMediaIntoEditor = (media: MediaInsert) => {
+    if (media.type === 'video') {
+      // 동영상은 기존 YouTube 경로만 유지(WO-1). youtube/vimeo URL 은 setYoutubeVideo 가 처리.
+      if (media.url) editor?.chain().focus().setYoutubeVideo({ src: media.url }).run();
+      return;
+    }
+    insertImg(media.url);
   };
   const [showLinkInput, setShowLinkInput] = useState(false);
   const [showVideoInput, setShowVideoInput] = useState(false);
@@ -501,8 +512,8 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
                   <button
                     type="button"
                     onClick={() => {
-                      onMediaLibraryPick((url: string) => {
-                        insertImg(url);
+                      onMediaLibraryPick((media) => {
+                        insertMediaIntoEditor(media);
                         setShowImageInput(false);
                       });
                     }}

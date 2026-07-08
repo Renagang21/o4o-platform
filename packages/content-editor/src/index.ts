@@ -12,6 +12,7 @@ export { TEMPLATE_CATEGORIES, templateCategoryLabel, normalizeTemplateCategory }
 export type {
   ContentEditorProps,
   EditorContent,
+  MediaInsert,
   EditorPreset,
   ImageUploadConfig,
   VideoEmbedConfig,

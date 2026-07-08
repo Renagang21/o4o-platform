@@ -16,7 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import { X, Pencil, Trash2, ImagePlus, Loader2, Sparkles, Plus, ChevronDown, ChevronRight } from 'lucide-react';
 import { supplierApi, type SupplierProduct, productApi, type ProductImage, type CategoryTreeItem, type BrandItem, type SpotPricePolicy } from '../../lib/api';
 import { ProductForm, type ProductFormData, CategorySelect } from '../../components/product';
-import { RichTextEditor, ContentRenderer } from '@o4o/content-editor';
+import { RichTextEditor, ContentRenderer, type MediaInsert } from '@o4o/content-editor';
 // WO-NETURE-PRODUCT-DRAWER-FORM-STANDARD-COMPLIANCE-V1: O4O Form Standard primitives
 import { Section, InfoRow, FormField } from '@o4o/operator-ux-core';
 import { toast } from '@o4o/error-handling';
@@ -168,7 +168,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
   // V2: multi-select AI suggestions in edit mode
   const [selectedSuggestions, setSelectedSuggestions] = useState<Set<string>>(new Set());
   // WO-NETURE-DESCRIPTION-IMAGE-MEDIA-LIBRARY-INTEGRATION-V1
-  const [mediaPickerTarget, setMediaPickerTarget] = useState<((url: string) => void) | null>(null);
+  const [mediaPickerTarget, setMediaPickerTarget] = useState<((media: MediaInsert) => void) | null>(null);
   // WO-NETURE-PRODUCT-PRIMARY-IMAGE-MEDIA-LIBRARY-INTEGRATION-V1
   const [showImagePicker, setShowImagePicker] = useState(false);
 
@@ -891,7 +891,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                   placeholder="거래처용 간단 소개"
                   minHeight="80px"
                   onImageUpload={editorImageUpload}
-                  onMediaLibraryPick={(insertImage) => setMediaPickerTarget(() => insertImage)}
+                  onMediaLibraryPick={(insertMedia) => setMediaPickerTarget(() => insertMedia)}
                   existingImages={images.filter((i) => i.type !== 'thumbnail').map((i) => ({ id: i.id, url: i.imageUrl }))}
                 />
               </FormField>
@@ -904,7 +904,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                   placeholder="거래처용 상세 설명"
                   minHeight="150px"
                   onImageUpload={editorImageUpload}
-                  onMediaLibraryPick={(insertImage) => setMediaPickerTarget(() => insertImage)}
+                  onMediaLibraryPick={(insertMedia) => setMediaPickerTarget(() => insertMedia)}
                   existingImages={images.filter((i) => i.type !== 'thumbnail').map((i) => ({ id: i.id, url: i.imageUrl }))}
                   showTemplateActions
                   templateCategory="product"
@@ -1016,7 +1016,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                   placeholder="소비자에게 보이는 간단 소개"
                   minHeight="80px"
                   onImageUpload={editorImageUpload}
-                  onMediaLibraryPick={(insertImage) => setMediaPickerTarget(() => insertImage)}
+                  onMediaLibraryPick={(insertMedia) => setMediaPickerTarget(() => insertMedia)}
                   existingImages={images.filter((i) => i.type !== 'thumbnail').map((i) => ({ id: i.id, url: i.imageUrl }))}
                 />
               </FormField>
@@ -1029,7 +1029,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                   placeholder="소비자에게 보이는 상세 설명"
                   minHeight="150px"
                   onImageUpload={editorImageUpload}
-                  onMediaLibraryPick={(insertImage) => setMediaPickerTarget(() => insertImage)}
+                  onMediaLibraryPick={(insertMedia) => setMediaPickerTarget(() => insertMedia)}
                   existingImages={images.filter((i) => i.type !== 'thumbnail').map((i) => ({ id: i.id, url: i.imageUrl }))}
                   showTemplateActions
                   templateCategory="product"
@@ -1060,7 +1060,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                   placeholder="거래처용 간단 소개"
                   minHeight="80px"
                   onImageUpload={editorImageUpload}
-                  onMediaLibraryPick={(insertImage) => setMediaPickerTarget(() => insertImage)}
+                  onMediaLibraryPick={(insertMedia) => setMediaPickerTarget(() => insertMedia)}
                   existingImages={images.filter((i) => i.type !== 'thumbnail').map((i) => ({ id: i.id, url: i.imageUrl }))}
                 />
               </FormField>
@@ -1073,7 +1073,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                   placeholder="거래처용 상세 설명"
                   minHeight="150px"
                   onImageUpload={editorImageUpload}
-                  onMediaLibraryPick={(insertImage) => setMediaPickerTarget(() => insertImage)}
+                  onMediaLibraryPick={(insertMedia) => setMediaPickerTarget(() => insertMedia)}
                   existingImages={images.filter((i) => i.type !== 'thumbnail').map((i) => ({ id: i.id, url: i.imageUrl }))}
                   showTemplateActions
                   templateCategory="product"
@@ -1967,7 +1967,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
         open={!!mediaPickerTarget}
         onClose={() => setMediaPickerTarget(null)}
         onSelect={(asset) => {
-          mediaPickerTarget?.(asset.url);
+          mediaPickerTarget?.({ type: 'image', url: asset.url, title: asset.originalName });
           setMediaPickerTarget(null);
         }}
         defaultFolder="description"

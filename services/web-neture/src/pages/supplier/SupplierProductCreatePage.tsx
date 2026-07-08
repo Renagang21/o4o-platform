@@ -13,7 +13,7 @@
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { RichTextEditor } from '@o4o/content-editor';
+import { RichTextEditor, type MediaInsert } from '@o4o/content-editor';
 import {
   supplierApi,
   productApi,
@@ -178,7 +178,7 @@ export default function SupplierProductCreatePage() {
   // content 라이브러리 선택 대상
   const [imagePickerTarget, setImagePickerTarget] = useState<'content' | null>(null);
   // 에디터 인라인 이미지 라이브러리 선택 콜백
-  const [mediaPickerTarget, setMediaPickerTarget] = useState<((url: string) => void) | null>(null);
+  const [mediaPickerTarget, setMediaPickerTarget] = useState<((media: MediaInsert) => void) | null>(null);
 
   // Submit
   const [submitting, setSubmitting] = useState(false);
@@ -897,7 +897,7 @@ export default function SupplierProductCreatePage() {
                 placeholder="소비자에게 보이는 간이 설명을 입력하세요..."
                 minHeight="120px"
                 onImageUpload={editorImageUpload}
-                onMediaLibraryPick={(insertImage) => setMediaPickerTarget(() => insertImage)}
+                onMediaLibraryPick={(insertMedia) => setMediaPickerTarget(() => insertMedia)}
               />
             </div>
 
@@ -999,7 +999,7 @@ export default function SupplierProductCreatePage() {
         open={!!mediaPickerTarget}
         onClose={() => setMediaPickerTarget(null)}
         onSelect={(asset) => {
-          mediaPickerTarget?.(asset.url);
+          mediaPickerTarget?.({ type: 'image', url: asset.url, title: asset.originalName });
           setMediaPickerTarget(null);
         }}
         title="설명 이미지 선택"

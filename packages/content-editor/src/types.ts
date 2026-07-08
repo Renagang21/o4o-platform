@@ -9,6 +9,21 @@ export interface EditorContent {
 }
 
 /**
+ * Media Type 인지형 삽입 계약 — WO-O4O-CONTENT-ASSET-MEDIA-LIBRARY-STANDARDIZATION-V1 §8
+ *
+ * 미디어 라이브러리/Picker 가 선택 결과를 편집기에 삽입할 때 사용하는 표준 계약.
+ * WO-1 에서는 type='image' 와 type='video'(sourceType='youtube') 만 실제 삽입한다.
+ * mp4/O4O Storage/External(sourceType='o4o_storage'|'external')는 WO-3에서 시그니처 변경 없이 확장.
+ */
+export interface MediaInsert {
+  type: 'image' | 'video';
+  url: string;
+  title?: string;
+  thumbnailUrl?: string;
+  sourceType?: 'youtube' | 'o4o_storage' | 'external';
+}
+
+/**
  * Toolbar preset — 용도별 버튼 구성
  * - full: 표준 편집기 (기본값) — 모든 기능 포함 (AI, 이미지, 동영상, 서식, HTML 탭)
  * - compact: 경량 입력 전용 (포럼 댓글 등) — 기본 서식만, HTML 탭 없음
@@ -64,10 +79,12 @@ export interface ContentEditorProps {
   onImageUpload?: (file: File) => Promise<string>;
   /** 기존 이미지 목록 (선택 삽입용) */
   existingImages?: { id: string; url: string; label?: string }[];
-  /** WO-NETURE-DESCRIPTION-IMAGE-MEDIA-LIBRARY-INTEGRATION-V1:
+  /** WO-NETURE-DESCRIPTION-IMAGE-MEDIA-LIBRARY-INTEGRATION-V1 →
+   *  WO-O4O-CONTENT-ASSET-MEDIA-LIBRARY-STANDARDIZATION-V1 §8.1 (Media Type 인지형 전환):
    *  공용 미디어 라이브러리 선택 콜백.
-   *  호출 시 insertImage 함수를 받아 부모가 picker를 열고, 선택 완료 시 insertImage(url)로 에디터에 삽입. */
-  onMediaLibraryPick?: (insertImage: (url: string) => void) => void;
+   *  호출 시 insertMedia 함수를 받아 부모가 picker를 열고, 선택 완료 시 insertMedia({type,url,...})로 에디터에 삽입.
+   *  WO-1: image 삽입 + video(sourceType='youtube') 만 실제 처리. mp4/external video는 WO-3. */
+  onMediaLibraryPick?: (insertMedia: (media: MediaInsert) => void) => void;
   /**
    * WO-O4O-CONTENT-EDITOR-AI-AUTH-HEADERS-V1: AI API 요청 추가 헤더.
    * - AI fetch 호출 시 headers에 병합됨 (Authorization: Bearer 등)
