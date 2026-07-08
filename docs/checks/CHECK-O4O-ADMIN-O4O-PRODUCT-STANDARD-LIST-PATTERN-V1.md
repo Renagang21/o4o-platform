@@ -1,6 +1,6 @@
 # CHECK-O4O-ADMIN-O4O-PRODUCT-STANDARD-LIST-PATTERN-V1
 
-Status: IN PROGRESS → 코드 완료, 프로덕션 smoke 대기 (2026-07-08)
+Status: DONE — 코드 완료 + 프로덕션 브라우저 smoke PASS (2026-07-08)
 WO: `WO-O4O-ADMIN-O4O-PRODUCT-STANDARD-LIST-PATTERN-V1`
 (초안 WO명: `...-STANDARD-TABLE-AND-PAGINATION-V1` — "테이블 교체"보다 "표준 목록 패턴 확립"이 정확해 개명)
 
@@ -62,8 +62,14 @@ o4o-product-db 목록 페이지 6개 전수 조사 결과, **WO가 가정한 문
 | admin-dashboard typecheck | **에러 0** (`tsc --noEmit`) |
 | admin-dashboard build | **EXIT 0** (`vite build`, ProductMasters/Candidates 청크 정상 생성) |
 | 변경 파일 | 2개 (ProductMastersPage.tsx, ProductCandidatesPage.tsx) — API/백엔드/공통 컴포넌트 무변경 |
-| DB write | **0** (GET-only 유지) |
-| 프로덕션 브라우저 smoke | **대기**(배포 후): 목록 렌더/검색/필터/페이지 이동/row 상세 이동/체크박스/선택 ActionBar/URL sync/empty·error |
+| DB write | **0** (GET-only 유지 — 네트워크상 유일 POST=/auth/login) |
+| 프로덕션 브라우저 smoke | **PASS** (admin.neture.co.kr, 2026-07-08, 서철환 admin) |
+
+**smoke 상세 (2 배포: BaseTable 마이그레이션 → `_select` 체크박스 수정):**
+- **ProductMasters**: BaseTable 렌더(총 198,389건, 1/9920 서버 pagination) · "더보기"→"상세 보기"→상세 이동(URL `/masters/{id}`) · 검색 "타이레놀"→43건+URL `?q=` sync+1/3 재계산 · "컬럼 설정"(columnVisibility) · **행 체크박스+헤더 select-all(indeterminate)** · 체크 시 **ActionBar "1개 선택"+선택 해제+statusInfo** 노출 · 체크박스 클릭이 상세 이동 안 함(stopPropagation)
+- **ProductCandidates**: BaseTable 렌더(총 394,491건, 1/19725) · 3필터+source_label+검색 · 안내 배너 · "더보기" · 체크박스
+- **네트워크 GET-only**: `/neture/products/library/search?page&limit` GET 200, mutation 0
+- **발견/수정**: BaseTable `selectable`은 헤더 select-all만 auto-wire → body 체크박스는 consumer `_select` 컬럼 필요(BaseTable.tsx:265). 1차 배포서 체크박스 미렌더 확인 → `_select` 컬럼 추가 재배포 후 정상(SuppliersList 등 기존 페이지도 동일 잠재 이슈 — 후속 정리 대상)
 
 ---
 
@@ -77,7 +83,7 @@ o4o-product-db 목록 페이지 6개 전수 조사 결과, **WO가 가정한 문
 | 수정/숨김/복원 action UX | 목록 레벨은 상세 이동. 숨김/복원/대표는 이미지 detail 레벨(별도 완료 WO) |
 | 속도 문제 개선 | 이미 서버 페이지네이션 — 회귀 없음 |
 | CHECK 작성 | ✅ 본 문서 |
-| commit/push/deploy | 진행 |
+| commit/push/deploy | ✅ 완료 (9c3652a41 마이그레이션 + 0a3f2f819 체크박스 수정, Cloud Run 배포 성공) |
 
 ---
 
