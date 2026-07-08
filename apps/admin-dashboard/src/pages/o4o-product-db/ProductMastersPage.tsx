@@ -70,7 +70,30 @@ export default function ProductMastersPage() {
     setQ(term.trim());
   };
 
+  const toggleSelect = (id: string, checked: boolean) => {
+    const next = new Set(selectedKeys);
+    if (checked) next.add(id); else next.delete(id);
+    setSelectedKeys(next);
+  };
+
   const columns: O4OColumn<ProductMasterRow>[] = [
+    {
+      key: '_select',
+      system: true,
+      header: '',
+      width: 40,
+      align: 'center',
+      render: (_, r) => (
+        <input
+          type="checkbox"
+          checked={selectedKeys.has(r.id)}
+          onChange={(e) => toggleSelect(r.id, e.target.checked)}
+          onClick={(e) => e.stopPropagation()}
+          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+        />
+      ),
+      onCellClick: () => {},
+    },
     {
       key: 'primaryImageUrl',
       header: '이미지',
