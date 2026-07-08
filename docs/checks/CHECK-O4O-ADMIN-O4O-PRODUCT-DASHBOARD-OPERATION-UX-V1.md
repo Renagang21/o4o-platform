@@ -1,6 +1,6 @@
 # CHECK-O4O-ADMIN-O4O-PRODUCT-DASHBOARD-OPERATION-UX-V1
 
-Status: 코드 완료 + typecheck/build 통과 → 프로덕션 smoke 진행 (2026-07-08)
+Status: DONE — 코드 완료 + typecheck/build 통과 + 프로덕션 브라우저 smoke PASS (2026-07-08)
 WO: `WO-O4O-ADMIN-O4O-PRODUCT-DASHBOARD-OPERATION-UX-V1`
 
 Scope: admin.neture.co.kr O4O 상품관리 **Overview(현황) Dashboard** 를 "DB 통계 조회" → "오늘 처리할 작업 중심 운영 화면"으로 개선. **Dashboard(ProductDbOverviewPage.tsx) 1파일만 변경.** 목록 화면·API·백엔드 무변경, 신규 통계 시스템 없음, DB write 0.
@@ -64,8 +64,16 @@ AI 기능 개선 / LLM prompt / merge·split / 재매칭 / 설명 생성 / 이�
 | admin-dashboard typecheck | **에러 0** |
 | admin-dashboard build | **EXIT 0** (`vite build`, ProductDbOverviewPage 청크 정상) |
 | 변경 파일 | 1개 (ProductDbOverviewPage.tsx) — API/백엔드/목록/공통 컴포넌트 무변경 |
-| DB write | **0** (GET-only 요약/목록 API 만) |
-| 프로덕션 브라우저 smoke | 진행 (배포 후): 빠른 첫 표시 / 오늘 처리할 작업 카드 클릭 이동 / 운영 용어 / Tooltip hover / 세부 통계 지연 로딩 / Console Error 없음 |
+| DB write | **0** (GET-only 요약/목록 API 만 — 네트워크상 유일 POST=/auth/login) |
+| 프로덕션 브라우저 smoke | **PASS** (admin.neture.co.kr, 2026-07-08, 서철환 admin) |
+
+**smoke 상세 (PASS):**
+- **점진 표시 확인**: 헤딩(오늘 처리할 작업/핵심 지표/세부 통계) 즉시 렌더 → 운영 섹션 카드가 먼저 채워지고 **세부 통계는 skeleton 유지하며 뒤이어 로딩**(첫 페인트 비차단).
+- **오늘 처리할 작업 5카드**: 충돌 확인 244 / 설명 검토 3,215 / OTC 초안 검토 1,294 / 이미지 없는 상품 195,599 / 신규 기본상품 생성 대상 146,258 — 운영 용어+색상+설명.
+- **핵심 운영 지표**: 기본 상품 198,389 / 공공데이터 후보 394,491 / **공식 설명 보유율 9%**(공식 17,877 / 기본상품 198,389 파생) + ? 툴팁.
+- **세부 통계 운영 용어**: 접수 대기/자동 매칭됨/신규 기본상품 승인, 미매칭·신규 생성 대상/식별자 정확 매칭/충돌·확인 필요, CSV 가져오기/공공데이터·외부 API 등 한글 라벨 + 툴팁.
+- **작업 카드 클릭 이동**: 충돌 확인 → `/candidates?matchStatus=conflict` (필터 적용 244건 목록) 정상.
+- **네트워크**: 운영 6호출(candidates·library/search·conflict·unmatched·description-status/summary·image-quality/summary) **먼저**, 세부 통계 24호출 **뒤에** 별도 발생 → 분리 로딩 실증. 전부 GET, mutation 0. Console Error 없음(다중 인터랙션 정상 동작).
 
 ---
 
@@ -79,4 +87,4 @@ AI 기능 개선 / LLM prompt / merge·split / 재매칭 / 설명 생성 / 이�
 | Tooltip 추가 | ✅ CSS hover InfoTip |
 | 기존 기능 회귀 없음 | 목록/링크 유지, mutation 0 |
 | typecheck/build | ✅ |
-| CHECK / commit·push·deploy | 진행 |
+| CHECK / commit·push·deploy | ✅ (f622c1054, Cloud Run 배포 성공, smoke PASS) |
