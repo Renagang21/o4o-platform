@@ -528,6 +528,16 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Product Master Audit Log routes:', auditLogError);
     }
 
+    // 24-e2i-3. Register Product Content Browse (read-only) — 제품 콘텐츠 통합 browse(4 source)
+    //         (WO-O4O-OPERATOR-PRODUCT-CONTENT-HUB-BROWSE-UNIFY-V1, A안). mutation 0.
+    try {
+      const { createProductContentBrowseController } = await import('../modules/neture/controllers/product-content-browse.controller.js');
+      app.use('/api/v1/admin/o4o-product-db/product-contents', createProductContentBrowseController(dataSource));
+      logger.info('✅ Product Content Browse (read-only) routes registered at /api/v1/admin/o4o-product-db/product-contents');
+    } catch (productContentBrowseError) {
+      logger.error('Failed to register Product Content Browse routes:', productContentBrowseError);
+    }
+
     // 24-e2i-2. Register Product Description/QR Summary (read-only) — 제품 리스트 설명서(KO/ZH) 상태 배치 조회
     //         (WO-O4O-PRODUCT-LIST-DESCRIPTION-QR-ACTIONS-V1). QR 은 deferred(자리만).
     try {
