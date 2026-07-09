@@ -11,7 +11,7 @@
 
 import { useEffect, useState, useCallback, type CSSProperties } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Package, RefreshCw, Search, ExternalLink, Boxes, Plus, PenSquare, FileText } from 'lucide-react';
+import { Package, RefreshCw, Search, ExternalLink, Boxes, Plus, PenSquare, FileText, Languages } from 'lucide-react';
 import { Pagination } from '@o4o/operator-ux-core';
 import { fetchHandledProducts, type HandledProduct } from '../../api/handledProducts';
 import { colors } from '../../styles/theme';
@@ -24,6 +24,8 @@ import { FileDown } from 'lucide-react';
 import { AddO4oStandardProductModal } from './AddO4oStandardProductModal';
 // WO-O4O-STORE-HANDLED-PRODUCT-DESCRIPTION-SELECTION-V1: 사용 설명서 선택 모달
 import { DescriptionSelectionModal, type DescriptionSelectionTarget } from './DescriptionSelectionModal';
+// WO-O4O-PRODUCT-QR-CONTENT-FLOW-MINIMAL-V1: 상품별 다국어 QR 콘텐츠 진입 + 연결 상태 배지
+import { getMlcSummaryMap, type StoreMlcSummaryItem } from '../../api/multilingualProductContentStore';
 
 type SourceFilter = 'all' | 'listing' | 'local';
 const PAGE_LIMIT = 20;
@@ -128,6 +130,40 @@ export default function StoreHandledProductsPage() {
   const [showAddO4oModal, setShowAddO4oModal] = useState(false);
   // WO-O4O-STORE-HANDLED-PRODUCT-DESCRIPTION-SELECTION-V1: 사용 설명서 선택 모달(listing 전용)
   const [descTarget, setDescTarget] = useState<DescriptionSelectionTarget | null>(null);
+  // WO-O4O-PRODUCT-QR-CONTENT-FLOW-MINIMAL-V1: 상품별 다국어 QR 콘텐츠 연결 상태 요약(배지). listing/local 각각.
+  const [mlcListing, setMlcListing] = useState<Map<string, StoreMlcSummaryItem>>(new Map());
+  const [mlcLocal, setMlcLocal] = useState<Map<string, StoreMlcSummaryItem>>(new Map());
+
+  useEffect(() => {
+    let cancelled = false;
+    Promise.all([getMlcSummaryMap('listing'), getMlcSummaryMap('local')])
+      .then(([listing, local]) => {
+        if (cancelled) return;
+        setMlcListing(listing);
+        setMlcLocal(local);
+      })
+      .catch(() => {
+        /* 배지는 비필수 — 요약 로드 실패 시 조용히 무시 */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [reloadKey]);
+
+  const mlcFor = useCallback(
+    (it: HandledProduct): StoreMlcSummaryItem | undefined =>
+      (it.sourceType === 'listing' ? mlcListing : mlcLocal).get(it.sourceId),
+    [mlcListing, mlcLocal],
+  );
+
+  // 상품별 다국어 QR 콘텐츠 저작 화면으로 이동 (target = sourceType/sourceId, 상품명 프리필).
+  const goMultilingual = useCallback(
+    (p: { sourceType: HandledProduct['sourceType']; sourceId: string; name: string }) => {
+      const qs = new URLSearchParams({ name: p.name });
+      navigate(`/store/products/multilingual/${p.sourceType}/${p.sourceId}?${qs.toString()}`);
+    },
+    [navigate],
+  );
 
   // 콘텐츠 만들기 — 기존 자료함 작성 화면으로 이동(URL 기반 전달 → 새로고침 안전).
   const goCreateContent = useCallback(
@@ -328,6 +364,32 @@ export default function StoreHandledProductsPage() {
                         <PenSquare size={12} />
                         콘텐츠 만들기
                       </button>
+                      {/* WO-O4O-PRODUCT-QR-CONTENT-FLOW-MINIMAL-V1: 상품별 다국어(한/중) QR 콘텐츠 저작 진입 + 연결 상태 배지 */}
+                      {(() => {
+                        const mlc = mlcFor(it);
+                        return (
+                          <button
+                            type="button"
+                            onClick={() => goMultilingual({ sourceType: it.sourceType, sourceId: it.sourceId, name: it.name })}
+                            style={styles.mlcBtn}
+                            aria-label="다국어 QR 콘텐츠 만들기"
+                          >
+                            <Languages size={12} />
+                            다국어 QR
+                            {mlc && (
+                              <span
+                                style={{
+                                  ...styles.mlcDot,
+                                  background: mlc.publishedLocaleCount > 0 ? '#DCFCE7' : '#FEF3C7',
+                                  color: mlc.publishedLocaleCount > 0 ? '#16A34A' : '#D97706',
+                                }}
+                              >
+                                {mlc.publishedLocaleCount > 0 ? `${mlc.publishedLocaleCount}개 언어` : '초안'}
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })()}
                       <button
                         type="button"
                         onClick={() => navigate(it.managePath)}
@@ -434,6 +496,9 @@ const styles: Record<string, CSSProperties> = {
   importBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 10px', background: '#F0FDF4', border: '1px solid #86EFAC', borderRadius: '6px', fontSize: '12px', color: '#15803D', cursor: 'pointer', whiteSpace: 'nowrap' },
   // WO-O4O-STORE-HANDLED-PRODUCT-DESCRIPTION-SELECTION-V1
   descBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 10px', background: '#EFF6FF', border: '1px solid #93C5FD', borderRadius: '6px', fontSize: '12px', color: '#1D4ED8', cursor: 'pointer', whiteSpace: 'nowrap' },
+  // WO-O4O-PRODUCT-QR-CONTENT-FLOW-MINIMAL-V1
+  mlcBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 10px', background: '#F5F3FF', border: '1px solid #C4B5FD', borderRadius: '6px', fontSize: '12px', color: '#6D28D9', cursor: 'pointer', whiteSpace: 'nowrap' },
+  mlcDot: { display: 'inline-flex', alignItems: 'center', padding: '1px 6px', fontSize: '10px', fontWeight: 600, borderRadius: '999px', whiteSpace: 'nowrap' },
   countBtn: { display: 'inline-flex', padding: 0, border: 'none', background: 'transparent', cursor: 'pointer' },
   empty: { padding: '40px 12px', textAlign: 'center', color: colors.neutral400, fontSize: '13px' },
   footnote: { marginTop: '14px', fontSize: '12px', color: colors.neutral500, lineHeight: 1.7, padding: '10px 12px', background: colors.neutral100, borderRadius: '6px' },

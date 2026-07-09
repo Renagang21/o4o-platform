@@ -954,5 +954,29 @@ export function createMultilingualProductContentController(
     }),
   );
 
+  // GET /pharmacy/multilingual-product-contents/:groupId — full group + pages (incl content, all statuses)
+  // WO-O4O-PRODUCT-QR-CONTENT-FLOW-MINIMAL-V1: 매장 저작 편집기가 초안(draft) 본문까지 hydrate 하기 위한 단건 조회.
+  // 기존 loadGroupWithPages 재사용(org-scoped). resolve 는 published 만 반환하므로 초안 편집엔 부적합.
+  // NOTE: 반드시 /summary·/hub·/:groupId/* 등 리터럴/하위 경로 뒤에 등록되어야 shadowing 되지 않는다.
+  router.get(
+    '/pharmacy/multilingual-product-contents/:groupId',
+    requireAuth,
+    requireStoreOwner,
+    asyncHandler(async (req: Request, res: Response) => {
+      const organizationId = (req as any).organizationId as string;
+      const groupId = asString(req.params.groupId, 80);
+      if (!groupId) {
+        res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'groupId is required' } });
+        return;
+      }
+      const data = await loadGroupWithPages(dataSource, groupId, organizationId);
+      if (!data) {
+        res.status(404).json({ success: false, error: { code: 'GROUP_NOT_FOUND', message: 'Content group not found' } });
+        return;
+      }
+      res.json({ success: true, data });
+    }),
+  );
+
   return router;
 }

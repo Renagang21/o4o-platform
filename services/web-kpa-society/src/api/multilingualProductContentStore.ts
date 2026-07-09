@@ -25,6 +25,18 @@ function getApiBase(): string {
 export type StoreMlcLocale = 'ko' | 'en' | 'zh' | 'ja' | 'vi' | 'th' | 'id';
 export type StoreMlcTargetKind = 'local' | 'listing';
 export type StoreMlcStatus = 'draft' | 'published' | 'archived';
+export type StoreMlcContentFormat = 'blocks' | 'html' | 'image_sequence' | 'json';
+
+export const STORE_MLC_LOCALES: StoreMlcLocale[] = ['ko', 'en', 'zh', 'ja', 'vi', 'th', 'id'];
+export const STORE_MLC_LOCALE_LABELS: Record<StoreMlcLocale, string> = {
+  ko: '한국어',
+  en: 'English',
+  zh: '中文',
+  ja: '日本語',
+  vi: 'Tiếng Việt',
+  th: 'ภาษาไทย',
+  id: 'Bahasa',
+};
 
 export interface StoreMlcHubItem {
   id: string;
@@ -169,6 +181,83 @@ export async function resolveMlc(
 ): Promise<{ group: StoreMlcGroup; page: any; requestedLocale: StoreMlcLocale | null }> {
   const json = await authFetch(
     `${getApiBase()}/${encodeURIComponent(groupId)}/resolve?locale=${encodeURIComponent(locale)}`,
+  );
+  return json.data;
+}
+
+/* ─── WO-O4O-PRODUCT-QR-CONTENT-FLOW-MINIMAL-V1: 매장 저작(store-created) ─── */
+
+/** 편집용 상세 페이지 (본문 content 포함) — GET/create/upsert 응답의 pages 형태 */
+export interface StoreMlcPageDetail extends StoreMlcPage {
+  content: Record<string, unknown>;
+  assets: Array<Record<string, unknown>>;
+  buttons: Array<Record<string, unknown>>;
+  metadata?: Record<string, unknown>;
+}
+
+/** 편집용 상세 그룹 (pages 에 content 포함) */
+export interface StoreMlcGroupDetail extends Omit<StoreMlcGroup, 'pages'> {
+  pages: StoreMlcPageDetail[];
+}
+
+export interface StoreMlcCreateGroupInput {
+  targetKind: StoreMlcTargetKind;
+  targetId: string;
+  title: string;
+  defaultLocale?: StoreMlcLocale;
+  contentKey?: string;
+}
+
+export interface StoreMlcPageInput {
+  title: string;
+  summary?: string;
+  contentFormat?: StoreMlcContentFormat;
+  content?: Record<string, unknown>;
+  status?: StoreMlcStatus;
+  isDefault?: boolean;
+  sortOrder?: number;
+}
+
+/** 단건 그룹 조회 (초안 본문까지 hydrate) — 저작 편집기 로드용 */
+export async function getStoreMlcGroup(groupId: string): Promise<StoreMlcGroupDetail> {
+  const json = await authFetch(`${getApiBase()}/${encodeURIComponent(groupId)}`);
+  return json.data;
+}
+
+/**
+ * 그룹 생성/갱신 (target+contentKey 기준 upsert, source_type='store_created').
+ * 이미 존재하면 title/defaultLocale 등만 갱신하고 pages 는 보존한다.
+ */
+export async function createStoreMlcGroup(input: StoreMlcCreateGroupInput): Promise<StoreMlcGroupDetail> {
+  const json = await authFetch(`${getApiBase()}`, {
+    method: 'POST',
+    body: JSON.stringify({ sourceType: 'store_created', ...input }),
+  });
+  return json.data;
+}
+
+/** 언어별 page upsert (한국어/중국어 각각 HTML) */
+export async function upsertStoreMlcPage(
+  groupId: string,
+  locale: StoreMlcLocale,
+  input: StoreMlcPageInput,
+): Promise<StoreMlcGroupDetail> {
+  const json = await authFetch(
+    `${getApiBase()}/${encodeURIComponent(groupId)}/pages/${encodeURIComponent(locale)}`,
+    { method: 'PUT', body: JSON.stringify(input) },
+  );
+  return json.data;
+}
+
+/** 언어별 page 발행/초안 토글 */
+export async function setStoreMlcPageStatus(
+  groupId: string,
+  locale: StoreMlcLocale,
+  status: StoreMlcStatus,
+): Promise<StoreMlcGroupDetail> {
+  const json = await authFetch(
+    `${getApiBase()}/${encodeURIComponent(groupId)}/pages/${encodeURIComponent(locale)}/status`,
+    { method: 'PATCH', body: JSON.stringify({ status }) },
   );
   return json.data;
 }

@@ -247,6 +247,8 @@ const StoreDirectContentPage = lazy(() => import('./pages/pharmacy/StoreDirectCo
 const StoreLocalProductsPage = lazy(() => import('./pages/pharmacy/StoreLocalProductsPage'));
 // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-UNIFIED-VIEW-V1: 매장 경영활용 제품 통합 조회
 const StoreHandledProductsPage = lazy(() => import('./pages/pharmacy/StoreHandledProductsPage'));
+// WO-O4O-PRODUCT-QR-CONTENT-FLOW-MINIMAL-V1: 상품별 다국어 QR 콘텐츠 저작 (한/중 HTML + publicKey QR)
+const StoreProductMultilingualContentPage = lazy(() => import('./pages/pharmacy/StoreProductMultilingualContentPage'));
 const StoreTabletDisplaysPage = lazy(() => import('./pages/pharmacy/StoreTabletDisplaysPage'));
 const StoreProductInfoCreatorPage = lazy(() => import('./pages/pharmacy/StoreProductInfoCreatorPage'));
 // Pharmacy specific (not in barrel)
@@ -972,6 +974,8 @@ function App() {
             /></PharmacyOwnerOnlyGuard>} />
             {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-UNIFIED-VIEW-V1: 매장 경영활용 제품 통합 조회(읽기) — listings+local 합산, 원본 관리 이동 */}
             <Route path="handled-products" element={<PharmacyOwnerOnlyGuard><StoreHandledProductsPage /></PharmacyOwnerOnlyGuard>} />
+            {/* WO-O4O-PRODUCT-QR-CONTENT-FLOW-MINIMAL-V1: 상품별 다국어 QR 콘텐츠 저작 (한/중 HTML + publicKey 언어탭 QR) */}
+            <Route path="products/multilingual/:targetKind/:targetId" element={<PharmacyOwnerOnlyGuard><StoreProductMultilingualContentPage /></PharmacyOwnerOnlyGuard>} />
             {/* WO-O4O-STORE-HUB-LEGACY-LIST-CLEANUP-V1: suppliers 라우트 제거 (mock-only, /store-hub/b2b 와 redundant) */}
             <Route path="commerce/products/:productId/marketing" element={<ProductMarketingPage />} />
             {/* WO-O4O-AI-AUTO-POP-BUILDER-V1: 상품 POP 만들기 (AI prefill + 편집 + PDF) */}
