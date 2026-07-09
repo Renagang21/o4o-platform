@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>脂质体胶原蛋白 + 谷胱甘肽 — 韩国 EL amor</title>
+<style>
+  :root{
+    --bg:#fbeef4; --panel:#ffffff; --ink:#4a2836; --sub:#8d6b78;
+    --accent:#d6437f; --accent-2:#e86ba3; --accent-soft:#fce4ee;
+    --gold:#c99a6a; --line:rgba(214,67,127,.22);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:linear-gradient(180deg,#fce6f0,#fbeef4 32%);
+    color:var(--ink); font-size:16px; line-height:1.85;
+    font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:480px;margin:0 auto;padding:0 20px 60px}
+
+  .hero{padding:34px 20px 30px;text-align:center;border-bottom:1px solid var(--line);
+    background:radial-gradient(circle at 50% 120%, rgba(232,107,163,.16), transparent 60%)}
+  .scan{display:inline-block;font-size:13.5px;letter-spacing:.18em;color:var(--accent);
+    border:1px solid var(--line);border-radius:999px;padding:8px 18px;margin-bottom:14px}
+  .origin{display:inline-block;font-size:12.5px;letter-spacing:.1em;color:#fff;
+    background:linear-gradient(180deg,var(--gold),#b9895b);border-radius:5px;
+    padding:3px 10px;font-weight:700;margin-bottom:14px}
+  .brand{font-size:14px;letter-spacing:.14em;color:var(--accent-2);font-style:italic;margin:0 0 8px}
+  .title{font-size:27px;font-weight:800;line-height:1.4;margin:0;color:var(--accent)}
+  .title small{display:block;font-size:15px;font-weight:400;color:var(--sub);
+    letter-spacing:.02em;margin-top:12px}
+  .formula{margin:22px auto 0;max-width:390px;font-size:16.5px;color:var(--ink);
+    padding-top:18px;border-top:1px solid var(--line)}
+  .formula b{color:var(--accent);font-weight:700}
+  .haccp{display:inline-block;margin-top:14px;font-size:13px;letter-spacing:.05em;
+    color:var(--accent);background:var(--accent-soft);border-radius:6px;padding:5px 13px;font-weight:600}
+
+  h2{font-size:14px;letter-spacing:.14em;color:var(--accent);text-align:center;
+    margin:46px 0 18px;font-weight:700}
+
+  .card{background:var(--panel);border:1px solid var(--line);
+    border-left:3px solid var(--accent);border-radius:14px;padding:20px 18px 18px;margin:13px 0;
+    box-shadow:0 4px 18px rgba(214,67,127,.06)}
+  .tag{display:inline-block;font-size:13px;letter-spacing:.03em;color:#fff;
+    background:linear-gradient(180deg,var(--accent-2),var(--accent));border-radius:6px;
+    padding:4px 12px;font-weight:700;margin-bottom:11px}
+  .card h3{margin:0 0 8px;font-size:20px;color:var(--accent);font-weight:800}
+  .card p{margin:0;color:var(--sub);font-size:15.5px}
+
+  .synergy{text-align:center;background:var(--panel);border:1px solid var(--line);
+    border-radius:14px;padding:24px 18px;margin:14px 0;box-shadow:0 4px 18px rgba(214,67,127,.06)}
+  .synergy p{margin:0 0 12px;color:var(--sub);font-size:15.5px}
+  .synergy .big{color:var(--accent);font-size:22px;font-weight:800;letter-spacing:.02em}
+
+  ul.who{list-style:none;padding:0;margin:0}
+  ul.who li{position:relative;padding:12px 0 12px 24px;color:var(--ink);font-size:16px;
+    border-bottom:1px solid var(--line)}
+  ul.who li:last-child{border-bottom:0}
+  ul.who li::before{content:"";position:absolute;left:3px;top:20px;width:8px;height:8px;
+    border-radius:50%;background:var(--accent-2)}
+
+  .gift{background:linear-gradient(180deg,var(--accent-soft),transparent);
+    border:1px solid var(--line);border-radius:14px;padding:22px 18px;margin:14px 0;
+    color:var(--sub);font-size:16px;text-align:center}
+  .gift b{color:var(--accent)}
+
+  .spec{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:24px 0 0;
+    color:var(--sub);font-size:14.5px}
+  .spec span{background:var(--panel);border:1px solid var(--line);
+    border-radius:8px;padding:9px 15px}
+
+  .cta{margin:42px 0 0;background:var(--panel);border:1.5px solid var(--accent);
+    border-radius:16px;padding:26px 20px;text-align:center;box-shadow:0 6px 22px rgba(214,67,127,.1)}
+  .cta .k{font-size:13.5px;letter-spacing:.16em;color:var(--accent);margin-bottom:12px}
+  .cta h3{margin:0 0 11px;font-size:21px;color:var(--accent);font-weight:800}
+  .cta p{margin:0;color:var(--sub);font-size:15.5px}
+  .cta .pill{display:inline-block;margin-top:18px;font-size:15px;color:#fff;
+    background:linear-gradient(180deg,var(--accent-2),var(--accent));font-weight:700;
+    border-radius:999px;padding:13px 24px}
+  .foot{text-align:center;color:#b592a1;font-size:12.5px;margin-top:28px;letter-spacing:.05em}
+</style>
+</head>
+<body>
+  <header class="hero">
+    <div class="scan">扫码查看</div><br>
+    <span class="origin">韩国原产</span>
+    <p class="brand">Inner Balance</p>
+    <h1 class="title">脂质体胶原蛋白<br>+ 谷胱甘肽
+      <small>EL amor · 与延世大学 B-I 企业共同研发</small>
+    </h1>
+    <div class="formula">
+      脂质体 <b>鱼胶原蛋白 5,500mg</b> × <b>谷胱甘肽</b> × <b>石榴浓缩液</b>
+    </div>
+    <div class="haccp">HACCP 认证 · 果冻条</div>
+  </header>
+
+  <main class="wrap">
+    <h2>三大核心，一眼看懂</h2>
+
+    <div class="card">
+      <span class="tag">脂质体 · 快速吸收</span>
+      <h3>鱼胶原蛋白 5,500mg</h3>
+      <p>取自鱼类的胶原蛋白（常与肌肤弹力话题一同出现的蛋白质），以助吸收的脂质体技术包裹呈现。5,500mg。</p>
+    </div>
+
+    <div class="card">
+      <span class="tag">内在平衡</span>
+      <h3>谷胱甘肽 + 石榴浓缩液</h3>
+      <p>美容护理中广为人知的谷胱甘肽（源自酵母）660mg，加入女性熟悉的石榴浓缩液 59.6%，浓郁呈现。</p>
+    </div>
+
+    <div class="card">
+      <span class="tag">美容辅料</span>
+      <h3>弹性蛋白 · 白首乌 · 大黄 · 玻尿酸</h3>
+      <p>弹力话题中常见的弹性蛋白 220mg，女性熟悉的传统原料白首乌 616mg，欧洲长期使用的植物原料大黄 440mg，以水润著称的玻尿酸与氨基酸（L-胱氨酸 · 鸟氨酸）等。</p>
+    </div>
+
+    <h2>强强联手</h2>
+    <div class="synergy">
+      <p>脂质体胶原蛋白负责吸收，谷胱甘肽与石榴掌管内在平衡，美容辅料增添丰富度。</p>
+      <div class="big">胶原蛋白 + 谷胱甘肽 + 石榴</div>
+    </div>
+
+    <h2>适合这些人</h2>
+    <ul class="who">
+      <li>想持续补充胶原蛋白的人</li>
+      <li>关注由内而外之美的人</li>
+      <li>想要无需喝水、方便的果冻条的人</li>
+      <li>想为身边的人准备美容礼品的人</li>
+    </ul>
+
+    <div class="gift">
+      <b>送礼自用，皆选高端</b><br>
+      方便的果冻条，融入每日由内而外的美容习惯，也适合作为送给珍视之人的美容礼品。
+    </div>
+
+    <div class="spec">
+      <span>22g × 共60条</span>
+      <span>59kcal / 条</span>
+      <span>果冻条</span>
+    </div>
+
+    <section class="cta">
+      <div class="k">店内咨询</div>
+      <h3>适合您的内在美</h3>
+      <p>肌肤 · 状态 · 关注点因人而异。请将本页面出示给<b style="color:var(--accent)">店内专业人员</b>，为您一同确认适合的方式。</p>
+      <span class="pill">请将此页面出示给店内专业人员</span>
+    </section>
+
+    <p class="foot">韩国 EL amor · 脂质体胶原蛋白 + 谷胱甘肽</p>
+  </main>
+</body>
+</html>

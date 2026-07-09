@@ -7,7 +7,7 @@
 > **초판 근거**: 제품 이미지 1건(담록원 "청정 한방 흑염소 진액 골드") 실제 처리 점검(2026-07-09)에서 도출.
 > 샘플 산출물:
 > - 흑염소 진액(다크+골드, 전통 보양 톤): [한국어](samples/damrokwon-heukyeomso-jinaek-gold.html) · [중국어(홍금)](samples/damrokwon-heukyeomso-jinaek-gold.zh.html)
-> - 리포좀 콜라겐(핑크 뷰티 톤, 이너뷰티): [한국어](samples/elamor-liposome-collagen-glutathione.html)
+> - 리포좀 콜라겐(핑크 뷰티 톤, 이너뷰티): [한국어](samples/elamor-liposome-collagen-glutathione.html) · [중국어(粉金 뷰티)](samples/elamor-liposome-collagen-glutathione.zh.html)
 >
 > **작업 단계 (순서 고정):**
 > 1. 이미지 → 한국어 설명서 내용 작성
