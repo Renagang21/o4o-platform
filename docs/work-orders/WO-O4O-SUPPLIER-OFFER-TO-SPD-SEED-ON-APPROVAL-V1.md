@@ -57,6 +57,23 @@ Linux `/workspace` 미사용. 동시 세션 WIP 미접촉.
 - offer 승인은 **DB write 발생 시점**이므로, seed를 어디에·어떤 status로 만들지 명확히 한 뒤에만 구현한다.
 - 구현은 **dry-run → 이중게이트 승인 → apply** 순서. write는 승인 후에만.
 
+### 5.1 범위 잠금 (Scope Lock — 확정)
+
+> 제목은 `ON-APPROVAL`이지만 **이번 WO 범위는 승인 훅 자동 배선이 아니다.** 이미 승인된 offer를 대상으로 한 **백필/수동 apply**까지다.
+
+```text
+이번 범위: approved offer 대상 read/dry-run → 사용자 승인 → 수동 apply(백필)
+이번 범위 아님: offer 승인 시 런타임 자동 훅 배선 → 후속 WO(...-APPROVAL-HOOK-WIRING-V1)
+```
+
+착수 순서(고정):
+```text
+1) approved offer 대상 dry-run(read-only)
+2) 생성예정/skip/중복/canonical 보유 현황 보고 → 사용자 승인 대기(여기서 정지)
+3) 승인 후 수동 apply
+4) 검증 SQL + admin Queue 노출 확인
+```
+
 ## 6. 중요 원칙 (불변식)
 
 ```text
@@ -91,17 +108,26 @@ Linux `/workspace` 미사용. 동시 세션 WIP 미접촉.
 
 ## 8. 승인 시 seed 생성 대상 (설계안 — 조사 후 확정)
 
-두 후보를 조사해 택1(또는 조건 분기):
+**확정: A안(SPD 직접 seed).** B안(draft 풀)은 이번 범위에서 사용하지 않는다.
 
-| 후보 | 대상 | 장점 | 단점 |
-|---|---|---|---|
-| **A. SPD 직접 seed** | `shared_product_descriptions` (source_type='supplier', status='needs_review', description_type='STORE') | 기존 seedFromSupplierOffers 재사용, master 직접 연결 | master 필수 |
-| **B. draft 풀** | `product_candidate_description_drafts` (review_status='needs_review', source_label='SUPPLIER_OFFER') | master 없어도 가능 | 별도 승격 단계 필요 |
+| 후보 | 대상 | 이번 WO |
+|---|---|---|
+| **A. SPD 직접 seed** | `shared_product_descriptions` (source_type='supplier', status='needs_review', description_type='STORE') | **채택** |
+| B. draft 풀 | `product_candidate_description_drafts` (review_status='needs_review') | 미사용(master 없는 공급자 콘텐츠 처리는 후속 WO) |
 
-권장 기본: **master 있으면 A, 없으면 B(또는 skip+로그)**. 최종은 조사 후 확정.
+대상 범위(확정):
+```text
+- master_id 가 있는 approved offer 만 대상.
+- master_id 가 없는 offer → 이번 WO에서는 skip + 사유 기록(후속 WO로 분리).
+```
 
-- 추출 필드: consumer_short/detail(우선), business_*는 별도 description_type=B2B 후보로 둘지 조사(기본은 consumer만, 최소 범위).
-- 트리거: 단건 승인 + batch-approve 모두 커버. 훅은 승인 트랜잭션 성공 후(가능하면 동일 TX, 실패 시 승인 롤백 영향 최소화 — 조사 후 결정).
+추출 필드(확정):
+```text
+1차: consumer_short_description / consumer_detail_description → STORE 설명 seed
+후속(범위 아님): business_short/detail_description → B2B 또는 operator-facing 콘텐츠 WO
+```
+
+- 트리거: 이번 범위는 **수동 apply(백필)**. 런타임 훅(단건/batch 승인 시 자동)은 후속 WO.
 
 ## 9. seed / draft status 기준
 
@@ -203,11 +229,11 @@ migration(가능하면 회피; 불가 시 후속 분리)
 ## 18. 완료 기준
 
 ```text
-1. 승인 흐름·seed 대상·보존·중복·rollback 기준 확정
-2. dry-run 통과(집계·샘플)
-3. 이중게이트 승인 후 apply
+1. 승인 흐름·seed 대상(A안)·보존·중복·rollback 기준 확정
+2. dry-run 통과(집계·샘플) → 사용자 승인
+3. 승인 후 수동 apply (백필). 승인 훅 자동 배선은 하지 않음
 4. needs_review seed 생성, canonical 보존·충돌 0
-5. admin 검토 Queue에서 신규 seed 확인 가능
+5. **[강한 완료 조건] 생성된 supplier seed 가 admin 설명서 검토 Queue에서 source=supplier(공급자 출처)로 식별·노출되어야 한다. Queue에 안 보이면 seed 생성만으로 완료로 보지 않는다.**
 6. 검증 SQL 통과, CHECK 작성, commit/push
 ```
 
