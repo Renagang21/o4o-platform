@@ -89,6 +89,12 @@ export class NetureCatalogService {
   /**
    * Master 생성 파이프라인
    *
+   * WO-O4O-PRODUCT-MASTER-BARCODELESS-REGISTRATION-INTERNAL-CODE-V1
+   *   바코드는 등록 전제조건이 아니다 — O4O 모든 제품(의약품 포함)은 바코드 없이 등록될 수 있고,
+   *   바코드는 제품관리 과정에서 필요할 때 나중에 붙인다. 바코드 미제공 시 공급자 경로(offer.service)와
+   *   동일한 자체 내부 코드(generateInternalBarcode, GS1 200 내부 예약 대역)로 생성한다.
+   *
+   * [바코드 제공 시]
    * 1. GTIN 검증
    * 2. 내부 barcode 조회 → 이미 존재하면 반환
    * 3. MFDS stub 호출
@@ -96,10 +102,12 @@ export class NetureCatalogService {
    * 4b. MFDS 미연동(stub) + manualData 제공 → 수동 데이터로 생성 (isMfdsVerified = false)
    * 4c. 둘 다 없으면 → 에러
    *
+   * [바코드 미제공 시] → createMasterWithInternalCode (이름+제조사 dedup 후 내부코드 생성)
+   *
    * 공급자가 직접 호출 불가. Admin/시스템 전용.
    */
   async resolveOrCreateMaster(
-    barcode: string,
+    barcode: string | null | undefined,
     manualData?: {
       regulatoryType?: string;
       regulatoryName?: string;
@@ -110,39 +118,46 @@ export class NetureCatalogService {
       drugCategory?: string | null;
     }
   ): Promise<{ success: boolean; data?: ProductMaster; error?: string }> {
+    const trimmed = (barcode ?? '').trim();
+
+    // 바코드 미제공 → O4O 자체 내부 코드로 생성 (모든 제품 공통, 카테고리 불문)
+    if (!trimmed) {
+      return this.createMasterWithInternalCode(manualData);
+    }
+
     // 1. GTIN 검증
     const { validateGtin } = await import('../../../utils/gtin.js');
-    const gtinError = validateGtin(barcode);
+    const gtinError = validateGtin(trimmed);
     if (gtinError) {
       return { success: false, error: `INVALID_GTIN: ${gtinError}` };
     }
 
     // 2. 내부 조회 — 이미 존재하면 반환
-    const existing = await this.masterRepo.findOne({ where: { barcode } });
+    const existing = await this.masterRepo.findOne({ where: { barcode: trimmed } });
     if (existing) {
       return { success: true, data: existing };
     }
 
     // 3. MFDS 조회 (stub)
     const { verifyProductByBarcode } = await import('./mfds.service.js');
-    const mfdsResult = await verifyProductByBarcode(barcode);
+    const mfdsResult = await verifyProductByBarcode(trimmed);
 
     // 4a. MFDS 검증 성공 → MFDS 데이터로 생성
     if (mfdsResult.verified && mfdsResult.product) {
       const master = this.masterRepo.create({
-        barcode,
+        barcode: trimmed,
         regulatoryType: mfdsResult.product.regulatoryType,
         regulatoryName: mfdsResult.product.regulatoryName,
         name: mfdsResult.product.regulatoryName,
         manufacturerName: mfdsResult.product.manufacturerName,
         mfdsPermitNumber: mfdsResult.product.permitNumber || null,
-        mfdsProductId: mfdsResult.product.productId || barcode,
+        mfdsProductId: mfdsResult.product.productId || trimmed,
         isMfdsVerified: true,
         mfdsSyncedAt: new Date(),
       });
 
       const saved = await this.masterRepo.save(master);
-      logger.info(`[NetureCatalogService] Created ProductMaster ${saved.id} for barcode ${barcode} (MFDS verified)`);
+      logger.info(`[NetureCatalogService] Created ProductMaster ${saved.id} for barcode ${trimmed} (MFDS verified)`);
       return { success: true, data: saved };
     }
 
@@ -151,13 +166,13 @@ export class NetureCatalogService {
       const effectiveRegName = manualData.regulatoryName || manualData.name || 'UNKNOWN';
       const effectiveName = manualData.name || manualData.regulatoryName || 'UNKNOWN';
       const master = this.masterRepo.create({
-        barcode,
+        barcode: trimmed,
         regulatoryType: manualData.regulatoryType || '일반',
         regulatoryName: effectiveRegName,
         name: effectiveName,
         manufacturerName: manualData.manufacturerName || '',
         mfdsPermitNumber: manualData.mfdsPermitNumber ?? null,
-        mfdsProductId: barcode, // MFDS 미연동 시 barcode를 ID로 사용
+        mfdsProductId: trimmed, // MFDS 미연동 시 barcode를 ID로 사용
         isMfdsVerified: false,
         mfdsSyncedAt: null,
         // WO-O4O-PRODUCT-DRUG-CATEGORY-ACTIVE-MODEL-F1-V1: 제공 시 active 분류 저장 (없으면 null)
@@ -165,12 +180,110 @@ export class NetureCatalogService {
       });
 
       const saved = await this.masterRepo.save(master);
-      logger.info(`[NetureCatalogService] Created ProductMaster ${saved.id} for barcode ${barcode} (manual, MFDS unverified)`);
+      logger.info(`[NetureCatalogService] Created ProductMaster ${saved.id} for barcode ${trimmed} (manual, MFDS unverified)`);
       return { success: true, data: saved };
     }
 
     // 4c. 둘 다 없음 → 에러
     return { success: false, error: mfdsResult.error || 'MFDS_VERIFICATION_FAILED' };
+  }
+
+  /**
+   * 바코드 없는 Master 생성 — O4O 자체 내부 코드 사용
+   *
+   * WO-O4O-PRODUCT-MASTER-BARCODELESS-REGISTRATION-INTERNAL-CODE-V1
+   *   - 내부 코드 규칙은 공급자 경로(offer.service)와 동일한 generateInternalBarcode 재사용(신규 규칙 금지).
+   *   - 내부 코드는 호출마다 달라 barcode dedup 불가 → 이름+제조사로 기존 Master를 먼저 조회(중복 방지).
+   *   - 내부 코드 UNIQUE 충돌 시 재생성 재시도.
+   *   - 규제 카테고리 특례 없음 — 모든 제품이 동일하게 바코드 없이 생성 가능.
+   */
+  private async createMasterWithInternalCode(
+    manualData?: {
+      regulatoryType?: string;
+      regulatoryName?: string;
+      manufacturerName?: string;
+      name?: string;
+      mfdsPermitNumber?: string | null;
+      drugCategory?: string | null;
+    }
+  ): Promise<{ success: boolean; data?: ProductMaster; error?: string }> {
+    const name = (manualData?.name || manualData?.regulatoryName || '').trim();
+    if (!name) {
+      // 바코드도 MFDS도 없으므로 최소 식별 정보(상품명)는 필요
+      return { success: false, error: 'NAME_REQUIRED_WITHOUT_BARCODE' };
+    }
+    const manufacturerName = (manualData?.manufacturerName || '').trim();
+
+    // 중복 방지: 이름+제조사로 기존 Master 조회
+    const existing = await this.findMasterByNameAndManufacturer(name, manufacturerName);
+    if (existing) {
+      return { success: true, data: existing };
+    }
+
+    const { generateInternalBarcode } = await import('../../../utils/gtin.js');
+    const effectiveRegName = (manualData?.regulatoryName || name).trim();
+    const seed = `${name}|${manufacturerName}`;
+    const MAX_ATTEMPTS = 3;
+
+    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+      const internalBarcode = generateInternalBarcode(attempt === 0 ? seed : `${seed}#${attempt}`);
+      const master = this.masterRepo.create({
+        barcode: internalBarcode,
+        regulatoryType: manualData?.regulatoryType || '일반',
+        regulatoryName: effectiveRegName,
+        name,
+        manufacturerName,
+        mfdsPermitNumber: manualData?.mfdsPermitNumber ?? null,
+        mfdsProductId: internalBarcode, // 바코드/MFDS 미연동 → 내부코드를 ID로 사용
+        isMfdsVerified: false,
+        mfdsSyncedAt: null,
+        drugCategory: normalizeDrugCategory(manualData?.drugCategory),
+      });
+
+      try {
+        const saved = await this.masterRepo.save(master);
+        logger.info(`[NetureCatalogService] Created ProductMaster ${saved.id} with internal code ${internalBarcode} (no barcode)`);
+        return { success: true, data: saved };
+      } catch (e: any) {
+        // 내부코드 UNIQUE 충돌 → 재생성 재시도
+        if (this.isUniqueViolation(e) && attempt < MAX_ATTEMPTS - 1) {
+          logger.warn(`[NetureCatalogService] internal barcode collision (${internalBarcode}), retrying`);
+          continue;
+        }
+        // 동시 등록으로 방금 같은 이름+제조사가 생겼을 수 있음 → 재조회
+        const raced = await this.findMasterByNameAndManufacturer(name, manufacturerName);
+        if (raced) {
+          return { success: true, data: raced };
+        }
+        logger.error('[NetureCatalogService] Failed to create master with internal code:', e);
+        return { success: false, error: 'MASTER_CREATE_FAILED' };
+      }
+    }
+
+    return { success: false, error: 'INTERNAL_CODE_GENERATION_EXHAUSTED' };
+  }
+
+  /** 이름+제조사(대소문자·공백 정규화) 기준 Master 조회 — 바코드 없는 등록의 중복 방지용 */
+  private async findMasterByNameAndManufacturer(
+    name: string,
+    manufacturerName: string
+  ): Promise<ProductMaster | null> {
+    // 이 파일의 검증된 검색 쿼리와 동일하게 QueryBuilder raw 문자열엔 실제 컬럼명 사용
+    // (m.manufacturer_name — property명 m.manufacturerName 은 함수식 안에서 컬럼 매핑 안 됨)
+    const qb = this.masterRepo
+      .createQueryBuilder('m')
+      .where('LOWER(TRIM(m.name)) = LOWER(TRIM(:name))', { name });
+    if (manufacturerName) {
+      qb.andWhere('LOWER(TRIM(m.manufacturer_name)) = LOWER(TRIM(:mfr))', { mfr: manufacturerName });
+    } else {
+      qb.andWhere("COALESCE(TRIM(m.manufacturer_name), '') = ''");
+    }
+    return qb.getOne();
+  }
+
+  /** Postgres UNIQUE 위반 판별 */
+  private isUniqueViolation(e: any): boolean {
+    return e?.code === '23505' || /duplicate key value/i.test(e?.message || '');
   }
 
   /**

@@ -618,18 +618,20 @@ export function createAdminController(dataSource: DataSource): Router {
 
   /**
    * POST /admin/masters/resolve
-   * Master 생성 파이프라인: barcode → GTIN 검증 → 내부 조회 → MFDS → create
+   * Master 생성 파이프라인.
+   *   - barcode 제공 시: GTIN 검증 → 내부 조회 → MFDS → create
+   *   - barcode 미제공 시: O4O 자체 내부 코드 생성 (이름+제조사 dedup) — manualData.name 필요
+   *     (WO-O4O-PRODUCT-MASTER-BARCODELESS-REGISTRATION-INTERNAL-CODE-V1)
    *
-   * Body: { barcode, manualData?: { regulatoryName, manufacturerName, regulatoryType?, name?, mfdsPermitNumber? } }
+   * Body: { barcode?, manualData?: { name?, regulatoryName?, manufacturerName?, regulatoryType?, mfdsPermitNumber?, drugCategory? } }
    */
   router.post('/masters/resolve', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
     try {
       const { barcode, manualData } = req.body;
-      if (!barcode || typeof barcode !== 'string') {
-        return res.status(400).json({ success: false, error: { code: 'MISSING_BARCODE', message: 'barcode is required' } });
-      }
+      // 바코드는 선택 — 미제공 시 서비스가 O4O 자체 내부 코드로 생성한다.
+      const trimmedBarcode = typeof barcode === 'string' ? barcode.trim() : '';
 
-      const result = await netureService.resolveOrCreateMaster(barcode.trim(), manualData);
+      const result = await netureService.resolveOrCreateMaster(trimmedBarcode || null, manualData);
       if (!result.success) {
         return res.status(400).json({ success: false, error: { code: result.error, message: result.error } });
       }

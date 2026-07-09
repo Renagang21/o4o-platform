@@ -446,13 +446,15 @@ export class NetureService {
   }
 
   async resolveOrCreateMaster(
-    barcode: string,
+    // WO-O4O-PRODUCT-MASTER-BARCODELESS-REGISTRATION-INTERNAL-CODE-V1: barcode 선택 (미제공 시 내부코드 생성)
+    barcode: string | null | undefined,
     manualData?: {
       regulatoryType?: string;
-      regulatoryName: string;
-      manufacturerName: string;
+      regulatoryName?: string;
+      manufacturerName?: string;
       name?: string;
       mfdsPermitNumber?: string | null;
+      drugCategory?: string | null;
     }
   ): Promise<{ success: boolean; data?: ProductMaster; error?: string }> {
     return this.catalogService.resolveOrCreateMaster(barcode, manualData);

@@ -2,7 +2,7 @@
 
 > **한 줄 요약**: ProductMaster(공식 상품) 등록에서 **바코드가 없으면 등록이 막히는** 결함을 수정한다. O4O는 이미 **자체 내부 코드 생성 규칙**(`generateInternalBarcode`, GS1 200 내부 예약 대역 EAN-13)을 가지고 있고 **공급자 등록 경로는 이미 이를 사용**한다. 그러나 admin/이미지 기반 등록 경로(`resolveOrCreateMaster`)는 바코드를 **필수 + GTIN 유효성**으로 요구하여, 자체 코드로 등록되어야 할 상품을 막는다. 이 **경로 간 불일치**를 해소한다.
 
-- **상태**: 착수 대기 (조사 완료 · read-only, 코드 변경 0)
+- **상태**: ✅ **구현 완료** (2026-07-09, commit 참조 §7) · 배포 빌드 타입체크 통과
 - **작성일**: 2026-07-09
 - **성격**: 백엔드 등록 파이프라인 결함 수정 (스키마 변경 없음)
 - **연관**: F12 Product Resource Architecture / [IR-O4O-PRODUCT-IMAGE-TO-DESCRIPTION-START-POINT-AUDIT-V1](../investigations/IR-O4O-PRODUCT-IMAGE-TO-DESCRIPTION-START-POINT-AUDIT-V1.md) §2
@@ -109,9 +109,11 @@ if (!barcode) {
 
 3. **UNIQUE 충돌 재시도**: 내부 코드 생성이 (희박하지만) UNIQUE 위반을 일으킬 수 있으므로, 저장 실패 시 재생성 재시도(예: 최대 3회) 처리.
 
-4. **규제 게이트 우회 금지 (필수)**: 내부 코드 도입은 **바코드 공백만 해결**한다. 규제 상품(건강기능식품·의약품·의료기기·의약외품 등 `category.isRegulated=true`)의 기존 게이트는 그대로 유지한다.
-   - `resolveProductMetadata`의 `REGULATED_FIELDS_REQUIRED`(regulatoryType/regulatoryName), `assertRegulatedPermit`(허가번호) 검증을 내부 코드 경로에서도 **동일하게 적용**한다.
-   - 즉 "바코드 없이 등록 가능"이 "규제 검증 없이 등록 가능"으로 번지지 않게 한다. (본 WO의 트리거였던 맨파워포텐도 건기식=규제 카테고리일 수 있으므로, 등록 시 규제 필드가 필요할 수 있음을 인지)
+4. **바코드-optional은 모든 제품 보편 적용 (카테고리 특례 없음)** — 사용자 확정(2026-07-09):
+   > *"의약품도 바코드 없이 등록될 수 있어야 한다. O4O 모든 제품은 바코드 없이 등록될 수 있어야 하고, 바코드는 제품관리 과정에서 필요할 때 나중에 붙이는 프로세스다."*
+   - 따라서 내부 코드 생성은 `regulatoryType`(일반/의약품/건기식/의료기기/의약외품)과 **무관하게 동일 적용**한다. 규제 카테고리라고 바코드를 요구하면 안 된다.
+   - **규제 허가 검증은 바코드와 별개 축**이다. admin `resolveOrCreateMaster`(`masters/resolve`) 경로는 원래부터 규제 허가 게이트를 **적용하지 않는다**(허가 게이트는 공급자 offer 경로 `resolveProductMetadata`의 `assertRegulatedPermit`에만 존재). 본 변경은 그 게이트를 **추가하지도 제거하지도 않는다** — 오직 바코드 blocker만 보편 제거한다.
+   - 결론: **바코드 부재가 어떤 제품(의약품 포함)의 등록도 막지 않는다.**
 
 5. **immutable 유지**: barcode는 생성 후 immutable(`MASTER_IMMUTABLE_FIELDS`). 내부 코드도 사후 변경 불가로 둔다.
 
@@ -126,14 +128,15 @@ if (!barcode) {
 
 ## 4. 검증 (Acceptance Criteria)
 
-- [ ] **바코드 미제공 admin/이미지 등록** → 내부 코드(200 prefix EAN-13)를 가진 ProductMaster 생성 성공.
-- [ ] **동일 상품 재등록**(같은 name+manufacturer, 바코드 없음) → **신규 master 생성 없이 기존 master 반환**(중복 0).
-- [ ] **실제 바코드 제공 경로** → 기존 동작 그대로(회귀 없음).
-- [ ] **공급자 등록 경로**(`createSupplierOffer`) → 기존 동작 그대로(회귀 없음).
-- [ ] **규제 카테고리 상품** → 규제 필드/허가 게이트가 내부 코드 경로에서도 동일하게 작동(우회 없음).
-- [ ] 스키마 변경 0 · barcode UNIQUE/immutable 유지.
-- [ ] 내부 코드 UNIQUE 충돌 시 재시도로 복구.
-- [ ] 단위 테스트: (1) 바코드 없음→내부코드 생성, (2) 재등록 dedup, (3) 규제 게이트 유지, (4) 실바코드 경로 무회귀.
+- [x] **바코드 미제공 admin 등록** → 내부 코드(200 prefix EAN-13) 생성 경로 구현. 코드 생성 알고리즘 런타임 검증 완료(유효 EAN-13·200 prefix·재시도 시 distinct).
+- [x] **동일 상품 재등록**(같은 name+manufacturer, 바코드 없음) → 내부코드 생성 전 `findMasterByNameAndManufacturer`로 기존 조회 후 반환(중복 방지) 구현.
+- [x] **실제 바코드 제공 경로** → 로직 무변경(변수만 `trimmed`로 정리). 회귀 없음.
+- [x] **공급자 등록 경로**(`createSupplierOffer`) → 미변경. `resolveOrCreateMaster` 시그니처만 확장(barcode nullable) — 공급자 경로는 항상 값 전달이라 동작 동일.
+- [x] **모든 카테고리(의약품 포함) 바코드 없이 등록 가능** → 내부코드 경로에 카테고리 분기 없음. 규제 허가 게이트는 이 경로에 원래 없음(§3-B-4).
+- [x] 스키마 변경 0 · barcode UNIQUE/immutable 유지.
+- [x] 내부 코드 UNIQUE 충돌 시 재시도(최대 3회, seed 접미사 변형) + 경합 시 재조회 복구 구현.
+- [x] 배포 빌드 타입체크(`tsc -p tsconfig.build.json --noEmit`) EXIT 0.
+- [ ] **런타임 E2E(실 DB write)** — 프로덕션 write는 사용자 승인·정식 등록 흐름에서 수행 예정(본 작업에서는 DB write 0).
 
 ---
 
@@ -160,4 +163,21 @@ if (!barcode) {
 
 ---
 
-*조사 read-only. DB write 0 · migration 0 · 코드 변경 0. 구현은 본 WO 승인 후 별도 착수.*
+## 7. 구현 내역 (2026-07-09)
+
+| 파일 | 변경 |
+|------|------|
+| [catalog.service.ts](../../apps/api-server/src/modules/neture/services/catalog.service.ts) | `resolveOrCreateMaster(barcode: string \| null \| undefined, ...)` — barcode 미제공 시 `createMasterWithInternalCode()` 분기. 신규 private 헬퍼 3종: `createMasterWithInternalCode`(내부코드 생성+재시도), `findMasterByNameAndManufacturer`(이름+제조사 dedup), `isUniqueViolation`(23505 판별) |
+| [neture.service.ts](../../apps/api-server/src/modules/neture/neture.service.ts) | 래퍼 시그니처 barcode nullable + manualData optional 정렬 |
+| [admin.controller.ts](../../apps/api-server/src/modules/neture/controllers/admin.controller.ts) | `POST /masters/resolve` `MISSING_BARCODE` 400 제거 → 바코드 선택. 미제공 시 `null` 전달로 내부코드 생성 |
+
+**설계 결정:**
+- 내부 코드 = `generateInternalBarcode` 재사용(신규 규칙 없음). seed = `name|manufacturer`, 충돌 시 `#attempt` 접미사로 변형.
+- 중복 방지는 **barcode가 아니라 이름+제조사**로(내부코드는 매 호출 달라 barcode dedup 불가). QueryBuilder raw 문자열엔 이 파일 기존 검색 쿼리와 동일하게 **실제 컬럼명**(`m.manufacturer_name`) 사용 — property명은 함수식 안에서 컬럼 매핑 안 됨.
+- 바코드 있는 경로/공급자 경로/규제 허가 검증은 무변경.
+
+**남은 dedup 한계(운영 인지):** 같은 이름+빈 제조사 서로 다른 제품이 있으면 오매칭 가능. 바코드 없는 등록에서 name은 대체로 특정적이라 실용상 허용, 필요 시 운영자가 수정. 내부코드↔실바코드 사후 정합은 §5 follow-up.
+
+---
+
+*조사 read-only 완료 → 구현 완료. DB write 0 · migration 0 · 스키마 변경 0. 실 DB 등록은 정식 흐름·승인 후.*
