@@ -143,6 +143,37 @@ export function createMediaLibraryRouter(dataSource: DataSource): Router {
   });
 
   /**
+   * GET /media-library/:id/usage
+   * Content Resource 사용처 조회 (운영자 전용, read-only) — WO-O4O-CONTENT-RESOURCE-USAGE-TRACE-V1
+   *   asset.url 이 store_execution_assets.html_content 의 img/video/source src 에 실제 삽입된 사용처를 반환.
+   *   iframe(YouTube) 제외. 데이터 변경 없음.
+   */
+  router.get('/media-library/:id/usage', authenticate, async (req: any, res: Response) => {
+    try {
+      const roles: string[] = req.user?.roles || [];
+      const isOperator = roles.some((r: string) =>
+        r.includes('admin') || r.includes('operator') || r.includes('super_admin')
+      );
+      if (!isOperator) {
+        res.status(403).json({ success: false, error: 'Operator access required' });
+        return;
+      }
+
+      const { id } = req.params;
+      const service = new MediaLibraryService(dataSource);
+      const result = await service.getUsage(id);
+      res.json({ success: true, ...result });
+    } catch (error: any) {
+      logger.error('[MediaLibrary] Usage error:', error);
+      if (error.message === 'Asset not found') {
+        res.status(404).json({ success: false, error: 'Asset not found' });
+        return;
+      }
+      res.status(500).json({ success: false, error: 'Failed to get usage' });
+    }
+  });
+
+  /**
    * PATCH /media-library/:id/metadata
    * Content Resource 메타데이터 수정 (운영자 전용) — WO-O4O-CONTENT-RESOURCE-METADATA-STANDARDIZATION-V1
    *   title/description/tags/keywords/language/source/usage_type/status/memo/is_library_public 만 수정.

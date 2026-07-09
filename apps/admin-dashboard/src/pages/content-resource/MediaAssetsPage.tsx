@@ -15,9 +15,11 @@ import { formatDate, formatFileSize } from '@/lib/utils';
 import {
   listMediaAssets,
   updateMediaAssetMetadata,
+  getMediaAssetUsage,
   type MediaAssetAdmin,
   type MediaAssetMetadataPatch,
   type MediaAssetSearchParams,
+  type MediaAssetUsageItem,
 } from '@/api/media-library.api';
 
 const SOURCE_OPTIONS = ['', 'operator', 'supplier', 'store', 'ai', 'external', 'import'];
@@ -244,6 +246,21 @@ const MetadataEditModal: React.FC<{
   const [memo, setMemo] = useState(asset.memo ?? '');
   const [isPublic, setIsPublic] = useState(asset.isLibraryPublic);
 
+  // WO-O4O-CONTENT-RESOURCE-USAGE-TRACE-V1: 사용처 탭 (상세 진입 시 1회 조회, read-only)
+  const [tab, setTab] = useState<'meta' | 'usage'>('meta');
+  const [usages, setUsages] = useState<MediaAssetUsageItem[] | null>(null);
+  const [usageLoading, setUsageLoading] = useState(false);
+
+  useEffect(() => {
+    if (tab === 'usage' && usages === null && !usageLoading) {
+      setUsageLoading(true);
+      getMediaAssetUsage(asset.id)
+        .then((r) => setUsages(r.usages))
+        .catch(() => setUsages([]))
+        .finally(() => setUsageLoading(false));
+    }
+  }, [tab, usages, usageLoading, asset.id]);
+
   const field = 'w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-200';
   const label = 'block text-xs font-medium text-gray-600 mb-1';
 
@@ -251,11 +268,48 @@ const MetadataEditModal: React.FC<{
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose}>
       <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl mx-4 max-h-[88vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
         <div className="px-5 py-4 border-b flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-gray-800">메타데이터 편집</h3>
+          <h3 className="text-sm font-semibold text-gray-800">Resource 상세</h3>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">✕</button>
         </div>
 
+        {/* 탭: 메타데이터 / 사용처 (WO-O4O-CONTENT-RESOURCE-USAGE-TRACE-V1) */}
+        <div className="px-5 pt-3 flex gap-1 border-b">
+          <button
+            onClick={() => setTab('meta')}
+            className={`px-3 py-1.5 text-sm rounded-t ${tab === 'meta' ? 'font-semibold text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
+          >메타데이터</button>
+          <button
+            onClick={() => setTab('usage')}
+            className={`px-3 py-1.5 text-sm rounded-t ${tab === 'usage' ? 'font-semibold text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
+          >사용처{usages ? ` (${usages.length})` : ''}</button>
+        </div>
+
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+          {tab === 'usage' ? (
+            <div className="space-y-2">
+              {usageLoading && <div className="text-sm text-gray-500 py-6 text-center">사용처 조회 중…</div>}
+              {!usageLoading && usages && usages.length === 0 && (
+                <div className="text-sm text-gray-400 py-6 text-center">
+                  이 Resource를 실제로 사용(img/video/source 삽입)하는 매장 실행 자산이 없습니다.
+                  <div className="text-xs text-gray-300 mt-1">(store_execution_assets 기준 · 본문 텍스트 언급·YouTube iframe 제외)</div>
+                </div>
+              )}
+              {!usageLoading && usages && usages.map((u) => (
+                <div key={u.assetId} className="border border-gray-200 rounded px-3 py-2 flex items-center justify-between">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="px-1.5 py-0.5 text-[10px] uppercase bg-slate-100 text-slate-600 rounded">{u.surface || u.usageType || 'asset'}</span>
+                      <span className="text-sm text-gray-800 truncate">{u.title || '(제목 없음)'}</span>
+                    </div>
+                    <div className="text-[11px] text-gray-400 mt-0.5">
+                      org: {u.organizationId || '—'}{u.updatedAt ? ` · ${new Date(u.updatedAt).toLocaleDateString()}` : ''}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+          <>
           {/* 파일(읽기 전용) */}
           <div className="flex gap-3 items-start">
             {asset.assetType === 'image' && <img src={asset.url} alt="" className="w-20 h-20 object-cover rounded border" />}
@@ -317,10 +371,13 @@ const MetadataEditModal: React.FC<{
             <label className={label}>내부 메모</label>
             <textarea className={field} rows={2} value={memo} onChange={(e) => setMemo(e.target.value)} />
           </div>
+          </>
+          )}
         </div>
 
         <div className="px-5 py-3 border-t flex justify-end gap-2">
-          <button onClick={onClose} className="px-4 py-2 text-sm border border-gray-300 rounded hover:bg-gray-50">취소</button>
+          <button onClick={onClose} className="px-4 py-2 text-sm border border-gray-300 rounded hover:bg-gray-50">닫기</button>
+          {tab === 'meta' && (
           <button
             disabled={saving}
             onClick={() =>
@@ -341,6 +398,7 @@ const MetadataEditModal: React.FC<{
           >
             {saving ? '저장 중…' : '저장'}
           </button>
+          )}
         </div>
       </div>
     </div>

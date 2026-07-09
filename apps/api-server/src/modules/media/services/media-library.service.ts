@@ -8,9 +8,38 @@
 import { Storage } from '@google-cloud/storage';
 import { randomUUID } from 'crypto';
 import sharp from 'sharp';
+import { parse as parseHtml } from 'node-html-parser';
 import type { DataSource, Repository } from 'typeorm';
 import { MediaAsset } from '../entities/MediaAsset.entity.js';
 import logger from '../../../utils/logger.js';
+
+/**
+ * WO-O4O-CONTENT-RESOURCE-USAGE-TRACE-V1:
+ *   HTML 안에서 img/video/source 태그의 src 가 resourceUrl 과 실제 일치하는지 판정.
+ *   iframe 제외(YouTube=Resource 아님). 본문 텍스트에 URL 이 언급된 경우는 사용으로 보지 않음.
+ */
+function htmlReferencesResourceUrl(html: string | null | undefined, resourceUrl: string): boolean {
+  if (!html || !resourceUrl) return false;
+  try {
+    const root = parseHtml(html);
+    const els = root.querySelectorAll('img, video, source');
+    return els.some((el) => (el.getAttribute('src') || '').trim() === resourceUrl.trim());
+  } catch {
+    return false;
+  }
+}
+
+export interface MediaAssetUsage {
+  /** 사용 표면(usage_type): pop/qr/signage/banner/notice */
+  surface: string | null;
+  usageType: string | null;
+  title: string | null;
+  organizationId: string | null;
+  updatedAt: Date | null;
+  resourceUrl: string;
+  /** store_execution_asset id */
+  assetId: string;
+}
 
 const IMAGE_MIMES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
@@ -244,6 +273,47 @@ export class MediaLibraryService {
    */
   async getById(id: string): Promise<MediaAsset | null> {
     return this.repo.findOne({ where: { id } });
+  }
+
+  /**
+   * WO-O4O-CONTENT-RESOURCE-USAGE-TRACE-V1: 사용처 조회(read-only).
+   *   asset.url 기준으로 store_execution_assets.html_content 후보(ILIKE)를 좁힌 뒤,
+   *   HTML 파싱으로 img/video/source src 에 url 이 실제 존재하는 것만 사용처로 확정(iframe 제외).
+   *   media_assets 는 서비스/조직 무관 공용 자산 → org 필터 없이 전 사용처 반환(각 항목 organizationId 표기).
+   *   데이터 변경 없음.
+   */
+  async getUsage(assetId: string): Promise<{ resourceUrl: string; usages: MediaAssetUsage[] }> {
+    const asset = await this.repo.findOne({ where: { id: assetId } });
+    if (!asset) throw new Error('Asset not found');
+    const url = asset.url;
+    if (!url) return { resourceUrl: '', usages: [] };
+
+    // coarse 후보: html_content 에 url 문자열이 포함된 execution asset (소규모 → 인덱스 불필요)
+    const rows: Array<{
+      id: string; organization_id: string | null; title: string | null;
+      usage_type: string | null; updated_at: Date | null; html_content: string | null;
+    }> = await this.dataSource.query(
+      `SELECT id, organization_id, title, usage_type, updated_at, html_content
+         FROM store_execution_assets
+        WHERE html_content IS NOT NULL AND html_content ILIKE $1
+        ORDER BY updated_at DESC`,
+      [`%${url}%`],
+    );
+
+    // 정밀 확정: img/video/source src 실제 일치만 (본문 텍스트 언급 제외)
+    const usages: MediaAssetUsage[] = rows
+      .filter((r) => htmlReferencesResourceUrl(r.html_content, url))
+      .map((r) => ({
+        surface: r.usage_type,
+        usageType: r.usage_type,
+        title: r.title,
+        organizationId: r.organization_id,
+        updatedAt: r.updated_at,
+        resourceUrl: url,
+        assetId: r.id,
+      }));
+
+    return { resourceUrl: url, usages };
   }
 
   /**

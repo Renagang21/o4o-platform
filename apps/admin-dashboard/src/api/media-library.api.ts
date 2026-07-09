@@ -125,6 +125,27 @@ export async function listMediaAssets(
   };
 }
 
+/** 사용처 항목 — WO-O4O-CONTENT-RESOURCE-USAGE-TRACE-V1 */
+export interface MediaAssetUsageItem {
+  surface: string | null;
+  usageType: string | null;
+  title: string | null;
+  organizationId: string | null;
+  updatedAt: string | null;
+  resourceUrl: string;
+  assetId: string;
+}
+
+/** Content Resource 사용처 조회. GET /platform/media-library/:id/usage (read-only) */
+export async function getMediaAssetUsage(
+  id: string,
+): Promise<{ resourceUrl: string; usages: MediaAssetUsageItem[] }> {
+  const res = await authClient.api.get<{ success: boolean; resourceUrl?: string; usages?: MediaAssetUsageItem[] }>(
+    `/platform/media-library/${id}/usage`,
+  );
+  return { resourceUrl: res.data?.resourceUrl ?? '', usages: res.data?.usages ?? [] };
+}
+
 /** metadata 수정. PATCH /platform/media-library/:id/metadata (파일 속성 불변) */
 export async function updateMediaAssetMetadata(
   id: string,
