@@ -477,6 +477,17 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Product Description Review Queue routes:', reviewQueueError);
     }
 
+    // 24-e2d-4. Register Product Landing (제품 대표 QR 진입점) — public read + admin 단건 발급
+    //           (WO-O4O-PRODUCT-LANDING-ARCHITECTURE-V1 / Phase 2)
+    try {
+      const { createPublicProductLandingController, createAdminProductLandingController } = await import('../modules/neture/controllers/product-landing.controller.js');
+      app.use('/api/v1/public/product-landings', createPublicProductLandingController(dataSource));
+      app.use('/api/v1/admin/o4o-product-db/product-landings', createAdminProductLandingController(dataSource));
+      logger.info('✅ Product Landing routes registered at /api/v1/public/product-landings (public) + /api/v1/admin/o4o-product-db/product-landings (admin)');
+    } catch (landingError) {
+      logger.error('Failed to register Product Landing routes:', landingError);
+    }
+
     // 24-e2e. Register Product Usage Links (read-only) — master 활용 연결 조회
     //         (WO-O4O-ADMIN-O4O-PRODUCT-USAGE-LINKS-READONLY-V1)
     try {
