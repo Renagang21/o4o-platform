@@ -72,19 +72,16 @@ async function assertTargetBelongsToStore(
     return rows.length > 0;
   }
 
-  const params: Array<string> = [targetId, organizationId];
-  let serviceClause = '';
-  if (serviceKey) {
-    params.push(serviceKey === 'cosmetics' ? 'k-cosmetics' : serviceKey);
-    serviceClause = `AND service_key = $${params.length}`;
-  }
-
+  // WO-O4O-PRODUCT-QR-CONTENT-FLOW-MINIMAL-V1: service_key 조건 제거.
+  // 소유 경계는 organization_id (Boundary Policy: Store Ops=organizationId) 이며,
+  // 취급상품 목록의 진실 소스(store-handled-products.routes.ts)도 organization_id + is_active 로만
+  // listing 을 조회한다. listing.service_key 는 'kpa-society' 로 저장돼 있어 mount serviceKey('kpa')와
+  // 불일치(알려진 kpa≠kpa-society 함정) → service_key 를 강제하면 자기 매장 상품인데도 매칭 실패한다.
   const rows = await dataSource.query(
     `SELECT 1 FROM organization_product_listings
      WHERE id = $1 AND organization_id = $2 AND is_active = true
-       ${serviceClause}
      LIMIT 1`,
-    params,
+    [targetId, organizationId],
   );
   return rows.length > 0;
 }
