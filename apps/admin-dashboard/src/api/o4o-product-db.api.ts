@@ -735,9 +735,18 @@ export async function getDescriptionDashboard(): Promise<DescriptionDashboard> {
 // WO-O4O-ADMIN-DESCRIPTION-REVIEW-QUEUE-V1
 // mount: GET /api/v1/admin/o4o-product-db/description-review-queue (+ /filter-options, /:draftId)
 
+// WO-O4O-ADMIN-DESCRIPTION-REVIEW-QUEUE-SPD-SOURCE-V1: OTC 초안 그룹 + SPD needs_review 혼합 row
 export interface ReviewQueueRow {
-  groupKey: string;
-  draftId: string;
+  sourceStore: 'OTC_DRAFT' | 'SPD';
+  reviewItemId: string;
+  detailKind: 'queue' | 'master';
+  detailKey: string; // OTC=draftId, SPD=masterId
+  groupKey: string | null;
+  draftId: string | null;
+  masterId: string | null;
+  productName: string | null;
+  manufacturerName: string | null;
+  descriptionType: string | null;
   ingredient: string | null;
   primaryUse: string | null;
   title: string | null;
@@ -756,6 +765,8 @@ export interface ReviewQueueListParams {
   q?: string;
   source?: string;
   status?: string;
+  sourceStore?: 'all' | 'otc_draft' | 'spd';
+  descriptionType?: string;
   sort?: 'applied_master' | 'updated_at' | 'group';
   order?: 'asc' | 'desc';
   page?: number;
@@ -806,6 +817,8 @@ export async function getDescriptionReviewQueue(
   if (params.q?.trim()) query.q = params.q.trim();
   if (params.source) query.source = params.source;
   if (params.status) query.status = params.status;
+  if (params.sourceStore && params.sourceStore !== 'all') query.sourceStore = params.sourceStore;
+  if (params.descriptionType) query.descriptionType = params.descriptionType;
   if (params.sort) query.sort = params.sort;
   if (params.order) query.order = params.order;
   query.page = String(params.page ?? 1);
@@ -820,13 +833,15 @@ export async function getDescriptionReviewQueue(
 }
 
 export async function getReviewQueueFilterOptions(): Promise<{
+  sourceStores: { value: string; count: number }[];
   sources: { value: string; count: number }[];
   statuses: { value: string; count: number }[];
 }> {
-  const res = await authClient.api.get<{ success: boolean; data: { sources: { value: string; count: number }[]; statuses: { value: string; count: number }[] } }>(
+  const res = await authClient.api.get<{ success: boolean; data: { sourceStores?: { value: string; count: number }[]; sources: { value: string; count: number }[]; statuses: { value: string; count: number }[] } }>(
     `/admin/o4o-product-db/description-review-queue/filter-options`,
   );
-  return res.data?.data ?? { sources: [], statuses: [] };
+  const d = res.data?.data ?? { sources: [], statuses: [] };
+  return { sourceStores: d.sourceStores ?? [], sources: d.sources ?? [], statuses: d.statuses ?? [] };
 }
 
 export async function getReviewQueueDetail(draftId: string): Promise<ReviewQueueDetail> {

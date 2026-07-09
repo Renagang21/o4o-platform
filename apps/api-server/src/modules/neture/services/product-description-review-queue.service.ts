@@ -9,19 +9,26 @@
  * 원칙: **read-only** — INSERT/UPDATE/DELETE·migration·Draft 구조 변경·ProductMaster 변경 없음.
  * 전부 parameterized SELECT.
  *
- * - list: OTC 초안(product_candidate_description_drafts)을 source_identifier_value(=groupKey)로 집계.
- *   적용 Master 수는 초안 seed_json.groupScope(masterTotal/spdMasters)를 사용(목록은 가볍게, join 안 함).
- * - detail: 대표 초안 1건의 상담 블록(content_json) + **적용 대상 Master 목록**을 결정적 parse join으로 해석.
+ * - list: 두 source 를 공통 row 로 정규화하여 UNION (WO-O4O-ADMIN-DESCRIPTION-REVIEW-QUEUE-SPD-SOURCE-V1):
+ *   · OTC_DRAFT — OTC 초안(product_candidate_description_drafts)을 source_identifier_value(=groupKey)로 집계.
+ *     적용 Master 수는 초안 seed_json.groupScope(masterTotal/spdMasters) 사용(목록은 가볍게, join 안 함).
+ *   · SPD — shared_product_descriptions 의 needs_review 를 master 단위 개별 검토 항목으로 노출(pm join).
+ *   sourceStore 필터(all|otc_draft|spd)로 두 축을 함께/따로 본다. 총계 = OTC 그룹 + SPD needs_review.
+ * - detail: OTC 대표 초안 1건의 상담 블록(content_json) + **적용 대상 Master 목록**을 결정적 parse join으로 해석.
  *   join 기준은 description-status 통합뷰와 동일: (name 괄호 성분)=ingredient AND (spec 첫 토큰)=strengthToken
- *   AND (제형 키워드)=doseForm AND drug_category='otc'. 추정 매칭 없음.
+ *   AND (제형 키워드)=doseForm AND drug_category='otc'. 추정 매칭 없음. (SPD row 상세는 기존 master 화면 재사용)
  */
 
 import type { DataSource } from 'typeorm';
+
+export type ReviewSourceStore = 'all' | 'otc_draft' | 'spd';
 
 export interface ReviewQueueParams {
   q?: string;
   source?: string; // source_label 정확일치
   status?: string; // review_status
+  sourceStore?: ReviewSourceStore; // 검토 source 축 (all=OTC 초안+SPD)
+  descriptionType?: string; // SPD description_type (STORE/SUPPLIER_STORE/B2B/B2C)
   sort?: 'applied_master' | 'updated_at' | 'group';
   order?: 'asc' | 'desc';
   page?: number;
@@ -29,15 +36,23 @@ export interface ReviewQueueParams {
 }
 
 export interface ReviewQueueRow {
-  groupKey: string;
-  draftId: string; // 대표 초안 (상세 진입 키)
+  sourceStore: 'OTC_DRAFT' | 'SPD';
+  reviewItemId: string; // 'draft:<uuid>' | 'spd:<uuid>' — 행 고유 키
+  detailKind: 'queue' | 'master'; // queue=그룹 상세 Drawer, master=기존 기본상품 상세 화면
+  detailKey: string; // OTC=draftId, SPD=masterId (상세 진입 대상)
+  groupKey: string | null;
+  draftId: string | null; // OTC 대표 초안 (queue detail 진입 키)
+  masterId: string | null; // SPD 대상 master
+  productName: string | null; // SPD 상품명 (OTC=title)
+  manufacturerName: string | null; // SPD 제조사
+  descriptionType: string | null; // SPD description_type (OTC='STORE')
   ingredient: string | null;
-  primaryUse: string | null; // content_json.efficacy 요약
+  primaryUse: string | null; // OTC=content_json.efficacy, SPD=summary
   title: string | null;
   sourceLabel: string | null;
   reviewStatus: string;
-  groupMasterCount: number | null; // 그룹 대상 Master 수 (masterTotal)
-  appliedMasterCount: number | null; // 적용(SPD) Master 수 (spdMasters)
+  groupMasterCount: number | null; // OTC 그룹 대상 Master 수 (masterTotal)
+  appliedMasterCount: number | null; // OTC 적용(SPD) Master 수 (spdMasters)
   author: string | null; // ai_provider
   reviewer: string | null; // reviewed_by
   draftCount: number;
@@ -87,9 +102,12 @@ const APPLIED_MASTER_LIMIT = 100;
 export class ProductDescriptionReviewQueueService {
   constructor(private dataSource: DataSource) {}
 
+  /** unified 컬럼(OTC 초안 그룹 + SPD needs_review UNION) 기준 필터. */
   private buildOuterWhere(params: ReviewQueueParams): { sql: string; args: unknown[] } {
     const where: string[] = [];
     const args: unknown[] = [];
+    if (params.sourceStore === 'otc_draft') where.push(`source_store = 'OTC_DRAFT'`);
+    else if (params.sourceStore === 'spd') where.push(`source_store = 'SPD'`);
     if (params.status) {
       args.push(params.status);
       where.push(`review_status = $${args.length}`);
@@ -98,15 +116,21 @@ export class ProductDescriptionReviewQueueService {
       args.push(params.source);
       where.push(`source_label = $${args.length}`);
     }
+    if (params.descriptionType) {
+      args.push(params.descriptionType);
+      where.push(`description_type = $${args.length}`);
+    }
     if (params.q?.trim()) {
       args.push(`%${params.q.trim()}%`);
       const i = args.length;
-      where.push(`(group_key ILIKE $${i} OR ingredient ILIKE $${i} OR title ILIKE $${i} OR primary_use ILIKE $${i})`);
+      where.push(`(product_name ILIKE $${i} OR group_key ILIKE $${i} OR ingredient ILIKE $${i} OR primary_use ILIKE $${i} OR master_id::text ILIKE $${i})`);
     }
     return { sql: where.length ? `WHERE ${where.join(' AND ')}` : '', args };
   }
 
-  private readonly GROUP_CTE = `
+  // OTC 초안 그룹 CTE (기존) + 두 source 를 공통 20컬럼으로 정규화한 unified CTE.
+  // 두 SELECT 의 컬럼 순서·타입은 반드시 동일해야 한다(UNION ALL).
+  private readonly UNIFIED_CTE = `
     WITH grp AS (
       SELECT source_identifier_value AS group_key,
         (array_agg(id ORDER BY updated_at DESC))[1] AS draft_id,
@@ -125,29 +149,84 @@ export class ProductDescriptionReviewQueueService {
       FROM product_candidate_description_drafts
       WHERE deleted_at IS NULL AND source_identifier_value IS NOT NULL
       GROUP BY source_identifier_value
+    ),
+    unified AS (
+      SELECT
+        'OTC_DRAFT'::text AS source_store,
+        ('draft:' || draft_id::text) AS review_item_id,
+        'queue'::text AS detail_kind,
+        draft_id::text AS detail_key,
+        group_key,
+        draft_id::text AS draft_id,
+        NULL::uuid AS master_id,
+        title AS product_name,
+        NULL::text AS manufacturer_name,
+        'STORE'::text AS description_type,
+        ingredient,
+        primary_use,
+        title,
+        source_label,
+        review_status,
+        master_total AS group_master_count,
+        spd_masters AS applied_master_count,
+        ai_provider AS author,
+        reviewed_by AS reviewer,
+        draft_count,
+        generated_at,
+        updated_at
+      FROM grp
+      UNION ALL
+      SELECT
+        'SPD'::text AS source_store,
+        ('spd:' || s.id::text) AS review_item_id,
+        'master'::text AS detail_kind,
+        s.master_id::text AS detail_key,
+        NULL::text AS group_key,
+        NULL::text AS draft_id,
+        s.master_id AS master_id,
+        pm.name AS product_name,
+        pm.manufacturer_name AS manufacturer_name,
+        s.description_type AS description_type,
+        NULL::text AS ingredient,
+        left(s.summary, 160) AS primary_use,
+        pm.name AS title,
+        s.source_type AS source_label,
+        s.status AS review_status,
+        NULL::int AS group_master_count,
+        NULL::int AS applied_master_count,
+        NULL::text AS author,
+        NULL::text AS reviewer,
+        1::int AS draft_count,
+        s.created_at AS generated_at,
+        s.updated_at AS updated_at
+      FROM shared_product_descriptions s
+      JOIN product_masters pm ON pm.id = s.master_id
+      WHERE s.deleted_at IS NULL AND s.status = 'needs_review'
     )`;
 
   async list(params: ReviewQueueParams): Promise<{ items: ReviewQueueRow[]; total: number }> {
     const { sql: whereSql, args } = this.buildOuterWhere(params);
 
     const countRows: { count: string }[] = await this.dataSource.query(
-      `${this.GROUP_CTE} SELECT COUNT(*) AS count FROM grp ${whereSql}`,
+      `${this.UNIFIED_CTE} SELECT COUNT(*) AS count FROM unified ${whereSql}`,
       args,
     );
     const total = Number(countRows[0]?.count ?? 0);
 
-    const sortCol = params.sort === 'updated_at' ? 'updated_at'
+    // 혼합 Queue 기본 정렬 = 최근 수정순. applied_master 는 OTC 만 값이 있어 NULLS LAST.
+    const sortCol = params.sort === 'applied_master' ? 'applied_master_count'
       : params.sort === 'group' ? 'group_key'
-      : 'spd_masters'; // 기본: 적용 Master 많은 순 (Queue 우선순위)
+      : 'updated_at';
     const order = params.order === 'asc' ? 'ASC' : 'DESC';
     const limit = Math.min(Math.max(params.limit ?? 20, 1), 100);
     const offset = Math.max(((params.page ?? 1) - 1) * limit, 0);
 
     const rows: any[] = await this.dataSource.query(
-      `${this.GROUP_CTE}
-       SELECT group_key, draft_id, ingredient, primary_use, title, source_label, review_status,
-         ai_provider, reviewed_by, master_total, spd_masters, draft_count, updated_at, generated_at
-       FROM grp ${whereSql}
+      `${this.UNIFIED_CTE}
+       SELECT source_store, review_item_id, detail_kind, detail_key, group_key, draft_id, master_id::text AS master_id,
+         product_name, manufacturer_name, description_type, ingredient, primary_use, title, source_label, review_status,
+         group_master_count, applied_master_count, author, reviewer, draft_count, generated_at, updated_at
+       FROM unified ${whereSql}
        ORDER BY ${sortCol} ${order} NULLS LAST, updated_at DESC
        LIMIT ${limit} OFFSET ${offset}`,
       args,
@@ -155,17 +234,25 @@ export class ProductDescriptionReviewQueueService {
 
     return {
       items: rows.map((r) => ({
+        sourceStore: r.source_store,
+        reviewItemId: r.review_item_id,
+        detailKind: r.detail_kind,
+        detailKey: r.detail_key,
         groupKey: r.group_key,
         draftId: r.draft_id,
+        masterId: r.master_id,
+        productName: r.product_name,
+        manufacturerName: r.manufacturer_name,
+        descriptionType: r.description_type,
         ingredient: r.ingredient,
         primaryUse: r.primary_use ? String(r.primary_use).slice(0, 160) : null,
         title: r.title,
         sourceLabel: r.source_label,
         reviewStatus: r.review_status,
-        groupMasterCount: r.master_total == null ? null : Number(r.master_total),
-        appliedMasterCount: r.spd_masters == null ? null : Number(r.spd_masters),
-        author: r.ai_provider,
-        reviewer: r.reviewed_by,
+        groupMasterCount: r.group_master_count == null ? null : Number(r.group_master_count),
+        appliedMasterCount: r.applied_master_count == null ? null : Number(r.applied_master_count),
+        author: r.author,
+        reviewer: r.reviewer,
         draftCount: Number(r.draft_count),
         generatedAt: r.generated_at,
         updatedAt: r.updated_at,
@@ -174,9 +261,21 @@ export class ProductDescriptionReviewQueueService {
     };
   }
 
-  /** 필터 옵션(source_label / review_status 분포) — Toolbar 채움용. */
-  async filterOptions(): Promise<{ sources: { value: string; count: number }[]; statuses: { value: string; count: number }[] }> {
-    const [sources, statuses] = await Promise.all([
+  /** 필터 옵션(source 축 / source_label / review_status 분포) — Toolbar 채움용. */
+  async filterOptions(): Promise<{
+    sourceStores: { value: string; count: number }[];
+    sources: { value: string; count: number }[];
+    statuses: { value: string; count: number }[];
+  }> {
+    const [otcGroups, spdNeedsReview, sources, statuses] = await Promise.all([
+      this.dataSource.query(
+        `SELECT count(DISTINCT source_identifier_value)::int AS count
+         FROM product_candidate_description_drafts WHERE deleted_at IS NULL AND source_identifier_value IS NOT NULL`,
+      ) as Promise<{ count: number }[]>,
+      this.dataSource.query(
+        `SELECT count(*)::int AS count
+         FROM shared_product_descriptions WHERE deleted_at IS NULL AND status = 'needs_review'`,
+      ) as Promise<{ count: number }[]>,
       this.dataSource.query(
         `SELECT source_label AS value, count(DISTINCT source_identifier_value)::int AS count
          FROM product_candidate_description_drafts WHERE deleted_at IS NULL AND source_identifier_value IS NOT NULL
@@ -188,7 +287,16 @@ export class ProductDescriptionReviewQueueService {
          GROUP BY review_status ORDER BY count DESC`,
       ) as Promise<{ value: string; count: number }[]>,
     ]);
-    return { sources, statuses };
+    const otcCount = otcGroups[0]?.count ?? 0;
+    const spdCount = spdNeedsReview[0]?.count ?? 0;
+    return {
+      sourceStores: [
+        { value: 'otc_draft', count: otcCount },
+        { value: 'spd', count: spdCount },
+      ],
+      sources,
+      statuses,
+    };
   }
 
   async detail(draftId: string): Promise<ReviewQueueDetail | null> {

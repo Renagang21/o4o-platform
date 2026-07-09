@@ -36,6 +36,7 @@ const ADMIN_ROLES = [
 ];
 
 const SORTS: NonNullable<ReviewQueueParams['sort']>[] = ['applied_master', 'updated_at', 'group'];
+const SOURCE_STORES: NonNullable<ReviewQueueParams['sourceStore']>[] = ['all', 'otc_draft', 'spd'];
 
 export function createProductDescriptionReviewQueueController(dataSource: DataSource): Router {
   const router = Router();
@@ -56,14 +57,17 @@ export function createProductDescriptionReviewQueueController(dataSource: DataSo
 
   router.get('/', async (req: Request, res: Response) => {
     try {
-      const { q, source, status, sort, order, page, limit } = req.query as Record<string, string>;
+      const { q, source, status, sourceStore, descriptionType, sort, order, page, limit } = req.query as Record<string, string>;
       const pageNum = Math.max(parseInt(page || '1', 10) || 1, 1);
       const limitNum = Math.min(Math.max(parseInt(limit || '20', 10) || 20, 1), 100);
       const sortVal = SORTS.includes(sort as any) ? (sort as ReviewQueueParams['sort']) : undefined;
+      const sourceStoreVal = SOURCE_STORES.includes(sourceStore as any) ? (sourceStore as ReviewQueueParams['sourceStore']) : undefined;
       const { items, total } = await service.list({
         q: q || undefined,
         source: source || undefined,
         status: status || undefined,
+        sourceStore: sourceStoreVal,
+        descriptionType: descriptionType || undefined,
         sort: sortVal,
         order: order === 'asc' ? 'asc' : 'desc',
         page: pageNum,
