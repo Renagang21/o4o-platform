@@ -26,9 +26,16 @@ const SOURCE_LABEL_PRESETS = [
   'MFDS_QUASI_DRUG_PERMIT',
 ];
 
-const STATUS_OPTIONS = [
-  'pending', 'reviewing', 'matched', 'linked',
-  'approved_new_master', 'rejected', 'merged', 'archived',
+// WO-O4O-ADMIN-PRODUCT-CANDIDATE-STATUS-SIMPLIFY-V2
+// 운영자는 "O4O 기본 상품 DB 반영 여부"만 알면 되므로 원시 8개 status 를 4개 그룹으로 묶어 노출한다.
+// (전체 = 필터 없음). 원시 status 값은 DB·API 에서 그대로 유지되고, 화면만 그룹으로 표시.
+//   registered = matched + linked + approved_new_master  (기존 연결/신규 승격 구분 없이 "등록 완료")
+//   rejected   = rejected + merged + archived            (파이프라인 종료 상태 "제외")
+const GROUPED_STATUS_OPTIONS: { value: string; label: string }[] = [
+  { value: 'pending', label: '대기' },
+  { value: 'review_required', label: '검토 필요' },
+  { value: 'registered', label: '등록 완료' },
+  { value: 'rejected', label: '제외' },
 ];
 const MATCH_STATUS_OPTIONS = [
   'unmatched', 'exact_identifier_match', 'possible_identifier_match',
@@ -46,7 +53,8 @@ export default function ProductCandidatesPage() {
   const [rows, setRows] = useState<ProductCandidateRow[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
-  const [status, setStatus] = useState(searchParams.get('status') || '');
+  // WO-O4O-ADMIN-PRODUCT-CANDIDATE-STATUS-SIMPLIFY-V2: 화면 상태 필터는 groupedStatus 로 통일
+  const [groupedStatus, setGroupedStatus] = useState(searchParams.get('groupedStatus') || '');
   const [matchStatus, setMatchStatus] = useState(searchParams.get('matchStatus') || '');
   const [sourceType, setSourceType] = useState(searchParams.get('sourceType') || '');
   // committed(쿼리에 반영되는) source_label / search 와 입력 버퍼 분리 — 타이핑마다 조회 방지
@@ -66,7 +74,7 @@ export default function ProductCandidatesPage() {
     setError(null);
     try {
       const res = await listProductCandidates({
-        status: status || undefined,
+        groupedStatus: groupedStatus || undefined,
         matchStatus: matchStatus || undefined,
         sourceType: sourceType || undefined,
         sourceLabel: sourceLabel || undefined,
@@ -83,7 +91,7 @@ export default function ProductCandidatesPage() {
     } finally {
       setLoading(false);
     }
-  }, [status, matchStatus, sourceType, sourceLabel, search, page]);
+  }, [groupedStatus, matchStatus, sourceType, sourceLabel, search, page]);
 
   useEffect(() => {
     load();
@@ -92,14 +100,14 @@ export default function ProductCandidatesPage() {
   // URL query sync (공유/새로고침/뒤로가기 유지) — 기본값은 생략
   useEffect(() => {
     const q: Record<string, string> = {};
-    if (status) q.status = status;
+    if (groupedStatus) q.groupedStatus = groupedStatus;
     if (matchStatus) q.matchStatus = matchStatus;
     if (sourceType) q.sourceType = sourceType;
     if (sourceLabel) q.sourceLabel = sourceLabel;
     if (search) q.search = search;
     if (page > 1) q.page = String(page);
     setSearchParams(q, { replace: true });
-  }, [status, matchStatus, sourceType, sourceLabel, search, page, setSearchParams]);
+  }, [groupedStatus, matchStatus, sourceType, sourceLabel, search, page, setSearchParams]);
 
   const totalPages = Math.max(1, Math.ceil(total / LIMIT));
 
@@ -223,9 +231,9 @@ export default function ProductCandidatesPage() {
 
       {/* Toolbar */}
       <div className="flex flex-wrap gap-3 mb-4 items-center">
-        <select value={status} onChange={onFilterChange(setStatus)} className="border border-gray-300 rounded px-3 py-2 text-sm">
-          <option value="">전체 상태</option>
-          {STATUS_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}
+        <select value={groupedStatus} onChange={onFilterChange(setGroupedStatus)} className="border border-gray-300 rounded px-3 py-2 text-sm">
+          <option value="">전체</option>
+          {GROUPED_STATUS_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
         <select value={matchStatus} onChange={onFilterChange(setMatchStatus)} className="border border-gray-300 rounded px-3 py-2 text-sm">
           <option value="">전체 매칭</option>

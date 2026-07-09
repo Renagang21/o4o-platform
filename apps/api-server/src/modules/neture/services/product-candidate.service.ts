@@ -92,6 +92,11 @@ export interface CreateCandidateInput {
 
 export interface FindCandidatesFilter {
   candidateStatus?: ProductCandidateStatus;
+  /**
+   * 다중 상태 필터 (그룹 상태용, In). candidateStatus 단건보다 우선한다.
+   * WO-O4O-ADMIN-PRODUCT-CANDIDATE-STATUS-SIMPLIFY-V2: 화면 groupedStatus 를 원시 status 배열로 변환해 전달.
+   */
+  candidateStatuses?: ProductCandidateStatus[];
   matchStatus?: ProductCandidateMatchStatus;
   sourceType?: ProductCandidateSourceType;
   /** 공공 seed 라벨 정확일치 필터 (예: MFDS_HEALTH_FUNCTIONAL_FOOD) — external_api 후보 분리용 */
@@ -244,7 +249,12 @@ export class ProductCandidateService {
     const limit = Math.min(100, Math.max(1, filter.limit ?? 20));
 
     const where: FindOptionsWhere<ProductCandidate> = { deletedAt: IsNull() };
-    if (filter.candidateStatus) where.candidateStatus = filter.candidateStatus;
+    // 다중 상태(그룹) 우선, 없으면 단건 상태
+    if (filter.candidateStatuses && filter.candidateStatuses.length > 0) {
+      where.candidateStatus = In(filter.candidateStatuses);
+    } else if (filter.candidateStatus) {
+      where.candidateStatus = filter.candidateStatus;
+    }
     if (filter.matchStatus) where.matchStatus = filter.matchStatus;
     if (filter.sourceType) where.sourceType = filter.sourceType;
     if (filter.sourceLabel) where.sourceLabel = filter.sourceLabel;

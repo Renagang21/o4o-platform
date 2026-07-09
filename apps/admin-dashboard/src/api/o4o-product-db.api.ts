@@ -46,7 +46,13 @@ export interface ProductCandidateRow {
 }
 
 export interface ProductCandidateListParams {
+  /** 원시 status 단건 필터 (내부/호환용). 일반 UI 는 groupedStatus 사용. */
   status?: string;
+  /**
+   * 화면용 그룹 상태: pending | review_required | registered | rejected.
+   * WO-O4O-ADMIN-PRODUCT-CANDIDATE-STATUS-SIMPLIFY-V2.
+   */
+  groupedStatus?: string;
   matchStatus?: string;
   sourceType?: string;
   /** 공공 seed 라벨 정확일치 (예: MFDS_HEALTH_FUNCTIONAL_FOOD) */
@@ -77,6 +83,7 @@ export async function listProductCandidates(
     query.all = 'true'; // platform cross-service opt-in (감사 로그 기록됨)
   }
   if (params.status) query.status = params.status;
+  if (params.groupedStatus) query.groupedStatus = params.groupedStatus;
   if (params.matchStatus) query.matchStatus = params.matchStatus;
   if (params.sourceType) query.sourceType = params.sourceType;
   if (params.sourceLabel?.trim()) query.sourceLabel = params.sourceLabel.trim();

@@ -23,6 +23,20 @@ import type {
 import type { ProductIdentifierType } from '../entities/ProductIdentifier.entity.js';
 import logger from '../../../utils/logger.js';
 
+/**
+ * WO-O4O-ADMIN-PRODUCT-CANDIDATE-STATUS-SIMPLIFY-V2
+ * 화면용 그룹 상태 → 원시 candidate status 배열 매핑.
+ * 운영자는 "O4O 기본 상품 DB 반영 여부"만 알면 되므로 matched/linked/approved_new_master 를
+ * registered(등록 완료) 하나로 묶는다. merged/archived 는 파이프라인 종료 상태이므로 rejected(제외)에 포함.
+ * DB 원시 status 값·의미는 변경하지 않는다 (기존 status 파라미터도 그대로 유지).
+ */
+const GROUPED_STATUS_MAP: Record<string, ProductCandidateStatus[]> = {
+  pending: ['pending'],
+  review_required: ['reviewing'],
+  registered: ['matched', 'linked', 'approved_new_master'],
+  rejected: ['rejected', 'merged', 'archived'],
+};
+
 const OPERATOR_ROLES = [
   'platform:admin', 'platform:super_admin',
   'neture:admin', 'neture:operator',
@@ -54,9 +68,14 @@ export function createProductCandidateController(dataSource: DataSource): Router
       }
       if (resolved.crossService) logCrossServiceQuery(req);
 
-      const { status, matchStatus, sourceType, sourceLabel, search, q, serviceKey, organizationId, page, limit } = req.query;
+      const { status, groupedStatus, matchStatus, sourceType, sourceLabel, search, q, serviceKey, organizationId, page, limit } = req.query;
+      // 화면용 groupedStatus 는 원시 status 배열로 변환 (기존 status 단건 필터도 계속 지원)
+      const candidateStatuses = groupedStatus
+        ? GROUPED_STATUS_MAP[String(groupedStatus)]
+        : undefined;
       const result = await service.findCandidates({
         candidateStatus: status as ProductCandidateStatus | undefined,
+        candidateStatuses,
         matchStatus: matchStatus as ProductCandidateMatchStatus | undefined,
         sourceType: sourceType as ProductCandidateSourceType | undefined,
         sourceLabel: (sourceLabel as string | undefined) || undefined,
