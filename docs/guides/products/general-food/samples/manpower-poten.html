@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>맨 파워 포텐 — MAN POWER POTEN</title>
+<style>
+  :root{
+    --bg:#14110b; --bg2:#1d1811; --panel:#211b12; --ink:#efe7d6; --sub:#c7bca4;
+    --gold:#c9a24b; --gold-2:#e7c66e; --amber:#d5641f; --amber-2:#e07a34;
+    --line:rgba(201,162,75,.22);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:linear-gradient(180deg,#191309,#14110b 45%);
+    color:var(--ink); font-size:16px; line-height:1.75;
+    font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:480px;margin:0 auto;padding:0 20px 60px}
+
+  .hero{padding:36px 20px 30px;text-align:center;color:#fff;
+    background:radial-gradient(130% 110% at 50% 0%, #2a2113, #17120a 72%);
+    border-radius:0 0 20px 20px;position:relative;overflow:hidden;
+    border-bottom:1px solid var(--line)}
+  .hero::after{content:"";position:absolute;left:-10%;right:-10%;bottom:-40px;height:90px;
+    background:radial-gradient(120% 100% at 50% 0%, rgba(231,198,110,.22), transparent 70%)}
+  .scan{display:inline-block;font-size:13px;letter-spacing:.2em;color:var(--gold-2);
+    border:1px solid rgba(231,198,110,.4);border-radius:999px;padding:8px 18px;margin-bottom:16px}
+  .catch{font-size:15.5px;letter-spacing:.04em;color:var(--amber-2);margin:0 0 8px;font-weight:600}
+  .title{font-size:36px;font-weight:800;line-height:1.15;margin:0;color:#fff;letter-spacing:.02em}
+  .title small{display:block;font-size:15px;font-weight:600;color:#cbb98d;
+    letter-spacing:.34em;margin-top:8px}
+  .subline{color:var(--gold-2);font-size:15.5px;margin:14px 0 0;font-weight:600;letter-spacing:.02em}
+  .badge{display:inline-block;margin-top:16px;font-size:13px;letter-spacing:.03em;color:#1a140a;
+    background:linear-gradient(180deg,var(--gold-2),var(--gold));border-radius:6px;padding:6px 14px;font-weight:700}
+
+  h2{font-size:13.5px;letter-spacing:.18em;color:var(--gold);text-align:center;
+    margin:46px 0 18px;font-weight:700}
+
+  .card{background:var(--panel);border:1px solid var(--line);
+    border-left:3px solid var(--gold);border-radius:14px;padding:20px 18px 18px;margin:13px 0;
+    box-shadow:0 6px 18px rgba(0,0,0,.35)}
+  .card .row{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:9px}
+  .tag{display:inline-block;font-size:13px;letter-spacing:.03em;color:#1a140a;
+    background:linear-gradient(180deg,var(--gold-2),var(--gold));border-radius:6px;
+    padding:4px 12px;font-weight:700}
+  .tag.plain{background:transparent;color:var(--sub);border:1px solid var(--line)}
+  .amt{font-size:13.5px;color:var(--amber-2);font-weight:700;letter-spacing:.02em}
+  .card h3{margin:0 0 8px;font-size:20px;color:#fff;font-weight:800}
+  .card p{margin:0;color:var(--sub);font-size:15.5px}
+  .card .who1{display:block;margin-top:9px;color:var(--gold-2);font-size:14.5px}
+
+  .syn{background:linear-gradient(180deg,#241c11,#1c160d);border:1px solid var(--line);
+    border-radius:16px;padding:24px 20px;margin:16px 0 0;text-align:center}
+  .syn .k{font-size:13px;letter-spacing:.16em;color:var(--gold);margin-bottom:12px}
+  .syn p{margin:0;color:var(--ink);font-size:16px;line-height:1.85}
+  .syn b{color:var(--gold-2)}
+
+  ul.who{list-style:none;padding:0;margin:0}
+  ul.who li{position:relative;padding:12px 0 12px 24px;color:var(--ink);font-size:16px;
+    border-bottom:1px solid var(--line)}
+  ul.who li:last-child{border-bottom:0}
+  ul.who li::before{content:"";position:absolute;left:3px;top:20px;width:8px;height:8px;
+    border-radius:50%;background:var(--gold)}
+
+  .gift{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:22px 18px;margin:18px 0 0;color:var(--sub);font-size:15.5px;text-align:center}
+  .gift b{color:var(--gold-2)}
+
+  .spec{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:24px 0 0;
+    color:var(--sub);font-size:14.5px}
+  .spec span{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:9px 15px}
+  .notice{margin:14px 0 0;text-align:center;font-size:14px;color:var(--amber-2);font-weight:600}
+
+  .cta{margin:44px 0 0;background:linear-gradient(180deg,#241c11,#181209);
+    border:1px solid var(--line);border-radius:16px;padding:28px 20px;text-align:center;color:#fff}
+  .cta .k{font-size:13px;letter-spacing:.2em;color:var(--gold);margin-bottom:12px}
+  .cta h3{margin:0 0 11px;font-size:21px;color:#fff;font-weight:800}
+  .cta p{margin:0;color:var(--sub);font-size:15.5px}
+  .cta .pill{display:inline-block;margin-top:18px;font-size:15px;color:#1a140a;
+    background:linear-gradient(180deg,var(--gold-2),var(--gold));font-weight:700;border-radius:999px;padding:13px 24px}
+  .foot{text-align:center;color:#8f8365;font-size:12.5px;margin-top:28px;letter-spacing:.05em}
+</style>
+</head>
+<body>
+  <div class="wrap" style="padding-top:0">
+  <header class="hero">
+    <div class="scan">QR 스캔으로 열어보기</div>
+    <p class="catch">남성의 하루, 컨디션을 설계하다</p>
+    <h1 class="title">맨 파워 포텐<small>MAN POWER POTEN</small></h1>
+    <p class="subline">쏘팔메토 &times; 옥타코사놀 &times; 서양호박씨유</p>
+    <div class="badge">100% MADE IN USA · HACCP · 건강기능식품</div>
+  </header>
+
+  <main>
+    <h2>5가지 핵심 원료, 한눈에</h2>
+
+    <div class="card">
+      <div class="row"><span class="tag">전립선 건강</span><span class="amt">410 mg</span></div>
+      <h3>쏘팔메토 열매추출물</h3>
+      <p>전립선 건강의 유지에 도움을 줄 수 있는 것으로 식약처가 인정한 기능성 원료입니다.</p>
+      <span class="who1">→ 중년 이후 남성 컨디션이 신경 쓰이는 분</span>
+    </div>
+
+    <div class="card">
+      <div class="row"><span class="tag">지구력</span><span class="amt">50 mg</span></div>
+      <h3>옥타코사놀 함유 유지</h3>
+      <p>지구력 증진에 도움을 줄 수 있는 것으로 알려진 기능성 원료입니다.</p>
+      <span class="who1">→ 활동량이 많거나 쉽게 지친다고 느끼는 분</span>
+    </div>
+
+    <div class="card">
+      <div class="row"><span class="tag plain">함유 원료</span><span class="amt">500 mg</span></div>
+      <h3>서양호박(쿠쿠르비트) 씨유</h3>
+      <p>남성 건강 관리 제품에 널리 쓰이는 원료로, 이 제품에 500mg 담겨 있습니다.</p>
+    </div>
+
+    <div class="card">
+      <div class="row"><span class="tag plain">전통 원료</span><span class="amt">100 mg</span></div>
+      <h3>호로파종자 추출물</h3>
+      <p>예로부터 활용되어 온 식물성 원료입니다.</p>
+    </div>
+
+    <div class="card">
+      <div class="row"><span class="tag">면역 · 에너지</span></div>
+      <h3>비타민D · 아연 · 비타민B군</h3>
+      <p>아연은 정상적인 면역기능과 세포분열에 필요하고, 항산화 작용으로 유해산소로부터 세포를 보호하는 데 필요합니다. 비타민B군(B1·B2·B6·B12)은 탄수화물과 에너지 대사, 체내 에너지 생성, 단백질·아미노산 이용에 필요합니다.</p>
+    </div>
+
+    <h2>함께여서 더 좋은 조합</h2>
+    <div class="syn">
+      <div class="k">각각의 합, 그 이상</div>
+      <p>전립선 건강(<b>쏘팔메토</b>) · 지구력(<b>옥타코사놀</b>) · 에너지 대사(<b>비타민B군</b>) · 세포 보호(<b>아연</b>)를
+      <b>하루 한 캡슐</b>에 담아, 따로 챙기던 남성 관리를 하나로 모았습니다.</p>
+    </div>
+
+    <h2>이런 분께 권해드립니다</h2>
+    <ul class="who">
+      <li>중년 이후 남성 컨디션 · 활력이 신경 쓰이는 분</li>
+      <li>아침마다 무겁고 지구력이 떨어졌다고 느끼는 분</li>
+      <li>여러 영양제를 하루 한 알로 단순하게 챙기고 싶은 분</li>
+    </ul>
+
+    <div class="gift">
+      <b>선물로도, 나를 위해서도</b><br>
+      100% 미국 제조 · HACCP 인증의 프리미엄 남성 건강기능식품.
+      아버지 · 남편께 드리는 선물로도, 나를 위한 하루 한 캡슐 루틴으로도 좋습니다.
+    </div>
+
+    <div class="spec">
+      <span>1,300mg × 60캡슐 × 3BOX</span>
+      <span>총 234g</span>
+      <span>1일 1회 1캡슐</span>
+    </div>
+    <p class="notice">본 제품은 매장 판매 전용입니다 (인터넷 판매불가)</p>
+
+    <section class="cta">
+      <div class="k">매장 상담</div>
+      <h3>나에게 맞는지 확인하세요</h3>
+      <p>복용 중인 약 · 건강 상태에 따라 맞는 방법은 사람마다 다릅니다. 이 화면을 <b style="color:var(--gold-2)">매장 내 전문성이 있는 도우미</b>에게 보여주시면, 나에게 맞는 방법을 함께 확인해 드립니다.</p>
+      <span class="pill">이 화면을 도우미에게 보여주세요</span>
+    </section>
+
+    <p class="foot">맨 파워 포텐 · MAN POWER POTEN · 건강기능식품</p>
+  </main>
+  </div>
+</body>
+</html>
