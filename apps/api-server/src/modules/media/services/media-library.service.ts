@@ -191,6 +191,12 @@ export class MediaLibraryService {
     limit?: number;
     assetType?: string;
     folder?: string;
+    // WO-O4O-CONTENT-RESOURCE-UNIFIED-SEARCH-V1: Metadata 기반 검색/필터 (AND 결합)
+    q?: string;
+    language?: string;
+    source?: string;
+    usageType?: string;
+    status?: string;
   }): Promise<{ data: MediaAsset[]; total: number; page: number; limit: number }> {
     const page = Math.max(1, options.page || 1);
     const limit = Math.min(100, Math.max(1, options.limit || 20));
@@ -200,12 +206,29 @@ export class MediaLibraryService {
       .where('m.is_library_public = true')
       .orderBy('m.created_at', 'DESC');
 
+    // Type(asset_type) — 파일 종류 필터
     if (options.assetType) {
       qb.andWhere('m.asset_type = :assetType', { assetType: options.assetType });
     }
 
     if (options.folder) {
       qb.andWhere('m.folder = :folder', { folder: options.folder });
+    }
+
+    // WO-O4O-CONTENT-RESOURCE-UNIFIED-SEARCH-V1 — Metadata 정확 필터 (AND).
+    //   url/gcs_path/file_name(파일 속성)은 검색 대상이 아니다(§5.5).
+    if (options.language) qb.andWhere('m.language = :language', { language: options.language });
+    if (options.source) qb.andWhere('m.source = :source', { source: options.source });
+    if (options.usageType) qb.andWhere('m.usage_type = :usageType', { usageType: options.usageType });
+    if (options.status) qb.andWhere('m.status = :status', { status: options.status });
+
+    // 검색어(q) — title/description/memo(ILIKE 부분) + keywords/tags(jsonb::text ILIKE). (§9)
+    const q = options.q?.trim();
+    if (q) {
+      qb.andWhere(
+        '(m.title ILIKE :q OR m.description ILIKE :q OR m.memo ILIKE :q OR m.keywords::text ILIKE :q OR m.tags::text ILIKE :q)',
+        { q: `%${q}%` },
+      );
     }
 
     const [data, total] = await qb

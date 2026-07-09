@@ -17,10 +17,12 @@ import {
   updateMediaAssetMetadata,
   type MediaAssetAdmin,
   type MediaAssetMetadataPatch,
+  type MediaAssetSearchParams,
 } from '@/api/media-library.api';
 
 const SOURCE_OPTIONS = ['', 'operator', 'supplier', 'store', 'ai', 'external', 'import'];
 const LANGUAGE_OPTIONS = ['', 'ko', 'en', 'ja', 'zh', 'vi', 'th', 'id'];
+const TYPE_OPTIONS = ['', 'image', 'video', 'audio', 'document'];
 
 function toCsv(arr: string[] | null | undefined): string {
   return (arr ?? []).join(', ');
@@ -36,10 +38,19 @@ const MediaAssetsPage: React.FC = () => {
   const [editing, setEditing] = useState<MediaAssetAdmin | null>(null);
   const [saving, setSaving] = useState(false);
 
-  const fetchAssets = useCallback(async () => {
+  // WO-O4O-CONTENT-RESOURCE-UNIFIED-SEARCH-V1: Metadata 검색/필터 (AND). Pagination(limit 100)은 기존 유지.
+  const [q, setQ] = useState('');
+  const [type, setType] = useState('');
+  const [language, setLanguage] = useState('');
+  const [source, setSource] = useState('');
+  const [usageType, setUsageType] = useState('');
+  const [status, setStatus] = useState('');
+
+  const doFetch = useCallback(async (override?: Partial<MediaAssetSearchParams>) => {
     setLoading(true);
+    const params: MediaAssetSearchParams = { page: 1, limit: 100, q, type, language, source, usageType, status, ...override };
     try {
-      const res = await listMediaAssets({ page: 1, limit: 100 });
+      const res = await listMediaAssets(params);
       setAssets(res.data);
       setTotal(res.total);
     } catch {
@@ -47,13 +58,20 @@ const MediaAssetsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [q, type, language, source, usageType, status]);
 
   useEffect(() => {
-    fetchAssets();
-  }, [fetchAssets]);
+    doFetch();
+    // 최초 1회 로드 (필터는 명시적 검색/선택 시 재조회)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  if (loading) {
+  const handleReset = () => {
+    setQ(''); setType(''); setLanguage(''); setSource(''); setUsageType(''); setStatus('');
+    doFetch({ q: '', type: '', language: '', source: '', usageType: '', status: '' });
+  };
+
+  if (loading && assets.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-gray-600">Loading…</div>
@@ -70,6 +88,46 @@ const MediaAssetsPage: React.FC = () => {
           공용 미디어 라이브러리(media_assets) 자산의 메타데이터를 관리합니다. 파일 URL은 변경되지 않으며,
           제목·설명·태그 등 서술 메타데이터만 수정됩니다. (총 {total}건)
         </p>
+
+        {/* WO-O4O-CONTENT-RESOURCE-UNIFIED-SEARCH-V1: Metadata 검색/필터 바 (AND) */}
+        <div className="bg-white border rounded p-3 mb-4 flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-1">
+            <input
+              type="search"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') doFetch(); }}
+              placeholder="제목·설명·메모·태그·키워드 검색…"
+              className="w-64 px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-200"
+            />
+            <button onClick={() => doFetch()} className="px-3 py-1.5 text-sm text-white bg-blue-600 rounded hover:bg-blue-700">검색</button>
+          </div>
+
+          <select value={type} onChange={(e) => { setType(e.target.value); doFetch({ type: e.target.value }); }} className="px-2 py-1.5 text-sm border border-gray-300 rounded">
+            {TYPE_OPTIONS.map((t) => <option key={t} value={t}>{t ? `종류: ${t}` : '종류: 전체'}</option>)}
+          </select>
+          <select value={language} onChange={(e) => { setLanguage(e.target.value); doFetch({ language: e.target.value }); }} className="px-2 py-1.5 text-sm border border-gray-300 rounded">
+            {LANGUAGE_OPTIONS.map((l) => <option key={l} value={l}>{l ? `언어: ${l}` : '언어: 전체'}</option>)}
+          </select>
+          <select value={source} onChange={(e) => { setSource(e.target.value); doFetch({ source: e.target.value }); }} className="px-2 py-1.5 text-sm border border-gray-300 rounded">
+            {SOURCE_OPTIONS.map((s) => <option key={s} value={s}>{s ? `출처: ${s}` : '출처: 전체'}</option>)}
+          </select>
+          <input
+            value={usageType}
+            onChange={(e) => setUsageType(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') doFetch(); }}
+            placeholder="용도(UsageType)"
+            className="w-32 px-2 py-1.5 text-sm border border-gray-300 rounded"
+          />
+          <input
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') doFetch(); }}
+            placeholder="상태(Status)"
+            className="w-28 px-2 py-1.5 text-sm border border-gray-300 rounded"
+          />
+          <button onClick={handleReset} className="px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50 text-gray-600">초기화</button>
+        </div>
 
         <div className="bg-white border rounded">
           <table className="w-full">

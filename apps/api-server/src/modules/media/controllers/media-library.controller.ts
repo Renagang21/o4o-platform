@@ -66,11 +66,17 @@ export function createMediaLibraryRouter(dataSource: DataSource): Router {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
-      const assetType = req.query.assetType as string | undefined;
+      // WO-O4O-CONTENT-RESOURCE-UNIFIED-SEARCH-V1: type(=asset_type) 는 type/assetType 둘 다 허용(alias)
+      const assetType = (req.query.type as string) || (req.query.assetType as string) || undefined;
       const folder = req.query.folder as string | undefined;
+      const q = req.query.q as string | undefined;
+      const language = req.query.language as string | undefined;
+      const source = req.query.source as string | undefined;
+      const usageType = req.query.usageType as string | undefined;
+      const status = req.query.status as string | undefined;
 
       const service = new MediaLibraryService(dataSource);
-      const result = await service.list({ page, limit, assetType, folder });
+      const result = await service.list({ page, limit, assetType, folder, q, language, source, usageType, status });
 
       res.json({ success: true, ...result });
     } catch (error: any) {

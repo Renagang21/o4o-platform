@@ -85,15 +85,35 @@ export interface MediaAssetMetadataPatch {
   isLibraryPublic?: boolean;
 }
 
-/** media_assets 목록 (공개 자산). GET /platform/media-library */
+/** media_assets 검색 파라미터 — WO-O4O-CONTENT-RESOURCE-UNIFIED-SEARCH-V1 */
+export interface MediaAssetSearchParams {
+  page?: number;
+  limit?: number;
+  folder?: string;
+  /** 검색어: title/description/memo/keywords/tags 대상(ILIKE) */
+  q?: string;
+  /** 파일 종류(asset_type): image/video/audio/document */
+  type?: string;
+  language?: string;
+  source?: string;
+  usageType?: string;
+  status?: string;
+}
+
+/** media_assets 목록/검색 (공개 자산). GET /platform/media-library */
 export async function listMediaAssets(
-  params: { page?: number; limit?: number; assetType?: string; folder?: string } = {},
+  params: MediaAssetSearchParams = {},
 ): Promise<{ data: MediaAssetAdmin[]; total: number; page: number; limit: number }> {
   const qs = new URLSearchParams();
   if (params.page) qs.set('page', String(params.page));
   if (params.limit) qs.set('limit', String(params.limit));
-  if (params.assetType) qs.set('assetType', params.assetType);
   if (params.folder) qs.set('folder', params.folder);
+  if (params.q && params.q.trim()) qs.set('q', params.q.trim());
+  if (params.type) qs.set('type', params.type);
+  if (params.language) qs.set('language', params.language);
+  if (params.source) qs.set('source', params.source);
+  if (params.usageType) qs.set('usageType', params.usageType);
+  if (params.status) qs.set('status', params.status);
   const res = await authClient.api.get<{ success: boolean; data?: MediaAssetAdmin[]; total?: number; page?: number; limit?: number }>(
     `/platform/media-library?${qs.toString()}`,
   );
