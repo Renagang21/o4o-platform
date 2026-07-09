@@ -700,6 +700,111 @@ export async function getDescriptionDashboard(): Promise<DescriptionDashboard> {
   return res.data.data;
 }
 
+// ─── Description Review Queue (설명서 검토 Queue, Group 중심, read-only) ────────
+// WO-O4O-ADMIN-DESCRIPTION-REVIEW-QUEUE-V1
+// mount: GET /api/v1/admin/o4o-product-db/description-review-queue (+ /filter-options, /:draftId)
+
+export interface ReviewQueueRow {
+  groupKey: string;
+  draftId: string;
+  ingredient: string | null;
+  primaryUse: string | null;
+  title: string | null;
+  sourceLabel: string | null;
+  reviewStatus: string;
+  groupMasterCount: number | null;
+  appliedMasterCount: number | null;
+  author: string | null;
+  reviewer: string | null;
+  draftCount: number;
+  generatedAt: string | null;
+  updatedAt: string | null;
+}
+
+export interface ReviewQueueListParams {
+  q?: string;
+  source?: string;
+  status?: string;
+  sort?: 'applied_master' | 'updated_at' | 'group';
+  order?: 'asc' | 'desc';
+  page?: number;
+  limit?: number;
+}
+
+export interface ReviewQueueAppliedMaster {
+  masterId: string;
+  name: string;
+  manufacturerName: string | null;
+  barcode: string | null;
+  hasCanonical: boolean;
+  hasNeedsReview: boolean;
+}
+
+export interface ReviewQueueDetail {
+  groupKey: string;
+  draftId: string;
+  ingredient: string | null;
+  strengthToken: string | null;
+  doseForm: string | null;
+  sourceLabel: string | null;
+  reviewStatus: string;
+  reviewFlags: string[];
+  author: string | null;
+  aiModel: string | null;
+  reviewer: string | null;
+  generatedAt: string | null;
+  updatedAt: string | null;
+  blocks: {
+    bodyMarkdown: string | null;
+    primaryClinicalUse: string | null;
+    selectionPoint: string | null;
+    counselingPoint: string | null;
+    safetyBlock: string | null;
+    usageLabel: string | null;
+    contentSource: string | null;
+  };
+  appliedMasters: ReviewQueueAppliedMaster[];
+  appliedMasterTotal: number;
+  appliedMasterSampleLimited: boolean;
+}
+
+export async function getDescriptionReviewQueue(
+  params: ReviewQueueListParams = {},
+): Promise<{ items: ReviewQueueRow[]; meta: ProductMasterListMeta }> {
+  const query: Record<string, string> = {};
+  if (params.q?.trim()) query.q = params.q.trim();
+  if (params.source) query.source = params.source;
+  if (params.status) query.status = params.status;
+  if (params.sort) query.sort = params.sort;
+  if (params.order) query.order = params.order;
+  query.page = String(params.page ?? 1);
+  query.limit = String(params.limit ?? 20);
+  const res = await authClient.api.get<{ success: boolean; data: ReviewQueueRow[]; meta: ProductMasterListMeta }>(
+    `/admin/o4o-product-db/description-review-queue?${new URLSearchParams(query).toString()}`,
+  );
+  return {
+    items: res.data?.data ?? [],
+    meta: res.data?.meta ?? { page: 1, limit: 20, total: 0, totalPages: 0 },
+  };
+}
+
+export async function getReviewQueueFilterOptions(): Promise<{
+  sources: { value: string; count: number }[];
+  statuses: { value: string; count: number }[];
+}> {
+  const res = await authClient.api.get<{ success: boolean; data: { sources: { value: string; count: number }[]; statuses: { value: string; count: number }[] } }>(
+    `/admin/o4o-product-db/description-review-queue/filter-options`,
+  );
+  return res.data?.data ?? { sources: [], statuses: [] };
+}
+
+export async function getReviewQueueDetail(draftId: string): Promise<ReviewQueueDetail> {
+  const res = await authClient.api.get<{ success: boolean; data: ReviewQueueDetail }>(
+    `/admin/o4o-product-db/description-review-queue/${encodeURIComponent(draftId)}`,
+  );
+  return res.data.data;
+}
+
 // ─── Product Usage Links (master 활용 연결, read-only) ────────────────────────
 // WO-O4O-ADMIN-O4O-PRODUCT-USAGE-LINKS-READONLY-V1
 // mount: GET /api/v1/admin/o4o-product-db/masters/:id/usage-links

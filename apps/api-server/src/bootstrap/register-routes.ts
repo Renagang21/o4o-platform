@@ -467,6 +467,16 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Product Description Dashboard routes:', descDashboardError);
     }
 
+    // 24-e2d-3. Register Product Description Review Queue (read-only) — Group 중심 검토 Queue
+    //           (WO-O4O-ADMIN-DESCRIPTION-REVIEW-QUEUE-V1)
+    try {
+      const { createProductDescriptionReviewQueueController } = await import('../modules/neture/controllers/product-description-review-queue.controller.js');
+      app.use('/api/v1/admin/o4o-product-db/description-review-queue', createProductDescriptionReviewQueueController(dataSource));
+      logger.info('✅ Product Description Review Queue (read-only) routes registered at /api/v1/admin/o4o-product-db/description-review-queue');
+    } catch (reviewQueueError) {
+      logger.error('Failed to register Product Description Review Queue routes:', reviewQueueError);
+    }
+
     // 24-e2e. Register Product Usage Links (read-only) — master 활용 연결 조회
     //         (WO-O4O-ADMIN-O4O-PRODUCT-USAGE-LINKS-READONLY-V1)
     try {
