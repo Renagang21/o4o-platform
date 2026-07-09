@@ -11,7 +11,7 @@
 
 import { useEffect, useState, useCallback, type CSSProperties } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Package, RefreshCw, Search, ExternalLink, Boxes, Plus, PenSquare } from 'lucide-react';
+import { Package, RefreshCw, Search, ExternalLink, Boxes, Plus, PenSquare, FileText } from 'lucide-react';
 import { Pagination } from '@o4o/operator-ux-core';
 import { fetchHandledProducts, type HandledProduct } from '../../api/handledProducts';
 import { colors } from '../../styles/theme';
@@ -22,6 +22,8 @@ import { ImportB2cDescriptionModal, type ImportB2cProduct } from './ImportB2cDes
 import { FileDown } from 'lucide-react';
 // WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1: O4O 표준 상품 검색·선택·등록 모달
 import { AddO4oStandardProductModal } from './AddO4oStandardProductModal';
+// WO-O4O-STORE-HANDLED-PRODUCT-DESCRIPTION-SELECTION-V1: 사용 설명서 선택 모달
+import { DescriptionSelectionModal, type DescriptionSelectionTarget } from './DescriptionSelectionModal';
 
 type SourceFilter = 'all' | 'listing' | 'local';
 const PAGE_LIMIT = 20;
@@ -124,6 +126,8 @@ export default function StoreHandledProductsPage() {
   const [importProduct, setImportProduct] = useState<ImportB2cProduct | null>(null);
   // WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1: O4O 표준 상품 검색·선택·등록 모달
   const [showAddO4oModal, setShowAddO4oModal] = useState(false);
+  // WO-O4O-STORE-HANDLED-PRODUCT-DESCRIPTION-SELECTION-V1: 사용 설명서 선택 모달(listing 전용)
+  const [descTarget, setDescTarget] = useState<DescriptionSelectionTarget | null>(null);
 
   // 콘텐츠 만들기 — 기존 자료함 작성 화면으로 이동(URL 기반 전달 → 새로고침 안전).
   const goCreateContent = useCallback(
@@ -302,6 +306,19 @@ export default function StoreHandledProductsPage() {
                           O4O 상세설명 가져오기
                         </button>
                       )}
+                      {/* WO-O4O-STORE-HANDLED-PRODUCT-DESCRIPTION-SELECTION-V1:
+                          O4O 기반 제품(listing)만 — 사용 설명서(STORE/SUPPLIER_STORE) 선택 */}
+                      {it.sourceType === 'listing' && (
+                        <button
+                          type="button"
+                          onClick={() => setDescTarget({ listingId: it.sourceId, name: it.name })}
+                          style={styles.descBtn}
+                          aria-label="사용 설명서 선택"
+                        >
+                          <FileText size={12} />
+                          사용 설명서
+                        </button>
+                      )}
                       <button
                         type="button"
                         onClick={() => goCreateContent({ sourceType: it.sourceType, sourceId: it.sourceId, name: it.name })}
@@ -346,6 +363,13 @@ export default function StoreHandledProductsPage() {
         open={showAddO4oModal}
         onClose={() => setShowAddO4oModal(false)}
         onRegistered={reload}
+      />
+
+      {/* WO-O4O-STORE-HANDLED-PRODUCT-DESCRIPTION-SELECTION-V1: 사용 설명서 선택 모달 */}
+      <DescriptionSelectionModal
+        open={!!descTarget}
+        product={descTarget}
+        onClose={() => setDescTarget(null)}
       />
 
       {/* WO-O4O-KPA-O4O-B2C-DESCRIPTION-COPY-TO-STORE-CONTENT-V1: O4O 상세설명 가져오기 모달 */}
@@ -408,6 +432,8 @@ const styles: Record<string, CSSProperties> = {
   createContentBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 10px', background: colors.white, border: `1px solid ${colors.primary}`, borderRadius: '6px', fontSize: '12px', color: colors.primary, cursor: 'pointer', whiteSpace: 'nowrap' },
   // WO-O4O-KPA-O4O-B2C-DESCRIPTION-COPY-TO-STORE-CONTENT-V1
   importBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 10px', background: '#F0FDF4', border: '1px solid #86EFAC', borderRadius: '6px', fontSize: '12px', color: '#15803D', cursor: 'pointer', whiteSpace: 'nowrap' },
+  // WO-O4O-STORE-HANDLED-PRODUCT-DESCRIPTION-SELECTION-V1
+  descBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 10px', background: '#EFF6FF', border: '1px solid #93C5FD', borderRadius: '6px', fontSize: '12px', color: '#1D4ED8', cursor: 'pointer', whiteSpace: 'nowrap' },
   countBtn: { display: 'inline-flex', padding: 0, border: 'none', background: 'transparent', cursor: 'pointer' },
   empty: { padding: '40px 12px', textAlign: 'center', color: colors.neutral400, fontSize: '13px' },
   footnote: { marginTop: '14px', fontSize: '12px', color: colors.neutral500, lineHeight: 1.7, padding: '10px 12px', background: colors.neutral100, borderRadius: '6px' },

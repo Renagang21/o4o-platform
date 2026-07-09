@@ -308,6 +308,24 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
       }
 
       logger.info(`[StoreProductLibrary] Listing created (master): org=${organizationId}, master=${masterId}`);
+
+      // WO-O4O-STORE-HANDLED-PRODUCT-DESCRIPTION-SELECTION-V1:
+      //   신규 등록 시 STORE canonical 설명서를 자동 선택(있으면). SUPPLIER_STORE 는 매장 경영자가 수동 선택.
+      //   등록 성공을 선택 insert 에 결합하지 않는다(실패해도 등록은 유지 — 경고만).
+      try {
+        await dataSource.query(
+          `INSERT INTO store_product_description_selections
+             (id, organization_id, master_id, organization_product_listing_id, description_id, description_type, is_enabled, created_at, updated_at)
+           SELECT gen_random_uuid(), $1, $2, $3, spd.id, spd.description_type, true, now(), now()
+             FROM shared_product_descriptions spd
+            WHERE spd.master_id = $2 AND spd.status = 'canonical' AND spd.description_type = 'STORE' AND spd.deleted_at IS NULL
+           ON CONFLICT (organization_id, master_id, description_type, description_id) WHERE deleted_at IS NULL DO NOTHING`,
+          [organizationId, masterId, insertResult[0].id],
+        );
+      } catch (selErr) {
+        logger.warn(`[StoreProductLibrary] STORE description auto-select skipped: ${(selErr as Error).message}`);
+      }
+
       return res.status(201).json({ success: true, data: insertResult[0] });
     }
   }));
