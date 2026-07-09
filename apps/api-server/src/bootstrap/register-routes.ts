@@ -517,6 +517,16 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Product Master Audit Log routes:', auditLogError);
     }
 
+    // 24-e2i-2. Register Product Description/QR Summary (read-only) — 제품 리스트 설명서(KO/ZH) 상태 배치 조회
+    //         (WO-O4O-PRODUCT-LIST-DESCRIPTION-QR-ACTIONS-V1). QR 은 deferred(자리만).
+    try {
+      const { createProductDescriptionQrSummaryController } = await import('../modules/neture/controllers/product-description-qr-summary.controller.js');
+      app.use('/api/v1/admin/o4o-product-db/masters', createProductDescriptionQrSummaryController(dataSource));
+      logger.info('✅ Product Description/QR Summary (read-only) routes registered at /api/v1/admin/o4o-product-db/masters/description-qr-summary');
+    } catch (descQrSummaryError) {
+      logger.error('Failed to register Product Description/QR Summary routes:', descQrSummaryError);
+    }
+
     // 24-e2i. Register Product Master Image action routes (admin write — 이미지 추가 / 대표 지정)
     //         (WO-O4O-ADMIN-O4O-PRODUCT-IMAGE-ACTION-V1, Phase 1)
     try {

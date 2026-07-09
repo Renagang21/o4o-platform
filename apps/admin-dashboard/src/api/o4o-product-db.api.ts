@@ -617,6 +617,37 @@ export async function getDescriptionStatusSummary(): Promise<Record<string, numb
   return res.data?.data ?? {};
 }
 
+// ─── Description/QR Summary (제품 리스트 badge/action, read-only) ──────────────
+// WO-O4O-PRODUCT-LIST-DESCRIPTION-QR-ACTIONS-V1
+// mount: GET /api/v1/admin/o4o-product-db/masters/description-qr-summary?ids=uuid,uuid,...
+// ko/zh 는 SPD(master-scope) language 기준. QR 은 master↔QR 직접 매핑 부재로 deferred(자리만).
+
+export interface DescriptionLangState {
+  exists: boolean;
+  status: string | null; // canonical | needs_review | candidate | null
+  descriptionId: string | null;
+}
+
+export interface ProductDescriptionQrSummary {
+  masterId: string;
+  descriptions: { ko: DescriptionLangState; zh: DescriptionLangState };
+  qr: { exists: false; deferred: true };
+  needsReview: boolean;
+}
+
+/** master id 배열 → masterId 키 맵. 빈 배열이면 요청하지 않음. 최대 100건. */
+export async function getProductDescriptionQrSummary(
+  masterIds: string[],
+): Promise<Record<string, ProductDescriptionQrSummary>> {
+  const ids = Array.from(new Set(masterIds.filter(Boolean))).slice(0, 100);
+  if (ids.length === 0) return {};
+  const res = await authClient.api.get<{
+    success: boolean;
+    data: Record<string, ProductDescriptionQrSummary>;
+  }>(`/admin/o4o-product-db/masters/description-qr-summary?ids=${encodeURIComponent(ids.join(','))}`);
+  return res.data?.data ?? {};
+}
+
 // ─── Description Dashboard (설명서 운영, read-only) ────────────────────────────
 // WO-O4O-ADMIN-DESCRIPTION-DASHBOARD-V1
 // mount: GET /api/v1/admin/o4o-product-db/description-dashboard

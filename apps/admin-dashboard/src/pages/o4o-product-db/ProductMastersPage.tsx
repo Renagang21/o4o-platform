@@ -17,10 +17,25 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Search, Eye } from 'lucide-react';
+import { Search, Eye, FileText } from 'lucide-react';
 import { BaseTable, RowActionMenu, ActionBar } from '@o4o/ui';
 import type { O4OColumn } from '@o4o/ui';
-import { listProductMasters, ProductMasterRow, ProductMasterListResult } from '@/api/o4o-product-db.api';
+import {
+  listProductMasters,
+  ProductMasterRow,
+  ProductMasterListResult,
+  getProductDescriptionQrSummary,
+  ProductDescriptionQrSummary,
+  DescriptionLangState,
+} from '@/api/o4o-product-db.api';
+
+// WO-O4O-PRODUCT-LIST-DESCRIPTION-QR-ACTIONS-V1: 언어별 설명서 상태 → badge 톤
+function langTone(state?: DescriptionLangState): { label: string; cls: string } {
+  if (!state || !state.exists) return { label: '없음', cls: 'bg-gray-100 text-gray-500' };
+  if (state.status === 'needs_review') return { label: '검토', cls: 'bg-amber-100 text-amber-700' };
+  if (state.status === 'canonical') return { label: '있음', cls: 'bg-green-100 text-green-700' };
+  return { label: '초안', cls: 'bg-blue-100 text-blue-700' }; // candidate
+}
 
 const PAGE_SIZE_OPTIONS = [20, 50, 100];
 const DEFAULT_LIMIT = 50;
@@ -46,6 +61,8 @@ export default function ProductMastersPage() {
   const [softLoading, setSoftLoading] = useState(false);  // 기존 데이터 유지한 채 갱신 중
   const [error, setError] = useState<string | null>(null);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+  // WO-O4O-PRODUCT-LIST-DESCRIPTION-QR-ACTIONS-V1: masterId → 설명서(KO/ZH)/QR 상태 요약 (read-only)
+  const [descQrMap, setDescQrMap] = useState<Record<string, ProductDescriptionQrSummary>>({});
 
   // 페이지 캐시 (key=`${q}|${limit}|${page}`). q/limit 변경 시 초기화.
   const cacheRef = useRef<Map<string, ProductMasterListResult>>(new Map());
@@ -119,6 +136,17 @@ export default function ProductMastersPage() {
         setSoftLoading(false);
       });
   }, [q, limit, page, keyFor, prefetchNext]);
+
+  // 현재 페이지 제품들의 설명서(KO/ZH)/QR 상태 배치 조회 (read-only, 실패해도 목록은 정상)
+  useEffect(() => {
+    const ids = rows.map((r) => r.id);
+    if (ids.length === 0) return;
+    let cancelled = false;
+    getProductDescriptionQrSummary(ids)
+      .then((m) => { if (!cancelled) setDescQrMap((prev) => ({ ...prev, ...m })); })
+      .catch(() => { /* badge 미표시로 진행 */ });
+    return () => { cancelled = true; };
+  }, [rows]);
 
   // 검색 debounce → 적용 검색어 commit + page reset
   useEffect(() => {
@@ -212,18 +240,51 @@ export default function ProductMastersPage() {
           : <span className="inline-block px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 text-xs">없음</span>,
     },
     {
+      // WO-O4O-PRODUCT-LIST-DESCRIPTION-QR-ACTIONS-V1
+      // 설명서 상태(KO/ZH). ko/zh = SPD(master-scope) language 기준. 매장 다국어 콘텐츠는 store-scope(후속).
+      key: 'descStatus',
+      header: '설명서',
+      align: 'center',
+      width: 132,
+      render: (_, r) => {
+        const s = descQrMap[r.id];
+        const ko = langTone(s?.descriptions.ko);
+        const zh = langTone(s?.descriptions.zh);
+        return (
+          <div className="flex items-center justify-center gap-1">
+            <span className={`inline-block px-1.5 py-0.5 rounded-full text-xs ${ko.cls}`}>KO {ko.label}</span>
+            <span className={`inline-block px-1.5 py-0.5 rounded-full text-xs ${zh.cls}`}>ZH {zh.label}</span>
+          </div>
+        );
+      },
+    },
+    {
       key: '_actions',
       header: '',
       width: 56,
       system: 'last',
       align: 'center',
-      render: (_, r) => (
-        <RowActionMenu
-          actions={[
-            { key: 'view', label: '상세 보기', icon: <Eye size={14} />, onClick: () => navigate(r.id) },
-          ]}
-        />
-      ),
+      render: (_, r) => {
+        const s = descQrMap[r.id];
+        const viewId = s?.descriptions.ko.descriptionId || s?.descriptions.zh.descriptionId || null;
+        return (
+          <RowActionMenu
+            actions={[
+              { key: 'view', label: '상세 보기', icon: <Eye size={14} />, onClick: () => navigate(r.id) },
+              {
+                key: 'desc',
+                label: '설명 보기',
+                icon: <FileText size={14} />,
+                hidden: !viewId,
+                onClick: () => navigate(`/admin/o4o-product-db/review/${viewId}`),
+              },
+              // QR 연결/생성은 admin QR 화면·master↔QR 매핑 부재로 이번 WO 범위 밖(자리만).
+              // 실제 연결은 WO-O4O-PRODUCT-UNIT-MULTILINGUAL-DESCRIPTION-QR-LINK-V1.
+              { key: 'qr', label: 'QR 연결 (후속 WO)', disabled: true, onClick: () => {} },
+            ]}
+          />
+        );
+      },
     },
   ];
 
