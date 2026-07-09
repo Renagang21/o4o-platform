@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MAN POWER POTEN 맨 파워 포텐 — 男性健康功能食品</title>
+<style>
+  :root{
+    --bg:#14110b; --bg2:#1d1811; --panel:#211b12; --ink:#efe7d6; --sub:#c7bca4;
+    --gold:#c9a24b; --gold-2:#e7c66e; --amber:#d5641f; --amber-2:#e07a34;
+    --line:rgba(201,162,75,.22);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:linear-gradient(180deg,#191309,#14110b 45%);
+    color:var(--ink); font-size:16px; line-height:1.85;
+    font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:480px;margin:0 auto;padding:0 20px 60px}
+
+  .hero{padding:36px 20px 30px;text-align:center;color:#fff;
+    background:radial-gradient(130% 110% at 50% 0%, #2a2113, #17120a 72%);
+    border-radius:0 0 20px 20px;position:relative;overflow:hidden;
+    border-bottom:1px solid var(--line)}
+  .hero::after{content:"";position:absolute;left:-10%;right:-10%;bottom:-40px;height:90px;
+    background:radial-gradient(120% 100% at 50% 0%, rgba(231,198,110,.22), transparent 70%)}
+  .scan{display:inline-block;font-size:13.5px;letter-spacing:.18em;color:var(--gold-2);
+    border:1px solid rgba(231,198,110,.4);border-radius:999px;padding:8px 18px;margin-bottom:12px}
+  .origin{display:inline-block;font-size:12.5px;letter-spacing:.1em;color:#1a140a;
+    background:linear-gradient(180deg,var(--gold-2),var(--gold));border-radius:5px;padding:3px 11px;font-weight:700;margin-bottom:14px}
+  .catch{font-size:15.5px;letter-spacing:.04em;color:var(--amber-2);margin:0 0 8px;font-weight:600}
+  .title{font-size:34px;font-weight:800;line-height:1.2;margin:0;color:#fff;letter-spacing:.04em}
+  .title small{display:block;font-size:15px;font-weight:400;color:#cbb98d;
+    letter-spacing:.06em;margin-top:8px}
+  .subline{color:var(--gold-2);font-size:15.5px;margin:14px 0 0;font-weight:600;letter-spacing:.02em}
+  .badge{display:inline-block;margin-top:16px;font-size:13px;letter-spacing:.03em;color:#1a140a;
+    background:linear-gradient(180deg,var(--gold-2),var(--gold));border-radius:6px;padding:6px 14px;font-weight:700}
+
+  h2{font-size:14px;letter-spacing:.14em;color:var(--gold);text-align:center;
+    margin:46px 0 18px;font-weight:700}
+
+  .card{background:var(--panel);border:1px solid var(--line);
+    border-left:3px solid var(--gold);border-radius:14px;padding:20px 18px 18px;margin:13px 0;
+    box-shadow:0 6px 18px rgba(0,0,0,.35)}
+  .card .row{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:9px}
+  .tag{display:inline-block;font-size:13px;letter-spacing:.03em;color:#1a140a;
+    background:linear-gradient(180deg,var(--gold-2),var(--gold));border-radius:6px;
+    padding:4px 12px;font-weight:700}
+  .tag.plain{background:transparent;color:var(--sub);border:1px solid var(--line)}
+  .amt{font-size:13.5px;color:var(--amber-2);font-weight:700;letter-spacing:.02em}
+  .card h3{margin:0 0 8px;font-size:20px;color:#fff;font-weight:800}
+  .card p{margin:0;color:var(--sub);font-size:15.5px}
+  .card .who1{display:block;margin-top:9px;color:var(--gold-2);font-size:14.5px}
+
+  .syn{background:linear-gradient(180deg,#241c11,#1c160d);border:1px solid var(--line);
+    border-radius:16px;padding:24px 20px;margin:16px 0 0;text-align:center}
+  .syn .k{font-size:13px;letter-spacing:.14em;color:var(--gold);margin-bottom:12px}
+  .syn p{margin:0;color:var(--ink);font-size:16px;line-height:1.9}
+  .syn b{color:var(--gold-2)}
+
+  ul.who{list-style:none;padding:0;margin:0}
+  ul.who li{position:relative;padding:12px 0 12px 24px;color:var(--ink);font-size:16px;
+    border-bottom:1px solid var(--line)}
+  ul.who li:last-child{border-bottom:0}
+  ul.who li::before{content:"";position:absolute;left:3px;top:20px;width:8px;height:8px;
+    border-radius:50%;background:var(--gold)}
+
+  .gift{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:22px 18px;margin:18px 0 0;color:var(--sub);font-size:16px;text-align:center}
+  .gift b{color:var(--gold-2)}
+
+  .spec{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:24px 0 0;
+    color:var(--sub);font-size:14.5px}
+  .spec span{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:9px 15px}
+  .notice{margin:14px 0 0;text-align:center;font-size:14px;color:var(--amber-2);font-weight:600}
+
+  .cta{margin:44px 0 0;background:linear-gradient(180deg,#241c11,#181209);
+    border:1px solid var(--line);border-radius:16px;padding:28px 20px;text-align:center;color:#fff}
+  .cta .k{font-size:13.5px;letter-spacing:.16em;color:var(--gold);margin-bottom:12px}
+  .cta h3{margin:0 0 11px;font-size:21px;color:#fff;font-weight:800}
+  .cta p{margin:0;color:var(--sub);font-size:15.5px}
+  .cta .pill{display:inline-block;margin-top:18px;font-size:15px;color:#1a140a;
+    background:linear-gradient(180deg,var(--gold-2),var(--gold));font-weight:700;border-radius:999px;padding:13px 24px}
+  .foot{text-align:center;color:#8f8365;font-size:12.5px;margin-top:28px;letter-spacing:.05em}
+</style>
+</head>
+<body>
+  <div class="wrap" style="padding-top:0">
+  <header class="hero">
+    <div class="scan">扫码查看</div><br>
+    <span class="origin">美国原产 · 100% 美国制造</span>
+    <p class="catch">为男性的每一天，注入能量</p>
+    <h1 class="title">MAN POWER POTEN<small>맨 파워 포텐</small></h1>
+    <p class="subline">锯棕榈 &times; 二十八烷醇 &times; 南瓜籽油</p>
+    <div class="badge">100% 美国制造 · HACCP · 韩国健康功能食品</div>
+  </header>
+
+  <main>
+    <h2>五大核心原料，一目了然</h2>
+
+    <div class="card">
+      <div class="row"><span class="tag">前列腺健康</span><span class="amt">410 mg</span></div>
+      <h3>锯棕榈果提取物</h3>
+      <p>在韩国被食品药品安全处认证为有助于维持前列腺健康的功能性原料。</p>
+      <span class="who1">→ 适合中年后关注男性状态的人</span>
+    </div>
+
+    <div class="card">
+      <div class="row"><span class="tag">耐力</span><span class="amt">50 mg</span></div>
+      <h3>含二十八烷醇油脂</h3>
+      <p>被认为有助于增强耐力的功能性原料。</p>
+      <span class="who1">→ 适合活动量大或容易感到疲惫的人</span>
+    </div>
+
+    <div class="card">
+      <div class="row"><span class="tag plain">含有原料</span><span class="amt">500 mg</span></div>
+      <h3>西洋南瓜（葫芦）籽油</h3>
+      <p>在男性健康管理产品中广泛使用的原料，本品含 500mg。</p>
+    </div>
+
+    <div class="card">
+      <div class="row"><span class="tag plain">传统原料</span><span class="amt">100 mg</span></div>
+      <h3>葫芦巴籽提取物</h3>
+      <p>自古沿用至今的植物性原料。</p>
+    </div>
+
+    <div class="card">
+      <div class="row"><span class="tag">免疫 · 能量</span></div>
+      <h3>维生素D · 锌 · 维生素B族</h3>
+      <p>锌有助于正常的免疫功能与细胞分裂，并通过抗氧化作用保护细胞免受有害氧的侵害；维生素B族（B1·B2·B6·B12）有助于碳水化合物与能量代谢、体内能量生成，以及蛋白质与氨基酸的利用。</p>
+    </div>
+
+    <h2>组合，胜于各自相加</h2>
+    <div class="syn">
+      <div class="k">一粒之中，四重照顾</div>
+      <p>将前列腺健康（<b>锯棕榈</b>）· 耐力（<b>二十八烷醇</b>）· 能量代谢（<b>维生素B族</b>）· 细胞保护（<b>锌</b>）
+      集于<b>每日一粒</b>，把过去分开补充的男性管理合而为一。</p>
+    </div>
+
+    <h2>适合这些人</h2>
+    <ul class="who">
+      <li>中年后关注男性状态 · 活力的人</li>
+      <li>每天早晨感到沉重、耐力下降的人</li>
+      <li>希望把多种营养品简化为每日一粒的人</li>
+    </ul>
+
+    <div class="gift">
+      <b>送礼自用，皆宜</b><br>
+      100% 美国制造 · HACCP 认证的高端男性健康功能食品。
+      既适合送给父亲 · 丈夫，也适合作为自己每日一粒的习惯。
+    </div>
+
+    <div class="spec">
+      <span>1,300mg × 60粒 × 3盒</span>
+      <span>共 234g</span>
+      <span>每日 1 次 1 粒</span>
+    </div>
+    <p class="notice">本产品仅限门店销售（不可网络销售）</p>
+
+    <section class="cta">
+      <div class="k">店内咨询</div>
+      <h3>确认是否适合您</h3>
+      <p>是否适合，会因正在服用的药物 · 健康状况而因人而异。请将本页面出示给<b style="color:var(--gold-2)">店内专业人员</b>，为您一同确认适合的方式。</p>
+      <span class="pill">请将此页面出示给店内专业人员</span>
+    </section>
+
+    <p class="foot">MAN POWER POTEN 맨 파워 포텐 · 韩国健康功能食品</p>
+  </main>
+  </div>
+</body>
+</html>
