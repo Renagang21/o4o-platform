@@ -31,10 +31,14 @@ import logger from '../../../utils/logger.js';
  * DB 원시 status 값·의미는 변경하지 않는다 (기존 status 파라미터도 그대로 유지).
  */
 const GROUPED_STATUS_MAP: Record<string, ProductCandidateStatus[]> = {
-  pending: ['pending'],
-  review_required: ['reviewing'],
+  // WO-O4O-ADMIN-PRODUCT-CANDIDATE-FILTER-MINIMAL-CLEANUP-V1:
+  // 등록 흐름 3단계. before_registration = pending+reviewing (아직 기본상품 DB 미반영).
+  before_registration: ['pending', 'reviewing'],
   registered: ['matched', 'linked', 'approved_new_master'],
   rejected: ['rejected', 'merged', 'archived'],
+  // 이전(V2) 그룹 키 — API 호환 위해 유지 (일반 UI 는 위 3개만 사용)
+  pending: ['pending'],
+  review_required: ['reviewing'],
 };
 
 const OPERATOR_ROLES = [

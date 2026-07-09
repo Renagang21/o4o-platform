@@ -26,20 +26,17 @@ const SOURCE_LABEL_PRESETS = [
   'MFDS_QUASI_DRUG_PERMIT',
 ];
 
-// WO-O4O-ADMIN-PRODUCT-CANDIDATE-STATUS-SIMPLIFY-V2
-// 운영자는 "O4O 기본 상품 DB 반영 여부"만 알면 되므로 원시 8개 status 를 4개 그룹으로 묶어 노출한다.
-// (전체 = 필터 없음). 원시 status 값은 DB·API 에서 그대로 유지되고, 화면만 그룹으로 표시.
-//   registered = matched + linked + approved_new_master  (기존 연결/신규 승격 구분 없이 "등록 완료")
-//   rejected   = rejected + merged + archived            (파이프라인 종료 상태 "제외")
+// WO-O4O-ADMIN-PRODUCT-CANDIDATE-FILTER-MINIMAL-CLEANUP-V1
+// 공공데이터 후보 화면은 "매칭 검토" 화면이 아니라 "O4O 기본상품 DB 등록 흐름 확인" 화면이다.
+// 따라서 상태 필터를 등록 흐름 3단계(+전체)로만 노출한다. 원시 status 값·API 는 그대로 유지.
+//   before_registration = pending + reviewing            (아직 기본상품 DB 미반영)
+//   registered          = matched + linked + approved_new_master  (기본상품 DB 반영됨)
+//   rejected(제외)      = rejected + merged + archived    (넣지 않기로/종료 처리)
+// matchStatus(매칭) 필터는 이 화면에서 제거 (API 파라미터는 호환 유지, UI 만 미노출).
 const GROUPED_STATUS_OPTIONS: { value: string; label: string }[] = [
-  { value: 'pending', label: '대기' },
-  { value: 'review_required', label: '검토 필요' },
+  { value: 'before_registration', label: '등록 전' },
   { value: 'registered', label: '등록 완료' },
   { value: 'rejected', label: '제외' },
-];
-const MATCH_STATUS_OPTIONS = [
-  'unmatched', 'exact_identifier_match', 'possible_identifier_match',
-  'possible_text_match', 'conflict', 'no_match', 'manually_matched',
 ];
 const SOURCE_TYPE_OPTIONS = [
   'supplier_web', 'pharmacy_web', 'store_web', 'mobile_draft',
@@ -53,9 +50,8 @@ export default function ProductCandidatesPage() {
   const [rows, setRows] = useState<ProductCandidateRow[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
-  // WO-O4O-ADMIN-PRODUCT-CANDIDATE-STATUS-SIMPLIFY-V2: 화면 상태 필터는 groupedStatus 로 통일
+  // WO-O4O-ADMIN-PRODUCT-CANDIDATE-STATUS-SIMPLIFY-V2 / FILTER-MINIMAL-CLEANUP-V1: 상태 필터는 groupedStatus 로 통일
   const [groupedStatus, setGroupedStatus] = useState(searchParams.get('groupedStatus') || '');
-  const [matchStatus, setMatchStatus] = useState(searchParams.get('matchStatus') || '');
   const [sourceType, setSourceType] = useState(searchParams.get('sourceType') || '');
   // committed(쿼리에 반영되는) source_label / search 와 입력 버퍼 분리 — 타이핑마다 조회 방지
   const [sourceLabel, setSourceLabel] = useState(searchParams.get('sourceLabel') || '');
@@ -75,7 +71,6 @@ export default function ProductCandidatesPage() {
     try {
       const res = await listProductCandidates({
         groupedStatus: groupedStatus || undefined,
-        matchStatus: matchStatus || undefined,
         sourceType: sourceType || undefined,
         sourceLabel: sourceLabel || undefined,
         search: search || undefined,
@@ -91,7 +86,7 @@ export default function ProductCandidatesPage() {
     } finally {
       setLoading(false);
     }
-  }, [groupedStatus, matchStatus, sourceType, sourceLabel, search, page]);
+  }, [groupedStatus, sourceType, sourceLabel, search, page]);
 
   useEffect(() => {
     load();
@@ -99,15 +94,16 @@ export default function ProductCandidatesPage() {
 
   // URL query sync (공유/새로고침/뒤로가기 유지) — 기본값은 생략
   useEffect(() => {
+    // 일반 UI 는 matchStatus/groupedMatchStatus 를 생성하지 않는다. 기존 URL 에 남아 있어도
+    // 여기서 q 에 싣지 않으므로 다음 replace 시 자동 제거된다(화면은 깨지지 않음). WO-...-FILTER-MINIMAL-CLEANUP-V1
     const q: Record<string, string> = {};
     if (groupedStatus) q.groupedStatus = groupedStatus;
-    if (matchStatus) q.matchStatus = matchStatus;
     if (sourceType) q.sourceType = sourceType;
     if (sourceLabel) q.sourceLabel = sourceLabel;
     if (search) q.search = search;
     if (page > 1) q.page = String(page);
     setSearchParams(q, { replace: true });
-  }, [groupedStatus, matchStatus, sourceType, sourceLabel, search, page, setSearchParams]);
+  }, [groupedStatus, sourceType, sourceLabel, search, page, setSearchParams]);
 
   const totalPages = Math.max(1, Math.ceil(total / LIMIT));
 
@@ -235,10 +231,7 @@ export default function ProductCandidatesPage() {
           <option value="">전체</option>
           {GROUPED_STATUS_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
-        <select value={matchStatus} onChange={onFilterChange(setMatchStatus)} className="border border-gray-300 rounded px-3 py-2 text-sm">
-          <option value="">전체 매칭</option>
-          {MATCH_STATUS_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}
-        </select>
+        {/* WO-...-FILTER-MINIMAL-CLEANUP-V1: 매칭(matchStatus) 필터는 등록 흐름 확인 화면에 불필요 → 제거 */}
         <select value={sourceType} onChange={onFilterChange(setSourceType)} className="border border-gray-300 rounded px-3 py-2 text-sm">
           <option value="">전체 source</option>
           {SOURCE_TYPE_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}
