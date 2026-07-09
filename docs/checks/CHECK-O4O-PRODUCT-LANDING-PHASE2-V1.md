@@ -68,14 +68,29 @@ smoke 발급 landing 2건(젤-씨과립·본프로탑정)은 실제 유효 데�
   - `/p/8zip5i6y4caj`(젤-씨과립, 설명 無) → 제품정보 + "상세 설명을 준비 중입니다." placeholder ✅
   - (앱 전역 `/auth/me` 401 은 페이지와 무관)
 
-## 6. Phase 3 — 전 제품 일괄 발급 스크립트 (dry-run 완료, apply 승인 대기)
+## 6. Phase 3 — 전 제품 일괄 발급 (DONE, 사용자 승인 후 실행 · 2026-07-09)
 
-- `apps/api-server/src/scripts/productmaster-landing-bulk-apply.ts` (build 제외). 기본 **dry-run(write 0)**, `--apply --batch-id <id>` 명시해야 실제 발급. batch INSERT·재개 가능·public_key 충돌 재시도·metadata.batchId(rollback 식별).
-- **dry-run 실측 (2026-07-09, write 0)**: totalMasters **198,389** · alreadyHasLanding **2** · **toCreate 198,387**.
-- **실제 apply(198,387 row write)는 사용자 명시 승인 후.** 발급 명령: `... --apply --batch-id landing-seed-20260709 [--batch-size 1000]`. rollback: `UPDATE product_landings SET deleted_at=now() WHERE metadata->>'batchId'='<id>'`.
+- 스크립트: `apps/api-server/src/scripts/productmaster-landing-bulk-apply.ts` (build 제외). dry-run 기본·`--apply --batch-id` 게이트·batch INSERT·재개 가능·public_key 충돌 재시도·metadata.batchId.
+- 실행: canary `--limit 1000` 검증(무결성 PASS) → 전량 `--apply --batch-id landing-seed-20260709 --batch-size 1000`.
+- **결과**: createdThisRun 197,387(+canary 1,000) · **totalLandingsNow 198,389 = totalMasters 198,389 → 100% 커버리지**.
+
+### 최종 무결성 (prod read-only)
+
+| 항목 | 값 |
+| --- | --- |
+| 전체 Landing (active) | **198,389** |
+| distinct public_key / distinct master | 198,389 / 198,389 (완전 1:1) |
+| master 당 Landing 중복 | **0** |
+| public_key 중복 | **0** |
+| **Landing 없는 master** | **0** (전 제품 커버) |
+| batchId=landing-seed-20260709 | 198,387 (+ smoke 수동 2 = 198,389) |
+| 공개 read 검증 | 7mqxhjkz944f(슬리세틴캡슐) → 200, placeholder ✅ |
+
+- **rollback**: `UPDATE product_landings SET deleted_at=now() WHERE metadata->>'batchId'='landing-seed-20260709' AND deleted_at IS NULL` (기존 데이터·ProductMaster 무영향).
+- QR 이미지 저장 0 · ProductMaster 변경 0 · 설명 자동생성 0. 모든 제품 = `neture.co.kr/p/{public_key}` 대표 QR/Landing 성립.
 
 ## 7. 다음
 
-- **Phase 3 apply** (승인 시): 전 198,387 master Landing 발급 → 모든 제품 대표 QR(`/p/{key}`) 성립.
-- Phase 4 on-create(신규 master 자동) · Phase 5 콘텐츠 구성(공급자·매장·관련) · Phase 6 노출 게이트(행정처분/회수).
-- 설명 채움 = 기존 설명 Dashboard/Queue 트랙(별개).
+- **Phase 4** on-create(신규 master 생성 시 Landing 자동 발급) · **Phase 5** Landing 콘텐츠 구성(공급자·매장·관련 블록·content_config) · **Phase 6** 노출 게이트(행정처분/회수 → exposure_state).
+- **QR 이미지/인쇄**: `/p/{key}` URL 을 QR 로 동적 생성(기존 qr-print 계열 재사용) — 운영 화면 연결은 후속.
+- 설명 채움 = 기존 설명 Dashboard/Queue 트랙(별개, 89% placeholder 를 실제 설명으로).
