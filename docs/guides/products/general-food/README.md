@@ -5,7 +5,9 @@
 의약품·건강기능식품·의료기기·의약외품에 속하지 않는 **일반식품(기타가공품, 액상 건강즙, 흑염소 진액, 홍삼/한방 진액 등)** 의 **매장 내(STORE) 콘텐츠 작성 기준**. 공통 규칙([DOCUMENT-INDEX](../../common/DOCUMENT-INDEX.md))을 상속하고, 제품 단위 패턴([O4O-PRODUCT-UNIT-DESCRIPTION-AGENT-GUIDE-V1](../O4O-PRODUCT-UNIT-DESCRIPTION-AGENT-GUIDE-V1.md))을 따른다.
 
 > **초판 근거**: 제품 이미지 1건(담록원 "청정 한방 흑염소 진액 골드") 실제 처리 점검(2026-07-09)에서 도출.
-> 샘플 산출물: [한국어](samples/damrokwon-heukyeomso-jinaek-gold.html) · [중국어(홍금 프리미엄 톤)](samples/damrokwon-heukyeomso-jinaek-gold.zh.html)
+> 샘플 산출물:
+> - 흑염소 진액(다크+골드, 전통 보양 톤): [한국어](samples/damrokwon-heukyeomso-jinaek-gold.html) · [중국어(홍금)](samples/damrokwon-heukyeomso-jinaek-gold.zh.html)
+> - 리포좀 콜라겐(핑크 뷰티 톤, 이너뷰티): [한국어](samples/elamor-liposome-collagen-glutathione.html)
 >
 > **작업 단계 = "내용 확인"만.** 사용자는 내용(한국어 기준본)만 확인하고, **디자인 적용·저장은 자동**이다(디자인 검토 단계 없음). 다국어는 한국어 확정 후 대상 언어를 문의받아 진행하며, 외국어·현지 디자인은 판단 대상이 아니라 저장한다.
 
