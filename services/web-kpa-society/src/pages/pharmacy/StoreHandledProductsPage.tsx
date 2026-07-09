@@ -11,7 +11,7 @@
 
 import { useEffect, useState, useCallback, type CSSProperties } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Package, RefreshCw, Search, ExternalLink, Boxes, Plus, PenSquare, FileText, Languages } from 'lucide-react';
+import { Package, RefreshCw, Search, ExternalLink, Boxes, Plus, PenSquare, Languages } from 'lucide-react';
 import { Pagination } from '@o4o/operator-ux-core';
 import { fetchHandledProducts, type HandledProduct } from '../../api/handledProducts';
 import { colors } from '../../styles/theme';
@@ -22,8 +22,6 @@ import { ImportB2cDescriptionModal, type ImportB2cProduct } from './ImportB2cDes
 import { FileDown } from 'lucide-react';
 // WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1: O4O 표준 상품 검색·선택·등록 모달
 import { AddO4oStandardProductModal } from './AddO4oStandardProductModal';
-// WO-O4O-STORE-HANDLED-PRODUCT-DESCRIPTION-SELECTION-V1: 사용 설명서 선택 모달
-import { DescriptionSelectionModal, type DescriptionSelectionTarget } from './DescriptionSelectionModal';
 // WO-O4O-PRODUCT-QR-CONTENT-FLOW-MINIMAL-V1: 상품별 다국어 QR 콘텐츠 진입 + 연결 상태 배지
 import { getMlcSummaryMap, type StoreMlcSummaryItem } from '../../api/multilingualProductContentStore';
 
@@ -128,8 +126,6 @@ export default function StoreHandledProductsPage() {
   const [importProduct, setImportProduct] = useState<ImportB2cProduct | null>(null);
   // WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1: O4O 표준 상품 검색·선택·등록 모달
   const [showAddO4oModal, setShowAddO4oModal] = useState(false);
-  // WO-O4O-STORE-HANDLED-PRODUCT-DESCRIPTION-SELECTION-V1: 사용 설명서 선택 모달(listing 전용)
-  const [descTarget, setDescTarget] = useState<DescriptionSelectionTarget | null>(null);
   // WO-O4O-PRODUCT-QR-CONTENT-FLOW-MINIMAL-V1: 상품별 다국어 QR 콘텐츠 연결 상태 요약(배지). listing/local 각각.
   const [mlcListing, setMlcListing] = useState<Map<string, StoreMlcSummaryItem>>(new Map());
   const [mlcLocal, setMlcLocal] = useState<Map<string, StoreMlcSummaryItem>>(new Map());
@@ -342,19 +338,6 @@ export default function StoreHandledProductsPage() {
                           O4O 상세설명 가져오기
                         </button>
                       )}
-                      {/* WO-O4O-STORE-HANDLED-PRODUCT-DESCRIPTION-SELECTION-V1:
-                          O4O 기반 제품(listing)만 — 사용 설명서(STORE/SUPPLIER_STORE) 선택 */}
-                      {it.sourceType === 'listing' && (
-                        <button
-                          type="button"
-                          onClick={() => setDescTarget({ listingId: it.sourceId, name: it.name })}
-                          style={styles.descBtn}
-                          aria-label="사용 설명서 선택"
-                        >
-                          <FileText size={12} />
-                          사용 설명서
-                        </button>
-                      )}
                       <button
                         type="button"
                         onClick={() => goCreateContent({ sourceType: it.sourceType, sourceId: it.sourceId, name: it.name })}
@@ -427,13 +410,6 @@ export default function StoreHandledProductsPage() {
         onRegistered={reload}
       />
 
-      {/* WO-O4O-STORE-HANDLED-PRODUCT-DESCRIPTION-SELECTION-V1: 사용 설명서 선택 모달 */}
-      <DescriptionSelectionModal
-        open={!!descTarget}
-        product={descTarget}
-        onClose={() => setDescTarget(null)}
-      />
-
       {/* WO-O4O-KPA-O4O-B2C-DESCRIPTION-COPY-TO-STORE-CONTENT-V1: O4O 상세설명 가져오기 모달 */}
       <ImportB2cDescriptionModal
         open={!!importProduct}
@@ -495,7 +471,6 @@ const styles: Record<string, CSSProperties> = {
   // WO-O4O-KPA-O4O-B2C-DESCRIPTION-COPY-TO-STORE-CONTENT-V1
   importBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 10px', background: '#F0FDF4', border: '1px solid #86EFAC', borderRadius: '6px', fontSize: '12px', color: '#15803D', cursor: 'pointer', whiteSpace: 'nowrap' },
   // WO-O4O-STORE-HANDLED-PRODUCT-DESCRIPTION-SELECTION-V1
-  descBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 10px', background: '#EFF6FF', border: '1px solid #93C5FD', borderRadius: '6px', fontSize: '12px', color: '#1D4ED8', cursor: 'pointer', whiteSpace: 'nowrap' },
   // WO-O4O-PRODUCT-QR-CONTENT-FLOW-MINIMAL-V1
   mlcBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 10px', background: '#F5F3FF', border: '1px solid #C4B5FD', borderRadius: '6px', fontSize: '12px', color: '#6D28D9', cursor: 'pointer', whiteSpace: 'nowrap' },
   mlcDot: { display: 'inline-flex', alignItems: 'center', padding: '1px 6px', fontSize: '10px', fontWeight: 600, borderRadius: '999px', whiteSpace: 'nowrap' },
