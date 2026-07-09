@@ -118,19 +118,29 @@ source: (유지)
 | api-server typecheck (변경 파일) | ✅ PASS (기존 `src/scripts/drug-otc-*` 무관 에러는 선존재) |
 | DB write / migration / candidate 변경 | 0 / 0 / 0 |
 
-### 배포 / smoke
+### 배포 (Cloud Run, `5ffde7577`)
 
-_(배포 후 채움)_
+| 워크플로우 | 결과 |
+| ---- | ---- |
+| Deploy Admin Dashboard | ✅ success (run 29022423098) |
+| Deploy API Server | ✅ success (run 29022422756) |
 
-```text
-[ ] Deploy Admin + API success
-[ ] 상태 select 4개(전체/등록 전/등록 완료/제외)
-[ ] 매칭 select 미노출
-[ ] 등록 전 → pending + reviewing
-[ ] 등록 완료 → matched + linked + approved_new_master
-[ ] 제외 → rejected + merged + archived
-[ ] groupedStatus query 동작, matchStatus query 미생성
-```
+### Browser smoke (production, 2026-07-09) — ✅ PASS
+
+`admin.neture.co.kr` 로그인 → client-side `/admin` → SPA 이동으로 `/admin/o4o-product-db/candidates`. Playwright headless.
+
+| 항목 | 결과 |
+| ---- | ---- |
+| 상단 select 개수 2개 (상태 + source, 매칭 select 제거됨) | ✅ |
+| 상태 select 4개 (전체 / 등록 전 / 등록 완료 / 제외) | ✅ 정확 일치 |
+| 매칭 필터 옵션 부재 (`unmatched`/`전체 매칭` 없음) | ✅ |
+| 각 그룹 선택 → `groupedStatus=` 사용, `matchStatus=` 미생성 | ✅ before_registration/registered/rejected 전부 |
+| URL `?groupedStatus=` 반영 | ✅ |
+| 등록 전 = pending + reviewing | ✅ grouped 126,897 = 126,897 + 0 |
+| 등록 완료 = matched + linked + approved_new_master | ✅ grouped 251,815 |
+| 제외 = rejected + merged + archived | ✅ grouped 15,779 |
+| 기존 `matchStatus` API 호환 (`matchStatus=unmatched` → 200 success) | ✅ |
+| console error / network 4xx·5xx | ✅ 0 / 0 |
 
 ---
 
@@ -142,5 +152,5 @@ _(배포 후 채움)_
 - [x] 기존 API 호환성 유지
 - [x] typecheck 통과
 - [x] CHECK 문서 작성
-- [ ] commit / push
-- [ ] 배포 후 smoke
+- [x] commit / push (`5ffde7577`)
+- [x] 배포 (Admin + API) success + 배포 후 smoke PASS
