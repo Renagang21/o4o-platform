@@ -19,6 +19,7 @@ import {
   getProductMasterAuditLog, ProductMasterAuditLog,
   uploadProductMasterImage, setProductMasterPrimaryImage,
   listProductMasterImages, hideProductMasterImage, restoreProductMasterImage, ProductMasterImageAdminRow,
+  getProductLandingQr, ProductLandingQr,
 } from '@/api/o4o-product-db.api';
 
 export default function ProductMasterDetailPage() {
@@ -225,6 +226,9 @@ export default function ProductMasterDetailPage() {
             <Field label="규제 구분" value={row.regulatoryType} />
             <Field label="MFDS 검증 여부" value={row.isMfdsVerified ? '검증됨' : '미검증'} />
           </Section>
+
+          {/* 제품 QR / 랜딩 (WO-O4O-PRODUCT-LANDING-ARCHITECTURE-V1) */}
+          {id && <ProductQrSection masterId={id} />}
 
           {/* 식별자 — barcode(primary) + ProductIdentifier 목록 (read-only) */}
           <PanelSection title={`식별자 (${row.identifiers?.length ?? 0})`}>
@@ -810,4 +814,69 @@ const IDENTIFIER_TYPE_LABEL: Record<string, string> = {
 };
 function identifierTypeLabel(type: string): string {
   return IDENTIFIER_TYPE_LABEL[type] ?? type;
+}
+
+// ─── 제품 QR / 랜딩 섹션 (WO-O4O-PRODUCT-LANDING-ARCHITECTURE-V1) ────────────────
+// 제품 대표 QR(동적 생성·비저장) + 공개 랜딩 URL(neture.co.kr/p/{key}). 모든 제품이 보유.
+function ProductQrSection({ masterId }: { masterId: string }) {
+  const [qr, setQr] = useState<ProductLandingQr | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    setLoading(true); setError(null);
+    getProductLandingQr(masterId, 320)
+      .then((d) => { if (alive) setQr(d); })
+      .catch((e: any) => { if (alive) setError(e?.response?.data?.error || 'QR 을 불러오지 못했습니다'); })
+      .finally(() => { if (alive) setLoading(false); });
+    return () => { alive = false; };
+  }, [masterId]);
+
+  const copy = () => {
+    if (!qr) return;
+    navigator.clipboard?.writeText(qr.url).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1500); });
+  };
+  const downloadSvg = () => {
+    if (!qr) return;
+    const blob = new Blob([qr.svg], { type: 'image/svg+xml' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `qr-${qr.publicKey}.svg`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+
+  return (
+    <div className="bg-white border border-gray-200 rounded-lg p-4">
+      <h3 className="text-sm font-semibold text-gray-700 mb-3">제품 QR · 랜딩</h3>
+      {loading ? (
+        <div className="text-sm text-gray-400">QR 불러오는 중…</div>
+      ) : error ? (
+        <div className="text-sm text-red-600">{error}</div>
+      ) : qr ? (
+        <div className="flex flex-col sm:flex-row gap-4 items-start">
+          <div
+            className="w-40 h-40 shrink-0 border border-gray-200 rounded bg-white p-2 [&>svg]:w-full [&>svg]:h-full"
+            dangerouslySetInnerHTML={{ __html: qr.svg }}
+          />
+          <div className="min-w-0 flex-1">
+            <div className="text-xs text-gray-500 mb-1">공개 랜딩 주소</div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <a href={qr.url} target="_blank" rel="noopener noreferrer" className="text-sm text-admin-blue hover:underline break-all">{qr.url}</a>
+            </div>
+            <div className="flex gap-2 mt-3 flex-wrap">
+              <button onClick={copy} className="px-3 py-1.5 border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-50">{copied ? '복사됨 ✓' : '주소 복사'}</button>
+              <a href={qr.url} target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-50">랜딩 열기</a>
+              <button onClick={downloadSvg} className="px-3 py-1.5 border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-50">QR 내려받기(SVG)</button>
+            </div>
+            <p className="text-xs text-gray-400 mt-3 leading-relaxed">
+              이 QR 은 제품 대표 랜딩(<span className="font-mono">/p/{qr.publicKey}</span>)으로 연결됩니다. 스캔 시 제품 설명(있으면)·기본정보가 표시되며, QR 이미지는 저장하지 않고 매번 생성됩니다.
+            </p>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
 }

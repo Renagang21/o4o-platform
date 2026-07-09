@@ -70,6 +70,22 @@ export function createAdminProductLandingController(dataSource: DataSource): Rou
     }
   });
 
+  // 제품 QR(SVG) + 공개 URL. Landing 없으면 idempotent 발급. QR 이미지 비저장(동적 생성).
+  router.get('/by-master/:masterId/qr', async (req: Request, res: Response) => {
+    try {
+      const size = Math.min(Math.max(parseInt(String(req.query.size ?? '320'), 10) || 320, 96), 1024);
+      const data = await service.getLandingQr(req.params.masterId, size);
+      res.json({ success: true, data });
+    } catch (err: any) {
+      if (String(err?.message) === 'MASTER_NOT_FOUND') {
+        res.status(404).json({ success: false, error: '존재하지 않는 기본상품입니다', code: 'MASTER_NOT_FOUND' });
+        return;
+      }
+      logger.error('[product-landing:admin] qr failed:', err);
+      res.status(500).json({ success: false, error: 'QR 생성에 실패했습니다', code: 'LANDING_QR_FAILED' });
+    }
+  });
+
   router.post('/', async (req: Request, res: Response) => {
     try {
       const masterId = (req.body?.masterId ?? '').trim();

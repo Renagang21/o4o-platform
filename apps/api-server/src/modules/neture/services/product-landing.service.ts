@@ -14,10 +14,16 @@
 
 import type { DataSource } from 'typeorm';
 import { randomBytes } from 'crypto';
+import { generateQrSvg } from '../../../services/qr-print.service.js';
 
 const KEY_ALPHABET = 'abcdefghijkmnpqrstuvwxyz23456789'; // 혼동 문자(0,1,l,o) 제외
 const KEY_LENGTH = 12;
 const PLACEHOLDER_TEXT = '상세 설명을 준비 중입니다.';
+/** 제품 Landing 공개 도메인 (전역 제품 자산 → neture.co.kr). */
+const LANDING_ORIGIN = (process.env.NETURE_PUBLIC_ORIGIN || 'https://neture.co.kr').replace(/\/$/, '');
+export function productLandingUrl(publicKey: string): string {
+  return `${LANDING_ORIGIN}/p/${publicKey}`;
+}
 
 export interface ProductLandingRow {
   id: string;
@@ -114,6 +120,17 @@ export class ProductLandingService {
       }
     }
     throw new Error('PUBLIC_KEY_GENERATION_FAILED');
+  }
+
+  /**
+   * master 의 Landing QR(SVG) + 공개 URL. Landing 없으면 idempotent 발급(모든 master 커버 보장).
+   * QR 이미지는 저장하지 않고 런타임 동적 생성(F12 #4).
+   */
+  async getLandingQr(masterId: string, size = 320): Promise<{ publicKey: string; url: string; svg: string; created: boolean }> {
+    const { landing, created } = await this.mintForMaster(masterId, 'admin-qr-view');
+    const url = productLandingUrl(landing.publicKey);
+    const svg = await generateQrSvg(url, size);
+    return { publicKey: landing.publicKey, url, svg, created };
   }
 
   /** 공개 Landing read model. 없으면 null. 노출 게이트 차단 시 blocked=true(콘텐츠 미포함). */

@@ -731,6 +731,23 @@ export async function getDescriptionDashboard(): Promise<DescriptionDashboard> {
   return res.data.data;
 }
 
+// ─── Product Landing QR (제품 대표 QR/랜딩, WO-O4O-PRODUCT-LANDING-ARCHITECTURE-V1) ──
+// mount: GET /api/v1/admin/o4o-product-db/product-landings/by-master/:masterId/qr
+
+export interface ProductLandingQr {
+  publicKey: string;
+  url: string;   // neture.co.kr/p/{publicKey}
+  svg: string;   // QR SVG(동적 생성, 비저장)
+  created: boolean;
+}
+
+export async function getProductLandingQr(masterId: string, size = 320): Promise<ProductLandingQr> {
+  const res = await authClient.api.get<{ success: boolean; data: ProductLandingQr }>(
+    `/admin/o4o-product-db/product-landings/by-master/${encodeURIComponent(masterId)}/qr?size=${size}`,
+  );
+  return res.data.data;
+}
+
 // ─── Description Review Queue (설명서 검토 Queue, Group 중심, read-only) ────────
 // WO-O4O-ADMIN-DESCRIPTION-REVIEW-QUEUE-V1
 // mount: GET /api/v1/admin/o4o-product-db/description-review-queue (+ /filter-options, /:draftId)
