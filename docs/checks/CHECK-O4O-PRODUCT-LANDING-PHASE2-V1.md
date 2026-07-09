@@ -59,8 +59,23 @@ smoke 발급 landing 2건(젤-씨과립·본프로탑정)은 실제 유효 데�
 - 의약품 의료 내용 자동 생성 **없음**(Landing 은 컨테이너, placeholder 는 중립 문구).
 - 노출 게이트(exposure_state) 존재 — 행정처분/회수 연동은 Phase 6.
 
-## 5. 다음 (롤아웃)
+## 5. Phase 2b — 프론트 `/p/{key}` 공개 페이지 (DONE, smoke PASS)
 
-- **Phase 2b (즉시 다음)**: 프론트 `neture.co.kr/p/{key}` 공개 페이지(제품정보+설명/준비중+언어탭) — 스캔 시 실제 화면.
-- Phase 3: 전 ProductMaster Landing/QR 일괄 발급(dry-run→승인→batchId). Phase 4 on-create. Phase 5 콘텐츠 구성. Phase 6 노출 게이트.
+- `services/web-neture/src/pages/ProductLandingPage.tsx` + route `/p/:publicKey`. 공개 API 호출, 제품 기본정보 + 설명(canonical HTML) / 없으면 "상세 설명을 준비 중입니다." placeholder + 노출 게이트(blocked) 안내. 무인증.
+- 배포: web-services `52d017274` success.
+- **프로덕션 smoke PASS** (neture.co.kr):
+  - `/p/43hjycpdhkb7`(본프로탑정, 설명 有) → 제품정보(의약품·규격·바코드) + canonical 설명 전체(효능·복용·주의·성분기준) 렌더 ✅
+  - `/p/8zip5i6y4caj`(젤-씨과립, 설명 無) → 제품정보 + "상세 설명을 준비 중입니다." placeholder ✅
+  - (앱 전역 `/auth/me` 401 은 페이지와 무관)
+
+## 6. Phase 3 — 전 제품 일괄 발급 스크립트 (dry-run 완료, apply 승인 대기)
+
+- `apps/api-server/src/scripts/productmaster-landing-bulk-apply.ts` (build 제외). 기본 **dry-run(write 0)**, `--apply --batch-id <id>` 명시해야 실제 발급. batch INSERT·재개 가능·public_key 충돌 재시도·metadata.batchId(rollback 식별).
+- **dry-run 실측 (2026-07-09, write 0)**: totalMasters **198,389** · alreadyHasLanding **2** · **toCreate 198,387**.
+- **실제 apply(198,387 row write)는 사용자 명시 승인 후.** 발급 명령: `... --apply --batch-id landing-seed-20260709 [--batch-size 1000]`. rollback: `UPDATE product_landings SET deleted_at=now() WHERE metadata->>'batchId'='<id>'`.
+
+## 7. 다음
+
+- **Phase 3 apply** (승인 시): 전 198,387 master Landing 발급 → 모든 제품 대표 QR(`/p/{key}`) 성립.
+- Phase 4 on-create(신규 master 자동) · Phase 5 콘텐츠 구성(공급자·매장·관련) · Phase 6 노출 게이트(행정처분/회수).
 - 설명 채움 = 기존 설명 Dashboard/Queue 트랙(별개).
