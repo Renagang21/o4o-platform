@@ -18,7 +18,7 @@
 → 설명서를 QR-code로 사용할 수 있는 상태로 연결
 ```
 
-**결론 요약**: 5개 단계 중 **검색·신규등록·설명서 저장 3개 축은 코드가 이미 완비**되어 있다. 비어 있는 링크는 딱 3곳 — ① OCR 텍스트 → 구조화 제품 필드 파싱, ② 설명서 → 매장용 안내물 디자인 조판, ③ 설명서(SPD) → QR 연결. 이 중 **③(QR 연결)이 스키마 변경 없이 가장 저렴하게 닫을 수 있는 첫 구현 지점**이다.
+**결론 요약**: 5개 단계 중 **검색·신규등록·설명서 저장 3개 축은 코드가 이미 완비**되어 있다. 비어 있는 링크는 딱 3곳 — ① OCR 텍스트 → 구조화 제품 필드 파싱, ② 설명서 → 매장용 안내물 디자인 조판, ③ 설명서(SPD) → QR 연결. **목적 정렬상 첫 구현 지점은 ①(OCR → 제품 확인 → 설명서 제작 대상으로 넘기기)**이다. ③(QR)은 스키마 변경 없이 가장 저렴하지만 목적상 "첫 성과"가 아니라 **설명서가 만들어진 뒤의 연결 작업**이므로 4단계로 둔다(§6).
 
 ---
 
@@ -109,18 +109,34 @@
 
 ---
 
-## 6. 바로 시작할 구현 WO 제안
+## 6. 바로 시작할 구현 WO 제안 (목적 정렬 우선순위)
 
-> **원칙**: 검색·등록·설명서 저장 3축은 재사용, 신규 코드는 "비어 있는 링크"에만. F12(ProductMaster 무변경 / QR 비저장) 및 copy-on-import 불변식 준수. **스키마 변경 없는 경로 우선.**
+> **원칙**: 검색·등록·설명서 저장 3축은 재사용, 신규 코드는 "비어 있는 링크"에만. F12(ProductMaster 무변경 / QR 비저장) 및 copy-on-import 불변식 준수. 스키마 변경 없는 경로 우선.
+>
+> **우선순위 정렬(2026-07-09 정정)**: 이번 트랙의 목적은 `제품 이미지 → 기존 제품 확인 → 설명서 제작`이다. 따라서 **첫 작업은 QR이 아니라 "이미지/OCR → 제품 확인 → 설명서 제작 대상으로 넘기기"**다. QR은 기술적으로 가장 싸지만(스키마 무변경) 목적상 "첫 성과"가 아니라 **설명서가 실제로 만들어진 뒤의 연결 작업**이다.
 
-**- 1단계 (QR 링크 브리지 — 가장 저렴한 첫 성과):**
-`WO-O4O-PRODUCT-DESCRIPTION-QR-LINK-MINIMAL-V1` — SPD canonical을 공개 렌더하는 read-only 경로(신규 alias 또는 기존 storefront 노출 재사용)를 확정하고, 그 URL을 `landing_type='link'`로 `store_qr_codes`에 연결하는 최소 브리지. 스키마 변경 없음. 산출: 제품 상세/설명서 화면의 "QR 만들기" 액션 1개.
+| 순서 | WO | 판단 |
+|:--:|----|------|
+| **1** | `WO-O4O-PRODUCT-OCR-TO-DESCRIPTION-WORKFLOW-START-V1` (= OCR-TO-CANDIDATE-FIELD-ADAPTER) | **먼저 해야 함** |
+| **2** | 제품 설명서 생성·저장 WO (한국어 기준본) | 그 다음 핵심 |
+| **3** | `WO-O4O-STORE-DESCRIPTION-LEAFLET-TEMPLATE-V1` | 설명서 품질 단계 |
+| **4** | `WO-O4O-PRODUCT-DESCRIPTION-QR-LINK-MINIMAL-V1` | 설명서가 생긴 뒤 연결 |
+| **5** | 다국어 설명서 WO | 한국어 기준본 이후 |
 
-**- 2단계 (이미지 → 제품 필드 어댑터):**
-`WO-O4O-PRODUCT-OCR-TO-CANDIDATE-FIELD-ADAPTER-V1` — `ProductOcrService.getCombinedOcrText`(store-ai, [product-ocr.service.ts](../../apps/api-server/src/modules/store-ai/services/product-ocr.service.ts) — 이미 배선됨) 출력을 파싱해 제품명/제조사/바코드 후보 필드로 구조화하고, `computeMatch` 검색 → no_match 시 `ProductCandidate` 생성으로 잇는 어댑터. 비-drug 후보 승격 게이트 확장 포함 검토.
+**- 1단계 (이미지/OCR → 제품 확인 → 설명서 제작 대상으로 넘기기):**
+`WO-O4O-PRODUCT-OCR-TO-DESCRIPTION-WORKFLOW-START-V1` — `ProductOcrService.getCombinedOcrText`(store-ai, [product-ocr.service.ts](../../apps/api-server/src/modules/store-ai/services/product-ocr.service.ts) — 이미 배선됨) 출력 또는 붙여넣은 OCR 텍스트에서 제품명/브랜드/바코드/제품유형/내용량/제조원 등을 **구조화 추출**(사진·OCR에 없는 정보는 생성 안 함) → `computeMatch` 검색(바코드→식별자→이름 순) → 판정(`existing_product_confirmed` / `existing_product_candidates` / `new_product_candidate_required` / `insufficient_information` / `regulated_review_required`) → 기존 Master면 ID 확정, 없고 정보 충분하면 `ProductCandidate` 생성. **의약품·의약외품·의료기기·화장품·인허가 확인 필요 제품은 자동 등록 보류(review_required).** 다음 WO에서 설명서 제작으로 이어지도록 데이터만 정리. QR·다국어·설명서 디자인은 이 WO에서 하지 않음.
+
+**- 2단계 (제품 설명서 생성·저장 — 한국어 기준본):**
+1단계에서 확정된 ProductMaster(또는 후보)에 대해 SPD(`shared_product_descriptions`)에 한국어 canonical 설명서를 생성·저장. write API(`createCandidate`/`setCanonical`) 재사용. grounding 원칙 준수(근거 없으면 HOLD).
 
 **- 3단계 (매장용 안내물 디자인 템플릿):**
-`WO-O4O-STORE-DESCRIPTION-LEAFLET-TEMPLATE-V1` — SPD `content`(HTML)를 입력으로 하는 전문 매장용 안내물 렌더 템플릿을 store 노출 계층 위에 신설. (1·2단계 완료 후, 품질 단계)
+`WO-O4O-STORE-DESCRIPTION-LEAFLET-TEMPLATE-V1` — SPD `content`(HTML)를 입력으로 하는 전문 매장용 안내물 렌더 템플릿을 store 노출 계층 위에 신설. (설명서 품질 단계)
+
+**- 4단계 (설명서 QR 링크 브리지):**
+`WO-O4O-PRODUCT-DESCRIPTION-QR-LINK-MINIMAL-V1` — 설명서가 실제로 만들어진 뒤, SPD canonical 공개 URL을 `landing_type='link'`로 `store_qr_codes`에 연결하는 최소 브리지(스키마 무변경).
+
+**- 5단계 (사용자 지정 다국어 설명서):**
+한국어 기준본 확정 후 다국어 확장.
 
 ---
 
