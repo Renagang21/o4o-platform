@@ -4,7 +4,7 @@
  * WO-O4O-ADMIN-PUBLIC-PRODUCT-DB-READONLY-SKELETON-V1
  * WO-O4O-ADMIN-O4O-PRODUCT-STANDARD-LIST-PATTERN-V1
  *   O4O 표준 목록 패턴: BaseTable + O4OColumn + RowActionMenu + ActionBar(선택) + 서버 페이지네이션 + URL sync.
- *   필터(status/matchStatus/sourceType/sourceLabel/search)·서버 페이지네이션은 기존과 동일.
+ *   필터(status/search)·서버 페이지네이션. source(sourceType/sourceLabel)·matchStatus 는 UI 미노출(데이터·API 보존).
  *   표준 컴포넌트 적용 + row action/선택 구조만 추가. 후보 승격/삭제는 이 화면에서 하지 않는다(구조만).
  *
  * mutation 없음. 후보 API 는 all=true(platform cross-service) 로 조회한다.
@@ -19,13 +19,6 @@ import { listProductCandidates, ProductCandidateRow, bulkCandidateAction } from 
 // WO-O4O-ADMIN-PRODUCT-CANDIDATE-CONFLICT-ACTIONS-V1: 충돌 상세 + 처리 드로어
 import CandidateConflictDrawer from './CandidateConflictDrawer';
 
-// 공공 seed 라벨 프리셋 (external_api 후보 분리용 — 직접 입력도 가능)
-const SOURCE_LABEL_PRESETS = [
-  'MFDS_HEALTH_FUNCTIONAL_FOOD',
-  'MFDS_EASY_DRUG_INFO',
-  'MFDS_QUASI_DRUG_PERMIT',
-];
-
 // WO-O4O-ADMIN-PRODUCT-CANDIDATE-FILTER-MINIMAL-CLEANUP-V1
 // 공공데이터 후보 화면은 "매칭 검토" 화면이 아니라 "O4O 기본상품 DB 등록 흐름 확인" 화면이다.
 // 따라서 상태 필터를 등록 흐름 3단계(+전체)로만 노출한다. 원시 status 값·API 는 그대로 유지.
@@ -33,14 +26,13 @@ const SOURCE_LABEL_PRESETS = [
 //   registered          = matched + linked + approved_new_master  (기본상품 DB 반영됨)
 //   rejected(제외)      = rejected + merged + archived    (넣지 않기로/종료 처리)
 // matchStatus(매칭) 필터는 이 화면에서 제거 (API 파라미터는 호환 유지, UI 만 미노출).
+// WO-O4O-ADMIN-PRODUCT-CANDIDATES-SOURCE-UI-HIDE-V1
+//   source(sourceType/sourceLabel) 는 운영자 관리 기준이 아니므로 화면에서 비노출한다.
+//   데이터·API·DB 의 source 는 이력으로 보존하고, UI(필터·컬럼·enum) 만 제거한다.
 const GROUPED_STATUS_OPTIONS: { value: string; label: string }[] = [
   { value: 'before_registration', label: '등록 전' },
   { value: 'registered', label: '등록 완료' },
   { value: 'rejected', label: '제외' },
-];
-const SOURCE_TYPE_OPTIONS = [
-  'supplier_web', 'pharmacy_web', 'store_web', 'mobile_draft',
-  'csv_import', 'xlsx_import', 'operator_import', 'external_api', 'unknown',
 ];
 
 const LIMIT = 20;
@@ -52,11 +44,8 @@ export default function ProductCandidatesPage() {
   const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
   // WO-O4O-ADMIN-PRODUCT-CANDIDATE-STATUS-SIMPLIFY-V2 / FILTER-MINIMAL-CLEANUP-V1: 상태 필터는 groupedStatus 로 통일
   const [groupedStatus, setGroupedStatus] = useState(searchParams.get('groupedStatus') || '');
-  const [sourceType, setSourceType] = useState(searchParams.get('sourceType') || '');
-  // committed(쿼리에 반영되는) source_label / search 와 입력 버퍼 분리 — 타이핑마다 조회 방지
-  const [sourceLabel, setSourceLabel] = useState(searchParams.get('sourceLabel') || '');
+  // committed(쿼리에 반영되는) search 와 입력 버퍼 분리 — 타이핑마다 조회 방지
   const [search, setSearch] = useState(searchParams.get('search') || '');
-  const [sourceLabelInput, setSourceLabelInput] = useState(sourceLabel);
   const [searchInput, setSearchInput] = useState(search);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -71,8 +60,6 @@ export default function ProductCandidatesPage() {
     try {
       const res = await listProductCandidates({
         groupedStatus: groupedStatus || undefined,
-        sourceType: sourceType || undefined,
-        sourceLabel: sourceLabel || undefined,
         search: search || undefined,
         page,
         limit: LIMIT,
@@ -86,7 +73,7 @@ export default function ProductCandidatesPage() {
     } finally {
       setLoading(false);
     }
-  }, [groupedStatus, sourceType, sourceLabel, search, page]);
+  }, [groupedStatus, search, page]);
 
   useEffect(() => {
     load();
@@ -96,14 +83,14 @@ export default function ProductCandidatesPage() {
   useEffect(() => {
     // 일반 UI 는 matchStatus/groupedMatchStatus 를 생성하지 않는다. 기존 URL 에 남아 있어도
     // 여기서 q 에 싣지 않으므로 다음 replace 시 자동 제거된다(화면은 깨지지 않음). WO-...-FILTER-MINIMAL-CLEANUP-V1
+    // source(sourceType/sourceLabel) 는 이 화면에서 사용하지 않으므로 q 에 싣지 않는다.
+    // 기존 URL 에 남아 있어도 다음 replace 시 자동 제거된다. WO-...-SOURCE-UI-HIDE-V1
     const q: Record<string, string> = {};
     if (groupedStatus) q.groupedStatus = groupedStatus;
-    if (sourceType) q.sourceType = sourceType;
-    if (sourceLabel) q.sourceLabel = sourceLabel;
     if (search) q.search = search;
     if (page > 1) q.page = String(page);
     setSearchParams(q, { replace: true });
-  }, [groupedStatus, sourceType, sourceLabel, search, page, setSearchParams]);
+  }, [groupedStatus, search, page, setSearchParams]);
 
   const totalPages = Math.max(1, Math.ceil(total / LIMIT));
 
@@ -113,20 +100,17 @@ export default function ProductCandidatesPage() {
     setter(e.target.value);
   };
 
-  // source_label + search 는 폼 제출(Enter / 버튼) 시에만 commit
+  // search 는 폼 제출(Enter / 버튼) 시에만 commit
   const onSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setPage(1);
     setSelectedKeys(new Set());
-    setSourceLabel(sourceLabelInput.trim());
     setSearch(searchInput.trim());
   };
   const onSearchReset = () => {
     setPage(1);
     setSelectedKeys(new Set());
-    setSourceLabelInput('');
     setSearchInput('');
-    setSourceLabel('');
     setSearch('');
   };
 
@@ -178,16 +162,6 @@ export default function ProductCandidatesPage() {
     { key: 'candidateManufacturer', header: '제조/업체', render: (_, r) => r.candidateManufacturer || '—' },
     { key: 'candidateCategory', header: '분류', render: (_, r) => r.candidateCategory || '—' },
     {
-      key: 'sourceType',
-      header: 'source',
-      render: (_, r) => (
-        <div>
-          <div>{r.sourceType}</div>
-          {r.sourceLabel && <div className="text-xs text-gray-400">{r.sourceLabel}</div>}
-        </div>
-      ),
-    },
-    {
       key: 'identifier',
       header: '식별자',
       render: (_, r) =>
@@ -232,23 +206,10 @@ export default function ProductCandidatesPage() {
           {GROUPED_STATUS_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
         {/* WO-...-FILTER-MINIMAL-CLEANUP-V1: 매칭(matchStatus) 필터는 등록 흐름 확인 화면에 불필요 → 제거 */}
-        <select value={sourceType} onChange={onFilterChange(setSourceType)} className="border border-gray-300 rounded px-3 py-2 text-sm">
-          <option value="">전체 source</option>
-          {SOURCE_TYPE_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}
-        </select>
+        {/* WO-...-SOURCE-UI-HIDE-V1: source(sourceType)·source_label 필터는 운영 기준 아님 → 비노출 */}
 
-        {/* source_label(공공 seed 라벨) + 검색 — 폼 제출 시에만 commit */}
+        {/* 검색 — 폼 제출 시에만 commit */}
         <form onSubmit={onSearchSubmit} className="flex flex-wrap gap-2 items-center">
-          <input
-            list="source-label-presets"
-            value={sourceLabelInput}
-            onChange={(e) => setSourceLabelInput(e.target.value)}
-            placeholder="source_label (예: MFDS_HEALTH_FUNCTIONAL_FOOD)"
-            className="border border-gray-300 rounded px-3 py-2 text-sm w-72"
-          />
-          <datalist id="source-label-presets">
-            {SOURCE_LABEL_PRESETS.map((o) => <option key={o} value={o} />)}
-          </datalist>
           <input
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
@@ -256,7 +217,7 @@ export default function ProductCandidatesPage() {
             className="border border-gray-300 rounded px-3 py-2 text-sm w-72"
           />
           <button type="submit" className="px-3 py-2 border border-gray-300 rounded text-sm bg-gray-50 hover:bg-gray-100">검색</button>
-          {(sourceLabel || search) && (
+          {search && (
             <button type="button" onClick={onSearchReset} className="px-3 py-2 text-sm text-gray-500 underline">초기화</button>
           )}
         </form>
