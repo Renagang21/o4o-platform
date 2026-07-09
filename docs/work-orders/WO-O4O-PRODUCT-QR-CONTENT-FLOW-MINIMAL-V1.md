@@ -70,17 +70,16 @@
 
 ---
 
-## 4. ★ 결정 필요 (실행 전 사용자 확정) — QR 개수 정책
+## 4. QR 개수 정책 — **B-1 확정** (2026-07-09)
 
-| 옵션 | 내용 | 정합성 |
-|------|------|------|
-| **B-1. 하나의 QR + 언어 탭** (선행 IR 권장·현 시스템 설계) | QR 1개 → publicKey 랜딩 → published locale 자동 탭(한/중). `store_qr_codes` lang 컬럼 없음과 부합 | **현 구조와 완전 정합. 프론트 위주.** |
-| **B-2. 언어별 QR 2개** (사용자 명시 요구) | 한국어 QR + 중국어 QR 각각 `store_qr_codes` row 생성. 각 QR `landingType='link'` + `...:publicKey?locale=ko` / `?locale=zh` | 저장은 가능하나 "하나의 QR" 설계 철학과 다름. QR row 2개 관리 |
+**결정: B-1 = 하나의 QR + 언어 탭.** (사용자 확정)
 
-- 사용자 원문 요구는 **B-2**("한국어 QR-code 생성·등록 / 중국어 QR-code 생성·등록").
-- 그러나 현 시스템·선행 IR은 **B-1**을 최소·정합안으로 권장(publicKey 랜딩이 언어 탭을 자동 처리).
-- **B-2 도 신규 스키마 없이 구현 가능**(같은 publicKey에 `?locale=` 를 붙인 2개 링크 QR). 단 QR 관리 화면에 상품당 QR 2개가 생기는 UX 감수.
-- ⇒ **실행 착수 전 B-1 / B-2 중 확정 필요.** (권장: B-1로 시작, 인쇄물 분리 필요 시 B-2 병행.)
+- QR **1개** → `landingType='link'` + `landingTargetId = ${origin}/multilingual-products/:publicKey`.
+- publicKey 랜딩(`MultilingualProductPublicLandingPage`)이 published locale(한/중)을 **언어 탭으로 자동 노출**. 단일 언어면 탭 없이 바로 표시, 없는 언어는 fallback.
+- `store_qr_codes` 에 lang 컬럼 없음과 완전 정합. **신규 스키마·migration 0.**
+- 아쿠아셀 적용: 한 상품(그룹)에 한국어 page + 중국어 page 저장 → **QR 1개 발급** → 스캔 시 언어 탭.
+
+> (참고) 대안 B-2(언어별 QR 2개, `?locale=` 링크)는 미채택. 향후 인쇄물을 언어별로 분리 배포할 필요가 생기면 같은 publicKey에 `?locale=` 를 붙인 추가 QR을 스키마 변경 없이 발급하는 방식으로 병행 가능(별도 판단).
 
 ---
 
@@ -101,7 +100,7 @@
 - [ ] 상품 기준 콘텐츠 target 생성 가능 (target_kind + target_id)
 - [ ] 한국어/중국어 콘텐츠 분리 저장 가능 (page 2 row)
 - [ ] HTML 디자인 저장 가능 (`content_format='html'`)
-- [ ] QR 생성 가능 (B-1: 1개 / B-2: 2개 — §4 확정에 따름)
+- [ ] QR 생성 가능 (B-1 확정: 상품당 QR **1개** → 언어 탭 랜딩)
 - [ ] `/qr/{slug}` 로 각각 접근 가능 (모바일 렌더 확인)
 - [ ] 상품 관리 화면에서 QR 확인 가능
 - [ ] 기존 상품 데이터·분류를 임의 변경하지 않음
