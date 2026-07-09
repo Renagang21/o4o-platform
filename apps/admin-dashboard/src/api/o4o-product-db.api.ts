@@ -617,6 +617,89 @@ export async function getDescriptionStatusSummary(): Promise<Record<string, numb
   return res.data?.data ?? {};
 }
 
+// ─── Description Dashboard (설명서 운영, read-only) ────────────────────────────
+// WO-O4O-ADMIN-DESCRIPTION-DASHBOARD-V1
+// mount: GET /api/v1/admin/o4o-product-db/description-dashboard
+
+export interface DescriptionDashboardCategory {
+  key: string;
+  label: string;
+  active: boolean;
+  spd: number;
+  drafts: number;
+  canonical: number;
+  needsReview: number;
+}
+
+export interface DescriptionDashboardGroupRow {
+  groupKey: string;
+  ingredient: string | null;
+  representativeTitle: string | null;
+  representativeExists: boolean;
+  masterTotal: number | null;
+  otc: number | null;
+  spdMasters: number | null;
+  canonical: boolean;
+  reviewStatuses: string[];
+  draftCount: number;
+  updatedAt: string | null;
+}
+
+export interface DescriptionDashboardCountEntry {
+  key: string;
+  count: number;
+}
+
+export interface DescriptionDashboardReviewer {
+  reviewerId: string | null;
+  reviewerLabel: string;
+  approved: number;
+  pending: number;
+  rejected: number;
+  total: number;
+}
+
+export interface DescriptionDashboardRecent {
+  kind: 'spd' | 'draft';
+  id: string;
+  title: string | null;
+  state: string;
+  source: string | null;
+  updatedAt: string | null;
+}
+
+export interface DescriptionDashboard {
+  summary: {
+    canonical: number;
+    needsReview: number;
+    draft: number;
+    approved: number;
+    rejected: number;
+    other: number;
+    spdTotal: number;
+    draftTotal: number;
+    lastUpdatedAt: string | null;
+  };
+  categorySummary: DescriptionDashboardCategory[];
+  workflow: { draft: number; review: number; approved: number; canonical: number };
+  groupSummary: DescriptionDashboardGroupRow[];
+  reviewerSummary: DescriptionDashboardReviewer[];
+  sourceSummary: {
+    spdBySourceType: DescriptionDashboardCountEntry[];
+    draftBySourceLabel: DescriptionDashboardCountEntry[];
+  };
+  displaySummary: Record<string, number>;
+  recentActivities: DescriptionDashboardRecent[];
+  generatedAt: string;
+}
+
+export async function getDescriptionDashboard(): Promise<DescriptionDashboard> {
+  const res = await authClient.api.get<{ success: boolean; data: DescriptionDashboard }>(
+    `/admin/o4o-product-db/description-dashboard`,
+  );
+  return res.data.data;
+}
+
 // ─── Product Usage Links (master 활용 연결, read-only) ────────────────────────
 // WO-O4O-ADMIN-O4O-PRODUCT-USAGE-LINKS-READONLY-V1
 // mount: GET /api/v1/admin/o4o-product-db/masters/:id/usage-links

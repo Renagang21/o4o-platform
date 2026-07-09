@@ -457,6 +457,16 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Product Description Status routes:', descStatusError);
     }
 
+    // 24-e2d-2. Register Product Description Dashboard (read-only) — 설명서 운영 대시보드
+    //           (WO-O4O-ADMIN-DESCRIPTION-DASHBOARD-V1)
+    try {
+      const { createProductDescriptionDashboardController } = await import('../modules/neture/controllers/product-description-dashboard.controller.js');
+      app.use('/api/v1/admin/o4o-product-db/description-dashboard', createProductDescriptionDashboardController(dataSource));
+      logger.info('✅ Product Description Dashboard (read-only) routes registered at /api/v1/admin/o4o-product-db/description-dashboard');
+    } catch (descDashboardError) {
+      logger.error('Failed to register Product Description Dashboard routes:', descDashboardError);
+    }
+
     // 24-e2e. Register Product Usage Links (read-only) — master 활용 연결 조회
     //         (WO-O4O-ADMIN-O4O-PRODUCT-USAGE-LINKS-READONLY-V1)
     try {
