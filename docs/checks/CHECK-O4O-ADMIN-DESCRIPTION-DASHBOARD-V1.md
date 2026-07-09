@@ -1,6 +1,6 @@
 # CHECK-O4O-ADMIN-DESCRIPTION-DASHBOARD-V1
 
-Status: 코드 완료 + typecheck/build 통과 → 배포·프로덕션 smoke 진행 (2026-07-09)
+Status: DONE — 코드 완료 + typecheck/build 통과 + 배포(dc1f738) + 프로덕션 smoke PASS (2026-07-09)
 WO: `WO-O4O-ADMIN-DESCRIPTION-DASHBOARD-V1`
 관련: `WO-O4O-ADMIN-O4O-PRODUCT-DESCRIPTION-STATUS-UNIFIED-VIEW-V1`(displaySummary 재사용), `WO-O4O-ADMIN-O4O-PRODUCT-DASHBOARD-OPERATION-UX-V1`(운영 대시보드 UX 패턴)
 
@@ -81,7 +81,24 @@ mount **`GET /api/v1/admin/o4o-product-db/description-dashboard`** (guard = desc
 | dashboard SQL prod read-only 정합 | group/recent UNION/reviewer NULL 버킷/last_updated 전부 정상 실행·정상값 |
 | 변경 파일 | 백엔드 3(service/controller 신규 + register 1블록) + 프론트 4(api client/page 신규 + layout/routes) |
 | DB write | **0** (mutation·migration 없음) |
-| 프로덕션 smoke | 진행 (배포 후): `/admin/o4o-product-db/description-dashboard` 진입 → 8 섹션 렌더 + 수치 정합 + Console Error 0 |
+| 프로덕션 smoke | **PASS** (admin.neture.co.kr, 2026-07-09) |
+
+### smoke 결과 (admin.neture.co.kr `/admin/o4o-product-db/description-dashboard`)
+
+배포: API+Admin Cloud Run `dc1f738` 모두 success. 8 섹션 전부 렌더 + 수치 DB 정합 + **Console Error 0**.
+
+| 섹션 | 렌더 값(실측) | DB 정합 |
+| --- | --- | --- |
+| Summary Card | 공식 17,877 / 검토 필요 3,564 / 초안 0 / 반려 0 · SPD 총 21,346 · 초안 총 95 | ✅ (canonical 17,877 · needsReview = SPD 3,469 + 초안 95) |
+| Category | OTC 운영중(공식 17,877/검토 3,564/초안 95) · 의약품기타·의료기기·의약외품·건기식 "준비중" | ✅ |
+| Workflow | 초안 0 → 검토 3,564 → 승인 0 → 공식 17,877 | ✅ |
+| Group(BaseTable) | 그룹별 그룹 상품수/적용 상품수/적용률/CANONICAL/검토상태 (예: 38→11 29%, 3→3 100%) | ✅ seed_json.groupScope 반영 |
+| Source | e약은요 19,431(91%) / OTC·영양제 복합 1,915(9%) + 초안 MFDS_DRUG_OTC 95 | ✅ |
+| Display Priority | 공식 17,877 / 검토 3,215 / 초안 1,294 / 없음 176,003 (master 축) | ✅ (displaySummary 재사용) |
+| Reviewer | "미기록 (배치 시드 · 검토자 없음)" 승인 17,877·검토 3,564·반려 0 | ✅ curated_by/reviewed_by NULL |
+| 최근 변경 | SPD canonical 20건(상품명·출처·변경일 2026-07-07) | ✅ |
+
+DB write 0 (조회 전용 확인). 탭 "설명서 운영" 노출·진입 정상.
 
 **응답 구조 (실측):**
 ```
