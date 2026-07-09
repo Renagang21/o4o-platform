@@ -119,7 +119,7 @@ export default function DescriptionDashboardPage() {
 
   const summaryCards = [
     { key: 'canonical', label: '공식(canonical)', tip: '서비스에 적용되는 공식 설명 수입니다.', value: summary.canonical, icon: <CheckCircle2 className="w-6 h-6 text-green-600" />, to: '/admin/o4o-product-db/review?status=canonical' },
-    { key: 'needs_review', label: '검토 필요', tip: '공식으로 확정하기 전 검토가 필요한 설명(SPD + 초안) 통합 목록으로 이동합니다.', value: summary.needsReview, icon: <FileText className="w-6 h-6 text-amber-600" />, to: '/admin/o4o-product-db/description-review-list?status=needs_review' },
+    { key: 'needs_review', label: '검토 필요', tip: '공식으로 확정하기 전 검토가 필요한 설명(SPD + 초안) 수입니다.', value: summary.needsReview, icon: <FileText className="w-6 h-6 text-amber-600" />, to: '/admin/o4o-product-db/review' },
     { key: 'draft', label: '초안', tip: '아직 검토 대기 전 초안 상태인 설명 수입니다.', value: summary.draft, icon: <ScrollText className="w-6 h-6 text-blue-600" />, to: '/admin/o4o-product-db/drug-description-drafts' },
     { key: 'rejected', label: '반려', tip: '검토 결과 반려된 설명 초안 수입니다.', value: summary.rejected, icon: <XCircle className="w-6 h-6 text-red-500" />, to: '/admin/o4o-product-db/drug-description-drafts' },
   ];
