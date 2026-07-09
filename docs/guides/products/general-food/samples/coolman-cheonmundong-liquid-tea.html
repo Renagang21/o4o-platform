@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>콸콸포맨 COOL MAN — 천문동 액상차</title>
+<style>
+  :root{
+    --bg:#e9eef4; --panel:#ffffff; --ink:#1e2a40; --sub:#586279;
+    --navy:#26324a; --blue:#3f6fb0; --blue-2:#5b8ac9; --gold:#b9975b;
+    --line:rgba(38,50,74,.14); --navy-soft:#eef2f8;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:linear-gradient(180deg,#f2f5f9,#e9eef4 40%);
+    color:var(--ink); font-size:16px; line-height:1.75;
+    font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:480px;margin:0 auto;padding:0 20px 60px}
+
+  .hero{padding:34px 20px 30px;text-align:center;color:#fff;
+    background:linear-gradient(160deg,#2b3a58,#1c2740);
+    border-radius:0 0 20px 20px;position:relative;overflow:hidden}
+  .hero::after{content:"";position:absolute;left:-10%;right:-10%;bottom:-30px;height:80px;
+    background:radial-gradient(120% 100% at 50% 0%, rgba(185,151,91,.25), transparent 70%)}
+  .scan{display:inline-block;font-size:13px;letter-spacing:.2em;color:#dfe7f2;
+    border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:8px 18px;margin-bottom:16px}
+  .catch{font-size:15px;letter-spacing:.05em;color:var(--blue-2);margin:0 0 6px;font-weight:600}
+  .title{font-size:34px;font-weight:800;line-height:1.2;margin:0;color:#fff;letter-spacing:.02em}
+  .title small{display:block;font-size:15px;font-weight:600;color:#c7d3e6;
+    letter-spacing:.32em;margin-top:6px}
+  .subline{color:#cdd7e8;font-size:15px;margin:12px 0 0}
+  .badge{display:inline-block;margin-top:16px;font-size:13px;letter-spacing:.03em;color:#1c2740;
+    background:linear-gradient(180deg,#e7d3a3,var(--gold));border-radius:6px;padding:5px 13px;font-weight:700}
+
+  h2{font-size:13.5px;letter-spacing:.18em;color:var(--blue);text-align:center;
+    margin:44px 0 18px;font-weight:700}
+
+  .card{background:var(--panel);border:1px solid var(--line);
+    border-left:3px solid var(--blue);border-radius:14px;padding:20px 18px 18px;margin:13px 0;
+    box-shadow:0 4px 16px rgba(38,50,74,.06)}
+  .tag{display:inline-block;font-size:13px;letter-spacing:.03em;color:#fff;
+    background:linear-gradient(180deg,var(--blue-2),var(--blue));border-radius:6px;
+    padding:4px 12px;font-weight:700;margin-bottom:11px}
+  .card h3{margin:0 0 8px;font-size:19px;color:var(--navy);font-weight:800}
+  .card p{margin:0;color:var(--sub);font-size:15.5px}
+
+  ul.who{list-style:none;padding:0;margin:0}
+  ul.who li{position:relative;padding:11px 0 11px 24px;color:var(--ink);font-size:16px;
+    border-bottom:1px solid var(--line)}
+  ul.who li:last-child{border-bottom:0}
+  ul.who li::before{content:"";position:absolute;left:3px;top:19px;width:8px;height:8px;
+    border-radius:50%;background:var(--blue-2)}
+
+  .gift{background:var(--navy-soft);border:1px solid var(--line);border-radius:14px;
+    padding:22px 18px;margin:18px 0 0;color:var(--sub);font-size:15.5px;text-align:center}
+  .gift b{color:var(--navy)}
+
+  .spec{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:24px 0 0;
+    color:var(--sub);font-size:14.5px}
+  .spec span{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:9px 15px}
+
+  .cta{margin:42px 0 0;background:var(--navy);border-radius:16px;padding:26px 20px;text-align:center;color:#fff}
+  .cta .k{font-size:13px;letter-spacing:.2em;color:var(--blue-2);margin-bottom:12px}
+  .cta h3{margin:0 0 11px;font-size:20px;color:#fff;font-weight:800}
+  .cta p{margin:0;color:#c7d3e6;font-size:15.5px}
+  .cta .pill{display:inline-block;margin-top:18px;font-size:15px;color:#1c2740;
+    background:linear-gradient(180deg,#e7d3a3,var(--gold));font-weight:700;border-radius:999px;padding:13px 24px}
+  .foot{text-align:center;color:#8a94a8;font-size:12.5px;margin-top:28px;letter-spacing:.06em}
+</style>
+</head>
+<body>
+  <div class="wrap" style="padding-top:0">
+  <header class="hero">
+    <div class="scan">QR 스캔으로 열어보기</div>
+    <p class="catch">시원하게 삽시다</p>
+    <h1 class="title">콸콸포맨<small>COOL MAN</small></h1>
+    <p class="subline">남성을 위한 천문동 액상차</p>
+    <div class="badge">100% 국내산 천문동 사용 · HACCP</div>
+  </header>
+
+  <main>
+    <h2>핵심</h2>
+
+    <div class="card">
+      <span class="tag">100% 국내산 · 전통 원료</span>
+      <h3>천문동</h3>
+      <p>예부터 남성에게 이야기되어 온 전통 뿌리 원료 천문동(아스파라거스 계열)을, 100% 국내산으로 담았습니다.</p>
+    </div>
+
+    <div class="card">
+      <span class="tag">시원한 컨셉 · 간편</span>
+      <h3>10ml × 30팩</h3>
+      <p>"시원하게 삽시다" 그대로, 남성을 위한 액상차를 10ml 개별 포장으로 간편하게 챙길 수 있습니다.</p>
+    </div>
+
+    <h2>이런 분께 권해드립니다</h2>
+    <ul class="who">
+      <li>천문동 같은 전통 남성 원료를 챙기고 싶은 분</li>
+      <li>물처럼 간편한 액상차를 찾는 분</li>
+      <li>아버지 · 어른께 건강 선물을 준비하는 분</li>
+    </ul>
+
+    <div class="gift">
+      <b>선물로도, 나를 위해서도</b><br>
+      간편한 10ml 액상차로 매일 챙기기 좋고, 아버지 · 어른께 드리는 건강 선물로도 좋습니다.
+    </div>
+
+    <div class="spec">
+      <span>300ml (10ml × 30팩)</span>
+      <span>18kcal / 10ml</span>
+      <span>액상차</span>
+    </div>
+
+    <section class="cta">
+      <div class="k">매장 상담</div>
+      <h3>나에게 맞는 방법</h3>
+      <p>컨디션 · 관심사는 사람마다 다릅니다. 이 화면을 <b style="color:#e7d3a3">매장 내 전문성이 있는 도우미</b>에게 보여주시면, 나에게 맞는 방법을 함께 확인해 드립니다.</p>
+      <span class="pill">이 화면을 도우미에게 보여주세요</span>
+    </section>
+
+    <p class="foot">콸콸포맨 COOL MAN · 천문동 액상차</p>
+  </main>
+  </div>
+</body>
+</html>

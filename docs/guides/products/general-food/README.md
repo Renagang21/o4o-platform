@@ -8,6 +8,7 @@
 > 샘플 산출물:
 > - 흑염소 진액(다크+골드, 전통 보양 톤): [한국어](samples/damrokwon-heukyeomso-jinaek-gold.html) · [중국어(홍금)](samples/damrokwon-heukyeomso-jinaek-gold.zh.html)
 > - 리포좀 콜라겐(핑크 뷰티 톤, 이너뷰티): [한국어](samples/elamor-liposome-collagen-glutathione.html) · [중국어(粉金 뷰티)](samples/elamor-liposome-collagen-glutathione.zh.html)
+> - 콸콸포맨(네이비+화이트 시원 톤, 남성/천문동 — R10 검색+질병주장 배제 사례): [한국어](samples/coolman-cheonmundong-liquid-tea.html) · [중국어](samples/coolman-cheonmundong-liquid-tea.zh.html)
 >
 > **작업 단계 (순서 고정):**
 > 1. 이미지에서 사실 파악(제품명·성분·용량·인증·분류·바코드).

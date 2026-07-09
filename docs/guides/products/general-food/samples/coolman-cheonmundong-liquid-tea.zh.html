@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>COOL MAN 콸콸포맨 — 天门冬液态茶</title>
+<style>
+  :root{
+    --bg:#e9eef4; --panel:#ffffff; --ink:#1e2a40; --sub:#586279;
+    --navy:#26324a; --blue:#3f6fb0; --blue-2:#5b8ac9; --gold:#b9975b;
+    --line:rgba(38,50,74,.14); --navy-soft:#eef2f8;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:linear-gradient(180deg,#f2f5f9,#e9eef4 40%);
+    color:var(--ink); font-size:16px; line-height:1.85;
+    font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:480px;margin:0 auto;padding:0 20px 60px}
+
+  .hero{padding:34px 20px 30px;text-align:center;color:#fff;
+    background:linear-gradient(160deg,#2b3a58,#1c2740);
+    border-radius:0 0 20px 20px;position:relative;overflow:hidden}
+  .hero::after{content:"";position:absolute;left:-10%;right:-10%;bottom:-30px;height:80px;
+    background:radial-gradient(120% 100% at 50% 0%, rgba(185,151,91,.25), transparent 70%)}
+  .scan{display:inline-block;font-size:13.5px;letter-spacing:.18em;color:#dfe7f2;
+    border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:8px 18px;margin-bottom:12px}
+  .origin{display:inline-block;font-size:12.5px;letter-spacing:.1em;color:#1c2740;
+    background:linear-gradient(180deg,#e7d3a3,var(--gold));border-radius:5px;padding:3px 11px;font-weight:700;margin-bottom:14px}
+  .catch{font-size:15.5px;letter-spacing:.05em;color:var(--blue-2);margin:0 0 6px;font-weight:600}
+  .title{font-size:34px;font-weight:800;line-height:1.2;margin:0;color:#fff;letter-spacing:.04em}
+  .title small{display:block;font-size:15px;font-weight:400;color:#c7d3e6;
+    letter-spacing:.02em;margin-top:8px}
+  .subline{color:#cdd7e8;font-size:15.5px;margin:12px 0 0}
+  .badge{display:inline-block;margin-top:16px;font-size:13px;letter-spacing:.03em;color:#1c2740;
+    background:linear-gradient(180deg,#e7d3a3,var(--gold));border-radius:6px;padding:5px 13px;font-weight:700}
+
+  h2{font-size:14px;letter-spacing:.14em;color:var(--blue);text-align:center;
+    margin:44px 0 18px;font-weight:700}
+
+  .card{background:var(--panel);border:1px solid var(--line);
+    border-left:3px solid var(--blue);border-radius:14px;padding:20px 18px 18px;margin:13px 0;
+    box-shadow:0 4px 16px rgba(38,50,74,.06)}
+  .tag{display:inline-block;font-size:13px;letter-spacing:.03em;color:#fff;
+    background:linear-gradient(180deg,var(--blue-2),var(--blue));border-radius:6px;
+    padding:4px 12px;font-weight:700;margin-bottom:11px}
+  .card h3{margin:0 0 8px;font-size:20px;color:var(--navy);font-weight:800}
+  .card p{margin:0;color:var(--sub);font-size:15.5px}
+
+  ul.who{list-style:none;padding:0;margin:0}
+  ul.who li{position:relative;padding:12px 0 12px 24px;color:var(--ink);font-size:16px;
+    border-bottom:1px solid var(--line)}
+  ul.who li:last-child{border-bottom:0}
+  ul.who li::before{content:"";position:absolute;left:3px;top:20px;width:8px;height:8px;
+    border-radius:50%;background:var(--blue-2)}
+
+  .gift{background:var(--navy-soft);border:1px solid var(--line);border-radius:14px;
+    padding:22px 18px;margin:18px 0 0;color:var(--sub);font-size:16px;text-align:center}
+  .gift b{color:var(--navy)}
+
+  .spec{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:24px 0 0;
+    color:var(--sub);font-size:14.5px}
+  .spec span{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:9px 15px}
+
+  .cta{margin:42px 0 0;background:var(--navy);border-radius:16px;padding:26px 20px;text-align:center;color:#fff}
+  .cta .k{font-size:13.5px;letter-spacing:.16em;color:var(--blue-2);margin-bottom:12px}
+  .cta h3{margin:0 0 11px;font-size:21px;color:#fff;font-weight:800}
+  .cta p{margin:0;color:#c7d3e6;font-size:15.5px}
+  .cta .pill{display:inline-block;margin-top:18px;font-size:15px;color:#1c2740;
+    background:linear-gradient(180deg,#e7d3a3,var(--gold));font-weight:700;border-radius:999px;padding:13px 24px}
+  .foot{text-align:center;color:#8a94a8;font-size:12.5px;margin-top:28px;letter-spacing:.06em}
+</style>
+</head>
+<body>
+  <div class="wrap" style="padding-top:0">
+  <header class="hero">
+    <div class="scan">扫码查看</div><br>
+    <span class="origin">韩国原产</span>
+    <p class="catch">清爽畅快，尽享生活</p>
+    <h1 class="title">COOL MAN<small>콸콸포맨</small></h1>
+    <p class="subline">男士专属 · 天门冬液态茶</p>
+    <div class="badge">100% 韩国产天门冬 · HACCP</div>
+  </header>
+
+  <main>
+    <h2>核心</h2>
+
+    <div class="card">
+      <span class="tag">100% 韩国产 · 传统原料</span>
+      <h3>天门冬</h3>
+      <p>自古与男性话题一同被提及的传统根类原料天门冬（天冬属植物），采用 100% 韩国产。</p>
+    </div>
+
+    <div class="card">
+      <span class="tag">清爽 · 便捷</span>
+      <h3>10ml × 30包</h3>
+      <p>秉承「清爽畅快」，男士专属液态茶，10ml 独立包装，方便日常携带与饮用。</p>
+    </div>
+
+    <h2>适合这些人</h2>
+    <ul class="who">
+      <li>想补充天门冬等传统男性原料的人</li>
+      <li>想要像喝水一样方便的液态茶的人</li>
+      <li>想为父亲 · 长辈准备健康礼品的人</li>
+    </ul>
+
+    <div class="gift">
+      <b>送礼自用，皆宜</b><br>
+      方便的 10ml 液态茶，适合日常常备，也适合送给父亲 · 长辈的健康礼品。
+    </div>
+
+    <div class="spec">
+      <span>300ml（10ml × 30包）</span>
+      <span>18kcal / 10ml</span>
+      <span>液态茶</span>
+    </div>
+
+    <section class="cta">
+      <div class="k">店内咨询</div>
+      <h3>适合您的方式</h3>
+      <p>状态 · 关注点因人而异。请将本页面出示给<b style="color:#e7d3a3">店内专业人员</b>，为您一同确认适合的方式。</p>
+      <span class="pill">请将此页面出示给店内专业人员</span>
+    </section>
+
+    <p class="foot">韩国 COOL MAN 콸콸포맨 · 天门冬液态茶</p>
+  </main>
+  </div>
+</body>
+</html>
