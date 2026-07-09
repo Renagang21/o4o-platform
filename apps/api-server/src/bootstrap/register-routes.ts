@@ -428,54 +428,12 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Product Candidate Review Queue routes:', productCandidateError);
     }
 
-    // 24-e2b. Register Shared Product Description routes (WO-O4O-PRODUCT-DESCRIPTION-SHARED-CANDIDATE-STORAGE-V1)
-    try {
-      const { createSharedProductDescriptionController } = await import('../modules/neture/controllers/shared-product-description.controller.js');
-      app.use('/api/v1/admin/shared-product-descriptions', createSharedProductDescriptionController(dataSource));
-      logger.info('✅ Shared Product Description routes registered at /api/v1/admin/shared-product-descriptions');
-    } catch (sharedDescError) {
-      logger.error('Failed to register Shared Product Description routes:', sharedDescError);
-    }
-
-    // 24-e2c. Register Product Candidate Description Draft admin read-only routes
-    //         (WO-O4O-ADMIN-O4O-DRUG-DESCRIPTION-DRAFT-REVIEW-SHELL-V1)
-    try {
-      const { createProductCandidateDescriptionDraftController } = await import('../modules/neture/controllers/product-candidate-description-draft.controller.js');
-      app.use('/api/v1/admin/product-candidate-description-drafts', createProductCandidateDescriptionDraftController(dataSource));
-      logger.info('✅ Product Candidate Description Draft (read-only) routes registered at /api/v1/admin/product-candidate-description-drafts');
-    } catch (draftReviewError) {
-      logger.error('Failed to register Product Candidate Description Draft routes:', draftReviewError);
-    }
-
-    // 24-e2d. Register Product Description Status unified view (read-only)
-    //         (WO-O4O-ADMIN-O4O-PRODUCT-DESCRIPTION-STATUS-UNIFIED-VIEW-V1)
-    try {
-      const { createProductDescriptionStatusController } = await import('../modules/neture/controllers/product-description-status.controller.js');
-      app.use('/api/v1/admin/o4o-product-db/description-status', createProductDescriptionStatusController(dataSource));
-      logger.info('✅ Product Description Status (read-only) routes registered at /api/v1/admin/o4o-product-db/description-status');
-    } catch (descStatusError) {
-      logger.error('Failed to register Product Description Status routes:', descStatusError);
-    }
-
-    // 24-e2d-2. Register Product Description Dashboard (read-only) — 설명서 운영 대시보드
-    //           (WO-O4O-ADMIN-DESCRIPTION-DASHBOARD-V1)
-    try {
-      const { createProductDescriptionDashboardController } = await import('../modules/neture/controllers/product-description-dashboard.controller.js');
-      app.use('/api/v1/admin/o4o-product-db/description-dashboard', createProductDescriptionDashboardController(dataSource));
-      logger.info('✅ Product Description Dashboard (read-only) routes registered at /api/v1/admin/o4o-product-db/description-dashboard');
-    } catch (descDashboardError) {
-      logger.error('Failed to register Product Description Dashboard routes:', descDashboardError);
-    }
-
-    // 24-e2d-3. Register Product Description Review Queue (read-only) — Group 중심 검토 Queue
-    //           (WO-O4O-ADMIN-DESCRIPTION-REVIEW-QUEUE-V1)
-    try {
-      const { createProductDescriptionReviewQueueController } = await import('../modules/neture/controllers/product-description-review-queue.controller.js');
-      app.use('/api/v1/admin/o4o-product-db/description-review-queue', createProductDescriptionReviewQueueController(dataSource));
-      logger.info('✅ Product Description Review Queue (read-only) routes registered at /api/v1/admin/o4o-product-db/description-review-queue');
-    } catch (reviewQueueError) {
-      logger.error('Failed to register Product Description Review Queue routes:', reviewQueueError);
-    }
+    // 24-e2b~e2d-3. 설명서 검토 워크플로우 라우트 제거
+    //   (WO-O4O-ADMIN-O4O-PRODUCT-DESCRIPTION-REVIEW-REMOVE-V1)
+    //   제거: shared-product-descriptions / product-candidate-description-drafts /
+    //         description-status / description-dashboard / description-review-queue.
+    //   유지: canonical 설명 조회(product-library), 설명/QR 요약 배지(masters/description-qr-summary),
+    //         설명 데이터 파이프라인(seed/derive job)·shared_product_descriptions 테이블.
 
     // 24-e2d-4. Register Product Landing (제품 대표 QR 진입점) — public read + admin 단건 발급
     //           (WO-O4O-PRODUCT-LANDING-ARCHITECTURE-V1 / Phase 2)

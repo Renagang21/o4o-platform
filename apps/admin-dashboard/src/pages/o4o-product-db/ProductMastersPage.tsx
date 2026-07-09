@@ -17,7 +17,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Search, Eye, FileText } from 'lucide-react';
+import { Search, Eye, Plus } from 'lucide-react';
 import { BaseTable, RowActionMenu, ActionBar } from '@o4o/ui';
 import type { O4OColumn } from '@o4o/ui';
 import {
@@ -29,12 +29,11 @@ import {
   DescriptionLangState,
 } from '@/api/o4o-product-db.api';
 
-// WO-O4O-PRODUCT-LIST-DESCRIPTION-QR-ACTIONS-V1: 언어별 설명서 상태 → badge 톤
+// WO-O4O-PRODUCT-LIST-DESCRIPTION-QR-ACTIONS-V1: 언어별 설명서 존재 여부 → badge 톤
 function langTone(state?: DescriptionLangState): { label: string; cls: string } {
   if (!state || !state.exists) return { label: '없음', cls: 'bg-gray-100 text-gray-500' };
-  if (state.status === 'needs_review') return { label: '검토', cls: 'bg-amber-100 text-amber-700' };
   if (state.status === 'canonical') return { label: '있음', cls: 'bg-green-100 text-green-700' };
-  return { label: '초안', cls: 'bg-blue-100 text-blue-700' }; // candidate
+  return { label: '초안', cls: 'bg-blue-100 text-blue-700' }; // candidate 등
 }
 
 const PAGE_SIZE_OPTIONS = [20, 50, 100];
@@ -265,19 +264,11 @@ export default function ProductMastersPage() {
       system: 'last',
       align: 'center',
       render: (_, r) => {
-        const s = descQrMap[r.id];
-        const viewId = s?.descriptions.ko.descriptionId || s?.descriptions.zh.descriptionId || null;
         return (
           <RowActionMenu
             actions={[
+              // 설명은 상세 화면에서 확인한다(설명서 검토 워크플로우 제거, WO-...-DESCRIPTION-REVIEW-REMOVE-V1).
               { key: 'view', label: '상세 보기', icon: <Eye size={14} />, onClick: () => navigate(r.id) },
-              {
-                key: 'desc',
-                label: '설명 보기',
-                icon: <FileText size={14} />,
-                hidden: !viewId,
-                onClick: () => navigate(`/admin/o4o-product-db/review/${viewId}`),
-              },
               // QR 연결/생성은 admin QR 화면·master↔QR 매핑 부재로 이번 WO 범위 밖(자리만).
               // 실제 연결은 WO-O4O-PRODUCT-UNIT-MULTILINGUAL-DESCRIPTION-QR-LINK-V1.
               { key: 'qr', label: 'QR 연결 (후속 WO)', disabled: true, onClick: () => {} },
@@ -326,7 +317,17 @@ export default function ProductMastersPage() {
           </select>
         </label>
 
-        <div className="ml-auto text-sm text-gray-500">총 {total.toLocaleString()}건</div>
+        <div className="ml-auto flex items-center gap-3">
+          <span className="text-sm text-gray-500">총 {total.toLocaleString()}건</span>
+          {/* WO-O4O-ADMIN-PRODUCT-MASTER-MANUAL-REGISTRATION-UI-V1 */}
+          <button
+            type="button"
+            onClick={() => navigate('/admin/o4o-product-db/masters/new')}
+            className="flex items-center gap-1 bg-admin-blue text-white px-3 py-2 rounded text-sm"
+          >
+            <Plus className="w-4 h-4" /> 새 상품 등록
+          </button>
+        </div>
       </div>
 
       {error && (

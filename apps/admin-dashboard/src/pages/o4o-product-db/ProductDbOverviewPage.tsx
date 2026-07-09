@@ -18,11 +18,11 @@ import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Database, ClipboardList, Package, AlertTriangle, HelpCircle,
-  FileText, ScrollText, ImageOff, PackagePlus, CheckCircle2,
+  ImageOff, PackagePlus, CheckCircle2,
 } from 'lucide-react';
 import {
   listProductCandidates, listProductMasters,
-  getDescriptionStatusSummary, getImageQualitySummary,
+  getImageQualitySummary,
 } from '@/api/o4o-product-db.api';
 
 // ProductCandidatesPage 와 동일한 enum 목록 (SSOT: 후보 필터)
@@ -77,9 +77,6 @@ interface OpsData {
   masterTotal: number;
   conflict: number;
   unmatched: number;
-  needsReview: number;   // 설명 검토 필요
-  draft: number;         // OTC 설명 초안
-  canonical: number;     // 공식 설명 보유
   missingImage: number;  // 대표 이미지 없음
 }
 type CountMap = Record<string, number>;
@@ -110,12 +107,11 @@ export default function ProductDbOverviewPage() {
     setOpsLoading(true);
     setOpsError(null);
     try {
-      const [candidateTotal, masterRes, conflict, unmatched, descSummary, imgSummary] = await Promise.all([
+      const [candidateTotal, masterRes, conflict, unmatched, imgSummary] = await Promise.all([
         candidateCount({}),
         listProductMasters({ page: 1, limit: 1 }),
         candidateCount({ matchStatus: 'conflict' }),
         candidateCount({ matchStatus: 'unmatched' }),
-        getDescriptionStatusSummary(),
         getImageQualitySummary(),
       ]);
       setOps({
@@ -123,9 +119,6 @@ export default function ProductDbOverviewPage() {
         masterTotal: masterRes.meta.total,
         conflict,
         unmatched,
-        needsReview: descSummary.needs_review ?? 0,
-        draft: descSummary.draft ?? 0,
-        canonical: descSummary.canonical ?? 0,
         missingImage: imgSummary.missing_image ?? 0,
       });
     } catch (e: any) {
@@ -172,9 +165,6 @@ export default function ProductDbOverviewPage() {
     );
   }
 
-  const officialRate =
-    ops && ops.masterTotal > 0 ? Math.round((ops.canonical / ops.masterTotal) * 100) : 0;
-
   // 오늘 처리할 작업 (우선순위 순) — 이미 존재하는 목록으로만 이동
   const tasks = ops ? [
     {
@@ -182,18 +172,6 @@ export default function ProductDbOverviewPage() {
       label: '충돌 확인', count: ops.conflict,
       desc: '동일 식별자가 여러 상품과 충돌하는 후보입니다. 어느 상품과 연결할지 결정하세요.',
       to: '/admin/o4o-product-db/candidates?matchStatus=conflict',
-    },
-    {
-      key: 'needs_review', icon: <FileText className="w-5 h-5" />, tone: 'amber' as const,
-      label: '설명 검토', count: ops.needsReview,
-      desc: '공식 설명으로 확정하기 전 검토가 필요한 상품 설명입니다.',
-      to: '/admin/o4o-product-db/review',
-    },
-    {
-      key: 'draft', icon: <ScrollText className="w-5 h-5" />, tone: 'blue' as const,
-      label: 'OTC 초안 검토', count: ops.draft,
-      desc: '검토 대기 중인 OTC 의약품 설명 초안입니다.',
-      to: '/admin/o4o-product-db/drug-description-drafts',
     },
     {
       key: 'missing_image', icon: <ImageOff className="w-5 h-5" />, tone: 'gray' as const,
@@ -234,7 +212,7 @@ export default function ProductDbOverviewPage() {
             {[...Array(3)].map((_, i) => <div key={i} className="h-20 rounded-lg bg-gray-100 animate-pulse" />)}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <KpiCard
               icon={<Package className="w-6 h-6 text-admin-blue" />}
               label="기본 상품 (ProductMaster)"
@@ -248,15 +226,6 @@ export default function ProductDbOverviewPage() {
               tip="공공데이터·가져오기·입력으로 수집된 후보입니다. 검토를 거쳐 기본상품으로 연결·승격됩니다."
               value={ops.candidateTotal}
               to="/admin/o4o-product-db/candidates"
-            />
-            <KpiCard
-              icon={<CheckCircle2 className="w-6 h-6 text-green-600" />}
-              label="공식 설명 보유율"
-              tip="기본상품 중 공식(canonical) 설명을 가진 비율입니다. 낮을수록 설명 보강이 필요합니다."
-              value={officialRate}
-              suffix="%"
-              sub={`공식 설명 ${ops.canonical.toLocaleString()} / 기본상품 ${ops.masterTotal.toLocaleString()}`}
-              to="/admin/o4o-product-db/description-status"
             />
           </div>
         )}

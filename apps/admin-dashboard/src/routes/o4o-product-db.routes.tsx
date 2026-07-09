@@ -16,14 +16,9 @@ const ProductDbOverviewPage = lazy(() => import('@/pages/o4o-product-db/ProductD
 const ProductCandidatesPage = lazy(() => import('@/pages/o4o-product-db/ProductCandidatesPage'));
 const ProductCandidateDetailPage = lazy(() => import('@/pages/o4o-product-db/ProductCandidateDetailPage'));
 const ProductMastersPage = lazy(() => import('@/pages/o4o-product-db/ProductMastersPage'));
+// WO-O4O-ADMIN-PRODUCT-MASTER-MANUAL-REGISTRATION-UI-V1: 관리자 수동 상품 등록
+const ProductMasterCreatePage = lazy(() => import('@/pages/o4o-product-db/ProductMasterCreatePage'));
 const ProductMasterDetailPage = lazy(() => import('@/pages/o4o-product-db/ProductMasterDetailPage'));
-const DescriptionReviewPage = lazy(() => import('@/pages/o4o-product-db/DescriptionReviewPage'));
-const DescriptionReviewDetailPage = lazy(() => import('@/pages/o4o-product-db/DescriptionReviewDetailPage'));
-const DrugDescriptionDraftsPage = lazy(() => import('@/pages/o4o-product-db/DrugDescriptionDraftsPage'));
-const DrugDescriptionDraftDetailPage = lazy(() => import('@/pages/o4o-product-db/DrugDescriptionDraftDetailPage'));
-const DescriptionStatusPage = lazy(() => import('@/pages/o4o-product-db/DescriptionStatusPage'));
-const DescriptionDashboardPage = lazy(() => import('@/pages/o4o-product-db/DescriptionDashboardPage'));
-const DescriptionReviewQueuePage = lazy(() => import('@/pages/o4o-product-db/DescriptionReviewQueuePage'));
 const ImageQualityPage = lazy(() => import('@/pages/o4o-product-db/ImageQualityPage'));
 const ProductDbMaintenancePage = lazy(() => import('@/pages/o4o-product-db/ProductDbMaintenancePage'));
 
@@ -51,14 +46,17 @@ export function O4OProductDbRoutes() {
       <Route path="candidates" element={<ProductCandidatesPage />} />
       <Route path="candidates/:id" element={<ProductCandidateDetailPage />} />
       <Route path="masters" element={<ProductMastersPage />} />
+      <Route path="masters/new" element={<ProductMasterCreatePage />} />
       <Route path="masters/:id" element={<ProductMasterDetailPage />} />
-      <Route path="review" element={<DescriptionReviewPage />} />
-      <Route path="review/:id" element={<DescriptionReviewDetailPage />} />
-      <Route path="drug-description-drafts" element={<DrugDescriptionDraftsPage />} />
-      <Route path="drug-description-drafts/:id" element={<DrugDescriptionDraftDetailPage />} />
-      <Route path="description-dashboard" element={<DescriptionDashboardPage />} />
-      <Route path="description-review-queue" element={<DescriptionReviewQueuePage />} />
-      <Route path="description-status" element={<DescriptionStatusPage />} />
+      {/* 설명서 검토 워크플로우 제거 (WO-O4O-ADMIN-O4O-PRODUCT-DESCRIPTION-REVIEW-REMOVE-V1).
+          북마크/딥링크 호환을 위해 기존 경로는 기본 상품 목록으로 리다이렉트한다. */}
+      <Route path="review" element={<Navigate to="../masters" replace />} />
+      <Route path="review/:id" element={<Navigate to="../../masters" replace />} />
+      <Route path="drug-description-drafts" element={<Navigate to="../masters" replace />} />
+      <Route path="drug-description-drafts/:id" element={<Navigate to="../../masters" replace />} />
+      <Route path="description-dashboard" element={<Navigate to="../masters" replace />} />
+      <Route path="description-review-queue" element={<Navigate to="../masters" replace />} />
+      <Route path="description-status" element={<Navigate to="../masters" replace />} />
       <Route path="image-quality" element={<ImageQualityPage />} />
       <Route path="maintenance" element={<ProductDbMaintenancePage />} />
     </Route>,

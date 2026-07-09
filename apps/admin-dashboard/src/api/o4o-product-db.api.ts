@@ -324,555 +324,37 @@ export async function getProductMaster(id: string): Promise<ProductMasterDetail 
   return res.data?.data ?? null;
 }
 
-// ─── SharedProductDescription 검토 (WO-O4O-DRUG-SHARED-DESCRIPTION-CANONICAL-CURATION-V1) ──
-// mount: /admin/shared-product-descriptions. read-only 목록/상세/dry-run + 단건 setCanonical(PATCH).
+// ─── ProductMaster 수동 등록 (WO-O4O-ADMIN-PRODUCT-MASTER-MANUAL-REGISTRATION-UI-V1) ──
+// POST /admin/o4o-product-db/masters. barcode 선택 — 없으면 O4O 자체 내부코드 자동 생성.
 
-export interface DescriptionReviewRow {
-  id: string;
-  masterId: string;
-  sourceType: string;
-  status: string;
-  language: string | null;
-  qualityScore: number | null;
-  summary: string | null;
-  contentPreview: string | null;
-  createdAt: string;
-  updatedAt: string;
-  masterName: string | null;
-  regulatoryName: string | null;
-  regulatoryType: string | null;
-  manufacturerName: string | null;
-  barcode: string | null;
-  representativeId: string | null;
-  representativeName: string | null;
-  mfdsCode: string | null;
-  multiManufacturer: boolean | null;
-  multiName: boolean | null;
-  hasRepresentativeImage: boolean;
-}
-
-export interface DescriptionReviewListParams {
-  status?: string;
-  sourceType?: string;
-  regulatoryType?: string;
-  language?: string;
-  q?: string;
-  multiManufacturer?: boolean;
-  multiName?: boolean;
-  page?: number;
-  limit?: number;
-}
-
-export interface DescriptionReviewListResult {
-  items: DescriptionReviewRow[];
-  meta: ProductMasterListMeta;
-}
-
-export async function listDescriptionReviews(
-  params: DescriptionReviewListParams = {},
-): Promise<DescriptionReviewListResult> {
-  const query: Record<string, string> = {};
-  if (params.status) query.status = params.status;
-  if (params.sourceType) query.sourceType = params.sourceType;
-  if (params.regulatoryType) query.regulatoryType = params.regulatoryType;
-  if (params.language) query.language = params.language;
-  if (params.q?.trim()) query.q = params.q.trim();
-  if (params.multiManufacturer) query.multiManufacturer = 'true';
-  if (params.multiName) query.multiName = 'true';
-  query.page = String(params.page ?? 1);
-  query.limit = String(params.limit ?? 20);
-
-  const res = await authClient.api.get<{
-    success: boolean;
-    data: DescriptionReviewRow[];
-    meta: ProductMasterListMeta;
-  }>(`/admin/shared-product-descriptions?${new URLSearchParams(query).toString()}`);
-
-  return {
-    items: res.data?.data ?? [],
-    meta: res.data?.meta ?? { page: 1, limit: 20, total: 0, totalPages: 0 },
-  };
-}
-
-export interface DescriptionReviewDetail {
-  id: string;
-  masterId: string;
-  sourceType: string;
-  status: string;
-  content: string;
-  summary: string | null;
-  language: string | null;
-  curatedBy: string | null;
-  curatedAt: string | null;
-  createdAt: string;
-  updatedAt: string;
-  masterName: string | null;
-  regulatoryName: string | null;
-  manufacturerName: string | null;
-  barcode: string | null;
-  specification: string | null;
-  mfdsProductId: string | null;
-  drugCategory: string | null;
-  representativeId: string | null;
-  representativeName: string | null;
-  mfdsCode: string | null;
-  reviewFlags: Record<string, unknown> | null;
-  thumbnailUrl: string | null;
-  identifiers: Array<{ identifierType: string; identifierValue: string; isPrimary: boolean }>;
-}
-
-export async function getDescriptionReviewDetail(id: string): Promise<DescriptionReviewDetail | null> {
-  const res = await authClient.api.get<{ success: boolean; data: DescriptionReviewDetail }>(
-    `/admin/shared-product-descriptions/${encodeURIComponent(id)}/detail`,
-  );
-  return res.data?.data ?? null;
-}
-
-/** 단건 canonical 승격 (기존 setCanonical 재사용 — 같은 master 기존 canonical 강등) */
-export async function setDescriptionCanonical(id: string): Promise<DescriptionReviewDetail | null> {
-  const res = await authClient.api.patch<{ success: boolean; data: DescriptionReviewDetail }>(
-    `/admin/shared-product-descriptions/${encodeURIComponent(id)}/canonical`,
-    {},
-  );
-  return res.data?.data ?? null;
-}
-
-/** 상태 변경 (reject=deprecated 등). canonical 은 setDescriptionCanonical 사용 */
-export async function setDescriptionStatus(id: string, status: string): Promise<void> {
-  await authClient.api.patch(`/admin/shared-product-descriptions/${encodeURIComponent(id)}/status`, { status });
-}
-
-export interface BulkCanonicalDryRunResult {
-  sourceType: string;
-  totalNeedsReview: number;
-  eligibleForBulkCanonical: number;
-  excludedExistingCanonical: number;
-  excludedMultiManufacturer: number;
-  excludedEmptyContent: number;
-  excludedAmbiguous: number;
-  sampleEligible: Array<{ id: string; masterName: string | null; mfdsCode: string | null }>;
-}
-
-export async function getBulkCanonicalDryRun(
-  sourceType = 'mfds_easy_drug',
-): Promise<BulkCanonicalDryRunResult | null> {
-  const res = await authClient.api.get<{ success: boolean; data: BulkCanonicalDryRunResult }>(
-    `/admin/shared-product-descriptions/bulk-canonical/dry-run?sourceType=${encodeURIComponent(sourceType)}`,
-  );
-  return res.data?.data ?? null;
-}
-
-// ─── ProductCandidate Description Draft (read-only 검토 shell) ────────────────
-// WO-O4O-ADMIN-O4O-DRUG-DESCRIPTION-DRAFT-REVIEW-SHELL-V1
-// mount: /api/v1/admin/product-candidate-description-drafts (GET only)
-
-export interface DrugDescriptionDraftRow {
-  id: string;
-  title: string | null;
-  sourceLabel: string;
-  language: string;
-  reviewStatus: string;
-  draftType: string;
-  groupKey: string | null;
-  anchorCandidateId: string;
-  verdict: string | null;
-  applyRunId: string | null;
-  masterTotal: number | null;
-  otc: number | null;
-  rx: number | null;
-  manufacturers: number | null;
-  spdMasters: number | null;
-  reviewFlags: string[];
-  efficacyPreview: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface DrugDescriptionDraftListParams {
-  sourceLabel?: string;
-  applyRunId?: string;
-  reviewStatus?: string;
-  verdict?: string;
-  q?: string;
-  page?: number;
-  limit?: number;
-}
-
-export interface DrugDescriptionDraftListResult {
-  items: DrugDescriptionDraftRow[];
-  meta: ProductMasterListMeta;
-}
-
-export async function listDrugDescriptionDrafts(
-  params: DrugDescriptionDraftListParams = {},
-): Promise<DrugDescriptionDraftListResult> {
-  const query: Record<string, string> = {};
-  if (params.sourceLabel) query.sourceLabel = params.sourceLabel;
-  if (params.applyRunId) query.applyRunId = params.applyRunId;
-  if (params.reviewStatus) query.reviewStatus = params.reviewStatus;
-  if (params.verdict) query.verdict = params.verdict;
-  if (params.q?.trim()) query.q = params.q.trim();
-  query.page = String(params.page ?? 1);
-  query.limit = String(params.limit ?? 20);
-
-  const res = await authClient.api.get<{
-    success: boolean;
-    data: DrugDescriptionDraftRow[];
-    meta: ProductMasterListMeta;
-  }>(`/admin/product-candidate-description-drafts?${new URLSearchParams(query).toString()}`);
-
-  return {
-    items: res.data?.data ?? [],
-    meta: res.data?.meta ?? { page: 1, limit: 20, total: 0, totalPages: 0 },
-  };
-}
-
-export interface DrugDescriptionDraftDetail {
-  id: string;
-  anchorCandidateId: string;
-  sourceLabel: string;
-  groupKey: string | null;
-  draftType: string;
-  language: string;
-  title: string | null;
-  summary: string | null;
-  contentJson: Record<string, unknown>;
-  seedJson: Record<string, unknown>;
-  guardResult: Record<string, unknown>;
-  reviewStatus: string;
-  reviewFlags: string[];
-  aiProvider: string | null;
-  aiModel: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export async function getDrugDescriptionDraft(id: string): Promise<DrugDescriptionDraftDetail | null> {
-  const res = await authClient.api.get<{ success: boolean; data: DrugDescriptionDraftDetail }>(
-    `/admin/product-candidate-description-drafts/${id}`,
-  );
-  return res.data?.data ?? null;
-}
-
-// ─── Description Status (master 기준 설명 상태 통합 뷰, read-only) ────────────
-// WO-O4O-ADMIN-O4O-PRODUCT-DESCRIPTION-STATUS-UNIFIED-VIEW-V1
-// mount: /api/v1/admin/o4o-product-db/description-status (GET only)
-
-export type DescriptionFinalStatus = 'canonical' | 'needs_review' | 'draft' | 'none';
-
-export interface DescriptionStatusRow {
-  masterId: string;
-  productName: string;
-  manufacturerName: string | null;
-  regulatoryType: string | null;
-  primaryIdentifier: string | null;
-  canonicalCount: number;
-  needsReviewCount: number;
-  draftCount: number;
-  finalStatus: DescriptionFinalStatus;
-  canonicalSourceTypes: string[];
-  needsReviewSourceTypes: string[];
-  draftVerdicts: string[];
-  canonicalDescriptionId: string | null;
-  needsReviewDescriptionId: string | null;
-  draftId: string | null;
-}
-
-export interface DescriptionStatusListParams {
-  finalStatus?: string;
-  regulatoryType?: string;
-  sourceType?: string;
-  draftOnly?: boolean;
-  q?: string;
-  page?: number;
-  limit?: number;
-}
-
-export interface DescriptionStatusListResult {
-  items: DescriptionStatusRow[];
-  meta: ProductMasterListMeta;
-}
-
-export async function listDescriptionStatus(
-  params: DescriptionStatusListParams = {},
-): Promise<DescriptionStatusListResult> {
-  const query: Record<string, string> = {};
-  if (params.finalStatus) query.finalStatus = params.finalStatus;
-  if (params.regulatoryType) query.regulatoryType = params.regulatoryType;
-  if (params.sourceType) query.sourceType = params.sourceType;
-  if (params.draftOnly) query.draftOnly = 'true';
-  if (params.q?.trim()) query.q = params.q.trim();
-  query.page = String(params.page ?? 1);
-  query.limit = String(params.limit ?? 20);
-
-  const res = await authClient.api.get<{
-    success: boolean;
-    data: DescriptionStatusRow[];
-    meta: ProductMasterListMeta;
-  }>(`/admin/o4o-product-db/description-status?${new URLSearchParams(query).toString()}`);
-
-  return {
-    items: res.data?.data ?? [],
-    meta: res.data?.meta ?? { page: 1, limit: 20, total: 0, totalPages: 0 },
-  };
-}
-
-export async function getDescriptionStatusSummary(): Promise<Record<string, number>> {
-  const res = await authClient.api.get<{ success: boolean; data: Record<string, number> }>(
-    `/admin/o4o-product-db/description-status/summary`,
-  );
-  return res.data?.data ?? {};
-}
-
-// ─── Description/QR Summary (제품 리스트 badge/action, read-only) ──────────────
-// WO-O4O-PRODUCT-LIST-DESCRIPTION-QR-ACTIONS-V1
-// mount: GET /api/v1/admin/o4o-product-db/masters/description-qr-summary?ids=uuid,uuid,...
-// ko/zh 는 SPD(master-scope) language 기준. QR 은 master↔QR 직접 매핑 부재로 deferred(자리만).
-
-export interface DescriptionLangState {
-  exists: boolean;
-  status: string | null; // canonical | needs_review | candidate | null
-  descriptionId: string | null;
-}
-
-export interface ProductDescriptionQrSummary {
-  masterId: string;
-  descriptions: { ko: DescriptionLangState; zh: DescriptionLangState };
-  qr: { exists: false; deferred: true };
-  needsReview: boolean;
-}
-
-/** master id 배열 → masterId 키 맵. 빈 배열이면 요청하지 않음. 최대 100건. */
-export async function getProductDescriptionQrSummary(
-  masterIds: string[],
-): Promise<Record<string, ProductDescriptionQrSummary>> {
-  const ids = Array.from(new Set(masterIds.filter(Boolean))).slice(0, 100);
-  if (ids.length === 0) return {};
-  const res = await authClient.api.get<{
-    success: boolean;
-    data: Record<string, ProductDescriptionQrSummary>;
-  }>(`/admin/o4o-product-db/masters/description-qr-summary?ids=${encodeURIComponent(ids.join(','))}`);
-  return res.data?.data ?? {};
-}
-
-// ─── Description Dashboard (설명서 운영, read-only) ────────────────────────────
-// WO-O4O-ADMIN-DESCRIPTION-DASHBOARD-V1
-// mount: GET /api/v1/admin/o4o-product-db/description-dashboard
-
-export interface DescriptionDashboardCategory {
-  key: string;
-  label: string;
-  active: boolean;
-  spd: number;
-  drafts: number;
-  canonical: number;
-  needsReview: number;
-}
-
-export interface DescriptionDashboardGroupRow {
-  groupKey: string;
-  ingredient: string | null;
-  representativeTitle: string | null;
-  representativeExists: boolean;
-  masterTotal: number | null;
-  otc: number | null;
-  spdMasters: number | null;
-  canonical: boolean;
-  reviewStatuses: string[];
-  draftCount: number;
-  updatedAt: string | null;
-}
-
-export interface DescriptionDashboardCountEntry {
-  key: string;
-  count: number;
-}
-
-export interface DescriptionDashboardReviewer {
-  reviewerId: string | null;
-  reviewerLabel: string;
-  approved: number;
-  pending: number;
-  rejected: number;
-  total: number;
-}
-
-export interface DescriptionDashboardRecent {
-  kind: 'spd' | 'draft';
-  id: string;
-  title: string | null;
-  state: string;
-  source: string | null;
-  updatedAt: string | null;
-}
-
-export interface DescriptionDashboard {
-  summary: {
-    canonical: number;
-    needsReview: number;
-    draft: number;
-    approved: number;
-    rejected: number;
-    other: number;
-    spdTotal: number;
-    draftTotal: number;
-    lastUpdatedAt: string | null;
-  };
-  categorySummary: DescriptionDashboardCategory[];
-  workflow: { draft: number; review: number; approved: number; canonical: number };
-  groupSummary: DescriptionDashboardGroupRow[];
-  reviewerSummary: DescriptionDashboardReviewer[];
-  sourceSummary: {
-    spdBySourceType: DescriptionDashboardCountEntry[];
-    draftBySourceLabel: DescriptionDashboardCountEntry[];
-  };
-  displaySummary: Record<string, number>;
-  recentActivities: DescriptionDashboardRecent[];
-  generatedAt: string;
-}
-
-export async function getDescriptionDashboard(): Promise<DescriptionDashboard> {
-  const res = await authClient.api.get<{ success: boolean; data: DescriptionDashboard }>(
-    `/admin/o4o-product-db/description-dashboard`,
-  );
-  return res.data.data;
-}
-
-// ─── Product Landing QR (제품 대표 QR/랜딩, WO-O4O-PRODUCT-LANDING-ARCHITECTURE-V1) ──
-// mount: GET /api/v1/admin/o4o-product-db/product-landings/by-master/:masterId/qr
-
-export interface ProductLandingQr {
-  publicKey: string;
-  url: string;   // neture.co.kr/p/{publicKey}
-  svg: string;   // QR SVG(동적 생성, 비저장)
-  created: boolean;
-}
-
-export async function getProductLandingQr(masterId: string, size = 320): Promise<ProductLandingQr> {
-  const res = await authClient.api.get<{ success: boolean; data: ProductLandingQr }>(
-    `/admin/o4o-product-db/product-landings/by-master/${encodeURIComponent(masterId)}/qr?size=${size}`,
-  );
-  return res.data.data;
-}
-
-// ─── Description Review Queue (설명서 검토 Queue, Group 중심, read-only) ────────
-// WO-O4O-ADMIN-DESCRIPTION-REVIEW-QUEUE-V1
-// mount: GET /api/v1/admin/o4o-product-db/description-review-queue (+ /filter-options, /:draftId)
-
-// WO-O4O-ADMIN-DESCRIPTION-REVIEW-QUEUE-SPD-SOURCE-V1: OTC 초안 그룹 + SPD needs_review 혼합 row
-export interface ReviewQueueRow {
-  sourceStore: 'OTC_DRAFT' | 'SPD';
-  reviewItemId: string;
-  detailKind: 'queue' | 'master';
-  detailKey: string; // OTC=draftId, SPD=masterId
-  groupKey: string | null;
-  draftId: string | null;
-  masterId: string | null;
-  productName: string | null;
-  manufacturerName: string | null;
-  descriptionType: string | null;
-  ingredient: string | null;
-  primaryUse: string | null;
-  title: string | null;
-  sourceLabel: string | null;
-  reviewStatus: string;
-  groupMasterCount: number | null;
-  appliedMasterCount: number | null;
-  author: string | null;
-  reviewer: string | null;
-  draftCount: number;
-  generatedAt: string | null;
-  updatedAt: string | null;
-}
-
-export interface ReviewQueueListParams {
-  q?: string;
-  source?: string;
-  status?: string;
-  sourceStore?: 'all' | 'otc_draft' | 'spd';
-  descriptionType?: string;
-  sort?: 'applied_master' | 'updated_at' | 'group';
-  order?: 'asc' | 'desc';
-  page?: number;
-  limit?: number;
-}
-
-export interface ReviewQueueAppliedMaster {
-  masterId: string;
+export interface CreateProductMasterInput {
   name: string;
-  manufacturerName: string | null;
-  barcode: string | null;
-  hasCanonical: boolean;
-  hasNeedsReview: boolean;
+  manufacturerName?: string;
+  barcode?: string;
+  regulatoryType?: string;
+  regulatoryName?: string;
+  mfdsPermitNumber?: string;
+  specification?: string;
+  originCountry?: string;
+  tags?: string[];
 }
 
-export interface ReviewQueueDetail {
-  groupKey: string;
-  draftId: string;
-  ingredient: string | null;
-  strengthToken: string | null;
-  doseForm: string | null;
-  sourceLabel: string | null;
-  reviewStatus: string;
-  reviewFlags: string[];
-  author: string | null;
-  aiModel: string | null;
-  reviewer: string | null;
-  generatedAt: string | null;
-  updatedAt: string | null;
-  blocks: {
-    bodyMarkdown: string | null;
-    primaryClinicalUse: string | null;
-    selectionPoint: string | null;
-    counselingPoint: string | null;
-    safetyBlock: string | null;
-    usageLabel: string | null;
-    contentSource: string | null;
-  };
-  appliedMasters: ReviewQueueAppliedMaster[];
-  appliedMasterTotal: number;
-  appliedMasterSampleLimited: boolean;
+export interface CreatedProductMaster {
+  id: string;
+  name: string;
+  barcode: string;
 }
 
-export async function getDescriptionReviewQueue(
-  params: ReviewQueueListParams = {},
-): Promise<{ items: ReviewQueueRow[]; meta: ProductMasterListMeta }> {
-  const query: Record<string, string> = {};
-  if (params.q?.trim()) query.q = params.q.trim();
-  if (params.source) query.source = params.source;
-  if (params.status) query.status = params.status;
-  if (params.sourceStore && params.sourceStore !== 'all') query.sourceStore = params.sourceStore;
-  if (params.descriptionType) query.descriptionType = params.descriptionType;
-  if (params.sort) query.sort = params.sort;
-  if (params.order) query.order = params.order;
-  query.page = String(params.page ?? 1);
-  query.limit = String(params.limit ?? 20);
-  const res = await authClient.api.get<{ success: boolean; data: ReviewQueueRow[]; meta: ProductMasterListMeta }>(
-    `/admin/o4o-product-db/description-review-queue?${new URLSearchParams(query).toString()}`,
+export async function createProductMaster(input: CreateProductMasterInput): Promise<CreatedProductMaster> {
+  const res = await authClient.api.post<{ success: boolean; data: CreatedProductMaster }>(
+    '/admin/o4o-product-db/masters',
+    input,
   );
-  return {
-    items: res.data?.data ?? [],
-    meta: res.data?.meta ?? { page: 1, limit: 20, total: 0, totalPages: 0 },
-  };
-}
-
-export async function getReviewQueueFilterOptions(): Promise<{
-  sourceStores: { value: string; count: number }[];
-  sources: { value: string; count: number }[];
-  statuses: { value: string; count: number }[];
-}> {
-  const res = await authClient.api.get<{ success: boolean; data: { sourceStores?: { value: string; count: number }[]; sources: { value: string; count: number }[]; statuses: { value: string; count: number }[] } }>(
-    `/admin/o4o-product-db/description-review-queue/filter-options`,
-  );
-  const d = res.data?.data ?? { sources: [], statuses: [] };
-  return { sourceStores: d.sourceStores ?? [], sources: d.sources ?? [], statuses: d.statuses ?? [] };
-}
-
-export async function getReviewQueueDetail(draftId: string): Promise<ReviewQueueDetail> {
-  const res = await authClient.api.get<{ success: boolean; data: ReviewQueueDetail }>(
-    `/admin/o4o-product-db/description-review-queue/${encodeURIComponent(draftId)}`,
-  );
-  return res.data.data;
+  const data = res.data?.data;
+  if (!data?.id) {
+    throw new Error('등록 응답이 올바르지 않습니다');
+  }
+  return data;
 }
 
 // ─── Product Usage Links (master 활용 연결, read-only) ────────────────────────
@@ -1173,4 +655,52 @@ export async function hideProductMasterImage(
 /** 숨김 이미지 복원 (대표 자동 지정 없음). */
 export async function restoreProductMasterImage(id: string, imageId: string): Promise<void> {
   await authClient.api.post(`/admin/o4o-product-db/masters/${id}/images/${imageId}/restore`, {});
+}
+
+// ─── Description/QR Summary (제품 리스트 badge, read-only) ─────────────────────
+// WO-O4O-PRODUCT-LIST-DESCRIPTION-QR-ACTIONS-V1
+// mount: GET /api/v1/admin/o4o-product-db/masters/description-qr-summary?ids=uuid,uuid,...
+// ko/zh 는 SPD(master-scope) language 기준. QR 은 master↔QR 직접 매핑 부재로 deferred(자리만).
+
+export interface DescriptionLangState {
+  exists: boolean;
+  status: string | null; // canonical | candidate | null (needs_review 폐지)
+  descriptionId: string | null;
+}
+
+export interface ProductDescriptionQrSummary {
+  masterId: string;
+  descriptions: { ko: DescriptionLangState; zh: DescriptionLangState };
+  qr: { exists: false; deferred: true };
+  needsReview: boolean;
+}
+
+/** master id 배열 → masterId 키 맵. 빈 배열이면 요청하지 않음. 최대 100건. */
+export async function getProductDescriptionQrSummary(
+  masterIds: string[],
+): Promise<Record<string, ProductDescriptionQrSummary>> {
+  const ids = Array.from(new Set(masterIds.filter(Boolean))).slice(0, 100);
+  if (ids.length === 0) return {};
+  const res = await authClient.api.get<{
+    success: boolean;
+    data: Record<string, ProductDescriptionQrSummary>;
+  }>(`/admin/o4o-product-db/masters/description-qr-summary?ids=${encodeURIComponent(ids.join(','))}`);
+  return res.data?.data ?? {};
+}
+
+// ─── Product Landing QR (제품 대표 QR/랜딩, WO-O4O-PRODUCT-LANDING-ARCHITECTURE-V1) ──
+// mount: GET /api/v1/admin/o4o-product-db/product-landings/by-master/:masterId/qr
+
+export interface ProductLandingQr {
+  publicKey: string;
+  url: string;   // neture.co.kr/p/{publicKey}
+  svg: string;   // QR SVG(동적 생성, 비저장)
+  created: boolean;
+}
+
+export async function getProductLandingQr(masterId: string, size = 320): Promise<ProductLandingQr> {
+  const res = await authClient.api.get<{ success: boolean; data: ProductLandingQr }>(
+    `/admin/o4o-product-db/product-landings/by-master/${encodeURIComponent(masterId)}/qr?size=${size}`,
+  );
+  return res.data.data;
 }

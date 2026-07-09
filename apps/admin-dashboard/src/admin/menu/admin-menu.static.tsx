@@ -150,12 +150,6 @@ export const adminMenuStatic: MenuItem[] = [
         path: '/admin/o4o-product-db/masters',
       },
       {
-        id: 'o4o-product-db-review',
-        label: '설명 검토',
-        icon: <FileText className="w-4 h-4" />,
-        path: '/admin/o4o-product-db/review',
-      },
-      {
         id: 'o4o-product-db-maintenance',
         label: '데이터 정비',
         icon: <Settings className="w-4 h-4" />,

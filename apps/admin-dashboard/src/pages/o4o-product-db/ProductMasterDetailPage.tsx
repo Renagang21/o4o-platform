@@ -361,33 +361,20 @@ export default function ProductMasterDetailPage() {
               const descs = row.descriptions ?? [];
               const pick = (m: (d: ProductDescriptionSummary) => boolean) => {
                 const cands = descs.filter(m);
-                return (
-                  cands.find((d) => d.status === 'canonical') ||
-                  cands.find((d) => d.status === 'needs_review') ||
-                  cands[0] || null
-                );
+                return cands.find((d) => d.status === 'canonical') || cands[0] || null;
               };
               const ko = pick((d) => !d.language || d.language.toLowerCase().startsWith('ko'));
               const zh = pick((d) => !!d.language && d.language.toLowerCase().startsWith('zh'));
               const pill = (label: string, d: ProductDescriptionSummary | null) => {
                 const tone = !d
                   ? 'bg-gray-100 text-gray-500'
-                  : d.status === 'needs_review'
-                    ? 'bg-amber-100 text-amber-700'
-                    : d.status === 'canonical'
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-blue-100 text-blue-700';
-                const state = !d ? '없음' : d.status === 'needs_review' ? '검토' : d.status === 'canonical' ? '있음' : '초안';
+                  : d.status === 'canonical'
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-blue-100 text-blue-700';
+                const state = !d ? '없음' : d.status === 'canonical' ? '있음' : '초안';
                 return (
                   <span className="inline-flex items-center gap-1">
                     <span className={`inline-block px-1.5 py-0.5 rounded-full text-xs ${tone}`}>{label} {state}</span>
-                    {d && (
-                      <button
-                        type="button"
-                        onClick={() => navigate(`/admin/o4o-product-db/review/${d.id}`)}
-                        className="text-xs text-admin-blue hover:underline"
-                      >보기</button>
-                    )}
                   </span>
                 );
               };
@@ -410,11 +397,6 @@ export default function ProductMasterDetailPage() {
                       {d.language && <span className="text-xs text-gray-400">· {d.language}</span>}
                       {d.qualityScore != null && <span className="text-xs text-gray-400">· 품질 {d.qualityScore.toFixed(2)}</span>}
                       {d.updatedAt && <span className="text-xs text-gray-400">· {d.updatedAt.slice(0, 10)}</span>}
-                      <button
-                        type="button"
-                        onClick={() => navigate(`/admin/o4o-product-db/review/${d.id}`)}
-                        className="text-xs text-admin-blue hover:underline ml-auto"
-                      >보기</button>
                     </div>
                     <div className="text-sm text-gray-700 line-clamp-2">
                       {d.summary || d.contentPreview || <span className="text-gray-400">내용 미리보기 없음</span>}
@@ -426,7 +408,7 @@ export default function ProductMasterDetailPage() {
               <div className="text-sm text-gray-400">표시할 설명 데이터가 없습니다.</div>
             )}
             <div className="text-xs text-gray-400 mt-2">
-              설명 생성·승인·수정 및 QR 연결은 이번 WO 범위 밖(GET-only)입니다. 설명 보기는 검토 화면으로 이동합니다.
+              설명은 정부/공공 원문 기반 자료이며, 매장 활용 후 피드백에 따라 수정됩니다. QR 연결은 후속 WO 범위입니다.
             </div>
           </PanelSection>
 
@@ -580,7 +562,7 @@ export default function ProductMasterDetailPage() {
               </ol>
             ) : (
               <div className="text-sm text-gray-400">
-                현재 기록된 작업 이력이 없습니다. 향후 메모·이미지·설명 검토 action이 이 영역에 표시됩니다.
+                현재 기록된 작업 이력이 없습니다. 향후 메모·이미지·설명 정비 action이 이 영역에 표시됩니다.
               </div>
             )}
             {audit && audit.gaps.length > 0 && (
@@ -785,7 +767,6 @@ function workspaceLabel(v: string | null): string | null {
 
 const DESCRIPTION_STATUS_TONE: Record<string, string> = {
   canonical: 'bg-green-100 text-green-700',
-  needs_review: 'bg-amber-100 text-amber-700',
   candidate: 'bg-blue-50 text-blue-700',
   hidden: 'bg-gray-100 text-gray-500',
   deprecated: 'bg-gray-100 text-gray-400',
