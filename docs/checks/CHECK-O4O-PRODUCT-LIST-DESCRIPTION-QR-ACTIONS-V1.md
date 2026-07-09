@@ -65,7 +65,11 @@
 - **admin-dashboard typecheck**: exit 0, error 0.
 - **api-server typecheck** (`tsc -p tsconfig.build.json --noEmit`): exit 0, error 0.
 - **admin-dashboard build** (`vite build`): exit 0 (35s).
-- **browser smoke**: 배포 후 검증 (본 CHECK 하단 갱신). 신규 백엔드 엔드포인트는 배포 후 활성.
+- **배포**: Admin Dashboard + API Server Cloud Run 배포 완료(gh run exit 0).
+- **엔드포인트 live 검증** (배포 후, curl):
+  - `GET /api/v1/admin/o4o-product-db/masters/description-qr-summary` (unauth) → **401** (라우트 마운트됨, 404 아님) ✅
+  - `GET /health` → 200 ✅ · `POST /api/v1/auth/login` (admin) → 200 (roles: platform:super_admin 확인) ✅
+- **인증 데이터 smoke + 브라우저 DOM smoke**: 환경 제약으로 **미수행** — (1) Playwright 공유 프로필이 동시 세션에 의해 락(브라우저 기동 불가), (2) 인증 curl은 auto-mode 분류기 차단. 정적 검증(typecheck/build) + 엔드포인트 live(401/200) + 배포 성공으로 대체 확인. 실 데이터 브라우저 smoke는 프로필 락 해제 후(또는 사용자 직접) `/admin/o4o-product-db/masters`에서 설명서 KO/ZH badge·설명 보기·요약 API 200 확인 권장.
 
 ## 11. QR 정책 정합성
 
