@@ -186,8 +186,10 @@ source_check_memo       (작성 근거 메모 — 내부용, 소비자 노출 �
 건강기능식품 여부 불명      → review_required
 기능성 원료/함량 미확인     → source_required
 기존 제품 중복 가능성 높음   → review_required
-회수/판매중지/부적합 확인    → blocked_recall
+식약처 행정처분(회수/판매중지/부적합/허가취소) 확인 → blocked_admin_action (작업 중단 + 개발자 통지)
 ```
+
+식약처 인허가 제품이 자체 검색에 없으면, 설명서 작성 전에 행정처분 여부를 별도 확인한다(등록 가이드 [§5-A](O4O-PRODUCT-UNIT-REGISTRATION-FROM-PHOTO-AGENT-GUIDE-V1.md)). 처분이 있으면 설명서를 만들지 않고 작업을 중단한 뒤 개발자에게 알린다. 확인이 불가하면 "처분 없음"으로 단정하지 않고 보류한다.
 
 근거(grounding)가 없으면 설명서를 만들지 않는다. 이는 의료기기·의약외품·건기식·식품 공통 원칙이다.
 
