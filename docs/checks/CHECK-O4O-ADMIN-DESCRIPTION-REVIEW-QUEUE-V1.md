@@ -1,6 +1,6 @@
 # CHECK-O4O-ADMIN-DESCRIPTION-REVIEW-QUEUE-V1
 
-Status: 코드 완료 + typecheck/build 통과 → 배포·프로덕션 smoke 진행 (2026-07-09)
+Status: DONE — 코드 완료 + typecheck/build 통과 + 배포(52317ee) + 프로덕션 smoke PASS (2026-07-09)
 WO: `WO-O4O-ADMIN-DESCRIPTION-REVIEW-QUEUE-V1`
 선행: `WO-O4O-ADMIN-DESCRIPTION-DASHBOARD-V1`(집계 대시보드)
 폐기: `WO-O4O-ADMIN-DESCRIPTION-REVIEW-LIST-V1`(단순 통합목록) — 커밋 `b4ff36fc5` 를 `61cb8d22f` 로 **revert**. 설명서 검토는 단순 List 가 아니라 **Group 중심 Review Queue** 로 재설계.
@@ -69,7 +69,23 @@ mount **`/api/v1/admin/o4o-product-db/description-review-queue`** (guard = dashb
 | 목록/상세 SQL prod read-only 정합 | 95 그룹·적용 Master 정렬·parse join(440 매칭) 정상 |
 | 변경 파일 | 백엔드 3(service/controller 신규 + register 1블록) + 프론트 5(api client/page 신규 + layout/routes/dashboard 카드) |
 | DB write | **0** |
-| 프로덕션 smoke | 진행 (배포 후): Queue 진입 → 목록·필터·정렬 → 행 클릭 Group Detail(적용 Master·블록) → Dashboard→Queue 이동 → Console Error 0 |
+| 프로덕션 smoke | **PASS** (admin.neture.co.kr, 2026-07-09) |
+
+### smoke 결과 (admin.neture.co.kr `/admin/o4o-product-db/description-review-queue`)
+
+배포: API+Admin Cloud Run `52317ee` 모두 success. **Console Error 0**.
+
+| 항목 | 결과 |
+| --- | --- |
+| 목록 렌더 | 총 **95 그룹**, 정렬 = 적용 Master 많은순(407/709 → 373/440 → 302/598 …), 페이지 1/5 ✅ |
+| Toolbar 필터 | 상태 select(검토 필요 95) · Source select(MFDS_DRUG_OTC 95) · 정렬 3옵션 · 검색 |
+| 컬럼 | 검토 그룹(성분+주요 용도)/Source/적용 Master(적용/그룹)/상태/최근 수정/작성자(AI 생성)/검토자(미배정) ✅ |
+| 검색 필터 | q="아세틸시스테인" → **총 2 그룹**(서버 필터링) ✅ |
+| Group Detail Drawer(에르도스테인) | 메타(그룹키·함량/제형 300밀리그램/캡슐·Source·작성자·검토자·원문출처·reviewFlags[auto,spd_overlap]) + 상담 4블록(주요 용도/선택/상담/안전) + 대표 설명 원문(bodyMarkdown) + **적용 대상 기본상품 440건(상위 100 표시)·전부 공식 뱃지** ✅ |
+| Dashboard 연결 | `검토 필요` Summary Card → `/description-review-queue?status=needs_review` (코드 반영) ✅ |
+| DB write | **0** (조회 전용) |
+
+적용 Master parse join 실측 = 에르도스테인 440건(seed_json masterTotal 440 일치), 전부 canonical(공식).
 
 ---
 
