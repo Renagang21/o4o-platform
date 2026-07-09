@@ -89,8 +89,15 @@ smoke 발급 landing 2건(젤-씨과립·본프로탑정)은 실제 유효 데�
 - **rollback**: `UPDATE product_landings SET deleted_at=now() WHERE metadata->>'batchId'='landing-seed-20260709' AND deleted_at IS NULL` (기존 데이터·ProductMaster 무영향).
 - QR 이미지 저장 0 · ProductMaster 변경 0 · 설명 자동생성 0. 모든 제품 = `neture.co.kr/p/{public_key}` 대표 QR/Landing 성립.
 
-## 7. 다음
+## 7. QR 가시화 — admin 제품 상세 QR·랜딩 섹션 (DONE, smoke PASS · 2026-07-09)
+
+- 백엔드: `GET /admin/o4o-product-db/product-landings/by-master/:masterId/qr` — Landing idempotent 확보 + `neture.co.kr/p/{key}` URL + **QR SVG 동적 생성**(`qr-print.generateQrSvg` 재사용, 비저장). `NETURE_PUBLIC_ORIGIN` env(기본 neture.co.kr).
+- 프론트: `ProductMasterDetailPage` "제품 QR · 랜딩" 섹션 — QR 이미지 + 공개 URL + 주소 복사 / 랜딩 열기 / QR SVG 내려받기.
+- 배포: API `cb779ad2d` + Admin success.
+- **프로덕션 smoke PASS** (admin.neture.co.kr, 젤-씨과립 상세): QR 엔드포인트 SVG(1588자) · 상세 화면에 **스캔 가능한 QR + `neture.co.kr/p/8zip5i6y4caj` + 3버튼** 렌더 · Console Error 0. QR 스캔 → 제품 랜딩(§5 검증).
+
+## 8. 다음
 
 - **Phase 4** on-create(신규 master 생성 시 Landing 자동 발급) · **Phase 5** Landing 콘텐츠 구성(공급자·매장·관련 블록·content_config) · **Phase 6** 노출 게이트(행정처분/회수 → exposure_state).
-- **QR 이미지/인쇄**: `/p/{key}` URL 을 QR 로 동적 생성(기존 qr-print 계열 재사용) — 운영 화면 연결은 후속.
+- QR 일괄 인쇄/내보내기(다건) · store 화면 QR 연결은 후속.
 - 설명 채움 = 기존 설명 Dashboard/Queue 트랙(별개, 89% placeholder 를 실제 설명으로).
