@@ -103,19 +103,33 @@ WO 본문 매핑표에는 `merged` / `archived`가 명시되지 않았으나, �
 | migration | 0 |
 | candidate 데이터 변경 | 0 |
 
-### Browser smoke
+### 배포
 
-배포 후 아래 확인 권장 (deploy 필요):
+| 워크플로우 | 커밋 | 결과 |
+| ---- | ---- | ---- |
+| Deploy API Server (Cloud Run) — `o4o-core-api` | `edd7737d0` | ✅ success (run 29019944521) |
+| Deploy Admin Dashboard (Cloud Run) — `o4o-admin-dashboard` | `edd7737d0` | ✅ success (run 29019944548) |
 
-```text
-[ ] 상태 select 옵션이 5개(전체/대기/검토 필요/등록 완료/제외)인지
-[ ] 전체 조회 정상
-[ ] 대기 → pending 만
-[ ] 검토 필요 → reviewing 만
-[ ] 등록 완료 → matched + linked + approved_new_master
-[ ] 제외 → rejected + merged + archived
-[ ] URL ?groupedStatus= 공유/새로고침 유지
-```
+> Admin 배포 1차 시도는 **Artifact Registry push timeout**(`context deadline exceeded`)으로 실패 — 이미지 빌드는 정상, 인프라 일시 오류. `gh run rerun --failed` 재실행으로 success.
+
+### Browser smoke (production, 2026-07-09) — ✅ PASS
+
+`admin.neture.co.kr` 로그인(운영자 계정) → client-side `/admin` 진입 → SPA 내부 이동으로 `/admin/o4o-product-db/candidates` 접속. Playwright headless.
+
+| 항목 | 결과 |
+| ---- | ---- |
+| 상태 select 옵션 5개 (전체/대기/검토 필요/등록 완료/제외) | ✅ 정확히 일치 |
+| 각 필터 선택 시 API 쿼리 `groupedStatus=` 사용 (원시 `status=` 미전송) | ✅ pending/review_required/registered/rejected 모두 |
+| URL `?groupedStatus=` 반영 | ✅ url bar 동기화 확인 |
+| 대기 = pending | ✅ grouped 126,897 = raw pending 126,897 |
+| 검토 필요 = reviewing | ✅ grouped 0 = raw reviewing 0 |
+| 등록 완료 = matched + linked + approved_new_master | ✅ grouped 251,815 = 1,000 + 0 + 250,815 |
+| 제외 = rejected + merged + archived | ✅ grouped 15,779 = 0 + 0 + 15,779 |
+| 기존 원시 `status` 단건 필터 유지 (`status=matched` → 200 success) | ✅ |
+| console error / network 4xx·5xx | ✅ 0 / 0 |
+
+> grouped `In(...)` 집계 total 이 개별 원시 status total 산술 합과 **정확히 일치** → 그룹 매핑이 누락·중복 없이 올바름을 증명.
+> (참고: 현재 프로덕션 데이터엔 `linked` / `merged` / `rejected` 후보 0건, `matched` 1,000건, `approved_new_master` 250,815건, `archived` 15,779건 — 의료기기 등급별 정리 결과 반영.)
 
 ---
 
@@ -126,5 +140,6 @@ WO 본문 매핑표에는 `merged` / `archived`가 명시되지 않았으나, �
 - [x] DB write 0 / migration 0 / candidate 데이터 변경 0
 - [x] typecheck 통과 (변경 파일)
 - [x] CHECK 문서 작성
-- [ ] commit / push (본 문서 커밋 시 완료)
-- [ ] (배포 후) browser smoke
+- [x] commit / push (`edd7737d0`)
+- [x] 배포 (API + Admin, Cloud Run) success
+- [x] browser smoke (production) PASS
