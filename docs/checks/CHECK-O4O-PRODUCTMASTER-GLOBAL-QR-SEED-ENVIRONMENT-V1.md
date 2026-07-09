@@ -32,7 +32,8 @@ Scope: 모든 ProductMaster 에 O4O 고유 QR 을 부여하기 위한 **사전 �
 ## 4. QR URL/slug/publicKey 후보 → 결정
 
 - 후보: `neture.co.kr/qr/{slug}` / `/qr/public/{slug}` / `/p/{publicKey}` / **`/r/{resourceId}`**.
-- **결정 권고 = `/r/{resourceId}`** (F12 정합). 내부 UUID 비노출은 F12 §3 opaque alias 발급으로 처리.
+- **결정 권고 = `/r/{resourceId}`** (F12 정합, 계층 1). 내부 UUID 비노출은 F12 §3 opaque alias 발급으로 처리.
+- **계층 조화**: `/qr/{slug}` 는 **계층 2 매장 QR**(구현·org 스코프), `/r/{id}` 는 **계층 1 Resource**(F12·미구현·전역). 전역 ProductMaster QR = 계층 1 → `/r/{id}`. 양 트랙 공통 = **QR 비저장**. 기존 4축 트랙(`/qr/{slug}`, B-1 1QR+언어탭)과 모순 아님(계층 상이). org 다국어 저장소 `store_multilingual_product_content_groups`(public_key)는 매장 소유라 전역 대상 불가. (IR §5.1)
 
 ## 5. QR 보유/미보유 현황 (prod read-only 2026-07-09, dry-run 실측)
 

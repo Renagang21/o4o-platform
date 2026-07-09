@@ -129,6 +129,22 @@ dry-run `productmaster-global-qr-dryrun.ts` 실측(write 0):
 
 ---
 
+## 5.1 기존 QR 트랙과의 조화 (reconciliation — 중요)
+
+병렬 트랙 `IR-O4O-*-TO-QR-FLOW-AUDIT-V1`(4축) 및 `WO-O4O-PRODUCT-QR-CONTENT-FLOW-MINIMAL-V1` 이 이미 다음을 확정했다. **모순이 아니라 계층이 다르다:**
+
+| 계층 | 공개 경로 | 구현 | 스코프 | 본 WO 관계 |
+| --- | --- | --- | --- | --- |
+| **계층 2 (매장 QR)** | **`/qr/{slug}`** (`GET /api/v1/{service}/qr/public/:slug`) | ✅ 구현됨 | 매장(organization) | 전역 상품 QR 아님 |
+| **계층 1 (Product Resource)** | **`/r/{resourceId}`** | ❌ 미구현(F12 step4) | master/서비스 중립 | **전역 ProductMaster QR 의 올바른 귀속처** |
+
+- 4축 트랙의 "공개경로=`/qr/{slug}`(/r/{resourceId} 아님)" 정정은 **매장 QR 계층에 한정**된 것이다(매장 QR 의 Resource permalink 은 미구현이라 slug 로 동작). 본 WO 의 **전역 ProductMaster QR 은 계층 1** 사안이므로 F12 `/r/{id}` 가 목표 경로다.
+- **양 트랙 공통 = QR 비저장**(4축이 "F12 불변식④" 명시, 온디맨드 `qr-print.service.ts`). 저장형 per-master QR 은 두 트랙 모두와 배치된다.
+- **B-1 확정(상품당 QR 1개 + 랜딩 언어탭)** 은 본 IR §5(언어 정책)와 동일 — 다국어 QR 다중 생성 금지.
+- **이미 존재하는 다국어 판매콘텐츠 저장소**: `store_multilingual_product_content_groups`/`_pages`(`public_key`, **organization 소유**, 언어탭 랜딩 `/api/v1/kpa/public/multilingual-product-contents/:publicKey` 구현). 단 이는 **매장(org) 소유**라 전역 ProductMaster 자산이 아니다 → 전역 상품 QR 의 저장소로 쓸 수 없다(계층·소유 불일치). 매장 단위 상품 QR 은 이 저장소 + landingType='link' 로 이미 처리 가능(4축 안1).
+
+→ 결론 보강: **전역 ProductMaster QR 의 귀속처는 계층 1(`/r/{id}`)뿐이며 미구현**이다. 계층 2(`/qr/{slug}`)·org 다국어 저장소는 매장 스코프라 전역 대상이 될 수 없다. 이는 §0 결론(모델 D + step4 선행)을 강화한다.
+
 ## 6. 충돌 가능성 정리
 
 1. **F12 Freeze #4(비저장)** — 저장 QR row(A/C) 전면 충돌. baseline 개정 WO 필수.
