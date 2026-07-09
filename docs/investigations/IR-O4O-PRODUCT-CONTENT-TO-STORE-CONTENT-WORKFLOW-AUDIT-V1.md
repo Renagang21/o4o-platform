@@ -211,4 +211,70 @@ store    : HUB 자료 보기·가져오기(=복사)·복사본 수정·QR/POP/�
 
 ---
 
-> 본 IR은 조사·설계 기록(불변)이다. QR 생성 정책은 재논의하지 않았고, 코드/DB/QR/배포 무변경. 구현은 §18 후속 WO에서 수행한다.
+## 부록 A. 테이블별 매트릭스 (스펙 §8)
+
+범례: 제품=제품 콘텐츠 / 매장=매장 콘텐츠 / 실행=실행 자산 / — 해당없음
+
+| 테이블·엔티티 | 역할 | 제품 | 매장 | 실행 | owner/scope | master 연결 | store/org 연결 | lang | status | source/copy | 한계 |
+|---|---|:-:|:-:|:-:|---|:-:|:-:|:-:|:-:|---|---|
+| ProductMaster (`product_masters`) | 기준 데이터 | — | — | — | platform | 자신 | — | — | productDataStatus | — | 콘텐츠 아님(콘텐츠 앵커) |
+| `product_identifiers` | 식별자 | — | — | — | platform | ✔ | — | — | verificationStatus | — | — |
+| `supplier_product_offers` | 공급자 원천 콘텐츠 | ✔(원천) | — | — | supplier×master | master_id | — | — | approval_status(PENDING/APPROVED/REJECTED) | offer→SPD seed(수동) | 콘텐츠 승인상태 없음(offer 상태만), in-place 편집 |
+| `organization_product_listings` | 매장 취급(O4O채택) | — | — | — | org | master_id | ✔ | — | status/is_active | — | 콘텐츠 아님 |
+| `store_local_products` | 매장 자체제품 | — | — | — | org | barcode loose | ✔ | — | is_active | — | 콘텐츠 아님 |
+| **SPD** `shared_product_descriptions` | **제품 콘텐츠 공용자산(설명서)** | ✔(원본) | — | — | master(공용) | master_id | — | ✔(default ko) | candidate/canonical/hidden/needs_review/deprecated | source_type=provenance | DESCRIPTION 전용, canonical unique (master,description_type)—lang 미포함 |
+| `product_candidate_description_drafts` | 검토용 draft | ✔(draft) | — | — | candidate | 간접 | — | ✔ | review_status(draft/needs_review/approved/rejected/...) | draft_type, AI provenance | master 이전 버퍼 |
+| `operator_multilingual_product_content_*` | 운영자 다국어 원본 | ✔(운영자) | — | — | service | target | — | ✔(locale) | draft/published/archived | author_role=operator | 제품 anchor는 target(local/listing) |
+| **`store_multilingual_product_content_*`** | **매장 다국어 콘텐츠(사본)** | — | ✔ | — | org | target(local/listing) | ✔ | ✔(ko/zh/…) | draft/published/archived | **source_type=store_created/operator_hub/supplier_offline_imported** | ko/zh 매장 사본의 핵심 |
+| `store_execution_assets` | **매장 실행자산** | — | ✔(본문) | ✔ | org | 간접 | ✔ | — | is_active | source_type=uploaded/generated | usage_type(pop/qr/signage/banner/notice), asset_type(file/content/external-link) |
+| `kpa_store_contents` | 매장 직접/스냅샷 | — | ✔ | — | org | 간접(links) | ✔ | translations | source_type=direct/snapshot_edit | snapshot override(COALESCE) | — |
+| `o4o_asset_snapshots` | 가져오기 사본 | — | ✔(사본) | — | org | — | ✔ | — | — | sourceAssetId(provenance), 반복복사 허용 | 불변 스냅샷 |
+| `store_asset_derivations` | 계보 추적 | — | — | — | org | — | ✔ | — | — | source/derived kinds | 변환기 아님(추적만) |
+| `media_assets` | 미디어 | — | 공용 | 공용 | service/org | — | — | ✔(tag) | status | source/usage_type | 단일 lang 태그 |
+| `store_qr_codes` | 매장 QR(계층2) | — | — | ✔ | org | 직접매핑 없음 | ✔ | 없음 | is_active | library_item_id/landing_target_id | master↔QR 직접매핑 부재 |
+| `store_tablet_displays` | 태블릿 편성 | — | — | ✔ | org | 제품 anchor | ✔ | — | — | content_id→kpa_store_contents(attach) | 콘텐츠는 attachment |
+| `tablet_interest_request` | 상담 요청 | — | — | — | org | master nullable | ✔ | — | 요청상태 | source(qr/tablet) | 상담=요청 row(콘텐츠 아님) |
+| `store_videos` | 매장 영상 | — | ✔ | ✔ | org | — | ✔ | — | — | 사본 | — |
+| `kpa_contents` | 운영자 문서허브 | ✔(운영자) | — | — | (서비스) | — | — | — | draft/ready/published/private | source_type, reusable_policy | **producer/visibility/serviceScope 컬럼 없음** |
+
+> 참고: `store_library_contents`, `store_pops` 라는 이름의 단일 테이블은 없음 → 각각 `store_execution_assets`(+snapshots+kpa_store_contents), POP는 `/pharmacy/pop/generate` 산출물(store_execution_assets usage_type=pop).
+
+## 부록 B. 화면별 매트릭스 (스펙 §9)
+
+| 화면·경로 | 주체 | 제품콘텐츠 조회 | 매장콘텐츠 생성 | 가져오기=복사 | 수정 | QR/POP/태블릿 연결 | 단절 |
+|---|---|:-:|:-:|:-:|:-:|:-:|---|
+| admin `/admin/o4o-product-db/masters`(+/:id) | admin | ✔(설명상태 KO/ZH badge, 직전 WO) | — | — | — | 설명보기 deep-link만 | QR/만들기 destination 없음 |
+| `/admin/o4o-product-db/description-review-queue` | admin | ✔ | — | — | ✗(read-only) | — | 승인 액션 없음(별도 surface) |
+| `/admin/shared-product-descriptions`(API) | admin | ✔ | — | — | ✔(canonical/status) | — | 수동 승격 |
+| 공급자 상품 등록/수정 (web-neture supplier) | supplier | ✔(offer 설명 작성) | — | — | ✔(offer in-place) | — | **콘텐츠 제출상태·SUPPLIER_STORE 산출 없음** |
+| 공급자/운영자 승인 (`/operator/products`) | operator | offer | — | — | 승인/반려 | — | 승인이 SPD 미접촉 |
+| OperatorContentHubPage (`/kpa/contents`) | operator | ✔(문서) | — | — | ✔ | — | 3축 컬럼 없음 |
+| OperatorMultilingualContentListPage | operator | ✔(다국어 원본) | — | — | ✔ | publish→HUB | — |
+| Hub 라이브러리 (HubMultilingual/ContentLibraryPage) | store | 운영자/공용 | — | ✔(가져오기) | — | — | 진입점 파편화 |
+| StoreHandledProductsPage (`/store/handled-products`) | store | 설명 선택 | — | (선택) | — | 행 "다국어QR" CTA(동시 트랙) | 상태 badge 금지(SIMPLIFY) |
+| StoreLibraryContentsPage (`/store-library/contents`) | store | — | ✔(내 자료함) | ✔(사본 UNION) | ✔ | — | — |
+| 다국어 콘텐츠 저작 (StoreProductMultilingualContentPage) | store | — | ✔(ko/zh 사본) | ✔(operator_hub import) | ✔ | publicKey landing+QR | — |
+| StorePopPage (`/store/marketing`) | store | — | — | — | — | ✔ POP 생성(4소스) | Product-AI POP 별도 |
+| StoreTabletDisplaysPage | store | — | — | — | attach | ✔ 태블릿(content_id) | 실행자산/POP→태블릿 없음 |
+| QR 생성 (StoreQrCreateModal / QR pages) | store | — | — | (page 사본 가드) | — | ✔ /qr/:slug | 콘텐츠 리스트엔 있음, 제품 리스트엔 없음 |
+
+## 부록 C. 현재 ↔ 목표 비교 (스펙 §17)
+
+| # | 업무 | 현재 가능 | 단절 | 재사용 | 필요 개발 | 우선순위 |
+|---|---|:-:|---|---|---|:-:|
+| 1 | 표준 콘텐츠 매장 가져오기 | ✔ | canonical 승격 수동 | import-b2c-description, SPD | 승격 자동화(보조) | 중 |
+| 2 | 공급자 콘텐츠 제출 | △ | offer in-place, 콘텐츠 제출상태 없음 | offer 설명 필드 | 제출 상태머신 | 중(G3) |
+| 3 | 공급자 콘텐츠 admin 승인 | △ | offer 승인이 SPD 미접촉 | offer 승인, seedFromSupplierOffers | 승인→SPD seed 훅 | **1위(G1)** |
+| 4 | 운영자 큐레이션 | ✔ | 매장 노출 진입점 파편 | kpa_contents, operator 다국어 | HUB browse 통일 | 3위(G4) |
+| 5 | 매장 콘텐츠 사본 생성 | ✔(견고) | — | copy-on-import 4레그 | — | — |
+| 6 | 매장 사본 수정 | ✔(견고) | — | COALESCE override 등 | — | — |
+| 7 | 매장 콘텐츠 → QR | ✔ | 제품 리스트 행 QR 없음(admin) | /qr/:slug, page 사본가드 | 행 액션(G7) | 5위 |
+| 8 | 매장 콘텐츠 → POP | ✔ | Product-AI POP 별도 | /pharmacy/pop/generate | (통합 선택) | 중 |
+| 9 | 매장 콘텐츠 → 태블릿 | △ | content=attach만 | store_tablet_displays | 실행자산→태블릿 | 하 |
+| 10 | 매장 콘텐츠 → 상담 | △ | CTA만·콘텐츠 없음 | consultation CTA, interest_request | 제품별 상담콘텐츠 | 하 |
+| — | SUPPLIER_STORE 생산 | ✗ | 생산경로 0건(소비만) | 소비 UI 존재 | descriptionType 산출 | 2위(G2) |
+| — | OSMU 1→다 변환 | ✗ | 변환기 없음 | store_asset_derivations(추적) | 변환 계층 | 6위(G5) |
+
+---
+
+> 본 IR은 조사·설계 기록(불변)이다. QR 생성 정책은 재논의하지 않았고, 코드/DB/QR/배포 무변경. 구현은 §18 후속 WO에서 수행한다. (부록 A/B/C는 스펙 §8/§9/§17 형식 보강, 2026-07-09.)
