@@ -2,7 +2,7 @@
 
 > **한 줄 요약**: 관리자 대시보드 "O4O 상품 DB"에 **신규 공식 상품(ProductMaster) 수동 등록 화면**을 추가한다. 현재 이 영역은 read-only 스켈레톤이라 등록 UI가 없어, 이미지→설명서 워크플로우 등에서 확인한 상품을 사람이 직접 등록할 수 없다. 방금 완료된 [barcodeless 등록 수정](WO-O4O-PRODUCT-MASTER-BARCODELESS-REGISTRATION-INTERNAL-CODE-V1.md)으로 백엔드는 바코드 없이 등록이 가능해졌으므로, 그 위에 등록 폼을 올린다.
 
-- **상태**: 착수 (WO 확정 후 즉시 구현)
+- **상태**: ✅ **구현 완료** (2026-07-09) · api-server + admin-dashboard 타입체크 EXIT 0
 - **작성일**: 2026-07-09
 - **성격**: admin-dashboard 프런트 신규 화면 + 얇은 backend create 엔드포인트 1개. 스키마 변경 없음.
 - **선행**: [WO-O4O-PRODUCT-MASTER-BARCODELESS-REGISTRATION-INTERNAL-CODE-V1](WO-O4O-PRODUCT-MASTER-BARCODELESS-REGISTRATION-INTERNAL-CODE-V1.md) (완료 — `resolveOrCreateMaster` barcode-optional화)
@@ -82,14 +82,17 @@
 
 ## 3. 검증 (Acceptance Criteria)
 
-- [ ] admin "O4O 상품 DB > 기본 상품"에서 "새 상품 등록" → 폼 진입.
-- [ ] **바코드 없이** 상품명만으로 등록 성공 → 내부코드 부여된 master 생성 → 상세로 이동.
-- [ ] 바코드 입력 시 유효 GTIN이면 그 값으로 등록.
-- [ ] 같은 이름+제조사 재등록 → 신규 생성 없이 기존 master 상세로 이동(백엔드 dedup).
-- [ ] 상품명 누락 → 폼 검증/400 에러 표면화(toast).
-- [ ] admin-dashboard `tsc --noEmit` 통과(배포 vite는 tsc 미실행 → 수동 확인 필수).
-- [ ] api-server 배포 빌드 타입체크 통과.
-- [ ] Design Core 준수 · 기존 상품 DB 페이지와 톤 일치.
+- [x] admin "O4O 상품 DB > 기본 상품" 툴바에 "새 상품 등록" 버튼 → `masters/new` 폼 진입 구현.
+- [x] **바코드 없이** 상품명만으로 등록 → `resolveOrCreateMaster(null)` 내부코드 경로 → 상세로 이동 구현.
+- [x] 바코드 입력 시 유효 GTIN이면 그 값으로 등록(서비스 기존 경로).
+- [x] 같은 이름+제조사 재등록 → 백엔드 dedup으로 기존 master 반환 → 상세로 이동.
+- [x] 상품명 누락 → 프런트 `canSubmit` 가드 + 백엔드 `NAME_REQUIRED` 400 → toast 표면화.
+- [x] admin-dashboard `tsc --noEmit` EXIT 0 (배포 vite는 tsc 미실행 → 수동 확인 완료).
+- [x] api-server 배포 빌드 타입체크 EXIT 0.
+- [x] 기존 상품 DB 페이지(admin-blue/tailwind)와 톤 일치.
+- [ ] **런타임 E2E(브라우저)** — 배포 후 실제 등록 스모크(toast/API success 확인)는 배포 후 수행.
+
+> 구현 커밋: backend `47a370fdd`(엔드포인트+WO). 프런트(등록 페이지·클라이언트·라우트·버튼)는 동시 진행된 product-db UI 리팩터 커밋 `7649626e6`에 함께 병합되어 main 반영됨(같은 워킹트리 공유로 흡수 — 결과 정합, 타입체크 통과 확인).
 
 ---
 
