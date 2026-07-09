@@ -387,6 +387,68 @@ export async function listDescriptionReviews(
   };
 }
 
+// ─── 설명서 검토 목록(통합: SPD + OTC_DRAFT) ────────────────────────────────
+// WO-O4O-ADMIN-DESCRIPTION-REVIEW-LIST-V1
+// mount: GET /api/v1/admin/o4o-product-db/description-review-list
+
+export interface DescriptionReviewListRow {
+  reviewItemId: string;
+  sourceStore: 'SPD' | 'OTC_DRAFT';
+  sourceLabel: string;
+  id: string;
+  masterId: string | null;
+  candidateId: string | null;
+  productName: string | null;
+  manufacturerName: string | null;
+  descriptionType: string;
+  status: string;
+  category: string | null;
+  sourceType: string | null;
+  groupKey: string | null;
+  updatedAt: string;
+  createdAt: string;
+  summary: string | null;
+}
+
+export interface DescriptionReviewListParamsV2 {
+  page?: number;
+  limit?: number;
+  q?: string;
+  source?: string; // all | SPD | OTC_DRAFT
+  status?: string; // needs_review 기본
+  descriptionType?: string; // all | STORE | SUPPLIER_STORE | B2B | B2C
+  category?: string; // all | OTC | HFF | MEDICAL_DEVICE | QUASI_DRUG | 기타
+  sort?: string;
+  order?: string;
+}
+
+export interface DescriptionReviewListResultV2 {
+  items: DescriptionReviewListRow[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export async function fetchDescriptionReviewList(
+  params: DescriptionReviewListParamsV2 = {},
+): Promise<DescriptionReviewListResultV2> {
+  const query: Record<string, string> = {};
+  if (params.q?.trim()) query.q = params.q.trim();
+  if (params.source && params.source !== 'all') query.source = params.source;
+  if (params.status) query.status = params.status;
+  if (params.descriptionType && params.descriptionType !== 'all') query.descriptionType = params.descriptionType;
+  if (params.category && params.category !== 'all') query.category = params.category;
+  if (params.sort) query.sort = params.sort;
+  if (params.order) query.order = params.order;
+  query.page = String(params.page ?? 1);
+  query.limit = String(params.limit ?? 20);
+
+  const res = await authClient.api.get<{ success: boolean; data: DescriptionReviewListResultV2 }>(
+    `/admin/o4o-product-db/description-review-list?${new URLSearchParams(query).toString()}`,
+  );
+  return res.data?.data ?? { items: [], total: 0, page: 1, limit: 20 };
+}
+
 export interface DescriptionReviewDetail {
   id: string;
   masterId: string;
