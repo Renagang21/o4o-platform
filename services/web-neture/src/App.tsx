@@ -360,6 +360,9 @@ const StoreProductPage = lazy(() => import('./pages/store/StoreProductPage'));
 // QR Landing (WO-O4O-STORE-PRODUCT-PAGE-INTEGRATION-V1)
 const QrLandingPage = lazy(() => import('./pages/store/QrLandingPage'));
 
+// Product Landing (WO-O4O-PRODUCT-LANDING-ARCHITECTURE-V1 / Phase 2b) — neture.co.kr/p/:publicKey
+const ProductLandingPage = lazy(() => import('./pages/ProductLandingPage'));
+
 // Catalog Import
 const CatalogImportDashboardPage = lazy(() => import('./pages/admin/catalog-import/CatalogImportDashboardPage'));
 const CSVImportPage = lazy(() => import('./pages/admin/catalog-import/CSVImportPage'));
@@ -662,6 +665,7 @@ function App() {
             <Route path="/auth/verify-email" element={<VerifyEmailPage />} />
             <Route path="/register/pending" element={<RegisterPendingPage />} />
             <Route path="/qr/:slug" element={<QrLandingPage />} />
+            <Route path="/p/:publicKey" element={<ProductLandingPage />} />
 
             {/* ================================================================
                 Neture 메인 (NetureLayout)
