@@ -40,6 +40,7 @@ services/          서비스(KPA·GP·KCos·Neture)               (제품군과 
 | 7 | [products/drug/*](../products/drug/) | DRUG-STANDARD · DRUG-WRITING · DRUG-GROUPING · DRUG-TEMPLATE · DRUG-RULE-REGISTRY(DR-NNN). |
 | 8 | [products/drug/knowledge/*](../products/drug/knowledge/) | **Knowledge Catalog(Rule 아님)**: ATC-FALSE-POSITIVE-CATALOG · GROUPING-PATTERNS · CONSUMER-WRITING-PATTERNS. |
 | 9 | products/{medical-device,quasi-drug,health-functional-food}/ · services/{kpa,gp,kcos,neture}/ | 제품군 확장 · 서비스 채널(Registry 없음, Rule ID 참조). |
+| 9-a | [products/O4O-PRODUCT-UNIT-DESCRIPTION-AGENT-GUIDE-V1](../products/O4O-PRODUCT-UNIT-DESCRIPTION-AGENT-GUIDE-V1.md) · [products/O4O-PRODUCT-UNIT-REGISTRATION-FROM-PHOTO-AGENT-GUIDE-V1](../products/O4O-PRODUCT-UNIT-REGISTRATION-FROM-PHOTO-AGENT-GUIDE-V1.md) | **제품 단위 트랙**(건기식/일반식품/기타 제품 — 의약품 그룹 트랙과 대비). 사진→등록→설명서(ko/zh)→QR. 조사=IR-...-PHOTO-TO-DESCRIPTION-QR-FLOW-AUDIT-V2. |
 | 10 | [../../adr/](../../adr/) | **ADR** — 채택된 결정 기록(IR=논의, ADR=결정). 소급 변환 없음, 새 결정부터. |
 
 ---
