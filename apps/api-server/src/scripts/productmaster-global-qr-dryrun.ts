@@ -6,15 +6,14 @@
  * 모든 O4O 표준 상품(ProductMaster)에 O4O 고유 QR 을 부여하기 위한 **사전 현황 산출**.
  * 실제 QR 을 생성하지 않는다. **SELECT 만 수행 — DB write 0**(존재 자체가 dry-run, --apply 개념 없음).
  *
- * ⚠️ 아키텍처 전제(Frozen F12 — O4O-PRODUCT-RESOURCE-ARCHITECTURE-BASELINE-V1):
- *   - Freeze #4: "QR = /r/{resourceId} 인코딩, **비저장·동적생성**" — QR row 를 자산으로 저장하지 않는다.
- *   - Freeze #3: 공개 permalink = /r/{resourceId} (Resource 단위, ProductMaster 단위가 아님).
- *   - Freeze #6: ProductMaster 는 Resource 를 모른다(FK 신설 금지, Resource→ProductMaster 단방향).
- *   따라서 "제품별 QR row 저장"은 F12 와 충돌하며 baseline 개정 WO 가 선행되어야 한다.
- *   본 dry-run 은 **두 후보 모델**의 현황을 모두 산출해 정책 결정을 돕는다:
- *     - 모델 D(F12 정합·권장): QR 대상 = ProductMaster 의 canonical Resource(/r/{id}). 저장 QR row 0.
- *     - 모델 C(대안·baseline 개정 필요): ProductIdentifier 에 QR_CODE identifier_type 로 per-master 토큰 저장.
- *   store_qr_codes(계층 2·매장 스코프) 재사용은 부적합(모델 A 기각) — 근거는 산출값으로 확인.
+ * 사업 방향(확정): Product → Content → QR → **Product Landing**. QR 은 제품 대표 QR 1개 → 확장 가능한
+ *   Product Landing(설명/공급자/운영자/매장/관련 콘텐츠·관련 제품). 설명서는 그중 하나이며, **설명이 없어도
+ *   QR/Landing 은 성립**한다. 따라서 QR/Landing 대상 = **모든 ProductMaster**.
+ *   - 본 dry-run 은 대상 전체 규모 + "Landing 에 실을 설명 콘텐츠 보유 현황"(콘텐츠 채움 지표) + 기존 QR/식별자
+ *     중복·충돌을 산출한다. 저장/URL 방식은 Product Landing 설계 WO 에서 확정(본 dry-run 은 결론을 확정하지 않음).
+ *   - store_qr_codes(계층 2·매장 스코프)는 전역 제품 QR 저장소로 부적합 — 근거는 산출값(null org 0 / master 타깃 0)으로 확인.
+ *   - 참고(현행 baseline F12): QR=/r/{id}·비저장 규정이 있으나 Resource 단위 관점이라 Product Landing(제품 단위·다콘텐츠)과
+ *     다르며 필요 시 개정 대상. (초안의 "QR=Resource / 설명없으면 QR없음 / /r/{id} 최종" 결론은 폐기.)
  *
  * 로컬 실행(읽기 전용): cloud-sql-proxy(127.0.0.1:15432) 기동 후
  *   DB_HOST=127.0.0.1 DB_PORT=15432 DB_USERNAME=o4o_api DB_PASSWORD=... DB_NAME=o4o_platform \
@@ -147,20 +146,19 @@ async function main(): Promise<void> {
     const report = {
       generatedAtNote: 'timestamp 는 리포트 소비 측에서 스탬프(스크립트는 시간 API 미사용)',
       writeCount: 0,
-      architectureGate: {
-        baseline: 'O4O-PRODUCT-RESOURCE-ARCHITECTURE-BASELINE-V1 (F12, Frozen)',
-        freeze4: 'QR = /r/{resourceId} 인코딩, 비저장·동적생성',
-        implication:
-          '제품별 QR row 저장(모델 A/C)은 baseline 개정 WO 선행 필요. 모델 D(/r/{id} 동적 QR)가 정합.',
-        rRoutePublicImplemented: false, // 조사 결과 /r/{id} 공개 라우트 미구현(F12 roadmap step 4)
+      direction: {
+        axis: 'Product -> Content -> QR -> Product Landing',
+        qrTargetsAllMasters: true, // 설명 유무 무관, 모든 ProductMaster 가 QR/Landing 대상
+        storageDecision: 'deferred to WO-O4O-PRODUCT-LANDING-ARCHITECTURE-V1',
+        f12Note: 'F12 현행 baseline(QR=/r/{id}·비저장)은 Resource 단위 관점 — Product Landing 방향에서 개정 가능',
       },
       inventory: {
-        totalProductMasters,
+        totalProductMasters, // = QR/Landing 대상 전부
         byRegulatory,
-        mastersWithCanonicalResource, // 모델 D 즉시 QR 대상
-        mastersWithAnyResource,
-        mastersWithoutAnyResource, // QR 지향 대상 부재 gap
-        canonicalResourceCoveragePct:
+        mastersWithCanonicalDescription: mastersWithCanonicalResource, // Landing 에 실을 설명 콘텐츠 有
+        mastersWithAnyDescription: mastersWithAnyResource,
+        mastersWithoutAnyDescription: mastersWithoutAnyResource, // Landing 설명 콘텐츠 아직 없음(대상은 유지)
+        descriptionCoveragePct:
           totalProductMasters > 0 ? +((mastersWithCanonicalResource / totalProductMasters) * 100).toFixed(2) : 0,
       },
       existingQr: {
@@ -176,22 +174,19 @@ async function main(): Promise<void> {
         candidateToCreateIfModelC: totalProductMasters - existingQrIdentifier,
       },
       candidateSummary: {
-        // 모델 D (권장·F12 정합): 저장 QR row 0, 대상 = canonical resource 보유 master
-        modelD_dynamicResourceQr: {
-          eligibleNow: mastersWithCanonicalResource,
-          blockedNoResource: mastersWithoutAnyResource,
-          estimatedStoredQrRows: 0,
+        // Product Landing 방향: QR/Landing 대상 = 모든 ProductMaster (설명 유무 무관)
+        qrLandingCandidates: totalProductMasters,
+        // 콘텐츠 채움 지표 (대상 배제 기준 아님)
+        landingContentReadiness: {
+          withCanonicalDescription: mastersWithCanonicalResource, // 설명 콘텐츠 즉시 有
+          withoutAnyDescription: mastersWithoutAnyResource, // 설명 콘텐츠 채움 필요(공급자/매장 콘텐츠 등으로도 구성 가능)
         },
-        // 모델 C (baseline 개정 필요): per-master QR_CODE identifier
-        modelC_storedIdentifier: {
-          candidateToCreate: totalProductMasters - existingQrIdentifier,
-          estimatedCreateCount: totalProductMasters - existingQrIdentifier,
-          duplicateTargets: 0, // (product_master_id, identifier_type) 유니크로 방지
-        },
+        // 저장 방식(스키마/URL)은 Product Landing 설계 WO 에서 확정 — 본 dry-run 은 결론 미확정
+        storageDecision: 'deferred',
       },
       samples: {
-        eligibleWithCanonicalResource: sampleEligible,
-        noResourceGap: sampleNoResource,
+        withCanonicalDescription: sampleEligible,
+        withoutAnyDescription: sampleNoResource,
       },
     };
 

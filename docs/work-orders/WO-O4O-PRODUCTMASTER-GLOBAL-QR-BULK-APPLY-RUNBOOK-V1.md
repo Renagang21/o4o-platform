@@ -8,25 +8,29 @@ Status: Runbook (문서 전용) — 이 문서는 실행 지시가 아니다. �
 
 ## 0. ⚠️ 선행 게이트 (반드시 먼저 읽기)
 
-IR 결론상 **저장형 per-ProductMaster QR(모델 A/C, 신규 테이블/identifier)은 F12 Freeze #4("QR 비저장·동적생성")와 충돌**한다. 따라서 apply 경로는 둘 중 하나로 갈린다.
+**사업 방향(확정)**: `Product → Content → QR → Product Landing`. QR 은 제품 대표 QR 1개 → **Product Landing**(확장 가능 화면: 설명/공급자/운영자/매장/관련 콘텐츠·관련 제품). 설명서는 그중 하나이며 **설명이 없어도 QR/Landing 은 성립**한다.
 
-| 경로 | 조건 | apply 성격 |
-| --- | --- | --- |
-| **경로 D (권장·F12 정합)** | `/r/{id}` 공개 라우트 + Resource 공개 alias 발급(F12 step4)이 선행 구현됨 | Resource permalink 을 QR 로 **동적 생성**. **저장 QR row 0** — "일괄 등록"은 Resource alias 발급(있다면)이지 QR row 삽입이 아님 |
-| **경로 S (저장형·보류)** | **F12 baseline 개정 WO 통과**로 저장형 QR 이 명문 허용된 경우에만 | per-master QR 토큰 저장(모델 C: ProductIdentifier QR_CODE) |
+**따라서 이 apply 는 Product Landing 아키텍처가 확정된 뒤에만 착수한다.**
 
-**경로 S 는 baseline 개정 전까지 금지.** 본 runbook 은 두 경로의 절차를 모두 문서화하되, 기본 실행 경로는 **D** 로 한다.
+| 선행 조건 | 상태 |
+| --- | --- |
+| `WO-O4O-PRODUCT-LANDING-ARCHITECTURE-V1` (Landing 데이터·공개 URL/키·구성 콘텐츠·**F12 개정 판단**) 완료 | **미완 — 이 apply 의 진짜 선행** |
+| 제품 대표 QR/Landing 저장 방식 확정(제품 단위 대표키) | Landing 아키텍처에서 결정 |
+
+- 제품 단위 대표 QR/Landing 저장은 현행 F12 #4/#6 과 관점이 다르므로, 채택 시 **F12 개정을 병행**한다(F12 는 절대 기준이 아님).
+- **본 runbook 은 apply 의 검증·승인·rollback 골격만 제공**한다. 구체 대상/URL/저장 스키마는 Product Landing 아키텍처 확정값을 따른다.
+- 참고(폐기): "QR=Resource(`/r/{id}`) 동적·저장0" 만을 유일 정답으로 보던 초안 결론은 **채택하지 않는다**(Landing 이 담을 콘텐츠 중 설명 하나에만 대응하므로 부족).
 
 ---
 
 ## 1. apply 목적
 
-모든 O4O 표준 상품(ProductMaster)이 O4O 고유 공개 진입점(QR)을 갖게 한다. 단, QR 은 상품의 **canonical Resource** 를 가리키는 대표 QR 1개다(언어별 다중 QR 아님).
+모든 O4O 표준 상품(ProductMaster)이 O4O 고유 공개 진입점(대표 QR 1개) → **Product Landing** 을 갖게 한다(언어별 다중 QR 아님).
 
 ## 2. apply 대상
 
-- 경로 D: canonical Resource(현 `shared_product_descriptions` status=canonical) 를 보유한 ProductMaster (2026-07-09 기준 **17,877**).
-- 경로 S(보류): active ProductMaster 전체 중 QR 토큰 미보유분.
+- **모든 active ProductMaster** (설명 유무 무관 — 설명 없어도 Landing 성립). 2026-07-09 기준 총 **198,389**.
+- 구체 대상·제외·저장 스키마는 **Product Landing 아키텍처 확정값**을 따른다.
 
 ## 3. 제외 대상
 
@@ -35,9 +39,8 @@ StoreLocalProduct
 OrganizationProductListing
 SupplierProductOffer
 매장별 복사 상품(store_execution_assets / kpa_store_contents)
-Resource(설명) 미보유 ProductMaster (경로 D 에서 QR 지향 대상 없음 — 설명/Resource 확보 후 대상)
 ```
-설명서/다국어 콘텐츠/StoreLocalProduct/Listing 생성 **금지**.
+설명서/다국어 콘텐츠/StoreLocalProduct/Listing 생성 **금지**. (설명 부재 master 는 제외가 아니라 Landing 콘텐츠를 이후 채우는 대상)
 
 ## 4. 사전 백업
 
@@ -141,6 +144,6 @@ apply 후 `docs/checks/CHECK-O4O-PRODUCTMASTER-GLOBAL-QR-BULK-APPLY-V1.md` 에:
 
 ## 13. 요약
 
-- 기본 실행 경로 = **D(F12 정합·저장 0)**. 선행 = `/r/{id}` 공개 라우트/alias.
-- 저장형(S)은 **baseline 개정 후에만**.
-- 어떤 경로든 **사용자 명시 승인 + dry-run 선행 + batchId rollback** 이 강제.
+- QR → **Product Landing**(확장 가능). 제품 대표 QR 1개. 대상 = 모든 ProductMaster.
+- **진짜 선행 = `WO-O4O-PRODUCT-LANDING-ARCHITECTURE-V1`**(Landing 데이터·URL·구성 콘텐츠·F12 개정 판단). 그 확정 전 apply 금지.
+- 어떤 경우든 **사용자 명시 승인 + dry-run 선행 + batchId rollback** 강제.

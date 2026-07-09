@@ -1,8 +1,8 @@
 # CHECK-O4O-PRODUCTMASTER-GLOBAL-QR-SEED-ENVIRONMENT-V1
 
-Status: DONE — 조사·환경 구축(문서 + read-only dry-run). **DB write 0 · 실제 QR 생성 0 · migration 0 · deploy 0** (2026-07-09)
+Status: DONE (조사) — 문서 + read-only dry-run. **DB write 0 · 실제 QR 생성 0 · migration 0 · deploy 0** (2026-07-09). **아키텍처 결론 미확정** — 최종 방향은 Product Landing 설계 WO.
 WO: `WO-O4O-PRODUCTMASTER-GLOBAL-QR-SEED-ENVIRONMENT-V1`
-상위 baseline: **F12 `O4O-PRODUCT-RESOURCE-ARCHITECTURE-BASELINE-V1` (Frozen)**
+사업 방향(확정): **`Product → Content → QR → Product Landing`** (QR→확장 가능한 Product Landing). F12 는 현행 baseline이며 이 방향에 따라 **개정 가능**.
 
 Scope: 모든 ProductMaster 에 O4O 고유 QR 을 부여하기 위한 **사전 환경**(정책·현황·dry-run·runbook·rollback 기준). 실제 전체 QR 일괄 생성은 하지 않음 — 별도 채팅방/별도 apply WO.
 
@@ -22,12 +22,16 @@ Scope: 모든 ProductMaster 에 O4O 고유 QR 을 부여하기 위한 **사전 �
 
 `store_qr_codes`·`store_qr_scan_events`·`product_masters`·`product_identifiers`·`shared_product_descriptions` / `GET /{service}/qr/public/:slug`·`POST /pharmacy/qr` / F12 baseline 문서 (§상세는 IR §2).
 
-## 3. ProductMaster QR 정책 (권장)
+## 3. ProductMaster QR 정책 (사업자 확정 — Product Landing 중심)
 
-- **ProductMaster 1개 = O4O 대표 QR 1개** (언어별 다중 QR 아님, 랜딩 언어탭).
-- **QR URL = `neture.co.kr/r/{resourceId}`** (F12 #3). `/qr/{slug}` 신설 금지(이중 아이덴티티).
-- **QR 비저장·동적생성**(F12 #4) — Resource permalink 을 QR 로 런타임 인코딩. 저장 QR row 0.
-- ProductMaster 무FK(F12 #6) — 방향은 Resource→ProductMaster.
+축 = **`Product → Content → QR → Product Landing`**.
+- **ProductMaster 1개 = O4O 대표 QR 1개** (언어별 다중 QR 아님, 랜딩 언어탭). — 유지.
+- **QR → Product Landing** 으로 연결(단일 Resource/설명 아님).
+- **Product Landing = 확장 가능한 화면**: 제품 설명 / 제품 콘텐츠 / 공급자 콘텐츠 / 운영자·매장 콘텐츠 / 관련 콘텐츠 / 관련 제품. 설명서는 그중 하나.
+- **모든 ProductMaster 가 QR/Landing 대상** — 설명 없어도 다른 콘텐츠로 Landing 구성 가능.
+- 저장/URL 방식은 **Product Landing 설계 WO 로 이관**(제품 단위 대표 QR·Landing 저장 유력 → 채택 시 F12 개정 병행).
+
+**폐기된 결론(채택 안 함)**: "QR=Resource" / "설명서 없으면 QR 없음" / "`/r/{resourceId}` 가 최종 구조".
 
 ## 4. QR URL/slug/publicKey 후보 → 결정
 
@@ -39,24 +43,23 @@ Scope: 모든 ProductMaster 에 O4O 고유 QR 을 부여하기 위한 **사전 �
 
 | 항목 | 값 |
 | --- | --- |
-| 전체 ProductMaster | **198,389** (rx 119,548 / otc 57,572 / 의약외품 17,148 / 의료기기 3,826 / 기타 295) |
-| canonical Resource 보유(모델 D 대상) | **17,877 (9.01%)** |
-| 임의 Resource 보유 | 21,092 |
-| **Resource 부재(QR 대상 없음 gap)** | **177,297 (≈89%)** |
+| 전체 ProductMaster (= **QR/Landing 대상 전부**) | **198,389** (rx 119,548 / otc 57,572 / 의약외품 17,148 / 의료기기 3,826 / 기타 295) |
+| 설명서(canonical SPD) 보유 = Landing 에 실을 설명 有 | **17,877 (9.01%)** |
+| 임의 설명 보유 | 21,092 |
+| 설명 부재(= Landing 설명 콘텐츠 아직 없음, QR 대상은 유지) | **177,297 (≈89%)** |
 | store_qr_codes | 27 (page16/link10/video1, active 10), null org **0**, master 타깃 **0**, slug 중복 **0** |
 | QR identifier(QR_CODE/O4O_QR) | **0** |
 
 ## 6. dry-run 결과
 
 - 스크립트: `apps/api-server/src/scripts/productmaster-global-qr-dryrun.ts` (**write 0**, SELECT only, `--out` JSON).
-- 실행 검증 완료(cloud-sql-proxy + `npx tsx`). writeCount=0. modelD.eligibleNow=17,877 / blockedNoResource=177,297 / estimatedStoredQrRows=0. modelC.candidateToCreate=198,389(보류).
-- 중복 slug 0 · master당 QR 중복 0 · master 직접 타깃 QR 0 · QR identifier 0.
+- 실행 검증 완료(cloud-sql-proxy + `npx tsx`). writeCount=0. QR/Landing 대상 = 전체 198,389. 설명 보유 17,877 / 설명 부재 177,297(대상은 유지·콘텐츠 채움 문제). 중복 slug 0 · master당 QR 중복 0 · master 직접 타깃 QR 0 · QR identifier 0.
 
-## 7. 권장 저장 방식
+## 7. 권장 방향 (Product Landing 중심)
 
-- **모델 D (`/r/{id}` 동적 QR)** 채택 — 신규 QR 저장 테이블/컬럼/identifier **미생성**.
-- store_qr_codes 재사용(A) 기각 / 신설 테이블(B)·QR_CODE identifier(C)는 **F12 개정 WO 선행 시에만**.
-- 진짜 선행 = F12 step4 `/r/{id}` 공개 라우트 + Resource 공개 alias(미구현).
+- QR → **Product Landing**(확장 가능 화면). 제품 대표 QR 1개 유지.
+- 저장/URL 은 **Product Landing 설계 WO 로 이관** — 제품 단위 대표 QR·Landing 저장(§4 B 계열)이 유력하며 채택 시 **F12 개정 병행**.
+- store_qr_codes 재사용(A) 기각(매장 스코프). "QR=Resource(`/r/{id}`)" 는 **채택 안 함**(Landing 이 담을 콘텐츠 중 설명 하나에만 대응).
 
 ## 8. 실제 QR 생성 없음 / 변경 없음
 
@@ -77,15 +80,16 @@ Scope: 모든 ProductMaster 에 O4O 고유 QR 을 부여하기 위한 **사전 �
 - CHECK: 본 문서
 - 신규 제품 QR 동시 등록 메모 / QR 없는 제품 보정 메모: IR §10·§11
 
-## 10. 후속 apply WO
+## 10. 후속 WO (Product Landing 중심)
 
-`WO-O4O-PRODUCT-RESOURCE-PUBLIC-ALIAS-V1`(=F12 step4, 진짜 선행) → `WO-O4O-PRODUCTMASTER-GLOBAL-QR-BULK-APPLY-V1` → `-MISSING-QR-BACKFILL-V1` → `-QR-ON-CREATE-V1` → `-QR-PUBLIC-LANDING-V1` → `WO-O4O-PRODUCT-MFDS-ADMIN-DISPOSITION-CHECK-PIPELINE-V1`.
+**`WO-O4O-PRODUCT-LANDING-ARCHITECTURE-V1`**(핵심 선행 — Landing 데이터·URL·구성 콘텐츠·F12 개정 판단) → `WO-O4O-PRODUCTMASTER-GLOBAL-QR-BULK-APPLY-V1` → `-QR-ON-CREATE-V1` → `WO-O4O-PRODUCT-LANDING-CONTENT-COMPOSITION-V1` → `-QR-PUBLIC-LANDING-V1` → `WO-O4O-PRODUCT-MFDS-ADMIN-DISPOSITION-CHECK-PIPELINE-V1`.
 
 ---
 
-## 11. 핵심 결론 (사업자 판단용)
+## 11. 핵심 결론 (사업자 확정 반영)
 
-- 이번 WO 의 문자적 전제(제품별 QR row 저장 + `/qr/{slug}`)는 **Frozen F12 와 충돌**. 저장형은 baseline 개정 없이는 불가.
-- **QR 은 상품의 canonical Resource(`/r/{id}`)를 가리키는 동적 QR** 로 정의하는 것이 F12 정합. 저장 0.
-- 실질 병목은 QR 이 아니라 **Resource(설명) 부재 89%** — 설명서 확보 트랙과 직결.
-- 저장형 QR 이 사업상 꼭 필요하면: **F12 개정 WO** 를 먼저 올린다(별도 결정).
+- 축 = **`Product → Content → QR → Product Landing`**. QR 은 제품 대표 QR 1개 → **Product Landing**.
+- Product Landing 은 설명서에 한정되지 않는 **확장 가능한 화면**(설명/공급자/운영자/매장/관련 콘텐츠·관련 제품). 설명서는 그중 하나.
+- **모든 ProductMaster 가 QR/Landing 대상** — "설명 없으면 QR 없음"은 폐기. 설명 부재 89% 는 **Landing 콘텐츠 채움 문제**.
+- 저장/URL·F12 개정 여부는 **Product Landing 설계 WO** 에서 결정. F12 는 절대 기준이 아니며 사업 방향에 맞춰 개정 가능.
+- 본 IR 의 기술 조사(구조·현황·dry-run·중복 검증)는 유효. 아키텍처 결론은 확정하지 않음.
