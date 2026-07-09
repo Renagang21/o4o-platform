@@ -40,19 +40,16 @@
 
 ---
 
-## 2. 범위 (In Scope)
+## 2. 범위 (In Scope) — **개정 2026-07-09 (구현 착수 결정 반영)**
 
-기존 QR 구조를 활용하여 **상품 기준 다국어 QR 콘텐츠 생성·연결 동선만 추가**한다.
+> 구현 착수 전 배선 매핑 결과, 매장(store)에는 다국어 page(한/중)를 직접 작성하는 편집기·API가 없고 운영자(operator) 전용임이 확인됨. 사용자 결정(§4-B): **매장 직접 저작 편집기를 신규**한다. 따라서 범위가 "프론트 연결만"에서 "**매장 저작 편집기 + 매장 스코프 백엔드 엔드포인트 신설**"로 확장됨. 단 **엔티티·테이블은 그대로(migration 0)**, 로직은 기존 operator 컨트롤러/서비스를 매장 스코프로 미러링한다.
 
-1. **상품 상세/관리 화면에 "QR 콘텐츠 만들기" CTA 추가**
-   - 대상: 취급상품(`StoreHandledProductsPage`, listing/local) 우선. (admin master는 후속 검토.)
-   - 동작: 해당 상품(target_kind + target_id)에 대한 다국어 콘텐츠 그룹 생성/편집 화면으로 진입.
-2. **기존 다국어 콘텐츠 편집기 재사용** — group/page 생성·편집(한국어 page, 중국어 page 각각 HTML).
-3. **상품 정보 prefill 전달** — target_kind/target_id/상품명. 신규 상품이면 먼저 상품 생성 후 그 id로 target 지정.
-4. **QR 콘텐츠용 landingType 추가 필요 여부 판단** → **판단 결과: 불필요.** 선행 IR 안 1(`landingType='link'` + publicKey URL) 채택으로 기존 타입 재사용.
-5. **한국어/중국어를 각각 QR target 으로 삼을 수 있는지** → 섹션 4 "결정 필요" 참조(1 QR+언어탭 vs 언어별 QR 2개).
-6. QR 공개 경로는 **반드시 `/qr/{slug}`** 사용.
-7. `neture.co.kr/r/{resourceId}` 경로 **사용 금지**(매장 QR 계층 미구현).
+1. **매장 저작 다국어 편집기 신규** — `store_created` 그룹 생성 + 한국어/중국어 page 작성(HTML). 기존 `OperatorMultilingualContentWritePage` 를 store 스코프로 이식.
+2. **매장 스코프 백엔드 엔드포인트 신설** — store `createGroup`(target_kind/target_id 바인딩 + `source_type='store_created'`) / `upsertPage(groupId, locale)` / `publishGroup`. 기존 operator 서비스 로직 재사용 + `organizationId` 소유 가드. 신규 테이블 없음.
+3. **상품 화면 진입 CTA** — 취급상품(`StoreHandledProductsPage`, listing/local) 행에서 해당 상품 다국어 편집기 진입 + 요약 배지(`StoreLocalProductsPage` 참조 이식). `sourceType`(listing/local) → `targetKind` 직결.
+4. **QR = 다국어 그룹 publicKey QR** (§4-C 결정) — `MultilingualPublicActions`(`ensureMlcPublicKey` → `getMlcQr`) 재사용. **store_qr_codes row 미생성.** 공개 경로 = **`/multilingual-products/:publicKey`**.
+5. 신규 상품이면 먼저 상품 생성(취급상품/로컬) 후 그 id로 target 지정.
+6. `neture.co.kr/r/{resourceId}` 경로 **사용 금지**(미구현).
 
 ---
 
@@ -60,13 +57,14 @@
 
 | 필요 기능 | 기존 자산 | 신규 필요? |
 |------|------|:---:|
-| 상품별 다국어 콘텐츠 저장 | `store_multilingual_product_content_groups/pages` | ❌ 재사용 |
+| 상품별 다국어 콘텐츠 저장 (엔티티/테이블) | `store_multilingual_product_content_groups/pages` | ❌ 재사용 (migration 0) |
 | 한/중 HTML 별도 저장 | page `(group_id, locale)` + `content_format='html'` | ❌ 재사용 |
-| 공개/QR 랜딩 (언어 탭·fallback) | `/public/multilingual-product-contents/:publicKey` + `MultilingualProductPublicLandingPage` | ❌ 재사용 |
-| publicKey 발급 | `POST /pharmacy/multilingual-product-contents/:groupId/public-key` | ❌ 재사용 |
-| QR 생성 | `POST /pharmacy/qr` + `StoreQrCreateModal`/`StoreQRPage` | ❌ 재사용 |
-| 상품 화면 → 다국어 진입 CTA | (부분) `MultilingualPublicActions` | ⚠️ listing/master용 진입 **추가** |
-| QR ↔ 다국어 그룹 연결 | 안 1(`landingType='link'` + publicKey URL) | ⚠️ QR 선택 모달에 "다국어 제품 콘텐츠" 소스 탭 **추가** |
+| 공개/QR 랜딩 (언어 탭·fallback) | `/multilingual-products/:publicKey` + `MultilingualProductPublicLandingPage` (`App.tsx:1084`) | ❌ 재사용 |
+| publicKey 발급 + QR SVG | `ensureMlcPublicKey` + `getMlcQr` (`MultilingualPublicActions`) | ❌ 재사용 |
+| 다국어 저작 서비스 로직 | operator 컨트롤러/서비스(`createGroup`/`upsertPage`/`publish`) | ♻️ 매장 스코프로 **미러링** |
+| 매장 스코프 저작 엔드포인트 | (없음 — store API엔 import/summary/ensureKey/getQr만) | ⚠️ **신설** (organizationId 가드) |
+| 매장 저작 편집기 화면 | `OperatorMultilingualContentWritePage`(operator 전용) | ⚠️ store 스코프로 **이식** |
+| 상품 화면 진입 CTA + 배지 | `StoreLocalProductsPage`(getMlcSummaryMap→summary.groupId→PublicActions) | ♻️ `StoreHandledProductsPage`로 **이식**(listing+local 2 kind) |
 
 ---
 
@@ -81,30 +79,36 @@
 
 > (참고) 대안 B-2(언어별 QR 2개, `?locale=` 링크)는 미채택. 향후 인쇄물을 언어별로 분리 배포할 필요가 생기면 같은 publicKey에 `?locale=` 를 붙인 추가 QR을 스키마 변경 없이 발급하는 방식으로 병행 가능(별도 판단).
 
+## 4-B. 저작 주체 — **매장 직접 저작 확정** (2026-07-09)
+**결정: 매장이 상품 화면에서 한/중 HTML을 직접 작성**(store_created 그룹). 운영자 저작→매장 가져오기 모델은 미채택. ⇒ 매장 스코프 저작 편집기·엔드포인트 신설(범위 §2 개정 참조). 신규 테이블 없음.
+
+## 4-C. QR 등록 형태 — **다국어 그룹 publicKey QR 확정** (2026-07-09)
+**결정: 다국어 그룹의 publicKey QR(`MultilingualPublicActions`)을 그대로 사용.** `store_qr_codes` row 미생성(중복 방지). 상품 화면에서 QR 보기/URL 복사/인쇄. **공개 경로 = `/multilingual-products/:publicKey`** (`/qr/{slug}` 아님 — 이 QR 형태는 다국어 전용 랜딩을 씀).
+
 ---
 
 ## 5. 금지 사항 (Guard)
 
-- ❌ 신규 QR 엔진 생성
-- ❌ QR 데이터 구조 전면 변경 / `store_qr_codes` 스키마에 lang 컬럼 신설(B-2도 `?locale=` 링크로 처리, 컬럼 불필요)
-- ❌ 기존 QR 공개 경로 변경 (`/qr/{slug}` 유지, `/r/{resourceId}` 금지)
+- ❌ 신규 QR 엔진 생성 (기존 `getMlcQr` SVG 생성 재사용)
+- ❌ 신규 저장소/테이블 생성 — 기존 `store_multilingual_product_content_*` 재사용 (**migration 0 필수**)
 - ❌ 상품 원본 데이터 임의 변경
 - ❌ 기존 설명서(`shared_product_descriptions`) 덮어쓰기 / 여기에 QR 판매 콘텐츠 저장
-- ❌ `kpa_contents` 다국어화(선행 IR 비권장 — 정책 구현체 중복 + 대규모 스키마 변경)
-- ❌ DB 스키마 변경 (본 WO 범위에서 migration 불필요가 목표)
+- ❌ `kpa_contents` 다국어화(선행 IR 비권장)
+- ❌ `/r/{resourceId}` 경로 사용
+- ⚠️ 백엔드 신설은 **매장 스코프 저작 엔드포인트로 한정**(operator 로직 미러 + organizationId 가드). 그 외 core/공통 계약 변경 금지.
 
 ---
 
 ## 6. 완료 기준 (사용자 §7 체크리스트 대응)
 
-- [ ] 상품 기준 콘텐츠 target 생성 가능 (target_kind + target_id)
-- [ ] 한국어/중국어 콘텐츠 분리 저장 가능 (page 2 row)
-- [ ] HTML 디자인 저장 가능 (`content_format='html'`)
-- [ ] QR 생성 가능 (B-1 확정: 상품당 QR **1개** → 언어 탭 랜딩)
-- [ ] `/qr/{slug}` 로 각각 접근 가능 (모바일 렌더 확인)
-- [ ] 상품 관리 화면에서 QR 확인 가능
+- [ ] 매장이 상품 화면에서 다국어 그룹 생성 가능 (target_kind + target_id, `source_type='store_created'`)
+- [ ] 한국어/중국어 HTML page 분리 저작·저장·publish 가능 (page 2 row, `content_format='html'`)
+- [ ] QR = 다국어 그룹 publicKey QR (상품당 1개, 언어 탭 랜딩)
+- [ ] **`/multilingual-products/:publicKey`** 로 접근·모바일 렌더 확인 (한/중 탭)
+- [ ] 상품 관리 화면(취급상품)에서 배지·QR 확인 가능
 - [ ] 기존 상품 데이터·분류를 임의 변경하지 않음
-- [ ] smoke: 선행 IR §5 시나리오(단일 언어 바로 표시 / 한·중 탭 / 없는 언어 fallback) 재사용
+- [ ] migration 0 (스키마 변경 없음)
+- [ ] smoke: 선행 IR §5 시나리오(단일 언어 바로 표시 / 한·중 탭 / 없는 언어 fallback)
 
 ---
 
