@@ -17,7 +17,6 @@ import { resolveOperatorScope, logCrossServiceQuery, PLATFORM_ADMIN_SCOPE_REQUIR
 import { ProductCandidateService } from '../services/product-candidate.service.js';
 import type {
   ProductCandidateStatus,
-  ProductCandidateMatchStatus,
   ProductCandidateSourceType,
 } from '../entities/ProductCandidate.entity.js';
 import type { ProductIdentifierType } from '../entities/ProductIdentifier.entity.js';
@@ -72,7 +71,7 @@ export function createProductCandidateController(dataSource: DataSource): Router
       }
       if (resolved.crossService) logCrossServiceQuery(req);
 
-      const { status, groupedStatus, matchStatus, sourceType, sourceLabel, search, q, serviceKey, organizationId, page, limit } = req.query;
+      const { status, groupedStatus, sourceType, sourceLabel, search, q, serviceKey, organizationId, page, limit } = req.query;
       // 화면용 groupedStatus 는 원시 status 배열로 변환 (기존 status 단건 필터도 계속 지원)
       const candidateStatuses = groupedStatus
         ? GROUPED_STATUS_MAP[String(groupedStatus)]
@@ -80,7 +79,6 @@ export function createProductCandidateController(dataSource: DataSource): Router
       const result = await service.findCandidates({
         candidateStatus: status as ProductCandidateStatus | undefined,
         candidateStatuses,
-        matchStatus: matchStatus as ProductCandidateMatchStatus | undefined,
         sourceType: sourceType as ProductCandidateSourceType | undefined,
         sourceLabel: (sourceLabel as string | undefined) || undefined,
         search: ((search ?? q) as string | undefined) || undefined,
@@ -145,7 +143,7 @@ export function createProductCandidateController(dataSource: DataSource): Router
     }
   }) as RequestHandler);
 
-  // POST / — 후보 생성 (+ 식별자 있으면 즉시 매칭 시도)
+  // POST / — 후보 생성 (사전 매칭 없음 — 중복 방지는 등록 시점 dedup)
   router.post('/', (async (req: Request, res: Response) => {
     try {
       const b = req.body ?? {};
@@ -171,24 +169,11 @@ export function createProductCandidateController(dataSource: DataSource): Router
         candidatePrice: b.candidatePrice ?? null,
         rawPayload: b.rawPayload ?? null,
       };
-      const candidate =
-        input.identifierType && input.identifierValue
-          ? await service.createCandidateFromIdentifier(input)
-          : await service.createCandidate(input);
+      const candidate = await service.createCandidate(input);
       return res.status(201).json({ success: true, data: candidate });
     } catch (error) {
       logger.error('[ProductCandidate] create error:', error);
       return res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
-    }
-  }) as RequestHandler);
-
-  // POST /:id/match — Identifier Core 기반 매칭 재시도
-  router.post('/:id/match', (async (req: Request, res: Response) => {
-    try {
-      const candidate = await service.matchCandidate(req.params.id);
-      return res.json({ success: true, data: candidate });
-    } catch (error) {
-      return handleMutationError(res, error, 'match');
     }
   }) as RequestHandler);
 
@@ -204,20 +189,6 @@ export function createProductCandidateController(dataSource: DataSource): Router
         return res.status(400).json({ success: false, error: msg });
       }
       return handleMutationError(res, error, 'promote-master');
-    }
-  }) as RequestHandler);
-
-  // POST /:id/manual-match — 운영자 수동 매칭 (기존 Master 연결)
-  router.post('/:id/manual-match', (async (req: Request, res: Response) => {
-    try {
-      const { productMasterId } = req.body ?? {};
-      if (!productMasterId) {
-        return res.status(400).json({ success: false, error: 'PRODUCT_MASTER_ID_REQUIRED' });
-      }
-      const candidate = await service.manuallyMatchCandidate(req.params.id, productMasterId, userId(req));
-      return res.json({ success: true, data: candidate });
-    } catch (error) {
-      return handleMutationError(res, error, 'manual-match');
     }
   }) as RequestHandler);
 

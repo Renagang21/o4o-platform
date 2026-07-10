@@ -215,15 +215,8 @@ export class MobileProductDraftService {
       },
     });
 
-    // 식별자가 있으면 매칭 시도 (자동 승격은 하지 않음)
-    if (candidate.identifierType && candidate.identifierValue) {
-      try {
-        await this.candidateService.matchCandidate(candidate.id);
-      } catch {
-        // 매칭 실패는 전환 자체를 막지 않는다 (best-effort)
-      }
-    }
-
+    // WO-O4O-PUBLIC-DATA-CANDIDATE-LEGACY-MASTER-MATCHING-REMOVAL-V1:
+    //   후보 생성 시 기존 ProductMaster 사전 매칭을 하지 않는다. 중복 방지는 등록(승격) 시점 dedup.
     draft.candidateId = candidate.id;
     draft.draftStatus = 'candidate_created';
     draft.convertedAt = new Date();

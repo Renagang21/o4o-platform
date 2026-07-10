@@ -25,10 +25,8 @@ export {
   ProductCandidate,
   PRODUCT_CANDIDATE_SOURCE_TYPES,
   PRODUCT_CANDIDATE_STATUSES,
-  PRODUCT_CANDIDATE_MATCH_STATUSES,
   type ProductCandidateSourceType,
   type ProductCandidateStatus,
-  type ProductCandidateMatchStatus,
 } from './ProductCandidate.entity.js';
 // WO-O4O-MOBILE-PRODUCT-DRAFT-TO-CANDIDATE-V1: Mobile Product Draft (Phase 4)
 export {

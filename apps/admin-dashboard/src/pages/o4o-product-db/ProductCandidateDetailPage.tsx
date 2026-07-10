@@ -11,8 +11,6 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { getProductCandidate, ProductCandidateRow } from '@/api/o4o-product-db.api';
-// WO-O4O-ADMIN-PUBLIC-DATA-CANDIDATE-CLOSED-STATUS-AND-MATCH-BADGE-CLEANUP-V1
-import { matchStatusBusinessLabel } from './candidate-status.util';
 
 export default function ProductCandidateDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -74,12 +72,10 @@ export default function ProductCandidateDetailPage() {
             <Field label="식별자 값" value={row.identifierValue} />
           </Section>
 
-          <Section title="매칭 결과">
+          {/* WO-...-LEGACY-MASTER-MATCHING-REMOVAL-V1: 사전 매칭 표시 제거 → 등록 결과만 */}
+          <Section title="등록 결과">
             <Field label="후보 상태" value={row.candidateStatus} />
-            {/* 종료 후보는 매칭 표시 숨김(—), 등록 전 후보는 업무 의미 문구 */}
-            <Field label="기본상품 매칭" value={matchStatusBusinessLabel(row.candidateStatus, row.matchStatus) ?? '—'} />
-            <Field label="매칭 Master ID" value={row.matchedProductMasterId} />
-            <Field label="신뢰도" value={row.confidenceScore} />
+            <Field label="등록된 O4O 상품 ID" value={row.matchedProductMasterId} />
             <Field label="검토 노트" value={row.reviewNote} />
             <Field label="생성일" value={row.createdAt} />
           </Section>

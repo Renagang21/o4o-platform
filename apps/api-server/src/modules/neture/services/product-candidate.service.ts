@@ -15,15 +15,13 @@
  */
 
 import type { DataSource, Repository, FindOptionsWhere } from 'typeorm';
-import { IsNull, ILike, In, Not } from 'typeorm';
+import { IsNull, In } from 'typeorm';
 import { ProductCandidate } from '../entities/ProductCandidate.entity.js';
 import type {
   ProductCandidateSourceType,
   ProductCandidateStatus,
-  ProductCandidateMatchStatus,
 } from '../entities/ProductCandidate.entity.js';
 import { ProductMaster } from '../entities/ProductMaster.entity.js';
-import { ProductIdentifierService } from './product-identifier.service.js';
 import type { ProductIdentifierType } from '../entities/ProductIdentifier.entity.js';
 import { normalizeIdentifier } from '../utils/product-identifier.util.js';
 // WO-O4O-PRODUCT-TYPE-CLASSIFICATION-WIRING-F3-V1
@@ -97,7 +95,6 @@ export interface FindCandidatesFilter {
    * WO-O4O-ADMIN-PRODUCT-CANDIDATE-STATUS-SIMPLIFY-V2: 화면 groupedStatus 를 원시 status 배열로 변환해 전달.
    */
   candidateStatuses?: ProductCandidateStatus[];
-  matchStatus?: ProductCandidateMatchStatus;
   sourceType?: ProductCandidateSourceType;
   /** 공공 seed 라벨 정확일치 필터 (예: MFDS_HEALTH_FUNCTIONAL_FOOD) — external_api 후보 분리용 */
   sourceLabel?: string;
@@ -111,23 +108,14 @@ export interface FindCandidatesFilter {
   limit?: number;
 }
 
-export interface MatchOutcome {
-  matchStatus: ProductCandidateMatchStatus;
-  matchedProductMasterId: string | null;
-  matchedIdentifierId: string | null;
-  confidenceScore: string | null;
-}
-
 export class ProductCandidateService {
   private readonly repo: Repository<ProductCandidate>;
   private readonly masterRepo: Repository<ProductMaster>;
-  private readonly identifierService: ProductIdentifierService;
   private readonly drugExtensionService: ProductDrugExtensionService;
 
   constructor(private readonly dataSource: DataSource) {
     this.repo = dataSource.getRepository(ProductCandidate);
     this.masterRepo = dataSource.getRepository(ProductMaster);
-    this.identifierService = new ProductIdentifierService(dataSource);
     this.drugExtensionService = new ProductDrugExtensionService(dataSource);
   }
 
@@ -146,7 +134,6 @@ export class ProductCandidateService {
       sourceLabel: input.sourceLabel ?? null,
       submittedBy: input.submittedBy ?? null,
       candidateStatus: 'pending',
-      matchStatus: 'unmatched',
       identifierType: input.identifierType ?? null,
       identifierValue: input.identifierValue ?? null,
       normalizedIdentifierValue: normalized,
@@ -161,12 +148,6 @@ export class ProductCandidateService {
       rawPayload: input.rawPayload ?? null,
     });
     return this.repo.save(entity);
-  }
-
-  /** 후보 생성 + 즉시 매칭 시도 (자동 승격은 하지 않음). */
-  async createCandidateFromIdentifier(input: CreateCandidateInput): Promise<ProductCandidate> {
-    const created = await this.createCandidate(input);
-    return this.matchCandidate(created.id);
   }
 
   async getCandidate(id: string): Promise<ProductCandidate | null> {
@@ -255,7 +236,6 @@ export class ProductCandidateService {
     } else if (filter.candidateStatus) {
       where.candidateStatus = filter.candidateStatus;
     }
-    if (filter.matchStatus) where.matchStatus = filter.matchStatus;
     if (filter.sourceType) where.sourceType = filter.sourceType;
     if (filter.sourceLabel) where.sourceLabel = filter.sourceLabel;
     if (filter.organizationId) where.organizationId = filter.organizationId;
@@ -293,131 +273,6 @@ export class ProductCandidateService {
     return { items, total };
   }
 
-  /**
-   * Identifier Core 기반 매칭 시도. ProductMaster 를 생성하지 않으며 자동 승격하지 않는다.
-   *
-   * 순서:
-   *   1. (type, normalized) identifier 검색
-   *   2. normalized identifier 검색 (type 무관)
-   *   3. product_masters.barcode fallback
-   *   4. name + brand/manufacturer 유사(ILIKE) 검색
-   *   5. 없음 → no_match / 충돌(복수 master) → conflict
-   */
-  async matchCandidate(candidateId: string): Promise<ProductCandidate> {
-    const candidate = await this.getCandidate(candidateId);
-    if (!candidate) throw new Error('CANDIDATE_NOT_FOUND');
-
-    const outcome = await this.computeMatch(candidate);
-
-    candidate.matchStatus = outcome.matchStatus;
-    candidate.matchedProductMasterId = outcome.matchedProductMasterId;
-    candidate.matchedIdentifierId = outcome.matchedIdentifierId;
-    candidate.confidenceScore = outcome.confidenceScore;
-    // exact/manual 매칭이어도 candidate_status 는 'matched' 까지만 (자동 승인 금지)
-    if (
-      outcome.matchStatus === 'exact_identifier_match' ||
-      outcome.matchStatus === 'possible_identifier_match'
-    ) {
-      candidate.candidateStatus = 'matched';
-    } else if (candidate.candidateStatus === 'pending') {
-      candidate.candidateStatus = 'reviewing';
-    }
-    return this.repo.save(candidate);
-  }
-
-  private async computeMatch(candidate: ProductCandidate): Promise<MatchOutcome> {
-    const type = candidate.identifierType as ProductIdentifierType | null;
-    const normalized =
-      candidate.normalizedIdentifierValue ||
-      (type && candidate.identifierValue ? normalizeIdentifier(type, candidate.identifierValue) : null);
-
-    // 1. (type, value) identifier 검색
-    if (type && candidate.identifierValue) {
-      const hits = await this.identifierService.findByIdentifier(type, candidate.identifierValue);
-      const outcome = this.outcomeFromIdentifierHits(hits, 'exact_identifier_match', '1.0000');
-      if (outcome) return outcome;
-    }
-
-    // 2. normalized identifier 검색 (type 무관)
-    if (normalized) {
-      const hits = await this.identifierService.findByNormalizedValue(normalized);
-      const outcome = this.outcomeFromIdentifierHits(hits, 'possible_identifier_match', '0.8000');
-      if (outcome) return outcome;
-    }
-
-    // 3. product_masters.barcode fallback
-    if (normalized) {
-      const masters = await this.masterRepo.find({ where: { barcode: normalized }, take: 2 });
-      if (masters.length === 1) {
-        return {
-          matchStatus: 'possible_identifier_match',
-          matchedProductMasterId: masters[0].id,
-          matchedIdentifierId: null,
-          confidenceScore: '0.7000',
-        };
-      }
-      if (masters.length > 1) {
-        return { matchStatus: 'conflict', matchedProductMasterId: null, matchedIdentifierId: null, confidenceScore: null };
-      }
-    }
-
-    // 4. name + brand/manufacturer 유사 검색
-    if (candidate.candidateName && candidate.candidateName.trim()) {
-      const where: FindOptionsWhere<ProductMaster> = { name: ILike(`%${candidate.candidateName.trim()}%`) };
-      const masters = await this.masterRepo.find({ where, take: 2 });
-      if (masters.length >= 1) {
-        return {
-          matchStatus: 'possible_text_match',
-          matchedProductMasterId: masters.length === 1 ? masters[0].id : null,
-          matchedIdentifierId: null,
-          confidenceScore: '0.4000',
-        };
-      }
-    }
-
-    return { matchStatus: 'no_match', matchedProductMasterId: null, matchedIdentifierId: null, confidenceScore: null };
-  }
-
-  /** identifier 검색 결과를 distinct master 기준으로 outcome 으로 변환. 없음 → null, 복수 master → conflict. */
-  private outcomeFromIdentifierHits(
-    hits: { productMasterId: string; id: string }[],
-    matchStatus: ProductCandidateMatchStatus,
-    confidence: string,
-  ): MatchOutcome | null {
-    if (hits.length === 0) return null;
-    const distinctMasters = [...new Set(hits.map((h) => h.productMasterId))];
-    if (distinctMasters.length > 1) {
-      return { matchStatus: 'conflict', matchedProductMasterId: null, matchedIdentifierId: null, confidenceScore: null };
-    }
-    return {
-      matchStatus,
-      matchedProductMasterId: distinctMasters[0],
-      matchedIdentifierId: hits[0].id,
-      confidenceScore: confidence,
-    };
-  }
-
-  /** 운영자 수동 매칭. 기존 Master 와 연결만 한다 (Master 생성 없음). */
-  async manuallyMatchCandidate(
-    candidateId: string,
-    productMasterId: string,
-    reviewedBy?: string | null,
-  ): Promise<ProductCandidate> {
-    const candidate = await this.getCandidate(candidateId);
-    if (!candidate) throw new Error('CANDIDATE_NOT_FOUND');
-    const master = await this.masterRepo.findOne({ where: { id: productMasterId } });
-    if (!master) throw new Error('PRODUCT_MASTER_NOT_FOUND');
-
-    candidate.matchedProductMasterId = master.id;
-    candidate.matchedIdentifierId = null;
-    candidate.matchStatus = 'manually_matched';
-    candidate.candidateStatus = 'matched';
-    candidate.confidenceScore = '1.0000';
-    candidate.reviewedBy = reviewedBy ?? null;
-    candidate.reviewedAt = new Date();
-    return this.repo.save(candidate);
-  }
-
   async rejectCandidate(candidateId: string, reason?: string, reviewedBy?: string | null): Promise<ProductCandidate> {
     const candidate = await this.getCandidate(candidateId);
     if (!candidate) throw new Error('CANDIDATE_NOT_FOUND');
@@ -437,69 +292,31 @@ export class ProductCandidateService {
     return this.repo.save(candidate);
   }
 
-  // ─── WO-O4O-ADMIN-PRODUCT-CANDIDATE-CONFLICT-ACTIONS-V1 ──────────────────────
+  // ─── WO-O4O-PUBLIC-DATA-CANDIDATE-LEGACY-MASTER-MATCHING-REMOVAL-V1 ──────────
+  //   사전 매칭 제거: 동일 식별자 후보(source duplicate)·식별자 일치 ProductMaster(master matching)
+  //   계산을 제거하고, 후보 상세에 필요한 원천 식별자 + 승격 가능 여부 + rawPayload 요약만 제공한다.
 
   /**
-   * 후보 충돌 정보 (read-only 계산). 전용 conflictReason 필드가 없으므로
-   * 동일 식별자를 공유하는 다른 후보 + 식별자(바코드) 일치 ProductMaster 를 계산해 근거로 제시한다.
-   * ProductCandidate/ProductMaster 를 변경하지 않는다. rawPayload 보존.
+   * 후보 상세 보조 정보 (read-only). 기존 ProductMaster 사전 매칭을 계산하지 않는다.
+   * 반환: 원천 식별자(conflictKey) + 승격 가능 여부(promotable) + rawPayload 요약.
    */
   async getConflictInfo(candidateId: string): Promise<{
     candidate: ProductCandidate;
     promotable: { eligible: boolean; reason: string | null };
     conflictKey: { identifierType: string | null; identifierValue: string | null; normalizedIdentifierValue: string | null };
-    conflictingCandidates: Array<{
-      id: string; candidateName: string | null; candidateManufacturer: string | null;
-      identifierValue: string | null; matchStatus: string; candidateStatus: string;
-      matchedProductMasterId: string | null; sourceLabel: string | null; createdAt: Date;
-    }>;
-    possibleMasters: Array<{
-      id: string; name: string; regulatoryName: string; manufacturerName: string;
-      barcode: string; category: { id: string; name: string } | null; brand: { id: string; name: string } | null;
-    }>;
     rawPayloadSummary: Record<string, unknown>;
   }> {
     const candidate = await this.getCandidate(candidateId);
     if (!candidate) throw new Error('CANDIDATE_NOT_FOUND');
 
-    const nv = candidate.normalizedIdentifierValue;
-    const iv = candidate.identifierValue;
-
-    // 동일 식별자를 공유하는 다른 후보 (self 제외, 최대 50)
-    let conflicting: ProductCandidate[] = [];
-    if (nv) {
-      conflicting = await this.repo.find({
-        where: { normalizedIdentifierValue: nv, id: Not(candidateId), deletedAt: IsNull() },
-        order: { createdAt: 'ASC' }, take: 50,
-      });
-    } else if (iv) {
-      conflicting = await this.repo.find({
-        where: { identifierValue: iv, id: Not(candidateId), deletedAt: IsNull() },
-        order: { createdAt: 'ASC' }, take: 50,
-      });
-    }
-
-    // 식별자(표준코드=barcode) 일치 ProductMaster (최대 50)
-    let masters: ProductMaster[] = [];
-    if (iv) {
-      masters = await this.masterRepo.find({ where: { barcode: iv }, relations: ['category', 'brand'], take: 50 });
-    }
-
     return {
       candidate,
       promotable: this.evaluatePromotable(candidate),
-      conflictKey: { identifierType: candidate.identifierType, identifierValue: iv, normalizedIdentifierValue: nv },
-      conflictingCandidates: conflicting.map((c) => ({
-        id: c.id, candidateName: c.candidateName, candidateManufacturer: c.candidateManufacturer,
-        identifierValue: c.identifierValue, matchStatus: c.matchStatus, candidateStatus: c.candidateStatus,
-        matchedProductMasterId: c.matchedProductMasterId, sourceLabel: c.sourceLabel, createdAt: c.createdAt,
-      })),
-      possibleMasters: masters.map((m) => ({
-        id: m.id, name: m.name, regulatoryName: m.regulatoryName, manufacturerName: m.manufacturerName,
-        barcode: m.barcode,
-        category: m.category ? { id: m.category.id, name: m.category.name } : null,
-        brand: m.brand ? { id: m.brand.id, name: m.brand.name } : null,
-      })),
+      conflictKey: {
+        identifierType: candidate.identifierType,
+        identifierValue: candidate.identifierValue,
+        normalizedIdentifierValue: candidate.normalizedIdentifierValue,
+      },
       rawPayloadSummary: this.summarizeRawPayload(candidate.rawPayload),
     };
   }
@@ -521,7 +338,6 @@ export class ProductCandidateService {
   /**
    * 선택 후보 일괄 상태 처리 (hard delete 없음, product_candidates 만 갱신).
    * archive→archived / ignore→rejected / manual_review→reviewing.
-   * matchStatus 는 변경하지 않는다(기존 archiveCandidate 와 일관 — 매칭 신호 보존).
    */
   async bulkAction(
     ids: string[],
@@ -562,9 +378,7 @@ export class ProductCandidateService {
     if (!(candidate.candidateStatus === 'pending' || candidate.candidateStatus === 'reviewing')) {
       return { eligible: false, reason: 'STATUS_NOT_PENDING_OR_REVIEWING' };
     }
-    if (candidate.matchStatus === 'manually_matched' || candidate.matchStatus === 'exact_identifier_match' || candidate.matchStatus === 'possible_identifier_match') {
-      return { eligible: false, reason: 'ALREADY_MATCHED' };
-    }
+    // WO-...-LEGACY-MASTER-MATCHING-REMOVAL-V1: 사전 매칭(match_status) 제거 → 등록 링크 유무로 판정.
     if (candidate.matchedProductMasterId) {
       return { eligible: false, reason: 'ALREADY_LINKED' };
     }

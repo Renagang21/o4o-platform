@@ -18,7 +18,6 @@ import {
   operatorProductCandidateApi,
   type ProductCandidate,
   type ProductCandidateStatus,
-  type ProductCandidateMatchStatus,
   type ProductCandidateSourceType,
   type ProductTypeClass,
 } from '../../lib/api/operatorProductCandidates';
@@ -44,16 +43,6 @@ const STATUS_BADGE: Record<string, { label: string; cls: string }> = {
   rejected: { label: '반려', cls: 'bg-red-50 text-red-700' },
   merged: { label: '병합', cls: 'bg-slate-100 text-slate-600' },
   archived: { label: '보관', cls: 'bg-slate-100 text-slate-500' },
-};
-
-const MATCH_BADGE: Record<string, { label: string; cls: string }> = {
-  unmatched: { label: '미매칭', cls: 'bg-slate-100 text-slate-500' },
-  exact_identifier_match: { label: '식별자 일치', cls: 'bg-green-50 text-green-700' },
-  possible_identifier_match: { label: '식별자 후보', cls: 'bg-teal-50 text-teal-700' },
-  possible_text_match: { label: '이름 후보', cls: 'bg-indigo-50 text-indigo-700' },
-  conflict: { label: '충돌', cls: 'bg-orange-50 text-orange-700' },
-  no_match: { label: '결과없음', cls: 'bg-slate-100 text-slate-500' },
-  manually_matched: { label: '수동매칭', cls: 'bg-green-50 text-green-700' },
 };
 
 // WO-O4O-PRODUCT-TYPE-CLASSIFICATION-WIRING-F3-V1
@@ -147,14 +136,12 @@ export default function ProductCandidateReviewPage() {
   const [items, setItems] = useState<ProductCandidate[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<'all' | ProductCandidateStatus>('all');
-  const [matchFilter, setMatchFilter] = useState<'all' | ProductCandidateMatchStatus>('all');
   const [typeFilter, setTypeFilter] = useState<'all' | ProductTypeClass>('all');
   const [bulkOnly, setBulkOnly] = useState(false); // WO-..-BULK-OPERATOR-REVIEW-V4: 공급자 대량 등록만
   const [searchTerm, setSearchTerm] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
 
   const [detail, setDetail] = useState<ProductCandidate | null>(null);
-  const [manualMasterId, setManualMasterId] = useState('');
   const [rejectReason, setRejectReason] = useState('');
 
   // 활용 상품 연결 (link-to-listing)
@@ -172,12 +159,11 @@ export default function ProductCandidateReviewPage() {
     setLoading(true);
     const res = await operatorProductCandidateApi.list({
       status: statusFilter === 'all' ? undefined : statusFilter,
-      matchStatus: matchFilter === 'all' ? undefined : matchFilter,
       limit: 100,
     });
     setItems(res.items);
     setLoading(false);
-  }, [statusFilter, matchFilter]);
+  }, [statusFilter]);
 
   useEffect(() => {
     load();
@@ -201,31 +187,6 @@ export default function ProductCandidateReviewPage() {
   const refreshDetail = async (id: string) => {
     const fresh = await operatorProductCandidateApi.get(id);
     setDetail(fresh);
-  };
-
-  const handleMatch = async () => {
-    if (!detail) return;
-    setActionLoading(true);
-    try {
-      await operatorProductCandidateApi.match(detail.id);
-      await refreshDetail(detail.id);
-      await load();
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
-  const handleManualMatch = async () => {
-    if (!detail || !manualMasterId.trim()) return;
-    setActionLoading(true);
-    try {
-      await operatorProductCandidateApi.manualMatch(detail.id, manualMasterId.trim());
-      setManualMasterId('');
-      await refreshDetail(detail.id);
-      await load();
-    } finally {
-      setActionLoading(false);
-    }
   };
 
   const handleReject = async () => {
@@ -390,20 +351,6 @@ export default function ProductCandidateReviewPage() {
       render: (v) => <Badge map={STATUS_BADGE} value={v} />,
     },
     {
-      key: 'matchStatus',
-      header: '매칭',
-      align: 'center',
-      width: '100px',
-      render: (v) => <Badge map={MATCH_BADGE} value={v} />,
-    },
-    {
-      key: 'confidenceScore',
-      header: '신뢰도',
-      align: 'center',
-      width: '70px',
-      render: (v) => <span className="text-xs text-slate-500">{v ? Number(v).toFixed(2) : '-'}</span>,
-    },
-    {
       key: 'createdAt',
       header: '생성일',
       width: '110px',
@@ -415,8 +362,9 @@ export default function ProductCandidateReviewPage() {
 
   // ─── Counts ───
   const pendingCount = items.filter((c) => c.candidateStatus === 'pending').length;
-  const matchedCount = items.filter((c) => c.candidateStatus === 'matched').length;
-  const conflictCount = items.filter((c) => c.matchStatus === 'conflict').length;
+  const registeredCount = items.filter(
+    (c) => c.candidateStatus === 'matched' || c.candidateStatus === 'linked' || c.candidateStatus === 'approved_new_master',
+  ).length;
 
   return (
     <div>
@@ -424,30 +372,28 @@ export default function ProductCandidateReviewPage() {
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-slate-900">상품 후보 검토</h1>
         <p className="text-sm text-slate-500 mt-1">
-          모바일·공급자·웹·import 로 수집된 상품 후보를 검토하고 기존 상품에 연결하거나 반려/보관합니다.
+          모바일·공급자·웹·import 로 수집된 상품 후보를 검토하고, 매칭된 상품은 활용 상품으로 추가하거나 반려/보관합니다.
         </p>
       </div>
 
       <GuideBlock
         variant="info"
         title="상품 후보 검토 절차를 안내합니다."
-        description="후보는 아직 정식 상품(ProductMaster)으로 확정되지 않은 수집 데이터입니다. 검토 후 기존 상품에 연결하거나 반려/보관합니다."
+        description="후보는 아직 정식 상품(ProductMaster)으로 확정되지 않은 수집 데이터입니다. 중복 방지는 상품 등록(승격) 시점 dedup 이 처리하며, 이 화면에서는 별도 사전 매칭을 하지 않습니다."
         steps={[
           '대기/검토중 후보를 선택해 식별자·이름·출처를 확인합니다',
-          '재매칭으로 Identifier Core 기반 자동 매칭을 다시 시도합니다',
-          '수동매칭으로 기존 상품(ProductMaster ID)에 직접 연결합니다',
+          '등록된 O4O 상품이 있는 후보는 활용 상품(내 약국/매장)으로 추가할 수 있습니다',
           '부적합한 후보는 사유와 함께 반려하거나 보관합니다',
         ]}
         compact
       />
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-4 my-6">
+      <div className="grid grid-cols-3 gap-4 my-6">
         {[
           { label: '전체', value: items.length, color: 'bg-slate-50 text-slate-700' },
           { label: '대기', value: pendingCount, color: 'bg-amber-50 text-amber-700' },
-          { label: '매칭됨', value: matchedCount, color: 'bg-green-50 text-green-700' },
-          { label: '충돌', value: conflictCount, color: 'bg-orange-50 text-orange-700' },
+          { label: '등록완료', value: registeredCount, color: 'bg-green-50 text-green-700' },
         ].map((s) => (
           <div key={s.label} className={`rounded-lg p-4 ${s.color}`}>
             <div className="text-sm font-medium">{s.label}</div>
@@ -471,20 +417,6 @@ export default function ProductCandidateReviewPage() {
             </button>
           ))}
         </div>
-        <select
-          value={matchFilter}
-          onChange={(e) => setMatchFilter(e.target.value as 'all' | ProductCandidateMatchStatus)}
-          className="px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="all">매칭 전체</option>
-          <option value="unmatched">미매칭</option>
-          <option value="exact_identifier_match">식별자 일치</option>
-          <option value="possible_identifier_match">식별자 후보</option>
-          <option value="possible_text_match">이름 후보</option>
-          <option value="conflict">충돌</option>
-          <option value="no_match">결과없음</option>
-          <option value="manually_matched">수동매칭</option>
-        </select>
         <select
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value as 'all' | ProductTypeClass)}
@@ -522,7 +454,6 @@ export default function ProductCandidateReviewPage() {
         emptyMessage={items.length === 0 ? '검토할 상품 후보가 없습니다' : '검색 결과가 없습니다'}
         onRowClick={(row) => {
           setDetail(row);
-          setManualMasterId('');
           setRejectReason('');
           setLinkOrgId(row.organizationId || '');
           setLinkServiceKey(row.serviceKey || '');
@@ -546,7 +477,6 @@ export default function ProductCandidateReviewPage() {
               </div>
               <div className="flex flex-wrap gap-2 justify-end">
                 <Badge map={STATUS_BADGE} value={detail.candidateStatus} />
-                <Badge map={MATCH_BADGE} value={detail.matchStatus} />
                 <Badge map={PRODUCT_TYPE_BADGE} value={detail.classification?.productTypeClass ?? 'unknown'} />
               </div>
             </div>
@@ -662,9 +592,7 @@ export default function ProductCandidateReviewPage() {
                 <Field label="카테고리" value={detail.candidateCategory} />
                 <Field label="규격/단위" value={[detail.candidateSpec, detail.candidateUnit].filter(Boolean).join(' / ')} />
                 <Field label="가격" value={detail.candidatePrice} />
-                <Field label="신뢰도" value={detail.confidenceScore ? Number(detail.confidenceScore).toFixed(4) : null} />
-                <Field label="매칭된 상품(Master)" value={detail.matchedProductMasterId} />
-                <Field label="매칭된 식별자" value={detail.matchedIdentifierId} />
+                <Field label="등록된 O4O 상품(Master) ID" value={detail.matchedProductMasterId} />
                 <Field label="생성일" value={new Date(detail.createdAt).toLocaleString('ko-KR')} />
                 <Field label="검토 메모" value={detail.reviewNote} />
               </dl>
@@ -672,39 +600,6 @@ export default function ProductCandidateReviewPage() {
               {detail.candidateImageUrl && (
                 <img src={detail.candidateImageUrl} alt="후보 이미지" className="max-h-40 rounded-lg border border-slate-100" />
               )}
-
-              {/* 재매칭 */}
-              <div className="border-t border-slate-100 pt-4">
-                <button
-                  onClick={handleMatch}
-                  disabled={actionLoading}
-                  className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
-                >
-                  재매칭 실행
-                </button>
-                <span className="ml-2 text-xs text-slate-400">Identifier Core 기반 자동 매칭을 다시 시도합니다 (자동 승격 아님)</span>
-              </div>
-
-              {/* 수동 매칭 */}
-              <div className="border-t border-slate-100 pt-4">
-                <label className="block text-sm font-medium text-slate-700 mb-1">수동 매칭 — 기존 상품(ProductMaster) ID</label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={manualMasterId}
-                    onChange={(e) => setManualMasterId(e.target.value)}
-                    placeholder="ProductMaster UUID"
-                    className="flex-1 px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <button
-                    onClick={handleManualMatch}
-                    disabled={actionLoading || !manualMasterId.trim()}
-                    className="px-3 py-1.5 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50"
-                  >
-                    연결
-                  </button>
-                </div>
-              </div>
 
               {/* 활용 상품으로 추가 (link-to-listing) */}
               <div className="border-t border-slate-100 pt-4">

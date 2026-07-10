@@ -291,11 +291,12 @@ export class DbPromotionMasterStore implements PromotionMasterStore {
   }
 
   async markCandidatePromoted(candidateId: string, masterId: string, kind: 'create' | 'link'): Promise<void> {
+    // WO-...-LEGACY-MASTER-MATCHING-REMOVAL-V1: match_status 제거 → 등록 링크(matchedProductMasterId)
+    //   + candidate_status 로만 등록 완료를 표현한다.
     await this.candidateRepo.update(
       { id: candidateId },
       {
         matchedProductMasterId: masterId,
-        matchStatus: 'exact_identifier_match',
         candidateStatus: kind === 'create' ? 'approved_new_master' : 'matched',
         reviewedAt: new Date(),
       },

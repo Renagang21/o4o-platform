@@ -61,15 +61,6 @@ export interface RefineDrugCategoryResult {
   productMaster: { id: string; name: string; regulatoryType: string; drugCategory: ProductDrugCategory | null };
 }
 
-export type ProductCandidateMatchStatus =
-  | 'unmatched'
-  | 'exact_identifier_match'
-  | 'possible_identifier_match'
-  | 'possible_text_match'
-  | 'conflict'
-  | 'no_match'
-  | 'manually_matched';
-
 // WO-O4O-PRODUCT-TYPE-CLASSIFICATION-WIRING-F3-V1
 export type ProductTypeClass =
   | 'non_drug'
@@ -121,10 +112,8 @@ export interface ProductCandidate {
   sourceLabel: string | null;
   submittedBy: string | null;
   candidateStatus: ProductCandidateStatus;
-  matchStatus: ProductCandidateMatchStatus;
+  /** 등록(승격) 결과로 연결된 O4O 상품 ID — 사전 매칭 아님 */
   matchedProductMasterId: string | null;
-  matchedIdentifierId: string | null;
-  confidenceScore: string | null;
   identifierType: string | null;
   identifierValue: string | null;
   normalizedIdentifierValue: string | null;
@@ -148,7 +137,6 @@ export interface ProductCandidate {
 
 export interface ProductCandidateListFilter {
   status?: ProductCandidateStatus;
-  matchStatus?: ProductCandidateMatchStatus;
   sourceType?: ProductCandidateSourceType;
   serviceKey?: string;
   organizationId?: string;
@@ -169,7 +157,6 @@ export const operatorProductCandidateApi = {
     try {
       const params: Record<string, string | number> = {};
       if (filter.status) params.status = filter.status;
-      if (filter.matchStatus) params.matchStatus = filter.matchStatus;
       if (filter.sourceType) params.sourceType = filter.sourceType;
       if (filter.serviceKey) params.serviceKey = filter.serviceKey;
       if (filter.organizationId) params.organizationId = filter.organizationId;
@@ -194,18 +181,6 @@ export const operatorProductCandidateApi = {
       console.warn('[ProductCandidate API] get failed:', error);
       return null;
     }
-  },
-
-  /** POST /:id/match — Identifier Core 매칭 재시도 */
-  async match(id: string): Promise<ProductCandidate | null> {
-    const res = await api.post(`${BASE}/${id}/match`);
-    return res.data?.data ?? null;
-  },
-
-  /** POST /:id/manual-match — 기존 ProductMaster 수동 연결 */
-  async manualMatch(id: string, productMasterId: string): Promise<ProductCandidate | null> {
-    const res = await api.post(`${BASE}/${id}/manual-match`, { productMasterId });
-    return res.data?.data ?? null;
   },
 
   /** POST /:id/reject */

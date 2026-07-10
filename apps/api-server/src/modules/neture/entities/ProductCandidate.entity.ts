@@ -29,7 +29,6 @@ import {
   Index,
 } from 'typeorm';
 import type { ProductMaster } from './ProductMaster.entity.js';
-import type { ProductIdentifier } from './ProductIdentifier.entity.js';
 
 /** 후보 유입 출처 (application-level union, varchar) */
 export type ProductCandidateSourceType =
@@ -77,29 +76,13 @@ export const PRODUCT_CANDIDATE_STATUSES: ProductCandidateStatus[] = [
   'archived',
 ];
 
-/** 매칭 상태 (application-level union, varchar) */
-export type ProductCandidateMatchStatus =
-  | 'unmatched'
-  | 'exact_identifier_match'
-  | 'possible_identifier_match'
-  | 'possible_text_match'
-  | 'conflict'
-  | 'no_match'
-  | 'manually_matched';
-
-export const PRODUCT_CANDIDATE_MATCH_STATUSES: ProductCandidateMatchStatus[] = [
-  'unmatched',
-  'exact_identifier_match',
-  'possible_identifier_match',
-  'possible_text_match',
-  'conflict',
-  'no_match',
-  'manually_matched',
-];
+// WO-O4O-PUBLIC-DATA-CANDIDATE-LEGACY-MASTER-MATCHING-REMOVAL-V1:
+//   기존 ProductMaster 사전 매칭 서브시스템 제거. match_status/matched_identifier_id/confidence_score
+//   는 엔티티에서 제거한다(중복 방지는 등록 트랜잭션 dedup=promoteOne 이 담당). match_status DB 컬럼은
+//   import 원천 신호로 raw SQL 이 여전히 기록하므로 물리 컬럼은 후속 migration WO 에서 정리한다.
 
 @Entity('product_candidates')
 @Index('idx_product_candidates_status', ['candidateStatus'])
-@Index('idx_product_candidates_match_status', ['matchStatus'])
 @Index('idx_product_candidates_source_type', ['sourceType'])
 @Index('idx_product_candidates_service_key', ['serviceKey'])
 @Index('idx_product_candidates_organization_id', ['organizationId'])
@@ -138,11 +121,8 @@ export class ProductCandidate {
   @Column({ name: 'candidate_status', type: 'varchar', length: 32, default: 'pending' })
   candidateStatus: ProductCandidateStatus;
 
-  /** 매칭 상태 */
-  @Column({ name: 'match_status', type: 'varchar', length: 32, default: 'unmatched' })
-  matchStatus: ProductCandidateMatchStatus;
-
-  // ── 매칭 결과 (단방향 nullable 관계 — ProductMaster/ProductIdentifier 구조 무변경) ──
+  // ── 등록 결과 링크 (사전 매칭 아님 — 후보 처리 결과로 연결된 O4O 상품 ID) ──
+  // WO-...-LEGACY-MASTER-MATCHING-REMOVAL-V1: 등록(승격) 시점 dedup 결과. 단방향 nullable.
 
   @Column({ name: 'matched_product_master_id', type: 'uuid', nullable: true })
   matchedProductMasterId: string | null;
@@ -151,18 +131,7 @@ export class ProductCandidate {
   @JoinColumn({ name: 'matched_product_master_id' })
   matchedProductMaster?: ProductMaster | null;
 
-  @Column({ name: 'matched_identifier_id', type: 'uuid', nullable: true })
-  matchedIdentifierId: string | null;
-
-  @ManyToOne('ProductIdentifier', { nullable: true, onDelete: 'SET NULL' })
-  @JoinColumn({ name: 'matched_identifier_id' })
-  matchedIdentifier?: ProductIdentifier | null;
-
-  /** 매칭 신뢰도 (0~1) */
-  @Column({ name: 'confidence_score', type: 'numeric', precision: 5, scale: 4, nullable: true })
-  confidenceScore: string | null;
-
-  // ── 후보 식별자 (Identifier Core 매칭 입력) ──
+  // ── 후보 식별자 (원천 식별자) ──
 
   @Column({ name: 'identifier_type', type: 'varchar', length: 40, nullable: true })
   identifierType: string | null;
