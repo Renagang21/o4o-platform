@@ -28,7 +28,25 @@ import {
   getProductDescriptionQrSummary,
   ProductDescriptionQrSummary,
   DescriptionLangState,
+  ProductMasterStatusFilter,
 } from '@/api/o4o-product-db.api';
+import {
+  ProductMasterStatusBadge,
+  ProductMasterStatusModal,
+  statusActionsFor,
+  StatusModalTarget,
+} from './ProductMasterStatusControls';
+
+const STATUS_FILTER_OPTIONS: { value: ProductMasterStatusFilter; label: string }[] = [
+  { value: 'all', label: '전체' },
+  { value: 'active', label: '정상' },
+  { value: 'suspended', label: '이용 중단' },
+  { value: 'archived', label: '보관' },
+];
+
+function parseStatusFilter(v: string | null): ProductMasterStatusFilter {
+  return STATUS_FILTER_OPTIONS.some((o) => o.value === v) ? (v as ProductMasterStatusFilter) : 'all';
+}
 
 // WO-O4O-PRODUCT-LIST-DESCRIPTION-QR-ACTIONS-V1: 언어별 설명서 존재 여부 → badge 톤
 function langTone(state?: DescriptionLangState): { label: string; cls: string } {
@@ -57,36 +75,40 @@ export default function ProductMastersPage() {
   const [limit, setLimit] = useState(parseLimit(searchParams.get('limit')));
   const [q, setQ] = useState(searchParams.get('q') || '');        // 적용된 검색어
   const [term, setTerm] = useState(searchParams.get('q') || '');  // 입력 버퍼
+  const [statusFilter, setStatusFilter] = useState<ProductMasterStatusFilter>(parseStatusFilter(searchParams.get('status')));
   const [hardLoading, setHardLoading] = useState(true);   // 표시할 데이터 없음 → skeleton
   const [softLoading, setSoftLoading] = useState(false);  // 기존 데이터 유지한 채 갱신 중
   const [error, setError] = useState<string | null>(null);
   // WO-O4O-PRODUCT-LIST-DESCRIPTION-QR-ACTIONS-V1: masterId → 설명서(KO/ZH)/QR 상태 요약 (read-only)
   const [descQrMap, setDescQrMap] = useState<Record<string, ProductDescriptionQrSummary>>({});
+  // WO-...-STATUS-ACTIONS-V1: 상태 변경 모달 대상 (null=닫힘) + 변경 후 강제 새로고침 nonce
+  const [statusTarget, setStatusTarget] = useState<StatusModalTarget | null>(null);
+  const [reloadNonce, setReloadNonce] = useState(0);
 
   // 페이지 캐시 (key=`${q}|${limit}|${page}`). q/limit 변경 시 초기화.
   const cacheRef = useRef<Map<string, ProductMasterListResult>>(new Map());
   const reqIdRef = useRef(0);
   const rowsLenRef = useRef(0); // 현재 표시 중인 행 수 (로딩 모드 결정용)
 
-  const keyFor = useCallback((pg: number) => `${q}|${limit}|${pg}`, [q, limit]);
+  const keyFor = useCallback((pg: number) => `${q}|${statusFilter}|${limit}|${pg}`, [q, statusFilter, limit]);
 
-  // 검색어/페이지 크기 변경 → 캐시 초기화 (load effect 보다 먼저 선언되어 먼저 실행)
+  // 검색어/상태필터/페이지 크기 변경 → 캐시 초기화 (load effect 보다 먼저 선언되어 먼저 실행)
   useEffect(() => {
     cacheRef.current.clear();
-  }, [q, limit]);
+  }, [q, statusFilter, limit]);
 
   // 다음 1~2 페이지 백그라운드 prefetch (화면 blocking 없음)
   const prefetchNext = useCallback((fromPage: number, tp: number) => {
     for (let i = 1; i <= PREFETCH_AHEAD; i++) {
       const pg = fromPage + i;
       if (pg > tp) break;
-      const key = `${q}|${limit}|${pg}`;
+      const key = `${q}|${statusFilter}|${limit}|${pg}`;
       if (cacheRef.current.has(key)) continue;
-      listProductMasters({ q: q || undefined, page: pg, limit })
+      listProductMasters({ q: q || undefined, status: statusFilter, page: pg, limit })
         .then((r) => { cacheRef.current.set(key, r); })
         .catch(() => { /* prefetch 실패는 무시 */ });
     }
-  }, [q, limit]);
+  }, [q, statusFilter, limit]);
 
   // 메인 로드 (q/limit/page 변경 시). 캐시 히트면 즉시 표시, 미스면 네트워크.
   useEffect(() => {
@@ -110,7 +132,7 @@ export default function ProductMastersPage() {
     // 데이터가 있으면 유지(soft), 없으면 skeleton(hard)
     if (rowsLenRef.current > 0) setSoftLoading(true); else setHardLoading(true);
 
-    listProductMasters({ q: q || undefined, page, limit })
+    listProductMasters({ q: q || undefined, status: statusFilter, page, limit })
       .then((res) => {
         if (myReq !== reqIdRef.current) return; // 최신 요청만 반영
         cacheRef.current.set(key, res);
@@ -134,7 +156,13 @@ export default function ProductMastersPage() {
         setHardLoading(false);
         setSoftLoading(false);
       });
-  }, [q, limit, page, keyFor, prefetchNext]);
+  }, [q, limit, page, keyFor, prefetchNext, reloadNonce]);
+
+  // 상태 변경 후 현재 페이지 강제 새로고침 (캐시 무효화)
+  const reloadCurrentPage = useCallback(() => {
+    cacheRef.current.clear();
+    setReloadNonce((n) => n + 1);
+  }, []);
 
   // 현재 페이지 제품들의 설명서(KO/ZH)/QR 상태 배치 조회 (read-only, 실패해도 목록은 정상)
   useEffect(() => {
@@ -164,10 +192,11 @@ export default function ProductMastersPage() {
   useEffect(() => {
     const nq: Record<string, string> = {};
     if (q) nq.q = q;
+    if (statusFilter !== 'all') nq.status = statusFilter;
     if (page > 1) nq.page = String(page);
     if (limit !== DEFAULT_LIMIT) nq.limit = String(limit);
     setSearchParams(nq, { replace: true });
-  }, [q, page, limit, setSearchParams]);
+  }, [q, statusFilter, page, limit, setSearchParams]);
 
   const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -179,6 +208,11 @@ export default function ProductMastersPage() {
   const changeLimit = (n: number) => {
     setPage(1);
     setLimit(n);
+  };
+
+  const changeStatusFilter = (v: ProductMasterStatusFilter) => {
+    setPage(1);
+    setStatusFilter(v);
   };
 
   const columns: O4OColumn<ProductMasterRow>[] = [
@@ -203,6 +237,14 @@ export default function ProductMastersPage() {
     { key: 'category', header: '분류', render: (_, r) => r.category?.name || '—' },
     { key: 'specification', header: '규격', render: (_, r) => r.specification || '—' },
     { key: 'barcode', header: '바코드', render: (_, r) => <span className="text-gray-500">{r.barcode || '—'}</span> },
+    {
+      // WO-...-STATUS-ACTIONS-V1: 이용 상태 배지
+      key: 'status',
+      header: '상태',
+      align: 'center',
+      width: 88,
+      render: (_, r) => <ProductMasterStatusBadge status={r.status} />,
+    },
     {
       key: 'imageStatus',
       header: '이미지 상태',
@@ -238,11 +280,19 @@ export default function ProductMastersPage() {
       system: 'last',
       align: 'center',
       render: (_, r) => {
+        const current = r.status ?? 'ACTIVE';
         return (
           <RowActionMenu
             actions={[
               // 설명은 상세 화면에서 확인한다(설명서 검토 워크플로우 제거, WO-...-DESCRIPTION-REVIEW-REMOVE-V1).
               { key: 'view', label: '상세 보기', icon: <Eye size={14} />, onClick: () => navigate(r.id) },
+              // WO-...-STATUS-ACTIONS-V1: 현재 상태에 따른 상태 변경 액션
+              ...statusActionsFor(current).map((a) => ({
+                key: `status:${a.targetStatus}`,
+                label: a.label,
+                onClick: () =>
+                  setStatusTarget({ id: r.id, name: r.name, currentStatus: current, targetStatus: a.targetStatus }),
+              })),
             ]}
           />
         );
@@ -275,6 +325,18 @@ export default function ProductMastersPage() {
             >초기화</button>
           )}
         </form>
+
+        {/* 상태 필터 — WO-...-STATUS-ACTIONS-V1 */}
+        <label className="flex items-center gap-1.5 text-sm text-gray-500">
+          상태
+          <select
+            value={statusFilter}
+            onChange={(e) => changeStatusFilter(e.target.value as ProductMasterStatusFilter)}
+            className="border border-gray-300 rounded px-2 py-1.5 text-sm"
+          >
+            {STATUS_FILTER_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+          </select>
+        </label>
 
         {/* 페이지 크기 */}
         <label className="flex items-center gap-1.5 text-sm text-gray-500">
@@ -352,6 +414,13 @@ export default function ProductMastersPage() {
           </div>
         )}
       </div>
+
+      {/* 상태 변경 모달 — WO-...-STATUS-ACTIONS-V1 */}
+      <ProductMasterStatusModal
+        target={statusTarget}
+        onClose={() => setStatusTarget(null)}
+        onDone={() => { setStatusTarget(null); reloadCurrentPage(); }}
+      />
     </div>
   );
 }

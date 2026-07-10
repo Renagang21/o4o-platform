@@ -477,10 +477,21 @@ export class NetureService {
     brandId?: string;
     regulatoryType?: string;
     drugCategory?: string;
+    statuses?: ('ACTIVE' | 'SUSPENDED' | 'ARCHIVED')[];
     page?: number;
     limit?: number;
   }): Promise<{ data: ProductMaster[]; total: number }> {
     return this.catalogService.searchProductMasters(params);
+  }
+
+  /** 상품 이용 상태 단건 변경 — WO-O4O-ADMIN-PRODUCT-MASTER-STATUS-ACTIONS-V1 */
+  async setProductMasterStatus(params: {
+    masterId: string;
+    status: 'ACTIVE' | 'SUSPENDED' | 'ARCHIVED';
+    reason?: string | null;
+    actorId: string;
+  }) {
+    return this.catalogService.setProductMasterStatus(params);
   }
 
   // ==================== Category ====================

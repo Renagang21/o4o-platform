@@ -12,6 +12,13 @@ import logger from '../../../utils/logger.js';
 import { PRODUCT_DRUG_CATEGORIES } from '../utils/product-type.util.js';
 import type { ProductDrugCategory } from '../utils/product-type.util.js';
 
+/**
+ * 상품 이용 상태 — WO-O4O-ADMIN-PRODUCT-MASTER-STATUS-FOUNDATION-V1 / ...-STATUS-ACTIONS-V1
+ * ACTIVE(정상) / SUSPENDED(이용 중단) / ARCHIVED(보관). DB 컬럼 product_masters.status 와 1:1.
+ */
+export const PRODUCT_MASTER_STATUSES = ['ACTIVE', 'SUSPENDED', 'ARCHIVED'] as const;
+export type ProductMasterStatus = (typeof PRODUCT_MASTER_STATUSES)[number];
+
 /** drug_category 입력 정규화 — 허용값만 통과, 그 외 null */
 function normalizeDrugCategory(raw?: string | null): ProductDrugCategory | null {
   if (!raw) return null;
@@ -363,6 +370,12 @@ export class NetureCatalogService {
     /** 표시용 분류 필터 (WO-...-STANDARD-PICKER...): additive, 미전달 시 미적용 */
     regulatoryType?: string;
     drugCategory?: string;
+    /**
+     * 이용 상태 필터 (WO-...-STATUS-ACTIONS-V1). 미전달 시 기본 ACTIVE-only.
+     * 참여자용 검색(공급자/매장/저작 picker)은 이 파라미터를 넘기지 않으므로 SUSPENDED/ARCHIVED 가 노출되지 않는다.
+     * 관리자 목록만 명시적으로 statuses 를 전달해 전체/특정 상태를 조회한다.
+     */
+    statuses?: ProductMasterStatus[];
     page?: number;
     limit?: number;
   }): Promise<{ data: ProductMaster[]; total: number }> {
@@ -420,11 +433,68 @@ export class NetureCatalogService {
     if (params.drugCategory) {
       qb.andWhere('m.drug_category = :drugCategory', { drugCategory: params.drugCategory });
     }
+    // 이용 상태 필터 — 미전달 시 기본 ACTIVE-only (참여자 검색에서 SUSPENDED/ARCHIVED 제외)
+    const statuses: ProductMasterStatus[] = params.statuses && params.statuses.length ? params.statuses : ['ACTIVE'];
+    qb.andWhere('m.status IN (:...statuses)', { statuses });
 
     qb.skip(offset).take(limit);
 
     const [data, total] = await qb.getManyAndCount();
     return { data, total };
+  }
+
+  /**
+   * 상품 이용 상태 단건 변경 — WO-O4O-ADMIN-PRODUCT-MASTER-STATUS-ACTIONS-V1
+   *
+   * product_masters.status 변경 + 변경 이력을 product_master_notes 시스템 메모로 기록(단일 트랜잭션).
+   * 신규 감사 테이블/승인 흐름 없음. 참여자·공급자·매장·주문·콘텐츠 등 사용처 데이터는 **일절 변경하지 않는다**.
+   * 같은 상태로의 변경은 no-op (changed=false, 메모 미기록). raw parameterized SQL(FOR UPDATE 로 경합 방지).
+   */
+  async setProductMasterStatus(params: {
+    masterId: string;
+    status: ProductMasterStatus;
+    reason?: string | null;
+    actorId: string;
+  }): Promise<{ found: boolean; previousStatus?: ProductMasterStatus; changed: boolean }> {
+    const { masterId, status, reason, actorId } = params;
+    const qr = AppDataSource.createQueryRunner();
+    await qr.connect();
+    await qr.startTransaction();
+    try {
+      const cur: Array<{ status: string | null }> = await qr.query(
+        `SELECT status FROM product_masters WHERE id = $1 FOR UPDATE`,
+        [masterId],
+      );
+      if (cur.length === 0) {
+        await qr.rollbackTransaction();
+        return { found: false, changed: false };
+      }
+      const previousStatus = (cur[0].status as ProductMasterStatus) ?? 'ACTIVE';
+      if (previousStatus === status) {
+        await qr.rollbackTransaction();
+        return { found: true, previousStatus, changed: false };
+      }
+      await qr.query(
+        `UPDATE product_masters SET status = $2, updated_at = NOW() WHERE id = $1`,
+        [masterId, status],
+      );
+      const trimmedReason = (reason ?? '').trim();
+      const noteBody =
+        `상품 상태 변경: ${previousStatus} → ${status}` +
+        (trimmedReason ? `\n사유: ${trimmedReason}` : '');
+      await qr.query(
+        `INSERT INTO product_master_notes (product_master_id, note, visibility, created_by)
+         VALUES ($1, $2, 'internal', $3)`,
+        [masterId, noteBody, actorId],
+      );
+      await qr.commitTransaction();
+      return { found: true, previousStatus, changed: true };
+    } catch (e) {
+      await qr.rollbackTransaction();
+      throw e;
+    } finally {
+      await qr.release();
+    }
   }
 
   // ==================== ProductCategory — 카테고리 관리 (WO-O4O-NETURE-CATEGORY-PRODUCTMASTER-STRUCTURE-V1) ====================

@@ -14,7 +14,43 @@ import { BulkMatchService } from '../services/bulk-match.service.js';
 import { AliasService, AliasSource } from '../services/alias.service.js';
 import { uploadSingleMiddleware } from '../../../middleware/upload.middleware.js';
 import { parseXlsxToRecords } from '../services/xlsx-parser.service.js';
+import { roleAssignmentService } from '../../auth/services/role-assignment.service.js';
 import logger from '../../../utils/logger.js';
+
+// WO-O4O-ADMIN-PRODUCT-MASTER-STATUS-ACTIONS-V1:
+//   이 검색 엔드포인트는 관리자 목록과 공급자/저작 picker 가 공유한다(requireAuth).
+//   비-ACTIVE(SUSPENDED/ARCHIVED) 조회는 관리자 롤에게만 허용하고, 그 외에는 항상 ACTIVE-only 로 강제한다.
+const STATUS_ADMIN_ROLES = [
+  'platform:admin',
+  'platform:super_admin',
+  'neture:admin',
+  'neture:operator',
+  'glycopharm:admin',
+  'glycopharm:operator',
+  'cosmetics:admin',
+  'cosmetics:operator',
+  'kpa-society:admin',
+  'kpa-society:operator',
+];
+
+/**
+ * status 쿼리 파라미터 → statuses 필터 결정.
+ * - 미전달/'active' → undefined(서비스 기본 ACTIVE-only)
+ * - 'all'|'suspended'|'archived' → 관리자 롤일 때만 해당 필터, 아니면 undefined(ACTIVE-only 강제)
+ */
+async function resolveStatusFilter(
+  req: Request,
+): Promise<('ACTIVE' | 'SUSPENDED' | 'ARCHIVED')[] | undefined> {
+  const raw = typeof req.query.status === 'string' ? req.query.status.toLowerCase() : '';
+  if (!raw || raw === 'active') return undefined;
+  const userId = (req as { user?: { id?: string } }).user?.id;
+  const isAdmin = userId ? await roleAssignmentService.hasAnyRole(userId, STATUS_ADMIN_ROLES) : false;
+  if (!isAdmin) return undefined; // 비관리자 → 항상 ACTIVE-only
+  if (raw === 'all') return ['ACTIVE', 'SUSPENDED', 'ARCHIVED'];
+  if (raw === 'suspended') return ['SUSPENDED'];
+  if (raw === 'archived') return ['ARCHIVED'];
+  return undefined;
+}
 
 export function createProductLibraryController(dataSource: DataSource): Router {
   const router = Router();
@@ -30,10 +66,13 @@ export function createProductLibraryController(dataSource: DataSource): Router {
     try {
       const { q, categoryId, brandId, page, limit } = req.query;
 
+      const statuses = await resolveStatusFilter(req);
+
       const result = await netureService.searchProductMasters({
         q: typeof q === 'string' ? q : undefined,
         categoryId: typeof categoryId === 'string' ? categoryId : undefined,
         brandId: typeof brandId === 'string' ? brandId : undefined,
+        statuses,
         page: page ? Number(page) : 1,
         limit: limit ? Number(limit) : 20,
       });
@@ -64,6 +103,8 @@ export function createProductLibraryController(dataSource: DataSource): Router {
         category: m.category ? { id: m.category.id, name: m.category.name } : null,
         brand: m.brand ? { id: m.brand.id, name: m.brand.name } : null,
         primaryImageUrl: imageMap.get(m.id) || null,
+        // WO-...-STATUS-ACTIONS-V1: 관리자 목록 상태 배지용 (참여자 응답에도 포함되나 항상 ACTIVE)
+        status: m.status,
       }));
 
       res.json({
@@ -241,6 +282,8 @@ export function createProductLibraryController(dataSource: DataSource): Router {
           regulatoryType: master.regulatoryType,
           regulatoryName: master.regulatoryName,
           name: master.name,
+          // WO-...-STATUS-ACTIONS-V1: 상세 현재 상태 배지 + 상태 변경 액션용
+          status: master.status,
           manufacturerName: master.manufacturerName,
           brandName: master.brandName,
           specification: master.specification,
