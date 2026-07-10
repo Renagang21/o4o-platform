@@ -20,8 +20,6 @@ import { toast } from '@o4o/error-handling';
 import { Pagination } from '@o4o/operator-ux-core';
 import { fetchHandledProducts, removeHandledProducts, type HandledProduct } from '../../api/handledProducts';
 import { colors } from '../../styles/theme';
-// WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1: 연결 콘텐츠 보기 드로어
-import { LinkedContentsDrawer, type LinkedDrawerProduct } from './LinkedContentsDrawer';
 // WO-...-DESCRIPTION-USAGE-POLICY-FIX-V1: 매장용(STORE) 상세설명서 읽기 전용 조회
 import { StoreDescriptionViewModal, type StoreDescriptionProduct } from './StoreDescriptionViewModal';
 // WO-...-ACTIONS-AND-MULTILINGUAL-DESCRIPTION-V1: 이미 등록된 상품별 QR 출력(읽기 전용)
@@ -150,8 +148,6 @@ export default function StoreHandledProductsPage() {
 
   const reload = useCallback(() => setReloadKey((k) => k + 1), []);
 
-  // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1: 연결 콘텐츠 보기 드로어(읽기 전용)
-  const [drawerProduct, setDrawerProduct] = useState<LinkedDrawerProduct | null>(null);
   // WO-...-DESCRIPTION-USAGE-POLICY-FIX-V1: 매장용 상세설명서 보기(읽기 전용, listing 전용)
   const [descProduct, setDescProduct] = useState<StoreDescriptionProduct | null>(null);
   // WO-...-ACTIONS-AND-MULTILINGUAL-DESCRIPTION-V1: 이미 등록된 상품별 QR 출력(읽기 전용)
@@ -203,12 +199,9 @@ export default function StoreHandledProductsPage() {
   // WO-...-REMOVE-AND-STATUS-AUDIT-V1: 매장 경영활용에서 제거(연결 해제) — 1건/다건.
   const handleRemove = useCallback(async () => {
     if (selectedItems.length === 0 || removing) return;
-    const withContent = selectedItems.filter((it) => it.linkedContentCount > 0);
-    let msg =
-      '선택한 제품을 매장 경영활용 제품 목록에서 제거하시겠습니까?\nO4O 표준 상품 정보와 상세설명서는 삭제되지 않습니다.';
-    if (withContent.length > 0) {
-      msg += `\n\n연결된 콘텐츠가 있는 제품 ${withContent.length}건이 포함되어 있습니다. 제품↔콘텐츠 연결만 해제되며, 자료함 콘텐츠와 QR은 삭제되지 않습니다.`;
-    }
+    // WO-...-CATEGORY-COLUMN-V1: '연결 콘텐츠' 개념 제거 → 연결 콘텐츠 경고 문구 삭제(연결 해제 시 자료함/QR 미삭제는 유지).
+    const msg =
+      '선택한 제품을 매장 경영활용 제품 목록에서 제거하시겠습니까?\nO4O 표준 상품 정보와 상세설명서·자료함 콘텐츠·QR은 삭제되지 않습니다.';
     if (!window.confirm(msg)) return;
     setRemoving(true);
     try {
@@ -345,8 +338,9 @@ export default function StoreHandledProductsPage() {
               </th>
               <th style={{ ...styles.th, textAlign: 'left' }}>제품</th>
               <th style={styles.th}>구분</th>
+              {/* WO-O4O-KPA-STORE-HANDLED-PRODUCT-CATEGORY-COLUMN-V1: '연결 콘텐츠' 제거 → O4O 표준 '분류' */}
+              <th style={styles.th}>분류</th>
               <th style={styles.th}>매장 표시 가격</th>
-              <th style={styles.th}>연결 콘텐츠</th>
               <th style={styles.th}>최근 수정일</th>
             </tr>
           </thead>
@@ -393,23 +387,15 @@ export default function StoreHandledProductsPage() {
                     <td style={styles.td}>
                       <Badge text="O4O 기반 제품" tone="blue" />
                     </td>
-                    <td style={styles.td}>{formatPrice(it.price)}</td>
+                    {/* WO-O4O-KPA-STORE-HANDLED-PRODUCT-CATEGORY-COLUMN-V1: O4O 표준 분류(미분류 안전 표시) */}
                     <td style={styles.td}>
-                      {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1:
-                          연결 콘텐츠 수 — N개는 보기 동작 진입, 없음은 단순 표시. */}
-                      {it.linkedContentCount > 0 ? (
-                        <button
-                          type="button"
-                          onClick={() => setDrawerProduct({ sourceType: it.sourceType, sourceId: it.sourceId, name: it.name })}
-                          style={styles.countBtn}
-                          aria-label="연결 콘텐츠 보기"
-                        >
-                          <Badge text={`${it.linkedContentCount}개`} tone="blue" />
-                        </button>
+                      {it.classificationCode && it.classificationCode !== 'unknown' ? (
+                        <Badge text={it.classificationLabel} tone="gray" />
                       ) : (
-                        <span style={{ color: colors.neutral400 }}>없음</span>
+                        <span style={{ color: colors.neutral400 }}>미분류</span>
                       )}
                     </td>
+                    <td style={styles.td}>{formatPrice(it.price)}</td>
                     <td style={styles.td}>{formatDate(it.updatedAt)}</td>
                     {/* WO-...-REMOVE-AND-STATUS-AUDIT-V1: '상태'(승인 대기) 컬럼 제거 — 이 화면엔 승인 절차 없음. */}
                   </tr>
@@ -421,13 +407,6 @@ export default function StoreHandledProductsPage() {
       </div>
 
       <Pagination page={page} totalPages={totalPages} onPageChange={changePage} total={total} />
-
-      {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1: 연결 콘텐츠 보기 드로어(읽기/열기 전용, 신규 작성 없음) */}
-      <LinkedContentsDrawer
-        open={!!drawerProduct}
-        product={drawerProduct}
-        onClose={() => setDrawerProduct(null)}
-      />
 
       {/* WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1: O4O 표준 상품 검색·선택·등록 모달 */}
       <AddO4oStandardProductModal
@@ -500,7 +479,6 @@ const styles: Record<string, CSSProperties> = {
   // WO-...-STANDARD-TABLE-V1: Selection ActionBar 액션 버튼
   importBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '5px 12px', background: '#F0FDF4', border: '1px solid #86EFAC', borderRadius: '6px', fontSize: '12px', color: '#15803D', cursor: 'pointer', whiteSpace: 'nowrap' },
   mlcBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '5px 12px', background: '#F5F3FF', border: '1px solid #C4B5FD', borderRadius: '6px', fontSize: '12px', color: '#6D28D9', cursor: 'pointer', whiteSpace: 'nowrap' },
-  countBtn: { display: 'inline-flex', padding: 0, border: 'none', background: 'transparent', cursor: 'pointer' },
   empty: { padding: '40px 12px', textAlign: 'center', color: colors.neutral400, fontSize: '13px' },
   footnote: { marginTop: '14px', fontSize: '12px', color: colors.neutral500, lineHeight: 1.7, padding: '10px 12px', background: colors.neutral100, borderRadius: '6px' },
 };

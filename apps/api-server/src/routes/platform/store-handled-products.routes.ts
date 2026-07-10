@@ -26,6 +26,8 @@ import { resolveStoreAccess } from '../../utils/store-owner.utils.js';
 import { ProductLandingService } from '../../modules/neture/services/product-landing.service.js';
 // WO-O4O-KPA-STORE-PRODUCT-QR-DOWNLOAD-AND-PRINT-SIZE-V1: PNG/SVG/PDF export (지정 mm 라벨 PDF)
 import { generateQrPng, generateQrSvg, generateProductQrLabelPdf } from '../../services/qr-print.service.js';
+// WO-O4O-KPA-STORE-HANDLED-PRODUCT-CATEGORY-COLUMN-V1: O4O 표준 분류(규제유형+의약품분류 → 표시 분류) SSOT 재사용
+import { deriveProductClassification } from '../../modules/neture/utils/product-type.util.js';
 
 type AuthMiddleware = RequestHandler;
 
@@ -41,6 +43,9 @@ interface UnifiedRow {
   end_at: string | null;
   master_id: string | null;
   updated_at: string;
+  // WO-O4O-KPA-STORE-HANDLED-PRODUCT-CATEGORY-COLUMN-V1: O4O 표준 분류 파생용 (listing 만 존재, local 은 NULL)
+  regulatory_type: string | null;
+  drug_category: string | null;
 }
 
 function listingStatusLabel(row: UnifiedRow, now: number): string {
@@ -112,7 +117,8 @@ export function createStoreHandledProductsRoutes(dataSource: DataSource): Router
                COALESCE(opl.price, spo.price_general) AS price,
                opl.is_active AS is_active, opl.status AS listing_status,
                opl.start_at AS start_at, opl.end_at AS end_at, opl.master_id AS master_id,
-               opl.updated_at AS updated_at
+               opl.updated_at AS updated_at,
+               pm.regulatory_type AS regulatory_type, pm.drug_category AS drug_category
         FROM organization_product_listings opl
         LEFT JOIN product_masters pm ON pm.id = opl.master_id
         LEFT JOIN supplier_product_offers spo ON spo.id = opl.offer_id
@@ -124,7 +130,8 @@ export function createStoreHandledProductsRoutes(dataSource: DataSource): Router
                lp.price_display AS price,
                lp.is_active AS is_active, NULL::varchar AS listing_status,
                NULL::timestamp AS start_at, NULL::timestamp AS end_at, NULL::uuid AS master_id,
-               lp.updated_at AS updated_at
+               lp.updated_at AS updated_at,
+               NULL::varchar AS regulatory_type, NULL::varchar AS drug_category
         FROM store_local_products lp
         WHERE lp.organization_id = $1 AND lp.is_active = true${searchLocal}`;
 
@@ -148,24 +155,9 @@ export function createStoreHandledProductsRoutes(dataSource: DataSource): Router
       ]);
       const total = countRes[0]?.total ?? 0;
 
-      // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-LINK-V1:
-      //   현재 페이지 제품들의 연결 콘텐츠 수(linkedContentCount)를 1회 집계 쿼리로 조회(N+1 회피).
-      //   UNION 본 쿼리는 건드리지 않고, 페이지 결과(source_id)에 대해서만 group count 한다.
-      const linkCountMap = new Map<string, number>();
-      if (rows.length > 0) {
-        const pageSourceIds = rows.map((r) => r.source_id);
-        const linkRows: Array<{ product_source_type: string; product_source_id: string; cnt: number }> =
-          await dataSource.query(
-            `SELECT product_source_type, product_source_id, COUNT(*)::int AS cnt
-             FROM kpa_store_content_product_links
-             WHERE organization_id = $1 AND product_source_id = ANY($2::uuid[])
-             GROUP BY product_source_type, product_source_id`,
-            [organizationId, pageSourceIds],
-          );
-        for (const lr of linkRows) {
-          linkCountMap.set(`${lr.product_source_type}:${lr.product_source_id}`, lr.cnt);
-        }
-      }
+      // WO-O4O-KPA-STORE-HANDLED-PRODUCT-CATEGORY-COLUMN-V1:
+      //   '연결 콘텐츠' 컬럼·집계(linkedContentCount) 제거 → O4O 표준 분류(classification)로 대체.
+      //   분류는 ProductMaster.regulatory_type(+drug_category)에서 deriveProductClassification 으로 파생.
 
       // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-DISPLAY-POOL-SIMPLIFY-V1:
       //   제품 풀(매장 취급제품)은 채널 상태판이 아니다. 화면에서 채널 상태 컬럼(타블렛/온라인몰/상품설명)을
@@ -174,6 +166,8 @@ export function createStoreHandledProductsRoutes(dataSource: DataSource): Router
       const now = Date.now();
       const items = rows.map((r) => {
         const isListing = r.source_type === 'listing';
+        // WO-...-CATEGORY-COLUMN-V1: O4O 표준 분류(코드+라벨). master 없는 local 은 regulatory_type=NULL → '미분류'.
+        const cls = deriveProductClassification({ regulatoryType: r.regulatory_type, drugCategory: r.drug_category });
         return {
           sourceType: r.source_type,
           sourceId: r.source_id,
@@ -184,8 +178,9 @@ export function createStoreHandledProductsRoutes(dataSource: DataSource): Router
           price: r.price != null ? Number(r.price) : null,
           statusLabel: isListing ? listingStatusLabel(r, now) : r.is_active ? '활성' : '비활성',
           isActive: r.is_active,
-          // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-LINK-V1: 연결 콘텐츠 수(0 = 없음).
-          linkedContentCount: linkCountMap.get(`${r.source_type}:${r.source_id}`) ?? 0,
+          // WO-O4O-KPA-STORE-HANDLED-PRODUCT-CATEGORY-COLUMN-V1: O4O 표준 분류 (사용자 표시 라벨).
+          classificationCode: cls.code,
+          classificationLabel: cls.label,
           updatedAt: r.updated_at,
           managePath: isListing
             ? `/store/my-products?highlight=${r.source_id}`
