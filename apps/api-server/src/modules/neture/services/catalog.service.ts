@@ -83,7 +83,10 @@ export class NetureCatalogService {
    * Master 조회 — barcode 기준
    */
   async getProductMasterByBarcode(barcode: string): Promise<ProductMaster | null> {
-    return this.masterRepo.findOne({ where: { barcode }, relations: ['category', 'brand'] });
+    // WO-...-BARCODE-NULLABLE-...-V1: 빈값/NULL 로는 조회하지 않는다(실제 바코드만).
+    const trimmed = (barcode ?? '').trim();
+    if (!trimmed) return null;
+    return this.masterRepo.findOne({ where: { barcode: trimmed }, relations: ['category', 'brand'] });
   }
 
   /**
@@ -97,9 +100,9 @@ export class NetureCatalogService {
    * Master 생성 파이프라인
    *
    * WO-O4O-PRODUCT-MASTER-BARCODELESS-REGISTRATION-INTERNAL-CODE-V1
-   *   바코드는 등록 전제조건이 아니다 — O4O 모든 제품(의약품 포함)은 바코드 없이 등록될 수 있고,
-   *   바코드는 제품관리 과정에서 필요할 때 나중에 붙인다. 바코드 미제공 시 공급자 경로(offer.service)와
-   *   동일한 자체 내부 코드(generateInternalBarcode, GS1 200 내부 예약 대역)로 생성한다.
+   * WO-O4O-PRODUCT-BARCODE-NULLABLE-AND-INTERNAL-CODE-GENERATION-STOP-V1:
+   *   바코드는 등록 전제조건이 아니다 — 바코드 미제공 시 **합성 내부코드(200…)를 만들지 않고 barcode=NULL** 로
+   *   생성한다. 정체성은 ProductMaster.id(UUID). 중복 방지는 이름+제조사(+공식 식별자) 정확 일치.
    *
    * [바코드 제공 시]
    * 1. GTIN 검증
@@ -109,7 +112,7 @@ export class NetureCatalogService {
    * 4b. MFDS 미연동(stub) + manualData 제공 → 수동 데이터로 생성 (isMfdsVerified = false)
    * 4c. 둘 다 없으면 → 에러
    *
-   * [바코드 미제공 시] → createMasterWithInternalCode (이름+제조사 dedup 후 내부코드 생성)
+   * [바코드 미제공 시] → createMasterWithoutBarcode (이름+제조사 정확 dedup 후 barcode=NULL 등록. 합성 내부코드 생성 안 함)
    *
    * 공급자가 직접 호출 불가. Admin/시스템 전용.
    */
@@ -127,9 +130,9 @@ export class NetureCatalogService {
   ): Promise<{ success: boolean; data?: ProductMaster; error?: string }> {
     const trimmed = (barcode ?? '').trim();
 
-    // 바코드 미제공 → O4O 자체 내부 코드로 생성 (모든 제품 공통, 카테고리 불문)
+    // 바코드 미제공 → barcode=NULL 로 생성 (합성 내부코드 생성 안 함)
     if (!trimmed) {
-      return this.createMasterWithInternalCode(manualData);
+      return this.createMasterWithoutBarcode(manualData);
     }
 
     // 1. GTIN 검증
@@ -196,15 +199,15 @@ export class NetureCatalogService {
   }
 
   /**
-   * 바코드 없는 Master 생성 — O4O 자체 내부 코드 사용
+   * 바코드 없는 Master 생성 — barcode=NULL (합성 내부코드 생성 안 함)
    *
-   * WO-O4O-PRODUCT-MASTER-BARCODELESS-REGISTRATION-INTERNAL-CODE-V1
-   *   - 내부 코드 규칙은 공급자 경로(offer.service)와 동일한 generateInternalBarcode 재사용(신규 규칙 금지).
-   *   - 내부 코드는 호출마다 달라 barcode dedup 불가 → 이름+제조사로 기존 Master를 먼저 조회(중복 방지).
-   *   - 내부 코드 UNIQUE 충돌 시 재생성 재시도.
+   * WO-O4O-PRODUCT-BARCODE-NULLABLE-AND-INTERNAL-CODE-GENERATION-STOP-V1
+   *   - 정체성 = ProductMaster.id(UUID). 합성 200 코드·INTERNAL_O4O·합성 mfds_product_id 를 만들지 않는다.
+   *   - barcode UNIQUE 충돌 없음(NULL) → 재시도 루프 불필요.
+   *   - 중복 방지 = 이름+제조사(정규화) 정확 일치(기존 검사 유지). 이름-유사 매칭 재도입 금지.
    *   - 규제 카테고리 특례 없음 — 모든 제품이 동일하게 바코드 없이 생성 가능.
    */
-  private async createMasterWithInternalCode(
+  private async createMasterWithoutBarcode(
     manualData?: {
       regulatoryType?: string;
       regulatoryName?: string;
@@ -221,53 +224,39 @@ export class NetureCatalogService {
     }
     const manufacturerName = (manualData?.manufacturerName || '').trim();
 
-    // 중복 방지: 이름+제조사로 기존 Master 조회
+    // 중복 방지: 이름+제조사 정확 일치로 기존 Master 조회
     const existing = await this.findMasterByNameAndManufacturer(name, manufacturerName);
     if (existing) {
       return { success: true, data: existing };
     }
 
-    const { generateInternalBarcode } = await import('../../../utils/gtin.js');
     const effectiveRegName = (manualData?.regulatoryName || name).trim();
-    const seed = `${name}|${manufacturerName}`;
-    const MAX_ATTEMPTS = 3;
+    const master = this.masterRepo.create({
+      barcode: null, // 실제 바코드 없음 — 합성코드 금지
+      regulatoryType: manualData?.regulatoryType || '일반',
+      regulatoryName: effectiveRegName,
+      name,
+      manufacturerName,
+      mfdsPermitNumber: manualData?.mfdsPermitNumber ?? null,
+      mfdsProductId: null, // 공식 값 없으면 NULL — 합성코드 금지
+      isMfdsVerified: false,
+      mfdsSyncedAt: null,
+      drugCategory: normalizeDrugCategory(manualData?.drugCategory),
+    });
 
-    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-      const internalBarcode = generateInternalBarcode(attempt === 0 ? seed : `${seed}#${attempt}`);
-      const master = this.masterRepo.create({
-        barcode: internalBarcode,
-        regulatoryType: manualData?.regulatoryType || '일반',
-        regulatoryName: effectiveRegName,
-        name,
-        manufacturerName,
-        mfdsPermitNumber: manualData?.mfdsPermitNumber ?? null,
-        mfdsProductId: internalBarcode, // 바코드/MFDS 미연동 → 내부코드를 ID로 사용
-        isMfdsVerified: false,
-        mfdsSyncedAt: null,
-        drugCategory: normalizeDrugCategory(manualData?.drugCategory),
-      });
-
-      try {
-        const saved = await this.masterRepo.save(master);
-        logger.info(`[NetureCatalogService] Created ProductMaster ${saved.id} with internal code ${internalBarcode} (no barcode)`);
-        return { success: true, data: saved };
-      } catch (e: any) {
-        // 내부코드 UNIQUE 충돌 → 재생성 재시도
-        if (this.isUniqueViolation(e) && attempt < MAX_ATTEMPTS - 1) {
-          logger.warn(`[NetureCatalogService] internal barcode collision (${internalBarcode}), retrying`);
-          continue;
-        }
-        // 동시 등록으로 방금 같은 이름+제조사가 생겼을 수 있음 → 재조회
-        const raced = await this.findMasterByNameAndManufacturer(name, manufacturerName);
-        if (raced) {
-          return { success: true, data: raced };
-        }
-        logger.error('[NetureCatalogService] Failed to create master with internal code:', e);
-        return { success: false, error: 'MASTER_CREATE_FAILED' };
+    try {
+      const saved = await this.masterRepo.save(master);
+      logger.info(`[NetureCatalogService] Created ProductMaster ${saved.id} (barcode=NULL, no synthetic code)`);
+      return { success: true, data: saved };
+    } catch (e: any) {
+      // 동시 등록으로 방금 같은 이름+제조사가 생겼을 수 있음 → 재조회
+      const raced = await this.findMasterByNameAndManufacturer(name, manufacturerName);
+      if (raced) {
+        return { success: true, data: raced };
       }
+      logger.error('[NetureCatalogService] Failed to create master without barcode:', e);
+      return { success: false, error: 'MASTER_CREATE_FAILED' };
     }
-
-    return { success: false, error: 'INTERNAL_CODE_GENERATION_EXHAUSTED' };
   }
 
   /** 이름+제조사(대소문자·공백 정규화) 기준 Master 조회 — 바코드 없는 등록의 중복 방지용 */

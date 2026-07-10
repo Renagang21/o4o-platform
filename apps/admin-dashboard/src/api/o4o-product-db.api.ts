@@ -170,7 +170,7 @@ export const PRODUCT_MASTER_STATUS_LABEL: Record<ProductMasterStatus, string> = 
 
 export interface ProductMasterRow {
   id: string;
-  barcode: string;
+  barcode: string | null;
   name: string;
   regulatoryName: string;
   manufacturerName: string;
@@ -295,7 +295,7 @@ export interface ProductUsageSummary {
 
 export interface ProductMasterDetail {
   id: string;
-  barcode: string;
+  barcode: string | null;
   regulatoryType: string;
   regulatoryName: string;
   name: string;
@@ -368,7 +368,7 @@ export interface CreateProductMasterInput {
 export interface CreatedProductMaster {
   id: string;
   name: string;
-  barcode: string;
+  barcode: string | null;
 }
 
 export async function createProductMaster(input: CreateProductMasterInput): Promise<CreatedProductMaster> {

@@ -60,28 +60,6 @@ export function isValidGtin(barcode: string): boolean {
   return validateGtin(barcode) === null;
 }
 
-/**
- * 내부 바코드 생성 (바코드 미입력 시 자동 생성)
- *
- * WO-NETURE-PRODUCT-REGISTRATION-REFACTOR-AND-AI-TAGGING-V1
- *
- * GS1 prefix 200 (매장 내부용 예약 대역) 기반 유효 EAN-13 생성.
- * 형식: 200 + hash(seed) 6자리 + timestamp 3자리 + check digit = 13자리
- */
-export function generateInternalBarcode(seed: string): string {
-  // Simple hash: seed 문자 코드 합산 → 6자리
-  let hash = 0;
-  for (let i = 0; i < seed.length; i++) {
-    hash = ((hash << 5) - hash + seed.charCodeAt(i)) | 0;
-  }
-  const hashStr = String(Math.abs(hash) % 1000000).padStart(6, '0');
-
-  // Timestamp 3자리 (밀리초 하위 3자리)
-  const ts = String(Date.now() % 1000).padStart(3, '0');
-
-  // 200 + 6자리 + 3자리 = 12자리 payload
-  const payload = `200${hashStr}${ts}`;
-  const checkDigit = calculateCheckDigit(payload);
-
-  return `${payload}${checkDigit}`;
-}
+// WO-O4O-PRODUCT-BARCODE-NULLABLE-AND-INTERNAL-CODE-GENERATION-STOP-V1:
+//   합성 내부 바코드 생성(generateInternalBarcode, GS1 200 대역) 제거.
+//   바코드 미입력 상품은 barcode=NULL 로 등록한다(정체성=ProductMaster.id UUID).

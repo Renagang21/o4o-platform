@@ -38,7 +38,9 @@ import type { ProductMaster } from './ProductMaster.entity.js';
  * 식별자 유형 (application-level union)
  *
  * - GTIN/EAN13/UPC/JAN : 국제 상품 식별 바코드 체계
- * - INTERNAL_O4O       : 바코드 미입력 시 O4O 내부 생성 (gtin.ts:generateInternalBarcode)
+ * - INTERNAL_O4O       : (LEGACY) 과거 바코드 미입력 시 O4O 내부 합성 코드. 신규 생성 중단됨
+ *                        (WO-O4O-PRODUCT-BARCODE-NULLABLE-AND-INTERNAL-CODE-GENERATION-STOP-V1).
+ *                        신규 바코드리스 상품은 식별자 없이 정체성=ProductMaster.id(UUID). 기존 데이터만 보유.
  * - SUPPLIER_SKU       : 공급자 SKU
  * - PHARMACY_LOCAL     : 약국 로컬 코드
  * - STORE_LOCAL        : 매장 로컬 코드

@@ -236,7 +236,7 @@ export default function ProductMastersPage() {
     { key: 'brand', header: '브랜드', render: (_, r) => r.brand?.name || '—' },
     { key: 'category', header: '분류', render: (_, r) => r.category?.name || '—' },
     { key: 'specification', header: '규격', render: (_, r) => r.specification || '—' },
-    { key: 'barcode', header: '바코드', render: (_, r) => <span className="text-gray-500">{r.barcode || '—'}</span> },
+    { key: 'barcode', header: '바코드', render: (_, r) => <span className="text-gray-500">{r.barcode || '바코드 없음'}</span> },
     {
       // WO-...-STATUS-ACTIONS-V1: 이용 상태 배지
       key: 'status',

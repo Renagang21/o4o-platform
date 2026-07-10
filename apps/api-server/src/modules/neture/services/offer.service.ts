@@ -813,11 +813,10 @@ export class NetureOfferService {
     data: { barcode?: string; isPublic?: boolean; distributionType?: OfferDistributionType; serviceKeys?: string[]; consumerShortDescription?: string | null },
     supplierId: string,
   ): Promise<{ success: false; error: string; message?: string } | { success: true; data: { barcode: string } }> {
-    let barcode = data.barcode?.trim() || '';
-    if (!barcode) {
-      const { generateInternalBarcode } = await import('../../../utils/gtin.js');
-      barcode = generateInternalBarcode(supplierId);
-    }
+    // WO-O4O-PRODUCT-BARCODE-NULLABLE-AND-INTERNAL-CODE-GENERATION-STOP-V1:
+    //   바코드 미입력 시 합성 내부코드(200…)를 만들지 않는다. 빈 값으로 전달하면
+    //   resolveOrCreateMaster 가 barcode=NULL 로 Master 를 생성한다(정체성=UUID).
+    const barcode = data.barcode?.trim() || '';
 
     // WO-NETURE-DISTRIBUTION-MODEL-SPLIT-PUBLIC-AND-SERVICE-SUPPLY-V1: 두 축 분리 검증
     // isPublic과 serviceKeys는 독립적 — 동시 설정 가능

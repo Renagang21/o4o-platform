@@ -97,7 +97,7 @@ export default function AdminMasterManagementPage() {
     const term = searchTerm.toLowerCase();
     return (
       !term ||
-      m.barcode.toLowerCase().includes(term) ||
+      (m.barcode || '').toLowerCase().includes(term) ||
       (m.name || '').toLowerCase().includes(term) ||
       (m.brandName || '').toLowerCase().includes(term)
     );

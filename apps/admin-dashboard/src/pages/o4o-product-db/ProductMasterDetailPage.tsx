@@ -259,7 +259,7 @@ export default function ProductMasterDetailPage() {
           <PanelSection title={`식별자 (${row.identifiers?.length ?? 0})`}>
             <div className="mb-3 text-sm">
               <span className="text-gray-500 mr-2">대표 바코드</span>
-              <span className="text-gray-900 break-all">{row.barcode || '—'}</span>
+              <span className="text-gray-900 break-all">{row.barcode || '바코드 없음'}</span>
             </div>
             {row.identifiers?.length ? (
               <div className="overflow-x-auto">

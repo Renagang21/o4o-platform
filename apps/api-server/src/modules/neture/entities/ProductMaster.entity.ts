@@ -2,11 +2,15 @@
  * ProductMaster Entity
  *
  * 플랫폼 상품 SSOT (Single Source of Truth)
- * 물리적 제품 1건 = barcode 1건 = ProductMaster 1건
+ * 상품 정체성 = ProductMaster.id (UUID) 단일.
  *
  * WO-O4O-PRODUCT-MASTER-CORE-RESET-V1
+ * WO-O4O-PRODUCT-BARCODE-NULLABLE-AND-INTERNAL-CODE-GENERATION-STOP-V1:
+ *   barcode = 실제 포장 바코드만 저장(없으면 NULL). O4O 합성 내부코드(200…) 생성 중단.
+ *   mfds_product_id = 공식 값만(없으면 NULL). 정체성은 barcode 아닌 UUID.
  *
- * Immutable fields: barcode, regulatory_type, regulatory_name, manufacturer_name, mfds_permit_number, mfds_product_id
+ * Immutable fields: regulatory_type, regulatory_name, manufacturer_name, mfds_permit_number.
+ *   (barcode/mfds_product_id 는 NULL→실제값 1회 세팅 허용 — 실제 바코드는 나중에 붙을 수 있음)
  */
 
 import {
@@ -34,9 +38,13 @@ export class ProductMaster {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  /** GTIN barcode (8/12/13/14자리, check digit 포함) — immutable */
-  @Column({ type: 'varchar', length: 14 })
-  barcode: string;
+  /**
+   * 실제 포장 바코드 (GTIN 8/12/13/14자리). 실제 바코드가 없으면 NULL.
+   * WO-...-BARCODE-NULLABLE-...-V1: O4O 합성 내부코드(200…)를 여기 저장하지 않는다.
+   * UNIQUE 는 값이 있는 행에만 적용(partial unique index).
+   */
+  @Column({ type: 'varchar', length: 14, nullable: true })
+  barcode: string | null;
 
   /** MFDS 기반 규제 유형 (자동 설정) — immutable */
   @Column({ name: 'regulatory_type', type: 'varchar', length: 50 })
@@ -100,9 +108,9 @@ export class ProductMaster {
   @Column({ name: 'mfds_permit_number', type: 'varchar', length: 100, nullable: true })
   mfdsPermitNumber: string | null;
 
-  /** 식약처 제품 ID — immutable */
-  @Column({ name: 'mfds_product_id', type: 'varchar', length: 100 })
-  mfdsProductId: string;
+  /** 식약처 공식 제품 ID (HIRA:/MFDS: 등). 공식 값이 없으면 NULL — 합성코드를 넣지 않는다. */
+  @Column({ name: 'mfds_product_id', type: 'varchar', length: 100, nullable: true })
+  mfdsProductId: string | null;
 
   /** 식약처 검증 여부 */
   @Column({ name: 'is_mfds_verified', type: 'boolean', default: true })
