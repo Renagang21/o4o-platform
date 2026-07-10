@@ -154,6 +154,48 @@ export async function promoteCandidateToMaster(id: string): Promise<PromoteMaste
   return res.data.data;
 }
 
+// ─── 데이터 정비: 등록 완료 고아 후보 정합화 (dry-run) ─────────────────────────
+// WO-O4O-ADMIN-PRODUCT-DB-MAINTENANCE-ORPHAN-CANDIDATE-ARCHIVE-DRYRUN-V1
+// mount: POST /api/v1/admin/o4o-product-db/maintenance/jobs/orphan-registered-candidates/dry-run
+// 대상: candidate_status IN (approved_new_master, matched) AND matched_product_master_id IS NULL.
+// master 가 삭제되어 링크가 끊긴 잔재 — 미등록 후보가 아니므로 등록 대상에서 분리(→ archived).
+// V1 은 dry-run 전용(DB write 0). apply 는 정책 승인 후 후속 WO.
+
+export interface OrphanCandidateDryRunSample {
+  candidateId: string;
+  sourceLabel: string | null;
+  candidateStatus: string;
+  name: string;
+  manufacturerName: string;
+  identifierValue: string | null;
+  reviewedAt: string | null;
+  before: { candidateStatus: string; matchedProductMasterId: null };
+  after: { candidateStatus: string; matchedProductMasterId: null };
+  reason: string;
+}
+
+export interface OrphanCandidateDryRunResult {
+  jobKey: string;
+  mode: 'dry-run';
+  targetCount: number;
+  byStatus: Array<{ candidateStatus: string; count: number }>;
+  bySourceLabel: Array<{ sourceLabel: string | null; count: number }>;
+  proposedChange: { from: string[]; to: string };
+  samples: OrphanCandidateDryRunSample[];
+  warnings: string[];
+  applyEligible: boolean;
+  applyEnabled: boolean;
+}
+
+/** 등록 완료 고아 후보 정합화 dry-run (DB write 0). */
+export async function dryRunOrphanRegisteredCandidates(): Promise<OrphanCandidateDryRunResult> {
+  const res = await authClient.api.post<{ success: boolean; data: OrphanCandidateDryRunResult }>(
+    '/admin/o4o-product-db/maintenance/jobs/orphan-registered-candidates/dry-run',
+    {},
+  );
+  return res.data.data;
+}
+
 // ─── ProductMaster ─────────────────────────────────────────────────────────
 
 /** 상품 이용 상태 — WO-O4O-ADMIN-PRODUCT-MASTER-STATUS-ACTIONS-V1 */

@@ -508,6 +508,16 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Product Master Create route:', masterCreateError);
     }
 
+    // 24-e2g-3. Register Product DB Maintenance route (데이터 정비 — 고아 후보 정합화 dry-run)
+    //           (WO-O4O-ADMIN-PRODUCT-DB-MAINTENANCE-ORPHAN-CANDIDATE-ARCHIVE-DRYRUN-V1). DB write 0.
+    try {
+      const { createProductDbMaintenanceController } = await import('../modules/neture/controllers/product-db-maintenance.controller.js');
+      app.use('/api/v1/admin/o4o-product-db/maintenance', createProductDbMaintenanceController(dataSource));
+      logger.info('✅ Product DB Maintenance route registered at POST /api/v1/admin/o4o-product-db/maintenance/jobs/orphan-registered-candidates/dry-run');
+    } catch (maintenanceError) {
+      logger.error('Failed to register Product DB Maintenance route:', maintenanceError);
+    }
+
     // 24-e2h. Register Product Master Audit Log (read-only) — master 작업 이력 조회
     //         (WO-O4O-ADMIN-O4O-PRODUCT-MASTER-AUDIT-LOG-VIEW-V1)
     try {
