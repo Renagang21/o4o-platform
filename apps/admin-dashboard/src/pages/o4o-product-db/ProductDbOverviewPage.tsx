@@ -17,7 +17,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Database, ClipboardList, Package, AlertTriangle, HelpCircle,
+  Database, ClipboardList, Package, HelpCircle,
   ImageOff, PackagePlus, CheckCircle2,
 } from 'lucide-react';
 import {
@@ -29,10 +29,6 @@ import {
 const STATUS_OPTIONS = [
   'pending', 'reviewing', 'matched', 'linked',
   'approved_new_master', 'rejected', 'merged', 'archived',
-];
-const MATCH_STATUS_OPTIONS = [
-  'unmatched', 'exact_identifier_match', 'possible_identifier_match',
-  'possible_text_match', 'conflict', 'no_match', 'manually_matched',
 ];
 const SOURCE_TYPE_OPTIONS = [
   'supplier_web', 'pharmacy_web', 'store_web', 'mobile_draft',
@@ -50,15 +46,6 @@ const STATUS_LABEL: Record<string, { label: string; desc: string }> = {
   merged: { label: '병합됨', desc: '다른 후보/상품에 병합된 후보입니다.' },
   archived: { label: '보관', desc: '처리 후 보관 처리된 후보입니다.' },
 };
-const MATCH_LABEL: Record<string, { label: string; desc: string }> = {
-  unmatched: { label: '미매칭 · 신규 생성 대상', desc: '아직 어떤 기본상품과도 연결되지 않은 후보입니다. 새 기본상품 생성 또는 매칭이 필요합니다.' },
-  exact_identifier_match: { label: '식별자 정확 매칭', desc: '바코드 등 식별자가 정확히 일치해 자동 매칭된 후보입니다.' },
-  possible_identifier_match: { label: '식별자 유사 · 검토 필요', desc: '식별자가 유사해 매칭 후보로 제안된 상태입니다. 관리자 확인이 필요합니다.' },
-  possible_text_match: { label: '이름 유사 · 검토 필요', desc: '상품명이 유사해 매칭 후보로 제안된 상태입니다. 관리자 확인이 필요합니다.' },
-  conflict: { label: '충돌 · 확인 필요', desc: '동일 식별자가 둘 이상의 상품과 충돌하는 후보입니다. 어느 상품과 연결할지 결정이 필요합니다.' },
-  no_match: { label: '매칭 없음', desc: '매칭 가능한 기본상품이 없어 매칭에서 제외된 후보입니다.' },
-  manually_matched: { label: '수동 매칭 완료', desc: '관리자가 직접 매칭을 완료한 후보입니다.' },
-};
 const SOURCE_LABEL: Record<string, { label: string; desc: string }> = {
   supplier_web: { label: '공급자 웹', desc: '공급자가 웹에서 입력한 후보입니다.' },
   pharmacy_web: { label: '약국 웹', desc: '약국이 웹에서 입력한 후보입니다.' },
@@ -75,14 +62,12 @@ const SOURCE_LABEL: Record<string, { label: string; desc: string }> = {
 interface OpsData {
   candidateTotal: number;
   masterTotal: number;
-  conflict: number;
-  unmatched: number;
-  missingImage: number;  // 대표 이미지 없음
+  beforeRegistration: number;  // 등록 전 후보 (pending+reviewing)
+  missingImage: number;        // 대표 이미지 없음
 }
 type CountMap = Record<string, number>;
 interface DistData {
   byStatus: CountMap;
-  byMatchStatus: CountMap;
   bySourceType: CountMap;
 }
 
@@ -107,18 +92,16 @@ export default function ProductDbOverviewPage() {
     setOpsLoading(true);
     setOpsError(null);
     try {
-      const [candidateTotal, masterRes, conflict, unmatched, imgSummary] = await Promise.all([
+      const [candidateTotal, masterRes, beforeRegistration, imgSummary] = await Promise.all([
         candidateCount({}),
         listProductMasters({ page: 1, limit: 1 }),
-        candidateCount({ matchStatus: 'conflict' }),
-        candidateCount({ matchStatus: 'unmatched' }),
+        candidateCount({ groupedStatus: 'before_registration' }),
         getImageQualitySummary(),
       ]);
       setOps({
         candidateTotal,
         masterTotal: masterRes.meta.total,
-        conflict,
-        unmatched,
+        beforeRegistration,
         missingImage: imgSummary.missing_image ?? 0,
       });
     } catch (e: any) {
@@ -133,16 +116,14 @@ export default function ProductDbOverviewPage() {
     setDistLoading(true);
     setDistError(null);
     try {
-      const [statusCounts, matchCounts, sourceCounts] = await Promise.all([
+      const [statusCounts, sourceCounts] = await Promise.all([
         Promise.all(STATUS_OPTIONS.map((s) => candidateCount({ status: s }))),
-        Promise.all(MATCH_STATUS_OPTIONS.map((s) => candidateCount({ matchStatus: s }))),
         Promise.all(SOURCE_TYPE_OPTIONS.map((s) => candidateCount({ sourceType: s }))),
       ]);
       const toMap = (keys: string[], vals: number[]): CountMap =>
         keys.reduce((acc, k, i) => ({ ...acc, [k]: vals[i] }), {} as CountMap);
       setDist({
         byStatus: toMap(STATUS_OPTIONS, statusCounts),
-        byMatchStatus: toMap(MATCH_STATUS_OPTIONS, matchCounts),
         bySourceType: toMap(SOURCE_TYPE_OPTIONS, sourceCounts),
       });
     } catch (e: any) {
@@ -166,24 +147,20 @@ export default function ProductDbOverviewPage() {
   }
 
   // 오늘 처리할 작업 (우선순위 순) — 이미 존재하는 목록으로만 이동
+  // WO-...-LEGACY-MASTER-MATCHING-REMOVAL-V1: 사전 매칭(conflict/unmatched) 지표 제거 →
+  //   '등록 전' 후보(candidate_status 기준)를 등록 대상으로 안내.
   const tasks = ops ? [
     {
-      key: 'conflict', icon: <AlertTriangle className="w-5 h-5" />, tone: 'red' as const,
-      label: '충돌 확인', count: ops.conflict,
-      desc: '동일 식별자가 여러 상품과 충돌하는 후보입니다. 어느 상품과 연결할지 결정하세요.',
-      to: '/admin/o4o-product-db/candidates?matchStatus=conflict',
+      key: 'before_registration', icon: <PackagePlus className="w-5 h-5" />, tone: 'indigo' as const,
+      label: '등록 전 후보', count: ops.beforeRegistration,
+      desc: '아직 O4O 기본상품으로 등록되지 않은 후보입니다. 검토 후 등록 또는 제외하세요.',
+      to: '/admin/o4o-product-db/candidates?groupedStatus=before_registration',
     },
     {
       key: 'missing_image', icon: <ImageOff className="w-5 h-5" />, tone: 'gray' as const,
       label: '이미지 없는 상품', count: ops.missingImage,
       desc: '대표 이미지가 없어 보강이 필요한 기본상품입니다.',
       to: '/admin/o4o-product-db/image-quality',
-    },
-    {
-      key: 'new_master', icon: <PackagePlus className="w-5 h-5" />, tone: 'indigo' as const,
-      label: '신규 기본상품 생성 대상', count: ops.unmatched,
-      desc: '아직 매칭되지 않아 새 기본상품 생성이 필요한 후보입니다.',
-      to: '/admin/o4o-product-db/candidates?matchStatus=unmatched',
     },
   ] : [];
 
@@ -244,20 +221,13 @@ export default function ProductDbOverviewPage() {
             {[...Array(3)].map((_, i) => <div key={i} className="h-64 rounded-lg bg-gray-100 animate-pulse" />)}
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <DistributionCard
               title="후보 상태별 분포"
               total={ops?.candidateTotal ?? 0}
               entries={STATUS_OPTIONS.map((k) => ({ key: k, value: dist.byStatus[k] ?? 0 }))}
               labelMap={STATUS_LABEL}
               linkFor={(k) => `/admin/o4o-product-db/candidates?status=${encodeURIComponent(k)}`}
-            />
-            <DistributionCard
-              title="매칭 상태별 분포"
-              total={ops?.candidateTotal ?? 0}
-              entries={MATCH_STATUS_OPTIONS.map((k) => ({ key: k, value: dist.byMatchStatus[k] ?? 0 }))}
-              labelMap={MATCH_LABEL}
-              linkFor={(k) => `/admin/o4o-product-db/candidates?matchStatus=${encodeURIComponent(k)}`}
             />
             <DistributionCard
               title="출처(source)별 분포"

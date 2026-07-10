@@ -26,7 +26,7 @@ export interface ProductCandidateRow {
   sourceType: string;
   sourceLabel: string | null;
   candidateStatus: string;
-  matchStatus: string;
+  /** 등록(승격) 결과로 연결된 O4O 상품 ID — 사전 매칭 아님 */
   matchedProductMasterId: string | null;
   identifierType: string | null;
   identifierValue: string | null;
@@ -38,7 +38,6 @@ export interface ProductCandidateRow {
   candidateUnit: string | null;
   candidateImageUrl: string | null;
   candidatePrice: string | null;
-  confidenceScore: string | null;
   rawPayload: Record<string, unknown> | null;
   reviewNote: string | null;
   createdAt: string;
@@ -53,7 +52,6 @@ export interface ProductCandidateListParams {
    * WO-O4O-ADMIN-PRODUCT-CANDIDATE-STATUS-SIMPLIFY-V2.
    */
   groupedStatus?: string;
-  matchStatus?: string;
   sourceType?: string;
   /** 공공 seed 라벨 정확일치 (예: MFDS_HEALTH_FUNCTIONAL_FOOD) */
   sourceLabel?: string;
@@ -84,7 +82,6 @@ export async function listProductCandidates(
   }
   if (params.status) query.status = params.status;
   if (params.groupedStatus) query.groupedStatus = params.groupedStatus;
-  if (params.matchStatus) query.matchStatus = params.matchStatus;
   if (params.sourceType) query.sourceType = params.sourceType;
   if (params.sourceLabel?.trim()) query.sourceLabel = params.sourceLabel.trim();
   if (params.search?.trim()) query.search = params.search.trim();
@@ -109,26 +106,20 @@ export async function getProductCandidate(id: string): Promise<ProductCandidateR
   return res.data?.data ?? null;
 }
 
-// ─── Candidate Conflict Actions (WO-O4O-ADMIN-PRODUCT-CANDIDATE-CONFLICT-ACTIONS-V1) ─────
+// ─── Candidate 상세 보조 정보 ─────
+// WO-O4O-PUBLIC-DATA-CANDIDATE-LEGACY-MASTER-MATCHING-REMOVAL-V1:
+//   사전 매칭(conflictingCandidates/possibleMasters·manualMatchCandidate) 제거.
+//   상세는 원천 식별자 + 승격 가능 여부 + rawPayload 요약만 제공한다.
 
 export interface CandidateConflictInfo {
   candidate: ProductCandidateRow;
-  /** WO-...-UNMATCHED-ACTIONS-V1: 신규 ProductMaster 승격 가능 여부 (drug 소스만 eligible) */
+  /** 신규 ProductMaster 등록(승격) 가능 여부 (drug 소스만 eligible) */
   promotable?: { eligible: boolean; reason: string | null };
   conflictKey: { identifierType: string | null; identifierValue: string | null; normalizedIdentifierValue: string | null };
-  conflictingCandidates: Array<{
-    id: string; candidateName: string | null; candidateManufacturer: string | null;
-    identifierValue: string | null; matchStatus: string; candidateStatus: string;
-    matchedProductMasterId: string | null; sourceLabel: string | null; createdAt: string;
-  }>;
-  possibleMasters: Array<{
-    id: string; name: string; regulatoryName: string; manufacturerName: string;
-    barcode: string; category: { id: string; name: string } | null; brand: { id: string; name: string } | null;
-  }>;
   rawPayloadSummary: Record<string, unknown>;
 }
 
-/** 후보 충돌 근거 조회 (read-only). */
+/** 후보 상세 보조 정보 조회 (read-only). */
 export async function getCandidateConflictInfo(id: string): Promise<CandidateConflictInfo> {
   const res = await authClient.api.get<{ success: boolean; data: CandidateConflictInfo }>(
     `/operator/product-candidates/${encodeURIComponent(id)}/conflict-info`,
@@ -145,14 +136,6 @@ export async function bulkCandidateAction(ids: string[], action: CandidateBulkAc
     { ids, action },
   );
   return res.data.data;
-}
-
-/** 후보를 기존 ProductMaster 에 수동 매칭 (candidate 만 갱신, master 무변경). */
-export async function manualMatchCandidate(id: string, productMasterId: string): Promise<void> {
-  await authClient.api.post(
-    `/operator/product-candidates/${encodeURIComponent(id)}/manual-match`,
-    { productMasterId },
-  );
 }
 
 export interface PromoteMasterResult {
