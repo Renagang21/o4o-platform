@@ -476,6 +476,16 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Product Master Note routes:', masterNoteError);
     }
 
+    // 24-e2g-1b. Register Product Master STORE Description authoring (관리자 직접 등록 — 진입점 4)
+    //           (IR-O4O-PRODUCT-REGISTRATION-MODULE-UNIFIED-V1 §5)
+    try {
+      const { createProductMasterDescriptionController } = await import('../modules/neture/controllers/product-master-description.controller.js');
+      app.use('/api/v1/admin/o4o-product-db/masters', createProductMasterDescriptionController(dataSource));
+      logger.info('✅ Product Master STORE Description routes registered at /api/v1/admin/o4o-product-db/masters/:id/store-descriptions');
+    } catch (masterDescError) {
+      logger.error('Failed to register Product Master STORE Description routes:', masterDescError);
+    }
+
     // 24-e2g-2. Register Product Master Create route (관리자 수동 상품 등록)
     //           (WO-O4O-ADMIN-PRODUCT-MASTER-MANUAL-REGISTRATION-UI-V1)
     try {
@@ -494,6 +504,16 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.info('✅ Product Master Audit Log routes registered at /api/v1/admin/o4o-product-db/masters/:id/audit-logs');
     } catch (auditLogError) {
       logger.error('Failed to register Product Master Audit Log routes:', auditLogError);
+    }
+
+    // 24-e2i. Register Product Master Status route (단건 상태 변경 — ACTIVE/SUSPENDED/ARCHIVED)
+    //         (WO-O4O-ADMIN-PRODUCT-MASTER-STATUS-ACTIONS-V1)
+    try {
+      const { createProductMasterStatusController } = await import('../modules/neture/controllers/product-master-status.controller.js');
+      app.use('/api/v1/admin/o4o-product-db/masters', createProductMasterStatusController(dataSource));
+      logger.info('✅ Product Master Status route registered at PATCH /api/v1/admin/o4o-product-db/masters/:id/status');
+    } catch (masterStatusError) {
+      logger.error('Failed to register Product Master Status route:', masterStatusError);
     }
 
     // 24-e2i-3. Register Product Content Browse (read-only) — 제품 콘텐츠 통합 browse(4 source)

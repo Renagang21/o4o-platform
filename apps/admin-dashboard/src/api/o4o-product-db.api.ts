@@ -173,6 +173,18 @@ export async function promoteCandidateToMaster(id: string): Promise<PromoteMaste
 
 // ─── ProductMaster ─────────────────────────────────────────────────────────
 
+/** 상품 이용 상태 — WO-O4O-ADMIN-PRODUCT-MASTER-STATUS-ACTIONS-V1 */
+export type ProductMasterStatus = 'ACTIVE' | 'SUSPENDED' | 'ARCHIVED';
+
+/** 목록 상태 필터값 (관리자 목록 전용) */
+export type ProductMasterStatusFilter = 'all' | 'active' | 'suspended' | 'archived';
+
+export const PRODUCT_MASTER_STATUS_LABEL: Record<ProductMasterStatus, string> = {
+  ACTIVE: '정상',
+  SUSPENDED: '이용 중단',
+  ARCHIVED: '보관',
+};
+
 export interface ProductMasterRow {
   id: string;
   barcode: string;
@@ -183,6 +195,8 @@ export interface ProductMasterRow {
   category: { id: string; name: string } | null;
   brand: { id: string; name: string } | null;
   primaryImageUrl: string | null;
+  /** 이용 상태(관리자 배지용). 구버전 응답 대비 optional — 없으면 ACTIVE 로 간주. */
+  status?: ProductMasterStatus;
 }
 
 export interface ProductMasterListMeta {
@@ -201,6 +215,8 @@ export interface ProductMasterListParams {
   q?: string;
   page?: number;
   limit?: number;
+  /** 관리자 상태 필터. 'active'/미전달 → ACTIVE-only. 'all'/'suspended'/'archived' 는 관리자 롤에서만 유효. */
+  status?: ProductMasterStatusFilter;
 }
 
 /**
@@ -215,6 +231,8 @@ export async function listProductMasters(
   if (params.q?.trim()) query.q = params.q.trim();
   query.page = String(params.page ?? 1);
   query.limit = String(params.limit ?? 20);
+  // 상태 필터 — 'all'/'active' 이 아닐 때만 전달. 관리자 목록에서 전체/특정 상태 조회.
+  if (params.status && params.status !== 'active') query.status = params.status;
 
   const res = await authClient.api.get<{
     success: boolean;
@@ -298,6 +316,8 @@ export interface ProductMasterDetail {
   regulatoryType: string;
   regulatoryName: string;
   name: string;
+  /** 이용 상태(현재 상태 배지 + 상태 변경 액션용). 구버전 응답 대비 optional. */
+  status?: ProductMasterStatus;
   manufacturerName: string;
   brandName: string | null;
   specification: string | null;
@@ -322,6 +342,29 @@ export async function getProductMaster(id: string): Promise<ProductMasterDetail 
     `/neture/products/library/${encodeURIComponent(id)}`,
   );
   return res.data?.data ?? null;
+}
+
+// ─── ProductMaster 상태 변경 (WO-O4O-ADMIN-PRODUCT-MASTER-STATUS-ACTIONS-V1) ──
+// PATCH /admin/o4o-product-db/masters/:id/status — ACTIVE | SUSPENDED | ARCHIVED + 사유.
+// product_masters.status 만 변경하고 변경 이력을 관리 메모(작업 이력)에 기록. 사용처 무변경.
+
+export interface ProductMasterStatusChangeResult {
+  id: string;
+  previousStatus: ProductMasterStatus;
+  status: ProductMasterStatus;
+  changed: boolean;
+}
+
+export async function setProductMasterStatus(
+  id: string,
+  status: ProductMasterStatus,
+  reason?: string,
+): Promise<ProductMasterStatusChangeResult> {
+  const res = await authClient.api.patch<{ success: boolean; data: ProductMasterStatusChangeResult }>(
+    `/admin/o4o-product-db/masters/${encodeURIComponent(id)}/status`,
+    { status, reason: reason?.trim() || undefined },
+  );
+  return res.data.data;
 }
 
 // ─── ProductMaster 수동 등록 (WO-O4O-ADMIN-PRODUCT-MASTER-MANUAL-REGISTRATION-UI-V1) ──
@@ -509,6 +552,36 @@ export async function addProductMasterNote(id: string, note: string): Promise<Pr
 
 export async function deleteProductMasterNote(id: string, noteId: string): Promise<void> {
   await authClient.api.delete(`/admin/o4o-product-db/masters/${id}/notes/${noteId}`);
+}
+
+// ─── 매장용(STORE) 상세설명서 저작 — 관리자 직접 등록 (진입점 4) ──
+// IR-O4O-PRODUCT-REGISTRATION-MODULE-UNIFIED-V1 §5
+// mount: /admin/o4o-product-db/masters/:id/store-descriptions
+export interface ProductMasterStoreDescription {
+  id: string;
+  language: string;
+  status: string;
+  summary: string | null;
+  content: string | null;
+  updatedAt: string;
+}
+
+export async function listProductMasterStoreDescriptions(id: string): Promise<ProductMasterStoreDescription[]> {
+  const res = await authClient.api.get<{ success: boolean; data: { items: ProductMasterStoreDescription[] } }>(
+    `/admin/o4o-product-db/masters/${id}/store-descriptions`,
+  );
+  return res.data?.data?.items ?? [];
+}
+
+export async function saveProductMasterStoreDescription(
+  id: string,
+  input: { content: string; summary?: string | null; language?: string },
+): Promise<{ id: string; status: string; language: string } | null> {
+  const res = await authClient.api.post<{ success: boolean; data: { id: string; status: string; language: string } }>(
+    `/admin/o4o-product-db/masters/${id}/store-descriptions`,
+    { content: input.content, summary: input.summary ?? null, language: input.language ?? 'ko' },
+  );
+  return res.data?.data ?? null;
 }
 
 // ─── Product Master Audit Log (작업 이력, read-only) ─────────────────────────

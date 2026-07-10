@@ -23,7 +23,14 @@ import {
   uploadProductMasterImage, setProductMasterPrimaryImage,
   listProductMasterImages, hideProductMasterImage, restoreProductMasterImage, ProductMasterImageAdminRow,
   getProductLandingQr, ProductLandingQr,
+  listProductMasterStoreDescriptions, saveProductMasterStoreDescription, ProductMasterStoreDescription,
 } from '@/api/o4o-product-db.api';
+import {
+  ProductMasterStatusBadge,
+  ProductMasterStatusModal,
+  statusActionsFor,
+  StatusModalTarget,
+} from './ProductMasterStatusControls';
 
 export default function ProductMasterDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -44,6 +51,8 @@ export default function ProductMasterDetailPage() {
   // WO-O4O-ADMIN-O4O-PRODUCT-IMAGE-SOFT-DELETE-RESTORE-V1: admin 이미지 목록(숨김 포함).
   // 공유 상세(row.images)는 active 만 → 복원 UI 위해 별도 조회.
   const [images, setImages] = useState<ProductMasterImageAdminRow[]>([]);
+  // WO-...-STATUS-ACTIONS-V1: 상태 변경 모달 대상 (null=닫힘)
+  const [statusTarget, setStatusTarget] = useState<StatusModalTarget | null>(null);
 
   const reloadImages = async () => {
     if (!id) return;
@@ -200,12 +209,28 @@ export default function ProductMasterDetailPage() {
         <div className="space-y-6">
           <div className="flex items-center gap-2 flex-wrap">
             <h2 className="text-xl font-bold text-gray-900">{row.name || '(이름 없음)'}</h2>
+            {/* WO-...-STATUS-ACTIONS-V1: 현재 이용 상태 배지 */}
+            <ProductMasterStatusBadge status={row.status} />
             {row.regulatoryType && (
               <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs">{row.regulatoryType}</span>
             )}
             {row.isMfdsVerified && (
               <span className="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-xs">MFDS 검증</span>
             )}
+            {/* 상태 변경 액션 — 현재 상태에 따라 이용 중단/보관 또는 정상 복원 */}
+            <div className="ml-auto flex items-center gap-2">
+              {statusActionsFor(row.status ?? 'ACTIVE').map((a) => (
+                <button
+                  key={a.targetStatus}
+                  onClick={() =>
+                    setStatusTarget({ id: row.id, name: row.name, currentStatus: row.status ?? 'ACTIVE', targetStatus: a.targetStatus })
+                  }
+                  className="px-3 py-1.5 border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-50"
+                >
+                  {a.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* 기본 정보 */}
@@ -352,6 +377,9 @@ export default function ProductMasterDetailPage() {
               <div className="text-sm text-gray-400">공식 설명 없음</div>
             )}
           </PanelSection>
+
+          {/* 매장용(STORE) 상세설명서 저작 — 관리자 직접 등록 (IR-O4O-PRODUCT-REGISTRATION-MODULE-UNIFIED-V1 §5) */}
+          {id && <StoreDescriptionPanel masterId={id} />}
 
           {/* 설명 후보 — SharedProductDescription 요약 (read-only preview) */}
           <PanelSection title={`설명 후보 (${row.descriptions?.length ?? 0})`}>
@@ -531,6 +559,13 @@ export default function ProductMasterDetailPage() {
           </PanelSection>
         </div>
       )}
+
+      {/* 상태 변경 모달 — WO-...-STATUS-ACTIONS-V1 */}
+      <ProductMasterStatusModal
+        target={statusTarget}
+        onClose={() => setStatusTarget(null)}
+        onDone={() => { setStatusTarget(null); reloadMaster(); reloadAudit(); }}
+      />
     </div>
   );
 }
@@ -689,6 +724,121 @@ const IDENTIFIER_TYPE_LABEL: Record<string, string> = {
 };
 function identifierTypeLabel(type: string): string {
   return IDENTIFIER_TYPE_LABEL[type] ?? type;
+}
+
+// ─── 매장용(STORE) 상세설명서 저작 (관리자 직접 등록 — 진입점 4) ──────────────────
+// IR-O4O-PRODUCT-REGISTRATION-MODULE-UNIFIED-V1 §5. createCandidate(STORE,manual)→setCanonical.
+// 저장 즉시 매장 화면(/store/handled-products → b2c-descriptions)에서 조회된다.
+const STORE_DESC_LANGS: Array<{ value: string; label: string }> = [
+  { value: 'ko', label: '한국어' },
+  { value: 'zh', label: '중국어' },
+  { value: 'en', label: '영어' },
+  { value: 'ja', label: '일본어' },
+];
+function StoreDescriptionPanel({ masterId }: { masterId: string }) {
+  const [items, setItems] = useState<ProductMasterStoreDescription[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(false);
+  const [language, setLanguage] = useState('ko');
+  const [content, setContent] = useState('');
+  const [summary, setSummary] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const reload = () => {
+    setLoading(true);
+    listProductMasterStoreDescriptions(masterId)
+      .then((rows) => setItems(rows))
+      .catch(() => setItems([]))
+      .finally(() => setLoading(false));
+  };
+  useEffect(() => { reload(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [masterId]);
+
+  const save = async () => {
+    if (!content.trim()) { setError('설명서 본문을 입력하세요'); return; }
+    setBusy(true); setError(null);
+    try {
+      await saveProductMasterStoreDescription(masterId, { content, summary: summary || null, language });
+      setContent(''); setSummary(''); setOpen(false);
+      reload();
+    } catch (e: any) {
+      setError(e?.response?.data?.error || 'STORE 설명서 저장에 실패했습니다');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <PanelSection
+      title={`매장용 상세설명서 (${items.length})`}
+      badge={<span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-xs">STORE</span>}
+    >
+      <p className="text-xs text-gray-400 mb-3">
+        매장 화면(내 매장 취급상품 → 매장용 상세설명서)에서 조회되는 설명서입니다. 언어별 1건(canonical)으로 저장되며, 같은 언어를 다시 저장하면 대체됩니다.
+      </p>
+
+      {loading ? (
+        <div className="text-sm text-gray-400">불러오는 중…</div>
+      ) : items.length === 0 ? (
+        <div className="text-sm text-gray-400">등록된 매장용 상세설명서가 없습니다.</div>
+      ) : (
+        <div className="space-y-2">
+          {items.map((d) => (
+            <div key={d.id} className="flex items-center gap-2 text-sm border border-gray-100 rounded px-3 py-2">
+              <span className="inline-block px-1.5 py-0.5 rounded-full text-xs bg-green-100 text-green-700">
+                {(d.language || 'ko').toUpperCase()} {d.status === 'canonical' ? '있음' : d.status}
+              </span>
+              <span className="text-gray-400 text-xs">{(d.updatedAt || '').slice(0, 10)}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {!open ? (
+        <button
+          onClick={() => setOpen(true)}
+          className="mt-3 flex items-center gap-1.5 bg-admin-blue text-white px-3 py-2 rounded text-sm"
+        >
+          매장용 상세설명서 작성
+        </button>
+      ) : (
+        <div className="mt-3 border border-gray-200 rounded p-3 space-y-3">
+          <div className="flex items-center gap-2">
+            <label className="text-xs text-gray-500">언어</label>
+            <select
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              className="border border-gray-300 rounded px-2 py-1 text-sm"
+            >
+              {STORE_DESC_LANGS.map((l) => <option key={l.value} value={l.value}>{l.label}</option>)}
+            </select>
+          </div>
+          <input
+            value={summary}
+            onChange={(e) => setSummary(e.target.value)}
+            placeholder="요약(선택)"
+            className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm"
+          />
+          <textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="본문 HTML(매장 화면에 그대로 렌더됩니다)"
+            rows={10}
+            className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm font-mono"
+          />
+          {error && <div className="text-sm text-red-600">{error}</div>}
+          <div className="flex items-center gap-2">
+            <button onClick={save} disabled={busy} className="bg-admin-blue text-white px-3 py-2 rounded text-sm disabled:opacity-50">
+              {busy ? '저장 중…' : '저장(canonical)'}
+            </button>
+            <button onClick={() => { setOpen(false); setError(null); }} disabled={busy} className="px-3 py-2 rounded text-sm border border-gray-300">
+              취소
+            </button>
+          </div>
+        </div>
+      )}
+    </PanelSection>
+  );
 }
 
 // ─── 제품 QR / 랜딩 섹션 (WO-O4O-PRODUCT-LANDING-ARCHITECTURE-V1) ────────────────
