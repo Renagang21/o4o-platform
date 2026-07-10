@@ -102,5 +102,32 @@ docs/checks/CHECK-O4O-ADMIN-PRODUCT-MASTER-STATUS-ACTIONS-V1.md                 
 
 - DB 스키마 변경/ migration: **0** (status 컬럼은 선행 FOUNDATION `aef2c3a66`).
 - 참여자·공급자·매장·주문·콘텐츠 데이터 변경: **0** (상태 변경은 product_masters.status + product_master_notes 메모만).
-- 프로덕션 데이터 직접 변경: **0**.
+- 프로덕션 데이터 직접 변경: **0** (§10 smoke 의 상태 변경은 동일 상품으로 순환 후 ACTIVE 복원).
+
+---
+
+## 10. 배포 후 실 API smoke (2026-07-10)
+
+- **배포 확인**: 내 커밋 `8fe7e46c3` 의 **Deploy API Server / Deploy Admin Dashboard 모두 SUCCESS** (병행 세션 `f1bce3172` 시점의 배포 실패 blocker = 미커밋 `product-master-status.controller.ts`/`ProductMasterStatusControls` 였고, 이 두 파일이 내 커밋에 포함되어 **blocker 해소**됨).
+- **브라우저 UI smoke 는 보류**: Playwright 영구 프로필(`C:\Users\home\.playwright-o4o-profile`)이 기존 Chrome 인스턴스에 점유되어 기동 실패(병행 세션/기존 브라우저 추정, 강제 종료 안 함). UI 계층(필터 드롭다운/배지/모달/행 액션)은 typecheck+build PASS 로 정합성 확인, **런타임 동작은 아래 실 API smoke 로 검증**.
+- **인증**: `sohae2100@gmail.com`(roles: platform:super_admin, neture:admin/operator …) → 상태 role-gate 통과.
+- **대상 상품**: `손 부목` (id `00a96718-…7aa84`, barcode `6970398842176`), smoke 전/후 모두 **ACTIVE**.
+
+| # | 검증 | 결과 |
+|---|------|------|
+| 1 | 목록 검색 응답에 `status` 필드 존재 · 기본 검색 전부 ACTIVE | **PASS** (총 198,394, 표본 5건 ACTIVE) |
+| 2 | 관리자 `status=all` 검색 200 | **PASS** |
+| 3 | `PATCH …/:id/status` ACTIVE→ARCHIVED | **PASS** (`changed:true`, previousStatus 정확) |
+| 4 | 상세 GET 상태 반영 (ARCHIVED / SUSPENDED / ACTIVE) | **PASS** |
+| 5 | **기본 검색(=참여자 picker 공통 메서드)에서 ARCHIVED 제외** (q=barcode → 0건) | **PASS** |
+| 6 | `status=archived` 필터로 관리자 조회 시 노출 (1건) | **PASS** |
+| 7 | ARCHIVED→ACTIVE 복원 | **PASS** (`changed:true`) |
+| 8 | ACTIVE→SUSPENDED + 기본 검색에서 제외 (0건) | **PASS** |
+| 9 | 상태 변경마다 시스템 메모 생성 (4회 변경 = 4메모) · 서버 생성 문구 정상 한글 · 실행자 `서철환` | **PASS** |
+| 10 | **no-op**: ACTIVE→ACTIVE `changed:false` · 메모 미생성 (총 메모 4건 유지) | **PASS** |
+| 11 | 최종 상태 ACTIVE 복원 확인 | **PASS** |
+
+- **메모 문구 인코딩**: 서버 생성 부분(`상품 상태 변경: SUSPENDED → ACTIVE` / `사유:`)은 **정상 한글 저장 확인**. 내가 CLI(curl -d)로 넣은 `reason` 의 한글만 깨짐(Git Bash cp949 전송 아티팩트, ASCII "smoke" 는 온전) — **제품 결함 아님**. 실제 브라우저는 textarea UTF-8 전송이라 무관.
+- **잔여물**: 대상 상품에 상태 변경 시스템 메모 4건이 감사 이력으로 남음(설계상 soft-audit, hard delete 안 함). 상품 상태 데이터는 ACTIVE 로 완전 복원.
+- **미검증(후속)**: 브라우저 UI 렌더(필터/배지/모달) — 프로필 점유 해소 후 수행 권장. 비관리자 롤의 `status=all` 강제 ACTIVE-only 는 코드 gate + 참여자 엔드포인트 미전달로 보장(순수 비관리자 토큰 negative 테스트는 별도).
 - 타 세션 WIP 파일: **미변경**.
