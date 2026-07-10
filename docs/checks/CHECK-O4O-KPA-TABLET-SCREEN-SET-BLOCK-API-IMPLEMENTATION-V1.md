@@ -114,7 +114,7 @@
 | **기존 구조 불변** | ✅ store_tablets 4 / store_tablet_displays 2 / idle 보유 1 (SCHEMA-V1 검증 시점과 동일) |
 | public tablet runtime | ✅ 미접촉 (핸들러 무변경, current 미참조) |
 
-> **테스트 잔여물**: `[SMOKE]` screen_set 1건(archived·soft-deleted) + block 2건이 `renagang21` org에 남음. 앱의 모든 정상 쿼리(deleted_at IS NULL / status<>archived)에서 필터됨 → 무해. API에 hard-delete 없어 완전 제거하려면 별도 승인된 raw DELETE 필요(§완료 후 정리 옵션).
+> **테스트 잔여물 — 제거 완료(사용자 승인 후)**: E2E가 남긴 `[SMOKE] active set`(id `eb874845…`, archived) + block 2건을 사용자 승인 하에 **guarded raw DELETE**(id + name LIKE '[SMOKE]%' + deleted_at IS NOT NULL 3중 조건)로 제거. FK `ON DELETE CASCADE`로 blocks 동반 삭제. **검증: screen_sets 0 / screen_blocks 0 / tablets_with_current 0** → SCHEMA-V1 baseline(빈 구조)로 완전 복귀, 잔여 0.
 
 ## 10. 완료 기준 대비
 
