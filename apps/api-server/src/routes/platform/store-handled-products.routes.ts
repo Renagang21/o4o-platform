@@ -48,16 +48,10 @@ interface UnifiedRow {
   drug_category: string | null;
 }
 
-function listingStatusLabel(row: UnifiedRow, now: number): string {
-  if (!row.is_active) return '비활성';
-  const s = (row.listing_status || '').toLowerCase();
-  if (s === 'pending') return '승인 대기';
-  if (s === 'canceled' || s === 'cancelled' || s === 'rejected') return '중지';
-  const start = row.start_at ? new Date(row.start_at).getTime() : null;
-  const end = row.end_at ? new Date(row.end_at).getTime() : null;
-  if ((start && start <= now) && (!end || end >= now) && (start || end)) return '이벤트';
-  return '활성';
-}
+// WO-O4O-KPA-STORE-NEW-PRODUCT-REQUEST-AND-ADMIN-APPROVAL-V1 (P3 cleanup):
+//   '승인 대기' 표시 제거. organization_product_listings.status 기본값 'pending'(Neture Distribution
+//   잔재)에서 유래했으나, 매장 경영활용 제품 목록은 이미 등록·사용 가능한 제품 풀이므로 유통 승인 상태를
+//   상태로 노출하지 않는다(실제 게이트 아님, is_active 로 충분). statusLabel 필드·listingStatusLabel 제거.
 
 export function createStoreHandledProductsRoutes(dataSource: DataSource): Router {
   const router = Router();
@@ -163,7 +157,6 @@ export function createStoreHandledProductsRoutes(dataSource: DataSource): Router
       //   제품 풀(매장 취급제품)은 채널 상태판이 아니다. 화면에서 채널 상태 컬럼(타블렛/온라인몰/상품설명)을
       //   제거했으므로, 그를 위한 enrich 조인 3종(store_tablet_displays / organization_product_channels /
       //   shared_product_descriptions)도 함께 제거한다. 채널 노출은 각 채널 메뉴에서 관리한다.
-      const now = Date.now();
       const items = rows.map((r) => {
         const isListing = r.source_type === 'listing';
         // WO-...-CATEGORY-COLUMN-V1: O4O 표준 분류(코드+라벨). master 없는 local 은 regulatory_type=NULL → '미분류'.
@@ -176,7 +169,6 @@ export function createStoreHandledProductsRoutes(dataSource: DataSource): Router
           originLabel: isListing ? 'O4O 기반 제품' : '매장 경영활용 제품',
           ownerLabel: isListing ? '공급/플랫폼' : '내 매장',
           price: r.price != null ? Number(r.price) : null,
-          statusLabel: isListing ? listingStatusLabel(r, now) : r.is_active ? '활성' : '비활성',
           isActive: r.is_active,
           // WO-O4O-KPA-STORE-HANDLED-PRODUCT-CATEGORY-COLUMN-V1: O4O 표준 분류 (사용자 표시 라벨).
           classificationCode: cls.code,

@@ -69,6 +69,11 @@ export type NotificationType =
   | 'store.consultation_requested'   // 매장 사용자: 신규 상담(태블릿 관심) 요청 접수
   // WO-O4O-KPA-ONLINE-SALES-ORDER-NOTIFICATION-V1
   | 'store.online_sales_order_created' // 매장 사용자: 온라인 스토어 신규 판매 주문 접수
+  // WO-O4O-KPA-STORE-NEW-PRODUCT-REQUEST-AND-ADMIN-APPROVAL-V1 (P3): 매장 신규 상품 등록 요청
+  | 'store.product_request_submitted'         // 운영자/관리자: 신규 상품 등록 요청 접수
+  | 'store.product_request_revision_requested' // 요청 매장: 보완 요청
+  | 'store.product_request_approved'          // 요청 매장: 등록 완료(신규 승인/기존 연결)
+  | 'store.product_request_rejected'          // 요청 매장: 등록 불가
   | 'custom';
 
 // Legacy interface for backward compatibility

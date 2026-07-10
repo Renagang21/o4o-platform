@@ -23,6 +23,7 @@ import type { DataSource } from 'typeorm';
 import { IsNull } from 'typeorm';
 import { ProductCandidate, type ProductCandidateStatus } from '../../../modules/neture/entities/ProductCandidate.entity.js';
 import { ProductCandidateService } from '../../../modules/neture/services/product-candidate.service.js';
+import { notifyAdminsOfStoreProductRequest } from '../../../modules/neture/services/store-product-request-notify.js';
 import { PRODUCT_CLASSIFICATION_CODES, classificationLabel, type ProductClassification } from '../../../modules/neture/utils/product-type.util.js';
 import { inferIdentifierTypeFromBarcode, normalizeIdentifier, sanitizeIdentifierValue } from '../../../modules/neture/utils/product-identifier.util.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
@@ -276,6 +277,11 @@ export function createStoreProductRequestController(dataSource: DataSource): Rou
     });
 
     logger.info(`[StoreProductRequest] Submitted: id=${candidate.id}, org=${organizationId}, by=${userId}`);
+    // P3: 관리자/운영자 알림 (커밋 후 fire-and-forget, best-effort — 실패해도 제출 성공에 영향 없음)
+    void notifyAdminsOfStoreProductRequest(dataSource, {
+      serviceKey: serviceKey ?? null, requestId: candidate.id, productName: f.productName,
+      actorId: userId ?? null, organizationId,
+    });
     res.status(201).json({ success: true, data: toRequestDto(candidate) });
   }));
 
@@ -354,6 +360,11 @@ export function createStoreProductRequestController(dataSource: DataSource): Rou
 
     const saved = await candidateRepo.save(candidate);
     logger.info(`[StoreProductRequest] Resubmitted: id=${id}, org=${organizationId}, by=${userId}`);
+    // P3: 재제출도 검토 대상 복귀 → 관리자 재알림 (best-effort)
+    void notifyAdminsOfStoreProductRequest(dataSource, {
+      serviceKey: saved.serviceKey, requestId: saved.id, productName: f.productName,
+      actorId: userId ?? null, organizationId,
+    });
     res.json({ success: true, data: toRequestDto(saved) });
   }));
 

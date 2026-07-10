@@ -52,17 +52,40 @@ export interface StoreRequestDuplicate {
   matchType: 'barcode' | 'name_manufacturer';
 }
 
+/** 액션 결과 — 컨트롤러가 커밋 후 제출자 알림에 사용할 필드 포함 */
+export interface StoreRequestActionResult {
+  masterId?: string;
+  listingId?: string | null;
+  candidateStatus: string;
+  submittedBy: string | null;
+  serviceKey: string | null;
+  organizationId: string | null;
+  productName: string | null;
+}
+
 export class StoreProductRequestAdminService {
   constructor(private readonly dataSource: DataSource) {}
 
-  /** store_web 요청 후보 로드(+검증) */
-  private async loadStoreRequest(candidateId: string): Promise<ProductCandidate> {
+  /**
+   * store_web 요청 후보 로드(+검증).
+   *
+   * sourceType/sourceLabel 로 일반 candidate·타 소스를 store request 액션에서 차단한다.
+   * allowedServiceKeys(=운영자 role-prefix 스코프, null=platform admin)가 주어지면 candidate.serviceKey
+   * (role-prefix 형식: 'kpa'/'glycopharm'/'neture'/'cosmetics')가 스코프에 포함될 때만 허용한다
+   * (P3 service-scope hardening — 타 서비스 요청을 다른 서비스 운영자가 처리하지 못하게 차단).
+   */
+  private async loadStoreRequest(candidateId: string, allowedServiceKeys?: string[] | null): Promise<ProductCandidate> {
     const repo = this.dataSource.getRepository(ProductCandidate);
     const candidate = await repo.findOne({
       where: { id: candidateId, sourceType: 'store_web', sourceLabel: STORE_REQUEST_SOURCE_LABEL },
     });
     if (!candidate) throw new Error('STORE_REQUEST_NOT_FOUND');
     if (candidate.deletedAt) throw new Error('STORE_REQUEST_NOT_FOUND');
+    if (allowedServiceKeys != null) {
+      if (!candidate.serviceKey || !allowedServiceKeys.includes(candidate.serviceKey)) {
+        throw new Error('OUT_OF_SCOPE');
+      }
+    }
     return candidate;
   }
 
@@ -70,8 +93,8 @@ export class StoreProductRequestAdminService {
    * 신규 승인 전 중복 후보 조회 (read-only). 바코드 정확일치 + (상품명 AND 제조사) 정확일치.
    * 관리자 화면에서 "기존 연결" 유도용 근거로 사용.
    */
-  async findDuplicates(candidateId: string): Promise<StoreRequestDuplicate[]> {
-    const candidate = await this.loadStoreRequest(candidateId);
+  async findDuplicates(candidateId: string, allowedServiceKeys?: string[] | null): Promise<StoreRequestDuplicate[]> {
+    const candidate = await this.loadStoreRequest(candidateId, allowedServiceKeys);
     const out: StoreRequestDuplicate[] = [];
 
     const barcode = candidate.identifierValue ? sanitizeIdentifierValue(candidate.identifierValue) : null;
@@ -138,9 +161,9 @@ export class StoreProductRequestAdminService {
    */
   async linkToExistingMaster(
     candidateId: string,
-    input: { masterId: string; reviewedBy?: string | null; note?: string | null },
-  ): Promise<{ masterId: string; listingId: string | null; candidateStatus: string }> {
-    const candidate = await this.loadStoreRequest(candidateId);
+    input: { masterId: string; reviewedBy?: string | null; note?: string | null; allowedServiceKeys?: string[] | null },
+  ): Promise<StoreRequestActionResult> {
+    const candidate = await this.loadStoreRequest(candidateId, input.allowedServiceKeys);
     if (!(candidate.candidateStatus === 'pending' || candidate.candidateStatus === 'reviewing')) {
       throw new Error('STATUS_NOT_REVIEWABLE');
     }
@@ -176,7 +199,11 @@ export class StoreProductRequestAdminService {
       );
 
       logger.info(`[StoreRequestAdmin] linked candidate=${candidateId} -> master=${input.masterId} listing=${listingId}`);
-      return { masterId: input.masterId, listingId, candidateStatus: 'linked' };
+      return {
+        masterId: input.masterId, listingId, candidateStatus: 'linked',
+        submittedBy: candidate.submittedBy, serviceKey: candidate.serviceKey,
+        organizationId: candidate.organizationId, productName: candidate.candidateName,
+      };
     });
   }
 
@@ -187,9 +214,9 @@ export class StoreProductRequestAdminService {
    */
   async approveAsNewMaster(
     candidateId: string,
-    input: { reviewedBy?: string | null; note?: string | null },
-  ): Promise<{ masterId: string; listingId: string | null; identifierCreated: boolean; candidateStatus: string }> {
-    const candidate = await this.loadStoreRequest(candidateId);
+    input: { reviewedBy?: string | null; note?: string | null; allowedServiceKeys?: string[] | null },
+  ): Promise<StoreRequestActionResult & { identifierCreated: boolean }> {
+    const candidate = await this.loadStoreRequest(candidateId, input.allowedServiceKeys);
     if (!(candidate.candidateStatus === 'pending' || candidate.candidateStatus === 'reviewing')) {
       throw new Error('STATUS_NOT_REVIEWABLE');
     }
@@ -282,16 +309,20 @@ export class StoreProductRequestAdminService {
       );
 
       logger.info(`[StoreRequestAdmin] approved new master candidate=${candidateId} -> master=${masterId} listing=${listingId} id=${identifierCreated}`);
-      return { masterId, listingId, identifierCreated, candidateStatus: 'approved_new_master' };
+      return {
+        masterId, listingId, identifierCreated, candidateStatus: 'approved_new_master',
+        submittedBy: candidate.submittedBy, serviceKey: candidate.serviceKey,
+        organizationId: candidate.organizationId, productName: candidate.candidateName,
+      };
     });
   }
 
   /** 보완 요청 — candidate_status='revision_requested' + 메모. 매장이 수정 재제출 시 pending 복귀(P1). */
   async requestRevision(
     candidateId: string,
-    input: { note: string; reviewedBy?: string | null },
-  ): Promise<{ candidateStatus: string }> {
-    const candidate = await this.loadStoreRequest(candidateId);
+    input: { note: string; reviewedBy?: string | null; allowedServiceKeys?: string[] | null },
+  ): Promise<StoreRequestActionResult> {
+    const candidate = await this.loadStoreRequest(candidateId, input.allowedServiceKeys);
     if (!(candidate.candidateStatus === 'pending' || candidate.candidateStatus === 'reviewing')) {
       throw new Error('STATUS_NOT_REVIEWABLE');
     }
@@ -304,15 +335,19 @@ export class StoreProductRequestAdminService {
       [candidateId, note, input.reviewedBy ?? null],
     );
     logger.info(`[StoreRequestAdmin] revision requested candidate=${candidateId}`);
-    return { candidateStatus: 'revision_requested' };
+    return {
+      candidateStatus: 'revision_requested',
+      submittedBy: candidate.submittedBy, serviceKey: candidate.serviceKey,
+      organizationId: candidate.organizationId, productName: candidate.candidateName,
+    };
   }
 
   /** 등록 불가 — candidate_status='rejected' + 사유. */
   async reject(
     candidateId: string,
-    input: { reason?: string | null; reviewedBy?: string | null },
-  ): Promise<{ candidateStatus: string }> {
-    await this.loadStoreRequest(candidateId);
+    input: { reason?: string | null; reviewedBy?: string | null; allowedServiceKeys?: string[] | null },
+  ): Promise<StoreRequestActionResult> {
+    const candidate = await this.loadStoreRequest(candidateId, input.allowedServiceKeys);
     await this.dataSource.query(
       `UPDATE product_candidates
          SET candidate_status = 'rejected', review_note = $2, reviewed_by = $3, reviewed_at = NOW(), updated_at = NOW()
@@ -320,6 +355,10 @@ export class StoreProductRequestAdminService {
       [candidateId, (input.reason ?? '').trim() || null, input.reviewedBy ?? null],
     );
     logger.info(`[StoreRequestAdmin] rejected candidate=${candidateId}`);
-    return { candidateStatus: 'rejected' };
+    return {
+      candidateStatus: 'rejected',
+      submittedBy: candidate.submittedBy, serviceKey: candidate.serviceKey,
+      organizationId: candidate.organizationId, productName: candidate.candidateName,
+    };
   }
 }

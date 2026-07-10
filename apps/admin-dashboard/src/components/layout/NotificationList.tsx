@@ -6,8 +6,18 @@
  */
 
 import React, { useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useNotifications } from '../../hooks/useNotifications';
 import type { Notification, NotificationType } from '../../types';
+
+// WO-O4O-KPA-STORE-NEW-PRODUCT-REQUEST-AND-ADMIN-APPROVAL-V1 (P3):
+//   알림 클릭 시 metadata.targetUrl(내부 경로)로 이동. 외부 URL(`//`, `http`)은 차단.
+function internalTargetUrl(notification: Notification): string | null {
+  const url = (notification as { metadata?: Record<string, unknown> }).metadata?.targetUrl;
+  if (typeof url !== 'string') return null;
+  if (!url.startsWith('/') || url.startsWith('//')) return null;
+  return url;
+}
 
 // Simple time ago function
 const timeAgo = (date: string): string => {
@@ -85,12 +95,15 @@ const getNotificationColor = (type: NotificationType): string => {
 const NotificationItem: React.FC<{
   notification: Notification;
   onMarkAsRead: (id: string) => Promise<void>;
-}> = ({ notification, onMarkAsRead }) => {
+  onNavigate?: (url: string) => void;
+}> = ({ notification, onMarkAsRead, onNavigate }) => {
   const handleClick = useCallback(async () => {
     if (!notification.isRead) {
       await onMarkAsRead(notification.id);
     }
-  }, [notification.id, notification.isRead, onMarkAsRead]);
+    const target = internalTargetUrl(notification);
+    if (target && onNavigate) onNavigate(target);
+  }, [notification, onMarkAsRead, onNavigate]);
 
   const timeAgoText = timeAgo(notification.createdAt);
 
@@ -137,6 +150,11 @@ const NotificationItem: React.FC<{
 };
 
 export const NotificationList: React.FC<NotificationListProps> = ({ onClose }) => {
+  const navigate = useNavigate();
+  const handleNavigate = useCallback((url: string) => {
+    onClose?.();
+    navigate(url);
+  }, [navigate, onClose]);
   const {
     notifications,
     unreadCount,
@@ -216,6 +234,7 @@ export const NotificationList: React.FC<NotificationListProps> = ({ onClose }) =
                 key={notification.id}
                 notification={notification}
                 onMarkAsRead={markAsRead}
+                onNavigate={handleNavigate}
               />
             ))}
 

@@ -27,7 +27,6 @@ export interface HandledProduct {
   originLabel: string;
   ownerLabel: string;
   price: number | null;
-  statusLabel: string;
   isActive: boolean;
   // WO-O4O-KPA-STORE-HANDLED-PRODUCT-CATEGORY-COLUMN-V1: O4O 표준 분류(코드+표시 라벨). 분류 없으면 '미분류'.
   classificationCode: string;
