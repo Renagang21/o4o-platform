@@ -12,7 +12,9 @@
  *   POST /:id/store-descriptions   — STORE 설명서 저장(=canonical upsert). createCandidate → setCanonical.
  *
  * 원칙: ProductMaster 본문/식별자/이미지 **무변경**. shared_product_descriptions 전용 write.
- *   content 는 서비스가 sanitize(jsdom+DOMPurify)한다. canonical 은 (master_id, 'STORE') 당 1개.
+ *   content 는 서비스가 sanitize(jsdom+DOMPurify)한다. canonical 은 **(master_id, 'STORE', 언어) 당 1개**
+ *   (WO-O4O-STORE-MULTILINGUAL-CANONICAL-DESCRIPTION-V1) — 언어별 저장 시 각 언어가 canonical 로 승격되며
+ *   다른 언어 canonical 을 강등하지 않는다.
  * 권한: O4O 상품관리 콘솔과 동일 ADMIN 롤셋(메모/생성 컨트롤러와 동일).
  */
 

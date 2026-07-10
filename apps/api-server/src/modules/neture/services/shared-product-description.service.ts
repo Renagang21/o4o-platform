@@ -5,7 +5,8 @@
  * 정책: docs/investigations/IR-O4O-PRODUCT-DESCRIPTION-SHARED-ASSET-AND-CANONICAL-DESCRIPTION-POLICY-V1.md
  *
  * - ProductMaster 기준 후보 저장/조회.
- * - canonical 대표 설명은 master 당 1개 (setCanonical 은 transaction 으로 기존 canonical 강등).
+ * - canonical 대표 설명은 **(master_id, description_type, 언어) 당 1개** (WO-O4O-STORE-MULTILINGUAL-CANONICAL-DESCRIPTION-V1).
+ *   setCanonical 은 transaction 으로 **같은 언어의** 기존 canonical 만 강등한다(ko canonical 이 있어도 zh 승격 가능).
  * - soft delete 우선. product_ai_contents 는 건드리지 않는다.
  */
 
