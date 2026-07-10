@@ -1131,6 +1131,226 @@ export function createStoreTabletRoutes(
     await handleInterestTransition(dataSource, req, res, organizationId, InterestRequestStatus.CANCELLED, INTEREST_TRANSITIONS);
   }));
 
+  // ─── Screen Set / Block 관리 API (WO-O4O-KPA-TABLET-SCREEN-SET-BLOCK-API-IMPLEMENTATION-V1) ───
+  //   계약: CHECK-O4O-KPA-TABLET-SCREEN-SET-BLOCK-API-CONTRACT-V1
+  //   - org 스코프 강제(organization_id = auth org). origin/service_key 는 요청 신뢰 안 함(서버 강제).
+  //   - blocks 저장 = 전체 교체(displays PUT 패턴). isEnabled(DTO) ↔ is_visible(컬럼).
+  //   - block_type = 배포 CHECK 7종만(notice/qr_link 미지원 — 배포 스키마 정본).
+  //   - description(WO §5)은 배포 스키마에 컬럼 없어 미지원(name만). current_screen_set_id NULL = legacy.
+  //   - 경로 top-level /store/screen-sets (/tablets/:id 포획 회피). public runtime 미접촉.
+  const SET_BLOCK_TYPES = [
+    'idle_media', 'product_list', 'product_content',
+    'corner_description', 'health_info', 'staff_inquiry', 'qr_guide',
+  ];
+  const SET_STATUSES_WRITABLE = ['draft', 'active', 'archived'];
+  const setCols = (p: string) =>
+    `${p}id, ${p}organization_id AS "organizationId", ${p}service_key AS "serviceKey", ` +
+    `${p}tablet_id AS "tabletId", ${p}name, ${p}origin, ${p}status, ` +
+    `${p}created_by_user_id AS "createdByUserId", ${p}created_at AS "createdAt", ${p}updated_at AS "updatedAt"`;
+  const blockCols = (p: string) =>
+    `${p}id, ${p}screen_set_id AS "screenSetId", ${p}block_type AS "blockType", ${p}sort_order AS "sortOrder", ` +
+    `${p}is_visible AS "isEnabled", ${p}config, ${p}created_at AS "createdAt", ${p}updated_at AS "updatedAt"`;
+
+  // GET /screen-sets — 목록 (org 스코프). filter: tabletId / status / includeArchived
+  router.get('/screen-sets', withStoreAuth(async (req, res, organizationId) => {
+    try {
+      const where: string[] = ['s.organization_id = $1', 's.deleted_at IS NULL'];
+      const params: any[] = [organizationId];
+      const { tabletId, status, includeArchived } = req.query;
+      if (tabletId && typeof tabletId === 'string') { params.push(tabletId); where.push(`s.tablet_id = $${params.length}`); }
+      if (status && typeof status === 'string') { params.push(status); where.push(`s.status = $${params.length}`); }
+      if (includeArchived !== 'true') { where.push(`s.status <> 'archived'`); }
+      const rows = await dataSource.query(
+        `SELECT ${setCols('s.')},
+                (SELECT count(*)::int FROM store_tablet_screen_blocks b WHERE b.screen_set_id = s.id) AS "blockCount",
+                EXISTS(SELECT 1 FROM store_tablets t WHERE t.current_screen_set_id = s.id) AS "isApplied"
+         FROM store_tablet_screen_sets s
+         WHERE ${where.join(' AND ')}
+         ORDER BY s.updated_at DESC`,
+        params,
+      );
+      res.json({ success: true, data: rows });
+    } catch (error: any) {
+      console.error('[StoreTablet] GET /screen-sets error:', error);
+      res.status(500).json({ success: false, error: 'Failed to fetch screen sets', code: 'INTERNAL_ERROR' });
+    }
+  }));
+
+  // GET /screen-sets/:id — 상세 + blocks
+  router.get('/screen-sets/:id', withStoreAuth(async (req, res, organizationId) => {
+    try {
+      const rows = await dataSource.query(
+        `SELECT ${setCols('s.')} FROM store_tablet_screen_sets s
+         WHERE s.id = $1 AND s.organization_id = $2 AND s.deleted_at IS NULL LIMIT 1`,
+        [req.params.id, organizationId],
+      );
+      if (!rows?.[0]) { res.status(404).json({ success: false, error: 'Screen set not found', code: 'SCREEN_SET_NOT_FOUND' }); return; }
+      const blocks = await dataSource.query(
+        `SELECT ${blockCols('')} FROM store_tablet_screen_blocks WHERE screen_set_id = $1 ORDER BY sort_order ASC`,
+        [req.params.id],
+      );
+      res.json({ success: true, data: { ...rows[0], blocks } });
+    } catch (error: any) {
+      console.error('[StoreTablet] GET /screen-sets/:id error:', error);
+      res.status(500).json({ success: false, error: 'Failed to fetch screen set', code: 'INTERNAL_ERROR' });
+    }
+  }));
+
+  // POST /screen-sets — 생성 (origin='store', service_key/org 서버 강제)
+  router.post('/screen-sets', withStoreAuth(async (req, res, organizationId) => {
+    try {
+      const userId = (req as any).user?.id ?? null;
+      const name = typeof req.body?.name === 'string' ? req.body.name.trim() : '';
+      if (!name) { res.status(400).json({ success: false, error: 'Screen set name is required', code: 'SCREEN_SET_NAME_REQUIRED' }); return; }
+      if (name.length > 120) { res.status(400).json({ success: false, error: 'name too long (max 120)', code: 'VALIDATION_ERROR' }); return; }
+      const status = req.body?.status === 'active' ? 'active' : 'draft';
+      let tabletId: string | null = null;
+      if (req.body?.tabletId != null) {
+        tabletId = String(req.body.tabletId);
+        const t = await dataSource.query(`SELECT id FROM store_tablets WHERE id = $1 AND organization_id = $2 LIMIT 1`, [tabletId, organizationId]);
+        if (!t?.[0]) { res.status(400).json({ success: false, error: 'Tablet not found in this store', code: 'INVALID_TABLET' }); return; }
+      }
+      const ins = await dataSource.query(
+        `INSERT INTO store_tablet_screen_sets (organization_id, service_key, tablet_id, name, origin, status, created_by_user_id)
+         VALUES ($1, NULL, $2, $3, 'store', $4, $5)
+         RETURNING ${setCols('')}`,
+        [organizationId, tabletId, name, status, userId],
+      );
+      res.status(201).json({ success: true, data: ins[0] });
+    } catch (error: any) {
+      console.error('[StoreTablet] POST /screen-sets error:', error);
+      res.status(500).json({ success: false, error: 'Failed to create screen set', code: 'INTERNAL_ERROR' });
+    }
+  }));
+
+  // PATCH /screen-sets/:id — name/status/tabletId 수정
+  router.patch('/screen-sets/:id', withStoreAuth(async (req, res, organizationId) => {
+    try {
+      const id = req.params.id;
+      const owned = await dataSource.query(`SELECT id FROM store_tablet_screen_sets WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1`, [id, organizationId]);
+      if (!owned?.[0]) { res.status(404).json({ success: false, error: 'Screen set not found', code: 'SCREEN_SET_NOT_FOUND' }); return; }
+      const sets: string[] = [];
+      const params: any[] = [];
+      if (typeof req.body?.name === 'string') {
+        const nm = req.body.name.trim();
+        if (!nm || nm.length > 120) { res.status(400).json({ success: false, error: 'invalid name', code: 'VALIDATION_ERROR' }); return; }
+        params.push(nm); sets.push(`name = $${params.length}`);
+      }
+      if (req.body?.status !== undefined) {
+        if (!SET_STATUSES_WRITABLE.includes(req.body.status)) { res.status(400).json({ success: false, error: 'invalid status', code: 'INVALID_STATUS' }); return; }
+        params.push(req.body.status); sets.push(`status = $${params.length}`);
+      }
+      if (req.body?.tabletId !== undefined) {
+        const tid: string | null = req.body.tabletId == null ? null : String(req.body.tabletId);
+        if (tid) {
+          const t = await dataSource.query(`SELECT id FROM store_tablets WHERE id = $1 AND organization_id = $2 LIMIT 1`, [tid, organizationId]);
+          if (!t?.[0]) { res.status(400).json({ success: false, error: 'Tablet not found in this store', code: 'INVALID_TABLET' }); return; }
+        }
+        params.push(tid); sets.push(`tablet_id = $${params.length}`);
+      }
+      if (sets.length === 0) { res.status(400).json({ success: false, error: 'no fields to update', code: 'VALIDATION_ERROR' }); return; }
+      sets.push(`updated_at = NOW()`);
+      params.push(id); params.push(organizationId);
+      const upd = await dataSource.query(
+        `UPDATE store_tablet_screen_sets SET ${sets.join(', ')}
+         WHERE id = $${params.length - 1} AND organization_id = $${params.length} AND deleted_at IS NULL
+         RETURNING ${setCols('')}`,
+        params,
+      );
+      res.json({ success: true, data: upd[0] });
+    } catch (error: any) {
+      console.error('[StoreTablet] PATCH /screen-sets/:id error:', error);
+      res.status(500).json({ success: false, error: 'Failed to update screen set', code: 'INTERNAL_ERROR' });
+    }
+  }));
+
+  // DELETE /screen-sets/:id — soft delete(archive). 적용 중이면 409(먼저 해제).
+  router.delete('/screen-sets/:id', withStoreAuth(async (req, res, organizationId) => {
+    try {
+      const id = req.params.id;
+      const inUse = await dataSource.query(`SELECT id FROM store_tablets WHERE current_screen_set_id = $1 AND organization_id = $2 LIMIT 1`, [id, organizationId]);
+      if (inUse?.[0]) { res.status(409).json({ success: false, error: 'Screen set is currently applied to a tablet. Unassign it first.', code: 'SCREEN_SET_IN_USE' }); return; }
+      const del = await dataSource.query(
+        `UPDATE store_tablet_screen_sets SET deleted_at = NOW(), status = 'archived', updated_at = NOW()
+         WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL RETURNING id`,
+        [id, organizationId],
+      );
+      if (!del?.[0]) { res.status(404).json({ success: false, error: 'Screen set not found', code: 'SCREEN_SET_NOT_FOUND' }); return; }
+      res.json({ success: true, data: { id, deleted: true } });
+    } catch (error: any) {
+      console.error('[StoreTablet] DELETE /screen-sets/:id error:', error);
+      res.status(500).json({ success: false, error: 'Failed to archive screen set', code: 'INTERNAL_ERROR' });
+    }
+  }));
+
+  // PUT /screen-sets/:id/blocks — 전체 교체 저장(displays PUT 패턴)
+  router.put('/screen-sets/:id/blocks', withStoreAuth(async (req, res, organizationId) => {
+    try {
+      const id = req.params.id;
+      const owned = await dataSource.query(`SELECT id FROM store_tablet_screen_sets WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1`, [id, organizationId]);
+      if (!owned?.[0]) { res.status(404).json({ success: false, error: 'Screen set not found', code: 'SCREEN_SET_NOT_FOUND' }); return; }
+      const blocks = req.body?.blocks;
+      if (!Array.isArray(blocks)) { res.status(400).json({ success: false, error: 'blocks must be an array', code: 'VALIDATION_ERROR' }); return; }
+      for (let i = 0; i < blocks.length; i++) {
+        const b = blocks[i];
+        if (!b || typeof b !== 'object') { res.status(400).json({ success: false, error: `blocks[${i}] must be an object`, code: 'VALIDATION_ERROR' }); return; }
+        if (!SET_BLOCK_TYPES.includes(b.blockType)) { res.status(400).json({ success: false, error: `blocks[${i}].blockType invalid (allowed: ${SET_BLOCK_TYPES.join(', ')})`, code: 'INVALID_BLOCK_TYPE' }); return; }
+        if (b.config != null && (typeof b.config !== 'object' || Array.isArray(b.config))) { res.status(400).json({ success: false, error: `blocks[${i}].config must be an object`, code: 'INVALID_BLOCK_CONFIG' }); return; }
+      }
+      await dataSource.transaction(async (manager) => {
+        await manager.query(`DELETE FROM store_tablet_screen_blocks WHERE screen_set_id = $1`, [id]);
+        for (let i = 0; i < blocks.length; i++) {
+          const b = blocks[i];
+          await manager.query(
+            `INSERT INTO store_tablet_screen_blocks (screen_set_id, block_type, sort_order, is_visible, config)
+             VALUES ($1, $2, $3, $4, $5::jsonb)`,
+            [id, b.blockType, Number.isFinite(b.sortOrder) ? b.sortOrder : i, b.isEnabled !== false, JSON.stringify(b.config ?? {})],
+          );
+        }
+        await manager.query(`UPDATE store_tablet_screen_sets SET updated_at = NOW() WHERE id = $1`, [id]);
+      });
+      const updated = await dataSource.query(`SELECT ${blockCols('')} FROM store_tablet_screen_blocks WHERE screen_set_id = $1 ORDER BY sort_order ASC`, [id]);
+      res.json({ success: true, data: updated });
+    } catch (error: any) {
+      console.error('[StoreTablet] PUT /screen-sets/:id/blocks error:', error);
+      res.status(500).json({ success: false, error: 'Failed to save blocks', code: 'INTERNAL_ERROR' });
+    }
+  }));
+
+  // POST /tablets/:id/current-screen-set — current 적용 (public runtime 미반영 — 값만 저장)
+  router.post('/tablets/:id/current-screen-set', withStoreAuth(async (req, res, organizationId) => {
+    try {
+      const tabletId = req.params.id;
+      const screenSetId = req.body?.screenSetId;
+      if (!screenSetId || typeof screenSetId !== 'string') { res.status(400).json({ success: false, error: 'screenSetId is required', code: 'VALIDATION_ERROR' }); return; }
+      const t = await dataSource.query(`SELECT id FROM store_tablets WHERE id = $1 AND organization_id = $2 LIMIT 1`, [tabletId, organizationId]);
+      if (!t?.[0]) { res.status(404).json({ success: false, error: 'Tablet not found', code: 'TABLET_NOT_FOUND' }); return; }
+      const s = await dataSource.query(`SELECT id, tablet_id AS "tabletId", status FROM store_tablet_screen_sets WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1`, [screenSetId, organizationId]);
+      if (!s?.[0]) { res.status(404).json({ success: false, error: 'Screen set not found', code: 'SCREEN_SET_NOT_FOUND' }); return; }
+      if (s[0].status !== 'active') { res.status(409).json({ success: false, error: 'Screen set must be active to apply', code: 'SCREEN_SET_NOT_ACTIVE' }); return; }
+      if (s[0].tabletId && s[0].tabletId !== tabletId) { res.status(409).json({ success: false, error: 'Screen set is dedicated to another tablet', code: 'SCREEN_SET_NOT_APPLICABLE' }); return; }
+      await dataSource.query(`UPDATE store_tablets SET current_screen_set_id = $1 WHERE id = $2 AND organization_id = $3`, [screenSetId, tabletId, organizationId]);
+      res.json({ success: true, data: { tabletId, currentScreenSetId: screenSetId } });
+    } catch (error: any) {
+      console.error('[StoreTablet] POST /tablets/:id/current-screen-set error:', error);
+      res.status(500).json({ success: false, error: 'Failed to apply screen set', code: 'INTERNAL_ERROR' });
+    }
+  }));
+
+  // DELETE /tablets/:id/current-screen-set — current 해제(→ legacy)
+  router.delete('/tablets/:id/current-screen-set', withStoreAuth(async (req, res, organizationId) => {
+    try {
+      const tabletId = req.params.id;
+      const t = await dataSource.query(`SELECT id FROM store_tablets WHERE id = $1 AND organization_id = $2 LIMIT 1`, [tabletId, organizationId]);
+      if (!t?.[0]) { res.status(404).json({ success: false, error: 'Tablet not found', code: 'TABLET_NOT_FOUND' }); return; }
+      await dataSource.query(`UPDATE store_tablets SET current_screen_set_id = NULL WHERE id = $1 AND organization_id = $2`, [tabletId, organizationId]);
+      res.json({ success: true, data: { tabletId, currentScreenSetId: null } });
+    } catch (error: any) {
+      console.error('[StoreTablet] DELETE /tablets/:id/current-screen-set error:', error);
+      res.status(500).json({ success: false, error: 'Failed to clear screen set', code: 'INTERNAL_ERROR' });
+    }
+  }));
+
   return router;
 }
 
