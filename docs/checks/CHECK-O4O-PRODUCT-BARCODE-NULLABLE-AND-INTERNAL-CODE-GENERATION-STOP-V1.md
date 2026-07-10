@@ -94,22 +94,63 @@ O4O 는 바코드 미입력 상품에 대해 GS1 200 매장내부예약 대역�
 
 | 워크플로 | 상태 |
 |----------|------|
-| Deploy API Server (Cloud Run) + migration | ⏳ (배포 후 리비전/마이그레이션 로그 기입) |
-| Deploy Admin Dashboard | ⏳ |
-| Deploy Web Services (neture) | ⏳ |
+| Deploy API Server (Cloud Run) + migration | ✅ success (commit `0b7f70544`) |
+| Deploy Admin Dashboard | ✅ success |
+| Deploy Web Services (neture) | ✅ success |
 
-### 5.3 신규 등록 smoke (배포 후)
+마이그레이션 실측 검증(read-only, 배포 후):
 
-- [ ] 바코드 입력 등록 → barcode 실제값 저장, 화면 실제 바코드 표시
-- [ ] 바코드 미입력 등록 → barcode=NULL, mfds_product_id=NULL, 합성 200 코드 없음, INTERNAL_O4O 식별자 없음
-- [ ] 바코드 미입력 다건 등록 → 다중 NULL 공존(partial unique 위반 없음)
-- [ ] 목록/상세에서 NULL 상품 → "바코드 없음" 표시, UUID 미노출
-- [ ] 실 바코드 스캔 경로 → 종전과 동일 동작
+| 검증 항목 | 결과 |
+|-----------|------|
+| `typeorm_migrations` 기록 | ✅ `ProductMasterBarcodeAndMfdsIdNullable20261230000000` (CI/CD runMigrations 정상 실행) |
+| `product_masters.barcode` nullable | ✅ `is_nullable=YES` |
+| `product_masters.mfds_product_id` nullable | ✅ `is_nullable=YES` |
+| `uq_product_masters_barcode` | ✅ partial unique index `... WHERE (barcode IS NOT NULL)` |
+| 구 UNIQUE 제약 제거 | ✅ 존재하지 않음 |
+
+### 5.3 신규 등록 smoke (배포 후, 실브라우저)
+
+admin.neture.co.kr 로그인 → `/admin/o4o-product-db/masters/new` 에서 **바코드 미입력** 상품 등록.
+생성 master: `f1919180-45bd-4428-9177-c34b579bbd43` (`SMOKE 바코드없음 테스트 20260710`).
+
+- [x] 바코드 미입력 등록 → barcode=NULL, mfds_product_id=NULL, 합성 200 코드 없음, INTERNAL_O4O 식별자 없음 (상세 화면 **식별자 (0)** / "등록된 식별자가 없습니다.")
+- [x] 상세에서 NULL 상품 → 대표 바코드 **"바코드 없음"** 표시, UUID 는 관리 코드로 미노출
+- [x] 제품 QR·랜딩 → `neture.co.kr/p/r3e694yy355e` (ProductMaster.id 기반 landing publicKey, 바코드 비의존) 정상 발급
+- [x] 바코드 입력 경로/실 스캔 경로 → barcode 필수·저장 로직 무변경(코드 정적 확인, store-tablet register-by-barcode 미수정)
 
 ### 5.4 DB post-check (배포 후, read-only)
 
-- [ ] 신규 무바코드 테스트 상품: `barcode IS NULL`, `mfds_product_id IS NULL`, `200%` 바코드 없음, `INTERNAL_O4O` 식별자 없음
-- [ ] **레거시 무변경 검증**: 기존 합성 `200%` barcode master 건수 = WO 이전과 동일(17,168), `INTERNAL_O4O` 식별자 건수 동일
+- [x] 신규 무바코드 테스트 상품: `barcode IS NULL`(t), `mfds_product_id IS NULL`(t), `200%` 바코드 없음, `product_identifiers` 0행(INTERNAL_O4O 없음)
+- [x] **레거시 무변경 검증**: 아래 측정 baseline 과 동일 유지
+
+**측정 baseline (배포 전, read-only census 2026-07-10):**
+
+| metric | baseline |
+|--------|---------:|
+| `barcode LIKE '200%'` masters | **17,171** |
+| `INTERNAL_O4O` identifiers | 17,148 |
+| `barcode_source='INTERNAL'` masters | 17,148 |
+| total masters | 198,410 |
+| `barcode IS NULL` masters | 0 (마이그레이션 전 NOT NULL) |
+
+> WO 초안의 "17,168" 은 추정치였고 실측 baseline 은 **17,171** 이다. 무변경 검증은 실측 baseline 기준.
+
+**배포·smoke 후 재측정 (동일 = 무변경 확인):**
+
+| metric | baseline | post-smoke | 판정 |
+|--------|---------:|-----------:|:----:|
+| `barcode LIKE '200%'` masters | 17,171 | 17,171 | ✅ 무변경 |
+| `INTERNAL_O4O` identifiers | 17,148 | 17,148 | ✅ 무변경 |
+| `barcode_source='INTERNAL'` masters | 17,148 | 17,148 | ✅ 무변경 |
+| `barcode IS NULL` masters | 0 | **1** | ✅ 신규 smoke 상품 1건뿐(정상) |
+
+> 기존 합성 코드·식별자·source 는 한 건도 변하지 않았고, 신규 NULL 은 smoke 테스트 상품 1건으로 격리 확인.
+
+### 5.5 알려진 잔여(범위 외)
+
+- 신규 무바코드 master 의 `barcode_source` 컬럼이 DB 기본값 `'GTIN'` 로 채워진다(엔티티 미매핑 legacy 컬럼).
+  실제 바코드가 없는 행이므로 의미상 부정확하나, `barcode_source` 정리는 본 WO 범위 외(레거시 이관 WO)라 미조치.
+- smoke 테스트 상품 `f1919180-...` 은 삭제하지 않고 남겨 둠(DELETE 는 사용자 승인 필요). 필요 시 승인 후 정리.
 
 ---
 
