@@ -135,6 +135,22 @@ export class ProductMaster {
   productDataCuratedAt: Date | null;
 
   /**
+   * 상품 이용 상태 — WO-O4O-ADMIN-PRODUCT-MASTER-STATUS-FOUNDATION-V1
+   *
+   * O4O 상품 DB 에서의 이용 가능 여부를 나타내는 lifecycle 상태(관리자 단순 관리 대상).
+   *   - ACTIVE    : 정상 검색·선택 가능
+   *   - SUSPENDED : 판매 금지·회수·안전/법적 제한 등으로 이용 대상에서 제외
+   *   - ARCHIVED  : 중복·오류·테스트·대체 등 데이터 정리 목적으로 이용 대상에서 제외
+   *
+   * varchar + application-level union (DB enum 아님, sibling 엔티티 관례 동일).
+   * 기존 데이터는 DB 기본값으로 전부 ACTIVE. 별도 backfill 없음.
+   * `product_data_status`(의료기기 정제 마커)와는 별개 축이며 서로 참조/변경하지 않는다.
+   * 상태 변경 API·사유·감사로그·화면 버튼은 후속 STATUS-ACTIONS WO 범위.
+   */
+  @Column({ name: 'status', type: 'varchar', length: 32, default: 'ACTIVE' })
+  status: 'ACTIVE' | 'SUSPENDED' | 'ARCHIVED';
+
+  /**
    * 대표상품(그룹핑) 연결 — WO-O4O-PRODUCT-MASTER-REPRESENTATIVE-LINK-FOUNDATION-V1
    *
    * nullable additive FK. 대표상품 미연결 허용(신규 등록 시 미지정 허용).
