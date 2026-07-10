@@ -24,6 +24,8 @@ import {
   type CandidateBulkAction,
   type ProductMasterRow,
 } from '@/api/o4o-product-db.api';
+// WO-O4O-ADMIN-PUBLIC-DATA-CANDIDATE-CLOSED-STATUS-AND-MATCH-BADGE-CLEANUP-V1
+import { matchStatusBusinessLabel, isConflictCandidate } from './candidate-status.util';
 
 interface Props {
   candidateId: string | null;
@@ -139,6 +141,11 @@ export default function CandidateConflictDrawer({ candidateId, open, onClose, on
   };
 
   const c = info?.candidate;
+  // WO-...-CLOSED-STATUS-AND-MATCH-BADGE-CLEANUP-V1:
+  //   식별자가 없는 후보(예: 의료기기)는 식별자 기반 충돌/매칭 영역을 숨긴다.
+  //   실제 충돌 후보만 제목에 '충돌 검토' 를 붙인다.
+  const hasIdentifier = !!(info?.conflictKey.identifierValue || info?.conflictKey.normalizedIdentifierValue);
+  const conflictReview = isConflictCandidate(c?.matchStatus);
 
   return (
     <>
@@ -146,7 +153,7 @@ export default function CandidateConflictDrawer({ candidateId, open, onClose, on
         open={open}
         onClose={onClose}
         width={640}
-        title={<span className="text-base font-semibold">후보 상세 · 충돌 검토</span>}
+        title={<span className="text-base font-semibold">{conflictReview ? '후보 상세 · 충돌 검토' : '후보 상세'}</span>}
         actions={c ? [
           { label: 'archive', variant: 'default', onClick: () => askBulk('archive') },
           { label: '제외(ignored)', variant: 'default', onClick: () => askBulk('ignore') },
@@ -166,56 +173,65 @@ export default function CandidateConflictDrawer({ candidateId, open, onClose, on
               <Field label="분류" value={c.candidateCategory} />
               <Field label="source" value={`${c.sourceType}${c.sourceLabel ? ` · ${c.sourceLabel}` : ''}`} />
               <Field label="후보 상태" value={c.candidateStatus} badge />
-              <Field label="매칭 상태" value={c.matchStatus} badge />
+              {/* 종료 후보는 매칭 표시 숨김, 등록 전 후보는 업무 의미 문구 */}
+              <Field label="기본상품 매칭" value={matchStatusBusinessLabel(c.candidateStatus, c.matchStatus)} badge />
               <Field label="생성일" value={c.createdAt?.slice(0, 10)} />
             </Section>
 
-            {/* B. 주요 원천값 */}
+            {/* B. 주요 원천값 — 식별자 필드는 식별자가 있는 후보에서만 표시 */}
             <Section title="주요 원천값">
-              <Field label="식별자 유형" value={info.conflictKey.identifierType} />
-              <Field label="식별자 값" value={info.conflictKey.identifierValue} mono />
-              <Field label="정규화 식별자" value={info.conflictKey.normalizedIdentifierValue} mono />
+              {hasIdentifier && (
+                <>
+                  <Field label="식별자 유형" value={info.conflictKey.identifierType} />
+                  <Field label="식별자 값" value={info.conflictKey.identifierValue} mono />
+                  <Field label="정규화 식별자" value={info.conflictKey.normalizedIdentifierValue} mono />
+                </>
+              )}
               {Object.entries(info.rawPayloadSummary).slice(0, 12).map(([k, v]) => (
                 <Field key={k} label={k} value={String(v)} />
               ))}
             </Section>
 
-            {/* C. 충돌 정보 */}
-            <Section title={`동일 식별자 다른 후보 (${info.conflictingCandidates.length})`}>
-              {info.conflictingCandidates.length === 0 ? (
-                <div className="text-gray-400 text-xs">동일 식별자를 공유하는 다른 후보가 없습니다. (충돌 근거는 rawPayload/원천값 확인 필요)</div>
-              ) : (
-                <MiniTable
-                  head={['상품명', '제조사', '후보상태', '매칭상태', 'source']}
-                  rows={info.conflictingCandidates.map((x) => [
-                    x.candidateName || '—', x.candidateManufacturer || '—', x.candidateStatus, x.matchStatus, x.sourceLabel || '—',
-                  ])}
-                />
-              )}
-            </Section>
+            {/* C. 식별자 기반 충돌/매칭 근거 — 식별자가 없는 후보(예: 의료기기)에서는 숨긴다 */}
+            {hasIdentifier && (
+              <>
+                <Section title={`동일 식별자 다른 후보 (${info.conflictingCandidates.length})`}>
+                  {info.conflictingCandidates.length === 0 ? (
+                    <div className="text-gray-400 text-xs">동일 식별자를 공유하는 다른 후보가 없습니다.</div>
+                  ) : (
+                    <MiniTable
+                      head={['상품명', '제조사', '후보상태', '매칭상태', 'source']}
+                      rows={info.conflictingCandidates.map((x) => [
+                        x.candidateName || '—', x.candidateManufacturer || '—', x.candidateStatus, x.matchStatus, x.sourceLabel || '—',
+                      ])}
+                    />
+                  )}
+                </Section>
 
-            <Section title={`식별자 일치 기본상품 (${info.possibleMasters.length})`}>
-              {info.possibleMasters.length === 0 ? (
-                <div className="text-gray-400 text-xs">바코드/식별자가 일치하는 기존 기본상품이 없습니다.</div>
-              ) : (
-                <div className="space-y-1.5">
-                  {info.possibleMasters.map((m) => (
-                    <div key={m.id} className="flex items-center justify-between border border-gray-200 rounded px-3 py-2">
-                      <div className="min-w-0">
-                        <div className="font-medium text-gray-900 truncate">{m.name}</div>
-                        <div className="text-xs text-gray-500 truncate">{m.manufacturerName} · <span className="font-mono">{m.barcode}</span></div>
-                      </div>
-                      <button
-                        onClick={() => askMatch(m as unknown as ProductMasterRow)}
-                        className="shrink-0 ml-2 flex items-center gap-1 text-xs px-2.5 py-1.5 rounded bg-admin-blue text-white"
-                      >
-                        <Link2 size={12} /> 매칭
-                      </button>
+                <Section title={`식별자 일치 기본상품 (${info.possibleMasters.length})`}>
+                  {info.possibleMasters.length === 0 ? (
+                    <div className="text-gray-400 text-xs">바코드/식별자가 일치하는 기존 기본상품이 없습니다.</div>
+                  ) : (
+                    <div className="space-y-1.5">
+                      {info.possibleMasters.map((m) => (
+                        <div key={m.id} className="flex items-center justify-between border border-gray-200 rounded px-3 py-2">
+                          <div className="min-w-0">
+                            <div className="font-medium text-gray-900 truncate">{m.name}</div>
+                            <div className="text-xs text-gray-500 truncate">{m.manufacturerName} · <span className="font-mono">{m.barcode}</span></div>
+                          </div>
+                          <button
+                            onClick={() => askMatch(m as unknown as ProductMasterRow)}
+                            className="shrink-0 ml-2 flex items-center gap-1 text-xs px-2.5 py-1.5 rounded bg-admin-blue text-white"
+                          >
+                            <Link2 size={12} /> 매칭
+                          </button>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              )}
-            </Section>
+                  )}
+                </Section>
+              </>
+            )}
 
             {/* 수동 매칭 검색 */}
             <Section title="기본상품 수동 매칭">

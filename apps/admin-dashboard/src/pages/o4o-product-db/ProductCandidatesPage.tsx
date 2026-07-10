@@ -18,6 +18,8 @@ import type { O4OColumn } from '@o4o/ui';
 import { listProductCandidates, ProductCandidateRow, bulkCandidateAction } from '@/api/o4o-product-db.api';
 // WO-O4O-ADMIN-PRODUCT-CANDIDATE-CONFLICT-ACTIONS-V1: 충돌 상세 + 처리 드로어
 import CandidateConflictDrawer from './CandidateConflictDrawer';
+// WO-O4O-ADMIN-PUBLIC-DATA-CANDIDATE-CLOSED-STATUS-AND-MATCH-BADGE-CLEANUP-V1
+import { matchStatusBusinessLabel, isConflictCandidate } from './candidate-status.util';
 
 // WO-O4O-ADMIN-PRODUCT-CANDIDATE-FILTER-MINIMAL-CLEANUP-V1
 // 공공데이터 후보 화면은 "매칭 검토" 화면이 아니라 "O4O 기본상품 DB 등록 흐름 확인" 화면이다.
@@ -43,7 +45,8 @@ export default function ProductCandidatesPage() {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
   // WO-O4O-ADMIN-PRODUCT-CANDIDATE-STATUS-SIMPLIFY-V2 / FILTER-MINIMAL-CLEANUP-V1: 상태 필터는 groupedStatus 로 통일
-  const [groupedStatus, setGroupedStatus] = useState(searchParams.get('groupedStatus') || '');
+  // WO-...-CLOSED-STATUS-AND-MATCH-BADGE-CLEANUP-V1: 기본 진입은 '등록 전' 후보 중심 (등록완료·제외는 필터로 조회)
+  const [groupedStatus, setGroupedStatus] = useState(searchParams.get('groupedStatus') || 'before_registration');
   // committed(쿼리에 반영되는) search 와 입력 버퍼 분리 — 타이핑마다 조회 방지
   const [search, setSearch] = useState(searchParams.get('search') || '');
   const [searchInput, setSearchInput] = useState(search);
@@ -173,7 +176,15 @@ export default function ProductCandidatesPage() {
         ) : '—',
     },
     { key: 'candidateStatus', header: '후보 상태', align: 'center', render: (_, r) => <Badge value={r.candidateStatus} /> },
-    { key: 'matchStatus', header: '매칭 상태', align: 'center', render: (_, r) => <Badge value={r.matchStatus} /> },
+    {
+      // WO-...-CLOSED-STATUS-AND-MATCH-BADGE-CLEANUP-V1:
+      //   종료(등록완료/제외/이력) 후보는 매칭 뱃지 미표시, 등록 전 후보는 업무 의미 문구로 표시.
+      key: 'matchStatus', header: '기본상품 매칭', align: 'center',
+      render: (_, r) => {
+        const label = matchStatusBusinessLabel(r.candidateStatus, r.matchStatus);
+        return label ? <Badge value={label} /> : <span className="text-gray-300">—</span>;
+      },
+    },
     { key: 'createdAt', header: '생성일', render: (_, r) => <span className="text-gray-500">{formatDate(r.createdAt)}</span> },
     {
       key: '_actions',
@@ -184,7 +195,13 @@ export default function ProductCandidatesPage() {
       render: (_, r) => (
         <RowActionMenu
           actions={[
-            { key: 'view', label: '상세·충돌 검토', icon: <Eye size={14} />, onClick: () => setDrawerId(r.id) },
+            {
+              key: 'view',
+              // 실제 충돌 후보만 '충돌 검토', 일반 후보는 '상세'
+              label: isConflictCandidate(r.matchStatus) ? '상세·충돌 검토' : '상세',
+              icon: <Eye size={14} />,
+              onClick: () => setDrawerId(r.id),
+            },
           ]}
         />
       ),
