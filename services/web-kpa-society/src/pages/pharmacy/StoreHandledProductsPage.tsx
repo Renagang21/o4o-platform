@@ -7,11 +7,18 @@
  * O4O 기반 제품(organization_product_listings) + 매장 경영활용 제품(store_local_products)을
  * 한 화면에서 조회한다. 직접 CRUD 하지 않고 원본 관리 화면(/my-products, /commerce/local-products)으로 이동.
  * 매장 경영활용 제품의 온라인몰 노출은 미지원(Display Domain). 라벨 정책: WO-...-TERM-CLARIFICATION-V1.
+ *
+ * WO-O4O-KPA-STORE-HANDLED-PRODUCTS-STANDARD-TABLE-V1:
+ *   O4O 표준 목록 UX(Toolbar + DataTable + Pagination)로 전환.
+ *   - 탭/검색어/페이지/페이지당 건수를 URL Query와 동기화
+ *   - 행별 + 전체 선택 체크박스, 선택 후 Selection ActionBar 로 다음 작업 제공
+ *   - 기존 행별 작업 버튼(O4O 상세설명 가져오기 / 콘텐츠 만들기 / 다국어 QR)은 선택 기반 액션으로 이동
+ *   - 여러 건 선택 시 실제 일괄 기능이 없으므로 '선택 해제'만 제공(임의 일괄 기능화 금지)
  */
 
-import { useEffect, useState, useCallback, type CSSProperties } from 'react';
+import { useEffect, useMemo, useState, useCallback, type CSSProperties } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Package, RefreshCw, Search, ExternalLink, Boxes, Plus, PenSquare, Languages } from 'lucide-react';
+import { Package, RefreshCw, Search, ExternalLink, Boxes, Plus, PenSquare, Languages, X } from 'lucide-react';
 import { Pagination } from '@o4o/operator-ux-core';
 import { fetchHandledProducts, type HandledProduct } from '../../api/handledProducts';
 import { colors } from '../../styles/theme';
@@ -26,7 +33,10 @@ import { AddO4oStandardProductModal } from './AddO4oStandardProductModal';
 import { getMlcSummaryMap, type StoreMlcSummaryItem } from '../../api/multilingualProductContentStore';
 
 type SourceFilter = 'all' | 'listing' | 'local';
-const PAGE_LIMIT = 20;
+
+// WO-...-STANDARD-TABLE-V1: 페이지당 건수(20/50/100), 기본 20
+const PAGE_SIZE_OPTIONS = [20, 50, 100] as const;
+const DEFAULT_PAGE_SIZE = 20;
 const SEARCH_DEBOUNCE_MS = 300;
 
 const SOURCE_TABS: { key: SourceFilter; label: string }[] = [
@@ -38,6 +48,11 @@ const SOURCE_TABS: { key: SourceFilter; label: string }[] = [
 /** 구분 라벨 — 정책 용어(WO-...-TERM-CLARIFICATION-V1). 백엔드 originLabel 대신 sourceType 기준 프론트 도출(KPA 단독). */
 function originLabel(sourceType: HandledProduct['sourceType']): string {
   return sourceType === 'listing' ? 'O4O 기반 제품' : '매장 경영활용 제품';
+}
+
+/** 선택 식별 키 — sourceType + sourceId 조합(교차 소스 유일). */
+function rowKey(it: Pick<HandledProduct, 'sourceType' | 'sourceId'>): string {
+  return `${it.sourceType}:${it.sourceId}`;
 }
 
 function Badge({ text, tone }: { text: string; tone: 'green' | 'gray' | 'amber' | 'blue' | 'muted' }) {
@@ -70,38 +85,78 @@ function isSourceFilter(v: string | null): v is SourceFilter {
   return v === 'all' || v === 'listing' || v === 'local';
 }
 
+function parsePageSize(v: string | null): number {
+  const n = Number(v);
+  return PAGE_SIZE_OPTIONS.includes(n as (typeof PAGE_SIZE_OPTIONS)[number]) ? n : DEFAULT_PAGE_SIZE;
+}
+
+function parsePage(v: string | null): number {
+  const n = Number(v);
+  return Number.isInteger(n) && n >= 1 ? n : 1;
+}
+
 export default function StoreHandledProductsPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
+  // ─── URL Query ↔ 상태 동기화(탭 / 검색어 / 페이지 / 페이지당 건수) ────────────
   const initialSource: SourceFilter = isSourceFilter(searchParams.get('source'))
     ? (searchParams.get('source') as SourceFilter)
     : 'all';
+  const initialSearch = searchParams.get('q') ?? '';
+
   const [source, setSource] = useState<SourceFilter>(initialSource);
-  const [searchInput, setSearchInput] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [page, setPage] = useState(1);
+  const [searchInput, setSearchInput] = useState(initialSearch);
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
+  const [page, setPage] = useState(() => parsePage(searchParams.get('page')));
+  const [limit, setLimit] = useState(() => parsePageSize(searchParams.get('limit')));
   const [items, setItems] = useState<HandledProduct[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
+  // WO-...-STANDARD-TABLE-V1: 행 선택(현재 페이지 기준). key = rowKey(it).
+  const [selected, setSelected] = useState<Set<string>>(new Set());
 
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
+  const totalPages = Math.max(1, Math.ceil(total / limit));
 
+  // URL Query 부분 갱신 헬퍼(기본값이면 파라미터 제거해 URL 을 깔끔히 유지).
+  const patchParams = useCallback(
+    (patch: Record<string, string | null>) => {
+      setSearchParams(
+        (prev) => {
+          const params = new URLSearchParams(prev);
+          for (const [k, v] of Object.entries(patch)) {
+            if (v == null || v === '') params.delete(k);
+            else params.set(k, v);
+          }
+          return params;
+        },
+        { replace: true },
+      );
+    },
+    [setSearchParams],
+  );
+
+  // 검색어 디바운스 → 확정 시(값이 바뀐 경우만) 페이지 1 초기화 + URL 반영.
   useEffect(() => {
     const handle = setTimeout(() => {
-      setSearchQuery(searchInput.trim());
+      const next = searchInput.trim();
+      if (next === searchQuery) return;
+      setSearchQuery(next);
       setPage(1);
+      patchParams({ q: next || null, page: null });
     }, SEARCH_DEBOUNCE_MS);
     return () => clearTimeout(handle);
-  }, [searchInput]);
+  }, [searchInput, searchQuery, patchParams]);
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
     setError(null);
-    fetchHandledProducts({ page, limit: PAGE_LIMIT, search: searchQuery || undefined, source })
+    // 목록이 바뀌면 선택 초기화(서버 페이지네이션 — 선택은 현재 페이지 기준).
+    setSelected(new Set());
+    fetchHandledProducts({ page, limit, search: searchQuery || undefined, source })
       .then((d) => {
         if (cancelled) return;
         setItems(d.items);
@@ -116,7 +171,7 @@ export default function StoreHandledProductsPage() {
     return () => {
       cancelled = true;
     };
-  }, [page, searchQuery, source, reloadKey]);
+  }, [page, limit, searchQuery, source, reloadKey]);
 
   const reload = useCallback(() => setReloadKey((k) => k + 1), []);
 
@@ -174,18 +229,46 @@ export default function StoreHandledProductsPage() {
     (next: SourceFilter) => {
       setSource(next);
       setPage(1);
-      setSearchParams(
-        (prev) => {
-          const params = new URLSearchParams(prev);
-          if (next === 'all') params.delete('source');
-          else params.set('source', next);
-          return params;
-        },
-        { replace: true },
-      );
+      setSelected(new Set());
+      patchParams({ source: next === 'all' ? null : next, page: null });
     },
-    [setSearchParams],
+    [patchParams],
   );
+
+  const changePageSize = useCallback(
+    (next: number) => {
+      setLimit(next);
+      setPage(1);
+      patchParams({ limit: next === DEFAULT_PAGE_SIZE ? null : String(next), page: null });
+    },
+    [patchParams],
+  );
+
+  const changePage = useCallback(
+    (next: number) => {
+      setPage(next);
+      patchParams({ page: next === 1 ? null : String(next) });
+    },
+    [patchParams],
+  );
+
+  // ─── 선택 ─────────────────────────────────────────────────────────────────
+  const allSelected = items.length > 0 && items.every((it) => selected.has(rowKey(it)));
+  const toggleAll = useCallback(() => {
+    setSelected((prev) => (prev.size >= items.length && items.length > 0 ? new Set() : new Set(items.map(rowKey))));
+  }, [items]);
+  const toggleOne = useCallback((key: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  }, []);
+  const clearSelection = useCallback(() => setSelected(new Set()), []);
+
+  const selectedItems = useMemo(() => items.filter((it) => selected.has(rowKey(it))), [items, selected]);
+  const singleSelected = selectedItems.length === 1 ? selectedItems[0] : null;
 
   return (
     <div style={styles.container}>
@@ -255,12 +338,112 @@ export default function StoreHandledProductsPage() {
 
       <div style={styles.countRow}>
         <span style={styles.countBadge}>{total}건</span>
+        <div style={{ flex: 1 }} />
+        <label style={styles.pageSizeLabel}>
+          페이지당
+          <select
+            value={limit}
+            onChange={(e) => changePageSize(Number(e.target.value))}
+            style={styles.pageSizeSelect}
+            aria-label="페이지당 건수"
+          >
+            {PAGE_SIZE_OPTIONS.map((n) => (
+              <option key={n} value={n}>
+                {n}건
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
+
+      {/* WO-...-STANDARD-TABLE-V1: Selection ActionBar — 선택 후 다음 작업.
+          1건 선택 시 컨텍스트 액션(사용 불가 작업은 숨김), 여러 건은 '선택 해제'만(실제 일괄 기능 없음). */}
+      {selected.size > 0 && (
+        <div style={styles.selectionBar}>
+          <span style={styles.selectionCount}>{selected.size}개 선택됨</span>
+          <div style={{ flex: 1 }} />
+          {singleSelected && (
+            <>
+              {/* O4O 상세설명 가져오기 — O4O 기반 제품(listing)만 사용 가능 → 그 외에는 숨김 */}
+              {singleSelected.sourceType === 'listing' && (
+                <button
+                  type="button"
+                  onClick={() => setImportProduct({ listingId: singleSelected.sourceId, name: singleSelected.name })}
+                  style={styles.importBtn}
+                >
+                  <FileDown size={13} />
+                  O4O 상세설명 가져오기
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() =>
+                  goCreateContent({
+                    sourceType: singleSelected.sourceType,
+                    sourceId: singleSelected.sourceId,
+                    name: singleSelected.name,
+                  })
+                }
+                style={styles.createContentBtn}
+              >
+                <PenSquare size={13} />
+                콘텐츠 만들기
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  goMultilingual({
+                    sourceType: singleSelected.sourceType,
+                    sourceId: singleSelected.sourceId,
+                    name: singleSelected.name,
+                  })
+                }
+                style={styles.mlcBtn}
+              >
+                <Languages size={13} />
+                다국어 QR
+                {(() => {
+                  const mlc = mlcFor(singleSelected);
+                  return mlc ? (
+                    <span
+                      style={{
+                        ...styles.mlcDot,
+                        background: mlc.publishedLocaleCount > 0 ? '#DCFCE7' : '#FEF3C7',
+                        color: mlc.publishedLocaleCount > 0 ? '#16A34A' : '#D97706',
+                      }}
+                    >
+                      {mlc.publishedLocaleCount > 0 ? `${mlc.publishedLocaleCount}개 언어` : '초안'}
+                    </span>
+                  ) : null;
+                })()}
+              </button>
+              <button type="button" onClick={() => navigate(singleSelected.managePath)} style={styles.manageBtn}>
+                관리
+                <ExternalLink size={12} />
+              </button>
+            </>
+          )}
+          <button type="button" onClick={clearSelection} style={styles.clearBtn}>
+            <X size={13} />
+            선택 해제
+          </button>
+        </div>
+      )}
 
       <div style={styles.tableWrap}>
         <table style={styles.table}>
           <thead>
             <tr>
+              <th style={{ ...styles.th, width: 40 }}>
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  onChange={toggleAll}
+                  style={styles.checkbox}
+                  aria-label="전체 선택"
+                  disabled={items.length === 0}
+                />
+              </th>
               <th style={{ ...styles.th, textAlign: 'left' }}>제품</th>
               <th style={styles.th}>구분</th>
               <th style={styles.th}>매장 표시 가격</th>
@@ -273,106 +456,70 @@ export default function StoreHandledProductsPage() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={7} style={styles.empty}>불러오는 중…</td>
+                <td colSpan={8} style={styles.empty}>불러오는 중…</td>
               </tr>
             ) : error ? (
               <tr>
-                <td colSpan={7} style={{ ...styles.empty, color: '#DC2626' }}>{error}</td>
+                <td colSpan={8} style={{ ...styles.empty, color: '#DC2626' }}>{error}</td>
               </tr>
             ) : items.length === 0 ? (
               <tr>
-                <td colSpan={7} style={styles.empty}>{searchQuery ? '검색 결과가 없습니다' : EMPTY_BY_SOURCE[source]}</td>
+                <td colSpan={8} style={styles.empty}>{searchQuery ? '검색 결과가 없습니다' : EMPTY_BY_SOURCE[source]}</td>
               </tr>
             ) : (
-              items.map((it) => (
-                <tr key={`${it.sourceType}:${it.sourceId}`} style={styles.row}>
-                  <td style={styles.tdProduct}>
-                    <div style={styles.productCell}>
-                      {it.imageUrl ? (
-                        <img src={it.imageUrl} alt="" style={styles.thumb} />
-                      ) : (
-                        <div style={styles.thumbPlaceholder}>
-                          <Package size={16} style={{ color: colors.neutral400 }} />
-                        </div>
-                      )}
-                      <span style={styles.productName} title={it.name}>{it.name}</span>
-                    </div>
-                  </td>
-                  <td style={styles.td}>
-                    <Badge text={originLabel(it.sourceType)} tone={it.sourceType === 'listing' ? 'blue' : 'amber'} />
-                  </td>
-                  <td style={styles.td}>{formatPrice(it.price)}</td>
-                  <td style={styles.td}>
-                    {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1:
-                        연결 콘텐츠 수 — N개는 보기 동작 진입, 없음은 단순 표시. */}
-                    {it.linkedContentCount > 0 ? (
-                      <button
-                        type="button"
-                        onClick={() => setDrawerProduct({ sourceType: it.sourceType, sourceId: it.sourceId, name: it.name })}
-                        style={styles.countBtn}
-                        aria-label="연결 콘텐츠 보기"
-                      >
-                        <Badge text={`${it.linkedContentCount}개`} tone="blue" />
-                      </button>
-                    ) : (
-                      <span style={{ color: colors.neutral400 }}>없음</span>
-                    )}
-                  </td>
-                  <td style={styles.td}>
-                    <Badge text={it.statusLabel} tone={it.isActive ? 'green' : 'gray'} />
-                  </td>
-                  <td style={styles.td}>{formatDate(it.updatedAt)}</td>
-                  <td style={styles.td}>
-                    {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1: 관리 영역에 콘텐츠 만들기 추가 */}
-                    <div style={styles.manageActions}>
-                      {/* WO-O4O-KPA-O4O-B2C-DESCRIPTION-COPY-TO-STORE-CONTENT-V1:
-                          O4O 기반 제품(listing)만 — 매장 경영활용 제품에는 미노출 */}
-                      {it.sourceType === 'listing' && (
+              items.map((it) => {
+                const key = rowKey(it);
+                const isSelected = selected.has(key);
+                return (
+                  <tr key={key} style={{ ...styles.row, ...(isSelected ? styles.rowSelected : null) }}>
+                    <td style={styles.tdCheckbox}>
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => toggleOne(key)}
+                        style={styles.checkbox}
+                        aria-label={`${it.name} 선택`}
+                      />
+                    </td>
+                    <td style={styles.tdProduct}>
+                      <div style={styles.productCell}>
+                        {it.imageUrl ? (
+                          <img src={it.imageUrl} alt="" style={styles.thumb} />
+                        ) : (
+                          <div style={styles.thumbPlaceholder}>
+                            <Package size={16} style={{ color: colors.neutral400 }} />
+                          </div>
+                        )}
+                        <span style={styles.productName} title={it.name}>{it.name}</span>
+                      </div>
+                    </td>
+                    <td style={styles.td}>
+                      <Badge text={originLabel(it.sourceType)} tone={it.sourceType === 'listing' ? 'blue' : 'amber'} />
+                    </td>
+                    <td style={styles.td}>{formatPrice(it.price)}</td>
+                    <td style={styles.td}>
+                      {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1:
+                          연결 콘텐츠 수 — N개는 보기 동작 진입, 없음은 단순 표시. */}
+                      {it.linkedContentCount > 0 ? (
                         <button
                           type="button"
-                          onClick={() => setImportProduct({ listingId: it.sourceId, name: it.name })}
-                          style={styles.importBtn}
-                          aria-label="O4O 상세설명 가져오기"
+                          onClick={() => setDrawerProduct({ sourceType: it.sourceType, sourceId: it.sourceId, name: it.name })}
+                          style={styles.countBtn}
+                          aria-label="연결 콘텐츠 보기"
                         >
-                          <FileDown size={12} />
-                          O4O 상세설명 가져오기
+                          <Badge text={`${it.linkedContentCount}개`} tone="blue" />
                         </button>
+                      ) : (
+                        <span style={{ color: colors.neutral400 }}>없음</span>
                       )}
-                      <button
-                        type="button"
-                        onClick={() => goCreateContent({ sourceType: it.sourceType, sourceId: it.sourceId, name: it.name })}
-                        style={styles.createContentBtn}
-                        aria-label="이 제품으로 콘텐츠 만들기"
-                      >
-                        <PenSquare size={12} />
-                        콘텐츠 만들기
-                      </button>
-                      {/* WO-O4O-PRODUCT-QR-CONTENT-FLOW-MINIMAL-V1: 상품별 다국어(한/중) QR 콘텐츠 저작 진입 + 연결 상태 배지 */}
-                      {(() => {
-                        const mlc = mlcFor(it);
-                        return (
-                          <button
-                            type="button"
-                            onClick={() => goMultilingual({ sourceType: it.sourceType, sourceId: it.sourceId, name: it.name })}
-                            style={styles.mlcBtn}
-                            aria-label="다국어 QR 콘텐츠 만들기"
-                          >
-                            <Languages size={12} />
-                            다국어 QR
-                            {mlc && (
-                              <span
-                                style={{
-                                  ...styles.mlcDot,
-                                  background: mlc.publishedLocaleCount > 0 ? '#DCFCE7' : '#FEF3C7',
-                                  color: mlc.publishedLocaleCount > 0 ? '#16A34A' : '#D97706',
-                                }}
-                              >
-                                {mlc.publishedLocaleCount > 0 ? `${mlc.publishedLocaleCount}개 언어` : '초안'}
-                              </span>
-                            )}
-                          </button>
-                        );
-                      })()}
+                    </td>
+                    <td style={styles.td}>
+                      <Badge text={it.statusLabel} tone={it.isActive ? 'green' : 'gray'} />
+                    </td>
+                    <td style={styles.td}>{formatDate(it.updatedAt)}</td>
+                    <td style={styles.td}>
+                      {/* WO-...-STANDARD-TABLE-V1: 행별 작업 버튼은 Selection ActionBar 로 이동.
+                          관리 컬럼은 원본 관리 화면 바로가기만 유지. */}
                       <button
                         type="button"
                         onClick={() => navigate(it.managePath)}
@@ -382,16 +529,16 @@ export default function StoreHandledProductsPage() {
                         관리
                         <ExternalLink size={12} />
                       </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
       </div>
 
-      <Pagination page={page} totalPages={totalPages} onPageChange={setPage} total={total} />
+      <Pagination page={page} totalPages={totalPages} onPageChange={changePage} total={total} />
 
       {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1: 연결 콘텐츠 보기 드로어 */}
       <LinkedContentsDrawer
@@ -451,28 +598,33 @@ const styles: Record<string, CSSProperties> = {
   searchWrap: { position: 'relative', minWidth: '220px' },
   searchIcon: { position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: colors.neutral400, pointerEvents: 'none' },
   searchInput: { width: '100%', padding: '8px 12px 8px 30px', border: `1px solid ${colors.neutral300}`, borderRadius: '6px', fontSize: '13px', outline: 'none', background: colors.white, boxSizing: 'border-box' },
-  countRow: { marginBottom: '10px' },
+  countRow: { display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' },
   countBadge: { display: 'inline-flex', alignItems: 'center', padding: '2px 8px', fontSize: '12px', fontWeight: 500, color: colors.neutral600, background: colors.neutral100, borderRadius: '999px' },
+  pageSizeLabel: { display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: colors.neutral500 },
+  pageSizeSelect: { padding: '5px 8px', border: `1px solid ${colors.neutral300}`, borderRadius: '6px', fontSize: '12px', color: colors.neutral700, background: colors.white, cursor: 'pointer' },
+  // WO-...-STANDARD-TABLE-V1: Selection ActionBar
+  selectionBar: { display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 14px', marginBottom: '10px', background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: '8px', flexWrap: 'wrap' },
+  selectionCount: { fontSize: '13px', fontWeight: 600, color: '#1D4ED8' },
+  clearBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '5px 12px', background: colors.white, border: `1px solid ${colors.neutral300}`, borderRadius: '6px', fontSize: '12px', color: colors.neutral700, cursor: 'pointer' },
   tableWrap: { overflowX: 'auto', border: `1px solid ${colors.neutral200}`, borderRadius: '8px', background: colors.white },
   table: { width: '100%', borderCollapse: 'collapse', fontSize: '13px' },
   th: { padding: '10px 12px', textAlign: 'center', fontSize: '12px', fontWeight: 600, color: colors.neutral500, background: '#F8FAFC', borderBottom: `1px solid ${colors.neutral200}`, whiteSpace: 'nowrap' },
   row: { borderBottom: `1px solid ${colors.neutral100}` },
+  rowSelected: { background: '#EFF6FF' },
   td: { padding: '10px 12px', textAlign: 'center', color: colors.neutral700, whiteSpace: 'nowrap' },
+  tdCheckbox: { padding: '10px 12px', textAlign: 'center', width: 40 },
   tdProduct: { padding: '10px 12px', textAlign: 'left', minWidth: '240px' },
   productCell: { display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 },
   thumb: { width: '36px', height: '36px', borderRadius: '6px', objectFit: 'cover', border: `1px solid ${colors.neutral200}`, flexShrink: 0 },
   thumbPlaceholder: { width: '36px', height: '36px', borderRadius: '6px', background: colors.neutral100, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
   productName: { fontSize: '14px', fontWeight: 500, color: colors.neutral800, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
   badge: { display: 'inline-flex', alignItems: 'center', padding: '2px 8px', fontSize: '11px', fontWeight: 500, borderRadius: '999px', whiteSpace: 'nowrap' },
+  checkbox: { width: 15, height: 15, cursor: 'pointer', accentColor: colors.primary },
   manageBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 10px', background: colors.white, border: `1px solid ${colors.neutral300}`, borderRadius: '6px', fontSize: '12px', color: colors.neutral700, cursor: 'pointer' },
-  // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1
-  manageActions: { display: 'inline-flex', alignItems: 'center', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' },
-  createContentBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 10px', background: colors.white, border: `1px solid ${colors.primary}`, borderRadius: '6px', fontSize: '12px', color: colors.primary, cursor: 'pointer', whiteSpace: 'nowrap' },
-  // WO-O4O-KPA-O4O-B2C-DESCRIPTION-COPY-TO-STORE-CONTENT-V1
-  importBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 10px', background: '#F0FDF4', border: '1px solid #86EFAC', borderRadius: '6px', fontSize: '12px', color: '#15803D', cursor: 'pointer', whiteSpace: 'nowrap' },
-  // WO-O4O-STORE-HANDLED-PRODUCT-DESCRIPTION-SELECTION-V1
-  // WO-O4O-PRODUCT-QR-CONTENT-FLOW-MINIMAL-V1
-  mlcBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 10px', background: '#F5F3FF', border: '1px solid #C4B5FD', borderRadius: '6px', fontSize: '12px', color: '#6D28D9', cursor: 'pointer', whiteSpace: 'nowrap' },
+  // WO-...-STANDARD-TABLE-V1: Selection ActionBar 액션 버튼(기존 행별 버튼 스타일 재사용)
+  createContentBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '5px 12px', background: colors.white, border: `1px solid ${colors.primary}`, borderRadius: '6px', fontSize: '12px', color: colors.primary, cursor: 'pointer', whiteSpace: 'nowrap' },
+  importBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '5px 12px', background: '#F0FDF4', border: '1px solid #86EFAC', borderRadius: '6px', fontSize: '12px', color: '#15803D', cursor: 'pointer', whiteSpace: 'nowrap' },
+  mlcBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '5px 12px', background: '#F5F3FF', border: '1px solid #C4B5FD', borderRadius: '6px', fontSize: '12px', color: '#6D28D9', cursor: 'pointer', whiteSpace: 'nowrap' },
   mlcDot: { display: 'inline-flex', alignItems: 'center', padding: '1px 6px', fontSize: '10px', fontWeight: 600, borderRadius: '999px', whiteSpace: 'nowrap' },
   countBtn: { display: 'inline-flex', padding: 0, border: 'none', background: 'transparent', cursor: 'pointer' },
   empty: { padding: '40px 12px', textAlign: 'center', color: colors.neutral400, fontSize: '13px' },
