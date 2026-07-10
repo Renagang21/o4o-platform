@@ -144,6 +144,13 @@ export const adminMenuStatic: MenuItem[] = [
         path: '/admin/o4o-product-db/candidates',
       },
       {
+        // WO-O4O-KPA-STORE-NEW-PRODUCT-REQUEST-AND-ADMIN-APPROVAL-V1 (P2)
+        id: 'o4o-product-db-store-requests',
+        label: '상품 등록 요청',
+        icon: <ClipboardList className="w-4 h-4" />,
+        path: '/admin/o4o-product-db/store-requests',
+      },
+      {
         id: 'o4o-product-db-masters',
         label: '기본 상품',
         icon: <Package className="w-4 h-4" />,

@@ -428,6 +428,18 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Product Candidate Review Queue routes:', productCandidateError);
     }
 
+    // 24-e2a. Register Store Product Request ADMIN routes (WO-O4O-KPA-STORE-NEW-PRODUCT-REQUEST-AND-ADMIN-APPROVAL-V1 Phase 2)
+    //         store_web 요청 전용 관리자 검토·승인(기존 candidate 콘솔 코어 무변경, 별도 뷰/액션).
+    try {
+      const { createStoreProductRequestAdminController } = await import(
+        '../routes/o4o-store/controllers/store-product-request-admin.controller.js'
+      );
+      app.use('/api/v1/operator/store-product-requests', createStoreProductRequestAdminController(dataSource));
+      logger.info('✅ Store Product Request Admin routes registered at /api/v1/operator/store-product-requests');
+    } catch (storeProductRequestAdminError) {
+      logger.error('Failed to register Store Product Request Admin routes:', storeProductRequestAdminError);
+    }
+
     // 24-e2b~e2d-3. 설명서 검토 워크플로우 라우트 제거
     //   (WO-O4O-ADMIN-O4O-PRODUCT-DESCRIPTION-REVIEW-REMOVE-V1)
     //   제거: shared-product-descriptions / product-candidate-description-drafts /

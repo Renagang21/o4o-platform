@@ -17,6 +17,8 @@ import { Database } from 'lucide-react';
 const TABS = [
   { to: 'overview', label: '현황' },
   { to: 'candidates', label: '공공데이터 후보' },
+  // WO-O4O-KPA-STORE-NEW-PRODUCT-REQUEST-AND-ADMIN-APPROVAL-V1 (P2): 매장 신규 상품 등록 요청 검토
+  { to: 'store-requests', label: '상품 등록 요청' },
   { to: 'masters', label: '기본 상품' },
   { to: 'image-quality', label: '이미지 상태' },
   { to: 'maintenance', label: '데이터 정비' },

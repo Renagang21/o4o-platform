@@ -15,6 +15,8 @@ const ProductDbLayout = lazy(() => import('@/pages/o4o-product-db/ProductDbLayou
 const ProductDbOverviewPage = lazy(() => import('@/pages/o4o-product-db/ProductDbOverviewPage'));
 const ProductCandidatesPage = lazy(() => import('@/pages/o4o-product-db/ProductCandidatesPage'));
 const ProductCandidateDetailPage = lazy(() => import('@/pages/o4o-product-db/ProductCandidateDetailPage'));
+// WO-O4O-KPA-STORE-NEW-PRODUCT-REQUEST-AND-ADMIN-APPROVAL-V1 (P2): 매장 신규 상품 등록 요청 검토·승인
+const StoreProductRequestsPage = lazy(() => import('@/pages/o4o-product-db/StoreProductRequestsPage'));
 const ProductMastersPage = lazy(() => import('@/pages/o4o-product-db/ProductMastersPage'));
 // WO-O4O-ADMIN-PRODUCT-MASTER-MANUAL-REGISTRATION-UI-V1: 관리자 수동 상품 등록
 const ProductMasterCreatePage = lazy(() => import('@/pages/o4o-product-db/ProductMasterCreatePage'));
@@ -45,6 +47,8 @@ export function O4OProductDbRoutes() {
       <Route path="overview" element={<ProductDbOverviewPage />} />
       <Route path="candidates" element={<ProductCandidatesPage />} />
       <Route path="candidates/:id" element={<ProductCandidateDetailPage />} />
+      {/* WO-O4O-KPA-STORE-NEW-PRODUCT-REQUEST-AND-ADMIN-APPROVAL-V1 (P2) */}
+      <Route path="store-requests" element={<StoreProductRequestsPage />} />
       <Route path="masters" element={<ProductMastersPage />} />
       <Route path="masters/new" element={<ProductMasterCreatePage />} />
       <Route path="masters/:id" element={<ProductMasterDetailPage />} />
