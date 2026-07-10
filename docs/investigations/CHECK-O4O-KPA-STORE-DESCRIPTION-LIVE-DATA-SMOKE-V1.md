@@ -51,4 +51,5 @@
 
 - 검증용 생성 listing `3e921ba5-…`(파비스비타민씨정)은 실제 활용 제품이 아님.
 - `/store/my-products`(유일한 listing 관리 UI)가 위 null 오류로 크래시 → **UI 로 비활성/삭제 불가**.
-- 소프트 비활성/삭제는 DB write → CLAUDE.md §0 상 사용자 승인 필요. 체험용 매장은 "예고 없이 초기화"되는 공용 데모라 잔존 영향 낮음. **승인 시 `UPDATE organization_product_listings SET is_active=false WHERE id='3e921ba5-…'` 로 정리 예정.**
+- 소프트 비활성/삭제는 DB write → CLAUDE.md §0 상 사용자 승인 필요.
+- **사용자 승인 → 하드 삭제 완료**: `DELETE FROM organization_product_listings WHERE id='3e921ba5-…'` (DELETE 1, 잔여 0 확인). ProductMaster/STORE 설명서 등 원본은 무접촉. cloud-sql-proxy 종료.
