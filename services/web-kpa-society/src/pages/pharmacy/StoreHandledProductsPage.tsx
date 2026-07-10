@@ -28,8 +28,6 @@ import { StoreDescriptionViewModal, type StoreDescriptionProduct } from './Store
 import { StoreProductQrModal, type StoreProductQrTarget } from './StoreProductQrModal';
 // WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1: O4O 표준 상품 검색·선택·등록 모달
 import { AddO4oStandardProductModal } from './AddO4oStandardProductModal';
-// WO-O4O-PRODUCT-QR-CONTENT-FLOW-MINIMAL-V1: 상품별 다국어 QR 콘텐츠 연결 상태 요약(배지)
-import { getMlcSummaryMap, type StoreMlcSummaryItem } from '../../api/multilingualProductContentStore';
 
 // WO-...-STANDARD-TABLE-V1: 페이지당 건수(20/50/100), 기본 20
 const PAGE_SIZE_OPTIONS = [20, 50, 100] as const;
@@ -160,37 +158,12 @@ export default function StoreHandledProductsPage() {
   const [qrTarget, setQrTarget] = useState<StoreProductQrTarget | null>(null);
   // WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1: O4O 표준 상품 검색·선택·등록 모달
   const [showAddO4oModal, setShowAddO4oModal] = useState(false);
-  // WO-O4O-PRODUCT-QR-CONTENT-FLOW-MINIMAL-V1: 상품별 다국어 QR 콘텐츠 연결 상태 요약(배지). listing 전용.
-  const [mlcListing, setMlcListing] = useState<Map<string, StoreMlcSummaryItem>>(new Map());
 
-  useEffect(() => {
-    let cancelled = false;
-    getMlcSummaryMap('listing')
-      .then((listing) => {
-        if (!cancelled) setMlcListing(listing);
-      })
-      .catch(() => {
-        /* 배지는 비필수 — 요약 로드 실패 시 조용히 무시 */
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [reloadKey]);
-
-  const mlcFor = useCallback(
-    (it: HandledProduct): StoreMlcSummaryItem | undefined => mlcListing.get(it.sourceId),
-    [mlcListing],
-  );
-
-  // WO-...-ACTIONS-AND-MULTILINGUAL-DESCRIPTION-V1: 상품 QR 출력 — 신규 작성 이동 없이 이미 등록된 QR 조회.
-  //   group 요약(mlcFor)에서 groupId/제공 언어를 넘긴다(없으면 groupId=null → 모달이 안내만).
-  const openProductQr = useCallback(
-    (it: HandledProduct) => {
-      const mlc = mlcFor(it);
-      setQrTarget({ name: it.name, groupId: mlc?.groupId ?? null, locales: mlc?.locales ?? [] });
-    },
-    [mlcFor],
-  );
+  // WO-O4O-KPA-STORE-PRODUCT-QR-ALWAYS-AVAILABLE-V1: 상품 QR 출력 — 다국어 무관 상품 기준 고정 QR.
+  //   모달이 sourceType/sourceId 로 master 기준 QR + 제공 언어를 조회한다(항상 사용 가능).
+  const openProductQr = useCallback((it: HandledProduct) => {
+    setQrTarget({ name: it.name, sourceType: it.sourceType, sourceId: it.sourceId });
+  }, []);
 
   const changePageSize = useCallback(
     (next: number) => {
@@ -337,19 +310,10 @@ export default function StoreHandledProductsPage() {
                 <FileText size={13} />
                 매장용 상세설명서 보기
               </button>
-              {/* WO-...-ACTIONS-AND-MULTILINGUAL-DESCRIPTION-V1: '콘텐츠 만들기' 제거(콘텐츠 메뉴에서만).
-                  '다국어 QR'(신규 작성 이동) → '상품 QR 출력'(이미 등록된 QR 조회·출력). */}
+              {/* WO-O4O-KPA-STORE-PRODUCT-QR-ALWAYS-AVAILABLE-V1: 상품 기준 고정 QR 출력(다국어 무관 항상 사용). */}
               <button type="button" onClick={() => openProductQr(singleSelected)} style={styles.mlcBtn}>
                 <QrCode size={13} />
                 상품 QR 출력
-                {(() => {
-                  const mlc = mlcFor(singleSelected);
-                  return mlc && mlc.publishedLocaleCount > 0 ? (
-                    <span style={{ ...styles.mlcDot, background: '#DCFCE7', color: '#16A34A' }}>
-                      {`${mlc.publishedLocaleCount}개 언어`}
-                    </span>
-                  ) : null;
-                })()}
               </button>
             </>
           )}
@@ -536,7 +500,6 @@ const styles: Record<string, CSSProperties> = {
   // WO-...-STANDARD-TABLE-V1: Selection ActionBar 액션 버튼
   importBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '5px 12px', background: '#F0FDF4', border: '1px solid #86EFAC', borderRadius: '6px', fontSize: '12px', color: '#15803D', cursor: 'pointer', whiteSpace: 'nowrap' },
   mlcBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '5px 12px', background: '#F5F3FF', border: '1px solid #C4B5FD', borderRadius: '6px', fontSize: '12px', color: '#6D28D9', cursor: 'pointer', whiteSpace: 'nowrap' },
-  mlcDot: { display: 'inline-flex', alignItems: 'center', padding: '1px 6px', fontSize: '10px', fontWeight: 600, borderRadius: '999px', whiteSpace: 'nowrap' },
   countBtn: { display: 'inline-flex', padding: 0, border: 'none', background: 'transparent', cursor: 'pointer' },
   empty: { padding: '40px 12px', textAlign: 'center', color: colors.neutral400, fontSize: '13px' },
   footnote: { marginTop: '14px', fontSize: '12px', color: colors.neutral500, lineHeight: 1.7, padding: '10px 12px', background: colors.neutral100, borderRadius: '6px' },

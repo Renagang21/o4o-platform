@@ -1,27 +1,25 @@
 /**
- * StoreProductQrModal — 상품별(이미 등록된) 다국어 QR 출력(읽기 전용)
+ * StoreProductQrModal — 상품 기준 고정 QR 출력(읽기 전용, 항상 사용 가능)
  *
- * WO-O4O-KPA-STORE-HANDLED-PRODUCT-ACTIONS-AND-MULTILINGUAL-DESCRIPTION-V1
+ * WO-O4O-KPA-STORE-PRODUCT-QR-ALWAYS-AVAILABLE-V1
  *
- * 신규 작성 화면으로 이동하지 않는다. 이미 등록된 상품별 다국어 콘텐츠(group)의
- * 고객용 QR 을 조회·미리보기·다운로드·인쇄한다. 본문 작성/수정 불가.
- * - publicKey 는 기존 콘텐츠에 대한 접근키 발급(idempotent) — 본문 저작이 아님.
- * - QR SVG 는 백엔드 생성(프론트 QR 의존성 없음).
- * - 상품별 다국어 콘텐츠(group) 자체가 없으면 안내만 하고 신규 작성 흐름을 만들지 않는다.
+ * QR 은 ProductMaster 기준 고정 Landing(/p/{publicKey}) — 다국어 콘텐츠 존재 여부와 무관하게 항상 발급/조회.
+ *   같은 상품이면 콘텐츠가 바뀌어도 동일 QR 유지(listing 재등록으로 id 가 바뀌어도 master 기준이라 안정).
+ * - QR 미리보기 · 다운로드(SVG) · 인쇄. 본문 작성/수정 불가(콘텐츠 메뉴 소관).
+ * - 다국어 콘텐츠(제공 언어)는 QR 랜딩에 연결되는 별도 정보로 표시만 한다(없어도 QR 사용).
  */
 
 import { useEffect, useState, type CSSProperties } from 'react';
-import { X, QrCode, Download, Printer, Loader2 } from 'lucide-react';
+import { X, Download, Printer, Loader2 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
-import { ensureMlcPublicKey, getMlcQr, STORE_MLC_LOCALE_LABELS, type StoreMlcLocale } from '../../api/multilingualProductContentStore';
+import { fetchHandledProductQr, type HandledProductSource } from '../../api/handledProducts';
+import { STORE_MLC_LOCALE_LABELS, type StoreMlcLocale } from '../../api/multilingualProductContentStore';
 import { colors } from '../../styles/theme';
 
 export interface StoreProductQrTarget {
   name: string;
-  /** store_multilingual_product_content_groups.id — 없으면 등록된 QR 콘텐츠 없음 */
-  groupId: string | null;
-  /** 제공(등록) 언어 */
-  locales: string[];
+  sourceType: HandledProductSource;
+  sourceId: string;
 }
 
 interface Props {
@@ -38,23 +36,21 @@ export function StoreProductQrModal({ open, target, onClose }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [qr, setQr] = useState<{ svg: string; url: string; publicKey: string } | null>(null);
+  const [languages, setLanguages] = useState<string[]>([]);
 
   useEffect(() => {
     if (!open || !target) return;
     let cancelled = false;
     setQr(null);
     setError(null);
-    if (!target.groupId) {
-      // 등록된 다국어 QR 콘텐츠 없음 — 안내만(신규 작성 흐름 없음).
-      setLoading(false);
-      return;
-    }
+    setLanguages([]);
     setLoading(true);
-    // 기존 콘텐츠 접근키 발급(idempotent) → QR SVG 조회.
-    ensureMlcPublicKey(target.groupId)
-      .then(() => getMlcQr(target.groupId as string))
+    fetchHandledProductQr(target.sourceType, target.sourceId)
       .then((res) => {
-        if (!cancelled) setQr({ svg: res.svg, url: res.url, publicKey: res.publicKey });
+        if (cancelled) return;
+        if (res.qr) setQr(res.qr);
+        else setError('이 상품은 QR을 발급할 수 없습니다(기준 상품 정보 없음).');
+        setLanguages(res.languages ?? []);
       })
       .catch((e: any) => {
         if (!cancelled) setError(e?.message || 'QR 을 불러오지 못했습니다');
@@ -105,8 +101,6 @@ export function StoreProductQrModal({ open, target, onClose }: Props) {
 
   if (!open || !target) return null;
 
-  const noContent = !target.groupId;
-
   return (
     <div style={styles.backdrop} role="presentation" onClick={onClose}>
       <div style={styles.modal} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
@@ -119,40 +113,37 @@ export function StoreProductQrModal({ open, target, onClose }: Props) {
         </header>
 
         <div style={styles.body}>
-          {noContent ? (
-            <div style={styles.emptyBox}>
-              <QrCode size={28} style={{ color: colors.neutral300 }} />
-              <p style={styles.emptyText}>이 상품에 등록된 다국어 QR 콘텐츠가 없습니다.</p>
-              <p style={styles.emptySub}>
-                다국어 안내 콘텐츠가 등록되면 이 화면에서 고객용 QR 을 출력할 수 있습니다.
-              </p>
-            </div>
-          ) : loading ? (
+          {loading ? (
             <div style={styles.stateBox}><Loader2 size={18} className="animate-spin" /><span>QR 을 불러오는 중…</span></div>
           ) : error ? (
             <div style={{ ...styles.stateBox, color: '#DC2626' }}>{error}</div>
           ) : qr ? (
             <>
-              {/* 제공 언어 표시 */}
-              {target.locales.length > 0 && (
+              {/* 제공 언어(다국어 콘텐츠) — 있으면 표시, 없으면 QR 사용 가능 안내. QR 은 항상 노출. */}
+              {languages.length > 0 ? (
                 <div style={styles.langRow}>
                   <span style={styles.langLabel}>제공 언어</span>
                   <div style={styles.langChips}>
-                    {target.locales.map((l) => (
+                    {languages.map((l) => (
                       <span key={l} style={styles.langChip}>{localeLabel(l)}</span>
                     ))}
                   </div>
                 </div>
+              ) : (
+                <div style={styles.noticeBox}>
+                  현재 등록된 다국어 안내 콘텐츠는 없습니다.
+                  <br />QR은 사용할 수 있으며, 콘텐츠가 등록되면 같은 QR에 반영됩니다.
+                </div>
               )}
               <div style={styles.qrBox} dangerouslySetInnerHTML={{ __html: qr.svg }} />
               <p style={styles.url}>{qr.url}</p>
-              <p style={styles.hint}>외국인 고객이 스캔하면 다국어 상품 안내 페이지가 열립니다. (읽기 전용 — 본문 작성·수정은 콘텐츠 메뉴에서)</p>
+              <p style={styles.hint}>고객이 스캔하면 상품 안내 페이지가 열립니다. (읽기 전용 — 콘텐츠 작성·수정은 콘텐츠 메뉴에서)</p>
             </>
           ) : null}
         </div>
 
         <footer style={styles.footer}>
-          {qr && !noContent && (
+          {qr && (
             <>
               <button type="button" onClick={handleDownload} style={styles.actionBtn}>
                 <Download size={14} /> 다운로드
@@ -178,13 +169,11 @@ const styles: Record<string, CSSProperties> = {
   iconBtn: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 30, height: 30, border: 'none', background: 'transparent', color: colors.neutral500, cursor: 'pointer', borderRadius: 6, flexShrink: 0 },
   body: { padding: 18, overflowY: 'auto', flex: 1, textAlign: 'center' },
   stateBox: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '48px 0', color: colors.neutral500, fontSize: 13 },
-  emptyBox: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '44px 16px', textAlign: 'center' },
-  emptyText: { margin: 0, fontSize: 14, fontWeight: 600, color: colors.neutral700 },
-  emptySub: { margin: 0, fontSize: 12, lineHeight: 1.7, color: colors.neutral400, maxWidth: 340 },
   langRow: { display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14, justifyContent: 'center', flexWrap: 'wrap' },
   langLabel: { fontSize: 12, color: colors.neutral500 },
   langChips: { display: 'inline-flex', gap: 6, flexWrap: 'wrap' },
   langChip: { fontSize: 11, fontWeight: 600, color: '#6D28D9', background: '#F5F3FF', border: '1px solid #C4B5FD', padding: '2px 8px', borderRadius: 999 },
+  noticeBox: { marginBottom: 14, padding: '9px 12px', fontSize: 12, lineHeight: 1.6, color: '#92400E', background: '#FEF3C7', border: '1px solid #FDE68A', borderRadius: 8, textAlign: 'left' },
   qrBox: { width: 240, height: 240, margin: '0 auto', background: colors.white, border: `1px solid ${colors.neutral200}`, borderRadius: 10, padding: 10 },
   url: { fontSize: 11, color: colors.neutral400, wordBreak: 'break-all', maxWidth: 320, margin: '12px auto 0' },
   hint: { fontSize: 11, color: colors.neutral400, lineHeight: 1.6, margin: '10px auto 0', maxWidth: 340 },

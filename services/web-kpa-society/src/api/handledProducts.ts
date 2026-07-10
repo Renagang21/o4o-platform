@@ -121,3 +121,23 @@ export async function removeHandledProducts(
   return res.data;
 }
 
+// WO-O4O-KPA-STORE-PRODUCT-QR-ALWAYS-AVAILABLE-V1:
+//   상품 기준 고정 QR(ProductMaster Landing) — 다국어 콘텐츠 유무와 무관하게 항상 발급/조회.
+//   languages = 해당 상품의 canonical STORE 상세설명서 언어(제공 언어).
+export interface HandledProductQr {
+  qr: { publicKey: string; url: string; svg: string } | null;
+  languages: string[];
+  reason?: string;
+}
+
+export async function fetchHandledProductQr(
+  sourceType: HandledProductSource,
+  sourceId: string,
+): Promise<HandledProductQr> {
+  const qs = new URLSearchParams({ sourceType, sourceId });
+  const res = await request<{ success: boolean; data: HandledProductQr }>(
+    `${BASE}/handled-products/qr?${qs.toString()}`,
+  );
+  return res.data;
+}
+

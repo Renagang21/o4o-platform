@@ -22,6 +22,8 @@ import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import type { AuthRequest } from '../../types/auth.js';
 import { resolveStoreAccess } from '../../utils/store-owner.utils.js';
+// WO-O4O-KPA-STORE-PRODUCT-QR-ALWAYS-AVAILABLE-V1: 상품 기준 고정 QR(ProductMaster Landing) — 다국어 무관 항상 발급.
+import { ProductLandingService } from '../../modules/neture/services/product-landing.service.js';
 
 type AuthMiddleware = RequestHandler;
 
@@ -275,6 +277,81 @@ export function createStoreHandledProductsRoutes(dataSource: DataSource): Router
     } catch (error: any) {
       console.error('[StoreHandledProducts] POST /handled-products/remove error:', error);
       res.status(500).json({ success: false, error: 'Failed to remove handled products', code: 'INTERNAL_ERROR' });
+    }
+  });
+
+  /**
+   * GET /handled-products/qr?sourceType=listing&sourceId=<uuid>
+   * WO-O4O-KPA-STORE-PRODUCT-QR-ALWAYS-AVAILABLE-V1
+   *
+   * 매장 취급제품의 "상품 QR" — 다국어 콘텐츠 존재 여부와 무관하게 **항상** 사용 가능.
+   *   - QR 은 ProductMaster 기준 고정 Landing(/p/{publicKey}) — 없으면 idempotent 발급(모든 master 커버).
+   *     같은 상품이면 콘텐츠 변경 후에도 동일 QR 유지(listing 재등록으로 id 가 바뀌어도 master 기준이라 안정).
+   *   - languages = 해당 master 의 canonical STORE 상세설명서 언어(제공 언어). 없으면 [](QR 은 그대로 사용).
+   * Boundary: organization_id 로 listing 소유 검증. parameter binding.
+   * (local 은 master 가 없어 상품 QR 대상 아님 — UI 목록에서도 listing 만 노출)
+   */
+  router.get('/handled-products/qr', async (req: Request, res: Response): Promise<void> => {
+    try {
+      const auth = await getAuth();
+      await new Promise<void>((resolve, reject) => {
+        (auth as any)(req, res, (err: any) => (err ? reject(err) : resolve()));
+      });
+      const authReq = req as AuthRequest;
+      const userId = authReq.user?.id;
+      if (!userId) {
+        res.status(403).json({ success: false, error: 'Store owner access required', code: 'FORBIDDEN' });
+        return;
+      }
+      const organizationId = await resolveStoreAccess(dataSource, userId, authReq.user?.roles || []);
+      if (!organizationId) {
+        res.status(403).json({ success: false, error: 'Store owner access required', code: 'FORBIDDEN' });
+        return;
+      }
+
+      const UUID_RE = /^[0-9a-fA-F-]{36}$/;
+      const sourceType = String(req.query.sourceType || '');
+      const sourceId = String(req.query.sourceId || '');
+      if (sourceType !== 'listing' || !UUID_RE.test(sourceId)) {
+        res.status(400).json({ success: false, error: 'sourceType=listing & valid sourceId required', code: 'VALIDATION_ERROR' });
+        return;
+      }
+
+      // org 소유 listing → master 확인
+      const rows: Array<{ master_id: string | null }> = await dataSource.query(
+        `SELECT master_id FROM organization_product_listings WHERE id = $1 AND organization_id = $2 LIMIT 1`,
+        [sourceId, organizationId],
+      );
+      if (!rows[0]) {
+        res.status(404).json({ success: false, error: 'O4O 제품을 현재 매장에서 찾을 수 없습니다.', code: 'LISTING_NOT_FOUND' });
+        return;
+      }
+      const masterId = rows[0].master_id;
+      if (!masterId) {
+        // master 없는 listing(예외) — QR 발급 불가.
+        res.json({ success: true, data: { qr: null, languages: [], reason: 'NO_MASTER' } });
+        return;
+      }
+
+      // 상품 기준 고정 Landing QR (없으면 idempotent 발급)
+      const landingSvc = new ProductLandingService(dataSource);
+      const qr = await landingSvc.getLandingQr(masterId, 320);
+
+      // 제공 언어 = 해당 master 의 canonical STORE 상세설명서 언어(랜딩이 노출하는 콘텐츠 기준)
+      const langRows: Array<{ language: string | null }> = await dataSource.query(
+        `SELECT DISTINCT language FROM shared_product_descriptions
+         WHERE master_id = $1 AND description_type = 'STORE' AND status = 'canonical' AND deleted_at IS NULL`,
+        [masterId],
+      );
+      const languages = langRows.map((r) => r.language).filter((l): l is string => !!l);
+
+      res.json({
+        success: true,
+        data: { qr: { publicKey: qr.publicKey, url: qr.url, svg: qr.svg }, languages },
+      });
+    } catch (error: any) {
+      console.error('[StoreHandledProducts] GET /handled-products/qr error:', error);
+      res.status(500).json({ success: false, error: 'Failed to build product QR', code: 'INTERNAL_ERROR' });
     }
   });
 
