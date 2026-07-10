@@ -81,8 +81,20 @@ Screen Set / Block 모델을 저장할 **최소 additive schema** 만 추가한�
 | api-server typecheck (변경 파일) | ✅ PASS (migration 파일 error 0; 기존 무관 `src/scripts/drug-otc-*` 에러는 선존재) |
 | migration glob 자동 인식 (`migration-config.ts` `migrations/*.ts|*.js`) | ✅ 수동 등록 불필요 |
 | additive 안전성 | ✅ CREATE TABLE IF NOT EXISTS / ADD COLUMN IF NOT EXISTS / 데이터 변경 0 / down() 완비 |
-| CI/CD 마이그레이션 적용 (배포 후) | ⏳ (배포 후 채움) |
-| 프로덕션 테이블 생성 확인 (read-only information_schema) | ⏳ (배포 후 채움) |
+| CI/CD 마이그레이션 적용 | ✅ Deploy API Server success (run 29097947226, `545961fd7`) |
+| 프로덕션 검증 (read-only information_schema / pg_constraint, 2026-07-10) | ✅ 아래 |
+
+### 프로덕션 검증 실측 (read-only SELECT, Cloud SQL proxy)
+
+| 확인 | 결과 |
+|---|---|
+| `store_tablet_screen_sets` / `store_tablet_screen_blocks` 존재 · row count | ✅ 둘 다 존재, **count 0** (빈 구조 · 자동생성 0) |
+| `store_tablets.current_screen_set_id` | ✅ uuid · nullable=YES |
+| screen_sets 컬럼 11개 (id/org NOT NULL, service_key/tablet_id/created_by/deleted_at NULL, origin/status/name NOT NULL, ts) | ✅ 설계 일치 |
+| CHECK 제약 3 (origin / status / block_type) | ✅ 존재 |
+| FK 2 (blocks→sets CASCADE, tablets.current→sets SET NULL) | ✅ 존재 |
+| PK 2 | ✅ 존재 |
+| `typeorm_migrations` 기록 | ✅ `CreateTabletScreenSetsAndBlocks20270120000000` |
 
 ## 6. 후속 WO
 
