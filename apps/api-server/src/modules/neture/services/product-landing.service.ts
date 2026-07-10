@@ -164,11 +164,13 @@ export class ProductLandingService {
     );
     const pm = pmRows[0] ?? null;
 
+    // WO-O4O-STORE-MULTILINGUAL-CANONICAL-DESCRIPTION-V1: canonical 언어별 다수 가능 →
+    //   공개 랜딩은 ko 우선(없으면 최신) 1건 선택(임의 언어 노출 방지).
     const spdRows = await this.dataSource.query(
       `SELECT content, summary, description_type
        FROM shared_product_descriptions
        WHERE master_id = $1 AND deleted_at IS NULL AND status = 'canonical'
-       ORDER BY updated_at DESC LIMIT 1`,
+       ORDER BY (language = 'ko') DESC, updated_at DESC LIMIT 1`,
       [landing.product_master_id],
     );
     const spd = spdRows[0] ?? null;

@@ -230,14 +230,17 @@ export class SharedProductDescriptionService {
         throw new Error('Cannot set a deleted description as canonical');
       }
 
-      // 기존 canonical 강등 (대상 자신 제외) — 같은 description_type 만 강등 (Freeze #2:
-      // canonical 은 (master_id, description_type) 당 1개. 타입이 다른 canonical 은 건드리지 않는다).
+      // 기존 canonical 강등 (대상 자신 제외) — 같은 description_type + **같은 언어**만 강등.
+      // WO-O4O-STORE-MULTILINGUAL-CANONICAL-DESCRIPTION-V1: canonical 유일성 =
+      //   (master_id, description_type, COALESCE(language,'ko')) 당 1개. 다른 언어/타입 canonical 은
+      //   건드리지 않는다(ko canonical 이 있어도 zh 를 canonical 로 승격 가능).
       await repo
         .createQueryBuilder()
         .update(SharedProductDescription)
         .set({ status: 'candidate', updatedBy: actorId ?? null })
         .where('master_id = :masterId', { masterId: target.masterId })
         .andWhere('description_type = :descriptionType', { descriptionType: target.descriptionType })
+        .andWhere(`COALESCE(language, 'ko') = COALESCE(:language, 'ko')`, { language: target.language ?? 'ko' })
         .andWhere('status = :status', { status: 'canonical' })
         .andWhere('id != :id', { id })
         .andWhere('deleted_at IS NULL')

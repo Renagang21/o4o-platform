@@ -214,12 +214,18 @@ export async function queryVisibleProducts(
          ON sp.master_id = pm.id
          AND sp.organization_id = opl.organization_id
          AND sp.is_active = true
-       -- canonical 1개/master (partial unique index) → DISTINCT ON 행 증식 없음
-       LEFT JOIN shared_product_descriptions spd
-         ON spd.master_id = pm.id
-         AND spd.status = 'canonical'
-         AND spd.description_type = 'STORE'
-         AND spd.deleted_at IS NULL
+       -- WO-O4O-STORE-MULTILINGUAL-CANONICAL-DESCRIPTION-V1: canonical 이 언어별 다수 가능해짐 →
+       -- LATERAL + ko 우선(없으면 최신) LIMIT 1 로 master 당 1행 보장(공개 목록 행 증식 방지, 비회귀).
+       LEFT JOIN LATERAL (
+         SELECT d.content, d.summary
+           FROM shared_product_descriptions d
+          WHERE d.master_id = pm.id
+            AND d.status = 'canonical'
+            AND d.description_type = 'STORE'
+            AND d.deleted_at IS NULL
+          ORDER BY (d.language = 'ko') DESC, d.updated_at DESC
+          LIMIT 1
+       ) spd ON true
        WHERE spo.is_active = true
          AND s.status = 'ACTIVE'
          ${whereExtra}
@@ -490,12 +496,18 @@ export async function queryTabletVisibleProducts(
          ON sp.master_id = pm.id
          AND sp.organization_id = opl.organization_id
          AND sp.is_active = true
-       -- canonical 1개/master (partial unique index) → DISTINCT ON 행 증식 없음
-       LEFT JOIN shared_product_descriptions spd
-         ON spd.master_id = pm.id
-         AND spd.status = 'canonical'
-         AND spd.description_type = 'STORE'
-         AND spd.deleted_at IS NULL
+       -- WO-O4O-STORE-MULTILINGUAL-CANONICAL-DESCRIPTION-V1: canonical 언어별 다수 가능 →
+       -- LATERAL + ko 우선(없으면 최신) LIMIT 1 로 master 당 1행 보장(태블릿 목록 행 증식 방지).
+       LEFT JOIN LATERAL (
+         SELECT d.content, d.summary
+           FROM shared_product_descriptions d
+          WHERE d.master_id = pm.id
+            AND d.status = 'canonical'
+            AND d.description_type = 'STORE'
+            AND d.deleted_at IS NULL
+          ORDER BY (d.language = 'ko') DESC, d.updated_at DESC
+          LIMIT 1
+       ) spd ON true
        ${dispJoins}
        WHERE spo.is_active = true
          AND s.status = 'ACTIVE'
