@@ -85,6 +85,7 @@
 - 진입점 **2 매장경영자 재구축**(→ 관리자 승인) · **3 서비스운영자 신설**(→ 관리자 승인).
 - **승인 흐름 공통화**: 등록 → pending → 승인자별(운영자/관리자) 승인 → canonical 노출.
 - B2B/B2C 저작 UI(STORE와 동일 코어, descriptionType만 다름).
+- **⚠️ STORE 다국어 제약 (2026-07-10 발견 — 별도 WO 필요)**: canonical 유일성이 **(master_id, description_type)** 라 언어를 포함하지 않는다(Freeze #2 / migration 20261223). 따라서 한 master 에 STORE canonical 은 **언어 무관 1개만** 가능 → ko 저장 후 zh 를 canonical 로 올리면 ko 가 candidate 로 강등된다. 그런데 매장 모달(b2c-descriptions)은 `status='canonical'` 만 읽고 **언어 탭 UI**를 제공한다(다국어 의도). **모델 불일치**: 다국어 STORE 를 매장 모달 언어 탭에 채우려면 canonical 유일성을 **(master_id, description_type, language)** 로 확장하고 b2c 쿼리도 언어별 canonical 을 반환해야 한다(F5 Content Stable 스키마 변경 = 별도 WO). 현재는 **한국어(기준본)를 canonical 로 두고 zh 는 candidate 로 보관**(저장은 됨, 매장 모달 미노출).
 - 큐레이션/검토 재도입 여부 판단(제거한 세션 의도와 조율).
 - 저장 content 표준(모달·QR·storefront 공통 렌더 계약).
 
