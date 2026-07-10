@@ -193,6 +193,23 @@ export interface ProductClassificationInfo {
   label: string;
 }
 
+/**
+ * O4O 표준 분류 코드 전체 목록 (자유입력 금지 — 선택 검증용 SSOT).
+ * ProductClassification union 과 1:1 유지. 매장 신규 상품 등록 요청 등에서 허용값 검증에 사용.
+ * WO-O4O-KPA-STORE-NEW-PRODUCT-REQUEST-V1 (additive export)
+ */
+export const PRODUCT_CLASSIFICATION_CODES: ProductClassification[] = [
+  'otc',
+  'rx',
+  'drug',
+  'quasi',
+  'health_functional',
+  'medical_device',
+  'cosmetic',
+  'general',
+  'unknown',
+];
+
 const CLASSIFICATION_LABELS: Record<ProductClassification, string> = {
   otc: '일반의약품',
   rx: '전문의약품',

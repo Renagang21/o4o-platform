@@ -58,6 +58,7 @@ export const PRODUCT_CANDIDATE_SOURCE_TYPES: ProductCandidateSourceType[] = [
 export type ProductCandidateStatus =
   | 'pending'
   | 'reviewing'
+  | 'revision_requested' // WO-O4O-KPA-STORE-NEW-PRODUCT-REQUEST-V1: 매장 요청 보완 필요 → 매장이 수정 재제출 시 pending 으로 복귀 (varchar union 추가, migration 불필요)
   | 'matched'
   | 'linked' // WO-O4O-PRODUCT-CANDIDATE-TO-STORE-PHARMACY-LISTING-V1: 약국/매장 활용 상품으로 연결됨
   | 'approved_new_master'
@@ -68,6 +69,7 @@ export type ProductCandidateStatus =
 export const PRODUCT_CANDIDATE_STATUSES: ProductCandidateStatus[] = [
   'pending',
   'reviewing',
+  'revision_requested',
   'matched',
   'linked',
   'approved_new_master',

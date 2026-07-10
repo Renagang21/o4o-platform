@@ -853,6 +853,18 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Store Product Library routes:', storeProductLibError);
     }
 
+    // 31-e2. Register Store Product Request routes (WO-O4O-KPA-STORE-NEW-PRODUCT-REQUEST-AND-ADMIN-APPROVAL-V1 Phase 1)
+    //        매장 신규 상품 등록 요청(제출·목록·재제출). product_candidates(source_type='store_web') 재사용.
+    try {
+      const { createStoreProductRequestController } = await import(
+        '../routes/o4o-store/controllers/store-product-request.controller.js'
+      );
+      app.use('/api/v1/store/product-requests', createStoreProductRequestController(dataSource));
+      logger.info('✅ Store Product Request routes registered at /api/v1/store/product-requests');
+    } catch (storeProductRequestError) {
+      logger.error('Failed to register Store Product Request routes:', storeProductRequestError);
+    }
+
     // 31-f. Register Store Channel Products routes (WO-O4O-STORE-PRODUCT-REGISTRATION-PHASE1-5-V1)
     try {
       const { createStoreChannelProductsController } = await import(

@@ -15,7 +15,7 @@
 
 import { useEffect, useMemo, useState, useCallback, type CSSProperties } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Package, RefreshCw, Search, Boxes, X, Trash2, FileText, Loader2, QrCode } from 'lucide-react';
+import { Package, RefreshCw, Search, Boxes, X, Trash2, FileText, Loader2, QrCode, PlusCircle, ClipboardList } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { Pagination } from '@o4o/operator-ux-core';
 import { fetchHandledProducts, removeHandledProducts, type HandledProduct } from '../../api/handledProducts';
@@ -26,6 +26,10 @@ import { StoreDescriptionViewModal, type StoreDescriptionProduct } from './Store
 import { StoreProductQrModal, type StoreProductQrTarget } from './StoreProductQrModal';
 // WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1: O4O 표준 상품 검색·선택·등록 모달
 import { AddO4oStandardProductModal } from './AddO4oStandardProductModal';
+// WO-O4O-KPA-STORE-NEW-PRODUCT-REQUEST-AND-ADMIN-APPROVAL-V1 (P1): 신규 상품 등록 요청(제출·상태)
+import { StoreNewProductRequestModal } from './StoreNewProductRequestModal';
+import { StoreProductRequestsListModal } from './StoreProductRequestsListModal';
+import type { StoreProductRequest } from '../../api/storeProductRequests';
 
 // WO-...-STANDARD-TABLE-V1: 페이지당 건수(20/50/100), 기본 20
 const PAGE_SIZE_OPTIONS = [20, 50, 100] as const;
@@ -154,6 +158,25 @@ export default function StoreHandledProductsPage() {
   const [qrTarget, setQrTarget] = useState<StoreProductQrTarget | null>(null);
   // WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1: O4O 표준 상품 검색·선택·등록 모달
   const [showAddO4oModal, setShowAddO4oModal] = useState(false);
+  // WO-O4O-KPA-STORE-NEW-PRODUCT-REQUEST-AND-ADMIN-APPROVAL-V1 (P1): 신규 상품 등록 요청 상태
+  const [showNewRequestModal, setShowNewRequestModal] = useState(false);
+  const [editRequest, setEditRequest] = useState<StoreProductRequest | null>(null);
+  const [showRequestsListModal, setShowRequestsListModal] = useState(false);
+  const [requestsRefreshKey, setRequestsRefreshKey] = useState(0);
+
+  // 신규 요청 모달 열기(신규 작성)
+  const openNewRequest = useCallback(() => { setEditRequest(null); setShowNewRequestModal(true); }, []);
+  // 목록에서 보완 요청 건 편집 → 편집 모달 오픈(목록은 닫음)
+  const openEditRequest = useCallback((req: StoreProductRequest) => {
+    setShowRequestsListModal(false);
+    setEditRequest(req);
+    setShowNewRequestModal(true);
+  }, []);
+  // 요청 제출/재제출/기존추가 성공 후 — 요청 목록 + 매장 경영활용 목록 갱신
+  const handleRequestSubmitted = useCallback(() => {
+    setRequestsRefreshKey((k) => k + 1);
+    reload();
+  }, [reload]);
 
   // WO-O4O-KPA-STORE-PRODUCT-QR-ALWAYS-AVAILABLE-V1: 상품 QR 출력 — 다국어 무관 상품 기준 고정 QR.
   //   모달이 sourceType/sourceId 로 master 기준 QR + 제공 언어를 조회한다(항상 사용 가능).
@@ -243,6 +266,16 @@ export default function StoreHandledProductsPage() {
           <button onClick={() => setShowAddO4oModal(true)} style={styles.primaryBtn}>
             <Boxes size={14} />
             O4O 표준 상품에서 추가
+          </button>
+          {/* WO-O4O-KPA-STORE-NEW-PRODUCT-REQUEST-AND-ADMIN-APPROVAL-V1 (P1):
+              O4O DB 에 없는 신규 상품의 등록 요청(제출·상태). 기존 상품은 위 '표준 상품에서 추가'로. */}
+          <button onClick={openNewRequest} style={styles.requestBtn}>
+            <PlusCircle size={14} />
+            신규 상품 등록 요청
+          </button>
+          <button onClick={() => setShowRequestsListModal(true)} style={styles.refreshBtn}>
+            <ClipboardList size={14} />
+            내 등록 요청
           </button>
           {/* WO-...-REMOVE-AND-STATUS-AUDIT-V1: '매장 직접 등록'(store_local_products) 정책 폐기 → 버튼 제거. */}
           <button onClick={reload} style={styles.refreshBtn}>
@@ -415,6 +448,23 @@ export default function StoreHandledProductsPage() {
         onRegistered={reload}
       />
 
+      {/* WO-O4O-KPA-STORE-NEW-PRODUCT-REQUEST-AND-ADMIN-APPROVAL-V1 (P1): 신규 상품 등록 요청 제출/재제출 */}
+      <StoreNewProductRequestModal
+        open={showNewRequestModal}
+        editRequest={editRequest}
+        onClose={() => { setShowNewRequestModal(false); setEditRequest(null); }}
+        onSubmitted={handleRequestSubmitted}
+        onAddExisting={() => setShowAddO4oModal(true)}
+      />
+
+      {/* 내 신규 상품 등록 요청 목록·상태 */}
+      <StoreProductRequestsListModal
+        open={showRequestsListModal}
+        onClose={() => setShowRequestsListModal(false)}
+        onEdit={openEditRequest}
+        refreshKey={requestsRefreshKey}
+      />
+
       {/* WO-...-DESCRIPTION-USAGE-POLICY-FIX-V1 / ACTIONS-AND-MULTILINGUAL-V1: 매장용 상세설명서 다국어 조회(읽기 전용) */}
       <StoreDescriptionViewModal
         open={!!descProduct}
@@ -448,6 +498,8 @@ const styles: Record<string, CSSProperties> = {
   headerActions: { display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' },
   refreshBtn: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: colors.white, border: `1px solid ${colors.neutral300}`, borderRadius: '6px', fontSize: '13px', color: colors.neutral700, cursor: 'pointer' },
   primaryBtn: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: colors.primary, border: `1px solid ${colors.primary}`, borderRadius: '6px', fontSize: '13px', color: colors.white, cursor: 'pointer' },
+  // WO-O4O-KPA-STORE-NEW-PRODUCT-REQUEST-V1: 신규 요청 버튼(보조 강조 톤)
+  requestBtn: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: '#EFF6FF', border: `1px solid ${colors.primary}`, borderRadius: '6px', fontSize: '13px', color: colors.primary, cursor: 'pointer', fontWeight: 500 },
   toolbar: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '12px', flexWrap: 'wrap' },
   searchWrap: { position: 'relative', minWidth: '220px' },
   searchIcon: { position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: colors.neutral400, pointerEvents: 'none' },
