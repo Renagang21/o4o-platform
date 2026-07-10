@@ -316,3 +316,68 @@ export async function generateQrPosterPdf(items: QrPosterItem[], perPage: 1 | 4)
     doc.end();
   });
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// WO-O4O-KPA-STORE-PRODUCT-QR-DOWNLOAD-AND-PRINT-SIZE-V1
+//   단일 상품 QR 라벨 PDF — 지정한 실제 mm 크기로 QR + 상품명 + 제공 언어 + 안내문구.
+//   QR 은 정사각형 sizeMm, quiet zone 포함. 실제 mm 가 인쇄 결과에 반영됨(PDF page = mm).
+// ─────────────────────────────────────────────────────────────────────────────
+
+const MM_TO_PT = 2.834645669; // 1mm = 72/25.4 pt
+
+const QR_LANG_LABEL: Record<string, string> = {
+  ko: '한국어', zh: '中文', en: 'English', ja: '日本語', vi: 'Tiếng Việt', th: 'ภาษาไทย', id: 'Bahasa',
+};
+
+export interface ProductQrLabelInput {
+  url: string;
+  name: string;
+  languages: string[]; // ['ko','zh']
+  sizeMm: number;      // QR 한 변 mm (정사각)
+  hint?: string;       // 안내 문구 (기본 '스캔하여 상품 안내 보기')
+}
+
+/** 단일 상품 QR 라벨 PDF(정확한 mm). QR + 상품명 + 제공 언어 + 안내. */
+export async function generateProductQrLabelPdf(input: ProductQrLabelInput): Promise<Buffer> {
+  const qrMm = Math.min(Math.max(input.sizeMm || 50, 15), 200);
+  const padMm = 4;
+  const langLabels = (input.languages || []).map((l) => QR_LANG_LABEL[l] || l.toUpperCase());
+  const hint = input.hint || '스캔하여 상품 안내 보기';
+
+  // 텍스트 밴드(상품명 2줄 + 제공언어 + 안내) 대략 높이(mm)
+  const textBandMm = 6 + (langLabels.length ? 4 : 0) + 4 + 4;
+  const pageWmm = Math.max(qrMm + padMm * 2, 44);
+  const pageHmm = padMm + qrMm + 2 + textBandMm + padMm;
+
+  const doc = new PDFDocument({ size: [pageWmm * MM_TO_PT, pageHmm * MM_TO_PT], margin: 0 });
+  const chunks: Buffer[] = [];
+  doc.on('data', (c: Buffer) => chunks.push(c));
+  doc.registerFont('NotoSansKR', FONT_PATH);
+
+  // QR (고해상 PNG, quiet zone 4) → 정확한 mm 로 배치
+  const qrPng = await generateQrPng(input.url, 1024, 4);
+  const qrPt = qrMm * MM_TO_PT;
+  const qrX = ((pageWmm - qrMm) / 2) * MM_TO_PT;
+  const qrY = padMm * MM_TO_PT;
+  doc.image(qrPng, qrX, qrY, { width: qrPt, height: qrPt });
+
+  const textX = padMm * MM_TO_PT;
+  const textW = (pageWmm - padMm * 2) * MM_TO_PT;
+  let ty = (padMm + qrMm + 2) * MM_TO_PT;
+
+  doc.font('NotoSansKR').fontSize(9).fillColor('#111111')
+    .text(input.name || '', textX, ty, { width: textW, align: 'center', height: 22, ellipsis: true });
+  ty += 15;
+  if (langLabels.length) {
+    doc.fontSize(7.5).fillColor('#555555')
+      .text(`제공 언어: ${langLabels.join(', ')}`, textX, ty, { width: textW, align: 'center' });
+    ty += 11;
+  }
+  doc.fontSize(7).fillColor('#888888').text(hint, textX, ty, { width: textW, align: 'center' });
+
+  return new Promise<Buffer>((resolve, reject) => {
+    doc.on('end', () => resolve(Buffer.concat(chunks)));
+    doc.on('error', reject);
+    doc.end();
+  });
+}

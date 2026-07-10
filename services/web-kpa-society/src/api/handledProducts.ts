@@ -141,3 +141,30 @@ export async function fetchHandledProductQr(
   return res.data;
 }
 
+// WO-O4O-KPA-STORE-PRODUCT-QR-DOWNLOAD-AND-PRINT-SIZE-V1:
+//   상품 QR 파일(png/svg/pdf) — pdf 는 지정 mm 라벨. 같은 상품 기준 고정 QR(데이터 재생성 아님).
+export type QrExportFormat = 'png' | 'svg' | 'pdf';
+
+export async function fetchHandledProductQrFile(
+  sourceType: HandledProductSource,
+  sourceId: string,
+  format: QrExportFormat,
+  sizeMm?: number,
+): Promise<Blob> {
+  const qs = new URLSearchParams({ sourceType, sourceId, format });
+  if (sizeMm) qs.set('sizeMm', String(Math.round(sizeMm)));
+  const url = `${BASE}/handled-products/qr/export?${qs.toString()}`;
+  const token = getAccessToken();
+  const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
+  let response = await fetch(url, { headers });
+  if (response.status === 401) {
+    const newToken = await tryRefreshToken();
+    if (newToken) response = await fetch(url, { headers: { Authorization: `Bearer ${newToken}` } });
+  }
+  if (!response.ok) {
+    const b = await response.json().catch(() => ({ message: 'Network error' }));
+    throw new Error(b?.error || b?.message || `HTTP ${response.status}`);
+  }
+  return response.blob();
+}
+

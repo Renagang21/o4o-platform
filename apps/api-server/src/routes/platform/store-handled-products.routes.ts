@@ -24,6 +24,8 @@ import type { AuthRequest } from '../../types/auth.js';
 import { resolveStoreAccess } from '../../utils/store-owner.utils.js';
 // WO-O4O-KPA-STORE-PRODUCT-QR-ALWAYS-AVAILABLE-V1: 상품 기준 고정 QR(ProductMaster Landing) — 다국어 무관 항상 발급.
 import { ProductLandingService } from '../../modules/neture/services/product-landing.service.js';
+// WO-O4O-KPA-STORE-PRODUCT-QR-DOWNLOAD-AND-PRINT-SIZE-V1: PNG/SVG/PDF export (지정 mm 라벨 PDF)
+import { generateQrPng, generateQrSvg, generateProductQrLabelPdf } from '../../services/qr-print.service.js';
 
 type AuthMiddleware = RequestHandler;
 
@@ -352,6 +354,91 @@ export function createStoreHandledProductsRoutes(dataSource: DataSource): Router
     } catch (error: any) {
       console.error('[StoreHandledProducts] GET /handled-products/qr error:', error);
       res.status(500).json({ success: false, error: 'Failed to build product QR', code: 'INTERNAL_ERROR' });
+    }
+  });
+
+  /**
+   * GET /handled-products/qr/export?sourceType=listing&sourceId=<uuid>&format=png|svg|pdf&sizeMm=NN
+   * WO-O4O-KPA-STORE-PRODUCT-QR-DOWNLOAD-AND-PRINT-SIZE-V1
+   *
+   * 상품 QR 을 용도별 파일로 내보낸다(같은 상품 기준 고정 QR = /p/{key}, 데이터 재생성 아님):
+   *   - png : 고해상 래스터(일반 이미지) · svg : 벡터(확대/편집) · pdf : 지정 mm 라벨(바로 인쇄)
+   * 파일명은 프론트가 상품명 기준으로 지정한다(Content-Disposition 미의존).
+   */
+  router.get('/handled-products/qr/export', async (req: Request, res: Response): Promise<void> => {
+    try {
+      const auth = await getAuth();
+      await new Promise<void>((resolve, reject) => {
+        (auth as any)(req, res, (err: any) => (err ? reject(err) : resolve()));
+      });
+      const authReq = req as AuthRequest;
+      const userId = authReq.user?.id;
+      if (!userId) {
+        res.status(403).json({ success: false, error: 'Store owner access required', code: 'FORBIDDEN' });
+        return;
+      }
+      const organizationId = await resolveStoreAccess(dataSource, userId, authReq.user?.roles || []);
+      if (!organizationId) {
+        res.status(403).json({ success: false, error: 'Store owner access required', code: 'FORBIDDEN' });
+        return;
+      }
+
+      const UUID_RE = /^[0-9a-fA-F-]{36}$/;
+      const sourceType = String(req.query.sourceType || '');
+      const sourceId = String(req.query.sourceId || '');
+      const format = String(req.query.format || 'png').toLowerCase();
+      const sizeMm = Math.min(Math.max(parseInt(String(req.query.sizeMm ?? '50'), 10) || 50, 15), 200);
+      if (sourceType !== 'listing' || !UUID_RE.test(sourceId) || !['png', 'svg', 'pdf'].includes(format)) {
+        res.status(400).json({ success: false, error: 'sourceType=listing, valid sourceId, format=png|svg|pdf required', code: 'VALIDATION_ERROR' });
+        return;
+      }
+
+      const rows: Array<{ master_id: string | null; name: string | null }> = await dataSource.query(
+        `SELECT opl.master_id, pm.name
+         FROM organization_product_listings opl
+         LEFT JOIN product_masters pm ON pm.id = opl.master_id
+         WHERE opl.id = $1 AND opl.organization_id = $2 LIMIT 1`,
+        [sourceId, organizationId],
+      );
+      if (!rows[0]) {
+        res.status(404).json({ success: false, error: 'O4O 제품을 현재 매장에서 찾을 수 없습니다.', code: 'LISTING_NOT_FOUND' });
+        return;
+      }
+      const masterId = rows[0].master_id;
+      if (!masterId) {
+        res.status(400).json({ success: false, error: '기준 상품 정보가 없어 QR 을 발급할 수 없습니다.', code: 'NO_MASTER' });
+        return;
+      }
+      const name = rows[0].name || '상품';
+
+      const landingSvc = new ProductLandingService(dataSource);
+      const { url } = await landingSvc.getLandingQr(masterId, 320);
+
+      if (format === 'svg') {
+        const svg = await generateQrSvg(url, 1024, 4);
+        res.setHeader('Content-Type', 'image/svg+xml; charset=utf-8');
+        res.send(svg);
+        return;
+      }
+      if (format === 'png') {
+        const png = await generateQrPng(url, 1024, 4);
+        res.setHeader('Content-Type', 'image/png');
+        res.send(png);
+        return;
+      }
+      // pdf — 제공 언어 포함 라벨(지정 mm)
+      const langRows: Array<{ language: string | null }> = await dataSource.query(
+        `SELECT DISTINCT language FROM shared_product_descriptions
+         WHERE master_id = $1 AND description_type = 'STORE' AND status = 'canonical' AND deleted_at IS NULL`,
+        [masterId],
+      );
+      const languages = langRows.map((r) => r.language).filter((l): l is string => !!l);
+      const pdf = await generateProductQrLabelPdf({ url, name, languages, sizeMm });
+      res.setHeader('Content-Type', 'application/pdf');
+      res.send(pdf);
+    } catch (error: any) {
+      console.error('[StoreHandledProducts] GET /handled-products/qr/export error:', error);
+      res.status(500).json({ success: false, error: 'Failed to export product QR', code: 'INTERNAL_ERROR' });
     }
   });
 
