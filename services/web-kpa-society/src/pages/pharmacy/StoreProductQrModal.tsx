@@ -135,9 +135,11 @@ export function StoreProductQrModal({ open, target, onClose }: Props) {
                   <br />QR은 사용할 수 있으며, 콘텐츠가 등록되면 같은 QR에 반영됩니다.
                 </div>
               )}
-              <div style={styles.qrBox} dangerouslySetInnerHTML={{ __html: qr.svg }} />
+              {/* svg 가 컨테이너에 꽉 맞도록 강제(고유 크기로 넘쳐 잘리는 문제 방지). */}
+              <style>{`.store-product-qr-svg svg{width:100%;height:100%;display:block}`}</style>
+              <div style={styles.qrBox} className="store-product-qr-svg" dangerouslySetInnerHTML={{ __html: qr.svg }} />
               <p style={styles.url}>{qr.url}</p>
-              <p style={styles.hint}>고객이 스캔하면 상품 안내 페이지가 열립니다. (읽기 전용 — 콘텐츠 작성·수정은 콘텐츠 메뉴에서)</p>
+              <p style={styles.hint}>고객이 스캔하면 상품 안내 페이지가 열립니다.</p>
             </>
           ) : null}
         </div>
@@ -167,16 +169,16 @@ const styles: Record<string, CSSProperties> = {
   eyebrow: { fontSize: 11, fontWeight: 700, color: '#6D28D9', marginBottom: 4 },
   title: { fontSize: 16, fontWeight: 700, color: colors.neutral800, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
   iconBtn: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 30, height: 30, border: 'none', background: 'transparent', color: colors.neutral500, cursor: 'pointer', borderRadius: 6, flexShrink: 0 },
-  body: { padding: 18, overflowY: 'auto', flex: 1, textAlign: 'center' },
+  body: { padding: 16, overflowY: 'auto', flex: 1, textAlign: 'center' },
   stateBox: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '48px 0', color: colors.neutral500, fontSize: 13 },
   langRow: { display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14, justifyContent: 'center', flexWrap: 'wrap' },
   langLabel: { fontSize: 12, color: colors.neutral500 },
   langChips: { display: 'inline-flex', gap: 6, flexWrap: 'wrap' },
   langChip: { fontSize: 11, fontWeight: 600, color: '#6D28D9', background: '#F5F3FF', border: '1px solid #C4B5FD', padding: '2px 8px', borderRadius: 999 },
   noticeBox: { marginBottom: 14, padding: '9px 12px', fontSize: 12, lineHeight: 1.6, color: '#92400E', background: '#FEF3C7', border: '1px solid #FDE68A', borderRadius: 8, textAlign: 'left' },
-  qrBox: { width: 240, height: 240, margin: '0 auto', background: colors.white, border: `1px solid ${colors.neutral200}`, borderRadius: 10, padding: 10 },
-  url: { fontSize: 11, color: colors.neutral400, wordBreak: 'break-all', maxWidth: 320, margin: '12px auto 0' },
-  hint: { fontSize: 11, color: colors.neutral400, lineHeight: 1.6, margin: '10px auto 0', maxWidth: 340 },
+  qrBox: { width: 200, height: 200, boxSizing: 'border-box', margin: '0 auto', background: colors.white, border: `1px solid ${colors.neutral200}`, borderRadius: 10, padding: 8, flexShrink: 0 },
+  url: { fontSize: 11, color: colors.neutral400, wordBreak: 'break-all', maxWidth: 320, margin: '10px auto 0' },
+  hint: { fontSize: 11, color: colors.neutral400, lineHeight: 1.5, margin: '8px auto 0', maxWidth: 340 },
   footer: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8, padding: '12px 18px', borderTop: `1px solid ${colors.neutral100}`, flexShrink: 0, flexWrap: 'wrap' },
   actionBtn: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '9px 14px', background: colors.white, color: colors.neutral700, border: `1px solid ${colors.neutral300}`, borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' },
   primaryBtn: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '9px 16px', background: '#6D28D9', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' },
