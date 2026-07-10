@@ -351,7 +351,8 @@ export async function setProductMasterStatus(
 }
 
 // ─── ProductMaster 수동 등록 (WO-O4O-ADMIN-PRODUCT-MASTER-MANUAL-REGISTRATION-UI-V1) ──
-// POST /admin/o4o-product-db/masters. barcode 선택 — 없으면 O4O 자체 내부코드 자동 생성.
+// POST /admin/o4o-product-db/masters. barcode 선택 — 없으면 barcode=NULL 로 등록(합성 내부코드 생성 안 함).
+// 정체성 = ProductMaster.id(UUID). WO-O4O-PRODUCT-BARCODE-NULLABLE-AND-INTERNAL-CODE-GENERATION-STOP-V1
 
 export interface CreateProductMasterInput {
   name: string;

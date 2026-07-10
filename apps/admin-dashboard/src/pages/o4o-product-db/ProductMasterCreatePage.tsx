@@ -3,8 +3,8 @@
  *
  * WO-O4O-ADMIN-PRODUCT-MASTER-MANUAL-REGISTRATION-UI-V1
  *
- * 신규 공식 상품(ProductMaster) 등록 폼. 바코드는 선택 — 비우면 O4O 자체 내부코드가 자동 생성된다
- * (WO-O4O-PRODUCT-MASTER-BARCODELESS-REGISTRATION-INTERNAL-CODE-V1).
+ * 신규 공식 상품(ProductMaster) 등록 폼. 바코드는 선택 — 비우면 barcode=NULL 로 등록된다(합성 내부코드 생성 안 함).
+ * 정체성 = ProductMaster.id(UUID). (WO-O4O-PRODUCT-BARCODE-NULLABLE-AND-INTERNAL-CODE-GENERATION-STOP-V1).
  * 카테고리/브랜드/이미지는 등록 후 상세 화면에서 이어서 편집한다.
  */
 
@@ -78,7 +78,7 @@ export default function ProductMasterCreatePage() {
 
       <h1 className="text-xl font-semibold text-gray-900 mb-1">새 상품 등록</h1>
       <p className="text-sm text-gray-500 mb-6">
-        공식 상품(ProductMaster)을 등록합니다. 바코드는 선택 항목이며, 비우면 O4O 자체 코드가 자동 생성됩니다.
+        공식 상품(ProductMaster)을 등록합니다. 바코드는 선택 항목이며, 비우면 바코드 없이(NULL) 등록됩니다.
         카테고리 · 브랜드 · 이미지는 등록 후 상세 화면에서 이어서 설정할 수 있습니다.
       </p>
 
@@ -108,7 +108,7 @@ export default function ProductMasterCreatePage() {
         <div>
           <label className={label} htmlFor="barcode">바코드 <span className="text-gray-400 font-normal">(선택)</span></label>
           <input id="barcode" className={field} value={form.barcode} onChange={set('barcode')}
-            placeholder="비우면 O4O 자체 코드 자동 생성" inputMode="numeric" />
+            placeholder="비우면 바코드 없이 등록(NULL)" inputMode="numeric" />
           <p className="text-xs text-gray-400 mt-1">있으면 유효한 GTIN(8/12/13/14자리)만 허용됩니다.</p>
         </div>
 
