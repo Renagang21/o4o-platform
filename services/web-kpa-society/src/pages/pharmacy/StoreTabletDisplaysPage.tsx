@@ -51,7 +51,6 @@ import {
   type OperatorCommonIdleSelection,
 } from '../../api/tabletDisplays';
 import type { Tablet as TabletType, ProductPool, TabletDisplaySettings } from '../../api/tabletDisplays';
-import { DataTable, type Column, ActionBar } from '@o4o/ui';
 
 // ==================== Types ====================
 
@@ -276,10 +275,6 @@ export default function StoreTabletDisplaysPage() {
   const [registering, setRegistering] = useState(false);
   const [deletingTabletId, setDeletingTabletId] = useState<string | null>(null);
 
-  // WO-O4O-KPA-STORE-TABLET-DISPLAYS-STANDARD-TABLE-V1: DataTable 행 선택 (bulk delete)
-  const [selectedTabletKeys, setSelectedTabletKeys] = useState<string[]>([]);
-  const [bulkDeleting, setBulkDeleting] = useState(false);
-
   // Toast
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -503,32 +498,6 @@ export default function StoreTabletDisplaysPage() {
     }
   };
 
-  // WO-O4O-KPA-STORE-TABLET-DISPLAYS-STANDARD-TABLE-V1: bulk delete fan-out
-  const handleBulkDeleteTablets = useCallback(async () => {
-    if (selectedTabletKeys.length === 0 || bulkDeleting) return;
-    if (!window.confirm(`선택한 ${selectedTabletKeys.length}개 태블릿을 삭제하시겠습니까?\n삭제 후에는 해당 진열 구성도 함께 사라집니다.`)) return;
-    setBulkDeleting(true);
-    try {
-      const settled = await Promise.allSettled(selectedTabletKeys.map((id) => deleteTablet(id)));
-      const successIds = new Set(selectedTabletKeys.filter((_, i) => settled[i].status === 'fulfilled'));
-      if (successIds.size > 0) {
-        const remaining = tablets.filter((t) => !successIds.has(t.id));
-        setTablets(remaining);
-        if (selectedTabletId && successIds.has(selectedTabletId)) {
-          setSelectedTabletId(remaining.length > 0 ? remaining[0].id : null);
-        }
-        setSelectedTabletKeys([]);
-        setToast({ type: 'success', message: `${successIds.size}개 태블릿이 삭제되었습니다.` });
-      }
-      const failCount = settled.filter((r) => r.status === 'rejected').length;
-      if (failCount > 0) {
-        setToast({ type: 'error', message: `${failCount}개 삭제에 실패했습니다.` });
-      }
-    } finally {
-      setBulkDeleting(false);
-    }
-  }, [selectedTabletKeys, bulkDeleting, tablets, selectedTabletId]);
-
   // Idle changes detection (shallow JSON compare)
   const idleHasChanges = JSON.stringify(idleItems) !== JSON.stringify(idleInitial);
 
@@ -645,60 +614,20 @@ export default function StoreTabletDisplaysPage() {
     }
   };
 
-  // WO-O4O-KPA-STORE-TABLET-DISPLAYS-STANDARD-TABLE-V1: 태블릿 목록 DataTable 컬럼 정의
-  const tabletColumns = useMemo<Column<TabletType>[]>(() => [
-    {
-      key: 'name',
-      title: '태블릿명',
-      render: (_v, t) => (
-        <span style={{ fontWeight: t.id === selectedTabletId ? 700 : 500, color: '#0f172a' }}>
-          {t.name}
-        </span>
+  // WO-O4O-KPA-TABLET-LOCATION-FIRST-UX-REFIT-V1: 위치/코너 우선 정렬 (같은 위치끼리 묶임, 위치 없는 태블릿은 뒤로)
+  const sortedTablets = useMemo(
+    () =>
+      [...tablets].sort(
+        (a, b) =>
+          (a.location?.trim() || '￿').localeCompare(b.location?.trim() || '￿', 'ko') ||
+          a.name.localeCompare(b.name, 'ko'),
       ),
-    },
-    {
-      key: 'location',
-      title: '위치',
-      render: (_v, t) => (
-        <span style={{ color: t.location ? '#334155' : '#94a3b8' }}>
-          {t.location || '—'}
-        </span>
-      ),
-    },
-    {
-      key: 'created_at',
-      title: '등록일',
-      render: (_v, t) => (
-        <span style={{ color: '#64748b', fontSize: '13px' }}>
-          {new Date(t.created_at).toLocaleDateString('ko-KR')}
-        </span>
-      ),
-    },
-    {
-      key: 'action',
-      title: '액션',
-      align: 'center' as const,
-      width: '80px',
-      render: (_v, t) => (
-        <button
-          onClick={(e) => { e.stopPropagation(); handleDeleteTablet(t.id, t.name); }}
-          disabled={deletingTabletId === t.id || bulkDeleting}
-          style={{
-            display: 'inline-flex', alignItems: 'center', gap: '4px',
-            padding: '3px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: 500,
-            color: '#dc2626', background: '#fef2f2', border: '1px solid #fecaca',
-            cursor: 'pointer', opacity: deletingTabletId === t.id ? 0.5 : 1,
-          }}
-          title="태블릿 삭제"
-        >
-          {deletingTabletId === t.id
-            ? <Loader2 style={{ width: 12, height: 12 }} />
-            : <X style={{ width: 12, height: 12 }} />}
-          삭제
-        </button>
-      ),
-    },
-  ], [selectedTabletId, deletingTabletId, bulkDeleting, handleDeleteTablet]);
+    [tablets],
+  );
+  // 위치/코너 표시명: location 우선, 없으면 name
+  const cornerPrimary = (t: TabletType) => t.location?.trim() || t.name;
+  const cornerSecondary = (t: TabletType) => (t.location?.trim() ? t.name : null);
+  const selectedTablet = tablets.find((t) => t.id === selectedTabletId) ?? null;
 
   return (
     <div className="space-y-6">
@@ -868,82 +797,134 @@ export default function StoreTabletDisplaysPage() {
       {/* Tablet list DataTable + editor */}
       {!loadingTablets && tablets.length > 0 && (
         <>
-          {/* WO-O4O-KPA-STORE-TABLET-DISPLAYS-STANDARD-TABLE-V1: 태블릿 목록 DataTable */}
-          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-            <div className="px-4 py-3 border-b bg-slate-50 flex items-center justify-between">
-              <h3 className="text-sm font-bold text-slate-700 flex items-center gap-2">
-                <Tablet className="w-4 h-4 text-teal-600" />
-                태블릿 목록 ({tablets.length})
-              </h3>
-              {hasChanges && (
-                <span className="text-xs text-amber-600 font-medium bg-amber-50 px-2 py-1 rounded">
-                  변경사항 있음
-                </span>
-              )}
-            </div>
-            <ActionBar
-              selectedCount={selectedTabletKeys.length}
-              onClearSelection={() => setSelectedTabletKeys([])}
-              actions={[
-                {
-                  key: 'delete',
-                  label: '삭제',
-                  icon: <X className="w-4 h-4" />,
-                  variant: 'danger',
-                  onClick: handleBulkDeleteTablets,
-                  disabled: bulkDeleting,
-                },
-              ]}
-            />
-            <DataTable<TabletType>
-              columns={tabletColumns}
-              dataSource={tablets}
-              rowKey="id"
-              rowSelection={{
-                selectedRowKeys: selectedTabletKeys,
-                onChange: setSelectedTabletKeys,
-              }}
-              onRowClick={(t) => setSelectedTabletId(t.id)}
-              onRow={(t) => ({
-                className: t.id === selectedTabletId ? 'bg-teal-50' : '',
-              })}
-              emptyText="등록된 태블릿이 없습니다"
-            />
-          </div>
-
-          {/* WO-O4O-KPA-TABLET-CORNER-IDLE-YOUTUBE-VIMEO-AUTO-RETURN-V1:
-              선택 태블릿의 코너별 공개 URL(크롬 북마크용). */}
-          {selectedTabletId && storeSlug && (
-            <div className="bg-white rounded-2xl shadow-sm p-4 border border-slate-100">
-              <p className="text-sm font-semibold text-slate-700 mb-1">이 태블릿의 공개 화면 URL</p>
-              <p className="text-[11px] text-slate-400 mb-2">
-                코너별로 다른 대기화면·진열을 쓰려면 각 태블릿의 Chrome에 아래 URL을 북마크하세요.
-                (tabletId가 없거나 유효하지 않으면 첫 번째 활성 태블릿 기준으로 표시됩니다.)
-              </p>
-              <div className="flex items-center gap-2 flex-wrap">
-                <code className="flex-1 min-w-[240px] text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-700 break-all">
-                  {publicTabletUrl(selectedTabletId)}
-                </code>
-                <button
-                  onClick={() => {
-                    navigator.clipboard?.writeText(publicTabletUrl(selectedTabletId))
-                      .then(() => setToast({ type: 'success', message: '공개 URL이 복사되었습니다.' }))
-                      .catch(() => setToast({ type: 'error', message: '복사에 실패했습니다. URL을 직접 선택해 복사해 주세요.' }));
-                  }}
-                  className="px-3 py-2 text-xs font-medium text-white bg-teal-600 rounded-lg hover:bg-teal-700 whitespace-nowrap"
-                >
-                  공개 URL 복사
-                </button>
-                <button
-                  onClick={handleOpenPreview}
-                  disabled={previewLoading}
-                  className="px-3 py-2 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 whitespace-nowrap disabled:opacity-50"
-                >
-                  미리보기 열기
-                </button>
+          {/* WO-O4O-KPA-TABLET-LOCATION-FIRST-UX-REFIT-V1: 위치/코너 우선 2단 레이아웃
+              좌측 = 위치/코너 태블릿 목록(1차 기준축), 우측 = 선택 코너의 현재 구성.
+              데이터 구조·API·public runtime 무변경 (UI 재배치만). */}
+          <div className="lg:grid lg:grid-cols-[300px_minmax(0,1fr)] lg:gap-6 lg:items-start">
+            {/* 좌측: 위치/코너 사이드바 */}
+            <aside className="space-y-2 mb-4 lg:mb-0 lg:sticky lg:top-4">
+              <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+                <div className="px-4 py-3 border-b bg-slate-50 flex items-center justify-between">
+                  <h3 className="text-sm font-bold text-slate-700 flex items-center gap-2">
+                    <Tablet className="w-4 h-4 text-teal-600" />
+                    코너 · 위치 ({tablets.length})
+                  </h3>
+                  <button
+                    onClick={() => setShowRegisterForm((v) => !v)}
+                    className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-teal-700 bg-teal-50 rounded-lg hover:bg-teal-100"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> 추가
+                  </button>
+                </div>
+                <div className="max-h-[70vh] overflow-y-auto divide-y divide-slate-100">
+                  {sortedTablets.map((t) => {
+                    const isSel = t.id === selectedTabletId;
+                    const secondary = cornerSecondary(t);
+                    return (
+                      <div
+                        key={t.id}
+                        onClick={() => setSelectedTabletId(t.id)}
+                        className={`flex items-start gap-2 px-4 py-3 cursor-pointer border-l-4 ${
+                          isSel ? 'bg-teal-50 border-teal-500' : 'border-transparent hover:bg-slate-50'
+                        }`}
+                      >
+                        <div className="flex-1 min-w-0">
+                          <div className={`text-sm truncate ${isSel ? 'font-bold text-teal-800' : 'font-semibold text-slate-800'}`}>
+                            {cornerPrimary(t)}
+                          </div>
+                          {secondary && <div className="text-xs text-slate-400 truncate mt-0.5">{secondary}</div>}
+                        </div>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleDeleteTablet(t.id, t.name); }}
+                          disabled={deletingTabletId === t.id}
+                          className="p-1 rounded text-slate-300 hover:text-red-600 hover:bg-red-50 flex-shrink-0 disabled:opacity-50"
+                          title="이 태블릿 삭제"
+                        >
+                          {deletingTabletId === t.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <X className="w-3.5 h-3.5" />}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          )}
+              <p className="text-[11px] text-slate-400 px-1">
+                코너/위치는 태블릿의 ‘위치’ 값 기준으로 정렬됩니다. 위치를 입력하면 같은 코너끼리 모여 보입니다.
+              </p>
+            </aside>
+
+            {/* 우측: 선택 코너의 현재 구성 */}
+            <div className="space-y-6 min-w-0">
+              {/* 현재 코너 화면 구성 요약 (WO-O4O-KPA-TABLET-LOCATION-FIRST-UX-REFIT-V1) */}
+              {selectedTablet && (
+                <div className="bg-white rounded-2xl shadow-sm p-4 border border-teal-100">
+                  <div className="flex items-start justify-between gap-3 flex-wrap">
+                    <div className="min-w-0">
+                      <div className="text-[11px] font-medium text-teal-600 mb-0.5">현재 코너 화면 구성</div>
+                      <h2 className="text-lg font-bold text-slate-900 truncate">{cornerPrimary(selectedTablet)}</h2>
+                      {cornerSecondary(selectedTablet) && (
+                        <div className="text-xs text-slate-400 truncate">{cornerSecondary(selectedTablet)}</div>
+                      )}
+                    </div>
+                    <div className="flex gap-2 flex-wrap">
+                      {storeSlug && (
+                        <button
+                          onClick={() => {
+                            navigator.clipboard?.writeText(publicTabletUrl(selectedTablet.id))
+                              .then(() => setToast({ type: 'success', message: '공개 URL이 복사되었습니다.' }))
+                              .catch(() => setToast({ type: 'error', message: '복사에 실패했습니다. URL을 직접 선택해 복사해 주세요.' }));
+                          }}
+                          className="px-3 py-2 text-xs font-medium text-white bg-teal-600 rounded-lg hover:bg-teal-700 whitespace-nowrap"
+                        >
+                          공개 URL 복사
+                        </button>
+                      )}
+                      <button
+                        onClick={handleOpenPreview}
+                        disabled={previewLoading}
+                        className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 whitespace-nowrap disabled:opacity-50"
+                      >
+                        {previewLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Tv className="w-3.5 h-3.5" />}
+                        미리보기
+                      </button>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 mt-3">
+                    <div className="bg-slate-50 rounded-lg px-3 py-2">
+                      <div className="text-[11px] text-slate-400">진열 상품</div>
+                      <div className="text-sm font-bold text-slate-800">
+                        {displays.length}
+                        {displays.length > 0 && (
+                          <span className="text-[11px] font-normal text-slate-400"> · 노출 {displays.filter((d) => d.isVisible).length}</span>
+                        )}
+                        {hasChanges && <span className="text-[11px] font-medium text-amber-600"> · 변경됨</span>}
+                      </div>
+                    </div>
+                    <div className="bg-slate-50 rounded-lg px-3 py-2">
+                      <div className="text-[11px] text-slate-400">대기 화면</div>
+                      <div className="text-sm font-bold text-slate-800">
+                        {idleItems.length}
+                        {idleHasChanges && <span className="text-[11px] font-medium text-amber-600"> · 변경됨</span>}
+                      </div>
+                    </div>
+                    <div className="bg-slate-50 rounded-lg px-3 py-2">
+                      <div className="text-[11px] text-slate-400">공통 대기영상</div>
+                      <div className="text-sm font-bold text-slate-800">
+                        {ocSelection ? (ocStatusLabel[ocSelection.status] ?? '선택됨') : '없음'}
+                      </div>
+                    </div>
+                  </div>
+                  {storeSlug && (
+                    <div className="mt-3">
+                      <div className="text-[11px] text-slate-400 mb-1">
+                        이 코너 태블릿의 공개 화면 URL (각 태블릿 Chrome에 북마크). tabletId가 없거나 유효하지 않으면 첫 번째 활성 태블릿 기준으로 표시됩니다.
+                      </div>
+                      <code className="block text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-700 break-all">
+                        {publicTabletUrl(selectedTablet.id)}
+                      </code>
+                    </div>
+                  )}
+                </div>
+              )}
 
           {/* WO-O4O-KPA-TABLET-OPERATOR-COMMON-IDLE-VIDEO-SELECTION-V1: 서비스 공통 대기 영상(태블릿별 1개) */}
           {selectedTabletId && (
@@ -1351,6 +1332,8 @@ export default function StoreTabletDisplaysPage() {
               </div>
             </div>
           )}
+            </div>{/* /우측: 선택 코너 현재 구성 */}
+          </div>{/* /위치·코너 2단 그리드 (WO-O4O-KPA-TABLET-LOCATION-FIRST-UX-REFIT-V1) */}
         </>
       )}
 
