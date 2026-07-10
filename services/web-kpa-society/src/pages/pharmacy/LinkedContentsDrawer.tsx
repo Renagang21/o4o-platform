@@ -11,7 +11,7 @@
 
 import { useEffect, useState, useCallback, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, FileText, ExternalLink, Plus, Loader2 } from 'lucide-react';
+import { X, FileText, ExternalLink, Loader2 } from 'lucide-react';
 import { handledProductContentApi, type LinkedContentItem } from '../../api/assetSnapshot';
 import { colors } from '../../styles/theme';
 
@@ -25,7 +25,6 @@ interface Props {
   open: boolean;
   product: LinkedDrawerProduct | null;
   onClose: () => void;
-  onCreateNew: () => void;
 }
 
 const STATUS_LABEL: Record<string, string> = {
@@ -41,7 +40,7 @@ function formatDate(iso: string): string {
   return Number.isNaN(d.getTime()) ? '-' : d.toLocaleDateString('ko-KR');
 }
 
-export function LinkedContentsDrawer({ open, product, onClose, onCreateNew }: Props) {
+export function LinkedContentsDrawer({ open, product, onClose }: Props) {
   const navigate = useNavigate();
   const [items, setItems] = useState<LinkedContentItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -111,10 +110,8 @@ export function LinkedContentsDrawer({ open, product, onClose, onCreateNew }: Pr
             <div style={styles.emptyBox}>
               <FileText size={28} style={{ color: colors.neutral300 }} />
               <p style={styles.emptyText}>이 제품에 연결된 콘텐츠가 없습니다.</p>
-              <button type="button" onClick={onCreateNew} style={styles.primaryBtn}>
-                <Plus size={14} />
-                새 콘텐츠 만들기
-              </button>
+              {/* WO-...-ACTIONS-AND-MULTILINGUAL-DESCRIPTION-V1: 콘텐츠 제작은 콘텐츠 메뉴에서만 — 신규 작성 진입 제거. */}
+              <p style={styles.emptySub}>콘텐츠 제작은 자료함(콘텐츠 메뉴)에서 진행합니다.</p>
             </div>
           ) : (
             <ul style={styles.list}>
@@ -137,14 +134,6 @@ export function LinkedContentsDrawer({ open, product, onClose, onCreateNew }: Pr
           )}
         </div>
 
-        {!loading && !error && items.length > 0 && (
-          <footer style={styles.footer}>
-            <button type="button" onClick={onCreateNew} style={styles.primaryBtn}>
-              <Plus size={14} />
-              새 콘텐츠 만들기
-            </button>
-          </footer>
-        )}
       </aside>
     </div>
   );
@@ -164,6 +153,7 @@ const styles: Record<string, CSSProperties> = {
   stateBox: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '40px 0', color: colors.neutral500, fontSize: 13 },
   emptyBox: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '48px 16px', textAlign: 'center' },
   emptyText: { margin: 0, fontSize: 13, color: colors.neutral500 },
+  emptySub: { margin: 0, fontSize: 12, color: colors.neutral400, lineHeight: 1.6 },
   list: { listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 8 },
   item: { display: 'flex', alignItems: 'center', gap: 10, padding: '11px 12px', border: `1px solid ${colors.neutral200}`, borderRadius: 8, background: colors.white },
   itemTitle: { fontSize: 14, fontWeight: 600, color: colors.neutral800, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },

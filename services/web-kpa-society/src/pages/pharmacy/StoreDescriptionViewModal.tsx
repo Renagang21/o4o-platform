@@ -1,13 +1,12 @@
 /**
- * StoreDescriptionViewModal — O4O 상품의 매장용(STORE) 상세설명서 직접 조회(읽기 전용)
+ * StoreDescriptionViewModal — O4O 상품의 매장용(STORE) 상세설명서 다국어 조회(읽기 전용)
  *
- * WO-O4O-KPA-STORE-HANDLED-PRODUCT-DESCRIPTION-USAGE-POLICY-FIX-V1
- *
- * 정책: O4O 상품 정보는 매장으로 복사하지 않는다. O4O 상품(master)에 등록된 매장용(STORE)
- *   상세설명서를 매장 화면에서 그대로 조회·표시한다. (구 'O4O 상세설명 가져오기=복사' 폐기)
- * - listing(=master)에 등록된 매장용 상세설명서만 표시(백엔드가 description_type='STORE' 로 한정).
- * - 없으면 '등록된 매장용 상세설명서가 없습니다' 안내.
- * - 매장이 직접 작성하는 설명은 이 화면과 분리(‘매장 제작 콘텐츠’에서 별도 생성·관리).
+ * WO-O4O-KPA-STORE-HANDLED-PRODUCT-DESCRIPTION-USAGE-POLICY-FIX-V1 (선행)
+ * WO-O4O-KPA-STORE-HANDLED-PRODUCT-ACTIONS-AND-MULTILINGUAL-DESCRIPTION-V1:
+ *   동일 ProductMaster 의 description_type='STORE' 설명서를 언어별로 조회.
+ *   - 한국어 기본 표시, 없으면 사용 가능한 첫 번째 언어.
+ *   - 실제 존재하는 언어만 버튼 노출. 버튼 선택 시 해당 언어 본문 표시.
+ *   - 전부 읽기 전용. 매장 복사·kpa_store_contents 생성 없음.
  */
 
 import { useEffect, useMemo, useState, type CSSProperties } from 'react';
@@ -27,6 +26,24 @@ interface Props {
   onClose: () => void;
 }
 
+// 언어 표시 라벨 + 노출 순서(한국어 우선).
+const LANG_LABELS: Record<string, string> = {
+  ko: '한국어',
+  en: 'English',
+  zh: '中文',
+  ja: '日本語',
+  vi: 'Tiếng Việt',
+  th: 'ภาษาไทย',
+  id: 'Bahasa',
+};
+const LANG_ORDER = ['ko', 'en', 'zh', 'ja', 'vi', 'th', 'id'];
+function langLabel(l: string): string {
+  return LANG_LABELS[l] || l.toUpperCase();
+}
+function normLang(l: string | null | undefined): string {
+  return (l || 'ko').toLowerCase();
+}
+
 function formatDate(iso: string): string {
   const d = new Date(iso);
   return Number.isNaN(d.getTime()) ? '-' : d.toLocaleDateString('ko-KR');
@@ -36,22 +53,20 @@ export function StoreDescriptionViewModal({ open, product, onClose }: Props) {
   const [items, setItems] = useState<StoreDescriptionItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [activeId, setActiveId] = useState<string | null>(null);
+  const [activeLang, setActiveLang] = useState<string | null>(null);
 
   useEffect(() => {
     if (!open || !product) return;
     let cancelled = false;
     setLoading(true);
     setError(null);
-    setActiveId(null);
+    setActiveLang(null);
     setItems([]);
     storeDescriptionApi
       .list(product.listingId)
       .then((res) => {
         if (cancelled) return;
-        const list = res?.data?.items ?? [];
-        setItems(list);
-        setActiveId(list[0]?.descriptionId ?? null);
+        setItems(res?.data?.items ?? []);
       })
       .catch((e: any) => {
         if (!cancelled) setError(e?.message || '매장용 상세설명서를 불러오지 못했습니다');
@@ -64,10 +79,35 @@ export function StoreDescriptionViewModal({ open, product, onClose }: Props) {
     };
   }, [open, product]);
 
-  const active = useMemo(
-    () => items.find((it) => it.descriptionId === activeId) ?? items[0] ?? null,
-    [items, activeId],
-  );
+  // 언어별 대표 설명서(언어당 최신 1건 — 백엔드가 updated_at DESC 정렬) + 노출 언어 목록.
+  const { byLang, languages } = useMemo(() => {
+    const map = new Map<string, StoreDescriptionItem>();
+    for (const it of items) {
+      const l = normLang(it.language);
+      if (!map.has(l)) map.set(l, it); // 첫 등장 = 최신
+    }
+    const present = Array.from(map.keys());
+    // 한국어 우선 → 그 외 정의된 순서 → 알 수 없는 언어는 뒤에.
+    const ordered = present.sort((a, b) => {
+      if (a === 'ko') return -1;
+      if (b === 'ko') return 1;
+      const ia = LANG_ORDER.indexOf(a);
+      const ib = LANG_ORDER.indexOf(b);
+      return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+    });
+    return { byLang: map, languages: ordered };
+  }, [items]);
+
+  // 기본 언어: 한국어 있으면 한국어, 없으면 사용 가능한 첫 번째 언어.
+  useEffect(() => {
+    if (languages.length === 0) {
+      setActiveLang(null);
+      return;
+    }
+    setActiveLang((prev) => (prev && languages.includes(prev) ? prev : languages.includes('ko') ? 'ko' : languages[0]));
+  }, [languages]);
+
+  const active = activeLang ? byLang.get(activeLang) ?? null : null;
 
   if (!open || !product) return null;
 
@@ -87,42 +127,39 @@ export function StoreDescriptionViewModal({ open, product, onClose }: Props) {
             <div style={styles.stateBox}><Loader2 size={18} className="animate-spin" /><span>불러오는 중…</span></div>
           ) : error ? (
             <div style={{ ...styles.stateBox, color: '#DC2626' }}>{error}</div>
-          ) : items.length === 0 ? (
+          ) : languages.length === 0 ? (
             // 정책 안내 — 매장용 상세설명서 미등록
             <div style={styles.emptyBox}>
               <FileText size={28} style={{ color: colors.neutral300 }} />
               <p style={styles.emptyText}>등록된 매장용 상세설명서가 없습니다.</p>
               <p style={styles.emptySub}>
                 O4O 상품에 매장용 상세설명서가 등록되면 이 화면에서 바로 확인할 수 있습니다.
-                매장이 직접 작성하는 설명은 ‘콘텐츠 만들기’(매장 제작 콘텐츠)에서 별도로 생성·관리합니다.
               </p>
             </div>
           ) : (
             <>
-              {/* 언어/버전이 여러 개면 선택 탭 제공 */}
-              {items.length > 1 && (
-                <div style={styles.tabRow}>
-                  {items.map((it) => {
-                    const on = it.descriptionId === active?.descriptionId;
-                    return (
-                      <button
-                        key={it.descriptionId}
-                        type="button"
-                        onClick={() => setActiveId(it.descriptionId)}
-                        style={{ ...styles.tab, ...(on ? styles.tabOn : styles.tabOff) }}
-                      >
-                        {(it.language || 'ko').toUpperCase()}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
+              {/* 실제 존재하는 언어만 버튼으로 노출(한국어 우선). 선택 시 해당 언어 본문 표시. */}
+              <div style={styles.tabRow}>
+                {languages.map((l) => {
+                  const on = l === activeLang;
+                  return (
+                    <button
+                      key={l}
+                      type="button"
+                      onClick={() => setActiveLang(l)}
+                      style={{ ...styles.tab, ...(on ? styles.tabOn : styles.tabOff) }}
+                    >
+                      {langLabel(l)}
+                    </button>
+                  );
+                })}
+              </div>
 
               {active && (
                 <>
                   <div style={styles.metaRow}>
                     <span style={styles.badge}>매장용</span>
-                    <span style={styles.metaText}>{(active.language || 'ko').toUpperCase()}</span>
+                    <span style={styles.metaText}>{langLabel(normLang(active.language))}</span>
                     <span style={styles.metaText}>{formatDate(active.updatedAt)}</span>
                   </div>
                   {active.summary && <p style={styles.summary}>{active.summary}</p>}
@@ -157,7 +194,7 @@ const styles: Record<string, CSSProperties> = {
   emptyBox: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '44px 16px', textAlign: 'center' },
   emptyText: { margin: 0, fontSize: 14, fontWeight: 600, color: colors.neutral700 },
   emptySub: { margin: 0, fontSize: 12, lineHeight: 1.7, color: colors.neutral400, maxWidth: 420 },
-  tabRow: { display: 'flex', gap: 6, marginBottom: 12 },
+  tabRow: { display: 'flex', gap: 6, marginBottom: 12, flexWrap: 'wrap' },
   tab: { padding: '5px 12px', fontSize: 12, fontWeight: 600, borderRadius: 6, cursor: 'pointer' },
   tabOn: { background: colors.primary, color: '#fff', border: `1px solid ${colors.primary}` },
   tabOff: { background: colors.white, color: colors.neutral600, border: `1px solid ${colors.neutral300}` },

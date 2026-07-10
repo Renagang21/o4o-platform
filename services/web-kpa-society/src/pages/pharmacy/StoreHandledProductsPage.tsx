@@ -14,8 +14,8 @@
  */
 
 import { useEffect, useMemo, useState, useCallback, type CSSProperties } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Package, RefreshCw, Search, Boxes, PenSquare, Languages, X, Trash2, FileText, Loader2 } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
+import { Package, RefreshCw, Search, Boxes, X, Trash2, FileText, Loader2, QrCode } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { Pagination } from '@o4o/operator-ux-core';
 import { fetchHandledProducts, removeHandledProducts, type HandledProduct } from '../../api/handledProducts';
@@ -24,9 +24,11 @@ import { colors } from '../../styles/theme';
 import { LinkedContentsDrawer, type LinkedDrawerProduct } from './LinkedContentsDrawer';
 // WO-...-DESCRIPTION-USAGE-POLICY-FIX-V1: 매장용(STORE) 상세설명서 읽기 전용 조회
 import { StoreDescriptionViewModal, type StoreDescriptionProduct } from './StoreDescriptionViewModal';
+// WO-...-ACTIONS-AND-MULTILINGUAL-DESCRIPTION-V1: 이미 등록된 상품별 QR 출력(읽기 전용)
+import { StoreProductQrModal, type StoreProductQrTarget } from './StoreProductQrModal';
 // WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1: O4O 표준 상품 검색·선택·등록 모달
 import { AddO4oStandardProductModal } from './AddO4oStandardProductModal';
-// WO-O4O-PRODUCT-QR-CONTENT-FLOW-MINIMAL-V1: 상품별 다국어 QR 콘텐츠 진입 + 연결 상태 배지
+// WO-O4O-PRODUCT-QR-CONTENT-FLOW-MINIMAL-V1: 상품별 다국어 QR 콘텐츠 연결 상태 요약(배지)
 import { getMlcSummaryMap, type StoreMlcSummaryItem } from '../../api/multilingualProductContentStore';
 
 // WO-...-STANDARD-TABLE-V1: 페이지당 건수(20/50/100), 기본 20
@@ -73,7 +75,6 @@ function parsePage(v: string | null): number {
 }
 
 export default function StoreHandledProductsPage() {
-  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
   // ─── URL Query ↔ 상태 동기화(검색어 / 페이지 / 페이지당 건수) ────────────
@@ -151,10 +152,12 @@ export default function StoreHandledProductsPage() {
 
   const reload = useCallback(() => setReloadKey((k) => k + 1), []);
 
-  // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1: 연결 콘텐츠 보기 드로어 + 콘텐츠 만들기 진입
+  // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1: 연결 콘텐츠 보기 드로어(읽기 전용)
   const [drawerProduct, setDrawerProduct] = useState<LinkedDrawerProduct | null>(null);
   // WO-...-DESCRIPTION-USAGE-POLICY-FIX-V1: 매장용 상세설명서 보기(읽기 전용, listing 전용)
   const [descProduct, setDescProduct] = useState<StoreDescriptionProduct | null>(null);
+  // WO-...-ACTIONS-AND-MULTILINGUAL-DESCRIPTION-V1: 이미 등록된 상품별 QR 출력(읽기 전용)
+  const [qrTarget, setQrTarget] = useState<StoreProductQrTarget | null>(null);
   // WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1: O4O 표준 상품 검색·선택·등록 모달
   const [showAddO4oModal, setShowAddO4oModal] = useState(false);
   // WO-O4O-PRODUCT-QR-CONTENT-FLOW-MINIMAL-V1: 상품별 다국어 QR 콘텐츠 연결 상태 요약(배지). listing 전용.
@@ -179,22 +182,14 @@ export default function StoreHandledProductsPage() {
     [mlcListing],
   );
 
-  // 상품별 다국어 QR 콘텐츠 저작 화면으로 이동 (target = sourceType/sourceId, 상품명 프리필).
-  const goMultilingual = useCallback(
-    (p: { sourceType: HandledProduct['sourceType']; sourceId: string; name: string }) => {
-      const qs = new URLSearchParams({ name: p.name });
-      navigate(`/store/products/multilingual/${p.sourceType}/${p.sourceId}?${qs.toString()}`);
+  // WO-...-ACTIONS-AND-MULTILINGUAL-DESCRIPTION-V1: 상품 QR 출력 — 신규 작성 이동 없이 이미 등록된 QR 조회.
+  //   group 요약(mlcFor)에서 groupId/제공 언어를 넘긴다(없으면 groupId=null → 모달이 안내만).
+  const openProductQr = useCallback(
+    (it: HandledProduct) => {
+      const mlc = mlcFor(it);
+      setQrTarget({ name: it.name, groupId: mlc?.groupId ?? null, locales: mlc?.locales ?? [] });
     },
-    [navigate],
-  );
-
-  // 콘텐츠 만들기 — 기존 자료함 작성 화면으로 이동(URL 기반 전달 → 새로고침 안전).
-  const goCreateContent = useCallback(
-    (p: { sourceType: HandledProduct['sourceType']; sourceId: string; name: string }) => {
-      const qs = new URLSearchParams({ create: '1', pType: p.sourceType, pId: p.sourceId, pName: p.name });
-      navigate(`/store/library/contents?${qs.toString()}`);
-    },
-    [navigate],
+    [mlcFor],
   );
 
   const changePageSize = useCallback(
@@ -333,53 +328,25 @@ export default function StoreHandledProductsPage() {
           <div style={{ flex: 1 }} />
           {singleSelected && (
             <>
-              {/* WO-...-DESCRIPTION-USAGE-POLICY-FIX-V1: 복사 아님 — 매장용(STORE) 상세설명서 직접 조회. */}
+              {/* WO-...-DESCRIPTION-USAGE-POLICY-FIX-V1: 복사 아님 — 매장용(STORE) 상세설명서 다국어 조회(읽기 전용). */}
               <button
                 type="button"
                 onClick={() => setDescProduct({ listingId: singleSelected.sourceId, name: singleSelected.name })}
                 style={styles.importBtn}
               >
                 <FileText size={13} />
-                매장용 상세설명 보기
+                매장용 상세설명서 보기
               </button>
-              <button
-                type="button"
-                onClick={() =>
-                  goCreateContent({
-                    sourceType: singleSelected.sourceType,
-                    sourceId: singleSelected.sourceId,
-                    name: singleSelected.name,
-                  })
-                }
-                style={styles.createContentBtn}
-              >
-                <PenSquare size={13} />
-                콘텐츠 만들기
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  goMultilingual({
-                    sourceType: singleSelected.sourceType,
-                    sourceId: singleSelected.sourceId,
-                    name: singleSelected.name,
-                  })
-                }
-                style={styles.mlcBtn}
-              >
-                <Languages size={13} />
-                다국어 QR
+              {/* WO-...-ACTIONS-AND-MULTILINGUAL-DESCRIPTION-V1: '콘텐츠 만들기' 제거(콘텐츠 메뉴에서만).
+                  '다국어 QR'(신규 작성 이동) → '상품 QR 출력'(이미 등록된 QR 조회·출력). */}
+              <button type="button" onClick={() => openProductQr(singleSelected)} style={styles.mlcBtn}>
+                <QrCode size={13} />
+                상품 QR 출력
                 {(() => {
                   const mlc = mlcFor(singleSelected);
-                  return mlc ? (
-                    <span
-                      style={{
-                        ...styles.mlcDot,
-                        background: mlc.publishedLocaleCount > 0 ? '#DCFCE7' : '#FEF3C7',
-                        color: mlc.publishedLocaleCount > 0 ? '#16A34A' : '#D97706',
-                      }}
-                    >
-                      {mlc.publishedLocaleCount > 0 ? `${mlc.publishedLocaleCount}개 언어` : '초안'}
+                  return mlc && mlc.publishedLocaleCount > 0 ? (
+                    <span style={{ ...styles.mlcDot, background: '#DCFCE7', color: '#16A34A' }}>
+                      {`${mlc.publishedLocaleCount}개 언어`}
                     </span>
                   ) : null;
                 })()}
@@ -491,14 +458,11 @@ export default function StoreHandledProductsPage() {
 
       <Pagination page={page} totalPages={totalPages} onPageChange={changePage} total={total} />
 
-      {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1: 연결 콘텐츠 보기 드로어 */}
+      {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1: 연결 콘텐츠 보기 드로어(읽기/열기 전용, 신규 작성 없음) */}
       <LinkedContentsDrawer
         open={!!drawerProduct}
         product={drawerProduct}
         onClose={() => setDrawerProduct(null)}
-        onCreateNew={() => {
-          if (drawerProduct) goCreateContent(drawerProduct);
-        }}
       />
 
       {/* WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1: O4O 표준 상품 검색·선택·등록 모달 */}
@@ -508,11 +472,18 @@ export default function StoreHandledProductsPage() {
         onRegistered={reload}
       />
 
-      {/* WO-...-DESCRIPTION-USAGE-POLICY-FIX-V1: 매장용 상세설명서 보기(읽기 전용, 복사 아님) */}
+      {/* WO-...-DESCRIPTION-USAGE-POLICY-FIX-V1 / ACTIONS-AND-MULTILINGUAL-V1: 매장용 상세설명서 다국어 조회(읽기 전용) */}
       <StoreDescriptionViewModal
         open={!!descProduct}
         product={descProduct}
         onClose={() => setDescProduct(null)}
+      />
+
+      {/* WO-...-ACTIONS-AND-MULTILINGUAL-DESCRIPTION-V1: 이미 등록된 상품별 QR 출력(미리보기·다운로드·인쇄, 읽기 전용) */}
+      <StoreProductQrModal
+        open={!!qrTarget}
+        target={qrTarget}
+        onClose={() => setQrTarget(null)}
       />
 
       <p style={styles.footnote}>
@@ -563,7 +534,6 @@ const styles: Record<string, CSSProperties> = {
   badge: { display: 'inline-flex', alignItems: 'center', padding: '2px 8px', fontSize: '11px', fontWeight: 500, borderRadius: '999px', whiteSpace: 'nowrap' },
   checkbox: { width: 15, height: 15, cursor: 'pointer', accentColor: colors.primary },
   // WO-...-STANDARD-TABLE-V1: Selection ActionBar 액션 버튼
-  createContentBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '5px 12px', background: colors.white, border: `1px solid ${colors.primary}`, borderRadius: '6px', fontSize: '12px', color: colors.primary, cursor: 'pointer', whiteSpace: 'nowrap' },
   importBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '5px 12px', background: '#F0FDF4', border: '1px solid #86EFAC', borderRadius: '6px', fontSize: '12px', color: '#15803D', cursor: 'pointer', whiteSpace: 'nowrap' },
   mlcBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '5px 12px', background: '#F5F3FF', border: '1px solid #C4B5FD', borderRadius: '6px', fontSize: '12px', color: '#6D28D9', cursor: 'pointer', whiteSpace: 'nowrap' },
   mlcDot: { display: 'inline-flex', alignItems: 'center', padding: '1px 6px', fontSize: '10px', fontWeight: 600, borderRadius: '999px', whiteSpace: 'nowrap' },
