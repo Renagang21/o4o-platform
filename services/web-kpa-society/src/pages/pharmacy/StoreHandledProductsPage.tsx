@@ -5,7 +5,8 @@
  * 선행: IR-O4O-KPA-STORE-HANDLED-PRODUCTS-UNIFIED-VIEW-DESIGN-V1
  *
  * O4O 기반 제품(organization_product_listings) + 매장 경영활용 제품(store_local_products)을
- * 한 화면에서 조회한다. 직접 CRUD 하지 않고 원본 관리 화면(/my-products, /commerce/local-products)으로 이동.
+ * 한 화면에서 조회한다. 실제 작업(매장용 상세설명 보기 / 콘텐츠 만들기 / 다국어 QR / 매장 직접 등록)은
+ * 이 화면에서 직접 수행한다. (WO-...-DESCRIPTION-USAGE-POLICY-FIX-V1: '관리'→/store/my-products 진입점 제거)
  * 매장 경영활용 제품의 온라인몰 노출은 미지원(Display Domain). 라벨 정책: WO-...-TERM-CLARIFICATION-V1.
  *
  * WO-O4O-KPA-STORE-HANDLED-PRODUCTS-STANDARD-TABLE-V1:
@@ -14,19 +15,24 @@
  *   - 행별 + 전체 선택 체크박스, 선택 후 Selection ActionBar 로 다음 작업 제공
  *   - 기존 행별 작업 버튼(O4O 상세설명 가져오기 / 콘텐츠 만들기 / 다국어 QR)은 선택 기반 액션으로 이동
  *   - 여러 건 선택 시 실제 일괄 기능이 없으므로 '선택 해제'만 제공(임의 일괄 기능화 금지)
+ *
+ * WO-O4O-KPA-STORE-HANDLED-PRODUCT-DESCRIPTION-USAGE-POLICY-FIX-V1:
+ *   O4O 상품 정보를 매장으로 복사하지 않는다. '매장용 상세설명 보기'로 O4O 상품(master)에 등록된
+ *   매장용(STORE) 상세설명서를 읽기 전용으로 직접 조회한다(구 'O4O 상세설명 가져오기=복사' 폐기).
  */
 
 import { useEffect, useMemo, useState, useCallback, type CSSProperties } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Package, RefreshCw, Search, ExternalLink, Boxes, Plus, PenSquare, Languages, X } from 'lucide-react';
+import { Package, RefreshCw, Search, Boxes, Plus, PenSquare, Languages, X } from 'lucide-react';
 import { Pagination } from '@o4o/operator-ux-core';
 import { fetchHandledProducts, type HandledProduct } from '../../api/handledProducts';
 import { colors } from '../../styles/theme';
 // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1: 연결 콘텐츠 보기 드로어
 import { LinkedContentsDrawer, type LinkedDrawerProduct } from './LinkedContentsDrawer';
-// WO-O4O-KPA-O4O-B2C-DESCRIPTION-COPY-TO-STORE-CONTENT-V1: O4O 상세설명 가져오기(listing 전용)
-import { ImportB2cDescriptionModal, type ImportB2cProduct } from './ImportB2cDescriptionModal';
-import { FileDown } from 'lucide-react';
+// WO-O4O-KPA-STORE-HANDLED-PRODUCT-DESCRIPTION-USAGE-POLICY-FIX-V1:
+//   O4O 상품 정보를 매장으로 복사하지 않고, 매장용(STORE) 상세설명서를 직접 조회·표시(읽기 전용).
+import { StoreDescriptionViewModal, type StoreDescriptionProduct } from './StoreDescriptionViewModal';
+import { FileText } from 'lucide-react';
 // WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1: O4O 표준 상품 검색·선택·등록 모달
 import { AddO4oStandardProductModal } from './AddO4oStandardProductModal';
 // WO-O4O-PRODUCT-QR-CONTENT-FLOW-MINIMAL-V1: 상품별 다국어 QR 콘텐츠 진입 + 연결 상태 배지
@@ -177,8 +183,8 @@ export default function StoreHandledProductsPage() {
 
   // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1: 연결 콘텐츠 보기 드로어 + 콘텐츠 만들기 진입
   const [drawerProduct, setDrawerProduct] = useState<LinkedDrawerProduct | null>(null);
-  // WO-O4O-KPA-O4O-B2C-DESCRIPTION-COPY-TO-STORE-CONTENT-V1: O4O 상세설명 가져오기 모달(listing 전용)
-  const [importProduct, setImportProduct] = useState<ImportB2cProduct | null>(null);
+  // WO-O4O-KPA-STORE-HANDLED-PRODUCT-DESCRIPTION-USAGE-POLICY-FIX-V1: 매장용 상세설명서 보기(읽기 전용, listing 전용)
+  const [descProduct, setDescProduct] = useState<StoreDescriptionProduct | null>(null);
   // WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1: O4O 표준 상품 검색·선택·등록 모달
   const [showAddO4oModal, setShowAddO4oModal] = useState(false);
   // WO-O4O-PRODUCT-QR-CONTENT-FLOW-MINIMAL-V1: 상품별 다국어 QR 콘텐츠 연결 상태 요약(배지). listing/local 각각.
@@ -364,15 +370,16 @@ export default function StoreHandledProductsPage() {
           <div style={{ flex: 1 }} />
           {singleSelected && (
             <>
-              {/* O4O 상세설명 가져오기 — O4O 기반 제품(listing)만 사용 가능 → 그 외에는 숨김 */}
+              {/* WO-...-DESCRIPTION-USAGE-POLICY-FIX-V1: 복사 아님 — 매장용(STORE) 상세설명서 직접 조회.
+                  O4O 기반 제품(listing)만 사용 가능 → 그 외에는 숨김 */}
               {singleSelected.sourceType === 'listing' && (
                 <button
                   type="button"
-                  onClick={() => setImportProduct({ listingId: singleSelected.sourceId, name: singleSelected.name })}
+                  onClick={() => setDescProduct({ listingId: singleSelected.sourceId, name: singleSelected.name })}
                   style={styles.importBtn}
                 >
-                  <FileDown size={13} />
-                  O4O 상세설명 가져오기
+                  <FileText size={13} />
+                  매장용 상세설명 보기
                 </button>
               )}
               <button
@@ -417,10 +424,8 @@ export default function StoreHandledProductsPage() {
                   ) : null;
                 })()}
               </button>
-              <button type="button" onClick={() => navigate(singleSelected.managePath)} style={styles.manageBtn}>
-                관리
-                <ExternalLink size={12} />
-              </button>
+              {/* WO-...-DESCRIPTION-USAGE-POLICY-FIX-V1: '관리'(→/store/my-products) 진입점 제거.
+                  현재 목록과 목적이 겹치는 별도 O4O listing 관리 화면으로의 이동을 없앤다. */}
             </>
           )}
           <button type="button" onClick={clearSelection} style={styles.clearBtn}>
@@ -450,21 +455,20 @@ export default function StoreHandledProductsPage() {
               <th style={styles.th}>연결 콘텐츠</th>
               <th style={styles.th}>상태</th>
               <th style={styles.th}>최근 수정일</th>
-              <th style={styles.th}>관리</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={8} style={styles.empty}>불러오는 중…</td>
+                <td colSpan={7} style={styles.empty}>불러오는 중…</td>
               </tr>
             ) : error ? (
               <tr>
-                <td colSpan={8} style={{ ...styles.empty, color: '#DC2626' }}>{error}</td>
+                <td colSpan={7} style={{ ...styles.empty, color: '#DC2626' }}>{error}</td>
               </tr>
             ) : items.length === 0 ? (
               <tr>
-                <td colSpan={8} style={styles.empty}>{searchQuery ? '검색 결과가 없습니다' : EMPTY_BY_SOURCE[source]}</td>
+                <td colSpan={7} style={styles.empty}>{searchQuery ? '검색 결과가 없습니다' : EMPTY_BY_SOURCE[source]}</td>
               </tr>
             ) : (
               items.map((it) => {
@@ -517,19 +521,8 @@ export default function StoreHandledProductsPage() {
                       <Badge text={it.statusLabel} tone={it.isActive ? 'green' : 'gray'} />
                     </td>
                     <td style={styles.td}>{formatDate(it.updatedAt)}</td>
-                    <td style={styles.td}>
-                      {/* WO-...-STANDARD-TABLE-V1: 행별 작업 버튼은 Selection ActionBar 로 이동.
-                          관리 컬럼은 원본 관리 화면 바로가기만 유지. */}
-                      <button
-                        type="button"
-                        onClick={() => navigate(it.managePath)}
-                        style={styles.manageBtn}
-                        aria-label="원본 관리 화면으로 이동"
-                      >
-                        관리
-                        <ExternalLink size={12} />
-                      </button>
-                    </td>
+                    {/* WO-...-DESCRIPTION-USAGE-POLICY-FIX-V1: '관리' 컬럼 제거.
+                        실제 작업(매장용 상세설명 보기 / 콘텐츠 만들기 / 다국어 QR)은 선택 후 ActionBar 에서 수행. */}
                   </tr>
                 );
               })
@@ -557,15 +550,11 @@ export default function StoreHandledProductsPage() {
         onRegistered={reload}
       />
 
-      {/* WO-O4O-KPA-O4O-B2C-DESCRIPTION-COPY-TO-STORE-CONTENT-V1: O4O 상세설명 가져오기 모달 */}
-      <ImportB2cDescriptionModal
-        open={!!importProduct}
-        product={importProduct}
-        onClose={() => setImportProduct(null)}
-        onImported={reload}
-        onViewLinked={() => {
-          if (importProduct) setDrawerProduct({ sourceType: 'listing', sourceId: importProduct.listingId, name: importProduct.name });
-        }}
+      {/* WO-O4O-KPA-STORE-HANDLED-PRODUCT-DESCRIPTION-USAGE-POLICY-FIX-V1: 매장용 상세설명서 보기(읽기 전용, 복사 아님) */}
+      <StoreDescriptionViewModal
+        open={!!descProduct}
+        product={descProduct}
+        onClose={() => setDescProduct(null)}
       />
 
       <p style={styles.footnote}>
@@ -620,7 +609,6 @@ const styles: Record<string, CSSProperties> = {
   productName: { fontSize: '14px', fontWeight: 500, color: colors.neutral800, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
   badge: { display: 'inline-flex', alignItems: 'center', padding: '2px 8px', fontSize: '11px', fontWeight: 500, borderRadius: '999px', whiteSpace: 'nowrap' },
   checkbox: { width: 15, height: 15, cursor: 'pointer', accentColor: colors.primary },
-  manageBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 10px', background: colors.white, border: `1px solid ${colors.neutral300}`, borderRadius: '6px', fontSize: '12px', color: colors.neutral700, cursor: 'pointer' },
   // WO-...-STANDARD-TABLE-V1: Selection ActionBar 액션 버튼(기존 행별 버튼 스타일 재사용)
   createContentBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '5px 12px', background: colors.white, border: `1px solid ${colors.primary}`, borderRadius: '6px', fontSize: '12px', color: colors.primary, cursor: 'pointer', whiteSpace: 'nowrap' },
   importBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '5px 12px', background: '#F0FDF4', border: '1px solid #86EFAC', borderRadius: '6px', fontSize: '12px', color: '#15803D', cursor: 'pointer', whiteSpace: 'nowrap' },

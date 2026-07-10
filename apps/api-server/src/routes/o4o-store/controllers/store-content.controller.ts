@@ -477,9 +477,12 @@ export function createStoreContentController(
           res.json({ success: true, data: { items: [] } });
           return;
         }
-        const rows: Array<{ id: string; summary: string | null; language: string | null; status: string; updated_at: Date; product_name: string | null }> =
+        // WO-O4O-KPA-STORE-HANDLED-PRODUCT-DESCRIPTION-USAGE-POLICY-FIX-V1:
+        //   정책 변경 — 매장으로 복사하지 않고 매장용(STORE) 상세설명서를 매장 화면에서 직접 조회·표시한다.
+        //   따라서 목록 조회에 본문(content HTML)을 함께 반환한다(additive, 읽기 전용 뷰어용).
+        const rows: Array<{ id: string; content: string | null; summary: string | null; language: string | null; status: string; updated_at: Date; product_name: string | null }> =
           await dataSource.query(
-            `SELECT spd.id, spd.summary, spd.language, spd.status, spd.updated_at, pm.name AS product_name
+            `SELECT spd.id, spd.content, spd.summary, spd.language, spd.status, spd.updated_at, pm.name AS product_name
              FROM shared_product_descriptions spd
              JOIN product_masters pm ON pm.id = spd.master_id
              WHERE spd.master_id = $1 AND spd.status = 'canonical' AND spd.description_type = 'STORE' AND spd.deleted_at IS NULL
@@ -492,10 +495,12 @@ export function createStoreContentController(
             items: rows.map((r) => ({
               descriptionId: r.id,
               // 제목 필드가 없으므로 제품명을 사용자 표시 제목으로 사용.
-              title: r.product_name || 'O4O 상세설명',
+              title: r.product_name || '매장용 상세설명서',
               language: r.language || 'ko',
               status: r.status,
               summary: r.summary,
+              // 읽기 전용 뷰어 표시용 본문. null 방어는 클라이언트에서 처리.
+              contentHtml: r.content || null,
               updatedAt: r.updated_at,
             })),
           },

@@ -347,40 +347,29 @@ export const handledProductContentApi = {
     ),
 };
 
-// ─── O4O B2C 상세설명 가져오기 (WO-O4O-KPA-O4O-B2C-DESCRIPTION-COPY-TO-STORE-CONTENT-V1) ──
+// ─── O4O 매장용(STORE) 상세설명서 직접 조회 ──
+// WO-O4O-KPA-STORE-HANDLED-PRODUCT-DESCRIPTION-USAGE-POLICY-FIX-V1:
+//   정책 변경 — O4O 상품 정보를 매장으로 복사하지 않고, O4O 상품(master)에 등록된 매장용(STORE)
+//   상세설명서를 매장 화면에서 직접 조회·표시한다(읽기 전용). 기존 '가져오기=복사'(import) 폐기.
 
-export interface B2cDescriptionItem {
+export interface StoreDescriptionItem {
   descriptionId: string;
   /** 제목 필드 없음 → 제품명 표시 */
   title: string;
   language: string;
   status: string;
   summary: string | null;
+  /** 읽기 전용 표시용 본문(HTML). 없을 수 있음 → 클라이언트 null 방어. */
+  contentHtml: string | null;
   updatedAt: string;
 }
 
-export interface ImportedB2cContent {
-  id: string;
-  sourceType: 'direct';
-  title: string;
-  status: string;
-  masterId: string;
-  updatedAt: string;
-}
-
-export const b2cDescriptionApi = {
-  /** listing(=master)에 가져올 수 있는 canonical B2C 상세설명 목록 */
+export const storeDescriptionApi = {
+  /** listing(=master)에 등록된 canonical 매장용(STORE) 상세설명서 목록(본문 포함, 읽기 전용) */
   list: (listingId: string) =>
-    apiClient.get<{ success: boolean; data: { items: B2cDescriptionItem[] } }>(
+    apiClient.get<{ success: boolean; data: { items: StoreDescriptionItem[] } }>(
       '/store-contents/b2c-descriptions',
       { listingId },
-    ),
-
-  /** 가져오기=복사 — 독립 direct 콘텐츠 + product_description 링크 생성 */
-  import: (listingId: string, descriptionId: string) =>
-    apiClient.post<{ success: boolean; data: ImportedB2cContent }>(
-      '/store-contents/import-b2c-description',
-      { listingId, descriptionId },
     ),
 };
 
