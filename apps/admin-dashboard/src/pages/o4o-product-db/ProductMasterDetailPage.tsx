@@ -4,17 +4,20 @@
  * WO-O4O-ADMIN-O4O-PRODUCT-MASTER-DETAIL-GET-ENRICHMENT-V1
  * (기반: WO-O4O-ADMIN-O4O-PRODUCT-MANAGEMENT-BASE-CONSOLE-V1 / ...-READONLY-SKELETON-V1)
  *
- * 상품 관리 콘솔의 중심 화면. GET-only 이며 어떤 mutation 버튼도 두지 않는다.
+ * 상품 관리 콘솔의 중심 화면. 상품 정보 관리(정보·식별자·이미지·설명)와 운영 기록(관리 메모·작업 이력)에 집중한다.
  * 상세 API(GET /neture/products/library/:id)가 additive 로 제공하는 enrichment
- * (identifiers / descriptions / sourceLinks / usageSummary)를 read-only 로 표시한다.
- * 관리 메모 / 작업 이력은 후속 write/audit WO 자리로 placeholder 유지.
+ * (identifiers / descriptions / sourceLinks)를 read-only 로 표시한다.
+ *
+ * WO-O4O-ADMIN-PRODUCT-MASTER-CONSOLE-SIMPLIFICATION-V1:
+ *   관리자 책임 범위 밖인 사용 상태·활용 연결(usage-links)·연결 수 표시 제거,
+ *   비활성 QR placeholder·dead code 제거. 실제 동작하는 ProductQrSection·관리 메모·작업 이력은 유지.
  */
 
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ImagePlus } from 'lucide-react';
 import {
-  getProductMaster, ProductMasterDetail, ProductDescriptionSummary, getProductUsageLinks, ProductUsageLinks,
+  getProductMaster, ProductMasterDetail, ProductDescriptionSummary,
   listProductMasterNotes, addProductMasterNote, deleteProductMasterNote, ProductMasterNote,
   getProductMasterAuditLog, ProductMasterAuditLog,
   uploadProductMasterImage, setProductMasterPrimaryImage,
@@ -26,7 +29,6 @@ export default function ProductMasterDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [row, setRow] = useState<ProductMasterDetail | null>(null);
-  const [usage, setUsage] = useState<ProductUsageLinks | null>(null);
   const [notes, setNotes] = useState<ProductMasterNote[]>([]);
   const [audit, setAudit] = useState<ProductMasterAuditLog | null>(null);
   const [noteText, setNoteText] = useState('');
@@ -173,8 +175,6 @@ export default function ProductMasterDetailPage() {
         if (alive) setLoading(false);
       }
     })();
-    // 활용 연결(별도 read-only GET) — 실패해도 상세 렌더에 영향 없음
-    getProductUsageLinks(id).then((u) => { if (alive) setUsage(u); }).catch(() => { if (alive) setUsage(null); });
     // 내부 운영 메모(별도 GET)
     listProductMasterNotes(id).then((n) => { if (alive) setNotes(n); }).catch(() => { if (alive) setNotes([]); });
     // 작업 이력(별도 GET)
@@ -383,7 +383,6 @@ export default function ProductMasterDetailPage() {
                   <span className="text-xs text-gray-500">설명서 상태</span>
                   {pill('KO', ko)}
                   {pill('ZH', zh)}
-                  <span className="ml-auto inline-block px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-400 text-xs">QR 연결 · 후속 WO</span>
                 </div>
               );
             })()}
@@ -408,7 +407,7 @@ export default function ProductMasterDetailPage() {
               <div className="text-sm text-gray-400">표시할 설명 데이터가 없습니다.</div>
             )}
             <div className="text-xs text-gray-400 mt-2">
-              설명은 정부/공공 원문 기반 자료이며, 매장 활용 후 피드백에 따라 수정됩니다. QR 연결은 후속 WO 범위입니다.
+              설명은 정부/공공 원문 기반 자료이며, 매장 활용 후 피드백에 따라 수정됩니다.
             </div>
           </PanelSection>
 
@@ -446,50 +445,6 @@ export default function ProductMasterDetailPage() {
             ) : (
               <div className="text-sm text-gray-400">연결된 원천 후보가 없습니다.</div>
             )}
-          </PanelSection>
-
-          {/* 사용 상태 — 활용 연결 조회 (read-only) */}
-          <PanelSection title="사용 상태">
-            <div className="grid grid-cols-3 gap-3">
-              <UsageCard label="조직 상품 연결 (organization listing)" value={usage?.summary.organizationListingCount ?? row.usageSummary?.organizationListingCount ?? 0} />
-              <UsageCard label="매장 취급 상품 (store local · barcode)" value={usage?.summary.storeLocalProductCount ?? row.usageSummary?.storeLocalProductCount ?? 0} />
-              <UsageCard label="자료함 콘텐츠 연결 (QR·태블릿·POP·블로그)" value={usage?.summary.contentLinkCount ?? 0} />
-            </div>
-
-            {/* 조직 상품 연결 목록 */}
-            <UsageList title="조직 상품 연결" empty="이 상품을 취급하는 조직 상품 연결이 아직 없습니다.">
-              {usage?.organizationListings.map((o) => (
-                <UsageRow key={o.id}
-                  main={o.organizationName || o.organizationId}
-                  meta={[o.serviceKey, statusLabel(o.status), o.sourceType, o.price != null ? `${o.price.toLocaleString()}원` : null]}
-                  date={o.updatedAt} />
-              ))}
-            </UsageList>
-
-            {/* 매장 취급 상품 목록 */}
-            <UsageList title="매장 취급 상품 (barcode 기준 loose 연결)" empty="이 바코드로 등록된 매장 경영활용 제품이 아직 없습니다.">
-              {usage?.storeLocalProducts.map((s) => (
-                <UsageRow key={s.id}
-                  main={s.displayName || s.id}
-                  meta={[s.organizationName || s.organizationId, s.isActive == null ? null : (s.isActive ? '노출' : '숨김'), s.price != null ? `${s.price.toLocaleString()}원` : null]}
-                  date={s.updatedAt} />
-              ))}
-            </UsageList>
-
-            {/* 자료함 콘텐츠 연결 목록 */}
-            <UsageList title="자료함 콘텐츠 연결" empty="이 상품을 참조하는 자료함 콘텐츠(QR/태블릿/POP/블로그)가 아직 없습니다.">
-              {usage?.contentLinks.map((c) => (
-                <UsageRow key={c.linkId}
-                  main={c.title || c.contentId}
-                  meta={[c.productSourceType === 'listing' ? '조직상품' : '매장제품', c.contentSourceType, workspaceLabel(c.workspaceStatus), c.shareStatus]}
-                  date={c.updatedAt} />
-              ))}
-            </UsageList>
-
-            <div className="text-xs text-gray-400 mt-3">
-              조회 전용입니다 — 연결 생성/해제·주문 가능 상품 전환은 이 화면에서 제공하지 않습니다.
-              QR/태블릿은 자료함 콘텐츠를 참조하는 downstream이며, 상품 직접 매핑은 콘텐츠 연결로 표현됩니다.
-            </div>
           </PanelSection>
 
           {/* 관리 메모 — 내부 운영 메모(append + soft delete). ProductMaster 본문 무변경 */}
@@ -612,61 +567,11 @@ function Field({ label, value }: { label: string; value: string | null | undefin
   );
 }
 
-/** 후속 기능/후속 API 자리 표시 (write 아님) */
-function FollowupNote({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="text-xs text-gray-400 border border-dashed border-gray-200 rounded px-3 py-2 bg-gray-50/50">
-      {children}
-    </div>
-  );
-}
-
 function ThMini({ children }: { children: React.ReactNode }) {
   return <th className="px-3 py-2 text-left font-semibold text-gray-500 whitespace-nowrap">{children}</th>;
 }
 function TdMini({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return <td className={`px-3 py-2 align-top whitespace-nowrap ${className}`}>{children}</td>;
-}
-
-function UsageCard({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="border border-gray-200 rounded-lg p-4">
-      <div className="text-2xl font-bold text-gray-900">{value.toLocaleString()}</div>
-      <div className="text-xs text-gray-500 mt-1">{label}</div>
-    </div>
-  );
-}
-
-/** 활용 연결 목록 — children(UsageRow[])이 없으면 empty state 표시 */
-function UsageList({ title, empty, children }: { title: string; empty: string; children?: React.ReactNode }) {
-  const hasRows = Array.isArray(children) ? children.filter(Boolean).length > 0 : !!children;
-  return (
-    <div className="mt-4">
-      <div className="text-xs font-semibold text-gray-500 mb-1">{title}</div>
-      {hasRows ? (
-        <div className="border border-gray-200 rounded-lg divide-y divide-gray-100">{children}</div>
-      ) : (
-        <div className="border border-dashed border-gray-200 rounded-lg px-3 py-4 text-xs text-gray-400">{empty}</div>
-      )}
-    </div>
-  );
-}
-
-function UsageRow({ main, meta, date }: { main: string; meta: (string | null | undefined)[]; date: string | null }) {
-  const chips = meta.filter((m): m is string => !!m);
-  return (
-    <div className="flex items-center justify-between px-3 py-2 text-sm">
-      <div className="min-w-0">
-        <div className="font-medium text-gray-800 truncate">{main}</div>
-        {chips.length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-0.5">
-            {chips.map((c, i) => <span key={i} className="px-1.5 py-0.5 rounded bg-gray-100 text-gray-600 text-xs">{c}</span>)}
-          </div>
-        )}
-      </div>
-      <div className="text-xs text-gray-400 shrink-0 ml-3">{date?.slice(0, 10) || '—'}</div>
-    </div>
-  );
 }
 
 /** 이미지 배열 → 3상태 배지(대표 있음 / 대표 없음 / 없음) */
@@ -752,17 +657,6 @@ const AUDIT_ACTION_LABEL: Record<string, { label: string; cls: string }> = {
 function AuditActionBadge({ action }: { action: string }) {
   const m = AUDIT_ACTION_LABEL[action] ?? { label: action, cls: 'bg-gray-100 text-gray-600' };
   return <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${m.cls}`}>{m.label}</span>;
-}
-
-function statusLabel(v: string | null): string | null {
-  if (!v) return null;
-  const m: Record<string, string> = { pending: '대기', approved: '승인', active: '활성', rejected: '반려', cancelled: '취소', ended: '종료' };
-  return m[v] ?? v;
-}
-function workspaceLabel(v: string | null): string | null {
-  if (!v) return null;
-  const m: Record<string, string> = { draft: '초안', pending_ai: 'AI대기', ai_processed: 'AI처리', ready_curation: '큐레이션대기', archived: '보관' };
-  return m[v] ?? v;
 }
 
 const DESCRIPTION_STATUS_TONE: Record<string, string> = {

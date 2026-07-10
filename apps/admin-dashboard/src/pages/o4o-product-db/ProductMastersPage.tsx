@@ -2,7 +2,8 @@
  * ProductMastersPage — 기본 상품 목록/검색 (read-only)
  *
  * WO-O4O-ADMIN-PUBLIC-PRODUCT-DB-READONLY-SKELETON-V1
- * WO-O4O-ADMIN-O4O-PRODUCT-STANDARD-LIST-PATTERN-V1 — BaseTable + O4OColumn + RowActionMenu + ActionBar + URL sync
+ * WO-O4O-ADMIN-O4O-PRODUCT-STANDARD-LIST-PATTERN-V1 — BaseTable + O4OColumn + RowActionMenu + URL sync
+ * WO-O4O-ADMIN-PRODUCT-MASTER-CONSOLE-SIMPLIFICATION-V1 — dead 선택 UI/빈 ActionBar/비활성 QR 메뉴 제거
  * WO-O4O-ADMIN-PRODUCT-MASTER-TABLE-PERFORMANCE-V1 — 체감 속도 개선
  *   "목록은 가볍게, 상세는 따로, 다음 페이지만 미리":
  *   - 목록 응답은 이미 테이블 필드만(경량). 상세는 행 클릭 시 별도 /masters/:id 로 이동(목록 재조회 없음).
@@ -11,14 +12,14 @@
  *   - 로딩 UX: 최초 skeleton, 페이지 이동 시 기존 데이터 유지 + 상단 얇은 로딩바(비블로킹).
  *   - 검색어/페이지 크기 변경 시 캐시 초기화.
  *
- * 관리 콘솔 컬럼: 선택/이미지/상품명/공식명/제조사/브랜드/분류/규격/바코드/이미지 상태/액션.
+ * 관리 콘솔 컬럼: 이미지/상품명/공식명/제조사/브랜드/분류/규격/바코드/이미지 상태/설명서/액션.
  * mutation 없음 (GET-only).
  */
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Search, Eye, Plus } from 'lucide-react';
-import { BaseTable, RowActionMenu, ActionBar } from '@o4o/ui';
+import { BaseTable, RowActionMenu } from '@o4o/ui';
 import type { O4OColumn } from '@o4o/ui';
 import {
   listProductMasters,
@@ -59,7 +60,6 @@ export default function ProductMastersPage() {
   const [hardLoading, setHardLoading] = useState(true);   // 표시할 데이터 없음 → skeleton
   const [softLoading, setSoftLoading] = useState(false);  // 기존 데이터 유지한 채 갱신 중
   const [error, setError] = useState<string | null>(null);
-  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   // WO-O4O-PRODUCT-LIST-DESCRIPTION-QR-ACTIONS-V1: masterId → 설명서(KO/ZH)/QR 상태 요약 (read-only)
   const [descQrMap, setDescQrMap] = useState<Record<string, ProductDescriptionQrSummary>>({});
 
@@ -154,7 +154,6 @@ export default function ProductMastersPage() {
       setQ((prev) => {
         if (prev === t) return prev;
         setPage(1);
-        setSelectedKeys(new Set());
         return t;
       });
     }, SEARCH_DEBOUNCE_MS);
@@ -173,41 +172,16 @@ export default function ProductMastersPage() {
   const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const t = term.trim();
-    setSelectedKeys(new Set());
     setPage(1);
     setQ(t);
   };
 
   const changeLimit = (n: number) => {
-    setSelectedKeys(new Set());
     setPage(1);
     setLimit(n);
   };
 
-  const toggleSelect = (id: string, checked: boolean) => {
-    const next = new Set(selectedKeys);
-    if (checked) next.add(id); else next.delete(id);
-    setSelectedKeys(next);
-  };
-
   const columns: O4OColumn<ProductMasterRow>[] = [
-    {
-      key: '_select',
-      system: true,
-      header: '',
-      width: 40,
-      align: 'center',
-      render: (_, r) => (
-        <input
-          type="checkbox"
-          checked={selectedKeys.has(r.id)}
-          onChange={(e) => toggleSelect(r.id, e.target.checked)}
-          onClick={(e) => e.stopPropagation()}
-          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-        />
-      ),
-      onCellClick: () => {},
-    },
     {
       key: 'primaryImageUrl',
       header: '이미지',
@@ -269,9 +243,6 @@ export default function ProductMastersPage() {
             actions={[
               // 설명은 상세 화면에서 확인한다(설명서 검토 워크플로우 제거, WO-...-DESCRIPTION-REVIEW-REMOVE-V1).
               { key: 'view', label: '상세 보기', icon: <Eye size={14} />, onClick: () => navigate(r.id) },
-              // QR 연결/생성은 admin QR 화면·master↔QR 매핑 부재로 이번 WO 범위 밖(자리만).
-              // 실제 연결은 WO-O4O-PRODUCT-UNIT-MULTILINGUAL-DESCRIPTION-QR-LINK-V1.
-              { key: 'qr', label: 'QR 연결 (후속 WO)', disabled: true, onClick: () => {} },
             ]}
           />
         );
@@ -299,7 +270,7 @@ export default function ProductMastersPage() {
           {q && (
             <button
               type="button"
-              onClick={() => { setTerm(''); setQ(''); setPage(1); setSelectedKeys(new Set()); }}
+              onClick={() => { setTerm(''); setQ(''); setPage(1); }}
               className="text-sm text-gray-500 hover:text-gray-700 px-2"
             >초기화</button>
           )}
@@ -337,18 +308,6 @@ export default function ProductMastersPage() {
         </div>
       )}
 
-      {/* 선택 시 일괄 작업 바 (구조 확립 — write 액션은 후속 WO) */}
-      {selectedKeys.size > 0 && (
-        <div className="mb-3">
-          <ActionBar
-            selectedCount={selectedKeys.size}
-            onClearSelection={() => setSelectedKeys(new Set())}
-            statusInfo="선택 항목에 대한 일괄 작업은 후속 WO에서 제공됩니다."
-            actions={[]}
-          />
-        </div>
-      )}
-
       <div className="bg-white border border-gray-200 rounded-lg overflow-hidden relative">
         {/* 비블로킹 로딩바 — 기존 데이터 유지한 채 갱신 중 */}
         {softLoading && (
@@ -366,9 +325,6 @@ export default function ProductMastersPage() {
             rowKey={(r) => r.id}
             onRowClick={(r) => navigate(r.id)}
             emptyMessage="아직 표시할 데이터가 없습니다"
-            selectable
-            selectedKeys={selectedKeys}
-            onSelectionChange={setSelectedKeys}
             tableId="o4o-product-masters"
             columnVisibility
             persistState
