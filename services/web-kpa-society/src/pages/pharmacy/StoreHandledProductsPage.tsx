@@ -1,60 +1,41 @@
 /**
- * StoreHandledProductsPage — 매장 경영활용 제품 (통합 조회, 읽기 전용)
+ * StoreHandledProductsPage — 매장 경영활용 제품 (O4O 기반 제품, 읽기 조회 + 경영활용 정리)
  *
- * WO-O4O-KPA-STORE-HANDLED-PRODUCTS-UNIFIED-VIEW-V1
- * 선행: IR-O4O-KPA-STORE-HANDLED-PRODUCTS-UNIFIED-VIEW-DESIGN-V1
- *
- * O4O 기반 제품(organization_product_listings) + 매장 경영활용 제품(store_local_products)을
- * 한 화면에서 조회한다. 실제 작업(매장용 상세설명 보기 / 콘텐츠 만들기 / 다국어 QR / 매장 직접 등록)은
- * 이 화면에서 직접 수행한다. (WO-...-DESCRIPTION-USAGE-POLICY-FIX-V1: '관리'→/store/my-products 진입점 제거)
- * 매장 경영활용 제품의 온라인몰 노출은 미지원(Display Domain). 라벨 정책: WO-...-TERM-CLARIFICATION-V1.
- *
- * WO-O4O-KPA-STORE-HANDLED-PRODUCTS-STANDARD-TABLE-V1:
- *   O4O 표준 목록 UX(Toolbar + DataTable + Pagination)로 전환.
- *   - 탭/검색어/페이지/페이지당 건수를 URL Query와 동기화
- *   - 행별 + 전체 선택 체크박스, 선택 후 Selection ActionBar 로 다음 작업 제공
- *   - 기존 행별 작업 버튼(O4O 상세설명 가져오기 / 콘텐츠 만들기 / 다국어 QR)은 선택 기반 액션으로 이동
- *   - 여러 건 선택 시 실제 일괄 기능이 없으므로 '선택 해제'만 제공(임의 일괄 기능화 금지)
- *
+ * WO-O4O-KPA-STORE-HANDLED-PRODUCTS-UNIFIED-VIEW-V1 (선행)
+ * WO-O4O-KPA-STORE-HANDLED-PRODUCTS-STANDARD-TABLE-V1: 표준 목록 UX(Toolbar+DataTable+Pagination)
  * WO-O4O-KPA-STORE-HANDLED-PRODUCT-DESCRIPTION-USAGE-POLICY-FIX-V1:
- *   O4O 상품 정보를 매장으로 복사하지 않는다. '매장용 상세설명 보기'로 O4O 상품(master)에 등록된
- *   매장용(STORE) 상세설명서를 읽기 전용으로 직접 조회한다(구 'O4O 상세설명 가져오기=복사' 폐기).
+ *   O4O 상품 정보를 매장으로 복사하지 않고, 매장용(STORE) 상세설명서를 읽기 전용 직접 조회.
+ *
+ * WO-O4O-KPA-STORE-HANDLED-PRODUCT-REMOVE-AND-STATUS-AUDIT-V1:
+ *   - '매장 경영활용에서 제거' 액션 추가(1건/다건). 상품 정보 삭제가 아니라 매장↔제품 경영활용 연결 해제.
+ *   - '매장 직접 등록'(store_local_products) 정책 폐기 → 등록 버튼·로컬 탭 제거. 목록은 O4O 기반 제품만.
+ *   - '승인 대기'(opl.status DEFAULT 'pending') = 유통 승인(Neture Distribution) 잔재. 이 화면엔 승인 절차
+ *     없음(등록 즉시 is_active=true) → 상태 컬럼/승인 대기 표시 제거.
  */
 
 import { useEffect, useMemo, useState, useCallback, type CSSProperties } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Package, RefreshCw, Search, Boxes, Plus, PenSquare, Languages, X } from 'lucide-react';
+import { Package, RefreshCw, Search, Boxes, PenSquare, Languages, X, Trash2, FileText, Loader2 } from 'lucide-react';
+import { toast } from '@o4o/error-handling';
 import { Pagination } from '@o4o/operator-ux-core';
-import { fetchHandledProducts, type HandledProduct } from '../../api/handledProducts';
+import { fetchHandledProducts, removeHandledProducts, type HandledProduct } from '../../api/handledProducts';
 import { colors } from '../../styles/theme';
 // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1: 연결 콘텐츠 보기 드로어
 import { LinkedContentsDrawer, type LinkedDrawerProduct } from './LinkedContentsDrawer';
-// WO-O4O-KPA-STORE-HANDLED-PRODUCT-DESCRIPTION-USAGE-POLICY-FIX-V1:
-//   O4O 상품 정보를 매장으로 복사하지 않고, 매장용(STORE) 상세설명서를 직접 조회·표시(읽기 전용).
+// WO-...-DESCRIPTION-USAGE-POLICY-FIX-V1: 매장용(STORE) 상세설명서 읽기 전용 조회
 import { StoreDescriptionViewModal, type StoreDescriptionProduct } from './StoreDescriptionViewModal';
-import { FileText } from 'lucide-react';
 // WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1: O4O 표준 상품 검색·선택·등록 모달
 import { AddO4oStandardProductModal } from './AddO4oStandardProductModal';
 // WO-O4O-PRODUCT-QR-CONTENT-FLOW-MINIMAL-V1: 상품별 다국어 QR 콘텐츠 진입 + 연결 상태 배지
 import { getMlcSummaryMap, type StoreMlcSummaryItem } from '../../api/multilingualProductContentStore';
-
-type SourceFilter = 'all' | 'listing' | 'local';
 
 // WO-...-STANDARD-TABLE-V1: 페이지당 건수(20/50/100), 기본 20
 const PAGE_SIZE_OPTIONS = [20, 50, 100] as const;
 const DEFAULT_PAGE_SIZE = 20;
 const SEARCH_DEBOUNCE_MS = 300;
 
-const SOURCE_TABS: { key: SourceFilter; label: string }[] = [
-  { key: 'all', label: '전체' },
-  { key: 'listing', label: 'O4O 기반 제품' },
-  { key: 'local', label: '매장 경영활용 제품' },
-];
-
-/** 구분 라벨 — 정책 용어(WO-...-TERM-CLARIFICATION-V1). 백엔드 originLabel 대신 sourceType 기준 프론트 도출(KPA 단독). */
-function originLabel(sourceType: HandledProduct['sourceType']): string {
-  return sourceType === 'listing' ? 'O4O 기반 제품' : '매장 경영활용 제품';
-}
+const EMPTY_MESSAGE =
+  '아직 취급 중인 O4O 제품이 없습니다. ‘O4O 표준 상품에서 추가’로 제품을 선택해 매장 경영활용 제품으로 등록할 수 있습니다.';
 
 /** 선택 식별 키 — sourceType + sourceId 조합(교차 소스 유일). */
 function rowKey(it: Pick<HandledProduct, 'sourceType' | 'sourceId'>): string {
@@ -81,16 +62,6 @@ function formatDate(iso: string): string {
   return Number.isNaN(d.getTime()) ? '-' : d.toLocaleDateString('ko-KR');
 }
 
-const EMPTY_BY_SOURCE: Record<SourceFilter, string> = {
-  all: '아직 등록된 매장 경영활용 제품이 없습니다. O4O 제품은 O4O 제품 화면에서 선택하여 등록할 수 있습니다.',
-  listing: '아직 취급 중인 O4O 제품이 없습니다. O4O 제품 화면에서 제품을 선택해 매장 경영활용 제품으로 등록할 수 있습니다.',
-  local: '아직 등록된 매장 경영활용 제품이 없습니다. ‘매장 경영활용 제품 등록’에서 추가할 수 있습니다.',
-};
-
-function isSourceFilter(v: string | null): v is SourceFilter {
-  return v === 'all' || v === 'listing' || v === 'local';
-}
-
 function parsePageSize(v: string | null): number {
   const n = Number(v);
   return PAGE_SIZE_OPTIONS.includes(n as (typeof PAGE_SIZE_OPTIONS)[number]) ? n : DEFAULT_PAGE_SIZE;
@@ -105,13 +76,9 @@ export default function StoreHandledProductsPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // ─── URL Query ↔ 상태 동기화(탭 / 검색어 / 페이지 / 페이지당 건수) ────────────
-  const initialSource: SourceFilter = isSourceFilter(searchParams.get('source'))
-    ? (searchParams.get('source') as SourceFilter)
-    : 'all';
+  // ─── URL Query ↔ 상태 동기화(검색어 / 페이지 / 페이지당 건수) ────────────
   const initialSearch = searchParams.get('q') ?? '';
 
-  const [source, setSource] = useState<SourceFilter>(initialSource);
   const [searchInput, setSearchInput] = useState(initialSearch);
   const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [page, setPage] = useState(() => parsePage(searchParams.get('page')));
@@ -123,6 +90,8 @@ export default function StoreHandledProductsPage() {
   const [reloadKey, setReloadKey] = useState(0);
   // WO-...-STANDARD-TABLE-V1: 행 선택(현재 페이지 기준). key = rowKey(it).
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  // WO-...-REMOVE-AND-STATUS-AUDIT-V1: 제거 진행 중 플래그
+  const [removing, setRemoving] = useState(false);
 
   const totalPages = Math.max(1, Math.ceil(total / limit));
 
@@ -162,7 +131,8 @@ export default function StoreHandledProductsPage() {
     setError(null);
     // 목록이 바뀌면 선택 초기화(서버 페이지네이션 — 선택은 현재 페이지 기준).
     setSelected(new Set());
-    fetchHandledProducts({ page, limit, search: searchQuery || undefined, source })
+    // WO-...-REMOVE-AND-STATUS-AUDIT-V1: 로컬(매장 직접 등록) 폐기 → O4O 기반 제품(listing)만 조회.
+    fetchHandledProducts({ page, limit, search: searchQuery || undefined, source: 'listing' })
       .then((d) => {
         if (cancelled) return;
         setItems(d.items);
@@ -177,27 +147,24 @@ export default function StoreHandledProductsPage() {
     return () => {
       cancelled = true;
     };
-  }, [page, limit, searchQuery, source, reloadKey]);
+  }, [page, limit, searchQuery, reloadKey]);
 
   const reload = useCallback(() => setReloadKey((k) => k + 1), []);
 
   // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1: 연결 콘텐츠 보기 드로어 + 콘텐츠 만들기 진입
   const [drawerProduct, setDrawerProduct] = useState<LinkedDrawerProduct | null>(null);
-  // WO-O4O-KPA-STORE-HANDLED-PRODUCT-DESCRIPTION-USAGE-POLICY-FIX-V1: 매장용 상세설명서 보기(읽기 전용, listing 전용)
+  // WO-...-DESCRIPTION-USAGE-POLICY-FIX-V1: 매장용 상세설명서 보기(읽기 전용, listing 전용)
   const [descProduct, setDescProduct] = useState<StoreDescriptionProduct | null>(null);
   // WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1: O4O 표준 상품 검색·선택·등록 모달
   const [showAddO4oModal, setShowAddO4oModal] = useState(false);
-  // WO-O4O-PRODUCT-QR-CONTENT-FLOW-MINIMAL-V1: 상품별 다국어 QR 콘텐츠 연결 상태 요약(배지). listing/local 각각.
+  // WO-O4O-PRODUCT-QR-CONTENT-FLOW-MINIMAL-V1: 상품별 다국어 QR 콘텐츠 연결 상태 요약(배지). listing 전용.
   const [mlcListing, setMlcListing] = useState<Map<string, StoreMlcSummaryItem>>(new Map());
-  const [mlcLocal, setMlcLocal] = useState<Map<string, StoreMlcSummaryItem>>(new Map());
 
   useEffect(() => {
     let cancelled = false;
-    Promise.all([getMlcSummaryMap('listing'), getMlcSummaryMap('local')])
-      .then(([listing, local]) => {
-        if (cancelled) return;
-        setMlcListing(listing);
-        setMlcLocal(local);
+    getMlcSummaryMap('listing')
+      .then((listing) => {
+        if (!cancelled) setMlcListing(listing);
       })
       .catch(() => {
         /* 배지는 비필수 — 요약 로드 실패 시 조용히 무시 */
@@ -208,9 +175,8 @@ export default function StoreHandledProductsPage() {
   }, [reloadKey]);
 
   const mlcFor = useCallback(
-    (it: HandledProduct): StoreMlcSummaryItem | undefined =>
-      (it.sourceType === 'listing' ? mlcListing : mlcLocal).get(it.sourceId),
-    [mlcListing, mlcLocal],
+    (it: HandledProduct): StoreMlcSummaryItem | undefined => mlcListing.get(it.sourceId),
+    [mlcListing],
   );
 
   // 상품별 다국어 QR 콘텐츠 저작 화면으로 이동 (target = sourceType/sourceId, 상품명 프리필).
@@ -229,16 +195,6 @@ export default function StoreHandledProductsPage() {
       navigate(`/store/library/contents?${qs.toString()}`);
     },
     [navigate],
-  );
-
-  const selectSource = useCallback(
-    (next: SourceFilter) => {
-      setSource(next);
-      setPage(1);
-      setSelected(new Set());
-      patchParams({ source: next === 'all' ? null : next, page: null });
-    },
-    [patchParams],
   );
 
   const changePageSize = useCallback(
@@ -276,6 +232,32 @@ export default function StoreHandledProductsPage() {
   const selectedItems = useMemo(() => items.filter((it) => selected.has(rowKey(it))), [items, selected]);
   const singleSelected = selectedItems.length === 1 ? selectedItems[0] : null;
 
+  // WO-...-REMOVE-AND-STATUS-AUDIT-V1: 매장 경영활용에서 제거(연결 해제) — 1건/다건.
+  const handleRemove = useCallback(async () => {
+    if (selectedItems.length === 0 || removing) return;
+    const withContent = selectedItems.filter((it) => it.linkedContentCount > 0);
+    let msg =
+      '선택한 제품을 매장 경영활용 제품 목록에서 제거하시겠습니까?\nO4O 표준 상품 정보와 상세설명서는 삭제되지 않습니다.';
+    if (withContent.length > 0) {
+      msg += `\n\n연결된 콘텐츠가 있는 제품 ${withContent.length}건이 포함되어 있습니다. 제품↔콘텐츠 연결만 해제되며, 자료함 콘텐츠와 QR은 삭제되지 않습니다.`;
+    }
+    if (!window.confirm(msg)) return;
+    setRemoving(true);
+    try {
+      const res = await removeHandledProducts(
+        selectedItems.map((it) => ({ sourceType: it.sourceType, sourceId: it.sourceId })),
+      );
+      if (res.removed > 0) toast.success(`${res.removed}개 제품을 매장 경영활용에서 제거했습니다.`);
+      if (res.failed.length > 0) toast.error(`${res.failed.length}개 제품 제거에 실패했습니다.`);
+      clearSelection();
+      reload();
+    } catch (e: any) {
+      toast.error(e?.message || '제거에 실패했습니다');
+    } finally {
+      setRemoving(false);
+    }
+  }, [selectedItems, removing, clearSelection, reload]);
+
   return (
     <div style={styles.container}>
       <div style={styles.header}>
@@ -290,8 +272,8 @@ export default function StoreHandledProductsPage() {
             매장 경영활용 제품
           </h1>
           <p style={styles.subtitle}>
-            약국 경영에 활용하는 전체 제품을 한 화면에서 확인합니다.
-            O4O 기반 제품과 매장에서 직접 등록한 제품의 등록·수정은 각 원본 관리 화면에서 합니다.
+            약국 경영에 활용할 O4O 제품을 확인·정리합니다.
+            실제 작업(매장용 상세설명 보기 / 콘텐츠 만들기 / 다국어 QR)은 제품을 선택한 뒤 수행합니다.
           </p>
         </div>
         <div style={styles.headerActions}>
@@ -301,12 +283,7 @@ export default function StoreHandledProductsPage() {
             <Boxes size={14} />
             O4O 표준 상품에서 추가
           </button>
-          {/* WO-O4O-KPA-COMMERCE-PRODUCT-TO-STORE-MANAGEMENT-USE-FLOW-V1:
-              'O4O 제품 신청' 버튼 제거 — O4O 제품 등록은 O4O 제품 화면(/store/commerce/products)에서 직접 선택·등록한다(대체 버튼 없음). */}
-          <button onClick={() => navigate('/store/commerce/local-products')} style={styles.secondaryBtn}>
-            <Plus size={14} />
-            매장 직접 등록
-          </button>
+          {/* WO-...-REMOVE-AND-STATUS-AUDIT-V1: '매장 직접 등록'(store_local_products) 정책 폐기 → 버튼 제거. */}
           <button onClick={reload} style={styles.refreshBtn}>
             <RefreshCw size={14} />
             새로고침
@@ -315,21 +292,7 @@ export default function StoreHandledProductsPage() {
       </div>
 
       <div style={styles.toolbar}>
-        <div style={styles.tabs}>
-          {SOURCE_TABS.map((t) => {
-            const active = source === t.key;
-            return (
-              <button
-                key={t.key}
-                type="button"
-                onClick={() => selectSource(t.key)}
-                style={{ ...styles.tab, ...(active ? styles.tabActive : styles.tabInactive) }}
-              >
-                {t.label}
-              </button>
-            );
-          })}
-        </div>
+        <div style={{ flex: 1 }} />
         <div style={styles.searchWrap}>
           <Search size={14} style={styles.searchIcon} />
           <input
@@ -362,26 +325,23 @@ export default function StoreHandledProductsPage() {
         </label>
       </div>
 
-      {/* WO-...-STANDARD-TABLE-V1: Selection ActionBar — 선택 후 다음 작업.
-          1건 선택 시 컨텍스트 액션(사용 불가 작업은 숨김), 여러 건은 '선택 해제'만(실제 일괄 기능 없음). */}
+      {/* WO-...-STANDARD-TABLE-V1 / REMOVE-AND-STATUS-AUDIT-V1: Selection ActionBar.
+          1건 선택 시 컨텍스트 작업 + 제거, 여러 건 선택 시 제거 + 선택 해제. */}
       {selected.size > 0 && (
         <div style={styles.selectionBar}>
           <span style={styles.selectionCount}>{selected.size}개 선택됨</span>
           <div style={{ flex: 1 }} />
           {singleSelected && (
             <>
-              {/* WO-...-DESCRIPTION-USAGE-POLICY-FIX-V1: 복사 아님 — 매장용(STORE) 상세설명서 직접 조회.
-                  O4O 기반 제품(listing)만 사용 가능 → 그 외에는 숨김 */}
-              {singleSelected.sourceType === 'listing' && (
-                <button
-                  type="button"
-                  onClick={() => setDescProduct({ listingId: singleSelected.sourceId, name: singleSelected.name })}
-                  style={styles.importBtn}
-                >
-                  <FileText size={13} />
-                  매장용 상세설명 보기
-                </button>
-              )}
+              {/* WO-...-DESCRIPTION-USAGE-POLICY-FIX-V1: 복사 아님 — 매장용(STORE) 상세설명서 직접 조회. */}
+              <button
+                type="button"
+                onClick={() => setDescProduct({ listingId: singleSelected.sourceId, name: singleSelected.name })}
+                style={styles.importBtn}
+              >
+                <FileText size={13} />
+                매장용 상세설명 보기
+              </button>
               <button
                 type="button"
                 onClick={() =>
@@ -424,10 +384,13 @@ export default function StoreHandledProductsPage() {
                   ) : null;
                 })()}
               </button>
-              {/* WO-...-DESCRIPTION-USAGE-POLICY-FIX-V1: '관리'(→/store/my-products) 진입점 제거.
-                  현재 목록과 목적이 겹치는 별도 O4O listing 관리 화면으로의 이동을 없앤다. */}
             </>
           )}
+          {/* WO-...-REMOVE-AND-STATUS-AUDIT-V1: 매장 경영활용에서 제거(연결 해제, 원본 무접촉). 1건/다건 공통. */}
+          <button type="button" onClick={handleRemove} disabled={removing} style={styles.removeBtn}>
+            {removing ? <Loader2 size={13} className="animate-spin" /> : <Trash2 size={13} />}
+            매장 경영활용에서 제거
+          </button>
           <button type="button" onClick={clearSelection} style={styles.clearBtn}>
             <X size={13} />
             선택 해제
@@ -453,22 +416,21 @@ export default function StoreHandledProductsPage() {
               <th style={styles.th}>구분</th>
               <th style={styles.th}>매장 표시 가격</th>
               <th style={styles.th}>연결 콘텐츠</th>
-              <th style={styles.th}>상태</th>
               <th style={styles.th}>최근 수정일</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={7} style={styles.empty}>불러오는 중…</td>
+                <td colSpan={6} style={styles.empty}>불러오는 중…</td>
               </tr>
             ) : error ? (
               <tr>
-                <td colSpan={7} style={{ ...styles.empty, color: '#DC2626' }}>{error}</td>
+                <td colSpan={6} style={{ ...styles.empty, color: '#DC2626' }}>{error}</td>
               </tr>
             ) : items.length === 0 ? (
               <tr>
-                <td colSpan={7} style={styles.empty}>{searchQuery ? '검색 결과가 없습니다' : EMPTY_BY_SOURCE[source]}</td>
+                <td colSpan={6} style={styles.empty}>{searchQuery ? '검색 결과가 없습니다' : EMPTY_MESSAGE}</td>
               </tr>
             ) : (
               items.map((it) => {
@@ -498,7 +460,7 @@ export default function StoreHandledProductsPage() {
                       </div>
                     </td>
                     <td style={styles.td}>
-                      <Badge text={originLabel(it.sourceType)} tone={it.sourceType === 'listing' ? 'blue' : 'amber'} />
+                      <Badge text="O4O 기반 제품" tone="blue" />
                     </td>
                     <td style={styles.td}>{formatPrice(it.price)}</td>
                     <td style={styles.td}>
@@ -517,12 +479,8 @@ export default function StoreHandledProductsPage() {
                         <span style={{ color: colors.neutral400 }}>없음</span>
                       )}
                     </td>
-                    <td style={styles.td}>
-                      <Badge text={it.statusLabel} tone={it.isActive ? 'green' : 'gray'} />
-                    </td>
                     <td style={styles.td}>{formatDate(it.updatedAt)}</td>
-                    {/* WO-...-DESCRIPTION-USAGE-POLICY-FIX-V1: '관리' 컬럼 제거.
-                        실제 작업(매장용 상세설명 보기 / 콘텐츠 만들기 / 다국어 QR)은 선택 후 ActionBar 에서 수행. */}
+                    {/* WO-...-REMOVE-AND-STATUS-AUDIT-V1: '상태'(승인 대기) 컬럼 제거 — 이 화면엔 승인 절차 없음. */}
                   </tr>
                 );
               })
@@ -550,7 +508,7 @@ export default function StoreHandledProductsPage() {
         onRegistered={reload}
       />
 
-      {/* WO-O4O-KPA-STORE-HANDLED-PRODUCT-DESCRIPTION-USAGE-POLICY-FIX-V1: 매장용 상세설명서 보기(읽기 전용, 복사 아님) */}
+      {/* WO-...-DESCRIPTION-USAGE-POLICY-FIX-V1: 매장용 상세설명서 보기(읽기 전용, 복사 아님) */}
       <StoreDescriptionViewModal
         open={!!descProduct}
         product={descProduct}
@@ -558,10 +516,8 @@ export default function StoreHandledProductsPage() {
       />
 
       <p style={styles.footnote}>
-        ※ 이 목록은 진열·콘텐츠·온라인 노출에 활용할 전체 제품 풀입니다. 타블렛 진열·온라인 판매 등 채널별 설정은 각 채널 메뉴에서 관리합니다.
-        {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-DISPLAY-POOL-SIMPLIFY-V1: 온라인몰 미지원 = 컬럼 대신 보조 안내 */}
-        {' '}매장에서 직접 등록한 제품은 온라인 판매(온라인몰) 노출을 지원하지 않습니다.
-        온라인 주문 이후의 조달·재고·배송·발송·응대는 매장 경영자가 자체적으로 처리합니다.
+        ※ 이 목록은 진열·콘텐츠·온라인 노출에 활용할 O4O 제품 풀입니다. 타블렛 진열·온라인 판매 등 채널별 설정은 각 채널 메뉴에서 관리합니다.
+        {' '}‘매장 경영활용에서 제거’는 매장과 제품의 경영활용 연결만 해제하며, O4O 표준 상품 정보·상세설명서·자료함 콘텐츠·QR은 삭제되지 않습니다.
       </p>
     </div>
   );
@@ -578,12 +534,7 @@ const styles: Record<string, CSSProperties> = {
   headerActions: { display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' },
   refreshBtn: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: colors.white, border: `1px solid ${colors.neutral300}`, borderRadius: '6px', fontSize: '13px', color: colors.neutral700, cursor: 'pointer' },
   primaryBtn: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: colors.primary, border: `1px solid ${colors.primary}`, borderRadius: '6px', fontSize: '13px', color: colors.white, cursor: 'pointer' },
-  secondaryBtn: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: colors.white, border: `1px solid ${colors.primary}`, borderRadius: '6px', fontSize: '13px', color: colors.primary, cursor: 'pointer' },
   toolbar: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '12px', flexWrap: 'wrap' },
-  tabs: { display: 'flex', gap: '4px', background: colors.neutral100, border: `1px solid ${colors.neutral200}`, borderRadius: '8px', padding: '3px' },
-  tab: { padding: '6px 14px', fontSize: '13px', fontWeight: 500, border: 'none', borderRadius: '6px', cursor: 'pointer' },
-  tabActive: { background: colors.white, color: colors.primary, boxShadow: '0 1px 3px rgba(0,0,0,0.08)' },
-  tabInactive: { background: 'transparent', color: colors.neutral500 },
   searchWrap: { position: 'relative', minWidth: '220px' },
   searchIcon: { position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: colors.neutral400, pointerEvents: 'none' },
   searchInput: { width: '100%', padding: '8px 12px 8px 30px', border: `1px solid ${colors.neutral300}`, borderRadius: '6px', fontSize: '13px', outline: 'none', background: colors.white, boxSizing: 'border-box' },
@@ -595,6 +546,8 @@ const styles: Record<string, CSSProperties> = {
   selectionBar: { display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 14px', marginBottom: '10px', background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: '8px', flexWrap: 'wrap' },
   selectionCount: { fontSize: '13px', fontWeight: 600, color: '#1D4ED8' },
   clearBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '5px 12px', background: colors.white, border: `1px solid ${colors.neutral300}`, borderRadius: '6px', fontSize: '12px', color: colors.neutral700, cursor: 'pointer' },
+  // WO-...-REMOVE-AND-STATUS-AUDIT-V1: 제거 버튼(위험 액션 톤)
+  removeBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '5px 12px', background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: '6px', fontSize: '12px', color: '#DC2626', cursor: 'pointer', whiteSpace: 'nowrap' },
   tableWrap: { overflowX: 'auto', border: `1px solid ${colors.neutral200}`, borderRadius: '8px', background: colors.white },
   table: { width: '100%', borderCollapse: 'collapse', fontSize: '13px' },
   th: { padding: '10px 12px', textAlign: 'center', fontSize: '12px', fontWeight: 600, color: colors.neutral500, background: '#F8FAFC', borderBottom: `1px solid ${colors.neutral200}`, whiteSpace: 'nowrap' },
@@ -609,7 +562,7 @@ const styles: Record<string, CSSProperties> = {
   productName: { fontSize: '14px', fontWeight: 500, color: colors.neutral800, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
   badge: { display: 'inline-flex', alignItems: 'center', padding: '2px 8px', fontSize: '11px', fontWeight: 500, borderRadius: '999px', whiteSpace: 'nowrap' },
   checkbox: { width: 15, height: 15, cursor: 'pointer', accentColor: colors.primary },
-  // WO-...-STANDARD-TABLE-V1: Selection ActionBar 액션 버튼(기존 행별 버튼 스타일 재사용)
+  // WO-...-STANDARD-TABLE-V1: Selection ActionBar 액션 버튼
   createContentBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '5px 12px', background: colors.white, border: `1px solid ${colors.primary}`, borderRadius: '6px', fontSize: '12px', color: colors.primary, cursor: 'pointer', whiteSpace: 'nowrap' },
   importBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '5px 12px', background: '#F0FDF4', border: '1px solid #86EFAC', borderRadius: '6px', fontSize: '12px', color: '#15803D', cursor: 'pointer', whiteSpace: 'nowrap' },
   mlcBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '5px 12px', background: '#F5F3FF', border: '1px solid #C4B5FD', borderRadius: '6px', fontSize: '12px', color: '#6D28D9', cursor: 'pointer', whiteSpace: 'nowrap' },

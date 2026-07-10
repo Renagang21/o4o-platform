@@ -81,3 +81,43 @@ export async function fetchHandledProducts(params?: {
   return res.data;
 }
 
+// WO-O4O-KPA-STORE-HANDLED-PRODUCT-REMOVE-AND-STATUS-AUDIT-V1:
+//   선택 제품을 매장 경영활용 제품 목록에서 제거(상품 정보 삭제 아님, 경영활용 연결만 해제).
+export interface RemoveHandledResult {
+  removed: number;
+  failed: Array<{ sourceType: string; sourceId: string; reason: string }>;
+}
+
+async function post<T>(url: string, body: unknown): Promise<T> {
+  const token = getAccessToken();
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+    ...(token && { Authorization: `Bearer ${token}` }),
+  };
+  let response = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body) });
+  if (response.status === 401) {
+    const newToken = await tryRefreshToken();
+    if (newToken) {
+      response = await fetch(url, {
+        method: 'POST',
+        headers: { ...headers, Authorization: `Bearer ${newToken}` },
+        body: JSON.stringify(body),
+      });
+    }
+  }
+  if (!response.ok) {
+    const b = await response.json().catch(() => ({ message: 'Network error' }));
+    const error: any = new Error(b.error || b.message || `HTTP ${response.status}`);
+    error.status = response.status;
+    throw error;
+  }
+  return response.json();
+}
+
+export async function removeHandledProducts(
+  items: Array<{ sourceType: HandledProductSource; sourceId: string }>,
+): Promise<RemoveHandledResult> {
+  const res = await post<{ success: boolean; data: RemoveHandledResult }>(`${BASE}/handled-products/remove`, { items });
+  return res.data;
+}
+

@@ -196,5 +196,87 @@ export function createStoreHandledProductsRoutes(dataSource: DataSource): Router
     }
   });
 
+  /**
+   * POST /handled-products/remove
+   * WO-O4O-KPA-STORE-HANDLED-PRODUCT-REMOVE-AND-STATUS-AUDIT-V1
+   *
+   * 선택 제품을 "매장 경영활용 제품 목록에서 제거"한다(상품 정보 삭제 아님).
+   *   - listing: organization_product_listings 행 삭제(= 매장↔제품 경영활용 연결 해제).
+   *              ProductMaster / 상세설명서(SPD) / 이미지 등 원본은 무접촉.
+   *              organization_product_channels 는 FK ON DELETE CASCADE 로 함께 정리(채널 배치 해제).
+   *   - local  : store_local_products 행 삭제.
+   *   - 공통: 제품↔콘텐츠 연결(kpa_store_content_product_links)만 해제. 자료함 콘텐츠·QR 자체는 보존.
+   * Body: { items: [{ sourceType: 'listing'|'local', sourceId: uuid }] } (1건/다건).
+   * Boundary Policy: organization_id 필터 필수, parameter binding 필수.
+   */
+  router.post('/handled-products/remove', async (req: Request, res: Response): Promise<void> => {
+    try {
+      const auth = await getAuth();
+      await new Promise<void>((resolve, reject) => {
+        (auth as any)(req, res, (err: any) => (err ? reject(err) : resolve()));
+      });
+
+      const authReq = req as AuthRequest;
+      const userId = authReq.user?.id;
+      if (!userId) {
+        res.status(403).json({ success: false, error: 'Store owner access required', code: 'FORBIDDEN' });
+        return;
+      }
+      const userRoles: string[] = authReq.user?.roles || [];
+      const organizationId = await resolveStoreAccess(dataSource, userId, userRoles);
+      if (!organizationId) {
+        res.status(403).json({ success: false, error: 'Store owner access required', code: 'FORBIDDEN' });
+        return;
+      }
+
+      const UUID_RE = /^[0-9a-fA-F-]{36}$/;
+      const rawItems = Array.isArray(req.body?.items) ? req.body.items : [];
+      const valid = rawItems.filter(
+        (it: any) =>
+          it &&
+          (it.sourceType === 'listing' || it.sourceType === 'local') &&
+          typeof it.sourceId === 'string' &&
+          UUID_RE.test(it.sourceId),
+      ) as Array<{ sourceType: 'listing' | 'local'; sourceId: string }>;
+      if (valid.length === 0) {
+        res.status(400).json({ success: false, error: 'items(sourceType, sourceId) required', code: 'VALIDATION_ERROR' });
+        return;
+      }
+
+      let removed = 0;
+      const failed: Array<{ sourceType: string; sourceId: string; reason: string }> = [];
+      for (const it of valid) {
+        try {
+          await dataSource.transaction(async (m) => {
+            // 제품↔콘텐츠 연결만 해제(콘텐츠·QR 자체는 보존).
+            await m.query(
+              `DELETE FROM kpa_store_content_product_links
+               WHERE organization_id = $1 AND product_source_type = $2 AND product_source_id = $3`,
+              [organizationId, it.sourceType, it.sourceId],
+            );
+            const table = it.sourceType === 'listing' ? 'organization_product_listings' : 'store_local_products';
+            const del: Array<{ id: string }> = await m.query(
+              `DELETE FROM ${table} WHERE id = $1 AND organization_id = $2 RETURNING id`,
+              [it.sourceId, organizationId],
+            );
+            if (del.length === 0) {
+              const e: any = new Error('NOT_FOUND');
+              e.code = 'NOT_FOUND';
+              throw e;
+            }
+          });
+          removed++;
+        } catch (e: any) {
+          failed.push({ sourceType: it.sourceType, sourceId: it.sourceId, reason: e?.code || e?.message || 'ERROR' });
+        }
+      }
+
+      res.json({ success: true, data: { removed, failed } });
+    } catch (error: any) {
+      console.error('[StoreHandledProducts] POST /handled-products/remove error:', error);
+      res.status(500).json({ success: false, error: 'Failed to remove handled products', code: 'INTERNAL_ERROR' });
+    }
+  });
+
   return router;
 }
