@@ -2,6 +2,10 @@
 
 상태: Scaffold (후속) · 진입: [DOCUMENT-INDEX](../../common/DOCUMENT-INDEX.md)
 
+> ▶ **제품 사진 → 매장 STORE 설명서(ko+zh) DB 저장 배치 작업을 시작한다면 여기부터:**
+> **[AGENT-KICKOFF.md](AGENT-KICKOFF.md)** (세션 시작 가이드) · **[examples/](examples/)** (정본 형식 예제) · **[PROCESSED-LEDGER.md](PROCESSED-LEDGER.md)** (처리 원장).
+> 규칙 SSOT는 [general-food/README.md](../general-food/README.md).
+
 건강기능식품 소비자 콘텐츠 규칙 자리. 공통 규칙을 상속하고, 전용 Writing/Grouping/Template + 자체 Rule Registry(예: `HF-NNN`)는 별도 WO에서 채운다. 기능성 표시·과장 금지 등은 CR을 우선 상속한다.
 
 > 현재는 스캐폴드. 과도한 선행 생성 금지.
