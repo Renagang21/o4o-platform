@@ -38,28 +38,25 @@ import type { ProductMaster } from './ProductMaster.entity.js';
  * 식별자 유형 (application-level union)
  *
  * - GTIN/EAN13/UPC/JAN : 국제 상품 식별 바코드 체계
- * - INTERNAL_O4O       : (LEGACY) 과거 바코드 미입력 시 O4O 내부 합성 코드. 신규 생성 중단됨
- *                        (WO-O4O-PRODUCT-BARCODE-NULLABLE-AND-INTERNAL-CODE-GENERATION-STOP-V1).
- *                        신규 바코드리스 상품은 식별자 없이 정체성=ProductMaster.id(UUID). 기존 데이터만 보유.
- * - SUPPLIER_SKU       : 공급자 SKU
- * - PHARMACY_LOCAL     : 약국 로컬 코드
- * - STORE_LOCAL        : 매장 로컬 코드
  * - KOREA_DRUG_CODE    : 한국 약품 표준코드 (PharmaProductMaster.drugCode 대응)
  * - KOREA_INSURANCE_CODE : 보험코드 (PharmaProductMaster.insuranceCode 대응)
  * - ATC_CODE           : ATC 분류코드 (PharmaProductMaster.atcCode 대응)
  * - MFDS_CODE          : 식약처 코드
  * - UDI_DI             : 의료기기 UDI-DI (GTIN형·HIBCC형 공존. 원형 보존 — WO-O4O-MEDICAL-DEVICE-UDI-DI-IDENTIFIER-TYPE-IMPLEMENTATION-V1)
  * - UNKNOWN            : 미분류
+ *
+ * 폐기된 유형 (WO-O4O-PRODUCT-IDENTIFIER-LEGACY-TYPE-CLEANUP-V1, 2026-07-10):
+ *   INTERNAL_O4O / SUPPLIER_SKU / PHARMACY_LOCAL / STORE_LOCAL 은 union 에서 제거됨.
+ *   - INTERNAL_O4O: 과거 O4O 내부 합성 코드. 신규 생성 중단(BARCODE-NULLABLE...-V1) 후 활성 0,
+ *     기존 17,148건은 soft-deleted(감사·롤백용)로만 잔존. identifier_type 컬럼은 varchar 라 값은 보존되나
+ *     활성(deletedAt IS NULL) 조회 대상 아님.
+ *   - SUPPLIER_SKU / PHARMACY_LOCAL / STORE_LOCAL: 실데이터·생성 경로 없어 제거. 필요 시 재도입.
  */
 export type ProductIdentifierType =
   | 'GTIN'
   | 'EAN13'
   | 'UPC'
   | 'JAN'
-  | 'INTERNAL_O4O'
-  | 'SUPPLIER_SKU'
-  | 'PHARMACY_LOCAL'
-  | 'STORE_LOCAL'
   | 'KOREA_DRUG_CODE'
   | 'KOREA_INSURANCE_CODE'
   | 'ATC_CODE'
@@ -72,10 +69,6 @@ export const PRODUCT_IDENTIFIER_TYPES: ProductIdentifierType[] = [
   'EAN13',
   'UPC',
   'JAN',
-  'INTERNAL_O4O',
-  'SUPPLIER_SKU',
-  'PHARMACY_LOCAL',
-  'STORE_LOCAL',
   'KOREA_DRUG_CODE',
   'KOREA_INSURANCE_CODE',
   'ATC_CODE',

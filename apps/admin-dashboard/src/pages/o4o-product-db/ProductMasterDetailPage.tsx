@@ -705,16 +705,16 @@ function DescriptionStatusBadge({ status }: { status: string }) {
   return <span className={`px-2 py-0.5 rounded-full text-xs ${tone}`}>{status}</span>;
 }
 
-/** identifier 유형 한글 라벨 (표시용, 없으면 원본 코드) */
+/**
+ * identifier 유형 한글 라벨 (표시용, 없으면 원본 코드).
+ * INTERNAL_O4O/SUPPLIER_SKU/PHARMACY_LOCAL/STORE_LOCAL 은 폐기(WO-O4O-PRODUCT-IDENTIFIER-LEGACY-TYPE-CLEANUP-V1).
+ * 폐기 유형의 soft-deleted 잔존 row 는 활성 조회 대상이 아니며, 만약 노출되면 fallback 으로 원본 코드가 표시된다.
+ */
 const IDENTIFIER_TYPE_LABEL: Record<string, string> = {
   GTIN: '바코드(GTIN)',
   EAN13: '바코드(EAN13)',
   UPC: '바코드(UPC)',
   JAN: '바코드(JAN)',
-  INTERNAL_O4O: 'O4O 내부코드',
-  SUPPLIER_SKU: '공급자 SKU',
-  PHARMACY_LOCAL: '약국 로컬코드',
-  STORE_LOCAL: '매장 로컬코드',
   KOREA_DRUG_CODE: '의약품 표준/약가코드',
   KOREA_INSURANCE_CODE: '보험코드',
   ATC_CODE: 'ATC 코드',
