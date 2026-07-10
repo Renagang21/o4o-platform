@@ -42,7 +42,7 @@
 | **R2** | **라벨/이미지 grounding** | 이미지에 있는 사실만 기재. **없는 항목은 placeholder("확인 필요") 없이 그냥 생략**. 있으면 그대로 적는다. 임의 창작 금지. |
 | **R3** | **원료 표기 그대로** | 배합비(%)·주원료/부원료 구분을 라벨 문구대로. 임의 재계산·재구성 금지. |
 | **R4** | **한약재 = 원료로만 나열** | 당귀·천궁 등은 원료 목록·전통 보양 맥락으로 소개하되, 개별 성분의 의약품형 효능 단정은 하지 않는다(R1과 함께). |
-| **R5** | **등록 계층 판단** | 바코드 있으면 canonical **ProductMaster**(F12: 물리제품 1 = barcode 1 = master 1). 바코드 없거나 매장 전용이면 **store_local_products**(barcode nullable). 콘텐츠 작성 계층과 무관하게 grounding 원칙은 동일. |
+| **R5** | **등록 계층 판단** | **바코드 유무와 무관하게 canonical ProductMaster 등록 가능** — 바코드 없으면 O4O 자체 내부코드(`generateInternalBarcode`, GS1 200 대역 EAN-13)를 자동 생성한다(모든 카테고리·의약품 포함). 근거: [WO-O4O-PRODUCT-MASTER-BARCODELESS-REGISTRATION-INTERNAL-CODE-V1](../../../work-orders/WO-O4O-PRODUCT-MASTER-BARCODELESS-REGISTRATION-INTERNAL-CODE-V1.md)(구현 완료). 등록 경로 `POST /api/v1/neture/admin/masters/resolve`(바코드 선택) 또는 관리자 수동 등록 UI. **store_local_products**는 매장 전용 제품용(별개 계층). ⚠️ 과거 "바코드 없으면 ProductMaster 불가"는 정비되어 더 이상 사실 아님. |
 | **R6** | **매장 콘텐츠 구조(레이아웃/톤)** | 아래 §2 표준 섹션 구조를 따른다. 효능·시너지·타깃 섹션을 다운시프트 없이 사용하되(STORE 전제), 제품의 실제 강점(전통 보양·국내산·선물)을 살린다. |
 | **R7** | **상담 CTA 용어** | 상담 안내 주체는 서비스 중립적으로 **"매장 내 전문성이 있는 도우미"**로 표기. "약사"는 약국(KPA) 맥락 한정. "직원"보다 전문성·신뢰 톤. (다국어: 中 `店内专业人员`) |
 | **R8** | **모바일 가독 폰트 크기** | 설명서는 **QR로 여는 모바일 화면**. 본문 ≥15.5px, 리스트/CTA 본문 16px, 태그·라벨 ≥13px, 푸터 ≥12.5px, 제목 27px+. 11~12px 소형 텍스트 지양. base `font-size:16px`. |
