@@ -82,7 +82,24 @@ WO §5.1 권장대로 **좌측 사이드바형**을 채택. 코너 태블릿은 
 |---|:--:|
 | `web-kpa-society` typecheck (`tsc --noEmit`) | ✅ PASS (exit 0) |
 | `web-kpa-society` build (`tsc && vite build`) | ✅ PASS (exit 0, StoreTabletDisplaysPage 청크 정상 빌드) |
-| 배포 / browser smoke | ⏳ (배포 후 채움) |
+| Deploy Web Services (Cloud Run, kpa-society) | ✅ success (run 29096266313, `10854b764`) |
+| Browser smoke (production, 약국 계정) | ✅ PASS (아래) |
+
+### Browser smoke (production, 2026-07-10) — 약국 경영자 계정
+
+`kpa-society.co.kr` 로그인 → `/store/commerce/tablet-displays`. Playwright headless.
+
+| 항목 | 결과 |
+|---|:--:|
+| 페이지 진입 | ✅ |
+| 코너·위치 사이드바 렌더 | ✅ |
+| 현재 코너 화면 구성 요약 패널 | ✅ |
+| 요약 통계 3종 (진열 상품 / 대기 화면 / 공통 대기영상) | ✅ |
+| 공개 URL 복사 + 미리보기 버튼 (요약에 통합) | ✅ |
+| 기존 편집 섹션 유지 (Idle 편집 / 서비스 공통 대기 영상 / 태블릿 화면 설정 / 상품 편집기) | ✅ 4/4 |
+| console error / network 4xx·5xx | ✅ 0 / 0 |
+
+> **다중 코너 전환(≥2 카드) 미실측**: 사용 가능한 약국 계정(renagang21)은 태블릿 1대 보유라 사이드바 카드가 1개 → 코너 선택 전환 경로는 브라우저에서 직접 실측 못 함. WO §7.3(테스트 데이터 생성 금지)로 임시 태블릿을 만들지 않았다. 단일 태블릿 렌더(자동 선택, §8.2 "1개일 때 불필요하게 복잡하지 않음")는 PASS. 다중 전환은 `setSelectedTabletId` onClick(단순 state) + typecheck/build 로 커버.
 
 ## 8. 남은 한계 (명시)
 
@@ -112,4 +129,4 @@ WO §5.1 권장대로 **좌측 사이드바형**을 채택. 코너 태블릿은 
 | 선택 위치/코너 현재 구성 한눈에 | ✅ 요약 패널(코너명·진열/대기/공통영상·공개URL·미리보기) |
 | 기존 진열/idle/운영자영상/공개URL 기능 유지 | ✅ 핸들러·컴포넌트 그대로 재배치 |
 | schema 변경 0 / public runtime 변경 0 / 기존 데이터 변경 0 | ✅ |
-| CHECK 문서 작성·커밋·push | ⏳ 본 커밋 |
+| CHECK 문서 작성·커밋·push | ✅ (`10854b764` 구현, 배포/smoke 결과 반영 커밋) |
