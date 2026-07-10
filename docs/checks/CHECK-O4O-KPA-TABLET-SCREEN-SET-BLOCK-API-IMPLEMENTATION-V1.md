@@ -81,19 +81,48 @@
 | 항목 | 결과 |
 |---|:--:|
 | api-server typecheck (변경 파일) | ✅ PASS (store-tablet.routes error 0; 무관 `src/scripts/drug-otc-*` 선존재 에러 별개) |
-| 배포 (Deploy API, CI 마이그레이션 없음) | ⏳ (배포 후) |
-| 8개 route 등록 + org scope + E2E smoke | ⏳ (배포 후) |
-| read-only DB 검증(생성/blocks/apply/해제 + 기존 displays/idle 불변) | ⏳ (배포 후) |
+| 배포 (Deploy API Server, CI 마이그레이션 없음) | ✅ success (run 29129807432, `bebf67c85`) |
+| 8개 route + org scope + E2E smoke (production) | ✅ PASS (아래) |
+| read-only DB 검증 (기존 displays/idle 불변) | ✅ PASS (아래) |
 
-_(배포 후 채움)_
+### E2E smoke (production, 약국 계정 renagang21, Bearer 토큰)
+
+`kpa-society.co.kr` 로그인 → `https://api.neture.co.kr/api/v1/store/*` 인증 호출.
+
+| 단계 | 결과 |
+|---|---|
+| GET /tablets | ✅ 200 (3대) |
+| POST /screen-sets 생성 | ✅ 201, **origin='store'(서버 강제)**, status='draft' |
+| GET /screen-sets 목록 | ✅ 생성 set 포함 |
+| GET /screen-sets/:id 상세 | ✅ 200, blocks 0 |
+| PUT /screen-sets/:id/blocks (2블록) | ✅ 200, count 2, **isEnabled(=is_visible) 매핑 확인** |
+| 잘못된 block_type `notice` | ✅ **400 INVALID_BLOCK_TYPE** (배포 스키마 강제) |
+| PATCH status=active | ✅ 200 (apply 성공으로 active 전이 입증) |
+| POST current-screen-set 적용 | ✅ 200, currentScreenSetId 설정 |
+| DELETE(적용 중) | ✅ **409 SCREEN_SET_IN_USE** |
+| DELETE current 해제 | ✅ 200, current=null |
+| DELETE 아카이브(해제 후) | ✅ 200 |
+| 목록(아카이브 후) | ✅ 미포함(필터) |
+| org scope: 임의 uuid 상세 | ✅ **404 SCREEN_SET_NOT_FOUND** |
+
+### 배포 후 read-only DB 검증
+
+| 확인 | 결과 |
+|---|---|
+| smoke set soft-delete(deleted_at + status=archived) | ✅ deleted_at set, status=archived, not_deleted=0 |
+| tablets_with_current_screen_set | ✅ **0** (해제됨, legacy 유지) |
+| **기존 구조 불변** | ✅ store_tablets 4 / store_tablet_displays 2 / idle 보유 1 (SCHEMA-V1 검증 시점과 동일) |
+| public tablet runtime | ✅ 미접촉 (핸들러 무변경, current 미참조) |
+
+> **테스트 잔여물**: `[SMOKE]` screen_set 1건(archived·soft-deleted) + block 2건이 `renagang21` org에 남음. 앱의 모든 정상 쿼리(deleted_at IS NULL / status<>archived)에서 필터됨 → 무해. API에 hard-delete 없어 완전 제거하려면 별도 승인된 raw DELETE 필요(§완료 후 정리 옵션).
 
 ## 10. 완료 기준 대비
 
 - [x] 8개 관리 API 구현
 - [x] schema 추가 없음 / UI·public runtime 변경 없음
 - [x] typecheck 통과
-- [ ] build/배포 성공 + smoke
-- [x] CHECK 작성 · [ ] commit/push
+- [x] build/배포 성공 + E2E smoke PASS
+- [x] CHECK 작성 · commit/push
 
 ## 11. 다음 단계
 
