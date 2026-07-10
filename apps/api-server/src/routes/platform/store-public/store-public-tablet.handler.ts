@@ -56,7 +56,10 @@ export function createStorePublicTabletRoutes(deps: {
       const firstTabletId = displaySource.tabletId;
 
       // Supplier products: 기존 4중 게이트 쿼리 (Commerce Domain — Checkout 진입 가능)
-      const supplierResult = await queryTabletVisibleProducts(dataSource, resolved.storeId, resolved.serviceKey, {
+      // WO-O4O-KPA-TABLET-SUPPLIER-PRODUCT-SERVICEKEY-ALIGNMENT-V1:
+      //   slug service_key('kpa')와 OPL service_key 불일치 방어. B2C 형제 쿼리와 동일한
+      //   resolveServiceKeys alias 목록으로 전달(단일키 서비스는 [key] → 동작 불변).
+      const supplierResult = await queryTabletVisibleProducts(dataSource, resolved.storeId, resolveServiceKeys(resolved.serviceKey), {
         page: req.query.page ? Number(req.query.page) : 1,
         limit: req.query.limit ? Number(req.query.limit) : 20,
         category: req.query.category as string | undefined,

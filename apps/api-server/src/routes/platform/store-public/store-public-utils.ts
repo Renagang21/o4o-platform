@@ -329,7 +329,11 @@ export async function resolveTabletDisplaySource(
 export async function queryTabletVisibleProducts(
   dataSource: DataSource,
   pharmacyId: string,
-  serviceKey: string,
+  // WO-O4O-KPA-TABLET-SUPPLIER-PRODUCT-SERVICEKEY-ALIGNMENT-V1:
+  //   slug service_key('kpa')와 OPL service_key('kpa-society' 등)가 다를 수 있어,
+  //   B2C 형제 쿼리(queryVisibleProducts)와 동일하게 serviceKey 배열 + ANY($2::text[]) 로 정합.
+  //   단일키 서비스(neture/glycopharm/cosmetics)는 [key] 이므로 ANY([key]) == (= key) 로 동작 불변.
+  serviceKeys: string[],
   options: {
     category?: string;
     q?: string;
@@ -346,7 +350,7 @@ export async function queryTabletVisibleProducts(
 ): Promise<{ data: any[]; meta: { page: number; limit: number; total: number; totalPages: number } }> {
   // WO-O4O-GA-PRELAUNCH-VERIFICATION-V1: SHA1 hash key (collision-safe)
   const ck = hashCacheKey(`sf:tablet:${pharmacyId}`, {
-    sk: serviceKey,
+    sk: serviceKeys.slice().sort().join(','),
     p: options.page || 1,
     l: options.limit || 20,
     cat: options.category,
@@ -364,7 +368,9 @@ export async function queryTabletVisibleProducts(
     const offset = (page - 1) * limit;
 
     const conditions: string[] = [];
-    const params: any[] = [pharmacyId, serviceKey];
+    // WO-O4O-KPA-TABLET-SUPPLIER-PRODUCT-SERVICEKEY-ALIGNMENT-V1:
+    //   $2 = serviceKeys text[] (ANY 매칭). count/data 공통 base params 로 사용.
+    const params: any[] = [pharmacyId, serviceKeys];
     let paramIdx = 3;
 
     if (options.category) {
@@ -413,7 +419,7 @@ export async function queryTabletVisibleProducts(
        INNER JOIN organization_product_listings opl
          ON opl.offer_id = spo.id
          AND opl.organization_id = $1
-         AND opl.service_key = $2
+         AND opl.service_key = ANY($2::text[])
          AND opl.is_active = true
        INNER JOIN organization_product_channels opc
          ON opc.product_listing_id = opl.id
@@ -483,7 +489,7 @@ export async function queryTabletVisibleProducts(
        INNER JOIN organization_product_listings opl
          ON opl.offer_id = spo.id
          AND opl.organization_id = $1
-         AND opl.service_key = $2
+         AND opl.service_key = ANY($2::text[])
          AND opl.is_active = true
        INNER JOIN organization_product_channels opc
          ON opc.product_listing_id = opl.id
