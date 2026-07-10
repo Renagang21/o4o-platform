@@ -2,16 +2,17 @@
  * ProductLandingPage — 제품 대표 QR 공개 랜딩 (neture.co.kr/p/:publicKey)
  *
  * WO-O4O-PRODUCT-LANDING-ARCHITECTURE-V1 / Phase 2b
- * Baseline: O4O-PRODUCT-RESOURCE-ARCHITECTURE-BASELINE-V2-AMENDMENT
+ * WO-O4O-KPA-PRODUCT-QR-LANGUAGE-SELECTOR-REUSE-AND-ADAPT-V1:
+ *   고객용 언어 선택 — 한국어만이면 UI 없음, 외국어가 있으면 [한국어][Other Languages].
+ *   Other Languages → 실제 공개 가능한 언어를 국기 + 자국어명으로 표시(모바일 바텀시트).
+ *   선택 언어는 localStorage 에 기억. 언어별 본문은 백엔드 canonical STORE(언어별)에서 조회.
  *
- * 제품 대표 QR 스캔 시 도착. 공개 API(GET /api/v1/public/product-landings/:publicKey)에서
- * 제품 기본정보 + 설명(canonical, 없으면 "준비 중")을 받아 렌더한다. 무인증.
- * Landing 은 확장 가능한 화면 — 이후 공급자/매장/관련 콘텐츠 블록이 추가된다(Phase 5).
+ * 제품 대표 QR 스캔 시 도착. 공개 API(GET /api/v1/public/product-landings/:publicKey?locale=).
  */
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Package, AlertCircle, FileText, Clock } from 'lucide-react';
+import { Package, AlertCircle, FileText, Clock, Globe, X } from 'lucide-react';
 import { api } from '../lib/api/index.js';
 
 interface PublicProductLanding {
@@ -35,6 +36,7 @@ interface PublicProductLanding {
   };
   placeholder: string | null;
   languages: string[];
+  resolvedLocale: string | null;
 }
 
 const REGULATORY_LABEL: Record<string, string> = {
@@ -44,11 +46,36 @@ const REGULATORY_LABEL: Record<string, string> = {
   GENERAL: '일반',
 };
 
+// 언어 코드 ↔ 자국어명 / 국기 (기존 LOCALE_LABELS 재사용 + 국기 매핑 보강)
+const LOCALE_LABELS: Record<string, string> = {
+  ko: '한국어', en: 'English', zh: '中文', ja: '日本語', vi: 'Tiếng Việt', th: 'ภาษาไทย', id: 'Bahasa Indonesia',
+};
+const LOCALE_FLAG: Record<string, string> = {
+  ko: '🇰🇷', en: '🇺🇸', zh: '🇨🇳', ja: '🇯🇵', vi: '🇻🇳', th: '🇹🇭', id: '🇮🇩',
+};
+const STORAGE_KEY = 'o4o_product_landing_locale';
+
+/** zh-CN / zh-TW 등 → 기본 코드(zh)로 정규화 (표시/매핑용) */
+function baseLocale(l: string | null | undefined): string {
+  return (l || '').toLowerCase().split('-')[0];
+}
+function localeLabel(l: string): string {
+  return LOCALE_LABELS[baseLocale(l)] || l.toUpperCase();
+}
+function localeFlag(l: string): string {
+  return LOCALE_FLAG[baseLocale(l)] || '🌐';
+}
+
 export default function ProductLandingPage() {
   const { publicKey } = useParams<{ publicKey: string }>();
   const [data, setData] = useState<PublicProductLanding | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // 초기 선택 언어: localStorage 복원(없으면 undefined → 백엔드 ko 기본)
+  const [locale, setLocale] = useState<string | undefined>(() => {
+    try { return localStorage.getItem(STORAGE_KEY) || undefined; } catch { return undefined; }
+  });
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   useEffect(() => {
     if (!publicKey) {
@@ -56,20 +83,31 @@ export default function ProductLandingPage() {
       setLoading(false);
       return;
     }
+    let cancelled = false;
+    setLoading(true);
     (async () => {
       try {
-        const res = await api.get(`/public/product-landings/${encodeURIComponent(publicKey)}`);
-        setData(res.data.data as PublicProductLanding);
+        const qs = locale ? `?locale=${encodeURIComponent(locale)}` : '';
+        const res = await api.get(`/public/product-landings/${encodeURIComponent(publicKey)}${qs}`);
+        if (!cancelled) { setData(res.data.data as PublicProductLanding); setError(null); }
       } catch (e: any) {
+        if (cancelled) return;
         if (e?.response?.status === 404) setError('존재하지 않는 제품 코드입니다.');
         else setError('제품 정보를 불러오지 못했습니다.');
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     })();
-  }, [publicKey]);
+    return () => { cancelled = true; };
+  }, [publicKey, locale]);
 
-  if (loading) {
+  const chooseLocale = (loc: string) => {
+    setLocale(loc);
+    try { localStorage.setItem(STORAGE_KEY, loc); } catch { /* ignore */ }
+    setSheetOpen(false);
+  };
+
+  if (loading && !data) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
@@ -96,7 +134,6 @@ export default function ProductLandingPage() {
     );
   }
 
-  // 노출 게이트 차단(행정처분/회수 등)
   if (data.blocked) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
@@ -113,6 +150,14 @@ export default function ProductLandingPage() {
 
   const p = data.product;
   const regLabel = p?.regulatoryType ? (REGULATORY_LABEL[p.regulatoryType] ?? p.regulatoryType) : null;
+
+  // 언어 선택 정책: 공개 가능한 언어 중 한국어 외 언어(외국어)가 있으면 [한국어][Other Languages].
+  const available = (data.languages || []).filter(Boolean);
+  const hasKo = available.some((l) => baseLocale(l) === 'ko');
+  const foreignLangs = available.filter((l) => baseLocale(l) !== 'ko');
+  const showSelector = foreignLangs.length >= 1; // 한국어만 있으면 선택 UI 없음
+  const resolved = data.resolvedLocale;
+  const koActive = baseLocale(resolved || '') === 'ko';
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -135,7 +180,34 @@ export default function ProductLandingPage() {
           </dl>
         </div>
 
-        {/* 설명 */}
+        {/* 언어 선택 — 외국어가 있을 때만 (한국어 / Other Languages) */}
+        {showSelector && (
+          <div className="flex items-center gap-2 mt-4">
+            {hasKo && (
+              <button
+                type="button"
+                onClick={() => chooseLocale('ko')}
+                className={`min-h-[44px] px-4 py-2 text-sm font-medium rounded-xl border ${
+                  koActive ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+                }`}
+              >
+                {LOCALE_FLAG.ko} 한국어
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => setSheetOpen(true)}
+              className={`min-h-[44px] px-4 py-2 text-sm font-medium rounded-xl border inline-flex items-center gap-1.5 ${
+                !koActive ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+              }`}
+            >
+              <Globe size={15} />
+              {!koActive && resolved ? `${localeFlag(resolved)} ${localeLabel(resolved)}` : 'Other Languages'}
+            </button>
+          </div>
+        )}
+
+        {/* 설명 (선택 언어 본문) */}
         <div className="bg-white rounded-2xl shadow-sm p-6 mt-4">
           <div className="flex items-center gap-2 mb-3">
             <FileText size={18} className="text-gray-400" />
@@ -159,6 +231,49 @@ export default function ProductLandingPage() {
 
         <p className="text-center text-xs text-gray-400 mt-6">O4O · neture.co.kr</p>
       </div>
+
+      {/* Other Languages — 모바일 바텀시트(터치 친화). 국기 + 자국어명. 실제 공개 언어만. */}
+      {sheetOpen && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" role="dialog" aria-modal="true">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setSheetOpen(false)} />
+          <div className="relative w-full sm:max-w-sm bg-white rounded-t-3xl sm:rounded-3xl shadow-xl p-5 pb-7 animate-[slideup_.2s_ease]">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base font-bold text-gray-900">언어 선택 · Language</h3>
+              <button type="button" onClick={() => setSheetOpen(false)} className="w-9 h-9 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100" aria-label="닫기">
+                <X size={20} />
+              </button>
+            </div>
+            <div className="flex flex-col gap-2">
+              {hasKo && (
+                <button
+                  type="button"
+                  onClick={() => chooseLocale('ko')}
+                  className={`w-full min-h-[52px] px-4 py-3 text-left text-base rounded-2xl border flex items-center gap-3 ${
+                    koActive ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-800 border-gray-200 hover:bg-gray-50'
+                  }`}
+                >
+                  <span className="text-xl">{LOCALE_FLAG.ko}</span> 한국어
+                </button>
+              )}
+              {foreignLangs.map((loc) => {
+                const active = baseLocale(resolved || '') === baseLocale(loc);
+                return (
+                  <button
+                    key={loc}
+                    type="button"
+                    onClick={() => chooseLocale(loc)}
+                    className={`w-full min-h-[52px] px-4 py-3 text-left text-base rounded-2xl border flex items-center gap-3 ${
+                      active ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-800 border-gray-200 hover:bg-gray-50'
+                    }`}
+                  >
+                    <span className="text-xl">{localeFlag(loc)}</span> {localeLabel(loc)}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

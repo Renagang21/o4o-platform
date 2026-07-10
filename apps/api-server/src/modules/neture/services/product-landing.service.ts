@@ -55,7 +55,8 @@ export interface PublicProductLanding {
     summary: string | null;
   };
   placeholder: string | null; // 설명 없을 때 안내 문구
-  languages: string[]; // 향후 언어탭 — 현재 ['ko']
+  languages: string[]; // 공개 가능한 언어(canonical STORE) — ko 우선 정렬
+  resolvedLocale: string | null; // 실제 표시 중인 언어
 }
 
 export class ProductLandingService {
@@ -133,8 +134,12 @@ export class ProductLandingService {
     return { publicKey: landing.publicKey, url, svg, created };
   }
 
-  /** 공개 Landing read model. 없으면 null. 노출 게이트 차단 시 blocked=true(콘텐츠 미포함). */
-  async getPublicLanding(publicKey: string): Promise<PublicProductLanding | null> {
+  /**
+   * 공개 Landing read model. 없으면 null. 노출 게이트 차단 시 blocked=true(콘텐츠 미포함).
+   * WO-O4O-KPA-PRODUCT-QR-LANGUAGE-SELECTOR-REUSE-AND-ADAPT-V1: locale 지원 —
+   *   languages = master 의 canonical STORE 언어(공개 가능), 요청 locale(없거나 미보유 시 ko→첫 언어) 본문 반환.
+   */
+  async getPublicLanding(publicKey: string, locale?: string): Promise<PublicProductLanding | null> {
     const rows = await this.dataSource.query(
       `SELECT * FROM product_landings WHERE public_key = $1 AND deleted_at IS NULL LIMIT 1`,
       [publicKey],
@@ -154,6 +159,7 @@ export class ProductLandingService {
         description: { hasCanonical: false, descriptionType: null, content: null, summary: null },
         placeholder: null,
         languages: ['ko'],
+        resolvedLocale: null,
       };
     }
 
@@ -164,16 +170,37 @@ export class ProductLandingService {
     );
     const pm = pmRows[0] ?? null;
 
-    // WO-O4O-STORE-MULTILINGUAL-CANONICAL-DESCRIPTION-V1: canonical 언어별 다수 가능 →
-    //   공개 랜딩은 ko 우선(없으면 최신) 1건 선택(임의 언어 노출 방지).
-    const spdRows = await this.dataSource.query(
-      `SELECT content, summary, description_type
+    // WO-O4O-KPA-PRODUCT-QR-LANGUAGE-SELECTOR-REUSE-AND-ADAPT-V1:
+    //   공개 가능한 언어(canonical STORE) 목록 + 요청 locale 본문(없으면 ko→첫 언어 fallback).
+    const langRows: Array<{ lang: string }> = await this.dataSource.query(
+      `SELECT DISTINCT COALESCE(language, 'ko') AS lang
        FROM shared_product_descriptions
-       WHERE master_id = $1 AND deleted_at IS NULL AND status = 'canonical'
-       ORDER BY (language = 'ko') DESC, updated_at DESC LIMIT 1`,
+       WHERE master_id = $1 AND deleted_at IS NULL AND status = 'canonical' AND description_type = 'STORE'`,
       [landing.product_master_id],
     );
-    const spd = spdRows[0] ?? null;
+    const available = langRows
+      .map((r) => (r.lang || 'ko').toLowerCase())
+      .sort((a, b) => (a === 'ko' ? -1 : b === 'ko' ? 1 : a.localeCompare(b)));
+
+    const reqLoc = (locale || '').toLowerCase();
+    const resolvedLocale = available.includes(reqLoc)
+      ? reqLoc
+      : available.includes('ko')
+        ? 'ko'
+        : available[0] ?? null;
+
+    let spd: { content: string | null; summary: string | null; description_type: string | null } | null = null;
+    if (resolvedLocale) {
+      const spdRows = await this.dataSource.query(
+        `SELECT content, summary, description_type
+         FROM shared_product_descriptions
+         WHERE master_id = $1 AND deleted_at IS NULL AND status = 'canonical' AND description_type = 'STORE'
+           AND COALESCE(language, 'ko') = $2
+         ORDER BY updated_at DESC LIMIT 1`,
+        [landing.product_master_id, resolvedLocale],
+      );
+      spd = spdRows[0] ?? null;
+    }
 
     return {
       publicKey: landing.public_key,
@@ -197,7 +224,8 @@ export class ProductLandingService {
         summary: spd?.summary ?? null,
       },
       placeholder: spd ? null : PLACEHOLDER_TEXT,
-      languages: ['ko'],
+      languages: available.length ? available : ['ko'],
+      resolvedLocale,
     };
   }
 }

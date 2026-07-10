@@ -37,7 +37,9 @@ export function createPublicProductLandingController(dataSource: DataSource): Ro
 
   router.get('/:publicKey', async (req: Request, res: Response) => {
     try {
-      const data = await service.getPublicLanding(req.params.publicKey);
+      // WO-...-PRODUCT-QR-LANGUAGE-SELECTOR-REUSE-AND-ADAPT-V1: locale 별 본문(고객 언어 전환)
+      const locale = typeof req.query.locale === 'string' ? req.query.locale.slice(0, 16) : undefined;
+      const data = await service.getPublicLanding(req.params.publicKey, locale);
       if (!data) {
         res.status(404).json({ success: false, error: '존재하지 않는 제품 랜딩입니다', code: 'LANDING_NOT_FOUND' });
         return;
