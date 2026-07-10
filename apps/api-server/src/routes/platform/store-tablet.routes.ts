@@ -42,6 +42,8 @@ import { ProductMaster } from '../../modules/neture/entities/ProductMaster.entit
 import { StoreProductProfile } from '../../modules/store-core/entities/StoreProductProfile.entity.js';
 import { validateGtin } from '../../utils/gtin.js';
 import { createRequireStoreOwner } from '../../utils/store-owner.utils.js';
+// WO-O4O-KPA-TABLET-IDLE-BLOCK-INTEGRATION-V1: idle_media block config 검증 (dual-read helper 모듈)
+import { parseIdleMediaConfig } from './store-tablet-idle-block.js';
 
 type AuthMiddleware = import('express').RequestHandler;
 
@@ -1296,6 +1298,11 @@ export function createStoreTabletRoutes(
         if (!b || typeof b !== 'object') { res.status(400).json({ success: false, error: `blocks[${i}] must be an object`, code: 'VALIDATION_ERROR' }); return; }
         if (!SET_BLOCK_TYPES.includes(b.blockType)) { res.status(400).json({ success: false, error: `blocks[${i}].blockType invalid (allowed: ${SET_BLOCK_TYPES.join(', ')})`, code: 'INVALID_BLOCK_TYPE' }); return; }
         if (b.config != null && (typeof b.config !== 'object' || Array.isArray(b.config))) { res.status(400).json({ success: false, error: `blocks[${i}].config must be an object`, code: 'INVALID_BLOCK_CONFIG' }); return; }
+        // WO-O4O-KPA-TABLET-IDLE-BLOCK-INTEGRATION-V1: idle_media config 검증(source/durationMs/custom_media)
+        if (b.blockType === 'idle_media') {
+          const parsed = parseIdleMediaConfig(b.config);
+          if (!parsed.ok && 'error' in parsed) { res.status(400).json({ success: false, error: `blocks[${i}].config: ${parsed.error}`, code: 'INVALID_BLOCK_CONFIG' }); return; }
+        }
       }
       await dataSource.transaction(async (manager) => {
         await manager.query(`DELETE FROM store_tablet_screen_blocks WHERE screen_set_id = $1`, [id]);
