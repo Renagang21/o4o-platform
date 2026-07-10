@@ -95,6 +95,10 @@ Screen Set / Block 모델을 저장할 **최소 additive schema** 만 추가한�
 | FK 2 (blocks→sets CASCADE, tablets.current→sets SET NULL) | ✅ 존재 |
 | PK 2 | ✅ 존재 |
 | `typeorm_migrations` 기록 | ✅ `CreateTabletScreenSetsAndBlocks20270120000000` |
+| **기존 태블릿 current_screen_set_id 전부 NULL** | ✅ non_null count = **0** (legacy 경로 유지, 자동 assignment 0) |
+| **기존 구조 불변** (감사 시점 대비) | ✅ store_tablets **4**, store_tablet_displays **2**, idle 보유 태블릿 **1** — 전부 동일 |
+
+> **결론**: 순수 additive. 기존 데이터·구조 변화 0, 신규 구조는 빈 상태(0/0), 모든 기존 태블릿은 `current_screen_set_id=NULL`(=기존 public runtime 동작 완전 불변). WO 닫기 가능.
 
 ## 6. 후속 WO
 
