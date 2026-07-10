@@ -2,8 +2,8 @@
 
 > WO: `WO-O4O-PUBLIC-DATA-CANDIDATE-LEGACY-MASTER-MATCHING-REMOVAL-V1`
 > 선행 조사: `CHECK-O4O-PUBLIC-DATA-CANDIDATE-LEGACY-MASTER-MATCHING-CODE-REMOVAL-AUDIT-V1`
-> 코드 커밋: `f1bce3172` (path-specific, 12 files, +75/−687)
-> 작업일: 2026-07-10
+> 코드 커밋: `f1bce3172` (제거 본체, 12 files, +75/−687) · `bdb12d647` (잔여 정리 — o4o-product-db.api.ts + Overview)
+> 작업일: 2026-07-10 · **최종 상태: 배포·smoke 완료 (main 복구됨)**
 
 ---
 
@@ -75,15 +75,17 @@
 
 ---
 
-## 5. 배포 결과
+## 5. 배포 결과 — **최종: 전부 배포됨 (main 복구 후)**
 
-| 서비스 | 결과 | 비고 |
+| 서비스 | 최종 결과 | 경로 |
 |---|---|---|
-| **Deploy Web Services** (web-neture) | ✅ **SUCCESS** (run 29065280223) | 내 오퍼레이터 페이지 변경 반영 |
-| **Deploy API Server** | ❌ FAILURE (run 29065280165) | **병행 세션 원인** |
-| **Deploy Admin Dashboard** | ❌ FAILURE (run 29065280189) | **병행 세션 원인** |
+| **web-neture** | ✅ SUCCESS | 내 커밋 `f1bce3172` 직후 배포(run 29065280223) |
+| **API Server** | ✅ SUCCESS | 병행 세션 복구 커밋 `8fe7e46c3`(내 `f1bce3172` 를 조상으로 포함) 배포 성공 → 내 제거 반영 |
+| **Admin Dashboard** | ✅ SUCCESS | `8fe7e46c3` 배포 성공(제거 본체) + `bdb12d647`(잔여 정리) 재배포 성공(run 29066104519) |
 
-### 5.1 api/admin 실패는 내 회귀가 아님 (증거)
+초기(§5.1)에 api/admin 이 실패했으나, **병행 PRODUCT-MASTER-STATUS 세션이 누락 파일(`product-master-status.controller.ts`·`ProductMasterStatusControls.tsx`)을 커밋(`8fe7e46c3`)하여 main 이 복구**되었고, 그 성공 배포에 **내 변경이 조상 커밋으로 포함**되어 함께 프로덕션 반영되었다. 이후 잔여 정리 `bdb12d647` 도 admin 재배포 성공.
+
+### 5.1 초기 실패는 내 회귀가 아니었음 (기록)
 직전 커밋 `d1b297d8b`("admin-direct STORE description authoring", 병행 세션 WO-...-PRODUCT-MASTER-STATUS 계열)에서 이미 두 배포가 실패했고, 원인은 **커밋된 파일이 아직 커밋 안 된 파일을 import**:
 - api-server: `src/bootstrap/register-routes.ts:512` → `Cannot find module '../modules/neture/controllers/product-master-status.controller.js'`
 - admin-dashboard: `src/pages/o4o-product-db/ProductMasterDetailPage.tsx` → `Could not resolve "./ProductMasterStatusControls"`
@@ -92,9 +94,16 @@
 
 > 조치 권장: 병행 세션이 `product-master-status.controller.ts` + `ProductMasterStatusControls` 를 커밋 → main green → api/admin 재배포(워크플로 재실행) → 그때 admin/api smoke 수행.
 
-### 5.2 실브라우저 smoke — 현재 보류 (사유 명확)
-- api/admin: 배포 실패로 구 리비전 서빙 → 내 변경 미반영 → smoke 불가(main 복구 후).
-- web-neture: 배포됐으나 `/operator/product-candidates` 는 OperatorRoute 가드 — 테스트 계정(sohae2100=neture supplier 롤)으로 접근 시 `/` 리다이렉트 → 브라우저 렌더 미도달. (오퍼레이터 롤 계정 필요.) 프론트 제거는 build 통과로 확인됨.
+### 5.2 실브라우저 smoke — **admin PASS** (2026-07-10, admin.neture.co.kr, Playwright)
+main 복구 + `bdb12d647` admin 재배포(SUCCESS) 후 로그인(sohae2100@) → 사이드바 내비로 검증:
+1. ✅ **후보 목록**: 컬럼 = 상품명/제조·업체/분류/식별자/후보 상태/생성일 — **"기본상품 매칭" 컬럼 없음**, 매칭 필터 없음, 기본 진입 = 등록 전(126,897건).
+2. ✅ **후보 상세 드로어**(의료기기 치관용 레진): 제목 = **"후보 상세"**, 섹션 = 후보 기본정보(**"등록된 O4O 상품 ID"**)/원천 식별자·주요 원천값/신규 기본상품 등록(drug-gated 안내)/rawPayload. **수동 매칭 검색·"동일 식별자 다른 후보"·"식별자 일치 기본상품"·매칭 상태 필드 전부 없음**. 액션 = archive/제외/보류.
+3. ✅ **현황(Overview)**: "오늘 처리할 작업" = **"등록 전 후보 126,897"**(+이미지 없는 상품) — **"충돌 확인" task 없음**. 세부 통계 = 후보 상태별 분포 + 출처별 분포 — **"매칭 상태별 분포" 없음**.
+4. ✅ **API 반영 간접 확인**: admin 후보 화면이 배포된 API(`8fe7e46c3`)와 정상 통신(목록 126,897건 로드 + 드로어 promotable 게이트 표시) → 슬림된 `getConflictInfo`·제거된 라우트 반영 확인.
+
+증빙: 스크린샷 `candidate-matching-removal-overview.png`.
+
+- web-neture(오퍼레이터): 배포됐으나 `/operator/product-candidates` 는 OperatorRoute 가드 — 테스트 계정(sohae2100=neture **supplier** 롤)으로 접근 시 `/` 리다이렉트. 오퍼레이터 롤 계정 필요 → 브라우저 smoke 보류(제거는 build 통과 + api 계약 정합으로 확인). 오퍼레이터 롤 계정 확보 시 후속 확인.
 
 ---
 
@@ -123,8 +132,8 @@
 - [x] 상품 등록 트랜잭션 dedup 유지
 - [x] 후보 업무 상태 = 등록 전/등록 완료/제외 중심
 - [x] type-check·build 통과
-- [~] 관련 서비스 배포 — **web-neture SUCCESS / api·admin BLOCKED(병행 세션 원인, §5)**
-- [~] 운영 smoke — **보류(배포 blockage + 오퍼레이터 롤 접근, §5.2)**
+- [x] 관련 서비스 배포 — **web-neture / API / Admin 전부 SUCCESS (main 복구 후, §5)**
+- [x] 운영 smoke — **admin PASS(후보 목록·상세·Overview, §5.2)** / web-neture 오퍼레이터 롤 계정 보류
 - [x] 제거 후 잔존 검색 결과 문서화
 - [x] DB 컬럼 DROP 여부·결과 명확 보고 (§6, 후속 migration WO)
 
@@ -133,4 +142,4 @@
 ## 8. 안전/범위 확인
 - 병행 세션 파일(`o4o-product-db.api.ts`, `register-routes.ts`, `product-library.controller.ts`, `neture.service.ts`, `catalog.service.ts`, `product-master-status.controller.ts`, `ProductMasterStatusControls`) **미접촉·미커밋** (path-specific 커밋). `pnpm-lock.yaml` 제외.
 - 후보 대량 승격 0 · 데이터 보정 0 · ProductMaster/Identifier 생성·수정 0 · hard delete 0 · `matched_product_master_id` 삭제 0 · migration 0(이번 커밋).
-- admin `o4o-product-db.api.ts` 의 `ProductCandidateRow.matchStatus/confidenceScore` 잔존 타입 필드 + `manualMatchCandidate` 함수(미사용) 정리는 병행 세션이 같은 파일을 편집 중이라 **미접촉** — 해당 파일 소유권이 정리되면 후속.
+- admin `o4o-product-db.api.ts` 잔여 정리(=`ProductCandidateRow.matchStatus/confidenceScore`·`ProductCandidateListParams.matchStatus`·`manualMatchCandidate`·`CandidateConflictInfo.conflictingCandidates/possibleMasters` 제거) + `ProductDbOverviewPage`(매칭 상태 지표→등록 전 후보 지표) 는 병행 세션이 해당 파일을 커밋(`8fe7e46c3`)한 뒤 **후속 커밋 `bdb12d647` 로 완료**. type-check/build/admin 재배포 PASS.
