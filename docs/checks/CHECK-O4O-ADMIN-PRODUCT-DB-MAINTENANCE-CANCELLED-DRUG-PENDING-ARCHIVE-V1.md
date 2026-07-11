@@ -39,8 +39,8 @@ apply **코드**만 배포하고 실제 실행은 사용자 명시 승인 후. �
 | dry-run DB write | ✅ 0 |
 | apply write 경로 격리 | ✅ apply 엔드포인트에만 UPDATE |
 | confirmation/ expectedCount 게이트 | ✅ 코드 차단 |
-| 이번 단계 apply 실행 | ❌ 미실행 |
-| gate smoke (Apply 미클릭) | (배포 후 §7) |
+| 이번 단계 apply 실행 | ❌ 미실행 (smoke 에서도 Apply 요청 0) |
+| gate smoke (Apply 미클릭) | ✅ **PASS** (§7) |
 
 ## 5. 예상 dry-run 수치 (IR 기준)
 
@@ -52,11 +52,26 @@ apply **코드**만 배포하고 실제 실행은 사용자 명시 승인 후. �
 - api-server: 변경 파일(product-db-maintenance.controller) 에러 0 (기존 무관 20 errors 는 `src/scripts/drug-otc-*`).
 - admin-dashboard: **0 errors** (재사용 카드 리팩터 포함).
 
-## 7. gate smoke (배포 후, Apply 미클릭)
+## 7. gate smoke (배포 후, Apply 미클릭) — PASS
 
-배포 후 admin.neture.co.kr `/admin/o4o-product-db/maintenance` 두 번째 카드에서:
-Dry-run → targetCount 74,680 확인 → 확인 문구 입력 전 Apply disabled, 정확 문구 입력 후 Apply enabled 확인,
-**Apply 클릭 안 함**(apply 요청 0). 결과는 본 문서에 추가.
+- 배포: commit `71b420e60`(구현) + `52104292f`(fix). Deploy API/Admin success.
+- ⚠️ **1차 smoke 500 버그 발견·수정**: TypeORM raw where 에서 엔티티 프로퍼티 `pc.rawPayload` 를 JSON
+  연산자 앞에서 컬럼으로 치환하지 못해 `column pc.rawpayload does not exist` 500 발생 → 물리 컬럼명
+  `pc.raw_payload` 로 수정(`52104292f`). **smoke 로 잡음.**
+- 재smoke 결과(admin.neture.co.kr, 두 번째 카드, **Apply 미클릭**):
+
+| smoke 항목 | 기대 | 결과 |
+|---|---|---|
+| Dry-run | 200 | ✅ HTTP 200 |
+| targetCount | 74,680 | ✅ **74,680** |
+| byStatus | pending 74,680 | ✅ |
+| bySourceLabel | mfds-drug-master-standard-code_2025-10-31 단일 | ✅ |
+| applyEligible / confirmationPhrase | true / ARCHIVE_CANCELLED_DRUG_PENDING_CANDIDATES | ✅ |
+| Apply (입력 전 / 틀린 문구) | disabled | ✅ disabled |
+| Apply (정확 문구) | enabled | ✅ **enabled** |
+| **Apply 요청 전송** | **0 (미클릭)** | ✅ **applyRequestSent=false** |
+
+→ confirmation 게이트 정상. **apply 미실행 · DB write 0.**
 
 ## 8. 다음 (사용자 명시 승인 필요)
 
@@ -68,4 +83,4 @@ confirmation: ARCHIVE_CANCELLED_DRUG_PENDING_CANDIDATES
 
 ---
 
-*Status: 코드 구현 완료 · apply 미실행 · dry-run write 0 · migration 0.*
+*Status: 코드 구현 완료 · apply 미실행 · dry-run write 0 · migration 0 · typecheck PASS · **gate smoke PASS(apply 미클릭)**.*
