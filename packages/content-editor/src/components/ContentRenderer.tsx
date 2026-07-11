@@ -49,8 +49,9 @@ interface ContentRendererProps {
    * 렌더링 변형.
    * - 'product-detail': 상품 상세설명 전용 폭/이미지 규칙 적용
    * - 'guide': 가이드/온보딩 콘텐츠 렌더링 (YouTube iframe + 이미지 + 리치 블록)
+   * - 'store-description': 매장용 상품 설명서 디자인 시스템 (반응형 @container, 시맨틱 sd-* 클래스)
    */
-  variant?: 'product-detail' | 'guide';
+  variant?: 'product-detail' | 'guide' | 'store-description';
 }
 
 /** 상품 상세설명 전용 스타일 — 이미지 반응형 + 컨텐츠 폭 제한 */
@@ -123,6 +124,106 @@ function injectEmbedCss() {
   embedCssInjected = true;
 }
 
+/**
+ * 매장용 상품 설명서(STORE/B2B `shared_product_descriptions`) 디자인 시스템.
+ *
+ * WO-O4O-STORE-DESCRIPTION-RENDERER-DESIGN-SYSTEM-V1
+ *   콘텐츠는 <style> 없이 시맨틱 HTML(sd-* 클래스)만 저장한다(write-sanitizer 무손실 통과).
+ *   반응형은 렌더러가 주입하는 이 스코프 스타일시트가 담당한다.
+ *   - 모든 규칙은 `.store-desc-content` 하위로 스코프(호스트 페이지 오염 없음).
+ *   - 래퍼에 container-type:inline-size → @container 로 폰(1열)·태블릿(2~3열) 반응형.
+ *   - 라이트/다크 토큰(prefers-color-scheme + :root[data-theme]).
+ */
+const storeDescriptionCss = `
+.store-desc-content{
+  --sd-bg:#eaf0f7; --sd-card:#ffffff; --sd-ink:#1a2735; --sd-sub:#5b7085;
+  --sd-blue:#1f6fbf; --sd-blue-deep:#17356b; --sd-navy:#13263f;
+  --sd-line:#e4ebf3; --sd-chip:#eaf1fb; --sd-chip-line:#cfdff2; --sd-gold:#c79a3e;
+  --sd-shadow:0 6px 22px rgba(23,53,107,.10);
+  container-type:inline-size; background:var(--sd-bg); color:var(--sd-ink);
+  font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic","Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  -webkit-font-smoothing:antialiased; padding:24px 14px 50px;
+}
+@media (prefers-color-scheme:dark){.store-desc-content{
+  --sd-bg:#0e1620; --sd-card:#16212f; --sd-ink:#e7eef6; --sd-sub:#9fb3c6;
+  --sd-blue:#5b9be0; --sd-blue-deep:#bcd6f2; --sd-navy:#e7eef6;
+  --sd-line:#263647; --sd-chip:#1b2a3c; --sd-chip-line:#2c4056; --sd-gold:#d8b662;
+  --sd-shadow:0 6px 22px rgba(0,0,0,.4);}}
+:root[data-theme="dark"] .store-desc-content{
+  --sd-bg:#0e1620; --sd-card:#16212f; --sd-ink:#e7eef6; --sd-sub:#9fb3c6;
+  --sd-blue:#5b9be0; --sd-blue-deep:#bcd6f2; --sd-navy:#e7eef6;
+  --sd-line:#263647; --sd-chip:#1b2a3c; --sd-chip-line:#2c4056; --sd-gold:#d8b662;
+  --sd-shadow:0 6px 22px rgba(0,0,0,.4);}
+:root[data-theme="light"] .store-desc-content{
+  --sd-bg:#eaf0f7; --sd-card:#ffffff; --sd-ink:#1a2735; --sd-sub:#5b7085;
+  --sd-blue:#1f6fbf; --sd-blue-deep:#17356b; --sd-navy:#13263f;
+  --sd-line:#e4ebf3; --sd-chip:#eaf1fb; --sd-chip-line:#cfdff2; --sd-gold:#c79a3e;
+  --sd-shadow:0 6px 22px rgba(23,53,107,.10);}
+.store-desc-content *{box-sizing:border-box}
+.store-desc-content .sd-card{max-width:860px;margin:0 auto;background:var(--sd-card);border:1px solid var(--sd-line);border-radius:20px;overflow:hidden;box-shadow:var(--sd-shadow)}
+.store-desc-content .sd-scan{display:block;text-align:center;font-size:12.5px;letter-spacing:.1em;color:var(--sd-sub);margin:0 auto 12px;max-width:860px}
+.store-desc-content .sd-hero{padding:28px 22px 24px;text-align:center;background:linear-gradient(180deg,var(--sd-chip),transparent)}
+.store-desc-content .sd-badges{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
+.store-desc-content .sd-badge{font-size:12.5px;font-weight:700;border-radius:999px;padding:5px 12px;line-height:1;background:transparent;border:1px solid var(--sd-chip-line);color:var(--sd-blue)}
+.store-desc-content .sd-badge.is-solid{background:var(--sd-blue-deep);color:#fff;border-color:transparent}
+.store-desc-content .sd-hero h1{margin:0;font-size:32px;font-weight:800;letter-spacing:-.01em;color:var(--sd-navy);text-wrap:balance}
+.store-desc-content .sd-hero h1 small{display:block;font-size:15px;font-weight:600;color:var(--sd-blue);letter-spacing:.01em;margin-top:9px}
+.store-desc-content .sd-meta{margin:12px 0 0;font-size:13px;color:var(--sd-sub)}
+.store-desc-content .sd-body{padding:6px 22px 26px}
+.store-desc-content .sd-intro{font-size:15.5px;line-height:1.75;color:var(--sd-ink);margin:20px 2px 0}
+.store-desc-content .sd-intro b{color:var(--sd-blue);font-weight:700}
+.store-desc-content .sd-body h2{font-size:18px;letter-spacing:-.005em;color:var(--sd-navy);font-weight:800;text-align:center;margin:34px 0 16px}
+.store-desc-content .sd-body h2::after{content:"";display:block;width:26px;height:3px;border-radius:3px;background:var(--sd-blue);margin:10px auto 0}
+.store-desc-content .sd-why,.store-desc-content .sd-who{list-style:none;margin:0;padding:0}
+.store-desc-content .sd-why li,.store-desc-content .sd-who li{position:relative;padding:11px 0 11px 22px;font-size:15.5px;color:var(--sd-ink);border-bottom:1px solid var(--sd-line);line-height:1.5}
+.store-desc-content .sd-why li::before{content:"";position:absolute;left:2px;top:18px;width:7px;height:7px;border-radius:50%;background:var(--sd-blue)}
+.store-desc-content .sd-who li::before{content:"";position:absolute;left:2px;top:18px;width:7px;height:7px;border-radius:50%;background:var(--sd-gold)}
+.store-desc-content .sd-core{display:flex;flex-direction:column;gap:11px}
+.store-desc-content .sd-item{background:var(--sd-chip);border:1px solid var(--sd-line);border-left:3px solid var(--sd-blue);border-radius:14px;padding:15px 16px 14px}
+.store-desc-content .sd-item .sd-tag{display:inline-block;font-size:12px;font-weight:700;color:#fff;background:var(--sd-blue);border-radius:6px;padding:3px 10px;margin-bottom:8px}
+.store-desc-content .sd-item h3{margin:0 0 6px;font-size:18px;font-weight:800;color:var(--sd-navy)}
+.store-desc-content .sd-item p{margin:0;font-size:15px;line-height:1.64;color:var(--sd-sub)}
+.store-desc-content .sd-intake{font-size:15.5px;color:var(--sd-ink);text-align:center;margin:0 2px;line-height:1.6}
+.store-desc-content .sd-intake small{display:block;color:var(--sd-sub);font-size:13px;margin-top:5px}
+.store-desc-content .sd-chips{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-top:2px;padding:0;list-style:none}
+.store-desc-content .sd-chips span,.store-desc-content .sd-chips li{font-size:12.5px;font-weight:600;color:var(--sd-blue);background:var(--sd-chip);border:1px solid var(--sd-chip-line);border-radius:999px;padding:6px 12px}
+.store-desc-content .sd-spec{text-align:center;font-size:13.5px;color:var(--sd-sub);font-weight:600;margin:20px 0 0}
+.store-desc-content .sd-cta{margin-top:28px;background:linear-gradient(180deg,var(--sd-chip),transparent);border:1px solid var(--sd-line);border-radius:16px;padding:22px 18px;text-align:center}
+.store-desc-content .sd-cta .sd-cta-k{font-size:12.5px;letter-spacing:.1em;color:var(--sd-blue);font-weight:800;margin-bottom:9px}
+.store-desc-content .sd-cta p{margin:0;font-size:15px;line-height:1.64;color:var(--sd-ink)}
+.store-desc-content .sd-cta b{color:var(--sd-blue)}
+.store-desc-content .sd-foot{text-align:center;font-size:12px;color:var(--sd-sub);margin-top:18px;letter-spacing:.02em}
+@container (min-width:640px){
+  .store-desc-content .sd-hero{padding:40px 34px 32px}
+  .store-desc-content .sd-hero h1{font-size:44px}
+  .store-desc-content .sd-hero h1 small{font-size:17px;margin-top:11px}
+  .store-desc-content .sd-meta{font-size:14.5px}
+  .store-desc-content .sd-badge{font-size:13.5px;padding:6px 14px}
+  .store-desc-content .sd-body{padding:8px 40px 40px}
+  .store-desc-content .sd-intro{font-size:17px;line-height:1.8;max-width:68ch;margin-left:auto;margin-right:auto;text-align:center}
+  .store-desc-content .sd-body h2{font-size:21px;margin:44px 0 20px}
+  .store-desc-content .sd-core{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .store-desc-content .sd-why,.store-desc-content .sd-who{display:grid;grid-template-columns:1fr 1fr;column-gap:28px}
+  .store-desc-content .sd-why li,.store-desc-content .sd-who li{font-size:16.5px}
+  .store-desc-content .sd-item h3{font-size:19px}
+  .store-desc-content .sd-item p{font-size:15.5px}
+  .store-desc-content .sd-intake{font-size:17px}
+  .store-desc-content .sd-chips span,.store-desc-content .sd-chips li{font-size:13.5px;padding:7px 14px}
+  .store-desc-content .sd-cta{padding:28px 24px}
+  .store-desc-content .sd-cta p{font-size:16px;max-width:62ch;margin:0 auto}
+}
+@container (min-width:900px){.store-desc-content .sd-core{grid-template-columns:1fr 1fr 1fr}}
+`;
+
+let storeDescriptionCssInjected = false;
+function injectStoreDescriptionCss() {
+  if (storeDescriptionCssInjected || typeof document === 'undefined') return;
+  const style = document.createElement('style');
+  style.textContent = storeDescriptionCss;
+  document.head.appendChild(style);
+  storeDescriptionCssInjected = true;
+}
+
 export function ContentRenderer({ html = '', className, style, variant }: ContentRendererProps) {
   // WO-O4O-CONTENT-RENDERER-PLATFORM-CONSISTENCY-V1: 이미지·표·임베드 CSS 를 모든 variant 공통 주입.
   injectImageDisplayCss();
@@ -149,6 +250,19 @@ export function ContentRenderer({ html = '', className, style, variant }: Conten
       <div
         className={`guide-rich-content ${className || ''}`}
         style={{ lineHeight: 1.7, ...style }}
+        dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(html) }}
+      />
+    );
+  }
+
+  // WO-O4O-STORE-DESCRIPTION-RENDERER-DESIGN-SYSTEM-V1: 매장용 설명서 반응형 디자인 시스템.
+  //   콘텐츠는 시맨틱 sd-* 클래스만 담고, 반응형 CSS 는 이 variant 가 스코프 주입한다.
+  if (variant === 'store-description') {
+    injectStoreDescriptionCss();
+    return (
+      <div
+        className={`store-desc-content ${className || ''}`}
+        style={style}
         dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(html) }}
       />
     );

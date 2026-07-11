@@ -67,17 +67,25 @@
 
 ---
 
-## 5. 콘텐츠 형식 + **반응형 디자인**
+## 5. 콘텐츠 형식 — **시맨틱 HTML** (반응형 디자인은 렌더러가 담당)
 
-**[examples/byeonenjang-probiotics.responsive.html](examples/byeonenjang-probiotics.responsive.html) 형식을 그대로 따른다.**
+> **⚠️ 형식 변경 (2026-07-11) — `<style>` 금지.**
+> 저장 sanitizer(`sanitize-description-html.util.ts`, DOMPurify 기본)가 **`<style>`을 태그째 제거**한다(검증됨). 그래서 설명서 콘텐츠에는 **`<style>`을 넣지 않는다.** 반응형·색·다크모드는 공용 렌더러 **`ContentRenderer variant="store-description"`**(WO-O4O-STORE-DESCRIPTION-RENDERER-DESIGN-SYSTEM-V1)가 스코프 CSS로 담당한다. 콘텐츠는 **시맨틱 HTML(아래 `sd-*` 클래스)만** 저장한다 — sanitizer가 시맨틱 태그·class 를 100% 보존한다(검증됨). 과거 `<style>` fragment 예제([examples/byeonenjang-probiotics.responsive.html](examples/byeonenjang-probiotics.responsive.html))는 **더 이상 쓰지 않는다**(참고용 보관).
 
-- **self-contained scoped fragment** — `<div class="xx-desc">` + 그 안에 `<style>`로 `.xx-desc …` 고유 class 스코프. 저장 시 sanitizer(DOMPurify 기본)가 `<style>`·class·inline style **보존**, `<script>`만 제거.
-- **번호·편집 라벨 금지**(R6-c). 소비자 랜딩 카피만. **10단 랜딩**(히어로→왜→핵심 구성 카드→이런 분께→섭취 안내→선물→트러스트→구성→상담).
-- **반응형 필수 — `@container` 컨테이너 쿼리**: 설명서는 폰 모달·매장 태블릿 등 폭이 다른 컨테이너에 삽입되므로 **뷰포트가 아니라 자기 컨테이너 폭**에 반응해야 한다.
-  - `.xx-desc{container-type:inline-size}` → `@container (min-width:640px){…}` 로 태블릿에서 **핵심 구성 2열·리스트 2열·타입 확대**, `(min-width:900px)` 3열.
-  - 좁으면 1열(폰), 넓게 주면 2~3열(태블릿) — 같은 fragment 하나로 폰·태블릿 대응.
-- **테마**: 토큰(`:root` custom props) + `@media (prefers-color-scheme:dark)` + `:root[data-theme]` 로 라이트/다크 둘 다.
-- **디자인 톤**: 카테고리/제품 색 반영(유산균=블루 등). 소제목은 작지 않게(18px 볼드 + 강조바). 중국어/영어는 현지 톤·서체.
+**[examples/byeonenjang.semantic.html](examples/byeonenjang.semantic.html) 형식을 그대로 따른다.** — class 어휘가 디자인 시스템과의 **계약**이다(임의 class 금지).
+
+**클래스 어휘 (sd-*):**
+- `sd-card` (최상위) → `sd-hero`(내부: `<h1>…<small>부제</small></h1>`, `sd-badges > sd-badge`[강조는 `.is-solid`], `sd-meta`) + `sd-body`.
+- `sd-body` 내부: `sd-intro`(`<b>` 강조) · `<h2>`(섹션 제목) · `sd-why`/`sd-who`(`<ul><li>`) · `sd-core > sd-item`(`sd-tag`, `<h3>`, `<p>`) · `sd-intake`(`<small>`) · `sd-chips`(`<ul><li>`) · `sd-spec` · `sd-cta`(`sd-cta-k`, `<p>`) · `sd-foot`.
+
+**규칙:**
+- **`<style>`·인라인 style·임의 class 금지.** 위 `sd-*` 구조만 맞추면 렌더러가 디자인을 입힌다.
+- **반응형은 자동** — 렌더러가 `@container` 로 폰 1열 / 태블릿(640px↑) 2열 / (900px↑) 3열. 저자는 구조만.
+- **테마 자동** — 렌더러가 라이트/다크 토큰 제공.
+- **번호·편집 라벨 금지**(R6-c). 소비자 랜딩 카피만. **10단 랜딩** 구조(히어로→왜→핵심 구성→이런 분께→섭취→트러스트→구성→상담).
+- 카테고리색·서체 등 세부 톤도 렌더러 소관 — 저자는 **문구와 구조**에 집중.
+
+> 디자인 시스템 정의: [packages/content-editor `ContentRenderer.tsx`](../../../../packages/content-editor/src/components/ContentRenderer.tsx) `storeDescriptionCss`. 소비 표면(현재 전환됨): KPA `StoreDescriptionViewModal`, Neture `ProductLandingPage`(QR 모바일). 태블릿 키오스크·다국어 랜딩은 후속 전환(혼재 슬롯 구분 필요).
 
 ---
 
@@ -126,7 +134,7 @@
 
 ## 부록. 파일럿 (검증 완료, 2026-07-11)
 
-- **변엔장** (제월당/노바렉스 제조, 프로바이오틱스 100억 CFU) — 식약처 `mainFunction`(장 건강) + 웹(시판·제월당·30포)로 ko 설명서 제작, 반응형 렌더 검증. 정본 형식 예제 = [examples/byeonenjang-probiotics.responsive.html](examples/byeonenjang-probiotics.responsive.html).
+- **변엔장** (노바렉스 제조, 프로바이오틱스 100억 CFU, 품목보고 200400200082915) — 식약처 `mainFunction`(장 건강) grounding으로 **시맨틱 ko+en** 제작, master `38a9d3e4-56be-4967-aa7b-0cb2d2e6baff` 등록, STORE·B2B ko+en canonical 저장 완료(2026-07-11). **정본 형식 예제 = [examples/byeonenjang.semantic.html](examples/byeonenjang.semantic.html)** (시맨틱 sd-*, `<style>` 없음). 반응형 프리뷰 검증 완료.
 
 ## 참조
 - 규칙 SSOT: [general-food/README.md](../general-food/README.md) (R1~R10)

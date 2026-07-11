@@ -13,6 +13,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Package, AlertCircle, FileText, Clock, Globe, X } from 'lucide-react';
+import { ContentRenderer } from '@o4o/content-editor';
 import { api } from '../lib/api/index.js';
 
 interface PublicProductLanding {
@@ -208,26 +209,26 @@ export default function ProductLandingPage() {
         )}
 
         {/* 설명 (선택 언어 본문) */}
-        <div className="bg-white rounded-2xl shadow-sm p-6 mt-4">
-          <div className="flex items-center gap-2 mb-3">
-            <FileText size={18} className="text-gray-400" />
-            <h2 className="text-base font-semibold text-gray-800">제품 설명</h2>
+        {data.description.hasCanonical && data.description.content ? (
+          // WO-O4O-STORE-DESCRIPTION-RENDERER-DESIGN-SYSTEM-V1: 매장용 설명서 반응형 디자인 시스템 + sanitize.
+          //   설명서는 자체 히어로/타이틀을 포함하므로 별도 "제품 설명" 카드 크롬 없이 직접 렌더(카드 중첩 방지).
+          <div className="mt-4">
+            <ContentRenderer variant="store-description" html={data.description.content} />
           </div>
-          {data.description.hasCanonical && data.description.content ? (
-            <div
-              className="prose prose-sm max-w-none text-gray-800"
-              // 신뢰된 canonical 설명(관리자 검수 SPD)만 렌더
-              dangerouslySetInnerHTML={{ __html: data.description.content }}
-            />
-          ) : (
+        ) : (
+          <div className="bg-white rounded-2xl shadow-sm p-6 mt-4">
+            <div className="flex items-center gap-2 mb-3">
+              <FileText size={18} className="text-gray-400" />
+              <h2 className="text-base font-semibold text-gray-800">제품 설명</h2>
+            </div>
             <div className="flex flex-col items-center justify-center py-10 text-center">
               <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-3">
                 <Clock size={22} className="text-gray-400" />
               </div>
               <p className="text-sm text-gray-500">{data.placeholder || '상세 설명을 준비 중입니다.'}</p>
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
         <p className="text-center text-xs text-gray-400 mt-6">O4O · neture.co.kr</p>
       </div>

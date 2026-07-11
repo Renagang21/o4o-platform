@@ -11,6 +11,7 @@
 
 import { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { X, FileText, Loader2 } from 'lucide-react';
+import { ContentRenderer } from '@o4o/content-editor';
 import { storeDescriptionApi, type StoreDescriptionItem } from '../../api/assetSnapshot';
 import { colors } from '../../styles/theme';
 
@@ -164,7 +165,8 @@ export function StoreDescriptionViewModal({ open, product, onClose }: Props) {
                   </div>
                   {active.summary && <p style={styles.summary}>{active.summary}</p>}
                   {active.contentHtml ? (
-                    <div style={styles.content} dangerouslySetInnerHTML={{ __html: active.contentHtml }} />
+                    // WO-O4O-STORE-DESCRIPTION-RENDERER-DESIGN-SYSTEM-V1: 매장용 설명서 반응형 디자인 시스템 + sanitize.
+                    <ContentRenderer variant="store-description" html={active.contentHtml} style={styles.content} />
                   ) : (
                     <div style={styles.noContent}>본문 내용이 없습니다.</div>
                   )}
