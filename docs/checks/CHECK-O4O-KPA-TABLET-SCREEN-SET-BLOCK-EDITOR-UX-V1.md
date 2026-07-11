@@ -80,10 +80,35 @@ Screen Set 영역 상단 + 적용/해제 근처에 amber 경고 박스 상시 �
 | web-kpa-society typecheck | ✅ PASS (exit 0) |
 | web-kpa-society build | ✅ PASS (exit 0) |
 | api-server typecheck (변경 파일) | ✅ PASS |
-| 배포 (web + api) | ⏳ (배포 후) |
-| browser smoke (생성/블록/적용/해제) | ⏳ (배포 후) |
+| 배포 (Deploy API 29148147302 + Web 29148147306) | ✅ 둘 다 success (`1382d8381`) |
+| browser smoke (production, 약국 계정) | ✅ PASS (아래) |
 
-_(배포 후 채움)_
+### Browser smoke (production, 2026-07-10) — UI E2E ✅ PASS
+
+`kpa-society.co.kr` 로그인 → `/store/commerce/tablet-displays`. Playwright, UI 클릭 구동.
+
+| 항목 | 결과 |
+|---|:--:|
+| 화면 세트 섹션 렌더 | ✅ |
+| 필수 경고("공개 태블릿 화면 반영은 후속…") | ✅ |
+| 새 세트 버튼 | ✅ |
+| legacy 4섹션 유지(공통 대기영상 + 상품 선택) | ✅ |
+| 세트 생성 → 목록 표시 + 편집기 열림 | ✅ |
+| idle_media 블록 추가 + 저장 | ✅ |
+| 적용 → 적용중 badge | ✅ |
+| 적용 해제 → badge 사라짐 | ✅ |
+| 보관 → 목록에서 제거 | ✅ |
+| console error | ✅ 0 |
+
+### 기존 데이터 불변 (read-only DB)
+
+| 대상 | 결과 |
+|---|:--:|
+| idle_playlist_items / displays / store_tablets | ✅ 1 / 2 / 4 (불변) |
+| tablets_with_current_screen_set | ✅ 0 (해제됨) |
+| public tablet runtime | ✅ 미접촉 |
+
+> **테스트 잔여물**: `[SMOKE-UX] set`(id `8d34a44d-9fce-4ea0-be14-b50e3ed0534d`, archived·soft-deleted) + block 1건. 앱 정상 쿼리에서 필터됨. hard-delete 정리는 사용자 승인 후 별도 raw DELETE.
 
 ## 8. 완료 기준
 
@@ -92,8 +117,8 @@ _(배포 후 채움)_
 - [x] public 미반영 경고 표시
 - [x] public runtime 변경 0 / 기존 legacy 기능 유지
 - [x] typecheck/build 성공
-- [ ] 배포 + browser smoke
-- [x] CHECK 작성 · [ ] commit/push
+- [x] 배포(web+api) + browser smoke UI E2E PASS
+- [x] CHECK 작성 · commit/push
 
 ## 9. 다음 단계
 
