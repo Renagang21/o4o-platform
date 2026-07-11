@@ -61,9 +61,13 @@ const APPLY_CHUNK_SIZE = 2000;
 const CANCELLED_DRUG_CONFIRMATION_PHRASE = 'ARCHIVE_CANCELLED_DRUG_PENDING_CANDIDATES';
 const CANCELLED_DRUG_ARCHIVE_NOTE =
   'cancelled-drug-archive:WO-O4O-ADMIN-PRODUCT-DB-MAINTENANCE-CANCELLED-DRUG-PENDING-ARCHIVE-V1';
-/** 취소 신호: isCancelled=true 또는 source.취소일자 존재 (승격 엔진 skip 기준과 동일) */
+/**
+ * 취소 신호: isCancelled=true 또는 source.취소일자 존재 (승격 엔진 skip 기준과 동일).
+ * 물리 컬럼명 `raw_payload` 사용 — TypeORM 은 raw where 안의 `pc.rawPayload`(엔티티 프로퍼티)를
+ * JSON 연산자 앞에서 컬럼으로 치환하지 못해 `pc.rawpayload does not exist` 로 실패한다.
+ */
 const CANCELLED_JSON_FILTER =
-  "(pc.rawPayload->>'isCancelled' = 'true' OR pc.rawPayload->'source'->>'취소일자' IS NOT NULL)";
+  "(pc.raw_payload->>'isCancelled' = 'true' OR pc.raw_payload->'source'->>'취소일자' IS NOT NULL)";
 
 export function createProductDbMaintenanceController(dataSource: DataSource): Router {
   const router = Router();
