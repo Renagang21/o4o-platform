@@ -73,14 +73,46 @@ apply **코드**만 배포하고 실제 실행은 사용자 명시 승인 후. �
 
 → confirmation 게이트 정상. **apply 미실행 · DB write 0.**
 
-## 8. 다음 (사용자 명시 승인 필요)
+## 8. apply 실행 결과 (2026-07-11 — 사용자 명시 승인 후 실행)
 
+- 승인: `취소 의약품 pending 74,680건 archived apply 실행 승인 / confirmation: ARCHIVE_CANCELLED_DRUG_PENDING_CANDIDATES`.
+- 실행: 데이터 정비 화면 두 번째 카드에서 dry-run(74,680 재확인) → 확인 문구 입력 → Apply.
+- apply 직전 독립 재검증(read-only): cancelled pending 74,680 / 드럭 트랙 단일 / 비취소 drug pending 1(대상 제외).
+
+### ⚠️ Cloud Run 요청 타임아웃 → idempotent 재실행으로 완주
+
+- 1차 apply: 청크 update 진행 중 **Cloud Run 요청 타임아웃(~300s)** 으로 HTTP 요청이 30청크(60,000건)에서 종료.
+  (JSON 필터 청크 스캔이 청크당 ~10s 라 300s 내 30청크만 처리.) 브라우저 응답 미수신.
+- 2차 apply(재실행): 대상이 남은 **14,680건** 으로 dry-run 재확인 → Apply. **idempotent**(archived 된 60,000건은
+  대상 필터에서 자동 제외) 라 잔여만 처리. 응답 수신: `updated 14,680 / chunks 8 / 31.8s`.
+- 합계 archived = 60,000 + 14,680 = **74,680**. (교훈: 대량 청크 apply 는 Cloud Run 요청 타임아웃에 걸릴 수 있으나
+  청크 idempotent 설계로 재실행 완주 가능. 향후 async job 화 검토.)
+
+### 사후검증 SQL (read-only, BEFORE→AFTER)
+
+| 검증 | BEFORE | AFTER | 판정 |
+|---|---:|---:|:--:|
+| A. 취소 pending 잔량 | 74,680 | **0** | ✅ |
+| B. archived 총량 | 69,207 | **143,887** (+74,680) | ✅ |
+| C. 드럭 pending 잔량 | 74,681 | **1** | ✅ |
+| D. 남은 1건 | — | 바이락스정(아시클로버) / 고려제약(주) / 전문의약품 / 8806428006706 — **비취소·체크디짓 불일치, pending 유지** | ✅ |
+| E. ProductMaster (DRUG 177,413 / QUASI_DRUG 17,148 / MEDICAL_DEVICE 3,826) | — | 동일 | ✅ 불변 |
+| F. ProductIdentifier active | 621,280 | 621,280 | ✅ 불변 |
+| G. 후보 총량 (hard delete 검증) | 394,495 | 394,495 | ✅ 보존 |
+
+→ **apply 성공.** candidate_status(pending→archived) 전환만. ProductMaster/ProductIdentifier 0 변경, hard delete 0.
+   드럭 pending 은 이제 1건(별도 수동 확인 대상)만 남음.
+
+> 주: E 의 소수 garbled 분류(의료기기 계열) 미세 변동은 병렬 세션의 product_masters 작업으로, 본 apply(코드상
+> product_candidates 만 UPDATE)와 무관. 핵심 DRUG/QUASI/MD master 수는 불변.
+
+## 9. 다음
+
+```text
+1. (완료) 취소 의약품 pending 74,680 archived
+2. 남은 드럭 pending 1건(비취소·체크디짓 불일치) 수동 확인
 ```
-취소 의약품 pending 74,680건 archived apply 실행 승인
-confirmation: ARCHIVE_CANCELLED_DRUG_PENDING_CANDIDATES
-```
-승인 후 apply 실행 → 사후검증(WO §7 A~G) → 본 CHECK 갱신.
 
 ---
 
-*Status: 코드 구현 완료 · apply 미실행 · dry-run write 0 · migration 0 · typecheck PASS · **gate smoke PASS(apply 미클릭)**.*
+*Status: **apply 실행 완료 · 사후검증 A~G PASS** · candidate_status 전환만 · ProductMaster/Identifier 불변 · hard delete 0 · migration 0.*
