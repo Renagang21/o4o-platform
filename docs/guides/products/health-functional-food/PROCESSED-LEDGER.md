@@ -13,7 +13,18 @@
 
 ---
 
-## 처리 목록
+## 2026-07-11 — 렌더러 디자인 시스템 전환 + 변엔장 첫 시맨틱 저장
+
+> **형식 변경**: 설명서 콘텐츠는 이제 **`<style>` 없는 시맨틱 HTML(sd-* 클래스)** 로 저장한다. 저장 sanitizer가 `<style>`을 제거하므로, 반응형 디자인은 공용 렌더러 `ContentRenderer variant="store-description"` 가 담당한다. (WO-O4O-STORE-DESCRIPTION-RENDERER-DESIGN-SYSTEM-V1, commit 6650956b3) — [AGENT-KICKOFF §5](AGENT-KICKOFF.md) + 예제 [examples/byeonenjang.semantic.html](examples/byeonenjang.semantic.html).
+> 아래 photo 배치 표(ko+zh, `<style>` fragment)는 구형식 — 재작성 시 시맨틱으로.
+
+| # | 제품 | 분류 | master id | 언어 | 형식 | 날짜 | 비고 |
+|---|------|------|-----------|:----:|:----:|------|------|
+| S1 | 변엔장 (프로바이오틱스 100억 CFU) | 건강기능식품 | `38a9d3e4-56be-4967-aa7b-0cb2d2e6baff` | ko+en | **시맨틱** | 2026-07-11 | MFDS 후보(품목보고 200400200082915·노바렉스). STORE·B2B×ko·en canonical. **첫 정본(식약처 기반, 시맨틱)** |
+
+---
+
+## 처리 목록 (구형식 — photo 배치, `<style>` fragment, ko+zh)
 
 | # | 제품 | 분류 | master id | ko | zh | 날짜 | 비고 |
 |---|------|------|-----------|:--:|:--:|------|------|
