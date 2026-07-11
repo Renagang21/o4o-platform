@@ -185,6 +185,8 @@ export interface OrphanCandidateDryRunResult {
   warnings: string[];
   applyEligible: boolean;
   applyEnabled: boolean;
+  /** apply 실행 확인 문구 (정확 일치해야 apply 가능) */
+  confirmationPhrase?: string;
 }
 
 /** 등록 완료 고아 후보 정합화 dry-run (DB write 0). */
@@ -192,6 +194,31 @@ export async function dryRunOrphanRegisteredCandidates(): Promise<OrphanCandidat
   const res = await authClient.api.post<{ success: boolean; data: OrphanCandidateDryRunResult }>(
     '/admin/o4o-product-db/maintenance/jobs/orphan-registered-candidates/dry-run',
     {},
+  );
+  return res.data.data;
+}
+
+export interface OrphanCandidateApplyResult {
+  mode: 'apply';
+  requested: number;
+  updated: number;
+  chunks: number;
+  elapsedMs: number;
+  warnings: string[];
+}
+
+/**
+ * 등록 완료 고아 후보 정합화 apply — candidate_status 를 archived 로 전환 (청크 update).
+ * confirmation 문구 정확일치 + expectedCount 경합 가드가 서버에서 재검증된다.
+ * ⚠️ DB write 경로. ProductMaster/ProductIdentifier 미변경.
+ */
+export async function applyOrphanRegisteredCandidates(
+  confirmation: string,
+  expectedCount: number,
+): Promise<OrphanCandidateApplyResult> {
+  const res = await authClient.api.post<{ success: boolean; data: OrphanCandidateApplyResult }>(
+    '/admin/o4o-product-db/maintenance/jobs/orphan-registered-candidates/apply',
+    { confirmation, expectedCount },
   );
   return res.data.data;
 }

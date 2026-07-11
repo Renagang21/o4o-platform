@@ -11,12 +11,15 @@
  */
 
 import { useState } from 'react';
-import { Settings, AlertTriangle, PlayCircle, Loader2 } from 'lucide-react';
+import { Settings, AlertTriangle, PlayCircle, Loader2, ShieldAlert } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import {
   dryRunOrphanRegisteredCandidates,
+  applyOrphanRegisteredCandidates,
   type OrphanCandidateDryRunResult,
 } from '@/api/o4o-product-db.api';
+
+const CONFIRMATION_PHRASE = 'ARCHIVE_ORPHAN_REGISTERED_CANDIDATES';
 
 export default function ProductDbMaintenancePage() {
   const [running, setRunning] = useState(false);
@@ -82,13 +85,19 @@ export default function ProductDbMaintenancePage() {
           </div>
         )}
 
-        {result && <DryRunResultView result={result} />}
+        {result && <DryRunResultView result={result} onApplied={runDryRun} />}
       </div>
     </div>
   );
 }
 
-function DryRunResultView({ result }: { result: OrphanCandidateDryRunResult }) {
+function DryRunResultView({
+  result,
+  onApplied,
+}: {
+  result: OrphanCandidateDryRunResult;
+  onApplied: () => void;
+}) {
   return (
     <div className="mt-5 space-y-5">
       {/* 요약 */}
@@ -171,18 +180,90 @@ function DryRunResultView({ result }: { result: OrphanCandidateDryRunResult }) {
         </div>
       </div>
 
-      {/* apply 비활성 */}
-      <div>
+      {/* apply — confirmation 게이트 */}
+      <ApplyPanel result={result} onApplied={onApplied} />
+    </div>
+  );
+}
+
+function ApplyPanel({
+  result,
+  onApplied,
+}: {
+  result: OrphanCandidateDryRunResult;
+  onApplied: () => void;
+}) {
+  const [confirmText, setConfirmText] = useState('');
+  const [applying, setApplying] = useState(false);
+  const [applyMsg, setApplyMsg] = useState<string | null>(null);
+  const [applyErr, setApplyErr] = useState<string | null>(null);
+
+  const phrase = result.confirmationPhrase ?? CONFIRMATION_PHRASE;
+  const canApply = result.applyEligible && confirmText === phrase && !applying;
+
+  const runApply = async () => {
+    if (!canApply) return;
+    setApplying(true);
+    setApplyMsg(null);
+    setApplyErr(null);
+    try {
+      const r = await applyOrphanRegisteredCandidates(confirmText, result.targetCount);
+      const msg = `Apply 완료 — ${r.updated.toLocaleString()}건 archived (chunks ${r.chunks}, ${r.elapsedMs}ms)`;
+      setApplyMsg(msg);
+      toast.success(msg);
+      setConfirmText('');
+      onApplied(); // dry-run 재실행 → targetCount 0 확인
+    } catch (e) {
+      const m = e instanceof Error ? e.message : 'Apply 실행에 실패했습니다';
+      setApplyErr(m);
+      toast.error(m);
+    } finally {
+      setApplying(false);
+    }
+  };
+
+  return (
+    <div className="border-t border-gray-200 pt-5">
+      <div className="flex items-start gap-2 text-xs text-red-700 bg-red-50 border border-red-200 rounded-md px-3 py-2 mb-3">
+        <ShieldAlert className="w-4 h-4 shrink-0 mt-0.5" />
+        <span>
+          Apply 는 <strong>candidate_status 를 archived 로 전환</strong>합니다(되돌리려면 별도 조치 필요).
+          ProductMaster/ProductIdentifier 는 변경되지 않습니다. 실행하려면 아래에 확인 문구를 정확히 입력하세요.
+        </span>
+      </div>
+      <div className="flex flex-wrap items-center gap-3">
+        <input
+          type="text"
+          value={confirmText}
+          onChange={(e) => setConfirmText(e.target.value)}
+          placeholder={phrase}
+          disabled={!result.applyEligible || applying}
+          className="px-3 py-2 text-sm font-mono border border-gray-300 rounded-md w-96 max-w-full disabled:bg-gray-50 disabled:text-gray-400"
+        />
         <button
           type="button"
-          disabled
-          title="정책 승인 후 실행 가능"
-          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md bg-gray-100 text-gray-400 cursor-not-allowed"
+          onClick={runApply}
+          disabled={!canApply}
+          title={result.applyEligible ? '확인 문구 입력 후 실행' : 'apply 부적격 (드럭 트랙 단일 아님 또는 대상 0)'}
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md bg-red-600 text-white hover:bg-red-700 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
         >
+          {applying ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
           Apply (archived 전환)
         </button>
-        <span className="ml-3 text-xs text-gray-400">정책 승인 후 실행 가능</span>
+        <span className="text-xs text-gray-400">
+          확인 문구: <code className="bg-gray-100 px-1 py-0.5 rounded">{phrase}</code>
+        </span>
       </div>
+      {applyMsg && (
+        <div className="mt-3 text-sm text-green-700 bg-green-50 border border-green-200 rounded-md px-3 py-2">
+          {applyMsg}
+        </div>
+      )}
+      {applyErr && (
+        <div className="mt-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md px-3 py-2">
+          {applyErr}
+        </div>
+      )}
     </div>
   );
 }

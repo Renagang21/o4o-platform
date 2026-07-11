@@ -46,6 +46,15 @@ const DRUG_SOURCE_PREFIX = 'mfds-drug-master-standard-code';
 
 const ORPHAN_ARCHIVE_TARGET_STATUS = 'archived';
 
+/** apply 실행 확인 문구 — 정확 일치해야만 apply 진행 (오작동 방지) */
+const CONFIRMATION_PHRASE = 'ARCHIVE_ORPHAN_REGISTERED_CANDIDATES';
+
+/** apply 배치 추적용 review_note 태그 */
+const ARCHIVE_NOTE = 'orphan-archive:WO-O4O-ADMIN-PRODUCT-DB-MAINTENANCE-ORPHAN-CANDIDATE-ARCHIVE-APPLY-V1';
+
+/** 청크 update 크기 (migration 금지 — 청크 admin API. reference_large_delete_migration_limit) */
+const APPLY_CHUNK_SIZE = 2000;
+
 export function createProductDbMaintenanceController(dataSource: DataSource): Router {
   const router = Router();
 
@@ -154,8 +163,10 @@ export function createProductDbMaintenanceController(dataSource: DataSource): Ro
           samples,
           warnings,
           applyEligible,
-          // V1: apply 는 정책 승인 후 후속 WO. 프론트는 이 플래그로 apply 버튼을 비활성 처리.
-          applyEnabled: false,
+          // apply 엔드포인트 구현됨(APPLY-V1). 실제 실행은 confirmation 문구 + expectedCount 재검증 게이트.
+          // 프론트는 applyEligible && confirmation 정확일치 일 때만 apply 버튼 활성화.
+          applyEnabled: applyEligible,
+          confirmationPhrase: CONFIRMATION_PHRASE,
         },
       });
     } catch (err) {
@@ -164,6 +175,149 @@ export function createProductDbMaintenanceController(dataSource: DataSource): Ro
         success: false,
         error: '고아 후보 정합화 dry-run 에 실패했습니다',
         code: 'ORPHAN_DRYRUN_FAILED',
+      });
+    }
+  });
+
+  /**
+   * POST /jobs/orphan-registered-candidates/apply
+   *
+   * 대상(candidate_status IN registered & master 없음 & 드럭 트랙)을 archived 로 전환.
+   * ⚠️ DB write 는 이 경로에만 존재. ProductMaster/ProductIdentifier 미변경, hard delete 없음.
+   *
+   * 게이트(하나라도 불충족 시 write 없이 차단):
+   *   1) confirmation === CONFIRMATION_PHRASE
+   *   2) nonDrugCount === 0 (드럭 외 대상 미포함)
+   *   3) expectedCount 제공 시 currentCount 와 일치 (경합 가드)
+   *
+   * migration 아님 — 청크 update(APPLY_CHUNK_SIZE/txn). archived 로 바뀐 행은 대상 필터에서
+   * 자동 제외되어 idempotent(중단 후 재실행 시 남은 대상만 처리).
+   */
+  router.post('/jobs/orphan-registered-candidates/apply', async (req: Request, res: Response) => {
+    try {
+      const body = (req.body ?? {}) as Record<string, unknown>;
+      const confirmation = typeof body.confirmation === 'string' ? body.confirmation : '';
+      const expectedCount =
+        typeof body.expectedCount === 'number' && Number.isFinite(body.expectedCount)
+          ? body.expectedCount
+          : null;
+
+      // 게이트 1: confirmation 문구
+      if (confirmation !== CONFIRMATION_PHRASE) {
+        res.status(400).json({
+          success: false,
+          error: 'confirmation 문구가 일치하지 않습니다',
+          code: 'CONFIRMATION_REQUIRED',
+        });
+        return;
+      }
+
+      const repo = dataSource.getRepository(ProductCandidate);
+      const base = () =>
+        repo
+          .createQueryBuilder('pc')
+          .where('pc.deletedAt IS NULL')
+          .andWhere('pc.candidateStatus IN (:...statuses)', { statuses: [...REGISTERED_STATUSES] })
+          .andWhere('pc.matchedProductMasterId IS NULL');
+
+      const currentCount = await base().getCount();
+      const nonDrugCount = await base()
+        .andWhere('(pc.sourceLabel IS NULL OR pc.sourceLabel NOT LIKE :prefix)', {
+          prefix: `${DRUG_SOURCE_PREFIX}%`,
+        })
+        .getCount();
+
+      // 게이트 2: 드럭 외 대상 감지 → 차단
+      if (nonDrugCount > 0) {
+        res.status(409).json({
+          success: false,
+          error: `드럭 외 대상 ${nonDrugCount}건 감지 — apply 중단`,
+          code: 'NON_DRUG_TARGET',
+          data: { nonDrugCount, currentCount },
+        });
+        return;
+      }
+
+      // 게이트 3: expectedCount 경합 가드
+      if (expectedCount !== null && expectedCount !== currentCount) {
+        res.status(409).json({
+          success: false,
+          error: `대상 수 불일치 (expected ${expectedCount} / current ${currentCount}) — apply 중단`,
+          code: 'COUNT_MISMATCH',
+          data: { expectedCount, currentCount },
+        });
+        return;
+      }
+
+      if (currentCount === 0) {
+        res.json({
+          success: true,
+          data: { mode: 'apply', requested: 0, updated: 0, chunks: 0, elapsedMs: 0, warnings: ['대상 0건 — 변경 없음'] },
+        });
+        return;
+      }
+
+      // 청크 update — candidate_status 만 archived. 각 청크는 대상 필터를 UPDATE where 에 재적용(안전).
+      const startedAt = Date.now();
+      const maxChunks = Math.ceil(currentCount / APPLY_CHUNK_SIZE) + 5; // 무한루프 방지 backstop
+      let updated = 0;
+      let chunks = 0;
+      const warnings: string[] = [];
+
+      for (;;) {
+        if (chunks >= maxChunks) {
+          warnings.push(`maxChunks(${maxChunks}) 도달 — 중단. 남은 대상은 재실행으로 처리.`);
+          break;
+        }
+        const rows = await base()
+          .select('pc.id', 'id')
+          .limit(APPLY_CHUNK_SIZE)
+          .getRawMany<{ id: string }>();
+        if (rows.length === 0) break;
+        const ids = rows.map((r) => r.id);
+
+        const result = await dataSource.transaction(async (mgr) =>
+          mgr
+            .createQueryBuilder()
+            .update(ProductCandidate)
+            .set({
+              candidateStatus: ORPHAN_ARCHIVE_TARGET_STATUS,
+              reviewedAt: () => 'NOW()',
+              reviewNote: ARCHIVE_NOTE,
+            })
+            .where('id IN (:...ids)', { ids })
+            .andWhere('candidate_status IN (:...statuses)', { statuses: [...REGISTERED_STATUSES] })
+            .andWhere('matched_product_master_id IS NULL')
+            .andWhere('deleted_at IS NULL')
+            .execute(),
+        );
+
+        const affected = result.affected ?? 0;
+        updated += affected;
+        chunks += 1;
+        // 안전: 이 청크에서 아무것도 안 바뀌었는데 rows 는 있었다면(경합/필터 이상) 무한루프 방지 위해 중단.
+        if (affected === 0) {
+          warnings.push('청크 affected=0 감지 — 중단(경합 의심). 재실행 권장.');
+          break;
+        }
+        if (rows.length < APPLY_CHUNK_SIZE) break;
+      }
+
+      const elapsedMs = Date.now() - startedAt;
+      logger.info(
+        `[product-db-maintenance] orphan archive apply done: requested=${currentCount} updated=${updated} chunks=${chunks} elapsedMs=${elapsedMs}`,
+      );
+
+      res.json({
+        success: true,
+        data: { mode: 'apply', requested: currentCount, updated, chunks, elapsedMs, warnings },
+      });
+    } catch (err) {
+      logger.error('[product-db-maintenance] orphan archive apply failed:', err);
+      res.status(500).json({
+        success: false,
+        error: '고아 후보 정합화 apply 에 실패했습니다',
+        code: 'ORPHAN_APPLY_FAILED',
       });
     }
   });
