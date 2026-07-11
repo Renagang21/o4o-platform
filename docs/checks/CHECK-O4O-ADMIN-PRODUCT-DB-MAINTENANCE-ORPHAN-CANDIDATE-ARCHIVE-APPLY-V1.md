@@ -62,18 +62,27 @@ apply **코드**를 구현하되 **실제 apply 는 실행하지 않는다.** �
 | confirmation 오입력 | ✅ 400 차단 (코드) |
 | expectedCount 불일치 | ✅ 409 차단 (코드) |
 | 드럭 외 대상 | ✅ 409 차단 (코드) |
-| **이번 단계 apply 실행** | ❌ **미실행** |
-| browser smoke (버튼 상태만, apply 클릭 없음) | 배포 후 확인 (§7) |
+| **이번 단계 apply 실행** | ❌ **미실행** (smoke 에서도 Apply 요청 0) |
+| browser smoke (버튼 상태만, apply 클릭 없음) | ✅ **PASS** (§7) |
 
-## 7. browser smoke (버튼 상태 검증 — apply 클릭 없음)
+## 7. browser smoke (버튼 상태 검증 — apply 클릭 없음) — PASS
 
-배포 후, admin.neture.co.kr `/admin/o4o-product-db/maintenance` 에서:
-1. Dry-run 실행 → targetCount 53,428 재확인
-2. confirmation 입력 전 Apply 버튼 **disabled** 확인
-3. `ARCHIVE_ORPHAN_REGISTERED_CANDIDATES` 입력 후 Apply 버튼 **enabled** 확인
-4. **Apply 클릭하지 않음** (실행 금지) → DB write 0 유지
+- 배포: commit `1c5541453` — Deploy API Server / Deploy Admin Dashboard 둘 다 success.
+- 환경: admin.neture.co.kr (프로덕션), Playwright chromium headless, admin 계정(SSOT env 주입).
+- **Apply 버튼은 클릭하지 않음** — 게이트 상태만 검증. apply 요청 전송 0 확인.
 
-> 결과는 확인 후 본 문서에 추가.
+| smoke 항목 | 기대 | 결과 |
+|---|---|---|
+| Dry-run 실행 | 200 | ✅ HTTP 200 |
+| targetCount | 53,428 | ✅ **53,428** |
+| applyEligible | true | ✅ true |
+| confirmation 입력창 표시 | 표시 | ✅ |
+| Apply 버튼 (입력 전) | disabled | ✅ disabled |
+| Apply 버튼 (틀린 문구) | disabled | ✅ disabled |
+| Apply 버튼 (정확 문구 `ARCHIVE_ORPHAN_REGISTERED_CANDIDATES`) | enabled | ✅ **enabled** |
+| **Apply 요청 전송** | **0 (미클릭)** | ✅ **applyRequestSent=false** |
+
+→ confirmation 게이트 정상 동작 확인. **apply 미실행 · DB write 0 유지.**
 
 ## 8. 다음 (사용자 명시 승인 필요)
 
@@ -86,4 +95,4 @@ confirmation: ARCHIVE_ORPHAN_REGISTERED_CANDIDATES
 
 ---
 
-*Status: apply 코드 구현 완료 · apply 미실행 · dry-run write 0 · migration 0 · typecheck PASS.*
+*Status: apply 코드 구현 완료 · apply 미실행 · dry-run write 0 · migration 0 · typecheck PASS · **gate smoke PASS(apply 미클릭)**.*
