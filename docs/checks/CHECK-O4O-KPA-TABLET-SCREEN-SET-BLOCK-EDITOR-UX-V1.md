@@ -108,7 +108,7 @@ Screen Set 영역 상단 + 적용/해제 근처에 amber 경고 박스 상시 �
 | tablets_with_current_screen_set | ✅ 0 (해제됨) |
 | public tablet runtime | ✅ 미접촉 |
 
-> **테스트 잔여물**: `[SMOKE-UX] set`(id `8d34a44d-9fce-4ea0-be14-b50e3ed0534d`, archived·soft-deleted) + block 1건. 앱 정상 쿼리에서 필터됨. hard-delete 정리는 사용자 승인 후 별도 raw DELETE.
+> **테스트 잔여물 — 제거 완료(사용자 승인)**: `[SMOKE-UX] set`(id `8d34a44d…`) + idle_media block 1건을 4중 가드 raw DELETE(`id` + `deleted_at IS NOT NULL` + `status='archived'` + `name LIKE '[SMOKE-UX]%'`)로 제거. `DELETE 1` + FK CASCADE로 block 동반 삭제. **재확인: screen_sets 0 / screen_blocks 0**, 기존 idle_playlist_items 1 / displays 2 / store_tablets 4 / operator selection 0 / current 0 **불변**.
 
 ## 8. 완료 기준
 
