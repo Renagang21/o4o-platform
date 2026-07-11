@@ -78,10 +78,34 @@ DB migration / template 테이블·컬럼·선택 UI / editor UX 변경 / store_
 |---|:--:|
 | api-server typecheck (변경 파일) | ✅ PASS |
 | 단위 테스트 (`store-public-tablet-screen.test.ts`) | ✅ 6/6 PASS |
-| 배포 (Deploy API, migration 없음) | ⏳ (배포 후) |
-| smoke — legacy 경로 불변 + screen_set 경로 | ⏳ (배포 후) |
+| 배포 (Deploy API Server, migration 없음) | ✅ success (run 29150855073, `211dd8cae`) |
+| smoke — legacy 경로 불변 + screen_set 경로 | ✅ PASS (아래) |
 
-_(배포 후 채움)_
+### Smoke (production, 공개 엔드포인트) — ✅ PASS
+
+`kpa-society.co.kr` 로그인 → 공개 `api.neture.co.kr/api/v1/stores/네뚜레-약국/tablet/*` (무인증) 호출. slug=`네뚜레-약국`, tabletId=`f4b12ff9…`.
+
+| 단계 | 결과 |
+|---|---|
+| **legacy** `/screen`(적용 세트 없음) | ✅ 200 `mode:'legacy'` |
+| **legacy** `/idle` baseline | ✅ 200 items 0 (이 태블릿 idle 0) |
+| 세트+4블록(idle_media/corner_description/product_list/qr_guide) 생성·적용 | ✅ 200 |
+| **screen_set** `/screen` | ✅ `mode:'screen_set'`, `templateKey:'corner_information_basic_v1'` |
+| sections 순서대로 4종 구성 | ✅ `[idle_media, corner_description, product_list, qr_guide]` |
+| corner_description 해석 | ✅ body='설명' |
+| product_list(gate 함수) 존재 | ✅ |
+| idle_media dual-read(legacy_idle_playlist) | ✅ items 0 (0-item 태블릿 정합) |
+| **해제 → legacy 복귀** `/screen` | ✅ `mode:'legacy'` |
+| 해제 후 `/idle` baseline 동일 | ✅ sameAsBaseline true |
+
+### 기존 데이터 불변 (read-only DB)
+
+| 대상 | 결과 |
+|---|:--:|
+| idle_playlist_items / displays / store_tablets / operator selection | ✅ 1 / 2 / 4 / 0 (불변) |
+| tablets_with_current_screen_set | ✅ 0 (해제됨) |
+
+> **테스트 잔여물**: `[SMOKE-PRT] set`(id `51e8e6cf-e5c8-4879-b283-312ab5adef1b`, archived·soft-deleted) + block 4건. hard-delete 정리는 사용자 승인 후 별도 raw DELETE.
 
 ## 8. 완료 기준
 
@@ -91,8 +115,8 @@ _(배포 후 채움)_
 - [x] 기본 template renderer 구조(향후 template_key 확장 가능)
 - [x] template 정식 기능 미구현
 - [x] typecheck/build + 단위 테스트
-- [ ] 배포 + 프로덕션 smoke
-- [x] CHECK 작성 · [ ] commit/push
+- [x] 배포 + 프로덕션 smoke (legacy 불변 + screen_set) PASS
+- [x] CHECK 작성 · commit/push
 
 ## 9. 다음 단계
 
