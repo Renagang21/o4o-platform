@@ -223,6 +223,30 @@ export async function applyOrphanRegisteredCandidates(
   return res.data.data;
 }
 
+// ── 취소 의약품 pending 후보 정합화 (WO-...-CANCELLED-DRUG-PENDING-ARCHIVE-V1) ──
+// 대상: pending & 드럭 트랙 & 취소(취소일자/isCancelled). 승격 아님 → archived. dry-run/apply 동일 shape 재사용.
+
+/** 취소 의약품 pending 후보 정합화 dry-run (DB write 0). */
+export async function dryRunCancelledDrugPending(): Promise<OrphanCandidateDryRunResult> {
+  const res = await authClient.api.post<{ success: boolean; data: OrphanCandidateDryRunResult }>(
+    '/admin/o4o-product-db/maintenance/jobs/cancelled-drug-pending-candidates/dry-run',
+    {},
+  );
+  return res.data.data;
+}
+
+/** 취소 의약품 pending 후보 정합화 apply — candidate_status pending→archived (청크). */
+export async function applyCancelledDrugPending(
+  confirmation: string,
+  expectedCount: number,
+): Promise<OrphanCandidateApplyResult> {
+  const res = await authClient.api.post<{ success: boolean; data: OrphanCandidateApplyResult }>(
+    '/admin/o4o-product-db/maintenance/jobs/cancelled-drug-pending-candidates/apply',
+    { confirmation, expectedCount },
+  );
+  return res.data.data;
+}
+
 // ─── ProductMaster ─────────────────────────────────────────────────────────
 
 /** 상품 이용 상태 — WO-O4O-ADMIN-PRODUCT-MASTER-STATUS-ACTIONS-V1 */

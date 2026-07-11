@@ -55,6 +55,16 @@ const ARCHIVE_NOTE = 'orphan-archive:WO-O4O-ADMIN-PRODUCT-DB-MAINTENANCE-ORPHAN-
 /** 청크 update 크기 (migration 금지 — 청크 admin API. reference_large_delete_migration_limit) */
 const APPLY_CHUNK_SIZE = 2000;
 
+// ── 취소 의약품 pending 정합화 (WO-...-CANCELLED-DRUG-PENDING-ARCHIVE-V1) ──
+// IR-O4O-DRUG-PENDING-CANDIDATE-COHORT-AUDIT-V1: 드럭 pending 74,681 중 74,680 = 허가취소 의약품
+// (취소일자 존재). 승격 대상 0. 승격이 아니라 archived 정합화.
+const CANCELLED_DRUG_CONFIRMATION_PHRASE = 'ARCHIVE_CANCELLED_DRUG_PENDING_CANDIDATES';
+const CANCELLED_DRUG_ARCHIVE_NOTE =
+  'cancelled-drug-archive:WO-O4O-ADMIN-PRODUCT-DB-MAINTENANCE-CANCELLED-DRUG-PENDING-ARCHIVE-V1';
+/** 취소 신호: isCancelled=true 또는 source.취소일자 존재 (승격 엔진 skip 기준과 동일) */
+const CANCELLED_JSON_FILTER =
+  "(pc.rawPayload->>'isCancelled' = 'true' OR pc.rawPayload->'source'->>'취소일자' IS NOT NULL)";
+
 export function createProductDbMaintenanceController(dataSource: DataSource): Router {
   const router = Router();
 
@@ -319,6 +329,168 @@ export function createProductDbMaintenanceController(dataSource: DataSource): Ro
         error: '고아 후보 정합화 apply 에 실패했습니다',
         code: 'ORPHAN_APPLY_FAILED',
       });
+    }
+  });
+
+  // ── 취소 의약품 pending 정합화 job (dry-run + apply) ──
+  // 대상: pending & 드럭 트랙 & 취소(isCancelled/취소일자) → archived. 승격 아님(승격 대상 0).
+
+  const cancelledDrugBase = () =>
+    dataSource
+      .getRepository(ProductCandidate)
+      .createQueryBuilder('pc')
+      .where('pc.deletedAt IS NULL')
+      .andWhere('pc.candidateStatus = :pending', { pending: 'pending' })
+      .andWhere('pc.sourceLabel LIKE :prefix', { prefix: `${DRUG_SOURCE_PREFIX}%` })
+      .andWhere(CANCELLED_JSON_FILTER);
+
+  /** POST /jobs/cancelled-drug-pending-candidates/dry-run — read-only, DB write 0 */
+  router.post('/jobs/cancelled-drug-pending-candidates/dry-run', async (_req: Request, res: Response) => {
+    try {
+      const targetCount = await cancelledDrugBase().getCount();
+
+      const byStatusRaw = await cancelledDrugBase()
+        .select('pc.candidateStatus', 'candidateStatus')
+        .addSelect('COUNT(*)', 'count')
+        .groupBy('pc.candidateStatus')
+        .getRawMany<{ candidateStatus: string; count: string }>();
+
+      const bySourceLabelRaw = await cancelledDrugBase()
+        .select('pc.sourceLabel', 'sourceLabel')
+        .addSelect('COUNT(*)', 'count')
+        .groupBy('pc.sourceLabel')
+        .orderBy('COUNT(*)', 'DESC')
+        .getRawMany<{ sourceLabel: string | null; count: string }>();
+
+      // 안전: 대상 중 취소 신호가 없는데 잡힌 건(=필터 이상)이 있는지 — 정의상 0
+      const nonCancelledInTarget = 0; // 필터가 이미 취소조건 포함
+
+      const sampleRows = await cancelledDrugBase().limit(10).getMany();
+      const samples = sampleRows.map((c) => ({
+        candidateId: c.id,
+        sourceLabel: c.sourceLabel,
+        candidateStatus: c.candidateStatus,
+        name: c.candidateName ?? '',
+        manufacturerName: c.candidateManufacturer ?? '',
+        identifierValue: c.identifierValue ?? c.normalizedIdentifierValue ?? null,
+        category: c.candidateCategory ?? null,
+        cancelledAt:
+          (c.rawPayload?.['cancelledAt'] as string | undefined) ??
+          ((c.rawPayload?.['source'] as Record<string, unknown> | undefined)?.['취소일자'] as string | undefined) ??
+          null,
+        before: { candidateStatus: c.candidateStatus, matchedProductMasterId: null as null },
+        after: { candidateStatus: ORPHAN_ARCHIVE_TARGET_STATUS, matchedProductMasterId: null as null },
+        reason: '허가취소된 의약품(취소일자 존재) — 승격 대상 아님. 등록/검토 흐름에서 제외 보관.',
+      }));
+
+      const warnings: string[] = [];
+      if (targetCount === 0) warnings.push('대상 후보가 0건입니다 — 이미 정합화되었거나 데이터 상태가 변경되었습니다.');
+
+      const applyEligible = targetCount > 0 && nonCancelledInTarget === 0;
+
+      res.json({
+        success: true,
+        data: {
+          jobKey: 'cancelled-drug-pending-archive',
+          mode: 'dry-run',
+          targetCount,
+          byStatus: byStatusRaw.map((r) => ({ candidateStatus: r.candidateStatus, count: Number(r.count) })),
+          bySourceLabel: bySourceLabelRaw.map((r) => ({ sourceLabel: r.sourceLabel, count: Number(r.count) })),
+          proposedChange: { from: ['pending'], to: ORPHAN_ARCHIVE_TARGET_STATUS },
+          samples,
+          warnings,
+          applyEligible,
+          applyEnabled: applyEligible,
+          confirmationPhrase: CANCELLED_DRUG_CONFIRMATION_PHRASE,
+        },
+      });
+    } catch (err) {
+      logger.error('[product-db-maintenance] cancelled-drug dry-run failed:', err);
+      res.status(500).json({
+        success: false,
+        error: '취소 의약품 pending 정합화 dry-run 에 실패했습니다',
+        code: 'CANCELLED_DRUG_DRYRUN_FAILED',
+      });
+    }
+  });
+
+  /** POST /jobs/cancelled-drug-pending-candidates/apply — candidate_status pending→archived (청크) */
+  router.post('/jobs/cancelled-drug-pending-candidates/apply', async (req: Request, res: Response) => {
+    try {
+      const body = (req.body ?? {}) as Record<string, unknown>;
+      const confirmation = typeof body.confirmation === 'string' ? body.confirmation : '';
+      const expectedCount =
+        typeof body.expectedCount === 'number' && Number.isFinite(body.expectedCount) ? body.expectedCount : null;
+
+      if (confirmation !== CANCELLED_DRUG_CONFIRMATION_PHRASE) {
+        res.status(400).json({ success: false, error: 'confirmation 문구가 일치하지 않습니다', code: 'CONFIRMATION_REQUIRED' });
+        return;
+      }
+
+      const repo = dataSource.getRepository(ProductCandidate);
+      const currentCount = await cancelledDrugBase().getCount();
+
+      if (expectedCount !== null && expectedCount !== currentCount) {
+        res.status(409).json({
+          success: false,
+          error: `대상 수 불일치 (expected ${expectedCount} / current ${currentCount}) — apply 중단`,
+          code: 'COUNT_MISMATCH',
+          data: { expectedCount, currentCount },
+        });
+        return;
+      }
+      if (currentCount === 0) {
+        res.json({ success: true, data: { mode: 'apply', requested: 0, updated: 0, chunks: 0, elapsedMs: 0, warnings: ['대상 0건 — 변경 없음'] } });
+        return;
+      }
+
+      const startedAt = Date.now();
+      const maxChunks = Math.ceil(currentCount / APPLY_CHUNK_SIZE) + 5;
+      let updated = 0;
+      let chunks = 0;
+      const warnings: string[] = [];
+
+      for (;;) {
+        if (chunks >= maxChunks) {
+          warnings.push(`maxChunks(${maxChunks}) 도달 — 중단. 남은 대상은 재실행으로 처리.`);
+          break;
+        }
+        const rows = await cancelledDrugBase().select('pc.id', 'id').limit(APPLY_CHUNK_SIZE).getRawMany<{ id: string }>();
+        if (rows.length === 0) break;
+        const ids = rows.map((r) => r.id);
+
+        // UPDATE where 에 대상 필터 전체 재적용 (취소·드럭·pending). candidate_status 만 변경.
+        const result = await dataSource.transaction(async (mgr) =>
+          mgr
+            .createQueryBuilder()
+            .update(ProductCandidate)
+            .set({ candidateStatus: ORPHAN_ARCHIVE_TARGET_STATUS, reviewedAt: () => 'NOW()', reviewNote: CANCELLED_DRUG_ARCHIVE_NOTE })
+            .where('id IN (:...ids)', { ids })
+            .andWhere('candidate_status = :pending', { pending: 'pending' })
+            .andWhere('deleted_at IS NULL')
+            .andWhere('source_label LIKE :prefix', { prefix: `${DRUG_SOURCE_PREFIX}%` })
+            .andWhere("(raw_payload->>'isCancelled' = 'true' OR raw_payload->'source'->>'취소일자' IS NOT NULL)")
+            .execute(),
+        );
+
+        const affected = result.affected ?? 0;
+        updated += affected;
+        chunks += 1;
+        if (affected === 0) {
+          warnings.push('청크 affected=0 감지 — 중단(경합 의심). 재실행 권장.');
+          break;
+        }
+        if (rows.length < APPLY_CHUNK_SIZE) break;
+      }
+
+      const elapsedMs = Date.now() - startedAt;
+      logger.info(
+        `[product-db-maintenance] cancelled-drug archive apply done: requested=${currentCount} updated=${updated} chunks=${chunks} elapsedMs=${elapsedMs}`,
+      );
+      res.json({ success: true, data: { mode: 'apply', requested: currentCount, updated, chunks, elapsedMs, warnings } });
+    } catch (err) {
+      logger.error('[product-db-maintenance] cancelled-drug apply failed:', err);
+      res.status(500).json({ success: false, error: '취소 의약품 pending 정합화 apply 에 실패했습니다', code: 'CANCELLED_DRUG_APPLY_FAILED' });
     }
   });
 
