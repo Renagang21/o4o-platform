@@ -109,7 +109,7 @@ public runtime 변경 / idle_playlist_items 이전 / operator 정책 변경 / id
 | store_tablet_displays / store_tablets | ✅ 2 / 4 (동일) |
 | tablets_with_current_screen_set | ✅ 0 (해제됨) |
 
-> **테스트 잔여물**: `[SMOKE-IDLE] set`(id `3382c153-3d43-4656-adcf-0a5377b0f2a7`, archived·soft-deleted) + block 3건. 앱 정상 쿼리에서 필터됨(무해). hard-delete 정리는 사용자 승인 후 별도 raw DELETE.
+> **테스트 잔여물 — 제거 완료(사용자 승인)**: `[SMOKE-IDLE] set`(id `3382c153…`) + block 3건을 4중 가드 raw DELETE(`id` + `deleted_at IS NOT NULL` + `status='archived'` + `name LIKE '[SMOKE-IDLE]%'`)로 제거. `DELETE 1` + FK CASCADE로 block 3건 동반 삭제. **재확인: screen_sets 0 / screen_blocks 0**, 기존 idle_playlist_items 1 / operator selection 0 / displays 2 / store_tablets 4 / current 0 **불변**.
 
 ## 8. 완료 기준
 
