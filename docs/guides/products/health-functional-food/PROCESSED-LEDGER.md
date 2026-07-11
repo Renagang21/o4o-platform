@@ -39,6 +39,13 @@
 
 > ✅ = 이 배치에서 만든 STORE canonical(ko/zh). 위 3종은 초기 file 샘플만 있고 DB STORE는 미저장 — 필요 시 후속 저장.
 
+## 2026-07-11 갱신 — 전 제품 STORE ko+zh 완비 + B2B 복사
+
+- **STORE 갭 채움**: 징코 zh, 흑염소 ko+zh, 콸콸포맨 ko+zh 저장 완료 → **위 표 13종 + 흑염소·콸콸포맨·리포좀 = 전부 STORE ko+zh 완비**(이가돌 제외, R2 유지).
+- **type-generic API 배포**(CHECK-...-MULTILINGUAL-CAPABILITY-V1): `store-descriptions` 엔드포인트가 `descriptionType`(STORE/B2B/B2C) 지원. 스키마·서비스는 이미 (master,type,lang)당 canonical 공존.
+- **STORE→B2B 복사 완료(26건)**: 13종 전부 **STORE ko/zh + B2B ko/zh (4 canonical) 공존**. B2C는 범위 외(규제 프레임 상이). QR·STORE 패널 무회귀(기본 GET=STORE만).
+- 저장 API에 `descriptionType` 파라미터 추가됨 → 앞으로 신규 제품도 STORE 저장 후 B2B 복사 가능.
+
 ---
 
 ## 다음 세션 이어받기

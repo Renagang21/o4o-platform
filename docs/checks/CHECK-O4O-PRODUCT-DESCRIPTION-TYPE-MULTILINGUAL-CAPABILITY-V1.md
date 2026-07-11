@@ -35,7 +35,8 @@
 ## 2. 검증
 
 - [x] api-server 배포 빌드 타입체크(`tsc -p tsconfig.build.json --noEmit`) EXIT 0.
-- [ ] **배포 후 스모크**(예정): 한 master에 STORE ko/zh + B2B ko/zh + B2C ko/zh 저장 → `GET ?descriptionType=all` 로 6건 canonical 공존 확인. 기존 STORE 패널 무회귀 확인.
+- [x] **배포 완료**(2026-07-11, revision 갱신) + **스모크 통과**: 13종 master에 STORE ko/zh + **B2B ko/zh 복사** → `GET ?descriptionType=all` 로 **type×lang canonical 4개 공존**(STORE/ko,STORE/zh,B2B/ko,B2B/zh) 확인. **기본 GET(프런트 패널)은 STORE만 반환 = 무회귀**. `?descriptionType=B2B` 정상.
+- [x] **QR 무영향** — 매장 화면/QR은 STORE canonical 만 읽고, B2B 추가가 STORE·master·listing·QR·publicKey 를 건드리지 않음(별도 SPD 행).
 
 ## 3. 후속 (범위 외)
 
