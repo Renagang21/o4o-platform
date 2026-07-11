@@ -84,15 +84,39 @@ apply **코드**를 구현하되 **실제 apply 는 실행하지 않는다.** �
 
 → confirmation 게이트 정상 동작 확인. **apply 미실행 · DB write 0 유지.**
 
-## 8. 다음 (사용자 명시 승인 필요)
+## 8. apply 실행 결과 (2026-07-11 — 사용자 명시 승인 후 실행)
 
-apply 실제 실행은 사용자가 아래를 명시적으로 승인해야 한다:
+- 승인: 사용자 명시 `고아 53,428건 archived apply 실행 승인 / confirmation: ARCHIVE_ORPHAN_REGISTERED_CANDIDATES`.
+- 실행: admin.neture.co.kr 데이터 정비 화면에서 dry-run(targetCount 53,428 재확인) → 확인 문구 입력 → Apply 클릭.
+- apply 직전 독립 재검증(read-only): targetCount 53,428 / approved_new_master 53,209 / matched 219 / nonDrug 0 / 드럭 트랙 단일 — 전부 일치.
+- 참고: 장시간 요청이라 브라우저가 HTTP 응답을 수신하기 전 커넥션이 종료됐으나(LB 타임아웃 추정),
+  **청크 update 는 idempotent** 라 서버가 완주. 결과는 아래 SQL 사후검증으로 확정.
+
+### 사후검증 SQL (read-only, BEFORE→AFTER)
+
+| 검증 | BEFORE | AFTER | 판정 |
+|---|---:|---:|:--:|
+| A. 고아 잔량 (registered & master 없음) | 53,428 | **0** | ✅ |
+| approved_new_master | 250,817 | 197,608 (−53,209) | ✅ |
+| matched | 1,000 | 781 (−219) | ✅ |
+| B. archived 총량 | 15,779 | **69,207** (+53,428) | ✅ |
+| B. archived 드럭 트랙 (`orphan-archive:` 노트) | 0 | **53,428** | ✅ |
+| C. registered WITH master (정상 등록완료) | 198,389 | 198,389 | ✅ 불변 |
+| D. ProductMaster (DRUG 177,413 / QUASI 17,148 / MD 3,826 …) | — | 동일 | ✅ 불변 |
+| D. ProductIdentifier active | 621,280 | 621,280 | ✅ 불변 |
+| 후보 총량 (hard delete 검증) | 394,495 | 394,495 | ✅ 보존 |
+
+→ **apply 성공.** candidate_status 전환만 발생. ProductMaster/ProductIdentifier 0 변경, hard delete 0.
+   "등록 완료인데 master 없는 후보"가 이제 등록/검토 흐름에서 완전히 빠짐(고아 잔량 0).
+
+## 9. 다음
+
+```text
+1. (완료) 고아 53,428 archived apply
+2. 드럭 pending 74,681 코호트 분석 (취소/무효/drug_unspecified/신규)
+3. 그 다음에야 드럭 한정 bulk 승격 dry-run 검토
 ```
-고아 53,428건 archived apply 실행 승인
-confirmation: ARCHIVE_ORPHAN_REGISTERED_CANDIDATES
-```
-승인 전까지 apply 를 실행하지 않는다. 실행 후 사후검증(WO §6 SQL A~D) + 본 CHECK 갱신.
 
 ---
 
-*Status: apply 코드 구현 완료 · apply 미실행 · dry-run write 0 · migration 0 · typecheck PASS · **gate smoke PASS(apply 미클릭)**.*
+*Status: **apply 실행 완료 · 사후검증 A~D PASS** · candidate_status 전환만 · ProductMaster/Identifier 불변 · hard delete 0 · migration 0.*
