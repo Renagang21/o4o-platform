@@ -90,17 +90,33 @@ AND deleted_at IS NULL
 | apply 버튼 disabled | ✅ (`applyEnabled:false`, UI disabled) |
 | admin-dashboard typecheck | ✅ 0 errors |
 | api-server typecheck (변경 파일) | ✅ 신규 controller/register-routes 에러 0. (기존 20 errors 는 무관한 `src/scripts/drug-otc-*` 일회성 스크립트 — 본 WO 미변경) |
-| browser smoke | ⏳ 배포 후 확인 (아래 §7) |
+| browser smoke | ✅ **PASS** (아래 §7) |
 
 ---
 
-## 7. browser smoke — 보류 사유 및 후속
+## 7. browser smoke — PASS (2026-07-11, 배포 후 프로덕션)
 
-- 엔드포인트가 프로덕션(admin.neture.co.kr)에 **배포된 뒤** 실제 브라우저 smoke 가능(로컬 dev 서버 미기동). main push → CI 배포 후:
-  1. admin 로그인 → `/admin/o4o-product-db/maintenance` 진입
-  2. "Dry-run 실행" → toast 성공 + 대상 53,428 표시 + API `success:true` 확인
-  3. Apply 버튼 disabled 확인
-- dry-run 은 read-only 이므로 배포 전 검증은 엔드포인트-동일 SQL 재현(§4)으로 갈음.
+- 배포: commit `8cd009f0d` — Deploy API Server (Cloud Run) / Deploy Admin Dashboard (Cloud Run) **둘 다 success**.
+- 환경: admin.neture.co.kr (프로덕션), Playwright chromium headless, admin 계정(SSOT env 주입, 자격증명 비노출).
+- 절차: 로그인 → `/admin` 랜딩 → **client-side 네비게이션**으로 O4O 상품 DB → 데이터 정비 진입
+  (deep-link `page.goto` 는 role 하이드레이션 전 guard 가 `/login` 으로 튕기므로 hard-nav 대신 클릭 이동).
+
+| smoke 항목 | 결과 |
+|---|---|
+| "등록 완료 고아 후보 정합화" 카드 표시 | ✅ |
+| Dry-run 실행 → API `POST .../dry-run` | ✅ HTTP **200**, `success:true` |
+| toast 성공("Dry-run 완료") | ✅ |
+| targetCount | ✅ **53,428** (화면 표시 + 응답) |
+| byStatus | ✅ approved_new_master **53,209** / matched **219** |
+| bySourceLabel | ✅ `mfds-drug-master-standard-code_2025-10-31` **단일** |
+| pending/HFF/의약외품/의료기기/e약은요 포함 | ❌ 없음 (응답 분포 = 드럭 단일) |
+| proposedChange | ✅ `approved_new_master / matched → archived` |
+| applyEligible / applyEnabled | ✅ `true` / `false` |
+| Apply 버튼 | ✅ 표시되나 **disabled** + "정책 승인 후 실행 가능" 문구 |
+| console error / pageerror / network 4xx-5xx | ✅ 0 / 0 / 0 |
+| DB write | ✅ 0 (dry-run read-only 엔드포인트) |
+
+→ **browser smoke PASS.** 화면·권한·API 연결·표시값·apply 비활성까지 실환경 확인 완료.
 
 ---
 
@@ -122,4 +138,4 @@ AND deleted_at IS NULL
 
 ---
 
-*Status: dry-run 구현 완료 · DB write 0 · migration 0 · apply 미실행 · typecheck PASS.*
+*Status: dry-run 구현 완료 · DB write 0 · migration 0 · apply 미실행 · typecheck PASS · **browser smoke PASS**.*
