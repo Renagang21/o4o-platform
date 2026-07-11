@@ -55,10 +55,19 @@ screen set 없는 태블릿/매장 → `/screen` mode=legacy → screen=null →
 | web-kpa-society typecheck | ✅ PASS (exit 0) |
 | web-k-cosmetics typecheck (shared consumer) | ✅ PASS (tablet/kiosk error 0) |
 | web-kpa-society build | ✅ PASS (exit 0) |
-| 배포 (web) | ⏳ (배포 후) |
-| browser smoke (screen_set + legacy 두 경로) | ⏳ (배포 후) |
+| 배포 (Deploy Web Services) | ✅ success (run 29154770095, `054c5b075`) |
+| browser smoke (공개 뷰어, 두 경로) | ✅ PASS (아래) |
 
-_(배포 후 채움)_
+### Browser smoke (production 공개 뷰어) — ✅ PASS
+
+무인증 공개 태블릿 뷰어 직접 로드. **뷰어 화면에 실제 반영 확인**:
+
+| 경로 | 결과 |
+|---|---|
+| **screen_set** `/tablet/네뚜레-약국?tabletId=c86863d8…`(구강관리 코너) | ✅ 헤더 h1 **"구강관리 코너"** + 부제 "입마름, 구취, 잇몸 관리…" + QR 배너 **"모바일로 더 보기"** · 기본 헤더 대체됨 · console 0 |
+| **legacy** `/tablet/sohae-약국`(태블릿 0개) | ✅ 헤더 **"매장 상품 안내"**(기본) · 코너/QR 없음 · console 0 |
+
+→ screen_set 태블릿은 sections(corner_description/qr_guide) **실제 화면 표시**, legacy 태블릿은 기존 화면 **불변**. 전 체인(세트 편집→적용→/screen→뷰어 렌더) 라이브.
 
 ## 6. 금지 범위 준수
 
@@ -70,8 +79,8 @@ DB migration / screen set·block schema / 관리 API / template 테이블·컬�
 - [x] screen_set 태블릿에서 sections(코너설명/QR/idle) 실제 표시
 - [x] legacy 태블릿 동작 불변 / idle auto-return 유지
 - [x] typecheck/build
-- [ ] 배포 + browser smoke
-- [x] CHECK 작성 · [ ] commit/push
+- [x] 배포 + browser smoke (screen_set 실화면 반영 + legacy 불변) PASS
+- [x] CHECK 작성 · commit/push
 
 ## 8. 다음 단계
 
