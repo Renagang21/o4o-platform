@@ -84,11 +84,32 @@ public runtime 변경 / idle_playlist_items 이전 / operator 정책 변경 / id
 |---|:--:|
 | api-server typecheck (변경 파일) | ✅ PASS |
 | 단위 테스트 (`store-tablet-idle-block.test.ts`) | ✅ 12/12 PASS |
-| 배포 (Deploy API, migration 없음) | ⏳ (배포 후) |
-| API smoke (idle_media 저장 정상 + 잘못된 config 400) | ⏳ (배포 후) |
-| 기존 idle_playlist_items / operator selection row count 불변 | ⏳ (배포 후) |
+| 배포 (Deploy API Server, migration 없음) | ✅ success (run 29131457970, `1723c3592`) |
+| API smoke (idle_media 저장 정상 + 잘못된 config 400) | ✅ PASS (아래) |
+| 기존 idle_playlist_items / operator selection row count 불변 | ✅ PASS (아래) |
 
-_(배포 후 채움)_
+### API smoke (production, 약국 계정) — ✅ PASS
+
+| 케이스 | 결과 |
+|---|---|
+| 유효 idle_media 3종(legacy_idle_playlist+durationMs / operator_common / custom_media+items) 저장 | ✅ 200, block 3건 |
+| source 누락 | ✅ 400 INVALID_BLOCK_CONFIG |
+| 잘못된 source | ✅ 400 |
+| durationMs 범위 밖(1) | ✅ 400 |
+| custom_media items 없음 | ✅ 400 |
+| custom_media 잘못된 mediaType('gif') | ✅ 400 |
+| archive | ✅ 200 |
+
+### 기존 저장소 불변 (read-only DB)
+
+| 대상 | 결과 |
+|---|---|
+| idle_playlist_items 보유 태블릿 | ✅ 1 (baseline 동일) |
+| operator_idle_selections active | ✅ 0 (동일) |
+| store_tablet_displays / store_tablets | ✅ 2 / 4 (동일) |
+| tablets_with_current_screen_set | ✅ 0 (해제됨) |
+
+> **테스트 잔여물**: `[SMOKE-IDLE] set`(id `3382c153-3d43-4656-adcf-0a5377b0f2a7`, archived·soft-deleted) + block 3건. 앱 정상 쿼리에서 필터됨(무해). hard-delete 정리는 사용자 승인 후 별도 raw DELETE.
 
 ## 8. 완료 기준
 
@@ -96,8 +117,8 @@ _(배포 후 채움)_
 - [x] 기존 idle 저장소·public runtime 불변 (참조만, 미연결)
 - [x] DB migration 0 / 데이터 이전 0
 - [x] typecheck + 단위 테스트
-- [ ] build/배포 + smoke
-- [x] CHECK 작성 · [ ] commit/push
+- [x] build/배포 + smoke PASS
+- [x] CHECK 작성 · commit/push
 
 ## 9. 다음 단계
 
