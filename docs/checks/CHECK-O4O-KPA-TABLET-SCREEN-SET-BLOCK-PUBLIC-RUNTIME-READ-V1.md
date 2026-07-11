@@ -105,7 +105,7 @@ DB migration / template 테이블·컬럼·선택 UI / editor UX 변경 / store_
 | idle_playlist_items / displays / store_tablets / operator selection | ✅ 1 / 2 / 4 / 0 (불변) |
 | tablets_with_current_screen_set | ✅ 0 (해제됨) |
 
-> **테스트 잔여물**: `[SMOKE-PRT] set`(id `51e8e6cf-e5c8-4879-b283-312ab5adef1b`, archived·soft-deleted) + block 4건. hard-delete 정리는 사용자 승인 후 별도 raw DELETE.
+> **테스트 잔여물 — 제거 완료(사용자 승인)**: `[SMOKE-PRT] set`(id `51e8e6cf…`) + block 4건(idle_media/corner_description/product_list/qr_guide)을 4중 가드 raw DELETE(`id` + `deleted_at IS NOT NULL` + `status='archived'` + `name LIKE '[SMOKE-PRT]%'`)로 제거. `DELETE 1` + FK CASCADE로 block 4건 동반 삭제. **재확인: screen_sets 0 / screen_blocks 0**, 기존 idle_playlist_items 1 / displays 2 / store_tablets 4 / operator selection 0 / current 0 **불변**.
 
 ## 8. 완료 기준
 
