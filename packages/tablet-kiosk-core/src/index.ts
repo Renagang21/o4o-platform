@@ -21,4 +21,7 @@ export type {
   TabletKioskApi,
   IdlePlaylistItem,
   LibraryAsset,
+  // WO-O4O-KPA-TABLET-KIOSK-CORE-SCREEN-CONSUMER-V1
+  TabletScreenResponse,
+  TabletScreenSection,
 } from './types';

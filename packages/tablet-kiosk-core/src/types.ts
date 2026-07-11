@@ -134,4 +134,30 @@ export interface TabletKioskApi {
     slug: string,
     interestId: string,
   ) => Promise<InterestStatusDetail>;
+  /**
+   * WO-O4O-KPA-TABLET-KIOSK-CORE-SCREEN-CONSUMER-V1 (opt-in).
+   * 적용된 Screen Set 을 읽어 sections 로 렌더한다. 미주입이거나 응답 mode='legacy' 면
+   * 기존 /products + /idle 기반 동작 그대로. 미주입 서비스(예: K-Cosmetics)는 무영향.
+   */
+  fetchScreen?: (
+    slug: string,
+    params?: { tabletId?: string },
+  ) => Promise<TabletScreenResponse | null>;
+}
+
+/**
+ * 공개 /tablet/screen 응답 (WO-O4O-KPA-TABLET-SCREEN-SET-BLOCK-PUBLIC-RUNTIME-READ-V1).
+ * mode='screen_set' 이면 sections 를 template 기준으로 렌더, 'legacy' 면 기존 경로 유지.
+ */
+export interface TabletScreenSection {
+  blockType: string;
+  sortOrder: number;
+  data: Record<string, unknown>;
+}
+export interface TabletScreenResponse {
+  mode: 'legacy' | 'screen_set';
+  templateKey?: string;
+  screenSet?: { id: string; name: string };
+  sections?: TabletScreenSection[];
+  tabletId?: string | null;
 }

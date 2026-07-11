@@ -26,7 +26,7 @@ import {
   type IdlePlaylistItem, type LibraryAsset, type TabletKioskApi,
 } from '@o4o/tablet-kiosk-core';
 // WO-O4O-KPA-TABLET-PREVIEW-V1: 공개 뷰어 재사용 미리보기 — 공개 데이터 조회 + 매장 slug
-import { fetchTabletProducts, fetchTabletSettings } from '../../api/tablet';
+import { fetchTabletProducts, fetchTabletSettings, fetchTabletScreen } from '../../api/tablet';
 import { getStoreSlug } from '../../api/pharmacyInfo';
 import { extractSnapshotMediaList, type SnapshotForMedia } from '@o4o/store-asset-policy-core';
 import { getStoreExecutionAssets } from '../../api/storeExecutionAssets';
@@ -244,6 +244,8 @@ export default function StoreTabletDisplaysPage() {
     checkStatus: async () => {
       throw new Error('미리보기에서는 상담 요청이 전송되지 않습니다.');
     },
+    // WO-O4O-KPA-TABLET-KIOSK-CORE-SCREEN-CONSUMER-V1: 미리보기도 적용 screen set 반영
+    fetchScreen: (slug) => fetchTabletScreen(slug, previewTabletIdRef.current ?? undefined),
   }), []);
 
   const handleOpenPreview = useCallback(async () => {

@@ -29,6 +29,7 @@ import {
   checkTabletInterestStatus,
   fetchTabletIdle,
   fetchTabletSettings,
+  fetchTabletScreen,
 } from '../../api/tablet';
 
 const IDLE_TIMEOUT_MS = 60_000;
@@ -66,6 +67,8 @@ export function TabletStorePage() {
         fetchProducts: (s, params) => fetchTabletProducts(s, { ...params, tabletId }),
         submitInterest: submitTabletInterest,
         checkStatus: checkTabletInterestStatus,
+        // WO-O4O-KPA-TABLET-KIOSK-CORE-SCREEN-CONSUMER-V1: 적용 screen set 소비(코너별 tabletId 주입)
+        fetchScreen: (s) => fetchTabletScreen(s, tabletId),
       }}
       showQrBadge={fromQr}
       idleTimeoutMs={IDLE_TIMEOUT_MS}

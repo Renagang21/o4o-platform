@@ -10,7 +10,7 @@
  * Calls /api/v1/stores/:slug/tablet/* endpoints directly.
  * No authentication required for tablet kiosk mode.
  */
-import type { IdlePlaylistItem } from '@o4o/tablet-kiosk-core';
+import type { IdlePlaylistItem, TabletScreenResponse } from '@o4o/tablet-kiosk-core';
 
 function getApiBase(): string {
   const base = import.meta.env.VITE_API_BASE_URL || '';
@@ -161,5 +161,24 @@ export async function fetchTabletSettings(slug: string): Promise<TabletDisplaySe
   const json = await res.json();
   if (!json.success) throw new Error(json.error?.message || 'Failed to fetch tablet settings');
   return json.data;
+}
+
+// ==================== Screen Set (WO-O4O-KPA-TABLET-KIOSK-CORE-SCREEN-CONSUMER-V1) ====================
+
+/**
+ * 공개 태블릿 화면 구성 조회. 적용된 screen set 있으면 mode='screen_set'+sections, 없으면 'legacy'.
+ * 실패 시 null 반환 → kiosk-core 는 legacy(/products+/idle) 로 동작.
+ */
+export async function fetchTabletScreen(slug: string, tabletId?: string): Promise<TabletScreenResponse | null> {
+  const qs = tabletId ? `?tabletId=${encodeURIComponent(tabletId)}` : '';
+  const url = `${getApiBase()}/${encodeURIComponent(slug)}/tablet/screen${qs}`;
+  try {
+    const res = await fetch(url);
+    const json = await res.json();
+    if (!json.success) return null;
+    return (json.data ?? null) as TabletScreenResponse | null;
+  } catch {
+    return null;
+  }
 }
 

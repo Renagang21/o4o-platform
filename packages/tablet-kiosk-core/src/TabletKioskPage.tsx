@@ -60,6 +60,7 @@ import type {
   InterestStatusDetail,
   TabletKioskApi,
   IdlePlaylistItem,
+  TabletScreenResponse,
 } from './types';
 // WO-O4O-KPA-TABLET-CORNER-IDLE-YOUTUBE-VIMEO-AUTO-RETURN-V1: idle 대기화면 YouTube/Vimeo embed.
 import { toIdleEmbedUrl } from './idleMedia';
@@ -375,6 +376,34 @@ export function TabletKioskPage({
       .catch((e) => dispatch({ type: 'LOAD_ERROR', message: e.message }));
   }, [slug, api]);
 
+  // WO-O4O-KPA-TABLET-KIOSK-CORE-SCREEN-CONSUMER-V1:
+  //   적용된 Screen Set 을 opt-in 으로 읽는다. api.fetchScreen 미주입이거나 응답 mode='legacy'
+  //   → screen=null → 기존 /products+/idle 동작 그대로. 미주입 서비스(K-Cosmetics 등) 무영향.
+  const [screen, setScreen] = useState<TabletScreenResponse | null>(null);
+  useEffect(() => {
+    if (!slug || !api.fetchScreen) return;
+    let cancelled = false;
+    api.fetchScreen(slug)
+      .then((s) => { if (!cancelled) setScreen(s && s.mode === 'screen_set' ? s : null); })
+      .catch(() => { if (!cancelled) setScreen(null); });
+    return () => { cancelled = true; };
+  }, [slug, api]);
+
+  // Screen Set sections → 화면 요소(코너 설명 / QR 안내 / 대기 미디어). screen=null 이면 전부 미적용(legacy).
+  const screenSections = screen?.sections ?? [];
+  const cornerInfo = (() => {
+    const d = screenSections.find((x) => x.blockType === 'corner_description')?.data as any;
+    return d && (d.title || d.body) ? { title: String(d.title ?? ''), body: String(d.body ?? '') } : null;
+  })();
+  const qrGuide = (() => {
+    const d = screenSections.find((x) => x.blockType === 'qr_guide')?.data as any;
+    return d && (d.label || d.url) ? { label: String(d.label ?? ''), url: String(d.url ?? '') } : null;
+  })();
+  const screenIdleItems = (() => {
+    const items = (screenSections.find((x) => x.blockType === 'idle_media')?.data as any)?.items;
+    return Array.isArray(items) ? (items as IdlePlaylistItem[]) : null;
+  })();
+
   // Submit interest request
   // WO-O4O-KPA-TABLET-PUBLIC-INFO-UX-PRIVACY-INPUT-REMOVAL-V1:
   //   태블릿 V1 은 개인정보를 받지 않는다. 상담 opt-in(showConsultationButton=true) 매장에서만
@@ -685,7 +714,7 @@ export function TabletKioskPage({
   if (mode === 'idle') {
     return (
       <IdleOverlay
-        items={idlePlaylist ?? []}
+        items={screenIdleItems ?? idlePlaylist ?? []}
         onUserInteraction={() => dispatch({ type: 'IDLE_EXIT' })}
         defaultDurationMs={displaySettings?.idleSlideSeconds ? displaySettings.idleSlideSeconds * 1000 : undefined}
       />
@@ -695,18 +724,26 @@ export function TabletKioskPage({
   // ── Browse view ──
   return (
     <div style={styles.fullscreen}>
-      {/* Header */}
+      {/* Header — screen_set 코너 설명 있으면 그 제목/설명, 없으면 기본(legacy) */}
       <div style={styles.header}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <h1 style={{ fontSize: '20px', fontWeight: 700 }}>매장 상품 안내</h1>
+          <h1 style={{ fontSize: '20px', fontWeight: 700 }}>{cornerInfo?.title || '매장 상품 안내'}</h1>
           {showQrBadge && displaySettings?.showQr !== false && (
             <span style={{ fontSize: '11px', fontWeight: 600, backgroundColor: '#f0fdf4', color: '#16a34a', padding: '2px 8px', borderRadius: '4px' }}>
               QR 코드로 접속
             </span>
           )}
         </div>
-        <span style={{ fontSize: '14px', color: '#64748b' }}>궁금한 상품을 터치해 설명을 확인해 보세요</span>
+        <span style={{ fontSize: '14px', color: '#64748b' }}>{cornerInfo?.body || '궁금한 상품을 터치해 설명을 확인해 보세요'}</span>
       </div>
+
+      {/* WO-O4O-KPA-TABLET-KIOSK-CORE-SCREEN-CONSUMER-V1: qr_guide 안내 배너(screen_set 전용, 있을 때만) */}
+      {qrGuide && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 24px', backgroundColor: '#eff6ff', borderBottom: '1px solid #dbeafe', color: '#1e40af', fontSize: '13px' }}>
+          <span style={{ fontWeight: 600 }}>📱 {qrGuide.label || '모바일 안내'}</span>
+          {qrGuide.url && <span style={{ color: '#3b82f6', wordBreak: 'break-all' }}>{qrGuide.url}</span>}
+        </div>
+      )}
 
       <div style={styles.body}>
         {loading ? (
