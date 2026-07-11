@@ -179,7 +179,9 @@ export function createStoreTabletRoutes(
   router.get('/tablets', withStoreAuth(async (req, res, organizationId) => {
     try {
       const tablets = await dataSource.query(
-        `SELECT id, name, location, is_active, created_at
+        // WO-O4O-KPA-TABLET-SCREEN-SET-BLOCK-EDITOR-UX-V1: current_screen_set_id 노출(에디터 초기 상태). additive.
+        `SELECT id, name, location, is_active, created_at,
+                current_screen_set_id AS "currentScreenSetId"
          FROM store_tablets
          WHERE organization_id = $1
          ORDER BY created_at DESC`,

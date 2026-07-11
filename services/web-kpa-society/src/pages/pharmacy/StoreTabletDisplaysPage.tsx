@@ -51,6 +51,8 @@ import {
   type OperatorCommonIdleSelection,
 } from '../../api/tabletDisplays';
 import type { Tablet as TabletType, ProductPool, TabletDisplaySettings } from '../../api/tabletDisplays';
+// WO-O4O-KPA-TABLET-SCREEN-SET-BLOCK-EDITOR-UX-V1: 화면 세트 관리 UI
+import TabletScreenSetManager from './TabletScreenSetManager';
 
 // ==================== Types ====================
 
@@ -924,6 +926,16 @@ export default function StoreTabletDisplaysPage() {
                     </div>
                   )}
                 </div>
+              )}
+
+              {/* WO-O4O-KPA-TABLET-SCREEN-SET-BLOCK-EDITOR-UX-V1: 화면 세트 관리 (public 미반영 — 경고 포함) */}
+              {selectedTabletId && (
+                <TabletScreenSetManager
+                  tabletId={selectedTabletId}
+                  currentScreenSetId={selectedTablet?.currentScreenSetId ?? null}
+                  onCurrentChange={(id) => setTablets((prev) => prev.map((t) => (t.id === selectedTabletId ? { ...t, currentScreenSetId: id } : t)))}
+                  onToast={setToast}
+                />
               )}
 
           {/* WO-O4O-KPA-TABLET-OPERATOR-COMMON-IDLE-VIDEO-SELECTION-V1: 서비스 공통 대기 영상(태블릿별 1개) */}

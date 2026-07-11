@@ -22,6 +22,8 @@ export interface Tablet {
   location: string | null;
   is_active: boolean;
   created_at: string;
+  // WO-O4O-KPA-TABLET-SCREEN-SET-BLOCK-EDITOR-UX-V1: 현재 적용 화면 세트(없으면 null=legacy)
+  currentScreenSetId?: string | null;
 }
 
 export interface DisplayItem {
@@ -171,6 +173,100 @@ export async function fetchTablets(): Promise<Tablet[]> {
     `${BASE}/tablets`,
   );
   return res.data;
+}
+
+// ==================== Screen Set / Block (WO-O4O-KPA-TABLET-SCREEN-SET-BLOCK-EDITOR-UX-V1) ====================
+// 선행 구현 관리 API(/store/screen-sets, /store/tablets/:id/current-screen-set)만 사용.
+// isEnabled(DTO) ↔ is_visible(API 내부) 매핑은 서버가 처리. public runtime 미반영.
+
+export type ScreenSetStatus = 'draft' | 'active' | 'archived' | 'operator_template';
+export type ScreenBlockType =
+  | 'idle_media' | 'product_list' | 'product_content'
+  | 'corner_description' | 'health_info' | 'staff_inquiry' | 'qr_guide';
+
+export interface ScreenSet {
+  id: string;
+  organizationId: string;
+  serviceKey: string | null;
+  tabletId: string | null;
+  name: string;
+  origin: 'store' | 'operator';
+  status: ScreenSetStatus;
+  createdByUserId: string | null;
+  createdAt: string;
+  updatedAt: string;
+  blockCount?: number;
+  isApplied?: boolean;
+}
+
+export interface ScreenBlock {
+  id?: string;
+  screenSetId?: string;
+  blockType: ScreenBlockType;
+  sortOrder: number;
+  isEnabled: boolean;
+  config: Record<string, unknown>;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ScreenSetDetail extends ScreenSet {
+  blocks: ScreenBlock[];
+}
+
+export async function fetchScreenSets(params?: { tabletId?: string; includeArchived?: boolean }): Promise<ScreenSet[]> {
+  const q = new URLSearchParams();
+  if (params?.tabletId) q.set('tabletId', params.tabletId);
+  if (params?.includeArchived) q.set('includeArchived', 'true');
+  const res = await request<{ success: boolean; data: ScreenSet[] }>(`${BASE}/screen-sets?${q.toString()}`);
+  return res.data;
+}
+
+export async function fetchScreenSet(id: string): Promise<ScreenSetDetail> {
+  const res = await request<{ success: boolean; data: ScreenSetDetail }>(`${BASE}/screen-sets/${id}`);
+  return res.data;
+}
+
+export async function createScreenSet(input: { name: string; tabletId?: string | null; status?: 'draft' | 'active' }): Promise<ScreenSet> {
+  const res = await request<{ success: boolean; data: ScreenSet }>(`${BASE}/screen-sets`, {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
+  return res.data;
+}
+
+export async function updateScreenSet(id: string, input: { name?: string; status?: ScreenSetStatus; tabletId?: string | null }): Promise<ScreenSet> {
+  const res = await request<{ success: boolean; data: ScreenSet }>(`${BASE}/screen-sets/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(input),
+  });
+  return res.data;
+}
+
+/** archive(soft delete). 적용 중이면 409 SCREEN_SET_IN_USE 를 throw. */
+export async function archiveScreenSet(id: string): Promise<void> {
+  await request(`${BASE}/screen-sets/${id}`, { method: 'DELETE' });
+}
+
+export async function saveScreenSetBlocks(id: string, blocks: ScreenBlock[]): Promise<ScreenBlock[]> {
+  const res = await request<{ success: boolean; data: ScreenBlock[] }>(`${BASE}/screen-sets/${id}/blocks`, {
+    method: 'PUT',
+    body: JSON.stringify({
+      blocks: blocks.map((b, i) => ({ blockType: b.blockType, sortOrder: i, isEnabled: b.isEnabled, config: b.config })),
+    }),
+  });
+  return res.data;
+}
+
+export async function applyCurrentScreenSet(tabletId: string, screenSetId: string): Promise<void> {
+  await request(`${BASE}/tablets/${tabletId}/current-screen-set`, {
+    method: 'POST',
+    body: JSON.stringify({ screenSetId }),
+  });
+}
+
+export async function clearCurrentScreenSet(tabletId: string): Promise<void> {
+  await request(`${BASE}/tablets/${tabletId}/current-screen-set`, { method: 'DELETE' });
 }
 
 export async function createTablet(name: string, location?: string): Promise<Tablet> {
