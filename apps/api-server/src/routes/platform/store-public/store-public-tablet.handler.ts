@@ -25,6 +25,9 @@ import {
   resolveTabletDisplaySource,
   resolveServiceKeys,
 } from './store-public-utils.js';
+// WO-O4O-KPA-TABLET-SCREEN-SET-BLOCK-PUBLIC-RUNTIME-READ-V1
+import { resolveTabletIdleItems } from './store-public-tablet-idle-resolve.js';
+import { resolveTemplateKey, shapeStaticBlock } from './store-public-tablet-screen.js';
 
 export function createStorePublicTabletRoutes(deps: {
   dataSource: DataSource;
@@ -379,74 +382,35 @@ export function createStorePublicTabletRoutes(deps: {
       const displaySource = await resolveTabletDisplaySource(dataSource, resolved.storeId, requestedTabletId);
       const tabletId = displaySource.tabletId;
 
-      let items: any[] = [];
+      // WO-O4O-KPA-TABLET-SCREEN-SET-BLOCK-PUBLIC-RUNTIME-READ-V1:
+      //   현재 태블릿에 적용된 screen set 의 idle_media block 이 있으면 그 config 로 override(dual-read),
+      //   없으면 legacy(idle_playlist_items + operator common prepend) 그대로. 저장소는 읽기만.
+      let screenSetIdleConfig: unknown = undefined;
       if (tabletId) {
-        const rows = await dataSource.query(
-          `SELECT idle_playlist_items FROM store_tablets WHERE id = $1 LIMIT 1`,
+        const t = await dataSource.query(
+          `SELECT current_screen_set_id FROM store_tablets WHERE id = $1 LIMIT 1`,
           [tabletId],
         );
-        items = Array.isArray(rows?.[0]?.idle_playlist_items) ? rows[0].idle_playlist_items : [];
+        const setId = t?.[0]?.current_screen_set_id;
+        if (setId) {
+          const blk = await dataSource.query(
+            `SELECT b.config
+             FROM store_tablet_screen_blocks b
+             JOIN store_tablet_screen_sets s ON s.id = b.screen_set_id AND s.deleted_at IS NULL
+             WHERE b.screen_set_id = $1 AND b.block_type = 'idle_media' AND b.is_visible = true
+             ORDER BY b.sort_order ASC LIMIT 1`,
+            [setId],
+          );
+          if (blk?.[0]) screenSetIdleConfig = blk[0].config;
+        }
       }
 
-      // WO-O4O-KPA-TABLET-OPERATOR-COMMON-IDLE-VIDEO-SELECTION-V1:
-      //   서비스 운영자 공통 영상 1개를 대기화면 앞에 삽입.
-      //   1) 매장이 선택한 영상이 방영 기간 내면 그 영상.
-      //   2) 없거나 만료면 유효한 태블릿 대상 후보 중 deterministic(seed=tabletId+오늘) 1개.
-      //   3) 유효 후보 0개면 기존 store idle 만.
-      let operatorSource: 'selected' | 'fallback' | null = null;
+      let items: any[] = [];
+      let operatorCommonSource: 'selected' | 'fallback' | null = null;
       if (tabletId) {
-        // WO-O4O-KPA-TABLET-OPERATOR-COMMON-IDLE-VIDEO-SELECTION-V1:
-        //   forced content service_key 는 'kpa-society'(운영자/candidates 기준)인데 slug serviceKey 는 'kpa'.
-        //   resolveServiceKeys 로 ['kpa','kpa-society'] 확장해 매칭(서비스 일반화).
-        const svcKeys = resolveServiceKeys(resolved.serviceKey);
-        let picked: any = null;
-        const sel = await dataSource.query(
-          `SELECT fc.id, fc.video_url AS "videoUrl", fc.source_type AS "sourceType",
-                  fc.tablet_duration_seconds AS "tabletDurationSeconds"
-           FROM store_tablet_operator_idle_selections s
-           JOIN signage_forced_content fc ON fc.id = s.forced_content_id
-           WHERE s.tablet_id = $1 AND s.cleared_at IS NULL
-             AND fc.service_key = ANY($2) AND fc.is_active = true AND fc.deleted_at IS NULL
-             AND fc.target_surface IN ('tablet_idle','both')
-             AND NOW() BETWEEN fc.start_at AND fc.end_at
-           LIMIT 1`,
-          [tabletId, svcKeys],
-        );
-        if (sel?.[0]) { picked = sel[0]; operatorSource = 'selected'; }
-        else {
-          const cands = await dataSource.query(
-            `SELECT fc.id, fc.video_url AS "videoUrl", fc.source_type AS "sourceType",
-                    fc.tablet_duration_seconds AS "tabletDurationSeconds"
-             FROM signage_forced_content fc
-             WHERE fc.service_key = ANY($1) AND fc.is_active = true AND fc.deleted_at IS NULL
-               AND fc.target_surface IN ('tablet_idle','both')
-               AND NOW() BETWEEN fc.start_at AND fc.end_at
-             ORDER BY fc.id ASC`,
-            [svcKeys],
-          );
-          if (cands.length > 0) {
-            const seed = `${tabletId}:${new Date().toISOString().slice(0, 10)}`;
-            let h = 0;
-            for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
-            picked = cands[h % cands.length];
-            operatorSource = 'fallback';
-          }
-        }
-        if (picked && (picked.sourceType === 'youtube' || picked.sourceType === 'vimeo')) {
-          const durationMs = picked.tabletDurationSeconds ? Number(picked.tabletDurationSeconds) * 1000 : 30000;
-          items = [
-            {
-              type: picked.sourceType,
-              url: picked.videoUrl,
-              durationMs,
-              // additive metadata (kiosk 는 type/url/durationMs 만 사용)
-              source: 'operator_common',
-              forcedContentId: picked.id,
-              isOperatorCommon: true,
-            },
-            ...items,
-          ];
-        }
+        const resolvedIdle = await resolveTabletIdleItems(dataSource, tabletId, resolved.serviceKey, screenSetIdleConfig);
+        items = resolvedIdle.items;
+        operatorCommonSource = resolvedIdle.operatorCommonSource;
       }
 
       res.json({
@@ -455,7 +419,7 @@ export function createStorePublicTabletRoutes(deps: {
         // additive: 어느 태블릿 기준인지(디버그/후속). 기존 client 는 data.items 만 사용.
         tabletId,
         tabletSource: displaySource.source,
-        operatorCommonSource: operatorSource,
+        operatorCommonSource,
       });
     } catch (error: any) {
       console.error('[UnifiedStore] GET /:slug/tablet/idle error:', error);
@@ -504,6 +468,96 @@ export function createStorePublicTabletRoutes(deps: {
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch tablet settings' },
+      });
+    }
+  });
+
+  // GET /:slug/tablet/screen — 적용된 Screen Set 을 template-compatible renderer 로 구성(공개).
+  // WO-O4O-KPA-TABLET-SCREEN-SET-BLOCK-PUBLIC-RUNTIME-READ-V1
+  //   current_screen_set_id NULL → { mode:'legacy' }(기존 /products·/idle 경로 사용).
+  //   NOT NULL → 유효 검증 후 visible blocks 를 sections 로 구성. block config 불량은 해당 섹션 생략(안전).
+  //   template 은 Phase 1 기본 1개(구조만) — template 테이블/컬럼/UI 없음.
+  router.get('/:slug/tablet/screen', async (req: Request, res: Response): Promise<void> => {
+    try {
+      const resolved = await resolvePublicStore(dataSource, req.params.slug, req, res);
+      if (!resolved) return;
+
+      const requestedTabletId = typeof req.query.tabletId === 'string' ? req.query.tabletId : null;
+      const displaySource = await resolveTabletDisplaySource(dataSource, resolved.storeId, requestedTabletId);
+      const tabletId = displaySource.tabletId;
+
+      let currentSetId: string | null = null;
+      let tabletOrg: string | null = null;
+      if (tabletId) {
+        const t = await dataSource.query(
+          `SELECT current_screen_set_id AS "currentSetId", organization_id AS "orgId" FROM store_tablets WHERE id = $1 LIMIT 1`,
+          [tabletId],
+        );
+        currentSetId = t?.[0]?.currentSetId ?? null;
+        tabletOrg = t?.[0]?.orgId ?? null;
+      }
+
+      // legacy: 적용 세트 없음 → 기존 경로
+      if (!tabletId || !currentSetId) {
+        res.json({ success: true, data: { mode: 'legacy', tabletId, tabletSource: displaySource.source } });
+        return;
+      }
+
+      // 적용 세트 유효성(org 일치 + 미삭제 + 미보관). 아니면 안전 legacy fallback.
+      const setRows = await dataSource.query(
+        `SELECT id, name, status FROM store_tablet_screen_sets
+         WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL AND status <> 'archived' LIMIT 1`,
+        [currentSetId, tabletOrg],
+      );
+      const set = setRows?.[0];
+      if (!set) {
+        res.json({ success: true, data: { mode: 'legacy', tabletId, tabletSource: displaySource.source, note: 'applied screen set unavailable → legacy fallback' } });
+        return;
+      }
+
+      const blocks = await dataSource.query(
+        `SELECT block_type AS "blockType", sort_order AS "sortOrder", config
+         FROM store_tablet_screen_blocks
+         WHERE screen_set_id = $1 AND is_visible = true
+         ORDER BY sort_order ASC`,
+        [set.id],
+      );
+
+      const templateKey = resolveTemplateKey(set);
+      const sections: Array<{ blockType: string; sortOrder: number; data: Record<string, unknown> }> = [];
+      for (const b of blocks) {
+        try {
+          if (b.blockType === 'idle_media') {
+            const resolvedIdle = await resolveTabletIdleItems(dataSource, tabletId, resolved.serviceKey, b.config);
+            sections.push({ blockType: 'idle_media', sortOrder: b.sortOrder, data: { items: resolvedIdle.items, operatorCommonSource: resolvedIdle.operatorCommonSource } });
+          } else if (b.blockType === 'product_list') {
+            // 기존 visibility gate 그대로(공유 함수 재사용). local products 는 기존 /tablet/products 로 서빙(gate 보존).
+            const supplierResult: any = await queryTabletVisibleProducts(dataSource, resolved.storeId, resolveServiceKeys(resolved.serviceKey), {
+              page: 1, limit: 50, sort: 'sort_order', order: 'asc', firstTabletId: tabletId, configured: displaySource.configured,
+            });
+            sections.push({ blockType: 'product_list', sortOrder: b.sortOrder, data: { products: supplierResult?.data ?? [], localProductsEndpoint: `/${req.params.slug}/tablet/products` } });
+          } else if (b.blockType === 'product_content') {
+            const cfg = (b.config && typeof b.config === 'object' && !Array.isArray(b.config)) ? b.config : {};
+            sections.push({ blockType: 'product_content', sortOrder: b.sortOrder, data: { productRef: cfg.productRef ?? null, contentId: cfg.contentId ?? null } });
+          } else {
+            const data = shapeStaticBlock(b.blockType, b.config);
+            if (data) sections.push({ blockType: b.blockType, sortOrder: b.sortOrder, data }); // null → 섹션 생략(안전)
+          }
+        } catch (blockErr) {
+          console.error(`[UnifiedStore] /tablet/screen block(${b.blockType}) resolve error:`, blockErr);
+          // 해당 block 생략(안전 fallback)
+        }
+      }
+
+      res.json({
+        success: true,
+        data: { mode: 'screen_set', templateKey, screenSet: { id: set.id, name: set.name }, sections, tabletId, tabletSource: displaySource.source },
+      });
+    } catch (error: any) {
+      console.error('[UnifiedStore] GET /:slug/tablet/screen error:', error);
+      res.status(500).json({
+        success: false,
+        error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch tablet screen' },
       });
     }
   });
