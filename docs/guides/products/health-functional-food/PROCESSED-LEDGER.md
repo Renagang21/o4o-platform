@@ -1,5 +1,10 @@
 # 매장 설명서 처리 원장 (PROCESSED LEDGER)
 
+> **⚠️ 방향 전환 (2026-07-11)**: **정본 데이터원 = 식약처(MFDS) 건기식**(41,261 후보). 파이프라인 = 후보 상품명 웹 검색 → **시판 중이면** 회사 홈페이지 보조 + 식약처 인정 기능성으로 설명서, **검색 안 되면 SKIP**(허가만/퇴출). 언어 = **ko + en**(zh 아님). 디자인 = **반응형 `@container`**(폰 1열 / 태블릿 2~3열). 상세: [AGENT-KICKOFF](AGENT-KICKOFF.md). 정본 예제: [examples/byeonenjang-probiotics.responsive.html](examples/byeonenjang-probiotics.responsive.html).
+> **아래 표의 사진(photo) 배치 제품들은 임시 예제(문장 예시용, 추후 삭제 예정)** — 정본 아님. STORE/B2B는 ko+zh로 만들어져 있으나 정본 언어정책(ko+en)과 다름.
+
+
+
 > 제품 이미지 → 매장 STORE 설명서(ko+zh) **DB 저장** 배치의 처리 기록.
 > **정본은 프로덕션 DB**(`shared_product_descriptions`, STORE canonical). 이 원장은 커버리지·중복 방지·이어받기용 목록.
 > 새 제품 저장 시 이 표에 **append**. 저장 전 [존재 가드](AGENT-KICKOFF.md#4-존재-가드-중복-방지--저장-전-필수)(zh canonical 있으면 skip) 필수.

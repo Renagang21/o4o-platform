@@ -1,0 +1,171 @@
+<style>
+  :root{
+    --bg:#eaf0f7; --card:#ffffff; --ink:#1a2735; --sub:#5b7085;
+    --blue:#1f6fbf; --blue-deep:#17356b; --navy-ink:#13263f;
+    --line:#e4ebf3; --chip:#eaf1fb; --chip-line:#cfdff2; --gold:#c79a3e;
+    --shadow:0 6px 22px rgba(23,53,107,.10);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#0e1620; --card:#16212f; --ink:#e7eef6; --sub:#9fb3c6;
+      --blue:#5b9be0; --blue-deep:#bcd6f2; --navy-ink:#e7eef6;
+      --line:#263647; --chip:#1b2a3c; --chip-line:#2c4056; --gold:#d8b662;
+      --shadow:0 6px 22px rgba(0,0,0,.4);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0e1620; --card:#16212f; --ink:#e7eef6; --sub:#9fb3c6;
+    --blue:#5b9be0; --blue-deep:#bcd6f2; --navy-ink:#e7eef6;
+    --line:#263647; --chip:#1b2a3c; --chip-line:#2c4056; --gold:#d8b662;
+    --shadow:0 6px 22px rgba(0,0,0,.4);
+  }
+  :root[data-theme="light"]{
+    --bg:#eaf0f7; --card:#ffffff; --ink:#1a2735; --sub:#5b7085;
+    --blue:#1f6fbf; --blue-deep:#17356b; --navy-ink:#13263f;
+    --line:#e4ebf3; --chip:#eaf1fb; --chip-line:#cfdff2; --gold:#c79a3e;
+    --shadow:0 6px 22px rgba(23,53,107,.10);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);
+    font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+    color:var(--ink);-webkit-font-smoothing:antialiased;padding:24px 14px 50px}
+
+  /* ── 설명서 fragment: 자기 컨테이너 폭에 반응(@container) ── */
+  .vj-desc{container-type:inline-size;max-width:860px;margin:0 auto}
+  .vj-desc *{box-sizing:border-box}
+  .vj-desc .scan{display:block;text-align:center;font-size:12.5px;letter-spacing:.14em;color:var(--sub);margin-bottom:12px}
+  .vj-desc .card{background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:var(--shadow)}
+
+  .vj-desc .hero{padding:28px 22px 24px;text-align:center;background:linear-gradient(180deg,var(--chip),transparent)}
+  .vj-desc .badges{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
+  .vj-desc .b{font-size:12.5px;font-weight:700;border-radius:999px;padding:5px 12px;line-height:1}
+  .vj-desc .b.line{background:transparent;border:1px solid var(--chip-line);color:var(--blue)}
+  .vj-desc .b.navy{background:var(--blue-deep);color:#fff}
+  .vj-desc h1{margin:0;font-size:32px;font-weight:800;letter-spacing:-.01em;color:var(--navy-ink);text-wrap:balance}
+  .vj-desc h1 small{display:block;font-size:15px;font-weight:600;color:var(--blue);letter-spacing:.02em;margin-top:9px}
+  .vj-desc .meta{margin:12px 0 0;font-size:13px;color:var(--sub)}
+
+  .vj-desc .body{padding:6px 22px 26px}
+  .vj-desc .intro{font-size:15.5px;line-height:1.78;color:var(--ink);margin:20px 2px 0}
+  .vj-desc .intro b{color:var(--blue);font-weight:700}
+
+  .vj-desc h2{font-size:18px;letter-spacing:-.005em;color:var(--navy-ink);font-weight:800;text-align:center;margin:34px 0 16px}
+  .vj-desc h2::after{content:"";display:block;width:26px;height:3px;border-radius:3px;background:var(--blue);margin:10px auto 0}
+
+  .vj-desc ul{list-style:none;margin:0;padding:0}
+  .vj-desc ul.why li,.vj-desc ul.who li{position:relative;padding:11px 0 11px 22px;font-size:15.5px;color:var(--ink);border-bottom:1px solid var(--line);line-height:1.5}
+  .vj-desc ul.why li::before{content:"";position:absolute;left:2px;top:18px;width:7px;height:7px;border-radius:50%;background:var(--blue)}
+  .vj-desc ul.who li::before{content:"";position:absolute;left:2px;top:18px;width:7px;height:7px;border-radius:50%;background:var(--gold)}
+
+  .vj-desc .core{display:flex;flex-direction:column;gap:11px}
+  .vj-desc .item{background:var(--chip);border:1px solid var(--line);border-left:3px solid var(--blue);border-radius:14px;padding:15px 16px 14px}
+  .vj-desc .item .tag{display:inline-block;font-size:12px;font-weight:700;color:#fff;background:var(--blue);border-radius:6px;padding:3px 10px;margin-bottom:8px}
+  .vj-desc .item h3{margin:0 0 6px;font-size:18px;font-weight:800;color:var(--navy-ink)}
+  .vj-desc .item p{margin:0;font-size:15px;line-height:1.66;color:var(--sub)}
+
+  .vj-desc .intake{font-size:15.5px;color:var(--ink);text-align:center;margin:0 2px;line-height:1.6}
+  .vj-desc .intake small{display:block;color:var(--sub);font-size:13px;margin-top:5px}
+
+  .vj-desc .chips{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-top:2px}
+  .vj-desc .chips span{font-size:12.5px;font-weight:600;color:var(--blue);background:var(--chip);border:1px solid var(--chip-line);border-radius:999px;padding:6px 12px}
+  .vj-desc .spec{text-align:center;font-size:13.5px;color:var(--sub);font-weight:600;margin:20px 0 0}
+
+  .vj-desc .cta{margin-top:28px;background:linear-gradient(180deg,var(--chip),transparent);border:1px solid var(--line);border-radius:16px;padding:22px 18px;text-align:center}
+  .vj-desc .cta .k{font-size:12.5px;letter-spacing:.14em;color:var(--blue);font-weight:800;margin-bottom:9px}
+  .vj-desc .cta p{margin:0;font-size:15px;line-height:1.66;color:var(--ink)}
+  .vj-desc .cta b{color:var(--blue)}
+  .vj-desc .foot{text-align:center;font-size:12px;color:var(--sub);margin-top:18px;letter-spacing:.03em}
+
+  /* ── 태블릿/넓은 컨테이너: 폭을 활용해 2열·큰 타입 ── */
+  @container (min-width:640px){
+    .vj-desc .hero{padding:40px 34px 32px}
+    .vj-desc h1{font-size:44px}
+    .vj-desc h1 small{font-size:17px;margin-top:11px}
+    .vj-desc .meta{font-size:14.5px}
+    .vj-desc .b{font-size:13.5px;padding:6px 14px}
+    .vj-desc .body{padding:8px 40px 40px}
+    .vj-desc .intro{font-size:17px;line-height:1.8;max-width:70ch;margin-left:auto;margin-right:auto;text-align:center}
+    .vj-desc h2{font-size:21px;margin:44px 0 20px}
+    .vj-desc .core{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .vj-desc ul.why,.vj-desc ul.who{display:grid;grid-template-columns:1fr 1fr;column-gap:28px}
+    .vj-desc ul.why li,.vj-desc ul.who li{font-size:16.5px}
+    .vj-desc .item h3{font-size:19px}
+    .vj-desc .item p{font-size:15.5px}
+    .vj-desc .intake{font-size:17px}
+    .vj-desc .chips span{font-size:13.5px;padding:7px 14px}
+    .vj-desc .cta{padding:28px 24px}
+    .vj-desc .cta p{font-size:16px;max-width:64ch;margin:0 auto}
+  }
+  @container (min-width:900px){
+    .vj-desc .core{grid-template-columns:1fr 1fr 1fr}
+  }
+</style>
+
+<div class="vj-desc">
+  <span class="scan">📷 QR 스캔으로 열어보기 · 매장 태블릿</span>
+  <div class="card">
+    <header class="hero">
+      <div class="badges">
+        <span class="b line">건강기능식품</span>
+        <span class="b navy">100억 CFU</span>
+        <span class="b line">노바렉스 제조</span>
+      </div>
+      <h1>변엔장<small>프로바이오틱스 · 장 건강</small></h1>
+      <p class="meta">제월당 · 노바렉스 제조 · 장용성 캡슐</p>
+    </header>
+
+    <div class="body">
+      <p class="intro">유산균 증식과 유해균 억제, 배변활동 원활에 도움을 줄 수 있는 <b>프로바이오틱스를 100억 CFU</b> 담은 장 건강 건강기능식품입니다. 장용성 캡슐로, 하루 한 포씩 간편하게 챙길 수 있습니다.</p>
+
+      <h2>왜 이 제품인가</h2>
+      <ul class="why">
+        <li>프로바이오틱스 100억 CFU — 유산균 증식·유해균 억제·배변활동 원활, 장 건강</li>
+        <li>1일 1회 1포 · 간편한 스틱 포</li>
+        <li>장용성 캡슐 — 장까지 전달</li>
+        <li>노바렉스 제조 · 건강기능식품</li>
+        <li>30포 구성</li>
+      </ul>
+
+      <h2>핵심 구성</h2>
+      <div class="core">
+        <div class="item">
+          <span class="tag">장 건강 기능성</span>
+          <h3>프로바이오틱스 100억 CFU</h3>
+          <p>프로바이오틱스는 유산균 증식과 유해균 억제, 배변활동 원활에 도움을 줄 수 있어 장 건강에 도움을 주는 기능성 원료이며, 100억 CFU(2,600mg 이상)를 담았습니다.</p>
+        </div>
+        <div class="item">
+          <span class="tag">장까지 전달</span>
+          <h3>장용성 캡슐</h3>
+          <p>위산에 견디는 장용성 캡슐에 담아, 유산균이 장까지 전달되도록 했습니다.</p>
+        </div>
+      </div>
+
+      <h2>이런 분께</h2>
+      <ul class="who">
+        <li>배변활동 · 장 건강을 챙기고 싶은 분</li>
+        <li>하루 한 포로 간편하게 유산균을 챙기고 싶은 분</li>
+        <li>고함량(100억 CFU) 프로바이오틱스를 원하는 분</li>
+      </ul>
+
+      <h2>섭취 안내</h2>
+      <p class="intake">1일 1회, 1회 1포를 물과 함께 섭취하십시오.<small>식약처 표시 섭취방법 기준</small></p>
+
+      <h2>믿을 수 있는 구성</h2>
+      <div class="chips">
+        <span>프로바이오틱스 100억 CFU</span>
+        <span>장용성 캡슐</span>
+        <span>노바렉스 제조</span>
+        <span>건강기능식품</span>
+        <span>품목보고 200400200082915</span>
+      </div>
+      <p class="spec">구성: 1포(2,600mg 이상) × 30포 · 건강기능식품</p>
+
+      <section class="cta">
+        <div class="k">매장 상담</div>
+        <p>질환이 있거나 의약품 복용 중이면 개인에 따라 맞는 방법이 다를 수 있습니다. 이 화면을 <b>매장 내 전문성이 있는 도우미</b>에게 보여주시면, 나에게 맞는 방법을 함께 확인해 드립니다.</p>
+      </section>
+
+      <p class="foot">변엔장 · 프로바이오틱스 · 건강기능식품</p>
+    </div>
+  </div>
+</div>
