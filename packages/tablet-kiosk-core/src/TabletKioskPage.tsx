@@ -404,6 +404,13 @@ export function TabletKioskPage({
     return Array.isArray(items) ? (items as IdlePlaylistItem[]) : null;
   })();
 
+  // WO-O4O-KPA-TABLET-SCREEN-SET-TEMPLATE-APPLY-V1:
+  //   templateKey 별 공개 레이아웃 분기. product_focus = 상품 영역 전면 배치 + 코너 설명 축약 헤더 + QR 하단 보조.
+  //   기본(corner_information_basic_v1) 및 legacy(screen=null)는 기존 레이아웃 불변.
+  //   새 block 을 요구하지 않고 기존 sections 를 다르게 배치만 한다(§4).
+  const templateKey = screen?.templateKey ?? 'corner_information_basic_v1';
+  const isProductFocus = templateKey === 'product_focus';
+
   // Submit interest request
   // WO-O4O-KPA-TABLET-PUBLIC-INFO-UX-PRIVACY-INPUT-REMOVAL-V1:
   //   태블릿 V1 은 개인정보를 받지 않는다. 상담 opt-in(showConsultationButton=true) 매장에서만
@@ -724,21 +731,25 @@ export function TabletKioskPage({
   // ── Browse view ──
   return (
     <div style={styles.fullscreen}>
-      {/* Header — screen_set 코너 설명 있으면 그 제목/설명, 없으면 기본(legacy) */}
-      <div style={styles.header}>
+      {/* Header — screen_set 코너 설명 있으면 그 제목/설명, 없으면 기본(legacy).
+          product_focus(§3.4): 코너 설명은 축약 헤더 → subtitle 생략, compact 패딩. */}
+      <div style={isProductFocus ? styles.headerCompact : styles.header}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <h1 style={{ fontSize: '20px', fontWeight: 700 }}>{cornerInfo?.title || '매장 상품 안내'}</h1>
+          <h1 style={{ fontSize: isProductFocus ? '17px' : '20px', fontWeight: 700 }}>{cornerInfo?.title || '매장 상품 안내'}</h1>
           {showQrBadge && displaySettings?.showQr !== false && (
             <span style={{ fontSize: '11px', fontWeight: 600, backgroundColor: '#f0fdf4', color: '#16a34a', padding: '2px 8px', borderRadius: '4px' }}>
               QR 코드로 접속
             </span>
           )}
         </div>
-        <span style={{ fontSize: '14px', color: '#64748b' }}>{cornerInfo?.body || '궁금한 상품을 터치해 설명을 확인해 보세요'}</span>
+        {!isProductFocus && (
+          <span style={{ fontSize: '14px', color: '#64748b' }}>{cornerInfo?.body || '궁금한 상품을 터치해 설명을 확인해 보세요'}</span>
+        )}
       </div>
 
-      {/* WO-O4O-KPA-TABLET-KIOSK-CORE-SCREEN-CONSUMER-V1: qr_guide 안내 배너(screen_set 전용, 있을 때만) */}
-      {qrGuide && (
+      {/* WO-O4O-KPA-TABLET-KIOSK-CORE-SCREEN-CONSUMER-V1: qr_guide 안내 배너(screen_set 전용, 있을 때만).
+          기본 템플릿은 상단, product_focus 는 하단 보조 배너로 이동(§3.4) → 여기서는 기본 템플릿만 렌더. */}
+      {qrGuide && !isProductFocus && (
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 24px', backgroundColor: '#eff6ff', borderBottom: '1px solid #dbeafe', color: '#1e40af', fontSize: '13px' }}>
           <span style={{ fontWeight: 600 }}>📱 {qrGuide.label || '모바일 안내'}</span>
           {qrGuide.url && <span style={{ color: '#3b82f6', wordBreak: 'break-all' }}>{qrGuide.url}</span>}
@@ -755,7 +766,7 @@ export function TabletKioskPage({
             <p style={{ color: '#94a3b8' }}>표시할 상품이 없습니다.</p>
           </div>
         ) : (
-          <div style={styles.grid}>
+          <div style={isProductFocus ? styles.gridFocus : styles.grid}>
             {products.map((p, idx) => {
               const highlighted = autoSlideSeconds > 0 && products.length > 1 && idx === browseIndex;
               return (
@@ -765,7 +776,7 @@ export function TabletKioskPage({
                 onClick={() => { setBrowseIndex(idx); dispatch({ type: 'SELECT_PRODUCT', product: p }); }}
                 style={highlighted ? { ...styles.productCard, outline: '3px solid #14b8a6', outlineOffset: '2px', transform: 'scale(1.02)' } : styles.productCard}
               >
-                <div style={styles.productImgArea}>
+                <div style={isProductFocus ? styles.productImgAreaFocus : styles.productImgArea}>
                   {p.imageUrl ? (
                     <img src={p.imageUrl} alt={p.name} style={styles.productImg} />
                   ) : (
@@ -789,6 +800,14 @@ export function TabletKioskPage({
           </div>
         )}
       </div>
+
+      {/* product_focus(§3.4): qr_guide 는 하단 보조 배너로 배치(있을 때만). 기본 템플릿은 상단에서 이미 렌더됨. */}
+      {qrGuide && isProductFocus && (
+        <div style={styles.qrGuideBottom}>
+          <span style={{ fontWeight: 600 }}>📱 {qrGuide.label || '모바일 안내'}</span>
+          {qrGuide.url && <span style={{ color: '#3b82f6', wordBreak: 'break-all' }}>{qrGuide.url}</span>}
+        </div>
+      )}
     </div>
   );
 }
@@ -912,6 +931,16 @@ const styles: Record<string, React.CSSProperties> = {
     borderBottom: '1px solid #e2e8f0',
     flexShrink: 0,
   },
+  // WO-O4O-KPA-TABLET-SCREEN-SET-TEMPLATE-APPLY-V1: product_focus 축약 헤더(코너 설명 최소화, 상품 영역 우선).
+  headerCompact: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '10px 24px',
+    backgroundColor: '#fff',
+    borderBottom: '1px solid #e2e8f0',
+    flexShrink: 0,
+  },
   body: {
     flex: 1,
     overflowY: 'auto',
@@ -921,6 +950,12 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
     gap: '12px',
+  },
+  // WO-O4O-KPA-TABLET-SCREEN-SET-TEMPLATE-APPLY-V1: product_focus 상품 그리드(더 큰 타일 = 상품 전면 배치).
+  gridFocus: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+    gap: '16px',
   },
   productCard: {
     position: 'relative',
@@ -933,6 +968,14 @@ const styles: Record<string, React.CSSProperties> = {
   },
   productImgArea: {
     height: '140px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f8fafc',
+  },
+  // WO-O4O-KPA-TABLET-SCREEN-SET-TEMPLATE-APPLY-V1: product_focus 는 이미지 영역을 더 크게(상품 강조).
+  productImgAreaFocus: {
+    height: '200px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -1080,6 +1123,18 @@ const styles: Record<string, React.CSSProperties> = {
     border: '1px solid #fde68a',
     borderRadius: '8px',
     margin: '16px 0',
+  },
+  // WO-O4O-KPA-TABLET-SCREEN-SET-TEMPLATE-APPLY-V1: product_focus 하단 QR 보조 배너.
+  qrGuideBottom: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    padding: '10px 24px',
+    backgroundColor: '#eff6ff',
+    borderTop: '1px solid #dbeafe',
+    color: '#1e40af',
+    fontSize: '13px',
+    flexShrink: 0,
   },
   // Idle overlay (WO-O4O-TABLET-IDLE-LAYER-V1)
   idleOverlay: {

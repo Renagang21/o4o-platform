@@ -47,6 +47,12 @@ const TEMPLATE_OPTIONS: { key: string; label: string; description: string }[] = 
     label: '기본 코너 안내형',
     description: '코너 설명, 제품 목록, QR 안내를 기본 구조로 보여주는 템플릿입니다.',
   },
+  // WO-O4O-KPA-TABLET-SCREEN-SET-TEMPLATE-APPLY-V1: 두 번째 템플릿(상품 집중형).
+  {
+    key: 'product_focus',
+    label: '상품 집중형',
+    description: '상품 목록과 제품 안내를 더 크게 보여주는 템플릿입니다.',
+  },
 ];
 const templateLabel = (key: string | null | undefined) =>
   TEMPLATE_OPTIONS.find((t) => t.key === key)?.label ?? TEMPLATE_OPTIONS[0].label;
@@ -399,7 +405,7 @@ function TemplateSelectField({ value, onChange }: { value: string; onChange: (v:
       </select>
       <p className="text-[11px] text-slate-500 leading-relaxed">{current.description}</p>
       <p className="text-[11px] text-slate-400 leading-relaxed">
-        현재는 기본 코너 안내형 템플릿만 사용할 수 있습니다. 추가 템플릿은 후속 단계에서 제공됩니다.
+        기본 코너 안내형과 상품 집중형을 선택할 수 있습니다. 추가 템플릿은 후속 단계에서 제공됩니다.
       </p>
     </div>
   );

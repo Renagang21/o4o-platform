@@ -1147,11 +1147,11 @@ export function createStoreTabletRoutes(
     'corner_description', 'health_info', 'staff_inquiry', 'qr_guide',
   ];
   const SET_STATUSES_WRITABLE = ['draft', 'active', 'archived'];
-  // WO-O4O-KPA-TABLET-SCREEN-SET-TEMPLATE-KEY-SCHEMA-V1:
-  //   Phase 1 저장 허용 template_key = corner_information_basic_v1 만(+ null=기본).
-  //   product_focus / idle_video_first / comparison 은 예약값(렌더러 없음) → 저장 차단.
-  //   후속 SCREEN-SET-TEMPLATE-APPLY 에서 렌더러 구현과 함께 화이트리스트 확장.
-  const SET_TEMPLATE_KEYS_ALLOWED = ['corner_information_basic_v1'];
+  // WO-O4O-KPA-TABLET-SCREEN-SET-TEMPLATE-KEY-SCHEMA-V1 / -TEMPLATE-APPLY-V1:
+  //   저장 허용 template_key = corner_information_basic_v1(기본) + product_focus(+ null=기본).
+  //   product_focus 는 kiosk-core 렌더러 분기 구현됨(-TEMPLATE-APPLY-V1).
+  //   idle_video_first / comparison 은 아직 예약값(렌더러 없음) → 저장 차단(후속 WO 에서 확장).
+  const SET_TEMPLATE_KEYS_ALLOWED = ['corner_information_basic_v1', 'product_focus'];
   const setCols = (p: string) =>
     `${p}id, ${p}organization_id AS "organizationId", ${p}service_key AS "serviceKey", ` +
     `${p}tablet_id AS "tabletId", ${p}name, ${p}origin, ${p}status, ` +
