@@ -1,21 +1,42 @@
-# products/health-functional-food — 건강기능식품 콘텐츠 (스캐폴드)
+# products/health-functional-food — 건강기능식품 매장용 상세설명서
 
-상태: Scaffold (후속) · 진입: [DOCUMENT-INDEX](../../common/DOCUMENT-INDEX.md)
+상태: Active · 진입: [DOCUMENT-INDEX](../../common/DOCUMENT-INDEX.md)
 
-> ▶ **제품 사진 → 매장 STORE 설명서(ko+zh) DB 저장 배치 작업을 시작한다면 여기부터:**
-> **[AGENT-KICKOFF.md](AGENT-KICKOFF.md)** (세션 시작 가이드) · **[examples/](examples/)** (정본 형식 예제) · **[PROCESSED-LEDGER.md](PROCESSED-LEDGER.md)** (처리 원장).
-> 규칙 SSOT는 [general-food/README.md](../general-food/README.md).
+> 최상위 정책: [O4O-STORE-PRODUCT-DESCRIPTION-POLICY-V1](../O4O-STORE-PRODUCT-DESCRIPTION-POLICY-V1.md)  
+> 실행 가이드: [O4O-PRODUCT-UNIT-DESCRIPTION-AGENT-GUIDE-V1](../O4O-PRODUCT-UNIT-DESCRIPTION-AGENT-GUIDE-V1.md)  
+> 배치 시작: [AGENT-KICKOFF.md](AGENT-KICKOFF.md) · [examples/](examples/) · [PROCESSED-LEDGER.md](PROCESSED-LEDGER.md)
 
-건강기능식품 소비자 콘텐츠 규칙 자리. 공통 규칙을 상속하고, 전용 Writing/Grouping/Template + 자체 Rule Registry(예: `HF-NNN`)는 별도 WO에서 채운다. 기능성 표시·과장 금지 등은 CR을 우선 상속한다.
+---
 
-> 현재는 스캐폴드. 과도한 선행 생성 금지.
+## 1. 제작 정책
 
-## 제품 단위 설명서 (건기식 포함)
+건강기능식품은 O4O가 매장용 공통 상세설명서를 제작하는 핵심 상품군이다.
 
-건강기능식품은 의약품처럼 성분 그룹으로 묶지 않고 **제품 단위 설명서 패턴**을 따른다. 건기식·일반식품·기타 제품 공통 작성 기준은 아래를 참조한다(SSOT):
+```text
+제품 1건 = 설명서 1건
+```
 
-- **설명서 작성**: [O4O-PRODUCT-UNIT-DESCRIPTION-AGENT-GUIDE-V1](../O4O-PRODUCT-UNIT-DESCRIPTION-AGENT-GUIDE-V1.md) (§9.1 건강기능식품 섹션)
-- **사진 기반 등록**: [O4O-PRODUCT-UNIT-REGISTRATION-FROM-PHOTO-AGENT-GUIDE-V1](../O4O-PRODUCT-UNIT-REGISTRATION-FROM-PHOTO-AGENT-GUIDE-V1.md)
-- 조사 근거: [IR-O4O-PRODUCT-UNIT-PHOTO-TO-DESCRIPTION-QR-FLOW-AUDIT-V2](../../../investigations/IR-O4O-PRODUCT-UNIT-PHOTO-TO-DESCRIPTION-QR-FLOW-AUDIT-V2.md)
+설명서의 최우선 목적은 소비자가 제품에 관심을 갖고, 제품의 장점과 신뢰 요소를 이해하여 구매를 고려하도록 돕는 것이다.
 
-건기식 전용 규칙(HF-NNN Registry, 기능성 원료 카탈로그 등)은 여전히 별도 WO에서 채운다.
+식약처 인정 기능성과 품목정보는 제품의 매력을 제한하는 자료가 아니라, 소비자가 제품의 장점을 믿고 선택하게 하는 핵심 근거로 사용한다.
+
+---
+
+## 2. 작성 방향
+
+- 소비자의 질환·증상·생활 고민에서 시작할 수 있다.
+- 제품의 기능성·함량·복합 구성·제형·섭취 편의성·제조정보를 구매 이유로 풀어 쓴다.
+- 공식 기능성만 나열하는 스펙 문서로 만들지 않는다.
+- 제품의 장점과 그 장점을 뒷받침하는 구체적인 근거를 함께 보여준다.
+- 확인되지 않은 제품 사실, 치료·예방·효과 보장, 원료 일반정보의 제품 효과 전이는 사용하지 않는다.
+- 주의사항은 꼭 필요한 범위에서 짧고 명확하게 제공하며 제품의 장점보다 앞세우지 않는다.
+
+---
+
+## 3. 운영 자료
+
+- `AGENT-KICKOFF.md`: 실제 배치 작업의 시작 절차
+- `examples/`: 현재 정본 형식과 문체 참고
+- `PROCESSED-LEDGER.md`: 처리 원장
+
+하위 문서가 최상위 정책과 충돌하면 `O4O-STORE-PRODUCT-DESCRIPTION-POLICY-V1`을 우선한다.
