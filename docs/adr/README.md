@@ -19,5 +19,6 @@
 | ADR | 제목 | 상태 | 날짜 |
 |---|---|---|---|
 | [ADR-0001](ADR-0001-content-documentation-architecture-baseline.md) | O4O Content Documentation Architecture Baseline | Accepted | 2026-07-08 |
+| [ADR-0002](ADR-0002-o4o-product-description-authenticated-access.md) | O4O Product Description Authenticated Access | Accepted | 2026-07-12 |
 
 > ADR-0001로 문서 체계를 **Baseline 선언**했다. 이후 구조 변경은 Major(새 IR/ADR 필요), 신규 규칙=Registry·사례=Knowledge·결정=ADR·작업=WO·결과=CHECK.

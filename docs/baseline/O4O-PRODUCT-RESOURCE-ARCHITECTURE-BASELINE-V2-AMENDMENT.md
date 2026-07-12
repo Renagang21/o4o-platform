@@ -4,6 +4,8 @@ Status: **BASELINE AMENDMENT** — F12 `O4O-PRODUCT-RESOURCE-ARCHITECTURE-BASELI
 Date: 2026-07-09
 근거 WO: `WO-O4O-PRODUCT-LANDING-ARCHITECTURE-V1` (사업 방향: `Product → Content → QR → Product Landing`)
 
+> ⏩ **후속 개정 (2026-07-12)**: 본 V2 가 전제한 `/p/{key}` **공개 열람**은 `V3-AMENDMENT`([O4O-PRODUCT-RESOURCE-ARCHITECTURE-BASELINE-V3-AMENDMENT](O4O-PRODUCT-RESOURCE-ARCHITECTURE-BASELINE-V3-AMENDMENT.md))에서 **로그인 회원 전용 본문 열람**으로 개정되었다(불변식 #3 개정 + #8·#9 신규). 고정 URL·기본 QR 은 그대로 유지. 결정: `ADR-0002`. 본 V2 원문은 보존한다.
+
 > F12 V1 은 절대 기준이 아니며 사업 방향에 맞춰 개정될 수 있다(V1 §4 거버넌스: "구조 변경은 본 Baseline 을 개정하는 명시적 WO 필수"). 본 문서가 그 명시적 개정이다. **V1 의 6 불변식은 유지**하되, 아래 항목만 확장/명확화한다.
 
 ---
