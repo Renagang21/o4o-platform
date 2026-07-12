@@ -505,7 +505,8 @@ export function createStorePublicTabletRoutes(deps: {
 
       // 적용 세트 유효성(org 일치 + 미삭제 + 미보관). 아니면 안전 legacy fallback.
       const setRows = await dataSource.query(
-        `SELECT id, name, status FROM store_tablet_screen_sets
+        // WO-O4O-KPA-TABLET-SCREEN-SET-TEMPLATE-KEY-SCHEMA-V1: template_key → resolveTemplateKey(NULL=기본)
+        `SELECT id, name, status, template_key AS "templateKey" FROM store_tablet_screen_sets
          WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL AND status <> 'archived' LIMIT 1`,
         [currentSetId, tabletOrg],
       );

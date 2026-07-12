@@ -1147,9 +1147,15 @@ export function createStoreTabletRoutes(
     'corner_description', 'health_info', 'staff_inquiry', 'qr_guide',
   ];
   const SET_STATUSES_WRITABLE = ['draft', 'active', 'archived'];
+  // WO-O4O-KPA-TABLET-SCREEN-SET-TEMPLATE-KEY-SCHEMA-V1:
+  //   Phase 1 저장 허용 template_key = corner_information_basic_v1 만(+ null=기본).
+  //   product_focus / idle_video_first / comparison 은 예약값(렌더러 없음) → 저장 차단.
+  //   후속 SCREEN-SET-TEMPLATE-APPLY 에서 렌더러 구현과 함께 화이트리스트 확장.
+  const SET_TEMPLATE_KEYS_ALLOWED = ['corner_information_basic_v1'];
   const setCols = (p: string) =>
     `${p}id, ${p}organization_id AS "organizationId", ${p}service_key AS "serviceKey", ` +
     `${p}tablet_id AS "tabletId", ${p}name, ${p}origin, ${p}status, ` +
+    `COALESCE(${p}template_key, 'corner_information_basic_v1') AS "templateKey", ` +
     `${p}created_by_user_id AS "createdByUserId", ${p}created_at AS "createdAt", ${p}updated_at AS "updatedAt"`;
   const blockCols = (p: string) =>
     `${p}id, ${p}screen_set_id AS "screenSetId", ${p}block_type AS "blockType", ${p}sort_order AS "sortOrder", ` +
@@ -1208,6 +1214,12 @@ export function createStoreTabletRoutes(
       if (!name) { res.status(400).json({ success: false, error: 'Screen set name is required', code: 'SCREEN_SET_NAME_REQUIRED' }); return; }
       if (name.length > 120) { res.status(400).json({ success: false, error: 'name too long (max 120)', code: 'VALIDATION_ERROR' }); return; }
       const status = req.body?.status === 'active' ? 'active' : 'draft';
+      // WO-O4O-KPA-TABLET-SCREEN-SET-TEMPLATE-KEY-SCHEMA-V1: templateKey(옵션). 미지정=NULL(=기본).
+      let templateKey: string | null = null;
+      if (req.body?.templateKey != null) {
+        templateKey = String(req.body.templateKey);
+        if (!SET_TEMPLATE_KEYS_ALLOWED.includes(templateKey)) { res.status(400).json({ success: false, error: `invalid templateKey (allowed: ${SET_TEMPLATE_KEYS_ALLOWED.join(', ')})`, code: 'INVALID_TEMPLATE_KEY' }); return; }
+      }
       let tabletId: string | null = null;
       if (req.body?.tabletId != null) {
         tabletId = String(req.body.tabletId);
@@ -1215,10 +1227,10 @@ export function createStoreTabletRoutes(
         if (!t?.[0]) { res.status(400).json({ success: false, error: 'Tablet not found in this store', code: 'INVALID_TABLET' }); return; }
       }
       const ins = await dataSource.query(
-        `INSERT INTO store_tablet_screen_sets (organization_id, service_key, tablet_id, name, origin, status, created_by_user_id)
-         VALUES ($1, NULL, $2, $3, 'store', $4, $5)
+        `INSERT INTO store_tablet_screen_sets (organization_id, service_key, tablet_id, name, origin, status, template_key, created_by_user_id)
+         VALUES ($1, NULL, $2, $3, 'store', $4, $5, $6)
          RETURNING ${setCols('')}`,
-        [organizationId, tabletId, name, status, userId],
+        [organizationId, tabletId, name, status, templateKey, userId],
       );
       res.status(201).json({ success: true, data: ins[0] });
     } catch (error: any) {
@@ -1251,6 +1263,12 @@ export function createStoreTabletRoutes(
           if (!t?.[0]) { res.status(400).json({ success: false, error: 'Tablet not found in this store', code: 'INVALID_TABLET' }); return; }
         }
         params.push(tid); sets.push(`tablet_id = $${params.length}`);
+      }
+      // WO-O4O-KPA-TABLET-SCREEN-SET-TEMPLATE-KEY-SCHEMA-V1: templateKey 수정(null=기본으로 초기화 허용)
+      if (req.body?.templateKey !== undefined) {
+        const tk: string | null = req.body.templateKey == null ? null : String(req.body.templateKey);
+        if (tk !== null && !SET_TEMPLATE_KEYS_ALLOWED.includes(tk)) { res.status(400).json({ success: false, error: `invalid templateKey (allowed: ${SET_TEMPLATE_KEYS_ALLOWED.join(', ')})`, code: 'INVALID_TEMPLATE_KEY' }); return; }
+        params.push(tk); sets.push(`template_key = $${params.length}`);
       }
       if (sets.length === 0) { res.status(400).json({ success: false, error: 'no fields to update', code: 'VALIDATION_ERROR' }); return; }
       sets.push(`updated_at = NOW()`);
