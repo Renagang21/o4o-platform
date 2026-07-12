@@ -110,6 +110,22 @@ import type {
 import { DEFAULT_SHARED_PRODUCT_DESCRIPTION_TYPE } from '../entities/SharedProductDescription.entity.js';
 import { sanitizeDescriptionHtml } from '../utils/sanitize-description-html.util.js';
 
+/**
+ * WO-O4O-STORE-DESCRIPTION-COSMETIC-WRITE-GUARD-AND-DOC-ALIGN-V1
+ * 화장품 ProductMaster 에 O4O 공통(비-supplier) STORE 설명서를 신규 생성/승격하려 할 때 던진다.
+ * 정책(O4O-STORE-PRODUCT-DESCRIPTION-POLICY-V1 §5): 화장품은 O4O 가 직접 제작하지 않고 공급자·브랜드가 제작한다.
+ * 컨트롤러는 이 에러를 잡아 500 이 아니라 도메인 오류(403)로 매핑한다.
+ */
+export class CosmeticDescriptionBlockedError extends Error {
+  readonly code = 'COSMETIC_O4O_DESCRIPTION_BLOCKED';
+  constructor(
+    message = '화장품 상품의 공통 설명서는 O4O에서 직접 제작하지 않습니다. 공급자 또는 브랜드 콘텐츠 경로를 이용해 주세요.',
+  ) {
+    super(message);
+    this.name = 'CosmeticDescriptionBlockedError';
+  }
+}
+
 export interface CreateCandidateInput {
   masterId: string;
   content: string;
@@ -181,6 +197,29 @@ export class SharedProductDescriptionService {
   }
 
   /**
+   * WO-O4O-STORE-DESCRIPTION-COSMETIC-WRITE-GUARD-AND-DOC-ALIGN-V1
+   * ProductMaster 가 화장품인지 판정한다. 실제 ProductMaster 필드 기준(문자열/상품명 추정 아님):
+   *   - regulatory_type = 'COSMETIC' (상품 등록 시 카테고리 매핑으로 설정), 또는
+   *   - category_id → product_categories.slug='cosmetics' (자기 또는 부모 카테고리).
+   * 화장품 canonical 생성 흐름은 현재 없으나(정책 일치), generic write 경로의 가드 gap 을 닫는다.
+   */
+  private async isCosmeticMaster(masterId: string): Promise<boolean> {
+    const rows: Array<{ rt: string | null; slug: string | null; parent_slug: string | null }> =
+      await this.dataSource.query(
+        `SELECT pm.regulatory_type AS rt, pc.slug AS slug, ppc.slug AS parent_slug
+           FROM product_masters pm
+           LEFT JOIN product_categories pc  ON pc.id = pm.category_id
+           LEFT JOIN product_categories ppc ON ppc.id = pc.parent_id
+          WHERE pm.id = $1
+          LIMIT 1`,
+        [masterId],
+      );
+    const r = rows[0];
+    if (!r) return false;
+    return r.rt === 'COSMETIC' || r.slug === 'cosmetics' || r.parent_slug === 'cosmetics';
+  }
+
+  /**
    * 후보 생성 (기본 status='candidate')
    *
    * WO-O4O-PRODUCT-DESCRIPTION-SANITIZE-ON-WRITE-V2:
@@ -189,6 +228,12 @@ export class SharedProductDescriptionService {
    * (seed 경로는 sanitize 결과가 빈 경우 createCandidate 호출 전에 skip 하므로 여기 도달하지 않는다.)
    */
   async createCandidate(input: CreateCandidateInput): Promise<SharedProductDescription> {
+    // WO-O4O-STORE-DESCRIPTION-COSMETIC-WRITE-GUARD-AND-DOC-ALIGN-V1:
+    //   화장품에는 O4O 공통(비-supplier) 설명서 신규 생성을 차단한다. 공급자(source_type='supplier')
+    //   경로는 브랜드·공급자 제작이므로 그대로 허용한다.
+    if (input.sourceType !== 'supplier' && (await this.isCosmeticMaster(input.masterId))) {
+      throw new CosmeticDescriptionBlockedError();
+    }
     const content = sanitizeDescriptionHtml(input.content);
     if (!content) {
       throw new Error('content is empty after sanitization');
@@ -229,6 +274,11 @@ export class SharedProductDescriptionService {
       }
       if (target.deletedAt) {
         throw new Error('Cannot set a deleted description as canonical');
+      }
+      // WO-O4O-STORE-DESCRIPTION-COSMETIC-WRITE-GUARD-AND-DOC-ALIGN-V1:
+      //   화장품 비-supplier 설명서의 canonical 승격 차단(2차 방어). supplier 는 허용.
+      if (target.sourceType !== 'supplier' && (await this.isCosmeticMaster(target.masterId))) {
+        throw new CosmeticDescriptionBlockedError();
       }
 
       // 기존 canonical 강등 (대상 자신 제외) — 같은 description_type + **같은 언어**만 강등.

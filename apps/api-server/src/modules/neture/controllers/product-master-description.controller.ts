@@ -25,7 +25,7 @@ import { Router } from 'express';
 import type { Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
 import { authenticate, requireRole } from '../../../middleware/auth.middleware.js';
-import { SharedProductDescriptionService } from '../services/shared-product-description.service.js';
+import { SharedProductDescriptionService, CosmeticDescriptionBlockedError } from '../services/shared-product-description.service.js';
 import { ProductMaster } from '../entities/ProductMaster.entity.js';
 import type { SharedProductDescriptionType } from '../entities/SharedProductDescription.entity.js';
 import logger from '../../../utils/logger.js';
@@ -148,6 +148,12 @@ export function createProductMasterDescriptionController(dataSource: DataSource)
         },
       });
     } catch (err) {
+      // WO-O4O-STORE-DESCRIPTION-COSMETIC-WRITE-GUARD-AND-DOC-ALIGN-V1:
+      //   화장품 O4O 공통 설명서 write 차단은 500 이 아니라 도메인 오류(403)로 응답한다.
+      if (err instanceof CosmeticDescriptionBlockedError) {
+        res.status(403).json({ success: false, error: err.message, code: err.code });
+        return;
+      }
       const msg = err instanceof Error ? err.message : String(err);
       // sanitize 후 빈 본문 등 서비스 검증 실패는 400 로 매핑
       if (/empty after sanitization/i.test(msg)) {
