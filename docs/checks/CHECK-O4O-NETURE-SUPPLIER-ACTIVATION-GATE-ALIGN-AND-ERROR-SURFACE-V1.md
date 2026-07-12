@@ -179,7 +179,7 @@ WHERE status='PENDING' AND (manager_name IS NULL OR manager_phone IS NULL);
 
 ### 6.2 배포 검증
 - 선행 WO 커밋 `2bc55ad3a`(2026-06-29) < `neture-web` 현재 리비전 `neture-web-01253-ngd` 배포시각 `2026-07-12T00:35Z` → **백엔드·프론트 선행 구현은 라이브 반영됨**.
-- 이번 세션 bulk-gate 수정은 커밋/푸시 시 CI/CD 로 배포 예정.
+- 이번 세션 bulk-gate 수정 배포 완료: push(`c88de49ca`) → GitHub Actions "Deploy Web Services (Cloud Run)" run `29178247011` **success** → `neture-web` 리비전 `neture-web-01253-ngd` → **`neture-web-01254-9pc`** (2026-07-12T03:29Z) 롤포워드.
 
 ### 6.3 라이브 브라우저 스모크 제약
 - 이번 변경은 이미 3개 형제 페이지에서 검증된 `SupplierActivationGate mode="gate"` 래퍼의 동일 적용(추가 로직 없음)으로, 회귀 위험이 사실상 없어 정적 검증으로 갈음.
