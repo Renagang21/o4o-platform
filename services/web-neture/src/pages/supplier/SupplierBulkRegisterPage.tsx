@@ -18,6 +18,9 @@ import {
 } from '../../lib/supplierProductTypes';
 import { validateBulkCsv, type BulkValidationResult, type BulkRowStatus } from '../../lib/bulkUploadValidation';
 import { submitBulkCandidates, type BulkCandidateSubmitResult } from '../../lib/api/supplier';
+// WO-O4O-NETURE-SUPPLIER-ACTIVATION-GATE-ALIGN-AND-ERROR-SURFACE-V1:
+// 대량 등록 진입도 사전 게이트 — PENDING 공급자는 파일 제출(후보 생성) 전에 차단.
+import SupplierActivationGate from '../../components/supplier/SupplierActivationGate';
 
 /** 유형별 CSV 템플릿(헤더만) 다운로드 — 백엔드 없이 클라이언트 생성 */
 function downloadTemplate(t: SupplierProductTypeDef) {
@@ -121,6 +124,7 @@ export default function SupplierBulkRegisterPage() {
   );
 
   return (
+    <SupplierActivationGate mode="gate">
     <div className="max-w-3xl">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-slate-900">대량 등록</h1>
@@ -263,6 +267,7 @@ export default function SupplierBulkRegisterPage() {
         />
       )}
     </div>
+    </SupplierActivationGate>
   );
 }
 
