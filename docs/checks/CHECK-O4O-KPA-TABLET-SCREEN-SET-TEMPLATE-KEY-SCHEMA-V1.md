@@ -54,13 +54,17 @@ GET /store/screen-sets[/:id] 응답: { ..., templateKey: 'corner_information_bas
 |---|:--:|
 | migration 생성 | ✅ 20270205000000 (additive, IF NOT EXISTS, down 완비) |
 | api-server typecheck (변경 파일) | ✅ PASS |
-| 배포 (CI migration) | ⏳ (배포 후) |
-| information_schema template_key 컬럼 | ⏳ (배포 후) |
-| 운영 샘플 보존 + template_key NULL | ⏳ (배포 후) |
-| GET/POST/PATCH templateKey + 잘못된값 400 | ⏳ (배포 후) |
-| public /screen templateKey 기본값 | ⏳ (배포 후) |
+| 배포 (Deploy API, CI migration) | ✅ success (run 29174943098, `e64edb557`) |
+| information_schema template_key 컬럼 | ✅ `character varying(50)`, nullable YES |
+| 운영 샘플 보존 + template_key NULL | ✅ 구강관리 기본 화면 세트(7280872e) template_key=NULL 유지 |
+| migration 기록 | ✅ AddTemplateKeyToTabletScreenSets20270205000000 |
+| GET templateKey (COALESCE 기본) | ✅ 'corner_information_basic_v1' |
+| PATCH 유효 templateKey | ✅ 200 |
+| PATCH 잘못된 templateKey(product_focus) | ✅ **400 INVALID_TEMPLATE_KEY** |
+| public /screen templateKey | ✅ 'corner_information_basic_v1' (mode screen_set) |
+| PATCH null 복구 → 샘플 template_key NULL 재확인 | ✅ (write 테스트 net-zero, 원상복구) |
 
-_(배포 후 채움)_
+> 검증 write 테스트는 운영 샘플에 PATCH(corner_information_basic_v1 → null)만 수행, 최종 **NULL 원상복구**(net-zero) — 샘플 무변경. 다른 태블릿/데이터 무접촉.
 
 ## 7. 완료 기준
 
@@ -70,8 +74,8 @@ _(배포 후 채움)_
 - [x] 운영 샘플 보존(additive, 기존 row NULL)
 - [x] 템플릿 UI/신규 렌더링 미구현
 - [x] typecheck
-- [ ] 배포 + information_schema/API/public 검증
-- [x] CHECK 작성 · [ ] commit/push
+- [x] 배포 + information_schema/API/public 검증 PASS
+- [x] CHECK 작성 · commit/push
 
 ## 8. 다음 단계
 
