@@ -1,7 +1,7 @@
 # 매장 설명서 처리 원장 (PROCESSED LEDGER)
 
 > **⚠️ 방향 전환 (2026-07-11)**: **정본 데이터원 = 식약처(MFDS) 건기식**(41,261 후보). 파이프라인 = 후보 상품명 웹 검색 → **시판 중이면** 회사 홈페이지 보조 + 식약처 인정 기능성으로 설명서, **검색 안 되면 SKIP**(허가만/퇴출). 언어 = **ko + en**(zh 아님). 디자인 = **반응형 `@container`**(폰 1열 / 태블릿 2~3열). 상세: [AGENT-KICKOFF](AGENT-KICKOFF.md). 정본 예제: [examples/byeonenjang.semantic.html](examples/byeonenjang.semantic.html) (기존 `byeonenjang-probiotics.responsive.html` 은 deprecated 보관).
-> **아래 표의 사진(photo) 배치 제품들은 임시 예제(문장 예시용, 추후 삭제 예정)** — 정본 아님. STORE/B2B는 ko+zh로 만들어져 있으나 정본 언어정책(ko+en)과 다름.
+> **아래 표의 사진(photo) 배치 제품들은 임시 예제(문장 예시용)** — 정본으로 사용하지 않으며, 향후 보존·정리 여부는 별도 결정한다. STORE/B2B는 ko+zh로 만들어져 있으나 정본 언어정책(ko+en)과 다름.
 
 
 
