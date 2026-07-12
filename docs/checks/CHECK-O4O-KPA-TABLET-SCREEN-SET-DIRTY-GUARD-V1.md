@@ -64,10 +64,24 @@ DB migration / API 추가·변경 / public runtime / kiosk-core / templateKey wh
 |---|:--:|
 | web-kpa-society typecheck | ✅ PASS (exit 0) |
 | web-kpa-society build | ✅ PASS (exit 0) |
-| 배포 (web) | ⏳ (배포 후) |
-| browser smoke (dirty 배지 + guard 확인창, 비저장) | ⏳ (배포 후) |
+| 배포 (Deploy Web Services) | ✅ success (run 29191733768, `468a27e57`) |
+| browser smoke (비저장) | ✅ PASS (아래) |
 
-_(배포 후 채움)_
+### Browser smoke (production, 약국 계정) — 비저장 ✅ PASS
+
+편집기 열기 → 이름 in-memory 편집(저장 안 함) → guard 확인창 dismiss(취소). **저장/write 0 → 운영 샘플 무변경.**
+
+| 항목 | 결과 |
+|---|:--:|
+| 편집기 열림 · 편집 전 dirty 배지 없음 | ✅ / ✅ |
+| in-memory 편집 후 **변경됨** 배지 | ✅ |
+| 미저장 경고 배너 | ✅ |
+| **저장 필요** 표시 | ✅ |
+| 이동 시 guard 확인창 발동 | ✅ ("저장되지 않은 변경이 있습니다 … 계속하시겠습니까?") |
+| 취소 시 편집 유지 · 변경됨 유지(무저장) | ✅ |
+| console error | ✅ 0 |
+
+> smoke는 dismiss(취소)만 수행 — 저장/적용 write 없음 → 운영 샘플(구강관리 코너) 무변경. beforeunload/적용-전용 문구는 코드+동일 confirmDiscard 경로로 커버.
 
 ## 8. 완료 기준 / 후속
 
@@ -76,7 +90,7 @@ _(배포 후 채움)_
 - [x] 저장 성공 시 dirty 초기화(baseline 갱신)
 - [x] 기존 저장/적용/해제/public runtime 불변
 - [x] typecheck/build
-- [ ] 배포 + browser smoke
-- [x] CHECK 작성 · [ ] commit/push
+- [x] 배포 + browser smoke (비저장) PASS
+- [x] CHECK 작성 · commit/push
 
 **후속 후보**: `WO-O4O-KPA-TABLET-CORNER-SWITCH-GUARD-V1`(다른 코너/태블릿 선택 시 guard — StoreTabletDisplaysPage 필요) · PREVIEW-PANEL · TEMPLATE-IDLE-VIDEO-FIRST.
