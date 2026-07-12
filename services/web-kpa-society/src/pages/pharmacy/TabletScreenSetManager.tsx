@@ -193,7 +193,7 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
     try {
       await clearCurrentScreenSet(tabletId);
       onCurrentChange(null);
-      onToast({ type: 'success', message: '적용 해제됨 (기존 legacy 경로 사용)' });
+      onToast({ type: 'success', message: '적용 해제됨 (기본 화면으로 복귀)' });
       await reload();
     } catch (e: any) {
       onToast({ type: 'error', message: e?.message || '해제에 실패했습니다.' });
@@ -202,7 +202,7 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
 
   const handleArchive = async (set: ScreenSet) => {
     if (busy) return;
-    if (!window.confirm(`"${set.name}" 세트를 보관(archive)하시겠습니까?`)) return;
+    if (!window.confirm(`"${set.name}" 세트를 보관하시겠습니까? 목록에서 숨겨지며, 적용 중인 세트는 먼저 적용 해제해야 합니다.`)) return;
     setBusy(true);
     try {
       await archiveScreenSet(set.id);
@@ -257,13 +257,20 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
           </p>
         </div>
 
+        {/* WO-O4O-KPA-TABLET-SCREEN-SET-OPERATION-USABILITY-PASS-V1: 저장/적용/해제·템플릿/블록 개념 안내 */}
+        <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-[11px] text-slate-600 leading-relaxed space-y-1">
+          <p><b className="text-slate-700">화면 세트</b>는 태블릿에 표시할 화면 구성 묶음입니다.</p>
+          <p><b className="text-slate-700">템플릿</b>은 같은 내용을 어떤 <b>배치</b>로 보여줄지 정하고, <b className="text-slate-700">블록</b>은 화면에 들어가는 <b>내용</b>(코너 설명·제품 목록·QR 안내·대기화면)입니다.</p>
+          <p><b className="text-slate-700">저장</b>은 세트 내용만 저장하며 태블릿에 자동 적용되지 않습니다. <b className="text-slate-700">적용</b>은 이 세트를 이 코너 태블릿의 현재 화면으로 사용하고, <b className="text-slate-700">적용 해제</b>는 기본 화면으로 되돌립니다.</p>
+        </div>
+
         {/* 현재 적용 */}
         <div className="flex items-center justify-between gap-3 flex-wrap text-sm">
           <div>
-            <span className="text-slate-400 text-xs">현재 적용: </span>
+            <span className="text-slate-400 text-xs">이 코너에 적용 중: </span>
             {currentSet
               ? <span className="font-semibold text-indigo-700">{currentSet.name}</span>
-              : <span className="text-slate-400">없음 (기존 legacy 경로)</span>}
+              : <span className="text-slate-400">없음 (기본 화면 사용 중)</span>}
           </div>
           {currentScreenSetId && (
             <button onClick={handleClear} disabled={busy} className="px-2.5 py-1 text-xs font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50">
@@ -340,7 +347,7 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
                 <option value="archived">보관</option>
               </select>
               <button onClick={handleSaveSet} disabled={savingSet} className="px-3 py-2 text-xs font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 flex items-center gap-1">
-                {savingSet ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />} 정보 저장
+                {savingSet ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />} 세트 정보 저장
               </button>
             </div>
 
@@ -350,6 +357,11 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
             </div>
 
             {/* 블록 목록 */}
+            {/* WO-O4O-KPA-TABLET-SCREEN-SET-OPERATION-USABILITY-PASS-V1: 블록=화면 표시 내용 안내 */}
+            <div>
+              <div className="text-xs font-semibold text-slate-700">화면에 표시할 블록</div>
+              <p className="text-[11px] text-slate-400 mt-0.5">화면에 들어가는 내용입니다. 순서 이동·표시 여부를 조정할 수 있고, 변경 후 아래 ‘블록 저장’을 눌러야 저장됩니다.</p>
+            </div>
             <div className="space-y-2">
               {blocks.length === 0 && <div className="text-xs text-slate-400">블록이 없습니다. 아래에서 추가하세요.</div>}
               {blocks.map((b, i) => (
@@ -357,7 +369,7 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-xs font-semibold text-slate-700 flex-1">{i + 1}. {BLOCK_LABEL[b.blockType] ?? b.blockType}</span>
                     <label className="text-[11px] text-slate-500 flex items-center gap-1">
-                      <input type="checkbox" checked={b.isEnabled} onChange={() => toggleBlock(i)} className="rounded border-slate-300 text-indigo-600" /> 표시
+                      <input type="checkbox" checked={b.isEnabled} onChange={() => toggleBlock(i)} className="rounded border-slate-300 text-indigo-600" /> 화면에 표시
                     </label>
                     <button onClick={() => moveBlock(i, 'up')} disabled={i === 0} className="p-1 rounded hover:bg-slate-100 disabled:opacity-30"><ChevronUp className="w-3.5 h-3.5" /></button>
                     <button onClick={() => moveBlock(i, 'down')} disabled={i === blocks.length - 1} className="p-1 rounded hover:bg-slate-100 disabled:opacity-30"><ChevronDown className="w-3.5 h-3.5" /></button>
@@ -405,7 +417,7 @@ function TemplateSelectField({ value, onChange }: { value: string; onChange: (v:
       </select>
       <p className="text-[11px] text-slate-500 leading-relaxed">{current.description}</p>
       <p className="text-[11px] text-slate-400 leading-relaxed">
-        기본 코너 안내형과 상품 집중형을 선택할 수 있습니다. 추가 템플릿은 후속 단계에서 제공됩니다.
+        템플릿은 같은 내용을 어떤 배치로 보여줄지만 정합니다(표시할 내용은 아래 블록에서 관리). 추가 템플릿은 후속 단계에서 제공됩니다.
       </p>
     </div>
   );
@@ -448,7 +460,7 @@ function BlockConfigForm({ block, onPatch, onReplaceConfig }: {
         </div>
       );
     case 'product_list':
-      return <p className="text-[11px] text-slate-500">기존 진열(store_tablet_displays)을 제품 목록으로 사용합니다. 별도 설정 없음.</p>;
+      return <p className="text-[11px] text-slate-500">이 코너에 진열된 제품 목록을 그대로 사용합니다. 별도 설정은 없으며, 진열된 제품이 없으면 목록이 비어 보입니다.</p>;
     case 'product_content':
     default:
       return <JsonConfig config={block.config} onReplaceConfig={onReplaceConfig} />;
