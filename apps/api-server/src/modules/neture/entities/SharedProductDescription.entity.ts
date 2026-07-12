@@ -154,6 +154,22 @@ export class SharedProductDescription {
   @Column({ name: 'updated_by', type: 'uuid', nullable: true })
   updatedBy: string | null;
 
+  // ── 작성 주체(공급자) attribution — WO-O4O-SPD-AUTHOR-SUBJECT-METADATA-V1 ──
+
+  /**
+   * 작성 주체가 공급자인 경우 그 공급자의 영구 SSOT (neture_suppliers.id, 단방향, onDelete SET NULL).
+   * "어떤 공급자가 이 STORE 설명서를 작성했는가"를 조인 없이 표현한다.
+   * 축 구분: created_by=작성 user / created_by_supplier_id=작성 공급자 조직 /
+   *   source_ref_id=원천 offer 추적·legacy fallback. 서로 경쟁 아님(누가 만들었나 vs 어디서 시작했나).
+   * FK 는 DB 레벨(migration)로 강제 — 기존 created_by/curated_by 와 동일하게 엔티티는 plain uuid 컬럼만 둔다.
+   */
+  @Column({ name: 'created_by_supplier_id', type: 'uuid', nullable: true })
+  createdBySupplierId: string | null;
+
+  /** 공급자가 운영자 검수를 요청(status→needs_review)한 시각. 신규 write 부터 세팅(기존 row 백필 없음). */
+  @Column({ name: 'submitted_at', type: 'timestamp', nullable: true })
+  submittedAt: Date | null;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
