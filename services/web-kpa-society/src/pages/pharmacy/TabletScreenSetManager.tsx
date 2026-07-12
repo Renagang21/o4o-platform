@@ -57,6 +57,13 @@ const TEMPLATE_OPTIONS: { key: string; label: string; description: string }[] = 
 const templateLabel = (key: string | null | undefined) =>
   TEMPLATE_OPTIONS.find((t) => t.key === key)?.label ?? TEMPLATE_OPTIONS[0].label;
 
+// WO-O4O-KPA-TABLET-SCREEN-SET-DIRTY-GUARD-V1: 미저장 변경 경고 문구 + 블록 비교 정규화
+const DISCARD_MSG = '저장되지 않은 변경이 있습니다.\n저장하지 않고 이동하면 변경사항이 사라질 수 있습니다.\n계속하시겠습니까?';
+const APPLY_DIRTY_MSG = '저장되지 않은 변경이 있습니다.\n먼저 저장하지 않고 적용하면 현재 편집 중인 변경사항이 반영되지 않을 수 있습니다.\n계속 적용하시겠습니까?';
+// 블록 dirty 비교: 타입/표시여부/config + 순서만(서버 sort_order 는 위치 기반 재정규화 → 값 무시).
+const normalizeBlocks = (bs: ScreenBlock[]) =>
+  JSON.stringify(bs.map((b) => ({ t: b.blockType, e: b.isEnabled, c: b.config ?? {} })));
+
 const IDLE_SOURCES = [
   { value: 'legacy_idle_playlist', label: '기존 대기 재생목록 사용' },
   { value: 'operator_common', label: '운영자 공통 대기영상 사용' },
@@ -130,6 +137,8 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
   const handleCreate = async () => {
     const name = newName.trim();
     if (!name) return;
+    // 생성 성공 시 새 세트 편집으로 전환 → 현재 편집 중 미저장 변경 손실 방지
+    if (!confirmDiscard()) return;
     setBusy(true);
     try {
       // WO-O4O-KPA-TABLET-TEMPLATE-SELECTION-EDITOR-V1: 선택한 templateKey 를 명시 전송(Phase 1 = 기본형).
@@ -150,7 +159,10 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
     setSavingSet(true);
     try {
       // WO-O4O-KPA-TABLET-TEMPLATE-SELECTION-EDITOR-V1: templateKey 를 함께 저장(명시 전송).
-      await updateScreenSet(editDetail.id, { name: nm, status: editStatus, templateKey: editTemplateKey });
+      const updated = await updateScreenSet(editDetail.id, { name: nm, status: editStatus, templateKey: editTemplateKey });
+      // WO-...-DIRTY-GUARD-V1: baseline 갱신 → infoDirty 해제
+      setEditDetail((prev) => (prev ? { ...prev, name: updated.name, status: updated.status, templateKey: updated.templateKey } : prev));
+      setEditName(updated.name); setEditStatus(updated.status); setEditTemplateKey(updated.templateKey ?? DEFAULT_TEMPLATE_KEY);
       onToast({ type: 'success', message: '세트 정보가 저장되었습니다.' });
       await reload();
     } catch (e: any) {
@@ -163,7 +175,10 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
     setSavingBlocks(true);
     try {
       const saved = await saveScreenSetBlocks(editDetail.id, blocks);
-      setBlocks(saved.map((b) => ({ ...b, config: b.config ?? {} })));
+      const normalized = saved.map((b) => ({ ...b, config: b.config ?? {} }));
+      setBlocks(normalized);
+      // WO-...-DIRTY-GUARD-V1: baseline 갱신 → blocksDirty 해제
+      setEditDetail((prev) => (prev ? { ...prev, blocks: normalized } : prev));
       onToast({ type: 'success', message: '블록이 저장되었습니다.' });
       await reload();
     } catch (e: any) {
@@ -173,6 +188,7 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
 
   const handleApply = async (set: ScreenSet) => {
     if (busy) return;
+    if (!confirmDiscard(APPLY_DIRTY_MSG)) return; // 미저장 변경은 적용에 반영 안 됨 경고
     setBusy(true);
     try {
       if (set.status !== 'active') {
@@ -189,6 +205,7 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
 
   const handleClear = async () => {
     if (busy) return;
+    if (!confirmDiscard()) return;
     setBusy(true);
     try {
       await clearCurrentScreenSet(tabletId);
@@ -202,6 +219,7 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
 
   const handleArchive = async (set: ScreenSet) => {
     if (busy) return;
+    if (editDetail?.id === set.id && !confirmDiscard()) return; // 편집 중인 세트 보관 시 미저장 변경 경고
     if (!window.confirm(`"${set.name}" 세트를 보관하시겠습니까? 목록에서 숨겨지며, 적용 중인 세트는 먼저 적용 해제해야 합니다.`)) return;
     setBusy(true);
     try {
@@ -232,6 +250,25 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
     setBlocks((prev) => prev.map((b, idx) => (idx === i ? { ...b, config: { ...b.config, ...patch } } : b)));
 
   const currentSet = sets.find((s) => s.id === currentScreenSetId) || null;
+
+  // ── Dirty Guard (WO-O4O-KPA-TABLET-SCREEN-SET-DIRTY-GUARD-V1) ──
+  //   세트 정보(이름/상태/템플릿)·블록을 baseline(editDetail)과 비교. 저장 성공 시 editDetail 갱신 → dirty 해제.
+  const infoDirty = !!editDetail && (
+    editName.trim() !== editDetail.name ||
+    editStatus !== editDetail.status ||
+    editTemplateKey !== (editDetail.templateKey ?? DEFAULT_TEMPLATE_KEY)
+  );
+  const blocksDirty = !!editDetail && normalizeBlocks(blocks) !== normalizeBlocks(editDetail.blocks ?? []);
+  const isDirty = infoDirty || blocksDirty;
+  const confirmDiscard = (msg = DISCARD_MSG) => !isDirty || window.confirm(msg);
+
+  // 브라우저 새로고침/닫기 이탈 경고 (미저장 변경 시)
+  useEffect(() => {
+    if (!isDirty) return;
+    const h = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = ''; };
+    window.addEventListener('beforeunload', h);
+    return () => window.removeEventListener('beforeunload', h);
+  }, [isDirty]);
 
   return (
     <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-indigo-100">
@@ -324,7 +361,7 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
                   {!isCurrent && (
                     <button onClick={() => handleApply(s)} disabled={busy} className="px-2.5 py-1 text-xs font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50">적용</button>
                   )}
-                  <button onClick={() => openEdit(s.id)} className="px-2.5 py-1 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50">편집</button>
+                  <button onClick={() => { if (confirmDiscard()) openEdit(s.id); }} className="px-2.5 py-1 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50">편집</button>
                   <button onClick={() => handleArchive(s)} disabled={busy} className="px-2 py-1 text-xs text-slate-400 hover:text-red-600 disabled:opacity-50" title="보관">보관</button>
                 </div>
               );
@@ -336,9 +373,20 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
         {editDetail && (
           <div className="border border-indigo-100 rounded-lg p-3 space-y-3 bg-indigo-50/30">
             <div className="flex items-center justify-between gap-2">
-              <h4 className="text-sm font-bold text-slate-700">세트 편집</h4>
-              <button onClick={closeEdit} className="text-slate-400 hover:text-slate-600"><X className="w-4 h-4" /></button>
+              <h4 className="text-sm font-bold text-slate-700 flex items-center gap-2">
+                세트 편집
+                {isDirty && <span className="text-[10px] font-semibold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">변경됨</span>}
+              </h4>
+              <button onClick={() => { if (confirmDiscard()) closeEdit(); }} className="text-slate-400 hover:text-slate-600"><X className="w-4 h-4" /></button>
             </div>
+
+            {/* WO-O4O-KPA-TABLET-SCREEN-SET-DIRTY-GUARD-V1: 미저장 변경 경고 배너 */}
+            {isDirty && (
+              <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-[11px] text-amber-800">
+                <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
+                저장되지 않은 변경이 있습니다. 변경사항을 유지하려면 저장해 주세요.
+              </div>
+            )}
             <div className="flex gap-2 items-center flex-wrap">
               <input value={editName} onChange={(e) => setEditName(e.target.value)} className="flex-1 min-w-[160px] px-3 py-2 rounded-lg border border-slate-200 text-sm" placeholder="세트 이름" />
               <select value={editStatus} onChange={(e) => setEditStatus(e.target.value as ScreenSetStatus)} className="px-2 py-2 rounded-lg border border-slate-200 text-sm">
@@ -346,9 +394,12 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
                 <option value="active">활성</option>
                 <option value="archived">보관</option>
               </select>
-              <button onClick={handleSaveSet} disabled={savingSet} className="px-3 py-2 text-xs font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 flex items-center gap-1">
-                {savingSet ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />} 세트 정보 저장
-              </button>
+              <div className="flex items-center gap-1.5">
+                {infoDirty && <span className="text-[10px] font-medium text-amber-600">저장 필요</span>}
+                <button onClick={handleSaveSet} disabled={savingSet} className="px-3 py-2 text-xs font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 flex items-center gap-1">
+                  {savingSet ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />} 세트 정보 저장
+                </button>
+              </div>
             </div>
 
             {/* WO-O4O-KPA-TABLET-TEMPLATE-SELECTION-EDITOR-V1: 템플릿 선택('정보 저장'으로 함께 반영) */}
@@ -388,7 +439,8 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
               <button onClick={addBlock} className="px-2.5 py-1.5 text-xs font-medium text-indigo-700 bg-white border border-indigo-200 rounded-lg hover:bg-indigo-50 flex items-center gap-1">
                 <Plus className="w-3.5 h-3.5" /> 블록 추가
               </button>
-              <button onClick={handleSaveBlocks} disabled={savingBlocks} className="ml-auto px-3 py-1.5 text-xs font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 flex items-center gap-1">
+              {blocksDirty && <span className="ml-auto text-[10px] font-medium text-amber-600">블록 저장 필요</span>}
+              <button onClick={handleSaveBlocks} disabled={savingBlocks} className={`${blocksDirty ? '' : 'ml-auto'} px-3 py-1.5 text-xs font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 flex items-center gap-1`}>
                 {savingBlocks ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />} 블록 저장
               </button>
             </div>
