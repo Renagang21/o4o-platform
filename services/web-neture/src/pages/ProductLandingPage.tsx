@@ -37,6 +37,7 @@ interface PublicProductLanding {
     content: string | null;
     summary: string | null;
   };
+  supplierCredit: { organizationName: string; contact: string | null } | null;
   placeholder: string | null;
   languages: string[];
   resolvedLocale: string | null;
@@ -285,6 +286,16 @@ export default function ProductLandingPage() {
               </div>
               <p className="text-sm text-gray-500">{data.placeholder || '상세 설명을 준비 중입니다.'}</p>
             </div>
+          </div>
+        )}
+
+        {/* WO-O4O-SUPPLIER-PRODUCT-DESCRIPTION-AUTO-CREDIT-V1:
+            공급자 제작 설명서 최하단 제작원(작지만 읽을 수 있는 수준, 광고 강조 아님).
+            업체명·연락처는 서버가 공급자 조직 등록정보에서 조회(본문 HTML 미저장). O4O·매장 콘텐츠는 없음(null). */}
+        {data.supplierCredit && (
+          <div className="mt-6 pt-4 border-t border-gray-100 text-xs text-gray-500 leading-relaxed">
+            <p>콘텐츠 제작: {data.supplierCredit.organizationName}</p>
+            {data.supplierCredit.contact && <p className="mt-0.5">문의: {data.supplierCredit.contact}</p>}
           </div>
         )}
 

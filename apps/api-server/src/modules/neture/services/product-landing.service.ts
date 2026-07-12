@@ -15,6 +15,7 @@
 import type { DataSource } from 'typeorm';
 import { randomBytes } from 'crypto';
 import { generateQrSvg } from '../../../services/qr-print.service.js';
+import logger from '../../../utils/logger.js';
 
 const KEY_ALPHABET = 'abcdefghijkmnpqrstuvwxyz23456789'; // 혼동 문자(0,1,l,o) 제외
 const KEY_LENGTH = 12;
@@ -55,6 +56,9 @@ export interface PublicProductLanding {
     content: string | null;
     summary: string | null;
   };
+  // WO-O4O-SUPPLIER-PRODUCT-DESCRIPTION-AUTO-CREDIT-V1: 공급자 제작 설명서에만 채워지는 제작원.
+  //   업체명·연락처는 공급자 조직 등록정보에서 렌더 시 조회(본문 HTML 미저장). null = 미표시.
+  supplierCredit: { organizationName: string; contact: string | null } | null;
   placeholder: string | null; // 설명 없을 때 안내 문구
   languages: string[]; // 공개 가능한 언어(canonical STORE) — ko 우선 정렬
   resolvedLocale: string | null; // 실제 표시 중인 언어
@@ -136,6 +140,44 @@ export class ProductLandingService {
   }
 
   /**
+   * WO-O4O-SUPPLIER-PRODUCT-DESCRIPTION-AUTO-CREDIT-V1
+   * 공급자 제작 설명서(source_type='supplier')의 제작원(업체명·공개 연락처)을 조직 등록정보에서 조회한다.
+   * 링크 체인: source_ref_id → supplier_product_offers.id → supplier_id → neture_suppliers → organizations.
+   * 원칙: 본문 HTML 미저장(렌더 시 조회) · **공개 허용 연락처만** · 깨진 체인/비활성 조직/이름 없음 → null(본문 영향 없음).
+   * 주: organizations 는 SnakeNamingStrategy 미적용(camelCase 컬럼) — "isActive" 를 큰따옴표로 참조한다.
+   */
+  private async resolveSupplierCredit(
+    sourceType: string | null,
+    sourceRefId: string | null,
+  ): Promise<{ organizationName: string; contact: string | null } | null> {
+    if (sourceType !== 'supplier' || !sourceRefId) return null; // 공급자 제작이 아니면 미표시
+    try {
+      const rows = await this.dataSource.query(
+        `SELECT o.name AS org_name, o."isActive" AS org_active,
+                s.contact_phone AS phone, s.contact_email AS email,
+                s.contact_phone_visibility AS phone_vis, s.contact_email_visibility AS email_vis
+         FROM supplier_product_offers spo
+         JOIN neture_suppliers s ON s.id = spo.supplier_id
+         JOIN organizations o ON o.id = s.organization_id
+         WHERE spo.id = $1
+         LIMIT 1`,
+        [sourceRefId],
+      );
+      const r = rows[0];
+      if (!r) return null; // 깨진 체인(offer/supplier/org 부재)
+      const orgName = (r.org_name ?? '').trim();
+      if (!orgName || r.org_active === false) return null; // 이름 없음 또는 비활성 조직 → 미표시
+      // 공개 허용 연락처만: 전화(공개) 우선 → 이메일(공개) → 둘 다 아니면 문의행 생략(null)
+      const phone = r.phone_vis === 'public' && r.phone ? String(r.phone).trim() : '';
+      const email = r.email_vis === 'public' && r.email ? String(r.email).trim() : '';
+      return { organizationName: orgName, contact: phone || email || null };
+    } catch (err) {
+      logger.warn(`[product-landing] supplier credit resolve failed (offer=${sourceRefId}): ${String((err as any)?.message ?? err)}`);
+      return null; // 조회 실패해도 본문은 정상, 제작원만 생략
+    }
+  }
+
+  /**
    * 공개 Landing read model. 없으면 null. 노출 게이트 차단 시 blocked=true(콘텐츠 미포함).
    * WO-O4O-KPA-PRODUCT-QR-LANGUAGE-SELECTOR-REUSE-AND-ADAPT-V1: locale 지원 —
    *   languages = master 의 canonical STORE 언어(공개 가능), 요청 locale(없거나 미보유 시 ko→첫 언어) 본문 반환.
@@ -169,6 +211,7 @@ export class ProductLandingService {
         authRequired: true,
         product: { name: nameRows[0]?.name ?? null, manufacturerName: null, barcode: null, regulatoryType: null, specification: null },
         description: { hasCanonical: false, descriptionType: null, content: null, summary: null },
+        supplierCredit: null,
         placeholder: null,
         languages: [],
         resolvedLocale: null,
@@ -186,6 +229,7 @@ export class ProductLandingService {
         authRequired: false,
         product: null,
         description: { hasCanonical: false, descriptionType: null, content: null, summary: null },
+        supplierCredit: null,
         placeholder: null,
         languages: ['ko'],
         resolvedLocale: null,
@@ -218,10 +262,10 @@ export class ProductLandingService {
         ? 'ko'
         : available[0] ?? null;
 
-    let spd: { content: string | null; summary: string | null; description_type: string | null } | null = null;
+    let spd: { content: string | null; summary: string | null; description_type: string | null; source_type: string | null; source_ref_id: string | null } | null = null;
     if (resolvedLocale) {
       const spdRows = await this.dataSource.query(
-        `SELECT content, summary, description_type
+        `SELECT content, summary, description_type, source_type, source_ref_id
          FROM shared_product_descriptions
          WHERE master_id = $1 AND deleted_at IS NULL AND status = 'canonical' AND description_type = 'STORE'
            AND COALESCE(language, 'ko') = $2
@@ -230,6 +274,9 @@ export class ProductLandingService {
       );
       spd = spdRows[0] ?? null;
     }
+
+    // 공급자 제작 설명서(source_type='supplier')에만 제작원 자동 표시. O4O/매장 콘텐츠는 null.
+    const supplierCredit = spd ? await this.resolveSupplierCredit(spd.source_type, spd.source_ref_id) : null;
 
     return {
       publicKey: landing.public_key,
@@ -253,6 +300,7 @@ export class ProductLandingService {
         content: spd?.content ?? null,
         summary: spd?.summary ?? null,
       },
+      supplierCredit,
       placeholder: spd ? null : PLACEHOLDER_TEXT,
       languages: available.length ? available : ['ko'],
       resolvedLocale,
