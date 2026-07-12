@@ -226,6 +226,21 @@ export function KpaGlobalHeader() {
           </GlobalHeaderMenuItem>
         </>
       }
+      /* WO-O4O-KPA-STORE-RESPONSIVE-AND-HAMBURGER-MENU-SIMPLIFY-V1:
+         모바일 햄버거는 개인 계정 메뉴(마이페이지/설정 + GlobalHeader 기본 이름·이메일·로그아웃)만 노출.
+         역할별 대시보드(강의 대시보드/관리자·운영 대시보드/내 매장)는 여기서 직접 노출하지 않는다.
+           - 기능·route·권한 무변경. 데스크톱 프로필 드롭다운(userMenuItems)에는 그대로 유지.
+           - 매장 진입은 상단 서비스 메뉴 '내 약국'(/store)로 일원화(내 매장과 동일 route)되어 접근성 유지. */
+      mobileUserMenuItems={
+        <>
+          <GlobalHeaderMenuItem to="/mypage" icon={<LayoutDashboard className="w-4 h-4" />}>
+            마이페이지
+          </GlobalHeaderMenuItem>
+          <GlobalHeaderMenuItem to="/mypage/settings" icon={<Settings className="w-4 h-4" />}>
+            설정
+          </GlobalHeaderMenuItem>
+        </>
+      }
     />
   );
 }

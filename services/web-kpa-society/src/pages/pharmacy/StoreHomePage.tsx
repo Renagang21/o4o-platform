@@ -37,7 +37,7 @@ import {
   FileEdit,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Card, useTemplate } from '@o4o/ui';
+import { Card } from '@o4o/ui';
 // WO-O4O-STORE-HOME-KPA-ADOPT-V1:
 // canonical StoreHomeShell 3번째 소비처. "실행 흐름 3단계"(기능 안내/온보딩 성격)를
 // onboardingSlot 으로 이동·하단 강등. 운영 블록(Live Signals/KPI/홍보성과/최근활동)은
@@ -54,7 +54,6 @@ import type { LiveSignals } from '../../api/storeHub';
 import { GuideEditableSection } from '../../components/guide';
 
 export function StoreHomePage() {
-  const tpl = useTemplate();
   const [analytics, setAnalytics] = useState<MarketingAnalyticsData | null>(null);
   const [recentScans, setRecentScans] = useState<RecentScanItem[]>([]);
   const [libraryCount, setLibraryCount] = useState<number | null>(null);
@@ -106,7 +105,7 @@ export function StoreHomePage() {
 
   if (noStore) {
     return (
-      <div className="max-w-[960px] p-6">
+      <div className="max-w-[960px]">
         <div className="flex flex-col items-center justify-center py-20 gap-3">
           <AlertCircle size={32} className="text-slate-400" />
           <p className="text-base font-medium text-slate-700">약국 매장이 아직 연결되지 않았습니다</p>
@@ -118,7 +117,7 @@ export function StoreHomePage() {
 
   if (loading) {
     return (
-      <div className="max-w-[960px] p-6">
+      <div className="max-w-[960px]">
         <div className="flex flex-col items-center justify-center py-20">
           <RefreshCw size={24} className="text-slate-300" />
           <p className="text-sm text-slate-500 mt-3">불러오는 중...</p>
@@ -135,14 +134,15 @@ export function StoreHomePage() {
   const deviceLabel: Record<string, string> = { mobile: '모바일', tablet: '태블릿', desktop: '데스크톱' };
 
   return (
-    <div className="max-w-[960px] p-6">
-      {/* Header */}
-      <div className="flex flex-wrap justify-between items-start gap-3 mb-6">
-        <div>
-          <h1 className="text-xl font-bold text-slate-800 m-0">{kpaConfig.uiText.storeHomeTitle}</h1>
-          <p className="text-[13px] text-slate-500 mt-1">{kpaConfig.uiText.storeHomeSubtitle}</p>
+    <div className="max-w-[960px]">
+      {/* Header (WO-O4O-KPA-STORE-RESPONSIVE-AND-HAMBURGER-MENU-SIMPLIFY-V1:
+          좁은 화면에서 제목·버튼이 한 행을 유지하되 매우 좁으면 자연 줄바꿈, 버튼 padding 축소, aria-label 추가) */}
+      <div className="flex flex-wrap justify-between items-start gap-2 mb-4 sm:mb-6">
+        <div className="min-w-0">
+          <h1 className="text-lg sm:text-xl font-bold text-slate-800 m-0">{kpaConfig.uiText.storeHomeTitle}</h1>
+          <p className="text-xs sm:text-[13px] text-slate-500 mt-1">{kpaConfig.uiText.storeHomeSubtitle}</p>
         </div>
-        <button onClick={fetchData} className="flex items-center gap-1.5 px-3.5 py-2 border border-slate-200 rounded-lg bg-white text-[13px] text-slate-600 cursor-pointer whitespace-nowrap">
+        <button onClick={fetchData} aria-label="새로고침" className="flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 border border-slate-200 rounded-lg bg-white text-[13px] text-slate-600 cursor-pointer whitespace-nowrap shrink-0">
           <RefreshCw size={14} />
           새로고침
         </button>
@@ -175,30 +175,33 @@ export function StoreHomePage() {
         </div>
       )}
 
-      {/* ── 운영 현황 KPI (WO-O4O-TEMPLATE-RESPONSIVE-LAYOUT-V1) ── */}
-      <div className={`grid ${tpl?.layout?.grid ?? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'} ${tpl?.layout?.gap ?? 'gap-3'} mb-6`}>
+      {/* ── 운영 현황 KPI (WO-O4O-KPA-STORE-RESPONSIVE-AND-HAMBURGER-MENU-SIMPLIFY-V1) ──
+          좁은 화면에서도 2열×2행으로 조밀하게(360px 이상 기본 2열), 데스크톱은 기존 4열 유지.
+          template grid(kpa=grid-cols-1 sm:grid-cols-2 …)는 모바일 1열 원인이므로 service-local 명시 grid로 대체.
+          카드 padding/숫자 크기는 좁은 화면에서 compact 처리(데스크톱 값 유지). */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 mb-5 sm:mb-6">
         {/* WO-O4O-KPA-STORE-HOME-KPI-LABEL-FIX-V1: 레이블 "매장 자산 관리" → "자료실 파일", 클릭 링크 추가 */}
         <Link to="/store/library/contents" className="no-underline">
-          <Card className="p-5 text-center hover:border-emerald-300 transition-colors cursor-pointer">
+          <Card className="p-3 sm:p-5 text-center h-full hover:border-emerald-300 transition-colors cursor-pointer">
             <BookOpen size={20} className="text-emerald-600 mx-auto" />
-            <p className="text-2xl font-bold text-primary m-0 mt-2">{libraryCount ?? '–'}</p>
-            <p className="text-xs text-slate-500 mt-1 m-0">자료실 파일</p>
+            <p className="text-xl sm:text-2xl font-bold text-primary m-0 mt-1.5 sm:mt-2">{libraryCount ?? '–'}</p>
+            <p className="text-[11px] sm:text-xs text-slate-500 mt-1 m-0">자료실 파일</p>
           </Card>
         </Link>
-        <Card className="p-5 text-center">
+        <Card className="p-3 sm:p-5 text-center h-full">
           <QrCode size={20} className="text-primary mx-auto" />
-          <p className="text-2xl font-bold text-primary m-0 mt-2">{analytics?.activeQrCount ?? '–'}</p>
-          <p className="text-xs text-slate-500 mt-1 m-0">활성 QR</p>
+          <p className="text-xl sm:text-2xl font-bold text-primary m-0 mt-1.5 sm:mt-2">{analytics?.activeQrCount ?? '–'}</p>
+          <p className="text-[11px] sm:text-xs text-slate-500 mt-1 m-0">활성 QR</p>
         </Card>
-        <Card className="p-5 text-center">
+        <Card className="p-3 sm:p-5 text-center h-full">
           <Package size={20} className="text-violet-600 mx-auto" />
-          <p className="text-2xl font-bold text-primary m-0 mt-2">{productCount ?? '–'}</p>
-          <p className="text-xs text-slate-500 mt-1 m-0">진열 상품</p>
+          <p className="text-xl sm:text-2xl font-bold text-primary m-0 mt-1.5 sm:mt-2">{productCount ?? '–'}</p>
+          <p className="text-[11px] sm:text-xs text-slate-500 mt-1 m-0">진열 상품</p>
         </Card>
-        <Card className="p-5 text-center">
+        <Card className="p-3 sm:p-5 text-center h-full">
           <BarChart3 size={20} className="text-primary mx-auto" />
-          <p className="text-2xl font-bold text-primary m-0 mt-2">{analytics?.weeklyScans?.toLocaleString() ?? '–'}</p>
-          <p className="text-xs text-slate-500 mt-1 m-0">이번주 스캔</p>
+          <p className="text-xl sm:text-2xl font-bold text-primary m-0 mt-1.5 sm:mt-2">{analytics?.weeklyScans?.toLocaleString() ?? '–'}</p>
+          <p className="text-[11px] sm:text-xs text-slate-500 mt-1 m-0">이번주 스캔</p>
         </Card>
       </div>
 

@@ -65,6 +65,13 @@ export interface GlobalHeaderProps {
   onLogout?: () => void;
   /** UserArea 드롭다운 내부 커스텀 메뉴 항목 (대시보드, 마이페이지 등) */
   userMenuItems?: React.ReactNode;
+  /**
+   * 모바일 햄버거 메뉴 전용 사용자 메뉴 항목.
+   * WO-O4O-KPA-STORE-RESPONSIVE-AND-HAMBURGER-MENU-SIMPLIFY-V1:
+   *   미주입 시 userMenuItems 로 fallback (기존 동작 불변 — additive).
+   *   주입 시 모바일 햄버거에서만 별도 항목을 렌더(데스크톱 드롭다운은 userMenuItems 유지).
+   */
+  mobileUserMenuItems?: React.ReactNode;
   /** UtilityArea 슬롯 (ServiceSwitcher 등) */
   utilitySlot?: React.ReactNode;
 }
@@ -88,6 +95,7 @@ export function GlobalHeader({
   onRegister,
   onLogout,
   userMenuItems,
+  mobileUserMenuItems,
   utilitySlot,
 }: GlobalHeaderProps) {
   const location = useLocation();
@@ -361,7 +369,7 @@ export function GlobalHeader({
                     </p>
                     <p className="text-xs text-slate-500">{user.email}</p>
                   </div>
-                  {userMenuItems}
+                  {mobileUserMenuItems ?? userMenuItems}
                   <button
                     onClick={() => {
                       setMobileMenuOpen(false);
