@@ -282,3 +282,44 @@ gcloud run jobs execute o4o-drug-seed-promotion-apply --region=asia-northeast3  
 2. `RepresentativeProduct` 그룹핑 (multiPackage/multiManufacturer MFDS 코드 기준)
 3. e약은요 이미지 GCS 사본
 4. rollback CLI 또는 운영 정리 도구 필요 여부 검토 (offer/listing 부착 전에만 안전 삭제 가능)
+
+---
+
+## 13. 게이트 B 재개 시도 로그 (2026-07-03, 노트북) — **실패·정지 (중복 barcode)**
+
+> 노트북(`C:\Users\sohae\coding\o4o-platform`) 동기화 후 §11 재개 절차대로 승격 apply 재실행. **중복 barcode 제약 위반으로 실패**. rollback·재실행 안 함(요청서 §8 준수).
+
+| 항목 | 값 |
+|---|---|
+| 노트북 동기화 | ✅ `68e99e93e → 6df125997` fast-forward, HEAD == origin/main |
+| gcloud | ✅ 인증 `sohae2100@gmail.com`, project `netureyoutube`, Job 존재 확인 |
+| 대용량 공공데이터 파일 | ⚠️ Drive `o4o-platform-local-sync` 는 repo 미러일 뿐, CSV/JSONL 없음 (승격 재개는 GCS 기반이라 무관, 후속 e약은요 작업 전 동기화 필요) |
+| 사전 백업 | ✅ 기존 `1783079396967` (2026-07-03 11:49 UTC, SUCCESSFUL, 현재 부분적용 상태 포함) 를 재개 안전망으로 확정 |
+| Job timeout | ✅ 이미 7200초 적용됨 (재설정 불필요) |
+| 승격 apply 재실행 (exec `o4o-drug-seed-promotion-apply-5whnt`) | ❌ **실패** — 12:04→12:27 UTC (~22분), exit 1 (NonZeroExitCode) |
+| 실패 원인 | `QueryFailedError: duplicate key value violates unique constraint "uq_product_masters_barcode"` — 배치 flush 의 `product_masters` multi-row INSERT (create path, `ON CONFLICT` 없음) 에서 발생 |
+| 데이터 정합성 | ✅ 제약이 지켜져 DB 손상 없음. 실패 flush 는 롤백됨. 승격은 **미완**(잔여 존재) |
+
+**성격**: §11 이 예상한 timeout 이 아니라 **멱등성 결함**. create path INSERT(`drug-master-promotion-apply.db.ts:442`) 에 `ON CONFLICT` 가드가 없고, master id 는 앱측 `randomUUID()` 로 candidate 에 선연결(:483) → 단순 `ON CONFLICT DO NOTHING` 은 dangling 참조를 유발하므로 한 줄 핫픽스 불가.
+
+**정적 분석 결론**: 코드는 설계상 멱등이어야 함 — `preloadCatalog`(:318) 이 기존 master 전량을 `mastersByBarcode` 로 로드하고, 스캔은 **순차**(:569) 이며 `createMaster`(:398) 가 즉시 map 갱신 → 기존/동일-run barcode 는 link 판정. 배포 이미지 `6ec364773` 은 HEAD 의 조상이고 db.ts 는 이후 변경 이력 0 → **배포 코드 == 현재 코드**, 멱등 로직 포함. 따라서 중복은 정적으로 재현 불가한 실데이터 edge case 이며 **DB 레벨 진단(실제 충돌 barcode 특정)** 이 필요.
+
+**환경 제약 (중요)**: 이 노트북 네트워크는 **Cloud SQL 5432 아웃바운드가 차단**됨(34.64.96.252:5432 TCP timeout 확인, 443 정상). → `gcloud sql connect` 가 연결 단계에서 무한 대기(인증/쿼리 문제 아님). **이 노트북에서 로컬 read-only SQL 검증 불가.** 검증/진단은 **Cloud Console → SQL → Query Editor**(HTTPS, 서버측 실행) 로만 가능.
+
+**다음 진단 (Cloud Console SQL Editor 에서 실행)** — 남은 후보 중 동일 barcode 충돌 규명:
+```sql
+WITH remaining AS (
+  SELECT COALESCE(raw_payload->>'standardCode', normalized_identifier_value) AS bc
+  FROM product_candidates
+  WHERE source_type='csv_import' AND identifier_type='KOREA_DRUG_CODE'
+    AND candidate_status IN ('pending','reviewing','matched')
+    AND deleted_at IS NULL
+    AND raw_payload->>'sourceBaseDate' = '2025-10-31'
+), dup AS (SELECT bc, count(*) c FROM remaining GROUP BY bc HAVING count(*) > 1)
+SELECT (SELECT count(*) FROM remaining) AS remaining_rows,
+       (SELECT count(*) FROM dup)        AS dup_barcode_groups,
+       COALESCE((SELECT sum(c) FROM dup),0) AS dup_rows_total;
+-- + 현재 상태: SELECT count(*) FROM product_masters WHERE tags @> '["import:hira-drug-master"]'::jsonb;
+```
+
+**해결 방향(미결정, 승인 대기)**: (A) 위 진단으로 충돌 규모 확인 → 데이터 이슈면 정리, 구조 이슈면 (B). (B) 코드 멱등화(버퍼 flush 전 barcode dedup + 기존 master 재조회 link 전환, 또는 create INSERT 를 `ON CONFLICT (barcode) DO NOTHING` + 반환 id 로 candidate 재연결) → 테스트 → 이미지 재빌드 → Job 재배포 → 재실행. **§13 승인은 "재실행" 범위이므로 코드 수정·재배포는 별도 승인 필요.**
