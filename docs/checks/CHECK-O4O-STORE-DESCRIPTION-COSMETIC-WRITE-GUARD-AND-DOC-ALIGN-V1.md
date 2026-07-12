@@ -76,7 +76,8 @@
 
 ## 8. 배포 / 프로덕션 검증
 
-- (커밋·push 후 채움) Track A 는 api 배포 대상(`Deploy API Server`). 프로덕션에서 실 write 미실행 — 코드/단위테스트로 차단 정합 확보. 실 화장품 master 로 read-only 확인은 후속(운영 DB 테스트 콘텐츠 생성 금지).
+- **배포**: `Deploy API Server (Cloud Run)` run `29184103038` **success** → 화장품 write 가드 라이브. (Web 배포 없음 — web 코드 무변경, 정상.)
+- **프로덕션 검증**: 실 write 미실행(WO §15 — 운영 DB 테스트 콘텐츠 생성 금지). 차단 정합은 단위테스트 10/10 로 확보. 실 화장품 master 대상 write 요청 → 403 차단은 코드/테스트 근거로 확정, 운영 read-only 확인(화장품 SPD 실건수 = IR §16 (I-1))은 Cloud Console SQL 후속.
 
 ## 9. 커밋 / 워킹트리
 
