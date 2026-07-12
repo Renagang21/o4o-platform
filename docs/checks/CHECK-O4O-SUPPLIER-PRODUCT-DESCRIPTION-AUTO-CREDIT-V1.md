@@ -75,7 +75,9 @@ shared_product_descriptions.source_type = 'supplier' + source_ref_id
 
 ## 11. 배포 / 프로덕션 smoke
 
-- (커밋·push 후 채움) CI "Deploy Web Services" + api 배포 대상. 실 공급자 작성 설명서(`source_type='supplier'`)가 있으면 `/p/:key` 로 검증하고, 없으면 운영 데이터 임의 생성 없이 코드/단위테스트 근거로 대체 기록.
+- **커밋/푸시**: `37f7f83e4` → origin/main (fast-forward, 무관 커밋 미혼입).
+- **배포(2026-07-12)**: `Deploy API Server (Cloud Run)` run `29183079296` **success** (supplierCredit read model), `Deploy Web Services (Cloud Run)` run `29183079326` **success** (ProductLandingPage 렌더). 양쪽 라이브.
+- **프로덕션 UI smoke**: **보류(deferred)** — credit 표시 경로는 (1) 로그인 + (2) `source_type='supplier'` 인 실제 공급자 작성 STORE 설명서의 `/p/:key` 두 조건이 동시에 필요하다. 현재 즉시 가리킬 수 있는 실 공급자 설명서 landing 이 확인되지 않았고, runbook §14 원칙(실데이터 없으면 운영 데이터 임의 생성 금지)에 따라 임의 생성하지 않는다. 기능 정합은 전 분기(공개연락처/우선순위/비적용/깨진체인/비활성/이름없음/비로그인) 를 덮는 **단위테스트 14/14 PASS** 로 확보. 실 공급자 설명서가 존재하면 해당 `/p/:key` 에서 (a)비로그인 본문·credit 미노출 (b)로그인 후 하단 업체명 (c)공개 연락처만 (d)기존 URL·QR 불변 을 확인할 것. (본 저장소의 "defer live UI smoke" 기록 관례와 동일.)
 
 ## 12. 후속 gap
 
