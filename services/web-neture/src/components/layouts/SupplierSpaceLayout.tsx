@@ -69,6 +69,9 @@ const SUPPLIER_SIDEBAR_GROUPS: SidebarGroup[] = [
       { label: '대량 등록', path: '/supplier/products/bulk' },
       { label: '등록 도우미', path: '/supplier/products/import-assistant' },
       { label: '제품 콘텐츠 관리', path: '/supplier/b2b-content' },
+      // WO-O4O-NETURE-SUPPLIER-STORE-DESCRIPTION-ENTRY-AND-ONBOARDING-V1:
+      //   매장 경영자용 STORE 설명서 서비스 진입점(1차: 안내). B2B(공급자→판매자)와 별개.
+      { label: '매장용 설명서', path: '/supplier/store-descriptions' },
     ],
   },
   {

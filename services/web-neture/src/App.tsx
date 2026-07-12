@@ -182,6 +182,10 @@ const SupplierCsvImportPage = lazy(() =>
 const SupplierB2BContentPage = lazy(() =>
   import('./pages/supplier/SupplierB2BContentPage').then((m) => ({ default: m.default }))
 );
+// WO-O4O-NETURE-SUPPLIER-STORE-DESCRIPTION-ENTRY-AND-ONBOARDING-V1
+const SupplierStoreDescriptionsPage = lazy(() =>
+  import('./pages/supplier/SupplierStoreDescriptionsPage').then((m) => ({ default: m.default }))
+);
 // WO-O4O-FORUM-MY-FORUM-EXPANSION-V1
 const MyForumDashboardPage = lazy(() =>
   import('./pages/supplier').then((m) => ({ default: m.MyForumDashboardPage }))
@@ -795,6 +799,8 @@ function App() {
               <Route path="/supplier/csv-import" element={<SupplierCsvImportPage />} />
               {/* WO-NETURE-B2B-CONTENT-MANAGEMENT-V1 */}
               <Route path="/supplier/b2b-content" element={<SupplierB2BContentPage />} />
+              {/* WO-O4O-NETURE-SUPPLIER-STORE-DESCRIPTION-ENTRY-AND-ONBOARDING-V1 */}
+              <Route path="/supplier/store-descriptions" element={<SupplierStoreDescriptionsPage />} />
               {/* WO-O4O-SUPPLIER-MYPAGE-PROFILE-REDIRECT-V1: /mypage/business-profile로 통합 */}
               <Route path="/supplier/profile" element={<Navigate to="/mypage/business-profile" replace />} />
               {/* WO-O4O-MARKET-TRIAL-PHASE1-V1 + WO-MARKET-TRIAL-SUPPLIER-RESULTS-AND-FEEDBACK-V1 */}

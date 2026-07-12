@@ -430,6 +430,8 @@ function EventKpiCard({
 
 const QUICK_LINKS = [
   { label: '상품 관리', path: '/supplier/products' },
+  // WO-O4O-NETURE-SUPPLIER-STORE-DESCRIPTION-ENTRY-AND-ONBOARDING-V1
+  { label: '매장용 설명서', path: '/supplier/store-descriptions' },
   { label: '주문 관리', path: '/supplier/orders' },
   { label: '유통참여형 펀딩', path: '/supplier/market-trial' },
   { label: '라이브러리', path: '/supplier/library' },
