@@ -8,7 +8,7 @@
  *   기존 legacy 진열/대기화면 편집 영역은 그대로 유지(이 컴포넌트는 additive).
  */
 import { useState, useEffect, useCallback } from 'react';
-import { Loader2, Plus, ChevronUp, ChevronDown, X, Save, Layers, AlertTriangle } from 'lucide-react';
+import { Loader2, Plus, ChevronUp, ChevronDown, X, Save, Layers, AlertTriangle, LayoutTemplate } from 'lucide-react';
 import {
   fetchScreenSets, fetchScreenSet, createScreenSet, updateScreenSet,
   archiveScreenSet, saveScreenSetBlocks, applyCurrentScreenSet, clearCurrentScreenSet,
@@ -36,6 +36,21 @@ const BLOCK_TYPES: { value: ScreenBlockType; label: string }[] = [
 const BLOCK_LABEL: Record<string, string> = Object.fromEntries(BLOCK_TYPES.map((b) => [b.value, b.label]));
 const STATUS_LABEL: Record<ScreenSetStatus, string> = { draft: '초안', active: '활성', archived: '보관', operator_template: '운영자 템플릿' };
 
+// WO-O4O-KPA-TABLET-TEMPLATE-SELECTION-EDITOR-V1:
+//   Phase 1 선택지는 corner_information_basic_v1 하나뿐이지만, 후속 TEMPLATE-APPLY 에서
+//   product_focus / idle_video_first / comparison 을 추가할 때 편집기 구조를 다시 만들지 않도록
+//   선택형 UI 를 미리 둔다. whitelist 확장/렌더러 구현은 이번 WO 범위 아님(서버 화이트리스트가 정본).
+const DEFAULT_TEMPLATE_KEY = 'corner_information_basic_v1';
+const TEMPLATE_OPTIONS: { key: string; label: string; description: string }[] = [
+  {
+    key: 'corner_information_basic_v1',
+    label: '기본 코너 안내형',
+    description: '코너 설명, 제품 목록, QR 안내를 기본 구조로 보여주는 템플릿입니다.',
+  },
+];
+const templateLabel = (key: string | null | undefined) =>
+  TEMPLATE_OPTIONS.find((t) => t.key === key)?.label ?? TEMPLATE_OPTIONS[0].label;
+
 const IDLE_SOURCES = [
   { value: 'legacy_idle_playlist', label: '기존 대기 재생목록 사용' },
   { value: 'operator_common', label: '운영자 공통 대기영상 사용' },
@@ -61,10 +76,14 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
 
   const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState('');
+  // WO-O4O-KPA-TABLET-TEMPLATE-SELECTION-EDITOR-V1: 생성 폼 템플릿 선택(기본값 = corner_information_basic_v1).
+  const [newTemplateKey, setNewTemplateKey] = useState(DEFAULT_TEMPLATE_KEY);
 
   const [editDetail, setEditDetail] = useState<ScreenSetDetail | null>(null);
   const [editName, setEditName] = useState('');
   const [editStatus, setEditStatus] = useState<ScreenSetStatus>('draft');
+  // WO-O4O-KPA-TABLET-TEMPLATE-SELECTION-EDITOR-V1: 편집 폼 템플릿 선택(GET 값으로 초기화).
+  const [editTemplateKey, setEditTemplateKey] = useState(DEFAULT_TEMPLATE_KEY);
   const [blocks, setBlocks] = useState<ScreenBlock[]>([]);
   const [savingSet, setSavingSet] = useState(false);
   const [savingBlocks, setSavingBlocks] = useState(false);
@@ -92,6 +111,8 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
       setEditDetail(detail);
       setEditName(detail.name);
       setEditStatus(detail.status);
+      // templateKey 미지정/null 이면 기본 템플릿으로 표시(WO §5).
+      setEditTemplateKey(detail.templateKey ?? DEFAULT_TEMPLATE_KEY);
       setBlocks(detail.blocks.map((b) => ({ ...b, config: b.config ?? {} })));
     } catch (e: any) {
       onToast({ type: 'error', message: e?.message || '세트 상세를 불러오지 못했습니다.' });
@@ -105,8 +126,9 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
     if (!name) return;
     setBusy(true);
     try {
-      const created = await createScreenSet({ name, tabletId });
-      setNewName(''); setCreating(false);
+      // WO-O4O-KPA-TABLET-TEMPLATE-SELECTION-EDITOR-V1: 선택한 templateKey 를 명시 전송(Phase 1 = 기본형).
+      const created = await createScreenSet({ name, tabletId, templateKey: newTemplateKey });
+      setNewName(''); setNewTemplateKey(DEFAULT_TEMPLATE_KEY); setCreating(false);
       onToast({ type: 'success', message: `화면 세트 "${created.name}" 생성됨` });
       await reload();
       openEdit(created.id);
@@ -121,7 +143,8 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
     if (!nm) return;
     setSavingSet(true);
     try {
-      await updateScreenSet(editDetail.id, { name: nm, status: editStatus });
+      // WO-O4O-KPA-TABLET-TEMPLATE-SELECTION-EDITOR-V1: templateKey 를 함께 저장(명시 전송).
+      await updateScreenSet(editDetail.id, { name: nm, status: editStatus, templateKey: editTemplateKey });
       onToast({ type: 'success', message: '세트 정보가 저장되었습니다.' });
       await reload();
     } catch (e: any) {
@@ -245,18 +268,22 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
 
         {/* 새 세트 생성 폼 */}
         {creating && (
-          <div className="flex gap-2 items-center">
-            <input
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
-              placeholder="세트 이름 (예: 입마름·구취 관리 세트)"
-              className="flex-1 px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
-              autoFocus
-            />
-            <button onClick={handleCreate} disabled={busy || !newName.trim()} className="px-3 py-2 text-xs font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 whitespace-nowrap">
-              만들기
-            </button>
+          <div className="space-y-2 border border-slate-100 rounded-lg p-3 bg-slate-50/60">
+            <div className="flex gap-2 items-center">
+              <input
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
+                placeholder="세트 이름 (예: 입마름·구취 관리 세트)"
+                className="flex-1 px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                autoFocus
+              />
+              <button onClick={handleCreate} disabled={busy || !newName.trim()} className="px-3 py-2 text-xs font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 whitespace-nowrap">
+                만들기
+              </button>
+            </div>
+            {/* WO-O4O-KPA-TABLET-TEMPLATE-SELECTION-EDITOR-V1: 생성 시 템플릿 선택 */}
+            <TemplateSelectField value={newTemplateKey} onChange={setNewTemplateKey} />
           </div>
         )}
 
@@ -278,7 +305,7 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
                       {s.tabletId === null && <span className="text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">재사용</span>}
                     </div>
                     <div className="text-[11px] text-slate-400">
-                      {STATUS_LABEL[s.status]} · 블록 {s.blockCount ?? 0}개
+                      {STATUS_LABEL[s.status]} · {templateLabel(s.templateKey)} · 블록 {s.blockCount ?? 0}개
                     </div>
                   </div>
                   {!isCurrent && (
@@ -309,6 +336,11 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
               <button onClick={handleSaveSet} disabled={savingSet} className="px-3 py-2 text-xs font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 flex items-center gap-1">
                 {savingSet ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />} 정보 저장
               </button>
+            </div>
+
+            {/* WO-O4O-KPA-TABLET-TEMPLATE-SELECTION-EDITOR-V1: 템플릿 선택('정보 저장'으로 함께 반영) */}
+            <div className="rounded-lg border border-slate-200 bg-white p-2.5">
+              <TemplateSelectField value={editTemplateKey} onChange={setEditTemplateKey} />
             </div>
 
             {/* 블록 목록 */}
@@ -345,6 +377,30 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+// ── 템플릿 선택 필드 (WO-O4O-KPA-TABLET-TEMPLATE-SELECTION-EDITOR-V1) ──
+//   Phase 1 은 선택지가 하나(corner_information_basic_v1)뿐이나, 후속 확장을 위해 선택형 구조를 유지.
+function TemplateSelectField({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const current = TEMPLATE_OPTIONS.find((t) => t.key === value) ?? TEMPLATE_OPTIONS[0];
+  return (
+    <div className="space-y-1.5">
+      <label className="text-xs font-semibold text-slate-600 flex items-center gap-1.5">
+        <LayoutTemplate className="w-3.5 h-3.5 text-indigo-500" /> 화면 템플릿
+      </label>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400"
+      >
+        {TEMPLATE_OPTIONS.map((t) => <option key={t.key} value={t.key}>{t.label}</option>)}
+      </select>
+      <p className="text-[11px] text-slate-500 leading-relaxed">{current.description}</p>
+      <p className="text-[11px] text-slate-400 leading-relaxed">
+        현재는 기본 코너 안내형 템플릿만 사용할 수 있습니다. 추가 템플릿은 후속 단계에서 제공됩니다.
+      </p>
     </div>
   );
 }

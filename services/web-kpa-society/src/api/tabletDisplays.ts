@@ -192,6 +192,9 @@ export interface ScreenSet {
   name: string;
   origin: 'store' | 'operator';
   status: ScreenSetStatus;
+  // WO-O4O-KPA-TABLET-TEMPLATE-SELECTION-EDITOR-V1: 화면 세트 렌더 템플릿 키.
+  //   서버 GET 은 COALESCE 로 항상 non-null 반환(미지정 → corner_information_basic_v1).
+  templateKey: string;
   createdByUserId: string | null;
   createdAt: string;
   updatedAt: string;
@@ -227,7 +230,7 @@ export async function fetchScreenSet(id: string): Promise<ScreenSetDetail> {
   return res.data;
 }
 
-export async function createScreenSet(input: { name: string; tabletId?: string | null; status?: 'draft' | 'active' }): Promise<ScreenSet> {
+export async function createScreenSet(input: { name: string; tabletId?: string | null; status?: 'draft' | 'active'; templateKey?: string | null }): Promise<ScreenSet> {
   const res = await request<{ success: boolean; data: ScreenSet }>(`${BASE}/screen-sets`, {
     method: 'POST',
     body: JSON.stringify(input),
@@ -235,7 +238,7 @@ export async function createScreenSet(input: { name: string; tabletId?: string |
   return res.data;
 }
 
-export async function updateScreenSet(id: string, input: { name?: string; status?: ScreenSetStatus; tabletId?: string | null }): Promise<ScreenSet> {
+export async function updateScreenSet(id: string, input: { name?: string; status?: ScreenSetStatus; tabletId?: string | null; templateKey?: string | null }): Promise<ScreenSet> {
   const res = await request<{ success: boolean; data: ScreenSet }>(`${BASE}/screen-sets/${id}`, {
     method: 'PATCH',
     body: JSON.stringify(input),
