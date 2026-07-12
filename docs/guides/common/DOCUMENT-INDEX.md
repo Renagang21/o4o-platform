@@ -43,6 +43,7 @@ services/          서비스(KPA·GP·KCos·Neture)               (제품군과 
 | 9-a | [O4O-STORE-PRODUCT-DESCRIPTION-POLICY-V1](../products/O4O-STORE-PRODUCT-DESCRIPTION-POLICY-V1.md) | **O4O 매장용 상품 상세설명서 SSOT**. 구매 지원 목적, 제품 신뢰, 로그인 전용, 제작·비제작 범위, 공급자 제작원 표시, 매장 자체 콘텐츠 구분. |
 | 9-b | [products/O4O-PRODUCT-UNIT-DESCRIPTION-AGENT-GUIDE-V1](../products/O4O-PRODUCT-UNIT-DESCRIPTION-AGENT-GUIDE-V1.md) · [products/O4O-PRODUCT-UNIT-REGISTRATION-FROM-PHOTO-AGENT-GUIDE-V1](../products/O4O-PRODUCT-UNIT-REGISTRATION-FROM-PHOTO-AGENT-GUIDE-V1.md) | 제품 단위 작성·사진 기반 등록의 실행 참고. 적용 범위와 정책은 9-a SSOT 우선. |
 | 9-c | [products/general-food/](../products/general-food/) | **Legacy / Existing Content Only**. 일반식품 신규 O4O 설명서 제작은 중단하고 기존 설명서·샘플만 보존. |
+| 9-d | [products/health-functional-food/HFF-DESCRIPTION-RULES-SSOT-V1](../products/health-functional-food/HFF-DESCRIPTION-RULES-SSOT-V1.md) | **건강기능식품 설명서 규칙 SSOT** (HFF-R01~R10). 구매 지원 우선·제품 단위·매력·신뢰·최소 제한·grounding·이중게이트·언어(ko+en)·샘플 지위. 과거 general-food R1~R10 참조 대체. |
 | 10 | [../../adr/](../../adr/) | **ADR** — 채택된 결정 기록(IR=논의, ADR=결정). 소급 변환 없음, 새 결정부터. |
 
 ---
