@@ -95,4 +95,69 @@ const SET_TEMPLATE_KEYS_ALLOWED = ['corner_information_basic_v1', 'product_focus
 
 - ✅ product_focus 저장 허용(whitelist) / 편집기 선택 / public /screen 반환(기존) / kiosk-core 렌더 분기
 - ✅ 기존 corner_information_basic_v1 불변 / 전 서비스 typecheck·build / public 단위 테스트
-- ⏳ 브라우저 smoke = **배포 후** 수행(로컬 DB 방화벽 제약). 배포 후 API curl 검증은 즉시 가능.
+- ⏳ 브라우저 live UI smoke = **Deferred**(사용자가 태블릿 작업 묶음 완료 후 최종 육안 확인 예정). 상세 §11-1.
+  - 기술 구현 / CI·build / 단위테스트 / 프로덕션 배포 / API health 는 모두 완료. 남은 것은 운영 샘플 육안 확인 1회.
+
+---
+
+## 11. 배포 후 상태 (2026-07-12)
+
+커밋 `01a5947f3` push → CI/CD 배포 완료.
+
+| 항목 | 결과 |
+|------|------|
+| Deploy API Server (Cloud Run) | ✅ success — 신규 리비전 `o4o-core-api-02538-6vr` 100% 트래픽 |
+| Deploy Web Services (Cloud Run) | ✅ success (편집기 product_focus 선택지 배포됨) |
+| API health (`GET /api/v1/auth/status`) | ✅ HTTP 200 |
+| 대상 운영 샘플 | org "네뚜레-약국"(renagang21) · 구강관리 기본 화면 세트(`7280872e…`) — templateKey 미변경 유지 |
+
+### 11-1. Live UI smoke status: **Deferred**
+
+**Reason:** The final product_focus flip smoke requires authenticated production management UI/API access and an operational write to the sample screen set. Automated credential handling was blocked by the security guard, and the user decided to perform final browser verification after the broader tablet work is complete.
+
+**Current verified scope:**
+- Code implemented (whitelist + editor option + kiosk-core renderer branch)
+- CI/build passed (web-kpa-society `tsc && vite build`, api-server build-scope tsc, cosmetics/glyco tsc)
+- Unit tests passed (public tablet screen 6/6, incl. `product_focus`)
+- Production deploy succeeded (`o4o-core-api-02538-6vr`, web services)
+- API health passed (`/api/v1/auth/status` 200)
+- Template whitelist + renderer path verified by automated tests/build
+
+**Pending (manual, after broader tablet work):**
+- Manual browser confirmation of product_focus layout (상품 전면 / 축약 헤더 / QR 하단 / 0건 크래시 없음)
+- Manual revert/confirm of corner_information_basic_v1 layout
+- console/network error 0 확인
+
+> 원칙: 프로덕션 비밀번호/토큰 자동 입력·저장 안 함. 운영 데이터 write flip 은 사용자 수동 로그인 또는 명시 승인 없이는 수행하지 않음.
+
+### 11-2. 참고 절차 (사용자 최종 확인 시 사용) — 자격증명/브라우저 필요 (auto mode 밖에서 수행)
+
+배포 후 product_focus 적용 체인 검증은 **인증된 관리 API PATCH(운영 데이터 write) 또는 관리 UI**가 필요하다.
+자동화 세션(auto mode)은 **프로덕션 자격증명 제출·토큰 materialize 를 안전 가드로 차단**하므로, 아래를 사용자가 수행(또는 auto mode 밖에서 실행)한다. WO §6 이 flip→복귀를 명시 허용한다.
+
+**A. 관리 UI 경로(권장 — 시각 확인 포함):**
+1. `/store/commerce/tablet-displays` → 구강관리 기본 화면 세트 편집 → 템플릿 `상품 집중형(product_focus)` 저장.
+2. 공개 태블릿 뷰어 → product_focus 레이아웃(상품 전면·축약 헤더·QR 하단) 확인.
+3. product_list 0건 상황에서도 크래시 없는지 확인.
+4. 템플릿 `기본 코너 안내형(corner_information_basic_v1)` 저장 → 기존 레이아웃 복귀.
+5. legacy 경로 + idle auto-return 불변 / console·network error 0 확인.
+
+**B. API curl 경로(구조 검증 — auto mode 밖에서):**
+```
+# 1) 로그인 → accessToken
+curl -sX POST https://api.neture.co.kr/api/v1/auth/login -H 'Content-Type: application/json' \
+  -d '{"email":"<kpa store_owner>","password":"<pw>"}'
+# 2) 대상 세트 확인
+curl -s https://api.neture.co.kr/api/v1/store/screen-sets -H "Authorization: Bearer $TOKEN"
+# 3) product_focus 저장(200 기대)
+curl -sX PATCH https://api.neture.co.kr/api/v1/store/screen-sets/7280872e... -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' -d '{"templateKey":"product_focus"}'
+# 4) 잘못된 key → 400 INVALID_TEMPLATE_KEY 기대
+curl -sX PATCH .../screen-sets/7280872e... -H "Authorization: Bearer $TOKEN" -d '{"templateKey":"comparison"}'
+# 5) 공개 반환 확인(templateKey=product_focus 기대)
+curl -s https://api.neture.co.kr/api/v1/stores/<slug>/tablet/screen
+# 6) 복귀
+curl -sX PATCH .../screen-sets/7280872e... -H "Authorization: Bearer $TOKEN" -d '{"templateKey":"corner_information_basic_v1"}'
+```
+
+> 코드/계약 근거: whitelist·400 가드·public templateKey 반환은 §7 단위 테스트(6/6) + 배포 리비전으로 확정. 위 절차는 운영 데이터에 대한 최종 live 확인이며, 결과는 본 문서에 보강한다.
