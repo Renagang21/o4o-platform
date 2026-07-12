@@ -96,12 +96,14 @@ CREATE INDEX IF NOT EXISTS idx_shared_product_descriptions_created_by_supplier
 | build/DB migration 적용 | ⏳ push 시 CI/CD 자동 실행 — §9 |
 | 배포 | ⏳ §9 |
 
-## 9. commit / push / 배포 / migration 적용
+## 9. commit / push / 배포 / migration 적용 — ✅ 완료
 
-- commit SHA: (본 커밋 — entity + migration + CHECK 동시)
-- push: (아래 실행 결과 기록)
-- 배포: main push → CI/CD 자동. api-server(`o4o-core-api`) 재배포 시 migration 자동 적용(CLAUDE.md §0 원칙).
-- migration 적용 확인: 배포 후 Cloud Run 로그(`typeorm_migrations` 에 `AddAuthorSubjectMetadataToSharedProductDescriptions20270108000000` 기록) 또는 read-only 컬럼 존재 확인으로 검증 예정.
+- commit SHA: `29f2f8097` (entity + migration + CHECK 동시). 선행 Readiness IR 커밋 = `cee6370e1`.
+- push: `f060abe40..29f2f8097 main -> main` (fast-forward, 무관 dirty 2파일 제외).
+- 배포: `Deploy API Server (Cloud Run)` run `29192105429` — **conclusion=success** (sha 29f2f8097).
+- migration 적용: Cloud Run Job `o4o-api-migrations` 실행 `o4o-api-migrations-l2kk8` — "✅ Migrations completed successfully".
+  - Job 로그(2026-07-12T12:16:16Z): `[X] 609 AddAuthorSubjectMetadataToSharedProductDescriptions20270108000000` → **본 마이그레이션이 #609 로 실제 실행됨**(TypeORM applied 마커). `typeorm_migrations` 테이블에 기록.
+- 잔여 read-only 확인(선택): Cloud SQL Auth Proxy 로 `\d shared_product_descriptions` 컬럼 2개 확인 가능하나, Job 실행 성공(DDL 적용)으로 이미 충족.
 
 ## 10. 다음 단계 (본 WO 범위 밖)
 
