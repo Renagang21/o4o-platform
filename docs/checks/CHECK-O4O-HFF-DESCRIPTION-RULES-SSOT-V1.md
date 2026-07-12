@@ -110,8 +110,8 @@ deploy           0
 
 ## 10. 커밋 / 배포
 
-- commit: (본 커밋 SHA — 아래 완료 보고)
-- push: main 직접(`git commit -- <docs 경로>` 로 해당 문서만, 동시 세션 안전)
+- commit: `f0a66cacd` (docs 5개만, `git commit -m … -- <docs 경로>` 로 스코프 — `_smoke_dirty_guard.mjs`(타 세션) 미포함)
+- push: `468a27e57..f0a66cacd  main -> main` **success**
 - 배포: 문서 전용이라 없음(코드·web·API 무변경).
 
 ## 11. 완료 판정
