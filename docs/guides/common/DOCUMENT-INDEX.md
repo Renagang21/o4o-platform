@@ -3,7 +3,7 @@
 > 새로 합류했다면 **이 문서 하나만 읽으면** 전체 구조를 이해할 수 있다.
 > 근거(결정 이력): [IR-O4O-CONTENT-AUTHORING-DOCUMENT-ARCHITECTURE-V1](../IR-O4O-CONTENT-AUTHORING-DOCUMENT-ARCHITECTURE-V1.md) · 운영: 본 폴더(`guides/`)
 
-상태: Active · V1 (2026-07-08)
+상태: Active · V1 (2026-07-12)
 
 ---
 
@@ -40,14 +40,16 @@ services/          서비스(KPA·GP·KCos·Neture)               (제품군과 
 | 7 | [products/drug/*](../products/drug/) | DRUG-STANDARD · DRUG-WRITING · DRUG-GROUPING · DRUG-TEMPLATE · DRUG-RULE-REGISTRY(DR-NNN). |
 | 8 | [products/drug/knowledge/*](../products/drug/knowledge/) | **Knowledge Catalog(Rule 아님)**: ATC-FALSE-POSITIVE-CATALOG · GROUPING-PATTERNS · CONSUMER-WRITING-PATTERNS. |
 | 9 | products/{medical-device,quasi-drug,health-functional-food}/ · services/{kpa,gp,kcos,neture}/ | 제품군 확장 · 서비스 채널(Registry 없음, Rule ID 참조). |
-| 9-a | [products/O4O-PRODUCT-UNIT-DESCRIPTION-AGENT-GUIDE-V1](../products/O4O-PRODUCT-UNIT-DESCRIPTION-AGENT-GUIDE-V1.md) · [products/O4O-PRODUCT-UNIT-REGISTRATION-FROM-PHOTO-AGENT-GUIDE-V1](../products/O4O-PRODUCT-UNIT-REGISTRATION-FROM-PHOTO-AGENT-GUIDE-V1.md) | **제품 단위 트랙**(건기식/일반식품/기타 제품 — 의약품 그룹 트랙과 대비). 사진→등록→설명서(ko/zh)→QR. 조사=IR-...-PHOTO-TO-DESCRIPTION-QR-FLOW-AUDIT-V2. |
-| 9-b | [products/general-food/](../products/general-food/) | **일반식품(기타가공품·건강즙 등) 매장(STORE) 콘텐츠 규칙 R1~R7** — 전문가 매개 매장 내 사용 전제, B2C 규제 프레임 미적용. 샘플=흑염소 진액 골드. |
+| 9-a | [O4O-STORE-PRODUCT-DESCRIPTION-POLICY-V1](../products/O4O-STORE-PRODUCT-DESCRIPTION-POLICY-V1.md) | **O4O 매장용 상품 상세설명서 SSOT**. 구매 지원 목적, 제품 신뢰, 로그인 전용, 제작·비제작 범위, 공급자 제작원 표시, 매장 자체 콘텐츠 구분. |
+| 9-b | [products/O4O-PRODUCT-UNIT-DESCRIPTION-AGENT-GUIDE-V1](../products/O4O-PRODUCT-UNIT-DESCRIPTION-AGENT-GUIDE-V1.md) · [products/O4O-PRODUCT-UNIT-REGISTRATION-FROM-PHOTO-AGENT-GUIDE-V1](../products/O4O-PRODUCT-UNIT-REGISTRATION-FROM-PHOTO-AGENT-GUIDE-V1.md) | 제품 단위 작성·사진 기반 등록의 실행 참고. 적용 범위와 정책은 9-a SSOT 우선. |
+| 9-c | [products/general-food/](../products/general-food/) | **Legacy / Existing Content Only**. 일반식품 신규 O4O 설명서 제작은 중단하고 기존 설명서·샘플만 보존. |
 | 10 | [../../adr/](../../adr/) | **ADR** — 채택된 결정 기록(IR=논의, ADR=결정). 소급 변환 없음, 새 결정부터. |
 
 ---
 
 ## 2. 무엇부터 읽나 (역할별)
 
+- **O4O 상품 상세설명서 작업** → O4O-STORE-PRODUCT-DESCRIPTION-POLICY-V1 → 해당 제품군 Guide → WORKFLOW.
 - **새 증상군/제품 batch 시작** → WORKFLOW → 해당 products/ Guide → CONTENT-CHECK-STANDARD.
 - **규칙이 궁금** → RULE-REGISTRY(CR/DR/AR)에서 Rule ID로 찾기.
 - **AI로 초안/요약/분류** → ai/ 전체.
@@ -58,7 +60,7 @@ services/          서비스(KPA·GP·KCos·Neture)               (제품군과 
 
 ## 3. 절대 원칙 (한눈에)
 
-- 하나의 규칙은 **한 곳**(SSOT)에만. 다른 문서는 Rule ID로 참조.
+- 하나의 규칙은 **한 곳**(SSOT)에만. 다른 문서는 Rule ID 또는 SSOT 링크로 참조.
 - **CHECK는 규칙을 설명하지 않는다** — 결과만.
 - **WO는 작업 차이만** — 공통은 이 폴더 참조.
 - **IR은 역사(불변)**, 운영·갱신은 DOCUMENT-ARCHITECTURE.
