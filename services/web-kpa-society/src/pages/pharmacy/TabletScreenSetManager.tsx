@@ -4,7 +4,7 @@
  * WO-O4O-KPA-TABLET-SCREEN-SET-BLOCK-EDITOR-UX-V1
  *   선택된 코너/태블릿의 Screen Set 목록·생성·수정·archive·적용/해제 + Screen Block 편집.
  *   선행 구현 관리 API(/store/screen-sets, /store/tablets/:id/current-screen-set)만 사용.
- *   ⚠️ Screen Set 적용은 저장되나 공개 태블릿 화면은 아직 바뀌지 않음(PUBLIC-RUNTIME-READ 후속).
+ *   적용된 Screen Set 은 공개 GET /:slug/tablet/screen → kiosk-core 뷰어에 반영됨(PUBLIC-RUNTIME-READ 완료).
  *   기존 legacy 진열/대기화면 편집 영역은 그대로 유지(이 컴포넌트는 additive).
  */
 import { useState, useEffect, useCallback } from 'react';
@@ -180,7 +180,7 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
       }
       await applyCurrentScreenSet(tabletId, set.id);
       onCurrentChange(set.id);
-      onToast({ type: 'success', message: `"${set.name}" 적용됨 (공개 반영은 후속 단계)` });
+      onToast({ type: 'success', message: `"${set.name}" 적용됨 — 공개 태블릿 화면에 반영됩니다.` });
       await reload();
     } catch (e: any) {
       onToast({ type: 'error', message: e?.message || '적용에 실패했습니다.' });
@@ -252,8 +252,8 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
         <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg p-3">
           <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
           <p className="text-xs text-amber-800 leading-relaxed">
-            화면 세트 적용은 저장되지만, <b>공개 태블릿 화면 반영은 후속 PUBLIC-RUNTIME-READ 단계에서 활성화</b>됩니다.
-            현재 공개 태블릿은 기존 진열/대기화면 경로를 계속 사용합니다.
+            <b>적용한 화면 세트는 공개 태블릿 뷰어(고객 화면)에 반영됩니다.</b>
+            운영 환경에서는 브라우저 캐시·네트워크 상태에 따라 태블릿 새로고침이 필요할 수 있습니다.
           </p>
         </div>
 
