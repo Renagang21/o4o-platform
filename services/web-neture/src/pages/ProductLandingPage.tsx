@@ -11,10 +11,11 @@
  */
 
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Package, AlertCircle, FileText, Clock, Globe, X } from 'lucide-react';
+import { useParams, useLocation } from 'react-router-dom';
+import { Package, AlertCircle, FileText, Clock, Globe, X, Lock, LogIn, UserPlus } from 'lucide-react';
 import { ContentRenderer } from '@o4o/content-editor';
 import { api } from '../lib/api/index.js';
+import { useAuth, useLoginModal } from '../contexts';
 
 interface PublicProductLanding {
   publicKey: string;
@@ -22,6 +23,7 @@ interface PublicProductLanding {
   status: string;
   exposureState: string;
   blocked: boolean;
+  authRequired: boolean;
   product: {
     name: string | null;
     manufacturerName: string | null;
@@ -69,6 +71,12 @@ function localeFlag(l: string): string {
 
 export default function ProductLandingPage() {
   const { publicKey } = useParams<{ publicKey: string }>();
+  const location = useLocation();
+  // WO-O4O-PRODUCT-DESCRIPTION-AUTH-GATE-AND-RETURNURL-V1 (Baseline V3-AMENDMENT · ADR-0002):
+  //   설명서 본문은 로그인 회원만. 비로그인은 게이트 표시 → 로그인/가입 후 원래 상품 URL 복귀.
+  //   isAuthenticated 를 fetch 의존성에 넣어 로그인 성공(모달 오버레이) 시 자동 재조회(본문 in-place 로드).
+  const { isAuthenticated } = useAuth();
+  const { openLoginModal, openRegisterModal } = useLoginModal();
   const [data, setData] = useState<PublicProductLanding | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -77,6 +85,18 @@ export default function ProductLandingPage() {
     try { return localStorage.getItem(STORAGE_KEY) || undefined; } catch { return undefined; }
   });
   const [sheetOpen, setSheetOpen] = useState(false);
+
+  // 원래 상품 URL(내부 상대경로만) — 로그인/가입 returnUrl. open-redirect 방지: pathname+search 만 사용.
+  const returnUrl = `${location.pathname}${location.search}`;
+
+  // 비로그인 설명서 페이지 색인 방지(보조조치). 실제 통제는 서버 인증. 이탈 시 원복.
+  useEffect(() => {
+    const meta = document.createElement('meta');
+    meta.name = 'robots';
+    meta.content = 'noindex, nofollow';
+    document.head.appendChild(meta);
+    return () => { document.head.removeChild(meta); };
+  }, []);
 
   useEffect(() => {
     if (!publicKey) {
@@ -100,7 +120,7 @@ export default function ProductLandingPage() {
       }
     })();
     return () => { cancelled = true; };
-  }, [publicKey, locale]);
+  }, [publicKey, locale, isAuthenticated]);
 
   const chooseLocale = (loc: string) => {
     setLocale(loc);
@@ -144,6 +164,44 @@ export default function ProductLandingPage() {
           </div>
           <h1 className="text-lg font-bold text-gray-900 mb-2">현재 표시할 수 없는 제품입니다</h1>
           <p className="text-sm text-gray-600">이 제품 정보는 일시적으로 제공되지 않습니다.</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 로그인 게이트 — 비로그인 사용자에게는 설명서 본문을 제공하지 않는다(서버에서 이미 미포함).
+  //   최소 상품 식별정보(제품명)와 로그인·가입 CTA 만 노출. 로그인 성공 시 상위 effect 가 자동 재조회.
+  if (data.authRequired) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+        <div className="w-full max-w-sm text-center">
+          <div className="w-16 h-16 bg-primary-100 rounded-2xl flex items-center justify-center mx-auto mb-5">
+            <Lock size={30} className="text-primary-600" />
+          </div>
+          {data.product?.name && (
+            <p className="text-base font-semibold text-gray-900 break-keep mb-1">{data.product.name}</p>
+          )}
+          <h1 className="text-lg font-bold text-gray-900 mb-2">로그인 후 제품 설명을 볼 수 있어요</h1>
+          <p className="text-sm text-gray-600 mb-6 break-keep">
+            이 제품 상세설명서는 O4O 회원에게만 제공됩니다. 로그인하거나 가입하면 바로 이 화면에서 이어서 볼 수 있어요.
+          </p>
+          <div className="flex flex-col gap-2.5">
+            <button
+              type="button"
+              onClick={() => openLoginModal(returnUrl)}
+              className="w-full min-h-[48px] inline-flex items-center justify-center gap-2 px-4 py-3 bg-green-600 text-white text-sm font-semibold rounded-xl hover:bg-green-700 transition-colors"
+            >
+              <LogIn size={18} /> 로그인
+            </button>
+            <button
+              type="button"
+              onClick={() => openRegisterModal()}
+              className="w-full min-h-[48px] inline-flex items-center justify-center gap-2 px-4 py-3 bg-white text-gray-800 text-sm font-semibold rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors"
+            >
+              <UserPlus size={18} /> 회원가입
+            </button>
+          </div>
+          <p className="text-center text-xs text-gray-400 mt-6">O4O · neture.co.kr</p>
         </div>
       </div>
     );

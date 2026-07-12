@@ -3,7 +3,9 @@
  *
  * WO-O4O-PRODUCT-LANDING-ARCHITECTURE-V1 / Phase 2
  *
- * public : GET  /api/v1/public/product-landings/:publicKey   — 무인증 공개 read model
+ * public : GET  /api/v1/public/product-landings/:publicKey   — 로그인 게이트 read model
+ *          (WO-O4O-PRODUCT-DESCRIPTION-AUTH-GATE-AND-RETURNURL-V1 / Baseline V3-AMENDMENT · ADR-0002)
+ *          고정 URL·기본 QR 은 유지하되 설명서 본문은 O4O 로그인 세션에만 응답. 비로그인은 authRequired shell.
  * admin  : POST /api/v1/admin/o4o-product-db/product-landings — { masterId } idempotent 단건 발급
  *          GET  /api/v1/admin/o4o-product-db/product-landings/by-master/:masterId — 발급 상태 조회
  *
@@ -13,7 +15,8 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
-import { authenticate, requireRole } from '../../../middleware/auth.middleware.js';
+import { authenticate, requireRole, optionalAuth } from '../../../middleware/auth.middleware.js';
+import type { AuthRequest } from '../../../middleware/auth.middleware.js';
 import { ProductLandingService } from '../services/product-landing.service.js';
 import logger from '../../../utils/logger.js';
 
@@ -30,16 +33,24 @@ const ADMIN_ROLES = [
   'kpa-society:operator',
 ];
 
-/** 공개(무인증) Landing read. */
+/**
+ * 상품 Landing read (로그인 게이트). `optionalAuth` 로 세션이 있으면 req.user 설정, 없어도 통과.
+ * 설명서 본문은 서버에서 로그인 세션(req.user)에만 응답한다(Baseline V3-AMENDMENT #8·#9 / ADR-0002).
+ * 인증 응답은 개인화되므로 공개 캐시에 저장하지 않는다(§E cache 보호).
+ */
 export function createPublicProductLandingController(dataSource: DataSource): Router {
   const router = Router();
   const service = new ProductLandingService(dataSource);
 
-  router.get('/:publicKey', async (req: Request, res: Response) => {
+  router.get('/:publicKey', optionalAuth, async (req: AuthRequest, res: Response) => {
     try {
       // WO-...-PRODUCT-QR-LANGUAGE-SELECTOR-REUSE-AND-ADAPT-V1: locale 별 본문(고객 언어 전환)
       const locale = typeof req.query.locale === 'string' ? req.query.locale.slice(0, 16) : undefined;
-      const data = await service.getPublicLanding(req.params.publicKey, locale);
+      const isAuthed = !!req.user; // optionalAuth 가 유효 세션에만 설정
+      // 인증 여부와 무관하게 공개 shared cache 저장 금지(로그아웃 후 타 사용자 재사용 방지).
+      res.setHeader('Cache-Control', 'no-store, private');
+      res.setHeader('Vary', 'Authorization');
+      const data = await service.getPublicLanding(req.params.publicKey, locale, isAuthed);
       if (!data) {
         res.status(404).json({ success: false, error: '존재하지 않는 제품 랜딩입니다', code: 'LANDING_NOT_FOUND' });
         return;

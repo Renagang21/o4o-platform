@@ -41,6 +41,7 @@ export interface PublicProductLanding {
   status: string;
   exposureState: string;
   blocked: boolean; // 노출 게이트 차단 여부
+  authRequired: boolean; // WO-...-AUTH-GATE: 비로그인 → true(본문 미포함, 로그인 게이트)
   product: {
     name: string | null;
     manufacturerName: string | null;
@@ -138,14 +139,41 @@ export class ProductLandingService {
    * 공개 Landing read model. 없으면 null. 노출 게이트 차단 시 blocked=true(콘텐츠 미포함).
    * WO-O4O-KPA-PRODUCT-QR-LANGUAGE-SELECTOR-REUSE-AND-ADAPT-V1: locale 지원 —
    *   languages = master 의 canonical STORE 언어(공개 가능), 요청 locale(없거나 미보유 시 ko→첫 언어) 본문 반환.
+   *
+   * WO-O4O-PRODUCT-DESCRIPTION-AUTH-GATE-AND-RETURNURL-V1 (Baseline V3-AMENDMENT / ADR-0002):
+   *   설명서 본문은 유효한 O4O 로그인 세션(isAuthed=true)에만 응답한다. 비로그인(isAuthed=false)에는
+   *   authRequired=true + 최소 상품 식별정보(제품명)만 반환하고 본문/summary/canonical 은 절대 미포함한다.
+   *   접근 통제는 이 서버 read model 에서 강제한다(프론트 숨김 아님). 대상 없음(404)과 인증필요는 구분한다.
    */
-  async getPublicLanding(publicKey: string, locale?: string): Promise<PublicProductLanding | null> {
+  async getPublicLanding(publicKey: string, locale?: string, isAuthed = false): Promise<PublicProductLanding | null> {
     const rows = await this.dataSource.query(
       `SELECT * FROM product_landings WHERE public_key = $1 AND deleted_at IS NULL LIMIT 1`,
       [publicKey],
     );
     const landing = rows[0];
     if (!landing) return null;
+
+    // AUTH GATE — 비로그인: 본문 미포함. 최소 상품 식별정보(제품명)만 노출하는 로그인 게이트 shell.
+    //   존재 여부(404)와 인증필요(authRequired)는 구분하되, 비로그인엔 본문·summary·언어·노출상태 등을 과다 노출하지 않는다.
+    if (!isAuthed) {
+      const nameRows = await this.dataSource.query(
+        `SELECT name FROM product_masters WHERE id = $1 LIMIT 1`,
+        [landing.product_master_id],
+      );
+      return {
+        publicKey: landing.public_key,
+        productMasterId: landing.product_master_id,
+        status: landing.status,
+        exposureState: landing.exposure_state,
+        blocked: false,
+        authRequired: true,
+        product: { name: nameRows[0]?.name ?? null, manufacturerName: null, barcode: null, regulatoryType: null, specification: null },
+        description: { hasCanonical: false, descriptionType: null, content: null, summary: null },
+        placeholder: null,
+        languages: [],
+        resolvedLocale: null,
+      };
+    }
 
     const blocked = landing.status !== 'active' || landing.exposure_state !== 'ok';
     if (blocked) {
@@ -155,6 +183,7 @@ export class ProductLandingService {
         status: landing.status,
         exposureState: landing.exposure_state,
         blocked: true,
+        authRequired: false,
         product: null,
         description: { hasCanonical: false, descriptionType: null, content: null, summary: null },
         placeholder: null,
@@ -208,6 +237,7 @@ export class ProductLandingService {
       status: landing.status,
       exposureState: landing.exposure_state,
       blocked: false,
+      authRequired: false,
       product: pm
         ? {
             name: pm.name,
