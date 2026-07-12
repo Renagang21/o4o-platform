@@ -159,6 +159,15 @@ const storeDescriptionCss = `
   --sd-blue:#1f6fbf; --sd-blue-deep:#17356b; --sd-navy:#13263f;
   --sd-line:#e4ebf3; --sd-chip:#eaf1fb; --sd-chip-line:#cfdff2; --sd-gold:#c79a3e;
   --sd-shadow:0 6px 22px rgba(23,53,107,.10);}
+/* 카테고리 테마 — 콘텐츠 루트(.sd-card)에 sd-theme-* 부여 시 accent 토큰만 교체(홍삼=홍/골드 등). 기본(미부여)=블루. */
+.store-desc-content .sd-theme-red{--sd-blue:#c0392b;--sd-blue-deep:#8c2620;--sd-navy:#6b241c;--sd-chip:#f8ece8;--sd-chip-line:#e8cdc5;--sd-gold:#b8892f}
+@media (prefers-color-scheme:dark){.store-desc-content .sd-theme-red{--sd-blue:#e88a78;--sd-blue-deep:#f2cabf;--sd-navy:#f2d9d2;--sd-chip:#2a1a16;--sd-chip-line:#43291f;--sd-gold:#d8b662}}
+:root[data-theme="dark"] .store-desc-content .sd-theme-red{--sd-blue:#e88a78;--sd-blue-deep:#f2cabf;--sd-navy:#f2d9d2;--sd-chip:#2a1a16;--sd-chip-line:#43291f;--sd-gold:#d8b662}
+:root[data-theme="light"] .store-desc-content .sd-theme-red{--sd-blue:#c0392b;--sd-blue-deep:#8c2620;--sd-navy:#6b241c;--sd-chip:#f8ece8;--sd-chip-line:#e8cdc5;--sd-gold:#b8892f}
+.store-desc-content .sd-theme-green{--sd-blue:#2f8f5b;--sd-blue-deep:#1c5f3b;--sd-navy:#194d31;--sd-chip:#e8f4ec;--sd-chip-line:#cbe6d5;--sd-gold:#b8892f}
+@media (prefers-color-scheme:dark){.store-desc-content .sd-theme-green{--sd-blue:#5cc088;--sd-blue-deep:#bfe9cf;--sd-navy:#d4f0de;--sd-chip:#15241b;--sd-chip-line:#25402f;--sd-gold:#d8b662}}
+:root[data-theme="dark"] .store-desc-content .sd-theme-green{--sd-blue:#5cc088;--sd-blue-deep:#bfe9cf;--sd-navy:#d4f0de;--sd-chip:#15241b;--sd-chip-line:#25402f;--sd-gold:#d8b662}
+:root[data-theme="light"] .store-desc-content .sd-theme-green{--sd-blue:#2f8f5b;--sd-blue-deep:#1c5f3b;--sd-navy:#194d31;--sd-chip:#e8f4ec;--sd-chip-line:#cbe6d5;--sd-gold:#b8892f}
 .store-desc-content *{box-sizing:border-box}
 .store-desc-content .sd-card{max-width:860px;margin:0 auto;background:var(--sd-card);border:1px solid var(--sd-line);border-radius:20px;overflow:hidden;box-shadow:var(--sd-shadow)}
 .store-desc-content .sd-scan{display:block;text-align:center;font-size:12.5px;letter-spacing:.1em;color:var(--sd-sub);margin:0 auto 12px;max-width:860px}

@@ -87,7 +87,8 @@
 - **반응형은 자동** — 렌더러가 `@container` 로 폰 1열 / 태블릿(640px↑) 2열 / (900px↑) 3열. 저자는 구조만.
 - **테마 자동** — 렌더러가 라이트/다크 토큰 제공.
 - **번호·편집 라벨 금지**(R6-c). 소비자 랜딩 카피만. **10단 랜딩** 구조(히어로→왜→핵심 구성→이런 분께→섭취→트러스트→구성→상담).
-- 카테고리색·서체 등 세부 톤도 렌더러 소관 — 저자는 **문구와 구조**에 집중.
+- **카테고리 테마**: 콘텐츠 루트를 `<div class="sd-card sd-theme-red">`처럼 지정하면 렌더러가 accent(홍/골드 등)를 교체한다(general-food §2 "패키지 톤 반영"). 현재 `sd-theme-red`(홍삼·전통보양), `sd-theme-green`(유산균·식물), 미지정=블루(기본). 예제 [examples/hongsam-red-ginseng.semantic.html](examples/hongsam-red-ginseng.semantic.html).
+- 그 외 서체·세부 톤은 렌더러 소관 — 저자는 **문구와 구조**에 집중.
 
 > 디자인 시스템 정의: [packages/content-editor `ContentRenderer.tsx`](../../../../packages/content-editor/src/components/ContentRenderer.tsx) `storeDescriptionCss`. 소비 표면(현재 전환됨): KPA `StoreDescriptionViewModal`, Neture `ProductLandingPage`(QR 모바일). 태블릿 키오스크·다국어 랜딩은 후속 전환(혼재 슬롯 구분 필요).
 
