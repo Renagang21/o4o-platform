@@ -96,6 +96,10 @@
 
 ## 6. 저장 경로 (API)
 
+> ⚠️ **이중게이트(필수) — 자동 저장 금지.** 정책 SSOT [`O4O-STORE-PRODUCT-DESCRIPTION-POLICY-V1`](../O4O-STORE-PRODUCT-DESCRIPTION-POLICY-V1.md) §6.1("승인된 작성·검수 절차를 거쳐 canonical 로 관리") 및 [`O4O-PRODUCT-UNIT-DESCRIPTION-AGENT-GUIDE-V1`](../O4O-PRODUCT-UNIT-DESCRIPTION-AGENT-GUIDE-V1.md)(승인·이중게이트)에 따라:
+> 1. **1차 게이트(내용 확인)** — 한국어 본문을 사람에게 보여주고 확정받는다(§작업순서 4). 확인 없이 저장 API 호출 금지.
+> 2. **2차 게이트(승인 저장)** — 확정된 내용만 아래 저장(canonical 승격)으로 진행한다. 저장은 admin 인증 경로이며, 승인 없이 임의 canonical 저장을 하지 않는다.
+
 **자격증명**: admin `sohae2100@gmail.com`(neture:admin), 비번은 **SSOT([docs/local/TEST-ACCOUNTS.local.md](../../../local/TEST-ACCOUNTS.local.md))에서 런타임 read** — 로그/커밋 노출 금지. host=`o4o-core-api` Cloud Run.
 
 1. 로그인 → `POST /api/v1/auth/login` `{email,password,includeLegacyTokens:true}` → `data.tokens.accessToken`.

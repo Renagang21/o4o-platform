@@ -5,6 +5,7 @@
 > **성격:** 기준 정의 문서. 코드/DB/UI 변경 없음. 후속 제작·정비 WO 는 본 문서를 기준으로 판단한다.
 > **자매 문서:** [`O4O-STORE-PRODUCTION-MATERIAL-CANONICAL-V1`](O4O-STORE-PRODUCTION-MATERIAL-CANONICAL-V1.md) (테이블·경계 정의) — 본 문서는 그 위의 **흐름(flow)** 기준.
 > **근거 조사:** [`IR-O4O-CONTENT-PRODUCTION-EDITOR-TO-TARGET-OUTPUT-FLOW-AUDIT-V1`](../investigations/IR-O4O-CONTENT-PRODUCTION-EDITOR-TO-TARGET-OUTPUT-FLOW-AUDIT-V1.md) · 선행 POP/QR IR — 2026-06-16
+> **상품설명 상품군 정책(SSOT):** [`O4O-STORE-PRODUCT-DESCRIPTION-POLICY-V1`](../guides/products/O4O-STORE-PRODUCT-DESCRIPTION-POLICY-V1.md) — 본 문서의 "공통 제작 골격"은 상품군 분리 **이전** 정의다. **상품설명(STORE)의 상품군별 제작/비제작 범위**(건강기능식품=O4O 제작 · 일반식품=신규중단 · 화장품=공급자 제작 등)는 해당 SSOT를 우선한다.
 
 ---
 
