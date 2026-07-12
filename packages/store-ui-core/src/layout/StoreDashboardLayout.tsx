@@ -10,7 +10,8 @@
  * 사이드바가 문서 흐름에 참여하여 마진 오프셋 불필요.
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Menu } from 'lucide-react';
 import { Outlet } from 'react-router-dom';
 import type { StoreDashboardConfig } from '../config/storeMenuConfig';
 import { StoreTopBar } from '../components/StoreTopBar';
@@ -61,6 +62,22 @@ export function StoreDashboardLayout({
 }: StoreDashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // WO-O4O-STORE-MOBILE-SIDEBAR-DRAWER-CROSSSERVICE-STANDARDIZE-V1:
+  // drawer open 시 ESC close + body scroll lock (표준 §4/§8). open 상태에서만 리스너 등록/해제.
+  useEffect(() => {
+    if (!sidebarOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSidebarOpen(false);
+    };
+    document.addEventListener('keydown', onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [sidebarOpen]);
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-100">
       {/* ──── TopBar (외부 GlobalHeader 사용 시 숨김) ──── */}
@@ -92,6 +109,7 @@ export function StoreDashboardLayout({
 
         {/* Sidebar: fixed drawer on mobile, sticky in-flow on desktop */}
         <aside
+          id="store-work-drawer"
           className={`fixed left-0 z-40 w-64 bg-white shadow-xl transform transition-transform duration-300 lg:sticky lg:z-auto lg:shadow-none lg:border-r lg:border-slate-200 lg:shrink-0 lg:translate-x-0 ${
             hideTopBar
               ? 'top-16 h-[calc(100vh-4rem)] lg:top-16'
@@ -114,6 +132,23 @@ export function StoreDashboardLayout({
           <main className="p-4 md:p-6">
             {/* WO-O4O-STORE-LAYOUT-WIDTH-OVERFLOW-FIX-V1: max-width constraint prevents full-bleed on wide screens */}
             <div className="max-w-[1200px] mx-auto w-full">
+              {/* WO-O4O-STORE-MOBILE-SIDEBAR-DRAWER-CROSSSERVICE-STANDARDIZE-V1:
+                  hideTopBar(외부 GlobalHeader 사용) 모드에서는 StoreTopBar 햄버거가 없어
+                  <1024px 에서 업무 사이드바 진입점이 사라진다. 이를 대체할 업무 메뉴 버튼을
+                  콘텐츠 상단에 자체 렌더(lg:hidden). !hideTopBar 는 StoreTopBar 햄버거가 담당하므로 미표시. */}
+              {hideTopBar && (
+                <button
+                  type="button"
+                  onClick={() => setSidebarOpen(true)}
+                  aria-label="매장 업무 메뉴 열기"
+                  aria-expanded={sidebarOpen}
+                  aria-controls="store-work-drawer"
+                  className="lg:hidden mb-4 inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+                >
+                  <Menu className="w-4 h-4" />
+                  업무 메뉴
+                </button>
+              )}
               {banner}
               <Outlet />
             </div>
