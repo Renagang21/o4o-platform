@@ -161,3 +161,21 @@ export interface TabletScreenResponse {
   sections?: TabletScreenSection[];
   tabletId?: string | null;
 }
+
+/**
+ * content_list section 의 카드(서버 resolve 결과).
+ * WO-O4O-KPA-TABLET-CONTENT-LIST-BLOCK-SCHEMA-CONTRACT-V1 의 /tablet/screen 응답 계약.
+ * 서버가 o4o_product_description / store_content item 을 viewer-ready 카드로 resolve 해 내려준다.
+ * detail.html 은 반드시 ContentRenderer(DOMPurify) 로만 렌더한다(raw innerHTML 금지).
+ */
+export interface TabletContentCard {
+  itemId: string;
+  sourceType: string;
+  sourceBadge: string;
+  title: string;
+  summary?: string;
+  thumbnailUrl?: string | null;
+  hasDetail: boolean;
+  relatedProductName?: string | null;
+  detail?: { html?: string };
+}

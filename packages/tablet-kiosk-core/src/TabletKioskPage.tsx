@@ -61,6 +61,7 @@ import type {
   TabletKioskApi,
   IdlePlaylistItem,
   TabletScreenResponse,
+  TabletContentCard,
 } from './types';
 // WO-O4O-KPA-TABLET-CORNER-IDLE-YOUTUBE-VIMEO-AUTO-RETURN-V1: idle 대기화면 YouTube/Vimeo embed.
 import { toIdleEmbedUrl } from './idleMedia';
@@ -355,6 +356,11 @@ export function TabletKioskPage({
   useEffect(() => {
     setDetailLocale(null);
   }, [selectedProduct?.id]);
+
+  // WO-O4O-KPA-TABLET-CONTENT-LIST-BLOCK-RUNTIME-V1:
+  //   content_list 카드 상세(모달). product detail(reducer) 와 독립 — 콘텐츠 카드는 상품이 아니므로
+  //   기존 상품 상세 흐름을 건드리지 않고 경량 오버레이로 표시. detail.html 은 ContentRenderer 로만 렌더.
+  const [openContentCard, setOpenContentCard] = useState<TabletContentCard | null>(null);
   const autoSlideSeconds = displaySettings?.autoSlideSeconds ?? 0;
 
   useEffect(() => {
@@ -415,6 +421,13 @@ export function TabletKioskPage({
   const screenIdleItems = (() => {
     const items = (screenSections.find((x) => x.blockType === 'idle_media')?.data as any)?.items;
     return Array.isArray(items) ? (items as IdlePlaylistItem[]) : null;
+  })();
+  // WO-O4O-KPA-TABLET-CONTENT-LIST-BLOCK-RUNTIME-V1:
+  //   서버(/tablet/screen)가 resolve 한 content_list 카드. o4o 표준 설명서/매장 제작 콘텐츠를
+  //   상품 record 없이도 코너 콘텐츠 카드로 노출. viewer 는 서버 카드 data 만 소비(재조회 없음).
+  const contentCards = (() => {
+    const items = (screenSections.find((x) => x.blockType === 'content_list')?.data as any)?.items;
+    return Array.isArray(items) ? (items as TabletContentCard[]) : [];
   })();
 
   // WO-O4O-KPA-TABLET-SCREEN-SET-TEMPLATE-APPLY-V1:
@@ -789,14 +802,50 @@ export function TabletKioskPage({
         </div>
       )}
 
+      {/* WO-O4O-KPA-TABLET-CONTENT-LIST-BLOCK-RUNTIME-V1: content_list 카드 섹션(§5.1·§5.3).
+          product_list(상품 record)와 분리된 "코너 콘텐츠" 카드 목록. 서버 resolve 카드만 소비.
+          items 있을 때만 렌더 → 상품 0건이어도 화면이 실사용 가능(§5.4). 상세는 하단 모달(ContentRenderer). */}
+      {contentCards.length > 0 && (
+        <div style={styles.contentListSection}>
+          <span style={styles.contentListLabel}>코너 콘텐츠</span>
+          <div style={styles.contentGrid}>
+            {contentCards.map((c) => {
+              const clickable = c.hasDetail && !!c.detail?.html;
+              return (
+                <div
+                  key={c.itemId}
+                  onClick={clickable ? () => setOpenContentCard(c) : undefined}
+                  style={clickable ? styles.contentCard : { ...styles.contentCard, cursor: 'default' }}
+                >
+                  {c.thumbnailUrl && (
+                    <div style={styles.contentThumbArea}>
+                      <img src={c.thumbnailUrl} alt="" style={styles.productImg} />
+                    </div>
+                  )}
+                  <div style={styles.contentCardBody}>
+                    <span style={styles.contentBadge}>{c.sourceBadge}</span>
+                    <span style={styles.contentCardTitle}>{c.title}</span>
+                    {c.summary && <span style={styles.contentCardSummary}>{c.summary}</span>}
+                    {c.relatedProductName && <span style={styles.contentCardRelated}>{c.relatedProductName}</span>}
+                    {clickable && <span style={styles.contentCardMore}>자세히 보기 ›</span>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       <div style={styles.body}>
         {loading ? (
           <div style={styles.centerMessage}>
             <p style={{ color: '#94a3b8' }}>상품을 불러오는 중...</p>
           </div>
         ) : products.length === 0 ? (
-          // WO-O4O-KPA-TABLET-TEMPLATE-USABILITY-REFINE-V1(§5.5):
-          //   빈 화면 한 줄 → 카드형 empty state. 상품이 실제로 들어가면(products.length>0) 렌더되지 않음.
+          // WO-O4O-KPA-TABLET-TEMPLATE-USABILITY-REFINE-V1(§5.5) / -CONTENT-LIST-BLOCK-RUNTIME-V1(§5.4):
+          //   빈 화면 한 줄 → 카드형 empty state. 단, content_list 카드가 있으면 이미 화면이 차므로
+          //   상품 empty state 를 표시하지 않는다(과도한 빈 강조 방지).
+          contentCards.length > 0 ? null : (
           <div style={styles.emptyWrap}>
             <div style={styles.emptyCard}>
               <div style={styles.emptyIcon} aria-hidden>🗂️</div>
@@ -804,6 +853,7 @@ export function TabletKioskPage({
               <p style={styles.emptyDesc}>코너 안내를 확인하시고, 필요한 제품은 직원에게 문의해 주세요.</p>
             </div>
           </div>
+          )
         ) : (
           <div style={isProductFocus ? styles.gridFocus : styles.grid}>
             {products.map((p, idx) => {
@@ -850,6 +900,31 @@ export function TabletKioskPage({
             <span style={styles.qrCardDesc}>QR을 스캔하면 이 코너 안내를 모바일에서도 확인할 수 있습니다.</span>
           </div>
           {shortHost(qrGuide.url) && <span style={styles.qrCardDomain}>{shortHost(qrGuide.url)}</span>}
+        </div>
+      )}
+
+      {/* WO-O4O-KPA-TABLET-CONTENT-LIST-BLOCK-RUNTIME-V1: content_list 카드 상세(모달).
+          detail.html 은 ContentRenderer(DOMPurify)로만 렌더 — raw innerHTML 금지. */}
+      {openContentCard && (
+        <div style={styles.contentModalOverlay} onClick={() => setOpenContentCard(null)} role="presentation">
+          <div style={styles.contentModal} onClick={(e) => e.stopPropagation()}>
+            <div style={styles.contentModalHeader}>
+              <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '4px', minWidth: 0 }}>
+                <span style={styles.contentBadge}>{openContentCard.sourceBadge}</span>
+                <h2 style={styles.contentModalTitle}>{openContentCard.title}</h2>
+                {openContentCard.relatedProductName && (
+                  <span style={styles.contentCardRelated}>{openContentCard.relatedProductName}</span>
+                )}
+              </div>
+              <button onClick={() => setOpenContentCard(null)} style={styles.contentModalClose} aria-label="닫기">✕</button>
+            </div>
+            <div style={styles.contentModalBody}>
+              <ContentRenderer
+                html={openContentCard.detail?.html ?? ''}
+                style={{ fontSize: '15px', color: '#334155', lineHeight: 1.65 }}
+              />
+            </div>
+          </div>
         </div>
       )}
     </div>
@@ -1345,6 +1420,136 @@ const styles: Record<string, React.CSSProperties> = {
     margin: 0,
     wordBreak: 'keep-all',
     overflowWrap: 'break-word',
+  },
+  // WO-O4O-KPA-TABLET-CONTENT-LIST-BLOCK-RUNTIME-V1: content_list 카드 섹션 + 상세 모달.
+  contentListSection: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+    padding: 'clamp(12px, 2vw, 18px) clamp(16px, 3vw, 28px)',
+    backgroundColor: '#fff',
+    borderBottom: '1px solid #e2e8f0',
+    flexShrink: 0,
+    maxHeight: '48vh',
+    overflowY: 'auto',
+  },
+  contentListLabel: {
+    fontSize: '11px',
+    fontWeight: 700,
+    letterSpacing: '0.04em',
+    color: '#94a3b8',
+  },
+  contentGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(min(240px, 100%), 1fr))',
+    gap: '12px',
+  },
+  contentCard: {
+    display: 'flex',
+    flexDirection: 'column',
+    backgroundColor: '#fff',
+    borderRadius: '12px',
+    border: '2px solid #e2e8f0',
+    cursor: 'pointer',
+    overflow: 'hidden',
+  },
+  contentThumbArea: {
+    height: '120px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f8fafc',
+  },
+  contentCardBody: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '4px',
+    padding: '12px 14px',
+  },
+  contentBadge: {
+    alignSelf: 'flex-start',
+    fontSize: '11px',
+    fontWeight: 700,
+    color: '#1d4ed8',
+    backgroundColor: '#eff6ff',
+    borderRadius: '4px',
+    padding: '2px 8px',
+  },
+  contentCardTitle: {
+    fontSize: 'clamp(14px, 1.6vw, 16px)',
+    fontWeight: 700,
+    color: '#0f172a',
+    wordBreak: 'keep-all',
+    overflowWrap: 'break-word',
+  },
+  contentCardSummary: {
+    fontSize: 'clamp(12px, 1.4vw, 13px)',
+    color: '#64748b',
+    lineHeight: 1.5,
+    wordBreak: 'keep-all',
+    overflowWrap: 'break-word',
+  },
+  contentCardRelated: {
+    fontSize: '12px',
+    color: '#94a3b8',
+  },
+  contentCardMore: {
+    fontSize: '13px',
+    fontWeight: 600,
+    color: '#2563eb',
+    marginTop: '2px',
+  },
+  contentModalOverlay: {
+    position: 'fixed',
+    inset: 0,
+    backgroundColor: 'rgba(15,23,42,0.55)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '24px',
+    zIndex: 900,
+  },
+  contentModal: {
+    display: 'flex',
+    flexDirection: 'column',
+    width: '100%',
+    maxWidth: '640px',
+    maxHeight: '86vh',
+    backgroundColor: '#fff',
+    borderRadius: '16px',
+    overflow: 'hidden',
+  },
+  contentModalHeader: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: '12px',
+    padding: '18px 20px',
+    borderBottom: '1px solid #e2e8f0',
+    flexShrink: 0,
+  },
+  contentModalTitle: {
+    fontSize: '20px',
+    fontWeight: 700,
+    margin: 0,
+    color: '#0f172a',
+    wordBreak: 'keep-all',
+    overflowWrap: 'break-word',
+  },
+  contentModalClose: {
+    flexShrink: 0,
+    width: '40px',
+    height: '40px',
+    borderRadius: '10px',
+    border: '1px solid #e2e8f0',
+    backgroundColor: '#fff',
+    color: '#334155',
+    fontSize: '16px',
+    cursor: 'pointer',
+  },
+  contentModalBody: {
+    padding: '20px',
+    overflowY: 'auto',
   },
   // Idle overlay (WO-O4O-TABLET-IDLE-LAYER-V1)
   idleOverlay: {

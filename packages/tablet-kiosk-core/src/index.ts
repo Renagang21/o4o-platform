@@ -24,4 +24,6 @@ export type {
   // WO-O4O-KPA-TABLET-KIOSK-CORE-SCREEN-CONSUMER-V1
   TabletScreenResponse,
   TabletScreenSection,
+  // WO-O4O-KPA-TABLET-CONTENT-LIST-BLOCK-RUNTIME-V1
+  TabletContentCard,
 } from './types';
