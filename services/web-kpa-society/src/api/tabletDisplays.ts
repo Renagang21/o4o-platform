@@ -182,7 +182,30 @@ export async function fetchTablets(): Promise<Tablet[]> {
 export type ScreenSetStatus = 'draft' | 'active' | 'archived' | 'operator_template';
 export type ScreenBlockType =
   | 'idle_media' | 'product_list' | 'product_content'
-  | 'corner_description' | 'health_info' | 'staff_inquiry' | 'qr_guide';
+  | 'corner_description' | 'health_info' | 'staff_inquiry' | 'qr_guide'
+  // WO-O4O-KPA-TABLET-CONTENT-LIST-PICKER-UI-V1: 코너 콘텐츠 카드 목록
+  | 'content_list';
+
+// ── content_list picker (WO-O4O-KPA-TABLET-CONTENT-LIST-PICKER-UI-V1) ──
+export interface StoreContentSearchResult {
+  contentId: string;
+  title: string;
+  sourceType: string;
+  workspaceStatus: string;
+  summary: string | null;
+  hasProductLink: boolean;
+}
+export interface O4oDescriptionSearchResult {
+  masterId: string;
+  name: string;
+  barcode: string | null;
+  summary: string | null;
+  languages: string[];
+}
+/** content_list item(저장 config) — 계약: masterId+language(o4o) / contentId(store) */
+export type ContentListItem =
+  | { sourceType: 'o4o_product_description'; masterId: string; language: string; displayTitle: string | null; displaySummary: string | null; visible: boolean; sortOrder: number }
+  | { sourceType: 'store_content'; contentId: string; displayTitle: string | null; displaySummary: string | null; visible: boolean; sortOrder: number };
 
 export interface ScreenSet {
   id: string;
@@ -258,6 +281,20 @@ export async function saveScreenSetBlocks(id: string, blocks: ScreenBlock[]): Pr
       blocks: blocks.map((b, i) => ({ blockType: b.blockType, sortOrder: i, isEnabled: b.isEnabled, config: b.config })),
     }),
   });
+  return res.data;
+}
+
+// WO-O4O-KPA-TABLET-CONTENT-LIST-PICKER-UI-V1: content_list picker 검색(read-only).
+export async function searchTabletStoreContents(q: string): Promise<StoreContentSearchResult[]> {
+  const res = await request<{ success: boolean; data: StoreContentSearchResult[] }>(
+    `${BASE}/tablet-content-sources/store-contents?q=${encodeURIComponent(q)}`,
+  );
+  return res.data;
+}
+export async function searchTabletO4oDescriptions(q: string): Promise<O4oDescriptionSearchResult[]> {
+  const res = await request<{ success: boolean; data: O4oDescriptionSearchResult[] }>(
+    `${BASE}/tablet-content-sources/o4o-descriptions?q=${encodeURIComponent(q)}`,
+  );
   return res.data;
 }
 

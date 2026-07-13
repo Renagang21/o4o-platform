@@ -1353,6 +1353,63 @@ export function createStoreTabletRoutes(
     }
   }));
 
+  // ── content_list picker 검색 (read-only) — WO-O4O-KPA-TABLET-CONTENT-LIST-PICKER-UI-V1 ──
+  //   편집기에서 content_list item(콘텐츠 카드)을 고르기 위한 검색 전용 엔드포인트.
+  //   저장/복사/생성 없음. store-contents = 매장 org 스코프, o4o-descriptions = STORE canonical 공용.
+
+  // GET /tablet-content-sources/store-contents?q= — 매장 제작 콘텐츠 검색(org 스코프)
+  router.get('/tablet-content-sources/store-contents', withStoreAuth(async (req, res, organizationId) => {
+    try {
+      const q = typeof req.query.q === 'string' ? req.query.q.trim() : '';
+      const params: any[] = [organizationId];
+      let where = `c.organization_id = $1 AND c.workspace_status <> 'archived'`;
+      if (q) { params.push(`%${q}%`); where += ` AND c.title ILIKE $${params.length}`; }
+      const rows = await dataSource.query(
+        `SELECT c.id AS "contentId", c.title, c.source_type AS "sourceType",
+                c.workspace_status AS "workspaceStatus",
+                (c.content_json->>'summary') AS summary,
+                EXISTS(SELECT 1 FROM kpa_store_content_product_links l WHERE l.content_id = c.id) AS "hasProductLink"
+           FROM kpa_store_contents c
+          WHERE ${where}
+          ORDER BY c.updated_at DESC
+          LIMIT 30`,
+        params,
+      );
+      res.json({ success: true, data: rows });
+    } catch (error: any) {
+      console.error('[StoreTablet] GET /tablet-content-sources/store-contents error:', error);
+      res.status(500).json({ success: false, error: 'Failed to search store contents', code: 'INTERNAL_ERROR' });
+    }
+  }));
+
+  // GET /tablet-content-sources/o4o-descriptions?q= — O4O 표준 설명서(STORE canonical) 검색
+  //   STORE canonical 은 플랫폼 공용 소비자 표준 콘텐츠 → org 게이트 없음(설계 §10). auth 는 store owner.
+  router.get('/tablet-content-sources/o4o-descriptions', withStoreAuth(async (req, res, _organizationId) => {
+    try {
+      const q = typeof req.query.q === 'string' ? req.query.q.trim() : '';
+      if (q.length < 2) { res.json({ success: true, data: [] }); return; }
+      const rows = await dataSource.query(
+        `SELECT pm.id AS "masterId", pm.name, pm.barcode,
+                (SELECT d.summary FROM shared_product_descriptions d
+                  WHERE d.master_id = pm.id AND d.description_type = 'STORE' AND d.status = 'canonical' AND d.deleted_at IS NULL
+                  ORDER BY (d.language = 'ko') DESC, d.updated_at DESC LIMIT 1) AS summary,
+                ARRAY(SELECT DISTINCT d.language FROM shared_product_descriptions d
+                       WHERE d.master_id = pm.id AND d.description_type = 'STORE' AND d.status = 'canonical' AND d.deleted_at IS NULL) AS languages
+           FROM product_masters pm
+          WHERE EXISTS(SELECT 1 FROM shared_product_descriptions d
+                        WHERE d.master_id = pm.id AND d.description_type = 'STORE' AND d.status = 'canonical' AND d.deleted_at IS NULL)
+            AND (pm.name ILIKE $1 OR pm.barcode = $2)
+          ORDER BY pm.name ASC
+          LIMIT 30`,
+        [`%${q}%`, q],
+      );
+      res.json({ success: true, data: rows });
+    } catch (error: any) {
+      console.error('[StoreTablet] GET /tablet-content-sources/o4o-descriptions error:', error);
+      res.status(500).json({ success: false, error: 'Failed to search o4o descriptions', code: 'INTERNAL_ERROR' });
+    }
+  }));
+
   // POST /tablets/:id/current-screen-set — current 적용 (public runtime 미반영 — 값만 저장)
   router.post('/tablets/:id/current-screen-set', withStoreAuth(async (req, res, organizationId) => {
     try {

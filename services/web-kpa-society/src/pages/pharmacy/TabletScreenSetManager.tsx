@@ -12,7 +12,10 @@ import { Loader2, Plus, ChevronUp, ChevronDown, X, Save, Layers, AlertTriangle, 
 import {
   fetchScreenSets, fetchScreenSet, createScreenSet, updateScreenSet,
   archiveScreenSet, saveScreenSetBlocks, applyCurrentScreenSet, clearCurrentScreenSet,
+  // WO-O4O-KPA-TABLET-CONTENT-LIST-PICKER-UI-V1
+  searchTabletStoreContents, searchTabletO4oDescriptions,
   type ScreenSet, type ScreenSetDetail, type ScreenBlock, type ScreenBlockType, type ScreenSetStatus,
+  type ContentListItem, type StoreContentSearchResult, type O4oDescriptionSearchResult,
 } from '../../api/tabletDisplays';
 
 type Toast = { type: 'success' | 'error'; message: string };
@@ -29,7 +32,9 @@ const BLOCK_TYPES: { value: ScreenBlockType; label: string }[] = [
   { value: 'corner_description', label: '코너 설명' },
   { value: 'health_info', label: '건강정보' },
   { value: 'product_list', label: '제품 목록' },
-  { value: 'product_content', label: '제품 콘텐츠' },
+  // WO-O4O-KPA-TABLET-CONTENT-LIST-PICKER-UI-V1: 신규 콘텐츠 카드 목록(product_content 는 deprecated).
+  { value: 'content_list', label: '코너 콘텐츠 목록' },
+  { value: 'product_content', label: '제품 콘텐츠 (구)' },
   { value: 'staff_inquiry', label: '직원 문의' },
   { value: 'qr_guide', label: 'QR 안내' },
 ];
@@ -78,6 +83,7 @@ function defaultConfig(type: ScreenBlockType): Record<string, unknown> {
     case 'staff_inquiry': return { message: '' };
     case 'qr_guide': return { label: '', url: '' };
     case 'product_list': return { source: 'legacy_tablet_displays' };
+    case 'content_list': return { items: [] };
     default: return {};
   }
 }
@@ -513,10 +519,164 @@ function BlockConfigForm({ block, onPatch, onReplaceConfig }: {
       );
     case 'product_list':
       return <p className="text-[11px] text-slate-500">이 코너에 진열된 제품 목록을 그대로 사용합니다. 별도 설정은 없으며, 진열된 제품이 없으면 목록이 비어 보입니다.</p>;
+    case 'content_list':
+      // WO-O4O-KPA-TABLET-CONTENT-LIST-PICKER-UI-V1: raw JSON 대신 picker 기반 편집.
+      return (
+        <ContentListEditor
+          items={Array.isArray(c.items) ? (c.items as ContentListItem[]) : []}
+          onChange={(items) => onReplaceConfig({ items })}
+        />
+      );
     case 'product_content':
     default:
       return <JsonConfig config={block.config} onReplaceConfig={onReplaceConfig} />;
   }
+}
+
+// ── content_list 편집기 (WO-O4O-KPA-TABLET-CONTENT-LIST-PICKER-UI-V1) ──
+//   raw JSON 없이 O4O 표준 설명서 / 매장 제작 콘텐츠를 골라 카드 목록을 구성.
+//   저장 config shape 는 서버 계약(parseContentListConfig)과 동일.
+function ContentListEditor({ items, onChange }: { items: ContentListItem[]; onChange: (items: ContentListItem[]) => void }) {
+  const [picking, setPicking] = useState(false);
+  const badge = (t: string) => (t === 'o4o_product_description' ? 'O4O 표준' : '매장 제작');
+  const upd = (i: number, patch: Partial<ContentListItem>) =>
+    onChange(items.map((it, idx) => (idx === i ? ({ ...it, ...patch } as ContentListItem) : it)));
+  const move = (i: number, dir: 'up' | 'down') => {
+    const t = dir === 'up' ? i - 1 : i + 1;
+    if (t < 0 || t >= items.length) return;
+    const next = [...items];
+    [next[i], next[t]] = [next[t], next[i]];
+    onChange(next.map((it, idx) => ({ ...it, sortOrder: idx * 10 } as ContentListItem)));
+  };
+  const remove = (i: number) => onChange(items.filter((_, idx) => idx !== i).map((it, idx) => ({ ...it, sortOrder: idx * 10 } as ContentListItem)));
+  const add = (added: ContentListItem[]) => {
+    // 중복(같은 masterId+language / contentId) 제외 후 append
+    const key = (it: ContentListItem) => (it.sourceType === 'o4o_product_description' ? `o4o:${it.masterId}:${it.language}` : `store:${it.contentId}`);
+    const seen = new Set(items.map(key));
+    const fresh = added.filter((it) => !seen.has(key(it)));
+    onChange([...items, ...fresh].map((it, idx) => ({ ...it, sortOrder: idx * 10 } as ContentListItem)));
+    setPicking(false);
+  };
+  return (
+    <div className="space-y-2">
+      <p className="text-[11px] text-slate-500">O4O 표준 설명서와 매장 제작 콘텐츠를 코너 카드로 표시합니다.</p>
+      {items.length === 0 && <div className="text-[11px] text-slate-400">선택된 콘텐츠가 없습니다. 아래 ‘콘텐츠 추가’로 골라 주세요.</div>}
+      {items.map((it, i) => {
+        const label = it.sourceType === 'o4o_product_description' ? `상품ID ${it.masterId.slice(0, 8)}… (${it.language})` : `콘텐츠 ${it.contentId.slice(0, 8)}…`;
+        return (
+          <div key={key2(it)} className="border border-slate-200 rounded-lg p-2 bg-white space-y-1.5">
+            <div className="flex items-center gap-2">
+              <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${it.sourceType === 'o4o_product_description' ? 'text-blue-700 bg-blue-50' : 'text-emerald-700 bg-emerald-50'}`}>{badge(it.sourceType)}</span>
+              <span className="text-[11px] text-slate-500 flex-1 truncate">{label}</span>
+              <label className="text-[10px] text-slate-500 flex items-center gap-1">
+                <input type="checkbox" checked={it.visible} onChange={() => upd(i, { visible: !it.visible })} className="rounded border-slate-300 text-indigo-600" /> 표시
+              </label>
+              <button onClick={() => move(i, 'up')} disabled={i === 0} className="p-0.5 rounded hover:bg-slate-100 disabled:opacity-30"><ChevronUp className="w-3.5 h-3.5" /></button>
+              <button onClick={() => move(i, 'down')} disabled={i === items.length - 1} className="p-0.5 rounded hover:bg-slate-100 disabled:opacity-30"><ChevronDown className="w-3.5 h-3.5" /></button>
+              <button onClick={() => remove(i)} className="p-0.5 rounded text-slate-400 hover:text-red-600 hover:bg-red-50"><X className="w-3.5 h-3.5" /></button>
+            </div>
+            <input value={it.displayTitle ?? ''} onChange={(e) => upd(i, { displayTitle: e.target.value.trim() ? e.target.value : null })} placeholder="제목 재정의 (비우면 원본)" className="w-full px-2 py-1 rounded border border-slate-200 text-[11px]" />
+            <input value={it.displaySummary ?? ''} onChange={(e) => upd(i, { displaySummary: e.target.value.trim() ? e.target.value : null })} placeholder="요약 재정의 (비우면 원본)" className="w-full px-2 py-1 rounded border border-slate-200 text-[11px]" />
+          </div>
+        );
+      })}
+      <button onClick={() => setPicking(true)} className="px-2.5 py-1.5 text-[11px] font-medium text-indigo-700 bg-white border border-indigo-200 rounded-lg hover:bg-indigo-50 inline-flex items-center gap-1">
+        <Plus className="w-3.5 h-3.5" /> 콘텐츠 추가
+      </button>
+      {picking && <ContentPickerModal onClose={() => setPicking(false)} onAdd={add} baseSort={items.length * 10} />}
+    </div>
+  );
+}
+const key2 = (it: ContentListItem) => (it.sourceType === 'o4o_product_description' ? `o4o:${it.masterId}:${it.language}` : `store:${it.contentId}`);
+
+// content 선택 모달 — 출처 탭(O4O 표준 / 매장 제작) + 검색 + 결과 추가.
+function ContentPickerModal({ onClose, onAdd, baseSort }: { onClose: () => void; onAdd: (items: ContentListItem[]) => void; baseSort: number }) {
+  const [tab, setTab] = useState<'o4o' | 'store'>('o4o');
+  const [q, setQ] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [o4o, setO4o] = useState<O4oDescriptionSearchResult[]>([]);
+  const [store, setStore] = useState<StoreContentSearchResult[]>([]);
+  const [selO4o, setSelO4o] = useState<Record<string, boolean>>({});
+  const [selStore, setSelStore] = useState<Record<string, boolean>>({});
+
+  const run = useCallback(async () => {
+    setLoading(true);
+    try {
+      if (tab === 'o4o') setO4o(await searchTabletO4oDescriptions(q));
+      else setStore(await searchTabletStoreContents(q));
+    } catch { /* 검색 실패는 빈 목록으로 */ if (tab === 'o4o') setO4o([]); else setStore([]); }
+    finally { setLoading(false); }
+  }, [tab, q]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { run(); }, [tab]); // 탭 전환 시 자동 검색(매장 제작은 q 없이 최근순)
+
+  const confirm = () => {
+    const out: ContentListItem[] = [];
+    let n = baseSort;
+    o4o.filter((r) => selO4o[r.masterId]).forEach((r) => {
+      out.push({ sourceType: 'o4o_product_description', masterId: r.masterId, language: 'ko', displayTitle: null, displaySummary: null, visible: true, sortOrder: (n += 10) });
+    });
+    store.filter((r) => selStore[r.contentId]).forEach((r) => {
+      out.push({ sourceType: 'store_content', contentId: r.contentId, displayTitle: null, displaySummary: null, visible: true, sortOrder: (n += 10) });
+    });
+    onAdd(out);
+  };
+  const selectedCount = Object.values(selO4o).filter(Boolean).length + Object.values(selStore).filter(Boolean).length;
+
+  return (
+    <div className="fixed inset-0 z-[950] bg-slate-900/50 flex items-center justify-center p-4" onClick={onClose} role="presentation">
+      <div className="bg-white rounded-2xl w-full max-w-lg max-h-[86vh] flex flex-col overflow-hidden" onClick={(e) => e.stopPropagation()}>
+        <div className="px-4 py-3 border-b flex items-center justify-between">
+          <h4 className="text-sm font-bold text-slate-700">콘텐츠 추가</h4>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-600"><X className="w-4 h-4" /></button>
+        </div>
+        <div className="px-4 pt-3 flex gap-2">
+          <button onClick={() => setTab('o4o')} className={`px-3 py-1.5 text-xs font-medium rounded-lg ${tab === 'o4o' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600'}`}>O4O 표준 설명서</button>
+          <button onClick={() => setTab('store')} className={`px-3 py-1.5 text-xs font-medium rounded-lg ${tab === 'store' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600'}`}>매장 제작 콘텐츠</button>
+        </div>
+        <div className="px-4 py-2 flex gap-2">
+          <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && run()}
+            placeholder={tab === 'o4o' ? '상품명 · 바코드 (2자 이상)' : '콘텐츠 제목 (비우면 최근순)'}
+            className="flex-1 px-3 py-2 rounded-lg border border-slate-200 text-sm" autoFocus />
+          <button onClick={run} className="px-3 py-2 text-xs font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700">검색</button>
+        </div>
+        <div className="flex-1 overflow-y-auto px-4 pb-2 space-y-1.5">
+          {loading ? (
+            <div className="flex items-center gap-2 text-sm text-slate-400 py-4"><Loader2 className="w-4 h-4 animate-spin" /> 검색 중…</div>
+          ) : tab === 'o4o' ? (
+            o4o.length === 0 ? <div className="text-xs text-slate-400 py-4">검색 결과가 없습니다. (STORE 표준 설명서가 있는 상품만 표시됩니다)</div> :
+            o4o.map((r) => (
+              <label key={r.masterId} className="flex items-start gap-2 p-2 rounded-lg border border-slate-100 hover:bg-slate-50 cursor-pointer">
+                <input type="checkbox" checked={!!selO4o[r.masterId]} onChange={(e) => setSelO4o((s) => ({ ...s, [r.masterId]: e.target.checked }))} className="mt-0.5 rounded border-slate-300 text-indigo-600" />
+                <div className="min-w-0">
+                  <div className="text-sm text-slate-800 truncate">{r.name}</div>
+                  <div className="text-[11px] text-slate-400 truncate">{r.barcode ? `${r.barcode} · ` : ''}{(r.summary || '').slice(0, 40) || 'STORE 표준 설명서'} · 언어 {(r.languages || []).join(',') || 'ko'}</div>
+                </div>
+              </label>
+            ))
+          ) : (
+            store.length === 0 ? <div className="text-xs text-slate-400 py-4">매장 제작 콘텐츠가 없습니다.</div> :
+            store.map((r) => (
+              <label key={r.contentId} className="flex items-start gap-2 p-2 rounded-lg border border-slate-100 hover:bg-slate-50 cursor-pointer">
+                <input type="checkbox" checked={!!selStore[r.contentId]} onChange={(e) => setSelStore((s) => ({ ...s, [r.contentId]: e.target.checked }))} className="mt-0.5 rounded border-slate-300 text-indigo-600" />
+                <div className="min-w-0">
+                  <div className="text-sm text-slate-800 truncate">{r.title || '(제목 없음)'}</div>
+                  <div className="text-[11px] text-slate-400 truncate">{r.hasProductLink ? '상품 연결 · ' : '일반 콘텐츠 · '}{r.workspaceStatus}{r.summary ? ` · ${r.summary.slice(0, 30)}` : ''}</div>
+                </div>
+              </label>
+            ))
+          )}
+        </div>
+        <div className="px-4 py-3 border-t flex items-center justify-between">
+          <span className="text-[11px] text-slate-400">{selectedCount}개 선택</span>
+          <div className="flex gap-2">
+            <button onClick={onClose} className="px-3 py-1.5 text-xs font-medium text-slate-600 bg-white border border-slate-200 rounded-lg">취소</button>
+            <button onClick={confirm} disabled={selectedCount === 0} className="px-3 py-1.5 text-xs font-medium text-white bg-indigo-600 rounded-lg disabled:opacity-50">추가</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function CustomMediaItems({ items, onChange }: { items: any[]; onChange: (items: any[]) => void }) {
