@@ -70,7 +70,19 @@ WO 전제(“태블릿 화면 제작 진입점이 없음 → 메뉴 추가”)�
 | typecheck (web-kpa-society `tsc --noEmit`) | ✅ EXIT 0 |
 | 다른 소비처 라벨 하드코딩 없음(grep) | ✅ |
 | GP/KCos config 무영향 | ✅ |
-| 브라우저 smoke (메뉴 노출/클릭 이동) | ⏳ 배포 후 prod 검증 |
+| 배포 | ✅ web deploy run 29231020890 **success** (커밋 028af6014) |
+| 코드 반영 확인 | ✅ KPA 블록(storeMenuConfig.ts:302) label `태블릿 화면 제작`, subPath `/commerce/tablet-displays` 불변. 구 `태블릿`(:142)은 별도 서비스 변형 블록(KPA 무관) |
+| 브라우저 smoke (메뉴 노출/클릭 이동) | ⏸ **Deferred** — 매장 사이드 메뉴는 로그인 후 노출. `/store/commerce/tablet-displays` 접속 시 `/login` 리다이렉트(매장 세션 없음), 자동 로그인/토큰 입력 금지 정책 → 인증 세션에서 후속 확인 |
+
+### 6.1 배포 후 prod smoke (2026-07-13)
+- 배포: `Deploy Web Services` run **29231020890 success**(028af6014). storeMenuConfig 변경 반영.
+- 코드 정합: KPA 블록만 `태블릿 화면 제작`(route/key/기능 불변), GP/KCos 무영향.
+- **라이브 메뉴 클릭 검증은 Deferred**: 매장 관리 영역은 로그인 게이트(`/login` 리다이렉트). 정책상 프로덕션 자동 로그인/체험계정 클릭을 하지 않음. 인증(매장 경영자) 세션에서 아래를 확인 권장:
+  1. 메뉴에 `태블릿 화면 제작` 라벨 노출
+  2. 클릭 → `/store/commerce/tablet-displays` 이동
+  3. 구강/피부 코너 표시
+  4. 공개 URL/미리보기 버튼 정상
+  5. console error 0(태블릿 무관 auth noise 제외)
 
 ## 7. 변경 파일
 
@@ -91,4 +103,4 @@ docs/checks/CHECK-O4O-KPA-TABLET-SCREEN-MAKER-MENU-ENTRY-V1.md   (신규)
 
 ---
 
-*진입점은 이미 존재(KPA `타블렛 구성`). 부재가 아닌 라벨 명확성 문제 → `태블릿 화면 제작`으로 라벨만 정비(KPA 블록 한정, route/기능 무변경). 신규 메뉴 추가 안 함(중복 방지). typecheck PASS. 브라우저 smoke=배포 후 prod.*
+*진입점은 이미 존재(KPA `타블렛 구성`). 부재가 아닌 라벨 명확성 문제 → `태블릿 화면 제작`으로 라벨만 정비(KPA 블록 한정, route/기능 무변경). 신규 메뉴 추가 안 함(중복 방지). typecheck PASS. 배포 success(run 29231020890). 라이브 메뉴 클릭 smoke=Deferred(매장 /login·자동 로그인 금지) → 인증 세션 후속.*
