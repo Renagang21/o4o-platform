@@ -13,9 +13,9 @@
 
 ## 2. 스케줄러 방식
 
-- **기존 프로젝트 표준(in-app setInterval job) 채택** — `jobs/cleanupLoginAttempts.ts` 와 동일 패턴. **신규 GCP 인프라(Cloud Scheduler / Cloud Run Job) 도입 없음**(WO §6.2 "기존 표준이 있으면 그 표준을 따른다").
-- 조사 결과: server 부팅 시 `.start()` 로 등록되는 스케줄 job 은 setInterval 기반이 유일한 표준(cleanupLoginAttemptsJob). node-cron/cron 패키지는 존재하나 등록된 스케줄 job 에는 미사용.
-- 신규 `jobs/spd-revision-expiry.job.ts` (`SpdRevisionExpiryJob`, 싱글톤 `spdRevisionExpiryJob`) → `server.ts` startServer() 에서 DB init 후 `.start()`.
+- **기존 프로덕션 job 표준(in-app setInterval job) 채택** — `jobs/market-trial-lifecycle.job.ts` + `services/startup.service.ts` 등록과 동일 패턴. **신규 GCP 인프라(Cloud Scheduler / Cloud Run Job) 도입 없음**(WO §6.2).
+- **엔트리포인트 검증(중요)**: prod 엔트리는 `dist/main.js`(=`src/main.ts`) → `startupService.initialize()`. `src/server.ts` 는 **prod 미사용**(dead) — 최초 server.ts 에 등록했다가 배포 후 부팅 로그 부재로 발견, **`services/startup.service.ts` 로 이전**(marketTrialLifecycleJob 옆). shutdown() 에 `.stop()` 도 등록.
+- 신규 `jobs/spd-revision-expiry.job.ts` (`SpdRevisionExpiryJob`, 싱글톤). node-cron/cron 패키지는 존재하나 등록된 스케줄 job 은 setInterval 표준.
 
 ## 3. 실행 주기
 
@@ -71,7 +71,7 @@ AND deleted_at IS NULL
 ## 14. 변경 파일 목록
 
 - `apps/api-server/src/jobs/spd-revision-expiry.job.ts` — 신규 스케줄 job
-- `apps/api-server/src/server.ts` — startServer() 에 `spdRevisionExpiryJob.start()` 등록
+- `apps/api-server/src/services/startup.service.ts` — initialize() `.start()` + shutdown() `.stop()` 등록(prod 경로)
 
 ## 15. commit SHA
 

@@ -11,7 +11,9 @@ import logger from '../utils/logger.js';
  *   운영자 수정 요청(revision_requested) 후 revision_due_at(=+30일) 경과 시 hard delete.
  *   알림 없음 · archived 없음. 삭제 조건/guard 는 service.expireRevisionRequested 단일 소스(재구현 금지).
  *
- * 실행 방식: 기존 프로젝트 표준(jobs/cleanupLoginAttempts.ts)과 동일한 in-app setInterval job.
+ * 실행 방식: 기존 프로덕션 job 표준(jobs/market-trial-lifecycle.job + services/startup.service.ts 등록)과
+ *   동일한 in-app setInterval job. startup.service.ts initialize() 에서 .start(), shutdown() 에서 .stop().
+ *   (prod 엔트리는 dist/main.js=main.ts → startupService.initialize; server.ts 는 prod 미사용.)
  *   - 서버 부팅 시 1회 즉시 실행(Cloud Run 콜드스타트마다 = 실질 daily 트리거) + 이후 24h 간격.
  *   - 30일 만료 창이므로 일 단위 정밀도로 충분(Cloud Scheduler 등 신규 인프라 도입 없음).
  * 모드: 운영 자동 실행은 apply(hard delete). guard 는 service 조건 그대로.

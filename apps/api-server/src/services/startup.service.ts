@@ -5,6 +5,7 @@ import { DatabaseChecker } from '../utils/database-checker.js';
 import { backupService } from './BackupService.js';
 import { errorAlertService } from './ErrorAlertService.js';
 import { marketTrialLifecycleJob } from '../jobs/market-trial-lifecycle.job.js';
+import { spdRevisionExpiryJob } from '../jobs/spd-revision-expiry.job.js';
 import { env } from '../utils/env-validator.js';
 import logger from '../utils/logger.js';
 
@@ -298,6 +299,11 @@ export class StartupService {
       // Auto-advance RECRUITING trials whose fundingEndAt has elapsed.
       marketTrialLifecycleJob.start();
       logger.info('✅ Market Trial Lifecycle Job started');
+
+      // WO-O4O-SPD-REVISION-REQUEST-EXPIRY-SCHEDULER-V1
+      // 공급자 STORE 설명서 수정 요청(revision_requested) 만료(due<now) 자동 hard delete — 매일(부팅+24h).
+      spdRevisionExpiryJob.start();
+      logger.info('✅ SPD Revision Expiry Job started');
     } catch (schedulerError) {
       logger.warn('Scheduler initialization failed (non-critical):', schedulerError);
     }
@@ -392,6 +398,7 @@ export class StartupService {
       // settlementScheduler removed (Phase 8-3 - legacy commerce)
       // MaterializedViewScheduler removed — mv_product_listings does not exist in DB
       marketTrialLifecycleJob.stop();
+      spdRevisionExpiryJob.stop();
       logger.info('✅ Schedulers stopped');
     } catch (error) {
       logger.error('Error during shutdown:', error);
