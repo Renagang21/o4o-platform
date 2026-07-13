@@ -498,6 +498,16 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Product Master STORE Description routes:', masterDescError);
     }
 
+    // 24-e2g-1c. Register Operator Supplier STORE Description Review Queue (공급자 매장용 설명서 최소 검수 큐)
+    //           (WO-O4O-NETURE-SUPPLIER-STORE-DESCRIPTION-DRAFT-SAVE-AND-REVIEW-QUEUE-V1)
+    try {
+      const { createOperatorSupplierStoreDescriptionReviewController } = await import('../modules/neture/controllers/operator-supplier-store-description-review.controller.js');
+      app.use('/api/v1/admin/o4o-product-db/supplier-store-descriptions', createOperatorSupplierStoreDescriptionReviewController(dataSource));
+      logger.info('✅ Operator Supplier STORE Description Review routes registered at /api/v1/admin/o4o-product-db/supplier-store-descriptions');
+    } catch (supplierStoreReviewError) {
+      logger.error('Failed to register Operator Supplier STORE Description Review routes:', supplierStoreReviewError);
+    }
+
     // 24-e2g-2. Register Product Master Create route (관리자 수동 상품 등록)
     //           (WO-O4O-ADMIN-PRODUCT-MASTER-MANUAL-REGISTRATION-UI-V1)
     try {

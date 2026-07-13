@@ -139,6 +139,10 @@ export interface CreateCandidateInput {
   status?: SharedProductDescriptionStatus;
   /** 설명서 유형 (기본 STORE) — WO-...-DESCRIPTION-TYPE-IMPLEMENTATION-V1 */
   descriptionType?: SharedProductDescriptionType;
+  /** 작성 주체 공급자 SSOT — WO-O4O-SPD-AUTHOR-SUBJECT-METADATA-V1 (nullable, 기존 경로 무영향) */
+  createdBySupplierId?: string | null;
+  /** 검수요청 시각 — 공급자가 needs_review 로 제출한 시점에만 세팅 */
+  submittedAt?: Date | null;
 }
 
 /** WO-O4O-PRODUCT-DESCRIPTION-CANDIDATE-SEED-V1: seed 가능 소스 */
@@ -257,8 +261,199 @@ export class SharedProductDescriptionService {
       descriptionType: input.descriptionType ?? DEFAULT_SHARED_PRODUCT_DESCRIPTION_TYPE,
       createdBy: input.createdBy ?? null,
       updatedBy: input.createdBy ?? null,
+      createdBySupplierId: input.createdBySupplierId ?? null,
+      submittedAt: input.submittedAt ?? null,
     });
     return this.repo.save(entity);
+  }
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // WO-O4O-NETURE-SUPPLIER-STORE-DESCRIPTION-DRAFT-SAVE-AND-REVIEW-QUEUE-V1
+  //   공급자(ACTIVE) 가 자기 상품의 STORE 설명서 초안을 작성/저장한다.
+  //   - description_type=STORE, source_type=supplier, created_by_supplier_id=작성 공급자.
+  //   - source_ref_id=원천 offer id(추적/AUTO-CREDIT fallback).
+  //   - status: draft(임시저장, submitted_at=null) 또는 needs_review(검수요청, submitted_at=now).
+  //   - canonical 은 절대 생성하지 않는다(운영자 검수 큐 경유).
+  //   - 공급자당 (master, STORE, language) 단일 작업행 유지: 기존 draft/needs_review 행이 있으면 갱신(upsert).
+  // ──────────────────────────────────────────────────────────────────────────
+  async upsertSupplierStoreDraft(input: {
+    masterId: string;
+    supplierId: string;
+    createdBy: string;
+    offerId?: string | null;
+    content: string;
+    summary?: string | null;
+    language?: string | null;
+    submit: boolean;
+  }): Promise<SharedProductDescription> {
+    const content = sanitizeDescriptionHtml(input.content);
+    if (!content) {
+      throw new Error('content is empty after sanitization');
+    }
+    const summary =
+      input.summary === undefined || input.summary === null
+        ? null
+        : sanitizeDescriptionHtml(input.summary) || null;
+    const language = input.language ?? 'ko';
+    const status: SharedProductDescriptionStatus = input.submit ? 'needs_review' : 'draft';
+    const submittedAt = input.submit ? new Date() : null;
+
+    // 공급자 본인의 기존 작업행(draft/needs_review, 같은 master/type/language) 재사용 — 중복 검수행 방지.
+    const existing = await this.repo
+      .createQueryBuilder('spd')
+      .where('spd.master_id = :masterId', { masterId: input.masterId })
+      .andWhere('spd.created_by_supplier_id = :supplierId', { supplierId: input.supplierId })
+      .andWhere('spd.description_type = :type', { type: 'STORE' })
+      .andWhere(`COALESCE(spd.language, 'ko') = COALESCE(:language, 'ko')`, { language })
+      .andWhere('spd.status IN (:...statuses)', { statuses: ['draft', 'needs_review'] })
+      .andWhere('spd.deleted_at IS NULL')
+      .orderBy('spd.updated_at', 'DESC')
+      .getOne();
+
+    if (existing) {
+      existing.content = content;
+      existing.summary = summary;
+      existing.status = status;
+      existing.sourceType = 'supplier';
+      existing.language = language;
+      existing.sourceRefId = input.offerId ?? existing.sourceRefId ?? null;
+      existing.updatedBy = input.createdBy;
+      // submitted_at: 검수요청 시점에만 세팅. 재-임시저장(draft)로 되돌리면 다시 null.
+      existing.submittedAt = submittedAt;
+      return this.repo.save(existing);
+    }
+
+    const entity = this.repo.create({
+      masterId: input.masterId,
+      content,
+      summary,
+      sourceType: 'supplier',
+      sourceRefId: input.offerId ?? null,
+      language,
+      status,
+      descriptionType: 'STORE',
+      createdBy: input.createdBy,
+      updatedBy: input.createdBy,
+      createdBySupplierId: input.supplierId,
+      submittedAt,
+    });
+    return this.repo.save(entity);
+  }
+
+  /** 공급자 본인의 STORE 설명서 작업행 목록 (draft/needs_review/canonical). read-only. */
+  async listSupplierStoreDrafts(
+    supplierId: string,
+    masterId?: string,
+  ): Promise<Array<Pick<SharedProductDescription, 'id' | 'masterId' | 'descriptionType' | 'language' | 'status' | 'summary' | 'content' | 'submittedAt' | 'updatedAt'>>> {
+    const qb = this.repo
+      .createQueryBuilder('spd')
+      .where('spd.created_by_supplier_id = :supplierId', { supplierId })
+      .andWhere('spd.description_type = :type', { type: 'STORE' })
+      .andWhere('spd.deleted_at IS NULL')
+      .orderBy('spd.updated_at', 'DESC');
+    if (masterId) qb.andWhere('spd.master_id = :masterId', { masterId });
+    const rows = await qb.getMany();
+    return rows.map((d) => ({
+      id: d.id,
+      masterId: d.masterId,
+      descriptionType: d.descriptionType,
+      language: d.language,
+      status: d.status,
+      summary: d.summary,
+      content: d.content,
+      submittedAt: d.submittedAt,
+      updatedAt: d.updatedAt,
+    }));
+  }
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // 운영자 최소 검수 큐 (공급자 STORE 설명서 전용). read-only + approve/reject 는 setCanonical/setStatus 재사용.
+  //   source_type='supplier' AND description_type='STORE' 로 한정. 작성자/공급자/제출일시 노출.
+  // ──────────────────────────────────────────────────────────────────────────
+  async listSupplierStoreReview(params: {
+    status?: string; // needs_review(기본) | draft | canonical | all
+    q?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<{ items: SupplierStoreReviewRow[]; total: number }> {
+    const page = Math.max(1, params.page ?? 1);
+    const limit = Math.min(100, Math.max(1, params.limit ?? 20));
+    const offset = (page - 1) * limit;
+
+    const where: string[] = [
+      'spd.deleted_at IS NULL',
+      `spd.source_type = 'supplier'`,
+      `spd.description_type = 'STORE'`,
+    ];
+    const args: unknown[] = [];
+    let p = 1;
+
+    const status = params.status && params.status.trim() ? params.status.trim() : 'needs_review';
+    if (status !== 'all') {
+      where.push(`spd.status = $${p++}`);
+      args.push(status);
+    }
+    if (params.q && params.q.trim()) {
+      const like = `%${params.q.trim()}%`;
+      where.push(`(pm.name ILIKE $${p} OR o.name ILIKE $${p} OR ns.slug ILIKE $${p})`);
+      args.push(like);
+      p++;
+    }
+    const whereSql = where.join(' AND ');
+
+    const fromSql = `
+      FROM shared_product_descriptions spd
+      JOIN product_masters pm ON pm.id = spd.master_id
+      LEFT JOIN neture_suppliers ns ON ns.id = spd.created_by_supplier_id
+      LEFT JOIN organizations o ON o.id = ns.organization_id
+      LEFT JOIN users u ON u.id = spd.created_by
+     WHERE ${whereSql}`;
+
+    const countRows: Array<{ c: string }> = await this.dataSource.query(
+      `SELECT count(*)::text AS c ${fromSql}`,
+      args,
+    );
+    const total = parseInt(countRows[0]?.c ?? '0', 10);
+
+    const items: SupplierStoreReviewRow[] = await this.dataSource.query(
+      `SELECT spd.id, spd.master_id AS "masterId", spd.status, spd.language,
+              spd.summary, LEFT(spd.content, 160) AS "contentPreview",
+              spd.submitted_at AS "submittedAt", spd.created_at AS "createdAt", spd.updated_at AS "updatedAt",
+              spd.created_by AS "createdBy", spd.created_by_supplier_id AS "supplierId",
+              pm.name AS "masterName", pm.manufacturer_name AS "manufacturerName", pm.barcode,
+              COALESCE(o.name, ns.slug) AS "supplierName",
+              u.name AS "authorName", u.email AS "authorEmail"
+         ${fromSql}
+        ORDER BY (CASE spd.status WHEN 'needs_review' THEN 0 WHEN 'draft' THEN 1 ELSE 2 END),
+                 COALESCE(spd.submitted_at, spd.updated_at) DESC
+        LIMIT ${limit} OFFSET ${offset}`,
+      args,
+    );
+    return { items, total };
+  }
+
+  /** 검수 큐 상세 — full content 미리보기. supplier/STORE 로 한정. read-only. */
+  async getSupplierStoreReviewDetail(id: string): Promise<SupplierStoreReviewDetail | null> {
+    const rows: Array<SupplierStoreReviewDetail> = await this.dataSource.query(
+      `SELECT spd.id, spd.master_id AS "masterId", spd.status, spd.language,
+              spd.content, spd.summary, spd.source_ref_id AS "sourceRefId",
+              spd.submitted_at AS "submittedAt", spd.created_at AS "createdAt", spd.updated_at AS "updatedAt",
+              spd.curated_by AS "curatedBy", spd.curated_at AS "curatedAt",
+              spd.created_by AS "createdBy", spd.created_by_supplier_id AS "supplierId",
+              pm.name AS "masterName", pm.manufacturer_name AS "manufacturerName", pm.barcode,
+              COALESCE(o.name, ns.slug) AS "supplierName",
+              u.name AS "authorName", u.email AS "authorEmail"
+         FROM shared_product_descriptions spd
+         JOIN product_masters pm ON pm.id = spd.master_id
+         LEFT JOIN neture_suppliers ns ON ns.id = spd.created_by_supplier_id
+         LEFT JOIN organizations o ON o.id = ns.organization_id
+         LEFT JOIN users u ON u.id = spd.created_by
+        WHERE spd.id = $1 AND spd.deleted_at IS NULL
+          AND spd.source_type = 'supplier' AND spd.description_type = 'STORE'
+        LIMIT 1`,
+      [id],
+    );
+    return rows[0] ?? null;
   }
 
   /**
@@ -725,6 +920,50 @@ export interface ReviewDetail {
   thumbnailImageId: string | null;
   thumbnailUrl: string | null;
   identifiers: Array<{ identifierType: string; identifierValue: string; isPrimary: boolean }>;
+}
+
+// WO-O4O-NETURE-SUPPLIER-STORE-DESCRIPTION-DRAFT-SAVE-AND-REVIEW-QUEUE-V1
+export interface SupplierStoreReviewRow {
+  id: string;
+  masterId: string;
+  status: string;
+  language: string | null;
+  summary: string | null;
+  contentPreview: string | null;
+  submittedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string | null;
+  supplierId: string | null;
+  masterName: string | null;
+  manufacturerName: string | null;
+  barcode: string | null;
+  supplierName: string | null;
+  authorName: string | null;
+  authorEmail: string | null;
+}
+
+export interface SupplierStoreReviewDetail {
+  id: string;
+  masterId: string;
+  status: string;
+  language: string | null;
+  content: string;
+  summary: string | null;
+  sourceRefId: string | null;
+  submittedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  curatedBy: string | null;
+  curatedAt: string | null;
+  createdBy: string | null;
+  supplierId: string | null;
+  masterName: string | null;
+  manufacturerName: string | null;
+  barcode: string | null;
+  supplierName: string | null;
+  authorName: string | null;
+  authorEmail: string | null;
 }
 
 export interface BulkCanonicalDryRun {

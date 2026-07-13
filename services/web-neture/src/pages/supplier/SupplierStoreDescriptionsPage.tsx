@@ -11,13 +11,28 @@
  *   - 매장 경영자는 가져오기=복사로 활용한다.
  * 상태는 backend(supplierProfileApi.getProfile → status/activationReady)를 단일 권위로 사용(재계산 없음).
  */
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { supplierProfileApi, type SupplierProfile } from '../../lib/api';
+import {
+  supplierProfileApi,
+  supplierApi,
+  supplierStoreDescriptionApi,
+  type SupplierProfile,
+  type SupplierProduct,
+  type SupplierStoreDescriptionDraft,
+} from '../../lib/api';
 import { ACTIVATION_FIELD_LABELS } from '../../lib/api';
+import SupplierStoreDescriptionEditorDrawer from './SupplierStoreDescriptionEditorDrawer';
 
 const PROFILE_PATH = '/mypage/business-profile';
 const PRODUCTS_PATH = '/supplier/products';
+
+const DRAFT_STATUS_BADGE: Record<string, { label: string; cls: string }> = {
+  draft: { label: '임시저장', cls: 'bg-slate-100 text-slate-600' },
+  needs_review: { label: '검수 대기', cls: 'bg-amber-50 text-amber-700' },
+  canonical: { label: '매장 노출', cls: 'bg-emerald-50 text-emerald-700' },
+  hidden: { label: '반려/보류', cls: 'bg-red-50 text-red-700' },
+};
 
 function missingLabels(profile: SupplierProfile | null): string[] {
   return (profile?.missingActivationFields ?? []).map((f) => ACTIVATION_FIELD_LABELS[f] || f);
@@ -26,6 +41,13 @@ function missingLabels(profile: SupplierProfile | null): string[] {
 export default function SupplierStoreDescriptionsPage() {
   const [profile, setProfile] = useState<SupplierProfile | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // authoring state (ACTIVE 전용)
+  const [products, setProducts] = useState<SupplierProduct[]>([]);
+  const [drafts, setDrafts] = useState<SupplierStoreDescriptionDraft[]>([]);
+  const [productsLoading, setProductsLoading] = useState(false);
+  const [keyword, setKeyword] = useState('');
+  const [selected, setSelected] = useState<SupplierProduct | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -47,6 +69,49 @@ export default function SupplierStoreDescriptionsPage() {
   const active = status === 'ACTIVE';
   const labels = missingLabels(profile);
 
+  const loadDrafts = () => {
+    supplierStoreDescriptionApi.listMine().then(setDrafts).catch(() => {});
+  };
+
+  // ACTIVE 시 상품 목록 + 내 STORE 설명서 작업행 로드
+  useEffect(() => {
+    if (!active) return;
+    let mounted = true;
+    setProductsLoading(true);
+    Promise.all([supplierApi.getProducts(), supplierStoreDescriptionApi.listMine()])
+      .then(([prods, myDrafts]) => {
+        if (!mounted) return;
+        setProducts(prods);
+        setDrafts(myDrafts);
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (mounted) setProductsLoading(false);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, [active]);
+
+  const draftByMaster = useMemo(() => {
+    const m = new Map<string, SupplierStoreDescriptionDraft>();
+    for (const d of drafts) {
+      const prev = m.get(d.masterId);
+      // 우선순위: canonical > needs_review > draft > 기타 (표시용 대표 상태)
+      const rank = (s: string) => (s === 'canonical' ? 3 : s === 'needs_review' ? 2 : s === 'draft' ? 1 : 0);
+      if (!prev || rank(d.status) > rank(prev.status)) m.set(d.masterId, d);
+    }
+    return m;
+  }, [drafts]);
+
+  const filteredProducts = useMemo(() => {
+    const kw = keyword.trim().toLowerCase();
+    if (!kw) return products;
+    return products.filter(
+      (p) => (p.name || '').toLowerCase().includes(kw) || (p.masterName || '').toLowerCase().includes(kw) || (p.barcode || '').includes(kw),
+    );
+  }, [products, keyword]);
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
       {/* Header */}
@@ -64,27 +129,91 @@ export default function SupplierStoreDescriptionsPage() {
           <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-emerald-600" />
         </div>
       ) : active ? (
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-6">
-          <h2 className="text-lg font-bold text-emerald-900">상품별 매장용 설명서 준비</h2>
-          <p className="mt-2 text-sm text-emerald-900">
-            등록하신 상품을 기준으로 매장용 설명서를 준비할 수 있습니다. 작성 기능은 곧 제공됩니다.
-          </p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <button
-              type="button"
-              disabled
-              title="작성 기능은 곧 제공됩니다"
-              className="cursor-not-allowed rounded-lg bg-slate-200 px-4 py-2 text-sm font-medium text-slate-500"
-            >
-              매장용 설명서 작성 (준비 중)
-            </button>
+        <div className="rounded-xl border border-slate-200 bg-white p-5">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-bold text-slate-900">상품별 매장용 설명서</h2>
+              <p className="mt-1 text-sm text-slate-500">
+                상품을 선택해 매장용(STORE) 설명서를 작성하세요. 검수요청 후 운영자 검수를 통과하면 매장에 노출됩니다.
+              </p>
+            </div>
             <Link
               to={PRODUCTS_PATH}
-              className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+              className="shrink-0 rounded-lg bg-slate-100 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200"
             >
-              내 상품 보기
+              내 상품 관리
             </Link>
           </div>
+
+          <div className="mt-4">
+            <input
+              type="text"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              placeholder="상품명 · 바코드 검색"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            />
+          </div>
+
+          <div className="mt-3 divide-y divide-slate-100 rounded-lg border border-slate-100">
+            {productsLoading ? (
+              <div className="flex items-center justify-center py-12 text-sm text-slate-400">불러오는 중…</div>
+            ) : filteredProducts.length === 0 ? (
+              <div className="py-12 text-center text-sm text-slate-400">
+                {products.length === 0 ? (
+                  <>
+                    등록된 상품이 없습니다.{' '}
+                    <Link to={PRODUCTS_PATH} className="text-emerald-700 underline">
+                      상품을 먼저 등록
+                    </Link>
+                    하세요.
+                  </>
+                ) : (
+                  '검색 결과가 없습니다.'
+                )}
+              </div>
+            ) : (
+              filteredProducts.slice(0, 100).map((p) => {
+                const d = draftByMaster.get(p.masterId);
+                const badge = d ? DRAFT_STATUS_BADGE[d.status] : null;
+                return (
+                  <div key={p.id} className="flex items-center gap-3 px-3 py-2.5">
+                    <div className="h-10 w-10 shrink-0 overflow-hidden rounded bg-slate-100">
+                      {p.primaryImageUrl ? (
+                        <img src={p.primaryImageUrl} alt="" className="h-full w-full object-cover" />
+                      ) : null}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-slate-800">{p.name || p.masterName || '(이름 없음)'}</p>
+                      <p className="truncate font-mono text-xs text-slate-400">{p.barcode}</p>
+                    </div>
+                    {badge && (
+                      <span className={`shrink-0 rounded px-2 py-0.5 text-xs font-medium ${badge.cls}`}>{badge.label}</span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setSelected(p)}
+                      className="shrink-0 rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-700"
+                    >
+                      {d ? '설명서 편집' : '설명서 작성'}
+                    </button>
+                  </div>
+                );
+              })
+            )}
+          </div>
+          {filteredProducts.length > 100 && (
+            <p className="mt-2 text-xs text-slate-400">최대 100개까지 표시됩니다. 검색으로 좁혀 주세요.</p>
+          )}
+
+          {selected && (
+            <SupplierStoreDescriptionEditorDrawer
+              product={selected}
+              open={!!selected}
+              onClose={() => setSelected(null)}
+              onSaved={loadDrafts}
+            />
+          )}
         </div>
       ) : (
         <div className="rounded-xl border border-amber-200 bg-amber-50 p-6 text-amber-900">
@@ -124,7 +253,7 @@ export default function SupplierStoreDescriptionsPage() {
           </li>
           <li>
             <span className="font-medium text-slate-800">2. 매장용 설명서 작성</span> — 상품별 STORE 설명서
-            초안을 작성합니다. <span className="text-slate-400">(준비 중)</span>
+            초안을 작성하고 검수요청합니다.
           </li>
           <li>
             <span className="font-medium text-slate-800">3. 운영자 검수</span> — 작성한 설명서는 운영자 검수 후

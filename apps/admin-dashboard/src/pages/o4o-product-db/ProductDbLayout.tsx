@@ -20,6 +20,8 @@ const TABS = [
   // WO-O4O-KPA-STORE-NEW-PRODUCT-REQUEST-AND-ADMIN-APPROVAL-V1 (P2): 매장 신규 상품 등록 요청 검토
   { to: 'store-requests', label: '상품 등록 요청' },
   { to: 'masters', label: '기본 상품' },
+  // WO-O4O-NETURE-SUPPLIER-STORE-DESCRIPTION-DRAFT-SAVE-AND-REVIEW-QUEUE-V1: 공급자 매장용 설명서 검수
+  { to: 'supplier-store-descriptions', label: '설명서 검수' },
   { to: 'image-quality', label: '이미지 상태' },
   { to: 'maintenance', label: '데이터 정비' },
 ];

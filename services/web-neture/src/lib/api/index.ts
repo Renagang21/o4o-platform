@@ -254,3 +254,11 @@ export {
   type SharedDescriptionSeedSource,
   type SharedDescriptionSeedResult,
 } from './sharedProductDescription.js';
+
+// Supplier STORE description authoring (WO-O4O-NETURE-SUPPLIER-STORE-DESCRIPTION-DRAFT-SAVE-AND-REVIEW-QUEUE-V1)
+export {
+  supplierStoreDescriptionApi,
+  type SupplierStoreDescriptionDraft,
+  type SupplierStoreDescriptionStatus,
+  type SaveSupplierStoreDescriptionInput,
+} from './supplierStoreDescription.js';

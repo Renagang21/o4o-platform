@@ -54,8 +54,13 @@ export const SHARED_PRODUCT_DESCRIPTION_SOURCE_TYPES: SharedProductDescriptionSo
   'manual',
 ];
 
-/** 후보 검토 상태 (application-level union, varchar) */
+/**
+ * 후보 검토 상태 (application-level union, varchar)
+ * - draft: 공급자 임시저장(아직 검수요청 전, submitted_at=null) — WO-O4O-NETURE-SUPPLIER-STORE-DESCRIPTION-DRAFT-SAVE-AND-REVIEW-QUEUE-V1.
+ *   매장 노출 대상 아님(canonical 아님). needs_review 로 전환 시 검수 큐 노출.
+ */
 export type SharedProductDescriptionStatus =
+  | 'draft'
   | 'candidate'
   | 'canonical'
   | 'hidden'
@@ -63,6 +68,7 @@ export type SharedProductDescriptionStatus =
   | 'deprecated';
 
 export const SHARED_PRODUCT_DESCRIPTION_STATUSES: SharedProductDescriptionStatus[] = [
+  'draft',
   'candidate',
   'canonical',
   'hidden',

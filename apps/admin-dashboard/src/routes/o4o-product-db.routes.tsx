@@ -22,6 +22,8 @@ const ProductMastersPage = lazy(() => import('@/pages/o4o-product-db/ProductMast
 const ProductMasterCreatePage = lazy(() => import('@/pages/o4o-product-db/ProductMasterCreatePage'));
 const ProductMasterDetailPage = lazy(() => import('@/pages/o4o-product-db/ProductMasterDetailPage'));
 const ImageQualityPage = lazy(() => import('@/pages/o4o-product-db/ImageQualityPage'));
+// WO-O4O-NETURE-SUPPLIER-STORE-DESCRIPTION-DRAFT-SAVE-AND-REVIEW-QUEUE-V1: 공급자 매장용 설명서 최소 검수 큐
+const SupplierStoreDescriptionReviewPage = lazy(() => import('@/pages/o4o-product-db/SupplierStoreDescriptionReviewPage'));
 const ProductDbMaintenancePage = lazy(() => import('@/pages/o4o-product-db/ProductDbMaintenancePage'));
 
 const PageLoader = () => (
@@ -52,6 +54,8 @@ export function O4OProductDbRoutes() {
       <Route path="masters" element={<ProductMastersPage />} />
       <Route path="masters/new" element={<ProductMasterCreatePage />} />
       <Route path="masters/:id" element={<ProductMasterDetailPage />} />
+      {/* WO-O4O-NETURE-SUPPLIER-STORE-DESCRIPTION-DRAFT-SAVE-AND-REVIEW-QUEUE-V1 */}
+      <Route path="supplier-store-descriptions" element={<SupplierStoreDescriptionReviewPage />} />
       {/* 설명서 검토 워크플로우 제거 (WO-O4O-ADMIN-O4O-PRODUCT-DESCRIPTION-REVIEW-REMOVE-V1).
           북마크/딥링크 호환을 위해 기존 경로는 기본 상품 목록으로 리다이렉트한다. */}
       <Route path="review" element={<Navigate to="../masters" replace />} />

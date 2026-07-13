@@ -20,6 +20,7 @@ import { ActionLogService } from '@o4o/action-log-core';
 // Controllers
 import { createSupplierManagementController } from './controllers/supplier-management.controller.js';
 import { createSupplierProductController } from './controllers/supplier-product.controller.js';
+import { createSupplierStoreDescriptionController } from './controllers/supplier-store-description.controller.js';
 import { createSupplierOrderController } from './controllers/supplier-order.controller.js';
 import { createShipmentController } from './controllers/shipment.controller.js';
 import { createInventoryController } from './controllers/inventory.controller.js';
@@ -77,6 +78,8 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
   // Supplier domain
   router.use('/supplier', createSupplierManagementController(dataSource));
   router.use('/supplier', createSupplierProductController(dataSource));
+  // WO-O4O-NETURE-SUPPLIER-STORE-DESCRIPTION-DRAFT-SAVE-AND-REVIEW-QUEUE-V1: 공급자 매장용(STORE) 설명서 저작/저장
+  router.use('/supplier', createSupplierStoreDescriptionController(dataSource));
   router.use('/supplier', createSupplierOrderController(dataSource));
   router.use('/supplier', createShipmentController(dataSource));
   router.use('/supplier', createInventoryController(dataSource));
