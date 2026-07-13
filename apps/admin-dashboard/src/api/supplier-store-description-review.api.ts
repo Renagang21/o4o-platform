@@ -31,6 +31,9 @@ export interface SupplierStoreReviewRow {
   supplierName: string | null;
   authorName: string | null;
   authorEmail: string | null;
+  /** 같은 (master, STORE, 언어) 에 이미 다른 canonical 이 있어 승인 불가 — WO-...-CANONICAL-CONFLICT-POLICY-V1 */
+  hasCanonicalConflict: boolean;
+  existingCanonicalId: string | null;
 }
 
 export interface SupplierStoreReviewDetail extends SupplierStoreReviewRow {
@@ -38,6 +41,8 @@ export interface SupplierStoreReviewDetail extends SupplierStoreReviewRow {
   sourceRefId: string | null;
   curatedBy: string | null;
   curatedAt: string | null;
+  existingCanonicalUpdatedAt: string | null;
+  existingCanonicalSourceType: string | null;
 }
 
 export interface RevisionExpiryResult {

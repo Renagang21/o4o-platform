@@ -489,12 +489,21 @@ export class SharedProductDescriptionService {
     }
     const whereSql = where.join(' AND ');
 
+    // WO-O4O-OPERATOR-SUPPLIER-STORE-DESCRIPTION-CANONICAL-CONFLICT-POLICY-V1:
+    //   같은 (master, STORE, 언어) 에 이미 다른 canonical 이 있으면 승인 충돌. partial-unique 상 최대 1건 → 1:1 join(count 무영향).
     const fromSql = `
       FROM shared_product_descriptions spd
       JOIN product_masters pm ON pm.id = spd.master_id
       LEFT JOIN neture_suppliers ns ON ns.id = spd.created_by_supplier_id
       LEFT JOIN organizations o ON o.id = ns.organization_id
       LEFT JOIN users u ON u.id = spd.created_by
+      LEFT JOIN shared_product_descriptions cc
+        ON cc.master_id = spd.master_id
+       AND cc.description_type = 'STORE'
+       AND COALESCE(cc.language, 'ko') = COALESCE(spd.language, 'ko')
+       AND cc.status = 'canonical'
+       AND cc.deleted_at IS NULL
+       AND cc.id <> spd.id
      WHERE ${whereSql}`;
 
     const countRows: Array<{ c: string }> = await this.dataSource.query(
@@ -512,7 +521,8 @@ export class SharedProductDescriptionService {
               spd.revision_due_at AS "revisionDueAt",
               pm.name AS "masterName", pm.manufacturer_name AS "manufacturerName", pm.barcode,
               COALESCE(o.name, ns.slug) AS "supplierName",
-              u.name AS "authorName", u.email AS "authorEmail"
+              u.name AS "authorName", u.email AS "authorEmail",
+              cc.id AS "existingCanonicalId", (cc.id IS NOT NULL) AS "hasCanonicalConflict"
          ${fromSql}
         ORDER BY (CASE spd.status WHEN 'needs_review' THEN 0 WHEN 'revision_requested' THEN 1 WHEN 'draft' THEN 2 ELSE 3 END),
                  COALESCE(spd.submitted_at, spd.updated_at) DESC
@@ -534,12 +544,21 @@ export class SharedProductDescriptionService {
               spd.created_by AS "createdBy", spd.created_by_supplier_id AS "supplierId",
               pm.name AS "masterName", pm.manufacturer_name AS "manufacturerName", pm.barcode,
               COALESCE(o.name, ns.slug) AS "supplierName",
-              u.name AS "authorName", u.email AS "authorEmail"
+              u.name AS "authorName", u.email AS "authorEmail",
+              cc.id AS "existingCanonicalId", cc.updated_at AS "existingCanonicalUpdatedAt",
+              cc.source_type AS "existingCanonicalSourceType", (cc.id IS NOT NULL) AS "hasCanonicalConflict"
          FROM shared_product_descriptions spd
          JOIN product_masters pm ON pm.id = spd.master_id
          LEFT JOIN neture_suppliers ns ON ns.id = spd.created_by_supplier_id
          LEFT JOIN organizations o ON o.id = ns.organization_id
          LEFT JOIN users u ON u.id = spd.created_by
+         LEFT JOIN shared_product_descriptions cc
+           ON cc.master_id = spd.master_id
+          AND cc.description_type = 'STORE'
+          AND COALESCE(cc.language, 'ko') = COALESCE(spd.language, 'ko')
+          AND cc.status = 'canonical'
+          AND cc.deleted_at IS NULL
+          AND cc.id <> spd.id
         WHERE spd.id = $1 AND spd.deleted_at IS NULL
           AND spd.source_type = 'supplier' AND spd.description_type = 'STORE'
         LIMIT 1`,
@@ -1036,6 +1055,8 @@ export interface SupplierStoreReviewRow {
   supplierName: string | null;
   authorName: string | null;
   authorEmail: string | null;
+  hasCanonicalConflict: boolean;
+  existingCanonicalId: string | null;
 }
 
 export interface SupplierStoreReviewDetail {
@@ -1062,6 +1083,10 @@ export interface SupplierStoreReviewDetail {
   supplierName: string | null;
   authorName: string | null;
   authorEmail: string | null;
+  hasCanonicalConflict: boolean;
+  existingCanonicalId: string | null;
+  existingCanonicalUpdatedAt: string | null;
+  existingCanonicalSourceType: string | null;
 }
 
 export interface BulkCanonicalDryRun {

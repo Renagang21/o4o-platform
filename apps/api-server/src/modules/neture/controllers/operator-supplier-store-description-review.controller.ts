@@ -109,6 +109,18 @@ export function createOperatorSupplierStoreDescriptionReviewController(dataSourc
         res.status(404).json({ success: false, error: '설명서를 찾을 수 없습니다', code: 'REVIEW_NOT_FOUND' });
         return;
       }
+      // WO-O4O-OPERATOR-SUPPLIER-STORE-DESCRIPTION-CANONICAL-CONFLICT-POLICY-V1:
+      //   같은 (master, STORE, 언어) 에 이미 다른 canonical 이 있으면 승인 차단(DB unique violation 전에 명시적 차단).
+      //   V1 은 교체하지 않는다(별도 WO). 수정 요청은 계속 허용.
+      if (detail.hasCanonicalConflict) {
+        res.status(409).json({
+          success: false,
+          code: 'CANONICAL_CONFLICT',
+          error: '이미 승인된 매장용 설명서가 있습니다. 기존 설명서 교체 기능은 별도 작업으로 제공됩니다.',
+          existingCanonicalId: detail.existingCanonicalId,
+        });
+        return;
+      }
       const canonical = await service.setCanonical(req.params.id, actor);
       res.json({ success: true, data: { id: canonical.id, status: canonical.status, curatedAt: canonical.curatedAt } });
     } catch (err) {

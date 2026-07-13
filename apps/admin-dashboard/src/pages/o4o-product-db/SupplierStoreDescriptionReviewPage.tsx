@@ -13,7 +13,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { Eye, CheckCircle2, MessageSquareWarning, Loader2, Trash2, XCircle } from 'lucide-react';
+import { Eye, CheckCircle2, MessageSquareWarning, Loader2, Trash2, XCircle, AlertTriangle } from 'lucide-react';
 import { ContentRenderer } from '@o4o/content-editor';
 import {
   listSupplierStoreReview,
@@ -120,8 +120,15 @@ export default function SupplierStoreDescriptionReviewPage() {
       toast.success('검수 완료로 승격되었습니다');
       setDetail(null);
       load();
-    } catch {
-      toast.error('승격에 실패했습니다');
+    } catch (e: unknown) {
+      // WO-...-CANONICAL-CONFLICT-POLICY-V1: 서버 409(이미 canonical 존재) 는 이해 가능한 안내로.
+      const err = e as { response?: { status?: number; data?: { code?: string; error?: string } } };
+      if (err?.response?.status === 409 && err.response.data?.code === 'CANONICAL_CONFLICT') {
+        toast.error(err.response.data.error || '이미 승인된 매장용 설명서가 있어 승인할 수 없습니다');
+        load();
+      } else {
+        toast.error('승격에 실패했습니다');
+      }
     } finally {
       setActing(false);
     }
@@ -309,6 +316,14 @@ export default function SupplierStoreDescriptionReviewPage() {
                     <td className="px-4 py-2.5 text-gray-600">{fmtDate(r.submittedAt || r.updatedAt)}</td>
                     <td className="px-4 py-2.5">
                       <span className={`rounded px-2 py-0.5 text-xs font-medium ${badge.cls}`}>{badge.label}</span>
+                      {r.hasCanonicalConflict && r.status !== 'canonical' && (
+                        <span
+                          title="이미 승인된 매장용 설명서가 있어 승인할 수 없습니다"
+                          className="ml-1 inline-flex items-center gap-0.5 rounded bg-red-50 px-1.5 py-0.5 text-[11px] font-medium text-red-600"
+                        >
+                          <AlertTriangle size={11} /> 승인 충돌
+                        </span>
+                      )}
                     </td>
                     <td className="px-4 py-2.5">
                       <div className="flex items-center justify-end gap-1">
@@ -322,9 +337,9 @@ export default function SupplierStoreDescriptionReviewPage() {
                         {r.status !== 'canonical' && (
                           <button
                             onClick={() => doApprove(r.id)}
-                            disabled={acting}
-                            title="승인(매장 노출)"
-                            className="rounded p-1.5 text-emerald-600 hover:bg-emerald-50 disabled:opacity-50"
+                            disabled={acting || r.hasCanonicalConflict}
+                            title={r.hasCanonicalConflict ? '이미 승인된 매장용 설명서가 있어 승인할 수 없습니다' : '승인(매장 노출)'}
+                            className="rounded p-1.5 text-emerald-600 hover:bg-emerald-50 disabled:opacity-40 disabled:hover:bg-transparent"
                           >
                             <CheckCircle2 size={16} />
                           </button>
@@ -403,6 +418,17 @@ export default function SupplierStoreDescriptionReviewPage() {
                     <div className="mt-1 text-xs text-orange-700">기한 내 공급자 재검수 요청이 없으면 자동 삭제됩니다.</div>
                   </div>
                 )}
+                {detail.hasCanonicalConflict && detail.status !== 'canonical' && (
+                  <div className="mx-6 mt-4 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+                    <AlertTriangle size={16} className="mt-0.5 shrink-0" />
+                    <div>
+                      <div className="font-medium">이미 승인된 매장용 설명서가 있어 승인할 수 없습니다.</div>
+                      <div className="mt-1 text-xs text-red-700">
+                        기존 설명서 교체 기능은 별도 작업으로 제공됩니다. 이 제출 건은 승인 대신 <strong>수정 요청</strong>으로 공급자에게 보완을 요청할 수 있습니다.
+                      </div>
+                    </div>
+                  </div>
+                )}
                 <div className="max-h-[60vh] overflow-y-auto px-6 py-5">
                   <ContentRenderer html={detail.content} variant="store-description" />
                 </div>
@@ -419,8 +445,9 @@ export default function SupplierStoreDescriptionReviewPage() {
                   {detail.status !== 'canonical' && (
                     <button
                       onClick={() => doApprove(detail.id)}
-                      disabled={acting}
-                      className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
+                      disabled={acting || detail.hasCanonicalConflict}
+                      title={detail.hasCanonicalConflict ? '이미 승인된 매장용 설명서가 있어 승인할 수 없습니다' : undefined}
+                      className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-40"
                     >
                       {acting ? '처리 중…' : '승인 (매장 노출)'}
                     </button>
