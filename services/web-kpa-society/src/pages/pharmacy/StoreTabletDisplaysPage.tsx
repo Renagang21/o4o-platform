@@ -18,7 +18,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Loader2, Tablet, ChevronUp, ChevronDown, X, Plus,
+  Loader2, Tablet, ChevronUp, ChevronDown, X, Plus, Info,
   ArrowLeft, Save, Package, ShoppingBag, AlertTriangle, Tv,
 } from 'lucide-react';
 import {
@@ -100,6 +100,14 @@ export default function StoreTabletDisplaysPage() {
   const [loadingPool, setLoadingPool] = useState(false);
   const [saving, setSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
+  // WO-O4O-KPA-TABLET-OPERATION-GUIDE-MODAL-V1: 상단 상시 안내 박스 → 버튼+모달.
+  const [showGuide, setShowGuide] = useState(false);
+  useEffect(() => {
+    if (!showGuide) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setShowGuide(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [showGuide]);
 
   // WO-O4O-KPA-TABLET-DISPLAY-CONTENT-SELECTION-V1: 진열 제품별 연결 콘텐츠 후보(by-product) 캐시.
   const [contentCandidates, setContentCandidates] = useState<Record<string, LinkedContentItem[]>>({});
@@ -655,6 +663,14 @@ export default function StoreTabletDisplaysPage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          {/* WO-O4O-KPA-TABLET-OPERATION-GUIDE-MODAL-V1: 상단 상시 안내 → 버튼(모달) */}
+          <button
+            onClick={() => setShowGuide(true)}
+            className="flex items-center gap-2 px-3 py-2.5 bg-white border border-slate-200 text-slate-600 text-sm font-medium rounded-xl hover:bg-slate-50 transition-colors"
+          >
+            <Info className="w-4 h-4 text-sky-600" />
+            운영 안내
+          </button>
           {/* WO-O4O-KPA-TABLET-PREVIEW-V1: 고객 화면 미리보기 (타블렛 선택 시) */}
           <button
             onClick={handleOpenPreview}
@@ -684,27 +700,46 @@ export default function StoreTabletDisplaysPage() {
         </div>
       </div>
 
-      {/* WO-O4O-KPA-TABLET-CORNER-PRODUCT-GUIDE-UX-AND-CHROME-OPERABILITY-V1:
-          크롬 태블릿 운영 안내. 앱이 아니라 크롬 브라우저에서 매장 태블릿 주소를 열어 사용한다.
-          (PWA/서비스워커/키오스크 연동은 이번 범위 아님 — 안내 문구만.) */}
-      <div className="bg-sky-50 border border-sky-100 rounded-2xl p-4">
-        <div className="flex items-start gap-2">
-          <Tablet className="w-4 h-4 text-sky-600 mt-0.5 flex-shrink-0" />
-          <div className="text-sm text-sky-900">
-            <p className="font-semibold mb-1">크롬 태블릿 운영 안내</p>
-            <ul className="list-disc pl-4 space-y-0.5 text-sky-800">
-              <li>크롬 브라우저에서 매장 태블릿 주소를 열어 사용합니다.</li>
-              <li>홈 화면에 바로가기로 추가하면 주소 입력 없이 실행할 수 있습니다.</li>
-              <li>화면 자동 꺼짐(절전) 시간을 매장 상황에 맞게 확인하세요.</li>
-              <li>구성을 바꾼 뒤에는 새로고침하거나 다시 열어 최신 화면을 확인하세요.</li>
-              <li>‘고객 화면 미리보기’로 상품 상세·대기 화면을 미리 확인할 수 있습니다.</li>
-              {/* WO-O4O-KPA-TABLET-PUBLIC-DISPLAY-SOURCE-ALIGNMENT-V1 */}
-              <li>고객 태블릿 화면에는 저장된 진열 구성(선택·저장한 상품)만 표시됩니다.</li>
-              <li>공개 화면은 첫 번째 활성 태블릿의 구성을 기준으로 표시됩니다. 위치별로 서로 다른 화면을 띄우는 기능은 후속 기기 연결 기능에서 다룹니다.</li>
-            </ul>
+      {/* WO-O4O-KPA-TABLET-OPERATION-GUIDE-MODAL-V1:
+          상단 상시 안내 박스를 제거하고 헤더 '운영 안내' 버튼 → 모달로 이동(작업 영역 우선).
+          문구는 현재 screen_set/content_list 구조에 맞게 정리. */}
+      {showGuide && (
+        <div
+          className="fixed inset-0 z-[950] bg-slate-900/50 flex items-center justify-center p-4"
+          onClick={() => setShowGuide(false)}
+          role="presentation"
+        >
+          <div
+            className="bg-white rounded-2xl w-full max-w-lg max-h-[86vh] flex flex-col overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="px-5 py-4 border-b flex items-center justify-between">
+              <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
+                <Tablet className="w-5 h-5 text-sky-600" /> 크롬 태블릿 운영 안내
+              </h3>
+              <button onClick={() => setShowGuide(false)} className="text-slate-400 hover:text-slate-600" aria-label="닫기">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="px-5 py-4 overflow-y-auto">
+              <ol className="list-decimal pl-5 space-y-2 text-sm text-slate-700 leading-relaxed">
+                <li>크롬 브라우저에서 매장 태블릿 주소를 열어 사용합니다.</li>
+                <li>홈 화면에 바로가기로 추가하면 주소 입력 없이 실행할 수 있습니다.</li>
+                <li>화면 자동 꺼짐(절전) 시간을 매장 상황에 맞게 확인하세요.</li>
+                <li>화면 구성을 바꾼 뒤에는 태블릿에서 새로고침하거나 다시 열어 최신 화면을 확인하세요.</li>
+                <li>‘고객 화면 미리보기’로 실제 태블릿 화면을 미리 확인할 수 있습니다.</li>
+                <li>고객 태블릿 화면에는 해당 코너에 적용된 화면 세트의 내용(코너 설명·콘텐츠·상품·QR·대기화면)이 표시됩니다.</li>
+                <li>공개 URL에 tabletId가 포함되면 해당 코너/태블릿 화면이 표시됩니다. tabletId가 없거나 유효하지 않으면 기본 활성 태블릿 기준으로 표시됩니다.</li>
+              </ol>
+            </div>
+            <div className="px-5 py-3 border-t flex justify-end">
+              <button onClick={() => setShowGuide(false)} className="px-4 py-2 text-sm font-medium text-white bg-slate-700 rounded-lg hover:bg-slate-800">
+                확인
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Loading */}
       {loadingTablets && (
