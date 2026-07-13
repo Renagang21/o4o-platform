@@ -568,10 +568,20 @@ export class SharedProductDescriptionService {
   }
 
   /**
-   * 선택 row 를 canonical 로 승격. 같은 master 의 기존 canonical 은 candidate 로 강등.
+   * 선택 row 를 canonical 로 승격. 같은 master 의 기존 canonical 은 강등.
    * transaction 으로 partial-unique 충돌 없이 1개/master 보장.
+   *
+   * opts.demotedStatus (기본 'candidate'): 기존 canonical 을 강등할 상태.
+   *   - 'candidate'(기본): 검토 풀에 남김(일반 승격/등록 경로). 기존 호출자 동작 불변.
+   *   - 'hidden': 교체(replace) 경로 전용 — 기존 승인본을 숨김 처리(더 이상 현재 승인본 아님).
+   *     WO-O4O-OPERATOR-SUPPLIER-STORE-DESCRIPTION-CANONICAL-REPLACE-APPLY-V1.
    */
-  async setCanonical(id: string, actorId?: string | null): Promise<SharedProductDescription> {
+  async setCanonical(
+    id: string,
+    actorId?: string | null,
+    opts?: { demotedStatus?: 'candidate' | 'hidden' },
+  ): Promise<SharedProductDescription> {
+    const demotedStatus = opts?.demotedStatus ?? 'candidate';
     return this.dataSource.transaction(async (manager) => {
       const repo = manager.getRepository(SharedProductDescription);
       const target = await repo.findOne({ where: { id } });
@@ -591,10 +601,11 @@ export class SharedProductDescriptionService {
       // WO-O4O-STORE-MULTILINGUAL-CANONICAL-DESCRIPTION-V1: canonical 유일성 =
       //   (master_id, description_type, COALESCE(language,'ko')) 당 1개. 다른 언어/타입 canonical 은
       //   건드리지 않는다(ko canonical 이 있어도 zh 를 canonical 로 승격 가능).
+      // 강등 UPDATE 가 승격 save 보다 먼저 실행되어 partial-unique(canonical 1개) 위반 없음.
       await repo
         .createQueryBuilder()
         .update(SharedProductDescription)
-        .set({ status: 'candidate', updatedBy: actorId ?? null })
+        .set({ status: demotedStatus, updatedBy: actorId ?? null })
         .where('master_id = :masterId', { masterId: target.masterId })
         .andWhere('description_type = :descriptionType', { descriptionType: target.descriptionType })
         .andWhere(`COALESCE(language, 'ko') = COALESCE(:language, 'ko')`, { language: target.language ?? 'ko' })

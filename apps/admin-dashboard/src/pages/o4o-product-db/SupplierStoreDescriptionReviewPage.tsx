@@ -13,7 +13,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { Eye, CheckCircle2, MessageSquareWarning, Loader2, Trash2, XCircle, AlertTriangle } from 'lucide-react';
+import { Eye, CheckCircle2, MessageSquareWarning, Loader2, Trash2, XCircle, AlertTriangle, Replace } from 'lucide-react';
 import { ContentRenderer } from '@o4o/content-editor';
 import {
   listSupplierStoreReview,
@@ -74,6 +74,16 @@ export default function SupplierStoreDescriptionReviewPage() {
   // 만료 정리
   const [expiryInfo, setExpiryInfo] = useState<{ count: number; sampleIds: string[] } | null>(null);
   const [expiryBusy, setExpiryBusy] = useState(false);
+  // canonical 교체 확인 모달 (WO-...-CANONICAL-REPLACE-APPLY-V1)
+  const [replaceTarget, setReplaceTarget] = useState<{
+    id: string;
+    masterName: string | null;
+    supplierName: string | null;
+    submittedAt: string | null;
+    existingCanonicalId: string | null;
+    existingCanonicalUpdatedAt?: string | null;
+    existingCanonicalSourceType?: string | null;
+  } | null>(null);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -129,6 +139,22 @@ export default function SupplierStoreDescriptionReviewPage() {
       } else {
         toast.error('승격에 실패했습니다');
       }
+    } finally {
+      setActing(false);
+    }
+  };
+
+  const doReplace = async () => {
+    if (!replaceTarget) return;
+    setActing(true);
+    try {
+      await approveSupplierStoreReview(replaceTarget.id, true);
+      toast.success('기존 승인본을 숨기고 교체했습니다');
+      setReplaceTarget(null);
+      setDetail(null);
+      load();
+    } catch {
+      toast.error('교체 승인에 실패했습니다');
     } finally {
       setActing(false);
     }
@@ -338,10 +364,28 @@ export default function SupplierStoreDescriptionReviewPage() {
                           <button
                             onClick={() => doApprove(r.id)}
                             disabled={acting || r.hasCanonicalConflict}
-                            title={r.hasCanonicalConflict ? '이미 승인된 매장용 설명서가 있어 승인할 수 없습니다' : '승인(매장 노출)'}
+                            title={r.hasCanonicalConflict ? '이미 승인된 매장용 설명서가 있어 승인할 수 없습니다 (교체는 별도 버튼)' : '승인(매장 노출)'}
                             className="rounded p-1.5 text-emerald-600 hover:bg-emerald-50 disabled:opacity-40 disabled:hover:bg-transparent"
                           >
                             <CheckCircle2 size={16} />
+                          </button>
+                        )}
+                        {r.status !== 'canonical' && r.hasCanonicalConflict && (
+                          <button
+                            onClick={() =>
+                              setReplaceTarget({
+                                id: r.id,
+                                masterName: r.masterName,
+                                supplierName: r.supplierName,
+                                submittedAt: r.submittedAt,
+                                existingCanonicalId: r.existingCanonicalId,
+                              })
+                            }
+                            disabled={acting}
+                            title="기존 승인본 숨기고 교체"
+                            className="rounded p-1.5 text-amber-600 hover:bg-amber-50 disabled:opacity-50"
+                          >
+                            <Replace size={16} />
                           </button>
                         )}
                         {r.status !== 'revision_requested' && r.status !== 'hidden' && (
@@ -422,9 +466,9 @@ export default function SupplierStoreDescriptionReviewPage() {
                   <div className="mx-6 mt-4 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
                     <AlertTriangle size={16} className="mt-0.5 shrink-0" />
                     <div>
-                      <div className="font-medium">이미 승인된 매장용 설명서가 있어 승인할 수 없습니다.</div>
+                      <div className="font-medium">이미 승인된 매장용 설명서가 있어 기본 승인은 차단됩니다.</div>
                       <div className="mt-1 text-xs text-red-700">
-                        기존 설명서 교체 기능은 별도 작업으로 제공됩니다. 이 제출 건은 승인 대신 <strong>수정 요청</strong>으로 공급자에게 보완을 요청할 수 있습니다.
+                        기존 승인본을 숨기고 이 제출 건으로 <strong>교체</strong>하거나, 승인 대신 <strong>수정 요청</strong>으로 공급자에게 보완을 요청할 수 있습니다.
                       </div>
                     </div>
                   </div>
@@ -442,11 +486,30 @@ export default function SupplierStoreDescriptionReviewPage() {
                       수정 요청
                     </button>
                   )}
+                  {detail.status !== 'canonical' && detail.hasCanonicalConflict && (
+                    <button
+                      onClick={() =>
+                        setReplaceTarget({
+                          id: detail.id,
+                          masterName: detail.masterName,
+                          supplierName: detail.supplierName,
+                          submittedAt: detail.submittedAt,
+                          existingCanonicalId: detail.existingCanonicalId,
+                          existingCanonicalUpdatedAt: detail.existingCanonicalUpdatedAt,
+                          existingCanonicalSourceType: detail.existingCanonicalSourceType,
+                        })
+                      }
+                      disabled={acting}
+                      className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-white hover:bg-amber-600 disabled:opacity-50"
+                    >
+                      기존 승인본 숨기고 교체
+                    </button>
+                  )}
                   {detail.status !== 'canonical' && (
                     <button
                       onClick={() => doApprove(detail.id)}
                       disabled={acting || detail.hasCanonicalConflict}
-                      title={detail.hasCanonicalConflict ? '이미 승인된 매장용 설명서가 있어 승인할 수 없습니다' : undefined}
+                      title={detail.hasCanonicalConflict ? '이미 승인된 매장용 설명서가 있어 기본 승인은 차단됩니다 (교체 버튼 사용)' : undefined}
                       className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-40"
                     >
                       {acting ? '처리 중…' : '승인 (매장 노출)'}
@@ -491,6 +554,45 @@ export default function SupplierStoreDescriptionReviewPage() {
                 className="rounded-lg bg-orange-600 px-4 py-2 text-sm font-medium text-white hover:bg-orange-700 disabled:opacity-50"
               >
                 {acting ? '처리 중…' : '수정 요청 보내기'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* canonical 교체 확인 모달 (WO-...-CANONICAL-REPLACE-APPLY-V1) */}
+      {replaceTarget && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4" onClick={() => !acting && setReplaceTarget(null)}>
+          <div className="w-full max-w-md rounded-xl bg-white p-5 shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <h3 className="flex items-center gap-2 text-base font-bold text-gray-900">
+              <Replace size={18} className="text-amber-600" /> 기존 승인본 숨기고 교체
+            </h3>
+            <p className="mt-2 whitespace-pre-line text-sm text-gray-600">
+              {`이미 승인된 매장용 설명서가 있습니다.\n\n교체하면 기존 승인본은 숨김 처리되고, 이 제출 건이 새 공식 매장용 설명서로 승인됩니다.\n\n매장이 이미 가져간 설명서는 자동으로 바뀌지 않습니다. Product Landing·QR·태블릿의 live 참조는 새 설명서를 사용합니다.`}
+            </p>
+            <div className="mt-3 space-y-1 rounded-lg bg-gray-50 px-3 py-2 text-xs text-gray-600">
+              <div>상품: <span className="font-medium text-gray-800">{replaceTarget.masterName || '(이름 없음)'}</span></div>
+              <div>새 제출 공급자: {replaceTarget.supplierName || '-'} · 제출 {fmtDate(replaceTarget.submittedAt)}</div>
+              <div>
+                기존 canonical: <span className="font-mono">{replaceTarget.existingCanonicalId || '-'}</span>
+                {replaceTarget.existingCanonicalSourceType ? ` · ${replaceTarget.existingCanonicalSourceType}` : ''}
+                {replaceTarget.existingCanonicalUpdatedAt ? ` · ${fmtDate(replaceTarget.existingCanonicalUpdatedAt)}` : ''}
+              </div>
+            </div>
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                onClick={() => setReplaceTarget(null)}
+                disabled={acting}
+                className="rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+              >
+                취소
+              </button>
+              <button
+                onClick={doReplace}
+                disabled={acting}
+                className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-white hover:bg-amber-600 disabled:opacity-50"
+              >
+                {acting ? '처리 중…' : '기존 승인본 숨기고 교체'}
               </button>
             </div>
           </div>

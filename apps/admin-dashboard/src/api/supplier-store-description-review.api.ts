@@ -84,8 +84,15 @@ export async function getSupplierStoreReviewDetail(id: string): Promise<Supplier
   return res.data?.data ?? null;
 }
 
-export async function approveSupplierStoreReview(id: string): Promise<void> {
-  await authClient.api.post(`${BASE}/${encodeURIComponent(id)}/approve`);
+/**
+ * 승인. replaceExisting=true 일 때만 기존 canonical 이 있어도 교체(기존→hidden, 대상→canonical).
+ * WO-O4O-OPERATOR-SUPPLIER-STORE-DESCRIPTION-CANONICAL-REPLACE-APPLY-V1.
+ */
+export async function approveSupplierStoreReview(id: string, replaceExisting = false): Promise<void> {
+  await authClient.api.post(
+    `${BASE}/${encodeURIComponent(id)}/approve`,
+    replaceExisting ? { replaceExisting: true } : {},
+  );
 }
 
 export async function rejectSupplierStoreReview(id: string): Promise<void> {

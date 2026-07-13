@@ -110,19 +110,36 @@ export function createOperatorSupplierStoreDescriptionReviewController(dataSourc
         return;
       }
       // WO-O4O-OPERATOR-SUPPLIER-STORE-DESCRIPTION-CANONICAL-CONFLICT-POLICY-V1:
-      //   같은 (master, STORE, 언어) 에 이미 다른 canonical 이 있으면 승인 차단(DB unique violation 전에 명시적 차단).
-      //   V1 은 교체하지 않는다(별도 WO). 수정 요청은 계속 허용.
-      if (detail.hasCanonicalConflict) {
+      //   같은 (master, STORE, 언어) 에 이미 다른 canonical 이 있으면 기본 승인 차단(DB unique violation 전 명시 차단).
+      // WO-O4O-OPERATOR-SUPPLIER-STORE-DESCRIPTION-CANONICAL-REPLACE-APPLY-V1:
+      //   운영자가 body.replaceExisting===true(boolean, 엄격) 로 명시 확인한 경우에만 교체.
+      //   교체 = setCanonical(demotedStatus:'hidden') → 기존 canonical 을 hidden 강등 + 대상 승격(단일 트랜잭션).
+      //   replaceExisting 없이는(undefined/null/false/'true'문자열/1 등) 계속 409. 수정 요청은 계속 허용.
+      const replaceExisting = req.body?.replaceExisting === true;
+      if (detail.hasCanonicalConflict && !replaceExisting) {
         res.status(409).json({
           success: false,
           code: 'CANONICAL_CONFLICT',
-          error: '이미 승인된 매장용 설명서가 있습니다. 기존 설명서 교체 기능은 별도 작업으로 제공됩니다.',
+          error: '이미 승인된 매장용 설명서가 있습니다. 교체하려면 운영자 확인(replaceExisting)이 필요합니다.',
           existingCanonicalId: detail.existingCanonicalId,
         });
         return;
       }
-      const canonical = await service.setCanonical(req.params.id, actor);
-      res.json({ success: true, data: { id: canonical.id, status: canonical.status, curatedAt: canonical.curatedAt } });
+      const canonical = await service.setCanonical(
+        req.params.id,
+        actor,
+        detail.hasCanonicalConflict && replaceExisting ? { demotedStatus: 'hidden' } : undefined,
+      );
+      res.json({
+        success: true,
+        data: {
+          id: canonical.id,
+          status: canonical.status,
+          curatedAt: canonical.curatedAt,
+          replaced: detail.hasCanonicalConflict && replaceExisting,
+          previousCanonicalId: detail.hasCanonicalConflict ? detail.existingCanonicalId : null,
+        },
+      });
     } catch (err) {
       logger.error('[supplier-store-review] approve failed:', err);
       res.status(500).json({ success: false, error: 'canonical 승격에 실패했습니다', code: 'REVIEW_APPROVE_FAILED' });
