@@ -166,6 +166,10 @@ async function startServer() {
     const { cleanupLoginAttemptsJob } = await import('./jobs/cleanupLoginAttempts.js');
     cleanupLoginAttemptsJob.start();
 
+    // 공급자 STORE 설명서 수정 요청 만료 자동 삭제 (WO-O4O-SPD-REVISION-REQUEST-EXPIRY-SCHEDULER-V1)
+    const { spdRevisionExpiryJob } = await import('./jobs/spd-revision-expiry.job.js');
+    spdRevisionExpiryJob.start();
+
     // 서버 시작
     app.listen(PORT, () => {
       logger.info('🚀 API Server Information:', {
