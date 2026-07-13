@@ -62,15 +62,33 @@ AND cc.id <> target.id
 
 ## 9. 배포 결과
 
-- (main push → API/Admin 배포 결과 기록. web-neture 무변경. migration 없음.)
+- main push `198520542` → **API Server / Admin Dashboard 배포 success** (2026-07-13). web-neture 무변경(미배포). **migration 없음**.
+- 신규 엔드포인트 회귀 없음(approve 는 기존 경로에 conflict 가드 추가).
 
-## 10. 실브라우저 smoke 결과
+## 10. 실브라우저 smoke 결과 (prod, 2026-07-13)
 
-- (충돌 없음 승인 / 충돌 있음 승인 차단(UI 비활성 + API 409) / 수정 요청 가능 기록.)
+전 과정 **PASS**. 공급자(renagang21=(주)네뚜레 공급자 테스트) 단일 계정으로 canonical 충돌 시나리오 구성.
 
-## 11. 테스트 데이터 정리 결과
+smoke 데이터: 상품 `[SMOKE] canonical 충돌 검증 상품`(barcode 8809178391215) · offer `50ab2cb7-...` · master `1b64db18-...` · SPD#1 `01b1df74-...` · SPD#2 `49ae8136-...`.
 
-- (`[SMOKE]`. SPD/master/offer/기존 canonical id·충돌 대상 id·status 전이·정리 여부 기록.)
+1. **충돌 없음 승인**: SPD#1(needs_review) 승인 전 `hasCanonicalConflict=false` → approve 200 → `canonical`(curated_at 세팅). ✅
+2. **두 번째 제출**: 같은 master/STORE/ko 로 공급자 재저장 → upsert 가 canonical#1 은 재사용 제외 → **신규 needs_review 행 #2**(id≠#1) 생성. ✅
+3. **충돌 감지(detail)**: #2 `hasCanonicalConflict=true`, `existingCanonicalId=#1`(일치). ✅
+4. **승인 차단(API)**: #2 approve → **409 `CANONICAL_CONFLICT`**, `existingCanonicalId=#1`. DB unique violation 아님(명시 차단). ✅
+5. **승인 차단(UI)**: 운영자 큐에서 #2 행 상태 셀에 `승인 충돌` 빨강 배지(title 안내) + **승인 버튼 disabled**(title 안내) + 수정 요청 버튼은 활성. ✅
+6. **수정 요청 가능(충돌 중)**: #2 request-revision → 200 `revision_requested`(due +30일). 충돌과 무관하게 수정 요청 동작. ✅
+7. **회귀**: 공급자 임시저장/검수요청/upsert·운영자 승인(#1)·수정 요청 정상. AUTO-CREDIT/QR/landing/tablet 무접촉. ✅
+
+## 11. 테스트 데이터 정리 결과 (`[SMOKE]`)
+
+| 항목 | id / 값 | 처리 |
+|------|---------|------|
+| offer | `50ab2cb7-50fc-4a25-8162-0bbb5569b2b3` | **삭제**(bulk delete, deleted:1) |
+| master | `1b64db18-fb0f-407f-9142-ee351e7d18fd` | 잔존(orphan `[SMOKE]`, UI 삭제 경로 없음) |
+| SPD#1(기존 canonical) | `01b1df74-4d8d-45bf-8e95-cf4790224f09` | **hidden** |
+| SPD#2(충돌 대상) | `49ae8136-08fe-4fa5-8aa6-95e6d8a8ac52` | **hidden** |
+
+status 전이: #1 needs_review→canonical→hidden · #2 needs_review→(승인 409 차단)→revision_requested→needs_review→hidden.
 
 ## 12. 변경 파일 목록
 
@@ -81,16 +99,17 @@ AND cc.id <> target.id
 
 ## 13. commit SHA
 
-- 구현: (기록)
-- 배포/smoke: (기록)
+- 구현: `198520542` (feat) — 5 files.
+- 배포/smoke 기록: (본 CHECK 갱신 커밋.)
 
 ## 14. push 결과
 
-- (기록)
+- `198520542` origin/main push 완료. CHECK 갱신 커밋 push(본 커밋).
 
 ## 완료 판정
 
-- (구현·정적검증·배포·smoke 후 CLOSED/PASS)
+**WO-O4O-OPERATOR-SUPPLIER-STORE-DESCRIPTION-CANONICAL-CONFLICT-POLICY-V1 — CLOSED / PASS**
+(구현·정적검증(3앱 0)·배포(API/Admin success)·실브라우저 smoke 통과. 충돌 없음 승인 / 충돌 시 UI 승인 비활성+API 409 CANONICAL_CONFLICT / 충돌 중 수정 요청 가능 확인. 교체·canonical unique index·기존 canonical·AUTO-CREDIT·QR·landing·tablet 무변경. migration 없음.)
 
 ## 후속 WO
 
