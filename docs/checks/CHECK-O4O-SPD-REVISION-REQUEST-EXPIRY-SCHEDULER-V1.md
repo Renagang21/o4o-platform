@@ -46,11 +46,11 @@ AND deleted_at IS NULL
 
 ## 8. dry-run 결과
 
-- (배포 후 운영 API dry-run(GET /expiry/dry-run) count 기록.)
+- 스케줄러 부팅 run 이 apply 를 실행하며 동일 조건 count 를 로깅: `targetCount=0`(현재 만료 대상 없음). dry-run SELECT = apply DELETE 동일 조건이므로 dry-run count 도 0.
 
 ## 9. apply 검증 결과 / 보류 사유
 
-- (무대상 apply(deleted:0) 또는 job 로그 확인 기록.)
+- **무대상 apply 실행 확인**: 부팅 run 로그 `[spd-revision-expiry] apply done` `targetCount=0 deletedCount=0` — apply 경로 정상 실행·에러 없음·무삭제(guard 정상).
 
 ## 10. positive apply 미수행 사유
 
@@ -62,7 +62,15 @@ AND deleted_at IS NULL
 
 ## 12. 배포 결과
 
-- (main push → API Server 배포 결과 + 부팅 로그 `[spd-revision-expiry] starting scheduled job` 확인.)
+- main push → **API Server 배포 success** (2026-07-13). 최초 `ab3bc431c`(server.ts, dead) → 부팅 로그 부재로 발견 → `c165697d9`(startup.service.ts, prod) 재배포.
+- **부팅 로그 확인**(rev o4o-core-api-02554-xq8):
+  ```
+  ✅ Market Trial Lifecycle Job started
+  [spd-revision-expiry] starting scheduled job (daily, apply)
+  ✅ SPD Revision Expiry Job started
+  [spd-revision-expiry] apply done  (targetCount=0, deletedCount=0)
+  ```
+  → 스케줄러가 prod 경로에서 등록·시작·부팅 apply 실행(무대상) 확인.
 
 ## 13. 기존 기능 회귀 확인
 
@@ -75,16 +83,17 @@ AND deleted_at IS NULL
 
 ## 15. commit SHA
 
-- 구현: (기록)
-- 배포/검증: (기록)
+- 구현: `ab3bc431c` (feat, 최초) → `c165697d9` (fix, 등록 위치를 startup.service.ts 로 이전 = prod 경로).
+- 배포/검증 기록: (본 CHECK 갱신 커밋.)
 
 ## 16. push 결과
 
-- (기록)
+- `ab3bc431c`·`c165697d9` origin/main push 완료. CHECK 갱신 커밋 push(본 커밋).
 
 ## 완료 판정
 
-- (구현·정적검증·배포·부팅로그/dry-run 검증 후 CLOSED/PASS)
+**WO-O4O-SPD-REVISION-REQUEST-EXPIRY-SCHEDULER-V1 — CLOSED / PASS**
+(구현·정적검증·배포·**부팅 로그로 스케줄러 실동작 확인**(prod 경로 등록·apply 무대상 실행·guard 정상). 기존 expireRevisionRequested 재사용·신규 인프라/ migration 없음·positive apply 미수행. 엔트리포인트 검증으로 dead server.ts 등록 버그를 배포 후 로그로 발견·수정.)
 
 ## 후속 WO
 
