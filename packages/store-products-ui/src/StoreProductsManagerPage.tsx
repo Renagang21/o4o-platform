@@ -583,7 +583,7 @@ export default function StoreProductsManagerPage({
       key: 'primaryImage',
       header: '',
       width: 60,
-      render: (row) => (
+      render: (_v, row) => (
         <div className="relative inline-block">
           {row.primaryImage ? (
             <img src={row.primaryImage} alt={row.name} className="h-10 w-10 rounded object-cover" />
@@ -606,7 +606,7 @@ export default function StoreProductsManagerPage({
     {
       key: 'name',
       header: '상품명',
-      render: (row) => (
+      render: (_v, row) => (
         <div>
           <p className="text-sm font-medium text-gray-900 truncate max-w-[200px]">{row.name}</p>
           <p className="text-xs text-gray-400">{row.barcode}</p>
@@ -617,19 +617,19 @@ export default function StoreProductsManagerPage({
       key: 'manufacturerName',
       header: '제조사',
       width: 120,
-      render: (row) => <span className="text-sm text-gray-600 truncate">{row.manufacturerName}</span>,
+      render: (_v, row) => <span className="text-sm text-gray-600 truncate">{row.manufacturerName}</span>,
     },
     {
       key: 'offerPrice',
       header: '공급가',
       width: 100,
-      render: (row) => <span className="text-sm text-gray-500">{row.offerPrice != null ? `${row.offerPrice.toLocaleString()}원` : '-'}</span>,
+      render: (_v, row) => <span className="text-sm text-gray-500">{row.offerPrice != null ? `${row.offerPrice.toLocaleString()}원` : '-'}</span>,
     },
     {
       key: 'price',
       header: '판매가',
       width: 120,
-      render: (row) => (
+      render: (_v, row) => (
         <button
           onClick={() => openModal('price', row)}
           className="flex items-center gap-1 text-sm font-medium text-gray-900 hover:text-blue-600 group"
@@ -643,7 +643,7 @@ export default function StoreProductsManagerPage({
       key: 'isActive',
       header: '활성',
       width: 70,
-      render: (row) => (
+      render: (_v, row) => (
         <button
           onClick={() => toggleMutation.mutate({ id: row.id, isActive: !row.isActive })}
           disabled={togglingId === row.id}
@@ -659,7 +659,7 @@ export default function StoreProductsManagerPage({
       key: 'id',
       header: '관리',
       width: 140,
-      render: (row) => (
+      render: (_v, row) => (
         <div className="flex gap-1 flex-wrap">
           <button
             onClick={() => openModal('image', row)}
