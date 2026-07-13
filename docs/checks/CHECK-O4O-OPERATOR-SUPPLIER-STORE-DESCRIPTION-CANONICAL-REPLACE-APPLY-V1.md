@@ -45,15 +45,33 @@
 
 ## 배포 결과
 
-- (main push → API/Admin 배포 결과 기록. web-neture 무변경.)
+- main push `da119c31d` → **API Server / Admin Dashboard 배포 success** (2026-07-13). web-neture 무변경(미배포). **migration 없음**.
 
-## 실브라우저 smoke 결과
+## 실브라우저 smoke 결과 (prod, 2026-07-13)
 
-- (충돌 없는 승인 / 충돌 기본 차단 409 / 교체 승인 → 기존 hidden·새 canonical / 수정 요청 가능 기록.)
+전 과정 **PASS**. 단일 공급자(renagang21=(주)네뚜레 공급자 테스트) 로 교체 시나리오 구성.
 
-## 테스트 데이터 정리 결과
+smoke 데이터: 상품 `[SMOKE] canonical 교체 검증 상품`(barcode 8809178392793) · offer `50a36463-...` · master `ea48e6d7-...` · SPD#1 `363c7b7e-...`(기존 canonical) · SPD#2 `5036317f-...`(교체 대상).
 
-- (`[SMOKE]`. 기존 canonical/신규 SPD/master/offer id·status 전이·정리 기록.)
+1. **충돌 없는 승인**: SPD#1 승인 전 `hasCanonicalConflict=false` → approve 200 → `canonical`, `replaced=false`, `previousCanonicalId=null`. ✅
+2. **두 번째 제출**: 같은 master 재저장 → 신규 needs_review #2. detail `hasCanonicalConflict=true`, `existingCanonicalId=#1`, `existingSourceType=supplier`, `existingUpdatedAt` 세팅. ✅
+3. **replaceExisting 엄격성(API)**: `{replaceExisting:'true'}`(문자열) / `{replaceExisting:1}` / `{replaceExisting:false}` / `{}`(누락) → **전부 409 CANONICAL_CONFLICT**(기본 차단 유지). ✅
+4. **UI 교체 버튼**: 큐에서 #2 행에 `승인 충돌` 배지 + 승인 버튼 **disabled**(title "…교체는 별도 버튼") + **"기존 승인본 숨기고 교체"** 버튼 + 수정 요청 버튼. ✅
+5. **UI 확인 모달**: "교체하면 기존 승인본은 숨김 처리…매장이 이미 가져간 설명서는 자동으로 바뀌지 않습니다. Product Landing·QR·태블릿의 live 참조는 새 설명서를 사용합니다." + 상품/새 공급자·제출일/기존 canonical id 표시. ✅
+6. **교체 실행(UI 확인)** → toast "기존 승인본을 숨기고 교체했습니다". 검증: **#1 status=`hidden`**(candidate 아님) · **#2 status=`canonical`**(`curated_by`/`curated_at` 세팅, `hasCanonicalConflict=false`). 단일 트랜잭션 성공, unique index 위반 없음. ✅
+7. **AUTO-CREDIT**: 교체 후 canonical(#2) 의 `source_ref_id`=offer(`50a36463`) — per-row 기준 새 canonical 을 따라감(본 테스트는 단일 공급자·동일 offer 라 크레딧 값 동일, 메커니즘=canonical 행 기준 확인). ✅
+8. **미변경 확인**: 매장 import 사본(이번 smoke 는 import 미수행 → 사본 자체 없음, 영향 없음)·Product Landing·QR·tablet·store content 파일 **코드 무접촉**. 수정 요청 경로 코드 무변경(직전 WO 검증). ✅
+
+## 테스트 데이터 정리 결과 (`[SMOKE]`)
+
+| 항목 | id / 값 | 처리 |
+|------|---------|------|
+| offer | `50a36463-b27b-4522-b56a-1ab03f536afd` | **삭제**(bulk delete, deleted:1) |
+| master | `ea48e6d7-df12-41c8-9b57-9c85ce6670ad` | 잔존(orphan `[SMOKE]`, UI 삭제 경로 없음) |
+| SPD#1(교체된 이전 승인본) | `363c7b7e-...` | **hidden**(교체로 강등) |
+| SPD#2(교체 후 canonical) | `5036317f-...` | canonical → **hidden**(정리 reject) |
+
+status 전이: #1 needs_review→canonical→(교체)hidden · #2 needs_review→(409 4회 차단)→(UI 교체)canonical→hidden(정리).
 
 ## 변경 파일 목록
 
@@ -64,11 +82,13 @@
 
 ## commit SHA / push
 
-- (기록)
+- 구현: `da119c31d` (feat) — 5 files. origin/main push 완료.
+- 배포/smoke 기록: (본 CHECK 갱신 커밋.)
 
 ## 완료 판정
 
-- (구현·정적검증·배포·smoke 후 CLOSED/PASS)
+**WO-O4O-OPERATOR-SUPPLIER-STORE-DESCRIPTION-CANONICAL-REPLACE-APPLY-V1 — CLOSED / PASS**
+(구현·정적검증(3앱 0)·배포(API/Admin success)·실브라우저 smoke 통과. 충돌 없는 승인 / replaceExisting 엄격성 4종 409 / UI 교체 버튼·확인 모달 → 기존 canonical hidden·새 canonical(단일 트랜잭션·unique 안전) / AUTO-CREDIT per-row 전환 확인. migration 없음. landing·QR·tablet·store content·매장 import 사본 무변경. hidden=관리자숨김+교체된 이전 승인본.)
 
 ## 후속 WO
 
