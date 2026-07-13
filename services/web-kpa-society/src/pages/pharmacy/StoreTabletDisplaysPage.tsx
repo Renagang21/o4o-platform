@@ -49,6 +49,8 @@ import {
   clearOperatorCommonIdle,
   type OperatorCommonIdleCandidate,
   type OperatorCommonIdleSelection,
+  // WO-O4O-KPA-TABLET-TOUCH-FIRST-CORNER-HOME-V1: 코너 카드 홈에 현재 화면 세트명/블록수 표시용.
+  fetchScreenSets,
 } from '../../api/tabletDisplays';
 import type { Tablet as TabletType, ProductPool, TabletDisplaySettings } from '../../api/tabletDisplays';
 // WO-O4O-KPA-TABLET-SCREEN-SET-BLOCK-EDITOR-UX-V1: 화면 세트 관리 UI
@@ -102,6 +104,20 @@ export default function StoreTabletDisplaysPage() {
   const [hasChanges, setHasChanges] = useState(false);
   // WO-O4O-KPA-TABLET-OPERATION-GUIDE-MODAL-V1: 상단 상시 안내 박스 → 버튼+모달.
   const [showGuide, setShowGuide] = useState(false);
+  // WO-O4O-KPA-TABLET-TOUCH-FIRST-CORNER-HOME-V1: currentScreenSetId → {name, blockCount} 인덱스(코너 카드 표시용).
+  const [screenSetIndex, setScreenSetIndex] = useState<Record<string, { name: string; blockCount: number }>>({});
+  useEffect(() => {
+    let cancelled = false;
+    fetchScreenSets()
+      .then((sets) => {
+        if (cancelled) return;
+        const idx: Record<string, { name: string; blockCount: number }> = {};
+        for (const s of sets) idx[s.id] = { name: s.name, blockCount: s.blockCount ?? 0 };
+        setScreenSetIndex(idx);
+      })
+      .catch(() => { /* 코너 카드 부가정보 실패는 무시(카드 자체는 표시) */ });
+    return () => { cancelled = true; };
+  }, [tablets.length]);
   useEffect(() => {
     if (!showGuide) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setShowGuide(false); };
@@ -833,9 +849,80 @@ export default function StoreTabletDisplaysPage() {
         </div>
       )}
 
-      {/* Tablet list DataTable + editor */}
-      {!loadingTablets && tablets.length > 0 && (
+      {/* WO-O4O-KPA-TABLET-TOUCH-FIRST-CORNER-HOME-V1: 첫 화면 = 코너 카드 홈(태블릿 목록 아님).
+          코너 = store_tablets(location||name). 카드 선택 시 기존 상세/편집기(아래) 재사용.
+          미선택(selectedTabletId=null) 상태에서만 홈을 표시한다. */}
+      {!loadingTablets && tablets.length > 0 && !selectedTabletId && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <h2 className="text-base font-bold text-slate-800 flex items-center gap-2">
+              <Tablet className="w-5 h-5 text-teal-600" /> 코너 화면
+              <span className="text-sm font-normal text-slate-400">({tablets.length})</span>
+            </h2>
+            {/* 태블릿 추가는 보조 액션으로 낮춤(연결 흐름 재설계는 후속 WO) */}
+            <button
+              onClick={() => setShowRegisterForm(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-teal-700 bg-white border border-teal-200 rounded-xl hover:bg-teal-50"
+            >
+              <Plus className="w-4 h-4" /> 코너/태블릿 추가
+            </button>
+          </div>
+          <p className="text-xs text-slate-400">관리할 코너를 선택하세요. 각 코너는 매장 위치 기준의 태블릿 화면입니다.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+            {sortedTablets.map((t) => {
+              const set = t.currentScreenSetId ? screenSetIndex[t.currentScreenSetId] : null;
+              return (
+                <div
+                  key={t.id}
+                  onClick={() => setSelectedTabletId(t.id)}
+                  className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 flex flex-col gap-3 cursor-pointer hover:border-teal-200 hover:shadow-md transition"
+                >
+                  <div className="min-w-0">
+                    <div className="text-base font-bold text-slate-900 truncate">{cornerPrimary(t)}</div>
+                    {cornerSecondary(t) && <div className="text-xs text-slate-400 truncate mt-0.5">{cornerSecondary(t)}</div>}
+                  </div>
+                  <div className="space-y-1 text-sm min-w-0">
+                    <div className="text-slate-600 truncate">
+                      화면 세트: <span className="font-medium text-slate-800">{set ? set.name : (t.currentScreenSetId ? '적용됨' : '기본 화면')}</span>
+                    </div>
+                    {set && <div className="text-xs text-slate-400">블록 {set.blockCount}개</div>}
+                    <div className="text-xs">
+                      <span className={t.is_active ? 'text-emerald-600 font-medium' : 'text-slate-400'}>{t.is_active ? '● 연결됨(활성)' : '○ 비활성'}</span>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 mt-auto">
+                    {storeSlug && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); window.open(publicTabletUrl(t.id), '_blank', 'noopener,noreferrer'); }}
+                        className="flex-1 min-h-[44px] px-3 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50"
+                      >
+                        공개 화면 확인
+                      </button>
+                    )}
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setSelectedTabletId(t.id); }}
+                      className="flex-1 min-h-[44px] px-3 py-2 text-sm font-semibold text-white bg-teal-600 rounded-xl hover:bg-teal-700"
+                    >
+                      관리
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Tablet list DataTable + editor (선택 코너 상세 — 기존 2단 레이아웃 재사용) */}
+      {!loadingTablets && tablets.length > 0 && selectedTabletId && (
         <>
+          {/* WO-O4O-KPA-TABLET-TOUCH-FIRST-CORNER-HOME-V1: 코너 홈으로 돌아가기 */}
+          <button
+            onClick={() => setSelectedTabletId(null)}
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50"
+          >
+            <ArrowLeft className="w-4 h-4" /> 코너 목록
+          </button>
           {/* WO-O4O-KPA-TABLET-LOCATION-FIRST-UX-REFIT-V1: 위치/코너 우선 2단 레이아웃
               좌측 = 위치/코너 태블릿 목록(1차 기준축), 우측 = 선택 코너의 현재 구성.
               데이터 구조·API·public runtime 무변경 (UI 재배치만). */}
