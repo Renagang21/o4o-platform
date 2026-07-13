@@ -54,14 +54,23 @@
 
 ## 6. 검증 상태
 
-- GitHub default branch에 코드 반영 완료.
-- 정적 타입체크, production build, 배포 및 운영 smoke는 CI/CD 결과와 운영 화면에서 후속 확인 필요.
-- 운영 확인 항목:
-  - `/admin/kpa-dashboard`에서 `kpa:admin` 미노출
-  - 390/768/1023px 모바일 햄버거에서 보유 역할별 대시보드 진입점 노출
-  - 1280px 데스크톱 사용자 드롭다운 기존 메뉴 유지
-  - `StoreUserDropdown`의 관리자 라벨이 `관리자 대시보드`로 표시
+- GitHub default branch(`origin/main`)에 코드 반영 완료. HEAD = `91579cfa4` 기준 3개 대상 파일 모두 최종 상태 확인.
+- CI/CD: "Deploy Web Services (Cloud Run)" — `e5dae363f`(00:56) 및 최신 `91579cfa4`(01:12) 모두 **success**. 중간 `1409de952` 배포는 후속 커밋으로 대체(cancelled, 정상). KPA web 프로덕션 반영 완료.
+- 정적 검증: web-kpa-society `tsc --noEmit` **exit 0**.
+
+### 운영 smoke (프로덕션 `kpa-society.co.kr`, 2026-07-13 · admin+operator+store_owner 다중역할 계정)
+
+| 항목 | 뷰포트 | 결과 |
+|---|---|---|
+| `/admin/kpa-dashboard`에서 `kpa:admin` 미노출 (제목·부제 유지) | — | **PASS** (`hasKpaAdminLiteral=false`, 제목·부제 present) |
+| 모바일 햄버거 사용자 메뉴 역할별 진입점 복원 | 390px | **PASS** — 관리자 대시보드(/admin)·운영 대시보드(/operator)·내 매장(/store)·마이페이지·설정·로그아웃 |
+| 데스크톱 사용자 드롭다운 = 모바일과 동일 항목 | 1280px | **PASS** — 동일 6항목, 라벨 `관리자 대시보드` |
+| 관리자 진입점 라벨 = `관리자 대시보드` (`관리자 콘솔` 미사용) | 390/1280px | **PASS** (GlobalHeader 데스크톱·모바일 모두). `StoreUserDropdown` 두 분기도 소스/배포 기준 `관리자 대시보드`로 통일 — 테스트 라우트(/store 홈)는 GlobalHeader 사용으로 별도 렌더 미발생. |
+
+- 콘솔 오류: 로그인 전 401(auth check)·미게시 법정문서 404 등 본 변경과 무관한 항목만 관측. 본 변경 관련 오류 0.
 
 ## 7. 상태
 
-코드 구현 및 push 완료. CI/CD·운영 smoke 확인 대기.
+코드 구현·push·CI 배포·운영 smoke 완료. **DONE**.
+
+> 참고(세션 노트): 본 WO 코드는 별도 세션이 `3e2b8f933`~`892e7218d` 4개 커밋으로 이미 main에 반영·배포했다. 본 검증 세션은 stale 로컬(`d33dfc712`)에서 중복 편집을 시도했다가 동시 pull(--autostash) 충돌이 발생, 중복 편집을 HEAD로 되돌려 충돌을 해소한 뒤(대상 3파일 = HEAD 일치) 운영 smoke만 수행했다. 코드 순변경 0.
