@@ -44,6 +44,8 @@ import { validateGtin } from '../../utils/gtin.js';
 import { createRequireStoreOwner } from '../../utils/store-owner.utils.js';
 // WO-O4O-KPA-TABLET-IDLE-BLOCK-INTEGRATION-V1: idle_media block config 검증 (dual-read helper 모듈)
 import { parseIdleMediaConfig } from './store-tablet-idle-block.js';
+// WO-O4O-KPA-TABLET-CONTENT-LIST-BLOCK-SCHEMA-CONTRACT-V1: content_list config 검증
+import { parseContentListConfig } from './store-tablet-content-list-block.js';
 
 type AuthMiddleware = import('express').RequestHandler;
 
@@ -1145,6 +1147,8 @@ export function createStoreTabletRoutes(
   const SET_BLOCK_TYPES = [
     'idle_media', 'product_list', 'product_content',
     'corner_description', 'health_info', 'staff_inquiry', 'qr_guide',
+    // WO-O4O-KPA-TABLET-CONTENT-LIST-BLOCK-SCHEMA-CONTRACT-V1: 코너 콘텐츠 카드 목록(신규).
+    'content_list',
   ];
   const SET_STATUSES_WRITABLE = ['draft', 'active', 'archived'];
   // WO-O4O-KPA-TABLET-SCREEN-SET-TEMPLATE-KEY-SCHEMA-V1 / -TEMPLATE-APPLY-V1:
@@ -1321,6 +1325,11 @@ export function createStoreTabletRoutes(
         // WO-O4O-KPA-TABLET-IDLE-BLOCK-INTEGRATION-V1: idle_media config 검증(source/durationMs/custom_media)
         if (b.blockType === 'idle_media') {
           const parsed = parseIdleMediaConfig(b.config);
+          if (!parsed.ok && 'error' in parsed) { res.status(400).json({ success: false, error: `blocks[${i}].config: ${parsed.error}`, code: 'INVALID_BLOCK_CONFIG' }); return; }
+        }
+        // WO-O4O-KPA-TABLET-CONTENT-LIST-BLOCK-SCHEMA-CONTRACT-V1: content_list config 검증(items/sourceType/키).
+        if (b.blockType === 'content_list') {
+          const parsed = parseContentListConfig(b.config);
           if (!parsed.ok && 'error' in parsed) { res.status(400).json({ success: false, error: `blocks[${i}].config: ${parsed.error}`, code: 'INVALID_BLOCK_CONFIG' }); return; }
         }
       }

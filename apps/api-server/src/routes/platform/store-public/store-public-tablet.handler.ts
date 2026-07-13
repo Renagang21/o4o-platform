@@ -28,6 +28,8 @@ import {
 // WO-O4O-KPA-TABLET-SCREEN-SET-BLOCK-PUBLIC-RUNTIME-READ-V1
 import { resolveTabletIdleItems } from './store-public-tablet-idle-resolve.js';
 import { resolveTemplateKey, shapeStaticBlock } from './store-public-tablet-screen.js';
+// WO-O4O-KPA-TABLET-CONTENT-LIST-BLOCK-SCHEMA-CONTRACT-V1: content_list item → 카드 resolve
+import { resolveContentListItems } from './store-public-tablet-content-resolve.js';
 
 export function createStorePublicTabletRoutes(deps: {
   dataSource: DataSource;
@@ -540,6 +542,12 @@ export function createStorePublicTabletRoutes(deps: {
           } else if (b.blockType === 'product_content') {
             const cfg = (b.config && typeof b.config === 'object' && !Array.isArray(b.config)) ? b.config : {};
             sections.push({ blockType: 'product_content', sortOrder: b.sortOrder, data: { productRef: cfg.productRef ?? null, contentId: cfg.contentId ?? null } });
+          } else if (b.blockType === 'content_list') {
+            // WO-O4O-KPA-TABLET-CONTENT-LIST-BLOCK-SCHEMA-CONTRACT-V1:
+            //   서버가 item(o4o_product_description / store_content)을 카드 data 로 resolve.
+            //   org 스코프/archived/canonical 게이트는 resolve 내부. 실패 item 은 skip → items=[] 허용.
+            const cards = await resolveContentListItems(dataSource, resolved.storeId, b.config);
+            sections.push({ blockType: 'content_list', sortOrder: b.sortOrder, data: { items: cards } });
           } else {
             const data = shapeStaticBlock(b.blockType, b.config);
             if (data) sections.push({ blockType: b.blockType, sortOrder: b.sortOrder, data }); // null → 섹션 생략(안전)
