@@ -230,6 +230,19 @@ function formatPrice(price: number): string {
   return price.toLocaleString('ko-KR') + '원';
 }
 
+// WO-O4O-KPA-TABLET-TEMPLATE-USABILITY-REFINE-V1:
+//   qr_guide URL 원문 노출을 피하고 사람이 읽는 짧은 도메인만 보조 표기.
+//   전체 https://... 를 큰 텍스트로 노출하지 않는다(§5.3). 데이터(config)는 바꾸지 않고 렌더링만 정비.
+function shortHost(url: string): string {
+  const raw = (url || '').trim();
+  if (!raw) return '';
+  try {
+    return new URL(raw).hostname.replace(/^www\./, '');
+  } catch {
+    return raw.replace(/^https?:\/\//i, '').replace(/^www\./, '').split('/')[0];
+  }
+}
+
 function mapSupplierProduct(p: TabletProduct): DisplayProduct {
   return {
     id: p.id,
@@ -732,27 +745,36 @@ export function TabletKioskPage({
   return (
     <div style={styles.fullscreen}>
       {/* Header — screen_set 코너 설명 있으면 그 제목/설명, 없으면 기본(legacy).
-          product_focus(§3.4): 코너 설명은 축약 헤더 → subtitle 생략, compact 패딩. */}
+          product_focus(§3.4): 코너 설명은 축약 헤더 → subtitle 생략, compact 패딩.
+          WO-O4O-KPA-TABLET-TEMPLATE-USABILITY-REFINE-V1(§5.1·§5.6):
+            제목/설명을 좌우 1행(space-between)에서 세로 스택으로 변경 → 제목이 좁은 폭에 눌려
+            글자 단위로 세로로 깨지던 문제 해소. 제목 wordBreak:keep-all(한글 단어 보존),
+            설명은 별도 문단으로 줄폭/줄간격 확보. clamp() 로 화면 폭 대응. */}
       <div style={isProductFocus ? styles.headerCompact : styles.header}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <h1 style={{ fontSize: isProductFocus ? '17px' : '20px', fontWeight: 700 }}>{cornerInfo?.title || '매장 상품 안내'}</h1>
+        <div style={styles.headerTitleRow}>
+          <h1 style={isProductFocus ? styles.cornerTitleCompact : styles.cornerTitle}>{cornerInfo?.title || '매장 상품 안내'}</h1>
           {showQrBadge && displaySettings?.showQr !== false && (
-            <span style={{ fontSize: '11px', fontWeight: 600, backgroundColor: '#f0fdf4', color: '#16a34a', padding: '2px 8px', borderRadius: '4px' }}>
-              QR 코드로 접속
-            </span>
+            <span style={styles.qrBadge}>QR 코드로 접속</span>
           )}
         </div>
         {!isProductFocus && (
-          <span style={{ fontSize: '14px', color: '#64748b' }}>{cornerInfo?.body || '궁금한 상품을 터치해 설명을 확인해 보세요'}</span>
+          <p style={styles.cornerBody}>{cornerInfo?.body || '궁금한 상품을 터치해 설명을 확인해 보세요'}</p>
         )}
       </div>
 
-      {/* WO-O4O-KPA-TABLET-KIOSK-CORE-SCREEN-CONSUMER-V1: qr_guide 안내 배너(screen_set 전용, 있을 때만).
-          기본 템플릿은 상단, product_focus 는 하단 보조 배너로 이동(§3.4) → 여기서는 기본 템플릿만 렌더. */}
+      {/* WO-O4O-KPA-TABLET-KIOSK-CORE-SCREEN-CONSUMER-V1: qr_guide 안내(screen_set 전용, 있을 때만).
+          기본 템플릿은 상단, product_focus 는 하단 보조 배너로 이동(§3.4).
+          WO-O4O-KPA-TABLET-TEMPLATE-USABILITY-REFINE-V1(§5.3·§5.4):
+            "라벨 + https://... 원문" 나열 → QR 카드(아이콘 + 행동유도 문구 + 짧은 도메인)로 정비.
+            전체 URL 대신 shortHost() 도메인만 보조 표기. 데이터(config label/url)는 변경하지 않음. */}
       {qrGuide && !isProductFocus && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 24px', backgroundColor: '#eff6ff', borderBottom: '1px solid #dbeafe', color: '#1e40af', fontSize: '13px' }}>
-          <span style={{ fontWeight: 600 }}>📱 {qrGuide.label || '모바일 안내'}</span>
-          {qrGuide.url && <span style={{ color: '#3b82f6', wordBreak: 'break-all' }}>{qrGuide.url}</span>}
+        <div style={styles.qrCard}>
+          <div style={styles.qrCardIcon} aria-hidden>▣</div>
+          <div style={styles.qrCardText}>
+            <span style={styles.qrCardTitle}>{qrGuide.label || '모바일에서 자세히 보기'}</span>
+            <span style={styles.qrCardDesc}>QR을 스캔하면 이 코너 안내를 모바일에서도 확인할 수 있습니다.</span>
+          </div>
+          {shortHost(qrGuide.url) && <span style={styles.qrCardDomain}>{shortHost(qrGuide.url)}</span>}
         </div>
       )}
 
@@ -762,8 +784,14 @@ export function TabletKioskPage({
             <p style={{ color: '#94a3b8' }}>상품을 불러오는 중...</p>
           </div>
         ) : products.length === 0 ? (
-          <div style={styles.centerMessage}>
-            <p style={{ color: '#94a3b8' }}>표시할 상품이 없습니다.</p>
+          // WO-O4O-KPA-TABLET-TEMPLATE-USABILITY-REFINE-V1(§5.5):
+          //   빈 화면 한 줄 → 카드형 empty state. 상품이 실제로 들어가면(products.length>0) 렌더되지 않음.
+          <div style={styles.emptyWrap}>
+            <div style={styles.emptyCard}>
+              <div style={styles.emptyIcon} aria-hidden>🗂️</div>
+              <p style={styles.emptyTitle}>이 코너의 상품을 준비 중입니다</p>
+              <p style={styles.emptyDesc}>코너 안내를 확인하시고, 필요한 제품은 직원에게 문의해 주세요.</p>
+            </div>
           </div>
         ) : (
           <div style={isProductFocus ? styles.gridFocus : styles.grid}>
@@ -801,11 +829,16 @@ export function TabletKioskPage({
         )}
       </div>
 
-      {/* product_focus(§3.4): qr_guide 는 하단 보조 배너로 배치(있을 때만). 기본 템플릿은 상단에서 이미 렌더됨. */}
+      {/* product_focus(§3.4): qr_guide 는 하단 보조 배너로 배치(있을 때만). 기본 템플릿은 상단에서 이미 렌더됨.
+          WO-O4O-KPA-TABLET-TEMPLATE-USABILITY-REFINE-V1: 상단 카드와 동일 정비(도메인만, 원문 URL 미노출). */}
       {qrGuide && isProductFocus && (
-        <div style={styles.qrGuideBottom}>
-          <span style={{ fontWeight: 600 }}>📱 {qrGuide.label || '모바일 안내'}</span>
-          {qrGuide.url && <span style={{ color: '#3b82f6', wordBreak: 'break-all' }}>{qrGuide.url}</span>}
+        <div style={styles.qrCardBottom}>
+          <div style={styles.qrCardIcon} aria-hidden>▣</div>
+          <div style={styles.qrCardText}>
+            <span style={styles.qrCardTitle}>{qrGuide.label || '모바일에서 자세히 보기'}</span>
+            <span style={styles.qrCardDesc}>QR을 스캔하면 이 코너 안내를 모바일에서도 확인할 수 있습니다.</span>
+          </div>
+          {shortHost(qrGuide.url) && <span style={styles.qrCardDomain}>{shortHost(qrGuide.url)}</span>}
         </div>
       )}
     </div>
@@ -922,11 +955,14 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: 'column',
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
   },
+  // WO-O4O-KPA-TABLET-TEMPLATE-USABILITY-REFINE-V1(§5.1·§5.6):
+  //   제목/설명을 세로 스택으로. 좌우 space-between 1행 배치 시 제목이 눌려 글자 단위로
+  //   세로로 깨지던 문제 해소. 제목은 headerTitleRow(가로)에서 badge 와 나란히, 설명은 아래 문단.
   header: {
     display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '16px 24px',
+    flexDirection: 'column',
+    gap: '6px',
+    padding: 'clamp(12px, 2vw, 18px) clamp(16px, 3vw, 28px)',
     backgroundColor: '#fff',
     borderBottom: '1px solid #e2e8f0',
     flexShrink: 0,
@@ -934,11 +970,54 @@ const styles: Record<string, React.CSSProperties> = {
   // WO-O4O-KPA-TABLET-SCREEN-SET-TEMPLATE-APPLY-V1: product_focus 축약 헤더(코너 설명 최소화, 상품 영역 우선).
   headerCompact: {
     display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '10px 24px',
+    flexDirection: 'column',
+    gap: '4px',
+    padding: 'clamp(8px, 1.4vw, 12px) clamp(16px, 3vw, 28px)',
     backgroundColor: '#fff',
     borderBottom: '1px solid #e2e8f0',
+    flexShrink: 0,
+  },
+  // 제목 + QR 배지 행(가로, 좁으면 wrap). 제목이 전체 폭을 확보해 세로 깨짐 없음.
+  headerTitleRow: {
+    display: 'flex',
+    alignItems: 'baseline',
+    flexWrap: 'wrap',
+    gap: '8px',
+  },
+  cornerTitle: {
+    fontSize: 'clamp(18px, 2.4vw, 26px)',
+    fontWeight: 700,
+    lineHeight: 1.25,
+    margin: 0,
+    // 한글 단어가 글자 단위로 쪼개지지 않도록(피/부/관/리 방지). 필요 시 단어 경계에서만 줄바꿈.
+    wordBreak: 'keep-all',
+    overflowWrap: 'break-word',
+  },
+  cornerTitleCompact: {
+    fontSize: 'clamp(16px, 1.8vw, 19px)',
+    fontWeight: 700,
+    lineHeight: 1.25,
+    margin: 0,
+    wordBreak: 'keep-all',
+    overflowWrap: 'break-word',
+  },
+  cornerBody: {
+    fontSize: 'clamp(13px, 1.5vw, 15px)',
+    color: '#64748b',
+    lineHeight: 1.65,
+    margin: 0,
+    maxWidth: '70ch',
+    wordBreak: 'keep-all',
+    overflowWrap: 'break-word',
+  },
+  qrBadge: {
+    fontSize: '11px',
+    fontWeight: 600,
+    backgroundColor: '#f0fdf4',
+    color: '#16a34a',
+    padding: '2px 8px',
+    borderRadius: '4px',
+    whiteSpace: 'nowrap',
     flexShrink: 0,
   },
   body: {
@@ -946,15 +1025,17 @@ const styles: Record<string, React.CSSProperties> = {
     overflowY: 'auto',
     padding: '16px',
   },
+  // WO-O4O-KPA-TABLET-TEMPLATE-USABILITY-REFINE-V1(§5.2): minmax(min(px,100%),1fr) 로 아주 좁은 폭에서도
+  //   한 열이 화면 밖으로 넘치지 않게(가로 overflow 방지). 폭에 따라 1~n 열 자연 대응.
   grid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(min(220px, 100%), 1fr))',
     gap: '12px',
   },
   // WO-O4O-KPA-TABLET-SCREEN-SET-TEMPLATE-APPLY-V1: product_focus 상품 그리드(더 큰 타일 = 상품 전면 배치).
   gridFocus: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(min(280px, 100%), 1fr))',
     gap: '16px',
   },
   productCard: {
@@ -1124,17 +1205,109 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: '8px',
     margin: '16px 0',
   },
-  // WO-O4O-KPA-TABLET-SCREEN-SET-TEMPLATE-APPLY-V1: product_focus 하단 QR 보조 배너.
-  qrGuideBottom: {
+  // WO-O4O-KPA-TABLET-TEMPLATE-USABILITY-REFINE-V1(§5.4): QR 안내 카드(상단/하단 공통 셸).
+  //   아이콘 + 행동유도 문구 + 짧은 도메인. 좁은 폭에서 도메인이 아래로 wrap(overflow 방지).
+  qrCard: {
     display: 'flex',
     alignItems: 'center',
-    gap: '8px',
-    padding: '10px 24px',
+    flexWrap: 'wrap',
+    gap: '12px',
+    padding: 'clamp(10px, 1.6vw, 14px) clamp(16px, 3vw, 28px)',
+    backgroundColor: '#eff6ff',
+    borderBottom: '1px solid #dbeafe',
+    flexShrink: 0,
+  },
+  qrCardBottom: {
+    display: 'flex',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: '12px',
+    padding: 'clamp(10px, 1.6vw, 14px) clamp(16px, 3vw, 28px)',
     backgroundColor: '#eff6ff',
     borderTop: '1px solid #dbeafe',
-    color: '#1e40af',
-    fontSize: '13px',
     flexShrink: 0,
+  },
+  qrCardIcon: {
+    width: '40px',
+    height: '40px',
+    borderRadius: '10px',
+    backgroundColor: '#dbeafe',
+    color: '#1d4ed8',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '22px',
+    flexShrink: 0,
+  },
+  qrCardText: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '2px',
+    minWidth: 0,
+    flex: 1,
+  },
+  qrCardTitle: {
+    fontSize: 'clamp(14px, 1.6vw, 16px)',
+    fontWeight: 700,
+    color: '#1e3a8a',
+  },
+  qrCardDesc: {
+    fontSize: 'clamp(12px, 1.4vw, 13px)',
+    color: '#3b6fb5',
+    lineHeight: 1.5,
+    wordBreak: 'keep-all',
+    overflowWrap: 'break-word',
+  },
+  qrCardDomain: {
+    fontSize: '13px',
+    fontWeight: 600,
+    color: '#2563eb',
+    backgroundColor: '#fff',
+    border: '1px solid #dbeafe',
+    borderRadius: '6px',
+    padding: '4px 10px',
+    whiteSpace: 'nowrap',
+    flexShrink: 0,
+  },
+  // WO-O4O-KPA-TABLET-TEMPLATE-USABILITY-REFINE-V1(§5.5): 상품 0건 카드형 empty state.
+  emptyWrap: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: '100%',
+    padding: '24px',
+  },
+  emptyCard: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    textAlign: 'center',
+    gap: '8px',
+    maxWidth: '420px',
+    width: '100%',
+    padding: 'clamp(24px, 4vw, 40px)',
+    backgroundColor: '#fff',
+    border: '1px solid #e2e8f0',
+    borderRadius: '16px',
+  },
+  emptyIcon: {
+    fontSize: '40px',
+    lineHeight: 1,
+    marginBottom: '4px',
+  },
+  emptyTitle: {
+    fontSize: 'clamp(15px, 1.8vw, 18px)',
+    fontWeight: 700,
+    color: '#334155',
+    margin: 0,
+  },
+  emptyDesc: {
+    fontSize: 'clamp(13px, 1.5vw, 14px)',
+    color: '#64748b',
+    lineHeight: 1.6,
+    margin: 0,
+    wordBreak: 'keep-all',
+    overflowWrap: 'break-word',
   },
   // Idle overlay (WO-O4O-TABLET-IDLE-LAYER-V1)
   idleOverlay: {
