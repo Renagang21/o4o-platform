@@ -100,7 +100,7 @@ export function StoreUserDropdown({ homeLink = '/', onLogout }: StoreUserDropdow
                     icon={<Shield className="w-4 h-4 text-amber-600" />}
                     onClick={() => setOpen(false)}
                   >
-                    {isAdmin ? '관리자 콘솔' : '운영 대시보드'}
+                    {isAdmin ? '관리자 대시보드' : '운영 대시보드'}
                   </DropdownLink>
                   <DropdownLink to="/mypage" icon={<Home className="w-4 h-4 text-slate-500" />} onClick={() => setOpen(false)}>
                     마이페이지
@@ -115,7 +115,7 @@ export function StoreUserDropdown({ homeLink = '/', onLogout }: StoreUserDropdow
                       icon={<Shield className="w-4 h-4 text-slate-500" />}
                       onClick={() => setOpen(false)}
                     >
-                      {isAdmin ? '관리자 콘솔' : '운영 대시보드'}
+                      {isAdmin ? '관리자 대시보드' : '운영 대시보드'}
                     </DropdownLink>
                   )}
                   {/* WO-O4O-DASHBOARD-SWITCHER-DORMANT-CODE-CLEANUP-V1 (2026-05-23):
