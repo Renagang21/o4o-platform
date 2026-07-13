@@ -65,7 +65,7 @@ canonical 승격 로직 · QR · product landing · tablet · SUPPLIER_STORE 무
 
 ## 10. migration 적용 결과
 
-- (main 배포 → CI/CD 자동 migration. 로그/컬럼 확인 후 기록.)
+- migration `20270121000000` main 배포 → CI/CD 자동 적용. 컬럼 존재 확인: 운영자 `request-revision` 호출이 `review_note`/`revision_requested_at`/`revision_due_at` 를 500 없이 세팅(§13-4) → 3 컬럼 실재.
 
 ## 11. typecheck / build 결과
 
@@ -75,15 +75,41 @@ canonical 승격 로직 · QR · product landing · tablet · SUPPLIER_STORE 무
 
 ## 12. 배포 결과
 
-- (main push → API/Admin/Web 배포 결과 기록.)
+- main push `ad090d03c` → CI/CD 3 타깃 전부 **success** (API/Admin/Web, 2026-07-13).
+- 신규 엔드포인트 라이브(401 게이트): `POST /:id/request-revision`, `GET /expiry/dry-run`, `POST /expiry/apply`.
 
-## 13. 실브라우저 smoke 결과
+## 13. 실브라우저 smoke 결과 (prod, 2026-07-13)
 
-- (공급자 작성→검수요청 / 운영자 수정 요청 / 공급자 수정→다시 검수요청 / 만료 dry-run·apply(smoke 데이터) 기록.)
+전 과정 **PASS**. 공급자(ACTIVE, renagang21@gmail.com=(주)네뚜레 공급자 테스트) → 운영자(sohae2100@gmail.com=Neture admin).
 
-## 14. 테스트 데이터 정리 결과
+1. 운영자 큐 UI = `수정 요청` 필터 탭 + `만료 정리`(대상 확인 dry-run) 패널 + 행 액션 `수정 요청`(반려 대체) 노출. ✅
+2. 수정 요청 모달 = 사유 없이 "수정 요청 보내기" **비활성**(필수 검증). ✅
+3. 사유 입력 후 수정 요청 → toast "수정 요청되었습니다(30일 기한)", 검수 대기 목록에서 제거. ✅
+4. detail 필드: `status=revision_requested`, `review_note`=사유, `revision_requested_at`=시각, `revision_due_at`=**정확히 +30일**, `submitted_at` 보존. ✅ (migration 컬럼 실재 확인)
+5. 자동삭제 dry-run guard: 이 행은 due **미래** → dry-run `count=0`(제외). ✅
+6. 공급자 페이지 = 해당 상품 `수정 요청` 배지. 편집 드로어 = 배너(운영자 사유 + 기한 2026.08.12까지 + 자동삭제 안내) + `다시 검수 요청` 버튼. ✅
+7. 본문 수정 후 `다시 검수 요청` → 동일 행 **upsert**(count=1, 중복 없음): `status=needs_review`, `submitted_at` 갱신, `review_note`/`revision_requested_at`/`revision_due_at` **전부 null 초기화**, 본문 갱신. ✅
+8. 만료 apply 무-대상 안전 실행: `mode=apply, count=0, deleted=0`(대상 없음 → 무삭제, 에러 없음). ✅
 
-- (`[SMOKE]` prefix. SPD/master/offer id·status 전이·revision_due_at·삭제 여부 기록.)
+**자동 삭제 job 검증 요약 (positive apply 미수행):**
+1. dry-run 조건 검증 — revision_requested + past-due 대상 count/sampleIds 반환(무대상 시 0). ✅
+2. DELETE WHERE = dry-run SELECT WHERE **동일 조건**(코드상 5중 guard 문자열 동일). ✅
+3. `revision_due_at` 미래 행 → dry-run 대상 **0** 확인(실검증). ✅
+4. 제외 guard(코드): canonical / needs_review / draft / created_by_supplier_id null / non-STORE / non-supplier 은 WHERE 에서 제외. ✅
+5. apply 는 **무대상 실행(deleted:0)** 으로 유지. positive 삭제는 미수행. ✅
+6. **자동 삭제 positive apply 는 의도적으로 수행하지 않음.** 사유: 운영 DB 에서 검증 목적의 `revision_due_at` backdate UPDATE 를 추가 발생시키지 않기 위함. dry-run 조건 + DELETE guard 동일성 + 무대상 apply + 코드 검증으로 대체. (핵심 = 삭제 성공 확인보다 **guard 오작동 방지 확인**)
+
+## 14. 테스트 데이터 정리 결과 (`[SMOKE]`)
+
+| 항목 | id / 값 | 처리 |
+|------|---------|------|
+| 상품명 | `[SMOKE] 수정요청 검증 상품` | — |
+| barcode | `8809178390904` | — |
+| offer id | `dad26482-f492-4e85-859b-fcd683a9322d` | **삭제**(bulk delete, deleted:1) |
+| master id | `c7a93862-d4a4-4d86-bf1a-f8352d36e082` | 잔존(orphan `[SMOKE]` master, UI 삭제 경로 없음·무승인 불가) |
+| SPD id | `4c9e8dc0-98e0-4afd-9101-db207d410a95` | **hidden**(reject 처리, 매장/큐 미노출) |
+
+status 전이: needs_review → revision_requested(due 2026-08-12) → needs_review(재요청, revision 필드 초기화) → hidden(정리).
 
 ## 15. 변경 파일 목록
 
@@ -99,13 +125,19 @@ canonical 승격 로직 · QR · product landing · tablet · SUPPLIER_STORE 무
 
 ## 16. commit SHA
 
-- 구현: (기록)
-- 배포/smoke: (기록)
+- 구현: `ad090d03c` (feat) — 10 files.
+- 배포/smoke 결과 기록: (본 CHECK 갱신 커밋 SHA.)
 
 ## 17. push 결과
 
-- (기록)
+- `ad090d03c` origin/main push 완료. CHECK 갱신 커밋 push (본 커밋).
 
 ## 완료 판정
 
-- (구현·정적검증·배포·smoke 후 CLOSED/PASS 판정)
+**WO-O4O-OPERATOR-SUPPLIER-STORE-DESCRIPTION-REVISION-REQUEST-AND-AUTO-DELETE-V1 — CLOSED / PASS**
+(구현·migration·정적검증(3앱 0)·배포·실브라우저 smoke 통과. 수정 요청(사유 필수)→revision_requested(+30일)→공급자 수정→다시 검수 요청(needs_review·revision 필드 초기화)→자동삭제 dry-run guard/무대상 apply 확인. positive apply 는 정책상 미수행. hidden 은 관리자 숨김 전용으로 유지.)
+
+## 후속 WO
+
+- `WO-O4O-OPERATOR-SUPPLIER-STORE-DESCRIPTION-CANONICAL-CONFLICT-POLICY-V1` — 기존 STORE canonical 존재 시 승인 차단/교체 정책·기존 canonical 처리·운영자 확인 UI. (본 WO 범위 외)
+- 자동 삭제 스케줄러 등록(cron) — 본 WO는 job/엔드포인트만; 스케줄 연결은 별도.
