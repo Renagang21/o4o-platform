@@ -11,6 +11,7 @@
 import { Link, Outlet } from 'react-router-dom';
 import { PublicLegalFooterInfo } from '@o4o/shared-space-ui';
 import { NetureGlobalHeader } from '../NetureGlobalHeader';
+import { NetureBottomNav } from '../NetureBottomNav';
 // WO-O4O-CROSSSERVICE-DYNAMIC-LEGAL-FOOTER-V1
 import { loadFooterLegal } from '../../lib/footerLegal';
 
@@ -41,6 +42,9 @@ export default function MainLayout() {
           </div>
         </div>
       </footer>
+
+      {/* WO-O4O-NETURE-MOBILE-NAV-...-V1: 모바일 하단 utility nav(알림/내정보). 비인증 시 미렌더. */}
+      <NetureBottomNav />
     </div>
   );
 }

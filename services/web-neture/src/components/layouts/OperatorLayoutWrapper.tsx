@@ -18,17 +18,22 @@ import {
   NETURE_OPERATOR_DOMAIN_IA,
 } from '../../config/operatorMenuGroups';
 import { NetureGlobalHeader } from '../NetureGlobalHeader';
+import { NetureBottomNav } from '../NetureBottomNav';
 
 export default function OperatorLayoutWrapper() {
   // operator sidebar 는 operator-scope 메뉴만 (admin 항목은 AdminLayoutWrapper 별도) — isAdmin=false 보존.
   const menuItems = filterMenuByRole(UNIFIED_MENU, false);
 
   return (
-    <OperatorAreaShell
-      header={<NetureGlobalHeader />}
-      menuItems={menuItems}
-      capabilities={ENABLED_CAPABILITIES}
-      domainIAConfig={NETURE_OPERATOR_DOMAIN_IA}
-    />
+    <>
+      <OperatorAreaShell
+        header={<NetureGlobalHeader />}
+        menuItems={menuItems}
+        capabilities={ENABLED_CAPABILITIES}
+        domainIAConfig={NETURE_OPERATOR_DOMAIN_IA}
+      />
+      {/* WO-O4O-NETURE-MOBILE-NAV-...-V1: operator 영역 모바일 하단 utility nav. */}
+      <NetureBottomNav />
+    </>
   );
 }

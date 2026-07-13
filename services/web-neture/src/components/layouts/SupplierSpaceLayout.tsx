@@ -30,6 +30,7 @@ import {
 import type { LucideIcon } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { NetureGlobalHeader } from '../NetureGlobalHeader';
+import { NetureBottomNav } from '../NetureBottomNav';
 import { SUPPLIER_ACCESS_ROLES } from '../../lib/role-constants';
 
 // WO-NETURE-SUPPLIER-PRODUCT-LIST-WIDE-TABLE-VIEW-APPLY-V1
@@ -347,6 +348,9 @@ export default function SupplierSpaceLayout() {
           </div>
         </div>
       </footer>
+
+      {/* WO-O4O-NETURE-MOBILE-NAV-...-V1: 공급자 영역 모바일 하단 utility nav(알림/내정보). */}
+      <NetureBottomNav />
     </div>
   );
 }

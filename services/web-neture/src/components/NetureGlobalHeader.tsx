@@ -13,8 +13,7 @@
 
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Settings, Shield } from 'lucide-react';
-import { GlobalHeader, GlobalHeaderMenuItem } from '@o4o/ui';
+import { GlobalHeader } from '@o4o/ui';
 import { NotificationBell, useNotifications } from '@o4o/account-ui';
 import type { NotificationItem } from '@o4o/account-ui';
 import { notificationsApi, NOTIFICATION_SERVICE_KEY } from '../lib/api/notifications';
@@ -31,6 +30,8 @@ import {
   NETURE_CONTEXTUAL_NAV,
   filterContextualNav,
 } from '../config/navigation';
+import { NetureUserMenuItems } from './NetureUserMenu';
+import { resolveNetureNotificationTarget } from '../lib/notificationRouting';
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function getUserDisplayName(user: any): string {
@@ -63,10 +64,10 @@ export function NetureGlobalHeader() {
   // KPA / K-Cosmetics / GlycoPharm GlobalHeader 동일 패턴.
   const handleNotificationClick = useCallback(
     (n: NotificationItem) => {
-      const target = (n.metadata as Record<string, unknown> | undefined)?.targetUrl;
-      if (typeof target === 'string' && target.length > 0) {
-        navigate(target);
-      }
+      // WO-O4O-NETURE-MOBILE-NAV-...-V1: 라우팅 규칙을 resolveNetureNotificationTarget(SSOT)로 이관 —
+      //   NetureBottomNav 모바일 알림 시트와 공유.
+      const target = resolveNetureNotificationTarget(n);
+      if (target) navigate(target);
     },
     [navigate],
   );
@@ -121,45 +122,13 @@ export function NetureGlobalHeader() {
           )}
         </>
       }
-      userMenuItems={
-        <>
-          {/* WO-O4O-NETURE-SUPPLIER-DASHBOARD-ENTRY-AND-MEMBER-LIST-CLEANUP-V1:
-              역할 동시 보유 사용자(operator + supplier 등)도 각 대시보드에
-              개별 진입할 수 있도록 항목을 역할별로 분리. 각 항목은 자기 역할의
-              canonical route 로 직접 연결.
-              WO-O4O-NETURE-ADMIN-OPERATOR-DASHBOARD-AND-MEMBER-TYPE-FIX-V1:
-              admin / operator 진입을 분리. admin 은 /admin (관리자 대시보드),
-              operator-only 는 /operator (운영자 대시보드). */}
-          {isAdmin && (
-            <GlobalHeaderMenuItem to="/admin" icon={<Shield className="w-4 h-4" />}>
-              관리자 대시보드
-            </GlobalHeaderMenuItem>
-          )}
-          {/* WO-O4O-NETURE-GLOBAL-HEADER-OPERATOR-LABEL-AND-NOTIFICATION-CLICK-FIX-V1:
-              "운영자 대시보드" → "운영 대시보드" (KPA / K-Cosmetics / GlycoPharm canonical 정합) */}
-          {isOperator && (
-            <GlobalHeaderMenuItem to="/operator" icon={<Shield className="w-4 h-4" />}>
-              운영 대시보드
-            </GlobalHeaderMenuItem>
-          )}
-          {isSupplier && (
-            <GlobalHeaderMenuItem to="/supplier/dashboard" icon={<LayoutDashboard className="w-4 h-4" />}>
-              공급자 대시보드
-            </GlobalHeaderMenuItem>
-          )}
-          {isPartner && (
-            <GlobalHeaderMenuItem to="/partner/dashboard" icon={<LayoutDashboard className="w-4 h-4" />}>
-              파트너 대시보드
-            </GlobalHeaderMenuItem>
-          )}
-          <GlobalHeaderMenuItem to="/mypage" icon={<LayoutDashboard className="w-4 h-4" />}>
-            마이페이지
-          </GlobalHeaderMenuItem>
-          <GlobalHeaderMenuItem to="/mypage/settings" icon={<Settings className="w-4 h-4" />}>
-            설정
-          </GlobalHeaderMenuItem>
-        </>
-      }
+      /* WO-O4O-NETURE-MOBILE-NAV-...-V1: 역할별 업무 공간 + 계정 메뉴를 NetureUserMenuItems(SSOT)로 이관.
+         데스크톱 프로필 드롭다운은 이 항목을 그대로 사용. */
+      userMenuItems={<NetureUserMenuItems user={user} isAuthenticated={isAuthenticated} />}
+      /* WO-O4O-NETURE-MOBILE-NAV-...-V1: 모바일 햄버거 drawer 는 사이트 nav 만 표시.
+         이름·이메일·역할별 업무 공간·계정 메뉴·로그아웃은 모바일 하단 '내정보' 프로필 시트
+         (NetureBottomNav)로 분리. 데스크톱 드롭다운(userMenuItems)은 영향 없음. */
+      showMobileUserMenu={false}
     />
   );
 }

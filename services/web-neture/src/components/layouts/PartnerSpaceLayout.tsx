@@ -24,6 +24,7 @@ import {
 import type { LucideIcon } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { NetureGlobalHeader } from '../NetureGlobalHeader';
+import { NetureBottomNav } from '../NetureBottomNav';
 import { PARTNER_ACCESS_ROLES } from '../../lib/role-constants';
 
 /* ------------------------------------------------------------------ */
@@ -238,6 +239,9 @@ export default function PartnerSpaceLayout() {
           </div>
         </div>
       </footer>
+
+      {/* WO-O4O-NETURE-MOBILE-NAV-...-V1: 파트너 영역 모바일 하단 utility nav(알림/내정보). */}
+      <NetureBottomNav />
     </div>
   );
 }
