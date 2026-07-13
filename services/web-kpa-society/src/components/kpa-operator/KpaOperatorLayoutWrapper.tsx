@@ -16,6 +16,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { ENABLED_CAPABILITIES } from '../../config/operatorCapabilities';
 import { UNIFIED_MENU, filterMenuByRole } from '../../config/operatorMenuGroups';
 import { KpaGlobalHeader } from '../KpaGlobalHeader';
+import { MobileBottomNav } from '../MobileBottomNav';
 
 export default function KpaOperatorLayoutWrapper() {
   // WO-O4O-KPA-OPERATOR-SIDEBAR-DOMAIN-IA-RESTRUCTURE-V1:
@@ -31,10 +32,16 @@ export default function KpaOperatorLayoutWrapper() {
   );
 
   return (
-    <OperatorAreaShell
-      header={<KpaGlobalHeader />}
-      menuItems={menuItems}
-      capabilities={ENABLED_CAPABILITIES}
-    />
+    <>
+      <OperatorAreaShell
+        header={<KpaGlobalHeader />}
+        menuItems={menuItems}
+        capabilities={ENABLED_CAPABILITIES}
+      />
+      {/* WO-O4O-KPA-MOBILE-BOTTOM-UTILITY-NAV-ROUTE-COVERAGE-FIX-V1:
+          operator 영역에도 모바일 하단 utility nav(알림/내정보) 제공 + 하단 여백 확보. */}
+      <div className="md:hidden" aria-hidden style={{ height: 'calc(3.5rem + env(safe-area-inset-bottom, 0px))' }} />
+      <MobileBottomNav />
+    </>
   );
 }

@@ -18,6 +18,7 @@ import { NotificationBell, useNotifications } from '@o4o/account-ui';
 import type { NotificationItem } from '@o4o/account-ui';
 import { isStoreOwnerDual } from '@o4o/auth-utils';
 import { KpaUserMenuItems } from './KpaUserMenu';
+import { resolveNotificationTarget } from '../lib/notificationRouting';
 import { useAuth, type User as UserType } from '../contexts';
 import { useAuthModal } from '../contexts/LoginModalContext';
 import {
@@ -81,29 +82,10 @@ export function KpaGlobalHeader() {
 
   const handleNotificationClick = useCallback(
     (n: NotificationItem) => {
-      const target = (n.metadata as Record<string, unknown> | undefined)?.targetUrl;
-      // 1순위 (WO-O4O-KPA-STORE-CONSULTATION-REQUEST-NOTIFICATION-WIRING-V1):
-      //   알림에 명시된 내부 path targetUrl 사용 — 외부 URL(`//`, `http://`, `https://`)로의 navigate 차단.
-      if (
-        typeof target === 'string' &&
-        target.startsWith('/') &&
-        !target.startsWith('//')
-      ) {
-        navigate(target);
-        return;
-      }
-      // 2·3순위 (WO-O4O-KPA-TABLET-INTEREST-NOTIFICATION-ROUTING-V1):
-      //   매장(store.*) 알림은 targetUrl 누락/무효 시에도 절대 /mypage 로 떨어지지 않고 매장 컨텍스트로 이동한다.
-      //   타블렛 관심/상담 알림 → 타블렛 화면, 그 외 store 알림 → 매장 홈.
-      //   (온라인 판매 주문 알림 등은 자체 targetUrl 을 가지므로 위 1순위에서 처리됨 — 본 fallback 무관.)
-      const type = String(n.type || '');
-      if (type === 'store.consultation_requested' || type.startsWith('store.tablet')) {
-        navigate('/store/commerce/tablet-displays');
-        return;
-      }
-      if (type.startsWith('store.')) {
-        navigate('/store');
-      }
+      // WO-O4O-KPA-MOBILE-BOTTOM-UTILITY-NAV-ROUTE-COVERAGE-FIX-V1:
+      //   라우팅 규칙을 resolveNotificationTarget(SSOT)로 이관 — MobileBottomNav 알림 시트와 공유.
+      const target = resolveNotificationTarget(n);
+      if (target) navigate(target);
     },
     [navigate],
   );

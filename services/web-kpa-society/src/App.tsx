@@ -7,6 +7,7 @@ const queryClient = new QueryClient({
   defaultOptions: { queries: { refetchOnWindowFocus: false, retry: 1 } },
 });
 import { Layout } from './components';
+import { MobileBottomNav } from './components/MobileBottomNav';
 import { LoadingSpinner } from './components/common/LoadingSpinner';
 import { AuthProvider, OrganizationProvider } from './contexts';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
@@ -526,6 +527,10 @@ function KpaStoreLayoutWrapper() {
           />
         }
       />
+      {/* WO-O4O-KPA-MOBILE-BOTTOM-UTILITY-NAV-ROUTE-COVERAGE-FIX-V1:
+          내 약국(store) 영역에도 모바일 하단 utility nav(알림/내정보) 제공 + 하단 여백 확보. */}
+      <div className="md:hidden" aria-hidden style={{ height: 'calc(3.5rem + env(safe-area-inset-bottom, 0px))' }} />
+      <MobileBottomNav />
     </div>
   );
 }

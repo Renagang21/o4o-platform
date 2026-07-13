@@ -18,6 +18,7 @@ import { Outlet } from 'react-router-dom';
 import { Menu } from 'lucide-react';
 import { AdminSidebar } from './AdminSidebar';
 import { KpaGlobalHeader } from '../KpaGlobalHeader';
+import { MobileBottomNav } from '../MobileBottomNav';
 
 export function AdminLayout() {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
@@ -50,6 +51,11 @@ export function AdminLayout() {
           <Outlet />
         </main>
       </div>
+
+      {/* WO-O4O-KPA-MOBILE-BOTTOM-UTILITY-NAV-ROUTE-COVERAGE-FIX-V1:
+          admin 영역에도 모바일 하단 utility nav(알림/내정보) 제공 + 하단 여백 확보. */}
+      <div className="md:hidden" aria-hidden style={{ height: 'calc(3.5rem + env(safe-area-inset-bottom, 0px))' }} />
+      <MobileBottomNav />
     </div>
   );
 }
