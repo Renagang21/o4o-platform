@@ -11,7 +11,7 @@
  *   - D Structure Actions: 회원 관리 / 운영 대시보드 진입
  *   최근 가입 신청 목록(분회 신청 detail)은 KPA 특수 섹션으로 레이아웃 하단 유지.
  *   operatorApi.getDistrictSummary(10) / AdminAuthGuard / route / 권한 구조 무변경.
- *   indigo 헤더 + kpa:admin 배지(시각 정체성) 유지.
+ *   indigo 헤더 시각 정체성 유지.
  */
 
 import { useState, useEffect } from 'react';
@@ -92,7 +92,7 @@ export function KpaAdminDashboardPage() {
   return (
     <div className="max-w-5xl mx-auto px-6 py-8 space-y-8">
 
-      {/* ── 헤더 (KPA 시각 정체성 — indigo + kpa:admin 배지) ── */}
+      {/* ── 헤더 (KPA 시각 정체성 — indigo) ── */}
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-lg bg-indigo-600 flex items-center justify-center shrink-0">
           <ShieldCheck className="w-5 h-5 text-white" />
@@ -101,9 +101,6 @@ export function KpaAdminDashboardPage() {
           <h1 className="text-xl font-bold text-slate-900">관리자 대시보드</h1>
           <p className="text-sm text-slate-500">KPA-Society 관리자 전용 공간</p>
         </div>
-        <span className="ml-auto inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
-          kpa:admin
-        </span>
       </div>
 
       {/* ── 4-Block 표준 레이아웃 (A Snapshot → B Policy → C GovernanceAlerts → D Actions) ── */}
