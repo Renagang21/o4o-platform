@@ -757,10 +757,21 @@ export function TabletKioskPage({
             <span style={styles.qrBadge}>QR 코드로 접속</span>
           )}
         </div>
-        {!isProductFocus && (
-          <p style={styles.cornerBody}>{cornerInfo?.body || '궁금한 상품을 터치해 설명을 확인해 보세요'}</p>
+        {/* legacy(코너 설명 미주입: GP/KCos 등)는 짧은 안내 힌트만 헤더 subtitle 로 유지 */}
+        {!isProductFocus && !cornerInfo?.body && (
+          <p style={styles.cornerHint}>궁금한 상품을 터치해 설명을 확인해 보세요</p>
         )}
       </div>
+
+      {/* 코너 설명 섹션 — 코너 제목(header)과 시각적으로 구분된 별도 섹션.
+          실제 코너 설명(screen_set corner_description)이 있을 때만 렌더. 긴 문단은 자체 스크롤로
+          화면 상단을 독점하지 않게 제한(§5.6). product_focus 는 축약 헤더라 설명 섹션 생략. */}
+      {!isProductFocus && cornerInfo?.body && (
+        <div style={styles.cornerDescSection}>
+          <span style={styles.cornerDescLabel}>코너 안내</span>
+          <p style={styles.cornerBody}>{cornerInfo.body}</p>
+        </div>
+      )}
 
       {/* WO-O4O-KPA-TABLET-KIOSK-CORE-SCREEN-CONSUMER-V1: qr_guide 안내(screen_set 전용, 있을 때만).
           기본 템플릿은 상단, product_focus 는 하단 보조 배너로 이동(§3.4).
@@ -1003,12 +1014,38 @@ const styles: Record<string, React.CSSProperties> = {
   },
   cornerBody: {
     fontSize: 'clamp(13px, 1.5vw, 15px)',
-    color: '#64748b',
+    color: '#475569',
     lineHeight: 1.65,
     margin: 0,
     maxWidth: '70ch',
     wordBreak: 'keep-all',
     overflowWrap: 'break-word',
+  },
+  // legacy(코너 설명 미주입) 헤더 안내 힌트 — 코너 설명 섹션과 구분되는 짧은 보조문구.
+  cornerHint: {
+    fontSize: 'clamp(13px, 1.5vw, 14px)',
+    color: '#94a3b8',
+    lineHeight: 1.5,
+    margin: 0,
+  },
+  // 코너 설명 섹션 — 제목(header)과 시각적으로 구분(다른 배경 + 라벨 + 상단 구분선).
+  //   긴 문단이 화면 상단을 독점하지 않도록 maxHeight + 자체 스크롤(§5.6).
+  cornerDescSection: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '6px',
+    padding: 'clamp(12px, 2vw, 18px) clamp(16px, 3vw, 28px)',
+    backgroundColor: '#f8fafc',
+    borderBottom: '1px solid #e2e8f0',
+    flexShrink: 0,
+    maxHeight: '30vh',
+    overflowY: 'auto',
+  },
+  cornerDescLabel: {
+    fontSize: '11px',
+    fontWeight: 700,
+    letterSpacing: '0.04em',
+    color: '#94a3b8',
   },
   qrBadge: {
     fontSize: '11px',
