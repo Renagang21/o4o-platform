@@ -72,6 +72,14 @@ export interface GlobalHeaderProps {
    *   주입 시 모바일 햄버거에서만 별도 항목을 렌더(데스크톱 드롭다운은 userMenuItems 유지).
    */
   mobileUserMenuItems?: React.ReactNode;
+  /**
+   * 모바일 햄버거 drawer 의 "인증 사용자 영역"(이름·이메일·userMenuItems·로그아웃) 렌더 여부.
+   * WO-O4O-KPA-MOBILE-NAV-AND-PROFILE-MENU-SEPARATION-V1:
+   *   기본값 true = 기존 동작 불변(additive). false 주입 시 모바일 drawer 는 사이트 nav 만 표시하고
+   *   인증 사용자 영역은 렌더하지 않는다(프로필 메뉴를 별도 UI로 분리하는 서비스용).
+   *   데스크톱 드롭다운(userMenuItems)과 비인증 로그인/회원가입 버튼은 영향 없음.
+   */
+  showMobileUserMenu?: boolean;
   /** UtilityArea 슬롯 (ServiceSwitcher 등) */
   utilitySlot?: React.ReactNode;
 }
@@ -96,6 +104,7 @@ export function GlobalHeader({
   onLogout,
   userMenuItems,
   mobileUserMenuItems,
+  showMobileUserMenu = true,
   utilitySlot,
 }: GlobalHeaderProps) {
   const location = useLocation();
@@ -360,27 +369,34 @@ export function GlobalHeader({
                 )
               )}
             </nav>
-            <div className="mt-4 pt-4 border-t border-slate-200">
-              {isAuthenticated && user ? (
-                <div className="space-y-1">
-                  <div className="px-4 py-2">
-                    <p className="text-sm font-semibold text-slate-800">
-                      {user.displayName}님
-                    </p>
-                    <p className="text-xs text-slate-500">{user.email}</p>
+            {isAuthenticated && user ? (
+              /* WO-O4O-KPA-MOBILE-NAV-AND-PROFILE-MENU-SEPARATION-V1:
+                 showMobileUserMenu=false 인 서비스는 모바일 drawer 에 인증 사용자 영역을 렌더하지 않는다
+                 (프로필 메뉴를 별도 UI로 분리). 기본값(true)은 기존 동작 유지. */
+              showMobileUserMenu && (
+                <div className="mt-4 pt-4 border-t border-slate-200">
+                  <div className="space-y-1">
+                    <div className="px-4 py-2">
+                      <p className="text-sm font-semibold text-slate-800">
+                        {user.displayName}님
+                      </p>
+                      <p className="text-xs text-slate-500">{user.email}</p>
+                    </div>
+                    {mobileUserMenuItems ?? userMenuItems}
+                    <button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        onLogout?.();
+                      }}
+                      className="flex items-center gap-3 w-full px-4 py-3 text-sm font-medium text-red-600 bg-transparent border-none cursor-pointer hover:bg-red-50 rounded-xl"
+                    >
+                      로그아웃
+                    </button>
                   </div>
-                  {mobileUserMenuItems ?? userMenuItems}
-                  <button
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      onLogout?.();
-                    }}
-                    className="flex items-center gap-3 w-full px-4 py-3 text-sm font-medium text-red-600 bg-transparent border-none cursor-pointer hover:bg-red-50 rounded-xl"
-                  >
-                    로그아웃
-                  </button>
                 </div>
-              ) : (
+              )
+            ) : (
+              <div className="mt-4 pt-4 border-t border-slate-200">
                 <div className="space-y-2">
                   {onLogin && (
                     <button
@@ -406,8 +422,8 @@ export function GlobalHeader({
                     </button>
                   )}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         )}
       </div>

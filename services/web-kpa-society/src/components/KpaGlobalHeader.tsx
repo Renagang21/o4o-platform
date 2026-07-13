@@ -13,11 +13,11 @@
 
 import { useNavigate, Link } from 'react-router-dom';
 import { useCallback, useEffect, useState } from 'react';
-import { GraduationCap, LayoutDashboard, Settings, Shield, Store } from 'lucide-react';
-import { GlobalHeader, GlobalHeaderMenuItem } from '@o4o/ui';
+import { GlobalHeader } from '@o4o/ui';
 import { NotificationBell, useNotifications } from '@o4o/account-ui';
 import type { NotificationItem } from '@o4o/account-ui';
-import { isOperatorOrAbove, isAdminOrAbove, isStoreOwnerDual } from '@o4o/auth-utils';
+import { isStoreOwnerDual } from '@o4o/auth-utils';
+import { KpaUserMenuItems } from './KpaUserMenu';
 import { useAuth, type User as UserType } from '../contexts';
 import { useAuthModal } from '../contexts/LoginModalContext';
 import {
@@ -108,10 +108,8 @@ export function KpaGlobalHeader() {
     [navigate],
   );
 
-  // 역할 판정 — WO-O4O-OPERATOR-MENU-COMMONIZATION-V1: platform:super_admin 포함
-  const isAdmin = user ? isAdminOrAbove(user.roles, 'kpa') : false;
-  const isOperator = user ? isOperatorOrAbove(user.roles, 'kpa') : false;
-  const isInstructor = user ? user.roles.includes('lms:instructor') : false;
+  // 역할 판정 — 프로필 메뉴 역할은 KpaUserMenuItems(SSOT)가 자체 판정.
+  // 여기서는 nav 조합(약국 HUB 등)에 필요한 isStoreOwner 만 산출한다.
   // WO-O4O-KPA-HEADER-MENU-CANONICAL-ALIGNMENT-V1:
   //   내 약국 + 운영 허브 모두 store_owner role 기준으로 통일.
   //   HubGuard/PharmacyGuard/StoreHubPage CTA 가 모두 isStoreOwnerDual 단일 SSOT 사용 — header도 동일.
@@ -190,42 +188,14 @@ export function KpaGlobalHeader() {
           )}
         </div>
       }
-      userMenuItems={
-        <>
-          {/* WO-O4O-ROLE-BASED-PROFILE-MENU-CANONICALIZATION-V1:
-              강의 대시보드 — lms:instructor 역할 보유 시에만 표시.
-              isAdmin 조건 제거: admin이라도 instructor 역할 없으면 미표시. */}
-          {isInstructor && (
-            <GlobalHeaderMenuItem to="/instructor" icon={<GraduationCap className="w-4 h-4" />}>
-              강의 대시보드
-            </GlobalHeaderMenuItem>
-          )}
-          {/* WO-O4O-ROLE-BASED-PROFILE-MENU-CANONICALIZATION-V1:
-              관리자/운영자 — 역할별 독립 표시. legacy ternary(admin이면 operator 숨김) 제거.
-              isAdmin → /admin 표시 / isOperator → /operator 표시 (동시 보유 시 둘 다 표시). */}
-          {isAdmin && (
-            <GlobalHeaderMenuItem to="/admin" icon={<Shield className="w-4 h-4" />}>
-              관리자 대시보드
-            </GlobalHeaderMenuItem>
-          )}
-          {isOperator && (
-            <GlobalHeaderMenuItem to="/operator" icon={<Shield className="w-4 h-4" />}>
-              운영 대시보드
-            </GlobalHeaderMenuItem>
-          )}
-          {isStoreOwner && (
-            <GlobalHeaderMenuItem to="/store" icon={<Store className="w-4 h-4" />}>
-              내 매장
-            </GlobalHeaderMenuItem>
-          )}
-          <GlobalHeaderMenuItem to="/mypage" icon={<LayoutDashboard className="w-4 h-4" />}>
-            마이페이지
-          </GlobalHeaderMenuItem>
-          <GlobalHeaderMenuItem to="/mypage/settings" icon={<Settings className="w-4 h-4" />}>
-            설정
-          </GlobalHeaderMenuItem>
-        </>
-      }
+      /* WO-O4O-ROLE-BASED-PROFILE-MENU-CANONICALIZATION-V1 규칙은 KpaUserMenuItems(SSOT)로 이동.
+         데스크톱 프로필 드롭다운은 이 항목을 그대로 사용. */
+      userMenuItems={<KpaUserMenuItems user={user} />}
+      /* WO-O4O-KPA-MOBILE-NAV-AND-PROFILE-MENU-SEPARATION-V1:
+         모바일 햄버거 drawer 는 사이트 nav 만 표시. 사용자 이름·이메일·역할별 대시보드·계정 메뉴·
+         로그아웃은 모바일 하단 '내정보' 프로필 시트(MobileBottomNav)로 분리한다.
+         데스크톱 드롭다운(userMenuItems)은 영향 없음. */
+      showMobileUserMenu={false}
     />
   );
 }
