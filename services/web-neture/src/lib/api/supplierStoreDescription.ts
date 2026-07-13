@@ -10,7 +10,14 @@ import { api } from '../apiClient';
 
 const BASE = '/neture/supplier/store-descriptions';
 
-export type SupplierStoreDescriptionStatus = 'draft' | 'needs_review' | 'canonical' | 'hidden' | 'candidate' | 'deprecated';
+export type SupplierStoreDescriptionStatus =
+  | 'draft'
+  | 'needs_review'
+  | 'revision_requested'
+  | 'canonical'
+  | 'hidden'
+  | 'candidate'
+  | 'deprecated';
 
 export interface SupplierStoreDescriptionDraft {
   id: string;
@@ -22,6 +29,11 @@ export interface SupplierStoreDescriptionDraft {
   content: string;
   submittedAt: string | null;
   updatedAt: string;
+  /** 운영자 수정 요청 사유 (status=revision_requested) */
+  reviewNote?: string | null;
+  revisionRequestedAt?: string | null;
+  /** 재검수 요청 마감 시각 (경과 시 자동 삭제) */
+  revisionDueAt?: string | null;
 }
 
 export interface SaveSupplierStoreDescriptionInput {

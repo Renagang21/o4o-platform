@@ -58,6 +58,9 @@ export const SHARED_PRODUCT_DESCRIPTION_SOURCE_TYPES: SharedProductDescriptionSo
  * 후보 검토 상태 (application-level union, varchar)
  * - draft: 공급자 임시저장(아직 검수요청 전, submitted_at=null) — WO-O4O-NETURE-SUPPLIER-STORE-DESCRIPTION-DRAFT-SAVE-AND-REVIEW-QUEUE-V1.
  *   매장 노출 대상 아님(canonical 아님). needs_review 로 전환 시 검수 큐 노출.
+ * - revision_requested: 운영자가 수정 요청함. 공급자가 revision_due_at 이내에 수정 후 다시 검수요청(→needs_review) 가능.
+ *   기한 경과 시 자동 삭제(hard delete). WO-O4O-OPERATOR-SUPPLIER-STORE-DESCRIPTION-REVISION-REQUEST-AND-AUTO-DELETE-V1.
+ * - hidden: 관리자 숨김 또는 노출 중단 (공급자 수정 요청 기본 상태로 쓰지 않는다).
  */
 export type SharedProductDescriptionStatus =
   | 'draft'
@@ -65,6 +68,7 @@ export type SharedProductDescriptionStatus =
   | 'canonical'
   | 'hidden'
   | 'needs_review'
+  | 'revision_requested'
   | 'deprecated';
 
 export const SHARED_PRODUCT_DESCRIPTION_STATUSES: SharedProductDescriptionStatus[] = [
@@ -73,6 +77,7 @@ export const SHARED_PRODUCT_DESCRIPTION_STATUSES: SharedProductDescriptionStatus
   'canonical',
   'hidden',
   'needs_review',
+  'revision_requested',
   'deprecated',
 ];
 
@@ -175,6 +180,20 @@ export class SharedProductDescription {
   /** 공급자가 운영자 검수를 요청(status→needs_review)한 시각. 신규 write 부터 세팅(기존 row 백필 없음). */
   @Column({ name: 'submitted_at', type: 'timestamp', nullable: true })
   submittedAt: Date | null;
+
+  // ── 수정 요청(revision request) — WO-O4O-OPERATOR-SUPPLIER-STORE-DESCRIPTION-REVISION-REQUEST-AND-AUTO-DELETE-V1 ──
+
+  /** 운영자가 수정 요청 시 남긴 사유 메모. 공급자에게 노출. 재검수 요청 시 null 로 초기화. */
+  @Column({ name: 'review_note', type: 'text', nullable: true })
+  reviewNote: string | null;
+
+  /** 운영자가 수정 요청한 시각. status='revision_requested' 로 전환할 때 세팅. */
+  @Column({ name: 'revision_requested_at', type: 'timestamp', nullable: true })
+  revisionRequestedAt: Date | null;
+
+  /** 공급자가 재검수 요청 가능한 마감 시각(기본 revision_requested_at + 30일). 경과 시 자동 삭제 대상. */
+  @Column({ name: 'revision_due_at', type: 'timestamp', nullable: true })
+  revisionDueAt: Date | null;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

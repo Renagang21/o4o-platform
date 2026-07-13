@@ -47,6 +47,28 @@ export function createOperatorSupplierStoreDescriptionReviewController(dataSourc
   router.use(authenticate);
   router.use(requireRole(ADMIN_ROLES));
 
+  // 만료(수정 요청 후 기한 경과) 자동 삭제 — dry-run / apply.
+  // 주의: '/:id' 라우트보다 먼저 등록(경로 충돌 방지).
+  router.get('/expiry/dry-run', async (_req: Request, res: Response) => {
+    try {
+      const result = await service.expireRevisionRequested({ apply: false });
+      res.json({ success: true, data: result });
+    } catch (err) {
+      logger.error('[supplier-store-review] expiry dry-run failed:', err);
+      res.status(500).json({ success: false, error: '만료 dry-run에 실패했습니다', code: 'EXPIRY_DRYRUN_FAILED' });
+    }
+  });
+
+  router.post('/expiry/apply', async (_req: Request, res: Response) => {
+    try {
+      const result = await service.expireRevisionRequested({ apply: true });
+      res.json({ success: true, data: result });
+    } catch (err) {
+      logger.error('[supplier-store-review] expiry apply failed:', err);
+      res.status(500).json({ success: false, error: '만료 삭제에 실패했습니다', code: 'EXPIRY_APPLY_FAILED' });
+    }
+  });
+
   // 목록
   router.get('/', async (req: Request, res: Response) => {
     try {
@@ -95,7 +117,33 @@ export function createOperatorSupplierStoreDescriptionReviewController(dataSourc
     }
   });
 
-  // 반려/보류 (status=hidden)
+  // 수정 요청 (status=revision_requested, 사유 필수, revision_due_at = now + 30일)
+  //   WO-O4O-OPERATOR-SUPPLIER-STORE-DESCRIPTION-REVISION-REQUEST-AND-AUTO-DELETE-V1.
+  router.post('/:id/request-revision', async (req: Request, res: Response) => {
+    try {
+      const actor = actorId(req);
+      const reason = typeof req.body?.reason === 'string' ? req.body.reason.trim() : '';
+      if (!reason) {
+        res.status(400).json({ success: false, error: '수정 요청 사유를 입력하세요', code: 'REASON_REQUIRED' });
+        return;
+      }
+      const detail = await service.getSupplierStoreReviewDetail(req.params.id);
+      if (!detail) {
+        res.status(404).json({ success: false, error: '설명서를 찾을 수 없습니다', code: 'REVIEW_NOT_FOUND' });
+        return;
+      }
+      const updated = await service.requestRevision(req.params.id, reason, actor, 30);
+      res.json({
+        success: true,
+        data: { id: updated.id, status: updated.status, revisionDueAt: updated.revisionDueAt, reviewNote: updated.reviewNote },
+      });
+    } catch (err) {
+      logger.error('[supplier-store-review] request-revision failed:', err);
+      res.status(500).json({ success: false, error: '수정 요청 처리에 실패했습니다', code: 'REVIEW_REVISION_FAILED' });
+    }
+  });
+
+  // 관리자 숨김 (status=hidden) — 노출 중단 전용. 공급자 수정 요청 기본 경로 아님.
   router.post('/:id/reject', async (req: Request, res: Response) => {
     try {
       const actor = actorId(req);
@@ -108,7 +156,7 @@ export function createOperatorSupplierStoreDescriptionReviewController(dataSourc
       res.json({ success: true, data: { id: updated.id, status: updated.status } });
     } catch (err) {
       logger.error('[supplier-store-review] reject failed:', err);
-      res.status(500).json({ success: false, error: '반려 처리에 실패했습니다', code: 'REVIEW_REJECT_FAILED' });
+      res.status(500).json({ success: false, error: '숨김 처리에 실패했습니다', code: 'REVIEW_REJECT_FAILED' });
     }
   });
 

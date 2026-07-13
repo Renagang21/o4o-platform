@@ -298,14 +298,15 @@ export class SharedProductDescriptionService {
     const status: SharedProductDescriptionStatus = input.submit ? 'needs_review' : 'draft';
     const submittedAt = input.submit ? new Date() : null;
 
-    // 공급자 본인의 기존 작업행(draft/needs_review, 같은 master/type/language) 재사용 — 중복 검수행 방지.
+    // 공급자 본인의 기존 작업행(draft/needs_review/revision_requested, 같은 master/type/language) 재사용
+    //   — 중복 검수행 방지. revision_requested(운영자 수정 요청) 행을 다시 편집·재요청하면 이 행을 갱신한다.
     const existing = await this.repo
       .createQueryBuilder('spd')
       .where('spd.master_id = :masterId', { masterId: input.masterId })
       .andWhere('spd.created_by_supplier_id = :supplierId', { supplierId: input.supplierId })
       .andWhere('spd.description_type = :type', { type: 'STORE' })
       .andWhere(`COALESCE(spd.language, 'ko') = COALESCE(:language, 'ko')`, { language })
-      .andWhere('spd.status IN (:...statuses)', { statuses: ['draft', 'needs_review'] })
+      .andWhere('spd.status IN (:...statuses)', { statuses: ['draft', 'needs_review', 'revision_requested'] })
       .andWhere('spd.deleted_at IS NULL')
       .orderBy('spd.updated_at', 'DESC')
       .getOne();
@@ -320,6 +321,11 @@ export class SharedProductDescriptionService {
       existing.updatedBy = input.createdBy;
       // submitted_at: 검수요청 시점에만 세팅. 재-임시저장(draft)로 되돌리면 다시 null.
       existing.submittedAt = submittedAt;
+      // 공급자가 다시 편집·저장하면 수정 요청 창은 해소된다 — revision 필드 초기화(만료 자동삭제 대상에서 제외).
+      // WO-O4O-OPERATOR-SUPPLIER-STORE-DESCRIPTION-REVISION-REQUEST-AND-AUTO-DELETE-V1 §4.4.
+      existing.reviewNote = null;
+      existing.revisionRequestedAt = null;
+      existing.revisionDueAt = null;
       return this.repo.save(existing);
     }
 
@@ -340,11 +346,11 @@ export class SharedProductDescriptionService {
     return this.repo.save(entity);
   }
 
-  /** 공급자 본인의 STORE 설명서 작업행 목록 (draft/needs_review/canonical). read-only. */
+  /** 공급자 본인의 STORE 설명서 작업행 목록 (draft/needs_review/revision_requested/canonical). read-only. */
   async listSupplierStoreDrafts(
     supplierId: string,
     masterId?: string,
-  ): Promise<Array<Pick<SharedProductDescription, 'id' | 'masterId' | 'descriptionType' | 'language' | 'status' | 'summary' | 'content' | 'submittedAt' | 'updatedAt'>>> {
+  ): Promise<Array<Pick<SharedProductDescription, 'id' | 'masterId' | 'descriptionType' | 'language' | 'status' | 'summary' | 'content' | 'submittedAt' | 'updatedAt' | 'reviewNote' | 'revisionRequestedAt' | 'revisionDueAt'>>> {
     const qb = this.repo
       .createQueryBuilder('spd')
       .where('spd.created_by_supplier_id = :supplierId', { supplierId })
@@ -363,7 +369,89 @@ export class SharedProductDescriptionService {
       content: d.content,
       submittedAt: d.submittedAt,
       updatedAt: d.updatedAt,
+      reviewNote: d.reviewNote,
+      revisionRequestedAt: d.revisionRequestedAt,
+      revisionDueAt: d.revisionDueAt,
     }));
+  }
+
+  /**
+   * 운영자 수정 요청 — WO-O4O-OPERATOR-SUPPLIER-STORE-DESCRIPTION-REVISION-REQUEST-AND-AUTO-DELETE-V1.
+   * status → revision_requested, review_note = 사유, revision_requested_at = now, revision_due_at = now + days(기본 30).
+   * supplier/STORE row 로만 한정(다른 경로 SPD 오전환 방지). 사유는 필수(컨트롤러에서 검증).
+   */
+  async requestRevision(
+    id: string,
+    reviewNote: string,
+    actorId?: string | null,
+    dueDays = 30,
+  ): Promise<SharedProductDescription> {
+    const entity = await this.repo.findOne({ where: { id } });
+    if (!entity) {
+      throw new Error('SharedProductDescription not found');
+    }
+    if (entity.sourceType !== 'supplier' || entity.descriptionType !== 'STORE') {
+      throw new Error('revision request is only allowed for supplier STORE descriptions');
+    }
+    const now = new Date();
+    const due = new Date(now.getTime() + dueDays * 24 * 60 * 60 * 1000);
+    entity.status = 'revision_requested';
+    entity.reviewNote = reviewNote;
+    entity.revisionRequestedAt = now;
+    entity.revisionDueAt = due;
+    entity.updatedBy = actorId ?? null;
+    return this.repo.save(entity);
+  }
+
+  /**
+   * 수정 요청 후 기한 경과(revision_due_at < now) STORE/supplier 설명서 자동 삭제(hard delete).
+   * dry-run(apply=false): 대상 count + 샘플 id. apply=true: 동일 조건 hard delete.
+   * 삭제 조건(엄격): description_type=STORE AND source_type=supplier AND status=revision_requested
+   *   AND revision_due_at < now() AND created_by_supplier_id IS NOT NULL.
+   * canonical/needs_review/draft/운영자작성/created_by_supplier_id null 은 절대 삭제하지 않는다.
+   */
+  async expireRevisionRequested(params: {
+    apply: boolean;
+  }): Promise<{ mode: 'dry-run' | 'apply'; count: number; sampleIds: string[]; deleted: number }> {
+    const WHERE = `
+       WHERE spd.description_type = 'STORE'
+         AND spd.source_type = 'supplier'
+         AND spd.status = 'revision_requested'
+         AND spd.created_by_supplier_id IS NOT NULL
+         AND spd.revision_due_at IS NOT NULL
+         AND spd.revision_due_at < NOW()
+         AND spd.deleted_at IS NULL`;
+
+    const countRows: Array<{ c: string }> = await this.dataSource.query(
+      `SELECT count(*)::text AS c FROM shared_product_descriptions spd ${WHERE}`,
+    );
+    const count = parseInt(countRows[0]?.c ?? '0', 10);
+    const sample: Array<{ id: string }> = await this.dataSource.query(
+      `SELECT spd.id FROM shared_product_descriptions spd ${WHERE} ORDER BY spd.revision_due_at ASC LIMIT 20`,
+    );
+    const sampleIds = sample.map((r) => r.id);
+
+    if (!params.apply) {
+      return { mode: 'dry-run', count, sampleIds, deleted: 0 };
+    }
+
+    // 동일 조건 hard delete (set-based). guard 조건을 DELETE WHERE 에 그대로 반영.
+    const del: Array<{ deleted: string }> = await this.dataSource.query(
+      `WITH del AS (
+         DELETE FROM shared_product_descriptions spd
+          WHERE spd.description_type = 'STORE'
+            AND spd.source_type = 'supplier'
+            AND spd.status = 'revision_requested'
+            AND spd.created_by_supplier_id IS NOT NULL
+            AND spd.revision_due_at IS NOT NULL
+            AND spd.revision_due_at < NOW()
+            AND spd.deleted_at IS NULL
+          RETURNING spd.id
+       )
+       SELECT count(*)::text AS deleted FROM del`,
+    );
+    const deleted = parseInt(del[0]?.deleted ?? '0', 10);
+    return { mode: 'apply', count, sampleIds, deleted };
   }
 
   // ──────────────────────────────────────────────────────────────────────────
@@ -420,11 +508,13 @@ export class SharedProductDescriptionService {
               spd.summary, LEFT(spd.content, 160) AS "contentPreview",
               spd.submitted_at AS "submittedAt", spd.created_at AS "createdAt", spd.updated_at AS "updatedAt",
               spd.created_by AS "createdBy", spd.created_by_supplier_id AS "supplierId",
+              spd.review_note AS "reviewNote", spd.revision_requested_at AS "revisionRequestedAt",
+              spd.revision_due_at AS "revisionDueAt",
               pm.name AS "masterName", pm.manufacturer_name AS "manufacturerName", pm.barcode,
               COALESCE(o.name, ns.slug) AS "supplierName",
               u.name AS "authorName", u.email AS "authorEmail"
          ${fromSql}
-        ORDER BY (CASE spd.status WHEN 'needs_review' THEN 0 WHEN 'draft' THEN 1 ELSE 2 END),
+        ORDER BY (CASE spd.status WHEN 'needs_review' THEN 0 WHEN 'revision_requested' THEN 1 WHEN 'draft' THEN 2 ELSE 3 END),
                  COALESCE(spd.submitted_at, spd.updated_at) DESC
         LIMIT ${limit} OFFSET ${offset}`,
       args,
@@ -439,6 +529,8 @@ export class SharedProductDescriptionService {
               spd.content, spd.summary, spd.source_ref_id AS "sourceRefId",
               spd.submitted_at AS "submittedAt", spd.created_at AS "createdAt", spd.updated_at AS "updatedAt",
               spd.curated_by AS "curatedBy", spd.curated_at AS "curatedAt",
+              spd.review_note AS "reviewNote", spd.revision_requested_at AS "revisionRequestedAt",
+              spd.revision_due_at AS "revisionDueAt",
               spd.created_by AS "createdBy", spd.created_by_supplier_id AS "supplierId",
               pm.name AS "masterName", pm.manufacturer_name AS "manufacturerName", pm.barcode,
               COALESCE(o.name, ns.slug) AS "supplierName",
@@ -935,6 +1027,9 @@ export interface SupplierStoreReviewRow {
   updatedAt: string;
   createdBy: string | null;
   supplierId: string | null;
+  reviewNote: string | null;
+  revisionRequestedAt: string | null;
+  revisionDueAt: string | null;
   masterName: string | null;
   manufacturerName: string | null;
   barcode: string | null;
@@ -956,6 +1051,9 @@ export interface SupplierStoreReviewDetail {
   updatedAt: string;
   curatedBy: string | null;
   curatedAt: string | null;
+  reviewNote: string | null;
+  revisionRequestedAt: string | null;
+  revisionDueAt: string | null;
   createdBy: string | null;
   supplierId: string | null;
   masterName: string | null;

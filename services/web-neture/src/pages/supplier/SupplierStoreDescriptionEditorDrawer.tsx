@@ -33,9 +33,15 @@ const LANGUAGE = 'ko';
 const STATUS_LABEL: Record<string, { label: string; cls: string }> = {
   draft: { label: '임시저장', cls: 'bg-slate-100 text-slate-600' },
   needs_review: { label: '검수 대기', cls: 'bg-amber-50 text-amber-700' },
+  revision_requested: { label: '수정 요청', cls: 'bg-orange-50 text-orange-700' },
   canonical: { label: '검수 완료(매장 노출)', cls: 'bg-emerald-50 text-emerald-700' },
-  hidden: { label: '반려/보류', cls: 'bg-red-50 text-red-700' },
+  hidden: { label: '숨김', cls: 'bg-red-50 text-red-700' },
 };
+
+function fmtDay(v: string | null | undefined): string {
+  if (!v) return '-';
+  return new Date(v).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
+}
 
 export default function SupplierStoreDescriptionEditorDrawer({ product, open, onClose, onSaved }: Props) {
   const { user } = useAuth();
@@ -128,6 +134,7 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
 
   const statusCfg = existing ? STATUS_LABEL[existing.status] : null;
   const isCanonical = existing?.status === 'canonical';
+  const isRevision = existing?.status === 'revision_requested';
 
   return (
     <>
@@ -161,6 +168,13 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
               {isCanonical && (
                 <div className="mb-3 px-3 py-2 rounded-lg bg-emerald-50 border border-emerald-200 text-xs text-emerald-800">
                   이 설명서는 운영자 검수를 통과해 매장에 노출 중입니다. 수정 후 다시 저장하면 새 초안으로 검수를 받습니다.
+                </div>
+              )}
+              {isRevision && (
+                <div className="mb-3 px-3 py-2 rounded-lg bg-orange-50 border border-orange-200 text-xs text-orange-800">
+                  <div className="font-semibold">운영자가 수정을 요청했습니다 · {fmtDay(existing?.revisionDueAt)}까지 재요청</div>
+                  {existing?.reviewNote && <div className="mt-1 whitespace-pre-wrap text-orange-900">사유: {existing.reviewNote}</div>}
+                  <div className="mt-1 text-orange-700">수정 후 <strong>다시 검수 요청</strong>하세요. 기한이 지나면 이 설명서는 자동 삭제됩니다.</div>
                 </div>
               )}
               <RichTextEditor
@@ -200,7 +214,7 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
               disabled={saving || loading}
               className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
             >
-              {saving ? '처리 중...' : '검수요청'}
+              {saving ? '처리 중...' : isRevision ? '다시 검수 요청' : '검수요청'}
             </button>
           </div>
         </div>

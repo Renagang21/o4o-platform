@@ -22,6 +22,9 @@ export interface SupplierStoreReviewRow {
   updatedAt: string;
   createdBy: string | null;
   supplierId: string | null;
+  reviewNote: string | null;
+  revisionRequestedAt: string | null;
+  revisionDueAt: string | null;
   masterName: string | null;
   manufacturerName: string | null;
   barcode: string | null;
@@ -35,6 +38,13 @@ export interface SupplierStoreReviewDetail extends SupplierStoreReviewRow {
   sourceRefId: string | null;
   curatedBy: string | null;
   curatedAt: string | null;
+}
+
+export interface RevisionExpiryResult {
+  mode: 'dry-run' | 'apply';
+  count: number;
+  sampleIds: string[];
+  deleted: number;
 }
 
 export interface SupplierStoreReviewListParams {
@@ -75,4 +85,21 @@ export async function approveSupplierStoreReview(id: string): Promise<void> {
 
 export async function rejectSupplierStoreReview(id: string): Promise<void> {
   await authClient.api.post(`${BASE}/${encodeURIComponent(id)}/reject`);
+}
+
+/** 수정 요청(사유 필수) — status=revision_requested, revision_due_at = now + 30일 */
+export async function requestRevisionSupplierStoreReview(id: string, reason: string): Promise<void> {
+  await authClient.api.post(`${BASE}/${encodeURIComponent(id)}/request-revision`, { reason });
+}
+
+/** 만료(수정 요청 후 기한 경과) 자동 삭제 — dry-run */
+export async function expirySupplierStoreReviewDryRun(): Promise<RevisionExpiryResult> {
+  const res = await authClient.api.get<{ success: boolean; data: RevisionExpiryResult }>(`${BASE}/expiry/dry-run`);
+  return res.data.data;
+}
+
+/** 만료 자동 삭제 — apply(hard delete) */
+export async function expirySupplierStoreReviewApply(): Promise<RevisionExpiryResult> {
+  const res = await authClient.api.post<{ success: boolean; data: RevisionExpiryResult }>(`${BASE}/expiry/apply`);
+  return res.data.data;
 }

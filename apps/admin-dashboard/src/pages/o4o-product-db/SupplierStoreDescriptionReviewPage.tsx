@@ -13,19 +13,22 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { Eye, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
+import { Eye, CheckCircle2, MessageSquareWarning, Loader2, Trash2, XCircle } from 'lucide-react';
 import { ContentRenderer } from '@o4o/content-editor';
 import {
   listSupplierStoreReview,
   getSupplierStoreReviewDetail,
   approveSupplierStoreReview,
-  rejectSupplierStoreReview,
+  requestRevisionSupplierStoreReview,
+  expirySupplierStoreReviewDryRun,
+  expirySupplierStoreReviewApply,
   type SupplierStoreReviewRow,
   type SupplierStoreReviewDetail,
 } from '@/api/supplier-store-description-review.api';
 
 const STATUS_OPTIONS: { value: string; label: string }[] = [
   { value: 'needs_review', label: '검수 대기' },
+  { value: 'revision_requested', label: '수정 요청' },
   { value: 'draft', label: '임시저장' },
   { value: 'canonical', label: '검수 완료' },
   { value: 'all', label: '전체' },
@@ -34,8 +37,9 @@ const STATUS_OPTIONS: { value: string; label: string }[] = [
 const STATUS_BADGE: Record<string, { label: string; cls: string }> = {
   draft: { label: '임시저장', cls: 'bg-slate-100 text-slate-600' },
   needs_review: { label: '검수 대기', cls: 'bg-amber-50 text-amber-700' },
+  revision_requested: { label: '수정 요청', cls: 'bg-orange-50 text-orange-700' },
   canonical: { label: '검수 완료', cls: 'bg-emerald-50 text-emerald-700' },
-  hidden: { label: '반려/보류', cls: 'bg-red-50 text-red-700' },
+  hidden: { label: '숨김', cls: 'bg-red-50 text-red-700' },
 };
 
 const LIMIT = 20;
@@ -43,6 +47,11 @@ const LIMIT = 20;
 function fmtDate(v: string | null | undefined): string {
   if (!v) return '-';
   return new Date(v).toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+}
+
+function fmtDay(v: string | null | undefined): string {
+  if (!v) return '-';
+  return new Date(v).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
 }
 
 export default function SupplierStoreDescriptionReviewPage() {
@@ -59,6 +68,12 @@ export default function SupplierStoreDescriptionReviewPage() {
   const [detail, setDetail] = useState<SupplierStoreReviewDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [acting, setActing] = useState(false);
+  // 수정 요청 사유 모달 (사유 필수)
+  const [revisionTarget, setRevisionTarget] = useState<{ id: string; masterName: string | null } | null>(null);
+  const [revisionReason, setRevisionReason] = useState('');
+  // 만료 정리
+  const [expiryInfo, setExpiryInfo] = useState<{ count: number; sampleIds: string[] } | null>(null);
+  const [expiryBusy, setExpiryBusy] = useState(false);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -112,18 +127,53 @@ export default function SupplierStoreDescriptionReviewPage() {
     }
   };
 
-  const doReject = async (id: string) => {
-    if (!window.confirm('이 설명서를 반려/보류 처리할까요?')) return;
+  const submitRevision = async () => {
+    if (!revisionTarget) return;
+    const reason = revisionReason.trim();
+    if (!reason) {
+      toast.error('수정 요청 사유를 입력하세요');
+      return;
+    }
     setActing(true);
     try {
-      await rejectSupplierStoreReview(id);
-      toast.success('반려/보류 처리되었습니다');
+      await requestRevisionSupplierStoreReview(revisionTarget.id, reason);
+      toast.success('수정 요청되었습니다 (공급자에게 30일 수정 기한 부여)');
+      setRevisionTarget(null);
+      setRevisionReason('');
       setDetail(null);
       load();
     } catch {
-      toast.error('반려 처리에 실패했습니다');
+      toast.error('수정 요청에 실패했습니다');
     } finally {
       setActing(false);
+    }
+  };
+
+  const runExpiryDryRun = async () => {
+    setExpiryBusy(true);
+    try {
+      const r = await expirySupplierStoreReviewDryRun();
+      setExpiryInfo({ count: r.count, sampleIds: r.sampleIds });
+    } catch {
+      toast.error('만료 dry-run에 실패했습니다');
+    } finally {
+      setExpiryBusy(false);
+    }
+  };
+
+  const runExpiryApply = async () => {
+    if (!expiryInfo || expiryInfo.count === 0) return;
+    if (!window.confirm(`기한이 지난 수정 요청 설명서 ${expiryInfo.count}건을 영구 삭제합니다. 진행할까요?`)) return;
+    setExpiryBusy(true);
+    try {
+      const r = await expirySupplierStoreReviewApply();
+      toast.success(`${r.deleted}건 삭제되었습니다`);
+      setExpiryInfo(null);
+      load();
+    } catch {
+      toast.error('만료 삭제에 실패했습니다');
+    } finally {
+      setExpiryBusy(false);
     }
   };
 
@@ -175,6 +225,36 @@ export default function SupplierStoreDescriptionReviewPage() {
             검색
           </button>
         </form>
+      </div>
+
+      {/* 만료 정리 (수정 요청 후 30일 경과 자동 삭제) */}
+      <div className="mb-4 flex flex-wrap items-center gap-2 rounded-lg border border-gray-100 bg-gray-50 px-3 py-2 text-sm">
+        <Trash2 size={15} className="text-gray-400" />
+        <span className="text-gray-600">수정 요청 후 기한(30일) 경과 설명서 정리</span>
+        <button
+          onClick={runExpiryDryRun}
+          disabled={expiryBusy}
+          className="rounded bg-white px-2.5 py-1 text-xs font-medium text-gray-700 ring-1 ring-gray-200 hover:bg-gray-100 disabled:opacity-50"
+        >
+          {expiryBusy ? '확인 중…' : '대상 확인(dry-run)'}
+        </button>
+        {expiryInfo && (
+          <>
+            <span className={`text-xs ${expiryInfo.count > 0 ? 'text-orange-700' : 'text-gray-500'}`}>
+              삭제 대상 {expiryInfo.count}건
+              {expiryInfo.count > 0 ? ` (예: ${expiryInfo.sampleIds.slice(0, 2).join(', ')}${expiryInfo.sampleIds.length > 2 ? ' …' : ''})` : ''}
+            </span>
+            {expiryInfo.count > 0 && (
+              <button
+                onClick={runExpiryApply}
+                disabled={expiryBusy}
+                className="rounded bg-red-600 px-2.5 py-1 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50"
+              >
+                삭제 실행
+              </button>
+            )}
+          </>
+        )}
       </div>
 
       {/* 목록 */}
@@ -249,14 +329,14 @@ export default function SupplierStoreDescriptionReviewPage() {
                             <CheckCircle2 size={16} />
                           </button>
                         )}
-                        {r.status !== 'hidden' && (
+                        {r.status !== 'revision_requested' && r.status !== 'hidden' && (
                           <button
-                            onClick={() => doReject(r.id)}
+                            onClick={() => setRevisionTarget({ id: r.id, masterName: r.masterName })}
                             disabled={acting}
-                            title="반려/보류"
-                            className="rounded p-1.5 text-red-500 hover:bg-red-50 disabled:opacity-50"
+                            title="수정 요청"
+                            className="rounded p-1.5 text-orange-600 hover:bg-orange-50 disabled:opacity-50"
                           >
-                            <XCircle size={16} />
+                            <MessageSquareWarning size={16} />
                           </button>
                         )}
                       </div>
@@ -316,17 +396,24 @@ export default function SupplierStoreDescriptionReviewPage() {
                     <XCircle size={18} />
                   </button>
                 </div>
+                {detail.status === 'revision_requested' && (
+                  <div className="mx-6 mt-4 rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-800">
+                    <div className="font-medium">수정 요청됨 · 기한 {fmtDay(detail.revisionDueAt)}까지</div>
+                    {detail.reviewNote && <div className="mt-1 whitespace-pre-wrap text-orange-900">사유: {detail.reviewNote}</div>}
+                    <div className="mt-1 text-xs text-orange-700">기한 내 공급자 재검수 요청이 없으면 자동 삭제됩니다.</div>
+                  </div>
+                )}
                 <div className="max-h-[60vh] overflow-y-auto px-6 py-5">
                   <ContentRenderer html={detail.content} variant="store-description" />
                 </div>
                 <div className="flex items-center justify-end gap-2 border-t border-gray-200 px-6 py-4">
-                  {detail.status !== 'hidden' && (
+                  {detail.status !== 'revision_requested' && detail.status !== 'hidden' && (
                     <button
-                      onClick={() => doReject(detail.id)}
+                      onClick={() => setRevisionTarget({ id: detail.id, masterName: detail.masterName })}
                       disabled={acting}
-                      className="rounded-lg bg-red-50 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-100 disabled:opacity-50"
+                      className="rounded-lg bg-orange-50 px-4 py-2 text-sm font-medium text-orange-700 hover:bg-orange-100 disabled:opacity-50"
                     >
-                      반려/보류
+                      수정 요청
                     </button>
                   )}
                   {detail.status !== 'canonical' && (
@@ -341,6 +428,44 @@ export default function SupplierStoreDescriptionReviewPage() {
                 </div>
               </>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* 수정 요청 사유 모달 (사유 필수) */}
+      {revisionTarget && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4" onClick={() => !acting && setRevisionTarget(null)}>
+          <div className="w-full max-w-md rounded-xl bg-white p-5 shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-base font-bold text-gray-900">수정 요청</h3>
+            <p className="mt-1 text-xs text-gray-500">
+              {revisionTarget.masterName || '(이름 없음)'} — 공급자에게 수정 사유를 전달합니다. 공급자는 30일 이내에 수정 후 다시 검수 요청할 수 있으며, 기한이 지나면 자동 삭제됩니다.
+            </p>
+            <textarea
+              value={revisionReason}
+              onChange={(e) => setRevisionReason(e.target.value)}
+              rows={4}
+              placeholder="수정 요청 사유를 입력하세요 (필수)"
+              className="mt-3 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-admin-blue"
+            />
+            <div className="mt-3 flex justify-end gap-2">
+              <button
+                onClick={() => {
+                  setRevisionTarget(null);
+                  setRevisionReason('');
+                }}
+                disabled={acting}
+                className="rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+              >
+                취소
+              </button>
+              <button
+                onClick={submitRevision}
+                disabled={acting || !revisionReason.trim()}
+                className="rounded-lg bg-orange-600 px-4 py-2 text-sm font-medium text-white hover:bg-orange-700 disabled:opacity-50"
+              >
+                {acting ? '처리 중…' : '수정 요청 보내기'}
+              </button>
+            </div>
           </div>
         </div>
       )}

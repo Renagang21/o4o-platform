@@ -30,8 +30,9 @@ const PRODUCTS_PATH = '/supplier/products';
 const DRAFT_STATUS_BADGE: Record<string, { label: string; cls: string }> = {
   draft: { label: '임시저장', cls: 'bg-slate-100 text-slate-600' },
   needs_review: { label: '검수 대기', cls: 'bg-amber-50 text-amber-700' },
+  revision_requested: { label: '수정 요청', cls: 'bg-orange-50 text-orange-700' },
   canonical: { label: '매장 노출', cls: 'bg-emerald-50 text-emerald-700' },
-  hidden: { label: '반려/보류', cls: 'bg-red-50 text-red-700' },
+  hidden: { label: '숨김', cls: 'bg-red-50 text-red-700' },
 };
 
 function missingLabels(profile: SupplierProfile | null): string[] {
@@ -97,8 +98,9 @@ export default function SupplierStoreDescriptionsPage() {
     const m = new Map<string, SupplierStoreDescriptionDraft>();
     for (const d of drafts) {
       const prev = m.get(d.masterId);
-      // 우선순위: canonical > needs_review > draft > 기타 (표시용 대표 상태)
-      const rank = (s: string) => (s === 'canonical' ? 3 : s === 'needs_review' ? 2 : s === 'draft' ? 1 : 0);
+      // 우선순위: revision_requested(조치 필요) > canonical > needs_review > draft > 기타
+      const rank = (s: string) =>
+        s === 'revision_requested' ? 4 : s === 'canonical' ? 3 : s === 'needs_review' ? 2 : s === 'draft' ? 1 : 0;
       if (!prev || rank(d.status) > rank(prev.status)) m.set(d.masterId, d);
     }
     return m;
