@@ -437,4 +437,21 @@ export const storeLibraryApi = {
       Object.keys(query).length > 0 ? query : undefined,
     );
   },
+
+  /**
+   * WO-O4O-STORE-IMPORTED-DESCRIPTION-REIMPORT-REPLACE-V1
+   * "원본 갱신됨" 사본(:id)의 현재 canonical 원본을 **새 사본으로 다시 가져오기**(덮어쓰기 아님).
+   * 응답 mode: 'create_copy'(새 사본 생성) | 'already_latest'(이미 최신).
+   */
+  reimportSource: (contentId: string) =>
+    apiClient.post<{
+      success: boolean;
+      data: {
+        mode: 'create_copy' | 'already_latest';
+        oldStoreContentId?: string;
+        newStoreContentId?: string;
+        sourceDescriptionId?: string;
+        message?: string;
+      };
+    }>(`/store-contents/${encodeURIComponent(contentId)}/reimport-source`, {}),
 };

@@ -225,6 +225,9 @@ function DocumentsSection({
   // WO-O4O-KPA-CONTENT-LIST-TAG-SEARCH-FILTER-V1: 출처 탭 + 태그 정확 필터
   const [source, setSource] = useState<SourceFilter>('all');
   const [activeTag, setActiveTag] = useState<string | null>(null);
+  // WO-O4O-STORE-IMPORTED-DESCRIPTION-REIMPORT-REPLACE-V1: 재가져오기 진행중 표식 + 내부 목록 새로고침 트리거
+  const [reimportingId, setReimportingId] = useState<string | null>(null);
+  const [internalReload, setInternalReload] = useState(0);
 
   // 출처 탭/태그 필터 변경 시 1페이지로 리셋
   const changeSource = useCallback((s: SourceFilter) => { setSource(s); setPage(1); }, []);
@@ -267,7 +270,7 @@ function DocumentsSection({
     return () => {
       cancelled = true;
     };
-  }, [page, searchQuery, source, activeTag, reloadKey]);
+  }, [page, searchQuery, source, activeTag, reloadKey, internalReload]);
 
   useEffect(() => {
     setSelected((prev) => {
@@ -353,6 +356,31 @@ function DocumentsSection({
     if (!singleSelectedRow) return;
     setPopTarget({ id: singleSelectedRow.id, title: singleSelectedRow.title, origin: singleSelectedRow.origin });
   }, [singleSelectedRow]);
+
+  // WO-O4O-STORE-IMPORTED-DESCRIPTION-REIMPORT-REPLACE-V1:
+  //   "원본 갱신됨" 사본에서 현재 canonical 원본을 **새 사본으로 다시 가져오기**(덮어쓰기 아님).
+  //   기존 사본(본문/QR/태블릿 연결)은 그대로 유지되고, 새 사본이 별도로 목록에 추가된다.
+  const handleReimport = useCallback(async (row: DocumentRow) => {
+    if (reimportingId) return;
+    if (!confirm('현재 사본은 그대로 두고, 새 원본을 별도 사본으로 가져옵니다.\n(기존 QR·태블릿 연결은 변경되지 않습니다.)\n계속할까요?')) return;
+    setReimportingId(row.id);
+    try {
+      const res = await storeLibraryApi.reimportSource(row.id);
+      const data = res?.data;
+      if (data?.mode === 'already_latest') {
+        toast.success('이미 최신 원본입니다.');
+      } else {
+        toast.success('새 원본을 매장 사본으로 가져왔습니다. 기존 사본은 그대로 유지됩니다.');
+        setInternalReload((n) => n + 1);
+      }
+    } catch (e: any) {
+      const code = e?.response?.data?.error?.code;
+      const msg = e?.response?.data?.error?.message;
+      toast.error(msg || (code === 'NO_CURRENT_CANONICAL' ? '현재 가져올 수 있는 새 원본이 없습니다.' : '다시 가져오기에 실패했습니다.'));
+    } finally {
+      setReimportingId(null);
+    }
+  }, [reimportingId]);
 
   // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-STANDARD-TABLE-V1: @o4o/ui Column<T>
   const columns = useMemo<Column<DocumentRow>[]>(
@@ -454,26 +482,41 @@ function DocumentsSection({
         key: '_actions',
         title: '액션',
         align: 'center' as const,
-        width: '80px',
+        width: '150px',
         // WO-O4O-STORE-LIBRARY-CONTENTS-DIRECT-CONTENT-REENTRY-UX-V1: direct 콘텐츠는 편집 가능
         // WO-O4O-KPA-STORE-LIBRARY-EXECUTION-ASSET-EDIT-ACTION-V1:
         //   execution-asset(매장 사본)도 편집 가능 — "열기" → "편집".
         // WO-O4O-KPA-STORE-LIBRARY-SNAPSHOT-SINGLE-EDIT-V1: snapshot 도 매장 사본 → "보기" → "편집".
         //   자료함의 콘텐츠형 항목은 direct/execution-asset/snapshot 모두 편집으로 통일(보기 전용 없음).
         render: (_v, row) => (
-          <a
-            href={row.href}
-            target={mode === 'modal' ? '_blank' : undefined}
-            rel={mode === 'modal' ? 'noreferrer' : undefined}
-            style={styles.viewBtn}
-            aria-label="콘텐츠 편집"
-          >
-            편집
-          </a>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+            {/* WO-O4O-STORE-IMPORTED-DESCRIPTION-REIMPORT-REPLACE-V1:
+                원본 갱신됨 사본만 "다시 가져오기"(새 사본 생성, 덮어쓰기 아님). */}
+            {row.hasSourceUpdate && row.origin === 'direct' && (
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); handleReimport(row); }}
+                disabled={reimportingId === row.id}
+                style={{ ...styles.viewBtn, background: '#FEF3C7', color: '#B45309', borderColor: '#FCD34D', cursor: reimportingId === row.id ? 'default' : 'pointer', opacity: reimportingId === row.id ? 0.6 : 1 }}
+                title="현재 사본은 그대로 두고, 새 원본을 별도 사본으로 가져옵니다."
+              >
+                {reimportingId === row.id ? '가져오는 중…' : '다시 가져오기'}
+              </button>
+            )}
+            <a
+              href={row.href}
+              target={mode === 'modal' ? '_blank' : undefined}
+              rel={mode === 'modal' ? 'noreferrer' : undefined}
+              style={styles.viewBtn}
+              aria-label="콘텐츠 편집"
+            >
+              편집
+            </a>
+          </div>
         ),
       },
     ],
-    [mode, applyTag],
+    [mode, applyTag, handleReimport, reimportingId],
   );
 
   const showRemoveButton = mode === 'page' && !!onRemoveSnapshots;

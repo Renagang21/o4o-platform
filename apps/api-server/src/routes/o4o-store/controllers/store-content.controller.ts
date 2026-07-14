@@ -627,6 +627,171 @@ export function createStoreContentController(
     },
   );
 
+  /**
+   * POST /store-contents/:id/reimport-source
+   * WO-O4O-STORE-IMPORTED-DESCRIPTION-REIMPORT-REPLACE-V1
+   *
+   * "원본 갱신됨" 배지를 본 매장 경영자가 새 canonical 원본을 **명시적으로 다시 가져오기**.
+   * V1 정책: 기존 사본(:id) 을 덮어쓰지 않고 **새 사본(D)** 을 생성한다.
+   *   - 기존 사본 C 는 본문/QR/태블릿 연결 그대로 유지(불변).
+   *   - C 의 source_metadata.sourceRefId(=이전 원본 SPD) 로 (master, STORE, 언어) 의 **현재 canonical** 을 해석.
+   *   - 현재 canonical 이 없으면 재가져오기 불가, 이미 최신(sourceRefId===현재)이면 no-op.
+   *   - 새 사본 D: sourceRefId=현재 canonical id, source_metadata 도 현재 기준. 같은 listing 링크 복제.
+   * 자동 갱신/덮어쓰기 없음. 매장 경영자 명시 액션에서만 호출.
+   */
+  router.post(
+    '/:id/reimport-source',
+    requireAuth,
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const authReq = req as AuthRequest;
+        const userId = authReq.user?.id;
+        if (!userId) {
+          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
+          return;
+        }
+        // 쓰기 = store owner 권한 (import 와 동일)
+        const { isOwner, organizationId: orgFromRa } = await isStoreOwner(dataSource, userId, 'kpa');
+        if (!isOwner) {
+          res.status(403).json({ success: false, error: { code: 'STORE_OWNER_REQUIRED', message: '매장 경영자(kpa:store_owner)만 가져올 수 있습니다.' } });
+          return;
+        }
+        let organizationId: string | null = orgFromRa;
+        if (!organizationId) {
+          const member = await dataSource.getRepository(KpaMember).findOne({ where: { user_id: userId } });
+          organizationId = member?.organization_id || null;
+        }
+        if (!organizationId) {
+          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: '매장 조직 정보를 찾을 수 없습니다.' } });
+          return;
+        }
+
+        const contentId = req.params.id;
+        if (!contentId || !UUID_RE.test(contentId)) {
+          res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'id는 유효한 UUID 여야 합니다.' } });
+          return;
+        }
+
+        // 기존 사본 C 조회 — org 소유 + O4O b2c import 로 만든 direct 사본만 대상.
+        const srcRows: Array<{ organization_id: string; source_type: string; source_metadata: { copiedFrom?: string; sourceRefId?: string } | null }> =
+          await dataSource.query(
+            `SELECT organization_id, source_type, source_metadata
+               FROM kpa_store_contents WHERE id = $1 LIMIT 1`,
+            [contentId],
+          );
+        const cRow = srcRows[0];
+        if (!cRow || cRow.organization_id !== organizationId) {
+          res.status(404).json({ success: false, error: { code: 'CONTENT_NOT_FOUND', message: '해당 콘텐츠를 현재 매장에서 찾을 수 없습니다.' } });
+          return;
+        }
+        if (cRow.source_type !== 'direct' || cRow.source_metadata?.copiedFrom !== 'o4o_b2c_product_description' || !cRow.source_metadata?.sourceRefId) {
+          res.status(400).json({ success: false, error: { code: 'NOT_REIMPORTABLE', message: 'O4O 설명서에서 가져온 사본만 다시 가져올 수 있습니다.' } });
+          return;
+        }
+        const oldRefId = cRow.source_metadata.sourceRefId;
+
+        // 이전 원본 SPD 로 (master, STORE, 언어) 축 확인 → 현재 canonical 해석.
+        const oldSpd: Array<{ master_id: string; description_type: string; language: string | null }> =
+          await dataSource.query(
+            `SELECT master_id, description_type, language FROM shared_product_descriptions WHERE id = $1 LIMIT 1`,
+            [oldRefId],
+          );
+        if (!oldSpd.length) {
+          res.status(400).json({ success: false, error: { code: 'SOURCE_UNRESOLVED', message: '원본 설명서 정보를 확인할 수 없습니다.' } });
+          return;
+        }
+        const { master_id: masterId, description_type: descType, language } = oldSpd[0];
+
+        // 같은 (master, STORE, 언어) 의 현재 canonical (배지 감지와 동일 해석).
+        const curRows: Array<{ id: string; content: string | null; summary: string | null; product_name: string | null }> =
+          await dataSource.query(
+            `SELECT spd.id, spd.content, spd.summary, pm.name AS product_name
+               FROM shared_product_descriptions spd
+               JOIN product_masters pm ON pm.id = spd.master_id
+              WHERE spd.master_id = $1 AND spd.description_type = $2
+                AND COALESCE(spd.language, 'ko') = COALESCE($3, 'ko')
+                AND spd.status = 'canonical' AND spd.deleted_at IS NULL
+              LIMIT 1`,
+            [masterId, descType, language],
+          );
+        if (!curRows.length) {
+          res.status(400).json({ success: false, error: { code: 'NO_CURRENT_CANONICAL', message: '현재 가져올 수 있는 새 원본이 없습니다.' } });
+          return;
+        }
+        const current = curRows[0];
+        if (current.id === oldRefId) {
+          res.status(200).json({ success: true, data: { mode: 'already_latest', message: '이미 최신 원본입니다.', sourceDescriptionId: current.id } });
+          return;
+        }
+
+        // 기존 사본 C 의 listing 링크(있으면 복제). 없으면 링크 없이 새 사본만.
+        const linkRows: Array<{ product_source_id: string; master_id: string | null }> = await dataSource.query(
+          `SELECT product_source_id, master_id FROM kpa_store_content_product_links
+            WHERE content_id = $1 AND organization_id = $2 AND product_source_type = 'listing' AND link_type = $3
+            LIMIT 1`,
+          [contentId, organizationId, LINK_TYPE],
+        );
+        const listingId = linkRows[0]?.product_source_id ?? null;
+
+        // 새 사본 D 생성 — import-b2c-description 과 동일 구조(덮어쓰기 아님). 단일 transaction.
+        const result = await dataSource.transaction(async (manager) => {
+          const title = current.product_name || 'O4O 상세설명';
+          const contentJson = {
+            html: current.content || '',
+            summary: current.summary || null,
+            sourceResources: [],
+            generatedBy: 'o4o-b2c-reimport',
+          };
+          const sourceMetadata = {
+            copiedFrom: 'o4o_b2c_product_description',
+            sourceRefId: current.id,
+            masterId,
+            copiedAt: new Date().toISOString(),
+            reimportedFrom: contentId, // 어떤 사본의 재가져오기인지 추적(표시/감사용, 자동 동작 없음)
+          };
+          const ins: Array<{ id: string; workspace_status: string; updated_at: Date }> = await manager.query(
+            `INSERT INTO kpa_store_contents
+               (organization_id, source_type, snapshot_id, title, content_json, tags, updated_by,
+                source_metadata, author_role, visibility_scope, workspace_status)
+             VALUES ($1, 'direct', NULL, $2, $3::jsonb, '[]'::jsonb, $4, $5::jsonb, 'operator', 'organization', 'draft')
+             RETURNING id, workspace_status, updated_at`,
+            [organizationId, title, JSON.stringify(contentJson), userId, JSON.stringify(sourceMetadata)],
+          );
+          const newContentId = ins[0].id;
+          if (listingId) {
+            await manager.query(
+              `INSERT INTO kpa_store_content_product_links
+                 (organization_id, content_id, product_source_type, product_source_id, master_id, link_type)
+               VALUES ($1, $2, 'listing', $3, $4, $5)
+               ON CONFLICT (organization_id, content_id, product_source_type, product_source_id, link_type) DO NOTHING`,
+              [organizationId, newContentId, listingId, masterId, LINK_TYPE],
+            );
+          }
+          return { contentId: newContentId, title, status: ins[0].workspace_status, updatedAt: ins[0].updated_at };
+        });
+
+        res.status(201).json({
+          success: true,
+          data: {
+            mode: 'create_copy',
+            oldStoreContentId: contentId,
+            newStoreContentId: result.contentId,
+            sourceDescriptionId: current.id,
+            id: result.contentId,
+            sourceType: 'direct' as const,
+            title: result.title,
+            status: result.status,
+            masterId,
+            updatedAt: result.updatedAt,
+            message: '새 원본을 매장 사본으로 가져왔습니다. 기존 사본은 그대로 유지됩니다.',
+          },
+        });
+      } catch (error: any) {
+        res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
+      }
+    },
+  );
+
   // ─────────────────────────────────────────────────────────────────────────
   // direct 콘텐츠 전용 CRUD (WO-O4O-STORE-CONTENT-DIRECT-DETAIL-EDIT-UX-V1)
   // NOTE: /direct/:id 라우트는 /:snapshotId 보다 먼저 등록해야 한다.
