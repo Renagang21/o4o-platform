@@ -74,37 +74,102 @@ const STATUS_LABEL: Record<ScreenSetStatus, string> = { draft: '초안', active:
 //   product_focus / idle_video_first / comparison 을 추가할 때 편집기 구조를 다시 만들지 않도록
 //   선택형 UI 를 미리 둔다. whitelist 확장/렌더러 구현은 이번 WO 범위 아님(서버 화이트리스트가 정본).
 const DEFAULT_TEMPLATE_KEY = 'corner_information_basic_v1';
-const TEMPLATE_OPTIONS: { key: string; label: string; description: string }[] = [
+
+// WO-O4O-KPA-TABLET-TEMPLATE-DRIVEN-BUILDER-STEPS-V1:
+//   템플릿 = 기능 종류가 아니라 UI 배치 유형. 각 템플릿에 필요한 입력 순서/블록만 단계별로 노출.
+//   메타(requiredBlocks/steps)로 제작 흐름을 구동한다. 템플릿 추가·중단은 코드에서만(사용자 등록 없음).
+type BuilderStepKind = 'basic' | 'blocks' | 'save';
+interface BuilderStepMeta {
+  title: string;
+  kind: BuilderStepKind;
+  /** kind='blocks' 단계가 다루는 블록 타입(추가/설정 대상). */
+  blockTypes?: ScreenBlockType[];
+  /** 단계 상단 안내(선택). */
+  note?: string;
+}
+interface TemplateMeta {
+  key: string;
+  label: string;
+  description: string;
+  /** 메인 화면에 있어야 하는 블록(없으면 해당 단계에서 경고). QR 은 모든 템플릿 필수. */
+  requiredBlocks: ScreenBlockType[];
+  /** 템플릿 선택 이후의 제작 단계(마지막은 항상 kind='save'). */
+  steps: BuilderStepMeta[];
+}
+const BASIC_STEP: BuilderStepMeta = { title: '기본 정보', kind: 'basic' };
+const SAVE_STEP: BuilderStepMeta = { title: '미리보기·저장', kind: 'save' };
+
+const TEMPLATE_OPTIONS: TemplateMeta[] = [
   {
     key: 'corner_information_basic_v1',
     label: '기본 코너 안내형',
-    description: '코너 설명, 제품 목록, QR 안내를 기본 구조로 보여주는 템플릿입니다.',
+    description: '코너 설명, 제품 목록, QR 안내를 기본 구조로 보여주는 범용 템플릿입니다.',
+    requiredBlocks: ['qr_guide'],
+    steps: [
+      BASIC_STEP,
+      { title: '화면 구성', kind: 'blocks', blockTypes: ['idle_media', 'corner_description', 'health_info', 'staff_inquiry', 'qr_guide'], note: '화면에 들어갈 구조 블록(대기화면·코너 설명·건강정보·QR·직원 문의)을 추가·설정합니다.' },
+      { title: '콘텐츠·제품', kind: 'blocks', blockTypes: ['content_list', 'product_list', 'product_content'], note: '고객에게 보여줄 코너 콘텐츠·제품 블록을 설정합니다.' },
+      SAVE_STEP,
+    ],
   },
-  // WO-O4O-KPA-TABLET-SCREEN-SET-TEMPLATE-APPLY-V1: 두 번째 템플릿(상품 집중형).
+  // WO-O4O-KPA-TABLET-SCREEN-SET-TEMPLATE-APPLY-V1: 상품 집중형.
   {
     key: 'product_focus',
     label: '상품 집중형',
-    description: '상품 목록과 제품 안내를 더 크게 보여주는 템플릿입니다.',
+    description: '중심 제품과 핵심 설명을 크게 보여주고 관련 콘텐츠·QR을 보조로 배치합니다.',
+    requiredBlocks: ['product_list', 'qr_guide'],
+    steps: [
+      BASIC_STEP,
+      { title: '중심 제품', kind: 'blocks', blockTypes: ['product_list', 'product_content'], note: '전면에 보여줄 제품을 구성합니다. 실제 진열 제품 선택은 코너별 진열 설정에서 관리됩니다.' },
+      { title: '핵심 설명', kind: 'blocks', blockTypes: ['corner_description', 'health_info'] },
+      { title: '관련 콘텐츠·제품·QR', kind: 'blocks', blockTypes: ['content_list', 'qr_guide', 'product_content'] },
+      SAVE_STEP,
+    ],
   },
-  // WO-O4O-KPA-TABLET-TEMPLATE-THREE-PATTERNS-V1: 신규 3 템플릿(대기 영상형 / 코너 소개형 / 제품 진열형).
+  // WO-O4O-KPA-TABLET-TEMPLATE-THREE-PATTERNS-V1: 대기 영상형 / 코너 소개형 / 제품 진열형.
   {
     key: 'idle_touch_video',
     label: '대기 영상형',
-    description: '대기 영상 위에 "화면을 터치하세요" 안내와 QR을 함께 보여줍니다. 손님의 첫 시선을 끄는 코너에 적합합니다.',
+    description: '대기 영상 위에 터치 안내와 QR을 보여줍니다. 손님의 첫 시선을 끄는 코너에 적합합니다.',
+    requiredBlocks: ['idle_media', 'qr_guide'],
+    steps: [
+      BASIC_STEP,
+      { title: '대기 영상·터치 안내', kind: 'blocks', blockTypes: ['idle_media', 'qr_guide'], note: '대기 영상(idle) 위에 “화면을 터치하세요 / Touch to start” 안내가 자동 표시됩니다. 대기 영상과 QR 안내를 구성하세요.' },
+      { title: '코너 설명', kind: 'blocks', blockTypes: ['corner_description', 'health_info'] },
+      { title: '콘텐츠·제품', kind: 'blocks', blockTypes: ['content_list', 'product_list', 'product_content'] },
+      SAVE_STEP,
+    ],
   },
   {
     key: 'corner_overview_qr',
     label: '코너 소개형',
     description: '영상 없이 코너 설명과 콘텐츠, QR을 중심으로 보여줍니다. 코너 안내가 중요한 화면에 적합합니다.',
+    requiredBlocks: ['corner_description', 'qr_guide'],
+    steps: [
+      BASIC_STEP,
+      { title: '코너 제목·설명', kind: 'blocks', blockTypes: ['corner_description'] },
+      { title: '안내 콘텐츠', kind: 'blocks', blockTypes: ['content_list', 'health_info'] },
+      { title: '제품·QR 구성', kind: 'blocks', blockTypes: ['product_list', 'qr_guide'] },
+      SAVE_STEP,
+    ],
   },
   {
     key: 'product_grid_qr',
     label: '제품 진열형',
     description: '여러 제품(5~10개 수준)을 한 화면에 진열해 보여줍니다. 제품이 많은 코너에 적합합니다.',
+    requiredBlocks: ['product_list', 'qr_guide'],
+    steps: [
+      BASIC_STEP,
+      { title: '코너 제목·짧은 설명', kind: 'blocks', blockTypes: ['corner_description'] },
+      { title: '제품 선택·순서', kind: 'blocks', blockTypes: ['product_list'], note: '제품 진열은 코너별 진열 설정에서 관리됩니다. 여기서는 제품 목록 블록의 표시 여부를 구성합니다.' },
+      { title: '보조 콘텐츠·QR', kind: 'blocks', blockTypes: ['content_list', 'qr_guide'] },
+      SAVE_STEP,
+    ],
   },
 ];
-const templateLabel = (key: string | null | undefined) =>
-  TEMPLATE_OPTIONS.find((t) => t.key === key)?.label ?? TEMPLATE_OPTIONS[0].label;
+const templateMeta = (key: string | null | undefined): TemplateMeta =>
+  TEMPLATE_OPTIONS.find((t) => t.key === key) ?? TEMPLATE_OPTIONS[0];
+const templateLabel = (key: string | null | undefined) => templateMeta(key).label;
 
 // WO-O4O-KPA-TABLET-SCREEN-SET-DIRTY-GUARD-V1: 미저장 변경 경고 문구 + 블록 비교 정규화
 const DISCARD_MSG = '저장되지 않은 변경이 있습니다.\n저장하지 않고 이동하면 변경사항이 사라질 수 있습니다.\n계속하시겠습니까?';
@@ -709,12 +774,12 @@ function JsonConfig({ config, onReplaceConfig }: { config: Record<string, unknow
 //   신규/수정 공통. 인라인 폼/패널을 단계 화면으로 분리. 기존 하위 편집기·저장 API·dirty guard 재사용.
 //   저장 = createScreenSet|updateScreenSet + saveScreenSetBlocks(전체 교체). 저장 성공 후 리스트 복귀.
 //   코너 적용/해제는 노출하지 않음(코너별 운영 탭 전용). draft 실미리보기는 후속 WO(placeholder).
-const BUILDER_STEPS = ['템플릿', '기본 정보', '화면 구성', '콘텐츠·제품', '미리보기·저장'] as const;
-const CONTENT_BLOCK_TYPES: ScreenBlockType[] = ['content_list', 'product_list', 'product_content'];
-const isContentBlock = (t: ScreenBlockType) => CONTENT_BLOCK_TYPES.includes(t);
-// 화면 구성 단계에서 추가 가능한 구조 블록(콘텐츠/제품 블록은 '콘텐츠·제품' 단계에서 추가).
-const STRUCTURE_ADD_TYPES = BLOCK_TYPES.filter((b) => !isContentBlock(b.value));
-const CONTENT_ADD_TYPES = BLOCK_TYPES.filter((b) => isContentBlock(b.value) && b.value !== 'product_content');
+// WO-O4O-KPA-TABLET-TEMPLATE-DRIVEN-BUILDER-STEPS-V1: 단계 = 선택 템플릿의 steps 메타로 구동.
+//   신규 draft 는 QR 안내 블록을 기본 포함(모든 템플릿 메인 QR 원칙). 기존 수정은 블록을 강제 변경하지 않는다.
+const seedInitialBlocks = (detail: ScreenSetDetail | null): ScreenBlock[] =>
+  detail
+    ? detail.blocks.map((b) => ({ ...b, config: b.config ?? {} }))
+    : [{ blockType: 'qr_guide', sortOrder: 0, isEnabled: true, config: defaultConfig('qr_guide') }];
 
 function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, previewApi, storeSlug }: {
   initialDetail: ScreenSetDetail | null;
@@ -729,11 +794,8 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
   const [name, setName] = useState(initialDetail?.name ?? '');
   const [status, setStatus] = useState<ScreenSetStatus>(initialDetail?.status ?? 'draft');
   const [templateKey, setTemplateKey] = useState(initialDetail?.templateKey ?? DEFAULT_TEMPLATE_KEY);
-  const [blocks, setBlocks] = useState<ScreenBlock[]>(
-    (initialDetail?.blocks ?? []).map((b) => ({ ...b, config: b.config ?? {} })),
-  );
-  const [structureAddType, setStructureAddType] = useState<ScreenBlockType>('corner_description');
-  const [contentAddType, setContentAddType] = useState<ScreenBlockType>('content_list');
+  const [blocks, setBlocks] = useState<ScreenBlock[]>(() => seedInitialBlocks(initialDetail));
+  const [stepAddType, setStepAddType] = useState<ScreenBlockType>('corner_description');
   const [saving, setSaving] = useState(false);
 
   // WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1: 저장 전 미리보기(태블릿 / QR 모바일). 모달은 편집 상태를 잃지 않는다.
@@ -756,7 +818,7 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
     name: initialDetail?.name ?? '',
     status: (initialDetail?.status ?? 'draft') as ScreenSetStatus,
     templateKey: initialDetail?.templateKey ?? DEFAULT_TEMPLATE_KEY,
-    blocks: normalizeBlocks(initialDetail?.blocks ?? []),
+    blocks: normalizeBlocks(seedInitialBlocks(initialDetail)),
   });
   const isDirty =
     name.trim() !== baseline.current.name ||
@@ -789,7 +851,15 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
     setBlocks((prev) => prev.map((b, idx) => (idx === i ? { ...b, config: cfg } : b)));
 
   const nameValid = name.trim().length > 0;
-  const contentBlockIdx = blocks.map((_, i) => i).filter((i) => isContentBlock(blocks[i].blockType));
+
+  // ── 템플릿 메타 구동 단계(WO-O4O-KPA-TABLET-TEMPLATE-DRIVEN-BUILDER-STEPS-V1) ──
+  const tmpl = templateMeta(templateKey);
+  const tSteps = tmpl.steps;              // 템플릿 선택 이후 단계(basic..save)
+  const totalSteps = 1 + tSteps.length;   // + 템플릿 선택(step 0)
+  // 템플릿 변경으로 단계 수가 줄면 현재 step 을 클램프(자동 삭제/덮어쓰기 아님).
+  useEffect(() => { setStep((s) => Math.min(s, totalSteps - 1)); }, [totalSteps]);
+  // 현재 템플릿 필수 블록 중 없는 것(경고용 — 자동 추가/삭제하지 않음).
+  const missingRequired = tmpl.requiredBlocks.filter((rt) => !blocks.some((b) => b.blockType === rt));
 
   const handleSave = async () => {
     if (!nameValid) { onToast({ type: 'error', message: '콘텐츠 이름을 입력해 주세요.' }); setStep(1); return; }
@@ -830,6 +900,45 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
     );
   };
 
+  // ── blocks 단계 렌더(단계별 blockTypes 필터 — 기존 하위 편집기 재사용) ──
+  //   필수 블록이 없어도 자동 추가/삭제하지 않고 경고 + 빠른 추가 버튼만 제공(예외 처리).
+  const renderBlocksStep = (sm: BuilderStepMeta) => {
+    const types = sm.blockTypes ?? [];
+    const idxs = blocks.map((_, i) => i).filter((i) => types.includes(blocks[i].blockType));
+    const addable = BLOCK_TYPES.filter((b) => types.includes(b.value) && b.value !== 'product_content');
+    const missingHere = tmpl.requiredBlocks.filter((rt) => types.includes(rt) && !blocks.some((b) => b.blockType === rt));
+    const addType = types.includes(stepAddType) ? stepAddType : (addable[0]?.value ?? types[0]);
+    return (
+      <div className="space-y-3">
+        {sm.note && <p className="text-[11px] text-slate-500">{sm.note}</p>}
+        {missingHere.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-[11px] text-amber-800">
+            <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
+            <span>필수 구성이 없습니다. 해당 단계를 확인해 주세요.</span>
+            {missingHere.map((t) => (
+              <button key={t} onClick={() => addBlock(t)} className="px-2 py-0.5 text-[11px] font-medium text-amber-800 bg-white border border-amber-300 rounded hover:bg-amber-100">+ {BLOCK_LABEL[t] ?? t}</button>
+            ))}
+          </div>
+        )}
+        {idxs.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-slate-300 bg-white/60 text-center py-6 px-4 text-sm text-slate-500">이 단계의 블록이 없습니다. 아래에서 추가하세요.</div>
+        ) : (
+          <div className="space-y-2">{idxs.map((i) => <BlockRow key={i} i={i} />)}</div>
+        )}
+        {addable.length > 0 && (
+          <div className="flex items-center gap-2 flex-wrap">
+            <select value={addType} onChange={(e) => setStepAddType(e.target.value as ScreenBlockType)} className="px-2 py-1.5 rounded-lg border border-slate-200 text-xs">
+              {addable.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+            </select>
+            <button onClick={() => addBlock(addType)} className="px-2.5 py-1.5 text-xs font-medium text-indigo-700 bg-white border border-indigo-200 rounded-lg hover:bg-indigo-50 flex items-center gap-1">
+              <Plus className="w-3.5 h-3.5" /> 블록 추가
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-4">
       {/* ── 헤더 + 스텝 인디케이터 ── */}
@@ -843,8 +952,8 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
         </button>
       </div>
       <ol className="flex items-center gap-1 flex-wrap text-[11px]">
-        {BUILDER_STEPS.map((label, idx) => (
-          <li key={label} className="flex items-center gap-1">
+        {['템플릿', ...tSteps.map((s) => s.title)].map((label, idx) => (
+          <li key={`${idx}-${label}`} className="flex items-center gap-1">
             <button
               onClick={() => setStep(idx)}
               className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full font-medium transition-colors ${
@@ -854,7 +963,7 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
               <span className={`w-4 h-4 rounded-full text-[10px] flex items-center justify-center ${idx === step ? 'bg-white/25' : 'bg-white/70 text-slate-500'}`}>{idx + 1}</span>
               {label}
             </button>
-            {idx < BUILDER_STEPS.length - 1 && <span className="text-slate-300">›</span>}
+            {idx < totalSteps - 1 && <span className="text-slate-300">›</span>}
           </li>
         ))}
       </ol>
@@ -869,114 +978,72 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
           </div>
         )}
 
-        {step === 1 && (
-          <div className="space-y-3">
-            <div>
-              <label className="text-xs font-semibold text-slate-600">콘텐츠 이름</label>
-              <input value={name} onChange={(e) => setName(e.target.value)} placeholder="예: 입마름·구취 관리 세트"
-                className="w-full mt-1 px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" autoFocus />
-              {!nameValid && <p className="text-[11px] text-amber-600 mt-1">저장하려면 이름이 필요합니다.</p>}
-            </div>
-            <div>
-              <label className="text-xs font-semibold text-slate-600">상태</label>
-              <select value={status} onChange={(e) => setStatus(e.target.value as ScreenSetStatus)}
-                className="mt-1 px-2 py-2 rounded-lg border border-slate-200 text-sm">
-                <option value="draft">초안</option>
-                <option value="active">활성</option>
-                {isEdit && <option value="archived">보관</option>}
-              </select>
-              <p className="text-[11px] text-slate-400 mt-1">저장은 세트 내용만 저장합니다(코너에 자동 적용되지 않음). 코너 적용은 ‘코너별 운영’ 탭에서 합니다.</p>
-            </div>
-          </div>
-        )}
-
-        {step === 2 && (
-          <div className="space-y-3">
-            <p className="text-[11px] text-slate-500">화면에 들어갈 <b>구조 블록</b>(코너 설명·건강정보·QR 안내·대기화면·직원 문의)을 추가하고 순서·표시 여부를 정합니다. 콘텐츠·제품 블록의 세부 설정은 다음 단계에서 합니다.</p>
-            <div className="space-y-2">
-              {blocks.length === 0 && <div className="text-xs text-slate-400">블록이 없습니다. 아래에서 추가하세요.</div>}
-              {blocks.map((b, i) => (
-                isContentBlock(b.blockType) ? (
-                  <div key={i} className="border border-dashed border-slate-200 rounded-lg p-2.5 bg-white/60 flex items-center gap-2">
-                    <span className="text-xs font-semibold text-slate-500 flex-1">{BLOCK_LABEL[b.blockType] ?? b.blockType} <span className="text-[10px] text-slate-400">— ‘콘텐츠·제품’ 단계에서 설정</span></span>
-                    <label className="text-[11px] text-slate-500 flex items-center gap-1">
-                      <input type="checkbox" checked={b.isEnabled} onChange={() => toggleBlock(i)} className="rounded border-slate-300 text-indigo-600" /> 표시
-                    </label>
-                    <button onClick={() => moveBlock(i, 'up')} disabled={i === 0} className="p-1 rounded hover:bg-slate-100 disabled:opacity-30"><ChevronUp className="w-3.5 h-3.5" /></button>
-                    <button onClick={() => moveBlock(i, 'down')} disabled={i === blocks.length - 1} className="p-1 rounded hover:bg-slate-100 disabled:opacity-30"><ChevronDown className="w-3.5 h-3.5" /></button>
-                    <button onClick={() => removeBlock(i)} className="p-1 rounded text-slate-400 hover:text-red-600 hover:bg-red-50"><X className="w-3.5 h-3.5" /></button>
+        {step >= 1 && (() => {
+          const sm = tSteps[step - 1];
+          if (!sm) return null;
+          if (sm.kind === 'basic') {
+            return (
+              <div className="space-y-3">
+                <div>
+                  <label className="text-xs font-semibold text-slate-600">콘텐츠 이름</label>
+                  <input value={name} onChange={(e) => setName(e.target.value)} placeholder="예: 입마름·구취 관리 세트"
+                    className="w-full mt-1 px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" autoFocus />
+                  {!nameValid && <p className="text-[11px] text-amber-600 mt-1">저장하려면 이름이 필요합니다.</p>}
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-slate-600">상태</label>
+                  <select value={status} onChange={(e) => setStatus(e.target.value as ScreenSetStatus)}
+                    className="mt-1 px-2 py-2 rounded-lg border border-slate-200 text-sm">
+                    <option value="draft">초안</option>
+                    <option value="active">활성</option>
+                    {isEdit && <option value="archived">보관</option>}
+                  </select>
+                  <p className="text-[11px] text-slate-400 mt-1">저장은 세트 내용만 저장합니다(코너에 자동 적용되지 않음). 코너 적용은 ‘코너별 운영’ 탭에서 합니다.</p>
+                </div>
+              </div>
+            );
+          }
+          if (sm.kind === 'save') {
+            return (
+              <div className="space-y-3">
+                <div className="rounded-lg border border-slate-200 bg-white p-3 space-y-1.5">
+                  <div className="text-sm font-bold text-slate-800">{name.trim() || '(이름 없음)'}</div>
+                  <div className="text-[11px] text-slate-500">
+                    템플릿 <b>{templateLabel(templateKey)}</b> · 상태 <b>{STATUS_LABEL[status]}</b> · 블록 <b>{blocks.length}</b>개
+                    {' '}(표시 {blocks.filter((b) => b.isEnabled).length}개)
                   </div>
-                ) : (
-                  <BlockRow key={i} i={i} />
-                )
-              ))}
-            </div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <select value={structureAddType} onChange={(e) => setStructureAddType(e.target.value as ScreenBlockType)} className="px-2 py-1.5 rounded-lg border border-slate-200 text-xs">
-                {STRUCTURE_ADD_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
-              </select>
-              <button onClick={() => addBlock(structureAddType)} className="px-2.5 py-1.5 text-xs font-medium text-indigo-700 bg-white border border-indigo-200 rounded-lg hover:bg-indigo-50 flex items-center gap-1">
-                <Plus className="w-3.5 h-3.5" /> 구조 블록 추가
-              </button>
-            </div>
-          </div>
-        )}
-
-        {step === 3 && (
-          <div className="space-y-3">
-            <p className="text-[11px] text-slate-500">고객에게 보여줄 <b>콘텐츠·제품</b> 블록을 설정합니다. 원본 콘텐츠는 참조만 하며 변경되지 않습니다.</p>
-            {contentBlockIdx.length === 0 ? (
-              <div className="rounded-lg border border-dashed border-slate-300 bg-white/60 text-center py-6 px-4 text-sm text-slate-500">
-                아직 콘텐츠·제품 블록이 없습니다. 아래에서 추가하세요.
+                  {missingRequired.length > 0 && (
+                    <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-amber-700 pt-1">
+                      <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" /> 필수 구성이 없습니다. 해당 단계를 확인해 주세요. (없는 항목: {missingRequired.map((t) => BLOCK_LABEL[t] ?? t).join(', ')})
+                    </div>
+                  )}
+                </div>
+                {/* WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1: 저장 전 미리보기(태블릿 / QR 모바일). */}
+                <div className="flex flex-wrap gap-2">
+                  <button onClick={() => openPreview('tablet')} disabled={!canPreview || previewLoading}
+                    className="min-h-[44px] px-4 py-2 text-sm font-semibold text-indigo-700 bg-white border border-indigo-200 rounded-xl hover:bg-indigo-50 disabled:opacity-50 inline-flex items-center gap-1.5"
+                    title={canPreview ? undefined : '매장 공개 주소를 불러오는 중이거나 미리보기를 사용할 수 없습니다.'}>
+                    {previewLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Layers className="w-4 h-4" />} 태블릿 미리보기
+                  </button>
+                  <button onClick={() => openPreview('mobile')} disabled={!canPreview || previewLoading}
+                    className="min-h-[44px] px-4 py-2 text-sm font-semibold text-indigo-700 bg-white border border-indigo-200 rounded-xl hover:bg-indigo-50 disabled:opacity-50 inline-flex items-center gap-1.5"
+                    title={canPreview ? undefined : '매장 공개 주소를 불러오는 중이거나 미리보기를 사용할 수 없습니다.'}>
+                    {previewLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Layers className="w-4 h-4" />} QR 모바일 미리보기
+                  </button>
+                </div>
+                <p className="text-[11px] text-slate-400">
+                  미리보기는 현재 편집 중인 내용(저장 전)을 실제 화면으로 보여줍니다. 상품 목록·코너 콘텐츠는 매장 데이터로 조회되며, 저장 전에는 DB에 반영되지 않습니다.
+                  {!canPreview && ' (매장 공개 주소를 불러오는 중이면 잠시 후 다시 시도해 주세요.)'}
+                </p>
+                <button onClick={handleSave} disabled={saving || !nameValid}
+                  className="w-full sm:w-auto min-h-[44px] px-5 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 disabled:opacity-50 inline-flex items-center justify-center gap-2">
+                  {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} 태블릿 콘텐츠 저장
+                </button>
               </div>
-            ) : (
-              <div className="space-y-2">
-                {contentBlockIdx.map((i) => <BlockRow key={i} i={i} />)}
-              </div>
-            )}
-            <div className="flex items-center gap-2 flex-wrap">
-              <select value={contentAddType} onChange={(e) => setContentAddType(e.target.value as ScreenBlockType)} className="px-2 py-1.5 rounded-lg border border-slate-200 text-xs">
-                {CONTENT_ADD_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
-              </select>
-              <button onClick={() => addBlock(contentAddType)} className="px-2.5 py-1.5 text-xs font-medium text-indigo-700 bg-white border border-indigo-200 rounded-lg hover:bg-indigo-50 flex items-center gap-1">
-                <Plus className="w-3.5 h-3.5" /> 콘텐츠·제품 블록 추가
-              </button>
-            </div>
-          </div>
-        )}
-
-        {step === 4 && (
-          <div className="space-y-3">
-            <div className="rounded-lg border border-slate-200 bg-white p-3 space-y-1.5">
-              <div className="text-sm font-bold text-slate-800">{name.trim() || '(이름 없음)'}</div>
-              <div className="text-[11px] text-slate-500">
-                템플릿 <b>{templateLabel(templateKey)}</b> · 상태 <b>{STATUS_LABEL[status]}</b> · 블록 <b>{blocks.length}</b>개
-                {' '}(표시 {blocks.filter((b) => b.isEnabled).length}개)
-              </div>
-            </div>
-            {/* WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1: 저장 전 미리보기(태블릿 / QR 모바일). */}
-            <div className="flex flex-wrap gap-2">
-              <button onClick={() => openPreview('tablet')} disabled={!canPreview || previewLoading}
-                className="min-h-[44px] px-4 py-2 text-sm font-semibold text-indigo-700 bg-white border border-indigo-200 rounded-xl hover:bg-indigo-50 disabled:opacity-50 inline-flex items-center gap-1.5"
-                title={canPreview ? undefined : '매장 공개 주소를 불러오는 중이거나 미리보기를 사용할 수 없습니다.'}>
-                {previewLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Layers className="w-4 h-4" />} 태블릿 미리보기
-              </button>
-              <button onClick={() => openPreview('mobile')} disabled={!canPreview || previewLoading}
-                className="min-h-[44px] px-4 py-2 text-sm font-semibold text-indigo-700 bg-white border border-indigo-200 rounded-xl hover:bg-indigo-50 disabled:opacity-50 inline-flex items-center gap-1.5"
-                title={canPreview ? undefined : '매장 공개 주소를 불러오는 중이거나 미리보기를 사용할 수 없습니다.'}>
-                {previewLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Layers className="w-4 h-4" />} QR 모바일 미리보기
-              </button>
-            </div>
-            <p className="text-[11px] text-slate-400">
-              미리보기는 현재 편집 중인 내용(저장 전)을 실제 화면으로 보여줍니다. 상품 목록·코너 콘텐츠는 매장 데이터로 조회되며, 저장 전에는 DB에 반영되지 않습니다.
-              {!canPreview && ' (매장 공개 주소를 불러오는 중이면 잠시 후 다시 시도해 주세요.)'}
-            </p>
-            <button onClick={handleSave} disabled={saving || !nameValid}
-              className="w-full sm:w-auto min-h-[44px] px-5 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 disabled:opacity-50 inline-flex items-center justify-center gap-2">
-              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} 태블릿 콘텐츠 저장
-            </button>
-          </div>
-        )}
+            );
+          }
+          return renderBlocksStep(sm);
+        })()}
       </div>
 
       {/* ── 이전/다음 ── */}
@@ -985,8 +1052,8 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
           className="min-h-[44px] px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 disabled:opacity-40">
           이전
         </button>
-        {step < BUILDER_STEPS.length - 1 ? (
-          <button onClick={() => setStep((s) => Math.min(BUILDER_STEPS.length - 1, s + 1))}
+        {step < totalSteps - 1 ? (
+          <button onClick={() => setStep((s) => Math.min(totalSteps - 1, s + 1))}
             className="min-h-[44px] px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700">
             다음
           </button>
