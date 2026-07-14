@@ -256,6 +256,8 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
     setBlocks((prev) => prev.map((b, idx) => (idx === i ? { ...b, config: { ...b.config, ...patch } } : b)));
 
   const currentSet = sets.find((s) => s.id === currentScreenSetId) || null;
+  // WO-O4O-KPA-TABLET-TOUCH-FIRST-SCREEN-SET-CARDS-V1: 현재 적용 세트를 제외한 나머지(카드 그리드).
+  const otherSets = sets.filter((s) => s.id !== currentScreenSetId);
 
   // ── Dirty Guard (WO-O4O-KPA-TABLET-SCREEN-SET-DIRTY-GUARD-V1) ──
   //   세트 정보(이름/상태/템플릿)·블록을 baseline(editDetail)과 비교. 저장 성공 시 editDetail 갱신 → dirty 해제.
@@ -307,19 +309,31 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
           <p><b className="text-slate-700">저장</b>은 세트 내용만 저장하며 태블릿에 자동 적용되지 않습니다. <b className="text-slate-700">적용</b>은 이 세트를 이 코너 태블릿의 현재 화면으로 사용하고, <b className="text-slate-700">적용 해제</b>는 기본 화면으로 되돌립니다.</p>
         </div>
 
-        {/* 현재 적용 */}
-        <div className="flex items-center justify-between gap-3 flex-wrap text-sm">
-          <div>
-            <span className="text-slate-400 text-xs">이 코너에 적용 중: </span>
-            {currentSet
-              ? <span className="font-semibold text-indigo-700">{currentSet.name}</span>
-              : <span className="text-slate-400">없음 (기본 화면 사용 중)</span>}
+        {/* WO-O4O-KPA-TABLET-TOUCH-FIRST-SCREEN-SET-CARDS-V1: 현재 사용 중 카드(적용 상태 우선). */}
+        <div className="rounded-xl border border-indigo-200 bg-indigo-50/50 p-3">
+          <div className="flex items-start justify-between gap-2 flex-wrap">
+            <div className="min-w-0">
+              <span className="text-[10px] font-semibold text-indigo-700 bg-indigo-100 px-1.5 py-0.5 rounded">현재 사용 중</span>
+              {currentSet ? (
+                <>
+                  <div className="text-base font-bold text-slate-900 truncate mt-1">{currentSet.name}</div>
+                  <div className="text-[11px] text-slate-500">{templateLabel(currentSet.templateKey)} · 블록 {currentSet.blockCount ?? 0}개</div>
+                </>
+              ) : currentScreenSetId ? (
+                <div className="text-sm text-slate-500 mt-1">현재 화면 세트 정보를 불러오지 못했습니다. 아래에서 다른 화면 세트를 선택해 적용해 주세요.</div>
+              ) : (
+                <div className="text-sm text-slate-500 mt-1">현재 적용된 화면 세트가 없습니다. 아래 저장된 화면 세트를 선택해 적용해 주세요.</div>
+              )}
+            </div>
+            <div className="flex gap-2 flex-wrap">
+              {currentSet && (
+                <button onClick={() => { if (confirmDiscard()) openEdit(currentSet.id); }} className="min-h-[44px] px-4 py-2 text-sm font-semibold text-indigo-700 bg-white border border-indigo-200 rounded-xl hover:bg-indigo-50">편집</button>
+              )}
+              {currentScreenSetId && (
+                <button onClick={handleClear} disabled={busy} className="min-h-[44px] px-3 py-2 text-sm font-medium text-slate-500 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 disabled:opacity-50">적용 해제</button>
+              )}
+            </div>
           </div>
-          {currentScreenSetId && (
-            <button onClick={handleClear} disabled={busy} className="px-2.5 py-1 text-xs font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50">
-              적용 해제
-            </button>
-          )}
         </div>
 
         {/* 새 세트 생성 폼 */}
@@ -343,35 +357,48 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
           </div>
         )}
 
-        {/* 세트 목록 */}
+        {/* WO-O4O-KPA-TABLET-TOUCH-FIRST-SCREEN-SET-CARDS-V1: 다른 화면 세트 = 카드 그리드(비교·선택·적용). */}
         {loading ? (
           <div className="flex items-center gap-2 text-sm text-slate-400 py-4"><Loader2 className="w-4 h-4 animate-spin" /> 불러오는 중…</div>
         ) : sets.length === 0 ? (
-          <div className="text-sm text-slate-400 py-4">이 코너에 적용 가능한 화면 세트가 없습니다. ‘새 세트’로 만들어 보세요.</div>
+          <div className="text-center py-8 space-y-3">
+            <p className="text-sm text-slate-500">아직 화면 세트가 없습니다. 코너에서 사용할 첫 화면 세트를 만들어 주세요.</p>
+            <button onClick={() => setCreating(true)} className="inline-flex items-center gap-1.5 min-h-[44px] px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700">
+              <Plus className="w-4 h-4" /> 첫 화면 세트 만들기
+            </button>
+          </div>
         ) : (
-          <div className="divide-y divide-slate-100 border border-slate-100 rounded-lg">
-            {sets.map((s) => {
-              const isCurrent = s.id === currentScreenSetId;
-              return (
-                <div key={s.id} className="flex items-center gap-2 px-3 py-2.5">
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-slate-800 truncate flex items-center gap-2">
-                      {s.name}
-                      {isCurrent && <span className="text-[10px] font-semibold text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded">적용중</span>}
-                      {s.tabletId === null && <span className="text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">재사용</span>}
+          <div className="space-y-2">
+            {otherSets.length > 0 && (
+              <>
+                <div className="text-xs font-semibold text-slate-600">다른 화면 세트</div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {otherSets.map((s) => (
+                    <div
+                      key={s.id}
+                      onClick={() => { if (confirmDiscard()) openEdit(s.id); }}
+                      className="rounded-xl border border-slate-200 bg-white p-3 flex flex-col gap-2 cursor-pointer hover:border-indigo-200 hover:shadow-sm transition"
+                    >
+                      <div className="min-w-0">
+                        <div className="text-sm font-bold text-slate-800 truncate flex items-center gap-1.5">
+                          {s.name}
+                          {s.tabletId === null && <span className="text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded flex-shrink-0">재사용</span>}
+                        </div>
+                        <div className="text-[11px] text-slate-400">{STATUS_LABEL[s.status]} · {templateLabel(s.templateKey)} · 블록 {s.blockCount ?? 0}개</div>
+                      </div>
+                      <div className="flex gap-2 mt-auto items-center">
+                        <button onClick={(e) => { e.stopPropagation(); if (confirmDiscard()) openEdit(s.id); }} className="flex-1 min-h-[44px] px-3 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50">편집</button>
+                        <button onClick={(e) => { e.stopPropagation(); handleApply(s); }} disabled={busy} className="flex-1 min-h-[44px] px-3 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 disabled:opacity-50">이 화면 사용</button>
+                        <button onClick={(e) => { e.stopPropagation(); handleArchive(s); }} disabled={busy} className="text-[11px] text-slate-300 hover:text-red-500 disabled:opacity-50 flex-shrink-0" title="보관">보관</button>
+                      </div>
                     </div>
-                    <div className="text-[11px] text-slate-400">
-                      {STATUS_LABEL[s.status]} · {templateLabel(s.templateKey)} · 블록 {s.blockCount ?? 0}개
-                    </div>
-                  </div>
-                  {!isCurrent && (
-                    <button onClick={() => handleApply(s)} disabled={busy} className="px-2.5 py-1 text-xs font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50">적용</button>
-                  )}
-                  <button onClick={() => { if (confirmDiscard()) openEdit(s.id); }} className="px-2.5 py-1 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50">편집</button>
-                  <button onClick={() => handleArchive(s)} disabled={busy} className="px-2 py-1 text-xs text-slate-400 hover:text-red-600 disabled:opacity-50" title="보관">보관</button>
+                  ))}
                 </div>
-              );
-            })}
+              </>
+            )}
+            <button onClick={() => setCreating(true)} className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 min-h-[44px] px-4 py-2 text-sm font-semibold text-indigo-700 bg-white border border-indigo-200 rounded-xl hover:bg-indigo-50">
+              <Plus className="w-4 h-4" /> 새 화면 세트 만들기
+            </button>
           </div>
         )}
 
