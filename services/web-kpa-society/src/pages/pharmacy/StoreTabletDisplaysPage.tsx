@@ -106,6 +106,8 @@ export default function StoreTabletDisplaysPage() {
   const [showGuide, setShowGuide] = useState(false);
   // WO-O4O-KPA-TABLET-TOUCH-FIRST-CORNER-HOME-V1: currentScreenSetId → {name, blockCount} 인덱스(코너 카드 표시용).
   const [screenSetIndex, setScreenSetIndex] = useState<Record<string, { name: string; blockCount: number }>>({});
+  // WO-O4O-KPA-TABLET-TOUCH-FIRST-TABLET-CONNECT-FLOW-V1: 실행 주소 원문은 기본 숨김(보조 토글).
+  const [showRunUrl, setShowRunUrl] = useState(false);
   useEffect(() => {
     let cancelled = false;
     fetchScreenSets()
@@ -195,6 +197,20 @@ export default function StoreTabletDisplaysPage() {
   const publicTabletUrl = (tabletId: string): string => {
     const base = (import.meta.env.VITE_KPA_WEB_ORIGIN as string | undefined) || window.location.origin;
     return `${base}/tablet/${encodeURIComponent(storeSlug ?? '')}?tabletId=${tabletId}`;
+  };
+
+  // WO-O4O-KPA-TABLET-TOUCH-FIRST-TABLET-CONNECT-FLOW-V1: 실행 액션(신규 API/pairing 없음 — 기존 URL 재사용).
+  //   화면 열기 = 공개 viewer 새 탭. 팝업 차단/ slug 부재 시 안내.
+  const handleOpenTabletScreen = (tabletId: string) => {
+    if (!storeSlug) { setToast({ type: 'error', message: '태블릿 실행 주소를 만들 수 없습니다. 매장 기본 정보를 먼저 확인해 주세요.' }); return; }
+    const w = window.open(publicTabletUrl(tabletId), '_blank', 'noopener,noreferrer');
+    if (!w) setToast({ type: 'error', message: '팝업이 차단되어 화면을 열지 못했습니다. 주소를 복사해 태블릿에서 직접 열어 주세요.' });
+  };
+  const handleCopyTabletUrl = (tabletId: string) => {
+    if (!storeSlug) { setToast({ type: 'error', message: '태블릿 실행 주소를 만들 수 없습니다. 매장 기본 정보를 먼저 확인해 주세요.' }); return; }
+    navigator.clipboard?.writeText(publicTabletUrl(tabletId))
+      .then(() => setToast({ type: 'success', message: '태블릿 실행 주소가 복사되었습니다.' }))
+      .catch(() => setToast({ type: 'error', message: '주소를 복사하지 못했습니다. 직접 열어 다시 시도해 주세요.' }));
   };
 
   // WO-O4O-KPA-TABLET-OPERATOR-COMMON-IDLE-VIDEO-SELECTION-V1: 서비스 공통 대기 영상(태블릿별 1개 선택)
@@ -703,7 +719,7 @@ export default function StoreTabletDisplaysPage() {
             className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 text-sm font-medium rounded-xl hover:bg-slate-50 transition-colors"
           >
             <Plus className="w-4 h-4" />
-            태블릿 추가
+            코너 추가
           </button>
           <button
             onClick={handleSave}
@@ -770,7 +786,7 @@ export default function StoreTabletDisplaysPage() {
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-teal-100">
           <div className="px-4 py-3 bg-teal-50 border-b border-teal-100 flex items-center gap-2">
             <Plus className="w-4 h-4 text-teal-600" />
-            <h3 className="text-sm font-bold text-teal-700">새 태블릿 추가</h3>
+            <h3 className="text-sm font-bold text-teal-700">새 코너 화면 만들기</h3>
           </div>
           <div className="p-4 flex flex-col gap-3">
             <div className="flex gap-3 flex-wrap">
@@ -818,7 +834,7 @@ export default function StoreTabletDisplaysPage() {
                 className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-medium text-white bg-teal-600 rounded-lg hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {registering ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
-                {registering ? '등록 중...' : '태블릿 추가'}
+                {registering ? '만드는 중...' : '코너 화면 만들기'}
               </button>
             </div>
           </div>
@@ -829,14 +845,14 @@ export default function StoreTabletDisplaysPage() {
       {!loadingTablets && tablets.length === 0 && !showRegisterForm && (
         <div className="text-center py-16 bg-white rounded-2xl shadow-sm">
           <Tablet className="w-16 h-16 text-slate-200 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-slate-800 mb-2">등록된 태블릿이 없습니다</h3>
-          <p className="text-slate-500 mb-4">태블릿을 추가하면 진열 구성을 시작할 수 있습니다.</p>
+          <h3 className="text-lg font-medium text-slate-800 mb-2">아직 코너 화면이 없습니다</h3>
+          <p className="text-slate-500 mb-4">코너를 만들면 태블릿에서 실행할 화면을 준비할 수 있습니다.</p>
           <button
             onClick={() => setShowRegisterForm(true)}
             className="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 text-white text-sm font-medium rounded-xl hover:bg-teal-700 transition-colors"
           >
             <Plus className="w-4 h-4" />
-            새 태블릿 추가
+            새 코너 화면 만들기
           </button>
         </div>
       )}
@@ -980,75 +996,103 @@ export default function StoreTabletDisplaysPage() {
 
             {/* 우측: 선택 코너의 현재 구성 */}
             <div className="space-y-6 min-w-0">
-              {/* 현재 코너 화면 구성 요약 (WO-O4O-KPA-TABLET-LOCATION-FIRST-UX-REFIT-V1) */}
+              {/* WO-O4O-KPA-TABLET-TOUCH-FIRST-TABLET-CONNECT-FLOW-V1:
+                  상단 = 태블릿 연결·실행(현재 상태·화면 세트·실행 액션), 하단 = 화면 구성 요약(제작 컨텍스트).
+                  긴 실행 URL 은 기본 숨김(보조 토글). QR 은 재사용 가능한 client QR 컴포넌트 부재로 Deferred(화면 열기+주소 복사). */}
               {selectedTablet && (
-                <div className="bg-white rounded-2xl shadow-sm p-4 border border-teal-100">
-                  <div className="flex items-start justify-between gap-3 flex-wrap">
+                <div className="bg-white rounded-2xl shadow-sm border border-teal-100 overflow-hidden">
+                  {/* 상단: 태블릿 연결·실행 */}
+                  <div className="p-4 space-y-3">
                     <div className="min-w-0">
-                      <div className="text-[11px] font-medium text-teal-600 mb-0.5">현재 코너 화면 구성</div>
+                      <div className="text-[11px] font-medium text-teal-600 mb-0.5">태블릿 연결·실행</div>
                       <h2 className="text-lg font-bold text-slate-900 truncate">{cornerPrimary(selectedTablet)}</h2>
-                      {cornerSecondary(selectedTablet) && (
-                        <div className="text-xs text-slate-400 truncate">{cornerSecondary(selectedTablet)}</div>
-                      )}
+                      <div className="flex items-center gap-2 mt-1 text-xs flex-wrap">
+                        <span className={selectedTablet.is_active ? 'text-emerald-600 font-medium' : 'text-slate-400'}>
+                          {selectedTablet.is_active ? '● 사용 중(활성)' : '○ 비활성'}
+                        </span>
+                        <span className="text-slate-300">·</span>
+                        <span className="text-slate-500 truncate">
+                          화면 세트: <span className="font-medium text-slate-700">{selectedTablet.currentScreenSetId ? (screenSetIndex[selectedTablet.currentScreenSetId]?.name ?? '적용됨') : '없음'}</span>
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex gap-2 flex-wrap">
-                      {storeSlug && (
-                        <button
-                          onClick={() => {
-                            navigator.clipboard?.writeText(publicTabletUrl(selectedTablet.id))
-                              .then(() => setToast({ type: 'success', message: '공개 URL이 복사되었습니다.' }))
-                              .catch(() => setToast({ type: 'error', message: '복사에 실패했습니다. URL을 직접 선택해 복사해 주세요.' }));
-                          }}
-                          className="px-3 py-2 text-xs font-medium text-white bg-teal-600 rounded-lg hover:bg-teal-700 whitespace-nowrap"
-                        >
-                          공개 URL 복사
-                        </button>
-                      )}
-                      <button
-                        onClick={handleOpenPreview}
-                        disabled={previewLoading}
-                        className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 whitespace-nowrap disabled:opacity-50"
-                      >
-                        {previewLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Tv className="w-3.5 h-3.5" />}
-                        미리보기
-                      </button>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-3 gap-2 mt-3">
-                    <div className="bg-slate-50 rounded-lg px-3 py-2">
-                      <div className="text-[11px] text-slate-400">진열 상품</div>
-                      <div className="text-sm font-bold text-slate-800">
-                        {displays.length}
-                        {displays.length > 0 && (
-                          <span className="text-[11px] font-normal text-slate-400"> · 노출 {displays.filter((d) => d.isVisible).length}</span>
+
+                    {storeSlug ? (
+                      <>
+                        <p className="text-xs text-slate-500">이 코너 화면을 태블릿에서 실행할 수 있습니다. 태블릿 크롬에서 ‘화면 열기’로 열거나, 주소를 복사해 북마크하세요.</p>
+                        <div className="flex gap-2 flex-wrap">
+                          <button
+                            onClick={() => handleOpenTabletScreen(selectedTablet.id)}
+                            className="flex-1 min-w-[150px] min-h-[44px] inline-flex items-center justify-center gap-1.5 px-4 py-2 text-sm font-semibold text-white bg-teal-600 rounded-xl hover:bg-teal-700"
+                          >
+                            <Tv className="w-4 h-4" /> 태블릿에서 화면 열기
+                          </button>
+                          <button
+                            onClick={() => handleCopyTabletUrl(selectedTablet.id)}
+                            className="flex-1 min-w-[120px] min-h-[44px] inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50"
+                          >
+                            주소 복사
+                          </button>
+                          <button
+                            onClick={handleOpenPreview}
+                            disabled={previewLoading}
+                            className="flex-1 min-w-[120px] min-h-[44px] inline-flex items-center justify-center gap-1.5 px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 disabled:opacity-50"
+                          >
+                            {previewLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Tv className="w-4 h-4" />} 미리보기
+                          </button>
+                        </div>
+                        {!selectedTablet.currentScreenSetId && (
+                          <div className="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                            연결할 화면 세트가 아직 없습니다. 아래에서 화면 세트를 만들어 적용해 주세요.
+                          </div>
                         )}
-                        {hasChanges && <span className="text-[11px] font-medium text-amber-600"> · 변경됨</span>}
+                        <div>
+                          <button onClick={() => setShowRunUrl((v) => !v)} className="text-[11px] text-slate-400 hover:text-slate-600 underline underline-offset-2">
+                            {showRunUrl ? '실행 주소 숨기기' : '실행 주소 보기'}
+                          </button>
+                          {showRunUrl && (
+                            <code className="block mt-1 text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-700 break-all">
+                              {publicTabletUrl(selectedTablet.id)}
+                            </code>
+                          )}
+                        </div>
+                      </>
+                    ) : (
+                      <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                        태블릿 실행 주소를 만들 수 없습니다. 매장 기본 정보(공개 주소)를 먼저 확인해 주세요.
                       </div>
-                    </div>
-                    <div className="bg-slate-50 rounded-lg px-3 py-2">
-                      <div className="text-[11px] text-slate-400">대기 화면</div>
-                      <div className="text-sm font-bold text-slate-800">
-                        {idleItems.length}
-                        {idleHasChanges && <span className="text-[11px] font-medium text-amber-600"> · 변경됨</span>}
+                    )}
+                  </div>
+
+                  {/* 하단: 화면 구성 요약(화면 제작 컨텍스트) */}
+                  <div className="px-4 py-3 border-t bg-slate-50/60">
+                    <div className="text-[11px] font-medium text-slate-500 mb-2">화면 구성</div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="bg-white rounded-lg px-3 py-2 border border-slate-100">
+                        <div className="text-[11px] text-slate-400">진열 상품</div>
+                        <div className="text-sm font-bold text-slate-800">
+                          {displays.length}
+                          {displays.length > 0 && (
+                            <span className="text-[11px] font-normal text-slate-400"> · 노출 {displays.filter((d) => d.isVisible).length}</span>
+                          )}
+                          {hasChanges && <span className="text-[11px] font-medium text-amber-600"> · 변경됨</span>}
+                        </div>
                       </div>
-                    </div>
-                    <div className="bg-slate-50 rounded-lg px-3 py-2">
-                      <div className="text-[11px] text-slate-400">공통 대기영상</div>
-                      <div className="text-sm font-bold text-slate-800">
-                        {ocSelection ? (ocStatusLabel[ocSelection.status] ?? '선택됨') : '없음'}
+                      <div className="bg-white rounded-lg px-3 py-2 border border-slate-100">
+                        <div className="text-[11px] text-slate-400">대기 화면</div>
+                        <div className="text-sm font-bold text-slate-800">
+                          {idleItems.length}
+                          {idleHasChanges && <span className="text-[11px] font-medium text-amber-600"> · 변경됨</span>}
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-lg px-3 py-2 border border-slate-100">
+                        <div className="text-[11px] text-slate-400">공통 대기영상</div>
+                        <div className="text-sm font-bold text-slate-800">
+                          {ocSelection ? (ocStatusLabel[ocSelection.status] ?? '선택됨') : '없음'}
+                        </div>
                       </div>
                     </div>
                   </div>
-                  {storeSlug && (
-                    <div className="mt-3">
-                      <div className="text-[11px] text-slate-400 mb-1">
-                        이 코너 태블릿의 공개 화면 URL (각 태블릿 Chrome에 북마크). tabletId가 없거나 유효하지 않으면 첫 번째 활성 태블릿 기준으로 표시됩니다.
-                      </div>
-                      <code className="block text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-700 break-all">
-                        {publicTabletUrl(selectedTablet.id)}
-                      </code>
-                    </div>
-                  )}
                 </div>
               )}
 
