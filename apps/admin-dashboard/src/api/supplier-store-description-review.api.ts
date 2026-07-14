@@ -43,6 +43,26 @@ export interface SupplierStoreReviewDetail extends SupplierStoreReviewRow {
   curatedAt: string | null;
   existingCanonicalUpdatedAt: string | null;
   existingCanonicalSourceType: string | null;
+  /** 같은 (master, STORE, 언어) 최근 canonical 교체 이력 — WO-...-CANONICAL-REPLACE-AUDIT-LOG-V1 */
+  auditLogs?: CanonicalReplaceAuditLogRow[];
+}
+
+/** canonical 교체 감사 로그 1건 (운영자 상세 "교체 이력" 표시용). */
+export interface CanonicalReplaceAuditLogRow {
+  id: string;
+  eventType: string;
+  descriptionType: string;
+  masterId: string;
+  language: string | null;
+  previousDescriptionId: string | null;
+  newDescriptionId: string | null;
+  previousStatus: string | null;
+  newStatus: string | null;
+  performedBy: string | null;
+  performedAt: string;
+  metadata: Record<string, unknown> | null;
+  performedByName: string | null;
+  performedByEmail: string | null;
 }
 
 export interface RevisionExpiryResult {
@@ -97,6 +117,14 @@ export async function approveSupplierStoreReview(id: string, replaceExisting = f
 
 export async function rejectSupplierStoreReview(id: string): Promise<void> {
   await authClient.api.post(`${BASE}/${encodeURIComponent(id)}/reject`);
+}
+
+/** 같은 (master, STORE, 언어) 최근 canonical 교체 이력 — WO-...-CANONICAL-REPLACE-AUDIT-LOG-V1 */
+export async function listSupplierStoreReviewAuditLogs(id: string): Promise<CanonicalReplaceAuditLogRow[]> {
+  const res = await authClient.api.get<{ success: boolean; data: { items: CanonicalReplaceAuditLogRow[] } }>(
+    `${BASE}/${encodeURIComponent(id)}/audit-logs`,
+  );
+  return res.data?.data?.items ?? [];
 }
 
 /** 수정 요청(사유 필수) — status=revision_requested, revision_due_at = now + 30일 */

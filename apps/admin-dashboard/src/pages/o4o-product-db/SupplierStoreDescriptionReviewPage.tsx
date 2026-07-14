@@ -475,6 +475,25 @@ export default function SupplierStoreDescriptionReviewPage() {
                 )}
                 <div className="max-h-[60vh] overflow-y-auto px-6 py-5">
                   <ContentRenderer html={detail.content} variant="store-description" />
+                  {/* 교체 이력 (WO-...-CANONICAL-REPLACE-AUDIT-LOG-V1): 같은 (master, STORE, 언어) 최근 교체 로그 */}
+                  {detail.auditLogs && detail.auditLogs.length > 0 && (
+                    <div className="mt-6 border-t border-gray-100 pt-4">
+                      <h4 className="text-sm font-semibold text-gray-700">교체 이력</h4>
+                      <ul className="mt-2 space-y-2">
+                        {detail.auditLogs.map((a) => (
+                          <li key={a.id} className="rounded-lg bg-gray-50 px-3 py-2 text-xs text-gray-600">
+                            <div className="font-medium text-gray-800">
+                              {fmtDate(a.performedAt)} · {a.performedByName || a.performedByEmail || a.performedBy || '운영자'}
+                              가 기존 승인본을 숨기고 이 상품의 매장용 설명서를 교체했습니다.
+                            </div>
+                            <div className="mt-0.5 text-gray-500">
+                              기존 {a.previousDescriptionId ? a.previousDescriptionId.slice(0, 8) : '-'} → 새 {a.newDescriptionId ? a.newDescriptionId.slice(0, 8) : '-'} · 기존 처리: hidden
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center justify-end gap-2 border-t border-gray-200 px-6 py-4">
                   {detail.status !== 'revision_requested' && detail.status !== 'hidden' && (

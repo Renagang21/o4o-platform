@@ -12,6 +12,7 @@
 
 import type { DataSource, Repository } from 'typeorm';
 import { SharedProductDescription } from '../entities/SharedProductDescription.entity.js';
+import { SharedProductDescriptionAuditLog } from '../entities/SharedProductDescriptionAuditLog.entity.js';
 
 // ── bulk canonical eligibility — 단일 소스(서비스 + Job 공유). repo 미의존(raw ds.query). ──
 // WO-O4O-DRUG-SHARED-DESCRIPTION-BULK-CANONICAL-APPLY-V1
@@ -564,7 +565,17 @@ export class SharedProductDescriptionService {
         LIMIT 1`,
       [id],
     );
-    return rows[0] ?? null;
+    const detail = rows[0] ?? null;
+    if (detail) {
+      // WO-O4O-...-CANONICAL-REPLACE-AUDIT-LOG-V1: 같은 (master, STORE, 언어) 최근 교체 이력 첨부(read-only).
+      detail.auditLogs = await this.listCanonicalReplaceAuditLogs(
+        detail.masterId,
+        'STORE',
+        detail.language,
+        5,
+      );
+    }
+    return detail;
   }
 
   /**
@@ -579,7 +590,7 @@ export class SharedProductDescriptionService {
   async setCanonical(
     id: string,
     actorId?: string | null,
-    opts?: { demotedStatus?: 'candidate' | 'hidden' },
+    opts?: { demotedStatus?: 'candidate' | 'hidden'; audit?: CanonicalReplaceAuditInput },
   ): Promise<SharedProductDescription> {
     const demotedStatus = opts?.demotedStatus ?? 'candidate';
     return this.dataSource.transaction(async (manager) => {
@@ -597,6 +608,19 @@ export class SharedProductDescriptionService {
         throw new CosmeticDescriptionBlockedError();
       }
 
+      const targetLanguage = target.language ?? 'ko';
+
+      // WO-O4O-OPERATOR-SUPPLIER-STORE-DESCRIPTION-CANONICAL-REPLACE-AUDIT-LOG-V1:
+      //   교체 감사 로그를 남기려면 "강등 전"의 기존 canonical id 를 트랜잭션 안에서 먼저 캡처한다.
+      //   partial-unique 상 (master, type, 언어) canonical 은 최대 1건 → 최대 1개.
+      const previousCanonicals: Array<{ id: string }> = await manager.query(
+        `SELECT id FROM shared_product_descriptions
+          WHERE master_id = $1 AND description_type = $2
+            AND COALESCE(language, 'ko') = COALESCE($3, 'ko')
+            AND status = 'canonical' AND deleted_at IS NULL AND id <> $4`,
+        [target.masterId, target.descriptionType, targetLanguage, id],
+      );
+
       // 기존 canonical 강등 (대상 자신 제외) — 같은 description_type + **같은 언어**만 강등.
       // WO-O4O-STORE-MULTILINGUAL-CANONICAL-DESCRIPTION-V1: canonical 유일성 =
       //   (master_id, description_type, COALESCE(language,'ko')) 당 1개. 다른 언어/타입 canonical 은
@@ -608,7 +632,7 @@ export class SharedProductDescriptionService {
         .set({ status: demotedStatus, updatedBy: actorId ?? null })
         .where('master_id = :masterId', { masterId: target.masterId })
         .andWhere('description_type = :descriptionType', { descriptionType: target.descriptionType })
-        .andWhere(`COALESCE(language, 'ko') = COALESCE(:language, 'ko')`, { language: target.language ?? 'ko' })
+        .andWhere(`COALESCE(language, 'ko') = COALESCE(:language, 'ko')`, { language: targetLanguage })
         .andWhere('status = :status', { status: 'canonical' })
         .andWhere('id != :id', { id })
         .andWhere('deleted_at IS NULL')
@@ -618,8 +642,66 @@ export class SharedProductDescriptionService {
       target.curatedBy = actorId ?? null;
       target.curatedAt = new Date();
       target.updatedBy = actorId ?? null;
-      return repo.save(target);
+      const saved = await repo.save(target);
+
+      // 감사 로그 — **실제 교체가 일어난 경우에만** insert(중복/no-op 방지).
+      //   조건: audit 요청됨 + demotedStatus='hidden'(교체 경로) + 강등된 기존 canonical 이 실제로 있었고
+      //         그 id 가 대상과 다름. 일반 승인(기존 canonical 없음)은 previousCanonicals=[] → insert 안 함.
+      if (opts?.audit && demotedStatus === 'hidden' && previousCanonicals.length > 0) {
+        const previousId = previousCanonicals[0].id;
+        if (previousId !== id) {
+          const auditRepo = manager.getRepository(SharedProductDescriptionAuditLog);
+          await auditRepo.save(
+            auditRepo.create({
+              eventType: opts.audit.eventType,
+              descriptionType: target.descriptionType,
+              masterId: target.masterId,
+              language: targetLanguage,
+              previousDescriptionId: previousId,
+              newDescriptionId: id,
+              previousStatus: 'canonical',
+              newStatus: 'canonical',
+              performedBy: opts.audit.performedBy ?? actorId ?? null,
+              metadata: {
+                ...(opts.audit.metadata ?? {}),
+                previousDemotedTo: demotedStatus,
+                source: opts.audit.source,
+              },
+            }),
+          );
+        }
+      }
+      return saved;
     });
+  }
+
+  /**
+   * canonical 교체 감사 로그 조회 — 같은 (master, description_type, 언어) 의 최근 교체 이력.
+   * WO-O4O-OPERATOR-SUPPLIER-STORE-DESCRIPTION-CANONICAL-REPLACE-AUDIT-LOG-V1 §6.4. read-only.
+   */
+  async listCanonicalReplaceAuditLogs(
+    masterId: string,
+    descriptionType: string,
+    language: string | null,
+    limit = 5,
+  ): Promise<CanonicalReplaceAuditLogRow[]> {
+    const lim = Math.min(50, Math.max(1, limit));
+    return this.dataSource.query(
+      `SELECT a.id, a.event_type AS "eventType", a.description_type AS "descriptionType",
+              a.master_id AS "masterId", a.language,
+              a.previous_description_id AS "previousDescriptionId",
+              a.new_description_id AS "newDescriptionId",
+              a.previous_status AS "previousStatus", a.new_status AS "newStatus",
+              a.performed_by AS "performedBy", a.performed_at AS "performedAt", a.metadata,
+              u.name AS "performedByName", u.email AS "performedByEmail"
+         FROM shared_product_description_audit_logs a
+         LEFT JOIN users u ON u.id = a.performed_by
+        WHERE a.master_id = $1 AND a.description_type = $2
+          AND COALESCE(a.language, 'ko') = COALESCE($3, 'ko')
+        ORDER BY a.performed_at DESC
+        LIMIT ${lim}`,
+      [masterId, descriptionType, language],
+    );
   }
 
   /** 상태 변경 (hidden / needs_review / deprecated / candidate). canonical 승격은 setCanonical 사용 */
@@ -1098,6 +1180,35 @@ export interface SupplierStoreReviewDetail {
   existingCanonicalId: string | null;
   existingCanonicalUpdatedAt: string | null;
   existingCanonicalSourceType: string | null;
+  /** 같은 (master, STORE, 언어) 최근 canonical 교체 이력 — WO-...-CANONICAL-REPLACE-AUDIT-LOG-V1 */
+  auditLogs?: CanonicalReplaceAuditLogRow[];
+}
+
+// WO-O4O-OPERATOR-SUPPLIER-STORE-DESCRIPTION-CANONICAL-REPLACE-AUDIT-LOG-V1
+/** setCanonical 교체 경로에서 감사 로그를 남기기 위한 입력. */
+export interface CanonicalReplaceAuditInput {
+  eventType: 'canonical_replaced';
+  performedBy: string | null;
+  source: string;
+  metadata?: Record<string, unknown>;
+}
+
+/** 교체 감사 로그 조회 결과 행(수행자 이름 join 포함). */
+export interface CanonicalReplaceAuditLogRow {
+  id: string;
+  eventType: string;
+  descriptionType: string;
+  masterId: string;
+  language: string | null;
+  previousDescriptionId: string | null;
+  newDescriptionId: string | null;
+  previousStatus: string | null;
+  newStatus: string | null;
+  performedBy: string | null;
+  performedAt: string;
+  metadata: Record<string, unknown> | null;
+  performedByName: string | null;
+  performedByEmail: string | null;
 }
 
 export interface BulkCanonicalDryRun {

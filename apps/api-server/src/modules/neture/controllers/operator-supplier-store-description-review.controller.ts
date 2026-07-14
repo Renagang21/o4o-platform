@@ -99,6 +99,23 @@ export function createOperatorSupplierStoreDescriptionReviewController(dataSourc
     }
   });
 
+  // 교체 감사 로그 조회 — 같은 (master, STORE, 언어) 최근 교체 이력.
+  //   WO-O4O-OPERATOR-SUPPLIER-STORE-DESCRIPTION-CANONICAL-REPLACE-AUDIT-LOG-V1 §6.4.
+  router.get('/:id/audit-logs', async (req: Request, res: Response) => {
+    try {
+      const detail = await service.getSupplierStoreReviewDetail(req.params.id);
+      if (!detail) {
+        res.status(404).json({ success: false, error: '설명서를 찾을 수 없습니다', code: 'REVIEW_NOT_FOUND' });
+        return;
+      }
+      const logs = await service.listCanonicalReplaceAuditLogs(detail.masterId, 'STORE', detail.language, 20);
+      res.json({ success: true, data: { items: logs } });
+    } catch (err) {
+      logger.error('[supplier-store-review] audit-logs failed:', err);
+      res.status(500).json({ success: false, error: '교체 이력 조회에 실패했습니다', code: 'REVIEW_AUDIT_LOGS_FAILED' });
+    }
+  });
+
   // canonical 승격 (운영자만)
   router.post('/:id/approve', async (req: Request, res: Response) => {
     try {
@@ -125,10 +142,27 @@ export function createOperatorSupplierStoreDescriptionReviewController(dataSourc
         });
         return;
       }
+      // WO-O4O-OPERATOR-SUPPLIER-STORE-DESCRIPTION-CANONICAL-REPLACE-AUDIT-LOG-V1:
+      //   실제 교체(hidden 강등 + 승격)일 때만 audit 옵션을 넘긴다. 일반 승인(충돌 없음)은 audit 없음.
+      const isReplace = detail.hasCanonicalConflict && replaceExisting;
       const canonical = await service.setCanonical(
         req.params.id,
         actor,
-        detail.hasCanonicalConflict && replaceExisting ? { demotedStatus: 'hidden' } : undefined,
+        isReplace
+          ? {
+              demotedStatus: 'hidden',
+              audit: {
+                eventType: 'canonical_replaced',
+                performedBy: actor,
+                source: 'operator_supplier_store_description_review',
+                metadata: {
+                  replaceExisting: true,
+                  previousSourceType: detail.existingCanonicalSourceType ?? null,
+                  newSupplierId: detail.supplierId ?? null,
+                },
+              },
+            }
+          : undefined,
       );
       res.json({
         success: true,

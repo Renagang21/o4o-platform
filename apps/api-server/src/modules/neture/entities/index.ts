@@ -52,6 +52,11 @@ export {
   type SharedProductDescriptionSourceType,
   type SharedProductDescriptionStatus,
 } from './SharedProductDescription.entity.js';
+// WO-O4O-OPERATOR-SUPPLIER-STORE-DESCRIPTION-CANONICAL-REPLACE-AUDIT-LOG-V1: canonical 교체 감사 로그
+export {
+  SharedProductDescriptionAuditLog,
+  type SharedProductDescriptionAuditEventType,
+} from './SharedProductDescriptionAuditLog.entity.js';
 // WO-O4O-HEALTH-FUNCTIONAL-FOOD-STORE-DESCRIPTION-BULK-APPLY-V1: 후보 기반 AI 설명 draft
 export {
   ProductCandidateDescriptionDraft,
