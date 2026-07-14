@@ -54,6 +54,9 @@ import { useEffect, useReducer, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 // WO-O4O-KPA-TABLET-PRODUCT-DESCRIPTION-RICH-RENDER-V1: canonical 상품설명 HTML 안전 렌더(DOMPurify)
 import { ContentRenderer } from '@o4o/content-editor';
+// WO-O4O-KPA-TABLET-TEMPLATE-THREE-PATTERNS-V1: 화면 QR 을 실제 스캔 가능한 코드로 렌더(client-side SVG, 백엔드/entity 무추가).
+//   기존 qr_guide 카드의 텍스트 안내(도메인)를 실제 QR 로 승격 + 대기 영상형 hero QR chip.
+import { QRCodeSVG } from 'qrcode.react';
 import type {
   TabletProduct,
   TabletContentTranslation,
@@ -436,6 +439,15 @@ export function TabletKioskPage({
   //   새 block 을 요구하지 않고 기존 sections 를 다르게 배치만 한다(§4).
   const templateKey = screen?.templateKey ?? 'corner_information_basic_v1';
   const isProductFocus = templateKey === 'product_focus';
+  // WO-O4O-KPA-TABLET-TEMPLATE-THREE-PATTERNS-V1: 신규 3 템플릿 레이아웃 분기(기존 sections 재배치, 새 block 없음).
+  //   product_grid_qr = 제품 진열형(축약 헤더 + 밀집 그리드 + 하단 QR)  → isProductLayout 에 포함.
+  //   corner_overview_qr = 코너 소개형(코너 설명 + 콘텐츠 + QR, 상품 그리드 생략).
+  //   idle_touch_video = 대기 영상형(상단 hero 영상 + 한/영 터치 유도 + QR chip).
+  const isProductGrid = templateKey === 'product_grid_qr';
+  const isCornerOverview = templateKey === 'corner_overview_qr';
+  const isIdleTouch = templateKey === 'idle_touch_video';
+  const isProductLayout = isProductFocus || isProductGrid; // 축약 헤더 + 하단 QR 배너
+  const hideProductsBody = isCornerOverview; // 코너 소개형: 설명·콘텐츠·QR 중심 → 상품 그리드 생략
 
   // Submit interest request
   // WO-O4O-KPA-TABLET-PUBLIC-INFO-UX-PRIVACY-INPUT-REMOVAL-V1:
@@ -757,29 +769,40 @@ export function TabletKioskPage({
   // ── Browse view ──
   return (
     <div style={styles.fullscreen}>
+      {/* WO-O4O-KPA-TABLET-TEMPLATE-THREE-PATTERNS-V1 — 대기 영상형(idle_touch_video):
+          상단 hero 영상(idle_media 첫 항목) + 한/영 터치 유도 오버레이 + QR chip. 그 아래로 기존
+          섹션(코너 설명/콘텐츠/상품)이 이어져 터치 탐색이 가능하다. */}
+      {isIdleTouch && (
+        <IdleTouchHero
+          items={screenIdleItems}
+          qrUrl={qrGuide?.url}
+          qrLabel={qrGuide?.label}
+        />
+      )}
+
       {/* Header — screen_set 코너 설명 있으면 그 제목/설명, 없으면 기본(legacy).
-          product_focus(§3.4): 코너 설명은 축약 헤더 → subtitle 생략, compact 패딩.
+          product_focus / product_grid_qr(§3.4): 코너 설명은 축약 헤더 → subtitle 생략, compact 패딩.
           WO-O4O-KPA-TABLET-TEMPLATE-USABILITY-REFINE-V1(§5.1·§5.6):
             제목/설명을 좌우 1행(space-between)에서 세로 스택으로 변경 → 제목이 좁은 폭에 눌려
             글자 단위로 세로로 깨지던 문제 해소. 제목 wordBreak:keep-all(한글 단어 보존),
             설명은 별도 문단으로 줄폭/줄간격 확보. clamp() 로 화면 폭 대응. */}
-      <div style={isProductFocus ? styles.headerCompact : styles.header}>
+      <div style={isProductLayout ? styles.headerCompact : styles.header}>
         <div style={styles.headerTitleRow}>
-          <h1 style={isProductFocus ? styles.cornerTitleCompact : styles.cornerTitle}>{cornerInfo?.title || '매장 상품 안내'}</h1>
+          <h1 style={isProductLayout ? styles.cornerTitleCompact : styles.cornerTitle}>{cornerInfo?.title || '매장 상품 안내'}</h1>
           {showQrBadge && displaySettings?.showQr !== false && (
             <span style={styles.qrBadge}>QR 코드로 접속</span>
           )}
         </div>
         {/* legacy(코너 설명 미주입: GP/KCos 등)는 짧은 안내 힌트만 헤더 subtitle 로 유지 */}
-        {!isProductFocus && !cornerInfo?.body && (
+        {!isProductLayout && !cornerInfo?.body && (
           <p style={styles.cornerHint}>궁금한 상품을 터치해 설명을 확인해 보세요</p>
         )}
       </div>
 
       {/* 코너 설명 섹션 — 코너 제목(header)과 시각적으로 구분된 별도 섹션.
           실제 코너 설명(screen_set corner_description)이 있을 때만 렌더. 긴 문단은 자체 스크롤로
-          화면 상단을 독점하지 않게 제한(§5.6). product_focus 는 축약 헤더라 설명 섹션 생략. */}
-      {!isProductFocus && cornerInfo?.body && (
+          화면 상단을 독점하지 않게 제한(§5.6). product 레이아웃(축약 헤더)은 설명 섹션 생략. */}
+      {!isProductLayout && cornerInfo?.body && (
         <div style={styles.cornerDescSection}>
           <span style={styles.cornerDescLabel}>코너 안내</span>
           <p style={styles.cornerBody}>{cornerInfo.body}</p>
@@ -791,9 +814,10 @@ export function TabletKioskPage({
           WO-O4O-KPA-TABLET-TEMPLATE-USABILITY-REFINE-V1(§5.3·§5.4):
             "라벨 + https://... 원문" 나열 → QR 카드(아이콘 + 행동유도 문구 + 짧은 도메인)로 정비.
             전체 URL 대신 shortHost() 도메인만 보조 표기. 데이터(config label/url)는 변경하지 않음. */}
-      {qrGuide && !isProductFocus && (
+      {qrGuide && !isProductLayout && !isIdleTouch && (
         <div style={styles.qrCard}>
-          <div style={styles.qrCardIcon} aria-hidden>▣</div>
+          {/* WO-O4O-KPA-TABLET-TEMPLATE-THREE-PATTERNS-V1: ▣ 아이콘 → 실제 스캔 QR(url 있을 때). url 없으면 아이콘 fallback. */}
+          {qrGuide.url ? <QrImage url={qrGuide.url} size={72} /> : <div style={styles.qrCardIcon} aria-hidden>▣</div>}
           <div style={styles.qrCardText}>
             <span style={styles.qrCardTitle}>{qrGuide.label || '모바일에서 자세히 보기'}</span>
             <span style={styles.qrCardDesc}>QR을 스캔하면 이 코너 안내를 모바일에서도 확인할 수 있습니다.</span>
@@ -836,6 +860,9 @@ export function TabletKioskPage({
         </div>
       )}
 
+      {/* WO-O4O-KPA-TABLET-TEMPLATE-THREE-PATTERNS-V1: 코너 소개형(corner_overview_qr)은 상품 그리드 생략
+          → 코너 설명 + 콘텐츠 카드 + QR 중심의 정적 안내 화면(§3.2). 그 외 템플릿은 기존대로 상품 노출. */}
+      {!hideProductsBody && (
       <div style={styles.body}>
         {loading ? (
           <div style={styles.centerMessage}>
@@ -889,12 +916,14 @@ export function TabletKioskPage({
           </div>
         )}
       </div>
+      )}
 
-      {/* product_focus(§3.4): qr_guide 는 하단 보조 배너로 배치(있을 때만). 기본 템플릿은 상단에서 이미 렌더됨.
+      {/* product 레이아웃(product_focus / product_grid_qr, §3.4): qr_guide 는 하단 보조 배너로 배치(있을 때만).
+          기본/코너 소개형은 상단에서 이미 렌더됨.
           WO-O4O-KPA-TABLET-TEMPLATE-USABILITY-REFINE-V1: 상단 카드와 동일 정비(도메인만, 원문 URL 미노출). */}
-      {qrGuide && isProductFocus && (
+      {qrGuide && isProductLayout && (
         <div style={styles.qrCardBottom}>
-          <div style={styles.qrCardIcon} aria-hidden>▣</div>
+          {qrGuide.url ? <QrImage url={qrGuide.url} size={72} /> : <div style={styles.qrCardIcon} aria-hidden>▣</div>}
           <div style={styles.qrCardText}>
             <span style={styles.qrCardTitle}>{qrGuide.label || '모바일에서 자세히 보기'}</span>
             <span style={styles.qrCardDesc}>QR을 스캔하면 이 코너 안내를 모바일에서도 확인할 수 있습니다.</span>
@@ -939,6 +968,54 @@ export function TabletKioskPage({
 //   - 빈 playlist: "화면을 터치해주세요" placeholder
 //   - 컨테이너 onPointerDown → IDLE_EXIT (window-level handler 와 이중 안전망)
 //   - iframe(youtube/vimeo)은 pointer 이벤트를 삼키므로 투명 tap-catcher 를 위에 덮어 터치 복귀 보장.
+
+// WO-O4O-KPA-TABLET-TEMPLATE-THREE-PATTERNS-V1:
+//   화면 QR = 그 화면(코너 안내)을 여는 스캔 가능한 QR. qr_guide.url(운영자 설정)을 client-side SVG 로 렌더.
+//   백엔드/entity/저장 모델 무추가 — 이미 존재하는 qr_guide.url 만 소비. url 없으면 렌더 안 함(호출부 fallback).
+function QrImage({ url, size = 72 }: { url: string; size?: number }) {
+  if (!url) return null;
+  return (
+    <div style={styles.qrImageBox}>
+      <QRCodeSVG value={url} size={size} bgColor="#ffffff" fgColor="#0f172a" level="M" />
+    </div>
+  );
+}
+
+// WO-O4O-KPA-TABLET-TEMPLATE-THREE-PATTERNS-V1 — 대기 영상형 hero.
+//   idle_media 첫 항목을 상단 배너 영상/이미지로 재생(브라우즈 모드, 단일 loop) + 한/영 터치 유도 오버레이 + QR chip.
+//   오버레이는 pointerEvents:none 으로 하단 콘텐츠 터치를 막지 않는다. 항목 없으면 안내 문구만.
+function IdleTouchHero({ items, qrUrl, qrLabel }: { items: IdlePlaylistItem[] | null; qrUrl?: string; qrLabel?: string }) {
+  const first = items && items.length > 0 ? items[0] : null;
+  const embedUrl =
+    first && (first.type === 'youtube' || first.type === 'vimeo') ? toIdleEmbedUrl(first.url) : null;
+  return (
+    <div style={styles.heroWrap}>
+      {first?.type === 'image' && <img src={first.url} alt="" style={styles.heroMedia} draggable={false} />}
+      {first?.type === 'video' && (
+        <video src={first.url} autoPlay muted loop playsInline style={styles.heroMedia} />
+      )}
+      {(first?.type === 'youtube' || first?.type === 'vimeo') && embedUrl && (
+        <iframe
+          src={embedUrl}
+          title="대기화면 영상"
+          allow="autoplay; encrypted-media; picture-in-picture"
+          style={styles.heroMedia}
+        />
+      )}
+      {!first && <div style={styles.heroPlaceholder} aria-hidden />}
+      <div style={styles.heroOverlay}>
+        <span style={styles.heroTouchKo}>화면을 터치하세요</span>
+        <span style={styles.heroTouchEn}>Touch to start</span>
+      </div>
+      {qrUrl && (
+        <div style={styles.heroQr}>
+          <QrImage url={qrUrl} size={64} />
+          <span style={styles.heroQrText}>{qrLabel || 'QR로 같은 화면 보기'}</span>
+        </div>
+      )}
+    </div>
+  );
+}
 
 interface IdleOverlayProps {
   items: IdlePlaylistItem[];
@@ -1380,6 +1457,85 @@ const styles: Record<string, React.CSSProperties> = {
     padding: '4px 10px',
     whiteSpace: 'nowrap',
     flexShrink: 0,
+  },
+  // WO-O4O-KPA-TABLET-TEMPLATE-THREE-PATTERNS-V1: 실제 QR 이미지 박스(흰 배경 여백 → 스캔 안정성).
+  qrImageBox: {
+    backgroundColor: '#ffffff',
+    padding: '6px',
+    borderRadius: '8px',
+    border: '1px solid #dbeafe',
+    lineHeight: 0,
+    flexShrink: 0,
+  },
+  // 대기 영상형(idle_touch_video) hero — 상단 배너 영상 + 터치 유도 + QR chip.
+  heroWrap: {
+    position: 'relative',
+    width: '100%',
+    height: 'clamp(180px, 34vh, 360px)',
+    backgroundColor: '#0f172a',
+    overflow: 'hidden',
+    flexShrink: 0,
+    borderBottom: '1px solid #e2e8f0',
+  },
+  heroMedia: {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    border: 'none',
+    display: 'block',
+  },
+  heroPlaceholder: {
+    width: '100%',
+    height: '100%',
+    background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+  },
+  heroOverlay: {
+    position: 'absolute',
+    inset: 0,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '6px',
+    textAlign: 'center',
+    pointerEvents: 'none',
+    background: 'linear-gradient(0deg, rgba(15,23,42,0.45) 0%, rgba(15,23,42,0.05) 40%, rgba(15,23,42,0.15) 100%)',
+  },
+  heroTouchKo: {
+    fontSize: 'clamp(22px, 4vw, 40px)',
+    fontWeight: 800,
+    color: '#ffffff',
+    textShadow: '0 2px 12px rgba(0,0,0,0.55)',
+    wordBreak: 'keep-all',
+  },
+  heroTouchEn: {
+    fontSize: 'clamp(13px, 2vw, 20px)',
+    fontWeight: 600,
+    color: '#e2e8f0',
+    letterSpacing: '0.04em',
+    textShadow: '0 2px 10px rgba(0,0,0,0.5)',
+  },
+  heroQr: {
+    position: 'absolute',
+    right: 'clamp(12px, 2vw, 24px)',
+    bottom: 'clamp(12px, 2vw, 24px)',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '4px',
+    backgroundColor: 'rgba(255,255,255,0.92)',
+    padding: '8px',
+    borderRadius: '10px',
+    boxShadow: '0 4px 14px rgba(0,0,0,0.3)',
+  },
+  heroQrText: {
+    fontSize: '11px',
+    fontWeight: 600,
+    color: '#1e3a8a',
+    maxWidth: '96px',
+    textAlign: 'center',
+    lineHeight: 1.3,
+    wordBreak: 'keep-all',
   },
   // WO-O4O-KPA-TABLET-TEMPLATE-USABILITY-REFINE-V1(§5.5): 상품 0건 카드형 empty state.
   emptyWrap: {

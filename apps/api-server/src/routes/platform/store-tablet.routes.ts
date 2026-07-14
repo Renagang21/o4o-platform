@@ -1151,11 +1151,17 @@ export function createStoreTabletRoutes(
     'content_list',
   ];
   const SET_STATUSES_WRITABLE = ['draft', 'active', 'archived'];
-  // WO-O4O-KPA-TABLET-SCREEN-SET-TEMPLATE-KEY-SCHEMA-V1 / -TEMPLATE-APPLY-V1:
-  //   저장 허용 template_key = corner_information_basic_v1(기본) + product_focus(+ null=기본).
-  //   product_focus 는 kiosk-core 렌더러 분기 구현됨(-TEMPLATE-APPLY-V1).
-  //   idle_video_first / comparison 은 아직 예약값(렌더러 없음) → 저장 차단(후속 WO 에서 확장).
-  const SET_TEMPLATE_KEYS_ALLOWED = ['corner_information_basic_v1', 'product_focus'];
+  // WO-O4O-KPA-TABLET-SCREEN-SET-TEMPLATE-KEY-SCHEMA-V1 / -TEMPLATE-APPLY-V1 / -TEMPLATE-THREE-PATTERNS-V1:
+  //   저장 허용 template_key. 각 값은 kiosk-core 렌더러 분기가 구현되어 있어야 한다(공개 runtime 은 pass-through).
+  //   - corner_information_basic_v1(기본) / product_focus(-TEMPLATE-APPLY-V1)
+  //   - idle_touch_video / corner_overview_qr / product_grid_qr (-TEMPLATE-THREE-PATTERNS-V1)
+  const SET_TEMPLATE_KEYS_ALLOWED = [
+    'corner_information_basic_v1',
+    'product_focus',
+    'idle_touch_video',
+    'corner_overview_qr',
+    'product_grid_qr',
+  ];
   const setCols = (p: string) =>
     `${p}id, ${p}organization_id AS "organizationId", ${p}service_key AS "serviceKey", ` +
     `${p}tablet_id AS "tabletId", ${p}name, ${p}origin, ${p}status, ` +

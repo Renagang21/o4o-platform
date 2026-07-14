@@ -46,7 +46,10 @@ function dsForCanonical(target: any, master: MasterRow): DataSource {
     getRepository: () => repo,
     query: async (sql: string) =>
       sql.includes('FROM product_masters pm') ? (master ? [master] : []) : [],
-    transaction: async (cb: any) => cb({ getRepository: () => repo }),
+    // WO-O4O-OPERATOR-SUPPLIER-STORE-DESCRIPTION-CANONICAL-REPLACE-AUDIT-LOG-V1:
+    //   setCanonical 이 트랜잭션 manager.query 로 "강등 전 기존 canonical id" 를 캡처한다.
+    //   이 목은 audit opts 없이 호출되므로 기존 canonical 없음([])만 돌려주면 충분(감사 로그 미발생).
+    transaction: async (cb: any) => cb({ getRepository: () => repo, query: async () => [] }),
   } as unknown as DataSource;
 }
 

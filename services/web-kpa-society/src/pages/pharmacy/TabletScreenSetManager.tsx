@@ -58,6 +58,22 @@ const TEMPLATE_OPTIONS: { key: string; label: string; description: string }[] = 
     label: '상품 집중형',
     description: '상품 목록과 제품 안내를 더 크게 보여주는 템플릿입니다.',
   },
+  // WO-O4O-KPA-TABLET-TEMPLATE-THREE-PATTERNS-V1: 신규 3 템플릿(대기 영상형 / 코너 소개형 / 제품 진열형).
+  {
+    key: 'idle_touch_video',
+    label: '대기 영상형',
+    description: '대기 영상 위에 "화면을 터치하세요" 안내와 QR을 함께 보여줍니다. 손님의 첫 시선을 끄는 코너에 적합합니다.',
+  },
+  {
+    key: 'corner_overview_qr',
+    label: '코너 소개형',
+    description: '영상 없이 코너 설명과 콘텐츠, QR을 중심으로 보여줍니다. 코너 안내가 중요한 화면에 적합합니다.',
+  },
+  {
+    key: 'product_grid_qr',
+    label: '제품 진열형',
+    description: '여러 제품(5~10개 수준)을 한 화면에 진열해 보여줍니다. 제품이 많은 코너에 적합합니다.',
+  },
 ];
 const templateLabel = (key: string | null | undefined) =>
   TEMPLATE_OPTIONS.find((t) => t.key === key)?.label ?? TEMPLATE_OPTIONS[0].label;
