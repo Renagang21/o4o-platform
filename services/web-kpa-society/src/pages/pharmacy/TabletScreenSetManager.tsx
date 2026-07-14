@@ -563,9 +563,15 @@ function BlockConfigForm({ block, onPatch, onReplaceConfig }: {
 // ── content_list 편집기 (WO-O4O-KPA-TABLET-CONTENT-LIST-PICKER-UI-V1) ──
 //   raw JSON 없이 O4O 표준 설명서 / 매장 제작 콘텐츠를 골라 카드 목록을 구성.
 //   저장 config shape 는 서버 계약(parseContentListConfig)과 동일.
+// WO-O4O-KPA-TABLET-TOUCH-FIRST-CONTENT-LIST-EDITOR-V1: content_list 편집을 터치 카드로 정비.
+//   config 계약(sourceType/masterId+language/contentId/visible/sortOrder/override) 불변 — UI/UX 만.
+//   제목은 config 에 없으므로: override → 추가 시 캡처한 힌트(세션) → 출처 중립 라벨. (원본 resolve 는 API 확장 필요 → 안 함)
 function ContentListEditor({ items, onChange }: { items: ContentListItem[]; onChange: (items: ContentListItem[]) => void }) {
   const [picking, setPicking] = useState(false);
-  const badge = (t: string) => (t === 'o4o_product_description' ? 'O4O 표준' : '매장 제작');
+  const [expanded, setExpanded] = useState<string | null>(null);
+  const [titleHints, setTitleHints] = useState<Record<string, string>>({});
+  const sourceLabel = (t: string) => (t === 'o4o_product_description' ? 'O4O 표준 설명서' : '매장 제작 콘텐츠');
+  const reindex = (arr: ContentListItem[]) => arr.map((it, idx) => ({ ...it, sortOrder: idx * 10 } as ContentListItem));
   const upd = (i: number, patch: Partial<ContentListItem>) =>
     onChange(items.map((it, idx) => (idx === i ? ({ ...it, ...patch } as ContentListItem) : it)));
   const move = (i: number, dir: 'up' | 'down') => {
@@ -573,51 +579,110 @@ function ContentListEditor({ items, onChange }: { items: ContentListItem[]; onCh
     if (t < 0 || t >= items.length) return;
     const next = [...items];
     [next[i], next[t]] = [next[t], next[i]];
-    onChange(next.map((it, idx) => ({ ...it, sortOrder: idx * 10 } as ContentListItem)));
+    onChange(reindex(next));
   };
-  const remove = (i: number) => onChange(items.filter((_, idx) => idx !== i).map((it, idx) => ({ ...it, sortOrder: idx * 10 } as ContentListItem)));
-  const add = (added: ContentListItem[]) => {
-    // 중복(같은 masterId+language / contentId) 제외 후 append
-    const key = (it: ContentListItem) => (it.sourceType === 'o4o_product_description' ? `o4o:${it.masterId}:${it.language}` : `store:${it.contentId}`);
-    const seen = new Set(items.map(key));
-    const fresh = added.filter((it) => !seen.has(key(it)));
-    onChange([...items, ...fresh].map((it, idx) => ({ ...it, sortOrder: idx * 10 } as ContentListItem)));
+  const remove = (i: number) => {
+    if (!window.confirm('이 콘텐츠를 현재 화면 세트에서 제거하시겠습니까?\n원본 콘텐츠는 삭제되지 않습니다.')) return;
+    onChange(reindex(items.filter((_, idx) => idx !== i)));
+  };
+  const add = (added: ContentListItem[], titles: Record<string, string>) => {
+    const seen = new Set(items.map(key2));
+    const fresh = added.filter((it) => !seen.has(key2(it)));
+    setTitleHints((h) => ({ ...h, ...titles }));
+    onChange(reindex([...items, ...fresh]));
     setPicking(false);
   };
+  const cardTitle = (it: ContentListItem) => it.displayTitle || titleHints[key2(it)] || sourceLabel(it.sourceType);
+  const btn = 'min-h-[44px] px-3 py-2 text-sm font-medium rounded-xl inline-flex items-center justify-center gap-1';
+
   return (
-    <div className="space-y-2">
-      <p className="text-[11px] text-slate-500">O4O 표준 설명서와 매장 제작 콘텐츠를 코너 카드로 표시합니다.</p>
-      {items.length === 0 && <div className="text-[11px] text-slate-400">선택된 콘텐츠가 없습니다. 아래 ‘콘텐츠 추가’로 골라 주세요.</div>}
-      {items.map((it, i) => {
-        const label = it.sourceType === 'o4o_product_description' ? `상품ID ${it.masterId.slice(0, 8)}… (${it.language})` : `콘텐츠 ${it.contentId.slice(0, 8)}…`;
-        return (
-          <div key={key2(it)} className="border border-slate-200 rounded-lg p-2 bg-white space-y-1.5">
-            <div className="flex items-center gap-2">
-              <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${it.sourceType === 'o4o_product_description' ? 'text-blue-700 bg-blue-50' : 'text-emerald-700 bg-emerald-50'}`}>{badge(it.sourceType)}</span>
-              <span className="text-[11px] text-slate-500 flex-1 truncate">{label}</span>
-              <label className="text-[10px] text-slate-500 flex items-center gap-1">
-                <input type="checkbox" checked={it.visible} onChange={() => upd(i, { visible: !it.visible })} className="rounded border-slate-300 text-indigo-600" /> 표시
-              </label>
-              <button onClick={() => move(i, 'up')} disabled={i === 0} className="p-0.5 rounded hover:bg-slate-100 disabled:opacity-30"><ChevronUp className="w-3.5 h-3.5" /></button>
-              <button onClick={() => move(i, 'down')} disabled={i === items.length - 1} className="p-0.5 rounded hover:bg-slate-100 disabled:opacity-30"><ChevronDown className="w-3.5 h-3.5" /></button>
-              <button onClick={() => remove(i)} className="p-0.5 rounded text-slate-400 hover:text-red-600 hover:bg-red-50"><X className="w-3.5 h-3.5" /></button>
-            </div>
-            <input value={it.displayTitle ?? ''} onChange={(e) => upd(i, { displayTitle: e.target.value.trim() ? e.target.value : null })} placeholder="제목 재정의 (비우면 원본)" className="w-full px-2 py-1 rounded border border-slate-200 text-[11px]" />
-            <input value={it.displaySummary ?? ''} onChange={(e) => upd(i, { displaySummary: e.target.value.trim() ? e.target.value : null })} placeholder="요약 재정의 (비우면 원본)" className="w-full px-2 py-1 rounded border border-slate-200 text-[11px]" />
-          </div>
-        );
-      })}
-      <button onClick={() => setPicking(true)} className="px-2.5 py-1.5 text-[11px] font-medium text-indigo-700 bg-white border border-indigo-200 rounded-lg hover:bg-indigo-50 inline-flex items-center gap-1">
-        <Plus className="w-3.5 h-3.5" /> 콘텐츠 추가
-      </button>
-      {picking && <ContentPickerModal onClose={() => setPicking(false)} onAdd={add} baseSort={items.length * 10} />}
+    <div className="space-y-3">
+      <div className="flex items-start justify-between gap-2 flex-wrap">
+        <div className="min-w-0">
+          <div className="text-sm font-bold text-slate-800">코너 콘텐츠 <span className="text-xs font-normal text-slate-400">{items.length}개</span></div>
+          <p className="text-[11px] text-slate-500 leading-relaxed">고객에게 보여줄 제품 설명·매장 안내 콘텐츠입니다. 여기서 바꾼 제목·설명은 현재 화면 세트에만 적용되며, 원본 콘텐츠는 변경되지 않습니다.</p>
+        </div>
+        <button onClick={() => setPicking(true)} className={`${btn} text-white bg-indigo-600 hover:bg-indigo-700 flex-shrink-0`}>
+          <Plus className="w-4 h-4" /> 코너 콘텐츠 추가
+        </button>
+      </div>
+
+      {items.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50/60 text-center py-8 px-4 space-y-3">
+          <p className="text-sm text-slate-500 leading-relaxed">아직 코너 콘텐츠가 없습니다.<br />이 코너에서 고객에게 보여줄 제품 설명이나 매장 안내 콘텐츠를 추가해 주세요.</p>
+          <button onClick={() => setPicking(true)} className={`${btn} text-white bg-indigo-600 hover:bg-indigo-700`}>
+            <Plus className="w-4 h-4" /> 코너 콘텐츠 추가
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {items.map((it, i) => {
+            const k = key2(it);
+            const open = expanded === k;
+            return (
+              <div key={k} className="rounded-xl border border-slate-200 bg-white p-3 space-y-2">
+                <div className="flex items-start gap-2">
+                  <span className="w-6 h-6 flex items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-500 flex-shrink-0">{i + 1}</span>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm font-semibold text-slate-800 truncate">{cardTitle(it)}</div>
+                    <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                      <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${it.sourceType === 'o4o_product_description' ? 'text-blue-700 bg-blue-50' : 'text-emerald-700 bg-emerald-50'}`}>{sourceLabel(it.sourceType)}</span>
+                      <span className={`text-[11px] ${it.visible ? 'text-emerald-600 font-medium' : 'text-slate-400'}`}>{it.visible ? '● 고객 화면에 표시' : '○ 현재 숨김'}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex gap-2 flex-wrap">
+                  <button onClick={() => move(i, 'up')} disabled={i === 0} className={`${btn} text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 disabled:opacity-30`}><ChevronUp className="w-4 h-4" /> 위로</button>
+                  <button onClick={() => move(i, 'down')} disabled={i === items.length - 1} className={`${btn} text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 disabled:opacity-30`}><ChevronDown className="w-4 h-4" /> 아래로</button>
+                  <button onClick={() => upd(i, { visible: !it.visible })} className={`${btn} ${it.visible ? 'text-slate-600 bg-white border border-slate-200 hover:bg-slate-50' : 'text-emerald-700 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100'}`}>{it.visible ? '숨기기' : '표시하기'}</button>
+                  <button onClick={() => setExpanded(open ? null : k)} className={`${btn} text-indigo-700 bg-white border border-indigo-200 hover:bg-indigo-50`}>내용 설정</button>
+                </div>
+                {open && (
+                  <div className="border-t border-slate-100 pt-2 space-y-2">
+                    <div>
+                      <label className="text-[11px] font-medium text-slate-600">화면에 표시할 제목</label>
+                      <input value={it.displayTitle ?? ''} onChange={(e) => upd(i, { displayTitle: e.target.value.trim() ? e.target.value : null })} placeholder="비워두면 원래 콘텐츠 제목을 사용합니다" className="w-full mt-1 px-3 py-2 rounded-lg border border-slate-200 text-sm" />
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-medium text-slate-600">화면에 표시할 짧은 설명</label>
+                      <input value={it.displaySummary ?? ''} onChange={(e) => upd(i, { displaySummary: e.target.value.trim() ? e.target.value : null })} placeholder="비워두면 원래 콘텐츠의 요약을 사용합니다" className="w-full mt-1 px-3 py-2 rounded-lg border border-slate-200 text-sm" />
+                    </div>
+                    <div className="pt-1">
+                      <button onClick={() => remove(i)} className="min-h-[44px] px-3 py-2 text-sm font-medium text-red-600 bg-white border border-red-200 rounded-xl hover:bg-red-50 inline-flex items-center gap-1">
+                        <X className="w-4 h-4" /> 이 화면 세트에서 제거
+                      </button>
+                      <p className="text-[11px] text-slate-400 mt-1">이 화면 세트의 목록에서만 빠집니다. 원본 콘텐츠는 삭제되지 않습니다.</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+      {picking && (
+        <ContentPickerModal
+          existingKeys={new Set(items.map(key2))}
+          onClose={() => setPicking(false)}
+          onAdd={add}
+          baseSort={items.length * 10}
+        />
+      )}
     </div>
   );
 }
 const key2 = (it: ContentListItem) => (it.sourceType === 'o4o_product_description' ? `o4o:${it.masterId}:${it.language}` : `store:${it.contentId}`);
 
 // content 선택 모달 — 출처 탭(O4O 표준 / 매장 제작) + 검색 + 결과 추가.
-function ContentPickerModal({ onClose, onAdd, baseSort }: { onClose: () => void; onAdd: (items: ContentListItem[]) => void; baseSort: number }) {
+// WO-O4O-KPA-TABLET-TOUCH-FIRST-CONTENT-LIST-EDITOR-V1: 콘텐츠 선택 모달 터치 정비.
+//   출처 탭/검색/dedup 유지. 결과=터치 카드(카드 전체 토글), 이미 추가된 항목 표시, 모바일 풀스크린.
+//   onAdd 는 선택 item + 제목 힌트(세션 표시용)를 함께 전달(config 미변경).
+function ContentPickerModal({ existingKeys, onClose, onAdd, baseSort }: {
+  existingKeys: Set<string>;
+  onClose: () => void;
+  onAdd: (items: ContentListItem[], titles: Record<string, string>) => void;
+  baseSort: number;
+}) {
   const [tab, setTab] = useState<'o4o' | 'store'>('o4o');
   const [q, setQ] = useState('');
   const [loading, setLoading] = useState(false);
@@ -639,66 +704,88 @@ function ContentPickerModal({ onClose, onAdd, baseSort }: { onClose: () => void;
 
   const confirm = () => {
     const out: ContentListItem[] = [];
+    const titles: Record<string, string> = {};
     let n = baseSort;
     o4o.filter((r) => selO4o[r.masterId]).forEach((r) => {
+      const key = `o4o:${r.masterId}:ko`;
       out.push({ sourceType: 'o4o_product_description', masterId: r.masterId, language: 'ko', displayTitle: null, displaySummary: null, visible: true, sortOrder: (n += 10) });
+      titles[key] = r.name;
     });
     store.filter((r) => selStore[r.contentId]).forEach((r) => {
+      const key = `store:${r.contentId}`;
       out.push({ sourceType: 'store_content', contentId: r.contentId, displayTitle: null, displaySummary: null, visible: true, sortOrder: (n += 10) });
+      titles[key] = r.title || '매장 제작 콘텐츠';
     });
-    onAdd(out);
+    onAdd(out, titles);
   };
   const selectedCount = Object.values(selO4o).filter(Boolean).length + Object.values(selStore).filter(Boolean).length;
+  const tabBtn = (active: boolean) => `flex-1 min-h-[44px] px-3 py-2 text-sm font-medium rounded-xl ${active ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
 
   return (
-    <div className="fixed inset-0 z-[950] bg-slate-900/50 flex items-center justify-center p-4" onClick={onClose} role="presentation">
-      <div className="bg-white rounded-2xl w-full max-w-lg max-h-[86vh] flex flex-col overflow-hidden" onClick={(e) => e.stopPropagation()}>
-        <div className="px-4 py-3 border-b flex items-center justify-between">
-          <h4 className="text-sm font-bold text-slate-700">콘텐츠 추가</h4>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600"><X className="w-4 h-4" /></button>
+    <div className="fixed inset-0 z-[950] bg-slate-900/50 flex items-stretch sm:items-center justify-center p-0 sm:p-4" onClick={onClose} role="presentation">
+      <div className="bg-white w-full h-full sm:h-auto sm:max-w-lg sm:max-h-[86vh] rounded-none sm:rounded-2xl flex flex-col overflow-hidden" onClick={(e) => e.stopPropagation()}>
+        <div className="px-4 py-3 border-b flex items-center justify-between flex-shrink-0">
+          <h4 className="text-base font-bold text-slate-700">코너 콘텐츠 추가</h4>
+          <button onClick={onClose} className="min-h-[40px] min-w-[40px] flex items-center justify-center text-slate-400 hover:text-slate-600" aria-label="닫기"><X className="w-5 h-5" /></button>
         </div>
-        <div className="px-4 pt-3 flex gap-2">
-          <button onClick={() => setTab('o4o')} className={`px-3 py-1.5 text-xs font-medium rounded-lg ${tab === 'o4o' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600'}`}>O4O 표준 설명서</button>
-          <button onClick={() => setTab('store')} className={`px-3 py-1.5 text-xs font-medium rounded-lg ${tab === 'store' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600'}`}>매장 제작 콘텐츠</button>
+        <div className="px-4 pt-3 flex gap-2 flex-shrink-0">
+          <button onClick={() => setTab('o4o')} className={tabBtn(tab === 'o4o')}>O4O 표준 설명서</button>
+          <button onClick={() => setTab('store')} className={tabBtn(tab === 'store')}>매장 제작 콘텐츠</button>
         </div>
-        <div className="px-4 py-2 flex gap-2">
+        <div className="px-4 py-2 flex gap-2 flex-shrink-0">
           <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && run()}
-            placeholder={tab === 'o4o' ? '상품명 · 바코드 (2자 이상)' : '콘텐츠 제목 (비우면 최근순)'}
-            className="flex-1 px-3 py-2 rounded-lg border border-slate-200 text-sm" autoFocus />
-          <button onClick={run} className="px-3 py-2 text-xs font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700">검색</button>
+            placeholder={tab === 'o4o' ? '상품명 · 바코드로 검색 (2자 이상)' : '콘텐츠 제목으로 검색 (비우면 최근순)'}
+            className="flex-1 min-h-[44px] px-3 py-2 rounded-xl border border-slate-200 text-sm" autoFocus />
+          <button onClick={run} className="min-h-[44px] px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-xl hover:bg-indigo-700">검색</button>
         </div>
-        <div className="flex-1 overflow-y-auto px-4 pb-2 space-y-1.5">
+        <div className="flex-1 overflow-y-auto px-4 pb-2 space-y-2">
           {loading ? (
-            <div className="flex items-center gap-2 text-sm text-slate-400 py-4"><Loader2 className="w-4 h-4 animate-spin" /> 검색 중…</div>
+            <div className="flex items-center gap-2 text-sm text-slate-400 py-6"><Loader2 className="w-4 h-4 animate-spin" /> 검색 중…</div>
           ) : tab === 'o4o' ? (
-            o4o.length === 0 ? <div className="text-xs text-slate-400 py-4">검색 결과가 없습니다. (STORE 표준 설명서가 있는 상품만 표시됩니다)</div> :
-            o4o.map((r) => (
-              <label key={r.masterId} className="flex items-start gap-2 p-2 rounded-lg border border-slate-100 hover:bg-slate-50 cursor-pointer">
-                <input type="checkbox" checked={!!selO4o[r.masterId]} onChange={(e) => setSelO4o((s) => ({ ...s, [r.masterId]: e.target.checked }))} className="mt-0.5 rounded border-slate-300 text-indigo-600" />
-                <div className="min-w-0">
-                  <div className="text-sm text-slate-800 truncate">{r.name}</div>
-                  <div className="text-[11px] text-slate-400 truncate">{r.barcode ? `${r.barcode} · ` : ''}{(r.summary || '').slice(0, 40) || 'STORE 표준 설명서'} · 언어 {(r.languages || []).join(',') || 'ko'}</div>
-                </div>
-              </label>
-            ))
+            o4o.length === 0 ? <div className="text-sm text-slate-400 py-6 text-center">검색 결과가 없습니다. 다른 검색어를 입력해 보세요.<br /><span className="text-[11px]">(매장용 표준 설명서가 있는 상품만 표시됩니다)</span></div> :
+            o4o.map((r) => {
+              const added = existingKeys.has(`o4o:${r.masterId}:ko`);
+              const sel = !!selO4o[r.masterId];
+              return (
+                <button key={r.masterId} disabled={added} onClick={() => setSelO4o((s) => ({ ...s, [r.masterId]: !s[r.masterId] }))}
+                  className={`w-full text-left rounded-xl border p-3 transition ${added ? 'border-slate-100 bg-slate-50 opacity-70 cursor-default' : sel ? 'border-indigo-400 bg-indigo-50' : 'border-slate-200 bg-white hover:border-indigo-200'}`}>
+                  <div className="flex items-start gap-2">
+                    <span className={`mt-0.5 w-5 h-5 rounded-md border flex items-center justify-center flex-shrink-0 ${sel ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-300'}`}>{sel ? '✓' : ''}</span>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-sm font-medium text-slate-800 truncate">{r.name}</div>
+                      <div className="text-[11px] text-slate-400 truncate">O4O 표준 설명서{r.barcode ? ` · ${r.barcode}` : ''}{r.summary ? ` · ${r.summary.slice(0, 30)}` : ''}</div>
+                    </div>
+                    {added && <span className="text-[10px] font-semibold text-slate-500 bg-slate-200 px-1.5 py-0.5 rounded flex-shrink-0">이미 추가됨</span>}
+                  </div>
+                </button>
+              );
+            })
           ) : (
-            store.length === 0 ? <div className="text-xs text-slate-400 py-4">매장 제작 콘텐츠가 없습니다.</div> :
-            store.map((r) => (
-              <label key={r.contentId} className="flex items-start gap-2 p-2 rounded-lg border border-slate-100 hover:bg-slate-50 cursor-pointer">
-                <input type="checkbox" checked={!!selStore[r.contentId]} onChange={(e) => setSelStore((s) => ({ ...s, [r.contentId]: e.target.checked }))} className="mt-0.5 rounded border-slate-300 text-indigo-600" />
-                <div className="min-w-0">
-                  <div className="text-sm text-slate-800 truncate">{r.title || '(제목 없음)'}</div>
-                  <div className="text-[11px] text-slate-400 truncate">{r.hasProductLink ? '상품 연결 · ' : '일반 콘텐츠 · '}{r.workspaceStatus}{r.summary ? ` · ${r.summary.slice(0, 30)}` : ''}</div>
-                </div>
-              </label>
-            ))
+            store.length === 0 ? <div className="text-sm text-slate-400 py-6 text-center">매장 제작 콘텐츠가 없습니다.</div> :
+            store.map((r) => {
+              const added = existingKeys.has(`store:${r.contentId}`);
+              const sel = !!selStore[r.contentId];
+              return (
+                <button key={r.contentId} disabled={added} onClick={() => setSelStore((s) => ({ ...s, [r.contentId]: !s[r.contentId] }))}
+                  className={`w-full text-left rounded-xl border p-3 transition ${added ? 'border-slate-100 bg-slate-50 opacity-70 cursor-default' : sel ? 'border-indigo-400 bg-indigo-50' : 'border-slate-200 bg-white hover:border-indigo-200'}`}>
+                  <div className="flex items-start gap-2">
+                    <span className={`mt-0.5 w-5 h-5 rounded-md border flex items-center justify-center flex-shrink-0 ${sel ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-300'}`}>{sel ? '✓' : ''}</span>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-sm font-medium text-slate-800 truncate">{r.title || '(제목 없음)'}</div>
+                      <div className="text-[11px] text-slate-400 truncate">매장 제작 콘텐츠 · {r.hasProductLink ? '상품 연결' : '일반 콘텐츠'}{r.summary ? ` · ${r.summary.slice(0, 30)}` : ''}</div>
+                    </div>
+                    {added && <span className="text-[10px] font-semibold text-slate-500 bg-slate-200 px-1.5 py-0.5 rounded flex-shrink-0">이미 추가됨</span>}
+                  </div>
+                </button>
+              );
+            })
           )}
         </div>
-        <div className="px-4 py-3 border-t flex items-center justify-between">
-          <span className="text-[11px] text-slate-400">{selectedCount}개 선택</span>
+        <div className="px-4 py-3 border-t flex items-center justify-between gap-2 flex-shrink-0">
+          <span className="text-xs text-slate-500">{selectedCount}개 선택됨</span>
           <div className="flex gap-2">
-            <button onClick={onClose} className="px-3 py-1.5 text-xs font-medium text-slate-600 bg-white border border-slate-200 rounded-lg">취소</button>
-            <button onClick={confirm} disabled={selectedCount === 0} className="px-3 py-1.5 text-xs font-medium text-white bg-indigo-600 rounded-lg disabled:opacity-50">추가</button>
+            <button onClick={onClose} className="min-h-[44px] px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50">취소</button>
+            <button onClick={confirm} disabled={selectedCount === 0} className="min-h-[44px] px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 disabled:opacity-50">선택한 콘텐츠 추가</button>
           </div>
         </div>
       </div>
