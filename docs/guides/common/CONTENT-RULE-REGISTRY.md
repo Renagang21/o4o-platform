@@ -16,7 +16,7 @@
 | **CR-004** | Grounding 필수 — 원문 근거 없으면 확장·창작 금지 | content-authoring/CONTENT-AUTHORING-PRINCIPLES | active |
 | **CR-005** | 소비자 오해·혼동 방지 — 사용 맥락(경로·형태)이 다르면 분리 | content-authoring/CONTENT-AUTHORING-PRINCIPLES | active |
 | **CR-006** | 안전성 안내 필수 — 전문가/진료 연결 기준 명시 | content-authoring/CONTENT-AUTHORING-PRINCIPLES | active |
-| **CR-007** | 원천 부재 시 추정 금지 → HOLD (SOURCE GAP 일반형; "안전 판단"이지 실패 아님) | WORKFLOW · content-authoring | active |
+| **CR-007** | 원천 부재 시 추정 금지 → HOLD (SOURCE GAP 일반형; "안전 판단"이지 실패 아님). **근거 부족 제품은 제작하지 않음** — 제품명·분류 불명확 또는 고유 원료·함량·기능성·사용법 등 핵심 근거 미확인 시 미작성·보류(유사/다른 제품으로 대체 금지, 보수적 추정 설명서 금지). 전 상품군 공통 | WORKFLOW · content-authoring | active |
 | **CR-008** | 작업은 read-only 조사, DB 반영은 승인·이중게이트 후에만 | WORKFLOW §4 | active |
 | **CR-009** | Pipeline: 작성→검토→승인→배포. canonical 승격은 항상 별도 승인 | WORKFLOW | active |
 | **CR-010** | Registry = 문서(운영 상태), 상태 변경 중앙 전용 | WORKFLOW §4 · registries/* | active |
