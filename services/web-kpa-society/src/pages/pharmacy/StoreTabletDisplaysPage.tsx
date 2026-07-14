@@ -91,6 +91,14 @@ function contentOptionLabel(it: LinkedContentItem): string {
 export default function StoreTabletDisplaysPage() {
   const navigate = useNavigate();
 
+  // WO-O4O-KPA-TABLET-CONTENT-LIBRARY-TAB-SPLIT-V1: 두 업무를 탭으로 분리.
+  //   'corners'  = 코너별 운영(코너 선택 → 현재 콘텐츠 · 교체 · 화면 열기)
+  //   'contents' = 태블릿 콘텐츠(화면 세트 = 콘텐츠 원본 목록 · 수정 · 보관)
+  const [activeTab, setActiveTab] = useState<'corners' | 'contents'>('corners');
+  // 코너 상세의 legacy 실행 편집기(대기화면·화면설정·진열·공통영상)는 primary 에서 접이식 '고급 설정'으로.
+  //   공개 뷰어가 아직 화면 세트를 소비하지 않아 legacy 가 실제 고객 화면을 결정하므로 제거하지 않고 보존한다.
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
   // Tablet state
   const [tablets, setTablets] = useState<TabletType[]>([]);
   const [selectedTabletId, setSelectedTabletId] = useState<string | null>(null);
@@ -695,6 +703,9 @@ export default function StoreTabletDisplaysPage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          {/* WO-O4O-KPA-TABLET-CONTENT-LIBRARY-TAB-SPLIT-V1: 헤더 간소화 —
+              고객 화면 미리보기(상단) 제거 · 코너 추가/저장 은 각 탭의 맥락 버튼으로 이동.
+              운영 안내(도움말)만 상단 유지. */}
           {/* WO-O4O-KPA-TABLET-OPERATION-GUIDE-MODAL-V1: 상단 상시 안내 → 버튼(모달) */}
           <button
             onClick={() => setShowGuide(true)}
@@ -703,33 +714,27 @@ export default function StoreTabletDisplaysPage() {
             <Info className="w-4 h-4 text-sky-600" />
             운영 안내
           </button>
-          {/* WO-O4O-KPA-TABLET-PREVIEW-V1: 고객 화면 미리보기 (타블렛 선택 시) */}
-          <button
-            onClick={handleOpenPreview}
-            disabled={!selectedTabletId || previewLoading}
-            title={selectedTabletId ? '고객 화면 미리보기' : '미리보기를 보려면 먼저 타블렛을 선택해 주세요.'}
-            className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 text-sm font-medium rounded-xl hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            {previewLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Tv className="w-4 h-4" />}
-            고객 화면 미리보기
-          </button>
-          {/* WO-O4O-STORE-TABLET-REGISTER-UI-V1: 목록 있을 때도 추가 버튼 */}
-          <button
-            onClick={() => setShowRegisterForm((v) => !v)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 text-sm font-medium rounded-xl hover:bg-slate-50 transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            코너 추가
-          </button>
-          <button
-            onClick={handleSave}
-            disabled={!hasChanges || saving}
-            className="flex items-center gap-2 px-4 py-2.5 bg-teal-600 text-white text-sm font-medium rounded-xl hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg shadow-teal-600/25"
-          >
-            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-            저장
-          </button>
         </div>
+      </div>
+
+      {/* WO-O4O-KPA-TABLET-CONTENT-LIBRARY-TAB-SPLIT-V1: 상단 탭 — 코너별 운영 / 태블릿 콘텐츠 */}
+      <div className="flex gap-1 border-b border-slate-200">
+        {([
+          { key: 'corners', label: '코너별 운영' },
+          { key: 'contents', label: '태블릿 콘텐츠' },
+        ] as const).map((t) => (
+          <button
+            key={t.key}
+            onClick={() => setActiveTab(t.key)}
+            className={`px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-colors ${
+              activeTab === t.key
+                ? 'border-teal-600 text-teal-700'
+                : 'border-transparent text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
       </div>
 
       {/* WO-O4O-KPA-TABLET-OPERATION-GUIDE-MODAL-V1:
@@ -781,8 +786,8 @@ export default function StoreTabletDisplaysPage() {
         </div>
       )}
 
-      {/* WO-O4O-STORE-TABLET-REGISTER-UI-V1: 인라인 등록 폼 — empty/non-empty 공용 */}
-      {!loadingTablets && showRegisterForm && (
+      {/* WO-O4O-STORE-TABLET-REGISTER-UI-V1: 인라인 등록 폼 — empty/non-empty 공용 (코너별 운영 탭 전용) */}
+      {activeTab === 'corners' && !loadingTablets && showRegisterForm && (
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-teal-100">
           <div className="px-4 py-3 bg-teal-50 border-b border-teal-100 flex items-center gap-2">
             <Plus className="w-4 h-4 text-teal-600" />
@@ -841,8 +846,8 @@ export default function StoreTabletDisplaysPage() {
         </div>
       )}
 
-      {/* No tablets */}
-      {!loadingTablets && tablets.length === 0 && !showRegisterForm && (
+      {/* No tablets (코너별 운영 탭 전용) */}
+      {activeTab === 'corners' && !loadingTablets && tablets.length === 0 && !showRegisterForm && (
         <div className="text-center py-16 bg-white rounded-2xl shadow-sm">
           <Tablet className="w-16 h-16 text-slate-200 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-slate-800 mb-2">아직 코너 화면이 없습니다</h3>
@@ -868,7 +873,7 @@ export default function StoreTabletDisplaysPage() {
       {/* WO-O4O-KPA-TABLET-TOUCH-FIRST-CORNER-HOME-V1: 첫 화면 = 코너 카드 홈(태블릿 목록 아님).
           코너 = store_tablets(location||name). 카드 선택 시 기존 상세/편집기(아래) 재사용.
           미선택(selectedTabletId=null) 상태에서만 홈을 표시한다. */}
-      {!loadingTablets && tablets.length > 0 && !selectedTabletId && (
+      {activeTab === 'corners' && !loadingTablets && tablets.length > 0 && !selectedTabletId && (
         <div className="space-y-3">
           <div className="flex items-center justify-between gap-2 flex-wrap">
             <h2 className="text-base font-bold text-slate-800 flex items-center gap-2">
@@ -929,8 +934,8 @@ export default function StoreTabletDisplaysPage() {
         </div>
       )}
 
-      {/* Tablet list DataTable + editor (선택 코너 상세 — 기존 2단 레이아웃 재사용) */}
-      {!loadingTablets && tablets.length > 0 && selectedTabletId && (
+      {/* Tablet list DataTable + editor (선택 코너 상세 — 기존 2단 레이아웃 재사용, 코너별 운영 탭 전용) */}
+      {activeTab === 'corners' && !loadingTablets && tablets.length > 0 && selectedTabletId && (
         <>
           {/* WO-O4O-KPA-TABLET-TOUCH-FIRST-CORNER-HOME-V1: 코너 홈으로 돌아가기 */}
           <button
@@ -1096,9 +1101,11 @@ export default function StoreTabletDisplaysPage() {
                 </div>
               )}
 
-              {/* WO-O4O-KPA-TABLET-SCREEN-SET-BLOCK-EDITOR-UX-V1: 화면 세트 관리 (public 미반영 — 경고 포함) */}
+              {/* WO-O4O-KPA-TABLET-CONTENT-LIBRARY-TAB-SPLIT-V1: 코너 모드 — 현재 사용 중 세트 + 교체(적용/해제)만.
+                  세트 원본 수정/생성/보관은 '태블릿 콘텐츠' 탭으로 이동. */}
               {selectedTabletId && (
                 <TabletScreenSetManager
+                  mode="corner"
                   tabletId={selectedTabletId}
                   currentScreenSetId={selectedTablet?.currentScreenSetId ?? null}
                   onCurrentChange={(id) => setTablets((prev) => prev.map((t) => (t.id === selectedTabletId ? { ...t, currentScreenSetId: id } : t)))}
@@ -1106,6 +1113,25 @@ export default function StoreTabletDisplaysPage() {
                 />
               )}
 
+              {/* WO-O4O-KPA-TABLET-CONTENT-LIBRARY-TAB-SPLIT-V1: 고급 설정(접이식) —
+                  대기화면·화면설정·진열·공통 대기영상은 legacy 실행 편집기다.
+                  공개 뷰어가 아직 화면 세트를 소비하지 않아 이 값들이 현재 실제 고객 화면을 결정하므로
+                  제거하지 않고 primary 에서 접어 둔다(교체·화면 열기 중심으로 코너 상세를 축소). */}
+              <div className="rounded-2xl border border-slate-200 bg-slate-50/60 overflow-hidden">
+                <button
+                  onClick={() => setShowAdvanced((v) => !v)}
+                  className="w-full flex items-center justify-between gap-2 px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+                >
+                  <span className="flex items-center gap-2">
+                    {showAdvanced ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    고급 설정 (대기화면 · 화면 설정 · 진열 · 공통 대기영상)
+                  </span>
+                  <span className="text-[11px] font-normal text-slate-400">현재 고객 화면에 반영되는 항목</span>
+                </button>
+              </div>
+
+              {showAdvanced && (
+              <>
           {/* WO-O4O-KPA-TABLET-OPERATOR-COMMON-IDLE-VIDEO-SELECTION-V1: 서비스 공통 대기 영상(태블릿별 1개) */}
           {selectedTabletId && (
             <div className="bg-white rounded-2xl shadow-sm p-4 border border-slate-100">
@@ -1396,10 +1422,20 @@ export default function StoreTabletDisplaysPage() {
 
               {/* Right: Current Display */}
               <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-                <div className="px-4 py-3 border-b bg-slate-50">
+                <div className="px-4 py-3 border-b bg-slate-50 flex items-center justify-between gap-2">
                   <h3 className="text-sm font-bold text-slate-700">
                     현재 태블릿 화면 구성 ({displays.length})
+                    {hasChanges && <span className="ml-1 text-xs font-medium text-amber-600">· 변경됨</span>}
                   </h3>
+                  {/* WO-O4O-KPA-TABLET-CONTENT-LIBRARY-TAB-SPLIT-V1: 진열 저장(상단 헤더 저장 제거 → 진열 섹션 맥락 저장) */}
+                  <button
+                    onClick={handleSave}
+                    disabled={!hasChanges || saving}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-teal-600 text-white text-xs font-medium rounded-lg hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                    진열 저장
+                  </button>
                 </div>
 
                 <div className="max-h-[400px] overflow-y-auto">
@@ -1512,9 +1548,28 @@ export default function StoreTabletDisplaysPage() {
               </div>
             </div>
           )}
+              </>
+              )}{/* /고급 설정 (WO-O4O-KPA-TABLET-CONTENT-LIBRARY-TAB-SPLIT-V1) */}
             </div>{/* /우측: 선택 코너 현재 구성 */}
           </div>{/* /위치·코너 2단 그리드 (WO-O4O-KPA-TABLET-LOCATION-FIRST-UX-REFIT-V1) */}
         </>
+      )}
+
+      {/* WO-O4O-KPA-TABLET-CONTENT-LIBRARY-TAB-SPLIT-V1: 태블릿 콘텐츠 탭 — 화면 세트(콘텐츠 원본) 라이브러리.
+          목록/수정/보관/생성 담당. 코너 적용(교체)은 코너별 운영 탭. tablets 로 '사용 중인 코너' 표시. */}
+      {activeTab === 'contents' && (
+        <div className="space-y-3">
+          <p className="text-sm text-slate-500">
+            태블릿 코너에 보여줄 화면 세트(콘텐츠)를 만들고 수정·보관합니다. 실제 코너 적용·교체는 <b>코너별 운영</b> 탭에서 합니다.
+          </p>
+          <TabletScreenSetManager
+            mode="library"
+            tabletId={null}
+            currentScreenSetId={null}
+            onToast={setToast}
+            tablets={tablets}
+          />
+        </div>
       )}
 
       {/* 고객 화면 미리보기 오버레이 (WO-O4O-KPA-TABLET-PREVIEW-V1) */}

@@ -20,11 +20,29 @@ import {
 
 type Toast = { type: 'success' | 'error'; message: string };
 
+// WO-O4O-KPA-TABLET-CONTENT-LIBRARY-TAB-SPLIT-V1:
+//   같은 컴포넌트를 두 맥락에서 재사용한다.
+//   - 'corner'  : 코너별 운영 탭 — 이 코너에 '현재 사용 중' 세트 + 다른 세트로 교체(적용/해제)만. 원본 편집/생성/보관 없음.
+//   - 'library' : 태블릿 콘텐츠 탭 — 매장 전체 화면 세트 목록(콘텐츠 원본) 수정/보관/생성. 코너 적용(교체) 없음.
+export type ScreenSetManagerMode = 'corner' | 'library';
+
+// library 모드에서 '사용 중인 코너' 계산용 최소 태블릿 정보(페이지의 TabletType 하위집합).
+export interface ScreenSetUsageTablet {
+  id: string;
+  name: string;
+  location?: string | null;
+  currentScreenSetId?: string | null;
+}
+
 interface Props {
-  tabletId: string;
+  // 코너 모드에서는 대상 태블릿 id, 라이브러리 모드에서는 null(매장 전체).
+  mode: ScreenSetManagerMode;
+  tabletId: string | null;
   currentScreenSetId: string | null;
-  onCurrentChange: (id: string | null) => void;
+  onCurrentChange?: (id: string | null) => void;
   onToast: (t: Toast) => void;
+  // library 모드 전용: 각 세트가 어느 코너에 적용됐는지 표시.
+  tablets?: ScreenSetUsageTablet[];
 }
 
 const BLOCK_TYPES: { value: ScreenBlockType; label: string }[] = [
@@ -104,7 +122,8 @@ function defaultConfig(type: ScreenBlockType): Record<string, unknown> {
   }
 }
 
-export default function TabletScreenSetManager({ tabletId, currentScreenSetId, onCurrentChange, onToast }: Props) {
+export default function TabletScreenSetManager({ mode, tabletId, currentScreenSetId, onCurrentChange, onToast, tablets }: Props) {
+  const isLibrary = mode === 'library';
   const [sets, setSets] = useState<ScreenSet[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -128,15 +147,24 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
     setLoading(true);
     try {
       const all = await fetchScreenSets();
-      // 이 코너에 적용 가능한 세트 = 이 태블릿 전용 + 매장 재사용(tabletId null)
-      setSets(all.filter((s) => s.tabletId === tabletId || s.tabletId === null));
+      // library: 매장 전체 화면 세트(비보관). corner: 이 태블릿 전용 + 매장 재사용(tabletId null).
+      setSets(isLibrary ? all : all.filter((s) => s.tabletId === tabletId || s.tabletId === null));
     } catch (e: any) {
       onToast({ type: 'error', message: e?.message || '화면 세트를 불러오지 못했습니다.' });
       setSets([]);
     } finally {
       setLoading(false);
     }
-  }, [tabletId, onToast]);
+  }, [tabletId, isLibrary, onToast]);
+
+  // WO-...-CONTENT-LIBRARY-TAB-SPLIT-V1: library 모드 — 세트 id → 적용 중인 코너 이름 목록.
+  const usageBySet = (() => {
+    const m: Record<string, string[]> = {};
+    (tablets ?? []).forEach((t) => {
+      if (t.currentScreenSetId) (m[t.currentScreenSetId] ??= []).push(t.location?.trim() || t.name);
+    });
+    return m;
+  })();
 
   useEffect(() => { reload(); }, [reload]);
 
@@ -164,7 +192,8 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
     setBusy(true);
     try {
       // WO-O4O-KPA-TABLET-TEMPLATE-SELECTION-EDITOR-V1: 선택한 templateKey 를 명시 전송(Phase 1 = 기본형).
-      const created = await createScreenSet({ name, tabletId, templateKey: newTemplateKey });
+      // library 모드는 매장 재사용 세트(tabletId=null)로 생성.
+      const created = await createScreenSet({ name, tabletId: isLibrary ? null : tabletId, templateKey: newTemplateKey });
       setNewName(''); setNewTemplateKey(DEFAULT_TEMPLATE_KEY); setCreating(false);
       onToast({ type: 'success', message: `화면 세트 "${created.name}" 생성됨` });
       await reload();
@@ -209,7 +238,7 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
   };
 
   const handleApply = async (set: ScreenSet) => {
-    if (busy) return;
+    if (busy || !tabletId) return; // 교체(적용)는 corner 모드 전용 — tabletId 필수
     if (!confirmDiscard(APPLY_DIRTY_MSG)) return; // 미저장 변경은 적용에 반영 안 됨 경고
     setBusy(true);
     try {
@@ -217,7 +246,7 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
         await updateScreenSet(set.id, { status: 'active' }); // 적용은 active 필요 → 자동 활성화
       }
       await applyCurrentScreenSet(tabletId, set.id);
-      onCurrentChange(set.id);
+      onCurrentChange?.(set.id);
       onToast({ type: 'success', message: `"${set.name}" 적용됨 — 공개 태블릿 화면에 반영됩니다.` });
       await reload();
     } catch (e: any) {
@@ -226,12 +255,12 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
   };
 
   const handleClear = async () => {
-    if (busy) return;
+    if (busy || !tabletId) return;
     if (!confirmDiscard()) return;
     setBusy(true);
     try {
       await clearCurrentScreenSet(tabletId);
-      onCurrentChange(null);
+      onCurrentChange?.(null);
       onToast({ type: 'success', message: '적용 해제됨 (기본 화면으로 복귀)' });
       await reload();
     } catch (e: any) {
@@ -298,34 +327,46 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
     <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-indigo-100">
       <div className="px-4 py-3 border-b bg-indigo-50/60 flex items-center justify-between">
         <h3 className="text-sm font-bold text-indigo-800 flex items-center gap-2">
-          <Layers className="w-4 h-4 text-indigo-600" /> 화면 세트 (Screen Set)
+          <Layers className="w-4 h-4 text-indigo-600" /> {isLibrary ? '태블릿 콘텐츠 (화면 세트)' : '이 코너에 적용할 화면 세트'}
         </h3>
-        <button
-          onClick={() => setCreating((v) => !v)}
-          className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-indigo-700 bg-white border border-indigo-200 rounded-lg hover:bg-indigo-50"
-        >
-          <Plus className="w-3.5 h-3.5" /> 새 세트
-        </button>
+        {/* 새 세트 생성은 콘텐츠(라이브러리) 모드에서만. 코너 모드는 기존 세트 교체만. */}
+        {isLibrary && (
+          <button
+            onClick={() => setCreating((v) => !v)}
+            className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-indigo-700 bg-white border border-indigo-200 rounded-lg hover:bg-indigo-50"
+          >
+            <Plus className="w-3.5 h-3.5" /> 새 세트
+          </button>
+        )}
       </div>
 
       <div className="p-4 space-y-4">
-        {/* 필수 경고 */}
-        <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg p-3">
-          <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
-          <p className="text-xs text-amber-800 leading-relaxed">
-            <b>적용한 화면 세트는 공개 태블릿 뷰어(고객 화면)에 반영됩니다.</b>
-            운영 환경에서는 브라우저 캐시·네트워크 상태에 따라 태블릿 새로고침이 필요할 수 있습니다.
+        {/* 필수 경고 — 코너 모드(교체=공개 반영)에서만 */}
+        {!isLibrary && (
+          <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg p-3">
+            <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+            <p className="text-xs text-amber-800 leading-relaxed">
+              <b>적용한 화면 세트는 공개 태블릿 뷰어(고객 화면)에 반영됩니다.</b>
+              운영 환경에서는 브라우저 캐시·네트워크 상태에 따라 태블릿 새로고침이 필요할 수 있습니다.
+            </p>
+          </div>
+        )}
+
+        {/* WO-O4O-KPA-TABLET-SCREEN-SET-OPERATION-USABILITY-PASS-V1: 저장/템플릿/블록 개념 안내 — 콘텐츠(편집) 모드에서만 */}
+        {isLibrary ? (
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-[11px] text-slate-600 leading-relaxed space-y-1">
+            <p><b className="text-slate-700">화면 세트</b>는 태블릿 코너에 표시할 화면 구성 묶음(콘텐츠 원본)입니다. 여기서 만들고 수정하며, 실제 코너 적용은 <b className="text-slate-700">코너별 운영</b> 탭에서 합니다.</p>
+            <p><b className="text-slate-700">템플릿</b>은 같은 내용을 어떤 <b>배치</b>로 보여줄지 정하고, <b className="text-slate-700">블록</b>은 화면에 들어가는 <b>내용</b>(코너 설명·제품 목록·QR 안내·대기화면)입니다.</p>
+            <p><b className="text-slate-700">저장</b>은 세트 내용만 저장합니다(코너에 자동 적용되지 않음). <b className="text-slate-700">보관</b>은 목록에서 숨깁니다(적용 중인 세트는 먼저 적용 해제 필요).</p>
+          </div>
+        ) : (
+          <p className="text-[11px] text-slate-500 leading-relaxed">
+            이 코너에 사용할 화면 세트를 골라 <b>이 화면 사용</b>으로 교체하세요. 세트 내용 수정·생성은 <b>태블릿 콘텐츠</b> 탭에서 합니다.
           </p>
-        </div>
+        )}
 
-        {/* WO-O4O-KPA-TABLET-SCREEN-SET-OPERATION-USABILITY-PASS-V1: 저장/적용/해제·템플릿/블록 개념 안내 */}
-        <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-[11px] text-slate-600 leading-relaxed space-y-1">
-          <p><b className="text-slate-700">화면 세트</b>는 태블릿에 표시할 화면 구성 묶음입니다.</p>
-          <p><b className="text-slate-700">템플릿</b>은 같은 내용을 어떤 <b>배치</b>로 보여줄지 정하고, <b className="text-slate-700">블록</b>은 화면에 들어가는 <b>내용</b>(코너 설명·제품 목록·QR 안내·대기화면)입니다.</p>
-          <p><b className="text-slate-700">저장</b>은 세트 내용만 저장하며 태블릿에 자동 적용되지 않습니다. <b className="text-slate-700">적용</b>은 이 세트를 이 코너 태블릿의 현재 화면으로 사용하고, <b className="text-slate-700">적용 해제</b>는 기본 화면으로 되돌립니다.</p>
-        </div>
-
-        {/* WO-O4O-KPA-TABLET-TOUCH-FIRST-SCREEN-SET-CARDS-V1: 현재 사용 중 카드(적용 상태 우선). */}
+        {/* WO-O4O-KPA-TABLET-TOUCH-FIRST-SCREEN-SET-CARDS-V1: 현재 사용 중 카드(적용 상태 우선) — 코너 모드 전용. */}
+        {!isLibrary && (
         <div className="rounded-xl border border-indigo-200 bg-indigo-50/50 p-3">
           <div className="flex items-start justify-between gap-2 flex-wrap">
             <div className="min-w-0">
@@ -342,18 +383,17 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
               )}
             </div>
             <div className="flex gap-2 flex-wrap">
-              {currentSet && (
-                <button onClick={() => { if (confirmDiscard()) openEdit(currentSet.id); }} className="min-h-[44px] px-4 py-2 text-sm font-semibold text-indigo-700 bg-white border border-indigo-200 rounded-xl hover:bg-indigo-50">편집</button>
-              )}
+              {/* 코너 모드: 세트 원본 편집은 콘텐츠 탭으로 이동 → 여기서는 적용 해제(교체)만. */}
               {currentScreenSetId && (
                 <button onClick={handleClear} disabled={busy} className="min-h-[44px] px-3 py-2 text-sm font-medium text-slate-500 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 disabled:opacity-50">적용 해제</button>
               )}
             </div>
           </div>
         </div>
+        )}
 
-        {/* 새 세트 생성 폼 */}
-        {creating && (
+        {/* 새 세트 생성 폼 — 콘텐츠(라이브러리) 모드 전용 */}
+        {isLibrary && creating && (
           <div className="space-y-2 border border-slate-100 rounded-lg p-3 bg-slate-50/60">
             <div className="flex gap-2 items-center">
               <input
@@ -374,26 +414,38 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
         )}
 
         {/* WO-O4O-KPA-TABLET-TOUCH-FIRST-SCREEN-SET-CARDS-V1: 다른 화면 세트 = 카드 그리드(비교·선택·적용). */}
-        {loading ? (
-          <div className="flex items-center gap-2 text-sm text-slate-400 py-4"><Loader2 className="w-4 h-4 animate-spin" /> 불러오는 중…</div>
-        ) : sets.length === 0 ? (
-          <div className="text-center py-8 space-y-3">
-            <p className="text-sm text-slate-500">아직 화면 세트가 없습니다. 코너에서 사용할 첫 화면 세트를 만들어 주세요.</p>
-            <button onClick={() => setCreating(true)} className="inline-flex items-center gap-1.5 min-h-[44px] px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700">
-              <Plus className="w-4 h-4" /> 첫 화면 세트 만들기
-            </button>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {otherSets.length > 0 && (
-              <>
-                <div className="text-xs font-semibold text-slate-600">다른 화면 세트</div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {otherSets.map((s) => (
+        {/* WO-...-CONTENT-LIBRARY-TAB-SPLIT-V1: library=매장 전체 세트 목록 / corner=현재 사용 중 제외 나머지(교체 대상). */}
+        {(() => {
+          const listSets = isLibrary ? sets : otherSets;
+          if (loading) {
+            return <div className="flex items-center gap-2 text-sm text-slate-400 py-4"><Loader2 className="w-4 h-4 animate-spin" /> 불러오는 중…</div>;
+          }
+          if (listSets.length === 0) {
+            return isLibrary ? (
+              <div className="text-center py-8 space-y-3">
+                <p className="text-sm text-slate-500">아직 화면 세트가 없습니다. 코너에 보여줄 첫 화면 세트(콘텐츠)를 만들어 주세요.</p>
+                <button onClick={() => setCreating(true)} className="inline-flex items-center gap-1.5 min-h-[44px] px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700">
+                  <Plus className="w-4 h-4" /> 첫 화면 세트 만들기
+                </button>
+              </div>
+            ) : (
+              <div className="text-center py-6 text-sm text-slate-500">
+                이 코너에 적용할 수 있는 화면 세트가 없습니다.<br />
+                <b>태블릿 콘텐츠</b> 탭에서 화면 세트를 먼저 만들어 주세요.
+              </div>
+            );
+          }
+          return (
+            <div className="space-y-2">
+              <div className="text-xs font-semibold text-slate-600">{isLibrary ? '화면 세트 목록' : '다른 화면 세트'}</div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {listSets.map((s) => {
+                  const usedCorners = isLibrary ? (usageBySet[s.id] ?? []) : [];
+                  return (
                     <div
                       key={s.id}
-                      onClick={() => { if (confirmDiscard()) openEdit(s.id); }}
-                      className="rounded-xl border border-slate-200 bg-white p-3 flex flex-col gap-2 cursor-pointer hover:border-indigo-200 hover:shadow-sm transition"
+                      onClick={isLibrary ? () => { if (confirmDiscard()) openEdit(s.id); } : undefined}
+                      className={`rounded-xl border border-slate-200 bg-white p-3 flex flex-col gap-2 transition ${isLibrary ? 'cursor-pointer hover:border-indigo-200 hover:shadow-sm' : ''}`}
                     >
                       <div className="min-w-0">
                         <div className="text-sm font-bold text-slate-800 truncate flex items-center gap-1.5">
@@ -401,25 +453,45 @@ export default function TabletScreenSetManager({ tabletId, currentScreenSetId, o
                           {s.tabletId === null && <span className="text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded flex-shrink-0">재사용</span>}
                         </div>
                         <div className="text-[11px] text-slate-400">{STATUS_LABEL[s.status]} · {templateLabel(s.templateKey)} · 블록 {s.blockCount ?? 0}개</div>
+                        {/* library: 사용 중인 코너 */}
+                        {isLibrary && (
+                          usedCorners.length > 0 ? (
+                            <div className="mt-1 flex items-center gap-1 flex-wrap">
+                              <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">사용 중</span>
+                              <span className="text-[11px] text-slate-500 truncate">{usedCorners.join(', ')}</span>
+                            </div>
+                          ) : (
+                            <div className="mt-1 text-[11px] text-slate-400">사용 중인 코너 없음</div>
+                          )
+                        )}
                       </div>
-                      <div className="flex gap-2 mt-auto items-center">
-                        <button onClick={(e) => { e.stopPropagation(); if (confirmDiscard()) openEdit(s.id); }} className="flex-1 min-h-[44px] px-3 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50">편집</button>
-                        <button onClick={(e) => { e.stopPropagation(); handleApply(s); }} disabled={busy} className="flex-1 min-h-[44px] px-3 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 disabled:opacity-50">이 화면 사용</button>
-                        <button onClick={(e) => { e.stopPropagation(); handleArchive(s); }} disabled={busy} className="text-[11px] text-slate-300 hover:text-red-500 disabled:opacity-50 flex-shrink-0" title="보관">보관</button>
-                      </div>
+                      {isLibrary ? (
+                        <div className="flex gap-2 mt-auto items-center">
+                          {/* 미리보기는 후속 PREVIEW-MODAL WO — 자리만 준비(비활성). */}
+                          <button disabled title="미리보기는 후속 단계에서 제공됩니다." className="min-h-[44px] px-3 py-2 text-sm font-medium text-slate-400 bg-slate-50 border border-slate-200 rounded-xl cursor-not-allowed">미리보기</button>
+                          <button onClick={(e) => { e.stopPropagation(); if (confirmDiscard()) openEdit(s.id); }} className="flex-1 min-h-[44px] px-3 py-2 text-sm font-semibold text-indigo-700 bg-white border border-indigo-200 rounded-xl hover:bg-indigo-50">수정</button>
+                          <button onClick={(e) => { e.stopPropagation(); handleArchive(s); }} disabled={busy} className="min-h-[44px] px-3 py-2 text-sm font-medium text-slate-500 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 disabled:opacity-50" title="목록에서 숨김(보관)">보관</button>
+                        </div>
+                      ) : (
+                        <div className="flex gap-2 mt-auto items-center">
+                          <button onClick={(e) => { e.stopPropagation(); handleApply(s); }} disabled={busy} className="flex-1 min-h-[44px] px-3 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 disabled:opacity-50">이 화면 사용</button>
+                        </div>
+                      )}
                     </div>
-                  ))}
-                </div>
-              </>
-            )}
-            <button onClick={() => setCreating(true)} className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 min-h-[44px] px-4 py-2 text-sm font-semibold text-indigo-700 bg-white border border-indigo-200 rounded-xl hover:bg-indigo-50">
-              <Plus className="w-4 h-4" /> 새 화면 세트 만들기
-            </button>
-          </div>
-        )}
+                  );
+                })}
+              </div>
+              {isLibrary && (
+                <button onClick={() => setCreating(true)} className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 min-h-[44px] px-4 py-2 text-sm font-semibold text-indigo-700 bg-white border border-indigo-200 rounded-xl hover:bg-indigo-50">
+                  <Plus className="w-4 h-4" /> 새 화면 세트 만들기
+                </button>
+              )}
+            </div>
+          );
+        })()}
 
-        {/* 편집 패널 */}
-        {editDetail && (
+        {/* 편집 패널 — 콘텐츠(라이브러리) 모드 전용 */}
+        {isLibrary && editDetail && (
           <div className="border border-indigo-100 rounded-lg p-3 space-y-3 bg-indigo-50/30">
             <div className="flex items-center justify-between gap-2">
               <h4 className="text-sm font-bold text-slate-700 flex items-center gap-2">
