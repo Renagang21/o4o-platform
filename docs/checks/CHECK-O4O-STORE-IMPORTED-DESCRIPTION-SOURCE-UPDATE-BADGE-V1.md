@@ -51,15 +51,32 @@
 
 ## 배포 결과
 
-- (main push → API/Web(kpa-society) 배포 결과 기록.)
+- main push `6467fb91d` → **API Server / Web Services 배포 success** (2026-07-14). **migration 없음**.
+- 배포 확인: `GET /api/v1/kpa/store-library/contents` item 에 `hasSourceUpdate` 반영(기존 direct 13건 전부 `false` — negative 정상).
 
-## 실브라우저 smoke 결과
+## 실브라우저 smoke 결과 (prod, 2026-07-14) — 전 과정 PASS
 
-- (import 사본 생성 → canonical 교체 → 매장 목록 `원본 갱신됨` 배지 + 사본 본문 불변(hash) 기록.)
+매장 경영자(renagang21=테스트 약국 매장) + 운영자(sohae2100). renagang21 토큰=supplier+store owner 겸용, 운영자 approve=admin 쿠키.
+데이터: master `33cc8fe7` · offer `30ebefdd` · SPD#1(원본 canonical A) `2bf8f57c` · SPD#2(교체 후 B) `fd1c5a8e` · listing `cb226dd3` · 매장 사본 C `29ae7921`.
 
-## 테스트 데이터 정리 결과
+1. 원본 canonical A: 공급자 STORE#1→운영자 승인→canonical. ✅
+2. 매장 import: A 를 `import-b2c-description`→사본 C(`source_metadata.sourceRefId=A`). ✅
+3. 교체 전: C `hasSourceUpdate=false`(A=현재 canonical), 본문 캡처. ✅
+4. canonical 교체: 공급자#2→운영자 replaceExisting→A `hidden`·#2 `canonical B`(replaced=true). ✅
+5. 교체 후(API): C **`hasSourceUpdate=true`**(sourceRefId=A ≠ 현재 canonical B). ✅
+6. 사본 본문 불변: C `content_json.html` = 교체 전과 **동일**(자동 변경 없음). ✅
+7. UI: `/store/library/contents` 에서 C 행에 **`원본 갱신됨`** 배지(tooltip) 렌더, 다른 17행 배지 없음. ✅
 
-- (`[SMOKE]`. canonical A/B SPD id·store copy id·source tracking·본문 hash before/after·정리 기록.)
+## 테스트 데이터 정리 결과 (`[SMOKE]`)
+
+| 항목 | id | 처리 |
+|------|----|------|
+| 매장 사본 C | `29ae7921` | **삭제**(200) |
+| offer | `30ebefdd` | **삭제**(1) |
+| SPD#1(원본 A) | `2bf8f57c` | **hidden**(교체 강등) |
+| SPD#2(canonical B) | `fd1c5a8e` | **hidden**(정리 reject) |
+| listing | `cb226dd3` | 잔존(remove 404·pending·offer0·`[SMOKE]` master → 무해 orphan) |
+| master | `33cc8fe7` | 잔존(orphan `[SMOKE]`) |
 
 ## 변경 파일 목록
 
