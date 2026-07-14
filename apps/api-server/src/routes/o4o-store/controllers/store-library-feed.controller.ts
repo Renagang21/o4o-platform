@@ -370,5 +370,110 @@ export function createStoreLibraryFeedController(
     },
   );
 
+  // ── WO-O4O-STORE-CONTENT-USAGE-TRACE-FOR-REIMPORT-V1 ─────────────────────────
+  //
+  // 매장 설명서 사본(kpa_store_contents) 1건이 어디에 쓰이는지 read-only 집계.
+  // REIMPORT-OVERWRITE(덮어쓰기) 착수 전 "이 사본이 QR/태블릿/POP/취급제품에서 사용 중인지"를
+  // 먼저 알기 위한 선행 안전장치. DB write 0 · migration 0 · 자동변경 0.
+  //
+  // 참조 방식이 자원마다 달라 단일 통합 쿼리로는 정확하지 않다(조사: IR usage-trace).
+  //   - QR            : store_qr_codes.landing_target_id (varchar soft-ref, FK 없음)
+  //   - 태블릿 진열     : store_tablet_displays.content_id (실제 FK, org 컬럼 없음 → 소유 검증으로 격리)
+  //   - 취급제품 연결   : kpa_store_content_product_links.content_id (FK)
+  //   - POP           : store_pops 직접 링크 없음 → store_asset_derivations(pop_pdf)로만 근사
+  // 미집계(솔직 표시): 태블릿 content_list 블록 JSON(contentId) / store_videos(링크 없음).
+  router.get(
+    '/contents/:id/usage',
+    requireAuth,
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const authReq = req as AuthRequest;
+        const userId = authReq.user?.id;
+        if (!userId) {
+          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
+          return;
+        }
+
+        const contentId = typeof req.params.id === 'string' ? req.params.id.trim() : '';
+        // UUID 형식 가드 — soft-ref varchar 비교(store_qr_codes)에서 임의 문자열 유입 차단.
+        const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        if (!UUID_RE.test(contentId)) {
+          res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid content id' } });
+          return;
+        }
+
+        const organizationId = await resolveDualOrgId(dataSource, userId);
+        if (!organizationId) {
+          res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Content not found' } });
+          return;
+        }
+
+        // 소유 검증 — 이 사본이 호출자 org 소유인지 먼저 확정(격리). 이후 count 는 이 id 를 권위 스코프로 사용.
+        const owned: Array<{ ok: number }> = await dataSource.query(
+          `SELECT 1 AS ok FROM kpa_store_contents WHERE id = $1 AND organization_id = $2 LIMIT 1`,
+          [contentId, organizationId],
+        );
+        if (!owned.length) {
+          res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Content not found' } });
+          return;
+        }
+
+        // 자원별 권위 소스에서 각각 count (병렬). org 컬럼이 있는 곳은 org 필터도 함께 적용.
+        const [qrRes, tabletRes, linkRes, popRes] = await Promise.all([
+          dataSource.query(
+            `SELECT COUNT(*)::int AS n FROM store_qr_codes
+              WHERE organization_id = $1 AND landing_type = 'page' AND landing_target_id = $2`,
+            [organizationId, contentId],
+          ),
+          // store_tablet_displays 에는 organization_id 컬럼이 없음(tablet_id 경유 격리).
+          // 위에서 content 가 org 소유임을 확정했으므로 content_id 참조 count 는 이미 격리됨.
+          dataSource.query(
+            `SELECT COUNT(*)::int AS n FROM store_tablet_displays WHERE content_id = $1`,
+            [contentId],
+          ),
+          dataSource.query(
+            `SELECT COUNT(*)::int AS n FROM kpa_store_content_product_links
+              WHERE organization_id = $1 AND content_id = $2`,
+            [organizationId, contentId],
+          ),
+          dataSource.query(
+            `SELECT COUNT(*)::int AS n FROM store_asset_derivations
+              WHERE organization_id = $1 AND source_kind = 'content_direct'
+                AND source_id = $2 AND derived_kind = 'pop_pdf'`,
+            [organizationId, contentId],
+          ),
+        ]);
+
+        const usage = {
+          qr: qrRes[0]?.n ?? 0,
+          tablet_display: tabletRes[0]?.n ?? 0,
+          product_link: linkRes[0]?.n ?? 0,
+          pop_pdf: popRes[0]?.n ?? 0,
+        };
+        const total = usage.qr + usage.tablet_display + usage.product_link + usage.pop_pdf;
+
+        res.json({
+          success: true,
+          data: {
+            contentId,
+            usage,
+            total,
+            // 미집계 항목을 은폐하지 않고 명시(참조 위치가 JSON 내부이거나 링크 자체가 없음).
+            coverage: {
+              tablet_content_list_block: 'not_counted', // 블록 config jsonb 내부 contentId — 인덱스 컬럼 없음
+              store_videos: 'no_link',                   // kpa_store_contents 참조 컬럼 없음
+              pop: 'approximate',                        // store_pops 직접 링크 없음 → derivation(pop_pdf) 근사
+            },
+          },
+        });
+      } catch (error: any) {
+        res.status(500).json({
+          success: false,
+          error: { code: 'INTERNAL_ERROR', message: error.message },
+        });
+      }
+    },
+  );
+
   return router;
 }

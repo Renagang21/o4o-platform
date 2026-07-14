@@ -454,4 +454,32 @@ export const storeLibraryApi = {
         message?: string;
       };
     }>(`/store-contents/${encodeURIComponent(contentId)}/reimport-source`, {}),
+
+  /**
+   * WO-O4O-STORE-CONTENT-USAGE-TRACE-FOR-REIMPORT-V1
+   * 매장 설명서 사본(:id)의 사용처 read-only 집계 (QR / 태블릿 진열 / 취급제품 / POP).
+   * REIMPORT-OVERWRITE 착수 전, "이 사본이 어디에 쓰이는지"를 표시하기 위한 선행 조회.
+   * coverage 는 미집계 항목(태블릿 블록 JSON / store_videos / POP 근사)을 명시한다.
+   */
+  getContentUsage: (contentId: string) =>
+    apiClient.get<{ success: boolean; data: StoreContentUsage }>(
+      `/store-library/contents/${encodeURIComponent(contentId)}/usage`,
+    ),
 };
+
+// WO-O4O-STORE-CONTENT-USAGE-TRACE-FOR-REIMPORT-V1
+export interface StoreContentUsage {
+  contentId: string;
+  usage: {
+    qr: number;
+    tablet_display: number;
+    product_link: number;
+    pop_pdf: number;
+  };
+  total: number;
+  coverage: {
+    tablet_content_list_block: string;
+    store_videos: string;
+    pop: string;
+  };
+}

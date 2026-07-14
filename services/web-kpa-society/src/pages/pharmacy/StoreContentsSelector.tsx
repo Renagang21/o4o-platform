@@ -24,6 +24,7 @@ import { DataTable, type Column, ActionBar } from '@o4o/ui';
 import {
   storeLibraryApi,
   type LibraryContentItem,
+  type StoreContentUsage,
 } from '../../api/assetSnapshot';
 import { colors } from '../../styles/theme';
 import type { ProductionSourceItem } from './productionTargets';
@@ -96,6 +97,19 @@ function formatDate(iso?: string | null): string {
   if (!iso) return '-';
   const d = new Date(iso);
   return Number.isNaN(d.getTime()) ? '-' : d.toLocaleDateString('ko-KR');
+}
+
+// WO-O4O-STORE-CONTENT-USAGE-TRACE-FOR-REIMPORT-V1:
+//   사용처 count 를 "QR 2 · 태블릿 1 · 취급제품 3에서 사용 중" 형태 라벨로. 0이면 자료함 전용 안내.
+//   미조회(undefined)/조회중(null)은 라벨 없음(호출부에서 렌더 생략).
+function usageSummaryLabel(u: StoreContentUsage | null | undefined): string | null {
+  if (!u) return null;
+  const parts: string[] = [];
+  if (u.usage.qr > 0) parts.push(`QR ${u.usage.qr}`);
+  if (u.usage.tablet_display > 0) parts.push(`태블릿 ${u.usage.tablet_display}`);
+  if (u.usage.product_link > 0) parts.push(`취급제품 ${u.usage.product_link}`);
+  if (u.usage.pop_pdf > 0) parts.push(`POP ${u.usage.pop_pdf}`);
+  return parts.length > 0 ? `${parts.join(' · ')}에서 사용 중` : '자료함에만 있음 (사용 중 아님)';
 }
 
 function toDocumentRow(it: LibraryContentItem): DocumentRow {
@@ -228,6 +242,10 @@ function DocumentsSection({
   // WO-O4O-STORE-IMPORTED-DESCRIPTION-REIMPORT-REPLACE-V1: 재가져오기 진행중 표식 + 내부 목록 새로고침 트리거
   const [reimportingId, setReimportingId] = useState<string | null>(null);
   const [internalReload, setInternalReload] = useState(0);
+  // WO-O4O-STORE-CONTENT-USAGE-TRACE-FOR-REIMPORT-V1:
+  //   "원본 갱신됨" 사본(direct)에 대해서만 사용처(QR/태블릿/취급제품/POP) 요약을 lazy 조회.
+  //   덮어쓰기(REIMPORT-OVERWRITE) 판단 전, 이 사본이 실제로 쓰이는지 표시하기 위함. read-only.
+  const [usageById, setUsageById] = useState<Record<string, StoreContentUsage | null>>({});
 
   // 출처 탭/태그 필터 변경 시 1페이지로 리셋
   const changeSource = useCallback((s: SourceFilter) => { setSource(s); setPage(1); }, []);
@@ -282,6 +300,42 @@ function DocumentsSection({
       return next.size === prev.size ? prev : next;
     });
   }, [rows]);
+
+  // WO-O4O-STORE-CONTENT-USAGE-TRACE-FOR-REIMPORT-V1:
+  //   현재 페이지의 "원본 갱신됨" direct 사본 각각에 대해 사용처 요약을 병렬 조회(미조회 항목만).
+  //   실패는 조용히 무시(요약 미표시) — 목록/편집 흐름에 영향 없음. rows 변경마다 신규 대상만 fetch.
+  useEffect(() => {
+    const targets = rows.filter(
+      (r) => r.origin === 'direct' && r.hasSourceUpdate && usageById[r.id] === undefined,
+    );
+    if (targets.length === 0) return;
+    let cancelled = false;
+    // 조회 시작 표식(null) — 중복 요청 방지.
+    setUsageById((prev) => {
+      const next = { ...prev };
+      for (const t of targets) next[t.id] = null;
+      return next;
+    });
+    (async () => {
+      const results = await Promise.all(
+        targets.map((t) =>
+          storeLibraryApi
+            .getContentUsage(t.id)
+            .then((res) => ({ id: t.id, usage: res?.data ?? null }))
+            .catch(() => ({ id: t.id, usage: null })),
+        ),
+      );
+      if (cancelled) return;
+      setUsageById((prev) => {
+        const next = { ...prev };
+        for (const r of results) next[r.id] = r.usage;
+        return next;
+      });
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [rows, usageById]);
 
   const handleStart = useCallback(() => {
     if (selected.size === 0) return;
@@ -420,6 +474,13 @@ function DocumentsSection({
                 원본 갱신됨
               </span>
             )}
+            {/* WO-O4O-STORE-CONTENT-USAGE-TRACE-FOR-REIMPORT-V1:
+                원본 갱신됨 사본의 사용처 요약(QR/태블릿/취급제품/POP). 덮어쓰기 판단 근거 — 표시 전용. */}
+            {row.hasSourceUpdate && usageSummaryLabel(usageById[row.id]) && (
+              <span style={styles.usageSummary} title="이 사본이 현재 사용되고 있는 위치입니다. (태블릿 블록·동영상 일부는 집계에서 제외)">
+                {usageSummaryLabel(usageById[row.id])}
+              </span>
+            )}
             {/* WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: AI 설명 콘텐츠 표식 (SSOT=aiDescriptionMode, 단일/코너 구분) */}
             {row.aiDescriptionMode && (
               <span style={{ ...styles.badge, background: '#FEF3C7', color: '#B45309', flexShrink: 0 }}>
@@ -516,7 +577,7 @@ function DocumentsSection({
         ),
       },
     ],
-    [mode, applyTag, handleReimport, reimportingId],
+    [mode, applyTag, handleReimport, reimportingId, usageById],
   );
 
   const showRemoveButton = mode === 'page' && !!onRemoveSnapshots;
@@ -848,6 +909,15 @@ const styles: Record<string, CSSProperties> = {
     fontSize: '11px',
     fontWeight: 500,
     borderRadius: '4px',
+    flexShrink: 0,
+  },
+  // WO-O4O-STORE-CONTENT-USAGE-TRACE-FOR-REIMPORT-V1: 사용처 요약 (배지 옆, 무채색 보조 텍스트)
+  usageSummary: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    fontSize: '11px',
+    fontWeight: 500,
+    color: '#92400E',
     flexShrink: 0,
   },
   // WO-O4O-KPA-CONTENT-LIST-TAG-FIELD-AND-DISPLAY-V1: 태그 chip (단순 표시)
