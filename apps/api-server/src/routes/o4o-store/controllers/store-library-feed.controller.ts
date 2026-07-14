@@ -171,7 +171,8 @@ export function createStoreLibraryFeedController(
                 -- WO-O4O-KPA-CONTENT-LIST-TAG-FIELD-AND-DISPLAY-V1: snapshot 태그는 기존 content_json 에 존재(resolver 복사).
                 --   신규 tags 컬럼이 비어있으면 content_json->'tags' 로 fallback.
                 COALESCE(NULLIF(s.tags, '[]'::jsonb), s.content_json->'tags', '[]'::jsonb) AS tags,
-                NULL::varchar AS ai_mode
+                NULL::varchar AS ai_mode,
+                NULL::jsonb AS source_metadata
               FROM o4o_asset_snapshots s
               LEFT JOIN kpa_store_asset_controls c
                 ON c.snapshot_id = s.id AND c.organization_id = s.organization_id
@@ -195,7 +196,8 @@ export function createStoreLibraryFeedController(
                 d.created_at AS sort_at,
                 NULL::varchar AS lifecycle_status,
                 COALESCE(d.tags, '[]'::jsonb) AS tags,
-                d.content_json->'aiDescription'->>'mode' AS ai_mode
+                d.content_json->'aiDescription'->>'mode' AS ai_mode,
+                d.source_metadata AS source_metadata
               FROM kpa_store_contents d
               WHERE d.organization_id = $1
                 AND d.source_type = 'direct'
@@ -213,7 +215,8 @@ export function createStoreLibraryFeedController(
                 e.created_at AS sort_at,
                 NULL::varchar AS lifecycle_status,
                 COALESCE(e.tags, '[]'::jsonb) AS tags,
-                NULL::varchar AS ai_mode
+                NULL::varchar AS ai_mode,
+                NULL::jsonb AS source_metadata
               FROM store_execution_assets e
               WHERE e.organization_id = $1
                 AND e.is_active = true
@@ -281,6 +284,46 @@ export function createStoreLibraryFeedController(
         const total = countResult[0]?.total || 0;
         const totalPages = Math.max(1, Math.ceil(total / limit));
 
+        // WO-O4O-STORE-IMPORTED-DESCRIPTION-SOURCE-UPDATE-BADGE-V1:
+        //   O4O b2c 설명서를 가져온 direct 사본(source_metadata.copiedFrom='o4o_b2c_product_description')에 대해
+        //   "원본 갱신됨" 감지. 사본의 원본 SPD id(sourceRefId)와, 같은 (master, STORE, 언어)의 현재 canonical id 비교.
+        //   교체(replace) 시 원본은 hidden 으로 강등되고 새 canonical 이 생기므로 id 가 달라진다 → 갱신됨.
+        //   자동 갱신 없음(사본 본문 무변경) — 표시 전용. migration 없음(원본 id 는 이미 source_metadata 에 보존).
+        const importRefIds = Array.from(
+          new Set(
+            (items as Array<{ origin: string; source_metadata: { copiedFrom?: string; sourceRefId?: string } | null }>)
+              .filter(
+                (r) =>
+                  r.origin === 'direct' &&
+                  r.source_metadata?.copiedFrom === 'o4o_b2c_product_description' &&
+                  !!r.source_metadata?.sourceRefId,
+              )
+              .map((r) => r.source_metadata!.sourceRefId as string),
+          ),
+        );
+        const updateBySrc = new Map<string, boolean>();
+        if (importRefIds.length) {
+          try {
+            const rows: Array<{ src_id: string; current_id: string | null }> = await dataSource.query(
+              `SELECT old.id::text AS src_id,
+                      (SELECT c.id FROM shared_product_descriptions c
+                        WHERE c.master_id = old.master_id
+                          AND c.description_type = old.description_type
+                          AND COALESCE(c.language, 'ko') = COALESCE(old.language, 'ko')
+                          AND c.status = 'canonical' AND c.deleted_at IS NULL
+                        LIMIT 1)::text AS current_id
+                 FROM shared_product_descriptions old
+                WHERE old.id = ANY($1::uuid[])`,
+              [importRefIds],
+            );
+            for (const r of rows) {
+              updateBySrc.set(r.src_id, !!r.current_id && r.current_id !== r.src_id);
+            }
+          } catch {
+            // 감지 실패 시 배지 미표시(안전). 목록 조회 자체는 계속.
+          }
+        }
+
         const normalized = (items as Array<{
           id: string;
           origin: 'snapshot' | 'direct' | 'execution-asset';
@@ -291,6 +334,7 @@ export function createStoreLibraryFeedController(
           lifecycle_status: string | null;
           tags: unknown;
           ai_mode: string | null;
+          source_metadata: { copiedFrom?: string; sourceRefId?: string } | null;
         }>).map((row) => ({
           id: row.id,
           origin: row.origin,
@@ -306,6 +350,11 @@ export function createStoreLibraryFeedController(
             : [],
           // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: AI 설명 분류 SSOT(content_json.aiDescription.mode)
           aiDescriptionMode: row.ai_mode ?? null,
+          // WO-O4O-STORE-IMPORTED-DESCRIPTION-SOURCE-UPDATE-BADGE-V1: 원본 갱신 감지(표시 전용, 사본 본문 무변경)
+          hasSourceUpdate:
+            row.origin === 'direct' && row.source_metadata?.sourceRefId
+              ? updateBySrc.get(row.source_metadata.sourceRefId) ?? false
+              : false,
         }));
 
         res.json({

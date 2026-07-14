@@ -73,6 +73,8 @@ interface DocumentRow {
   tags: string[];
   // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: AI 설명 분류 SSOT('single'|'corner'|null)
   aiDescriptionMode: string | null;
+  // WO-O4O-STORE-IMPORTED-DESCRIPTION-SOURCE-UPDATE-BADGE-V1: O4O 설명서 가져온 사본의 원본 갱신 여부(표시 전용)
+  hasSourceUpdate: boolean;
 }
 
 const keyOf = (origin: RowOrigin, id: string) => `${origin}:${id}`;
@@ -137,6 +139,7 @@ function toDocumentRow(it: LibraryContentItem): DocumentRow {
     contentJson: it.contentJson || {},
     tags: Array.isArray(it.tags) ? it.tags.filter((t): t is string => typeof t === 'string') : [],
     aiDescriptionMode: typeof it.aiDescriptionMode === 'string' ? it.aiDescriptionMode : null,
+    hasSourceUpdate: it.hasSourceUpdate === true,
   };
 }
 
@@ -378,6 +381,16 @@ function DocumentsSection({
             {/* WO-O4O-STORE-LIBRARY-CONTENTS-DIRECT-CONTENT-REENTRY-UX-V1: direct 콘텐츠 visual indicator */}
             {row.origin === 'direct' && (
               <span style={{ ...styles.badge, background: '#DCFCE7', color: '#16A34A', flexShrink: 0 }}>내 콘텐츠</span>
+            )}
+            {/* WO-O4O-STORE-IMPORTED-DESCRIPTION-SOURCE-UPDATE-BADGE-V1:
+                O4O 설명서를 가져온 사본의 원본(canonical)이 교체/갱신됨. 사본 본문은 자동으로 바뀌지 않음(표시 전용). */}
+            {row.hasSourceUpdate && (
+              <span
+                style={{ ...styles.badge, background: '#FEF3C7', color: '#B45309', flexShrink: 0 }}
+                title="원본 설명서가 갱신되었습니다. 현재 매장 사본은 자동으로 바뀌지 않습니다. 필요하면 새 원본을 다시 가져오세요."
+              >
+                원본 갱신됨
+              </span>
             )}
             {/* WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: AI 설명 콘텐츠 표식 (SSOT=aiDescriptionMode, 단일/코너 구분) */}
             {row.aiDescriptionMode && (

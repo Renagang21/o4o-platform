@@ -398,6 +398,8 @@ export interface LibraryContentItem {
   tags?: string[];
   // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: AI 설명 분류 SSOT(content_json.aiDescription.mode) — 'single'|'corner'|null
   aiDescriptionMode?: string | null;
+  // WO-O4O-STORE-IMPORTED-DESCRIPTION-SOURCE-UPDATE-BADGE-V1: O4O b2c 설명서 가져온 사본의 원본(canonical) 갱신 여부(표시 전용)
+  hasSourceUpdate?: boolean;
 }
 
 export interface PaginatedLibraryContents {
