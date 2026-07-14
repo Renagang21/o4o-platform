@@ -17,6 +17,8 @@ import {
   type ScreenSet, type ScreenSetDetail, type ScreenBlock, type ScreenBlockType, type ScreenSetStatus,
   type ContentListItem, type StoreContentSearchResult, type O4oDescriptionSearchResult,
 } from '../../api/tabletDisplays';
+// WO-O4O-KPA-TABLET-CONTENT-STANDARD-LIST-V1: library 목록을 O4O 표준 테이블로 정비(추출).
+import TabletContentLibraryList from './TabletContentLibraryList';
 
 type Toast = { type: 'success' | 'error'; message: string };
 
@@ -146,8 +148,10 @@ export default function TabletScreenSetManager({ mode, tabletId, currentScreenSe
   const reload = useCallback(async () => {
     setLoading(true);
     try {
-      const all = await fetchScreenSets();
-      // library: 매장 전체 화면 세트(비보관). corner: 이 태블릿 전용 + 매장 재사용(tabletId null).
+      // WO-O4O-KPA-TABLET-CONTENT-STANDARD-LIST-V1: library 는 상태 필터(보관 포함)를 위해 archived 도 조회.
+      //   corner 는 적용 후보만 필요 → 기존대로 비보관.
+      const all = await fetchScreenSets(isLibrary ? { includeArchived: true } : undefined);
+      // library: 매장 전체 화면 세트. corner: 이 태블릿 전용 + 매장 재사용(tabletId null).
       setSets(isLibrary ? all : all.filter((s) => s.tabletId === tabletId || s.tabletId === null));
     } catch (e: any) {
       onToast({ type: 'error', message: e?.message || '화면 세트를 불러오지 못했습니다.' });
@@ -329,15 +333,7 @@ export default function TabletScreenSetManager({ mode, tabletId, currentScreenSe
         <h3 className="text-sm font-bold text-indigo-800 flex items-center gap-2">
           <Layers className="w-4 h-4 text-indigo-600" /> {isLibrary ? '태블릿 콘텐츠 (화면 세트)' : '이 코너에 적용할 화면 세트'}
         </h3>
-        {/* 새 세트 생성은 콘텐츠(라이브러리) 모드에서만. 코너 모드는 기존 세트 교체만. */}
-        {isLibrary && (
-          <button
-            onClick={() => setCreating((v) => !v)}
-            className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-indigo-700 bg-white border border-indigo-200 rounded-lg hover:bg-indigo-50"
-          >
-            <Plus className="w-3.5 h-3.5" /> 새 세트
-          </button>
-        )}
+        {/* WO-O4O-KPA-TABLET-CONTENT-STANDARD-LIST-V1: 생성 진입('태블릿 화면 만들기')은 표준 리스트 도구막대로 이전. */}
       </div>
 
       <div className="p-4 space-y-4">
@@ -413,10 +409,26 @@ export default function TabletScreenSetManager({ mode, tabletId, currentScreenSe
           </div>
         )}
 
-        {/* WO-O4O-KPA-TABLET-TOUCH-FIRST-SCREEN-SET-CARDS-V1: 다른 화면 세트 = 카드 그리드(비교·선택·적용). */}
-        {/* WO-...-CONTENT-LIBRARY-TAB-SPLIT-V1: library=매장 전체 세트 목록 / corner=현재 사용 중 제외 나머지(교체 대상). */}
-        {(() => {
-          const listSets = isLibrary ? sets : otherSets;
+        {/* WO-O4O-KPA-TABLET-CONTENT-STANDARD-LIST-V1: library = O4O 표준 테이블
+            (검색 + 상태 필터 + 페이지네이션 + 체크 일괄 보관 + kebab 개별 작업(수정/보관)).
+            생성 진입('태블릿 화면 만들기')은 테이블 도구막대에서 제공(→ 기존 생성 폼 오픈). */}
+        {isLibrary && (
+          <TabletContentLibraryList
+            sets={sets}
+            loading={loading}
+            busy={busy}
+            usageBySet={usageBySet}
+            templateLabel={templateLabel}
+            onCreate={() => { if (confirmDiscard()) setCreating(true); }}
+            onEdit={(id) => { if (confirmDiscard()) openEdit(id); }}
+            onArchive={handleArchive}
+            onRefresh={reload}
+          />
+        )}
+
+        {/* WO-O4O-KPA-TABLET-TOUCH-FIRST-SCREEN-SET-CARDS-V1: 코너 모드 = 현재 사용 중 제외 나머지 카드 그리드(비교·선택·적용). */}
+        {!isLibrary && (() => {
+          const listSets = otherSets;
           if (loading) {
             return <div className="flex items-center gap-2 text-sm text-slate-400 py-4"><Loader2 className="w-4 h-4 animate-spin" /> 불러오는 중…</div>;
           }
