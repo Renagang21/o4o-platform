@@ -14,11 +14,15 @@ import {
   archiveScreenSet, saveScreenSetBlocks, applyCurrentScreenSet, clearCurrentScreenSet,
   // WO-O4O-KPA-TABLET-CONTENT-LIST-PICKER-UI-V1
   searchTabletStoreContents, searchTabletO4oDescriptions,
+  // WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1: 저장 전 draft → sections resolve(read-only)
+  previewScreenSet,
   type ScreenSet, type ScreenSetDetail, type ScreenBlock, type ScreenBlockType, type ScreenSetStatus,
   type ContentListItem, type StoreContentSearchResult, type O4oDescriptionSearchResult,
 } from '../../api/tabletDisplays';
 // WO-O4O-KPA-TABLET-CONTENT-STANDARD-LIST-V1: library 목록을 O4O 표준 테이블로 정비(추출).
 import TabletContentLibraryList from './TabletContentLibraryList';
+// WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1: 제작 셸 미리보기 = kiosk-core 뷰어 재사용(sections 주입 + embedded).
+import { TabletKioskPage, type TabletKioskApi, type TabletScreenResponse } from '@o4o/tablet-kiosk-core';
 
 type Toast = { type: 'success' | 'error'; message: string };
 
@@ -45,6 +49,10 @@ interface Props {
   onToast: (t: Toast) => void;
   // library 모드 전용: 각 세트가 어느 코너에 적용됐는지 표시.
   tablets?: ScreenSetUsageTablet[];
+  // WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1: 제작 셸 미리보기용(library 전용, opt-in).
+  //   kiosk-core 재사용 미리보기 = previewApi(상품 조회) + storeSlug(공개 slug). 미주입 시 미리보기 비활성.
+  previewApi?: TabletKioskApi;
+  storeSlug?: string | null;
 }
 
 const BLOCK_TYPES: { value: ScreenBlockType; label: string }[] = [
@@ -123,7 +131,7 @@ function defaultConfig(type: ScreenBlockType): Record<string, unknown> {
   }
 }
 
-export default function TabletScreenSetManager({ mode, tabletId, currentScreenSetId, onCurrentChange, onToast, tablets }: Props) {
+export default function TabletScreenSetManager({ mode, tabletId, currentScreenSetId, onCurrentChange, onToast, tablets, previewApi, storeSlug }: Props) {
   const isLibrary = mode === 'library';
   const [sets, setSets] = useState<ScreenSet[]>([]);
   const [loading, setLoading] = useState(true);
@@ -239,6 +247,8 @@ export default function TabletScreenSetManager({ mode, tabletId, currentScreenSe
             onCancel={() => setBuilder(null)}
             onSaved={() => { setBuilder(null); reload(); }}
             onToast={onToast}
+            previewApi={previewApi}
+            storeSlug={storeSlug ?? null}
           />
         ) : (
         <>
@@ -706,11 +716,13 @@ const isContentBlock = (t: ScreenBlockType) => CONTENT_BLOCK_TYPES.includes(t);
 const STRUCTURE_ADD_TYPES = BLOCK_TYPES.filter((b) => !isContentBlock(b.value));
 const CONTENT_ADD_TYPES = BLOCK_TYPES.filter((b) => isContentBlock(b.value) && b.value !== 'product_content');
 
-function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast }: {
+function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, previewApi, storeSlug }: {
   initialDetail: ScreenSetDetail | null;
   onCancel: () => void;
   onSaved: () => void;
   onToast: (t: Toast) => void;
+  previewApi?: TabletKioskApi;
+  storeSlug?: string | null;
 }) {
   const isEdit = !!initialDetail;
   const [step, setStep] = useState(0);
@@ -723,6 +735,21 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast }:
   const [structureAddType, setStructureAddType] = useState<ScreenBlockType>('corner_description');
   const [contentAddType, setContentAddType] = useState<ScreenBlockType>('content_list');
   const [saving, setSaving] = useState(false);
+
+  // WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1: 저장 전 미리보기(태블릿 / QR 모바일). 모달은 편집 상태를 잃지 않는다.
+  const canPreview = !!previewApi && !!storeSlug;
+  const [preview, setPreview] = useState<{ screen: TabletScreenResponse; view: 'tablet' | 'mobile' } | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const openPreview = async (view: 'tablet' | 'mobile') => {
+    if (!canPreview || previewLoading) return;
+    setPreviewLoading(true);
+    try {
+      const screen = await previewScreenSet({ templateKey, blocks });
+      setPreview({ screen, view });
+    } catch (e: any) {
+      onToast({ type: 'error', message: e?.message || '미리보기를 불러오지 못했습니다.' });
+    } finally { setPreviewLoading(false); }
+  };
 
   // ── dirty guard (baseline = 초기값) ──
   const baseline = useRef({
@@ -927,10 +954,23 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast }:
                 {' '}(표시 {blocks.filter((b) => b.isEnabled).length}개)
               </div>
             </div>
-            <div className="flex items-start gap-2 bg-slate-50 border border-slate-200 rounded-lg p-3 text-[11px] text-slate-500">
-              <AlertTriangle className="w-3.5 h-3.5 text-slate-400 mt-0.5 flex-shrink-0" />
-              실시간 미리보기(태블릿·QR 모바일)는 후속 단계에서 제공됩니다. 지금은 저장 후 ‘코너별 운영’ 탭에서 적용해 공개 화면을 확인할 수 있습니다.
+            {/* WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1: 저장 전 미리보기(태블릿 / QR 모바일). */}
+            <div className="flex flex-wrap gap-2">
+              <button onClick={() => openPreview('tablet')} disabled={!canPreview || previewLoading}
+                className="min-h-[44px] px-4 py-2 text-sm font-semibold text-indigo-700 bg-white border border-indigo-200 rounded-xl hover:bg-indigo-50 disabled:opacity-50 inline-flex items-center gap-1.5"
+                title={canPreview ? undefined : '매장 공개 주소를 불러오는 중이거나 미리보기를 사용할 수 없습니다.'}>
+                {previewLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Layers className="w-4 h-4" />} 태블릿 미리보기
+              </button>
+              <button onClick={() => openPreview('mobile')} disabled={!canPreview || previewLoading}
+                className="min-h-[44px] px-4 py-2 text-sm font-semibold text-indigo-700 bg-white border border-indigo-200 rounded-xl hover:bg-indigo-50 disabled:opacity-50 inline-flex items-center gap-1.5"
+                title={canPreview ? undefined : '매장 공개 주소를 불러오는 중이거나 미리보기를 사용할 수 없습니다.'}>
+                {previewLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Layers className="w-4 h-4" />} QR 모바일 미리보기
+              </button>
             </div>
+            <p className="text-[11px] text-slate-400">
+              미리보기는 현재 편집 중인 내용(저장 전)을 실제 화면으로 보여줍니다. 상품 목록·코너 콘텐츠는 매장 데이터로 조회되며, 저장 전에는 DB에 반영되지 않습니다.
+              {!canPreview && ' (매장 공개 주소를 불러오는 중이면 잠시 후 다시 시도해 주세요.)'}
+            </p>
             <button onClick={handleSave} disabled={saving || !nameValid}
               className="w-full sm:w-auto min-h-[44px] px-5 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 disabled:opacity-50 inline-flex items-center justify-center gap-2">
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} 태블릿 콘텐츠 저장
@@ -957,6 +997,44 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast }:
           </button>
         )}
       </div>
+
+      {/* WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1: 저장 전 미리보기 모달. 닫아도 편집 상태(name/blocks 등) 유지. */}
+      {preview && previewApi && (
+        <div className="fixed inset-0 z-[100000] bg-slate-900/70 flex flex-col" onClick={() => setPreview(null)} role="presentation">
+          <div className="bg-slate-900/95 text-white px-4 py-2 flex items-center justify-between gap-3 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="text-sm font-semibold whitespace-nowrap">저장 전 미리보기</span>
+              <div className="flex gap-1">
+                <button onClick={() => setPreview((p) => (p ? { ...p, view: 'tablet' } : p))}
+                  className={`px-3 py-1 text-xs font-medium rounded-full ${preview.view === 'tablet' ? 'bg-white text-slate-900' : 'bg-white/10 text-white hover:bg-white/20'}`}>
+                  태블릿
+                </button>
+                <button onClick={() => setPreview((p) => (p ? { ...p, view: 'mobile' } : p))}
+                  className={`px-3 py-1 text-xs font-medium rounded-full ${preview.view === 'mobile' ? 'bg-white text-slate-900' : 'bg-white/10 text-white hover:bg-white/20'}`}>
+                  QR 모바일
+                </button>
+              </div>
+            </div>
+            <button onClick={() => setPreview(null)} className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-medium whitespace-nowrap">
+              <X className="w-4 h-4" /> 닫기
+            </button>
+          </div>
+          <div className="flex-1 min-h-0 flex items-center justify-center p-3 overflow-auto" onClick={(e) => e.stopPropagation()}>
+            {preview.view === 'tablet' ? (
+              <div style={{ position: 'relative', overflow: 'hidden', width: 'min(100%, 1024px)', aspectRatio: '16 / 10', background: '#000', borderRadius: 12, boxShadow: '0 10px 40px rgba(0,0,0,0.5)' }}>
+                <TabletKioskPage api={previewApi} slug={storeSlug ?? undefined} previewScreen={preview.screen} embedded showQrBadge={false} />
+              </div>
+            ) : (
+              <div style={{ position: 'relative', overflow: 'hidden', width: 390, maxWidth: '100%', height: 'min(86vh, 780px)', background: '#000', borderRadius: 24, boxShadow: '0 10px 40px rgba(0,0,0,0.5)' }}>
+                <TabletKioskPage api={previewApi} slug={storeSlug ?? undefined} previewScreen={preview.screen} embedded showQrBadge={false} />
+              </div>
+            )}
+          </div>
+          <div className="bg-slate-900/90 text-slate-300 text-[11px] px-4 py-1.5 text-center flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+            저장 전 미리보기입니다. 실제 태블릿에서는 화면 크기·방향에 따라 표시가 달라질 수 있습니다. 상담 요청은 전송되지 않습니다.
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -284,6 +284,19 @@ export async function saveScreenSetBlocks(id: string, blocks: ScreenBlock[]): Pr
   return res.data;
 }
 
+// WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1: 저장 전 draft blocks 를 sections 로 resolve(read-only, DB write 없음).
+//   반환은 공개 /tablet/screen 과 동일한 TabletScreenResponse(mode='screen_set') — kiosk-core previewScreen 주입용.
+export async function previewScreenSet(input: { templateKey?: string | null; blocks: ScreenBlock[] }): Promise<TabletScreenResponse> {
+  const res = await request<{ success: boolean; data: TabletScreenResponse }>(`${BASE}/screen-sets/preview`, {
+    method: 'POST',
+    body: JSON.stringify({
+      templateKey: input.templateKey ?? undefined,
+      blocks: input.blocks.map((b, i) => ({ blockType: b.blockType, sortOrder: i, isEnabled: b.isEnabled, config: b.config })),
+    }),
+  });
+  return res.data;
+}
+
 // WO-O4O-KPA-TABLET-CONTENT-LIST-PICKER-UI-V1: content_list picker 검색(read-only).
 export async function searchTabletStoreContents(q: string): Promise<StoreContentSearchResult[]> {
   const res = await request<{ success: boolean; data: StoreContentSearchResult[] }>(
@@ -365,7 +378,7 @@ export async function fetchProductPool(
 
 // ==================== Idle Playlist (WO-O4O-TABLET-IDLE-PLAYLIST-EDITOR-V1) ====================
 
-import type { IdlePlaylistItem } from '@o4o/tablet-kiosk-core';
+import type { IdlePlaylistItem, TabletScreenResponse } from '@o4o/tablet-kiosk-core';
 
 /**
  * Tablet idle playlist 조회 (admin).

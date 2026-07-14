@@ -43,9 +43,13 @@ import { StoreProductProfile } from '../../modules/store-core/entities/StoreProd
 import { validateGtin } from '../../utils/gtin.js';
 import { createRequireStoreOwner } from '../../utils/store-owner.utils.js';
 // WO-O4O-KPA-TABLET-IDLE-BLOCK-INTEGRATION-V1: idle_media block config 검증 (dual-read helper 모듈)
-import { parseIdleMediaConfig } from './store-tablet-idle-block.js';
+import { parseIdleMediaConfig, resolveIdleMediaItems } from './store-tablet-idle-block.js';
 // WO-O4O-KPA-TABLET-CONTENT-LIST-BLOCK-SCHEMA-CONTRACT-V1: content_list config 검증
 import { parseContentListConfig } from './store-tablet-content-list-block.js';
+// WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1: 저장 전 draft blocks → sections resolve(read-only) 재사용.
+//   공개 /tablet/screen 핸들러와 동일한 resolve 함수(SELECT only)를 관리 라우터에서 재사용한다.
+import { resolveContentListItems } from './store-public/store-public-tablet-content-resolve.js';
+import { shapeStaticBlock, resolveTemplateKey } from './store-public/store-public-tablet-screen.js';
 
 type AuthMiddleware = import('express').RequestHandler;
 
@@ -1356,6 +1360,66 @@ export function createStoreTabletRoutes(
     } catch (error: any) {
       console.error('[StoreTablet] PUT /screen-sets/:id/blocks error:', error);
       res.status(500).json({ success: false, error: 'Failed to save blocks', code: 'INTERNAL_ERROR' });
+    }
+  }));
+
+  // POST /screen-sets/preview — 저장 전 draft blocks 를 sections 로 resolve(read-only). WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1
+  //   공개 /:slug/tablet/screen 핸들러와 동일한 resolve 로직을 body.blocks 로 복제(저장/DB write 없음).
+  //   - content_list: resolveContentListItems(org 스코프) — 공개와 동일 게이트.
+  //   - idle_media: custom_media 는 config 자체 items 로 완전 resolve. draft 는 tablet 미지정 → legacy/operator 소스 빈 배열.
+  //   - product_list: 뷰어가 /tablet/products 로 별도 표시하므로 sections 에서 생략(상품은 fetchProducts 로 노출).
+  //   - 정적 텍스트(corner_description/health_info/staff_inquiry/qr_guide): shapeStaticBlock.
+  //   개별 block 실패는 해당 섹션만 생략(안전 fallback). screen_set 소유 검증 불필요(저장 안 함, org 스코프만).
+  router.post('/screen-sets/preview', withStoreAuth(async (req, res, organizationId) => {
+    try {
+      let templateKey = resolveTemplateKey({ templateKey: req.body?.templateKey });
+      if (!SET_TEMPLATE_KEYS_ALLOWED.includes(templateKey)) templateKey = 'corner_information_basic_v1';
+
+      const rawBlocks = Array.isArray(req.body?.blocks) ? req.body.blocks : [];
+      const visible = rawBlocks
+        .map((b: any, i: number) => ({ b, i }))
+        .filter(({ b }: any) => b && typeof b === 'object' && b.isEnabled !== false && SET_BLOCK_TYPES.includes(b.blockType))
+        .sort((x: any, y: any) => {
+          const sx = Number.isFinite(x.b.sortOrder) ? x.b.sortOrder : x.i;
+          const sy = Number.isFinite(y.b.sortOrder) ? y.b.sortOrder : y.i;
+          return sx - sy;
+        });
+
+      const sections: Array<{ blockType: string; sortOrder: number; data: Record<string, unknown> }> = [];
+      let order = 0;
+      for (const { b } of visible) {
+        const bt = b.blockType as string;
+        const config = (b.config && typeof b.config === 'object' && !Array.isArray(b.config)) ? b.config : {};
+        try {
+          if (bt === 'content_list') {
+            const items = await resolveContentListItems(dataSource, organizationId, config);
+            if (items.length > 0) sections.push({ blockType: bt, sortOrder: order++, data: { items } });
+          } else if (bt === 'idle_media') {
+            const parsed = parseIdleMediaConfig(config);
+            if (parsed.ok) {
+              // draft: legacy_idle_playlist / operator_common 은 tablet 저장소 필요 → 빈 소스. custom_media 만 완전 resolve.
+              const resolved = resolveIdleMediaItems(parsed.value, { legacyIdlePlaylist: [], operatorCommon: [] });
+              const items = resolved.map((it) => ({ type: it.mediaType, url: it.url, ...(it.durationMs !== undefined ? { durationMs: it.durationMs } : {}) }));
+              if (items.length > 0) sections.push({ blockType: bt, sortOrder: order++, data: { items } });
+            }
+          } else if (bt === 'product_content') {
+            sections.push({ blockType: bt, sortOrder: order++, data: { productRef: config.productRef ?? null, contentId: config.contentId ?? null } });
+          } else if (bt === 'product_list') {
+            // 뷰어가 fetchProducts 로 상품을 별도 표시 → preview sections 에서 생략.
+            continue;
+          } else {
+            const data = shapeStaticBlock(bt, config);
+            if (data) sections.push({ blockType: bt, sortOrder: order++, data });
+          }
+        } catch (blockErr) {
+          console.warn(`[StoreTablet] preview block resolve skipped (${bt}):`, (blockErr as any)?.message);
+        }
+      }
+
+      res.json({ success: true, data: { mode: 'screen_set', templateKey, screenSet: { id: 'preview', name: '(미리보기)' }, sections, tabletId: null } });
+    } catch (error: any) {
+      console.error('[StoreTablet] POST /screen-sets/preview error:', error);
+      res.status(500).json({ success: false, error: 'Failed to build preview', code: 'INTERNAL_ERROR' });
     }
   }));
 

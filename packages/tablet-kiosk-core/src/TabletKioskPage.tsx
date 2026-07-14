@@ -311,6 +311,19 @@ export interface TabletKioskPageProps {
    * WO-O4O-KPA-TABLET-PREVIEW-V1.
    */
   slug?: string;
+  /**
+   * Screen 직접 주입(opt-in). WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1.
+   * 지정 시 api.fetchScreen 을 호출하지 않고 이 sections 로 렌더(저장 전 draft 미리보기).
+   * mode='screen_set' 인 응답만 의미 있음. 상품은 여전히 api.fetchProducts(slug) 로 조회.
+   * 미지정 서비스/경로는 기존 동작(fetchScreen) 그대로.
+   */
+  previewScreen?: TabletScreenResponse | null;
+  /**
+   * embedded(미리보기 모달) 모드. WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1.
+   * true 면 root/모달을 position:fixed(뷰포트 전체화면) 대신 position:absolute(부모 박스 채움)로 렌더.
+   * 부모는 position:relative; overflow:hidden 컨테이너를 제공해야 한다. 미지정=기존 전체화면 kiosk.
+   */
+  embedded?: boolean;
 }
 
 export interface TabletKioskDisplaySettings {
@@ -328,9 +341,13 @@ export function TabletKioskPage({
   idlePlaylist,
   displaySettings,
   slug: slugProp,
+  previewScreen,
+  embedded = false,
 }: TabletKioskPageProps) {
   const { slug: routeSlug } = useParams<{ slug: string }>();
   const slug = slugProp ?? routeSlug;
+  // WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1: embedded 면 root/모달의 position:fixed → absolute(부모 박스 채움).
+  const rootStyle = embedded ? { ...styles.fullscreen, position: 'absolute' as const } : styles.fullscreen;
   const [state, dispatch] = useReducer(reducer, initialState);
   const {
     mode,
@@ -401,15 +418,19 @@ export function TabletKioskPage({
   // WO-O4O-KPA-TABLET-KIOSK-CORE-SCREEN-CONSUMER-V1:
   //   적용된 Screen Set 을 opt-in 으로 읽는다. api.fetchScreen 미주입이거나 응답 mode='legacy'
   //   → screen=null → 기존 /products+/idle 동작 그대로. 미주입 서비스(K-Cosmetics 등) 무영향.
-  const [screen, setScreen] = useState<TabletScreenResponse | null>(null);
+  const [fetchedScreen, setFetchedScreen] = useState<TabletScreenResponse | null>(null);
   useEffect(() => {
+    // WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1: previewScreen 주입 시 fetch 생략(draft sections 사용).
+    if (previewScreen) return;
     if (!slug || !api.fetchScreen) return;
     let cancelled = false;
     api.fetchScreen(slug)
-      .then((s) => { if (!cancelled) setScreen(s && s.mode === 'screen_set' ? s : null); })
-      .catch(() => { if (!cancelled) setScreen(null); });
+      .then((s) => { if (!cancelled) setFetchedScreen(s && s.mode === 'screen_set' ? s : null); })
+      .catch(() => { if (!cancelled) setFetchedScreen(null); });
     return () => { cancelled = true; };
-  }, [slug, api]);
+  }, [slug, api, previewScreen]);
+  // 주입 우선(previewScreen) → 없으면 fetch 결과. mode='screen_set' 인 것만 유효.
+  const screen = (previewScreen && previewScreen.mode === 'screen_set') ? previewScreen : fetchedScreen;
 
   // Screen Set sections → 화면 요소(코너 설명 / QR 안내 / 대기 미디어). screen=null 이면 전부 미적용(legacy).
   const screenSections = screen?.sections ?? [];
@@ -562,7 +583,7 @@ export function TabletKioskPage({
   // ── Error view ──
   if (mode === 'error' || (errorMessage && mode !== 'submitted')) {
     return (
-      <div style={styles.fullscreen}>
+      <div style={rootStyle}>
         <div style={styles.centerMessage}>
           <div style={{ fontSize: '48px', marginBottom: '16px' }}>!</div>
           <h2 style={{ fontSize: '24px', marginBottom: '8px' }}>오류 발생</h2>
@@ -580,7 +601,7 @@ export function TabletKioskPage({
     const st = interestStatus ? statusLabels[interestStatus.status] : statusLabels.REQUESTED;
     const isDone = interestStatus?.status === 'COMPLETED' || interestStatus?.status === 'CANCELLED';
     return (
-      <div style={styles.fullscreen}>
+      <div style={rootStyle}>
         <div style={styles.centerMessage}>
           <div style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: st.color + '20', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
             <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: st.color }} />
@@ -620,7 +641,7 @@ export function TabletKioskPage({
     const showLangSwitch = localeKeys.length > 0;
 
     return (
-      <div style={styles.fullscreen}>
+      <div style={rootStyle}>
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column' as const, overflow: 'auto' }}>
           {/* Product Image */}
           <div style={styles.detailImageArea}>
@@ -768,7 +789,7 @@ export function TabletKioskPage({
 
   // ── Browse view ──
   return (
-    <div style={styles.fullscreen}>
+    <div style={rootStyle}>
       {/* WO-O4O-KPA-TABLET-TEMPLATE-THREE-PATTERNS-V1 — 대기 영상형(idle_touch_video):
           상단 hero 영상(idle_media 첫 항목) + 한/영 터치 유도 오버레이 + QR chip. 그 아래로 기존
           섹션(코너 설명/콘텐츠/상품)이 이어져 터치 탐색이 가능하다. */}
@@ -935,7 +956,7 @@ export function TabletKioskPage({
       {/* WO-O4O-KPA-TABLET-CONTENT-LIST-BLOCK-RUNTIME-V1: content_list 카드 상세(모달).
           detail.html 은 ContentRenderer(DOMPurify)로만 렌더 — raw innerHTML 금지. */}
       {openContentCard && (
-        <div style={styles.contentModalOverlay} onClick={() => setOpenContentCard(null)} role="presentation">
+        <div style={embedded ? { ...styles.contentModalOverlay, position: 'absolute' as const } : styles.contentModalOverlay} onClick={() => setOpenContentCard(null)} role="presentation">
           <div style={styles.contentModal} onClick={(e) => e.stopPropagation()}>
             <div style={styles.contentModalHeader}>
               <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '4px', minWidth: 0 }}>

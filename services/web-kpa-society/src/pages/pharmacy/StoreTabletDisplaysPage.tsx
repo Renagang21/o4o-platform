@@ -1568,6 +1568,8 @@ export default function StoreTabletDisplaysPage() {
             currentScreenSetId={null}
             onToast={setToast}
             tablets={tablets}
+            previewApi={previewApi}
+            storeSlug={storeSlug}
           />
         </div>
       )}
