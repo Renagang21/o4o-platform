@@ -7,7 +7,7 @@
  *   적용된 Screen Set 은 공개 GET /:slug/tablet/screen → kiosk-core 뷰어에 반영됨(PUBLIC-RUNTIME-READ 완료).
  *   기존 legacy 진열/대기화면 편집 영역은 그대로 유지(이 컴포넌트는 additive).
  */
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Loader2, Plus, ChevronUp, ChevronDown, X, Save, Layers, AlertTriangle, LayoutTemplate } from 'lucide-react';
 import {
   fetchScreenSets, fetchScreenSet, createScreenSet, updateScreenSet,
@@ -100,7 +100,6 @@ const templateLabel = (key: string | null | undefined) =>
 
 // WO-O4O-KPA-TABLET-SCREEN-SET-DIRTY-GUARD-V1: 미저장 변경 경고 문구 + 블록 비교 정규화
 const DISCARD_MSG = '저장되지 않은 변경이 있습니다.\n저장하지 않고 이동하면 변경사항이 사라질 수 있습니다.\n계속하시겠습니까?';
-const APPLY_DIRTY_MSG = '저장되지 않은 변경이 있습니다.\n먼저 저장하지 않고 적용하면 현재 편집 중인 변경사항이 반영되지 않을 수 있습니다.\n계속 적용하시겠습니까?';
 // 블록 dirty 비교: 타입/표시여부/config + 순서만(서버 sort_order 는 위치 기반 재정규화 → 값 무시).
 const normalizeBlocks = (bs: ScreenBlock[]) =>
   JSON.stringify(bs.map((b) => ({ t: b.blockType, e: b.isEnabled, c: b.config ?? {} })));
@@ -130,20 +129,9 @@ export default function TabletScreenSetManager({ mode, tabletId, currentScreenSe
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
 
-  const [creating, setCreating] = useState(false);
-  const [newName, setNewName] = useState('');
-  // WO-O4O-KPA-TABLET-TEMPLATE-SELECTION-EDITOR-V1: 생성 폼 템플릿 선택(기본값 = corner_information_basic_v1).
-  const [newTemplateKey, setNewTemplateKey] = useState(DEFAULT_TEMPLATE_KEY);
-
-  const [editDetail, setEditDetail] = useState<ScreenSetDetail | null>(null);
-  const [editName, setEditName] = useState('');
-  const [editStatus, setEditStatus] = useState<ScreenSetStatus>('draft');
-  // WO-O4O-KPA-TABLET-TEMPLATE-SELECTION-EDITOR-V1: 편집 폼 템플릿 선택(GET 값으로 초기화).
-  const [editTemplateKey, setEditTemplateKey] = useState(DEFAULT_TEMPLATE_KEY);
-  const [blocks, setBlocks] = useState<ScreenBlock[]>([]);
-  const [savingSet, setSavingSet] = useState(false);
-  const [savingBlocks, setSavingBlocks] = useState(false);
-  const [addType, setAddType] = useState<ScreenBlockType>('idle_media');
+  // WO-O4O-KPA-TABLET-CONTENT-STEP-BUILDER-SHELL-V1: 인라인 생성/편집 UI → 단계형 제작 셸.
+  //   builder=null → 리스트. builder.detail=null → 신규 제작. builder.detail=존재 → 기존 수정(hydrate).
+  const [builder, setBuilder] = useState<{ detail: ScreenSetDetail | null } | null>(null);
 
   const reload = useCallback(async () => {
     setLoading(true);
@@ -172,78 +160,21 @@ export default function TabletScreenSetManager({ mode, tabletId, currentScreenSe
 
   useEffect(() => { reload(); }, [reload]);
 
+  // WO-O4O-KPA-TABLET-CONTENT-STEP-BUILDER-SHELL-V1: 수정 진입 = 상세 hydrate 후 제작 셸.
   const openEdit = useCallback(async (id: string) => {
     try {
       const detail = await fetchScreenSet(id);
-      setEditDetail(detail);
-      setEditName(detail.name);
-      setEditStatus(detail.status);
-      // templateKey 미지정/null 이면 기본 템플릿으로 표시(WO §5).
-      setEditTemplateKey(detail.templateKey ?? DEFAULT_TEMPLATE_KEY);
-      setBlocks(detail.blocks.map((b) => ({ ...b, config: b.config ?? {} })));
+      setBuilder({ detail });
     } catch (e: any) {
       onToast({ type: 'error', message: e?.message || '세트 상세를 불러오지 못했습니다.' });
     }
   }, [onToast]);
 
-  const closeEdit = () => { setEditDetail(null); setBlocks([]); };
-
-  const handleCreate = async () => {
-    const name = newName.trim();
-    if (!name) return;
-    // 생성 성공 시 새 세트 편집으로 전환 → 현재 편집 중 미저장 변경 손실 방지
-    if (!confirmDiscard()) return;
-    setBusy(true);
-    try {
-      // WO-O4O-KPA-TABLET-TEMPLATE-SELECTION-EDITOR-V1: 선택한 templateKey 를 명시 전송(Phase 1 = 기본형).
-      // library 모드는 매장 재사용 세트(tabletId=null)로 생성.
-      const created = await createScreenSet({ name, tabletId: isLibrary ? null : tabletId, templateKey: newTemplateKey });
-      setNewName(''); setNewTemplateKey(DEFAULT_TEMPLATE_KEY); setCreating(false);
-      onToast({ type: 'success', message: `화면 세트 "${created.name}" 생성됨` });
-      await reload();
-      openEdit(created.id);
-    } catch (e: any) {
-      onToast({ type: 'error', message: e?.message || '생성에 실패했습니다.' });
-    } finally { setBusy(false); }
-  };
-
-  const handleSaveSet = async () => {
-    if (!editDetail) return;
-    const nm = editName.trim();
-    if (!nm) return;
-    setSavingSet(true);
-    try {
-      // WO-O4O-KPA-TABLET-TEMPLATE-SELECTION-EDITOR-V1: templateKey 를 함께 저장(명시 전송).
-      const updated = await updateScreenSet(editDetail.id, { name: nm, status: editStatus, templateKey: editTemplateKey });
-      // WO-...-DIRTY-GUARD-V1: baseline 갱신 → infoDirty 해제
-      setEditDetail((prev) => (prev ? { ...prev, name: updated.name, status: updated.status, templateKey: updated.templateKey } : prev));
-      setEditName(updated.name); setEditStatus(updated.status); setEditTemplateKey(updated.templateKey ?? DEFAULT_TEMPLATE_KEY);
-      onToast({ type: 'success', message: '세트 정보가 저장되었습니다.' });
-      await reload();
-    } catch (e: any) {
-      onToast({ type: 'error', message: e?.message || '저장에 실패했습니다.' });
-    } finally { setSavingSet(false); }
-  };
-
-  const handleSaveBlocks = async () => {
-    if (!editDetail) return;
-    setSavingBlocks(true);
-    try {
-      const saved = await saveScreenSetBlocks(editDetail.id, blocks);
-      const normalized = saved.map((b) => ({ ...b, config: b.config ?? {} }));
-      setBlocks(normalized);
-      // WO-...-DIRTY-GUARD-V1: baseline 갱신 → blocksDirty 해제
-      setEditDetail((prev) => (prev ? { ...prev, blocks: normalized } : prev));
-      onToast({ type: 'success', message: '블록이 저장되었습니다.' });
-      await reload();
-    } catch (e: any) {
-      onToast({ type: 'error', message: e?.message || '블록 저장에 실패했습니다. (config 형식 확인)' });
-    } finally { setSavingBlocks(false); }
-  };
+  // 신규 제작 진입(빈 셸).
+  const openCreate = useCallback(() => setBuilder({ detail: null }), []);
 
   const handleApply = async (set: ScreenSet) => {
     if (busy || !tabletId) return; // 교체(적용)는 corner 모드 전용 — tabletId 필수
-    if (!confirmDiscard(APPLY_DIRTY_MSG)) return; // 미저장 변경은 적용에 반영 안 됨 경고
     setBusy(true);
     try {
       if (set.status !== 'active') {
@@ -260,7 +191,6 @@ export default function TabletScreenSetManager({ mode, tabletId, currentScreenSe
 
   const handleClear = async () => {
     if (busy || !tabletId) return;
-    if (!confirmDiscard()) return;
     setBusy(true);
     try {
       await clearCurrentScreenSet(tabletId);
@@ -274,12 +204,10 @@ export default function TabletScreenSetManager({ mode, tabletId, currentScreenSe
 
   const handleArchive = async (set: ScreenSet) => {
     if (busy) return;
-    if (editDetail?.id === set.id && !confirmDiscard()) return; // 편집 중인 세트 보관 시 미저장 변경 경고
     if (!window.confirm(`"${set.name}" 세트를 보관하시겠습니까? 목록에서 숨겨지며, 적용 중인 세트는 먼저 적용 해제해야 합니다.`)) return;
     setBusy(true);
     try {
       await archiveScreenSet(set.id);
-      if (editDetail?.id === set.id) closeEdit();
       onToast({ type: 'success', message: '세트를 보관했습니다.' });
       await reload();
     } catch (e: any) {
@@ -290,42 +218,9 @@ export default function TabletScreenSetManager({ mode, tabletId, currentScreenSe
     } finally { setBusy(false); }
   };
 
-  // ── block 편집 helpers ──
-  const addBlock = () => setBlocks((prev) => [...prev, { blockType: addType, sortOrder: prev.length, isEnabled: true, config: defaultConfig(addType) }]);
-  const removeBlock = (i: number) => setBlocks((prev) => prev.filter((_, idx) => idx !== i));
-  const toggleBlock = (i: number) => setBlocks((prev) => prev.map((b, idx) => (idx === i ? { ...b, isEnabled: !b.isEnabled } : b)));
-  const moveBlock = (i: number, dir: 'up' | 'down') => setBlocks((prev) => {
-    const t = dir === 'up' ? i - 1 : i + 1;
-    if (t < 0 || t >= prev.length) return prev;
-    const next = [...prev];
-    [next[i], next[t]] = [next[t], next[i]];
-    return next;
-  });
-  const patchConfig = (i: number, patch: Record<string, unknown>) =>
-    setBlocks((prev) => prev.map((b, idx) => (idx === i ? { ...b, config: { ...b.config, ...patch } } : b)));
-
   const currentSet = sets.find((s) => s.id === currentScreenSetId) || null;
   // WO-O4O-KPA-TABLET-TOUCH-FIRST-SCREEN-SET-CARDS-V1: 현재 적용 세트를 제외한 나머지(카드 그리드).
   const otherSets = sets.filter((s) => s.id !== currentScreenSetId);
-
-  // ── Dirty Guard (WO-O4O-KPA-TABLET-SCREEN-SET-DIRTY-GUARD-V1) ──
-  //   세트 정보(이름/상태/템플릿)·블록을 baseline(editDetail)과 비교. 저장 성공 시 editDetail 갱신 → dirty 해제.
-  const infoDirty = !!editDetail && (
-    editName.trim() !== editDetail.name ||
-    editStatus !== editDetail.status ||
-    editTemplateKey !== (editDetail.templateKey ?? DEFAULT_TEMPLATE_KEY)
-  );
-  const blocksDirty = !!editDetail && normalizeBlocks(blocks) !== normalizeBlocks(editDetail.blocks ?? []);
-  const isDirty = infoDirty || blocksDirty;
-  const confirmDiscard = (msg = DISCARD_MSG) => !isDirty || window.confirm(msg);
-
-  // 브라우저 새로고침/닫기 이탈 경고 (미저장 변경 시)
-  useEffect(() => {
-    if (!isDirty) return;
-    const h = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = ''; };
-    window.addEventListener('beforeunload', h);
-    return () => window.removeEventListener('beforeunload', h);
-  }, [isDirty]);
 
   return (
     <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-indigo-100">
@@ -337,6 +232,16 @@ export default function TabletScreenSetManager({ mode, tabletId, currentScreenSe
       </div>
 
       <div className="p-4 space-y-4">
+        {/* WO-O4O-KPA-TABLET-CONTENT-STEP-BUILDER-SHELL-V1: library 제작/수정은 단계형 제작 셸이 화면을 전환(takeover). */}
+        {isLibrary && builder ? (
+          <TabletContentStepBuilder
+            initialDetail={builder.detail}
+            onCancel={() => setBuilder(null)}
+            onSaved={() => { setBuilder(null); reload(); }}
+            onToast={onToast}
+          />
+        ) : (
+        <>
         {/* 필수 경고 — 코너 모드(교체=공개 반영)에서만 */}
         {!isLibrary && (
           <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg p-3">
@@ -388,30 +293,9 @@ export default function TabletScreenSetManager({ mode, tabletId, currentScreenSe
         </div>
         )}
 
-        {/* 새 세트 생성 폼 — 콘텐츠(라이브러리) 모드 전용 */}
-        {isLibrary && creating && (
-          <div className="space-y-2 border border-slate-100 rounded-lg p-3 bg-slate-50/60">
-            <div className="flex gap-2 items-center">
-              <input
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
-                placeholder="세트 이름 (예: 입마름·구취 관리 세트)"
-                className="flex-1 px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                autoFocus
-              />
-              <button onClick={handleCreate} disabled={busy || !newName.trim()} className="px-3 py-2 text-xs font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 whitespace-nowrap">
-                만들기
-              </button>
-            </div>
-            {/* WO-O4O-KPA-TABLET-TEMPLATE-SELECTION-EDITOR-V1: 생성 시 템플릿 선택 */}
-            <TemplateSelectField value={newTemplateKey} onChange={setNewTemplateKey} />
-          </div>
-        )}
-
         {/* WO-O4O-KPA-TABLET-CONTENT-STANDARD-LIST-V1: library = O4O 표준 테이블
             (검색 + 상태 필터 + 페이지네이션 + 체크 일괄 보관 + kebab 개별 작업(수정/보관)).
-            생성 진입('태블릿 화면 만들기')은 테이블 도구막대에서 제공(→ 기존 생성 폼 오픈). */}
+            생성/수정 진입은 단계형 제작 셸(builder)로 전환. */}
         {isLibrary && (
           <TabletContentLibraryList
             sets={sets}
@@ -419,165 +303,43 @@ export default function TabletScreenSetManager({ mode, tabletId, currentScreenSe
             busy={busy}
             usageBySet={usageBySet}
             templateLabel={templateLabel}
-            onCreate={() => { if (confirmDiscard()) setCreating(true); }}
-            onEdit={(id) => { if (confirmDiscard()) openEdit(id); }}
+            onCreate={openCreate}
+            onEdit={openEdit}
             onArchive={handleArchive}
             onRefresh={reload}
           />
         )}
 
         {/* WO-O4O-KPA-TABLET-TOUCH-FIRST-SCREEN-SET-CARDS-V1: 코너 모드 = 현재 사용 중 제외 나머지 카드 그리드(비교·선택·적용). */}
-        {!isLibrary && (() => {
-          const listSets = otherSets;
-          if (loading) {
-            return <div className="flex items-center gap-2 text-sm text-slate-400 py-4"><Loader2 className="w-4 h-4 animate-spin" /> 불러오는 중…</div>;
-          }
-          if (listSets.length === 0) {
-            return isLibrary ? (
-              <div className="text-center py-8 space-y-3">
-                <p className="text-sm text-slate-500">아직 화면 세트가 없습니다. 코너에 보여줄 첫 화면 세트(콘텐츠)를 만들어 주세요.</p>
-                <button onClick={() => setCreating(true)} className="inline-flex items-center gap-1.5 min-h-[44px] px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700">
-                  <Plus className="w-4 h-4" /> 첫 화면 세트 만들기
-                </button>
-              </div>
-            ) : (
-              <div className="text-center py-6 text-sm text-slate-500">
-                이 코너에 적용할 수 있는 화면 세트가 없습니다.<br />
-                <b>태블릿 콘텐츠</b> 탭에서 화면 세트를 먼저 만들어 주세요.
-              </div>
-            );
-          }
-          return (
-            <div className="space-y-2">
-              <div className="text-xs font-semibold text-slate-600">{isLibrary ? '화면 세트 목록' : '다른 화면 세트'}</div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {listSets.map((s) => {
-                  const usedCorners = isLibrary ? (usageBySet[s.id] ?? []) : [];
-                  return (
-                    <div
-                      key={s.id}
-                      onClick={isLibrary ? () => { if (confirmDiscard()) openEdit(s.id); } : undefined}
-                      className={`rounded-xl border border-slate-200 bg-white p-3 flex flex-col gap-2 transition ${isLibrary ? 'cursor-pointer hover:border-indigo-200 hover:shadow-sm' : ''}`}
-                    >
-                      <div className="min-w-0">
-                        <div className="text-sm font-bold text-slate-800 truncate flex items-center gap-1.5">
-                          {s.name}
-                          {s.tabletId === null && <span className="text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded flex-shrink-0">재사용</span>}
-                        </div>
-                        <div className="text-[11px] text-slate-400">{STATUS_LABEL[s.status]} · {templateLabel(s.templateKey)} · 블록 {s.blockCount ?? 0}개</div>
-                        {/* library: 사용 중인 코너 */}
-                        {isLibrary && (
-                          usedCorners.length > 0 ? (
-                            <div className="mt-1 flex items-center gap-1 flex-wrap">
-                              <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">사용 중</span>
-                              <span className="text-[11px] text-slate-500 truncate">{usedCorners.join(', ')}</span>
-                            </div>
-                          ) : (
-                            <div className="mt-1 text-[11px] text-slate-400">사용 중인 코너 없음</div>
-                          )
-                        )}
-                      </div>
-                      {isLibrary ? (
-                        <div className="flex gap-2 mt-auto items-center">
-                          {/* 미리보기는 후속 PREVIEW-MODAL WO — 자리만 준비(비활성). */}
-                          <button disabled title="미리보기는 후속 단계에서 제공됩니다." className="min-h-[44px] px-3 py-2 text-sm font-medium text-slate-400 bg-slate-50 border border-slate-200 rounded-xl cursor-not-allowed">미리보기</button>
-                          <button onClick={(e) => { e.stopPropagation(); if (confirmDiscard()) openEdit(s.id); }} className="flex-1 min-h-[44px] px-3 py-2 text-sm font-semibold text-indigo-700 bg-white border border-indigo-200 rounded-xl hover:bg-indigo-50">수정</button>
-                          <button onClick={(e) => { e.stopPropagation(); handleArchive(s); }} disabled={busy} className="min-h-[44px] px-3 py-2 text-sm font-medium text-slate-500 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 disabled:opacity-50" title="목록에서 숨김(보관)">보관</button>
-                        </div>
-                      ) : (
-                        <div className="flex gap-2 mt-auto items-center">
-                          <button onClick={(e) => { e.stopPropagation(); handleApply(s); }} disabled={busy} className="flex-1 min-h-[44px] px-3 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 disabled:opacity-50">이 화면 사용</button>
-                        </div>
-                      )}
+        {!isLibrary && (loading ? (
+          <div className="flex items-center gap-2 text-sm text-slate-400 py-4"><Loader2 className="w-4 h-4 animate-spin" /> 불러오는 중…</div>
+        ) : otherSets.length === 0 ? (
+          <div className="text-center py-6 text-sm text-slate-500">
+            이 코너에 적용할 수 있는 화면 세트가 없습니다.<br />
+            <b>태블릿 콘텐츠</b> 탭에서 화면 세트를 먼저 만들어 주세요.
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <div className="text-xs font-semibold text-slate-600">다른 화면 세트</div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {otherSets.map((s) => (
+                <div key={s.id} className="rounded-xl border border-slate-200 bg-white p-3 flex flex-col gap-2 transition">
+                  <div className="min-w-0">
+                    <div className="text-sm font-bold text-slate-800 truncate flex items-center gap-1.5">
+                      {s.name}
+                      {s.tabletId === null && <span className="text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded flex-shrink-0">재사용</span>}
                     </div>
-                  );
-                })}
-              </div>
-              {isLibrary && (
-                <button onClick={() => setCreating(true)} className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 min-h-[44px] px-4 py-2 text-sm font-semibold text-indigo-700 bg-white border border-indigo-200 rounded-xl hover:bg-indigo-50">
-                  <Plus className="w-4 h-4" /> 새 화면 세트 만들기
-                </button>
-              )}
-            </div>
-          );
-        })()}
-
-        {/* 편집 패널 — 콘텐츠(라이브러리) 모드 전용 */}
-        {isLibrary && editDetail && (
-          <div className="border border-indigo-100 rounded-lg p-3 space-y-3 bg-indigo-50/30">
-            <div className="flex items-center justify-between gap-2">
-              <h4 className="text-sm font-bold text-slate-700 flex items-center gap-2">
-                세트 편집
-                {isDirty && <span className="text-[10px] font-semibold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">변경됨</span>}
-              </h4>
-              <button onClick={() => { if (confirmDiscard()) closeEdit(); }} className="text-slate-400 hover:text-slate-600"><X className="w-4 h-4" /></button>
-            </div>
-
-            {/* WO-O4O-KPA-TABLET-SCREEN-SET-DIRTY-GUARD-V1: 미저장 변경 경고 배너 */}
-            {isDirty && (
-              <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-[11px] text-amber-800">
-                <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
-                저장되지 않은 변경이 있습니다. 변경사항을 유지하려면 저장해 주세요.
-              </div>
-            )}
-            <div className="flex gap-2 items-center flex-wrap">
-              <input value={editName} onChange={(e) => setEditName(e.target.value)} className="flex-1 min-w-[160px] px-3 py-2 rounded-lg border border-slate-200 text-sm" placeholder="세트 이름" />
-              <select value={editStatus} onChange={(e) => setEditStatus(e.target.value as ScreenSetStatus)} className="px-2 py-2 rounded-lg border border-slate-200 text-sm">
-                <option value="draft">초안</option>
-                <option value="active">활성</option>
-                <option value="archived">보관</option>
-              </select>
-              <div className="flex items-center gap-1.5">
-                {infoDirty && <span className="text-[10px] font-medium text-amber-600">저장 필요</span>}
-                <button onClick={handleSaveSet} disabled={savingSet} className="px-3 py-2 text-xs font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 flex items-center gap-1">
-                  {savingSet ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />} 세트 정보 저장
-                </button>
-              </div>
-            </div>
-
-            {/* WO-O4O-KPA-TABLET-TEMPLATE-SELECTION-EDITOR-V1: 템플릿 선택('정보 저장'으로 함께 반영) */}
-            <div className="rounded-lg border border-slate-200 bg-white p-2.5">
-              <TemplateSelectField value={editTemplateKey} onChange={setEditTemplateKey} />
-            </div>
-
-            {/* 블록 목록 */}
-            {/* WO-O4O-KPA-TABLET-SCREEN-SET-OPERATION-USABILITY-PASS-V1: 블록=화면 표시 내용 안내 */}
-            <div>
-              <div className="text-xs font-semibold text-slate-700">화면에 표시할 블록</div>
-              <p className="text-[11px] text-slate-400 mt-0.5">화면에 들어가는 내용입니다. 순서 이동·표시 여부를 조정할 수 있고, 변경 후 아래 ‘블록 저장’을 눌러야 저장됩니다.</p>
-            </div>
-            <div className="space-y-2">
-              {blocks.length === 0 && <div className="text-xs text-slate-400">블록이 없습니다. 아래에서 추가하세요.</div>}
-              {blocks.map((b, i) => (
-                <div key={i} className="border border-slate-200 rounded-lg p-2.5 bg-white">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-xs font-semibold text-slate-700 flex-1">{i + 1}. {BLOCK_LABEL[b.blockType] ?? b.blockType}</span>
-                    <label className="text-[11px] text-slate-500 flex items-center gap-1">
-                      <input type="checkbox" checked={b.isEnabled} onChange={() => toggleBlock(i)} className="rounded border-slate-300 text-indigo-600" /> 화면에 표시
-                    </label>
-                    <button onClick={() => moveBlock(i, 'up')} disabled={i === 0} className="p-1 rounded hover:bg-slate-100 disabled:opacity-30"><ChevronUp className="w-3.5 h-3.5" /></button>
-                    <button onClick={() => moveBlock(i, 'down')} disabled={i === blocks.length - 1} className="p-1 rounded hover:bg-slate-100 disabled:opacity-30"><ChevronDown className="w-3.5 h-3.5" /></button>
-                    <button onClick={() => removeBlock(i)} className="p-1 rounded text-slate-400 hover:text-red-600 hover:bg-red-50"><X className="w-3.5 h-3.5" /></button>
+                    <div className="text-[11px] text-slate-400">{STATUS_LABEL[s.status]} · {templateLabel(s.templateKey)} · 블록 {s.blockCount ?? 0}개</div>
                   </div>
-                  <BlockConfigForm block={b} onPatch={(patch) => patchConfig(i, patch)} onReplaceConfig={(cfg) => setBlocks((prev) => prev.map((x, idx) => (idx === i ? { ...x, config: cfg } : x)))} />
+                  <div className="flex gap-2 mt-auto items-center">
+                    <button onClick={() => handleApply(s)} disabled={busy} className="flex-1 min-h-[44px] px-3 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 disabled:opacity-50">이 화면 사용</button>
+                  </div>
                 </div>
               ))}
             </div>
-
-            {/* 블록 추가 + 저장 */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <select value={addType} onChange={(e) => setAddType(e.target.value as ScreenBlockType)} className="px-2 py-1.5 rounded-lg border border-slate-200 text-xs">
-                {BLOCK_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
-              </select>
-              <button onClick={addBlock} className="px-2.5 py-1.5 text-xs font-medium text-indigo-700 bg-white border border-indigo-200 rounded-lg hover:bg-indigo-50 flex items-center gap-1">
-                <Plus className="w-3.5 h-3.5" /> 블록 추가
-              </button>
-              {blocksDirty && <span className="ml-auto text-[10px] font-medium text-amber-600">블록 저장 필요</span>}
-              <button onClick={handleSaveBlocks} disabled={savingBlocks} className={`${blocksDirty ? '' : 'ml-auto'} px-3 py-1.5 text-xs font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 flex items-center gap-1`}>
-                {savingBlocks ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />} 블록 저장
-              </button>
-            </div>
           </div>
+        ))}
+        </>
         )}
       </div>
     </div>
@@ -929,6 +691,272 @@ function JsonConfig({ config, onReplaceConfig }: { config: Record<string, unknow
         placeholder='{ "key": "value" }'
       />
       {err && <p className="text-[10px] text-red-500">{err}</p>}
+    </div>
+  );
+}
+
+// ── 단계형 제작 셸 (WO-O4O-KPA-TABLET-CONTENT-STEP-BUILDER-SHELL-V1) ──
+//   신규/수정 공통. 인라인 폼/패널을 단계 화면으로 분리. 기존 하위 편집기·저장 API·dirty guard 재사용.
+//   저장 = createScreenSet|updateScreenSet + saveScreenSetBlocks(전체 교체). 저장 성공 후 리스트 복귀.
+//   코너 적용/해제는 노출하지 않음(코너별 운영 탭 전용). draft 실미리보기는 후속 WO(placeholder).
+const BUILDER_STEPS = ['템플릿', '기본 정보', '화면 구성', '콘텐츠·제품', '미리보기·저장'] as const;
+const CONTENT_BLOCK_TYPES: ScreenBlockType[] = ['content_list', 'product_list', 'product_content'];
+const isContentBlock = (t: ScreenBlockType) => CONTENT_BLOCK_TYPES.includes(t);
+// 화면 구성 단계에서 추가 가능한 구조 블록(콘텐츠/제품 블록은 '콘텐츠·제품' 단계에서 추가).
+const STRUCTURE_ADD_TYPES = BLOCK_TYPES.filter((b) => !isContentBlock(b.value));
+const CONTENT_ADD_TYPES = BLOCK_TYPES.filter((b) => isContentBlock(b.value) && b.value !== 'product_content');
+
+function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast }: {
+  initialDetail: ScreenSetDetail | null;
+  onCancel: () => void;
+  onSaved: () => void;
+  onToast: (t: Toast) => void;
+}) {
+  const isEdit = !!initialDetail;
+  const [step, setStep] = useState(0);
+  const [name, setName] = useState(initialDetail?.name ?? '');
+  const [status, setStatus] = useState<ScreenSetStatus>(initialDetail?.status ?? 'draft');
+  const [templateKey, setTemplateKey] = useState(initialDetail?.templateKey ?? DEFAULT_TEMPLATE_KEY);
+  const [blocks, setBlocks] = useState<ScreenBlock[]>(
+    (initialDetail?.blocks ?? []).map((b) => ({ ...b, config: b.config ?? {} })),
+  );
+  const [structureAddType, setStructureAddType] = useState<ScreenBlockType>('corner_description');
+  const [contentAddType, setContentAddType] = useState<ScreenBlockType>('content_list');
+  const [saving, setSaving] = useState(false);
+
+  // ── dirty guard (baseline = 초기값) ──
+  const baseline = useRef({
+    name: initialDetail?.name ?? '',
+    status: (initialDetail?.status ?? 'draft') as ScreenSetStatus,
+    templateKey: initialDetail?.templateKey ?? DEFAULT_TEMPLATE_KEY,
+    blocks: normalizeBlocks(initialDetail?.blocks ?? []),
+  });
+  const isDirty =
+    name.trim() !== baseline.current.name ||
+    status !== baseline.current.status ||
+    templateKey !== baseline.current.templateKey ||
+    normalizeBlocks(blocks) !== baseline.current.blocks;
+  useEffect(() => {
+    if (!isDirty) return;
+    const h = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = ''; };
+    window.addEventListener('beforeunload', h);
+    return () => window.removeEventListener('beforeunload', h);
+  }, [isDirty]);
+  const guardedCancel = () => { if (!isDirty || window.confirm(DISCARD_MSG)) onCancel(); };
+
+  // ── block helpers ──
+  const addBlock = (t: ScreenBlockType) =>
+    setBlocks((prev) => [...prev, { blockType: t, sortOrder: prev.length, isEnabled: true, config: defaultConfig(t) }]);
+  const removeBlock = (i: number) => setBlocks((prev) => prev.filter((_, idx) => idx !== i));
+  const toggleBlock = (i: number) => setBlocks((prev) => prev.map((b, idx) => (idx === i ? { ...b, isEnabled: !b.isEnabled } : b)));
+  const moveBlock = (i: number, dir: 'up' | 'down') => setBlocks((prev) => {
+    const t = dir === 'up' ? i - 1 : i + 1;
+    if (t < 0 || t >= prev.length) return prev;
+    const next = [...prev];
+    [next[i], next[t]] = [next[t], next[i]];
+    return next;
+  });
+  const patchConfig = (i: number, patch: Record<string, unknown>) =>
+    setBlocks((prev) => prev.map((b, idx) => (idx === i ? { ...b, config: { ...b.config, ...patch } } : b)));
+  const replaceConfig = (i: number, cfg: Record<string, unknown>) =>
+    setBlocks((prev) => prev.map((b, idx) => (idx === i ? { ...b, config: cfg } : b)));
+
+  const nameValid = name.trim().length > 0;
+  const contentBlockIdx = blocks.map((_, i) => i).filter((i) => isContentBlock(blocks[i].blockType));
+
+  const handleSave = async () => {
+    if (!nameValid) { onToast({ type: 'error', message: '콘텐츠 이름을 입력해 주세요.' }); setStep(1); return; }
+    setSaving(true);
+    try {
+      let id = initialDetail?.id;
+      if (isEdit && id) {
+        await updateScreenSet(id, { name: name.trim(), status, templateKey });
+      } else {
+        // library 재사용 세트(tabletId=null). create 계약은 draft|active 만 허용 → archived 는 draft 로.
+        const created = await createScreenSet({ name: name.trim(), tabletId: null, status: status === 'active' ? 'active' : 'draft', templateKey });
+        id = created.id;
+      }
+      await saveScreenSetBlocks(id!, blocks);
+      onToast({ type: 'success', message: isEdit ? '태블릿 콘텐츠가 저장되었습니다.' : `태블릿 콘텐츠 "${name.trim()}" 생성됨` });
+      onSaved();
+    } catch (e: any) {
+      onToast({ type: 'error', message: e?.message || '저장에 실패했습니다.' });
+    } finally { setSaving(false); }
+  };
+
+  // ── 블록 행(순서/표시/삭제 + config) ──
+  const BlockRow = ({ i }: { i: number }) => {
+    const b = blocks[i];
+    return (
+      <div className="border border-slate-200 rounded-lg p-2.5 bg-white">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-xs font-semibold text-slate-700 flex-1">{BLOCK_LABEL[b.blockType] ?? b.blockType}</span>
+          <label className="text-[11px] text-slate-500 flex items-center gap-1">
+            <input type="checkbox" checked={b.isEnabled} onChange={() => toggleBlock(i)} className="rounded border-slate-300 text-indigo-600" /> 화면에 표시
+          </label>
+          <button onClick={() => moveBlock(i, 'up')} disabled={i === 0} className="p-1 rounded hover:bg-slate-100 disabled:opacity-30"><ChevronUp className="w-3.5 h-3.5" /></button>
+          <button onClick={() => moveBlock(i, 'down')} disabled={i === blocks.length - 1} className="p-1 rounded hover:bg-slate-100 disabled:opacity-30"><ChevronDown className="w-3.5 h-3.5" /></button>
+          <button onClick={() => removeBlock(i)} className="p-1 rounded text-slate-400 hover:text-red-600 hover:bg-red-50"><X className="w-3.5 h-3.5" /></button>
+        </div>
+        <BlockConfigForm block={b} onPatch={(patch) => patchConfig(i, patch)} onReplaceConfig={(cfg) => replaceConfig(i, cfg)} />
+      </div>
+    );
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* ── 헤더 + 스텝 인디케이터 ── */}
+      <div className="flex items-center justify-between gap-2 flex-wrap">
+        <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
+          <Layers className="w-4 h-4 text-indigo-600" /> {isEdit ? '태블릿 화면 수정' : '태블릿 화면 만들기'}
+          {isDirty && <span className="text-[10px] font-semibold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">변경됨</span>}
+        </h3>
+        <button onClick={guardedCancel} className="text-xs text-slate-500 hover:text-slate-700 inline-flex items-center gap-1">
+          <X className="w-3.5 h-3.5" /> 목록으로
+        </button>
+      </div>
+      <ol className="flex items-center gap-1 flex-wrap text-[11px]">
+        {BUILDER_STEPS.map((label, idx) => (
+          <li key={label} className="flex items-center gap-1">
+            <button
+              onClick={() => setStep(idx)}
+              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full font-medium transition-colors ${
+                idx === step ? 'bg-indigo-600 text-white' : idx < step ? 'bg-indigo-50 text-indigo-700' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+              }`}
+            >
+              <span className={`w-4 h-4 rounded-full text-[10px] flex items-center justify-center ${idx === step ? 'bg-white/25' : 'bg-white/70 text-slate-500'}`}>{idx + 1}</span>
+              {label}
+            </button>
+            {idx < BUILDER_STEPS.length - 1 && <span className="text-slate-300">›</span>}
+          </li>
+        ))}
+      </ol>
+
+      {/* ── 단계 본문 ── */}
+      <div className="border border-indigo-100 rounded-xl p-4 bg-indigo-50/20 min-h-[220px]">
+        {step === 0 && (
+          <div className="space-y-2">
+            <div className="rounded-lg border border-slate-200 bg-white p-3">
+              <TemplateSelectField value={templateKey} onChange={setTemplateKey} />
+            </div>
+          </div>
+        )}
+
+        {step === 1 && (
+          <div className="space-y-3">
+            <div>
+              <label className="text-xs font-semibold text-slate-600">콘텐츠 이름</label>
+              <input value={name} onChange={(e) => setName(e.target.value)} placeholder="예: 입마름·구취 관리 세트"
+                className="w-full mt-1 px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" autoFocus />
+              {!nameValid && <p className="text-[11px] text-amber-600 mt-1">저장하려면 이름이 필요합니다.</p>}
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-slate-600">상태</label>
+              <select value={status} onChange={(e) => setStatus(e.target.value as ScreenSetStatus)}
+                className="mt-1 px-2 py-2 rounded-lg border border-slate-200 text-sm">
+                <option value="draft">초안</option>
+                <option value="active">활성</option>
+                {isEdit && <option value="archived">보관</option>}
+              </select>
+              <p className="text-[11px] text-slate-400 mt-1">저장은 세트 내용만 저장합니다(코너에 자동 적용되지 않음). 코너 적용은 ‘코너별 운영’ 탭에서 합니다.</p>
+            </div>
+          </div>
+        )}
+
+        {step === 2 && (
+          <div className="space-y-3">
+            <p className="text-[11px] text-slate-500">화면에 들어갈 <b>구조 블록</b>(코너 설명·건강정보·QR 안내·대기화면·직원 문의)을 추가하고 순서·표시 여부를 정합니다. 콘텐츠·제품 블록의 세부 설정은 다음 단계에서 합니다.</p>
+            <div className="space-y-2">
+              {blocks.length === 0 && <div className="text-xs text-slate-400">블록이 없습니다. 아래에서 추가하세요.</div>}
+              {blocks.map((b, i) => (
+                isContentBlock(b.blockType) ? (
+                  <div key={i} className="border border-dashed border-slate-200 rounded-lg p-2.5 bg-white/60 flex items-center gap-2">
+                    <span className="text-xs font-semibold text-slate-500 flex-1">{BLOCK_LABEL[b.blockType] ?? b.blockType} <span className="text-[10px] text-slate-400">— ‘콘텐츠·제품’ 단계에서 설정</span></span>
+                    <label className="text-[11px] text-slate-500 flex items-center gap-1">
+                      <input type="checkbox" checked={b.isEnabled} onChange={() => toggleBlock(i)} className="rounded border-slate-300 text-indigo-600" /> 표시
+                    </label>
+                    <button onClick={() => moveBlock(i, 'up')} disabled={i === 0} className="p-1 rounded hover:bg-slate-100 disabled:opacity-30"><ChevronUp className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => moveBlock(i, 'down')} disabled={i === blocks.length - 1} className="p-1 rounded hover:bg-slate-100 disabled:opacity-30"><ChevronDown className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => removeBlock(i)} className="p-1 rounded text-slate-400 hover:text-red-600 hover:bg-red-50"><X className="w-3.5 h-3.5" /></button>
+                  </div>
+                ) : (
+                  <BlockRow key={i} i={i} />
+                )
+              ))}
+            </div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <select value={structureAddType} onChange={(e) => setStructureAddType(e.target.value as ScreenBlockType)} className="px-2 py-1.5 rounded-lg border border-slate-200 text-xs">
+                {STRUCTURE_ADD_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+              </select>
+              <button onClick={() => addBlock(structureAddType)} className="px-2.5 py-1.5 text-xs font-medium text-indigo-700 bg-white border border-indigo-200 rounded-lg hover:bg-indigo-50 flex items-center gap-1">
+                <Plus className="w-3.5 h-3.5" /> 구조 블록 추가
+              </button>
+            </div>
+          </div>
+        )}
+
+        {step === 3 && (
+          <div className="space-y-3">
+            <p className="text-[11px] text-slate-500">고객에게 보여줄 <b>콘텐츠·제품</b> 블록을 설정합니다. 원본 콘텐츠는 참조만 하며 변경되지 않습니다.</p>
+            {contentBlockIdx.length === 0 ? (
+              <div className="rounded-lg border border-dashed border-slate-300 bg-white/60 text-center py-6 px-4 text-sm text-slate-500">
+                아직 콘텐츠·제품 블록이 없습니다. 아래에서 추가하세요.
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {contentBlockIdx.map((i) => <BlockRow key={i} i={i} />)}
+              </div>
+            )}
+            <div className="flex items-center gap-2 flex-wrap">
+              <select value={contentAddType} onChange={(e) => setContentAddType(e.target.value as ScreenBlockType)} className="px-2 py-1.5 rounded-lg border border-slate-200 text-xs">
+                {CONTENT_ADD_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+              </select>
+              <button onClick={() => addBlock(contentAddType)} className="px-2.5 py-1.5 text-xs font-medium text-indigo-700 bg-white border border-indigo-200 rounded-lg hover:bg-indigo-50 flex items-center gap-1">
+                <Plus className="w-3.5 h-3.5" /> 콘텐츠·제품 블록 추가
+              </button>
+            </div>
+          </div>
+        )}
+
+        {step === 4 && (
+          <div className="space-y-3">
+            <div className="rounded-lg border border-slate-200 bg-white p-3 space-y-1.5">
+              <div className="text-sm font-bold text-slate-800">{name.trim() || '(이름 없음)'}</div>
+              <div className="text-[11px] text-slate-500">
+                템플릿 <b>{templateLabel(templateKey)}</b> · 상태 <b>{STATUS_LABEL[status]}</b> · 블록 <b>{blocks.length}</b>개
+                {' '}(표시 {blocks.filter((b) => b.isEnabled).length}개)
+              </div>
+            </div>
+            <div className="flex items-start gap-2 bg-slate-50 border border-slate-200 rounded-lg p-3 text-[11px] text-slate-500">
+              <AlertTriangle className="w-3.5 h-3.5 text-slate-400 mt-0.5 flex-shrink-0" />
+              실시간 미리보기(태블릿·QR 모바일)는 후속 단계에서 제공됩니다. 지금은 저장 후 ‘코너별 운영’ 탭에서 적용해 공개 화면을 확인할 수 있습니다.
+            </div>
+            <button onClick={handleSave} disabled={saving || !nameValid}
+              className="w-full sm:w-auto min-h-[44px] px-5 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 disabled:opacity-50 inline-flex items-center justify-center gap-2">
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} 태블릿 콘텐츠 저장
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* ── 이전/다음 ── */}
+      <div className="flex items-center justify-between gap-2">
+        <button onClick={() => setStep((s) => Math.max(0, s - 1))} disabled={step === 0}
+          className="min-h-[44px] px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 disabled:opacity-40">
+          이전
+        </button>
+        {step < BUILDER_STEPS.length - 1 ? (
+          <button onClick={() => setStep((s) => Math.min(BUILDER_STEPS.length - 1, s + 1))}
+            className="min-h-[44px] px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700">
+            다음
+          </button>
+        ) : (
+          <button onClick={handleSave} disabled={saving || !nameValid}
+            className="min-h-[44px] px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 disabled:opacity-50 inline-flex items-center gap-2">
+            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} 저장
+          </button>
+        )}
+      </div>
     </div>
   );
 }
