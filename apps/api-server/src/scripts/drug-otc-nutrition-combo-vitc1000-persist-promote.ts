@@ -7,7 +7,7 @@
  * 배경: 비타민C 1000mg draft(6f143bbc)의 groupScope.masterTotal 이 31(stale)이라 mismatch 로 승격 제외됐다.
  *   실제 1000mg급 = spec {1000,1030,1030.9,1031}밀리그램(염 보정 규격) = 38. STRENGTH-SPLIT-V1 §3.1 확정.
  *   → masterTotal 38 보정 + masterIds 38 저장 후, 동일 정책(masterIds 기반, mfds_drug_otc_nutrition_combo,
- *     content=mdToHtml, 기존 canonical 보존)으로 canonical 승격 편입.
+ *     content=draftMarkdownToHtml(인용=내부 주석 렌더 제외), 기존 canonical 보존)으로 canonical 승격 편입.
  *
  * 단일 그룹 전용(비타민C만). Mg·B2·B6 액제·revise/hold 3건 미접촉.
  *
@@ -22,6 +22,8 @@
  */
 
 const RUN_ID = 'otc-nutrition-combo-draft-v1';
+import { draftMarkdownToHtml } from '../modules/neture/drug-import/draft-markdown-to-html.js';
+
 const CANDIDATE_ID = '6f143bbc-ff49-4ffc-9271-42e50cf2e84d'; // 비타민 C 1000mg 정제
 const ATC7 = 'A11GA01';
 const CORRECTED_MASTER_TOTAL = 38;
@@ -29,39 +31,6 @@ const CORRECTED_MASTER_TOTAL = 38;
 const VITC_1000_SPECS = ['1000밀리그램', '1030밀리그램', '1030.9밀리그램', '1031밀리그램'];
 const PROMOTION_SOURCE_TYPE = 'mfds_drug_otc_nutrition_combo';
 const PROMOTION_LANGUAGE = 'ko';
-
-/** bodyMarkdown → HTML (promotion 스크립트와 동일 변환). */
-function mdToHtml(md: string): string {
-  const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  const inline = (s: string) => esc(s).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-  const lines = md.replace(/\r\n/g, '\n').split('\n');
-  const out: string[] = [];
-  let para: string[] = [];
-  const flushPara = () => { if (para.length) { out.push(`<p>${para.map(inline).join('<br>')}</p>`); para = []; } };
-  for (let i = 0; i < lines.length; i++) {
-    const t = lines[i].trim();
-    if (t === '') { flushPara(); continue; }
-    const h = /^(#{1,6})\s+(.*)$/.exec(t);
-    if (h) { flushPara(); out.push(`<h${h[1].length}>${inline(h[2])}</h${h[1].length}>`); continue; }
-    if (t.startsWith('|')) {
-      flushPara();
-      const rows: string[] = [];
-      while (i < lines.length && lines[i].trim().startsWith('|')) { rows.push(lines[i].trim()); i++; }
-      i--;
-      const cells = (r: string) => r.replace(/^\||\|$/g, '').split('|').map((c) => c.trim());
-      const isSep = (r: string) => /^\|?[\s:|-]+\|?$/.test(r) && r.includes('-');
-      const header = rows[0] && !isSep(rows[0]) ? cells(rows[0]) : null;
-      const bodyRows = rows.filter((r, idx) => !(idx === 0 && header) && !isSep(r));
-      const thead = header ? `<thead><tr>${header.map((c) => `<th>${inline(c)}</th>`).join('')}</tr></thead>` : '';
-      const tbody = `<tbody>${bodyRows.map((r) => `<tr>${cells(r).map((c) => `<td>${inline(c)}</td>`).join('')}</tr>`).join('')}</tbody>`;
-      out.push(`<table>${thead}${tbody}</table>`);
-      continue;
-    }
-    para.push(t);
-  }
-  flushPara();
-  return out.join('\n');
-}
 
 async function main(): Promise<void> {
   const apply =
@@ -124,7 +93,12 @@ async function main(): Promise<void> {
     const newInsert = masterIds.length - existingCanonical;
     if (validOtc !== masterIds.length) throw new Error(`비-OTC master 포함 (${validOtc}/${masterIds.length})`);
 
-    const contentHtml = mdToHtml(String(draft.content_json?.bodyMarkdown ?? ''));
+    // WO-O4O-MDTOHTML-BLOCKQUOTE-SAFETY-GUARD-V1: 공용 변환기 — 인용(내부 편집 주석)은 렌더 제외.
+    // 1차 원칙(구조화 필드 렌더)은 canonical-promotion 스크립트에만 적용됨 → 본 경로는 안전망 의존(CHECK §6).
+    const { html: contentHtml, droppedQuoteBlocks } = draftMarkdownToHtml(
+      String(draft.content_json?.bodyMarkdown ?? ''),
+    );
+    if (droppedQuoteBlocks > 0) console.log(`internal note dropped: ${droppedQuoteBlocks} block(s)`);
     const summary = String(draft.content_json?.summaryTable?.['사용목적'] ?? '') || null;
 
     let insertedTotal = 0;

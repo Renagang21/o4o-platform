@@ -89,53 +89,6 @@ interface GroupPlan {
   summary: string | null;
 }
 
-/**
- * bodyMarkdown → HTML (이 draft 본문 구조 전용: ## 제목 / 파이프 표 / **볼드** / 문단). 외부 의존 없음.
- *
- * ⚠️ **승격 렌더 소스에서 제외됨** (WO-O4O-OTC-CANONICAL-RENDER-SOURCE-STRUCTURED-FIELDS-V1).
- * 인용 블록(`>`) 분기가 없어 bodyMarkdown 의 내부 편집 주석이 `<p>&gt; …</p>` 로 소비자에 노출된다.
- * 소비자 본문은 buildDrugOtcConsumerHtml(구조화 필드)로 생성한다. 본 함수 보강은 후속 WO 범위.
- */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function mdToHtml(md: string): string {
-  const esc = (s: string) =>
-    s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  const inline = (s: string) => esc(s).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-  const lines = md.replace(/\r\n/g, '\n').split('\n');
-  const out: string[] = [];
-  let para: string[] = [];
-  const flushPara = () => {
-    if (para.length) {
-      out.push(`<p>${para.map(inline).join('<br>')}</p>`);
-      para = [];
-    }
-  };
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    const trimmed = line.trim();
-    if (trimmed === '') { flushPara(); continue; }
-    const h = /^(#{1,6})\s+(.*)$/.exec(trimmed);
-    if (h) { flushPara(); const lvl = h[1].length; out.push(`<h${lvl}>${inline(h[2])}</h${lvl}>`); continue; }
-    if (trimmed.startsWith('|')) {
-      flushPara();
-      const rows: string[] = [];
-      while (i < lines.length && lines[i].trim().startsWith('|')) { rows.push(lines[i].trim()); i++; }
-      i--; // 마지막 non-table 라인 되돌림
-      const cells = (r: string) => r.replace(/^\||\|$/g, '').split('|').map((c) => c.trim());
-      const isSep = (r: string) => /^\|?[\s:|-]+\|?$/.test(r) && r.includes('-');
-      const header = rows[0] && !isSep(rows[0]) ? cells(rows[0]) : null;
-      const bodyRows = rows.filter((r, idx) => !(idx === 0 && header) && !isSep(r));
-      const thead = header ? `<thead><tr>${header.map((c) => `<th>${inline(c)}</th>`).join('')}</tr></thead>` : '';
-      const tbody = `<tbody>${bodyRows.map((r) => `<tr>${cells(r).map((c) => `<td>${inline(c)}</td>`).join('')}</tr>`).join('')}</tbody>`;
-      out.push(`<table>${thead}${tbody}</table>`);
-      continue;
-    }
-    para.push(trimmed);
-  }
-  flushPara();
-  return out.join('\n');
-}
-
 async function main(): Promise<void> {
   const argv = process.argv.slice(2);
   const apply =
@@ -304,7 +257,7 @@ async function main(): Promise<void> {
       otcDefenseMismatchGroups: otcMismatch.length,
       insertedTotal: apply ? insertedTotal : 0, dbWrite: apply ? insertedTotal : 0,
       postInsertedByGroup: apply ? postInsertedByGroup : [],
-      contentFormat: 'html (bodyMarkdown→mdToHtml)',
+      contentFormat: 'html (구조화 필드→sd-* / buildDrugOtcConsumerHtml)',
       sourceType: PROMOTION_SOURCE_TYPE,
       // 무거운 필드(masterIds 배열·contentHtml) 제외한 lean plan
       plans: plans.map((p) => ({
@@ -324,7 +277,7 @@ async function main(): Promise<void> {
     console.log(`expectedNewInsert   : ${report.expectedNewCanonicalInsert}`);
     console.log(`preservedCanonical  : ${report.preservedExistingCanonical}`);
     console.log(`otcDefenseMismatch  : ${report.otcDefenseMismatchGroups}`);
-    console.log(`content format      : html (bodyMarkdown→mdToHtml)`);
+    console.log(`content format      : html (구조화 필드→sd-* / buildDrugOtcConsumerHtml)`);
     console.log(`dbWrite             : ${report.dbWrite}`);
     for (const p of plans) {
       const tag = p.hasMasterIds ? 'ELIGIBLE' : 'BLOCKED ';
