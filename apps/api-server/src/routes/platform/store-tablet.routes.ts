@@ -1346,12 +1346,31 @@ export function createStoreTabletRoutes(
     }
   }));
 
-  // DELETE /screen-sets/:id — soft delete(archive). 적용 중이면 409(먼저 해제).
+  // DELETE /screen-sets/:id — soft delete(archive). 적용 중/연결 중이면 409(먼저 해제).
+  //
+  // WO-O4O-KPA-TABLET-FINAL-INTEGRATION-SMOKE-V1 (결함 수정):
+  //   이 경로가 UI '보관' 버튼(archiveScreenSet)이 쓰는 경로인데, PATCH {status:'archived'} 와 달리
+  //   **연결(store_tablet_corner_contents) 가드가 없었다**. 그래서 연결된 콘텐츠를 보관하면
+  //   해당 코너 목록에서 조용히 사라지고(공개 GET 이 deleted_at IS NULL 로 JOIN) 링크 행만 남았다.
+  //   실측: PATCH → 409 ARCHIVE_BLOCKED_CONNECTED / DELETE → 200 (동일 의도, 다른 결과).
+  //   ASSIGNMENT-MODEL-V1 §6("현재/연결 시 보관 거부, 자동 연결 삭제 없음") 에 맞춰 두 경로를 일치시킨다.
+  //   코너 연결 해제 UI 는 CORNER-CONTENT-LINK-UI-V1 에서 제공되므로 사용자에게 해제 경로가 있다.
   router.delete('/screen-sets/:id', withStoreAuth(async (req, res, organizationId) => {
     try {
       const id = req.params.id;
       const inUse = await dataSource.query(`SELECT id FROM store_tablets WHERE current_screen_set_id = $1 AND organization_id = $2 LIMIT 1`, [id, organizationId]);
-      if (inUse?.[0]) { res.status(409).json({ success: false, error: 'Screen set is currently applied to a tablet. Unassign it first.', code: 'SCREEN_SET_IN_USE' }); return; }
+      if (inUse?.[0]) { res.status(409).json({ success: false, error: '이 콘텐츠를 현재 사용 중인 코너가 있어 보관할 수 없습니다. 먼저 다른 콘텐츠로 전환해 주세요.', code: 'SCREEN_SET_IN_USE' }); return; }
+      const links = await dataSource.query(`SELECT count(*)::int AS c FROM store_tablet_corner_contents WHERE screen_set_id = $1 AND organization_id = $2`, [id, organizationId]);
+      const linkCount = links?.[0]?.c ?? 0;
+      if (linkCount > 0) {
+        res.status(409).json({
+          success: false,
+          error: `이 콘텐츠가 ${linkCount}개 코너에 연결되어 있어 보관할 수 없습니다. 먼저 코너 연결을 해제해 주세요.`,
+          code: 'ARCHIVE_BLOCKED_CONNECTED',
+          data: { linkCount },
+        });
+        return;
+      }
       const del = await dataSource.query(
         `UPDATE store_tablet_screen_sets SET deleted_at = NOW(), status = 'archived', updated_at = NOW()
          WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL RETURNING id`,
