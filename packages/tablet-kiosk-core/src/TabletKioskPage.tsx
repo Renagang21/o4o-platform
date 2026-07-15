@@ -826,7 +826,11 @@ export function TabletKioskPage({
       {!isProductLayout && cornerInfo?.body && (
         <div style={styles.cornerDescSection}>
           <span style={styles.cornerDescLabel}>코너 안내</span>
-          <p style={styles.cornerBody}>{cornerInfo.body}</p>
+          {/* WO-O4O-KPA-TABLET-STANDARD-EDITOR-UNIFY-V1: 코너 설명은 표준 편집기(RichTextEditor) 산출 HTML.
+              평문 <p>{body}</p> 는 React 이스케이프로 태그가 글자로 보였다 → 기존 ContentRenderer 로 렌더.
+              sanitize 는 ContentRenderer(DOMPurify sanitizeRichHtml)가 담당 — raw innerHTML 신규 사용 없음.
+              (상품 상세가 이미 쓰는 계약과 동일: types.ts "ContentRenderer 로만 렌더") */}
+          <ContentRenderer html={cornerInfo.body} variant="guide" style={styles.cornerBody} />
         </div>
       )}
 

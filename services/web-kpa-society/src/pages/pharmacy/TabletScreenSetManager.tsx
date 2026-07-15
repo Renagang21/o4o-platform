@@ -23,6 +23,8 @@ import {
 import TabletContentLibraryList from './TabletContentLibraryList';
 // WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1: 제작 셸 미리보기 = kiosk-core 뷰어 재사용(sections 주입 + embedded).
 import { TabletKioskPage, detectIdleMediaType, type TabletKioskApi, type TabletScreenResponse } from '@o4o/tablet-kiosk-core';
+// WO-O4O-KPA-TABLET-STANDARD-EDITOR-UNIFY-V1: 코너 설명 본문 = O4O 표준 편집기(별도 HTML 입력창 없음)
+import { RichTextEditor } from '@o4o/content-editor';
 
 type Toast = { type: 'success' | 'error'; message: string };
 
@@ -95,10 +97,12 @@ const BUILDER_STEPS: BuilderStepMeta[] = [
 //   product_list = 코너 진열 제품(코너별 운영에서 관리) · qr_guide = 모든 템플릿 메인 QR 원칙.
 const AUTO_BLOCK_TYPES: ScreenBlockType[] = ['idle_media', 'corner_description', 'content_list', 'product_list', 'qr_guide'];
 
-// 코너 설명 예제 요청문(WO-O4O-KPA-TABLET-BUILDER-BUSINESS-FIELDS-V1).
-//   공개 태블릿 뷰어가 코너 설명 본문을 **평문**으로 렌더하므로 HTML/마크다운을 요구하지 않는다
-//   (ContentCreationGuideModal 의 store/operator 프롬프트는 HTML 생성용이라 여기선 부적합).
-const CORNER_DESC_PROMPT = `약국 매장 태블릿의 코너 안내 화면에 넣을 "짧은 소개" 글을 써 주세요.
+// 코너 설명 예제 요청문.
+//   WO-O4O-KPA-TABLET-STANDARD-EDITOR-UNIFY-V1: 코너 설명이 표준 편집기(HTML) + ContentRenderer 렌더로
+//   바뀌었으므로, 평문만 요구하던 이전 요청문을 HTML 산출용으로 교체한다.
+//   ContentRenderer 는 sanitizeRichHtml(DOMPurify)로 script/위험 속성을 제거하고
+//   iframe 은 youtube/vimeo 만 허용하므로, 요청문에서도 그 범위를 벗어나지 않게 지시한다.
+const CORNER_DESC_PROMPT = `약국 매장 태블릿의 코너 안내 화면에 넣을 "짧은 소개"를 HTML로 만들어 주세요.
 
 [코너 이름]
 예: 구강관리 코너
@@ -108,7 +112,10 @@ const CORNER_DESC_PROMPT = `약국 매장 태블릿의 코너 안내 화면에 �
 
 조건:
 - 손님이 태블릿 화면에서 읽는 글입니다. 3~5문장, 한 문장은 짧게.
-- 꾸미기 없는 순수 텍스트만. HTML 태그, 마크다운(**, #), 이모지, 목록 기호를 쓰지 마세요.
+- O4O 편집기의 HTML 탭에 그대로 붙여 넣을 수 있는 형태로 만들어 주세요.
+- 사용할 태그: p, h2, h3, strong, em, ul, ol, li, br, a 정도면 충분합니다.
+- 강조·여백 같은 꾸미기는 태그 안 style 속성(인라인 CSS)으로만 해 주세요.
+- script, iframe, 외부 CSS 파일, 외부 폰트, 외부 스크립트는 사용하지 마세요(자동 제거됩니다).
 - 제품을 파는 광고 문구가 아니라, 이 코너에서 무엇을 확인할 수 있는지 안내하는 톤으로.
 - 질병을 치료·예방한다고 단정하지 마세요. 증상이 있으면 약사와 상담하라고 안내해 주세요.
 - 과장된 표현, 최상급 표현(최고·완벽 등)은 쓰지 마세요.`;
@@ -873,15 +880,20 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
               </button>
             </div>
           </div>
-          <textarea
-            value={c.body ?? ''}
-            onChange={(e) => patchConfigOf('corner_description', { body: e.target.value })}
-            placeholder="이 코너가 어떤 곳인지, 손님이 무엇을 확인할 수 있는지 3~5줄로 적어 주세요."
-            rows={7}
-            className="w-full mt-1 px-3 py-2 rounded-lg border border-slate-200 text-sm leading-relaxed focus:outline-none focus:ring-2 focus:ring-indigo-400"
-          />
+          {/* WO-O4O-KPA-TABLET-STANDARD-EDITOR-UNIFY-V1: 평문 textarea → O4O 표준 편집기.
+              저장 HTML 은 태블릿/QR 모바일 모두 ContentRenderer 로 렌더된다(동일 계약).
+              별도 HTML 입력창은 만들지 않는다 — 표준 편집기의 기존 HTML 탭/붙여넣기를 쓴다. */}
+          <div className="mt-1">
+            <RichTextEditor
+              value={c.body ?? ''}
+              onChange={(html) => patchConfigOf('corner_description', { body: html })}
+              placeholder="이 코너가 어떤 곳인지, 손님이 무엇을 확인할 수 있는지 3~5줄로 적어 주세요."
+              minHeight="220px"
+            />
+          </div>
           <p className="text-[11px] text-slate-400 mt-1">
-            글자만 표시됩니다(굵게·색상 같은 꾸미기는 사용하지 않습니다). 오른쪽 미리보기에서 실제 보이는 모습을 확인하세요.
+            굵게·문단·목록·링크 같은 서식을 쓸 수 있습니다. ChatGPT로 만든 HTML은 편집기의 HTML 탭에 붙여 넣으세요.
+            오른쪽 미리보기에서 실제 태블릿에 보이는 모습을 확인할 수 있습니다.
           </p>
         </div>
       </div>
@@ -1141,15 +1153,16 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
                 <li><b>예제 요청문 복사</b>를 누릅니다.</li>
                 <li>ChatGPT(또는 Gemini) 대화창에 붙여 넣습니다.</li>
                 <li>대괄호 부분(코너 이름 / 이 코너에서 다루는 것)을 우리 매장에 맞게 고칩니다.</li>
-                <li>나온 글을 확인하고 <b>짧은 소개</b> 칸에 붙여 넣습니다.</li>
-                <li>오른쪽 미리보기에서 실제 태블릿 화면을 확인하고 저장합니다.</li>
+                <li>나온 HTML을 복사해 <b>짧은 소개</b> 편집기의 <b>HTML 탭</b>에 붙여 넣습니다.</li>
+                <li>편집기로 문구를 다듬고, 오른쪽 미리보기에서 실제 태블릿 화면을 확인한 뒤 저장합니다.</li>
               </ol>
               <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-[11px] text-amber-800 leading-relaxed">
                 <b>확인해 주세요.</b> AI가 쓴 글은 사실과 다를 수 있습니다. 붙여 넣기 전에 약사가 내용을 검토해 주세요.
                 질병을 치료·예방한다고 단정하는 표현은 사용하지 않습니다.
               </div>
               <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-[11px] text-slate-600 leading-relaxed">
-                코너 설명은 <b>글자만</b> 표시됩니다. 굵게·색상·표 같은 꾸미기나 HTML 태그를 넣으면 태블릿 화면에 그대로 글자로 보일 수 있으니 넣지 마세요.
+                굵게·문단·목록·링크 같은 서식은 그대로 표시됩니다. 다만 <b>script·외부 스크립트·외부 CSS</b>는 안전을 위해 자동으로 제거됩니다.
+                영상은 YouTube·Vimeo만 넣을 수 있습니다.
               </div>
               <div>
                 <div className="text-xs font-semibold text-slate-600 mb-1">예제 요청문</div>

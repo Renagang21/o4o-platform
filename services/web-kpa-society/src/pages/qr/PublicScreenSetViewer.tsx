@@ -81,7 +81,9 @@ export default function PublicScreenSetViewer({ screenSet }: { screenSet: QrScre
 
         <header style={styles.header}>
           <h1 style={styles.cornerTitle}>{screenSet.name || '코너 안내'}</h1>
-          {cornerBody && <p style={styles.cornerBody}>{cornerBody}</p>}
+          {/* WO-O4O-KPA-TABLET-STANDARD-EDITOR-UNIFY-V1: 코너 설명 = 표준 편집기 산출 HTML.
+              태블릿과 동일하게 ContentRenderer(DOMPurify)로 렌더 → 두 화면의 렌더 계약 일치. */}
+          {cornerBody && <ContentRenderer html={cornerBody} variant="guide" style={styles.cornerBody} />}
         </header>
 
         {bodySections.map((section, idx) => (
