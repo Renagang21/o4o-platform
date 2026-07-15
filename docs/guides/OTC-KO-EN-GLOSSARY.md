@@ -1,6 +1,6 @@
 # OTC-KO-EN-GLOSSARY — 일반의약품 설명서 한글-영문 권장 표현표
 
-상태: **Draft V0.3** (2026-07-15) · 대상: **일반의약품(OTC) 전용** · 지침: [OTC-EN-TRANSLATION-GUIDE](OTC-EN-TRANSLATION-GUIDE.md)
+상태: **Draft V0.4** (2026-07-16) · 대상: **일반의약품(OTC) 전용** · 지침: [OTC-EN-TRANSLATION-GUIDE](OTC-EN-TRANSLATION-GUIDE.md)
 
 > ⚠️ **이 표는 고정 사전이 아니다.** 소비자 톤 번역을 돕는 **권장 표현 모음**이다 (GUIDE T-08).
 > **문맥에 맞으면 다른 표현을 써도 된다.** 표현 통일보다 **의미 정확성과 자연스러움이 우선**이다.
@@ -47,12 +47,18 @@
 
 ## 3. 투여경로
 
-| 한국어 | 권장 영어 | 비고 |
-|---|---|---|
-| 경구 | by mouth | 정식: Oral. 파일럿 확정 |
-| 외용 | on the skin | 정식: Topical. 부위 문맥 따라 조정 |
-| 점안 | in the eye | 정식: Ophthalmic |
-| 직장 | rectal | §5 참조 |
+> **경로는 초안 데이터에서 확정된 값을 쓴다.** 번역 입력 `meta.route`(DR-019 파생: `oral`·`vaginal`·`topical`·`ophthalmic`·`rectal`·`inhalation`·`transdermal`) 를 보고 동사를 고른다.
+> **제형명(`doseForm`)으로 경로를 짐작하지 않는다** — 질정과 경구정이 둘 다 `정` 이다. `route=null`(needs_review) 이면 번역하지 말고 문의한다.
+
+| route 값 | 한국어 | 권장 영어 | 동사 |
+|---|---|---|---|
+| `oral` | 경구 | by mouth | **take** |
+| `vaginal` | 질 내 | in the vagina | **insert** (§5 G-01) |
+| `topical` | 외용 | on the skin | apply |
+| `ophthalmic` | 점안 | in the eye | put / use |
+| `rectal` | 직장 | rectal | insert (§5 G-01) |
+| `inhalation` | 흡입 | by inhalation | inhale / use |
+| `transdermal` | 첩부 | on the skin (patch) | apply |
 
 ## 4. 용법 표현 (문맥 의존 — 고정하지 않음)
 
@@ -104,3 +110,4 @@
 | V0.1 | 2026-07-15 | 초안 작성 (`WO-O4O-OTC-EN-TRANSLATION-GUIDE-DOCS-V1`). 직역 고정표. |
 | V0.2 | 2026-07-15 | **고정 사전 → 권장 소비자 표현표로 전환.** 문맥 조정 허용 명시, 소비자 톤 열 추가, 안전 표현(§5 G-01~G-04)만 고정 분리 (`WO-O4O-OTC-EN-TRANSLATION-GUIDE-CONSUMER-TONE-REVISION-V1`). |
 | V0.3 | 2026-07-15 | 파일럿 P1~P5 반영 — **§4-1 연령 경계 규칙 신설**(오역 최대 지점) · `사용상의 주의사항`→**`사용상 주의사항`** 표기 정정 · `Over-the-counter` 등재 · 경구/질정 표현 확정(확인 필요 해제) · 항목명은 경로 따라 take/use 로 갈림 명시(DR-019). 근거 = `CHECK-O4O-OTC-EN-DESIGN-PILOT-VALIDATION-V1` |
+| V0.4 | 2026-07-16 | §3 투여경로를 **route 값 기준표**로 교체 — 번역 입력 `meta.route`(DR-019 파생) 를 보고 동사를 고르고, **제형명으로 짐작하지 않는다**. `route=null`(needs_review) 이면 번역 보류. 근거 = `CHECK-O4O-OTC-ROUTE-SIGNAL-ENRICHMENT-V1` |

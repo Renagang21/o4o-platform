@@ -11,6 +11,8 @@
  * 소비자 HTML 은 구조화 필드에서만 만든다 — drug-otc-description-consumer-html.ts.
  */
 
+import { deriveOtcRoute, type OtcRouteResult } from './drug-otc-route.js';
+
 /** 파생 입력. 소비자 HTML 빌더와 달리 주석 원천인 bodyMarkdown 을 읽는다. */
 export interface DrugOtcDraftContent {
   summaryTable?: Record<string, string> | null;
@@ -50,6 +52,11 @@ export interface DrugOtcTranslationInput {
     title: string;
     groupKey: string | null;
     midBodyQuoteNeedsReview: boolean;
+    /**
+     * 투여경로 파생값(DR-019). 제형명으로 추정하지 않으며 근거 없으면 route=null·needs_review.
+     * 번역자는 이 값으로 take/insert 등 동사를 정한다(G-01).
+     */
+    route: OtcRouteResult;
   };
 }
 
@@ -120,6 +127,12 @@ export function buildDrugOtcTranslationInput(
       title: opts.title,
       groupKey: opts.groupKey ?? null,
       midBodyQuoteNeedsReview,
+      route: deriveOtcRoute({
+        groupKey: opts.groupKey ?? null,
+        usageLabel: content.usageLabel ?? null,
+        summaryTable: content.summaryTable ?? null,
+        title: opts.title,
+      }),
     },
   };
 }
