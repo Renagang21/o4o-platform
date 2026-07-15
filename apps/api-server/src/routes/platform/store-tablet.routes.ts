@@ -1295,6 +1295,16 @@ export function createStoreTabletRoutes(
       }
       if (req.body?.status !== undefined) {
         if (!SET_STATUSES_WRITABLE.includes(req.body.status)) { res.status(400).json({ success: false, error: 'invalid status', code: 'INVALID_STATUS' }); return; }
+        // WO-O4O-KPA-TABLET-CORNER-CONTENT-ASSIGNMENT-MODEL-V1 §6: 보관 시 코너 연결 보호.
+        //   현재 사용 중인 코너가 있으면 보관 거부. 사용 중은 아니어도 연결이 있으면 연결 수 안내 후 거부.
+        //   자동 연결 삭제는 하지 않는다(명시적 해제 유도).
+        if (req.body.status === 'archived') {
+          const cur = await dataSource.query(`SELECT count(*)::int AS c FROM store_tablets WHERE current_screen_set_id = $1 AND organization_id = $2`, [id, organizationId]);
+          if ((cur?.[0]?.c ?? 0) > 0) { res.status(409).json({ success: false, error: '이 콘텐츠를 현재 사용 중인 코너가 있어 보관할 수 없습니다. 먼저 다른 콘텐츠로 전환해 주세요.', code: 'ARCHIVE_BLOCKED_CURRENT' }); return; }
+          const links = await dataSource.query(`SELECT count(*)::int AS c FROM store_tablet_corner_contents WHERE screen_set_id = $1 AND organization_id = $2`, [id, organizationId]);
+          const linkCount = links?.[0]?.c ?? 0;
+          if (linkCount > 0) { res.status(409).json({ success: false, error: `이 콘텐츠가 ${linkCount}개 코너에 연결되어 있어 보관할 수 없습니다. 먼저 코너 연결을 해제해 주세요.`, code: 'ARCHIVE_BLOCKED_CONNECTED', data: { linkCount } }); return; }
+        }
         params.push(req.body.status); sets.push(`status = $${params.length}`);
       }
       if (req.body?.tabletId !== undefined) {
@@ -1526,11 +1536,21 @@ export function createStoreTabletRoutes(
       if (!screenSetId || typeof screenSetId !== 'string') { res.status(400).json({ success: false, error: 'screenSetId is required', code: 'VALIDATION_ERROR' }); return; }
       const t = await dataSource.query(`SELECT id FROM store_tablets WHERE id = $1 AND organization_id = $2 LIMIT 1`, [tabletId, organizationId]);
       if (!t?.[0]) { res.status(404).json({ success: false, error: 'Tablet not found', code: 'TABLET_NOT_FOUND' }); return; }
-      const s = await dataSource.query(`SELECT id, tablet_id AS "tabletId", status FROM store_tablet_screen_sets WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1`, [screenSetId, organizationId]);
+      const s = await dataSource.query(`SELECT id, status FROM store_tablet_screen_sets WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1`, [screenSetId, organizationId]);
       if (!s?.[0]) { res.status(404).json({ success: false, error: 'Screen set not found', code: 'SCREEN_SET_NOT_FOUND' }); return; }
       if (s[0].status !== 'active') { res.status(409).json({ success: false, error: 'Screen set must be active to apply', code: 'SCREEN_SET_NOT_ACTIVE' }); return; }
-      if (s[0].tabletId && s[0].tabletId !== tabletId) { res.status(409).json({ success: false, error: 'Screen set is dedicated to another tablet', code: 'SCREEN_SET_NOT_APPLICABLE' }); return; }
-      await dataSource.query(`UPDATE store_tablets SET current_screen_set_id = $1 WHERE id = $2 AND organization_id = $3`, [screenSetId, tabletId, organizationId]);
+      // WO-O4O-KPA-TABLET-CORNER-CONTENT-ASSIGNMENT-MODEL-V1 §2:
+      //   적용 = 연결 보장 + current 변경(원자적). 연결이 없으면 생성한다(current ∈ 연결 목록 불변식).
+      //   legacy tablet_id 전용 제약은 다중 코너 재사용과 충돌하므로 연결 기반으로 대체.
+      await dataSource.transaction(async (manager) => {
+        await manager.query(
+          `INSERT INTO store_tablet_corner_contents (organization_id, tablet_id, screen_set_id, sort_order, is_visible)
+           VALUES ($1, $2, $3, COALESCE((SELECT MAX(sort_order) + 10 FROM store_tablet_corner_contents WHERE tablet_id = $2), 0), TRUE)
+           ON CONFLICT (tablet_id, screen_set_id) DO NOTHING`,
+          [organizationId, tabletId, screenSetId],
+        );
+        await manager.query(`UPDATE store_tablets SET current_screen_set_id = $1 WHERE id = $2 AND organization_id = $3`, [screenSetId, tabletId, organizationId]);
+      });
       res.json({ success: true, data: { tabletId, currentScreenSetId: screenSetId } });
     } catch (error: any) {
       console.error('[StoreTablet] POST /tablets/:id/current-screen-set error:', error);
@@ -1549,6 +1569,109 @@ export function createStoreTabletRoutes(
     } catch (error: any) {
       console.error('[StoreTablet] DELETE /tablets/:id/current-screen-set error:', error);
       res.status(500).json({ success: false, error: 'Failed to clear screen set', code: 'INTERNAL_ERROR' });
+    }
+  }));
+
+  // ─────────────────────────────────────────────────────────────
+  // WO-O4O-KPA-TABLET-CORNER-CONTENT-ASSIGNMENT-MODEL-V1: 코너×콘텐츠 연결(store_tablet_corner_contents)
+  //   연결 = 선택 가능 콘텐츠 목록. current_screen_set_id = 현재 표시 콘텐츠(∈ 연결).
+  // ─────────────────────────────────────────────────────────────
+
+  // GET /tablets/:id/screen-sets — 코너에 연결된 콘텐츠 목록(+isCurrent, set 메타)
+  router.get('/tablets/:id/screen-sets', withStoreAuth(async (req, res, organizationId) => {
+    try {
+      const tabletId = req.params.id;
+      const t = await dataSource.query(`SELECT id, current_screen_set_id AS "currentScreenSetId" FROM store_tablets WHERE id = $1 AND organization_id = $2 LIMIT 1`, [tabletId, organizationId]);
+      if (!t?.[0]) { res.status(404).json({ success: false, error: 'Tablet not found', code: 'TABLET_NOT_FOUND' }); return; }
+      const currentId: string | null = t[0].currentScreenSetId ?? null;
+      const rows = await dataSource.query(
+        `SELECT cc.screen_set_id AS "screenSetId", cc.sort_order AS "sortOrder", cc.is_visible AS "isVisible",
+                s.name, s.status, COALESCE(s.template_key, 'corner_information_basic_v1') AS "templateKey",
+                s.public_qr_slug AS "publicQrSlug",
+                (SELECT count(*)::int FROM store_tablet_screen_blocks b WHERE b.screen_set_id = s.id) AS "blockCount"
+           FROM store_tablet_corner_contents cc
+           JOIN store_tablet_screen_sets s ON s.id = cc.screen_set_id AND s.deleted_at IS NULL
+          WHERE cc.tablet_id = $1 AND cc.organization_id = $2
+          ORDER BY cc.sort_order ASC, s.updated_at DESC`,
+        [tabletId, organizationId],
+      );
+      const data = rows.map((r: any) => ({ ...r, isCurrent: r.screenSetId === currentId }));
+      res.json({ success: true, data, currentScreenSetId: currentId });
+    } catch (error: any) {
+      console.error('[StoreTablet] GET /tablets/:id/screen-sets error:', error);
+      res.status(500).json({ success: false, error: 'Failed to fetch corner contents', code: 'INTERNAL_ERROR' });
+    }
+  }));
+
+  // POST /tablets/:id/screen-sets/:screenSetId — 코너에 콘텐츠 연결 추가(원본 복사 없음)
+  router.post('/tablets/:id/screen-sets/:screenSetId', withStoreAuth(async (req, res, organizationId) => {
+    try {
+      const tabletId = req.params.id;
+      const screenSetId = req.params.screenSetId;
+      const t = await dataSource.query(`SELECT id FROM store_tablets WHERE id = $1 AND organization_id = $2 LIMIT 1`, [tabletId, organizationId]);
+      if (!t?.[0]) { res.status(404).json({ success: false, error: 'Tablet not found', code: 'TABLET_NOT_FOUND' }); return; }
+      const s = await dataSource.query(`SELECT id, status FROM store_tablet_screen_sets WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1`, [screenSetId, organizationId]);
+      if (!s?.[0]) { res.status(404).json({ success: false, error: 'Screen set not found', code: 'SCREEN_SET_NOT_FOUND' }); return; }
+      if (s[0].status === 'archived') { res.status(409).json({ success: false, error: 'Archived screen set cannot be linked', code: 'SCREEN_SET_ARCHIVED' }); return; }
+      // 중복은 UNIQUE(tablet, set) 로 방지 — 이미 있으면 그대로 성공(멱등).
+      await dataSource.query(
+        `INSERT INTO store_tablet_corner_contents (organization_id, tablet_id, screen_set_id, sort_order, is_visible)
+         VALUES ($1, $2, $3, COALESCE((SELECT MAX(sort_order) + 10 FROM store_tablet_corner_contents WHERE tablet_id = $2), 0), TRUE)
+         ON CONFLICT (tablet_id, screen_set_id) DO NOTHING`,
+        [organizationId, tabletId, screenSetId],
+      );
+      res.status(201).json({ success: true, data: { tabletId, screenSetId } });
+    } catch (error: any) {
+      console.error('[StoreTablet] POST /tablets/:id/screen-sets/:screenSetId error:', error);
+      res.status(500).json({ success: false, error: 'Failed to link screen set', code: 'INTERNAL_ERROR' });
+    }
+  }));
+
+  // DELETE /tablets/:id/screen-sets/:screenSetId — 코너에서 콘텐츠 연결 해제(원본/타 코너/QR 무변경)
+  //   현재 사용 중 콘텐츠는 자동 전환하지 않고 409 반환(명시적 전환 유도).
+  router.delete('/tablets/:id/screen-sets/:screenSetId', withStoreAuth(async (req, res, organizationId) => {
+    try {
+      const tabletId = req.params.id;
+      const screenSetId = req.params.screenSetId;
+      const t = await dataSource.query(`SELECT id, current_screen_set_id AS "currentScreenSetId" FROM store_tablets WHERE id = $1 AND organization_id = $2 LIMIT 1`, [tabletId, organizationId]);
+      if (!t?.[0]) { res.status(404).json({ success: false, error: 'Tablet not found', code: 'TABLET_NOT_FOUND' }); return; }
+      if (t[0].currentScreenSetId === screenSetId) {
+        res.status(409).json({ success: false, error: '현재 사용 중인 콘텐츠입니다. 먼저 다른 콘텐츠로 전환하거나 적용을 해제해 주세요.', code: 'CURRENT_CONTENT_CANNOT_BE_REMOVED' });
+        return;
+      }
+      const del = await dataSource.query(
+        `DELETE FROM store_tablet_corner_contents WHERE tablet_id = $1 AND screen_set_id = $2 AND organization_id = $3 RETURNING id`,
+        [tabletId, screenSetId, organizationId],
+      );
+      if (!del?.[0]) { res.status(404).json({ success: false, error: 'Link not found', code: 'CORNER_CONTENT_NOT_FOUND' }); return; }
+      res.json({ success: true, data: { tabletId, screenSetId, removed: true } });
+    } catch (error: any) {
+      console.error('[StoreTablet] DELETE /tablets/:id/screen-sets/:screenSetId error:', error);
+      res.status(500).json({ success: false, error: 'Failed to unlink screen set', code: 'INTERNAL_ERROR' });
+    }
+  }));
+
+  // PATCH /tablets/:id/screen-sets/order — 연결 콘텐츠 정렬(body.order = screenSetId 배열)
+  router.patch('/tablets/:id/screen-sets/order', withStoreAuth(async (req, res, organizationId) => {
+    try {
+      const tabletId = req.params.id;
+      const order = Array.isArray(req.body?.order) ? req.body.order.filter((x: unknown): x is string => typeof x === 'string') : null;
+      if (!order || order.length === 0) { res.status(400).json({ success: false, error: 'order (screenSetId array) is required', code: 'VALIDATION_ERROR' }); return; }
+      const t = await dataSource.query(`SELECT id FROM store_tablets WHERE id = $1 AND organization_id = $2 LIMIT 1`, [tabletId, organizationId]);
+      if (!t?.[0]) { res.status(404).json({ success: false, error: 'Tablet not found', code: 'TABLET_NOT_FOUND' }); return; }
+      await dataSource.transaction(async (manager) => {
+        for (let i = 0; i < order.length; i++) {
+          await manager.query(
+            `UPDATE store_tablet_corner_contents SET sort_order = $1, updated_at = NOW()
+             WHERE tablet_id = $2 AND screen_set_id = $3 AND organization_id = $4`,
+            [i * 10, tabletId, order[i], organizationId],
+          );
+        }
+      });
+      res.json({ success: true, data: { tabletId, order } });
+    } catch (error: any) {
+      console.error('[StoreTablet] PATCH /tablets/:id/screen-sets/order error:', error);
+      res.status(500).json({ success: false, error: 'Failed to reorder corner contents', code: 'INTERNAL_ERROR' });
     }
   }));
 
