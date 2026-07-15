@@ -31,7 +31,7 @@
 | **CR-019** | products·services 축은 직교. 서비스는 자체 Rule Registry 없이 CR/DR/AR/OR를 Rule ID로 참조 | DOCUMENT-ARCHITECTURE §2 · services/*/README | active |
 | **CR-020** | 매장용 설명서 콘텐츠 = **`<style>` 없는 시맨틱 HTML + `sd-*` 클래스 계약**(전 제품군 공통). 반응형·색·테마는 공용 렌더러 담당(`ContentRenderer variant="store-description"`). **인라인 style·어휘 밖 임의 class·제품군별 재정의 금지**. 클래스 CSS 정의의 SSOT = 코드(`ContentRenderer.tsx`) | content-authoring/STORE-DESCRIPTION-CLASS-CONTRACT | active |
 
-| **CR-021** | **내부 편집 주석은 소비자 콘텐츠·번역 대상에서 제외**한다(작성자용 메모·큐레이션 지시·그룹 경계 설명 등). **단 삭제가 아니라 분리다** — 주석에만 있는 안전 근거(예: 같은 성분 고함량이 전문의약품 / 제형명과 실제 투여경로 불일치)는 **작성자·번역자가 반드시 열람**해야 한다. 초안 형식에서는 본문 선두 인용 블록(`>`)이 이 주석에 해당 | content-authoring/CONTENT-AUTHORING-PRINCIPLES · 실증 = `CHECK-O4O-OTC-EN-DESIGN-PILOT-VALIDATION-V1` | active |
+| **CR-021** | **내부 편집 주석은 소비자 콘텐츠·번역 대상에서 제외**한다(작성자용 메모·큐레이션 지시·그룹 경계 설명 등). **단 삭제가 아니라 분리다** — 주석에만 있는 안전 근거(예: 같은 성분 고함량이 전문의약품 / 제형명과 실제 투여경로 불일치)는 **작성자·번역자가 반드시 열람**해야 한다. 초안 형식에서는 본문 선두 인용 블록(`>`)이 이 주석에 해당. **구현 원칙 = 주석 삭제가 아니라 소비자 렌더 소스를 구조화 필드로 고정**(주석이 원천 배제됨) — 분리 구조 설계 = [CHECK-O4O-OTC-TRANSLATOR-NOTE-SEPARATION-V1](../../checks/CHECK-O4O-OTC-TRANSLATOR-NOTE-SEPARATION-V1.md) | content-authoring/CONTENT-AUTHORING-PRINCIPLES · 실증 = `CHECK-O4O-OTC-EN-DESIGN-PILOT-VALIDATION-V1` · 설계 = `CHECK-O4O-OTC-TRANSLATOR-NOTE-SEPARATION-V1` | active |
 
 > 신규 공통 규칙은 CR-022부터 부여하고 해당 SSOT Guide 본문을 함께 수정한다.
 > CR-021 은 HFF-R07(번호·편집 라벨 금지)이 건기식 한정이라 의약품에 미적용이던 것을 **2개 제품군 공통으로 승격**한 것이다(제품군 Guide 는 이를 복사하지 않고 Rule ID 로 참조). 운영/Git/문서 관리 규칙은 CR이 아니라 [OR](OPERATIONAL-RULE-REGISTRY.md)에 등재한다.
