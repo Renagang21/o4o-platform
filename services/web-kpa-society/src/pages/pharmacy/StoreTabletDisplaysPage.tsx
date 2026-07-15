@@ -1110,6 +1110,8 @@ export default function StoreTabletDisplaysPage() {
                   tabletId={selectedTabletId}
                   onCurrentChange={(id) => setTablets((prev) => prev.map((t) => (t.id === selectedTabletId ? { ...t, currentScreenSetId: id } : t)))}
                   onToast={setToast}
+                  previewApi={previewApi}
+                  storeSlug={storeSlug}
                 />
               )}
 

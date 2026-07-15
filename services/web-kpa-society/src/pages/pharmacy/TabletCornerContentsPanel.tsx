@@ -15,11 +15,15 @@
  *   - 표시숨김(is_visible): 서버 토글 엔드포인트 부재(INSERT 시 TRUE 고정) + 공개 런타임이 연결을 미소비.
  *   - 연결 sort_order 역시 현재 공개 런타임 미반영(관리용 정렬).
  */
-import { useState, useEffect, useCallback } from 'react';
-import { Loader2, Plus, ChevronUp, ChevronDown, X, Layers, AlertTriangle, Tv } from 'lucide-react';
+import { useState, useEffect, useCallback, type ReactNode } from 'react';
+import { Loader2, Plus, ChevronUp, ChevronDown, X, Layers, AlertTriangle, Tv, Eye, Trash2 } from 'lucide-react';
+import { RowActionMenu } from '@o4o/ui';
+import { defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
+import { TabletKioskPage, type TabletKioskApi, type TabletScreenResponse } from '@o4o/tablet-kiosk-core';
 import {
   fetchCornerContents, addCornerContent, removeCornerContent, reorderCornerContents,
   applyCurrentScreenSet, clearCurrentScreenSet, updateScreenSet, fetchScreenSets,
+  fetchScreenSet, previewScreenSet,
   type CornerContent, type ScreenSet, type ScreenSetStatus,
 } from '../../api/tabletDisplays';
 
@@ -30,7 +34,38 @@ interface Props {
   /** 적용/해제 후 상위(코너 카드·헤더)의 currentScreenSetId 동기화. */
   onCurrentChange: (id: string | null) => void;
   onToast: (t: Toast) => void;
+  /** 미리보기(kiosk-core 재사용) — 미주입 시 미리보기 비활성. */
+  previewApi?: TabletKioskApi;
+  storeSlug?: string | null;
 }
+
+// WO-O4O-KPA-TABLET-CORNER-MANAGEMENT-RESPONSIVE-UI-V1: 콘텐츠별 점3개 메뉴.
+//   '코너에서 제거'는 연결만 끊는 동작이므로 원본 삭제로 읽히지 않게 문구를 명시한다(실패 기준).
+//   현재 사용 중인 콘텐츠는 '이 화면 사용'/'코너에서 제거'를 숨긴다(서버도 409 로 막음).
+const cornerContentActionPolicy = defineActionPolicy<CornerContent>('kpa:tablet-corner-content', {
+  inlineMax: 0,
+  rules: [
+    { key: 'preview', label: '미리보기' },
+    { key: 'apply', label: '이 화면 사용', variant: 'primary', visible: (c) => !c.isCurrent },
+    {
+      key: 'remove',
+      label: '코너에서 제거',
+      variant: 'danger',
+      visible: (c) => !c.isCurrent,
+      confirm: (c) => ({
+        title: '이 코너에서 제거할까요?',
+        message: `“${c.name}” 을(를) 이 코너의 목록에서 뺍니다.\n콘텐츠 자체는 삭제되지 않고, 다른 코너의 연결도 그대로 유지됩니다.`,
+        confirmText: '코너에서 제거',
+        variant: 'danger',
+      }),
+    },
+  ],
+});
+const ACTION_ICONS: Record<string, ReactNode> = {
+  preview: <Eye className="w-4 h-4" />,
+  apply: <Tv className="w-4 h-4" />,
+  remove: <Trash2 className="w-4 h-4" />,
+};
 
 const STATUS_LABEL: Record<ScreenSetStatus, string> = {
   draft: '초안', active: '활성', archived: '보관', operator_template: '운영자 템플릿',
@@ -38,11 +73,28 @@ const STATUS_LABEL: Record<ScreenSetStatus, string> = {
 
 const btn = 'min-h-[44px] px-3 py-2 text-sm font-medium rounded-xl inline-flex items-center justify-center gap-1.5';
 
-export default function TabletCornerContentsPanel({ tabletId, onCurrentChange, onToast }: Props) {
+export default function TabletCornerContentsPanel({ tabletId, onCurrentChange, onToast, previewApi, storeSlug }: Props) {
   const [items, setItems] = useState<CornerContent[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [picking, setPicking] = useState(false);
+  // 미리보기 — 저장된 세트를 그대로 확인(원본 수정 아님). 기존 draft preview 경로 재사용.
+  const canPreview = !!previewApi && !!storeSlug;
+  const [preview, setPreview] = useState<{ name: string; screen: TabletScreenResponse; view: 'tablet' | 'mobile' } | null>(null);
+  const [previewBusy, setPreviewBusy] = useState<string | null>(null);
+
+  const handlePreview = async (it: CornerContent) => {
+    if (!canPreview) { onToast({ type: 'error', message: '매장 공개 주소를 불러오는 중입니다. 잠시 후 다시 시도해 주세요.' }); return; }
+    if (previewBusy) return;
+    setPreviewBusy(it.screenSetId);
+    try {
+      const detail = await fetchScreenSet(it.screenSetId);           // 저장된 원본 읽기(read-only)
+      const screen = await previewScreenSet({ templateKey: detail.templateKey, blocks: detail.blocks });
+      setPreview({ name: it.name, screen, view: 'tablet' });
+    } catch (e: any) {
+      onToast({ type: 'error', message: e?.message || '미리보기를 불러오지 못했습니다.' });
+    } finally { setPreviewBusy(null); }
+  };
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -96,10 +148,10 @@ export default function TabletCornerContentsPanel({ tabletId, onCurrentChange, o
     } finally { setBusy(false); }
   };
 
-  // 연결 해제 — 현재 표시 콘텐츠면 서버가 409(CURRENT_CONTENT_CANNOT_BE_REMOVED).
+  // 코너에서 제거 = 연결만 삭제(원본/타 코너/QR 무변경). 현재 표시 콘텐츠면 서버가 409.
+  //   확인 다이얼로그는 액션 정책(cornerContentActionPolicy.remove.confirm)이 담당한다.
   const handleRemove = async (it: CornerContent) => {
     if (busy) return;
-    if (!window.confirm(`"${it.name}" 을(를) 이 코너에서 연결 해제할까요?\n콘텐츠 원본과 다른 코너의 연결은 그대로 유지됩니다.`)) return;
     setBusy(true);
     try {
       await removeCornerContent(tabletId, it.screenSetId);
@@ -139,7 +191,7 @@ export default function TabletCornerContentsPanel({ tabletId, onCurrentChange, o
           {items.length > 0 && <span className="text-xs font-normal text-indigo-400">({items.length})</span>}
         </h3>
         <button onClick={() => setPicking(true)} disabled={busy} className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-indigo-700 bg-white border border-indigo-200 rounded-lg hover:bg-indigo-50 disabled:opacity-50">
-          <Plus className="w-3.5 h-3.5" /> 콘텐츠 연결
+          <Plus className="w-3.5 h-3.5" /> 기존 콘텐츠 추가
         </button>
       </div>
 
@@ -186,38 +238,56 @@ export default function TabletCornerContentsPanel({ tabletId, onCurrentChange, o
               <b>태블릿 콘텐츠</b> 탭에서 만든 콘텐츠를 이 코너에 연결해 주세요.
             </p>
             <button onClick={() => setPicking(true)} className={`${btn} text-white bg-indigo-600 hover:bg-indigo-700`}>
-              <Plus className="w-4 h-4" /> 콘텐츠 연결
+              <Plus className="w-4 h-4" /> 기존 콘텐츠 추가
             </button>
           </div>
         ) : (
           <div className="space-y-2">
             <div className="text-xs font-semibold text-slate-600">연결된 콘텐츠</div>
             {items.map((it, i) => (
-              <div key={it.screenSetId} className={`rounded-xl border p-3 space-y-2 ${it.isCurrent ? 'border-indigo-300 bg-indigo-50/40' : 'border-slate-200 bg-white'}`}>
+              <div
+                key={it.screenSetId}
+                className={`rounded-xl border p-3 space-y-2 ${it.isCurrent ? 'border-indigo-400 bg-indigo-50/60 ring-1 ring-indigo-200' : 'border-slate-200 bg-white'}`}
+              >
                 <div className="flex items-start gap-2">
                   <span className="w-6 h-6 flex items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-500 flex-shrink-0">{i + 1}</span>
                   <div className="min-w-0 flex-1">
                     <div className="text-sm font-semibold text-slate-800 truncate">{it.name}</div>
                     <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                      {it.isCurrent && <span className="text-[10px] font-semibold text-indigo-700 bg-indigo-100 px-1.5 py-0.5 rounded">현재 사용 중</span>}
-                      <span className="text-[11px] text-slate-400">{STATUS_LABEL[it.status] ?? it.status} · 블록 {it.blockCount}개</span>
+                      {it.isCurrent
+                        ? <span className="text-[10px] font-bold text-white bg-indigo-600 px-2 py-0.5 rounded-full">● 현재 사용 중</span>
+                        : <span className="text-[11px] text-slate-400">{STATUS_LABEL[it.status] ?? it.status}</span>}
+                      <span className="text-[11px] text-slate-400">블록 {it.blockCount}개</span>
                     </div>
                   </div>
+                  {/* 점 3개 메뉴: 미리보기 / 이 화면 사용 / 코너에서 제거 */}
+                  <div className="flex-shrink-0">
+                    <RowActionMenu
+                      actions={buildRowActions(cornerContentActionPolicy, it, {
+                        preview: () => handlePreview(it),
+                        apply: () => handleApply(it),
+                        remove: () => handleRemove(it),
+                      }, {
+                        icons: ACTION_ICONS,
+                        loading: previewBusy === it.screenSetId ? { preview: true } : undefined,
+                      })}
+                      inlineMax={cornerContentActionPolicy.inlineMax}
+                      disabled={busy}
+                    />
+                  </div>
                 </div>
+                {/* 주 동작은 큰 버튼으로 — 매장 스마트폰에서 바로 누를 수 있게(min-h 44px). */}
                 <div className="flex gap-2 flex-wrap">
                   {!it.isCurrent && (
-                    <button onClick={() => handleApply(it)} disabled={busy} className={`${btn} flex-1 min-w-[120px] font-semibold text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50`}>
+                    <button onClick={() => handleApply(it)} disabled={busy} className={`${btn} flex-1 min-w-[140px] font-semibold text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50`}>
                       <Tv className="w-4 h-4" /> 이 화면 사용
                     </button>
                   )}
-                  <button onClick={() => handleMove(i, 'up')} disabled={busy || i === 0} className={`${btn} text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 disabled:opacity-30`} title="위로">
+                  <button onClick={() => handleMove(i, 'up')} disabled={busy || i === 0} className={`${btn} w-11 text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 disabled:opacity-30`} title="위로" aria-label="위로">
                     <ChevronUp className="w-4 h-4" />
                   </button>
-                  <button onClick={() => handleMove(i, 'down')} disabled={busy || i === items.length - 1} className={`${btn} text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 disabled:opacity-30`} title="아래로">
+                  <button onClick={() => handleMove(i, 'down')} disabled={busy || i === items.length - 1} className={`${btn} w-11 text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 disabled:opacity-30`} title="아래로" aria-label="아래로">
                     <ChevronDown className="w-4 h-4" />
-                  </button>
-                  <button onClick={() => handleRemove(it)} disabled={busy} className={`${btn} text-red-600 bg-white border border-red-200 hover:bg-red-50 disabled:opacity-50`}>
-                    <X className="w-4 h-4" /> 연결 해제
                   </button>
                 </div>
               </div>
@@ -228,6 +298,37 @@ export default function TabletCornerContentsPanel({ tabletId, onCurrentChange, o
           </div>
         )}
       </div>
+
+      {/* WO-O4O-KPA-TABLET-CORNER-MANAGEMENT-RESPONSIVE-UI-V1: 콘텐츠 미리보기(읽기 전용).
+          저장된 세트를 kiosk-core 로 그대로 렌더 — 원본을 수정하지 않는다. */}
+      {preview && previewApi && (
+        <div className="fixed inset-0 z-[100000] bg-slate-900/70 flex flex-col" onClick={() => setPreview(null)} role="presentation">
+          <div className="bg-slate-900/95 text-white px-4 py-2 flex items-center justify-between gap-3 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="text-sm font-semibold truncate">{preview.name}</span>
+              <div className="flex gap-1 flex-shrink-0">
+                <button onClick={() => setPreview((p) => (p ? { ...p, view: 'tablet' } : p))}
+                  className={`px-3 py-1 text-xs font-medium rounded-full ${preview.view === 'tablet' ? 'bg-white text-slate-900' : 'bg-white/10 text-white hover:bg-white/20'}`}>태블릿</button>
+                <button onClick={() => setPreview((p) => (p ? { ...p, view: 'mobile' } : p))}
+                  className={`px-3 py-1 text-xs font-medium rounded-full ${preview.view === 'mobile' ? 'bg-white text-slate-900' : 'bg-white/10 text-white hover:bg-white/20'}`}>QR 모바일</button>
+              </div>
+            </div>
+            <button onClick={() => setPreview(null)} className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-medium whitespace-nowrap">
+              <X className="w-4 h-4" /> 닫기
+            </button>
+          </div>
+          <div className="flex-1 min-h-0 flex items-center justify-center p-3 overflow-auto" onClick={(e) => e.stopPropagation()}>
+            <div style={preview.view === 'tablet'
+              ? { position: 'relative', overflow: 'hidden', width: 'min(100%, 1024px)', aspectRatio: '16 / 10', background: '#000', borderRadius: 12 }
+              : { position: 'relative', overflow: 'hidden', width: 390, maxWidth: '100%', height: 'min(86vh, 780px)', background: '#000', borderRadius: 24 }}>
+              <TabletKioskPage api={previewApi} slug={storeSlug ?? undefined} previewScreen={preview.screen} embedded showQrBadge={false} />
+            </div>
+          </div>
+          <div className="bg-slate-900/90 text-slate-300 text-[11px] px-4 py-1.5 text-center flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+            저장된 내용을 보여 주는 미리보기입니다. 실제 태블릿에서는 화면 크기·방향에 따라 달라질 수 있습니다.
+          </div>
+        </div>
+      )}
 
       {picking && (
         <CornerContentPicker
@@ -289,7 +390,7 @@ function CornerContentPicker({ tabletId, linkedIds, onClose, onAdded, onToast }:
     <div className="fixed inset-0 z-[950] bg-slate-900/50 flex items-stretch sm:items-center justify-center p-0 sm:p-4" onClick={onClose} role="presentation">
       <div className="bg-white w-full h-full sm:h-auto sm:max-w-lg sm:max-h-[86vh] rounded-none sm:rounded-2xl flex flex-col overflow-hidden" onClick={(e) => e.stopPropagation()}>
         <div className="px-4 py-3 border-b flex items-center justify-between flex-shrink-0">
-          <h4 className="text-base font-bold text-slate-700">코너에 콘텐츠 연결</h4>
+          <h4 className="text-base font-bold text-slate-700">기존 콘텐츠 추가</h4>
           <button onClick={onClose} className="min-h-[40px] min-w-[40px] flex items-center justify-center text-slate-400 hover:text-slate-600" aria-label="닫기"><X className="w-5 h-5" /></button>
         </div>
         <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2">
