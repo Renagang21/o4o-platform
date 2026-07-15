@@ -1,6 +1,6 @@
 # OTC-DESCRIPTION-DESIGN-GUIDE — 일반의약품 설명서 화면 디자인 지침
 
-상태: **Draft V0.6** (2026-07-16) · 대상: **일반의약품(OTC) 전용** · 진입: [DOCUMENT-INDEX](common/DOCUMENT-INDEX.md)
+상태: **Draft V0.7** (2026-07-16) · 대상: **일반의약품(OTC) 전용** · 진입: [DOCUMENT-INDEX](common/DOCUMENT-INDEX.md)
 번역 기준: [OTC-EN-TRANSLATION-GUIDE](OTC-EN-TRANSLATION-GUIDE.md) · 테스트 기록: [OTC-DESCRIPTION-DESIGN-TEST-LOG](OTC-DESCRIPTION-DESIGN-TEST-LOG.md)
 
 > 이 문서는 **새 디자인 시스템을 만들지 않는다.** 이미 구현된 공용 렌더러를 그대로 쓴다.
@@ -47,7 +47,7 @@ OTC 에서 유의할 점만:
 
 > ✅ **주의사항은 `sd-warn` 을 쓴다 (2026-07-16 신설).** 금기·경고·주의사항 전용 어휘이며 `sd-who`("이런 분께")를 재사용하지 않는다 — [클래스 계약 §2-1](content-authoring/STORE-DESCRIPTION-CLASS-CONTRACT.md).
 > 렌더러가 **삼각 마커 + 좌측 굵은 선 + 박스 배경**으로 구분하고(색 의존 금지), 640px 이상에서도 **1열을 유지**한다(금기가 두 열로 쪼개지면 오독).
-> ⚠️ **이미 공개된 686건은 아직 `sd-who` 로 저장돼 있다** — 소급 재생성은 **별도 승인 WO** (§8-A).
+> ✅ **공개 중인 1,372건(ko 686 + en 686) 소급 완료 (2026-07-16)** — `sd-who` 잔여 0. 전건이 `sd-warn` 이다 (§8-A).
 
 ---
 
@@ -196,7 +196,7 @@ OTC 에서 유의할 점만:
 
 | # | 항목 | 영향 |
 |---|---|---|
-| **A** | ~~주의사항·금기 전용 class 부재~~ → **계약·코드 해소 (2026-07-16)** | `sd-warn` 신설 + 렌더러/빌더 반영. **단 기존 공개 686건은 `sd-who` 로 저장돼 있어 소급 재생성(content UPDATE)이 남음 → 별도 승인 WO.** `WO-O4O-SD-WARNING-CLASS-CONTRACT-AND-BUILDER-V1` |
+| ~~**A**~~ | ~~주의사항·금기 전용 class 부재~~ | ✅ **완전 해결 (2026-07-16)** — 계약·코드(`sd-warn` 신설 + 렌더러/빌더, `WO-O4O-SD-WARNING-CLASS-CONTRACT-AND-BUILDER-V1`) **+ 공개 중인 1,372건(ko 686 + en 686) 소급 적용**(`sd-who` 잔여 0, 클래스 외 콘텐츠 변경 0, `WO-O4O-OTC-SD-WARN-BACKFILL-1372-V1`) |
 | **B** | **C 키오스크 variant 미지정 / D 렌더러 미사용** | 같은 설명서가 화면마다 다르게 보임 (§3) |
 | **C** | **언어 전환 UI 4중 중복** | 화면마다 조작이 다름 (§5) |
 | ~~**D**~~ | ~~줄바꿈 규칙 부재 + `overflow:hidden`~~ | ✅ **해결 (2026-07-15)** — `overflow-wrap:anywhere` 적용. `WO-O4O-SD-HERO-LONG-TEXT-OVERFLOW-FIX-V1` |
@@ -243,3 +243,4 @@ OTC 에서 유의할 점만:
 | V0.4 | 2026-07-15 | 파일럿 P1~P5 실측 반영 — §4.3 **계산값 → 실측 확정**(20/20 일치) · 슬롯별 분기표(B 모달 576=1열 / A 랜딩 644=2열, 경계 639↔641) · §7 줄바꿈 결함 실측 확정(h1 594>301, 잘림). 디자인 규칙 변경 없음 — 추정의 확정 (`WO-O4O-OTC-EN-DESIGN-PILOT-VALIDATION-V1`). |
 | V0.5 | 2026-07-15 | **§8-D 해소** — 렌더러에 `overflow-wrap:anywhere; word-break:normal` 적용으로 긴 영문 단어 잘림 수정(h1 594→301, 27/27 PASS, 반응형·한국어 무회귀). §7 경고 → 해결 기록으로 교체 (`WO-O4O-SD-HERO-LONG-TEXT-OVERFLOW-FIX-V1`). |
 | V0.6 | 2026-07-16 | §2 주의사항 = **`sd-warn`**(신설) 반영 · §8-A **계약·코드 해소**(기존 686 소급은 별도 WO). 근거 = `CHECK-O4O-SD-WARNING-CLASS-CONTRACT-AND-BUILDER-V1`. |
+| V0.7 | 2026-07-16 | §2·§8-A **소급 완료 반영** — 공개 중인 1,372건(ko 686 + en 686) `sd-who`→`sd-warn` 적용, 잔여 0. §8-A **완전 해결**. 규칙 변경 없음(상태 갱신). 근거 = `CHECK-O4O-OTC-SD-WARN-BACKFILL-1372-V1`. |
