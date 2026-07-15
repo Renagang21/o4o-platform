@@ -21,7 +21,9 @@
  * DB write 게이트: `--apply` AND `DRUG_OTC_EN_PILOT_CONFIRM=YES`
  */
 
-const PROMOTION_SOURCE_TYPE = 'mfds_drug_otc';
+import type { SharedProductDescriptionSourceType } from '../modules/neture/entities/SharedProductDescription.entity.js';
+
+const PROMOTION_SOURCE_TYPE: SharedProductDescriptionSourceType = 'mfds_drug_otc';
 const EXPECTED_ROWS = 5;
 
 /** 영문 시안 — 구조화 4필드 번역. groupKey 로 한국어 canonical 과 매칭한다. */
