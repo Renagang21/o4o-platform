@@ -111,6 +111,8 @@ export interface ServingSpec {
 
 export interface GroundingInput {
   declaredAmount: DeclaredAmount | null;
+  /** 표시 CFU 절대값 — 원문 파싱값과 교차 검증됨(PRE-SRC-CFU-*) */
+  declaredCfu?: DeclaredCfu | null;
   serving: ServingSpec | null;
   /**
    * 작성자가 선언한 "환산 허용" 여부. 가드는 이 값을 신뢰하지 않고 **독립 재계산**하여
@@ -127,6 +129,12 @@ export interface GuardSourceInput {
   intake: string;
   caution: string;
   dosageForm: string;
+}
+
+/** 표시 CFU 절대값. 작성 전 가드가 **원문 파싱값과 교차 검증**한다(불일치 = BLOCKED). */
+export interface DeclaredCfu {
+  /** 예: 1e10 (100억) */
+  absolute: number;
 }
 
 export interface GuardProductInput {

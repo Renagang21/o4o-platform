@@ -89,9 +89,13 @@ describe('A. 기준량 환산 (computeBasis)', () => {
 describe('V1.1 — 위험 신호와 정보성 신호 분리', () => {
   it('PRE-* 고지는 PRECHECK_INFO 이며 reviewCount 에 합산되지 않는다', () => {
     const r = runGuard(OK_VIVA_FULL_BASIS, { phase: 'pre' });
-    expect(r.findings.every((f) => f.status === 'PRECHECK_INFO')).toBe(true);
+    // V1.2: pre 단계에 원문 교차검증(PRE-SRC-*)이 추가됐다. 고지(PRECHECK_INFO)와
+    // 원문 일치(PASS)는 섞이지만, **위험 신호는 없어야** 한다.
+    expect(r.findings.some((f) => f.status === 'BLOCKED' || f.status === 'REVIEW_REQUIRED')).toBe(false);
     expect(r.reviewCount).toBe(0);
-    expect(r.precheckInfoCount).toBe(2); // PRE-A-BASIS-001 + PRE-F-AGE-001
+    expect(r.findings.filter((f) => f.ruleId === 'PRE-A-BASIS-001' || f.ruleId === 'PRE-F-AGE-001')
+      .every((f) => f.status === 'PRECHECK_INFO')).toBe(true);
+    expect(r.precheckInfoCount).toBeGreaterThanOrEqual(2);
     expect(r.overallStatus).not.toBe('REVIEW_REQUIRED');
   });
 

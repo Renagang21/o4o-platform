@@ -25,8 +25,11 @@ import type {
 } from './product-description-guard.types.js';
 import { GUARD_VERSION } from './product-description-guard.types.js';
 import { computeBasis, ruleA, ruleB, ruleC, ruleD, ruleE, ruleF, ruleG, ruleH } from './product-description-guard.rules.js';
+import { crossCheckNumber, isBulkMaterial, parseBasis, parseCfu } from './source-grounding-parser.js';
+import type { ParseOutcome } from './source-grounding-parser.js';
 
 export * from './product-description-guard.types.js';
+export * from './source-grounding-parser.js';
 export { computeBasis } from './product-description-guard.rules.js';
 
 /**
@@ -52,9 +55,75 @@ export function isRiskSignal(f: GuardFinding): boolean {
  * 작성 전 가드 (§6 pre): grounding 만 보고 "환산 허용 여부 / 생성 금지 목록" 을 확정한다.
  * 초안을 보지 않으므로 초안 작성 **전에** 실행할 수 있다.
  */
+/**
+ * PRE-SRC (V1.2) — 손으로 채운 grounding 이 **공식 원문과 일치하는가**.
+ *
+ * 이 검사가 없으면 파서·작성자의 오독이 그대로 초안 수치가 된다(실측: 1.5억 → 5억, 3.3배).
+ * 판정 원칙(WO):
+ *   정상 파싱 + 타당성 통과      → 작성 가능 (PASS)
+ *   파싱 결과가 원문 숫자와 불일치 → BLOCKED
+ *   원문 형식이 비정상            → REVIEW_REQUIRED (HOLD 후보)
+ *   파싱 실패                     → **값 없음으로 단정하지 않음** → REVIEW_REQUIRED (원문 수동 확인)
+ */
+function runSourceCrossCheck(input: GuardProductInput): GuardFinding[] {
+  const out: GuardFinding[] = [];
+  const base = input.source.baseStandard ?? '';
+
+  // ① 벌크 원료 — 소비자 설명서 대상이 아니다
+  const bulk = isBulkMaterial(input.source.intake ?? '');
+  if (bulk.bulk) {
+    out.push({
+      ruleId: 'PRE-SRC-BULK-004', severity: 'ERROR', status: 'BLOCKED', language: 'n/a',
+      field: 'source.intake', matchedText: trunc(input.source.intake, 60),
+      sourceEvidence: `SRV_USE: ${trunc(input.source.intake, 70)}`,
+      message: `벌크 원료로 판정됩니다(${bulk.reason}) — 소비자 설명서 작성 대상이 아닙니다.`,
+      suggestedAction: '대상에서 제외하십시오.',
+    });
+  }
+
+  // ② 표시 CFU 교차 검증
+  const cfu = parseCfu(base);
+  // `?? null` 로 뭉개면 미제공이 "없음 단언" 이 된다 → undefined 를 그대로 넘긴다
+  const declaredCfu = input.grounding.declaredCfu === undefined ? undefined : (input.grounding.declaredCfu?.absolute ?? null);
+  const c = crossCheckNumber('표시량(CFU)', declaredCfu, cfu);
+  out.push(
+    c.status === 'NOT_DECLARED'
+      ? { ruleId: 'PRE-SRC-CFU-NOT-DECLARED-005', severity: 'INFO', status: 'PRECHECK_INFO', language: 'n/a', field: 'grounding.declaredCfu', matchedText: null, sourceEvidence: `BASE_STANDARD: ${trunc(base, 70)}`, message: c.message, suggestedAction: '원문 파싱값을 확인하고 초안 수치를 여기에 맞추십시오.' }
+    : c.status === 'MATCH'
+      ? { ruleId: 'PRE-SRC-CFU-001', severity: 'INFO', status: 'PASS', language: 'n/a', field: 'grounding.declaredCfu', matchedText: null, sourceEvidence: `BASE_STANDARD: ${trunc(base, 70)}`, message: c.message, suggestedAction: '조치 불요.' }
+      : c.status === 'MISMATCH'
+        ? { ruleId: 'PRE-SRC-CFU-MISMATCH-002', severity: 'ERROR', status: 'BLOCKED', language: 'n/a', field: 'grounding.declaredCfu', matchedText: String(declaredCfu ?? ''), sourceEvidence: `BASE_STANDARD: ${trunc(base, 90)}`, message: c.message, suggestedAction: '원문 수치를 그대로 사용하십시오. 임의 값 금지.' }
+        : { ruleId: 'PRE-SRC-CFU-UNVERIFIABLE-003', severity: 'WARNING', status: 'REVIEW_REQUIRED', language: 'n/a', field: 'grounding.declaredCfu', matchedText: null, sourceEvidence: `BASE_STANDARD: ${trunc(base, 90)}`, message: c.message, suggestedAction: '사람이 원문을 직접 읽고 확정하십시오. **파싱 실패를 근거 부재로 해석하지 마십시오.**' },
+  );
+
+  // ③ 표시 기준량 교차 검증
+  const pb = parseBasis(base);
+  const declaredBasis = input.grounding.declaredAmount
+    ? input.grounding.declaredAmount.basisUnit === 'g'
+      ? input.grounding.declaredAmount.basisAmount * 1000
+      : input.grounding.declaredAmount.basisAmount
+    : undefined; // 미제공 — "없음 단언" 이 아니다
+  const parsedBasisMg: ParseOutcome<number> =
+    pb.kind === 'PARSED'
+      ? { kind: 'PARSED', value: pb.value.unit === 'g' ? pb.value.amount * 1000 : pb.value.amount, evidence: pb.evidence }
+      : pb;
+  const cb = crossCheckNumber('표시 기준량(mg 환산)', declaredBasis, parsedBasisMg);
+  out.push(
+    cb.status === 'NOT_DECLARED'
+      ? { ruleId: 'PRE-SRC-BASIS-NOT-DECLARED-005', severity: 'INFO', status: 'PRECHECK_INFO', language: 'n/a', field: 'grounding.declaredAmount', matchedText: null, sourceEvidence: `BASE_STANDARD: ${trunc(base, 70)}`, message: cb.message, suggestedAction: '원문 파싱값을 확인하십시오.' }
+    : cb.status === 'MATCH'
+      ? { ruleId: 'PRE-SRC-BASIS-001', severity: 'INFO', status: 'PASS', language: 'n/a', field: 'grounding.declaredAmount', matchedText: null, sourceEvidence: `BASE_STANDARD: ${trunc(base, 70)}`, message: cb.message, suggestedAction: '조치 불요.' }
+      : cb.status === 'MISMATCH'
+        ? { ruleId: 'PRE-SRC-BASIS-MISMATCH-002', severity: 'ERROR', status: 'BLOCKED', language: 'n/a', field: 'grounding.declaredAmount', matchedText: String(declaredBasis ?? ''), sourceEvidence: `BASE_STANDARD: ${trunc(base, 90)}`, message: cb.message, suggestedAction: '원문 기준량을 그대로 사용하십시오.' }
+        : { ruleId: 'PRE-SRC-BASIS-UNVERIFIABLE-003', severity: 'WARNING', status: 'REVIEW_REQUIRED', language: 'n/a', field: 'grounding.declaredAmount', matchedText: null, sourceEvidence: `BASE_STANDARD: ${trunc(base, 90)}`, message: cb.message, suggestedAction: '사람이 원문을 직접 읽고 확정하십시오.' },
+  );
+
+  return out;
+}
+
 export function runPreGuard(input: GuardProductInput): GuardFinding[] {
   const basis = computeBasis(input);
-  const findings: GuardFinding[] = [];
+  const findings: GuardFinding[] = [...runSourceCrossCheck(input)];
 
   findings.push({
     ruleId: 'PRE-A-BASIS-001',
