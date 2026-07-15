@@ -19,6 +19,20 @@
 ## 1. 대상 = 식약처 건강기능식품 (핵심)
 
 - 대상 풀 = `product_candidates` 중 `source_label='MFDS_HEALTH_FUNCTIONAL_FOOD'` (약 41,261건, 공식 데이터).
+
+> ⚠️ **41,261건은 소비자 완제품 목록이 아니다 — 원료 회사의 벌크 원료가 대량 섞여 있다.**
+> 유산균 파일럿 실측: 동일 기능성 828건 중 **소비자 완제품은 246건(30%)**뿐. 나머지는 벌크 원료.
+> ```text
+> 소비자 완제품 : 프로바이오틱스 수 = 표시량(…CFU / 포·캡슐·mg)   + 브랜드 제품명
+> 벌크 원료     : …CFU/g (단위중량당)                             + 균주·규격명(혼합유산균a-10 등)
+>                 또는 SRV_USE = "건강기능식품의 원료로 사용한다."
+> ```
+> **`SRV_USE NOT ILIKE '%원료로 사용%'` 만으로는 못 거른다.** 반드시 함께:
+> ```sql
+> AND raw_payload->'source'->>'BASE_STANDARD' ILIKE '%표시량%'   -- 단위당 표시 = 소비자 완제품
+> AND raw_payload->'source'->>'PRDUCT'        NOT ILIKE '%수출%'
+> ```
+> 근거·실측 = [pilot-probiotics/PILOT-PROBIOTICS-V1 §1](pilot-probiotics/PILOT-PROBIOTICS-V1.md).
 - 이 후보는 **바코드/SKU 없음**(HOLD)이지만 **설명서 grounding 자료는 풍부**하다 — `raw_payload` 안:
   - `source.PRDUCT` = 공식 상품명 · `source.ENTRPS` = 제조사
   - **`mainFunction` / `source.MAIN_FNCTN` = 식약처 인정 기능성 문구(전문)** ← 가장 중요한 grounding
@@ -84,7 +98,8 @@
 
 **규칙:**
 - **`<style>`·인라인 style·임의 class 금지.** 위 `sd-*` 구조만 맞추면 렌더러가 디자인을 입힌다.
-- **반응형은 자동** — 렌더러가 `@container` 로 폰 1열 / 태블릿(640px↑) 2열 / (900px↑) 3열. 저자는 구조만.
+- **반응형은 자동** — 렌더러가 `@container` 로 폰 1열 / 태블릿(640px↑) 2열 / (900px↑) 3열. 저자는 구조만. (실측 검증: [REVIEW-V1 §3-1](pilot-probiotics/REVIEW-V1.md))
+- **알려진 현상 — 900px↑ `sd-core` 3열의 빈 칸**: `sd-item` 이 2개면 세 번째 칸이 빈다(정본 예제도 2개). **결정 = 그대로 둔다**(주 표면이 QR 모바일·모달이라 1~2열 구간). ⚠️ **빈 칸을 채우려고 근거 없는 세 번째 카드를 만들지 말 것**(CR-004 위반). 렌더러도 바꾸지 않는다.
 - **테마 자동** — 렌더러가 라이트/다크 토큰 제공.
 - **번호·편집 라벨 금지**(HFF-R07). 소비자 랜딩 카피만. **10단 랜딩** 구조(히어로→왜→핵심 구성→이런 분께→섭취→트러스트→구성→상담).
 - **카테고리 테마**: 콘텐츠 루트를 `<div class="sd-card sd-theme-red">`처럼 지정하면 렌더러가 accent(홍/골드 등)를 교체한다(general-food §2 "패키지 톤 반영"). 현재 `sd-theme-red`(홍삼·전통보양), `sd-theme-green`(유산균·식물), 미지정=블루(기본). 예제 [examples/hongsam-red-ginseng.semantic.html](examples/hongsam-red-ginseng.semantic.html).
@@ -119,14 +134,16 @@
 - **여러 컴퓨터 무혼선**:
   1. **결정론적 분할** — 머신마다 disjoint 그룹(카테고리별, 또는 `id/이름 해시 % N`). 사전 조율 없이 안 겹침.
   2. **DB 존재 가드(안전망)** — 겹쳐도 저장 직전 체크로 중복 방지. 최악이라도 재생성 낭비뿐(canonical은 (master,type,lang)당 1개 = 마지막 것만).
-  3. (대규모 시) 정비 화면/큐 테이블 — 지금 규모(건기식 master 15)엔 불필요.
+  3. (대규모 시) 정비 화면/큐 테이블 — 지금 규모(건기식 master **30**, 2026-07-14 실측)엔 불필요.
 - **그룹 순서(카테고리)**: 유산균/장 → 면역/항산화 → 혈행·기억력 → 뼈·관절·치아 → 눈 → 피부·모발 → 남성·여성 → 에너지.
 
 ---
 
 ## 8. 알려진 정비 과제 (선행/병행)
 
-- **regulatory_type 표기 불일치**: 같은 개념이 여러 리터럴 — 일반식품 `일반`(15) vs `GENERAL`(4), 건기식 `건강기능식품`(정상) + **인코딩 깨진 1건**(`efbfbd…`, name도 깨짐 = U+FFFD 소실). 작업 큐 필터가 새지 않게 **값 정규화** 필요(DB write=승인).
+- ~~**regulatory_type 인코딩 손상**~~ → **해결됨 (2026-07-14)**. 손상은 1건이 아니라 **5건**이었고(regulatory_type·name·manufacturer 동시 U+FFFD 소실, 공식 원천 미연결), 복구 대신 **guarded delete** 로 정리했다(운영 사용 0 확인·스냅샷 백업). **건기식 master = 30건 clean(name 손상 0).** → [CHECK-...-BROKEN-REGULATORY-TYPE-NORMALIZE-V1](../../../checks/CHECK-O4O-HFF-BROKEN-REGULATORY-TYPE-NORMALIZE-V1.md) · [CHECK-...-CORRUPTED-PRODUCTMASTER-GUARDED-DELETE-V1](../../../checks/CHECK-O4O-HFF-CORRUPTED-PRODUCTMASTER-GUARDED-DELETE-V1.md)
+  - 잔여(범위 밖): 일반식품 `일반`(15) vs `GENERAL`(9) 한/영 리터럴 혼재. name 손상 1건은 `[E2E_TEST]` 테스트 픽스처(GENERAL, 건기식 아님) — 별도 판단.
+  - **원인 미규명**: 바코드리스 admin 등록 경로의 CP949 인코딩 버그로 추정(생성 2026-07-10~12). **재발 시 신규 등록도 깨진다** — 재발 확인되면 별도 조사 WO.
 - **식약처 매칭(사진 제품↔공식 레코드)**: 이름만으론 fuzzy(오프라인 수입은 0매칭 다수). 정확 매칭엔 품목보고번호/제조사가 필요 → 보류.
 - **정비 화면(maintenance)**: 규모 커질 때 `/admin/o4o-product-db/maintenance`에 "건기식 STORE 미작성 목록"(읽기전용). 지금은 즉석 쿼리로 충분.
 
@@ -141,9 +158,21 @@
 
 ---
 
-## 부록. 파일럿 (검증 완료, 2026-07-11)
+## 부록. 파일럿
 
-- **변엔장** (노바렉스 제조, 프로바이오틱스 100억 CFU, 품목보고 200400200082915) — 식약처 `mainFunction`(장 건강) grounding으로 **시맨틱 ko+en** 제작, master `38a9d3e4-56be-4967-aa7b-0cb2d2e6baff` 등록, STORE·B2B ko+en canonical 저장 완료(2026-07-11). **정본 형식 예제 = [examples/byeonenjang.semantic.html](examples/byeonenjang.semantic.html)** (시맨틱 sd-*, `<style>` 없음). 반응형 프리뷰 검증 완료.
+### A. 단건 파일럿 — 변엔장 (2026-07-11)
+
+식약처 `mainFunction`(장 건강) grounding 으로 **시맨틱 ko+en** 제작. **정본 형식 예제 = [examples/byeonenjang.semantic.html](examples/byeonenjang.semantic.html)** (시맨틱 sd-*, `<style>` 없음) — 형식 기준으로 계속 유효.
+
+> ⚠️ **DB 상태 정정 (2026-07-14)**: 당시 등록했던 master `38a9d3e4…` 와 그 STORE·B2B canonical 은 **삭제되었다** — 그 master 가 인코딩 손상 5건에 포함되어 guarded delete 대상이었다(§8). **DB에 변엔장 master/설명서는 없다.** 예제 **파일**만 형식 참조용으로 남아 있다.
+> ⚠️ 예제의 **"장용성 캡슐"을 다른 제품에 복사하지 말 것** — MFDS 건기식 데이터원에는 **균주명·코팅·장용성 정보가 없다.** 근거 없이 쓰면 창작(CR-004/실패 유형 ①⑤).
+
+### B. 그룹 파일럿 — 유산균 장건강 828 그룹 (2026-07-15)
+
+공통 골격 1종 + 제품 5건(제조사·제형·균수·섭취방법 상이) ko/en 초안 + 검수. **판정 GO(조건부), 저장 전 승인 대기.**
+→ [pilot-probiotics/PILOT-PROBIOTICS-V1](pilot-probiotics/PILOT-PROBIOTICS-V1.md) · [REVIEW-V1](pilot-probiotics/REVIEW-V1.md)
+
+그룹 제작 착수 전 반드시 볼 것: **§1 벌크 원료 필터** · [REVIEW-V1 §3](pilot-probiotics/REVIEW-V1.md) 5개 선결 조건 · [CONTENT-AUTHORING-PRINCIPLES §4-1](../../content-authoring/CONTENT-AUTHORING-PRINCIPLES.md) grounding 실패 5유형.
 
 ## 참조
 - 규칙 SSOT: [HFF-DESCRIPTION-RULES-SSOT-V1.md](HFF-DESCRIPTION-RULES-SSOT-V1.md) (HFF-R01~R10)
