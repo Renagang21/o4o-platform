@@ -26,10 +26,12 @@ import {
   resolveServiceKeys,
 } from './store-public-utils.js';
 // WO-O4O-KPA-TABLET-SCREEN-SET-BLOCK-PUBLIC-RUNTIME-READ-V1
+//   idle handler(GET /:slug/tablet/idle)는 여전히 resolveTabletIdleItems 를 직접 사용.
 import { resolveTabletIdleItems } from './store-public-tablet-idle-resolve.js';
-import { resolveTemplateKey, shapeStaticBlock } from './store-public-tablet-screen.js';
-// WO-O4O-KPA-TABLET-CONTENT-LIST-BLOCK-SCHEMA-CONTRACT-V1: content_list item → 카드 resolve
-import { resolveContentListItems } from './store-public-tablet-content-resolve.js';
+// WO-O4O-KPA-TABLET-QR-LANDING-CONTRACT-V1:
+//   /tablet/screen 의 blocks→sections 는 공용 resolveScreenSetSections 로 통일(QR landing 과 동일 소스).
+//   기존의 resolveTemplateKey/shapeStaticBlock/resolveContentListItems 직접 호출은 resolver 내부로 이동.
+import { resolveScreenSetSections } from './store-public-screen-set-resolve.js';
 
 export function createStorePublicTabletRoutes(deps: {
   dataSource: DataSource;
@@ -505,62 +507,32 @@ export function createStorePublicTabletRoutes(deps: {
         return;
       }
 
-      // 적용 세트 유효성(org 일치 + 미삭제 + 미보관). 아니면 안전 legacy fallback.
-      const setRows = await dataSource.query(
-        // WO-O4O-KPA-TABLET-SCREEN-SET-TEMPLATE-KEY-SCHEMA-V1: template_key → resolveTemplateKey(NULL=기본)
-        `SELECT id, name, status, template_key AS "templateKey" FROM store_tablet_screen_sets
-         WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL AND status <> 'archived' LIMIT 1`,
-        [currentSetId, tabletOrg],
-      );
-      const set = setRows?.[0];
-      if (!set) {
+      // 적용 세트 유효성(org 일치 + 미삭제 + 미보관) + blocks→sections.
+      // WO-O4O-KPA-TABLET-QR-LANDING-CONTRACT-V1: 공용 resolveScreenSetSections 로 통일(QR landing 과 동일 소스).
+      //   tabletContext 지정 = 기존 공개 runtime 동작 그대로(full idle + 태블릿 gate 상품). 게이트 미충족 시 null → legacy fallback.
+      const resolvedSet = await resolveScreenSetSections(dataSource, {
+        organizationId: tabletOrg as string,
+        screenSetId: currentSetId,
+        serviceKey: resolved.serviceKey,
+        storeId: resolved.storeId,
+        storeSlug: req.params.slug,
+        tabletContext: { tabletId, configured: displaySource.configured },
+      });
+      if (!resolvedSet) {
         res.json({ success: true, data: { mode: 'legacy', tabletId, tabletSource: displaySource.source, note: 'applied screen set unavailable → legacy fallback' } });
         return;
       }
 
-      const blocks = await dataSource.query(
-        `SELECT block_type AS "blockType", sort_order AS "sortOrder", config
-         FROM store_tablet_screen_blocks
-         WHERE screen_set_id = $1 AND is_visible = true
-         ORDER BY sort_order ASC`,
-        [set.id],
-      );
-
-      const templateKey = resolveTemplateKey(set);
-      const sections: Array<{ blockType: string; sortOrder: number; data: Record<string, unknown> }> = [];
-      for (const b of blocks) {
-        try {
-          if (b.blockType === 'idle_media') {
-            const resolvedIdle = await resolveTabletIdleItems(dataSource, tabletId, resolved.serviceKey, b.config);
-            sections.push({ blockType: 'idle_media', sortOrder: b.sortOrder, data: { items: resolvedIdle.items, operatorCommonSource: resolvedIdle.operatorCommonSource } });
-          } else if (b.blockType === 'product_list') {
-            // 기존 visibility gate 그대로(공유 함수 재사용). local products 는 기존 /tablet/products 로 서빙(gate 보존).
-            const supplierResult: any = await queryTabletVisibleProducts(dataSource, resolved.storeId, resolveServiceKeys(resolved.serviceKey), {
-              page: 1, limit: 50, sort: 'sort_order', order: 'asc', firstTabletId: tabletId, configured: displaySource.configured,
-            });
-            sections.push({ blockType: 'product_list', sortOrder: b.sortOrder, data: { products: supplierResult?.data ?? [], localProductsEndpoint: `/${req.params.slug}/tablet/products` } });
-          } else if (b.blockType === 'product_content') {
-            const cfg = (b.config && typeof b.config === 'object' && !Array.isArray(b.config)) ? b.config : {};
-            sections.push({ blockType: 'product_content', sortOrder: b.sortOrder, data: { productRef: cfg.productRef ?? null, contentId: cfg.contentId ?? null } });
-          } else if (b.blockType === 'content_list') {
-            // WO-O4O-KPA-TABLET-CONTENT-LIST-BLOCK-SCHEMA-CONTRACT-V1:
-            //   서버가 item(o4o_product_description / store_content)을 카드 data 로 resolve.
-            //   org 스코프/archived/canonical 게이트는 resolve 내부. 실패 item 은 skip → items=[] 허용.
-            const cards = await resolveContentListItems(dataSource, resolved.storeId, b.config);
-            sections.push({ blockType: 'content_list', sortOrder: b.sortOrder, data: { items: cards } });
-          } else {
-            const data = shapeStaticBlock(b.blockType, b.config);
-            if (data) sections.push({ blockType: b.blockType, sortOrder: b.sortOrder, data }); // null → 섹션 생략(안전)
-          }
-        } catch (blockErr) {
-          console.error(`[UnifiedStore] /tablet/screen block(${b.blockType}) resolve error:`, blockErr);
-          // 해당 block 생략(안전 fallback)
-        }
-      }
-
       res.json({
         success: true,
-        data: { mode: 'screen_set', templateKey, screenSet: { id: set.id, name: set.name }, sections, tabletId, tabletSource: displaySource.source },
+        data: {
+          mode: 'screen_set',
+          templateKey: resolvedSet.set.templateKey,
+          screenSet: { id: resolvedSet.set.id, name: resolvedSet.set.name },
+          sections: resolvedSet.sections,
+          tabletId,
+          tabletSource: displaySource.source,
+        },
       });
     } catch (error: any) {
       console.error('[UnifiedStore] GET /:slug/tablet/screen error:', error);
