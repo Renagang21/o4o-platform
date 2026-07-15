@@ -1005,6 +1005,19 @@ function QrImage({ url, size = 72 }: { url: string; size?: number }) {
 // WO-O4O-KPA-TABLET-TEMPLATE-THREE-PATTERNS-V1 — 대기 영상형 hero.
 //   idle_media 첫 항목을 상단 배너 영상/이미지로 재생(브라우즈 모드, 단일 loop) + 한/영 터치 유도 오버레이 + QR chip.
 //   오버레이는 pointerEvents:none 으로 하단 콘텐츠 터치를 막지 않는다. 항목 없으면 안내 문구만.
+/** 하단 안내 바용 약한 터치 아이콘(WO-O4O-KPA-TABLET-IDLE-TOUCH-HINT-BAR-V1).
+ *  이 패키지는 인라인 스타일만 쓰므로(@keyframes 주입 없음) 애니메이션 대신 정적 아이콘을 쓴다. */
+function TouchHintIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2"
+         strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, opacity: 0.9 }} aria-hidden>
+      <path d="M9 11V6a2 2 0 1 1 4 0v5" />
+      <path d="M13 11V9a2 2 0 1 1 4 0v2" />
+      <path d="M17 11v-.5a2 2 0 1 1 4 0V15a6 6 0 0 1-6 6h-2a7 7 0 0 1-7-7v-3a2 2 0 1 1 4 0" />
+    </svg>
+  );
+}
+
 function IdleTouchHero({ items, qrUrl, qrLabel }: { items: IdlePlaylistItem[] | null; qrUrl?: string; qrLabel?: string }) {
   const first = items && items.length > 0 ? items[0] : null;
   const embedUrl =
@@ -1024,10 +1037,22 @@ function IdleTouchHero({ items, qrUrl, qrLabel }: { items: IdlePlaylistItem[] | 
         />
       )}
       {!first && <div style={styles.heroPlaceholder} aria-hidden />}
-      <div style={styles.heroOverlay}>
-        <span style={styles.heroTouchKo}>화면을 터치하세요</span>
-        <span style={styles.heroTouchEn}>Touch to start</span>
-      </div>
+      {/* WO-O4O-KPA-TABLET-IDLE-TOUCH-HINT-BAR-V1:
+          영상/이미지가 있으면 **중앙 대형 안내를 쓰지 않는다** — 광고·홍보 영상을 가리기 때문.
+          대신 하단의 얇은 반투명 보조 안내 바만 얹는다(영상 전체는 계속 터치 영역: pointerEvents:none).
+          중앙 대형 안내는 미디어가 아예 없을 때의 **기본 대체 화면**으로만 남긴다. */}
+      {first ? (
+        <div style={styles.heroHintBar}>
+          <TouchHintIcon />
+          <span style={styles.heroHintKo}>화면을 터치하여 자세히 보세요</span>
+          <span style={styles.heroHintEn}>Touch to explore</span>
+        </div>
+      ) : (
+        <div style={styles.heroOverlay}>
+          <span style={styles.heroTouchKo}>화면을 터치하세요</span>
+          <span style={styles.heroTouchEn}>Touch to start</span>
+        </div>
+      )}
       {qrUrl && (
         <div style={styles.heroQr}>
           <QrImage url={qrUrl} size={64} />
@@ -1521,6 +1546,39 @@ const styles: Record<string, React.CSSProperties> = {
     textAlign: 'center',
     pointerEvents: 'none',
     background: 'linear-gradient(0deg, rgba(15,23,42,0.45) 0%, rgba(15,23,42,0.05) 40%, rgba(15,23,42,0.15) 100%)',
+  },
+  // WO-O4O-KPA-TABLET-IDLE-TOUCH-HINT-BAR-V1: 미디어가 있을 때의 하단 보조 안내 바.
+  //   영상 위에 얇게 얹히고(높이 ≈ hero 의 10%), pointerEvents:none 이라 영상 전체가 터치 영역으로 남는다.
+  //   위쪽으로 투명해지는 그라디언트라 영상 경계가 딱딱하게 잘리지 않는다.
+  //   (기본 = 하단. 광고 자막이 하단에 있는 경우를 위한 '상단 안내' 변형은 실제 요구 확인 시 추가.)
+  heroHintBar: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 'clamp(26px, 10%, 40px)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '7px',
+    padding: '0 12px',
+    overflow: 'hidden',
+    pointerEvents: 'none',
+    background: 'linear-gradient(0deg, rgba(15,23,42,0.72) 0%, rgba(15,23,42,0.5) 65%, rgba(15,23,42,0) 100%)',
+  },
+  heroHintKo: {
+    fontSize: 'clamp(11px, 1.5vw, 15px)',
+    fontWeight: 700,
+    color: '#ffffff',
+    whiteSpace: 'nowrap',
+    textShadow: '0 1px 6px rgba(0,0,0,0.5)',
+  },
+  heroHintEn: {
+    fontSize: 'clamp(9px, 1.05vw, 12px)',
+    fontWeight: 500,
+    color: '#cbd5e1',
+    letterSpacing: '0.03em',
+    whiteSpace: 'nowrap',
   },
   heroTouchKo: {
     fontSize: 'clamp(22px, 4vw, 40px)',
