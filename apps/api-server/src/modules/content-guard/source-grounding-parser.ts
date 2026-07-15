@@ -224,6 +224,17 @@ export function crossCheckNumber(
   declared: number | null | undefined,
   parsed: ParseOutcome<number>,
 ): { ok: boolean; status: 'MATCH' | 'MISMATCH' | 'UNVERIFIABLE' | 'NOT_DECLARED'; message: string } {
+  // ⚠️ **원문 자체의 문제가 최우선**이다.
+  //    ABNORMAL(원문 오타·모순) / PARSE_FAILED(표기는 있는데 못 읽음)는 입력을 제공했든 안 했든
+  //    반드시 드러나야 한다. 이 검사를 `declared === undefined` 뒤에 두면 입력을 비워 두는 것만으로
+  //    **ABNORMAL 이 조용히 묻힌다**(100건 CP1 실측: "10.000,000,000 CFU/230㎎").
+  if (parsed.kind === 'ABNORMAL' || parsed.kind === 'PARSE_FAILED') {
+    return {
+      ok: false,
+      status: 'UNVERIFIABLE',
+      message: `${label}: ${parsed.reason} → 원문 수동 확인 필요(값 없음으로 단정 금지).`,
+    };
+  }
   // `undefined` = 입력을 **제공하지 않음**(아직 채우지 않은 선택 필드).
   // `null`      = 작성자가 **"원문에 없다"고 단언**함.
   // 둘을 뭉치면 미제공을 위반으로 오판해 가드가 값 채우기를 강요하게 된다(= 작성 도구화).

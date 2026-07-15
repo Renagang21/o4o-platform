@@ -115,6 +115,25 @@ describe('파싱 실패를 부재로 단정하지 않는다 (핵심 원칙)', ()
   it('crossCheck: 진짜 ABSENT + 입력 없음 = 정합', () => {
     expect(crossCheckNumber('표시량', null, parseCfu(SRC.noNumber)).status).toBe('MATCH');
   });
+
+  // 100건 CP1 실측 — "100억 프로바이오틱스 플러스+" (10.000,000,000 CFU/230㎎)
+  // 입력을 **비워 두는 것만으로** ABNORMAL 이 조용히 묻히면 안 된다.
+  it('ABNORMAL 은 입력 미제공(undefined)이어도 조용히 통과하지 않는다', () => {
+    const r = crossCheckNumber('표시량', undefined, parseCfu(SRC.typo));
+    expect(r.status).toBe('UNVERIFIABLE');
+    expect(r.ok).toBe(false);
+  });
+
+  it('PARSE_FAILED 도 입력 미제공이어도 조용히 통과하지 않는다', () => {
+    const r = crossCheckNumber('표시량', undefined, parseCfu(SRC.hangeulOnly));
+    expect(r.status).toBe('UNVERIFIABLE');
+  });
+
+  it('정상 원문 + 입력 미제공은 NOT_DECLARED (위반 아님)', () => {
+    const r = crossCheckNumber('표시량', undefined, parseCfu(SRC.normal));
+    expect(r.status).toBe('NOT_DECLARED');
+    expect(r.ok).toBe(true);
+  });
 });
 
 // ═══ 교차 검증 ═════════════════════════════════════════════════════════════
