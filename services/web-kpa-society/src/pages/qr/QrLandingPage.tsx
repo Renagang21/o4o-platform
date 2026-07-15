@@ -18,6 +18,8 @@ import type { QrLandingData, QrPublicItem } from '../../api/storeQr';
 import { submitQrPageConsultation } from '../../api/tablet';
 // WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: 동영상 전용 공개 뷰어
 import PublicVideoViewer from './PublicVideoViewer';
+// WO-O4O-KPA-TABLET-QR-LANDING-CONTRACT-V1/WO-B: screen_set 모바일 세로 뷰어(대기영상 제외)
+import PublicScreenSetViewer from './PublicScreenSetViewer';
 // WO-O4O-KPA-QR-PAGE-LANDING-RENDER-V1: page 콘텐츠 inline 렌더 (body 우선 / legacy blocks 폴백)
 import { ContentRenderer } from '@o4o/content-editor';
 import { BlockRenderer } from '@o4o/block-renderer';
@@ -131,6 +133,12 @@ export default function QrLandingPage() {
   //   헤더/사이드바/푸터 없는 전체 화면 동영상만 표시.
   if (data.landingType === 'video') {
     return <PublicVideoViewer videoUrl={data.videoUrl} title={data.title} />;
+  }
+
+  // WO-O4O-KPA-TABLET-QR-LANDING-CONTRACT-V1/WO-B: screen_set QR → 태블릿과 같은 원본을 모바일 세로형으로.
+  //   대기영상(idle_media)은 태블릿 전용이라 제외하고 코너 설명·콘텐츠·제품부터 바로 표시한다.
+  if (data.landingType === 'screen_set' && data.screenSet) {
+    return <PublicScreenSetViewer screenSet={data.screenSet} />;
   }
 
   // WO-O4O-KPA-QR-PAGE-LANDING-RENDER-V1: page 콘텐츠는 공개 landing 에서 본문을 바로 렌더한다

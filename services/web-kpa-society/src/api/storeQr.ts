@@ -54,6 +54,24 @@ export interface QrLandingData {
   // WO-O4O-KPA-QR-PAGE-CONSULTATION-CTA-V1: page 콘텐츠 하단 상담 요청 버튼 노출 설정.
   consultationCtaEnabled?: boolean;
   consultationCtaLabel?: string | null;
+  // WO-O4O-KPA-TABLET-QR-LANDING-CONTRACT-V1: landingType='screen_set' 일 때 태블릿과 동일한 sections.
+  //   모바일 뷰어(PublicScreenSetViewer)는 이 sections 를 세로형으로 렌더하되 idle_media(대기영상)는 제외한다.
+  screenSet?: QrScreenSet | null;
+}
+
+// WO-O4O-KPA-TABLET-QR-LANDING-CONTRACT-V1: screen_set landing sections(공용 resolver 산출).
+export interface QrScreenSetSection {
+  blockType: string;
+  sortOrder: number;
+  data: Record<string, unknown>;
+}
+
+export interface QrScreenSet {
+  landingType: 'screen_set';
+  slug: string;
+  name: string;
+  templateKey: string;
+  sections: QrScreenSetSection[];
 }
 
 export type QrPageContent =
