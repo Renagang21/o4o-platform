@@ -1,6 +1,6 @@
 # OTC-DESCRIPTION-DESIGN-GUIDE — 일반의약품 설명서 화면 디자인 지침
 
-상태: **Draft V0.4** (2026-07-15) · 대상: **일반의약품(OTC) 전용** · 진입: [DOCUMENT-INDEX](common/DOCUMENT-INDEX.md)
+상태: **Draft V0.5** (2026-07-15) · 대상: **일반의약품(OTC) 전용** · 진입: [DOCUMENT-INDEX](common/DOCUMENT-INDEX.md)
 번역 기준: [OTC-EN-TRANSLATION-GUIDE](OTC-EN-TRANSLATION-GUIDE.md) · 테스트 기록: [OTC-DESCRIPTION-DESIGN-TEST-LOG](OTC-DESCRIPTION-DESIGN-TEST-LOG.md)
 
 > 이 문서는 **새 디자인 시스템을 만들지 않는다.** 이미 구현된 공용 렌더러를 그대로 쓴다.
@@ -181,9 +181,11 @@ OTC 에서 유의할 점만:
 | `sd-item` (2~3열 그리드 트랙) | 트랙 폭 고정 → 긴 성분명이 넘침 |
 | `sd-chips` / `sd-badge` (알약) | 긴 단어가 알약을 뚫음 |
 
-> ⚠️ **줄바꿈 규칙이 없다 — 실측 확정(2026-07-15).** `.store-desc-content` 스코프 계산값 = `overflow-wrap:normal / word-break:normal / hyphens:manual`. 긴 영문 단어를 `sd-hero h1` 에 넣으면 **scrollWidth 594 vs clientWidth 301** 로 넘치고, `sd-card` 의 `overflow:hidden`(`:172`) 때문에 **가로 스크롤 0 — 글자가 잘려 사라진다**(문서 오버플로도 0이라 사용자는 잘린 줄 모른다). 증거 [스크린샷](products/drug/pilot-en-design/evidence/P-3-long-english-word-clipped-375px.png) → **미해결** (§8-D).
+> ✅ **해결됨 (2026-07-15).** 렌더러가 `overflow-wrap:anywhere; word-break:normal` 로 긴 문자열을 **자동 줄바꿈**한다 — 계약이 보장하는 안전망이다([클래스 계약 §3-1](content-authoring/STORE-DESCRIPTION-CLASS-CONTRACT.md)).
+> 수정 전: `sd-hero h1` **scrollWidth 594 vs clientWidth 301** → 가로 스크롤 0으로 **잘려 사라짐**([증거](products/drug/pilot-en-design/evidence/P-3-long-english-word-clipped-375px.png)).
+> 수정 후: **594 → 301 = clientWidth**, 잘림 0 · 27/27 PASS([증거](products/drug/pilot-en-design/evidence/P-3-FIXED-long-english-word-wraps-375px.png) · [CHECK](../checks/CHECK-O4O-SD-HERO-LONG-TEXT-OVERFLOW-FIX-V1.md)).
 
-**저자 대응 (지금 할 수 있는 것)**: 제목·태그·알약에 **긴 단일 단어를 넣지 않는다**. 긴 성분명은 본문(`p`)에 둔다. 번역 GUIDE T-07(재표현 허용) 범위에서 짧게 쓰되, **정보를 줄이지는 않는다**(T-03).
+**저자 대응 (권장 — 안전망과 별개)**: 줄바꿈은 보장되지만, 제목·태그·알약에 **긴 단일 단어를 넣지 않는 편이 읽기 좋다**. 긴 성분명은 본문(`p`)에 둔다. 번역 GUIDE T-07(재표현 허용) 범위에서 짧게 쓰되, **정보를 줄이지는 않는다**(T-03).
 
 ---
 
@@ -196,7 +198,7 @@ OTC 에서 유의할 점만:
 | **A** | **주의사항·금기 전용 class 부재** | OTC 필수 정보를 시각적으로 강조할 수단 없음 (§2) |
 | **B** | **C 키오스크 variant 미지정 / D 렌더러 미사용** | 같은 설명서가 화면마다 다르게 보임 (§3) |
 | **C** | **언어 전환 UI 4중 중복** | 화면마다 조작이 다름 (§5) |
-| **D** | **줄바꿈 규칙 부재 + `overflow:hidden`** | 긴 영문 단어가 잘림 (§7) |
+| ~~**D**~~ | ~~줄바꿈 규칙 부재 + `overflow:hidden`~~ | ✅ **해결 (2026-07-15)** — `overflow-wrap:anywhere` 적용. `WO-O4O-SD-HERO-LONG-TEXT-OVERFLOW-FIX-V1` |
 | **E** | **표(`<table>`) 소비 측 가로 스크롤 없음** | `.tableWrapper{overflow-x:auto}` 가 `.content-editor .ProseMirror` **편집기에만** 스코프됨(`tableKit.ts:45`). 소비 측은 `table-layout:fixed; width:100%` + 카드 `overflow:hidden` → 넓은 표가 **찌그러지고 잘림**. `sd-*` 표 class 도 없음 |
 
 > **E 관련 저자 지침 (잠정)**: 표는 `sd-*` 계약에 없다. **설명서에 `<table>` 을 쓰지 않는다.** 표로 표현하고 싶은 내용은 `sd-core > sd-item` 또는 `sd-why` 목록으로 표현한다 — 이쪽이 이미 반응형이다.
@@ -238,3 +240,4 @@ OTC 에서 유의할 점만:
 | V0.2 | 2026-07-15 | §10 테스트 결과 반영 경로 추가. 규칙 신설 아님 — DOCUMENT-ARCHITECTURE §3·§6 매핑 + OR-005(버전·이력 갱신) 연결. |
 | V0.3 | 2026-07-15 | `sd-*` 클래스 계약이 공통 축으로 승격됨에 따라 §1·§2 의 계약 복사본을 **참조로 교체**(SSOT = [STORE-DESCRIPTION-CLASS-CONTRACT](content-authoring/STORE-DESCRIPTION-CLASS-CONTRACT.md), CR-020). 디자인 규칙 변경 없음 (`WO-O4O-SD-CLASS-COMMON-CONTRACT-UNIFY-V1`). |
 | V0.4 | 2026-07-15 | 파일럿 P1~P5 실측 반영 — §4.3 **계산값 → 실측 확정**(20/20 일치) · 슬롯별 분기표(B 모달 576=1열 / A 랜딩 644=2열, 경계 639↔641) · §7 줄바꿈 결함 실측 확정(h1 594>301, 잘림). 디자인 규칙 변경 없음 — 추정의 확정 (`WO-O4O-OTC-EN-DESIGN-PILOT-VALIDATION-V1`). |
+| V0.5 | 2026-07-15 | **§8-D 해소** — 렌더러에 `overflow-wrap:anywhere; word-break:normal` 적용으로 긴 영문 단어 잘림 수정(h1 594→301, 27/27 PASS, 반응형·한국어 무회귀). §7 경고 → 해결 기록으로 교체 (`WO-O4O-SD-HERO-LONG-TEXT-OVERFLOW-FIX-V1`). |

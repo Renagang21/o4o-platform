@@ -1,6 +1,6 @@
 # OTC-DESCRIPTION-DESIGN-TEST-LOG — 설명서 화면 디자인 테스트 기록
 
-상태: **Active (기록 문서)** · V0.2 (2026-07-15) · 대상: **일반의약품(OTC) 전용**
+상태: **Active (기록 문서)** · V0.3 (2026-07-15) · 대상: **일반의약품(OTC) 전용**
 지침: [OTC-DESCRIPTION-DESIGN-GUIDE](OTC-DESCRIPTION-DESIGN-GUIDE.md)
 
 > 테스트 화면 **1건마다 §3 양식을 복사해 1개 블록**을 추가한다.
@@ -17,6 +17,7 @@
 | # | 대상 설명서 | 언어 | 화면 | 폭 | 결과 | GUIDE 반영 |
 |---|---|---|---|---|---|---|
 | D-1~D-5 | P1~P5 (파일럿 시안) | en | 모바일·태블릿세로·태블릿가로·PC | 375/768/1024/1280 | **20/20 PASS** | GUIDE V0.4 (§4.3 실측 확정) |
+| **D-6** | 긴 영문 제목 잘림 **수정 검증** | en·ko | 위 4폭 + 640경계·200%줌·KPA모달·Neture랜딩 | 9종 × 3콘텐츠 | **27/27 PASS** | GUIDE V0.5 (§8-D 해소) · 계약 V1.1 §3-1 |
 
 > 근거: [CHECK-O4O-OTC-EN-DESIGN-PILOT-VALIDATION-V1](../checks/CHECK-O4O-OTC-EN-DESIGN-PILOT-VALIDATION-V1.md) · 측정 원본 [measurements-v1.json](products/drug/pilot-en-design/evidence/measurements-v1.json)
 
@@ -30,7 +31,7 @@
 |---|---|---|---|
 | P-1 | **B 모달(PC)이 1열로 뜬다** (컨테이너 ~576 < 640) | ✅ **확인** | 슬롯 604 → 컨테이너 **576** → **1열**. PC인데 폰 레이아웃 — 의도된 동작 |
 | P-2 | **A 랜딩이 640 경계에 4px 차로 걸침** (~644) | ✅ **확인** | 슬롯 672 → 컨테이너 **644** → 2열. 경계 실측: **639=1열 / 641=2열** → **여백 4px 늘면 1열로 붕괴** |
-| P-3 | **긴 영문 단어가 잘림** | ✅ **확인 (결함)** | `sd-hero h1` scrollWidth **594** vs clientWidth **301**. `overflow-wrap/word-break/hyphens = normal/normal/manual`, 카드 `overflow:hidden` → **가로 스크롤 0, 글자가 잘려 사라짐**. 증거 [스크린샷](products/drug/pilot-en-design/evidence/P-3-long-english-word-clipped-375px.png) |
+| P-3 | **긴 영문 단어가 잘림** | ✅ 확인 (결함) → **✅ 수정 완료 (D-6)** | 수정 전 `sd-hero h1` scrollWidth **594** vs clientWidth **301**, 카드 `overflow:hidden` → **가로 스크롤 0, 글자가 잘려 사라짐**([증거](products/drug/pilot-en-design/evidence/P-3-long-english-word-clipped-375px.png)). 수정 후 **594 → 301**([증거](products/drug/pilot-en-design/evidence/P-3-FIXED-long-english-word-wraps-375px.png)) |
 | P-4 | **C 키오스크가 무스타일** (variant 미지정) | ✅ **확인** | `TabletKioskPage.tsx:699,711` — `ContentRenderer` 에 `variant` 없음(기본 분기) |
 | P-5 | **D 다국어 랜딩이 다르게 보임** | ✅ **확인** | `MultilingualProductPublicLandingPage.tsx` — `ContentRenderer` 사용 **0회**, 자체 `prose` 마크업 |
 | P-6 | 200% 확대 시 좁은 레이아웃 정상 전환 | ✅ **PASS** | PC 1280 @200% → 컨테이너 **612** → 1열, 가로 오버플로 **0** |
@@ -178,6 +179,57 @@
 | DR / CR | 반영 | DR-019 · CR-021 |
 | 신설 사유 | — | DR-019: 기존 DR-002/003/009 는 "경로가 다르면" 을 다루나 **경로를 무엇으로 판단하는지**는 없었음. CR-021: HFF-R07(편집 라벨 금지)이 제품군 한정이라 의약품에 미적용 → 2개 제품군 공통이므로 CR 승격 |
 
+### D-6 — `sd-hero` 긴 영문 잘림 수정 검증 (2026-07-15)
+
+- 수정: `ContentRenderer.tsx` `.store-desc-content` 에 **`overflow-wrap:anywhere; word-break:normal`** 1회 선언 (스코프 루트 → 전 하위 상속)
+- WO: `WO-O4O-SD-HERO-LONG-TEXT-OVERFLOW-FIX-V1` · CHECK: [CHECK-...-FIX-V1](../checks/CHECK-O4O-SD-HERO-LONG-TEXT-OVERFLOW-FIX-V1.md)
+- 방법: 렌더러 CSS 소스 추출 + Playwright — **콘텐츠 3종 × 슬롯 9종 = 27 측정**
+
+**수정 효과 (핵심 지표)**
+
+| 지표 | 수정 전 | 수정 후 |
+|---|---|---|
+| `sd-hero h1` scrollWidth vs clientWidth (375px) | **594 > 301** (잘림) | **301 = 301** (줄바꿈) |
+| 계산값 `overflow-wrap` / `word-break` | normal / normal | **anywhere / normal** |
+| 가로 스크롤 | 0 (잘려서 스크롤조차 없음) | 0 (넘치지 않음) |
+
+**27/27 PASS — 잘림 0 · 가로 스크롤 0**
+
+| 콘텐츠 | 375 | 639 | 641 | 768 | 1024 | 1280 | 200%줌 | KPA모달 | Neture랜딩 |
+|---|---|---|---|---|---|---|---|---|---|
+| 긴영문(스트레스) | 1열 | 1열 | 2열 | 2열 | 3열 | 3열 | 1열 | 1열 | 2열 |
+| 일반영문(정상) | 1열 | 1열 | 2열 | 2열 | 3열 | 3열 | 1열 | 1열 | 2열 |
+| 한국어 | 1열 | 1열 | 2열 | 2열 | 3열 | 3열 | 1열 | 1열 | 2열 |
+
+**무회귀 확인**
+
+| 항목 | 결과 |
+|---|---|
+| 기존 1열·2열·3열 반응형 유지 | ✅ 27/27 동일 |
+| 640 경계 유지 (639=1열 / 641=2열) | ✅ 불변 |
+| 한국어 제목 정상 | ✅ (`word-break:normal` 이라 임의 분절 없음) |
+| 일반 영문 제목 정상 | ✅ |
+| KPA 모달(604→576=1열) · Neture 랜딩(672→644=2열) | ✅ 둘 다 불변 |
+| 파일럿 시안 5건 재측정 | ✅ **20/20 수정 전과 동일** |
+| typecheck / build | ✅ 통과 (`tsc --noEmit` exit 0 · tsup build success) |
+
+**원인 분류**
+
+- [x] 렌더러 문제 → **수정 완료** (§8-D 해소)
+
+**반영 판정** (기준 = [GUIDE §10](OTC-DESCRIPTION-DESIGN-GUIDE.md))
+
+- [x] 제품군 공통 → **[클래스 계약 V1.1 §3-1](content-authoring/STORE-DESCRIPTION-CLASS-CONTRACT.md)** (렌더러 보장 명문화)
+- [x] OTC 디자인 기준 → **GUIDE V0.4 → V0.5** (§7 경고 → 해결 · §8-D 해소 표기)
+- [x] **새 CR 미신설** — CR-020(계약) 범위 내로 설명 가능. 규칙 신설이 아니라 **렌더러 동작 추가**
+
+| 반영 대상 | 결과 | 내용 |
+|---|---|---|
+| GUIDE | 반영(V0.5) | §7 해결 기록 · §8-D 해소 |
+| 계약 문서 | 반영(V1.1) | §3-1 긴 문자열 줄바꿈 보장 |
+| DR / CR | **미반영(의도)** | CR-020 범위 내 — 중복 신설 금지 |
+| 신설 사유 | — | 해당 없음 |
+
 ---
 
 ## 5. 이력
@@ -186,3 +238,4 @@
 |---|---|---|
 | V0.1 | 2026-07-15 | 초안 작성 (`WO-O4O-OTC-DESCRIPTION-DESIGN-GUIDE-DOCS-V1`). §2 우선 검증 가설 P-1~P-6 포함. |
 | V0.2 | 2026-07-15 | 반영 판정란 추가(TEST-LOG / GUIDE / DR / CR / WO 승격 경로 + 신설 사유). 판단 기준은 GUIDE §10 참조로 연결(중복 기재 안 함). |
+| V0.3 | 2026-07-15 | D-6 기록 — 긴 영문 잘림 **수정 검증 27/27 PASS**(무회귀 포함). P-3 가설 = 수정 완료로 갱신 (`WO-O4O-SD-HERO-LONG-TEXT-OVERFLOW-FIX-V1`). |

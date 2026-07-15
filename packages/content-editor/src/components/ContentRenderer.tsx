@@ -143,6 +143,9 @@ const storeDescriptionCss = `
   container-type:inline-size; background:var(--sd-bg); color:var(--sd-ink);
   font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic","Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
   -webkit-font-smoothing:antialiased; padding:24px 14px 50px;
+  /* WO-O4O-SD-HERO-LONG-TEXT-OVERFLOW-FIX-V1: 긴 영문 단어가 sd-card 의 overflow:hidden 에 잘리던 문제.
+     anywhere = break-word 와 달리 min-content 기여도를 낮춰 sd-core 그리드 트랙 넘침까지 막는다. */
+  overflow-wrap:anywhere; word-break:normal;
 }
 @media (prefers-color-scheme:dark){.store-desc-content{
   --sd-bg:#0e1620; --sd-card:#16212f; --sd-ink:#e7eef6; --sd-sub:#9fb3c6;

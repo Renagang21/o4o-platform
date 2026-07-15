@@ -1,6 +1,6 @@
 # STORE-DESCRIPTION-CLASS-CONTRACT — 매장용 설명서 `sd-*` 클래스 계약 (전 제품군 공통)
 
-상태: Active · V1 (2026-07-15) · 규칙 ID: **CR-020** · 진입: [DOCUMENT-INDEX](../common/DOCUMENT-INDEX.md)
+상태: Active · **V1.1** (2026-07-15) · 규칙 ID: **CR-020** · 진입: [DOCUMENT-INDEX](../common/DOCUMENT-INDEX.md)
 승격 근거: [CHECK-O4O-SD-CLASS-COMMON-CONTRACT-UNIFY-V1](../../checks/CHECK-O4O-SD-CLASS-COMMON-CONTRACT-UNIFY-V1.md)
 
 > **새 디자인 규칙이 아니다.** 이미 운영 중인 계약의 **SSOT 위치를 바로잡은 문서**다.
@@ -72,6 +72,24 @@ sd-card                                    최상위 (테마: sd-theme-*)
 **알려진 현상 — `sd-core` 다단 구간의 빈 칸**: `sd-item` 수가 열 수로 나눠떨어지지 않으면 마지막 칸이 빈다(예: 항목 2개 + 3열).
 
 > ⚠️ **빈 칸을 채우려고 근거 없는 항목을 만들지 않는다 (CR-004 grounding).** 레이아웃은 콘텐츠를 창작할 이유가 되지 못한다. 대응 여부는 제품군 Guide 가 결정한다.
+
+### 3-1. 긴 문자열 줄바꿈 (렌더러가 보장)
+
+공백 없는 긴 문자열(영문 성분명·URL·SKU)은 **렌더러가 자동으로 줄바꿈**한다 — 저자가 CSS로 대응하지 않는다.
+
+```css
+.store-desc-content { overflow-wrap:anywhere; word-break:normal; }   /* ContentRenderer.tsx */
+```
+
+| 보장 | 내용 |
+|---|---|
+| 긴 단어 | 넘치기 직전에 **줄바꿈** — 잘리지 않는다 |
+| 일반 단어·한국어 | **무변경** (`word-break:normal` 이라 임의 분절 없음) |
+| `sd-core` 트랙 | `anywhere` 는 min-content 기여도를 낮춰 **그리드 트랙도 넘치지 않는다** |
+
+> 배경: 이전에는 `overflow-wrap:normal` + `sd-card{overflow:hidden}` 조합으로 **긴 단어가 가로 스크롤 없이 잘려 사라졌다**(사용자가 결함을 인지조차 못 함). 2026-07-15 수정 — 실측·근거 = [CHECK-O4O-SD-HERO-LONG-TEXT-OVERFLOW-FIX-V1](../../checks/CHECK-O4O-SD-HERO-LONG-TEXT-OVERFLOW-FIX-V1.md).
+>
+> **저자 지침 변화 없음**: 제목·태그에 긴 단일 단어를 넣지 않는 편이 여전히 읽기 좋다. 이 보장은 **안전망**이지 권장이 아니다.
 
 ---
 
@@ -149,3 +167,4 @@ sd-card                                    최상위 (테마: sd-theme-*)
 | 버전 | 일자 | 내용 |
 |---|---|---|
 | V1 | 2026-07-15 | HFF AGENT-KICKOFF §5 에만 있던 계약을 **공통 축으로 승격**. 규칙 신설 없음 — 기술 내용은 기존 계약 그대로, 위치만 이동 (`WO-O4O-SD-CLASS-COMMON-CONTRACT-UNIFY-V1`). CR-020 등재. |
+| V1.1 | 2026-07-15 | §3-1 **긴 문자열 줄바꿈 보장** 추가 — 렌더러가 `overflow-wrap:anywhere; word-break:normal` 로 처리. 계약 어휘·구조 변경 없음(렌더러 동작 명문화). 새 CR 미신설 — CR-020 범위 내 (`WO-O4O-SD-HERO-LONG-TEXT-OVERFLOW-FIX-V1`). |
