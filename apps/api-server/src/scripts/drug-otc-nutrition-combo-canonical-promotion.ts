@@ -13,7 +13,10 @@
  *   - master 당 canonical 1개(partial unique) 계약 준수. needs_review 중간 적재 없음.
  *   - masterIds 미보유 그룹(2 mismatch: 비타민C 1000mg·mgB 액제)은 승격 보류(NO_MASTERIDS).
  *   - excluded 3건(#1 a12cc 5mg / #12 a11db subgroup / #14 a11ex 제목충돌)은 완전 제외.
- *   - **SPD.content 는 HTML 계약** → draft bodyMarkdown 을 HTML 로 변환하여 저장(mdToHtml).
+ *   - **SPD.content 는 HTML 계약** → 소비자 본문은 **구조화 필드**(efficacy·usage·caution·summaryTable·
+ *     ingredientSelection)에서만 sd-* 시맨틱 HTML 로 생성한다(buildDrugOtcConsumerHtml).
+ *     `bodyMarkdown` 은 내부 편집 주석을 포함하므로 **렌더 소스로 쓰지 않는다**(CR-021,
+ *     WO-O4O-OTC-CANONICAL-RENDER-SOURCE-STRUCTURED-FIELDS-V1). 구조화 필드 누락 시 승격 보류.
  *
  * DB write 게이트:
  *   - 실제 INSERT 는 `--apply` AND DRUG_OTC_NUTRITION_COMBO_CANONICAL_APPLY_CONFIRM=YES 둘 다 있을 때만.
@@ -27,6 +30,8 @@
  *   DB_HOST=127.0.0.1 DB_PORT=5433 DB_USERNAME=o4o_api DB_PASSWORD=*** DB_NAME=o4o_platform \
  *     npx tsx src/scripts/drug-otc-nutrition-combo-canonical-promotion.ts
  */
+
+import { buildDrugOtcConsumerHtml } from '../modules/neture/drug-import/drug-otc-description-consumer-html.js';
 
 const RUN_ID = 'otc-nutrition-combo-draft-v1';
 const SOURCE_LABEL = 'MFDS_DRUG_OTC';
@@ -69,6 +74,8 @@ interface GroupPlan {
   title: string;
   groupKey: string;
   hasMasterIds: boolean;
+  /** write 대상 여부. masterIds 부재 또는 구조화 필드 누락이면 false → 승격 보류. */
+  eligible: boolean;
   targetMasters: number;
   validOtcMasters: number; // masterIds 중 실제 OTC master 수 (방어)
   existingCanonical: number; // 보존
@@ -82,7 +89,14 @@ interface GroupPlan {
   summary: string | null;
 }
 
-/** bodyMarkdown → HTML (이 draft 본문 구조 전용: ## 제목 / 파이프 표 / **볼드** / 문단). 외부 의존 없음. */
+/**
+ * bodyMarkdown → HTML (이 draft 본문 구조 전용: ## 제목 / 파이프 표 / **볼드** / 문단). 외부 의존 없음.
+ *
+ * ⚠️ **승격 렌더 소스에서 제외됨** (WO-O4O-OTC-CANONICAL-RENDER-SOURCE-STRUCTURED-FIELDS-V1).
+ * 인용 블록(`>`) 분기가 없어 bodyMarkdown 의 내부 편집 주석이 `<p>&gt; …</p>` 로 소비자에 노출된다.
+ * 소비자 본문은 buildDrugOtcConsumerHtml(구조화 필드)로 생성한다. 본 함수 보강은 후속 WO 범위.
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function mdToHtml(md: string): string {
   const esc = (s: string) =>
     s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -166,7 +180,7 @@ async function main(): Promise<void> {
 
       if (!masterIds) {
         plans.push({
-          candidateId: d.candidate_id, title: d.title, groupKey, hasMasterIds: false,
+          candidateId: d.candidate_id, title: d.title, groupKey, hasMasterIds: false, eligible: false,
           targetMasters: 0, validOtcMasters: 0, existingCanonical: 0, alreadyApplied: 0,
           newCanonicalInsert: 0, contentHtmlLen: 0,
           reason: 'NO_MASTERIDS: MEMBERSHIP-PERSIST 미저장 그룹(mismatch) — 승격 보류',
@@ -193,13 +207,28 @@ async function main(): Promise<void> {
       const alreadyApplied = Number(row.already_applied);
       const newInsert = masterIds.length - existingCanonical;
 
-      const contentHtml = mdToHtml(String((d.content_json as any)?.bodyMarkdown ?? d.content_html ?? ''));
+      // WO-O4O-OTC-CANONICAL-RENDER-SOURCE-STRUCTURED-FIELDS-V1:
+      // 소비자 본문 = 구조화 필드에서만 생성한다. bodyMarkdown 은 내부 편집 주석을 포함하므로
+      // 렌더 소스로 쓰지 않는다(CR-021). 필수 필드가 비면 승격하지 않고 보류한다.
+      const cj = (d.content_json ?? {}) as Record<string, unknown>;
+      const built = buildDrugOtcConsumerHtml(cj as never, { title: d.title });
+      if (built.missing.length) {
+        plans.push({
+          candidateId: d.candidate_id, title: d.title, groupKey, hasMasterIds: true, eligible: false,
+          targetMasters: masterIds.length, validOtcMasters: validOtc,
+          existingCanonical, alreadyApplied, newCanonicalInsert: 0, contentHtmlLen: 0,
+          reason: `INCOMPLETE_FIELDS: 구조화 필드 누락(${built.missing.join(',')}) — 승격 보류`,
+          masterIds: [], contentHtml: '', summary: null,
+        });
+        continue;
+      }
+      const contentHtml = built.html;
       if (!sampleHtml) sampleHtml = contentHtml;
       const summary = String((d.content_json as any)?.summaryTable?.['사용목적'] ?? '') || null;
 
       const otcWarn = validOtc !== masterIds.length ? ` ⚠️validOtc ${validOtc}/${masterIds.length}` : '';
       plans.push({
-        candidateId: d.candidate_id, title: d.title, groupKey, hasMasterIds: true,
+        candidateId: d.candidate_id, title: d.title, groupKey, hasMasterIds: true, eligible: true,
         targetMasters: masterIds.length, validOtcMasters: validOtc,
         existingCanonical, alreadyApplied, newCanonicalInsert: newInsert,
         contentHtmlLen: contentHtml.length,
@@ -209,7 +238,7 @@ async function main(): Promise<void> {
     }
 
     // ── apply: 단일 트랜잭션으로 eligible 그룹 canonical INSERT + post-count ──
-    const eligibleForWrite = plans.filter((p) => p.hasMasterIds);
+    const eligibleForWrite = plans.filter((p) => p.eligible);
     if (eligibleForWrite.some((p) => p.validOtcMasters !== p.targetMasters)) {
       throw new Error('otc 방어검증 실패 — masterIds 에 비-OTC master 포함, apply 중단');
     }
