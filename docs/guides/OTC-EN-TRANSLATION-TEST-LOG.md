@@ -1,6 +1,6 @@
 # OTC-EN-TRANSLATION-TEST-LOG — 테스트 번역 및 오류 기록
 
-상태: **Active (기록 문서)** · V0.4 (2026-07-16) · 대상: **일반의약품(OTC) 전용**
+상태: **Active (기록 문서)** · V0.5 (2026-07-16) · 대상: **일반의약품(OTC) 전용**
 지침: [OTC-EN-TRANSLATION-GUIDE](OTC-EN-TRANSLATION-GUIDE.md) · 권장 표현: [OTC-KO-EN-GLOSSARY](OTC-KO-EN-GLOSSARY.md)
 
 > 테스트 번역 **1건마다 §2 양식을 복사해 1개 블록**을 추가한다.
@@ -21,6 +21,7 @@
 | T-3 | P3 나프록센나트륨 275mg 정 | 2026-07-15 | V0.5 | V0.2 | CR-021 |
 | T-4 | P4 클로트리마졸 100mg 질정 | 2026-07-15 | V0.5 | V0.2 | **DR-019** |
 | T-5 | P5 데소게스트렐 0.075mg 정 | 2026-07-15 | V0.5 | V0.2 | GLOSSARY V0.3 |
+| **T-11** | **배치 37그룹** (A군 전량 — 신규 32 + 파일럿 5 재사용) | 2026-07-16 | V0.5 | V0.4 | **미반영(수정 불필요)** |
 | **T-6~T-10** | **저장 파일럿 5건** (덱스판테놀100 / 사카로마이세스282.5 / 알벤다졸400 / 덱시부프로펜300 / 세티리진10) | 2026-07-16 | V0.5 | **V0.4** | **미반영(GUIDE·GLOSSARY 수정 불필요)** |
 
 > T-6~T-10 은 **DB 저장까지 수행**한 첫 사례다(en · STORE · `needs_review` 5 rows). 판정 = [CHECK-...-EN-TRANSLATION-PERSIST-PILOT-V1](../checks/CHECK-O4O-OTC-EN-TRANSLATION-PERSIST-PILOT-V1.md)
@@ -226,6 +227,64 @@
 
 > **지침 재검증 통과**: 파일럿(T-1~T-5) 이후 갱신된 GUIDE V0.5 / GLOSSARY V0.4 로 **수정 없이** 5건을 처리했다.
 
+### T-11 — 배치 37그룹 (2026-07-16, GUIDE V0.5 / GLOSSARY V0.4)
+
+A군 37그룹 전량. **신규 32건 번역 + 파일럿 5건 재사용**(재번역 안 함). 산출물 = [otc-en-translations-v1.json](products/drug/pilot-en-design/translations/otc-en-translations-v1.json).
+
+**자동 검수 — 전건 통과**
+
+| 확인 | 결과 |
+|---|---|
+| groupKey 커버리지 | **37/37** (누락 0 · 초과 0) |
+| 영문에 한글 잔존 | **0** |
+| 필수 필드(title·efficacy·usage·usageLabel·caution·summaryTable) | **0 누락** |
+| summaryTable 6항목 | **37/37** |
+| `usageLabel` = `How to take it` | **37/37** (route=oral 전건) |
+| **translatorNote 유출** | **0** (주석 보유 13그룹 검사) |
+| sd-* HTML 렌더 | **148/148 PASS** (37건 × 4폭) |
+
+**수치 보존 — 진짜 누락 0**
+
+1차 검사에서 20건이 "숫자 누락"으로 걸렸으나 **전부 오탐**이었다.
+
+| 유형 | 예 | 판정 |
+|---|---|---|
+| 숫자를 영어 단어로 표기 | `1일 3회` → `three times a day` | 정상 (T-07 소비자 톤) |
+| 분수 표기 | `1/2정(5mg)` → `half a tablet (5 mg)` | 정상 |
+| `1회`·`1일` 관용 표현 | `1일 2~3g` → `2–3 g a day` | 정상 (영어에 `1` 불필요) |
+
+> **판정식 교훈**: 한국어 숫자를 영문 숫자 토큰으로만 대조하면 **소비자 톤 번역이 전부 오탐**으로 잡힌다. `one/once/two/twice/three…` 단어 표기를 함께 봐야 한다.
+
+**파일럿 5건 대조 — 차이 0**
+
+`덱스판테놀 / 사카로마이세스 / 알벤다졸 / 덱시부프로펜 / 세티리진` 5건의 `efficacy`·`usage`·`caution` 이 파일럿 저장분과 **완전 동일**. 재번역하지 않았고 덮어쓸 것도 없다.
+
+**어려웠던 표현**
+
+| 원문 | 사용한 표현 | 비고 |
+|---|---|---|
+| 기능 무력증 | functional weakness | 대응 영어가 없어 원문 구조 유지 |
+| 우유 알칼리 증후군 | milk-alkali syndrome | 의학 표준어 |
+| 서방정 | slow-release tablet | `으깨거나 씹지 말고` = `swallow it whole — do not crush or chew it` |
+| 소아 과량 시 철중독 사망 | If a child takes too much, iron poisoning can be fatal | 원문 강조(**볼드**)를 **문장 강도**로 유지(G-03) |
+
+**GLOSSARY 대비 다르게 쓴 표현** (오류 아님)
+
+| 원문 | 실제 사용 | 왜 |
+|---|---|---|
+| 정장(整腸) | settle the gut / improve the balance of gut bacteria | 1:1 대응어 없음 → 기능 서술(T-07) |
+| 거담 | help you cough it up | 소비자 톤 |
+| 제산 | neutralise stomach acid | |
+
+**반영 판정**
+
+- [x] 이 배치만의 문제 → **본 TEST-LOG에만** — **반복 이슈 없음**
+- [ ] GUIDE 수정 → **불필요**
+- [ ] GLOSSARY 수정 → **불필요** (§4-1 연령 경계가 37건 전부 커버)
+- [ ] DR / CR → 해당 없음
+
+> **3회 연속 지침 무수정 통과**(T-1~T-5 시안 → T-6~T-10 저장 → T-11 배치 37). GUIDE V0.5 / GLOSSARY V0.4 는 **안정 상태**로 판단한다.
+
 ---
 
 ## 4. 이력
@@ -238,3 +297,4 @@
 
 
 | V0.4 | 2026-07-16 | 저장 파일럿 기록 — GUIDE·GLOSSARY 수정 없이 전건 판정 (`WO-O4O-OTC-EN-TRANSLATION-PERSIST-PILOT-V1`). |
+| V0.5 | 2026-07-16 | T-11 배치 37그룹 기록 — 자동 검수 전건 통과, 수치 오탐 20건 추적해 기각. GUIDE·GLOSSARY 무수정 3회 연속 (`WO-O4O-OTC-EN-TRANSLATION-BATCH-37-V1`). |

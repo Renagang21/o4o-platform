@@ -1,0 +1,607 @@
+{
+  "version": "v1",
+  "wo": "WO-O4O-OTC-EN-TRANSLATION-BATCH-37-V1",
+  "generatedAt": "2026-07-16",
+  "guideVersion": "OTC-EN-TRANSLATION-GUIDE V0.5",
+  "glossaryVersion": "OTC-KO-EN-GLOSSARY V0.4",
+  "scope": "A군(INSERT_auto) 37그룹. 전부 route=oral → 동사 take (DR-019/G-01).",
+  "contract": {
+    "source": "한국어 canonical 구조화 4필드(efficacy·usage·caution·summaryTable). bodyMarkdown 미사용(CR-021).",
+    "translatorNote": "참고 전용 — 본문에 삽입하지 않음. 이 파일에 포함하지 않는다.",
+    "persist": "그룹당 1개 번역 → 연결 master 전체 전개(needs_review). masterIds 는 저장 단계가 결정한다."
+  },
+  "translations": [
+    {
+      "groupKey": "니자티딘|75밀리그램|정",
+      "title": "Nizatidine 75 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for excess stomach acid, heartburn and acid burping.",
+      "usage": "Adults aged 15–79 take one tablet (75 mg) once a day. If your symptoms have not improved after 8 hours, you may take one more tablet. Do not take more than two tablets (150 mg) in one day. Do not drink alcohol while taking this medicine.",
+      "caution": "Do not take this if you have ever reacted to this medicine or to another H2 blocker; if you have a blood disorder, liver or kidney disease, or a stomach or duodenal condition; if you are under 15 or 80 or older; or if you are pregnant or breastfeeding. Talk to a pharmacist before taking it if you have a sore throat, cough or high fever, unexplained weight loss, or ongoing stomach pain.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Nizatidine 75 mg",
+        "How it works": "Reduces stomach acid (H2 blocker)",
+        "Main symptoms": "Excess stomach acid, heartburn, acid burping",
+        "Who should be careful": "Under 15 or 80 and over; liver or kidney disease",
+        "Why this one": "An H2 blocker that reduces acid production"
+      }
+    },
+    {
+      "groupKey": "니푸록사지드|200밀리그램|캡슐",
+      "title": "Nifuroxazide 200 mg Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for sudden diarrhoea caused by bacteria.",
+      "usage": "Adults take one capsule (200 mg) four times a day. Do not take it for more than 3 days. Drink plenty of fluids while taking it.",
+      "caution": "Do not take this if you have ever reacted to it, or if you are a child or teenager under 18. Talk to a pharmacist before taking it if you are pregnant or breastfeeding. If the diarrhoea continues after 2 days of treatment, consider replacing lost fluids or get advice.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Nifuroxazide 200 mg",
+        "How it works": "Acts on bacteria in the gut (anti-diarrhoeal)",
+        "Main symptoms": "Sudden bacterial diarrhoea",
+        "Who should be careful": "Under 18; do not take for more than 3 days",
+        "Why this one": "An anti-diarrhoeal that works inside the gut"
+      }
+    },
+    {
+      "groupKey": "덱스판테놀|100밀리그램|정",
+      "title": "Dexpanthenol 100 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used as a supportive treatment for hair loss.",
+      "usage": "Adults take one tablet three times a day. The treatment period is 6 weeks.",
+      "caution": "Do not take this if you have ever reacted to it, if you are under 19, or for any purpose other than hair loss. Talk to a pharmacist before taking it if you are pregnant or breastfeeding, or have ever had a drug allergy. If there is no improvement after about 6 weeks, stop taking it.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Dexpanthenol 100 mg",
+        "How it works": "Supports treatment for hair loss",
+        "Main symptoms": "Hair loss",
+        "Who should be careful": "Under 19; not for any purpose other than hair loss",
+        "Why this one": "A preparation used as a supportive treatment for hair loss"
+      }
+    },
+    {
+      "groupKey": "덱시부프로펜|300밀리그램|정",
+      "title": "Dexibuprofen 300 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for chronic polyarthritis, rheumatoid arthritis, joint disease and ankylosing spondylitis; for painful swelling and inflammation after injury or surgery; and as a supportive treatment for infections that come with a fever.",
+      "usage": "Adults take one tablet (300 mg) two to four times a day. Do not take more than four tablets (1,200 mg) in one day. For sudden, short-term illness, take it for no more than 5 days as a rule. Take it after food if your stomach is sensitive.",
+      "caution": "Do not take this if you have ever reacted to this medicine, to aspirin or to another anti-inflammatory painkiller; if you have a peptic ulcer, bleeding, severe liver or kidney problems, heart failure or severe high blood pressure; for pain around coronary artery bypass surgery (CABG); or if you are 6 months or more into pregnancy. There is a risk of blood clots in the heart and brain (heart attack, stroke) and of bleeding, ulcers or perforation in the gut — stop taking it if you have stomach pain, black stools or difficulty breathing. If you feel dizzy after taking it, take care when driving or operating machinery.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Dexibuprofen 300 mg",
+        "How it works": "Reduces fever, pain and inflammation (a refined form of the ibuprofen family)",
+        "Main symptoms": "Arthritis, pain and swelling after injury or surgery, pain with fever",
+        "Who should be careful": "Stomach problems; heart, liver or kidney disease; pregnancy",
+        "Why this one": "An anti-inflammatory painkiller based on the active form of the ibuprofen family"
+      }
+    },
+    {
+      "groupKey": "디오스민|300밀리그램|캡슐",
+      "title": "Diosmin 300 mg Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to ease heaviness and pain in the legs caused by poor vein circulation, as a supportive treatment for problems caused by fragile capillaries, and to treat the signs of haemorrhoids.",
+      "usage": "Adults take one capsule twice a day. If haemorrhoids come back or get worse, up to 1,200–1,800 mg a day may be taken. The dose may be adjusted to suit your age and symptoms.",
+      "caution": "Do not take this if you have ever reacted to it, or if you are breastfeeding. Talk to a pharmacist before taking it if you are pregnant. Do not take it for a long period. If your symptoms do not improve quickly, an examination of the anus and a review of your treatment are needed.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Diosmin 300 mg",
+        "How it works": "Improves vein circulation",
+        "Main symptoms": "Heavy, aching legs from poor vein circulation; signs of haemorrhoids",
+        "Who should be careful": "Breastfeeding; long-term use",
+        "Why this one": "A vein circulation treatment for heavy legs and haemorrhoid symptoms (capsule)"
+      }
+    },
+    {
+      "groupKey": "디오스민|600밀리그램|정",
+      "title": "Diosmin 600 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for heaviness and pain in the legs caused by poor vein circulation, as a supportive treatment for problems caused by fragile capillaries, and to treat the signs of haemorrhoids.",
+      "usage": "For poor vein circulation, take one tablet (600 mg) once a day, before breakfast. For haemorrhoids, take one tablet two to three times a day with meals.",
+      "caution": "Do not take this if you have ever reacted to it, or if you are breastfeeding. Talk to a pharmacist before taking it if you are pregnant. Do not take it for a long period. If your symptoms do not improve quickly, have an examination of the anus or talk to a pharmacist.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Diosmin 600 mg",
+        "How it works": "Improves vein circulation",
+        "Main symptoms": "Heavy, aching legs from poor vein circulation; signs of haemorrhoids",
+        "Who should be careful": "Breastfeeding; long-term use",
+        "Why this one": "A vein circulation treatment for heavy legs and haemorrhoid symptoms"
+      }
+    },
+    {
+      "groupKey": "락토바실루스아시도필루스균|300밀리그램|캡슐",
+      "title": "Lactobacillus acidophilus 300 mg Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to settle the gut and to help with constipation, loose stools, bloating and abnormal fermentation in the bowel.",
+      "usage": "Adults and children 12 or older take one capsule (300 mg) one to three times a day. Children aged 8 to under 12 take it once or twice a day.",
+      "caution": "Do not take this if your immune system is weakened (for example by AIDS, leukaemia, an organ transplant or high-dose steroids), or for a child under 1 who has a high fever or blood in the stool. Talk to a pharmacist before taking it if you have ever reacted to Yellow No. 5.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Lactobacillus acidophilus 300 mg",
+        "How it works": "Settles the gut (improves the balance of gut bacteria)",
+        "Main symptoms": "Constipation, loose stools, bloating, abnormal fermentation in the bowel",
+        "Who should be careful": "Weakened immune system; babies",
+        "Why this one": "A live-culture treatment that helps balance the gut"
+      }
+    },
+    {
+      "groupKey": "로라타딘|10밀리그램|연질캡슐",
+      "title": "Loratadine 10 mg Soft Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for allergic rhinitis (sneezing, a blocked nose, itching and burning eyes) and for long-lasting hives with no known cause.",
+      "usage": "Adults and children 12 or older take one capsule (10 mg) once a day. Children aged 6 to under 12 who weigh 30 kg or more take 10 mg once a day.",
+      "caution": "Do not take this if you have ever reacted to it, if you are under 6, or if you are pregnant or breastfeeding. Talk to a pharmacist before taking it if you have liver problems or kidney failure. Do not take it together with cimetidine, erythromycin or ketoconazole.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Loratadine 10 mg",
+        "How it works": "Antihistamine (eases allergy symptoms)",
+        "Main symptoms": "Allergic rhinitis, long-lasting hives",
+        "Who should be careful": "Under 6; pregnancy and breastfeeding; liver problems",
+        "Why this one": "An antihistamine taken once a day (soft capsule)"
+      }
+    },
+    {
+      "groupKey": "로라타딘|10밀리그램|정",
+      "title": "Loratadine 10 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for allergic rhinitis (sneezing, a blocked nose, itching and burning eyes) and for long-lasting hives with no known cause.",
+      "usage": "Adults and children 12 or older take one tablet (10 mg) once a day. Children aged 6 to under 12 take one tablet once a day if they weigh 30 kg or more, or half a tablet once a day if they weigh under 30 kg.",
+      "caution": "Do not take this if you have ever reacted to it, if you are a child under 6, or if you are pregnant or breastfeeding. Talk to a pharmacist before taking it if you have liver problems or kidney failure. Do not take it together with medicines that slow down liver metabolism, such as cimetidine, erythromycin or ketoconazole.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Loratadine 10 mg",
+        "How it works": "Antihistamine (eases allergy symptoms)",
+        "Main symptoms": "Allergic rhinitis (sneezing, blocked nose, itching), long-lasting hives",
+        "Who should be careful": "Under 6; pregnancy and breastfeeding; liver problems",
+        "Why this one": "An antihistamine taken once a day"
+      }
+    },
+    {
+      "groupKey": "로페라미드염산염|2밀리그램|캡슐",
+      "title": "Loperamide Hydrochloride 2 mg Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to ease diarrhoea.",
+      "usage": "Adults take two capsules to start, then one more capsule each time they pass a loose stool, without going over the stated daily dose. Replace fluids and salts while taking it. If sudden diarrhoea has not improved within 48 hours, or long-lasting diarrhoea within 10 days, stop taking it and get advice.",
+      "caution": "Do not take this for babies under 2, for bacterial diarrhoea with blood in the stool or a high fever, or if you have sudden ulcerative colitis, pseudomembranous colitis, a blocked bowel or megacolon. Talk to a pharmacist before taking it if you have liver problems, are elderly, or are pregnant or breastfeeding. If you feel tired, dizzy or sleepy after taking it, take care when driving or operating machinery.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Loperamide hydrochloride 2 mg",
+        "How it works": "Slows down bowel movement (anti-diarrhoeal)",
+        "Main symptoms": "Diarrhoea",
+        "Who should be careful": "Bacterial diarrhoea with blood or fever; blocked bowel; driving and machinery",
+        "Why this one": "An anti-diarrhoeal that stops diarrhoea"
+      }
+    },
+    {
+      "groupKey": "바실루스리케니포르미스균|250밀리그램|캡슐",
+      "title": "Bacillus licheniformis 250 mg Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for sudden and long-lasting bowel inflammation, sudden and long-lasting diarrhoea, sudden dysentery, and abnormal fermentation in the bowel from various causes.",
+      "usage": "Adults take two capsules three times a day (four capsules for the first dose). Children take one capsule three times a day. For infants, the contents of the capsule may be mixed with a small amount of water or milk.",
+      "caution": "Talk to a pharmacist before giving this to a baby under 3 months old. Talk to a pharmacist if it is taken together with certain antibiotics such as ciprofloxacin. Get advice if the diarrhoea lasts a long time or comes with a fever or blood in the stool.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Bacillus licheniformis 250 mg",
+        "How it works": "Settles the gut (improves the balance of gut bacteria)",
+        "Main symptoms": "Sudden and long-lasting bowel inflammation, diarrhoea, abnormal fermentation in the bowel",
+        "Who should be careful": "Babies under 3 months",
+        "Why this one": "A live-culture treatment that helps balance the gut"
+      }
+    },
+    {
+      "groupKey": "브로멜라인|100밀리그램|정",
+      "title": "Bromelain 100 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to ease inflammation that comes with swelling, and swelling after injury or surgery.",
+      "usage": "Adults and children 12 or older take 100 mg twice a day, with water, 30 minutes before meals.",
+      "caution": "Do not take this if you have a severe blood clotting disorder (such as haemophilia), severe liver or kidney disease, if you are taking anticoagulants or antiplatelet medicines, if you are pregnant or breastfeeding, or if you are under 12. Talk to a pharmacist before taking it if you are taking antibiotics such as tetracycline, or have had an allergic reaction before.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Bromelain 100 mg",
+        "How it works": "Anti-inflammatory enzyme (eases swelling)",
+        "Main symptoms": "Inflammation with swelling; swelling after injury or surgery",
+        "Who should be careful": "Blood clotting disorders; taking anticoagulants; pregnancy",
+        "Why this one": "An enzyme treatment that eases inflammatory swelling"
+      }
+    },
+    {
+      "groupKey": "브로멜라인|45밀리그램|정",
+      "title": "Bromelain 45 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to ease inflammation that comes with swelling, and swelling after injury or surgery.",
+      "usage": "Adults and children 12 or older take one to two tablets (45–90 mg) three times a day, with water, 30 minutes before meals.",
+      "caution": "Do not take this if you have a severe blood clotting disorder, severe liver or kidney disease, if you are taking anticoagulants or antiplatelet medicines, if you are pregnant or breastfeeding, or if you are under 12. Talk to a pharmacist before taking it if you are taking antibiotics such as tetracycline, or have had an allergic reaction before.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Bromelain 45 mg",
+        "How it works": "Anti-inflammatory enzyme (eases swelling)",
+        "Main symptoms": "Inflammation with swelling; swelling after injury or surgery",
+        "Who should be careful": "Blood clotting disorders; taking anticoagulants; pregnancy",
+        "Why this one": "An enzyme treatment that eases inflammatory swelling (lower strength)"
+      }
+    },
+    {
+      "groupKey": "사카로마이세스보울라르디균|282.5밀리그램|캡슐",
+      "title": "Saccharomyces boulardii 282.5 mg Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to settle the gut when the balance of gut bacteria is upset — for example by antibiotics or chemotherapy — and to help with constipation, loose stools, bloating and abnormal fermentation in the bowel.",
+      "usage": "Adults and children 12 or older take one to two capsules twice a day. Children aged 3 to under 12 take one capsule three times a day.",
+      "caution": "Talk to a pharmacist before giving this to a baby under 3 months old. If there is no improvement after about a month, stop taking it and get advice. (The domestic pack should be kept in a cool place.)",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Saccharomyces boulardii 282.5 mg",
+        "How it works": "Settles the gut (live yeast)",
+        "Main symptoms": "Upset gut balance from antibiotics, constipation, loose stools, bloating",
+        "Who should be careful": "Babies under 3 months",
+        "Why this one": "A yeast-based gut treatment for antibiotic-related upset of gut bacteria"
+      }
+    },
+    {
+      "groupKey": "세티리진염산염|10밀리그램|연질캡슐",
+      "title": "Cetirizine Hydrochloride 10 mg Soft Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for seasonal and year-round allergic rhinitis, allergic conjunctivitis, long-lasting hives with no known cause, and itchy skin.",
+      "usage": "Adults and children 6 or older take 10 mg once a day, before bed. If you are sensitive to side effects, you may take 5 mg in the morning and 5 mg in the evening.",
+      "caution": "Do not take this if you have ever reacted to it, if you have kidney failure, or if you are under 6. Talk to a pharmacist before taking it if you have kidney or liver problems, are elderly, are at risk of epilepsy or seizures, or are pregnant or breastfeeding. It can make you sleepy, so take care when driving or operating machinery. Do not take it together with theophylline or a large amount of alcohol.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Cetirizine hydrochloride 10 mg",
+        "How it works": "Antihistamine (eases allergy symptoms)",
+        "Main symptoms": "Allergic rhinitis and conjunctivitis, long-lasting hives, itchy skin",
+        "Who should be careful": "Kidney failure; pregnancy and breastfeeding; sleepiness",
+        "Why this one": "An antihistamine taken once a day (soft capsule)"
+      }
+    },
+    {
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "title": "Cetirizine Hydrochloride 10 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for seasonal and year-round allergic rhinitis, allergic conjunctivitis, long-lasting hives with no known cause, and itchy skin.",
+      "usage": "Adults and children 6 or older take one tablet (10 mg) once a day, before bed. If you are sensitive to side effects, you may split the dose and take half a tablet (5 mg) in the morning and half in the evening.",
+      "caution": "Take care if you have ever reacted to this medicine or to hydroxyzine or piperazine derivatives, or if you have kidney failure. Talk to a pharmacist before taking it if you are pregnant or breastfeeding, have kidney or liver problems, are elderly, or are at risk of epilepsy or seizures. It can make you sleepy, so take care when driving or operating machinery. Do not take it together with theophylline, ritonavir or a large amount of alcohol.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Cetirizine hydrochloride 10 mg",
+        "How it works": "Antihistamine (eases allergy symptoms)",
+        "Main symptoms": "Allergic rhinitis, allergic conjunctivitis, long-lasting hives, itchy skin",
+        "Who should be careful": "Kidney problems; pregnancy and breastfeeding; may cause sleepiness",
+        "Why this one": "An antihistamine taken once a day"
+      }
+    },
+    {
+      "groupKey": "소브레롤|200밀리그램|캡슐",
+      "title": "Sobrerol 200 mg Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for sudden and long-lasting bronchitis, bronchitis with asthma or a cough, inflammation of the nose and throat, and inflammation of the voice box and windpipe — that is, sudden and long-lasting breathing problems with increased mucus.",
+      "usage": "Adults take one capsule (200 mg) twice a day.",
+      "caution": "Do not take this if you have ever reacted to it. Talk to a pharmacist before taking it if you are pregnant, may be pregnant, are breastfeeding, or for a baby under 2. Get advice if the phlegm or cough lasts a long time.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Sobrerol 200 mg",
+        "How it works": "Thins mucus and helps you cough it up",
+        "Main symptoms": "Sudden and long-lasting bronchitis; breathing problems with increased mucus",
+        "Who should be careful": "Under 2; pregnancy and breastfeeding",
+        "Why this one": "A mucus-thinning treatment that helps clear phlegm"
+      }
+    },
+    {
+      "groupKey": "수산화마그네슘|500밀리그램|정",
+      "title": "Magnesium Hydroxide 500 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to neutralise stomach acid and ease symptoms of stomach and duodenal ulcers, gastritis and excess stomach acid, and to relieve constipation.",
+      "usage": "To neutralise acid, take 2–5 tablets (1–2.5 g) a day in divided doses. For constipation, take 2–4 tablets (1–2 g) a day in one or two doses. The dose may be adjusted to suit your age and symptoms.",
+      "caution": "Do not take this if you have kidney problems or diarrhoea. Talk to a pharmacist before taking it if you have heart problems or high magnesium levels in the blood, and do not take it together with tetracycline antibiotics. Taking it with a lot of milk or calcium supplements can cause milk-alkali syndrome.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Magnesium hydroxide 500 mg",
+        "How it works": "Neutralises stomach acid and relieves constipation",
+        "Main symptoms": "Heartburn, excess stomach acid, constipation",
+        "Who should be careful": "Kidney problems, diarrhoea, high magnesium levels",
+        "Why this one": "A magnesium preparation used both to neutralise acid and to relieve constipation"
+      }
+    },
+    {
+      "groupKey": "시트룰린말산염|500밀리그램|정",
+      "title": "Citrulline Malate 500 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used as a supportive treatment for functional weakness.",
+      "usage": "Adults take two tablets three times a day. Children 6 or older take two tablets twice a day. Do not take it for more than 4 weeks.",
+      "caution": "Do not give this to a child under 6. Talk to a pharmacist before taking it if you are pregnant or breastfeeding, or have ever reacted to Yellow No. 203 or Yellow No. 5. If there is no improvement after about a month, stop taking it.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Citrulline malate 500 mg",
+        "How it works": "Supports treatment for functional weakness",
+        "Main symptoms": "Weakness and tiredness from reduced function",
+        "Who should be careful": "Under 6; do not take for more than 4 weeks",
+        "Why this one": "A preparation used to support treatment for functional weakness"
+      }
+    },
+    {
+      "groupKey": "아세트아미노펜|160밀리그램|정",
+      "title": "Acetaminophen 160 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for fever and pain from a cold, headache, nerve pain, muscle pain, period pain, sprain pain, toothache and joint pain.",
+      "usage": "Children 12 or under take the recommended dose every 4 to 6 hours as needed. If the child's weight is known, 10–15 mg per kg of body weight is more suitable, and no more than five doses (75 mg/kg) a day. Check the exact dose for the child's age and weight with a pharmacist.",
+      "caution": "Do not take this if you have ever reacted to it, if you have severe liver or kidney problems, or aspirin-induced asthma. Do not take it together with other products that contain acetaminophen. Get advice if a fever lasts more than 3 days, or pain more than 5 days in a child. A child should take it under the supervision of a guardian.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Acetaminophen 160 mg",
+        "How it works": "Reduces fever and pain",
+        "Main symptoms": "Fever, headache, muscle pain and toothache in children",
+        "Who should be careful": "Dose is based on body weight; liver disease; other cold medicines taken at the same time",
+        "Why this one": "A fever and pain reliever dosed by a child's body weight"
+      }
+    },
+    {
+      "groupKey": "아세트아미노펜|325밀리그램|연질캡슐",
+      "title": "Acetaminophen 325 mg Soft Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for fever and pain from a cold, headache, nerve pain, muscle pain, period pain, sprain pain, toothache and joint pain.",
+      "usage": "Adults and children 12 or older take two capsules three to four times a day, every 4 to 6 hours as needed. Do not take more than 12 capsules (4 g) in one day. Take the lowest dose for the shortest possible time.",
+      "caution": "Do not take this if you have ever reacted to it, if you have a peptic ulcer, severe liver or kidney problems, aspirin-induced asthma, or if you drink alcohol. If you drink alcohol regularly there is a risk of liver damage, so get advice. Do not take it together with other products that contain acetaminophen. Get advice if a fever lasts more than 3 days or pain more than 10 days.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Acetaminophen 325 mg",
+        "How it works": "Reduces fever and pain",
+        "Main symptoms": "Fever, headache, nerve pain, muscle pain, period pain, toothache, joint pain",
+        "Who should be careful": "Liver disease; alcohol; do not exceed 4,000 mg a day",
+        "Why this one": "A fever and pain reliever that is gentle on the stomach (soft capsule)"
+      }
+    },
+    {
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "title": "Acetaminophen 650 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to reduce fever and to ease pain from a cold, headache, toothache, muscle pain, back pain, period pain and joint pain.",
+      "usage": "Adults and children 12 or older take two tablets every 8 hours. Do not take more than six tablets in 24 hours. This is a slow-release tablet, so swallow it whole — do not crush or chew it. Do not take it together with other cold or pain medicines that contain acetaminophen.",
+      "caution": "Do not take this if you have ever reacted to it, if you have a peptic ulcer, severe liver or kidney problems, aspirin-induced asthma, or if you are under 12. If you drink alcohol regularly there is a risk of liver damage, so get advice, and do not take more than 4,000 mg a day. Talk to a pharmacist or doctor if a fever lasts more than 3 days or pain more than 10 days.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Acetaminophen 650 mg (slow-release tablet)",
+        "How it works": "Reduces fever and pain",
+        "Main symptoms": "Fever, headache, toothache, muscle pain, back pain, period pain, joint pain",
+        "Who should be careful": "Liver disease; alcohol; do not exceed 4,000 mg a day",
+        "Why this one": "A slow-release fever and pain reliever for longer-lasting effect"
+      }
+    },
+    {
+      "groupKey": "아세틸시스테인|100밀리그램|캡슐",
+      "title": "Acetylcysteine 100 mg Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used when phlegm is hard to cough up in sudden or long-lasting bronchitis, asthma, inflammation of the voice box, or sinus inflammation.",
+      "usage": "For sudden illness, adults take 200 mg three times a day. For long-lasting illness, twice a day, before meals, with a small amount of water. Children aged 6 to 14 with a long-lasting illness take 100 mg three times a day. Leave at least 2 hours between this medicine and an antibiotic.",
+      "caution": "Do not take this if you have ever reacted to it, if you have a stomach or duodenal ulcer, or for a baby under 2. Talk to a pharmacist before taking it if you are pregnant or breastfeeding.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Acetylcysteine 100 mg",
+        "How it works": "Thins mucus and helps you cough it up",
+        "Main symptoms": "Thick phlegm in bronchitis, inflammation of the voice box or sinuses",
+        "Who should be careful": "Stomach or duodenal ulcer; under 2",
+        "Why this one": "A mucus-thinning treatment at a lower strength that can be divided for children"
+      }
+    },
+    {
+      "groupKey": "아세틸시스테인|200밀리그램|캡슐",
+      "title": "Acetylcysteine 200 mg Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used when phlegm is hard to cough up in sudden or long-lasting bronchitis, asthma, inflammation of the voice box, or sinus inflammation.",
+      "usage": "For sudden illness, adults take one capsule (200 mg) three times a day. For long-lasting illness, twice a day, before meals, with a small amount of water. Leave at least 2 hours between this medicine and an antibiotic taken by mouth.",
+      "caution": "Do not take this if you have ever reacted to it, if you have a stomach or duodenal ulcer, or for a baby under 2. Talk to a pharmacist before taking it if you are pregnant or breastfeeding. Talk to a pharmacist or doctor if the phlegm or cough lasts a long time, or comes with a fever or difficulty breathing.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Acetylcysteine 200 mg",
+        "How it works": "Thins mucus and helps you cough it up",
+        "Main symptoms": "Thick phlegm in bronchitis, inflammation of the voice box or sinuses",
+        "Who should be careful": "Stomach or duodenal ulcer; under 2",
+        "Why this one": "A mucus-thinning treatment that makes phlegm easier to clear"
+      }
+    },
+    {
+      "groupKey": "알마게이트|500밀리그램|정",
+      "title": "Almagate 500 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine neutralises stomach acid and eases symptoms of stomach and duodenal ulcers, gastritis, excess stomach acid, heartburn, nausea, vomiting, stomach pain and acid burping.",
+      "usage": "Adults and children 12 or older chew two tablets (1 g) three times a day, 30 minutes to 1 hour after meals. If needed, one more dose may be taken before bed.",
+      "caution": "Do not take this if you have ever reacted to it, if you have Alzheimer's disease, or if you have bleeding in the digestive tract that has not been diagnosed. Talk to a pharmacist if you have kidney problems, are elderly, have trouble absorbing food, or have signs of bleeding such as black stools. Do not take it together with tetracycline antibiotics. If your symptoms do not improve after about 2 weeks, stop taking it and talk to a pharmacist or doctor.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Almagate 500 mg",
+        "How it works": "Neutralises stomach acid",
+        "Main symptoms": "Heartburn, excess stomach acid, acid burping, stomach pain, nausea",
+        "Who should be careful": "Kidney problems; take care with long-term use",
+        "Why this one": "An antacid that is chewed"
+      }
+    },
+    {
+      "groupKey": "알벤다졸|400밀리그램|정",
+      "title": "Albendazole 400 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to treat infection with roundworm, pinworm, hookworm, whipworm, American hookworm and threadworm, including mixed infections.",
+      "usage": "For roundworm, hookworm, whipworm and hookworm infection, adults and children 24 months or older take one tablet (400 mg) once. For pinworm, take one tablet and then one more tablet 7 days later to prevent reinfection. If the tablet is hard to swallow, you may chew it or take it with a small amount of water.",
+      "caution": "Do not take this if you have ever reacted to it, if you are pregnant, may be pregnant or are breastfeeding, or for children under 2. Talk to a pharmacist before taking it if you have liver or kidney problems. Pinworm often spreads again within a family, so it is best to treat everyone together.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Albendazole 400 mg",
+        "How it works": "Treats worm infection",
+        "Main symptoms": "Roundworm, pinworm, hookworm, whipworm infection",
+        "Who should be careful": "Pregnancy and breastfeeding; do not give to children under 2",
+        "Why this one": "A worm treatment taken as a single dose"
+      }
+    },
+    {
+      "groupKey": "암브록솔염산염|30밀리그램|정",
+      "title": "Ambroxol Hydrochloride 30 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for sudden and long-lasting bronchitis and asthmatic bronchitis caused by problems with mucus production.",
+      "usage": "Adults take one tablet three times a day (twice a day once symptoms settle). It can be taken with or without food.",
+      "caution": "Do not take this if you have ever reacted to it, if you have severe liver or kidney problems, if you are in the first 3 months of pregnancy, or if you are breastfeeding. Talk to a pharmacist before taking it if you are pregnant, elderly, or have a peptic ulcer. Rarely a severe skin reaction can occur — stop taking it straight away if this happens.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Ambroxol hydrochloride 30 mg",
+        "How it works": "Helps you clear mucus",
+        "Main symptoms": "Sudden and long-lasting bronchitis, asthmatic bronchitis from mucus problems",
+        "Who should be careful": "Severe liver or kidney problems; early pregnancy",
+        "Why this one": "A treatment that helps clear phlegm"
+      }
+    },
+    {
+      "groupKey": "에르도스테인|300밀리그램|정",
+      "title": "Erdosteine 300 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to thin mucus and help you cough it up in sudden and long-lasting breathing problems.",
+      "usage": "Adults take one tablet (300 mg) two to three times a day. For sudden breathing problems, do not take it for more than 10 days in a row.",
+      "caution": "Do not take this if you have ever reacted to it, if you have cirrhosis of the liver, cystathionine synthase deficiency, a peptic ulcer, or severe kidney problems. Talk to a pharmacist before taking it if you have mild to moderate liver problems, or are pregnant or breastfeeding, and get advice before taking it with other cough or phlegm medicines.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Erdosteine 300 mg",
+        "How it works": "Thins mucus and helps you cough it up",
+        "Main symptoms": "Thick phlegm in sudden and long-lasting breathing problems",
+        "Who should be careful": "Peptic ulcer; severe kidney problems; cirrhosis of the liver",
+        "Why this one": "A mucus-thinning treatment that helps clear phlegm (tablet)"
+      }
+    },
+    {
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "title": "Erdosteine 300 mg Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used in sudden and long-lasting breathing problems to thin phlegm so that it is easier to cough up.",
+      "usage": "Adults take one capsule (300 mg) two to three times a day. For sudden breathing problems, do not take it for more than 10 days in a row. Talk to a pharmacist before taking it with other cough or phlegm medicines.",
+      "caution": "Take care if you have ever reacted to this medicine, or if you have a peptic ulcer, severe kidney problems, cirrhosis of the liver, or cystathionine synthase deficiency. Talk to a pharmacist before taking it if you have mild to moderate liver problems or have had an allergic reaction before. Talk to a pharmacist or doctor if the phlegm or cough lasts a long time, or comes with a fever or difficulty breathing.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Erdosteine 300 mg",
+        "How it works": "Thins mucus and helps you cough it up",
+        "Main symptoms": "Thick phlegm in sudden and long-lasting breathing problems; a cough that will not clear",
+        "Who should be careful": "Peptic ulcer; severe kidney problems; cirrhosis of the liver; reaction to this medicine",
+        "Why this one": "A mucus-thinning treatment that helps phlegm clear more easily"
+      }
+    },
+    {
+      "groupKey": "엘카르니틴|330밀리그램|정",
+      "title": "L-Carnitine 330 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for primary and secondary carnitine deficiency, and for problems with heart muscle metabolism caused by reduced blood supply to the heart, such as angina and sudden heart attack.",
+      "usage": "Adults take 2–3 g a day, divided into two or three doses. The dose may be adjusted to suit your age and symptoms.",
+      "caution": "Do not take this if you have ever reacted to it. Talk to a pharmacist before taking it if you are pregnant or breastfeeding. If muscle weakness appears in a person with uraemia, stop taking it and get advice.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "L-carnitine 330 mg",
+        "How it works": "Supplies carnitine (improves heart muscle metabolism)",
+        "Main symptoms": "Carnitine deficiency; heart muscle metabolism problems from reduced blood supply",
+        "Who should be careful": "Pregnancy and breastfeeding",
+        "Why this one": "A metabolic preparation that replaces carnitine"
+      }
+    },
+    {
+      "groupKey": "탄산수소나트륨|500밀리그램|정",
+      "title": "Sodium Bicarbonate 500 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine neutralises stomach acid and eases symptoms of stomach and duodenal ulcers, gastritis and excess stomach acid. It is also used to correct acidosis and to help the body pass uric acid.",
+      "usage": "Adults take one to two tablets (0.5–1 g) at a time, 6–10 tablets (3–5 g) a day. The dose may be adjusted to suit your age and symptoms.",
+      "caution": "Do not take this if you need to limit how much sodium you take in — for example with high blood sodium, swelling, pregnancy-related high blood pressure, or high blood pressure. Talk to a pharmacist before taking it if you have kidney problems, heart problems or congestive heart failure. Taking it with a lot of milk or calcium supplements can cause milk-alkali syndrome, so get advice.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Sodium bicarbonate 500 mg",
+        "How it works": "Neutralises stomach acid",
+        "Main symptoms": "Heartburn, excess stomach acid, symptoms of stomach and duodenal ulcers",
+        "Who should be careful": "If you need to limit sodium; kidney problems",
+        "Why this one": "An antacid that neutralises stomach acid quickly"
+      }
+    },
+    {
+      "groupKey": "트리메부틴말레산염|100밀리그램|정",
+      "title": "Trimebutine Maleate 100 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for acid reflux and hiatal hernia; for the digestive problems that come with gastritis, duodenitis or ulcers — stomach pain, indigestion, nausea and vomiting; and for irritable bowel syndrome and spastic colon.",
+      "usage": "Adults take one to two tablets (100–200 mg) three times a day, before meals. The dose may be adjusted to suit your age and symptoms.",
+      "caution": "Do not take this if you have an inherited problem such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption. Talk to a pharmacist before taking it if you are pregnant, may be pregnant, or are breastfeeding. Talk to a pharmacist or doctor if your symptoms last a long time or get worse.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Trimebutine maleate 100 mg",
+        "How it works": "Regulates gut movement",
+        "Main symptoms": "Stomach pain, indigestion, nausea, vomiting, irritable bowel symptoms",
+        "Who should be careful": "Inherited conditions affecting lactose; pregnancy and breastfeeding",
+        "Why this one": "A digestive aid that regulates gut movement"
+      }
+    },
+    {
+      "groupKey": "트리메부틴말레산염|150밀리그램|정",
+      "title": "Trimebutine Maleate 150 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for acid reflux and hiatal hernia; for the digestive problems that come with gastritis, duodenitis or ulcers — stomach pain, indigestion, nausea and vomiting; and for irritable bowel syndrome and spastic colon.",
+      "usage": "Adults take 100–200 mg three times a day, before meals. The dose may be adjusted to suit your age and symptoms.",
+      "caution": "Do not take this if you have an inherited problem with lactose metabolism, such as galactose intolerance. Talk to a pharmacist before taking it if you are pregnant or breastfeeding. Get advice if your symptoms last a long time or get worse.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Trimebutine maleate 150 mg",
+        "How it works": "Regulates gut movement",
+        "Main symptoms": "Stomach pain, indigestion, nausea, vomiting, irritable bowel symptoms",
+        "Who should be careful": "Inherited lactose metabolism disorders; pregnancy and breastfeeding",
+        "Why this one": "A digestive aid that regulates gut movement"
+      }
+    },
+    {
+      "groupKey": "트리메부틴말레산염|200밀리그램|정",
+      "title": "Trimebutine Maleate 200 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for acid reflux and hiatal hernia; for the digestive problems that come with gastritis, duodenitis or ulcers — stomach pain, indigestion, nausea and vomiting; and for irritable bowel syndrome and spastic colon.",
+      "usage": "Adults take 100–200 mg three times a day, before meals. The dose may be adjusted to suit your age and symptoms.",
+      "caution": "Do not take this if you have an inherited problem with lactose metabolism, such as galactose intolerance. Talk to a pharmacist before taking it if you are pregnant or breastfeeding, or if you have ever reacted to Yellow No. 4 (tartrazine).",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Trimebutine maleate 200 mg",
+        "How it works": "Regulates gut movement",
+        "Main symptoms": "Stomach pain, indigestion, nausea, vomiting, irritable bowel symptoms",
+        "Who should be careful": "Inherited lactose metabolism disorders; pregnancy and breastfeeding",
+        "Why this one": "A digestive aid that regulates gut movement"
+      }
+    },
+    {
+      "groupKey": "펙소페나딘염산염|120밀리그램|정",
+      "title": "Fexofenadine Hydrochloride 120 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to ease the symptoms of allergic rhinitis.",
+      "usage": "Adults and teenagers 12 or older take one tablet with water before a meal. If you have kidney failure, start with half a tablet once a day. Do not take it with grapefruit or orange juice, or with an antacid.",
+      "caution": "Do not take this if you have ever reacted to it. Talk to a pharmacist before taking it if you have kidney failure, are a child under 12, are elderly, have had heart or blood vessel disease, or are pregnant or breastfeeding.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Fexofenadine hydrochloride 120 mg",
+        "How it works": "Antihistamine (eases allergy symptoms)",
+        "Main symptoms": "Symptoms of allergic rhinitis",
+        "Who should be careful": "Kidney failure (lower dose); pregnancy and breastfeeding",
+        "Why this one": "An antihistamine that is less likely to make you sleepy"
+      }
+    },
+    {
+      "groupKey": "폴리사카리드철착염|326.1밀리그램|캡슐",
+      "title": "Polysaccharide Iron Complex 326.1 mg Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for iron deficiency anaemia.",
+      "usage": "Adults take one capsule (150 mg as iron) once a day. Avoid green tea, black tea, milk and dairy products just before and after taking it.",
+      "caution": "Do not take this if you have ever reacted to it, for a baby under 12 months, or if you have haemochromatosis, anaemia that is not caused by iron deficiency, or a problem using iron. If a child takes too much, iron poisoning can be fatal — always keep it out of the reach of children. Talk to a pharmacist before taking it if you have a peptic ulcer or kidney problems, and do not take it together with an antacid, tetracycline or a calcium supplement.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Polysaccharide iron complex 326.1 mg (150 mg as iron)",
+        "How it works": "Supplies iron",
+        "Main symptoms": "Iron deficiency anaemia",
+        "Who should be careful": "Keep away from children (overdose risk); anaemia not caused by iron deficiency",
+        "Why this one": "An iron treatment for anaemia"
+      }
+    },
+    {
+      "groupKey": "폴산|1밀리그램|정",
+      "title": "Folic Acid 1 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to prevent and treat folic acid deficiency, to supply folic acid during pregnancy and breastfeeding, and for anaemia linked to folic acid deficiency — such as anaemia from poor nutrition, anaemia in pregnancy, and anaemia in children.",
+      "usage": "To treat folic acid deficiency, adults and children 24 months or older take 0.25–1 mg a day. To prevent it, or when the body needs more, take 0.1–0.25 mg a day.",
+      "caution": "Do not take this if you have ever reacted to it, or if you have pernicious anaemia or megaloblastic anaemia caused by vitamin B12 deficiency (it can mask the cause of the anaemia). Talk to a pharmacist before taking it if you are under a doctor's care. If there is no improvement after about a month, stop taking it.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Folic acid 1 mg",
+        "How it works": "Supplies folic acid (folate)",
+        "Main symptoms": "Folic acid deficiency; folic acid supply in pregnancy and breastfeeding; anaemia from poor nutrition",
+        "Who should be careful": "Pernicious anaemia from vitamin B12 deficiency",
+        "Why this one": "A vitamin preparation that replaces folate"
+      }
+    }
+  ]
+}
