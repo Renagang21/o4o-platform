@@ -28,4 +28,7 @@
 | **DR-017** | 필수 블록(사용 경우→방법→주의→병원 방문→사용 확인 포인트→성분 기준 선택) + GMP 문구 | DRUG-TEMPLATE | active |
 | **DR-018** | 성분별 대표 ↔ 세대/계열 대표는 **목적(진입 축)이 다르면 공존**한다. 소비자 진입용 세대/계열 대표(예: "졸림 적은 알레르기약")와 canonical 승격용 성분별 대표(로라타딘·펙소페나딘·세티리진)는 동시에 유효 — 과병합(하나로 뭉갬)도 과분할(불필요 분리)도 아님 | DRUG-STANDARD · DRUG-GROUPING | active |
 
-> DR-NNN은 R1~R62 + DELTA-AUDIT 확정분. 신규는 DR-019부터. 실증 사례·패턴은 [knowledge/](knowledge/)(Rule 아님)에 축적, Registry는 규칙 문장만 유지.
+| **DR-019** | **투여경로를 제형명(`doseForm`)만으로 판단·추정하지 않는다.** 제형명은 경로를 구분하지 못한다(실증: 클로트리마졸 질정의 `doseForm='정'` — 경구 정제와 동일값, `groupKey` 에도 route 축 없음). 판단 근거는 **`usageLabel`(복용 안내 ↔ 사용 안내)** 를 1차로 하고 성분 표기의 `(질정)` 등 · 용법 본문(`질 내 삽입`)으로 교차 확인한다. 경로 오판은 DR-002·DR-003 위반과 오투여로 직결 | DRUG-GROUPING · DRUG-TEMPLATE · 실증 = `CHECK-O4O-OTC-EN-DESIGN-PILOT-VALIDATION-V1` | active |
+
+> DR-NNN은 R1~R62 + DELTA-AUDIT 확정분. 신규는 DR-020부터.
+> DR-019 는 DR-002/003/009("경로가 **다르면**" 어떻게 하나)가 다루지 않던 "**경로를 무엇으로 판단하나**"를 채운다. 실증 사례·패턴은 [knowledge/](knowledge/)(Rule 아님)에 축적, Registry는 규칙 문장만 유지.
