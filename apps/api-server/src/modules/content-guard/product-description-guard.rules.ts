@@ -200,7 +200,10 @@ export function ruleA(input: GuardProductInput): GuardFinding[] {
 
 const SUPERLATIVE_KO = /(가장|최대|최소|최고|유일한|대표적인|특별한|프리미엄)/g;
 const COMPARATIVE_KO = /(높은|낮은|많은|적은)\s*(균수|함량|숫자|수치)/g;
-const SUPERLATIVE_EN = /\b(the\s+best|most\s+\w+|highest|lowest|minimum|maximum|unique|premium|least)\b/gi;
+// ⚠️ 규격 표기("at least 10 billion CFU", "keep to a minimum")는 최상급이 아니다 → SPEC_MINMAX_EN 으로 분리.
+const SUPERLATIVE_EN = /\b(the\s+best|the\s+most\s+\w+|highest|lowest|the\s+least|unique|premium)\b/gi;
+/** 공식 규격상의 최소·최대치 (WO §9: 근거 확인 후 PASS) → 자동 PASS 하지 않고 REVIEW */
+const SPEC_MINMAX_EN = /\b(at\s+least|at\s+most|to\s+a\s+minimum|minimum|maximum)\b/gi;
 /** 소비자 상황 문맥(제품 비교 아님) — 오탐 완화 → REVIEW_REQUIRED 로 강등 */
 const CONSUMER_CONTEXT = /(막막|고민|신경\s*쓰|부담스러|번거로|어려워|잊게)/;
 
@@ -228,6 +231,19 @@ export function ruleB(input: GuardProductInput): GuardFinding[] {
   scan(stripHtml(input.drafts.ko), SUPERLATIVE_KO, 'ko', 'koDraft');
   scan(stripHtml(input.drafts.ko), COMPARATIVE_KO, 'ko', 'koDraft');
   scan(stripHtml(input.drafts.en), SUPERLATIVE_EN, 'en', 'enDraft');
+  // 규격 최소·최대치는 자동 PASS 하지 않고 REVIEW 로 남긴다(WO §6.2 — 애매하면 PASS 금지)
+  {
+    const en = stripHtml(input.drafts.en);
+    for (const m of matchAll(SPEC_MINMAX_EN, en)) {
+      out.push({
+        ruleId: 'B-SPEC-MINMAX-003', severity: 'INFO', status: 'REVIEW_REQUIRED', language: 'en',
+        field: 'enDraft', matchedText: m.text,
+        sourceEvidence: `BASE_STANDARD: ${truncate(input.source.baseStandard, 70)}`,
+        message: `규격 최소·최대치 표현입니다("${m.text}") — 공식 규격("…이상")의 번역인지 확인하십시오.`,
+        suggestedAction: '표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오.',
+      });
+    }
+  }
   if (out.length === 0) out.push(ok('B-SUPERLATIVE-001', 'drafts', '최상급·비교급 검출 없음'));
   return out;
 }
@@ -235,9 +251,17 @@ export function ruleB(input: GuardProductInput): GuardFinding[] {
 // ═══ C. 부재 → 허용/부존재 ═════════════════════════════════════════════════
 
 const ABSENCE_KO = /(필요하지\s*않|필요\s*없|불필요|하지\s*않아도\s*되|아닙니다|들어\s*있지\s*않|포함되어\s*있지\s*않|별도\s*(보관\s*)?조건이\s*없|표시되어\s*있지\s*않)/g;
-const ABSENCE_EN = /\b(no\s+refrigeration|without\s+refrigeration|does\s+not\s+(require|need)|not\s+required|free\s+from|no\s+need\s+to|room-temperature\s+storage)\b/gi;
+const ABSENCE_EN = /\b(no\s+refrigeration|without\s+refrigeration|does\s+not\s+(require|need)|not\s+required|free\s+from|room-temperature\s+storage)\b/gi;
+/** "no need to time it around eating" 처럼 **원문 지시("식전·식후 어느때나")의 번역**일 수 있다 → REVIEW */
+const ABSENCE_SOFT_EN = /\bno\s+need\s+to\b/gi;
 /** 수치·계산 서술(제품 속성 주장 아님) → 오탐 */
 const NUMERIC_CONTEXT = /(계산|환산|세\s*값|일치)/;
+/**
+ * 긍정 원문에서 파생된 부정형 대비 표현 → 근거 있음.
+ * 예: 원문 "씹어서 섭취" → "물로 삼키는 방식이 **아닙니다**"
+ * 창작이 아니라 **표현 방식** 문제이므로 BLOCKED 가 아니라 REVIEW(긍정형 권고).
+ */
+const CONTRAST_CONTEXT = /(씹어|츄어블|장용|이중\s*캡슐)/;
 
 export function ruleC(input: GuardProductInput): GuardFinding[] {
   const out: GuardFinding[] = [];
@@ -254,6 +278,17 @@ export function ruleC(input: GuardProductInput): GuardFinding[] {
         });
         continue;
       }
+      // 원문의 긍정 사실(씹어서/장용성 등)에서 파생된 부정형 대비 → 창작 아님. 표현만 조정 권고.
+      if (lang === 'ko' && CONTRAST_CONTEXT.test(ctx) && CONTRAST_CONTEXT.test(src)) {
+        out.push({
+          ruleId: 'C-ABSENCE-CONTRAST-005', severity: 'WARNING', status: 'REVIEW_REQUIRED', language: lang,
+          field, matchedText: m.text,
+          sourceEvidence: `원문에 대비 근거 있음 (SRV_USE/SUNGSANG: ${truncate(input.source.intake, 40)})`,
+          message: `원문 사실에서 파생된 부정형 대비입니다: "${ctx}" — 근거는 있으나 부정형입니다.`,
+          suggestedAction: '긍정형으로 바꾸는 것을 권합니다(예: "씹어서 섭취하도록 표시되어 있습니다").',
+        });
+        continue;
+      }
       out.push({
         ruleId: 'C-ABSENCE-AS-PERMISSION-001', severity: 'ERROR', status: 'BLOCKED', language: lang,
         field, matchedText: m.text,
@@ -265,6 +300,18 @@ export function ruleC(input: GuardProductInput): GuardFinding[] {
   };
   scan(stripHtml(input.drafts.ko), ABSENCE_KO, 'ko', 'koDraft');
   scan(stripHtml(input.drafts.en), ABSENCE_EN, 'en', 'enDraft');
+  {
+    const en = stripHtml(input.drafts.en);
+    for (const m of matchAll(ABSENCE_SOFT_EN, en)) {
+      out.push({
+        ruleId: 'C-ABSENCE-SOFT-004', severity: 'WARNING', status: 'REVIEW_REQUIRED', language: 'en',
+        field: 'enDraft', matchedText: m.text,
+        sourceEvidence: `SRV_USE: ${truncate(input.source.intake, 70)}`,
+        message: `"${m.text}" — 원문 지시의 번역인지 부재 추론인지 확인이 필요합니다: "${contextAround(en, m.index, 45)}"`,
+        suggestedAction: '원문이 직접 뒷받침하지 않으면 삭제하십시오.',
+      });
+    }
+  }
   void src;
   if (out.length === 0) out.push(ok('C-ABSENCE-AS-PERMISSION-001', 'drafts', '부재→허용 표현 검출 없음'));
   return out;
@@ -274,10 +321,10 @@ export function ruleC(input: GuardProductInput): GuardFinding[] {
 
 const CLAIM_KO: Array<[RegExp, string]> = [
   [/부담\s*(이\s*)?(적|없)/g, '부담이 적다/없다'],
-  [/순한/g, '순한'],
+  [/(?<![가-힣])순한/g, '순한'],
   [/입문용|처음\s*시작하|이제\s*(막\s*)?챙겨/g, '입문용'],
   [/안심하고/g, '안심'],
-  [/흡수(율|가)/g, '흡수'],
+  [/흡수율|흡수가\s*(좋|빠|잘)/g, '흡수'],
   [/장까지\s*(도달|전달)/g, '장까지 도달'],
   [/살아남/g, '생존'],
   [/효과가\s*좋/g, '효과가 좋다'],
@@ -398,10 +445,10 @@ export function ruleF(input: GuardProductInput): GuardFinding[] {
   const en = stripHtml(input.drafts.en);
 
   // F-1: 원문이 "이상/미만" 을 쓰지 않았는데 본문이 경계를 확정
-  const srcUsesBoundary = /(이상|미만|이하|초과)/.test(ageRaw);
+  //      ⚠️ 원문 대조는 **양쪽 모두** 공백 제거 후 비교(원문 "9세 이상" ↔ 본문 "9세 이상").
+  const ageRawNoSp = ageRaw.replace(/\s+/g, '');
   for (const m of matchAll(AGE_BOUNDARY_KO, ko)) {
-    const inSource = ageRaw.includes(m.text.replace(/\s+/g, ''));
-    if (srcUsesBoundary && inSource) continue;
+    if (ageRawNoSp.includes(m.text.replace(/\s+/g, ''))) continue; // 원문이 그 경계를 명시 → 그대로 쓴 것
     out.push({
       ruleId: 'F-AGE-BOUNDARY-001', severity: 'ERROR', status: 'BLOCKED', language: 'ko',
       field: 'koDraft', matchedText: m.text,
@@ -442,7 +489,8 @@ export function ruleF(input: GuardProductInput): GuardFinding[] {
 // ═══ G. 제형·섭취방법 일반화 ═══════════════════════════════════════════════
 
 const DIRECT_KO = /물\s*없이|그대로\s*섭취|직접\s*섭취|직접\s*드/g;
-const DIRECT_EN = /\b(straight|directly|without water)\b/gi;
+// ⚠️ "straight from the label" 같은 오탐 방지 — **섭취 문맥**에서만 매칭
+const DIRECT_EN = /\b(without water|taken?\s+(it\s+)?straight|straight,?\s+without|tipped\s+straight|taken?\s+directly|take\s+it\s+directly)\b/gi;
 const CHEW_KO = /씹어/;
 
 export function ruleG(input: GuardProductInput): GuardFinding[] {
@@ -484,7 +532,10 @@ export function ruleG(input: GuardProductInput): GuardFinding[] {
 
 // ═══ H. ko/en 대조 + §16 기능성 강화 ═══════════════════════════════════════
 
-const ESCALATION_EN = /\b(improves|prevents|treats|guarantees|boosts|enhances|ensures|restores)\b/gi;
+const ESCALATION_EN = /\b(improves|prevents|treats|boosts|enhances|ensures|restores)\b/gi;
+/** "guarantees at least N CFU through its shelf life" = 표시량 규격 보장이지 기능성 강화가 아니다 */
+const GUARANTEE_EN = /\bguarantees\b/gi;
+const GUARANTEE_SPEC_CTX = /at\s+least|CFU|shelf life|per\s+(capsule|stick|tablet)/i;
 const SUPPORTS_EN = /\bsupports\b/gi;
 
 export function ruleH(input: GuardProductInput): GuardFinding[] {
@@ -541,6 +592,21 @@ export function ruleH(input: GuardProductInput): GuardFinding[] {
       sourceEvidence: `MAIN_FNCTN: "${truncate(input.source.mainFunction, 70)}" (도움을 줄 수 있음)`,
       message: `영어에서 기능성이 한국어보다 강화됐습니다("${m.text}").`,
       suggestedAction: '"may help …" 프레임으로 되돌리십시오.',
+    });
+  }
+  for (const m of matchAll(GUARANTEE_EN, en)) {
+    const ctx = contextAround(en, m.index, 60);
+    const specish = GUARANTEE_SPEC_CTX.test(ctx);
+    out.push({
+      ruleId: specish ? 'H-GUARANTEE-SPEC-006' : 'H-FUNCTION-ESCALATION-003',
+      severity: specish ? 'INFO' : 'ERROR',
+      status: specish ? 'REVIEW_REQUIRED' : 'BLOCKED',
+      language: 'en', field: 'enDraft', matchedText: m.text,
+      sourceEvidence: `BASE_STANDARD: ${truncate(input.source.baseStandard, 60)}`,
+      message: specish
+        ? `"guarantees" 가 표시량 규격 보장 문맥으로 보입니다: "${ctx}"`
+        : `"guarantees" 로 결과를 보장했습니다: "${ctx}"`,
+      suggestedAction: specish ? '표시량 규격 보장이면 PASS 입니다.' : '결과 보장 표현을 삭제하십시오.',
     });
   }
   for (const m of matchAll(SUPPORTS_EN, en)) {

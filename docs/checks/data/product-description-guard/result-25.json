@@ -2,21 +2,18 @@
   "guardVersion": "product-description-guard@1.0.0",
   "totalProducts": 25,
   "pass": 0,
-  "reviewRequired": 0,
-  "blocked": 25,
+  "reviewRequired": 25,
+  "blocked": 0,
   "findingsByRule": {
     "PRE-F-AGE-001": 23,
-    "B-SUPERLATIVE-001": 51,
-    "D-CLAIM-UNGROUNDED-001": 4,
-    "H-FUNCTION-ESCALATION-003": 8,
+    "B-SPEC-MINMAX-003": 51,
+    "H-GUARANTEE-SPEC-006": 7,
     "H-MAKER-MISSING-005": 25,
     "PRE-A-BASIS-001": 17,
-    "C-ABSENCE-AS-PERMISSION-001": 3,
+    "C-ABSENCE-SOFT-004": 1,
     "B-SUPERLATIVE-CONTEXT-002": 2,
-    "F-AGE-BOUNDARY-001": 6,
-    "G-FORM-GENERALIZATION-001": 2,
-    "A-UNIT-BASIS-001": 4,
-    "C-ABSENCE-NUMERIC-003": 2
+    "C-ABSENCE-NUMERIC-003": 2,
+    "C-ABSENCE-CONTRAST-005": 2
   },
   "products": [
     {
@@ -24,12 +21,12 @@
       "productName": "듀오락 바이오팜 장건강 캡슐",
       "guardVersion": "product-description-guard@1.0.0",
       "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "BLOCKED",
-      "koEnStatus": "BLOCKED",
-      "overallStatus": "BLOCKED",
-      "blockedCount": 5,
-      "reviewCount": 2,
-      "passCount": 6,
+      "postGuardStatus": "REVIEW_REQUIRED",
+      "koEnStatus": "REVIEW_REQUIRED",
+      "overallStatus": "REVIEW_REQUIRED",
+      "blockedCount": 0,
+      "reviewCount": 5,
+      "passCount": 7,
       "findings": [
         {
           "ruleId": "PRE-A-BASIS-001",
@@ -65,26 +62,26 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…pport gut health. This product guarantees at least 1 billion CFU per capsule (350mg) throu…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수: 1,000,000,000 CFU/350mg 이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…reaction occurs Format: 1 capsule 350mg · at least 1 billion CFU probiotics · Health Funct…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수: 1,000,000,000 CFU/350mg 이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -99,25 +96,14 @@
         },
         {
           "ruleId": "D-CLAIM-UNGROUNDED-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
-          "language": "ko",
-          "field": "koDraft",
-          "matchedText": "부담이 없",
-          "sourceEvidence": "원문에 근거 없음",
-          "message": "원문 근거 없는 제품 주장(부담이 적다/없다)입니다: \"…가 하루 1캡슐 350mg — 한 번에 챙길 것이 하나뿐 캡슐이라 분말의 맛·향 부담이 없고, 물과 함께 삼키면 끝 프로바이오틱스 10억 CFU (350mg 기준…\"",
-          "suggestedAction": "삭제하십시오. 제품 주장은 원문 근거가 있을 때만 가능합니다."
-        },
-        {
-          "ruleId": "D-CLAIM-UNGROUNDED-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
-          "language": "ko",
-          "field": "koDraft",
-          "matchedText": "부담 없",
-          "sourceEvidence": "원문에 근거 없음",
-          "message": "원문 근거 없는 제품 주장(부담이 적다/없다)입니다: \"…물과 함께 삼키면 끝 프로바이오틱스 10억 CFU (350mg 기준) — 매일 부담 없이 이어가기 좋은 함량 (주)쎌바이오텍 제조 붕해시험 20분 이내 · 대장…\"",
-          "suggestedAction": "삭제하십시오. 제품 주장은 원문 근거가 있을 때만 가능합니다."
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "근거 없는 제품 주장 검출 없음",
+          "suggestedAction": "조치 불요"
         },
         {
           "ruleId": "E-NAME-DERIVED-001",
@@ -153,15 +139,15 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "H-FUNCTION-ESCALATION-003",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "H-GUARANTEE-SPEC-006",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
           "matchedText": "guarantees",
-          "sourceEvidence": "MAIN_FNCTN: \"유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음\" (도움을 줄 수 있음)",
-          "message": "영어에서 기능성이 한국어보다 강화됐습니다(\"guarantees\").",
-          "suggestedAction": "\"may help …\" 프레임으로 되돌리십시오."
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수: 1,000,000,000 CFU/350mg 이상",
+          "message": "\"guarantees\" 가 표시량 규격 보장 문맥으로 보입니다: \"…wel movement, and may help support gut health. This product guarantees at least 1 billion CFU per capsule (350mg) throug…\"",
+          "suggestedAction": "표시량 규격 보장이면 PASS 입니다."
         },
         {
           "ruleId": "H-MAKER-MISSING-005",
@@ -181,12 +167,12 @@
       "productName": "프로바",
       "guardVersion": "product-description-guard@1.0.0",
       "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "BLOCKED",
+      "postGuardStatus": "REVIEW_REQUIRED",
       "koEnStatus": "REVIEW_REQUIRED",
-      "overallStatus": "BLOCKED",
-      "blockedCount": 4,
-      "reviewCount": 3,
-      "passCount": 5,
+      "overallStatus": "REVIEW_REQUIRED",
+      "blockedCount": 0,
+      "reviewCount": 6,
+      "passCount": 6,
       "findings": [
         {
           "ruleId": "PRE-A-BASIS-001",
@@ -222,37 +208,37 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…health. This product’s labelled basis is at least 100 million CFU per 2,000mg. A simple s…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(100,000,000(1억) CFU/2000mg) 이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "minimum",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…y and direct sunlight Keep air exposure to a minimum after opening 18 months from manufact…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "to a minimum",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(100,000,000(1억) CFU/2000mg) 이상",
+          "message": "규격 최소·최대치 표현입니다(\"to a minimum\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…fants and children Format: powder stick · at least 100 million CFU probiotics per 2,000mg…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(100,000,000(1억) CFU/2000mg) 이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -267,14 +253,14 @@
         },
         {
           "ruleId": "D-CLAIM-UNGROUNDED-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
-          "language": "ko",
-          "field": "koDraft",
-          "matchedText": "순한",
-          "sourceEvidence": "원문에 근거 없음",
-          "message": "원문 근거 없는 제품 주장(순한)입니다: \"…1억 CFU 기준으로 담은 분말입니다. 왜 이 제품인가 하루 1포 로 끝나는 단순한 섭취 프로바이오틱스 1억 CFU — 2,000mg 기준으로 설계된 제품 주식…\"",
-          "suggestedAction": "삭제하십시오. 제품 주장은 원문 근거가 있을 때만 가능합니다."
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "근거 없는 제품 주장 검출 없음",
+          "suggestedAction": "조치 불요"
         },
         {
           "ruleId": "E-NAME-DERIVED-001",
@@ -327,11 +313,11 @@
       "productName": "뉴로랩스 덴마크 유산균",
       "guardVersion": "product-description-guard@1.0.0",
       "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "BLOCKED",
-      "koEnStatus": "BLOCKED",
-      "overallStatus": "BLOCKED",
-      "blockedCount": 3,
-      "reviewCount": 2,
+      "postGuardStatus": "REVIEW_REQUIRED",
+      "koEnStatus": "REVIEW_REQUIRED",
+      "overallStatus": "REVIEW_REQUIRED",
+      "blockedCount": 0,
+      "reviewCount": 5,
       "passCount": 7,
       "findings": [
         {
@@ -368,26 +354,26 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…pport gut health. This product guarantees at least 10 billion CFU per capsule (340mg) thro…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량 (100억 CFU/340 mg) 이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…reaction occurs Format: 1 capsule 340mg · at least 10 billion CFU probiotics · Health Func…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량 (100억 CFU/340 mg) 이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -445,15 +431,15 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "H-FUNCTION-ESCALATION-003",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "H-GUARANTEE-SPEC-006",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
           "matchedText": "guarantees",
-          "sourceEvidence": "MAIN_FNCTN: \"유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음\" (도움을 줄 수 있음)",
-          "message": "영어에서 기능성이 한국어보다 강화됐습니다(\"guarantees\").",
-          "suggestedAction": "\"may help …\" 프레임으로 되돌리십시오."
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량 (100억 CFU/340 mg) 이상",
+          "message": "\"guarantees\" 가 표시량 규격 보장 문맥으로 보입니다: \"…wel movement, and may help support gut health. This product guarantees at least 10 billion CFU per capsule (340mg) throu…\"",
+          "suggestedAction": "표시량 규격 보장이면 PASS 입니다."
         },
         {
           "ruleId": "H-MAKER-MISSING-005",
@@ -473,12 +459,12 @@
       "productName": "락토핏 플러스 프로바이오틱스",
       "guardVersion": "product-description-guard@1.0.0",
       "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "BLOCKED",
+      "postGuardStatus": "REVIEW_REQUIRED",
       "koEnStatus": "REVIEW_REQUIRED",
-      "overallStatus": "BLOCKED",
-      "blockedCount": 4,
-      "reviewCount": 3,
-      "passCount": 4,
+      "overallStatus": "REVIEW_REQUIRED",
+      "blockedCount": 0,
+      "reviewCount": 6,
+      "passCount": 5,
       "findings": [
         {
           "ruleId": "PRE-A-BASIS-001",
@@ -514,48 +500,48 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…health. This product’s labelled basis is at least 10 billion CFU per 4g. Easy to take No…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(10,000,000,000 (100억) CFU/4g) 이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…idual constitution Format: powder stick · at least 10 billion CFU probiotics per 4g · 2 st…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(10,000,000,000 (100억) CFU/4g) 이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
-          "ruleId": "C-ABSENCE-AS-PERMISSION-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "C-ABSENCE-SOFT-004",
+          "severity": "WARNING",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
           "matchedText": "no need to",
-          "sourceEvidence": "원문에 해당 부재·허용 명시 없음 (검색 대상: BASE_STANDARD/SRV_USE/INTAKE_HINT1/SUNGSANG)",
-          "message": "원문에 없는 것을 \"없다/불필요하다\"로 기술했을 수 있습니다: \"…n to be Before or after a meal, either way — no need to time it around eating One stick, t…\"",
-          "suggestedAction": "원문이 직접 뒷받침하지 않으면 삭제하십시오. 부정형 대신 긍정형(있는 것)으로 기술하십시오."
+          "sourceEvidence": "SRV_USE: 1일 2회, 1회 1포를 식전·식후 어느때나 물 없이 섭취하십시오.",
+          "message": "\"no need to\" — 원문 지시의 번역인지 부재 추론인지 확인이 필요합니다: \"…n to be Before or after a meal, either way — no need to time it around eating One stick, t…\"",
+          "suggestedAction": "원문이 직접 뒷받침하지 않으면 삭제하십시오."
         },
         {
           "ruleId": "D-CLAIM-UNGROUNDED-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
-          "language": "en",
-          "field": "enDraft",
-          "matchedText": "Easy to take",
-          "sourceEvidence": "원문에 근거 없음",
-          "message": "원문 근거 없는 제품 주장(easy to take)입니다: \"…led basis is at least 10 billion CFU per 4g. Easy to take No water · twice a day A white-p…\"",
-          "suggestedAction": "삭제하십시오. 제품 주장은 원문 근거가 있을 때만 가능합니다."
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "근거 없는 제품 주장 검출 없음",
+          "suggestedAction": "조치 불요"
         },
         {
           "ruleId": "E-NAME-DERIVED-001",
@@ -608,12 +594,12 @@
       "productName": "디노키즈생유산균",
       "guardVersion": "product-description-guard@1.0.0",
       "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "BLOCKED",
+      "postGuardStatus": "REVIEW_REQUIRED",
       "koEnStatus": "REVIEW_REQUIRED",
-      "overallStatus": "BLOCKED",
-      "blockedCount": 6,
-      "reviewCount": 3,
-      "passCount": 5,
+      "overallStatus": "REVIEW_REQUIRED",
+      "blockedCount": 0,
+      "reviewCount": 5,
+      "passCount": 7,
       "findings": [
         {
           "ruleId": "PRE-A-BASIS-001",
@@ -660,26 +646,26 @@
           "suggestedAction": "제품·그룹 비교 주장이 아닌지 사람이 확인하십시오."
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…health. This product’s labelled basis is at least 10 billion CFU per 2g. Guided by age Fr…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(10,000,000,000 (100억) CFU / 2g) 이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…se reaction occurs Format: powder stick · at least 10 billion CFU probiotics per 2g · Heal…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(10,000,000,000 (100억) CFU / 2g) 이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -716,47 +702,25 @@
         },
         {
           "ruleId": "F-AGE-BOUNDARY-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
-          "language": "ko",
-          "field": "koDraft",
-          "matchedText": "9세 이상",
-          "sourceEvidence": "SRV_USE 연령 표기: \"9세 이상 및 성인 : 1일 2~3회, 1회 1포 / 4-9세 어린이 : 1일 2회, 1회 1포 / 6개월-4세 어린이 : 1일 1회, 1회 1…\"",
-          "message": "원문보다 연령 경계를 명확하게 확정했습니다(\"9세 이상\"). 원문 표기를 그대로 보존해야 합니다.",
-          "suggestedAction": "원문 표기 그대로 쓰십시오(예: 원문 \"4-9세\" → \"4-9세\"). \"이상/미만\"은 원문이 명시할 때만."
-        },
-        {
-          "ruleId": "F-AGE-BOUNDARY-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
-          "language": "ko",
-          "field": "koDraft",
-          "matchedText": "9세 이상",
-          "sourceEvidence": "SRV_USE 연령 표기: \"9세 이상 및 성인 : 1일 2~3회, 1회 1포 / 4-9세 어린이 : 1일 2회, 1회 1포 / 6개월-4세 어린이 : 1일 1회, 1회 1…\"",
-          "message": "원문보다 연령 경계를 명확하게 확정했습니다(\"9세 이상\"). 원문 표기를 그대로 보존해야 합니다.",
-          "suggestedAction": "원문 표기 그대로 쓰십시오(예: 원문 \"4-9세\" → \"4-9세\"). \"이상/미만\"은 원문이 명시할 때만."
-        },
-        {
-          "ruleId": "F-AGE-BOUNDARY-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
-          "language": "ko",
-          "field": "koDraft",
-          "matchedText": "9세 이상",
-          "sourceEvidence": "SRV_USE 연령 표기: \"9세 이상 및 성인 : 1일 2~3회, 1회 1포 / 4-9세 어린이 : 1일 2회, 1회 1포 / 6개월-4세 어린이 : 1일 1회, 1회 1…\"",
-          "message": "원문보다 연령 경계를 명확하게 확정했습니다(\"9세 이상\"). 원문 표기를 그대로 보존해야 합니다.",
-          "suggestedAction": "원문 표기 그대로 쓰십시오(예: 원문 \"4-9세\" → \"4-9세\"). \"이상/미만\"은 원문이 명시할 때만."
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "연령 경계 원문 보존 확인",
+          "suggestedAction": "조치 불요"
         },
         {
           "ruleId": "G-FORM-GENERALIZATION-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
-          "language": "en",
-          "field": "enDraft",
-          "matchedText": "straight",
-          "sourceEvidence": "SRV_USE: \"9세 이상 및 성인 : 1일 2~3회, 1회 1포 / 4-9세 어린이 : 1일 2회, 1회 1포 / 6개월-4세 어린이 : 1일 1회, 1회 1…\" — 직접 섭취 언급 없음",
-          "message": "원문이 직접 섭취를 제시하지 않는데 \"물 없이/그대로 섭취\"를 기술했습니다(제형 기반 추정).",
-          "suggestedAction": "삭제하십시오. 원문이 \"직접 또는 물과 함께\" 처럼 명시할 때만 서술 가능합니다."
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "제형 기반 추정 검출 없음",
+          "suggestedAction": "조치 불요"
         },
         {
           "ruleId": "H-MAKER-MISSING-005",
@@ -776,12 +740,12 @@
       "productName": "하루하루 장편한 프로바이오틱스",
       "guardVersion": "product-description-guard@1.0.0",
       "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "BLOCKED",
-      "koEnStatus": "BLOCKED",
-      "overallStatus": "BLOCKED",
-      "blockedCount": 7,
-      "reviewCount": 3,
-      "passCount": 5,
+      "postGuardStatus": "REVIEW_REQUIRED",
+      "koEnStatus": "REVIEW_REQUIRED",
+      "overallStatus": "REVIEW_REQUIRED",
+      "blockedCount": 0,
+      "reviewCount": 5,
+      "passCount": 6,
       "findings": [
         {
           "ruleId": "PRE-A-BASIS-001",
@@ -807,69 +771,36 @@
         },
         {
           "ruleId": "A-UNIT-BASIS-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
-          "language": "ko",
-          "field": "koDraft",
-          "matchedText": "1일 섭취 프로바이오틱스 100억",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(10,000,000,000(100억) cfu/400mg) 이상 | SRV_USE: 1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
-          "message": "표시 기준량과 섭취단위의 연결 근거가 없는데 1일 총량를 기술했습니다 (근거 부족: 1단위 중량이 공식 원문에 없음).",
-          "suggestedAction": "표시 기준량만 기술하고 1단위당·1일 총량 수치는 삭제하십시오."
-        },
-        {
-          "ruleId": "A-UNIT-BASIS-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
-          "language": "en",
-          "field": "enDraft",
-          "matchedText": "10 billion CFU per capsule",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(10,000,000,000(100억) cfu/400mg) 이상 | SRV_USE: 1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
-          "message": "표시 기준량과 섭취단위의 연결 근거가 없는데 per-unit 수치를 기술했습니다 (근거 부족: 1단위 중량이 공식 원문에 없음).",
-          "suggestedAction": "표시 기준량만 기술하고 1단위당·1일 총량 수치는 삭제하십시오."
-        },
-        {
-          "ruleId": "A-UNIT-BASIS-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
-          "language": "en",
-          "field": "enDraft",
-          "matchedText": "10 billion CFU per capsule",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(10,000,000,000(100억) cfu/400mg) 이상 | SRV_USE: 1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
-          "message": "표시 기준량과 섭취단위의 연결 근거가 없는데 per-unit 수치를 기술했습니다 (근거 부족: 1단위 중량이 공식 원문에 없음).",
-          "suggestedAction": "표시 기준량만 기술하고 1단위당·1일 총량 수치는 삭제하십시오."
-        },
-        {
-          "ruleId": "A-UNIT-BASIS-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
-          "language": "en",
-          "field": "enDraft",
-          "matchedText": "10 billion CFU of probiotics per day",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(10,000,000,000(100억) cfu/400mg) 이상 | SRV_USE: 1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
-          "message": "표시 기준량과 섭취단위의 연결 근거가 없는데 per-day 총량를 기술했습니다 (근거 부족: 1단위 중량이 공식 원문에 없음).",
-          "suggestedAction": "표시 기준량만 기술하고 1단위당·1일 총량 수치는 삭제하십시오."
-        },
-        {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
-          "language": "en",
-          "field": "enDraft",
-          "matchedText": "least",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
           "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…pport gut health. This product guarantees at least 10 billion CFU per capsule (400mg) thro…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "message": "환산 근거 없음(1단위 중량이 공식 원문에 없음) — 파생 수치 미기재 확인",
+          "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…al constitution Format: 1 capsule 400mg · at least 10 billion CFU probiotics · Health Func…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(10,000,000,000(100억) cfu/400mg) 이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+        },
+        {
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
+          "language": "en",
+          "field": "enDraft",
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(10,000,000,000(100억) cfu/400mg) 이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -927,17 +858,6 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "H-FUNCTION-ESCALATION-003",
-          "severity": "ERROR",
-          "status": "BLOCKED",
-          "language": "en",
-          "field": "enDraft",
-          "matchedText": "guarantees",
-          "sourceEvidence": "MAIN_FNCTN: \"유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음\" (도움을 줄 수 있음)",
-          "message": "영어에서 기능성이 한국어보다 강화됐습니다(\"guarantees\").",
-          "suggestedAction": "\"may help …\" 프레임으로 되돌리십시오."
-        },
-        {
           "ruleId": "H-MAKER-MISSING-005",
           "severity": "WARNING",
           "status": "REVIEW_REQUIRED",
@@ -955,11 +875,11 @@
       "productName": "락토필엔테로 비움",
       "guardVersion": "product-description-guard@1.0.0",
       "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "BLOCKED",
-      "koEnStatus": "BLOCKED",
-      "overallStatus": "BLOCKED",
-      "blockedCount": 3,
-      "reviewCount": 2,
+      "postGuardStatus": "REVIEW_REQUIRED",
+      "koEnStatus": "REVIEW_REQUIRED",
+      "overallStatus": "REVIEW_REQUIRED",
+      "blockedCount": 0,
+      "reviewCount": 5,
       "passCount": 7,
       "findings": [
         {
@@ -996,26 +916,26 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…pport gut health. This product guarantees at least 10 billion CFU per capsule (350mg) thro…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량 이상 (100억 CFU/350 mg)",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…reaction occurs Format: 1 capsule 350mg · at least 10 billion CFU probiotics · Health Func…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량 이상 (100억 CFU/350 mg)",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -1073,15 +993,15 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "H-FUNCTION-ESCALATION-003",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "H-GUARANTEE-SPEC-006",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
           "matchedText": "guarantees",
-          "sourceEvidence": "MAIN_FNCTN: \"유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음\" (도움을 줄 수 있음)",
-          "message": "영어에서 기능성이 한국어보다 강화됐습니다(\"guarantees\").",
-          "suggestedAction": "\"may help …\" 프레임으로 되돌리십시오."
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량 이상 (100억 CFU/350 mg)",
+          "message": "\"guarantees\" 가 표시량 규격 보장 문맥으로 보입니다: \"…wel movement, and may help support gut health. This product guarantees at least 10 billion CFU per capsule (350mg) throu…\"",
+          "suggestedAction": "표시량 규격 보장이면 PASS 입니다."
         },
         {
           "ruleId": "H-MAKER-MISSING-005",
@@ -1101,11 +1021,11 @@
       "productName": "파라오틱스",
       "guardVersion": "product-description-guard@1.0.0",
       "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "BLOCKED",
+      "postGuardStatus": "REVIEW_REQUIRED",
       "koEnStatus": "REVIEW_REQUIRED",
-      "overallStatus": "BLOCKED",
-      "blockedCount": 2,
-      "reviewCount": 3,
+      "overallStatus": "REVIEW_REQUIRED",
+      "blockedCount": 0,
+      "reviewCount": 5,
       "passCount": 6,
       "findings": [
         {
@@ -1142,26 +1062,26 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…health. This product's labelled basis is at least 10 billion CFU per 700mg through its sh…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수: 표시량(10,000,000,000 CFU/700mg) 이상 / 성상 : 흰색 장용성 경질 내부캡슐과 투명 …",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…d capsule (enteric inner + clear outer) · at least 10 billion CFU probiotics per 700mg · t…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수: 표시량(10,000,000,000 CFU/700mg) 이상 / 성상 : 흰색 장용성 경질 내부캡슐과 투명 …",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -1236,11 +1156,11 @@
       "productName": "김치생유산균바이오캡슐",
       "guardVersion": "product-description-guard@1.0.0",
       "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "BLOCKED",
+      "postGuardStatus": "REVIEW_REQUIRED",
       "koEnStatus": "REVIEW_REQUIRED",
-      "overallStatus": "BLOCKED",
-      "blockedCount": 2,
-      "reviewCount": 2,
+      "overallStatus": "REVIEW_REQUIRED",
+      "blockedCount": 0,
+      "reviewCount": 4,
       "passCount": 7,
       "findings": [
         {
@@ -1277,26 +1197,26 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…health. This product's labelled basis is at least 10 billion CFU per 900mg — and 900mg is…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(10,000,000,000cfu이상/900mg)이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…apsule 450mg · 2 capsules daily (900mg) · at least 10 billion CFU probiotics per 900mg · H…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(10,000,000,000cfu이상/900mg)이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -1371,11 +1291,11 @@
       "productName": "비피스앤(N)",
       "guardVersion": "product-description-guard@1.0.0",
       "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "BLOCKED",
+      "postGuardStatus": "REVIEW_REQUIRED",
       "koEnStatus": "REVIEW_REQUIRED",
-      "overallStatus": "BLOCKED",
-      "blockedCount": 2,
-      "reviewCount": 3,
+      "overallStatus": "REVIEW_REQUIRED",
+      "blockedCount": 0,
+      "reviewCount": 5,
       "passCount": 6,
       "findings": [
         {
@@ -1412,26 +1332,26 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…health. This product's labelled basis is at least 100 million CFU per 1,000mg. Split serv…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 : 표시량(100,000,000(1억) cfu/1,000 mg) 이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…n occurs Format: pale blue hard capsule · at least 100 million CFU probiotics per 1,000mg…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 : 표시량(100,000,000(1억) cfu/1,000 mg) 이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -1506,11 +1426,11 @@
       "productName": "트리맥스바이오틱스",
       "guardVersion": "product-description-guard@1.0.0",
       "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "BLOCKED",
+      "postGuardStatus": "REVIEW_REQUIRED",
       "koEnStatus": "REVIEW_REQUIRED",
-      "overallStatus": "BLOCKED",
-      "blockedCount": 2,
-      "reviewCount": 3,
+      "overallStatus": "REVIEW_REQUIRED",
+      "blockedCount": 0,
+      "reviewCount": 5,
       "passCount": 6,
       "findings": [
         {
@@ -1547,26 +1467,26 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…health. This product's labelled basis is at least 1 billion CFU per 3g. How it's taken St…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(1,000,000,000(10억) CFU/3g) 이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…ke it unsupervised Format: powder stick · at least 1 billion CFU probiotics per 3g · 1 sti…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(1,000,000,000(10억) CFU/3g) 이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -1641,11 +1561,11 @@
       "productName": "닥터파이토 비피아이 유산균",
       "guardVersion": "product-description-guard@1.0.0",
       "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "BLOCKED",
+      "postGuardStatus": "REVIEW_REQUIRED",
       "koEnStatus": "REVIEW_REQUIRED",
-      "overallStatus": "BLOCKED",
-      "blockedCount": 2,
-      "reviewCount": 3,
+      "overallStatus": "REVIEW_REQUIRED",
+      "blockedCount": 0,
+      "reviewCount": 5,
       "passCount": 6,
       "findings": [
         {
@@ -1682,26 +1602,26 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…health. This product's labelled basis is at least 5 billion CFU per 2g. How it's taken St…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스균수 : 표시량(5,000,000,000(50억)CFU/2g) 이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…se reaction occurs Format: powder stick · at least 5 billion CFU probiotics per 2g · 1 sti…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스균수 : 표시량(5,000,000,000(50억)CFU/2g) 이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -1776,11 +1696,11 @@
       "productName": "W이너밸런스프로바이오틱스",
       "guardVersion": "product-description-guard@1.0.0",
       "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "BLOCKED",
-      "koEnStatus": "BLOCKED",
-      "overallStatus": "BLOCKED",
-      "blockedCount": 3,
-      "reviewCount": 3,
+      "postGuardStatus": "REVIEW_REQUIRED",
+      "koEnStatus": "REVIEW_REQUIRED",
+      "overallStatus": "REVIEW_REQUIRED",
+      "blockedCount": 0,
+      "reviewCount": 6,
       "passCount": 6,
       "findings": [
         {
@@ -1817,26 +1737,26 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…pport gut health. This product guarantees at least 5 billion CFU per 2g through its shelf…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 : 표시량 이상 [표시량 5,000,000,000 (50억)CFU/2g]",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…erse reaction occurs Format: 1 stick 2g · at least 5 billion CFU probiotics per 2g · 1 sti…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 : 표시량 이상 [표시량 5,000,000,000 (50억)CFU/2g]",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
           "ruleId": "C-ABSENCE-NUMERIC-003",
@@ -1894,15 +1814,15 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "H-FUNCTION-ESCALATION-003",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "H-GUARANTEE-SPEC-006",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
           "matchedText": "guarantees",
-          "sourceEvidence": "MAIN_FNCTN: \"유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음\" (도움을 줄 수 있음)",
-          "message": "영어에서 기능성이 한국어보다 강화됐습니다(\"guarantees\").",
-          "suggestedAction": "\"may help …\" 프레임으로 되돌리십시오."
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 : 표시량 이상 [표시량 5,000,000,000 (50억)CFU/2g]",
+          "message": "\"guarantees\" 가 표시량 규격 보장 문맥으로 보입니다: \"…wel movement, and may help support gut health. This product guarantees at least 5 billion CFU per 2g through its shelf l…\"",
+          "suggestedAction": "표시량 규격 보장이면 PASS 입니다."
         },
         {
           "ruleId": "H-MAKER-MISSING-005",
@@ -1922,11 +1842,11 @@
       "productName": "닥터트루 프로바이오틱스 패밀리 생유산균",
       "guardVersion": "product-description-guard@1.0.0",
       "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "BLOCKED",
-      "koEnStatus": "BLOCKED",
-      "overallStatus": "BLOCKED",
-      "blockedCount": 3,
-      "reviewCount": 2,
+      "postGuardStatus": "REVIEW_REQUIRED",
+      "koEnStatus": "REVIEW_REQUIRED",
+      "overallStatus": "REVIEW_REQUIRED",
+      "blockedCount": 0,
+      "reviewCount": 5,
       "passCount": 7,
       "findings": [
         {
@@ -1963,26 +1883,26 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…pport gut health. This product guarantees at least 10 billion CFU per 2g through its shelf…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량 (10,000,000,000(100억) cfu/2g) 이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…erse reaction occurs Format: 1 stick 2g · at least 10 billion CFU probiotics per 2g · 1 st…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량 (10,000,000,000(100억) cfu/2g) 이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -2040,15 +1960,15 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "H-FUNCTION-ESCALATION-003",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "H-GUARANTEE-SPEC-006",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
           "matchedText": "guarantees",
-          "sourceEvidence": "MAIN_FNCTN: \"유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음\" (도움을 줄 수 있음)",
-          "message": "영어에서 기능성이 한국어보다 강화됐습니다(\"guarantees\").",
-          "suggestedAction": "\"may help …\" 프레임으로 되돌리십시오."
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량 (10,000,000,000(100억) cfu/2g) 이상",
+          "message": "\"guarantees\" 가 표시량 규격 보장 문맥으로 보입니다: \"…wel movement, and may help support gut health. This product guarantees at least 10 billion CFU per 2g through its shelf…\"",
+          "suggestedAction": "표시량 규격 보장이면 PASS 입니다."
         },
         {
           "ruleId": "H-MAKER-MISSING-005",
@@ -2068,11 +1988,11 @@
       "productName": "프로바이오티끄 디땅트",
       "guardVersion": "product-description-guard@1.0.0",
       "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "BLOCKED",
+      "postGuardStatus": "REVIEW_REQUIRED",
       "koEnStatus": "REVIEW_REQUIRED",
-      "overallStatus": "BLOCKED",
-      "blockedCount": 2,
-      "reviewCount": 3,
+      "overallStatus": "REVIEW_REQUIRED",
+      "blockedCount": 0,
+      "reviewCount": 5,
       "passCount": 6,
       "findings": [
         {
@@ -2109,26 +2029,26 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…health. This product's labelled basis is at least 3 billion CFU per 1,500mg. Storage guid…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(30억 CFU/1,500 mg)이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…idual constitution Format: powder stick · at least 3 billion CFU probiotics per 1,500mg ·…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(30억 CFU/1,500 mg)이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -2203,11 +2123,11 @@
       "productName": "온가족 생유산균",
       "guardVersion": "product-description-guard@1.0.0",
       "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "BLOCKED",
+      "postGuardStatus": "REVIEW_REQUIRED",
       "koEnStatus": "REVIEW_REQUIRED",
-      "overallStatus": "BLOCKED",
-      "blockedCount": 2,
-      "reviewCount": 3,
+      "overallStatus": "REVIEW_REQUIRED",
+      "blockedCount": 0,
+      "reviewCount": 5,
       "passCount": 6,
       "findings": [
         {
@@ -2244,26 +2164,26 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…health. This product's labelled basis is at least 100 million CFU per 2,000mg. How it's t…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(100,000,000(1억) cfu/2,000 mg) 이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…ening or taking it Format: powder stick · at least 100 million CFU probiotics per 2,000mg…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(100,000,000(1억) cfu/2,000 mg) 이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -2338,11 +2258,11 @@
       "productName": "히게이아혼합유산균",
       "guardVersion": "product-description-guard@1.0.0",
       "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "BLOCKED",
+      "postGuardStatus": "REVIEW_REQUIRED",
       "koEnStatus": "REVIEW_REQUIRED",
-      "overallStatus": "BLOCKED",
-      "blockedCount": 2,
-      "reviewCount": 3,
+      "overallStatus": "REVIEW_REQUIRED",
+      "blockedCount": 0,
+      "reviewCount": 5,
       "passCount": 6,
       "findings": [
         {
@@ -2379,26 +2299,26 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…health. This product's labelled basis is at least 3 billion CFU per 2,000mg. Check before…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(3,000,000,000(30억) CFU/2000mg) 이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…ke it unsupervised Format: powder stick · at least 3 billion CFU probiotics per 2,000mg ·…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(3,000,000,000(30억) CFU/2000mg) 이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -2473,11 +2393,11 @@
       "productName": "큐업",
       "guardVersion": "product-description-guard@1.0.0",
       "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "BLOCKED",
+      "postGuardStatus": "REVIEW_REQUIRED",
       "koEnStatus": "REVIEW_REQUIRED",
-      "overallStatus": "BLOCKED",
-      "blockedCount": 2,
-      "reviewCount": 3,
+      "overallStatus": "REVIEW_REQUIRED",
+      "blockedCount": 0,
+      "reviewCount": 5,
       "passCount": 6,
       "findings": [
         {
@@ -2514,26 +2434,26 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…health. This product's labelled basis is at least 10 billion CFU per 2g. Storage conditio…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량{10,000,000,000(100억) CFU/2g} 이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…se reaction occurs Format: powder stick · at least 10 billion CFU probiotics per 2g · 1 st…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량{10,000,000,000(100억) CFU/2g} 이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -2608,11 +2528,11 @@
       "productName": "오달달 키즈 유산균",
       "guardVersion": "product-description-guard@1.0.0",
       "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "BLOCKED",
+      "postGuardStatus": "REVIEW_REQUIRED",
       "koEnStatus": "REVIEW_REQUIRED",
-      "overallStatus": "BLOCKED",
-      "blockedCount": 2,
-      "reviewCount": 3,
+      "overallStatus": "REVIEW_REQUIRED",
+      "blockedCount": 0,
+      "reviewCount": 5,
       "passCount": 6,
       "findings": [
         {
@@ -2649,26 +2569,26 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…health. This product's labelled basis is at least 5 billion CFU per 2g. How it's taken On…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(5,000,000,000(50억) CFU/2g) 이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…se reaction occurs Format: powder stick · at least 5 billion CFU probiotics per 2g · 1 sti…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(5,000,000,000(50억) CFU/2g) 이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -2743,11 +2663,11 @@
       "productName": "슬리문 키즈 30억 유산균",
       "guardVersion": "product-description-guard@1.0.0",
       "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "BLOCKED",
-      "koEnStatus": "BLOCKED",
-      "overallStatus": "BLOCKED",
-      "blockedCount": 3,
-      "reviewCount": 3,
+      "postGuardStatus": "REVIEW_REQUIRED",
+      "koEnStatus": "REVIEW_REQUIRED",
+      "overallStatus": "REVIEW_REQUIRED",
+      "blockedCount": 0,
+      "reviewCount": 6,
       "passCount": 6,
       "findings": [
         {
@@ -2784,26 +2704,26 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…pport gut health. This product guarantees at least 3 billion CFU per 1,000mg through its s…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 : 표시량(3,000,000,000(30억) CFU/1,000mg)이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…take it unsupervised Format: 1 stick 1g · at least 3 billion CFU probiotics per 1,000mg ·…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 : 표시량(3,000,000,000(30억) CFU/1,000mg)이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
           "ruleId": "C-ABSENCE-NUMERIC-003",
@@ -2861,15 +2781,15 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "H-FUNCTION-ESCALATION-003",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "H-GUARANTEE-SPEC-006",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
           "matchedText": "guarantees",
-          "sourceEvidence": "MAIN_FNCTN: \"유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음\" (도움을 줄 수 있음)",
-          "message": "영어에서 기능성이 한국어보다 강화됐습니다(\"guarantees\").",
-          "suggestedAction": "\"may help …\" 프레임으로 되돌리십시오."
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 : 표시량(3,000,000,000(30억) CFU/1,000mg)이상",
+          "message": "\"guarantees\" 가 표시량 규격 보장 문맥으로 보입니다: \"…wel movement, and may help support gut health. This product guarantees at least 3 billion CFU per 1,000mg through its sh…\"",
+          "suggestedAction": "표시량 규격 보장이면 PASS 입니다."
         },
         {
           "ruleId": "H-MAKER-MISSING-005",
@@ -2889,11 +2809,11 @@
       "productName": "장건강 프로바이오틱스",
       "guardVersion": "product-description-guard@1.0.0",
       "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "BLOCKED",
+      "postGuardStatus": "REVIEW_REQUIRED",
       "koEnStatus": "REVIEW_REQUIRED",
-      "overallStatus": "BLOCKED",
-      "blockedCount": 3,
-      "reviewCount": 3,
+      "overallStatus": "REVIEW_REQUIRED",
+      "blockedCount": 0,
+      "reviewCount": 6,
       "passCount": 5,
       "findings": [
         {
@@ -2930,37 +2850,37 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…health. This product's labelled basis is at least 100 million CFU per 1,400mg. How it's t…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱 수 : 표시량 100,000,000 CFU/1,400 mg)이상 / 성상 : 흰노랑색의 타원형 츄어블 정제",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…chewable tablet · 2 tablets once daily · at least 100 million CFU probiotics per 1,400mg…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱 수 : 표시량 100,000,000 CFU/1,400 mg)이상 / 성상 : 흰노랑색의 타원형 츄어블 정제",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
-          "ruleId": "C-ABSENCE-AS-PERMISSION-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "C-ABSENCE-CONTRAST-005",
+          "severity": "WARNING",
+          "status": "REVIEW_REQUIRED",
           "language": "ko",
           "field": "koDraft",
           "matchedText": "아닙니다",
-          "sourceEvidence": "원문에 해당 부재·허용 명시 없음 (검색 대상: BASE_STANDARD/SRV_USE/INTAKE_HINT1/SUNGSANG)",
-          "message": "원문에 없는 것을 \"없다/불필요하다\"로 기술했을 수 있습니다: \"…담았습니다. 왜 이 제품인가 씹어서 섭취하는 츄어블 정제 — 물로 삼키는 방식이 아닙니다 1일 1회에 2정 — 하루에 한 번만 챙기면 되는 구성 프로바이오틱스 1…\"",
-          "suggestedAction": "원문이 직접 뒷받침하지 않으면 삭제하십시오. 부정형 대신 긍정형(있는 것)으로 기술하십시오."
+          "sourceEvidence": "원문에 대비 근거 있음 (SRV_USE/SUNGSANG: 1일 1회, 1회 2정을 씹어서 섭취하십시오.)",
+          "message": "원문 사실에서 파생된 부정형 대비입니다: \"…담았습니다. 왜 이 제품인가 씹어서 섭취하는 츄어블 정제 — 물로 삼키는 방식이 아닙니다 1일 1회에 2정 — 하루에 한 번만 챙기면 되는 구성 프로바이오틱스 1…\" — 근거는 있으나 부정형입니다.",
+          "suggestedAction": "긍정형으로 바꾸는 것을 권합니다(예: \"씹어서 섭취하도록 표시되어 있습니다\")."
         },
         {
           "ruleId": "D-CLAIM-UNGROUNDED-001",
@@ -3024,12 +2944,12 @@
       "productName": "돌피니 유산균 츄어블",
       "guardVersion": "product-description-guard@1.0.0",
       "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "BLOCKED",
+      "postGuardStatus": "REVIEW_REQUIRED",
       "koEnStatus": "REVIEW_REQUIRED",
-      "overallStatus": "BLOCKED",
-      "blockedCount": 4,
-      "reviewCount": 3,
-      "passCount": 4,
+      "overallStatus": "REVIEW_REQUIRED",
+      "blockedCount": 0,
+      "reviewCount": 6,
+      "passCount": 5,
       "findings": [
         {
           "ruleId": "PRE-A-BASIS-001",
@@ -3065,37 +2985,37 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…health. This product's labelled basis is at least 100 million CFU per 2,000mg. How it's t…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(100,000,000 CFU/2000㎎) 이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…ite round tablet · 1 tablet twice daily · at least 100 million CFU probiotics per 2,000mg…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(100,000,000 CFU/2000㎎) 이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
-          "ruleId": "C-ABSENCE-AS-PERMISSION-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "C-ABSENCE-CONTRAST-005",
+          "severity": "WARNING",
+          "status": "REVIEW_REQUIRED",
           "language": "ko",
           "field": "koDraft",
           "matchedText": "아닙니다",
-          "sourceEvidence": "원문에 해당 부재·허용 명시 없음 (검색 대상: BASE_STANDARD/SRV_USE/INTAKE_HINT1/SUNGSANG)",
-          "message": "원문에 없는 것을 \"없다/불필요하다\"로 기술했을 수 있습니다: \"…CFU 기준으로 담았습니다. 왜 이 제품인가 씹어서 섭취 — 물로 삼키는 방식이 아닙니다 1일 2회 1정씩 — 하루 두 번으로 나눠 섭취하는 구성 프로바이오틱스…\"",
-          "suggestedAction": "원문이 직접 뒷받침하지 않으면 삭제하십시오. 부정형 대신 긍정형(있는 것)으로 기술하십시오."
+          "sourceEvidence": "원문에 대비 근거 있음 (SRV_USE/SUNGSANG: 1일 2회, 1회 1정을 씹어서 섭취하십시오.)",
+          "message": "원문 사실에서 파생된 부정형 대비입니다: \"…CFU 기준으로 담았습니다. 왜 이 제품인가 씹어서 섭취 — 물로 삼키는 방식이 아닙니다 1일 2회 1정씩 — 하루 두 번으로 나눠 섭취하는 구성 프로바이오틱스…\" — 근거는 있으나 부정형입니다.",
+          "suggestedAction": "긍정형으로 바꾸는 것을 권합니다(예: \"씹어서 섭취하도록 표시되어 있습니다\")."
         },
         {
           "ruleId": "D-CLAIM-UNGROUNDED-001",
@@ -3132,14 +3052,14 @@
         },
         {
           "ruleId": "G-FORM-GENERALIZATION-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
-          "language": "ko",
-          "field": "koDraft",
-          "matchedText": "물 없이",
-          "sourceEvidence": "SRV_USE: \"1일 2회, 1회 1정을 씹어서 섭취하십시오.\" — 직접 섭취 언급 없음",
-          "message": "원문이 직접 섭취를 제시하지 않는데 \"물 없이/그대로 섭취\"를 기술했습니다(제형 기반 추정).",
-          "suggestedAction": "삭제하십시오. 원문이 \"직접 또는 물과 함께\" 처럼 명시할 때만 서술 가능합니다."
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "제형 기반 추정 검출 없음",
+          "suggestedAction": "조치 불요"
         },
         {
           "ruleId": "H-MAKER-MISSING-005",
@@ -3159,12 +3079,12 @@
       "productName": "디노키즈생유산균",
       "guardVersion": "product-description-guard@1.0.0",
       "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "BLOCKED",
+      "postGuardStatus": "REVIEW_REQUIRED",
       "koEnStatus": "REVIEW_REQUIRED",
-      "overallStatus": "BLOCKED",
-      "blockedCount": 5,
-      "reviewCount": 3,
-      "passCount": 6,
+      "overallStatus": "REVIEW_REQUIRED",
+      "blockedCount": 0,
+      "reviewCount": 5,
+      "passCount": 7,
       "findings": [
         {
           "ruleId": "PRE-A-BASIS-001",
@@ -3211,26 +3131,26 @@
           "suggestedAction": "제품·그룹 비교 주장이 아닌지 사람이 확인하십시오."
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…health. This product's labelled basis is at least 10 billion CFU per 2g. Guided by age Ho…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(10,000,000,000 (100억) CFU / 2g) 이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…se reaction occurs Format: powder stick · at least 10 billion CFU probiotics per 2g · 1–3…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(10,000,000,000 (100억) CFU / 2g) 이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -3267,36 +3187,14 @@
         },
         {
           "ruleId": "F-AGE-BOUNDARY-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
-          "language": "ko",
-          "field": "koDraft",
-          "matchedText": "9세 이상",
-          "sourceEvidence": "SRV_USE 연령 표기: \"9세 이상 및 성인 : 1일 2~3회, 1회 1포 / 4-9세 어린이 : 1일 2회, 1회 1포 / 6개월-4세 어린이 : 1일 1회, 1회 1…\"",
-          "message": "원문보다 연령 경계를 명확하게 확정했습니다(\"9세 이상\"). 원문 표기를 그대로 보존해야 합니다.",
-          "suggestedAction": "원문 표기 그대로 쓰십시오(예: 원문 \"4-9세\" → \"4-9세\"). \"이상/미만\"은 원문이 명시할 때만."
-        },
-        {
-          "ruleId": "F-AGE-BOUNDARY-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
-          "language": "ko",
-          "field": "koDraft",
-          "matchedText": "9세 이상",
-          "sourceEvidence": "SRV_USE 연령 표기: \"9세 이상 및 성인 : 1일 2~3회, 1회 1포 / 4-9세 어린이 : 1일 2회, 1회 1포 / 6개월-4세 어린이 : 1일 1회, 1회 1…\"",
-          "message": "원문보다 연령 경계를 명확하게 확정했습니다(\"9세 이상\"). 원문 표기를 그대로 보존해야 합니다.",
-          "suggestedAction": "원문 표기 그대로 쓰십시오(예: 원문 \"4-9세\" → \"4-9세\"). \"이상/미만\"은 원문이 명시할 때만."
-        },
-        {
-          "ruleId": "F-AGE-BOUNDARY-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
-          "language": "ko",
-          "field": "koDraft",
-          "matchedText": "9세 이상",
-          "sourceEvidence": "SRV_USE 연령 표기: \"9세 이상 및 성인 : 1일 2~3회, 1회 1포 / 4-9세 어린이 : 1일 2회, 1회 1포 / 6개월-4세 어린이 : 1일 1회, 1회 1…\"",
-          "message": "원문보다 연령 경계를 명확하게 확정했습니다(\"9세 이상\"). 원문 표기를 그대로 보존해야 합니다.",
-          "suggestedAction": "원문 표기 그대로 쓰십시오(예: 원문 \"4-9세\" → \"4-9세\"). \"이상/미만\"은 원문이 명시할 때만."
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "연령 경계 원문 보존 확인",
+          "suggestedAction": "조치 불요"
         },
         {
           "ruleId": "G-FORM-GENERALIZATION-001",
@@ -3327,11 +3225,11 @@
       "productName": "생유산균 알파",
       "guardVersion": "product-description-guard@1.0.0",
       "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "BLOCKED",
+      "postGuardStatus": "REVIEW_REQUIRED",
       "koEnStatus": "REVIEW_REQUIRED",
-      "overallStatus": "BLOCKED",
-      "blockedCount": 2,
-      "reviewCount": 3,
+      "overallStatus": "REVIEW_REQUIRED",
+      "blockedCount": 0,
+      "reviewCount": 5,
       "passCount": 6,
       "findings": [
         {
@@ -3368,26 +3266,26 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…health. This product's labelled basis is at least 300 million CFU per 6,000mg. Check befo…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수: 300,000,000CFU / 6,000mg (표시량이상)",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…f on the packaging Format: powder stick · at least 300 million CFU probiotics per 6,000mg…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수: 300,000,000CFU / 6,000mg (표시량이상)",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -3462,11 +3360,11 @@
       "productName": "비바 비피도 플러스",
       "guardVersion": "product-description-guard@1.0.0",
       "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "BLOCKED",
-      "koEnStatus": "BLOCKED",
-      "overallStatus": "BLOCKED",
-      "blockedCount": 3,
-      "reviewCount": 2,
+      "postGuardStatus": "REVIEW_REQUIRED",
+      "koEnStatus": "REVIEW_REQUIRED",
+      "overallStatus": "REVIEW_REQUIRED",
+      "blockedCount": 0,
+      "reviewCount": 5,
       "passCount": 7,
       "findings": [
         {
@@ -3503,26 +3401,26 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…pport gut health. This product guarantees at least 1 billion CFU per 5,000mg through its s…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(1,000,000,000(10억) CFU/5,000mg) 표시량 이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
-          "ruleId": "B-SUPERLATIVE-001",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "B-SPEC-MINMAX-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
-          "matchedText": "least",
-          "sourceEvidence": null,
-          "message": "전수 비교 근거 없이 최상급·비교급을 사용했습니다: \"…rving · twice daily (10 capsules a day) · at least 1 billion CFU probiotics per 5,000mg ·…\"",
-          "suggestedAction": "비교를 삭제하고 수치를 그대로 기술하십시오(예: \"1억 CFU 기준으로 설계된 제품\")."
+          "matchedText": "at least",
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(1,000,000,000(10억) CFU/5,000mg) 표시량 이상",
+          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
+          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -3580,15 +3478,15 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "H-FUNCTION-ESCALATION-003",
-          "severity": "ERROR",
-          "status": "BLOCKED",
+          "ruleId": "H-GUARANTEE-SPEC-006",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
           "matchedText": "guarantees",
-          "sourceEvidence": "MAIN_FNCTN: \"유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음\" (도움을 줄 수 있음)",
-          "message": "영어에서 기능성이 한국어보다 강화됐습니다(\"guarantees\").",
-          "suggestedAction": "\"may help …\" 프레임으로 되돌리십시오."
+          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(1,000,000,000(10억) CFU/5,000mg) 표시량 이상",
+          "message": "\"guarantees\" 가 표시량 규격 보장 문맥으로 보입니다: \"…wel movement, and may help support gut health. This product guarantees at least 1 billion CFU per 5,000mg through its sh…\"",
+          "suggestedAction": "표시량 규격 보장이면 PASS 입니다."
         },
         {
           "ruleId": "H-MAKER-MISSING-005",
