@@ -8,7 +8,7 @@
  *   기존 legacy 진열/대기화면 편집 영역은 그대로 유지(이 컴포넌트는 additive).
  */
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Loader2, Plus, ChevronUp, ChevronDown, X, Save, Layers, AlertTriangle, LayoutTemplate } from 'lucide-react';
+import { Loader2, Plus, ChevronUp, ChevronDown, X, Save, Layers, AlertTriangle } from 'lucide-react';
 import {
   fetchScreenSets, fetchScreenSet, createScreenSet, updateScreenSet,
   archiveScreenSet, saveScreenSetBlocks,
@@ -309,28 +309,81 @@ export default function TabletScreenSetManager({ onToast, tablets, previewApi, s
   );
 }
 
-// ── 템플릿 선택 필드 (WO-O4O-KPA-TABLET-TEMPLATE-SELECTION-EDITOR-V1) ──
-//   Phase 1 은 선택지가 하나(corner_information_basic_v1)뿐이나, 후속 확장을 위해 선택형 구조를 유지.
-function TemplateSelectField({ value, onChange }: { value: string; onChange: (v: string) => void }) {
-  const current = TEMPLATE_OPTIONS.find((t) => t.key === value) ?? TEMPLATE_OPTIONS[0];
-  return (
-    <div className="space-y-1.5">
-      <label className="text-xs font-semibold text-slate-600 flex items-center gap-1.5">
-        <LayoutTemplate className="w-3.5 h-3.5 text-indigo-500" /> 화면 템플릿
-      </label>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400"
-      >
-        {TEMPLATE_OPTIONS.map((t) => <option key={t.key} value={t.key}>{t.label}</option>)}
-      </select>
-      <p className="text-[11px] text-slate-500 leading-relaxed">{current.description}</p>
-      <p className="text-[11px] text-slate-400 leading-relaxed">
-        템플릿은 같은 내용을 어떤 배치로 보여줄지만 정합니다(표시할 내용은 아래 블록에서 관리). 추가 템플릿은 후속 단계에서 제공됩니다.
-      </p>
-    </div>
-  );
+// ── 템플릿 축소 미리보기(와이어프레임) — WO-O4O-KPA-TABLET-TEMPLATE-PREVIEW-LAYOUT-FIX-V1 ──
+//   카드 5장에 kiosk 인스턴스를 띄우면 preview POST 5회 + 렌더 비용이 커지므로, 카드는 '배치 스케치'만 보여준다.
+//   실제 결과 화면은 오른쪽 고정 미리보기(TabletKioskPage embedded)가 담당한다.
+//   (WO-O4O-KPA-TABLET-TEMPLATE-SELECTION-EDITOR-V1 의 드롭다운 TemplateSelectField 를 대체)
+function TemplateThumb({ templateKey }: { templateKey: string }) {
+  const frame = 'w-full aspect-[16/10] rounded-md border border-slate-200 bg-white p-1.5 overflow-hidden';
+  const block = 'rounded-[2px] bg-slate-200';
+  const line = 'rounded-full bg-slate-200';
+  const qr = 'rounded-[2px] bg-slate-700';
+
+  switch (templateKey) {
+    // 대기 영상형: 전면 영상 + 중앙 터치 안내 + 우하단 QR
+    case 'idle_touch_video':
+      return (
+        <div className={frame} aria-hidden>
+          <div className="w-full h-full rounded-[3px] bg-slate-600 relative flex items-center justify-center">
+            <div className="h-1 w-1/3 rounded-full bg-white/70" />
+            <div className="absolute bottom-1 right-1 w-3 h-3 rounded-[2px] bg-white" />
+          </div>
+        </div>
+      );
+    // 상품 집중형: 큰 제품 + 우측 설명/QR
+    case 'product_focus':
+      return (
+        <div className={`${frame} flex gap-1`} aria-hidden>
+          <div className={`${block} flex-[2]`} />
+          <div className="flex-1 flex flex-col gap-1">
+            <div className={`${line} h-1 w-full`} />
+            <div className={`${line} h-1 w-4/5`} />
+            <div className={`${line} h-1 w-3/5`} />
+            <div className={`${qr} mt-auto w-3 h-3`} />
+          </div>
+        </div>
+      );
+    // 코너 소개형: 제목 + 설명 텍스트 중심 + QR
+    case 'corner_overview_qr':
+      return (
+        <div className={`${frame} flex flex-col gap-1`} aria-hidden>
+          <div className={`${line} h-1.5 w-1/2`} />
+          <div className="flex gap-1 flex-1 min-h-0">
+            <div className="flex-1 flex flex-col gap-1">
+              <div className={`${line} h-1 w-full`} />
+              <div className={`${line} h-1 w-5/6`} />
+              <div className={`${block} flex-1 mt-0.5`} />
+            </div>
+            <div className={`${qr} w-4 h-4 self-start`} />
+          </div>
+        </div>
+      );
+    // 제품 진열형: 제품 그리드 + QR
+    case 'product_grid_qr':
+      return (
+        <div className={`${frame} flex gap-1`} aria-hidden>
+          <div className="flex-1 grid grid-cols-3 grid-rows-2 gap-1">
+            {Array.from({ length: 6 }).map((_, i) => <div key={i} className={block} />)}
+          </div>
+          <div className={`${qr} w-3 h-3 self-end`} />
+        </div>
+      );
+    // 기본 코너 안내형: 제목 + 목록 + QR
+    case 'corner_information_basic_v1':
+    default:
+      return (
+        <div className={`${frame} flex flex-col gap-1`} aria-hidden>
+          <div className={`${line} h-1.5 w-2/5`} />
+          <div className="flex gap-1 flex-1 min-h-0">
+            <div className="flex-1 flex flex-col gap-1">
+              <div className={`${block} flex-1`} />
+              <div className={`${block} flex-1`} />
+            </div>
+            <div className={`${qr} w-4 h-4 self-end`} />
+          </div>
+        </div>
+      );
+  }
 }
 
 // ── block_type별 config 폼 (1차) ──
@@ -701,6 +754,30 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
     } finally { setPreviewLoading(false); }
   };
 
+  // ── WO-O4O-KPA-TABLET-TEMPLATE-PREVIEW-LAYOUT-FIX-V1: 오른쪽 고정 미리보기 ──
+  //   모든 단계에서 항상 표시(마지막 단계 모달 전용 아님). 템플릿/블록이 바뀌면 즉시 반영.
+  //   기존 draft preview 경로(previewScreenSet) + TabletKioskPage embedded 재사용 — kiosk-core 무변경.
+  const [liveView, setLiveView] = useState<'tablet' | 'mobile'>('tablet');
+  const [liveScreen, setLiveScreen] = useState<TabletScreenResponse | null>(null);
+  const [liveLoading, setLiveLoading] = useState(false);
+  const [liveError, setLiveError] = useState<string | null>(null);
+  // 입력마다 POST 하지 않도록 디바운스. templateKey + 블록 내용(정규화)이 바뀔 때만 재조회.
+  const liveKey = `${templateKey}|${normalizeBlocks(blocks)}`;
+  useEffect(() => {
+    if (!canPreview) return;
+    let cancelled = false;
+    setLiveLoading(true);
+    const timer = setTimeout(() => {
+      previewScreenSet({ templateKey, blocks })
+        .then((s) => { if (!cancelled) { setLiveScreen(s); setLiveError(null); } })
+        .catch((e: any) => { if (!cancelled) setLiveError(e?.message || '미리보기를 불러오지 못했습니다.'); })
+        .finally(() => { if (!cancelled) setLiveLoading(false); });
+    }, 400);
+    return () => { cancelled = true; clearTimeout(timer); };
+    // liveKey 가 templateKey/blocks 를 인코딩한다(내용 기준 재조회).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [liveKey, canPreview]);
+
   // ── dirty guard (baseline = 초기값) ──
   const baseline = useRef({
     name: initialDetail?.name ?? '',
@@ -856,12 +933,46 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
         ))}
       </ol>
 
+      {/* ── WO-O4O-KPA-TABLET-TEMPLATE-PREVIEW-LAYOUT-FIX-V1: 2단 — 왼쪽 단계 입력(≈58%) / 오른쪽 실제 결과 화면(≈42%).
+             PC 웹 기준. lg 미만에서는 미리보기가 아래로 내려간다. ── */}
+      <div className="lg:grid lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] lg:gap-4 lg:items-start">
+      <div className="space-y-4 min-w-0">
       {/* ── 단계 본문 ── */}
       <div className="border border-indigo-100 rounded-xl p-4 bg-indigo-50/20 min-h-[220px]">
+        {/* WO-O4O-KPA-TABLET-TEMPLATE-PREVIEW-LAYOUT-FIX-V1: 드롭다운 → 카드 선택(5종). 클릭 즉시 선택 + 오른쪽 미리보기 반영. */}
         {step === 0 && (
-          <div className="space-y-2">
-            <div className="rounded-lg border border-slate-200 bg-white p-3">
-              <TemplateSelectField value={templateKey} onChange={setTemplateKey} />
+          <div className="space-y-3">
+            <div>
+              <div className="text-sm font-bold text-slate-800">화면 템플릿 선택</div>
+              <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
+                같은 내용을 어떤 <b>배치</b>로 보여줄지 정합니다(표시할 내용은 다음 단계의 블록에서 관리).
+                카드를 누르면 오른쪽 미리보기에 바로 반영됩니다.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {TEMPLATE_OPTIONS.map((t) => {
+                const selected = t.key === templateKey;
+                return (
+                  <button
+                    key={t.key}
+                    type="button"
+                    onClick={() => setTemplateKey(t.key)}
+                    aria-pressed={selected}
+                    className={`text-left rounded-xl border p-3 transition ${
+                      selected
+                        ? 'border-indigo-400 bg-indigo-50 ring-1 ring-indigo-300'
+                        : 'border-slate-200 bg-white hover:border-indigo-200 hover:shadow-sm'
+                    }`}
+                  >
+                    <TemplateThumb templateKey={t.key} />
+                    <div className="mt-2 flex items-center gap-1.5 flex-wrap">
+                      <span className="text-sm font-bold text-slate-800">{t.label}</span>
+                      {selected && <span className="text-[10px] font-semibold text-indigo-700 bg-indigo-100 px-1.5 py-0.5 rounded">선택됨</span>}
+                    </div>
+                    <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">{t.description}</p>
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
@@ -906,21 +1017,22 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
                     </div>
                   )}
                 </div>
-                {/* WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1: 저장 전 미리보기(태블릿 / QR 모바일). */}
+                {/* WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1: 저장 전 미리보기(태블릿 / QR 모바일).
+                    WO-...-TEMPLATE-PREVIEW-LAYOUT-FIX-V1: 상시 미리보기는 오른쪽 패널이 담당 → 여기는 전체화면 '크게 보기'. */}
                 <div className="flex flex-wrap gap-2">
                   <button onClick={() => openPreview('tablet')} disabled={!canPreview || previewLoading}
                     className="min-h-[44px] px-4 py-2 text-sm font-semibold text-indigo-700 bg-white border border-indigo-200 rounded-xl hover:bg-indigo-50 disabled:opacity-50 inline-flex items-center gap-1.5"
                     title={canPreview ? undefined : '매장 공개 주소를 불러오는 중이거나 미리보기를 사용할 수 없습니다.'}>
-                    {previewLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Layers className="w-4 h-4" />} 태블릿 미리보기
+                    {previewLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Layers className="w-4 h-4" />} 태블릿 크게 보기
                   </button>
                   <button onClick={() => openPreview('mobile')} disabled={!canPreview || previewLoading}
                     className="min-h-[44px] px-4 py-2 text-sm font-semibold text-indigo-700 bg-white border border-indigo-200 rounded-xl hover:bg-indigo-50 disabled:opacity-50 inline-flex items-center gap-1.5"
                     title={canPreview ? undefined : '매장 공개 주소를 불러오는 중이거나 미리보기를 사용할 수 없습니다.'}>
-                    {previewLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Layers className="w-4 h-4" />} QR 모바일 미리보기
+                    {previewLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Layers className="w-4 h-4" />} QR 모바일 크게 보기
                   </button>
                 </div>
                 <p className="text-[11px] text-slate-400">
-                  미리보기는 현재 편집 중인 내용(저장 전)을 실제 화면으로 보여줍니다. 상품 목록·코너 콘텐츠는 매장 데이터로 조회되며, 저장 전에는 DB에 반영되지 않습니다.
+                  오른쪽 미리보기와 같은 내용을 전체 화면으로 크게 봅니다. 상품 목록·코너 콘텐츠는 매장 데이터로 조회되며, 저장 전에는 DB에 반영되지 않습니다.
                   {!canPreview && ' (매장 공개 주소를 불러오는 중이면 잠시 후 다시 시도해 주세요.)'}
                 </p>
                 <button onClick={handleSave} disabled={saving || !nameValid}
@@ -952,6 +1064,66 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
           </button>
         )}
       </div>
+      </div>{/* /왼쪽: 단계 입력 */}
+
+      {/* ── 오른쪽: 실제 결과 화면(모든 단계에서 유지) ── */}
+      <aside className="mt-4 lg:mt-0 lg:sticky lg:top-4 min-w-0">
+        <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
+          <div className="px-3 py-2 border-b bg-slate-50 flex items-center justify-between gap-2 flex-wrap">
+            <span className="text-xs font-bold text-slate-700">실제 화면 미리보기</span>
+            <div className="flex gap-1">
+              {([
+                { key: 'tablet', label: '태블릿 화면' },
+                { key: 'mobile', label: 'QR 모바일 화면' },
+              ] as const).map((v) => (
+                <button
+                  key={v.key}
+                  type="button"
+                  onClick={() => setLiveView(v.key)}
+                  className={`px-2.5 py-1 text-[11px] font-medium rounded-full transition-colors ${
+                    liveView === v.key ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  {v.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="relative bg-slate-100 p-3 flex items-center justify-center min-h-[220px]">
+            {!canPreview ? (
+              <p className="text-[11px] text-slate-500 text-center leading-relaxed py-8">
+                매장 공개 주소를 불러오는 중입니다.<br />잠시 후 미리보기가 표시됩니다.
+              </p>
+            ) : liveError ? (
+              <p className="text-[11px] text-red-600 text-center leading-relaxed py-8">{liveError}</p>
+            ) : !liveScreen ? (
+              <div className="flex items-center gap-2 text-xs text-slate-400 py-8">
+                <Loader2 className="w-4 h-4 animate-spin" /> 미리보기 준비 중…
+              </div>
+            ) : liveView === 'tablet' ? (
+              <div style={{ position: 'relative', overflow: 'hidden', width: '100%', aspectRatio: '16 / 10', background: '#000', borderRadius: 10 }}>
+                <TabletKioskPage api={previewApi} slug={storeSlug ?? undefined} previewScreen={liveScreen} embedded showQrBadge={false} />
+              </div>
+            ) : (
+              <div style={{ position: 'relative', overflow: 'hidden', width: 'min(100%, 240px)', aspectRatio: '9 / 19', background: '#000', borderRadius: 18 }}>
+                <TabletKioskPage api={previewApi} slug={storeSlug ?? undefined} previewScreen={liveScreen} embedded showQrBadge={false} />
+              </div>
+            )}
+            {/* 재조회 중에도 이전 화면을 유지(깜빡임 방지) */}
+            {liveLoading && liveScreen && (
+              <span className="absolute top-2 right-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-900/70 text-white text-[10px]">
+                <Loader2 className="w-3 h-3 animate-spin" /> 갱신 중
+              </span>
+            )}
+          </div>
+
+          <div className="px-3 py-1.5 border-t bg-white text-[10px] text-slate-400 leading-relaxed">
+            저장 전 미리보기입니다. 상품·코너 콘텐츠는 매장 데이터로 조회되며 저장 전에는 DB에 반영되지 않습니다. 실제 태블릿에서는 화면 크기·방향에 따라 달라질 수 있습니다.
+          </div>
+        </div>
+      </aside>
+      </div>{/* /2단 그리드 */}
 
       {/* WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1: 저장 전 미리보기 모달. 닫아도 편집 상태(name/blocks 등) 유지. */}
       {preview && previewApi && (
