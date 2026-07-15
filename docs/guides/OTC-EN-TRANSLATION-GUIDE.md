@@ -1,6 +1,6 @@
 # OTC-EN-TRANSLATION-GUIDE — 일반의약품 설명서 영문 번역 지침
 
-상태: **Draft V0.1** (2026-07-15) · 진입: [DOCUMENT-INDEX](common/DOCUMENT-INDEX.md)
+상태: **Draft V0.2** (2026-07-15) · 대상: **일반의약품(OTC) 전용** · 진입: [DOCUMENT-INDEX](common/DOCUMENT-INDEX.md)
 
 > 이 문서는 완성된 규정이 아니다. **테스트 번역을 시작하기 위한 초안**이다.
 > 테스트에서 발견된 문제는 [OTC-EN-TRANSLATION-TEST-LOG](OTC-EN-TRANSLATION-TEST-LOG.md)에 기록하고, 반복되는 것만 이 문서와 [OTC-KO-EN-GLOSSARY](OTC-KO-EN-GLOSSARY.md)에 반영한다.
@@ -9,11 +9,9 @@
 
 ## 1. 범위
 
-- 대상: **일반의약품(OTC)** 한국어 설명서의 영문 번역.
+- 대상: **일반의약품(OTC) 전용**. 다른 제품군은 이 문서의 대상이 아니다.
 - 원문 기준: 식약처 허가 내용 기반으로 이미 확정된 **한국어 정본**.
 - 이 문서는 **번역 기준만** 정한다. 설명서를 새로 쓰는 규칙(문체·구성·소구)은 [products/drug/DRUG-WRITING](products/drug/DRUG-WRITING.md)에 있으며 여기서 다시 정하지 않는다.
-
-> ⚠️ 건강기능식품의 `en`(영어권 소비자 톤 재작성, [HFF-DESCRIPTION-RULES-SSOT-V1 §4](products/health-functional-food/HFF-DESCRIPTION-RULES-SSOT-V1.md))과 다르다. 의약품 `en`은 **한국어 정본의 충실한 번역**이다. 두 기준을 섞지 않는다.
 
 ---
 
@@ -83,3 +81,4 @@
 | 버전 | 일자 | 내용 |
 |---|---|---|
 | V0.1 | 2026-07-15 | 초안 작성 (`WO-O4O-OTC-EN-TRANSLATION-GUIDE-DOCS-V1`). 테스트 번역 전, 미검증. |
+| V0.2 | 2026-07-15 | 대상 = 일반의약품 전용으로 §1 명확화. 타 제품군 참조 제거. |
