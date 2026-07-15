@@ -384,7 +384,10 @@ function ContentListEditor({ items, onChange }: { items: ContentListItem[]; onCh
   const [picking, setPicking] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [titleHints, setTitleHints] = useState<Record<string, string>>({});
-  const sourceLabel = (t: string) => (t === 'o4o_product_description' ? 'O4O 표준 설명서' : '매장 제작 콘텐츠');
+  // WO-O4O-KPA-TABLET-BUILDER-BUSINESS-FIELDS-V1: 피커 출처 명칭과 목록 라벨을 일치시킨다.
+  //   저장 계약은 sourceType 2종뿐이라, store_content 가 'O4O 제공'인지 '매장 제작'인지는 저장값만으로 구분되지 않는다
+  //   (구분은 kpa_store_contents.source_type — 목록은 그 값을 갖지 않는다). → 출처 중립 라벨을 쓴다.
+  const sourceLabel = (t: string) => (t === 'o4o_product_description' ? '상품 매장용 상세설명서' : '가져온 콘텐츠');
   const reindex = (arr: ContentListItem[]) => arr.map((it, idx) => ({ ...it, sortOrder: idx * 10 } as ContentListItem));
   const upd = (i: number, patch: Partial<ContentListItem>) =>
     onChange(items.map((it, idx) => (idx === i ? ({ ...it, ...patch } as ContentListItem) : it)));
