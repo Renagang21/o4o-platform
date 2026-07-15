@@ -8,7 +8,7 @@
  *   기존 legacy 진열/대기화면 편집 영역은 그대로 유지(이 컴포넌트는 additive).
  */
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Loader2, Plus, ChevronUp, ChevronDown, X, Save, Layers, AlertTriangle } from 'lucide-react';
+import { Loader2, Plus, ChevronUp, ChevronDown, X, Save, Layers, Copy, Check, Sparkles } from 'lucide-react';
 import {
   fetchScreenSets, fetchScreenSet, createScreenSet, updateScreenSet,
   archiveScreenSet, saveScreenSetBlocks,
@@ -52,18 +52,8 @@ interface Props {
   storeSlug?: string | null;
 }
 
-const BLOCK_TYPES: { value: ScreenBlockType; label: string }[] = [
-  { value: 'idle_media', label: '대기화면(Idle)' },
-  { value: 'corner_description', label: '코너 설명' },
-  { value: 'health_info', label: '건강정보' },
-  { value: 'product_list', label: '제품 목록' },
-  // WO-O4O-KPA-TABLET-CONTENT-LIST-PICKER-UI-V1: 신규 콘텐츠 카드 목록(product_content 는 deprecated).
-  { value: 'content_list', label: '코너 콘텐츠 목록' },
-  { value: 'product_content', label: '제품 콘텐츠 (구)' },
-  { value: 'staff_inquiry', label: '직원 문의' },
-  { value: 'qr_guide', label: 'QR 안내' },
-];
-const BLOCK_LABEL: Record<string, string> = Object.fromEntries(BLOCK_TYPES.map((b) => [b.value, b.label]));
+// WO-O4O-KPA-TABLET-BUILDER-BUSINESS-FIELDS-V1: 블록 유형 목록/라벨(BLOCK_TYPES·BLOCK_LABEL) 제거 —
+//   사용자에게 블록 유형을 고르게 하지 않으므로 내부 용어 테이블이 필요 없다.
 const STATUS_LABEL: Record<ScreenSetStatus, string> = { draft: '초안', active: '활성', archived: '보관', operator_template: '운영자 템플릿' };
 
 // WO-O4O-KPA-TABLET-TEMPLATE-SELECTION-EDITOR-V1:
@@ -73,14 +63,16 @@ const STATUS_LABEL: Record<ScreenSetStatus, string> = { draft: '초안', active:
 const DEFAULT_TEMPLATE_KEY = 'corner_information_basic_v1';
 
 // WO-O4O-KPA-TABLET-TEMPLATE-DRIVEN-BUILDER-STEPS-V1:
-//   템플릿 = 기능 종류가 아니라 UI 배치 유형. 각 템플릿에 필요한 입력 순서/블록만 단계별로 노출.
-//   메타(requiredBlocks/steps)로 제작 흐름을 구동한다. 템플릿 추가·중단은 코드에서만(사용자 등록 없음).
-type BuilderStepKind = 'basic' | 'blocks' | 'save';
+//   템플릿 = 기능 종류가 아니라 UI 배치 유형.
+// WO-O4O-KPA-TABLET-BUILDER-BUSINESS-FIELDS-V1:
+//   제작 화면에서 **블록 개념을 제거**한다. 단계는 템플릿별 블록 묶음이 아니라
+//   사용자가 실제로 하는 업무 3항목(대기 화면 / 코너 설명 / 추가 정보)으로 고정한다.
+//   내부 블록(idle_media/corner_description/content_list/product_list/qr_guide)은
+//   템플릿 선택 시 자동 준비되고 사용자에게 용어가 노출되지 않는다.
+type BuilderStepKind = 'basic' | 'idle' | 'corner' | 'extra' | 'save';
 interface BuilderStepMeta {
   title: string;
   kind: BuilderStepKind;
-  /** kind='blocks' 단계가 다루는 블록 타입(추가/설정 대상). */
-  blockTypes?: ScreenBlockType[];
   /** 단계 상단 안내(선택). */
   note?: string;
 }
@@ -88,80 +80,71 @@ interface TemplateMeta {
   key: string;
   label: string;
   description: string;
-  /** 메인 화면에 있어야 하는 블록(없으면 해당 단계에서 경고). QR 은 모든 템플릿 필수. */
+  /** 이 템플릿이 화면에 쓰는 블록(자동 준비 대상). 사용자에게 노출하지 않는다. */
   requiredBlocks: ScreenBlockType[];
-  /** 템플릿 선택 이후의 제작 단계(마지막은 항상 kind='save'). */
-  steps: BuilderStepMeta[];
 }
-const BASIC_STEP: BuilderStepMeta = { title: '기본 정보', kind: 'basic' };
-const SAVE_STEP: BuilderStepMeta = { title: '미리보기·저장', kind: 'save' };
+const BUILDER_STEPS: BuilderStepMeta[] = [
+  { title: '기본 정보', kind: 'basic' },
+  { title: '대기 화면', kind: 'idle', note: '손님이 화면을 만지지 않을 때 자동으로 재생할 영상·이미지입니다. “화면을 터치하세요” 안내는 자동으로 표시됩니다.' },
+  { title: '코너 설명', kind: 'corner', note: '이 코너가 어떤 곳인지 손님에게 보여줄 제목과 짧은 소개입니다.' },
+  { title: '추가 정보', kind: 'extra', note: '손님에게 함께 보여줄 설명서·안내 콘텐츠를 골라 목록으로 구성합니다.' },
+  { title: '미리보기·저장', kind: 'save' },
+];
+
+// 업무 3항목이 사용하는 내부 블록 — 템플릿 선택 시 자동 확보(추가만. 기존 블록 삭제·재정렬 없음).
+//   product_list = 코너 진열 제품(코너별 운영에서 관리) · qr_guide = 모든 템플릿 메인 QR 원칙.
+const AUTO_BLOCK_TYPES: ScreenBlockType[] = ['idle_media', 'corner_description', 'content_list', 'product_list', 'qr_guide'];
+
+// 코너 설명 예제 요청문(WO-O4O-KPA-TABLET-BUILDER-BUSINESS-FIELDS-V1).
+//   공개 태블릿 뷰어가 코너 설명 본문을 **평문**으로 렌더하므로 HTML/마크다운을 요구하지 않는다
+//   (ContentCreationGuideModal 의 store/operator 프롬프트는 HTML 생성용이라 여기선 부적합).
+const CORNER_DESC_PROMPT = `약국 매장 태블릿의 코너 안내 화면에 넣을 "짧은 소개" 글을 써 주세요.
+
+[코너 이름]
+예: 구강관리 코너
+
+[이 코너에서 다루는 것]
+예: 치약, 칫솔, 치간칫솔, 구강청결제
+
+조건:
+- 손님이 태블릿 화면에서 읽는 글입니다. 3~5문장, 한 문장은 짧게.
+- 꾸미기 없는 순수 텍스트만. HTML 태그, 마크다운(**, #), 이모지, 목록 기호를 쓰지 마세요.
+- 제품을 파는 광고 문구가 아니라, 이 코너에서 무엇을 확인할 수 있는지 안내하는 톤으로.
+- 질병을 치료·예방한다고 단정하지 마세요. 증상이 있으면 약사와 상담하라고 안내해 주세요.
+- 과장된 표현, 최상급 표현(최고·완벽 등)은 쓰지 마세요.`;
 
 const TEMPLATE_OPTIONS: TemplateMeta[] = [
   {
     key: 'corner_information_basic_v1',
     label: '기본 코너 안내형',
     description: '코너 설명, 제품 목록, QR 안내를 기본 구조로 보여주는 범용 템플릿입니다.',
-    requiredBlocks: ['qr_guide'],
-    steps: [
-      BASIC_STEP,
-      { title: '화면 구성', kind: 'blocks', blockTypes: ['idle_media', 'corner_description', 'health_info', 'staff_inquiry', 'qr_guide'], note: '화면에 들어갈 구조 블록(대기화면·코너 설명·건강정보·QR·직원 문의)을 추가·설정합니다.' },
-      { title: '콘텐츠·제품', kind: 'blocks', blockTypes: ['content_list', 'product_list', 'product_content'], note: '고객에게 보여줄 코너 콘텐츠·제품 블록을 설정합니다.' },
-      SAVE_STEP,
-    ],
+    requiredBlocks: ['corner_description', 'content_list', 'product_list', 'qr_guide'],
   },
   // WO-O4O-KPA-TABLET-SCREEN-SET-TEMPLATE-APPLY-V1: 상품 집중형.
   {
     key: 'product_focus',
     label: '상품 집중형',
     description: '중심 제품과 핵심 설명을 크게 보여주고 관련 콘텐츠·QR을 보조로 배치합니다.',
-    requiredBlocks: ['product_list', 'qr_guide'],
-    steps: [
-      BASIC_STEP,
-      { title: '중심 제품', kind: 'blocks', blockTypes: ['product_list', 'product_content'], note: '전면에 보여줄 제품을 구성합니다. 실제 진열 제품 선택은 코너별 진열 설정에서 관리됩니다.' },
-      { title: '핵심 설명', kind: 'blocks', blockTypes: ['corner_description', 'health_info'] },
-      { title: '관련 콘텐츠·제품·QR', kind: 'blocks', blockTypes: ['content_list', 'qr_guide', 'product_content'] },
-      SAVE_STEP,
-    ],
+    requiredBlocks: ['product_list', 'content_list', 'qr_guide'],
   },
   // WO-O4O-KPA-TABLET-TEMPLATE-THREE-PATTERNS-V1: 대기 영상형 / 코너 소개형 / 제품 진열형.
   {
     key: 'idle_touch_video',
     label: '대기 영상형',
     description: '대기 영상 위에 터치 안내와 QR을 보여줍니다. 손님의 첫 시선을 끄는 코너에 적합합니다.',
-    requiredBlocks: ['idle_media', 'qr_guide'],
-    steps: [
-      BASIC_STEP,
-      { title: '대기 영상·터치 안내', kind: 'blocks', blockTypes: ['idle_media', 'qr_guide'], note: '대기 영상(idle) 위에 “화면을 터치하세요 / Touch to start” 안내가 자동 표시됩니다. 대기 영상과 QR 안내를 구성하세요.' },
-      { title: '코너 설명', kind: 'blocks', blockTypes: ['corner_description', 'health_info'] },
-      { title: '콘텐츠·제품', kind: 'blocks', blockTypes: ['content_list', 'product_list', 'product_content'] },
-      SAVE_STEP,
-    ],
+    requiredBlocks: ['idle_media', 'corner_description', 'qr_guide'],
   },
   {
     key: 'corner_overview_qr',
     label: '코너 소개형',
     description: '영상 없이 코너 설명과 콘텐츠, QR을 중심으로 보여줍니다. 코너 안내가 중요한 화면에 적합합니다.',
-    requiredBlocks: ['corner_description', 'qr_guide'],
-    steps: [
-      BASIC_STEP,
-      { title: '코너 제목·설명', kind: 'blocks', blockTypes: ['corner_description'] },
-      { title: '안내 콘텐츠', kind: 'blocks', blockTypes: ['content_list', 'health_info'] },
-      { title: '제품·QR 구성', kind: 'blocks', blockTypes: ['product_list', 'qr_guide'] },
-      SAVE_STEP,
-    ],
+    requiredBlocks: ['corner_description', 'content_list', 'qr_guide'],
   },
   {
     key: 'product_grid_qr',
     label: '제품 진열형',
     description: '여러 제품(5~10개 수준)을 한 화면에 진열해 보여줍니다. 제품이 많은 코너에 적합합니다.',
-    requiredBlocks: ['product_list', 'qr_guide'],
-    steps: [
-      BASIC_STEP,
-      { title: '코너 제목·짧은 설명', kind: 'blocks', blockTypes: ['corner_description'] },
-      { title: '제품 선택·순서', kind: 'blocks', blockTypes: ['product_list'], note: '제품 진열은 코너별 진열 설정에서 관리됩니다. 여기서는 제품 목록 블록의 표시 여부를 구성합니다.' },
-      { title: '보조 콘텐츠·QR', kind: 'blocks', blockTypes: ['content_list', 'qr_guide'] },
-      SAVE_STEP,
-    ],
+    requiredBlocks: ['product_list', 'corner_description', 'qr_guide'],
   },
 ];
 const templateMeta = (key: string | null | undefined): TemplateMeta =>
@@ -389,57 +372,7 @@ function TemplateThumb({ templateKey }: { templateKey: string }) {
   }
 }
 
-// ── block_type별 config 폼 (1차) ──
-function BlockConfigForm({ block, onPatch, onReplaceConfig }: {
-  block: ScreenBlock;
-  onPatch: (patch: Record<string, unknown>) => void;
-  onReplaceConfig: (cfg: Record<string, unknown>) => void;
-}) {
-  const c = block.config as any;
-  const input = 'w-full px-2 py-1.5 rounded border border-slate-200 text-xs';
-  switch (block.blockType) {
-    case 'idle_media':
-      return (
-        <div className="space-y-1.5">
-          <select value={c.source ?? 'legacy_idle_playlist'} onChange={(e) => onReplaceConfig(e.target.value === 'custom_media' ? { source: 'custom_media', items: c.items ?? [] } : { source: e.target.value })} className={input}>
-            {IDLE_SOURCES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
-          </select>
-          {c.source === 'custom_media' && <CustomMediaItems items={Array.isArray(c.items) ? c.items : []} onChange={(items) => onPatch({ items })} />}
-          {c.source !== 'custom_media' && <p className="text-[10px] text-slate-400">선택한 소스의 기존 대기화면을 대기 블록으로 사용합니다.</p>}
-        </div>
-      );
-    case 'corner_description':
-    case 'health_info':
-      return (
-        <div className="space-y-1.5">
-          <input value={c.title ?? ''} onChange={(e) => onPatch({ title: e.target.value })} placeholder="제목" className={input} />
-          <textarea value={c.body ?? ''} onChange={(e) => onPatch({ body: e.target.value })} placeholder="내용" rows={2} className={input} />
-        </div>
-      );
-    case 'staff_inquiry':
-      return <textarea value={c.message ?? ''} onChange={(e) => onPatch({ message: e.target.value })} placeholder="직원 안내 문구" rows={2} className={input} />;
-    case 'qr_guide':
-      return (
-        <div className="space-y-1.5">
-          <input value={c.label ?? ''} onChange={(e) => onPatch({ label: e.target.value })} placeholder="라벨" className={input} />
-          <input value={c.url ?? ''} onChange={(e) => onPatch({ url: e.target.value })} placeholder="URL (선택)" className={input} />
-        </div>
-      );
-    case 'product_list':
-      return <p className="text-[11px] text-slate-500">이 코너에 진열된 제품 목록을 그대로 사용합니다. 별도 설정은 없으며, 진열된 제품이 없으면 목록이 비어 보입니다.</p>;
-    case 'content_list':
-      // WO-O4O-KPA-TABLET-CONTENT-LIST-PICKER-UI-V1: raw JSON 대신 picker 기반 편집.
-      return (
-        <ContentListEditor
-          items={Array.isArray(c.items) ? (c.items as ContentListItem[]) : []}
-          onChange={(items) => onReplaceConfig({ items })}
-        />
-      );
-    case 'product_content':
-    default:
-      return <JsonConfig config={block.config} onReplaceConfig={onReplaceConfig} />;
-  }
-}
+// WO-...-BUSINESS-FIELDS-V1: block_type 별 config 폼(BlockConfigForm) 제거 — 업무 단계 렌더러가 대체.
 
 // ── content_list 편집기 (WO-O4O-KPA-TABLET-CONTENT-LIST-PICKER-UI-V1) ──
 //   raw JSON 없이 O4O 표준 설명서 / 매장 제작 콘텐츠를 골라 카드 목록을 구성.
@@ -480,19 +413,19 @@ function ContentListEditor({ items, onChange }: { items: ContentListItem[]; onCh
     <div className="space-y-3">
       <div className="flex items-start justify-between gap-2 flex-wrap">
         <div className="min-w-0">
-          <div className="text-sm font-bold text-slate-800">코너 콘텐츠 <span className="text-xs font-normal text-slate-400">{items.length}개</span></div>
+          <div className="text-sm font-bold text-slate-800">추가 정보 <span className="text-xs font-normal text-slate-400">{items.length}개</span></div>
           <p className="text-[11px] text-slate-500 leading-relaxed">고객에게 보여줄 제품 설명·매장 안내 콘텐츠입니다. 여기서 바꾼 제목·설명은 현재 화면 세트에만 적용되며, 원본 콘텐츠는 변경되지 않습니다.</p>
         </div>
         <button onClick={() => setPicking(true)} className={`${btn} text-white bg-indigo-600 hover:bg-indigo-700 flex-shrink-0`}>
-          <Plus className="w-4 h-4" /> 코너 콘텐츠 추가
+          <Plus className="w-4 h-4" /> 추가 정보 고르기
         </button>
       </div>
 
       {items.length === 0 ? (
         <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50/60 text-center py-8 px-4 space-y-3">
-          <p className="text-sm text-slate-500 leading-relaxed">아직 코너 콘텐츠가 없습니다.<br />이 코너에서 고객에게 보여줄 제품 설명이나 매장 안내 콘텐츠를 추가해 주세요.</p>
+          <p className="text-sm text-slate-500 leading-relaxed">아직 고른 추가 정보가 없습니다.<br />이 코너에서 손님에게 함께 보여줄 상세설명서·안내 콘텐츠를 골라 주세요.</p>
           <button onClick={() => setPicking(true)} className={`${btn} text-white bg-indigo-600 hover:bg-indigo-700`}>
-            <Plus className="w-4 h-4" /> 코너 콘텐츠 추가
+            <Plus className="w-4 h-4" /> 추가 정보 고르기
           </button>
         </div>
       ) : (
@@ -564,7 +497,12 @@ function ContentPickerModal({ existingKeys, onClose, onAdd, baseSort }: {
   onAdd: (items: ContentListItem[], titles: Record<string, string>) => void;
   baseSort: number;
 }) {
-  const [tab, setTab] = useState<'o4o' | 'store'>('o4o');
+  // WO-O4O-KPA-TABLET-BUILDER-BUSINESS-FIELDS-V1: 출처 3분류.
+  //   spd   = 상품 매장용 상세설명서 (o4o_product_description)
+  //   o4o   = O4O 제공 콘텐츠  (store_content 중 source_type='snapshot_edit' — 운영자/HUB 원본을 매장이 가져온 것)
+  //   store = 매장 제작 콘텐츠 (store_content 중 source_type='direct')
+  //   저장 계약(ContentListItem.sourceType)은 2종 그대로 — 분류는 표시/필터 기준이며 API·DB 변경 없음.
+  const [tab, setTab] = useState<'spd' | 'o4o' | 'store'>('spd');
   const [q, setQ] = useState('');
   const [loading, setLoading] = useState(false);
   const [o4o, setO4o] = useState<O4oDescriptionSearchResult[]>([]);
@@ -575,9 +513,9 @@ function ContentPickerModal({ existingKeys, onClose, onAdd, baseSort }: {
   const run = useCallback(async () => {
     setLoading(true);
     try {
-      if (tab === 'o4o') setO4o(await searchTabletO4oDescriptions(q));
+      if (tab === 'spd') setO4o(await searchTabletO4oDescriptions(q));
       else setStore(await searchTabletStoreContents(q));
-    } catch { /* 검색 실패는 빈 목록으로 */ if (tab === 'o4o') setO4o([]); else setStore([]); }
+    } catch { /* 검색 실패는 빈 목록으로 */ if (tab === 'spd') setO4o([]); else setStore([]); }
     finally { setLoading(false); }
   }, [tab, q]);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -595,7 +533,7 @@ function ContentPickerModal({ existingKeys, onClose, onAdd, baseSort }: {
     store.filter((r) => selStore[r.contentId]).forEach((r) => {
       const key = `store:${r.contentId}`;
       out.push({ sourceType: 'store_content', contentId: r.contentId, displayTitle: null, displaySummary: null, visible: true, sortOrder: (n += 10) });
-      titles[key] = r.title || '매장 제작 콘텐츠';
+      titles[key] = r.title || '코너 콘텐츠';
     });
     onAdd(out, titles);
   };
@@ -606,23 +544,25 @@ function ContentPickerModal({ existingKeys, onClose, onAdd, baseSort }: {
     <div className="fixed inset-0 z-[950] bg-slate-900/50 flex items-stretch sm:items-center justify-center p-0 sm:p-4" onClick={onClose} role="presentation">
       <div className="bg-white w-full h-full sm:h-auto sm:max-w-lg sm:max-h-[86vh] rounded-none sm:rounded-2xl flex flex-col overflow-hidden" onClick={(e) => e.stopPropagation()}>
         <div className="px-4 py-3 border-b flex items-center justify-between flex-shrink-0">
-          <h4 className="text-base font-bold text-slate-700">코너 콘텐츠 추가</h4>
+          <h4 className="text-base font-bold text-slate-700">추가 정보 고르기</h4>
           <button onClick={onClose} className="min-h-[40px] min-w-[40px] flex items-center justify-center text-slate-400 hover:text-slate-600" aria-label="닫기"><X className="w-5 h-5" /></button>
         </div>
-        <div className="px-4 pt-3 flex gap-2 flex-shrink-0">
-          <button onClick={() => setTab('o4o')} className={tabBtn(tab === 'o4o')}>O4O 표준 설명서</button>
-          <button onClick={() => setTab('store')} className={tabBtn(tab === 'store')}>매장 제작 콘텐츠</button>
+        {/* 출처 기준 3분류(성격 기준 아님) — WO-...-BUSINESS-FIELDS-V1 */}
+        <div className="px-4 pt-3 grid grid-cols-3 gap-1.5 flex-shrink-0">
+          <button onClick={() => setTab('spd')} className={tabBtn(tab === 'spd')}>상품 매장용<br className="sm:hidden" /> 상세설명서</button>
+          <button onClick={() => setTab('o4o')} className={tabBtn(tab === 'o4o')}>O4O 제공<br className="sm:hidden" /> 콘텐츠</button>
+          <button onClick={() => setTab('store')} className={tabBtn(tab === 'store')}>매장 제작<br className="sm:hidden" /> 콘텐츠</button>
         </div>
         <div className="px-4 py-2 flex gap-2 flex-shrink-0">
           <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && run()}
-            placeholder={tab === 'o4o' ? '상품명 · 바코드로 검색 (2자 이상)' : '콘텐츠 제목으로 검색 (비우면 최근순)'}
+            placeholder={tab === 'spd' ? '상품명 · 바코드로 검색 (2자 이상)' : '콘텐츠 제목으로 검색 (비우면 최근순)'}
             className="flex-1 min-h-[44px] px-3 py-2 rounded-xl border border-slate-200 text-sm" autoFocus />
           <button onClick={run} className="min-h-[44px] px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-xl hover:bg-indigo-700">검색</button>
         </div>
         <div className="flex-1 overflow-y-auto px-4 pb-2 space-y-2">
           {loading ? (
             <div className="flex items-center gap-2 text-sm text-slate-400 py-6"><Loader2 className="w-4 h-4 animate-spin" /> 검색 중…</div>
-          ) : tab === 'o4o' ? (
+          ) : tab === 'spd' ? (
             o4o.length === 0 ? <div className="text-sm text-slate-400 py-6 text-center">검색 결과가 없습니다. 다른 검색어를 입력해 보세요.<br /><span className="text-[11px]">(매장용 표준 설명서가 있는 상품만 표시됩니다)</span></div> :
             o4o.map((r) => {
               const added = existingKeys.has(`o4o:${r.masterId}:ko`);
@@ -641,9 +581,13 @@ function ContentPickerModal({ existingKeys, onClose, onAdd, baseSort }: {
                 </button>
               );
             })
-          ) : (
-            store.length === 0 ? <div className="text-sm text-slate-400 py-6 text-center">매장 제작 콘텐츠가 없습니다.</div> :
-            store.map((r) => {
+          ) : (() => {
+            // store_content 를 출처(source_type)로 나눠 표시: snapshot_edit = O4O 제공 / direct = 매장 제작.
+            const wanted = tab === 'o4o' ? 'snapshot_edit' : 'direct';
+            const rows = store.filter((r) => (r.sourceType || 'snapshot_edit') === wanted);
+            const emptyMsg = tab === 'o4o' ? 'O4O에서 제공한 콘텐츠가 없습니다.' : '매장에서 직접 만든 콘텐츠가 없습니다.';
+            return rows.length === 0 ? <div className="text-sm text-slate-400 py-6 text-center">{emptyMsg}</div> :
+            rows.map((r) => {
               const added = existingKeys.has(`store:${r.contentId}`);
               const sel = !!selStore[r.contentId];
               return (
@@ -653,14 +597,14 @@ function ContentPickerModal({ existingKeys, onClose, onAdd, baseSort }: {
                     <span className={`mt-0.5 w-5 h-5 rounded-md border flex items-center justify-center flex-shrink-0 ${sel ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-300'}`}>{sel ? '✓' : ''}</span>
                     <div className="min-w-0 flex-1">
                       <div className="text-sm font-medium text-slate-800 truncate">{r.title || '(제목 없음)'}</div>
-                      <div className="text-[11px] text-slate-400 truncate">매장 제작 콘텐츠 · {r.hasProductLink ? '상품 연결' : '일반 콘텐츠'}{r.summary ? ` · ${r.summary.slice(0, 30)}` : ''}</div>
+                      <div className="text-[11px] text-slate-400 truncate">{tab === 'o4o' ? 'O4O 제공 콘텐츠' : '매장 제작 콘텐츠'} · {r.hasProductLink ? '상품 연결' : '일반 콘텐츠'}{r.summary ? ` · ${r.summary.slice(0, 30)}` : ''}</div>
                     </div>
                     {added && <span className="text-[10px] font-semibold text-slate-500 bg-slate-200 px-1.5 py-0.5 rounded flex-shrink-0">이미 추가됨</span>}
                   </div>
                 </button>
               );
-            })
-          )}
+            });
+          })()}
         </div>
         <div className="px-4 py-3 border-t flex items-center justify-between gap-2 flex-shrink-0">
           <span className="text-xs text-slate-500">{selectedCount}개 선택됨</span>
@@ -693,37 +637,31 @@ function CustomMediaItems({ items, onChange }: { items: any[]; onChange: (items:
   );
 }
 
-function JsonConfig({ config, onReplaceConfig }: { config: Record<string, unknown>; onReplaceConfig: (cfg: Record<string, unknown>) => void }) {
-  const [text, setText] = useState(() => JSON.stringify(config ?? {}, null, 2));
-  const [err, setErr] = useState<string | null>(null);
-  return (
-    <div className="space-y-1">
-      <textarea
-        value={text}
-        onChange={(e) => {
-          setText(e.target.value);
-          try { const p = JSON.parse(e.target.value); if (p && typeof p === 'object' && !Array.isArray(p)) { setErr(null); onReplaceConfig(p); } else setErr('object 형식이어야 합니다'); }
-          catch { setErr('JSON 형식 오류'); }
-        }}
-        rows={3}
-        className="w-full px-2 py-1.5 rounded border border-slate-200 text-[11px] font-mono"
-        placeholder='{ "key": "value" }'
-      />
-      {err && <p className="text-[10px] text-red-500">{err}</p>}
-    </div>
-  );
-}
 
 // ── 단계형 제작 셸 (WO-O4O-KPA-TABLET-CONTENT-STEP-BUILDER-SHELL-V1) ──
 //   신규/수정 공통. 인라인 폼/패널을 단계 화면으로 분리. 기존 하위 편집기·저장 API·dirty guard 재사용.
 //   저장 = createScreenSet|updateScreenSet + saveScreenSetBlocks(전체 교체). 저장 성공 후 리스트 복귀.
 //   코너 적용/해제는 노출하지 않음(코너별 운영 탭 전용). draft 실미리보기는 후속 WO(placeholder).
-// WO-O4O-KPA-TABLET-TEMPLATE-DRIVEN-BUILDER-STEPS-V1: 단계 = 선택 템플릿의 steps 메타로 구동.
-//   신규 draft 는 QR 안내 블록을 기본 포함(모든 템플릿 메인 QR 원칙). 기존 수정은 블록을 강제 변경하지 않는다.
+// WO-O4O-KPA-TABLET-BUILDER-BUSINESS-FIELDS-V1: 단계 = 업무 3항목 고정(BUILDER_STEPS). 블록은 자동 준비.
 const seedInitialBlocks = (detail: ScreenSetDetail | null): ScreenBlock[] =>
-  detail
-    ? detail.blocks.map((b) => ({ ...b, config: b.config ?? {} }))
-    : [{ blockType: 'qr_guide', sortOrder: 0, isEnabled: true, config: defaultConfig('qr_guide') }];
+  detail ? detail.blocks.map((b) => ({ ...b, config: b.config ?? {} })) : [];
+
+/**
+ * 업무 항목이 쓰는 내부 블록을 자동 확보한다(WO-...-BUSINESS-FIELDS-V1 "내부 블록은 템플릿 선택 시 자동 준비").
+ *  - **추가만** 한다. 기존 블록의 순서·설정·표시여부를 바꾸거나 삭제하지 않는다(보호 샘플 안전).
+ *  - qr_guide 는 사용자에게 노출되지 않으므로 신규 생성 시 기본 라벨을 넣는다(빈 라벨이면 공개 화면에서 QR 섹션이 사라짐).
+ */
+const ensureAutoBlocks = (blocks: ScreenBlock[]): ScreenBlock[] => {
+  const missing = AUTO_BLOCK_TYPES.filter((t) => !blocks.some((b) => b.blockType === t));
+  if (missing.length === 0) return blocks;
+  const added = missing.map((t, i) => ({
+    blockType: t,
+    sortOrder: blocks.length + i,
+    isEnabled: true,
+    config: t === 'qr_guide' ? { label: '모바일로 더 보기', url: '' } : defaultConfig(t),
+  }));
+  return [...blocks, ...added];
+};
 
 function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, previewApi, storeSlug }: {
   initialDetail: ScreenSetDetail | null;
@@ -738,9 +676,14 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
   const [name, setName] = useState(initialDetail?.name ?? '');
   const [status, setStatus] = useState<ScreenSetStatus>(initialDetail?.status ?? 'draft');
   const [templateKey, setTemplateKey] = useState(initialDetail?.templateKey ?? DEFAULT_TEMPLATE_KEY);
-  const [blocks, setBlocks] = useState<ScreenBlock[]>(() => seedInitialBlocks(initialDetail));
-  const [stepAddType, setStepAddType] = useState<ScreenBlockType>('corner_description');
+  // WO-...-BUSINESS-FIELDS-V1: 진입 즉시 업무 항목이 쓰는 내부 블록을 자동 확보(추가만).
+  const [blocks, setBlocks] = useState<ScreenBlock[]>(() => ensureAutoBlocks(seedInitialBlocks(initialDetail)));
   const [saving, setSaving] = useState(false);
+  // 템플릿을 바꾸면 그 템플릿이 쓰는 블록을 자동 준비한다(사용자는 블록을 의식하지 않는다).
+  const selectTemplate = (key: string) => {
+    setTemplateKey(key);
+    setBlocks((prev) => ensureAutoBlocks(prev));
+  };
 
   // WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1: 저장 전 미리보기(태블릿 / QR 모바일). 모달은 편집 상태를 잃지 않는다.
   const canPreview = !!previewApi && !!storeSlug;
@@ -786,7 +729,10 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
     name: initialDetail?.name ?? '',
     status: (initialDetail?.status ?? 'draft') as ScreenSetStatus,
     templateKey: initialDetail?.templateKey ?? DEFAULT_TEMPLATE_KEY,
-    blocks: normalizeBlocks(seedInitialBlocks(initialDetail)),
+    // WO-...-BUSINESS-FIELDS-V1: 자동 준비된 블록은 '사용자 변경'이 아니다.
+    //   baseline 을 초기 state 와 동일하게(ensureAutoBlocks 적용) 잡아야 열자마자 '변경됨'/이탈 경고가 뜨지 않는다.
+    //   자동 추가분은 다음 저장 때 함께 영속된다.
+    blocks: normalizeBlocks(ensureAutoBlocks(seedInitialBlocks(initialDetail))),
   });
   const isDirty =
     name.trim() !== baseline.current.name ||
@@ -801,33 +747,46 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
   }, [isDirty]);
   const guardedCancel = () => { if (!isDirty || window.confirm(DISCARD_MSG)) onCancel(); };
 
-  // ── block helpers ──
-  const addBlock = (t: ScreenBlockType) =>
-    setBlocks((prev) => [...prev, { blockType: t, sortOrder: prev.length, isEnabled: true, config: defaultConfig(t) }]);
-  const removeBlock = (i: number) => setBlocks((prev) => prev.filter((_, idx) => idx !== i));
-  const toggleBlock = (i: number) => setBlocks((prev) => prev.map((b, idx) => (idx === i ? { ...b, isEnabled: !b.isEnabled } : b)));
-  const moveBlock = (i: number, dir: 'up' | 'down') => setBlocks((prev) => {
-    const t = dir === 'up' ? i - 1 : i + 1;
-    if (t < 0 || t >= prev.length) return prev;
-    const next = [...prev];
-    [next[i], next[t]] = [next[t], next[i]];
-    return next;
-  });
-  const patchConfig = (i: number, patch: Record<string, unknown>) =>
-    setBlocks((prev) => prev.map((b, idx) => (idx === i ? { ...b, config: { ...b.config, ...patch } } : b)));
-  const replaceConfig = (i: number, cfg: Record<string, unknown>) =>
-    setBlocks((prev) => prev.map((b, idx) => (idx === i ? { ...b, config: cfg } : b)));
+  // ── 업무 항목 ↔ 내부 블록 접근자 (WO-...-BUSINESS-FIELDS-V1) ──
+  //   사용자는 블록을 추가/삭제/정렬하지 않는다. 각 업무 단계가 자기 블록의 config 만 수정한다.
+  const blockIndex = (t: ScreenBlockType) => blocks.findIndex((b) => b.blockType === t);
+  const patchConfigOf = (t: ScreenBlockType, patch: Record<string, unknown>) =>
+    setBlocks((prev) => prev.map((b) => (b.blockType === t ? { ...b, config: { ...b.config, ...patch } } : b)));
+  const replaceConfigOf = (t: ScreenBlockType, cfg: Record<string, unknown>) =>
+    setBlocks((prev) => prev.map((b) => (b.blockType === t ? { ...b, config: cfg } : b)));
+  const configOf = (t: ScreenBlockType): any => (blocks[blockIndex(t)]?.config ?? {});
 
   const nameValid = name.trim().length > 0;
 
-  // ── 템플릿 메타 구동 단계(WO-O4O-KPA-TABLET-TEMPLATE-DRIVEN-BUILDER-STEPS-V1) ──
-  const tmpl = templateMeta(templateKey);
-  const tSteps = tmpl.steps;              // 템플릿 선택 이후 단계(basic..save)
-  const totalSteps = 1 + tSteps.length;   // + 템플릿 선택(step 0)
-  // 템플릿 변경으로 단계 수가 줄면 현재 step 을 클램프(자동 삭제/덮어쓰기 아님).
-  useEffect(() => { setStep((s) => Math.min(s, totalSteps - 1)); }, [totalSteps]);
-  // 현재 템플릿 필수 블록 중 없는 것(경고용 — 자동 추가/삭제하지 않음).
-  const missingRequired = tmpl.requiredBlocks.filter((rt) => !blocks.some((b) => b.blockType === rt));
+  // ── 코너 설명 작성 보조 (WO-...-BUSINESS-FIELDS-V1) ──
+  //   공개 뷰어가 본문을 평문 렌더 → HTML 생성 프롬프트(ContentCreationGuideModal 의 store/operator 모드)는 부적합.
+  //   태블릿 코너 설명 전용 평문 요청문 + 사용 방법 모달을 둔다.
+  const [promptCopied, setPromptCopied] = useState(false);
+  const [showAiGuide, setShowAiGuide] = useState(false);
+  const copyCornerPrompt = async () => {
+    try {
+      await navigator.clipboard.writeText(CORNER_DESC_PROMPT);
+      setPromptCopied(true);
+      setTimeout(() => setPromptCopied(false), 2000);
+    } catch {
+      onToast({ type: 'error', message: '복사하지 못했습니다. 요청문을 직접 선택해 복사해 주세요.' });
+    }
+  };
+
+  // 저장 단계 요약 — 업무 항목 기준(블록 수 미노출).
+  const idleCfg = configOf('idle_media');
+  const idleSummary = idleCfg.source === 'custom_media'
+    ? `직접 넣은 영상·이미지 ${(Array.isArray(idleCfg.items) ? idleCfg.items : []).length}개`
+    : (IDLE_SOURCES.find((s) => s.value === (idleCfg.source ?? 'legacy_idle_playlist'))?.label ?? '기본');
+  const cornerDescCfg = configOf('corner_description');
+  const cornerSummary = (cornerDescCfg.title || cornerDescCfg.body) ? (cornerDescCfg.title || '(제목 없음)') : '작성 안 함';
+  const extraCount = (Array.isArray(configOf('content_list').items) ? configOf('content_list').items : []).length;
+
+  // ── 업무 3항목 고정 단계 (WO-O4O-KPA-TABLET-BUILDER-BUSINESS-FIELDS-V1) ──
+  //   템플릿(step 0) + 기본 정보 · 대기 화면 · 코너 설명 · 추가 정보 · 미리보기·저장.
+  //   템플릿을 바꿔도 단계 구성은 그대로다(배치만 달라짐) → step 클램프 불필요.
+  const tSteps = BUILDER_STEPS;
+  const totalSteps = 1 + tSteps.length;
 
   const handleSave = async () => {
     if (!nameValid) { onToast({ type: 'error', message: '콘텐츠 이름을 입력해 주세요.' }); setStep(1); return; }
@@ -849,63 +808,96 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
     } finally { setSaving(false); }
   };
 
-  // ── 블록 행(순서/표시/삭제 + config) ──
-  const BlockRow = ({ i }: { i: number }) => {
-    const b = blocks[i];
+  // ── 업무 단계 렌더러 (WO-O4O-KPA-TABLET-BUILDER-BUSINESS-FIELDS-V1) ──
+  //   블록 유형 선택/블록 추가/블록 행(순서·표시·삭제) UI 없음. 각 단계는 자기 업무 필드만 다룬다.
+
+  // 1) 대기 화면 — idle_media 용어 미노출. 기존 미디어 선택 기능(소스/직접 입력) 재사용.
+  const renderIdleStep = () => {
+    const c = configOf('idle_media');
+    const source = c.source ?? 'legacy_idle_playlist';
     return (
-      <div className="border border-slate-200 rounded-lg p-2.5 bg-white">
-        <div className="flex items-center gap-2 mb-2">
-          <span className="text-xs font-semibold text-slate-700 flex-1">{BLOCK_LABEL[b.blockType] ?? b.blockType}</span>
-          <label className="text-[11px] text-slate-500 flex items-center gap-1">
-            <input type="checkbox" checked={b.isEnabled} onChange={() => toggleBlock(i)} className="rounded border-slate-300 text-indigo-600" /> 화면에 표시
-          </label>
-          <button onClick={() => moveBlock(i, 'up')} disabled={i === 0} className="p-1 rounded hover:bg-slate-100 disabled:opacity-30"><ChevronUp className="w-3.5 h-3.5" /></button>
-          <button onClick={() => moveBlock(i, 'down')} disabled={i === blocks.length - 1} className="p-1 rounded hover:bg-slate-100 disabled:opacity-30"><ChevronDown className="w-3.5 h-3.5" /></button>
-          <button onClick={() => removeBlock(i)} className="p-1 rounded text-slate-400 hover:text-red-600 hover:bg-red-50"><X className="w-3.5 h-3.5" /></button>
+      <div className="space-y-3">
+        <div>
+          <label className="text-xs font-semibold text-slate-600">무엇을 보여줄까요?</label>
+          <select
+            value={source}
+            onChange={(e) => replaceConfigOf('idle_media', e.target.value === 'custom_media'
+              ? { source: 'custom_media', items: Array.isArray(c.items) ? c.items : [] }
+              : { source: e.target.value })}
+            className="w-full mt-1 px-3 py-2 rounded-lg border border-slate-200 text-sm bg-white"
+          >
+            {IDLE_SOURCES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
+          </select>
         </div>
-        <BlockConfigForm block={b} onPatch={(patch) => patchConfig(i, patch)} onReplaceConfig={(cfg) => replaceConfig(i, cfg)} />
+        {source === 'custom_media' ? (
+          <div className="rounded-lg border border-slate-200 bg-white p-3 space-y-2">
+            <p className="text-[11px] text-slate-500">이 화면에서 직접 재생할 영상·이미지를 넣습니다.</p>
+            <CustomMediaItems items={Array.isArray(c.items) ? c.items : []} onChange={(items) => patchConfigOf('idle_media', { items })} />
+          </div>
+        ) : (
+          <p className="text-[11px] text-slate-500">선택한 곳에 등록된 대기 영상·이미지를 그대로 사용합니다.</p>
+        )}
       </div>
     );
   };
 
-  // ── blocks 단계 렌더(단계별 blockTypes 필터 — 기존 하위 편집기 재사용) ──
-  //   필수 블록이 없어도 자동 추가/삭제하지 않고 경고 + 빠른 추가 버튼만 제공(예외 처리).
-  const renderBlocksStep = (sm: BuilderStepMeta) => {
-    const types = sm.blockTypes ?? [];
-    const idxs = blocks.map((_, i) => i).filter((i) => types.includes(blocks[i].blockType));
-    const addable = BLOCK_TYPES.filter((b) => types.includes(b.value) && b.value !== 'product_content');
-    const missingHere = tmpl.requiredBlocks.filter((rt) => types.includes(rt) && !blocks.some((b) => b.blockType === rt));
-    const addType = types.includes(stepAddType) ? stepAddType : (addable[0]?.value ?? types[0]);
+  // 2) 코너 설명 — 제목 + 짧은 소개(평문).
+  //   공개 뷰어가 본문을 평문으로 렌더(<p>{body}</p>)하므로 HTML 편집기/HTML 입력창을 두지 않는다.
+  const renderCornerStep = () => {
+    const c = configOf('corner_description');
     return (
       <div className="space-y-3">
-        {sm.note && <p className="text-[11px] text-slate-500">{sm.note}</p>}
-        {missingHere.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-[11px] text-amber-800">
-            <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
-            <span>필수 구성이 없습니다. 해당 단계를 확인해 주세요.</span>
-            {missingHere.map((t) => (
-              <button key={t} onClick={() => addBlock(t)} className="px-2 py-0.5 text-[11px] font-medium text-amber-800 bg-white border border-amber-300 rounded hover:bg-amber-100">+ {BLOCK_LABEL[t] ?? t}</button>
-            ))}
+        <div>
+          <label className="text-xs font-semibold text-slate-600">코너 제목</label>
+          <input
+            value={c.title ?? ''}
+            onChange={(e) => patchConfigOf('corner_description', { title: e.target.value })}
+            placeholder="예: 구강관리 코너"
+            className="w-full mt-1 px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          />
+        </div>
+        <div>
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <label className="text-xs font-semibold text-slate-600">짧은 소개</label>
+            <div className="flex gap-1.5">
+              <button
+                type="button"
+                onClick={copyCornerPrompt}
+                className="inline-flex items-center gap-1 px-2 py-1 text-[11px] font-medium text-indigo-700 bg-white border border-indigo-200 rounded-lg hover:bg-indigo-50"
+              >
+                {promptCopied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />} {promptCopied ? '복사됨' : '예제 요청문 복사'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowAiGuide(true)}
+                className="inline-flex items-center gap-1 px-2 py-1 text-[11px] font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50"
+              >
+                <Sparkles className="w-3 h-3 text-indigo-500" /> ChatGPT 사용 방법
+              </button>
+            </div>
           </div>
-        )}
-        {idxs.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-slate-300 bg-white/60 text-center py-6 px-4 text-sm text-slate-500">이 단계의 블록이 없습니다. 아래에서 추가하세요.</div>
-        ) : (
-          <div className="space-y-2">{idxs.map((i) => <BlockRow key={i} i={i} />)}</div>
-        )}
-        {addable.length > 0 && (
-          <div className="flex items-center gap-2 flex-wrap">
-            <select value={addType} onChange={(e) => setStepAddType(e.target.value as ScreenBlockType)} className="px-2 py-1.5 rounded-lg border border-slate-200 text-xs">
-              {addable.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
-            </select>
-            <button onClick={() => addBlock(addType)} className="px-2.5 py-1.5 text-xs font-medium text-indigo-700 bg-white border border-indigo-200 rounded-lg hover:bg-indigo-50 flex items-center gap-1">
-              <Plus className="w-3.5 h-3.5" /> 블록 추가
-            </button>
-          </div>
-        )}
+          <textarea
+            value={c.body ?? ''}
+            onChange={(e) => patchConfigOf('corner_description', { body: e.target.value })}
+            placeholder="이 코너가 어떤 곳인지, 손님이 무엇을 확인할 수 있는지 3~5줄로 적어 주세요."
+            rows={7}
+            className="w-full mt-1 px-3 py-2 rounded-lg border border-slate-200 text-sm leading-relaxed focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          />
+          <p className="text-[11px] text-slate-400 mt-1">
+            글자만 표시됩니다(굵게·색상 같은 꾸미기는 사용하지 않습니다). 오른쪽 미리보기에서 실제 보이는 모습을 확인하세요.
+          </p>
+        </div>
       </div>
     );
   };
+
+  // 3) 추가 정보 — content_list 용어 미노출. 출처 3종 피커 + 단일 목록(순서·표시·제거·화면용 제목/요약).
+  const renderExtraStep = () => (
+    <ContentListEditor
+      items={Array.isArray(configOf('content_list').items) ? (configOf('content_list').items as ContentListItem[]) : []}
+      onChange={(items) => replaceConfigOf('content_list', { items })}
+    />
+  );
 
   return (
     <div className="space-y-4">
@@ -959,7 +951,7 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
                   <button
                     key={t.key}
                     type="button"
-                    onClick={() => setTemplateKey(t.key)}
+                    onClick={() => selectTemplate(t.key)}
                     aria-pressed={selected}
                     className={`text-left rounded-xl border p-3 transition ${
                       selected
@@ -983,6 +975,14 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
         {step >= 1 && (() => {
           const sm = tSteps[step - 1];
           if (!sm) return null;
+          if (sm.kind === 'idle' || sm.kind === 'corner' || sm.kind === 'extra') {
+            return (
+              <div className="space-y-3">
+                {sm.note && <p className="text-[11px] text-slate-500 leading-relaxed">{sm.note}</p>}
+                {sm.kind === 'idle' ? renderIdleStep() : sm.kind === 'corner' ? renderCornerStep() : renderExtraStep()}
+              </div>
+            );
+          }
           if (sm.kind === 'basic') {
             return (
               <div className="space-y-3">
@@ -1010,15 +1010,15 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
               <div className="space-y-3">
                 <div className="rounded-lg border border-slate-200 bg-white p-3 space-y-1.5">
                   <div className="text-sm font-bold text-slate-800">{name.trim() || '(이름 없음)'}</div>
+                  {/* WO-...-BUSINESS-FIELDS-V1: 블록 수 대신 업무 항목 기준 요약(내부 용어 미노출). */}
                   <div className="text-[11px] text-slate-500">
-                    템플릿 <b>{templateLabel(templateKey)}</b> · 상태 <b>{STATUS_LABEL[status]}</b> · 블록 <b>{blocks.length}</b>개
-                    {' '}(표시 {blocks.filter((b) => b.isEnabled).length}개)
+                    템플릿 <b>{templateLabel(templateKey)}</b> · 상태 <b>{STATUS_LABEL[status]}</b>
                   </div>
-                  {missingRequired.length > 0 && (
-                    <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-amber-700 pt-1">
-                      <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" /> 필수 구성이 없습니다. 해당 단계를 확인해 주세요. (없는 항목: {missingRequired.map((t) => BLOCK_LABEL[t] ?? t).join(', ')})
-                    </div>
-                  )}
+                  <ul className="text-[11px] text-slate-600 space-y-0.5 pt-0.5">
+                    <li>대기 화면: <b>{idleSummary}</b></li>
+                    <li>코너 설명: <b>{cornerSummary}</b></li>
+                    <li>추가 정보: <b>{extraCount > 0 ? `${extraCount}개` : '없음'}</b></li>
+                  </ul>
                 </div>
                 {/* WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1: 저장 전 미리보기(태블릿 / QR 모바일).
                     WO-...-TEMPLATE-PREVIEW-LAYOUT-FIX-V1: 상시 미리보기는 오른쪽 패널이 담당 → 여기는 전체화면 '크게 보기'. */}
@@ -1045,7 +1045,7 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
               </div>
             );
           }
-          return renderBlocksStep(sm);
+          return null;
         })()}
       </div>
 
@@ -1128,6 +1128,46 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
         </div>
       </aside>
       </div>{/* /2단 그리드 */}
+
+      {/* WO-O4O-KPA-TABLET-BUILDER-BUSINESS-FIELDS-V1: 코너 설명용 ChatGPT 사용 방법 모달(평문 기준). */}
+      {showAiGuide && (
+        <div className="fixed inset-0 z-[100000] bg-slate-900/50 flex items-center justify-center p-4" onClick={() => setShowAiGuide(false)} role="presentation">
+          <div className="bg-white rounded-2xl w-full max-w-lg max-h-[86vh] flex flex-col overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div className="px-5 py-4 border-b flex items-center justify-between">
+              <h4 className="text-base font-bold text-slate-800 flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-indigo-500" /> ChatGPT로 코너 설명 쓰기
+              </h4>
+              <button onClick={() => setShowAiGuide(false)} className="text-slate-400 hover:text-slate-600" aria-label="닫기"><X className="w-5 h-5" /></button>
+            </div>
+            <div className="px-5 py-4 overflow-y-auto space-y-3">
+              <ol className="list-decimal pl-5 space-y-1.5 text-sm text-slate-700 leading-relaxed">
+                <li><b>예제 요청문 복사</b>를 누릅니다.</li>
+                <li>ChatGPT(또는 Gemini) 대화창에 붙여 넣습니다.</li>
+                <li>대괄호 부분(코너 이름 / 이 코너에서 다루는 것)을 우리 매장에 맞게 고칩니다.</li>
+                <li>나온 글을 확인하고 <b>짧은 소개</b> 칸에 붙여 넣습니다.</li>
+                <li>오른쪽 미리보기에서 실제 태블릿 화면을 확인하고 저장합니다.</li>
+              </ol>
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-[11px] text-amber-800 leading-relaxed">
+                <b>확인해 주세요.</b> AI가 쓴 글은 사실과 다를 수 있습니다. 붙여 넣기 전에 약사가 내용을 검토해 주세요.
+                질병을 치료·예방한다고 단정하는 표현은 사용하지 않습니다.
+              </div>
+              <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-[11px] text-slate-600 leading-relaxed">
+                코너 설명은 <b>글자만</b> 표시됩니다. 굵게·색상·표 같은 꾸미기나 HTML 태그를 넣으면 태블릿 화면에 그대로 글자로 보일 수 있으니 넣지 마세요.
+              </div>
+              <div>
+                <div className="text-xs font-semibold text-slate-600 mb-1">예제 요청문</div>
+                <pre className="text-[11px] text-slate-700 bg-slate-50 border border-slate-200 rounded-lg p-3 whitespace-pre-wrap break-words max-h-56 overflow-y-auto">{CORNER_DESC_PROMPT}</pre>
+              </div>
+            </div>
+            <div className="px-5 py-3 border-t flex justify-end gap-2">
+              <button onClick={copyCornerPrompt} className="px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 inline-flex items-center gap-1.5">
+                {promptCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />} {promptCopied ? '복사됨' : '예제 요청문 복사'}
+              </button>
+              <button onClick={() => setShowAiGuide(false)} className="px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50">닫기</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1: 저장 전 미리보기 모달. 닫아도 편집 상태(name/blocks 등) 유지. */}
       {preview && previewApi && (
