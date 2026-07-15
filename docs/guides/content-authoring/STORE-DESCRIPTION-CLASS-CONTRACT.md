@@ -1,6 +1,6 @@
 # STORE-DESCRIPTION-CLASS-CONTRACT — 매장용 설명서 `sd-*` 클래스 계약 (전 제품군 공통)
 
-상태: Active · **V1.1** (2026-07-15) · 규칙 ID: **CR-020** · 진입: [DOCUMENT-INDEX](../common/DOCUMENT-INDEX.md)
+상태: Active · **V1.2** (2026-07-16) · 규칙 ID: **CR-020** · 진입: [DOCUMENT-INDEX](../common/DOCUMENT-INDEX.md)
 승격 근거: [CHECK-O4O-SD-CLASS-COMMON-CONTRACT-UNIFY-V1](../../checks/CHECK-O4O-SD-CLASS-COMMON-CONTRACT-UNIFY-V1.md)
 
 > **새 디자인 규칙이 아니다.** 이미 운영 중인 계약의 **SSOT 위치를 바로잡은 문서**다.
@@ -29,7 +29,7 @@
 ```text
 sd-card                                    최상위 (테마: sd-theme-*)
 ├─ sd-hero      h1 > small · sd-badges > sd-badge(.is-solid) · sd-meta
-└─ sd-body      sd-intro · <h2> · sd-why / sd-who (ul>li)
+└─ sd-body      sd-intro · <h2> · sd-why / sd-who / sd-warn (ul>li)
                 sd-core > sd-item (sd-tag, h3, p)
                 sd-intake (small) · sd-chips (ul>li) · sd-spec
                 sd-cta (sd-cta-k, p) · sd-foot
@@ -44,7 +44,8 @@ sd-card                                    최상위 (테마: sd-theme-*)
 | `sd-body` | 본문 컨테이너 |
 | `sd-intro` | 도입 문단 |
 | `<h2>` | 섹션 제목 (별도 class 없음 — 태그로 인식) |
-| `sd-why` / `sd-who` | 목록 (`ul > li`). 불릿 자동 |
+| `sd-why` / `sd-who` | 목록 (`ul > li`). 불릿 자동. `sd-why`=이래서 씁니다 / `sd-who`=이런 분께 |
+| **`sd-warn`** | **금기·경고·주의사항 전용 목록** (`ul > li`). §2-1 — 다른 목록과 **의미가 다르다** |
 | `sd-core` > `sd-item` | 핵심 항목 카드 (`sd-tag`, `h3`, `p`) — **반응형 다단 대상** |
 | `sd-intake` | 사용·섭취 안내 (`small` = 보조) |
 | `sd-chips` | 태그 알약 (`ul > li`) |
@@ -52,6 +53,27 @@ sd-card                                    최상위 (테마: sd-theme-*)
 | `sd-cta` | 상담 유도 (`sd-cta-k` = 키커, `p`) |
 | `sd-foot` | 하단 문구 |
 | `sd-theme-*` | 카테고리 accent 교체 (§4) |
+
+### 2-1. `sd-warn` — 금기·경고·주의사항 (전 제품군 공통)
+
+```html
+<h2>주의 대상</h2>
+<ul class="sd-warn">
+  <li>이 약에 과민증이 있으면 복용하지 않습니다.</li>
+  <li>임부는 복용 전 약사와 상담하세요.</li>
+</ul>
+```
+
+| 규칙 | 내용 |
+|---|---|
+| **용도 고정** | 금기·경고·주의사항 **전용**. 다른 내용을 담지 않는다 |
+| **재사용 금지** | `sd-who`("이런 분께")·`sd-item`·`sd-cta` 를 경고 용도로 **쓰지 않는다** — 의미가 어긋난다 |
+| **의미 색** | `--sd-warn` 계열은 **카테고리 테마(`sd-theme-*`)가 바꾸지 않는다** — 경고는 브랜드 accent 와 별개 축이다 |
+| **색 의존 금지** | 렌더러가 **삼각 마커 + 좌측 굵은 선 + 박스 배경**을 함께 준다. 색만으로 의미를 전달하지 않는다 |
+| **다단 금지** | 640px 이상에서도 **1열 유지**(`sd-why`/`sd-who` 는 2열이 된다) — 금기가 두 열로 쪼개지면 오독 위험. 행 길이는 `74ch` 로 제한 |
+
+> 저자는 구조만 맞춘다. 색·마커·여백·반응형은 렌더러 소관이다.
+> 근거·실측 = [CHECK-O4O-SD-WARNING-CLASS-CONTRACT-AND-BUILDER-V1](../../checks/CHECK-O4O-SD-WARNING-CLASS-CONTRACT-AND-BUILDER-V1.md).
 
 > `sd-scan` 은 렌더러에만 존재하며 저자가 쓰는 어휘가 아니다.
 > `--sd-*` 로 시작하는 이름은 class 가 아니라 **CSS 변수**(토큰)다. 콘텐츠에서 쓰지 않는다.
@@ -104,6 +126,8 @@ sd-card                                    최상위 (테마: sd-theme-*)
 | (미지정) | 블루 |
 
 **어느 제품군·카테고리에 어떤 테마를 쓰는지는 제품군 Guide 소관**이다 (예: HFF 홍삼=red, 유산균=green). 이 문서는 **메커니즘만** 정의한다.
+
+> ⚠️ **`sd-theme-*` 는 accent 만 바꾼다.** `--sd-warn` 계열(§2-1)은 **의미 색**이라 테마가 바꾸지 않는다 — 홍삼 테마에서도 경고는 같은 색으로 읽힌다.
 
 ---
 
@@ -168,3 +192,4 @@ sd-card                                    최상위 (테마: sd-theme-*)
 |---|---|---|
 | V1 | 2026-07-15 | HFF AGENT-KICKOFF §5 에만 있던 계약을 **공통 축으로 승격**. 규칙 신설 없음 — 기술 내용은 기존 계약 그대로, 위치만 이동 (`WO-O4O-SD-CLASS-COMMON-CONTRACT-UNIFY-V1`). CR-020 등재. |
 | V1.1 | 2026-07-15 | §3-1 **긴 문자열 줄바꿈 보장** 추가 — 렌더러가 `overflow-wrap:anywhere; word-break:normal` 로 처리. 계약 어휘·구조 변경 없음(렌더러 동작 명문화). 새 CR 미신설 — CR-020 범위 내 (`WO-O4O-SD-HERO-LONG-TEXT-OVERFLOW-FIX-V1`). |
+| V1.2 | 2026-07-16 | **`sd-warn` 어휘 신설**(§2-1) — 금기·경고·주의사항 전용, 전 제품군 공통. 의미 색이라 `sd-theme-*` 미적용, 색 의존 금지(삼각 마커+굵은 선+박스), 640px↑ 다단 금지. 기존 어휘·구조 변경 없음(추가만) (`WO-O4O-SD-WARNING-CLASS-CONTRACT-AND-BUILDER-V1`). |

@@ -65,6 +65,15 @@ describe('buildDrugOtcConsumerHtml — 렌더 소스 = 구조화 필드', () => 
     expect(html).not.toContain('<table');
   });
 
+  it('주의사항을 sd-warn 으로 낸다 — sd-who 재사용 금지 (CR-020 §2-1)', () => {
+    const { html } = buildDrugOtcConsumerHtml(P3, { title: 'T' });
+    expect(html).toContain('<ul class="sd-warn">');
+    expect(html).not.toContain('<ul class="sd-who">');
+    // 경고 항목이 실제로 sd-warn 안에 들어간다
+    const warn = html.slice(html.indexOf('sd-warn'), html.indexOf('</ul>', html.indexOf('sd-warn')));
+    expect(warn).toContain('2세 이하');
+  });
+
   it('sd-* 계약을 지킨다 — <style>·인라인 style 없음 (CR-020)', () => {
     const { html } = buildDrugOtcConsumerHtml(P3, { title: 'T' });
     expect(html).toContain('sd-card');

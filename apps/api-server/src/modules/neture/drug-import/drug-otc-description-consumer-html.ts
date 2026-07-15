@@ -129,9 +129,9 @@ export function buildDrugOtcConsumerHtml(
   out.push(`    <h2>${esc(usageHeading)}</h2>`);
   out.push(`    <p class="sd-intake">${paragraphs(src.usage as string).map(esc).join('<br>')}</p>`);
 
-  // 주의 대상 → sd-who
+  // 주의 대상 → sd-warn (금기·경고 전용 — CR-020. sd-who 는 "이런 분께" 용도라 의미가 다르다)
   out.push('    <h2>주의 대상</h2>');
-  out.push('    <ul class="sd-who">');
+  out.push('    <ul class="sd-warn">');
   for (const p of paragraphs(src.caution as string)) out.push(`      <li>${esc(p)}</li>`);
   out.push('    </ul>');
 

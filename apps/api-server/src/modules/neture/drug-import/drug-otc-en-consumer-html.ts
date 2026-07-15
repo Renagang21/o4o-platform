@@ -88,7 +88,8 @@ export function buildDrugOtcEnConsumerHtml(t: DrugOtcEnTranslation): BuildEnHtml
   out.push(`    <p class="sd-intake">${esc(t.usage)}</p>`);
 
   out.push(`    <h2>Before you ${t.usageLabel.includes('use') ? 'use' : 'take'} this</h2>`);
-  out.push('    <ul class="sd-who">');
+  // 금기·경고 전용 sd-warn (CR-020). sd-who("이런 분께")와 의미가 다르므로 재사용하지 않는다.
+  out.push('    <ul class="sd-warn">');
   for (const s of sentences(t.caution)) out.push(`      <li>${esc(s)}</li>`);
   out.push('    </ul>');
 

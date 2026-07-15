@@ -139,6 +139,7 @@ const storeDescriptionCss = `
   --sd-bg:#eaf0f7; --sd-card:#ffffff; --sd-ink:#1a2735; --sd-sub:#5b7085;
   --sd-blue:#1f6fbf; --sd-blue-deep:#17356b; --sd-navy:#13263f;
   --sd-line:#e4ebf3; --sd-chip:#eaf1fb; --sd-chip-line:#cfdff2; --sd-gold:#c79a3e;
+  --sd-warn:#a4341c; --sd-warn-bg:#fdf1ec; --sd-warn-line:#f0cdc0;
   --sd-shadow:0 6px 22px rgba(23,53,107,.10);
   container-type:inline-size; background:var(--sd-bg); color:var(--sd-ink);
   font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic","Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -151,16 +152,19 @@ const storeDescriptionCss = `
   --sd-bg:#0e1620; --sd-card:#16212f; --sd-ink:#e7eef6; --sd-sub:#9fb3c6;
   --sd-blue:#5b9be0; --sd-blue-deep:#bcd6f2; --sd-navy:#e7eef6;
   --sd-line:#263647; --sd-chip:#1b2a3c; --sd-chip-line:#2c4056; --sd-gold:#d8b662;
+  --sd-warn:#f0907a; --sd-warn-bg:#2b1a16; --sd-warn-line:#4a2b23;
   --sd-shadow:0 6px 22px rgba(0,0,0,.4);}}
 :root[data-theme="dark"] .store-desc-content{
   --sd-bg:#0e1620; --sd-card:#16212f; --sd-ink:#e7eef6; --sd-sub:#9fb3c6;
   --sd-blue:#5b9be0; --sd-blue-deep:#bcd6f2; --sd-navy:#e7eef6;
   --sd-line:#263647; --sd-chip:#1b2a3c; --sd-chip-line:#2c4056; --sd-gold:#d8b662;
+  --sd-warn:#f0907a; --sd-warn-bg:#2b1a16; --sd-warn-line:#4a2b23;
   --sd-shadow:0 6px 22px rgba(0,0,0,.4);}
 :root[data-theme="light"] .store-desc-content{
   --sd-bg:#eaf0f7; --sd-card:#ffffff; --sd-ink:#1a2735; --sd-sub:#5b7085;
   --sd-blue:#1f6fbf; --sd-blue-deep:#17356b; --sd-navy:#13263f;
   --sd-line:#e4ebf3; --sd-chip:#eaf1fb; --sd-chip-line:#cfdff2; --sd-gold:#c79a3e;
+  --sd-warn:#a4341c; --sd-warn-bg:#fdf1ec; --sd-warn-line:#f0cdc0;
   --sd-shadow:0 6px 22px rgba(23,53,107,.10);}
 /* 카테고리 테마 — 콘텐츠 루트(.sd-card)에 sd-theme-* 부여 시 accent 토큰만 교체(홍삼=홍/골드 등). 기본(미부여)=블루. */
 .store-desc-content .sd-theme-red{--sd-blue:#c0392b;--sd-blue-deep:#8c2620;--sd-navy:#6b241c;--sd-chip:#f8ece8;--sd-chip-line:#e8cdc5;--sd-gold:#b8892f}
@@ -190,6 +194,13 @@ const storeDescriptionCss = `
 .store-desc-content .sd-why li,.store-desc-content .sd-who li{position:relative;padding:11px 0 11px 22px;font-size:15.5px;color:var(--sd-ink);border-bottom:1px solid var(--sd-line);line-height:1.5}
 .store-desc-content .sd-why li::before{content:"";position:absolute;left:2px;top:18px;width:7px;height:7px;border-radius:50%;background:var(--sd-blue)}
 .store-desc-content .sd-who li::before{content:"";position:absolute;left:2px;top:18px;width:7px;height:7px;border-radius:50%;background:var(--sd-gold)}
+/* sd-warn — 금기·경고·주의사항 전용(CR-020). **의미 색**이라 sd-theme-* 가 바꾸지 않는다.
+   색만으로 의미를 전달하지 않기 위해 삼각 마커 + 좌측 굵은 선 + 박스 배경을 함께 쓴다. */
+.store-desc-content .sd-warn{list-style:none;margin:0;padding:12px 14px;border:1px solid var(--sd-warn-line);border-left:3px solid var(--sd-warn);border-radius:12px;background:var(--sd-warn-bg)}
+.store-desc-content .sd-warn li{position:relative;padding:9px 0 9px 22px;font-size:15.5px;color:var(--sd-ink);border-bottom:1px solid var(--sd-warn-line);line-height:1.55}
+.store-desc-content .sd-warn li:last-child{border-bottom:0}
+.store-desc-content .sd-warn li::before{content:"";position:absolute;left:1px;top:1.05em;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:9px solid var(--sd-warn)}
+.store-desc-content .sd-warn li b,.store-desc-content .sd-warn li strong{color:var(--sd-warn);font-weight:700}
 .store-desc-content .sd-core{display:flex;flex-direction:column;gap:11px}
 .store-desc-content .sd-item{background:var(--sd-chip);border:1px solid var(--sd-line);border-left:3px solid var(--sd-blue);border-radius:14px;padding:15px 16px 14px}
 .store-desc-content .sd-item .sd-tag{display:inline-block;font-size:12px;font-weight:700;color:#fff;background:var(--sd-blue);border-radius:6px;padding:3px 10px;margin-bottom:8px}
@@ -217,6 +228,9 @@ const storeDescriptionCss = `
   .store-desc-content .sd-core{display:grid;grid-template-columns:1fr 1fr;gap:14px}
   .store-desc-content .sd-why,.store-desc-content .sd-who{display:grid;grid-template-columns:1fr 1fr;column-gap:28px}
   .store-desc-content .sd-why li,.store-desc-content .sd-who li{font-size:16.5px}
+  /* sd-warn 은 다단으로 쪼개지 않는다 — 금기가 두 열로 나뉘면 오독 위험. 행 길이만 제한. */
+  .store-desc-content .sd-warn{padding:16px 20px;max-width:74ch;margin-left:auto;margin-right:auto}
+  .store-desc-content .sd-warn li{font-size:16.5px}
   .store-desc-content .sd-item h3{font-size:19px}
   .store-desc-content .sd-item p{font-size:15.5px}
   .store-desc-content .sd-intake{font-size:17px}
