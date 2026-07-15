@@ -1,14 +1,17 @@
 /**
  * OTC single 초안(66그룹) → shared_product_descriptions canonical 승격 — 전개 기반 경로
  *
- * WO-O4O-OTC-SINGLE-GROUP-EXPANSION-APPLY-PATH-V1
- * 선행: CHECK-O4O-OTC-KO-CANONICAL-PROMOTION-READINESS-V1 (승격 조건·예상 수량 확정)
+ * WO-O4O-OTC-SINGLE-GROUP-EXPANSION-APPLY-PATH-V1 (경로 구현)
+ *   → WO-O4O-OTC-CANONICAL-APPLY-AUTO-ONLY-V1 (A군 한정 apply 승인)
+ * 선행: CHECK-O4O-OTC-KO-CANONICAL-PROMOTION-READINESS-V1 · CHECK-O4O-OTC-CANONICAL-APPLY-TARGET-SPLIT-V1
  *
  * 배경: single 초안은 `seed_json.groupScope.masterIds` 가 없어 기존 apply(masterIds SSOT)로는
  *   전부 NO_MASTERIDS 보류였다. 본 경로는 **성분·함량·제형 3축 전개**(공용 모듈)로 멤버십을 얻는다.
  *   **dry-run 과 apply 가 같은 전개 함수를 쓴다** → 결과 불일치가 구조적으로 불가능.
  *
- * 정책(READINESS §6 확정):
+ * 정책(READINESS §6 · TARGET-SPLIT 확정):
+ *   - **A군 한정**: `guard_result.verdict='INSERT_auto'` 그룹만 승격한다(WO-O4O-OTC-CANONICAL-APPLY-AUTO-ONLY-V1).
+ *     review / low_ground_flag / **rx_minor_flag**(전문의약품 혼입 가능) / manual 은 **약사 검토 대상(B군)** 으로 제외.
  *   - 정책 A = **SPD 가 전혀 없는 master 에만** 신규 canonical INSERT.
  *     기존 canonical 은 물론 candidate/hidden 이 있어도 **건드리지 않는다** → **UPDATE 0**.
  *   - content = **구조화 필드**(efficacy·usage·caution·summaryTable) → sd-* HTML.
@@ -18,7 +21,7 @@
  *
  * DB write 게이트(둘 다 필요):
  *   `--apply` AND `DRUG_OTC_SINGLE_CANONICAL_APPLY_CONFIRM=YES`
- *   ⚠️ 본 WO 는 **경로 구현 + dry-run 까지**다. 실제 apply 는 **별도 승인 WO**.
+ *   + 승인 수량 일치 가드: 그룹 37 · INSERT 686 과 다르면 **중단**(대상이 변했다는 뜻).
  *
  * 재실행 안전: INSERT 는 `NOT EXISTS(SPD)` 조건 → 재실행 시 자동 no-op.
  *
@@ -39,8 +42,14 @@ const OTC_SOURCE_LABEL = 'MFDS_DRUG_OTC';
 /** 승격 SPD source_type — 감사·rollback·필터용 전용 값(entity union 등재됨). */
 const PROMOTION_SOURCE_TYPE = 'mfds_drug_otc';
 const PROMOTION_LANGUAGE = 'ko';
-/** 승격 status. 초안이 needs_review 라 canonical 승격은 승인 사안 → apply WO 에서 재확인. */
+/** 승격 status. 사용자 승인(WO-O4O-OTC-CANONICAL-APPLY-AUTO-ONLY-V1)으로 canonical 확정. */
 const PROMOTION_STATUS = 'canonical';
+/** A군 = 자동 승격 허용 verdict. 그 외(review/low_ground/rx_minor/manual)는 약사 검토 대상이라 제외. */
+const ELIGIBLE_VERDICTS: string[] = ['INSERT_auto'];
+/** 승인된 예상 INSERT 수. 다르면 apply 중단(예상과 실제가 어긋나면 대상이 변했다는 뜻). */
+const EXPECTED_INSERT = 686;
+/** 승인된 예상 그룹 수. */
+const EXPECTED_GROUPS = 37;
 
 interface PlanRow {
   gk: string;
@@ -89,7 +98,12 @@ async function main(): Promise<void> {
       sourceLabel: OTC_SOURCE_LABEL,
       promotionSourceType: PROMOTION_SOURCE_TYPE,
     });
-    const targets = selectPromotionTargets(rows, 'A_no_spd_only');
+    const allTargets = selectPromotionTargets(rows, 'A_no_spd_only');
+    // A군 필터 — verdict='INSERT_auto' 만. B군(review/low_ground/rx_minor/manual)은 승격하지 않는다.
+    const targets = allTargets.filter((t) => t.verdict !== null && ELIGIBLE_VERDICTS.includes(t.verdict));
+    const excludedB = allTargets.filter(
+      (t) => t.masterIds.length > 0 && !(t.verdict !== null && ELIGIBLE_VERDICTS.includes(t.verdict)),
+    );
 
     // ── 2) 그룹 간 master 중복 방어 (master 당 canonical 1개 계약) ──
     const dup = findCrossGroupDuplicateMasters(targets);
@@ -144,8 +158,14 @@ async function main(): Promise<void> {
 
     const expectedInsert = writable.reduce((n, w) => n + w.target.masterIds.length, 0);
 
-    // ── 4) apply (이중 게이트) ──
+    // ── 4) apply (이중 게이트 + 승인 수량 일치) ──
     if (apply) {
+      if (writable.length !== EXPECTED_GROUPS)
+        throw new Error(`승격 그룹 수 불일치: ${writable.length} ≠ 승인된 ${EXPECTED_GROUPS} — apply 중단`);
+      if (expectedInsert !== EXPECTED_INSERT)
+        throw new Error(`예상 INSERT 불일치: ${expectedInsert} ≠ 승인된 ${EXPECTED_INSERT} — apply 중단`);
+      if (writable.some((w) => w.target.verdict !== 'INSERT_auto'))
+        throw new Error('A군 아닌 그룹이 write 대상에 포함 — apply 중단');
       const qr = ds.createQueryRunner();
       await qr.connect();
       await qr.startTransaction();
@@ -172,14 +192,18 @@ async function main(): Promise<void> {
           );
           insertedTotal += Array.isArray(res) ? res.length : 0;
         }
-        // post-count: master 당 canonical 중복 0 검증
+        // post-count: canonical 유일성 계약 검증.
+        // 계약은 master 단독이 아니라 (master_id, description_type, COALESCE(language,'ko')) 당 1개다
+        // — 같은 master 에 STORE ko / STORE zh / B2B en 이 공존하는 것은 정상(실측 44 master).
         const [{ dup: dupCanon }]: { dup: string }[] = await qr.query(
           `SELECT count(*)::text AS dup FROM (
-             SELECT master_id FROM shared_product_descriptions
+             SELECT master_id, description_type, COALESCE(language,'ko') AS lang
+             FROM shared_product_descriptions
              WHERE deleted_at IS NULL AND status='canonical'
-             GROUP BY master_id HAVING count(*) > 1) x`,
+             GROUP BY 1,2,3 HAVING count(*) > 1) x`,
         );
-        if (Number(dupCanon) > 0) throw new Error(`master 당 canonical 중복 ${dupCanon} — 롤백`);
+        if (Number(dupCanon) > 0)
+          throw new Error(`canonical 중복 ${dupCanon} (master,type,language) — 롤백`);
         if (insertedTotal !== expectedInsert)
           throw new Error(`INSERT 수 불일치: 실제 ${insertedTotal} ≠ 예상 ${expectedInsert} — 롤백`);
         await qr.commitTransaction();
@@ -200,7 +224,8 @@ async function main(): Promise<void> {
     console.log(`targetMasters(전개)  : ${rows.length} (distinct ${new Set(rows.map((r) => r.masterId)).size})`);
     console.log(`기존 canonical 보유  : ${rows.filter((r) => r.hasCanonical).length}`);
     console.log(`설명 전무(정책 A 대상): ${rows.filter((r) => !r.hasAnySpd).length}`);
-    console.log(`승격 가능 그룹       : ${eligible.length} / 보류 ${plans.length - eligible.length}`);
+    console.log(`A군(INSERT_auto)     : ${eligible.length}그룹 / 예상 ${expectedInsert} master`);
+    console.log(`B군 제외(약사 검토)  : ${excludedB.length}그룹 / ${excludedB.reduce((n, t) => n + t.masterIds.length, 0)} master`);
     console.log(`예상 INSERT rows     : ${expectedInsert}`);
     console.log(`예상 UPDATE rows     : 0 (UPDATE 경로 없음)`);
     console.log(`그룹 간 master 중복  : 0`);
@@ -224,6 +249,8 @@ async function main(): Promise<void> {
         expectedUpdate: 0,
         crossGroupDuplicateMasters: 0,
         eligibleGroups: eligible.length,
+        excludedBGroups: excludedB.map((t) => ({ gk: t.gk, verdict: t.verdict, masters: t.masterIds.length })),
+        excludedBMasters: excludedB.reduce((n, t) => n + t.masterIds.length, 0),
         heldGroups: plans.filter((p) => !p.eligible).map((p) => ({ gk: p.gk, reason: p.reason })),
         byVerdict: countBy(eligible, (p) => p.verdict ?? 'null'),
         contentSource: 'structured fields → sd-* (buildDrugOtcConsumerHtml). bodyMarkdown 미사용',
