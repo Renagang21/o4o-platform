@@ -231,16 +231,45 @@ export function ruleB(input: GuardProductInput): GuardFinding[] {
   scan(stripHtml(input.drafts.ko), SUPERLATIVE_KO, 'ko', 'koDraft');
   scan(stripHtml(input.drafts.ko), COMPARATIVE_KO, 'ko', 'koDraft');
   scan(stripHtml(input.drafts.en), SUPERLATIVE_EN, 'en', 'enDraft');
-  // 규격 최소·최대치는 자동 PASS 하지 않고 REVIEW 로 남긴다(WO §6.2 — 애매하면 PASS 금지)
+  // 규격 최소·최대치 — **문자열이 아니라 공식 규격 문맥**으로 판정 (V1.1 튜닝)
   {
     const en = stripHtml(input.drafts.en);
+    // 공식 BASE_STANDARD 가 "…이상/이하/not less than" 규격을 쓰는가?
+    const srcHasSpecBound = /이상|이하|미만|초과|not\s+less\s+than|at\s+least/i.test(input.source.baseStandard);
     for (const m of matchAll(SPEC_MINMAX_EN, en)) {
+      const ctx = contextAround(en, m.index, 55);
+      // 규격 인용 문맥: 수량/단위와 함께 쓰였고 원문에도 규격 하한이 있음.
+      // ⚠️ 단위는 반드시 **경계와 수량**을 요구한다. `g` 를 맨몸 대안으로 두면
+      //    "mornin(g)" 같은 임의 단어가 규격 인용으로 오인돼 INFO 로 강등된다(=미탐).
+      const SPEC_QUOTE_CTX =
+        /(\bCFU\b|\d\s*(?:mg|g|billion|million)\b|\bbillion\b|\bmillion\b|labelled basis|\bper\s)/i;
+      const specQuote = srcHasSpecBound && SPEC_QUOTE_CTX.test(ctx);
+      // 제품·그룹 비교 문맥이면 규격 인용이 아니다
+      const comparative = /(than|in this group|compared|other products|competitors)/i.test(ctx);
+      if (specQuote && !comparative) {
+        out.push({
+          ruleId: 'B-SPEC-MINMAX-003', severity: 'INFO', status: 'INFO', language: 'en',
+          field: 'enDraft', matchedText: m.text,
+          sourceEvidence: `BASE_STANDARD 규격 하한 존재: ${truncate(input.source.baseStandard, 60)}`,
+          message: `공식 규격 인용입니다("${m.text}") — BASE_STANDARD 의 "…이상" 에 대응.`,
+          suggestedAction: '조치 불요(규격 인용).',
+        });
+        continue;
+      }
       out.push({
-        ruleId: 'B-SPEC-MINMAX-003', severity: 'INFO', status: 'REVIEW_REQUIRED', language: 'en',
-        field: 'enDraft', matchedText: m.text,
-        sourceEvidence: `BASE_STANDARD: ${truncate(input.source.baseStandard, 70)}`,
-        message: `규격 최소·최대치 표현입니다("${m.text}") — 공식 규격("…이상")의 번역인지 확인하십시오.`,
-        suggestedAction: '표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오.',
+        ruleId: comparative ? 'B-SPEC-MINMAX-COMPARE-004' : 'B-SPEC-MINMAX-003',
+        severity: comparative ? 'ERROR' : 'WARNING',
+        status: comparative ? 'BLOCKED' : 'REVIEW_REQUIRED',
+        language: 'en', field: 'enDraft', matchedText: m.text,
+        sourceEvidence: srcHasSpecBound
+          ? `BASE_STANDARD: ${truncate(input.source.baseStandard, 60)}`
+          : 'BASE_STANDARD 에 규격 하한 표현 없음',
+        message: comparative
+          ? `규격어가 **제품·그룹 비교**로 사용됐습니다: "${ctx}"`
+          : `규격 최소·최대치 표현이나 규격 인용 문맥이 아닙니다: "${ctx}"`,
+        suggestedAction: comparative
+          ? '비교 주장을 삭제하십시오(전수 비교 근거 없음).'
+          : '공식 규격 인용이면 수량·단위와 함께 쓰십시오. 제품 비교면 삭제하십시오.',
       });
     }
   }
@@ -619,14 +648,57 @@ export function ruleH(input: GuardProductInput): GuardFinding[] {
     });
   }
 
-  // 제품명·제조사 존재
-  if (!en.includes(input.manufacturer) && !/[A-Za-z]/.test(input.manufacturer)) {
-    out.push({
-      ruleId: 'H-MAKER-MISSING-005', severity: 'WARNING', status: 'REVIEW_REQUIRED', language: 'en',
-      field: 'enDraft', matchedText: null, sourceEvidence: `ENTRPS="${input.manufacturer}"`,
-      message: '영어 초안에서 제조사 표기를 확인하십시오(영문 표기 사용 가능).',
-      suggestedAction: '제조사 영문 표기가 정확한지 확인하십시오.',
-    });
+  // 제조사 표기 (V1.1 튜닝) — 영문명을 **창작하지 않는다**. 3분기:
+  //   ① 공식 영문명 있음 → 정확히 대조 (불일치·누락 = REVIEW)
+  //   ② 공식 영문명 없음 → 한국어 법인명 보존 또는 음역 정책 → INFO
+  //   ③ en 초안에 제조사 자체가 없음 → REVIEW
+  {
+    const mEn = (input.manufacturerEn ?? '').trim();
+    // 제조사 흔적이 en 초안에 있는가.
+    //   공식 영문 제조사명은 **원천(MFDS ENTRPS)에 존재하지 않는다**(한국어 법인명만 제공).
+    //   따라서 en 초안은 한국어 법인명 보존 또는 음역 표기를 쓸 수밖에 없다.
+    //   → 한국어 법인명 문자열 매칭만으로 "표기 없음"을 판정하면 음역 초안을 전부 오탐한다.
+    //   실제 위험은 "제조사를 아예 안 밝힘"이므로 **제조사 지정 표기의 존재**로 판정한다.
+    const koreanCoreName = input.manufacturer.replace(/\(주\)|주식회사|㈜|\)|\(|\s+/g, '');
+    const MAKER_DESIGNATION_EN =
+      /\b(manufactur(ed|er)\s+by|manufacturer\s*[:：]|made\s+by|produced\s+by|co\.\s*,?\s*ltd|inc\.|corp(\.|oration)?|pharm|plant)\b/i;
+    const traceInEn =
+      (mEn ? en.includes(mEn) : false) ||
+      (koreanCoreName.length > 1 && en.includes(koreanCoreName)) ||
+      MAKER_DESIGNATION_EN.test(en);
+
+    if (mEn) {
+      out.push(
+        en.includes(mEn)
+          ? {
+              ruleId: 'H-MAKER-MATCH-005', severity: 'INFO', status: 'INFO', language: 'en',
+              field: 'enDraft', matchedText: mEn, sourceEvidence: `manufacturerEn="${mEn}"`,
+              message: '공식 영문 제조사명이 영어 초안과 일치합니다.',
+              suggestedAction: '조치 불요.',
+            }
+          : {
+              ruleId: 'H-MAKER-MISMATCH-005', severity: 'WARNING', status: 'REVIEW_REQUIRED', language: 'en',
+              field: 'enDraft', matchedText: null,
+              sourceEvidence: `manufacturerEn="${mEn}" / ENTRPS="${input.manufacturer}"`,
+              message: '공식 영문 제조사명이 영어 초안에 그대로 나타나지 않습니다.',
+              suggestedAction: `영어 초안의 제조사 표기를 "${mEn}" 로 맞추십시오(임의 영문명 생성 금지).`,
+            },
+      );
+    } else if (!traceInEn) {
+      out.push({
+        ruleId: 'H-MAKER-ABSENT-006', severity: 'WARNING', status: 'REVIEW_REQUIRED', language: 'en',
+        field: 'enDraft', matchedText: null, sourceEvidence: `ENTRPS="${input.manufacturer}" / 공식 영문명 없음`,
+        message: '영어 초안에서 제조사 표기 자체가 확인되지 않습니다.',
+        suggestedAction: '한국어 법인명을 보존하거나 지정된 음역 정책을 적용하십시오. **영문명 창작 금지.**',
+      });
+    } else {
+      out.push({
+        ruleId: 'H-MAKER-NO-OFFICIAL-EN-007', severity: 'INFO', status: 'INFO', language: 'en',
+        field: 'enDraft', matchedText: null, sourceEvidence: `ENTRPS="${input.manufacturer}" / 공식 영문명 없음`,
+        message: '공식 영문 제조사명이 없어 한국어 법인명 보존 또는 음역 표기로 처리됐습니다.',
+        suggestedAction: '음역 표기가 정책에 맞는지는 표본검수에서 확인하십시오(자동 판정 대상 아님).',
+      });
+    }
   }
 
   if (out.length === 0) out.push(ok('H-COUNT-MISMATCH-001', 'drafts', 'ko/en 수치·기능성 대조 통과'));

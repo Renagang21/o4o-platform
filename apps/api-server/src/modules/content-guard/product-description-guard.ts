@@ -29,12 +29,23 @@ import { computeBasis, ruleA, ruleB, ruleC, ruleD, ruleE, ruleF, ruleG, ruleH } 
 export * from './product-description-guard.types.js';
 export { computeBasis } from './product-description-guard.rules.js';
 
-/** 상태 병합: BLOCKED > REVIEW_REQUIRED > PASS > NOT_APPLICABLE */
+/**
+ * 상태 병합: BLOCKED > REVIEW_REQUIRED > PASS/INFO > PRECHECK_INFO > NOT_APPLICABLE
+ *
+ * V1.1: `PRECHECK_INFO`(작성 전 상태 고지)와 `INFO`(근거 확인된 정보성)는 **위험 신호가 아니다**.
+ *       최종 판정을 REVIEW 로 끌어올리지 않는다 — 검수자가 실제 위험에 집중하도록.
+ */
 export function mergeStatus(findings: GuardFinding[]): GuardStatus {
   if (findings.some((f) => f.status === 'BLOCKED')) return 'BLOCKED';
   if (findings.some((f) => f.status === 'REVIEW_REQUIRED')) return 'REVIEW_REQUIRED';
-  if (findings.some((f) => f.status === 'PASS')) return 'PASS';
+  if (findings.some((f) => f.status === 'PASS' || f.status === 'INFO')) return 'PASS';
+  if (findings.some((f) => f.status === 'PRECHECK_INFO')) return 'PASS';
   return 'NOT_APPLICABLE';
+}
+
+/** 최종 REVIEW 집계에 포함되는 것만 (PRECHECK_INFO·INFO 제외) */
+export function isRiskSignal(f: GuardFinding): boolean {
+  return f.status === 'BLOCKED' || f.status === 'REVIEW_REQUIRED';
 }
 
 /**
@@ -47,8 +58,9 @@ export function runPreGuard(input: GuardProductInput): GuardFinding[] {
 
   findings.push({
     ruleId: 'PRE-A-BASIS-001',
-    severity: basis.allowed ? 'INFO' : 'WARNING',
-    status: basis.allowed ? 'PASS' : 'REVIEW_REQUIRED',
+    severity: 'INFO',
+    // V1.1: 작성 전 가드는 위반 검출이 아니라 **상태 고지** → 최종 REVIEW 집계에서 제외
+    status: 'PRECHECK_INFO',
     language: 'n/a',
     field: 'grounding',
     matchedText: null,
@@ -67,7 +79,7 @@ export function runPreGuard(input: GuardProductInput): GuardFinding[] {
   findings.push({
     ruleId: 'PRE-F-AGE-001',
     severity: 'INFO',
-    status: hasAge ? 'PASS' : 'REVIEW_REQUIRED',
+    status: 'PRECHECK_INFO',
     language: 'n/a',
     field: 'grounding.ageBandsRaw',
     matchedText: hasAge ? trunc(ageRaw, 70) : null,
@@ -122,8 +134,10 @@ export function runGuard(input: GuardProductInput, opts: GuardOptions = {}): Gua
     koEnStatus,
     overallStatus: mergeStatus(findings),
     blockedCount: findings.filter((f) => f.status === 'BLOCKED').length,
+    // V1.1: REVIEW 집계 = **사람 판정이 필요한 것만**. PRECHECK_INFO·INFO 는 제외.
     reviewCount: findings.filter((f) => f.status === 'REVIEW_REQUIRED').length,
-    passCount: findings.filter((f) => f.status === 'PASS').length,
+    passCount: findings.filter((f) => f.status === 'PASS' || f.status === 'INFO').length,
+    precheckInfoCount: findings.filter((f) => f.status === 'PRECHECK_INFO').length,
     findings,
   };
 }
@@ -134,7 +148,7 @@ export function runGuardBatch(inputs: GuardProductInput[], opts: GuardOptions = 
   const findingsByRule: Record<string, number> = {};
   for (const p of products) {
     for (const f of p.findings) {
-      if (f.status === 'PASS' || f.status === 'NOT_APPLICABLE') continue;
+      if (!isRiskSignal(f)) continue; // V1.1: 위험 신호만 집계(PRECHECK_INFO·INFO·PASS 제외)
       findingsByRule[f.ruleId] = (findingsByRule[f.ruleId] ?? 0) + 1;
     }
   }

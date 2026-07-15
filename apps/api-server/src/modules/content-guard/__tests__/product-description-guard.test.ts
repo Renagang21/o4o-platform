@@ -78,8 +78,107 @@ describe('A. 기준량 환산 (computeBasis)', () => {
   it('작성 전 가드가 환산 불가 시 생성 금지 목록을 고지', () => {
     const pre = runPreGuard(ERR_LACTOFIT_DAILY_TOTAL);
     const f = pre.find((x) => x.ruleId === 'PRE-A-BASIS-001')!;
-    expect(f.status).toBe('REVIEW_REQUIRED');
+    // V1.1: 작성 전 고지는 위반 검출이 아니다 → 최종 REVIEW 집계에서 제외
+    expect(f.status).toBe('PRECHECK_INFO');
     expect(f.message).toMatch(/생성 금지 목록/);
+  });
+});
+
+// ═══ V1.1 REVIEW 튜닝: 위험 신호 / 정보성 신호 분리 ══════════════════════════
+
+describe('V1.1 — 위험 신호와 정보성 신호 분리', () => {
+  it('PRE-* 고지는 PRECHECK_INFO 이며 reviewCount 에 합산되지 않는다', () => {
+    const r = runGuard(OK_VIVA_FULL_BASIS, { phase: 'pre' });
+    expect(r.findings.every((f) => f.status === 'PRECHECK_INFO')).toBe(true);
+    expect(r.reviewCount).toBe(0);
+    expect(r.precheckInfoCount).toBe(2); // PRE-A-BASIS-001 + PRE-F-AGE-001
+    expect(r.overallStatus).not.toBe('REVIEW_REQUIRED');
+  });
+
+  it('PRECHECK_INFO 단독으로는 배치 REVIEW 를 만들지 않는다', () => {
+    const b = runGuardBatch([OK_VIVA_FULL_BASIS, OK_KIMCHI_DAILY_BASIS], { phase: 'pre' });
+    expect(b.reviewRequired).toBe(0);
+    expect(b.blocked).toBe(0);
+    // findingsByRule 은 위험 신호만 집계
+    expect(Object.keys(b.findingsByRule)).not.toContain('PRE-A-BASIS-001');
+  });
+
+  it('PRECHECK_INFO 는 BLOCKED 를 가리지 않는다 (미탐 0 유지)', () => {
+    const r = runGuard(ERR_LACTOFIT_DAILY_TOTAL);
+    expect(r.precheckInfoCount).toBeGreaterThan(0);
+    expect(r.overallStatus).toBe('BLOCKED');
+  });
+
+  // H-MAKER 3분기. en 초안에 제조사 표기가 실제로 있는 입력을 만들어 검증한다
+  // (OK_VIVA_FULL_BASIS 의 en 초안에는 제조사 표기 자체가 없어 ABSENT 분기로 간다).
+  const withEnMaker = (enMakerText: string, manufacturerEn: string | null) => ({
+    ...OK_VIVA_FULL_BASIS,
+    manufacturerEn,
+    drafts: {
+      ...OK_VIVA_FULL_BASIS.drafts,
+      en: `${OK_VIVA_FULL_BASIS.drafts.en}<p>Manufacturer: ${enMakerText}</p>`,
+    },
+  });
+
+  it('H-MAKER: 공식 영문 제조사명이 없으면 창작하지 않고 INFO 로 고지', () => {
+    // 공식 영문명 없음 + en 에 한국어 법인명 보존 → 창작 요구 없이 INFO
+    const r = runGuard(withEnMaker(OK_VIVA_FULL_BASIS.manufacturer, null), { phase: 'bilingual' });
+    const f = r.findings.find((x) => x.ruleId.startsWith('H-MAKER'))!;
+    expect(f.ruleId).toBe('H-MAKER-NO-OFFICIAL-EN-007');
+    expect(f.status).toBe('INFO');
+    expect(f.suggestedAction).toMatch(/자동 판정 대상 아님/);
+  });
+
+  it('H-MAKER: 공식 영문명이 en 초안과 일치하면 INFO', () => {
+    const r = runGuard(withEnMaker('Novarex Co., Ltd.', 'Novarex Co., Ltd.'), { phase: 'bilingual' });
+    const f = r.findings.find((x) => x.ruleId.startsWith('H-MAKER'))!;
+    expect(f.ruleId).toBe('H-MAKER-MATCH-005');
+    expect(f.status).toBe('INFO');
+  });
+
+  it('H-MAKER: 공식 영문명이 있는데 en 초안이 다르면 REVIEW (미탐 방지)', () => {
+    const r = runGuard(withEnMaker('Some Other Corp.', 'Novarex Co., Ltd.'), { phase: 'bilingual' });
+    const f = r.findings.find((x) => x.ruleId.startsWith('H-MAKER'))!;
+    expect(f.ruleId).toBe('H-MAKER-MISMATCH-005');
+    expect(f.status).toBe('REVIEW_REQUIRED');
+  });
+
+  it('H-MAKER: en 초안에 제조사 표기 자체가 없으면 REVIEW', () => {
+    const r = runGuard({ ...OK_VIVA_FULL_BASIS, manufacturerEn: null }, { phase: 'bilingual' });
+    const f = r.findings.find((x) => x.ruleId.startsWith('H-MAKER'))!;
+    expect(f.ruleId).toBe('H-MAKER-ABSENT-006');
+    expect(f.status).toBe('REVIEW_REQUIRED');
+  });
+
+  // B-SPEC-MINMAX 3분기 — 규격어는 문자열이 아니라 **문맥**으로 판정한다.
+  const withEn = (enBody: string) => ({
+    ...OK_VIVA_FULL_BASIS,
+    drafts: { ...OK_VIVA_FULL_BASIS.drafts, en: `<p>${enBody}</p>` },
+  });
+
+  it('B-SPEC-MINMAX: 규격 인용 문맥("at least 1 billion CFU")은 INFO', () => {
+    const r = runGuard(withEn('Contains at least 1 billion CFU per labelled basis.'), { phase: 'post' });
+    const f = r.findings.find((x) => x.ruleId.startsWith('B-SPEC-MINMAX'))!;
+    expect(f.ruleId).toBe('B-SPEC-MINMAX-003');
+    expect(f.status).toBe('INFO');
+  });
+
+  it('B-SPEC-MINMAX: 수량·단위 없는 규격어는 REVIEW (자동 PASS 하지 않음)', () => {
+    const r = runGuard(withEn('Keep hassle to a minimum every morning.'), { phase: 'post' });
+    const f = r.findings.find((x) => x.ruleId.startsWith('B-SPEC-MINMAX'))!;
+    expect(f.ruleId).toBe('B-SPEC-MINMAX-003');
+    expect(f.status).toBe('REVIEW_REQUIRED');
+  });
+
+  it('B-SPEC-MINMAX: 규격어가 제품 비교로 쓰이면 BLOCKED (탐지력 강화)', () => {
+    const r = runGuard(
+      withEn('Contains at least 1 billion CFU, more than other products in this group.'),
+      { phase: 'post' },
+    );
+    const f = r.findings.find((x) => x.ruleId === 'B-SPEC-MINMAX-COMPARE-004')!;
+    expect(f).toBeDefined();
+    expect(f.status).toBe('BLOCKED');
+    expect(r.overallStatus).toBe('BLOCKED');
   });
 });
 

@@ -1,15 +1,12 @@
 {
-  "guardVersion": "product-description-guard@1.0.0",
+  "guardVersion": "product-description-guard@1.1.0",
   "totalProducts": 25,
-  "pass": 0,
-  "reviewRequired": 25,
+  "pass": 12,
+  "reviewRequired": 13,
   "blocked": 0,
   "findingsByRule": {
-    "PRE-F-AGE-001": 23,
-    "B-SPEC-MINMAX-003": 51,
     "H-GUARANTEE-SPEC-006": 7,
-    "H-MAKER-MISSING-005": 25,
-    "PRE-A-BASIS-001": 17,
+    "B-SPEC-MINMAX-003": 1,
     "C-ABSENCE-SOFT-004": 1,
     "B-SUPERLATIVE-CONTEXT-002": 2,
     "C-ABSENCE-NUMERIC-003": 2,
@@ -19,19 +16,20 @@
     {
       "candidateId": "pilot-probiotics:duolac-biofarm",
       "productName": "듀오락 바이오팜 장건강 캡슐",
-      "guardVersion": "product-description-guard@1.0.0",
-      "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "REVIEW_REQUIRED",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "PASS",
       "koEnStatus": "REVIEW_REQUIRED",
       "overallStatus": "REVIEW_REQUIRED",
       "blockedCount": 0,
-      "reviewCount": 5,
-      "passCount": 7,
+      "reviewCount": 1,
+      "passCount": 9,
+      "precheckInfoCount": 2,
       "findings": [
         {
           "ruleId": "PRE-A-BASIS-001",
           "severity": "INFO",
-          "status": "PASS",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding",
           "matchedText": null,
@@ -42,7 +40,7 @@
         {
           "ruleId": "PRE-F-AGE-001",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding.ageBandsRaw",
           "matchedText": null,
@@ -64,24 +62,24 @@
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수: 1,000,000,000 CFU/350mg 이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수: 1,000,000,000 CFU/350mg 이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수: 1,000,000,000 CFU/350mg 이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수: 1,000,000,000 CFU/350mg 이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -150,34 +148,35 @@
           "suggestedAction": "표시량 규격 보장이면 PASS 입니다."
         },
         {
-          "ruleId": "H-MAKER-MISSING-005",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
+          "severity": "INFO",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": null,
-          "sourceEvidence": "ENTRPS=\"(주)쎌바이오텍\"",
-          "message": "영어 초안에서 제조사 표기를 확인하십시오(영문 표기 사용 가능).",
-          "suggestedAction": "제조사 영문 표기가 정확한지 확인하십시오."
+          "sourceEvidence": "ENTRPS=\"(주)쎌바이오텍\" / 공식 영문명 없음",
+          "message": "공식 영문 제조사명이 없어 한국어 법인명 보존 또는 음역 표기로 처리됐습니다.",
+          "suggestedAction": "음역 표기가 정책에 맞는지는 표본검수에서 확인하십시오(자동 판정 대상 아님)."
         }
       ]
     },
     {
       "candidateId": "pilot-probiotics:proba-novarex",
       "productName": "프로바",
-      "guardVersion": "product-description-guard@1.0.0",
-      "preGuardStatus": "REVIEW_REQUIRED",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
       "postGuardStatus": "REVIEW_REQUIRED",
-      "koEnStatus": "REVIEW_REQUIRED",
+      "koEnStatus": "PASS",
       "overallStatus": "REVIEW_REQUIRED",
       "blockedCount": 0,
-      "reviewCount": 6,
-      "passCount": 6,
+      "reviewCount": 1,
+      "passCount": 9,
+      "precheckInfoCount": 2,
       "findings": [
         {
           "ruleId": "PRE-A-BASIS-001",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding",
           "matchedText": null,
@@ -188,7 +187,7 @@
         {
           "ruleId": "PRE-F-AGE-001",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding.ageBandsRaw",
           "matchedText": null,
@@ -210,35 +209,35 @@
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(100,000,000(1억) CFU/2000mg) 이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수 : 표시량(100,000,000(1억) CFU/2000mg) 이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "B-SPEC-MINMAX-003",
-          "severity": "INFO",
+          "severity": "WARNING",
           "status": "REVIEW_REQUIRED",
           "language": "en",
           "field": "enDraft",
           "matchedText": "to a minimum",
           "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(100,000,000(1억) CFU/2000mg) 이상",
-          "message": "규격 최소·최대치 표현입니다(\"to a minimum\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "message": "규격 최소·최대치 표현이나 규격 인용 문맥이 아닙니다: \"…m heat, humidity and direct sunlight Keep air exposure to a minimum after opening 18 months from manufacture I…\"",
+          "suggestedAction": "공식 규격 인용이면 수량·단위와 함께 쓰십시오. 제품 비교면 삭제하십시오."
         },
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(100,000,000(1억) CFU/2000mg) 이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수 : 표시량(100,000,000(1억) CFU/2000mg) 이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -296,34 +295,35 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "H-MAKER-MISSING-005",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
+          "severity": "INFO",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": null,
-          "sourceEvidence": "ENTRPS=\"주식회사 노바렉스\"",
-          "message": "영어 초안에서 제조사 표기를 확인하십시오(영문 표기 사용 가능).",
-          "suggestedAction": "제조사 영문 표기가 정확한지 확인하십시오."
+          "sourceEvidence": "ENTRPS=\"주식회사 노바렉스\" / 공식 영문명 없음",
+          "message": "공식 영문 제조사명이 없어 한국어 법인명 보존 또는 음역 표기로 처리됐습니다.",
+          "suggestedAction": "음역 표기가 정책에 맞는지는 표본검수에서 확인하십시오(자동 판정 대상 아님)."
         }
       ]
     },
     {
       "candidateId": "pilot-probiotics:neurolabs-denmark",
       "productName": "뉴로랩스 덴마크 유산균",
-      "guardVersion": "product-description-guard@1.0.0",
-      "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "REVIEW_REQUIRED",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "PASS",
       "koEnStatus": "REVIEW_REQUIRED",
       "overallStatus": "REVIEW_REQUIRED",
       "blockedCount": 0,
-      "reviewCount": 5,
-      "passCount": 7,
+      "reviewCount": 1,
+      "passCount": 9,
+      "precheckInfoCount": 2,
       "findings": [
         {
           "ruleId": "PRE-A-BASIS-001",
           "severity": "INFO",
-          "status": "PASS",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding",
           "matchedText": null,
@@ -334,7 +334,7 @@
         {
           "ruleId": "PRE-F-AGE-001",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding.ageBandsRaw",
           "matchedText": null,
@@ -356,24 +356,24 @@
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량 (100억 CFU/340 mg) 이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수 : 표시량 (100억 CFU/340 mg) 이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량 (100억 CFU/340 mg) 이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수 : 표시량 (100억 CFU/340 mg) 이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -442,34 +442,35 @@
           "suggestedAction": "표시량 규격 보장이면 PASS 입니다."
         },
         {
-          "ruleId": "H-MAKER-MISSING-005",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
+          "severity": "INFO",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": null,
-          "sourceEvidence": "ENTRPS=\"(주)빅솔 반월공장\"",
-          "message": "영어 초안에서 제조사 표기를 확인하십시오(영문 표기 사용 가능).",
-          "suggestedAction": "제조사 영문 표기가 정확한지 확인하십시오."
+          "sourceEvidence": "ENTRPS=\"(주)빅솔 반월공장\" / 공식 영문명 없음",
+          "message": "공식 영문 제조사명이 없어 한국어 법인명 보존 또는 음역 표기로 처리됐습니다.",
+          "suggestedAction": "음역 표기가 정책에 맞는지는 표본검수에서 확인하십시오(자동 판정 대상 아님)."
         }
       ]
     },
     {
       "candidateId": "pilot-probiotics:lactofit-plus",
       "productName": "락토핏 플러스 프로바이오틱스",
-      "guardVersion": "product-description-guard@1.0.0",
-      "preGuardStatus": "REVIEW_REQUIRED",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
       "postGuardStatus": "REVIEW_REQUIRED",
-      "koEnStatus": "REVIEW_REQUIRED",
+      "koEnStatus": "PASS",
       "overallStatus": "REVIEW_REQUIRED",
       "blockedCount": 0,
-      "reviewCount": 6,
-      "passCount": 5,
+      "reviewCount": 1,
+      "passCount": 8,
+      "precheckInfoCount": 2,
       "findings": [
         {
           "ruleId": "PRE-A-BASIS-001",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding",
           "matchedText": null,
@@ -480,7 +481,7 @@
         {
           "ruleId": "PRE-F-AGE-001",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding.ageBandsRaw",
           "matchedText": null,
@@ -502,24 +503,24 @@
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(10,000,000,000 (100억) CFU/4g) 이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수 : 표시량(10,000,000,000 (100억) CFU/4g) 이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(10,000,000,000 (100억) CFU/4g) 이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수 : 표시량(10,000,000,000 (100억) CFU/4g) 이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "C-ABSENCE-SOFT-004",
@@ -577,34 +578,35 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "H-MAKER-MISSING-005",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
+          "severity": "INFO",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": null,
-          "sourceEvidence": "ENTRPS=\"종근당건강(주)\"",
-          "message": "영어 초안에서 제조사 표기를 확인하십시오(영문 표기 사용 가능).",
-          "suggestedAction": "제조사 영문 표기가 정확한지 확인하십시오."
+          "sourceEvidence": "ENTRPS=\"종근당건강(주)\" / 공식 영문명 없음",
+          "message": "공식 영문 제조사명이 없어 한국어 법인명 보존 또는 음역 표기로 처리됐습니다.",
+          "suggestedAction": "음역 표기가 정책에 맞는지는 표본검수에서 확인하십시오(자동 판정 대상 아님)."
         }
       ]
     },
     {
       "candidateId": "pilot-probiotics:dinokids",
       "productName": "디노키즈생유산균",
-      "guardVersion": "product-description-guard@1.0.0",
-      "preGuardStatus": "REVIEW_REQUIRED",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
       "postGuardStatus": "REVIEW_REQUIRED",
-      "koEnStatus": "REVIEW_REQUIRED",
+      "koEnStatus": "PASS",
       "overallStatus": "REVIEW_REQUIRED",
       "blockedCount": 0,
-      "reviewCount": 5,
-      "passCount": 7,
+      "reviewCount": 1,
+      "passCount": 9,
+      "precheckInfoCount": 2,
       "findings": [
         {
           "ruleId": "PRE-A-BASIS-001",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding",
           "matchedText": null,
@@ -615,7 +617,7 @@
         {
           "ruleId": "PRE-F-AGE-001",
           "severity": "INFO",
-          "status": "PASS",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding.ageBandsRaw",
           "matchedText": "9세 이상 및 성인 : 1일 2~3회, 1회 1포 / 4-9세 어린이 : 1일 2회, 1회 1포 / 6개월-4세 어린이 : 1…",
@@ -648,24 +650,24 @@
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(10,000,000,000 (100억) CFU / 2g) 이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수 : 표시량(10,000,000,000 (100억) CFU / 2g) 이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(10,000,000,000 (100억) CFU / 2g) 이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수 : 표시량(10,000,000,000 (100억) CFU / 2g) 이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -723,34 +725,35 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "H-MAKER-MISSING-005",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
+          "severity": "INFO",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": null,
-          "sourceEvidence": "ENTRPS=\"조아제약(주)\"",
-          "message": "영어 초안에서 제조사 표기를 확인하십시오(영문 표기 사용 가능).",
-          "suggestedAction": "제조사 영문 표기가 정확한지 확인하십시오."
+          "sourceEvidence": "ENTRPS=\"조아제약(주)\" / 공식 영문명 없음",
+          "message": "공식 영문 제조사명이 없어 한국어 법인명 보존 또는 음역 표기로 처리됐습니다.",
+          "suggestedAction": "음역 표기가 정책에 맞는지는 표본검수에서 확인하십시오(자동 판정 대상 아님)."
         }
       ]
     },
     {
       "candidateId": "pilot-probiotics-20:a1-harudaru",
       "productName": "하루하루 장편한 프로바이오틱스",
-      "guardVersion": "product-description-guard@1.0.0",
-      "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "REVIEW_REQUIRED",
-      "koEnStatus": "REVIEW_REQUIRED",
-      "overallStatus": "REVIEW_REQUIRED",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "PASS",
+      "koEnStatus": "PASS",
+      "overallStatus": "PASS",
       "blockedCount": 0,
-      "reviewCount": 5,
-      "passCount": 6,
+      "reviewCount": 0,
+      "passCount": 9,
+      "precheckInfoCount": 2,
       "findings": [
         {
           "ruleId": "PRE-A-BASIS-001",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding",
           "matchedText": null,
@@ -761,7 +764,7 @@
         {
           "ruleId": "PRE-F-AGE-001",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding.ageBandsRaw",
           "matchedText": null,
@@ -783,24 +786,24 @@
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(10,000,000,000(100억) cfu/400mg) 이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수 : 표시량(10,000,000,000(100억) cfu/400mg) 이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(10,000,000,000(100억) cfu/400mg) 이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수 : 표시량(10,000,000,000(100억) cfu/400mg) 이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -858,34 +861,35 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "H-MAKER-MISSING-005",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
+          "severity": "INFO",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": null,
-          "sourceEvidence": "ENTRPS=\"(주)뉴팜\"",
-          "message": "영어 초안에서 제조사 표기를 확인하십시오(영문 표기 사용 가능).",
-          "suggestedAction": "제조사 영문 표기가 정확한지 확인하십시오."
+          "sourceEvidence": "ENTRPS=\"(주)뉴팜\" / 공식 영문명 없음",
+          "message": "공식 영문 제조사명이 없어 한국어 법인명 보존 또는 음역 표기로 처리됐습니다.",
+          "suggestedAction": "음역 표기가 정책에 맞는지는 표본검수에서 확인하십시오(자동 판정 대상 아님)."
         }
       ]
     },
     {
       "candidateId": "pilot-probiotics-20:a2-lactophil-entero",
       "productName": "락토필엔테로 비움",
-      "guardVersion": "product-description-guard@1.0.0",
-      "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "REVIEW_REQUIRED",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "PASS",
       "koEnStatus": "REVIEW_REQUIRED",
       "overallStatus": "REVIEW_REQUIRED",
       "blockedCount": 0,
-      "reviewCount": 5,
-      "passCount": 7,
+      "reviewCount": 1,
+      "passCount": 9,
+      "precheckInfoCount": 2,
       "findings": [
         {
           "ruleId": "PRE-A-BASIS-001",
           "severity": "INFO",
-          "status": "PASS",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding",
           "matchedText": null,
@@ -896,7 +900,7 @@
         {
           "ruleId": "PRE-F-AGE-001",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding.ageBandsRaw",
           "matchedText": null,
@@ -918,24 +922,24 @@
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량 이상 (100억 CFU/350 mg)",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수 : 표시량 이상 (100억 CFU/350 mg)",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량 이상 (100억 CFU/350 mg)",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수 : 표시량 이상 (100억 CFU/350 mg)",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -1004,34 +1008,35 @@
           "suggestedAction": "표시량 규격 보장이면 PASS 입니다."
         },
         {
-          "ruleId": "H-MAKER-MISSING-005",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
+          "severity": "INFO",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": null,
-          "sourceEvidence": "ENTRPS=\"(주)빅솔 반월공장\"",
-          "message": "영어 초안에서 제조사 표기를 확인하십시오(영문 표기 사용 가능).",
-          "suggestedAction": "제조사 영문 표기가 정확한지 확인하십시오."
+          "sourceEvidence": "ENTRPS=\"(주)빅솔 반월공장\" / 공식 영문명 없음",
+          "message": "공식 영문 제조사명이 없어 한국어 법인명 보존 또는 음역 표기로 처리됐습니다.",
+          "suggestedAction": "음역 표기가 정책에 맞는지는 표본검수에서 확인하십시오(자동 판정 대상 아님)."
         }
       ]
     },
     {
       "candidateId": "pilot-probiotics-20:a3-paraotics",
       "productName": "파라오틱스",
-      "guardVersion": "product-description-guard@1.0.0",
-      "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "REVIEW_REQUIRED",
-      "koEnStatus": "REVIEW_REQUIRED",
-      "overallStatus": "REVIEW_REQUIRED",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "PASS",
+      "koEnStatus": "PASS",
+      "overallStatus": "PASS",
       "blockedCount": 0,
-      "reviewCount": 5,
-      "passCount": 6,
+      "reviewCount": 0,
+      "passCount": 9,
+      "precheckInfoCount": 2,
       "findings": [
         {
           "ruleId": "PRE-A-BASIS-001",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding",
           "matchedText": null,
@@ -1042,7 +1047,7 @@
         {
           "ruleId": "PRE-F-AGE-001",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding.ageBandsRaw",
           "matchedText": null,
@@ -1064,24 +1069,24 @@
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수: 표시량(10,000,000,000 CFU/700mg) 이상 / 성상 : 흰색 장용성 경질 내부캡슐과 투명 …",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수: 표시량(10,000,000,000 CFU/700mg) 이상 / 성상 : 흰색 장용성 경질…",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수: 표시량(10,000,000,000 CFU/700mg) 이상 / 성상 : 흰색 장용성 경질 내부캡슐과 투명 …",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수: 표시량(10,000,000,000 CFU/700mg) 이상 / 성상 : 흰색 장용성 경질…",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -1139,34 +1144,35 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "H-MAKER-MISSING-005",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
+          "severity": "INFO",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": null,
-          "sourceEvidence": "ENTRPS=\"(주)씨티씨바이오\"",
-          "message": "영어 초안에서 제조사 표기를 확인하십시오(영문 표기 사용 가능).",
-          "suggestedAction": "제조사 영문 표기가 정확한지 확인하십시오."
+          "sourceEvidence": "ENTRPS=\"(주)씨티씨바이오\" / 공식 영문명 없음",
+          "message": "공식 영문 제조사명이 없어 한국어 법인명 보존 또는 음역 표기로 처리됐습니다.",
+          "suggestedAction": "음역 표기가 정책에 맞는지는 표본검수에서 확인하십시오(자동 판정 대상 아님)."
         }
       ]
     },
     {
       "candidateId": "pilot-probiotics-20:a4-kimchi-biocapsule",
       "productName": "김치생유산균바이오캡슐",
-      "guardVersion": "product-description-guard@1.0.0",
-      "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "REVIEW_REQUIRED",
-      "koEnStatus": "REVIEW_REQUIRED",
-      "overallStatus": "REVIEW_REQUIRED",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "PASS",
+      "koEnStatus": "PASS",
+      "overallStatus": "PASS",
       "blockedCount": 0,
-      "reviewCount": 4,
-      "passCount": 7,
+      "reviewCount": 0,
+      "passCount": 9,
+      "precheckInfoCount": 2,
       "findings": [
         {
           "ruleId": "PRE-A-BASIS-001",
           "severity": "INFO",
-          "status": "PASS",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding",
           "matchedText": null,
@@ -1177,7 +1183,7 @@
         {
           "ruleId": "PRE-F-AGE-001",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding.ageBandsRaw",
           "matchedText": null,
@@ -1199,24 +1205,24 @@
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(10,000,000,000cfu이상/900mg)이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수 : 표시량(10,000,000,000cfu이상/900mg)이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(10,000,000,000cfu이상/900mg)이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수 : 표시량(10,000,000,000cfu이상/900mg)이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -1274,34 +1280,35 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "H-MAKER-MISSING-005",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
+          "severity": "INFO",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": null,
-          "sourceEvidence": "ENTRPS=\"(주)바이오리듬\"",
-          "message": "영어 초안에서 제조사 표기를 확인하십시오(영문 표기 사용 가능).",
-          "suggestedAction": "제조사 영문 표기가 정확한지 확인하십시오."
+          "sourceEvidence": "ENTRPS=\"(주)바이오리듬\" / 공식 영문명 없음",
+          "message": "공식 영문 제조사명이 없어 한국어 법인명 보존 또는 음역 표기로 처리됐습니다.",
+          "suggestedAction": "음역 표기가 정책에 맞는지는 표본검수에서 확인하십시오(자동 판정 대상 아님)."
         }
       ]
     },
     {
       "candidateId": "pilot-probiotics-20:a5-bifisn",
       "productName": "비피스앤(N)",
-      "guardVersion": "product-description-guard@1.0.0",
-      "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "REVIEW_REQUIRED",
-      "koEnStatus": "REVIEW_REQUIRED",
-      "overallStatus": "REVIEW_REQUIRED",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "PASS",
+      "koEnStatus": "PASS",
+      "overallStatus": "PASS",
       "blockedCount": 0,
-      "reviewCount": 5,
-      "passCount": 6,
+      "reviewCount": 0,
+      "passCount": 9,
+      "precheckInfoCount": 2,
       "findings": [
         {
           "ruleId": "PRE-A-BASIS-001",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding",
           "matchedText": null,
@@ -1312,7 +1319,7 @@
         {
           "ruleId": "PRE-F-AGE-001",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding.ageBandsRaw",
           "matchedText": null,
@@ -1334,24 +1341,24 @@
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 : 표시량(100,000,000(1억) cfu/1,000 mg) 이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 : 표시량(100,000,000(1억) cfu/1,000 mg) 이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 : 표시량(100,000,000(1억) cfu/1,000 mg) 이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 : 표시량(100,000,000(1억) cfu/1,000 mg) 이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -1409,34 +1416,35 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "H-MAKER-MISSING-005",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
+          "severity": "INFO",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": null,
-          "sourceEvidence": "ENTRPS=\"주식회사 네추럴웨이\"",
-          "message": "영어 초안에서 제조사 표기를 확인하십시오(영문 표기 사용 가능).",
-          "suggestedAction": "제조사 영문 표기가 정확한지 확인하십시오."
+          "sourceEvidence": "ENTRPS=\"주식회사 네추럴웨이\" / 공식 영문명 없음",
+          "message": "공식 영문 제조사명이 없어 한국어 법인명 보존 또는 음역 표기로 처리됐습니다.",
+          "suggestedAction": "음역 표기가 정책에 맞는지는 표본검수에서 확인하십시오(자동 판정 대상 아님)."
         }
       ]
     },
     {
       "candidateId": "pilot-probiotics-20:b1-trimax",
       "productName": "트리맥스바이오틱스",
-      "guardVersion": "product-description-guard@1.0.0",
-      "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "REVIEW_REQUIRED",
-      "koEnStatus": "REVIEW_REQUIRED",
-      "overallStatus": "REVIEW_REQUIRED",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "PASS",
+      "koEnStatus": "PASS",
+      "overallStatus": "PASS",
       "blockedCount": 0,
-      "reviewCount": 5,
-      "passCount": 6,
+      "reviewCount": 0,
+      "passCount": 9,
+      "precheckInfoCount": 2,
       "findings": [
         {
           "ruleId": "PRE-A-BASIS-001",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding",
           "matchedText": null,
@@ -1447,7 +1455,7 @@
         {
           "ruleId": "PRE-F-AGE-001",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding.ageBandsRaw",
           "matchedText": null,
@@ -1469,24 +1477,24 @@
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(1,000,000,000(10억) CFU/3g) 이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수 : 표시량(1,000,000,000(10억) CFU/3g) 이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(1,000,000,000(10억) CFU/3g) 이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수 : 표시량(1,000,000,000(10억) CFU/3g) 이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -1544,34 +1552,35 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "H-MAKER-MISSING-005",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
+          "severity": "INFO",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": null,
-          "sourceEvidence": "ENTRPS=\"(주)렉스팜\"",
-          "message": "영어 초안에서 제조사 표기를 확인하십시오(영문 표기 사용 가능).",
-          "suggestedAction": "제조사 영문 표기가 정확한지 확인하십시오."
+          "sourceEvidence": "ENTRPS=\"(주)렉스팜\" / 공식 영문명 없음",
+          "message": "공식 영문 제조사명이 없어 한국어 법인명 보존 또는 음역 표기로 처리됐습니다.",
+          "suggestedAction": "음역 표기가 정책에 맞는지는 표본검수에서 확인하십시오(자동 판정 대상 아님)."
         }
       ]
     },
     {
       "candidateId": "pilot-probiotics-20:b2-drphyto-bifi",
       "productName": "닥터파이토 비피아이 유산균",
-      "guardVersion": "product-description-guard@1.0.0",
-      "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "REVIEW_REQUIRED",
-      "koEnStatus": "REVIEW_REQUIRED",
-      "overallStatus": "REVIEW_REQUIRED",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "PASS",
+      "koEnStatus": "PASS",
+      "overallStatus": "PASS",
       "blockedCount": 0,
-      "reviewCount": 5,
-      "passCount": 6,
+      "reviewCount": 0,
+      "passCount": 9,
+      "precheckInfoCount": 2,
       "findings": [
         {
           "ruleId": "PRE-A-BASIS-001",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding",
           "matchedText": null,
@@ -1582,7 +1591,7 @@
         {
           "ruleId": "PRE-F-AGE-001",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding.ageBandsRaw",
           "matchedText": null,
@@ -1604,24 +1613,24 @@
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스균수 : 표시량(5,000,000,000(50억)CFU/2g) 이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스균수 : 표시량(5,000,000,000(50억)CFU/2g) 이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스균수 : 표시량(5,000,000,000(50억)CFU/2g) 이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스균수 : 표시량(5,000,000,000(50억)CFU/2g) 이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -1679,34 +1688,35 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "H-MAKER-MISSING-005",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
+          "severity": "INFO",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": null,
-          "sourceEvidence": "ENTRPS=\"(주)비피도\"",
-          "message": "영어 초안에서 제조사 표기를 확인하십시오(영문 표기 사용 가능).",
-          "suggestedAction": "제조사 영문 표기가 정확한지 확인하십시오."
+          "sourceEvidence": "ENTRPS=\"(주)비피도\" / 공식 영문명 없음",
+          "message": "공식 영문 제조사명이 없어 한국어 법인명 보존 또는 음역 표기로 처리됐습니다.",
+          "suggestedAction": "음역 표기가 정책에 맞는지는 표본검수에서 확인하십시오(자동 판정 대상 아님)."
         }
       ]
     },
     {
       "candidateId": "pilot-probiotics-20:b3-w-innerbalance",
       "productName": "W이너밸런스프로바이오틱스",
-      "guardVersion": "product-description-guard@1.0.0",
-      "preGuardStatus": "REVIEW_REQUIRED",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
       "postGuardStatus": "REVIEW_REQUIRED",
       "koEnStatus": "REVIEW_REQUIRED",
       "overallStatus": "REVIEW_REQUIRED",
       "blockedCount": 0,
-      "reviewCount": 6,
-      "passCount": 6,
+      "reviewCount": 2,
+      "passCount": 8,
+      "precheckInfoCount": 2,
       "findings": [
         {
           "ruleId": "PRE-A-BASIS-001",
           "severity": "INFO",
-          "status": "PASS",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding",
           "matchedText": null,
@@ -1717,7 +1727,7 @@
         {
           "ruleId": "PRE-F-AGE-001",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding.ageBandsRaw",
           "matchedText": null,
@@ -1739,24 +1749,24 @@
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 : 표시량 이상 [표시량 5,000,000,000 (50억)CFU/2g]",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 : 표시량 이상 [표시량 5,000,000,000 (50억)CFU/2g]",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 : 표시량 이상 [표시량 5,000,000,000 (50억)CFU/2g]",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 : 표시량 이상 [표시량 5,000,000,000 (50억)CFU/2g]",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "C-ABSENCE-NUMERIC-003",
@@ -1825,34 +1835,35 @@
           "suggestedAction": "표시량 규격 보장이면 PASS 입니다."
         },
         {
-          "ruleId": "H-MAKER-MISSING-005",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
+          "severity": "INFO",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": null,
-          "sourceEvidence": "ENTRPS=\"(주)오투바이오\"",
-          "message": "영어 초안에서 제조사 표기를 확인하십시오(영문 표기 사용 가능).",
-          "suggestedAction": "제조사 영문 표기가 정확한지 확인하십시오."
+          "sourceEvidence": "ENTRPS=\"(주)오투바이오\" / 공식 영문명 없음",
+          "message": "공식 영문 제조사명이 없어 한국어 법인명 보존 또는 음역 표기로 처리됐습니다.",
+          "suggestedAction": "음역 표기가 정책에 맞는지는 표본검수에서 확인하십시오(자동 판정 대상 아님)."
         }
       ]
     },
     {
       "candidateId": "pilot-probiotics-20:b4-drtrue-family",
       "productName": "닥터트루 프로바이오틱스 패밀리 생유산균",
-      "guardVersion": "product-description-guard@1.0.0",
-      "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "REVIEW_REQUIRED",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "PASS",
       "koEnStatus": "REVIEW_REQUIRED",
       "overallStatus": "REVIEW_REQUIRED",
       "blockedCount": 0,
-      "reviewCount": 5,
-      "passCount": 7,
+      "reviewCount": 1,
+      "passCount": 9,
+      "precheckInfoCount": 2,
       "findings": [
         {
           "ruleId": "PRE-A-BASIS-001",
           "severity": "INFO",
-          "status": "PASS",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding",
           "matchedText": null,
@@ -1863,7 +1874,7 @@
         {
           "ruleId": "PRE-F-AGE-001",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding.ageBandsRaw",
           "matchedText": null,
@@ -1885,24 +1896,24 @@
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량 (10,000,000,000(100억) cfu/2g) 이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수 : 표시량 (10,000,000,000(100억) cfu/2g) 이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량 (10,000,000,000(100억) cfu/2g) 이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수 : 표시량 (10,000,000,000(100억) cfu/2g) 이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -1971,34 +1982,35 @@
           "suggestedAction": "표시량 규격 보장이면 PASS 입니다."
         },
         {
-          "ruleId": "H-MAKER-MISSING-005",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
+          "severity": "INFO",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": null,
-          "sourceEvidence": "ENTRPS=\"(주)케비젠\"",
-          "message": "영어 초안에서 제조사 표기를 확인하십시오(영문 표기 사용 가능).",
-          "suggestedAction": "제조사 영문 표기가 정확한지 확인하십시오."
+          "sourceEvidence": "ENTRPS=\"(주)케비젠\" / 공식 영문명 없음",
+          "message": "공식 영문 제조사명이 없어 한국어 법인명 보존 또는 음역 표기로 처리됐습니다.",
+          "suggestedAction": "음역 표기가 정책에 맞는지는 표본검수에서 확인하십시오(자동 판정 대상 아님)."
         }
       ]
     },
     {
       "candidateId": "pilot-probiotics-20:b5-detente",
       "productName": "프로바이오티끄 디땅트",
-      "guardVersion": "product-description-guard@1.0.0",
-      "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "REVIEW_REQUIRED",
-      "koEnStatus": "REVIEW_REQUIRED",
-      "overallStatus": "REVIEW_REQUIRED",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "PASS",
+      "koEnStatus": "PASS",
+      "overallStatus": "PASS",
       "blockedCount": 0,
-      "reviewCount": 5,
-      "passCount": 6,
+      "reviewCount": 0,
+      "passCount": 9,
+      "precheckInfoCount": 2,
       "findings": [
         {
           "ruleId": "PRE-A-BASIS-001",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding",
           "matchedText": null,
@@ -2009,7 +2021,7 @@
         {
           "ruleId": "PRE-F-AGE-001",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding.ageBandsRaw",
           "matchedText": null,
@@ -2031,24 +2043,24 @@
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(30억 CFU/1,500 mg)이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수 : 표시량(30억 CFU/1,500 mg)이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(30억 CFU/1,500 mg)이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수 : 표시량(30억 CFU/1,500 mg)이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -2106,34 +2118,35 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "H-MAKER-MISSING-005",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
+          "severity": "INFO",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": null,
-          "sourceEvidence": "ENTRPS=\"(주)메디바이오랩\"",
-          "message": "영어 초안에서 제조사 표기를 확인하십시오(영문 표기 사용 가능).",
-          "suggestedAction": "제조사 영문 표기가 정확한지 확인하십시오."
+          "sourceEvidence": "ENTRPS=\"(주)메디바이오랩\" / 공식 영문명 없음",
+          "message": "공식 영문 제조사명이 없어 한국어 법인명 보존 또는 음역 표기로 처리됐습니다.",
+          "suggestedAction": "음역 표기가 정책에 맞는지는 표본검수에서 확인하십시오(자동 판정 대상 아님)."
         }
       ]
     },
     {
       "candidateId": "pilot-probiotics-20:c1-ongajok",
       "productName": "온가족 생유산균",
-      "guardVersion": "product-description-guard@1.0.0",
-      "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "REVIEW_REQUIRED",
-      "koEnStatus": "REVIEW_REQUIRED",
-      "overallStatus": "REVIEW_REQUIRED",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "PASS",
+      "koEnStatus": "PASS",
+      "overallStatus": "PASS",
       "blockedCount": 0,
-      "reviewCount": 5,
-      "passCount": 6,
+      "reviewCount": 0,
+      "passCount": 9,
+      "precheckInfoCount": 2,
       "findings": [
         {
           "ruleId": "PRE-A-BASIS-001",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding",
           "matchedText": null,
@@ -2144,7 +2157,7 @@
         {
           "ruleId": "PRE-F-AGE-001",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding.ageBandsRaw",
           "matchedText": null,
@@ -2166,24 +2179,24 @@
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(100,000,000(1억) cfu/2,000 mg) 이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수 : 표시량(100,000,000(1억) cfu/2,000 mg) 이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(100,000,000(1억) cfu/2,000 mg) 이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수 : 표시량(100,000,000(1억) cfu/2,000 mg) 이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -2241,34 +2254,35 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "H-MAKER-MISSING-005",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
+          "severity": "INFO",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": null,
-          "sourceEvidence": "ENTRPS=\"(주)뉴팜\"",
-          "message": "영어 초안에서 제조사 표기를 확인하십시오(영문 표기 사용 가능).",
-          "suggestedAction": "제조사 영문 표기가 정확한지 확인하십시오."
+          "sourceEvidence": "ENTRPS=\"(주)뉴팜\" / 공식 영문명 없음",
+          "message": "공식 영문 제조사명이 없어 한국어 법인명 보존 또는 음역 표기로 처리됐습니다.",
+          "suggestedAction": "음역 표기가 정책에 맞는지는 표본검수에서 확인하십시오(자동 판정 대상 아님)."
         }
       ]
     },
     {
       "candidateId": "pilot-probiotics-20:c2-hygeia",
       "productName": "히게이아혼합유산균",
-      "guardVersion": "product-description-guard@1.0.0",
-      "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "REVIEW_REQUIRED",
-      "koEnStatus": "REVIEW_REQUIRED",
-      "overallStatus": "REVIEW_REQUIRED",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "PASS",
+      "koEnStatus": "PASS",
+      "overallStatus": "PASS",
       "blockedCount": 0,
-      "reviewCount": 5,
-      "passCount": 6,
+      "reviewCount": 0,
+      "passCount": 9,
+      "precheckInfoCount": 2,
       "findings": [
         {
           "ruleId": "PRE-A-BASIS-001",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding",
           "matchedText": null,
@@ -2279,7 +2293,7 @@
         {
           "ruleId": "PRE-F-AGE-001",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding.ageBandsRaw",
           "matchedText": null,
@@ -2301,24 +2315,24 @@
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(3,000,000,000(30억) CFU/2000mg) 이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수 : 표시량(3,000,000,000(30억) CFU/2000mg) 이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(3,000,000,000(30억) CFU/2000mg) 이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수 : 표시량(3,000,000,000(30억) CFU/2000mg) 이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -2376,34 +2390,35 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "H-MAKER-MISSING-005",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
+          "severity": "INFO",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": null,
-          "sourceEvidence": "ENTRPS=\"주식회사 노바렉스\"",
-          "message": "영어 초안에서 제조사 표기를 확인하십시오(영문 표기 사용 가능).",
-          "suggestedAction": "제조사 영문 표기가 정확한지 확인하십시오."
+          "sourceEvidence": "ENTRPS=\"주식회사 노바렉스\" / 공식 영문명 없음",
+          "message": "공식 영문 제조사명이 없어 한국어 법인명 보존 또는 음역 표기로 처리됐습니다.",
+          "suggestedAction": "음역 표기가 정책에 맞는지는 표본검수에서 확인하십시오(자동 판정 대상 아님)."
         }
       ]
     },
     {
       "candidateId": "pilot-probiotics-20:c3-qup",
       "productName": "큐업",
-      "guardVersion": "product-description-guard@1.0.0",
-      "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "REVIEW_REQUIRED",
-      "koEnStatus": "REVIEW_REQUIRED",
-      "overallStatus": "REVIEW_REQUIRED",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "PASS",
+      "koEnStatus": "PASS",
+      "overallStatus": "PASS",
       "blockedCount": 0,
-      "reviewCount": 5,
-      "passCount": 6,
+      "reviewCount": 0,
+      "passCount": 9,
+      "precheckInfoCount": 2,
       "findings": [
         {
           "ruleId": "PRE-A-BASIS-001",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding",
           "matchedText": null,
@@ -2414,7 +2429,7 @@
         {
           "ruleId": "PRE-F-AGE-001",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding.ageBandsRaw",
           "matchedText": null,
@@ -2436,24 +2451,24 @@
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량{10,000,000,000(100억) CFU/2g} 이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수 : 표시량{10,000,000,000(100억) CFU/2g} 이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량{10,000,000,000(100억) CFU/2g} 이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수 : 표시량{10,000,000,000(100억) CFU/2g} 이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -2511,34 +2526,35 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "H-MAKER-MISSING-005",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
+          "severity": "INFO",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": null,
-          "sourceEvidence": "ENTRPS=\"(주)메디오젠 충주공장\"",
-          "message": "영어 초안에서 제조사 표기를 확인하십시오(영문 표기 사용 가능).",
-          "suggestedAction": "제조사 영문 표기가 정확한지 확인하십시오."
+          "sourceEvidence": "ENTRPS=\"(주)메디오젠 충주공장\" / 공식 영문명 없음",
+          "message": "공식 영문 제조사명이 없어 한국어 법인명 보존 또는 음역 표기로 처리됐습니다.",
+          "suggestedAction": "음역 표기가 정책에 맞는지는 표본검수에서 확인하십시오(자동 판정 대상 아님)."
         }
       ]
     },
     {
       "candidateId": "pilot-probiotics-20:c4-odaldal-kids",
       "productName": "오달달 키즈 유산균",
-      "guardVersion": "product-description-guard@1.0.0",
-      "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "REVIEW_REQUIRED",
-      "koEnStatus": "REVIEW_REQUIRED",
-      "overallStatus": "REVIEW_REQUIRED",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "PASS",
+      "koEnStatus": "PASS",
+      "overallStatus": "PASS",
       "blockedCount": 0,
-      "reviewCount": 5,
-      "passCount": 6,
+      "reviewCount": 0,
+      "passCount": 9,
+      "precheckInfoCount": 2,
       "findings": [
         {
           "ruleId": "PRE-A-BASIS-001",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding",
           "matchedText": null,
@@ -2549,7 +2565,7 @@
         {
           "ruleId": "PRE-F-AGE-001",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding.ageBandsRaw",
           "matchedText": null,
@@ -2571,24 +2587,24 @@
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(5,000,000,000(50억) CFU/2g) 이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수 : 표시량(5,000,000,000(50억) CFU/2g) 이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(5,000,000,000(50억) CFU/2g) 이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수 : 표시량(5,000,000,000(50억) CFU/2g) 이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -2646,34 +2662,35 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "H-MAKER-MISSING-005",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
+          "severity": "INFO",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": null,
-          "sourceEvidence": "ENTRPS=\"(주)신비바이오\"",
-          "message": "영어 초안에서 제조사 표기를 확인하십시오(영문 표기 사용 가능).",
-          "suggestedAction": "제조사 영문 표기가 정확한지 확인하십시오."
+          "sourceEvidence": "ENTRPS=\"(주)신비바이오\" / 공식 영문명 없음",
+          "message": "공식 영문 제조사명이 없어 한국어 법인명 보존 또는 음역 표기로 처리됐습니다.",
+          "suggestedAction": "음역 표기가 정책에 맞는지는 표본검수에서 확인하십시오(자동 판정 대상 아님)."
         }
       ]
     },
     {
       "candidateId": "pilot-probiotics-20:c5-sleemoon-kids",
       "productName": "슬리문 키즈 30억 유산균",
-      "guardVersion": "product-description-guard@1.0.0",
-      "preGuardStatus": "REVIEW_REQUIRED",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
       "postGuardStatus": "REVIEW_REQUIRED",
       "koEnStatus": "REVIEW_REQUIRED",
       "overallStatus": "REVIEW_REQUIRED",
       "blockedCount": 0,
-      "reviewCount": 6,
-      "passCount": 6,
+      "reviewCount": 2,
+      "passCount": 8,
+      "precheckInfoCount": 2,
       "findings": [
         {
           "ruleId": "PRE-A-BASIS-001",
           "severity": "INFO",
-          "status": "PASS",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding",
           "matchedText": null,
@@ -2684,7 +2701,7 @@
         {
           "ruleId": "PRE-F-AGE-001",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding.ageBandsRaw",
           "matchedText": null,
@@ -2706,24 +2723,24 @@
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 : 표시량(3,000,000,000(30억) CFU/1,000mg)이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 : 표시량(3,000,000,000(30억) CFU/1,000mg)이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 : 표시량(3,000,000,000(30억) CFU/1,000mg)이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 : 표시량(3,000,000,000(30억) CFU/1,000mg)이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "C-ABSENCE-NUMERIC-003",
@@ -2792,34 +2809,35 @@
           "suggestedAction": "표시량 규격 보장이면 PASS 입니다."
         },
         {
-          "ruleId": "H-MAKER-MISSING-005",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
+          "severity": "INFO",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": null,
-          "sourceEvidence": "ENTRPS=\"주식회사 피비에이치바이오\"",
-          "message": "영어 초안에서 제조사 표기를 확인하십시오(영문 표기 사용 가능).",
-          "suggestedAction": "제조사 영문 표기가 정확한지 확인하십시오."
+          "sourceEvidence": "ENTRPS=\"주식회사 피비에이치바이오\" / 공식 영문명 없음",
+          "message": "공식 영문 제조사명이 없어 한국어 법인명 보존 또는 음역 표기로 처리됐습니다.",
+          "suggestedAction": "음역 표기가 정책에 맞는지는 표본검수에서 확인하십시오(자동 판정 대상 아님)."
         }
       ]
     },
     {
       "candidateId": "pilot-probiotics-20:d1-janggeonkang",
       "productName": "장건강 프로바이오틱스",
-      "guardVersion": "product-description-guard@1.0.0",
-      "preGuardStatus": "REVIEW_REQUIRED",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
       "postGuardStatus": "REVIEW_REQUIRED",
-      "koEnStatus": "REVIEW_REQUIRED",
+      "koEnStatus": "PASS",
       "overallStatus": "REVIEW_REQUIRED",
       "blockedCount": 0,
-      "reviewCount": 6,
-      "passCount": 5,
+      "reviewCount": 1,
+      "passCount": 8,
+      "precheckInfoCount": 2,
       "findings": [
         {
           "ruleId": "PRE-A-BASIS-001",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding",
           "matchedText": null,
@@ -2830,7 +2848,7 @@
         {
           "ruleId": "PRE-F-AGE-001",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding.ageBandsRaw",
           "matchedText": null,
@@ -2852,24 +2870,24 @@
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱 수 : 표시량 100,000,000 CFU/1,400 mg)이상 / 성상 : 흰노랑색의 타원형 츄어블 정제",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱 수 : 표시량 100,000,000 CFU/1,400 mg)이상 / 성상 : 흰노랑색의 타원형 …",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱 수 : 표시량 100,000,000 CFU/1,400 mg)이상 / 성상 : 흰노랑색의 타원형 츄어블 정제",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱 수 : 표시량 100,000,000 CFU/1,400 mg)이상 / 성상 : 흰노랑색의 타원형 …",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "C-ABSENCE-CONTRAST-005",
@@ -2927,34 +2945,35 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "H-MAKER-MISSING-005",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
+          "severity": "INFO",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": null,
-          "sourceEvidence": "ENTRPS=\"에스에스바이오팜(주)\"",
-          "message": "영어 초안에서 제조사 표기를 확인하십시오(영문 표기 사용 가능).",
-          "suggestedAction": "제조사 영문 표기가 정확한지 확인하십시오."
+          "sourceEvidence": "ENTRPS=\"에스에스바이오팜(주)\" / 공식 영문명 없음",
+          "message": "공식 영문 제조사명이 없어 한국어 법인명 보존 또는 음역 표기로 처리됐습니다.",
+          "suggestedAction": "음역 표기가 정책에 맞는지는 표본검수에서 확인하십시오(자동 판정 대상 아님)."
         }
       ]
     },
     {
       "candidateId": "pilot-probiotics-20:d2-dolphini",
       "productName": "돌피니 유산균 츄어블",
-      "guardVersion": "product-description-guard@1.0.0",
-      "preGuardStatus": "REVIEW_REQUIRED",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
       "postGuardStatus": "REVIEW_REQUIRED",
-      "koEnStatus": "REVIEW_REQUIRED",
+      "koEnStatus": "PASS",
       "overallStatus": "REVIEW_REQUIRED",
       "blockedCount": 0,
-      "reviewCount": 6,
-      "passCount": 5,
+      "reviewCount": 1,
+      "passCount": 8,
+      "precheckInfoCount": 2,
       "findings": [
         {
           "ruleId": "PRE-A-BASIS-001",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding",
           "matchedText": null,
@@ -2965,7 +2984,7 @@
         {
           "ruleId": "PRE-F-AGE-001",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding.ageBandsRaw",
           "matchedText": null,
@@ -2987,24 +3006,24 @@
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(100,000,000 CFU/2000㎎) 이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수 : 표시량(100,000,000 CFU/2000㎎) 이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(100,000,000 CFU/2000㎎) 이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수 : 표시량(100,000,000 CFU/2000㎎) 이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "C-ABSENCE-CONTRAST-005",
@@ -3062,34 +3081,35 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "H-MAKER-MISSING-005",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
+          "severity": "INFO",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": null,
-          "sourceEvidence": "ENTRPS=\"주)팜크로스\"",
-          "message": "영어 초안에서 제조사 표기를 확인하십시오(영문 표기 사용 가능).",
-          "suggestedAction": "제조사 영문 표기가 정확한지 확인하십시오."
+          "sourceEvidence": "ENTRPS=\"주)팜크로스\" / 공식 영문명 없음",
+          "message": "공식 영문 제조사명이 없어 한국어 법인명 보존 또는 음역 표기로 처리됐습니다.",
+          "suggestedAction": "음역 표기가 정책에 맞는지는 표본검수에서 확인하십시오(자동 판정 대상 아님)."
         }
       ]
     },
     {
       "candidateId": "pilot-probiotics-20:d3-dinokids",
       "productName": "디노키즈생유산균",
-      "guardVersion": "product-description-guard@1.0.0",
-      "preGuardStatus": "REVIEW_REQUIRED",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
       "postGuardStatus": "REVIEW_REQUIRED",
-      "koEnStatus": "REVIEW_REQUIRED",
+      "koEnStatus": "PASS",
       "overallStatus": "REVIEW_REQUIRED",
       "blockedCount": 0,
-      "reviewCount": 5,
-      "passCount": 7,
+      "reviewCount": 1,
+      "passCount": 9,
+      "precheckInfoCount": 2,
       "findings": [
         {
           "ruleId": "PRE-A-BASIS-001",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding",
           "matchedText": null,
@@ -3100,7 +3120,7 @@
         {
           "ruleId": "PRE-F-AGE-001",
           "severity": "INFO",
-          "status": "PASS",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding.ageBandsRaw",
           "matchedText": "9세 이상 및 성인 : 1일 2~3회, 1회 1포 / 4-9세 어린이 : 1일 2회, 1회 1포 / 6개월-4세 어린이 : 1…",
@@ -3133,24 +3153,24 @@
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(10,000,000,000 (100억) CFU / 2g) 이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수 : 표시량(10,000,000,000 (100억) CFU / 2g) 이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(10,000,000,000 (100억) CFU / 2g) 이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수 : 표시량(10,000,000,000 (100억) CFU / 2g) 이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -3208,34 +3228,35 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "H-MAKER-MISSING-005",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
+          "severity": "INFO",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": null,
-          "sourceEvidence": "ENTRPS=\"조아제약(주)\"",
-          "message": "영어 초안에서 제조사 표기를 확인하십시오(영문 표기 사용 가능).",
-          "suggestedAction": "제조사 영문 표기가 정확한지 확인하십시오."
+          "sourceEvidence": "ENTRPS=\"조아제약(주)\" / 공식 영문명 없음",
+          "message": "공식 영문 제조사명이 없어 한국어 법인명 보존 또는 음역 표기로 처리됐습니다.",
+          "suggestedAction": "음역 표기가 정책에 맞는지는 표본검수에서 확인하십시오(자동 판정 대상 아님)."
         }
       ]
     },
     {
       "candidateId": "pilot-probiotics-20:d4-alpha",
       "productName": "생유산균 알파",
-      "guardVersion": "product-description-guard@1.0.0",
-      "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "REVIEW_REQUIRED",
-      "koEnStatus": "REVIEW_REQUIRED",
-      "overallStatus": "REVIEW_REQUIRED",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "PASS",
+      "koEnStatus": "PASS",
+      "overallStatus": "PASS",
       "blockedCount": 0,
-      "reviewCount": 5,
-      "passCount": 6,
+      "reviewCount": 0,
+      "passCount": 9,
+      "precheckInfoCount": 2,
       "findings": [
         {
           "ruleId": "PRE-A-BASIS-001",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding",
           "matchedText": null,
@@ -3246,7 +3267,7 @@
         {
           "ruleId": "PRE-F-AGE-001",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding.ageBandsRaw",
           "matchedText": null,
@@ -3268,24 +3289,24 @@
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수: 300,000,000CFU / 6,000mg (표시량이상)",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수: 300,000,000CFU / 6,000mg (표시량이상)",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수: 300,000,000CFU / 6,000mg (표시량이상)",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수: 300,000,000CFU / 6,000mg (표시량이상)",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -3343,34 +3364,35 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "H-MAKER-MISSING-005",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
+          "severity": "INFO",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": null,
-          "sourceEvidence": "ENTRPS=\"경남제약(주)\"",
-          "message": "영어 초안에서 제조사 표기를 확인하십시오(영문 표기 사용 가능).",
-          "suggestedAction": "제조사 영문 표기가 정확한지 확인하십시오."
+          "sourceEvidence": "ENTRPS=\"경남제약(주)\" / 공식 영문명 없음",
+          "message": "공식 영문 제조사명이 없어 한국어 법인명 보존 또는 음역 표기로 처리됐습니다.",
+          "suggestedAction": "음역 표기가 정책에 맞는지는 표본검수에서 확인하십시오(자동 판정 대상 아님)."
         }
       ]
     },
     {
       "candidateId": "pilot-probiotics-20:d5-viva-bifido",
       "productName": "비바 비피도 플러스",
-      "guardVersion": "product-description-guard@1.0.0",
-      "preGuardStatus": "REVIEW_REQUIRED",
-      "postGuardStatus": "REVIEW_REQUIRED",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "PASS",
       "koEnStatus": "REVIEW_REQUIRED",
       "overallStatus": "REVIEW_REQUIRED",
       "blockedCount": 0,
-      "reviewCount": 5,
-      "passCount": 7,
+      "reviewCount": 1,
+      "passCount": 9,
+      "precheckInfoCount": 2,
       "findings": [
         {
           "ruleId": "PRE-A-BASIS-001",
           "severity": "INFO",
-          "status": "PASS",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding",
           "matchedText": null,
@@ -3381,7 +3403,7 @@
         {
           "ruleId": "PRE-F-AGE-001",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "PRECHECK_INFO",
           "language": "n/a",
           "field": "grounding.ageBandsRaw",
           "matchedText": null,
@@ -3403,24 +3425,24 @@
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(1,000,000,000(10억) CFU/5,000mg) 표시량 이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수 : 표시량(1,000,000,000(10억) CFU/5,000mg) 표시량 이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "B-SPEC-MINMAX-003",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": "at least",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(1,000,000,000(10억) CFU/5,000mg) 표시량 이상",
-          "message": "규격 최소·최대치 표현입니다(\"at least\") — 공식 규격(\"…이상\")의 번역인지 확인하십시오.",
-          "suggestedAction": "표시량 규격의 번역이면 PASS 입니다. 제품 비교면 삭제하십시오."
+          "sourceEvidence": "BASE_STANDARD 규격 하한 존재: 프로바이오틱스 수 : 표시량(1,000,000,000(10억) CFU/5,000mg) 표시량 이상",
+          "message": "공식 규격 인용입니다(\"at least\") — BASE_STANDARD 의 \"…이상\" 에 대응.",
+          "suggestedAction": "조치 불요(규격 인용)."
         },
         {
           "ruleId": "C-ABSENCE-AS-PERMISSION-001",
@@ -3489,15 +3511,15 @@
           "suggestedAction": "표시량 규격 보장이면 PASS 입니다."
         },
         {
-          "ruleId": "H-MAKER-MISSING-005",
-          "severity": "WARNING",
-          "status": "REVIEW_REQUIRED",
+          "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
+          "severity": "INFO",
+          "status": "INFO",
           "language": "en",
           "field": "enDraft",
           "matchedText": null,
-          "sourceEvidence": "ENTRPS=\"주식회사 제이비케이랩\"",
-          "message": "영어 초안에서 제조사 표기를 확인하십시오(영문 표기 사용 가능).",
-          "suggestedAction": "제조사 영문 표기가 정확한지 확인하십시오."
+          "sourceEvidence": "ENTRPS=\"주식회사 제이비케이랩\" / 공식 영문명 없음",
+          "message": "공식 영문 제조사명이 없어 한국어 법인명 보존 또는 음역 표기로 처리됐습니다.",
+          "suggestedAction": "음역 표기가 정책에 맞는지는 표본검수에서 확인하십시오(자동 판정 대상 아님)."
         }
       ]
     }

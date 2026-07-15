@@ -21,7 +21,19 @@
 
 // ─── 결과 ────────────────────────────────────────────────────────────────────
 
-export type GuardStatus = 'PASS' | 'REVIEW_REQUIRED' | 'BLOCKED' | 'NOT_APPLICABLE';
+/**
+ * PRECHECK_INFO (V1.1) — **작성 전 가드의 상태 고지**.
+ *   작성 전 가드는 위반을 검출하는 단계가 아니라 "작성자가 반드시 확인해야 할 상태"를 알리는 단계다.
+ *   따라서 **최종 REVIEW 집계에 합산하지 않는다**(검수자가 실제 위험에 집중하도록).
+ *   위험도 순: BLOCKED > REVIEW_REQUIRED > PASS/INFO > PRECHECK_INFO > NOT_APPLICABLE
+ */
+export type GuardStatus =
+  | 'PASS'
+  | 'INFO'
+  | 'PRECHECK_INFO'
+  | 'REVIEW_REQUIRED'
+  | 'BLOCKED'
+  | 'NOT_APPLICABLE';
 export type GuardSeverity = 'ERROR' | 'WARNING' | 'INFO';
 export type GuardLanguage = 'ko' | 'en' | 'both' | 'n/a';
 export type GuardPhase = 'pre' | 'post' | 'bilingual';
@@ -53,6 +65,8 @@ export interface GuardProductResult {
   blockedCount: number;
   reviewCount: number;
   passCount: number;
+  /** 작성 전 상태 고지 수 — 최종 REVIEW 집계에 포함되지 않음 */
+  precheckInfoCount: number;
   findings: GuardFinding[];
 }
 
@@ -118,7 +132,13 @@ export interface GuardSourceInput {
 export interface GuardProductInput {
   candidateId: string;
   productName: string;
+  /** 공식 제조사명(ENTRPS, 한국어 법인명) */
   manufacturer: string;
+  /**
+   * 공식 영문 제조사명. **없으면 생략/null** — 가드는 영문명을 **창작하지 않는다**.
+   * 있으면 en 초안과 정확히 대조. 없으면 en 에 제조사 표기 존재 여부만 확인(INFO).
+   */
+  manufacturerEn?: string | null;
   statementNo: string;
   source: GuardSourceInput;
   grounding: GroundingInput;
@@ -136,4 +156,9 @@ export interface GuardOptions {
   strict?: boolean;
 }
 
-export const GUARD_VERSION = 'product-description-guard@1.0.0';
+/**
+ * 1.1.0 — REVIEW 튜닝(WO-O4O-PRODUCT-DESCRIPTION-GROUNDING-GUARD-REVIEW-TUNING-V1).
+ *   위험 신호(BLOCKED/REVIEW_REQUIRED)와 정보성·형식성 신호(INFO/PRECHECK_INFO)를 분리.
+ *   **검출을 약화한 것이 아니라** 사람이 실제 위험에 집중하도록 분류를 바꾼 것이다.
+ */
+export const GUARD_VERSION = 'product-description-guard@1.1.0';
