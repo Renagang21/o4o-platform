@@ -1,11 +1,12 @@
 {
   "guardVersion": "product-description-guard@1.1.0",
   "totalProducts": 25,
-  "pass": 17,
-  "reviewRequired": 8,
+  "pass": 11,
+  "reviewRequired": 14,
   "blocked": 0,
   "findingsByRule": {
     "B-SPEC-MINMAX-003": 1,
+    "D-STORAGE-UNGROUNDED-010": 8,
     "C-ABSENCE-SOFT-004": 1,
     "B-SUPERLATIVE-CONTEXT-002": 2,
     "C-ABSENCE-NUMERIC-003": 2,
@@ -344,12 +345,12 @@
       "productName": "뉴로랩스 덴마크 유산균",
       "guardVersion": "product-description-guard@1.1.0",
       "preGuardStatus": "PASS",
-      "postGuardStatus": "PASS",
+      "postGuardStatus": "REVIEW_REQUIRED",
       "koEnStatus": "PASS",
-      "overallStatus": "PASS",
+      "overallStatus": "REVIEW_REQUIRED",
       "blockedCount": 0,
-      "reviewCount": 0,
-      "passCount": 10,
+      "reviewCount": 1,
+      "passCount": 9,
       "precheckInfoCount": 3,
       "findings": [
         {
@@ -441,15 +442,15 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "D-CLAIM-UNGROUNDED-001",
-          "severity": "INFO",
-          "status": "PASS",
-          "language": "n/a",
-          "field": "drafts",
-          "matchedText": null,
-          "sourceEvidence": null,
-          "message": "근거 없는 제품 주장 검출 없음",
-          "suggestedAction": "조치 불요"
+          "ruleId": "D-STORAGE-UNGROUNDED-010",
+          "severity": "WARNING",
+          "status": "REVIEW_REQUIRED",
+          "language": "ko",
+          "field": "koDraft",
+          "matchedText": "보관 조건 서술",
+          "sourceEvidence": "PRSRV_PD 미제공",
+          "message": "보관 조건을 기술했으나 원문 보관 정보가 입력되지 않았습니다.",
+          "suggestedAction": "PRSRV_PD 를 source.storage 로 넣어 검증하십시오."
         },
         {
           "ruleId": "E-NAME-DERIVED-001",
@@ -664,8 +665,8 @@
       "koEnStatus": "PASS",
       "overallStatus": "REVIEW_REQUIRED",
       "blockedCount": 0,
-      "reviewCount": 1,
-      "passCount": 10,
+      "reviewCount": 2,
+      "passCount": 9,
       "precheckInfoCount": 3,
       "findings": [
         {
@@ -768,15 +769,15 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "D-CLAIM-UNGROUNDED-001",
-          "severity": "INFO",
-          "status": "PASS",
-          "language": "n/a",
-          "field": "drafts",
-          "matchedText": null,
-          "sourceEvidence": null,
-          "message": "근거 없는 제품 주장 검출 없음",
-          "suggestedAction": "조치 불요"
+          "ruleId": "D-STORAGE-UNGROUNDED-010",
+          "severity": "WARNING",
+          "status": "REVIEW_REQUIRED",
+          "language": "ko",
+          "field": "koDraft",
+          "matchedText": "보관 조건 서술",
+          "sourceEvidence": "PRSRV_PD 미제공",
+          "message": "보관 조건을 기술했으나 원문 보관 정보가 입력되지 않았습니다.",
+          "suggestedAction": "PRSRV_PD 를 source.storage 로 넣어 검증하십시오."
         },
         {
           "ruleId": "E-NAME-DERIVED-001",
@@ -987,12 +988,12 @@
       "productName": "락토필엔테로 비움",
       "guardVersion": "product-description-guard@1.1.0",
       "preGuardStatus": "PASS",
-      "postGuardStatus": "PASS",
+      "postGuardStatus": "REVIEW_REQUIRED",
       "koEnStatus": "PASS",
-      "overallStatus": "PASS",
+      "overallStatus": "REVIEW_REQUIRED",
       "blockedCount": 0,
-      "reviewCount": 0,
-      "passCount": 10,
+      "reviewCount": 1,
+      "passCount": 9,
       "precheckInfoCount": 3,
       "findings": [
         {
@@ -1084,15 +1085,15 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "D-CLAIM-UNGROUNDED-001",
-          "severity": "INFO",
-          "status": "PASS",
-          "language": "n/a",
-          "field": "drafts",
-          "matchedText": null,
-          "sourceEvidence": null,
-          "message": "근거 없는 제품 주장 검출 없음",
-          "suggestedAction": "조치 불요"
+          "ruleId": "D-STORAGE-UNGROUNDED-010",
+          "severity": "WARNING",
+          "status": "REVIEW_REQUIRED",
+          "language": "ko",
+          "field": "koDraft",
+          "matchedText": "보관 조건 서술",
+          "sourceEvidence": "PRSRV_PD 미제공",
+          "message": "보관 조건을 기술했으나 원문 보관 정보가 입력되지 않았습니다.",
+          "suggestedAction": "PRSRV_PD 를 source.storage 로 넣어 검증하십시오."
         },
         {
           "ruleId": "E-NAME-DERIVED-001",
@@ -1461,12 +1462,12 @@
       "productName": "비피스앤(N)",
       "guardVersion": "product-description-guard@1.1.0",
       "preGuardStatus": "PASS",
-      "postGuardStatus": "PASS",
+      "postGuardStatus": "REVIEW_REQUIRED",
       "koEnStatus": "PASS",
-      "overallStatus": "PASS",
+      "overallStatus": "REVIEW_REQUIRED",
       "blockedCount": 0,
-      "reviewCount": 0,
-      "passCount": 10,
+      "reviewCount": 1,
+      "passCount": 9,
       "precheckInfoCount": 3,
       "findings": [
         {
@@ -1558,15 +1559,15 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "D-CLAIM-UNGROUNDED-001",
-          "severity": "INFO",
-          "status": "PASS",
-          "language": "n/a",
-          "field": "drafts",
-          "matchedText": null,
-          "sourceEvidence": null,
-          "message": "근거 없는 제품 주장 검출 없음",
-          "suggestedAction": "조치 불요"
+          "ruleId": "D-STORAGE-UNGROUNDED-010",
+          "severity": "WARNING",
+          "status": "REVIEW_REQUIRED",
+          "language": "ko",
+          "field": "koDraft",
+          "matchedText": "보관 조건 서술",
+          "sourceEvidence": "PRSRV_PD 미제공",
+          "message": "보관 조건을 기술했으나 원문 보관 정보가 입력되지 않았습니다.",
+          "suggestedAction": "PRSRV_PD 를 source.storage 로 넣어 검증하십시오."
         },
         {
           "ruleId": "E-NAME-DERIVED-001",
@@ -1777,12 +1778,12 @@
       "productName": "닥터파이토 비피아이 유산균",
       "guardVersion": "product-description-guard@1.1.0",
       "preGuardStatus": "PASS",
-      "postGuardStatus": "PASS",
+      "postGuardStatus": "REVIEW_REQUIRED",
       "koEnStatus": "PASS",
-      "overallStatus": "PASS",
+      "overallStatus": "REVIEW_REQUIRED",
       "blockedCount": 0,
-      "reviewCount": 0,
-      "passCount": 10,
+      "reviewCount": 1,
+      "passCount": 9,
       "precheckInfoCount": 3,
       "findings": [
         {
@@ -1874,15 +1875,15 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "D-CLAIM-UNGROUNDED-001",
-          "severity": "INFO",
-          "status": "PASS",
-          "language": "n/a",
-          "field": "drafts",
-          "matchedText": null,
-          "sourceEvidence": null,
-          "message": "근거 없는 제품 주장 검출 없음",
-          "suggestedAction": "조치 불요"
+          "ruleId": "D-STORAGE-UNGROUNDED-010",
+          "severity": "WARNING",
+          "status": "REVIEW_REQUIRED",
+          "language": "ko",
+          "field": "koDraft",
+          "matchedText": "보관 조건 서술",
+          "sourceEvidence": "PRSRV_PD 미제공",
+          "message": "보관 조건을 기술했으나 원문 보관 정보가 입력되지 않았습니다.",
+          "suggestedAction": "PRSRV_PD 를 source.storage 로 넣어 검증하십시오."
         },
         {
           "ruleId": "E-NAME-DERIVED-001",
@@ -2093,12 +2094,12 @@
       "productName": "닥터트루 프로바이오틱스 패밀리 생유산균",
       "guardVersion": "product-description-guard@1.1.0",
       "preGuardStatus": "PASS",
-      "postGuardStatus": "PASS",
+      "postGuardStatus": "REVIEW_REQUIRED",
       "koEnStatus": "PASS",
-      "overallStatus": "PASS",
+      "overallStatus": "REVIEW_REQUIRED",
       "blockedCount": 0,
-      "reviewCount": 0,
-      "passCount": 10,
+      "reviewCount": 1,
+      "passCount": 9,
       "precheckInfoCount": 3,
       "findings": [
         {
@@ -2190,15 +2191,15 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "D-CLAIM-UNGROUNDED-001",
-          "severity": "INFO",
-          "status": "PASS",
-          "language": "n/a",
-          "field": "drafts",
-          "matchedText": null,
-          "sourceEvidence": null,
-          "message": "근거 없는 제품 주장 검출 없음",
-          "suggestedAction": "조치 불요"
+          "ruleId": "D-STORAGE-UNGROUNDED-010",
+          "severity": "WARNING",
+          "status": "REVIEW_REQUIRED",
+          "language": "ko",
+          "field": "koDraft",
+          "matchedText": "보관 조건 서술",
+          "sourceEvidence": "PRSRV_PD 미제공",
+          "message": "보관 조건을 기술했으나 원문 보관 정보가 입력되지 않았습니다.",
+          "suggestedAction": "PRSRV_PD 를 source.storage 로 넣어 검증하십시오."
         },
         {
           "ruleId": "E-NAME-DERIVED-001",
@@ -2725,12 +2726,12 @@
       "productName": "큐업",
       "guardVersion": "product-description-guard@1.1.0",
       "preGuardStatus": "PASS",
-      "postGuardStatus": "PASS",
+      "postGuardStatus": "REVIEW_REQUIRED",
       "koEnStatus": "PASS",
-      "overallStatus": "PASS",
+      "overallStatus": "REVIEW_REQUIRED",
       "blockedCount": 0,
-      "reviewCount": 0,
-      "passCount": 10,
+      "reviewCount": 1,
+      "passCount": 9,
       "precheckInfoCount": 3,
       "findings": [
         {
@@ -2822,15 +2823,15 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "D-CLAIM-UNGROUNDED-001",
-          "severity": "INFO",
-          "status": "PASS",
-          "language": "n/a",
-          "field": "drafts",
-          "matchedText": null,
-          "sourceEvidence": null,
-          "message": "근거 없는 제품 주장 검출 없음",
-          "suggestedAction": "조치 불요"
+          "ruleId": "D-STORAGE-UNGROUNDED-010",
+          "severity": "WARNING",
+          "status": "REVIEW_REQUIRED",
+          "language": "ko",
+          "field": "koDraft",
+          "matchedText": "보관 조건 서술",
+          "sourceEvidence": "PRSRV_PD 미제공",
+          "message": "보관 조건을 기술했으나 원문 보관 정보가 입력되지 않았습니다.",
+          "suggestedAction": "PRSRV_PD 를 source.storage 로 넣어 검증하십시오."
         },
         {
           "ruleId": "E-NAME-DERIVED-001",
@@ -3519,8 +3520,8 @@
       "koEnStatus": "PASS",
       "overallStatus": "REVIEW_REQUIRED",
       "blockedCount": 0,
-      "reviewCount": 1,
-      "passCount": 10,
+      "reviewCount": 2,
+      "passCount": 9,
       "precheckInfoCount": 3,
       "findings": [
         {
@@ -3623,15 +3624,15 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "D-CLAIM-UNGROUNDED-001",
-          "severity": "INFO",
-          "status": "PASS",
-          "language": "n/a",
-          "field": "drafts",
-          "matchedText": null,
-          "sourceEvidence": null,
-          "message": "근거 없는 제품 주장 검출 없음",
-          "suggestedAction": "조치 불요"
+          "ruleId": "D-STORAGE-UNGROUNDED-010",
+          "severity": "WARNING",
+          "status": "REVIEW_REQUIRED",
+          "language": "ko",
+          "field": "koDraft",
+          "matchedText": "보관 조건 서술",
+          "sourceEvidence": "PRSRV_PD 미제공",
+          "message": "보관 조건을 기술했으나 원문 보관 정보가 입력되지 않았습니다.",
+          "suggestedAction": "PRSRV_PD 를 source.storage 로 넣어 검증하십시오."
         },
         {
           "ruleId": "E-NAME-DERIVED-001",

@@ -129,6 +129,14 @@ export interface GuardSourceInput {
   intake: string;
   caution: string;
   dosageForm: string;
+  /**
+   * 보관 조건 원문(PRSRV_PD). **30-B 에서 발견된 구멍**: 이 필드가 없어서 초안의 보관 서술
+   * ("실온 보관", "냉장 보관", "냉장 불필요")을 가드가 검증할 수 없었다.
+   * 실측: `생생락 유산균` 은 원문이 **냉장(0~10도)** 을 지시한다 — 실온이라 단정하면 위반이다.
+   */
+  storage?: string;
+  /** 유통기한 원문(DISTB_PD) */
+  shelfLife?: string;
 }
 
 /** 표시 CFU 절대값. 작성 전 가드가 **원문 파싱값과 교차 검증**한다(불일치 = BLOCKED). */

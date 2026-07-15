@@ -297,7 +297,8 @@ const CONTRAST_CONTEXT = /(씹어|츄어블|장용|이중\s*캡슐)/;
 
 export function ruleC(input: GuardProductInput): GuardFinding[] {
   const out: GuardFinding[] = [];
-  const src = `${input.source.baseStandard} ${input.source.intake} ${input.source.caution} ${input.source.dosageForm}`;
+  // 보관·유통기한 원문 포함 — 없으면 "냉장 불필요" 같은 보관 주장을 검증할 수 없다(30-B).
+  const src = `${input.source.baseStandard} ${input.source.intake} ${input.source.caution} ${input.source.dosageForm} ${input.source.storage ?? ''} ${input.source.shelfLife ?? ''}`;
   const scan = (text: string, re: RegExp, lang: 'ko' | 'en', field: string) => {
     for (const m of matchAll(re, text)) {
       const ctx = contextAround(text, m.index, 45);
@@ -375,7 +376,8 @@ const CLAIM_EN: Array<[RegExp, string]> = [
 
 export function ruleD(input: GuardProductInput): GuardFinding[] {
   const out: GuardFinding[] = [];
-  const src = `${input.source.baseStandard} ${input.source.intake} ${input.source.caution} ${input.source.dosageForm}`;
+  // 보관·유통기한 원문 포함 — 없으면 "냉장 불필요" 같은 보관 주장을 검증할 수 없다(30-B).
+  const src = `${input.source.baseStandard} ${input.source.intake} ${input.source.caution} ${input.source.dosageForm} ${input.source.storage ?? ''} ${input.source.shelfLife ?? ''}`;
   const scan = (text: string, list: Array<[RegExp, string]>, lang: 'ko' | 'en', field: string) => {
     for (const [re, label] of list) {
       for (const m of matchAll(re, text)) {
@@ -403,6 +405,40 @@ export function ruleD(input: GuardProductInput): GuardFinding[] {
   };
   scan(stripHtml(input.drafts.ko), CLAIM_KO, 'ko', 'koDraft');
   scan(stripHtml(input.drafts.en), CLAIM_EN, 'en', 'enDraft');
+
+  // D-9 (V1.3, 30-B) — **보관 조건 모순**.
+  //   원문이 냉장을 지시하는데 초안이 "실온/냉장 불필요"라고 쓰면 **정반대 주장**이다.
+  //   기존 srcHas 방식은 키워드 존재(/냉장/)를 근거로 오인해 오히려 REVIEW 로 낮췄다 —
+  //   **키워드가 있다는 것과 그 주장을 뒷받침한다는 것은 다르다.**
+  //   실측: `생생락 유산균` PRSRV_PD = "냉장(0~10도)에 보관하십시오".
+  {
+    const storage = `${input.source.storage ?? ''}`;
+    const srcNeedsCold = /냉장|0\s*~\s*10\s*도|0-10\s*℃/.test(storage);
+    const srcRoomTemp = /실온|상온/.test(storage);
+    const koText = stripHtml(input.drafts.ko);
+    const enText = stripHtml(input.drafts.en);
+    const claimsRoom = /실온\s*(에서)?\s*보관|상온\s*보관|냉장\s*(이)?\s*(불필요|필요\s*없|없이)|냉장고\s*자리/.test(koText)
+      || /room[- ]temperature\s+storage|no\s+refrigeration|without\s+refrigeration|does\s+not\s+need\s+refrigerat/i.test(enText);
+    if (srcNeedsCold && !srcRoomTemp && claimsRoom) {
+      out.push({
+        ruleId: 'D-STORAGE-CONTRADICTION-009', severity: 'ERROR', status: 'BLOCKED', language: 'both',
+        field: 'drafts', matchedText: '실온/냉장 불필요',
+        sourceEvidence: `PRSRV_PD: "${truncate(storage, 80)}"`,
+        message: '원문은 **냉장 보관**을 지시하는데 초안이 실온 보관·냉장 불필요로 기술했습니다(정반대 주장).',
+        suggestedAction: '원문 보관 조건을 그대로 기술하십시오.',
+      });
+    }
+    // 보관 주장을 하는데 원문 보관 정보가 아예 없으면 근거 없음
+    if (!storage.trim() && (/실온\s*보관|냉장\s*보관/.test(koText))) {
+      out.push({
+        ruleId: 'D-STORAGE-UNGROUNDED-010', severity: 'WARNING', status: 'REVIEW_REQUIRED', language: 'ko',
+        field: 'koDraft', matchedText: '보관 조건 서술',
+        sourceEvidence: 'PRSRV_PD 미제공',
+        message: '보관 조건을 기술했으나 원문 보관 정보가 입력되지 않았습니다.',
+        suggestedAction: 'PRSRV_PD 를 source.storage 로 넣어 검증하십시오.',
+      });
+    }
+  }
 
   // D-7 (V1.2) — "표시량을 **유통기한까지 보장**한다" 주장.
   //   BASE_STANDARD 는 "표시량(N CFU/기준량) **이상**" 이라는 **규격**만 진술한다.

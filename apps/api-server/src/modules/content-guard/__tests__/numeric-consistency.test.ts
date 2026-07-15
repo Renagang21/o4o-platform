@@ -98,6 +98,31 @@ describe('잠금 2 — 원문 근거가 있는데 막았던 사례의 원문 범
     expect(blocked.findings.some((f) => f.ruleId === 'G-FORM-GENERALIZATION-001' && f.status === 'BLOCKED')).toBe(true);
   });
 
+  // 30-B 실측 — 보관 조건. 키워드 존재 ≠ 주장 뒷받침.
+  it('보관: 원문이 냉장인데 실온이라 쓰면 BLOCKED / 원문대로 쓰면 통과', () => {
+    const cold = { ...OK_VIVA_FULL_BASIS.source, storage: '냉장(0~10도)에 보관하십시오. 개봉 후에는 가급적 빨리 섭취하십시오.' };
+    const bad = runGuard(
+      { ...OK_VIVA_FULL_BASIS, source: cold, drafts: { ko: '<p>실온 보관 — 냉장고 자리를 차지하지 않습니다.</p>', en: '<p>x</p>' } },
+      { phase: 'post' },
+    );
+    expect(bad.findings.some((f) => f.ruleId === 'D-STORAGE-CONTRADICTION-009' && f.status === 'BLOCKED')).toBe(true);
+
+    const good = runGuard(
+      { ...OK_VIVA_FULL_BASIS, source: cold, drafts: { ko: '<p>냉장(0~10도) 보관 — 공식 보관 조건입니다.</p>', en: '<p>x</p>' } },
+      { phase: 'post' },
+    );
+    expect(good.findings.some((f) => f.ruleId.startsWith('D-STORAGE'))).toBe(false);
+  });
+
+  it('보관: 원문이 실온이면 실온 서술은 위반이 아니다', () => {
+    const room = { ...OK_VIVA_FULL_BASIS.source, storage: '직사광선을 피하여 실온에서 보관' };
+    const r = runGuard(
+      { ...OK_VIVA_FULL_BASIS, source: room, drafts: { ko: '<p>실온 보관이 가능합니다.</p>', en: '<p>x</p>' } },
+      { phase: 'post' },
+    );
+    expect(r.findings.some((f) => f.ruleId.startsWith('D-STORAGE'))).toBe(false);
+  });
+
   it('물과 함께 씹어: 원문에 있으면 허용 / 원문이 물을 말하지 않으면 차단', () => {
     // 실측 원문 — 청인 해우
     const allowed = runGuard(withSrc('1일 3회, 1회 1포씩 식전 또는 식후에 물과 함께 씹어드십시오.', '물과 함께 씹어서 섭취합니다.'), { phase: 'post' });
