@@ -1,14 +1,13 @@
 {
   "guardVersion": "product-description-guard@1.1.0",
   "totalProducts": 25,
-  "pass": 17,
-  "reviewRequired": 8,
+  "pass": 19,
+  "reviewRequired": 6,
   "blocked": 0,
   "findingsByRule": {
     "B-SPEC-MINMAX-003": 1,
     "C-ABSENCE-SOFT-004": 1,
     "B-SUPERLATIVE-CONTEXT-002": 2,
-    "C-ABSENCE-NUMERIC-003": 2,
     "C-ABSENCE-CONTRAST-005": 2
   },
   "products": [
@@ -1935,12 +1934,12 @@
       "productName": "W이너밸런스프로바이오틱스",
       "guardVersion": "product-description-guard@1.1.0",
       "preGuardStatus": "PASS",
-      "postGuardStatus": "REVIEW_REQUIRED",
+      "postGuardStatus": "PASS",
       "koEnStatus": "PASS",
-      "overallStatus": "REVIEW_REQUIRED",
+      "overallStatus": "PASS",
       "blockedCount": 0,
-      "reviewCount": 1,
-      "passCount": 9,
+      "reviewCount": 0,
+      "passCount": 10,
       "precheckInfoCount": 3,
       "findings": [
         {
@@ -2021,15 +2020,15 @@
           "suggestedAction": "조치 불요(규격 인용)."
         },
         {
-          "ruleId": "C-ABSENCE-NUMERIC-003",
+          "ruleId": "C-ABSENCE-CALC-STATEMENT-006",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "ko",
           "field": "koDraft",
           "matchedText": "필요 없",
           "sourceEvidence": null,
-          "message": "부정형이지만 수치 서술 문맥으로 보입니다: \"…제품인가 표시 기준량 2g = 1포 = 하루 섭취량 — 세 값이 일치해 계산이 필요 없습니다 1포당 프로바이오틱스 50억 CFU = 1일 섭취 50억 CFU 1…\"",
-          "suggestedAction": "제품 속성 주장이 아닌지 확인하십시오(오탐 가능)."
+          "message": "계산·환산에 대한 서술입니다(제품 속성 주장 아님): \"…제품인가 표시 기준량 2g = 1포 = 하루 섭취량 — 세 값이 일치해 계산이 필요 없습니다 1포당 프로바이오틱스 50억 CFU = 1일 섭취 50억 CFU 1…\"",
+          "suggestedAction": "조치 불요. 수치 자체의 정확성은 A-CALC-* 가 검사합니다."
         },
         {
           "ruleId": "D-CLAIM-UNGROUNDED-001",
@@ -3041,12 +3040,12 @@
       "productName": "슬리문 키즈 30억 유산균",
       "guardVersion": "product-description-guard@1.1.0",
       "preGuardStatus": "PASS",
-      "postGuardStatus": "REVIEW_REQUIRED",
+      "postGuardStatus": "PASS",
       "koEnStatus": "PASS",
-      "overallStatus": "REVIEW_REQUIRED",
+      "overallStatus": "PASS",
       "blockedCount": 0,
-      "reviewCount": 1,
-      "passCount": 9,
+      "reviewCount": 0,
+      "passCount": 10,
       "precheckInfoCount": 3,
       "findings": [
         {
@@ -3127,15 +3126,15 @@
           "suggestedAction": "조치 불요(규격 인용)."
         },
         {
-          "ruleId": "C-ABSENCE-NUMERIC-003",
+          "ruleId": "C-ABSENCE-CALC-STATEMENT-006",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "ko",
           "field": "koDraft",
           "matchedText": "필요 없",
           "sourceEvidence": null,
-          "message": "부정형이지만 수치 서술 문맥으로 보입니다: \"…기준량 1,000mg = 1포(1g) = 하루 섭취량 — 세 값이 일치해 계산이 필요 없습니다 1포당 프로바이오틱스 30억 CFU = 1일 섭취 30억 CFU 1…\"",
-          "suggestedAction": "제품 속성 주장이 아닌지 확인하십시오(오탐 가능)."
+          "message": "계산·환산에 대한 서술입니다(제품 속성 주장 아님): \"…기준량 1,000mg = 1포(1g) = 하루 섭취량 — 세 값이 일치해 계산이 필요 없습니다 1포당 프로바이오틱스 30억 CFU = 1일 섭취 30억 CFU 1…\"",
+          "suggestedAction": "조치 불요. 수치 자체의 정확성은 A-CALC-* 가 검사합니다."
         },
         {
           "ruleId": "D-CLAIM-UNGROUNDED-001",

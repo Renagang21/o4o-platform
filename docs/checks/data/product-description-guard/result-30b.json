@@ -1,12 +1,10 @@
 {
   "guardVersion": "product-description-guard@1.1.0",
   "totalProducts": 10,
-  "pass": 6,
-  "reviewRequired": 4,
+  "pass": 10,
+  "reviewRequired": 0,
   "blocked": 0,
-  "findingsByRule": {
-    "C-ABSENCE-NUMERIC-003": 4
-  },
+  "findingsByRule": {},
   "products": [
     {
       "candidateId": "batch-30b:b1-lacto-bloom",
@@ -722,12 +720,12 @@
       "productName": "유투바이오틱스 G 것 헬스",
       "guardVersion": "product-description-guard@1.1.0",
       "preGuardStatus": "PASS",
-      "postGuardStatus": "REVIEW_REQUIRED",
+      "postGuardStatus": "PASS",
       "koEnStatus": "PASS",
-      "overallStatus": "REVIEW_REQUIRED",
+      "overallStatus": "PASS",
       "blockedCount": 0,
-      "reviewCount": 1,
-      "passCount": 9,
+      "reviewCount": 0,
+      "passCount": 10,
       "precheckInfoCount": 2,
       "findings": [
         {
@@ -797,15 +795,15 @@
           "suggestedAction": "조치 불요(규격 인용)."
         },
         {
-          "ruleId": "C-ABSENCE-NUMERIC-003",
+          "ruleId": "C-ABSENCE-CALC-STATEMENT-006",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "ko",
           "field": "koDraft",
           "matchedText": "필요 없",
           "sourceEvidence": null,
-          "message": "부정형이지만 수치 서술 문맥으로 보입니다: \"…. 왜 이 제품인가 표시 기준량 500mg = 1캡슐 = 하루 섭취량 — 계산이 필요 없습니다 1캡슐당 프로바이오틱스 100억 CFU 붕해 20분 이내(경질캡슐)…\"",
-          "suggestedAction": "제품 속성 주장이 아닌지 확인하십시오(오탐 가능)."
+          "message": "계산·환산에 대한 서술입니다(제품 속성 주장 아님): \"…. 왜 이 제품인가 표시 기준량 500mg = 1캡슐 = 하루 섭취량 — 계산이 필요 없습니다 1캡슐당 프로바이오틱스 100억 CFU 붕해 20분 이내(경질캡슐)…\"",
+          "suggestedAction": "조치 불요. 수치 자체의 정확성은 A-CALC-* 가 검사합니다."
         },
         {
           "ruleId": "D-CLAIM-UNGROUNDED-001",
@@ -869,12 +867,12 @@
       "productName": "데일리 프로바이오틱스",
       "guardVersion": "product-description-guard@1.1.0",
       "preGuardStatus": "PASS",
-      "postGuardStatus": "REVIEW_REQUIRED",
+      "postGuardStatus": "PASS",
       "koEnStatus": "PASS",
-      "overallStatus": "REVIEW_REQUIRED",
+      "overallStatus": "PASS",
       "blockedCount": 0,
-      "reviewCount": 1,
-      "passCount": 9,
+      "reviewCount": 0,
+      "passCount": 10,
       "precheckInfoCount": 2,
       "findings": [
         {
@@ -944,15 +942,15 @@
           "suggestedAction": "조치 불요(규격 인용)."
         },
         {
-          "ruleId": "C-ABSENCE-NUMERIC-003",
+          "ruleId": "C-ABSENCE-CALC-STATEMENT-006",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "ko",
           "field": "koDraft",
           "matchedText": "필요 없",
           "sourceEvidence": null,
-          "message": "부정형이지만 수치 서술 문맥으로 보입니다: \"…. 왜 이 제품인가 표시 기준량 325mg = 1캡슐 = 하루 섭취량 — 계산이 필요 없습니다 1캡슐당 프로바이오틱스 100억 CFU 붕해시험 20분 이내 — 식…\"",
-          "suggestedAction": "제품 속성 주장이 아닌지 확인하십시오(오탐 가능)."
+          "message": "계산·환산에 대한 서술입니다(제품 속성 주장 아님): \"…. 왜 이 제품인가 표시 기준량 325mg = 1캡슐 = 하루 섭취량 — 계산이 필요 없습니다 1캡슐당 프로바이오틱스 100억 CFU 붕해시험 20분 이내 — 식…\"",
+          "suggestedAction": "조치 불요. 수치 자체의 정확성은 A-CALC-* 가 검사합니다."
         },
         {
           "ruleId": "D-CLAIM-UNGROUNDED-001",
@@ -1016,12 +1014,12 @@
       "productName": "생생락 유산균",
       "guardVersion": "product-description-guard@1.1.0",
       "preGuardStatus": "PASS",
-      "postGuardStatus": "REVIEW_REQUIRED",
+      "postGuardStatus": "PASS",
       "koEnStatus": "PASS",
-      "overallStatus": "REVIEW_REQUIRED",
+      "overallStatus": "PASS",
       "blockedCount": 0,
-      "reviewCount": 1,
-      "passCount": 9,
+      "reviewCount": 0,
+      "passCount": 10,
       "precheckInfoCount": 2,
       "findings": [
         {
@@ -1091,15 +1089,15 @@
           "suggestedAction": "조치 불요(규격 인용)."
         },
         {
-          "ruleId": "C-ABSENCE-NUMERIC-003",
+          "ruleId": "C-ABSENCE-CALC-STATEMENT-006",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "ko",
           "field": "koDraft",
           "matchedText": "필요 없",
           "sourceEvidence": null,
-          "message": "부정형이지만 수치 서술 문맥으로 보입니다: \"…. 왜 이 제품인가 표시 기준량 330mg = 1캡슐 = 하루 섭취량 — 계산이 필요 없습니다 1캡슐당 프로바이오틱스 100억 CFU 냉장(0~10도) 보관 —…\"",
-          "suggestedAction": "제품 속성 주장이 아닌지 확인하십시오(오탐 가능)."
+          "message": "계산·환산에 대한 서술입니다(제품 속성 주장 아님): \"…. 왜 이 제품인가 표시 기준량 330mg = 1캡슐 = 하루 섭취량 — 계산이 필요 없습니다 1캡슐당 프로바이오틱스 100억 CFU 냉장(0~10도) 보관 —…\"",
+          "suggestedAction": "조치 불요. 수치 자체의 정확성은 A-CALC-* 가 검사합니다."
         },
         {
           "ruleId": "D-CLAIM-UNGROUNDED-001",
@@ -1163,12 +1161,12 @@
       "productName": "센서티브 장케어",
       "guardVersion": "product-description-guard@1.1.0",
       "preGuardStatus": "PASS",
-      "postGuardStatus": "REVIEW_REQUIRED",
+      "postGuardStatus": "PASS",
       "koEnStatus": "PASS",
-      "overallStatus": "REVIEW_REQUIRED",
+      "overallStatus": "PASS",
       "blockedCount": 0,
-      "reviewCount": 1,
-      "passCount": 9,
+      "reviewCount": 0,
+      "passCount": 10,
       "precheckInfoCount": 2,
       "findings": [
         {
@@ -1238,15 +1236,15 @@
           "suggestedAction": "조치 불요(규격 인용)."
         },
         {
-          "ruleId": "C-ABSENCE-NUMERIC-003",
+          "ruleId": "C-ABSENCE-CALC-STATEMENT-006",
           "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
+          "status": "INFO",
           "language": "ko",
           "field": "koDraft",
           "matchedText": "필요 없",
           "sourceEvidence": null,
-          "message": "부정형이지만 수치 서술 문맥으로 보입니다: \"…. 왜 이 제품인가 표시 기준량 350mg = 1캡슐 = 하루 섭취량 — 계산이 필요 없습니다 1캡슐당 프로바이오틱스 100억 CFU 붕해시험 20분 이내 — 식…\"",
-          "suggestedAction": "제품 속성 주장이 아닌지 확인하십시오(오탐 가능)."
+          "message": "계산·환산에 대한 서술입니다(제품 속성 주장 아님): \"…. 왜 이 제품인가 표시 기준량 350mg = 1캡슐 = 하루 섭취량 — 계산이 필요 없습니다 1캡슐당 프로바이오틱스 100억 CFU 붕해시험 20분 이내 — 식…\"",
+          "suggestedAction": "조치 불요. 수치 자체의 정확성은 A-CALC-* 가 검사합니다."
         },
         {
           "ruleId": "D-CLAIM-UNGROUNDED-001",

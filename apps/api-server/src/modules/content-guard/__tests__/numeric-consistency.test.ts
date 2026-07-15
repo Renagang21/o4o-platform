@@ -98,6 +98,40 @@ describe('잠금 2 — 원문 근거가 있는데 막았던 사례의 원문 범
     expect(blocked.findings.some((f) => f.ruleId === 'G-FORM-GENERALIZATION-001' && f.status === 'BLOCKED')).toBe(true);
   });
 
+  // 30건(A·B·C) 실측 튜닝 — "계산이 필요 없습니다" 는 문서 행위 서술이지 제품 주장이 아니다.
+  // 16/16 전부 사람 해제됐다. 단 **문맥 창으로 강등하면 미탐**이 생기므로 결합 매치만 INFO.
+  describe('C-ABSENCE 계산 서술 튜닝 (30건 실측)', () => {
+    const withKo = (ko: string) => ({
+      ...OK_VIVA_FULL_BASIS,
+      drafts: { ko: `<p>${ko}</p>`, en: '<p>x</p>' },
+    });
+
+    it('"계산이 필요 없습니다" → INFO (최종 REVIEW 집계 제외)', () => {
+      const r = runGuard(withKo('표시 기준량 2g = 1포 = 하루 섭취량 — 계산이 필요 없습니다.'), { phase: 'post' });
+      const f = r.findings.find((x) => x.ruleId === 'C-ABSENCE-CALC-STATEMENT-006')!;
+      expect(f).toBeDefined();
+      expect(f.status).toBe('INFO');
+      expect(r.findings.some((x) => x.ruleId === 'C-ABSENCE-NUMERIC-003')).toBe(false);
+    });
+
+    it('**미탐 방지**: 같은 문장에 제품 주장이 붙으면 그것은 강등되지 않는다', () => {
+      // 문맥 창(45자)으로 판정했다면 "물이 필요 없습니다" 까지 INFO 로 새어나간다
+      const r = runGuard(
+        withKo('표시 기준량 2g = 1포 = 하루 섭취량 — 계산이 필요 없습니다. 물이 필요 없습니다.'),
+        { phase: 'post' },
+      );
+      const risky = r.findings.filter((x) => x.ruleId.startsWith('C-ABSENCE') && (x.status === 'BLOCKED' || x.status === 'REVIEW_REQUIRED'));
+      expect(risky.length).toBeGreaterThan(0); // 물 주장은 반드시 남는다
+      expect(r.findings.some((x) => x.ruleId === 'C-ABSENCE-CALC-STATEMENT-006')).toBe(true); // 계산 서술은 INFO
+    });
+
+    it('계산과 무관한 부재 주장은 그대로 검출', () => {
+      const r = runGuard(withKo('냉장이 필요 없습니다.'), { phase: 'post' });
+      expect(r.findings.some((x) => x.ruleId.startsWith('C-ABSENCE')
+        && (x.status === 'BLOCKED' || x.status === 'REVIEW_REQUIRED'))).toBe(true);
+    });
+  });
+
   // 30-B 실측 — 보관 조건. 키워드 존재 ≠ 주장 뒷받침.
   it('보관: 원문이 냉장인데 실온이라 쓰면 BLOCKED / 원문대로 쓰면 통과', () => {
     const cold = { ...OK_VIVA_FULL_BASIS.source, storage: '냉장(0~10도)에 보관하십시오. 개봉 후에는 가급적 빨리 섭취하십시오.' };

@@ -286,7 +286,19 @@ const ABSENCE_KO = /(필요하지\s*않|필요\s*없|불필요|하지\s*않아�
 const ABSENCE_EN = /\b(no\s+refrigeration|without\s+refrigeration|does\s+not\s+(require|need)|not\s+required|free\s+from|room-temperature\s+storage)\b/gi;
 /** "no need to time it around eating" 처럼 **원문 지시("식전·식후 어느때나")의 번역**일 수 있다 → REVIEW */
 const ABSENCE_SOFT_EN = /\bno\s+need\s+to\b/gi;
-/** 수치·계산 서술(제품 속성 주장 아님) → 오탐 */
+/**
+ * **문서 행위**에 대한 부정형 → 제품 속성 주장이 아니다 (30-A·B·C 30건 실측: 16/16 전부 사람 해제).
+ *
+ * "계산이 필요 없습니다" 는 **독자가 계산할 필요가 없다**는 이 안내문의 서술이지,
+ * 제품이 무엇을 필요로 하지 않는다는 주장이 아니다. 실제 위험(틀린 계산)은
+ * `A-CALC-MISMATCH-002` / `A-UNIT-BASIS-001` 이 독립적으로 검출한다.
+ *
+ * ⚠️ **문맥 창(45자)으로 판정하면 미탐이 생긴다**:
+ *   "…계산이 필요 없습니다. 물이 필요 없습니다" → 두 번째(물)까지 창 안에 '계산'이 있어 강등된다.
+ *   따라서 **부정형이 계산·환산과 직접 결합한 매치**만 INFO 로 본다.
+ */
+const CALC_NO_NEED = /(계산|환산)\s*[이을]?\s*(필요\s*없|필요하지\s*않|불필요|할\s*필요\s*없)/g;
+/** 수치 대조 서술(세 값이 일치 등) — 제품 속성 주장 아님 */
 const NUMERIC_CONTEXT = /(계산|환산|세\s*값|일치)/;
 /**
  * 긍정 원문에서 파생된 부정형 대비 표현 → 근거 있음.
@@ -300,8 +312,27 @@ export function ruleC(input: GuardProductInput): GuardFinding[] {
   // 보관·유통기한 원문 포함 — 없으면 "냉장 불필요" 같은 보관 주장을 검증할 수 없다(30-B).
   const src = `${input.source.baseStandard} ${input.source.intake} ${input.source.caution} ${input.source.dosageForm} ${input.source.storage ?? ''} ${input.source.shelfLife ?? ''}`;
   const scan = (text: string, re: RegExp, lang: 'ko' | 'en', field: string) => {
+    // 계산·환산과 **직접 결합한** 부정형의 위치를 먼저 확정한다(문맥 창 누수 방지)
+    const calcSpans: Array<[number, number]> = [];
+    if (lang === 'ko') {
+      for (const cm of matchAll(CALC_NO_NEED, text)) calcSpans.push([cm.index, cm.index + cm.text.length]);
+    }
+    const inCalcSpan = (i: number, len: number) => calcSpans.some(([a, b]) => i >= a && i + len <= b);
+
     for (const m of matchAll(re, text)) {
       const ctx = contextAround(text, m.index, 45);
+      // 30건 실측 튜닝: 문서 행위("계산이 필요 없다")는 제품 주장이 아니다 → INFO(최종 REVIEW 집계 제외).
+      // 실제 계산 오류는 A-CALC-* 가 독립 검출하므로 검출력 손실이 없다.
+      if (lang === 'ko' && inCalcSpan(m.index, m.text.length)) {
+        out.push({
+          ruleId: 'C-ABSENCE-CALC-STATEMENT-006', severity: 'INFO', status: 'INFO', language: lang,
+          field, matchedText: m.text, sourceEvidence: null,
+          message: `계산·환산에 대한 서술입니다(제품 속성 주장 아님): "${ctx}"`,
+          suggestedAction: '조치 불요. 수치 자체의 정확성은 A-CALC-* 가 검사합니다.',
+        });
+        continue;
+      }
+      // 계산과 결합하지 않았으나 수치 서술 창 안 → 여전히 사람 판정
       if (lang === 'ko' && NUMERIC_CONTEXT.test(ctx)) {
         out.push({
           ruleId: 'C-ABSENCE-NUMERIC-003', severity: 'INFO', status: 'REVIEW_REQUIRED', language: lang,
