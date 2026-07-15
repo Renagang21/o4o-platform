@@ -65,6 +65,52 @@ export interface ResolvedScreenSet {
 }
 
 /**
+ * 모바일/QR 미러용 로컬 상품 resolve — /tablet/products 의 local 경로와 동일 기준.
+ * 이 Screen Set 이 적용된 태블릿(current_screen_set_id)의 visible local 진열이 있으면 코너별로 제한,
+ * 없으면 매장(org) 전체 활성 로컬로 폴백. 반환 형태는 모바일 뷰어 ProductCard 와 호환.
+ */
+async function resolveScreenSetLocalProducts(
+  dataSource: DataSource,
+  organizationId: string,
+  screenSetId: string,
+): Promise<Array<{ id: string; type: 'local'; name: string; price: number | null; imageUrl: string | null }>> {
+  const tabletRows = await dataSource.query(
+    `SELECT id FROM store_tablets WHERE current_screen_set_id = $1 AND organization_id = $2 LIMIT 1`,
+    [screenSetId, organizationId],
+  );
+  const tabletId: string | null = tabletRows?.[0]?.id ?? null;
+
+  let rows: any[] = [];
+  if (tabletId) {
+    rows = await dataSource.query(
+      `SELECT lp.id, lp.name, lp.price_display AS "priceDisplay", lp.thumbnail_url AS "thumbnailUrl", disp.sort_order AS "sortOrder"
+         FROM store_tablet_displays disp
+         JOIN store_local_products lp ON lp.id = disp.product_id AND lp.organization_id = $2 AND lp.is_active = true
+        WHERE disp.tablet_id = $1 AND disp.product_type = 'local' AND disp.is_visible = true
+        ORDER BY disp.sort_order ASC NULLS LAST, lp.name ASC`,
+      [tabletId, organizationId],
+    );
+  }
+  if (rows.length === 0) {
+    // 진열 미구성(legacy) → 매장 전체 활성 로컬.
+    rows = await dataSource.query(
+      `SELECT id, name, price_display AS "priceDisplay", thumbnail_url AS "thumbnailUrl", sort_order AS "sortOrder"
+         FROM store_local_products
+        WHERE organization_id = $1 AND is_active = true
+        ORDER BY sort_order ASC NULLS LAST, name ASC LIMIT 50`,
+      [organizationId],
+    );
+  }
+  return rows.map((r) => ({
+    id: r.id,
+    type: 'local' as const,
+    name: r.name,
+    price: r.priceDisplay != null ? Number(r.priceDisplay) : null,
+    imageUrl: r.thumbnailUrl ?? null,
+  }));
+}
+
+/**
  * 저장된 Screen Set 을 sections 로 resolve. 경계/삭제/보관 게이트 미충족 시 null.
  */
 export async function resolveScreenSetSections(
@@ -116,11 +162,20 @@ export async function resolveScreenSetSections(
           firstTabletId: tabletContext?.tabletId ?? null,
           configured: tabletContext?.configured ?? false,
         });
+        let products: any[] = supplierResult?.data ?? [];
+        // WO(디자인 채우기): QR 모바일 미러는 section.products 만 소비하고 /tablet/products(로컬)를 재조회하지 않는다.
+        //   태블릿 kiosk 는 section.products 를 쓰지 않고 fetchProducts(/tablet/products, supplier+local)로 상품을 그린다.
+        //   → tabletContext 없는(모바일/QR) 경로에서만 로컬 상품을 section 에 포함해 태블릿과 상품 parity 를 맞춘다.
+        //   (태블릿 runtime 경로는 기존과 동일하게 supplier 만 — kiosk 미소비라 무영향.)
+        if (!tabletContext) {
+          const locals = await resolveScreenSetLocalProducts(dataSource, input.organizationId, input.screenSetId);
+          products = [...products, ...locals];
+        }
         sections.push({
           blockType: 'product_list',
           sortOrder: b.sortOrder,
           data: {
-            products: supplierResult?.data ?? [],
+            products,
             localProductsEndpoint: input.storeSlug ? `/${input.storeSlug}/tablet/products` : null,
           },
         });
