@@ -155,6 +155,8 @@ For any questions, please ask a store staff member or a relevant professional.
 
 부족한 근거를 보수적 추정 설명서로 채우지 않는다 — **근거가 부족하면 문구를 약하게 쓰는 것이 아니라 제작 자체를 보류**한다. 근거가 충분한 제품은 매력과 신뢰를 적극적으로 보여 구매를 돕고(HFF-R06 임팩트), 근거가 부족한 제품은 제작하지 않는다. 공통 원칙 = [CONTENT-AUTHORING-PRINCIPLES](../../content-authoring/CONTENT-AUTHORING-PRINCIPLES.md) (CR-007, 건기식·의약품·의료기기·의약외품 및 향후 상품군 공통).
 
+**작성 시 반복 검출되는 grounding 실패 5유형** — ①부재를 허용으로 ②외부 지식 유입 ③전수 비교 없는 최상급 ④허위 차별화 ⑤추론 확장 = [CONTENT-AUTHORING-PRINCIPLES §4-1](../../content-authoring/CONTENT-AUTHORING-PRINCIPLES.md) (CR-002·003·004). **①④는 "창작 금지" 점검만으로 잡히지 않는다**(지어낸 사실이 없어도 위반). 유산균 그룹 파일럿에서 5유형 전량 실검출 — [pilot-probiotics/REVIEW-V1 §2 Q4](pilot-probiotics/REVIEW-V1.md).
+
 ### HFF-R10 — 검수·승격·이중게이트 (CR-008 · CR-009)
 
 설명서 초안 작성과 canonical 반영을 분리한다.

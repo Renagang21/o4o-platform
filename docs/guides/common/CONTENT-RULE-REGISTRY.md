@@ -12,8 +12,8 @@
 |---|---|---|---|
 | **CR-001** | 소비자 중심 · 목적 우선순위(선택 > 안전 > 상담 > 정보). 성분 설명 자체가 목적 아님 | content-authoring/CONTENT-AUTHORING-PRINCIPLES | active |
 | **CR-002** | 공식 원문(허가사항·e약은요 등) 우선 — 기억·AI·인터넷·홍보는 열위 | content-authoring/CONTENT-AUTHORING-PRINCIPLES | active |
-| **CR-003** | 과장·우월성 단정 금지("더 좋다/부작용 없다/빨리 낫는다" 등) | content-authoring/CONTENT-AUTHORING-PRINCIPLES | active |
-| **CR-004** | Grounding 필수 — 원문 근거 없으면 확장·창작 금지 | content-authoring/CONTENT-AUTHORING-PRINCIPLES | active |
+| **CR-003** | 과장·우월성 단정 금지("더 좋다/부작용 없다/빨리 낫는다" 등). **최상급은 대상 전수 비교 근거 없이 금지**, **그룹 공통 사항을 그 제품만의 장점처럼 배치 금지**(허위 차별화) — 실패 유형 ③④ | content-authoring/CONTENT-AUTHORING-PRINCIPLES §3·§4-1 | active |
+| **CR-004** | Grounding 필수 — 원문 근거 없으면 확장·창작 금지. **원문에 없는 것은 "근거 없음"이지 "허용"이 아니다**(제약의 부재 ≠ 자유의 근거) — 실패 유형 ①⑤ | content-authoring/CONTENT-AUTHORING-PRINCIPLES §4·§4-1 | active |
 | **CR-005** | 소비자 오해·혼동 방지 — 사용 맥락(경로·형태)이 다르면 분리 | content-authoring/CONTENT-AUTHORING-PRINCIPLES | active |
 | **CR-006** | 안전성 안내 필수 — 전문가/진료 연결 기준 명시 | content-authoring/CONTENT-AUTHORING-PRINCIPLES | active |
 | **CR-007** | 원천 부재 시 추정 금지 → HOLD (SOURCE GAP 일반형; "안전 판단"이지 실패 아님). **근거 부족 제품은 제작하지 않음** — 제품명·분류 불명확 또는 고유 원료·함량·기능성·사용법 등 핵심 근거 미확인 시 미작성·보류(유사/다른 제품으로 대체 금지, 보수적 추정 설명서 금지). 전 상품군 공통 | WORKFLOW · content-authoring | active |
