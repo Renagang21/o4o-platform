@@ -41,7 +41,10 @@ export interface CountMatch {
  */
 export function extractKoCounts(text: string): CountMatch[] {
   const out: CountMatch[] = [];
-  const re = /([0-9][0-9,]*)\s*(조|억|만|천)\s*(CFU|cfu)?/g;
+  // ⚠️ 소수점 필수: `[0-9][0-9,]*` 로는 "1.5억" 에서 **"5억"만** 잡혀 3.3배 오독한다.
+  //    source-grounding-parser 의 결손 #1 과 **동일한 결손이 이 모듈에도 있었다**.
+  //    30-A 청인 해우(1.5억)에서 ko"5억" vs en"150 million" 허위 불일치로 드러났다.
+  const re = /([0-9][0-9,.]*[0-9]|[0-9])\s*(조|억|만|천)\s*(CFU|cfu)?/g;
   let m: RegExpExecArray | null;
   while ((m = re.exec(text)) !== null) {
     const scale = KO_SCALE[m[2]];

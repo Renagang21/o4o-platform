@@ -28,6 +28,16 @@ describe('units', () => {
     expect(extractKoCounts('1억 CFU')[0].value).toBe(1e8);
     expect(extractKoCounts('5,000억')[0].value).toBe(5e11);
   });
+
+  // 30-A 실측 — source-grounding-parser 의 결손 #1 과 **동일한 결손이 이 모듈에도** 있었다.
+  // 청인 해우 ko "1.5억" 을 5억으로 읽어 en "150 million" 과 허위 불일치(BLOCKED)를 냈다.
+  it('소수점 억을 정확히 읽는다 (1.5억 ≠ 5억)', () => {
+    expect(extractKoCounts('1.5억 CFU')[0].value).toBe(1.5e8);
+    expect(extractKoCounts('1.5억 CFU')[0].value).not.toBe(5e8);
+    expect(extractKoCounts('표시량 150,000,000(1.5억)CFU/15g')
+      .map((c) => c.value)).toContain(1.5e8);
+    expect(extractKoCounts('2.5억')[0].value).toBe(2.5e8);
+  });
   it('영어 표기를 절대수로 변환', () => {
     expect(extractEnCounts('10 billion CFU')[0].value).toBe(1e10);
     expect(extractEnCounts('100 million CFU')[0].value).toBe(1e8);
@@ -152,6 +162,55 @@ describe('V1.1 — 위험 신호와 정보성 신호 분리', () => {
     const f = r.findings.find((x) => x.ruleId.startsWith('H-MAKER'))!;
     expect(f.ruleId).toBe('H-MAKER-ABSENT-006');
     expect(f.status).toBe('REVIEW_REQUIRED');
+  });
+
+  // G 규칙 결손 (30-A 실측) — 원문이 문자 그대로 허용하는 표현을 차단하고 있었다.
+  it('G-FORM: 원문이 "그대로 섭취"라고 적었으면 초안의 "그대로 섭취"는 위반이 아니다', () => {
+    const r = runGuard(
+      {
+        ...OK_VIVA_FULL_BASIS,
+        source: { ...OK_VIVA_FULL_BASIS.source, intake: '1일 2회, 1회 1포를 물, 음료에 타거나 그대로 섭취하십시오.' },
+        drafts: { ko: '<p>물·음료에 타거나 그대로 섭취할 수 있습니다.</p>', en: '<p>Mix it or take it directly.</p>' },
+      },
+      { phase: 'post' },
+    );
+    expect(r.findings.some((f) => f.ruleId === 'G-FORM-GENERALIZATION-001' && f.status === 'BLOCKED')).toBe(false);
+  });
+
+  it('G-FORM: 원문에 직접섭취 근거가 없으면 "물 없이"는 여전히 BLOCKED (미탐 방지)', () => {
+    const r = runGuard(
+      {
+        ...OK_VIVA_FULL_BASIS,
+        source: { ...OK_VIVA_FULL_BASIS.source, intake: '성인 : 1일 3회, 1회 2포 (2그램), 소아 : 1일 2회, 1회 1포 (1그램)' },
+        drafts: { ko: '<p>물 없이도 먹을 수 있는 과립입니다.</p>', en: '<p>x</p>' },
+      },
+      { phase: 'post' },
+    );
+    expect(r.findings.some((f) => f.ruleId === 'G-FORM-GENERALIZATION-001' && f.status === 'BLOCKED')).toBe(true);
+  });
+
+  it('G-CHEWABLE: 원문이 "물과 함께 씹어"면 물 언급은 위반이 아니다', () => {
+    const r = runGuard(
+      {
+        ...OK_VIVA_FULL_BASIS,
+        source: { ...OK_VIVA_FULL_BASIS.source, intake: '1일 3회, 1회 1포씩 식전 또는 식후에 물과 함께 씹어드십시오.' },
+        drafts: { ko: '<p>물과 함께 씹어서 섭취합니다.</p>', en: '<p>x</p>' },
+      },
+      { phase: 'post' },
+    );
+    expect(r.findings.some((f) => f.ruleId === 'G-CHEWABLE-002')).toBe(false);
+  });
+
+  it('G-CHEWABLE: 원문이 물을 지시하지 않는 츄어블을 물과 함께 삼킨다고 쓰면 BLOCKED', () => {
+    const r = runGuard(
+      {
+        ...OK_VIVA_FULL_BASIS,
+        source: { ...OK_VIVA_FULL_BASIS.source, intake: '1일 2회, 1회 1정을 씹어서 섭취하십시오.' },
+        drafts: { ko: '<p>물과 함께 삼키면 됩니다.</p>', en: '<p>x</p>' },
+      },
+      { phase: 'post' },
+    );
+    expect(r.findings.some((f) => f.ruleId === 'G-CHEWABLE-002' && f.status === 'BLOCKED')).toBe(true);
   });
 
   // B-SPEC-MINMAX 3분기 — 규격어는 문자열이 아니라 **문맥**으로 판정한다.

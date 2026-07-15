@@ -1,0 +1,932 @@
+{
+  "guardVersion": "product-description-guard@1.1.0",
+  "totalProducts": 10,
+  "pass": 7,
+  "reviewRequired": 3,
+  "blocked": 0,
+  "findingsByRule": {
+    "C-ABSENCE-NUMERIC-003": 3
+  },
+  "products": [
+    {
+      "candidateId": "batch-30a:a1-antibio-pro",
+      "productName": "안티비오 프로(베트남)",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "NOT_APPLICABLE",
+      "postGuardStatus": "PASS",
+      "koEnStatus": "NOT_APPLICABLE",
+      "overallStatus": "PASS",
+      "blockedCount": 0,
+      "reviewCount": 0,
+      "passCount": 7,
+      "precheckInfoCount": 0,
+      "findings": [
+        {
+          "ruleId": "A-UNIT-BASIS-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "환산 근거 없음(표시 기준량(1000mg)이 1회분(2000mg)·1일분(6000mg) 어느 쪽과도 일치하지 않음) — 파생 수치 미기재 확인",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "B-SUPERLATIVE-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "최상급·비교급 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "C-ABSENCE-AS-PERMISSION-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "부재→허용 표현 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "D-CLAIM-UNGROUNDED-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "근거 없는 제품 주장 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "E-NAME-DERIVED-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "제품명 유도 주장 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "F-AGE-BOUNDARY-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "연령 경계 원문 보존 확인",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "G-FORM-GENERALIZATION-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "제형 기반 추정 검출 없음",
+          "suggestedAction": "조치 불요"
+        }
+      ]
+    },
+    {
+      "candidateId": "batch-30a:a2-drproba-kids",
+      "productName": "닥터프로바 유기농 키즈 프로바이오틱스",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "NOT_APPLICABLE",
+      "postGuardStatus": "PASS",
+      "koEnStatus": "NOT_APPLICABLE",
+      "overallStatus": "PASS",
+      "blockedCount": 0,
+      "reviewCount": 0,
+      "passCount": 7,
+      "precheckInfoCount": 0,
+      "findings": [
+        {
+          "ruleId": "A-UNIT-BASIS-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "환산 근거 없음(1단위 중량이 공식 원문에 없음) — 파생 수치 미기재 확인",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "B-SUPERLATIVE-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "최상급·비교급 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "C-ABSENCE-AS-PERMISSION-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "부재→허용 표현 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "D-CLAIM-UNGROUNDED-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "근거 없는 제품 주장 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "E-NAME-DERIVED-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "제품명 유도 주장 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "F-AGE-BOUNDARY-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "연령 관련 위반 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "G-FORM-GENERALIZATION-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "제형 기반 추정 검출 없음",
+          "suggestedAction": "조치 불요"
+        }
+      ]
+    },
+    {
+      "candidateId": "batch-30a:a3-lifecare-gold",
+      "productName": "라이프케어 생유산균 골드",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "NOT_APPLICABLE",
+      "postGuardStatus": "PASS",
+      "koEnStatus": "NOT_APPLICABLE",
+      "overallStatus": "PASS",
+      "blockedCount": 0,
+      "reviewCount": 0,
+      "passCount": 7,
+      "precheckInfoCount": 0,
+      "findings": [
+        {
+          "ruleId": "A-UNIT-BASIS-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "환산 근거 없음(1단위 중량이 공식 원문에 없음) — 파생 수치 미기재 확인",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "B-SUPERLATIVE-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "최상급·비교급 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "C-ABSENCE-AS-PERMISSION-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "부재→허용 표현 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "D-CLAIM-UNGROUNDED-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "근거 없는 제품 주장 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "E-NAME-DERIVED-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "제품명 유도 주장 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "F-AGE-BOUNDARY-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "연령 관련 위반 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "G-FORM-GENERALIZATION-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "제형 기반 추정 검출 없음",
+          "suggestedAction": "조치 불요"
+        }
+      ]
+    },
+    {
+      "candidateId": "batch-30a:a4-lacto-saeng-gold",
+      "productName": "락토 생 유산균 골드",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "NOT_APPLICABLE",
+      "postGuardStatus": "PASS",
+      "koEnStatus": "NOT_APPLICABLE",
+      "overallStatus": "PASS",
+      "blockedCount": 0,
+      "reviewCount": 0,
+      "passCount": 7,
+      "precheckInfoCount": 0,
+      "findings": [
+        {
+          "ruleId": "A-UNIT-BASIS-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "환산 근거 없음(1단위 중량이 공식 원문에 없음) — 파생 수치 미기재 확인",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "B-SUPERLATIVE-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "최상급·비교급 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "C-ABSENCE-AS-PERMISSION-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "부재→허용 표현 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "D-CLAIM-UNGROUNDED-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "근거 없는 제품 주장 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "E-NAME-DERIVED-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "제품명 유도 주장 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "F-AGE-BOUNDARY-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "연령 관련 위반 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "G-FORM-GENERALIZATION-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "제형 기반 추정 검출 없음",
+          "suggestedAction": "조치 불요"
+        }
+      ]
+    },
+    {
+      "candidateId": "batch-30a:a5-lemona-tok",
+      "productName": "레모나 톡 온가족 생유산균",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "NOT_APPLICABLE",
+      "postGuardStatus": "REVIEW_REQUIRED",
+      "koEnStatus": "NOT_APPLICABLE",
+      "overallStatus": "REVIEW_REQUIRED",
+      "blockedCount": 0,
+      "reviewCount": 1,
+      "passCount": 6,
+      "precheckInfoCount": 0,
+      "findings": [
+        {
+          "ruleId": "A-CALC-MISMATCH-002",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "환산 검증 통과(1일 200,000,000, 1단위 200,000,000)",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "B-SUPERLATIVE-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "최상급·비교급 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "C-ABSENCE-NUMERIC-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
+          "language": "ko",
+          "field": "koDraft",
+          "matchedText": "필요 없",
+          "sourceEvidence": null,
+          "message": "부정형이지만 수치 서술 문맥으로 보입니다: \"…았습니다. 왜 이 제품인가 표시 기준량 2g = 1포 = 하루 섭취량 — 계산이 필요 없습니다 1포당 프로바이오틱스 2억 CFU 직접 섭취 가능 — 물과 함께 먹…\"",
+          "suggestedAction": "제품 속성 주장이 아닌지 확인하십시오(오탐 가능)."
+        },
+        {
+          "ruleId": "D-CLAIM-UNGROUNDED-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "근거 없는 제품 주장 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "E-NAME-DERIVED-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "제품명 유도 주장 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "F-AGE-BOUNDARY-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "연령 관련 위반 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "G-FORM-GENERALIZATION-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "제형 기반 추정 검출 없음",
+          "suggestedAction": "조치 불요"
+        }
+      ]
+    },
+    {
+      "candidateId": "batch-30a:a6-mylacto-janggwae",
+      "productName": "마이락토 장쾌(MYLACTO NICE BOWEL)",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "NOT_APPLICABLE",
+      "postGuardStatus": "REVIEW_REQUIRED",
+      "koEnStatus": "NOT_APPLICABLE",
+      "overallStatus": "REVIEW_REQUIRED",
+      "blockedCount": 0,
+      "reviewCount": 1,
+      "passCount": 6,
+      "precheckInfoCount": 0,
+      "findings": [
+        {
+          "ruleId": "A-CALC-MISMATCH-002",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "환산 검증 통과(1일 1,000,000,000, 1단위 1,000,000,000)",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "B-SUPERLATIVE-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "최상급·비교급 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "C-ABSENCE-NUMERIC-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
+          "language": "ko",
+          "field": "koDraft",
+          "matchedText": "필요 없",
+          "sourceEvidence": null,
+          "message": "부정형이지만 수치 서술 문맥으로 보입니다: \"…니다. 왜 이 제품인가 표시 기준량 1.5g = 1포 = 하루 섭취량 — 계산이 필요 없습니다 1포당 프로바이오틱스 10억 CFU 직접 섭취 또는 물·음료와 함께…\"",
+          "suggestedAction": "제품 속성 주장이 아닌지 확인하십시오(오탐 가능)."
+        },
+        {
+          "ruleId": "D-CLAIM-UNGROUNDED-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "근거 없는 제품 주장 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "E-NAME-DERIVED-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "제품명 유도 주장 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "F-AGE-BOUNDARY-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "연령 관련 위반 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "G-FORM-GENERALIZATION-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "제형 기반 추정 검출 없음",
+          "suggestedAction": "조치 불요"
+        }
+      ]
+    },
+    {
+      "candidateId": "batch-30a:a7-pyeonanhan-lak",
+      "productName": "편안한 락 생유산균 캡슐",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "NOT_APPLICABLE",
+      "postGuardStatus": "REVIEW_REQUIRED",
+      "koEnStatus": "NOT_APPLICABLE",
+      "overallStatus": "REVIEW_REQUIRED",
+      "blockedCount": 0,
+      "reviewCount": 1,
+      "passCount": 6,
+      "precheckInfoCount": 0,
+      "findings": [
+        {
+          "ruleId": "A-CALC-MISMATCH-002",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "환산 검증 통과(1일 10,000,000,000, 1단위 10,000,000,000)",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "B-SUPERLATIVE-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "최상급·비교급 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "C-ABSENCE-NUMERIC-003",
+          "severity": "INFO",
+          "status": "REVIEW_REQUIRED",
+          "language": "ko",
+          "field": "koDraft",
+          "matchedText": "필요 없",
+          "sourceEvidence": null,
+          "message": "부정형이지만 수치 서술 문맥으로 보입니다: \"…. 왜 이 제품인가 표시 기준량 450mg = 1캅셀 = 하루 섭취량 — 계산이 필요 없습니다 1캅셀당 프로바이오틱스 100억 CFU 장용성 경질캡슐 — 공식 기…\"",
+          "suggestedAction": "제품 속성 주장이 아닌지 확인하십시오(오탐 가능)."
+        },
+        {
+          "ruleId": "D-CLAIM-UNGROUNDED-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "근거 없는 제품 주장 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "E-NAME-DERIVED-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "제품명 유도 주장 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "F-AGE-BOUNDARY-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "연령 관련 위반 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "G-FORM-GENERALIZATION-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "제형 기반 추정 검출 없음",
+          "suggestedAction": "조치 불요"
+        }
+      ]
+    },
+    {
+      "candidateId": "batch-30a:a8-inner-bowelcare",
+      "productName": "이너 바울케어",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "NOT_APPLICABLE",
+      "postGuardStatus": "PASS",
+      "koEnStatus": "NOT_APPLICABLE",
+      "overallStatus": "PASS",
+      "blockedCount": 0,
+      "reviewCount": 0,
+      "passCount": 7,
+      "precheckInfoCount": 0,
+      "findings": [
+        {
+          "ruleId": "A-UNIT-BASIS-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "환산 근거 없음(1단위 중량이 공식 원문에 없음) — 파생 수치 미기재 확인",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "B-SUPERLATIVE-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "최상급·비교급 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "C-ABSENCE-AS-PERMISSION-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "부재→허용 표현 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "D-CLAIM-UNGROUNDED-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "근거 없는 제품 주장 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "E-NAME-DERIVED-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "제품명 유도 주장 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "F-AGE-BOUNDARY-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "연령 관련 위반 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "G-FORM-GENERALIZATION-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "제형 기반 추정 검출 없음",
+          "suggestedAction": "조치 불요"
+        }
+      ]
+    },
+    {
+      "candidateId": "batch-30a:a9-cheongin-haewoo",
+      "productName": "청인 해우",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "NOT_APPLICABLE",
+      "postGuardStatus": "PASS",
+      "koEnStatus": "NOT_APPLICABLE",
+      "overallStatus": "PASS",
+      "blockedCount": 0,
+      "reviewCount": 0,
+      "passCount": 7,
+      "precheckInfoCount": 0,
+      "findings": [
+        {
+          "ruleId": "A-UNIT-BASIS-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "환산 근거 없음(1단위 중량이 공식 원문에 없음) — 파생 수치 미기재 확인",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "B-SUPERLATIVE-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "최상급·비교급 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "C-ABSENCE-AS-PERMISSION-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "부재→허용 표현 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "D-CLAIM-UNGROUNDED-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "근거 없는 제품 주장 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "E-NAME-DERIVED-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "제품명 유도 주장 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "F-AGE-BOUNDARY-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "연령 관련 위반 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "G-FORM-GENERALIZATION-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "제형 기반 추정 검출 없음",
+          "suggestedAction": "조치 불요"
+        }
+      ]
+    },
+    {
+      "candidateId": "batch-30a:a10-riwell-kidup",
+      "productName": "리웰키드업",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "NOT_APPLICABLE",
+      "postGuardStatus": "PASS",
+      "koEnStatus": "NOT_APPLICABLE",
+      "overallStatus": "PASS",
+      "blockedCount": 0,
+      "reviewCount": 0,
+      "passCount": 7,
+      "precheckInfoCount": 0,
+      "findings": [
+        {
+          "ruleId": "A-UNIT-BASIS-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "환산 근거 없음(1단위 중량이 공식 원문에 없음) — 파생 수치 미기재 확인",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "B-SUPERLATIVE-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "최상급·비교급 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "C-ABSENCE-AS-PERMISSION-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "부재→허용 표현 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "D-CLAIM-UNGROUNDED-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "근거 없는 제품 주장 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "E-NAME-DERIVED-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "제품명 유도 주장 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "F-AGE-BOUNDARY-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "연령 관련 위반 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "G-FORM-GENERALIZATION-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "제형 기반 추정 검출 없음",
+          "suggestedAction": "조치 불요"
+        }
+      ]
+    }
+  ]
+}

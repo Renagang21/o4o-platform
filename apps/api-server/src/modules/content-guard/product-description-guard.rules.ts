@@ -563,8 +563,14 @@ const CHEW_KO = /씹어/;
 export function ruleG(input: GuardProductInput): GuardFinding[] {
   const out: GuardFinding[] = [];
   const intake = input.source.intake;
-  const srcDirect = /직접|물\s*없이|털어서/.test(intake);
+  // ⚠️ V1.2: `그대로` 누락으로 **원문이 문자 그대로 허용하는 표현을 차단**하고 있었다.
+  //    실측: 리웰키드업 SRV_USE = "…타거나 **그대로 섭취**하십시오" / 닥터프로바 = "1회 1포를 **그대로** 혹은 물과 함께 섭취"
+  //    원문이 "그대로"라고 적었는데 초안의 "그대로 섭취"를 제형 기반 추정으로 오판했다.
+  const srcDirect = /직접|물\s*없이|털어서|그대로/.test(intake);
   const srcChew = /씹어/.test(intake);
+  // 원문 자체가 "물과 함께"를 지시하면 츄어블이어도 물과 함께가 맞다.
+  //    실측: 청인 해우 SRV_USE = "물과 함께 **씹어**드십시오" — 씹기와 물이 **양립**한다.
+  const srcWithWater = /물과\s*함께|충분한\s*물|물로/.test(intake);
   const ko = stripHtml(input.drafts.ko);
   const en = stripHtml(input.drafts.en);
 
@@ -582,8 +588,9 @@ export function ruleG(input: GuardProductInput): GuardFinding[] {
       }
     }
   }
-  // 츄어블인데 물과 함께 삼키는 제품으로 서술
-  if (srcChew && /물과\s*함께\s*(삼키|섭취)/.test(ko)) {
+  // 츄어블인데 물과 함께 삼키는 제품으로 서술.
+  // 단 원문이 스스로 "물과 함께"를 지시하면 위반이 아니다(청인 해우: "물과 함께 씹어드십시오").
+  if (srcChew && !srcWithWater && /물과\s*함께\s*(삼키|섭취)/.test(ko)) {
     out.push({
       ruleId: 'G-CHEWABLE-002', severity: 'ERROR', status: 'BLOCKED', language: 'ko',
       field: 'koDraft', matchedText: '물과 함께 삼키/섭취',
