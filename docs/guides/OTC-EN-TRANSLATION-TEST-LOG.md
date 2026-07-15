@@ -1,6 +1,6 @@
 # OTC-EN-TRANSLATION-TEST-LOG — 테스트 번역 및 오류 기록
 
-상태: **Active (기록 문서)** · V0.3 (2026-07-15) · 대상: **일반의약품(OTC) 전용**
+상태: **Active (기록 문서)** · V0.4 (2026-07-16) · 대상: **일반의약품(OTC) 전용**
 지침: [OTC-EN-TRANSLATION-GUIDE](OTC-EN-TRANSLATION-GUIDE.md) · 권장 표현: [OTC-KO-EN-GLOSSARY](OTC-KO-EN-GLOSSARY.md)
 
 > 테스트 번역 **1건마다 §2 양식을 복사해 1개 블록**을 추가한다.
@@ -21,6 +21,9 @@
 | T-3 | P3 나프록센나트륨 275mg 정 | 2026-07-15 | V0.5 | V0.2 | CR-021 |
 | T-4 | P4 클로트리마졸 100mg 질정 | 2026-07-15 | V0.5 | V0.2 | **DR-019** |
 | T-5 | P5 데소게스트렐 0.075mg 정 | 2026-07-15 | V0.5 | V0.2 | GLOSSARY V0.3 |
+| **T-6~T-10** | **저장 파일럿 5건** (덱스판테놀100 / 사카로마이세스282.5 / 알벤다졸400 / 덱시부프로펜300 / 세티리진10) | 2026-07-16 | V0.5 | **V0.4** | **미반영(GUIDE·GLOSSARY 수정 불필요)** |
+
+> T-6~T-10 은 **DB 저장까지 수행**한 첫 사례다(en · STORE · `needs_review` 5 rows). 판정 = [CHECK-...-EN-TRANSLATION-PERSIST-PILOT-V1](../checks/CHECK-O4O-OTC-EN-TRANSLATION-PERSIST-PILOT-V1.md)
 
 > 시안: [TRANSLATION-DRAFTS-V1](products/drug/pilot-en-design/TRANSLATION-DRAFTS-V1.md) · 판정: [CHECK-...-PILOT-VALIDATION-V1](../checks/CHECK-O4O-OTC-EN-DESIGN-PILOT-VALIDATION-V1.md)
 > ⚠️ 5건 모두 **DB 저장 없음**. 한국어 초안이 `needs_review` 라 영문은 시안 지위다.
@@ -180,6 +183,49 @@
 | DR / CR | 반영 | DR-019 · CR-021 |
 | 신설 사유 | | DR-019: 기존 DR-002/003/009 는 "경로가 다르면"을 다루나 **경로 판단 근거**는 없음. CR-021: HFF-R07 이 제품군 한정 → 2개 제품군 공통이라 CR 승격 |
 
+### T-6~T-10 — 영문 저장 파일럿 (2026-07-16, GUIDE V0.5 / GLOSSARY V0.4)
+
+한국어 **canonical**(`mfds_drug_otc`, A군 승격분) 기준. 번역 대상 = 구조화 4필드.
+
+**정보 검증 (§2.1)** — 5/5 OK
+
+| 확인 | 결과 |
+|---|---|
+| 효능·용법·주의 누락 | **0** |
+| 숫자·단위·연령·횟수·기간 일치 | **OK** (아래 대조) |
+| 원문에 없는 의학 정보 추가 | **0** |
+| 안전 표현(G-01~G-04) | **OK** (5건 전부 oral → `take`) |
+| 내부 주석 노출 | **0** |
+
+**수치·연령 대조 (GLOSSARY §4-1 적용)**
+
+| 그룹 | 원문 | 영문 | 판정 |
+|---|---|---|---|
+| 덱스판테놀 100mg | 1회 1정 1일 3회 / 6주 / **19세 미만** | one tablet three times a day / 6 weeks / **under 19** | OK |
+| 사카로마이세스 282.5mg | **12세 이상** 1~2캡슐 1일 2회 / **3~12세** 1캡슐 1일 3회 / **3개월 미만** | **12 or older** / **aged 3 to under 12** / **under 3 months** | OK |
+| 알벤다졸 400mg | **24개월 이상** 1정 1회 / 7일 뒤 1정 / **2세 미만** | **24 months or older** / 7 days later / **under 2** | OK |
+| 덱시부프로펜 300mg | 1정(300mg) 1일 2~4회 / 1일 4정(1,200mg) 이내 / 5일 이내 / **임신 6개월 이상** | one tablet (300 mg) two to four times a day / max 1,200 mg / no more than 5 days / **6 months or more into pregnancy** | OK |
+| 세티리진 10mg | **6세 이상** 1일 1회 1정(10mg) / 1/2정(5mg) 분할 | **6 or older** / half a tablet (5 mg) | OK |
+
+> **`12세 이상`=`12 or older` · `3~12세`=`aged 3 to under 12` · `24개월 이상`=`24 months or older` · `2세 미만`=`under 2`** — GLOSSARY §4-1 경계 규칙이 5건 전부에서 그대로 적용됐다. **규칙 신설 없이 판정 완료.**
+
+**어려웠던 표현**
+
+| 원문 | 사용한 표현 | 비고 |
+|---|---|---|
+| 장내 균총 이상에서의 정장 | settle the gut when the balance of gut bacteria is upset | "정장"에 대응하는 일반 영어가 없어 기능 서술로 풀었다(T-07) |
+| (내수용은 냉소 보관.) | (The domestic pack should be kept in a cool place.) | 괄호 주석이 **원문 본문**의 일부라 유지(내부 편집 주석 아님 — CR-021 대상 아님) |
+| 이부프로펜 계열 개량 성분 | a refined form of the ibuprofen family | |
+
+**반영 판정**
+
+- [x] 이 5건만의 문제 → **본 TEST-LOG에만** — 신규 이슈 없음
+- [ ] GUIDE 수정 → **불필요** (T-01~T-10 으로 전건 판정)
+- [ ] GLOSSARY 수정 → **불필요** (V0.4 §4-1 로 연령 경계 전건 커버)
+- [ ] DR / CR → 해당 없음
+
+> **지침 재검증 통과**: 파일럿(T-1~T-5) 이후 갱신된 GUIDE V0.5 / GLOSSARY V0.4 로 **수정 없이** 5건을 처리했다.
+
 ---
 
 ## 4. 이력
@@ -189,3 +235,6 @@
 | V0.1 | 2026-07-15 | 초안 작성 (`WO-O4O-OTC-EN-TRANSLATION-GUIDE-DOCS-V1`). |
 | V0.2 | 2026-07-15 | 소비자 톤 기준 반영 — 정보/표현 2층 검증 표, 직역투·GLOSSARY 이탈 기록란 추가 (`WO-O4O-OTC-EN-TRANSLATION-GUIDE-CONSUMER-TONE-REVISION-V1`). |
 | V0.3 | 2026-07-15 | 반영 판정란 추가(TEST-LOG / GLOSSARY / GUIDE / DR / CR + 신설 사유). 판단 기준은 GUIDE §5 참조로 연결(중복 기재 안 함). |
+
+
+| V0.4 | 2026-07-16 | 저장 파일럿 기록 — GUIDE·GLOSSARY 수정 없이 전건 판정 (`WO-O4O-OTC-EN-TRANSLATION-PERSIST-PILOT-V1`). |

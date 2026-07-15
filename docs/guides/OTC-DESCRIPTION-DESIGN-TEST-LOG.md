@@ -1,6 +1,6 @@
 # OTC-DESCRIPTION-DESIGN-TEST-LOG — 설명서 화면 디자인 테스트 기록
 
-상태: **Active (기록 문서)** · V0.3 (2026-07-15) · 대상: **일반의약품(OTC) 전용**
+상태: **Active (기록 문서)** · V0.4 (2026-07-16) · 대상: **일반의약품(OTC) 전용**
 지침: [OTC-DESCRIPTION-DESIGN-GUIDE](OTC-DESCRIPTION-DESIGN-GUIDE.md)
 
 > 테스트 화면 **1건마다 §3 양식을 복사해 1개 블록**을 추가한다.
@@ -17,6 +17,7 @@
 | # | 대상 설명서 | 언어 | 화면 | 폭 | 결과 | GUIDE 반영 |
 |---|---|---|---|---|---|---|
 | D-1~D-5 | P1~P5 (파일럿 시안) | en | 모바일·태블릿세로·태블릿가로·PC | 375/768/1024/1280 | **20/20 PASS** | GUIDE V0.4 (§4.3 실측 확정) |
+| **D-7** | **저장된 영문 5건** (en · needs_review) | en | 모바일·태블릿세로·태블릿가로·PC | 375/768/1024/1280 | **20/20 PASS** | 미반영(기준 그대로) |
 | **D-6** | 긴 영문 제목 잘림 **수정 검증** | en·ko | 위 4폭 + 640경계·200%줌·KPA모달·Neture랜딩 | 9종 × 3콘텐츠 | **27/27 PASS** | GUIDE V0.5 (§8-D 해소) · 계약 V1.1 §3-1 |
 
 > 근거: [CHECK-O4O-OTC-EN-DESIGN-PILOT-VALIDATION-V1](../checks/CHECK-O4O-OTC-EN-DESIGN-PILOT-VALIDATION-V1.md) · 측정 원본 [measurements-v1.json](products/drug/pilot-en-design/evidence/measurements-v1.json)
@@ -230,6 +231,26 @@
 | DR / CR | **미반영(의도)** | CR-020 범위 내 — 중복 신설 금지 |
 | 신설 사유 | — | 해당 없음 |
 
+### D-7 — 저장된 영문 5건 렌더 검증 (2026-07-16)
+
+- 대상: DB 저장된 en STORE 5건(`needs_review`) 의 `sd-*` HTML · GUIDE **V0.5**
+- 방법: 렌더러 CSS 추출 + Playwright, 5건 × 4폭 = **20 측정**
+
+| 뷰포트 | 컨테이너 | `sd-core` | 가로 스크롤 | 잘림 |
+|---|---:|---|---:|---|
+| 모바일 375 | 347 | 1열 | 0 | 없음 |
+| 태블릿 세로 768 | 740 | 2열 | 0 | 없음 |
+| 태블릿 가로 1024 | 996 | 3열 | 0 | 없음 |
+| PC 1280 | 1252 | 3열 | 0 | 없음 |
+
+**20/20 PASS** — GUIDE §4.3 기준과 동일. `<table>` 0 · `sd-card` 5/5.
+증거: [EN-PERSIST-dexibuprofen-375px.png](products/drug/pilot-en-design/evidence/EN-PERSIST-dexibuprofen-375px.png)
+
+> **§8-D 수정 효과 확인**: 영문 성분명(`Saccharomyces boulardii`·`Dexibuprofen`)이 잘림 없이 줄바꿈된다.
+> `summaryTable` 6항목 → `sd-core` 6 item → 3열 구간에서 **2행 정확히 채움**(빈 칸 0).
+
+**반영 판정**: 기준 변경 불필요 — GUIDE V0.5 그대로 통과.
+
 ---
 
 ## 5. 이력
@@ -239,3 +260,6 @@
 | V0.1 | 2026-07-15 | 초안 작성 (`WO-O4O-OTC-DESCRIPTION-DESIGN-GUIDE-DOCS-V1`). §2 우선 검증 가설 P-1~P-6 포함. |
 | V0.2 | 2026-07-15 | 반영 판정란 추가(TEST-LOG / GUIDE / DR / CR / WO 승격 경로 + 신설 사유). 판단 기준은 GUIDE §10 참조로 연결(중복 기재 안 함). |
 | V0.3 | 2026-07-15 | D-6 기록 — 긴 영문 잘림 **수정 검증 27/27 PASS**(무회귀 포함). P-3 가설 = 수정 완료로 갱신 (`WO-O4O-SD-HERO-LONG-TEXT-OVERFLOW-FIX-V1`). |
+
+
+| V0.4 | 2026-07-16 | 저장 파일럿 기록 — GUIDE·GLOSSARY 수정 없이 전건 판정 (`WO-O4O-OTC-EN-TRANSLATION-PERSIST-PILOT-V1`). |
