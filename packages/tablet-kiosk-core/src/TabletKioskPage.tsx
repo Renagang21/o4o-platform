@@ -53,7 +53,7 @@
 import { useEffect, useReducer, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 // WO-O4O-KPA-TABLET-PRODUCT-DESCRIPTION-RICH-RENDER-V1: canonical 상품설명 HTML 안전 렌더(DOMPurify)
-import { ContentRenderer } from '@o4o/content-editor';
+import { ContentRenderer, hasStoreDescriptionMarkup } from '@o4o/content-editor';
 // WO-O4O-KPA-TABLET-TEMPLATE-THREE-PATTERNS-V1: 화면 QR 을 실제 스캔 가능한 코드로 렌더(client-side SVG, 백엔드/entity 무추가).
 //   기존 qr_guide 카드의 텍스트 안내(도메인)를 실제 QR 로 승격 + 대기 영상형 hero QR chip.
 import { QRCodeSVG } from 'qrcode.react';
@@ -715,10 +715,19 @@ export function TabletKioskPage({
               </>
             ) : (
               <>
+                {/* WO-O4O-TABLET-CONTENT-RENDERER-VARIANT-FIX-V1: 이 슬롯은 섞인다 —
+                    O4O 상품이면 SPD STORE canonical(설명서), local 상품이면 매장 입력 설명.
+                    설명서(sd-*)일 때만 공통 디자인 시스템을 태우고, 그 경우 인라인 글자 크기·색을
+                    주지 않는다(15px 이 sd-hero h1 32~44px 과 충돌). 그 외는 기존 렌더 그대로. */}
                 {selectedProduct.description && (
                   <ContentRenderer
                     html={selectedProduct.description}
-                    style={{ fontSize: '15px', color: '#475569', lineHeight: 1.6, margin: '0 0 8px' }}
+                    variant={hasStoreDescriptionMarkup(selectedProduct.description) ? 'store-description' : undefined}
+                    style={
+                      hasStoreDescriptionMarkup(selectedProduct.description)
+                        ? { margin: '0 0 8px' }
+                        : { fontSize: '15px', color: '#475569', lineHeight: 1.6, margin: '0 0 8px' }
+                    }
                   />
                 )}
                 {selectedProduct.summary && (
@@ -972,11 +981,18 @@ export function TabletKioskPage({
               </div>
               <button onClick={() => setOpenContentCard(null)} style={styles.contentModalClose} aria-label="닫기">✕</button>
             </div>
+            {/* WO-O4O-TABLET-CONTENT-RENDERER-VARIANT-FIX-V1: 이 슬롯도 섞인다 —
+                sourceType='o4o_product_description' 이어도 sd-* 설명서(OTC)와 평문 설명(e약은요)이
+                모두 온다. 그래서 sourceType 이 아니라 마크업으로 판별한다. */}
             <div style={styles.contentModalBody}>
-              <ContentRenderer
-                html={openContentCard.detail?.html ?? ''}
-                style={{ fontSize: '15px', color: '#334155', lineHeight: 1.65 }}
-              />
+              {hasStoreDescriptionMarkup(openContentCard.detail?.html) ? (
+                <ContentRenderer html={openContentCard.detail?.html ?? ''} variant="store-description" />
+              ) : (
+                <ContentRenderer
+                  html={openContentCard.detail?.html ?? ''}
+                  style={{ fontSize: '15px', color: '#334155', lineHeight: 1.65 }}
+                />
+              )}
             </div>
           </div>
         </div>

@@ -54,6 +54,23 @@ interface ContentRendererProps {
   variant?: 'product-detail' | 'guide' | 'store-description';
 }
 
+/**
+ * 이 HTML 이 매장용 설명서(sd-*) 마크업인가 — `variant="store-description"` 을 줄지 판단한다.
+ *
+ * WO-O4O-TABLET-CONTENT-RENDERER-VARIANT-FIX-V1:
+ *   설명서와 일반 콘텐츠가 **같은 슬롯**에 섞여 들어오는 소비 표면(태블릿 등)이 있다.
+ *   `store-description` variant 는 래퍼에 배경(--sd-bg)·패딩·폰트를 걸므로, sd-* 가 아닌
+ *   콘텐츠(e약은요 설명 등)에 주면 그 화면이 회귀한다. 반대로 안 주면 sd-* 가 무스타일이 된다.
+ *   → 슬롯이 고정된 표면(A 랜딩·B 모달·운영자 검수)은 지금처럼 variant 를 직접 주고,
+ *     **섞이는 슬롯만** 이 함수로 판별한다.
+ *
+ *   판별축 = `sd-card`(CR-020 §2 의 콘텐츠 루트). source_type 이 아니라 **마크업 자체**를 본다 —
+ *   sd-* 를 쓰는 새 source_type 이 생겨도 서버 계약 변경 없이 따라온다.
+ */
+export function hasStoreDescriptionMarkup(html?: string | null): boolean {
+  return typeof html === 'string' && html.includes('class="sd-card"');
+}
+
 /** 상품 상세설명 전용 스타일 — 이미지 반응형 + 컨텐츠 폭 제한 */
 const productDetailStyle: React.CSSProperties = {
   maxWidth: 720,

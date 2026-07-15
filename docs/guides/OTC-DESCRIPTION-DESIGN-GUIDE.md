@@ -1,6 +1,6 @@
 # OTC-DESCRIPTION-DESIGN-GUIDE — 일반의약품 설명서 화면 디자인 지침
 
-상태: **Draft V0.7** (2026-07-16) · 대상: **일반의약품(OTC) 전용** · 진입: [DOCUMENT-INDEX](common/DOCUMENT-INDEX.md)
+상태: **Draft V0.8** (2026-07-16) · 대상: **일반의약품(OTC) 전용** · 진입: [DOCUMENT-INDEX](common/DOCUMENT-INDEX.md)
 번역 기준: [OTC-EN-TRANSLATION-GUIDE](OTC-EN-TRANSLATION-GUIDE.md) · 테스트 기록: [OTC-DESCRIPTION-DESIGN-TEST-LOG](OTC-DESCRIPTION-DESIGN-TEST-LOG.md)
 
 > 이 문서는 **새 디자인 시스템을 만들지 않는다.** 이미 구현된 공용 렌더러를 그대로 쓴다.
@@ -55,14 +55,29 @@ OTC 에서 유의할 점만:
 
 같은 설명서 1건이 아래 화면에 그대로 재사용된다.
 
-| # | 화면 | 경로 | 렌더러 적용 |
-|---|---|---|---|
-| A | Neture 상품 QR 랜딩 (모바일) | `/p/:publicKey` | ✅ `variant="store-description"` |
-| B | KPA 약사용 모달 (PC) | 모달 (라우트 없음) | ✅ `variant="store-description"` |
-| C | KPA 태블릿 키오스크 (매장) | `/tablet/:slug` | ❌ **variant 미지정 → 무스타일** |
-| D | KPA 다국어 공개 랜딩 | `/multilingual-products/:publicKey` | ❌ **ContentRenderer 미사용** |
+**설명서(SPD)를 렌더하는 화면 — 이 문서의 적용 대상**
 
-> ⚠️ **"QR 화면과 태블릿 화면에서 동일 콘텐츠 재사용"은 아직 절반만 달성**이다. C·D는 A·B와 다르게 보인다 — 렌더러 WO §3 "후속 전환"에 미완으로 기재돼 있다. 이 문서는 **A·B 기준**으로 쓰고, C·D는 전환 후 동일 적용된다 (§8-B).
+| # | 화면 | 경로 | 렌더러 적용 | 현재 노출 |
+|---|---|---|---|---|
+| A | Neture 상품 QR 랜딩 (모바일) | `/p/:publicKey` | ✅ `variant="store-description"` | **686 master** (전량 `active`/`ok`) |
+| B | KPA 약사용 모달 (PC) | 모달 (라우트 없음) | ✅ `variant="store-description"` | 0 (OTC listing 0건) |
+| C | KPA 태블릿 키오스크 (매장) | `/tablet/*` | ✅ `variant="store-description"` **(설명서일 때만 — 아래 주)** | 0 (OTC listing 0건) |
+| E | 운영자 설명서 검수 (admin) | `/admin/o4o-product-db/supplier-store-descriptions` | ✅ `variant="store-description"` | 공급자 `SUPPLIER_STORE` |
+
+> **C 는 슬롯이 섞인다.** 같은 자리에 설명서(`sd-*`)와 평문 설명(e약은요 19,177건 등)이 모두 들어온다.
+> `store-description` variant 는 래퍼에 배경·패딩·폰트를 걸므로 **평문에 주면 그 화면이 회귀**한다.
+> → C 는 `hasStoreDescriptionMarkup(html)`(= `class="sd-card"` 보유)로 **설명서일 때만** variant 를 준다.
+> 슬롯이 고정된 A·B·E 는 지금처럼 variant 를 직접 준다. 판별축은 `source_type` 이 아니라 **마크업**이다 —
+> `o4o_product_description` 카드에도 e약은요(평문)가 오기 때문이다 (§8-B).
+
+**설명서를 렌더하지 않는 화면 — 이 문서의 대상 아님**
+
+| # | 화면 | 경로 | 데이터 |
+|---|---|---|---|
+| D | KPA 다국어 공개 랜딩 | `/multilingual-products/:publicKey` | **SPD 아님** — `store_multilingual_product_content_*` (운영자 RichTextEditor 저작 → HUB → 매장 복사). `sd-*` 를 생성하지 않으며 `source_type` enum 이 SPD 를 배제한다. |
+
+> **D 를 "설명서 렌더 경로"로 분류하면 안 된다.** OTC 설명서가 D 에 도달할 경로는 코드상 없다 —
+> 근거: [CHECK-...-8B-RENDER-PATH-AUDIT-V1](../checks/CHECK-O4O-OTC-DESIGN-8B-RENDER-PATH-AUDIT-V1.md) §5.
 
 ---
 
@@ -197,7 +212,7 @@ OTC 에서 유의할 점만:
 | # | 항목 | 영향 |
 |---|---|---|
 | ~~**A**~~ | ~~주의사항·금기 전용 class 부재~~ | ✅ **완전 해결 (2026-07-16)** — 계약·코드(`sd-warn` 신설 + 렌더러/빌더, `WO-O4O-SD-WARNING-CLASS-CONTRACT-AND-BUILDER-V1`) **+ 공개 중인 1,372건(ko 686 + en 686) 소급 적용**(`sd-who` 잔여 0, 클래스 외 콘텐츠 변경 0, `WO-O4O-OTC-SD-WARN-BACKFILL-1372-V1`) |
-| **B** | **C 키오스크 variant 미지정 / D 렌더러 미사용** | 같은 설명서가 화면마다 다르게 보임 (§3) |
+| ~~**B**~~ | ~~C 키오스크 variant 미지정 / D 렌더러 미사용~~ | ✅ **해결 (2026-07-16)** — **C**: 태블릿 설명서 슬롯 2곳(상품 상세 `description` · content_list 카드 상세)에 variant 적용 + 인라인 15px 제거. 섞이는 슬롯이라 `hasStoreDescriptionMarkup` 로 설명서일 때만 적용 → e약은요 회귀 0 (48측정 PASS). **D**: **오분류였음** — SPD 를 읽지 않는 별개 파이프라인이라 대상에서 제외(§3). 조사 = `WO-O4O-OTC-DESIGN-8B-RENDER-PATH-AUDIT-V1` / 수정 = `WO-O4O-TABLET-CONTENT-RENDERER-VARIANT-FIX-V1` |
 | **C** | **언어 전환 UI 4중 중복** | 화면마다 조작이 다름 (§5) |
 | ~~**D**~~ | ~~줄바꿈 규칙 부재 + `overflow:hidden`~~ | ✅ **해결 (2026-07-15)** — `overflow-wrap:anywhere` 적용. `WO-O4O-SD-HERO-LONG-TEXT-OVERFLOW-FIX-V1` |
 | **E** | **표(`<table>`) 소비 측 가로 스크롤 없음** | `.tableWrapper{overflow-x:auto}` 가 `.content-editor .ProseMirror` **편집기에만** 스코프됨(`tableKit.ts:45`). 소비 측은 `table-layout:fixed; width:100%` + 카드 `overflow:hidden` → 넓은 표가 **찌그러지고 잘림**. `sd-*` 표 class 도 없음 |
@@ -244,3 +259,4 @@ OTC 에서 유의할 점만:
 | V0.5 | 2026-07-15 | **§8-D 해소** — 렌더러에 `overflow-wrap:anywhere; word-break:normal` 적용으로 긴 영문 단어 잘림 수정(h1 594→301, 27/27 PASS, 반응형·한국어 무회귀). §7 경고 → 해결 기록으로 교체 (`WO-O4O-SD-HERO-LONG-TEXT-OVERFLOW-FIX-V1`). |
 | V0.6 | 2026-07-16 | §2 주의사항 = **`sd-warn`**(신설) 반영 · §8-A **계약·코드 해소**(기존 686 소급은 별도 WO). 근거 = `CHECK-O4O-SD-WARNING-CLASS-CONTRACT-AND-BUILDER-V1`. |
 | V0.7 | 2026-07-16 | §2·§8-A **소급 완료 반영** — 공개 중인 1,372건(ko 686 + en 686) `sd-who`→`sd-warn` 적용, 잔여 0. §8-A **완전 해결**. 규칙 변경 없음(상태 갱신). 근거 = `CHECK-O4O-OTC-SD-WARN-BACKFILL-1372-V1`. |
+| V0.8 | 2026-07-16 | **§3 화면 표 구조 정정** — SPD 렌더 화면(A·B·C·E)과 비렌더 화면(D)을 분리. **D 는 SPD 미사용 → 대상 제외**(오분류 정정), **E 운영자 검수 화면 추가**(누락), **C variant 적용**(섞이는 슬롯 = 마크업 판별) + 화면별 현재 노출 병기. **§8-B 해결**. 근거 = `CHECK-O4O-OTC-DESIGN-8B-RENDER-PATH-AUDIT-V1` · `CHECK-O4O-TABLET-CONTENT-RENDERER-VARIANT-FIX-V1`. |

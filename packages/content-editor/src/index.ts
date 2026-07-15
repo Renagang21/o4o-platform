@@ -5,6 +5,8 @@
 
 // WO-O4O-LMS-LESSON-AI-ASSIST-V1: AiContentModal 외부 export 추가 (LessonModal 직접 mount용)
 export { RichTextEditor, Toolbar, ContentPreview, ContentRenderer, TemplateModal, SaveTemplateModal, AiContentModal } from './components';
+// WO-O4O-TABLET-CONTENT-RENDERER-VARIANT-FIX-V1: 설명서/일반 콘텐츠가 섞이는 슬롯의 variant 판별
+export { hasStoreDescriptionMarkup } from './components';
 export { sanitizeHtml, sanitizeRichHtml, isBlankHtml } from './sanitize';
 export { handleClipboardPaste, compressImage } from './utils/handleImagePaste';
 // WO-O4O-STANDARD-EDITOR-TEMPLATE-PURPOSE-CATEGORY-V1: 고정 분류 상수/헬퍼
