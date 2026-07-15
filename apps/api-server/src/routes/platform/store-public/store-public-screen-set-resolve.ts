@@ -22,6 +22,8 @@ import { resolveTabletIdleItems } from './store-public-tablet-idle-resolve.js';
 import { resolveTemplateKey, shapeStaticBlock } from './store-public-tablet-screen.js';
 import { resolveContentListItems } from './store-public-tablet-content-resolve.js';
 import { parseIdleMediaConfig, resolveIdleMediaItems } from '../store-tablet-idle-block.js';
+// WO-O4O-KPA-TABLET-QR-AUTO-LINK-AND-GUIDE-URL-V1: qr_guide URL 을 Screen Set QR(public_qr_slug)로 서버 도출.
+import { buildScreenSetQrUrl } from '../store-screen-set-qr.service.js';
 
 export interface ScreenSection {
   blockType: string;
@@ -70,7 +72,8 @@ export async function resolveScreenSetSections(
   input: ResolveScreenSetInput,
 ): Promise<ResolvedScreenSet | null> {
   const setRows = await dataSource.query(
-    `SELECT id, name, status, template_key AS "templateKey" FROM store_tablet_screen_sets
+    `SELECT id, name, status, template_key AS "templateKey", public_qr_slug AS "publicQrSlug"
+     FROM store_tablet_screen_sets
      WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL AND status <> 'archived' LIMIT 1`,
     [input.screenSetId, input.organizationId],
   );
@@ -127,6 +130,15 @@ export async function resolveScreenSetSections(
       } else if (b.blockType === 'content_list') {
         const cards = await resolveContentListItems(dataSource, input.storeId, b.config);
         sections.push({ blockType: 'content_list', sortOrder: b.sortOrder, data: { items: cards } });
+      } else if (b.blockType === 'qr_guide') {
+        // WO-O4O-KPA-TABLET-QR-AUTO-LINK-AND-GUIDE-URL-V1 §5:
+        //   qr_guide URL 은 config 자유 입력값에 의존하지 않고 Screen Set QR(public_qr_slug)로 **서버 도출**.
+        //   slug 없으면 임의 URL 을 쓰지 않는다(url=''). label(안내 문구)만 config 유지.
+        //   블록이 존재하면 노출(라벨 없어도 자동 URL 있으면 렌더). label·url 둘 다 없으면 생략.
+        const cfg = (b.config && typeof b.config === 'object' && !Array.isArray(b.config)) ? (b.config as Record<string, unknown>) : {};
+        const label = typeof cfg.label === 'string' ? cfg.label : '';
+        const url = set.publicQrSlug ? buildScreenSetQrUrl(input.serviceKey, set.publicQrSlug) : '';
+        if (label || url) sections.push({ blockType: 'qr_guide', sortOrder: b.sortOrder, data: { label, url } });
       } else {
         const data = shapeStaticBlock(b.blockType, b.config);
         if (data) sections.push({ blockType: b.blockType, sortOrder: b.sortOrder, data });

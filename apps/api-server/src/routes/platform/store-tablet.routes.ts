@@ -50,8 +50,30 @@ import { parseContentListConfig } from './store-tablet-content-list-block.js';
 //   공개 /tablet/screen 핸들러와 동일한 resolve 함수(SELECT only)를 관리 라우터에서 재사용한다.
 import { resolveContentListItems } from './store-public/store-public-tablet-content-resolve.js';
 import { shapeStaticBlock, resolveTemplateKey } from './store-public/store-public-tablet-screen.js';
+// WO-O4O-KPA-TABLET-QR-AUTO-LINK-AND-GUIDE-URL-V1: 저장 시 screen_set QR 멱등 확보 + URL 도출.
+import { ensureScreenSetQr, buildScreenSetQrUrl } from './store-screen-set-qr.service.js';
 
 type AuthMiddleware = import('express').RequestHandler;
+
+// 태블릿 관리 라우트는 KPA 전용(/api/v1/store 마운트, service-agnostic). QR URL/서비스 스코프 기본 kpa.
+const TABLET_QR_SERVICE_KEY = 'kpa';
+
+// 저장 응답에 QR 링크 정보를 additive 로 병합. ensure 실패는 저장을 무효화하지 않고 플래그로 표기(§3 복구 가능).
+async function withQrLink(
+  dataSource: DataSource,
+  organizationId: string,
+  screenSetId: string,
+  base: Record<string, unknown>,
+): Promise<Record<string, unknown>> {
+  try {
+    const qr = await ensureScreenSetQr(dataSource, { organizationId, screenSetId, serviceKey: TABLET_QR_SERVICE_KEY });
+    if (qr) return { ...base, publicQrSlug: qr.slug, publicQrUrl: qr.url };
+    return { ...base, publicQrSlug: (base.publicQrSlug as string) ?? null, publicQrUrl: null };
+  } catch (err) {
+    console.error('[StoreTablet] ensureScreenSetQr failed (non-fatal, recoverable):', (err as any)?.message);
+    return { ...base, publicQrSlug: (base.publicQrSlug as string) ?? null, publicQrUrl: null, qrLink: 'failed' };
+  }
+}
 
 // ─────────────────────────────────────────────────────
 // Display Guard — 상품 존재 검증
@@ -1170,6 +1192,8 @@ export function createStoreTabletRoutes(
     `${p}id, ${p}organization_id AS "organizationId", ${p}service_key AS "serviceKey", ` +
     `${p}tablet_id AS "tabletId", ${p}name, ${p}origin, ${p}status, ` +
     `COALESCE(${p}template_key, 'corner_information_basic_v1') AS "templateKey", ` +
+    // WO-O4O-KPA-TABLET-QR-AUTO-LINK-AND-GUIDE-URL-V1: 연결된 screen_set QR slug(additive, nullable).
+    `${p}public_qr_slug AS "publicQrSlug", ` +
     `${p}created_by_user_id AS "createdByUserId", ${p}created_at AS "createdAt", ${p}updated_at AS "updatedAt"`;
   const blockCols = (p: string) =>
     `${p}id, ${p}screen_set_id AS "screenSetId", ${p}block_type AS "blockType", ${p}sort_order AS "sortOrder", ` +
@@ -1213,7 +1237,9 @@ export function createStoreTabletRoutes(
         `SELECT ${blockCols('')} FROM store_tablet_screen_blocks WHERE screen_set_id = $1 ORDER BY sort_order ASC`,
         [req.params.id],
       );
-      res.json({ success: true, data: { ...rows[0], blocks } });
+      // WO-O4O-KPA-TABLET-QR-AUTO-LINK-AND-GUIDE-URL-V1 §4: 관리 상세 진입 시 owner 인증 하 lazy ensure
+      //   (과거 저장/연결 누락 콘텐츠 복구). 공개 runtime 은 read-only 유지(여기 아님).
+      res.json({ success: true, data: await withQrLink(dataSource, organizationId, req.params.id, { ...rows[0], blocks }) });
     } catch (error: any) {
       console.error('[StoreTablet] GET /screen-sets/:id error:', error);
       res.status(500).json({ success: false, error: 'Failed to fetch screen set', code: 'INTERNAL_ERROR' });
@@ -1246,7 +1272,8 @@ export function createStoreTabletRoutes(
          RETURNING ${setCols('')}`,
         [organizationId, tabletId, name, status, templateKey, userId],
       );
-      res.status(201).json({ success: true, data: ins[0] });
+      // WO-O4O-KPA-TABLET-QR-AUTO-LINK-AND-GUIDE-URL-V1 §3: Screen Set ID 생성 후 screen_set QR 자동 확보.
+      res.status(201).json({ success: true, data: await withQrLink(dataSource, organizationId, ins[0].id, ins[0]) });
     } catch (error: any) {
       console.error('[StoreTablet] POST /screen-sets error:', error);
       res.status(500).json({ success: false, error: 'Failed to create screen set', code: 'INTERNAL_ERROR' });
@@ -1293,7 +1320,16 @@ export function createStoreTabletRoutes(
          RETURNING ${setCols('')}`,
         params,
       );
-      res.json({ success: true, data: upd[0] });
+      if (!upd?.[0]) { res.status(404).json({ success: false, error: 'Screen set not found', code: 'SCREEN_SET_NOT_FOUND' }); return; }
+      // WO-O4O-KPA-TABLET-QR-AUTO-LINK-AND-GUIDE-URL-V1 §7: 이름 변경 시 QR title 갱신(가능) — slug 는 불변.
+      if (req.body?.name !== undefined && upd[0].publicQrSlug) {
+        await dataSource.query(
+          `UPDATE store_qr_codes SET title = $1, updated_at = NOW()
+           WHERE organization_id = $2 AND landing_type = 'screen_set' AND landing_target_id = $3`,
+          [String(upd[0].name || 'Tablet Corner').slice(0, 300), organizationId, id],
+        ).catch((e: unknown) => console.error('[StoreTablet] QR title sync failed (non-fatal):', (e as any)?.message));
+      }
+      res.json({ success: true, data: await withQrLink(dataSource, organizationId, id, upd[0]) });
     } catch (error: any) {
       console.error('[StoreTablet] PATCH /screen-sets/:id error:', error);
       res.status(500).json({ success: false, error: 'Failed to update screen set', code: 'INTERNAL_ERROR' });
@@ -1356,7 +1392,9 @@ export function createStoreTabletRoutes(
         await manager.query(`UPDATE store_tablet_screen_sets SET updated_at = NOW() WHERE id = $1`, [id]);
       });
       const updated = await dataSource.query(`SELECT ${blockCols('')} FROM store_tablet_screen_blocks WHERE screen_set_id = $1 ORDER BY sort_order ASC`, [id]);
-      res.json({ success: true, data: updated });
+      // WO-O4O-KPA-TABLET-QR-AUTO-LINK-AND-GUIDE-URL-V1 §3: 블록 저장(커밋) 후 screen_set QR 확보.
+      //   data(blocks 배열)는 그대로 두고 publicQrSlug/publicQrUrl 를 top-level additive 로 병합(프론트 호환).
+      res.json({ success: true, data: updated, ...(await withQrLink(dataSource, organizationId, id, {})) });
     } catch (error: any) {
       console.error('[StoreTablet] PUT /screen-sets/:id/blocks error:', error);
       res.status(500).json({ success: false, error: 'Failed to save blocks', code: 'INTERNAL_ERROR' });
