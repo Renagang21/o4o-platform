@@ -551,9 +551,13 @@ export function ruleD(input: GuardProductInput): GuardFinding[] {
   {
     const srcAll = `${input.source.baseStandard} ${input.source.intake} ${input.source.caution} ${input.source.dosageForm} ${input.source.mainFunction}`;
     const srcStatesShelfGuarantee = /유통\s*기한|shelf\s*life|보장/i.test(srcAll);
+    // ⚠️ 문장 경계를 `[^.]` 로 잡으면 **소수점 하나에 끊긴다** → 위반을 놓친다(미탐).
+    //    실측 재현: "guarantees at least **1.5** billion CFU … through its shelf life" → 검출 실패.
+    //    소수점 결손의 5번째 경로. 경계는 마침표가 아니라 **마침표+공백**(문장 종결)이다.
+    const NOT_SENTENCE_END = String.raw`(?:(?![.。]\s)[\s\S])`;
     const claims: Array<[RegExp, 'ko' | 'en', string]> = [
-      [/유통\s*기한\s*까지[^。.]{0,24}보장|보장[^。.]{0,24}유통\s*기한\s*까지/g, 'ko', 'koDraft'],
-      [/guarantee[sd]?[^.]{0,90}shelf\s*life|shelf\s*life[^.]{0,50}guarantee[sd]?/gi, 'en', 'enDraft'],
+      [new RegExp(String.raw`유통\s*기한\s*까지${NOT_SENTENCE_END}{0,24}보장|보장${NOT_SENTENCE_END}{0,24}유통\s*기한\s*까지`, 'g'), 'ko', 'koDraft'],
+      [new RegExp(String.raw`guarantee[sd]?${NOT_SENTENCE_END}{0,90}shelf\s*life|shelf\s*life${NOT_SENTENCE_END}{0,50}guarantee[sd]?`, 'gi'), 'en', 'enDraft'],
     ];
     for (const [re, lang, field] of claims) {
       const text = stripHtml(lang === 'ko' ? input.drafts.ko : input.drafts.en);

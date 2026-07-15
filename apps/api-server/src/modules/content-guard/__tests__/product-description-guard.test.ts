@@ -280,6 +280,47 @@ describe('V1.1 — 위험 신호와 정보성 신호 분리', () => {
     expect(f.status).toBe('REVIEW_REQUIRED');
   });
 
+  // 소수점 결손 **5번째 경로** (CP2 전 전수 검색에서 발견) — 이번엔 **미탐**이다.
+  // 문장 경계를 `[^.]` 로 잡으면 "1.5 billion" 의 소수점에서 끊겨 위반을 통째로 놓친다.
+  it('D-SHELFLIFE: 소수점이 끼어도 유통기한 보장을 놓치지 않는다 (en)', () => {
+    const r = runGuard(
+      {
+        ...OK_VIVA_FULL_BASIS,
+        drafts: {
+          ...OK_VIVA_FULL_BASIS.drafts,
+          en: '<p>This product guarantees at least 1.5 billion CFU per 15g through its shelf life.</p>',
+        },
+      },
+      { phase: 'post' },
+    );
+    expect(r.findings.some((f) => f.ruleId === 'D-SHELFLIFE-GUARANTEE-007' && f.status === 'BLOCKED')).toBe(true);
+  });
+
+  it('D-SHELFLIFE: 소수점이 끼어도 유통기한 보장을 놓치지 않는다 (ko)', () => {
+    const r = runGuard(
+      {
+        ...OK_VIVA_FULL_BASIS,
+        drafts: { ...OK_VIVA_FULL_BASIS.drafts, ko: '<p>이 제품은 15g당 1.5억 CFU를 유통기한까지 보장합니다.</p>' },
+      },
+      { phase: 'post' },
+    );
+    expect(r.findings.some((f) => f.ruleId === 'D-SHELFLIFE-GUARANTEE-007' && f.status === 'BLOCKED')).toBe(true);
+  });
+
+  it('D-SHELFLIFE: 문장이 바뀌면 결합하지 않는다 (과탐 방지)', () => {
+    const r = runGuard(
+      {
+        ...OK_VIVA_FULL_BASIS,
+        drafts: {
+          ...OK_VIVA_FULL_BASIS.drafts,
+          en: '<p>This product guarantees quality. Storage is cool and dry through its shelf life.</p>',
+        },
+      },
+      { phase: 'post' },
+    );
+    expect(r.findings.some((f) => f.ruleId.startsWith('D-SHELFLIFE'))).toBe(false);
+  });
+
   it('D-SHELFLIFE: 중립 표현(표시 기준/labelled standard)은 검출되지 않는다', () => {
     const r = runGuard(
       {
