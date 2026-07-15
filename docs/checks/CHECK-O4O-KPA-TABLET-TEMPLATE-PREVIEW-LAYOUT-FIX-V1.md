@@ -76,27 +76,42 @@ lg:grid lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]   → 왼쪽 ≈57.4% / �
 | 항목 | 결과 |
 |------|------|
 | `tsc --noEmit -p tsconfig.json` | ✅ **EXIT=0** |
-| `vite build` | ✅ **EXIT=0** (22.3s) |
+| `vite build` | ✅ **EXIT=0** |
 | 사장 코드 제거 | ✅ tsc TS6133 이 `LayoutTemplate` 검출 → 제거 후 0 |
 | 구조(헤더/스텝=그리드 밖, aside=상시) | ✅ 마커 확인 |
 | API·DB·kiosk-core 변경 | **없음** |
+| 배포 | ✅ Deploy Web Services success (run 29414246780 · 29414946125) |
 
-> **브라우저 실측 + 스크린샷**: 아래 §8 참조.
+## 8. 브라우저 실측 (배포본 · PASS)
 
-## 8. 스크린샷 / 브라우저 실측
+`https://kpa-society.co.kr` · 약국 경영자 계정(SSOT=`docs/local/TEST-ACCOUNTS.local.md`, env 주입) · Playwright 1.57 · viewport 1600×1000.
 
-WO 산출물로 **실제 제작 화면 스크린샷**이 요구된다. 배포 후 약국 계정(SSOT=`docs/local/TEST-ACCOUNTS.local.md`)으로 실측한다.
+| 검증 항목 | 결과 |
+|-----------|------|
+| 신규 제작 진입 | ✅ 태블릿 콘텐츠 탭 → `태블릿 화면 만들기` |
+| 템플릿 카드 5종 표시 | ✅ `button[aria-pressed]` **count=5**, 각 카드 와이어프레임 상이 |
+| 카드 클릭 → 선택 상태 변경 | ✅ `선택됨` 배지 이동 확인 |
+| **오른쪽 태블릿 미리보기 즉시 변경** | ✅ 템플릿별 레이아웃 실제 상이 — 대기 영상형=「화면을 터치하세요 / Touch to start」 전면 영상 / 제품 진열형=「매장 상품 안내」+제품 그리드+가격 / 기본 코너 안내형=헤더+상품 카드 (kiosk-core 가 `screen.templateKey` 로 분기) |
+| QR 모바일 미리보기 전환 | ✅ 9:19 프레임 전환 |
+| 다음 단계에서도 미리보기 유지 | ✅ step 2(기본 정보)에서도 우측 패널 유지 |
+| 콘솔/pageerror / API 4xx·5xx | ✅ **0건** |
 
-실측 항목:
+### 8-1. 실측으로 발견·수정한 결함 (sticky 무력화)
+
+최초 구현의 `lg:sticky lg:top-4` 가 **전혀 동작하지 않음**을 실측으로 확인했다(정적 검증만으로는 잡히지 않는 결함).
+
 ```
-신규 제작 진입 → 템플릿 카드 5종 표시
-카드 클릭 → 선택 상태 변경
-오른쪽 태블릿 미리보기 즉시 변경
-QR 모바일 미리보기 전환
-다음 단계에서도 오른쪽 미리보기 유지
-기존 저장·dirty guard 유지
+수정 전: 스크롤 700px → asideTop = -115  (패널이 화면 밖으로 밀려남)
+수정 후: 스크롤 700px → asideTop =   73  (headerBottom=65 바로 아래 고정)
 ```
-(콘솔 0만으로 PASS 금지 — 성공·실패 toast + API success/error 동시 확인)
+
+원인 2가지 → 수정(commit `4622349f4`):
+1. **매니저 루트 카드의 `overflow-hidden`** 이 조상 스크롤포트가 되어 sticky 를 무력화
+   → 제작 셸(takeover)을 **카드 래퍼 밖**에서 렌더. 카드 헤더(`태블릿 콘텐츠`)와 셸 헤더(`태블릿 화면 만들기`) **중복도 함께 해소**.
+2. sticky 오프셋 `top-4`(16px) < **전역 헤더 높이 65px**(실측: `header` `position:sticky; top:0; z-50`)
+   → `lg:top-[73px]` 로 조정(헤더 하단 +8px).
+
+> 저장 실행(row write)은 하지 않았다 — 검증 목적의 테스트 콘텐츠를 프로덕션에 남기지 않기 위함. 저장 경로·dirty guard 는 **미변경**(코드 기준)이며, 실제 저장 smoke 는 운영 데이터 생성이 필요할 때 별도 수행.
 
 ## 9. 후속
 
