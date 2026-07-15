@@ -1,6 +1,6 @@
 # OTC-EN-TRANSLATION-GUIDE — 일반의약품 설명서 영문 번역 지침
 
-상태: **Draft V0.3** (2026-07-15) · 대상: **일반의약품(OTC) 전용** · 진입: [DOCUMENT-INDEX](common/DOCUMENT-INDEX.md)
+상태: **Draft V0.5** (2026-07-15) · 대상: **일반의약품(OTC) 전용** · 진입: [DOCUMENT-INDEX](common/DOCUMENT-INDEX.md)
 
 > 이 문서는 완성된 규정이 아니다. **테스트 번역을 시작하기 위한 초안**이다.
 > 테스트에서 발견된 문제는 [OTC-EN-TRANSLATION-TEST-LOG](OTC-EN-TRANSLATION-TEST-LOG.md)에 기록하고, 반복되는 것만 이 문서와 [OTC-KO-EN-GLOSSARY](OTC-KO-EN-GLOSSARY.md)에 반영한다.
@@ -95,11 +95,23 @@
 
 ---
 
-## 5. 버전 관리
+## 5. 버전 관리 · 테스트 결과 반영
 
 - 이 문서와 GLOSSARY는 각각 **독립 버전**을 가진다 (`V0.1`, `V0.2` …).
-- 번역 작업 시 **사용한 GUIDE 버전과 GLOSSARY 버전을 TEST-LOG에 기록**한다.
-- 변경은 §7 이력 표에 1줄씩 추가한다.
+- 번역 작업 시 **사용한 GUIDE 버전과 GLOSSARY 버전을 TEST-LOG에 기록**한다 (**OR-005**).
+- 변경은 §7 이력 표에 1줄씩 **같은 커밋에서** 추가한다 (OR-005).
+
+**테스트 결과를 어디에 반영하나** — 새 규칙이 아니라 [DOCUMENT-ARCHITECTURE §3·§6](common/DOCUMENT-ARCHITECTURE.md)(단일 위치 · 공통 우선 · 새 규칙은 CHECK가 아니라 Guide + Registry)의 적용이다. [TEST-LOG](OTC-EN-TRANSLATION-TEST-LOG.md)는 **실행 결과** 문서이므로 규칙이 거기 남으면 안 된다.
+
+| 문제의 범위 | 반영 위치 |
+|---|---|
+| 그 설명서 1건만 | **TEST-LOG에만** |
+| 다른 OTC 번역에도 반복되는 표현 | **[GLOSSARY](OTC-KO-EN-GLOSSARY.md)** |
+| 다른 OTC 번역에도 반복되는 기준 | **본 GUIDE** |
+| 의약품 전반 규칙 | **[DR Registry](products/drug/DRUG-RULE-REGISTRY.md)** |
+| 제품군에 걸치는 규칙 | **[CR Registry](common/CONTENT-RULE-REGISTRY.md)** |
+
+**기존 규칙으로 설명되면 새 규칙을 만들지 않고 그 규칙을 보완한다.** (예: §2.2 의 "부재≠허용"은 신설이 아니라 CR-004 연결이다.)
 
 ---
 
@@ -122,3 +134,4 @@
 | V0.2 | 2026-07-15 | 대상 = 일반의약품 전용으로 §1 명확화. |
 | V0.3 | 2026-07-15 | **외국어 번역 기준을 직역 중심에서 소비자 친화적 톤으로 변경. 한국어 정본의 핵심 정보와 안전 관련 내용은 그대로 유지.** 원칙을 정보(엄격)/표현(유연) 2층으로 재구성 (`WO-O4O-OTC-EN-TRANSLATION-GUIDE-CONSUMER-TONE-REVISION-V1`). |
 | V0.4 | 2026-07-15 | V0.3 소비자 톤 전환이 연 grounding 함정을 §2.2 경계에 명시(특히 **①부재를 허용으로** = 의약품 안전 문제) + §4 정보 체크리스트 1줄 추가. 규칙 신설 아님 — 전 제품군 공통 [CONTENT-AUTHORING-PRINCIPLES §4-1](content-authoring/CONTENT-AUTHORING-PRINCIPLES.md)(CR-002·003·004) 연결. 건기식 파일럿 검수에서 실제 검출된 5유형 반영. |
+| V0.5 | 2026-07-15 | §5 에 테스트 결과 반영 경로 추가(TEST-LOG / GLOSSARY / GUIDE / DR / CR). 규칙 신설 아님 — DOCUMENT-ARCHITECTURE §3·§6 매핑 + OR-005(버전·이력 갱신) 연결. |

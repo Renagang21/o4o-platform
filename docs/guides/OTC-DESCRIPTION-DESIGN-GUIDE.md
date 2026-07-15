@@ -1,6 +1,6 @@
 # OTC-DESCRIPTION-DESIGN-GUIDE — 일반의약품 설명서 화면 디자인 지침
 
-상태: **Draft V0.1** (2026-07-15) · 대상: **일반의약품(OTC) 전용** · 진입: [DOCUMENT-INDEX](common/DOCUMENT-INDEX.md)
+상태: **Draft V0.2** (2026-07-15) · 대상: **일반의약품(OTC) 전용** · 진입: [DOCUMENT-INDEX](common/DOCUMENT-INDEX.md)
 번역 기준: [OTC-EN-TRANSLATION-GUIDE](OTC-EN-TRANSLATION-GUIDE.md) · 테스트 기록: [OTC-DESCRIPTION-DESIGN-TEST-LOG](OTC-DESCRIPTION-DESIGN-TEST-LOG.md)
 
 > 이 문서는 **새 디자인 시스템을 만들지 않는다.** 이미 구현된 공용 렌더러를 그대로 쓴다.
@@ -211,8 +211,29 @@
 
 ---
 
-## 10. 이력
+## 10. 테스트 결과를 어디에 반영하나
+
+> **새 규칙이 아니다.** 경로의 SSOT = [DOCUMENT-ARCHITECTURE §3](common/DOCUMENT-ARCHITECTURE.md)(단일 위치 · 공통 우선 · CHECK는 규칙을 설명하지 않는다) + [§6](common/DOCUMENT-ARCHITECTURE.md)(새 규칙 → CHECK가 아니라 Guide 수정 + Registry 등재). 아래는 그 원칙을 **이 문서군에 매핑**한 것이다.
+
+[TEST-LOG](OTC-DESCRIPTION-DESIGN-TEST-LOG.md)는 **실행 결과(CHECK 역할)** 문서다. 규칙은 TEST-LOG에 살지 않는다.
+
+| 문제의 범위 | 반영 위치 |
+|---|---|
+| 그 설명서 1건만의 문제 | **TEST-LOG에만** |
+| 다른 OTC 설명서에도 반복될 디자인 기준 | **본 GUIDE** |
+| 의약품 전반에 걸치는 규칙 | **[DR Registry](products/drug/DRUG-RULE-REGISTRY.md)** + 해당 Guide |
+| 제품군에 걸쳐 성립하는 규칙 | **[CR Registry](common/CONTENT-RULE-REGISTRY.md)** + 해당 공통 Guide |
+| 코드를 고쳐야 하는 것 | 문서가 아니라 **WO** (§8) |
+
+- **중복 신설 금지**: 기존 CR/DR 로 설명되면 새 규칙을 만들지 않고 **그 규칙을 보완**한다 (예: 색 의존 금지는 CR-005 소비자 오해 방지의 디자인 적용).
+- **반영 시 버전·이력을 같은 커밋에서 갱신**한다 (§11) — **OR-005**.
+- 테스트 시 **사용한 GUIDE 버전을 TEST-LOG에 기록**한다 (OR-005).
+
+---
+
+## 11. 이력
 
 | 버전 | 일자 | 내용 |
 |---|---|---|
 | V0.1 | 2026-07-15 | 초안 작성 (`WO-O4O-OTC-DESCRIPTION-DESIGN-GUIDE-DOCS-V1`). 신규 디자인 정의 없음 — 기존 `ContentRenderer variant="store-description"` 실측값 정리 + 미해결 5건(§8) 기록. 화면 실측 검증 전. |
+| V0.2 | 2026-07-15 | §10 테스트 결과 반영 경로 추가. 규칙 신설 아님 — DOCUMENT-ARCHITECTURE §3·§6 매핑 + OR-005(버전·이력 갱신) 연결. |

@@ -1,11 +1,14 @@
 # OTC-EN-TRANSLATION-TEST-LOG — 테스트 번역 및 오류 기록
 
-상태: **Active (기록 문서)** · V0.2 (2026-07-15) · 대상: **일반의약품(OTC) 전용**
+상태: **Active (기록 문서)** · V0.3 (2026-07-15) · 대상: **일반의약품(OTC) 전용**
 지침: [OTC-EN-TRANSLATION-GUIDE](OTC-EN-TRANSLATION-GUIDE.md) · 권장 표현: [OTC-KO-EN-GLOSSARY](OTC-KO-EN-GLOSSARY.md)
 
 > 테스트 번역 **1건마다 §2 양식을 복사해 1개 블록**을 추가한다.
-> 여기 기록된 것 중 **반복되는 것만** GUIDE / GLOSSARY 에 반영한다. 1회성 이슈는 이 문서에만 남긴다.
 > 용어 불일치 자체는 **오류가 아니다** (GLOSSARY는 고정 사전이 아님). 문맥상 어느 표현이 나았는지를 기록한다.
+>
+> ⚠️ **이 문서는 실행 결과(CHECK 역할)다 — 규칙이 여기 살면 안 된다.**
+> 1회성 이슈는 여기 남기고, 반복될 것은 승격한다: 표현 = GLOSSARY / 기준 = GUIDE / 의약품 공통 = DR / 제품군 공통 = CR.
+> 판단 기준은 **[GUIDE §5](OTC-EN-TRANSLATION-GUIDE.md)** 에 있다(여기서 반복하지 않는다).
 
 ---
 
@@ -73,11 +76,22 @@
 **수정 결과**
 -
 
-**지침서·용어표 반영**
+**반영 판정** (기준 = [GUIDE §5](OTC-EN-TRANSLATION-GUIDE.md) · 버전·이력 갱신 = OR-005)
+
+- [ ] 이 1건만 → **본 TEST-LOG에만** (승격 없음)
+- [ ] 반복되는 표현 → **GLOSSARY**
+- [ ] 반복되는 기준 → **GUIDE**
+- [ ] 의약품 전반 규칙 → **DR-NNN** (ID: )
+- [ ] 제품군 공통 규칙 → **CR-NNN** (ID: )
+
+> **기존 규칙으로 설명되면 신설하지 않고 보완한다.** 신설했다면 사유를 적는다.
+
 | 대상 | 반영 여부 | 내용 |
 |---|---|---|
 | GUIDE | 미반영 / 반영(V0.x) | |
 | GLOSSARY | 미반영 / 반영(V0.x) | |
+| DR / CR | 미반영 / 반영(ID) | |
+| 신설 사유 (신설 시에만) | | |
 ```
 
 ---
@@ -94,3 +108,4 @@
 |---|---|---|
 | V0.1 | 2026-07-15 | 초안 작성 (`WO-O4O-OTC-EN-TRANSLATION-GUIDE-DOCS-V1`). |
 | V0.2 | 2026-07-15 | 소비자 톤 기준 반영 — 정보/표현 2층 검증 표, 직역투·GLOSSARY 이탈 기록란 추가 (`WO-O4O-OTC-EN-TRANSLATION-GUIDE-CONSUMER-TONE-REVISION-V1`). |
+| V0.3 | 2026-07-15 | 반영 판정란 추가(TEST-LOG / GLOSSARY / GUIDE / DR / CR + 신설 사유). 판단 기준은 GUIDE §5 참조로 연결(중복 기재 안 함). |
