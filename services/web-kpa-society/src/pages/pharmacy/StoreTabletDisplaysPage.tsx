@@ -55,6 +55,8 @@ import {
 import type { Tablet as TabletType, ProductPool, TabletDisplaySettings } from '../../api/tabletDisplays';
 // WO-O4O-KPA-TABLET-SCREEN-SET-BLOCK-EDITOR-UX-V1: 화면 세트 관리 UI
 import TabletScreenSetManager from './TabletScreenSetManager';
+// WO-O4O-KPA-TABLET-CORNER-CONTENT-LINK-UI-V1: 코너별 운영 = 코너×콘텐츠 연결 패널(링크 전용)
+import TabletCornerContentsPanel from './TabletCornerContentsPanel';
 
 // ==================== Types ====================
 
@@ -1101,13 +1103,11 @@ export default function StoreTabletDisplaysPage() {
                 </div>
               )}
 
-              {/* WO-O4O-KPA-TABLET-CONTENT-LIBRARY-TAB-SPLIT-V1: 코너 모드 — 현재 사용 중 세트 + 교체(적용/해제)만.
-                  세트 원본 수정/생성/보관은 '태블릿 콘텐츠' 탭으로 이동. */}
+              {/* WO-O4O-KPA-TABLET-CORNER-CONTENT-LINK-UI-V1: 코너 = 연결(store_tablet_corner_contents) 기반.
+                  연결 목록 · 현재 사용 중 · 빠른 교체 · 순서 · 연결 추가/해제. 원본 수정/생성/보관은 '태블릿 콘텐츠' 탭. */}
               {selectedTabletId && (
-                <TabletScreenSetManager
-                  mode="corner"
+                <TabletCornerContentsPanel
                   tabletId={selectedTabletId}
-                  currentScreenSetId={selectedTablet?.currentScreenSetId ?? null}
                   onCurrentChange={(id) => setTablets((prev) => prev.map((t) => (t.id === selectedTabletId ? { ...t, currentScreenSetId: id } : t)))}
                   onToast={setToast}
                 />
@@ -1556,16 +1556,13 @@ export default function StoreTabletDisplaysPage() {
       )}
 
       {/* WO-O4O-KPA-TABLET-CONTENT-LIBRARY-TAB-SPLIT-V1: 태블릿 콘텐츠 탭 — 화면 세트(콘텐츠 원본) 라이브러리.
-          목록/수정/보관/생성 담당. 코너 적용(교체)은 코너별 운영 탭. tablets 로 '사용 중인 코너' 표시. */}
+          목록/수정/보관/생성 담당. 코너 연결·교체는 코너별 운영 탭. tablets 로 '사용 중인 코너' 표시. */}
       {activeTab === 'contents' && (
         <div className="space-y-3">
           <p className="text-sm text-slate-500">
-            태블릿 코너에 보여줄 화면 세트(콘텐츠)를 만들고 수정·보관합니다. 실제 코너 적용·교체는 <b>코너별 운영</b> 탭에서 합니다.
+            태블릿 코너에 보여줄 화면 세트(콘텐츠)를 만들고 수정·보관합니다. 실제 코너 연결·교체는 <b>코너별 운영</b> 탭에서 합니다.
           </p>
           <TabletScreenSetManager
-            mode="library"
-            tabletId={null}
-            currentScreenSetId={null}
             onToast={setToast}
             tablets={tablets}
             previewApi={previewApi}

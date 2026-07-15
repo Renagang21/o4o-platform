@@ -11,7 +11,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Loader2, Plus, ChevronUp, ChevronDown, X, Save, Layers, AlertTriangle, LayoutTemplate } from 'lucide-react';
 import {
   fetchScreenSets, fetchScreenSet, createScreenSet, updateScreenSet,
-  archiveScreenSet, saveScreenSetBlocks, applyCurrentScreenSet, clearCurrentScreenSet,
+  archiveScreenSet, saveScreenSetBlocks,
   // WO-O4O-KPA-TABLET-CONTENT-LIST-PICKER-UI-V1
   searchTabletStoreContents, searchTabletO4oDescriptions,
   // WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1: 저장 전 draft → sections resolve(read-only)
@@ -30,9 +30,11 @@ type Toast = { type: 'success' | 'error'; message: string };
 //   같은 컴포넌트를 두 맥락에서 재사용한다.
 //   - 'corner'  : 코너별 운영 탭 — 이 코너에 '현재 사용 중' 세트 + 다른 세트로 교체(적용/해제)만. 원본 편집/생성/보관 없음.
 //   - 'library' : 태블릿 콘텐츠 탭 — 매장 전체 화면 세트 목록(콘텐츠 원본) 수정/보관/생성. 코너 적용(교체) 없음.
-export type ScreenSetManagerMode = 'corner' | 'library';
+// WO-O4O-KPA-TABLET-CORNER-CONTENT-LINK-UI-V1:
+//   코너별 운영은 연결(store_tablet_corner_contents) 기반 TabletCornerContentsPanel 로 분리됨.
+//   → 이 컴포넌트는 '태블릿 콘텐츠'(콘텐츠 원본 라이브러리) 전용. corner 모드/적용(교체)은 여기서 다루지 않는다.
 
-// library 모드에서 '사용 중인 코너' 계산용 최소 태블릿 정보(페이지의 TabletType 하위집합).
+// '사용 중인 코너' 계산용 최소 태블릿 정보(페이지의 TabletType 하위집합).
 export interface ScreenSetUsageTablet {
   id: string;
   name: string;
@@ -41,15 +43,10 @@ export interface ScreenSetUsageTablet {
 }
 
 interface Props {
-  // 코너 모드에서는 대상 태블릿 id, 라이브러리 모드에서는 null(매장 전체).
-  mode: ScreenSetManagerMode;
-  tabletId: string | null;
-  currentScreenSetId: string | null;
-  onCurrentChange?: (id: string | null) => void;
   onToast: (t: Toast) => void;
-  // library 모드 전용: 각 세트가 어느 코너에 적용됐는지 표시.
+  // 각 세트가 어느 코너에서 현재 사용 중인지 표시.
   tablets?: ScreenSetUsageTablet[];
-  // WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1: 제작 셸 미리보기용(library 전용, opt-in).
+  // WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1: 제작 셸 미리보기용(opt-in).
   //   kiosk-core 재사용 미리보기 = previewApi(상품 조회) + storeSlug(공개 slug). 미주입 시 미리보기 비활성.
   previewApi?: TabletKioskApi;
   storeSlug?: string | null;
@@ -196,8 +193,7 @@ function defaultConfig(type: ScreenBlockType): Record<string, unknown> {
   }
 }
 
-export default function TabletScreenSetManager({ mode, tabletId, currentScreenSetId, onCurrentChange, onToast, tablets, previewApi, storeSlug }: Props) {
-  const isLibrary = mode === 'library';
+export default function TabletScreenSetManager({ onToast, tablets, previewApi, storeSlug }: Props) {
   const [sets, setSets] = useState<ScreenSet[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -209,18 +205,17 @@ export default function TabletScreenSetManager({ mode, tabletId, currentScreenSe
   const reload = useCallback(async () => {
     setLoading(true);
     try {
-      // WO-O4O-KPA-TABLET-CONTENT-STANDARD-LIST-V1: library 는 상태 필터(보관 포함)를 위해 archived 도 조회.
-      //   corner 는 적용 후보만 필요 → 기존대로 비보관.
-      const all = await fetchScreenSets(isLibrary ? { includeArchived: true } : undefined);
-      // library: 매장 전체 화면 세트. corner: 이 태블릿 전용 + 매장 재사용(tabletId null).
-      setSets(isLibrary ? all : all.filter((s) => s.tabletId === tabletId || s.tabletId === null));
+      // WO-O4O-KPA-TABLET-CONTENT-STANDARD-LIST-V1: 상태 필터(보관 포함)를 위해 archived 도 조회.
+      // 매장 전체 화면 세트 = 콘텐츠 원본 목록. (코너 적용 가능 여부로 거르지 않는다 —
+      //  WO-...-CORNER-CONTENT-ASSIGNMENT-MODEL-V1 에서 tablet_id 전용 제약이 제거되어 모든 코너에 재사용 가능.)
+      setSets(await fetchScreenSets({ includeArchived: true }));
     } catch (e: any) {
       onToast({ type: 'error', message: e?.message || '화면 세트를 불러오지 못했습니다.' });
       setSets([]);
     } finally {
       setLoading(false);
     }
-  }, [tabletId, isLibrary, onToast]);
+  }, [onToast]);
 
   // WO-...-CONTENT-LIBRARY-TAB-SPLIT-V1: library 모드 — 세트 id → 적용 중인 코너 이름 목록.
   const usageBySet = (() => {
@@ -246,34 +241,7 @@ export default function TabletScreenSetManager({ mode, tabletId, currentScreenSe
   // 신규 제작 진입(빈 셸).
   const openCreate = useCallback(() => setBuilder({ detail: null }), []);
 
-  const handleApply = async (set: ScreenSet) => {
-    if (busy || !tabletId) return; // 교체(적용)는 corner 모드 전용 — tabletId 필수
-    setBusy(true);
-    try {
-      if (set.status !== 'active') {
-        await updateScreenSet(set.id, { status: 'active' }); // 적용은 active 필요 → 자동 활성화
-      }
-      await applyCurrentScreenSet(tabletId, set.id);
-      onCurrentChange?.(set.id);
-      onToast({ type: 'success', message: `"${set.name}" 적용됨 — 공개 태블릿 화면에 반영됩니다.` });
-      await reload();
-    } catch (e: any) {
-      onToast({ type: 'error', message: e?.message || '적용에 실패했습니다.' });
-    } finally { setBusy(false); }
-  };
-
-  const handleClear = async () => {
-    if (busy || !tabletId) return;
-    setBusy(true);
-    try {
-      await clearCurrentScreenSet(tabletId);
-      onCurrentChange?.(null);
-      onToast({ type: 'success', message: '적용 해제됨 (기본 화면으로 복귀)' });
-      await reload();
-    } catch (e: any) {
-      onToast({ type: 'error', message: e?.message || '해제에 실패했습니다.' });
-    } finally { setBusy(false); }
-  };
+  // 적용(교체)/적용 해제는 코너별 운영 탭(TabletCornerContentsPanel)이 연결 모델 기준으로 담당한다.
 
   const handleArchive = async (set: ScreenSet) => {
     if (busy) return;
@@ -291,22 +259,18 @@ export default function TabletScreenSetManager({ mode, tabletId, currentScreenSe
     } finally { setBusy(false); }
   };
 
-  const currentSet = sets.find((s) => s.id === currentScreenSetId) || null;
-  // WO-O4O-KPA-TABLET-TOUCH-FIRST-SCREEN-SET-CARDS-V1: 현재 적용 세트를 제외한 나머지(카드 그리드).
-  const otherSets = sets.filter((s) => s.id !== currentScreenSetId);
-
   return (
     <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-indigo-100">
       <div className="px-4 py-3 border-b bg-indigo-50/60 flex items-center justify-between">
         <h3 className="text-sm font-bold text-indigo-800 flex items-center gap-2">
-          <Layers className="w-4 h-4 text-indigo-600" /> {isLibrary ? '태블릿 콘텐츠 (화면 세트)' : '이 코너에 적용할 화면 세트'}
+          <Layers className="w-4 h-4 text-indigo-600" /> 태블릿 콘텐츠 (화면 세트)
         </h3>
         {/* WO-O4O-KPA-TABLET-CONTENT-STANDARD-LIST-V1: 생성 진입('태블릿 화면 만들기')은 표준 리스트 도구막대로 이전. */}
       </div>
 
       <div className="p-4 space-y-4">
-        {/* WO-O4O-KPA-TABLET-CONTENT-STEP-BUILDER-SHELL-V1: library 제작/수정은 단계형 제작 셸이 화면을 전환(takeover). */}
-        {isLibrary && builder ? (
+        {/* WO-O4O-KPA-TABLET-CONTENT-STEP-BUILDER-SHELL-V1: 제작/수정은 단계형 제작 셸이 화면을 전환(takeover). */}
+        {builder ? (
           <TabletContentStepBuilder
             initialDetail={builder.detail}
             onCancel={() => setBuilder(null)}
@@ -317,103 +281,27 @@ export default function TabletScreenSetManager({ mode, tabletId, currentScreenSe
           />
         ) : (
         <>
-        {/* 필수 경고 — 코너 모드(교체=공개 반영)에서만 */}
-        {!isLibrary && (
-          <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg p-3">
-            <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
-            <p className="text-xs text-amber-800 leading-relaxed">
-              <b>적용한 화면 세트는 공개 태블릿 뷰어(고객 화면)에 반영됩니다.</b>
-              운영 환경에서는 브라우저 캐시·네트워크 상태에 따라 태블릿 새로고침이 필요할 수 있습니다.
-            </p>
-          </div>
-        )}
-
-        {/* WO-O4O-KPA-TABLET-SCREEN-SET-OPERATION-USABILITY-PASS-V1: 저장/템플릿/블록 개념 안내 — 콘텐츠(편집) 모드에서만 */}
-        {isLibrary ? (
-          <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-[11px] text-slate-600 leading-relaxed space-y-1">
-            <p><b className="text-slate-700">화면 세트</b>는 태블릿 코너에 표시할 화면 구성 묶음(콘텐츠 원본)입니다. 여기서 만들고 수정하며, 실제 코너 적용은 <b className="text-slate-700">코너별 운영</b> 탭에서 합니다.</p>
-            <p><b className="text-slate-700">템플릿</b>은 같은 내용을 어떤 <b>배치</b>로 보여줄지 정하고, <b className="text-slate-700">블록</b>은 화면에 들어가는 <b>내용</b>(코너 설명·제품 목록·QR 안내·대기화면)입니다.</p>
-            <p><b className="text-slate-700">저장</b>은 세트 내용만 저장합니다(코너에 자동 적용되지 않음). <b className="text-slate-700">보관</b>은 목록에서 숨깁니다(적용 중인 세트는 먼저 적용 해제 필요).</p>
-          </div>
-        ) : (
-          <p className="text-[11px] text-slate-500 leading-relaxed">
-            이 코너에 사용할 화면 세트를 골라 <b>이 화면 사용</b>으로 교체하세요. 세트 내용 수정·생성은 <b>태블릿 콘텐츠</b> 탭에서 합니다.
-          </p>
-        )}
-
-        {/* WO-O4O-KPA-TABLET-TOUCH-FIRST-SCREEN-SET-CARDS-V1: 현재 사용 중 카드(적용 상태 우선) — 코너 모드 전용. */}
-        {!isLibrary && (
-        <div className="rounded-xl border border-indigo-200 bg-indigo-50/50 p-3">
-          <div className="flex items-start justify-between gap-2 flex-wrap">
-            <div className="min-w-0">
-              <span className="text-[10px] font-semibold text-indigo-700 bg-indigo-100 px-1.5 py-0.5 rounded">현재 사용 중</span>
-              {currentSet ? (
-                <>
-                  <div className="text-base font-bold text-slate-900 truncate mt-1">{currentSet.name}</div>
-                  <div className="text-[11px] text-slate-500">{templateLabel(currentSet.templateKey)} · 블록 {currentSet.blockCount ?? 0}개</div>
-                </>
-              ) : currentScreenSetId ? (
-                <div className="text-sm text-slate-500 mt-1">현재 화면 세트 정보를 불러오지 못했습니다. 아래에서 다른 화면 세트를 선택해 적용해 주세요.</div>
-              ) : (
-                <div className="text-sm text-slate-500 mt-1">현재 적용된 화면 세트가 없습니다. 아래 저장된 화면 세트를 선택해 적용해 주세요.</div>
-              )}
-            </div>
-            <div className="flex gap-2 flex-wrap">
-              {/* 코너 모드: 세트 원본 편집은 콘텐츠 탭으로 이동 → 여기서는 적용 해제(교체)만. */}
-              {currentScreenSetId && (
-                <button onClick={handleClear} disabled={busy} className="min-h-[44px] px-3 py-2 text-sm font-medium text-slate-500 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 disabled:opacity-50">적용 해제</button>
-              )}
-            </div>
-          </div>
+        {/* WO-O4O-KPA-TABLET-SCREEN-SET-OPERATION-USABILITY-PASS-V1: 저장/템플릿/블록 개념 안내 */}
+        <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-[11px] text-slate-600 leading-relaxed space-y-1">
+          <p><b className="text-slate-700">화면 세트</b>는 태블릿 코너에 표시할 화면 구성 묶음(콘텐츠 원본)입니다. 여기서 만들고 수정하며, 실제 코너 연결·교체는 <b className="text-slate-700">코너별 운영</b> 탭에서 합니다.</p>
+          <p><b className="text-slate-700">템플릿</b>은 같은 내용을 어떤 <b>배치</b>로 보여줄지 정하고, <b className="text-slate-700">블록</b>은 화면에 들어가는 <b>내용</b>(코너 설명·제품 목록·QR 안내·대기화면)입니다.</p>
+          <p><b className="text-slate-700">저장</b>은 세트 내용만 저장합니다(코너에 자동 적용되지 않음). <b className="text-slate-700">보관</b>은 목록에서 숨깁니다(코너에서 사용/연결 중이면 먼저 해제해야 합니다).</p>
         </div>
-        )}
 
-        {/* WO-O4O-KPA-TABLET-CONTENT-STANDARD-LIST-V1: library = O4O 표준 테이블
+        {/* WO-O4O-KPA-TABLET-CONTENT-STANDARD-LIST-V1: O4O 표준 테이블
             (검색 + 상태 필터 + 페이지네이션 + 체크 일괄 보관 + kebab 개별 작업(수정/보관)).
             생성/수정 진입은 단계형 제작 셸(builder)로 전환. */}
-        {isLibrary && (
-          <TabletContentLibraryList
-            sets={sets}
-            loading={loading}
-            busy={busy}
-            usageBySet={usageBySet}
-            templateLabel={templateLabel}
-            onCreate={openCreate}
-            onEdit={openEdit}
-            onArchive={handleArchive}
-            onRefresh={reload}
-          />
-        )}
-
-        {/* WO-O4O-KPA-TABLET-TOUCH-FIRST-SCREEN-SET-CARDS-V1: 코너 모드 = 현재 사용 중 제외 나머지 카드 그리드(비교·선택·적용). */}
-        {!isLibrary && (loading ? (
-          <div className="flex items-center gap-2 text-sm text-slate-400 py-4"><Loader2 className="w-4 h-4 animate-spin" /> 불러오는 중…</div>
-        ) : otherSets.length === 0 ? (
-          <div className="text-center py-6 text-sm text-slate-500">
-            이 코너에 적용할 수 있는 화면 세트가 없습니다.<br />
-            <b>태블릿 콘텐츠</b> 탭에서 화면 세트를 먼저 만들어 주세요.
-          </div>
-        ) : (
-          <div className="space-y-2">
-            <div className="text-xs font-semibold text-slate-600">다른 화면 세트</div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {otherSets.map((s) => (
-                <div key={s.id} className="rounded-xl border border-slate-200 bg-white p-3 flex flex-col gap-2 transition">
-                  <div className="min-w-0">
-                    <div className="text-sm font-bold text-slate-800 truncate flex items-center gap-1.5">
-                      {s.name}
-                      {s.tabletId === null && <span className="text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded flex-shrink-0">재사용</span>}
-                    </div>
-                    <div className="text-[11px] text-slate-400">{STATUS_LABEL[s.status]} · {templateLabel(s.templateKey)} · 블록 {s.blockCount ?? 0}개</div>
-                  </div>
-                  <div className="flex gap-2 mt-auto items-center">
-                    <button onClick={() => handleApply(s)} disabled={busy} className="flex-1 min-h-[44px] px-3 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 disabled:opacity-50">이 화면 사용</button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
+        <TabletContentLibraryList
+          sets={sets}
+          loading={loading}
+          busy={busy}
+          usageBySet={usageBySet}
+          templateLabel={templateLabel}
+          onCreate={openCreate}
+          onEdit={openEdit}
+          onArchive={handleArchive}
+          onRefresh={reload}
+        />
         </>
         )}
       </div>

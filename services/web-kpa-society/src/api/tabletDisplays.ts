@@ -311,6 +311,53 @@ export async function searchTabletO4oDescriptions(q: string): Promise<O4oDescrip
   return res.data;
 }
 
+// ==================== 코너 × 콘텐츠 연결 (WO-O4O-KPA-TABLET-CORNER-CONTENT-ASSIGNMENT-MODEL-V1) ====================
+// store_tablet_corner_contents = 코너↔콘텐츠(Screen Set) 다대다 연결 SSOT.
+//   current_screen_set_id = 그중 '현재 표시' 1개(∈ 연결). 적용(POST current-screen-set)은 연결 보장 + current 를 원자적으로 처리.
+//   주의: 연결의 sort_order / is_visible 은 현재 공개 런타임이 소비하지 않는 관리용 메타다(고객 화면 영향 없음).
+//   is_visible 토글 엔드포인트는 아직 없다(INSERT 시 TRUE 고정) → UI 미제공.
+
+export interface CornerContent {
+  screenSetId: string;
+  sortOrder: number;
+  isVisible: boolean;
+  name: string;
+  status: ScreenSetStatus;
+  templateKey: string;
+  publicQrSlug: string | null;
+  blockCount: number;
+  /** 이 코너의 현재 표시 콘텐츠 여부 */
+  isCurrent: boolean;
+}
+
+/** 코너에 연결된 콘텐츠 목록(+ 현재 표시 id). 보관/삭제된 세트는 서버가 제외한다. */
+export async function fetchCornerContents(
+  tabletId: string,
+): Promise<{ items: CornerContent[]; currentScreenSetId: string | null }> {
+  const res = await request<{ success: boolean; data: CornerContent[]; currentScreenSetId: string | null }>(
+    `${BASE}/tablets/${tabletId}/screen-sets`,
+  );
+  return { items: res.data ?? [], currentScreenSetId: res.currentScreenSetId ?? null };
+}
+
+/** 코너에 콘텐츠 연결 추가(원본 복사 없음). 보관된 세트면 409 SCREEN_SET_ARCHIVED. UNIQUE 멱등. */
+export async function addCornerContent(tabletId: string, screenSetId: string): Promise<void> {
+  await request(`${BASE}/tablets/${tabletId}/screen-sets/${screenSetId}`, { method: 'POST' });
+}
+
+/** 연결 해제(원본/타 코너/QR 무변경). 현재 표시 콘텐츠면 409 CURRENT_CONTENT_CANNOT_BE_REMOVED. */
+export async function removeCornerContent(tabletId: string, screenSetId: string): Promise<void> {
+  await request(`${BASE}/tablets/${tabletId}/screen-sets/${screenSetId}`, { method: 'DELETE' });
+}
+
+/** 연결 정렬 — order = screenSetId 배열(표시 순서). */
+export async function reorderCornerContents(tabletId: string, order: string[]): Promise<void> {
+  await request(`${BASE}/tablets/${tabletId}/screen-sets/order`, {
+    method: 'PATCH',
+    body: JSON.stringify({ order }),
+  });
+}
+
 export async function applyCurrentScreenSet(tabletId: string, screenSetId: string): Promise<void> {
   await request(`${BASE}/tablets/${tabletId}/current-screen-set`, {
     method: 'POST',
