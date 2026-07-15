@@ -26,6 +26,8 @@ const SRC = {
   hangeulWithDigits: '프로바이오틱스 수: 표시량(10,000,000,000(백억)CFU/g) 이상',
   // 한글 수사만 — 표기는 있으나 수치를 읽을 수 없다
   hangeulOnly: '프로바이오틱스 수: 표시량(백억 CFU/g) 이상',
+  // 기준량이 슬래시가 아니라 "N g 당" 으로 붙는 표기 (CP2 실측: 프로바이오텍)
+  viaDang: '1) 성상 : 고유의 향미가 있고 이미·이취가 없는 연한 분홍색의 분말 2) 프로바이오틱스 수(2 g 당) : 표시량 이상 ( 표시량 : 215,000,000(2.15억) CFU ) 3) 대장균군 : 음성',
   // 표시량만 있고 수치 없음 = 진짜 부재
   noNumber: '프로바이오틱스 수 : 표시량 이상 (3) 대장균군 : 음성',
   normal: '프로바이오틱스 수 : 표시량 (100억 CFU/340 mg) 이상',
@@ -77,6 +79,32 @@ describe('결손 #3 — 전각 ㎎ 뒤 경계 실패', () => {
     expect(r.kind).toBe('PARSED');
     if (r.kind !== 'PARSED') return;
     expect(r.value).toEqual({ amount: 2, unit: 'g' });
+  });
+});
+
+// CP2 실측 — "다른 표기법"을 "원문에 없음"으로 단정하면 실패유형 ①이 파서에서 재현된다.
+describe('결손 #6 — 기준량이 "N g 당" 형태일 때 ABSENT 오판', () => {
+  it('"프로바이오틱스 수(2 g 당)" 의 기준량을 읽는다 — ABSENT 아님', () => {
+    const r = parseBasis(SRC.viaDang);
+    expect(r.kind).toBe('PARSED');
+    if (r.kind !== 'PARSED') return;
+    expect(r.value).toEqual({ amount: 2, unit: 'g' });
+  });
+
+  it('같은 원문의 소수점 억(2.15억)도 정확히 읽는다', () => {
+    const r = parseCfu(SRC.viaDang);
+    expect(r.kind).toBe('PARSED');
+    if (r.kind !== 'PARSED') return;
+    expect(r.value).toBe(2.15e8);
+  });
+
+  it('표시량은 있는데 중량 표기도 있고 연결만 실패하면 PARSE_FAILED (ABSENT 아님)', () => {
+    const r = parseBasis('프로바이오틱스 수 : 표시량 이상, 내용량 500 mg 포장');
+    expect(r.kind).toBe('PARSE_FAILED');
+  });
+
+  it('표시량만 있고 중량 토큰이 아예 없으면 ABSENT (진짜 부재)', () => {
+    expect(parseBasis(SRC.noNumber).kind).toBe('ABSENT');
   });
 });
 

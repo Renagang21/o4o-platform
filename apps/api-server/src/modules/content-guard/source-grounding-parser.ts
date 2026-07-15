@@ -145,10 +145,22 @@ export function parseCfu(baseStandard: string): ParseOutcome<number> {
  */
 export function parseBasis(baseStandard: string): ParseOutcome<ParsedBasis> {
   const b = normalizeSource(baseStandard);
+
+  // 기준량이 슬래시가 아니라 **"N g 당"** 으로 붙는 표기 (실측: 프로바이오텍
+  //   "프로바이오틱스 수(2 g 당) : 표시량 이상 ( 표시량 : 215,000,000(2.15억) CFU )").
+  // 이 형태를 못 읽고 ABSENT 를 돌려주면 **"다른 표기법"을 "원문에 없음"으로 단정**하게 된다
+  // — 이 모듈이 막으려던 실패유형 ①(부재를 허용으로)이 파서 자신에게 재현되는 것이다.
+  const viaDang = b.match(/([\d,.]+)\s*(mg|g)\s*당/i);
+  if (viaDang) {
+    return { kind: 'PARSED', value: { amount: num(viaDang[1]), unit: viaDang[2].toLowerCase() as 'mg' | 'g' }, evidence: viaDang[0] };
+  }
+
   if (!/[/]/.test(b)) {
-    return /표시량/.test(b)
-      ? { kind: 'ABSENT', reason: '원문에 표시 기준량(분모) 표기 없음' }
-      : { kind: 'ABSENT', reason: '원문에 표시량 표기 없음' };
+    if (!/표시량/.test(b)) return { kind: 'ABSENT', reason: '원문에 표시량 표기 없음' };
+    // 표시량은 있는데 분모를 못 찾았다 → **중량 토큰이 있으면 "못 읽은 것"이지 "없는 것"이 아니다**
+    return /[\d,.]+\s*(mg|g)\b/i.test(b)
+      ? { kind: 'PARSE_FAILED', reason: '표시량과 중량 표기는 있으나 기준량으로 연결하지 못했습니다', raw: b.slice(0, 120) }
+      : { kind: 'ABSENT', reason: '원문에 표시 기준량(분모) 표기 없음' };
   }
 
   // 기준량이 "1포(2.5g)" 형태 — 못 읽으면 근거가 **있는데** "확정 불가" 오분류 (결손 #2)
