@@ -12,7 +12,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { extractKoCounts, NUM_TOKEN, KO_SCALE_TOKEN } from '../product-description-guard.units.js';
 import { parseCfu } from '../source-grounding-parser.js';
-import { runGuard } from '../product-description-guard.js';
+import { runGuard, computeBasis } from '../product-description-guard.js';
 import { OK_VIVA_FULL_BASIS } from './fixtures/known-errors.js';
 
 /** 같은 의미의 수치를 읽는 독립 경로들 */
@@ -96,6 +96,86 @@ describe('잠금 2 — 원문 근거가 있는데 막았던 사례의 원문 범
     // 실측 원문 — 안티비오 (직접섭취 근거 없음)
     const blocked = runGuard(withSrc('성인 : 1일 3회, 1회 2포 (2그램), 소아 : 1일 2회, 1회 1포 (1그램)', '그대로 섭취할 수 있습니다.'), { phase: 'post' });
     expect(blocked.findings.some((f) => f.ruleId === 'G-FORM-GENERALIZATION-001' && f.status === 'BLOCKED')).toBe(true);
+  });
+
+  // V1.3 ServingSpec 보강 (100건 진입 전) — 중량 세 층위 구분 + 역산 금지.
+  // 실측: Lacto Bloom "1회 2캡슐(900mg)" = 2캡슐 **합계** 900mg. 1캡슐 450mg 은 원문에 없다.
+  describe('ServingSpec 3층 구분 · 역산 금지', () => {
+    const lactoBloom = {
+      ...OK_VIVA_FULL_BASIS,
+      source: {
+        ...OK_VIVA_FULL_BASIS.source,
+        baseStandard: '프로바이오틱스 수 : 표시량(100,000,000CFU/900mg) 이상',
+        intake: '1일 1회, 1회 2캡슐(900mg)을 물과 함께 섭취하십시오',
+      },
+      grounding: {
+        declaredCfu: { absolute: 1e8 },
+        declaredAmount: { value: 1, unit: '억 CFU', basisAmount: 900, basisUnit: 'mg' },
+        serving: {
+          unitType: 'capsule',
+          unitWeight: null, unitWeightUnit: null,   // 1캡슐 중량은 원문에 없다
+          unitsPerServing: 2,
+          servingTotalWeight: 900, servingTotalWeightUnit: 'mg', // 원문 명시
+          servingsPerDay: 1,
+        },
+        ageBandsRaw: null,
+      },
+    };
+
+    it('1회 총중량만 있어도 기준량 대응은 확정된다 (이전엔 환산 불가였다)', () => {
+      const b = computeBasis(lactoBloom as never);
+      expect(b.allowed).toBe(true);
+      // 1일 1회 제품이라 1회분 == 1일분 → basisEquals 는 'daily'/'serving' 둘 다 유효
+      expect(['serving', 'daily']).toContain(b.basisEquals);
+      expect(b.perServingCount).toBe(1e8);
+      expect(b.servingMg).toBe(900); // 원문 명시 1회 총중량이 그대로 쓰였다
+    });
+
+    it('1단위 중량이 없으면 per-unit 은 금지된다 (역산 금지)', () => {
+      const b = computeBasis(lactoBloom as never);
+      expect(b.perUnitAllowed).toBe(false);
+      expect(b.perUnitCount).toBeUndefined(); // 5천만 CFU 로 역산하지 않는다
+    });
+
+    it('그럼에도 초안이 1캡슐당 수치를 쓰면 BLOCKED', () => {
+      const r = runGuard(
+        { ...lactoBloom, drafts: { ko: '<p>1캡슐당 5천만 CFU가 들어 있습니다.</p>', en: '<p>x</p>' } } as never,
+        { phase: 'post' },
+      );
+      expect(r.findings.some((f) => f.ruleId === 'A-PER-UNIT-DERIVED-003' && f.status === 'BLOCKED')).toBe(true);
+    });
+
+    it('1회 총중량 기준 서술은 통과', () => {
+      const r = runGuard(
+        { ...lactoBloom, drafts: { ko: '<p>1회 2캡슐(900mg)이 표시 기준량 900mg과 같습니다.</p>', en: '<p>x</p>' } } as never,
+        { phase: 'post' },
+      );
+      expect(r.findings.some((f) => f.status === 'BLOCKED')).toBe(false);
+    });
+
+    it('원문 명시 1회 총중량과 1단위×개수가 어긋나면 환산 불가 (모순 검출)', () => {
+      const contradictory = {
+        ...lactoBloom,
+        grounding: {
+          ...lactoBloom.grounding,
+          serving: { ...lactoBloom.grounding.serving, unitWeight: 500, unitWeightUnit: 'mg' }, // 500×2=1000 ≠ 900
+        },
+      };
+      const b = computeBasis(contradictory as never);
+      expect(b.allowed).toBe(false);
+      expect(b.reason).toMatch(/모순/);
+    });
+
+    it('1일 총중량도 원문 명시가 우선하며, 어긋나면 모순', () => {
+      const bad = {
+        ...lactoBloom,
+        grounding: {
+          ...lactoBloom.grounding,
+          serving: { ...lactoBloom.grounding.serving, dailyTotalWeight: 1800, dailyTotalWeightUnit: 'mg' }, // 900×1 ≠ 1800
+        },
+      };
+      expect(computeBasis(bad as never).reason).toMatch(/1일 총중량 모순/);
+    });
   });
 
   // 30건(A·B·C) 실측 튜닝 — "계산이 필요 없습니다" 는 문서 행위 서술이지 제품 주장이 아니다.

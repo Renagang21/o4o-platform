@@ -218,7 +218,7 @@
           "field": "grounding",
           "matchedText": null,
           "sourceEvidence": "BASE_STANDARD: ① 성상 : 고유의 향미가 있고 이미, 이취가 없는 흐린 갈색, 진한노랑의 알갱이가 들어있는 노란 하양색 분말 ② 프로바이오틱스 수 : 4,00… | SRV_USE: 1일 1회, 1회 1포를 그대로 혹은 물과 함께 섭취",
-          "message": "환산 불가(1단위 중량이 공식 원문에 없음) → **작성 전 생성 금지 목록**: per serving · per stick · per capsule · daily total",
+          "message": "환산 불가(1회 섭취 중량이 공식 원문에 없음(1단위 중량·1회 총중량 모두 부재)) → **작성 전 생성 금지 목록**: per serving · per stick · per capsule · daily total",
           "suggestedAction": "표시 기준량만 기술하십시오. 1단위당·1일 총량 수치는 만들지 마십시오."
         },
         {
@@ -240,7 +240,7 @@
           "field": "drafts",
           "matchedText": null,
           "sourceEvidence": null,
-          "message": "환산 근거 없음(1단위 중량이 공식 원문에 없음) — 파생 수치 미기재 확인",
+          "message": "환산 근거 없음(1회 섭취 중량이 공식 원문에 없음(1단위 중량·1회 총중량 모두 부재)) — 파생 수치 미기재 확인",
           "suggestedAction": "조치 불요"
         },
         {
@@ -387,7 +387,7 @@
           "field": "grounding",
           "matchedText": null,
           "sourceEvidence": "BASE_STANDARD: 1. 성상: 이미, 이취가 없고 고유의 향미가 있으며 흰 분홍색의 분말 2. 프로바이오틱스: 표시량(200,000,000(2억)cfu/2g) 이… | SRV_USE: 1일 1회, 1회 1포를 그대로 또는 물과 함께 섭취하십시오.",
-          "message": "환산 불가(1단위 중량이 공식 원문에 없음) → **작성 전 생성 금지 목록**: per serving · per stick · per capsule · daily total",
+          "message": "환산 불가(1회 섭취 중량이 공식 원문에 없음(1단위 중량·1회 총중량 모두 부재)) → **작성 전 생성 금지 목록**: per serving · per stick · per capsule · daily total",
           "suggestedAction": "표시 기준량만 기술하십시오. 1단위당·1일 총량 수치는 만들지 마십시오."
         },
         {
@@ -409,7 +409,7 @@
           "field": "drafts",
           "matchedText": null,
           "sourceEvidence": null,
-          "message": "환산 근거 없음(1단위 중량이 공식 원문에 없음) — 파생 수치 미기재 확인",
+          "message": "환산 근거 없음(1회 섭취 중량이 공식 원문에 없음(1단위 중량·1회 총중량 모두 부재)) — 파생 수치 미기재 확인",
           "suggestedAction": "조치 불요"
         },
         {
@@ -567,7 +567,7 @@
           "field": "grounding",
           "matchedText": null,
           "sourceEvidence": "BASE_STANDARD: 1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 분말 2. 대장균군 : 음성 3. 프로바이오틱스 수 : 표시량(100,000,000… | SRV_USE: 1일 1회, 1회 1포를 섭취하십시오.",
-          "message": "환산 불가(1단위 중량이 공식 원문에 없음) → **작성 전 생성 금지 목록**: per serving · per stick · per capsule · daily total",
+          "message": "환산 불가(1회 섭취 중량이 공식 원문에 없음(1단위 중량·1회 총중량 모두 부재)) → **작성 전 생성 금지 목록**: per serving · per stick · per capsule · daily total",
           "suggestedAction": "표시 기준량만 기술하십시오. 1단위당·1일 총량 수치는 만들지 마십시오."
         },
         {
@@ -589,7 +589,7 @@
           "field": "drafts",
           "matchedText": null,
           "sourceEvidence": null,
-          "message": "환산 근거 없음(1단위 중량이 공식 원문에 없음) — 파생 수치 미기재 확인",
+          "message": "환산 근거 없음(1회 섭취 중량이 공식 원문에 없음(1단위 중량·1회 총중량 모두 부재)) — 파생 수치 미기재 확인",
           "suggestedAction": "조치 불요"
         },
         {
@@ -769,7 +769,7 @@
           "field": "drafts",
           "matchedText": null,
           "sourceEvidence": null,
-          "message": "환산 검증 통과(1일 200,000,000, 1단위 200,000,000)",
+          "message": "환산 검증 통과(1일 200,000,000, 1단위 200,000,000, 1회 200,000,000)",
           "suggestedAction": "조치 불요"
         },
         {
@@ -916,7 +916,7 @@
           "field": "drafts",
           "matchedText": null,
           "sourceEvidence": null,
-          "message": "환산 검증 통과(1일 1,000,000,000, 1단위 1,000,000,000)",
+          "message": "환산 검증 통과(1일 1,000,000,000, 1단위 1,000,000,000, 1회 1,000,000,000)",
           "suggestedAction": "조치 불요"
         },
         {
@@ -1063,7 +1063,7 @@
           "field": "drafts",
           "matchedText": null,
           "sourceEvidence": null,
-          "message": "환산 검증 통과(1일 10,000,000,000, 1단위 10,000,000,000)",
+          "message": "환산 검증 통과(1일 10,000,000,000, 1단위 10,000,000,000, 1회 10,000,000,000)",
           "suggestedAction": "조치 불요"
         },
         {
@@ -1188,7 +1188,7 @@
           "field": "grounding",
           "matchedText": null,
           "sourceEvidence": "BASE_STANDARD: 1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰노란색의 내용물을 함유한 하얀색의 장용성 경질캡슐 2. 프로바이오틱스 수 : 표시량(10… | SRV_USE: 1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
-          "message": "환산 불가(1단위 중량이 공식 원문에 없음) → **작성 전 생성 금지 목록**: per serving · per stick · per capsule · daily total",
+          "message": "환산 불가(1회 섭취 중량이 공식 원문에 없음(1단위 중량·1회 총중량 모두 부재)) → **작성 전 생성 금지 목록**: per serving · per stick · per capsule · daily total",
           "suggestedAction": "표시 기준량만 기술하십시오. 1단위당·1일 총량 수치는 만들지 마십시오."
         },
         {
@@ -1210,7 +1210,7 @@
           "field": "drafts",
           "matchedText": null,
           "sourceEvidence": null,
-          "message": "환산 근거 없음(1단위 중량이 공식 원문에 없음) — 파생 수치 미기재 확인",
+          "message": "환산 근거 없음(1회 섭취 중량이 공식 원문에 없음(1단위 중량·1회 총중량 모두 부재)) — 파생 수치 미기재 확인",
           "suggestedAction": "조치 불요"
         },
         {
@@ -1368,7 +1368,7 @@
           "field": "grounding",
           "matchedText": null,
           "sourceEvidence": "BASE_STANDARD: ① 성상 : 고유의 향미가 있고 이미·이취가 없는 황갈색의 환 ② 프로바이오틱스 수 : 표시량 150,000,000(1.5억)CFU/15g 이상… | SRV_USE: 1일 3회, 1회 1포씩 식전 또는 식후에 물과 함께 씹어드십시오.",
-          "message": "환산 불가(1단위 중량이 공식 원문에 없음) → **작성 전 생성 금지 목록**: per serving · per stick · per capsule · daily total",
+          "message": "환산 불가(1회 섭취 중량이 공식 원문에 없음(1단위 중량·1회 총중량 모두 부재)) → **작성 전 생성 금지 목록**: per serving · per stick · per capsule · daily total",
           "suggestedAction": "표시 기준량만 기술하십시오. 1단위당·1일 총량 수치는 만들지 마십시오."
         },
         {
@@ -1390,7 +1390,7 @@
           "field": "drafts",
           "matchedText": null,
           "sourceEvidence": null,
-          "message": "환산 근거 없음(1단위 중량이 공식 원문에 없음) — 파생 수치 미기재 확인",
+          "message": "환산 근거 없음(1회 섭취 중량이 공식 원문에 없음(1단위 중량·1회 총중량 모두 부재)) — 파생 수치 미기재 확인",
           "suggestedAction": "조치 불요"
         },
         {
@@ -1548,7 +1548,7 @@
           "field": "grounding",
           "matchedText": null,
           "sourceEvidence": "BASE_STANDARD: 1. 성상: 고유의 향미가 있고 이미, 이취가 없는 흰분홍의 분말 2. 대장균군 : 음성 3. 프로바이오틱스 수 : 표시량 (1,000,000,… | SRV_USE: 1일 2회, 1회 1포를 물, 음료, 요구르트, 우유에 타거나 그대로 섭취하십시오.",
-          "message": "환산 불가(1단위 중량이 공식 원문에 없음) → **작성 전 생성 금지 목록**: per serving · per stick · per capsule · daily total",
+          "message": "환산 불가(1회 섭취 중량이 공식 원문에 없음(1단위 중량·1회 총중량 모두 부재)) → **작성 전 생성 금지 목록**: per serving · per stick · per capsule · daily total",
           "suggestedAction": "표시 기준량만 기술하십시오. 1단위당·1일 총량 수치는 만들지 마십시오."
         },
         {
@@ -1570,7 +1570,7 @@
           "field": "drafts",
           "matchedText": null,
           "sourceEvidence": null,
-          "message": "환산 근거 없음(1단위 중량이 공식 원문에 없음) — 파생 수치 미기재 확인",
+          "message": "환산 근거 없음(1회 섭취 중량이 공식 원문에 없음(1단위 중량·1회 총중량 모두 부재)) — 파생 수치 미기재 확인",
           "suggestedAction": "조치 불요"
         },
         {

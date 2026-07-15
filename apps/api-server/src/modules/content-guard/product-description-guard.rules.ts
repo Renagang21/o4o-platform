@@ -35,7 +35,7 @@ const ok = (
 // ═══ A. 기준량·섭취단위·일일량 ══════════════════════════════════════════════
 
 export interface BasisComputation {
-  /** 환산 가능 여부 (A-1: 4값 전부 원문 확인) */
+  /** 기준량이 1회분/1일분 중 어디에 대응하는지 확정됐는가 (A-1) */
   allowed: boolean;
   reason: string;
   /** 1회 총중량(mg) */
@@ -46,58 +46,97 @@ export interface BasisComputation {
   basisMg?: number;
   /** 기준량이 1회분인지 1일분인지 */
   basisEquals?: 'serving' | 'daily' | 'neither';
-  /** 1단위당 기능성분량 (절대수) */
+  /**
+   * 1단위당(per-capsule/stick) 수치를 **생성해도 되는가**.
+   * V1.3: `allowed` 와 **별개**다. 1회 총중량만 원문에 있으면 1회 수치는 되지만
+   * 1단위당은 역산이 되므로 금지된다(실측: Lacto Bloom "1회 2캡슐(900mg)").
+   */
+  perUnitAllowed: boolean;
+  /** 1단위당 기능성분량 — perUnitAllowed 일 때만 */
   perUnitCount?: number;
-  /** 1일 총 기능성분량 (절대수) */
+  /** 1회 섭취 기능성분량 */
+  perServingCount?: number;
+  /** 1일 총 기능성분량 — 근거가 완전할 때만 */
   dailyCount?: number;
 }
 
-/** A-1/A-3: 환산 허용 판정 + 계산. 근거가 하나라도 없으면 allowed=false. */
+/**
+ * A-1/A-3: 환산 허용 판정 + 계산. 근거가 하나라도 없으면 allowed=false.
+ *
+ * V1.3 — 중량 세 층위를 구분하고 **역산하지 않는다**:
+ *   1회 총중량 = 원문 명시값 우선, 없으면 (1단위 중량 × 개수) — **둘 다 원문 근거일 때만**
+ *   1일 총중량 = 원문 명시값 우선, 없으면 (1회 총중량 × 1일 횟수)
+ *   1단위 중량이 없으면 1회 총중량이 있어도 **per-unit 은 금지**
+ */
 export function computeBasis(input: GuardProductInput): BasisComputation {
   const da = input.grounding.declaredAmount;
   const sv = input.grounding.serving;
-  if (!da) return { allowed: false, reason: '표시량(declaredAmount) 없음' };
-  if (!sv) return { allowed: false, reason: '섭취단위(serving) 없음' };
-  if (sv.unitWeight == null || sv.unitWeightUnit == null)
-    return { allowed: false, reason: '1단위 중량이 공식 원문에 없음' };
-  if (sv.unitsPerServing == null) return { allowed: false, reason: '1회 섭취 개수 없음' };
-  if (sv.servingsPerDay == null) return { allowed: false, reason: '1일 섭취 횟수 없음' };
+  const deny = (reason: string, extra: Partial<BasisComputation> = {}): BasisComputation =>
+    ({ allowed: false, perUnitAllowed: false, reason, ...extra });
 
-  const unitMg = toMg(sv.unitWeight, sv.unitWeightUnit);
+  if (!da) return deny('표시량(declaredAmount) 없음');
+  if (!sv) return deny('섭취단위(serving) 없음');
+
   const basisMg = toMg(da.basisAmount, da.basisUnit);
-  if (unitMg == null || basisMg == null)
-    return { allowed: false, reason: `중량 단위 미지원(${sv.unitWeightUnit}/${da.basisUnit})` };
+  if (basisMg == null) return deny(`기준량 단위 미지원(${da.basisUnit})`);
 
-  const servingMg = unitMg * sv.unitsPerServing;
-  const dailyMg = servingMg * sv.servingsPerDay;
+  const unitMg = sv.unitWeight != null && sv.unitWeightUnit != null ? toMg(sv.unitWeight, sv.unitWeightUnit) : null;
+  const statedServing = sv.servingTotalWeight != null && sv.servingTotalWeightUnit != null
+    ? toMg(sv.servingTotalWeight, sv.servingTotalWeightUnit) : null;
+  const derivedServing = unitMg != null && sv.unitsPerServing != null ? unitMg * sv.unitsPerServing : null;
 
-  // 표시량 절대수 (예: 100 억 CFU → 1e10)
+  // 원문이 1회 총중량과 (1단위×개수)를 **둘 다** 주는데 어긋나면 원문/입력 모순 → 사람 확인
+  if (statedServing != null && derivedServing != null && !near(statedServing, derivedServing)) {
+    return deny(`1회 총중량 모순: 원문 명시 ${statedServing}mg vs 1단위×개수 ${derivedServing}mg`, { basisMg });
+  }
+  const servingMg = statedServing ?? derivedServing ?? undefined;
+  if (servingMg == null) {
+    return deny('1회 섭취 중량이 공식 원문에 없음(1단위 중량·1회 총중량 모두 부재)', { basisMg });
+  }
+
+  const statedDaily = sv.dailyTotalWeight != null && sv.dailyTotalWeightUnit != null
+    ? toMg(sv.dailyTotalWeight, sv.dailyTotalWeightUnit) : null;
+  const derivedDaily = sv.servingsPerDay != null ? servingMg * sv.servingsPerDay : null;
+  if (statedDaily != null && derivedDaily != null && !near(statedDaily, derivedDaily)) {
+    return deny(`1일 총중량 모순: 원문 명시 ${statedDaily}mg vs 1회×횟수 ${derivedDaily}mg`, { basisMg, servingMg });
+  }
+  const dailyMg = statedDaily ?? derivedDaily ?? undefined;
+
   const declaredCount = normalizeDeclared(da.value, da.unit);
-  if (declaredCount == null)
-    return { allowed: false, reason: `표시량 단위 미지원(${da.unit})`, servingMg, dailyMg, basisMg };
+  if (declaredCount == null) return deny(`표시량 단위 미지원(${da.unit})`, { basisMg, servingMg, dailyMg });
 
   const basisEquals: BasisComputation['basisEquals'] =
-    near(basisMg, dailyMg) ? 'daily' : near(basisMg, servingMg) ? 'serving' : 'neither';
-
-  // 기준량이 1일분이면 → 1일 총량 = 표시량, 1단위당 = 표시량 / (1일 총 단위수)
-  // 기준량이 1회분이면 → 1회 = 표시량, 1일 총량 = 표시량 × 횟수
-  const unitsPerDay = sv.unitsPerServing * sv.servingsPerDay;
-  let perUnitCount: number | undefined;
-  let dailyCount: number | undefined;
-  if (basisEquals === 'daily') {
-    dailyCount = declaredCount;
-    perUnitCount = declaredCount / unitsPerDay;
-  } else if (basisEquals === 'serving') {
-    perUnitCount = declaredCount / sv.unitsPerServing;
-    dailyCount = declaredCount * sv.servingsPerDay;
-  } else {
-    return {
-      allowed: false,
-      reason: `표시 기준량(${basisMg}mg)이 1회분(${servingMg}mg)·1일분(${dailyMg}mg) 어느 쪽과도 일치하지 않음`,
-      servingMg, dailyMg, basisMg, basisEquals,
-    };
+    dailyMg != null && near(basisMg, dailyMg) ? 'daily' : near(basisMg, servingMg) ? 'serving' : 'neither';
+  if (basisEquals === 'neither') {
+    return deny(
+      `표시 기준량(${basisMg}mg)이 1회분(${servingMg}mg)·1일분(${dailyMg ?? '?'}mg) 어느 쪽과도 일치하지 않음`,
+      { basisMg, servingMg, dailyMg, basisEquals },
+    );
   }
-  return { allowed: true, reason: '4값 전부 확인 + 기준량 대응 확정', servingMg, dailyMg, basisMg, basisEquals, perUnitCount, dailyCount };
+
+  // 1단위 중량이 원문에 없으면 per-unit 은 역산이므로 금지 (1회 수치는 가능)
+  const perUnitAllowed = unitMg != null && sv.unitsPerServing != null;
+
+  let perServingCount: number | undefined;
+  let dailyCount: number | undefined;
+  if (basisEquals === 'serving') {
+    perServingCount = declaredCount;
+    dailyCount = sv.servingsPerDay != null ? declaredCount * sv.servingsPerDay : undefined;
+  } else {
+    dailyCount = declaredCount;
+    perServingCount = sv.servingsPerDay != null ? declaredCount / sv.servingsPerDay : undefined;
+  }
+  const perUnitCount = perUnitAllowed && perServingCount != null && sv.unitsPerServing
+    ? perServingCount / sv.unitsPerServing : undefined;
+
+  return {
+    allowed: true,
+    perUnitAllowed,
+    reason: perUnitAllowed
+      ? '4값 전부 확인 + 기준량 대응 확정'
+      : '기준량 대응 확정(1회 기준) — 1단위 중량이 원문에 없어 per-unit 수치는 금지',
+    servingMg, dailyMg, basisMg, basisEquals, perUnitCount, perServingCount, dailyCount,
+  };
 }
 
 function near(a: number, b: number): boolean {
@@ -166,10 +205,31 @@ export function ruleA(input: GuardProductInput): GuardFinding[] {
     return out;
   }
 
+  // V1.3 — 기준량 대응은 확정됐으나 **1단위 중량이 원문에 없는** 경우:
+  //   1회 수치는 허용, per-unit 수치는 **역산**이므로 금지(캡슐 균등 가정이 원문에 없다).
+  if (!basis.perUnitAllowed) {
+    for (const [re, lang, field] of [
+      [PER_UNIT_KO, 'ko', 'koDraft'],
+      [PER_UNIT_KO2, 'ko', 'koDraft'],
+      [PER_UNIT_EN, 'en', 'enDraft'],
+    ] as const) {
+      const text = lang === 'ko' ? ko : en;
+      for (const m of matchAll(re, text)) {
+        out.push({
+          ruleId: 'A-PER-UNIT-DERIVED-003', severity: 'ERROR', status: 'BLOCKED', language: lang,
+          field, matchedText: m.text, sourceEvidence: evidence,
+          message: '1단위 중량이 공식 원문에 없는데 1단위당 수치를 기술했습니다(1회 총중량에서 역산).',
+          suggestedAction: '1회 총중량 기준으로만 기술하십시오. 예: "1회 2캡슐(900mg)에 N CFU".',
+        });
+      }
+    }
+  }
+
   // A-3: 계산 가능 → 본문 수치가 계산값과 일치하는지
-  const expectedPerUnit = basis.perUnitCount!;
-  const expectedDaily = basis.dailyCount!;
+  const expectedPerUnit = basis.perUnitCount;
+  const expectedDaily = basis.dailyCount;
   for (const m of matchAll(DAILY_KO, ko)) {
+    if (expectedDaily == null) break; // 1일 근거 불완전 → A-2 가 이미 처리
     const nums = extractKoCounts(m.text);
     for (const n of nums) {
       if (!near(n.value, expectedDaily)) {
@@ -183,6 +243,7 @@ export function ruleA(input: GuardProductInput): GuardFinding[] {
     }
   }
   for (const m of matchAll(PER_UNIT_KO, ko)) {
+    if (expectedPerUnit == null) break; // perUnitAllowed=false → 위에서 BLOCKED 처리됨
     const nums = extractKoCounts(m.text);
     for (const n of nums) {
       if (!near(n.value, expectedPerUnit)) {
@@ -195,7 +256,15 @@ export function ruleA(input: GuardProductInput): GuardFinding[] {
       }
     }
   }
-  if (out.length === 0) out.push(ok('A-CALC-MISMATCH-002', 'drafts', `환산 검증 통과(1일 ${expectedDaily.toLocaleString()}, 1단위 ${expectedPerUnit.toLocaleString()})`));
+  if (out.length === 0) {
+    // V1.3: perUnit/daily 는 근거가 완전할 때만 존재한다 → 있는 값만 보고한다
+    const parts = [
+      expectedDaily != null ? `1일 ${expectedDaily.toLocaleString()}` : null,
+      expectedPerUnit != null ? `1단위 ${expectedPerUnit.toLocaleString()}` : '1단위 산출 불가(1단위 중량 원문 부재)',
+      basis.perServingCount != null ? `1회 ${basis.perServingCount.toLocaleString()}` : null,
+    ].filter(Boolean);
+    out.push(ok('A-CALC-MISMATCH-002', 'drafts', `환산 검증 통과(${parts.join(', ')})`));
+  }
   return out;
 }
 

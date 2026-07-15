@@ -95,18 +95,43 @@ export interface DeclaredAmount {
   basisUnit: string;
 }
 
-/** 섭취 단위 — 공식 원문 SRV_USE 에서만 채운다. 원문에 없으면 null 로 둔다(추정 금지). */
+/**
+ * 섭취 규격 — 공식 원문 SRV_USE 에서만 채운다. **원문에 없으면 null**(추정·역산 금지).
+ *
+ * V1.3 (100건 대량작업 진입 전 보강) — 세 층위를 **구분**한다.
+ * 이전 모델은 `unitWeight` 만 있어 "1회 2캡슐(900mg)" 처럼 **1회 총중량만 주어진 원문**을
+ * 표현할 수 없었다(실측: Lacto Bloom). 그 결과 근거가 있는데도 환산 불가로 처리했다.
+ *
+ * ```text
+ * unitWeight          1개 단위 중량   ← 원문 명시 시에만. 없으면 per-capsule 역산 금지
+ * unitsPerServing     1회 개수
+ * servingTotalWeight  1회 총중량      ← 원문 명시 시에만
+ * servingsPerDay      1일 횟수
+ * dailyTotalWeight    1일 총중량      ← 원문 명시 시에만
+ * ```
+ *
+ * **불변 원칙**: 세 중량은 서로에게서 **역산하지 않는다**.
+ *   - `servingTotalWeight` 만 있고 `unitWeight` 가 없으면 → 1회 수치는 가능, **1단위당 수치는 금지**
+ *     ("1회 2캡슐(900mg)" 에서 1캡슐=450mg 을 유도하려면 캡슐 균등 가정이 필요한데 원문에 없다)
+ *   - 1일 총량은 **원문에 있거나**, 1회 총중량 × 1일 횟수가 **모두 원문 근거**일 때만 생성한다
+ */
 export interface ServingSpec {
   /** 'capsule' | 'tablet' | 'stick' | 'sachet' | 'bottle' 등 */
   unitType: string;
-  /** 1개 단위 중량. **원문에 없으면 null** — 이 값이 null 이면 파생 수치 생성 금지 */
+  /** 1개 단위 중량. **원문에 없으면 null** — null 이면 1단위당(per-capsule) 수치 생성 금지 */
   unitWeight: number | null;
   unitWeightUnit: string | null;
   /** 1회 섭취 개수 */
   unitsPerServing: number | null;
+  /** 1회 총중량. **원문이 명시할 때만**(예: "1회 2캡슐(900mg)"). 역산 금지 */
+  servingTotalWeight?: number | null;
+  servingTotalWeightUnit?: string | null;
   /** 1일 섭취 횟수. 범위면 최소값(servingsPerDayMax 에 최대) */
   servingsPerDay: number | null;
   servingsPerDayMax?: number | null;
+  /** 1일 총중량. **원문이 명시할 때만**. 역산 금지 */
+  dailyTotalWeight?: number | null;
+  dailyTotalWeightUnit?: string | null;
 }
 
 export interface GroundingInput {
