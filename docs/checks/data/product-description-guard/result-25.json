@@ -1,11 +1,10 @@
 {
   "guardVersion": "product-description-guard@1.1.0",
   "totalProducts": 25,
-  "pass": 12,
-  "reviewRequired": 13,
+  "pass": 17,
+  "reviewRequired": 8,
   "blocked": 0,
   "findingsByRule": {
-    "H-GUARANTEE-SPEC-006": 7,
     "B-SPEC-MINMAX-003": 1,
     "C-ABSENCE-SOFT-004": 1,
     "B-SUPERLATIVE-CONTEXT-002": 2,
@@ -19,10 +18,10 @@
       "guardVersion": "product-description-guard@1.1.0",
       "preGuardStatus": "PASS",
       "postGuardStatus": "PASS",
-      "koEnStatus": "REVIEW_REQUIRED",
-      "overallStatus": "REVIEW_REQUIRED",
+      "koEnStatus": "PASS",
+      "overallStatus": "PASS",
       "blockedCount": 0,
-      "reviewCount": 1,
+      "reviewCount": 0,
       "passCount": 9,
       "precheckInfoCount": 2,
       "findings": [
@@ -135,17 +134,6 @@
           "sourceEvidence": null,
           "message": "제형 기반 추정 검출 없음",
           "suggestedAction": "조치 불요"
-        },
-        {
-          "ruleId": "H-GUARANTEE-SPEC-006",
-          "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
-          "language": "en",
-          "field": "enDraft",
-          "matchedText": "guarantees",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수: 1,000,000,000 CFU/350mg 이상",
-          "message": "\"guarantees\" 가 표시량 규격 보장 문맥으로 보입니다: \"…wel movement, and may help support gut health. This product guarantees at least 1 billion CFU per capsule (350mg) throug…\"",
-          "suggestedAction": "표시량 규격 보장이면 PASS 입니다."
         },
         {
           "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
@@ -313,10 +301,10 @@
       "guardVersion": "product-description-guard@1.1.0",
       "preGuardStatus": "PASS",
       "postGuardStatus": "PASS",
-      "koEnStatus": "REVIEW_REQUIRED",
-      "overallStatus": "REVIEW_REQUIRED",
+      "koEnStatus": "PASS",
+      "overallStatus": "PASS",
       "blockedCount": 0,
-      "reviewCount": 1,
+      "reviewCount": 0,
       "passCount": 9,
       "precheckInfoCount": 2,
       "findings": [
@@ -429,17 +417,6 @@
           "sourceEvidence": null,
           "message": "제형 기반 추정 검출 없음",
           "suggestedAction": "조치 불요"
-        },
-        {
-          "ruleId": "H-GUARANTEE-SPEC-006",
-          "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
-          "language": "en",
-          "field": "enDraft",
-          "matchedText": "guarantees",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량 (100억 CFU/340 mg) 이상",
-          "message": "\"guarantees\" 가 표시량 규격 보장 문맥으로 보입니다: \"…wel movement, and may help support gut health. This product guarantees at least 10 billion CFU per capsule (340mg) throu…\"",
-          "suggestedAction": "표시량 규격 보장이면 PASS 입니다."
         },
         {
           "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
@@ -879,10 +856,10 @@
       "guardVersion": "product-description-guard@1.1.0",
       "preGuardStatus": "PASS",
       "postGuardStatus": "PASS",
-      "koEnStatus": "REVIEW_REQUIRED",
-      "overallStatus": "REVIEW_REQUIRED",
+      "koEnStatus": "PASS",
+      "overallStatus": "PASS",
       "blockedCount": 0,
-      "reviewCount": 1,
+      "reviewCount": 0,
       "passCount": 9,
       "precheckInfoCount": 2,
       "findings": [
@@ -995,17 +972,6 @@
           "sourceEvidence": null,
           "message": "제형 기반 추정 검출 없음",
           "suggestedAction": "조치 불요"
-        },
-        {
-          "ruleId": "H-GUARANTEE-SPEC-006",
-          "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
-          "language": "en",
-          "field": "enDraft",
-          "matchedText": "guarantees",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량 이상 (100억 CFU/350 mg)",
-          "message": "\"guarantees\" 가 표시량 규격 보장 문맥으로 보입니다: \"…wel movement, and may help support gut health. This product guarantees at least 10 billion CFU per capsule (350mg) throu…\"",
-          "suggestedAction": "표시량 규격 보장이면 PASS 입니다."
         },
         {
           "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
@@ -1706,10 +1672,10 @@
       "guardVersion": "product-description-guard@1.1.0",
       "preGuardStatus": "PASS",
       "postGuardStatus": "REVIEW_REQUIRED",
-      "koEnStatus": "REVIEW_REQUIRED",
+      "koEnStatus": "PASS",
       "overallStatus": "REVIEW_REQUIRED",
       "blockedCount": 0,
-      "reviewCount": 2,
+      "reviewCount": 1,
       "passCount": 8,
       "precheckInfoCount": 2,
       "findings": [
@@ -1824,17 +1790,6 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "H-GUARANTEE-SPEC-006",
-          "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
-          "language": "en",
-          "field": "enDraft",
-          "matchedText": "guarantees",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 : 표시량 이상 [표시량 5,000,000,000 (50억)CFU/2g]",
-          "message": "\"guarantees\" 가 표시량 규격 보장 문맥으로 보입니다: \"…wel movement, and may help support gut health. This product guarantees at least 5 billion CFU per 2g through its shelf l…\"",
-          "suggestedAction": "표시량 규격 보장이면 PASS 입니다."
-        },
-        {
           "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
           "severity": "INFO",
           "status": "INFO",
@@ -1853,10 +1808,10 @@
       "guardVersion": "product-description-guard@1.1.0",
       "preGuardStatus": "PASS",
       "postGuardStatus": "PASS",
-      "koEnStatus": "REVIEW_REQUIRED",
-      "overallStatus": "REVIEW_REQUIRED",
+      "koEnStatus": "PASS",
+      "overallStatus": "PASS",
       "blockedCount": 0,
-      "reviewCount": 1,
+      "reviewCount": 0,
       "passCount": 9,
       "precheckInfoCount": 2,
       "findings": [
@@ -1969,17 +1924,6 @@
           "sourceEvidence": null,
           "message": "제형 기반 추정 검출 없음",
           "suggestedAction": "조치 불요"
-        },
-        {
-          "ruleId": "H-GUARANTEE-SPEC-006",
-          "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
-          "language": "en",
-          "field": "enDraft",
-          "matchedText": "guarantees",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량 (10,000,000,000(100억) cfu/2g) 이상",
-          "message": "\"guarantees\" 가 표시량 규격 보장 문맥으로 보입니다: \"…wel movement, and may help support gut health. This product guarantees at least 10 billion CFU per 2g through its shelf…\"",
-          "suggestedAction": "표시량 규격 보장이면 PASS 입니다."
         },
         {
           "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
@@ -2680,10 +2624,10 @@
       "guardVersion": "product-description-guard@1.1.0",
       "preGuardStatus": "PASS",
       "postGuardStatus": "REVIEW_REQUIRED",
-      "koEnStatus": "REVIEW_REQUIRED",
+      "koEnStatus": "PASS",
       "overallStatus": "REVIEW_REQUIRED",
       "blockedCount": 0,
-      "reviewCount": 2,
+      "reviewCount": 1,
       "passCount": 8,
       "precheckInfoCount": 2,
       "findings": [
@@ -2796,17 +2740,6 @@
           "sourceEvidence": null,
           "message": "제형 기반 추정 검출 없음",
           "suggestedAction": "조치 불요"
-        },
-        {
-          "ruleId": "H-GUARANTEE-SPEC-006",
-          "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
-          "language": "en",
-          "field": "enDraft",
-          "matchedText": "guarantees",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 : 표시량(3,000,000,000(30억) CFU/1,000mg)이상",
-          "message": "\"guarantees\" 가 표시량 규격 보장 문맥으로 보입니다: \"…wel movement, and may help support gut health. This product guarantees at least 3 billion CFU per 1,000mg through its sh…\"",
-          "suggestedAction": "표시량 규격 보장이면 PASS 입니다."
         },
         {
           "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
@@ -3382,10 +3315,10 @@
       "guardVersion": "product-description-guard@1.1.0",
       "preGuardStatus": "PASS",
       "postGuardStatus": "PASS",
-      "koEnStatus": "REVIEW_REQUIRED",
-      "overallStatus": "REVIEW_REQUIRED",
+      "koEnStatus": "PASS",
+      "overallStatus": "PASS",
       "blockedCount": 0,
-      "reviewCount": 1,
+      "reviewCount": 0,
       "passCount": 9,
       "precheckInfoCount": 2,
       "findings": [
@@ -3498,17 +3431,6 @@
           "sourceEvidence": null,
           "message": "제형 기반 추정 검출 없음",
           "suggestedAction": "조치 불요"
-        },
-        {
-          "ruleId": "H-GUARANTEE-SPEC-006",
-          "severity": "INFO",
-          "status": "REVIEW_REQUIRED",
-          "language": "en",
-          "field": "enDraft",
-          "matchedText": "guarantees",
-          "sourceEvidence": "BASE_STANDARD: 프로바이오틱스 수 : 표시량(1,000,000,000(10억) CFU/5,000mg) 표시량 이상",
-          "message": "\"guarantees\" 가 표시량 규격 보장 문맥으로 보입니다: \"…wel movement, and may help support gut health. This product guarantees at least 1 billion CFU per 5,000mg through its sh…\"",
-          "suggestedAction": "표시량 규격 보장이면 PASS 입니다."
         },
         {
           "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",

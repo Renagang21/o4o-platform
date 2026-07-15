@@ -170,6 +170,67 @@ describe('V1.1 — 위험 신호와 정보성 신호 분리', () => {
     expect(f.status).toBe('REVIEW_REQUIRED');
   });
 
+  // D-SHELFLIFE-GUARANTEE (V1.2) — 표본검수에서 발견된 신규 실패 유형.
+  //   BASE_STANDARD 는 "표시량 … 이상" 이라는 **규격**만 진술한다.
+  //   "유통기한까지 보장" 은 규제 일반지식을 끌어온 추론 확장이다.
+  it('D-SHELFLIFE: ko "유통기한까지 보장" 은 원문 근거 없으면 BLOCKED', () => {
+    const r = runGuard(
+      {
+        ...OK_VIVA_FULL_BASIS,
+        drafts: { ...OK_VIVA_FULL_BASIS.drafts, ko: '<p>이 제품은 5,000mg당 10억 CFU 이상을 유통기한까지 보장합니다.</p>' },
+      },
+      { phase: 'post' },
+    );
+    const f = r.findings.find((x) => x.ruleId === 'D-SHELFLIFE-GUARANTEE-007')!;
+    expect(f).toBeDefined();
+    expect(f.status).toBe('BLOCKED');
+    expect(f.language).toBe('ko');
+  });
+
+  it('D-SHELFLIFE: en "guarantees … through its shelf life" 도 BLOCKED', () => {
+    const r = runGuard(
+      {
+        ...OK_VIVA_FULL_BASIS,
+        drafts: {
+          ...OK_VIVA_FULL_BASIS.drafts,
+          en: '<p>This product guarantees at least 1 billion CFU per 5,000mg through its shelf life.</p>',
+        },
+      },
+      { phase: 'post' },
+    );
+    const f = r.findings.find((x) => x.ruleId === 'D-SHELFLIFE-GUARANTEE-007')!;
+    expect(f).toBeDefined();
+    expect(f.status).toBe('BLOCKED');
+  });
+
+  it('D-SHELFLIFE: 원문이 유통기한 보장을 진술하면 BLOCKED 아님 (REVIEW)', () => {
+    const r = runGuard(
+      {
+        ...OK_VIVA_FULL_BASIS,
+        source: { ...OK_VIVA_FULL_BASIS.source, baseStandard: '프로바이오틱스 수 : 표시량 이상 (유통기한까지 보장)' },
+        drafts: { ...OK_VIVA_FULL_BASIS.drafts, ko: '<p>이 제품은 5,000mg당 10억 CFU 이상을 유통기한까지 보장합니다.</p>' },
+      },
+      { phase: 'post' },
+    );
+    expect(r.findings.some((x) => x.ruleId === 'D-SHELFLIFE-GUARANTEE-007')).toBe(false);
+    const f = r.findings.find((x) => x.ruleId === 'D-SHELFLIFE-GUARANTEE-GROUNDED-008')!;
+    expect(f.status).toBe('REVIEW_REQUIRED');
+  });
+
+  it('D-SHELFLIFE: 중립 표현(표시 기준/labelled standard)은 검출되지 않는다', () => {
+    const r = runGuard(
+      {
+        ...OK_VIVA_FULL_BASIS,
+        drafts: {
+          ko: '<p>이 제품의 표시 기준은 5,000mg당 10억 CFU 이상입니다.</p>',
+          en: '<p>The labelled standard for this product is at least 1 billion CFU per 5,000mg.</p>',
+        },
+      },
+      { phase: 'post' },
+    );
+    expect(r.findings.some((x) => x.ruleId.startsWith('D-SHELFLIFE'))).toBe(false);
+  });
+
   it('B-SPEC-MINMAX: 규격어가 제품 비교로 쓰이면 BLOCKED (탐지력 강화)', () => {
     const r = runGuard(
       withEn('Contains at least 1 billion CFU, more than other products in this group.'),

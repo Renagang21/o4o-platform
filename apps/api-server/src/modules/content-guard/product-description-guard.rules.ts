@@ -400,6 +400,44 @@ export function ruleD(input: GuardProductInput): GuardFinding[] {
   };
   scan(stripHtml(input.drafts.ko), CLAIM_KO, 'ko', 'koDraft');
   scan(stripHtml(input.drafts.en), CLAIM_EN, 'en', 'enDraft');
+
+  // D-7 (V1.2) — "표시량을 **유통기한까지 보장**한다" 주장.
+  //   BASE_STANDARD 는 "표시량(N CFU/기준량) **이상**" 이라는 **규격**만 진술한다.
+  //   수치·기준량은 근거가 있으나 다음 두 요소는 **공식 원문에 없다**:
+  //     ① 보장 **주체** — 규격은 기준이지 제품이 소비자에게 하는 약속이 아니다
+  //     ② 시간 **범위** — "유통기한까지" 는 원문 어디에도 없다
+  //   "표시량은 유통기한까지 유지되어야 한다" 는 규제 일반지식을 끌어오는 것은
+  //   **외부 지식 유입(실패유형 ②)** 이자 **추론 확장(실패유형 ⑤)** 이다.
+  //   원문이 실제로 그 연결을 진술하면(예: 유통기한까지 균수 보장) grounded 로 REVIEW.
+  {
+    const srcAll = `${input.source.baseStandard} ${input.source.intake} ${input.source.caution} ${input.source.dosageForm} ${input.source.mainFunction}`;
+    const srcStatesShelfGuarantee = /유통\s*기한|shelf\s*life|보장/i.test(srcAll);
+    const claims: Array<[RegExp, 'ko' | 'en', string]> = [
+      [/유통\s*기한\s*까지[^。.]{0,24}보장|보장[^。.]{0,24}유통\s*기한\s*까지/g, 'ko', 'koDraft'],
+      [/guarantee[sd]?[^.]{0,90}shelf\s*life|shelf\s*life[^.]{0,50}guarantee[sd]?/gi, 'en', 'enDraft'],
+    ];
+    for (const [re, lang, field] of claims) {
+      const text = stripHtml(lang === 'ko' ? input.drafts.ko : input.drafts.en);
+      for (const m of matchAll(re, text)) {
+        out.push({
+          ruleId: srcStatesShelfGuarantee ? 'D-SHELFLIFE-GUARANTEE-GROUNDED-008' : 'D-SHELFLIFE-GUARANTEE-007',
+          severity: srcStatesShelfGuarantee ? 'WARNING' : 'ERROR',
+          status: srcStatesShelfGuarantee ? 'REVIEW_REQUIRED' : 'BLOCKED',
+          language: lang, field, matchedText: truncate(m.text, 60),
+          sourceEvidence: srcStatesShelfGuarantee
+            ? `원문에 유통기한·보장 표현 존재: ${truncate(srcAll, 60)}`
+            : `BASE_STANDARD 는 규격만 진술: "${truncate(input.source.baseStandard, 60)}" — 유통기한·보장 표현 없음`,
+          message: srcStatesShelfGuarantee
+            ? `유통기한 보장 주장의 원문 근거를 사람이 확인하십시오: "${truncate(m.text, 50)}"`
+            : `원문에 없는 **유통기한 보장** 주장입니다: "${truncate(m.text, 50)}". 원문은 "표시량 … 이상" 이라는 규격만 진술합니다.`,
+          suggestedAction: srcStatesShelfGuarantee
+            ? '원문 근거 위치를 §E 표에 기록하십시오.'
+            : '보장 주체·시간 범위를 삭제하고 규격을 규격으로 기술하십시오. 예: "이 제품의 표시 기준은 …당 N CFU 이상입니다" / "The labelled standard for this product is at least N CFU per …".',
+        });
+      }
+    }
+  }
+
   if (out.length === 0) out.push(ok('D-CLAIM-UNGROUNDED-001', 'drafts', '근거 없는 제품 주장 검출 없음'));
   return out;
 }
@@ -562,9 +600,14 @@ export function ruleG(input: GuardProductInput): GuardFinding[] {
 // ═══ H. ko/en 대조 + §16 기능성 강화 ═══════════════════════════════════════
 
 const ESCALATION_EN = /\b(improves|prevents|treats|boosts|enhances|ensures|restores)\b/gi;
-/** "guarantees at least N CFU through its shelf life" = 표시량 규격 보장이지 기능성 강화가 아니다 */
+/**
+ * "guarantees at least N CFU" = 표시량 규격 문맥이지 기능성 강화(H)가 아니다 → H 에서는 REVIEW.
+ * ⚠️ V1.2: `shelf life` 를 규격 문맥의 **근거로 쓰지 않는다**. "유통기한까지 보장" 은 원문에 없는
+ *    추론 확장이며, 그 자체가 위반이다(D-SHELFLIFE-GUARANTEE-007 이 BLOCKED 로 검출).
+ *    이전 정의는 위반 요소를 정당화 근거로 오인했다.
+ */
 const GUARANTEE_EN = /\bguarantees\b/gi;
-const GUARANTEE_SPEC_CTX = /at\s+least|CFU|shelf life|per\s+(capsule|stick|tablet)/i;
+const GUARANTEE_SPEC_CTX = /at\s+least|CFU|per\s+(capsule|stick|tablet)/i;
 const SUPPORTS_EN = /\bsupports\b/gi;
 
 export function ruleH(input: GuardProductInput): GuardFinding[] {

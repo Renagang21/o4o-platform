@@ -150,6 +150,32 @@ grounding memo (§A 환산식 확정)
 > ✓ (소비자 상황) 큰 알을 삼키기 부담스러운 분         → 증상·고민 소구, 허용
 > ```
 
+### D-2. **규격을 약속으로 바꾸지 않기** (20건 파일럿 표본검수 실측 — 8/25 위반)
+
+`BASE_STANDARD` 의 `표시량(N CFU/기준량) 이상` 은 **규격**이다. 다음 두 가지는 **원문에 없다**.
+
+| 덧붙은 것 | 왜 위반인가 |
+|---|---|
+| 보장 **주체** ("이 제품은 … 보장합니다" / "This product guarantees …") | 규격은 기준이지 제품이 소비자에게 하는 **약속**이 아니다 |
+| 시간 **범위** ("유통기한까지" / "through its shelf life") | 원문 어디에도 없다 |
+
+"표시량은 유통기한까지 유지되어야 한다"는 **규제 일반지식**이다. 사실이더라도 이 제품 원문이
+말하지 않았으면 쓰지 않는다 — 실패유형 **② 외부 지식 유입** + **⑤ 추론 확장**.
+
+```text
+✗ 이 제품은 캡슐 1개(350mg)당 10억 CFU 이상을 유통기한까지 보장합니다.
+✓ 이 제품의 표시 기준은 캡슐 1개(350mg)당 10억 CFU 이상입니다.
+
+✗ This product guarantees at least 1 billion CFU per capsule (350mg) through its shelf life.
+✓ The labelled standard for this product is at least 1 billion CFU per capsule (350mg).
+```
+
+**수치와 기준량은 근거가 있으므로 그대로 둔다.** 삭제 대상은 보장 주체·시간 범위뿐이다.
+원문이 실제로 유통기한 보장을 진술하면 그때는 §E 표에 근거 위치를 적고 쓸 수 있다.
+
+> 자동 검출: `D-SHELFLIFE-GUARANTEE-007` (BLOCKED) / 원문 근거 있으면 `-GROUNDED-008` (REVIEW).
+> **ko·en 양쪽을 검사한다** — 실측에서 en 은 중립 표현인데 ko 만 위반인 사례(`a3-paraotics`)가 있었다.
+
 ---
 
 ## E. 필수 기록 표 (초안 1건마다)
