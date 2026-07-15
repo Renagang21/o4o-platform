@@ -36,6 +36,7 @@ services/          서비스(KPA·GP·KCos·Neture)               (제품군과 
 | 3 | [CONTENT-CHECK-STANDARD](CONTENT-CHECK-STANDARD.md) | CHECK 문서 작성 규칙(필수 항목·표·완료 보고). |
 | 4 | [CONTENT-RULE-REGISTRY](CONTENT-RULE-REGISTRY.md) · [OPERATIONAL-RULE-REGISTRY](OPERATIONAL-RULE-REGISTRY.md) | 공통 규칙(CR-NNN) · 운영/Git/문서 관리 규칙(OR-NNN). |
 | 5 | [content-authoring/CONTENT-AUTHORING-PRINCIPLES](../content-authoring/CONTENT-AUTHORING-PRINCIPLES.md) | 소비자 중심·원문 우선·과장 금지·grounding 필수. |
+| 5-a | [content-authoring/STORE-DESCRIPTION-CLASS-CONTRACT](../content-authoring/STORE-DESCRIPTION-CLASS-CONTRACT.md) | **매장용 설명서 `sd-*` 클래스 계약 SSOT (전 제품군 공통, CR-020)**. `<style>` 금지·시맨틱 HTML·반응형은 렌더러 담당. 제품군 문서는 참조만(복사 금지). |
 | 6 | [ai/*](../ai/) | AI-PROMPT-STANDARD · AI-GROUNDING · AI-REVIEW · AI-SAFETY · AI-RULE-REGISTRY(AR-NNN). |
 | 7 | [products/drug/*](../products/drug/) | DRUG-STANDARD · DRUG-WRITING · DRUG-GROUPING · DRUG-TEMPLATE · DRUG-RULE-REGISTRY(DR-NNN). |
 | 8 | [products/drug/knowledge/*](../products/drug/knowledge/) | **Knowledge Catalog(Rule 아님)**: ATC-FALSE-POSITIVE-CATALOG · GROUPING-PATTERNS · CONSUMER-WRITING-PATTERNS. |

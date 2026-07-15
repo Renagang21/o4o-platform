@@ -1,6 +1,6 @@
 # OTC-DESCRIPTION-DESIGN-GUIDE — 일반의약품 설명서 화면 디자인 지침
 
-상태: **Draft V0.2** (2026-07-15) · 대상: **일반의약품(OTC) 전용** · 진입: [DOCUMENT-INDEX](common/DOCUMENT-INDEX.md)
+상태: **Draft V0.3** (2026-07-15) · 대상: **일반의약품(OTC) 전용** · 진입: [DOCUMENT-INDEX](common/DOCUMENT-INDEX.md)
 번역 기준: [OTC-EN-TRANSLATION-GUIDE](OTC-EN-TRANSLATION-GUIDE.md) · 테스트 기록: [OTC-DESCRIPTION-DESIGN-TEST-LOG](OTC-DESCRIPTION-DESIGN-TEST-LOG.md)
 
 > 이 문서는 **새 디자인 시스템을 만들지 않는다.** 이미 구현된 공용 렌더러를 그대로 쓴다.
@@ -30,33 +30,23 @@
 | **콘텐츠(저자)** | 시맨틱 HTML — `sd-*` class 구조만. 문구와 구조에 집중. |
 | **디자인(렌더러)** | 폰트·색·여백·**반응형**·라이트/다크. 저자는 손대지 않는다. |
 
-**금지**: `<style>` 태그 · 인라인 `style` · 임의 class.
-`<style>`은 write-path sanitizer(`apps/api-server/src/modules/neture/utils/sanitize-description-html.util.ts`)가 **태그째 제거**하므로 넣어도 저장되지 않는다. 시맨틱 태그와 class 는 무손실 보존된다.
-
-**class 어휘 = 디자인 시스템과의 계약**이다. 어휘 밖 class 는 스타일이 붙지 않는다. 확장이 필요하면 이 문서를 고치지 말고 **렌더러 WO**를 낸다 (§8).
+이 분리와 금지 사항(`<style>` · 인라인 `style` · 임의 class)은 **[클래스 계약 §5](content-authoring/STORE-DESCRIPTION-CLASS-CONTRACT.md)** 소관이다 (CR-020). OTC 예외는 없다.
 
 ---
 
 ## 2. 구조 표시 방식
 
-기존 `sd-*` 어휘를 그대로 쓴다 (전체 목록: [HFF AGENT-KICKOFF §5](products/health-functional-food/AGENT-KICKOFF.md)).
+> **클래스 어휘 = 전 제품군 공통 계약 (CR-020).**
+> 어휘 전체·금지 사항·이름 변경 영향 범위는 **[STORE-DESCRIPTION-CLASS-CONTRACT](content-authoring/STORE-DESCRIPTION-CLASS-CONTRACT.md)** 에 있다. **여기서 반복하지 않는다.**
+> OTC 전용 어휘는 없다 — 다른 제품군과 **같은 계약**을 쓴다.
 
-| 요소 | class | 비고 |
-|---|---|---|
-| 최상위 | `sd-card` | 루트. 카테고리 테마는 `sd-theme-*` |
-| 제목부 | `sd-hero` (`h1 > small`, `sd-badges > sd-badge`, `sd-meta`) | |
-| 본문 | `sd-body` | |
-| 도입 | `sd-intro` | |
-| 섹션 제목 | `<h2>` | 가운데 정렬 + 밑줄 자동 |
-| 목록 | `sd-why` / `sd-who` (`ul > li`) | 불릿 자동 |
-| 핵심 항목 | `sd-core > sd-item` (`sd-tag`, `h3`, `p`) | **반응형 다단 대상** |
-| 사용법 | `sd-intake` (`small`) | |
-| 태그 | `sd-chips` (`ul > li`) | |
-| 규격 | `sd-spec` | |
-| 상담 유도 | `sd-cta` (`sd-cta-k`, `p`) | |
-| 하단 | `sd-foot` | |
+OTC 에서 유의할 점만:
 
-> ⚠️ **주의사항 전용 class 는 없다.** 현재 어휘에 경고·금기 강조 표시가 없다 — 일반의약품에는 **금기·주의사항이 필수**인데(번역 GUIDE T-03) 시각적으로 구분할 수단이 없다. **미해결 항목** (§8-A). 임의 class 를 만들지 말 것.
+- 핵심 항목은 `sd-core > sd-item` 에 둔다 — **반응형 다단 대상**이라 긴 성분명이 넘칠 수 있다 (§7).
+- 섹션 제목은 `<h2>` (별도 class 없음).
+
+> ⚠️ **주의사항 전용 class 는 없다.** 계약 어휘에 경고·금기 강조 표시가 없다 — 일반의약품에는 **금기·주의사항이 필수**인데(번역 GUIDE T-03) 시각적으로 구분할 수단이 없다. **미해결 항목** (§8-A).
+> **임의 class 를 만들지 말 것** — 계약 위반이며 스타일도 붙지 않는다. 어휘 확장은 문서가 아니라 **렌더러 WO** 로 한다.
 
 ---
 
@@ -237,3 +227,4 @@
 |---|---|---|
 | V0.1 | 2026-07-15 | 초안 작성 (`WO-O4O-OTC-DESCRIPTION-DESIGN-GUIDE-DOCS-V1`). 신규 디자인 정의 없음 — 기존 `ContentRenderer variant="store-description"` 실측값 정리 + 미해결 5건(§8) 기록. 화면 실측 검증 전. |
 | V0.2 | 2026-07-15 | §10 테스트 결과 반영 경로 추가. 규칙 신설 아님 — DOCUMENT-ARCHITECTURE §3·§6 매핑 + OR-005(버전·이력 갱신) 연결. |
+| V0.3 | 2026-07-15 | `sd-*` 클래스 계약이 공통 축으로 승격됨에 따라 §1·§2 의 계약 복사본을 **참조로 교체**(SSOT = [STORE-DESCRIPTION-CLASS-CONTRACT](content-authoring/STORE-DESCRIPTION-CLASS-CONTRACT.md), CR-020). 디자인 규칙 변경 없음 (`WO-O4O-SD-CLASS-COMMON-CONTRACT-UNIFY-V1`). |

@@ -29,5 +29,6 @@
 | **CR-017** | 문서 4역할: Guide=설계 / CHECK=실행 결과 / Registry=운영 상태 / Memory=불변 결정 | DOCUMENT-ARCHITECTURE §1 | active |
 | **CR-018** | DOCUMENT-INDEX = 단일 진입점(새 합류자는 여기부터). CLAUDE.md는 규칙 복사 없이 INDEX 포인터만 | DOCUMENT-INDEX · CLAUDE.md | active |
 | **CR-019** | products·services 축은 직교. 서비스는 자체 Rule Registry 없이 CR/DR/AR/OR를 Rule ID로 참조 | DOCUMENT-ARCHITECTURE §2 · services/*/README | active |
+| **CR-020** | 매장용 설명서 콘텐츠 = **`<style>` 없는 시맨틱 HTML + `sd-*` 클래스 계약**(전 제품군 공통). 반응형·색·테마는 공용 렌더러 담당(`ContentRenderer variant="store-description"`). **인라인 style·어휘 밖 임의 class·제품군별 재정의 금지**. 클래스 CSS 정의의 SSOT = 코드(`ContentRenderer.tsx`) | content-authoring/STORE-DESCRIPTION-CLASS-CONTRACT | active |
 
-> 신규 공통 규칙은 CR-020부터 부여하고 해당 SSOT Guide 본문을 함께 수정한다. 운영/Git/문서 관리 규칙은 CR이 아니라 [OR](OPERATIONAL-RULE-REGISTRY.md)에 등재한다.
+> 신규 공통 규칙은 CR-021부터 부여하고 해당 SSOT Guide 본문을 함께 수정한다. 운영/Git/문서 관리 규칙은 CR이 아니라 [OR](OPERATIONAL-RULE-REGISTRY.md)에 등재한다.

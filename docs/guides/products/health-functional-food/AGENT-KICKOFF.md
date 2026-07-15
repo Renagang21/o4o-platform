@@ -87,23 +87,19 @@
 
 ## 5. 콘텐츠 형식 — **시맨틱 HTML** (반응형 디자인은 렌더러가 담당)
 
-> **⚠️ 형식 변경 (2026-07-11) — `<style>` 금지.**
-> 저장 sanitizer(`sanitize-description-html.util.ts`, DOMPurify 기본)가 **`<style>`을 태그째 제거**한다(검증됨). 그래서 설명서 콘텐츠에는 **`<style>`을 넣지 않는다.** 반응형·색·다크모드는 공용 렌더러 **`ContentRenderer variant="store-description"`**(WO-O4O-STORE-DESCRIPTION-RENDERER-DESIGN-SYSTEM-V1)가 스코프 CSS로 담당한다. 콘텐츠는 **시맨틱 HTML(아래 `sd-*` 클래스)만** 저장한다 — sanitizer가 시맨틱 태그·class 를 100% 보존한다(검증됨). 과거 `<style>` fragment 예제([examples/byeonenjang-probiotics.responsive.html](examples/byeonenjang-probiotics.responsive.html))는 **더 이상 쓰지 않는다**(참고용 보관).
+> **계약 SSOT = [content-authoring/STORE-DESCRIPTION-CLASS-CONTRACT](../../content-authoring/STORE-DESCRIPTION-CLASS-CONTRACT.md) (CR-020, 전 제품군 공통).**
+> `<style>` 금지 · 시맨틱 HTML · `sd-*` 클래스 어휘 · 반응형(렌더러 `@container` 담당) · 인라인 style·임의 class 금지 — **전부 거기에 있다. 여기서 반복하지 않는다** (2026-07-15 공통 승격, `WO-O4O-SD-CLASS-COMMON-CONTRACT-UNIFY-V1`).
+> 과거 `<style>` fragment 예제([examples/byeonenjang-probiotics.responsive.html](examples/byeonenjang-probiotics.responsive.html))는 **더 이상 쓰지 않는다**(참고용 보관).
 
-**[examples/byeonenjang.semantic.html](examples/byeonenjang.semantic.html) 형식을 그대로 따른다.** — class 어휘가 디자인 시스템과의 **계약**이다(임의 class 금지).
+**[examples/byeonenjang.semantic.html](examples/byeonenjang.semantic.html) 형식을 그대로 따른다.**
 
-**클래스 어휘 (sd-*):**
-- `sd-card` (최상위) → `sd-hero`(내부: `<h1>…<small>부제</small></h1>`, `sd-badges > sd-badge`[강조는 `.is-solid`], `sd-meta`) + `sd-body`.
-- `sd-body` 내부: `sd-intro`(`<b>` 강조) · `<h2>`(섹션 제목) · `sd-why`/`sd-who`(`<ul><li>`) · `sd-core > sd-item`(`sd-tag`, `<h3>`, `<p>`) · `sd-intake`(`<small>`) · `sd-chips`(`<ul><li>`) · `sd-spec` · `sd-cta`(`sd-cta-k`, `<p>`) · `sd-foot`.
+**아래는 HFF 전용 사항만** (계약은 위 공통 문서):
 
-**규칙:**
-- **`<style>`·인라인 style·임의 class 금지.** 위 `sd-*` 구조만 맞추면 렌더러가 디자인을 입힌다.
-- **반응형은 자동** — 렌더러가 `@container` 로 폰 1열 / 태블릿(640px↑) 2열 / (900px↑) 3열. 저자는 구조만. (실측 검증: [REVIEW-V1 §3-1](pilot-probiotics/REVIEW-V1.md))
-- **알려진 현상 — 900px↑ `sd-core` 3열의 빈 칸**: `sd-item` 이 2개면 세 번째 칸이 빈다(정본 예제도 2개). **결정 = 그대로 둔다**(주 표면이 QR 모바일·모달이라 1~2열 구간). ⚠️ **빈 칸을 채우려고 근거 없는 세 번째 카드를 만들지 말 것**(CR-004 위반). 렌더러도 바꾸지 않는다.
-- **테마 자동** — 렌더러가 라이트/다크 토큰 제공.
 - **번호·편집 라벨 금지**(HFF-R07). 소비자 랜딩 카피만. **10단 랜딩** 구조(히어로→왜→핵심 구성→이런 분께→섭취→트러스트→구성→상담).
-- **카테고리 테마**: 콘텐츠 루트를 `<div class="sd-card sd-theme-red">`처럼 지정하면 렌더러가 accent(홍/골드 등)를 교체한다(general-food §2 "패키지 톤 반영"). 현재 `sd-theme-red`(홍삼·전통보양), `sd-theme-green`(유산균·식물), 미지정=블루(기본). 예제 [examples/hongsam-red-ginseng.semantic.html](examples/hongsam-red-ginseng.semantic.html).
-- 그 외 서체·세부 톤은 렌더러 소관 — 저자는 **문구와 구조**에 집중.
+- **카테고리 테마 매핑** — 계약의 `sd-theme-*` 메커니즘에 대한 **HFF 카테고리 배정**: `sd-theme-red`(홍삼·전통보양), `sd-theme-green`(유산균·식물), 미지정=블루(기본). 루트에 `<div class="sd-card sd-theme-red">` 형태로 부여(general-food §2 "패키지 톤 반영"). 예제 [examples/hongsam-red-ginseng.semantic.html](examples/hongsam-red-ginseng.semantic.html).
+- **반응형 실측 검증 근거**: [REVIEW-V1 §3-1](pilot-probiotics/REVIEW-V1.md).
+- **`sd-core` 3열 빈 칸에 대한 HFF 결정**: 현상 자체는 계약 문서 §3 참조. HFF는 **그대로 둔다** — 주 표면이 QR 모바일·모달이라 1~2열 구간이다. 렌더러도 바꾸지 않는다.
+- 저자는 **문구와 구조**에 집중한다. 서체·톤은 렌더러 소관.
 
 > 디자인 시스템 정의: [packages/content-editor `ContentRenderer.tsx`](../../../../packages/content-editor/src/components/ContentRenderer.tsx) `storeDescriptionCss`. 소비 표면(현재 전환됨): KPA `StoreDescriptionViewModal`, Neture `ProductLandingPage`(QR 모바일). 태블릿 키오스크·다국어 랜딩은 후속 전환(혼재 슬롯 구분 필요).
 
@@ -165,7 +161,13 @@
 식약처 `mainFunction`(장 건강) grounding 으로 **시맨틱 ko+en** 제작. **정본 형식 예제 = [examples/byeonenjang.semantic.html](examples/byeonenjang.semantic.html)** (시맨틱 sd-*, `<style>` 없음) — 형식 기준으로 계속 유효.
 
 > ⚠️ **DB 상태 정정 (2026-07-14)**: 당시 등록했던 master `38a9d3e4…` 와 그 STORE·B2B canonical 은 **삭제되었다** — 그 master 가 인코딩 손상 5건에 포함되어 guarded delete 대상이었다(§8). **DB에 변엔장 master/설명서는 없다.** 예제 **파일**만 형식 참조용으로 남아 있다.
-> ⚠️ 예제의 **"장용성 캡슐"을 다른 제품에 복사하지 말 것** — MFDS 건기식 데이터원에는 **균주명·코팅·장용성 정보가 없다.** 근거 없이 쓰면 창작(CR-004/실패 유형 ①⑤).
+> ⚠️ 예제의 **"장용성 캡슐"을 다른 제품에 복사하지 말 것** — 근거 없이 쓰면 창작(CR-004/실패 유형 ①⑤).
+>
+> **정정 (2026-07-15, 20-pilot A-3)**: 직전 문구는 "데이터원에 균주명·코팅·장용성 정보가 **없다**"였으나 이는 **5건 표본으로 데이터원 전체를 단정한 과일반화**였다(= 실패 유형 ③의 문서판). 실제로 **`파라오틱스`(20040017059210)는 BASE_STANDARD 에 "흰색 장용성 경질 내부캡슐" + inner/outer 1액·2액 붕해시험까지 명시**되어 있다.
+> ```text
+> 올바른 규칙 : 제품마다 다르다 — BASE_STANDARD 에 있으면 쓰고, 없으면 쓰지 않는다.
+>              (균주명은 지금까지 확인된 표본 전체에서 미발견 — 발견 시에도 그 제품 원문에 한해 사용)
+> ```
 
 ### B. 그룹 파일럿 — 유산균 장건강 828 그룹 (2026-07-15)
 
