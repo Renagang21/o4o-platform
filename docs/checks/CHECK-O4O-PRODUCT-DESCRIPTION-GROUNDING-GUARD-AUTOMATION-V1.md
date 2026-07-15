@@ -180,4 +180,5 @@ pnpm --filter @o4o/api-server guard:product-description -- \
 
 ## 13. 열린 항목
 
-- **`CHECK-O4O-HFF-DESCRIPTION-GROUP-PILOT-PROBIOTICS-20-V1.md` 부재** — 20-pilot 의 최종 CHECK(그 WO §13)가 미작성이다. 실질 근거(GROUNDING/GUARD 20-A~D)는 전부 있으나 통합 CHECK 가 없다. 별도 마무리 필요.
+- ~~`CHECK-O4O-HFF-DESCRIPTION-GROUP-PILOT-PROBIOTICS-20-V1.md` 부재~~ → **해소(2026-07-16)**. 본 WO 가 찾아낸 사람 미탐 4건까지 반영해 작성 완료. 파일럿 최종 판정 = **CONDITIONAL PASS**(자동 가드 없는 대량 제작 불허). → [CHECK-O4O-HFF-DESCRIPTION-GROUP-PILOT-PROBIOTICS-20-V1](CHECK-O4O-HFF-DESCRIPTION-GROUP-PILOT-PROBIOTICS-20-V1.md)
+- **REVIEW 사유 튜닝** — 25건에서 REVIEW 검출 130건 중 **정보성·형식성이 116건(89%)**. 사유별 건수는 파일럿 CHECK §5 에 기록됨. `B-SPEC-MINMAX-003`(51) · `H-MAKER-MISSING-005`(25) 처리와 `PRE-*` 표시 계층 분리가 다음 WO 대상. **성급한 INFO 하향 금지** — 기록 후 튜닝.
