@@ -259,6 +259,23 @@ export default function TabletScreenSetManager({ onToast, tablets, previewApi, s
     } finally { setBusy(false); }
   };
 
+  // WO-O4O-KPA-TABLET-CONTENT-STEP-BUILDER-SHELL-V1: 제작/수정은 단계형 제작 셸이 화면을 전환(takeover).
+  // WO-O4O-KPA-TABLET-TEMPLATE-PREVIEW-LAYOUT-FIX-V1: 셸은 카드 래퍼 '밖'에서 렌더한다.
+  //   ① 카드의 overflow-hidden 이 조상 스크롤포트가 되어 오른쪽 sticky 미리보기를 무력화한다(실측: 스크롤 시 패널이 밀려남).
+  //   ② 카드 헤더('태블릿 콘텐츠')가 셸 헤더('태블릿 화면 만들기')와 중복된다.
+  if (builder) {
+    return (
+      <TabletContentStepBuilder
+        initialDetail={builder.detail}
+        onCancel={() => setBuilder(null)}
+        onSaved={() => { setBuilder(null); reload(); }}
+        onToast={onToast}
+        previewApi={previewApi}
+        storeSlug={storeSlug ?? null}
+      />
+    );
+  }
+
   return (
     <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-indigo-100">
       <div className="px-4 py-3 border-b bg-indigo-50/60 flex items-center justify-between">
@@ -269,18 +286,6 @@ export default function TabletScreenSetManager({ onToast, tablets, previewApi, s
       </div>
 
       <div className="p-4 space-y-4">
-        {/* WO-O4O-KPA-TABLET-CONTENT-STEP-BUILDER-SHELL-V1: 제작/수정은 단계형 제작 셸이 화면을 전환(takeover). */}
-        {builder ? (
-          <TabletContentStepBuilder
-            initialDetail={builder.detail}
-            onCancel={() => setBuilder(null)}
-            onSaved={() => { setBuilder(null); reload(); }}
-            onToast={onToast}
-            previewApi={previewApi}
-            storeSlug={storeSlug ?? null}
-          />
-        ) : (
-        <>
         {/* WO-O4O-KPA-TABLET-SCREEN-SET-OPERATION-USABILITY-PASS-V1: 저장/템플릿/블록 개념 안내 */}
         <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-[11px] text-slate-600 leading-relaxed space-y-1">
           <p><b className="text-slate-700">화면 세트</b>는 태블릿 코너에 표시할 화면 구성 묶음(콘텐츠 원본)입니다. 여기서 만들고 수정하며, 실제 코너 연결·교체는 <b className="text-slate-700">코너별 운영</b> 탭에서 합니다.</p>
@@ -302,8 +307,6 @@ export default function TabletScreenSetManager({ onToast, tablets, previewApi, s
           onArchive={handleArchive}
           onRefresh={reload}
         />
-        </>
-        )}
       </div>
     </div>
   );
@@ -1067,7 +1070,8 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
       </div>{/* /왼쪽: 단계 입력 */}
 
       {/* ── 오른쪽: 실제 결과 화면(모든 단계에서 유지) ── */}
-      <aside className="mt-4 lg:mt-0 lg:sticky lg:top-4 min-w-0">
+      {/* sticky 오프셋 = 전역 헤더(sticky top-0 · 실측 높이 65px) 아래로 내려 가리지 않게 한다. */}
+      <aside className="mt-4 lg:mt-0 lg:sticky lg:top-[73px] min-w-0">
         <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
           <div className="px-3 py-2 border-b bg-slate-50 flex items-center justify-between gap-2 flex-wrap">
             <span className="text-xs font-bold text-slate-700">실제 화면 미리보기</span>
