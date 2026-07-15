@@ -10,6 +10,22 @@
 
 // ─── 수량(CFU 등) ────────────────────────────────────────────────────────────
 
+/**
+ * **수치 표기의 단일 정규화 규칙 (SSOT)**
+ *
+ * ⚠️ 이 상수를 쓰지 않고 정규식에 숫자 패턴을 직접 쓰지 말 것.
+ *
+ * 근거(30-A 실측): 소수점 억 오독(`1.5억` → `5억`, 3.3배)이 **4개 파싱 경로에 복제**돼 있었다.
+ *   ① source-grounding-parser.parseCfu   ② units.extractKoCounts
+ *   ③ rules.PER_UNIT_KO                  ④ rules.DAILY_KO
+ * 한 곳씩 고치면 다섯 번째가 또 생긴다. 같은 수치를 읽는 모든 경로는 **같은 규칙**을 공유한다.
+ *
+ * 매칭: `1` `100` `5,000` `1.5` `2.5` — 천단위 콤마와 소수점 모두 허용.
+ */
+export const NUM_TOKEN = String.raw`[0-9][0-9,]*(?:\.[0-9]+)?`;
+/** 한국어 수사 스케일 토큰 */
+export const KO_SCALE_TOKEN = String.raw`(?:조|억|만|천)`;
+
 const KO_SCALE: Record<string, number> = {
   '조': 1e12,
   '억': 1e8,
@@ -41,10 +57,8 @@ export interface CountMatch {
  */
 export function extractKoCounts(text: string): CountMatch[] {
   const out: CountMatch[] = [];
-  // ⚠️ 소수점 필수: `[0-9][0-9,]*` 로는 "1.5억" 에서 **"5억"만** 잡혀 3.3배 오독한다.
-  //    source-grounding-parser 의 결손 #1 과 **동일한 결손이 이 모듈에도 있었다**.
-  //    30-A 청인 해우(1.5억)에서 ko"5억" vs en"150 million" 허위 불일치로 드러났다.
-  const re = /([0-9][0-9,.]*[0-9]|[0-9])\s*(조|억|만|천)\s*(CFU|cfu)?/g;
+  // 공유 규칙(NUM_TOKEN) 사용 — 소수점 억("1.5억")을 5억으로 오독하던 결손을 잠근다.
+  const re = new RegExp(String.raw`(${NUM_TOKEN})\s*(${KO_SCALE_TOKEN})\s*(?:CFU|cfu)?`, 'g');
   let m: RegExpExecArray | null;
   while ((m = re.exec(text)) !== null) {
     const scale = KO_SCALE[m[2]];

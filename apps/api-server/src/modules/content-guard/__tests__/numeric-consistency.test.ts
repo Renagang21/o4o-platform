@@ -1,0 +1,108 @@
+/**
+ * 잠금 1 — **동일 수치를 읽는 모든 파싱 경로가 같은 정규화 규칙을 쓰는가**
+ *
+ * 30-A 실측: 소수점 억 오독(`1.5억` → `5억`, 3.3배)이 **4개 경로에 복제**돼 있었고,
+ * 두 곳만 고친 상태로 배치를 돌리다 3번째·4번째를 발견했다.
+ * 경로별로 테스트를 흩뿌리면 5번째 경로가 생길 때 또 놓친다.
+ * 이 파일은 **모든 경로에 같은 입력을 넣어 같은 값이 나오는지**를 한자리에서 강제한다.
+ *
+ * 새 파싱 경로를 추가하면 여기 PATHS 에 등록할 것.
+ */
+import fs from 'node:fs';
+import path from 'node:path';
+import { extractKoCounts, NUM_TOKEN, KO_SCALE_TOKEN } from '../product-description-guard.units.js';
+import { parseCfu } from '../source-grounding-parser.js';
+import { runGuard } from '../product-description-guard.js';
+import { OK_VIVA_FULL_BASIS } from './fixtures/known-errors.js';
+
+/** 같은 의미의 수치를 읽는 독립 경로들 */
+const PATHS: Array<{ name: string; read: (text: string) => number | null }> = [
+  {
+    name: 'units.extractKoCounts (초안 본문)',
+    read: (t) => extractKoCounts(t)[0]?.value ?? null,
+  },
+  {
+    name: 'source-grounding-parser.parseCfu (공식 원문)',
+    read: (t) => {
+      const r = parseCfu(`프로바이오틱스 수 : 표시량(${t} CFU/2g) 이상`);
+      return r.kind === 'PARSED' ? r.value : null;
+    },
+  },
+];
+
+describe('잠금 1 — 수치 파싱 경로 일관성', () => {
+  // 각 표기를 모든 경로에 넣어 **같은 값**이 나와야 한다
+  const CASES: Array<[string, number]> = [
+    ['1억', 1e8],
+    ['100억', 1e10],
+    ['1.5억', 1.5e8],   // ← 4개 경로에 복제됐던 결손
+    ['2.5억', 2.5e8],
+    ['5,000억', 5e11],
+    ['30억', 3e9],
+  ];
+
+  for (const [text, expected] of CASES) {
+    it(`"${text}" → ${expected.toExponential()} · 모든 경로 동일`, () => {
+      for (const p of PATHS) {
+        expect({ path: p.name, value: p.read(text) }).toEqual({ path: p.name, value: expected });
+      }
+    });
+  }
+
+  it('규칙 상수가 소수점·천단위 콤마를 모두 허용한다', () => {
+    const re = new RegExp(`^${NUM_TOKEN}$`);
+    for (const s of ['1', '100', '1.5', '2.5', '5,000', '10,000']) expect(re.test(s)).toBe(true);
+    expect(new RegExp(`^${KO_SCALE_TOKEN}$`).test('억')).toBe(true);
+  });
+
+  /**
+   * 회귀 방지: 소스에 숫자 패턴을 **직접** 박은 경로가 생기면 실패시킨다.
+   * `[0-9][0-9,]*` 뒤에 소수점 허용이 없는 형태가 결손의 정확한 형상이었다.
+   */
+  it('억 스케일을 읽는 정규식이 공유 상수를 우회하지 않는다', () => {
+    // jest 는 CJS 로 실행되므로 import.meta 대신 cwd(apps/api-server) 기준 경로
+    const srcDir = path.resolve(process.cwd(), 'src/modules/content-guard');
+    const offenders: string[] = [];
+    for (const f of fs.readdirSync(srcDir).filter((x) => x.endsWith('.ts'))) {
+      const body = fs.readFileSync(path.join(srcDir, f), 'utf8');
+      for (const line of body.split('\n')) {
+        if (line.trim().startsWith('*') || line.trim().startsWith('//')) continue; // 주석 제외
+        // 한국어 스케일을 읽으면서 소수점을 허용하지 않는 숫자 패턴
+        if (/\(조\|억\|만\|천\)|조\|억\|만\|천/.test(line) && /\[0-9\]\[0-9,\]\*(?!\(\?:\\\.)/.test(line)) {
+          offenders.push(`${f}: ${line.trim().slice(0, 90)}`);
+        }
+      }
+    }
+    expect(offenders).toEqual([]);
+  });
+});
+
+describe('잠금 2 — 원문 근거가 있는데 막았던 사례의 원문 범위 고정', () => {
+  /**
+   * 규칙을 완화할 때는 **원문이 실제로 무엇을 진술했는지**를 테스트로 고정한다.
+   * 아래 3건은 30-A 에서 "원문에 있는데 가드가 막은" 실측이며,
+   * 완화 후에도 **근거가 없으면 여전히 막아야** 한다(쌍으로 고정).
+   */
+  const withSrc = (intake: string, ko: string) => ({
+    ...OK_VIVA_FULL_BASIS,
+    source: { ...OK_VIVA_FULL_BASIS.source, intake },
+    drafts: { ko: `<p>${ko}</p>`, en: '<p>x</p>' },
+  });
+
+  it('그대로: 원문에 있으면 허용 / 없으면 차단', () => {
+    // 실측 원문 — 리웰키드업
+    const allowed = runGuard(withSrc('1일 2회, 1회 1포를 물, 음료, 요구르트, 우유에 타거나 그대로 섭취하십시오.', '그대로 섭취할 수 있습니다.'), { phase: 'post' });
+    expect(allowed.findings.some((f) => f.ruleId === 'G-FORM-GENERALIZATION-001' && f.status === 'BLOCKED')).toBe(false);
+    // 실측 원문 — 안티비오 (직접섭취 근거 없음)
+    const blocked = runGuard(withSrc('성인 : 1일 3회, 1회 2포 (2그램), 소아 : 1일 2회, 1회 1포 (1그램)', '그대로 섭취할 수 있습니다.'), { phase: 'post' });
+    expect(blocked.findings.some((f) => f.ruleId === 'G-FORM-GENERALIZATION-001' && f.status === 'BLOCKED')).toBe(true);
+  });
+
+  it('물과 함께 씹어: 원문에 있으면 허용 / 원문이 물을 말하지 않으면 차단', () => {
+    // 실측 원문 — 청인 해우
+    const allowed = runGuard(withSrc('1일 3회, 1회 1포씩 식전 또는 식후에 물과 함께 씹어드십시오.', '물과 함께 씹어서 섭취합니다.'), { phase: 'post' });
+    expect(allowed.findings.some((f) => f.ruleId === 'G-CHEWABLE-002')).toBe(false);
+    const blocked = runGuard(withSrc('1일 2회, 1회 1정을 씹어서 섭취하십시오.', '물과 함께 삼키면 됩니다.'), { phase: 'post' });
+    expect(blocked.findings.some((f) => f.ruleId === 'G-CHEWABLE-002' && f.status === 'BLOCKED')).toBe(true);
+  });
+});

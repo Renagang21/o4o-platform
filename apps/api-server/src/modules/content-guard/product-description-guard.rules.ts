@@ -19,6 +19,8 @@ import {
   stripHtml,
   contextAround,
   toMg,
+  NUM_TOKEN,
+  KO_SCALE_TOKEN,
 } from './product-description-guard.units.js';
 
 const ok = (
@@ -113,9 +115,10 @@ function normalizeDeclared(value: number, unit: string): number | null {
 }
 
 /** per-unit / daily-total 수치를 주장하는 표현 (ko/en) */
-const PER_UNIT_KO = /(1|한)\s*(캡슐|캅셀|정|포|스틱)\s*(당|에)\s*[0-9][0-9,]*\s*(조|억|만|천)/g;
+// 공유 수치 규칙(NUM_TOKEN) 사용 — 소수점 억 오독 결손이 여기에도 복제돼 있었다(30-A 감사).
+const PER_UNIT_KO = new RegExp(String.raw`(?:1|한)\s*(?:캡슐|캅셀|정|포|스틱)\s*(?:당|에)\s*${NUM_TOKEN}\s*${KO_SCALE_TOKEN}`, 'g');
 const PER_UNIT_KO2 = /(1|한)\s*(캡슐|캅셀|정|포|스틱)\s*\([0-9][0-9,.]*\s*(mg|g)\)\s*당/g;
-const DAILY_KO = /1일\s*(섭취\s*)?(총\s*)?(프로바이오틱스\s*)?[0-9][0-9,]*\s*(조|억|만|천)/g;
+const DAILY_KO = new RegExp(String.raw`1일\s*(?:섭취\s*)?(?:총\s*)?(?:프로바이오틱스\s*)?${NUM_TOKEN}\s*${KO_SCALE_TOKEN}`, 'g');
 const PER_UNIT_EN = /\b[0-9][0-9,.]*\s*(trillion|billion|million)\s*CFU\s*per\s*(capsule|tablet|stick|sachet)\b/gi;
 const DAILY_EN = /\b[0-9][0-9,.]*\s*(trillion|billion|million)\s*CFU\s*(of\s+probiotics\s+)?per\s*day\b/gi;
 
