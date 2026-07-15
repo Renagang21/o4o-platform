@@ -22,7 +22,7 @@ import {
 // WO-O4O-KPA-TABLET-CONTENT-STANDARD-LIST-V1: library 목록을 O4O 표준 테이블로 정비(추출).
 import TabletContentLibraryList from './TabletContentLibraryList';
 // WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1: 제작 셸 미리보기 = kiosk-core 뷰어 재사용(sections 주입 + embedded).
-import { TabletKioskPage, type TabletKioskApi, type TabletScreenResponse } from '@o4o/tablet-kiosk-core';
+import { TabletKioskPage, detectIdleMediaType, type TabletKioskApi, type TabletScreenResponse } from '@o4o/tablet-kiosk-core';
 
 type Toast = { type: 'success' | 'error'; message: string };
 
@@ -157,12 +157,6 @@ const DISCARD_MSG = '저장되지 않은 변경이 있습니다.\n저장하지 �
 const normalizeBlocks = (bs: ScreenBlock[]) =>
   JSON.stringify(bs.map((b) => ({ t: b.blockType, e: b.isEnabled, c: b.config ?? {} })));
 
-const IDLE_SOURCES = [
-  { value: 'legacy_idle_playlist', label: '기존 대기 재생목록 사용' },
-  { value: 'operator_common', label: '운영자 공통 대기영상 사용' },
-  { value: 'custom_media', label: '직접 미디어 입력' },
-];
-
 function defaultConfig(type: ScreenBlockType): Record<string, unknown> {
   switch (type) {
     case 'idle_media': return { source: 'legacy_idle_playlist' };
@@ -175,6 +169,9 @@ function defaultConfig(type: ScreenBlockType): Record<string, unknown> {
     default: return {};
   }
 }
+
+// WO-O4O-KPA-TABLET-IDLE-VIDEO-URL-ONLY-V1: 대기 화면 소스 선택 UI 제거 → IDLE_SOURCES 불필요.
+//   (콘텐츠마다 YouTube/Vimeo URL 1개만 사용. 저장은 custom_media.items[] 계약 그대로.)
 
 export default function TabletScreenSetManager({ onToast, tablets, previewApi, storeSlug }: Props) {
   const [sets, setSets] = useState<ScreenSet[]>([]);
@@ -621,25 +618,7 @@ function ContentPickerModal({ existingKeys, onClose, onAdd, baseSort }: {
   );
 }
 
-function CustomMediaItems({ items, onChange }: { items: any[]; onChange: (items: any[]) => void }) {
-  const MEDIA = ['image', 'video', 'youtube', 'vimeo'];
-  const upd = (i: number, patch: any) => onChange(items.map((it, idx) => (idx === i ? { ...it, ...patch } : it)));
-  return (
-    <div className="space-y-1.5">
-      {items.map((it, i) => (
-        <div key={i} className="flex gap-1.5 items-center">
-          <select value={it.mediaType ?? 'image'} onChange={(e) => upd(i, { mediaType: e.target.value })} className="px-1.5 py-1 rounded border border-slate-200 text-[11px]">
-            {MEDIA.map((m) => <option key={m} value={m}>{m}</option>)}
-          </select>
-          <input value={it.url ?? ''} onChange={(e) => upd(i, { url: e.target.value })} placeholder="url" className="flex-1 px-2 py-1 rounded border border-slate-200 text-[11px]" />
-          <button onClick={() => onChange(items.filter((_, idx) => idx !== i))} className="text-slate-400 hover:text-red-600"><X className="w-3.5 h-3.5" /></button>
-        </div>
-      ))}
-      <button onClick={() => onChange([...items, { mediaType: 'image', url: '' }])} className="text-[11px] text-indigo-600 hover:underline">+ 미디어 추가</button>
-    </div>
-  );
-}
-
+// WO-...-IDLE-VIDEO-URL-ONLY-V1: 다중 미디어 입력(CustomMediaItems) 제거 — URL 1개 입력으로 대체.
 
 // ── 단계형 제작 셸 (WO-O4O-KPA-TABLET-CONTENT-STEP-BUILDER-SHELL-V1) ──
 //   신규/수정 공통. 인라인 폼/패널을 단계 화면으로 분리. 기존 하위 편집기·저장 API·dirty guard 재사용.
@@ -665,6 +644,7 @@ const ensureAutoBlocks = (blocks: ScreenBlock[]): ScreenBlock[] => {
   }));
   return [...blocks, ...added];
 };
+
 
 function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, previewApi, storeSlug }: {
   initialDetail: ScreenSetDetail | null;
@@ -778,9 +758,8 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
 
   // 저장 단계 요약 — 업무 항목 기준(블록 수 미노출).
   const idleCfg = configOf('idle_media');
-  const idleSummary = idleCfg.source === 'custom_media'
-    ? `직접 넣은 영상·이미지 ${(Array.isArray(idleCfg.items) ? idleCfg.items : []).length}개`
-    : (IDLE_SOURCES.find((s) => s.value === (idleCfg.source ?? 'legacy_idle_playlist'))?.label ?? '기본');
+  const idleUrl: string = idleCfg.source === 'custom_media' && Array.isArray(idleCfg.items) ? (idleCfg.items[0]?.url ?? '') : '';
+  const idleSummary = idleUrl ? `동영상 1개 (${detectIdleMediaType(idleUrl) === 'vimeo' ? 'Vimeo' : 'YouTube'})` : '지정 안 함 (기본 화면)';
   const cornerDescCfg = configOf('corner_description');
   const cornerSummary = (cornerDescCfg.title || cornerDescCfg.body) ? (cornerDescCfg.title || '(제목 없음)') : '작성 안 함';
   const extraCount = (Array.isArray(configOf('content_list').items) ? configOf('content_list').items : []).length;
@@ -814,32 +793,47 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
   // ── 업무 단계 렌더러 (WO-O4O-KPA-TABLET-BUILDER-BUSINESS-FIELDS-V1) ──
   //   블록 유형 선택/블록 추가/블록 행(순서·표시·삭제) UI 없음. 각 단계는 자기 업무 필드만 다룬다.
 
-  // 1) 대기 화면 — idle_media 용어 미노출. 기존 미디어 선택 기능(소스/직접 입력) 재사용.
+  // 1) 대기 화면 — WO-O4O-KPA-TABLET-IDLE-VIDEO-URL-ONLY-V1:
+  //    콘텐츠마다 YouTube/Vimeo URL **하나만** 받는다. 소스 선택·미디어 유형 선택·다중 항목 UI 없음.
+  //    저장은 기존 계약 그대로: { source:'custom_media', items:[{ mediaType, url }] }.
+  //    URL 을 비우면 custom_media 는 items ≥ 1 을 요구해 저장이 400 → 유효한 'legacy_idle_playlist'
+  //    (= 영상 지정 없음)으로 되돌린다. 이때 대기 화면은 기본 대체 화면이 된다.
   const renderIdleStep = () => {
     const c = configOf('idle_media');
-    const source = c.source ?? 'legacy_idle_playlist';
+    const url: string = c.source === 'custom_media' && Array.isArray(c.items) ? (c.items[0]?.url ?? '') : '';
+    const trimmed = url.trim();
+    const detected = trimmed ? detectIdleMediaType(trimmed) : null;
+    const invalid = !!trimmed && detected !== 'youtube' && detected !== 'vimeo';
+    const setUrl = (next: string) => {
+      const v = next.trim();
+      if (!v) { replaceConfigOf('idle_media', { source: 'legacy_idle_playlist' }); return; }
+      const t = detectIdleMediaType(v);
+      // 판별 실패(youtube/vimeo 아님)여도 입력값은 유지 — 저장 전 안내로 교정하게 한다.
+      replaceConfigOf('idle_media', { source: 'custom_media', items: [{ mediaType: t, url: v }] });
+    };
     return (
       <div className="space-y-3">
         <div>
-          <label className="text-xs font-semibold text-slate-600">무엇을 보여줄까요?</label>
-          <select
-            value={source}
-            onChange={(e) => replaceConfigOf('idle_media', e.target.value === 'custom_media'
-              ? { source: 'custom_media', items: Array.isArray(c.items) ? c.items : [] }
-              : { source: e.target.value })}
-            className="w-full mt-1 px-3 py-2 rounded-lg border border-slate-200 text-sm bg-white"
-          >
-            {IDLE_SOURCES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
-          </select>
+          <label className="text-xs font-semibold text-slate-600">대기 동영상 URL</label>
+          <input
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            placeholder="YouTube 또는 Vimeo 주소를 붙여 넣으세요"
+            className={`w-full mt-1 px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 ${
+              invalid ? 'border-amber-400 focus:ring-amber-400' : 'border-slate-200 focus:ring-indigo-400'
+            }`}
+          />
+          {invalid ? (
+            <p className="text-[11px] text-amber-600 mt-1">
+              YouTube 또는 Vimeo 주소만 사용할 수 있습니다. 주소를 다시 확인해 주세요.
+            </p>
+          ) : (
+            <p className="text-[11px] text-slate-400 mt-1">
+              소리 없이 자동 재생되고, 끝나면 다시 처음부터 반복됩니다. 손님이 화면을 터치하면 안내 화면으로 넘어갑니다.
+              비워 두면 대기 화면에 기본 안내가 표시됩니다.
+            </p>
+          )}
         </div>
-        {source === 'custom_media' ? (
-          <div className="rounded-lg border border-slate-200 bg-white p-3 space-y-2">
-            <p className="text-[11px] text-slate-500">이 화면에서 직접 재생할 영상·이미지를 넣습니다.</p>
-            <CustomMediaItems items={Array.isArray(c.items) ? c.items : []} onChange={(items) => patchConfigOf('idle_media', { items })} />
-          </div>
-        ) : (
-          <p className="text-[11px] text-slate-500">선택한 곳에 등록된 대기 영상·이미지를 그대로 사용합니다.</p>
-        )}
       </div>
     );
   };

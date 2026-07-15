@@ -1121,8 +1121,13 @@ function IdleOverlay({ items, onUserInteraction, defaultDurationMs }: IdleOverla
           autoPlay
           muted
           playsInline
+          /* WO-O4O-KPA-TABLET-IDLE-VIDEO-URL-ONLY-V1:
+             단일 항목이면 onEnded 의 (0+1)%1=0 → setIndex(0) 이 같은 값이라 리렌더가 없어
+             영상이 끝난 뒤 멈춰 있었다. 항목이 1개일 때는 loop 로 계속 재생한다.
+             (2개 이상이면 loop 시 onEnded 가 안 와 순환이 멈추므로 기존 onEnded 유지) */
+          loop={items.length <= 1}
           onEnded={() => {
-            if (items.length > 0) setIndex((i) => (i + 1) % items.length);
+            if (items.length > 1) setIndex((i) => (i + 1) % items.length);
           }}
           style={styles.idleMedia}
         />
@@ -1150,6 +1155,16 @@ function IdleOverlay({ items, onUserInteraction, defaultDurationMs }: IdleOverla
             </span>
           </div>
         )
+      )}
+      {/* WO-O4O-KPA-TABLET-IDLE-VIDEO-URL-ONLY-V1: 영상이 재생될 때만 하단의 작은 터치 안내.
+          중앙 대형 문구는 쓰지 않는다(광고·홍보 영상을 가림). pointerEvents:none 이라
+          화면 전체가 그대로 터치 영역(iframe 은 idleTapCatcher 가 처리). */}
+      {current && (
+        <div style={styles.heroHintBar}>
+          <TouchHintIcon />
+          <span style={styles.heroHintKo}>화면을 터치하여 자세히 보세요</span>
+          <span style={styles.heroHintEn}>Touch to explore</span>
+        </div>
       )}
     </div>
   );
