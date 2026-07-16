@@ -274,10 +274,7 @@ export function crossCheckNumber(
       ? { ok: true, status: 'MATCH', message: `${label}: 원문에 없음 — 입력도 비어 있음(정합)` }
       : { ok: false, status: 'MISMATCH', message: `${label}: 원문에 없는데 입력 ${declared} 가 있습니다(근거 없는 값).` };
   }
-  // PARSE_FAILED / ABNORMAL — **값 없음으로 단정하지 않는다**
-  return {
-    ok: false,
-    status: 'UNVERIFIABLE',
-    message: `${label}: ${parsed.reason} → 원문 수동 확인 필요(값 없음으로 단정 금지).`,
-  };
+  // ABNORMAL / PARSE_FAILED 는 **함수 진입부에서 이미 처리**했다(원문 문제 최우선).
+  // 여기 도달하면 타입상 남는 분기가 없다 — 컴파일러가 never 로 좁힌다.
+  throw new Error(`crossCheckNumber: 처리되지 않은 파싱 결과 (${label})`);
 }

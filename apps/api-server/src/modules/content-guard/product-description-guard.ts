@@ -24,7 +24,7 @@ import type {
   GuardStatus,
 } from './product-description-guard.types.js';
 import { GUARD_VERSION } from './product-description-guard.types.js';
-import { computeBasis, ruleA, ruleB, ruleC, ruleD, ruleE, ruleF, ruleG, ruleH } from './product-description-guard.rules.js';
+import { computeBasis, ruleA, ruleB, ruleC, ruleD, ruleE, ruleF, ruleG, ruleH, ruleQ } from './product-description-guard.rules.js';
 import { crossCheckNumber, isBulkMaterial, parseBasis, parseCfu } from './source-grounding-parser.js';
 import type { ParseOutcome } from './source-grounding-parser.js';
 
@@ -173,6 +173,7 @@ export function runPostGuard(input: GuardProductInput): GuardFinding[] {
     ...ruleE(input),
     ...ruleF(input),
     ...ruleG(input),
+    ...ruleQ(input), // 콘텐츠 품질(CP3) — 문장 파손·중복·잔여 구두점
   ];
 }
 

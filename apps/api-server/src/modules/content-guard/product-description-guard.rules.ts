@@ -21,6 +21,8 @@ import {
   toMg,
   NUM_TOKEN,
   KO_SCALE_TOKEN,
+  MID_DOT_CLASS,
+  TRAILING_JUNK,
 } from './product-description-guard.units.js';
 
 const ok = (
@@ -744,6 +746,122 @@ export function ruleG(input: GuardProductInput): GuardFinding[] {
   }
   void CHEW_KO;
   if (out.length === 0) out.push(ok('G-FORM-GENERALIZATION-001', 'drafts', '제형 기반 추정 검출 없음'));
+  return out;
+}
+
+// ═══ Q. 콘텐츠 품질 (CP3) — 사실은 맞으나 매장에서 읽히는 품질 결함 ══════════
+//
+// CP2 실화면 검수에서 **자동 overflow 검사로는 안 잡히는 층**이 드러났다.
+// 레이아웃도 정상이고 허위 사실도 없지만, 문장이 깨져 읽히지 않는다.
+// 판정: 읽기를 방해하는 파손(조사 결합·절단)은 BLOCKED, 중복·잔여 구두점은 REVIEW.
+
+/** 원문 문장을 통째로 인용하고 조사를 붙인 흔적. 실측: "…섭취하십시오이며" */
+const JOSA_CONCAT = /(하십시오|하세요|합니다|드십시오|하시기\s*바랍니다|섭취한다|사용한다)(이며|이고|이지만|입니다만|であ)/g;
+/**
+ * 원문 절단 탐지 — **원문을 근거로** 판정한다.
+ *
+ * ⚠️ "관형어 + 단일음절" 휴리스틱은 쓰지 않는다. 한국어에는 `하는 분`, `있는 것`, `먹을 수`
+ *    처럼 정상 표현이 많아 93건 전부를 오탐했다(실측). 문법 추측이 아니라 **증거**로 판정한다.
+ *
+ * 진짜 절단의 신호: 초안 셀이 **원문의 접두사인데 단어 중간에서 끊겼다**.
+ *   원문 "…내용물을 함유한 투명한 경질캡슐" / 셀 "…함유한 투"
+ *   → 셀이 원문의 접두사이고, 원문의 다음 글자가 공백·구두점이 아니다(= 단어 중간).
+ */
+function findTruncation(cell: string, sources: string[]): { evidence: string; fragment: boolean } | null {
+  const c = cell.replace(TRAILING_JUNK, '').trim();
+  if (c.length < 8) return null; // 너무 짧으면 판정하지 않는다
+  for (const raw of sources) {
+    const src = (raw ?? '').replace(/\s+/g, ' ').trim();
+    if (!src) continue;
+    const i = src.indexOf(c);
+    if (i < 0) continue;
+    const next = src[i + c.length];
+    if (next === undefined) return null;           // 원문 끝까지 = 완전 인용
+    if (/[\s.,)\]}·ㆍ]/.test(next)) return null;  // 어절 경계에서 끝남 = 정상
+    // 단어 중간에서 끊겼다. 다만 **결과가 읽히는지**는 마지막 어절 길이로 갈린다:
+    //   "…함유한 투"   → 마지막 어절 1음절 = 파편 → 확실한 파손
+    //   "…곳에 보관"   → 원문은 "보관하십시오" 지만 "보관" 자체가 단어 → 읽힌다(요약형)
+    const lastToken = c.split(/\s+/).pop() ?? '';
+    return { evidence: src.slice(i, i + c.length + 6), fragment: lastToken.length <= 1 };
+  }
+  return null;
+}
+
+export function ruleQ(input: GuardProductInput): GuardFinding[] {
+  const out: GuardFinding[] = [];
+  const ko = stripHtml(input.drafts.ko);
+
+  // Q-1 원문 인용 뒤 조사 결합
+  for (const m of matchAll(JOSA_CONCAT, ko)) {
+    out.push({
+      ruleId: 'Q-JOSA-CONCAT-001', severity: 'ERROR', status: 'BLOCKED', language: 'ko',
+      field: 'koDraft', matchedText: m.text, sourceEvidence: null,
+      message: `원문 문장을 통째로 인용하고 조사를 붙였습니다("${m.text}") — 문장이 성립하지 않습니다.`,
+      suggestedAction: '인용은 용법 수치 부분만 하고, 원문 전체는 "섭취방법(공식 표기 그대로)" 에 두십시오.',
+    });
+  }
+
+  // Q-2 원문 절단 — 초안 셀이 원문의 접두사인데 단어 중간에서 끊긴 경우
+  {
+    const sources = [input.source.dosageForm, input.source.baseStandard, input.source.intake, input.source.storage ?? '', input.source.caution];
+    for (const raw of input.drafts.ko.matchAll(/<li[^>]*>([\s\S]*?)<\/li>|<div class="sd-item"[^>]*>([\s\S]*?)<\/div>/g)) {
+      const cell = stripHtml(raw[1] ?? raw[2] ?? '');
+      if (!cell) continue;
+      const cut = findTruncation(cell, sources);
+      if (cut) {
+        out.push({
+          ruleId: cut.fragment ? 'Q-TRUNCATED-002' : 'Q-TRUNCATED-PARTIAL-005',
+          severity: cut.fragment ? 'ERROR' : 'WARNING',
+          status: cut.fragment ? 'BLOCKED' : 'REVIEW_REQUIRED',
+          language: 'ko', field: 'koDraft', matchedText: truncate(cell, 50),
+          sourceEvidence: `원문은 이어집니다: "…${truncate(cut.evidence, 44)}…"`,
+          message: cut.fragment
+            ? `원문 인용이 **단어 중간에서 잘려 파편이 남았습니다**: "${truncate(cell, 40)}"`
+            : `원문 인용이 단어 중간에서 끝납니다(읽히기는 함): "${truncate(cell, 40)}" — 요약형이면 그대로 두어도 됩니다.`,
+          suggestedAction: cut.fragment
+            ? '원문을 자르지 말고 필요한 절 전체를 인용하십시오.'
+            : '의도한 요약인지 사람이 확인하십시오.',
+        });
+      }
+    }
+  }
+
+  // Q-3 표시 기준 행에 비핵심 시험항목이 끌려와 중복
+  {
+    const items = [...input.drafts.ko.matchAll(/<div class="sd-item"[^>]*>([\s\S]*?)<\/div>/g)].map((m) => stripHtml(m[1]));
+    const probioRow = items.find((t) => /프로바이오틱스\s*수/.test(t)) ?? '';
+    for (const key of ['대장균군', '붕해']) {
+      const inProbioRow = new RegExp(key).test(probioRow);
+      const hasOwnRow = items.some((t) => !/프로바이오틱스\s*수/.test(t) && new RegExp(key).test(t));
+      if (inProbioRow && hasOwnRow) {
+        out.push({
+          ruleId: 'Q-SPEC-DUP-003', severity: 'WARNING', status: 'REVIEW_REQUIRED', language: 'ko',
+          field: 'koDraft', matchedText: key, sourceEvidence: null,
+          message: `"${key}" 이 프로바이오틱스 수 행과 별도 행에 **중복** 노출됩니다(원문 절단 시 끌려온 것).`,
+          suggestedAction: '프로바이오틱스 수 행은 해당 절만 인용하십시오.',
+        });
+      }
+    }
+  }
+
+  // Q-4 유사 구두점 잔존 (SSOT: MID_DOT_CLASS)
+  {
+    const cells = [...input.drafts.ko.matchAll(/<div class="sd-item"[^>]*>([\s\S]*?)<\/div>|<li[^>]*>([\s\S]*?)<\/li>/g)]
+      .map((m) => stripHtml(m[1] ?? m[2] ?? ''));
+    const dangling = new RegExp(`${MID_DOT_CLASS}\s*$`);
+    for (const c of cells) {
+      if (dangling.test(c)) {
+        out.push({
+          ruleId: 'Q-PUNCT-DANGLING-004', severity: 'WARNING', status: 'REVIEW_REQUIRED', language: 'ko',
+          field: 'koDraft', matchedText: truncate(c, 40), sourceEvidence: null,
+          message: `행이 가운뎃점으로 끝납니다 — 원문 절단의 흔적입니다: "${truncate(c, 36)}"`,
+          suggestedAction: '후행 구두점을 제거하십시오(유사 가운뎃점 SSOT: MID_DOT_CLASS).',
+        });
+      }
+    }
+  }
+
+  if (out.length === 0) out.push(ok('Q-JOSA-CONCAT-001', 'drafts', '콘텐츠 품질 결함 검출 없음'));
   return out;
 }
 

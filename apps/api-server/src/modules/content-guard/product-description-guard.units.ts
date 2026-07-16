@@ -26,6 +26,25 @@ export const NUM_TOKEN = String.raw`[0-9][0-9,]*(?:\.[0-9]+)?`;
 /** 한국어 수사 스케일 토큰 */
 export const KO_SCALE_TOKEN = String.raw`(?:조|억|만|천)`;
 
+/**
+ * **구두점·문자 정규화 SSOT** (CP3)
+ *
+ * 유사 가운뎃점은 코드포인트가 여럿이고 열거하면 끝이 없다. 실측:
+ *   `·` U+00B7 · `ㆍ` U+318D(한글 아래아) · `･` U+FF65 · `⋅` U+22C5 · `‧` U+2027 · `∙` U+2219
+ * CP2 에서 U+318D 를 놓쳐 표시 기준 행 끝에 `ㆍ` 가 남았다(문자 열거 방식의 실패).
+ *
+ * ⚠️ 작성 템플릿·검사 도구가 각자 정규화를 복사하면 또 어긋난다.
+ *    **가드가 판정 주체**이며 이 상수가 유일한 기준이다.
+ */
+export const MID_DOT_CLASS = String.raw`[·ㆍ･⋅‧∙・]`;
+/** 후행 비문자(구두점·공백)를 제거해야 하는지 판정 — 한글/영숫자/닫는괄호/%로 끝나야 정상 */
+export const TRAILING_JUNK = /[^가-힣A-Za-z0-9)\]}%℃]+$/u;
+
+/** 유사 가운뎃점을 표준 `·` 로 통일 */
+export function normalizeMidDot(s: string): string {
+  return (s ?? '').replace(new RegExp(MID_DOT_CLASS, 'g'), '·');
+}
+
 const KO_SCALE: Record<string, number> = {
   '조': 1e12,
   '억': 1e8,

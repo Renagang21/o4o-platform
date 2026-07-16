@@ -16,7 +16,7 @@
       "overallStatus": "PASS",
       "blockedCount": 0,
       "reviewCount": 0,
-      "passCount": 12,
+      "passCount": 13,
       "precheckInfoCount": 2,
       "findings": [
         {
@@ -163,6 +163,17 @@
           "suggestedAction": "조치 불요"
         },
         {
+          "ruleId": "Q-JOSA-CONCAT-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "콘텐츠 품질 결함 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
           "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
           "severity": "INFO",
           "status": "INFO",
@@ -185,7 +196,7 @@
       "overallStatus": "PASS",
       "blockedCount": 0,
       "reviewCount": 0,
-      "passCount": 12,
+      "passCount": 13,
       "precheckInfoCount": 2,
       "findings": [
         {
@@ -332,6 +343,17 @@
           "suggestedAction": "조치 불요"
         },
         {
+          "ruleId": "Q-JOSA-CONCAT-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "콘텐츠 품질 결함 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
           "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
           "severity": "INFO",
           "status": "INFO",
@@ -354,7 +376,7 @@
       "overallStatus": "PASS",
       "blockedCount": 0,
       "reviewCount": 0,
-      "passCount": 13,
+      "passCount": 14,
       "precheckInfoCount": 2,
       "findings": [
         {
@@ -512,6 +534,17 @@
           "suggestedAction": "조치 불요"
         },
         {
+          "ruleId": "Q-JOSA-CONCAT-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "콘텐츠 품질 결함 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
           "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
           "severity": "INFO",
           "status": "INFO",
@@ -534,7 +567,7 @@
       "overallStatus": "PASS",
       "blockedCount": 0,
       "reviewCount": 0,
-      "passCount": 13,
+      "passCount": 14,
       "precheckInfoCount": 2,
       "findings": [
         {
@@ -692,6 +725,17 @@
           "suggestedAction": "조치 불요"
         },
         {
+          "ruleId": "Q-JOSA-CONCAT-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "콘텐츠 품질 결함 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
           "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
           "severity": "INFO",
           "status": "INFO",
@@ -714,7 +758,7 @@
       "overallStatus": "PASS",
       "blockedCount": 0,
       "reviewCount": 0,
-      "passCount": 10,
+      "passCount": 11,
       "precheckInfoCount": 2,
       "findings": [
         {
@@ -839,6 +883,17 @@
           "suggestedAction": "조치 불요"
         },
         {
+          "ruleId": "Q-JOSA-CONCAT-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "콘텐츠 품질 결함 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
           "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
           "severity": "INFO",
           "status": "INFO",
@@ -861,7 +916,7 @@
       "overallStatus": "PASS",
       "blockedCount": 0,
       "reviewCount": 0,
-      "passCount": 10,
+      "passCount": 11,
       "precheckInfoCount": 2,
       "findings": [
         {
@@ -986,6 +1041,17 @@
           "suggestedAction": "조치 불요"
         },
         {
+          "ruleId": "Q-JOSA-CONCAT-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "콘텐츠 품질 결함 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
           "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
           "severity": "INFO",
           "status": "INFO",
@@ -1008,7 +1074,7 @@
       "overallStatus": "PASS",
       "blockedCount": 0,
       "reviewCount": 0,
-      "passCount": 10,
+      "passCount": 11,
       "precheckInfoCount": 2,
       "findings": [
         {
@@ -1133,6 +1199,17 @@
           "suggestedAction": "조치 불요"
         },
         {
+          "ruleId": "Q-JOSA-CONCAT-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "콘텐츠 품질 결함 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
           "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
           "severity": "INFO",
           "status": "INFO",
@@ -1155,7 +1232,7 @@
       "overallStatus": "PASS",
       "blockedCount": 0,
       "reviewCount": 0,
-      "passCount": 13,
+      "passCount": 14,
       "precheckInfoCount": 2,
       "findings": [
         {
@@ -1313,6 +1390,17 @@
           "suggestedAction": "조치 불요"
         },
         {
+          "ruleId": "Q-JOSA-CONCAT-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "콘텐츠 품질 결함 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
           "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
           "severity": "INFO",
           "status": "INFO",
@@ -1335,7 +1423,7 @@
       "overallStatus": "PASS",
       "blockedCount": 0,
       "reviewCount": 0,
-      "passCount": 13,
+      "passCount": 14,
       "precheckInfoCount": 2,
       "findings": [
         {
@@ -1493,6 +1581,17 @@
           "suggestedAction": "조치 불요"
         },
         {
+          "ruleId": "Q-JOSA-CONCAT-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "콘텐츠 품질 결함 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
           "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
           "severity": "INFO",
           "status": "INFO",
@@ -1515,7 +1614,7 @@
       "overallStatus": "PASS",
       "blockedCount": 0,
       "reviewCount": 0,
-      "passCount": 13,
+      "passCount": 14,
       "precheckInfoCount": 2,
       "findings": [
         {
@@ -1670,6 +1769,17 @@
           "matchedText": null,
           "sourceEvidence": null,
           "message": "제형 기반 추정 검출 없음",
+          "suggestedAction": "조치 불요"
+        },
+        {
+          "ruleId": "Q-JOSA-CONCAT-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "drafts",
+          "matchedText": null,
+          "sourceEvidence": null,
+          "message": "콘텐츠 품질 결함 검출 없음",
           "suggestedAction": "조치 불요"
         },
         {
