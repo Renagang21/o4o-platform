@@ -1,6 +1,6 @@
 # OTC-DESCRIPTION-DESIGN-GUIDE — 일반의약품 설명서 화면 디자인 지침
 
-상태: **Draft V0.8** (2026-07-16) · 대상: **일반의약품(OTC) 전용** · 진입: [DOCUMENT-INDEX](common/DOCUMENT-INDEX.md)
+상태: **Draft V0.9** (2026-07-16) · 대상: **일반의약품(OTC) 전용** · 진입: [DOCUMENT-INDEX](common/DOCUMENT-INDEX.md)
 번역 기준: [OTC-EN-TRANSLATION-GUIDE](OTC-EN-TRANSLATION-GUIDE.md) · 테스트 기록: [OTC-DESCRIPTION-DESIGN-TEST-LOG](OTC-DESCRIPTION-DESIGN-TEST-LOG.md)
 
 > 이 문서는 **새 디자인 시스템을 만들지 않는다.** 이미 구현된 공용 렌더러를 그대로 쓴다.
@@ -153,21 +153,41 @@ OTC 에서 유의할 점만:
 
 ## 5. 언어 전환 UI
 
-> ⚠️ **현재 표준이 없다.** 4개 화면이 **각자 구현**했고 `LOCALE_LABELS` 가 4곳에 중복돼 있다.
+> ⚠️ **현재 표준이 없다.** 화면마다 **각자 구현**했고, 라벨 정의는 **9곳에 중복**돼 있다(전수 실측 2026-07-16 — "4곳"은 과소 집계였다). **그중 2곳은 값까지 다르다** (아래 §5-1).
 
-| 화면 | 형태 | 위치 |
-|---|---|---|
-| A | `[🇰🇷 한국어][🌐 Other Languages]` → 모바일 바텀시트 | 본문 상단 |
-| B | 작은 알약 탭 | 모달 헤더 |
-| C | `[기본]` + 로케일 버튼 (터치 44px) | 상단 |
-| D | 알약(모바일) / `min-h-44px` 큰 탭(태블릿) | 상단 |
+| 화면 | 형태 | 위치 | 터치 |
+|---|---|---|---|
+| A | `[🇰🇷 한국어][🌐 Other Languages]` → 모바일 바텀시트 | 본문 상단 | 44px |
+| B | 작은 알약 탭 | 모달 헤더 | — |
+| C | `[기본]` + 로케일 버튼 | 상단 | 44px |
+| D | 알약(모바일) / 큰 탭(태블릿) | 상단 | **44px (2026-07-16 보완 — 이전 모바일 ~30px)** |
 
 **OTC 기준 (잠정)**:
 
 - 위치는 **본문 위**, 콘텐츠 카드 **바깥**. 카드 안에 넣지 않는다(인쇄·QR 캡처 시 섞임).
 - 언어가 1개뿐이면 **표시하지 않는다** (A·D 기존 동작).
-- 터치 대상 **최소 44×44px** — C·D 가 이미 이 값을 쓴다. 이것을 기준으로 삼는다.
-- 공통 컴포넌트 추출은 **이 문서 범위 밖** — 4중 중복이라 별도 WO 필요 (§8-C).
+- 터치 대상 **최소 44×44px** — A·C·D 가 이 값을 쓴다. 이것을 기준으로 삼는다.
+- **선택 상태를 색상에만 의존하지 않는다** — §6 "의미 전달을 색에만 의존하지 않는다"의 적용이다(신설 규칙 아님). D 는 명도차(**명도비 17.85:1** — 색맹도 구분 가능) + **굵기** + `aria-pressed`(스크린리더) 3중으로 만족한다.
+- 공통 컴포넌트 추출은 **이 문서 범위 밖** — 별도 WO 필요 (§8-C).
+
+### 5-1. 라벨 정의 9곳 — 값 불일치 2곳 (실측 2026-07-16)
+
+| 파일 | 상수 | `th` | `id` |
+|---|---|---|---|
+| **`api/multilingualProductContentStore.ts:31`** | **`STORE_MLC_LOCALE_LABELS`** (매장 축 SSOT) | `ภาษาไทย` | `Bahasa` |
+| `api/operatorMultilingualContent.ts:28` | `OPERATOR_MLC_LOCALE_LABELS` (운영자 축 — 타입이 다름) | `ภาษาไทย` | `Bahasa` |
+| `pages/public/MultilingualProductPublicLandingPage.tsx` | ~~로컬~~ → **SSOT 사용 (2026-07-16)** | — | — |
+| `components/MultilingualContentBadge.tsx:17` | `LOCALE_LABELS` | `ภาษาไทย` | `Bahasa` |
+| **`components/store/StoreAssetSelectorModal.tsx:110`** | `MLC_LOCALE_LABELS` | **`ไทย`** ❌ | **`Indonesia`** ❌ |
+| `pages/pharmacy/HubMultilingualContentLibraryPage.tsx:33` | `LOCALE_LABELS` | `ภาษาไทย` | `Bahasa` |
+| `pages/pharmacy/StoreMultilingualContentsMyPage.tsx:25` | `LOCALE_LABELS` | `ภาษาไทย` | `Bahasa` |
+| `pages/pharmacy/StoreDescriptionViewModal.tsx:31` | `LANG_LABELS` | `ภาษาไทย` | `Bahasa` |
+| **`web-neture/pages/ProductLandingPage.tsx:55`** | `LOCALE_LABELS` | `ภาษาไทย` | **`Bahasa Indonesia`** ❌ |
+| `packages/tablet-kiosk-core/TabletKioskPage.tsx:76` | `LOCALE_LABELS` | `ภาษาไทย` | `Bahasa` |
+| `api-server/services/qr-print.service.ts:329` | `QR_LANG_LABEL` (백엔드) | `ภาษาไทย` | `Bahasa` |
+
+> **같은 언어가 화면마다 다르게 불린다** — 태국어 `ภาษาไทย`/`ไทย`, 인도네시아어 `Bahasa`/`Bahasa Indonesia`/`Indonesia`.
+> 통합은 **4서비스 + 백엔드에 걸친 Shared Module 변경**이라 별도 WO 필요 (§8-C). 이번 WO 는 "라벨 문구 변경 금지" 범위라 **정정하지 않고 기록만** 했다.
 
 ---
 
@@ -213,7 +233,7 @@ OTC 에서 유의할 점만:
 |---|---|---|
 | ~~**A**~~ | ~~주의사항·금기 전용 class 부재~~ | ✅ **완전 해결 (2026-07-16)** — 계약·코드(`sd-warn` 신설 + 렌더러/빌더, `WO-O4O-SD-WARNING-CLASS-CONTRACT-AND-BUILDER-V1`) **+ 공개 중인 1,372건(ko 686 + en 686) 소급 적용**(`sd-who` 잔여 0, 클래스 외 콘텐츠 변경 0, `WO-O4O-OTC-SD-WARN-BACKFILL-1372-V1`) |
 | ~~**B**~~ | ~~C 키오스크 variant 미지정 / D 렌더러 미사용~~ | ✅ **해결 (2026-07-16)** — **C**: 태블릿 설명서 슬롯 2곳(상품 상세 `description` · content_list 카드 상세)에 variant 적용 + 인라인 15px 제거. 섞이는 슬롯이라 `hasStoreDescriptionMarkup` 로 설명서일 때만 적용 → e약은요 회귀 0 (48측정 PASS). **D**: **오분류였음** — SPD 를 읽지 않는 별개 파이프라인이라 대상에서 제외(§3). 조사 = `WO-O4O-OTC-DESIGN-8B-RENDER-PATH-AUDIT-V1` / 수정 = `WO-O4O-TABLET-CONTENT-RENDERER-VARIANT-FIX-V1` |
-| **C** | **언어 전환 UI 4중 중복** | 화면마다 조작이 다름 (§5) |
+| **C** | **언어 전환 UI 중복** — **부분 해소 (2026-07-16)** | ✅ **D 랜딩**: 로컬 라벨 제거 → `STORE_MLC_LOCALE_LABELS` SSOT 사용 · 모바일 터치 **~30px → 44px** · 선택 상태 색 의존 해소(`aria-pressed` + 굵기). `WO-O4O-MULTILINGUAL-LANGUAGE-UI-CONSOLIDATION-V1`<br>⚠️ **남음**: 라벨 정의가 여전히 **8곳** 분산이고 **2곳은 값 불일치**(§5-1). 4서비스+백엔드 Shared Module 변경이라 별도 WO. 공통 컴포넌트 추출도 미착수 |
 | ~~**D**~~ | ~~줄바꿈 규칙 부재 + `overflow:hidden`~~ | ✅ **해결 (2026-07-15)** — `overflow-wrap:anywhere` 적용. `WO-O4O-SD-HERO-LONG-TEXT-OVERFLOW-FIX-V1` |
 | **E** | **표(`<table>`) 소비 측 가로 스크롤 없음** | `.tableWrapper{overflow-x:auto}` 가 `.content-editor .ProseMirror` **편집기에만** 스코프됨(`tableKit.ts:45`). 소비 측은 `table-layout:fixed; width:100%` + 카드 `overflow:hidden` → 넓은 표가 **찌그러지고 잘림**. `sd-*` 표 class 도 없음 |
 
@@ -259,4 +279,5 @@ OTC 에서 유의할 점만:
 | V0.5 | 2026-07-15 | **§8-D 해소** — 렌더러에 `overflow-wrap:anywhere; word-break:normal` 적용으로 긴 영문 단어 잘림 수정(h1 594→301, 27/27 PASS, 반응형·한국어 무회귀). §7 경고 → 해결 기록으로 교체 (`WO-O4O-SD-HERO-LONG-TEXT-OVERFLOW-FIX-V1`). |
 | V0.6 | 2026-07-16 | §2 주의사항 = **`sd-warn`**(신설) 반영 · §8-A **계약·코드 해소**(기존 686 소급은 별도 WO). 근거 = `CHECK-O4O-SD-WARNING-CLASS-CONTRACT-AND-BUILDER-V1`. |
 | V0.7 | 2026-07-16 | §2·§8-A **소급 완료 반영** — 공개 중인 1,372건(ko 686 + en 686) `sd-who`→`sd-warn` 적용, 잔여 0. §8-A **완전 해결**. 규칙 변경 없음(상태 갱신). 근거 = `CHECK-O4O-OTC-SD-WARN-BACKFILL-1372-V1`. |
+| V0.9 | 2026-07-16 | **§5 언어 전환 UI 실측 갱신** — 라벨 중복 **4곳 → 9곳**(과소 집계 정정) + **§5-1 신설**(값 불일치 2곳 기록: `ไทย`/`Bahasa Indonesia`/`Indonesia`) · D 터치 44px 반영 · 선택 상태 색 의존 금지를 **§6 기존 규칙의 적용**으로 연결(신설 아님) · **§8-C 부분 해소**. 근거 = `CHECK-O4O-MULTILINGUAL-LANGUAGE-UI-CONSOLIDATION-V1`. |
 | V0.8 | 2026-07-16 | **§3 화면 표 구조 정정** — SPD 렌더 화면(A·B·C·E)과 비렌더 화면(D)을 분리. **D 는 SPD 미사용 → 대상 제외**(오분류 정정), **E 운영자 검수 화면 추가**(누락), **C variant 적용**(섞이는 슬롯 = 마크업 판별) + 화면별 현재 노출 병기. **§8-B 해결**. 근거 = `CHECK-O4O-OTC-DESIGN-8B-RENDER-PATH-AUDIT-V1` · `CHECK-O4O-TABLET-CONTENT-RENDERER-VARIANT-FIX-V1`. |

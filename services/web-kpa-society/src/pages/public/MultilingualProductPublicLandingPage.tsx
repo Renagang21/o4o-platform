@@ -16,13 +16,10 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import { sanitizeRichHtml } from '@o4o/content-editor';
 import {
   resolvePublicMlc,
+  STORE_MLC_LOCALE_LABELS,
   type PublicMlcResolve,
   type StoreMlcLocale,
 } from '../../api/multilingualProductContentStore';
-
-const LOCALE_LABELS: Record<string, string> = {
-  ko: '한국어', en: 'English', zh: '中文', ja: '日本語', vi: 'Tiếng Việt', th: 'ภาษาไทย', id: 'Bahasa',
-};
 
 function PageBody({ page, large = false }: { page: NonNullable<PublicMlcResolve['page']>; large?: boolean }) {
   const format = page.contentFormat;
@@ -154,13 +151,14 @@ export function MultilingualProductPublicLandingPage() {
                     <button
                       key={loc}
                       onClick={() => switchLocale(loc)}
-                      className={`min-h-[44px] px-5 py-2.5 text-base rounded-xl border ${
+                      aria-pressed={active}
+                      className={`inline-flex items-center justify-center min-h-[44px] px-5 py-2.5 text-base rounded-xl border ${
                         active
-                          ? 'bg-slate-900 text-white border-slate-900'
+                          ? 'bg-slate-900 text-white border-slate-900 font-semibold'
                           : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
                       }`}
                     >
-                      {LOCALE_LABELS[loc] || loc}
+                      {STORE_MLC_LOCALE_LABELS[loc] || loc}
                     </button>
                   );
                 })}
@@ -236,13 +234,14 @@ export function MultilingualProductPublicLandingPage() {
                     <button
                       key={loc}
                       onClick={() => switchLocale(loc)}
-                      className={`px-3 py-1.5 text-xs rounded-full border ${
+                      aria-pressed={active}
+                      className={`inline-flex items-center justify-center min-h-[44px] px-3.5 text-xs rounded-full border ${
                         active
-                          ? 'bg-slate-900 text-white border-slate-900'
+                          ? 'bg-slate-900 text-white border-slate-900 font-semibold'
                           : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
                       }`}
                     >
-                      {LOCALE_LABELS[loc] || loc}
+                      {STORE_MLC_LOCALE_LABELS[loc] || loc}
                     </button>
                   );
                 })}
