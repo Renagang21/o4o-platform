@@ -797,19 +797,30 @@ const JOSA_CONCAT = /(하십시오|하세요|합니다|드십시오|하시기\s*
 function findTruncation(cell: string, sources: string[]): { evidence: string; fragment: boolean } | null {
   const c = cell.replace(TRAILING_JUNK, '').trim();
   if (c.length < 8) return null; // 너무 짧으면 판정하지 않는다
+  // ⚠️ 셀 앞에 레이블("보관 ", "성상 ")이 붙으면 셀 전체가 원문의 접두사가 아니게 되어
+  //    indexOf(c) 가 -1 로 빠진다(실측: CP2 서흥). **셀의 꼬리**를 원문에서 찾아야 한다.
+  //    셀 끝 24자를 앵커로 삼아 원문 위치를 잡고, 그 지점 다음 글자로 절단 여부를 본다.
+  const tail = c.slice(-24);
   for (const raw of sources) {
     const src = (raw ?? '').replace(/\s+/g, ' ').trim();
-    if (!src) continue;
-    const i = src.indexOf(c);
-    if (i < 0) continue;
-    const next = src[i + c.length];
+    if (!src || tail.length < 6) continue;
+    const ti = src.indexOf(tail);
+    if (ti < 0) continue;
+    const i = ti; // 원문에서 꼬리가 시작하는 위치
+    const next = src[i + tail.length];
     if (next === undefined) return null;           // 원문 끝까지 = 완전 인용
     if (/[\s.,)\]}·ㆍ]/.test(next)) return null;  // 어절 경계에서 끝남 = 정상
     // 단어 중간에서 끊겼다. 다만 **결과가 읽히는지**는 마지막 어절 길이로 갈린다:
     //   "…함유한 투"   → 마지막 어절 1음절 = 파편 → 확실한 파손
     //   "…곳에 보관"   → 원문은 "보관하십시오" 지만 "보관" 자체가 단어 → 읽힌다(요약형)
-    const lastToken = c.split(/\s+/).pop() ?? '';
-    return { evidence: src.slice(i, i + c.length + 6), fragment: lastToken.length <= 1 };
+    // 파편 판정: 마지막 음절이 원문에서 **더 긴 단어의 일부**인가.
+    //   "…함유한 투" → 원문 "투명한", 다음 글자 '명'(한글) = 단어 계속 → 파편(BLOCKED)
+    //   "…서늘한 곳" → 원문 "곳에", 다음 글자 '에'(조사) = 단어 완결 → 읽히는 요약(REVIEW)
+    // 다음 글자가 **조사·어미로 시작하는 새 형태소**면 앞은 완전한 단어다.
+    const JOSA_START = /^(에|이|가|은|는|을|를|의|와|과|로|도|만|께|한|하|되|입|씩|부터|까지|에서|에게|으로)/;
+    const afterCut = src.slice(i + tail.length);
+    const fragment = !JOSA_START.test(afterCut);
+    return { evidence: src.slice(i, i + tail.length + 6), fragment };
   }
   return null;
 }

@@ -1,10 +1,12 @@
 {
   "guardVersion": "product-description-guard@1.1.0",
   "totalProducts": 10,
-  "pass": 10,
-  "reviewRequired": 0,
+  "pass": 7,
+  "reviewRequired": 3,
   "blocked": 0,
-  "findingsByRule": {},
+  "findingsByRule": {
+    "Q-TRUNCATED-PARTIAL-005": 3
+  },
   "products": [
     {
       "candidateId": "batch-30a:a1-antibio-pro",
@@ -1069,12 +1071,12 @@
       "productName": "편안한 락 생유산균 캡슐",
       "guardVersion": "product-description-guard@1.1.0",
       "preGuardStatus": "PASS",
-      "postGuardStatus": "PASS",
+      "postGuardStatus": "REVIEW_REQUIRED",
       "koEnStatus": "PASS",
-      "overallStatus": "PASS",
+      "overallStatus": "REVIEW_REQUIRED",
       "blockedCount": 0,
-      "reviewCount": 0,
-      "passCount": 11,
+      "reviewCount": 1,
+      "passCount": 10,
       "precheckInfoCount": 2,
       "findings": [
         {
@@ -1199,15 +1201,15 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "Q-JOSA-CONCAT-001",
-          "severity": "INFO",
-          "status": "PASS",
-          "language": "n/a",
-          "field": "drafts",
-          "matchedText": null,
-          "sourceEvidence": null,
-          "message": "콘텐츠 품질 결함 검출 없음",
-          "suggestedAction": "조치 불요"
+          "ruleId": "Q-TRUNCATED-PARTIAL-005",
+          "severity": "WARNING",
+          "status": "REVIEW_REQUIRED",
+          "language": "ko",
+          "field": "koDraft",
+          "matchedText": "보관 습기가 적고 직사광선을 받지 않는 서늘한 곳",
+          "sourceEvidence": "원문은 이어집니다: \"…습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십…\"",
+          "message": "원문 인용이 단어 중간에서 끝납니다(읽히기는 함): \"보관 습기가 적고 직사광선을 받지 않는 서늘한 곳\" — 요약형이면 그대로 두어도 됩니다.",
+          "suggestedAction": "의도한 요약인지 사람이 확인하십시오."
         },
         {
           "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
@@ -1227,12 +1229,12 @@
       "productName": "이너 바울케어",
       "guardVersion": "product-description-guard@1.1.0",
       "preGuardStatus": "PASS",
-      "postGuardStatus": "PASS",
+      "postGuardStatus": "REVIEW_REQUIRED",
       "koEnStatus": "PASS",
-      "overallStatus": "PASS",
+      "overallStatus": "REVIEW_REQUIRED",
       "blockedCount": 0,
-      "reviewCount": 0,
-      "passCount": 14,
+      "reviewCount": 1,
+      "passCount": 13,
       "precheckInfoCount": 2,
       "findings": [
         {
@@ -1390,15 +1392,15 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "Q-JOSA-CONCAT-001",
-          "severity": "INFO",
-          "status": "PASS",
-          "language": "n/a",
-          "field": "drafts",
-          "matchedText": null,
-          "sourceEvidence": null,
-          "message": "콘텐츠 품질 결함 검출 없음",
-          "suggestedAction": "조치 불요"
+          "ruleId": "Q-TRUNCATED-PARTIAL-005",
+          "severity": "WARNING",
+          "status": "REVIEW_REQUIRED",
+          "language": "ko",
+          "field": "koDraft",
+          "matchedText": "보관 습기가 적고 직사광선을 받지 않는 서늘한 곳",
+          "sourceEvidence": "원문은 이어집니다: \"…습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십…\"",
+          "message": "원문 인용이 단어 중간에서 끝납니다(읽히기는 함): \"보관 습기가 적고 직사광선을 받지 않는 서늘한 곳\" — 요약형이면 그대로 두어도 됩니다.",
+          "suggestedAction": "의도한 요약인지 사람이 확인하십시오."
         },
         {
           "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
@@ -1418,12 +1420,12 @@
       "productName": "청인 해우",
       "guardVersion": "product-description-guard@1.1.0",
       "preGuardStatus": "PASS",
-      "postGuardStatus": "PASS",
+      "postGuardStatus": "REVIEW_REQUIRED",
       "koEnStatus": "PASS",
-      "overallStatus": "PASS",
+      "overallStatus": "REVIEW_REQUIRED",
       "blockedCount": 0,
-      "reviewCount": 0,
-      "passCount": 14,
+      "reviewCount": 1,
+      "passCount": 13,
       "precheckInfoCount": 2,
       "findings": [
         {
@@ -1581,15 +1583,15 @@
           "suggestedAction": "조치 불요"
         },
         {
-          "ruleId": "Q-JOSA-CONCAT-001",
-          "severity": "INFO",
-          "status": "PASS",
-          "language": "n/a",
-          "field": "drafts",
-          "matchedText": null,
-          "sourceEvidence": null,
-          "message": "콘텐츠 품질 결함 검출 없음",
-          "suggestedAction": "조치 불요"
+          "ruleId": "Q-TRUNCATED-PARTIAL-005",
+          "severity": "WARNING",
+          "status": "REVIEW_REQUIRED",
+          "language": "ko",
+          "field": "koDraft",
+          "matchedText": "보관 습기가 적고 직사광선을 받지 않는 서늘한 곳",
+          "sourceEvidence": "원문은 이어집니다: \"…습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십…\"",
+          "message": "원문 인용이 단어 중간에서 끝납니다(읽히기는 함): \"보관 습기가 적고 직사광선을 받지 않는 서늘한 곳\" — 요약형이면 그대로 두어도 됩니다.",
+          "suggestedAction": "의도한 요약인지 사람이 확인하십시오."
         },
         {
           "ruleId": "H-MAKER-NO-OFFICIAL-EN-007",
