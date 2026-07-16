@@ -281,6 +281,31 @@ const SPEC_MINMAX_EN = /\b(at\s+least|at\s+most|to\s+a\s+minimum|minimum|maximum
 /** 소비자 상황 문맥(제품 비교 아님) — 오탐 완화 → REVIEW_REQUIRED 로 강등 */
 const CONSUMER_CONTEXT = /(막막|고민|신경\s*쓰|부담스러|번거로|어려워|잊게)/;
 
+/**
+ * 제품명과 **원문 그대로 인용한 부분**은 우리 주장이 아니다 → 최상급 판정에서 제외한다.
+ *
+ * 이미 확립된 원칙인데 B 규칙에만 적용돼 있지 않았다(CP3 실측):
+ *   `프리미엄 유산균 17`            제품명에 '프리미엄' → 제품명은 표기 가능
+ *   `공기의 노출을 최대한 차단`      원문 보관 조건 인용 → 인용은 주장이 아님
+ * (CP1 의 `(베트남)`, CP2 의 `온 가족이` 와 같은 처리)
+ */
+function stripQuotedAndName(text: string, input: GuardProductInput): string {
+  let t = text;
+  for (const name of [input.productName, input.productNameEn ?? '', input.manufacturer, input.manufacturerEn ?? '']) {
+    if (name && name.length > 1) t = t.split(name).join(' ');
+  }
+  for (const src of [input.source.storage ?? '', input.source.caution, input.source.intake, input.source.dosageForm]) {
+    const clean = (src ?? '').replace(/\s+/g, ' ').trim();
+    if (clean.length < 6) continue;
+    // 원문을 그대로 인용한 구간을 제거(부분 인용도 어절 단위로 훑는다)
+    for (const chunk of clean.split(/[.。①②③④⑤]|\s{2,}/)) {
+      const c = chunk.trim();
+      if (c.length >= 6) t = t.split(c).join(' ');
+    }
+  }
+  return t;
+}
+
 export function ruleB(input: GuardProductInput): GuardFinding[] {
   const out: GuardFinding[] = [];
   const scan = (text: string, re: RegExp, lang: 'ko' | 'en', field: string) => {
@@ -302,9 +327,11 @@ export function ruleB(input: GuardProductInput): GuardFinding[] {
       });
     }
   };
-  scan(stripHtml(input.drafts.ko), SUPERLATIVE_KO, 'ko', 'koDraft');
-  scan(stripHtml(input.drafts.ko), COMPARATIVE_KO, 'ko', 'koDraft');
-  scan(stripHtml(input.drafts.en), SUPERLATIVE_EN, 'en', 'enDraft');
+  const koScan = stripQuotedAndName(stripHtml(input.drafts.ko), input);
+  const enScan = stripQuotedAndName(stripHtml(input.drafts.en), input);
+  scan(koScan, SUPERLATIVE_KO, 'ko', 'koDraft');
+  scan(koScan, COMPARATIVE_KO, 'ko', 'koDraft');
+  scan(enScan, SUPERLATIVE_EN, 'en', 'enDraft');
   // 규격 최소·최대치 — **문자열이 아니라 공식 규격 문맥**으로 판정 (V1.1 튜닝)
   {
     const en = stripHtml(input.drafts.en);

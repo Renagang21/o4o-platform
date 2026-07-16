@@ -1,0 +1,895 @@
+[
+  {
+    "candidateId": "cp3:c3-01-active-gold",
+    "productName": "액티브프로바이오골드",
+    "productNameEn": "Active Probio Gold",
+    "manufacturer": "(주)한풍네이처팜",
+    "manufacturerEn": null,
+    "statementNo": "2012001900790",
+    "category": "hff",
+    "_bucket": "DECIMAL",
+    "_slug": "c3-01-active-gold",
+    "source": {
+      "mainFunction": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+      "baseStandard": "① 성상 : 이미, 이취가 없고 고유의 향미가 있는 미색의 내용물을 함유한 흰색의 불투명 경질캡슐 ② 프로바이오틱스 수(CFU/1,200 mg) : 표시량 120,000,000(1.2억) 이상 ③ 대장균군 : 음성 ④ 붕해시험 : 적합",
+      "intake": "1일 2회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+      "caution": "-질환이 있거나 의약품 복용 시 전문가와상담하시기 바랍니다. -알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있습니다. -어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도하시기 바랍니다. -이상사례 발생 시 섭취를 중단하고 전문가와 상담하시기 바랍니다. -특이체질, 알레르기 체질인 경우 원료를 확인하신 후 섭취하십시오. -소비기한을 확인하시기 바라며, 섭취량 및 섭취방법을 준수하십시오. -제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오. -섭취 시 목에 걸릴 우려가 있으니 충분한 물과 함께 섭취하시고 1캡슐씩 나누어 섭취하는 것을 권장합니다.",
+      "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 미색의 내용물을 함유한 흰색의 불투명 경질캡슐",
+      "storage": "- 직사광선 및 고온다습한 곳을 피해 습기가 적고 서늘한 곳에 보관, 유통하십시오. - 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.",
+      "shelfLife": "제조일로부터 24개월"
+    },
+    "grounding": {
+      "declaredCfu": {
+        "absolute": 120000000
+      },
+      "declaredAmount": {
+        "value": 1.2,
+        "unit": "억 CFU",
+        "basisAmount": 1200,
+        "basisUnit": "mg"
+      },
+      "serving": {
+        "unitType": "capsule",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 2,
+        "servingTotalWeight": null,
+        "servingTotalWeightUnit": null,
+        "servingsPerDay": 2,
+        "servingsPerDayMax": null
+      },
+      "calculationAllowed": false,
+      "ageBandsRaw": null
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">1200mg당 1.2억 CFU 이상</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>액티브프로바이오골드<small>프로바이오틱스 · 장 건강</small></h1><p class=\"sd-meta\">(주)한풍네이처팜 제조 · 1일 2회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품의 표시 기준은 <b>1200mg당 1.2억 CFU 이상</b>입니다. 공식 섭취방법은 <b>1일 2회, 1회 2캡슐</b>이며, <b>1캡슐의 중량은 공식 표기에 없어</b> 단위당 균수는 계산하지 않았습니다. 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 프로바이오틱스를 담았습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>표시 기준: <b>1200mg당 1.2억 CFU 이상</b></li><li><b>1캡슐의 중량은 공식 표기에 없어</b> 캡슐당 균수는 따로 계산하지 않았습니다</li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 미색의 내용물을 함유한 흰색의 불투명 경질캡슐 · (주)한풍네이처팜 제조</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>프로바이오틱스 수</b> 표시량 120,000,000(1.2억) 이상</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 미색의 내용물을 함유한 흰색의 불투명 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> - 직사광선 및 고온다습한 곳을 피해 습기가 적고 서늘한 곳에 보관, 유통하십시오. - 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>하루 2번으로 관리하고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+      "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">at least 120 million CFU per 1200mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>Active Probio Gold<small>Probiotics · Gut health</small></h1><p class=\"sd-meta\">Made by Ildong Bioscience · 2 times a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">The labelled standard for this product is at least <b>120 million CFU per 1200mg</b>. <b>The weight of one capsule is not stated in the official text</b>, so this page does not calculate a per-capsule count. Probiotics are recognized by Korea's MFDS as an ingredient that may help promote lactic acid bacteria growth and suppress harmful bacteria, may help support smooth bowel movement, and may help support gut health.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>The labelled standard for this product is at least <b>120 million CFU per 1200mg</b></li><li><b>The weight of one capsule is not stated in the official text</b>, so this page does not calculate a per-capsule count</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by Ildong Bioscience</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Probiotic count</b> at least 120 million CFU per 1200mg</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 미색의 내용물을 함유한 흰색의 불투명 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> - 직사광선 및 고온다습한 곳을 피해 습기가 적고 서늘한 곳에 보관, 유통하십시오. - 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who prefer a 2 times a day routine</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children and follow the stated daily intake · Stop use and consult a professional if adverse effects occur</div></div>"
+    }
+  },
+  {
+    "candidateId": "cp3:c3-02-appidus",
+    "productName": "애피더스혼합유산균",
+    "productNameEn": "Appidus Mixed Lactic Acid Bacteria",
+    "manufacturer": "코스맥스바이오(주)",
+    "manufacturerEn": null,
+    "statementNo": "200400200021678",
+    "category": "hff",
+    "_bucket": "BASIS_UNIT",
+    "_slug": "c3-02-appidus",
+    "source": {
+      "mainFunction": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+      "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 회갈색의 입자성이 있는 내용물을 포함한 노란 하얀색의 분말 2) 프로바이오틱스 수 : 표시량(400,000,000(4억)CFU/6g) 이상 3) 대장균군 : 음성",
+      "intake": "1일 2회, 1회 1포(3g)를 충분한 물과 함께 섭취하십시오. 1일 1회, 1회 2포(6g)를 충분한 물과 함께 섭취하십시오.",
+      "caution": "섭취 시 위장장애, 소화불량의 증상이 있을 경우 섭취를 중단하십시오. 개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오. 섭취 전 제품에 이상이 있는 경우 섭취를 금하십시오. 특정 원료 성분에 알레르기 체질은 원료 성분을 확인 후 섭취하십시오. 질환이 있거나 의약품 복용 시 전문가와 상담 하십시오 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있습니다 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도하십시오 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오",
+      "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 회갈색의 입자성이 있는 내용물을 포함한 노란 하얀색의 분말",
+      "storage": "수분, 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하시고, 개봉 후에는 변질될 수 있으므로 바로드십시오.",
+      "shelfLife": "제조일로부터 18개월."
+    },
+    "grounding": {
+      "declaredCfu": {
+        "absolute": 400000000
+      },
+      "declaredAmount": {
+        "value": 4,
+        "unit": "억 CFU",
+        "basisAmount": 6,
+        "basisUnit": "g"
+      },
+      "serving": {
+        "unitType": "stick",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingTotalWeight": 3,
+        "servingTotalWeightUnit": "g",
+        "servingsPerDay": 2,
+        "servingsPerDayMax": null
+      },
+      "calculationAllowed": true,
+      "ageBandsRaw": null
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">6g당 4억 CFU 이상</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>애피더스혼합유산균<small>프로바이오틱스 · 장 건강</small></h1><p class=\"sd-meta\">코스맥스바이오(주) 제조 · 1일 2회 1회 1포(3g)</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 표시 기준량 6g과 1회 섭취량이 <b>같습니다</b>. 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 프로바이오틱스를 담았습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>표시 기준량 <b>6g = 1회 1포(3g) = 하루 섭취량</b> — 계산이 필요 없습니다</li><li>1회 섭취 프로바이오틱스 <b>4억 CFU</b> — <b>1포의 중량은 공식 표기에 없어</b> 포당 수치는 계산하지 않았습니다</li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 회갈색의 입자성이 있는 내용물을 포함한 노란 하얀색의 분말 · 코스맥스바이오(주) 제조</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1포(3g)</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>프로바이오틱스 수</b> 표시량(400,000,000(4억)CFU/6g) 이상 3)</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 회갈색의 입자성이 있는 내용물을 포함한 노란 하얀색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월.</div><div class=\"sd-item\"><b>보관</b> 수분, 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하시고, 개봉 후에는 변질될 수 있으므로 바로드십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>하루 2번으로 관리하고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+      "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">at least 400 million CFU per 6g</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>Appidus Mixed Lactic Acid Bacteria<small>Probiotics · Gut health</small></h1><p class=\"sd-meta\">Made by Ildong Pharmaceutical · 2 times a day · 1 stick (3 g) per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">The labelled basis of 6g and one serving are <b>the same</b>. Probiotics are recognized by Korea's MFDS as an ingredient that may help promote lactic acid bacteria growth and suppress harmful bacteria, may help support smooth bowel movement, and may help support gut health.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Labelled basis <b>6g = one serving (3 g) = daily serving</b> — no calculation needed</li><li><b>400 million CFU</b> per serving — <b>the weight of one stick is not stated in the official text</b>, so this page does not calculate a per-stick count</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by Ildong Pharmaceutical</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 stick (3 g) per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Probiotic count</b> at least 400 million CFU per 6g</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 회갈색의 입자성이 있는 내용물을 포함한 노란 하얀색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 18개월.</div><div class=\"sd-item\"><b>Storage</b> 수분, 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하시고, 개봉 후에는 변질될 수 있으므로 바로드십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who prefer a 2 times a day routine</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children and follow the stated daily intake · Stop use and consult a professional if adverse effects occur</div></div>"
+    }
+  },
+  {
+    "candidateId": "cp3:c3-03-enfant-chew",
+    "productName": "앙팡 츄어블 유산균",
+    "productNameEn": "Enfant Chewable Lactic Acid Bacteria",
+    "manufacturer": "(주)쎌바이오텍",
+    "manufacturerEn": null,
+    "statementNo": "200400170171153",
+    "category": "hff",
+    "_bucket": "BASIS_UNIT",
+    "_slug": "c3-03-enfant-chew",
+    "source": {
+      "mainFunction": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+      "baseStandard": "1) 성상: 고유의 향미를 가지며 이미, 이취가 없는 노란 하얀색의 원형 츄어블 정제 2) 프로바이오틱스 수 : 표시량(1,000,000,000 CFU/2g) 이상 3) 대장균군: 음성",
+      "intake": "1일 1회, 1회 2정(2g)을 씹어서 섭취하십시오.",
+      "caution": "(가) 질환이 있거나 의약품 복용 시 전문가와 상담할 것 (나) 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음 (다) 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도할 것 (라) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+      "dosageForm": "고유의 향미를 가지며 이미, 이취가 없는 노란 하얀색의 원형 츄어블 정제",
+      "storage": "실온/ 습기, 일광을 피하여 서늘한 곳에 보관, 유통하십시오.",
+      "shelfLife": "제조일로부터 24개월까지"
+    },
+    "grounding": {
+      "declaredCfu": {
+        "absolute": 1000000000
+      },
+      "declaredAmount": {
+        "value": 10,
+        "unit": "억 CFU",
+        "basisAmount": 2,
+        "basisUnit": "g"
+      },
+      "serving": {
+        "unitType": "tablet",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 2,
+        "servingTotalWeight": 2,
+        "servingTotalWeightUnit": "g",
+        "servingsPerDay": 1,
+        "servingsPerDayMax": null
+      },
+      "calculationAllowed": true,
+      "ageBandsRaw": null
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">2g당 10억 CFU 이상</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>앙팡 츄어블 유산균<small>프로바이오틱스 · 장 건강</small></h1><p class=\"sd-meta\">(주)쎌바이오텍 제조 · 1일 1회 1회 2정(2g)</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 표시 기준량 2g과 1회 섭취량이 <b>같습니다</b>. 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 프로바이오틱스를 담았습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>표시 기준량 <b>2g = 1회 2정(2g) = 하루 섭취량</b> — 계산이 필요 없습니다</li><li>1회 섭취 프로바이오틱스 <b>10억 CFU</b> — <b>1정의 중량은 공식 표기에 없어</b> 정당 수치는 계산하지 않았습니다</li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 가지며 이미, 이취가 없는 노란 하얀색의 원형 츄어블 정제 · (주)쎌바이오텍 제조</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정(2g)</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>프로바이오틱스 수</b> 표시량(1,000,000,000 CFU/2g) 이상 3)</div><div class=\"sd-item\"><b>성상</b> 고유의 향미를 가지며 이미, 이취가 없는 노란 하얀색의 원형 츄어블 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 실온/ 습기, 일광을 피하여 서늘한 곳에 보관, 유통하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>하루 한 번으로 관리하고 싶은 분</li><li>정 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+      "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">at least 1 billion CFU per 2g</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Enfant Chewable Lactic Acid Bacteria<small>Probiotics · Gut health</small></h1><p class=\"sd-meta\">Made by CTCBIO · Once a day · 2 tablets (2 g) per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">The labelled basis of 2g and one serving are <b>the same</b>. Probiotics are recognized by Korea's MFDS as an ingredient that may help promote lactic acid bacteria growth and suppress harmful bacteria, may help support smooth bowel movement, and may help support gut health.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Labelled basis <b>2g = one serving (2 g) = daily serving</b> — no calculation needed</li><li><b>1 billion CFU</b> per serving — <b>the weight of one tablet is not stated in the official text</b>, so this page does not calculate a per-tablet count</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by CTCBIO</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 tablets (2 g) per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Probiotic count</b> at least 1 billion CFU per 2g</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미를 가지며 이미, 이취가 없는 노란 하얀색의 원형 츄어블 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 실온/ 습기, 일광을 피하여 서늘한 곳에 보관, 유통하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who prefer a once a day routine</li><li>Those who prefer tablets</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children and follow the stated daily intake · Stop use and consult a professional if adverse effects occur</div></div>"
+    }
+  },
+  {
+    "candidateId": "cp3:c3-04-raphahil-365",
+    "productName": "라파힐 프로바이오틱스365",
+    "productNameEn": "Raphahil Probiotics 365",
+    "manufacturer": "주식회사 상상바이오",
+    "manufacturerEn": null,
+    "statementNo": "2017286000716",
+    "category": "hff",
+    "_bucket": "SCI",
+    "_slug": "c3-04-raphahil-365",
+    "source": {
+      "mainFunction": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+      "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 분말을 함유한 흰색의 경질캡슐 ② 프로바이오틱스 : 표시량 (1X10^9 CFU/430mg) 이상 ③ 대장균군 : 음성 ④ 붕해시험 : 적합 (20분 이내)",
+      "intake": "1일 1회, 1회 1캡슐(총430mg)을 물과 함께 섭취하십시오.",
+      "caution": "(가) 질환이 있거나 의약품 복용 시 전문가와 상담할 것 (나) 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음 (다) 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도할 것 (라) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+      "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰색의 분말을 함유한 흰색의 경질캡슐",
+      "storage": "① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+      "shelfLife": "제조일로부터 18개월"
+    },
+    "grounding": {
+      "declaredCfu": {
+        "absolute": 1000000000
+      },
+      "declaredAmount": {
+        "value": 10,
+        "unit": "억 CFU",
+        "basisAmount": 430,
+        "basisUnit": "mg"
+      },
+      "serving": {
+        "unitType": "capsule",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingTotalWeight": 430,
+        "servingTotalWeightUnit": "mg",
+        "servingsPerDay": 1,
+        "servingsPerDayMax": null
+      },
+      "calculationAllowed": true,
+      "ageBandsRaw": null
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">430mg당 10억 CFU 이상</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>라파힐 프로바이오틱스365<small>프로바이오틱스 · 장 건강</small></h1><p class=\"sd-meta\">주식회사 상상바이오 제조 · 1일 1회 1회 1캡슐(430mg)</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 표시 기준량 430mg과 1회 섭취량이 <b>같습니다</b>. 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 프로바이오틱스를 담았습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>표시 기준량 <b>430mg = 1회 1캡슐(430mg) = 하루 섭취량</b> — 계산이 필요 없습니다</li><li>1회 섭취 프로바이오틱스 <b>10억 CFU</b> — <b>1캡슐의 중량은 공식 표기에 없어</b> 캡슐당 수치는 계산하지 않았습니다</li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰색의 분말을 함유한 흰색의 경질캡슐 · 주식회사 상상바이오 제조</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐(430mg)</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>프로바이오틱스 수</b> 표시량 (1X10^9 CFU/430mg) 이상</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 분말을 함유한 흰색의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>보관</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>하루 한 번으로 관리하고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+      "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">at least 1 billion CFU per 430mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Raphahil Probiotics 365<small>Probiotics · Gut health</small></h1><p class=\"sd-meta\">Made by Raphas · Once a day · 1 capsule (430 mg) per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">The labelled basis of 430mg and one serving are <b>the same</b>. Probiotics are recognized by Korea's MFDS as an ingredient that may help promote lactic acid bacteria growth and suppress harmful bacteria, may help support smooth bowel movement, and may help support gut health.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Labelled basis <b>430mg = one serving (430 mg) = daily serving</b> — no calculation needed</li><li><b>1 billion CFU</b> per serving — <b>the weight of one capsule is not stated in the official text</b>, so this page does not calculate a per-capsule count</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by Raphas</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule (430 mg) per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Probiotic count</b> at least 1 billion CFU per 430mg</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 분말을 함유한 흰색의 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>Storage</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who prefer a once a day routine</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children and follow the stated daily intake · Stop use and consult a professional if adverse effects occur</div></div>"
+    }
+  },
+  {
+    "candidateId": "cp3:c3-05-celtiva-17",
+    "productName": "셀티바 프로바이오틱스 솔루션 17",
+    "productNameEn": "Celtiva Probiotics Solution 17",
+    "manufacturer": "(주)알피바이오",
+    "manufacturerEn": null,
+    "statementNo": "200400170061018",
+    "category": "hff",
+    "_bucket": "SCI",
+    "_slug": "c3-05-celtiva-17",
+    "source": {
+      "mainFunction": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+      "baseStandard": "1) 성상: 고유의 향미가 있고 이미, 이취가 없는 연한 노란색 분말을 함유한 투명한 경질캡슐 2) 프로바이오틱스 수 : 표시량 ｛1X10^10 CFU /500mg｝이상 3) 대장균군 : 음성 4) 붕해: 20분 이내",
+      "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+      "caution": "(가) 질환이 있거나 의약품 복용 시 전문가와 상담할 것 (나) 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음 (다) 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도할 것 (라) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+      "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 연한 노란색 분말을 함유한 투명한 경질캡슐",
+      "storage": "고온다습한 곳과 직사광선을 피해 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손에 닿지 않도록 주의하시기 바랍니다.",
+      "shelfLife": "제조일로부터 18개월"
+    },
+    "grounding": {
+      "declaredCfu": {
+        "absolute": 10000000000
+      },
+      "declaredAmount": {
+        "value": 100,
+        "unit": "억 CFU",
+        "basisAmount": 500,
+        "basisUnit": "mg"
+      },
+      "serving": {
+        "unitType": "capsule",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingTotalWeight": null,
+        "servingTotalWeightUnit": null,
+        "servingsPerDay": 1,
+        "servingsPerDayMax": null
+      },
+      "calculationAllowed": false,
+      "ageBandsRaw": null
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">500mg당 100억 CFU 이상</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>셀티바 프로바이오틱스 솔루션 17<small>프로바이오틱스 · 장 건강</small></h1><p class=\"sd-meta\">(주)알피바이오 제조 · 1일 1회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품의 표시 기준은 <b>500mg당 100억 CFU 이상</b>입니다. 공식 섭취방법은 <b>1일 1회, 1회 1캡슐</b>이며, <b>1캡슐의 중량은 공식 표기에 없어</b> 단위당 균수는 계산하지 않았습니다. 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 프로바이오틱스를 담았습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>표시 기준: <b>500mg당 100억 CFU 이상</b></li><li><b>1캡슐의 중량은 공식 표기에 없어</b> 캡슐당 균수는 따로 계산하지 않았습니다</li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 연한 노란색 분말을 함유한 투명한 경질캡슐 · (주)알피바이오 제조</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>프로바이오틱스 수</b> 표시량 ｛1X10^10 CFU /500mg｝이상 3)</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연한 노란색 분말을 함유한 투명한 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳과 직사광선을 피해 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>하루 한 번으로 관리하고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+      "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">at least 10 billion CFU per 500mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Celtiva Probiotics Solution 17<small>Probiotics · Gut health</small></h1><p class=\"sd-meta\">Made by CTCBIO · Once a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">The labelled standard for this product is at least <b>10 billion CFU per 500mg</b>. <b>The weight of one capsule is not stated in the official text</b>, so this page does not calculate a per-capsule count. Probiotics are recognized by Korea's MFDS as an ingredient that may help promote lactic acid bacteria growth and suppress harmful bacteria, may help support smooth bowel movement, and may help support gut health.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>The labelled standard for this product is at least <b>10 billion CFU per 500mg</b></li><li><b>The weight of one capsule is not stated in the official text</b>, so this page does not calculate a per-capsule count</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by CTCBIO</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Probiotic count</b> at least 10 billion CFU per 500mg</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 연한 노란색 분말을 함유한 투명한 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳과 직사광선을 피해 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who prefer a once a day routine</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children and follow the stated daily intake · Stop use and consult a professional if adverse effects occur</div></div>"
+    }
+  },
+  {
+    "candidateId": "cp3:c3-06-pyeonanhan-lak-p",
+    "productName": "편안한 락 생유산균",
+    "productNameEn": "Pyeonanhan Lak Live Lactic Acid Bacteria",
+    "manufacturer": "(주)케이에이치앤비",
+    "manufacturerEn": null,
+    "statementNo": "2004001702932",
+    "category": "hff",
+    "_bucket": "FULLWIDTH",
+    "_slug": "c3-06-pyeonanhan-lak-p",
+    "source": {
+      "mainFunction": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+      "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 백색의 분말 ② 프로바이오틱스 수 : 표시량(100,000,000cfu/2,000mg) 이상 ③ 대장균군 : 음성",
+      "intake": "1일 1회, 1회 1포(2,000 ㎎)을 물과 함께 섭취하십시오.",
+      "caution": "(가) 질환이 있거나 의약품 복용 시 전문가와 상담할 것 (나) 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음 (다) 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도할 것 (라) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+      "dosageForm": "고유의 향미가 있고 이미.이취가 없는 백색의 분말",
+      "storage": "습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시요.",
+      "shelfLife": "제조일로부터 24개월"
+    },
+    "grounding": {
+      "declaredCfu": {
+        "absolute": 100000000
+      },
+      "declaredAmount": {
+        "value": 1,
+        "unit": "억 CFU",
+        "basisAmount": 2000,
+        "basisUnit": "mg"
+      },
+      "serving": {
+        "unitType": "stick",
+        "unitWeight": 2000,
+        "unitWeightUnit": "mg",
+        "unitsPerServing": 1,
+        "servingTotalWeight": null,
+        "servingTotalWeightUnit": null,
+        "servingsPerDay": 1,
+        "servingsPerDayMax": null
+      },
+      "calculationAllowed": true,
+      "ageBandsRaw": null
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">2000mg당 1억 CFU 이상</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>편안한 락 생유산균<small>프로바이오틱스 · 장 건강</small></h1><p class=\"sd-meta\">(주)케이에이치앤비 제조 · 1일 1회 1회 1포(2000mg)</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 표시 기준량 2000mg과 1회 섭취량이 <b>같습니다</b>. 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 프로바이오틱스를 담았습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>표시 기준량 <b>2000mg = 1포 = 하루 섭취량</b> — 계산이 필요 없습니다</li><li>1포당 프로바이오틱스 <b>1억 CFU</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미.이취가 없는 백색의 분말 · (주)케이에이치앤비 제조</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포(2000mg)</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>프로바이오틱스 수</b> 표시량(100,000,000cfu/2,000mg) 이상</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미.이취가 없는 백색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시요.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>하루 한 번으로 관리하고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+      "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">at least 100 million CFU per 2000mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Pyeonanhan Lak Live Lactic Acid Bacteria<small>Probiotics · Gut health</small></h1><p class=\"sd-meta\">Made by KH&B · Once a day · 1 stick (2000 mg) per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">The labelled basis of 2000mg and one serving are <b>the same</b>. Probiotics are recognized by Korea's MFDS as an ingredient that may help promote lactic acid bacteria growth and suppress harmful bacteria, may help support smooth bowel movement, and may help support gut health.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Labelled basis <b>2000mg = one stick = daily serving</b> — no calculation needed</li><li><b>100 million CFU</b> of probiotics per stick</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by KH&B</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick (2000 mg) per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Probiotic count</b> at least 100 million CFU per 2000mg</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미.이취가 없는 백색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시요.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who prefer a once a day routine</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children and follow the stated daily intake · Stop use and consult a professional if adverse effects occur</div></div>"
+    }
+  },
+  {
+    "candidateId": "cp3:c3-07-nlbio",
+    "productName": "엔엘바이오(NLBio)",
+    "productNameEn": "NLBio",
+    "manufacturer": "주)팜크로스",
+    "manufacturerEn": null,
+    "statementNo": "200400151101268",
+    "category": "hff",
+    "_bucket": "FULLWIDTH",
+    "_slug": "c3-07-nlbio",
+    "source": {
+      "mainFunction": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+      "baseStandard": "1. 성상: 고유의 향미가 있고 이미·이취가 없는 흰색의 분말 2. 프로바이오틱스 수 : 표시량(100,000,000(1억) CFU/1,500㎎) 이상 3. 대장균군: 음성",
+      "intake": "1일 1회, 1회 1포를 그대로 섭취하거나 NL쉐이크에 타서 함께 섭취",
+      "caution": "[프로바이오틱스] 질환이 있거나 의약품 복용 시 전문가와 상담할 것. 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음. 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도할 것. 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것.",
+      "dosageForm": "고유의 향미가 있고 이미·이취가 없는 흰색의 분말",
+      "storage": "직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 보관하십시오.",
+      "shelfLife": "제조일로부터 18개월"
+    },
+    "grounding": {
+      "declaredCfu": {
+        "absolute": 100000000
+      },
+      "declaredAmount": {
+        "value": 1,
+        "unit": "억 CFU",
+        "basisAmount": 1500,
+        "basisUnit": "mg"
+      },
+      "serving": {
+        "unitType": "stick",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingTotalWeight": null,
+        "servingTotalWeightUnit": null,
+        "servingsPerDay": 1,
+        "servingsPerDayMax": null
+      },
+      "calculationAllowed": false,
+      "ageBandsRaw": null
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">1500mg당 1억 CFU 이상</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>엔엘바이오(NLBio)<small>프로바이오틱스 · 장 건강</small></h1><p class=\"sd-meta\">주)팜크로스 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품의 표시 기준은 <b>1500mg당 1억 CFU 이상</b>입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>이며, <b>1포의 중량은 공식 표기에 없어</b> 단위당 균수는 계산하지 않았습니다. 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 프로바이오틱스를 담았습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>표시 기준: <b>1500mg당 1억 CFU 이상</b></li><li><b>1포의 중량은 공식 표기에 없어</b> 포당 균수는 따로 계산하지 않았습니다</li><li><b>직접 섭취</b> 가능 — 공식 표기</li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 흰색의 분말 · 주)팜크로스 제조</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">직접 또는 물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>프로바이오틱스 수</b> 표시량(100,000,000(1억) CFU/1,500㎎) 이상 3</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 흰색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>하루 한 번으로 관리하고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+      "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">at least 100 million CFU per 1500mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>NLBio<small>Probiotics · Gut health</small></h1><p class=\"sd-meta\">Made by Pharmcross · Once a day · 1 stick per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">The labelled standard for this product is at least <b>100 million CFU per 1500mg</b>. <b>The weight of one stick is not stated in the official text</b>, so this page does not calculate a per-stick count. Probiotics are recognized by Korea's MFDS as an ingredient that may help promote lactic acid bacteria growth and suppress harmful bacteria, may help support smooth bowel movement, and may help support gut health.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>The labelled standard for this product is at least <b>100 million CFU per 1500mg</b></li><li><b>The weight of one stick is not stated in the official text</b>, so this page does not calculate a per-stick count</li><li><b>Can be taken directly</b> — as officially stated</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by Pharmcross</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">Directly or with water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Probiotic count</b> at least 100 million CFU per 1500mg</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 흰색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who prefer a once a day routine</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children and follow the stated daily intake · Stop use and consult a professional if adverse effects occur</div></div>"
+    }
+  },
+  {
+    "candidateId": "cp3:c3-08-drpang-kids",
+    "productName": "닥터팡 키즈베이비 유산균",
+    "productNameEn": "Dr. Pang Kids Baby Lactic Acid Bacteria",
+    "manufacturer": "(주)비오팜",
+    "manufacturerEn": null,
+    "statementNo": "20040017021698",
+    "category": "hff",
+    "_bucket": "NAME_KIDS",
+    "_slug": "c3-08-drpang-kids",
+    "source": {
+      "mainFunction": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+      "baseStandard": "①성상 : 이미, 이취가 없고 고유의 향미가 있는 미백색의 분말 ②프로바이오틱스 수 : 표시량(500,000,000 CFU/1,500mg)이상 ③대장균군 : 음성",
+      "intake": "1일 1회, 1회 1포를 물과 함께 섭취하십시오.",
+      "caution": "- 질환이 있거나 의약품 복용 시 전문가와 상담할 것 - 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음 - 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도할 것 - 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것 - 개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오. - 알레르기 체질이신 경우 원료 성분을 확인 하신 후 섭취하십시오. - 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.",
+      "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 미백색의 분말",
+      "storage": "① 직사광선을 받지 않는 서늘한 곳에 보관하십시오.② 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+      "shelfLife": "제조일로부터 18개월"
+    },
+    "grounding": {
+      "declaredCfu": {
+        "absolute": 500000000
+      },
+      "declaredAmount": {
+        "value": 5,
+        "unit": "억 CFU",
+        "basisAmount": 1500,
+        "basisUnit": "mg"
+      },
+      "serving": {
+        "unitType": "stick",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingTotalWeight": null,
+        "servingTotalWeightUnit": null,
+        "servingsPerDay": 1,
+        "servingsPerDayMax": null
+      },
+      "calculationAllowed": false,
+      "ageBandsRaw": null
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">1500mg당 5억 CFU 이상</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>닥터팡 키즈베이비 유산균<small>프로바이오틱스 · 장 건강</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품의 표시 기준은 <b>1500mg당 5억 CFU 이상</b>입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>이며, <b>1포의 중량은 공식 표기에 없어</b> 단위당 균수는 계산하지 않았습니다. 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 프로바이오틱스를 담았습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>표시 기준: <b>1500mg당 5억 CFU 이상</b></li><li><b>1포의 중량은 공식 표기에 없어</b> 포당 균수는 따로 계산하지 않았습니다</li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 미백색의 분말 · (주)비오팜 제조</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>프로바이오틱스 수</b> 표시량(500,000,000 CFU/1,500mg)이상</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 미백색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>보관</b> ① 직사광선을 받지 않는 서늘한 곳에 보관하십시오.② 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>하루 한 번으로 관리하고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+      "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">at least 500 million CFU per 1500mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Dr. Pang Kids Baby Lactic Acid Bacteria<small>Probiotics · Gut health</small></h1><p class=\"sd-meta\">Made by CTCBIO · Once a day · 1 stick per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">The labelled standard for this product is at least <b>500 million CFU per 1500mg</b>. <b>The weight of one stick is not stated in the official text</b>, so this page does not calculate a per-stick count. Probiotics are recognized by Korea's MFDS as an ingredient that may help promote lactic acid bacteria growth and suppress harmful bacteria, may help support smooth bowel movement, and may help support gut health.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>The labelled standard for this product is at least <b>500 million CFU per 1500mg</b></li><li><b>The weight of one stick is not stated in the official text</b>, so this page does not calculate a per-stick count</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by CTCBIO</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Probiotic count</b> at least 500 million CFU per 1500mg</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 미백색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>Storage</b> ① 직사광선을 받지 않는 서늘한 곳에 보관하십시오.② 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who prefer a once a day routine</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children and follow the stated daily intake · Stop use and consult a professional if adverse effects occur</div></div>"
+    }
+  },
+  {
+    "candidateId": "cp3:c3-09-kids-formula",
+    "productName": "어린이 생 유산균 키즈 포뮬러 튼튼",
+    "productNameEn": "Kids Formula Live Lactic Acid Bacteria",
+    "manufacturer": "주식회사 코스팜",
+    "manufacturerEn": null,
+    "statementNo": "20172880236167",
+    "category": "hff",
+    "_bucket": "NAME_KIDS",
+    "_slug": "c3-09-kids-formula",
+    "source": {
+      "mainFunction": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+      "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 노란 하양색의 분말 2. 프로바이오틱스 수 : 표시량(2,000,000,000(20억) CFU / 2 g) 이상 3. 대장균군 : 음성",
+      "intake": "1일 1회, 1회 1포를 그대로 섭취하십시오.",
+      "caution": "1) 질환이 있거나 의약품 복용 시 전문가와 상담하시기 바랍니다. 2) 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있으니 주의하십시오. 3) 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도하시기 바랍니다. 4) 이상사례 발생 시 섭취를 중단하고 전문가와 상담하시기 바랍니다.",
+      "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 노란 하양색의 분말",
+      "storage": "직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 실온 보관하십시오.",
+      "shelfLife": "제조일로부터 18개월"
+    },
+    "grounding": {
+      "declaredCfu": {
+        "absolute": 2000000000
+      },
+      "declaredAmount": {
+        "value": 20,
+        "unit": "억 CFU",
+        "basisAmount": 2,
+        "basisUnit": "g"
+      },
+      "serving": {
+        "unitType": "stick",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingTotalWeight": null,
+        "servingTotalWeightUnit": null,
+        "servingsPerDay": 1,
+        "servingsPerDayMax": null
+      },
+      "calculationAllowed": false,
+      "ageBandsRaw": null
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">2g당 20억 CFU 이상</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>어린이 생 유산균 키즈 포뮬러 튼튼<small>프로바이오틱스 · 장 건강</small></h1><p class=\"sd-meta\">주식회사 코스팜 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품의 표시 기준은 <b>2g당 20억 CFU 이상</b>입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>이며, <b>1포의 중량은 공식 표기에 없어</b> 단위당 균수는 계산하지 않았습니다. 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 프로바이오틱스를 담았습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>표시 기준: <b>2g당 20억 CFU 이상</b></li><li><b>1포의 중량은 공식 표기에 없어</b> 포당 균수는 따로 계산하지 않았습니다</li><li><b>직접 섭취</b> 가능 — 공식 표기</li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노란 하양색의 분말 · 주식회사 코스팜 제조</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">직접 또는 물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>프로바이오틱스 수</b> 표시량(2,000,000,000(20억) CFU / 2 g) 이상 3</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노란 하양색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 실온 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>하루 한 번으로 관리하고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+      "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">at least 2 billion CFU per 2g</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Kids Formula Live Lactic Acid Bacteria<small>Probiotics · Gut health</small></h1><p class=\"sd-meta\">Made by Cellbiotech · Once a day · 1 stick per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">The labelled standard for this product is at least <b>2 billion CFU per 2g</b>. <b>The weight of one stick is not stated in the official text</b>, so this page does not calculate a per-stick count. Probiotics are recognized by Korea's MFDS as an ingredient that may help promote lactic acid bacteria growth and suppress harmful bacteria, may help support smooth bowel movement, and may help support gut health.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>The labelled standard for this product is at least <b>2 billion CFU per 2g</b></li><li><b>The weight of one stick is not stated in the official text</b>, so this page does not calculate a per-stick count</li><li><b>Can be taken directly</b> — as officially stated</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by Cellbiotech</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">Directly or with water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Probiotic count</b> at least 2 billion CFU per 2g</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 노란 하양색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 실온 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who prefer a once a day routine</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children and follow the stated daily intake · Stop use and consult a professional if adverse effects occur</div></div>"
+    }
+  },
+  {
+    "candidateId": "cp3:c3-10-naturedream-w",
+    "productName": "네이처드림 W 프로바이오틱스",
+    "productNameEn": "Naturedream W Probiotics",
+    "manufacturer": "노비스바이오(주)",
+    "manufacturerEn": null,
+    "statementNo": "20040020041471",
+    "category": "hff",
+    "_bucket": "SPECIAL",
+    "_slug": "c3-10-naturedream-w",
+    "source": {
+      "mainFunction": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+      "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 분홍색의 분말 2. 프로바이오틱스 수 : 표시량(100,000,000(1억) CFU / 2 g) 이상 3. 대장균군 : 음성",
+      "intake": "1일 1회, 1회 1포(2g)를 직접 섭취하십시오.",
+      "caution": "(가) 질환이 있거나 의약품 복용 시 전문가와 상담할 것 (나) 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음 (다) 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도할 것 (라) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+      "dosageForm": "고유의 향미가 있고, 이미, 이취가 없는 분홍색의 분말",
+      "storage": "실온/ 습기와 직사광선을 피하여 서늘한 곳에 보관하십시오. 유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+      "shelfLife": "제조일로부터 18개월까지"
+    },
+    "grounding": {
+      "declaredCfu": {
+        "absolute": 100000000
+      },
+      "declaredAmount": {
+        "value": 1,
+        "unit": "억 CFU",
+        "basisAmount": 2,
+        "basisUnit": "g"
+      },
+      "serving": {
+        "unitType": "stick",
+        "unitWeight": 2,
+        "unitWeightUnit": "g",
+        "unitsPerServing": 1,
+        "servingTotalWeight": null,
+        "servingTotalWeightUnit": null,
+        "servingsPerDay": 1,
+        "servingsPerDayMax": null
+      },
+      "calculationAllowed": true,
+      "ageBandsRaw": null
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">2g당 1억 CFU 이상</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>네이처드림 W 프로바이오틱스<small>프로바이오틱스 · 장 건강</small></h1><p class=\"sd-meta\">노비스바이오(주) 제조 · 1일 1회 1회 1포(2g)</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 표시 기준량 2g과 1회 섭취량이 <b>같습니다</b>. 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 프로바이오틱스를 담았습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>표시 기준량 <b>2g = 1포 = 하루 섭취량</b> — 계산이 필요 없습니다</li><li>1포당 프로바이오틱스 <b>1억 CFU</b></li><li><b>직접 섭취</b> 가능 — 공식 표기</li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고, 이미, 이취가 없는 분홍색의 분말 · 노비스바이오(주) 제조</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포(2g)</span><span class=\"sd-tag\">직접 또는 물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>프로바이오틱스 수</b> 표시량(100,000,000(1억) CFU / 2 g) 이상 3</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고, 이미, 이취가 없는 분홍색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월까지</div><div class=\"sd-item\"><b>보관</b> 실온/ 습기와 직사광선을 피하여 서늘한 곳에 보관하십시오. 유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>하루 한 번으로 관리하고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+      "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">at least 100 million CFU per 2g</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Naturedream W Probiotics<small>Probiotics · Gut health</small></h1><p class=\"sd-meta\">Made by KG&F · Once a day · 1 stick (2 g) per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">The labelled basis of 2g and one serving are <b>the same</b>. Probiotics are recognized by Korea's MFDS as an ingredient that may help promote lactic acid bacteria growth and suppress harmful bacteria, may help support smooth bowel movement, and may help support gut health.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Labelled basis <b>2g = one stick = daily serving</b> — no calculation needed</li><li><b>100 million CFU</b> of probiotics per stick</li><li><b>Can be taken directly</b> — as officially stated</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by KG&F</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick (2 g) per serving</span><span class=\"sd-tag\">Directly or with water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Probiotic count</b> at least 100 million CFU per 2g</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고, 이미, 이취가 없는 분홍색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 18개월까지</div><div class=\"sd-item\"><b>Storage</b> 실온/ 습기와 직사광선을 피하여 서늘한 곳에 보관하십시오. 유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who prefer a once a day routine</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children and follow the stated daily intake · Stop use and consult a professional if adverse effects occur</div></div>"
+    }
+  },
+  {
+    "candidateId": "cp3:c3-11-honhap-cap",
+    "productName": "혼합유산균캡",
+    "productNameEn": "Mixed Lactic Acid Bacteria Cap",
+    "manufacturer": "(주)생명과학",
+    "manufacturerEn": null,
+    "statementNo": "20040020038120",
+    "category": "hff",
+    "_bucket": "MULTI",
+    "_slug": "c3-11-honhap-cap",
+    "source": {
+      "mainFunction": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+      "baseStandard": "①성상: 고유의 향미가 있고 이미 이취가 없는 하양색의 분말이 들어있는 하양색의 불투명한 경질캡슐 ②프로바이오틱스수: 표시량(2,000,000,000(20억)CFU/1,000mg)이상 ③대장균군: 음성 ④붕해시험: 20분이내",
+      "intake": "1일 2회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+      "caution": "1) 질환이 있거나 의약품 복용 시 전문가와 상담할 것. 2) 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음. 3) 어린이가 함부로 섭취하지 않도록 일일 섭취량 방법을 지도할 것. 4) 이상 사례 발생시 섭취를 중단하고 전문가와 상담할 것.",
+      "dosageForm": "고유의 향미가 있고 이미 이취가 없는 하양색의 분말이 들어있는 하양색의 불투명한 경질캡슐",
+      "storage": "제품개봉 후 흡습방지를 위해 뚜껑을 꼭 닫아주십시오. 고온다습, 직사광선을 피하여 건냉한 곳에 보관하십시오. 어린이 손에 닿지않는 곳에 보관하십시오.",
+      "shelfLife": "제조일로부터 2년"
+    },
+    "grounding": {
+      "declaredCfu": {
+        "absolute": 2000000000
+      },
+      "declaredAmount": {
+        "value": 20,
+        "unit": "억 CFU",
+        "basisAmount": 1000,
+        "basisUnit": "mg"
+      },
+      "serving": {
+        "unitType": "capsule",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingTotalWeight": null,
+        "servingTotalWeightUnit": null,
+        "servingsPerDay": 2,
+        "servingsPerDayMax": null
+      },
+      "calculationAllowed": false,
+      "ageBandsRaw": null
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">1000mg당 20억 CFU 이상</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>혼합유산균캡<small>프로바이오틱스 · 장 건강</small></h1><p class=\"sd-meta\">(주)생명과학 제조 · 1일 2회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품의 표시 기준은 <b>1000mg당 20억 CFU 이상</b>입니다. 공식 섭취방법은 <b>1일 2회, 1회 1캡슐</b>이며, <b>1캡슐의 중량은 공식 표기에 없어</b> 단위당 균수는 계산하지 않았습니다. 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 프로바이오틱스를 담았습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>표시 기준: <b>1000mg당 20억 CFU 이상</b></li><li><b>1캡슐의 중량은 공식 표기에 없어</b> 캡슐당 균수는 따로 계산하지 않았습니다</li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미 이취가 없는 하양색의 분말이 들어있는 하양색의 불투명한 경질캡슐 · (주)생명과학 제조</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>프로바이오틱스 수</b> 표시량(2,000,000,000(20억)CFU/1,000mg)이상</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미 이취가 없는 하양색의 분말이 들어있는 하양색의 불투명한 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>보관</b> 제품개봉 후 흡습방지를 위해 뚜껑을 꼭 닫아주십시오. 고온다습, 직사광선을 피하여 건냉한 곳에 보관하십시오. 어린이 손에 닿지않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>하루 2번으로 관리하고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+      "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">at least 2 billion CFU per 1000mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>Mixed Lactic Acid Bacteria Cap<small>Probiotics · Gut health</small></h1><p class=\"sd-meta\">Made by Novarex · 2 times a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">The labelled standard for this product is at least <b>2 billion CFU per 1000mg</b>. <b>The weight of one capsule is not stated in the official text</b>, so this page does not calculate a per-capsule count. Probiotics are recognized by Korea's MFDS as an ingredient that may help promote lactic acid bacteria growth and suppress harmful bacteria, may help support smooth bowel movement, and may help support gut health.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>The labelled standard for this product is at least <b>2 billion CFU per 1000mg</b></li><li><b>The weight of one capsule is not stated in the official text</b>, so this page does not calculate a per-capsule count</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by Novarex</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Probiotic count</b> at least 2 billion CFU per 1000mg</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미 이취가 없는 하양색의 분말이 들어있는 하양색의 불투명한 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>Storage</b> 제품개봉 후 흡습방지를 위해 뚜껑을 꼭 닫아주십시오. 고온다습, 직사광선을 피하여 건냉한 곳에 보관하십시오. 어린이 손에 닿지않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who prefer a 2 times a day routine</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children and follow the stated daily intake · Stop use and consult a professional if adverse effects occur</div></div>"
+    }
+  },
+  {
+    "candidateId": "cp3:c3-12-nuguna",
+    "productName": "누구나건강 프로바이오틱스 유산균",
+    "productNameEn": "Nuguna Health Probiotics",
+    "manufacturer": "바이오디피씨(주)",
+    "manufacturerEn": null,
+    "statementNo": "2023000462486",
+    "category": "hff",
+    "_bucket": "PLAIN",
+    "_slug": "c3-12-nuguna",
+    "source": {
+      "mainFunction": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+      "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 분말 (2) 프로바이오틱스 수 : 표시량(1,000,000,000(10억) CFU / 2 g) 이상 (3) 대장균군 : 음성",
+      "intake": "1일 1회, 1회 1포를 충분한 물과 함께 섭취하십시오.",
+      "caution": "- 질환이 있거나 의약품 복용 시 전문가와 상담하시기 바랍니다. - 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있으니 주의하시기 바랍니다. - 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도하시기 바랍니다. - 이상사례 발생 시 섭취를 중단하고 전문가와 상담하시기 바랍니다.",
+      "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰색의 분말",
+      "storage": "직사광선 및 고온다습한 곳을 피하고 서늘한 곳에 보관하십시오.",
+      "shelfLife": "제조일로부터 18개월까지"
+    },
+    "grounding": {
+      "declaredCfu": {
+        "absolute": 1000000000
+      },
+      "declaredAmount": {
+        "value": 10,
+        "unit": "억 CFU",
+        "basisAmount": 2,
+        "basisUnit": "g"
+      },
+      "serving": {
+        "unitType": "stick",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingTotalWeight": null,
+        "servingTotalWeightUnit": null,
+        "servingsPerDay": 1,
+        "servingsPerDayMax": null
+      },
+      "calculationAllowed": false,
+      "ageBandsRaw": null
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">2g당 10억 CFU 이상</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>누구나건강 프로바이오틱스 유산균<small>프로바이오틱스 · 장 건강</small></h1><p class=\"sd-meta\">바이오디피씨(주) 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품의 표시 기준은 <b>2g당 10억 CFU 이상</b>입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>이며, <b>1포의 중량은 공식 표기에 없어</b> 단위당 균수는 계산하지 않았습니다. 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 프로바이오틱스를 담았습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>표시 기준: <b>2g당 10억 CFU 이상</b></li><li><b>1포의 중량은 공식 표기에 없어</b> 포당 균수는 따로 계산하지 않았습니다</li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰색의 분말 · 바이오디피씨(주) 제조</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>프로바이오틱스 수</b> 표시량(1,000,000,000(10억) CFU / 2 g) 이상 (3)</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월까지</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피하고 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>하루 한 번으로 관리하고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+      "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">at least 1 billion CFU per 2g</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Nuguna Health Probiotics<small>Probiotics · Gut health</small></h1><p class=\"sd-meta\">Made by Bio DPC · Once a day · 1 stick per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">The labelled standard for this product is at least <b>1 billion CFU per 2g</b>. <b>The weight of one stick is not stated in the official text</b>, so this page does not calculate a per-stick count. Probiotics are recognized by Korea's MFDS as an ingredient that may help promote lactic acid bacteria growth and suppress harmful bacteria, may help support smooth bowel movement, and may help support gut health.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>The labelled standard for this product is at least <b>1 billion CFU per 2g</b></li><li><b>The weight of one stick is not stated in the official text</b>, so this page does not calculate a per-stick count</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by Bio DPC</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Probiotic count</b> at least 1 billion CFU per 2g</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 18개월까지</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피하고 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who prefer a once a day routine</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children and follow the stated daily intake · Stop use and consult a professional if adverse effects occur</div></div>"
+    }
+  },
+  {
+    "candidateId": "cp3:c3-13-donga",
+    "productName": "동아 프로바이오틱스",
+    "productNameEn": "Dong-A Probiotics",
+    "manufacturer": "(주)에스엘에스",
+    "manufacturerEn": null,
+    "statementNo": "2004001706274",
+    "category": "hff",
+    "_bucket": "PLAIN",
+    "_slug": "c3-13-donga",
+    "source": {
+      "mainFunction": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+      "baseStandard": "① 성상 : 고유의 향미가 있고 이미·이취가 없는 노랑 하양색의 입자성이 있는 분말 ② 프로바이오틱스수 : 표시량[300,000,000(3억)CFU/2g]이상 ③ 대장균군 : 음성",
+      "intake": "1일 1회, 1회 1포씩 섭취하시기 바랍니다.",
+      "caution": "(가) 질환이 있거나 의약품 복용 시 전문가와 상담할 것 (나) 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음 (다) 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도할 것 (라) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+      "dosageForm": "고유의 향미가 있고 이미·이취가 없는 노랑 하양색의 입자성이 있는 분말",
+      "storage": "직사광선 및 고온다습한 곳을 피해 서늘한 실온에 보관하시고, 어린이 손에 닿지 않도록 보관하십시오.",
+      "shelfLife": "18개월"
+    },
+    "grounding": {
+      "declaredCfu": {
+        "absolute": 300000000
+      },
+      "declaredAmount": {
+        "value": 3,
+        "unit": "억 CFU",
+        "basisAmount": 2,
+        "basisUnit": "g"
+      },
+      "serving": {
+        "unitType": "stick",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingTotalWeight": null,
+        "servingTotalWeightUnit": null,
+        "servingsPerDay": 1,
+        "servingsPerDayMax": null
+      },
+      "calculationAllowed": false,
+      "ageBandsRaw": null
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">2g당 3억 CFU 이상</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>동아 프로바이오틱스<small>프로바이오틱스 · 장 건강</small></h1><p class=\"sd-meta\">(주)에스엘에스 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품의 표시 기준은 <b>2g당 3억 CFU 이상</b>입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>이며, <b>1포의 중량은 공식 표기에 없어</b> 단위당 균수는 계산하지 않았습니다. 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 프로바이오틱스를 담았습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>표시 기준: <b>2g당 3억 CFU 이상</b></li><li><b>1포의 중량은 공식 표기에 없어</b> 포당 균수는 따로 계산하지 않았습니다</li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 노랑 하양색의 입자성이 있는 분말 · (주)에스엘에스 제조</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>프로바이오틱스 수</b> 표시량[300,000,000(3억)CFU/2g]이상</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 노랑 하양색의 입자성이 있는 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 18개월</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피해 서늘한 실온에 보관하시고, 어린이 손에 닿지 않도록 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>하루 한 번으로 관리하고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+      "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">at least 300 million CFU per 2g</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Dong-A Probiotics<small>Probiotics · Gut health</small></h1><p class=\"sd-meta\">Made by Dong-A Pharmaceutical · Once a day · 1 stick per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">The labelled standard for this product is at least <b>300 million CFU per 2g</b>. <b>The weight of one stick is not stated in the official text</b>, so this page does not calculate a per-stick count. Probiotics are recognized by Korea's MFDS as an ingredient that may help promote lactic acid bacteria growth and suppress harmful bacteria, may help support smooth bowel movement, and may help support gut health.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>The labelled standard for this product is at least <b>300 million CFU per 2g</b></li><li><b>The weight of one stick is not stated in the official text</b>, so this page does not calculate a per-stick count</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by Dong-A Pharmaceutical</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Probiotic count</b> at least 300 million CFU per 2g</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 노랑 하양색의 입자성이 있는 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 18개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피해 서늘한 실온에 보관하시고, 어린이 손에 닿지 않도록 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who prefer a once a day routine</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children and follow the stated daily intake · Stop use and consult a professional if adverse effects occur</div></div>"
+    }
+  },
+  {
+    "candidateId": "cp3:c3-14-lactoon-gold",
+    "productName": "락토온 프로바이오틱스 생유산균 골드",
+    "productNameEn": "Lactoon Probiotics Gold",
+    "manufacturer": "동서바이오팜(주) 안성공장",
+    "manufacturerEn": null,
+    "statementNo": "20220011370176",
+    "category": "hff",
+    "_bucket": "PLAIN",
+    "_slug": "c3-14-lactoon-gold",
+    "source": {
+      "mainFunction": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+      "baseStandard": "1) 성상 : 고유의 향미가 있고, 이미, 이취가 없는 하얀색의 분말 2) 프로바이오틱스 수 : 표시량(1억 CFU / 2,500 mg) 이상 3) 대장균군 : 음성",
+      "intake": "1일 1회, 1회 1포를 직접 또는 물과 함께 섭취",
+      "caution": "(가) 질환이 있거나 의약품 복용 시 전문가와 상담할 것 (나) 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음 (다) 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도할 것 (라) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+      "dosageForm": "고유의 향미가 있고, 이미, 이취가 없는 하양색의 분말",
+      "storage": "실온/ 직사광선을 피하여 건조하고 서늘한 곳에서 보관하십시오.",
+      "shelfLife": "제조일로부터 24개월"
+    },
+    "grounding": {
+      "declaredCfu": {
+        "absolute": 100000000
+      },
+      "declaredAmount": {
+        "value": 1,
+        "unit": "억 CFU",
+        "basisAmount": 2500,
+        "basisUnit": "mg"
+      },
+      "serving": {
+        "unitType": "stick",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingTotalWeight": null,
+        "servingTotalWeightUnit": null,
+        "servingsPerDay": 1,
+        "servingsPerDayMax": null
+      },
+      "calculationAllowed": false,
+      "ageBandsRaw": null
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">2500mg당 1억 CFU 이상</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>락토온 프로바이오틱스 생유산균 골드<small>프로바이오틱스 · 장 건강</small></h1><p class=\"sd-meta\">동서바이오팜(주) 안성공장 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품의 표시 기준은 <b>2500mg당 1억 CFU 이상</b>입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>이며, <b>1포의 중량은 공식 표기에 없어</b> 단위당 균수는 계산하지 않았습니다. 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 프로바이오틱스를 담았습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>표시 기준: <b>2500mg당 1억 CFU 이상</b></li><li><b>1포의 중량은 공식 표기에 없어</b> 포당 균수는 따로 계산하지 않았습니다</li><li><b>직접 섭취</b> 가능 — 공식 표기</li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고, 이미, 이취가 없는 하양색의 분말 · 동서바이오팜(주) 안성공장 제조</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">직접 또는 물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>프로바이오틱스 수</b> 표시량(1억 CFU / 2,500 mg) 이상 3)</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고, 이미, 이취가 없는 하양색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온/ 직사광선을 피하여 건조하고 서늘한 곳에서 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>하루 한 번으로 관리하고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+      "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">at least 100 million CFU per 2500mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Lactoon Probiotics Gold<small>Probiotics · Gut health</small></h1><p class=\"sd-meta\">Made by Lactoon · Once a day · 1 stick per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">The labelled standard for this product is at least <b>100 million CFU per 2500mg</b>. <b>The weight of one stick is not stated in the official text</b>, so this page does not calculate a per-stick count. Probiotics are recognized by Korea's MFDS as an ingredient that may help promote lactic acid bacteria growth and suppress harmful bacteria, may help support smooth bowel movement, and may help support gut health.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>The labelled standard for this product is at least <b>100 million CFU per 2500mg</b></li><li><b>The weight of one stick is not stated in the official text</b>, so this page does not calculate a per-stick count</li><li><b>Can be taken directly</b> — as officially stated</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by Lactoon</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">Directly or with water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Probiotic count</b> at least 100 million CFU per 2500mg</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고, 이미, 이취가 없는 하양색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온/ 직사광선을 피하여 건조하고 서늘한 곳에서 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who prefer a once a day routine</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children and follow the stated daily intake · Stop use and consult a professional if adverse effects occur</div></div>"
+    }
+  },
+  {
+    "candidateId": "cp3:c3-15-boryung",
+    "productName": "보령닥터클린유산균",
+    "productNameEn": "Boryung Dr. Clean Lactic Acid Bacteria",
+    "manufacturer": "주식회사 다원바이오텍",
+    "manufacturerEn": null,
+    "statementNo": "2004001704682",
+    "category": "hff",
+    "_bucket": "PLAIN",
+    "_slug": "c3-15-boryung",
+    "source": {
+      "mainFunction": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+      "baseStandard": "1) 성 상 : 이미, 이취가 없고 고유의 향미가 있는 흰색의 분말 2) 프로바이오틱스 수 : 표시량 (100,000,000cfu/2.0g) 이상 3) 대장균군 : 음성",
+      "intake": "1일 1회, 1회 1포를 충분한 물과 함께 섭취하십시오.",
+      "caution": "1. 질환이 있거나 의약품 복용 시 전문가와 상담하십시오. 2. 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있습니다. 3. 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도하십시오. 4. 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오. 5. 섭취시 뜨거운 음식과 함께 섭취하지 마십시오. 6. 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하시기 바랍니다.",
+      "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 흰색의 분말",
+      "storage": "직사광선을 피하여 서늘한 곳에 보관하시고 습기를 피하여 주십시오.",
+      "shelfLife": "제조일로부터 24개월"
+    },
+    "grounding": {
+      "declaredCfu": {
+        "absolute": 100000000
+      },
+      "declaredAmount": {
+        "value": 1,
+        "unit": "억 CFU",
+        "basisAmount": 2,
+        "basisUnit": "g"
+      },
+      "serving": {
+        "unitType": "stick",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingTotalWeight": null,
+        "servingTotalWeightUnit": null,
+        "servingsPerDay": 1,
+        "servingsPerDayMax": null
+      },
+      "calculationAllowed": false,
+      "ageBandsRaw": null
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">2g당 1억 CFU 이상</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>보령닥터클린유산균<small>프로바이오틱스 · 장 건강</small></h1><p class=\"sd-meta\">주식회사 다원바이오텍 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품의 표시 기준은 <b>2g당 1억 CFU 이상</b>입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>이며, <b>1포의 중량은 공식 표기에 없어</b> 단위당 균수는 계산하지 않았습니다. 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 프로바이오틱스를 담았습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>표시 기준: <b>2g당 1억 CFU 이상</b></li><li><b>1포의 중량은 공식 표기에 없어</b> 포당 균수는 따로 계산하지 않았습니다</li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 흰색의 분말 · 주식회사 다원바이오텍 제조</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>프로바이오틱스 수</b> 표시량 (100,000,000cfu/2.0g) 이상 3)</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 흰색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하여 서늘한 곳에 보관하시고 습기를 피하여 주십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>하루 한 번으로 관리하고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+      "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">at least 100 million CFU per 2g</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Boryung Dr. Clean Lactic Acid Bacteria<small>Probiotics · Gut health</small></h1><p class=\"sd-meta\">Made by Boryung · Once a day · 1 stick per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">The labelled standard for this product is at least <b>100 million CFU per 2g</b>. <b>The weight of one stick is not stated in the official text</b>, so this page does not calculate a per-stick count. Probiotics are recognized by Korea's MFDS as an ingredient that may help promote lactic acid bacteria growth and suppress harmful bacteria, may help support smooth bowel movement, and may help support gut health.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>The labelled standard for this product is at least <b>100 million CFU per 2g</b></li><li><b>The weight of one stick is not stated in the official text</b>, so this page does not calculate a per-stick count</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by Boryung</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Probiotic count</b> at least 100 million CFU per 2g</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 흰색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하여 서늘한 곳에 보관하시고 습기를 피하여 주십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who prefer a once a day routine</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children and follow the stated daily intake · Stop use and consult a professional if adverse effects occur</div></div>"
+    }
+  },
+  {
+    "candidateId": "cp3:c3-16-jangcare",
+    "productName": "장케어 프로바이오틱스",
+    "productNameEn": "Jang Care Probiotics",
+    "manufacturer": "(주)웰레스트",
+    "manufacturerEn": null,
+    "statementNo": "20230029284162",
+    "category": "hff",
+    "_bucket": "PLAIN",
+    "_slug": "c3-16-jangcare",
+    "source": {
+      "mainFunction": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+      "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 하얀색 분말 2) 대장균군 : 음성 3) 프로바이오틱스 수 : 표시량(100,000,000(1억) cfu/ 2g) 이상",
+      "intake": "1일 1회, 1회 1포를 직접 혹은 물과 함께 섭취",
+      "caution": "1) 질환이 있거나 의약품 복용 시 전문가와 상담할 것 2) 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음 3) 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도할 것 4) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것 5) 알레르기, 특이체질이신 경우 성분을 확인하신 후 섭취하시기 바랍니다. 6) 제품 개봉 또는 섭취 시, 포장재에 의해 상처를 입으실 수 있으니 주의하시기 바랍니다.",
+      "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 하얀색 분말",
+      "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.",
+      "shelfLife": "18개월"
+    },
+    "grounding": {
+      "declaredCfu": {
+        "absolute": 100000000
+      },
+      "declaredAmount": {
+        "value": 1,
+        "unit": "억 CFU",
+        "basisAmount": 2,
+        "basisUnit": "g"
+      },
+      "serving": {
+        "unitType": "stick",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingTotalWeight": null,
+        "servingTotalWeightUnit": null,
+        "servingsPerDay": 1,
+        "servingsPerDayMax": null
+      },
+      "calculationAllowed": false,
+      "ageBandsRaw": null
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">2g당 1억 CFU 이상</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>장케어 프로바이오틱스<small>프로바이오틱스 · 장 건강</small></h1><p class=\"sd-meta\">(주)웰레스트 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품의 표시 기준은 <b>2g당 1억 CFU 이상</b>입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>이며, <b>1포의 중량은 공식 표기에 없어</b> 단위당 균수는 계산하지 않았습니다. 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 프로바이오틱스를 담았습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>표시 기준: <b>2g당 1억 CFU 이상</b></li><li><b>1포의 중량은 공식 표기에 없어</b> 포당 균수는 따로 계산하지 않았습니다</li><li><b>직접 섭취</b> 가능 — 공식 표기</li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 하얀색 분말 · (주)웰레스트 제조</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">직접 또는 물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>프로바이오틱스 수</b> 표시량(100,000,000(1억) cfu/ 2g) 이상</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 하얀색 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 18개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>하루 한 번으로 관리하고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+      "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">at least 100 million CFU per 2g</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Jang Care Probiotics<small>Probiotics · Gut health</small></h1><p class=\"sd-meta\">Made by Wellrest · Once a day · 1 stick per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">The labelled standard for this product is at least <b>100 million CFU per 2g</b>. <b>The weight of one stick is not stated in the official text</b>, so this page does not calculate a per-stick count. Probiotics are recognized by Korea's MFDS as an ingredient that may help promote lactic acid bacteria growth and suppress harmful bacteria, may help support smooth bowel movement, and may help support gut health.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>The labelled standard for this product is at least <b>100 million CFU per 2g</b></li><li><b>The weight of one stick is not stated in the official text</b>, so this page does not calculate a per-stick count</li><li><b>Can be taken directly</b> — as officially stated</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by Wellrest</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">Directly or with water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Probiotic count</b> at least 100 million CFU per 2g</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 하얀색 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 18개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who prefer a once a day routine</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children and follow the stated daily intake · Stop use and consult a professional if adverse effects occur</div></div>"
+    }
+  },
+  {
+    "candidateId": "cp3:c3-17-jinrak-k",
+    "productName": "진락혼합유산균K",
+    "productNameEn": "Jinrak Mixed Lactic Acid Bacteria K",
+    "manufacturer": "구안산업(주)금산공장",
+    "manufacturerEn": null,
+    "statementNo": "20040020039141",
+    "category": "hff",
+    "_bucket": "PLAIN",
+    "_slug": "c3-17-jinrak-k",
+    "source": {
+      "mainFunction": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+      "baseStandard": "1) 성상 : 고유의 향미를 가지며 이미, 이취가 없는 흰 노랑색의 분말 2) 프로바이오틱스 수 : 표시량[3,000,000,000CFU(30억)/3g]이상 3) 대장균군 : 음성",
+      "intake": "1일 1회, 1회 1포(3g)씩 섭취하세요.",
+      "caution": "(가) 질환이 있거나 의약품 복용 시 전문가와 상담할 것 (나) 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음 (다) 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도할 것 (라) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+      "dosageForm": "고유의 향미를 가지며 이미, 이취가 없는 흰 노랑색의 분말",
+      "storage": "실온보관. 직사광선을 피하여 서늘한 곳에 보관하세요.",
+      "shelfLife": "제조일로부터 18개월"
+    },
+    "grounding": {
+      "declaredCfu": {
+        "absolute": 3000000000
+      },
+      "declaredAmount": {
+        "value": 30,
+        "unit": "억 CFU",
+        "basisAmount": 3,
+        "basisUnit": "g"
+      },
+      "serving": {
+        "unitType": "stick",
+        "unitWeight": 3,
+        "unitWeightUnit": "g",
+        "unitsPerServing": 1,
+        "servingTotalWeight": null,
+        "servingTotalWeightUnit": null,
+        "servingsPerDay": 1,
+        "servingsPerDayMax": null
+      },
+      "calculationAllowed": true,
+      "ageBandsRaw": null
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">3g당 30억 CFU 이상</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>진락혼합유산균K<small>프로바이오틱스 · 장 건강</small></h1><p class=\"sd-meta\">구안산업(주)금산공장 제조 · 1일 1회 1회 1포(3g)</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 표시 기준량 3g과 1회 섭취량이 <b>같습니다</b>. 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 프로바이오틱스를 담았습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>표시 기준량 <b>3g = 1포 = 하루 섭취량</b> — 계산이 필요 없습니다</li><li>1포당 프로바이오틱스 <b>30억 CFU</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 가지며 이미, 이취가 없는 흰 노랑색의 분말 · 구안산업(주)금산공장 제조</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포(3g)</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>프로바이오틱스 수</b> 표시량[3,000,000,000CFU(30억)/3g]이상 3)</div><div class=\"sd-item\"><b>성상</b> 고유의 향미를 가지며 이미, 이취가 없는 흰 노랑색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>보관</b> 실온보관. 직사광선을 피하여 서늘한 곳에 보관하세요.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>하루 한 번으로 관리하고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+      "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">at least 3 billion CFU per 3g</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Jinrak Mixed Lactic Acid Bacteria K<small>Probiotics · Gut health</small></h1><p class=\"sd-meta\">Made by Jinrak · Once a day · 1 stick (3 g) per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">The labelled basis of 3g and one serving are <b>the same</b>. Probiotics are recognized by Korea's MFDS as an ingredient that may help promote lactic acid bacteria growth and suppress harmful bacteria, may help support smooth bowel movement, and may help support gut health.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Labelled basis <b>3g = one stick = daily serving</b> — no calculation needed</li><li><b>3 billion CFU</b> of probiotics per stick</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by Jinrak</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick (3 g) per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Probiotic count</b> at least 3 billion CFU per 3g</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미를 가지며 이미, 이취가 없는 흰 노랑색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>Storage</b> 실온보관. 직사광선을 피하여 서늘한 곳에 보관하세요.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who prefer a once a day routine</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children and follow the stated daily intake · Stop use and consult a professional if adverse effects occur</div></div>"
+    }
+  },
+  {
+    "candidateId": "cp3:c3-18-premium-17",
+    "productName": "프리미엄 유산균 17",
+    "productNameEn": "Premium Lactic Acid Bacteria 17",
+    "manufacturer": "(주)유디바이오",
+    "manufacturerEn": null,
+    "statementNo": "2020001635455",
+    "category": "hff",
+    "_bucket": "PLAIN",
+    "_slug": "c3-18-premium-17",
+    "source": {
+      "mainFunction": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+      "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰보라색의 분말 2. 프로바이오틱스 수 : 표시량[500,000,000(5억)CFU/2g] 이상 3. 대장균군 : 음성",
+      "intake": "1일 1회, 1회 1포를 그대로 섭취하십시오.",
+      "caution": "(가) 질환이 있거나 의약품 복용 시 전문가와 상담할 것 (나) 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음 (다) 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도할 것 (라) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+      "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰보라색의 분말",
+      "storage": "습기와 직사광선을 피하여 실온에 보관하십시오",
+      "shelfLife": "제조일로부터 18개월"
+    },
+    "grounding": {
+      "declaredCfu": {
+        "absolute": 500000000
+      },
+      "declaredAmount": {
+        "value": 5,
+        "unit": "억 CFU",
+        "basisAmount": 2,
+        "basisUnit": "g"
+      },
+      "serving": {
+        "unitType": "stick",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingTotalWeight": null,
+        "servingTotalWeightUnit": null,
+        "servingsPerDay": 1,
+        "servingsPerDayMax": null
+      },
+      "calculationAllowed": false,
+      "ageBandsRaw": null
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">2g당 5억 CFU 이상</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>프리미엄 유산균 17<small>프로바이오틱스 · 장 건강</small></h1><p class=\"sd-meta\">(주)유디바이오 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품의 표시 기준은 <b>2g당 5억 CFU 이상</b>입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>이며, <b>1포의 중량은 공식 표기에 없어</b> 단위당 균수는 계산하지 않았습니다. 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 프로바이오틱스를 담았습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>표시 기준: <b>2g당 5억 CFU 이상</b></li><li><b>1포의 중량은 공식 표기에 없어</b> 포당 균수는 따로 계산하지 않았습니다</li><li><b>직접 섭취</b> 가능 — 공식 표기</li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰보라색의 분말 · (주)유디바이오 제조</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">직접 또는 물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>프로바이오틱스 수</b> 표시량[500,000,000(5억)CFU/2g] 이상 3</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰보라색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>보관</b> 습기와 직사광선을 피하여 실온에 보관하십시오</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>하루 한 번으로 관리하고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+      "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">at least 500 million CFU per 2g</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Premium Lactic Acid Bacteria 17<small>Probiotics · Gut health</small></h1><p class=\"sd-meta\">Made by UD Bio · Once a day · 1 stick per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">The labelled standard for this product is at least <b>500 million CFU per 2g</b>. <b>The weight of one stick is not stated in the official text</b>, so this page does not calculate a per-stick count. Probiotics are recognized by Korea's MFDS as an ingredient that may help promote lactic acid bacteria growth and suppress harmful bacteria, may help support smooth bowel movement, and may help support gut health.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>The labelled standard for this product is at least <b>500 million CFU per 2g</b></li><li><b>The weight of one stick is not stated in the official text</b>, so this page does not calculate a per-stick count</li><li><b>Can be taken directly</b> — as officially stated</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by UD Bio</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">Directly or with water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Probiotic count</b> at least 500 million CFU per 2g</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰보라색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>Storage</b> 습기와 직사광선을 피하여 실온에 보관하십시오</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who prefer a once a day routine</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children and follow the stated daily intake · Stop use and consult a professional if adverse effects occur</div></div>"
+    }
+  },
+  {
+    "candidateId": "cp3:c3-19-health365",
+    "productName": "건강프로젝트 365 프로바이오틱스",
+    "productNameEn": "Health Project 365 Probiotics",
+    "manufacturer": "(주)메디오젠 충주공장",
+    "manufacturerEn": null,
+    "statementNo": "20180012174491",
+    "category": "hff",
+    "_bucket": "PLAIN",
+    "_slug": "c3-19-health365",
+    "source": {
+      "mainFunction": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+      "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰노란색의 분말을 함유한 투명 경질 캡슐 2. 프로바이오틱스 수 : 표시량{2,000,000,000(20억)CFU/500mg} 이상 3. 대장균군 : 음성 4. 붕해 : 적합(20분 이내)",
+      "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+      "caution": "(가) 질환이 있거나 의약품 복용 시 전문가와 상담할 것 (나) 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음 (다) 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도할 것 (라) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+      "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰노란색의 분말을 함유한 투명 경질 캡슐",
+      "storage": "직사광선 및 고온다습한 곳을 피해 실온에 보관하십시오.",
+      "shelfLife": "제조일로부터 18개월까지"
+    },
+    "grounding": {
+      "declaredCfu": {
+        "absolute": 2000000000
+      },
+      "declaredAmount": {
+        "value": 20,
+        "unit": "억 CFU",
+        "basisAmount": 500,
+        "basisUnit": "mg"
+      },
+      "serving": {
+        "unitType": "capsule",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingTotalWeight": null,
+        "servingTotalWeightUnit": null,
+        "servingsPerDay": 1,
+        "servingsPerDayMax": null
+      },
+      "calculationAllowed": false,
+      "ageBandsRaw": null
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">500mg당 20억 CFU 이상</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>건강프로젝트 365 프로바이오틱스<small>프로바이오틱스 · 장 건강</small></h1><p class=\"sd-meta\">(주)메디오젠 충주공장 제조 · 1일 1회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품의 표시 기준은 <b>500mg당 20억 CFU 이상</b>입니다. 공식 섭취방법은 <b>1일 1회, 1회 1캡슐</b>이며, <b>1캡슐의 중량은 공식 표기에 없어</b> 단위당 균수는 계산하지 않았습니다. 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 프로바이오틱스를 담았습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>표시 기준: <b>500mg당 20억 CFU 이상</b></li><li><b>1캡슐의 중량은 공식 표기에 없어</b> 캡슐당 균수는 따로 계산하지 않았습니다</li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰노란색의 분말을 함유한 투명 경질 캡슐 · (주)메디오젠 충주공장 제조</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>프로바이오틱스 수</b> 표시량{2,000,000,000(20억)CFU/500mg} 이상 3</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰노란색의 분말을 함유한 투명 경질 캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월까지</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피해 실온에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>하루 한 번으로 관리하고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+      "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">at least 2 billion CFU per 500mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Health Project 365 Probiotics<small>Probiotics · Gut health</small></h1><p class=\"sd-meta\">Made by Mediogen · Once a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">The labelled standard for this product is at least <b>2 billion CFU per 500mg</b>. <b>The weight of one capsule is not stated in the official text</b>, so this page does not calculate a per-capsule count. Probiotics are recognized by Korea's MFDS as an ingredient that may help promote lactic acid bacteria growth and suppress harmful bacteria, may help support smooth bowel movement, and may help support gut health.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>The labelled standard for this product is at least <b>2 billion CFU per 500mg</b></li><li><b>The weight of one capsule is not stated in the official text</b>, so this page does not calculate a per-capsule count</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by Mediogen</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Probiotic count</b> at least 2 billion CFU per 500mg</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰노란색의 분말을 함유한 투명 경질 캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 18개월까지</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피해 실온에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who prefer a once a day routine</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children and follow the stated daily intake · Stop use and consult a professional if adverse effects occur</div></div>"
+    }
+  }
+]

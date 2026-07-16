@@ -1,0 +1,12 @@
+[
+  {
+    "candidateId": "cp3-hold:201200180223",
+    "productName": "신프로바이오틱스",
+    "manufacturer": "재단법인 경북바이오산업연구원 바이오벤처프라자",
+    "statementNo": "201200180223",
+    "holdCode": "HOLD_GROUNDING",
+    "reason": "BASE_STANDARD 가 \"표시량 이상\" 뿐 — 표시 CFU·기준량이 **원문에 없다**. 근거 부재로 제작 불가(원문 보완 전까지).",
+    "baseStandard": "(1) 성상 : 고유의 색택과 향미를 가지며 이미·이취가 없어야 함 (2) 프로바이오틱스 수 : 표시량 이상 (3) 대장균군 : 음성",
+    "intake": "1일 1회, 1회 1포 섭취"
+  }
+]

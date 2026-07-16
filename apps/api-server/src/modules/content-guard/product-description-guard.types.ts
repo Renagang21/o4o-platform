@@ -173,6 +173,12 @@ export interface DeclaredCfu {
 export interface GuardProductInput {
   candidateId: string;
   productName: string;
+  /**
+   * 영문 제품명(음역). 공식 영문명은 원천에 없으므로 **작성자가 정한 표기**를 그대로 받는다.
+   * 가드는 이 값을 **창작하지 않고**, 제품명 표기를 최상급 주장으로 오인하지 않는 데만 쓴다.
+   * 실측(CP3): "Premium Lactic Acid Bacteria 17" 의 Premium 은 제품명이지 주장이 아니다.
+   */
+  productNameEn?: string;
   /** 공식 제조사명(ENTRPS, 한국어 법인명) */
   manufacturer: string;
   /**

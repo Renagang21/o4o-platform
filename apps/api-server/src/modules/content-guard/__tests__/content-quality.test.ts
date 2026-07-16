@@ -104,3 +104,33 @@ describe('Q-4 유사 구두점 잔존 (SSOT)', () => {
     expect(new RegExp(MID_DOT_CLASS).test('ㆍ')).toBe(true);
   });
 });
+
+// CP3 실측 — 제품명·원문 인용은 우리 주장이 아니다. 단 **완화가 검출력을 깎으면 안 된다**(쌍으로 고정).
+describe('B-SUPERLATIVE — 제품명·원문 인용 제외 (CP3)', () => {
+  const base = {
+    ...OK_VIVA_FULL_BASIS,
+    productName: '프리미엄 유산균 17',
+    source: { ...OK_VIVA_FULL_BASIS.source, storage: '개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.' },
+  };
+  const ko = (x: string) => ({ ...base, drafts: { ko: `<p>${x}</p>`, en: '<p>x</p>' } });
+
+  it('제품명 안의 "프리미엄" 은 최상급 주장이 아니다', () => {
+    const r = runGuard(ko('프리미엄 유산균 17 은 2g당 5억 CFU 이상입니다.'), { phase: 'post' });
+    expect(r.findings.some((f) => f.ruleId === 'B-SUPERLATIVE-001' && f.status === 'BLOCKED')).toBe(false);
+  });
+
+  it('원문 보관 조건 인용 안의 "최대한" 은 주장이 아니다', () => {
+    const r = runGuard(ko('보관: 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.'), { phase: 'post' });
+    expect(r.findings.some((f) => f.ruleId === 'B-SUPERLATIVE-001' && f.status === 'BLOCKED')).toBe(false);
+  });
+
+  it('**우리가 만든** 최상급 주장은 여전히 BLOCKED (미탐 방지)', () => {
+    const r = runGuard(ko('이 그룹에서 가장 균수가 많은 제품입니다.'), { phase: 'post' });
+    expect(r.findings.some((f) => f.ruleId === 'B-SUPERLATIVE-001' && f.status === 'BLOCKED')).toBe(true);
+  });
+
+  it('제품명 밖에서 프리미엄을 주장하면 BLOCKED', () => {
+    const r = runGuard(ko('타사 대비 프리미엄 원료를 썼습니다.'), { phase: 'post' });
+    expect(r.findings.some((f) => f.ruleId === 'B-SUPERLATIVE-001' && f.status === 'BLOCKED')).toBe(true);
+  });
+});
