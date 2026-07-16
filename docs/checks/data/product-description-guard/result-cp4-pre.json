@@ -1,0 +1,1190 @@
+{
+  "guardVersion": "product-description-guard@1.1.0",
+  "totalProducts": 20,
+  "pass": 20,
+  "reviewRequired": 0,
+  "blocked": 0,
+  "findingsByRule": {},
+  "products": [
+    {
+      "candidateId": "cp4:c4-01-kids-strawberry",
+      "productName": "프로바이오틱스 키즈 딸기맛",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "NOT_APPLICABLE",
+      "koEnStatus": "NOT_APPLICABLE",
+      "overallStatus": "PASS",
+      "blockedCount": 0,
+      "reviewCount": 0,
+      "passCount": 2,
+      "precheckInfoCount": 2,
+      "findings": [
+        {
+          "ruleId": "PRE-SRC-CFU-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredCfu",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1) 성상: 고유의 향미가 있고 이미·이취가 없는 연한 분홍색의 분말 2) 프로바이오틱스 수: 표시량(250,000,000(2…",
+          "message": "표시량(CFU): 원문과 일치 (2.5억)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-SRC-BASIS-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredAmount",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1) 성상: 고유의 향미가 있고 이미·이취가 없는 연한 분홍색의 분말 2) 프로바이오틱스 수: 표시량(250,000,000(2…",
+          "message": "표시 기준량(mg 환산): 원문과 일치 (/2 g)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-A-BASIS-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1) 성상: 고유의 향미가 있고 이미·이취가 없는 연한 분홍색의 분말 2) 프로바이오틱스 수: 표시량(250,000,000(2.5억) CFU/2… | SRV_USE: 1일 1회, 1회 1포씩 입안에서 녹여서 섭취하십시오.",
+          "message": "환산 불가(1회 섭취 중량이 공식 원문에 없음(1단위 중량·1회 총중량 모두 부재)) → **작성 전 생성 금지 목록**: per serving · per stick · per capsule · daily total",
+          "suggestedAction": "표시 기준량만 기술하십시오. 1단위당·1일 총량 수치는 만들지 마십시오."
+        },
+        {
+          "ruleId": "PRE-F-AGE-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding.ageBandsRaw",
+          "matchedText": null,
+          "sourceEvidence": "SRV_USE: 1일 1회, 1회 1포씩 입안에서 녹여서 섭취하십시오.",
+          "message": "원문에 연령별 섭취량 없음 → **어린이·가족 대상 소구 금지**(제품명에 키즈가 있어도)",
+          "suggestedAction": "대상 연령 주장을 쓰지 마십시오."
+        }
+      ]
+    },
+    {
+      "candidateId": "cp4:c4-02-corereset",
+      "productName": "코어리셋 옴니바이오틱스 캡슐",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "NOT_APPLICABLE",
+      "koEnStatus": "NOT_APPLICABLE",
+      "overallStatus": "PASS",
+      "blockedCount": 0,
+      "reviewCount": 0,
+      "passCount": 2,
+      "precheckInfoCount": 2,
+      "findings": [
+        {
+          "ruleId": "PRE-SRC-CFU-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredCfu",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: (1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 노란색, 연두색의 입자성이 있는 밝은 회황색의 내용물을 함유한 투명한 …",
+          "message": "표시량(CFU): 원문과 일치 (2,000,000,000 CFU)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-SRC-BASIS-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredAmount",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: (1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 노란색, 연두색의 입자성이 있는 밝은 회황색의 내용물을 함유한 투명한 …",
+          "message": "표시 기준량(mg 환산): 원문과 일치 (/1g)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-A-BASIS-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: (1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 노란색, 연두색의 입자성이 있는 밝은 회황색의 내용물을 함유한 투명한 경질캡슐 (2) 프… | SRV_USE: 1일 2회, 1회 1캡슐(0.5g) 또는 1일 1회, 1회 2캡슐(1g)을 충분한 물과 함께 섭취하십시오.",
+          "message": "환산 허용 — 1단위 undefined / 1일 총 2,000,000,000 (기준량=daily)",
+          "suggestedAction": "계산값과 다른 수치를 쓰지 마십시오."
+        },
+        {
+          "ruleId": "PRE-F-AGE-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding.ageBandsRaw",
+          "matchedText": null,
+          "sourceEvidence": "SRV_USE: 1일 2회, 1회 1캡슐(0.5g) 또는 1일 1회, 1회 2캡슐(1g)을 충분한 물과 함께 섭취하십시오.",
+          "message": "원문에 연령별 섭취량 없음 → **어린이·가족 대상 소구 금지**(제품명에 키즈가 있어도)",
+          "suggestedAction": "대상 연령 주장을 쓰지 마십시오."
+        }
+      ]
+    },
+    {
+      "candidateId": "cp4:c4-03-mogertium",
+      "productName": "모거티움",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "NOT_APPLICABLE",
+      "koEnStatus": "NOT_APPLICABLE",
+      "overallStatus": "PASS",
+      "blockedCount": 0,
+      "reviewCount": 0,
+      "passCount": 2,
+      "precheckInfoCount": 2,
+      "findings": [
+        {
+          "ruleId": "PRE-SRC-CFU-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredCfu",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 흐린 황갈색의 내용물을 함유한 갈색의 장용성 경질캡슐 2. 프로바이오틱스…",
+          "message": "표시량(CFU): 원문과 일치 (1억)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-SRC-BASIS-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredAmount",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 흐린 황갈색의 내용물을 함유한 갈색의 장용성 경질캡슐 2. 프로바이오틱스…",
+          "message": "표시 기준량(mg 환산): 원문과 일치 (/900mg)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-A-BASIS-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 흐린 황갈색의 내용물을 함유한 갈색의 장용성 경질캡슐 2. 프로바이오틱스 수: 표시량[10… | SRV_USE: 1일 1회, 1회 2캡슐(900mg)을 충분한 물과 함께 섭취하십시오",
+          "message": "환산 허용 — 1단위 undefined / 1일 총 100,000,000 (기준량=daily)",
+          "suggestedAction": "계산값과 다른 수치를 쓰지 마십시오."
+        },
+        {
+          "ruleId": "PRE-F-AGE-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding.ageBandsRaw",
+          "matchedText": null,
+          "sourceEvidence": "SRV_USE: 1일 1회, 1회 2캡슐(900mg)을 충분한 물과 함께 섭취하십시오",
+          "message": "원문에 연령별 섭취량 없음 → **어린이·가족 대상 소구 금지**(제품명에 키즈가 있어도)",
+          "suggestedAction": "대상 연령 주장을 쓰지 마십시오."
+        }
+      ]
+    },
+    {
+      "candidateId": "cp4:c4-04-lacfidus",
+      "productName": "락피더스",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "NOT_APPLICABLE",
+      "koEnStatus": "NOT_APPLICABLE",
+      "overallStatus": "PASS",
+      "blockedCount": 0,
+      "reviewCount": 0,
+      "passCount": 2,
+      "precheckInfoCount": 2,
+      "findings": [
+        {
+          "ruleId": "PRE-SRC-CFU-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredCfu",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1) 성상: 고유의 향미가 있고 이미∙이취가 없는 노랑 하양 또는 흐린 노랑색의 입자성이 있는 분말 2) 대장균군: 음성 3)…",
+          "message": "표시량(CFU): 원문과 일치 (1.0x10^10)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-SRC-BASIS-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredAmount",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1) 성상: 고유의 향미가 있고 이미∙이취가 없는 노랑 하양 또는 흐린 노랑색의 입자성이 있는 분말 2) 대장균군: 음성 3)…",
+          "message": "표시 기준량(mg 환산): 원문과 일치 (/ 2000mg)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-A-BASIS-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1) 성상: 고유의 향미가 있고 이미∙이취가 없는 노랑 하양 또는 흐린 노랑색의 입자성이 있는 분말 2) 대장균군: 음성 3) 프로바이오틱스 :… | SRV_USE: 1일 1회, 1회 1포를 직접 또는 물과 함께 섭취하십시오.",
+          "message": "환산 불가(1회 섭취 중량이 공식 원문에 없음(1단위 중량·1회 총중량 모두 부재)) → **작성 전 생성 금지 목록**: per serving · per stick · per capsule · daily total",
+          "suggestedAction": "표시 기준량만 기술하십시오. 1단위당·1일 총량 수치는 만들지 마십시오."
+        },
+        {
+          "ruleId": "PRE-F-AGE-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding.ageBandsRaw",
+          "matchedText": null,
+          "sourceEvidence": "SRV_USE: 1일 1회, 1회 1포를 직접 또는 물과 함께 섭취하십시오.",
+          "message": "원문에 연령별 섭취량 없음 → **어린이·가족 대상 소구 금지**(제품명에 키즈가 있어도)",
+          "suggestedAction": "대상 연령 주장을 쓰지 마십시오."
+        }
+      ]
+    },
+    {
+      "candidateId": "cp4:c4-05-jangnae-17",
+      "productName": "장내희망 프로바이오틱스 17종",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "NOT_APPLICABLE",
+      "koEnStatus": "NOT_APPLICABLE",
+      "overallStatus": "PASS",
+      "blockedCount": 0,
+      "reviewCount": 0,
+      "passCount": 2,
+      "precheckInfoCount": 2,
+      "findings": [
+        {
+          "ruleId": "PRE-SRC-CFU-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredCfu",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1) 성상 : 고유의 향미가 있고 이미·이취가 없는 연분홍색의 입자성이 있는 분말 2) 프로바이오틱스 수 : 표시량(1*10^…",
+          "message": "표시량(CFU): 원문과 일치 (1*10^8)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-SRC-BASIS-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredAmount",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1) 성상 : 고유의 향미가 있고 이미·이취가 없는 연분홍색의 입자성이 있는 분말 2) 프로바이오틱스 수 : 표시량(1*10^…",
+          "message": "표시 기준량(mg 환산): 원문과 일치 (/1.5g)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-A-BASIS-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1) 성상 : 고유의 향미가 있고 이미·이취가 없는 연분홍색의 입자성이 있는 분말 2) 프로바이오틱스 수 : 표시량(1*10^8 CUF/1.5g… | SRV_USE: 1일 1회, 1회 1포를 그대로 섭취하십시오.",
+          "message": "환산 불가(1회 섭취 중량이 공식 원문에 없음(1단위 중량·1회 총중량 모두 부재)) → **작성 전 생성 금지 목록**: per serving · per stick · per capsule · daily total",
+          "suggestedAction": "표시 기준량만 기술하십시오. 1단위당·1일 총량 수치는 만들지 마십시오."
+        },
+        {
+          "ruleId": "PRE-F-AGE-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding.ageBandsRaw",
+          "matchedText": null,
+          "sourceEvidence": "SRV_USE: 1일 1회, 1회 1포를 그대로 섭취하십시오.",
+          "message": "원문에 연령별 섭취량 없음 → **어린이·가족 대상 소구 금지**(제품명에 키즈가 있어도)",
+          "suggestedAction": "대상 연령 주장을 쓰지 마십시오."
+        }
+      ]
+    },
+    {
+      "candidateId": "cp4:c4-06-lactobegin",
+      "productName": "락토비긴 프로바이오틱스",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "NOT_APPLICABLE",
+      "koEnStatus": "NOT_APPLICABLE",
+      "overallStatus": "PASS",
+      "blockedCount": 0,
+      "reviewCount": 0,
+      "passCount": 2,
+      "precheckInfoCount": 2,
+      "findings": [
+        {
+          "ruleId": "PRE-SRC-CFU-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredCfu",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1. 성상 : 고유의 향미가 있고, 이미, 이취가 없는 흰 노란색의 분말 2. 프로바이오틱스수 : 표시량 [100,000,00…",
+          "message": "표시량(CFU): 원문과 일치 (100,000,000 CFU)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-SRC-BASIS-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredAmount",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1. 성상 : 고유의 향미가 있고, 이미, 이취가 없는 흰 노란색의 분말 2. 프로바이오틱스수 : 표시량 [100,000,00…",
+          "message": "표시 기준량(mg 환산): 원문과 일치 (/2g)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-A-BASIS-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1. 성상 : 고유의 향미가 있고, 이미, 이취가 없는 흰 노란색의 분말 2. 프로바이오틱스수 : 표시량 [100,000,000 CFU/２g]의… | SRV_USE: 1일1회, 1회 1포씩 직접 섭취하거나 물과 함께 섭취하십시오.",
+          "message": "환산 불가(1회 섭취 중량이 공식 원문에 없음(1단위 중량·1회 총중량 모두 부재)) → **작성 전 생성 금지 목록**: per serving · per stick · per capsule · daily total",
+          "suggestedAction": "표시 기준량만 기술하십시오. 1단위당·1일 총량 수치는 만들지 마십시오."
+        },
+        {
+          "ruleId": "PRE-F-AGE-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding.ageBandsRaw",
+          "matchedText": null,
+          "sourceEvidence": "SRV_USE: 1일1회, 1회 1포씩 직접 섭취하거나 물과 함께 섭취하십시오.",
+          "message": "원문에 연령별 섭취량 없음 → **어린이·가족 대상 소구 금지**(제품명에 키즈가 있어도)",
+          "suggestedAction": "대상 연령 주장을 쓰지 마십시오."
+        }
+      ]
+    },
+    {
+      "candidateId": "cp4:c4-07-corebiotics",
+      "productName": "코어바이오틱스",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "NOT_APPLICABLE",
+      "koEnStatus": "NOT_APPLICABLE",
+      "overallStatus": "PASS",
+      "blockedCount": 0,
+      "reviewCount": 0,
+      "passCount": 2,
+      "precheckInfoCount": 2,
+      "findings": [
+        {
+          "ruleId": "PRE-SRC-CFU-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredCfu",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1. 성상 : 고유의 향미가 있고 이미·이취가 없는 황회색의 분말 2. 대장균군 : 음성 3. 프로바이오틱스 수 : 표시량(1…",
+          "message": "표시량(CFU): 원문과 일치 (100,000,000 CFU)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-SRC-BASIS-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredAmount",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1. 성상 : 고유의 향미가 있고 이미·이취가 없는 황회색의 분말 2. 대장균군 : 음성 3. 프로바이오틱스 수 : 표시량(1…",
+          "message": "표시 기준량(mg 환산): 원문과 일치 (/3,000mg)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-A-BASIS-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1. 성상 : 고유의 향미가 있고 이미·이취가 없는 황회색의 분말 2. 대장균군 : 음성 3. 프로바이오틱스 수 : 표시량(100,000,000… | SRV_USE: 1일 1회, 1회 1포를 직접 또는 물과 함께 섭취하십시오.",
+          "message": "환산 불가(1회 섭취 중량이 공식 원문에 없음(1단위 중량·1회 총중량 모두 부재)) → **작성 전 생성 금지 목록**: per serving · per stick · per capsule · daily total",
+          "suggestedAction": "표시 기준량만 기술하십시오. 1단위당·1일 총량 수치는 만들지 마십시오."
+        },
+        {
+          "ruleId": "PRE-F-AGE-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding.ageBandsRaw",
+          "matchedText": null,
+          "sourceEvidence": "SRV_USE: 1일 1회, 1회 1포를 직접 또는 물과 함께 섭취하십시오.",
+          "message": "원문에 연령별 섭취량 없음 → **어린이·가족 대상 소구 금지**(제품명에 키즈가 있어도)",
+          "suggestedAction": "대상 연령 주장을 쓰지 마십시오."
+        }
+      ]
+    },
+    {
+      "candidateId": "cp4:c4-08-daily-super-kids",
+      "productName": "데일리 수퍼 키즈 프로바이오틱스",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "NOT_APPLICABLE",
+      "koEnStatus": "NOT_APPLICABLE",
+      "overallStatus": "PASS",
+      "blockedCount": 0,
+      "reviewCount": 0,
+      "passCount": 2,
+      "precheckInfoCount": 2,
+      "findings": [
+        {
+          "ruleId": "PRE-SRC-CFU-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredCfu",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: (1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 하얀색의 입자성이 있는 노란 하얀색의 분말 (2) 프로바이오틱스 수 :…",
+          "message": "표시량(CFU): 원문과 일치 (100억)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-SRC-BASIS-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredAmount",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: (1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 하얀색의 입자성이 있는 노란 하얀색의 분말 (2) 프로바이오틱스 수 :…",
+          "message": "표시 기준량(mg 환산): 원문과 일치 (/1g)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-A-BASIS-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: (1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 하얀색의 입자성이 있는 노란 하얀색의 분말 (2) 프로바이오틱스 수 : 표시량(10,00… | SRV_USE: 1일 1회, 1회 1포를 섭취하십시오.",
+          "message": "환산 불가(1회 섭취 중량이 공식 원문에 없음(1단위 중량·1회 총중량 모두 부재)) → **작성 전 생성 금지 목록**: per serving · per stick · per capsule · daily total",
+          "suggestedAction": "표시 기준량만 기술하십시오. 1단위당·1일 총량 수치는 만들지 마십시오."
+        },
+        {
+          "ruleId": "PRE-F-AGE-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding.ageBandsRaw",
+          "matchedText": null,
+          "sourceEvidence": "SRV_USE: 1일 1회, 1회 1포를 섭취하십시오.",
+          "message": "원문에 연령별 섭취량 없음 → **어린이·가족 대상 소구 금지**(제품명에 키즈가 있어도)",
+          "suggestedAction": "대상 연령 주장을 쓰지 마십시오."
+        }
+      ]
+    },
+    {
+      "candidateId": "cp4:c4-09-uri-family",
+      "productName": "우리가족 장건강엔 프로바이오틱스 생유산균",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "NOT_APPLICABLE",
+      "koEnStatus": "NOT_APPLICABLE",
+      "overallStatus": "PASS",
+      "blockedCount": 0,
+      "reviewCount": 0,
+      "passCount": 2,
+      "precheckInfoCount": 2,
+      "findings": [
+        {
+          "ruleId": "PRE-SRC-CFU-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredCfu",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 분말 2. 프로바이오틱스 : 표시량(100,000,000(1억)C…",
+          "message": "표시량(CFU): 원문과 일치 (1억)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-SRC-BASIS-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredAmount",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 분말 2. 프로바이오틱스 : 표시량(100,000,000(1억)C…",
+          "message": "표시 기준량(mg 환산): 원문과 일치 (/ 2 g)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-A-BASIS-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 분말 2. 프로바이오틱스 : 표시량(100,000,000(1억)CFU / 2 g) … | SRV_USE: 1일 1회, 1회 1포를 그대로 섭취하십시오.",
+          "message": "환산 불가(1회 섭취 중량이 공식 원문에 없음(1단위 중량·1회 총중량 모두 부재)) → **작성 전 생성 금지 목록**: per serving · per stick · per capsule · daily total",
+          "suggestedAction": "표시 기준량만 기술하십시오. 1단위당·1일 총량 수치는 만들지 마십시오."
+        },
+        {
+          "ruleId": "PRE-F-AGE-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding.ageBandsRaw",
+          "matchedText": null,
+          "sourceEvidence": "SRV_USE: 1일 1회, 1회 1포를 그대로 섭취하십시오.",
+          "message": "원문에 연령별 섭취량 없음 → **어린이·가족 대상 소구 금지**(제품명에 키즈가 있어도)",
+          "suggestedAction": "대상 연령 주장을 쓰지 마십시오."
+        }
+      ]
+    },
+    {
+      "candidateId": "cp4:c4-10-newmate-19",
+      "productName": "뉴메이트 프로바이오 유산균19",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "NOT_APPLICABLE",
+      "koEnStatus": "NOT_APPLICABLE",
+      "overallStatus": "PASS",
+      "blockedCount": 0,
+      "reviewCount": 0,
+      "passCount": 2,
+      "precheckInfoCount": 2,
+      "findings": [
+        {
+          "ruleId": "PRE-SRC-CFU-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredCfu",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1) 성상: 고유의 향미가 있고 이미, 이취가 없는 연한 노랑 하얀색의 입자성이 있는 분말 2) 프로바이오틱스 수: 표시량(1…",
+          "message": "표시량(CFU): 원문과 일치 (1억)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-SRC-BASIS-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredAmount",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1) 성상: 고유의 향미가 있고 이미, 이취가 없는 연한 노랑 하얀색의 입자성이 있는 분말 2) 프로바이오틱스 수: 표시량(1…",
+          "message": "표시 기준량(mg 환산): 원문과 일치 (/2 g)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-A-BASIS-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1) 성상: 고유의 향미가 있고 이미, 이취가 없는 연한 노랑 하얀색의 입자성이 있는 분말 2) 프로바이오틱스 수: 표시량(100,000,000… | SRV_USE: 1일 1회, 1회 1포씩 입안에서 녹여 섭취하십시오.",
+          "message": "환산 불가(1회 섭취 중량이 공식 원문에 없음(1단위 중량·1회 총중량 모두 부재)) → **작성 전 생성 금지 목록**: per serving · per stick · per capsule · daily total",
+          "suggestedAction": "표시 기준량만 기술하십시오. 1단위당·1일 총량 수치는 만들지 마십시오."
+        },
+        {
+          "ruleId": "PRE-F-AGE-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding.ageBandsRaw",
+          "matchedText": null,
+          "sourceEvidence": "SRV_USE: 1일 1회, 1회 1포씩 입안에서 녹여 섭취하십시오.",
+          "message": "원문에 연령별 섭취량 없음 → **어린이·가족 대상 소구 금지**(제품명에 키즈가 있어도)",
+          "suggestedAction": "대상 연령 주장을 쓰지 마십시오."
+        }
+      ]
+    },
+    {
+      "candidateId": "cp4:c4-11-easypoo",
+      "productName": "이지푸",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "NOT_APPLICABLE",
+      "koEnStatus": "NOT_APPLICABLE",
+      "overallStatus": "PASS",
+      "blockedCount": 0,
+      "reviewCount": 0,
+      "passCount": 2,
+      "precheckInfoCount": 2,
+      "findings": [
+        {
+          "ruleId": "PRE-SRC-CFU-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredCfu",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 진한 갈색 반점이 있는 갈색의 원형 정제 2. 프로바이오틱스수 : 표시량…",
+          "message": "표시량(CFU): 원문과 일치 (1억)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-SRC-BASIS-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredAmount",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 진한 갈색 반점이 있는 갈색의 원형 정제 2. 프로바이오틱스수 : 표시량…",
+          "message": "표시 기준량(mg 환산): 원문과 일치 (/ 2.4g)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-A-BASIS-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 진한 갈색 반점이 있는 갈색의 원형 정제 2. 프로바이오틱스수 : 표시량(100,000,0… | SRV_USE: 1일 2회, 1회 1정을 씹어서 섭취하십시오.",
+          "message": "환산 불가(1회 섭취 중량이 공식 원문에 없음(1단위 중량·1회 총중량 모두 부재)) → **작성 전 생성 금지 목록**: per serving · per stick · per capsule · daily total",
+          "suggestedAction": "표시 기준량만 기술하십시오. 1단위당·1일 총량 수치는 만들지 마십시오."
+        },
+        {
+          "ruleId": "PRE-F-AGE-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding.ageBandsRaw",
+          "matchedText": null,
+          "sourceEvidence": "SRV_USE: 1일 2회, 1회 1정을 씹어서 섭취하십시오.",
+          "message": "원문에 연령별 섭취량 없음 → **어린이·가족 대상 소구 금지**(제품명에 키즈가 있어도)",
+          "suggestedAction": "대상 연령 주장을 쓰지 마십시오."
+        }
+      ]
+    },
+    {
+      "candidateId": "cp4:c4-12-neulbium",
+      "productName": "늘비움",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "NOT_APPLICABLE",
+      "koEnStatus": "NOT_APPLICABLE",
+      "overallStatus": "PASS",
+      "blockedCount": 0,
+      "reviewCount": 0,
+      "passCount": 2,
+      "precheckInfoCount": 2,
+      "findings": [
+        {
+          "ruleId": "PRE-SRC-CFU-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredCfu",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: (1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 흐린 녹갈색의 분말 (2) 프로바이오틱스 수 : 표시량(100,000,…",
+          "message": "표시량(CFU): 원문과 일치 (1억)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-SRC-BASIS-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredAmount",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: (1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 흐린 녹갈색의 분말 (2) 프로바이오틱스 수 : 표시량(100,000,…",
+          "message": "표시 기준량(mg 환산): 원문과 일치 (/ 2 g)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-A-BASIS-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: (1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 흐린 녹갈색의 분말 (2) 프로바이오틱스 수 : 표시량(100,000,000(1억) CF… | SRV_USE: 1일 1회, 1회 1포를 충분한 물과 함께 섭취하십시오.",
+          "message": "환산 불가(1회 섭취 중량이 공식 원문에 없음(1단위 중량·1회 총중량 모두 부재)) → **작성 전 생성 금지 목록**: per serving · per stick · per capsule · daily total",
+          "suggestedAction": "표시 기준량만 기술하십시오. 1단위당·1일 총량 수치는 만들지 마십시오."
+        },
+        {
+          "ruleId": "PRE-F-AGE-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding.ageBandsRaw",
+          "matchedText": null,
+          "sourceEvidence": "SRV_USE: 1일 1회, 1회 1포를 충분한 물과 함께 섭취하십시오.",
+          "message": "원문에 연령별 섭취량 없음 → **어린이·가족 대상 소구 금지**(제품명에 키즈가 있어도)",
+          "suggestedAction": "대상 연령 주장을 쓰지 마십시오."
+        }
+      ]
+    },
+    {
+      "candidateId": "cp4:c4-13-donga-honhap",
+      "productName": "동아혼합유산균",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "NOT_APPLICABLE",
+      "koEnStatus": "NOT_APPLICABLE",
+      "overallStatus": "PASS",
+      "blockedCount": 0,
+      "reviewCount": 0,
+      "passCount": 2,
+      "precheckInfoCount": 2,
+      "findings": [
+        {
+          "ruleId": "PRE-SRC-CFU-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredCfu",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: ① 성상 : 고유의 향미가 있고 이미∙이취가 없는 노랑 하양색의 입자성이 있는 분말 ② 프로바이오틱스 수 : 표시량[300,0…",
+          "message": "표시량(CFU): 원문과 일치 (3억)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-SRC-BASIS-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredAmount",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: ① 성상 : 고유의 향미가 있고 이미∙이취가 없는 노랑 하양색의 입자성이 있는 분말 ② 프로바이오틱스 수 : 표시량[300,0…",
+          "message": "표시 기준량(mg 환산): 원문과 일치 (/2 g)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-A-BASIS-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: ① 성상 : 고유의 향미가 있고 이미∙이취가 없는 노랑 하양색의 입자성이 있는 분말 ② 프로바이오틱스 수 : 표시량[300,000,000(3억)… | SRV_USE: 1일 1회, 1회 1포씩 섭취하십시오.",
+          "message": "환산 불가(1회 섭취 중량이 공식 원문에 없음(1단위 중량·1회 총중량 모두 부재)) → **작성 전 생성 금지 목록**: per serving · per stick · per capsule · daily total",
+          "suggestedAction": "표시 기준량만 기술하십시오. 1단위당·1일 총량 수치는 만들지 마십시오."
+        },
+        {
+          "ruleId": "PRE-F-AGE-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding.ageBandsRaw",
+          "matchedText": null,
+          "sourceEvidence": "SRV_USE: 1일 1회, 1회 1포씩 섭취하십시오.",
+          "message": "원문에 연령별 섭취량 없음 → **어린이·가족 대상 소구 금지**(제품명에 키즈가 있어도)",
+          "suggestedAction": "대상 연령 주장을 쓰지 마십시오."
+        }
+      ]
+    },
+    {
+      "candidateId": "cp4:c4-14-monica-good",
+      "productName": "모니카 굿프로바이오틱스",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "NOT_APPLICABLE",
+      "koEnStatus": "NOT_APPLICABLE",
+      "overallStatus": "PASS",
+      "blockedCount": 0,
+      "reviewCount": 0,
+      "passCount": 2,
+      "precheckInfoCount": 2,
+      "findings": [
+        {
+          "ruleId": "PRE-SRC-CFU-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredCfu",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: (1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 하양색의 분말 (2) 프로바이오틱스 수 : 표시량 (100,000,00…",
+          "message": "표시량(CFU): 원문과 일치 (100,000,000CFU)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-SRC-BASIS-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredAmount",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: (1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 하양색의 분말 (2) 프로바이오틱스 수 : 표시량 (100,000,00…",
+          "message": "표시 기준량(mg 환산): 원문과 일치 (/2g)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-A-BASIS-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: (1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 하양색의 분말 (2) 프로바이오틱스 수 : 표시량 (100,000,000CFU/2g)이상… | SRV_USE: 1일 1회, 1회 1포(2g)를 충분한 물과 함께 섭취하십시오.",
+          "message": "환산 허용 — 1단위 100,000,000 / 1일 총 100,000,000 (기준량=daily)",
+          "suggestedAction": "계산값과 다른 수치를 쓰지 마십시오."
+        },
+        {
+          "ruleId": "PRE-F-AGE-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding.ageBandsRaw",
+          "matchedText": null,
+          "sourceEvidence": "SRV_USE: 1일 1회, 1회 1포(2g)를 충분한 물과 함께 섭취하십시오.",
+          "message": "원문에 연령별 섭취량 없음 → **어린이·가족 대상 소구 금지**(제품명에 키즈가 있어도)",
+          "suggestedAction": "대상 연령 주장을 쓰지 마십시오."
+        }
+      ]
+    },
+    {
+      "candidateId": "cp4:c4-15-bighit",
+      "productName": "빅히트 프로바이오틱스",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "NOT_APPLICABLE",
+      "koEnStatus": "NOT_APPLICABLE",
+      "overallStatus": "PASS",
+      "blockedCount": 0,
+      "reviewCount": 0,
+      "passCount": 2,
+      "precheckInfoCount": 2,
+      "findings": [
+        {
+          "ruleId": "PRE-SRC-CFU-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredCfu",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰분홍색의 입자성이 있는 분말. 2) 프로바이오틱스 수 : 표시량(100…",
+          "message": "표시량(CFU): 원문과 일치 (1억)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-SRC-BASIS-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredAmount",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰분홍색의 입자성이 있는 분말. 2) 프로바이오틱스 수 : 표시량(100…",
+          "message": "표시 기준량(mg 환산): 원문과 일치 (/ 1.5g)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-A-BASIS-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰분홍색의 입자성이 있는 분말. 2) 프로바이오틱스 수 : 표시량(100,000,000(1… | SRV_USE: 1일 1회, 1회 1포를 그대로 섭취",
+          "message": "환산 불가(1회 섭취 중량이 공식 원문에 없음(1단위 중량·1회 총중량 모두 부재)) → **작성 전 생성 금지 목록**: per serving · per stick · per capsule · daily total",
+          "suggestedAction": "표시 기준량만 기술하십시오. 1단위당·1일 총량 수치는 만들지 마십시오."
+        },
+        {
+          "ruleId": "PRE-F-AGE-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding.ageBandsRaw",
+          "matchedText": null,
+          "sourceEvidence": "SRV_USE: 1일 1회, 1회 1포를 그대로 섭취",
+          "message": "원문에 연령별 섭취량 없음 → **어린이·가족 대상 소구 금지**(제품명에 키즈가 있어도)",
+          "suggestedAction": "대상 연령 주장을 쓰지 마십시오."
+        }
+      ]
+    },
+    {
+      "candidateId": "cp4:c4-16-amare-tricore",
+      "productName": "아마레 트라이코어 바이오틱스",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "NOT_APPLICABLE",
+      "koEnStatus": "NOT_APPLICABLE",
+      "overallStatus": "PASS",
+      "blockedCount": 0,
+      "reviewCount": 0,
+      "passCount": 2,
+      "precheckInfoCount": 2,
+      "findings": [
+        {
+          "ruleId": "PRE-SRC-CFU-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredCfu",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 연미색의 분말 2) 프로바이오틱스 수 : 표시량(30억CFU/7,000m…",
+          "message": "표시량(CFU): 원문과 일치 (30억)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-SRC-BASIS-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredAmount",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 연미색의 분말 2) 프로바이오틱스 수 : 표시량(30억CFU/7,000m…",
+          "message": "표시 기준량(mg 환산): 원문과 일치 (/7,000mg)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-A-BASIS-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 연미색의 분말 2) 프로바이오틱스 수 : 표시량(30억CFU/7,000mg) 이상 3) 대… | SRV_USE: 1일 1회, 1회 1포를 충분한 물과 함께 섭취하십시오",
+          "message": "환산 불가(1회 섭취 중량이 공식 원문에 없음(1단위 중량·1회 총중량 모두 부재)) → **작성 전 생성 금지 목록**: per serving · per stick · per capsule · daily total",
+          "suggestedAction": "표시 기준량만 기술하십시오. 1단위당·1일 총량 수치는 만들지 마십시오."
+        },
+        {
+          "ruleId": "PRE-F-AGE-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding.ageBandsRaw",
+          "matchedText": null,
+          "sourceEvidence": "SRV_USE: 1일 1회, 1회 1포를 충분한 물과 함께 섭취하십시오",
+          "message": "원문에 연령별 섭취량 없음 → **어린이·가족 대상 소구 금지**(제품명에 키즈가 있어도)",
+          "suggestedAction": "대상 연령 주장을 쓰지 마십시오."
+        }
+      ]
+    },
+    {
+      "candidateId": "cp4:c4-17-jangpyeonan",
+      "productName": "장편안 프로바이오틱스",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "NOT_APPLICABLE",
+      "koEnStatus": "NOT_APPLICABLE",
+      "overallStatus": "PASS",
+      "blockedCount": 0,
+      "reviewCount": 0,
+      "passCount": 2,
+      "precheckInfoCount": 2,
+      "findings": [
+        {
+          "ruleId": "PRE-SRC-CFU-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredCfu",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: (1) 성상 : 이미, 이취가 없고 고유의 향미가 있는 백색분말을 함유한 흰색의 경질캡슐 (2) 프로바이오틱스 수 : 표시량(…",
+          "message": "표시량(CFU): 원문과 일치 (100,000,000 CFU)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-SRC-BASIS-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredAmount",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: (1) 성상 : 이미, 이취가 없고 고유의 향미가 있는 백색분말을 함유한 흰색의 경질캡슐 (2) 프로바이오틱스 수 : 표시량(…",
+          "message": "표시 기준량(mg 환산): 원문과 일치 (/ 400mg)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-A-BASIS-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: (1) 성상 : 이미, 이취가 없고 고유의 향미가 있는 백색분말을 함유한 흰색의 경질캡슐 (2) 프로바이오틱스 수 : 표시량(100,000,00… | SRV_USE: 1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+          "message": "환산 불가(1회 섭취 중량이 공식 원문에 없음(1단위 중량·1회 총중량 모두 부재)) → **작성 전 생성 금지 목록**: per serving · per stick · per capsule · daily total",
+          "suggestedAction": "표시 기준량만 기술하십시오. 1단위당·1일 총량 수치는 만들지 마십시오."
+        },
+        {
+          "ruleId": "PRE-F-AGE-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding.ageBandsRaw",
+          "matchedText": null,
+          "sourceEvidence": "SRV_USE: 1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+          "message": "원문에 연령별 섭취량 없음 → **어린이·가족 대상 소구 금지**(제품명에 키즈가 있어도)",
+          "suggestedAction": "대상 연령 주장을 쓰지 마십시오."
+        }
+      ]
+    },
+    {
+      "candidateId": "cp4:c4-18-jillago",
+      "productName": "질라고",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "NOT_APPLICABLE",
+      "koEnStatus": "NOT_APPLICABLE",
+      "overallStatus": "PASS",
+      "blockedCount": 0,
+      "reviewCount": 0,
+      "passCount": 2,
+      "precheckInfoCount": 2,
+      "findings": [
+        {
+          "ruleId": "PRE-SRC-CFU-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredCfu",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1) 성 상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 분말 2) 프로바이오틱스 수 : 표시량(1,000,000,000…",
+          "message": "표시량(CFU): 원문과 일치 (1,000,000,000cfu)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-SRC-BASIS-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredAmount",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1) 성 상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 분말 2) 프로바이오틱스 수 : 표시량(1,000,000,000…",
+          "message": "표시 기준량(mg 환산): 원문과 일치 (/2g)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-A-BASIS-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1) 성 상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 분말 2) 프로바이오틱스 수 : 표시량(1,000,000,000cfu/2g) 이상… | SRV_USE: 1일 1회, 1회 1포씩 직접 또는 물과 함께 섭취하십시오.",
+          "message": "환산 불가(1회 섭취 중량이 공식 원문에 없음(1단위 중량·1회 총중량 모두 부재)) → **작성 전 생성 금지 목록**: per serving · per stick · per capsule · daily total",
+          "suggestedAction": "표시 기준량만 기술하십시오. 1단위당·1일 총량 수치는 만들지 마십시오."
+        },
+        {
+          "ruleId": "PRE-F-AGE-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding.ageBandsRaw",
+          "matchedText": null,
+          "sourceEvidence": "SRV_USE: 1일 1회, 1회 1포씩 직접 또는 물과 함께 섭취하십시오.",
+          "message": "원문에 연령별 섭취량 없음 → **어린이·가족 대상 소구 금지**(제품명에 키즈가 있어도)",
+          "suggestedAction": "대상 연령 주장을 쓰지 마십시오."
+        }
+      ]
+    },
+    {
+      "candidateId": "cp4:c4-19-haruengine",
+      "productName": "하루엔진 장 건강 유산균",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "NOT_APPLICABLE",
+      "koEnStatus": "NOT_APPLICABLE",
+      "overallStatus": "PASS",
+      "blockedCount": 0,
+      "reviewCount": 0,
+      "passCount": 2,
+      "precheckInfoCount": 2,
+      "findings": [
+        {
+          "ruleId": "PRE-SRC-CFU-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredCfu",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1) 성상 : 고유의 향미가 있고, 이미, 이취가 없는 하얀색의 분말 2) 프로바이오틱스 수 : 표시량(1억 CFU / 2,0…",
+          "message": "표시량(CFU): 원문과 일치 (1억)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-SRC-BASIS-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredAmount",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1) 성상 : 고유의 향미가 있고, 이미, 이취가 없는 하얀색의 분말 2) 프로바이오틱스 수 : 표시량(1억 CFU / 2,0…",
+          "message": "표시 기준량(mg 환산): 원문과 일치 (/ 2,000 mg)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-A-BASIS-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: 1) 성상 : 고유의 향미가 있고, 이미, 이취가 없는 하얀색의 분말 2) 프로바이오틱스 수 : 표시량(1억 CFU / 2,000 mg) 이상 … | SRV_USE: 1일 1회, 1회 1포를 직접 또는 충분한 물과 함께 섭취",
+          "message": "환산 불가(1회 섭취 중량이 공식 원문에 없음(1단위 중량·1회 총중량 모두 부재)) → **작성 전 생성 금지 목록**: per serving · per stick · per capsule · daily total",
+          "suggestedAction": "표시 기준량만 기술하십시오. 1단위당·1일 총량 수치는 만들지 마십시오."
+        },
+        {
+          "ruleId": "PRE-F-AGE-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding.ageBandsRaw",
+          "matchedText": null,
+          "sourceEvidence": "SRV_USE: 1일 1회, 1회 1포를 직접 또는 충분한 물과 함께 섭취",
+          "message": "원문에 연령별 섭취량 없음 → **어린이·가족 대상 소구 금지**(제품명에 키즈가 있어도)",
+          "suggestedAction": "대상 연령 주장을 쓰지 마십시오."
+        }
+      ]
+    },
+    {
+      "candidateId": "cp4:c4-20-gongskin",
+      "productName": "공스킨 산뜻해질유산균",
+      "guardVersion": "product-description-guard@1.1.0",
+      "preGuardStatus": "PASS",
+      "postGuardStatus": "NOT_APPLICABLE",
+      "koEnStatus": "NOT_APPLICABLE",
+      "overallStatus": "PASS",
+      "blockedCount": 0,
+      "reviewCount": 0,
+      "passCount": 2,
+      "precheckInfoCount": 2,
+      "findings": [
+        {
+          "ruleId": "PRE-SRC-CFU-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredCfu",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: (1) 성상 : 고유의 향미를 지니고 이미, 이취가 없는 흰색 또는 흰노란색 분말을 함유한 하얀색의 경질캡슐 (2) 프로바이오…",
+          "message": "표시량(CFU): 원문과 일치 (1억)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-SRC-BASIS-001",
+          "severity": "INFO",
+          "status": "PASS",
+          "language": "n/a",
+          "field": "grounding.declaredAmount",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: (1) 성상 : 고유의 향미를 지니고 이미, 이취가 없는 흰색 또는 흰노란색 분말을 함유한 하얀색의 경질캡슐 (2) 프로바이오…",
+          "message": "표시 기준량(mg 환산): 원문과 일치 (/ 250 mg)",
+          "suggestedAction": "조치 불요."
+        },
+        {
+          "ruleId": "PRE-A-BASIS-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding",
+          "matchedText": null,
+          "sourceEvidence": "BASE_STANDARD: (1) 성상 : 고유의 향미를 지니고 이미, 이취가 없는 흰색 또는 흰노란색 분말을 함유한 하얀색의 경질캡슐 (2) 프로바이오틱스 수 : 표시량… | SRV_USE: 1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+          "message": "환산 불가(1회 섭취 중량이 공식 원문에 없음(1단위 중량·1회 총중량 모두 부재)) → **작성 전 생성 금지 목록**: per serving · per stick · per capsule · daily total",
+          "suggestedAction": "표시 기준량만 기술하십시오. 1단위당·1일 총량 수치는 만들지 마십시오."
+        },
+        {
+          "ruleId": "PRE-F-AGE-001",
+          "severity": "INFO",
+          "status": "PRECHECK_INFO",
+          "language": "n/a",
+          "field": "grounding.ageBandsRaw",
+          "matchedText": null,
+          "sourceEvidence": "SRV_USE: 1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+          "message": "원문에 연령별 섭취량 없음 → **어린이·가족 대상 소구 금지**(제품명에 키즈가 있어도)",
+          "suggestedAction": "대상 연령 주장을 쓰지 마십시오."
+        }
+      ]
+    }
+  ]
+}
