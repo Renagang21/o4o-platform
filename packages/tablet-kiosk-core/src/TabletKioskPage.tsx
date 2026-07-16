@@ -893,7 +893,9 @@ export function TabletKioskPage({
           product_list(상품 record)와 분리된 "코너 콘텐츠" 카드 목록. 서버 resolve 카드만 소비.
           items 있을 때만 렌더 → 상품 0건이어도 화면이 실사용 가능(§5.4). 상세는 하단 모달(ContentRenderer). */}
       {contentCards.length > 0 && (
-        <div style={styles.contentListSection}>
+        // WO-O4O-KPA-TABLET-TEMPLATE-DESIGN-REFINE-V1: 제품 집중/진열형은 제품을 먼저 보이게 flex order 로 재정렬.
+        //   (상품 집중형·제품 진열형인데 제품이 콘텐츠 카드 아래로 밀려 이름과 어긋났다.)
+        <div style={{ ...styles.contentListSection, order: isProductLayout ? 6 : 4 }}>
           <span style={styles.contentListLabel}>코너 콘텐츠</span>
           <div style={styles.contentGrid}>
             {contentCards.map((c) => {
@@ -926,7 +928,8 @@ export function TabletKioskPage({
       {/* WO-O4O-KPA-TABLET-TEMPLATE-THREE-PATTERNS-V1: 코너 소개형(corner_overview_qr)은 상품 그리드 생략
           → 코너 설명 + 콘텐츠 카드 + QR 중심의 정적 안내 화면(§3.2). 그 외 템플릿은 기존대로 상품 노출. */}
       {!hideProductsBody && (
-      <div style={styles.body}>
+      // WO-O4O-KPA-TABLET-TEMPLATE-DESIGN-REFINE-V1: 제품 템플릿은 제품(order 4)이 콘텐츠(order 6)보다 먼저.
+      <div style={{ ...styles.body, order: isProductLayout ? 4 : 5 }}>
         {loading ? (
           <div style={styles.centerMessage}>
             <p style={{ color: '#94a3b8' }}>상품을 불러오는 중...</p>
@@ -985,7 +988,8 @@ export function TabletKioskPage({
           기본/코너 소개형은 상단에서 이미 렌더됨.
           WO-O4O-KPA-TABLET-TEMPLATE-USABILITY-REFINE-V1: 상단 카드와 동일 정비(도메인만, 원문 URL 미노출). */}
       {qrGuide && isProductLayout && (
-        <div style={styles.qrCardBottom}>
+        // order 7: 제품·콘텐츠 뒤(최하단) 보조 QR 배너 유지.
+        <div style={{ ...styles.qrCardBottom, order: 7 }}>
           {qrGuide.url ? <QrImage url={qrGuide.url} size={72} /> : <div style={styles.qrCardIcon} aria-hidden>▣</div>}
           <div style={styles.qrCardText}>
             <span style={styles.qrCardTitle}>{qrGuide.label || '모바일에서 자세히 보기'}</span>
