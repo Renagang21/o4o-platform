@@ -230,8 +230,18 @@ function reducer(state: RuntimeState, action: Action): RuntimeState {
 
 // ── Pure helpers ──
 
-function formatPrice(price: number): string {
-  return price.toLocaleString('ko-KR') + '원';
+// WO-O4O-KPA-TABLET-PRODUCT-DETAIL-DESIGN-AND-QR-V1: 가격 표기 정규화.
+//   local 상품은 price_display 가 "12000.00" 같은 원시 문자열이라 그대로 노출됐다.
+//   숫자/숫자문자열이면 천단위 + '원', 숫자로 못 읽으면 '' 반환(호출부에서 원문/‘가격 문의’ 폴백).
+function formatPrice(price: number | string | null | undefined): string {
+  if (price == null) return '';
+  const n = typeof price === 'string' ? Number(price.replace(/[^0-9.\-]/g, '')) : price;
+  if (!Number.isFinite(n)) return '';
+  return Math.round(n).toLocaleString('ko-KR') + '원';
+}
+/** 상품의 표시 가격 텍스트: 숫자면 "12,000원", 비숫자 라벨이면 그 라벨, 없으면 '가격 문의'. */
+function productPriceText(p: { price?: number; priceDisplay?: string }): string {
+  return formatPrice(p.price ?? p.priceDisplay) || p.priceDisplay || '가격 문의';
 }
 
 // WO-O4O-KPA-TABLET-TEMPLATE-USABILITY-REFINE-V1:
@@ -642,26 +652,45 @@ export function TabletKioskPage({
 
     return (
       <div style={rootStyle}>
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column' as const, overflow: 'auto' }}>
-          {/* Product Image */}
-          <div style={styles.detailImageArea}>
-            {selectedProduct.imageUrl ? (
-              <img src={selectedProduct.imageUrl} alt={selectedProduct.name} style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' as const }} />
-            ) : (
-              <div style={{ fontSize: '64px', color: '#cbd5e1' }}>📦</div>
-            )}
-          </div>
+        {/* WO-O4O-KPA-TABLET-PRODUCT-DETAIL-DESIGN-AND-QR-V1: 상단 헤더 = 뒤로 · 코너명 · QR(항상 표시).
+            QR = 현재 코너 콘텐츠의 모바일 화면(screen-set QR). 다른 손님이 자기 휴대전화로 이어서 볼 수 있게 상세에도 유지. */}
+        <div style={styles.detailHeader}>
+          <button onClick={() => dispatch({ type: 'BACK_TO_BROWSE' })} style={styles.detailHeaderBack} aria-label="뒤로">← 뒤로</button>
+          <span style={styles.detailHeaderCorner}>{cornerInfo?.title || '상품 안내'}</span>
+          {qrGuide?.url ? (
+            <div style={styles.detailHeaderQr}>
+              <div style={styles.detailQrText}>
+                <span style={styles.detailQrTitle}>휴대전화로 이어서 보기</span>
+                <span style={styles.detailQrDesc}>QR을 스캔하세요</span>
+              </div>
+              <QrImage url={qrGuide.url} size={60} />
+            </div>
+          ) : <span aria-hidden style={{ width: 1 }} />}
+        </div>
 
-          {/* Product Info */}
-          <div style={styles.detailInfo}>
+        {/* 본문 2단: 왼쪽 이미지(≈40%) · 오른쪽 정보(≈60%).
+            inline 스타일만 쓰는 패키지라 media query 대신 flexWrap + flexBasis 로 반응형 —
+            넓은 태블릿에선 좌우 2단, 좁은 폭(모바일)에선 자동으로 세로 적층된다. */}
+        <div style={styles.detailBody}>
+          {/* 왼쪽: 상품 이미지 + 분류 배지 */}
+          <div style={styles.detailImageCol}>
+            <div style={styles.detailImageBox}>
+              {selectedProduct.imageUrl ? (
+                <img src={selectedProduct.imageUrl} alt={selectedProduct.name} style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' as const }} />
+              ) : (
+                <div style={{ fontSize: '64px', color: '#cbd5e1' }}>📦</div>
+              )}
+            </div>
             {selectedProduct.category && (
               <span style={styles.categoryBadge}>{selectedProduct.category}</span>
             )}
-            <h2 style={{ fontSize: '24px', fontWeight: 700, margin: '8px 0' }}>{selectedProduct.name}</h2>
+          </div>
+
+          {/* 오른쪽: 상품명 · 가격 · 설명 · 안내 */}
+          <div style={styles.detailInfoCol}>
+            <h2 style={styles.detailName}>{selectedProduct.name}</h2>
             {displaySettings?.showPrice !== false && (
-              <p style={{ fontSize: '22px', fontWeight: 700, color: '#2563eb', margin: '0 0 16px' }}>
-                {selectedProduct.price ? formatPrice(selectedProduct.price) : selectedProduct.priceDisplay || '가격 문의'}
-              </p>
+              <p style={styles.detailPrice}>{productPriceText(selectedProduct)}</p>
             )}
             {/* WO-O4O-KPA-TABLET-INLINE-MULTILINGUAL-DESCRIPTION-BRIDGE-V1:
                 게시 가능 번역이 있으면 언어 버튼(기본 + locale별) 노출. 다인종/다언어 고객 응대용.
@@ -937,7 +966,7 @@ export function TabletKioskPage({
                   <span style={styles.productName}>{p.name}</span>
                   {displaySettings?.showPrice !== false && (
                     <span style={styles.productPrice}>
-                      {p.price ? formatPrice(p.price) : p.priceDisplay || '가격 문의'}
+                      {productPriceText(p)}
                     </span>
                   )}
                 </div>
@@ -1387,6 +1416,111 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#0369a1',
     fontSize: '13px',
     fontWeight: 500,
+  },
+  // ── WO-O4O-KPA-TABLET-PRODUCT-DETAIL-DESIGN-AND-QR-V1: 상품 상세 2단 + QR ──
+  detailHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '12px',
+    flexWrap: 'wrap',
+    padding: '12px 20px',
+    backgroundColor: '#fff',
+    borderBottom: '1px solid #e2e8f0',
+    flexShrink: 0,
+  },
+  detailHeaderBack: {
+    padding: '8px 14px',
+    borderRadius: '10px',
+    border: '1px solid #e2e8f0',
+    backgroundColor: '#fff',
+    color: '#334155',
+    fontSize: '15px',
+    fontWeight: 600,
+    cursor: 'pointer',
+    flexShrink: 0,
+  },
+  detailHeaderCorner: {
+    flex: 1,
+    minWidth: 0,
+    fontSize: '18px',
+    fontWeight: 700,
+    color: '#0f172a',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  },
+  detailHeaderQr: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    padding: '6px 10px 6px 12px',
+    backgroundColor: '#f8fafc',
+    border: '1px solid #e2e8f0',
+    borderRadius: '12px',
+    flexShrink: 0,
+  },
+  detailQrText: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-end',
+    textAlign: 'right',
+  },
+  detailQrTitle: { fontSize: '12.5px', fontWeight: 700, color: '#0f172a', whiteSpace: 'nowrap' },
+  detailQrDesc: { fontSize: '11px', color: '#64748b', whiteSpace: 'nowrap' },
+  detailBody: {
+    flex: 1,
+    overflow: 'auto',
+    display: 'flex',
+    flexWrap: 'wrap',
+    alignItems: 'flex-start',
+    alignContent: 'flex-start',
+    gap: '24px',
+    padding: '24px',
+    maxWidth: '1180px',
+    width: '100%',
+    margin: '0 auto',
+    boxSizing: 'border-box',
+  },
+  detailImageCol: {
+    flex: '1 1 300px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '12px',
+  },
+  detailImageBox: {
+    width: '100%',
+    aspectRatio: '4 / 3',
+    maxHeight: '420px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f8fafc',
+    borderRadius: '16px',
+    border: '1px solid #eef2f7',
+    padding: '16px',
+    boxSizing: 'border-box',
+  },
+  detailInfoCol: {
+    flex: '2 1 360px',
+    minWidth: 0,
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  detailName: {
+    fontSize: '26px',
+    fontWeight: 800,
+    color: '#0f172a',
+    lineHeight: 1.3,
+    margin: '0 0 6px',
+    wordBreak: 'keep-all',
+  },
+  detailPrice: {
+    fontSize: '24px',
+    fontWeight: 800,
+    color: '#2563eb',
+    margin: '0 0 18px',
   },
   actionBar: {
     display: 'flex',
