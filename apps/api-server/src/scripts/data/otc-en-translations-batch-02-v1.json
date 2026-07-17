@@ -1,0 +1,145 @@
+{
+  "wo": "WO-O4O-OTC-BULK-BATCH-02-EN-TRANSLATION-PERSIST-66-V1",
+  "batch": "OTC Batch 02",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "translations": [
+    {
+      "groupKey": "나프록센|250밀리그램|연질캡슐",
+      "title": "Naproxen 250 mg Soft Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for osteoarthritis, rheumatoid arthritis and ankylosing spondylitis; tendinitis and bursitis; acute gout; painful menstruation; musculoskeletal disorders such as sprains, bruises and low back pain; pain after surgery or tooth extraction; and migraine.",
+      "usage": "For pain, adults first take two capsules (500 mg), then one capsule (250 mg) every 6 to 8 hours, without exceeding 1,250 mg a day. If your stomach is sensitive, take it after food, and do not take it together with other anti-inflammatory painkillers.",
+      "caution": "Do not take this if you have ever reacted to this medicine, aspirin or other anti-inflammatory painkillers; if you have a peptic ulcer, severe liver or kidney impairment, heart failure or bronchial asthma; for pain around coronary artery bypass graft (CABG) surgery; if you are pregnant or breastfeeding; or if you are a child aged 2 or under. Because there is a risk of cardiovascular clots such as heart attack and stroke and of gastrointestinal bleeding or ulcers, stop taking it and seek advice if you have stomach pain, black stools, a rash or difficulty breathing.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Naproxen 250 mg",
+        "How it works": "Reduces fever, pain and inflammation",
+        "Main symptoms": "Menstrual pain, headache, toothache, muscle pain, joint pain, low back pain",
+        "Who should be careful": "Stomach problems, cardiovascular or kidney disease, pregnancy",
+        "Why this one": "A long-acting anti-inflammatory painkiller (soft capsule)"
+      }
+    },
+    {
+      "groupKey": "알파칼시돌|1마이크로그램|연질캡슐",
+      "title": "Alfacalcidol 1 μg Soft Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to improve symptoms that accompany abnormal vitamin D metabolism, such as low blood calcium and bone pain, in chronic kidney failure, hypoparathyroidism, and vitamin D–resistant rickets or osteomalacia, and for osteoporosis.",
+      "usage": "The dose is adjusted while your blood calcium level is kept under control. For osteoporosis or chronic kidney failure, adults take half to one capsule (0.5–1 μg) once a day. Do not take it together with products containing calcium, vitamin D or magnesium.",
+      "caution": "Do not take this if you have high blood calcium, high blood phosphate or high blood magnesium, or signs of vitamin D toxicity. If you are pregnant or breastfeeding, a child, an older adult, or have had kidney stones, talk to a pharmacist before taking it, and take care not to exceed the set dose.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Alfacalcidol 1 μg",
+        "How it works": "Supplies active vitamin D for calcium metabolism",
+        "Main symptoms": "Osteoporosis; low blood calcium and bone pain from abnormal vitamin D metabolism",
+        "Who should be careful": "High blood calcium, kidney stones, pregnancy or breastfeeding",
+        "Why this one": "A high-strength active vitamin D preparation"
+      }
+    },
+    {
+      "groupKey": "아르기닌티디아시케이트|200밀리그램|연질캡슐",
+      "title": "Arginine Tidiacicate 200 mg Soft Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used as an adjunctive treatment for impaired liver function.",
+      "usage": "Adults take 100–200 mg twice a day, after food.",
+      "caution": "Do not take this if you are a child aged 15 or under, or if you have severe kidney failure. If you are pregnant or breastfeeding, talk to a pharmacist before taking it, and if there is no improvement after about a month, seek advice.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Arginine tidiacicate 200 mg",
+        "How it works": "Supports liver function",
+        "Main symptoms": "Adjunctive care for impaired liver function",
+        "Who should be careful": "Children aged 15 or under, severe kidney failure",
+        "Why this one": "An arginine preparation used to support liver function"
+      }
+    },
+    {
+      "groupKey": "이부프로펜|400밀리그램|연질캡슐",
+      "title": "Ibuprofen 400 mg Soft Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for fever and pain from a cold, low back pain, menstrual pain, arthritis, pain after surgery, headache, migraine, toothache, muscle pain, neuralgia and soft-tissue injury.",
+      "usage": "For mild to moderate pain and colds, adults take half to one capsule (200–400 mg) three to four times a day. For migraine, take half to one capsule, without exceeding 400 mg in 24 hours. Do not exceed the recommended dose.",
+      "caution": "Do not take this if you have ever reacted to this medicine, aspirin or other anti-inflammatory painkillers; if you have a gastrointestinal ulcer or bleeding, severe liver or kidney impairment, heart failure, high blood pressure or bronchial asthma; for pain around CABG surgery; or during the last three months of pregnancy. Because there is a risk of cardiovascular clots and gastrointestinal bleeding, stop taking it and seek advice if you have stomach pain, black stools or difficulty breathing.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Ibuprofen 400 mg",
+        "How it works": "Reduces fever, pain and inflammation",
+        "Main symptoms": "Fever, headache, migraine, toothache, menstrual pain, muscle pain, joint pain",
+        "Who should be careful": "Stomach problems, cardiovascular or kidney disease, late pregnancy",
+        "Why this one": "A high-strength soft-capsule anti-inflammatory painkiller"
+      }
+    },
+    {
+      "groupKey": "클로닉신리시네이트|125밀리그램|연질캡슐",
+      "title": "Clonixin Lysinate 125 mg Soft Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to relieve mild to moderate pain such as muscle pain, neuralgia, pain after injury or surgery, headache, toothache and earache.",
+      "usage": "Adults take one to two capsules (125–250 mg) three times a day. Do not take it together with other anti-inflammatory painkillers.",
+      "caution": "Do not take this if you have a peptic ulcer; if you have ever had asthma, hives or an allergy to this medicine, aspirin or other anti-inflammatory painkillers; for pain around CABG surgery; if you are pregnant; or if you have severe liver or kidney impairment, heart failure or inflammatory bowel disease. If you have had high blood pressure, bronchial asthma, or liver or kidney impairment, talk to a pharmacist before taking it.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Clonixin lysinate 125 mg",
+        "How it works": "Relieves pain and inflammation",
+        "Main symptoms": "Muscle pain, neuralgia, headache, toothache, earache, pain after injury or surgery",
+        "Who should be careful": "Peptic ulcer, severe liver or kidney impairment, pregnancy",
+        "Why this one": "An anti-inflammatory painkiller for mild to moderate pain (soft capsule)"
+      }
+    },
+    {
+      "groupKey": "플루벤다졸|500밀리그램|정",
+      "title": "Flubendazole 500 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to treat roundworm, pinworm, whipworm and hookworm infections, and mixed infections of these.",
+      "usage": "Adults and children take one tablet (500 mg) as a single dose.",
+      "caution": "Do not take this if you have ever reacted to this medicine or if you are pregnant. If you are an infant under 1 year of age, a woman who may be pregnant, or breastfeeding, talk to a pharmacist before taking it. Because pinworm is easily re-transmitted within a family, it is best to treat the family together.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Flubendazole 500 mg",
+        "How it works": "Antiparasitic that treats worm infections",
+        "Main symptoms": "Roundworm, pinworm, whipworm and hookworm infection",
+        "Who should be careful": "Pregnancy, infants under 1 year",
+        "Why this one": "A single-dose deworming medicine"
+      }
+    },
+    {
+      "groupKey": "이부프로펜아르기닌|368.9밀리그램|정",
+      "title": "Ibuprofen Arginine 368.9 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for rheumatoid arthritis, osteoarthritis, low back pain, headache, menstrual pain, anti-inflammatory pain relief after injury, and fever and pain from influenza.",
+      "usage": "Adults and children aged 12 and over take one to two tablets every 4 to 6 hours with water, up to a maximum of six tablets (1,200 mg as ibuprofen) a day.",
+      "caution": "Do not take this if you have a peptic ulcer or a severe blood disorder; if you have ever reacted to this medicine, aspirin or other anti-inflammatory painkillers; if you have bronchial asthma; for pain around CABG surgery; if you have had a heart attack; or if you are pregnant. If you have liver or kidney impairment or heart failure, or are an older adult, talk to a pharmacist before taking it, and discuss taking it with other anti-inflammatory painkillers or anticoagulants.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Ibuprofen arginine 368.9 mg (ibuprofen class)",
+        "How it works": "Reduces fever, pain and inflammation",
+        "Main symptoms": "Headache, menstrual pain, low back pain, arthritis, pain after injury, cold fever",
+        "Who should be careful": "Stomach problems, cardiovascular or kidney disease, pregnancy",
+        "Why this one": "An ibuprofen arginine salt formulated for fast absorption"
+      }
+    },
+    {
+      "groupKey": "L-시스틴|500밀리그램|연질캡슐",
+      "title": "L-Cystine 500 mg Soft Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used as adjunctive treatment for eczema and acne, and for disorders of keratin areas where the nails and hair split easily.",
+      "usage": "Take two to four capsules (1,000–2,000 mg) a day for 10 to 20 days out of a month.",
+      "caution": "Do not take this if you have severe kidney impairment or hepatic coma, if you are a child aged 6 or under, if you have cystinuria, or if you are hypersensitive to soybean oil, soy or peanut. If you have kidney stones or a disorder of fat metabolism, talk to a pharmacist before taking it, and stop if there is no improvement after a month.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "L-cystine 500 mg",
+        "How it works": "Supplies an amino acid for skin and hair",
+        "Main symptoms": "Eczema and acne; disorders of keratin areas where nails and hair split",
+        "Who should be careful": "Soy or peanut hypersensitivity, kidney stones",
+        "Why this one": "An amino acid preparation involved in skin and hair"
+      }
+    }
+  ],
+  "testLog": [
+    { "groupKey": "나프록센|250밀리그램|연질캡슐", "guide": "V0.5", "glossary": "V0.2", "numericCheck": "초기 2캡슐(500mg)→two capsules (500 mg) / 유지 1캡슐(250mg) q6~8h→one capsule (250 mg) every 6 to 8 hours / 1일 상한 1,250mg→1,250 mg a day", "cautionStrength": "금기 CABG·2세이하·임부수유부·소화성궤양 verbatim 유지, 심혈관혈전·GI출혈 경고 강도 보존", "verdict": "PASS" },
+    { "groupKey": "알파칼시돌|1마이크로그램|연질캡슐", "guide": "V0.5", "glossary": "V0.2", "numericCheck": "0.5~1캡슐(0.5~1㎍) 1일1회→half to one capsule (0.5–1 μg) once a day / 적응증 4종+골다공증 전건 유지", "cautionStrength": "고칼슘·고인산·고마그네슘·비타민D독성 금기 유지, 혈청칼슘 관리 문구·초과금지 보존", "verdict": "PASS" },
+    { "groupKey": "아르기닌티디아시케이트|200밀리그램|연질캡슐", "guide": "V0.5", "glossary": "V0.2", "numericCheck": "100~200mg 1일2회 식후→100–200 mg twice a day, after food", "cautionStrength": "15세이하·심한 신부전 금기 유지, 1개월 미개선 상담 보존", "arginineNoExpansion": "효능=adjunctive treatment for impaired liver function (허가원문 verbatim, detox/recovery/health/fatigue 표현 0)", "verdict": "PASS" },
+    { "groupKey": "이부프로펜|400밀리그램|연질캡슐", "guide": "V0.5", "glossary": "V0.2", "numericCheck": "1/2~1정(200~400mg) 1일3~4회→half to one capsule (200–400 mg) three to four times a day / 편두통 24h≤400mg→not exceeding 400 mg in 24 hours", "cautionStrength": "위장관궤양·심부전·고혈압·CABG·임신말기3개월 금기 유지", "verdict": "PASS" },
+    { "groupKey": "클로닉신리시네이트|125밀리그램|연질캡슐", "guide": "V0.5", "glossary": "V0.2", "numericCheck": "1~2캡슐(125~250mg) 1일3회→one to two capsules (125–250 mg) three times a day", "cautionStrength": "소화성궤양·천식/두드러기 경험·CABG·염증성장질환 금기 유지", "verdict": "PASS" },
+    { "groupKey": "플루벤다졸|500밀리그램|정", "guide": "V0.5", "glossary": "V0.2", "numericCheck": "1정(500mg) 단회→one tablet (500 mg) as a single dose", "cautionStrength": "임부 금기·1세미만 상담 유지, 요충 가족관리 문구 보존", "verdict": "PASS" },
+    { "groupKey": "이부프로펜아르기닌|368.9밀리그램|정", "guide": "V0.5", "glossary": "V0.2", "numericCheck": "1~2정 q4~6h→one to two tablets every 4 to 6 hours / 1일 최대 6정(이부프로펜 1,200mg)→six tablets (1,200 mg as ibuprofen) / 12세이상→aged 12 and over", "cautionStrength": "소화성궤양·혈액이상·심근경색·CABG·임부 금기 유지", "verdict": "PASS" },
+    { "groupKey": "L-시스틴|500밀리그램|연질캡슐", "guide": "V0.5", "glossary": "V0.2", "numericCheck": "1일 2~4캡슐(1,000~2,000mg)→two to four capsules (1,000–2,000 mg) / 1개월 중 10~20일→10 to 20 days out of a month", "cautionStrength": "신장애·간성혼수·6세이하·시스틴뇨·대두유/콩/땅콩 과민 금기 전건 유지", "verdict": "PASS" }
+  ]
+}
