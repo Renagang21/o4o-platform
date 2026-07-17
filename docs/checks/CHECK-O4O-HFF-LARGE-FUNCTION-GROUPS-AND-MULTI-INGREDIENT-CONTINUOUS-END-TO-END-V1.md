@@ -20,10 +20,10 @@
 | 4 | 코엔자임Q10 | 153 | **LIVE 102** |
 | 5 | 녹차 카테킨 | 150 | **LIVE 98** |
 | 6 | 가르시니아 | 145 | **LIVE 106** |
-| 7 | 감마리놀렌산 | 129 | 대기 |
+| 7 | 감마리놀렌산 | 129 | **LIVE 64** |
 | 8 | 글루코사민 | 124 | **LIVE 80** |
-| 9 | 프로폴리스 | 112 | 대기 |
-| 10 | 오메가3 | 111 | 대기 |
+| 9 | 프로폴리스 | 112 | **LIVE 77** |
+| 10 | 오메가3 | 111 | **LIVE 65** |
 | 11 | 식이섬유 | 106 | **LIVE 2**(다수 HOLD) |
 | 12 | L-테아닌 | 98 | **LIVE 77** |
 | 13 | 은행잎 | 52 | **LIVE 19** |
@@ -58,16 +58,16 @@
 
 | 지표 | 값 |
 |---|---:|
-| PART A 완료 그룹 | 11 (MSM·루테인·밀크씨슬·코엔자임Q10·글루코사민·가르시니아·녹차·테아닌·은행잎·옥타코사놀·식이섬유) |
-| LIVE 신규 ProductMaster | 1,221 |
-| LIVE STORE canonical SPD | 2,442 |
-| DB write | 4,884 |
+| PART A 완료 그룹 | **14 (완료)** — 11 (MSM·루테인·밀크씨슬·코엔자임Q10·글루코사민·가르시니아·녹차·테아닌·은행잎·옥타코사놀·식이섬유) |
+| LIVE 신규 ProductMaster | **1,427** |
+| LIVE STORE canonical SPD | **2,854** |
+| DB write | **5,708** |
 | BLOCKED | 0 (개별 BLOCKED 는 generate 단계 자동 HOLD — HOLD_NAME_UNGROUNDED_CLAIM 등) |
 
-> 이번 세션 Agent B 누적 LIVE(VD 417 + 단일영양소 1,036 + 기능성원료 1,221) = **2,674 제품**. HFF o4o_hff_generated 전체 master 3,437.
+> 이번 세션 Agent B 누적 LIVE(VD 417 + 단일영양소 1,036 + 기능성원료 1,427) = **2,880 제품**. HFF o4o_hff_generated 전체 master 3,437.
 
 **생산 중 규칙화(추가)**: ①개별 guard BLOCKED(예: "다이어트젤리" 제품명 E-NAME-DERIVED) → generate 자동 HOLD(HOLD_NAME_UNGROUNDED_CLAIM), 산출 json 은 항상 BLOCKED 0. ②제품명 수량스케일어 phantom count HOLD_IDENTITY.
 
 ## 4. 남은 작업 (재개 지점)
-- PART A 미처리: 감마리놀렌산(gla, 복합 4편익 함수) · 오메가3(omega-3, 편익 변이) · 프로폴리스(propolis, 지표=총플라보노이드 스펙 미검출 0) · 은행잎/식이섬유 잔여 HOLD. → 편익 컴포넌트 매핑 보강 시 재개.
+- **PART A 완료(14그룹)**. gla 64·omega-3 65·propolis 77 추가 LIVE(propolis 지표=총플라보노이드 인식 보강). 잔여는 각 그룹 HOLD(복합→PART B/액상/수출/grounding).
 - PART B(2~3원료 복합형 M2/M3): 미착수. 조합별(칼슘+비타민D, 철+엽산, EPA·DHA+비타민E, 루테인+지아잔틴 등) 그룹화 + 원료별 기능성/수치 대응표 검증 필요(§10). 복합형 ~8,000 모집단.
