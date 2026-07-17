@@ -382,6 +382,8 @@ export function TabletKioskPage({
   //   content_list 카드 상세(모달). product detail(reducer) 와 독립 — 콘텐츠 카드는 상품이 아니므로
   //   기존 상품 상세 흐름을 건드리지 않고 경량 오버레이로 표시. detail.html 은 ContentRenderer 로만 렌더.
   const [openContentCard, setOpenContentCard] = useState<TabletContentCard | null>(null);
+  // WO-O4O-KPA-TABLET-PUBLIC-QR-AND-DEMO-IMAGE-FIX-V1: QR 은 상시 노출이 아니라 작은 버튼 → 모달에서만.
+  const [qrModalOpen, setQrModalOpen] = useState(false);
   const autoSlideSeconds = displaySettings?.autoSlideSeconds ?? 0;
 
   useEffect(() => {
@@ -469,6 +471,12 @@ export function TabletKioskPage({
   const isCornerOverview = templateKey === 'corner_overview_qr';
   const isIdleTouch = templateKey === 'idle_touch_video';
   const isProductLayout = isProductFocus || isProductGrid; // 축약 헤더 + 하단 QR 배너
+  // WO-O4O-KPA-TABLET-PUBLIC-QR-AND-DEMO-IMAGE-FIX-V1:
+  //   screen-set 소비자(KPA, qrGuide.url 있음)는 코너명 전용 헤더 밴드를 제거하고(제목은 코너 설명 섹션이 담당),
+  //   우상단 작은 '휴대전화로 보기' 버튼 → QR 모달로 단순화. legacy(GP/KCos, qrGuide 없음)는 기존 헤더 유지(무영향).
+  //   idle_touch 는 상단 hero 에 QR chip 이 이미 있어 별도 버튼 없이 헤더만 숨긴다.
+  const hideHeaderBand = !!qrGuide?.url;
+  const showFloatingQr = !!qrGuide?.url && !isIdleTouch && displaySettings?.showQr !== false;
   const hideProductsBody = isCornerOverview; // 코너 소개형: 설명·콘텐츠·QR 중심 → 상품 그리드 생략
 
   // Submit interest request
@@ -836,34 +844,33 @@ export function TabletKioskPage({
             제목/설명을 좌우 1행(space-between)에서 세로 스택으로 변경 → 제목이 좁은 폭에 눌려
             글자 단위로 세로로 깨지던 문제 해소. 제목 wordBreak:keep-all(한글 단어 보존),
             설명은 별도 문단으로 줄폭/줄간격 확보. clamp() 로 화면 폭 대응. */}
+      {/* WO-O4O-KPA-TABLET-PUBLIC-QR-AND-DEMO-IMAGE-FIX-V1: 코너명 전용 헤더 밴드는 legacy(GP/KCos)에서만.
+          KPA(screen-set)는 코너 설명 섹션이 제목을 담고, QR 은 우상단 작은 버튼 → 모달. */}
+      {!hideHeaderBand && (
       <div style={isProductLayout ? styles.headerCompact : styles.header}>
         <div style={styles.headerMain}>
           <div style={styles.headerTexts}>
             <div style={styles.headerTitleRow}>
               <h1 style={isProductLayout ? styles.cornerTitleCompact : styles.cornerTitle}>{cornerInfo?.title || '매장 상품 안내'}</h1>
             </div>
-            {/* legacy(코너 설명 미주입: GP/KCos 등)는 짧은 안내 힌트만 헤더 subtitle 로 유지 */}
             {!isProductLayout && !cornerInfo?.body && (
               <p style={styles.cornerHint}>궁금한 상품을 터치해 설명을 확인해 보세요</p>
             )}
           </div>
-          {/* WO-O4O-KPA-TABLET-DEMO-ALL-TEMPLATES-AND-CORNER-QR-V1: 코너 메인 QR 을 헤더 우상단에 고정.
-              모든 템플릿에서 항상 보인다(product 레이아웃에서 하단으로 밀려 안 보이던 결함 해소).
-              url 은 서버가 Screen Set public_qr_slug 로 도출(임의 URL 아님).
-              idle 은 상단 hero 에 QR chip 이 이미 있어 헤더 QR 은 생략. qrGuide 없으면(legacy) 기존 텍스트 배지 유지. */}
-          {qrGuide?.url && !isIdleTouch && displaySettings?.showQr !== false ? (
-            <div style={styles.headerQr}>
-              <div style={styles.headerQrText}>
-                <span style={styles.headerQrTitle}>휴대전화로 보기</span>
-                <span style={styles.headerQrDesc}>QR 스캔</span>
-              </div>
-              <QrImage url={qrGuide.url} size={60} />
-            </div>
-          ) : (showQrBadge && displaySettings?.showQr !== false && (
+          {showQrBadge && displaySettings?.showQr !== false && (
             <span style={styles.qrBadge}>QR 코드로 접속</span>
-          ))}
+          )}
         </div>
       </div>
+      )}
+
+      {/* WO-O4O-KPA-TABLET-PUBLIC-QR-AND-DEMO-IMAGE-FIX-V1: 우상단 작은 '휴대전화로 보기' 버튼(QR 상시 노출 대신).
+          클릭 시 QR 모달. url 은 서버가 Screen Set public_qr_slug 로 도출(공개 /qr/{slug} — 비로그인 접근). */}
+      {showFloatingQr && (
+        <button type="button" onClick={() => setQrModalOpen(true)} style={styles.floatingQrBtn} aria-label="휴대전화로 보기">
+          <span style={styles.floatingQrIcon} aria-hidden>▣</span> 휴대전화로 보기
+        </button>
+      )}
 
       {/* 코너 설명 섹션 — 코너 제목(header)과 시각적으로 구분된 별도 섹션.
           실제 코너 설명(screen_set corner_description)이 있을 때만 렌더. 긴 문단은 자체 스크롤로
@@ -990,6 +997,19 @@ export function TabletKioskPage({
 
       {/* WO-O4O-KPA-TABLET-CONTENT-LIST-BLOCK-RUNTIME-V1: content_list 카드 상세(모달).
           detail.html 은 ContentRenderer(DOMPurify)로만 렌더 — raw innerHTML 금지. */}
+      {/* WO-O4O-KPA-TABLET-PUBLIC-QR-AND-DEMO-IMAGE-FIX-V1: QR 모달 — QR 이미지는 여기서만 표시.
+          url = 서버 도출 공개 /qr/{slug}(비로그인 소비자 화면). */}
+      {qrModalOpen && qrGuide?.url && (
+        <div style={embedded ? { ...styles.contentModalOverlay, position: 'absolute' as const } : styles.contentModalOverlay} onClick={() => setQrModalOpen(false)} role="presentation">
+          <div style={styles.qrModal} onClick={(e) => e.stopPropagation()}>
+            <div style={styles.qrModalTitle}>휴대전화로 이어서 보기</div>
+            <div style={styles.qrModalDesc}>QR을 스캔하면 이 코너 안내를 휴대전화에서 확인할 수 있습니다.</div>
+            <div style={{ margin: '18px 0' }}><QrImage url={qrGuide.url} size={200} /></div>
+            <button type="button" onClick={() => setQrModalOpen(false)} style={styles.qrModalClose}>닫기</button>
+          </div>
+        </div>
+      )}
+
       {openContentCard && (
         <div style={embedded ? { ...styles.contentModalOverlay, position: 'absolute' as const } : styles.contentModalOverlay} onClick={() => setOpenContentCard(null)} role="presentation">
           <div style={styles.contentModal} onClick={(e) => e.stopPropagation()}>
@@ -1332,6 +1352,49 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: '4px',
     whiteSpace: 'nowrap',
     flexShrink: 0,
+  },
+  // WO-O4O-KPA-TABLET-PUBLIC-QR-AND-DEMO-IMAGE-FIX-V1: 우상단 작은 '휴대전화로 보기' 버튼 + QR 모달.
+  floatingQrBtn: {
+    position: 'absolute',
+    top: '12px',
+    right: '12px',
+    zIndex: 30,
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '8px 12px',
+    fontSize: '13px',
+    fontWeight: 700,
+    color: '#0f172a',
+    backgroundColor: 'rgba(255,255,255,0.92)',
+    border: '1px solid #e2e8f0',
+    borderRadius: '999px',
+    boxShadow: '0 2px 8px rgba(15,23,42,0.12)',
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+  },
+  floatingQrIcon: { fontSize: '14px', lineHeight: 1, color: '#4f46e5' },
+  qrModal: {
+    background: '#fff',
+    borderRadius: '20px',
+    padding: '28px 32px',
+    maxWidth: '360px',
+    width: '90%',
+    textAlign: 'center',
+    boxShadow: '0 20px 60px rgba(0,0,0,0.35)',
+  },
+  qrModalTitle: { fontSize: '18px', fontWeight: 800, color: '#0f172a' },
+  qrModalDesc: { fontSize: '13px', color: '#64748b', marginTop: '6px', lineHeight: 1.5 },
+  qrModalClose: {
+    marginTop: '4px',
+    padding: '10px 24px',
+    fontSize: '14px',
+    fontWeight: 600,
+    color: '#334155',
+    backgroundColor: '#fff',
+    border: '1px solid #e2e8f0',
+    borderRadius: '12px',
+    cursor: 'pointer',
   },
   body: {
     flex: 1,
