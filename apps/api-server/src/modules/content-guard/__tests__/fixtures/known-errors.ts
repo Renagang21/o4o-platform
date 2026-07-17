@@ -193,6 +193,52 @@ export const ERR_FUNCTION_ESCALATION = base({
   },
 });
 
+/** ⑪ 제품명 out-of-scope 주장 — 'AntiAller'(항알러지), 본문은 clean (KIDS/WOMENS 확대 2026-07-18) */
+export const ERR_NAME_CLAIM_ANTIALLER = base({
+  candidateId: 'err-name-antialler',
+  productName: 'Kids Garden® AntiAller Pro Probiotics Powder',
+  productNameEn: 'Kids Garden AntiAller Pro Probiotics Powder',
+  manufacturer: '코스맥스엔비티(주)',
+  statementNo: '200700170352210',
+  // 본문(body)은 인정 기능성만 — ruleE 는 발화 안 함. 이름 자체가 항알러지 소구.
+  drafts: {
+    ko: '<p>아이의 장 건강을 챙기려는 보호자를 위한 제품입니다. 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 프로바이오틱스를 담았습니다.</p>',
+    en: '<p>For guardians caring for a child’s gut health. Contains probiotics.</p>',
+  },
+});
+
+/** ⑫ 제품명 out-of-scope 주장 — 'immStar'(면역), MAIN_FNCTN 은 장건강뿐 */
+export const ERR_NAME_CLAIM_IMMSTAR = base({
+  candidateId: 'err-name-immstar',
+  productName: '키즈가든®아임스타®베타 키즈  Kids Garden® immStar® Beta Kids',
+  productNameEn: 'Kids Garden immStar Beta Kids',
+  manufacturer: '코스맥스엔비티(주)',
+  statementNo: '200700170353212',
+  drafts: {
+    ko: '<p>아이의 장 건강을 챙기려는 보호자를 위한 제품입니다. 장 건강에 도움을 줄 수 있는 프로바이오틱스를 담았습니다.</p>',
+    en: '<p>For guardians caring for a child’s gut health. Contains probiotics.</p>',
+  },
+});
+
+/** ⑬ (근거 있음) 면역 기능성이 인정된 제품을 '면역'으로 명명 — 정당(미발화 확인용) */
+export const OK_NAME_CLAIM_GROUNDED_IMMUNE = base({
+  candidateId: 'ok-name-immune-grounded',
+  productName: '면역스타 비타민C',
+  productNameEn: 'immStar Vitamin C',
+  manufacturer: '(주)정상제조',
+  source: {
+    mainFunction: '항산화·정상적인 면역 기능에 필요·결합조직 형성에 필요(비타민C)',
+    baseStandard: '비타민C : 표시량(1000 mg) 이상',
+    intake: '1일 1회, 1회 1정을 물과 함께 섭취하십시오.',
+    caution: '(가) 질환이 있거나 의약품 복용 시 전문가와 상담할 것',
+    dosageForm: '정제',
+  },
+  drafts: {
+    ko: '<p>정상적인 면역 기능에 필요한 비타민C 1000mg.</p>',
+    en: '<p>Vitamin C 1000mg, needed for normal immune function.</p>',
+  },
+});
+
 export const KNOWN_ERROR_FIXTURES = [
   ERR_LACTOFIT_DAILY_TOTAL,
   ERR_PROBA_PER_STICK,

@@ -670,6 +670,50 @@ export function ruleE(input: GuardProductInput): GuardFinding[] {
   return out;
 }
 
+// ═══ E-2. 제품명 자체의 out-of-scope 질병/기능 주장 ═════════════════════════
+// ruleE 는 "제품명 토큰 → **본문** 유도 표현"을 잡는다. 본문이 clean(인정 기능성만)
+// 한데 **제품명 자체**가 승인 기능성 밖의 질병/치료/특수 기능 도메인을 담으면 ruleE 는
+// 잡지 못한다(본문 유도가 없으므로). 이 규칙이 그 사각지대를 메운다 —
+// 매장 게시 시 제품명이 곧 소구가 되므로 사람 확인(REVIEW)이 필요하다.
+// ⚠️ 실측 gap: 영문/로마자 브랜드 토큰 `AntiAller`(항알러지)·`immStar`(면역)이
+//    ruleE 의 NAME_TOKENS 로도, `/면역|immun/`("immStar"엔 "immun" 부분문자열 없음)
+//    로도 안 걸려 수동 격리로만 커버됐다. (KIDS/WOMENS 확대 2건, 2026-07-18)
+// 근거 게이트: 승인 기능성(MAIN_FNCTN)에 해당 도메인이 **있으면** 근거 있음 → 미발화
+//    (예: 면역 기능성이 인정된 비타민C 를 "면역"으로 명명 — 정당).
+const NAME_CLAIM_DOMAINS: Array<[RegExp, RegExp, string]> = [
+  // [제품명 out-of-scope claim 토큰(ko + en/romanized), MAIN_FNCTN 근거 도메인, 라벨]
+  [/항\s*알러지|항\s*알레르기|알러지\s*케어|알레르기\s*케어|anti[\s-]?allerg?y?|allergy\s*care/i, /알러지|알레르기|allerg/i, '항알러지(anti-allergy)'],
+  [/이뮨\s*스타|임뮨|이뮤노\s*스타|imm[\s-]?star|immuno[\s-]?star/i, /면역|immun/i, '면역 브랜드(immStar 등)'],
+  [/다이어트|슬리밍|slimming|diet(?!ary)/i, /체지방|체중|다이어트|weight|body\s*fat|slim/i, '다이어트(diet/slimming)'],
+  [/관절\s*케어|joint\s*care/i, /관절|joint/i, '관절(joint)'],
+  [/혈당\s*케어|혈압\s*케어|blood\s*sugar\s*care|blood\s*pressure\s*care/i, /혈당|혈압|blood\s*sugar|blood\s*pressure/i, '혈당·혈압(blood sugar/pressure)'],
+  [/항염|anti[\s-]?inflamm?/i, /염증|inflamm/i, '항염(anti-inflammatory)'],
+];
+
+export function ruleENameClaim(input: GuardProductInput): GuardFinding[] {
+  const out: GuardFinding[] = [];
+  const names = `${input.productName} ${input.productNameEn ?? ''}`;
+  const mainFn = input.source.mainFunction ?? '';
+  for (const [nameRe, domainRe, label] of NAME_CLAIM_DOMAINS) {
+    const m = names.match(nameRe);
+    if (!m) continue;
+    if (domainRe.test(mainFn)) continue; // 승인 기능성에 도메인 근거 있음 → 정당(미발화)
+    out.push({
+      ruleId: 'E-NAME-CLAIM-OUTOFSCOPE-003',
+      severity: 'WARNING',
+      status: 'REVIEW_REQUIRED',
+      language: 'n/a',
+      field: 'productName',
+      matchedText: m[0],
+      sourceEvidence: `제품명="${input.productName}${input.productNameEn ? ' / ' + input.productNameEn : ''}" / MAIN_FNCTN="${truncate(mainFn, 70)}"`,
+      message: `제품명이 승인 기능성 밖의 주장을 담고 있습니다(${label}). 본문이 인정 기능성만 담았더라도 매장 게시 시 제품명 자체가 질병·특수 기능 소구가 되어 사람 확인이 필요합니다.`,
+      suggestedAction: '승인 기능성(MAIN_FNCTN)에 해당 근거가 있는지 재확인하고, 없으면 격리(HOLD_NAME_UNGROUNDED_CLAIM)하십시오. 제품명은 임의로 바꾸지 마십시오.',
+    });
+  }
+  if (out.length === 0) out.push(ok('E-NAME-CLAIM-OUTOFSCOPE-003', 'productName', '제품명 out-of-scope 주장 없음'));
+  return out;
+}
+
 // ═══ F. 연령 범위 ══════════════════════════════════════════════════════════
 
 const AGE_BOUNDARY_KO = /([0-9]+\s*(세|개월))\s*(이상|미만|이하|초과)/g;

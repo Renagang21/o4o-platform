@@ -14,6 +14,7 @@ import {
   ERR_LACTOFIT_DAILY_TOTAL, ERR_PROBA_PER_STICK, ERR_DINOKIDS_BASIS_AND_AGE,
   ERR_SUPERLATIVE, ERR_ABSENCE_AS_PERMISSION, ERR_KIDS_NAME_CLAIM,
   ERR_NAME_DERIVED, ERR_FORM_GENERALIZATION, ERR_KO_EN_MISMATCH, ERR_FUNCTION_ESCALATION,
+  ERR_NAME_CLAIM_ANTIALLER, ERR_NAME_CLAIM_IMMSTAR, OK_NAME_CLAIM_GROUNDED_IMMUNE,
   OK_KIMCHI_DAILY_BASIS, OK_VIVA_FULL_BASIS,
 } from './fixtures/known-errors.js';
 
@@ -554,6 +555,36 @@ describe('PRE-SRC-CFU 범위화 — 프로바이오틱스만', () => {
   it('프로바이오틱스 제품(declaredCfu 있음)은 여전히 PRE-SRC-CFU 교차검증을 수행한다', () => {
     const r = runGuard(OK_VIVA_FULL_BASIS, { phase: 'pre' });
     expect(r.findings.some((f) => f.ruleId.startsWith('PRE-SRC-CFU'))).toBe(true);
+  });
+});
+
+// 제품명 out-of-scope 주장 (2026-07-18) — 본문 clean 인데 제품명이 질병/기능 소구
+//   ruleE(본문 유도)의 사각지대. 영문/로마자 토큰(AntiAller·immStar) 자동 감지.
+describe('E-NAME-CLAIM — 제품명 out-of-scope 주장', () => {
+  const claimFindings = (r: ReturnType<typeof runGuard>) =>
+    r.findings.filter((f) => f.ruleId === 'E-NAME-CLAIM-OUTOFSCOPE-003' && f.status !== 'PASS');
+
+  it('AntiAller: 본문 clean 이어도 제품명 항알러지 → REVIEW_REQUIRED (BLOCKED 아님)', () => {
+    const r = runGuard(ERR_NAME_CLAIM_ANTIALLER);
+    expect(claimFindings(r).some((f) => f.status === 'REVIEW_REQUIRED')).toBe(true);
+    // 본문 유도가 없으므로 ruleE(E-NAME-DERIVED)·전체는 BLOCKED 가 아니다
+    expect(blocked(r)).toHaveLength(0);
+  });
+
+  it('immStar: "immun" 부분문자열이 없어 기존 /면역|immun/ 로 놓쳤던 케이스 → REVIEW_REQUIRED', () => {
+    const r = runGuard(ERR_NAME_CLAIM_IMMSTAR);
+    expect(claimFindings(r).some((f) => f.status === 'REVIEW_REQUIRED')).toBe(true);
+    expect(blocked(r)).toHaveLength(0);
+  });
+
+  it('근거 있음: 면역 기능성 인정 제품을 "면역"으로 명명 → 미발화(정당)', () => {
+    const r = runGuard(OK_NAME_CLAIM_GROUNDED_IMMUNE);
+    expect(claimFindings(r)).toHaveLength(0);
+  });
+
+  it('오탐 방지: 일반 유산균(김치생유산균)은 제품명 주장 미발화', () => {
+    const r = runGuard(OK_KIMCHI_DAILY_BASIS);
+    expect(claimFindings(r)).toHaveLength(0);
   });
 });
 
