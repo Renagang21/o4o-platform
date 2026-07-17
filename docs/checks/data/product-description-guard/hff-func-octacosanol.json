@@ -1,0 +1,1052 @@
+[
+ {
+  "candidateId": "octacosanol-001",
+  "productName": "VIP파워맨",
+  "productNameEn": "VIP파워맨",
+  "manufacturer": "엔피케이(주)",
+  "manufacturerEn": null,
+  "statementNo": "20100019004692",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[옥타코사놀 함유 유지] ①지구력 증진에 도움을 줄 수 있음\n\n[아연] ①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "① 성    상 : 미황색 내용물을 함유한 갈색 투명캅셀로 이미, 이취가 없다.\n② 대장균군 : 음 성\n③ 붕해시험 : 20분 이내\n④ 옥타코사놀 : 표시량(15mg/3,000mg)의 80~120%\n⑤ 아    연 : 표시량(20mg/3,000mg)의 80~150%\n⑥ 잔류용매(mg/kg) : 5.0 이하 (헥산을 사용한 경우)",
+   "intake": "1일 3회, 1회 2캡슐을 물과 함께 섭취",
+   "caution": "① 과량섭취 시 부작용이 있을 수 있음.\n② 특정원료에 알레르기가 있거나 질병치료 약물투여 중인 분은 섭취 전 전문가와 상의하십시오.\n③ 소비기한이 경과된 제품은 섭취하지 마십시오.\n[옥타코사놀 함유 유지]\n (가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n (나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "미황색 내용물을 함유한 갈색 투명캅셀로 이미, 이취가 없다.",
+   "storage": "① 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 15,
+    "unit": "mg",
+    "basisAmount": 3000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">옥타코사놀 15mg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>VIP파워맨<small>옥타코사놀</small></h1><p class=\"sd-meta\">엔피케이(주) 제조 · 1일 3회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 옥타코사놀 <b>15mg</b>를 표시량으로 담았습니다(표시 기준 3000mg당). 옥타코사놀의 기능성은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(2캡슐) 섭취로 옥타코사놀 <b>15mg</b></li><li>미황색 내용물을 함유한 갈색 투명캅셀로 이미, 이취가 없다. · 엔피케이(주) 제조</li></ul>\n  <h2>옥타코사놀 기능성 (공식 인정)</h2><ul class=\"sd-why\"><li>지구력 증진에 도움을 줄 수 있음</li><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>옥타코사놀</b> 표시량(15mg/3000mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 미황색 내용물을 함유한 갈색 투명캅셀로 이미, 이취가 없다.</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 옥타코사놀 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Octacosanol 15mg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>VIP파워맨<small>Octacosanol</small></h1><p class=\"sd-meta\">Made by 엔피케이(주) · 3 times a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>15mg</b> of labelled Octacosanol (per 3000mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>15mg</b> of Octacosanol per serving (2 capsules)</li><li>Made by 엔피케이(주)</li></ul>\n  <h2>Octacosanol functional claims (officially recognised)</h2><ul class=\"sd-why\"><li>May help with improving endurance</li><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Octacosanol</b> labelled (15mg / 3000mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 미황색 내용물을 함유한 갈색 투명캅셀로 이미, 이취가 없다.</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Octacosanol daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "octacosanol-002",
+  "productName": "갈력파워 옥타코사놀",
+  "productNameEn": "갈력파워 옥타코사놀",
+  "manufacturer": "(주)비티진",
+  "manufacturerEn": null,
+  "statementNo": "20040020030137",
+  "category": "hff",
+  "source": {
+   "mainFunction": "① 지구력 증진에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 밝은 회황색의 분말을 함유한 흰색의 불투명한 경질캡슐\n 2) 옥타코사놀 : 표시량(25 mg / 800 mg)의 80 ~ 120%\n 3) 대장균군 : 음성\n 4) 붕해도 : 20분 이내\n 5) 납(mg/kg) : 1.0 이하\n 6) 카드뮴(mg/kg) : 0.3 이하",
+   "intake": "1일 2회, 1회 2캡슐을 물과 함께 섭취.",
+   "caution": "어린이, 임산부 및 수유부는 섭취를 피하십시오.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 밝은 회황색의 분말을 함유한 흰색의 불투명한 경질캡슐",
+   "storage": "직사광선을 피하고 서늘한 곳에서 보관하십시오.",
+   "shelfLife": "2년"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 25,
+    "unit": "mg",
+    "basisAmount": 800,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">옥타코사놀 25mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>갈력파워 옥타코사놀<small>옥타코사놀</small></h1><p class=\"sd-meta\">(주)비티진 제조 · 1일 2회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 옥타코사놀 <b>25mg</b>를 표시량으로 담았습니다(표시 기준 800mg당). 옥타코사놀의 기능성은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(2캡슐) 섭취로 옥타코사놀 <b>25mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 밝은 회황색의 분말을 함유한 흰색의 불투명한 경질캡슐 · (주)비티진 제조</li></ul>\n  <h2>옥타코사놀 기능성 (공식 인정)</h2><ul class=\"sd-why\"><li>지구력 증진에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>옥타코사놀</b> 표시량(25mg/800mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 밝은 회황색의 분말을 함유한 흰색의 불투명한 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 2년</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에서 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 옥타코사놀 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Octacosanol 25mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>갈력파워 옥타코사놀<small>Octacosanol</small></h1><p class=\"sd-meta\">Made by (주)비티진 · 2 times a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>25mg</b> of labelled Octacosanol (per 800mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>25mg</b> of Octacosanol per serving (2 capsules)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비티진</li></ul>\n  <h2>Octacosanol functional claims (officially recognised)</h2><ul class=\"sd-why\"><li>May help with improving endurance</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Octacosanol</b> labelled (25mg / 800mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 밝은 회황색의 분말을 함유한 흰색의 불투명한 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 2년</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에서 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Octacosanol daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "octacosanol-003",
+  "productName": "건강한자 행복하라 맥스",
+  "productNameEn": "건강한자 행복하라 맥스",
+  "manufacturer": "(주)알피바이오",
+  "manufacturerEn": null,
+  "statementNo": "20040017006625",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[옥타코사놀 함유 유지] ①지구력 증진에 도움을 줄 수 있음",
+   "baseStandard": "1.성상: 이미, 이취가 없고 고유의 향미가 있는 미황색의 내용물을 함유한 황색의 타원형 연질캡슐\n2.옥타코사놀: 표시량(10 mg/1,400 mg)의 80~120%\n3.대장균군: 음성\n4.붕해 : 20분 이내",
+   "intake": "1일 2회, 1회 2캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "특이체질, 알레르기체질의 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.\n\n과량 섭취 시 부작용이 있을 수 있으며, 질병치료나 약물투여 중인 분들은 섭취 전 의사와 상의하십시오.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 미황색의 내용물을 함유한 황색의 타원형 연질캡슐",
+   "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 10,
+    "unit": "mg",
+    "basisAmount": 1400,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">옥타코사놀 10mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>건강한자 행복하라 맥스<small>옥타코사놀</small></h1><p class=\"sd-meta\">(주)알피바이오 제조 · 1일 2회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 옥타코사놀 <b>10mg</b>를 표시량으로 담았습니다(표시 기준 1400mg당). 옥타코사놀의 기능성은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(2캡슐) 섭취로 옥타코사놀 <b>10mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 미황색의 내용물을 함유한 황색의 타원형 연질캡슐 · (주)알피바이오 제조</li></ul>\n  <h2>옥타코사놀 기능성 (공식 인정)</h2><ul class=\"sd-why\"><li>지구력 증진에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>옥타코사놀</b> 표시량(10mg/1400mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 미황색의 내용물을 함유한 황색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 옥타코사놀 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Octacosanol 10mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>건강한자 행복하라 맥스<small>Octacosanol</small></h1><p class=\"sd-meta\">Made by (주)알피바이오 · 2 times a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>10mg</b> of labelled Octacosanol (per 1400mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>10mg</b> of Octacosanol per serving (2 capsules)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)알피바이오</li></ul>\n  <h2>Octacosanol functional claims (officially recognised)</h2><ul class=\"sd-why\"><li>May help with improving endurance</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Octacosanol</b> labelled (10mg / 1400mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 미황색의 내용물을 함유한 황색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Octacosanol daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "octacosanol-004",
+  "productName": "건강한자 행복하라 맥스",
+  "productNameEn": "건강한자 행복하라 맥스",
+  "manufacturer": "(주)비오팜",
+  "manufacturerEn": null,
+  "statementNo": "200400170211053",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[옥타코사놀 함유 유지] ①지구력 증진에 도움을 줄 수 있음\n\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "①성상 : 이미, 이취가 없고 고유의 향미가 있으며 연노랑색의 점도가 있는 내용물을 함유한 흑갈색의 타원형 연질캡슐\n②옥타코사놀 : 표시량(10mg/1,100mg)의 80~120% \n③비타민E : 표시량(5mg α-TE/1,100mg)의 80~150%\n④대장균군 : 음성\n⑤붕해시험 : 20분 이내",
+   "intake": "1일 2회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있으며 연노랑색의 점도가 있는 내용물을 함유한 흑갈색의 타원형 연질캡슐",
+   "storage": "① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 10,
+    "unit": "mg",
+    "basisAmount": 1100,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">옥타코사놀 10mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>건강한자 행복하라 맥스<small>옥타코사놀</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 2회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 옥타코사놀 <b>10mg</b>를 표시량으로 담았습니다(표시 기준 1100mg당). 옥타코사놀의 기능성은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(1캡슐) 섭취로 옥타코사놀 <b>10mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있으며 연노랑색의 점도가 있는 내용물을 함유한 흑갈색의 타원형 연질캡슐 · (주)비오팜 제조</li></ul>\n  <h2>옥타코사놀 기능성 (공식 인정)</h2><ul class=\"sd-why\"><li>지구력 증진에 도움을 줄 수 있음</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>옥타코사놀</b> 표시량(10mg/1100mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있으며 연노랑색의 점도가 있는 내용물을 함유한 흑갈색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ② 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 옥타코사놀 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Octacosanol 10mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>건강한자 행복하라 맥스<small>Octacosanol</small></h1><p class=\"sd-meta\">Made by (주)비오팜 · 2 times a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>10mg</b> of labelled Octacosanol (per 1100mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>10mg</b> of Octacosanol per serving (1 capsule)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비오팜</li></ul>\n  <h2>Octacosanol functional claims (officially recognised)</h2><ul class=\"sd-why\"><li>May help with improving endurance</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Octacosanol</b> labelled (10mg / 1100mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있으며 연노랑색의 점도가 있는 내용물을 함유한 흑갈색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ② 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Octacosanol daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "octacosanol-005",
+  "productName": "건강한자행복하라맥스",
+  "productNameEn": "건강한자행복하라맥스",
+  "manufacturer": "(주)서흥",
+  "manufacturerEn": null,
+  "statementNo": "20040020006915",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[옥타코사놀함유유지 제품]①지구력 증진에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 미황색 점조성 내용물을 함유한 갈색 투명의 연질캡슐\r\n2) 옥타코사놀 : 표시량(10 mg/1.4g)의 80~120%\r\n3) 잔류용매 : 5.0 mg/kg 이하\r\n4) 대장균군 : 음성   \r\n5) 붕해 :  20분 이내",
+   "intake": "1일 2회, 1회 2캡슐(0.7g)을 물과 함께 섭취하십시오.",
+   "caution": "① 임산부와 수유부는 섭취에 주의하십시오.\r\n② 특정 성분에 알레르기가 있으신 분은 원료명을 확인 후 섭취하십시오.",
+   "dosageForm": "미황색 점조성 내용물을 함유한 갈색 투명의 연질캡슐",
+   "storage": "① 제품은 직사광선을 피하고 서늘한 곳에서 보관 유통하십시오.\r\n② 제품 개봉 후에는 인습되지 않게 밀봉하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 10,
+    "unit": "mg",
+    "basisAmount": 1.4,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": 0.7,
+    "servingTotalWeightUnit": "g",
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">옥타코사놀 10mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>건강한자행복하라맥스<small>옥타코사놀</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 2회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 옥타코사놀 <b>10mg</b>를 표시량으로 담았습니다(표시 기준 1.4g당). 옥타코사놀의 기능성은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(2캡슐) 섭취로 옥타코사놀 <b>10mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>미황색 점조성 내용물을 함유한 갈색 투명의 연질캡슐 · (주)서흥 제조</li></ul>\n  <h2>옥타코사놀 기능성 (공식 인정)</h2><ul class=\"sd-why\"><li>지구력 증진에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>옥타코사놀</b> 표시량(10mg/1.4g)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 미황색 점조성 내용물을 함유한 갈색 투명의 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 제품은 직사광선을 피하고 서늘한 곳에서 보관 유통하십시오. ② 제품 개봉 후에는 인습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 옥타코사놀 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Octacosanol 10mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>건강한자행복하라맥스<small>Octacosanol</small></h1><p class=\"sd-meta\">Made by (주)서흥 · 2 times a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>10mg</b> of labelled Octacosanol (per 1.4g of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>10mg</b> of Octacosanol per serving (2 capsules)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)서흥</li></ul>\n  <h2>Octacosanol functional claims (officially recognised)</h2><ul class=\"sd-why\"><li>May help with improving endurance</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Octacosanol</b> labelled (10mg / 1.4g), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 미황색 점조성 내용물을 함유한 갈색 투명의 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 제품은 직사광선을 피하고 서늘한 곳에서 보관 유통하십시오. ② 제품 개봉 후에는 인습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Octacosanol daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "octacosanol-006",
+  "productName": "녹십초옥타코사놀",
+  "productNameEn": "녹십초옥타코사놀",
+  "manufacturer": "(주)녹십초알로에",
+  "manufacturerEn": null,
+  "statementNo": "2004001701350",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[옥타코사놀함유유지 제품]①지구력 증진에 도움을 줄 수 있음",
+   "baseStandard": "성상: 갈색의 페이스트상을 함유한 적갈색의 연질캅셀\n옥타코사놀: 표시량(8.2mg/1.8g)의 80~120%\n대장균군: 음성\n붕해시험: 20분이내",
+   "intake": "1일 2회 1회 2캅셀씩 물과 함께 섭취하십시오",
+   "caution": "섭취시 캅셀이 기도에 걸리지 않도록 주의하십시오.",
+   "dosageForm": "갈색의 페이스트상을 함유한 적갈색의 연질캅셀",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관하시기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 8.2,
+    "unit": "mg",
+    "basisAmount": 1.8,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">옥타코사놀 8.2mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>녹십초옥타코사놀<small>옥타코사놀</small></h1><p class=\"sd-meta\">(주)녹십초알로에 제조 · 1일 2회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 옥타코사놀 <b>8.2mg</b>를 표시량으로 담았습니다(표시 기준 1.8g당). 옥타코사놀의 기능성은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(2캡슐) 섭취로 옥타코사놀 <b>8.2mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>갈색의 페이스트상을 함유한 적갈색의 연질캅셀 · (주)녹십초알로에 제조</li></ul>\n  <h2>옥타코사놀 기능성 (공식 인정)</h2><ul class=\"sd-why\"><li>지구력 증진에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>옥타코사놀</b> 표시량(8.2mg/1.8g)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 갈색의 페이스트상을 함유한 적갈색의 연질캅셀</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관하시기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 옥타코사놀 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Octacosanol 8.2mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>녹십초옥타코사놀<small>Octacosanol</small></h1><p class=\"sd-meta\">Made by (주)녹십초알로에 · 2 times a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>8.2mg</b> of labelled Octacosanol (per 1.8g of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>8.2mg</b> of Octacosanol per serving (2 capsules)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)녹십초알로에</li></ul>\n  <h2>Octacosanol functional claims (officially recognised)</h2><ul class=\"sd-why\"><li>May help with improving endurance</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Octacosanol</b> labelled (8.2mg / 1.8g), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 갈색의 페이스트상을 함유한 적갈색의 연질캅셀</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관하시기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Octacosanol daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "octacosanol-007",
+  "productName": "세이헬스 옥타코사놀",
+  "productNameEn": "세이헬스 옥타코사놀",
+  "manufacturer": "(주)알피바이오",
+  "manufacturerEn": null,
+  "statementNo": "200400170061153",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[옥타코사놀 함유 유지] ①지구력 증진에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 갈색 점박이를 포함한 하얀색의 장방형 제피정제\n2) 옥타코사놀 : 표시량(7.0mg/500mg의 80~120%\n3) 붕해시험 : 60분 이내\n4) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오",
+   "caution": "",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 갈색 점박이를 포함한 하얀색의 장방형 제피정제",
+   "storage": "실온/ 고온다습한 곳과 직사광선을 피하여 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 7,
+    "unit": "mg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">옥타코사놀 7mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>세이헬스 옥타코사놀<small>옥타코사놀</small></h1><p class=\"sd-meta\">(주)알피바이오 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 옥타코사놀 <b>7mg</b>를 표시량으로 담았습니다(표시 기준 500mg당). 옥타코사놀의 기능성은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 옥타코사놀 <b>7mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 갈색 점박이를 포함한 하얀색의 장방형 제피정제 · (주)알피바이오 제조</li></ul>\n  <h2>옥타코사놀 기능성 (공식 인정)</h2><ul class=\"sd-why\"><li>지구력 증진에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>옥타코사놀</b> 표시량(7mg/500mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 갈색 점박이를 포함한 하얀색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 실온/ 고온다습한 곳과 직사광선을 피하여 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 옥타코사놀 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Octacosanol 7mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>세이헬스 옥타코사놀<small>Octacosanol</small></h1><p class=\"sd-meta\">Made by (주)알피바이오 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>7mg</b> of labelled Octacosanol (per 500mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>7mg</b> of Octacosanol per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)알피바이오</li></ul>\n  <h2>Octacosanol functional claims (officially recognised)</h2><ul class=\"sd-why\"><li>May help with improving endurance</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Octacosanol</b> labelled (7mg / 500mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 갈색 점박이를 포함한 하얀색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 실온/ 고온다습한 곳과 직사광선을 피하여 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Octacosanol daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "octacosanol-008",
+  "productName": "신용비",
+  "productNameEn": "신용비",
+  "manufacturer": "(주)녹십초알로에",
+  "manufacturerEn": null,
+  "statementNo": "2004001701341",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[옥타코사놀함유유지 제품]①지구력 증진에 도움을 줄 수 있음.",
+   "baseStandard": "1.성상:고유의 향미가 있고 이미,이취가 없는 탁한 황갈색의 내용물을 함유한 진한 분홍색의 연질캅셀\r\n2.옥타코사놀:표시량(10mg/1.8g)의 80~120%\r\n3.대장균군:음성\r\n4.붕해도:20분이내",
+   "intake": "1일 2회 1회 2캡슐씩 물과 함께 섭취바랍니다.",
+   "caution": "1.어린이,임산부 및 수유부는 섭취를 피할 것\n2.이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미,이취가 없는 탁한 황갈색의 내용물을 함유한 진한 분홍색의 연질캅셀",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관",
+   "shelfLife": "2년"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 10,
+    "unit": "mg",
+    "basisAmount": 1.8,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">옥타코사놀 10mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>신용비<small>옥타코사놀</small></h1><p class=\"sd-meta\">(주)녹십초알로에 제조 · 1일 2회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 옥타코사놀 <b>10mg</b>를 표시량으로 담았습니다(표시 기준 1.8g당). 옥타코사놀의 기능성은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(2캡슐) 섭취로 옥타코사놀 <b>10mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미,이취가 없는 탁한 황갈색의 내용물을 함유한 진한 분홍색의 연질캅셀 · (주)녹십초알로에 제조</li></ul>\n  <h2>옥타코사놀 기능성 (공식 인정)</h2><ul class=\"sd-why\"><li>지구력 증진에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>옥타코사놀</b> 표시량(10mg/1.8g)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미,이취가 없는 탁한 황갈색의 내용물을 함유한 진한 분홍색의 연질캅셀</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 2년</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 옥타코사놀 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Octacosanol 10mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>신용비<small>Octacosanol</small></h1><p class=\"sd-meta\">Made by (주)녹십초알로에 · 2 times a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>10mg</b> of labelled Octacosanol (per 1.8g of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>10mg</b> of Octacosanol per serving (2 capsules)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)녹십초알로에</li></ul>\n  <h2>Octacosanol functional claims (officially recognised)</h2><ul class=\"sd-why\"><li>May help with improving endurance</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Octacosanol</b> labelled (10mg / 1.8g), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미,이취가 없는 탁한 황갈색의 내용물을 함유한 진한 분홍색의 연질캅셀</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 2년</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Octacosanol daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "octacosanol-009",
+  "productName": "아폴로암스트롱",
+  "productNameEn": "아폴로암스트롱",
+  "manufacturer": "(주)경주생약 제2공장",
+  "manufacturerEn": null,
+  "statementNo": "2023000783532",
+  "category": "hff",
+  "source": {
+   "mainFunction": "① 지구력 증진에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고, 이미·이취가 없는 진갈색의 환\n2) 옥타코사놀 : 표시량 (7mg / 4.2g)의 80~120%\n3) 대장균군 : 음성",
+   "intake": "1일 1회, 1환을 씹어서 섭취하세요",
+   "caution": "- 소비기한이 경과 된 제품은 섭취하기 마십시오\n- 임산부, 수유부, 특이체질 및 알레르기 체질인 경우 성분을 확인하신 후 섭취하십시오\n- 이상사례 발생 시 섭취를 중단하고 전문가와 상의하십시오\n- 제품 개봉 또는 섭취 시 포장재의 의해 다칠 우려가 있으니 주의하십시오.",
+   "dosageForm": "고유의 향미가 있고, 이미·이취가 없는 진갈색의 환",
+   "storage": "직사광선을 피해 서늘한 곳에 보관 / 실온 유통",
+   "shelfLife": "제조일로 부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 7,
+    "unit": "mg",
+    "basisAmount": 4.2,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">옥타코사놀 7mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>아폴로암스트롱<small>옥타코사놀</small></h1><p class=\"sd-meta\">(주)경주생약 제2공장 제조 · 1일 1회 1환</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1환)에 옥타코사놀 <b>7mg</b>를 표시량으로 담았습니다(표시 기준 4.2g당). 옥타코사놀의 기능성은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1환) 섭취로 옥타코사놀 <b>7mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고, 이미·이취가 없는 진갈색의 환 · (주)경주생약 제2공장 제조</li></ul>\n  <h2>옥타코사놀 기능성 (공식 인정)</h2><ul class=\"sd-why\"><li>지구력 증진에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1환</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>옥타코사놀</b> 표시량(7mg/4.2g)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고, 이미·이취가 없는 진갈색의 환</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로 부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피해 서늘한 곳에 보관 / 실온 유통</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 옥타코사놀 섭취를 챙기고 싶은 분</li><li>씹어 먹는 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Octacosanol 7mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>아폴로암스트롱<small>Octacosanol</small></h1><p class=\"sd-meta\">Made by (주)경주생약 제2공장 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>7mg</b> of labelled Octacosanol (per 4.2g of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>7mg</b> of Octacosanol per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)경주생약 제2공장</li></ul>\n  <h2>Octacosanol functional claims (officially recognised)</h2><ul class=\"sd-why\"><li>May help with improving endurance</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Octacosanol</b> labelled (7mg / 4.2g), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고, 이미·이취가 없는 진갈색의 환</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로 부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피해 서늘한 곳에 보관 / 실온 유통</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Octacosanol daily</li><li>Those who prefer a chewable form</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "octacosanol-010",
+  "productName": "어거스트메드옥타코사놀",
+  "productNameEn": "어거스트메드옥타코사놀",
+  "manufacturer": "(주)유니쎌팜",
+  "manufacturerEn": null,
+  "statementNo": "20040020028316",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[옥타코사놀함유유지 제품]①지구력 증진에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 미황색의 내용물을 함유한 명적색의 연질캡슐\r\n2. 옥타코사놀 : 2.8mg/850mg의 80~120%\r\n3. 대장균군 : 음성\r\n4. 붕해도 : 20분 이내",
+   "intake": "1일 3회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "알러지 및 특이체질이신분은 제품성분을 확인하신 후 섭취하십시오.",
+   "dosageForm": "미황색의 내용물을 함유한 명적색의 연질캡슐",
+   "storage": "실온(고온다습한 곳과 직사광선을 피하여 서늘한 곳에 보관하십시오.)",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 2.8,
+    "unit": "mg",
+    "basisAmount": 850,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">옥타코사놀 2.8mg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>어거스트메드옥타코사놀<small>옥타코사놀</small></h1><p class=\"sd-meta\">(주)유니쎌팜 제조 · 1일 3회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 옥타코사놀 <b>2.8mg</b>를 표시량으로 담았습니다(표시 기준 850mg당). 옥타코사놀의 기능성은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(1캡슐) 섭취로 옥타코사놀 <b>2.8mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>미황색의 내용물을 함유한 명적색의 연질캡슐 · (주)유니쎌팜 제조</li></ul>\n  <h2>옥타코사놀 기능성 (공식 인정)</h2><ul class=\"sd-why\"><li>지구력 증진에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>옥타코사놀</b> 표시량(2.8mg/850mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 미황색의 내용물을 함유한 명적색의 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 실온(고온다습한 곳과 직사광선을 피하여 서늘한 곳에 보관하십시오.)</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 옥타코사놀 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Octacosanol 2.8mg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>어거스트메드옥타코사놀<small>Octacosanol</small></h1><p class=\"sd-meta\">Made by (주)유니쎌팜 · 3 times a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>2.8mg</b> of labelled Octacosanol (per 850mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>2.8mg</b> of Octacosanol per serving (1 capsule)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)유니쎌팜</li></ul>\n  <h2>Octacosanol functional claims (officially recognised)</h2><ul class=\"sd-why\"><li>May help with improving endurance</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Octacosanol</b> labelled (2.8mg / 850mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 미황색의 내용물을 함유한 명적색의 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온(고온다습한 곳과 직사광선을 피하여 서늘한 곳에 보관하십시오.)</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Octacosanol daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "octacosanol-011",
+  "productName": "어거스트메드옥타코사놀",
+  "productNameEn": "어거스트메드옥타코사놀",
+  "manufacturer": "(주)비오팜",
+  "manufacturerEn": null,
+  "statementNo": "20040017021712",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①지구력 증진에 도움을 줄 수 있음",
+   "baseStandard": "(1)성상 : 고유의 향미가 있고 이미, 이취가 없는 회황색의 내용물을 함유한 어두운 적갈색의 타원형 연질캡슐\n(2)옥타코사놀 : 표시량(10 mg/2,400 mg)의 80~120%\n(3)대장균군 : 음성\n(4)붕해시험 : 20분 이내",
+   "intake": "1일 2회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "- 개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오. \n- 알레르기 체질이신 경우 성분을 확인 하신 후 섭취하여 주시기 바랍니다. \n- 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의 하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 회황색의 내용물을 함유한 어두운 적갈색의 타원형 연질캡슐",
+   "storage": "① 고온다습 및 직사광선을 받지 않는 서늘한 곳에 보관하십시오.② 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 10,
+    "unit": "mg",
+    "basisAmount": 2400,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">옥타코사놀 10mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>어거스트메드옥타코사놀<small>옥타코사놀</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 2회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 옥타코사놀 <b>10mg</b>를 표시량으로 담았습니다(표시 기준 2400mg당). 옥타코사놀의 기능성은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(2캡슐) 섭취로 옥타코사놀 <b>10mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 회황색의 내용물을 함유한 어두운 적갈색의 타원형 연질캡슐 · (주)비오팜 제조</li></ul>\n  <h2>옥타코사놀 기능성 (공식 인정)</h2><ul class=\"sd-why\"><li>지구력 증진에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>옥타코사놀</b> 표시량(10mg/2400mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 회황색의 내용물을 함유한 어두운 적갈색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 고온다습 및 직사광선을 받지 않는 서늘한 곳에 보관하십시오. ② 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 옥타코사놀 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Octacosanol 10mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>어거스트메드옥타코사놀<small>Octacosanol</small></h1><p class=\"sd-meta\">Made by (주)비오팜 · 2 times a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>10mg</b> of labelled Octacosanol (per 2400mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>10mg</b> of Octacosanol per serving (2 capsules)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비오팜</li></ul>\n  <h2>Octacosanol functional claims (officially recognised)</h2><ul class=\"sd-why\"><li>May help with improving endurance</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Octacosanol</b> labelled (10mg / 2400mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 회황색의 내용물을 함유한 어두운 적갈색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 고온다습 및 직사광선을 받지 않는 서늘한 곳에 보관하십시오. ② 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Octacosanol daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "octacosanol-012",
+  "productName": "에너지큐",
+  "productNameEn": "에너지큐",
+  "manufacturer": "주식회사 다원바이오텍",
+  "manufacturerEn": null,
+  "statementNo": "20040017046108",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[옥타코사놀 함유 유지] ①지구력 증진에 도움을 줄 수 있음",
+   "baseStandard": "1) 성 상 : 이미, 이취가 없고 고유의 향미가 있는 흰 노랑색의 분말\n2) 옥타코사놀 : 표시량(40mg/4g)의 80~120%\n3) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포씩 충분한 물과 함께 섭취하십시오.",
+   "caution": "1.알레르기 등 특이체질이신 분은 제품 성분을 확인 후 섭취하시기 바랍니다. \n2.제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하시기 바랍니다.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 흰 노랑색의 분말",
+   "storage": "실온/ 직사광선을 피하여 서늘한 곳에 보관하시고 습기를 피하여 주십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 40,
+    "unit": "mg",
+    "basisAmount": 4,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">옥타코사놀 40mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>에너지큐<small>옥타코사놀</small></h1><p class=\"sd-meta\">주식회사 다원바이오텍 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1포)에 옥타코사놀 <b>40mg</b>를 표시량으로 담았습니다(표시 기준 4g당). 옥타코사놀의 기능성은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 옥타코사놀 <b>40mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 흰 노랑색의 분말 · 주식회사 다원바이오텍 제조</li></ul>\n  <h2>옥타코사놀 기능성 (공식 인정)</h2><ul class=\"sd-why\"><li>지구력 증진에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>옥타코사놀</b> 표시량(40mg/4g)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 흰 노랑색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 실온/ 직사광선을 피하여 서늘한 곳에 보관하시고 습기를 피하여 주십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 옥타코사놀 섭취를 챙기고 싶은 분</li><li>간편한 분말 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Octacosanol 40mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>에너지큐<small>Octacosanol</small></h1><p class=\"sd-meta\">Made by 주식회사 다원바이오텍 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 sachet) provides <b>40mg</b> of labelled Octacosanol (per 4g of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>40mg</b> of Octacosanol per serving (1 sachet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 다원바이오텍</li></ul>\n  <h2>Octacosanol functional claims (officially recognised)</h2><ul class=\"sd-why\"><li>May help with improving endurance</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Octacosanol</b> labelled (40mg / 4g), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 흰 노랑색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 실온/ 직사광선을 피하여 서늘한 곳에 보관하시고 습기를 피하여 주십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Octacosanol daily</li><li>Those who prefer a convenient powder form</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "octacosanol-013",
+  "productName": "옥타코사놀",
+  "productNameEn": "옥타코사놀",
+  "manufacturer": "(주)알피바이오",
+  "manufacturerEn": null,
+  "statementNo": "20040017006545",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①지구력 증진에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상:이미, 이취가 없는 갈색의 내용물을 함유한 암갈색의 연질캡슐\n2) 옥타코사놀:표시량(10.3mg/7800mg)의80~120%\n3) 대장균군:음성\n4) 붕해:20분이내",
+   "intake": "1일 3회, 1회 4캡슐을 물과 함께 섭취 하십시오.",
+   "caution": "",
+   "dosageForm": "이미, 이취가 없는 갈색의 내용물을 함유한 암갈색의 연질캡슐",
+   "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 10.3,
+    "unit": "mg",
+    "basisAmount": 7800,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 4,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">옥타코사놀 10.3mg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>옥타코사놀<small>옥타코사놀</small></h1><p class=\"sd-meta\">(주)알피바이오 제조 · 1일 3회 4캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 옥타코사놀 <b>10.3mg</b>를 표시량으로 담았습니다(표시 기준 7800mg당). 옥타코사놀의 기능성은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(4캡슐) 섭취로 옥타코사놀 <b>10.3mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없는 갈색의 내용물을 함유한 암갈색의 연질캡슐 · (주)알피바이오 제조</li></ul>\n  <h2>옥타코사놀 기능성 (공식 인정)</h2><ul class=\"sd-why\"><li>지구력 증진에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 4캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>옥타코사놀</b> 표시량(10.3mg/7800mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없는 갈색의 내용물을 함유한 암갈색의 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 옥타코사놀 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Octacosanol 10.3mg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>옥타코사놀<small>Octacosanol</small></h1><p class=\"sd-meta\">Made by (주)알피바이오 · 3 times a day · 4 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>10.3mg</b> of labelled Octacosanol (per 7800mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>10.3mg</b> of Octacosanol per serving (4 capsules)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)알피바이오</li></ul>\n  <h2>Octacosanol functional claims (officially recognised)</h2><ul class=\"sd-why\"><li>May help with improving endurance</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">4 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Octacosanol</b> labelled (10.3mg / 7800mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없는 갈색의 내용물을 함유한 암갈색의 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Octacosanol daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "octacosanol-014",
+  "productName": "옥타코사놀",
+  "productNameEn": "옥타코사놀",
+  "manufacturer": "주식회사 노바렉스2공장",
+  "manufacturerEn": null,
+  "statementNo": "200600200081135",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[옥타코사놀함유유지] 지구력 증진에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 녹갈색의 점도가 있는 내용물을 함유한 갈흑색의 타원형 연질캡슐\n2. 옥타코사놀 : 표시량(40mg/7800mg) 의 80~120%\n3. 대장균군 : 음성\n4. 붕해 : 20분 이내",
+   "intake": "1일 3회, 1회 4캡슐 (1캡슐당 650mg)을 물과 함께 섭취하십시오.",
+   "caution": "특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다.\n제품 개봉 또는 섭취 시 포장재에 의해 다칠 우려가 있으니 주의하시기 바랍니다\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n특정 성분에 알레르기 체질이신 분은 성분을 확인 후 섭취하여 주십시오.\n임산부, 수유 여성 및 영·유아·어린이는 섭취에 주의하시기 바랍니다.\n소비기한 경과, 포장재 변형, 팽창, 손상이 되었거나 내용물이 변질 되었을 경우 섭취하지 마십시오.\n원료 특성상 침전물이 발생할 수 있으나 원료 고유의 성분이므로 안심하고 섭취하십시오.\n개봉 또는 섭취 시 포장재에 의한 상처를 입을 수 있으니 주의하시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 녹갈색의 점도가 있는 내용물을 함유한 갈흑색의 타원형 연질캡슐",
+   "storage": "1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오. 4. 온도 및 습도 등의 변화에 의해 캡슐이 붙는 현상이 발생될 수 있으나, 품질에 이상이 없으니 안심하고 섭취하십시오. 5. 직사광선과 고온다습한 곳을 피해 서늘한 곳에 실온 보관하시기 바랍니다. 6. 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 40,
+    "unit": "mg",
+    "basisAmount": 7800,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 4,
+    "servingTotalWeight": 650,
+    "servingTotalWeightUnit": "mg",
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">옥타코사놀 40mg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>옥타코사놀<small>옥타코사놀</small></h1><p class=\"sd-meta\">주식회사 노바렉스2공장 제조 · 1일 3회 4캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 옥타코사놀 <b>40mg</b>를 표시량으로 담았습니다(표시 기준 7800mg당). 옥타코사놀의 기능성은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(4캡슐) 섭취로 옥타코사놀 <b>40mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 녹갈색의 점도가 있는 내용물을 함유한 갈흑색의 타원형 연질캡슐 · 주식회사 노바렉스2공장 제조</li></ul>\n  <h2>옥타코사놀 기능성 (공식 인정)</h2><ul class=\"sd-why\"><li>지구력 증진에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 4캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>옥타코사놀</b> 표시량(40mg/7800mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 녹갈색의 점도가 있는 내용물을 함유한 갈흑색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오. 4. 5. 직사광선과 고온다습한 곳을 피해 서늘한 곳에 실온 보관하시기 바랍니다. 6. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 옥타코사놀 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Octacosanol 40mg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>옥타코사놀<small>Octacosanol</small></h1><p class=\"sd-meta\">Made by 주식회사 노바렉스2공장 · 3 times a day · 4 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>40mg</b> of labelled Octacosanol (per 7800mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>40mg</b> of Octacosanol per serving (4 capsules)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 노바렉스2공장</li></ul>\n  <h2>Octacosanol functional claims (officially recognised)</h2><ul class=\"sd-why\"><li>May help with improving endurance</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">4 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Octacosanol</b> labelled (40mg / 7800mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 녹갈색의 점도가 있는 내용물을 함유한 갈흑색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오. 4. 5. 직사광선과 고온다습한 곳을 피해 서늘한 곳에 실온 보관하시기 바랍니다. 6. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Octacosanol daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "octacosanol-015",
+  "productName": "옥타코사놀",
+  "productNameEn": "옥타코사놀",
+  "manufacturer": "주식회사 상상바이오",
+  "manufacturerEn": null,
+  "statementNo": "20200016052397",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[옥타코사놀 함유 유지] ① 지구력 증진에 도움을 줄 수 있음",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 정제\n② 옥타코사놀 : 표시량(10mg/500mg)의 80 ~ 120%\n③ 대장균군 : 음성\n④ 붕해시험 : 30분이내",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "[옥타코사놀 함유 유지] ① 어린이, 임산부 및 수유부는 섭취를 피하십시오. ② 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 정제",
+   "storage": "① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 10,
+    "unit": "mg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">옥타코사놀 10mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>옥타코사놀<small>옥타코사놀</small></h1><p class=\"sd-meta\">주식회사 상상바이오 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 옥타코사놀 <b>10mg</b>를 표시량으로 담았습니다(표시 기준 500mg당). 옥타코사놀의 기능성은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 옥타코사놀 <b>10mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 정제 · 주식회사 상상바이오 제조</li></ul>\n  <h2>옥타코사놀 기능성 (공식 인정)</h2><ul class=\"sd-why\"><li>지구력 증진에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>옥타코사놀</b> 표시량(10mg/500mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 옥타코사놀 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Octacosanol 10mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>옥타코사놀<small>Octacosanol</small></h1><p class=\"sd-meta\">Made by 주식회사 상상바이오 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>10mg</b> of labelled Octacosanol (per 500mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>10mg</b> of Octacosanol per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 상상바이오</li></ul>\n  <h2>Octacosanol functional claims (officially recognised)</h2><ul class=\"sd-why\"><li>May help with improving endurance</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Octacosanol</b> labelled (10mg / 500mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Octacosanol daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "octacosanol-016",
+  "productName": "옥타코사놀&홍국",
+  "productNameEn": "옥타코사놀&홍국",
+  "manufacturer": "코스맥스엔비티(주)",
+  "manufacturerEn": null,
+  "statementNo": "200700170351951",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[옥타코사놀 함유 유지] \n①지구력 증진에 도움을 줄 수 있음\n[홍국] \n①혈중 콜레스테롤 개선에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 어두운 적갈색의 원형 제피정제\n2. 붕해시험 : 60분 이내\n3. 총 모나콜린 K : 표시량(5mg/200mg)의 80 ~ 120%\n4. 활성형 모나콜린 K : 확인\n5. 시트리닌(mg/kg) : 0.05 이하\n6. 옥타코사놀 : 표시량(12mg/200mg)의 80 ~ 120%\n7. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "1) 임산부, 수유부나 의약품을 섭취하시는 분은 섭취 전 전문가와 상담하여 주십시오.\n2) 특이체질, 알레르기체질인 경우에는 의사와 상담 후 섭취여부를 결정하십시오.\n3) 섭취량 및 섭취 방법을 확인한 후 섭취하십시오.\n4) 섭취 전에 유통기한을 확인 후 섭취하십시오. 또한 유통기한이 경과한 제품은 섭취하지 마십시오.\n5) 이상증상이 생길 경우 섭취를 중단하고, 전문의와 상담하거나 소비자 상담실로 문의하시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 어두운 적갈색의 원형 제피정제",
+   "storage": "실온/ 1. 직사광선이나 고온 다습한 곳을 피하여 청결하고 서늘한 곳에 보관 하십시오. 2. 제품 개봉 후에는 흡습이 일어날 수 있으니 반드시 밀봉하여 보관 하십시오.3. 유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 12,
+    "unit": "mg",
+    "basisAmount": 200,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">옥타코사놀 12mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>옥타코사놀&amp;홍국<small>옥타코사놀</small></h1><p class=\"sd-meta\">코스맥스엔비티(주) 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 옥타코사놀 <b>12mg</b>를 표시량으로 담았습니다(표시 기준 200mg당). 옥타코사놀의 기능성은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 옥타코사놀 <b>12mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 어두운 적갈색의 원형 제피정제 · 코스맥스엔비티(주) 제조</li></ul>\n  <h2>옥타코사놀 기능성 (공식 인정)</h2><ul class=\"sd-why\"><li>지구력 증진에 도움을 줄 수 있음</li><li>혈중 콜레스테롤 개선에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>옥타코사놀</b> 표시량(12mg/200mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 어두운 적갈색의 원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 실온/ 1. 직사광선이나 고온 다습한 곳을 피하여 청결하고 서늘한 곳에 보관 하십시오. 2. 제품 개봉 후에는 흡습이 일어날 수 있으니 반드시 밀봉하여 보관 하십시오.3. 유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 옥타코사놀 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Octacosanol 12mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>옥타코사놀&amp;홍국<small>Octacosanol</small></h1><p class=\"sd-meta\">Made by 코스맥스엔비티(주) · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>12mg</b> of labelled Octacosanol (per 200mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>12mg</b> of Octacosanol per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스엔비티(주)</li></ul>\n  <h2>Octacosanol functional claims (officially recognised)</h2><ul class=\"sd-why\"><li>May help with improving endurance</li><li>May help with improving blood cholesterol</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Octacosanol</b> labelled (12mg / 200mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 어두운 적갈색의 원형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 실온/ 1. 직사광선이나 고온 다습한 곳을 피하여 청결하고 서늘한 곳에 보관 하십시오. 2. 제품 개봉 후에는 흡습이 일어날 수 있으니 반드시 밀봉하여 보관 하십시오.3. 유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Octacosanol daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "octacosanol-017",
+  "productName": "옥타활력환",
+  "productNameEn": "옥타활력환",
+  "manufacturer": "대원헬스케어 주식회사 2공장",
+  "manufacturerEn": null,
+  "statementNo": "20172880193174",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①지구력 증진에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미,이취가 없는 갈색의 환\n2. 옥타코사놀 : 표시량(9 mg/9,000 mg)의 80~120%\n3. 잔류용매(mg/kg) : 5.0 이하\n4. 대장균군: 음성\n5. 붕해도 : 제1액 60분 이내, 제2액 60분 이내",
+   "intake": "1일 2회, 1회 1포를 물과 함께 섭취하십시오.",
+   "caution": "",
+   "dosageForm": "고유의 향미가 있고 이미,이취가 없는 갈색의 환",
+   "storage": "직사광선을 피하여 실온에 보관하시고, 영.유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 9,
+    "unit": "mg",
+    "basisAmount": 9000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">옥타코사놀 9mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>옥타활력환<small>옥타코사놀</small></h1><p class=\"sd-meta\">대원헬스케어 주식회사 2공장 제조 · 1일 2회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 옥타코사놀 <b>9mg</b>를 표시량으로 담았습니다(표시 기준 9000mg당). 옥타코사놀의 기능성은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(1포) 섭취로 옥타코사놀 <b>9mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미,이취가 없는 갈색의 환 · 대원헬스케어 주식회사 2공장 제조</li></ul>\n  <h2>옥타코사놀 기능성 (공식 인정)</h2><ul class=\"sd-why\"><li>지구력 증진에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>옥타코사놀</b> 표시량(9mg/9000mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미,이취가 없는 갈색의 환</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하여 실온에 보관하시고, 영.유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 옥타코사놀 섭취를 챙기고 싶은 분</li><li>간편한 분말 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Octacosanol 9mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>옥타활력환<small>Octacosanol</small></h1><p class=\"sd-meta\">Made by 대원헬스케어 주식회사 2공장 · 2 times a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>9mg</b> of labelled Octacosanol (per 9000mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>9mg</b> of Octacosanol per serving (1 sachet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 대원헬스케어 주식회사 2공장</li></ul>\n  <h2>Octacosanol functional claims (officially recognised)</h2><ul class=\"sd-why\"><li>May help with improving endurance</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Octacosanol</b> labelled (9mg / 9000mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미,이취가 없는 갈색의 환</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하여 실온에 보관하시고, 영.유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Octacosanol daily</li><li>Those who prefer a convenient powder form</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "octacosanol-018",
+  "productName": "온톤 알티지 오메가3 & 옥타코사놀",
+  "productNameEn": "온톤 알티지 오메가3 & 옥타코사놀",
+  "manufacturer": "(주)신비바이오",
+  "manufacturerEn": null,
+  "statementNo": "2023000229680",
+  "category": "hff",
+  "source": {
+   "mainFunction": "1) [EPA 및 DHA 함유 유지] 혈중 중성지질 개선 ･ 혈행 개선 ･ 기억력 개선 ･ 건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\n2 [옥타코사놀 함유 유지] 지구력 증진에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 진한 노랑색의 내용물을 함유한 투명한 타원형 연질캡슐\n2) EPA 및 DHA의 합 : 표시량(1,470 mg/3,000 mg)의 80~120%\n3) 옥타코사놀 : 표시량(26 mg/3,000 mg)의 80~120%\n4) 납(mg/kg) : 3.0 이하\n5) 카드뮴(mg/kg) : 1.0 이하\n6) 수은(mg/kg) : 0.5 이하\n7) 대장균군 : 음성\n8) 붕해시험: 20분 이내",
+   "intake": "1일 2회, 1회 3캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "1) 소비기한을 확인 후 섭취하시기 바라며, 섭취량 및 방법을 준수하시기 바랍니다.\n2) 특이체질, 알레르기 체질의 경우 성분을 확인하신 후 섭취하십시오.\n3) 어린이, 임산부 및 수유부는 섭취를 피하십시오.\n4) 용기 안의 실리카겔(방습제)은 절대 드시지 마십시오.\n5) 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.\n6) 의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담하십시오.\n7) 개인에 따라 피부 관련 이상반응이 발생할 수 있습니다.\n8) 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 진한 노랑색의 내용물을 함유한 투명한 타원형 연질캡슐",
+   "storage": "1) 고온다습(30℃ 이상, 상대습도 75% 이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오. 2) 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 26,
+    "unit": "mg",
+    "basisAmount": 3000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 3,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">옥타코사놀 26mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>온톤 알티지 오메가3 &amp; 옥타코사놀<small>옥타코사놀</small></h1><p class=\"sd-meta\">(주)신비바이오 제조 · 1일 2회 3캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 옥타코사놀 <b>26mg</b>를 표시량으로 담았습니다(표시 기준 3000mg당). 옥타코사놀의 기능성은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(3캡슐) 섭취로 옥타코사놀 <b>26mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 진한 노랑색의 내용물을 함유한 투명한 타원형 연질캡슐 · (주)신비바이오 제조</li></ul>\n  <h2>옥타코사놀 기능성 (공식 인정)</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선 ･ 혈행 개선 ･ 기억력 개선 ･ 건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음 2   지구력 증진에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 3캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>옥타코사놀</b> 표시량(26mg/3000mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 진한 노랑색의 내용물을 함유한 투명한 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1) 고온다습(30℃ 이상, 상대습도 75% 이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오. 2) 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 옥타코사놀 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Octacosanol 26mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>온톤 알티지 오메가3 &amp; 옥타코사놀<small>Octacosanol</small></h1><p class=\"sd-meta\">Made by (주)신비바이오 · 2 times a day · 3 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>26mg</b> of labelled Octacosanol (per 3000mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>26mg</b> of Octacosanol per serving (3 capsules)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)신비바이오</li></ul>\n  <h2>Octacosanol functional claims (officially recognised)</h2><ul class=\"sd-why\"><li>May help with improving blood triglyceride levels, improving blood circulation, memory improvement, and improving dry eyes for eye health</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">3 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Octacosanol</b> labelled (26mg / 3000mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 진한 노랑색의 내용물을 함유한 투명한 타원형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1) 고온다습(30℃ 이상, 상대습도 75% 이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오. 2) 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Octacosanol daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "octacosanol-019",
+  "productName": "지구력엔",
+  "productNameEn": "지구력엔",
+  "manufacturer": "코스맥스바이오(주)",
+  "manufacturerEn": null,
+  "statementNo": "200400200022421",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①지구력 증진에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 이미, 이취가 없고 고유의 향미가 있는 흰보라색의 분말\n2) 옥타코사놀 : 표시량(12.5mg/5g)의 80~120%\n3) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포(5g)를 섭취하십시오.",
+   "caution": "섭취 시 위장장애, 소화불량의 증상이 있을 경우 섭취를 중단하십시오.\n개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오.\n섭취 전 제품에 이상이 있는 경우 섭취를 금하십시오.\n특정 원료 성분에 알레르기 체질은 원료 성분을 확인 후 섭취하십시오.",
+   "dosageForm": "흰보라색의 분말",
+   "storage": "수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 2년"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 12.5,
+    "unit": "mg",
+    "basisAmount": 5,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": 5,
+    "servingTotalWeightUnit": "g",
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">옥타코사놀 12.5mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>지구력엔<small>옥타코사놀</small></h1><p class=\"sd-meta\">코스맥스바이오(주) 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1포)에 옥타코사놀 <b>12.5mg</b>를 표시량으로 담았습니다(표시 기준 5g당). 옥타코사놀의 기능성은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 옥타코사놀 <b>12.5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>흰보라색의 분말 · 코스맥스바이오(주) 제조</li></ul>\n  <h2>옥타코사놀 기능성 (공식 인정)</h2><ul class=\"sd-why\"><li>지구력 증진에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>옥타코사놀</b> 표시량(12.5mg/5g)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 흰보라색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>보관</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 옥타코사놀 섭취를 챙기고 싶은 분</li><li>간편한 분말 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Octacosanol 12.5mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>지구력엔<small>Octacosanol</small></h1><p class=\"sd-meta\">Made by 코스맥스바이오(주) · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 sachet) provides <b>12.5mg</b> of labelled Octacosanol (per 5g of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>12.5mg</b> of Octacosanol per serving (1 sachet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스바이오(주)</li></ul>\n  <h2>Octacosanol functional claims (officially recognised)</h2><ul class=\"sd-why\"><li>May help with improving endurance</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Octacosanol</b> labelled (12.5mg / 5g), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 흰보라색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>Storage</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Octacosanol daily</li><li>Those who prefer a convenient powder form</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "octacosanol-020",
+  "productName": "지구력증진엔 옥타코사놀",
+  "productNameEn": "지구력증진엔 옥타코사놀",
+  "manufacturer": "(주)팜투팜2공장",
+  "manufacturerEn": null,
+  "statementNo": "20180003915111",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[옥타코사놀 함유 유지] ①지구력 증진에 도움을 줄 수 있음",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 정제\n② 옥타코사놀 : 표시량 ( 40 mg/ 700 mg)의 80~120%\n③ 대장균군 : 음성\n④ 붕해시험 : 30분 이내",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취 하십시오.",
+   "caution": "① 질환이 있거나 의약품 복용 시 전문가와 상담 하십시오. \n② 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있습니다. \n③ 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도하십시오.\n④ 이상 사례 발생 시 섭취를 중단하고 전문가와 상담 하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 정제",
+   "storage": "",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 40,
+    "unit": "mg",
+    "basisAmount": 700,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">옥타코사놀 40mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>지구력증진엔 옥타코사놀<small>옥타코사놀</small></h1><p class=\"sd-meta\">(주)팜투팜2공장 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 옥타코사놀 <b>40mg</b>를 표시량으로 담았습니다(표시 기준 700mg당). 옥타코사놀의 기능성은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 옥타코사놀 <b>40mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 정제 · (주)팜투팜2공장 제조</li></ul>\n  <h2>옥타코사놀 기능성 (공식 인정)</h2><ul class=\"sd-why\"><li>지구력 증진에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>옥타코사놀</b> 표시량(40mg/700mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 옥타코사놀 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Octacosanol 40mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>지구력증진엔 옥타코사놀<small>Octacosanol</small></h1><p class=\"sd-meta\">Made by (주)팜투팜2공장 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>40mg</b> of labelled Octacosanol (per 700mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>40mg</b> of Octacosanol per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)팜투팜2공장</li></ul>\n  <h2>Octacosanol functional claims (officially recognised)</h2><ul class=\"sd-why\"><li>May help with improving endurance</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Octacosanol</b> labelled (40mg / 700mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Octacosanol daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "octacosanol-021",
+  "productName": "케이헬씨 옥타코사놀",
+  "productNameEn": "케이헬씨 옥타코사놀",
+  "manufacturer": "주식회사 상상바이오",
+  "manufacturerEn": null,
+  "statementNo": "20200016052313",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[옥타코사놀 함유 유지] ① 지구력 증진에 도움을 줄 수 있음",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 정제\n② 옥타코사놀 : 표시량(7mg/500mg)의 80 ~ 120%\n③ 대장균군 : 음성\n④ 붕해시험 : 30분이내",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "[옥타코사놀 함유 유지] ① 어린이, 임산부 및 수유부는 섭취를 피하십시오. ② 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 정제",
+   "storage": "① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 7,
+    "unit": "mg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">옥타코사놀 7mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>케이헬씨 옥타코사놀<small>옥타코사놀</small></h1><p class=\"sd-meta\">주식회사 상상바이오 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 옥타코사놀 <b>7mg</b>를 표시량으로 담았습니다(표시 기준 500mg당). 옥타코사놀의 기능성은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 옥타코사놀 <b>7mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 정제 · 주식회사 상상바이오 제조</li></ul>\n  <h2>옥타코사놀 기능성 (공식 인정)</h2><ul class=\"sd-why\"><li>지구력 증진에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>옥타코사놀</b> 표시량(7mg/500mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 옥타코사놀 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Octacosanol 7mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>케이헬씨 옥타코사놀<small>Octacosanol</small></h1><p class=\"sd-meta\">Made by 주식회사 상상바이오 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>7mg</b> of labelled Octacosanol (per 500mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>7mg</b> of Octacosanol per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 상상바이오</li></ul>\n  <h2>Octacosanol functional claims (officially recognised)</h2><ul class=\"sd-why\"><li>May help with improving endurance</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Octacosanol</b> labelled (7mg / 500mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Octacosanol daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "octacosanol-022",
+  "productName": "파워바이탈",
+  "productNameEn": "파워바이탈",
+  "manufacturer": "코스맥스바이오(주)",
+  "manufacturerEn": null,
+  "statementNo": "200400200023069",
+  "category": "hff",
+  "source": {
+   "mainFunction": "지구력 증진에 도움을 줄 수 있음.",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없으며 밝은 적갈색의 내용물을 함유한 갈흑색의 장방형 연질캡슐\n2) 옥타코사놀 : 표시량(20mg/1000mg)의 80~120%\n3) 대장균군 : 음성\n4) 붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "섭취 시 목에 걸릴 수 있으므로 반드시 물과 함께 섭취하십시오. \n섭취 시 위장장애, 소화불량의 증상이 있을 경우 섭취를 중단하십시오.\n개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오.\n섭취 전 제품에 이상이 있는 경우 섭취를 금하십시오.\n특정 원료 성분에 알레르기 체질은 원료 성분을 확인 후 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 밝은 적갈색의 내용물을 함유한 갈흑색의 장방형 연질캡슐",
+   "storage": "수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 2년"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 20,
+    "unit": "mg",
+    "basisAmount": 1000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">옥타코사놀 20mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>파워바이탈<small>옥타코사놀</small></h1><p class=\"sd-meta\">코스맥스바이오(주) 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1캡슐)에 옥타코사놀 <b>20mg</b>를 표시량으로 담았습니다(표시 기준 1000mg당). 옥타코사놀의 기능성은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 옥타코사놀 <b>20mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며 밝은 적갈색의 내용물을 함유한 갈흑색의 장방형 연질캡슐 · 코스맥스바이오(주) 제조</li></ul>\n  <h2>옥타코사놀 기능성 (공식 인정)</h2><ul class=\"sd-why\"><li>지구력 증진에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>옥타코사놀</b> 표시량(20mg/1000mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 밝은 적갈색의 내용물을 함유한 갈흑색의 장방형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>보관</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 옥타코사놀 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Octacosanol 20mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>파워바이탈<small>Octacosanol</small></h1><p class=\"sd-meta\">Made by 코스맥스바이오(주) · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 capsule) provides <b>20mg</b> of labelled Octacosanol (per 1000mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>20mg</b> of Octacosanol per serving (1 capsule)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스바이오(주)</li></ul>\n  <h2>Octacosanol functional claims (officially recognised)</h2><ul class=\"sd-why\"><li>May help with improving endurance</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Octacosanol</b> labelled (20mg / 1000mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없으며 밝은 적갈색의 내용물을 함유한 갈흑색의 장방형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>Storage</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Octacosanol daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "octacosanol-023",
+  "productName": "팍시다이어트 맨즈(FCCE DIET MAN’S)",
+  "productNameEn": "팍시다이어트 맨즈(FCCE DIET MAN’S)",
+  "manufacturer": "(주)비오팜",
+  "manufacturerEn": null,
+  "statementNo": "200400170211397",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[가르시니아캄보지아 추출물] 탄수화물이 지방으로 합성되는 것을 억제하여 체지방 감소에 도움을 줄 수 있음\n[밀크씨슬추출물] 간 건강에 도움을 줄 수 있음 \n[옥타코사놀함유유지] 지구력증진에 도움을 줄 수 있음 \n[비타민B1] 탄수화물과 에너지 대사에 필요\n[비타민B2] 체내 에너지 생성에 필요\n[나이아신] 체내 에너지 생성에 필요\n[판토텐산] 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+   "baseStandard": "①성상 : 고유의 향미가 있고 이미, 이취가 없으며 하양색, 주황색, 갈색의 점박이가 있는 연한 노란색 장방형 제피정제\n②총(-)-Hydroxycitric acid : 표시량(750 mg/2,700 mg) 80%~120% \n③실리마린 : 표시량(130 mg/2,700 mg) 80~120%\n④옥타코사놀 : 표시량(7 mg/2,700 mg)의 80~120%\n⑤비타민B2 : 표시량(40 mg/2,700 mg) 80~180% \n⑥나이아신 : 표시량(15 mg NE/2,700 mg) 80~150%\n⑦판토텐산 : 표시량(5 mg/2,700 mg) 80~180%\n⑧비타민B1 : 표시량(1.2 mg/2,700 mg) 80~180%\n⑨납(mg/kg) : 1.0이하 \n⑩카드뮴(mg/kg) : 0.5이하\n⑪수은(mg/kg) : 0.4 이하 \n⑫비소(mg/kg) : 1.0이하\n⑬대장균군 : 음성\n⑭붕해시험 : 60분이내",
+   "intake": "1일 3회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 간·신장·심장질환, 알레르기 및 천식이 있거나 의약품 복용 시 전문가와 상담할 것\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n알레르기 반응이 나타나는 경우에는 섭취 중단\n설사, 위통, 복부팽만 등의 위장관계 장애가 나타나는 경우에는 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 하양색, 주황색, 갈색의 점박이가 있는 연한 노란색 장방형 제피정제",
+   "storage": "실온/ ①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하십시오.②유통 중 인습되지 않도록 포장의 파손에 주의하십시오.③어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 7,
+    "unit": "mg",
+    "basisAmount": 2700,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">옥타코사놀 7mg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>팍시다이어트 맨즈(FCCE DIET MAN’S)<small>옥타코사놀</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 3회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 옥타코사놀 <b>7mg</b>를 표시량으로 담았습니다(표시 기준 2700mg당). 옥타코사놀의 기능성은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(1정) 섭취로 옥타코사놀 <b>7mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며 하양색, 주황색, 갈색의 점박이가 있는 연한 노란색 장방형 제피정제 · (주)비오팜 제조</li></ul>\n  <h2>옥타코사놀 기능성 (공식 인정)</h2><ul class=\"sd-why\"><li>탄수화물이 지방으로 합성되는 것을 억제하여 체지방 감소에 도움을 줄 수 있음</li><li>간 건강에 도움을 줄 수 있음</li><li>지구력증진에 도움을 줄 수 있음</li><li>탄수화물과 에너지 대사에 필요</li><li>체내 에너지 생성에 필요</li><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>옥타코사놀</b> 표시량(7mg/2700mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 하양색, 주황색, 갈색의 점박이가 있는 연한 노란색 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온/ ①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하십시오. ②유통 중 인습되지 않도록 포장의 파손에 주의하십시오. ③어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 옥타코사놀 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Octacosanol 7mg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>팍시다이어트 맨즈(FCCE DIET MAN’S)<small>Octacosanol</small></h1><p class=\"sd-meta\">Made by (주)비오팜 · 3 times a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>7mg</b> of labelled Octacosanol (per 2700mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>7mg</b> of Octacosanol per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비오팜</li></ul>\n  <h2>Octacosanol functional claims (officially recognised)</h2><ul class=\"sd-why\"><li>May help with reducing body fat by inhibiting the conversion of carbohydrate into fat</li><li>May help with liver health</li><li>May help with improving endurance</li><li>Needed for carbohydrate and energy metabolism</li><li>Needed for energy production in the body</li><li>Needed for the metabolism of fat, carbohydrate and protein and for energy production</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Octacosanol</b> labelled (7mg / 2700mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없으며 하양색, 주황색, 갈색의 점박이가 있는 연한 노란색 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온/ ①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하십시오. ②유통 중 인습되지 않도록 포장의 파손에 주의하십시오. ③어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Octacosanol daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "octacosanol-024",
+  "productName": "혼일 윗저마인",
+  "productNameEn": "혼일 윗저마인",
+  "manufacturer": "동서바이오팜(주) 안성공장",
+  "manufacturerEn": null,
+  "statementNo": "20220011370145",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[옥타코사놀 함유 유지]지구력 증진에 도움을 줄 수 있음\n\n[비타민E]항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 주황색 내용물을 포함한 빨강검정색의 장방형 연질캡슐\n2. 옥타코사놀 : 표시량(10 mg / 2,000 mg)의 80~120%\n3. 비타민 E : 표시량(30 mg α-TE / 2,000 mg)의 80~150%\n4. 대장균군 : 음성\n5. 붕해: 20분 이내",
+   "intake": "1일 1회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 주황색 내용물을 포함한 빨강검정색의 장방형 연질캡슐",
+   "storage": "고온다습, 직사광선을 피하여 건조하고 서늘한 곳에서 보관 및 유통하십시오. 영·유아 및 어린이의 손이 닿지 않는 곳에서 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월 까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 10,
+    "unit": "mg",
+    "basisAmount": 2000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">옥타코사놀 10mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>혼일 윗저마인<small>옥타코사놀</small></h1><p class=\"sd-meta\">동서바이오팜(주) 안성공장 제조 · 1일 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 2캡슐)에 옥타코사놀 <b>10mg</b>를 표시량으로 담았습니다(표시 기준 2000mg당). 옥타코사놀의 기능성은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2캡슐) 섭취로 옥타코사놀 <b>10mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 주황색 내용물을 포함한 빨강검정색의 장방형 연질캡슐 · 동서바이오팜(주) 안성공장 제조</li></ul>\n  <h2>옥타코사놀 기능성 (공식 인정)</h2><ul class=\"sd-why\"><li>지구력 증진에 도움을 줄 수 있음</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>옥타코사놀</b> 표시량(10mg/2000mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 주황색 내용물을 포함한 빨강검정색의 장방형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월 까지</div><div class=\"sd-item\"><b>보관</b> 고온다습, 직사광선을 피하여 건조하고 서늘한 곳에서 보관 및 유통하십시오. 영·유아 및 어린이의 손이 닿지 않는 곳에서 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 옥타코사놀 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Octacosanol 10mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>혼일 윗저마인<small>Octacosanol</small></h1><p class=\"sd-meta\">Made by 동서바이오팜(주) 안성공장 · Once a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 2 capsules) provides <b>10mg</b> of labelled Octacosanol (per 2000mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>10mg</b> of Octacosanol per serving (2 capsules)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 동서바이오팜(주) 안성공장</li></ul>\n  <h2>Octacosanol functional claims (officially recognised)</h2><ul class=\"sd-why\"><li>May help with improving endurance</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Octacosanol</b> labelled (10mg / 2000mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 주황색 내용물을 포함한 빨강검정색의 장방형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월 까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습, 직사광선을 피하여 건조하고 서늘한 곳에서 보관 및 유통하십시오. 영·유아 및 어린이의 손이 닿지 않는 곳에서 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Octacosanol daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "octacosanol-025",
+  "productName": "황제자현단",
+  "productNameEn": "황제자현단",
+  "manufacturer": "인성제약(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040020019358",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[옥타코사놀함유유지 제품]①지구력 증진에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 흑갈색의 환제로서 고유의 향미가 있으며, 이미 이취가 없다.\r\n2) 옥타코사놀함량 : 표시량(7mg/4g)의 80~120%\r\n3) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1환(4g)을 씹어서 섭취하여 주십시오.",
+   "caution": "알레르기 체질이나 특이체질이신 경우 성분을 확인하신 후 섭취하여 주시기 바랍니다.",
+   "dosageForm": "흑갈색의 환제로서 고유의 향미가 있으며, 이미 이취가 없다.",
+   "storage": "① 직사광선을 피하고 서늘한 곳에 보관 하십시오.",
+   "shelfLife": "제조일로부터24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 7,
+    "unit": "mg",
+    "basisAmount": 4,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">옥타코사놀 7mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>황제자현단<small>옥타코사놀</small></h1><p class=\"sd-meta\">인성제약(주) 제조 · 1일 1회 1환</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1환)에 옥타코사놀 <b>7mg</b>를 표시량으로 담았습니다(표시 기준 4g당). 옥타코사놀의 기능성은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1환) 섭취로 옥타코사놀 <b>7mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>흑갈색의 환제로서 고유의 향미가 있으며, 이미 이취가 없다. · 인성제약(주) 제조</li></ul>\n  <h2>옥타코사놀 기능성 (공식 인정)</h2><ul class=\"sd-why\"><li>지구력 증진에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1환</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>옥타코사놀</b> 표시량(7mg/4g)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 흑갈색의 환제로서 고유의 향미가 있으며, 이미 이취가 없다.</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터24개월까지</div><div class=\"sd-item\"><b>보관</b> ① 직사광선을 피하고 서늘한 곳에 보관 하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 옥타코사놀 섭취를 챙기고 싶은 분</li><li>씹어 먹는 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Octacosanol 7mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>황제자현단<small>Octacosanol</small></h1><p class=\"sd-meta\">Made by 인성제약(주) · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>7mg</b> of labelled Octacosanol (per 4g of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>7mg</b> of Octacosanol per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 인성제약(주)</li></ul>\n  <h2>Octacosanol functional claims (officially recognised)</h2><ul class=\"sd-why\"><li>May help with improving endurance</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Octacosanol</b> labelled (7mg / 4g), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 흑갈색의 환제로서 고유의 향미가 있으며, 이미 이취가 없다.</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터24개월까지</div><div class=\"sd-item\"><b>Storage</b> ① 직사광선을 피하고 서늘한 곳에 보관 하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Octacosanol daily</li><li>Those who prefer a chewable form</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]
