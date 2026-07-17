@@ -183,3 +183,31 @@ WO: `WO-O4O-OTC-EN-DESIGN-PILOT-VALIDATION-V1` · 대상: [CHECK-...-PILOT-SELEC
 | **실제 경로** | 경구 | 경구 | 경구 | **질 내** | 경구 |
 
 **`doseForm='정'` 은 5건 전부 동일해 경로를 구분하지 못한다.** 실사용 가능한 신호는 **`usageLabel`(복용 안내 ↔ 사용 안내)** 이며, `summaryTable.성분` 의 `(질정)` 표기와 `usage` 본문이 이를 뒷받침한다.
+
+---
+
+## P6 — 은행엽건조엑스 80mg 정 (WO-O4O-OTC-HERBAL-EN-TRANSLATION-PERSIST-299-V1)
+
+**Ginkgo Leaf Dry Extract 80 mg Tablet** · `usageLabel=복용 안내` → 경구(How to take it)
+
+| 필드 | ko | en |
+|---|---|---|
+| efficacy | 말초동맥 순환장애(간헐성 파행증), 어지러움, 이명, 기억력 감퇴 등 기질성 뇌기능장애 치료 | …peripheral arterial circulation problems (intermittent claudication), dizziness, tinnitus…, and organic brain dysfunction with dementia-related symptoms… |
+| usage | 1회 1/2정(40mg) 1일 3회 또는 1정(80mg) 1일 2회 / 기질성 뇌기능장애 1/2~1정(40~80mg) 1일 3회 또는 1.5정(120mg) 1일 2회 | half a tablet (40 mg) three times a day, or one tablet (80 mg) twice a day / half to one tablet (40–80 mg) three times a day, or one and a half tablets (120 mg) twice a day |
+| caution | 과민증·12세 이하·치료 필요 고혈압·임부·갈락토오스 불내성 등 유전질환 복용 금지 / 수유부·출혈장애·수술예정·항응고제·항혈소판제 상담 | **Do not take this** if you have ever reacted…; a child aged 12 or under; high blood pressure that needs treatment; pregnant; galactose intolerance, Lapp lactase deficiency, glucose-galactose malabsorption. **Talk to a pharmacist** if breastfeeding, bleeding disorder, scheduled for surgery, anticoagulant or antiplatelet medicines. |
+
+**수치 대조**: `40mg`→`40 mg` ✅ / `80mg`→`80 mg` ✅ / `120mg`→`120 mg` ✅ / `40~80mg`→`40–80 mg` ✅ / `1일 3회`→`three times a day` ✅ / `1일 2회`→`twice a day` ✅ / `12세 이하`→`12 or under` ✅ / 금기·상담 강도 유지 ✅
+
+## P7 — 포도엽건조엑스 180mg 캡슐
+
+**Grape Leaf Dry Extract 180 mg Capsule** · `usageLabel=복용 안내` → 경구
+
+| 필드 | ko | en |
+|---|---|---|
+| efficacy | 만성 정맥부전으로 인한 하지 부종·중압감·통증 개선 | …leg swelling, a feeling of heaviness in the legs, and pain caused by chronic venous insufficiency. |
+| usage | 1회 2캡슐(360mg) 1일 1회 아침 식전 물과 함께 | two capsules (360 mg) once a day, before breakfast, with water |
+| caution | 과민증·소아청소년·임부/임신가능/수유부·포도당-갈락토오스 흡수장애 금지 / 6주 개선 없으면 중단 / 한쪽 다리 갑작 통증·부기·피부변색 즉시 중단 상담 | **Do not take this** if…a child or adolescent; pregnant, may be pregnant, or breastfeeding; glucose-galactose malabsorption. If no improvement after about **six weeks**, stop. Sudden pain, swelling or skin discoloration in **one leg** → stop immediately and seek advice. |
+
+**수치 대조**: `2캡슐(360mg)`→`two capsules (360 mg)` ✅ / `1일 1회`→`once a day` ✅ / `아침 식전`→`before breakfast` ✅ / `6주`→`six weeks` ✅ / 금기·중단 신호 유지 ✅
+
+> **반복 이슈(GUIDE/GLOSSARY 반영 대상 없음)**: 생약 성분명은 `Ginkgo leaf dry extract` / `Grape leaf dry extract` 로 소문자 성분 표기, 유전질환 3종(galactose intolerance / Lapp lactase deficiency / glucose-galactose malabsorption)은 기존 GLOSSARY 표기 재사용. 신규 반복 이슈 없음.

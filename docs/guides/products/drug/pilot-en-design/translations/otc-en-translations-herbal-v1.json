@@ -1,0 +1,38 @@
+{
+  "wo": "WO-O4O-OTC-HERBAL-EN-TRANSLATION-PERSIST-299-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "translations": [
+    {
+      "groupKey": "은행엽건조엑스|80밀리그램|정",
+      "title": "Ginkgo Leaf Dry Extract 80 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to treat peripheral arterial circulation problems (intermittent claudication), dizziness, tinnitus of vascular or degenerative origin, and organic brain dysfunction with dementia-related symptoms such as memory loss and difficulty concentrating.",
+      "usage": "For peripheral arterial circulation problems, dizziness or tinnitus, adults take half a tablet (40 mg) three times a day, or one tablet (80 mg) twice a day. For organic brain dysfunction such as memory loss, adults take half to one tablet (40–80 mg) three times a day, or one and a half tablets (120 mg) twice a day. The dose may be adjusted to suit your age and symptoms.",
+      "caution": "Do not take this if you have ever reacted to this medicine; if you are a child aged 12 or under; if you have high blood pressure that needs treatment; if you are pregnant; or if you have an inherited condition such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Talk to a pharmacist before taking it if you are breastfeeding, have a bleeding disorder, or are scheduled for surgery, and also if you are taking anticoagulant or antiplatelet medicines at the same time.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Ginkgo leaf dry extract 80 mg",
+        "How it works": "Improves peripheral circulation",
+        "Main symptoms": "Peripheral arterial circulation problems, dizziness, tinnitus, memory loss",
+        "Who should be careful": "Taking anticoagulants or antiplatelets; scheduled for surgery",
+        "Why this one": "A ginkgo leaf preparation for peripheral circulation and tinnitus"
+      }
+    },
+    {
+      "groupKey": "포도엽건조엑스|180밀리그램|캡슐",
+      "title": "Grape Leaf Dry Extract 180 mg Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to relieve leg swelling, a feeling of heaviness in the legs, and pain caused by chronic venous insufficiency.",
+      "usage": "Adults take two capsules (360 mg) once a day, before breakfast, with water.",
+      "caution": "Do not take this if you have ever reacted to this medicine; if you are a child or adolescent; if you are pregnant, may be pregnant, or are breastfeeding; or if you have glucose-galactose malabsorption. If there is no improvement after about six weeks, stop taking it. If you have sudden pain, swelling or skin discoloration in one leg, stop taking it immediately and seek advice.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Grape leaf dry extract 180 mg",
+        "How it works": "Improves venous circulation",
+        "Main symptoms": "Leg swelling, heaviness and pain from chronic venous insufficiency",
+        "Who should be careful": "Children and adolescents; pregnant or breastfeeding",
+        "Why this one": "A grape leaf preparation for leg swelling and heaviness"
+      }
+    }
+  ]
+}
