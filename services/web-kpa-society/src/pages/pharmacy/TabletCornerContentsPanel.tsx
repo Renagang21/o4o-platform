@@ -16,7 +16,7 @@
  *   - 연결 sort_order 역시 현재 공개 런타임 미반영(관리용 정렬).
  */
 import { useState, useEffect, useCallback, type ReactNode } from 'react';
-import { Loader2, Plus, ChevronUp, ChevronDown, X, Layers, AlertTriangle, Tv, Eye, Trash2 } from 'lucide-react';
+import { Loader2, Plus, ChevronUp, ChevronDown, X, Layers, Tv, Eye, Trash2 } from 'lucide-react';
 import { RowActionMenu } from '@o4o/ui';
 import { defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
 import { TabletKioskPage, type TabletKioskApi, type TabletScreenResponse } from '@o4o/tablet-kiosk-core';
@@ -70,12 +70,25 @@ const cornerContentActionPolicy = defineActionPolicy<CornerContent>('kpa:tablet-
         variant: 'danger',
       }),
     },
+    // WO-O4O-KPA-TABLET-CORNER-CURRENT-PREVIEW-COMPACT-V1: '현재 사용 중' 카드를 제거하면서
+    //   거기 있던 '적용 해제'를 현재 콘텐츠의 kebab 으로 이관(기능 보존).
+    {
+      key: 'clear',
+      label: '적용 해제',
+      visible: (c) => c.isCurrent,
+      confirm: {
+        title: '적용을 해제할까요?',
+        message: '현재 표시 콘텐츠를 해제하고 기본 화면으로 되돌립니다.\n연결은 유지됩니다.',
+        confirmText: '적용 해제',
+      },
+    },
   ],
 });
 const ACTION_ICONS: Record<string, ReactNode> = {
   preview: <Eye className="w-4 h-4" />,
   apply: <Tv className="w-4 h-4" />,
   remove: <Trash2 className="w-4 h-4" />,
+  clear: <X className="w-4 h-4" />,
 };
 
 const STATUS_LABEL: Record<ScreenSetStatus, string> = {
@@ -145,9 +158,9 @@ export default function TabletCornerContentsPanel({ tabletId, onCurrentChange, o
     } finally { setBusy(false); }
   };
 
+  // 확인은 kebab 액션 정책(clear.confirm)이 담당 → window.confirm 없음.
   const handleClear = async () => {
     if (busy) return;
-    if (!window.confirm('현재 표시 콘텐츠를 해제하고 기본 화면으로 되돌릴까요?\n연결은 유지됩니다.')) return;
     setBusy(true);
     try {
       await clearCurrentScreenSet(tabletId);
@@ -196,52 +209,31 @@ export default function TabletCornerContentsPanel({ tabletId, onCurrentChange, o
 
   return (
     <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-indigo-100">
-      <div className="px-4 py-3 border-b bg-indigo-50/60 flex items-center justify-between">
-        <h3 className="text-sm font-bold text-indigo-800 flex items-center gap-2">
-          <Layers className="w-4 h-4 text-indigo-600" /> 이 코너의 콘텐츠
+      {/* WO-O4O-KPA-TABLET-CORNER-CURRENT-PREVIEW-COMPACT-V1: 큰 안내 박스 + 별도 현재 사용 중 카드 제거.
+          제목 줄에서 현재 적용을 간단히 표시하고 '현재 화면 보기'로 실제 화면을 read-only 모달 확인. */}
+      <div className="px-4 py-3 border-b bg-indigo-50/60 flex items-center justify-between gap-2 flex-wrap">
+        <h3 className="text-sm font-bold text-indigo-800 flex items-center gap-2 min-w-0">
+          <Layers className="w-4 h-4 text-indigo-600 flex-shrink-0" /> 이 코너의 콘텐츠
           {items.length > 0 && <span className="text-xs font-normal text-indigo-400">({items.length})</span>}
+          <span className="text-[11px] font-normal text-slate-500 whitespace-nowrap">· 현재 적용 {current ? 1 : 0}개</span>
         </h3>
-        <button onClick={() => setPicking(true)} disabled={busy} className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-indigo-700 bg-white border border-indigo-200 rounded-lg hover:bg-indigo-50 disabled:opacity-50">
-          <Plus className="w-3.5 h-3.5" /> 기존 콘텐츠 추가
-        </button>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {current && (
+            <button
+              onClick={() => handlePreview(current)}
+              disabled={busy || previewBusy === current.screenSetId}
+              className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-indigo-700 bg-white border border-indigo-200 rounded-lg hover:bg-indigo-50 disabled:opacity-50"
+            >
+              {previewBusy === current.screenSetId ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Eye className="w-3.5 h-3.5" />} 현재 화면 보기
+            </button>
+          )}
+          <button onClick={() => setPicking(true)} disabled={busy} className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-indigo-700 bg-white border border-indigo-200 rounded-lg hover:bg-indigo-50 disabled:opacity-50">
+            <Plus className="w-3.5 h-3.5" /> 기존 콘텐츠 추가
+          </button>
+        </div>
       </div>
 
       <div className="p-4 space-y-4">
-        <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg p-3">
-          <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
-          <p className="text-xs text-amber-800 leading-relaxed">
-            <b>현재 사용 중인 콘텐츠가 공개 태블릿 화면(고객 화면)에 표시됩니다.</b> 바꾼 뒤에는 태블릿에서 새로고침해야 반영될 수 있습니다.
-            콘텐츠 내용 수정·생성·보관은 <b>태블릿 콘텐츠</b> 탭에서 합니다.
-          </p>
-        </div>
-
-        {/* 현재 사용 중 */}
-        <div className="rounded-xl border border-indigo-200 bg-indigo-50/50 p-3">
-          <div className="flex items-start justify-between gap-2 flex-wrap">
-            <div className="min-w-0">
-              <span className="text-[10px] font-semibold text-indigo-700 bg-indigo-100 px-1.5 py-0.5 rounded">현재 사용 중</span>
-              {current ? (
-                <>
-                  <div className="text-base font-bold text-slate-900 truncate mt-1">{current.name}</div>
-                  <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                    <TemplateBadge templateKey={current.templateKey} />
-                    <span className="text-[11px] text-slate-500">블록 {current.blockCount}개</span>
-                  </div>
-                </>
-              ) : (
-                <div className="text-sm text-slate-500 mt-1">
-                  현재 표시 중인 콘텐츠가 없습니다(기본 화면). 아래에서 <b>이 화면 사용</b>을 눌러 선택해 주세요.
-                </div>
-              )}
-            </div>
-            {current && (
-              <button onClick={handleClear} disabled={busy} className={`${btn} text-slate-500 bg-white border border-slate-200 hover:bg-slate-50 disabled:opacity-50`}>
-                적용 해제
-              </button>
-            )}
-          </div>
-        </div>
-
         {/* 연결 목록 */}
         {loading ? (
           <div className="flex items-center gap-2 text-sm text-slate-400 py-4"><Loader2 className="w-4 h-4 animate-spin" /> 불러오는 중…</div>
@@ -282,6 +274,7 @@ export default function TabletCornerContentsPanel({ tabletId, onCurrentChange, o
                         preview: () => handlePreview(it),
                         apply: () => handleApply(it),
                         remove: () => handleRemove(it),
+                        clear: () => handleClear(),
                       }, {
                         icons: ACTION_ICONS,
                         loading: previewBusy === it.screenSetId ? { preview: true } : undefined,
