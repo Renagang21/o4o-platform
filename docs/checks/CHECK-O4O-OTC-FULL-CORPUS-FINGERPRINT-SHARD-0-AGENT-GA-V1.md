@@ -109,7 +109,12 @@ WO: `WO-O4O-OTC-FULL-CORPUS-SOURCE-FINGERPRINT-AUDIT-3-AGENT-V1` · 일자: 2026
 | 합 | 2,285 | 6,407 |
 
 > 예: 에르도스테인300캡슐 grounded **52** ↔ authored **1건**(67 master) / 클로닉신125정 grounded 22 ↔ authored 1건 / 트리메부틴150정 grounded 22 ↔ authored 1건. **동일 약의 grounded 지문 분열(§7 144건)이 authored 1건으로 수렴 가능**(검토후) → 이것이 재사용의 핵심.
-> **⚠️ shard 부분값**: 전체 authored 재사용·최종 작성단위 수는 **3 shard 병합 + 안전지문 대조 후** 확정. authored 무성분명(166키, nutrition_combo)·grounded 무성분명(2,405 master)은 **주성분코드(active_ingredients/drug_code) 축**으로 통합단계 보강.
+> **⚠️ shard 부분값**: 전체 authored 재사용·최종 작성단위 수는 **3 shard 병합 + 안전지문 대조 후** 확정. authored 무성분명(166키, nutrition_combo)·grounded 무성분명은 **주성분코드 축**으로 통합단계 보강.
+>
+> **★ 주성분코드 축 타당성 실측(통합 step4 de-risk)**: shard0 무성분명 grounded master 의 주성분 축 가용성 —
+> - ❌ `active_ingredients`(jsonb) = **전건 empty** · ❌ `ingredient_summary`(text) = **전건 empty**
+> - ✅ **`atc_code` = 100% 보유(3,158/3,158)**
+> → **무성분명 bridge 는 `active_ingredients` 아닌 `atc_code`(+ 함량·제형·경로)로 해야 가능**. authored 측도 atc_code 보유(nutrition_combo 멤버십에 사용). **통합 step4 는 atc_code 축으로 설계**해야 무성분명 2,405+ 를 authored/기존그룹에 합류시켜 "새 설명서 필요" 과대평가를 방지할 수 있음. (`active_ingredients` 비-UTF8 손상 이슈는 nutrition_combo 트랙 한정 — 여기선 단순 미populate.)
 
 ---
 
