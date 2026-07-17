@@ -1,0 +1,12 @@
+{
+  "original": 130,
+  "corrected": 117,
+  "dropped": 13,
+  "removedInstances": {
+    "아스파탐": 0,
+    "유당": 0,
+    "색소": 13
+  },
+  "robustDedup": "LIKE 아스파탐/페닐케톤·유당/갈락토/락토오스·황색/타르색소/적색/청색/색소",
+  "flag_regex_bug": "setb has_dye 정규식 황색s?ds?호 가 황색203호 등 다중숫자·일부 케이스 미검출 → LIKE 로 정정"
+}

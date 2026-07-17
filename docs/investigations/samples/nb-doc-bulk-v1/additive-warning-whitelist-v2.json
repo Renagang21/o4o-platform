@@ -1,0 +1,2211 @@
+{
+  "wo": "WO-O4O-OTC-ADDITIVE-WARNING-WHITELIST-V1 (v2 dedup-corrected)",
+  "koUpdateMasters": 117,
+  "enUpdateMasters": 117,
+  "note": "robust LIKE dedup 으로 이미 색소 경고 보유 13 master 제외",
+  "droppedMasters": [
+    {
+      "master_id": "769eeb27-e741-4f18-ab44-a3802a8debcd",
+      "group": "시트룰린말산염|500밀리그램|정",
+      "was": [
+        "색소"
+      ]
+    },
+    {
+      "master_id": "7a5a9018-7df7-4792-81b8-d552b244d81f",
+      "group": "시트룰린말산염|500밀리그램|정",
+      "was": [
+        "색소"
+      ]
+    },
+    {
+      "master_id": "74c63161-bf1c-406f-8980-b2230bc91319",
+      "group": "시트룰린말산염|500밀리그램|정",
+      "was": [
+        "색소"
+      ]
+    },
+    {
+      "master_id": "5f453f52-373d-4a83-99df-971b7339a1b7",
+      "group": "시트룰린말산염|500밀리그램|정",
+      "was": [
+        "색소"
+      ]
+    },
+    {
+      "master_id": "2204ad85-43c7-4006-99cd-cd0e1bbc9c6c",
+      "group": "시트룰린말산염|500밀리그램|정",
+      "was": [
+        "색소"
+      ]
+    },
+    {
+      "master_id": "edf9433b-8d72-40dd-8dc7-eae375f8a511",
+      "group": "시트룰린말산염|500밀리그램|정",
+      "was": [
+        "색소"
+      ]
+    },
+    {
+      "master_id": "27a0a515-6611-4937-95d3-74df3f33da18",
+      "group": "시트룰린말산염|500밀리그램|정",
+      "was": [
+        "색소"
+      ]
+    },
+    {
+      "master_id": "ec6f3f9c-5688-49f9-9421-80a0aa572223",
+      "group": "트리메부틴말레산염|200밀리그램|정",
+      "was": [
+        "색소"
+      ]
+    },
+    {
+      "master_id": "37968b62-d70b-4f18-8a75-ad5214a3afde",
+      "group": "시트룰린말산염|500밀리그램|정",
+      "was": [
+        "색소"
+      ]
+    },
+    {
+      "master_id": "fdc60f5e-ecdf-4e57-92fc-d7e8232e71dd",
+      "group": "시트룰린말산염|500밀리그램|정",
+      "was": [
+        "색소"
+      ]
+    },
+    {
+      "master_id": "7310a52c-b78a-4c6b-a87f-085928829431",
+      "group": "트리메부틴말레산염|200밀리그램|정",
+      "was": [
+        "색소"
+      ]
+    },
+    {
+      "master_id": "f5c1434f-b61d-49e9-89b8-259fee2699b5",
+      "group": "트리메부틴말레산염|200밀리그램|정",
+      "was": [
+        "색소"
+      ]
+    },
+    {
+      "master_id": "41a09e81-d401-4ef2-97f4-0e6ea4dba82b",
+      "group": "시트룰린말산염|500밀리그램|정",
+      "was": [
+        "색소"
+      ]
+    }
+  ],
+  "entries": [
+    {
+      "master_id": "ada3c143-30d9-4932-b3b5-8e5f277ad4fd",
+      "item_seq": "201900596",
+      "groupKey": "아세틸시스테인|200밀리그램|캡슐",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "061f125e-035c-42f3-9006-5e677566019a",
+      "item_seq": "201901688",
+      "groupKey": "아세틸시스테인|200밀리그램|캡슐",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "4e0f15ec-bb4b-4ef6-a4c7-6c84429249f5",
+      "item_seq": "201804440",
+      "groupKey": "아세틸시스테인|200밀리그램|캡슐",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "9d6f9f50-bc19-4e2d-8dc7-610c7676dfec",
+      "item_seq": "201206776",
+      "groupKey": "아세틸시스테인|200밀리그램|캡슐",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "17be0018-6a2e-4870-abb5-381db280504f",
+      "item_seq": "202003114",
+      "groupKey": "아세틸시스테인|200밀리그램|캡슐",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "cbebf5b8-8e82-4d15-b7e4-409b07d2129d",
+      "item_seq": "201406195",
+      "groupKey": "아세틸시스테인|200밀리그램|캡슐",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "98772007-adbe-4a95-8369-450d2b62a969",
+      "item_seq": "201900596",
+      "groupKey": "아세틸시스테인|200밀리그램|캡슐",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "a7c87830-b567-41af-ac9e-fae2e2c0e3fa",
+      "item_seq": "201905784",
+      "groupKey": "아세틸시스테인|200밀리그램|캡슐",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "424ba7a2-d7f7-4a22-9c28-94236c18b787",
+      "item_seq": "201900172",
+      "groupKey": "아세틸시스테인|200밀리그램|캡슐",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "237c7038-aa80-46b0-9d04-647337b581cd",
+      "item_seq": "199301063",
+      "groupKey": "아세트아미노펜|160밀리그램|정",
+      "additives": [
+        "유당",
+        "색소"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오. 이 약은 황색4호(타르트라진)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it. This product contains Tartrazine (Yellow No. 4). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        },
+        "색소": {
+          "dyes": [
+            "황색4호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "0c870f14-f9ba-4ffe-918e-8fcd33cc7aa5",
+      "item_seq": "201901688",
+      "groupKey": "아세틸시스테인|200밀리그램|캡슐",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "482c96da-1b63-4c05-aa50-09d2f4deae1a",
+      "item_seq": "201900172",
+      "groupKey": "아세틸시스테인|200밀리그램|캡슐",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "825389c6-2fba-4a15-9fa6-eee254afbfb4",
+      "item_seq": "201109594",
+      "groupKey": "아세틸시스테인|200밀리그램|캡슐",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "f6fdcd68-a628-4bb8-80ba-2fda13cfdd9c",
+      "item_seq": "201506556",
+      "groupKey": "아세틸시스테인|200밀리그램|캡슐",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "c96462b8-055b-40b5-83cb-83ae48d6be86",
+      "item_seq": "201901688",
+      "groupKey": "아세틸시스테인|200밀리그램|캡슐",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "730f074b-5387-4867-ba57-c7721676660f",
+      "item_seq": "201901688",
+      "groupKey": "아세틸시스테인|200밀리그램|캡슐",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "c9b86b7f-eedb-429c-bfe1-84a24304d705",
+      "item_seq": "201406195",
+      "groupKey": "아세틸시스테인|200밀리그램|캡슐",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "f21d6a01-51af-4d49-bc7e-4f5b867842fc",
+      "item_seq": "201901688",
+      "groupKey": "아세틸시스테인|200밀리그램|캡슐",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "3fca0c40-d04d-4732-8a50-4b355903ca48",
+      "item_seq": "201905784",
+      "groupKey": "아세틸시스테인|200밀리그램|캡슐",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "88562d5f-441d-4d3e-8dc5-643d17d1e546",
+      "item_seq": "201804440",
+      "groupKey": "아세틸시스테인|200밀리그램|캡슐",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "714aaf02-3596-4e4c-88e6-de9e94ba52cd",
+      "item_seq": "201802993",
+      "groupKey": "암브록솔염산염|30밀리그램|정",
+      "additives": [
+        "유당",
+        "색소"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오. 이 약은 황색5호(선셋옐로우 FCF), 황색4호(타르트라진)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it. This product contains Sunset Yellow FCF (Yellow No. 5), Tartrazine (Yellow No. 4). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        },
+        "색소": {
+          "dyes": [
+            "황색5호",
+            "황색4호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "cf205e2d-4f76-4ee2-855d-376771d8574e",
+      "item_seq": "202003114",
+      "groupKey": "아세틸시스테인|200밀리그램|캡슐",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "feaaffb6-567c-42a5-811e-246530733591",
+      "item_seq": "201901688",
+      "groupKey": "아세틸시스테인|200밀리그램|캡슐",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "36f39c46-e196-40ff-a8b6-c8ca6b78ad63",
+      "item_seq": "201206776",
+      "groupKey": "아세틸시스테인|200밀리그램|캡슐",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "f95797a0-ebca-40ac-9a35-f8dcf4cfdba4",
+      "item_seq": "201506556",
+      "groupKey": "아세틸시스테인|200밀리그램|캡슐",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "7ae9a663-9d6e-4c2a-a19c-da42b5b97552",
+      "item_seq": "202502933",
+      "groupKey": "아세틸시스테인|200밀리그램|캡슐",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "74244176-b615-4611-b127-52a4189b0813",
+      "item_seq": "199301063",
+      "groupKey": "아세트아미노펜|160밀리그램|정",
+      "additives": [
+        "유당",
+        "색소"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오. 이 약은 황색4호(타르트라진)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it. This product contains Tartrazine (Yellow No. 4). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        },
+        "색소": {
+          "dyes": [
+            "황색4호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "561d6f4c-382b-439e-b81f-aaa80987448f",
+      "item_seq": "201905784",
+      "groupKey": "아세틸시스테인|200밀리그램|캡슐",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "ad758d7f-1b5c-4faf-b8ea-3f463bc274e8",
+      "item_seq": "201900172",
+      "groupKey": "아세틸시스테인|200밀리그램|캡슐",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "2a4c0600-96ac-4c9c-9e77-35113d28a6e8",
+      "item_seq": "201804440",
+      "groupKey": "아세틸시스테인|200밀리그램|캡슐",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "bdbe845c-67bf-4491-ba48-6cd5abc4c412",
+      "item_seq": "202300418",
+      "groupKey": "로라타딘|10밀리그램|연질캡슐",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "4399f567-fd33-419b-8e9d-5595170d52ef",
+      "item_seq": "201905435",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "ecf7cd48-e801-4fa1-a31c-eb838abb5307",
+      "item_seq": "201907203",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "3e4b2abe-5efd-406d-9d97-16d82c459282",
+      "item_seq": "201506556",
+      "groupKey": "아세틸시스테인|200밀리그램|캡슐",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "23b663a0-7137-47b9-b906-cba56e9706a7",
+      "item_seq": "201900928",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "색소"
+      ],
+      "ko_warning": "이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "f6efedac-9349-4f95-a0c9-71baa518ab6a",
+      "item_seq": "201802993",
+      "groupKey": "암브록솔염산염|30밀리그램|정",
+      "additives": [
+        "유당",
+        "색소"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오. 이 약은 황색5호(선셋옐로우 FCF), 황색4호(타르트라진)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it. This product contains Sunset Yellow FCF (Yellow No. 5), Tartrazine (Yellow No. 4). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        },
+        "색소": {
+          "dyes": [
+            "황색5호",
+            "황색4호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "406fa3af-283f-4dda-93ac-57980c911c1d",
+      "item_seq": "201904785",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "유당",
+        "색소"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오. 이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it. This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        },
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "eaad1d69-77e5-4892-996d-e97ebd452237",
+      "item_seq": "199301063",
+      "groupKey": "아세트아미노펜|160밀리그램|정",
+      "additives": [
+        "유당",
+        "색소"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오. 이 약은 황색4호(타르트라진)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it. This product contains Tartrazine (Yellow No. 4). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        },
+        "색소": {
+          "dyes": [
+            "황색4호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "307f7dfb-4514-40f9-8a32-f45b751d754d",
+      "item_seq": "202003114",
+      "groupKey": "아세틸시스테인|200밀리그램|캡슐",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "de7866f8-a395-4bbe-b725-feb9f0659704",
+      "item_seq": "201206776",
+      "groupKey": "아세틸시스테인|200밀리그램|캡슐",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "00abdcbb-29a6-4ad9-a067-88eea2926380",
+      "item_seq": "201406195",
+      "groupKey": "아세틸시스테인|200밀리그램|캡슐",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "3a3cf3cf-17cd-4338-aa4d-34c5181f31a3",
+      "item_seq": "202003523",
+      "groupKey": "암브록솔염산염|30밀리그램|정",
+      "additives": [
+        "유당",
+        "아스파탐"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오. 이 약은 아스파탐을 함유하고 있어 페닐케톤뇨증 환자는 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it. This product contains aspartame (a source of phenylalanine). Patients with phenylketonuria (PKU) must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        },
+        "아스파탐": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "e2b064e2-e77e-4be0-90ff-f6c14725f5f3",
+      "item_seq": "202300418",
+      "groupKey": "로라타딘|10밀리그램|연질캡슐",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "90a625a3-4100-40a9-84d3-62d68fe68da6",
+      "item_seq": "202502933",
+      "groupKey": "아세틸시스테인|200밀리그램|캡슐",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "b809819d-96d8-4d85-bf22-b09cf732be5f",
+      "item_seq": "201900596",
+      "groupKey": "아세틸시스테인|200밀리그램|캡슐",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "f6a7c836-82ed-4121-a997-96e190abb3d9",
+      "item_seq": "199701269",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "102d9ef7-33b4-45d1-ab4c-5934b0af0146",
+      "item_seq": "200904150",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "2297aef0-95ab-48c0-bd5c-87d412cf4a96",
+      "item_seq": "201901574",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "색소"
+      ],
+      "ko_warning": "이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "a6f1e861-ee0c-47d0-83c3-80da1edb463a",
+      "item_seq": "201602501",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "색소"
+      ],
+      "ko_warning": "이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "9416e3cc-431b-4833-a851-271451dd9d8d",
+      "item_seq": "201603166",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "색소"
+      ],
+      "ko_warning": "이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "f27f8108-e0d5-48e4-8005-d599386c445d",
+      "item_seq": "202500894",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "색소"
+      ],
+      "ko_warning": "이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "d5e0b06a-6839-4404-b4d8-0bbf0d8809ff",
+      "item_seq": "202000875",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "유당",
+        "색소"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오. 이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it. This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        },
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "12e24539-e03f-41c0-b3e8-406379443006",
+      "item_seq": "202500894",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "색소"
+      ],
+      "ko_warning": "이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "9fa83d89-dbfa-4da5-995e-f4c80b311bc7",
+      "item_seq": "199701269",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "981fe76c-f9ec-42cf-984f-f6c1cf41d1c3",
+      "item_seq": "202004092",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "유당",
+        "색소"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오. 이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it. This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        },
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "929e0c1e-0ef6-4346-a902-958844a25a99",
+      "item_seq": "199701269",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "2661e7cb-900b-45b7-b8b9-c70048c0186a",
+      "item_seq": "202002174",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "66021c21-c7e9-4206-a218-28aaeb2221d3",
+      "item_seq": "201904785",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "유당",
+        "색소"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오. 이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it. This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        },
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "56e33865-73b2-4822-88a6-d26d66d4d7e0",
+      "item_seq": "202002172",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "유당",
+        "색소"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오. 이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it. This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        },
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "fe8e69ec-6310-4e44-b1c6-318313c8cd97",
+      "item_seq": "202403084",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "cab6c9f3-6ec8-4c05-b9cb-4252dcdfbd9e",
+      "item_seq": "202004092",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "유당",
+        "색소"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오. 이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it. This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        },
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "2d308ff5-6618-457a-a8ca-d6ed1e9da8cb",
+      "item_seq": "201901574",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "색소"
+      ],
+      "ko_warning": "이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "7c597245-483a-49d6-900d-e2907571d587",
+      "item_seq": "202502925",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "색소"
+      ],
+      "ko_warning": "이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "a579fe07-1614-4999-9d01-481bd37deb39",
+      "item_seq": "201901574",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "색소"
+      ],
+      "ko_warning": "이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "1eed5e2a-0329-4326-b699-fddf63169cbd",
+      "item_seq": "202500894",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "색소"
+      ],
+      "ko_warning": "이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "55be42a0-0909-48dc-8270-982f4e7a2389",
+      "item_seq": "202501994",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "2eafab2c-1234-4d7a-b4b5-6b6c78792e67",
+      "item_seq": "202502925",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "색소"
+      ],
+      "ko_warning": "이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "e5a65090-587c-4cc0-a53d-8a84c4b5f1f7",
+      "item_seq": "202000875",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "유당",
+        "색소"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오. 이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it. This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        },
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "e040e63c-ae89-4a14-8cdc-4a0a7a18efb1",
+      "item_seq": "202201616",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "ca7cbc2b-34e6-4a10-bfb8-3bb8ed6cf653",
+      "item_seq": "201907203",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "8985a3e4-0940-4cfe-82a8-536bf8fa7242",
+      "item_seq": "201602501",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "색소"
+      ],
+      "ko_warning": "이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "d8da8206-187a-4b71-bb85-43bb4aae8dd7",
+      "item_seq": "201602501",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "색소"
+      ],
+      "ko_warning": "이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "84496a30-0fb4-4330-8f3b-053216e42d3f",
+      "item_seq": "202004092",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "유당",
+        "색소"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오. 이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it. This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        },
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "9664462b-c013-4b27-a9aa-517126302fde",
+      "item_seq": "202000875",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "유당",
+        "색소"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오. 이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it. This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        },
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "741cd8f2-144d-43d0-95f9-adab2596986c",
+      "item_seq": "201904785",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "유당",
+        "색소"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오. 이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it. This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        },
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "5645d154-74af-41d1-89d6-98407f94844f",
+      "item_seq": "199701269",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "e639e6aa-1d34-480d-aa0e-670602c97386",
+      "item_seq": "201900054",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "8f55150b-1970-4a89-912a-c3ed81ea6ca0",
+      "item_seq": "202201616",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "b965dd7d-a5fd-4c9c-a242-b48aecba75ab",
+      "item_seq": "201900928",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "색소"
+      ],
+      "ko_warning": "이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "9562efb1-744b-4fb6-83f0-bc05dfe95692",
+      "item_seq": "202501994",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "4baecb6b-fe24-4bfc-b3b2-635417ac1bae",
+      "item_seq": "202002172",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "유당",
+        "색소"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오. 이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it. This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        },
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "cd6205bf-03e3-4901-b4bf-84c232158749",
+      "item_seq": "202403084",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "66cd05a2-2691-4903-bace-21a771327faf",
+      "item_seq": "201900054",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "c7865f8b-ff72-4233-82fc-fc75a0db6741",
+      "item_seq": "201900054",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "0dcef623-65cb-4e76-9553-ea396b1beb87",
+      "item_seq": "201907203",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "0b5c2c6a-edb6-46f5-9559-66840b7c5a58",
+      "item_seq": "201905435",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "a209c8a4-9b46-4965-8c7e-744dd54cad6c",
+      "item_seq": "201900928",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "색소"
+      ],
+      "ko_warning": "이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "1fa36afe-fff4-42bd-8a52-c9f1006f028e",
+      "item_seq": "200003096",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "a332d9aa-c309-4e95-8e48-0750b21fa641",
+      "item_seq": "202201616",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "abc15e40-37d8-405f-bb1b-a0444b536907",
+      "item_seq": "199701269",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "fad15f8c-5e06-4344-b674-a68ef0202088",
+      "item_seq": "202002174",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "e3ea6f0e-aadd-4067-b4a3-d21af802b6f0",
+      "item_seq": "199701674",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "4a5327fe-7e30-41ca-b9d5-d74e485af983",
+      "item_seq": "200904150",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "4d7c97bd-6556-46d7-879f-8e1627c9b561",
+      "item_seq": "200003096",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "96bbea40-4a00-4661-9c1a-0c060f3c6f2c",
+      "item_seq": "201904785",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "유당",
+        "색소"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오. 이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it. This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        },
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "3a561d9f-3609-4856-ae44-871140afa3c9",
+      "item_seq": "200003096",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "33855f49-9e6a-4533-bd59-386d5cf76ca9",
+      "item_seq": "199701674",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "7cf53520-bbea-40c7-ad6e-09a0199553ca",
+      "item_seq": "199701674",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "60ab3841-35c0-4937-9131-b0c628f7ada1",
+      "item_seq": "200003096",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "0affe148-c3bf-4d53-815f-0c7e163033f9",
+      "item_seq": "199701674",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "660a9141-f33b-4ebc-b16a-7e6877b0f0c4",
+      "item_seq": "202500894",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "색소"
+      ],
+      "ko_warning": "이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "455ecf3a-8ffa-4b75-9baa-ef8e62535a98",
+      "item_seq": "202000875",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "유당",
+        "색소"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오. 이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it. This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        },
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "99521021-9da9-4541-a282-730c1b1321d0",
+      "item_seq": "202004092",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "유당",
+        "색소"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오. 이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it. This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        },
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "5f9a2c9f-fc9b-460b-8f0b-5d59248fffb6",
+      "item_seq": "201904785",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "유당",
+        "색소"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오. 이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it. This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        },
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "921a498a-cf9c-4491-b04e-dde7437e9dbe",
+      "item_seq": "201901574",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "색소"
+      ],
+      "ko_warning": "이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "36e6a67b-c615-4846-9e53-ece9654b6ede",
+      "item_seq": "201603166",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "색소"
+      ],
+      "ko_warning": "이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "ea6205e4-74c2-497c-85ea-5b973d11512b",
+      "item_seq": "201603166",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "색소"
+      ],
+      "ko_warning": "이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "e02ffa1e-0d78-435a-a72b-8749e31103c1",
+      "item_seq": "202002172",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "유당",
+        "색소"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오. 이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it. This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        },
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "48a7ac8b-a64e-4210-9b9e-7a917aac83d0",
+      "item_seq": "199701674",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "a95bd360-598f-4a4d-a9f9-e775565b579e",
+      "item_seq": "201905435",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "e80a8c56-c084-4c54-8284-f1fc0374ca0b",
+      "item_seq": "202002172",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "유당",
+        "색소"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오. 이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it. This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        },
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "ee3ed8dd-659f-4b2f-8c0f-79e7f4eaac80",
+      "item_seq": "202004092",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "유당",
+        "색소"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오. 이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it. This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        },
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "de1bcd3c-a2e8-474e-9829-853892e1f54c",
+      "item_seq": "202000875",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "유당",
+        "색소"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오. 이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it. This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        },
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    },
+    {
+      "master_id": "c58d45ee-2bce-4832-a45b-990aa63b2c72",
+      "item_seq": "199701269",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "0ea904cb-1abd-474b-8e0b-c54ece4662a1",
+      "item_seq": "199701674",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "cef92565-951c-404f-a420-aabc0c8243a3",
+      "item_seq": "202403084",
+      "groupKey": "세티리진염산염|10밀리그램|정",
+      "additives": [
+        "유당"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        }
+      }
+    },
+    {
+      "master_id": "2b54d6d5-98bb-4e9d-820b-eb271c345a20",
+      "item_seq": "202002172",
+      "groupKey": "에르도스테인|300밀리그램|캡슐",
+      "additives": [
+        "유당",
+        "색소"
+      ],
+      "ko_warning": "이 약은 유당을 함유하고 있어 갈락토오스 불내성, Lapp 유당분해효소 결핍증, 포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 분은 복용하지 마십시오. 이 약은 황색5호(선셋옐로우 FCF)를 함유하고 있어 이 성분에 과민하거나 알레르기 병력이 있는 분은 신중히 복용하십시오.",
+      "en_warning": "This product contains lactose. Patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption must not take it. This product contains Sunset Yellow FCF (Yellow No. 5). Patients hypersensitive to this ingredient or with a history of allergy should take it with caution.",
+      "en_exists": true,
+      "evidence": {
+        "유당": {
+          "strength": "금기"
+        },
+        "색소": {
+          "dyes": [
+            "황색5호"
+          ],
+          "strength": "신중투여"
+        }
+      }
+    }
+  ]
+}
