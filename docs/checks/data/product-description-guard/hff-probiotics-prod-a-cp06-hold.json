@@ -1,0 +1,12 @@
+[
+  {
+    "candidateId": "98fc7bf9-1a6e-42e9-a524-a995291efb23",
+    "productName": "야쿠르트 라이트",
+    "manufacturer": "(주)에치와이 평택공장",
+    "statementNo": "2014001710732",
+    "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+    "reason": "표시량 기준량이 부피(65 mL) — 중량 기반 CFU/기준량 모델 밖 액상 제품(야쿠르트 라이트)",
+    "baseStandard": "1) 성상 : 고유의 향미가 있고 이미,이취가 없는 연한 노란색의 액상 2) 프로바이오틱스 수 : 표시량(10,000,000,000 CFU / 65 ml) 이상 3) 대장균군 : 음성",
+    "intake": "1일 1회, 1회 1병을 식사와 관계없이 드실 수 있습니다."
+  }
+]
