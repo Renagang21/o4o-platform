@@ -1,0 +1,4 @@
+{
+ "note": "30건 전량 단일 [비타민C] · 표시량(X/Y) 파싱정상 · 부피(mL) 없음 · 복합기능성 없음 -> drafting HOLD 0. 부피(mL 액상)/복합기능성/수치깨짐 유형은 strict-pool 선정 단계에서 사전 배제됨(vc-pool.mjs/vc-select.mjs 필터).",
+ "items": []
+}
