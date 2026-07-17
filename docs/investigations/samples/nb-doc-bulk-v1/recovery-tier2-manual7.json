@@ -1,0 +1,47 @@
+{
+  "wo": "WO-O4O-OTC-EASYDRUG-NB-DOC-RECOVERY-DRYRUN-TIER2-V1",
+  "manualReview": [
+    {
+      "item_seq": "201205361",
+      "ko_masters": 3,
+      "type": "pH값유실",
+      "note": "pH 값 유실 — NB 대조 수동"
+    },
+    {
+      "item_seq": "201205362",
+      "ko_masters": 2,
+      "type": "pH값유실",
+      "note": "pH 값 유실 — NB 대조 수동"
+    },
+    {
+      "item_seq": "201205364",
+      "ko_masters": 2,
+      "type": "pH값유실",
+      "note": "pH 값 유실 — NB 대조 수동"
+    },
+    {
+      "item_seq": "201602706",
+      "ko_masters": 4,
+      "type": "앵커비고유",
+      "note": "크레아티닌 앵커 비고유(없음)"
+    },
+    {
+      "item_seq": "201906886",
+      "ko_masters": 3,
+      "type": "앵커비고유",
+      "note": "크레아티닌 앵커 비고유(없음)"
+    },
+    {
+      "item_seq": "202000054",
+      "ko_masters": 3,
+      "type": "앵커비고유",
+      "note": "크레아티닌 앵커 비고유(없음)"
+    },
+    {
+      "item_seq": "202000200",
+      "ko_masters": 4,
+      "type": "앵커비고유",
+      "note": "크레아티닌 앵커 비고유(없음)"
+    }
+  ]
+}

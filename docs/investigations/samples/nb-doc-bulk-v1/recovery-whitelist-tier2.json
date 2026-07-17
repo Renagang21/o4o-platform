@@ -1,0 +1,699 @@
+{
+  "wo": "WO-O4O-OTC-EASYDRUG-NB-DOC-RECOVERY-DRYRUN-TIER2-V1",
+  "model": "value + ) + (\\n\\n if boundary eaten)",
+  "koUpdateMasters": 354,
+  "enUpdateMasters": 0,
+  "valueOnly": 11,
+  "valueBreak": 75,
+  "entries": [
+    {
+      "item_seq": "199500435",
+      "ko_masters": 10,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": true
+    },
+    {
+      "item_seq": "199701033",
+      "ko_masters": 6,
+      "find": "크레아티닌 청소율 ",
+      "replace": "크레아티닌 청소율 &lt; 10 mL/min)\n\n",
+      "nbValue": "&lt; 10 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "199701900",
+      "ko_masters": 14,
+      "find": "크레아티닌 청소율 ",
+      "replace": "크레아티닌 청소율 &lt; 10 mL/min)\n\n",
+      "nbValue": "&lt; 10 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "200300100",
+      "ko_masters": 4,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "200300251",
+      "ko_masters": 4,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "200300269",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "200300463",
+      "ko_masters": 4,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": true
+    },
+    {
+      "item_seq": "200300579",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "200300769",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "200301033",
+      "ko_masters": 6,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "200301252",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "200301507",
+      "ko_masters": 8,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "200301610",
+      "ko_masters": 5,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "200301618",
+      "ko_masters": 5,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "200301833",
+      "ko_masters": 6,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "200302457",
+      "ko_masters": 5,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "200400009",
+      "ko_masters": 4,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "200400151",
+      "ko_masters": 4,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": true
+    },
+    {
+      "item_seq": "200400233",
+      "ko_masters": 4,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "200400668",
+      "ko_masters": 5,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "200400830",
+      "ko_masters": 4,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "200400951",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "200401445",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "200402284",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": true
+    },
+    {
+      "item_seq": "200402328",
+      "ko_masters": 4,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": true
+    },
+    {
+      "item_seq": "200402458",
+      "ko_masters": 4,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "200402508",
+      "ko_masters": 5,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": true
+    },
+    {
+      "item_seq": "200402912",
+      "ko_masters": 4,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "200403090",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "200403246",
+      "ko_masters": 4,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "200403710",
+      "ko_masters": 4,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "200404048",
+      "ko_masters": 5,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "200404437",
+      "ko_masters": 6,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "200404779",
+      "ko_masters": 9,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "200410902",
+      "ko_masters": 7,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "200411048",
+      "ko_masters": 4,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "200702709",
+      "ko_masters": 5,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201505921",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201507696",
+      "ko_masters": 4,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201508010",
+      "ko_masters": 4,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": true
+    },
+    {
+      "item_seq": "201508139",
+      "ko_masters": 4,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201600445",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201601174",
+      "ko_masters": 4,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201601245",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201601506",
+      "ko_masters": 4,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201601614",
+      "ko_masters": 4,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201601896",
+      "ko_masters": 4,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201602096",
+      "ko_masters": 4,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201602679",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201602684",
+      "ko_masters": 4,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201602871",
+      "ko_masters": 4,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201603171",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": true
+    },
+    {
+      "item_seq": "201605007",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201605325",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201606935",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201700418",
+      "ko_masters": 5,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201700567",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": true
+    },
+    {
+      "item_seq": "201701108",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201701882",
+      "ko_masters": 4,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201706739",
+      "ko_masters": 4,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201707212",
+      "ko_masters": 4,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201708145",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201801702",
+      "ko_masters": 4,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201801843",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201802357",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201802652",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201803233",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201803487",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201803649",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201804394",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201804395",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201805153",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201805240",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201900892",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201901374",
+      "ko_masters": 4,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201902226",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201903071",
+      "ko_masters": 4,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201903082",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201903606",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201904700",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201905990",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": true
+    },
+    {
+      "item_seq": "201906544",
+      "ko_masters": 4,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "201908418",
+      "ko_masters": 3,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "202002625",
+      "ko_masters": 8,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "202003868",
+      "ko_masters": 4,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": false
+    },
+    {
+      "item_seq": "202500897",
+      "ko_masters": 2,
+      "find": "크레아티닌청소율이",
+      "replace": "크레아티닌청소율이&lt; 25 mL/min)",
+      "nbValue": "&lt; 25 mL/min",
+      "breakSurvived": true
+    }
+  ],
+  "flagged": []
+}
