@@ -1,0 +1,77 @@
+{
+  "wo": "WO-O4O-OTC-EASYDRUG-NB-DOC-RECOVERY-MANUAL7-V1",
+  "koUpdateMasters": 21,
+  "enUpdateMasters": 0,
+  "entries": [
+    {
+      "item_seq": "201602706",
+      "ko_masters": 4,
+      "find": "크레아티닌 청소율이",
+      "replace": "크레아티닌 청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "sourceField": "NB_DOC_DATA",
+      "breakSurvived": false,
+      "evidence": "장장애(크레아티닌청소율이&lt;25 mL/min)"
+    },
+    {
+      "item_seq": "201906886",
+      "ko_masters": 3,
+      "find": "크레아티닌 청소율이",
+      "replace": "크레아티닌 청소율이&lt; 25 mL/min)",
+      "nbValue": "&lt; 25 mL/min",
+      "sourceField": "NB_DOC_DATA",
+      "breakSurvived": true,
+      "evidence": "장장애(크레아티닌청소율이&lt;25 mL/min)"
+    },
+    {
+      "item_seq": "202000054",
+      "ko_masters": 3,
+      "find": "크레아티닌 청소율이",
+      "replace": "크레아티닌 청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "sourceField": "NB_DOC_DATA",
+      "breakSurvived": false,
+      "evidence": "장장애(크레아티닌청소율이&lt;25 mL/min)"
+    },
+    {
+      "item_seq": "202000200",
+      "ko_masters": 4,
+      "find": "크레아티닌 청소율이",
+      "replace": "크레아티닌 청소율이&lt; 25 mL/min)\n\n",
+      "nbValue": "&lt; 25 mL/min",
+      "sourceField": "NB_DOC_DATA",
+      "breakSurvived": false,
+      "evidence": "장장애(크레아티닌청소율이&lt;25 mL/min)"
+    },
+    {
+      "item_seq": "201205361",
+      "ko_masters": 3,
+      "find": "(pH",
+      "replace": "(pH &lt; 5.5)",
+      "nbValue": "&lt; 5.5",
+      "sourceField": "UD_DOC_DATA",
+      "breakSurvived": false,
+      "evidence": "개봉하여 액체나 부드러운 음식(pH < 5.5)과 함께 섞은 즉시 복용하되, 이 약의 내용물을 씹지 않고 즉시 삼켜야 한다."
+    },
+    {
+      "item_seq": "201205362",
+      "ko_masters": 2,
+      "find": "(pH",
+      "replace": "(pH &lt; 5.5)",
+      "nbValue": "&lt; 5.5",
+      "sourceField": "UD_DOC_DATA",
+      "breakSurvived": false,
+      "evidence": "개봉하여 액체나 부드러운 음식(pH < 5.5)과 함께 섞은 즉시 복용하되, 이 약의 내용물을 씹지 않고 즉시 삼켜야 한다."
+    },
+    {
+      "item_seq": "201205364",
+      "ko_masters": 2,
+      "find": "(pH",
+      "replace": "(pH &lt; 5.5)",
+      "nbValue": "&lt; 5.5",
+      "sourceField": "UD_DOC_DATA",
+      "breakSurvived": false,
+      "evidence": "개봉하여 액체나 부드러운 음식(pH < 5.5)과 함께 섞은 즉시 복용하되, 이 약의 내용물을 씹지 않고 즉시 삼켜야 한다."
+    }
+  ]
+}
