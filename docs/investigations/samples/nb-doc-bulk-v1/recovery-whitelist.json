@@ -1,0 +1,148 @@
+{
+  "wo": "WO-O4O-OTC-EASYDRUG-NB-DOC-RECOVERY-DRYRUN-V1",
+  "tier": "creatinine-value-only",
+  "koUpdateMasters": 108,
+  "enUpdateMasters": 0,
+  "entries": [
+    {
+      "item_seq": "199700265",
+      "ko_masters": 3,
+      "find": "크레아티닌 청소율 ",
+      "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+      "nbEvidence": "&lt; 10 mL/min"
+    },
+    {
+      "item_seq": "199701398",
+      "ko_masters": 11,
+      "find": "크레아티닌 청소율 ",
+      "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+      "nbEvidence": "&lt; 10 mL/min"
+    },
+    {
+      "item_seq": "199701908",
+      "ko_masters": 8,
+      "find": "크레아티닌 청소율 ",
+      "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+      "nbEvidence": "&lt; 10 mL/min"
+    },
+    {
+      "item_seq": "199702829",
+      "ko_masters": 6,
+      "find": "크레아티닌 청소율 ",
+      "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+      "nbEvidence": "&lt; 10 mL/min"
+    },
+    {
+      "item_seq": "199702846",
+      "ko_masters": 3,
+      "find": "크레아티닌 청소율 ",
+      "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+      "nbEvidence": "&lt; 10 mL/min"
+    },
+    {
+      "item_seq": "199703153",
+      "ko_masters": 2,
+      "find": "크레아티닌 청소율 ",
+      "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+      "nbEvidence": "&lt; 10 mL/min"
+    },
+    {
+      "item_seq": "199802009",
+      "ko_masters": 6,
+      "find": "크레아티닌 청소율 ",
+      "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+      "nbEvidence": "&lt; 10 mL/min"
+    },
+    {
+      "item_seq": "199802497",
+      "ko_masters": 5,
+      "find": "크레아티닌 청소율 ",
+      "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+      "nbEvidence": "&lt; 10 mL/min"
+    },
+    {
+      "item_seq": "199802620",
+      "ko_masters": 6,
+      "find": "크레아티닌 청소율 ",
+      "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+      "nbEvidence": "&lt; 10 mL/min"
+    },
+    {
+      "item_seq": "199803095",
+      "ko_masters": 10,
+      "find": "크레아티닌 청소율 ",
+      "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+      "nbEvidence": "&lt; 10 mL/min"
+    },
+    {
+      "item_seq": "200001515",
+      "ko_masters": 3,
+      "find": "크레아티닌 청소율 ",
+      "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+      "nbEvidence": "&lt; 10 mL/min"
+    },
+    {
+      "item_seq": "200001634",
+      "ko_masters": 2,
+      "find": "크레아티닌 청소율 ",
+      "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+      "nbEvidence": "&lt; 10 mL/min"
+    },
+    {
+      "item_seq": "200610765",
+      "ko_masters": 5,
+      "find": "크레아티닌 청소율 ",
+      "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+      "nbEvidence": "&lt; 10 mL/min"
+    },
+    {
+      "item_seq": "200803434",
+      "ko_masters": 11,
+      "find": "크레아티닌 청소율 ",
+      "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+      "nbEvidence": "&lt; 10 mL/min"
+    },
+    {
+      "item_seq": "200905228",
+      "ko_masters": 5,
+      "find": "크레아티닌 청소율 ",
+      "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+      "nbEvidence": "&lt; 10 mL/min"
+    },
+    {
+      "item_seq": "200905403",
+      "ko_masters": 10,
+      "find": "크레아티닌 청소율 ",
+      "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+      "nbEvidence": "&lt; 10 mL/min"
+    },
+    {
+      "item_seq": "201802416",
+      "ko_masters": 3,
+      "find": "크레아티닌 청소율 ",
+      "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+      "nbEvidence": "&lt; 10 mL/min"
+    },
+    {
+      "item_seq": "201906400",
+      "ko_masters": 2,
+      "find": "크레아티닌 청소율 ",
+      "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+      "nbEvidence": "&lt; 10 mL/min"
+    },
+    {
+      "item_seq": "202203978",
+      "ko_masters": 3,
+      "find": "크레아티닌 청소율 ",
+      "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+      "nbEvidence": "&lt; 10 mL/min"
+    },
+    {
+      "item_seq": "202501708",
+      "ko_masters": 4,
+      "find": "크레아티닌 청소율 ",
+      "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+      "nbEvidence": "&lt; 10 mL/min"
+    }
+  ]
+}

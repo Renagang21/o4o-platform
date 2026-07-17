@@ -1,0 +1,1848 @@
+{
+  "results": [
+    {
+      "item_seq": "197000040",
+      "reason": "paren_suspect",
+      "ko_masters": 19,
+      "en_masters": 0,
+      "nb_ok": true,
+      "verdict": "복구불필요",
+      "note": "괄호 내용 온전(68자), 닫힘괄호만 유실 — 정보손실 없음"
+    },
+    {
+      "item_seq": "198700315",
+      "reason": "paren_suspect",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "verdict": "복구불필요",
+      "note": "괄호 내용 온전(219자), 닫힘괄호만 유실 — 정보손실 없음"
+    },
+    {
+      "item_seq": "198901310",
+      "reason": "paren_suspect",
+      "ko_masters": 5,
+      "en_masters": 0,
+      "nb_ok": true,
+      "verdict": "복구불필요",
+      "note": "괄호 내용 온전(235자), 닫힘괄호만 유실 — 정보손실 없음"
+    },
+    {
+      "item_seq": "198901710",
+      "reason": "paren_suspect",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "verdict": "복구불필요",
+      "note": "괄호 내용 온전(235자), 닫힘괄호만 유실 — 정보손실 없음"
+    },
+    {
+      "item_seq": "199100705",
+      "reason": "paren_suspect",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "verdict": "복구불필요",
+      "note": "괄호 내용 온전(219자), 닫힘괄호만 유실 — 정보손실 없음"
+    },
+    {
+      "item_seq": "199300224",
+      "reason": "paren_suspect",
+      "ko_masters": 2,
+      "en_masters": 0,
+      "nb_ok": true,
+      "verdict": "복구불필요",
+      "note": "괄호 내용 온전(235자), 닫힘괄호만 유실 — 정보손실 없음"
+    },
+    {
+      "item_seq": "199302363",
+      "reason": "paren_suspect",
+      "ko_masters": 6,
+      "en_masters": 0,
+      "nb_ok": true,
+      "verdict": "복구불필요",
+      "note": "괄호 내용 온전(235자), 닫힘괄호만 유실 — 정보손실 없음"
+    },
+    {
+      "item_seq": "199500435",
+      "reason": "paren_suspect",
+      "ko_masters": 10,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이\\n\\n이 약을 복용하기"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "199501735",
+      "reason": "paren_suspect",
+      "ko_masters": 5,
+      "en_masters": 0,
+      "nb_ok": true,
+      "verdict": "복구불필요",
+      "note": "괄호 내용 온전(242자), 닫힘괄호만 유실 — 정보손실 없음"
+    },
+    {
+      "item_seq": "199700265",
+      "reason": "creatinine",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 10 mL/min",
+      "recovery": {
+        "find": "크레아티닌 청소율 ",
+        "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+        "afterPreview": "\\n\\n이 약을 복용하기 "
+      },
+      "verdict": "자동복구가능"
+    },
+    {
+      "item_seq": "199701033",
+      "reason": "creatinine",
+      "ko_masters": 6,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 10 mL/min",
+      "recovery": {
+        "find": "크레아티닌 청소율 ",
+        "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+        "afterPreview": "이 약을 복용하기 전에"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "199701398",
+      "reason": "creatinine",
+      "ko_masters": 11,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 10 mL/min",
+      "recovery": {
+        "find": "크레아티닌 청소율 ",
+        "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+        "afterPreview": "\\n\\n이 약을 복용하기 "
+      },
+      "verdict": "자동복구가능"
+    },
+    {
+      "item_seq": "199701900",
+      "reason": "creatinine",
+      "ko_masters": 14,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 10 mL/min",
+      "recovery": {
+        "find": "크레아티닌 청소율 ",
+        "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+        "afterPreview": "이 약을 복용하기 전에"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "199701908",
+      "reason": "creatinine",
+      "ko_masters": 8,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 10 mL/min",
+      "recovery": {
+        "find": "크레아티닌 청소율 ",
+        "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+        "afterPreview": "\\n\\n이 약을 복용하기 "
+      },
+      "verdict": "자동복구가능"
+    },
+    {
+      "item_seq": "199702829",
+      "reason": "creatinine",
+      "ko_masters": 6,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 10 mL/min",
+      "recovery": {
+        "find": "크레아티닌 청소율 ",
+        "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+        "afterPreview": "\\n\\n이 약을 복용하기 "
+      },
+      "verdict": "자동복구가능"
+    },
+    {
+      "item_seq": "199702846",
+      "reason": "creatinine",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 10 mL/min",
+      "recovery": {
+        "find": "크레아티닌 청소율 ",
+        "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+        "afterPreview": "\\n\\n이 약을 복용하기 "
+      },
+      "verdict": "자동복구가능"
+    },
+    {
+      "item_seq": "199703153",
+      "reason": "creatinine",
+      "ko_masters": 2,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 10 mL/min",
+      "recovery": {
+        "find": "크레아티닌 청소율 ",
+        "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+        "afterPreview": "\\n\\n이 약을 복용하기 "
+      },
+      "verdict": "자동복구가능"
+    },
+    {
+      "item_seq": "199802009",
+      "reason": "creatinine",
+      "ko_masters": 6,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 10 mL/min",
+      "recovery": {
+        "find": "크레아티닌 청소율 ",
+        "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+        "afterPreview": "\\n\\n이 약을 복용하기 "
+      },
+      "verdict": "자동복구가능"
+    },
+    {
+      "item_seq": "199802497",
+      "reason": "creatinine",
+      "ko_masters": 5,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 10 mL/min",
+      "recovery": {
+        "find": "크레아티닌 청소율 ",
+        "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+        "afterPreview": "\\n\\n이 약을 복용하기 "
+      },
+      "verdict": "자동복구가능"
+    },
+    {
+      "item_seq": "199802620",
+      "reason": "creatinine",
+      "ko_masters": 6,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 10 mL/min",
+      "recovery": {
+        "find": "크레아티닌 청소율 ",
+        "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+        "afterPreview": "\\n\\n이 약을 복용하기 "
+      },
+      "verdict": "자동복구가능"
+    },
+    {
+      "item_seq": "199803095",
+      "reason": "creatinine",
+      "ko_masters": 10,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 10 mL/min",
+      "recovery": {
+        "find": "크레아티닌 청소율 ",
+        "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+        "afterPreview": "\\n\\n이 약을 복용하기 "
+      },
+      "verdict": "자동복구가능"
+    },
+    {
+      "item_seq": "199900511",
+      "reason": "paren_suspect",
+      "ko_masters": 2,
+      "en_masters": 0,
+      "nb_ok": true,
+      "verdict": "복구불필요",
+      "note": "괄호 내용 온전(219자), 닫힘괄호만 유실 — 정보손실 없음"
+    },
+    {
+      "item_seq": "200001515",
+      "reason": "creatinine",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 10 mL/min",
+      "recovery": {
+        "find": "크레아티닌 청소율 ",
+        "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+        "afterPreview": "\\n\\n이 약을 복용하기 "
+      },
+      "verdict": "자동복구가능"
+    },
+    {
+      "item_seq": "200001634",
+      "reason": "creatinine",
+      "ko_masters": 2,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 10 mL/min",
+      "recovery": {
+        "find": "크레아티닌 청소율 ",
+        "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+        "afterPreview": "\\n\\n이 약을 복용하기 "
+      },
+      "verdict": "자동복구가능"
+    },
+    {
+      "item_seq": "200300100",
+      "reason": "paren_suspect",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "200300251",
+      "reason": "paren_suspect",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "200300269",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "200300463",
+      "reason": "paren_suspect",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이\\n\\n이 약을 복용하기"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "200300579",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "200300769",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "200301033",
+      "reason": "paren_suspect",
+      "ko_masters": 6,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "200301252",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "200301507",
+      "reason": "paren_suspect",
+      "ko_masters": 8,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "200301610",
+      "reason": "paren_suspect",
+      "ko_masters": 5,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "200301618",
+      "reason": "paren_suspect",
+      "ko_masters": 5,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "200301833",
+      "reason": "paren_suspect",
+      "ko_masters": 6,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "200302457",
+      "reason": "paren_suspect",
+      "ko_masters": 5,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "200400009",
+      "reason": "paren_suspect",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "200400151",
+      "reason": "paren_suspect",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이\\n\\n이 약을 복용하기"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "200400233",
+      "reason": "paren_suspect",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "200400668",
+      "reason": "paren_suspect",
+      "ko_masters": 5,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "200400830",
+      "reason": "paren_suspect",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "200400951",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "200401321",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "verdict": "복구불필요",
+      "note": "괄호 내용 온전(32자), 닫힘괄호만 유실 — 정보손실 없음"
+    },
+    {
+      "item_seq": "200401445",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "200402284",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이\\n\\n이 약을 복용하기"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "200402328",
+      "reason": "paren_suspect",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이\\n\\n이 약을 복용하기"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "200402458",
+      "reason": "paren_suspect",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "200402508",
+      "reason": "paren_suspect",
+      "ko_masters": 5,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이\\n\\n이 약을 복용하기"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "200402912",
+      "reason": "paren_suspect",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "200403090",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "200403246",
+      "reason": "paren_suspect",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "200403710",
+      "reason": "paren_suspect",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "200404048",
+      "reason": "paren_suspect",
+      "ko_masters": 5,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "200404437",
+      "reason": "paren_suspect",
+      "ko_masters": 6,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "200404779",
+      "reason": "paren_suspect",
+      "ko_masters": 9,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "200410902",
+      "reason": "paren_suspect",
+      "ko_masters": 7,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "200411048",
+      "reason": "paren_suspect",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "200608160",
+      "reason": "paren_suspect",
+      "ko_masters": 8,
+      "en_masters": 0,
+      "nb_ok": true,
+      "verdict": "복구불필요",
+      "note": "괄호 내용 온전(154자), 닫힘괄호만 유실 — 정보손실 없음"
+    },
+    {
+      "item_seq": "200610765",
+      "reason": "creatinine",
+      "ko_masters": 5,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 10 mL/min",
+      "recovery": {
+        "find": "크레아티닌 청소율 ",
+        "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+        "afterPreview": "\\n\\n이 약을 복용하기 "
+      },
+      "verdict": "자동복구가능"
+    },
+    {
+      "item_seq": "200610785",
+      "reason": "paren_suspect",
+      "ko_masters": 7,
+      "en_masters": 0,
+      "nb_ok": true,
+      "verdict": "복구불필요",
+      "note": "괄호 내용 온전(227자), 닫힘괄호만 유실 — 정보손실 없음"
+    },
+    {
+      "item_seq": "200702709",
+      "reason": "paren_suspect",
+      "ko_masters": 5,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "200803434",
+      "reason": "creatinine",
+      "ko_masters": 11,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 10 mL/min",
+      "recovery": {
+        "find": "크레아티닌 청소율 ",
+        "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+        "afterPreview": "\\n\\n이 약을 복용하기 "
+      },
+      "verdict": "자동복구가능"
+    },
+    {
+      "item_seq": "200809417",
+      "reason": "paren_suspect",
+      "ko_masters": 6,
+      "en_masters": 0,
+      "nb_ok": true,
+      "verdict": "복구불필요",
+      "note": "괄호 내용 온전(38자), 닫힘괄호만 유실 — 정보손실 없음"
+    },
+    {
+      "item_seq": "200905228",
+      "reason": "creatinine",
+      "ko_masters": 5,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 10 mL/min",
+      "recovery": {
+        "find": "크레아티닌 청소율 ",
+        "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+        "afterPreview": "\\n\\n이 약을 복용하기 "
+      },
+      "verdict": "자동복구가능"
+    },
+    {
+      "item_seq": "200905403",
+      "reason": "creatinine",
+      "ko_masters": 10,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 10 mL/min",
+      "recovery": {
+        "find": "크레아티닌 청소율 ",
+        "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+        "afterPreview": "\\n\\n이 약을 복용하기 "
+      },
+      "verdict": "자동복구가능"
+    },
+    {
+      "item_seq": "201205361",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "verdict": "수동검토",
+      "note": "pH 값 유실 — NB 대조 수동"
+    },
+    {
+      "item_seq": "201205362",
+      "reason": "paren_suspect",
+      "ko_masters": 2,
+      "en_masters": 0,
+      "nb_ok": true,
+      "verdict": "수동검토",
+      "note": "pH 값 유실 — NB 대조 수동"
+    },
+    {
+      "item_seq": "201205364",
+      "reason": "paren_suspect",
+      "ko_masters": 2,
+      "en_masters": 0,
+      "nb_ok": true,
+      "verdict": "수동검토",
+      "note": "pH 값 유실 — NB 대조 수동"
+    },
+    {
+      "item_seq": "201403677",
+      "reason": "paren_suspect",
+      "ko_masters": 2,
+      "en_masters": 0,
+      "nb_ok": true,
+      "verdict": "복구불필요",
+      "note": "괄호 내용 온전(219자), 닫힘괄호만 유실 — 정보손실 없음"
+    },
+    {
+      "item_seq": "201405818",
+      "reason": "paren_suspect",
+      "ko_masters": 2,
+      "en_masters": 0,
+      "nb_ok": true,
+      "verdict": "복구불필요",
+      "note": "괄호 내용 온전(219자), 닫힘괄호만 유실 — 정보손실 없음"
+    },
+    {
+      "item_seq": "201500197",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "verdict": "복구불필요",
+      "note": "괄호 내용 온전(219자), 닫힘괄호만 유실 — 정보손실 없음"
+    },
+    {
+      "item_seq": "201505921",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201507696",
+      "reason": "paren_suspect",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201508010",
+      "reason": "paren_suspect",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이\\n\\n이 약을 복용하기"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201508139",
+      "reason": "paren_suspect",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201600445",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201601174",
+      "reason": "paren_suspect",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201601245",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201601506",
+      "reason": "paren_suspect",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201601614",
+      "reason": "paren_suspect",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201601896",
+      "reason": "paren_suspect",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201602096",
+      "reason": "paren_suspect",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201602679",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201602684",
+      "reason": "paren_suspect",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201602706",
+      "reason": "creatinine",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "verdict": "수동검토",
+      "note": "크레아티닌 앵커 비고유(없음)",
+      "nbValue": "&lt; 25 mL/min"
+    },
+    {
+      "item_seq": "201602871",
+      "reason": "paren_suspect",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201603171",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이\\n\\n이 약을 복용하기"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201604402",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "verdict": "복구불필요",
+      "note": "괄호 내용 온전(219자), 닫힘괄호만 유실 — 정보손실 없음"
+    },
+    {
+      "item_seq": "201605007",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201605325",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201606935",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201607229",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "verdict": "복구불필요",
+      "note": "괄호 내용 온전(227자), 닫힘괄호만 유실 — 정보손실 없음"
+    },
+    {
+      "item_seq": "201700418",
+      "reason": "paren_suspect",
+      "ko_masters": 5,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201700567",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이\\n\\n이 약을 복용하기"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201701108",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201701140",
+      "reason": "paren_suspect",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "verdict": "복구불필요",
+      "note": "괄호 내용 온전(227자), 닫힘괄호만 유실 — 정보손실 없음"
+    },
+    {
+      "item_seq": "201701882",
+      "reason": "paren_suspect",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201706739",
+      "reason": "paren_suspect",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201707212",
+      "reason": "paren_suspect",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201708145",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201801702",
+      "reason": "paren_suspect",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201801843",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201802357",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201802416",
+      "reason": "creatinine",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 10 mL/min",
+      "recovery": {
+        "find": "크레아티닌 청소율 ",
+        "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+        "afterPreview": "\\n\\n이 약을 복용하기 "
+      },
+      "verdict": "자동복구가능"
+    },
+    {
+      "item_seq": "201802652",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201803233",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201803487",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201803649",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201804394",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201804395",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201805153",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201805240",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201900892",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201901374",
+      "reason": "paren_suspect",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201902226",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201903071",
+      "reason": "paren_suspect",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201903082",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201903606",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201904700",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201905990",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이\\n\\n이 약을 복용하기"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201906059",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "verdict": "복구불필요",
+      "note": "괄호 내용 온전(227자), 닫힘괄호만 유실 — 정보손실 없음"
+    },
+    {
+      "item_seq": "201906326",
+      "reason": "creatinine",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "verdict": "NB근거부족",
+      "note": "크레아티닌 유실이나 NB에 청소율 수치 없음"
+    },
+    {
+      "item_seq": "201906400",
+      "reason": "creatinine",
+      "ko_masters": 2,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 10 mL/min",
+      "recovery": {
+        "find": "크레아티닌 청소율 ",
+        "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+        "afterPreview": "\\n이 약을 복용하기 전"
+      },
+      "verdict": "자동복구가능"
+    },
+    {
+      "item_seq": "201906544",
+      "reason": "paren_suspect",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "201906886",
+      "reason": "creatinine",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "verdict": "수동검토",
+      "note": "크레아티닌 앵커 비고유(없음)",
+      "nbValue": "&lt; 25 mL/min"
+    },
+    {
+      "item_seq": "201908418",
+      "reason": "paren_suspect",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "202000054",
+      "reason": "creatinine",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "verdict": "수동검토",
+      "note": "크레아티닌 앵커 비고유(없음)",
+      "nbValue": "&lt; 25 mL/min"
+    },
+    {
+      "item_seq": "202000200",
+      "reason": "creatinine",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "verdict": "수동검토",
+      "note": "크레아티닌 앵커 비고유(없음)",
+      "nbValue": "&lt; 25 mL/min"
+    },
+    {
+      "item_seq": "202002625",
+      "reason": "paren_suspect",
+      "ko_masters": 8,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "202003868",
+      "reason": "paren_suspect",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이이 약을 복용하기 전"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "202202575",
+      "reason": "paren_suspect",
+      "ko_masters": 2,
+      "en_masters": 0,
+      "nb_ok": true,
+      "verdict": "복구불필요",
+      "note": "괄호 내용 온전(85자), 닫힘괄호만 유실 — 정보손실 없음"
+    },
+    {
+      "item_seq": "202202609",
+      "reason": "paren_suspect",
+      "ko_masters": 2,
+      "en_masters": 0,
+      "nb_ok": true,
+      "verdict": "복구불필요",
+      "note": "괄호 내용 온전(66자), 닫힘괄호만 유실 — 정보손실 없음"
+    },
+    {
+      "item_seq": "202203978",
+      "reason": "creatinine",
+      "ko_masters": 3,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 10 mL/min",
+      "recovery": {
+        "find": "크레아티닌 청소율 ",
+        "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+        "afterPreview": "\\n\\n이 약을 복용하기 "
+      },
+      "verdict": "자동복구가능"
+    },
+    {
+      "item_seq": "202500897",
+      "reason": "paren_suspect",
+      "ko_masters": 2,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 25 mL/min",
+      "recovery": {
+        "find": "크레아티닌청소율",
+        "replace": "크레아티닌청소율&lt; 25 mL/min)",
+        "afterPreview": "이\\n\\n이 약을 복용하기"
+      },
+      "verdict": "수동검토",
+      "note": "값복원 가능하나 유실점 이후 문장 이어붙음 — 경계 검토 필요"
+    },
+    {
+      "item_seq": "202501708",
+      "reason": "creatinine",
+      "ko_masters": 4,
+      "en_masters": 0,
+      "nb_ok": true,
+      "nbValue": "&lt; 10 mL/min",
+      "recovery": {
+        "find": "크레아티닌 청소율 ",
+        "replace": "크레아티닌 청소율 &lt; 10 mL/min)",
+        "afterPreview": "\\n\\n이 약을 복용하기 "
+      },
+      "verdict": "자동복구가능"
+    }
+  ]
+}
