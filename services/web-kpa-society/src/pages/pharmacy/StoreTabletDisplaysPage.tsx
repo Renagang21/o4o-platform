@@ -1697,8 +1697,8 @@ export default function StoreTabletDisplaysPage() {
             <div
               style={
                 previewView === 'mobile'
-                  ? { width: 390, maxWidth: '100%', height: '100%', boxShadow: '0 0 0 1px rgba(255,255,255,0.15)', background: '#fff', overflow: 'hidden' }
-                  : { width: '100%', height: '100%', overflow: 'hidden' }
+                  ? { position: 'relative', width: 390, maxWidth: '100%', height: '100%', boxShadow: '0 0 0 1px rgba(255,255,255,0.15)', background: '#fff', overflow: 'hidden' }
+                  : { position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }
               }
             >
               <TabletKioskPage
@@ -1706,6 +1706,7 @@ export default function StoreTabletDisplaysPage() {
                 slug={previewSlug}
                 displaySettings={previewSettings}
                 showQrBadge={previewSettings?.showQr !== false}
+                embedded
               />
             </div>
           </div>
