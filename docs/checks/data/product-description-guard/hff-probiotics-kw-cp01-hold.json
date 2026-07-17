@@ -1,0 +1,12 @@
+[
+  {
+    "candidateId": "4b07bd2a-04d2-40e8-89d8-0a6eb681a520",
+    "productName": "락토베베F",
+    "manufacturer": "(주)뉴팜",
+    "statementNo": "20040017014271",
+    "holdCode": "HOLD_SOURCE_ABNORMAL",
+    "reason": "원문 CFU 이중표기(102,000,000(1억2백만))가 파서/가드에 상충값으로 읽힘 — H-COUNT-MISMATCH BLOCKED. 원문 표기 정정 필요",
+    "baseStandard": "- 성상 : 고유의 향미가 있고 이미·이취가 없는 노란 하양색의 분말 - 프로바이오틱스 수 : 표시량(102,000,000(1억2백만) cfu/2g) 이상 - 대장균군 : 음성",
+    "intake": "1일 2회, 1회 1포를 물 또는 우유, 이유식 등에 타거나 직접 섭취하십시오."
+  }
+]

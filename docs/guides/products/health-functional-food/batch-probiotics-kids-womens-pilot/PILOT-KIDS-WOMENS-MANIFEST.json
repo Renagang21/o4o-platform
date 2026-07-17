@@ -1,0 +1,204 @@
+{
+  "wo": "WO-O4O-HFF-PROBIOTICS-KIDS-WOMENS-VALIDATED-PATTERN-PILOT-V1",
+  "generatedAt": "2026-07-18",
+  "status": "PAUSED_EXTERNAL_DEPENDENCY_DB_WRITE_PERMISSION",
+  "pattern": "보호자 톤(KIDS)/성인 프레이밍(WOMENS). 연령·급여방법·주의문구는 원문 근거만(창작 금지). MFDS 인정 기능성 verbatim. 질병 치료·예방 단정 없음. 성장/발달/면역/여성특이 주장 없음.",
+  "functionality": "프로바이오틱스 단일 기능성(유산균 증식·유해균 억제·배변활동·장 건강)",
+  "targetMix": {
+    "KIDS": 15,
+    "WOMENS": 4
+  },
+  "production": {
+    "count": 19,
+    "items": [
+      {
+        "statementNo": "200700170351205",
+        "slug": "c-cp01-01-beibirak-live-probiotics-gol",
+        "target": "KIDS",
+        "productName": "베이비락 생유산균 골든플레인",
+        "productNameEn": "Beibirak Live Probiotics Goldeunpeulrein",
+        "manufacturer": "코스맥스엔비티(주)",
+        "dataFile": "hff-probiotics-kw-cp01.json"
+      },
+      {
+        "statementNo": "20180012174232",
+        "slug": "c-cp01-02-nyuorijin-beibi-probiotics",
+        "target": "KIDS",
+        "productName": "뉴오리진 베이비 프로바이오틱스",
+        "productNameEn": "Nyuorijin Beibi Probiotics",
+        "manufacturer": "(주)메디오젠 충주공장",
+        "dataFile": "hff-probiotics-kw-cp01.json"
+      },
+      {
+        "statementNo": "200400200201025",
+        "slug": "c-cp01-03-yuginong-gut-daewon-kijeu",
+        "target": "KIDS",
+        "productName": "유기농 장대원 키즈",
+        "productNameEn": "Yuginong Gut Daewon Kijeu",
+        "manufacturer": "엠에스바이오텍(주)",
+        "dataFile": "hff-probiotics-kw-cp01.json"
+      },
+      {
+        "statementNo": "200400200081553",
+        "slug": "c-cp01-04-teunteundatkeom-teunteunkije",
+        "target": "KIDS",
+        "productName": "튼튼닷컴 튼튼키즈 유산균 19",
+        "productNameEn": "Teunteundatkeom Teunteunkijeu Probiotics 19",
+        "manufacturer": "주식회사 노바렉스",
+        "dataFile": "hff-probiotics-kw-cp01.json"
+      },
+      {
+        "statementNo": "200400200061380",
+        "slug": "c-cp01-05-eorini-supeobaiotikseu",
+        "target": "KIDS",
+        "productName": "어린이 수퍼바이오틱스",
+        "productNameEn": "Eorini Supeobaiotikseu",
+        "manufacturer": "(주)서흥",
+        "dataFile": "hff-probiotics-kw-cp01.json"
+      },
+      {
+        "statementNo": "20040017059109",
+        "slug": "c-cp01-07-dr-peuroba-kijeu",
+        "target": "KIDS",
+        "productName": "닥터프로바 키즈",
+        "productNameEn": "Dr. Peuroba Kijeu",
+        "manufacturer": "(주)씨티씨바이오",
+        "dataFile": "hff-probiotics-kw-cp01.json"
+      },
+      {
+        "statementNo": "201400200731",
+        "slug": "c-cp01-08-seltiai-kijeu-cellti-kids",
+        "target": "KIDS",
+        "productName": "셀티아이 키즈(CellTi KIDS)",
+        "productNameEn": "CellTi KIDS",
+        "manufacturer": "주식회사 셀로닉스",
+        "dataFile": "hff-probiotics-kw-cp01.json"
+      },
+      {
+        "statementNo": "200400170211282",
+        "slug": "c-cp01-09-kijeudei-gutiseu-guteeth",
+        "target": "KIDS",
+        "productName": "키즈데이 구티스(Guteeth)",
+        "productNameEn": "Guteeth",
+        "manufacturer": "(주)비오팜",
+        "dataFile": "hff-probiotics-kw-cp01.json"
+      },
+      {
+        "statementNo": "20040015070479",
+        "slug": "c-cp01-10-probiotics-kijeu-max",
+        "target": "KIDS",
+        "productName": "프로바이오틱스 키즈 맥스",
+        "productNameEn": "Probiotics Kijeu Max",
+        "manufacturer": "(주)비피도",
+        "dataFile": "hff-probiotics-kw-cp01.json"
+      },
+      {
+        "statementNo": "20040015162412",
+        "slug": "c-cp01-11-koorong-aisarang-maeil-probi",
+        "target": "KIDS",
+        "productName": "코오롱 아이사랑 매일 유산균",
+        "productNameEn": "Koorong Aisarang Maeil Probiotics",
+        "manufacturer": "(주)허브큐어",
+        "dataFile": "hff-probiotics-kw-cp01.json"
+      },
+      {
+        "statementNo": "20040015110981",
+        "slug": "c-cp01-12-geseupeuro-kijeu-gespro-minl",
+        "target": "KIDS",
+        "productName": "게스프로 키즈 (GESPRO MINLAC)",
+        "productNameEn": "GESPRO MINLAC",
+        "manufacturer": "주)팜크로스",
+        "dataFile": "hff-probiotics-kw-cp01.json"
+      },
+      {
+        "statementNo": "202000120163",
+        "slug": "c-cp01-13-premium-probiotics-kijeu",
+        "target": "KIDS",
+        "productName": "프리미엄 프로바이오틱스 키즈",
+        "productNameEn": "Premium Probiotics Kijeu",
+        "manufacturer": "주식회사 내츄럴엔",
+        "dataFile": "hff-probiotics-kw-cp01.json"
+      },
+      {
+        "statementNo": "200400200023973",
+        "slug": "c-cp01-14-yutubaiombebe-c-geot-care",
+        "target": "KIDS",
+        "productName": "유투바이옴베베 C 것 케어",
+        "productNameEn": "Yutubaiombebe C Geot Care",
+        "manufacturer": "코스맥스바이오(주)",
+        "dataFile": "hff-probiotics-kw-cp01.json"
+      },
+      {
+        "statementNo": "200700170351239",
+        "slug": "c-cp01-15-seltiba-probiotics-kijeu-chy",
+        "target": "KIDS",
+        "productName": "셀티바 프로바이오틱스 키즈 츄어블",
+        "productNameEn": "Seltiba Probiotics Kijeu Chyueobeul",
+        "manufacturer": "코스맥스엔비티(주)",
+        "dataFile": "hff-probiotics-kw-cp01.json"
+      },
+      {
+        "statementNo": "20180012174267",
+        "slug": "c-cp01-16-20eok-bo-gut-kijeu-saeng-pro",
+        "target": "KIDS",
+        "productName": "20억 보장 키즈 생 유산균 영유아 유래 균주",
+        "productNameEn": "20eok Bo Gut Kijeu Saeng Probiotics Yeongyua Yurae Gyunju",
+        "manufacturer": "(주)메디오젠 충주공장",
+        "dataFile": "hff-probiotics-kw-cp01.json"
+      },
+      {
+        "statementNo": "200400200201069",
+        "slug": "c-cp01-17-wsikeurit-care-probiotics",
+        "target": "WOMENS",
+        "productName": "W시크릿케어 프로바이오틱스",
+        "productNameEn": "Wsikeurit Care Probiotics",
+        "manufacturer": "엠에스바이오텍(주)",
+        "dataFile": "hff-probiotics-kw-cp01.json"
+      },
+      {
+        "statementNo": "200700170352148",
+        "slug": "c-cp01-18-umeon-probiotics",
+        "target": "WOMENS",
+        "productName": "우먼 프로바이오틱스",
+        "productNameEn": "Umeon Probiotics",
+        "manufacturer": "코스맥스엔비티(주)",
+        "dataFile": "hff-probiotics-kw-cp01.json"
+      },
+      {
+        "statementNo": "20180012174313",
+        "slug": "c-cp01-19-ineo-care-umeon-balance-prob",
+        "target": "WOMENS",
+        "productName": "이너케어 우먼밸런스 유산균",
+        "productNameEn": "Ineo Care Umeon Balance Probiotics",
+        "manufacturer": "(주)메디오젠 충주공장",
+        "dataFile": "hff-probiotics-kw-cp01.json"
+      },
+      {
+        "statementNo": "200600200032252",
+        "slug": "c-cp01-20-ineo-plus-yeoseong-probiotic",
+        "target": "WOMENS",
+        "productName": "이너플러스 여성유산균",
+        "productNameEn": "Ineo Plus Yeoseong Probiotics",
+        "manufacturer": "콜마비앤에이치(주)음성공장",
+        "dataFile": "hff-probiotics-kw-cp01.json"
+      }
+    ]
+  },
+  "hold": {
+    "count": 1,
+    "items": [
+      {
+        "statementNo": "20040017014271",
+        "productName": "락토베베F",
+        "holdCode": "HOLD_SOURCE_ABNORMAL",
+        "reason": "원문 CFU 이중표기(102,000,000(1억2백만))가 파서/가드에 상충값으로 읽힘 — H-COUNT-MISMATCH BLOCKED. 원문 표기 정정 필요"
+      }
+    ]
+  },
+  "applyContract": {
+    "reuse": "hff-b3-store-canonical-apply.ts 계약(loadTargets → hff-probiotics-kw-cp01.json, TARGET=19)",
+    "expectedWrites": "76 = master19+candidate19+SPD(ko19+en19)",
+    "dbWrite": "미실행(권한 대기)"
+  },
+  "note": "20 파일럿(작성 19/HOLD 1). 확대 전 오케스트레이터 재검 대상."
+}
