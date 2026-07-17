@@ -147,3 +147,25 @@ describe('B-SUPERLATIVE — 제품명·원문 인용 제외 (CP3)', () => {
     expect(r.findings.some((f) => f.ruleId === 'B-SUPERLATIVE-001' && f.status === 'BLOCKED')).toBe(true);
   });
 });
+
+describe('Q-5 스펙 값 끝 항목번호 파편 (2026-07-17)', () => {
+  const spec = (val: string) => withKo(`<div class="sd-spec"><div class="sd-item"><b>프로바이오틱스 수</b> ${val}</div><div class="sd-item"><b>성상</b> 흰색 분말</div></div>`);
+  it('검출: "표시량(…CFU/300mg) 이상 3" 의 bare 항목번호 3 → BLOCKED', () => {
+    const r = runGuard(spec('표시량(100,000,000 CFU/300mg) 이상 3'), { phase: 'post' });
+    expect(r.findings.some((f) => f.ruleId === 'Q-SPEC-ITEMNO-006' && f.status === 'BLOCKED')).toBe(true);
+  });
+  it('검출: "…이상 3)" 괄호형 파편도 BLOCKED', () => {
+    const r = runGuard(spec('표시량(50억/2.2g) 이상 3)'), { phase: 'post' });
+    expect(r.findings.some((f) => f.ruleId === 'Q-SPEC-ITEMNO-006' && f.status === 'BLOCKED')).toBe(true);
+  });
+  it('보존: "…이상" 에서 끝나면 위반 아님', () => {
+    const r = runGuard(spec('표시량(100,000,000 CFU/300mg) 이상'), { phase: 'post' });
+    expect(r.findings.some((f) => f.ruleId === 'Q-SPEC-ITEMNO-006')).toBe(false);
+  });
+  it('보존: 단위 있는 숫자로 끝나면(2g)·18개월) 위반 아님', () => {
+    const r1 = runGuard(spec('표시량(100,000,000 CFU/2 g)'), { phase: 'post' });
+    const r2 = runGuard(spec('표시량(1억 CFU/300mg) 이상, 제조일로부터 18개월'), { phase: 'post' });
+    expect(r1.findings.some((f) => f.ruleId === 'Q-SPEC-ITEMNO-006')).toBe(false);
+    expect(r2.findings.some((f) => f.ruleId === 'Q-SPEC-ITEMNO-006')).toBe(false);
+  });
+});

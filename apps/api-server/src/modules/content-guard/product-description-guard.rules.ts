@@ -932,6 +932,27 @@ export function ruleQ(input: GuardProductInput): GuardFinding[] {
     }
   }
 
+  // Q-5 스펙 값 끝에 새어든 **항목번호 파편** (2026-07-17)
+  //   원문이 항목번호를 공백 없이 붙인 형식("…이상 3)대장균군", "…이상 3.성상")일 때 작성기 trailing-cleanup 이
+  //   괄호형 "(N)"만 제거하고 bare "N)"·"N."·" N" 을 놓쳐 스펙 값 끝에 항목번호가 남는다.
+  //   실측: 프로바이오틱스 수 행 "표시량(…CFU/Nmg) 이상 3" (Batch 001/002 14건). 단위 없는 1~2자리 = 누출 항목번호.
+  {
+    const cells = [...input.drafts.ko.matchAll(/<div class="sd-item"[^>]*>([\s\S]*?)<\/div>/g)].map((m) => stripHtml(m[1]));
+    // 값 종료어(이상/음성/CFU/%/℃/닫는 괄호) 뒤에 단위 없는 bare 1~2자리 숫자로 끝남 = 항목번호 파편.
+    const ITEMNO_FRAG = /(?:이상|음성|CFU|cfu|%|℃|\))\s+(\d{1,2})\s*[)．.]?\s*$/;
+    for (const c of cells) {
+      const m = c.match(ITEMNO_FRAG);
+      if (m) {
+        out.push({
+          ruleId: 'Q-SPEC-ITEMNO-006', severity: 'ERROR', status: 'BLOCKED', language: 'ko',
+          field: 'koDraft', matchedText: truncate(c, 50), sourceEvidence: null,
+          message: `스펙 값 끝에 원문 항목번호 파편이 남았습니다("…${truncate(c.slice(-16), 16)}") — 단위 없는 "${m[1]}" 은 다음 시험항목 번호가 새어든 것입니다.`,
+          suggestedAction: '스펙 값 끝의 항목번호(bare N)·N.·N)를 제거하십시오. 값은 "…이상" 에서 끝나야 합니다.',
+        });
+      }
+    }
+  }
+
   if (out.length === 0) out.push(ok('Q-JOSA-CONCAT-001', 'drafts', '콘텐츠 품질 결함 검출 없음'));
   return out;
 }
