@@ -156,7 +156,9 @@ const TEMPLATE_OPTIONS: TemplateMeta[] = [
 ];
 const templateMeta = (key: string | null | undefined): TemplateMeta =>
   TEMPLATE_OPTIONS.find((t) => t.key === key) ?? TEMPLATE_OPTIONS[0];
-const templateLabel = (key: string | null | undefined) => templateMeta(key).label;
+// WO-O4O-KPA-TABLET-CORNER-TEMPLATE-LABEL-V1: 코너 관리 화면(TabletCornerContentsPanel)도 같은 사용자용 라벨을
+//   쓰도록 export(라벨 드리프트 방지). 내부 template_key 는 노출하지 않는다.
+export const templateLabel = (key: string | null | undefined) => templateMeta(key).label;
 
 // WO-O4O-KPA-TABLET-SCREEN-SET-DIRTY-GUARD-V1: 미저장 변경 경고 문구 + 블록 비교 정규화
 const DISCARD_MSG = '저장되지 않은 변경이 있습니다.\n저장하지 않고 이동하면 변경사항이 사라질 수 있습니다.\n계속하시겠습니까?';

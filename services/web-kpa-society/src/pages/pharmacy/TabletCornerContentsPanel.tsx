@@ -20,6 +20,17 @@ import { Loader2, Plus, ChevronUp, ChevronDown, X, Layers, AlertTriangle, Tv, Ey
 import { RowActionMenu } from '@o4o/ui';
 import { defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
 import { TabletKioskPage, type TabletKioskApi, type TabletScreenResponse } from '@o4o/tablet-kiosk-core';
+// WO-O4O-KPA-TABLET-CORNER-TEMPLATE-LABEL-V1: 현재/연결 콘텐츠의 템플릿을 사용자용 라벨로 표시(같은 소스 재사용).
+import { templateLabel } from './TabletScreenSetManager';
+
+// 템플릿 배지(공통) — 내부 template_key 미노출, templateLabel 로 변환.
+function TemplateBadge({ templateKey }: { templateKey?: string | null }) {
+  return (
+    <span className="inline-flex items-center text-[10px] font-semibold text-indigo-700 bg-indigo-50 border border-indigo-100 px-1.5 py-0.5 rounded">
+      {templateLabel(templateKey)}
+    </span>
+  );
+}
 import {
   fetchCornerContents, addCornerContent, removeCornerContent, reorderCornerContents,
   applyCurrentScreenSet, clearCurrentScreenSet, updateScreenSet, fetchScreenSets,
@@ -212,7 +223,10 @@ export default function TabletCornerContentsPanel({ tabletId, onCurrentChange, o
               {current ? (
                 <>
                   <div className="text-base font-bold text-slate-900 truncate mt-1">{current.name}</div>
-                  <div className="text-[11px] text-slate-500">블록 {current.blockCount}개</div>
+                  <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                    <TemplateBadge templateKey={current.templateKey} />
+                    <span className="text-[11px] text-slate-500">블록 {current.blockCount}개</span>
+                  </div>
                 </>
               ) : (
                 <div className="text-sm text-slate-500 mt-1">
@@ -257,6 +271,7 @@ export default function TabletCornerContentsPanel({ tabletId, onCurrentChange, o
                       {it.isCurrent
                         ? <span className="text-[10px] font-bold text-white bg-indigo-600 px-2 py-0.5 rounded-full">● 현재 사용 중</span>
                         : <span className="text-[11px] text-slate-400">{STATUS_LABEL[it.status] ?? it.status}</span>}
+                      <TemplateBadge templateKey={it.templateKey} />
                       <span className="text-[11px] text-slate-400">블록 {it.blockCount}개</span>
                     </div>
                   </div>
