@@ -7,7 +7,7 @@
  *   적용된 Screen Set 은 공개 GET /:slug/tablet/screen → kiosk-core 뷰어에 반영됨(PUBLIC-RUNTIME-READ 완료).
  *   기존 legacy 진열/대기화면 편집 영역은 그대로 유지(이 컴포넌트는 additive).
  */
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Loader2, Plus, ChevronUp, ChevronDown, X, Save, Layers, Copy, Check, Sparkles } from 'lucide-react';
 import {
   fetchScreenSets, fetchScreenSet, createScreenSet, updateScreenSet,
@@ -652,6 +652,16 @@ export function normalizeCornerBody(body: unknown): string {
   return '';
 }
 
+// WO-O4O-KPA-TABLET-CORNER-EDITOR-AND-DRAFT-PREVIEW-RUNTIME-FIX-V1 §4.6:
+//   실제 공개 QR(PublicScreenSetViewer)은 대기 영상(idle_media)을 제외한다. draft 미리보기 endpoint 는
+//   idle_media 를 포함하므로, QR 모바일 미리보기만 idle_media 섹션을 걷어내 공개 QR 과 핵심 구성을 맞춘다.
+//   (태블릿 미리보기는 그대로 — 대기 영상은 태블릿 개념.) kiosk-core·resolver·공개 viewer 무변경.
+function stripIdleForMobilePreview(screen: TabletScreenResponse | null): TabletScreenResponse | null {
+  const secs = (screen as unknown as { sections?: Array<{ blockType?: string }> })?.sections;
+  if (!screen || !Array.isArray(secs)) return screen;
+  return { ...screen, sections: secs.filter((s) => s?.blockType !== 'idle_media') } as TabletScreenResponse;
+}
+
 const seedInitialBlocks = (detail: ScreenSetDetail | null): ScreenBlock[] =>
   detail
     ? detail.blocks.map((b) =>
@@ -743,6 +753,8 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
     // liveKey 가 templateKey/blocks 를 인코딩한다(내용 기준 재조회).
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [liveKey, canPreview]);
+  // §4.6: QR 모바일 미리보기는 대기 영상을 제외(공개 QR 정합). identity 안정화 위해 memo.
+  const liveScreenMobile = useMemo(() => stripIdleForMobilePreview(liveScreen), [liveScreen]);
 
   // ── dirty guard (baseline = 초기값) ──
   const baseline = useRef({
@@ -1156,7 +1168,7 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
               </div>
             ) : (
               <div style={{ position: 'relative', overflow: 'hidden', width: 'min(100%, 240px)', aspectRatio: '9 / 19', background: '#000', borderRadius: 18 }}>
-                <TabletKioskPage api={previewApi} slug={storeSlug ?? undefined} previewScreen={liveScreen} embedded showQrBadge={false} />
+                <TabletKioskPage api={previewApi} slug={storeSlug ?? undefined} previewScreen={liveScreenMobile} embedded showQrBadge={false} />
               </div>
             )}
             {/* 재조회 중에도 이전 화면을 유지(깜빡임 방지) — 오류 상태에선 오류 배지가 우선 */}
@@ -1250,7 +1262,7 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
               </div>
             ) : (
               <div style={{ position: 'relative', overflow: 'hidden', width: 390, maxWidth: '100%', height: 'min(86vh, 780px)', background: '#000', borderRadius: 24, boxShadow: '0 10px 40px rgba(0,0,0,0.5)' }}>
-                <TabletKioskPage api={previewApi} slug={storeSlug ?? undefined} previewScreen={preview.screen} embedded showQrBadge={false} />
+                <TabletKioskPage api={previewApi} slug={storeSlug ?? undefined} previewScreen={stripIdleForMobilePreview(preview.screen)} embedded showQrBadge={false} />
               </div>
             )}
           </div>
