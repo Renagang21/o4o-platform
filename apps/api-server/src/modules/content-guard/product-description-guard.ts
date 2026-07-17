@@ -81,20 +81,28 @@ function runSourceCrossCheck(input: GuardProductInput): GuardFinding[] {
     });
   }
 
-  // ② 표시 CFU 교차 검증
-  const cfu = parseCfu(base);
-  // `?? null` 로 뭉개면 미제공이 "없음 단언" 이 된다 → undefined 를 그대로 넘긴다
-  const declaredCfu = input.grounding.declaredCfu === undefined ? undefined : (input.grounding.declaredCfu?.absolute ?? null);
-  const c = crossCheckNumber('표시량(CFU)', declaredCfu, cfu);
-  out.push(
-    c.status === 'NOT_DECLARED'
-      ? { ruleId: 'PRE-SRC-CFU-NOT-DECLARED-005', severity: 'INFO', status: 'PRECHECK_INFO', language: 'n/a', field: 'grounding.declaredCfu', matchedText: null, sourceEvidence: `BASE_STANDARD: ${trunc(base, 70)}`, message: c.message, suggestedAction: '원문 파싱값을 확인하고 초안 수치를 여기에 맞추십시오.' }
-    : c.status === 'MATCH'
-      ? { ruleId: 'PRE-SRC-CFU-001', severity: 'INFO', status: 'PASS', language: 'n/a', field: 'grounding.declaredCfu', matchedText: null, sourceEvidence: `BASE_STANDARD: ${trunc(base, 70)}`, message: c.message, suggestedAction: '조치 불요.' }
-      : c.status === 'MISMATCH'
-        ? { ruleId: 'PRE-SRC-CFU-MISMATCH-002', severity: 'ERROR', status: 'BLOCKED', language: 'n/a', field: 'grounding.declaredCfu', matchedText: String(declaredCfu ?? ''), sourceEvidence: `BASE_STANDARD: ${trunc(base, 90)}`, message: c.message, suggestedAction: '원문 수치를 그대로 사용하십시오. 임의 값 금지.' }
-        : { ruleId: 'PRE-SRC-CFU-UNVERIFIABLE-003', severity: 'WARNING', status: 'REVIEW_REQUIRED', language: 'n/a', field: 'grounding.declaredCfu', matchedText: null, sourceEvidence: `BASE_STANDARD: ${trunc(base, 90)}`, message: c.message, suggestedAction: '사람이 원문을 직접 읽고 확정하십시오. **파싱 실패를 근거 부재로 해석하지 마십시오.**' },
-  );
+  // ② 표시 CFU 교차 검증 — **프로바이오틱스 제품에만** (2026-07-17 범위화).
+  //   비타민·미네랄 등 비프로바이오틱 제품의 BASE_STANDARD 에 있는 `세균수 100 cfu/ml` 등은
+  //   **미생물 한도 품질규격**이지 효능 CFU 표시량이 아니다. 전 제품에 CFU 교차검증을 돌리면
+  //   그 미생물 한도를 효능 CFU 로 오인해 PRE-SRC-CFU-UNVERIFIABLE-003 오탐(비타민 C 100·비타민 D 파일럿).
+  //   판정: declaredCfu 를 채웠거나(프로바이오틱스 작성 규약) mainFunction 이 프로바이오틱스/유산균이면 프로바이오틱스.
+  const isProbioticProduct =
+    input.grounding.declaredCfu !== undefined || /프로바이오틱스|유산균/.test(input.source.mainFunction ?? '');
+  if (isProbioticProduct) {
+    const cfu = parseCfu(base);
+    // `?? null` 로 뭉개면 미제공이 "없음 단언" 이 된다 → undefined 를 그대로 넘긴다
+    const declaredCfu = input.grounding.declaredCfu === undefined ? undefined : (input.grounding.declaredCfu?.absolute ?? null);
+    const c = crossCheckNumber('표시량(CFU)', declaredCfu, cfu);
+    out.push(
+      c.status === 'NOT_DECLARED'
+        ? { ruleId: 'PRE-SRC-CFU-NOT-DECLARED-005', severity: 'INFO', status: 'PRECHECK_INFO', language: 'n/a', field: 'grounding.declaredCfu', matchedText: null, sourceEvidence: `BASE_STANDARD: ${trunc(base, 70)}`, message: c.message, suggestedAction: '원문 파싱값을 확인하고 초안 수치를 여기에 맞추십시오.' }
+      : c.status === 'MATCH'
+        ? { ruleId: 'PRE-SRC-CFU-001', severity: 'INFO', status: 'PASS', language: 'n/a', field: 'grounding.declaredCfu', matchedText: null, sourceEvidence: `BASE_STANDARD: ${trunc(base, 70)}`, message: c.message, suggestedAction: '조치 불요.' }
+        : c.status === 'MISMATCH'
+          ? { ruleId: 'PRE-SRC-CFU-MISMATCH-002', severity: 'ERROR', status: 'BLOCKED', language: 'n/a', field: 'grounding.declaredCfu', matchedText: String(declaredCfu ?? ''), sourceEvidence: `BASE_STANDARD: ${trunc(base, 90)}`, message: c.message, suggestedAction: '원문 수치를 그대로 사용하십시오. 임의 값 금지.' }
+          : { ruleId: 'PRE-SRC-CFU-UNVERIFIABLE-003', severity: 'WARNING', status: 'REVIEW_REQUIRED', language: 'n/a', field: 'grounding.declaredCfu', matchedText: null, sourceEvidence: `BASE_STANDARD: ${trunc(base, 90)}`, message: c.message, suggestedAction: '사람이 원문을 직접 읽고 확정하십시오. **파싱 실패를 근거 부재로 해석하지 마십시오.**' },
+    );
+  }
 
   // ③ 표시 기준량 교차 검증
   const pb = parseBasis(base);

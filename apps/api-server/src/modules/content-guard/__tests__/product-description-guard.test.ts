@@ -540,6 +540,23 @@ describe('오탐 분리 — REVIEW_REQUIRED', () => {
   });
 });
 
+// CFU 교차검증 범위화 (2026-07-17) — 비프로바이오틱 제품의 미생물 한도 CFU/ml 오탐 방지
+describe('PRE-SRC-CFU 범위화 — 프로바이오틱스만', () => {
+  const vitaminBase = '1) 성상 : 노란색 연질캡슐 2) 비타민D : 표시량(10㎍/450mg)의 80~180% 3) 세균수 : 100 cfu/ml 이하 4) 대장균 : 음성';
+  it('비타민 제품(declaredCfu 없음·mainFunction 비타민D)은 세균수 cfu/ml 로 PRE-SRC-CFU 를 내지 않는다', () => {
+    const r = runGuard({
+      ...OK_VIVA_FULL_BASIS,
+      grounding: { ...OK_VIVA_FULL_BASIS.grounding, declaredCfu: undefined } as any,
+      source: { ...OK_VIVA_FULL_BASIS.source, mainFunction: '[비타민D] 뼈의 형성과 유지에 필요', baseStandard: vitaminBase },
+    }, { phase: 'pre' });
+    expect(r.findings.some((f) => f.ruleId.startsWith('PRE-SRC-CFU'))).toBe(false);
+  });
+  it('프로바이오틱스 제품(declaredCfu 있음)은 여전히 PRE-SRC-CFU 교차검증을 수행한다', () => {
+    const r = runGuard(OK_VIVA_FULL_BASIS, { phase: 'pre' });
+    expect(r.findings.some((f) => f.ruleId.startsWith('PRE-SRC-CFU'))).toBe(true);
+  });
+});
+
 // ═══ 엔진 ══════════════════════════════════════════════════════════════════
 
 describe('engine', () => {
