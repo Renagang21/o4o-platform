@@ -1,0 +1,382 @@
+{
+ "no_wonmun": 38187,
+ "no_wonmun_by_form": {
+  "granule": 5293,
+  "capsule": 5316,
+  "other": 16238,
+  "eyedrop": 481,
+  "liquid": 600,
+  "tablet": 6990,
+  "ointment": 333,
+  "syrup": 1131,
+  "gel": 429,
+  "cream": 717,
+  "powder": 444,
+  "patch": 94,
+  "vaginal-tab": 57,
+  "lotion": 54,
+  "suppository": 10
+ },
+ "tier4_split_groups": [
+  {
+   "key": "a1c8533c2d4810e4",
+   "n": 175,
+   "rawDistinct": 1,
+   "safeDistinct": 15,
+   "itemseqs": 11,
+   "anyCanon": true,
+   "sample": "티어하이리프레쉬점안액(카르복시메틸셀룰로오스나트륨)"
+  },
+  {
+   "key": "95172cbc3c47ee26",
+   "n": 157,
+   "rawDistinct": 1,
+   "safeDistinct": 57,
+   "itemseqs": 3,
+   "anyCanon": true,
+   "sample": "큐앤큐포비돈거즈볼-중(포비돈요오드)"
+  },
+  {
+   "key": "8fec1b7b1fc7322e",
+   "n": 123,
+   "rawDistinct": 1,
+   "safeDistinct": 2,
+   "itemseqs": 34,
+   "anyCanon": true,
+   "sample": "글로아스피린장용정100mg(아스피린)"
+  },
+  {
+   "key": "a653f2648c997209",
+   "n": 117,
+   "rawDistinct": 1,
+   "safeDistinct": 2,
+   "itemseqs": 18,
+   "anyCanon": true,
+   "sample": "메부라틴정(트리메부틴말레산염)(수출명:MEBURATINTablet100mg)"
+  },
+  {
+   "key": "04f899ee5e6f9276",
+   "n": 114,
+   "rawDistinct": 1,
+   "safeDistinct": 28,
+   "itemseqs": 1,
+   "anyCanon": true,
+   "sample": "큐앤큐바셀린윤나거즈"
+  },
+  {
+   "key": "27e6f67360f51075",
+   "n": 105,
+   "rawDistinct": 1,
+   "safeDistinct": 11,
+   "itemseqs": 26,
+   "anyCanon": true,
+   "sample": "리도케인크림(리도카인)"
+  },
+  {
+   "key": "1e05f892c6718275",
+   "n": 96,
+   "rawDistinct": 2,
+   "safeDistinct": 6,
+   "itemseqs": 13,
+   "anyCanon": true,
+   "sample": "게보핏파워플라스타(디클로페낙나트륨)"
+  },
+  {
+   "key": "aedf81cb0c1b48c0",
+   "n": 89,
+   "rawDistinct": 1,
+   "safeDistinct": 13,
+   "itemseqs": 22,
+   "anyCanon": true,
+   "sample": "바레겐크림(테르비나핀염산염)"
+  },
+  {
+   "key": "ef1c8d86b62229dc",
+   "n": 86,
+   "rawDistinct": 1,
+   "safeDistinct": 39,
+   "itemseqs": 1,
+   "anyCanon": true,
+   "sample": "큐앤큐헥시코올탈지면액"
+  },
+  {
+   "key": "ba6618e989a34a6c",
+   "n": 79,
+   "rawDistinct": 1,
+   "safeDistinct": 2,
+   "itemseqs": 14,
+   "anyCanon": true,
+   "sample": "뮤코펙트정(암브록솔염산염)"
+  },
+  {
+   "key": "eb2cf23d9889f0ac",
+   "n": 76,
+   "rawDistinct": 1,
+   "safeDistinct": 3,
+   "itemseqs": 19,
+   "anyCanon": true,
+   "sample": "케라시딜캡슐"
+  },
+  {
+   "key": "02bc2422d13d104e",
+   "n": 63,
+   "rawDistinct": 1,
+   "safeDistinct": 3,
+   "itemseqs": 19,
+   "anyCanon": true,
+   "sample": "알마드정(알마게이트)"
+  },
+  {
+   "key": "ce42f1ad751bbbc3",
+   "n": 63,
+   "rawDistinct": 1,
+   "safeDistinct": 2,
+   "itemseqs": 11,
+   "anyCanon": true,
+   "sample": "클라리틴정(로라타딘)"
+  },
+  {
+   "key": "9788b0420174e712",
+   "n": 55,
+   "rawDistinct": 1,
+   "safeDistinct": 3,
+   "itemseqs": 7,
+   "anyCanon": true,
+   "sample": "모이스아이뷰점안액(트레할로스수화물)(1회용)"
+  },
+  {
+   "key": "695574a3e1c1f9a8",
+   "n": 54,
+   "rawDistinct": 1,
+   "safeDistinct": 3,
+   "itemseqs": 12,
+   "anyCanon": true,
+   "sample": "대웅알벤다졸정(수출명:MedalbenTabDaezole)"
+  },
+  {
+   "key": "ce0851c78321445d",
+   "n": 54,
+   "rawDistinct": 1,
+   "safeDistinct": 5,
+   "itemseqs": 9,
+   "anyCanon": true,
+   "sample": "간모아액"
+  },
+  {
+   "key": "16ad8b36fb4f7d84",
+   "n": 51,
+   "rawDistinct": 1,
+   "safeDistinct": 3,
+   "itemseqs": 11,
+   "anyCanon": true,
+   "sample": "투스딘골드캡슐"
+  },
+  {
+   "key": "7b0a713f2f1eb6cb",
+   "n": 49,
+   "rawDistinct": 1,
+   "safeDistinct": 2,
+   "itemseqs": 8,
+   "anyCanon": true,
+   "sample": "레디페린-에프캡슐"
+  },
+  {
+   "key": "6543a33660f16dd7",
+   "n": 49,
+   "rawDistinct": 1,
+   "safeDistinct": 7,
+   "itemseqs": 17,
+   "anyCanon": true,
+   "sample": "안국아시클로버크림"
+  },
+  {
+   "key": "31f24cbaf788d012",
+   "n": 48,
+   "rawDistinct": 1,
+   "safeDistinct": 14,
+   "itemseqs": 8,
+   "anyCanon": true,
+   "sample": "마이녹실액5%(미녹시딜)"
+  },
+  {
+   "key": "8457d2a43653b4d8",
+   "n": 47,
+   "rawDistinct": 1,
+   "safeDistinct": 11,
+   "itemseqs": 10,
+   "anyCanon": true,
+   "sample": "네오시덤연고(퓨시드산나트륨)(군납용)"
+  },
+  {
+   "key": "a6e74a74518669d8",
+   "n": 45,
+   "rawDistinct": 1,
+   "safeDistinct": 6,
+   "itemseqs": 7,
+   "anyCanon": true,
+   "sample": "벤타손연고(무피로신)"
+  },
+  {
+   "key": "4219745b98e95ff5",
+   "n": 45,
+   "rawDistinct": 1,
+   "safeDistinct": 4,
+   "itemseqs": 8,
+   "anyCanon": true,
+   "sample": "케토진첩부제(케토프로펜)"
+  },
+  {
+   "key": "d12c1d0ad9a5839a",
+   "n": 42,
+   "rawDistinct": 1,
+   "safeDistinct": 2,
+   "itemseqs": 6,
+   "anyCanon": true,
+   "sample": "유닉신정"
+  },
+  {
+   "key": "39871649ed1653de",
+   "n": 42,
+   "rawDistinct": 1,
+   "safeDistinct": 4,
+   "itemseqs": 8,
+   "anyCanon": true,
+   "sample": "이니포텐액(시트룰린말산염)"
+  },
+  {
+   "key": "9c720cd486d59e69",
+   "n": 40,
+   "rawDistinct": 1,
+   "safeDistinct": 3,
+   "itemseqs": 8,
+   "anyCanon": true,
+   "sample": "파워스탑플라스타(플루르비프로펜)"
+  },
+  {
+   "key": "d6ca75c223b4f751",
+   "n": 40,
+   "rawDistinct": 1,
+   "safeDistinct": 3,
+   "itemseqs": 7,
+   "anyCanon": true,
+   "sample": "인프라센액"
+  },
+  {
+   "key": "fdac8d487f35b788",
+   "n": 38,
+   "rawDistinct": 1,
+   "safeDistinct": 5,
+   "itemseqs": 1,
+   "anyCanon": true,
+   "sample": "비디클로라프렙외용액"
+  },
+  {
+   "key": "0da29bb63039acaa",
+   "n": 37,
+   "rawDistinct": 1,
+   "safeDistinct": 10,
+   "itemseqs": 1,
+   "anyCanon": true,
+   "sample": "신신파스에스(수출명:별첨)"
+  },
+  {
+   "key": "21518d0c7a101319",
+   "n": 36,
+   "rawDistinct": 1,
+   "safeDistinct": 12,
+   "itemseqs": 2,
+   "anyCanon": true,
+   "sample": "해동본방황제고카타플라스마"
+  },
+  {
+   "key": "fa1dd7ba91a843a3",
+   "n": 36,
+   "rawDistinct": 1,
+   "safeDistinct": 2,
+   "itemseqs": 8,
+   "anyCanon": true,
+   "sample": "메부라틴정150밀리그람(트리메부틴말레산염)(수출명:MEBURATINTablet150mg)"
+  },
+  {
+   "key": "e7945034de262c0c",
+   "n": 35,
+   "rawDistinct": 1,
+   "safeDistinct": 4,
+   "itemseqs": 4,
+   "anyCanon": true,
+   "sample": "성광포스틱스왑액(포비돈요오드)"
+  },
+  {
+   "key": "73ea4ff9d96d3209",
+   "n": 34,
+   "rawDistinct": 1,
+   "safeDistinct": 5,
+   "itemseqs": 13,
+   "anyCanon": true,
+   "sample": "로시놀더블액션크림"
+  },
+  {
+   "key": "883dc6760dd8b2b3",
+   "n": 33,
+   "rawDistinct": 1,
+   "safeDistinct": 6,
+   "itemseqs": 9,
+   "anyCanon": true,
+   "sample": "풀케어네일라카(시클로피록스)"
+  },
+  {
+   "key": "8cd1216b1c956e6c",
+   "n": 33,
+   "rawDistinct": 1,
+   "safeDistinct": 5,
+   "itemseqs": 11,
+   "anyCanon": true,
+   "sample": "케토에스겔(케토프로펜)"
+  },
+  {
+   "key": "fde75aa97f9e404e",
+   "n": 32,
+   "rawDistinct": 1,
+   "safeDistinct": 8,
+   "itemseqs": 1,
+   "anyCanon": true,
+   "sample": "케토핀프리점안액(케토티펜푸마르산염)(1회용)(수출명:다티펜점안액)"
+  },
+  {
+   "key": "63b6d725553693c9",
+   "n": 32,
+   "rawDistinct": 1,
+   "safeDistinct": 4,
+   "itemseqs": 6,
+   "anyCanon": true,
+   "sample": "바르젠정(클로닉신리시네이트)(수출명:CLOCXINETab.Stocxine(Clonysinlysinate125)STOLXINE)"
+  },
+  {
+   "key": "74f177aecdb25f4b",
+   "n": 32,
+   "rawDistinct": 1,
+   "safeDistinct": 4,
+   "itemseqs": 3,
+   "anyCanon": true,
+   "sample": "엑소덤패취(니코틴)(수출명:Exoderm)"
+  },
+  {
+   "key": "3f3f5fe3af746d94",
+   "n": 31,
+   "rawDistinct": 1,
+   "safeDistinct": 9,
+   "itemseqs": 10,
+   "anyCanon": true,
+   "sample": "히드론케어로션2.5%(히드로코르티손)"
+  },
+  {
+   "key": "3853514711af7147",
+   "n": 30,
+   "rawDistinct": 1,
+   "safeDistinct": 2,
+   "itemseqs": 5,
+   "anyCanon": true,
+   "sample": "알지렉스정(세티리진염산염)"
+  }
+ ]
+}

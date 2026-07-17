@@ -1,0 +1,116 @@
+{
+  "wo": "WO-O4O-OTC-FULL-CORPUS-SOURCE-FINGERPRINT-GROUPING-AUDIT-V1",
+  "mode": "read-only",
+  "db_write": 0,
+  "q_answers": {
+    "1_target_products": 57572,
+    "2_wonmun_products": 19385,
+    "3_source_fingerprint_groups(safe)": 6267,
+    "4_auto_groupable_products(multi-member)": 17233,
+    "5_reps_for_coverage": {
+      "top10": 878,
+      "top50": 2016,
+      "top100": 2831,
+      "top500": 6365,
+      "groups_for_50pct": 1168,
+      "groups_for_70pct": 2353,
+      "groups_for_80pct": 3253,
+      "groups_for_90pct": 4329
+    },
+    "6_canonical_extendable_products": 19385,
+    "7_new_rep_groups_needed": 0,
+    "8_manual_special_track_products": "38187 (원문없음) + tier4 split 10850"
+  },
+  "population": {
+    "otc_total": 57572,
+    "distinct_representatives": 14876
+  },
+  "wonmun": {
+    "with_wonmun": 19385,
+    "without_wonmun": 38187,
+    "rate": 0.337,
+    "distinct_itemseq": 4747,
+    "distinct_rawFull": 3619,
+    "distinct_normFull": 3572
+  },
+  "canonical": {
+    "has_ko": 22259,
+    "has_en": 1213
+  },
+  "groups": {
+    "safe_rep_units": 6267,
+    "normfull_groups": 3572,
+    "multi_member_safe": 4115,
+    "singleton_safe": 2152
+  },
+  "tiers": {
+    "tier1_raw_identical": 8343,
+    "tier2_normalized_merged": 192,
+    "tier4_split_needed_products": 10850,
+    "tier4_groups": 1360,
+    "tier5_no_wonmun": 38187
+  },
+  "size_distribution": {
+    "1": {
+      "groups": 2152,
+      "products": 2152
+    },
+    "100+": {
+      "groups": 1,
+      "products": 198
+    },
+    "50-99": {
+      "groups": 11,
+      "products": 781
+    },
+    "20-49": {
+      "groups": 33,
+      "products": 942
+    },
+    "10-19": {
+      "groups": 182,
+      "products": 2376
+    },
+    "5-9": {
+      "groups": 729,
+      "products": 4550
+    },
+    "2-4": {
+      "groups": 3159,
+      "products": 8386
+    }
+  },
+  "coverage": {
+    "total_with_wonmun": 19385,
+    "top10": 878,
+    "top50": 2016,
+    "top100": 2831,
+    "top500": 6365,
+    "groups_for_50pct": 1168,
+    "groups_for_70pct": 2353,
+    "groups_for_80pct": 3253,
+    "groups_for_90pct": 4329
+  },
+  "scenarios": {
+    "A_strict": {
+      "auto_products": 8343,
+      "rep_descriptions": 4115,
+      "coverage_of_total": 0.145
+    },
+    "B_semi": {
+      "auto_products": 8535,
+      "rep_groups_to_review": 4115,
+      "coverage_of_total": 0.148
+    },
+    "C_max": {
+      "est_products": 19385,
+      "est_rep_groups": 6267,
+      "manual_split_products": 10850,
+      "separate_track_no_wonmun": 38187
+    }
+  },
+  "relationships_5": {
+    "ingredient_groups": 2890,
+    "ingredient_group_split_across_sources": 925
+  }
+}
