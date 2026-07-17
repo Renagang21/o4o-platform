@@ -1,0 +1,2046 @@
+{
+  "batch": "WO-O4O-HFF-DESCRIPTION-PROBIOTICS-PRODUCTION-BATCH-003-COMPLETE-V1",
+  "generatedAt": "2026-07-17",
+  "functionality": "프로바이오틱스 단일 기능성(유산균 증식·유해균 억제·배변활동 원활·장 건강)",
+  "mainFunctionCanonical": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+  "spdTarget": "SharedProductDescription STORE canonical (source_type=o4o_hff_generated), ko+en",
+  "dbWrite": false,
+  "totalWritten": 226,
+  "uniqueStatementNo": 226,
+  "items": [
+    {
+      "checkpoint": "C-CP01",
+      "statementNo": "200700170351551",
+      "slug": "c-cp01-01-mobita-probio",
+      "productName": "모비타 프로바이오",
+      "productNameEn": "Mobita Probio",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp01.json"
+    },
+    {
+      "checkpoint": "C-CP01",
+      "statementNo": "200400200201098",
+      "slug": "c-cp01-02-algocare-stick",
+      "productName": "알고케어 프로바이오틱 스틱",
+      "productNameEn": "Algocare Probiotic Stick",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp01.json"
+    },
+    {
+      "checkpoint": "C-CP01",
+      "statementNo": "20180012174284",
+      "slug": "c-cp01-03-88-hwalryeok",
+      "productName": "88활력유산균",
+      "productNameEn": "88 Vitality Probiotics",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp01.json"
+    },
+    {
+      "checkpoint": "C-CP01",
+      "statementNo": "200400200061628",
+      "slug": "c-cp01-04-seohung-plant-family",
+      "productName": "식물성 유산균 패밀리",
+      "productNameEn": "Plant-Based Probiotics Family",
+      "manufacturer": "(주)서흥",
+      "dataFile": "hff-probiotics-prod-c-cp01.json"
+    },
+    {
+      "checkpoint": "C-CP01",
+      "statementNo": "200600200032640",
+      "slug": "c-cp01-05-corereset-omni",
+      "productName": "코어리셋 옴니바이오틱스 프라임",
+      "productNameEn": "CoreReset Omnibiotics Prime",
+      "manufacturer": "콜마비앤에이치(주)음성공장",
+      "dataFile": "hff-probiotics-prod-c-cp01.json"
+    },
+    {
+      "checkpoint": "C-CP01",
+      "statementNo": "20040015070388",
+      "slug": "c-cp01-06-softmorning",
+      "productName": "소프트모닝",
+      "productNameEn": "Soft Morning Probiotics",
+      "manufacturer": "(주)비피도",
+      "dataFile": "hff-probiotics-prod-c-cp01.json"
+    },
+    {
+      "checkpoint": "C-CP01",
+      "statementNo": "20040017059270",
+      "slug": "c-cp01-07-radiwell-clearance",
+      "productName": "래디웰 프로바이오틱스 클리어런스 ",
+      "productNameEn": "Radiwell Probiotics Clearance",
+      "manufacturer": "(주)씨티씨바이오",
+      "dataFile": "hff-probiotics-prod-c-cp01.json"
+    },
+    {
+      "checkpoint": "C-CP01",
+      "statementNo": "200400200023399",
+      "slug": "c-cp01-08-cosmax-100",
+      "productName": "프로바이오틱스 100억",
+      "productNameEn": "Probiotics 10 Billion",
+      "manufacturer": "코스맥스바이오(주)",
+      "dataFile": "hff-probiotics-prod-c-cp01.json"
+    },
+    {
+      "checkpoint": "C-CP01",
+      "statementNo": "200400200082915",
+      "slug": "c-cp01-09-byeon-en-jang",
+      "productName": "변 엔 장",
+      "productNameEn": "Byeon-en-Jang Probiotics",
+      "manufacturer": "주식회사 노바렉스",
+      "dataFile": "hff-probiotics-prod-c-cp01.json"
+    },
+    {
+      "checkpoint": "C-CP01",
+      "statementNo": "20040017014628",
+      "slug": "c-cp01-10-truen-floragg",
+      "productName": "트루엔 프로바이오틱스 플로라GG 플러스",
+      "productNameEn": "Truen Probiotics Flora GG Plus",
+      "manufacturer": "(주)뉴팜",
+      "dataFile": "hff-probiotics-prod-c-cp01.json"
+    },
+    {
+      "checkpoint": "C-CP01",
+      "statementNo": "20130020008620",
+      "slug": "c-cp01-11-lunavera",
+      "productName": "루나베라",
+      "productNameEn": "Lunavera Probiotics",
+      "manufacturer": "(주)오투바이오",
+      "dataFile": "hff-probiotics-prod-c-cp01.json"
+    },
+    {
+      "checkpoint": "C-CP01",
+      "statementNo": "20200016052417",
+      "slug": "c-cp01-12-heobaksa",
+      "productName": "허박사 프로바이오틱스",
+      "productNameEn": "Dr. Heo Probiotics",
+      "manufacturer": "주식회사 상상바이오",
+      "dataFile": "hff-probiotics-prod-c-cp01.json"
+    },
+    {
+      "checkpoint": "C-CP01",
+      "statementNo": "202100111828",
+      "slug": "c-cp01-13-hempharma-probio",
+      "productName": "프로바이오틱스",
+      "productNameEn": "HEM Pharma Probiotics",
+      "manufacturer": "주식회사 에이치이엠파마 세종공장",
+      "dataFile": "hff-probiotics-prod-c-cp01.json"
+    },
+    {
+      "checkpoint": "C-CP01",
+      "statementNo": "2022001022258",
+      "slug": "c-cp01-14-daily12-balance-w",
+      "productName": "DAILY 12 PROBIOTICS BALANCE W",
+      "productNameEn": "Daily 12 Probiotics Balance W",
+      "manufacturer": "(주)한미양행 선유공장",
+      "dataFile": "hff-probiotics-prod-c-cp01.json"
+    },
+    {
+      "checkpoint": "C-CP01",
+      "statementNo": "2023000229694",
+      "slug": "c-cp01-15-lactocell",
+      "productName": "락토셀",
+      "productNameEn": "Lactocell",
+      "manufacturer": "(주)신비바이오",
+      "dataFile": "hff-probiotics-prod-c-cp01.json"
+    },
+    {
+      "checkpoint": "C-CP01",
+      "statementNo": "2023000462496",
+      "slug": "c-cp01-16-super-daily-one",
+      "productName": "슈퍼 프로바이오틱스 데일리원",
+      "productNameEn": "Super Probiotics Daily One",
+      "manufacturer": "바이오디피씨(주)",
+      "dataFile": "hff-probiotics-prod-c-cp01.json"
+    },
+    {
+      "checkpoint": "C-CP01",
+      "statementNo": "2023002721152",
+      "slug": "c-cp01-17-premium-100",
+      "productName": "프리미엄 100억 유산균",
+      "productNameEn": "Premium 10 Billion Probiotics",
+      "manufacturer": "위바이옴 익산공장",
+      "dataFile": "hff-probiotics-prod-c-cp01.json"
+    },
+    {
+      "checkpoint": "C-CP01",
+      "statementNo": "2023002928424",
+      "slug": "c-cp01-18-welrest-gold",
+      "productName": "프로바이오틱스 생유산균 골드",
+      "productNameEn": "Probiotics Live Gold",
+      "manufacturer": "(주)웰레스트",
+      "dataFile": "hff-probiotics-prod-c-cp01.json"
+    },
+    {
+      "checkpoint": "C-CP01",
+      "statementNo": "2023002952521",
+      "slug": "c-cp01-19-fermentec-yuhan",
+      "productName": "장건강 유한 생유산균 캡슐",
+      "productNameEn": "Gut-Health Yuhan Live Probiotics Capsule",
+      "manufacturer": "퍼멘텍(주)오송공장",
+      "dataFile": "hff-probiotics-prod-c-cp01.json"
+    },
+    {
+      "checkpoint": "C-CP01",
+      "statementNo": "200700170351577",
+      "slug": "c-cp01-20-gi-probalance",
+      "productName": "지아이-프로밸런스",
+      "productNameEn": "GI-ProBalance",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp01.json"
+    },
+    {
+      "checkpoint": "C-CP02",
+      "statementNo": "200700170351601",
+      "slug": "c-cp02-01-probiotics-yeonguso-10eok-pr",
+      "productName": "유산균 연구소 10억 프로바이오틱스",
+      "productNameEn": "Probiotics Yeonguso 10eok Probiotics",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp02.json"
+    },
+    {
+      "checkpoint": "C-CP02",
+      "statementNo": "200400200201124",
+      "slug": "c-cp02-02-syubiche-probio-spitze-probi",
+      "productName": "슈비체 프로바이오 (SPITZE PROBIO)",
+      "productNameEn": "SPITZE PROBIO",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp02.json"
+    },
+    {
+      "checkpoint": "C-CP02",
+      "statementNo": "20180012174291",
+      "slug": "c-cp02-03-baikeurom-mam-pyeonhan-probi",
+      "productName": "바이크롬 맘 편한 유산균",
+      "productNameEn": "Baikeurom Mam Pyeonhan Probiotics",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp02.json"
+    },
+    {
+      "checkpoint": "C-CP02",
+      "statementNo": "200400200061629",
+      "slug": "c-cp02-04-baiokoeo-10-billion-probioti",
+      "productName": "바이오코어 100억 유산균",
+      "productNameEn": "Baiokoeo 10 Billion Probiotics",
+      "manufacturer": "(주)서흥",
+      "dataFile": "hff-probiotics-prod-c-cp02.json"
+    },
+    {
+      "checkpoint": "C-CP02",
+      "statementNo": "200600200032659",
+      "slug": "c-cp02-05-atomy-sci-maikeurobaiom",
+      "productName": "애터미 SCI 마이크로바이옴",
+      "productNameEn": "Atomy SCI Maikeurobaiom",
+      "manufacturer": "콜마비앤에이치(주)음성공장",
+      "dataFile": "hff-probiotics-prod-c-cp02.json"
+    },
+    {
+      "checkpoint": "C-CP02",
+      "statementNo": "20040015070407",
+      "slug": "c-cp02-06-bifidus-probiotics",
+      "productName": "비피더스 프로바이오틱스",
+      "productNameEn": "Bifidus Probiotics",
+      "manufacturer": "(주)비피도",
+      "dataFile": "hff-probiotics-prod-c-cp02.json"
+    },
+    {
+      "checkpoint": "C-CP02",
+      "statementNo": "20040017059276",
+      "slug": "c-cp02-07-reseukyu-gut-higeia",
+      "productName": "레스큐장 히게이아",
+      "productNameEn": "Reseukyu Gut Higeia",
+      "manufacturer": "(주)씨티씨바이오",
+      "dataFile": "hff-probiotics-prod-c-cp02.json"
+    },
+    {
+      "checkpoint": "C-CP02",
+      "statementNo": "200400200023443",
+      "slug": "c-cp02-08-gut-health-10-billion-probio",
+      "productName": "장건강 100억 프로바이오틱스",
+      "productNameEn": "Gut Health 10 Billion Probiotics",
+      "manufacturer": "코스맥스바이오(주)",
+      "dataFile": "hff-probiotics-prod-c-cp02.json"
+    },
+    {
+      "checkpoint": "C-CP02",
+      "statementNo": "200400200083113",
+      "slug": "c-cp02-09-probiotic-8-10-billion-probi",
+      "productName": "프로바이오틱-8 100억(Probiotic-8 10 Billion)",
+      "productNameEn": "Probiotic-8 10 Billion",
+      "manufacturer": "주식회사 노바렉스",
+      "dataFile": "hff-probiotics-prod-c-cp02.json"
+    },
+    {
+      "checkpoint": "C-CP02",
+      "statementNo": "20040017014637",
+      "slug": "c-cp02-10-raepbaiom-active-probiotics",
+      "productName": "랩바이옴 액티브 프로바이오틱스",
+      "productNameEn": "Raepbaiom Active Probiotics",
+      "manufacturer": "(주)뉴팜",
+      "dataFile": "hff-probiotics-prod-c-cp02.json"
+    },
+    {
+      "checkpoint": "C-CP02",
+      "statementNo": "200700170351622",
+      "slug": "c-cp02-11-nutrabliss-by-watsons",
+      "productName": "Nutrabliss by Watsons",
+      "productNameEn": "Nutrabliss By Watsons",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp02.json"
+    },
+    {
+      "checkpoint": "C-CP02",
+      "statementNo": "200400200201198",
+      "slug": "c-cp02-12-geseupeuro-gut-health-gespro",
+      "productName": "게스프로 장건강(Gespro Enguz)",
+      "productNameEn": "Gespro Enguz",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp02.json"
+    },
+    {
+      "checkpoint": "C-CP02",
+      "statementNo": "2018001217430",
+      "slug": "c-cp02-13-probiotics-probiotics-9",
+      "productName": "유산균프로바이오틱스9",
+      "productNameEn": "Probiotics Probiotics 9",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp02.json"
+    },
+    {
+      "checkpoint": "C-CP02",
+      "statementNo": "200400200061632",
+      "slug": "c-cp02-14-10-billion-probiotics",
+      "productName": "100억 유산균",
+      "productNameEn": "10 Billion Probiotics",
+      "manufacturer": "(주)서흥",
+      "dataFile": "hff-probiotics-prod-c-cp02.json"
+    },
+    {
+      "checkpoint": "C-CP02",
+      "statementNo": "200600200032747",
+      "slug": "c-cp02-15-mai-care-gut-solrusyeon",
+      "productName": "마이케어 [장]솔루션",
+      "productNameEn": "Mai Care Solrusyeon",
+      "manufacturer": "콜마비앤에이치(주)음성공장",
+      "dataFile": "hff-probiotics-prod-c-cp02.json"
+    },
+    {
+      "checkpoint": "C-CP02",
+      "statementNo": "20040015070416",
+      "slug": "c-cp02-16-bipijen-pyueo-bifidus-gold-b",
+      "productName": "비피젠 퓨어 비피더스 골드(BIFIGEN Pure Bifidus Gold)",
+      "productNameEn": "BIFIGEN Pure Bifidus Gold",
+      "manufacturer": "(주)비피도",
+      "dataFile": "hff-probiotics-prod-c-cp02.json"
+    },
+    {
+      "checkpoint": "C-CP02",
+      "statementNo": "20040017059278",
+      "slug": "c-cp02-17-premium-rakto-care-live-prob",
+      "productName": "프리미엄 락토케어 생유산균",
+      "productNameEn": "Premium Rakto Care Live Probiotics",
+      "manufacturer": "(주)씨티씨바이오",
+      "dataFile": "hff-probiotics-prod-c-cp02.json"
+    },
+    {
+      "checkpoint": "C-CP02",
+      "statementNo": "200400200023468",
+      "slug": "c-cp02-18-7jong-probiotics",
+      "productName": "7종 유산균",
+      "productNameEn": "7jong Probiotics",
+      "manufacturer": "코스맥스바이오(주)",
+      "dataFile": "hff-probiotics-prod-c-cp02.json"
+    },
+    {
+      "checkpoint": "C-CP02",
+      "statementNo": "200400200083194",
+      "slug": "c-cp02-19-probiotics-senseotibeu",
+      "productName": "프로바이오틱스 센서티브",
+      "productNameEn": "Probiotics Senseotibeu",
+      "manufacturer": "주식회사 노바렉스",
+      "dataFile": "hff-probiotics-prod-c-cp02.json"
+    },
+    {
+      "checkpoint": "C-CP02",
+      "statementNo": "20040017014647",
+      "slug": "c-cp02-20-belrideiteo-probiotics",
+      "productName": "벨리데이터 유산균",
+      "productNameEn": "Belrideiteo Probiotics",
+      "manufacturer": "(주)뉴팜",
+      "dataFile": "hff-probiotics-prod-c-cp02.json"
+    },
+    {
+      "checkpoint": "C-CP03",
+      "statementNo": "200700170351635",
+      "slug": "c-cp03-01-super-probiotics-super-probi",
+      "productName": "슈퍼 프로바이오틱스(Super Probiotics)",
+      "productNameEn": "Super Probiotics",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp03.json"
+    },
+    {
+      "checkpoint": "C-CP03",
+      "statementNo": "200400200201226",
+      "slug": "c-cp03-02-nunkkot-probiotics-probiotic",
+      "productName": "눈꽃 프로바이오틱스 유산균 19",
+      "productNameEn": "Nunkkot Probiotics Probiotics 19",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp03.json"
+    },
+    {
+      "checkpoint": "C-CP03",
+      "statementNo": "20180012174307",
+      "slug": "c-cp03-03-hyzen-newpower-probiotics",
+      "productName": "Hyzen Newpower Probiotics",
+      "productNameEn": "Hyzen Newpower Probiotics",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp03.json"
+    },
+    {
+      "checkpoint": "C-CP03",
+      "statementNo": "200400200061637",
+      "slug": "c-cp03-04-probiotics-plus",
+      "productName": "유산균 플러스",
+      "productNameEn": "Probiotics Plus",
+      "manufacturer": "(주)서흥",
+      "dataFile": "hff-probiotics-prod-c-cp03.json"
+    },
+    {
+      "checkpoint": "C-CP03",
+      "statementNo": "200600200032918",
+      "slug": "c-cp03-05-ilyang-salaitneun-probiotics",
+      "productName": "일양 살아있는 프로바이오틱스 장용캡슐",
+      "productNameEn": "Ilyang Salaitneun Probiotics Gut Yong Capsule",
+      "manufacturer": "콜마비앤에이치(주)음성공장",
+      "dataFile": "hff-probiotics-prod-c-cp03.json"
+    },
+    {
+      "checkpoint": "C-CP03",
+      "statementNo": "20040015070429",
+      "slug": "c-cp03-06-ideunmaikeurobaiompeurojekte",
+      "productName": "이든마이크로바이옴프로젝트970",
+      "productNameEn": "Ideunmaikeurobaiompeurojekteu970",
+      "manufacturer": "(주)비피도",
+      "dataFile": "hff-probiotics-prod-c-cp03.json"
+    },
+    {
+      "checkpoint": "C-CP03",
+      "statementNo": "20040017059279",
+      "slug": "c-cp03-07-10eok-probiotics",
+      "productName": "10억 프로바이오틱스",
+      "productNameEn": "10eok Probiotics",
+      "manufacturer": "(주)씨티씨바이오",
+      "dataFile": "hff-probiotics-prod-c-cp03.json"
+    },
+    {
+      "checkpoint": "C-CP03",
+      "statementNo": "200400200023532",
+      "slug": "c-cp03-08-5-billion-live-probiotics",
+      "productName": "50억 생유산균",
+      "productNameEn": "5 Billion Live Probiotics",
+      "manufacturer": "코스맥스바이오(주)",
+      "dataFile": "hff-probiotics-prod-c-cp03.json"
+    },
+    {
+      "checkpoint": "C-CP03",
+      "statementNo": "200400200083211",
+      "slug": "c-cp03-09-ponyu-10-billion-family-prob",
+      "productName": "포뉴 100억 패밀리 프로바이오틱스 유산균",
+      "productNameEn": "Ponyu 10 Billion Family Probiotics Probiotics",
+      "manufacturer": "주식회사 노바렉스",
+      "dataFile": "hff-probiotics-prod-c-cp03.json"
+    },
+    {
+      "checkpoint": "C-CP03",
+      "statementNo": "20040017014665",
+      "slug": "c-cp03-10-ongajok-live-probiotics-plus",
+      "productName": "온가족 생유산균 플러스",
+      "productNameEn": "Ongajok Live Probiotics Plus",
+      "manufacturer": "(주)뉴팜",
+      "dataFile": "hff-probiotics-prod-c-cp03.json"
+    },
+    {
+      "checkpoint": "C-CP03",
+      "statementNo": "200400200201238",
+      "slug": "c-cp03-12-ikseuteurim-rieol-bifidus-pl",
+      "productName": "익스트림 리얼 비피더스 플러스",
+      "productNameEn": "Ikseuteurim Rieol Bifidus Plus",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp03.json"
+    },
+    {
+      "checkpoint": "C-CP03",
+      "statementNo": "2018001217431",
+      "slug": "c-cp03-13-pan-bio-probiotics",
+      "productName": "Pan Bio probiotics",
+      "productNameEn": "Pan Bio Probiotics",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp03.json"
+    },
+    {
+      "checkpoint": "C-CP03",
+      "statementNo": "200400200061645",
+      "slug": "c-cp03-14-eichi-005-probiotics",
+      "productName": "에이치 005 프로바이오틱스",
+      "productNameEn": "Eichi 005 Probiotics",
+      "manufacturer": "(주)서흥",
+      "dataFile": "hff-probiotics-prod-c-cp03.json"
+    },
+    {
+      "checkpoint": "C-CP03",
+      "statementNo": "200600200032925",
+      "slug": "c-cp03-15-prolacto-plus-gos-dietary-su",
+      "productName": "PROLACTO PLUS GOS DIETARY SUPPLEMENT PRODUCT (LA-MOON VITA BRAND)",
+      "productNameEn": "LA-MOON VITA BRAND",
+      "manufacturer": "콜마비앤에이치(주)음성공장",
+      "dataFile": "hff-probiotics-prod-c-cp03.json"
+    },
+    {
+      "checkpoint": "C-CP03",
+      "statementNo": "20040015070475",
+      "slug": "c-cp03-16-raipeuning-balance-baiom-lif",
+      "productName": "라이프닝 밸런스 바이옴(Lifening Balance Biome)",
+      "productNameEn": "Lifening Balance Biome",
+      "manufacturer": "(주)비피도",
+      "dataFile": "hff-probiotics-prod-c-cp03.json"
+    },
+    {
+      "checkpoint": "C-CP03",
+      "statementNo": "20040017059288",
+      "slug": "c-cp03-17-probiotics-10-billion-active",
+      "productName": "프로바이오틱스 100억 액티브",
+      "productNameEn": "Probiotics 10 Billion Active",
+      "manufacturer": "(주)씨티씨바이오",
+      "dataFile": "hff-probiotics-prod-c-cp03.json"
+    },
+    {
+      "checkpoint": "C-CP03",
+      "statementNo": "200400200023676",
+      "slug": "c-cp03-18-welssideu-probiotics-10-bill",
+      "productName": "웰씨드프로바이오틱스100억",
+      "productNameEn": "Welssideu Probiotics 10 Billion",
+      "manufacturer": "코스맥스바이오(주)",
+      "dataFile": "hff-probiotics-prod-c-cp03.json"
+    },
+    {
+      "checkpoint": "C-CP03",
+      "statementNo": "200400200083280",
+      "slug": "c-cp03-19-probiotics-7",
+      "productName": "프로바이오틱스 7",
+      "productNameEn": "Probiotics 7",
+      "manufacturer": "주식회사 노바렉스",
+      "dataFile": "hff-probiotics-prod-c-cp03.json"
+    },
+    {
+      "checkpoint": "C-CP03",
+      "statementNo": "20040017014667",
+      "slug": "c-cp03-20-gut-ejon-probiotics-19",
+      "productName": "장에존 프로바이오틱스 19",
+      "productNameEn": "Gut Ejon Probiotics 19",
+      "manufacturer": "(주)뉴팜",
+      "dataFile": "hff-probiotics-prod-c-cp03.json"
+    },
+    {
+      "checkpoint": "C-CP04",
+      "statementNo": "200400200201242",
+      "slug": "c-cp04-02-seltiba-probiotics-iji-plus",
+      "productName": "셀티바 프로바이오틱스 이지 플러스",
+      "productNameEn": "Seltiba Probiotics Iji Plus",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp04.json"
+    },
+    {
+      "checkpoint": "C-CP04",
+      "statementNo": "20180012174318",
+      "slug": "c-cp04-03-rabisen-syupeurim-family",
+      "productName": "라비센 슈프림 패밀리",
+      "productNameEn": "Rabisen Syupeurim Family",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp04.json"
+    },
+    {
+      "checkpoint": "C-CP04",
+      "statementNo": "200400200061659",
+      "slug": "c-cp04-04-live-probiotics-family-plus",
+      "productName": "생유산균 패밀리 플러스",
+      "productNameEn": "Live Probiotics Family Plus",
+      "manufacturer": "(주)서흥",
+      "dataFile": "hff-probiotics-prod-c-cp04.json"
+    },
+    {
+      "checkpoint": "C-CP04",
+      "statementNo": "200600200033042",
+      "slug": "c-cp04-05-gut-yongseong-probiotics-10-",
+      "productName": "장용성유산균100억",
+      "productNameEn": "Gut Yongseong Probiotics 10 Billion",
+      "manufacturer": "콜마비앤에이치(주)음성공장",
+      "dataFile": "hff-probiotics-prod-c-cp04.json"
+    },
+    {
+      "checkpoint": "C-CP04",
+      "statementNo": "20040015070478",
+      "slug": "c-cp04-06-probiotics-gold",
+      "productName": "프로바이오틱스 골드",
+      "productNameEn": "Probiotics Gold",
+      "manufacturer": "(주)비피도",
+      "dataFile": "hff-probiotics-prod-c-cp04.json"
+    },
+    {
+      "checkpoint": "C-CP04",
+      "statementNo": "20040017059289",
+      "slug": "c-cp04-07-probiotics-10-billion-keompo",
+      "productName": "프로바이오틱스 100억 컴포터블",
+      "productNameEn": "Probiotics 10 Billion Keompoteobeul",
+      "manufacturer": "(주)씨티씨바이오",
+      "dataFile": "hff-probiotics-prod-c-cp04.json"
+    },
+    {
+      "checkpoint": "C-CP04",
+      "statementNo": "200400200023765",
+      "slug": "c-cp04-08-probiotics-keompeulrekseu-10",
+      "productName": "프로바이오틱스 컴플렉스 100억",
+      "productNameEn": "Probiotics Keompeulrekseu 10 Billion",
+      "manufacturer": "코스맥스바이오(주)",
+      "dataFile": "hff-probiotics-prod-c-cp04.json"
+    },
+    {
+      "checkpoint": "C-CP04",
+      "statementNo": "200400200083289",
+      "slug": "c-cp04-09-probioticslactomin-probiotic",
+      "productName": "Probioticslactomin 프로바이오틱스락토민",
+      "productNameEn": "Probioticslactomin Probiotics Raktomin",
+      "manufacturer": "주식회사 노바렉스",
+      "dataFile": "hff-probiotics-prod-c-cp04.json"
+    },
+    {
+      "checkpoint": "C-CP04",
+      "statementNo": "200700170351702",
+      "slug": "c-cp04-10-probiotics-plus",
+      "productName": "프로바이오틱스 플러스",
+      "productNameEn": "Probiotics Plus",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp04.json"
+    },
+    {
+      "checkpoint": "C-CP04",
+      "statementNo": "200400200201248",
+      "slug": "c-cp04-11-peurobideonseu-gut-health-10",
+      "productName": "프로비던스 장건강 100억 유산균",
+      "productNameEn": "Peurobideonseu Gut Health 10 Billion Probiotics",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp04.json"
+    },
+    {
+      "checkpoint": "C-CP04",
+      "statementNo": "20180012174331",
+      "slug": "c-cp04-12-waijeubaiom-family-y-s-biome",
+      "productName": "와이즈바이옴 패밀리 (Y's BIOME FAMILY)",
+      "productNameEn": "Y's BIOME FAMILY",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp04.json"
+    },
+    {
+      "checkpoint": "C-CP04",
+      "statementNo": "200400200061674",
+      "slug": "c-cp04-13-koeoriset-omnibaiotikseu",
+      "productName": "코어리셋 옴니바이오틱스",
+      "productNameEn": "Koeoriset Omnibaiotikseu",
+      "manufacturer": "(주)서흥",
+      "dataFile": "hff-probiotics-prod-c-cp04.json"
+    },
+    {
+      "checkpoint": "C-CP04",
+      "statementNo": "200600200033132",
+      "slug": "c-cp04-14-poppro-probiotics",
+      "productName": "Poppro Probiotics",
+      "productNameEn": "Poppro Probiotics",
+      "manufacturer": "콜마비앤에이치(주)음성공장",
+      "dataFile": "hff-probiotics-prod-c-cp04.json"
+    },
+    {
+      "checkpoint": "C-CP04",
+      "statementNo": "20040015070480",
+      "slug": "c-cp04-15-bipi-balance-premium",
+      "productName": "비피 밸런스 프리미엄",
+      "productNameEn": "Bipi Balance Premium",
+      "manufacturer": "(주)비피도",
+      "dataFile": "hff-probiotics-prod-c-cp04.json"
+    },
+    {
+      "checkpoint": "C-CP04",
+      "statementNo": "20040017059314",
+      "slug": "c-cp04-16-stom-peurobijen",
+      "productName": "STOM 프로비젠",
+      "productNameEn": "STOM Peurobijen",
+      "manufacturer": "(주)씨티씨바이오",
+      "dataFile": "hff-probiotics-prod-c-cp04.json"
+    },
+    {
+      "checkpoint": "C-CP04",
+      "statementNo": "200400200023803",
+      "slug": "c-cp04-17-gut-eneun-probiotics",
+      "productName": "장에는 프로바이오틱스",
+      "productNameEn": "Gut Eneun Probiotics",
+      "manufacturer": "코스맥스바이오(주)",
+      "dataFile": "hff-probiotics-prod-c-cp04.json"
+    },
+    {
+      "checkpoint": "C-CP04",
+      "statementNo": "200400200083302",
+      "slug": "c-cp04-18-probiotics",
+      "productName": "프로바이오틱스",
+      "productNameEn": "Probiotics",
+      "manufacturer": "주식회사 노바렉스",
+      "dataFile": "hff-probiotics-prod-c-cp04.json"
+    },
+    {
+      "checkpoint": "C-CP04",
+      "statementNo": "200700170351743",
+      "slug": "c-cp04-19-probiotics-yeonguso-dr-chyue",
+      "productName": "유산균 연구소 닥터 츄어블",
+      "productNameEn": "Probiotics Yeonguso Dr. Chyueobeul",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp04.json"
+    },
+    {
+      "checkpoint": "C-CP04",
+      "statementNo": "200400200201342",
+      "slug": "c-cp04-20-nyu-gut-anehwaje",
+      "productName": "뉴장안에화제",
+      "productNameEn": "Nyu Gut Anehwaje",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp04.json"
+    },
+    {
+      "checkpoint": "C-CP05",
+      "statementNo": "20180012174337",
+      "slug": "c-cp05-01-peurobideonseu-olinwon-probi",
+      "productName": "프로비던스 올인원 유산균",
+      "productNameEn": "Peurobideonseu Olinwon Probiotics",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp05.json"
+    },
+    {
+      "checkpoint": "C-CP05",
+      "statementNo": "200400200061704",
+      "slug": "c-cp05-02-raktobaiom-iji",
+      "productName": "락토바이옴 이지",
+      "productNameEn": "Raktobaiom Iji",
+      "manufacturer": "(주)서흥",
+      "dataFile": "hff-probiotics-prod-c-cp05.json"
+    },
+    {
+      "checkpoint": "C-CP05",
+      "statementNo": "200600200033210",
+      "slug": "c-cp05-03-creneuros-cns-mood-probiotic",
+      "productName": "CreNeuroS CNS Mood Probiotic Capsules",
+      "productNameEn": "CreNeuroS CNS Mood Probiotic Capsules",
+      "manufacturer": "콜마비앤에이치(주)음성공장",
+      "dataFile": "hff-probiotics-prod-c-cp05.json"
+    },
+    {
+      "checkpoint": "C-CP05",
+      "statementNo": "20040015070482",
+      "slug": "c-cp05-04-bifidus-probiotics",
+      "productName": "비피더스 유산균",
+      "productNameEn": "Bifidus Probiotics",
+      "manufacturer": "(주)비피도",
+      "dataFile": "hff-probiotics-prod-c-cp05.json"
+    },
+    {
+      "checkpoint": "C-CP05",
+      "statementNo": "20040017059319",
+      "slug": "c-cp05-05-panena-rilrekseu",
+      "productName": "파네나 릴렉스",
+      "productNameEn": "Panena Rilrekseu",
+      "manufacturer": "(주)씨티씨바이오",
+      "dataFile": "hff-probiotics-prod-c-cp05.json"
+    },
+    {
+      "checkpoint": "C-CP05",
+      "statementNo": "200400200024046",
+      "slug": "c-cp05-06-gut-health-balance",
+      "productName": "장건강밸런스",
+      "productNameEn": "Gut Health Balance",
+      "manufacturer": "코스맥스바이오(주)",
+      "dataFile": "hff-probiotics-prod-c-cp05.json"
+    },
+    {
+      "checkpoint": "C-CP05",
+      "statementNo": "200700170351757",
+      "slug": "c-cp05-07-ineoseutaendadeu-10-billion-",
+      "productName": "이너스탠다드 100억 유산균",
+      "productNameEn": "Ineoseutaendadeu 10 Billion Probiotics",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp05.json"
+    },
+    {
+      "checkpoint": "C-CP05",
+      "statementNo": "200400200201417",
+      "slug": "c-cp05-08-organic-probiotics-plus-th",
+      "productName": "Organic Probiotics Plus (TH)",
+      "productNameEn": "Organic Probiotics Plus",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp05.json"
+    },
+    {
+      "checkpoint": "C-CP05",
+      "statementNo": "20180012174338",
+      "slug": "c-cp05-09-probiotics-solgo-probiotics-",
+      "productName": "프로바이오틱스 솔고 유산균 플러스",
+      "productNameEn": "Probiotics Solgo Probiotics Plus",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp05.json"
+    },
+    {
+      "checkpoint": "C-CP05",
+      "statementNo": "200400200061725",
+      "slug": "c-cp05-10-raktobaiom-solrusyeon2",
+      "productName": "락토바이옴 솔루션2",
+      "productNameEn": "Raktobaiom Solrusyeon2",
+      "manufacturer": "(주)서흥",
+      "dataFile": "hff-probiotics-prod-c-cp05.json"
+    },
+    {
+      "checkpoint": "C-CP05",
+      "statementNo": "200600200033218",
+      "slug": "c-cp05-11-probiotics-probiotics",
+      "productName": "프로바이오틱스 유산균",
+      "productNameEn": "Probiotics Probiotics",
+      "manufacturer": "콜마비앤에이치(주)음성공장",
+      "dataFile": "hff-probiotics-prod-c-cp05.json"
+    },
+    {
+      "checkpoint": "C-CP05",
+      "statementNo": "20040015070501",
+      "slug": "c-cp05-12-elpotin-peuro-pokeoseu",
+      "productName": "엘포틴 프로 포커스",
+      "productNameEn": "Elpotin Peuro Pokeoseu",
+      "manufacturer": "(주)비피도",
+      "dataFile": "hff-probiotics-prod-c-cp05.json"
+    },
+    {
+      "checkpoint": "C-CP05",
+      "statementNo": "20040017059320",
+      "slug": "c-cp05-13-panena-peulrou",
+      "productName": "파네나 플로우",
+      "productNameEn": "Panena Peulrou",
+      "manufacturer": "(주)씨티씨바이오",
+      "dataFile": "hff-probiotics-prod-c-cp05.json"
+    },
+    {
+      "checkpoint": "C-CP05",
+      "statementNo": "200700170351774",
+      "slug": "c-cp05-14-rakpido-probiotics-super-pae",
+      "productName": "락피도 프로바이오틱스 슈퍼패스",
+      "productNameEn": "Rakpido Probiotics Super Paeseu",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp05.json"
+    },
+    {
+      "checkpoint": "C-CP05",
+      "statementNo": "200400200201418",
+      "slug": "c-cp05-15-organic-probiotics-th",
+      "productName": "Organic Probiotics (TH)",
+      "productNameEn": "Organic Probiotics",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp05.json"
+    },
+    {
+      "checkpoint": "C-CP05",
+      "statementNo": "20180012174340",
+      "slug": "c-cp05-16-maeil-kwaehwal-probiotics",
+      "productName": "매일 쾌활 유산균",
+      "productNameEn": "Maeil Kwaehwal Probiotics",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp05.json"
+    },
+    {
+      "checkpoint": "C-CP05",
+      "statementNo": "200400200061726",
+      "slug": "c-cp05-17-raktobaiom-solrusyeon1",
+      "productName": "락토바이옴 솔루션1",
+      "productNameEn": "Raktobaiom Solrusyeon1",
+      "manufacturer": "(주)서흥",
+      "dataFile": "hff-probiotics-prod-c-cp05.json"
+    },
+    {
+      "checkpoint": "C-CP05",
+      "statementNo": "200600200033231",
+      "slug": "c-cp05-18-dcn-peopekteu-probiotics-pro",
+      "productName": "DCN 퍼펙트 유산균 프로바이오틱스 100억",
+      "productNameEn": "DCN Peopekteu Probiotics Probiotics 10 Billion",
+      "manufacturer": "콜마비앤에이치(주)음성공장",
+      "dataFile": "hff-probiotics-prod-c-cp05.json"
+    },
+    {
+      "checkpoint": "C-CP05",
+      "statementNo": "200700170351793",
+      "slug": "c-cp05-19-probiotics-chyueobeul",
+      "productName": "프로바이오틱스 츄어블",
+      "productNameEn": "Probiotics Chyueobeul",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp05.json"
+    },
+    {
+      "checkpoint": "C-CP05",
+      "statementNo": "200400200201437",
+      "slug": "c-cp05-20-premium-rosel-probiotics-dps",
+      "productName": "프리미엄 로셀 유산균 DPS(Developed Probiotic Solution)",
+      "productNameEn": "Developed Probiotic Solution",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp05.json"
+    },
+    {
+      "checkpoint": "C-CP06",
+      "statementNo": "20180012174342",
+      "slug": "c-cp06-01-beurio-saeng-probiotics-prob",
+      "productName": "브리오 생 유산균 프로바이오틱스 액티브",
+      "productNameEn": "Beurio Saeng Probiotics Probiotics Active",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp06.json"
+    },
+    {
+      "checkpoint": "C-CP06",
+      "statementNo": "200400200061732",
+      "slug": "c-cp06-02-probiotics-teuripeul",
+      "productName": "프로바이오틱스 트리플",
+      "productNameEn": "Probiotics Teuripeul",
+      "manufacturer": "(주)서흥",
+      "dataFile": "hff-probiotics-prod-c-cp06.json"
+    },
+    {
+      "checkpoint": "C-CP06",
+      "statementNo": "200600200033257",
+      "slug": "c-cp06-03-harangwon-esensyeol-probioti",
+      "productName": "하랑원 에센셜 프로바이오틱스",
+      "productNameEn": "Harangwon Esensyeol Probiotics",
+      "manufacturer": "콜마비앤에이치(주)음성공장",
+      "dataFile": "hff-probiotics-prod-c-cp06.json"
+    },
+    {
+      "checkpoint": "C-CP06",
+      "statementNo": "200700170351825",
+      "slug": "c-cp06-04-probiotics",
+      "productName": "프로바이오틱스",
+      "productNameEn": "Probiotics",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp06.json"
+    },
+    {
+      "checkpoint": "C-CP06",
+      "statementNo": "200400200201492",
+      "slug": "c-cp06-05-super-probiotics-19-jeodang-",
+      "productName": "슈퍼 프로바이오틱스 19 저당스틱",
+      "productNameEn": "Super Probiotics 19 Jeodang Stick",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp06.json"
+    },
+    {
+      "checkpoint": "C-CP06",
+      "statementNo": "20180012174366",
+      "slug": "c-cp06-06-rakto-probiotics-20eok-bunma",
+      "productName": "락토 프로바이오틱스 20억 분말",
+      "productNameEn": "Rakto Probiotics 20eok Bunmal",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp06.json"
+    },
+    {
+      "checkpoint": "C-CP06",
+      "statementNo": "200400200061768",
+      "slug": "c-cp06-07-core-reset-omnibiotics",
+      "productName": "Core reset Omnibiotics",
+      "productNameEn": "Core Reset Omnibiotics",
+      "manufacturer": "(주)서흥",
+      "dataFile": "hff-probiotics-prod-c-cp06.json"
+    },
+    {
+      "checkpoint": "C-CP06",
+      "statementNo": "200600200033260",
+      "slug": "c-cp06-08-herakeulreseu-ekseupeoteu-bi",
+      "productName": "헤라클레스 엑스퍼트 비피더스",
+      "productNameEn": "Herakeulreseu Ekseupeoteu Bifidus",
+      "manufacturer": "콜마비앤에이치(주)음성공장",
+      "dataFile": "hff-probiotics-prod-c-cp06.json"
+    },
+    {
+      "checkpoint": "C-CP06",
+      "statementNo": "200700170351841",
+      "slug": "c-cp06-09-raktogeulrou-probiotics",
+      "productName": "락토글로우 프로바이오틱스",
+      "productNameEn": "Raktogeulrou Probiotics",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp06.json"
+    },
+    {
+      "checkpoint": "C-CP06",
+      "statementNo": "200400200201506",
+      "slug": "c-cp06-10-simplus-probiotics",
+      "productName": "simplus 프로바이오틱스",
+      "productNameEn": "Simplus Probiotics",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp06.json"
+    },
+    {
+      "checkpoint": "C-CP06",
+      "statementNo": "20180012174392",
+      "slug": "c-cp06-11-bipirakto-gold-f-capsule",
+      "productName": "비피락토골드F캡슐",
+      "productNameEn": "Bipirakto Gold F Capsule",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp06.json"
+    },
+    {
+      "checkpoint": "C-CP06",
+      "statementNo": "200400200061818",
+      "slug": "c-cp06-12-probiotics-chyueobeul",
+      "productName": "프로바이오틱스 츄어블",
+      "productNameEn": "Probiotics Chyueobeul",
+      "manufacturer": "(주)서흥",
+      "dataFile": "hff-probiotics-prod-c-cp06.json"
+    },
+    {
+      "checkpoint": "C-CP06",
+      "statementNo": "20060020003527",
+      "slug": "c-cp06-13-atomy-probiotics-10-plus-chi",
+      "productName": "애터미 프로바이오틱스 10플러스 친생 유산균",
+      "productNameEn": "Atomy Probiotics 10 Plus Chinsaeng Probiotics",
+      "manufacturer": "콜마비앤에이치(주)음성공장",
+      "dataFile": "hff-probiotics-prod-c-cp06.json"
+    },
+    {
+      "checkpoint": "C-CP06",
+      "statementNo": "200700170351892",
+      "slug": "c-cp06-14-endatbaio-solrusyeon-gut-hea",
+      "productName": "엔닷바이오 솔루션 장건강 100억 프로바이오틱스",
+      "productNameEn": "Endatbaio Solrusyeon Gut Health 10 Billion Probiotics",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp06.json"
+    },
+    {
+      "checkpoint": "C-CP06",
+      "statementNo": "200400200201511",
+      "slug": "c-cp06-15-emeseu-probiotics",
+      "productName": "엠에스 프로바이오틱스",
+      "productNameEn": "Emeseu Probiotics",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp06.json"
+    },
+    {
+      "checkpoint": "C-CP06",
+      "statementNo": "2018001217441",
+      "slug": "c-cp06-16-mamseu-probiotics-gold",
+      "productName": "맘스 프로바이오틱스 골드",
+      "productNameEn": "Mamseu Probiotics Gold",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp06.json"
+    },
+    {
+      "checkpoint": "C-CP06",
+      "statementNo": "200400200061855",
+      "slug": "c-cp06-17-gut-probiotics",
+      "productName": "장 유산균",
+      "productNameEn": "Gut Probiotics",
+      "manufacturer": "(주)서흥",
+      "dataFile": "hff-probiotics-prod-c-cp06.json"
+    },
+    {
+      "checkpoint": "C-CP06",
+      "statementNo": "20060020003697",
+      "slug": "c-cp06-18-koorong-raktogeurin-probioti",
+      "productName": "코오롱 락토그린 프로바이오틱스",
+      "productNameEn": "Koorong Raktogeurin Probiotics",
+      "manufacturer": "콜마비앤에이치(주)음성공장",
+      "dataFile": "hff-probiotics-prod-c-cp06.json"
+    },
+    {
+      "checkpoint": "C-CP06",
+      "statementNo": "200700170351969",
+      "slug": "c-cp06-19-probiotics-family",
+      "productName": "프로바이오틱스 패밀리",
+      "productNameEn": "Probiotics Family",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp06.json"
+    },
+    {
+      "checkpoint": "C-CP06",
+      "statementNo": "200400200201530",
+      "slug": "c-cp06-20-nekseupam-care-gyunjil-probi",
+      "productName": "넥스팜케어 균질프로바이오틱스",
+      "productNameEn": "Nekseupam Care Gyunjil Probiotics",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp06.json"
+    },
+    {
+      "checkpoint": "C-CP07",
+      "statementNo": "20180012174412",
+      "slug": "c-cp07-01-rovizyme",
+      "productName": "Rovizyme",
+      "productNameEn": "Rovizyme",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp07.json"
+    },
+    {
+      "checkpoint": "C-CP07",
+      "statementNo": "200400200062021",
+      "slug": "c-cp07-02-ineobaiom",
+      "productName": "이너바이옴",
+      "productNameEn": "Ineobaiom",
+      "manufacturer": "(주)서흥",
+      "dataFile": "hff-probiotics-prod-c-cp07.json"
+    },
+    {
+      "checkpoint": "C-CP07",
+      "statementNo": "200700170351985",
+      "slug": "c-cp07-03-yuginong-gut-daewon",
+      "productName": "유기농 장대원",
+      "productNameEn": "Yuginong Gut Daewon",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp07.json"
+    },
+    {
+      "checkpoint": "C-CP07",
+      "statementNo": "200400200201544",
+      "slug": "c-cp07-04-ebeo-probiotics-ineo-care-5-",
+      "productName": "에버프로바이오틱스 이너케어 50억CFU",
+      "productNameEn": "Ebeo Probiotics Ineo Care 5 Billion CFU",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp07.json"
+    },
+    {
+      "checkpoint": "C-CP07",
+      "statementNo": "20180012174415",
+      "slug": "c-cp07-05-dr-ex-probiotics",
+      "productName": "닥터 EX 프로바이오틱스",
+      "productNameEn": "Dr. EX Probiotics",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp07.json"
+    },
+    {
+      "checkpoint": "C-CP07",
+      "statementNo": "200400200062135",
+      "slug": "c-cp07-06-baioribeu-10-billion-probiot",
+      "productName": "바이오리브 100억 유산균 프레시",
+      "productNameEn": "Baioribeu 10 Billion Probiotics Peuresi",
+      "manufacturer": "(주)서흥",
+      "dataFile": "hff-probiotics-prod-c-cp07.json"
+    },
+    {
+      "checkpoint": "C-CP07",
+      "statementNo": "200700170351987",
+      "slug": "c-cp07-07-olinwon-probiotics-10-billio",
+      "productName": "올인원 프로바이오틱스 100억",
+      "productNameEn": "Olinwon Probiotics 10 Billion",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp07.json"
+    },
+    {
+      "checkpoint": "C-CP07",
+      "statementNo": "20040020020193",
+      "slug": "c-cp07-08-w-deobeulyu-balance-care-pro",
+      "productName": "W(더블유) 밸런스케어 프로바이오틱스",
+      "productNameEn": "W Balance Care Probiotics",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp07.json"
+    },
+    {
+      "checkpoint": "C-CP07",
+      "statementNo": "2018001217443",
+      "slug": "c-cp07-09-family-probiotics-gold",
+      "productName": "패밀리 프로바이오틱스 골드",
+      "productNameEn": "Family Probiotics Gold",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp07.json"
+    },
+    {
+      "checkpoint": "C-CP07",
+      "statementNo": "200400200062136",
+      "slug": "c-cp07-10-yeoeseudeo-probiotics-gold-p",
+      "productName": "여에스더 유산균 골드 PRO  ",
+      "productNameEn": "Yeoeseudeo Probiotics Gold PRO",
+      "manufacturer": "(주)서흥",
+      "dataFile": "hff-probiotics-prod-c-cp07.json"
+    },
+    {
+      "checkpoint": "C-CP07",
+      "statementNo": "200700170352052",
+      "slug": "c-cp07-11-inkeurobi-gut-health-probiot",
+      "productName": "인크로비 장건강 프로바이오틱스 ",
+      "productNameEn": "Inkeurobi Gut Health Probiotics",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp07.json"
+    },
+    {
+      "checkpoint": "C-CP07",
+      "statementNo": "20040020020203",
+      "slug": "c-cp07-12-probiotics-senseotibeu",
+      "productName": "프로바이오틱스 센서티브",
+      "productNameEn": "Probiotics Senseotibeu",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp07.json"
+    },
+    {
+      "checkpoint": "C-CP07",
+      "statementNo": "20180012174434",
+      "slug": "c-cp07-13-raktoreonseu",
+      "productName": "락토런스",
+      "productNameEn": "Raktoreonseu",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp07.json"
+    },
+    {
+      "checkpoint": "C-CP07",
+      "statementNo": "200400200062142",
+      "slug": "c-cp07-14-probiotics",
+      "productName": "유산균",
+      "productNameEn": "Probiotics",
+      "manufacturer": "(주)서흥",
+      "dataFile": "hff-probiotics-prod-c-cp07.json"
+    },
+    {
+      "checkpoint": "C-CP07",
+      "statementNo": "200700170352065",
+      "slug": "c-cp07-15-probiotics-premium-10-billio",
+      "productName": "프로바이오틱스 프리미엄 100억",
+      "productNameEn": "Probiotics Premium 10 Billion",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp07.json"
+    },
+    {
+      "checkpoint": "C-CP07",
+      "statementNo": "20040020020204",
+      "slug": "c-cp07-16-ribaiotikseupyueo",
+      "productName": "리바이오틱스퓨어",
+      "productNameEn": "Ribaiotikseupyueo",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp07.json"
+    },
+    {
+      "checkpoint": "C-CP07",
+      "statementNo": "20180012174442",
+      "slug": "c-cp07-17-neombeosebeun-raiteu",
+      "productName": "넘버세븐 라이트",
+      "productNameEn": "Neombeosebeun Raiteu",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp07.json"
+    },
+    {
+      "checkpoint": "C-CP07",
+      "statementNo": "200400200062147",
+      "slug": "c-cp07-18-yeoeseudeo-probiotics-keulra",
+      "productName": "여에스더 유산균 클래식 PRO",
+      "productNameEn": "Yeoeseudeo Probiotics Keulraesik PRO",
+      "manufacturer": "(주)서흥",
+      "dataFile": "hff-probiotics-prod-c-cp07.json"
+    },
+    {
+      "checkpoint": "C-CP07",
+      "statementNo": "200700170352077",
+      "slug": "c-cp07-19-10-billion-probiotics-pappin",
+      "productName": "100억 유산균 팝핑 톡톡",
+      "productNameEn": "10 Billion Probiotics Papping Toktok",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp07.json"
+    },
+    {
+      "checkpoint": "C-CP07",
+      "statementNo": "20040020020258",
+      "slug": "c-cp07-20-probiotics",
+      "productName": "프로바이오틱스",
+      "productNameEn": "Probiotics",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp07.json"
+    },
+    {
+      "checkpoint": "C-CP08",
+      "statementNo": "20180012174451",
+      "slug": "c-cp08-01-hyobi-gut-gun",
+      "productName": "효비장군",
+      "productNameEn": "Hyobi Gut Gun",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp08.json"
+    },
+    {
+      "checkpoint": "C-CP08",
+      "statementNo": "200400200062187",
+      "slug": "c-cp08-02-haepimundei-raep-gut-health-",
+      "productName": "해피문데이 랩 장 건강 100억 유산균",
+      "productNameEn": "Haepimundei Raep Gut Health 10 Billion Probiotics",
+      "manufacturer": "(주)서흥",
+      "dataFile": "hff-probiotics-prod-c-cp08.json"
+    },
+    {
+      "checkpoint": "C-CP08",
+      "statementNo": "200700170352096",
+      "slug": "c-cp08-03-ineobeulrasseom",
+      "productName": "이너블라썸",
+      "productNameEn": "Ineobeulrasseom",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp08.json"
+    },
+    {
+      "checkpoint": "C-CP08",
+      "statementNo": "20040020020289",
+      "slug": "c-cp08-04-w-care-probiotics",
+      "productName": "W케어 프로바이오틱스",
+      "productNameEn": "W Care Probiotics",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp08.json"
+    },
+    {
+      "checkpoint": "C-CP08",
+      "statementNo": "200700170352163",
+      "slug": "c-cp08-06-gut-health-10-billion-probio",
+      "productName": "장건강 100억 유산균",
+      "productNameEn": "Gut Health 10 Billion Probiotics",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp08.json"
+    },
+    {
+      "checkpoint": "C-CP08",
+      "statementNo": "20040020020332",
+      "slug": "c-cp08-07-super-peuri-probiotics",
+      "productName": "슈퍼프리 프로바이오틱스",
+      "productNameEn": "Super Peuri Probiotics",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp08.json"
+    },
+    {
+      "checkpoint": "C-CP08",
+      "statementNo": "20180012174457",
+      "slug": "c-cp08-08-aimbio-probiotics-keompoteu",
+      "productName": "아임비오유산균 컴포트",
+      "productNameEn": "Aimbio Probiotics Keompoteu",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp08.json"
+    },
+    {
+      "checkpoint": "C-CP08",
+      "statementNo": "200700170352170",
+      "slug": "c-cp08-09-probiotics-probiotics-seupes",
+      "productName": "프로바이오틱스 유산균 스페셜핏",
+      "productNameEn": "Probiotics Probiotics Seupesyeolpit",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp08.json"
+    },
+    {
+      "checkpoint": "C-CP08",
+      "statementNo": "20040020020338",
+      "slug": "c-cp08-10-emeseu-premium-probiotics-go",
+      "productName": "엠에스 프리미엄 유산균 골드",
+      "productNameEn": "Emeseu Premium Probiotics Gold",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp08.json"
+    },
+    {
+      "checkpoint": "C-CP08",
+      "statementNo": "20180012174459",
+      "slug": "c-cp08-11-baioribeu-10-billion-probiot",
+      "productName": "바이오리브 100억 유산균",
+      "productNameEn": "Baioribeu 10 Billion Probiotics",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp08.json"
+    },
+    {
+      "checkpoint": "C-CP08",
+      "statementNo": "200700170352173",
+      "slug": "c-cp08-12-bildeu-10-billion-probiotics",
+      "productName": "빌드 100억 유산균 베이직",
+      "productNameEn": "Bildeu 10 Billion Probiotics Beijik",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp08.json"
+    },
+    {
+      "checkpoint": "C-CP08",
+      "statementNo": "20040020020370",
+      "slug": "c-cp08-13-dinobo-peurojenik-meteurikse",
+      "productName": "디노보 프로제닉 메트릭스",
+      "productNameEn": "Dinobo Peurojenik Meteurikseu",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp08.json"
+    },
+    {
+      "checkpoint": "C-CP08",
+      "statementNo": "20180012174466",
+      "slug": "c-cp08-14-dr-bakseu-gut-health-en-10-b",
+      "productName": "닥터박스 장 건강엔 100억 프로바이오틱스",
+      "productNameEn": "Dr. Bakseu Gut Health En 10 Billion Probiotics",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp08.json"
+    },
+    {
+      "checkpoint": "C-CP08",
+      "statementNo": "200700170352192",
+      "slug": "c-cp08-15-bildeu-10-billion-probiotics",
+      "productName": "빌드 100억 유산균 프로",
+      "productNameEn": "Bildeu 10 Billion Probiotics Peuro",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp08.json"
+    },
+    {
+      "checkpoint": "C-CP08",
+      "statementNo": "20040020020426",
+      "slug": "c-cp08-16-w-deobeulyu-ineo-balance-car",
+      "productName": "W(더블유) 이너밸런스케어 프로바이오틱스",
+      "productNameEn": "W Ineo Balance Care Probiotics",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp08.json"
+    },
+    {
+      "checkpoint": "C-CP08",
+      "statementNo": "20180012174469",
+      "slug": "c-cp08-17-ineo-probiotics-probiotics",
+      "productName": "이너 유산균 프로바이오틱스",
+      "productNameEn": "Ineo Probiotics Probiotics",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp08.json"
+    },
+    {
+      "checkpoint": "C-CP08",
+      "statementNo": "200700170352225",
+      "slug": "c-cp08-18-10-billion-probiotics",
+      "productName": "100억 유산균",
+      "productNameEn": "10 Billion Probiotics",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp08.json"
+    },
+    {
+      "checkpoint": "C-CP08",
+      "statementNo": "20040020020458",
+      "slug": "c-cp08-19-polrisia-probiotics",
+      "productName": "폴리시아프로바이오틱스",
+      "productNameEn": "Polrisia Probiotics",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp08.json"
+    },
+    {
+      "checkpoint": "C-CP08",
+      "statementNo": "20180012174470",
+      "slug": "c-cp08-20-nyuorijin-probiotics-new-ori",
+      "productName": "뉴오리진 프로바이오틱스 (New Origin Probiotics)",
+      "productNameEn": "New Origin Probiotics",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp08.json"
+    },
+    {
+      "checkpoint": "C-CP09",
+      "statementNo": "200700170352231",
+      "slug": "c-cp09-01-raktosel-lactocell",
+      "productName": "락토셀(LactoCell)",
+      "productNameEn": "LactoCell",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp09.json"
+    },
+    {
+      "checkpoint": "C-CP09",
+      "statementNo": "20040020020473",
+      "slug": "c-cp09-02-ppeuttiaenraktoyu",
+      "productName": "쁘띠앤락토유",
+      "productNameEn": "Ppeuttiaenraktoyu",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp09.json"
+    },
+    {
+      "checkpoint": "C-CP09",
+      "statementNo": "20180012174471",
+      "slug": "c-cp09-03-nyuorijin-probiotics-mct-new",
+      "productName": "뉴오리진 프로바이오틱스 MCT (New Origin Probiotics MCT)",
+      "productNameEn": "New Origin Probiotics MCT",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp09.json"
+    },
+    {
+      "checkpoint": "C-CP09",
+      "statementNo": "200700170352249",
+      "slug": "c-cp09-04-probiotics-17",
+      "productName": "프로바이오틱스17",
+      "productNameEn": "Probiotics 17",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp09.json"
+    },
+    {
+      "checkpoint": "C-CP09",
+      "statementNo": "20040020020519",
+      "slug": "c-cp09-05-super-probiotics-19",
+      "productName": "슈퍼프로바이오틱스19",
+      "productNameEn": "Super Probiotics 19",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp09.json"
+    },
+    {
+      "checkpoint": "C-CP09",
+      "statementNo": "20180012174475",
+      "slug": "c-cp09-06-harutin-probiotics-alpa",
+      "productName": "하루틴 유산균 알파α",
+      "productNameEn": "Harutin Probiotics Alpaα",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp09.json"
+    },
+    {
+      "checkpoint": "C-CP09",
+      "statementNo": "200700170352359",
+      "slug": "c-cp09-07-alroebaiotikseu",
+      "productName": "알로에바이오틱스",
+      "productNameEn": "Alroebaiotikseu",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp09.json"
+    },
+    {
+      "checkpoint": "C-CP09",
+      "statementNo": "20040020020586",
+      "slug": "c-cp09-08-dinobo-peurojenikseu",
+      "productName": "디노보 프로제닉스",
+      "productNameEn": "Dinobo Peurojenikseu",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp09.json"
+    },
+    {
+      "checkpoint": "C-CP09",
+      "statementNo": "20180012174478",
+      "slug": "c-cp09-09-aihilseu-probiotics",
+      "productName": "아이힐스 유산균",
+      "productNameEn": "Aihilseu Probiotics",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp09.json"
+    },
+    {
+      "checkpoint": "C-CP09",
+      "statementNo": "200700170352376",
+      "slug": "c-cp09-10-teuraenjit-10-billion-probio",
+      "productName": "트랜짓 100억 유산균",
+      "productNameEn": "Teuraenjit 10 Billion Probiotics",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp09.json"
+    },
+    {
+      "checkpoint": "C-CP09",
+      "statementNo": "20040020020619",
+      "slug": "c-cp09-11-balance-probiotics-premium-p",
+      "productName": "밸런스 프로바이오틱스 프리미엄 유산균 17",
+      "productNameEn": "Balance Probiotics Premium Probiotics 17",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp09.json"
+    },
+    {
+      "checkpoint": "C-CP09",
+      "statementNo": "20180012174480",
+      "slug": "c-cp09-12-premium-baio-care-probiotics",
+      "productName": "Premium 바이오케어 프로바이오틱스",
+      "productNameEn": "Premium Baio Care Probiotics",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp09.json"
+    },
+    {
+      "checkpoint": "C-CP09",
+      "statementNo": "200700170352402",
+      "slug": "c-cp09-13-rakto-solrusyeon-probiotics-",
+      "productName": "락토:솔루션 유산균 순 PURE",
+      "productNameEn": "Rakto:Solrusyeon Probiotics Sun PURE",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp09.json"
+    },
+    {
+      "checkpoint": "C-CP09",
+      "statementNo": "20040020020687",
+      "slug": "c-cp09-14-probiotics-balance-17",
+      "productName": "프로바이오틱스 밸런스 17",
+      "productNameEn": "Probiotics Balance 17",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp09.json"
+    },
+    {
+      "checkpoint": "C-CP09",
+      "statementNo": "20180012174482",
+      "slug": "c-cp09-15-gut-health-peurojekteu-365-b",
+      "productName": "장건강 프로젝트 365 비피더스 유산균 100억",
+      "productNameEn": "Gut Health Peurojekteu 365 Bifidus Probiotics 10 Billion",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp09.json"
+    },
+    {
+      "checkpoint": "C-CP09",
+      "statementNo": "200700170352451",
+      "slug": "c-cp09-16-yeoeseudeo-probiotics-raktoj",
+      "productName": "여에스더 유산균 락토지지(Lacto. GG)",
+      "productNameEn": "Lacto. GG",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp09.json"
+    },
+    {
+      "checkpoint": "C-CP09",
+      "statementNo": "20040020020699",
+      "slug": "c-cp09-17-ajenda-family-probiotics",
+      "productName": "아젠다 패밀리 프로바이오틱스",
+      "productNameEn": "Ajenda Family Probiotics",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp09.json"
+    },
+    {
+      "checkpoint": "C-CP09",
+      "statementNo": "20180012174483",
+      "slug": "c-cp09-18-10-billion-saeng-probiotics-",
+      "productName": "100억 생 유산균 비피더스 락토 프로바이오틱스",
+      "productNameEn": "10 Billion Saeng Probiotics Bifidus Rakto Probiotics",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp09.json"
+    },
+    {
+      "checkpoint": "C-CP09",
+      "statementNo": "200700170352505",
+      "slug": "c-cp09-19-hy-probiotics-balance",
+      "productName": "hy 프로바이오틱스 밸런스",
+      "productNameEn": "Hy Probiotics Balance",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp09.json"
+    },
+    {
+      "checkpoint": "C-CP09",
+      "statementNo": "20040020020701",
+      "slug": "c-cp09-20-w-deobeulyu-probiotics",
+      "productName": "W(더블유) 프로바이오틱스",
+      "productNameEn": "W Probiotics",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp09.json"
+    },
+    {
+      "checkpoint": "C-CP10",
+      "statementNo": "20180012174484",
+      "slug": "c-cp10-01-barobaiotikseu-10-billion",
+      "productName": "바로바이오틱스 100억",
+      "productNameEn": "Barobaiotikseu 10 Billion",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp10.json"
+    },
+    {
+      "checkpoint": "C-CP10",
+      "statementNo": "200700170352597",
+      "slug": "c-cp10-02-wonpeodei-premium-probiotics",
+      "productName": "원퍼데이 프리미엄 프로바이오틱스",
+      "productNameEn": "Wonpeodei Premium Probiotics",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp10.json"
+    },
+    {
+      "checkpoint": "C-CP10",
+      "statementNo": "20040020020704",
+      "slug": "c-cp10-03-ssideumong-probiotics-10-bil",
+      "productName": "씨드몽 프로바이오틱스 100억",
+      "productNameEn": "Ssideumong Probiotics 10 Billion",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp10.json"
+    },
+    {
+      "checkpoint": "C-CP10",
+      "statementNo": "20180012174485",
+      "slug": "c-cp10-04-raktojigu-probiotics",
+      "productName": "락토지구 프로바이오틱스",
+      "productNameEn": "Raktojigu Probiotics",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp10.json"
+    },
+    {
+      "checkpoint": "C-CP10",
+      "statementNo": "200700170352620",
+      "slug": "c-cp10-05-saieonseu-koeo-probiotics-yg",
+      "productName": "사이언스 코어 유산균 YG",
+      "productNameEn": "Saieonseu Koeo Probiotics YG",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp10.json"
+    },
+    {
+      "checkpoint": "C-CP10",
+      "statementNo": "20040020020708",
+      "slug": "c-cp10-06-super-probiotics-koeo",
+      "productName": "슈퍼 프로바이오틱스 코어",
+      "productNameEn": "Super Probiotics Koeo",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp10.json"
+    },
+    {
+      "checkpoint": "C-CP10",
+      "statementNo": "20180012174496",
+      "slug": "c-cp10-07-rabisen-syupeurim-peureswi",
+      "productName": "라비센 슈프림 프레쉬",
+      "productNameEn": "Rabisen Syupeurim Peureswi",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp10.json"
+    },
+    {
+      "checkpoint": "C-CP10",
+      "statementNo": "200700170352644",
+      "slug": "c-cp10-08-dr-probiotics-solrusyeon-sum",
+      "productName": "닥터. 유산균 솔루션 숨쉬는 N",
+      "productNameEn": "Dr. . Probiotics Solrusyeon Sumswineun N",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp10.json"
+    },
+    {
+      "checkpoint": "C-CP10",
+      "statementNo": "20040020020709",
+      "slug": "c-cp10-09-probiotics-probiotics-19",
+      "productName": "프로바이오틱스 유산균 19",
+      "productNameEn": "Probiotics Probiotics 19",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp10.json"
+    },
+    {
+      "checkpoint": "C-CP10",
+      "statementNo": "201800121745",
+      "slug": "c-cp10-10-rakto-probiotics-5-billion-b",
+      "productName": "락토 프로바이오틱스 50억 분말",
+      "productNameEn": "Rakto Probiotics 5 Billion Bunmal",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp10.json"
+    },
+    {
+      "checkpoint": "C-CP10",
+      "statementNo": "200700170352744",
+      "slug": "c-cp10-11-deobeulpit-probiotics",
+      "productName": "더블핏 프로바이오틱스",
+      "productNameEn": "Deobeulpit Probiotics",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp10.json"
+    },
+    {
+      "checkpoint": "C-CP10",
+      "statementNo": "20040020020713",
+      "slug": "c-cp10-12-wonbaio",
+      "productName": "원바이오",
+      "productNameEn": "Wonbaio",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp10.json"
+    },
+    {
+      "checkpoint": "C-CP10",
+      "statementNo": "20180012174506",
+      "slug": "c-cp10-13-10-billion-live-probiotics-b",
+      "productName": "100억 생유산균 비피더스 프로바이오틱스 장용성캡슐",
+      "productNameEn": "10 Billion Live Probiotics Bifidus Probiotics Gut Yongseong Capsule",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp10.json"
+    },
+    {
+      "checkpoint": "C-CP10",
+      "statementNo": "200700170352749",
+      "slug": "c-cp10-14-dr-probiotics-solrusyeon-10-",
+      "productName": "닥터. 유산균 솔루션 100억",
+      "productNameEn": "Dr. . Probiotics Solrusyeon 10 Billion",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp10.json"
+    },
+    {
+      "checkpoint": "C-CP10",
+      "statementNo": "20040020020717",
+      "slug": "c-cp10-15-meolti-probiotics-live-probi",
+      "productName": "멀티 프로바이오틱스 생유산균",
+      "productNameEn": "Meolti Probiotics Live Probiotics",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp10.json"
+    },
+    {
+      "checkpoint": "C-CP10",
+      "statementNo": "20180012174513",
+      "slug": "c-cp10-16-bifidus-yuhan-live-probiotic",
+      "productName": "비피더스 유한 생유산균 캡슐",
+      "productNameEn": "Bifidus Yuhan Live Probiotics Capsule",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp10.json"
+    },
+    {
+      "checkpoint": "C-CP10",
+      "statementNo": "200700170352772",
+      "slug": "c-cp10-17-sagwamat-toktok-probiotics",
+      "productName": "사과맛 톡톡 유산균",
+      "productNameEn": "Sagwamat Toktok Probiotics",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp10.json"
+    },
+    {
+      "checkpoint": "C-CP10",
+      "statementNo": "20040020020718",
+      "slug": "c-cp10-18-eitosolrusyeon-5-billion-pro",
+      "productName": "에이토솔루션 50억 프로바이오틱스",
+      "productNameEn": "Eitosolrusyeon 5 Billion Probiotics",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp10.json"
+    },
+    {
+      "checkpoint": "C-CP10",
+      "statementNo": "20180012174514",
+      "slug": "c-cp10-19-santteuthaejil-yuhan-live-pr",
+      "productName": "산뜻해질 유한 생유산균 캡슐",
+      "productNameEn": "Santteuthaejil Yuhan Live Probiotics Capsule",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp10.json"
+    },
+    {
+      "checkpoint": "C-CP10",
+      "statementNo": "200700170352782",
+      "slug": "c-cp10-20-gut-kwaehan-haru",
+      "productName": "장쾌한 하루",
+      "productNameEn": "Gut Kwaehan Haru",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp10.json"
+    },
+    {
+      "checkpoint": "C-CP11",
+      "statementNo": "20040020020766",
+      "slug": "c-cp11-01-ongajok-live-probiotics-gold",
+      "productName": "온가족 생유산균 골드",
+      "productNameEn": "Ongajok Live Probiotics Gold",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp11.json"
+    },
+    {
+      "checkpoint": "C-CP11",
+      "statementNo": "20180012174515",
+      "slug": "c-cp11-02-raktobelra",
+      "productName": "락토벨라",
+      "productNameEn": "Raktobelra",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp11.json"
+    },
+    {
+      "checkpoint": "C-CP11",
+      "statementNo": "200700170352817",
+      "slug": "c-cp11-03-10-billion-probiotics-abc",
+      "productName": "100억 유산균 ABC",
+      "productNameEn": "10 Billion Probiotics ABC",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp11.json"
+    },
+    {
+      "checkpoint": "C-CP11",
+      "statementNo": "20040020020852",
+      "slug": "c-cp11-04-super-probiotics-19-plus",
+      "productName": "슈퍼 프로바이오틱스19 플러스",
+      "productNameEn": "Super Probiotics 19 Plus",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp11.json"
+    },
+    {
+      "checkpoint": "C-CP11",
+      "statementNo": "20180012174523",
+      "slug": "c-cp11-05-eiem-ineopit-probiotics",
+      "productName": "에이엠 이너핏 유산균",
+      "productNameEn": "Eiem Ineopit Probiotics",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp11.json"
+    },
+    {
+      "checkpoint": "C-CP11",
+      "statementNo": "20040020020853",
+      "slug": "c-cp11-07-ajenda-jideobeulyuel-probiot",
+      "productName": "아젠다 지더블유엘 프로바이오틱스",
+      "productNameEn": "Ajenda Jideobeulyuel Probiotics",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp11.json"
+    },
+    {
+      "checkpoint": "C-CP11",
+      "statementNo": "20180012174526",
+      "slug": "c-cp11-08-ongajok-olinwon-saeng-probio",
+      "productName": "온가족 올인원 생 유산균",
+      "productNameEn": "Ongajok Olinwon Saeng Probiotics",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp11.json"
+    },
+    {
+      "checkpoint": "C-CP11",
+      "statementNo": "200700170352879",
+      "slug": "c-cp11-09-deipeuroba",
+      "productName": "데이프로바",
+      "productNameEn": "Deipeuroba",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp11.json"
+    },
+    {
+      "checkpoint": "C-CP11",
+      "statementNo": "20040020020890",
+      "slug": "c-cp11-10-nau-care-live-probiotics-pro",
+      "productName": "나우케어 생유산균 프로바이오틱스",
+      "productNameEn": "Nau Care Live Probiotics Probiotics",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp11.json"
+    },
+    {
+      "checkpoint": "C-CP11",
+      "statementNo": "2018001217464",
+      "slug": "c-cp11-11-ua-dr-probiotics-pomyulreo",
+      "productName": "우아닥터 유산균 포뮬러",
+      "productNameEn": "Ua Dr. Probiotics Pomyulreo",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp11.json"
+    },
+    {
+      "checkpoint": "C-CP11",
+      "statementNo": "200700170352886",
+      "slug": "c-cp11-12-wonpeodei-premium-probiotics",
+      "productName": "원퍼데이 프리미엄 프로바이오틱스 소프트",
+      "productNameEn": "Wonpeodei Premium Probiotics Sopeuteu",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp11.json"
+    },
+    {
+      "checkpoint": "C-CP11",
+      "statementNo": "20040020020895",
+      "slug": "c-cp11-13-deobeulyu-10eok-probiotics",
+      "productName": "더블유 10억 유산균",
+      "productNameEn": "Deobeulyu 10eok Probiotics",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp11.json"
+    },
+    {
+      "checkpoint": "C-CP11",
+      "statementNo": "2018001217472",
+      "slug": "c-cp11-14-jeil-waiy-probiotics",
+      "productName": "제일 와이Y 유산균",
+      "productNameEn": "Jeil WaiY Probiotics",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp11.json"
+    },
+    {
+      "checkpoint": "C-CP11",
+      "statementNo": "200700170352899",
+      "slug": "c-cp11-15-pyueojen-rakto-bifidus-probi",
+      "productName": "퓨어젠 락토비피더스 유산균",
+      "productNameEn": "Pyueojen Rakto Bifidus Probiotics",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp11.json"
+    },
+    {
+      "checkpoint": "C-CP11",
+      "statementNo": "20040020020913",
+      "slug": "c-cp11-16-10-billion-probiotics-probio",
+      "productName": "100억 유산균 프로바이오틱스",
+      "productNameEn": "10 Billion Probiotics Probiotics",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp11.json"
+    },
+    {
+      "checkpoint": "C-CP11",
+      "statementNo": "201800121749",
+      "slug": "c-cp11-17-probiotics-11",
+      "productName": "프로바이오틱스11",
+      "productNameEn": "Probiotics 11",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp11.json"
+    },
+    {
+      "checkpoint": "C-CP11",
+      "statementNo": "200700170352903",
+      "slug": "c-cp11-18-probio-stick-seu-probiostix",
+      "productName": "프로바이오스틱스 ProbioSTIX",
+      "productNameEn": "Probio Stick Seu ProbioSTIX",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp11.json"
+    },
+    {
+      "checkpoint": "C-CP11",
+      "statementNo": "20040020020916",
+      "slug": "c-cp11-19-ineo-probiotics",
+      "productName": "이너 프로바이오틱스",
+      "productNameEn": "Ineo Probiotics",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp11.json"
+    },
+    {
+      "checkpoint": "C-CP11",
+      "statementNo": "2018001217499",
+      "slug": "c-cp11-20-probiotics-saeng-probiotics-",
+      "productName": "프로바이오틱스 생 유산균12",
+      "productNameEn": "Probiotics Saeng Probiotics 12",
+      "manufacturer": "(주)메디오젠 충주공장",
+      "dataFile": "hff-probiotics-prod-c-cp11.json"
+    },
+    {
+      "checkpoint": "C-CP12",
+      "statementNo": "200700170352938",
+      "slug": "c-cp12-01-baiomera-probiotics",
+      "productName": "바이오메라 프로바이오틱스",
+      "productNameEn": "Baiomera Probiotics",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp12.json"
+    },
+    {
+      "checkpoint": "C-CP12",
+      "statementNo": "200700170353007",
+      "slug": "c-cp12-03-gut-health-probiotics-probio",
+      "productName": "장건강 프로바이오틱스 유산균",
+      "productNameEn": "Gut Health Probiotics Probiotics",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp12.json"
+    },
+    {
+      "checkpoint": "C-CP12",
+      "statementNo": "20040020020967",
+      "slug": "c-cp12-04-raktobiseu",
+      "productName": "락토비스",
+      "productNameEn": "Raktobiseu",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp12.json"
+    },
+    {
+      "checkpoint": "C-CP12",
+      "statementNo": "200700170353059",
+      "slug": "c-cp12-05-chokomat-yuhan-live-probioti",
+      "productName": "초코맛 유한 생유산균 스틱",
+      "productNameEn": "Chokomat Yuhan Live Probiotics Stick",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp12.json"
+    },
+    {
+      "checkpoint": "C-CP12",
+      "statementNo": "20040020020976",
+      "slug": "c-cp12-06-dr-orakeul-premium-probiotic",
+      "productName": "닥터오라클 프리미엄 프로바이오틱스 100억 CFU",
+      "productNameEn": "Dr. Orakeul Premium Probiotics 10 Billion CFU",
+      "manufacturer": "엠에스바이오텍(주)",
+      "dataFile": "hff-probiotics-prod-c-cp12.json"
+    },
+    {
+      "checkpoint": "C-CP12",
+      "statementNo": "200700170353062",
+      "slug": "c-cp12-07-waupap-probiotics",
+      "productName": "와우팝 프로바이오틱스",
+      "productNameEn": "Waupap Probiotics",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp12.json"
+    },
+    {
+      "checkpoint": "C-CP12",
+      "statementNo": "200700170353112",
+      "slug": "c-cp12-08-raktodei-bipit-lactoday-befi",
+      "productName": "락토데이 비핏(LactoDay BEFIT)",
+      "productNameEn": "LactoDay BEFIT",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp12.json"
+    },
+    {
+      "checkpoint": "C-CP12",
+      "statementNo": "200700170353127",
+      "slug": "c-cp12-09-solga-10-billion-probiotics",
+      "productName": "솔가 100억 프로바이오틱스",
+      "productNameEn": "Solga 10 Billion Probiotics",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp12.json"
+    },
+    {
+      "checkpoint": "C-CP12",
+      "statementNo": "20070017035590",
+      "slug": "c-cp12-11-sum-probio-family",
+      "productName": "숨프로바이오 패밀리",
+      "productNameEn": "Sum Probio Family",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp12.json"
+    },
+    {
+      "checkpoint": "C-CP12",
+      "statementNo": "20070017035795",
+      "slug": "c-cp12-14-probio-nik-plus-probionic-pl",
+      "productName": "프로바이오닉 플러스 (Probionic Plus)",
+      "productNameEn": "Probionic Plus",
+      "manufacturer": "코스맥스엔비티(주)",
+      "dataFile": "hff-probiotics-prod-c-cp12.json"
+    }
+  ]
+}
