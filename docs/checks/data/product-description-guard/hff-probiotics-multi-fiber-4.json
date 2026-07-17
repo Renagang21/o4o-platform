@@ -1,0 +1,202 @@
+[
+  {
+    "candidateId": "6b8e0269-bc7c-4bb5-8838-c430c505cc8b",
+    "productName": "쾌변엔 식이섬유 유산균",
+    "productNameEn": "Dietary Fiber Probiotics",
+    "manufacturer": "(주)오투바이오",
+    "manufacturerEn": "O2 Bio",
+    "statementNo": "20130020008439",
+    "category": "hff",
+    "source": {
+      "mainFunction": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음\n\n①배변활동 원활에 도움을 줄 수 있음",
+      "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 황회색의 분말 2. 식이섬유(%) : 표시량[5g/12g]의 80% 이상 3. 프로바이오틱스 수 : 표시량 이상 [10,000,000,000(100억) CFU/12g] 4. 대장균군 : 음성",
+      "intake": "1일 2회, 1회 1포 충분한 물과 함께 섭취하십시오.",
+      "caution": "(가) 질환이 있거나 의약품 복용 시 전문가와 상담할 것 (나) 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음 (다) 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도할 것 (라) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것 · 반드시 충분한 물과 함께 섭취할 것(액상제외)",
+      "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 황회색의 분말",
+      "storage": "직사광선을 피하여 서늘한 곳에 보관하십시오.",
+      "shelfLife": "24개월"
+    },
+    "grounding": {
+      "declaredCfu": {
+        "absolute": 10000000000
+      },
+      "declaredAmount": {
+        "value": 100,
+        "unit": "억 CFU",
+        "basisAmount": 12,
+        "basisUnit": "g"
+      },
+      "serving": {
+        "unitType": "stick",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingsPerDay": 2,
+        "servingTotalWeight": null,
+        "dailyTotalWeight": null
+      },
+      "calculationAllowed": false,
+      "ageBandsRaw": null,
+      "_secondFunctional": {
+        "ingredient": "식이섬유",
+        "declaredLabelAmount": "5g",
+        "basis": "12g",
+        "recognizedFunction": "배변활동 원활"
+      }
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">12g당 100억 CFU 이상</span><span class=\"sd-badge\">식이섬유 5g</span></div>\n  <h1>쾌변엔 식이섬유 유산균<small>프로바이오틱스 + 식이섬유 · 장 건강</small></h1><p class=\"sd-meta\">(주)오투바이오 제조 · 1일 2회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 유산균(프로바이오틱스)과 식이섬유를 함께 담은 장 건강 건강기능식품입니다. 프로바이오틱스는 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있고, 식이섬유는 배변활동 원활에 도움을 줄 수 있습니다. 두 원료 모두 배변활동과 관련된 식약처 인정 기능성 원료입니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>프로바이오틱스 100억 CFU + 식이섬유 5g — 표시 기준 12g 기준</li><li>유산균과 식이섬유가 모두 배변활동 원활에 도움을 줄 수 있는 식약처 인정 기능성 원료</li><li>1일 2회, 1회 1포 · 물과 함께 섭취</li><li>(주)오투바이오 제조 · 건강기능식품</li><li>대장균군 음성 — 식약처 신고 기준 적합</li></ul>\n  <h2>핵심 구성</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">장 건강 기능성</span><h3>프로바이오틱스 100억 CFU</h3><p>표시 기준 12g당 프로바이오틱스 100억 CFU 이상입니다. 프로바이오틱스는 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 기능성 원료입니다.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">배변활동 기능성</span><h3>식이섬유 5g</h3><p>표시 기준 12g당 식이섬유 5g입니다. 식이섬유는 배변활동 원활에 도움을 줄 수 있는 기능성 원료입니다.</p></div></div>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>프로바이오틱스 수</b> 12g당 100억 CFU 이상</div><div class=\"sd-item\"><b>식이섬유</b> 12g당 5g</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 황회색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>배변활동·장 건강을 함께 챙기고 싶은 분</li><li>유산균과 식이섬유를 한 번에 섭취하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+      "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">at least 10 billion CFU per 12 g</span><span class=\"sd-badge\">Dietary fiber 5 g</span></div>\n  <h1>Dietary Fiber Probiotics<small>Probiotics + Dietary fiber · Gut health</small></h1><p class=\"sd-meta\">Made by O2 Bio · 2 times a day, one stick</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This is a gut-health functional food that combines probiotics with dietary fiber. Probiotics are recognized by Korea’s MFDS as an ingredient that may help promote the growth of beneficial bacteria and suppress harmful bacteria, may help with smooth bowel movement, and may help with gut health. Dietary fiber is recognized by the MFDS as an ingredient that may help with smooth bowel movement. Both ingredients relate to smooth bowel movement.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>10 billion CFU of probiotics + 5 g of dietary fiber — per the labelled 12 g basis</li><li>Both probiotics and dietary fiber are MFDS-recognized ingredients that may help with smooth bowel movement</li><li>2 times a day, one stick · with water</li><li>Made by O2 Bio · Health Functional Food</li><li>Coliform negative — meets its MFDS notified standard</li></ul>\n  <h2>Key composition</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">Gut health function</span><h3>Probiotics 10 billion CFU</h3><p>The labelled standard for this product is at least 10 billion CFU of probiotics per 12 g. Probiotics are recognized by Korea’s MFDS as an ingredient that may help promote the growth of beneficial bacteria and suppress harmful bacteria, may help with smooth bowel movement, and may help with gut health.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">Bowel movement function</span><h3>Dietary fiber 5 g</h3><p>The labelled amount of dietary fiber is 5 g per 12 g. Dietary fiber is recognized by the MFDS as an ingredient that may help with smooth bowel movement.</p></div></div>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Twice a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Probiotic count</b> at least 10 billion CFU per 12 g</div><div class=\"sd-item\"><b>Dietary fiber</b> 5 g per 12 g</div><div class=\"sd-item\"><b>Appearance</b> A powder as officially described</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to look after bowel movement and gut health together</li><li>Those who prefer taking probiotics and dietary fiber in one stick</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children and follow the stated daily intake · Stop use and consult a professional if adverse effects occur</div></div>"
+    }
+  },
+  {
+    "candidateId": "649eaf37-45e3-4cc3-acc5-6e6b507b2af3",
+    "productName": "생유산균화이버",
+    "productNameEn": "Live Probiotics Fiber",
+    "manufacturer": "종근당건강(주)",
+    "manufacturerEn": "Chong Kun Dang Health",
+    "statementNo": "20040020016625",
+    "category": "hff",
+    "source": {
+      "mainFunction": "유산균 증식 및 유해균 억제 · 배변활동 원활에 도움을 줄 수 있음 · 장 건강에 도움을 줄 수 있음\n\n①배변활동 원활에 도움을 줄 수 있음",
+      "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 회황색의 분말 2. 식이섬유 : 표시량(4.0g/6g)의 80% 이상 3. 프로바이오틱스수 : 표시량(1,000,000,000CFU/6g) 이상 4. 대장균군 : 음성",
+      "intake": "1일 1회, 1회 1포를 식전·식후 어느때나 물 200ml 이상에 타서 충분히 섞은 후 섭취하십시오.",
+      "caution": "(가) 질환이 있거나 의약품 복용 시 전문가와 상담할 것 (나) 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음 (다) 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도할 것 (라) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것 (마) 반드시 충분한 물과 함께 섭취할 것 (액상제외)",
+      "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 회황색의 분말",
+      "storage": "직사광선을 받지 않는 서늘한 곳에 보관하여야 한다.",
+      "shelfLife": "15개월"
+    },
+    "grounding": {
+      "declaredCfu": {
+        "absolute": 1000000000
+      },
+      "declaredAmount": {
+        "value": 10,
+        "unit": "억 CFU",
+        "basisAmount": 6,
+        "basisUnit": "g"
+      },
+      "serving": {
+        "unitType": "stick",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingsPerDay": 1,
+        "servingTotalWeight": null,
+        "dailyTotalWeight": null
+      },
+      "calculationAllowed": false,
+      "ageBandsRaw": null,
+      "_secondFunctional": {
+        "ingredient": "식이섬유",
+        "declaredLabelAmount": "4.0g",
+        "basis": "6g",
+        "recognizedFunction": "배변활동 원활"
+      }
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">6g당 10억 CFU 이상</span><span class=\"sd-badge\">식이섬유 4.0g</span></div>\n  <h1>생유산균화이버<small>프로바이오틱스 + 식이섬유 · 장 건강</small></h1><p class=\"sd-meta\">종근당건강(주) 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 유산균(프로바이오틱스)과 식이섬유를 함께 담은 장 건강 건강기능식품입니다. 프로바이오틱스는 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있고, 식이섬유는 배변활동 원활에 도움을 줄 수 있습니다. 두 원료 모두 배변활동과 관련된 식약처 인정 기능성 원료입니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>프로바이오틱스 10억 CFU + 식이섬유 4.0g — 표시 기준 6g 기준</li><li>유산균과 식이섬유가 모두 배변활동 원활에 도움을 줄 수 있는 식약처 인정 기능성 원료</li><li>1일 1회, 1회 1포 · 물에 타서 섭취</li><li>종근당건강(주) 제조 · 건강기능식품</li><li>대장균군 음성 — 식약처 신고 기준 적합</li></ul>\n  <h2>핵심 구성</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">장 건강 기능성</span><h3>프로바이오틱스 10억 CFU</h3><p>표시 기준 6g당 프로바이오틱스 10억 CFU 이상입니다. 프로바이오틱스는 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 기능성 원료입니다.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">배변활동 기능성</span><h3>식이섬유 4.0g</h3><p>표시 기준 6g당 식이섬유 4.0g입니다. 식이섬유는 배변활동 원활에 도움을 줄 수 있는 기능성 원료입니다.</p></div></div>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물에 타서</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>프로바이오틱스 수</b> 6g당 10억 CFU 이상</div><div class=\"sd-item\"><b>식이섬유</b> 6g당 4.0g</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 회황색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 15개월</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>배변활동·장 건강을 함께 챙기고 싶은 분</li><li>물에 타서 마시는 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+      "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">at least 1 billion CFU per 6 g</span><span class=\"sd-badge\">Dietary fiber 4.0 g</span></div>\n  <h1>Live Probiotics Fiber<small>Probiotics + Dietary fiber · Gut health</small></h1><p class=\"sd-meta\">Made by Chong Kun Dang Health · Once a day, one stick</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This is a gut-health functional food that combines probiotics with dietary fiber. Probiotics are recognized by Korea’s MFDS as an ingredient that may help promote the growth of beneficial bacteria and suppress harmful bacteria, may help with smooth bowel movement, and may help with gut health. Dietary fiber is recognized by the MFDS as an ingredient that may help with smooth bowel movement. Both ingredients relate to smooth bowel movement.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>1 billion CFU of probiotics + 4.0 g of dietary fiber — per the labelled 6 g basis</li><li>Both probiotics and dietary fiber are MFDS-recognized ingredients that may help with smooth bowel movement</li><li>Once a day, one stick · dissolved in water</li><li>Made by Chong Kun Dang Health · Health Functional Food</li><li>Coliform negative — meets its MFDS notified standard</li></ul>\n  <h2>Key composition</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">Gut health function</span><h3>Probiotics 1 billion CFU</h3><p>The labelled standard for this product is at least 1 billion CFU of probiotics per 6 g. Probiotics are recognized by Korea’s MFDS as an ingredient that may help promote the growth of beneficial bacteria and suppress harmful bacteria, may help with smooth bowel movement, and may help with gut health.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">Bowel movement function</span><h3>Dietary fiber 4.0 g</h3><p>The labelled amount of dietary fiber is 4.0 g per 6 g. Dietary fiber is recognized by the MFDS as an ingredient that may help with smooth bowel movement.</p></div></div>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">Dissolved in water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Probiotic count</b> at least 1 billion CFU per 6 g</div><div class=\"sd-item\"><b>Dietary fiber</b> 4.0 g per 6 g</div><div class=\"sd-item\"><b>Appearance</b> A powder as officially described</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 15개월</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to look after bowel movement and gut health together</li><li>Those who prefer a drink dissolved in water</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children and follow the stated daily intake · Stop use and consult a professional if adverse effects occur</div></div>"
+    }
+  },
+  {
+    "candidateId": "23a41e02-9e67-44e7-ab5a-bd0b41e81734",
+    "productName": "유지연의 쾌변엔 장 건강",
+    "productNameEn": "Yujiyeon Gut Health Probiotics",
+    "manufacturer": "(주)세종바이오팜",
+    "manufacturerEn": "Sejong Biopharm",
+    "statementNo": "20190009105367",
+    "category": "hff",
+    "source": {
+      "mainFunction": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음\n\n･배변활동 원활에 도움을 줄 수 있음",
+      "baseStandard": "1. 성상: 고유의 향미가 있고, 이미, 이취가 없는 연한 갈색의 분말 2. 프로바이오틱스: 표시량(300,000,000(3억) CFU/6g) 이상 3. 식이섬유: 표시량(3.9g/6g)의 80% 이상 4. 대장균군: 음성",
+      "intake": "1일 1회, 1회 1포를 그대로 혹은 충분한 물과 함께 섭취하십시오.",
+      "caution": "1. 질환이 있거나 의약품 복용 시 전문가와 상담하십시오. 2. 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있습니다. 3. 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도하십시오. 4. 반드시 충분한 물과 함께 섭취하십시오. 5. 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것 6. 섭취량 및 섭취방법을 준수하십시오. 7. 소비기한이 경과한 제품은 섭취하지 마십시오.",
+      "dosageForm": "고유의 향미가 있고, 이미, 이취가 없는 연한 갈색의 분말",
+      "storage": "실온/ 습기가 적고, 직사광선을 받지 않는 서늘한 곳에 보관하십시오. 개봉 후에는 가능한 빨리 섭취하시기 바랍니다.",
+      "shelfLife": "제조일로부터 24개월까지"
+    },
+    "grounding": {
+      "declaredCfu": {
+        "absolute": 300000000
+      },
+      "declaredAmount": {
+        "value": 3,
+        "unit": "억 CFU",
+        "basisAmount": 6,
+        "basisUnit": "g"
+      },
+      "serving": {
+        "unitType": "stick",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingsPerDay": 1,
+        "servingTotalWeight": null,
+        "dailyTotalWeight": null
+      },
+      "calculationAllowed": false,
+      "ageBandsRaw": null,
+      "_secondFunctional": {
+        "ingredient": "식이섬유",
+        "declaredLabelAmount": "3.9g",
+        "basis": "6g",
+        "recognizedFunction": "배변활동 원활"
+      }
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">6g당 3억 CFU 이상</span><span class=\"sd-badge\">식이섬유 3.9g</span></div>\n  <h1>유지연의 쾌변엔 장 건강<small>프로바이오틱스 + 식이섬유 · 장 건강</small></h1><p class=\"sd-meta\">(주)세종바이오팜 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 유산균(프로바이오틱스)과 식이섬유를 함께 담은 장 건강 건강기능식품입니다. 프로바이오틱스는 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있고, 식이섬유는 배변활동 원활에 도움을 줄 수 있습니다. 두 원료 모두 배변활동과 관련된 식약처 인정 기능성 원료입니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>프로바이오틱스 3억 CFU + 식이섬유 3.9g — 표시 기준 6g 기준</li><li>유산균과 식이섬유가 모두 배변활동 원활에 도움을 줄 수 있는 식약처 인정 기능성 원료</li><li>1일 1회, 1회 1포 · 그대로 또는 물과 함께 섭취</li><li>(주)세종바이오팜 제조 · 건강기능식품</li><li>대장균군 음성 — 식약처 신고 기준 적합</li></ul>\n  <h2>핵심 구성</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">장 건강 기능성</span><h3>프로바이오틱스 3억 CFU</h3><p>표시 기준 6g당 프로바이오틱스 3억 CFU 이상입니다. 프로바이오틱스는 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 기능성 원료입니다.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">배변활동 기능성</span><h3>식이섬유 3.9g</h3><p>표시 기준 6g당 식이섬유 3.9g입니다. 식이섬유는 배변활동 원활에 도움을 줄 수 있는 기능성 원료입니다.</p></div></div>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">그대로 또는 물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>프로바이오틱스 수</b> 6g당 3억 CFU 이상</div><div class=\"sd-item\"><b>식이섬유</b> 6g당 3.9g</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고, 이미, 이취가 없는 연한 갈색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>배변활동·장 건강을 함께 챙기고 싶은 분</li><li>그대로 또는 물과 함께 간편하게 섭취하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+      "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">at least 300 million CFU per 6 g</span><span class=\"sd-badge\">Dietary fiber 3.9 g</span></div>\n  <h1>Yujiyeon Gut Health Probiotics<small>Probiotics + Dietary fiber · Gut health</small></h1><p class=\"sd-meta\">Made by Sejong Biopharm · Once a day, one stick</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This is a gut-health functional food that combines probiotics with dietary fiber. Probiotics are recognized by Korea’s MFDS as an ingredient that may help promote the growth of beneficial bacteria and suppress harmful bacteria, may help with smooth bowel movement, and may help with gut health. Dietary fiber is recognized by the MFDS as an ingredient that may help with smooth bowel movement. Both ingredients relate to smooth bowel movement.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>300 million CFU of probiotics + 3.9 g of dietary fiber — per the labelled 6 g basis</li><li>Both probiotics and dietary fiber are MFDS-recognized ingredients that may help with smooth bowel movement</li><li>Once a day, one stick · directly or with water</li><li>Made by Sejong Biopharm · Health Functional Food</li><li>Coliform negative — meets its MFDS notified standard</li></ul>\n  <h2>Key composition</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">Gut health function</span><h3>Probiotics 300 million CFU</h3><p>The labelled standard for this product is at least 300 million CFU of probiotics per 6 g. Probiotics are recognized by Korea’s MFDS as an ingredient that may help promote the growth of beneficial bacteria and suppress harmful bacteria, may help with smooth bowel movement, and may help with gut health.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">Bowel movement function</span><h3>Dietary fiber 3.9 g</h3><p>The labelled amount of dietary fiber is 3.9 g per 6 g. Dietary fiber is recognized by the MFDS as an ingredient that may help with smooth bowel movement.</p></div></div>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">Directly or with water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Probiotic count</b> at least 300 million CFU per 6 g</div><div class=\"sd-item\"><b>Dietary fiber</b> 3.9 g per 6 g</div><div class=\"sd-item\"><b>Appearance</b> A powder as officially described</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to look after bowel movement and gut health together</li><li>Those who want a simple routine, directly or with water</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children and follow the stated daily intake · Stop use and consult a professional if adverse effects occur</div></div>"
+    }
+  },
+  {
+    "candidateId": "1803cf8f-a8e5-41b7-8ae5-0e67a06cd5aa",
+    "productName": "슬림풀 나이트",
+    "productNameEn": "Slimpul Night",
+    "manufacturer": "(주)오투바이오",
+    "manufacturerEn": "O2 Bio",
+    "statementNo": "20130020008478",
+    "category": "hff",
+    "source": {
+      "mainFunction": "① 배변활동 원활에 도움을 줄 수 있음\n\n유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+      "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 흐린 황갈색의 분말 2. 식이섬유 : 표시량 [5g/8g]의 80% 이상 3. 프로바이오틱스 : 표시량 [1,000,000,000(10억)CFU/8g] 이상 4. 대장균군 : 음성",
+      "intake": "1일 1회, 1회 1포를 물에 타서 섭취하십시오.",
+      "caution": "반드시 충분한 물과 함께 섭취할 것(액상제외) (가) 질환이 있거나 의약품 복용 시 전문가와 상담할 것 (나) 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음 (다) 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도할 것 (라) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+      "dosageForm": "고유의 향미가 있고 이미,이취가 없는 흐린 황갈색의 분말",
+      "storage": "직사광선을 피하여 서늘한 곳에 보관하십시오.",
+      "shelfLife": "18개월"
+    },
+    "grounding": {
+      "declaredCfu": {
+        "absolute": 1000000000
+      },
+      "declaredAmount": {
+        "value": 10,
+        "unit": "억 CFU",
+        "basisAmount": 8,
+        "basisUnit": "g"
+      },
+      "serving": {
+        "unitType": "stick",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingsPerDay": 1,
+        "servingTotalWeight": null,
+        "dailyTotalWeight": null
+      },
+      "calculationAllowed": false,
+      "ageBandsRaw": null,
+      "_secondFunctional": {
+        "ingredient": "식이섬유",
+        "declaredLabelAmount": "5g",
+        "basis": "8g",
+        "recognizedFunction": "배변활동 원활"
+      }
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">8g당 10억 CFU 이상</span><span class=\"sd-badge\">식이섬유 5g</span></div>\n  <h1>슬림풀 나이트<small>프로바이오틱스 + 식이섬유 · 장 건강</small></h1><p class=\"sd-meta\">(주)오투바이오 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 유산균(프로바이오틱스)과 식이섬유를 함께 담은 장 건강 건강기능식품입니다. 프로바이오틱스는 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있고, 식이섬유는 배변활동 원활에 도움을 줄 수 있습니다. 두 원료 모두 배변활동과 관련된 식약처 인정 기능성 원료입니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>프로바이오틱스 10억 CFU + 식이섬유 5g — 표시 기준 8g 기준</li><li>유산균과 식이섬유가 모두 배변활동 원활에 도움을 줄 수 있는 식약처 인정 기능성 원료</li><li>1일 1회, 1회 1포 · 물에 타서 섭취</li><li>(주)오투바이오 제조 · 건강기능식품</li><li>대장균군 음성 — 식약처 신고 기준 적합</li></ul>\n  <h2>핵심 구성</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">장 건강 기능성</span><h3>프로바이오틱스 10억 CFU</h3><p>표시 기준 8g당 프로바이오틱스 10억 CFU 이상입니다. 프로바이오틱스는 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 기능성 원료입니다.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">배변활동 기능성</span><h3>식이섬유 5g</h3><p>표시 기준 8g당 식이섬유 5g입니다. 식이섬유는 배변활동 원활에 도움을 줄 수 있는 기능성 원료입니다.</p></div></div>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물에 타서</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>프로바이오틱스 수</b> 8g당 10억 CFU 이상</div><div class=\"sd-item\"><b>식이섬유</b> 8g당 5g</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미,이취가 없는 흐린 황갈색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 18개월</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>배변활동·장 건강을 함께 챙기고 싶은 분</li><li>물에 타서 마시는 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+      "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">at least 1 billion CFU per 8 g</span><span class=\"sd-badge\">Dietary fiber 5 g</span></div>\n  <h1>Slimpul Night<small>Probiotics + Dietary fiber · Gut health</small></h1><p class=\"sd-meta\">Made by O2 Bio · Once a day, one stick</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This is a gut-health functional food that combines probiotics with dietary fiber. Probiotics are recognized by Korea’s MFDS as an ingredient that may help promote the growth of beneficial bacteria and suppress harmful bacteria, may help with smooth bowel movement, and may help with gut health. Dietary fiber is recognized by the MFDS as an ingredient that may help with smooth bowel movement. Both ingredients relate to smooth bowel movement.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>1 billion CFU of probiotics + 5 g of dietary fiber — per the labelled 8 g basis</li><li>Both probiotics and dietary fiber are MFDS-recognized ingredients that may help with smooth bowel movement</li><li>Once a day, one stick · dissolved in water</li><li>Made by O2 Bio · Health Functional Food</li><li>Coliform negative — meets its MFDS notified standard</li></ul>\n  <h2>Key composition</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">Gut health function</span><h3>Probiotics 1 billion CFU</h3><p>The labelled standard for this product is at least 1 billion CFU of probiotics per 8 g. Probiotics are recognized by Korea’s MFDS as an ingredient that may help promote the growth of beneficial bacteria and suppress harmful bacteria, may help with smooth bowel movement, and may help with gut health.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">Bowel movement function</span><h3>Dietary fiber 5 g</h3><p>The labelled amount of dietary fiber is 5 g per 8 g. Dietary fiber is recognized by the MFDS as an ingredient that may help with smooth bowel movement.</p></div></div>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">Dissolved in water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Probiotic count</b> at least 1 billion CFU per 8 g</div><div class=\"sd-item\"><b>Dietary fiber</b> 5 g per 8 g</div><div class=\"sd-item\"><b>Appearance</b> A powder as officially described</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 18개월</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to look after bowel movement and gut health together</li><li>Those who prefer a drink dissolved in water</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children and follow the stated daily intake · Stop use and consult a professional if adverse effects occur</div></div>"
+    }
+  }
+]
